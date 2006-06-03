@@ -1,0 +1,15 @@
+<!-- @version $Id: USA_Illinois_Boone.txt,v 1.1 2005/10/23 22:08:17 roland-d Exp $ -->
+<!-- @see http://www.naco.org/ -->
+Belvidere
+Bonus Township
+Boone Township
+Caledonia Township
+Capron
+Flora Township
+Garden Prairie
+LeRoy Township
+Manchester Township
+North Caledonia
+Poplar Grove Township
+Spring Township
+Timberlane

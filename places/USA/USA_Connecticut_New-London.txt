@@ -1,0 +1,45 @@
+<!-- @version $Id: USA_Connecticut_New-London.txt,v 1.1 2005/10/23 22:08:17 roland-d Exp $ -->
+<!-- @see http://www.naco.org/ -->
+Baltic
+Bozrah
+Colchester
+East Lyme
+Franklin
+Gales Ferry
+Gilman
+Glasgo
+Griswold
+Groton
+Hadlyme
+Hanover
+Jewett City
+Lebanon
+Ledyard
+Lisbon
+Lyme
+Mashantucket
+Montville
+Mystic
+New London
+Niantic
+North Franklin
+North Stonington
+North Westchester
+Norwich
+Oakdale
+Old Lyme
+Old Mystic
+Pawcatuck
+Preston
+Quaker Hill
+Salem
+South Lyme
+Sprague
+Stonington
+Taftville
+Uncasville
+Versailles
+Voluntown
+Waterford
+West Mystic
+Yantic

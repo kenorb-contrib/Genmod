@@ -1,0 +1,21 @@
+User-agent: Googlebot
+Disallow: /calendar.php
+Disallow: /search.php
+Disallow: /placelist.php
+Disallow: /ancestry.php
+Disallow: /pedigree.php
+Disallow: /descendancy.php
+Disallow: /hourglass.php
+Disallow: /aliveinyear.php
+Disallow: /source.php
+Disallow: /sourcelist.php
+Disallow: /reportengine.php
+Disallow: /statistics.php
+Disallow: /patriarchlist.php
+Disallow: /medialist.php
+Disallow: /timeline.php
+Disallow: /relationship.php
+Disallow: /fanchart.php
+
+User-agent: *
+Disallow: /

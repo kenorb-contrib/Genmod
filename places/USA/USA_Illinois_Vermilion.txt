@@ -1,0 +1,41 @@
+<!-- @version $Id: USA_Illinois_Vermilion.txt,v 1.1 2005/10/23 22:08:17 roland-d Exp $ -->
+<!-- @see http://www.naco.org/ -->
+Allerton
+Alvin
+Armstrong
+Belgium
+Bismarck
+Blount Township
+Butler Township
+Carroll Township
+Catlin Township
+Clarence
+Collison
+Danville
+East Lynn
+Elwood Township
+Fairmount
+Fithian
+Georgetown
+Grant Township
+Henning
+Hoopeston
+Indianola
+Jamaica Township
+Love Township
+McKendree Township
+Middlefork Township
+Muncie
+Newell Township
+Oakwood Township
+Pilot Township
+Potomac
+Rankin
+Ridge Farm
+Ross Township
+Rossville
+Sidell Township
+South Ross Township
+Tilton
+Vance Township
+Westville

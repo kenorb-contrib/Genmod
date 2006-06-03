@@ -1,0 +1,45 @@
+<!-- @version $Id: USA_Illinois_Bureau.txt,v 1.1 2005/10/23 22:08:17 roland-d Exp $ -->
+<!-- @see http://www.naco.org/ -->
+Arispie Township
+Arlington
+Berlin Township
+Buda
+Bureau Junction
+Bureau Township
+Cherry
+Clarion Township
+Concord Township
+Dalzell
+De Pue
+Depue
+Dover
+Fairfield Township
+Gold Township
+Greenville Township
+Hall Township
+Hollowayville
+Indiantown Township
+Kasbeer
+La Moille Township
+Ladd
+Leepertown Township
+Macon Township
+Malden
+Manlius Township
+Milo Township
+Mineral
+Neponset Township
+New Bedford
+Normandy
+Ohio Township
+Princeton
+Seatonville
+Selby Township
+Sheffield
+Spring Valley
+Tiskilwa
+Van Orin
+Walnut Township
+Westfield Township
+Wheatland Township
+Wyanet Township

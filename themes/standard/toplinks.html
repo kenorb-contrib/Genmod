@@ -1,0 +1,72 @@
+<?php
+/**
+ * Top menu for Standard theme
+ *
+ * Genmod: Genealogy Viewer
+ * Copyright (C) 2002 to 2003 John Finlay and Others
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+ *
+ * $Id: toplinks.html,v 1.10 2006/03/18 19:28:55 roland-d Exp $
+ *
+ * @package Genmod
+ * @subpackage Themes
+ */
+
+$menubar = new MenuBar();
+?>
+<div style="position: relative; z-index: 100; width: 98%">
+	<img src="<?php print $GM_IMAGE_DIR."/".$GM_IMAGES["hline"]["other"]; ?>" width="99%" height="3" alt="" />
+	<table width="100%">
+		<tr>
+			<td width="10%" valign="top">
+				<?php $menu = $menubar->getGedcomMenu(); $menu->printMenu(); ?>
+			</td>
+			<td width="10%" valign="top">
+				<?php $menu = $menubar->getMygedviewMenu(); $menu->printMenu(); ?>
+			</td>
+				<?php $menu = $menubar->getCustomMenu(); 
+				if (!is_null($menu)) {?>
+					<td width="10%" valign="top">
+					<?php $menu->printMenu(); ?>
+					</td>
+				<?php } ?>
+			<td width="10%" valign="top">
+				<?php $menu = $menubar->getChartsMenu(); $menu->printMenu(); ?>
+			</td>
+			<td width="10%" valign="top">
+				<?php $menu = $menubar->getListsMenu(); $menu->printMenu(); ?>
+			</td>
+			<td width="10%" valign="top">
+				<?php $menu = $menubar->getCalendarMenu(); $menu->printMenu(); ?>
+			</td>
+			<td width="10%" valign="top">
+				<?php $menu = $menubar->getReportsMenu(); $menu->printMenu(); ?>
+			</td>
+			<?php $menu = $menubar->getClippingsMenu(); 
+			if (!is_null($menu)) { ?> 
+			<td width="10%" valign="top"><?php $menu->printMenu(); ?></td>
+			<?php } ?>
+			<td width="10%" valign="top">
+				<?php $menu = $menubar->getSearchMenu(); $menu->printMenu(); ?>
+			</td>
+			<td width="10%" valign="top">
+				<?php $menu = $menubar->getHelpMenu(); $menu->printMenu(); ?>
+			</td>
+		</tr>
+	</table>
+	<img src="<?php print $GM_IMAGE_DIR."/".$GM_IMAGES["hline"]["other"]; ?>" width="99%" height="3" alt="" />
+</div>
+<?php include("accesskeyHeaders.php"); ?>

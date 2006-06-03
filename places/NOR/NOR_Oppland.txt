@@ -1,0 +1,27 @@
+<!-- $Id: NOR_Oppland.txt,v 1.1 2005/10/23 22:06:17 roland-d Exp $ -->
+Dovre
+Etnedal
+Gausdal
+Gjøvik
+Gran
+Jevnaker
+Lesja
+Lillehammer
+Lom
+Lunner
+Nord-Aurdal
+Nord-Fron
+Nordre Land
+Ringebu
+Sel
+Skjåk
+Søndre Land
+Sør-Aurdal
+Sør-Fron
+Vang
+Vestre Slidre
+Vestre Toten
+Vågå
+Østre Toten
+Øyer
+Øystre Slidre

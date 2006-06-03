@@ -1,0 +1,54 @@
+<!-- @version $Id: USA_California_Riverside.txt,v 1.1 2005/10/23 22:08:17 roland-d Exp $ -->
+<!-- @see http://www.naco.org/ -->
+Aguanga
+Anza
+Banning
+Beaumont
+Blythe
+Cabazon
+Calimesa
+Canyon Lake
+Cathedral City
+Cherry Valley
+Chiriaco Summit
+Coachella
+Corona
+Desert Center
+Desert Hot Springs
+Eagle Mountain
+Gilman Hot Springs
+Hemet
+Homeland
+Idyllwild
+Indian Wells
+Indio
+La Quinta
+Lake Elsinore
+Lakeview
+March Air Force Base
+Mecca
+Menifee
+Mira Loma
+Moreno Valley
+Mountain Center
+Murrieta
+Norco
+North Palm Springs
+Nuevo
+Palm Desert
+Palm Springs
+Perris
+Quail Valley
+Rancho Mirage
+Ripley
+Riverside
+Romoland
+Rubidoux
+San Jacinto
+Sun City
+Temecula
+Thermal
+Thousand Palms
+White Water
+Wildomar
+Winchester

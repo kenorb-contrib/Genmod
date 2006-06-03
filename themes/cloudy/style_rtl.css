@@ -1,0 +1,22 @@
+/* styles for rtl
+will be needed to fix some of the RTL theme problems
+*/
+body { 
+	direction: rtl;
+	text-align: right; 
+}
+html          
+{ 
+	direction:rtl;
+    whitespace:normal;
+}
+#footer       
+{ 
+	text-align:center;
+}
+.person_box, .person_boxF, .person_boxNN { text-align:right; }
+.footer {text-align:left; direction:rtl;}
+.image {margin-right:0px; margin-left:15px;}
+#header {width:100%; text-align:right; direction:rtl; caption-side:left; display:table; }
+#index_main_blocks .blockhc { direction:rtl;}
+#index_small_blocks .blockh2 { direction:rtl;}
