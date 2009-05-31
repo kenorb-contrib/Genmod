@@ -1,0 +1,11 @@
+<!-- @version $Id: USA_Alaska_Aleutians_West_Census_Area.txt,v 1.1 2005/10/23 22:08:16 roland-d Exp $ -->
+<!-- @see http://www.naco.org/ -->
+Adak
+Aleutians West Census Area
+Atka
+Dutch Harbor
+Nikolski
+Saint George
+Saint George Island
+Saint Paul
+Unalaska

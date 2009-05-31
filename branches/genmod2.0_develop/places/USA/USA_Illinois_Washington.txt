@@ -1,0 +1,23 @@
+<!-- @version $Id: USA_Illinois_Washington.txt,v 1.1 2005/10/23 22:08:17 roland-d Exp $ -->
+<!-- @see http://www.naco.org/ -->
+Addieville
+Ashley
+Beaucoup Township
+Bolo Township
+Centralia
+Covington Township
+Du Bois Township
+Hoyleton Township
+Irvington Township
+Johannisburg Township
+Lively Grove Township
+Nashville
+New Minden
+Oakdale Township
+Okawville Township
+Pilot Knob Township
+Plum Hill Township
+Radom
+Richview Township
+Venedy
+Wamac
