@@ -1,0 +1,32 @@
+<!-- @version $Id: USA_Illinois_Adams.txt,v 1.1 2005/10/23 22:08:17 roland-d Exp $ -->
+<!-- @see http://www.naco.org/ -->
+Beverly Township
+Burton Township
+Camp Point Township
+Clayton Township
+Coatsburg
+Columbus
+Concord Township
+Ellington Township
+Fall Creek Township
+Fowler
+Gilmer Township
+Golden
+Honey Creek Township
+Houston Township
+Keene Township
+La Prairie
+Liberty Township
+Lima Township
+Loraine
+McKee Township
+Melrose Township
+Mendon Township
+Northeast Township
+Paloma
+Payson Township
+Plainville
+Quincy
+Richfield Township
+Riverside Township
+Ursa Township

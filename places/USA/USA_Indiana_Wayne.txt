@@ -1,0 +1,32 @@
+<!-- @version $Id: USA_Indiana_Wayne.txt,v 1.1 2005/10/23 22:08:18 roland-d Exp $ -->
+<!-- @see http://www.naco.org/ -->
+Abington Township
+Boston Township
+Cambridge City
+Center Township
+Centerville
+Clay Township
+Dalton Township
+Dublin
+East Germantown
+Economy
+Fountain City
+Franklin Township
+Greene Township
+Greens Fork
+Hagerstown
+Harrison Township
+Jackson Township
+Jefferson Township
+Milton
+Mount Auburn
+New Garden Township
+Perry Township
+Pershing
+Richmond
+Spring Grove
+Washington Township
+Wayne Township
+Webster Township
+Whitewater
+Williamsburg

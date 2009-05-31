@@ -1,0 +1,38 @@
+<!-- @version $Id: USA_Oregon.txt,v 1.1 2005/10/23 22:09:29 roland-d Exp $ -->
+<!-- @see http://countyhunter.com/counties.htm -->
+Baker
+Benton
+Clackamas
+Clatsop
+Columbia
+Coos
+Crook
+Curry
+Deschutes
+Douglas
+Gilliam
+Grant
+Harney
+Hood River
+Jackson
+Jefferson
+Josephine
+Klamath
+Lake
+Lane
+Lincoln
+Linn
+Malheur
+Marion
+Morrow
+Multnomah
+Polk
+Sherman
+Tillamook
+Umatilla
+Union
+Wallowa
+Wasco
+Washington
+Wheeler
+Yamhill

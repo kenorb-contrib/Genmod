@@ -1,0 +1,16 @@
+<!-- @version $Id: USA_California_Amador.txt,v 1.1 2005/10/23 22:08:17 roland-d Exp $ -->
+<!-- @see http://www.naco.org/ -->
+Amador City
+Drytown
+Fiddletown
+Ione
+Jackson
+Kit Carson
+Martell
+Mount Aukum
+Pine Grove
+Pioneer
+Plymouth
+River Pines
+Sutter Creek
+Volcano

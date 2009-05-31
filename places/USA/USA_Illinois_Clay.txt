@@ -1,0 +1,18 @@
+<!-- @version $Id: USA_Illinois_Clay.txt,v 1.1 2005/10/23 22:08:17 roland-d Exp $ -->
+<!-- @see http://www.naco.org/ -->
+Bible Grove Township
+Blair Township
+Clay City
+Flora
+Harter Township
+Hoosier Township
+Ingraham
+Iola
+Larkinsburg Township
+Louisville Township
+Oskaloosa Township
+Pixley Township
+Sailor Springs
+Songer Township
+Stanford Township
+Xenia Township

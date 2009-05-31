@@ -1,0 +1,25 @@
+<!-- @version $Id: USA_Indiana_Shelby.txt,v 1.1 2005/10/23 22:08:18 roland-d Exp $ -->
+<!-- @see http://www.naco.org/ -->
+Addison Township
+Boggstown
+Brandywine Township
+Fairland
+Flat Rock
+Fountaintown
+Gwynneville
+Hanover Township
+Hendricks Township
+Jackson Township
+Liberty Township
+Marion Township
+Moral Township
+Morristown
+Noble Township
+Saint Paul
+Shelby Township
+Shelbyville
+Sugar Creek Township
+Union Township
+Van Buren Township
+Waldron
+Washington Township

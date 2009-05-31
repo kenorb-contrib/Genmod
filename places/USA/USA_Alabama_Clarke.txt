@@ -1,0 +1,17 @@
+<!-- @version $Id: USA_Alabama_Clarke.txt,v 1.1 2005/10/23 22:08:16 roland-d Exp $ -->
+<!-- @see http://www.naco.org/ -->
+Allen
+Alma
+Campbell
+Carlton
+Coffeeville
+Dickinson
+Fulton
+Gainestown
+Grove Hill
+Jackson
+Morvin
+Salitpa
+Thomasville
+Walker Springs
+Whatley

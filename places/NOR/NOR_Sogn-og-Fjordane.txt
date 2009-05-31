@@ -1,0 +1,27 @@
+<!-- $Id: NOR_Sogn-og-Fjordane.txt,v 1.1 2005/10/23 22:06:17 roland-d Exp $ -->
+Askvoll
+Aurland
+Balestrand
+Bremanger
+Eid
+Fjaler
+Flora
+Førde
+Gaular
+Gloppen
+Gulen
+Hornindal
+Hyllestad
+Høyanger
+Jølster
+Leikanger
+Luster
+Lærdal
+Naustdal
+Selje
+Sogndal
+Solund
+Stryn
+Vik
+Vågsøy
+Årdal
