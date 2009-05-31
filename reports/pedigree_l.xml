@@ -1,0 +1,567 @@
+<GMReport access="PRIV_PUBLIC" icon="pedigree" type="indi">
+	<!-- $Id: pedigree_l.xml,v 1.6 2009/05/03 12:58:25 sjouke Exp $ -->
+	<GMRTitle><GMRvar var="gm_lang[pedigree_chart]" /> (<GMRvar var="gm_lang[landscape]" />)</GMRTitle>
+	<GMRDescription>Prints a pedigree chart in landscape mode</GMRDescription>
+	<GMRStyle name="header" font="LucidaSansUnicode" size="18" style="" />
+	<GMRStyle name="pagenum" font="LucidaSansUnicode" size="8" style="" />
+	<GMRStyle name="label1" font="LucidaSansUnicode" size="9" style="" />
+	<GMRStyle name="name" font="LucidaSansUnicode" size="9" style="" />
+	<GMRStyle name="text" font="LucidaSansUnicode" size="7" style="" />
+	<GMRInput name="pid" lookup="INDI" type="text" default=""><GMRvar var="gm_lang[enter_pid]" />:</GMRInput>
+	<GMRInput name="showIndID" type="checkbox" default="SHOW_ID_NUMBERS"><GMRvar var="gm_lang[SHOW_ID_NUMBERS]" /></GMRInput>
+	<GMRInput name="showFamID" type="checkbox" default="SHOW_FAM_ID_NUMBERS"><GMRvar var="gm_lang[SHOW_FAM_ID_NUMBERS]" /></GMRInput>
+	<GMRInput name="pageSize" type="select" options="AVAIL_PAGE_SIZES" default="DEFAULT_PAGE_SIZE"><GMRvar var="gm_lang[page_size]" /></GMRInput>
+	<GMRDoc pageSize="$pageSize" orientation="L" margin="24">
+		<GMRHeader>
+			<!-- GMRCell width="0" height="10" align="right" style="pagenum"><GMRvar var="gm_lang[page]" /> <GMRPageNum /> <GMRvar var="gm_lang[of]" /> <GMRTotalPages /> - <GMRNow /></GMRCell -->
+			<GMRTextBox width="50%" height="10" border="0">
+				<GMRText style="pagenum"><GMRNow /></GMRText>
+			</GMRTextBox>
+			<GMRTextBox width="0" height="10" border="0" newline="1">
+				<GMRText style="pagenum" align="right"><GMRvar var="gm_lang[page]" /> <GMRPageNum /> <GMRvar var="gm_lang[of]" /> <GMRTotalPages /></GMRText>
+			</GMRTextBox>
+			<GMRCell width="0" height="20" align="left" style="header"><GMRvar var="gm_lang[pedigree_chart]" /></GMRCell>
+		</GMRHeader>
+		<GMRBody>
+			<GMRLine x1="32" y1="270" x2="210" y2="270" />
+			<GMRLine x1="32" y1="270" x2="32" y2="425" />
+			<GMRLine x1="32" y1="425" x2="210" y2="425" />
+			<GMRLine x1="32" y1="150" x2="32" y2="270" />
+			<GMRLine x1="32" y1="150" x2="210" y2="150" />
+
+			<GMRLine x1="210" y1="95" x2="210" y2="215" />
+			<GMRLine x1="210" y1="335" x2="210" y2="455" />
+			<GMRLine x1="210" y1="95" x2="390" y2="95" />
+			<GMRLine x1="210" y1="215" x2="390" y2="215" />
+			<GMRLine x1="210" y1="335" x2="390" y2="335" />
+			<GMRLine x1="210" y1="455" x2="390" y2="455" />
+
+			<GMRGedcom id="$pid">
+			<GMRTextBox pagecheck="false" width="195" height="10" align="left" left="21" top="258">
+				<GMRText style="label1">1. </GMRText>
+				<GMRText style="name"><GMRGetPersonName id="$pid" truncate="32" /></GMRText>
+			</GMRTextBox>
+			<GMRTextBox pagecheck="false" width="170" height="10" align="left" left="32" top="272">
+				<GMRText style="text"><GMRvarLetter var="factarray[BIRT]" />: <GMRGedcomValue tag="BIRT:DATE" truncate="32" />
+					<br /><GMRvarLetter var="factarray[PLAC]" />: <GMRGedcomValue tag="BIRT:PLAC" truncate="32" />
+					<GMRGedcom id="@FAMS">
+						<br /><GMRvarLetter var="factarray[MARR]" />: <GMRGedcomValue tag="MARR:DATE" truncate="32" /><GMRif condition="$showFamID"> (<GMRGedcomValue tag="@id" />)</GMRif>
+						<br /><GMRvarLetter var="factarray[PLAC]" />: <GMRGedcomValue tag="MARR:PLAC" truncate="32" />
+					</GMRGedcom>
+					<br /><GMRvarLetter var="factarray[DEAT]" />: <GMRGedcomValue tag="DEAT:DATE" truncate="32" />
+					<br /><GMRvarLetter var="factarray[PLAC]" />: <GMRGedcomValue tag="DEAT:PLAC" truncate="32" />
+				</GMRText>
+			</GMRTextBox>
+
+			<GMRTextBox pagecheck="false" width="195" height="10" align="left" left="21" top="138">
+				<GMRText style="label1">2. </GMRText>
+				<GMRText style="name"><GMRGedcom id="@FAMC"><GMRGetPersonName id="@HUSB" truncate="32" /></GMRGedcom></GMRText>
+			</GMRTextBox>
+			<GMRTextBox pagecheck="false" width="170" height="10" align="left" left="32" top="152">
+				<GMRGedcom id="@FAMC:@HUSB">
+					<GMRText style="text"><GMRvarLetter var="factarray[BIRT]" />: <GMRGedcomValue tag="BIRT:DATE" truncate="32" />
+						<br /><GMRvarLetter var="factarray[PLAC]" />: <GMRGedcomValue tag="BIRT:PLAC" truncate="32" />
+						<GMRGedcom id="@FAMS">
+							<br /><GMRvarLetter var="factarray[MARR]" />: <GMRGedcomValue tag="MARR:DATE" truncate="32" /><GMRif condition="$showFamID"> (<GMRGedcomValue tag="@id" />)</GMRif>
+							<br /><GMRvarLetter var="factarray[PLAC]" />: <GMRGedcomValue tag="MARR:PLAC" truncate="32" />
+						</GMRGedcom>
+						<br /><GMRvarLetter var="factarray[DEAT]" />: <GMRGedcomValue tag="DEAT:DATE" truncate="32" />
+						<br /><GMRvarLetter var="factarray[PLAC]" />: <GMRGedcomValue tag="DEAT:PLAC" truncate="32" />
+					</GMRText>
+				</GMRGedcom>
+			</GMRTextBox>
+
+			<GMRTextBox pagecheck="false" width="195" height="10" align="left" left="21" top="413">
+				<GMRText style="label1">3. </GMRText>
+				<GMRText style="name"><GMRGedcom id="@FAMC"><GMRGetPersonName id="@WIFE" truncate="32" /></GMRGedcom></GMRText>
+			</GMRTextBox>
+			<GMRTextBox pagecheck="false" width="170" height="10" align="left" left="32" top="427">
+				<GMRGedcom id="@FAMC:@WIFE">
+					<GMRText style="text"><GMRvarLetter var="factarray[BIRT]" />: <GMRGedcomValue tag="BIRT:DATE" truncate="32" />
+						<br /><GMRvarLetter var="factarray[PLAC]" />: <GMRGedcomValue tag="BIRT:PLAC" truncate="32" />
+						<br /><GMRvarLetter var="factarray[DEAT]" />: <GMRGedcomValue tag="DEAT:DATE" truncate="32" />
+						<br /><GMRvarLetter var="factarray[PLAC]" />: <GMRGedcomValue tag="DEAT:PLAC" truncate="32" />
+					</GMRText>
+				</GMRGedcom>
+			</GMRTextBox>
+
+			<GMRTextBox pagecheck="false" width="195" height="10" align="left" left="199" top="83">
+				<GMRText style="label1">4. </GMRText>
+				<GMRText style="name"><GMRGedcom id="@FAMC:@HUSB:@FAMC"><GMRGetPersonName id="@HUSB" truncate="32" /></GMRGedcom></GMRText>
+			</GMRTextBox>
+			<GMRTextBox pagecheck="false" width="170" height="10" align="left" left="210" top="97">
+				<GMRGedcom id="@FAMC:@HUSB:@FAMC:@HUSB">
+					<GMRText style="text"><GMRvarLetter var="factarray[BIRT]" />: <GMRGedcomValue tag="BIRT:DATE" truncate="32" />
+						<br /><GMRvarLetter var="factarray[PLAC]" />: <GMRGedcomValue tag="BIRT:PLAC" truncate="32" />
+						<GMRGedcom id="@FAMS">
+							<br /><GMRvarLetter var="factarray[MARR]" />: <GMRGedcomValue tag="MARR:DATE" truncate="32" /><GMRif condition="$showFamID"> (<GMRGedcomValue tag="@id" />)</GMRif>
+							<br /><GMRvarLetter var="factarray[PLAC]" />: <GMRGedcomValue tag="MARR:PLAC" truncate="32" />
+						</GMRGedcom>
+						<br /><GMRvarLetter var="factarray[DEAT]" />: <GMRGedcomValue tag="DEAT:DATE" truncate="32" />
+						<br /><GMRvarLetter var="factarray[PLAC]" />: <GMRGedcomValue tag="DEAT:PLAC" truncate="32" />
+					</GMRText>
+				</GMRGedcom>
+			</GMRTextBox>
+
+			<GMRTextBox pagecheck="false" width="195" height="10" align="left" left="199" top="203">
+				<GMRText style="label1">5. </GMRText>
+				<GMRText style="name"><GMRGedcom id="@FAMC:@HUSB:@FAMC"><GMRGetPersonName id="@WIFE" truncate="32" /></GMRGedcom></GMRText>
+			</GMRTextBox>
+			<GMRTextBox pagecheck="false" width="170" height="10" align="left" left="210" top="217">
+				<GMRGedcom id="@FAMC:@HUSB:@FAMC:@WIFE">
+					<GMRText style="text"><GMRvarLetter var="factarray[BIRT]" />: <GMRGedcomValue tag="BIRT:DATE" truncate="32" />
+						<br /><GMRvarLetter var="factarray[PLAC]" />: <GMRGedcomValue tag="BIRT:PLAC" truncate="32" />
+						<br /><GMRvarLetter var="factarray[DEAT]" />: <GMRGedcomValue tag="DEAT:DATE" truncate="32" />
+						<br /><GMRvarLetter var="factarray[PLAC]" />: <GMRGedcomValue tag="DEAT:PLAC" truncate="32" />
+					</GMRText>
+				</GMRGedcom>
+			</GMRTextBox>
+
+
+			<GMRTextBox pagecheck="false" width="195" height="10" align="left" left="199" top="323">
+				<GMRText style="label1">6. </GMRText>
+				<GMRText style="name"><GMRGedcom id="@FAMC:@WIFE:@FAMC"><GMRGetPersonName id="@HUSB" truncate="32" /></GMRGedcom></GMRText>
+			</GMRTextBox>
+			<GMRTextBox pagecheck="false" width="170" height="10" align="left" left="210" top="337">
+				<GMRGedcom id="@FAMC:@WIFE:@FAMC:@HUSB">
+					<GMRText style="text"><GMRvarLetter var="factarray[BIRT]" />: <GMRGedcomValue tag="BIRT:DATE" truncate="32" />
+						<br /><GMRvarLetter var="factarray[PLAC]" />: <GMRGedcomValue tag="BIRT:PLAC" truncate="32" />
+						<GMRGedcom id="@FAMS">
+							<br /><GMRvarLetter var="factarray[MARR]" />: <GMRGedcomValue tag="MARR:DATE" truncate="32" /><GMRif condition="$showFamID"> (<GMRGedcomValue tag="@id" />)</GMRif>
+							<br /><GMRvarLetter var="factarray[PLAC]" />: <GMRGedcomValue tag="MARR:PLAC" truncate="32" />
+						</GMRGedcom>
+						<br /><GMRvarLetter var="factarray[DEAT]" />: <GMRGedcomValue tag="DEAT:DATE" truncate="32" />
+						<br /><GMRvarLetter var="factarray[PLAC]" />: <GMRGedcomValue tag="DEAT:PLAC" truncate="32" />
+					</GMRText>
+				</GMRGedcom>
+			</GMRTextBox>
+
+			<GMRTextBox pagecheck="false" width="195" height="10" align="left" left="199" top="443">
+				<GMRText style="label1">7. </GMRText>
+				<GMRText style="name"><GMRGedcom id="@FAMC:@WIFE:@FAMC"><GMRGetPersonName id="@WIFE" truncate="32" /></GMRGedcom></GMRText>
+			</GMRTextBox>
+			<GMRTextBox pagecheck="false" width="170" height="10" align="left" left="210" top="457">
+				<GMRGedcom id="@FAMC:@WIFE:@FAMC:@WIFE">
+					<GMRText style="text"><GMRvarLetter var="factarray[BIRT]" />: <GMRGedcomValue tag="BIRT:DATE" truncate="32" />
+						<br /><GMRvarLetter var="factarray[PLAC]" />: <GMRGedcomValue tag="BIRT:PLAC" truncate="32" />
+						<br /><GMRvarLetter var="factarray[DEAT]" />: <GMRGedcomValue tag="DEAT:DATE" truncate="32" />
+						<br /><GMRvarLetter var="factarray[PLAC]" />: <GMRGedcomValue tag="DEAT:PLAC" truncate="32" />
+					</GMRText>
+				</GMRGedcom>
+			</GMRTextBox>
+
+
+
+			<GMRLine x1="390" y1="65" x2="390" y2="125" />
+			<GMRLine x1="390" y1="65" x2="570" y2="65" />
+			<GMRLine x1="390" y1="125" x2="570" y2="125" />
+			<GMRTextBox pagecheck="false" width="195" height="10" align="left" left="380" top="53">
+				<GMRText style="label1">8. </GMRText>
+				<GMRText style="name"><GMRGedcom id="@FAMC:@HUSB:@FAMC:@HUSB:@FAMC"><GMRGetPersonName id="@HUSB" truncate="32" /></GMRGedcom></GMRText>
+			</GMRTextBox>
+			<GMRTextBox pagecheck="false" width="170" height="10" align="left" left="390" top="67">
+				<GMRGedcom id="@FAMC:@HUSB:@FAMC:@HUSB:@FAMC:@HUSB">
+					<GMRText style="text"><GMRvarLetter var="factarray[BIRT]" />: <GMRGedcomValue tag="BIRT:DATE" truncate="32" />
+						 <GMRGedcomValue tag="BIRT:PLAC" truncate="32" />
+						<GMRGedcom id="@FAMS">
+							<br /><GMRvarLetter var="factarray[MARR]" />: <GMRGedcomValue tag="MARR:DATE" truncate="32" /><GMRif condition="$showFamID"> (<GMRGedcomValue tag="@id" />)</GMRif>
+							 <GMRGedcomValue tag="MARR:PLAC" truncate="32" />
+						</GMRGedcom>
+						<br /><GMRvarLetter var="factarray[DEAT]" />: <GMRGedcomValue tag="DEAT:DATE" truncate="32" />
+						 <GMRGedcomValue tag="DEAT:PLAC" truncate="32" />
+					</GMRText>
+				</GMRGedcom>
+			</GMRTextBox>
+
+			<GMRTextBox pagecheck="false" width="195" height="10" align="left" left="380" top="113">
+				<GMRText style="label1">9. </GMRText>
+				<GMRText style="name"><GMRGedcom id="@FAMC:@HUSB:@FAMC:@HUSB:@FAMC"><GMRGetPersonName id="@WIFE" truncate="32" /></GMRGedcom></GMRText>
+			</GMRTextBox>
+			<GMRTextBox pagecheck="false" width="170" height="10" align="left" left="390" top="127">
+				<GMRGedcom id="@FAMC:@HUSB:@FAMC:@HUSB:@FAMC:@WIFE">
+					<GMRText style="text"><GMRvarLetter var="factarray[BIRT]" />: <GMRGedcomValue tag="BIRT:DATE" truncate="32" />
+						 <GMRGedcomValue tag="BIRT:PLAC" truncate="32" />
+						<br /><GMRvarLetter var="factarray[DEAT]" />: <GMRGedcomValue tag="DEAT:DATE" truncate="32" />
+						 <GMRGedcomValue tag="DEAT:PLAC" truncate="32" />
+					</GMRText>
+				</GMRGedcom>
+			</GMRTextBox>
+
+			<GMRLine x1="390" y1="185" x2="390" y2="245" />
+			<GMRLine x1="390" y1="185" x2="570" y2="185" />
+			<GMRLine x1="390" y1="245" x2="570" y2="245" />
+			<GMRTextBox pagecheck="false" width="195" height="10" align="left" left="375" top="173">
+				<GMRText style="label1">10. </GMRText>
+				<GMRText style="name"><GMRGedcom id="@FAMC:@HUSB:@FAMC:@WIFE:@FAMC"><GMRGetPersonName id="@HUSB" truncate="32" /></GMRGedcom></GMRText>
+			</GMRTextBox>
+			<GMRTextBox pagecheck="false" width="170" height="10" align="left" left="390" top="187">
+				<GMRGedcom id="@FAMC:@HUSB:@FAMC:@WIFE:@FAMC:@HUSB">
+					<GMRText style="text"><GMRvarLetter var="factarray[BIRT]" />: <GMRGedcomValue tag="BIRT:DATE" truncate="32" />
+						 <GMRGedcomValue tag="BIRT:PLAC" truncate="32" />
+						<GMRGedcom id="@FAMS">
+							<br /><GMRvarLetter var="factarray[MARR]" />: <GMRGedcomValue tag="MARR:DATE" truncate="32" /><GMRif condition="$showFamID"> (<GMRGedcomValue tag="@id" />)</GMRif>
+							 <GMRGedcomValue tag="MARR:PLAC" truncate="32" />
+						</GMRGedcom>
+						<br /><GMRvarLetter var="factarray[DEAT]" />: <GMRGedcomValue tag="DEAT:DATE" truncate="32" />
+						 <GMRGedcomValue tag="DEAT:PLAC" truncate="32" />
+					</GMRText>
+				</GMRGedcom>
+			</GMRTextBox>
+
+			<GMRTextBox pagecheck="false" width="195" height="10" align="left" left="375" top="233">
+				<GMRText style="label1">11. </GMRText>
+				<GMRText style="name"><GMRGedcom id="@FAMC:@HUSB:@FAMC:@WIFE:@FAMC"><GMRGetPersonName id="@WIFE" truncate="32" /></GMRGedcom></GMRText>
+			</GMRTextBox>
+			<GMRTextBox pagecheck="false" width="170" height="10" align="left" left="390" top="247">
+				<GMRGedcom id="@FAMC:@HUSB:@FAMC:@WIFE:@FAMC:@WIFE">
+					<GMRText style="text"><GMRvarLetter var="factarray[BIRT]" />: <GMRGedcomValue tag="BIRT:DATE" truncate="32" />
+						 <GMRGedcomValue tag="BIRT:PLAC" truncate="32" />
+						<br /><GMRvarLetter var="factarray[DEAT]" />: <GMRGedcomValue tag="DEAT:DATE" truncate="32" />
+						 <GMRGedcomValue tag="DEAT:PLAC" truncate="32" />
+					</GMRText>
+				</GMRGedcom>
+			</GMRTextBox>
+
+			<GMRLine x1="390" y1="305" x2="390" y2="365" />
+			<GMRLine x1="390" y1="305" x2="570" y2="305" />
+			<GMRLine x1="390" y1="365" x2="570" y2="365" />
+			<GMRTextBox pagecheck="false" width="195" height="10" align="left" left="375" top="293">
+				<GMRText style="label1">12. </GMRText>
+				<GMRText style="name"><GMRGedcom id="@FAMC:@WIFE:@FAMC:@HUSB:@FAMC"><GMRGetPersonName id="@HUSB" truncate="32" /></GMRGedcom></GMRText>
+			</GMRTextBox>
+			<GMRTextBox pagecheck="false" width="170" height="10" align="left" left="390" top="307">
+				<GMRGedcom id="@FAMC:@WIFE:@FAMC:@HUSB:@FAMC:@HUSB">
+					<GMRText style="text"><GMRvarLetter var="factarray[BIRT]" />: <GMRGedcomValue tag="BIRT:DATE" truncate="32" />
+						 <GMRGedcomValue tag="BIRT:PLAC" truncate="32" />
+						<GMRGedcom id="@FAMS">
+							<br /><GMRvarLetter var="factarray[MARR]" />: <GMRGedcomValue tag="MARR:DATE" truncate="32" /><GMRif condition="$showFamID"> (<GMRGedcomValue tag="@id" />)</GMRif>
+							 <GMRGedcomValue tag="MARR:PLAC" truncate="32" />
+						</GMRGedcom>
+						<br /><GMRvarLetter var="factarray[DEAT]" />: <GMRGedcomValue tag="DEAT:DATE" truncate="32" />
+						 <GMRGedcomValue tag="DEAT:PLAC" truncate="32" />
+					</GMRText>
+				</GMRGedcom>
+			</GMRTextBox>
+
+			<GMRTextBox pagecheck="false" width="195" height="10" align="left" left="375" top="353">
+				<GMRText style="label1">13. </GMRText>
+				<GMRText style="name"><GMRGedcom id="@FAMC:@WIFE:@FAMC:@HUSB:@FAMC"><GMRGetPersonName id="@WIFE" truncate="32" /></GMRGedcom></GMRText>
+			</GMRTextBox>
+			<GMRTextBox pagecheck="false" width="170" height="10" align="left" left="390" top="367">
+				<GMRGedcom id="@FAMC:@WIFE:@FAMC:@HUSB:@FAMC:@WIFE">
+					<GMRText style="text"><GMRvarLetter var="factarray[BIRT]" />: <GMRGedcomValue tag="BIRT:DATE" truncate="32" />
+						 <GMRGedcomValue tag="BIRT:PLAC" truncate="32" />
+						<br /><GMRvarLetter var="factarray[DEAT]" />: <GMRGedcomValue tag="DEAT:DATE" truncate="32" />
+						 <GMRGedcomValue tag="DEAT:PLAC" truncate="32" />
+					</GMRText>
+				</GMRGedcom>
+			</GMRTextBox>
+
+			<GMRLine x1="390" y1="425" x2="390" y2="485" />
+			<GMRLine x1="390" y1="425" x2="570" y2="425" />
+			<GMRLine x1="390" y1="485" x2="570" y2="485" />
+			<GMRTextBox pagecheck="false" width="195" height="10" align="left" left="375" top="413">
+				<GMRText style="label1">14. </GMRText>
+				<GMRText style="name"><GMRGedcom id="@FAMC:@WIFE:@FAMC:@WIFE:@FAMC"><GMRGetPersonName id="@HUSB" truncate="32" /></GMRGedcom></GMRText>
+			</GMRTextBox>
+			<GMRTextBox pagecheck="false" width="170" height="10" align="left" left="390" top="427">
+				<GMRGedcom id="@FAMC:@WIFE:@FAMC:@WIFE:@FAMC:@HUSB">
+					<GMRText style="text"><GMRvarLetter var="factarray[BIRT]" />: <GMRGedcomValue tag="BIRT:DATE" truncate="32" />
+						 <GMRGedcomValue tag="BIRT:PLAC" truncate="32" />
+						<GMRGedcom id="@FAMS">
+							<br /><GMRvarLetter var="factarray[MARR]" />: <GMRGedcomValue tag="MARR:DATE" truncate="32" /><GMRif condition="$showFamID"> (<GMRGedcomValue tag="@id" />)</GMRif>
+							 <GMRGedcomValue tag="MARR:PLAC" truncate="32" />
+						</GMRGedcom>
+						<br /><GMRvarLetter var="factarray[DEAT]" />: <GMRGedcomValue tag="DEAT:DATE" truncate="32" />
+						 <GMRGedcomValue tag="DEAT:PLAC" truncate="32" />
+					</GMRText>
+				</GMRGedcom>
+			</GMRTextBox>
+
+			<GMRTextBox pagecheck="false" width="195" height="10" align="left" left="375" top="473">
+				<GMRText style="label1">15. </GMRText>
+				<GMRText style="name"><GMRGedcom id="@FAMC:@WIFE:@FAMC:@WIFE:@FAMC"><GMRGetPersonName id="@WIFE" truncate="32" /></GMRGedcom></GMRText>
+			</GMRTextBox>
+			<GMRTextBox pagecheck="false" width="170" height="10" align="left" left="390" top="487">
+				<GMRGedcom id="@FAMC:@WIFE:@FAMC:@WIFE:@FAMC:@WIFE">
+					<GMRText style="text"><GMRvarLetter var="factarray[BIRT]" />: <GMRGedcomValue tag="BIRT:DATE" truncate="32" />
+						 <GMRGedcomValue tag="BIRT:PLAC" truncate="32" />
+						<br /><GMRvarLetter var="factarray[DEAT]" />: <GMRGedcomValue tag="DEAT:DATE" truncate="32" />
+						 <GMRGedcomValue tag="DEAT:PLAC" truncate="32" />
+					</GMRText>
+				</GMRGedcom>
+			</GMRTextBox>
+
+
+
+			<GMRLine x1="570" y1="50" x2="570" y2="80" />
+			<GMRLine x1="570" y1="50" x2="750" y2="50" />
+			<GMRLine x1="570" y1="80" x2="750" y2="80" />
+			<GMRTextBox pagecheck="false" width="195" height="10" align="left" left="554" top="38">
+				<GMRText style="label1">16. </GMRText>
+				<GMRText style="name"><GMRGedcom id="@FAMC:@HUSB:@FAMC:@HUSB:@FAMC:@HUSB:@FAMC"><GMRGetPersonName id="@HUSB" truncate="34" /></GMRGedcom></GMRText>
+			</GMRTextBox>
+			<GMRTextBox pagecheck="false" width="195" height="10" align="left" left="570" top="50">
+				<GMRGedcom id="@FAMC:@HUSB:@FAMC:@HUSB:@FAMC:@HUSB:@FAMC:@HUSB">
+					<GMRText style="text"><GMRvarLetter var="factarray[BIRT]" />: <GMRGedcomValue tag="BIRT:DATE" truncate="20" />
+						  <GMRvarLetter var="factarray[DEAT]" />: <GMRGedcomValue tag="DEAT:DATE" truncate="20" />
+						<GMRGedcom id="@FAMS">
+							<br /><GMRvarLetter var="factarray[MARR]" />: <GMRGedcomValue tag="MARR:DATE" truncate="20" /><GMRif condition="$showFamID"> (<GMRGedcomValue tag="@id" />)</GMRif>
+						</GMRGedcom>
+					</GMRText>
+				</GMRGedcom>
+			</GMRTextBox>
+
+			<GMRTextBox pagecheck="false" width="195" height="10" align="left" left="554" top="68">
+				<GMRText style="label1">17. </GMRText>
+				<GMRText style="name"><GMRGedcom id="@FAMC:@HUSB:@FAMC:@HUSB:@FAMC:@HUSB:@FAMC"><GMRGetPersonName id="@WIFE" truncate="34" /></GMRGedcom></GMRText>
+			</GMRTextBox>
+			<GMRTextBox pagecheck="false" width="195" height="10" align="left" left="570" top="82">
+				<GMRGedcom id="@FAMC:@HUSB:@FAMC:@HUSB:@FAMC:@HUSB:@FAMC:@WIFE">
+					<GMRText style="text"><GMRvarLetter var="factarray[BIRT]" />: <GMRGedcomValue tag="BIRT:DATE" truncate="20" />
+						  <GMRvarLetter var="factarray[DEAT]" />: <GMRGedcomValue tag="DEAT:DATE" truncate="20" />
+					</GMRText>
+				</GMRGedcom>
+			</GMRTextBox>
+
+			<GMRLine x1="570" y1="110" x2="570" y2="140" />
+			<GMRLine x1="570" y1="110" x2="750" y2="110" />
+			<GMRLine x1="570" y1="140" x2="750" y2="140" />
+			<GMRTextBox pagecheck="false" width="195" height="10" align="left" left="554" top="98">
+				<GMRText style="label1">18. </GMRText>
+				<GMRText style="name"><GMRGedcom id="@FAMC:@HUSB:@FAMC:@HUSB:@FAMC:@WIFE:@FAMC"><GMRGetPersonName id="@HUSB" truncate="34" /></GMRGedcom></GMRText>
+			</GMRTextBox>
+			<GMRTextBox pagecheck="false" width="195" height="10" align="left" left="570" top="112">
+				<GMRGedcom id="@FAMC:@HUSB:@FAMC:@HUSB:@FAMC:@WIFE:@FAMC:@HUSB">
+					<GMRText style="text"><GMRvarLetter var="factarray[BIRT]" />: <GMRGedcomValue tag="BIRT:DATE" truncate="20" />
+						  <GMRvarLetter var="factarray[DEAT]" />: <GMRGedcomValue tag="DEAT:DATE" truncate="20" />
+						<GMRGedcom id="@FAMS">
+							<br /><GMRvarLetter var="factarray[MARR]" />: <GMRGedcomValue tag="MARR:DATE" truncate="20" /><GMRif condition="$showFamID"> (<GMRGedcomValue tag="@id" />)</GMRif>
+						</GMRGedcom>
+					</GMRText>
+				</GMRGedcom>
+			</GMRTextBox>
+
+			<GMRTextBox pagecheck="false" width="195" height="10" align="left" left="554" top="129">
+				<GMRText style="label1">19. </GMRText>
+				<GMRText style="name"><GMRGedcom id="@FAMC:@HUSB:@FAMC:@HUSB:@FAMC:@WIFE:@FAMC"><GMRGetPersonName id="@WIFE" truncate="34" /></GMRGedcom></GMRText>
+			</GMRTextBox>
+			<GMRTextBox pagecheck="false" width="195" height="10" align="left" left="570" top="142">
+				<GMRGedcom id="@FAMC:@HUSB:@FAMC:@HUSB:@FAMC:@WIFE:@FAMC:@WIFE">
+					<GMRText style="text"><GMRvarLetter var="factarray[BIRT]" />: <GMRGedcomValue tag="BIRT:DATE" truncate="20" />
+						  <GMRvarLetter var="factarray[DEAT]" />: <GMRGedcomValue tag="DEAT:DATE" truncate="20" />
+					</GMRText>
+				</GMRGedcom>
+			</GMRTextBox>
+
+			<GMRLine x1="570" y1="170" x2="570" y2="200" />
+			<GMRLine x1="570" y1="170" x2="750" y2="170" />
+			<GMRLine x1="570" y1="200" x2="750" y2="200" />
+			<GMRTextBox pagecheck="false" width="195" height="10" align="left" left="554" top="158">
+				<GMRText style="label1">20. </GMRText>
+				<GMRText style="name"><GMRGedcom id="@FAMC:@HUSB:@FAMC:@WIFE:@FAMC:@HUSB:@FAMC"><GMRGetPersonName id="@HUSB" truncate="34" /></GMRGedcom></GMRText>
+			</GMRTextBox>
+			<GMRTextBox pagecheck="false" width="195" height="10" align="left" left="570" top="172">
+				<GMRGedcom id="@FAMC:@HUSB:@FAMC:@WIFE:@FAMC:@HUSB:@FAMC:@HUSB">
+					<GMRText style="text"><GMRvarLetter var="factarray[BIRT]" />: <GMRGedcomValue tag="BIRT:DATE" truncate="20" />
+						  <GMRvarLetter var="factarray[DEAT]" />: <GMRGedcomValue tag="DEAT:DATE" truncate="20" />
+						<GMRGedcom id="@FAMS">
+							<br /><GMRvarLetter var="factarray[MARR]" />: <GMRGedcomValue tag="MARR:DATE" truncate="20" /><GMRif condition="$showFamID"> (<GMRGedcomValue tag="@id" />)</GMRif>
+						</GMRGedcom>
+					</GMRText>
+				</GMRGedcom>
+			</GMRTextBox>
+
+			<GMRTextBox pagecheck="false" width="195" height="10" align="left" left="554" top="189">
+				<GMRText style="label1">21. </GMRText>
+				<GMRText style="name"><GMRGedcom id="@FAMC:@HUSB:@FAMC:@WIFE:@FAMC:@HUSB:@FAMC"><GMRGetPersonName id="@WIFE" truncate="34" /></GMRGedcom></GMRText>
+			</GMRTextBox>
+			<GMRTextBox pagecheck="false" width="195" height="10" align="left" left="570" top="202">
+				<GMRGedcom id="@FAMC:@HUSB:@FAMC:@WIFE:@FAMC:@HUSB:@FAMC:@WIFE">
+					<GMRText style="text"><GMRvarLetter var="factarray[BIRT]" />: <GMRGedcomValue tag="BIRT:DATE" truncate="20" />
+						  <GMRvarLetter var="factarray[DEAT]" />: <GMRGedcomValue tag="DEAT:DATE" truncate="20" />
+					</GMRText>
+				</GMRGedcom>
+			</GMRTextBox>
+
+			<GMRLine x1="570" y1="230" x2="570" y2="260" />
+			<GMRLine x1="570" y1="230" x2="750" y2="230" />
+			<GMRLine x1="570" y1="260" x2="750" y2="260" />
+			<GMRTextBox pagecheck="false" width="195" height="10" align="left" left="554" top="218">
+				<GMRText style="label1">22. </GMRText>
+				<GMRText style="name"><GMRGedcom id="@FAMC:@HUSB:@FAMC:@WIFE:@FAMC:@WIFE:@FAMC"><GMRGetPersonName id="@HUSB" truncate="34" /></GMRGedcom></GMRText>
+			</GMRTextBox>
+			<GMRTextBox pagecheck="false" width="195" height="10" align="left" left="570" top="232">
+				<GMRGedcom id="@FAMC:@HUSB:@FAMC:@WIFE:@FAMC:@WIFE:@FAMC:@HUSB">
+					<GMRText style="text"><GMRvarLetter var="factarray[BIRT]" />: <GMRGedcomValue tag="BIRT:DATE" truncate="20" />
+						  <GMRvarLetter var="factarray[DEAT]" />: <GMRGedcomValue tag="DEAT:DATE" truncate="20" />
+						<GMRGedcom id="@FAMS">
+							<br /><GMRvarLetter var="factarray[MARR]" />: <GMRGedcomValue tag="MARR:DATE" truncate="20" /><GMRif condition="$showFamID"> (<GMRGedcomValue tag="@id" />)</GMRif>
+						</GMRGedcom>
+					</GMRText>
+				</GMRGedcom>
+			</GMRTextBox>
+
+			<GMRTextBox pagecheck="false" width="195" height="10" align="left" left="554" top="249">
+				<GMRText style="label1">23. </GMRText>
+				<GMRText style="name"><GMRGedcom id="@FAMC:@HUSB:@FAMC:@WIFE:@FAMC:@WIFE:@FAMC"><GMRGetPersonName id="@WIFE" truncate="34" /></GMRGedcom></GMRText>
+			</GMRTextBox>
+			<GMRTextBox pagecheck="false" width="195" height="10" align="left" left="570" top="262">
+				<GMRGedcom id="@FAMC:@HUSB:@FAMC:@WIFE:@FAMC:@WIFE:@FAMC:@WIFE">
+					<GMRText style="text"><GMRvarLetter var="factarray[BIRT]" />: <GMRGedcomValue tag="BIRT:DATE" truncate="20" />
+						  <GMRvarLetter var="factarray[DEAT]" />: <GMRGedcomValue tag="DEAT:DATE" truncate="20" />
+					</GMRText>
+				</GMRGedcom>
+			</GMRTextBox>
+
+			<GMRLine x1="570" y1="290" x2="570" y2="320" />
+			<GMRLine x1="570" y1="290" x2="750" y2="290" />
+			<GMRLine x1="570" y1="320" x2="750" y2="320" />
+			<GMRTextBox pagecheck="false" width="195" height="10" align="left" left="554" top="278">
+				<GMRText style="label1">24. </GMRText>
+				<GMRText style="name"><GMRGedcom id="@FAMC:@WIFE:@FAMC:@HUSB:@FAMC:@HUSB:@FAMC"><GMRGetPersonName id="@HUSB" truncate="34" /></GMRGedcom></GMRText>
+			</GMRTextBox>
+			<GMRTextBox pagecheck="false" width="195" height="10" align="left" left="570" top="292">
+				<GMRGedcom id="@FAMC:@WIFE:@FAMC:@HUSB:@FAMC:@HUSB:@FAMC:@HUSB">
+					<GMRText style="text"><GMRvarLetter var="factarray[BIRT]" />: <GMRGedcomValue tag="BIRT:DATE" truncate="20" />
+						  <GMRvarLetter var="factarray[DEAT]" />: <GMRGedcomValue tag="DEAT:DATE" truncate="20" />
+						<GMRGedcom id="@FAMS">
+							<br /><GMRvarLetter var="factarray[MARR]" />: <GMRGedcomValue tag="MARR:DATE" truncate="20" /><GMRif condition="$showFamID"> (<GMRGedcomValue tag="@id" />)</GMRif>
+						</GMRGedcom>
+					</GMRText>
+				</GMRGedcom>
+			</GMRTextBox>
+
+			<GMRTextBox pagecheck="false" width="195" height="10" align="left" left="554" top="309">
+				<GMRText style="label1">25. </GMRText>
+				<GMRText style="name"><GMRGedcom id="@FAMC:@WIFE:@FAMC:@HUSB:@FAMC:@HUSB:@FAMC"><GMRGetPersonName id="@WIFE" truncate="34" /></GMRGedcom></GMRText>
+			</GMRTextBox>
+			<GMRTextBox pagecheck="false" width="195" height="10" align="left" left="570" top="322">
+				<GMRGedcom id="@FAMC:@WIFE:@FAMC:@HUSB:@FAMC:@HUSB:@FAMC:@WIFE">
+					<GMRText style="text"><GMRvarLetter var="factarray[BIRT]" />: <GMRGedcomValue tag="BIRT:DATE" truncate="20" />
+						  <GMRvarLetter var="factarray[DEAT]" />: <GMRGedcomValue tag="DEAT:DATE" truncate="20" />
+					</GMRText>
+				</GMRGedcom>
+			</GMRTextBox>
+
+			<GMRLine x1="570" y1="350" x2="570" y2="380" />
+			<GMRLine x1="570" y1="350" x2="750" y2="350" />
+			<GMRLine x1="570" y1="380" x2="750" y2="380" />
+			<GMRTextBox pagecheck="false" width="195" height="10" align="left" left="554" top="338">
+				<GMRText style="label1">26. </GMRText>
+				<GMRText style="name"><GMRGedcom id="@FAMC:@WIFE:@FAMC:@HUSB:@FAMC:@WIFE:@FAMC"><GMRGetPersonName id="@HUSB" truncate="34" /></GMRGedcom></GMRText>
+			</GMRTextBox>
+			<GMRTextBox pagecheck="false" width="195" height="10" align="left" left="570" top="352">
+				<GMRGedcom id="@FAMC:@WIFE:@FAMC:@HUSB:@FAMC:@WIFE:@FAMC:@HUSB">
+					<GMRText style="text"><GMRvarLetter var="factarray[BIRT]" />: <GMRGedcomValue tag="BIRT:DATE" truncate="20" />
+						  <GMRvarLetter var="factarray[DEAT]" />: <GMRGedcomValue tag="DEAT:DATE" truncate="20" />
+						<GMRGedcom id="@FAMS">
+							<br /><GMRvarLetter var="factarray[MARR]" />: <GMRGedcomValue tag="MARR:DATE" truncate="20" /><GMRif condition="$showFamID"> (<GMRGedcomValue tag="@id" />)</GMRif>
+						</GMRGedcom>
+					</GMRText>
+				</GMRGedcom>
+			</GMRTextBox>
+
+			<GMRTextBox pagecheck="false" width="195" height="10" align="left" left="554" top="369">
+				<GMRText style="label1">27. </GMRText>
+				<GMRText style="name"><GMRGedcom id="@FAMC:@WIFE:@FAMC:@HUSB:@FAMC:@WIFE:@FAMC"><GMRGetPersonName id="@WIFE" truncate="34" /></GMRGedcom></GMRText>
+			</GMRTextBox>
+			<GMRTextBox pagecheck="false" width="195" height="10" align="left" left="570" top="382">
+				<GMRGedcom id="@FAMC:@WIFE:@FAMC:@HUSB:@FAMC:@WIFE:@FAMC:@WIFE">
+					<GMRText style="text"><GMRvarLetter var="factarray[BIRT]" />: <GMRGedcomValue tag="BIRT:DATE" truncate="20" />
+						  <GMRvarLetter var="factarray[DEAT]" />: <GMRGedcomValue tag="DEAT:DATE" truncate="20" />
+					</GMRText>
+				</GMRGedcom>
+			</GMRTextBox>
+
+			<GMRLine x1="570" y1="410" x2="570" y2="440" />
+			<GMRLine x1="570" y1="410" x2="750" y2="410" />
+			<GMRLine x1="570" y1="440" x2="750" y2="440" />
+			<GMRTextBox pagecheck="false" width="195" height="10" align="left" left="554" top="398">
+				<GMRText style="label1">28. </GMRText>
+				<GMRText style="name"><GMRGedcom id="@FAMC:@WIFE:@FAMC:@WIFE:@FAMC:@HUSB:@FAMC"><GMRGetPersonName id="@HUSB" truncate="34" /></GMRGedcom></GMRText>
+			</GMRTextBox>
+			<GMRTextBox pagecheck="false" width="195" height="10" align="left" left="570" top="412">
+				<GMRGedcom id="@FAMC:@WIFE:@FAMC:@WIFE:@FAMC:@HUSB:@FAMC:@HUSB">
+					<GMRText style="text"><GMRvarLetter var="factarray[BIRT]" />: <GMRGedcomValue tag="BIRT:DATE" truncate="20" />
+						  <GMRvarLetter var="factarray[DEAT]" />: <GMRGedcomValue tag="DEAT:DATE" truncate="20" />
+						<GMRGedcom id="@FAMS">
+							<br /><GMRvarLetter var="factarray[MARR]" />: <GMRGedcomValue tag="MARR:DATE" truncate="20" /><GMRif condition="$showFamID"> (<GMRGedcomValue tag="@id" />)</GMRif>
+						</GMRGedcom>
+					</GMRText>
+				</GMRGedcom>
+			</GMRTextBox>
+
+			<GMRTextBox pagecheck="false" width="195" height="10" align="left" left="554" top="429">
+				<GMRText style="label1">29. </GMRText>
+				<GMRText style="name"><GMRGedcom id="@FAMC:@WIFE:@FAMC:@WIFE:@FAMC:@HUSB:@FAMC"><GMRGetPersonName id="@WIFE" truncate="34" /></GMRGedcom></GMRText>
+			</GMRTextBox>
+			<GMRTextBox pagecheck="false" width="195" height="10" align="left" left="570" top="442">
+				<GMRGedcom id="@FAMC:@WIFE:@FAMC:@WIFE:@FAMC:@HUSB:@FAMC:@WIFE">
+					<GMRText style="text"><GMRvarLetter var="factarray[BIRT]" />: <GMRGedcomValue tag="BIRT:DATE" truncate="20" />
+						  <GMRvarLetter var="factarray[DEAT]" />: <GMRGedcomValue tag="DEAT:DATE" truncate="20" />
+					</GMRText>
+				</GMRGedcom>
+			</GMRTextBox>
+
+			<GMRLine x1="570" y1="470" x2="570" y2="500" />
+			<GMRLine x1="570" y1="470" x2="750" y2="470" />
+			<GMRLine x1="570" y1="500" x2="750" y2="500" />
+			<GMRTextBox pagecheck="false" width="195" height="10" align="left" left="554" top="458">
+				<GMRText style="label1">30. </GMRText>
+				<GMRText style="name"><GMRGedcom id="@FAMC:@WIFE:@FAMC:@WIFE:@FAMC:@WIFE:@FAMC"><GMRGetPersonName id="@HUSB" truncate="34" /></GMRGedcom></GMRText>
+			</GMRTextBox>
+			<GMRTextBox pagecheck="false" width="195" height="10" align="left" left="570" top="472">
+				<GMRGedcom id="@FAMC:@WIFE:@FAMC:@WIFE:@FAMC:@WIFE:@FAMC:@HUSB">
+					<GMRText style="text"><GMRvarLetter var="factarray[BIRT]" />: <GMRGedcomValue tag="BIRT:DATE" truncate="20" />
+						  <GMRvarLetter var="factarray[DEAT]" />: <GMRGedcomValue tag="DEAT:DATE" truncate="20" />
+						<GMRGedcom id="@FAMS">
+							<br /><GMRvarLetter var="factarray[MARR]" />: <GMRGedcomValue tag="MARR:DATE" truncate="20" /><GMRif condition="$showFamID"> (<GMRGedcomValue tag="@id" />)</GMRif>
+						</GMRGedcom>
+					</GMRText>
+				</GMRGedcom>
+			</GMRTextBox>
+
+			<GMRTextBox pagecheck="false" width="195" height="10" align="left" left="554" top="489">
+				<GMRText style="label1">31. </GMRText>
+				<GMRText style="name"><GMRGedcom id="@FAMC:@WIFE:@FAMC:@WIFE:@FAMC:@WIFE:@FAMC"><GMRGetPersonName id="@WIFE" truncate="34" /></GMRGedcom></GMRText>
+			</GMRTextBox>
+			<GMRTextBox pagecheck="false" width="195" height="10" align="left" left="570" top="502">
+				<GMRGedcom id="@FAMC:@WIFE:@FAMC:@WIFE:@FAMC:@WIFE:@FAMC:@WIFE">
+					<GMRText style="text"><GMRvarLetter var="factarray[BIRT]" />: <GMRGedcomValue tag="BIRT:DATE" truncate="20" />
+						  <GMRvarLetter var="factarray[DEAT]" />: <GMRGedcomValue tag="DEAT:DATE" truncate="20" />
+					</GMRText>
+				</GMRGedcom>
+			</GMRTextBox>
+
+				<GMRSetVar name="my" value="335" />
+				<GMRRepeatTag tag="FAMS">
+					<GMRGedcom id="@FAMS">
+						<GMRif condition="$my LT 413">
+							<GMRTextBox pagecheck="false" width="180" height="10" align="left" left="38" top="$my">
+								<GMRif condition="$pid==@HUSB">
+									<GMRText style="name"><GMRGetPersonName id="@WIFE" truncate="32" /></GMRText>
+								</GMRif>
+								<GMRif condition="$pid==@WIFE">
+									<GMRText style="name"><GMRGetPersonName id="@HUSB" truncate="32" /></GMRText>
+								</GMRif>
+							</GMRTextBox>
+							<GMRSetVar name="my" value="$my+10" />
+							<GMRLine x1="38" y1="$my" x2="160" y2="$my" />
+						</GMRif>
+						<GMRSetVar name="my" value="$my+2" />
+						<GMRRepeatTag tag="CHIL">
+							<GMRif condition="$my LT 413">
+								<GMRTextBox pagecheck="false" width="180" height="10" align="left" left="48" top="$my">
+									<GMRText style="text"><GMRGetPersonName id="@CHIL" truncate="32" /></GMRText>
+								</GMRTextBox>
+								<GMRSetVar name="my" value="$my+10" />
+							</GMRif>
+						</GMRRepeatTag>
+					</GMRGedcom>
+				</GMRRepeatTag>
+			</GMRGedcom>
+		</GMRBody>
+	</GMRDoc>
+</GMReport>
+
