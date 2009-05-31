@@ -1,0 +1,39 @@
+<!-- @version $Id: USA_Illinois_Kane.txt,v 1.1 2005/10/23 22:08:17 roland-d Exp $ -->
+<!-- @see http://www.naco.org/ -->
+Algonquin
+Aurora
+Barrington Hills
+Bartlett
+Batavia
+Big Rock Township
+Blackberry Township
+Burlington Township
+Campton Township
+Carpentersville
+Dundee Township
+East Dundee
+Elburn
+Elgin
+Geneva Township
+Gilberts
+Hampshire Township
+Hoffman Estates
+Kaneville Township
+Lafox
+Lily Lake
+Maple Park
+Montgomery
+Mooseheart
+North Aurora
+Pingree Grove
+Plato Center
+Plato Township
+Rutland Township
+Saint Charles
+Sleepy Hollow
+South Elgin
+Sugar Grove
+Virgil Township
+Wasco
+Wayne
+West Dundee

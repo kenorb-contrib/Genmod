@@ -1,0 +1,98 @@
+<!-- THIS FILE MUST BE SAVED IN UTF-8 ENCODING (or some special characters will be lost) -->
+<!-- @version $Id: DEU_Bayern.txt,v 1.1 2005/10/23 21:49:12 roland-d Exp $ -->
+Kreis Aichach-Friedberg
+Kreis Altötting
+Kreis Amberg-Sulzbach
+Kreis Ansbach
+Kreis Aschaffenburg
+Kreis Augsburg
+Kreis Bad Kissingen
+Kreis Bad Tölz-Wolfratshausen
+Kreis Bamberg
+Kreis Bayreuth
+Kreis Berchtesgadener Land
+Kreis Cham
+Kreis Coburg
+Kreis Dachau
+Kreis Deggendorf
+Kreis Dillingen a.d. Donau
+Kreis Dingolfing-Landau
+Kreis Donau-Ries
+Kreis Ebersberg
+Kreis Eichstätt
+Kreis Erding
+Kreis Erlangen-Höchstadt
+Kreis Fürstenfeldbruck
+Kreis Fürth
+Kreis Forchheim
+Kreis Freising
+Kreis Freyung-Grafenau
+Kreis Garmisch-Partenkirchen
+Kreis Günzburg
+Kreis Haßberge
+Kreis Hof
+Kreis Kelheim
+Kreis Kitzingen
+Kreis Kronach
+Kreis Kulmbach
+Kreis Landsberg a. Lech
+Kreis Landshut
+Kreis Lichtenfels
+Kreis Lindau/Bodensee
+Kreis Main-Spessart
+Kreis Mühldorf a. Inn
+Kreis München
+Kreis Miesbach
+Kreis Miltenberg
+Kreis Nürnberger Land
+Kreis Neu-Ulm
+Kreis Neuburg-Schrobenhausen
+Kreis Neumarkt i.d. Oberpfalz
+Kreis Neustadt a.d. Waldnaab
+Kreis Neustadt/Aisch-Bad Windsheim
+Kreis Oberallgäu
+Kreis Ostallgäu
+Kreis Passau
+Kreis Pfaffenhofen a.d. Ilm
+Kreis Regen
+Kreis Regensburg
+Kreis Rhön-Grabfeld
+Kreis Rosenheim
+Kreis Roth
+Kreis Rottal-Inn
+Kreis Schwandorf
+Kreis Schweinfurt
+Kreis Starnberg
+Kreis Straubing-Bogen
+Kreis Tirschenreuth
+Kreis Traunstein
+Kreis Unterallgäu
+Kreis Würzburg
+Kreis Weißenburg-Gunzenhausen
+Kreis Weilheim-Schongau
+Kreis Wunsiedel i. Fichtelgebirge
+Stadt Amberg
+Stadt Ansbach
+Stadt Aschaffenburg
+Stadt Augsburg
+Stadt Bamberg
+Stadt Bayreuth
+Stadt Coburg
+Stadt Erlangen
+Stadt Fürth
+Stadt Hof
+Stadt Ingolstadt
+Stadt Kaufbeuren
+Stadt Kempten/Allgäu
+Stadt Landshut
+Stadt München
+Stadt Memmingen
+Stadt Nürnberg
+Stadt Passau
+Stadt Regensburg
+Stadt Rosenheim
+Stadt Schwabach
+Stadt Schweinfurt
+Stadt Straubing
+Stadt Würzburg
+Stadt Weiden/Oberpfalz

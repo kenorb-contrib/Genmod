@@ -1,0 +1,71 @@
+=====================================================================
+	Change Log
+	Genmod
+
+	This and other information can be found online at
+	http://www.genmod.net/
+
+	# $Id: changelog.txt,v 1.36 2006/04/30 18:44:14 roland-d Exp $
+=====================================================================
+
+Version 1.0 Beta 3
+- Added [ 1466810 ] Cache statistics to DB (sjouke)
+- Fixed [ 1466096 ] User comment displays backslashes (sjouke)
+- Fixed [ 1466089 ] Option All missing for default tab on indi page (sjouke)
+- Added [ 1466090 ] Move event cache to DB (sjouke)
+- Fixed [ 1464668 ] Login block too wide to put in right section blocks (roland-d)
+- Fixed [ 1464666 ] Users are not automatically logged out (roland-d)
+- Added [ 1464670 ] Add a crawler check for bots (made by laie_techie) (roland-d)
+- Added [ 1453328 ] Check for correct MySQL version (roland-d)
+- Added [ 1453326 ] Automatic database creation (roland-d)
+- Added [ 1449082 ] Add possibility to create own HTML pages (roland-d)
+
+Version 1.0 Beta 2
+
+- Added robots.txt file (roland-d)
+- Fixed [ 1414927 ] New user problem with unique name (sjouke)
+- Added [ 1346140 ] Cleanup Lanugage File (roland-d)
+- Fixed [ 1411911 ] Download gedcom problems (sjouke)
+- Fixed [ 1411371 ] Upload/add zipped gedcom broken (sjouke)
+- Added [ 1410667 ] Genmod Sanity Check (sjouke)
+- Fixed [ 1409919 ] Media to DB (sjouke)
+- Fixed [ 1401879 ] Gedcom statistics are incorrect (roland-d)
+- Fixed [ 1401873 ] Timeline cannot add person (roland-d)
+- Added [ 1365087 ] Soundex Search List Sort Option (sjouke)
+- Fixed [ 1394734 ] Multiple approval emails to same user (sjouke)
+- Fixed [ 1394729 ] Backup should be extended (sjouke)
+- Fixed [ 1398393 ] No GM admin news behind proxy server (sjouke)
+- Fixed [ 1396542 ] Counter error on index page (sjouke)
+- Added [ 1395328 ] Userfilter on names in userlist (sjouke)
+
+
+Version 1.0 Beta 1
+- Added [ 1356409 ] Enterprise version (sjouke)
+- Added [ 1356492 ] Adjust backup to new data storage (sjouke)
+- Fixed [ 1394736 ] Indi page crashes on non-existent individual (roland-d)
+- Added [ 1388607 ] PHP error logging (sjouke)
+- Added [ 1388601 ] Improve performance of Index page (sjouke)
+- Fixed [ 1367244 ] Reimport of GEDCOM - lose Media titles (roland-d)
+- Fixed [ 1367478 ] HTTPS login ignored from Login Block (sjouke)
+- Fixed [ 1376149 ] Unique source facts broken (sjouke)
+- Added [ 1372907 ] Move gedcom privacy settings to DB (sjouke)
+- Added [ 1369076 ] Move Gedcom config settings to DB (sjouke)
+- Added [ 1362024 ] GEDCOM settings from gedcoms.php to DB (sjouke)
+- Added [ 1362022 ] Counters to DB (sjouke)
+- Fixed [ 1365582 ] Media is distorted on Charts (roland-d)
+- Added [ 1362516 ] Genmod news to admins (sjouke)
+- Fixed [ 1362034 ] Editing a media item causes it to be doubled (roland-d)
+- Fixed [ 1362142 ] Source tab on indi page shows only 1 image (roland-d)
+- Added [ 1361039 ] Prevent deletion of last admin user (sjouke)
+- Added [ 1358929 ] Mass update for user settings (sjouke)
+- Added [ 1356408 ] Logging to database (sjouke)
+- Fixed [ 1361043 ] User comment doesn't show in FF (sjouke)
+- Fixed [ 1355984 ] Search name combinations gives list instead of details page (sjouke)
+- Fixed [ 1361447 ] Media error on Welcome page (roland-d)
+- Fixed [ 1360973 ] Pedigree Bug - new CVS (roland-d)
+
+ -------------------------------------------------------
+ Version 1.0 Alpha
+- Fixed [ 1346466 ] Adding multiple favorites is not possible (sjouke)
+- Fixed [ 1346101 ] Login with a ? in URL fails (sjouke)
+ -------------------------------------------------------

@@ -1,0 +1,39 @@
+<!-- @version $Id: USA_Connecticut_Fairfield.txt,v 1.1 2005/10/23 22:08:17 roland-d Exp $ -->
+<!-- @see http://www.naco.org/ -->
+Bethel
+Botsford
+Bridgeport
+Brookfield
+Cos Cob
+Danbury
+Darien
+Easton
+Fairfield
+Georgetown
+Greens Farms
+Greenwich
+Hawleyville
+Monroe
+New Canaan
+New Fairfield
+Newtown
+Norwalk
+Old Greenwich
+Redding
+Redding Center
+Redding Ridge
+Ridgefield
+Ridgeway
+Riverside
+Sandy Hook
+Shelton
+Sherman
+Southport
+Stamford
+Stevenson
+Stratford
+Trumbull
+West Redding
+Weston
+Westport
+Wilton

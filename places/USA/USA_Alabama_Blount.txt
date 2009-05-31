@@ -1,0 +1,17 @@
+<!-- @version $Id: USA_Alabama_Blount.txt,v 1.1 2005/10/23 22:08:16 roland-d Exp $ -->
+<!-- @see http://www.naco.org/ -->
+Allgood
+Altoona
+Blountsville
+Cleveland
+County Line
+Garden City
+Hayden
+Highland Lake
+Locust Fork
+Nectar
+Oneonta
+Remlap
+Rosa
+Snead
+Susan Moore

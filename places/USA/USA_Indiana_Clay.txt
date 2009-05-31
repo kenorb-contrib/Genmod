@@ -1,0 +1,24 @@
+<!-- @version $Id: USA_Indiana_Clay.txt,v 1.1 2005/10/23 22:08:18 roland-d Exp $ -->
+<!-- @see http://www.naco.org/ -->
+Bowling Green
+Brazil
+Carbon
+Cass Township
+Center Point
+Centerpoint
+Clay City
+Coalmont
+Cory
+Dick Johnson Township
+Harmony
+Harrison Township
+Jackson Township
+Knightsville
+Lewis Township
+Perry Township
+Poland
+Posey Township
+Staunton
+Sugar Ridge Township
+Van Buren Township
+Washington Township

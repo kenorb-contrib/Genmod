@@ -1,0 +1,10 @@
+<!-- @version $Id: USA_Connecticut.txt,v 1.1 2005/10/23 22:08:17 roland-d Exp $ -->
+<!-- @see http://countyhunter.com/counties.htm -->
+Fairfield
+Hartford
+Litchfield
+Middlesex
+New Haven
+New London
+Tolland
+Windham

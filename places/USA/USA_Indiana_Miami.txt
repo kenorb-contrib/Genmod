@@ -1,0 +1,26 @@
+<!-- @version $Id: USA_Indiana_Miami.txt,v 1.1 2005/10/23 22:08:18 roland-d Exp $ -->
+<!-- @see http://www.naco.org/ -->
+Allen Township
+Amboy
+Bunker Hill
+Butler Township
+Chili
+Clay Township
+Converse
+Deedsville
+Deer Creek Township
+Denver
+Erie Township
+Grissom Air Force Base
+Harrison Township
+Jackson Township
+Jefferson Township
+Macy
+Mexico
+Miami
+Perry Township
+Peru
+Pipe Creek Township
+Richland Township
+Union Township
+Washington Township

@@ -1,0 +1,8 @@
+﻿<!-- @version $Id: AUS.txt,v 1.1 2005/11/21 15:41:54 roland-d Exp $ -->
+New South Wales
+Northern Territory
+Queensland
+South Australia
+Tasmania
+Victoria
+Western Australia
