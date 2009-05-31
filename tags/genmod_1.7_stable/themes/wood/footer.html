@@ -1,0 +1,36 @@
+<?php
+global $CONFIGURED, $CONFIG_PARMS;
+print "</div> <!-- closing div id=\"content\" -->\n";//FIXME uncomment as soon as ready
+print "<div id=\"footer\" class=\"$TEXT_DIRECTION\">";
+print "\n\t<br /><div align=\"center\" style=\"width:99%;\">";
+print_lang_form(1);
+print "\n\t<br /><a href=\"http://www.Genmod.net\" target=\"_blank\"><img src=\"".$GM_IMAGE_DIR."/".$GM_IMAGES["gedview"]["other"]."\" width=\"100\" height=\"45\" border=\"0\" alt=\"Genmod";
+if (count($CONFIG_PARMS) >1) print " Enterprise";
+print " Version $VERSION $VERSION_RELEASE\" title=\"Genmod";
+if (count($CONFIG_PARMS) >1) print " Enterprise";
+print " Version $VERSION $VERSION_RELEASE\" /></a><br />";
+print "\n\t<br />";
+print_help_link("preview_help", "qm");
+print "<a href=\"$SCRIPT_NAME?view=preview&amp;".get_query_string()."\">".$gm_lang["print_preview"]."</a>";
+print "<br />";
+if ($SHOW_STATS) print_execution_stats();
+if ($buildindex) print " ".$gm_lang["build_error"]."  <a href=\"editgedcoms.php\">".$gm_lang["rebuild_indexes"]."</a>\n";
+if ($CONFIGURED) {
+	if (change_present() && (userCanAccept(getUserName()))) {
+		print "<br />".$gm_lang["changes_exist"]." <a href=\"#\" onclick=\"window.open('edit_changes.php','','width=800,height=600,resizable=1,scrollbars=1'); return false;\">".
+		$gm_lang["accept_changes"]."</a>\n";
+	}
+}
+print "</div>";
+print "</div> <!-- close div id=\"footer\" -->\n";
+?>
+<script language="JavaScript" type="text/javascript">
+function onloadfunction() {
+	footerdiv = document.getElementById("footer");
+	headerdiv = document.getElementById("header2");
+	if (footerdiv && headerdiv) {
+		newtop = (headerdiv.offsetTop + headerdiv.offsetHeight + 5);
+		footerdiv.style.top = newtop +"px";
+	}
+}
+</script>

@@ -1,0 +1,18 @@
+<!-- @version $Id: USA_Indiana_Wabash.txt,v 1.1 2005/10/23 22:08:18 roland-d Exp $ -->
+<!-- @see http://www.naco.org/ -->
+Chester Township
+La Fontaine
+Lagro
+Laketon
+Liberty Mills
+Liberty Township
+Noble Township
+North Manchester
+Paw Paw Township
+Pleasant Township
+Roann
+Servia
+Somerset
+Urbana
+Wabash
+Waltz Township

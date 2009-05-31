@@ -1,0 +1,14 @@
+<!-- @version $Id: USA_Arkansas_Newton.txt,v 1.1 2005/10/23 22:08:17 roland-d Exp $ -->
+<!-- @see http://www.naco.org/ -->
+Bass
+Compton
+Deer
+Dogpatch
+Hasty
+Jasper
+Marble Falls
+Mount Judea
+Parthenon
+Ponca
+Vendor
+Western Grove

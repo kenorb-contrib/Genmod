@@ -1,0 +1,12 @@
+<!-- @version $Id: USA_Alabama_Dallas.txt,v 1.1 2005/10/23 22:08:16 roland-d Exp $ -->
+<!-- @see http://www.naco.org/ -->
+Benton
+Boys Ranch
+Marion Junction
+Minter
+Orrville
+Plantersville
+Safford
+Sardis
+Selma
+Tyler

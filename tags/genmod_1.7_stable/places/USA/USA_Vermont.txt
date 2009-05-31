@@ -1,0 +1,16 @@
+<!-- @version $Id: USA_Vermont.txt,v 1.1 2005/10/23 22:09:29 roland-d Exp $ -->
+<!-- @see http://countyhunter.com/counties.htm -->
+Addison
+Bennington
+Caledonia
+Chittendon
+Essex
+Franklin
+Grand Isle
+Lamoille
+Orange
+Orleans
+Rutland
+Washington
+Windham
+Windsor

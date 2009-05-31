@@ -1,0 +1,26 @@
+<!-- $Id: NOR_Troms.txt,v 1.1 2005/10/23 22:06:17 roland-d Exp $ -->
+Balsfjord
+Bardu
+Berg
+Bjarkøy
+Dyrøy
+Gratangen
+Harstad
+Ibestad
+Karlsøy
+Kvæfjord
+Kvænangen
+Kåfjord
+Lavangen
+Lenvik
+Lyngen
+Målselv
+Nordreisa
+Salangen
+Skjervøy
+Skånland
+Storfjord
+Sørreisa
+Torsken
+Tranøy
+Tromsø

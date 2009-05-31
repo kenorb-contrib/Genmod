@@ -1,0 +1,19 @@
+<!-- @version $Id: USA_Idaho_Idaho.txt,v 1.1 2005/10/23 22:08:17 roland-d Exp $ -->
+<!-- @see http://www.naco.org/ -->
+Clearwater
+Cottonwood
+Dixie
+Elk City
+Fenn
+Ferdinand
+Grangeville
+Greencreek
+Kamiah
+Keuterville
+Kooskia
+Lucile
+Pollock
+Riggins
+Stites
+Warren
+White Bird

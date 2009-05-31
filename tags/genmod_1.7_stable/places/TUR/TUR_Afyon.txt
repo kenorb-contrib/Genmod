@@ -1,0 +1,20 @@
+<!-- THIS FILE MUST BE SAVED IN UTF-8 ENCODING (or some special characters will be lost) -->
+<!-- @version $Ip $ -->
+Başmakçı
+Bayat
+Bolvadin
+Çay
+Çobanlar
+Dazkırı
+Dinar
+Emirdağ
+Evciler
+Hocalar
+İhsaniya
+İscehisar
+Kızılören
+Merkez
+Sandıklı
+Sincanlı
+Sultandağ
+Şuhut

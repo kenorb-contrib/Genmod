@@ -1,0 +1,52 @@
+<GMReport access="GM_PUBLIC" icon="indis">
+	<GMRTitle><GMRvar var="gm_lang[birth_report]" /></GMRTitle>
+	<GMRDescription>Prints a list of individuals matching specific birth criteria</GMRDescription>
+	<GMRInput name="birthplace" lookup="PLAC" type="text"><GMRvar var="gm_lang[birthplace]" /> </GMRInput>
+	<GMRInput name="birthdate1" lookup="DATE" type="text"><GMRvar var="gm_lang[birthdate1]" /></GMRInput>
+	<GMRInput name="birthdate2" lookup="DATE" type="text"><GMRvar var="gm_lang[birthdate2]" /></GMRInput>
+	<GMRInput name="sortby" type="select" options="NAME,BIRT"><GMRvar var="gm_lang[sort_by]" /></GMRInput>
+	<GMRStyle name="header" font="LucidaSansUnicode" size="16" style="b" />
+	<GMRStyle name="pagenum" font="LucidaSansUnicode" size="8" style="" />
+	<GMRStyle name="text" font="LucidaSansUnicode" size="9" style="" />
+	<GMRStyle name="label" font="LucidaSansUnicode" size="10" style="b" />
+	<GMRDoc pageSize="A4" orientation="P" margin="24">
+		<GMRHeader>
+			<GMRCell width="0" height="20" align="center" style="header"><GMRvar var="gm_lang[birth_report]" /></GMRCell>
+			<GMRCell width="0" height="10" align="right" style="pagenum"><GMRvar var="gm_lang[page]" /> <GMRPageNum /> <GMRvar var="gm_lang[of]" /> <GMRTotalPages /></GMRCell>
+			<GMRTextBox width="60" height="12" border="1">
+				<GMRText style="label"> </GMRText>
+			</GMRTextBox>
+			<GMRTextBox width="200" height="12" border="1">
+				<GMRText style="label"><GMRvar var="gm_lang[name]" /></GMRText>
+			</GMRTextBox>
+			<GMRTextBox width="150" height="12" border="1">
+				<GMRText style="label"><GMRvar var="gm_lang[date]" /></GMRText>
+			</GMRTextBox>
+			<GMRTextBox width="0" height="12" border="1" newline="1">
+				<GMRText style="label"><GMRvar var="factarray[PLAC]" /></GMRText>
+			</GMRTextBox>
+		</GMRHeader>
+		<GMRBody>
+			<GMRList list="individual" filter1="BIRT:PLAC CONTAINS $birthplace" filter2="BIRT:DATE GTE $birthdate1" filter3="BIRT:DATE LTE $birthdate2" sortby="$sortby">
+				<GMRTextBox width="60" height="12" border="0">
+					<GMRText style="text"><GMRGedcomValue tag="@id" /></GMRText>
+				</GMRTextBox>
+				<GMRTextBox width="200" height="12" border="0">
+					<GMRText style="text"><GMRGetPersonName id="" /></GMRText>
+				</GMRTextBox>
+				<GMRTextBox width="150" height="12" border="0">
+					<GMRText style="text"><GMRGedcomValue tag="BIRT:DATE" /></GMRText>
+				</GMRTextBox>
+				<GMRTextBox width="0" height="12" border="0" newline="1">
+					<GMRText style="text"><GMRGedcomValue tag="BIRT:PLAC" /></GMRText>
+				</GMRTextBox>
+			</GMRList>
+			<GMRCell width="0" height="12" border="0" align="right" style="label">
+				<br /><GMRvar var="gm_lang[total_indis]" />: <GMRListTotal />
+			</GMRCell>
+		</GMRBody>
+		<GMRFooter>
+			<GMRCell width="0" height="10"><GMRNow /></GMRCell>
+		</GMRFooter>
+	</GMRDoc>
+</GMReport>

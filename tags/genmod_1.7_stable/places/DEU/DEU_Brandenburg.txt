@@ -1,0 +1,20 @@
+<!-- THIS FILE MUST BE SAVED IN UTF-8 ENCODING (or some special characters will be lost) -->
+<!-- @version $Id: DEU_Brandenburg.txt,v 1.1 2005/10/23 21:49:12 roland-d Exp $ -->
+Kreis Barnim
+Kreis Dahme-Spreewald
+Kreis Elbe-Elster
+Kreis Havelland
+Kreis Märkisch-Oderland
+Kreis Oberhavel
+Kreis Oberspreewald-Lausitz
+Kreis Oder-Spree
+Kreis Ostprignitz-Ruppin
+Kreis Potsdam-Mittelmark
+Kreis Prignitz
+Kreis Spree-Neiße
+Kreis Teltow-Fläming
+Kreis Uckermark
+Stadt Brandenburg
+Stadt Cottbus
+Stadt Frankfurt/Oder
+Stadt Potsdam

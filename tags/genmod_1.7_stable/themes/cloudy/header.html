@@ -1,0 +1,575 @@
+<?php
+/**
+ * Header for Cloudy theme
+ *
+ * Genmod: Genealogy Viewer
+ * Copyright (C) 2002 to 2003 John Finlay and Others
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+ *
+ * $Id: header.html,v 1.2 2006/02/13 22:23:06 roland-d Exp $
+ *
+ * @author w.a. bastein http://genealogy.bastein.biz
+ * @package Genmod
+ * @subpackage Themes
+ */
+?>
+<div id="header" class="<?php print $TEXT_DIRECTION; ?>">
+<img src="<?php print $THEME_DIR?>images/loading.gif" width="70" height="25" id="ProgBar" name="ProgBar" style="position:absolute;margin-left:auto;margin-right:auto;left:47%;top:48%;margin-bottom:auto;margin-top:auto;" alt="loading..." />
+<table width="100%" border="0" cellspacing="0" cellpadding="0" style="border-left:1px solid #003399;border-top:1px solid #003399;border-right:1px solid #003399;" >
+    <tr>
+        <td>
+            <table width="100%" border="0" cellspacing="0" cellpadding="0" style="background:url('<?php print $GM_IMAGE_DIR; ?>/clouds.gif');height:38px;white-space: nowrap;" >
+                <tr>
+                    <td width="10" ><img src="<?php print $GM_IMAGE_DIR; ?>/pixel.gif" width="1" height="1" alt="" /></td>
+                    <td align="<?php print $TEXT_DIRECTION=="ltr"?"left":"right" ?>" valign="middle" >
+                        <div class="title" style="<?php print $TEXT_DIRECTION=="rtl"?"left":"right" ?>">
+							<?php print_gedcom_title_link(TRUE); ?>
+                        </div>
+                    </td>
+                    <td valign="middle" align="center">
+                        <div class="blanco" style="COLOR: #6699ff;" >
+                            <?php print_user_links(); ?>
+                        </div>
+                    </td>
+                    <td align="<?php print $TEXT_DIRECTION=="rtl"?"left":"right" ?>" valign="middle" >
+                        <?php print_theme_dropdown(); ?>
+                    </td>
+                    <td style="white-space: normal;" align="<?php print $TEXT_DIRECTION=="rtl"?"left":"right" ?>" valign="middle" >
+                        <form action="search.php" method="post">
+                            <input type="hidden" name="action" value="general" />
+							<input type="hidden" name="topsearch" value="yes" />
+                            <input type="text" class="formbut" accesskey="<?php print $gm_lang["accesskey_search"]?>" name="query" size="15" value="<?php print $gm_lang['search']?>" onfocus="if (this.value == '<?php print $gm_lang['search']?>') this.value=''; focusHandler();" onblur="if (this.value == '') this.value='<?php print $gm_lang['search']?>';" />
+                            <input type="image" src="<?php print $THEME_DIR ?>/images/go.gif" align="top" title="<?php print $gm_lang['search']?>" />
+                        </form>
+                        <div class="blanco">
+                            <?php print_favorite_selector(0); ?>
+                        </div>
+                    </td>
+                    <td width="10"><img src="<?php print $GM_IMAGE_DIR; ?>/pixel.gif" width="1" height="1" alt="" /></td>
+                </tr>
+            </table>
+            <table width="100%" border="0" cellspacing="0" cellpadding="1" bgcolor="#aaccff" >
+                <tr valign="middle" style="height:26px;margin-top:2pt;">
+                    <td width="10">
+                    </td>
+                    <td align="left">
+                        <table cellspacing="0" cellpadding="0" border="0" style="min-width:200px;height:26px;" align="<?php print $TEXT_DIRECTION=="ltr"?"left":"right" ?>">
+                            <tr>
+                                <td><img src="<?php print $GM_IMAGE_DIR; ?>/pixel.gif" width="1" height="1" alt="" /></td>
+                                <td width="1">
+                                   <?php
+                                   $my_temp_menu= array();
+                                   $my_temp_menu["label"] = $HOME_SITE_TEXT;
+                                   $my_temp_menu["labelpos"] = "none";
+					               $my_temp_menu["icon"] = $GM_IMAGE_DIR."/".$GM_IMAGES["home"]["large"];
+                                   $my_temp_menu["link"] = $HOME_SITE_URL;
+                                   $my_temp_menu["class"] = "menuitem";
+                                   $my_temp_menu["hoverclass"] = "menuitem_hover";
+                                   $my_temp_menu["flyout"] = "down";
+                                   print_menu($my_temp_menu);
+                                   ?>
+                                </td>
+                                <td width="1">
+                                    <?php
+                                    $my_temp_menu=get_gedcom_menu();
+                 					if ($TEXT_DIRECTION=="rtl") $ff="_rtl";
+                 					else $ff="";
+                                    $my_temp_menu["labelpos"] = "none";
+                                    $my_temp_menu["submenuclass"] = "submenu$ff";
+                                    $i=0;
+                                    if (isset($my_temp_menu["items"]))
+                                    foreach ( $my_temp_menu["items"] as $key ) {
+                                        $my_temp_menu["items"][$i]["class"] = "submenuitem$ff";
+                                        $my_temp_menu["items"][$i]["hoverclass"] = "submenuitem_hover$ff";
+                                        $i++;
+                                    }
+                                    print_menu($my_temp_menu);
+                                    ?>
+                                </td>
+                                <td width="1">
+                                     <?php
+                                    //-- mygedview menu
+                                    $menu = array();
+                                    $menu["label"] = $gm_lang["mygedview"];
+                                    $menu["labelpos"] = "none";
+                       				$menu["icon"] = $GM_IMAGE_DIR."/".$GM_IMAGES["mygedview"]["large"];
+                                    $menu["link"] = "index.php?command=user";
+                                    $menu["class"] = "menuitem";
+                                    $menu["hoverclass"] = "menuitem_hover";
+                                    $menu["flyout"] = "down";
+                       				$menu["submenuclass"] = "submenu$ff";
+                                    $menu["items"] = get_mygedview_submenu();
+                                    $i=0;
+                                    foreach ( $menu["items"] as $key ) {
+			                            $menu["items"][$i]["class"] = "submenuitem$ff";
+			                            $menu["items"][$i]["hoverclass"] = "submenuitem_hover$ff";
+                                    	if ($i < 2) $menu["items"][$i]["icon"] = $GM_IMAGE_DIR."/".$GM_IMAGES["mygedview"]["small"];
+                                    	else if (stristr($menu["items"][$i]["link"],"admin.php") or (stristr($menu["items"][$i]["link"],"editgedcoms.php")))
+                                 		$menu["items"][$i]["icon"] = $GM_IMAGE_DIR."/".$GM_IMAGES["admin"]["small"];
+		                                else if (stristr($menu["items"][$i]["link"],"pedigree.php"))
+		                                $menu["items"][$i]["icon"] = $GM_IMAGE_DIR."/".$GM_IMAGES["pedigree"]["small"];
+		                                else if (stristr($menu["items"][$i]["link"],"individual.php"))
+		                                $menu["items"][$i]["icon"] = $GM_IMAGE_DIR."/".$GM_IMAGES["indis"]["small"];
+	                                    $i++;
+                                    }
+                                    print_menu($menu);
+                                    ?>
+                                </td>
+                                <td valign="middle" width="1" >
+                                    <?php
+                                    //-- charts menu
+									$menu = array();
+									$menu["label"] = $gm_lang["charts"];
+									$menu["labelpos"] = "none";
+									$menu["icon"] = $GM_IMAGE_DIR."/".$GM_IMAGES["pedigree"]["large"];
+									if (file_exists("pedigree.php")) $menu["link"] = "pedigree.php";
+									$menu["class"] = "menuitem";
+									$menu["hoverclass"] = "menuitem_hover";
+									$menu["flyout"] = "down";
+									$menu["submenuclass"] = "submenu$ff";
+									$menu["items"] = array();
+
+									if (file_exists("pedigree.php")) {
+										$submenu = array();
+										$submenu["label"] = $gm_lang["pedigree_chart"];
+										$submenu["labelpos"] = "right";
+										$submenu["icon"] = $GM_IMAGE_DIR."/".$GM_IMAGES["pedigree"]["small"];
+										$submenu["link"] = "pedigree.php";
+										$submenu["class"] = "submenuitem$ff";
+										$submenu["hoverclass"] = "submenuitem_hover$ff";
+										$menu["items"][] = $submenu;
+                                   	}
+									if (file_exists("descendancy.php")) {
+										$submenu = array();
+										$submenu["label"] = $gm_lang["descend_chart"];
+										$submenu["labelpos"] = "right";
+										$submenu["icon"] = $GM_IMAGE_DIR."/".$GM_IMAGES["descendant"]["small"];
+										$submenu["link"] = "descendancy.php";
+										$submenu["class"] = "submenuitem$ff";
+										$submenu["hoverclass"] = "submenuitem_hover$ff";
+										$menu["items"][] = $submenu;
+									}
+
+									if (file_exists("timeline.php")) {
+										$submenu = array();
+										$submenu["label"] = $gm_lang["timeline_chart"];
+										$submenu["labelpos"] = "right";
+										$submenu["icon"] = $GM_IMAGE_DIR."/".$GM_IMAGES["timeline"]["small"];
+										$submenu["link"] = "timeline.php";
+										$submenu["class"] = "submenuitem$ff";
+										$submenu["hoverclass"] = "submenuitem_hover$ff";
+										$menu["items"][] = $submenu;
+									}
+
+									if (file_exists("relationship.php")) {
+										$submenu = array();
+										$submenu["label"] = $gm_lang["relationship_chart"];
+										$submenu["labelpos"] = "right";
+										$submenu["icon"] = $GM_IMAGE_DIR."/".$GM_IMAGES["relationship"]["small"];
+										$submenu["link"] = "relationship.php";
+										$submenu["class"] = "submenuitem$ff";
+										$submenu["hoverclass"] = "submenuitem_hover$ff";
+										$menu["items"][] = $submenu;
+									}
+
+                                    if (file_exists("ancestry.php")) {
+	                                    $submenu = array();
+	                                    $submenu["label"] = $gm_lang["ancestry_chart"];
+	                                    $submenu["labelpos"] = "right";
+	                                    $submenu["icon"] = $GM_IMAGE_DIR."/".$GM_IMAGES["ancestry"]["small"];
+	                                    $submenu["link"] = "ancestry.php";
+	                                    $submenu["class"] = "submenuitem$ff";
+	                                    $submenu["hoverclass"] = "submenuitem_hover$ff";
+	                                    $menu["items"][] = $submenu;
+                                    }
+                                    if (file_exists("fanchart.php") and function_exists("imagecreate")) {
+	                                    $submenu = array();
+	                                    $submenu["label"] = $gm_lang["fan_chart"];
+	                                    $submenu["labelpos"] = "right";
+	                                    $submenu["icon"] = $GM_IMAGE_DIR."/".$GM_IMAGES["fanchart"]["small"];
+	                                    $submenu["link"] = "fanchart.php";
+	                                    $submenu["class"] = "submenuitem$ff";
+	                                    $submenu["hoverclass"] = "submenuitem_hover$ff";
+	                                    $menu["items"][] = $submenu;
+                                    }
+                                    if (file_exists("hourglass.php")) {
+	                                    $submenu = array();
+	                                    $submenu["label"] = $gm_lang["hourglass_chart"];
+	                                    $submenu["labelpos"] = "right";
+	                                    $submenu["icon"] = $GM_IMAGE_DIR."/".$GM_IMAGES["hourglass"]["small"];
+	                                    $submenu["link"] = "hourglass.php";
+	                                    $submenu["class"] = "submenuitem$ff";
+	                                    $submenu["hoverclass"] = "submenuitem_hover$ff";
+	                                    $menu["items"][] = $submenu;
+                                    }
+                                    if (file_exists("familybook.php")) {
+	                                    $submenu = array();
+	                                    $submenu["label"] = $gm_lang["familybook_chart"];
+	                                    $submenu["labelpos"] = "right";
+	                                    $submenu["icon"] = $GM_IMAGE_DIR."/".$GM_IMAGES["fambook"]["small"];
+	                                    $submenu["link"] = "familybook.php";
+	                                    $submenu["class"] = "submenuitem$ff";
+	                                    $submenu["hoverclass"] = "submenuitem_hover$ff";
+	                                    $menu["items"][] = $submenu;
+                                    }
+                                    print_menu($menu);
+                                    ?>
+                                </td>
+                                <td width="1">
+                                    <?php
+                                    //-- lists menu
+									$menu = array();
+									$menu["label"] = $gm_lang["lists"];
+									$menu["labelpos"] = "none";
+									$menu["icon"] = $GM_IMAGE_DIR."/".$GM_IMAGES["lists"]["large"];
+									$menu["link"] = "indilist.php";
+									$menu["class"] = "menuitem";
+									$menu["hoverclass"] = "menuitem_hover";
+									$menu["flyout"] = "down";
+									$menu["submenuclass"] = "submenu$ff";
+									$menu["items"] = array();
+
+                                    if (file_exists("indilist.php")) {
+										$submenu = array();
+										$submenu["label"] = $gm_lang["individual_list"];
+										$submenu["labelpos"] = "right";
+										$submenu["icon"] = $GM_IMAGE_DIR."/".$GM_IMAGES["indis"]["small"];
+										$submenu["link"] = "indilist.php";
+										$submenu["class"] = "submenuitem$ff";
+										$submenu["hoverclass"] = "submenuitem_hover$ff";
+										$menu["items"][] = $submenu;
+									}
+
+									if (file_exists("famlist.php")) {
+										$submenu = array();
+										$submenu["label"] = $gm_lang["family_list"];
+										$submenu["labelpos"] = "right";
+										$submenu["icon"] = $GM_IMAGE_DIR."/".$GM_IMAGES["cfamily"]["small"];
+										$submenu["link"] = "famlist.php";
+										$submenu["class"] = "submenuitem$ff";
+										$submenu["hoverclass"] = "submenuitem_hover$ff";
+										$menu["items"][] = $submenu;
+									}
+
+                                    //-- produce a plot of statistics
+                                    if (file_exists("statistics.php")&&file_exists("jpgraph")) {
+	                                    $submenu = array();
+	                                    $submenu["label"] = $gm_lang["statistics"];
+	                                    $submenu["labelpos"] = "right";
+	                       				$submenu["icon"] = $GM_IMAGE_DIR."/".$GM_IMAGES["statistic"]["small"];
+	                                    $submenu["link"] = "statistics.php";
+	                       				$submenu["class"] = "submenuitem$ff";
+	                       				$submenu["hoverclass"] = "submenuitem_hover$ff";
+	                                    $menu["items"][] = $submenu;
+                                    }
+
+                                    //-- list most ancient parent of a family
+                                    if (file_exists("patriarchlist.php")) {
+	                                    $submenu = array();
+	                                    $submenu["label"] = $gm_lang["patriarch_list"];
+	                                    $submenu["labelpos"] = "right";
+	                       				$submenu["icon"] = $GM_IMAGE_DIR."/".$GM_IMAGES["patriarch"]["small"];
+	                                    $submenu["link"] = "patriarchlist.php";
+	                       				$submenu["class"] = "submenuitem$ff";
+	                       				$submenu["hoverclass"] = "submenuitem_hover$ff";
+	                                    $menu["items"][] = $submenu;
+                                    }
+
+                                    if ($SHOW_SOURCES>=getUserAccessLevel(getUserName())) {
+	                                    if (file_exists("sourcelist.php")) {
+		                                    $submenu = array();
+		                                    $submenu["label"] = $gm_lang["source_list"];
+		                                    $submenu["labelpos"] = "right";
+		                       				$submenu["icon"] = $GM_IMAGE_DIR."/".$GM_IMAGES["menu_source"]["small"];
+		                                    $submenu["link"] = "sourcelist.php";
+		                       				$submenu["class"] = "submenuitem$ff";
+		                       				$submenu["hoverclass"] = "submenuitem_hover$ff";
+		                                    $menu["items"][] = $submenu;
+	                                    }
+
+	                                    if (file_exists("repolist.php")) {
+							                $submenu = array();
+							                $submenu["label"] = $gm_lang["repo_list"];
+							                $submenu["labelpos"] = "right";
+											$submenu["icon"] = $GM_IMAGE_DIR."/".$GM_IMAGES["menu_repository"]["small"];
+							                $submenu["link"] = "repolist.php";
+							                $submenu["class"] = "submenuitem$ff";
+								            $submenu["hoverclass"] = "submenuitem_hover$ff";
+									        $menu["items"][] = $submenu;
+								        }
+									}
+
+									if (file_exists("placelist.php")) {
+	                                    $submenu = array();
+	                                    $submenu["label"] = $gm_lang["place_list"];
+	                                    $submenu["labelpos"] = "right";
+	                       				$submenu["icon"] = $GM_IMAGE_DIR."/".$GM_IMAGES["place"]["small"];
+	                                    $submenu["link"] = "placelist.php";
+	                       				$submenu["class"] = "submenuitem$ff";
+	                       				$submenu["hoverclass"] = "submenuitem_hover$ff";
+	                                    $menu["items"][] = $submenu;
+                                    }
+
+									if (file_exists("aliveinyear.php")) {
+										$submenu = array();
+										$submenu["label"] = $gm_lang["alive_in_year"];
+										$submenu["labelpos"] = "right";
+										$submenu["icon"] = $GM_IMAGE_DIR."/".$GM_IMAGES["indis"]["small"];
+										$submenu["link"] = "aliveinyear.php";
+										$submenu["class"] = "submenuitem$ff";
+										$submenu["hoverclass"] = "submenuitem_hover$ff";
+										$menu["items"][] = $submenu;
+									}
+
+									if (file_exists("medialist.php")) {
+                                    	global $MULTI_MEDIA;
+                                    	if($MULTI_MEDIA) {
+		                                    $submenu = array();
+		                                    $submenu["label"] = $gm_lang["media_list"];
+		                                    $submenu["labelpos"] = "right";
+		                            		$submenu["icon"] = $GM_IMAGE_DIR."/".$GM_IMAGES["media"]["small"];
+		                                    $submenu["link"] = "medialist.php";
+		                       				$submenu["class"] = "submenuitem$ff";
+		                       				$submenu["hoverclass"] = "submenuitem_hover$ff";
+		                                    $menu["items"][] = $submenu;
+                                    	}
+                                    }
+                                    print_menu($menu);
+                                    ?>
+                                </td>
+                                <?php
+								if (file_exists("calendar.php")) {
+                                	print "<td width=\"1\">";
+
+                                    $menu = array();
+                                    $menu["label"] = $gm_lang["anniversary_calendar"];
+                                    $menu["labelpos"] = "none";
+                       				$menu["icon"] = $GM_IMAGE_DIR."/".$GM_IMAGES["calendar"]["large"];
+                                    $menu["link"] = "calendar.php";
+                                    $menu["class"] = "menuitem";
+                                    $menu["hoverclass"] = "menuitem_hover";
+                       				$menu["submenuclass"] = "submenu$ff";
+                                    $menu["flyout"] = "down";
+                                    $menu["items"] = array();
+
+									$submenu = array();
+									$submenu["label"] = $gm_lang["viewday"];
+									$submenu["labelpos"] = "right";
+									$submenu["icon"] = $GM_IMAGE_DIR."/".$GM_IMAGES["calendar"]["small"];
+									$submenu["link"] = "calendar.php";
+									$submenu["class"] = "submenuitem$ff";
+									$submenu["hoverclass"] = "submenuitem_hover$ff";
+									$menu["items"][] = $submenu;
+
+									$submenu = array();
+									$submenu["label"] = $gm_lang["viewmonth"];
+									$submenu["labelpos"] = "right";
+									$submenu["icon"] = $GM_IMAGE_DIR."/".$GM_IMAGES["calendar"]["small"];
+									$submenu["link"] = "calendar.php?action=calendar";
+									$submenu["class"] = "submenuitem$ff";
+									$submenu["hoverclass"] = "submenuitem_hover$ff";
+									$menu["items"][] = $submenu;
+
+									$submenu = array();
+									$submenu["label"] = $gm_lang["viewyear"];
+									$submenu["labelpos"] = "right";
+									$submenu["icon"] = $GM_IMAGE_DIR."/".$GM_IMAGES["calendar"]["small"];
+									$submenu["link"] = "calendar.php?action=year";
+									$submenu["class"] = "submenuitem$ff";
+									$submenu["hoverclass"] = "submenuitem_hover$ff";
+									$menu["items"][] = $submenu;
+
+                                    print_menu($menu);
+                                	print "</td>";
+                            	}
+
+                                if (file_exists("reportengine.php")) {
+				                    print "<td width=\"1\">";
+				                    $menu = array();
+				                    $menu["label"] = $gm_lang["reports"];
+				                    $menu["labelpos"] = "none";
+				      				$menu["icon"] = $GM_IMAGE_DIR."/".$GM_IMAGES["reports"]["large"];
+				                    $menu["link"] = "reportengine.php";
+				                    $menu["class"] = "menuitem";
+				                    $menu["hoverclass"] = "menuitem_hover";
+				      				$menu["submenuclass"] = "submenu$ff";
+				                    $menu["flyout"] = "down";
+				                    $menu["items"] = get_reports_submenu("submenuitem$ff", "submenuitem_hover$ff");
+
+	                                print_menu($menu);
+    	                            print "</td>";
+                                }
+
+                              	if (file_exists("clippings.php")) {
+	                                global $ENABLE_CLIPPINGS_CART;
+	                                if ($ENABLE_CLIPPINGS_CART>=getUserAccessLevel()) {
+										print "<td width=\"1\">";
+										$menu = array();
+										$menu["label"] = $gm_lang["clippings_cart"];
+										$menu["labelpos"] = "none";
+										$menu["icon"] = $GM_IMAGE_DIR."/".$GM_IMAGES["clippings"]["large"];
+										$menu["link"] = "clippings.php";
+										$menu["class"] = "menuitem";
+										$menu["hoverclass"] = "menuitem_hover";
+										print_menu($menu);
+										print "</td>";
+									}
+                                }
+
+								if (file_exists("search.php")) {
+									print "<td width=\"1\">";
+									$menu = array();
+									$menu["label"] = $gm_lang["search"];
+									$menu["labelpos"] = "none";
+									$menu["icon"] = $GM_IMAGE_DIR."/".$GM_IMAGES["search"]["large"];
+									$menu["class"] = "menuitem";
+									$menu["link"] = "search.php";
+									$menu["hoverclass"] = "menuitem_hover";
+									$menu["flyout"] = "down";
+									$menu["submenuclass"] = "submenu$ff";
+									$menu["items"] = array();
+
+									$submenu = array();
+									$submenu["label"] = $gm_lang["search_general"];
+									$submenu["labelpos"] = "right";
+									$submenu["icon"] = $GM_IMAGE_DIR."/".$GM_IMAGES["search"]["small"];
+									$submenu["link"] = "search.php?action=general&amp;topsearch=yes";
+									$submenu["class"] = "submenuitem$ff";
+									$submenu["hoverclass"] = "submenuitem_hover$ff";
+									$menu["items"][] = $submenu;
+
+									$submenu = array();
+									$submenu["label"] = $gm_lang["search_soundex"];
+									$submenu["labelpos"] = "right";
+									$submenu["icon"] = $GM_IMAGE_DIR."/".$GM_IMAGES["search"]["small"];
+									$submenu["link"] = "search.php?action=soundex&amp;topsearch=yes";
+									$submenu["class"] = "submenuitem$ff";
+									$submenu["hoverclass"] = "submenuitem_hover$ff";
+									$menu["items"][] = $submenu;
+
+									print_menu($menu);
+            						print "</td>";
+        						}
+                                ?>
+                                <td width="1">
+                                    <?php
+                                    $menu = array();
+                                    $menu["label"] = $gm_lang["print_preview"];
+                                    $menu["labelpos"] = "none";
+            						$menu["icon"] = $GM_IMAGE_DIR."/".$GM_IMAGES["printer"]["large"];
+                                    $menu["link"] = "$SCRIPT_NAME?view=preview";
+                                    if (!Empty($QUERY_STRING)) $menu["link"] .="&amp;$QUERY_STRING";
+                                    $menu["class"] = "menuitem";
+                                    $menu["hoverclass"] = "menuitem_hover";
+                                    print_menu($menu);
+                                    ?>
+                                </td>
+                                <td width="1" >
+                                    <?php
+                                    global $SHOW_CONTEXT_HELP, $SCRIPT_NAME, $QUERY_STRING, $helpindex;
+                                    //-- help menu
+                                    $menu = array();
+                                    $menu["label"] = $gm_lang["help_page"];
+                                    $menu["labelpos"] = "none";
+                   					$menu["icon"] = $GM_IMAGE_DIR."/".$GM_IMAGES["help"]["large"];
+                                    $menu["link"] = "#";
+                                    if (empty($helpindex)) $menu["onclick"] = "return helpPopup('help_".basename($SCRIPT_NAME)."&amp;action=".$action."');";
+                                    else $menu["onclick"] = "return helpPopup('".$helpindex."');";
+                                    $menu["class"] = "menuitem";
+                                    $menu["hoverclass"] = "menuitem_hover";
+                                    $menu["flyout"] = "down";
+                   					$menu["submenuclass"] = "submenu$ff";
+                                    $menu["items"] = array();
+
+									$submenu = array();
+									$submenu["label"] = $gm_lang["help_for_this_page"];
+									$submenu["labelpos"] = "right";
+									$submenu["icon"] = $GM_IMAGE_DIR."/".$GM_IMAGES["menu_help"]["small"];
+									$submenu["link"] = "#";
+									if (empty($helpindex)) $submenu["onclick"] = "return helpPopup('help_".basename($SCRIPT_NAME)."&amp;action=".$action."');";
+									else $submenu["onclick"] = "return helpPopup('".$helpindex."');";
+									$submenu["class"] = "submenuitem$ff";
+									$submenu["hoverclass"] = "submenuitem_hover$ff";
+									$menu["items"][] = $submenu;
+
+									$submenu = array();
+									$submenu["label"] = $gm_lang["help_contents"];
+									$submenu["labelpos"] = "right";
+									$submenu["icon"] = $GM_IMAGE_DIR."/".$GM_IMAGES["menu_help"]["small"];
+									$submenu["link"] = "#";
+									$submenu["onclick"] = "return helpPopup('help_contents_help');";
+									$submenu["class"] = "submenuitem$ff";
+									$submenu["hoverclass"] = "submenuitem_hover$ff";
+                                    $menu["items"][] = $submenu;
+							 
+							     if (file_exists("faq.php")) {
+									$submenu = array();
+									$submenu["label"] = $gm_lang["faq_list"];
+									$submenu["labelpos"] = "right";
+									$submenu["icon"] = $GM_IMAGE_DIR."/".$GM_IMAGES["menu_help"]["small"];
+									$submenu["link"] = "faq.php";
+									$submenu["class"] = "submenuitem$ff";
+									$submenu["hoverclass"] = "submenuitem_hover$ff";
+									$menu["items"][] = $submenu;
+								}
+								 if (file_exists("searchhelp.php")) {
+									$submenu = array();
+									$submenu["label"] = $gm_lang["hs_title"];
+									$submenu["labelpos"] = "right";
+									$submenu["icon"] = $GM_IMAGE_DIR."/".$GM_IMAGES["search"]["small"];
+									$submenu["link"] = "#";
+					                $submenu["onclick"] = "window.open('searchhelp.php', '', 'top=50,left=10,width=700,height=600,scrollbars=1,resizable=1');";
+									$submenu["class"] = "submenuitem$ff";
+									$submenu["hoverclass"] = "submenuitem_hover$ff";
+									$menu["items"][] = $submenu;
+								 }
+                                    $menu["items"][]="separator";
+                                    //-- add contact links to help menu
+					                $menuitems = print_contact_links(1);
+					                foreach($menuitems as $menuitem) {
+						                $menuitem["class"] = "submenuitem$ff";
+					                	$menuitem["hoverclass"] = "submenuitem_hover$ff";
+						                $menu["items"][] = $menuitem;
+					                }
+					                $menu["items"][]="separator";
+
+                                    $submenu = array();
+                                    if ($_SESSION["show_context_help"]) {
+                                    $submenu["label"] = $gm_lang["hide_contexthelp"];
+                                    $submenu["link"] = "$SCRIPT_NAME?$QUERY_STRING&amp;show_context_help=no";
+                                    }
+                                    else {
+                                    $submenu["label"] = $gm_lang["show_contexthelp"];
+                                    $submenu["link"] = "$SCRIPT_NAME?$QUERY_STRING&amp;show_context_help=yes";
+                                    }
+                                    $submenu["labelpos"] = "right";
+				                   	$submenu["class"] = "submenuitem$ff";
+				                   	$submenu["hoverclass"] = "submenuitem_hover$ff";
+                                    $menu["items"][] = $submenu;
+                                    print_menu($menu);
+                                    ?>
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                    <td >&nbsp;</td>
+                    <td>
+                        <div align="<?php print $TEXT_DIRECTION=="rtl"?"left":"right" ?>" ><?php print_lang_form(1); ?>
+                        </div>
+                    </td>
+                    <td width="10"><img src="<?php print $GM_IMAGE_DIR; ?>/pixel.gif" width="1" height="1" alt="" /></td>
+                </tr>
+            </table>
