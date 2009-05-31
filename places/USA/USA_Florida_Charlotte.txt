@@ -1,9 +1,0 @@
-<!-- @version $Id: USA_Florida_Charlotte.txt,v 1.1 2005/10/23 22:08:17 roland-d Exp $ -->
-<!-- @see http://www.naco.org/ -->
-El Jobean
-Englewood
-Murdock
-Placida
-Port Charlotte
-Punta Gorda
-Rotonda West

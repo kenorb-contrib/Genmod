@@ -3,7 +3,7 @@
  * Modifies the themes by means of a user friendly interface
  *
  * Genmod: Genealogy Viewer
- * Copyright (C) 2005 Genmod Development Team
+ * Copyright (C) 2005 - 2008 Genmod Development Team
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,19 +21,13 @@
  *
  * @package Genmod
  * @subpackage Themes
- * @version $Id: theme_edit.php,v 1.2 2006/01/09 14:19:30 sjouke Exp $
+ * @version $Id: theme_edit.php,v 1.8 2008/03/02 12:14:13 sjouke Exp $
  */
 
 /**
  * Inclusion of the configuration file
 */
 require("config.php");
-
-/**
- * Inclusion of the language files
-*/
-require($GM_BASE_DIRECTORY.$factsfile["english"]);
-if (file_exists($GM_BASE_DIRECTORY . $factsfile[$LANGUAGE])) require $GM_BASE_DIRECTORY . $factsfile[$LANGUAGE];
 
 if (!isset($action)) $action="";
 if (!isset($choose_theme)) $choose_theme="";
@@ -42,10 +36,11 @@ if (!isset($choose_theme)) $choose_theme="";
 //-- otherwise have them login again
 $uname = $gm_username;
 if (empty($uname)) {
-	header("Location: login.php?url=theme_edit.php");
+	if (empty($LOGIN_URL)) header("Location: login.php?url=theme_edit.php");
+	else header("Location: ".$LOGIN_URL."?url=theme_edit.php");
 	exit;
 }
-$user = getUser($uname);
+$user = $Users->getUser($uname);
 
 // -- print html header information
 print_header("Theme editor");
@@ -58,7 +53,7 @@ print_header("Theme editor");
 	<select name="choose_theme">
 	<option value=""><?php print $gm_lang["site_default"]; ?></option>
 			<?php
-				$themes = get_theme_names();
+				$themes = GetThemeNames();
 				foreach($themes as $indexval => $themedir) {
 					print "<option value=\"".$themedir["dir"]."\"";
 					if ($themedir["dir"] == $choose_theme) print " selected=\"selected\"";

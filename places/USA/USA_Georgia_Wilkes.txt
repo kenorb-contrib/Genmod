@@ -1,7 +1,0 @@
-<!-- @version $Id: USA_Georgia_Wilkes.txt,v 1.1 2005/10/23 22:08:17 roland-d Exp $ -->
-<!-- @see http://www.naco.org/ -->
-Danburg
-Philomath
-Rayle
-Tignall
-Washington

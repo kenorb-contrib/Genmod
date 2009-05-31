@@ -1,8 +1,0 @@
-<!-- @version $Id: USA_Alabama_Fayette.txt,v 1.1 2005/10/23 22:08:16 roland-d Exp $ -->
-<!-- @see http://www.naco.org/ -->
-Bankston
-Belk
-Berry
-Fayette
-Glen Allen
-Winfield

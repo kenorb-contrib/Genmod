@@ -3,7 +3,7 @@
  * Searches based on user query.
  *
  * Genmod: Genealogy Viewer
- * Copyright (C) 2005 Genmod Development Team
+ * Copyright (C) 2005 - 2008 Genmod Development Team
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,22 +21,45 @@
  *
  * @package Genmod
  * @subpackage Display
- * @version $Id: search.php,v 1.17 2006/04/09 15:53:27 roland-d Exp $
+ * @version $Id: search.php,v 1.82 2009/05/23 06:11:24 sjouke Exp $
  */
 
 /**
  * Inclusion of the configuration file
 */
-require("config.php");
+require("config.php"); 
+
+$COMBIKEY = true;
 
 if (!isset($view)) $view = "";
+if (!isset($action)) $action = "";
+
+// We come from the quick start block
+if ($action == "quickstart") {
+	if (isset($query) && !empty($query)) {
+		$action = "general";
+	}
+	else {
+		$action = "soundex";
+		$soundex = "Russell";
+		if (!empty($firstname) && HasChinese($firstname)) $soundex = "DaitchM"; 
+		if (!empty($lastname) && HasChinese($lastname)) $soundex = "DaitchM"; 
+		if (!empty($place) && HasChinese($place)) $soundex = "DaitchM";
+	}
+	if (isset($crossged) && $crossged == "yes" && $ALLOW_CHANGE_GEDCOM) {
+		foreach ($GEDCOMS as $key=>$ged) {
+			$str = preg_replace(array("/\./","/-/","/ /"), array("_","_","_"), $key);
+			$$str = "yes";
+		}
+	}
+}
 
 // Remove slashes
 if (isset($query)) {
 	// Reset the "Search" text from the page header
 	if ($query == $gm_lang["search"]) {
 		unset($query);
-		unset($action);
+		$action = "";
 		unset($topsearch);
 	}
 	else {
@@ -45,23 +68,28 @@ if (isset($query)) {
 	}
 }
 if (!isset($soundex)) $soundex = "Russell";
-if (!isset($action)) $action = "";
 if (!isset($nameprt)) $nameprt = "";
 if (!isset($tagfilter)) $tagfilter = "on";
 if (!isset($showasso)) $showasso = "off";
 if (!isset($sorton)) $sorton = "";
 
-if (!empty($firstname)) $myfirstname = $firstname;
+// if no general search specified, search in indi's
+if (!isset($srindi) && !isset($srfams) && !isset($srsour)&& !isset($srmedia)&& !isset($srnote)&& !isset($srrepo)) $srindi = "yes";
+
+// If we only search on a place, no hits are likely to occur in person names. So, set nameprt to all.
+if (empty($firstname) && empty($lastname) && !empty($place)) $nameprt = "all";
+
+if (!empty($firstname)) $myfirstname = stripslashes($firstname);
 else {
 	unset($firstname);
 	$myfirstname = "";
 }
-if (!empty($lastname)) $mylastname = $lastname;
+if (!empty($lastname)) $mylastname = stripslashes($lastname);
 else {
 	unset($lastname);
 	$mylastname = "";
 }	
-if (!empty($place)) $myplace = $place;
+if (!empty($place)) $myplace = stripslashes($place);
 else {
 	unset($place);
 	$myplace = "";
@@ -86,37 +114,59 @@ if (isset($topsearch)) {
 	if (isset($query)) {
 
 		// see if it's an indi ID. If it's found and privacy allows it, JUMP!!!!
-		if (find_person_record($query)) {
-			if (showLivingNameByID($query)||displayDetailsByID($query)) {
+		if (FindPersonRecord($query)) {
+			if (showLivingNameByID(str2upper($query))) {
 				header("Location: individual.php?pid=".$query."&ged=".$GEDCOM);
 				exit;
 			}
 		}
 
 		// see if it's a family ID. If it's found and privacy allows it, JUMP!!!!
-		if (find_family_record($query)) {
+		$f = FindFamilyRecord($query); 
+		if ($f) {
 			//-- check if we can display both parents
-			if (displayDetailsByID($query, "FAM") == true) {
-				$parents = find_parents($query);
+			if (displayDetailsByID(str2upper($query), "FAM") == true) {
+				$parents = FindParents($query);
 				if (showLivingNameByID($parents["HUSB"]) && showLivingNameByID($parents["WIFE"])) {
-					header("Location: family.php?famid=".$query."&ged=".$GEDCOM);
-					exit;
+					$ct = preg_match("/0 @(.*)@ (.*)/", $f, $match);
+					if ($ct>0) {
+						$fid = trim($match[1]);
+						header("Location: family.php?famid=".$fid."&ged=".$GEDCOM);
+						exit;
+					}
 				}
 			}
 		}
 
 		// see if it's an source ID. If it's found and privacy allows it, JUMP!!!!
-		if ($SHOW_SOURCES>=getUserAccessLevel($gm_username)) {
-			if (find_source_record($query)) {
+		if ($SHOW_SOURCES >= $Users->getUserAccessLevel($gm_username)) {
+			if (FindSourceRecord($query)) {
 				header("Location: source.php?sid=".$query."&ged=".$GEDCOM);
 				exit;
 			}
 		}
 
 		// see if it's a repository ID. If it's found and privacy allows it, JUMP!!!!
-		if ($SHOW_SOURCES>=getUserAccessLevel($gm_username)) {
-			if (find_repo_record($query)) {
+		if ($SHOW_SOURCES >= $Users->getUserAccessLevel($gm_username)) {
+			if (FindRepoRecord($query)) {
 				header("Location: repo.php?rid=".$query."&ged=".$GEDCOM);
+				exit;
+			}
+		}
+		
+		// see if it's a media ID. If it's found and privacy allows it, JUMP!!!!
+		$f = FindMediaRecord($query);
+		if (!empty($f) && DisplayDetailsByID(str2upper($query), "OBJE", 1, true)) {
+			header("Location: mediadetail.php?mid=".$query."&ged=".$GEDCOM);
+			exit;
+		}
+		
+		// see if it's a note ID. If it's found and privacy allows it, JUMP!!!!
+		$f = FindOtherRecord($query);
+		if (!empty($f) && DisplayDetailsByID(str2upper($query), "NOTE", 1, true)) {
+			$type = GetRecType($f);
+			if ($type == "NOTE") {
+				header("Location: note.php?oid=".$query."&ged=".$GEDCOM);
 				exit;
 			}
 		}
@@ -127,13 +177,21 @@ if (isset($topsearch)) {
 $sgeds = array();
 if (($ALLOW_CHANGE_GEDCOM) && (count($GEDCOMS) > 1)) {
 	foreach ($GEDCOMS as $key=>$ged) {
+		// BUT we must NOT search in a gedcom with authentication required and a user not logged in!
 		$str = preg_replace(array("/\./","/-/","/ /"), array("_","_","_"), $key);
+		SwitchGedcom($key);
+		if ($REQUIRE_AUTHENTICATION && empty($gm_username)) unset($$str);
 		if (isset($$str)) $sgeds[] = $key;
 	}
+	SwitchGedcom();
 }
 else $sgeds[] = $GEDCOM;
+
+// if no search gedcom is specified, take the default gedcom
+if (empty($sgeds)) $sgeds[] = $GEDCOM;
+
 // If we want to show associated persons, build the list
-if ($showasso == "on") get_asso_list();
+if ($showasso == "on") GetAssoList();
 
 // Section to gather results for general search
 if ($action=="general") {
@@ -142,11 +200,22 @@ if ($action=="general") {
 	if (isset($query)) {
 		
 		// -- array of names to be used for results. Must be here and empty.
-		$indilist = array();
-		$sourcelist = array();
-		$famlist = array();
-		$famlist2 = array();
+		$sindilist = array();
+		$ssourcelist = array();
+		$sfamlist = array();
+		$sfamlist2 = array();
+		$srepolist = array();
+		$smedialist = array();
 
+		// Keep track of what indi's are already printed to keep a reliable counter
+		$indi_printed = array();
+		$fam_printed = array();
+		$sour_printed = array();
+		$repo_printed = array();
+  
+		// init various counters
+		InitListCounters();
+		
 		// Now see if there is a query left after the cleanup
 		if (trim($query)!="") {
 
@@ -158,14 +227,14 @@ if ($action=="general") {
 			// Note: when more than one word is entered, this will return results where one word
 			// is in one subrecord, another in another subrecord. Theze results are filtered later.
 			if (strlen($query) == 1) $query = preg_replace(array("/\?/", "/\|/", "/\*/"), array("\\\?","\\\|", "\\\\\*") , $query);
-			if ($REGEXP_DB) $query = preg_replace(array("/\(/", "/\)/", "/\//", "/\]/", "/\[/", "/\s+/"), array('\(','\)','\/','\]','\[', '.*'), $query);
-			else {
-				$query = "%".preg_replace("/\s+/", "%", $query)."%";
-			}
+			$query = preg_replace(array("/\(/", "/\)/", "/\//", "/\]/", "/\[/", "/\s+/"), array('\(','\)','\/','\]','\[', ' '), $query);
+			
+			// Get the cleaned up query to use in result comparisons
+			$cquery = ParseFTSearchQuery($query);
 			
 			// Search the indi's
 			if ((isset($srindi)) && (count($sgeds)>0)) {
-				$indilist = search_indis($query, $sgeds);
+				$sindilist = FTSearchIndis($query, $sgeds);
 			}
 
 			// Search the fams
@@ -174,109 +243,120 @@ if ($action=="general") {
 				// the search array, so the fam records can be retrieved.
 				// This way we include hits on family names.
 				// If indi's are not searched yet, we have to search them first
-				if (!isset($srindi)) $indilist = search_indis($query, $sgeds);
+				if (!isset($srindi)) $sindilist = FTSearchIndis($query, $sgeds);
 				$famquery = array();
-				$cntgeds = count($sgeds);
-				foreach($indilist as $key1 => $myindi) {
+				foreach($sindilist as $key1 => $myindi) {
+					$found = false;
 					foreach($myindi["names"] as $key2 => $name) {
-						if ((preg_match("/".$query."/i", $name[0]) > 0)) {
-							if ($cntgeds > 1) {
-								$ged = splitkey($key1, "ged");
-								$key1 = splitkey($key1, "id");
+						foreach ($cquery["includes"] as $qindex => $squery) {
+							if ((preg_match("/".$squery["term"]."/i", $name[0]) > 0)) {
+								$found = true;
+								$ged = SplitKey($key1, "gedid");
+								$key1 = SplitKey($key1, "id");
+								$famquery[] = array($key1, $ged);
+								break;
 							}
-							else $ged = $sgeds[0];
-							$famquery[] = array($key1, $ged);
-							break;
 						}
+						if ($found) break;
 					}
 				}
 				// Get the famrecs with hits on names from the family table
-				if (!empty($famquery)) $famlist = search_fams_names($famquery, "OR", true, $cntgeds);
-				// Get the famrecs with hits in the gedcom record from the family table
-				if (!empty($query)) $famlist2 = search_fams($query, $sgeds, "OR", true);
-				$famlist = gm_array_merge($famlist, $famlist2);
-//				// clear the myindilist is no search was intended for indi's
-//				if (!isset($srindi)) $indilist = array();
+				if (!empty($famquery)) $sfamlist = SearchFamsNames($famquery, "OR", true);
 
+				// Get the famrecs with hits in the gedcom record from the family table
+				if (!empty($query)) $sfamlist2 = FTSearchFams($query, $sgeds, "OR", true);
+				$sfamlist = GmArrayMerge($sfamlist, $sfamlist2);
+				// clear the myindilist is no search was intended for indi's
+				// if (!isset($srindi)) $sindilist = array();
 			}
 
 			// Search the sources
 			if ((isset($srsour)) && (count($sgeds)>0)) {
-				if (!empty($query)) $sourcelist = search_sources($query, $sgeds);
+				if (!empty($query)) $ssourcelist = FTSearchSources($query, $sgeds);
 			}
 
+			// Search the repositories
+			if ((isset($srrepo)) && (count($sgeds)>0)) {
+				if (!empty($query)) $srepolist = FTSearchRepos($query, $sgeds);
+//				print_r($srepolist);
+			}
+			
+			// Search the notes
+			$note_controller = new NoteController();
+			if ((isset($srnote)) && (count($sgeds)>0)) {
+				if (!empty($query)) {
+					$note_controller->FTSearchNotes($query, $sgeds);
+//					print_r($note_controller->notelist);
+				}
+			}
+			
+			// Search the media
+			$media = new Media;
+			if ((isset($srmedia)) && (count($sgeds)>0)) {
+				if (!empty($query)) {
+					$media->FTSearchMedia($query, $sgeds);
+				}
+			}
+			
 			//-- if only 1 item is returned, automatically forward to that item
 			// Check for privacy first. If ID cannot be displayed, continue to the search page.
-			if ((count($indilist)==1)&&(count($famlist)==0)&&(count($sourcelist)==0) && (isset($srindi))) {
-				foreach($indilist as $key=>$indi) {
-					if (count($sgeds) > 1) {
-						$ged = splitkey($key, "ged");
-						$pid = splitkey($key, "id");
-						if ($GEDCOM != $ged) {
-							$oldged = $GEDCOM;
-							$GEDCOM = $ged;
-							ReadPrivacy($GEDCOM);
-						}
-					}
-					else {
-						$pid = $key;
-						$key = $key."[".$indi["gedfile"]."]";
-					}
+			if ((count($sindilist)==1)&&(count($sfamlist)==0)&&(count($ssourcelist)==0) && (count($srepolist)==0) && (count($media->medialist)==0) && count($note_controller->notelist) == 0 && (isset($srindi))) {
+				foreach($sindilist as $key=>$indi) {
+					$ged = SplitKey($key, "ged");
+					$pid = SplitKey($key, "id");
+					SwitchGedcom($ged);
 					if (!isset($assolist[$key])) {
-						if (showLivingNameByID($pid)||displayDetailsByID($pid)) {
+						if (showLivingNameByID($pid)) {
 							header("Location: individual.php?pid=".$pid."&ged=".get_gedcom_from_id($indi["gedfile"]));
 							exit;
 						}
 					}
-					if ((count($sgeds> 1)) && (isset($oldged))) {
-						$GEDCOM = $oldged;
-						ReadPrivacy($GEDCOM);
-					}
 				}
+				SwitchGedcom();
 			}
-			if ((count($indilist)==0 || !isset($srindi))&&(count($famlist)==1)&&(count($sourcelist)==0)) {
-				foreach($famlist as $famid=>$fam) {
-					if (count($sgeds) >1) {
-						$ged = splitkey($famid, "ged");
-						$famid = splitkey($famid, "id");
-						if ($GEDCOM != $ged) {
-							$oldged = $GEDCOM;
-							$GEDCOM = $ged;
-							ReadPrivacy($GEDCOM);
-						}
-					}
+			if ((count($sindilist)==0 || !isset($srindi))&&(count($sfamlist)==1)&&(count($ssourcelist)==0) && (count($srepolist)==0) && (count($media->medialist)==0) && count($note_controller->notelist) == 0) {
+				foreach($sfamlist as $famid=>$fam) {
+					$ged = SplitKey($famid, "ged");
+					$famid = SplitKey($famid, "id");
+					SwitchGedcom($ged);
 					if (displayDetailsByID($famid, "FAM") == true) {
-						$parents = find_parents($famid);
+						$parents = FindParents($famid);
 						if (showLivingNameByID($parents["HUSB"]) && showLivingNameByID($parents["WIFE"])) {
 							header("Location: family.php?famid=".$famid."&ged=".$GEDCOM);
 							exit;
 						}
 					}
-					if (count($sgeds> 1)) {
-						$GEDCOM = $oldged;
-						ReadPrivacy($GEDCOM);
-					}
 				}
+				SwitchGedcom();
 			}
-			if ((count($indilist)==0 || !isset($srindi))&&(count($famlist)==0)&&(count($sourcelist)==1)) {
-				foreach($sourcelist as $sid=>$source) {
-					if (count($sgeds) >1) {
-						$ged = splitkey($sid, "ged");
-						$sid = splitkey($sid, "id");
-						if ($GEDCOM != $ged) {
-							$oldged = $GEDCOM;
-							$GEDCOM = $ged;
-							ReadPrivacy($GEDCOM);
-						}
-					}
-					if (displayDetailsByID($sid, "SOUR")) {
+			if ((count($sindilist)==0 || !isset($srindi))&&(count($sfamlist)==0)&&(count($ssourcelist)==1) && (count($srepolist)==0) && (count($media->medialist)==0) && count($note_controller->notelist==0)) {
+				foreach($ssourcelist as $sid=>$source) {
+					$ged = SplitKey($sid, "ged");
+					$sid = SplitKey($sid, "id");
+					SwitchGedcom($ged);
+					if (displayDetailsByID($sid, "SOUR", 1, true)) {
 						header("Location: source.php?sid=".$sid."&ged=".get_gedcom_from_id($source["gedfile"]));
 						exit;
 					}
-					if (count($sgeds> 1)) {
-						$GEDCOM = $oldged;
-						ReadPrivacy($GEDCOM);
+				}
+				SwitchGedcom();
+			}
+			if ((count($sindilist)==0 || !isset($srindi))&&(count($sfamlist)==0)&&(count($ssourcelist)==0) && (count($srepolist)==1)  && (count($media->medialist)==0)&& count($note_controller->notelist) == 0) {
+				foreach($srepolist as $rid=>$repo) {
+					$ged = SplitKey($rid, "ged");
+					$rid = SplitKey($rid, "id");
+					SwitchGedcom($ged);
+					if (displayDetailsByID($rid, "REPO", 1, true)) {
+						header("Location: repo.php?rid=".$rid."&ged=".get_gedcom_from_id($repo["gedfile"]));
+						exit;
 					}
+				}
+				SwitchGedcom();
+			}
+			if ((count($sindilist)==0 || !isset($srindi))&&(count($sfamlist)==0)&&(count($ssourcelist)==0) && (count($srepolist)==0) && (count($media->medialist)==0) && count($note_controller->notelist) == 1) {
+				foreach($note_controller->notelist as $oid=>$note) {
+					header("Location: note.php?oid=".$note->GetXref()."&ged=".get_gedcom_from_id($note->gedcomid));
+					exit;
 				}
 			}
 		}
@@ -284,7 +364,8 @@ if ($action=="general") {
 }
 
 if ($action=="soundex") {
-	if (((!empty($lastname))||(!empty($firstname))||(!empty($place)))&&(count($sgeds)>0)) {
+	// Only place filled in is incorrect. Search place only in combination with the other fields.
+	if ((!empty($lastname) || !empty($firstname)) && count($sgeds)>0) {
 		$logstring = "Soundex, ";
 		if (!empty($lastname)) $logstring .= "Last name: ".$lastname."<br />";
 		if (!empty($firstname)) $logstring .= "First name: ".$firstname."<br />";
@@ -319,12 +400,14 @@ if ($action=="soundex") {
 				$year = "%".preg_replace("/\s+/", "%", $year)."%";
 			}		
 		}
-		$indilist = array();
+		$sindilist = array();
 			
 		if ($soundex == "DaitchM") DMsoundex("", "opencache");
 
 		// Do some preliminary stuff: determine the soundex codes for the search criteria
 		if (!empty($lastname)) {
+			$orglastname = $lastname;
+			if (HasChinese($lastname, true)) $lastname = GetPinYin($lastname, true);
 			$lastnames = preg_split("/\s/", trim($lastname));
 			$larr = array();
 			for($j=0; $j<count($lastnames); $j++) {
@@ -333,6 +416,8 @@ if ($action=="soundex") {
 			}
 		}
 		if (!empty($firstname)) {
+			$orgfirstname = $firstname;
+			if (HasChinese($firstname, true)) $firstname = GetPinYin($firstname, true);
 			$firstnames = preg_split("/\s/", trim($firstname));
 			$farr = array();
 			for($j=0; $j<count($firstnames); $j++) {
@@ -340,79 +425,115 @@ if ($action=="soundex") {
 				if ($soundex == "DaitchM") $farr[$j] = DMsoundex($firstnames[$j]);
 			}
 		}
-		if ((!empty($place)) && ($soundex == "DaitchM")) $parr = DMsoundex($place);
-		if ((!empty($place)) && ($soundex == "Russell")) $parr = soundex(trim($place));
-		
+		$parr = array();
+		if (isset($place)) {
+			if (HasChinese($place, true)) $place = GetPinYin($place, true);
+			if ((!empty($place)) && ($soundex == "DaitchM")) $parr = DMsoundex($place);
+			if ((!empty($place)) && ($soundex == "Russell")) $parr = soundex(trim($place));
+		}
 		// Start the search
 		$oldged = $GEDCOM;
-		$printname = array();
+		$printindiname = array();
 		$printfamname = array();
-		
+		$indi_printed = array();
+		$fam_printed = array();
+
 		// Build the query
-		$sql = "SELECT i_id, i_gedcom, i_file FROM ".$TBLPREFIX."individuals WHERE (";
+		$sql = "SELECT DISTINCT n_id, i_key, i_id, i_gedcom, i_file, i_isdead, n_name, n_surname, n_type, n_letter FROM ";
+
+		if (isset($farr)) $sql .= $TBLPREFIX."soundex as s1, ";
+		if (isset($larr)) $sql .= $TBLPREFIX."soundex as s2, ";
+		$sql .= $TBLPREFIX."individuals, ".$TBLPREFIX."names WHERE i_key=n_key AND ";
+		
 		if (isset($farr)) {
+			
+			if (count($sgeds) != count($GEDCOMS)) {
+				$sql .= " (";
+				$i = 0;
+				foreach ($sgeds as $key => $gedcom) {
+					if ($i != 0) $sql .= " OR ";
+					$i++;
+					$sql .= "s1.s_file='".$GEDCOMS[$gedcom]["id"]."'";
+				}
+				$sql .= ") AND";
+			}
+		
+			$sql .= " i_key=s1.s_gid AND ";
+			if ($soundex == "Russell") $sql .= "s1.s_type='R'";
+			else $sql .= "s1.s_type='D'";
+			$sql .= " AND s1.s_nametype='F' AND (";
 			$i = 0;
 			foreach ($farr as $key => $code) {
 				if ($soundex == "Russell") {
 					if ($i > 0) $sql .= " OR ";
 					$i++;
-					$sql .= "i_fnsoundex LIKE '%".$code."%'";
+					$sql .= "s1.s_code LIKE '".$code."'";
 				}
 				else {
 					foreach ($code as $key2 => $value) {
 						if ($i > 0) $sql .= " OR ";
 						$i++;
-						$sql .= "i_fndmsoundex LIKE '%".$value."%'";
+						$sql .= "s1.s_code LIKE '".$value."'";
 					}
 				}
 			}
 			$sql .= ")";
 		}
 		if (isset($larr)) {
-			if (isset($farr)) $sql .= " AND (";
+			if (isset($farr)) $sql .= " AND i_key=s2.s_gid AND s1.s_type=s2.s_type AND s2.s_nametype='L' AND (";
+			else {
+				if (count($sgeds) != count($GEDCOMS)) {
+					$sql .= " (";
+					$i = 0;
+					foreach ($sgeds as $key => $gedcom) {
+						if ($i != 0) $sql .= " OR ";
+						$i++;
+						$sql .= "s2.s_file='".$GEDCOMS[$gedcom]["id"]."'";
+					}
+					$sql .= ") AND";
+				}
+				
+				$sql .= " i_key=s2.s_gid AND s2.s_nametype='L' AND (";
+			}
 			$i = 0;
 			foreach ($larr as $key => $code) {
 				if ($soundex == "Russell") {
 					if ($i > 0) $sql .= " OR ";
 					$i++;
-					$sql .= "i_snsoundex LIKE '%".$code."%'";
+					if (isset($farr)) $sql .= "s2.s_code LIKE '".$code."'";
+					else $sql .= "s2.s_code LIKE '".$code."'";
 				}
 				else {
 					foreach ($code as $key2 => $value) {
 						if ($i > 0) $sql .= " OR ";
 						$i++;
-						$sql .= "i_sndmsoundex LIKE '%".$value."%'";
+						if (isset($farr)) $sql .= "s2.s_code LIKE '".$value."'";
+						else $sql .= "s2.s_code LIKE '".$value."'";
 					}
 				}
 			}
 			$sql .= ")";
 		}
-		if (count($sgeds) != count($GEDCOMS)) {
-			if (isset($farr) || isset($larr)) $sql .= " AND (";
-			$i = 0;
-			foreach ($sgeds as $key => $gedcom) {
-				if ($i != 0) $sql .= " OR ";
-				$i++;
-				$sql .= "i_file='".$GEDCOMS[$gedcom]["id"]."'";
-			}
-			$sql .= ")";
-		}
-		$res = mysql_query($sql);
-		$indilist = array();
+		$res = NewQuery($sql);		
+		$sindilist = array();
 		if ($res) {
-			while ($row = mysql_fetch_assoc($res)) {
-				$indi = array();
-				$indi["gedcom"] = $row["i_gedcom"];
-				$indi["gedfile"] = $row["i_file"];
-				$indi["names"] = get_indi_names($indi["gedcom"]);
-				$key = $row["i_id"]."[".$row["i_file"]."]";
-				$indilist[$key] = $indi;
+			while ($row = $res->FetchAssoc()) {
+				if (!isset($sindilist[$row["i_key"]])) {
+					$indi = array();
+					$indi["gedcom"] = $row["i_gedcom"];
+					$indi["gedfile"] = $row["i_file"];
+					$indi["names"][] = array($row["n_name"], $row["n_letter"], $row["n_surname"], $row["n_type"]);
+					$indi["isdead"] = $row["i_isdead"];
+					$sindilist[$row["i_key"]] = $indi;
+				}
+				else $sindilist[$row["i_key"]]["names"][] = array($row["n_name"], $row["n_letter"], $row["n_surname"], $row["n_type"]);
 			}
 		}
+
 		// -- Check the result on places
-		foreach ($indilist as $key => $value) {
+		foreach ($sindilist as $key => $value) {
 			$save = true;
-			$ikey = splitkey($key, "id");
+			$ikey = SplitKey($key, "id");
 			if ((!empty($place))||(!empty($year))) {
 				$indirec = $value["gedcom"];
 				if (!empty($place)) {
@@ -421,6 +542,8 @@ if ($action=="soundex") {
 					if ($pt>0) {
 						$places = array();
 						for ($pp=0; $pp<count($match[1]); $pp++){
+							// Split on chinese comma 239 188 140
+							$match[1][$pp] = preg_replace("/".chr(239).chr(188).chr(140)."/", ",", $match[1][$pp]);
 							$places[$pp] =preg_split("/,\s/", trim($match[1][$pp]));
 						}
 						$cp=count($places);
@@ -428,11 +551,13 @@ if ($action=="soundex") {
 						while($p<$cp && $savep == false) {
 							$pp = 0;
 							while($pp<count($places[$p]) && $savep == false) {
+								if (HasChinese($places[$p][$pp])) $pl = GetPinYin(trim($places[$p][$pp]));
+								else $pl = trim($places[$p][$pp]);
 								if ($soundex == "Russell") {
-									if (soundex(trim($places[$p][$pp]))==$parr) $savep = true;
+									if (soundex($pl) == $parr) $savep = true;
 								}
 								if ($soundex == "DaitchM") {
-									$arr1 = DMsoundex(trim($places[$p][$pp]));
+									$arr1 = DMsoundex($pl);
 									$a = array_intersect($arr1, $parr);
 									if (!empty($a)) $savep = true;
 								}
@@ -453,14 +578,16 @@ if ($action=="soundex") {
 			if ($save === true) {
 				if ($nameprt == "all") {
 					foreach($value["names"] as $indexval => $namearray) {
-						$printname[] = array(sortable_name_from_name($namearray[0]), $ikey, get_gedcom_from_id($value["gedfile"]),"");
+						$printindiname[] = array(SortableNameFromName($namearray[0]), $ikey, get_gedcom_from_id($value["gedfile"]),"");
 					}
+					$indi_printed[JoinKey($ikey, $value["gedfile"])] = "1";
 				}
 				else {
 					foreach($value["names"] as $indexval => $namearray) {
 						$print = false;
 						$name = split("/", $namearray[0]);
-						if (!empty($lastname)) {
+						if (!empty($lastname) && HasChinese($orglastname, true) == HasChinese($name[1], true)) {
+							if (HasChinese($name[1], true)) $name[1] = GetPinYin($name[1], true);
 							$lnames = preg_split("/\s/", trim($name[1]));
 							foreach ($lnames as $namekey => $name) {
 								if ($soundex == "DaitchM") {
@@ -479,7 +606,8 @@ if ($action=="soundex") {
 								if ($print) break;
 							}
 						}
-						if (!empty($firstname) && $print == false) {
+						if (!empty($firstname) && $print == false  && HasChinese($orgfirstname, true) == HasChinese($name[0], true)) {
+							if (HasChinese($name[0], true)) $name[0] = GetPinYin($name[0], true);
 							$fnames = preg_split("/\s/", trim($name[0]));
 							foreach ($fnames as $namekey => $name) {
 								if ($soundex == "DaitchM") {
@@ -498,84 +626,53 @@ if ($action=="soundex") {
 								if ($print) break;
 							}
 						}
-						if ($print) $printname[] = array(sortable_name_from_name($namearray[0]), $ikey, get_gedcom_from_id($value["gedfile"]),"");
+						if ($print) {
+							$printindiname[] = array(SortableNameFromName($namearray[0]), $ikey, get_gedcom_from_id($value["gedfile"]),"");
+							$indi_printed[JoinKey($ikey, $value["gedfile"])] = "1";
+						}
 					}
 				}
 			}
 		}
 		DMSoundex("", "closecache");
 		$GEDCOM = $oldged;
+		$GEDCOMID = $GEDCOMS[$GEDCOM]["id"];
 		// check the result on required characters
 		if (isset($barr)) {
-			foreach ($printname as $pkey=>$pname) {
+			foreach ($printindiname as $pkey=>$pname) {
 				$print = true;
 				foreach ($barr as $key=>$checkchar) {
-					if (str2upper(substr($pname[0], $checkchar[1], $checkchar[2])) != str2upper($checkchar[0])) {
+					if (Str2Upper(substr($pname[0], $checkchar[1], $checkchar[2])) != Str2Upper($checkchar[0])) {
 						$print = false;
 						break;
 					}
 				}
 				if ($print == false) {
-					unset($printname[$pkey]);
+					unset($indi_printed[JoinKey($printindiname[$pkey][2], $printindiname[$pkey][3])]);
+					unset($printindiname[$pkey]);
 				}
 			}
 		}
 		// Now we have the final list of indi's to be printed.
 		// We may add the assos at this point.
-			if ($showasso == "on") {
-			foreach($printname as $key => $pname) {
-				$apid = $pname[1]."[".$pname[2]."]";
-				// Check if associates exist
-				if (isset($assolist[$apid])) {
-				// if so, print all indi's where the indi is associated to
-					foreach($assolist[$apid] as $indexval => $asso) {
-						if ($asso["type"] == "indi") {
-							$indi_printed[$indexval] = "1";
-							// print all names
-							foreach($asso["name"] as $nkey => $assoname) {
-								$key = splitkey($indexval, "id");
-								$printname[] = array(sortable_name_from_name($assoname[0]), $key, get_gedcom_from_id($asso["gedfile"]), $apid);
-							}
-						}
-						else if ($asso["type"] == "fam") {
-							$fam_printed[$indexval] = "1";
-							// print all names
-							foreach($asso["name"] as $nkey => $assoname) {
-								$assosplit = preg_split("/(\s\+\s)/", trim($assoname));
-								// Both names have to have the same direction
-								if (hasRTLText($assosplit[0]) == hasRTLText($assosplit[1])) {
-									$apid2 = splitkey($indexval, "id");
-									$printfamname[]=array(check_NN($assoname), $apid2, get_gedcom_from_id($asso["gedfile"]), $apid);
-								}
-							}
-						}
-					}
-					unset($assolist[$apid]);
-				}
-			}
-		}
+		if ($showasso == "on") SearchAddAssos();
 		//-- if only 1 item is returned, automatically forward to that item
-		if (count($printname)==1) {
-			$oldged = $GEDCOM;
-			$GEDCOM = $printname[0][2];
-			ReadPrivacy($GEDCOM);
-			if (showLivingNameByID($printname[0][1])||displayDetailsByID($printname[0][1])) {
-				header("Location: individual.php?pid=".$printname[0][1]."&ged=".$printname[0][2]);
+		if (count($printindiname)==1) {
+			$GEDCOM = $printindiname[0][2];
+			SwitchGedcom($GEDCOM);
+			if (showLivingNameByID($printindiname[0][1])) {
+				header("Location: individual.php?pid=".$printindiname[0][1]."&ged=".$printindiname[0][2]);
 				exit;
 			}
-			else {
-				$GEDCOM = $oldged;
-				ReadPrivacy($GEDCOM);
-			}
+			SwitchGedcom();
 		}
-		if ($sorton == "last") uasort($printname, "itemsort");
-		else uasort($printname, "firstnamesort");
-		reset($printname);
+		if ($sorton == "last" || $sorton == "") uasort($printindiname, "ItemSort");
+		else uasort($printindiname, "FirstnameSort");
+		reset($printindiname);
 	}
 }
 
 print_header($gm_lang["search"]);
-
 ?>
 <script language="JavaScript" type="text/javascript">
 <!--
@@ -594,10 +691,10 @@ print_header($gm_lang["search"]);
 			}
 		}
 		if (frm.action[0].checked) {
-		if (frm.query.value.length<2) {
-				alert("<?php print $gm_lang["search_more_chars"]?>");
-				frm.query.focus();
-				return false;
+			if (frm.query.value.length<1) {
+					alert("<?php print $gm_lang["search_more_chars"]?>");
+					frm.query.focus();
+					return false;
 			}
 		}
 		return true;
@@ -629,15 +726,20 @@ else {
 			print "<tr><td class=\"shade2\" style=\"padding: 5px;\">";
 			print $gm_lang["search_geds"];
 			print "</td><td class=\"shade1\" style=\"padding: 5px;\">";
+			echo '<input type="checkbox" onclick="CheckAllGed(this)" />'.$gm_lang['select_deselect_all'].'<br>';
 			foreach ($GEDCOMS as $key=>$ged) {
-				$str = preg_replace(array("/\./","/-/","/ /"), array("_","_","_"), $key);
-				print "<input type=\"checkbox\" ";
-				if (($key == $GEDCOM) && ($action == "")) print "checked=\"checked\" ";
-				else {
-					if (isset($$str)) print "checked=\"checked\" ";
+				SwitchGedcom($key);
+				if (!empty($gm_username) || !$REQUIRE_AUTHENTICATION) {
+					$str = preg_replace(array("/\./","/-/","/ /"), array("_","_","_"), $key);
+					print "<input type=\"checkbox\" ";
+					if (($key == $GEDCOM) && ($action == "")) print "checked=\"checked\" ";
+					else {
+						if (in_array($key, $sgeds)) print "checked=\"checked\" ";
+					}
+					print "value=\"yes\" class=\"checkged\" name=\"".$str."\""." />".$GEDCOMS[$key]["title"]."<br />";
 				}
-				print "value=\"yes\" name=\"".$str."\""." />".$GEDCOMS[$key]["title"]."<br />";
 			}
+			SwitchGedcom();
 			print "</td></tr>";
 		}
 		
@@ -677,7 +779,7 @@ else {
 		print "<tr><td class=\"shade2\" style=\"padding: 5px;\">";
 		print $gm_lang["enter_terms"];
 		print "</td><td class=\"shade1\" style=\"padding: 5px;\"><input tabindex=\"1\" type=\"text\" name=\"query\" value=\"";
-		if ($action=="general" && isset($myquery)) print $myquery;
+		if ($action=="general" && isset($myquery)) print htmlspecialchars($myquery);
 		else print "";
 		print "\" />";
 		print "</td><td class=\"shade3\" style=\"vertical-align: middle; padding: 5px;\" rowspan=\"3\">";
@@ -691,9 +793,20 @@ else {
 		print "<input type=\"checkbox\"";
 		if (isset($srfams)) print " checked=\"checked\"";
 		print " value=\"yes\" name=\"srfams\" />".$gm_lang["search_fams"]."<br />";
+		if (ShowSourceFromAnyGed()) {
+			print "<input type=\"checkbox\"";
+			if (isset($srsour)) print " checked=\"checked\"";
+			print " value=\"yes\" name=\"srsour\" />".$gm_lang["search_sources"]."<br />";
+			print "<input type=\"checkbox\"";
+			if (isset($srrepo)) print " checked=\"checked\"";
+			print " value=\"yes\" name=\"srrepo\" />".$gm_lang["search_repos"]."<br />";
+		}
 		print "<input type=\"checkbox\"";
-		if (isset($srsour)) print " checked=\"checked\"";
-		print " value=\"yes\" name=\"srsour\" />".$gm_lang["search_sources"]."<br />";
+		if (isset($srmedia)) print " checked=\"checked\"";
+		print " value=\"yes\" name=\"srmedia\" />".$gm_lang["search_media"]."<br />";
+		print "<input type=\"checkbox\"";
+		if (isset($srnote)) print " checked=\"checked\"";
+		print " value=\"yes\" name=\"srnote\" />".$gm_lang["search_notes"]."<br />";
 		print "</td>";
 		print "</tr>";
 		print "<tr><td class=\"shade2\" style=\"padding: 5px;\">".$gm_lang["search_tagfilter"]."</td>";
@@ -716,22 +829,24 @@ else {
 		print $gm_lang["soundex_search"];
 		print "</div>";
 		
-		print "<table class=\"width100 center $TEXT_DIRECTION\"><tr><td class=\"shade2\">";
-		print $gm_lang["firstname_search"];
-		print "</td><td class=\"shade1\">";
-		print "<input tabindex=\"3\" type=\"text\" name=\"firstname\" value=\"";
-		if ($action=="soundex") print $myfirstname;
-		print "\" />";
+		print "<table class=\"width100 center $TEXT_DIRECTION\">";
+		
+		print "<tr><td class=\"shade2\">";
+		print $gm_lang["lastname_search"];
+		print "</td><td class=\"shade1\"><input tabindex=\"3\" type=\"text\" name=\"lastname\" value=\"";
+		if ($action=="soundex") print $mylastname;
+		print "\" /></td>";
 
-		print "</td><td class=\"shade3\" style=\"vertical-align: middle; text-align: center; padding: 5px;\"  rowspan=\"4\">";
+		print "<td class=\"shade3\" style=\"vertical-align: middle; text-align: center; padding: 5px;\"  rowspan=\"4\">";
 		print "<input tabindex=\"7\" type=\"submit\" value=\"";
 		print $gm_lang["search"];
-		print "\" />";
+		print "\" /></td></tr>";
 
-		print "</td></tr><tr><td class=\"shade2\">";
-		print $gm_lang["lastname_search"];
-		print "</td><td class=\"shade1\"><input tabindex=\"4\" type=\"text\" name=\"lastname\" value=\"";
-		if ($action=="soundex") print $mylastname;
+		print "<tr><td class=\"shade2\">";
+		print $gm_lang["firstname_search"];
+		print "</td><td class=\"shade1\">";
+		print "<input tabindex=\"4\" type=\"text\" name=\"firstname\" value=\"";
+		if ($action=="soundex") print $myfirstname;
 		print "\" /></td></tr>";
 		print "<tr><td class=\"shade2\">";
 		print $gm_lang["search_place"];
@@ -756,9 +871,9 @@ else {
 		print "<tr><td class=\"shade2\">";
 		print $gm_lang["search_prtnames"];
 		print "</td><td class=\"shade1\" colspan=\"2\" ><input type=\"radio\" name=\"nameprt\" value=\"hit\" ";
-		if (($nameprt == "hit") || ($nameprt == "")) print "checked=\"checked\" ";
+		if (($nameprt == "hit")) print "checked=\"checked\" ";
 		print ">".$gm_lang["search_prthit"]."<br /><input type=\"radio\" name=\"nameprt\" value=\"all\" ";
-		if ($nameprt == "all") print "checked=\"checked\" ";;
+		if ($nameprt == "all" || ($nameprt == "")) print "checked=\"checked\" ";;
 		print " />".$gm_lang["search_prtall"];
 		print "</td>";
 		print "</td></tr>";
@@ -783,7 +898,7 @@ if ($action=="general") {
 		//--- Results in these tags will be ignored when the tagfilter is on
 
 		// Never show results in _UID
-		if (userIsAdmin($gm_username)) $skiptags = "_UID";
+		if ($Users->userIsAdmin($gm_username)) $skiptags = "_UID";
 		
 		// If not admin, also hide searches in RESN tags
 		else $skiptags = "RESN, _UID";
@@ -791,21 +906,399 @@ if ($action=="general") {
 		// Add the optional tags
 		$skiptags_option = ", _GMU, FILE, FORM, CHAN, SUBM, REFN";
     	if ($tagfilter == "on") $skiptags .= $skiptags_option;
-   		$userlevel = GetUserAccessLevel();
-
-		// Keep track of what indi's are already printed to keep a reliable counter
-		$indi_printed = array();
-		$fam_printed = array();
-  
-		// init various counters
-		init_list_counters();
+   		$userlevel = $Users->GetUserAccessLevel();
 
 		// printqueues for indi's and fams
 		$printindiname = array();
 		$printfamname = array();
-
-		$cti=count($indilist);
+		
+		$cti=count($sindilist);
+		$oldged = $GEDCOM;
 		if (($cti>0) && (isset($srindi))) {
+			$curged = $GEDCOM;
+
+			// Add the facts in $global_facts that should not show
+			$skiptagsged = $skiptags;
+    		foreach ($global_facts as $gfact => $gvalue) {
+	    		if (isset($gvalue["show"])) {
+		    		if (($gvalue["show"] < $userlevel)) $skiptagsged .= ", ".$gfact;
+	    		}
+  		  	}
+			foreach ($sindilist as $key => $value) {
+				$nodisplay = false;
+				$GEDCOM = SplitKey($key, "ged");
+				$GEDCOMID = $GEDCOMS[$GEDCOM]["id"];
+				$key = SplitKey($key, "id");
+				if ($GEDCOM != $curged) {
+					SwitchGedcom($GEDCOMID);
+					$curged = $GEDCOM;
+					// Recalculate the tags to skip
+					$skiptagsged = $skiptags;
+					foreach ($global_facts as $gfact => $gvalue) {
+			    		if (isset($gvalue["show"])) {
+	    					if (($gvalue["show"] < $userlevel)) $skiptagsged .= ", ".$gfact;
+    					}
+ 					}
+				}
+				//-- make sure that the data that was searched on is not in a private part of the record
+				$hit = false;
+		    	$found = false;
+		    	// First check if the hit is in the key!
+		    	if ($tagfilter == "off") {
+					foreach($cquery["includes"] as $qindex => $squery) {
+		    			if (strpos(Str2Upper($key), Str2Upper($squery["term"])) !== false) {
+			    			$hit = true;
+			    			if (DisplayDetailsByID($key, "INDI") || ShowLivingNameByID($key)) $found = true;
+			    			else {
+				    			$nodisplay = true;
+			    			}
+			    			break;
+		    			}
+	    			}
+	    		}
+				if ($found == false && !$nodisplay) {
+		    		$recs = GetAllSubrecords($value["gedcom"], "", false, false, false);
+					// Also levels>1 must be checked for tags. This is done below.
+					foreach ($recs as $keysr => $subrec) {
+						// We must remember the level 1 tag to check later. This was we can eliminate 
+						// hits in 2 DATE which are valid, while we actually excluded hits in 1 CHAN.
+						$ct = preg_match("/\d\s(\S*)\s*.*/i", $subrec, $level1tag);
+						$level1tag = $level1tag[1];
+						$recs2 = preg_split("/\r?\n/", $subrec);
+						foreach ($recs2 as $keysr2 => $subrec2) {
+							// There must be a hit in a subrec. If found, check in which tag
+							foreach ($cquery["includes"] as $qindex => $squery) {
+								if (preg_match("/".$squery["term"]."/i", $subrec2, $result)>0) {
+									$ct = preg_match("/\d\s(\S*)\s*.*/i", $subrec2, $result2);
+									if (($ct > 0) && (!empty($result2[1]))) {
+//										print "Hit in".$subrec2."<br />leveltag: ".$level1tag."<br />tag:".$result2[1]."<br />";
+										//$hit = true;
+										// if the tag can be displayed, do so
+										// but first check if the hit is in a link to a hidden record
+										if (strpos($skiptagsged, $result2[1]) === false && strpos($skiptagsged, $level1tag) === false) {
+											$ct9 = preg_match("/\d\s\w+\s@(.+)@/", $subrec2, $match9);
+											if ($ct9) {
+												$rtype = "";
+												if (in_array($result2[1], array("FAMC", "FAMS"))) $rtype = "FAM";
+												else if ($result2[1] == "ASSO") $rtype = "INDI";
+												else if ($result2[1] == "SOUR") $rtype = "SOUR";
+												else $rtype = "OBJE";
+//												print "Check ".$match9[1]." leveltag ".$result2[1]." type ".$rtype." subrec ".$subrec2." for display<br />";
+												if (!DisplayDetailsByID($match9[1], $rtype)) {
+//													print "Don't show!<br />";
+													$hit = true;
+													$nodisplay = true;
+													break;
+												}
+												else $found = true;
+											}
+											else $found = true;
+										}
+									}
+								}
+								if ($found == true || $nodisplay == true) break;
+							}
+							if ($found == true || $nodisplay == true) break;
+						}
+						if ($found == true || $nodisplay == true) break;
+					}
+				}
+//				if ($hit) print "Hit is true";
+				if ($found == true && $nodisplay == false) {
+					// print all names from the indi found
+			    	foreach($value["names"] as $indexval => $namearray) {
+						$printindiname[] = array(SortableNameFromName($namearray[0]), $key, get_gedcom_from_id($value["gedfile"]), "");
+					}
+					$indi_printed[JoinKey($key, $GEDCOMID)] = "1";
+				}
+				else if ($hit == true) $indi_hide[$key."[".get_gedcom_from_id($value["gedfile"])."]"] = 1;
+			}
+		}
+		
+		// Get the fams to be printed
+		$ctf=count($sfamlist);
+		if ($ctf>0 || count($printfamname)>0) {
+			$oldged = $GEDCOM;
+			$curged = $GEDCOM;
+			// Add the facts in $global_facts that should not show
+			$skiptagsged = $skiptags;
+    		foreach ($global_facts as $gfact => $gvalue) {
+	    		if (isset($gvalue["show"])) {
+		    		if (($gvalue["show"] < $userlevel)) $skiptagsged .= ", ".$gfact;
+	    		}
+  		  	}
+			foreach ($sfamlist as $key => $value) {
+				$GEDCOM = SplitKey($key, "ged");
+				$GEDCOMID = $GEDCOMS[$GEDCOM]["id"];
+				$key = SplitKey($key, "id");
+				if ($GEDCOM != $curged) {
+					SwitchGedcom($GEDCOMID);
+					$curged = $GEDCOM;
+					// Recalculate the tags to skip
+					$skiptagsged = $skiptags;
+					foreach ($global_facts as $gfact => $gvalue) {
+			    		if (isset($gvalue["show"])) {
+	   						if (($gvalue["show"] < $userlevel)) $skiptagsged .= ", ".$gfact;
+    					}
+					}
+			  	}
+
+				// lets see where the hit is
+				$nodisplay = false;
+			    $found = false;
+				$hit = false;
+		    	// First check if the hit is in the key!
+		    	if ($tagfilter == "off") {
+					foreach ($cquery["includes"] as $qindex => $squery) {
+			    		if (strpos(Str2Upper($key), Str2Upper($squery["term"])) !== false) {
+				    		if (DisplayDetailsByID($key, "FAM")) $found = true;
+				    		else {
+					    		$nodisplay = true;
+				    			$hit = true;
+			    			}
+				    		break;
+		    			}
+	    			}
+	    		}
+				// If a name is hit, no need to check for tags
+				if ($found == false) {
+					foreach($value["name"] as $nkey => $famname) {
+						foreach ($cquery["includes"] as $qindex => $squery) {
+							if ((preg_match("/".$squery["term"]."/i", $famname)) > 0) {
+								$found = true;
+								break;
+							}
+						}
+						if ($found) break;
+					}
+				}
+				// If no hit in a name or ID, check if there is a hit on a valid tag
+				if ($found == false && !$nodisplay) {
+					$recs = GetAllSubrecords($value["gedcom"], $skiptagsged, false, false, false);
+					// Also levels>1 must be checked for tags. This is done below.
+					foreach ($recs as $keysr => $subrec) {
+						// We must remember the level 1 tag to check later. This was we can eliminate 
+						// hits in 2 DATE which are valid, while we actually excluded hits in 1 CHAN.
+						$ct = preg_match("/\d\s(\S*)\s*.*/i", $subrec, $level1tag);
+						$level1tag = $level1tag[1];
+						$recs2 = preg_split("/\r?\n/", $subrec);
+						foreach ($recs2 as $keysr2 => $subrec2) {
+							// There must be a hit in a subrec. If found, check in which tag
+							foreach ($cquery["includes"] as $qindex => $squery) {
+								if (preg_match("/".$squery["term"]."/i", $subrec2, $result)>0) {
+									$ct = preg_match("/\d\s(\S*)\s*.*/i", $subrec2, $result2);
+									if (($ct > 0) && (!empty($result2[1]))) {
+//										print "Hit in".$subrec2."<br />leveltag: ".$level1tag."<br />tag:".$result2[1]."<br />";
+										//$hit = true;
+										// if the tag can be displayed, do so
+										// but first check if the hit is in a link to a hidden record
+										if (strpos($skiptagsged, $result2[1]) === false && strpos($skiptagsged, $level1tag) === false) {
+											$ct9 = preg_match("/\d\s\w+\s@(.+)@/", $subrec2, $match9);
+											if ($ct9) {
+												$rtype = "";
+												if (in_array($result2[1], array("CHIL", "HUSB", "WIFE", "ASSO"))) $rtype = "INDI";
+												else if ($result2[1] == "SOUR") $rtype = "SOUR";
+												else $rtype = "OBJE";
+//												print "Check ".$match9[1]." leveltag ".$result2[1]." type ".$rtype." subrec ".$subrec2." for display<br />";
+												if (!DisplayDetailsByID($match9[1], $rtype)) {
+//													print "Don't show!<br />";
+													$hit = true;
+													$nodisplay = true;
+													break;
+												}
+												else $found = true;
+											}
+											else $found = true;
+										}
+									}
+								}
+								if ($found == true || $nodisplay == true) break;
+							}
+							if ($found == true || $nodisplay == true) break;
+						}
+						if ($found == true || $nodisplay == true) break;
+					}
+				}
+				if ($found == true && $nodisplay == false) {
+					$printed = false;	
+					foreach ($value["name"] as $namekey => $famname) {
+						$famsplit = preg_split("/(\s\+\s)/", trim($famname));
+						// Both names have to have the same direction and combination of chinese/not chinese
+						$foundf = false;
+						$founds = false;
+						$founde = false;
+						if (hasRTLText($famsplit[0]) == hasRTLText($famsplit[1]) && HasChinese($famsplit[0], true) == HasChinese($famsplit[1], true)) {
+							// do not print if the hit only in the second name. We want it first.
+							foreach ($cquery["includes"] as $qindex => $squery) {
+//								print $squery."<br />".$famsplit[0]."<br />".$famsplit[1]."<br />";
+								if (preg_match("/".$squery["term"]."/i", $famsplit[0]) > 0) $foundf = true;
+								if (preg_match("/".$squery["term"]."/i", $famsplit[1]) > 0) $founds = true;
+							}
+//							if ($foundf) print "ff is waar";
+//							if ($founds) print "fs is waar";
+//							print "<br /><br />";
+							// now we must also check that excluded names are not printed anyway, regardless of in name 1 or 2
+							if (isset($cquery["excludes"])) {
+								foreach ($cquery["excludes"] as $qindex => $squery) {
+	//								print $squery."<br />".$famsplit[0]."<br />".$famsplit[1]."<br />";
+									if (preg_match("/".$squery["term"]."/i", $famsplit[0]) > 0) $founde = true;
+									if (preg_match("/".$squery["term"]."/i", $famsplit[1]) > 0) $founde = true;
+								}
+							}
+							 
+//							if ($foundf && !$founds && !$founde) // Not ok. Hit can be in both name parts!
+							if ($foundf && !$founde) {
+								$printfamname[]=array(CheckNN($famname), $key, get_gedcom_from_id($value["gedfile"]),"");
+								$fam_printed[JoinKey($key, $GEDCOMID)] = "1";
+								$printed = true;
+							}
+						}
+					}
+					if (!$printed && !$founde) {
+						$printfamname[]=array(CheckNN($value["name"][0]), $key, get_gedcom_from_id($value["gedfile"]),"");
+						$fam_printed[JoinKey($key, $GEDCOMID)] = "1";
+					}						
+		    	}
+				else if ($hit == true) $fam_hide[$key."[".get_gedcom_from_id($value["gedfile"])."]"] = 1;
+			}
+			SwitchGedcom();
+		}
+	
+		// Add the assos to the indi and famlist
+	  	if ($showasso == "on") {
+		  	SearchAddAssos();
+		}
+		SwitchGedcom();
+
+		?>
+		<script type="text/javascript">
+		<!--
+		function tabswitch(n) {
+			if (n==7) n = 0;
+			var tabid = new Array('0','indis','fams','sources','repos','media','notes');
+			// show all tabs ?
+			var disp='none';
+			if (n==0) disp='block';
+			// reset all tabs areas
+			for (i=1; i<tabid.length; i++) document.getElementById(tabid[i]).style.display=disp;
+			if ('<?php echo $view; ?>' != 'preview') {
+				// current tab area
+				if (n>0) document.getElementById(tabid[n]).style.display='block';
+				// empty tabs
+				for (i=0; i<tabid.length; i++) {
+					var elt = document.getElementById('door'+i);
+					if (document.getElementById('no_tab'+i)) { // empty ?
+						if (<?php if (!empty($gm_username)) echo 'true'; else echo 'false';?>) {
+							elt.style.display='block';
+							elt.style.opacity='0.4';
+							elt.style.filter='alpha(opacity=40)';
+						}
+						else elt.style.display='none'; // empty and not editable ==> hide
+					}
+					else elt.style.display='block';
+				}
+				// current door
+				for (i=0; i<tabid.length; i++) {
+					document.getElementById('door'+i).className='shade1 rela';
+				}
+				document.getElementById('door'+n).className='shade1';
+				return false;
+			}
+		}
+		//-->
+		</script>
+		<div id="result" class="width100" style="display: inline-block;"><br /><br />
+		<div class="door">
+		<dl>
+		<dd id="door1"><a href="javascript:;" onclick="tabswitch(1)" ><?php print $gm_lang["search_indis"]." (".count($sindilist).")";?></a></dd>
+		<dd id="door2"><a href="javascript:;" onclick="tabswitch(2)" ><?php print $gm_lang["search_fams"]." (".count($sfamlist).")";?></a></dd>
+		<dd id="door3"><a href="javascript:;" onclick="tabswitch(3)" ><?php print $gm_lang["search_sources"]." (".count($ssourcelist).")";?></a></dd>
+		<dd id="door4"><a href="javascript:;" onclick="tabswitch(4)" ><?php print $gm_lang["search_repos"]." (".count($srepolist).")";?></a></dd>
+		<dd id="door5"><a href="javascript:;" onclick="tabswitch(5)" ><?php print $gm_lang["search_media"]." (".count($media_total).")";?></a></dd>
+		<dd id="door6"><a href="javascript:;" onclick="tabswitch(6)" ><?php print $gm_lang["search_notes"]." (".count($note_total).")";?></a></dd>
+		<dd id="door0"><a href="javascript:;" onclick="tabswitch(0)" ><?php print $gm_lang["all"]?></a></dd>
+		</dl>
+		</div><br /><br />
+	
+		<?php
+
+		// Print the indis	
+		print "<div id=\"indis\" class=\"tab_page\" style=\"display:none;\" >";
+		if ((count($sindilist)>0)&& (isset($srindi))) {
+			print "\n\t<table class=\"list_table $TEXT_DIRECTION\">\n\t\t<tr><td class=\"shade2 center\"";
+			$indi_count = count($printindiname);
+			if($indi_count > 12) print " colspan=\"2\"";
+			print "><img src=\"".$GM_IMAGE_DIR."/".$GM_IMAGES["indis"]["small"]."\" border=\"0\" title=\"".$gm_lang["people"]."\" alt=\"".$gm_lang["individuals"]."\" />&nbsp;&nbsp;";
+			print $gm_lang["individuals"];
+			print "</td></tr><tr><td class=\"$TEXT_DIRECTION shade1 wrap\"><ul>";
+			$i=1;
+			uasort($printindiname, "ItemSort");
+			foreach($printindiname as $pkey => $pvalue) {
+				if (isset($sindilist[$pvalue[1]."[".$GEDCOMS[$pvalue[2]]["id"]."]"])) {
+					 $indilist[$pvalue[1]."[".$GEDCOMS[$pvalue[2]]["id"]."]"] = $sindilist[$pvalue[1]."[".$GEDCOMS[$pvalue[2]]["id"]."]"];
+				 }
+				print_list_person($pvalue[1], array(CheckNN($pvalue[0]), $pvalue[2]),"", $pvalue[3]);
+				print "\n";
+				if ($i==ceil($indi_count/2) && $indi_count>12) print "</ul></td><td class=\"shade1 wrap\"><ul>\n";
+				$i++;
+			}
+			print "\n\t\t</ul>&nbsp;</td></tr>";
+			if ((count($sindilist)>0) && (isset($srindi))) {
+				print "<tr><td>".$gm_lang["total_indis"]." ".$cti;
+				if (count($indi_private)>0) print "  (".$gm_lang["private"]." ".count($indi_private).")";
+				if (count($indi_hide)>0) print "  --  ".$gm_lang["hidden"]." ".count($indi_hide);
+				if (count($indi_private)>0 || count($indi_hide)>0) print_help_link("privacy_error_help", "qm");
+				print "</td></tr>";
+			}
+			print "</table>";
+			
+		}
+		else print "<div id=\"no_tab1\"></div>";
+		print "<br /></div>";
+		
+		// print the fams
+		print "<div id=\"fams\" class=\"tab_page\" style=\"display:none;\" >";
+		$ctf=count($sfamlist);
+		if ($ctf>0 || count($printfamname)>0) {
+			$oldged = $GEDCOM;
+			$curged = $GEDCOM;
+
+			uasort($printfamname, "ItemSort");
+			print "\n\t<table class=\"list_table $TEXT_DIRECTION\">\n\t\t<tr><td class=\"shade2 center\"";
+			$fam_count = count($printfamname);
+			if($fam_count > 12) print " colspan=\"2\"";
+			print "><img src=\"".$GM_IMAGE_DIR."/".$GM_IMAGES["sfamily"]["small"]."\" border=\"0\" alt=\"".$gm_lang["families"]."\" />&nbsp;&nbsp;";
+			print $gm_lang["families"];
+			print "</td></tr><tr><td class=\"$TEXT_DIRECTION shade1 wrap\"><ul>";
+			$i=1;
+			foreach($printfamname as $pkey => $pvalue) {
+				$hkey = $pvalue[1]."[".$GEDCOMS[$pvalue[2]]["id"]."]";
+				if (isset($sfamlist[$hkey])) {
+					$famlist[$hkey] = $sfamlist[$hkey];
+				}
+				print_list_family($pvalue[1], array($pvalue[0], $pvalue[2]), "", $pvalue[3]);
+				print "\n";
+				if ($i==ceil($fam_count/2) && $fam_count>12) print "</ul></td><td class=\"shade1 wrap\"><ul>\n";
+				$i++;
+			}
+			print "\n\t\t</ul>&nbsp;</td></tr>";
+			if ((count($sfamlist)>0) || (count($printfamname)>0)) {
+				print "<tr><td>".$gm_lang["total_fams"]." ".$ctf;
+				if (count($fam_private)>0) print "  (".$gm_lang["private"]." ".count($fam_private).")";
+				if (count($fam_hide)>0) print "  --  ".$gm_lang["hidden"]." ".count($fam_hide);
+				if (count($fam_private)>0 || count($fam_hide)>0) print_help_link("privacy_error_help", "qm");
+				print "</td></tr>";
+			}
+			print "</table>";
+		}
+		else print "<div id=\"no_tab2\"></div>";
+		print "<br /></div>";
+		
+		// Print the sources
+		print "<div id=\"sources\" class=\"tab_page\" style=\"display:none;\" >";
+		$cts=count($ssourcelist);
+		if ($cts>0) {
+			uasort($ssourcelist, "SourceSort"); 
 			$oldged = $GEDCOM;
 			$curged = $GEDCOM;
 
@@ -816,44 +1309,60 @@ if ($action=="general") {
 		    		if (($gvalue["show"] < $userlevel)) $skiptagsged .= ", ".$gfact;
 	    		}
   		  	}
-
-			foreach ($indilist as $key => $value) {
-				if (count($sgeds) > 1) {
-					$GEDCOM = splitkey($key, "ged");
-					$key = splitkey($key, "id");
-					if ($GEDCOM != $curged) {
-						ReadPrivacy($GEDCOM);
-						$curged = $GEDCOM;
-						// Recalculate the tags to skip
-						$skiptagsged = $skiptags;
-						foreach ($global_facts as $gfact => $gvalue) {
-				    		if (isset($gvalue["show"])) {
-		    					if (($gvalue["show"] < $userlevel)) $skiptagsged .= ", ".$gfact;
-	    					}
-  					  	}
-					}
+			print "\n\t<table class=\"list_table $TEXT_DIRECTION\">\n\t\t<tr><td class=\"shade2 center\"";
+			$sour_count = count($ssourcelist);
+			if($sour_count > 12) print " colspan=\"2\"";
+			print "><img src=\"".$GM_IMAGE_DIR."/".$GM_IMAGES["source"]["small"]."\" border=\"0\" alt=\"".$gm_lang["sources"]."\" />&nbsp;&nbsp;";
+			print $gm_lang["sources"];
+			print "</td></tr><tr><td class=\"$TEXT_DIRECTION shade1 wrap\"><ul>";
+			$i=1;
+			foreach ($ssourcelist as $key => $value) {
+				$GEDCOM = SplitKey($key, "ged");
+				$key = SplitKey($key, "id");
+				if ($curged != $GEDCOM) {
+					SwitchGedcom($GEDCOM);
+					$curged = $GEDCOM;
+					// Recalculate the tags to skip
+					$skiptagsged = $skiptags;
+					foreach ($global_facts as $gfact => $gvalue) {
+			    		if (isset($gvalue["show"])) {
+	    					if (($gvalue["show"] < $userlevel)) $skiptagsged .= ", ".$gfact;
+    					}
+				  	}
 				}
-				//-- make sure that the data that was searched on is not in a private part of the record
-				$hit = false;
 		    	$found = false;
+		    	$hit = false;
 		    	// First check if the hit is in the key!
 		    	if ($tagfilter == "off") {
-	    			if (strpos(str2upper($key), str2upper($query)) !== false) $found = true;
+					foreach ($cquery["includes"] as $qindex => $squery) {
+			    		if (strpos(Str2Upper($key), Str2Upper($squery["term"])) !== false) {
+				    		$found = true;
+				    		$hit = true;
+				    		break;
+		    			}
+		    		}
 	    		}
 				if ($found == false) {
-		    		$recs = get_all_subrecords($value["gedcom"], "", false, false, false);
+					$recs = GetAllSubrecords($value["gedcom"], $skiptagsged, false, false, false);
 					// Also levels>1 must be checked for tags. This is done below.
 					foreach ($recs as $keysr => $subrec) {
+						// We must remember the level 1 tag to check later. This was we can eliminate 
+						// hits in 2 DATE which are valid, while we actually excluded hits in 1 CHAN.
+						$ct = preg_match("/\d\s(\S*)\s*.*/i", $subrec, $level1tag);
+						$level1tag = $level1tag[1];
 						$recs2 = preg_split("/\r?\n/", $subrec);
 						foreach ($recs2 as $keysr2 => $subrec2) {
 							// There must be a hit in a subrec. If found, check in which tag
-							if (preg_match("/$query/i", $subrec2, $result)>0) {
-								$ct = preg_match("/\d\s(\S*)\s*.*/i", $subrec2, $result2);
-								if (($ct > 0) && (!empty($result2[1]))) {
-									$hit = true;
-									// if the tag can be displayed, do so
-									if (strpos($skiptagsged, $result2[1]) === false) $found = true;
+							foreach ($cquery["includes"] as $qindex => $squery) {
+								if (preg_match("/".$squery["term"]."/i",$subrec2, $result)>0) {
+									$ct = preg_match("/\d.(\S*).*/i",$subrec2, $result2);
+									if (($ct > 0) && (!empty($result2[1]))) {
+										$hit = true;
+										// if the tag can be displayed, do so
+										if (strpos($skiptagsged, $result2[1]) === false && strpos($skiptagsged, $level1tag) === false) $found = true;
+									}
 								}
+								if ($found == true) break;
 							}
 							if ($found == true) break;
 						}
@@ -861,80 +1370,31 @@ if ($action=="general") {
 					}
 				}
 				if ($found == true) {
-					
-					// print all names from the indi found
-			    	foreach($value["names"] as $indexval => $namearray) {
-						$printindiname[] = array(sortable_name_from_name($namearray[0]), $key, get_gedcom_from_id($value["gedfile"]), "");
-					}
-					$indi_printed[$key."[".$GEDCOM."]"] = "1";
-					
-					// If associates must be shown, see if we can display them and add them to the print array
-					if (($showasso == "on") && (strpos($skiptagsged, "ASSO") === false)) {
-						$apid = $key."[".$value["gedfile"]."]";
-						// Check if associates exist
-						if (isset($assolist[$apid])) {
-							// if so, print all indi's where the indi is associated to
-							foreach($assolist[$apid] as $indexval => $asso) {
-								if ($asso["type"] == "indi") {
-									$indi_printed[$indexval] = "1";
-									// print all names
-									foreach($asso["name"] as $nkey => $assoname) {
-										$key = splitkey($indexval, "id");
-										$printindiname[] = array(sortable_name_from_name($assoname[0]), $key, get_gedcom_from_id($asso["gedfile"]), $apid);
-									}
-								}
-								else if ($asso["type"] == "fam") {
-									$fam_printed[$indexval] = "1";
-									// print all names
-									foreach($asso["name"] as $nkey => $assoname) {
-										$assosplit = preg_split("/(\s\+\s)/", trim($assoname));
-										// Both names have to have the same direction
-										if (hasRTLText($assosplit[0]) == hasRTLText($assosplit[1])) {
-											$apid2 = splitkey($indexval, "id");
-											$printfamname[]=array(check_NN($assoname), $apid2, get_gedcom_from_id($asso["gedfile"]), $apid);
-										}
-									}
-								}
-							}
-						}
-					}
+					print_list_source($key, $value);
+					$sour_printed[$key."[".$GEDCOM."]"] = "1";
+					if ($i==ceil($sour_count/2) && $sour_count>12) print "</ul></td><td class=\"shade1 wrap\"><ul>\n";
+					$i++;
 				}
-				else if ($hit == true) $indi_hide[$key."[".get_gedcom_from_id($value["gedfile"])."]"] = 1;
+				else if ($hit == true) $source_hide[$key."[".get_gedcom_from_id($value["gedfile"])."]"] = 1;
 			}
+			print "\n\t\t</ul>&nbsp;</td></tr>";
+			SwitchGedcom();
+			if (count($source_total)>0) {
+			// if ($cts > 0) {
+				print "<tr><td>".$gm_lang["total_sources"]." ".count($source_total);
+				if (count($source_hide)>0) print "  --  ".$gm_lang["hidden"]." ".count($source_hide);
+				print "</td></tr>";
+			}
+			print "</table>";
 		}
-		// Start output here, because from the indi's we may have printed some fams which need the column header.
-		print "<br />";
-		print "\n\t<div class=\"search_results\"><table class=\"list_table center $TEXT_DIRECTION\">\n\t\t<tr>";
-		if ((count($indilist)>0)&& (isset($srindi))) print "<td class=\"topbottombar\"><img src=\"".$GM_IMAGE_DIR."/".$GM_IMAGES["indis"]["small"]."\" border=\"0\" alt=\"\" /> ".$gm_lang["people"]."</td>";
-		if ((count($famlist)>0) || (count($printfamname)>0)) print "<td class=\"topbottombar\"><img src=\"".$GM_IMAGE_DIR."/".$GM_IMAGES["sfamily"]["small"]."\" border=\"0\" alt=\"\" /> ".$gm_lang["families"]."</td>";
-		if (count($sourcelist)>0) print "<td class=\"topbottombar\"><img src=\"".$GM_IMAGE_DIR."/".$GM_IMAGES["source"]["small"]."\" border=\"0\" alt=\"\" /> ".$gm_lang["sources"]."</td>";
-		print "</tr>\n\t\t<tr>";
-			
-			
-		// Print the indis	
-		if (count($printindiname)>0) {	
-			uasort($printindiname, "itemsort");
-			print "<td class=\"shade1 wrap\"><ul>";
-			foreach($printindiname as $pkey => $pvalue) {
-				$GEDCOM = $pvalue[2];
-				if ($GEDCOM != $curged) {
-					ReadPrivacy($GEDCOM);
-					$curged = $GEDCOM;
-				}
-				print_list_person($pvalue[1], array(check_NN($pvalue[0]), $pvalue[2]),"", $pvalue[3]);
-				print "\n";
-			}
-			print "\n\t\t</ul>&nbsp;</td>";
-			$GEDCOM = $oldged;
-			if ($GEDCOM != $curged) {
-				ReadPrivacy($GEDCOM);
-				$curged = $GEDCOM;
-			}
-		}
+		else print "<div id=\"no_tab3\"></div>";
+		print "<br /></div>";
 		
-		// Process the fams
-		$ctf=count($famlist);
-		if ($ctf>0 || count($printfamname)>0) {
+		// Print the repositories
+		print "<div id=\"repos\" class=\"tab_page\" style=\"display:none;\" >";
+		$ctr = count($srepolist);
+		if ($ctr > 0) {
+			uasort($srepolist, "SourceSort"); 
 			$oldged = $GEDCOM;
 			$curged = $GEDCOM;
 
@@ -945,209 +1405,235 @@ if ($action=="general") {
 		    		if (($gvalue["show"] < $userlevel)) $skiptagsged .= ", ".$gfact;
 	    		}
   		  	}
-	
-			foreach ($famlist as $key => $value) {
-				if (count($sgeds) > 1) {
-					$GEDCOM = splitkey($key, "ged");
-					$key = splitkey($key, "id");
-					if ($GEDCOM != $curged) {
-						ReadPrivacy($GEDCOM);
-						$curged = $GEDCOM;
-						// Recalculate the tags to skip
-						$skiptagsged = $skiptags;
-						foreach ($global_facts as $gfact => $gvalue) {
-				    		if (isset($gvalue["show"])) {
-	    						if (($gvalue["show"] < $userlevel)) $skiptagsged .= ", ".$gfact;
-    						}
-						}
-  				  	}
-				}
-
-				// lets see where the hit is
-			    $found = false;
-				// If a name is hit, no need to check for tags
-				foreach($value["name"] as $nkey => $famname) {
-					if ((preg_match("/".$query."/i", $famname)) > 0) {
-						$found = true;
-						break;
-					}
-				}
-				$hit = false;
-		    	// First check if the hit is in the key!
-		    	if (($tagfilter == "off") && ($found == false)) {
-		    		if (strpos(str2upper($key), str2upper($query)) !== false) {
-			    		$found = true;
-			    		$hit = true;
-		    		}
-	    		}
-				// If no hit in a name or ID, check if there is a hit on a valid tag
-				if ($found == false) {
-					$recs = get_all_subrecords($value["gedcom"], $skiptagsged, false, false, false);
-					// Also levels>1 must be checked for tags. This is done below.
-					foreach ($recs as $keysr => $subrec) {
-						$recs2 = preg_split("/\r?\n/", $subrec);
-						foreach ($recs2 as $keysr2 => $subrec2) {
-							// There must be a hit in a subrec. If found, check in which tag
-							if (preg_match("/$query/i",$subrec2, $result)>0) {
-								$ct = preg_match("/\d.(\S*).*/i",$subrec2, $result2);
-								if (($ct > 0) && (!empty($result2[1]))) {
-									$hit = true;
-									// if the tag can be displayed, do so
-									if (strpos($skiptagsged, $result2[1]) === false) $found = true;
-								}
-							}
-							if ($found == true) break;
-						}
-						if ($found == true) break;
-					}
-				}
-				if ($found == true) {	
-					foreach ($value["name"] as $namekey => $famname) {
-						$famsplit = preg_split("/(\s\+\s)/", trim($famname));
-						// Both names have to have the same direction
-						if (hasRTLText($famsplit[0]) == hasRTLText($famsplit[1])) {
-							// do not print if the hit only in the second name. We want it first.
-							if (!((preg_match("/".$query."/i", $famsplit[0]) == 0) && (preg_match("/".$query."/i", $famsplit[1]) > 0))) {
-								$printfamname[]=array(check_NN($famname), $key, get_gedcom_from_id($value["gedfile"]),"");
-							}
-						}
-					}
-					$fam_printed[$key."[".$GEDCOM."]"] = "1";
-		    	}
-				else if ($hit == true) $fam_hide[$key."[".get_gedcom_from_id($value["gedfile"])."]"] = 1;
-			}
-			uasort($printfamname, "itemsort");
-			print "\n\t\t<td class=\"shade1 wrap\"><ul>";
-			foreach($printfamname as $pkey => $pvalue) {
-				$GEDCOM = $pvalue[2];
-				if ($GEDCOM != $curged) {
-					ReadPrivacy($GEDCOM);
+			print "\n\t<table class=\"list_table $TEXT_DIRECTION\">\n\t\t<tr><td class=\"shade2 center\"";
+			$repo_count = count($srepolist);
+			if($repo_count > 12) print " colspan=\"2\"";
+			print "><img src=\"".$GM_IMAGE_DIR."/".$GM_IMAGES["repository"]["small"]."\" border=\"0\" alt=\"".$gm_lang["search_repos"]."\" />&nbsp;&nbsp;";
+			print $gm_lang["search_repos"];
+			print "</td></tr><tr><td class=\"$TEXT_DIRECTION shade1 wrap\"><ul>";
+			$i=1;
+			foreach ($srepolist as $key => $value) {
+				$GEDCOM = SplitKey($key, "ged");
+				$GEDCOMID = $GEDCOMS[$GEDCOM]["id"];
+				$key = SplitKey($key, "id");
+				if ($curged != $GEDCOM) {
+					SwitchGedcom($GEDCOMID);
 					$curged = $GEDCOM;
-				}
-				print_list_family($pvalue[1], array($pvalue[0], $pvalue[2]), "", $pvalue[3]);
-				print "\n";
-			}
-			print "\n\t\t</ul>&nbsp;</td>";
-			$GEDCOM = $oldged;
-			if ($GEDCOM != $curged) {
-				ReadPrivacy($GEDCOM);
-				$curged = $GEDCOM;
-			}
-		}
-		$cts=count($sourcelist);
-		if ($cts>0) {
-			uasort($sourcelist, "itemsort"); 
-			$oldged = $GEDCOM;
-			$curged = $GEDCOM;
-
-			// Add the facts in $global_facts that should not show
-			$skiptagsged = $skiptags;
-    		foreach ($global_facts as $gfact => $gvalue) {
-	    		if (isset($gvalue["show"])) {
-		    		if (($gvalue["show"] < $userlevel)) $skiptagsged .= ", ".$gfact;
-	    		}
-  		  	}
-			
-			print "\n\t\t<td class=\"shade1 wrap\"><ul>";
-			foreach ($sourcelist as $key => $value) {
-				if (count($sgeds) > 1) {
-					$GEDCOM = splitkey($key, "ged");
-					$key = splitkey($key, "id");
-					if ($curged != $GEDCOM) {
-						ReadPrivacy($GEDCOM);
-						$curged = $GEDCOM;
-						// Recalculate the tags to skip
-						$skiptagsged = $skiptags;
-						foreach ($global_facts as $gfact => $gvalue) {
-				    		if (isset($gvalue["show"])) {
-		    					if (($gvalue["show"] < $userlevel)) $skiptagsged .= ", ".$gfact;
-	    					}
-  					  	}
-					}
+					// Recalculate the tags to skip
+					$skiptagsged = $skiptags;
+					foreach ($global_facts as $gfact => $gvalue) {
+			    		if (isset($gvalue["show"])) {
+	    					if (($gvalue["show"] < $userlevel)) $skiptagsged .= ", ".$gfact;
+    					}
+				  	}
 				}
 		    	$found = false;
 		    	$hit = false;
 		    	// First check if the hit is in the key!
 		    	if ($tagfilter == "off") {
-		    		if (strpos(str2upper($key), str2upper($query)) !== false) {
-			    		$found = true;
-			    		$hit = true;
+					foreach ($cquery["includes"] as $qindex => $squery) {
+			    		if (strpos(Str2Upper($key), Str2Upper($squery["term"])) !== false) {
+				    		$found = true;
+				    		$hit = true;
+				    		break;
+		    			}
 		    		}
 	    		}
 				if ($found == false) {
-					$recs = get_all_subrecords($value["gedcom"], $skiptagsged, false, false, false);
+					$recs = GetAllSubrecords($value["gedcom"], $skiptagsged, false, false, false);
 					// Also levels>1 must be checked for tags. This is done below.
 					foreach ($recs as $keysr => $subrec) {
+						// We must remember the level 1 tag to check later. This was we can eliminate 
+						// hits in 2 DATE which are valid, while we actually excluded hits in 1 CHAN.
+						$ct = preg_match("/\d\s(\S*)\s*.*/i", $subrec, $level1tag);
+						$level1tag = $level1tag[1];
 						$recs2 = preg_split("/\r?\n/", $subrec);
 						foreach ($recs2 as $keysr2 => $subrec2) {
 							// There must be a hit in a subrec. If found, check in which tag
-							if (preg_match("/$query/i",$subrec2, $result)>0) {
-								$ct = preg_match("/\d.(\S*).*/i",$subrec2, $result2);
-								if (($ct > 0) && (!empty($result2[1]))) {
-									$hit = true;
-									// if the tag can be displayed, do so
-									if (strpos($skiptagsged, $result2[1]) === false) $found = true;
+							foreach ($cquery["includes"] as $qindex => $squery) {
+								if (preg_match("/".$squery["term"]."/i",$subrec2, $result)>0) {
+									$ct = preg_match("/\d.(\S*).*/i",$subrec2, $result2);
+									if (($ct > 0) && (!empty($result2[1]))) {
+										$hit = true;
+										// if the tag can be displayed, do so
+										if (strpos($skiptagsged, $result2[1]) === false && strpos($skiptagsged, $level1tag) === false) $found = true;
+									}
 								}
+								if ($found == true) break;
 							}
 							if ($found == true) break;
 						}
 						if ($found == true) break;
 					}
 				}
-				if ($found == true) print_list_source($key, $value);
-				else if ($hit == true) $source_hide[$key."[".get_gedcom_from_id($value["gedfile"])."]"] = 1;
+				if ($found == true) {
+					print_list_repository($value["name"], $value);
+					$repo_printed[$key."[".$GEDCOM."]"] = "1";
+					if ($i==ceil($repo_count/2) && $repo_count>12) print "</ul></td><td class=\"shade1 wrap\"><ul>\n";
+					$i++;
+				}
+				else if ($hit == true) $repo_hide[$key."[".get_gedcom_from_id($value["gedfile"])."]"] = 1;
 			}
-			print "\n\t\t</ul>&nbsp;</td>";
-			$GEDCOM = $oldged;
-			if ($GEDCOM != $curged) {
-				ReadPrivacy($GEDCOM);
-				$curged = $GEDCOM;
+			print "\n\t\t</ul>&nbsp;</td></tr>";
+			SwitchGedcom();
+			if (count($repo_total)>0) {
+			// if ($cts > 0) {
+				print "<tr><td>".$gm_lang["total_repositories"]." ".count($repo_total);
+				if (count($repo_hide)>0) print "  --  ".$gm_lang["hidden"]." ".count($repo_hide);
+				print "</td></tr>";
 			}
+			print "</table>";
 		}
-		print "</tr><tr>\n\t";
-		$cti = count($indi_printed);
-		$ctf = count($fam_printed);
-		if ($cti > 0 || $cts > 0 || $ctf > 0) {
-			if (($cti > 0) && (isset($srindi))) {
-				print "<td>".$gm_lang["total_indis"]." ".$cti;
-				if (count($indi_private)>0) print "  (".$gm_lang["private"]." ".count($indi_private).")";
-				if (count($indi_hide)>0) print "  --  ".$gm_lang["hidden"]." ".count($indi_hide);
-				if (count($indi_private)>0 || count($indi_hide)>0) print_help_link("privacy_error_help", "qm");
-				print "</td>";
+		else print "<div id=\"no_tab4\"></div>";
+		print "<br /></div>";
+		
+		// Print the media
+		print "<div id=\"media\" class=\"tab_page\" style=\"display:none;\" >";
+		if (count($media_total) > 0) {
+			print "\n\t<table class=\"list_table  $TEXT_DIRECTION\">\n\t\t<tr><td class=\"shade2 center\"";
+			$media_count = count($media_total) - count($media_hide);
+			if($media_count>12)	print " colspan=\"2\"";
+			print "><img src=\"".$GM_IMAGE_DIR."/".$GM_IMAGES["media"]["small"]."\" border=\"0\" title=\"".$gm_lang["media"]."\" alt=\"".$gm_lang["media"]."\" />&nbsp;&nbsp;";
+			print $gm_lang["media"];
+			print "</td></tr><tr><td class=\"$TEXT_DIRECTION shade1 wrap\"><ul>";
+			$i=1;
+			foreach ($media->medialist as $key => $value) {
+				$ged = SplitKey($key, "gedid");
+				$id = SplitKey($key, "id");
+				print_list_media($id, $value, true);
+				if ($i==ceil($media_count/2) && $media_count>12) print "</ul></td><td class=\"shade1 wrap\"><ul>\n";
+				$i++;
 			}
-			if ($ctf > 0) {
-				print "<td>".$gm_lang["total_fams"]." ".$ctf;
-				if (count($fam_private)>0) print "  (".$gm_lang["private"]." ".count($fam_private).")";
-				if (count($fam_hide)>0) print "  --  ".$gm_lang["hidden"]." ".count($fam_hide);
-				if (count($fam_private)>0 || count($fam_hide)>0) print_help_link("privacy_error_help", "qm");
-				print "</td>";
+			print "\n\t\t</ul></td>\n\t\t";
+		
+			print "</tr>";
+			if (count($media_total) > 0) { 
+				print "<tr><td>";
+				print $gm_lang["total_media"]." ".count($media_total);
+				if (count($media_hide)>0) print "&nbsp;--&nbsp;".$gm_lang["hidden"]." ".count($media_hide);
+				print "</td></tr>";
 			}
-			if ($cts > 0) {
-				print "<td>".$gm_lang["total_sources"]." ".$cts;
-				if (count($source_hide)>0) print "  --  ".$gm_lang["hidden"]." ".count($source_hide);
-				print "</td>";
-			}
-			if ($cti > 0 || $cts > 0 || $ctf > 0) print "</tr>\n\t";
+			print "</table><br />";
 		}
-		else if (isset($query)) print "<td class=\"warning\" style=\" text-align: center;\"><i>".$gm_lang["no_results"]."</i><br /></td></tr>\n\t\t";
-		print "</table></div>";
+		else print "<div id=\"no_tab5\"></div>";
+		print "<br /></div>";
+		
+		// Print the notes
+		print "<div id=\"notes\" class=\"tab_page\" style=\"display:none;\" >";
+		$ctn = count($note_total);
+		$curged = $GEDCOMID;
+		if ($ctn>0) {
+
+			// Add the facts in $global_facts that should not show
+			$skiptagsged = $skiptags;
+    		foreach ($global_facts as $gfact => $gvalue) {
+	    		if (isset($gvalue["show"])) {
+		    		if (($gvalue["show"] < $userlevel)) $skiptagsged .= ", ".$gfact;
+	    		}
+  		  	}
+			print "\n\t<table class=\"list_table $TEXT_DIRECTION\">\n\t\t<tr><td class=\"shade2 center\"";
+			$note_count = count($controller->notelist);
+			if($note_count > 12) print " colspan=\"2\"";
+			print "><img src=\"".$GM_IMAGE_DIR."/".$GM_IMAGES["note"]["other"]."\" border=\"0\" alt=\"".$gm_lang["notes"]."\" />&nbsp;&nbsp;";
+			print $gm_lang["notes"];
+			print "</td></tr><tr><td class=\"$TEXT_DIRECTION shade1 wrap\"><ul>";
+			$i=1;
+			foreach ($note_controller->notelist as $key => $note) {
+				if ($note->gedcomid != $GEDCOMID) {
+					SwitchGedcom($note->gedcomid);
+					$skiptagsged = $skiptags;
+					foreach ($global_facts as $gfact => $gvalue) {
+			    		if (isset($gvalue["show"])) {
+	    					if (($gvalue["show"] < $userlevel)) $skiptagsged .= ", ".$gfact;
+    					}
+				  	}
+				}
+		    	$found = false;
+		    	$hit = false;
+		    	// First check if the hit is in the key!
+		    	if ($tagfilter == "off") {
+					foreach ($cquery["includes"] as $qindex => $squery) {
+			    		if (strpos(Str2Upper($note->xref), Str2Upper($squery["term"])) !== false) {
+				    		$found = true;
+				    		$hit = true;
+				    		break;
+		    			}
+		    		}
+	    		}
+	    		// We must check the text that is in the note here, because it's at level 0 and not in the subrecs
+	    		$text = Str2Upper($note->GetNoteText());
+				foreach ($cquery["includes"] as $qindex => $squery) {
+			    	if (strpos($text, Str2Upper($squery["term"])) !== false || Str2Upper($squery["term"]) == "NOTE") {
+				   		$found = true;
+				   		$hit = true;
+				   		break;
+		    		}
+		    	}
+				if ($found == false) {
+					$recs = GetAllSubrecords($note->gedrec, $skiptagsged, false, false, false);
+					// Also levels>1 must be checked for tags. This is done below.
+					foreach ($recs as $keysr => $subrec) {
+						// We must remember the level 1 tag to check later. This was we can eliminate 
+						// hits in 2 DATE which are valid, while we actually excluded hits in 1 CHAN.
+						$ct = preg_match("/\d\s(\S*)\s*.*/i", $subrec, $level1tag);
+						$level1tag = $level1tag[1];
+						$recs2 = preg_split("/\r?\n/", $subrec);
+						foreach ($recs2 as $keysr2 => $subrec2) {
+							// There must be a hit in a subrec. If found, check in which tag
+							foreach ($cquery["includes"] as $qindex => $squery) {
+								if (preg_match("/".$squery["term"]."/i",$subrec2, $result)>0) {
+									$ct = preg_match("/\d.(\S*).*/i",$subrec2, $result2);
+									if (($ct > 0) && (!empty($result2[1]))) {
+										$hit = true;
+										// if the tag can be displayed, do so
+										if (strpos($skiptagsged, $result2[1]) === false && strpos($skiptagsged, $level1tag) === false) $found = true;
+									}
+								}
+								if ($found == true) break;
+							}
+							if ($found == true) break;
+						}
+						if ($found == true) break;
+					}
+				}
+				if ($found == true) {
+					$note->PrintListNote();
+					$note_printed[$note->xref."[".$GEDCOM."]"] = "1";
+					if ($i==ceil($note_count/2) && $note_count>12) print "</ul></td><td class=\"shade1 wrap\"><ul>\n";
+					$i++;
+				}
+				else if ($hit == true) $note_hide[$note->xref."[".get_gedcom_from_id($note->gedcomid)."]"] = 1;
+			}
+			print "\n\t\t</ul>&nbsp;</td></tr>";
+			SwitchGedcom();
+			if (count($note_total)>0) {
+			// if ($cts > 0) {
+				print "<tr><td>".$gm_lang["total_notes"]." ".count($note_total);
+				if (count($note_hide)>0) print "  --  ".$gm_lang["hidden"]." ".count($note_hide);
+				print "</td></tr>";
+			}
+			print "</table>";
+		}
+		else print "<div id=\"no_tab6\"></div>";
+		print "<br /></div>";
+		
+print "</div>"; // End result div
+		
 	}
-	else if (isset($query)) print "<br /><div class=\"warning\" style=\" text-align: center;\"><i>".$gm_lang["no_results"]."</i><br /></div>\n\t\t";
+//	else if (isset($query)) print "<br /><div class=\"warning width80\" style=\" text-align: center;\"><i>".$gm_lang["no_results"]."</i><br /></div>\n\t\t";
 }
 
 // ----- section to search and display results for a Soundex last name search
 if ($action=="soundex") {
 	if ($soundex == "DaitchM") DMsoundex("", "closecache");
 // 	$query = "";	// Stop function PrintReady from doing strange things to accented names
-	if (((!empty($lastname))||(!empty($firstname)) ||(!empty($place))) && (isset($printname))) {
-		print "<div class=\"search_results\"><br />";
-		print "\n\t<table class=\"list_table $TEXT_DIRECTION\">\n\t\t<tr>\n\t\t";
-		$i=0;
-		$ct=count($printname);
+	if (((!empty($lastname))||(!empty($firstname)) ||(!empty($place))) && (isset($printindiname))) {
+		$ct=count($printindiname);
 		if ($ct > 0) {
-			init_list_counters();
-			$oldged = $GEDCOM;
-			$curged = $GEDCOM;
+			print "<div class=\"search_results\"><br />";
+			print "\n\t<table class=\"list_table $TEXT_DIRECTION\">\n\t\t<tr>\n\t\t";
+			$i=0;
+			InitListCounters();
 			$extrafams = false;
 			if (count($printfamname)>0) $extrafams = true;
 			if ($extrafams) {
@@ -1157,46 +1643,27 @@ if ($action=="soundex") {
 			else print "<td colspan=\"2\" class=\"topbottombar\"><img src=\"".$GM_IMAGE_DIR."/".$GM_IMAGES["indis"]["small"]."\" border=\"0\" alt=\"\" /> ".$gm_lang["people"]."</td>";
 			print "</tr><tr>\n\t\t<td class=\"shade1 wrap\"><ul>";
 
-			foreach ($printname as $key => $pvalue) {
-				$GEDCOM = $pvalue[2];
-				if ($GEDCOM != $curged) {
-					ReadPrivacy($GEDCOM);
-					$curged = $GEDCOM;
-				}
-				print_list_person($pvalue[1], array(check_NN($pvalue[0]), $pvalue[2]), "", $pvalue[3]);
-				$indiprinted[$pvalue[1]."[".$pvalue[2]."]"] = 1;
+			foreach ($printindiname as $key => $pvalue) {
+				if (isset($sindilist[$pvalue[1]."[".$GEDCOMS[$pvalue[2]]["id"]."]"])) $indilist[$pvalue[1]."[".$GEDCOMS[$pvalue[2]]["id"]."]"] = $sindilist[$pvalue[1]."[".$GEDCOMS[$pvalue[2]]["id"]."]"];
+				print_list_person($pvalue[1], array(CheckNN($pvalue[0]), $pvalue[2]), "", $pvalue[3]);
+				$indi_printed[$pvalue[1]."[".$pvalue[2]."]"] = 1;
 				print "\n";
 				if (!$extrafams) {
-					if ($i == floor($ct / 2) && $ct>9) print "\n\t\t</ul></td>\n\t\t<td class=\"list_value_wrap\"><ul>";
+					if ($i == floor(($ct-1) / 2) && $ct>9) print "\n\t\t</ul></td>\n\t\t<td class=\"list_value_wrap\"><ul>";
 					$i++;
 				}
-			}
-			$GEDCOM = $oldged;
-			if ($GEDCOM != $curged) {
-				ReadPrivacy($GEDCOM);
-				$curged = $GEDCOM;
 			}
 			print "\n\t\t</ul></td>";
 
 			// Start printing the associated fams
 			if ($extrafams) {
-				uasort($printfamname, "itemsort");
+				uasort($printfamname, "ItemSort");
 				print "\n\t\t<td class=\"shade1 wrap\"><ul>";
 				foreach($printfamname as $pkey => $pvalue) {
-					$GEDCOM = $pvalue[2];
-					if ($GEDCOM != $curged) {
-						ReadPrivacy($GEDCOM);
-						$curged = $GEDCOM;
-					}
 					print_list_family($pvalue[1], array($pvalue[0], $pvalue[2]), "", $pvalue[3]);
 					print "\n";
 				}
 				print "\n\t\t</ul>&nbsp;</td>";
-				$GEDCOM = $oldged;
-				if ($GEDCOM != $curged) {
-					ReadPrivacy($GEDCOM);
-					$curged = $GEDCOM;
-				}
 			}
 
 			// start printing the table footer
@@ -1219,12 +1686,31 @@ if ($action=="soundex") {
 				}
 				print "</tr>";
 			}
+			print "</table></div>";
 		}
-		else if (!isset($topsearch)) print "<td class=\"warning\" style=\" text-align: center;\"><i>".$gm_lang["no_results"]."</i></td></tr>\n\t\t";
-		print "</table></div>";
+		else if (!isset($topsearch)) print "<br /><br /><div class=\"warning width100\" style=\" text-align: center;\"><i>".$gm_lang["no_results"]."</i></div>\n\t\t";
 	}
-	else if (!isset($topsearch)) print "<br /><div class=\"warning\" style=\" text-align: center;\"><i>".$gm_lang["no_results"]."</i><br /></div>\n\t\t";
+	else if (!isset($topsearch)) print "<br /><br /><div class=\"warning width100\" style=\" text-align: center;\"><i>".$gm_lang["no_results"]."</i><br /></div>\n\t\t";
 }
-print "<br /><br /><br />";
+print "<br />";
+if ($action == "general") {
+	if(isset($sindilist) && isset($srindi) && count($sindilist) > 0) $tab = 1;
+	else if(isset($sfamlist) && count($sfamlist) > 0) $tab = 2;
+	else if(isset($ssourcelist) && count($ssourcelist) > 0) $tab = 3;
+	else if(isset($srepolist) && count($srepolist) > 0) $tab = 4;
+	else if(isset($media_total) && count($media_total) > 0) $tab = 5;
+	else if(isset($note_total) && count($note_total) > 0) $tab = 6;
+	else {
+		print "<br /><div class=\"warning\" style=\" text-align: center;\"><i>".$gm_lang["no_results"]."</i><br /></div>";
+		print "<div id=\"no_tab0\"></div>";
+		$tab = "0";
+	}
+	if ($tab != "0") {
+		print "<script type=\"text/javascript\">\n<!--\n";
+		print "tabswitch($tab)";
+		print "\n//-->\n</script>\n";
+	}
+}
+
 print_footer();
 ?>

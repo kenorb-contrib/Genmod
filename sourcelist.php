@@ -3,7 +3,7 @@
  * Parses gedcom file and displays a list of the sources in the file.
  *
  * Genmod: Genealogy Viewer
- * Copyright (C) 2005 Genmod Development Team
+ * Copyright (C) 2005 - 2008 Genmod Development Team
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,7 +21,7 @@
  *
  * @package Genmod
  * @subpackage Lists
- * @version $Id: sourcelist.php,v 1.2 2006/03/12 19:02:14 roland-d Exp $
+ * @version $Id: sourcelist.php,v 1.8 2008/08/03 04:29:47 sjouke Exp $
  */
  
 /**
@@ -29,20 +29,21 @@
 */
 require("config.php");
 
-$addsourcelist = get_source_add_title_list();  //-- array of additional source titlesadd
-$sourcelist = get_source_list();               //-- array of regular source titles 
-
-uasort($sourcelist, "itemsort"); 
-uasort($addsourcelist, "itemsort"); 
-
-$ca = count($addsourcelist);
-$cs = get_list_size("sourcelist");
-$ctot = $ca + $cs;
 print_header($gm_lang["source_list"]);
 print "<div class=\"center\">";
-print "<h2>".$gm_lang["source_list"]."</h2>\n\t";
+print "<h3>".$gm_lang["source_list"]."</h3>\n\t";
 
-print "\n\t<table class=\"list_table $TEXT_DIRECTION\">\n\t\t<tr><td class=\"shade2 center\"";
+$addsourcelist = GetSourceAddTitleList();  //-- array of additional source titlesadd
+$sourcelist = GetSourceList();               //-- array of regular source titles 
+GetAllSourceLinks(false);				// Array of source links
+uasort($sourcelist, "SourceSort"); 
+uasort($addsourcelist, "SourceSort"); 
+
+$ca = count($addsourcelist);
+$cs = GetListSize("sourcelist");
+$ctot = $ca + $cs;
+
+print "\n\t<table class=\"list_table $TEXT_DIRECTION center\">\n\t\t<tr><td class=\"shade2 center\"";
 if($ca>0 || $cs>12)	print " colspan=\"2\"";
 print "><img src=\"".$GM_IMAGE_DIR."/".$GM_IMAGES["source"]["small"]."\" border=\"0\" title=\"".$gm_lang["sources"]."\" alt=\"".$gm_lang["sources"]."\" />&nbsp;&nbsp;";
 print $gm_lang["titles_found"];

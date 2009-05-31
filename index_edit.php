@@ -4,7 +4,7 @@
  * to keep bookmarks, see a list of upcoming events, etc.
  *
  * Genmod: Genealogy Viewer
- * Copyright (C) 2005 Genmod Development Team
+ * Copyright (C) 2005 - 2008 Genmod Development Team
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -24,7 +24,7 @@
  *
  * @package Genmod
  * @subpackage Display
- * @version $Id: index_edit.php,v 1.14 2006/05/13 07:53:45 roland-d Exp $
+ * @version $Id: index_edit.php,v 1.21 2009/02/07 08:45:14 sjouke Exp $
  */
 
 /**
@@ -46,7 +46,7 @@ if (empty($uname) || empty($name)) {
 	print_simple_footer();
 	exit;
 }
-if (!userIsAdmin($uname)) $setdefault=false;
+if (!$Users->userIsAdmin($uname)) $setdefault=false;
 
 if (!isset($action)) $action="";
 if (!isset($command)) $command="user";
@@ -130,6 +130,7 @@ if ($command=="user") {
 	$ublocks = getBlocks($uname);
 	if (($action=="reset") || ((count($ublocks["main"])==0) && (count($ublocks["right"])==0))) {
 		$ublocks["main"] = array();
+		$ublocks["main"][] = array("print_quickstart_block", "");
 		$ublocks["main"][] = array("print_todays_events", "");
 		$ublocks["main"][] = array("print_user_messages", "");
 		$ublocks["main"][] = array("print_user_favorites", "");
@@ -145,6 +146,7 @@ else {
 	$ublocks = getBlocks($GEDCOM);
 	if (($action=="reset") or ((count($ublocks["main"])==0) and (count($ublocks["right"])==0))) {
 		$ublocks["main"] = array();
+		$ublocks["main"][] = array("print_quickstart_block", "");
 		$ublocks["main"][] = array("print_gedcom_stats", "");
 		$ublocks["main"][] = array("print_gedcom_news", "");
 		$ublocks["main"][] = array("print_gedcom_favorites", "");
@@ -174,6 +176,10 @@ if ($action=="updateconfig") {
 			else {
 				$config[$config_name] = "";
 			}
+		}
+		// Cleanup the config for parameters that no longer exist
+		foreach ($config as $key => $value) {
+			if (!array_key_exists($key, $GM_BLOCKS[$block[0]]["config"])) unset($config[$key]);
 		}
 		$ublocks[$side][$index][1] = $config;
 		setBlocks($name, $ublocks, $setdefault);
@@ -229,11 +235,39 @@ if ($action=="update") {
 	<?php
 }
 
+// NOTE: Store the changed userfavorite
+if ($action == "storefav") {
+	$favorite["username"] = $username;
+	$favorite["gid"] = $id;
+	$favorite["type"] = $type;
+	$favorite["file"] = $file;
+	if (isset($favurl)) $favorite["url"] = $favurl;
+	else $favorite["url"] = "";
+	if (isset($favnote)) $favorite["note"] = $favnote;
+	else $favorite["note"] = "";
+	if (isset($favtitle)) $favorite["title"] = $favtitle;
+	else $favorite["title"] = "";
+	if (EditFavorite($favorite)) { ?>
+		<script language="JavaScript" type="text/javascript">
+		opener.location.reload();
+		window.close();
+		</script>
+		<?php
+	}
+	else {
+		print "<span class=\"error\">".$gm_lang["favorite_not_stored"]."</span>";
+		print "<div class=\"center\"><a href=\"javascript:// ".$gm_lang["close_window"]."\" onclick=\"self.close();\">".$gm_lang["close_window"]."</a></div>\n";
+		print_footer();
+		exit;
+	}
+}
+
 if ($action=="configure" && isset($ublocks[$side][$index])) {
 	$block = $ublocks[$side][$index];
+	
 	print "<table class=\"facts_table ".$TEXT_DIRECTION."\">";
 	print "<tr><td class=\"facts_label\">";
-	print "<h2>".$gm_lang["config_block"]."</h2>";
+	print "<h3>".$gm_lang["config_block"]."</h3>";
 	print "</td></tr>";
 	print "<tr><td class=\"topbottombar\">";
 	print "<b>".$GM_BLOCKS[$block[0]]["name"]."</b>";
@@ -251,6 +285,7 @@ if ($action=="configure" && isset($ublocks[$side][$index])) {
 	print "<input type=\"hidden\" name=\"side\" value=\"$side\" />\n";
 	print "<input type=\"hidden\" name=\"index\" value=\"$index\" />\n";
 	print "<table border=\"0\" class=\"facts_table ".$TEXT_DIRECTION."\">";
+	
 	if ($GM_BLOCKS[$block[0]]["canconfig"]) {
 		eval($block[0]."_config(\$block[1]);");
 		print "<tr><td colspan=\"2\" class=\"center\">";
@@ -410,8 +445,8 @@ else {
 		// NOTE: Print the header
 		print "<div class=\"topbottombar\">";
 			print_help_link("portal_config_intructions", "qm");
-			if ($command=="user") print "<b>".str2upper($gm_lang["customize_page"])."</b>";
-			else print "<b>".str2upper($gm_lang["customize_gedcom_page"])."</b>";
+			if ($command=="user") print "<b>".Str2Upper($gm_lang["customize_page"])."</b>";
+			else print "<b>".Str2Upper($gm_lang["customize_gedcom_page"])."</b>";
 		print "</div>";
 		
 		// NOTE: Print the container
@@ -499,7 +534,7 @@ else {
 			
 			// NOTE: Print the submit buttons
 			print "<div>";
-				if ((userIsAdmin($uname))&&($command=='user')) {
+				if (($Users->userIsAdmin($uname))&&($command=='user')) {
 					print $gm_lang["use_blocks_for_default"]."<input type=\"checkbox\" name=\"setdefault\" value=\"1\" /><br />\n";
 				}
 				

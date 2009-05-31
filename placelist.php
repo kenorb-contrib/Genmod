@@ -3,7 +3,7 @@
  * Displays a place hierachy
  *
  * Genmod: Genealogy Viewer
- * Copyright (C) 2005 Genmod Development Team
+ * Copyright (C) 2005 - 2008 Genmod Development Team
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,7 +21,7 @@
  *
  * @package Genmod
  * @subpackage Lists
- * @version $Id: placelist.php,v 1.1 2005/10/23 21:36:54 roland-d Exp $
+ * @version $Id: placelist.php,v 1.14 2009/03/25 16:53:52 sjouke Exp $
  */
 
 /**
@@ -36,15 +36,30 @@ function case_in_array($value, $array) {
 	return false;
 }
 
+function ComparePlace($parray, $location) {
+	$location = preg_replace("/".chr(239).chr(188).chr(140)."/", ",", $location);
+	$places = preg_split("/,/", $location);
+	$secalp = array_reverse($places);
+//		print "<br /><br />";
+//		print_r($parray);
+//		print_r($secalp);
+	foreach($parray as $key => $part) {
+		if (!isset($secalp[$key]) || $part != trim($secalp[$key])) return false;
+	}
+	return true;
+}
+
+
 if (empty($action)) $action = "find";
 if (empty($display)) $display = "hierarchy";
+if (empty($select)) $select = "all";
 
 if ($display=="hierarchy") print_header($gm_lang["place_list"]);
 else print_header($gm_lang["place_list2"]);
 
-print "\n\t<div class=\"center\">";
-if ($display=="hierarchy") print "<h2>".$gm_lang["place_list"]."</h2>\n\t";
-else print "<h2>".$gm_lang["place_list2"]."</h2>\n\t";
+print "\n\t<div class=\"center\" >";
+if ($display=="hierarchy") print "<h3>".$gm_lang["place_list"]."</h3>\n\t";
+else print "<h3>".$gm_lang["place_list2"]."</h3>\n\t";
 
 if (!isset($parent)) $parent=array();
 else {
@@ -64,7 +79,7 @@ if ($level>count($parent)) $level = count($parent);
 if ($level<count($parent)) $level = 0;
 
 //-- extract the place form encoded in the gedcom
-$header = find_gedcom_record("HEAD");
+$header = FindGedcomRecord("HEAD");
 $hasplaceform = strpos($header, "1 PLAC");
 
 //-- hierarchical display
@@ -73,7 +88,7 @@ if ($display=="hierarchy") {
 	$placelist = array();
 	$positions = array();
 	$numfound = 0;
-	get_place_list();
+	GetPlaceList();
 	// -- sort the array
 	uasort($placelist, "stringsort");
 
@@ -101,7 +116,7 @@ if ($display=="hierarchy") {
 		$numls = count($parent)-1;
 		$num_place="";
 		//-- place and page text orientation is opposite -> top level added at the beginning of the place text
-		print "<a href=\"placelist.php?level=0\">";
+		print "<a href=\"placelist.php?level=0&amp;select=$select\">";
 		if ($numls>=0 && (($TEXT_DIRECTION=="ltr" && hasRtLText($parent[$numls])) || ($TEXT_DIRECTION=="rtl" && !hasRtLText($parent[$numls])))) print $gm_lang["top_level"].", ";
 		print "</a>";
 	    for($i=$numls; $i>=0; $i--) {
@@ -115,16 +130,19 @@ if ($display=="hierarchy") {
 					print "&amp;parent[$j]=".$ppart;
 				}
 			}
- 			print "\">";
+ 			print "&amp;select=$select\">";
  			if (trim($parent[$i])=="") print $gm_lang["unknown"];
-			else print PrintReady($parent[$i]);
+			else {
+				print PrintReady($parent[$i]);
+				if (HasChinese($parent[$i])) print " (".printReady(GetPinYin($parent[$i])).")";
+			}
 			print "</a>";
  			if ($i>0) print ", ";
  			else if (($TEXT_DIRECTION=="rtl" && hasRtLText($parent[$i])) || ($TEXT_DIRECTION=="ltr" &&  !hasRtLText($parent[$i])))  print ", ";
 			if (empty($num_place)) $num_place=$parent[$i];
 		}
 	}
-	print "<a href=\"placelist.php?level=0\">";
+	print "<a href=\"placelist.php?level=0&amp;select=$select\">";
 	//-- place and page text orientation is the same -> top level added at the end of the place text
 	if ($level==0 || ($numls>=0 && (($TEXT_DIRECTION=="rtl" && hasRtLText($parent[$numls])) || ($TEXT_DIRECTION=="ltr" && !hasRtLText($parent[$numls]))))) print $gm_lang["top_level"];
 	print "</a>";
@@ -132,7 +150,7 @@ if ($display=="hierarchy") {
 	print_help_link("ppp_levels_help", "qm");
 
 	// show clickable map if found
-	print "\n\t<br /><br />\n\t<table class=\"width90\"><tr><td class=\"center\">";
+	print "\n\t<br /><br />\n\t<table class=\"width90 center\"><tr><td class=\"center\">";
 	if ($level>=1 and $level<=3) {
 		$country = $parent[0];
 		if ($country == "\xD7\x99\xD7\xA9\xD7\xA8\xD7\x90\xD7\x9C") $country = "ISR"; // Israel hebrew name
@@ -141,7 +159,8 @@ if ($display=="hierarchy") {
 			// search country code using current language countries table
 			require($GM_BASE_DIRECTORY."languages/countries.en.php");
 			// changed $LANGUAGE to $deflang (the language set for the current gedcom)	// eikland
-			if (file_exists($GM_BASE_DIRECTORY."languages/countries.".$lang_short_cut[$deflang].".php")) require($GM_BASE_DIRECTORY."languages/countries.".$lang_short_cut[$deflang].".php");
+			// changed to $GEDCOMLANG sjouke
+			if (file_exists($GM_BASE_DIRECTORY."languages/countries.".$lang_short_cut[$GEDCOMLANG].".php")) require($GM_BASE_DIRECTORY."languages/countries.".$lang_short_cut[$GEDCOMLANG].".php");
 			foreach ($countries as $countrycode => $countryname) {
 				if (strtoupper($countryname) == $country) {
 					$country = $countrycode;
@@ -157,10 +176,10 @@ if ($display=="hierarchy") {
 		if (!file_exists($mapfile)) $mapfile = "places/".$country."/".$country.".htm";
 
 		if ($level>1) {
-			$state = smart_utf8_decode($parent[1]);
+			$state = SmartUtf8Decode($parent[1]);
 			$mapname .= "_".$state;
 			if ($level>2) {
-				$county = smart_utf8_decode($parent[2]);
+				$county = SmartUtf8Decode($parent[2]);
 				$mapname .= "_".$county;
 				$parent[2] = str_replace("'","\'",$parent[2]);
 				$areaname = $parent[2];
@@ -251,9 +270,9 @@ if ($display=="hierarchy") {
 	// -- print the array
 	foreach ($placelist as $key => $value) {
 		if ($i==0) {
-			print "\n\t<br />\n\t<table class=\"list_table $TEXT_DIRECTION\"";
+			print "\n\t<br />\n\t<table align=\"center\" class=\"list_table $TEXT_DIRECTION\"";
 			if ($TEXT_DIRECTION=="rtl") print " dir=\"rtl\"";
-			print ">\n\t\t<tr>\n\t\t<td class=\"list_label\" ";
+			print ">\n\t\t<tr>\n\t\t<td class=\"shade2 center\" ";
 			if ($ct1 > 20) print "colspan=\"3\"";
 			else if ($ct1 > 4) print "colspan=\"2\"";
 			print ">&nbsp;";
@@ -266,46 +285,54 @@ if ($display=="hierarchy") {
 
 			print "&nbsp;";
 			print_help_link("ppp_placelist_help", "qm");
-			print "</td></tr><tr><td class=\"list_value\"><ul>\n\t\t\t";
+			print "</td></tr><tr><td class=\"shade1 center\"><ul>\n\t\t\t";
 		}
 
 //		print "<li ";
 		if (begRTLText($value))
 			 print "<li class=\"rtl\" dir=\"rtl\"";
 		else print "<li class=\"ltr\" dir=\"ltr\"";
-		print "type=\"square\">\n<a href=\"placelist.php?action=$action&amp;level=".($level+1).$linklevels;
-		print "&amp;parent[$level]=".urlencode($value)."\" class=\"list_item\">";
+		print " type=\"square\">\n<a href=\"placelist.php?action=$action&amp;level=".($level+1).$linklevels;
+		print "&amp;parent[$level]=".urlencode($value)."&amp;select=$select\" class=\"shade1\">";
 
 		if (trim($value)=="") print $gm_lang["unknown"];
-		else print PrintReady($value);
+		else {
+			print PrintReady($value);
+			if (HasChinese($value)) {
+				print " (".printReady(GetPinYin($value)).")";
+			}
+		}
 		print "</a></li>\n";
 		if ($ct1 > 20){
-			if ($i == floor($ct1 / 3)) print "\n\t\t</ul></td>\n\t\t<td class=\"list_value\"><ul>";
-			if ($i == floor(($ct1 / 3) * 2)) print "\n\t\t</ul></td>\n\t\t<td class=\"list_value\"><ul>";
+			if ($i == floor($ct1 / 3)) print "\n\t\t</ul></td>\n\t\t<td class=\"shade1\"><ul>";
+			if ($i == floor(($ct1 / 3) * 2)) print "\n\t\t</ul></td>\n\t\t<td class=\"shade1\"><ul>";
 		}
-		else if ($ct1 > 4 && $i == floor($ct1 / 2)) print "\n\t\t</ul></td>\n\t\t<td class=\"list_value\"><ul>";
+		else if ($ct1 > 4 && $i == floor($ct1 / 2)) print "\n\t\t</ul></td>\n\t\t<td class=\"shade1\"><ul>";
 	    $i++;
 	}
 	if ($i>0){
 		print "\n\t\t</ul></td></tr>";
 		if (($action!="show")&&($level>0)) {
-			print "<tr>\n\t\t<td class=\"list_label\" ";
+			print "<tr>\n\t\t<td class=\"shade2 center\" ";
 			if ($ct1 > 20) print "colspan=\"3\"";
 			else if ($ct1 > 4) print "colspan=\"2\"";
 			print ">\n\t";
 			print $gm_lang["view_records_in_place"];
 			print_help_link("ppp_view_records_help", "qm");
-			print "</td></tr><tr><td class=\"list_value\" ";
+			print "</td></tr><tr><td class=\"shade1\" ";
 			if ($ct1 > 20) print "colspan=\"3\"";
 			else if ($ct1 > 4) print "colspan=\"2\"";
 			print " style=\"text-align: center;\">";
-			print "<a href=\"placelist.php?action=show&amp;level=$level";
+			print "<a href=\"placelist.php?select=$select&amp;action=show&amp;level=$level";
 			foreach($parent as $key=>$value) {
 				print "&amp;parent[$key]=".urlencode(trim($value));
 			}
 			print "\"><span class=\"formField\">";
 			if (trim($value)=="") print $gm_lang["unknown"];
-			else print PrintReady($value);
+			else {
+				print PrintReady($value);
+				if (HasChinese($value)) print " (".printReady(GetPinYin($value)).")";
+			}
 			print "</span></a> ";
 			print "</td></tr>";
 		}
@@ -321,53 +348,86 @@ if ($level > 0) {
 		$myindilist = array();
 		$mysourcelist = array();
 		$myfamlist = array();
-
-		$positions = get_place_positions($parent, $level);
+		
+		$positions = GetPlacePositions($parent, $level);
 		for($i=0; $i<count($positions); $i++) {
 			$gid = $positions[$i];
-			$indirec=find_gedcom_record($gid);
+			$indirec=FindGedcomRecord($gid);
 			$ct = preg_match("/0 @(.*)@ (.*)/", $indirec, $match);
 			if ($ct>0) {
 				$type = trim($match[2]);
 				if ($type == "INDI") {
-					$myindilist["$gid"] = get_sortable_name($gid);
+					$prt = false;
+					if ($select == "all") $prt = true;
+					else {
+						$srec = GetSubRecord(1, "1 $select", $indirec);
+						$prec = GetGedcomValue("PLAC", 2, $srec);
+						$prt = ComparePlace($parent, $prec);
+					}
+					if ($prt) {
+						$myindilist["$gid"] = GetSortableName($gid);
+						if (HasChinese($myindilist["$gid"])) $myindilist["$gid"] .= " (".GetSortableAddName($gid).")";
+					}
 				}
 				else if ($type == "FAM") {
-					$myfamlist["$gid"] = get_family_descriptor($gid);
+					$prt = false;
+					if ($select == "all") $prt = true;
+					else {
+						$srec = GetSubRecord(1, "1 $select", $indirec);
+						$prec = GetGedcomValue("PLAC", 2, $srec);
+						$prt = ComparePlace($parent, $prec);
+					}
+					if ($prt) {
+						$myfamlist["$gid"] = GetFamilyDescriptor($gid);
+						if (HasChinese($myfamlist["$gid"])) $myfamlist["$gid"] .= " (".GetFamilyAddDescriptor($gid, false, $indirec).")";
+					}
 				}
-				else if ($type == "SOUR") {
-					$mysourcelist["$gid"] = get_source_descriptor($gid);
+				else if ($type == "SOUR" && $select == "all") {
+					$mysourcelist["$gid"] = GetSourceDescriptor($gid);
 				}
 			}
 		}
 
-		print "\n\t<br /><br /><table class=\"list_table $TEXT_DIRECTION\">\n\t\t<tr>";
+		print "\n\t<br /><br /><table class=\"list_table $TEXT_DIRECTION center\">\n\t\t<tr>";
 		$ci = count($myindilist);
 		$cs = count($mysourcelist);
 		$cf = count($myfamlist);
-		if ($ci>0) print "<td class=\"list_label\"><img src=\"".$GM_IMAGE_DIR."/".$GM_IMAGES["indis"]["small"]."\" border=\"0\" alt=\"\" /> ".$gm_lang["individuals"]."</td>";
-		if ($cs>0) print "<td class=\"list_label\"><img src=\"".$GM_IMAGE_DIR."/".$GM_IMAGES["source"]["small"]."\" border=\"0\" alt=\"\" /> ".$gm_lang["sources"]."</td>";
-		if ($cf>0) print "<td class=\"list_label\"><img src=\"".$GM_IMAGE_DIR."/".$GM_IMAGES["sfamily"]["small"]."\" border=\"0\" alt=\"\" /> ".$gm_lang["families"]."</td>";
+		$cnt = ($ci > 0) + ($cf > 0) + ($cs > 0);
+		print "<td class=\"shade2 center\" colspan=\"".$cnt."\">";
+		print "<form action=\"placelist.php\" name=\"selectplace\" method=\"get\">";
+		print "<input type=\"hidden\" name=\"action\" value=\"".$action."\">";
+		print "<input type=\"hidden\" name=\"display\" value=\"".$display."\">";
+		print "<input type=\"hidden\" name=\"level\" value=\"".$level."\">";
+		$j = 0;
+		while (isset($parent[$j])) {
+			print "<input type=\"hidden\" name=\"parent[]\" value=\"".$parent[$j]."\">";
+			$j++;
+		}
+//		if ($cnt > 0) {
+			print $gm_lang["pl_show_event"].":&nbsp";
+			print "<select name=\"select\" onchange=\"document.selectplace.submit(); return false;\" />";
+			PrintFilterEvent($select);
+			print "</select>";
+//		}
+		print "</form>";
+		print "</td></tr><tr>";
+		if ($ci>0) print "<td class=\"shade2 center\"><img src=\"".$GM_IMAGE_DIR."/".$GM_IMAGES["indis"]["small"]."\" border=\"0\" alt=\"\" /> ".$gm_lang["individuals"]."</td>";
+		if ($cs>0) print "<td class=\"shade2 center\"><img src=\"".$GM_IMAGE_DIR."/".$GM_IMAGES["source"]["small"]."\" border=\"0\" alt=\"\" /> ".$gm_lang["sources"]."</td>";
+		if ($cf>0) print "<td class=\"shade2 center\"><img src=\"".$GM_IMAGE_DIR."/".$GM_IMAGES["sfamily"]["small"]."\" border=\"0\" alt=\"\" /> ".$gm_lang["families"]."</td>";
 		$i=0;
-//		$pass = FALSE;
 		$indisurnames = array();
 		foreach($myindilist as $gid=>$indi) {
-//			if (showLivingNameByID($gid)||displayDetailsByID($gid)) {
 				$name = trim($indi);
 				$names = preg_split("/,/", $name);
-				$indi = check_NN($names);
+				$indi = CheckNN($names);
 				$indisurnames[$gid] = array();
 				$indisurnames[$gid]["name"] = $indi;
 				$indisurnames[$gid]["gid"] = $gid;
-//			}
-//			else {
-//				$pass = TRUE;
-//			}
 		}
 		print "</tr><tr>";
 		if ($ci>0) {
-			uasort($indisurnames, "itemsort");
-			print "\n\t\t<td class=\"list_value_wrap\">";
+			uasort($indisurnames, "ItemSort");
+			print "\n\t\t<td class=\"shade1 wrap\">";
 			print "\n<ul>";
 			foreach ($indisurnames as $indexval => $value) {
 	    		print_list_person($value["gid"], array($value["name"], $GEDCOM));
@@ -383,7 +443,7 @@ if ($level > 0) {
 			print "\n\t\t</td>\n\t\t";
 		}
 		if ($cs>0) {
-			print "<td class=\"list_value_wrap\">";
+			print "<td class=\"shade1 wrap\">";
 			print "\n<ul>";
 			asort($mysourcelist);
 			$i=0;
@@ -402,20 +462,20 @@ if ($level > 0) {
 		$surnames = array();
 		foreach($myfamlist as $gid=>$fam) {
 			// Added space to regexp after z to also remove prefixes
-			$name = preg_replace(array("/ [jJsS][rR]\.?,/", "/ I+,/", "/^[a-z. ]*/"), array(",",",",""), $fam);
-			$name = trim($name);
+			$name = StripPrefix($fam);
 			$names = preg_split("/[,+]/", $name);
 			$surname = $names[0];
 			$firstname = "";
 			if (isset($names[1])) $firstname = trim($names[1]);
 			else $surname = "";
-			$surname = str2upper(trim($surname));
+			$surname = Str2Upper(trim($surname));
 			if (!isset($surnames[$surname.$firstname.$gid])) {
 				$surnames[$surname.$firstname.$gid] = array();
 				// Convert names again to include prefixes for displaying
-				$name = preg_replace(array("/ [jJsS][rR]\.?,/", "/ I+,/"), array(",",","), $fam);
-				$names = preg_split("/[,+]/", $name);
-				$fam = check_NN($names);
+				// That is not needed, everything was ok in $fam!
+//				$name = preg_replace(array("/ [jJsS][rR]\.?,/", "/ I+,/", "/\(.*\)/"), array(",",",",""), $fam);
+//				$names = preg_split("/[,+]/", $name);
+//				$fam = CheckNN($names);
 				$surnames[$surname.$firstname.$gid]["name"] = $fam;
 				$surnames[$surname.$firstname.$gid]["gid"] = $gid;
 			}
@@ -423,9 +483,9 @@ if ($level > 0) {
 		$i=0;
 		if (isset($surnames)) $ct=count($surnames);
 		if ($ct>0) {
-			uasort($surnames, "itemsort");
+			uasort($surnames, "ItemSort");
 			reset($surnames);
-			print "<td class=\"list_value_wrap\">";
+			print "<td class=\"shade1 wrap\">";
 			print "\n<ul>";
 			foreach ($surnames as $indexval => $value) {
 				print_list_family($value["gid"], array($value["name"], $GEDCOM));
@@ -476,7 +536,7 @@ if ($level > 0) {
 if ($display=="list") {
 	$placelist = array();
 
-	find_place_list("");
+	FindPlaceList("");
 	uasort($placelist, "stringsort");
 	if (count($placelist)==0) {
 		print "<b>".$gm_lang["no_results"]."</b><br />";
@@ -491,7 +551,7 @@ if ($display=="list") {
 		print $gm_lang["place_list2"];
 		print "&nbsp;";
 		print_help_link("ppp_placelist_help2", "qm");
-		print "</td></tr><tr><td class=\"list_value_wrap\"><ul>\n\t\t\t";
+		print "</td></tr><tr><td class=\"shade1 wrap\"><ul>\n\t\t\t";
 		$i=0;
 		foreach($placelist as $indexval => $revplace) {
 			$linklevels = "";
@@ -510,14 +570,14 @@ if ($display=="list") {
 			if (begRTLText($revplace))
 			     print "<li class=\"rtl\" dir=\"rtl\"";
 		    else print "<li class=\"ltr\" dir=\"ltr\"";
-			print "type=\"square\"><a href=\"placelist.php?action=show&amp;display=hierarchy&amp;level=$level$linklevels\">";
+			print "type=\"square\"><a href=\"placelist.php?action=show&amp;display=hierarchy&amp;level=$level$linklevels&amp;select=$select\">";
 			print PrintReady($revplace)."</a></li>\n";
 			$i++;
 			if ($ct > 20){
-				if ($i == floor($ct / 3)) print "\n\t\t</ul></td>\n\t\t<td class=\"list_value_wrap\"><ul>";
-				if ($i == floor(($ct / 3) * 2)) print "\n\t\t</ul></td>\n\t\t<td class=\"list_value_wrap\"><ul>";
+				if ($i == floor($ct / 3)) print "\n\t\t</ul></td>\n\t\t<td class=\"shade1 wrap\"><ul>";
+				if ($i == floor(($ct / 3) * 2)) print "\n\t\t</ul></td>\n\t\t<td class=\"shade1 wrap\"><ul>";
 			}
-			else if ($i == floor($ct/2)) print "</ul></td><td class=\"list_value_wrap\"><ul>\n\t\t\t";
+			else if ($i == floor($ct/2)) print "</ul></td><td class=\"shade1 wrap\"><ul>\n\t\t\t";
 		}
 		print "\n\t\t</ul></td></tr>\n\t\t";
 		if ($i>1) {
@@ -529,7 +589,7 @@ if ($display=="list") {
 	}
 }
 
-print "<br /><a href=\"placelist.php?display=";
+print "<br /><a href=\"placelist.php?select=ALL&amp;display=";
 if ($display=="list") print "hierarchy\">".$gm_lang["show_place_hierarchy"];
 else print "list\">".$gm_lang["show_place_list"];
 print "</a><br /><br />\n";

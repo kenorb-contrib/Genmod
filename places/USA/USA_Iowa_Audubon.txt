@@ -1,8 +1,0 @@
-<!-- @version $Id: USA_Iowa_Audubon.txt,v 1.1 2005/10/23 22:08:18 roland-d Exp $ -->
-<!-- @see http://www.naco.org/ -->
-Audubon
-Brayton
-Exira
-Gray
-Hamlin
-Kimballton

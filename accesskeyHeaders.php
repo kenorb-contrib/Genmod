@@ -3,7 +3,7 @@
  *  Code for access key codes
  *
  * Genmod: Genealogy Viewer
- * Copyright (C) 2005 Genmod Development Team
+ * Copyright (C) 2005 - 2008 Genmod Development Team
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,12 +21,12 @@
  *
  * @package Genmod
  * @subpackage Charts
- * @version $Id: accesskeyHeaders.php,v 1.3 2006/04/17 20:01:52 roland-d Exp $
+ * @version $Id: accesskeyHeaders.php,v 1.5 2008/01/06 10:47:14 roland-d Exp $
  */
  ?>
 <div class="accesskeys">
-<a class="accesskeys" href="#content" title="<?php print $gm_lang["accesskey_skip_to_content_desc"]; ?>" tabindex="-1" accesskey="<?php print $gm_lang["accesskey_skip_to_content"]; ?>"><?php print $gm_lang["accesskey_skip_to_content_desc"]; ?></a>
-<a class="accesskeys" href="javascript:// accesskey_viewing_advice_help" onfocus="this.onclick" onclick="return helpPopup('accesskey_viewing_advice_help');" title="<?php print $gm_lang["accesskey_viewing_advice_desc"]; ?>" accesskey="<?php print $gm_lang["accesskey_viewing_advice"]; ?>"><?php print $gm_lang["accesskey_viewing_advice_desc"]; ?></a>
-<a href="javascript:// help_<?php print basename($SCRIPT_NAME); ?>" onclick="return helpPopup('help_<?php print basename($SCRIPT_NAME); ?>&amp;action=<?php print $action;?>');" accesskey="<?php print $gm_lang["accesskey_help_current_page"]; ?>"> </a>
-<a href="javascript:// help_contents_help" onclick="return helpPopup('help_contents_help');" accesskey="<?php print $gm_lang["accesskey_help_content"]; ?>"> </a>
+<a class="accesskeys" href="#content" title="<?php print $gm_lang["accesskey_skip_to_content_desc"]; ?>" tabindex="0" accesskey="<?php print $gm_lang["accesskey_skip_to_content"]; ?>"><?php print $gm_lang["accesskey_skip_to_content_desc"]; ?></a>
+<a class="accesskeys" href="javascript://accesskey_viewing_advice_help" onfocus="this.onclick" onclick="return helpPopup('accesskey_viewing_advice_help');" title="<?php print $gm_lang["accesskey_viewing_advice_desc"]; ?>" accesskey="<?php print $gm_lang["accesskey_viewing_advice"]; ?>"><?php print $gm_lang["accesskey_viewing_advice_desc"]; ?></a>
+<a href="javascript://help_<?php print basename($SCRIPT_NAME); ?>" onclick="return helpPopup('help_<?php print basename($SCRIPT_NAME); ?>&amp;action=<?php print $action;?>');" accesskey="<?php print $gm_lang["accesskey_help_current_page"]; ?>"> </a>
+<a href="javascript://help_contents_help" onclick="return helpPopup('help_contents_help');" accesskey="<?php print $gm_lang["accesskey_help_content"]; ?>"> </a>
 </div>

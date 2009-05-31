@@ -24,341 +24,15 @@
  *
  * @package Genmod
  * @subpackage Lists
- * @version $Id: statistics.php,v 1.2 2006/04/17 20:01:52 roland-d Exp $
+ * @version $Id: statistics.php,v 1.17 2009/03/25 16:53:52 sjouke Exp $
  */
 
 /**
  * Inclusion of the configuration file
 */
 require("config.php");
+require_once($GM_BASE_DIRECTORY."includes/functions/functions_plot.php");
 
-function get_person()
-{
-$myindilist= array();
-$keys= array();
-$values= array();
-$dates= array();
-$families= array();
-global $nrfam, $famgeg, $famgeg1, $nrpers, $persgeg, $persgeg1,$key2ind,$nrman,$nrvrouw;
-global $match1,$match2;
-
-	$myindilist= GetIndiList();
-	$keys = array_keys($myindilist);
-	$values = array_values($myindilist);
-
-	$nrpers= count($myindilist);
-	$nrman=0; $nrvrouw=0;
-	for($i=0; $i<$nrpers; $i++)
-	{
-		$value = $values[$i];
-		$key = $keys[$i];
-		$deathdate="";
-		$birthdate="";
-		$sex= "";
-		$indirec= find_person_record($key);
-		if (dateplace($indirec,"1 BIRT")!==false)
-			{$birthdate= $match1[1]; $birthplace=$match2[1];}
-//--	print ("geboorte:".$birthdate."--".$birthplace."<br>");
-		if (dateplace($indirec,"1 DEAT")!==false)
-			{$deathdate= $match1[1]; $deathplace=$match2[1];}
-//-- print ("overleden:".$deathdate."--".$deathplace."<br>");
-		if (stringinfo($indirec,"1 SEX") !==false)
-			{	$sex= 0;
-				if ($match1[1] == "M") {$sex= 1; $nrman++;}
-				if ($match1[1] == "F") {$sex= 2; $nrvrouw++;}
-			}
- //--print ("sexe=".$match1[1].":".$sex."<br>");
-
-//-- get the marriage date of (the first) marriage.
-
-		$ybirth= -1; $mbirth= -1;
-		$ydeath= -1; $mdeath= -1;
-		if ($birthdate !== "")
-		{
-			$dates= parse_date($birthdate);
-// the parse_date function is in function.php
-$ik=0; $mrk= "  :  ";
-//-- print "gegevens b/m=" . $key . $mrk . $birthdate . $mrk . $dates[$ik]["day"] . $mrk . $dates[$ik]["mon"] . $mrk . $dates[$ik]["year"] . $mrk . $dates[$ik]["ext"] ;
-			if ($dates[0]["ext"] == "")
-			{	$ybirth= $dates[0]["year"];
-				$mbirth= $dates[0]["mon"];
-//--print "gevonden jaar en maand" . $birthdate . ":" .$ybirth . ":" . $mbirth . ":<br>";
-			}
-		}
-
-		if ($deathdate !== "")
-		{
-			$dates= parse_date($deathdate);
-// the parse_date function is in function.php
-$ik=0; $mrk= "  :  ";
-//-- print "====" . $mrk . $deathdate . $mrk . $dates[$ik]["day"] . $mrk . $dates[$ik]["mon"] . $mrk . $dates[$ik]["year"] . $mrk . $dates[$ik]["ext"] . "<br>" ;
-			if ($dates[0]["ext"] == "")
-			{	$ydeath= $dates[0]["year"];
-				$mdeath= $dates[0]["mon"];
-			}
-		}
-//-- else {print "==== no deathdate<br>";}
-
-		$families= find_sfamily_ids($key); //-- get the number of marriages of this person.
-//--print "families:";
-//--if (isset($families)) { print_r($families);}
-//--print ":einde<br>";
-		$persgeg[$i]["key"]= $key;
-		$key2ind[$key]= $i;
-		$persgeg[$i]["ybirth"]= $ybirth;
-		$persgeg[$i]["mbirth"]= $mbirth;
-		$persgeg[$i]["ydeath"]= $ydeath;
-		$persgeg[$i]["mdeath"]= $mdeath;
-		$persgeg1[$i]["arfams"]= $families;
-		$persgeg[$i]["sex"]= $sex;
-	}
-}
-
-function complete_data()
-{
-// fill in the first marriages instead of the keys.
-global $nrfam, $famgeg, $famgeg1, $nrpers, $persgeg, $persgeg1,$key2ind,$nrman,$nrvrouw;
-$childs= array();
-$families= array();
-
-//look in the persgeg array for marriages that occurred
-	for($i=0; $i<$nrpers; $i++)
-	{
-		$families= $persgeg1[$i]["arfams"];
-		$ctc= count($families);
-		$marrmonth= -1; $marryear= -1;
-		$first= true;
-//-- if ($ctc > 0)
-//-- {print " eerste huwelijk. nr, aantal, key's:" . $i . " : " . $ctc . " : " ;}
-		for($j=0; $j<$ctc; $j++)
-		{
-			$keyf= $families[$j]; $k= $key2ind[$keyf]; //get the family array and month/date of marriage
-//-- print $keyf . " : ";
-			$mm= $famgeg[$k]["mmarr"];
-			$my= $famgeg[$k]["ymarr"];
-			if ($first)
-			{	$marryear= $my; $marrmonth= $mm; $marrkey= $keyf; $kb= $k; $first= false;}
-			if (($marryear < 0) or (($my < $marryear) and ($my > 0)))
-			{	$marryear= $my; $marrmonth= $mm; $marrkey= $keyf; $kb= $k; $first= false;}
-		}
-		$persgeg[$i]["ymarr1"]= $marryear;
-		$persgeg[$i]["mmarr1"]= $marrmonth;
-		$famgeg[$kb]["ymarr1"]= $marryear;
-		$famgeg[$kb]["mmarr1"]= $marrmonth;
-//-- if ($ctc > 0)
-//-- {print " keuze=:" . $kb . ":". $marrkey . " : " . $marryear . " : " . $marrmonth . "<br>";}
-	}
-	for($i=0; $i<$nrfam; $i++)
-	{
-		$childs= $famgeg1[$i]["arfamc"];
-		$ctc= count($childs);
-		$birthmonth= -1; $birthyear= -1; $sex=3;
-		$first= true;
-//-- if ($ctc > 0)
-//-- {print " eerste kind. nr, aantal, key's:" . $i . " : " . $ctc . " : " ;}
-		for($j=0; $j<$ctc; $j++)
-		{
-			$key= $childs[$j]; $k= $key2ind[$key];
-//-- print $key . ":";
-			$bm= $persgeg[$k]["mbirth"];
-			$by= $persgeg[$k]["ybirth"];
-			$sex= $persgeg[$k]["sex"];
-			if ($first)
-			{	$birthyear= $by; $birthmonth= $bm; $childkey= $key; $sex1= $sex; $first= false;}
-			if (($birthyear < 0) or (($by < $birthyear) and ($by > 0)))
-			{	$birthyear= $by; $birthmonth= $bm; $childkey= $key; $sex1= $sex; $first= false;}
-//--{print " loop gevonden:" . $key . " : " . $sex . " : " . $by . " : " . $bm . "<br>";}
-		}
-		$famgeg[$i]["sex1"]= $sex1;
-		$famgeg[$i]["ybirth1"]= $birthyear;
-		$famgeg[$i]["mbirth1"]= $birthmonth;
-		$persgeg[$k]["ybirth1"]= $birthyear;
-		$persgeg[$k]["mbirth1"]= $birthmonth;
-//--if ($ctc > 0)
-//--{print " gevonden:" . $childkey . " : " . $sex1 . " : " . $birthyear . " : " . $birthmonth . "<br>";}
-	}
-}
-
-
-function get_family()
-{
-$myfamlist= array();
-$keys= array();
-$values= array();
-$parents=array();
-global $nrfam, $famgeg, $famgeg1, $nrpers, $persgeg, $persgeg1,$key2ind,$nrman,$nrvrouw;
-global $match1,$match2;
-
-$dates= array();
-	$myfamlist= get_fam_list();
-	$nrfam= count($myfamlist);
-	$keys = array_keys($myfamlist);
-	$values = array_values($myfamlist);
-
-	for($i=0; $i<$nrfam; $i++)
-	{
-		$value = $values[$i];
-		$key = $keys[$i];
-		$marriagedate=""; $ymarr= -1; $mmarr= -1;
-		$divorcedate= ""; $ydiv= -1; $mdiv= -1;
-		$indirec= find_family_record($key);
-//--	print("famrec:" . $key . ":" . $indirec . "<BR>");
-		if (dateplace($indirec,"1 MARR")!==false)
-			{$marriagedate= $match1[1]; $marriageplace=$match2[1]; $sex=1;}
-		else
-		if (dateplace($indirec,"1 MARS")!==false)
-			{$marriagedate= $match1[1]; $marriageplace=$match2[1]; $sex=0;}
-//--	 print ("gehuwd:".$marriagedate."--".$marriageplace."<br>");
-		if (dateplace($indirec,"1 DIV")!==false)
-			{$divorcedate= $match1[1]; $divorceplace=$match2[1];}
-		if ($marriagedate !== "")
-		{
-			$dates= parse_date($marriagedate);
-// the parse_date function is in function.php
-$ik=0; $mrk= "  :  ";
-//-- print "marriage, nr, key=" .$i . $mrk . $key . $mrk . $marriagedate . $mrk . $dates[$ik]["day"] . $mrk . $dates[$ik]["mon"] . $mrk . $dates[$ik]["year"] . $mrk . $dates[$ik]["ext"] ;
-//--	==== beware that every about 1850 means that the value will be set to unidentified == -1 ======
-			if ($dates[0]["ext"] == "")
-			{	$ymarr= $dates[0]["year"];
-				$mmarr= $dates[0]["mon"];
-			}
-		}
-		if ($divorcedate !== "")
-		{
-			$dates= parse_date($divorcedate);
-// the parse_date function is in function.php
-$ik=0; $mrk= "  :  ";
-//-- print "===divorce=" . $mrk . $divorcedate . $mrk . $dates[$ik]["day"] . $mrk . $dates[$ik]["mon"] . $mrk . $dates[$ik]["year"] . $mrk . $dates[$ik]["ext"] ;
-//		$ydiv= substr($divorcedate,6,4);
-//		$mdiv= substr($divorcedate,3,2);
-			if ($dates[0]["ext"] == "")
-			{	$ydiv= $dates[0]["year"];
-				$mdiv= $dates[0]["mon"];
-			}
-
-		}
-		$parents= find_parents($key);
-//--print ("parents zijn:".$parents["HUSB"].":".$parents["WIFE"]."<BR>");
-		$xfather= $parents["HUSB"]; $xmother= $parents["WIFE"];
-
-//--	check if divorcedate exists otherwise get deadthdate from husband or wife
-		if ($ydiv !== "")
-		{
-			$ydeathf= ""; $ydeathm= "";
-			if ($xfather !== "") {$indf= $key2ind[$xfather]; $ydeathf= $persgeg[$indf]["ydeath"];}
-			if ($xmother !== "") {$indm= $key2ind[$xmother]; $ydeathm= $persgeg[$indm]["ydeath"];}
-//--print(" keys en index father mother=" . $indf . ":" . $xfather . ":" . $indm . ":" . $xmother . "<BR>");
-			if (($ydeathf !== "") and ($ydeathm !== ""))
-			{	if ($ydeathf > $ydeathm)
-				{	$ydiv= $ydeathf; $mdiv= $persgeg[$indf]["mdeath"];}
-				else
-				{	$ydiv= $ydeathm; $mdiv= $persgeg[$indm]["mdeath"];};
-			}
-		};
-		$childs= preg_match_all("/1\s*CHIL\s*@(.*)@/",$indirec,$match1,PREG_SET_ORDER);
-//-- print "===kinderen:" . "Aantal=" . $childs . "=nrs=";
-//--	for($k=0; $k<$childs; $k++) {print $match1[$k][0] . " : ";} print "<BR>";
-$children= array();
-		for($k=0; $k<$childs; $k++)
-		{	$children[$k]= $match1[$k][1]; //--
- $children[$k] . " : ";
-		}
-
-
-		$famgeg[$i]["key"]= $key;
-		$key2ind[$key]= $i;
-		$famgeg[$i]["ymarr"]= $ymarr;
-		$famgeg[$i]["mmarr"]= $mmarr;
-		$famgeg[$i]["ydiv"]= $ydiv;
-		$famgeg[$i]["mdiv"]= $mdiv;
-		$famgeg[$i]["childs"]= $childs;
-		$famgeg1[$i]["arfamc"]= $children;
-		$famgeg[$i]["male"]= $xfather;
-		$famgeg[$i]["female"]= $xmother;
-	//-- print "==ouders==:" . $xfather . ":" . $xmother . "==gehuwd==" . $ymarr . "-" . $mmarr . "<BR>";
-	}
-}
-
-function stringinfo($indirec,$lookfor)
-//look for a starting string in the gedcom record of a person
-//then take the stripped comment
-{
-//-- print "start stringinfo<br>";
-global $match1,$match2;
-	$birthrec = get_sub_record(1, $lookfor, $indirec);
-	$match1[1]="";
-	$match2[1]="";
-	if ($birthrec!==false)
-		{
-			$dct = preg_match("/".$lookfor." (.*)/", $birthrec, $match1);
-			if ($dct < 1) {$match1[1]="";}
-//--print("stringinfo:".$dct.":".$lookfor.":".$birthrec.":".$match1[1].":<BR>");
-			$match1[1]= trim($match1[1]);
-			return true;
-		}
-	else 	{	return false;}
-}
-
-/**
- * Find the DATE and PLACE variables in a person or family record
- *
- * Look for a starting string in the gedcom record of a person or family
- * then find the DATE and PLACE variables
- *
- * @author	GM Development Team
- * @param		<type>	<varname>		<description>
- * @return 	<type>	<description>
- */
-function dateplace($indirec,$lookfor) {
-//-- print "start dateplace<br>";
-global $match1,$match2;
-
-	$birthrec = get_sub_record(1, $lookfor, $indirec);
-//--	$birthrec= $indirec;
-//-- You need to get the subrecord in order not to mistaken by another key with same subkeys.
-	$match1[1]="";
-	$match2[1]="";
-//-- print "dataplace:" . $lookfor . "<BR>" . $birthrec . "<br>" . $indirec . "<br>";
-	if ($birthrec!== "")
-		{
-			$dct = preg_match("/2 DATE (.*)/", $birthrec, $match1);
-//-- if ($dct > 0) {print("birthrec + date" . $birthrec . ":::" . $match1[1] . "<BR>");};
-//--			if ($dct>0) $match1[1]= get_number_date($match1[1]);
-//--			$pct = preg_match("/2 PLAC (.*)/", $birthrec, $match2);
-//--			if ($pct>0) print " -- ".$match2[1]."<br>";
-			if ($dct > 0) {$match1[1]= trim($match1[1]);} else {$match1[1]="";}
-//--			if ($pct > 0) {$match2[1]= trim($match2[1]);} else {$match2[1]="";}
-			return true;
-		}
-	else 	{	return false;}
-}
-
-function put_plot_data()
-{
-	global $GEDCOM, $GEDCOMS, $INDEX_DIRECTORY;
-global $nrfam, $famgeg, $nrpers, $persgeg,$key2ind,$nrman,$nrvrouw;
-global $gm_lang;
-
-	$indexfile = $INDEX_DIRECTORY.$GEDCOM."_statistiek.php";
-	$FP = fopen($indexfile, "wb");
-	if (!$FP)
-	{
-		print "<font class=\"error\">" . $gm_lang["statutci"] . "</font>";
-		exit;
-	}
-
-	/*$lists = array("famgeg"=>$famgeg, "persgeg"=>$persgeg, "key2ind"=>$key2ind);
-	fwrite($FP, serialize($lists));
-	*/
-	fwrite($FP, 'a:3:{s:6:"famgeg";');
-	fwrite($FP, serialize($famgeg));
-	fwrite($FP, 's:7:"persgeg";');
-	fwrite($FP, serialize($persgeg));
-	fwrite($FP, 's:7:"key2ind";');
-	fwrite($FP, serialize($key2ind));
-	fwrite($FP, '}');
-	fclose($FP);
-}
 
 //--	========= start of main program =========
 
@@ -369,177 +43,167 @@ $persgeg1= array();
 $key2ind= array();
 $match1= array();
 $match2= array();
+
+if (isset($cleanup) && $cleanup == "yes") unset($_SESSION[$GEDCOM."statisticsplot"]);
+
 global $nrfam, $famgeg, $nrpers, $persgeg,$key2ind,$nrman,$nrvrouw;
 global $match1,$match2;
 
-	print_header($gm_lang["statistics"]);
-//-- You should install jpgraph routines on your computer. I implemented them in gaphic/src
+print_header($gm_lang["statistics"]);
+//-- You should install JpGraph routines on your computer. I implemented them in genmod/modules/jpgraph
 //-- Please check this with any availability test
 
 //-- The info below comes from www.php.net when looking at functions
 
-	$mypath= ini_get("include_path");
+$mypath= ini_get("include_path");
 //--	On some servers the include path does not support the (current) directory from the calling routine
 //--	ini_set("include_path", $mypath);
 
-	$GDcheck= 1; $JPcheck= 1;
-//-- Check if GD library is loaded
-	if (!extension_loaded('gd')) {$GDcheck= 0;}
-//-- Check if JPgraph modules are available
-	if ((!file_exists($GM_BASE_DIRECTORY . "jpgraph/jpgraph.php")) or
-	    (!file_exists($GM_BASE_DIRECTORY . "jpgraph/jpgraph_line.php")) or
-	    (!file_exists($GM_BASE_DIRECTORY . "jpgraph/jpgraph_bar.php")))
-		{$JPcheck= 0;}
 
-	if (($GDcheck == 0) or ($JPcheck == 0))
-	{
-		if ($GDcheck == 0)
-			{print $gm_lang["stplGDno"] . "<BR>";}
-		if ($JPcheck == 0)
-			{print $gm_lang["stpljpgraphno"] . "<BR>";}
-		exit;
+CheckPlotExtensions();
+
+GetPlotData();
+
+print "\n\t<center><h2>".$gm_lang["statistiek_list"]."</h2>\n\t";
+print "</center>";
+print "<form method=\"post\" name=\"form\" action=\"statisticsplot.php\">";
+print "<table class=\"facts_table width60 center $TEXT_DIRECTION\">";
+
+// statistics
+print "<tr><td class=\"topbottombar\" colspan=\"2\">".$gm_lang["statistics"].print_help_link("stat_help","qm", "", false, true)."</td></tr>";
+print "<tr><td class=\"shade2 wrap width30 vmiddle\">".$gm_lang["statnnames"]."</td><td class=\"shade1\">".$nrpers."</td></tr>";
+print "<tr><td class=\"shade2 wrap width30 vmiddle\">".$gm_lang["statnfam"]."</td><td class=\"shade1\">".$nrfam."</td></tr>";
+print "<tr><td class=\"shade2 wrap width30 vmiddle\">".$gm_lang["statnmale"]."</td><td class=\"shade1\">".$nrman."</td></tr>";
+print "<tr><td class=\"shade2 wrap width30 vmiddle\">".$gm_lang["statnfemale"]."</td><td class=\"shade1\">".$nrvrouw."</td></tr>";
+
+//if (!isset($plottype)) $plottype=0;
+if (isset($_SESSION[$GEDCOM."statisticsplot"])) {
+	foreach ($_SESSION[$GEDCOM."statisticsplot"] as $name => $value) {
+		$$name = $value;
 	}
-
-	if (!isset($_SESSION[$GEDCOM."nrpers"]))
-		{	$nrpers=0;}
-		else
-		{	$nrpers=$_SESSION[$GEDCOM . "nrpers"];
-			$nrfam=$_SESSION[$GEDCOM . "nrfam"];
-			$nrman=$_SESSION[$GEDCOM . "nrman"];
-			$nrvrouw=$_SESSION[$GEDCOM . "nrvrouw"];
-		}
-//-- if nrpers<1 means there is no intermediate file yet set in this session
-	if ($nrpers < 1)
-	{
-		get_person();
-		get_family();
-		complete_data();
-		put_plot_data();
-	}
-	print "\t<left><h3>".$gm_lang["statistics"]."</h3>\t";
-	print ($gm_lang["statnnames"].$nrpers."<BR>");
-	print ($gm_lang["statnfam"].$nrfam."<BR>");
-	print ($gm_lang["statnmale"].$nrman."<BR>");
-	print ($gm_lang["statnfemale"].$nrvrouw."<BR>");
-	$_SESSION[$GEDCOM . "nrpers"]= $nrpers;
-	$_SESSION[$GEDCOM . "nrfam"]= $nrfam;
-	$_SESSION[$GEDCOM . "nrman"]= $nrman;
-	$_SESSION[$GEDCOM . "nrvrouw"]= $nrvrouw;
-
-{
-	?>
-	<script type="text/javascript">
-	<!--
-	var pasteto;
-	function open_find(textbox)
-	{
-		pasteto = textbox;
-//--<?php print "textbox".textbox."<br>"; ?>
-		findwin = window.open('statistiekplot.php', '', 'left=50,top=50,width=450,height=450,resizable=1,scrollbars=1');
-	}
-	function paste_id(value)
-	{
-		pasteto.value=value;
-	}
-	//-->
-	</script>
-
-<?php
-if (!isset($plottype)) $plottype=0;
-
-?>
-	<h3><?php print $gm_lang["statvars"]; ?> <?php print_help_link("stat_help","qm"); ?> </h3>
-	<form method="post" name="form" action="statisticsplot.php?action=newform">
-	<input type="hidden" name="action" value="update">
-
-	<table ALIGN=bottom BORDER= 2 width=600>
-	<tr>
-	<td width= 180> <?php print $gm_lang["statlxa"]; ?> </td>
-	<td> <select name="x-as">
-		<option value= "11" selected="selected"><?php print $gm_lang["stat_11_mb"]; ?>
-		<option value= "12"> <?php print $gm_lang["stat_12_md"]; ?>
-		<option value= "13"> <?php print $gm_lang["stat_13_mm"]; ?>
-		<option value= "14"> <?php print $gm_lang["stat_14_mb1"]; ?>
-		<option value= "15"> <?php print $gm_lang["stat_15_mm1"]; ?>
-		<option value= "16"> <?php print $gm_lang["stat_16_mmb"] . "<i>" . $gm_lang["stat_gmx"] ."</i>"; ?>
-		<option value= "17"> <?php print $gm_lang["stat_17_arb"] . "<i>" . $gm_lang["stat_gax"] ."</i>"; ?>
-		<option value= "18"> <?php print $gm_lang["stat_18_ard"] . "<i>" . $gm_lang["stat_gax"] ."</i>";  ?>
-		<option value= "19"> <?php print $gm_lang["stat_19_arm"] . "<i>" . $gm_lang["stat_gax"] ."</i>";  ?>
-		<option value= "20"> <?php print $gm_lang["stat_20_arm1"] . "<i>" . $gm_lang["stat_gax"] ."</i>";  ?>
-		<option value= "21"> <?php print $gm_lang["stat_21_nok"] . "<i>" . $gm_lang["stat_gnx"] ."</i>";  ?>
-	</select>
-	<tr>
-	<td> <?php print $gm_lang["statlya"]; ?>  </td>
-	<td> <select name="y-as">
-		<option value= "201" selected="selected"> <?php print $gm_lang["stat_201_num"]; ?>
-		<option value= "202"> <?php print $gm_lang["stat_202_perc"]; ?>
-	</select>
-	</td>
-	</tr>
-	<tr>
-	<td> <?php print $gm_lang["statlza"]; ?>  </td>
-	<td> <select name="z-as">
-		<option value= "300"> <?php print $gm_lang["stat_300_none"]; ?>
-		<option value= "301"> <?php print $gm_lang["stat_301_mf"]; ?>
-		<option value= "302" selected="selected"> <?php print $gm_lang["stat_302_cgp"]; ?>
-	</select>
-	</td>
-	</tr>
-	</table>
-<br>
-
-<?php
-print "<h3>" . $gm_lang["statmess1"] . "</h3>";
-/*
-#	<tr>
-#	<td> <?php print $gm_lang["statrfpx"]; ?> </td>
-#	<td> <input type="text" name="grenzen-jaren" value="1700,1800,1850,1900,1950,1980,2000"
-#			size="60" onfocus="getHelp('periode_help');">
-#	</td>
-#	</tr>
-*/
-?>
-
-	<table ALIGN=bottom BORDER= 2 width=600>
-	<tr>
-	<td width= 180> <?php print $gm_lang["statar_xgl"]; ?> </td>
-	<td> <input type="text" name="xas-grenzen-leeftijden" value="1,5,10,20,30,40,50,60,70,80,90"
-			size="60" onfocus="getHelp('periode_help');">
-	</td>
-	</tr>
-	<tr>
-	<td width= 180> <?php print $gm_lang["statar_xgm"]; ?> </td>
-	<td> <input type="text" name="xas-grenzen-maanden" value="-24,-12,0,8,12,18,24,48"
-			size="60" onfocus="getHelp('periode_help');">
-	</td>
-	</tr>
-	<tr>
-	<td> <?php print $gm_lang["statar_xga"]; ?> </td>
-	<td> <input type="text" name="xas-grenzen-aantallen" value="1,2,3,4,5,6,7,8,9,10"
-			size="60" onfocus="getHelp('periode_help');">
-	</td>
-	</tr>
-	<tr>
-	<td> <?php print $gm_lang["statar_zgp"]; ?> </td>
-	<td> <input type="text" name="zas-grenzen-periode" value="1800,1900,1950,1980"
-			size="60" onfocus="getHelp('periode_help');">
-	</td>
-	</tr>
-	</table>
-
-</td></tr></table></center>
-<br>
-<input type="submit" value="<?php print $gm_lang["statsubmit"]; ?> " onclick="closeHelp();">
-<input type="reset"  value=" <?php print $gm_lang["statreset"]; ?> "><br>
-</form>
-<?php
+}
+else {
+	//$xasGrLeeftijden = "1,5,10,20,30,40,50,60,70,80,90";
+	$xasGrLeeftijden = "1,5,10,20,30,40,50,60,70,80,90,100";
+	$xasGrMaanden = "-24,-12,0,8,12,18,24,48";
+	$xasGrAantallen = "1,2,3,4,5,6,7,8,9,10";
+	// A maximum of 7 entries will work with statisticsplot.php as is
+	$zasGrPeriode = "1800,1900,1950,1980"; 
+	//$zasGrPeriode = "1700,1750,1800,1850,1900,1950,2000";
+	$showShadow = "yes";
+	$valuePos = "top";
+	$graphSize = "autoWindow";
+	$x_as = "11";
+	$y_as = "201";
+	$z_as = "302";
 }
 
+// plotting variables
+print "<tr><td class=\"topbottombar\" colspan=\"2\">".$gm_lang["statvars"]."</td></tr>";
+
+print "<tr><td class=\"shade2 wrap width50 vmiddle\">";
+print $gm_lang["statlxa"];
+print "</td><td class=\"shade1\">";
+print "<select name=\"x_as\">";
+print "<option value= \"11\" "; if ($x_as == "11") print "selected=\"selected\""; print">".$gm_lang["stat_11_mb"]; print "</option>";
+print "<option value= \"12\" "; if ($x_as == "12") print "selected=\"selected\""; print">".$gm_lang["stat_12_md"]; print "</option>";
+print "<option value= \"13\" "; if ($x_as == "13") print "selected=\"selected\""; print">".$gm_lang["stat_13_mm"]; print "</option>";
+print "<option value= \"14\" "; if ($x_as == "14") print "selected=\"selected\""; print">".$gm_lang["stat_14_mb1"]; print "</option>";
+print "<option value= \"15\" "; if ($x_as == "15") print "selected=\"selected\""; print">".$gm_lang["stat_15_mm1"]; print "</option>";
+print "<option value= \"16\" "; if ($x_as == "16") print "selected=\"selected\""; print">".$gm_lang["stat_16_mmb"]."&nbsp;<i>".$gm_lang["stat_gmx"]."</i>"; print "</option>";
+print "<option value= \"17\" "; if ($x_as == "17") print "selected=\"selected\""; print">".$gm_lang["stat_17_arb"]."&nbsp;<i>".$gm_lang["stat_gax"]."</i>"; print "</option>";
+print "<option value= \"18\" "; if ($x_as == "18") print "selected=\"selected\""; print">".$gm_lang["stat_18_ard"]."&nbsp;<i>".$gm_lang["stat_gax"]."</i>"; print "</option>";
+print "<option value= \"19\" "; if ($x_as == "19") print "selected=\"selected\""; print">".$gm_lang["stat_19_arm"]."&nbsp;<i>".$gm_lang["stat_gax"]."</i>"; print "</option>";
+print "<option value= \"20\" "; if ($x_as == "20") print "selected=\"selected\""; print">".$gm_lang["stat_20_arm1"]."&nbsp;<i>".$gm_lang["stat_gax"]."</i>"; print "</option>";
+print "<option value= \"21\" "; if ($x_as == "21") print "selected=\"selected\""; print">".$gm_lang["stat_21_nok"]."&nbsp;<i>".$gm_lang["stat_gnx"]."</i>"; print "</option>";
+print "</select></td></tr>";
+
+print "<tr><td class=\"shade2 wrap vmiddle\">";
+print $gm_lang["statlya"];
+print "</td><td class=\"shade1\">";
+print "<select name=\"y_as\">";
+print "<option value= \"201\" "; if ($y_as == "201") print "selected=\"selected\""; print">".$gm_lang["stat_201_num"]; print "</option>";
+print "<option value= \"202\" "; if ($y_as == "202") print "selected=\"selected\""; print">".$gm_lang["stat_202_perc"]; print "</option>";
+print "</select></td></tr>";
+
+print "<tr><td class=\"shade2 wrap vmiddle\">";
+print $gm_lang["statlza"];
+print "</td><td class=\"shade1\">";
+print "<select name=\"z_as\">";
+print "<option value= \"300\" "; if ($z_as == "300") print "selected=\"selected\""; print">".$gm_lang["stat_300_none"]; print "</option>";
+print "<option value= \"301\" "; if ($z_as == "301") print "selected=\"selected\""; print">".$gm_lang["stat_301_mf"]; print "</option>";
+print "<option value= \"302\" "; if ($z_as == "302") print "selected=\"selected\""; print">".$gm_lang["stat_302_cgp"]; print "</option>";
+print "</select></td></tr>";
+
+// tickvalues
+print "<tr><td class=\"topbottombar\" colspan=\"2\">".$gm_lang["statmess1"]."</td></tr>";
+print "<tr><td class=\"shade2 wrap vmiddle\">";
+print $gm_lang["statar_xgl"]."</td>";
+print "<td class=\"shade1\">";
+print "<input type=\"text\" name=\"xasGrLeeftijden\" value=\"".$xasGrLeeftijden."\" size=\"60\" onfocus=\"getHelp('periode_help');\" />";
+print "</td></tr>";
+
+print "<tr><td class=\"shade2 wrap vmiddle\">";
+print $gm_lang["statar_xgm"]."</td>";
+print "<td class=\"shade1\">";
+print "<input type=\"text\" name=\"xasGrMaanden\" value=\"".$xasGrMaanden."\" size=\"60\" onfocus=\"getHelp('periode_help');\" />";
+print "</td></tr>";
+
+print "<tr><td class=\"shade2 wrap vmiddle\">";
+print $gm_lang["statar_xga"]."</td>";
+print "<td class=\"shade1\">";
+print "<input type=\"text\" name=\"xasGrAantallen\" value=\"".$xasGrAantallen."\" size=\"60\" onfocus=\"getHelp('periode_help');\" />";
+print "</td></tr>";
+
+print "<tr><td class=\"shade2 wrap vmiddle\">";
+print $gm_lang["statar_zgp"]."</td>";
+print "<td class=\"shade1\">";
+print "<input type=\"text\" name=\"zasGrPeriode\" value=\"".$zasGrPeriode."\" size=\"60\" onfocus=\"getHelp('periode_help');\" />";
+print "</td></tr>";
+
+// Options
+print "<tr><td class=\"topbottombar\" colspan=\"2\">"."Options"/*$gm_lang["statmess1"]*/."</td></tr>";
+print "<tr><td class=\"shade2 wrap vmiddle\">";
+print $gm_lang["pl_shadow"]."</td>";
+print "<td class=\"shade1\"><select name=\"showShadow\">";
+	print "<option value=\"yes\" ";if ($showShadow=="yes") print "selected=\"selected\""; print ">".$gm_lang["yes"]."</option>";
+	print "<option value=\"no\" ";if ($showShadow=="no") print "selected=\"selected\""; print ">".$gm_lang["no"]."</option>";
+print "</select></td></tr>";
+
+print "<tr><td class=\"shade2 wrap vmiddle\">";
+print $gm_lang["pl_val"]."</td>";
+print "<td class=\"shade1\"><select name=\"valuePos\">";
+	print "<option value=\"none\" ";if ($valuePos=="none") print "selected=\"selected\""; print ">".$gm_lang["none"]."</option>";
+	print "<option value=\"top\" ";if ($valuePos=="top") print "selected=\"selected\""; print ">".$gm_lang["top"]."</option>";
+	print "<option value=\"center\" ";if ($valuePos=="center") print "selected=\"selected\""; print ">".$gm_lang["center"]."</option>";
+	print "<option value=\"bottom\" ";if ($valuePos=="bottom") print "selected=\"selected\""; print ">".$gm_lang["bottom"]."</option>";
+print "</select></td></tr>";
+
+print "<tr><td class=\"shade2 wrap vmiddle\">";
+print $gm_lang["pl_size"]."</td>";
+print "<td class=\"shade1\"><select name=\"graphSize\">";
+	print "<option value=\"autoScreen\" ";if ($graphSize=="autoScreen") print "selected=\"selected\""; print ">".$gm_lang["pl_scr"]."</option>";
+	print "<option value=\"autoWindow\" ";if ($graphSize=="autoWindow") print "selected=\"selected\""; print ">".$gm_lang["pl_win"]."</option>";
+	print "<option value=\"700x400\" ";if ($graphSize=="700x400") print "selected=\"selected\""; print ">".$gm_lang["pl_std"]."</option>";
+	print "<option value=\"1050x600\" ";if ($graphSize=="1050x600") print "selected=\"selected\""; print ">".$gm_lang["pl_large"]."</option>";
+            print "<option value=\"1400x800\" ";if ($graphSize=="1400x800") print "selected=\"selected\""; print ">".$gm_lang["pl_xlarge"]."</option>";
+    print "</select>";
+print "<input type=\"hidden\" name=\"screenRes\" value=\"\" size=\"10\" />";
+print "<input type=\"hidden\" name=\"windowRes\" value=\"\" size=\"10\" />";
+print "</td></tr>";
+
+// Submit bar
+print "<tr><td class=\"topbottombar\" colspan=\"2\">";
+	print "<input type=\"submit\" value=\"".$gm_lang["statsubmit"]."\" onclick=\"document.form.screenRes.value=screen.width+'x'+screen.height;document.form.windowRes.value=document.body.clientWidth+'x'+document.body.clientHeight;closeHelp();\" />&nbsp;&nbsp;&nbsp;&nbsp;";
+	print "<input type=\"button\" value=\"".$gm_lang["statreset"]."\" onclick=\"location.href='statistics.php?cleanup=yes'; return false;\" />";
+print "</td></tr></table>";
+print "</form>";
+
+
 //--print "plottype=".$plottype."<br>";
-$_SESSION["plottype"]=$plottype;
+//$_SESSION["plottype"]=$plottype;
 
-
-print "<br>";
+print "<br />";
 print_footer();
 
 ?>

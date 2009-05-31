@@ -3,7 +3,7 @@
  * Parses gedcom file and displays a descendancy tree.
  *
  * Genmod: Genealogy Viewer
- * Copyright (C) 2005 Genmod Development Team
+ * Copyright (C) 2005 - 2008 Genmod Development Team
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,7 +23,7 @@
  *
  * @package Genmod
  * @subpackage Charts
- * @version $Id: descendancy.php,v 1.2 2006/02/19 18:40:23 roland-d Exp $
+ * @version $Id: descendancy.php,v 1.24 2009/03/25 16:53:52 sjouke Exp $
  */
 
 /**
@@ -33,14 +33,7 @@ require("config.php");
 /**
  * Inclusion of the chart functions
 */
-require("includes/functions_charts.php");
-/**
- * Inclusion of the language files
-*/
-require($GM_BASE_DIRECTORY.$factsfile["english"]);
-if (file_exists($GM_BASE_DIRECTORY . $factsfile[$LANGUAGE])) require $GM_BASE_DIRECTORY . $factsfile[$LANGUAGE];
-require $GM_BASE_DIRECTORY.$confighelpfile["english"];
-if (file_exists($GM_BASE_DIRECTORY.$confighelpfile[$LANGUAGE])) require $GM_BASE_DIRECTORY.$confighelpfile[$LANGUAGE];
+require("includes/functions/functions_charts.php");
 
 /**
  * print a child family
@@ -53,11 +46,12 @@ function print_child_family($pid, $depth, $label="1.", $gpid="") {
 	global $GM_IMAGE_DIR, $GM_IMAGES, $personcount;
 
 	if ($depth<1) return;
-	$famids = find_sfamily_ids($pid);
-	foreach($famids as $famkey => $famid) {
-		print_sosa_family($famid, "", -1, $label, $pid, $gpid, $personcount);
+	$famids = FindSfamilyIds($pid);
+	foreach($famids as $famkey => $ffamid) {
+		$famid = $ffamid["famid"];
+		PrintSosaFamily($famid, "", -1, $label, $pid, $gpid, $personcount);
 		$personcount++;
-		$children = get_children_ids($famid);
+		$children = GetChildrenIds($famid);
 		$i=1;
 		foreach ($children as $childkey => $child) {
 			print_child_family($child, $depth-1, $label.($i++).".", $pid);
@@ -78,23 +72,25 @@ function print_child_descendancy($pid, $depth) {
 
 	// print child
 	print "<li>";
-	print "<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\"><tr><td>";
-	if ($depth==$generations) print "<img src=\"".$GM_IMAGE_DIR."/".$GM_IMAGES["spacer"]["other"]."\" height=\"2\" width=\"$Dindent\" border=\"0\" alt=\"\" /></td><td>\n";
-	else print "<img src=\"".$GM_IMAGE_DIR."/".$GM_IMAGES["hline"]["other"]."\" height=\"2\" width=\"$Dindent\" border=\"0\" alt=\"\" /></td><td>\n";
+	print "<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\"><tr><td style=\"vertical-align:middle;\">";
+	if ($depth==$generations) print "<img src=\"".$GM_IMAGE_DIR."/".$GM_IMAGES["spacer"]["other"]."\" height=\"2\" width=\"$Dindent\" border=\"0\" alt=\"\" /></td><td style=\"vertical-align:middle;\">\n";
+	else print "<img src=\"".$GM_IMAGE_DIR."/".$GM_IMAGES["hline"]["other"]."\" height=\"2\" width=\"$Dindent\" border=\"0\" alt=\"\" /></td><td style=\"vertical-align:middle;\">\n";
 	print_pedigree_person($pid, 1, $view!="preview",'',$personcount);
 	print "</td>";
 
 	// check if child has parents and add an arrow
 	print "<td>&nbsp;</td>";
 	print "<td>";
-	$sfamids = find_family_ids($pid);
-	foreach($sfamids as $indexval => $sfamid) {
-		$parents = find_parents($sfamid);
+	$sfamids = FindFamilyIds($pid);
+	foreach($sfamids as $indexval => $fsfamid) {
+		$sfamid = $fsfamid["famid"];
+		$parents = FindParents($sfamid);
 		if ($parents) {
 			$parid=$parents["HUSB"];
 			if ($parid=="") $parid=$parents["WIFE"];
 			if ($parid!="") {
-				print_url_arrow($parid.$personcount.$pid, "?pid=$parid&amp;generations=$generations&amp;chart_style=$chart_style&amp;show_full=$show_full&amp;box_width=$box_width", $gm_lang["start_at_parents"], 2);
+				$desc = GetFamilyDescriptor($sfamid, true);
+				PrintUrlArrow($parid.$personcount.$pid, "?pid=$parid&amp;generations=$generations&amp;chart_style=$chart_style&amp;show_full=$show_full&amp;box_width=$box_width", PrintReady($gm_lang["start_at_parents"]."&nbsp;-&nbsp;".$desc), 2);
 				$personcount++;
 			}
 		}
@@ -112,13 +108,14 @@ function print_child_descendancy($pid, $depth) {
 	print "</td></tr>";
 
 	// empty descendancy
-	$sfam = find_sfamily_ids($pid);
+	$sfam = FindSfamilyIds($pid);
 	print "</table>";
 	print "</li>\r\n";
 	if ($depth<1) return;
 
 	// loop for each spouse
-	foreach ($sfam as $indexval => $famid) {
+	foreach ($sfam as $indexval => $ffamid) {
+		$famid = $ffamid["famid"];
 		$personcount++;
 		print_family_descendancy($pid, $famid, $depth);
 	}
@@ -137,8 +134,8 @@ function print_family_descendancy($pid, $famid, $depth) {
 
 	if ($famid=="") return;
 
-	$famrec = find_family_record($famid);
-	$parents = find_parents($famid);
+	$famrec = FindFamilyRecord($famid);
+	$parents = FindParents($famid);
 	if ($parents) {
 
 		// spouse id
@@ -150,11 +147,11 @@ function print_family_descendancy($pid, $famid, $depth) {
 		print "<img src=\"".$GM_IMAGE_DIR."/".$GM_IMAGES["spacer"]["other"]."\" height=\"2\" width=\"$Dindent\" border=\"0\" alt=\"\" />";
 		print "<span class=\"details1\" style=\"white-space: nowrap; \" >";
 		print "<a href=\"#\" onclick=\"expand_layer('".$famid.$personcount."'); return false;\" class=\"top\"><img id=\"".$famid.$personcount."_img\" src=\"".$GM_IMAGE_DIR."/".$GM_IMAGES["minus"]["other"]."\" align=\"middle\" hspace=\"0\" vspace=\"3\" border=\"0\" alt=\"".$gm_lang["view_family"]."\" /></a> ";
-		if (showFact("MARR", $famid)) print_simple_fact($famrec, "MARR", $id); else print $gm_lang["private"];
+		if (showFact("MARR", $famid) && DisplayDetailsByID($famid, "FAM")) print_simple_fact($famrec, "MARR", $id); else print $gm_lang["private"];
 		print "</span>";
 
 		// print spouse
-		print "<ul style=\"list-style: none; display: block;\" id=\"$famid.$personcount\">";
+		print "<ul style=\"list-style: none; display: block;\" id=\"$famid$personcount\">";
 		print "<li>";
 		print "<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\"><tr><td>";
 		print_pedigree_person("$id", 1, $view!="preview",''.$personcount);
@@ -163,14 +160,16 @@ function print_family_descendancy($pid, $famid, $depth) {
 		// check if spouse has parents and add an arrow
 		print "<td>&nbsp;</td>";
 		print "<td>";
-		$sfamids = find_family_ids($id);
-		foreach($sfamids as $indexval => $sfamid) {
-			$parents = find_parents($sfamid);
+		$sfamids = FindFamilyIds($id);
+		foreach($sfamids as $indexval => $fsfamid) {
+			$sfamid = $fsfamid["famid"];
+			$parents = FindParents($sfamid);
 			if ($parents) {
 				$parid=$parents["HUSB"];
 				if ($parid=="") $parid=$parents["WIFE"];
 				if ($parid!="") {
-					print_url_arrow($parid.$personcount.$pid, "?pid=$parid&amp;generations=$generations&amp;show_full=$show_full&amp;box_width=$box_width", $gm_lang["start_at_parents"], 2);
+					$desc = GetFamilyDescriptor($sfamid, true);
+					PrintUrlArrow($parid.$personcount.$pid, "?pid=$parid&amp;generations=$generations&amp;show_full=$show_full&amp;box_width=$box_width", PrintReady($gm_lang["start_at_parents"]."&nbsp;-&nbsp;".$desc), 2);
 					$personcount++;
 				}
 			}
@@ -179,7 +178,7 @@ function print_family_descendancy($pid, $famid, $depth) {
 		print "</td></tr>";
 
 		// children
-		$children = get_children_ids($famid);
+		$children = GetChildrenIds($famid);
 		print "<tr><td colspan=\"3\" class=\"details1\" >&nbsp;";
 		if (count($children)<1) print $gm_lang["no_children"];
 		else print $factarray["NCHI"].": ".count($children);
@@ -218,18 +217,29 @@ $pbheight = $bheight+14;
 
 // -- root id
 if (!isset($pid)) $pid="";
-$pid = clean_input($pid);
-$pid=check_rootid($pid);
-if ((DisplayDetailsByID($pid))||(showLivingNameByID($pid))) $name = get_person_name($pid);
-else $name = $gm_lang["private"];
+$pid = CleanInput($pid);
+$pid=CheckRootId($pid);
+if (showLivingNameByID($pid)) {
+	$name = GetPersonName($pid);
+	$addname = GetAddPersonName($pid);
+}
+else {
+	$name = $gm_lang["private"];
+	$addname = "";
+}
 
 // -- print html header information
-print_header($name." ".$gm_lang["descend_chart"]);
+$title = $name;
+if ($SHOW_ID_NUMBERS) $title .= " - ".$pid;
+$title .= " - ".$gm_lang["descend_chart"];
+print_header($title);
 if (strlen($name)<30) $cellwidth="420";
 else $cellwidth=(strlen($name)*14);
-print "\n\t<table class=\"list_table $TEXT_DIRECTION\"><tr><td width=\"${cellwidth}px\" valign=\"top\">\n\t\t";
-print "\n\t<h2>".$gm_lang["descend_chart"].":<br />".PrintReady($name)."</h2>";
-//print "\n\t<h2>".$gm_lang["descend_chart"].":<br />".$name."</h2>";
+print "\n\t<table class=\"list_table $TEXT_DIRECTION\"><tr><td width=\"${cellwidth}\" valign=\"top\">\n\t\t";
+print "\n\t<h3>".$gm_lang["descend_chart"].":";
+print "<br />".PrintReady($name);
+if ($addname != "") print "<br />" . PrintReady($addname);
+print "</h3>";
 ?>
 
 <script type="text/javascript">
@@ -255,7 +265,7 @@ if ($view!="preview") {
 	print $gm_lang["root_person"]."&nbsp;</td>";
 	print "<td class=\"shade1 vmiddle\">";
 	print "\n\t\t<input class=\"pedigree_form\" type=\"text\" id=\"pid\" name=\"pid\" size=\"3\" value=\"$pid\" />";
-	print_findindi_link("pid","");
+	PrintFindIndiLink("pid","");
 	print "</td>";
 
 	// NOTE: box width
@@ -282,8 +292,8 @@ if ($view!="preview") {
 	print "</td>";
 
 	// NOTE: submit
-	print "<td rowspan=\"2\" class=\"topbottombar\">";
-	print "<input type=\"submit\" value=\"".$gm_lang["view"]."\" />";
+	print "<td rowspan=\"2\">";
+	print "<input type=\"submit\"  value=\"".$gm_lang["view"]."\" />";
 	print "</td></tr>";
 
 	// NOTE: generations
@@ -294,8 +304,8 @@ if ($view!="preview") {
 	print "<td class=\"shade1 vmiddle\">";
 	print "<select name=\"generations\">";
 	for ($i=2; $i<=$MAX_DESCENDANCY_GENERATIONS; $i++) {
-	print "<option value=\"".$i."\"" ;
-	if ($i == $generations) print "selected=\"selected\" ";
+		print "<option value=\"".$i."\"" ;
+		if ($i == $generations) print " selected=\"selected\"";
 		print ">".$i."</option>";
 	}
 	print "</select>";
@@ -328,7 +338,7 @@ $dabo=array();
 // descendancy booklet
 if ($chart_style) {
 	$show_cousins = true;
-	$famids = find_sfamily_ids($pid);
+	$famids = FindSfamilyIds($pid);
 	if (count($famids)) {
 		print_child_family($pid,$generations);
 		print_footer();

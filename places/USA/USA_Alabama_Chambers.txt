@@ -1,8 +1,0 @@
-<!-- @version $Id: USA_Alabama_Chambers.txt,v 1.1 2005/10/23 22:08:16 roland-d Exp $ -->
-<!-- @see http://www.naco.org/ -->
-Cusseta
-Five Points
-Lafayette
-Lanett
-Valley
-Waverly

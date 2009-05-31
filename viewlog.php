@@ -3,7 +3,7 @@
  * View logfiles 
  *
  * Genmod: Genealogy Viewer
- * Copyright (C) 2005 Genmod Development Team
+ * Copyright (C) 2005 - 2008 Genmod Development Team
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,21 +21,13 @@
  *
  * @package Genmod
  * @subpackage Admin
- * @version $Id: viewlog.php,v 1.16 2006/04/09 15:53:27 roland-d Exp $
+ * @version $Id: viewlog.php,v 1.30 2008/09/14 18:19:42 sjouke Exp $
  */
 
 /**
  * Inclusion of the configuration file
 */
 require "config.php";
-
-/**
- * Inclusion of the language files
-*/
-/*
-require $GM_BASE_DIRECTORY . $confighelpfile["english"];
-if (file_exists($GM_BASE_DIRECTORY . $confighelpfile[$LANGUAGE])) require $GM_BASE_DIRECTORY . $confighelpfile[$LANGUAGE];
-*/
 
 // Check for logtype
 if (!isset($cat)) exit;
@@ -50,8 +42,8 @@ if ($action != "download") print_simple_header("Print logfile");
 //-- make sure that they have admin status before they can use this page
 // $uname = $gm_username;
 $auth = false;
-if (($cat == "S") && (userIsAdmin($gm_username))) $auth = true;
-if ((($cat == "G") || ($cat == "F"))  && (userGedcomAdmin($gm_username, $ged))) $auth = true;
+if (($cat == "S") && ($Users->userIsAdmin($gm_username))) $auth = true;
+if ((($cat == "G") || ($cat == "F"))  && ($Users->userGedcomAdmin($gm_username, $ged))) $auth = true;
 
 if ($auth) {
 	if (!empty($action)) {
@@ -70,7 +62,7 @@ if ($auth) {
 				foreach($loglines as $key => $logline) {
 					print '"'.$logline["type"].'","'.date("d.m.Y H:i:s", $logline["time"]).'","'.$logline["user"].'","';
 					if ($cat != "S") print $logline["gedcom"].'","';
-					$text = str_replace("<br />", "; ", $logline["text"]);
+					$text = preg_replace(array("~[\r\n]~", "~<br />~"), array("", "; "), $logline["text"]);
 					print $text.'"';
 					print "\r\n";
 				}
@@ -85,133 +77,79 @@ if ($auth) {
 			$sql = 	"DELETE FROM ".$TBLPREFIX."log WHERE (l_category='".$cat."' AND l_timestamp<'".$timestamp."'";
 			if ($cat != "S") $sql .= " AND l_gedcom='".$ged."'";
 			$sql .= ")";
-			$res = dbquery($sql);
-			if ($res == "1") {
+			$res = NewQuery($sql);
+			if ($res) {
 				print $gm_lang["cleanup_success"];
-				$g = array();
-				$g[] = $ged;
-				WriteToLog(",Cleanup up logfile older than ".date("d.m.Y H:i:s", $timestamp), "I", $cat, $g);
+				if ($cat == "F") {
+					$g = array();
+					$g[] = $ged;
+				}
+				else $g = $ged;
+				WriteToLog("ViewLog-> Cleanup up logfile older than ".date("d.m.Y H:i:s", $timestamp), "I", $cat, $g);
 			}
 			else print $gm_lang["cleanup_failed"];
 		}
 	}
-	// Perform the query
-	$loglines = ReadLog($cat, $max, $type, $ged);
+	// Set the notifications to off
+	HaveReadNewLogrecs($cat, $ged);
+	
+	// Retrieve number of loglines
 	$logcount = ReadLog($cat, $max, $type, $ged, false, true);
+	
 	// Start form
 	print "<form action=\"viewlog.php\" method=\"get\">";
 	
-	// Print the loglines
-	print "<table class=\"facts_table ".$TEXT_DIRECTION."\">";
-	
 	// -- Print the top line
-	if ($cat == "F") print "<tr><td colspan=\"6\" class=\"topbottombar\">";
-	else print "<tr><td colspan=\"5\" class=\"topbottombar\">";
+	print "<div class=\"topbottombar center\">";
 	print $gm_lang["logfile_content"]." - ";
 	if ($cat == "S") print $gm_lang["syslog"];
 	else print $GEDCOMS[$ged]["title"];
 	print " - ".$gm_lang["recs_present"]." ".$logcount;
-	print "</td></tr>";
+	print "</div>";
 
-	// -- Print the options title
-	if ($cat == "F") print "<tr><td colspan=\"6\" class=\"shade2 center\">";
-	else print "<tr><td colspan=\"5\" class=\"shade2 center\">";
-	print $gm_lang["select_an_option"]."</td></tr>";
-
-	// -- Print the options line
-	print "<tr><td colspan=\"2\" class=\"shade2\">".$gm_lang["show_last"]."</td>";
-	print "<td class=\"shade1\" width10>";
-	print "<select onchange=\"document.location=options[selectedIndex].value;\">";
-	print "<option value=\"viewlog.php?cat=".$cat."&amp;type=".$type."&amp;max=20&amp;ged=$ged&amp;cat=$cat\"";
-	if ($max == "20") print " selected=\"selected\"";
-	print " >"."20"."</option>";
-	print "<option value=\"viewlog.php?cat=".$cat."&amp;type=".$type."&amp;max=50&amp;ged=$ged&amp;cat=$cat\"";
-	if ($max == "50") print " selected=\"selected\"";
-	print " >"."50"."</option>";
-	print "<option value=\"viewlog.php?cat=".$cat."&amp;type=".$type."&amp;max=100&amp;ged=$ged&amp;cat=$cat\"";
-	if ($max == "100") print " selected=\"selected\"";
-	print " >"."100"."</option>";
-	print "<option value=\"viewlog.php?cat=".$cat."&amp;type=".$type."&amp;max=0&amp;ged=$ged&amp;cat=$cat\"";
-	if ($max == "0") print " selected=\"selected\"";
-	print " >".$gm_lang["all"]."</option>";
-	print "</select></td>";
-	print "<td class=\"shade2\">".$gm_lang["show_events"]."</td>";
-	print "<td class=\"shade1 width10\"";
-	if ($cat == "F") print " colspan=\"2\""; 
-	print ">";
-	print "<input type=\"radio\" name=\"type\" value=\"All\" onclick=\"document.location='viewlog.php?cat=$cat&amp;max=$max&amp;ged=$ged'\"";
-	if ($type == "") print " checked=\"checked\"";
-	print " />".$gm_lang["all"]."&nbsp;";
-	print "<input type=\"radio\" name=\"type\" value=\"I\" onclick=\"document.location='viewlog.php?type=I&amp;cat=$cat&amp;max=$max&amp;ged=$ged'\"";
-	if ($type == "I") print " checked=\"checked\"";
-	print " /><img src=\"".$GM_IMAGE_DIR."/".$GM_IMAGES["log"]["information"]."\" alt=\"".$gm_lang["information"]."\" />&nbsp;";
-	print "<input type=\"radio\" name=\"type\" value=\"W\" onclick=\"document.location='viewlog.php?type=W&amp;cat=$cat&amp;max=$max&amp;ged=$ged'\"";
-	if ($type == "W") print " checked=\"checked\"";
-	print " /><img src=\"".$GM_IMAGE_DIR."/".$GM_IMAGES["log"]["warning"]."\" alt=\"".$gm_lang["warning"]."\" />&nbsp;";
-	print "<input type=\"radio\" name=\"type\" value=\"E\" onclick=\"document.location='viewlog.php?type=E&amp;cat=$cat&amp;max=$max&amp;ged=$ged'\"";
-	if ($type == "E") print " checked=\"checked\"";
-	print " /><img src=\"".$GM_IMAGE_DIR."/".$GM_IMAGES["log"]["error"]."\" alt=\"".$gm_lang["error"]."\" />&nbsp;";
-	print "</td>";
-	print "</tr>";
-	
 	// -- Print the buttons bar
-	if ($cat == "F") print "<tr><td colspan=\"6\" class=\"topbottombar\">";
-	else print "<tr><td colspan=\"5\" class=\"topbottombar\">";
-	print"<input type=\"button\" value=\"".$gm_lang["back"]."\" onclick='self.close();' />&nbsp;<input type=\"button\" value=\"".$gm_lang["refresh"]."\" onclick=\"document.location='viewlog.php?type=$type&amp;cat=$cat&amp;max=$max&amp;ged=$ged'; \" /></td></tr>";
-
-		// -- Print the title bar and content
-	if (($cat == "S") || ($cat == "G")) {
-		print "<tr><td class=\"list_label\">".$gm_lang["type"]."</td><td class=\"list_label\">".$gm_lang["date_time"]."</td><td class=\"list_label\">".$gm_lang["ip_address"]."</td><td class=\"list_label\">".$gm_lang["user"]."</td><td class=\"list_label\">".$gm_lang["message"]."</td></tr>";
-		foreach ($loglines as $key => $logline) {
-			print "<tr>";
-			print "<td class=\"shade1\">";
-			if ($logline["type"] == "I") print "<img src=\"".$GM_IMAGE_DIR."/".$GM_IMAGES["log"]["information"]."\" alt=\"".$gm_lang["information"]."\" />";
-			if ($logline["type"] == "W") print "<img src=\"".$GM_IMAGE_DIR."/".$GM_IMAGES["log"]["warning"]."\" alt=\"".$gm_lang["warning"]."\" />";
-			if ($logline["type"] == "E") print "<img src=\"".$GM_IMAGE_DIR."/".$GM_IMAGES["log"]["error"]."\" alt=\"".$gm_lang["error"]."\" />";
-			print "</td>";
-			print "<td class=\"shade1\">".date("d.m.Y H:i:s", $logline["time"])."</td>";
-			print "<td class=\"shade1\">".$logline["ip"]."</td>";
-			print "<td class=\"shade1\">";
-			if (!empty($logline["user"])) print $logline["user"]."</td>";
-			else print "&nbsp;</td>";
-			print "<td class=\"shade1 wrap\">".$logline["text"]."</td>";
-			print "</tr>";
-		}
-		print "<tr><td colspan=\"5\" class=\"topbottombar\">";
-	}
-
-	if ($cat == "F") {
-		print "<tr><td class=\"list_label\">".$gm_lang["type"]."</td><td class=\"list_label\">".$gm_lang["date_time"]."</td><td class=\"list_label\">".$gm_lang["ip_address"]."</td><td class=\"list_label\">".$gm_lang["user"]."</td><td class=\"list_label\">".$gm_lang["searchtype"]."</td><td class=\"list_label\">".$gm_lang["query"]."</td></tr>";
-		foreach ($loglines as $key => $logline) {
-			print "<tr>";
-			print "<td class=\"shade1\">";
-			if ($logline["type"] == "I") print "<img src=\"".$GM_IMAGE_DIR."/".$GM_IMAGES["log"]["information"]."\" alt=\"".$gm_lang["information"]."\" />";
-			if ($logline["type"] == "W") print "<img src=\"".$GM_IMAGE_DIR."/".$GM_IMAGES["log"]["warning"]."\" alt=\"".$gm_lang["warning"]."\" />";
-			if ($logline["type"] == "E") print "<img src=\"".$GM_IMAGE_DIR."/".$GM_IMAGES["log"]["error"]."\" alt=\"".$gm_lang["error"]."\" />";
-			print "</td>";
-			print "<td class=\"shade1\">".date("d.m.Y H:i:s", $logline["time"])."</td>";
-			print "<td class=\"shade1\">".$logline["ip"]."</td>";
-			print "<td class=\"shade1\">";
-			if (!empty($logline["user"])) print $logline["user"]."</td>";
-			else print "&nbsp;</td>";
-			$msg = preg_split("/,/", $logline["text"]);
-			if (empty($msg[0])) $msg[0] = "&nbsp;";
-			if (!isset($msg[1])) $msg[1] = "&nbsp;";
-			print "<td class=\"shade1 wrap\">".$msg[0]."</td>";
-			print "<td class=\"shade1 wrap\">".$msg[1]."</td>";
-			print "</tr>";
-		}
-		print "<tr><td colspan=\"6\" class=\"topbottombar\">";
-	}
+	print"<div id=\"toplinks\" name=\"toplinks\" class=\"center\"><input  type=\"button\" value=\"".$gm_lang["back"]."\" onclick='self.close();' />&nbsp;<input  type=\"button\" value=\"".$gm_lang["refresh"]."\" onclick=\"document.location='viewlog.php?type=$type&amp;cat=$cat&amp;max=$max&amp;ged=$ged'; \" /></div>";
+	print "<hr />";
+	// -- Print the options title
+	print "<div id=\"viewlog_option\">".$gm_lang["select_an_option"]."<br />";
+		print "<hr />";
+		// -- Print the options line
+		print "<label for=\"viewlogoption\">".$gm_lang["show_last"]."</label>";
+		print "<select id=\"viewlogoption\" name=\"viewlogoption\" onchange=\"document.location=options[selectedIndex].value;\">";
+		print "<option value=\"viewlog.php?cat=".$cat."&amp;type=".$type."&amp;max=20&amp;ged=$ged&amp;cat=$cat\"";
+		if ($max == "20") print " selected=\"selected\"";
+		print " >"."20"."</option>";
+		print "<option value=\"viewlog.php?cat=".$cat."&amp;type=".$type."&amp;max=50&amp;ged=$ged&amp;cat=$cat\"";
+		if ($max == "50") print " selected=\"selected\"";
+		print " >"."50"."</option>";
+		print "<option value=\"viewlog.php?cat=".$cat."&amp;type=".$type."&amp;max=100&amp;ged=$ged&amp;cat=$cat\"";
+		if ($max == "100") print " selected=\"selected\"";
+		print " >"."100"."</option>";
+		print "<option value=\"viewlog.php?cat=".$cat."&amp;type=".$type."&amp;max=0&amp;ged=$ged&amp;cat=$cat\"";
+		if ($max == "0") print " selected=\"selected\"";
+		print " >".$gm_lang["all"]."</option>";
+		print "</select>";
+		print "<br />";
+		
+		print "<label for=\"type\">".$gm_lang["show_events"]."</label>";
+		print "<input type=\"radio\" name=\"type\" value=\"All\" onclick=\"document.location='viewlog.php?cat=$cat&amp;max=$max&amp;ged=$ged'\"";
+		if ($type == "") print " checked=\"checked\"";
+		print " />".$gm_lang["all"]."&nbsp;";
+		print "<input type=\"radio\" name=\"type\" value=\"I\" onclick=\"document.location='viewlog.php?type=I&amp;cat=$cat&amp;max=$max&amp;ged=$ged'\"";
+		if ($type == "I") print " checked=\"checked\"";
+		print " /><img src=\"".$GM_IMAGE_DIR."/".$GM_IMAGES["log"]["information"]."\" alt=\"".$gm_lang["information"]."\" />&nbsp;";
+		print "<input type=\"radio\" name=\"type\" value=\"W\" onclick=\"document.location='viewlog.php?type=W&amp;cat=$cat&amp;max=$max&amp;ged=$ged'\"";
+		if ($type == "W") print " checked=\"checked\"";
+		print " /><img src=\"".$GM_IMAGE_DIR."/".$GM_IMAGES["log"]["warning"]."\" alt=\"".$gm_lang["warning"]."\" />&nbsp;";
+		print "<input type=\"radio\" name=\"type\" value=\"E\" onclick=\"document.location='viewlog.php?type=E&amp;cat=$cat&amp;max=$max&amp;ged=$ged'\"";
+		if ($type == "E") print " checked=\"checked\"";
+		print " /><img src=\"".$GM_IMAGE_DIR."/".$GM_IMAGES["log"]["error"]."\" alt=\"".$gm_lang["error"]."\" />&nbsp;";
+	print "</div>";
 	
-	// -- Print the bottom button bar
-	print"<input type=\"button\" value=\"".$gm_lang["back"]."\" onclick='self.close();' />&nbsp;<input type=\"button\" value=\"".$gm_lang["refresh"]."\" onclick=\"document.location='viewlog.php?type=$type&amp;cat=$cat&amp;max=$max&amp;ged=$ged'; \" /></td></tr>";
-	
+	print "<div id=\"viewlog_admin\">";
 	// -- Print the administration title
-	print "<tr><td>&nbsp;</td></tr>";
-	if ($cat == "F") print "<tr><td colspan=\"6\" class=\"topbottombar center\">";
-	else print "<tr><td colspan=\"5\" class=\"topbottombar center\">";
-	print $gm_lang["administration"]."</td></tr>";
+	print $gm_lang["administration"]."<br />";
+	print "<hr />";
 
 	// -- Print the administration options line
 	// -- Calculate the number of months that can be deleted
@@ -229,34 +167,80 @@ if ($auth) {
 			if ($minsnow < $mins) $months--;
 		}
 		
-		print "<tr><td colspan=\"2\" class=\"shade2\">".$gm_lang["cleanup_older"]."</td>";
-		print "<td class=\"shade1 vmiddle\">";
-		print "<select name=\"cleanup\">";
+		print "<label for=\"cleanup\">".$gm_lang["cleanup_older"]."</label>";
+		print "<select id=\"cleanup\" name=\"cleanup\">";
 		for ($i=0; $i<=$months; $i++) {
 			print "<option value=\"".$i."M\"";
 			if ($i == $months) print "selected=\"selected\" ";
 			print ">".$i."&nbsp;".$gm_lang["months"]."</option>";
 		}
 		print "</select>";
-		print "</td>";
-		print "<td class=\"shade2\">";
 		print "<input type=\"hidden\" name=\"cat\" value=\"$cat\" />";
 		print "<input type=\"hidden\" name=\"max\" value=\"$max\" />";
 		print "<input type=\"hidden\" name=\"type\" value=\"$type\" />";
 		print "<input type=\"hidden\" name=\"ged\" value=\"$ged\" />";
-		print "<input type=\"submit\" name=\"action\" value=\"".$gm_lang["cleanup"]."\" />";
-		print "</td>";
+		print "<input  type=\"submit\" name=\"action\" value=\"".$gm_lang["cleanup"]."\" />";
 	}
-	else print "<tr><td class=\"shade2\" colspan=\"3\">&nbsp;</td>";
-	if ($cat == "F") print "<td class=\"shade2\" colspan=\"2\">";
-	else print "<td class=\"shade2\">";
-	print "<input type=\"button\" value=\"".$gm_lang["export_log"]."\" onclick=\"document.location='viewlog.php?type=$type&amp;cat=$cat&amp;max=$max&amp;ged=$ged&amp;action=download'; \" /></td></tr>";
+	print "<br />";
+	print "<label for=\"cleanup\">".$gm_lang["export"]."</label>";
+	print "<input  type=\"button\" value=\"".$gm_lang["export_log"]."\" onclick=\"document.location='viewlog.php?type=$type&amp;cat=$cat&amp;max=$max&amp;ged=$ged&amp;action=download'; \" /></td></tr>";
 	
-	// -- Print the bottom bar
-	if ($cat == "F") print "<tr><td colspan=\"6\" class=\"topbottombar\">&nbsp;</td></tr>";
-	else print "<tr><td colspan=\"5\" class=\"topbottombar\">&nbsp;</td></tr>";
+	print "</div>";
+	print "<br clear=\"all\" />";
 	
+	// Perform the query
+	$loglines = ReadLog($cat, $max, $type, $ged);
+	
+	// Print the loglines
+//	print "<div id=\"logdetails\">";
+	print "<table width=\"100%\">";
+	// -- Print the title bar and content
+	if (($cat == "S") || ($cat == "G")) {
+		print "<tr class=\"admin_item_box shade2\"><td>".$gm_lang["type"]."</td><td>".$gm_lang["date_time"]."</td><td>".$gm_lang["ip_address"]."</td><td>".$gm_lang["user"]."</td><td>".$gm_lang["message"]."</td></tr>";
+		foreach ($loglines as $key => $logline) {
+			print "<tr class=\"admin_item_box shade1\">";
+			print "<td>";
+			if ($logline["type"] == "I") print "<img src=\"".$GM_IMAGE_DIR."/".$GM_IMAGES["log"]["information"]."\" alt=\"".$gm_lang["information"]."\" />";
+			if ($logline["type"] == "W") print "<img src=\"".$GM_IMAGE_DIR."/".$GM_IMAGES["log"]["warning"]."\" alt=\"".$gm_lang["warning"]."\" />";
+			if ($logline["type"] == "E") print "<img src=\"".$GM_IMAGE_DIR."/".$GM_IMAGES["log"]["error"]."\" alt=\"".$gm_lang["error"]."\" />";
+			print "</td>";
+			print "<td>".date("d.m.Y H:i:s", $logline["time"])."</td>";
+			print "<td>".$logline["ip"]."</td>";
+			print "<td>";
+			if (!empty($logline["user"])) print $logline["user"]."</td>";
+			else print "&nbsp;</td>";
+			print "<td class=\"wrap\">".$logline["text"]."</td>";
+			print "</tr>";
+		}
+		print "<tr>";
+	}
+
+	if ($cat == "F") {
+		print "<tr class=\"admin_item_box shade2\"><td>".$gm_lang["type"]."</td><td>".$gm_lang["date_time"]."</td><td>".$gm_lang["ip_address"]."</td><td>".$gm_lang["user"]."</td><td>".$gm_lang["searchtype"]."</td><td>".$gm_lang["query"]."</td></tr>";
+		foreach ($loglines as $key => $logline) {
+			print "<tr class=\"admin_item_box shade1\">";
+			print "<td>";
+			if ($logline["type"] == "I") print "<img src=\"".$GM_IMAGE_DIR."/".$GM_IMAGES["log"]["information"]."\" alt=\"".$gm_lang["information"]."\" />";
+			if ($logline["type"] == "W") print "<img src=\"".$GM_IMAGE_DIR."/".$GM_IMAGES["log"]["warning"]."\" alt=\"".$gm_lang["warning"]."\" />";
+			if ($logline["type"] == "E") print "<img src=\"".$GM_IMAGE_DIR."/".$GM_IMAGES["log"]["error"]."\" alt=\"".$gm_lang["error"]."\" />";
+			print "</td>";
+			print "<td>".date("d.m.Y H:i:s", $logline["time"])."</td>";
+			print "<td>".$logline["ip"]."</td>";
+			print "<td>";
+			if (!empty($logline["user"])) print $logline["user"]."</td>";
+			else print "&nbsp;</td>";
+			$msg = preg_split("/,/", $logline["text"]);
+			if (empty($msg[0])) $msg[0] = "&nbsp;";
+			if (!isset($msg[1])) $msg[1] = "&nbsp;";
+			print "<td class=\"wrap\">".stripslashes($msg[0])."</td>";
+			print "<td class=\"wrap\">".stripslashes($msg[1])."</td>";
+			print "</tr>";
+		}
+		print "<tr>";
+	}
 	print "</table>";
+//	print "</div>";
+	
 	// NOTE: Close form
 	print "</form>";
 	print "<br /><br />";

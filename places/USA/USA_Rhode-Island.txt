@@ -1,7 +1,0 @@
-<!-- @version $Id: USA_Rhode-Island.txt,v 1.1 2005/10/23 22:09:29 roland-d Exp $ -->
-<!-- @see http://countyhunter.com/counties.htm -->
-Bristol
-Kent
-Newport
-Providence
-Washington

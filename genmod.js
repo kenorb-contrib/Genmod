@@ -2,7 +2,7 @@
  * Common javascript functions
  *
  * Genmod: Genealogy Viewer
- * Copyright (C) 2005 Genmod Development Team
+ * Copyright (C) 2005 - 2007 Genmod Development Team
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,7 +20,7 @@
  *
  * @package Genmod
  * @subpackage Display
- * @version $Id: genmod.js,v 1.23 2006/03/14 21:55:32 roland-d Exp $
+ * @version $Id: genmod.js,v 1.47 2009/03/16 19:51:12 sjouke Exp $
  */
 if (!document.getElementById)	// Check if browser supports the getElementByID function
 {
@@ -77,7 +77,7 @@ function showbox(startpos, layer, boxpid){
 function moveout(layer) {
 	browserName=navigator.appName;
  	if (browserName == "Microsoft Internet Explorer") {
-	 		clearTimeout(windowout);
+		windowout=setTimeout("hidebox('"+layer+"')", 1000);
  	}
  	else {
 		hidebox(layer); 
@@ -93,11 +93,9 @@ function hidebox(layer){
 // IE fix for flickering the box when the mouse is going from link to link
 function keepbox(layer){
 	var keepbox;
+	clearTimeout(windowout);
 	keepbox = document.getElementById('I'+layer+'links');
 	keepbox.style.visibility = 'visible';
-	if (browserName == "Microsoft Internet Explorer") {
-		windowout=setTimeout("moveout('"+layer+"')", 1000);
- 	}
 	return false;
 }
 // Find the horizontal position
@@ -138,13 +136,14 @@ function closeHelp() {
 	if (helpWin) helpWin.close();
 }
 
-function openImage(filename, width, height) {
-		height=height+50;
+function openImage(filename, width, height, checkfile) {
+		checkfile = typeof(checkfile) != 'undefined' ? checkfile : 1;
+		height = 50 + (1*height);
 		screenW = screen.width;
 	 	screenH = screen.height;
 	 	if (width>screenW-100) width=screenW-100;
 	 	if (height>screenH-110) height=screenH-120;
-		if ((filename.search(/\.je?pg$/gi)!=-1)||(filename.search(/\.gif$/gi)!=-1)||(filename.search(/\.png$/gi)!=-1)||(filename.search(/\.bmp$/gi)!=-1)) window.open('imageview.php?filename='+filename,'','top=50,left=50,height='+height+',width='+width+',scrollbars=1,resizable=1');
+		if (checkfile==1) window.open('imageview.php?filename='+filename,'','top=50,left=50,height='+height+',width='+width+',scrollbars=1,resizable=1');
 		else window.open(unescape(filename),'','top=50,left=50,height='+height+',width='+width+',scrollbars=1,resizable=1');
 		return false;
 	}
@@ -222,13 +221,13 @@ function MM_showHideLayers() { //v6.0
 }
 
 var show = false;
-	function togglechildrenbox() {
+	function togglechildrenbox(sid) {
 		if (show) {
-			MM_showHideLayers('childbox', ' ', 'hide',' ');
+			MM_showHideLayers('childbox'+sid, ' ', 'hide',' ');
 			show=false;
 		}
 		else {
-			MM_showHideLayers('childbox', ' ', 'show', ' ');
+			MM_showHideLayers('childbox'+sid, ' ', 'show', ' ');
 			show=true;
 		}
 		return false;
@@ -328,36 +327,39 @@ var oldname = 0;
 var oldthumbdisp = 0;
 var repositioned = 0;
 var oldiconsdislpay = 0;
-function expandbox(boxid, bstyle) {
+function expandbox(boxid, bstyle, random) {
+	// NOTE: Check if the box has already been zoomed into
 	if (big==1) {
-		restorebox(oldboxid, bstyle);
+		restorebox(oldboxid, bstyle, random);
 		if (boxid==oldboxid) return true;
 	}
+	// Set the correct identifiers
+	boxidparent = boxid;
+	boxid = boxid+"."+random;
+	
 	url = window.location.toString();
 	divbox = document.getElementById("out-"+boxid);
 	inbox = document.getElementById("inout-"+boxid);
 	inbox2 = document.getElementById("inout2-"+boxid);
-	parentbox = document.getElementById("box"+boxid);
+	parentbox = document.getElementById("box"+boxidparent);
 	if (!parentbox) {
 		parentbox=divbox;
-	//	if (bstyle!=2) divbox.style.position="absolute";
 	}
 	sex = document.getElementById("box-"+boxid+"-sex");
 	thumb1 = document.getElementById("box-"+boxid+"-thumb");
 	famlinks = document.getElementById("I"+boxid+"links");
 	icons = document.getElementById("icons-"+boxid);
 	iconz = document.getElementById("iconz-"+boxid);	// This is the Zoom icon
-	
 	if (divbox) {
 		if (icons) {
-		oldiconsdislpay = icons.style.display;
-		icons.style.display = "block";
+			oldiconsdislpay = icons.style.display;
+			icons.style.display = "block";
 		}
 		if (iconz) {
 			if (iconz.src==zoominout[0].src) iconz.src = zoominout[1].src;
 			else iconz.src = zoominout[0].src;
 		}
-		oldboxid=boxid;
+		oldboxid=boxidparent;
 		big = 1;
 		oldheight=divbox.style.height;
 		oldwidth=divbox.style.width;
@@ -367,12 +369,14 @@ function expandbox(boxid, bstyle) {
 			divbox.style.width='350px';
 			diff = 350-parseInt(oldwidth);
 			if (famlinks) {
-				famleft = parseInt(famlinks.style.left);
+				if (famlinks.style.left > 0) famleft = parseInt(famlinks.style.left);
+				else famleft = 0;
 				famlinks.style.left = (famleft+diff)+"px";
 			}
 			//parentbox.style.width = parseInt(parentbox.style.width)+diff;
 		}
 		divleft = parseInt(parentbox.style.left);
+		
 		if (textDirection=="rtl") divleft = parseInt(parentbox.style.right);
 		oldleft=divleft;
 		divleft = divleft - diff;
@@ -422,12 +426,16 @@ function expandbox(boxid, bstyle) {
 	}
 	return true;
 }
-function restorebox(boxid, bstyle) {
+function restorebox(boxid, bstyle, random) {
+	// Set the correct identifiers
+	boxidparent = boxid;
+	boxid = boxid+"."+random; 
+	
 	divbox = document.getElementById("out-"+boxid);
 	inbox = document.getElementById("inout-"+boxid);
 	inbox2 = document.getElementById("inout2-"+boxid);
 	famlinks = document.getElementById("I"+boxid+"links");
-	parentbox = document.getElementById("box"+boxid);
+	parentbox = document.getElementById("box"+boxidparent);
 	if (!parentbox) {
 		parentbox=divbox;
 	}
@@ -887,6 +895,7 @@ return false;
  * - Families
  * - Media (These are media filenames)
  * - Object (These are media references e.g. M1)
+ * - Notes
  * - Sources
  * - Repositories
  * - Special characters
@@ -898,12 +907,14 @@ return false;
  * - print_findmedia_link
  * - print_findobject_link
  * - print_findsource_link
+ * - print_findnote_link
  * - print_findrepository_link
  * - print_specialchar_link
 */
-function findIndi(field) {
+function findIndi(field,gedcom) {
      pastefield = field;
-     window.open('find.php?type=indi', '', 'left=50,top=50,width=850,height=450,resizable=1,scrollbars=1');
+	if (!gedcom) gedcom = 0;
+     window.open('find.php?type=indi&gedid='+gedcom, '', 'left=50,top=50,width=850,height=450,resizable=1,scrollbars=1');
      return false;
 }
 
@@ -938,9 +949,16 @@ function findRepository(field) {
 	window.open('find.php?type=repo', '', 'left=50,top=50,width=850,height=450,resizable=1,scrollbars=1');
 	return false;
 }
-function findSpecialChar(field) {
+function findNote(field) {
 	pastefield = field;
-	window.open('find.php?type=specialchar&amp;language_filter='+language_filter+'&amp;magnify='+magnify, '', 'top=55,left=55,scrollbars=1,resizeable=1');
+	window.open('find.php?type=note', '', 'left=50,top=50,width=850,height=450,resizable=1,scrollbars=1');
+	return false;
+}
+function findSpecialChar(field) {
+	language_filter = "";
+	magnify = "";
+	pastefield = field;
+	window.open('find.php?type=specialchar&amp;language_filter='+language_filter+'&amp;magnify='+magnify, '', 'top=50,left=50,width=850,height=450,scrollbars=1,resizeable=1');
 	return false;
 }
 
@@ -965,12 +983,22 @@ function deletesource(pid, change_type) {
 	 return false;
 }
 
+function deletegnote(pid, change_type) {
+	 window.open('edit_interface.php?action=deletegnote&pid='+pid+'&change_type='+change_type+"&"+sessionname+"="+sessionid, '', 'top=50,left=50,width=600,height=500,resizable=1,scrollbars=1');
+	 return false;
+}
+
+function deletemedia(mid, change_type) {
+	 window.open('edit_interface.php?action=deletemedia&pid='+mid+'&change_type='+change_type+"&"+sessionname+"="+sessionid, '', 'top=50,left=50,width=600,height=500,resizable=1,scrollbars=1');
+	 return false;
+}
+
 function deleterepository(pid, change_type) {
 	 window.open('edit_interface.php?action=deleterepo&pid='+pid+'&change_type='+change_type+"&"+sessionname+"="+sessionid, '', 'top=50,left=50,width=600,height=500,resizable=1,scrollbars=1');
 	 return false;
 }
 
-function delete_record(pid, fact, change_type, count) {
+function delete_record(pid, fact, count, change_type) {
 	if (!count) count = 1;
 	window.open('edit_interface.php?action=delete&pid='+pid+'&change_type='+change_type+'&fact='+fact+'&count='+count+"&"+sessionname+"="+sessionid, '', 'top=50,left=50,width=600,height=500,resizable=1,scrollbars=1');
 	return false;
@@ -984,8 +1012,18 @@ function reorder_children(famid, change_type) {
 	return false;
 }
 
+function reorder_media(famid, change_type) {
+	window.open('edit_interface.php?action=reorder_media&pid='+famid+'&change_type='+change_type+"&"+sessionname+"="+sessionid, '', 'top=50,left=50,width=710,height=500,resizable=1,scrollbars=1');
+	return false;
+}
+
 function reorder_families(pid, change_type) {
 	window.open('edit_interface.php?action=reorder_fams&pid='+pid+'&change_type='+change_type+"&"+sessionname+"="+sessionid, '', 'top=50,left=50,width=710,height=500,resizable=1,scrollbars=1');
+	return false;
+}
+
+function relation_families(pid, change_type) {
+	window.open('edit_interface.php?action=relation_fams&pid='+pid+'&change_type='+change_type+"&"+sessionname+"="+sessionid, '', 'top=50,left=50,width=710,height=500,resizable=1,scrollbars=1');
 	return false;
 }
 
@@ -1032,10 +1070,21 @@ function add_famc(pid, change_type) {
 	return false;
 }
 
+function add_newfamc(pid, change_type) {
+	 window.open('edit_interface.php?action=addnewfamlink&pid='+pid+'&change_type='+change_type+'&famtag=CHIL'+"&"+sessionname+"="+sessionid, '', 'top=50,left=50,width=710,height=500,resizable=1,scrollbars=1');
+	return false;
+}
+
 function add_fams(pid, famtag, change_type) {
 	window.open('edit_interface.php?action=addfamlink&pid='+pid+'&change_type='+change_type+'&famtag='+famtag+"&"+sessionname+"="+sessionid, '', 'top=50,left=50,width=710,height=500,resizable=1,scrollbars=1');
 	return false;
 }
+
+function add_newfams(pid, famtag, change_type) {
+	window.open('edit_interface.php?action=addnewfamlink&pid='+pid+'&change_type='+change_type+'&famtag='+famtag+"&"+sessionname+"="+sessionid, '', 'top=50,left=50,width=710,height=500,resizable=1,scrollbars=1');
+	return false;
+}
+
 function add_name(pid, change_type) {
 	window.open('edit_interface.php?action=addname&pid='+pid+'&change_type='+change_type+"&"+sessionname+"="+sessionid, '', 'top=50,left=50,width=710,height=500,resizable=1,scrollbars=1');
 	return false;
@@ -1060,6 +1109,17 @@ function addnewsource(field, change_type) {
 function addnewrepository(field, change_type) {
 	pastefield = field;
 	window.open('edit_interface.php?action=addnewrepository&pid=newrepo&change_type='+change_type, '', 'top=70,left=70,width=600,height=500,resizable=1,scrollbars=1');
+	return false;
+}
+
+function addnewmedia(field, change_type) {
+	pastefield = field;
+	window.open('edit_interface.php?action=add&pid=newmedia&fact=OBJE&change_type='+change_type, '' ,'top=70,left=70,width=800,height=500,resizable=1,scrollbars=1');
+	return false;
+}
+function addnewgnote(field, change_type) {
+	pastefield = field;
+	window.open('edit_interface.php?action=addnewgnote&pid=newgnote&change_type='+change_type, '' ,'top=70,left=70,width=800,height=500,resizable=1,scrollbars=1');
 	return false;
 }
 
@@ -1096,4 +1156,30 @@ function copy_record(pid, fact, count, change_type) {
 function linkspouse(pid, famtag, change_type) {
 	window.open('edit_interface.php?action=linkspouse&pid='+pid+'&change_type='+change_type+'&famtag='+famtag+'&famid=new&'+sessionname+"="+sessionid, '', 'top=50,left=50,width=710,height=500,resizable=1,scrollbars=1');
 	return false;
+}
+
+/**
+ * Change the colour of a specified element
+ */
+function ChangeClass(id, newClass) {
+	identity=document.getElementById(id);
+	identity.className=newClass;
+}
+
+function CheckAllGed(master){
+	var checked = master.checked;
+	var col = document.getElementsByTagName('INPUT');
+	for (var i=0;i<col.length;i++) {
+		if (col[i].className == 'checkged') { 
+			col[i].checked = checked;
+		}
+	}
+}
+
+function Urldecode(string) {
+
+ 	var string = decodeURI(string);
+ 	var string = unescape(string);
+	var string = string.replace(/\+/g," ");
+	return string;
 }

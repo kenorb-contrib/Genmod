@@ -17,7 +17,7 @@
  * Depending on the current status of the list.
  *
  * Genmod: Genealogy Viewer
- * Copyright (C) 2005 Genmod Development Team
+ * Copyright (C) 2005 - 2008 Genmod Development Team
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -35,7 +35,7 @@
  *
  * @package Genmod
  * @subpackage Lists
- * @version $Id: repolist.php,v 1.1 2005/10/23 21:36:54 roland-d Exp $
+ * @version $Id: repolist.php,v 1.6 2008/08/02 18:57:28 sjouke Exp $
  */
 
 /**
@@ -43,35 +43,35 @@
 */
 require("config.php");
 
-$repolist = get_repo_list();               //-- array of regular repository titles 
-$addrepolist = get_repo_add_title_list();  //-- array of additional repository titlesadd
+print_header($gm_lang["repo_list"]);
+print "<div class=\"center\">";
+print "<h3>".$gm_lang["repo_list"]."</h3>\n\t";
 
-$cr = count($repolist);
+$lrepolist = GetRepoList();               //-- array of regular repository titles 
+$addrepolist = GetRepoAddTitleList();  //-- array of additional repository titlesadd
+
+$cr = count($lrepolist);
 $ca = count($addrepolist);
 $ctot = $cr + $ca;
 
-print_header($gm_lang["repo_list"]);
-print "<div class=\"center\">";
-print "<h2>".$gm_lang["repo_list"]."</h2>\n\t";
-
-print "\n\t<table class=\"list_table $TEXT_DIRECTION\">\n\t\t<tr><td class=\"list_label\"";
+print "\n\t<table class=\"list_table $TEXT_DIRECTION center\">\n\t\t<tr><td class=\"shade2 center\"";
 if($cr>12)	print " colspan=\"2\"";
 print "><img src=\"".$GM_IMAGE_DIR."/".$GM_IMAGES["repository"]["small"]."\" border=\"0\" title=\"".$gm_lang["titles_found"]."\" alt=\"".$gm_lang["titles_found"]."\" />&nbsp;&nbsp;";
 print $gm_lang["titles_found"];
-print "</td></tr><tr><td class=\"$TEXT_DIRECTION list_value_wrap\"><ul>";
+print "</td></tr><tr><td class=\"$TEXT_DIRECTION shade1 wrap\"><ul>";
 
 if ($cr>0){
 	$i=1;
 	// -- print the array
-	foreach ($repolist as $key => $value) {
+	foreach ($lrepolist as $key => $value) {
 		print_list_repository($key, $value);
-		if ($i==ceil($cr/2) && $cr>12) print "</ul></td><td class=\"list_value_wrap\"><ul>\n";
+		if ($i==ceil($cr/2) && $cr>12) print "</ul></td><td class=\"shade1 wrap\"><ul>\n";
 		$i++;
 	}
 	// -- print the additional array
 	foreach ($addrepolist as $key => $value) {
 		print_list_repository($key, $value);
-		if ($i==ceil($cr/2) && $cr>12) print "</ul></td><td class=\"list_value_wrap\"><ul>\n";
+		if ($i==ceil($cr/2) && $cr>12) print "</ul></td><td class=\"shade1 wrap\"><ul>\n";
 		$i++;
 	}
 
