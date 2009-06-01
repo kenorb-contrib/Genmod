@@ -2360,7 +2360,6 @@ function print_main_media($factrec, $pid, $nlevel, $count=1, $change=false, $sty
 	global $GEDCOMS, $GEDCOM, $MEDIATYPE, $gm_username, $Users, $MediaFS;
 	global $WORD_WRAPPED_NOTES, $MEDIA_DIRECTORY, $GM_IMAGE_DIR, $GM_IMAGES, $TEXT_DIRECTION;
 	
-	include_once("includes/functions/functions_mediadb.php");
 	$deleted = false;
 	if ($styleadd == "deleted") {
 		$deleted = true;

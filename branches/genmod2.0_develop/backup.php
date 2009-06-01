@@ -460,5 +460,21 @@ switch ($action) {
 	?>
 </div>
 <?php
+
+
+function GetMediaFiles($gedid="") {
+	global $TBLPREFIX, $MEDIA_IN_DB;
+	
+	$mlist = array();
+	$sql = "SELECT m_file from ".$TBLPREFIX."media WHERE m_file NOT LIKE '%://%'";
+	if (!empty($gedid)) $sql .= " AND m_gedfile='".$gedid."'";
+	$sql .= "ORDER BY m_file ASC";
+	$res = NewQuery($sql);
+	while($row = $res->FetchRow()){
+		$row = db_cleanup($row);
+		if ($MEDIA_IN_DB || file_exists($row[0])) $mlist[] = $row[0];
+	}
+	return array_flip(array_flip($mlist));
+}
 print_footer();
 ?>

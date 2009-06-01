@@ -157,42 +157,6 @@ if ($action=="newentry") {
 	}
 }
 
-
-if ($action=="delete") {
-	remove_db_media($m_id, $m_gedfile);
-	$action = "showmedia";
-}
-
-if ($action=="showmedia") {
-	$medialist = get_db_media_list();
-	if (count($medialist)>0) {
-		print "<table class=\"list_table\">\n";
-		print "<tr><td class=\"list_label\">".$gm_lang["delete"]."</td><td class=\"list_label\">".$gm_lang["title"]."</td><td class=\"list_label\">".$gm_lang["gedcomid"]."</td>\n";
-		print "<td class=\"list_label\">".$factarray["FILE"]."</td><td class=\"list_label\">".$gm_lang["highlighted"]."</td><td class=\"list_label\">order</td><td class=\"list_label\">gedcom</td></tr>\n";
-		foreach($medialist as $indexval => $media) {
-			print "<tr>";
-			print "<td class=\"list_value\"><a href=\"addmedia.php?action=delete&m_id=".$media["ID"]."\">delete</a></td>";
-			print "<td class=\"list_value\"><a href=\"addmedia.php?action=edit&m_id=".$media["ID"]."\">edit</a></td>";
-			print "<td class=\"list_value\">".$media["TITL"]."</td>";
-//			print "<td class=\"list_value\">";
-//			print_list_person($media["INDI"], array(GetPersonName($media["INDI"]), $GEDCOM));
-//			print "</td>";
-			print "<td class=\"list_value\">".$media["FILE"]."</td>";
-//			print "<td class=\"list_value\">".$media["_PRIM"]."</td>";
-//			print "<td class=\"list_value\">".$media["ORDER"]."</td>";
-			print "<td class=\"list_value\">".$media["GEDFILE"]."</td>";
-			print "</tr>\n";
-		}
-		print "</table>\n";
-	}
-}
-
-
-if ($action=="showmediaform") {
- 	if (!isset($pid)) $pid = "";
-	ShowMediaForm($pid);
-}
-
 print "<br />";
 print "<div class=\"center\"><a href=\"#\" onclick=\"if (window.opener.showchanges) window.opener.showchanges(); window.close();\">".$gm_lang["close_window"]."</a></div>\n";
 print "<br />";
