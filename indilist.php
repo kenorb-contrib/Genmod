@@ -19,7 +19,7 @@
  *
  * @package Genmod
  * @subpackage Lists
- * @version $Id: indilist.php,v 1.24 2009/05/16 06:04:38 sjouke Exp $
+ * @version $Id$
  */
 
 /**

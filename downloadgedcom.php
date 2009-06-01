@@ -21,7 +21,7 @@
  *
  * @package Genmod
  * @subpackage Admin
- * @version $Id: downloadgedcom.php,v 1.19 2008/08/03 04:29:47 sjouke Exp $
+ * @version $Id$
  */
 
 class DownloadGedcom {

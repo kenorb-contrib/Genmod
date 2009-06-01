@@ -22,7 +22,7 @@
  *
  * @package Genmod
  * @subpackage Lists
- * @version $Id: unlinked.php,v 1.7 2008/08/08 12:16:50 sjouke Exp $
+ * @version $Id$
  */
 
 /**

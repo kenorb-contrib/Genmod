@@ -21,7 +21,7 @@
  *
  * @package Genmod
  * @subpackage Admin
- * @version $Id: changelog.php,v 1.3 2008/12/26 17:41:47 sjouke Exp $
+ * @version $Id$
  */
 $search = @$HTTP_GET_VARS["search"];
 if (empty($search)) $search = @$_GET["search"];

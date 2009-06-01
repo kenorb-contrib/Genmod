@@ -21,7 +21,7 @@
  *
  * @package Genmod
  * @subpackage Admin
- * @version $Id: hitcount.php,v 1.14 2009/03/16 19:51:12 sjouke Exp $
+ * @version $Id$
  */
 if (strstr($_SERVER["SCRIPT_NAME"],"hitcount.php")) {
 	require "intrusion.php";

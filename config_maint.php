@@ -24,7 +24,7 @@
  * @package Genmod
  * @subpackage Admin
  * @see config.php
- * @version $Id: config_maint.php,v 1.5 2008/08/03 04:29:47 sjouke Exp $
+ * @version $Id$
  */
  
 /**

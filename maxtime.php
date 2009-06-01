@@ -21,7 +21,7 @@
  *
  * @package Genmod
  * @subpackage Admin
- * @version $Id: maxtime.php,v 1.3 2008/12/20 15:20:44 sjouke Exp $
+ * @version $Id$
  */
 
 /**

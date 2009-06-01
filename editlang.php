@@ -21,7 +21,7 @@
  *
  * @package Genmod
  * @subpackage Languages
- * @version $Id: editlang.php,v 1.45 2009/02/20 11:57:10 sjouke Exp $
+ * @version $Id$
  */
 
 class EditLang {

@@ -26,7 +26,7 @@
  * @package Genmod
  * @subpackage Admin
  * @see editconfig.php
- * @version $Id: configbase.php,v 1.13 2008/12/06 15:07:17 sjouke Exp $
+ * @version $Id$
  */
 
 if (preg_match("/\Wconfigbase.php/", $_SERVER["SCRIPT_NAME"])>0) {

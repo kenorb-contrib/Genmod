@@ -22,7 +22,7 @@
  * @author Genmod Development Team
  * @package Genmod
  * @subpackage Display
- * @version $Id: media.php,v 1.42 2009/03/06 06:25:40 sjouke Exp $
+ * @version $Id$
  */
 
 /**

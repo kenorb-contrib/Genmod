@@ -24,7 +24,7 @@
  * @author GM Development Team
  * @package Genmod
  * @subpackage Admin
- * @version $Id: editconfig_gedcom.php,v 1.62 2009/04/24 06:25:16 sjouke Exp $
+ * @version $Id$
  */
 
 /**

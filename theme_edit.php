@@ -21,7 +21,7 @@
  *
  * @package Genmod
  * @subpackage Themes
- * @version $Id: theme_edit.php,v 1.8 2008/03/02 12:14:13 sjouke Exp $
+ * @version $Id$
  */
 
 /**

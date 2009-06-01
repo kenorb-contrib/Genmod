@@ -26,7 +26,7 @@
  *
  * @package Genmod
  * @subpackage Charts
- * @version $Id: ancestry.php,v 1.21 2009/03/25 16:53:52 sjouke Exp $
+ * @version $Id$
  */
  
 /**

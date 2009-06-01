@@ -23,7 +23,7 @@
  *
  * @package Genmod
  * @subpackage Admin
- * @version $Id: gminfo.php,v 1.10 2008/08/03 04:29:47 sjouke Exp $
+ * @version $Id$
  */
 
 /**

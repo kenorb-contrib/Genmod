@@ -23,7 +23,7 @@
  *
  * @package Genmod
  * @subpackage Charts
- * @version $Id: family.php,v 1.18 2009/03/29 13:20:10 sjouke Exp $
+ * @version $Id$
  */
 
 /**

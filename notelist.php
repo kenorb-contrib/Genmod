@@ -21,7 +21,7 @@
  *
  * @package Genmod
  * @subpackage Lists
- * @version $Id: notelist.php,v 1.1 2009/03/16 19:52:52 sjouke Exp $
+ * @version $Id$
  */
  
 /**

@@ -23,7 +23,7 @@
  *
  * @package Genmod
  * @subpackage Edit
- * @version $Id: edit_merge.php,v 1.22 2009/03/21 18:16:43 sjouke Exp $
+ * @version $Id$
  */
 /**
  * Inclusion of the configuration file

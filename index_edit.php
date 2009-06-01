@@ -24,7 +24,7 @@
  *
  * @package Genmod
  * @subpackage Display
- * @version $Id: index_edit.php,v 1.21 2009/02/07 08:45:14 sjouke Exp $
+ * @version $Id$
  */
 
 /**

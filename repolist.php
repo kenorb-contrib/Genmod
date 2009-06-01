@@ -35,7 +35,7 @@
  *
  * @package Genmod
  * @subpackage Lists
- * @version $Id: repolist.php,v 1.6 2008/08/02 18:57:28 sjouke Exp $
+ * @version $Id$
  */
 
 /**

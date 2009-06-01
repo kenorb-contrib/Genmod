@@ -21,7 +21,7 @@
  *
  * @package Genmod
  * @subpackage Lists
- * @version $Id: placelist.php,v 1.14 2009/03/25 16:53:52 sjouke Exp $
+ * @version $Id$
  */
 
 /**

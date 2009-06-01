@@ -24,7 +24,7 @@
  *
  * @package Genmod
  * @subpackage Charts
- * @version $Id: clippings.php,v 1.31 2009/03/20 05:24:33 sjouke Exp $
+ * @version $Id$
  */
 
 /**

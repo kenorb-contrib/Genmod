@@ -25,7 +25,7 @@
  *
  * @package Genmod
  * @subpackage Charts
- * @version $Id: hourglass.php,v 1.24 2009/03/25 16:53:52 sjouke Exp $
+ * @version $Id$
  */
 
 /**

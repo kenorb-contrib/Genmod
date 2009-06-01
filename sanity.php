@@ -23,7 +23,7 @@
  *
  * @package Genmod
  * @subpackage Admin
- * @version $Id: sanity.php,v 1.61 2009/04/12 11:26:23 sjouke Exp $
+ * @version $Id$
  */
 
 /**

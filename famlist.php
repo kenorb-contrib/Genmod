@@ -38,7 +38,7 @@
  *
  * @package Genmod
  * @subpackage Lists
- * @version $Id: famlist.php,v 1.22 2009/05/19 09:22:25 sjouke Exp $
+ * @version $Id$
  */
 
 /**

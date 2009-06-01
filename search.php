@@ -21,7 +21,7 @@
  *
  * @package Genmod
  * @subpackage Display
- * @version $Id: search.php,v 1.82 2009/05/23 06:11:24 sjouke Exp $
+ * @version $Id$
  */
 
 /**

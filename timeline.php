@@ -25,7 +25,7 @@
  *
  * @package Genmod
  * @subpackage Charts
- * @version $Id: timeline.php,v 1.11 2008/11/28 06:59:48 sjouke Exp $
+ * @version $Id$
  */
 
 /**

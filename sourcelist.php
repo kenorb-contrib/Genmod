@@ -21,7 +21,7 @@
  *
  * @package Genmod
  * @subpackage Lists
- * @version $Id: sourcelist.php,v 1.8 2008/08/03 04:29:47 sjouke Exp $
+ * @version $Id$
  */
  
 /**

@@ -21,7 +21,7 @@
  *
  * @package Genmod
  * @subpackage Edit
- * @version $Id: edit_interface.php,v 1.159 2009/05/19 09:22:25 sjouke Exp $
+ * @version $Id$
  */
 
 /**

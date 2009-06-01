@@ -23,7 +23,7 @@
  *
  * @package Genmod
  * @subpackage Charts
- * @version $Id: faq.php,v 1.16 2008/08/03 04:29:47 sjouke Exp $
+ * @version $Id$
  */
  
 /**

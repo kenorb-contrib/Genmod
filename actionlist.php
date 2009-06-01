@@ -35,7 +35,7 @@
  *
  * @package Genmod
  * @subpackage Lists
- * @version $Id: actionlist.php,v 1.8 2009/05/03 06:15:15 sjouke Exp $
+ * @version $Id$
  */
 
 /**

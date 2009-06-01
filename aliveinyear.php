@@ -36,7 +36,7 @@
  *
  * @package Genmod
  * @subpackage Lists
- * @version $Id: aliveinyear.php,v 1.18 2009/03/25 16:53:52 sjouke Exp $
+ * @version $Id$
  */
 
 /**

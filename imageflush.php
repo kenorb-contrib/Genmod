@@ -22,7 +22,7 @@
  * @author Genmod Development Team
  * @package Genmod
  * @subpackage Charts
- * @version $Id: imageflush.php,v 1.4 2008/11/22 09:40:37 sjouke Exp $
+ * @version $Id$
  */
  
 /**

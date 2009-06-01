@@ -21,7 +21,7 @@
  *
  * @package Genmod
  * @subpackage Admin
- * @version $Id: editlang_edit_settings.php,v 1.20 2009/02/19 09:50:05 sjouke Exp $
+ * @version $Id$
  */
 
 /**

@@ -21,7 +21,7 @@
  *
  * @package Genmod
  * @subpackage Admin
- * @version $Id: message.php,v 1.17 2008/06/27 04:01:28 sjouke Exp $
+ * @version $Id$
  */
  
 /**

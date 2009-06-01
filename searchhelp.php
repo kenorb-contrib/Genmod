@@ -23,7 +23,7 @@
  *
  * @package Genmod
  * @subpackage Help
- * @version $Id: searchhelp.php,v 1.12 2008/03/02 12:14:13 sjouke Exp $
+ * @version $Id$
  */
 
 class SearchHelp {

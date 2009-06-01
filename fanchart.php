@@ -23,7 +23,7 @@
  *
  * @package Genmod
  * @subpackage Charts
- * @version $Id: fanchart.php,v 1.29 2009/03/25 16:53:52 sjouke Exp $
+ * @version $Id$
  */
  
 /**

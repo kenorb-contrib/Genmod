@@ -19,7 +19,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
- * @version $Id: clippings_download.php,v 1.3 2008/01/06 10:50:11 roland-d Exp $
+ * @version $Id$
  * @package Genmod
  * @subpackage DB
  */
