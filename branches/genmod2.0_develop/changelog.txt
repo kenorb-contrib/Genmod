@@ -7,6 +7,9 @@
 
 	# $Id: changelog.txt,v 1.510 2009/05/29 07:43:05 sjouke Exp $
 =====================================================================
+Version 2.0 beta 1
+- Fixed various language files contain English texts (sjouke) 
+
 Version 1.7 final
 - Fixed delete person should also delete ASSO pointers from others (sjouke)
 - Fixed print relatives in search is broken (sjouke)
