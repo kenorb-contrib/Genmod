@@ -21,7 +21,7 @@
  *
  * @package Genmod
  * @subpackage Themes
- * @version $Id: theme.php,v 1.2 2009/03/16 19:51:30 sjouke Exp $
+ * @version $Id$
  */
 
 $theme_name = "Clear";		//-- the name of this theme
