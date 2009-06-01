@@ -23,7 +23,7 @@
  *
  * @package Genmod
  * @subpackage Display
- * @version $Id: functions_print.php,v 1.264 2009/05/27 16:25:31 sjouke Exp $
+ * @version $Id$
  */
 if (strstr($_SERVER["SCRIPT_NAME"],basename(__FILE__))) {
 	require "../../intrusion.php";

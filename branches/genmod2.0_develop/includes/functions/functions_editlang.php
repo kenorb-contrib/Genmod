@@ -21,7 +21,7 @@
  *
  * @package Genmod
  * @subpackage Admin
- * @version $Id: functions_editlang.php,v 1.11 2008/02/02 10:15:45 sjouke Exp $
+ * @version $Id$
  */
 
 if (strstr($_SERVER["SCRIPT_NAME"],basename(__FILE__))) {

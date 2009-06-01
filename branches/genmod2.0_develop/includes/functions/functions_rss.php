@@ -19,7 +19,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
- * @version $Id: functions_rss.php,v 1.22 2009/03/08 18:37:35 sjouke Exp $
+ * @version $Id$
  * @package Genmod
  * @subpackage RSS
  */

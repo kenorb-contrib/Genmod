@@ -24,7 +24,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
- * @version $Id: functions_plot.php,v 1.3 2009/04/12 11:26:23 sjouke Exp $
+ * @version $Id$
  * @package Genmod
  * @subpackage DB
  */

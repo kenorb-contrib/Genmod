@@ -20,7 +20,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  * @package Genmod
- * @version $Id: functions_name.php,v 1.77 2009/05/27 16:25:31 sjouke Exp $
+ * @version $Id$
  */
 
 /**

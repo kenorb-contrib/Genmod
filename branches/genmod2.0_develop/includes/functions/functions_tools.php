@@ -2,7 +2,7 @@
 /**
  * Functions used Tools to cleanup and manipulate Gedcoms before they are imported
  *
- * $Id: functions_tools.php,v 1.8 2008/01/06 11:16:37 roland-d Exp $
+ * $Id$
  *
  * Genmod: Genealogy Viewer
  * Copyright (C) 2005 - 2008 Genmod Development Team

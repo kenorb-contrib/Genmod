@@ -24,7 +24,7 @@
  *
  * @package Genmod
  * @subpackage Dates
- * @version $Id: functions_date_hijri.php,v 1.5 2008/01/06 11:16:35 roland-d Exp $
+ * @version $Id$
  */
 
 /**

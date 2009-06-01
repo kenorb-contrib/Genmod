@@ -22,7 +22,7 @@
  * @package Genmod
  * @subpackage Edit
  * @see functions_places.php
- * @version $Id: functions_edit.php,v 1.143 2009/05/27 16:25:31 sjouke Exp $
+ * @version $Id$
  */
 
 if (strstr($_SERVER["SCRIPT_NAME"],basename(__FILE__))) {

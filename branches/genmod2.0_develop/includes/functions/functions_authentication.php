@@ -27,7 +27,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  * @package Genmod
  * @subpackage DB
- * @version $Id: authentication.php,v 1.68 2009/03/16 19:51:12 sjouke Exp $
+ * @version $Id$
  */
 if (strstr($_SERVER["SCRIPT_NAME"],basename(__FILE__))) {
 	require "../../intrusion.php";
