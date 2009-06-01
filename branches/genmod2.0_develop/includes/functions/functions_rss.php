@@ -418,23 +418,11 @@ function getGedcomNews() {
 		$mon = date("M", $news["date"]);
 		$year = date("Y", $news["date"]);
 		$data = "";
-		$ct = preg_match("/#(.+)#/", $news["title"], $match);
-		if ($ct>0) {
-			if (isset($gm_lang[$match[1]])) $news["title"] = preg_replace("/$match[0]/", $gm_lang[$match[1]], $news["title"]);
-		}
+		$news["title"] = ReplaceEmbedText($news["title"]);
 		$itemArray[0] = $news["title"];
 
 		$itemArray[1] = iso8601_date($news["date"]);
-		$ct = preg_match("/#(.+)#/", $news["text"], $match);
-		if ($ct>0) {
-			if (isset($gm_lang[$match[1]])) $news["text"] = preg_replace("/$match[0]/", $gm_lang[$match[1]], $news["text"]);
-		}
-		$ct = preg_match("/#(.+)#/", $news["text"], $match);
-		if ($ct>0) {
-			if (isset($gm_lang[$match[1]])) $news["text"] = preg_replace("/$match[0]/", $gm_lang[$match[1]], $news["text"]);
-			$varname = $match[1];
-			if (isset($$varname)) $news["text"] = preg_replace("/$match[0]/", $$varname, $news["text"]);
-		}
+		$news["text"] = ReplaceEmbedText($news["text"]);
 		$trans = get_html_translation_table(HTML_SPECIALCHARS);
 		$trans = array_flip($trans);
 		$news["text"] = strtr($news["text"], $trans);

@@ -3481,7 +3481,32 @@ function RelativePathFile($file) {
 	if ($s == "/") $file = substr($file, 1);
 	return $file;
 }
+
+function ReplaceEmbedText($text) {
+	global $gm_lang, $CONFIG_VARS;
 	
-// optional extra file
-if (file_exists($GM_BASE_DIRECTORY . "includes/functions/functions.extra.php")) require $GM_BASE_DIRECTORY . "includes/functions/functions.extra.php";
+	while (preg_match("/#(.+)#/", $text, $match) > 0) {
+		$varname = $match[1];
+		global $$varname;
+		
+		// check if config variable
+		if (in_array($varname, $CONFIG_VARS)) $text = preg_replace("/$match[0]/", $gm_lang["embedvar_not_allowed"], $text);
+		
+		// check language variable
+		else if (isset($gm_lang[$varname])) $text = preg_replace("/$match[0]/", $gm_lang[$varname], $text);
+		
+		// check variable
+		else if (isset($$varname)) $text = preg_replace("/$match[0]/", $$varname, $text);
+		
+		// check constant
+		else if (defined($varname)) $text = preg_replace("/$match[0]/", constant($varname), $text);
+		
+		// check constant with prefix
+		else if (defined("GM_".$varname)) $text = preg_replace("/$match[0]/", constant("GM_".$varname), $text);
+		
+		// if nothing is found, replace with error message. Doing nothing would cause an endless loop anyway
+		else $text = preg_replace("/$match[0]/", $gm_lang["embedvar_not_found"], $text);
+	}
+	return $text;
+}	
 ?>
