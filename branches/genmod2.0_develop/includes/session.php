@@ -21,7 +21,7 @@
  *
  * @package Genmod
  * @subpackage Admin
- * @version $Id: session.php,v 1.130 2009/05/29 05:09:49 sjouke Exp $
+ * @version $Id$
  */
 
 // NOTE: Load and start the debug collector

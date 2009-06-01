@@ -23,7 +23,7 @@
  *
  * @package Genmod
  * @subpackage Reports
- * @version $Id: reportpdf.php,v 1.23 2009/05/03 06:15:15 sjouke Exp $
+ * @version $Id$
  */
 
 //-- do not allow direct access to this file
