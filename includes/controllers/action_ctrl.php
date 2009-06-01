@@ -21,7 +21,7 @@
  *
  * @package Genmod
  * @subpackage DataModel
- * @version $Id: action_class.php,v 1.7 2009/05/03 06:20:06 sjouke Exp $
+ * @version $Id$
  */
 if (stristr($_SERVER["SCRIPT_NAME"],basename(__FILE__))) {
 	require "../../intrusion.php";

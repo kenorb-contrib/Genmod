@@ -21,7 +21,7 @@
  *
  * @package Genmod
  * @subpackage Charts
- * @version $Id: note_ctrl.php,v 1.5 2009/03/29 13:20:10 sjouke Exp $
+ * @version $Id$
  */
 
 if (stristr($_SERVER["SCRIPT_NAME"],basename(__FILE__))) {
