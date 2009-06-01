@@ -20,7 +20,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  * @package Genmod
- * @version $Id: setgenmod.php,v 1.2 2008/01/06 11:16:38 roland-d Exp $
+ * @version $Id$
  */
 
 // Set a global array

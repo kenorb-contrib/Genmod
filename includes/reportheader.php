@@ -9,7 +9,7 @@
  *
  * @package Genmod
  * @subpackage Reports
- * @version $Id: reportheader.php,v 1.5 2009/05/03 12:58:25 sjouke Exp $
+ * @version $Id$
  */
 
 //-- do not allow direct access to this file

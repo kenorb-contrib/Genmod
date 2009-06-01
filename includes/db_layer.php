@@ -19,7 +19,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
- * $Id: db_layer.php,v 1.27 2009/03/18 19:43:42 sjouke Exp $
+ * $Id$
  * @package Genmod
  * @subpackage Database
  */
