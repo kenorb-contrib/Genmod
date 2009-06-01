@@ -24,7 +24,7 @@
  *
  * @package Genmod
  * @subpackage Dates
- * @version $Id: functions_date.php,v 1.16 2008/06/22 06:06:02 sjouke Exp $
+ * @version $Id$
  */
 
 /**

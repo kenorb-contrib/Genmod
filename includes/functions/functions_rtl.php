@@ -23,7 +23,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  * @package Genmod
- * @version $Id: functions_rtl.php,v 1.5 2008/01/06 11:16:37 roland-d Exp $
+ * @version $Id$
  */
 
 /**

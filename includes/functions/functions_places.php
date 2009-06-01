@@ -21,7 +21,7 @@
  *
  * @package Genmod
  * @subpackage Edit
- * @version $Id: functions_places.php,v 1.11 2008/09/10 10:50:51 sjouke Exp $
+ * @version $Id$
  */
 
 if (strstr($_SERVER["SCRIPT_NAME"],basename(__FILE__))) {
