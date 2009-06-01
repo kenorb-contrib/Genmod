@@ -21,7 +21,7 @@
  *
  * @package Genmod
  * @subpackage DataModel
- * @version $Id: file_class.php,v 1.9 2009/05/02 06:43:54 sjouke Exp $
+ * @version $Id$
  */
 
 if (strstr($_SERVER["SCRIPT_NAME"],basename(__FILE__))) {
