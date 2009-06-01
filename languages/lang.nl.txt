@@ -818,7 +818,6 @@
 "file_too_big";"Het bestand is te groot."
 "filename";"Bestandsnaam:"
 "files_found";"Bestanden gevonden:"
-"filter";"Filter"
 "filter_address";"Toon adressen die bevatten:"
 "find_add_mmlink";"Zoek te koppelen ID "
 "find_fam_list";"Lijst gezinnen zoeken"
