@@ -23,7 +23,7 @@
  *
  * @package Genmod
  * @subpackage Blocks
- * @version $Id: recent_changes.php,v 1.23 2009/04/30 04:05:22 sjouke Exp $
+ * @version $Id$
  */
 
 $GM_BLOCKS["print_recent_changes"]["name"]      = $gm_lang["recent_changes_block"];

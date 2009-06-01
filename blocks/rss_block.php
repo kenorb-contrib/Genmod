@@ -23,7 +23,7 @@
  *
  * @package Genmod
  * @subpackage Blocks
- * @version $Id: rss_block.php,v 1.9 2009/03/29 13:20:10 sjouke Exp $
+ * @version $Id$
  */
 $GM_BLOCKS["print_RSS_block"]["name"]		= $gm_lang["rss_feeds"];
 $GM_BLOCKS["print_RSS_block"]["descr"]		= "rss_descr";

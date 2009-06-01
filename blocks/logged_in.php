@@ -23,7 +23,7 @@
  *
  * @package Genmod
  * @subpackage Blocks
- * @version $Id: logged_in.php,v 1.16 2009/02/07 08:45:14 sjouke Exp $
+ * @version $Id$
  */
 
 $GM_BLOCKS["print_logged_in_users"]["name"]        	= $gm_lang["logged_in_users_block"];

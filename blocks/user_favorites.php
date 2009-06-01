@@ -23,7 +23,7 @@
  *
   * @package Genmod
  * @subpackage Blocks
- * $Id: user_favorites.php,v 1.21 2009/04/24 06:25:16 sjouke Exp $
+ * $Id$
  */
 
 $GM_BLOCKS["print_user_favorites"]["name"]      = $gm_lang["user_favorites_block"];

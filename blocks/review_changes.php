@@ -23,7 +23,7 @@
  *
  * @package Genmod
  * @subpackage Blocks
- * @version $Id: review_changes.php,v 1.24 2009/03/16 19:51:12 sjouke Exp $
+ * @version $Id$
  * @todo add a time configuration option
  */
 

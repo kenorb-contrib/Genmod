@@ -23,7 +23,7 @@
  *
  * @package Genmod
  * @subpackage Blocks
- * @version $Id: random_media.php,v 1.28 2009/04/24 06:25:16 sjouke Exp $
+ * @version $Id$
  */
 
 //-- only enable this block if multi media has been enabled
