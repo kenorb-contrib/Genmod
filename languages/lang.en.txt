@@ -2573,3 +2573,5 @@
 "link_not_added";"You made a link to a non existent ID. This link is not added:"
 "unapproved_link";"Changes are present for one or more links to this record. These changes will show up after approval."
 "associate_with";"Associate with"
+"embedvar_not_found";"<b>embedded variable not found</b>"
+"embedvar_not_allowed";"<b>embedded variable not allowed</b>"
