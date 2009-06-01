@@ -444,9 +444,9 @@ $GedcomConfig = new GedcomConfig();
 if ($CONFIGURED) if ($DBLAYER->connected) $GedcomConfig->ReadGedcomConfig(get_gedcom_from_id($GEDCOMID));
 require_once($GM_BASE_DIRECTORY."includes/functions/functions_name.php");
 require_once($GM_BASE_DIRECTORY."includes/functions/functions_authentication.php");      // -- load the authentication system
+require_once($GM_BASE_DIRECTORY."includes/functions/functions_search.php");
 
 //-- load media specific functions
-require_once($GM_BASE_DIRECTORY."includes/functions/functions_mediadb.php");
 $MediaFS = new MediaFS();
 
 if (empty($PEDIGREE_GENERATIONS)) $PEDIGREE_GENERATIONS = $DEFAULT_PEDIGREE_GENERATIONS;

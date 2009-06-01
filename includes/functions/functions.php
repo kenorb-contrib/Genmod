@@ -3472,6 +3472,15 @@ function SwitchGedcom($ged="") {
 	return;
 }
 
+/* Strips the trailing dot and slash from the filename
+*/
+function RelativePathFile($file) {
+	$s = substr($file,0,1);
+	if ($s == ".") $file = substr($file, 1);
+	$s = substr($file,0,1);
+	if ($s == "/") $file = substr($file, 1);
+	return $file;
+}
 	
 // optional extra file
 if (file_exists($GM_BASE_DIRECTORY . "includes/functions/functions.extra.php")) require $GM_BASE_DIRECTORY . "includes/functions/functions.extra.php";
