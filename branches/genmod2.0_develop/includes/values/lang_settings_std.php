@@ -21,7 +21,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
- * $Id: lang_settings_std.php,v 1.5 2008/01/11 07:47:37 sjouke Exp $
+ * $Id$
  *
  * @package Genmod
  * @subpackage Languages

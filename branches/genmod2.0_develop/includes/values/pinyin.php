@@ -19,7 +19,7 @@
  *
  * @package Genmod
  * @subpackage Display
- * @version $Id: repo.php,v 1.23 2007/12/14 07:39:38 sjouke Exp $
+ * @version $Id$
  */
 if (strstr($_SERVER["SCRIPT_NAME"],basename(__FILE__))) {
 	require "../../intrusion.php";

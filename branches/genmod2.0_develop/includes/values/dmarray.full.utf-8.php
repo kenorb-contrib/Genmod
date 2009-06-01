@@ -19,7 +19,7 @@
  *
  * @package Genmod
  * @subpackage Display
- * @version $Id: dmarray.full.utf-8.php,v 1.4 2008/01/06 11:16:34 roland-d Exp $
+ * @version $Id$
  */
 if (strstr($_SERVER["SCRIPT_NAME"],basename(__FILE__))) {
 	require "../../intrusion.php";
