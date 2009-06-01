@@ -21,7 +21,7 @@
  *
  * @package Genmod
  * @subpackage Themes
- * @version $Id: theme.php,v 1.15 2009/03/18 19:43:48 sjouke Exp $
+ * @version $Id$
  */
 
 $theme_name = "Standard";		//-- the name of this theme
