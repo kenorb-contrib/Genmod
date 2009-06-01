@@ -21,7 +21,7 @@
  *
  * @package Genmod
  * @subpackage Display
- * @version $Id: include_top.php,v 1.1 2008/07/13 05:36:29 sjouke Exp $
+ * @version $Id$
  */
 if (stristr($_SERVER["SCRIPT_NAME"],basename(__FILE__))) {
 	require "../../intrusion.php";

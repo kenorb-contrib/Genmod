@@ -22,7 +22,7 @@
  *
  * @package Genmod
  * @subpackage Display
- * @version $Id: templecodes.php,v 1.2 2008/01/06 11:16:39 roland-d Exp $
+ * @version $Id$
  */
 
 if (stristr($_SERVER["SCRIPT_NAME"],basename(__FILE__))) {

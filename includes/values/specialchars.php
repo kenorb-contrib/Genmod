@@ -39,7 +39,7 @@
  *
  * @package Genmod
  * @subpackage Languages
- * @version $Id: specialchars.php,v 1.3 2008/01/06 11:16:38 roland-d Exp $
+ * @version $Id$
  */
  
 if (stristr($_SERVER["SCRIPT_NAME"],basename(__FILE__))) {
