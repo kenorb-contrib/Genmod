@@ -1,5 +1,5 @@
 <GMReport access="PRIV_PUBLIC" icon="sfamily" type="general">
-	<!-- $Id: marrlist.xml,v 1.5 2009/05/03 12:58:25 sjouke Exp $ -->
+	<!-- $Id$ -->
 	<GMRTitle><GMRvar var="gm_lang[marr_report]" /></GMRTitle>
 	<GMRDescription>Prints a list of families matching specific name and/or marriage criteria</GMRDescription>
 	<GMRInput name="name" lookup="NAME" type="text"><GMRvar var="gm_lang[name]" /></GMRInput>

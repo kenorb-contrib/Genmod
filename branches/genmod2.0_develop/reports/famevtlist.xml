@@ -1,5 +1,5 @@
 <GMReport access="PRIV_PUBLIC" icon="sfamily" type="general">
-	<!-- $Id: famevtlist.xml,v 1.4 2009/05/03 12:58:25 sjouke Exp $ -->
+	<!-- $Id$ -->
 	<GMRTitle><GMRvar var="gm_lang[fam_evt_report]" /></GMRTitle>
 	<GMRDescription>Prints a list of families matching specific name and/or family event criteria</GMRDescription>
 	<GMRInput name="name" lookup="NAME" type="text"><GMRvar var="gm_lang[name]" /></GMRInput>

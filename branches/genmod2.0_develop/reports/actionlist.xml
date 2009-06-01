@@ -1,5 +1,5 @@
 <GMReport access="PRIV_USER" icon="place" type="repo">
-	<!-- $Id: actionlist.xml,v 1.3 2009/05/27 17:26:30 sjouke Exp $ -->
+	<!-- $Id$ -->
 	<GMRTitle><GMRvar var="gm_lang[actionlist]" /></GMRTitle>
 	<GMRDescription>Prints a list of actions with repository and individual data</GMRDescription>
 	<GMRInput name="repo" lookup="REPO" type="text" default=""><GMRvar var="gm_lang[repo]" /></GMRInput>
