@@ -21,7 +21,7 @@
  *
  * @package Genmod
  * @subpackage Charts
- * @version $Id: source_ctrl.php,v 1.26 2009/03/16 19:51:12 sjouke Exp $
+ * @version $Id$
  */
 if (stristr($_SERVER["SCRIPT_NAME"],"source_ctrl")) {
 	require "../../intrusion.php";

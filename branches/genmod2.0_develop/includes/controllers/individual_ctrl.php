@@ -23,7 +23,7 @@
  *
  * @package Genmod
  * @subpackage Charts
- * @version $Id: individual_ctrl.php,v 1.90 2009/04/24 06:25:16 sjouke Exp $
+ * @version $Id$
  */
 
 if (stristr($_SERVER["SCRIPT_NAME"],basename(__FILE__))) {

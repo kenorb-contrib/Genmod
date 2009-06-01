@@ -21,7 +21,7 @@
  *
  * @package Genmod
  * @subpackage Charts
- * @version $Id: timeline_ctrl.php,v 1.12 2008/01/06 10:57:55 roland-d Exp $
+ * @version $Id$
  */
  
 if (stristr($_SERVER["SCRIPT_NAME"],basename(__FILE__))) {

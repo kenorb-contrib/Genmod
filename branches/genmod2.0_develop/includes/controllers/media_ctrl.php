@@ -21,7 +21,7 @@
  *
  * @package Genmod
  * @subpackage Charts
- * @version $Id: media_ctrl.php,v 1.8 2009/03/16 19:51:12 sjouke Exp $
+ * @version $Id$
  */
  
 if (stristr($_SERVER["SCRIPT_NAME"],basename(__FILE__))) {
