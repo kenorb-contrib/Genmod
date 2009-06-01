@@ -23,7 +23,7 @@
  *
  * @package Genmod
  * @subpackage Blocks
- * @version $Id: quick_start.php,v 1.18 2009/02/07 08:45:14 sjouke Exp $
+ * @version $Id$
  */
 
 $GM_BLOCKS["print_quickstart_block"]["name"]        = $gm_lang["quickstart_block"];

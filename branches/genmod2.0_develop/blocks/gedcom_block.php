@@ -23,7 +23,7 @@
  *
  * @package Genmod
  * @subpackage Blocks
- * @version $Id: gedcom_block.php,v 1.9 2009/02/07 08:45:14 sjouke Exp $
+ * @version $Id$
  */
  
 $GM_BLOCKS["print_gedcom_block"]["name"]        = $gm_lang["gedcom_block"];

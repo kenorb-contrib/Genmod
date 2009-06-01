@@ -21,7 +21,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
- * @version $Id: top10_botviews.php,v 1.2 2009/02/07 08:45:14 sjouke Exp $
+ * @version $Id$
  * @package Genmod
  * @subpackage Blocks
  */

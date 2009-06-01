@@ -23,7 +23,7 @@
  *
  * @package Genmod
  * @subpackage Blocks
- * @version $Id: gedcom_favorites.php,v 1.27 2009/03/29 13:20:10 sjouke Exp $
+ * @version $Id$
  */
 
 $GM_BLOCKS["print_gedcom_favorites"]["name"]        = $gm_lang["gedcom_favorites_block"];

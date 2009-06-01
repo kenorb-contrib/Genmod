@@ -23,7 +23,7 @@
  *
  * @package Genmod
  * @subpackage Blocks
- * $Id: upcoming_events.php,v 1.26 2009/02/07 08:45:14 sjouke Exp $
+ * $Id$
  */
 
 $GM_BLOCKS["print_upcoming_events"]["name"] 		= $gm_lang["upcoming_events_block"];
