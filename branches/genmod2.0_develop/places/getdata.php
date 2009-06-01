@@ -21,7 +21,7 @@
  *
  * @package Genmod
  * @subpackage Edit
- * @version $Id: getdata.php,v 1.2 2008/01/06 11:16:39 roland-d Exp $
+ * @version $Id$
  * @see functions_places.php
  */
 
