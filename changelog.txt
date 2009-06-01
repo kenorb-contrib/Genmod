@@ -5,7 +5,7 @@
 	This and other information can be found online at
 	http://www.genmod.net/
 
-	# $Id: changelog.txt,v 1.510 2009/05/29 07:43:05 sjouke Exp $
+	# $Id$
 =====================================================================
 Version 2.0 beta 1
 - Fixed various language files contain English texts (sjouke) 
