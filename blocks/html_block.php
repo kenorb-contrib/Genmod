@@ -43,19 +43,7 @@ function print_html_block($block=true, $config="", $side, $index) {
 	print "<div class=\"blockcontent\">";
 	if ($block) print "<div class=\"small_inner_block\">\n";
 
-	$ct = preg_match("/#(.+)#/", $config["html"], $match);
-	if ($ct>0) {
-			if (isset($gm_lang[$match[1]])) $config["html"] = preg_replace("/$match[0]/", $gm_lang[$match[1]], $config["html"]);
-	}
-	$ct = preg_match("/#(.+)#/", $config["html"], $match);
-	if ($ct>0) {
-			if (isset($gm_lang[$match[1]])) $config["html"] = preg_replace("/$match[0]/", $gm_lang[$match[1]], $config["html"]);
-			$varname = $match[1];
-			if (!empty($$varname)) {
-				$value = $$varname;
-				$config["html"] = preg_replace("/$match[0]/", $value, $config["html"]);
-			}
-	}
+	$config["html"] = ReplaceEmbedText($config["html"]);
 	print $config["html"];
 
 	if ($block) print "</div>\n";
