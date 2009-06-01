@@ -21,7 +21,7 @@
  *
  * @package Genmod
  * @subpackage Languages
- * @version $Id: changelanguage.php,v 1.23 2009/02/19 10:14:32 sjouke Exp $
+ * @version $Id$
  */
  
 /**

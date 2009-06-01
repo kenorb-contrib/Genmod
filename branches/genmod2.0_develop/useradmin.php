@@ -23,7 +23,7 @@
  *
  * @package Genmod
  * @subpackage Admin
- * @version $Id: useradmin.php,v 1.54 2008/08/09 21:19:43 sjouke Exp $
+ * @version $Id$
  */
 
 /**

@@ -21,7 +21,7 @@
  *
  * @package Genmod
  * @subpackage Display
- * @version $Id: find.php,v 1.49 2009/05/19 09:22:25 sjouke Exp $
+ * @version $Id$
  */
 
 /**

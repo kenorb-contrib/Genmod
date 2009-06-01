@@ -20,7 +20,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  * @package Genmod
- * @version $Id: editnews.php,v 1.7 2008/11/23 08:59:37 sjouke Exp $
+ * @version $Id$
  */
 
 /**

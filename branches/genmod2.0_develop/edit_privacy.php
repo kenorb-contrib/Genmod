@@ -24,7 +24,7 @@
  * @author GM Development Team
  * @package Genmod
  * @subpackage Privacy
- * @version $Id: edit_privacy.php,v 1.28 2009/03/16 19:51:12 sjouke Exp $
+ * @version $Id$
  */
 
 /**

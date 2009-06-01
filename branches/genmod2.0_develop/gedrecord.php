@@ -21,7 +21,7 @@
  *
  * @package Genmod
  * @subpackage Charts
- * @version $Id: gedrecord.php,v 1.11 2008/02/02 10:15:40 sjouke Exp $
+ * @version $Id$
  */
 
 /**

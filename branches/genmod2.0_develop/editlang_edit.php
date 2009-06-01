@@ -21,7 +21,7 @@
  *
  * @package Genmod
  * @subpackage EditLang
- * @version $Id: editlang_edit.php,v 1.16 2008/01/06 10:54:59 roland-d Exp $
+ * @version $Id$
  */
 
 /**

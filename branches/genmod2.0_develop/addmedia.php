@@ -26,7 +26,7 @@
  *
  * @package Genmod
  * @subpackage MediaDB
- * @version $Id: addmedia.php,v 1.28 2009/02/18 09:16:50 sjouke Exp $
+ * @version $Id$
  */
 
 /**

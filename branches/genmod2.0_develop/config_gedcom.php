@@ -27,7 +27,7 @@
  * @package Genmod
  * @subpackage Admin
  * @see editconfig_gedcom.php
- * @version $Id: config_gedcom.php,v 1.29 2009/04/24 06:25:16 sjouke Exp $
+ * @version $Id$
  */
 
 if (preg_match("/\Wconfig_gedcom\.php/", $_SERVER["SCRIPT_NAME"])>0) {

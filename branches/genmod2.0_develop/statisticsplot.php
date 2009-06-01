@@ -24,7 +24,7 @@
  *
  * @package Genmod
  * @subpackage Lists
- * @version $Id: statisticsplot.php,v 1.10 2009/03/25 16:53:52 sjouke Exp $
+ * @version $Id$
  */
  
 /**

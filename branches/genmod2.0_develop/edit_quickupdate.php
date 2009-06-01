@@ -23,7 +23,7 @@
  *
  * @package Genmod
  * @subpackage Edit
- * @version $Id: edit_quickupdate.php,v 1.55 2009/04/24 06:25:16 sjouke Exp $
+ * @version $Id$
  */
 
 require("config.php");

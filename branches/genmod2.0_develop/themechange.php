@@ -22,7 +22,7 @@
  * @author Genmod Development Team
  * @package Genmod
  * @subpackage Themes
- * @version $Id: themechange.php,v 1.6 2008/02/02 10:15:42 sjouke Exp $
+ * @version $Id$
  */
 
 /**

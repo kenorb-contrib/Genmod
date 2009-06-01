@@ -22,7 +22,7 @@
  * @author Genmod Development Team
  * @package Genmod
  * @subpackage Help
- * @version $Id: helptext_vars.php,v 1.3 2008/03/14 05:49:17 sjouke Exp $
+ * @version $Id$
  */
 
 // The variables in this file are used to glue together other var's in the help_text.xx.php

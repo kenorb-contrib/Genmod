@@ -23,7 +23,7 @@
  *
  * @package Genmod
  * @subpackage Admin
- * @version $Id: login_register.php,v 1.31 2009/04/21 16:35:06 sjouke Exp $
+ * @version $Id$
  */
 
 /**

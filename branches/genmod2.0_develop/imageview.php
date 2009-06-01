@@ -22,7 +22,7 @@
  * @author Genmod Development Team
  * @package Genmod
  * @subpackage Media
- * @version $Id: imageview.php,v 1.8 2008/11/23 07:17:11 sjouke Exp $
+ * @version $Id$
  */
 
 /**

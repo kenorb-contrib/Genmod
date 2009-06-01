@@ -25,7 +25,7 @@
  *
  * @package Genmod
  * @subpackage Admin
- * @version $Id: admin.php,v 1.51 2009/04/17 14:15:32 sjouke Exp $
+ * @version $Id$
  */
 
 /**

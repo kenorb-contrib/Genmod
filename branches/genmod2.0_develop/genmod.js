@@ -20,7 +20,7 @@
  *
  * @package Genmod
  * @subpackage Display
- * @version $Id: genmod.js,v 1.47 2009/03/16 19:51:12 sjouke Exp $
+ * @version $Id$
  */
 if (!document.getElementById)	// Check if browser supports the getElementByID function
 {

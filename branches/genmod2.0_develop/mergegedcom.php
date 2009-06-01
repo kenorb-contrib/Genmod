@@ -24,7 +24,7 @@
  * @author Genmod Development Team
  * @package Genmod
  * @subpackage Admin
- * @version $Id: mergegedcom.php,v 1.19 2008/11/21 13:45:00 sjouke Exp $
+ * @version $Id$
  */
  // NOTE: No direct access to this script
  //-- Be careful this may not be a good idea... 

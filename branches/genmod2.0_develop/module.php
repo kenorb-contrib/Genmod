@@ -21,7 +21,7 @@
  *
  * @package Genmod
  * @subpackage Display
- * @version $Id: module.php,v 1.2 2008/01/06 11:00:25 roland-d Exp $
+ * @version $Id$
  * @author Patrick Kellum
  */
 

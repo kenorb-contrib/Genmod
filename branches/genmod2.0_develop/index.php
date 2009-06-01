@@ -22,7 +22,7 @@
  *
  * @package Genmod
  * @subpackage Display
- * @version $Id: index.php,v 1.19 2008/08/03 06:17:54 sjouke Exp $
+ * @version $Id$
  */
 
  

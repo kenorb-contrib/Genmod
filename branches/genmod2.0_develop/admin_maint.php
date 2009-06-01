@@ -23,7 +23,7 @@
  *
  * @package Genmod
  * @subpackage Admin
- * @version $Id: admin_maint.php,v 1.13 2009/03/06 06:25:40 sjouke Exp $
+ * @version $Id$
  */
 
 /**

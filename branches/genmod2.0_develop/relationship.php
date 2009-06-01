@@ -23,7 +23,7 @@
  *
  * @package Genmod
  * @subpackage Charts
- * @version $Id: relationship.php,v 1.12 2008/11/28 06:59:48 sjouke Exp $
+ * @version $Id$
  */
 
 /**

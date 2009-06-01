@@ -21,7 +21,7 @@
  *
  * @package Genmod
  * @subpackage Charts
- * @version $Id: accesskeyHeaders.php,v 1.5 2008/01/06 10:47:14 roland-d Exp $
+ * @version $Id$
  */
  ?>
 <div class="accesskeys">

@@ -21,7 +21,7 @@
  *
  * @package Genmod
  * @subpackage Admin
- * @version $Id: viewlog.php,v 1.30 2008/09/14 18:19:42 sjouke Exp $
+ * @version $Id$
  */
 
 /**

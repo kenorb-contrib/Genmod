@@ -4,7 +4,7 @@
     Version 1.0
     Copyright 2005 - 2007 Genmod Development team
 
-    # $Id: readme.txt,v 1.13 2008/07/13 13:22:25 sjouke Exp $
+    # $Id$
 =======================================================
 
 CONTENTS

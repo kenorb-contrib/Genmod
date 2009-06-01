@@ -24,7 +24,7 @@
  * @author Genmod Development Team
  * @package Genmod
  * @subpackage Admin
- * @version $Id: help_text.php,v 1.11 2008/02/02 10:15:40 sjouke Exp $
+ * @version $Id$
  */
 
 /**

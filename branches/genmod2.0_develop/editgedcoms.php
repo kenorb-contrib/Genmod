@@ -25,7 +25,7 @@
  * @package Genmod
  * @subpackage Admin
  * @see index/gedcoms.php
- * @version $Id: editgedcoms.php,v 1.39 2008/08/03 04:29:47 sjouke Exp $
+ * @version $Id$
  */
 
 /**

@@ -20,7 +20,7 @@
  *
  * @package Genmod
  * @subpackage admin
- * @version $Id: upgrade15-16.php,v 1.7 2008/04/01 04:46:14 sjouke Exp $
+ * @version $Id$
  */
  
 /**

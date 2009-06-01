@@ -19,7 +19,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
- * @version $Id: intrusion.php,v 1.2 2008/01/06 10:58:37 roland-d Exp $
+ * @version $Id$
  * @package Genmod
  * @subpackage Admin
  */

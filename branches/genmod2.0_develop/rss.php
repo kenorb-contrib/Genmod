@@ -22,7 +22,7 @@
  *
  * @package Genmod
  * @subpackage RSS
- * @version $Id: rss.php,v 1.11 2009/03/16 19:51:12 sjouke Exp $
+ * @version $Id$
  */
 
 if (isset($_SESSION["CLANGUAGE"])) $oldlang = $_SESSION["CLANGUAGE"];

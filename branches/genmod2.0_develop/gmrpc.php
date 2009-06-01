@@ -21,7 +21,7 @@
  *
  * @package Genmod
  * @subpackage zwooff
- * @version $Id: gmrpc.php,v 1.21 2009/04/17 13:56:49 sjouke Exp $
+ * @version $Id$
  */
  
 require "config.php";

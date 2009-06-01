@@ -21,7 +21,7 @@
  *
  * @package Genmod
  * @subpackage Admin
- * @version $Id: downloadbackup.php,v 1.9 2008/06/27 04:01:26 sjouke Exp $
+ * @version $Id$
  */
 
 /**

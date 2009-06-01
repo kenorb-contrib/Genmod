@@ -22,7 +22,7 @@
  * @author Genmod Development Team
  * @package Genmod
  * @subpackage Admin
- * @version $Id: backup.php,v 1.32 2008/08/03 04:29:47 sjouke Exp $
+ * @version $Id$
  */
 
 /**

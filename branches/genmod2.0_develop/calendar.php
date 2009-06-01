@@ -23,7 +23,7 @@
  *
  * This Page Is Valid XHTML 1.0 Transitional! > 3 September 2005
  *
- * $Id: calendar.php,v 1.25 2008/08/03 04:29:47 sjouke Exp $
+ * $Id$
  * @package Genmod
  * @subpackage Calendar
  */

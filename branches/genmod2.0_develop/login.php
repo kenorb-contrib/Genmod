@@ -25,7 +25,7 @@
  *
  * @package Genmod
  * @subpackage Display
- * @version $Id: login.php,v 1.22 2009/04/17 18:02:27 sjouke Exp $
+ * @version $Id$
  */ 
 
 /**

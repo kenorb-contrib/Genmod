@@ -25,7 +25,7 @@
  *
  * @package Genmod
  * @subpackage Display
- * @version $Id: individual.php,v 1.98 2009/04/24 06:25:16 sjouke Exp $
+ * @version $Id$
  */
 
 /**

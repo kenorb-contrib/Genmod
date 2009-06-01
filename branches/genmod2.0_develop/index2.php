@@ -20,7 +20,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  * @package Genmod
- * @version $Id: index2.php,v 1.6 2008/01/06 10:58:11 roland-d Exp $
+ * @version $Id$
  */
 
 // Include the configuration file

@@ -24,7 +24,7 @@
  * @author Genmod Development Team
  * @package Genmod
  * @subpackage Admin
- * @version $Id: uploadgedcom.php,v 1.58 2009/05/17 07:31:09 sjouke Exp $
+ * @version $Id$
  */
  // NOTE: No direct access to this script
  //-- Be careful this may not be a good idea... 

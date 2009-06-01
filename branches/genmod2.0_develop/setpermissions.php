@@ -20,7 +20,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  * @package Genmod
- * @version $Id: setpermissions.php,v 1.3 2008/01/06 11:01:43 roland-d Exp $
+ * @version $Id$
  */
 
 if (chmod("config.php", 0777)) print "Successfully set permissions for config.php.<br />";
