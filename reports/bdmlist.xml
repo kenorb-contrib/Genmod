@@ -2,7 +2,7 @@
 	<!--
 	@package Genmod
 	@subpackage Reports
-	@version $Id: bdmlist.xml,v 1.4 2009/05/03 12:58:25 sjouke Exp $
+	@version $Id$
 	-->
 	<GMRTitle><GMRvar var="gm_lang[bdm]" /></GMRTitle>
 	<GMRDescription>Prints a list of BIRT/DEAT/MARR events for individuals matching NAME or PLAC criteria.</GMRDescription>

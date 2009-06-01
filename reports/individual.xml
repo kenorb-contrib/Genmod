@@ -1,5 +1,5 @@
 <GMReport access="PRIV_PUBLIC" icon="indis" type="indi">
-	<!-- $Id: individual.xml,v 1.9 2009/05/03 12:58:25 sjouke Exp $ -->
+	<!-- $Id$ -->
 	<GMRTitle><GMRvar var="gm_lang[individual_report]" /></GMRTitle>
 	<GMRDescription>Prints an individual record report</GMRDescription>
 	<GMRInput name="pid" lookup="INDI" type="text" default=""><GMRvar var="gm_lang[enter_pid]" />:</GMRInput>

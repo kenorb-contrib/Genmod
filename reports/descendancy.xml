@@ -1,5 +1,5 @@
 <GMReport access="PRIV_PUBLIC" icon="descend" type="general">
-	<!-- $Id: descendancy.xml,v 1.5 2009/05/03 12:58:25 sjouke Exp $ -->
+	<!-- $Id$ -->
 	<GMRTitle><GMRvar var="gm_lang[descend_report]" /></GMRTitle>
 	<GMRDescription>Prints a descendant chart in portrait mode</GMRDescription>
 	<GMRInput name="pid" lookup="INDI" type="text" default=""><GMRvar var="gm_lang[enter_pid]" />:</GMRInput>

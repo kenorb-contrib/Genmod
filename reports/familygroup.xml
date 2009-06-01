@@ -1,5 +1,5 @@
 <GMReport access="PRIV_PUBLIC" icon="sfamily" type="fam">
-	<!-- $Id: familygroup.xml,v 1.8 2009/05/03 12:58:25 sjouke Exp $ -->
+	<!-- $Id$ -->
 	<GMRTitle><GMRvar var="gm_lang[family_group_report]" /></GMRTitle>
 	<GMRDescription>Prints a PAF style family group record</GMRDescription>
 	<!-- inputs for the report -->

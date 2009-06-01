@@ -1,5 +1,5 @@
 <GMReport access="PRIV_PUBLIC" icon="ancestry" language="english" type="indi">
-	<!-- $Id: ahnentafel.xml,v 1.7 2009/05/03 12:58:25 sjouke Exp $ -->
+	<!-- $Id$ -->
 	<GMRTitle><GMRvar var="gm_lang[ahnentafel_report]" /></GMRTitle>
 	<GMRDescription>Prints an Ahnentafel report for the selected individual</GMRDescription>
 	<GMRInput name="pid" lookup="INDI" type="text"><GMRvar var="gm_lang[enter_pid]" /></GMRInput>

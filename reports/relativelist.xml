@@ -1,5 +1,5 @@
 <GMReport access="PRIV_PUBLIC" icon="cfamily" type="indi">
-	<!-- $Id: relativelist.xml,v 1.6 2009/05/03 12:58:25 sjouke Exp $ -->
+	<!-- $Id$ -->
 	<GMRTitle><GMRvar var="gm_lang[relatives_report]" /></GMRTitle>
 	<GMRDescription>Prints a list of individuals related to a specific person</GMRDescription>
 	<GMRInput name="pid" lookup="INDI" type="text"><GMRvar var="gm_lang[enter_pid]" /></GMRInput>
