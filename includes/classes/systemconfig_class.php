@@ -21,7 +21,7 @@
  *
  * @package Genmod
  * @subpackage Admin
- * @version $Id: system_config_class.php,v 1.4 2009/01/13 19:03:10 sjouke Exp $
+ * @version $Id$
  */
 
 if (stristr($_SERVER["SCRIPT_NAME"],basename(__FILE__))) {

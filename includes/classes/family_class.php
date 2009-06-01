@@ -23,7 +23,7 @@
  *
  * @package Genmod
  * @subpackage DataModel
- * @version $Id: family_class.php,v 1.27 2008/02/08 22:47:32 sjouke Exp $
+ * @version $Id$
  */
  
 if (stristr($_SERVER["SCRIPT_NAME"],basename(__FILE__))) {

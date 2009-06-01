@@ -21,7 +21,7 @@
  *
  * @package Genmod
  * @subpackage DataModel
- * @version $Id: note_class.php,v 1.2 2009/03/29 13:20:11 sjouke Exp $
+ * @version $Id$
  */
 
 if (stristr($_SERVER["SCRIPT_NAME"],basename(__FILE__))) {

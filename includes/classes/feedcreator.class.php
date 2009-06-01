@@ -24,7 +24,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  * @author www.bitfolge.de
  * @package Genmod
  * @subpackage RSS
- * @version $Id: feedcreator.class.php,v 1.2 2007/01/11 21:53:41 roland-d Exp $
+ * @version $Id$
 ****************************************************************************
 
 
