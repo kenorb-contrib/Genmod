@@ -32,7 +32,7 @@
 require "config.php";
 
 global $TEXT_DIRECTION;
-include "includes/functions_edit.php";
+include "includes/functions/functions_edit.php";
 
 // Remove slashes
 if (isset($ufirstname)) $ufirstname = stripslashes($ufirstname);

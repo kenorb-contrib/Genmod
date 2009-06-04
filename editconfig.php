@@ -150,20 +150,14 @@ print_header($gm_lang["configure_head"]);
 		}
 						
 		if (!$error_db && !$error_db2 && !$error_db3 && !$error_indexdir && !$error_url && !$error_ali && !$error_ali_login) {
-			// First see what values are changed: only for values in the config.sys file we must rewrite that file
-			$db_configs = $SystemConfig->GetConfigFileParmList();
-			foreach ($db_configs as $key => $parm) {
-				if (!isset($CONFIG_PARMS[$CONFIG["SERVER_URL"]][$parm]) || $CONFIG[$parm] != $CONFIG_PARMS[$CONFIG["SERVER_URL"]][$parm]) {
-					$config_file_update = true;
-					break;
-				}
-			}
-			$CONFIG_PARMS[$CONFIG["SERVER_URL"]] = $CONFIG;
 			
-			if (!StoreConfig($CONFIG["SERVER_URL"], $config_file_update)) {
+			
+			if (!$SystemConfig->StoreConfig($CONFIG)) {
 				$message .= "<span class=\"error\">".$gm_lang["gm_config_write_error"]."</span>";
 				$error_cnf = true;
 			}
+			
+			$CONFIG_PARMS[$CONFIG["SERVER_URL"]] = $CONFIG;
 			
 			// Set English to active as it always needs to be active
 			$NEW_LANGS["english"] = "english";

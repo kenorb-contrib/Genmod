@@ -656,7 +656,7 @@ function GetChangedDate($datestr) {
 					if ($day != "") $Dt = $day;
 				}
 				else {
-					if (!function_exists("ConvertHdate")) require_once("includes/functions_date_hebrew.php");
+					if (!function_exists("ConvertHdate")) require_once("includes/functions/functions_date_hebrew.php");
 					$datestr = ConvertHdate($dstr_beg, $dstr_end, $day, $month, $year);
 
 					$Dt = "";

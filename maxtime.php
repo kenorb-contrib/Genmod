@@ -64,7 +64,7 @@ else {
 		print "<script>document.getElementById('max_progress').innerHTML='".$secs."';</script>";
 		flush();
 		@ob_flush();
-		$SystemConfig->StoreConfigValue('max_execution_time', $secs);
+		$SystemConfig->SetConfigDBValue('max_execution_time', $secs);
 		sleep(1);
 	}
 	print $gm_lang["maxtime_lower"];
