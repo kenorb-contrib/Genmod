@@ -54,14 +54,13 @@ print_header($gm_lang["config_maint"]);
 <div id="content">
 	<?php
 	if ($action == "update" && isset($delconf)) {
-		if (FileIsWriteable("config.php")) {
-			foreach ($delconf as $key => $value) {
-				print "deleting".$value;
-				unset ($CONFIG_PARMS[trim($value)]);
+		foreach ($delconf as $key => $value) {
+			if (!$SystemConfig->DeleteConfig($value)) {
+				$message = "<span class=\"error\">".$gm_lang["gm_config_write_error"]."</span>";
+				break;
 			}
-			StoreConfig();
+			else unset($CONFIG_PARMS[$value]);
 		}
-		else $message = "<span class=\"error\">".$gm_lang["gm_config_write_error"]."</span>";
 	}
 	?>
 	<form method="post" name="configform" action="config_maint.php">

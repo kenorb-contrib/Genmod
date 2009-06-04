@@ -225,7 +225,6 @@ $CONFIG_VARS[] = "DBUSER";
 $CONFIG_VARS[] = "DBPASS";
 $CONFIG_VARS[] = "DBNAME";
 $CONFIG_VARS[] = "INDEX_DIRECTORY";
-$CONFIG_VARS[] = "GM_DATABASE";
 $CONFIG_VARS[] = "DBPERSIST";
 $CONFIG_VARS[] = "TBLPREFIX";
 $CONFIG_VARS[] = "AUTHENTICATION_MODULE";
@@ -285,7 +284,7 @@ if (empty($SERVER_URL)) {
 	$SERVER_URL .= dirname($SCRIPT_NAME)."/";
 	$SERVER_URL = stripslashes($SERVER_URL);
 }
-//require_once($GM_BASE_DIRECTORY."modules/gallery2/main.php");
+
 //--load common functions
 require_once($GM_BASE_DIRECTORY."includes/functions/functions.php");
 require_once($GM_BASE_DIRECTORY."includes/functions/functions_language.php");
@@ -788,13 +787,6 @@ if ((strstr($SCRIPT_NAME, "editconfig.php")===false) &&(strstr($SCRIPT_NAME, "ed
 		$_SESSION["timediff"] = 0;
 	}
    
-	//-- load any editing changes
-	if ($Users->userCanEdit($gm_username)) {
-		if (!isset($_SESSION['changes'])) $_SESSION['changes'] = array();
-		$changes = $_SESSION['changes'];
-	}
-//	if (empty($LOGIN_URL)) $LOGIN_URL = "login.php";
-
 }
 
 //-- load the user specific theme
@@ -847,6 +839,7 @@ if ((time() - $_SESSION["check_login"]) > 900) {
 // Check for the presence of Greybox
 if (is_dir("modules/greybox/")) $USE_GREYBOX = true;
 else $USE_GREYBOX = false;
+
 // Define the function to autoload the classes
 function __autoload($classname) {
 	global $GM_BASE_DIRECTORY;
