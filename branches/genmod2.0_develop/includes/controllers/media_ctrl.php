@@ -90,21 +90,20 @@ class MediaControllerRoot extends BaseController {
 	 * Add a new favorite for the action user
 	 */
 	function addFavorite() {
-		global $GEDCOM;
+		global $GEDCOMID, $Favorites;
+		global $Favorites;
 		if (empty($this->uname)) return;
 		if (!empty($_REQUEST["mid"])) {
 			$mid = strtoupper($_REQUEST["mid"]);
 			$mediarec = FindMediaRecord($mid);
 			if ($mediarec) {
-				$favorite = array();
-				$favorite["username"] = $this->uname;
-				$favorite["type"] = "OBJE";
-				$favorite["gid"] = $mid;
-				$favorite["file"] = $GEDCOM;
-				$favorite["url"] = "";
-				$favorite["title"] = $this->media->m_titl;
-				$favorite["note"] = "";
-				addFavorite($favorite);
+				$favorite = new Favorite();
+				$favorite->username = $this->uname;
+				$favorite->gid = $mid;
+				$favorite->type = 'OBJE';
+				$favorite->file = $GEDCOMID;
+				$favorite->title = $this->media->m_titl;
+				$favorite->SetFavorite();
 			}
 		}
 	}

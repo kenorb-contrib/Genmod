@@ -62,15 +62,17 @@ class FamilyRoot extends BaseController
 			$pbwidth,
 			$pbheight,
 			$bheight,
-			$GEDCOM,
 			$famlist,
+			$GEDCOM,
+			$GEDCOMID,
 			$gm_lang,
 			$CONTACT_EMAIL,
 			$show_famlink,
 			$show_changes,
 			$ENABLE_CLIPPINGS_CART,
 			$Users,
-			$SHOW_ID_NUMBERS
+			$SHOW_ID_NUMBERS,
+			$Favorites
 		;
 		
 		parent::__construct();
@@ -143,16 +145,12 @@ class FamilyRoot extends BaseController
 				$_REQUEST['gid'] = strtoupper($_REQUEST['gid']);
 				$indirec = FindGedcomRecord($_REQUEST['gid']);
 				if ($indirec) {
-					$favorite = array(
-						'username' => $this->uname,
-						'gid' => $_REQUEST['gid'],
-						'type' => 'FAM',
-						'file' => $GEDCOM,
-						'url' => '',
-						'note' => '',
-						'title' => ''
-					);
-					addFavorite($favorite);
+					$favorite = new Favorite();
+					$favorite->username = $this->uname;
+					$favorite->gid = $_REQUEST['gid'];
+					$favorite->type = 'FAM';
+					$favorite->file = $GEDCOMID;
+					$favorite->SetFavorite();
 				}
 			}
 		}

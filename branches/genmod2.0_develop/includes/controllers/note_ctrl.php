@@ -106,21 +106,18 @@ class NoteControllerRoot extends BaseController {
 	 * Add a new favorite for the action user
 	 */
 	function addFavorite() {
-		global $GEDCOM;
+		global $GEDCOMID, $Favorites;
 		if (empty($this->uname)) return;
 		if (!empty($_REQUEST["oid"])) {
 			$oid = strtoupper($_REQUEST["oid"]);
 			$indirec = FindOtherRecord($oid);
 			if ($indirec) {
-				$favorite = array();
-				$favorite["username"] = $this->uname;
-				$favorite["gid"] = $oid;
-				$favorite["type"] = "NOTE";
-				$favorite["file"] = $GEDCOM;
-				$favorite["url"] = "";
-				$favorite["note"] = "";
-				$favorite["title"] = "";
-				addFavorite($favorite);
+				$favorite = new Favorite();
+				$favorite->username = $this->uname;
+				$favorite->gid = $oid;
+				$favorite->type = 'NOTE';
+				$favorite->file = $GEDCOMID;
+				$favorite->SetFavorite();
 			}
 		}
 	}

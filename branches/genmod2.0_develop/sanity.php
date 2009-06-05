@@ -308,12 +308,12 @@ if (!empty($check_oldgeds)) {
 	// 4 - Language variable name of the message that this table contains records of non-existent gedcoms
 	$gedcheck = array();
 	$gedcheck[] = array("a_gedfile", "actions", "geds", "sc_oldged_actions");
-	$gedcheck[] = array("b_username", "blocks", "gednames", "sc_oldged_blocks");
+	$gedcheck[] = array("b_username", "blocks", "geds", "sc_oldged_blocks");
 	$gedcheck[] = array("ch_gedfile", "changes", "geds", "sc_oldged_changes");
 	$gedcheck[] = array("d_file", "dates", "geds", "sc_oldged_dates");
-	$gedcheck[] = array("ge_gedcom", "eventcache", "gednames", "sc_oldged_cache");
+	$gedcheck[] = array("ge_file", "eventcache", "geds", "sc_oldged_cache");
 	$gedcheck[] = array("f_file", "families", "geds", "sc_oldged_fams");
-	$gedcheck[] = array("fv_file", "favorites", "gednames", "sc_oldged_favs");
+	$gedcheck[] = array("fv_file", "favorites", "geds", "sc_oldged_favs");
 	$gedcheck[] = array("gc_gedcom", "gedconf", "gednames", "sc_oldged_gedconf");
 	$gedcheck[] = array("i_file", "individuals", "geds", "sc_oldged_indis");
 	$gedcheck[] = array("if_file", "individual_family", "geds", "sc_oldged_indifamily");

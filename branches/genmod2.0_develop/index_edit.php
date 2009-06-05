@@ -237,17 +237,16 @@ if ($action=="update") {
 
 // NOTE: Store the changed userfavorite
 if ($action == "storefav") {
-	$favorite["username"] = $username;
-	$favorite["gid"] = $id;
-	$favorite["type"] = $type;
-	$favorite["file"] = $file;
-	if (isset($favurl)) $favorite["url"] = $favurl;
-	else $favorite["url"] = "";
-	if (isset($favnote)) $favorite["note"] = $favnote;
-	else $favorite["note"] = "";
-	if (isset($favtitle)) $favorite["title"] = $favtitle;
-	else $favorite["title"] = "";
-	if (EditFavorite($favorite)) { ?>
+	$favorite = new favorite();
+	$favorite->username = $username;
+	$favorite->id = $id;
+	$favorite->gid = $gid;
+	$favorite->type = $type;
+	$favorite->file = $file;
+	if (isset($favurl)) $favorite->url = $favurl;
+	if (isset($favnote)) $favorite->note = $favnote;
+	if (isset($favtitle)) $favorite->title = $favtitle;
+	if ($favorite->SetFavorite()) { ?>
 		<script language="JavaScript" type="text/javascript">
 		opener.location.reload();
 		window.close();

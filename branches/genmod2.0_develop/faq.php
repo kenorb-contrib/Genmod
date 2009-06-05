@@ -65,15 +65,15 @@ if ($canconfig && $adminedit) {?>
 					}
 				}
 			}
-			$sql = "UPDATE ".$TBLPREFIX."blocks SET b_order='".$order."', b_config='".$DBCONN->EscapeQuery(serialize($header))."' WHERE b_id='".$pidh."' and b_username='".$GEDCOM."' and b_location='header'";
+			$sql = "UPDATE ".$TBLPREFIX."blocks SET b_order='".$order."', b_config='".$DBCONN->EscapeQuery(serialize($header))."' WHERE b_id='".$pidh."' and b_username='".$GEDCOMID."' and b_location='header'";
 			$res = NewQuery($sql);
-			$sql = "UPDATE ".$TBLPREFIX."blocks SET b_order='".$order."', b_config='".$DBCONN->EscapeQuery(serialize($body))."' WHERE b_id='".$pidb."'  and b_username='".$GEDCOM."' and b_location='body'";
+			$sql = "UPDATE ".$TBLPREFIX."blocks SET b_order='".$order."', b_config='".$DBCONN->EscapeQuery(serialize($body))."' WHERE b_id='".$pidb."'  and b_username='".$GEDCOMID."' and b_location='body'";
 			$res = NewQuery($sql);
 			WriteToLog("FAQ-> FAQ item has been edited.<br />Header ID: ".$pidh.".<br />Body ID: ".$pidb, "I", "G", $GEDCOM);
 			$action = "show";
 		}
 		else if ($type == "delete") {
-			$sql = "DELETE FROM ".$TBLPREFIX."blocks WHERE b_order='".$id."' AND b_name='faq' AND b_username='".$GEDCOM."'";
+			$sql = "DELETE FROM ".$TBLPREFIX."blocks WHERE b_order='".$id."' AND b_name='faq' AND b_username='".$GEDCOMID."'";
 			$res = NewQuery($sql);
 			WriteToLog("FAQ-> FAQ item has been deleted.<br />Header ID: ".$pidh.".<br />Body ID: ".$pidb, "I", "G", $GEDCOM);
 			$action = "show";
@@ -91,9 +91,9 @@ if ($canconfig && $adminedit) {?>
 				}
 			}
 			$newid = GetNextId("blocks", "b_id");
-			$sql = "INSERT INTO ".$TBLPREFIX."blocks VALUES ($newid, '".$GEDCOM."', 'header', '$order', 'faq', '".$DBCONN->EscapeQuery(serialize($header))."')";
+			$sql = "INSERT INTO ".$TBLPREFIX."blocks VALUES ($newid, '".$GEDCOMID."', 'header', '$order', 'faq', '".$DBCONN->EscapeQuery(serialize($header))."')";
 			$res = NewQuery($sql);
-			$sql = "INSERT INTO ".$TBLPREFIX."blocks VALUES (".($newid+1).", '".$GEDCOM."', 'body', '".$order."', 'faq', '".$DBCONN->EscapeQuery(serialize($body))."')";
+			$sql = "INSERT INTO ".$TBLPREFIX."blocks VALUES (".($newid+1).", '".$GEDCOMID."', 'body', '".$order."', 'faq', '".$DBCONN->EscapeQuery(serialize($body))."')";
 			$res = NewQuery($sql);
 			WriteToLog("FAQ-> FAQ item has been added.<br />Header ID: ".$newid.".<br />Body ID: ".($newid+1), "I", "G", $GEDCOM);
 			$action = "show";

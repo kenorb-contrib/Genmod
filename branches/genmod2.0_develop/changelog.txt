@@ -8,6 +8,7 @@
 	# $Id$
 =====================================================================
 Version 2.0 beta 1
+- Fixed note favorites don't display in menu and blocks (sjouke)
 - Fixed various language files contain English texts (sjouke) 
 
 Version 1.7 final

@@ -110,21 +110,18 @@ class SourceControllerRoot extends BaseController {
 	 * Add a new favorite for the action user
 	 */
 	function addFavorite() {
-		global $GEDCOM;
+		global $GEDCOMID, $Favorites;
 		if (empty($this->uname)) return;
 		if (!empty($_REQUEST["gid"])) {
 			$gid = strtoupper($_REQUEST["gid"]);
 			$indirec = FindSourceRecord($gid);
 			if ($indirec) {
-				$favorite = array();
-				$favorite["username"] = $this->uname;
-				$favorite["gid"] = $gid;
-				$favorite["type"] = "SOUR";
-				$favorite["file"] = $GEDCOM;
-				$favorite["url"] = "";
-				$favorite["note"] = "";
-				$favorite["title"] = "";
-				addFavorite($favorite);
+				$favorite = new Favorite();
+				$favorite->username = $this->uname;
+				$favorite->gid = $gid;
+				$favorite->type = 'SOUR';
+				$favorite->file = $GEDCOMID;
+				$favorite->SetFavorite();
 			}
 		}
 	}
