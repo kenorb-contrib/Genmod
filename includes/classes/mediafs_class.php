@@ -251,7 +251,6 @@ class MediaFS {
 				$files[$file]["filedata"] = new MFile($file);
 			}
 			return $files;
-			print_r($files);
 		}
 	}
 	

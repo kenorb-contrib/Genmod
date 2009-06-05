@@ -713,7 +713,6 @@ if ($action=="filter") {
 			print "\n\t\t<tr><td class=\"list_value_wrap\"><ul>";
 			foreach ($note_controller->notelist as $key => $note) {
 				SwitchGedcom($note->gedcomid);
-				print_r($note);
 				if (DisplayDetailsByID($key, "NOTE", 1, true)) {
 					print "<li>";
 				    print "<a href=\"#\" onclick=\"sndReq(document.getElementById('dummy'), 'lastused', 'type', 'NOTE', 'id', '".JoinKey($note->GetXref(), $GEDCOMID)."'); pasteid('".$note->GetXref()."'); return false;\"><span class=\"list_item\">".PrintReady($note->GetTitle()." (".$note->GetXref().")")."</span></a>\n";

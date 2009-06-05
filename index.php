@@ -112,6 +112,7 @@ else $user = $Users->getUser($uname);
 if (empty($command)) $command="user";
 
 if (!empty($uname)) {
+	if ($action == "addfav" || $action == "deletefav") $Favorites = new Favorites();
 	//-- add favorites action
 	if (($action=="addfav")&&(!empty($gid))) {
 		$gid = strtoupper($gid);
@@ -124,16 +125,16 @@ if (!empty($uname)) {
 				if ($command=="user") $favtype = "user";
 				else $favtype = "gedcom";
 			}
-			if ($favtype=="gedcom") $favtype = $GEDCOM;
-			else $favtype=$uname;
-			$favorite["username"] = $favtype;
-			$favorite["gid"] = $gid;
-			$favorite["type"] = trim($match[2]);
-			$favorite["file"] = $GEDCOM;
-			$favorite["url"] = "";
-			$favorite["note"] = $favnote;
-			$favorite["title"] = "";
-			addFavorite($favorite);
+			$favorite = new Favorite();
+			if ($favtype == "gedcom") $favorite->username = "";
+			else $favorite->username = $uname;
+			$favorite->gid = $gid;
+			$favorite->type = trim($match[2]);
+			$favorite->file = $GEDCOMID;
+			$favorite->url = "";
+			$favorite->note = $favnote;
+			$favorite->title = "";
+			$favorite->SetFavorite();
 		}
 	}
 	if (($action=="addfav")&&(!empty($url))) {
@@ -144,19 +145,19 @@ if (!empty($uname)) {
 			if ($command=="user") $favtype = "user";
 			else $favtype = "gedcom";
 		}
-		if ($favtype=="gedcom") $favtype = $GEDCOM;
-		else $favtype=$uname;
-		$favorite["username"] = $favtype;
-		$favorite["gid"] = "";
-		$favorite["type"] = "URL";
-		$favorite["file"] = $GEDCOM;
-		$favorite["url"] = $url;
-		$favorite["note"] = $favnote;
-		$favorite["title"] = $favtitle;
-		addFavorite($favorite);
+		$favorite = new Favorite();
+		if ($favtype == "gedcom") $favorite->username = "";
+		else $favorite->username = $uname;
+		$favorite->gid = "";
+		$favorite->type = "URL";
+		$favorite->file = $GEDCOMID;
+		$favorite->url = $url;
+		$favorite->note = $favnote;
+		$favorite->title = $favtitle;
+		$favorite->SetFavorite();
 	}
 	if (($action=="deletefav")&&(isset($fv_id))) {
-		deleteFavorite($fv_id);
+		$Favorites->deleteFavorite($fv_id);
 	}
 	else if ($action=="deletemessage") {
 		if (isset($message_id)) {

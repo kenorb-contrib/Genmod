@@ -27,7 +27,6 @@
 if (stristr($_SERVER["SCRIPT_NAME"],basename(__FILE__))) {
 	require "../../intrusion.php";
 }
-}
  
 class Note extends GedcomRecord {
 
@@ -395,12 +394,14 @@ class Note extends GedcomRecord {
 		}
 	}
 	
-	function PrintListNote() {
+	function PrintListNote($len=60) {
 		global $GEDCOM, $SHOW_ID_NUMBERS, $GEDCOM, $TEXT_DIRECTION;
 		
+		if (!$this->disp) return false;
+
 		if (begRTLText($this->GetTitle())) print "\n\t\t\t<li class=\"rtl\" dir=\"rtl\">";
 		else print "\n\t\t\t<li class=\"ltr\" dir=\"ltr\">";
-		print "\n\t\t\t<a href=\"note.php?oid=".$this->xref."&amp;ged=".$GEDCOM."\" class=\"list_item\">".PrintReady($this->GetTitle(60));
+		print "\n\t\t\t<a href=\"note.php?oid=".$this->xref."&amp;ged=".$GEDCOM."\" class=\"list_item\">".PrintReady($this->GetTitle($len));
 		if ($SHOW_ID_NUMBERS) {
 			if ($TEXT_DIRECTION=="ltr") print " &lrm;(".$this->GetXref().")&lrm;";
 			else print " &rlm;(".$this->GetXref().")&rlm;";

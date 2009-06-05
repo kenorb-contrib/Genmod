@@ -840,7 +840,7 @@ function print_pedigree_person($pid, $style=1, $show_famlink=true, $count=0, $pe
  * @param boolean $use_alternate_styles
  */
 function print_header($title, $head="",$use_alternate_styles=true) {
-	global $gm_lang, $bwidth, $gm_username, $Users;
+	global $gm_lang, $bwidth, $gm_username, $Users, $Favorites;
 	global $HOME_SITE_URL, $HOME_SITE_TEXT, $SERVER_URL;
 	global $BROWSERTYPE, $indilist, $INDILIST_RETRIEVED;
 	global $view, $cart, $menubar, $USE_GREYBOX;
@@ -1073,6 +1073,11 @@ var whichhelp = 'help_<?php print basename($SCRIPT_NAME)."&amp;action=".$action;
 	 // print "<div id=\"container\">";
 	 print "<!-- begin header section -->\n";
 	 include("includes/values/include_top.php");
+	 
+	 // Initialize the favorites class here, as it always comes with the menus.
+	 // Exception: index_edit for editing a user favorite.
+	 $Favorites = new Favorites();
+	 
 	 if ($view!="preview") include($menubar);
 	 else include($print_headerfile);
 	 print "<!-- end header section -->\n";
@@ -4554,4 +4559,117 @@ function PrintFilterEvent($filterev) {
 	print ">".$gm_lang["custom_event"]."</option>\n";
 	print "</select>\n";
 }
+function PrintBlockFavorites($userfavs, $side, $index, $style) {
+	global $GEDCOM, $command, $Users, $gm_username, $gm_lang;
+	
+	$mygedcom = $GEDCOM;
+	$current_gedcom = $GEDCOM;
+	foreach($userfavs as $key=>$favorite) {
+		if (isset($favorite->id)) $key=$favorite->id;
+		SwitchGedcom($favorite->file);
+		if ($favorite->type=="URL") {
+			print "<div id=\"boxurl".$key.".0\" class=\"person_box";
+			print "\"><ul>\n";
+			print "<li><a href=\"".$favorite->url."\">".PrintReady($favorite->title)."</a></li>";
+			print "</ul>";
+			print "<span class=\"favorite_padding\">".PrintReady($favorite->note)."</span>";
+			print "</div>\n";
+		}
+		else {
+			if (DisplayDetailsByID($favorite->gid, $favorite->type, 1, true)) {
+				$indirec = FindGedcomRecord($favorite->gid);
+				if ($favorite->type=="INDI") {
+					print "<div id=\"box".$favorite->gid.".0\" class=\"person_box";
+					if (preg_match("/1 SEX F/", $indirec)>0) print "F";
+					else if (preg_match("/1 SEX M/", $indirec)>0) print "";
+					else print "NN";
+					print "\">\n";
+					print_pedigree_person($favorite->gid, $style, 1, $key);
+//					print "</div>\n";
+					if (!empty($favorite->note)) print "<span class=\"favorite_padding\">".PrintReady($gm_lang["note"].": ".$favorite->note)."</span>";
+					print "</div>\n";
+				}
+				if ($favorite->type=="FAM") {
+					print "<div id=\"box".$favorite->gid.".0\" class=\"person_box";
+					print "\"><ul>\n";
+					print_list_family($favorite->gid, array(GetFamilyDescriptor($favorite->gid), get_gedcom_from_id($favorite->file)));
+					print "</ul>";
+					if (!empty($favorite->note)) print "<span class=\"favorite_padding\">".PrintReady($gm_lang["note"].": ".$favorite->note)."</span>";
+					print "</div>\n";
+				}
+				if ($favorite->type=="SOUR") {
+					print "<div id=\"box".$favorite->gid.".0\" class=\"person_box";
+					print "\"><ul>\n";
+					print_list_source($favorite->gid, array("name"=>GetSourceDescriptor($favorite->gid, $indirec), "gedfile"=>$favorite->file));
+					print "</ul>";
+					if (!empty($favorite->note)) print "<span class=\"favorite_padding\">".PrintReady($gm_lang["note"].": ".$favorite->note)."</span>";
+					print "</div>\n";
+				}
+				if ($favorite->type=="OBJE") {
+					print "<div id=\"box".$favorite->gid.".0\" class=\"person_box";
+					print "\"><ul>\n";
+					print_media_links("0 OBJE @".$favorite->gid."@", 0);
+					print "</ul>";
+					if (!empty($favorite->note)) print "<span class=\"favorite_padding\">".PrintReady($gm_lang["note"].": ".$favorite->note)."</span>";
+					print "</div>\n";
+				}
+				if ($favorite->type=="NOTE") {
+					print "<div id=\"box".$favorite->gid.".0\" class=\"person_box";
+					print "\"><ul>\n";
+					$note_controller = new NoteController($favorite->gid);
+						$note_controller->note->PrintListNote(80);
+					print "</ul>";
+					if (!empty($favorite->note)) print "<span class=\"favorite_padding\">".PrintReady($gm_lang["note"].": ".$favorite->note)."</span>";
+					print "</div>\n";
+				}
+			}
+			if ($command=="user" || $Users->userIsAdmin($gm_username)) {
+				if (!empty($favorite->note)) print "&nbsp;&nbsp;";
+				print "<a class=\"font9\" href=\"index.php?command=$command&amp;action=deletefav&amp;fv_id=".$key."\" onclick=\"return confirm('".$gm_lang["confirm_fav_remove"]."');\">".$gm_lang["remove"]."</a>\n";
+				print "&nbsp;";
+				print "<a class=\"font9\" href=\"javascript: ".$gm_lang["config_block"]."\" onclick=\"window.open('index_edit.php?favid=$key&amp;name=$gm_username&amp;command=$command&amp;action=configure&amp;side=$side&amp;index=$index', '', 'top=50,left=50,width=600,height=400,scrollbars=1,resizable=1'); return false;\">".$gm_lang["edit"]."</a>";
+			}
+			SwitchGedcom();
+		}
+	}
+}
+function PrintBlockAddFavorite($command, $type) {
+	global $GM_IMAGE_DIR, $GM_IMAGES, $gm_lang, $GEDCOMID;
+	
+	?>
+		<script language="JavaScript" type="text/javascript">
+		<!--
+		var pastefield;
+		function paste_id(value) {
+			pastefield.value=value;
+		}
+		//-->
+		</script>
+		<br />
+	<?php
+	print_help_link("index_add_favorites_help", "qm", "add_favorite");
+	print "<b><a href=\"javascript: ".$gm_lang["add_favorite"]." \" onclick=\"expand_layer('add_".$type."_fav'); return false;\"><img id=\"add_ged_fav_img\" src=\"".$GM_IMAGE_DIR."/".$GM_IMAGES["plus"]["other"]."\" border=\"0\" />&nbsp;".$gm_lang["add_favorite"]."</a></b>";
+	print "<br /><div id=\"add_".$type."_fav\" style=\"display: none;\">\n";
+	print "<form name=\"addfavform\" method=\"get\" action=\"index.php\">\n";
+	print "<input type=\"hidden\" name=\"action\" value=\"addfav\" />\n";
+	print "<input type=\"hidden\" name=\"command\" value=\"$command\" />\n";
+	print "<input type=\"hidden\" name=\"favtype\" value=\"".$type."\" />\n";
+	print "<table border=\"0\" cellspacing=\"0\" width=\"100%\"><tr><td>".$gm_lang["add_fav_enter_id"]." <br />";
+	print "<input class=\"pedigree_form\" type=\"text\" name=\"gid\" id=\"gid\" size=\"3\" value=\"\" />";
+	PrintFindIndiLink("gid",$GEDCOMID);
+	print_findfamily_link("gid");
+	print_findsource_link("gid");
+	print_findobject_link("gid");
+	print_findnote_link("gid");
+	print "\n<br />".$gm_lang["add_fav_or_enter_url"];
+	print "\n<br />".$gm_lang["url"]."<input type=\"text\" name=\"url\" size=\"40\" value=\"\" />";
+	print "\n<br />".$gm_lang["title"]." <input type=\"text\" name=\"favtitle\" size=\"40\" value=\"\" />";
+	print "\n</td><td>";
+	print "\n".$gm_lang["add_fav_enter_note"];
+	print "\n<br /><textarea name=\"favnote\" rows=\"6\" cols=\"40\"></textarea>";
+	print "</td></tr></table>\n";
+	print "\n<br /><input type=\"submit\" value=\"".$gm_lang["add"]."\" style=\"font-size: 8pt; \" />";
+	print "\n</form></div>\n";
+}
+
 ?>

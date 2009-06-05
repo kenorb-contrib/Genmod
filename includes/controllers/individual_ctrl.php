@@ -583,21 +583,19 @@ class IndividualControllerRoot extends BaseController {
 	 * Add a new favorite for the action user
 	 */
 	function addFavorite() {
-		global $GEDCOM;
+		global $GEDCOMID, $Favorites;
+		global $Favorites;
 		if (empty($this->uname)) return;
 		if (!empty($_REQUEST["gid"])) {
 			$gid = strtoupper($_REQUEST["gid"]);
 			$indirec = FindPersonRecord($gid);
 			if ($indirec) {
-				$favorite = array();
-				$favorite["username"] = $this->uname;
-				$favorite["gid"] = $gid;
-				$favorite["type"] = "INDI";
-				$favorite["file"] = $GEDCOM;
-				$favorite["url"] = "";
-				$favorite["note"] = "";
-				$favorite["title"] = "";
-				addFavorite($favorite);
+				$favorite = new Favorite();
+				$favorite->username = $this->uname;
+				$favorite->gid = $gid;
+				$favorite->type = 'INDI';
+				$favorite->file = $GEDCOMID;
+				$favorite->SetFavorite();
 			}
 		}
 	}

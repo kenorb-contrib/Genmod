@@ -2395,58 +2395,58 @@ function FindRinId($rin) {
 function DeleteGedcom($ged) {
 	global $INDEX_DIRECTORY, $TBLPREFIX, $DBCONN, $GEDCOMS;
 
-	$dbged = $GEDCOMS[$ged]["id"];
-	$sql = "DELETE FROM ".$TBLPREFIX."blocks WHERE b_username='".$DBCONN->EscapeQuery($ged)."'";
+	$gedid = $GEDCOMS[$ged]["id"];
+	$sql = "DELETE FROM ".$TBLPREFIX."blocks WHERE b_username='".$DBCONN->EscapeQuery($gedid)."'";
 	$res = NewQuery($sql);
-	$sql = "DELETE FROM ".$TBLPREFIX."changes WHERE ch_gedfile='".$DBCONN->EscapeQuery($dbged)."'";
+	$sql = "DELETE FROM ".$TBLPREFIX."changes WHERE ch_gedfile='".$DBCONN->EscapeQuery($gedid)."'";
 	$res = NewQuery($sql);
-	$sql = "DELETE FROM ".$TBLPREFIX."dates WHERE d_file='".$DBCONN->EscapeQuery($dbged)."'";
+	$sql = "DELETE FROM ".$TBLPREFIX."dates WHERE d_file='".$DBCONN->EscapeQuery($gedid)."'";
 	$res = NewQuery($sql);
-	$sql = "DELETE FROM ".$TBLPREFIX."eventcache WHERE ge_gedcom='".$DBCONN->EscapeQuery(get_gedcom_from_id($dbged))."'";
+	$sql = "DELETE FROM ".$TBLPREFIX."eventcache WHERE ge_file='".$DBCONN->EscapeQuery($gedid)."'";
 	$res = NewQuery($sql);
-	$sql = "DELETE FROM ".$TBLPREFIX."families WHERE f_file='".$DBCONN->EscapeQuery($dbged)."'";
+	$sql = "DELETE FROM ".$TBLPREFIX."families WHERE f_file='".$DBCONN->EscapeQuery($gedid)."'";
 	$res = NewQuery($sql);
-	$sql = "DELETE FROM ".$TBLPREFIX."favorites WHERE fv_file='".$DBCONN->EscapeQuery(get_gedcom_from_id($ged))."'";
+	$sql = "DELETE FROM ".$TBLPREFIX."favorites WHERE fv_file='".$DBCONN->EscapeQuery($gedid)."'";
 	$res = NewQuery($sql);
-	$sql = "DELETE FROM ".$TBLPREFIX."individual_family WHERE if_file='".$DBCONN->EscapeQuery($dbged)."'";
+	$sql = "DELETE FROM ".$TBLPREFIX."individual_family WHERE if_file='".$DBCONN->EscapeQuery($gedid)."'";
 	$res = NewQuery($sql);
-	$sql = "DELETE FROM ".$TBLPREFIX."individuals WHERE i_file='".$DBCONN->EscapeQuery($dbged)."'";
+	$sql = "DELETE FROM ".$TBLPREFIX."individuals WHERE i_file='".$DBCONN->EscapeQuery($gedid)."'";
 	$res = NewQuery($sql);
-	$sql = "DELETE FROM ".$TBLPREFIX."asso WHERE as_file='".$DBCONN->EscapeQuery($dbged)."'";
+	$sql = "DELETE FROM ".$TBLPREFIX."asso WHERE as_file='".$DBCONN->EscapeQuery($gedid)."'";
 	$res = NewQuery($sql);
-	$sql = "DELETE FROM ".$TBLPREFIX."log WHERE l_gedcom='".$DBCONN->EscapeQuery(get_gedcom_from_id($dbged))."'";
+	$sql = "DELETE FROM ".$TBLPREFIX."log WHERE l_gedcom='".$DBCONN->EscapeQuery($ged)."'";
 	$res = NewQuery($sql);
-	$sql = "DELETE FROM ".$TBLPREFIX."media WHERE m_gedfile='".$DBCONN->EscapeQuery($dbged)."'";
+	$sql = "DELETE FROM ".$TBLPREFIX."media WHERE m_gedfile='".$DBCONN->EscapeQuery($gedid)."'";
 	$res = NewQuery($sql);
-	$sql = "DELETE FROM ".$TBLPREFIX."media_mapping WHERE mm_gedfile='".$DBCONN->EscapeQuery($dbged)."'";
+	$sql = "DELETE FROM ".$TBLPREFIX."media_mapping WHERE mm_gedfile='".$DBCONN->EscapeQuery($gedid)."'";
 	$res = NewQuery($sql);
-	$sql = "DELETE FROM ".$TBLPREFIX."names WHERE n_file='".$DBCONN->EscapeQuery($dbged)."'";
+	$sql = "DELETE FROM ".$TBLPREFIX."names WHERE n_file='".$DBCONN->EscapeQuery($gedid)."'";
 	$res = NewQuery($sql);
-	$sql = "DELETE FROM ".$TBLPREFIX."news WHERE n_username='".$DBCONN->EscapeQuery(get_gedcom_from_id($ged))."'";
+	$sql = "DELETE FROM ".$TBLPREFIX."news WHERE n_username='".$DBCONN->EscapeQuery($ged)."'";
 	$res = NewQuery($sql);
-	$sql = "DELETE FROM ".$TBLPREFIX."other WHERE o_file='".$DBCONN->EscapeQuery($dbged)."'";
+	$sql = "DELETE FROM ".$TBLPREFIX."other WHERE o_file='".$DBCONN->EscapeQuery($gedid)."'";
 	$res = NewQuery($sql);
-	$sql = "DELETE FROM ".$TBLPREFIX."other_mapping WHERE om_gedfile='".$DBCONN->EscapeQuery($dbged)."'";
+	$sql = "DELETE FROM ".$TBLPREFIX."other_mapping WHERE om_gedfile='".$DBCONN->EscapeQuery($gedid)."'";
 	$res = NewQuery($sql);
-	$sql = "DELETE FROM ".$TBLPREFIX."placelinks WHERE pl_file='".$DBCONN->EscapeQuery($dbged)."'";
+	$sql = "DELETE FROM ".$TBLPREFIX."placelinks WHERE pl_file='".$DBCONN->EscapeQuery($gedid)."'";
 	$res = NewQuery($sql);
-	$sql = "DELETE FROM ".$TBLPREFIX."places WHERE p_file='".$DBCONN->EscapeQuery($dbged)."'";
+	$sql = "DELETE FROM ".$TBLPREFIX."places WHERE p_file='".$DBCONN->EscapeQuery($gedid)."'";
 	$res = NewQuery($sql);
-	$sql = "DELETE FROM ".$TBLPREFIX."sources WHERE s_file='".$DBCONN->EscapeQuery($dbged)."'";
+	$sql = "DELETE FROM ".$TBLPREFIX."sources WHERE s_file='".$DBCONN->EscapeQuery($gedid)."'";
 	$res = NewQuery($sql);
-	$sql = "DELETE FROM ".$TBLPREFIX."source_mapping WHERE sm_gedfile='".$DBCONN->EscapeQuery($dbged)."'";
+	$sql = "DELETE FROM ".$TBLPREFIX."source_mapping WHERE sm_gedfile='".$DBCONN->EscapeQuery($gedid)."'";
 	$res = NewQuery($sql);
-	$sql = "DELETE FROM ".$TBLPREFIX."statscache WHERE gs_gedcom='".$DBCONN->EscapeQuery(get_gedcom_from_id($dbged))."'";
+	$sql = "DELETE FROM ".$TBLPREFIX."statscache WHERE gs_gedcom='".$DBCONN->EscapeQuery($ged)."'";
 	$res = NewQuery($sql);
-	$sql = "DELETE FROM ".$TBLPREFIX."counters WHERE c_id LIKE '%[".$DBCONN->EscapeQuery($dbged)."]%'";
+	$sql = "DELETE FROM ".$TBLPREFIX."counters WHERE c_id LIKE '%[".$DBCONN->EscapeQuery($gedid)."]%'";
 	$res = NewQuery($sql);
-	$sql = "DELETE FROM ".$TBLPREFIX."users_gedcoms WHERE ug_gedfile='".$DBCONN->EscapeQuery($dbged)."'";
+	$sql = "DELETE FROM ".$TBLPREFIX."users_gedcoms WHERE ug_gedfile='".$DBCONN->EscapeQuery($gedid)."'";
 	$res = NewQuery($sql);
-	$sql = "DELETE FROM ".$TBLPREFIX."actions WHERE a_gedfile='".$DBCONN->EscapeQuery($dbged)."'";
+	$sql = "DELETE FROM ".$TBLPREFIX."actions WHERE a_gedfile='".$DBCONN->EscapeQuery($gedid)."'";
 	$res = NewQuery($sql);
-	$sql = "DELETE FROM ".$TBLPREFIX."pdata WHERE pd_file='".$DBCONN->EscapeQuery($dbged)."'";
+	$sql = "DELETE FROM ".$TBLPREFIX."pdata WHERE pd_file='".$DBCONN->EscapeQuery($gedid)."'";
 	$res = NewQuery($sql);
-	$sql = "DELETE FROM ".$TBLPREFIX."soundex WHERE s_file='".$DBCONN->EscapeQuery($dbged)."'";
+	$sql = "DELETE FROM ".$TBLPREFIX."soundex WHERE s_file='".$DBCONN->EscapeQuery($gedid)."'";
 	$res = NewQuery($sql);
 }
 
@@ -2834,11 +2834,11 @@ function GetNextId($table, $field) {
  * @return array $faqs	The array containing the FAQ items
  */
 function GetFaqData($id='') {
-	global $TBLPREFIX, $GEDCOM;
+	global $TBLPREFIX, $GEDCOMID;
 	
 	$faqs = array();
 	// Read the faq data from the DB
-	$sql = "SELECT b_id, b_location, b_order, b_config FROM ".$TBLPREFIX."blocks WHERE b_username='$GEDCOM' AND (b_location='header' OR b_location = 'body')";
+	$sql = "SELECT b_id, b_location, b_order, b_config FROM ".$TBLPREFIX."blocks WHERE b_username='$GEDCOMID' AND (b_location='header' OR b_location = 'body')";
 	if ($id != '') $sql .= "AND b_order='".$id."'";
 	$res = NewQuery($sql);
 	while($row = $res->FetchAssoc()){
@@ -3661,7 +3661,7 @@ function GetChangeNames($pid) {
 
 function GetCachedEvents($action, $daysprint, $filter, $onlyBDM="no", $skipfacts) {
 	global $gm_lang, $month, $year, $day, $monthtonum, $monthstart;
-	global $GEDCOM, $DEBUG, $ASC, $IGNORE_FACTS, $IGNORE_YEAR;
+	global $GEDCOM, $GEDCOMID, $DEBUG, $ASC, $IGNORE_FACTS, $IGNORE_YEAR;
 	global $USE_RTL_FUNCTIONS, $DAYS_TO_SHOW_LIMIT;
 	global $CIRCULAR_BASE, $TBLPREFIX;
 	global $GedcomConfig;
@@ -3683,7 +3683,7 @@ function GetCachedEvents($action, $daysprint, $filter, $onlyBDM="no", $skipfacts
 //		print "Retrieve from cache";
 	}
 	else {
-		$sql = "DELETE FROM ".$TBLPREFIX."eventcache WHERE ge_cache='".$action."' AND ge_gedcom='".$GEDCOM."'";
+		$sql = "DELETE FROM ".$TBLPREFIX."eventcache WHERE ge_cache='".$action."' AND ge_file='".$GEDCOMID."'";
 		$res = NewQuery($sql);
 	}
 	
@@ -3785,7 +3785,7 @@ function GetCachedEvents($action, $daysprint, $filter, $onlyBDM="no", $skipfacts
 //		SortFacts($found_facts); No sortfacts here!
 //		reset($found_facts);
 		foreach ($found_facts as $key => $factr) {
-			$sql = "INSERT INTO ".$TBLPREFIX."eventcache VALUES('0','".mysql_real_escape_string($GEDCOM)."', '".$action."', '".$factr[0]."', '".$factr[7]."', '".$factr[6]."', '".mysql_real_escape_string($factr[1])."', '".$factr[2]."', '".$factr[3]."', '".mysql_real_escape_string($factr[4])."', '".$factr[5]."')";
+			$sql = "INSERT INTO ".$TBLPREFIX."eventcache VALUES('0','".$GEDCOMID."', '".$action."', '".$factr[0]."', '".$factr[7]."', '".$factr[6]."', '".mysql_real_escape_string($factr[1])."', '".$factr[2]."', '".$factr[3]."', '".mysql_real_escape_string($factr[4])."', '".$factr[5]."')";
 			$res = NewQuery($sql);
 			$error = mysql_error();
 			if (!empty($error)) print $error."<br />";
@@ -3797,7 +3797,7 @@ function GetCachedEvents($action, $daysprint, $filter, $onlyBDM="no", $skipfacts
 
 	$monthend = $monthstart + (60*60*24*($daysprint-1));
 	$found_facts = array();
-	$sql = "SELECT ge_gid, ge_factrec, ge_type, ge_datestamp, ge_name, ge_gender FROM ".$TBLPREFIX."eventcache WHERE ge_cache='".$action."' AND ge_gedcom='".$GEDCOM."' AND ge_datestamp BETWEEN ".$monthstart." AND ".$monthend;
+	$sql = "SELECT ge_gid, ge_factrec, ge_type, ge_datestamp, ge_name, ge_gender FROM ".$TBLPREFIX."eventcache WHERE ge_cache='".$action."' AND ge_file='".$GEDCOMID."' AND ge_datestamp BETWEEN ".$monthstart." AND ".$monthend;
 	if ($onlyBDM == "yes") $sql .= " AND ge_fact IN ('BIRT', 'DEAT', 'MARR')";
 	if ($filter == "alive") $sql .= " AND ge_isdead=0";
 	$sql .= " ORDER BY ge_order";
