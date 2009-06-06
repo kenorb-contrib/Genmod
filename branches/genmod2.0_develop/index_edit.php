@@ -38,15 +38,14 @@ global $GEDCOM_TITLE;
 
 //-- make sure that they have user status before they can use this page
 //-- otherwise have them login again
-$uname = $gm_username;
-if (empty($uname) || empty($name)) {
+if (empty($gm_username) || empty($name)) {
 	print_simple_header("");
 	print $gm_lang["access_denied"];
 	print "<div class=\"center\"><a href=\"javascript:// ".$gm_lang["close_window"]."\" onclick=\"self.close();\">".$gm_lang["close_window"]."</a></div>\n";
 	print_simple_footer();
 	exit;
 }
-if (!$Users->userIsAdmin($uname)) $setdefault=false;
+if (!$Users->userIsAdmin($gm_username)) $setdefault=false;
 
 if (!isset($action)) $action="";
 if (!isset($command)) $command="user";
@@ -89,6 +88,7 @@ $GM_BLOCKS = array();
 $httpslogin = false;
 if ((empty($LOGIN_URL) && substr($SERVER_URL,0,5) == "https") || substr($LOGIN_URL,0,5) == "https") $httpslogin = true;
 //-- load all of the blocks
+
 $d = dir("blocks");
 while (false !== ($entry = $d->read())) {
 	if (($entry!=".") && ($entry!="..") && ($entry!="CVS") && (strstr($entry, ".")==".php")) {
@@ -126,39 +126,8 @@ foreach($SortedBlocks as $key => $b) {
 $SortedBlocks = array_flip($SortedBlocks);
 
 //-- get the blocks list
-if ($command=="user") {
-	$ublocks = getBlocks($uname);
-	if (($action=="reset") || ((count($ublocks["main"])==0) && (count($ublocks["right"])==0))) {
-		$ublocks["main"] = array();
-		$ublocks["main"][] = array("print_quickstart_block", "");
-		$ublocks["main"][] = array("print_todays_events", "");
-		$ublocks["main"][] = array("print_user_messages", "");
-		$ublocks["main"][] = array("print_user_favorites", "");
-
-		$ublocks["right"] = array();
-		$ublocks["right"][] = array("print_welcome_block", "");
-		$ublocks["right"][] = array("print_random_media", "");
-		$ublocks["right"][] = array("print_upcoming_events", "");
-		$ublocks["right"][] = array("print_logged_in_users", "");
-	}
-}
-else {
-	$ublocks = getBlocks($GEDCOM);
-	if (($action=="reset") or ((count($ublocks["main"])==0) and (count($ublocks["right"])==0))) {
-		$ublocks["main"] = array();
-		$ublocks["main"][] = array("print_quickstart_block", "");
-		$ublocks["main"][] = array("print_gedcom_stats", "");
-		$ublocks["main"][] = array("print_gedcom_news", "");
-		$ublocks["main"][] = array("print_gedcom_favorites", "");
-		$ublocks["main"][] = array("review_changes_block", "");
-
-		$ublocks["right"] = array();
-		$ublocks["right"][] = array("print_gedcom_block", "");
-		$ublocks["right"][] = array("print_random_media", "");
-		$ublocks["right"][] = array("print_todays_events", "");
-		$ublocks["right"][] = array("print_logged_in_users", "");
-	}
-}
+if ($command=="user") $ublocks = new Blocks("user", $gm_username, $action);
+else $ublocks = new Blocks("gedcom", "", $action);
 
 if ($command=="user") print_simple_header($gm_lang["mygedview"]);
 else print_simple_header($GEDCOMS[$GEDCOM]["title"]);
@@ -166,7 +135,8 @@ else print_simple_header($GEDCOMS[$GEDCOM]["title"]);
 $GEDCOM_TITLE = PrintReady($GEDCOMS[$GEDCOM]["title"]);  // needed in $gm_lang["rss_descr"]
 
 if ($action=="updateconfig") {
-	$block = $ublocks[$side][$index];
+	$block = $ublocks->$side;
+	$block = $block[$index];
 	if (isset($GM_BLOCKS[$block[0]]["canconfig"]) && $GM_BLOCKS[$block[0]]["canconfig"] && isset($GM_BLOCKS[$block[0]]["config"]) && is_array($GM_BLOCKS[$block[0]]["config"])) {
 		$config = $block[1];
 		foreach($GM_BLOCKS[$block[0]]["config"] as $config_name=>$config_value) {
@@ -181,8 +151,9 @@ if ($action=="updateconfig") {
 		foreach ($config as $key => $value) {
 			if (!array_key_exists($key, $GM_BLOCKS[$block[0]]["config"])) unset($config[$key]);
 		}
-		$ublocks[$side][$index][1] = $config;
-		setBlocks($name, $ublocks, $setdefault);
+		if ($side == "main") $ublocks->main[$index][1] = $config;
+		else $ublocks->right[$index][1] = $config;
+		$ublocks->SetValues($setdefault);
 	}
 	print $gm_lang["config_update_ok"]."<br />\n";?>
 	<script language="JavaScript" type="text/javascript">
@@ -193,41 +164,39 @@ if ($action=="updateconfig") {
 }
 
 if ($action=="update") {
-	$newublocks["main"] = array();
+	$newublocks = new Blocks($command, $name, "init");
 	if (is_array($main)) {
 		foreach($main as $indexval => $b) {
 			$config = "";
 			$index = "";
-			reset($ublocks["main"]);
-			foreach($ublocks["main"] as $index=>$block) {
+			reset($ublocks->main);
+			foreach($ublocks->main as $index=>$block) {
 				if ($block[0]==$b) {
 					$config = $block[1];
 					break;
 				}
 			}
-			if ($index!="") unset($ublocks["main"][$index]);
-			$newublocks["main"][] = array($b, $config);
+			if ($index!="") unset($ublocks->main[$index]);
+			$newublocks->main[] = array($b, $config);
 		}
 	}
 
-	$newublocks["right"] = array();
 	if (is_array($right)) {
 		foreach($right as $indexval => $b) {
 			$config = "";
 			$index = "";
-			reset($ublocks["right"]);
-			foreach($ublocks["right"] as $index=>$block) {
+			reset($ublocks->right);
+			foreach($ublocks->right as $index=>$block) {
 				if ($block[0]==$b) {
 					$config = $block[1];
 					break;
 				}
 			}
-			if ($index!="") unset($ublocks["right"][$index]);
-			$newublocks["right"][] = array($b, $config);
+			if ($index!="") unset($ublocks->right[$index]);
+			$newublocks->right[] = array($b, $config);
 		}
 	}
-	$ublocks = $newublocks;
-	setBlocks($name, $ublocks, $setdefault); ?>
+	$newublocks->SetValues($setdefault);?>
 	<script language="JavaScript" type="text/javascript">
 	opener.location.reload();
 	window.close();
@@ -261,9 +230,10 @@ if ($action == "storefav") {
 	}
 }
 
-if ($action=="configure" && isset($ublocks[$side][$index])) {
-	$block = $ublocks[$side][$index];
+$block = $ublocks->$side;
+if ($action=="configure" && isset($block[$index])) {
 	
+	$block = $block[$index];
 	print "<table class=\"facts_table ".$TEXT_DIRECTION."\">";
 	print "<tr><td class=\"facts_label\">";
 	print "<h3>".$gm_lang["config_block"]."</h3>";
@@ -447,7 +417,7 @@ else {
 			if ($command=="user") print "<b>".Str2Upper($gm_lang["customize_page"])."</b>";
 			else print "<b>".Str2Upper($gm_lang["customize_gedcom_page"])."</b>";
 		print "</div>";
-		
+
 		// NOTE: Print the container
 		print "<div id=\"index_edit_container\">";
 			// NOTE: Print the arrows for moving the left block items up and down
@@ -463,7 +433,7 @@ else {
 			print "<div id=\"index_edit_left\">";
 				print "<b>".$gm_lang["main_section"]."</b>";
 				print "<select multiple=\"multiple\" id=\"main_select\" name=\"main[]\" size=\"10\" onchange=\"show_description('main_select');\">\n";
-				foreach($ublocks["main"] as $indexval => $block) {
+				foreach($ublocks->main as $indexval => $block) {
 					if (function_exists($block[0])) {
 						print "<option value=\"$block[0]\">".$GM_BLOCKS[$block[0]]["name"]."</option>\n";
 					}
@@ -495,7 +465,7 @@ else {
 			print "<div id=\"index_edit_right\">";
 				print "<b>".$gm_lang["right_section"]."</b>";
 				print "<select multiple=\"multiple\" id=\"right_select\" name=\"right[]\" size=\"10\" onchange=\"show_description('right_select');\">\n";
-				foreach($ublocks["right"] as $indexval => $block) {
+				foreach($ublocks->right as $indexval => $block) {
 					if (function_exists($block[0])) {
 						print "<option value=\"$block[0]\">".$GM_BLOCKS[$block[0]]["name"]."</option>\n";
 					}
@@ -533,7 +503,7 @@ else {
 			
 			// NOTE: Print the submit buttons
 			print "<div>";
-				if (($Users->userIsAdmin($uname))&&($command=='user')) {
+				if (($Users->userIsAdmin($gm_username))&&($command=='user')) {
 					print $gm_lang["use_blocks_for_default"]."<input type=\"checkbox\" name=\"setdefault\" value=\"1\" /><br />\n";
 				}
 				

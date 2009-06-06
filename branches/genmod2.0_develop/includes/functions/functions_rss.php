@@ -69,12 +69,12 @@ function getUpcomingEvents() {
 	global $INDEX_DIRECTORY, $USE_RTL_FUNCTIONS,$SERVER_URL;
 	global $DAYS_TO_SHOW_LIMIT, $lastcachedate;
 	global $CIRCULAR_BASE, $TBLPREFIX;
-	global $GedcomSettings;
+	global $GedcomConfig;
 
 	$dataArray[0] = $gm_lang["upcoming_events"];
-	if (!isset($lastcachedate)) $lastcachedate = $GedcomSettings->GetAllLastCacheDates();
+	if (!isset($lastcachedate)) $lastcachedate = $GedcomConfig->GetAllLastCacheDates();
 
-	if (!isset($lastcachedate)) $lastcachedate = $GedcomSettings->GetAllLastCacheDates();
+	if (!isset($lastcachedate)) $lastcachedate = $GedcomConfig->GetAllLastCacheDates();
 	if (is_array($lastcachedate) && $lastcachedate["gc_last_upcoming"] != 0) $dataArray[1] = iso8601_date($lastcachedate["gc_last_upcoming"]);
 	else $dataArray[1] = iso8601_date(time());
 
@@ -230,7 +230,7 @@ function getUpcomingEvents() {
  */
 function getTodaysEvents() {
 	global $gm_lang, $month, $year, $day, $monthtonum, $HIDE_LIVE_PEOPLE, $SHOW_ID_NUMBERS, $command, $TEXT_DIRECTION, $SHOW_FAM_ID_NUMBERS;
-	global $GM_IMAGE_DIR, $GM_IMAGES, $GEDCOM, $REGEXP_DB, $DEBUG, $ASC, $INDEX_DIRECTORY, $IGNORE_FACTS, $IGNORE_YEAR, $SERVER_URL, $lastcachedate;
+	global $GM_IMAGE_DIR, $GM_IMAGES, $GEDCOM, $REGEXP_DB, $DEBUG, $ASC, $INDEX_DIRECTORY, $IGNORE_FACTS, $IGNORE_YEAR, $SERVER_URL, $lastcachedate, $GedcomConfig;
 
 	if ($command=="user") $filter = "living";
 	else $filter = "all";
@@ -241,7 +241,7 @@ function getTodaysEvents() {
 	$daytext = "<ul>";
 	$action = "today";
 	$dataArray[0] = $gm_lang["on_this_day"];
-	if (!isset($lastcachedate)) $lastcachedate = $GedcomSettings->GetAllLastCacheDates();
+	if (!isset($lastcachedate)) $lastcachedate = $GedcomConfig->GetAllLastCacheDates();
 	if (is_array($lastcachedate) && $lastcachedate["gc_last_today"] != 0) $dataArray[1] = iso8601_date($lastcachedate["gc_last_today"]);
 	else $dataArray[1] = iso8601_date(time());
 
@@ -314,11 +314,11 @@ function getTodaysEvents() {
 function getGedcomStats() {
 	global $gm_lang, $day, $month, $year, $GEDCOM, $GEDCOMS, $ALLOW_CHANGE_GEDCOM;
 	global $command, $COMMON_NAMES_THRESHOLD, $SERVER_URL, $RTLOrd, $TBLPREFIX;
-	global $GEDCOMID, $lastcachedate;
+	global $GEDCOMID, $lastcachedate, $GedcomConfig;
 
 	$data = "";
 	$dataArray[0] = $gm_lang["gedcom_stats"] . " - " . $GEDCOMS[$GEDCOM]["title"];
-	if (!isset($lastcachedate)) $lastcachedate = $GedcomSettings->GetAllLastCacheDates();
+	if (!isset($lastcachedate)) $lastcachedate = $GedcomConfig->GetAllLastCacheDates();
 	if (is_array($lastcachedate) && $lastcachedate["gc_last_stats"] != 0) $dataArray[1] = iso8601_date($lastcachedate["gc_last_stats"]);
 	else $dataArray[1] = iso8601_date(time());
 
@@ -446,7 +446,7 @@ function getGedcomNews() {
  */
 function getTop10Surnames() {
 	global $gm_lang, $GEDCOM,$SERVER_URL;
-	global $COMMON_NAMES_ADD, $COMMON_NAMES_REMOVE, $COMMON_NAMES_THRESHOLD, $GM_BLOCKS, $command, $GM_IMAGES, $GM_IMAGE_DIR;
+	global $COMMON_NAMES_ADD, $COMMON_NAMES_REMOVE, $COMMON_NAMES_THRESHOLD, $GM_BLOCKS, $command, $GM_IMAGES, $GM_IMAGE_DIR, $GedcomConfig;
 
 	$data = "";
 	$dataArray = array();
@@ -461,7 +461,7 @@ function getTop10Surnames() {
 	if (empty($config)) $config = $GM_BLOCKS["print_block_name_top10"]["config"];
 
 	$dataArray[0] = str_replace("10", $config["num"], $gm_lang["block_top10_title"]);
-	if (!isset($lastcachedate)) $lastcachedate = $GedcomSettings->GetAllLastCacheDates();
+	if (!isset($lastcachedate)) $lastcachedate = $GedcomConfig->GetAllLastCacheDates();
 	if (is_array($lastcachedate) && $lastcachedate["gc_last_stats"] != 0) $dataArray[1] = iso8601_date($lastcachedate["gc_last_stats"]);
 	else $dataArray[1] = iso8601_date(time());
 

@@ -74,13 +74,16 @@ $db_original[$TBLPREFIX."asso"]["key"]["as_pid"] = "KEY `as_pid` (`as_pid`)";
 $db_original[$TBLPREFIX."asso"]["key"]["as_of"] = "KEY `as_of` (`as_of`)";
 $db_original[$TBLPREFIX."asso"]["key"]["as_rel"] = "KEY `as_rel` (`as_of`, `as_type`)";
 
-$db_original[$TBLPREFIX."blocks"]["row"]["b_id"]["details"] = "INT NOT NULL";
+$db_original[$TBLPREFIX."blocks"]["row"]["b_id"]["details"] = "INT NOT NULL AUTO_INCREMENT";
 $db_original[$TBLPREFIX."blocks"]["row"]["b_username"]["details"] = "VARCHAR(30) CHARACTER SET #charset# COLLATE #collate# ";
 $db_original[$TBLPREFIX."blocks"]["row"]["b_location"]["details"] = "VARCHAR(30) CHARACTER SET #charset# COLLATE #collate# ";
 $db_original[$TBLPREFIX."blocks"]["row"]["b_order"]["details"] = "TINYINT UNSIGNED";
 $db_original[$TBLPREFIX."blocks"]["row"]["b_name"]["details"] = "VARCHAR(255) CHARACTER SET #charset# COLLATE #collate# ";
 $db_original[$TBLPREFIX."blocks"]["row"]["b_config"]["details"] = "TEXT CHARACTER SET #charset# COLLATE #collate# ";
+$db_original[$TBLPREFIX."blocks"]["row"]["b_file"]["details"] = "TINYINT UNSIGNED";
 $db_original[$TBLPREFIX."blocks"]["key"]["primary"] = "PRIMARY KEY  (`b_id`)";
+$db_original[$TBLPREFIX."blocks"]["key"]["b_user"] = "KEY `b_user` (`b_username`)";
+$db_original[$TBLPREFIX."blocks"]["key"]["b_file"] = "KEY `b_file` (`b_file`)";
              
 $db_original[$TBLPREFIX."changes"]["row"]["ch_id"]["details"] = "INT NOT NULL AUTO_INCREMENT";
 $db_original[$TBLPREFIX."changes"]["row"]["ch_cid"]["details"] = "INT(11) NOT NULL DEFAULT '0'";

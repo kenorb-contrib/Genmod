@@ -70,7 +70,7 @@ class User {
 		return $this->GetUser($username, $userfields);
 	}
 	
-	function GetUser($username, $userfields="") {
+	public function GetUser($username, $userfields="") {
 		global $TBLPREFIX, $userobjects, $REGEXP_DB, $GEDCOMS, $DBLAYER, $DBCONN;
 
 		if (empty($username)) return false;
@@ -103,7 +103,7 @@ class User {
 		}
 	}
 
-	function FillUser($username, $user_data) {
+	public function FillUser($username, $user_data) {
 		global $userobjects, $TBLPREFIX;
 		
 		foreach ($user_data as $key => $user_row) {

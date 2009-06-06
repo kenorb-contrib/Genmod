@@ -89,7 +89,7 @@ class Note extends GedcomRecord {
 	 * Check if privacy options allow this record to be displayed
 	 * @return boolean
 	 */
-	function canDisplayDetails() {
+	public function canDisplayDetails() {
 		return $this->disp;
 	}
 	
@@ -97,7 +97,7 @@ class Note extends GedcomRecord {
 	 * get the title of this note record
 	 * @return string
 	 */
-	function getTitle($l=40, $changed=false) {
+	public function getTitle($l=40, $changed=false) {
 		global $gm_lang;
 
 		if ($changed && !is_null($this->newgedrec)) {
@@ -127,7 +127,7 @@ class Note extends GedcomRecord {
 	 * get note facts array
 	 * @return array
 	 */
-	function getNoteFacts() {
+	public function getNoteFacts() {
 		$this->parseFacts();
 		return $this->notefacts;
 	}
@@ -135,14 +135,14 @@ class Note extends GedcomRecord {
 	/**
 	 * Set the gedcom id in which the note exists
 	 */
-	function SetGedcomId($id) {
+	public function SetGedcomId($id) {
 		$this->gedcomid = $id;
 	}
 	
 	/**
 	 * Parse the facts from the individual record
 	 */
-	function parseFacts() {
+	private function parseFacts() {
 		if (!is_null($this->notefacts)) return;
 		$this->notefacts = array();
 		$this->allnotesubs = GetAllSubrecords($this->gedrec, "CONC, CONT", true, false, false);
@@ -186,7 +186,7 @@ class Note extends GedcomRecord {
 	/**
 	 * get the text of the note
 	 */
-	function getNoteText($changed=false) {
+	public function getNoteText($changed=false) {
 		global $WORD_WRAPPED_NOTES;
 
 		if ($changed && !is_null($this->newgedrec)) {
@@ -211,7 +211,7 @@ class Note extends GedcomRecord {
 	 * get the list of individuals connected to this note
 	 * @return array
 	 */
-	function getNoteIndis() {
+	public function getNoteIndis() {
 		global $REGEXP_DB, $GEDCOMID;
 		if (!is_null($this->indilist)) return $this->indilist;
 		$this->indilist = array();
@@ -230,7 +230,7 @@ class Note extends GedcomRecord {
 	 * get the list of families connected to this note
 	 * @return array
 	 */
-	function getNoteFams() {
+	public function getNoteFams() {
 		global $REGEXP_DB, $GEDCOMID;
 		if (!is_null($this->famlist)) return $this->famlist;
 		$this->famlist = array();
@@ -249,7 +249,7 @@ class Note extends GedcomRecord {
 	 * get the list of media connected to this note
 	 * @return array
 	 */
-	function getNoteMedia() {
+	public function getNoteMedia() {
 		global $TBLPREFIX, $GEDCOMID;
 		
 		if (!is_null($this->medialist)) return $this->medialist;
@@ -269,7 +269,7 @@ class Note extends GedcomRecord {
 	 * get the list of repositories connected to this note
 	 * @return array
 	 */
-	function getNoteRepos() {
+	public function getNoteRepos() {
 		global $TBLPREFIX, $GEDCOMID;
 		
 		if (!is_null($this->repolist)) return $this->repolist;
@@ -289,7 +289,7 @@ class Note extends GedcomRecord {
 	 * get the list of sources connected to this note
 	 * @return array
 	 */
-	function getNoteSources() {
+	public function getNoteSources() {
 		global $TBLPREFIX, $GEDCOMID;
 		
 		if (!is_null($this->sourcelist)) return $this->sourcelist;
@@ -312,7 +312,7 @@ class Note extends GedcomRecord {
 	 * @param int $level		The start level for this note, usually 1
 	 * @param string $pid		The gedcom XREF id for the level 0 record that this note is a part of
 	 */
-	function PrintGeneralNote($styleadd="", $mayedit=true) {
+	public function PrintGeneralNote($styleadd="", $mayedit=true) {
 		global $gm_lang, $gm_username, $Users;
 		global $factarray, $view, $show_changes;
 		global $WORD_WRAPPED_NOTES, $GM_IMAGE_DIR;
@@ -394,7 +394,7 @@ class Note extends GedcomRecord {
 		}
 	}
 	
-	function PrintListNote($len=60) {
+	public function PrintListNote($len=60) {
 		global $GEDCOM, $SHOW_ID_NUMBERS, $GEDCOM, $TEXT_DIRECTION;
 		
 		if (!$this->disp) return false;

@@ -31,6 +31,7 @@ if (stristr($_SERVER["SCRIPT_NAME"],basename(__FILE__))) {
 class GedcomConfig {
 
 	var $classname = "GedcomConfig";
+	var $current_gedcom = "";
 	var $GEDCONF = array();
 	var $lastmail = array();
 	var $cachenames = array("upcoming", "today", "stats", "plotdata");
@@ -89,7 +90,7 @@ class GedcomConfig {
 	 * @author	Genmod Development Team
 	 * @param		array	$settings	Array with GEDCOM settings
 	**/
-	public function StoreGedcomConfig($settings) {
+	public function SetGedcomConfig($settings) {
 		global $TBLPREFIX, $GEDCOM;
 		
 		// Clear the cache
