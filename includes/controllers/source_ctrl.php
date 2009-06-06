@@ -97,10 +97,6 @@ class SourceControllerRoot extends BaseController {
 			$this->canedit = $Users->userCanEdit($this->uname);
 		}
 		
-		if ($this->show_changes=="yes" && $this->canedit) {
-			$this->source->diffMerge($this->diffsource);
-		}
-		
 		if ($this->source->canDisplayDetails() && ($Users->userCanViewGedlines() || $ENABLE_CLIPPINGS_CART >= $Users->getUserAccessLevel() || !empty($this->uname))) {
 			$this->display_other_menu = true;
 		}

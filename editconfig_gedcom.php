@@ -329,7 +329,7 @@ if ($action=="update") {
 	$newconf["time_limit"] = $_POST["NEW_TIME_LIMIT"];
 	$newconf["last_change_email"] = $_POST["NEW_LAST_CHANGE_EMAIL"];
 
-	$GedcomConfig->StoreGedcomConfig($newconf);
+	$GedcomConfig->SetGedcomConfig($newconf);
 	$MediaFS->CreateDir(RelativePathFile($newconf["media_directory"]), "")
 	;
 	foreach($_POST as $key=>$value) {

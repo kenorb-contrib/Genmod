@@ -31,10 +31,6 @@ if (!empty($lang)) {
 	$changelanguage = "yes";
 	$NEWLANGUAGE = $lang;
 }
-/**
- * Inclusion of the RSS feed creator class
-*/
-require("includes/feedcreator.class.php");
 
 /**
  * Inclusion of the RSS functions
@@ -94,16 +90,24 @@ $printTop10Surnames = false;
 $printRecentChanges = false;
 
 // First try to retrieve the block config from the database
-$blocks = getBlocks($GEDCOM);
-$bconfig = array();
-foreach ($blocks as $side => $blocko) {
-	foreach ($blocko as $order => $blockdata) {
+$bconfig = "";
+$blocks = new Blocks("gedcom");
+foreach ($blocks->main as $order => $blockdata) {
+	if ($blockdata[0] == "print_RSS_block") {
+		$bconfig = $blockdata[1];
+		break;
+	}
+}
+if (empty($bconfig)) {
+	foreach ($blocks->right as $order => $blockdata) {
 		if ($blockdata[0] == "print_RSS_block") {
 			$bconfig = $blockdata[1];
-			break 2;
+			break;
 		}
 	}
 }
+
+
 // If empty, get it from the RSS block
 if (empty($bconfig) || count($bconfig) == 0) {
 	require("blocks/rss_block.php");

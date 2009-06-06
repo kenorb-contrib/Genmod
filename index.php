@@ -96,8 +96,7 @@ if (!isset($action)) $action="";
 
 //-- make sure that they have user status before they can use this page
 //-- otherwise have them login again
-$uname = $gm_username;
-if (empty($uname)) {
+if (empty($gm_username)) {
 	if (!empty($command)) {
 		if ($command=="user") {
 			if (empty($LOGIN_URL)) header("Location: login.php?help_message=mygedview_login_help&url=".urlencode("index.php?command=user"));
@@ -107,11 +106,10 @@ if (empty($uname)) {
 	}
 	$command="gedcom";
 }
-else $user = $Users->getUser($uname);
 
 if (empty($command)) $command="user";
 
-if (!empty($uname)) {
+if (!empty($gm_username)) {
 	if ($action == "addfav" || $action == "deletefav") $Favorites = new Favorites();
 	//-- add favorites action
 	if (($action=="addfav")&&(!empty($gid))) {
@@ -127,7 +125,7 @@ if (!empty($uname)) {
 			}
 			$favorite = new Favorite();
 			if ($favtype == "gedcom") $favorite->username = "";
-			else $favorite->username = $uname;
+			else $favorite->username = $gm_username;
 			$favorite->gid = $gid;
 			$favorite->type = trim($match[2]);
 			$favorite->file = $GEDCOMID;
@@ -147,7 +145,7 @@ if (!empty($uname)) {
 		}
 		$favorite = new Favorite();
 		if ($favtype == "gedcom") $favorite->username = "";
-		else $favorite->username = $uname;
+		else $favorite->username = $gm_username;
 		$favorite->gid = "";
 		$favorite->type = "URL";
 		$favorite->file = $GEDCOMID;
@@ -175,53 +173,8 @@ if (!empty($uname)) {
 }
 
 //-- get the blocks list
-if ($command=="user") {
-	$ublocks = getBlocks($uname);
-	if ((count($ublocks["main"])==0) && (count($ublocks["right"])==0)) {
-		$ublocks["main"][] = array("print_quickstart_block", "");
-		$ublocks["main"][] = array("print_todays_events", "");
-		$ublocks["main"][] = array("print_user_messages", "");
-		$ublocks["main"][] = array("print_user_favorites", "");
-
-		$ublocks["right"][] = array("print_welcome_block", "");
-		$ublocks["right"][] = array("print_random_media", "");
-		$ublocks["right"][] = array("print_upcoming_events", "");
-		$ublocks["right"][] = array("print_logged_in_users", "");
-	}
-}
-else {
-	$ublocks = getBlocks($GEDCOM);
-	if ((count($ublocks["main"])==0) && (count($ublocks["right"])==0)) {
-		$ublocks["main"][] = array("print_quickstart_block", "");
-		$ublocks["main"][] = array("print_gedcom_stats", "");
-		$ublocks["main"][] = array("print_gedcom_news", "");
-		$ublocks["main"][] = array("print_gedcom_favorites", "");
-		$ublocks["main"][] = array("review_changes_block", "");
-
-		$ublocks["right"][] = array("print_gedcom_block", "");
-		$ublocks["right"][] = array("print_random_media", "");
-		$ublocks["right"][] = array("print_todays_events", "");
-		$ublocks["right"][] = array("print_logged_in_users", "");
-	}
-}
-
-//-- Set some behaviour controls that depend on which blocks are selected
-$welcome_block_present = false;
-$gedcom_block_present = false;
-$top10_block_present = false;
-$login_block_present = false;
-foreach($ublocks["right"] as $block) {
-	if ($block[0]=="print_welcome_block") $welcome_block_present = true;
-	if ($block[0]=="print_gedcom_block") $gedcom_block_present = true;
-	if ($block[0]=="print_block_name_top10") $top10_block_present = true;
-	if ($block[0]=="print_login_block") $login_block_present = true;
-}
-foreach($ublocks["main"] as $block) {
-	if ($block[0]=="print_welcome_block") $welcome_block_present = true;
-	if ($block[0]=="print_gedcom_block") $gedcom_block_present = true;
-	if ($block[0]=="print_block_name_top10") $top10_block_present = true;
-	if ($block[0]=="print_login_block") $login_block_present = true;
-}
+if ($command=="user") $ublocks = new Blocks("user", $gm_username, $action);
+else $ublocks = new Blocks("gedcom", "", $action);
 
 if ($command=="user") {
 	$helpindex = "index_myged_help";
@@ -256,11 +209,11 @@ if ($command=="user") {
 	print $gm_lang["mygedview_desc"];
 	print "</div>\n";
 }
-if (count($ublocks["main"]) != 0) {
-	if (count($ublocks["right"]) != 0) print "\t<div id=\"index_main_blocks\">\n";
+if (count($ublocks->main) != 0) {
+	if (count($ublocks->right) != 0) print "\t<div id=\"index_main_blocks\">\n";
 	else print "\t<div id=\"index_full_blocks\">\n";
 
-	foreach($ublocks["main"] as $bindex=>$block) {
+	foreach($ublocks->main as $bindex=>$block) {
 		if (function_exists($block[0])) eval($block[0]."(false, \$block[1], \"main\", $bindex);");
 //		print $TOTAL_QUERIES." ";
 	}
@@ -269,10 +222,10 @@ if (count($ublocks["main"]) != 0) {
 //-- end of main content section
 
 //-- start of blocks section
-if (count($ublocks["right"]) != 0) {
-	if (count($ublocks["main"]) != 0) print "\t<div id=\"index_small_blocks\">\n";
+if (count($ublocks->right) != 0) {
+	if (count($ublocks->main) != 0) print "\t<div id=\"index_small_blocks\">\n";
 	else print "\t<div id=\"index_full_blocks\">\n";
-	foreach($ublocks["right"] as $bindex => $block) {
+	foreach($ublocks->right as $bindex => $block) {
 		// NOTE: print_random_media(true, $block[1], right, $bindex
 //		$time1 = getmicrotime();
 		if (function_exists($block[0])) eval($block[0]."(true, \$block[1], \"right\", $bindex);");
@@ -286,13 +239,13 @@ if (count($ublocks["right"]) != 0) {
 }
 //-- end of blocks section
 
-if (($command=="user") and (!$welcome_block_present)) {
+if (($command=="user") and (!$ublocks->welcome_block_present)) {
 	print "<div>";
 	print_help_link("mygedview_customize_help", "qm");
 	print "<a href=\"#\" onclick=\"window.open('index_edit.php?name=".$gm_username."&amp;command=user', '', 'top=50,left=10,width=1000,height=400,scrollbars=1,resizable=1');\">".$gm_lang["customize_page"]."</a>\n";
 	print "</div>";
 }
-if (($command=="gedcom") and (!$gedcom_block_present)) {
+if (($command=="gedcom") and (!$ublocks->gedcom_block_present)) {
 	if ($Users->userIsAdmin($gm_username)) {
 		print "<div>";
 		print "<a href=\"#\" onclick=\"window.open('index_edit.php?name=$GEDCOM&amp;command=gedcom', '', 'top=50,left=10,width=1000,height=400,scrollbars=1,resizable=1');\">".$gm_lang["customize_gedcom_page"]."</a>\n";

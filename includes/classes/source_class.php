@@ -30,7 +30,7 @@ if (stristr($_SERVER["SCRIPT_NAME"],basename(__FILE__))) {
 
 class Source extends GedcomRecord {
 	
-	var $classname = "GedcomRecord";
+	var $classname = "Source";
 	var $disp = true;
 	var $name = "";
 	var $sourcefacts = null;
@@ -67,7 +67,7 @@ class Source extends GedcomRecord {
 	 * Check if privacy options allow this record to be displayed
 	 * @return boolean
 	 */
-	function canDisplayDetails() {
+	public function canDisplayDetails() {
 		return $this->disp;
 	}
 	
@@ -75,7 +75,7 @@ class Source extends GedcomRecord {
 	 * get the title of this source record
 	 * @return string
 	 */
-	function getTitle() {
+	public function getTitle() {
 		global $gm_lang;
 		
 		if (empty($this->name)) return $gm_lang["unknown"];
@@ -86,7 +86,7 @@ class Source extends GedcomRecord {
 	 * get source facts array
 	 * @return array
 	 */
-	function getSourceFacts() {
+	public function getSourceFacts() {
 		$this->parseFacts();
 		return $this->sourcefacts;
 	}
@@ -94,7 +94,7 @@ class Source extends GedcomRecord {
 	/**
 	 * Parse the facts from the individual record
 	 */
-	function parseFacts() {
+	private function parseFacts() {
 		if (!is_null($this->sourcefacts)) return;
 		$this->sourcefacts = array();
 		$this->allsourcesubs = GetAllSubrecords($this->gedrec, "", true, false, false);
@@ -135,52 +135,12 @@ class Source extends GedcomRecord {
 		}
 		SortFacts($this->sourcefacts, "SOUR");
 	}
-	/**
-	 * Merge the facts from another Source object into this object
-	 * for generating a diff view
-	 * @param Source $diff	the source to compare facts with
-	 */
-	function diffMerge(&$diff) {
-		if (is_null($diff)) return;
-		$this->parseFacts();
-		$diff->parseFacts();
-		
-		//-- update old facts
-		foreach($this->sourcefacts as $key=>$fact) {
-			$found = false;
-			foreach($diff->sourcefacts as $indexval => $newfact) {
-				$newfact=preg_replace("/\\\/", "/", $newfact);
-				if (trim($newfact[0])==trim($fact[0])) {
-					$found = true;
-					break;
-				}
-			}
-			if (!$found) {
-				$this->sourcefacts[$key][0].="\nGM_OLD\n";
-			}
-		}
-		//-- look for new facts
-		foreach($diff->sourcefacts as $key=>$newfact) {
-			$found = false;
-			foreach($this->sourcefacts as $indexval => $fact) {
-				$newfact=preg_replace("/\\\/", "/", $newfact);
-				if (trim($newfact[0])==trim($fact[0])) {
-					$found = true;
-					break;
-				}
-			}
-			if (!$found) {
-				$newfact[0].="\nGM_NEW\n";
-				$this->sourcefacts[]=$newfact;
-			}
-		}
-	}
 	
 	/**
 	 * get the list of individuals connected to this source
 	 * @return array
 	 */
-	function getSourceIndis() {
+	public function getSourceIndis() {
 		global $REGEXP_DB, $GEDCOMID;
 		if (!is_null($this->indilist)) return $this->indilist;
 		$links = GetSourceLinks($this->xref, "INDI", true, false);
@@ -199,7 +159,7 @@ class Source extends GedcomRecord {
 	 * get the list of families connected to this source
 	 * @return array
 	 */
-	function getSourceFams() {
+	public function getSourceFams() {
 		global $REGEXP_DB, $GEDCOMID;
 		if (!is_null($this->famlist)) return $this->famlist;
 		$links = GetSourceLinks($this->xref, "FAM", true, false);
@@ -218,7 +178,7 @@ class Source extends GedcomRecord {
 	 * get the list of media connected to this source
 	 * @return array
 	 */
-	function getSourceMedia() {
+	public function getSourceMedia() {
 		global $TBLPREFIX, $GEDCOMID;
 		
 		if (!is_null($this->medialist)) return $this->medialist;
@@ -238,7 +198,7 @@ class Source extends GedcomRecord {
 	 * get the list of media connected to this source
 	 * @return array
 	 */
-	function getSourceNotes() {
+	public function getSourceNotes() {
 		global $TBLPREFIX, $GEDCOMID;
 
 		if (!is_null($this->notelist)) return $this->notelist;

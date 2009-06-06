@@ -104,6 +104,4 @@ class Favorite extends Favorites {
 	}
 	
 }
-			
-
 ?>
