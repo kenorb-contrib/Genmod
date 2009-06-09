@@ -813,7 +813,7 @@ switch ($action) {
 			$rec = GetChangeData(false, $famid, true, "gedlines", "");
 			$gedrec = $rec[$GEDCOM][$famid];
 		}
-		$family = new Family($gedrec);
+		$family = new Family($famid, $gedrec);
 		$father = $family->getHusband();
 		$mother = $family->getWife();
 		$children = $family->getChildren();
@@ -960,7 +960,7 @@ switch ($action) {
 			$rec = GetChangeData(false, $famid, true, "gedlines", "");
 			$gedrec = $rec[$GEDCOM][$famid];
 		}
-		$family = new Family($gedrec);
+		$family = new Family($famid, $gedrec);
 		$father = $family->getHusband();
 		$mother = $family->getWife();
 		$children = $family->getChildren();

@@ -30,67 +30,97 @@ if (stristr($_SERVER["SCRIPT_NAME"],basename(__FILE__))) {
  
 class Note extends GedcomRecord {
 
-	var $classname = "Note";
-	var $indilist = null;
-	var $famlist = null;
-	var $medialist = null;
-	var $sourcelist = null;
-	var $repolist = null;
+	public $classname = "Note";
 	
-	var $text = null;
-	var $newtext = null;
-	var $title = null;
-	var $newtitle = null;
-	var $notefacts = null;
+	private $indilist = null;
+	private $indi_count = null;
+	private $famlist = null;
+	private $fam_count = null;
+	private $medialist = null;
+	private $media_count = null;
+	private $sourcelist = null;
+	private $sour_count = null;
+	private $repolist = null;
+	private $repo_count = null;
 	
-	var $showchanges = false;
-	var $canedit = null;
-	var $disp = null;
-	var $new = false;
-	var $deleted = false;
-	var $changed = false;
-	var $textchanged = false;
-	var $newgedrec = null;
-	var $gedcomid = null;
+	private $text = null;
+	private $newtext = null;
+	private $title = null;
+	private $newtitle = null;
+	private $notefacts = null;
+	
+	private $canedit = null;
+	private $textchanged = false;
+	private $newgedrec = null;
 	
 	/**
 	 * Constructor for note object
 	 * @param string $gedrec	the raw note gedcom record
 	 */
-	public function __construct($gedrec, $new=false) {
-		global $gm_username, $GEDCOMID, $Users;
+	public function __construct($id, $gedrec="", $new=false) {
+		global $otherlist, $GEDCOMID;
 
-		parent::__construct($gedrec);
-		$this->changed = false;
+		if (empty($gedrec)) {
+			if (isset($sourcelist[$id])) $gedrec = $sourcelist[$id]["gedcom"];
+			else $gedrec = FindOtherRecord($id);
+		}
+		if (empty($gedrec)) $gedrec = "0 @".$id."@ NOTE\r\n";
+		else $otherlist[$id]["gedcom"] = $gedrec;
+		
+		parent::__construct($id, $gedrec);
+		
 		$this->gedcomid = $GEDCOMID;
-		$this->disp = displayDetailsByID($this->xref, "NOTE", 1, true);
+		
 		if ($this->disp) {
-			if ((!isset($show_changes) || $show_changes != "no") && $Users->UserCanEdit($gm_username)) $this->showchanges = true;
-			if ($this->showchanges) $rec = $this->getchangedGedcomRecord();
-			if (empty($rec)) $this->deleted = true;
-			else if (($rec != $this->gedrec) && !$new) {
-				$this->changed = true;
-				$this->newgedrec = $rec;
-			}
-			else if (!empty($rec) && $new) {
-				$this->new = true;
-				$this->newgedrec = $rec;
-			}
-			if ($Users->UserCanEdit($gm_username)) $this->canedit = true;
-			else $this->canedit = false;
-
 			// If the record is changed, check WHAT is changed.
 			if ($this->changed && ($this->GetNoteText() != $this->GetNoteText(true))) $this->textchanged = true;
 			
 		}
 	}
 	
-	/**
-	 * Check if privacy options allow this record to be displayed
-	 * @return boolean
-	 */
-	public function canDisplayDetails() {
-		return $this->disp;
+	public function __get($property) {
+		$result = NULL;
+		switch ($property) {
+			case "text":
+				return $this->GetNoteText();
+				break;
+			case "indilist":
+				return $this->GetNoteIndis();
+				break;
+			case "indi_count":
+				if (is_null($this->indi_count)) $this->GetNoteIndis();
+				return $this->indi_count;
+				break;
+			case "famlist":
+				return $this->GetNoteFams();
+				break;
+			case "fam_count":
+				if (is_null($this->fam_count)) $this->GetNoteFams();
+				return $this->fam_count;
+				break;
+			case "medialist":
+				return $this->GetNoteMedia();
+				break;
+			case "media_count":
+				if (is_null($this->media_count)) $this->GetNoteMedia();
+				return $this->media_count;
+				break;
+			case "sourcelist":
+				return $this->GetNoteSources();
+				break;
+			case "sour_count":
+				if (is_null($this->sour_count)) $this->GetNoteSources();
+				return $this->sour_count;
+			case "repolist":
+				return $this->GetNoteRepos();
+				break;
+			case "repo_count":
+				if (is_null($this->repo_count)) $this->GetNoteRepos();
+				return $this->repo_count;
+			default:
+				return parent::__get($property);
+				break;
+		}
 	}
 	
 	/**
@@ -124,66 +154,6 @@ class Note extends GedcomRecord {
 	}
 	
 	/**
-	 * get note facts array
-	 * @return array
-	 */
-	public function getNoteFacts() {
-		$this->parseFacts();
-		return $this->notefacts;
-	}
-	
-	/**
-	 * Set the gedcom id in which the note exists
-	 */
-	public function SetGedcomId($id) {
-		$this->gedcomid = $id;
-	}
-	
-	/**
-	 * Parse the facts from the individual record
-	 */
-	private function parseFacts() {
-		if (!is_null($this->notefacts)) return;
-		$this->notefacts = array();
-		$this->allnotesubs = GetAllSubrecords($this->gedrec, "CONC, CONT", true, false, false);
-		foreach ($this->allnotesubs as $key => $subrecord) {
-			$ft = preg_match("/1\s(\w+)(.*)/", $subrecord, $match);
-			if ($ft>0) {
-				$fact = $match[1];
-				$gid = trim(str_replace("@", "", $match[2]));
-			}
-			else {
-				$fact = "";
-				$gid = "";
-			}
-			$fact = trim($fact);
-			if (!isset($count[$fact])) $count[$fact] = 1;
-			else $count[$fact]++;
-			if (!empty($fact) ) {
-				$this->notefacts[] = array($fact, $subrecord, $count[$fact]);
-			}
-		}
-		$newrecs = RetrieveNewFacts($this->xref);
-		foreach($newrecs as $key=> $newrec) {
-			$ft = preg_match("/1\s(\w+)(.*)/", $newrec, $match);
-			if ($ft>0) {
-				$fact = $match[1];
-				$gid = trim(str_replace("@", "", $match[2]));
-			}
-			else {
-				$fact = "";
-				$gid = "";
-			}
-			$fact = trim($fact);
-			if (!isset($count[$fact])) $count[$fact] = 1;
-			else $count[$fact]++;
-			if (!empty($fact) && !in_array($fact, array("CONC", "CONT"))) {
-				$this->notefacts[] = array($fact, $newrec, $count[$fact], "new");
-			}
-		}
-	}
-
-	/**
 	 * get the text of the note
 	 */
 	public function getNoteText($changed=false) {
@@ -211,10 +181,12 @@ class Note extends GedcomRecord {
 	 * get the list of individuals connected to this note
 	 * @return array
 	 */
-	public function getNoteIndis() {
-		global $REGEXP_DB, $GEDCOMID;
+	private function getNoteIndis() {
+		global $GEDCOMID;
+		
 		if (!is_null($this->indilist)) return $this->indilist;
 		$this->indilist = array();
+		
 		$links = GetNoteLinks($this->xref, "INDI", true);
 		if (count($links) > 0) {
 			$linkslist = implode("[".$GEDCOMID."]','", $links);
@@ -223,6 +195,7 @@ class Note extends GedcomRecord {
 			$this->indilist = GetIndiList("", $linkslist, true);
 			uasort($this->indilist, "ItemSort");
 		}
+		$this->indi_count=count($this->indilist);
 		return $this->indilist;
 	}
 	
@@ -230,7 +203,7 @@ class Note extends GedcomRecord {
 	 * get the list of families connected to this note
 	 * @return array
 	 */
-	public function getNoteFams() {
+	private function getNoteFams() {
 		global $REGEXP_DB, $GEDCOMID;
 		if (!is_null($this->famlist)) return $this->famlist;
 		$this->famlist = array();
@@ -242,6 +215,7 @@ class Note extends GedcomRecord {
 			$this->famlist = GetFamList("", $linkslist, true);
 			uasort($this->famlist, "ItemSort");
 		}
+		$this->fam_count=count($this->famlist);
 		return $this->famlist;
 	}
 	
@@ -249,7 +223,7 @@ class Note extends GedcomRecord {
 	 * get the list of media connected to this note
 	 * @return array
 	 */
-	public function getNoteMedia() {
+	private function getNoteMedia() {
 		global $TBLPREFIX, $GEDCOMID;
 		
 		if (!is_null($this->medialist)) return $this->medialist;
@@ -262,6 +236,7 @@ class Note extends GedcomRecord {
 			$this->medialist[$link] = $media;
 		}
 		uasort($this->medialist, "ItemSort");
+		$this->media_count=count($this->medialist);
 		return $this->medialist;
 	}
 	
@@ -269,7 +244,7 @@ class Note extends GedcomRecord {
 	 * get the list of repositories connected to this note
 	 * @return array
 	 */
-	public function getNoteRepos() {
+	private function getNoteRepos() {
 		global $TBLPREFIX, $GEDCOMID;
 		
 		if (!is_null($this->repolist)) return $this->repolist;
@@ -282,6 +257,7 @@ class Note extends GedcomRecord {
 			$this->repolist = GetRepoList("", $linkslist);
 		}
 		uasort($this->repolist, "ItemSort");
+		$this->repo_count=count($this->repolist);
 		return $this->repolist;
 	}
 
@@ -289,7 +265,7 @@ class Note extends GedcomRecord {
 	 * get the list of sources connected to this note
 	 * @return array
 	 */
-	public function getNoteSources() {
+	private function getNoteSources() {
 		global $TBLPREFIX, $GEDCOMID;
 		
 		if (!is_null($this->sourcelist)) return $this->sourcelist;
@@ -302,96 +278,8 @@ class Note extends GedcomRecord {
 			$this->sourcelist = GetSourceList($linkslist);
 		}
 		uasort($this->sourcelist, "Sourcesort");
+		$this->sour_count=count($this->sourcelist);
 		return $this->sourcelist;
-	}
-	/**
-	 * print main note row
-	 *
-	 * this function will print a table row for a fact table for a level 1 note in the main record
-	 * @param string $factrec	the raw gedcom sub record for this note
-	 * @param int $level		The start level for this note, usually 1
-	 * @param string $pid		The gedcom XREF id for the level 0 record that this note is a part of
-	 */
-	public function PrintGeneralNote($styleadd="", $mayedit=true) {
-		global $gm_lang, $gm_username, $Users;
-		global $factarray, $view, $show_changes;
-		global $WORD_WRAPPED_NOTES, $GM_IMAGE_DIR;
-		global $GM_IMAGES, $GEDCOM;
-
-		if (!$this->disp) return false;
-		
-		if (($this->textchanged || $this->deleted) && $this->showchanges && !($view == "preview")) {
-			$styleadd = "change_old";
-			print "\n\t\t<tr><td class=\"shade2 $styleadd center\" style=\"vertical-align: middle;\"><img src=\"".$GM_IMAGE_DIR."/".$GM_IMAGES["note"]["other"]."\" width=\"50\" height=\"50\" alt=\"\" /><br />".$gm_lang["note"].":";
-			print " </td>\n<td class=\"shade1 $styleadd wrap\">";
-			if (showFactDetails("NOTE", $this->xref)) {
-				print PrintReady($this->GetNoteText())."<br />\n";
-				// See if RESN tag prevents display or edit/delete
-			 	$resn_tag = preg_match("/2 RESN (.*)/", $this->gedrec, $match);
-	 			if ($resn_tag > 0) $resn_value = strtolower(trim($match[1]));
-				// -- Find RESN tag
-				if (isset($resn_value)) {
-					print_help_link("RESN_help", "qm");
-					print $gm_lang[$resn_value]."\n";
-				}
-				print "<br />\n";
-			}
-			print "</td></tr>";
-		}
-		if (($this->textchanged || $this->new) && !$this->deleted && $this->showchanges && !($view == "preview")) $styleadd = "change_new";
-		if (!$this->deleted || !$this->showchanges) {
-			print "\n\t\t<tr><td class=\"shade2 $styleadd center\" style=\"vertical-align: middle;\"><img src=\"".$GM_IMAGE_DIR."/".$GM_IMAGES["note"]["other"]."\" width=\"50\" height=\"50\" alt=\"\" /><br />".$gm_lang["note"].":";
-			if ($this->canedit && !FactEditRestricted($this->xref, $this->gedrec, 0) && ($styleadd!="change_old")&&($view!="preview")&& $mayedit) {
-				$menu = array();
-				$menu["label"] = $gm_lang["edit"];
-				$menu["labelpos"] = "right";
-				$menu["icon"] = "";
-				$menu["link"] = "#";
-				$menu["onclick"] = "return edit_record('$this->xref', 'NOTE', '1', 'edit_general_note');";
-				$menu["class"] = "";
-				$menu["hoverclass"] = "";
-				$menu["flyout"] = "down";
-				$menu["submenuclass"] = "submenu";
-				$menu["items"] = array();
-				$submenu = array();
-				$submenu["label"] = $gm_lang["edit"];
-				$submenu["labelpos"] = "right";
-				$submenu["icon"] = "";
-				$submenu["onclick"] = "return edit_record('$this->xref', 'NOTE', '1', 'edit_general_note');";
-				$submenu["link"] = "#";
-				$submenu["class"] = "submenuitem";
-				$submenu["hoverclass"] = "submenuitem_hover";
-				$menu["items"][] = $submenu;
-				$submenu = array();
-				$submenu["label"] = $gm_lang["copy"];
-				$submenu["labelpos"] = "right";
-				$submenu["icon"] = "";
-				$submenu["onclick"] = "return copy_record('$this->xref', 'NOTE', '1', 'copy_general_note');";
-				$submenu["link"] = "#";
-				$submenu["class"] = "submenuitem";
-				$submenu["hoverclass"] = "submenuitem_hover";
-				$menu["items"][] = $submenu;
-				// No delete option. A note cannot be without text!
-				print " <div style=\"width:25px;\" class=\"center\">";
-				print_menu($menu);
-				print "</div>";
-			}
-			print " </td>\n<td class=\"shade1 $styleadd wrap\">";
-			if (showFactDetails("NOTE", $this->xref)) {
-				if ($styleadd == "change_new") print PrintReady($this->GetNoteText(true))."<br />\n";
-				else print PrintReady($this->GetNoteText())."<br />\n";
-				// See if RESN tag prevents display or edit/delete
-			 	$resn_tag = preg_match("/2 RESN (.*)/", $this->gedrec, $match);
-		 		if ($resn_tag > 0) $resn_value = strtolower(trim($match[1]));
-				// -- Find RESN tag
-				if (isset($resn_value)) {
-					print_help_link("RESN_help", "qm");
-					print $gm_lang[$resn_value]."\n";
-				}
-				print "<br />\n";
-			}
-			print "</td></tr>";
-		}
 	}
 	
 	public function PrintListNote($len=60) {
@@ -403,8 +291,8 @@ class Note extends GedcomRecord {
 		else print "\n\t\t\t<li class=\"ltr\" dir=\"ltr\">";
 		print "\n\t\t\t<a href=\"note.php?oid=".$this->xref."&amp;ged=".$GEDCOM."\" class=\"list_item\">".PrintReady($this->GetTitle($len));
 		if ($SHOW_ID_NUMBERS) {
-			if ($TEXT_DIRECTION=="ltr") print " &lrm;(".$this->GetXref().")&lrm;";
-			else print " &rlm;(".$this->GetXref().")&rlm;";
+			if ($TEXT_DIRECTION=="ltr") print " &lrm;(".$this->xref.")&lrm;";
+			else print " &rlm;(".$this->xref.")&rlm;";
 		}
 		print "</a>\n";
 		print "</li>\n";

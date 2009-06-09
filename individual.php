@@ -41,7 +41,7 @@ $controller = new IndividualController();
 
 print_header($controller->PageTitle);
 // NOTE: If the person is not found, display message
-if (!$controller->indi->exist) {
+if ($controller->indi->isempty) {
 	print $gm_lang["person_not_found"];
 	print_footer();
 	exit;

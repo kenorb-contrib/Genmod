@@ -181,7 +181,7 @@ class GedcomConfig {
 	public function SetLastNotifMail($ged) {
 		global $TBLPREFIX;
 		
-		$sql = "UPDATE ".$TBLPREFIX."gedconf SET gc_last_change_email='".time()."' WHERE gc_gedcom='".$gedvalue."'";
+		$sql = "UPDATE ".$TBLPREFIX."gedconf SET gc_last_change_email='".time()."' WHERE gc_gedcom='".$ged."'";
 		$res = NewQuery($sql);
 		return true;
 	}

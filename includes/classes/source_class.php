@@ -30,119 +30,183 @@ if (stristr($_SERVER["SCRIPT_NAME"],basename(__FILE__))) {
 
 class Source extends GedcomRecord {
 	
-	var $classname = "Source";
-	var $disp = true;
-	var $name = "";
-	var $sourcefacts = null;
-	var $indilist = null;
-	var $famlist = null;
-	var $medialist = null;
-	var $notelist = null;
-	var $sournew = false;
-	var $sourdeleted = false;
-	var $showchanges = false;
+	public $classname = "Source";
+	private $name = null;
+	private $descriptor = null;
+	private $adddescriptor = null;
+	
+	private $indilist = null;
+	private $indi_count = null;
+	private $famlist = null;
+	private $fam_count = null;
+	private $medialist = null;
+	private $media_count = null;
+	private $notelist = null;
+	private $note_count = null;
+	private $exclude_facts = "";
 	
 	/**
 	 * Constructor for source object
 	 * @param string $gedrec	the raw source gedcom record
 	 */
-	public function __construct($gedrec) {
-		global $gm_username, $GEDCOM, $Users;
-		parent::__construct($gedrec);
-		$this->disp = displayDetailsByID($this->xref, "SOUR", 1, true);
-		if ($this->disp) {
-			$this->name = GetSourceDescriptor($this->xref);
-			$add_descriptor = GetAddSourceDescriptor($this->xref);
-			if ($add_descriptor) $this->name .= " - ".$add_descriptor;
-			if ((!isset($show_changes) || $show_changes != "no") && $Users->UserCanEdit($gm_username)) $this->showchanges = true;
-			if ($this->showchanges && GetChangeData(true, $this->xref, true, "", "")) {
-				$rec = GetChangeData(false, $this->xref, true, "gedlines", "");
-				if (empty($rec[$GEDCOM][$this->xref])) $this->sourdeleted = true;
-			}
-		}
+	public function __construct($id, $gedrec="") {
+		global $sourcelist;
 		
+		if (empty($gedrec)) {
+			if (isset($sourcelist[$id])) $gedrec = $sourcelist[$id]["gedcom"];
+			else $gedrec = FindSourceRecord($id);
+		}
+		if (empty($gedrec)) $gedrec = "0 @".$id."@ SOUR\r\n";
+		else $sourcelist[$id]["gedcom"] = $gedrec;
+		
+		parent::__construct($id, $gedrec);
+	}
+
+	public function __get($property) {
+		$result = NULL;
+		switch ($property) {
+			case "descriptor":
+				return $this->GetSourceDescriptor();
+				break;
+			case "adddescriptor":
+				return $this->GetAddSourceDescriptor();
+				break;
+			case "title":
+				return $this->GetTitle();
+				break;
+			case "indilist":
+				return $this->GetSourceIndis();
+				break;
+			case "indi_count":
+				if (is_null($this->indi_count)) $this->GetSourceIndis();
+				return $this->indi_count;
+				break;
+			case "famlist":
+				return $this->GetSourceFams();
+				break;
+			case "fam_count":
+				if (is_null($this->fam_count)) $this->GetSourceFams();
+				return $this->fam_count;
+				break;
+			case "medialist":
+				return $this->GetSourceMedia();
+				break;
+			case "media_count":
+				if (is_null($this->media_count)) $this->GetSourceMedia();
+				return $this->media_count;
+				break;
+			case "notelist":
+				return $this->GetSourceNotes();
+				break;
+			case "note_count":
+				if (is_null($this->note_count)) $this->GetSourceNotes();
+				return $this->note_count;
+			default:
+				return parent::__get($property);
+				break;
+		}
 	}
 	
-	/**
-	 * Check if privacy options allow this record to be displayed
-	 * @return boolean
-	 */
-	public function canDisplayDetails() {
-		return $this->disp;
-	}
 	
 	/**
 	 * get the title of this source record
 	 * @return string
 	 */
-	public function getTitle() {
+	private function getTitle() {
 		global $gm_lang;
 		
-		if (empty($this->name)) return $gm_lang["unknown"];
+		if (is_null($this->name)) {
+			$this->name = $this->GetSourceDescriptor();
+			if ($this->disp) {
+				$add_descriptor = $this->GetAddSourceDescriptor();
+				if ($add_descriptor) {
+					if ($this->name) $this->name .= " - ".$add_descriptor;
+					else $this->name = $add_descriptor;
+				}
+			}
+			else $this->name = $gm_lang["private"];
+		}
+		if (!$this->name) return $gm_lang["unknown"];
 		return $this->name;
 	}
 	
 	/**
-	 * get source facts array
-	 * @return array
+	 * get the descriptive title of the source
+	 *
+	 * @param string $sid the gedcom xref id for the source to find
+	 * @return string the title of the source
 	 */
-	public function getSourceFacts() {
-		$this->parseFacts();
-		return $this->sourcefacts;
-	}
-	
-	/**
-	 * Parse the facts from the individual record
-	 */
-	private function parseFacts() {
-		if (!is_null($this->sourcefacts)) return;
-		$this->sourcefacts = array();
-		$this->allsourcesubs = GetAllSubrecords($this->gedrec, "", true, false, false);
-		foreach ($this->allsourcesubs as $key => $subrecord) {
-			$ft = preg_match("/1\s(\w+)(.*)/", $subrecord, $match);
-			if ($ft>0) {
-				$fact = $match[1];
-				$gid = trim(str_replace("@", "", $match[2]));
+	private function GetSourceDescriptor() {
+		global $gm_lang;
+		
+		if (!is_null($this->descriptor)) return $this->descriptor;
+		
+		if ($this->show_changes) $gedrec = $this->GetChangedGedRec();
+		else $gedrec = $this->gedrec;
+		
+		if (!empty($gedrec)) {
+			$tt = preg_match("/1 TITL (.*)/", $gedrec, $smatch);
+			if ($tt>0) {
+				if (!ShowFact("TITL", $this->xref, "SOUR") || !ShowFactDetails("TITL", $this->xref, "SOUR")) {
+					$this->descriptor = false;
+					return $gm_lang["private"];
+				}
+				else {
+					$subrec = GetSubRecord(1, "1 TITL", $gedrec);
+					// This automatically handles CONC/CONT lines below the title record
+					$this->descriptor = GetGedcomValue("TITL", 1, $subrec);
+				}				
+				return $this->descriptor;
 			}
-			else {
-				$fact = "";
-				$gid = "";
-			}
-			$fact = trim($fact);
-			if (!isset($count[$fact])) $count[$fact] = 1;
-			else $count[$fact]++;
-			if (!empty($fact) ) {
-				$this->sourcefacts[] = array($fact, $subrecord, $count[$fact]);
+			$et = preg_match("/1 ABBR (.*)/", $gedrec, $smatch);
+			if ($et>0) {
+				if (!ShowFact("ABBR", $this->xref, "SOUR") || !ShowFactDetails("ABBR", $this->xref, "SOUR")) return $gm_lang["private"];
+				$this->descriptor = $smatch[1];
+				return $this->descriptor;
 			}
 		}
-		$newrecs = RetrieveNewFacts($this->xref);
-		foreach($newrecs as $key=> $newrec) {
-			$ft = preg_match("/1\s(\w+)(.*)/", $newrec, $match);
-			if ($ft>0) {
-				$fact = $match[1];
-				$gid = trim(str_replace("@", "", $match[2]));
-			}
-			else {
-				$fact = "";
-				$gid = "";
-			}
-			$fact = trim($fact);
-			if (!isset($count[$fact])) $count[$fact] = 1;
-			else $count[$fact]++;
-			if (!empty($fact) ) {
-				$this->sourcefacts[] = array($fact, $newrec, $count[$fact], "new");
-			}
-		}
-		SortFacts($this->sourcefacts, "SOUR");
+		$this->descriptor = false;
+		return false;
+	}	
+
+	/**
+	 * get the additional descriptive title of the source
+	 *
+	 * @param string $sid the gedcom xref id for the source to find
+	 * @return string the additional title of the source
+	 */
+	private function GetAddSourceDescriptor() {
+		global $GEDCOM;
+	
+		if (!is_null($this->adddescriptor)) return $this->adddescriptor;
+		
+		if ($this->show_changes) $gedrec = $this->GetChangedGedRec();
+		else $gedrec = $this->gedrec;
+		
+		if (!empty($gedrec)) {
+			$ct = preg_match("/\d ROMN (.*)/", $gedrec, $match);
+	 		if ($ct>0) {
+				if (!ShowFact("ROMN", $this->xref, "SOUR") || !ShowFactDetails("ROMN", $this->xref, "SOUR")) return false;
+				$this->adddescriptor = $smatch[1];
+				return $this->adddescriptor;
+	 		}
+			$ct = preg_match("/\d _HEB (.*)/", $gedrec, $match);
+	 		if ($ct>0) {
+				if (!ShowFact("_HEB", $this->xref, "SOUR")|| !ShowFactDetails("_HEB", $this->xref, "SOUR")) return false;
+				$this->adddescriptor = $smatch[1];
+				return $this->adddescriptor;
+	 		}
+	 	}
+		$this->adddescriptor = false;
+		return $this->adddescriptor;
 	}
 	
-	/**
-	 * get the list of individuals connected to this source
-	 * @return array
-	 */
-	public function getSourceIndis() {
-		global $REGEXP_DB, $GEDCOMID;
+	private function GetSourceIndis() {
+		global $GEDCOMID;
+
 		if (!is_null($this->indilist)) return $this->indilist;
+		$this->indilist = array();
+		
 		$links = GetSourceLinks($this->xref, "INDI", true, false);
 		if (count($links) > 0) {
 			$linkslst = implode("[".$GEDCOMID."]','", $links);
@@ -151,17 +215,16 @@ class Source extends GedcomRecord {
 			$this->indilist = GetIndiList("", $linkslst, true);
 			uasort($this->indilist, "ItemSort");
 		}
-		else $this->indilist = array();
+		$this->indi_count=count($this->indilist);
 		return $this->indilist;
 	}
 	
-	/**
-	 * get the list of families connected to this source
-	 * @return array
-	 */
-	public function getSourceFams() {
-		global $REGEXP_DB, $GEDCOMID;
+	private function GetSourceFams() {
+		global $GEDCOMID;
+
 		if (!is_null($this->famlist)) return $this->famlist;
+		$this->famlist = array();
+		
 		$links = GetSourceLinks($this->xref, "FAM", true, false);
 		if (count($links) > 0) {
 			$linkslst = implode("[".$GEDCOMID."]','", $links);
@@ -170,16 +233,12 @@ class Source extends GedcomRecord {
 			$this->famlist = GetFamList("", $linkslst, true);
 			uasort($this->famlist, "ItemSort");
 		}
-		else $this->famlist = array();
+		$this->fam_count=count($this->famlist);
 		return $this->famlist;
 	}
 	
-	/**
-	 * get the list of media connected to this source
-	 * @return array
-	 */
-	public function getSourceMedia() {
-		global $TBLPREFIX, $GEDCOMID;
+	private function GetSourceMedia() {
+		global $GEDCOMID;
 		
 		if (!is_null($this->medialist)) return $this->medialist;
 		$this->medialist = array();
@@ -192,14 +251,12 @@ class Source extends GedcomRecord {
 			$this->medialist[$link] = $media;
 		}
 		uasort($this->medialist, "ItemSort");
+		$this->media_count=count($this->medialist);
 		return $this->medialist;
 	}
-	/**
-	 * get the list of media connected to this source
-	 * @return array
-	 */
-	public function getSourceNotes() {
-		global $TBLPREFIX, $GEDCOMID;
+	
+	private function GetSourceNotes() {
+		global $GEDCOMID;
 
 		if (!is_null($this->notelist)) return $this->notelist;
 		$this->notelist = array();
@@ -213,6 +270,7 @@ class Source extends GedcomRecord {
 			$note_controller->GetNoteList("", $links);
 			$this->notelist = $note_controller->notelist;
 		}
+		$this->note_count=count($this->notelist);
 		return $this->notelist;
 	}
 }

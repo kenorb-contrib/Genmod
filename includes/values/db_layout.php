@@ -45,7 +45,7 @@ if (isset($_POST["TBLPREFIX"])) $TBLPREFIX = $_POST["TBLPREFIX"];
 	* 0/1 fields												:	TINYINT(1)
 	* Order type fields (max 255)								:	TINYINT UNSIGNED
 	* Auto increment fields										:	INT
-	* Username													:	VARCHAR(30)
+	* Username													:	VARBINARY(30) NOT NULL DEFAULT ''
 	* Fact tag													:	VARCHAR(15)
 */
 
@@ -75,7 +75,7 @@ $db_original[$TBLPREFIX."asso"]["key"]["as_of"] = "KEY `as_of` (`as_of`)";
 $db_original[$TBLPREFIX."asso"]["key"]["as_rel"] = "KEY `as_rel` (`as_of`, `as_type`)";
 
 $db_original[$TBLPREFIX."blocks"]["row"]["b_id"]["details"] = "INT NOT NULL AUTO_INCREMENT";
-$db_original[$TBLPREFIX."blocks"]["row"]["b_username"]["details"] = "VARCHAR(30) CHARACTER SET #charset# COLLATE #collate# ";
+$db_original[$TBLPREFIX."blocks"]["row"]["b_username"]["details"] = "VARBINARY(30) NOT NULL DEFAULT ''";
 $db_original[$TBLPREFIX."blocks"]["row"]["b_location"]["details"] = "VARCHAR(30) CHARACTER SET #charset# COLLATE #collate# ";
 $db_original[$TBLPREFIX."blocks"]["row"]["b_order"]["details"] = "TINYINT UNSIGNED";
 $db_original[$TBLPREFIX."blocks"]["row"]["b_name"]["details"] = "VARCHAR(255) CHARACTER SET #charset# COLLATE #collate# ";
@@ -148,8 +148,8 @@ $db_original[$TBLPREFIX."families"]["key"]["fam_id_file"] = "UNIQUE KEY `fam_id_
 $db_original[$TBLPREFIX."families"]["key"]["fam_file"] = "KEY `fam_file` (`f_file`)";
 $db_original[$TBLPREFIX."families"]["key"]["fam_gedcom"] = "FULLTEXT `fam_gedcom` (`f_gedcom`)";
 
-$db_original[$TBLPREFIX."favorites"]["row"]["fv_id"]["details"] = "INT NOT NULL";       
-$db_original[$TBLPREFIX."favorites"]["row"]["fv_username"]["details"] = "VARCHAR(30) CHARACTER SET #charset# COLLATE #collate# ";
+$db_original[$TBLPREFIX."favorites"]["row"]["fv_id"]["details"] = "INT NOT NULL AUTO_INCREMENT";       
+$db_original[$TBLPREFIX."favorites"]["row"]["fv_username"]["details"] = "VARBINARY(30) NOT NULL DEFAULT ''";
 $db_original[$TBLPREFIX."favorites"]["row"]["fv_gid"]["details"] = "VARCHAR(64) CHARACTER SET #charset# COLLATE #collate# ";
 $db_original[$TBLPREFIX."favorites"]["row"]["fv_type"]["details"] = "VARCHAR(10) CHARACTER SET #charset# COLLATE #collate# ";
 $db_original[$TBLPREFIX."favorites"]["row"]["fv_file"]["details"] = "TINYINT UNSIGNED";
@@ -433,7 +433,7 @@ $db_original[$TBLPREFIX."facts"]["key"]["primary"] = "PRIMARY KEY  (`lg_string`)
 $db_original[$TBLPREFIX."lockout"]["row"]["lo_ip"]["details"] = "VARCHAR(16) CHARACTER SET #charset# COLLATE #collate# ";
 $db_original[$TBLPREFIX."lockout"]["row"]["lo_timestamp"]["details"] = "INT(11)";
 $db_original[$TBLPREFIX."lockout"]["row"]["lo_release"]["details"] = "INT(11)";
-$db_original[$TBLPREFIX."lockout"]["row"]["lo_username"]["details"] = "VARCHAR(30) CHARACTER SET #charset# COLLATE #collate# ";
+$db_original[$TBLPREFIX."lockout"]["row"]["lo_username"]["details"] = "VARBINARY(30) NOT NULL DEFAULT ''";
 $db_original[$TBLPREFIX."lockout"]["key"]["primary"] = "PRIMARY KEY (`lo_ip`, `lo_username`)";
             
 $db_original[$TBLPREFIX."log"]["row"]["l_num"]["details"] = "INT AUTO_INCREMENT";
@@ -530,7 +530,7 @@ $db_original[$TBLPREFIX."names"]["key"]["name_surn_file"] = "KEY `name_surn_file
 $db_original[$TBLPREFIX."names"]["key"]["name_file"] = "KEY `name_file` (`n_file`)";
              
 $db_original[$TBLPREFIX."news"]["row"]["n_id"]["details"] = "INT NOT NULL";
-$db_original[$TBLPREFIX."news"]["row"]["n_username"]["details"] = "VARCHAR(30) CHARACTER SET #charset# COLLATE #collate# ";
+$db_original[$TBLPREFIX."news"]["row"]["n_username"]["details"] = "VARBINARY(30) NOT NULL DEFAULT ''";
 $db_original[$TBLPREFIX."news"]["row"]["n_date"]["details"] = "INT";
 $db_original[$TBLPREFIX."news"]["row"]["n_title"]["details"] = "VARCHAR(255) CHARACTER SET #charset# COLLATE #collate# ";
 $db_original[$TBLPREFIX."news"]["row"]["n_text"]["details"] = "TEXT CHARACTER SET #charset# COLLATE #collate# ";

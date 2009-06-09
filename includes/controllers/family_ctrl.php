@@ -125,7 +125,7 @@ class FamilyRoot extends BaseController
 		$famrec = trim($this->famrec);
 		if (empty($famrec)) $this->famrec = "0 @".$this->famid."@ FAM\r\n";
 		$this->display = displayDetailsByID($this->famid, 'FAM');
-		$this->family = new Family($this->famrec);
+		$this->family = new Family($this->famid, $this->famrec);
 		
 		
 		//-- check if we can display both parents

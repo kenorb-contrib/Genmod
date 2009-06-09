@@ -1986,7 +1986,8 @@ function GMRFactsSHandler($attrs) {
 //		print "<br /><br />";
 	} else {
 		$ignorefacts = preg_split("/[\s,;:]/", $tag);
-		$oldperson = new Person($gedrec);
+		$id = GetRecID($gedrec);
+		$oldperson = new Person($id, $gedrec);
 		$facts = RetrieveNewFacts($oldperson->xref, true);
 		foreach ($facts as $key=>$fact) {
 			$ct = preg_match("/1 (.+)/", $fact, $match);

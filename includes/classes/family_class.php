@@ -48,10 +48,10 @@ class Family extends GedcomRecord {
 	 * constructor
 	 * @param string $gedrec	the gedcom record
 	 */
-	public function __construct($gedrec, $changed=false) {
+	public function __construct($id, $gedrec, $changed=false) {
 		global $GEDCOM, $show_changes, $Users;
 		
-		parent::__construct($gedrec);
+		parent::__construct($id, $gedrec);
 		$this->disp = displayDetailsById($this->xref, "FAM");
 
 		if ((!isset($show_changes) || $show_changes != "no") && $Users->UserCanEdit($Users->GetUserName())) $this->show_changes = true;
@@ -71,7 +71,7 @@ class Family extends GedcomRecord {
 				$indirec = $rec[$GEDCOM][$husb];
 			}
 			else $indirec = FindPersonRecord($husb);
-			$this->husb = new Person($indirec);
+			$this->husb = new Person($husb, $indirec);
 		}
 		$wiferec = GetSubRecord(1, "1 WIFE", $gedrec);
 		if (!empty($wiferec)) {
@@ -82,7 +82,7 @@ class Family extends GedcomRecord {
 				$indirec = $rec[$GEDCOM][$wife];
 			}
 			else $indirec = FindPersonRecord($wife);
-			$this->wife = new Person($indirec);
+			$this->wife = new Person($wife, $indirec);
 		}
 
 		if ($this->show_changes && GetChangeData(true, $this->xref, true, "", "CHIL")) {
@@ -97,11 +97,11 @@ class Family extends GedcomRecord {
 			if ($this->show_changes && GetChangeData(true, $chil, true, "", "INDI")) {
 				$rec = GetChangeData(false, $chil, true, "gedlines", "INDI");
 				$indirec = $rec[$GEDCOM][$chil];
-				$this->children[] = new Person($indirec, true);
+				$this->children[] = new Person($chil, $indirec, true);
 			}
 			else {
 				$indirec = FindPersonRecord($chil);
-				$this->children[] = new Person($indirec);
+				$this->children[] = new Person($chil, $indirec);
 			}
 		}
 	}
@@ -132,7 +132,7 @@ class Family extends GedcomRecord {
 		
 		if (!is_null($this->media_count)) return $this->media_count;
 		
-		if ($this->show_changes) $gedrec = $this->getchangedGedcomRecord();
+		if ($this->show_changes) $gedrec = $this->getchangedGedRec();
 		else $gedrec = $this->gedrec;
 		$i = 1;
 		do {

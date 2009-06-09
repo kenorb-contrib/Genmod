@@ -51,6 +51,7 @@ class Favorite extends Favorites {
 			$this->title = $favdata["fv_title"];
 			$this->note = $favdata["fv_note"];
 			$this->url = $favdata["fv_url"];
+			if ($this->type == "SOUR") $this->object = new source($this->gid);
 		}
 	}
 	

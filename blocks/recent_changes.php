@@ -39,7 +39,7 @@ $GM_BLOCKS["print_recent_changes"]["rss"]       = true;
 **/
 function print_recent_changes($block=true, $config="", $side, $index) {
 	global $gm_lang, $factarray, $month, $year, $day, $monthtonum, $HIDE_LIVE_PEOPLE, $SHOW_ID_NUMBERS, $command, $TEXT_DIRECTION, $SHOW_FAM_ID_NUMBERS;
-	global $GM_IMAGE_DIR, $GM_IMAGES, $GEDCOM, $REGEXP_DB, $DEBUG, $ASC, $IGNORE_FACTS, $IGNORE_YEAR, $TOTAL_QUERIES, $LAST_QUERY, $GM_BLOCKS, $SHOW_SOURCES;
+	global $GM_IMAGE_DIR, $GM_IMAGES, $GEDCOM, $GEDCOMID, $REGEXP_DB, $DEBUG, $ASC, $IGNORE_FACTS, $IGNORE_YEAR, $TOTAL_QUERIES, $LAST_QUERY, $GM_BLOCKS, $SHOW_SOURCES;
 	global $medialist, $gm_username, $Users;
 
 	$block = true;			// Always restrict this block's height
@@ -160,32 +160,19 @@ function print_recent_changes($block=true, $config="", $side, $index) {
 			}
 
 			if ($factarr[2]=="SOUR") {
+				$source = new source($factarr[0]);
 				$gid = $factarr[0];
 				$factrec = $factarr[1];
-				if (displayDetailsById($gid, "SOUR", 1, true)) {
-					$sourcerec = FindSourceRecord($gid);
-					$name = GetSourceDescriptor($gid);
+				if ($source->disp) {
 					if ($lastgid!=$gid) {
-						print "<a href=\"source.php?sid=$gid&amp;ged=".$GEDCOM."\"><b>".PrintReady($name)."</b>";
-						if ($SHOW_FAM_ID_NUMBERS) {
-						   if ($TEXT_DIRECTION=="ltr")
-								print " &lrm;($gid)&lrm;";
-						   else print " &rlm;($gid)&rlm;";
-						}
+						print "<a href=\"source.php?sid=$gid&amp;gedid=".$GEDCOMID."\"><b>".PrintReady($source->descriptor)."</b>";
+						if ($SHOW_FAM_ID_NUMBERS) print $source->addxref;
 						print "</a><br />\n";
 						$lastgid=$gid;
 					}
 					print "<div class=\"indent" . ($TEXT_DIRECTION=="rtl"?"_rtl":"") . "\">";
 					print $factarray["CHAN"];
-					$ct = preg_match("/\d DATE (.*)/", $factrec, $match);
-					if ($ct>0) {
-							print " - <span class=\"date\">".GetChangedDate($match[1]);
-							$tt = preg_match("/3 TIME (.*)/", $factrec, $match);
-							if ($tt>0) {
-									print " - ".$match[1];
-							}
-							print "</span>\n";
-					}
+					print " - <span class=\"date\">".$source->lastchanged."</span>\n";
 					print "</div><br />";
 				}
 			}
