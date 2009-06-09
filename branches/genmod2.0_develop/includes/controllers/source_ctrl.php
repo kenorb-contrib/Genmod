@@ -30,12 +30,10 @@ if (stristr($_SERVER["SCRIPT_NAME"],"source_ctrl")) {
 /**
  * Main controller class for the source page.
  */
-class SourceControllerRoot extends BaseController {
-	var $classname = "SourceControllerRoot";
-	var $sid;
-	var $show_changes = "yes";
-	var $action = "";
-	var $source = null;
+class SourceController extends DetailController {
+	public $classname = "SourceController";
+	private $action = "";
+	public $source = null;
 	var $uname = "";
 	var $diffsource = null;
 	var $canedit = false;
@@ -53,20 +51,19 @@ class SourceControllerRoot extends BaseController {
 
 		$nonfacts = array();
 		
-		if ((!isset($_REQUEST["show_changes"]) || $_REQUEST["show_changes"] != "no") && $Users->UserCanEdit($this->uname)) $this->show_changes = true;
 		if (!empty($_REQUEST["action"])) $this->action = $_REQUEST["action"];
-		if (!empty($_REQUEST["sid"])) $this->sid = strtoupper($_REQUEST["sid"]);
-		$this->sid = CleanInput($this->sid);
+		if (!empty($_REQUEST["sid"])) $this->xref = strtoupper($_REQUEST["sid"]);
+		$this->xref = CleanInput($this->xref);
 		
-		$sourcerec = FindSourceRecord($this->sid);
-		if (!$sourcerec) {
-			if (!GetChangeData(true, $this->sid, true, "", "")) $this->isempty = true;
-			$sourcerec = "0 @".$this->sid."@ SOUR\r\n";
-		}
+		$sourcerec = FindSourceRecord($this->xref);
+//		if (!$sourcerec) {
+//			if (!GetChangeData(true, $this->sid, true, "", "")) $this->isempty = true;
+//			$sourcerec = "0 @".$this->sid."@ SOUR\r\n";
+//		}
 		
-		$this->source = new Source($sourcerec);
-		
-		if (!$this->source->canDisplayDetails()) {
+		$this->source = new Source($this->xref, $sourcerec);
+
+		if (!$this->source->disp) {
 			print_header($gm_lang["private"]." ".$gm_lang["source_info"]);
 			print_privacy_error($CONTACT_EMAIL);
 			print_footer();
@@ -80,9 +77,6 @@ class SourceControllerRoot extends BaseController {
 			case "addfav":
 				$this->addFavorite();
 				break;
-			case "accept":
-				$this->acceptChanges();
-				break;
 		}
 		
 		//-- check for the user
@@ -93,11 +87,11 @@ class SourceControllerRoot extends BaseController {
 //			$sourcerec = $newrec;
 //		}
 		
-		if ($this->source->canDisplayDetails()) {
+		if ($this->source->disp) {
 			$this->canedit = $Users->userCanEdit($this->uname);
 		}
 		
-		if ($this->source->canDisplayDetails() && ($Users->userCanViewGedlines() || $ENABLE_CLIPPINGS_CART >= $Users->getUserAccessLevel() || !empty($this->uname))) {
+		if ($this->source->disp && ($Users->userCanViewGedlines() || $ENABLE_CLIPPINGS_CART >= $Users->getUserAccessLevel() || !empty($this->uname))) {
 			$this->display_other_menu = true;
 		}
 	}
@@ -127,8 +121,12 @@ class SourceControllerRoot extends BaseController {
 	 * @return string
 	 */
 	function getPageTitle() {
-		global $gm_lang;
-		return $this->source->getTitle()." - ".$this->sid." - ".$gm_lang["source_info"];
+		global $gm_lang, $SHOW_ID_NUMBERS;
+
+		if ($SHOW_ID_NUMBERS) $add = $this->xref." - ";
+		else $add = "";
+		if ($this->source->title) return $this->source->title." - ".$add.$gm_lang["source_info"];
+		else return $add.$gm_lang["source_info"];
 	}
 	/**
 	 * check if use can edit this person
@@ -143,7 +141,7 @@ class SourceControllerRoot extends BaseController {
 	 * @return Menu
 	 */
 	function &getEditMenu() {
-		global $TEXT_DIRECTION, $GEDCOM, $gm_lang, $Users, $show_changes;
+		global $TEXT_DIRECTION, $GEDCOM, $gm_lang, $Users;
 		
 		if ($TEXT_DIRECTION=="rtl") $ff="_rtl";
 		else $ff="";
@@ -155,23 +153,23 @@ class SourceControllerRoot extends BaseController {
 			// edit source / edit_raw
 			if ($Users->userCanEditGedlines()) {
 				$submenu = new Menu($gm_lang['edit_raw']);
-				$submenu->addLink("edit_raw('".$this->sid."', 'edit_raw');");
+				$submenu->addLink("edit_raw('".$this->source->xref."', 'edit_raw');");
 				$menu->addSubmenu($submenu);
 			}
 
 			// edit source / delete_source
 			$submenu = new Menu($gm_lang['delete_source']);
-			$submenu->addLink("if (confirm('".$gm_lang["confirm_delete_source"]."'))  deletesource('".$this->sid."', 'delete_source'); ");
+			$submenu->addLink("if (confirm('".$gm_lang["confirm_delete_source"]."'))  deletesource('".$this->source->xref."', 'delete_source'); ");
 			$menu->addSubmenu($submenu);
 
-			if (GetChangeData(true, $this->sid, true)) {
+			if ($this->source->ischanged) {
 				// edit_sour / seperator
 				$submenu = new Menu();
 				$submenu->isSeperator();
 				$menu->addSubmenu($submenu);
 
 				// edit_sour / show/hide changes
-				if ($show_changes == "no") $submenu = new Menu($gm_lang['show_changes']);
+				if (!$this->source->show_changes) $submenu = new Menu($gm_lang['show_changes']);
 				else $submenu = new Menu($gm_lang['hide_changes']);
 				$submenu->addLink('showchanges();');
 				$menu->addSubmenu($submenu);
@@ -195,7 +193,7 @@ class SourceControllerRoot extends BaseController {
 		$menu = new Menu($gm_lang['other']);
 		if ($Users->userCanViewGedlines()) {
 				// other / view_gedcom
-				if ($this->show_changes == 'yes' && $this->userCanEdit()) $execute = "show_gedcom_record('new');";
+				if ($this->source->show_changes && $this->userCanEdit()) $execute = "show_gedcom_record('new');";
 				else $execute = "show_gedcom_record();";
 				$submenu = new Menu($gm_lang['view_gedcom']);
 				$submenu->addLink($execute);
@@ -204,28 +202,16 @@ class SourceControllerRoot extends BaseController {
 		if ($ENABLE_CLIPPINGS_CART >= $Users->getUserAccessLevel()) {
 				// other / add_to_cart
 				$submenu = new Menu($gm_lang['add_to_cart']);
-				$submenu->addLink('clippings.php?action=add&id='.$this->sid.'&type=sour');
+				$submenu->addLink('clippings.php?action=add&id='.$this->source->xref.'&type=sour');
 				$menu->addSubmenu($submenu);
 		}
-		if ($this->source->canDisplayDetails() && !empty($this->uname)) {
+		if ($this->source->disp && !empty($this->uname)) {
 				// other / add_to_my_favorites
 				$submenu = new Menu($gm_lang['add_to_my_favorites']);
-				$submenu->addLink('source.php?action=addfav&sid='.$this->sid.'&gid='.$this->sid);
+				$submenu->addLink('source.php?action=addfav&sid='.$this->source->xref.'&gid='.$this->source->xref);
 				$menu->addSubmenu($submenu);
 		}
 		return $menu;
-	}
-}
-// -- end of class
-//-- load a user extended class if one exists
-if (file_exists('includes/controllers/source_ctrl_user.php'))
-{
-	include_once 'includes/controllers/source_ctrl_user.php';
-}
-else
-{
-	class SourceController extends SourceControllerRoot
-	{
 	}
 }
 ?>

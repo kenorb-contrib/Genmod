@@ -41,17 +41,24 @@ if (stristr($_SERVER["SCRIPT_NAME"],basename(__FILE__))) {
  * @todo Update this description
  */
 class BaseController {
-	var $view = "";
+	public $view = "";
+	public $xref = null;
+	public $show_changes = null;
 	/**
 	 * constructor for this class
 	 */
-	function __construct() {
+	protected function __construct() {
+		global $show_changes;
+		
 		if (isset($_REQUEST["view"])) $this->view = $_REQUEST["view"];
+		
+		$this->show_changes = $show_changes;
+
 	}
 	/**
 	 * check if this controller should be in print preview mode
 	 */
-	function isPrintPreview() {
+	public function isPrintPreview() {
 		if ($this->view == "preview") return true;
 		else return false;
 	}

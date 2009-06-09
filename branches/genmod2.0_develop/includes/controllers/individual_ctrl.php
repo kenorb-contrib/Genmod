@@ -33,9 +33,9 @@ if (stristr($_SERVER["SCRIPT_NAME"],basename(__FILE__))) {
 /**
  * Main controller class for the individual page.
  */
-class IndividualControllerRoot extends BaseController {
+class IndividualController extends BaseController {
 	
-	var $classname = "IndividualControllerRoot";
+	var $classname = "IndividualController";
 	var $action = "";
 	var $pid = "";
 	var $default_tab = 0;
@@ -145,12 +145,12 @@ class IndividualControllerRoot extends BaseController {
 		}
 		
 		// NOTE: Create the person Object
-		if ($this->newindi) $this->indi = new Person($indirec, true);
-		else $this->indi = new Person($indirec);
+		if ($this->newindi) $this->indi = new Person($this->pid, $indirec, true);
+		else $this->indi = new Person($this->pid, $indirec);
 	//	print_r($this->indi);
 		$this->close_relatives = $this->indi->close_relatives;
 		
-		if (!$this->indi->exist) {
+		if ($this->indi->isempty) {
 			$this->PageTitle = $gm_lang["person_not_found"];
 			return false;
 		}
@@ -193,7 +193,7 @@ class IndividualControllerRoot extends BaseController {
 			
 			// NOTE: What menus can we show?
 			if ($this->indi->disp && (!empty($this->uname) || $Users->userCanViewGedlines() || $ENABLE_CLIPPINGS_CART >= $Users->getUserAccessLevel())) $this->show_menu_other = true;
-			if ($this->indi->exist && !$this->indi->indideleted && ($this->canedit || $this->caneditown)) $this->show_menu_edit = true;
+			if (!$this->indi->isempty && !$this->indi->indideleted && ($this->canedit || $this->caneditown)) $this->show_menu_edit = true;
 			
 			// NOTE: Parse all facts into arrays
 			$this->indi->parseFacts();
@@ -440,7 +440,7 @@ class IndividualControllerRoot extends BaseController {
 		//-- main other menu item
 		$menu = new Menu($gm_lang["other"]);
 		
-		if ($this->indi->exist) {
+		if (!$this->indi->isempty) {
 			// Show Gedcom Record
 			if ($this->canShowGedcomRecord) {
 				if ($this->show_changes  && $this->canedit) $execute = "show_gedcom_record('new');";
@@ -620,16 +620,6 @@ class IndividualControllerRoot extends BaseController {
 				break;
 		}
 		return "person_box".$isf;
-	}
-}
-// -- end of class
-//-- load a user extended class if one exists
-if (file_exists('includes/controllers/individual_ctrl_user.php')) {
-	include_once 'includes/controllers/individual_ctrl_user.php';
-}
-else {
-	class IndividualController extends IndividualControllerRoot	{
-		
 	}
 }
 ?>

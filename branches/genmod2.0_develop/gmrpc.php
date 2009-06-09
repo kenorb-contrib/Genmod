@@ -125,11 +125,8 @@ switch($action) {
 		$sid = strtoupper($sid);
 		if (empty($sid)) print "";
 		else {
-			$sourcerec = FindSourceRecord($sid);
-			if (!$sourcerec && !GetChangeData(true, $sid, true, "", "")) {
-				print "<span class=\"error\">".$gm_lang["source_id_no_exists"]."</span>";
-			}
-			else if (DisplayDetailsByID($sid, "SOUR", 1, true)) print GetSourceDescriptor($sid)." (".$sid.")";
+			$source = new source($sid);
+			if ($source->disp) print $source->descriptor.$source->addxref;
 			else print "";
 		}
 	break;
@@ -169,7 +166,7 @@ switch($action) {
 			if ($note_controller->isempty) {
 				print "<span class=\"error\">".$gm_lang["note_id_no_exists"]."</span>";
 			}
-			else if ($note_controller->note->canDisplayDetails()) print $note_controller->note->GetTitle(40, true)." (".$oid.")";
+			else if ($note_controller->note->disp) print $note_controller->note->GetTitle(40, true)." (".$oid.")";
 			else print "";
 		}
 	break;

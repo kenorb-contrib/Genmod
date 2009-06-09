@@ -340,7 +340,9 @@ function GetAllSubrecords($gedrec, $ignore="", $families=true, $sort=true, $Appl
 			else $dispmedialink = true;
 			if ($ApplyPriv && preg_match("/\d\sSOUR\s@(\w+)@/", $match[$i][0], $mmatch)) $dispsourcelink = DisplayDetailsByID($mmatch[1], "SOUR", 1, true);
 			else $dispsourcelink = true;
-			if (!$ApplyPriv || (showFact($fact, $id, $type) && showFactDetails($fact,$id) && $dispmedialink && $dispsourcelink)) {
+			if ($ApplyPriv && preg_match("/\d\sNOTE\s@(\w+)@/", $match[$i][0], $mmatch)) $dispnotelink = DisplayDetailsByID($mmatch[1], "NOTE", 1, true);
+			else $dispnotelink = true;
+			if (!$ApplyPriv || (showFact($fact, $id, $type) && showFactDetails($fact,$id) && $dispmedialink && $dispsourcelink && $dispnotelink)) {
 				$subrec = GetSubRecord(1, "1 $fact", $gedrec, $prev_tags[$fact]);
 				if (!$ApplyPriv || (!FactViewRestricted($id, $subrec) && !FactViewRestricted($id, $gedrec, 1))) {
 					if ($fact=="EVEN") {
@@ -1629,7 +1631,7 @@ function GmMail($mailto, $subject, $message, $from_name='', $from_mail='', $repl
 		$message = $html_header.$message.$html_footer;
 	}
 	
-	require_once('includes/functions/sendmail.class.php');
+	require_once('includes/classes/sendmail.class.php');
 	$sendmail = new SendMail($filenames, $path, $mailto, $from_mail, $from_name, $replyto, $subject, $message, $html, $admincopy);
 }
 

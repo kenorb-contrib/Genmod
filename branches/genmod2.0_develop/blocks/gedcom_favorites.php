@@ -74,7 +74,7 @@ function print_gedcom_favorites_config($favid="") {
 	print "<br />";
 	if ($fav->type == "INDI") print GetPersonName($fav->gid);
 	if ($fav->type == "FAM") print GetFamilyDescriptor($fav->gid);
-	if ($fav->type == "SOUR") print GetSourceDescriptor($fav->gid);
+	if ($fav->type == "SOUR") print $fav->object->descriptor;
 	if ($fav->type == "OBJE") print GetMediaDescriptor($fav->gid);
 	if ($fav->type == "NOTE") {
 		$note_controller = new NoteController($fav->gid);
@@ -84,7 +84,7 @@ function print_gedcom_favorites_config($favid="") {
 	print "<input type=\"hidden\" name=\"action\" value=\"storefav\" />\n";
 	print "<input type=\"hidden\" name=\"id\" value=\"".$fav->id."\" />\n";
 	print "<input type=\"hidden\" name=\"gid\" value=\"".$fav->gid."\" />\n";
-	print "<input type=\"hidden\" name=\"username\" value=\"".$fav->username."\" />\n";
+	print "<input type=\"hidden\" name=\"username\" value=\"\" />\n";
 	print "<input type=\"hidden\" name=\"type\" value=\"".$fav->type."\" />\n";
 	print "<input type=\"hidden\" name=\"file\" value=\"".$fav->file."\" />\n";
 	if ($fav->type == "URL") {

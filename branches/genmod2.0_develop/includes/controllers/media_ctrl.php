@@ -31,7 +31,7 @@ if (stristr($_SERVER["SCRIPT_NAME"],basename(__FILE__))) {
 /**
  * Main controller class for the media page.
  */
-class MediaControllerRoot extends BaseController {
+class MediaControllerRoot extends DetailController {
 	var $classname = "MediaControllerRoot";
 	var $mid;
 	var $show_changes = "yes";

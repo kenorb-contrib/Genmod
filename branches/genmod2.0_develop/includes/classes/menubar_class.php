@@ -319,6 +319,14 @@ class MenuBar {
 		$mypid = $pid;
 		foreach($userfavs as $key => $favorite) {
 			SwitchGedcom($favorite->file);
+			if ($favorite->type=="SOUR" && $favorite->object->disp) {
+				if ($SHOW_ID_NUMBERS) $addid = " (".$favorite->gid.")";
+				else $addid = "";
+				$sourname = PrintReady(trim($favorite->object->title).$addid);
+				$submenu = new Menu($sourname, true);
+				$submenu->addLink("source.php?sid=".$favorite->gid."&ged=$GEDCOM");
+				$menu->submenus[count($menu->submenus)-1]->submenus[]=$submenu;
+			}
 			if (displayDetailsById($favorite->gid, $favorite->type, 1, true)) {
 				$indirec = FindGedcomRecord($favorite->gid);
 				if ($favorite->type=="INDI") {
@@ -337,14 +345,6 @@ class MenuBar {
 					$submenu->addLink("family.php?famid=".$favorite->gid."&ged=$GEDCOM");
 					$menu->submenus[count($menu->submenus)-1]->submenus[]=$submenu;
 				}
-				if ($favorite->type=="SOUR") {
-					if ($SHOW_ID_NUMBERS) $addid = " (".$favorite->gid.")";
-					else $addid = "";
-					$sourname = PrintReady(trim(GetSourceDescriptor($favorite->gid)).$addid);
-					$submenu = new Menu($sourname);
-					$submenu->addLink("source.php?sid=".$favorite->gid."&ged=$GEDCOM");
-					$menu->submenus[count($menu->submenus)-1]->submenus[]=$submenu;
-				}
 				if ($favorite->type=="OBJE") {
 					if ($SHOW_ID_NUMBERS) $addid = " (".$favorite->gid.")";
 					else $addid = "";
@@ -358,7 +358,7 @@ class MenuBar {
 					else $addid = "";
 					$note_controller = new NoteController($favorite->gid);
 					// Note is deleted or doesn't exist
-					if (!$note_controller->isempty && $note_controller->note->canDisplayDetails()) {
+					if (!$note_controller->note->isempty && $note_controller->note->disp) {
 						$notename = $note_controller->note->GetTitle(80, false).$addid;
 						$submenu = new Menu($notename);
 						$submenu->addLink("note.php?oid=".$favorite->gid."&gedid=$GEDCOMID");
@@ -393,6 +393,14 @@ class MenuBar {
 					$submenu->addLink($favorite->url);
 					$menu->submenus[count($menu->submenus)-1]->submenus[]=$submenu;
 				}
+				elseif ($favorite->type=="SOUR" && $favorite->object->disp) {
+						if ($SHOW_ID_NUMBERS) $addid = " (".$favorite->gid.")";
+						else $addid = "";
+						$sourname = PrintReady(trim($favorite->object->title).$addid);
+						$submenu = new Menu($sourname);
+						$submenu->addLink("source.php?sid=".$favorite->gid."&gedid=$GEDCOMID");
+						$menu->submenus[count($menu->submenus)-1]->submenus[]=$submenu;
+				}
 				else if (displayDetailsById($favorite->gid, $favorite->type, 1, true)) {
 					$indirec = FindGedcomRecord($favorite->gid);
 					if ($favorite->type=="INDI") {
@@ -411,14 +419,6 @@ class MenuBar {
 						$submenu->addLink("family.php?famid=".$favorite->gid."&ged=$GEDCOM");
 						$menu->submenus[count($menu->submenus)-1]->submenus[]=$submenu;
 					}
-					if ($favorite->type=="SOUR") {
-						if ($SHOW_ID_NUMBERS) $addid = " (".$favorite->gid.")";
-						else $addid = "";
-						$sourname = PrintReady(trim(GetSourceDescriptor($favorite->gid)).$addid);
-						$submenu = new Menu($sourname);
-						$submenu->addLink("source.php?sid=".$favorite->gid."&ged=$GEDCOM");
-						$menu->submenus[count($menu->submenus)-1]->submenus[]=$submenu;
-					}
 					if ($favorite->type=="OBJE") {
 						if ($SHOW_ID_NUMBERS) $addid = " (".$favorite->gid.")";
 						else $addid = "";
@@ -432,7 +432,7 @@ class MenuBar {
 						else $addid = "";
 						$note_controller = new NoteController($favorite->gid);
 						// Note is deleted or doesn't exist
-						if (!$note_controller->isempty && $note_controller->note->canDisplayDetails()) {
+						if (!$note_controller->note->isempty && $note_controller->note->disp) {
 							$notename = $note_controller->note->GetTitle(80, false).$addid;
 							$submenu = new Menu($notename);
 							$submenu->addLink("note.php?oid=".$favorite->gid."&gedid=$GEDCOMID");
@@ -803,7 +803,7 @@ class MenuBar {
 	function GetThisSourceMenu(&$source_controller) {
 		global $gm_lang, $Users, $ALLOW_EDIT_GEDCOM;
 		
-		if (!$source_controller->isempty && !$source_controller->source->sourdeleted) {
+		if (!$source_controller->isempty && !$source_controller->source->isdeleted) {
 			//-- main edit menu item
 			$menu = new Menu($gm_lang["this_source"]);
 			

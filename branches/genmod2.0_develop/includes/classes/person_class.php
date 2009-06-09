@@ -59,20 +59,26 @@ class Person extends GedcomRecord {
 	var $sosamax = 7;
 	var $fams = null;
 	var $famc = null;
-	var $spouseFamilies = null;
-	var $childFamilies = null;
 	var $close_relatives = false;
 	var $media_count = null;
 	var $actionlist = array();
+	public $sexdetails;
+	
+	// holder arrays for person objects
+	var $parents = null;
+	var $siblings = null;
+	var $spouses = null;
+	var $mother_family = null;
+	var $father_family = null;
 	
 	/**
 	 * Constructor for person object
 	 * @param string $gedrec	the raw individual gedcom record
 	 */
-	public function __construct($gedrec, $changed=false) {
+	public function __construct($id, $gedrec, $changed=false) {
 		global $MAX_ALIVE_AGE, $GEDCOM, $controller, $show_changes, $Users, $Actions;
 		
-		parent::__construct($gedrec);
+		parent::__construct($id, $gedrec);
 
 		// NOTE: See if we can show changes
 		if ((!isset($show_changes) || $show_changes != "no") && $Users->UserCanEditOwn($Users->GetUserName(), $this->xref)) $this->show_changes = true;
@@ -203,7 +209,7 @@ class Person extends GedcomRecord {
 		
 		if (!is_null($this->media_count)) return $this->media_count;
 		
-		if ($this->show_changes) $gedrec = $this->getchangedGedcomRecord();
+		if ($this->show_changes) $gedrec = $this->getchangedGedRec();
 		else $gedrec = $this->gedrec;
 		$i = 1;
 		do {
@@ -1029,13 +1035,13 @@ class Person extends GedcomRecord {
 						if ($this->show_changes && (GetChangeData(true, $parentid, true, "", "INDI"))) {
 							$rec = GetChangeData(false, $parentid, true, "gedlines", "INDI");
 							$parentrec = $rec[$GEDCOM][$parentid];
-							$this->parents[$famid][$type] = new Person($parentrec, true);
+							$this->parents[$famid][$type] = new Person($parentid, $parentrec, true);
 						}
-						else $this->parents[$famid][$type] = new Person(FindGedcomRecord($parentid));
+						else $this->parents[$famid][$type] = new Person($parentid, FindGedcomRecord($parentid));
 						// NOTE: Family with Parents
 						$sex = $this->parents[$famid][$type]->getSex();
 						$label = $this->parents[$famid][$type]->gender($sex, $rela."parents");
-						if ($this->parents[$famid][$type]->getxref()==$this->xref) $label = "<img src=\"images/selected.png\" alt=\"\" />";
+						if ($this->parents[$famid][$type]->xref==$this->xref) $label = "<img src=\"images/selected.png\" alt=\"\" />";
 						$this->parents[$famid][$type]->setLabel($label);
 					}
 				}
@@ -1059,9 +1065,9 @@ class Person extends GedcomRecord {
 					if ($this->show_changes && (GetChangeData(true, $sibid, true, "", ""))) {
 						$rec = GetChangeData(false, $sibid, true, "gedlines", "");
 						$sibrec = $rec[$GEDCOM][$sibid];
-						if(!isset($this->siblings[$sibid])) $this->siblings[$sibid] = new Person($sibrec, true);
+						if(!isset($this->siblings[$sibid])) $this->siblings[$sibid] = new Person($sibid, $sibrec, true);
 					}
-					else if (!isset($this->siblings[$sibid])) $this->siblings[$sibid] = new Person(FindGedcomRecord($sibid));
+					else if (!isset($this->siblings[$sibid])) $this->siblings[$sibid] = new Person($sibid, FindGedcomRecord($sibid));
 //					NOTE: we must get the relation of the person to the siblings, not of the siblings to the family!
 					if ($prela == "") {
 						$famlink = GetSubRecord(1, "1 FAMC @".$famid."@", $this->siblings[$sibid]->gedrec);
@@ -1071,7 +1077,7 @@ class Person extends GedcomRecord {
 					}
 					$sex = $this->siblings[$sibid]->getSex();
 					$label = $this->siblings[$sibid]->gender($sex, $rela."parentskids");
-					if ($this->siblings[$sibid]->getxref()==$this->xref) $label = "<img src=\"images/selected.png\" alt=\"\" />";
+					if ($this->siblings[$sibid]->xref==$this->xref) $label = "<img src=\"images/selected.png\" alt=\"\" />";
 					$this->siblings[$sibid]->setFamLabel($famid, $label);
 				}
 			}
@@ -1133,7 +1139,7 @@ class Person extends GedcomRecord {
 						if (isset($rec[$GEDCOM][$parentid])) $parentged = $rec[$GEDCOM][$parentid];
 					}
 					if (!empty($parentged)) {
-						$this->spouses[$famid]["parents"][$type] = new Person($parentged);
+						$this->spouses[$famid]["parents"][$type] = new Person($parentid, $parentged);
 						$sex = $this->spouses[$famid]["parents"][$type]->getSex();
 						$divorced = "";
 						$married = "";
@@ -1144,7 +1150,7 @@ class Person extends GedcomRecord {
 						}
 						$divorced = GetSubRecord(1, "DIV", $famrec);
 						$label = $this->spouses[$famid]["parents"][$type]->gender($sex, "spouseparents", $divorced, $married);
-						if ($this->spouses[$famid]["parents"][$type]->getxref()==$this->xref) $label = "<img src=\"images/selected.png\" alt=\"\" />";
+						if ($this->spouses[$famid]["parents"][$type]->xref==$this->xref) $label = "<img src=\"images/selected.png\" alt=\"\" />";
 						$this->spouses[$famid]["parents"][$type]->setLabel($label);
 					}
 				}
@@ -1162,9 +1168,9 @@ class Person extends GedcomRecord {
 					if ($this->show_changes && GetChangeData(true, $kidid, true, "", "")) {
 						$rec = GetChangeData(false, $kidid, "gedlines", "");
 						$kidrec = $rec[$GEDCOM][$kidid];
-						$this->spouses[$famid]["kids"][$kidid] = new Person($kidrec, true);
+						$this->spouses[$famid]["kids"][$kidid] = new Person($kidid, $kidrec, true);
 					}
-					else $this->spouses[$famid]["kids"][$kidid] = new Person(FindGedcomRecord($kidid));
+					else $this->spouses[$famid]["kids"][$kidid] = new Person($kidid, FindGedcomRecord($kidid));
 					$sex = $this->spouses[$famid]["kids"][$kidid]->getSex();
 					// Get the type of family relationship
 					$famlink = GetSubRecord(1, "1 FAMC @".$famid."@", $this->spouses[$famid]["kids"][$kidid]->gedrec);
@@ -1172,7 +1178,7 @@ class Person extends GedcomRecord {
 					if ($ft>0 && $fmatch[1] != "birth") $rela = trim($fmatch[1]);
 					else $rela = "";
 					$label = $this->spouses[$famid]["kids"][$kidid]->gender($sex, $rela."spousekids");
-					if ($this->spouses[$famid]["kids"][$kidid]->getxref()==$this->xref) $label = "<img src=\"images/selected.png\" alt=\"\" />";
+					if ($this->spouses[$famid]["kids"][$kidid]->xref==$this->xref) $label = "<img src=\"images/selected.png\" alt=\"\" />";
 					$this->spouses[$famid]["kids"][$kidid]->setLabel($label);
 				}
 			}
@@ -1196,16 +1202,16 @@ class Person extends GedcomRecord {
 								$kids = FindChildrenInRecord($famrec, $father_famid);
 								if (count($kids) > 0) {
 									foreach ($kids as $kidkey => $kidid) {
-										$newkids[$kidid] = new Person(FindGedcomRecord($kidid));
+										$newkids[$kidid] = new Person($kidid, FindGedcomRecord($kidid));
 										$sex = $newkids[$kidid]->getSex();
 										$label = $newkids[$kidid]->gender($sex, "halfkids");
-										if ($newkids[$kidid]->getxref()==$this->xref) $label = "<img src=\"images/selected.png\" alt=\"\" />";
+										if ($newkids[$kidid]->xref==$this->xref) $label = "<img src=\"images/selected.png\" alt=\"\" />";
 										$newkids[$kidid]->setLabel($label);
 									}
 									$this->father_family[$father_famid]["kids"] = $newkids;
 									$parents = FindParentsInRecord($famrec);
 									foreach ($parents as $type => $parentid) {
-										$this->father_family[$father_famid][$type] = new Person(FindGedcomRecord($parentid));
+										$this->father_family[$father_famid][$type] = new Person($parentid, FindGedcomRecord($parentid));
 									}
 									// NOTE: Get the label for the family
 									$this->father_family[$father_famid]["label"] = $gm_lang["fathers_family_with"] . " ";
@@ -1241,16 +1247,16 @@ class Person extends GedcomRecord {
 								$kids = FindChildrenInRecord($famrec, $mother_famid);
 								if (count($kids) > 0) {
 									foreach ($kids as $kidkey => $kidid) {
-										$newkids[$kidid] = new Person(FindGedcomRecord($kidid));
+										$newkids[$kidid] = new Person($kidid, FindGedcomRecord($kidid));
 										$sex = $newkids[$kidid]->getSex();
 										$label = $newkids[$kidid]->gender($sex, "halfkids");
-										if ($newkids[$kidid]->getxref()==$this->xref) $label = "<img src=\"images/selected.png\" alt=\"\" />";
+										if ($newkids[$kidid]->xref==$this->xref) $label = "<img src=\"images/selected.png\" alt=\"\" />";
 										$newkids[$kidid]->setLabel($label);
 									}
 									$this->mother_family[$mother_famid]["kids"] = $newkids;
 									$parents = FindParentsInRecord($famrec);
 									foreach ($parents as $type => $parentid) {
-										$this->mother_family[$mother_famid][$type] = new Person(FindGedcomRecord($parentid));
+										$this->mother_family[$mother_famid][$type] = new Person($parentid, FindGedcomRecord($parentid));
 									}
 									// NOTE: Get the label for the family
 									$this->mother_family[$mother_famid]["label"] = $gm_lang["mothers_family_with"] . " ";
@@ -1506,7 +1512,7 @@ class Person extends GedcomRecord {
 					// // NOTE: Create a family object with the new record
 					// $family = new Family($famrec, true);
 				// }
-				$family = new Family($famrec);
+				$family = new Family($famid, $famrec);
 				$family->childFamily = $this->getChildFamilyLabel($family);
 				if ($ffamid["primary"] == "Y") $family->ShowPrimary = true;
 				else $family->ShowPrimary = false;

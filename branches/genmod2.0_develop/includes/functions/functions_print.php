@@ -4576,7 +4576,15 @@ function PrintBlockFavorites($userfavs, $side, $index, $style) {
 			print "</div>\n";
 		}
 		else {
-			if (DisplayDetailsByID($favorite->gid, $favorite->type, 1, true)) {
+			if ($favorite->type=="SOUR" && $favorite->object->disp) {
+				print "<div id=\"box".$favorite->object->xref.".0\" class=\"person_box";
+				print "\"><ul>\n";
+				print_list_source($favorite->object->xref, array("name"=>$favorite->object->descriptor, "gedfile"=>$favorite->file));
+				print "</ul>";
+				if (!empty($favorite->note)) print "<span class=\"favorite_padding\">".PrintReady($gm_lang["note"].": ".$favorite->note)."</span>";
+				print "</div>\n";
+			}
+			else if (DisplayDetailsByID($favorite->gid, $favorite->type, 1, true)) {
 				$indirec = FindGedcomRecord($favorite->gid);
 				if ($favorite->type=="INDI") {
 					print "<div id=\"box".$favorite->gid.".0\" class=\"person_box";
@@ -4593,14 +4601,6 @@ function PrintBlockFavorites($userfavs, $side, $index, $style) {
 					print "<div id=\"box".$favorite->gid.".0\" class=\"person_box";
 					print "\"><ul>\n";
 					print_list_family($favorite->gid, array(GetFamilyDescriptor($favorite->gid), get_gedcom_from_id($favorite->file)));
-					print "</ul>";
-					if (!empty($favorite->note)) print "<span class=\"favorite_padding\">".PrintReady($gm_lang["note"].": ".$favorite->note)."</span>";
-					print "</div>\n";
-				}
-				if ($favorite->type=="SOUR") {
-					print "<div id=\"box".$favorite->gid.".0\" class=\"person_box";
-					print "\"><ul>\n";
-					print_list_source($favorite->gid, array("name"=>GetSourceDescriptor($favorite->gid, $indirec), "gedfile"=>$favorite->file));
 					print "</ul>";
 					if (!empty($favorite->note)) print "<span class=\"favorite_padding\">".PrintReady($gm_lang["note"].": ".$favorite->note)."</span>";
 					print "</div>\n";

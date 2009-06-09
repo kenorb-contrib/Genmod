@@ -839,7 +839,7 @@ function PedigreeArray($rootid) {
 	for($i = 0; $i < ($treesize / 2); $i++) {
 		if (!empty($treeid[$i])) {
 			print " ";
-			$person = new Person(FindPersonRecord($treeid[$i]));
+			$person = new Person($treeid[$i], FindPersonRecord($treeid[$i]));
 			$famids = $person->getChildFamilies();
 			// $famids = FindFamilyIds($treeid[$i]);
 			if (count($famids) > 0) {

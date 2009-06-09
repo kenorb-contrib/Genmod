@@ -31,8 +31,8 @@ if (stristr($_SERVER["SCRIPT_NAME"],basename(__FILE__))) {
 /**
  * Main controller class for the Note page.
  */
-class NoteControllerRoot extends BaseController {
-	var $classname = "NoteControllerRoot";
+class NoteController extends DetailController {
+	var $classname = "NoteController";
 	var $oid;
 	var $show_changes = "yes";
 	var $action = "";
@@ -42,12 +42,11 @@ class NoteControllerRoot extends BaseController {
 	var $isempty = false;
 	var $display_other_menu = false;
 	var $notelist = array();
-	var $xref = null;
 	
 	/**
 	 * constructor
 	 */
-	public function __construct($oid="") {
+	public function __construct() {
 		global $gm_lang, $CONTACT_EMAIL, $GEDCOM;
 		global $ENABLE_CLIPPINGS_CART, $Users, $show_changes, $nonfacts;
 		
@@ -57,23 +56,22 @@ class NoteControllerRoot extends BaseController {
 				
 		if ($show_changes == "yes" && $Users->UserCanEdit($this->uname)) $this->show_changes = true;
 		if (!empty($_REQUEST["action"])) $this->action = $_REQUEST["action"];
-		if (!empty($oid)) $this->xref = $oid;
-		else if (!empty($_REQUEST["oid"])) $this->xref = strtoupper($_REQUEST["oid"]);
+		if (!empty($_REQUEST["oid"])) $this->xref = strtoupper($_REQUEST["oid"]);
 		
 		$this->uname = $Users->GetUserName();
 
 		if (!is_null($this->xref)) {
 			$this->xref = CleanInput($this->xref);
 		
-			$noterec = FindOtherRecord($this->xref);
+			$noterec = FindOtherRecord($this->xref, $GEDCOM, false, "NOTE");
 			if (!$noterec) {
 				if (!GetChangeData(true, $this->xref, true, "", "")) $this->isempty = true;
 				$noterec = "0 @".$this->xref."@ NOTE\r\n";
-				$this->note = new Note($noterec, true);
+				$this->note = new Note($this->xref, $noterec, true);
 			}
-			else $this->note = new Note($noterec);
+			else $this->note = new Note($this->xref, $noterec);
 		
-			if (!$this->note->canDisplayDetails()) {
+			if (!$this->note->disp) {
 				print_header($gm_lang["private"]." ".$gm_lang["note_info"]);
 				print_privacy_error($CONTACT_EMAIL);
 				print_footer();
@@ -90,11 +88,11 @@ class NoteControllerRoot extends BaseController {
 					break;
 			}
 			
-			if ($this->note->canDisplayDetails()) {
+			if ($this->note->disp) {
 				$this->canedit = $Users->userCanEdit($this->uname);
 			}
 			
-			if ($this->note->canDisplayDetails() && ($Users->userCanViewGedlines() || $ENABLE_CLIPPINGS_CART >= $Users->getUserAccessLevel() || !empty($this->uname))) {
+			if ($this->note->disp && ($Users->userCanViewGedlines() || $ENABLE_CLIPPINGS_CART >= $Users->getUserAccessLevel() || !empty($this->uname))) {
 				$this->display_other_menu = true;
 			}
 		}
@@ -207,7 +205,7 @@ class NoteControllerRoot extends BaseController {
 				$submenu->addLink('clippings.php?action=add&id='.$this->xref.'&type=note');
 				$menu->addSubmenu($submenu);
 		}
-		if ($this->note->canDisplayDetails() && !empty($this->uname)) {
+		if ($this->note->disp && !empty($this->uname)) {
 				// other / add_to_my_favorites
 				$submenu = new Menu($gm_lang['add_to_my_favorites']);
 				$submenu->addLink('note.php?action=addfav&oid='.$this->xref.'&gid='.$this->xref);
@@ -224,9 +222,9 @@ class NoteControllerRoot extends BaseController {
  		if (!empty($selection)) $sql .= " AND o_id IN (".$selection.")";
  		$res = NewQuery($sql);
  		while ($row = $res->FetchAssoc()) {
-	 		$note = new Note($row["o_gedcom"]);
+	 		$note = new Note($row["o_id"], $row["o_gedcom"]);
 	 		$note->GetTitle(40);
-	 		if ($note->canDisplayDetails()) $this->notelist[] = $note;
+	 		if ($note->disp) $this->notelist[] = $note;
 	 		else $note_hide++;
  		}
  		$this->NotelistSort();
@@ -281,12 +279,12 @@ class NoteControllerRoot extends BaseController {
 	$res = NewQuery($sql);
 	if ($res) {
  		while ($row = $res->FetchAssoc()) {
-	 		$note = new Note($row["o_gedcom"]);
+	 		$note = new Note($row["o_id"], $row["o_gedcom"]);
 	 		$note->GetTitle(40);
-	 		$note->SetGedcomId($row["o_file"]);
+	 		$note->gedcomid = $row["o_file"];
 	 		SwitchGedcom($row["o_file"]);
 			$note_total[$note->xref."[".$GEDCOM."]"] = 1;
-	 		if ($note->canDisplayDetails()) $this->notelist[] = $note;
+	 		if ($note->disp) $this->notelist[] = $note;
 	 		else $note_hide[$note->xref."[".$GEDCOM."]"] = 1;
 	 		SwitchGedcom();
  		}
@@ -307,17 +305,94 @@ class NoteControllerRoot extends BaseController {
 			return $anum > $bnum;
 		}
 	}
-}
-	
- 		
-// -- end of class
-//-- load a user extended class if one exists
-if (file_exists('includes/controllers/note_ctrl_user.php')) {
-		include_once 'includes/controllers/note_ctrl_user.php';
-} 
-else {
-	class NoteController extends NoteControllerRoot 
-	{
+	/**
+	 * print main note row
+	 *
+	 * this function will print a table row for a fact table for a level 1 note in the main record
+	 * @param string $factrec	the raw gedcom sub record for this note
+	 * @param int $level		The start level for this note, usually 1
+	 * @param string $pid		The gedcom XREF id for the level 0 record that this note is a part of
+	 */
+	protected function PrintGeneralNote($styleadd="", $mayedit=true) {
+		global $gm_lang, $gm_username, $Users;
+		global $factarray, $view, $show_changes;
+		global $WORD_WRAPPED_NOTES, $GM_IMAGE_DIR;
+		global $GM_IMAGES, $GEDCOM;
+
+		if (!$this->note->disp) return false;
+		
+		if (($this->note->textchanged || $this->note->isdeleted) && $this->note->show_changes && !($this->view == "preview")) {
+			$styleadd = "change_old";
+			print "\n\t\t<tr><td class=\"shade2 $styleadd center\" style=\"vertical-align: middle;\"><img src=\"".$GM_IMAGE_DIR."/".$GM_IMAGES["note"]["other"]."\" width=\"50\" height=\"50\" alt=\"\" /><br />".$gm_lang["note"].":";
+			print " </td>\n<td class=\"shade1 $styleadd wrap\">";
+			if (showFactDetails("NOTE", $this->note->xref)) {
+				print PrintReady($this->note->GetNoteText())."<br />\n";
+				// See if RESN tag prevents display or edit/delete
+			 	$resn_tag = preg_match("/2 RESN (.*)/", $this->note->gedrec, $match);
+	 			if ($resn_tag > 0) $resn_value = strtolower(trim($match[1]));
+				// -- Find RESN tag
+				if (isset($resn_value)) {
+					print_help_link("RESN_help", "qm");
+					print $gm_lang[$resn_value]."\n";
+				}
+				print "<br />\n";
+			}
+			print "</td></tr>";
+		}
+		if (($this->note->textchanged || $this->note->isnew) && !$this->note->isdeleted && $this->show_changes && !($this->view == "preview")) $styleadd = "change_new";
+		if (!$this->note->isdeleted || !$this->show_changes) {
+			print "\n\t\t<tr><td class=\"shade2 $styleadd center\" style=\"vertical-align: middle;\"><img src=\"".$GM_IMAGE_DIR."/".$GM_IMAGES["note"]["other"]."\" width=\"50\" height=\"50\" alt=\"\" /><br />".$gm_lang["note"].":";
+			if ($this->canedit && !FactEditRestricted($this->note->xref, $this->note->gedrec, 0) && ($styleadd!="change_old")&&($view!="preview")&& $mayedit) {
+				$menu = array();
+				$menu["label"] = $gm_lang["edit"];
+				$menu["labelpos"] = "right";
+				$menu["icon"] = "";
+				$menu["link"] = "#";
+				$menu["onclick"] = "return edit_record('$this->xref', 'NOTE', '1', 'edit_general_note');";
+				$menu["class"] = "";
+				$menu["hoverclass"] = "";
+				$menu["flyout"] = "down";
+				$menu["submenuclass"] = "submenu";
+				$menu["items"] = array();
+				$submenu = array();
+				$submenu["label"] = $gm_lang["edit"];
+				$submenu["labelpos"] = "right";
+				$submenu["icon"] = "";
+				$submenu["onclick"] = "return edit_record('$this->xref', 'NOTE', '1', 'edit_general_note');";
+				$submenu["link"] = "#";
+				$submenu["class"] = "submenuitem";
+				$submenu["hoverclass"] = "submenuitem_hover";
+				$menu["items"][] = $submenu;
+				$submenu = array();
+				$submenu["label"] = $gm_lang["copy"];
+				$submenu["labelpos"] = "right";
+				$submenu["icon"] = "";
+				$submenu["onclick"] = "return copy_record('$this->xref', 'NOTE', '1', 'copy_general_note');";
+				$submenu["link"] = "#";
+				$submenu["class"] = "submenuitem";
+				$submenu["hoverclass"] = "submenuitem_hover";
+				$menu["items"][] = $submenu;
+				// No delete option. A note cannot be without text!
+				print " <div style=\"width:25px;\" class=\"center\">";
+				print_menu($menu);
+				print "</div>";
+			}
+			print " </td>\n<td class=\"shade1 $styleadd wrap\">";
+			if (showFactDetails("NOTE", $this->note->xref)) {
+				if ($styleadd == "change_new") print PrintReady($this->note->GetNoteText(true))."<br />\n";
+				else print PrintReady($this->note->GetNoteText())."<br />\n";
+				// See if RESN tag prevents display or edit/delete
+			 	$resn_tag = preg_match("/2 RESN (.*)/", $this->note->gedrec, $match);
+		 		if ($resn_tag > 0) $resn_value = strtolower(trim($match[1]));
+				// -- Find RESN tag
+				if (isset($resn_value)) {
+					print_help_link("RESN_help", "qm");
+					print $gm_lang[$resn_value]."\n";
+				}
+				print "<br />\n";
+			}
+			print "</td></tr>";
+		}
 	}
 }
 ?>

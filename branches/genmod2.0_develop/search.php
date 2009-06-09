@@ -1561,7 +1561,7 @@ if ($action=="general") {
 		    		}
 	    		}
 	    		// We must check the text that is in the note here, because it's at level 0 and not in the subrecs
-	    		$text = Str2Upper($note->GetNoteText());
+	    		$text = Str2Upper($note->text);
 				foreach ($cquery["includes"] as $qindex => $squery) {
 			    	if (strpos($text, Str2Upper($squery["term"])) !== false || Str2Upper($squery["term"]) == "NOTE") {
 				   		$found = true;

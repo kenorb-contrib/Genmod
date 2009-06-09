@@ -88,7 +88,7 @@ class TimelineControllerRoot extends BaseController {
 				$value = CleanInput($value);
 				$this->pids[$key] = $value;
 				$indirec = FindPersonRecord($value);
-				$this->people[] = new Person($indirec);
+				$this->people[] = new Person($value, $indirec);
 			}
 		}
 		

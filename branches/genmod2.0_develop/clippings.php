@@ -609,7 +609,7 @@ else {
 				    if($clipping['type']=='note') {
 						$note_controller = new NoteController($clipping['id']);
 						print "<a href=\"note.php?oid=".$clipping['id']."\">";
-						if ($note_controller->note->canDisplayDetails()) print $note_controller->note->GetTitle(40)." (".$clipping['id'].")";
+						if ($note_controller->note->disp) print $note_controller->note->GetTitle(40)." (".$clipping['id'].")";
 						else print $gm_lang["private"];
 			      		print "</a>";
 			    	}
