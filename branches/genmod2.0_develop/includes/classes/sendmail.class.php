@@ -6,14 +6,16 @@ if (stristr($_SERVER["SCRIPT_NAME"],basename(__FILE__))) {
 
 class SendMail {
 	
-	var $classname = 'SendMail';
-	var $header = '';
-	var $message = '';
-	var $uid = '';
+	public $classname = 'SendMail';
+	
+	private $header = '';
+	private $message = '';
+	private $uid = '';
 	
 	// TODO: test the \r\n in the attachment functions
 	
-	function SendMail($filenames, $path, $mailto, $from_mail, $from_name, $replyto, $subject, $message, $html=true, $admincopy=false) {
+	public function __construct($filenames, $path, $mailto, $from_mail, $from_name, $replyto, $subject, $message, $html=true, $admincopy=false) {
+		
 		$this->uid = md5(uniqid(time()));
 		// NOTE: Add the general mail header
 		$this->MailHeader($from_name, $from_mail, $replyto, $admincopy);
@@ -34,7 +36,7 @@ class SendMail {
 		else return false;
 	}
 	// NOTE: Basic mailheader
-	function MailHeader($from_name, $from_mail, $replyto, $admincopy) {
+	private function MailHeader($from_name, $from_mail, $replyto, $admincopy) {
 		global $Users, $WEBMASTER_EMAIL, $BCC_WEBMASTER;
 		$this->header .= "MIME-Version: 1.0\n";
 		$this->header .= "X-Mailer: Genmod\n";
@@ -48,23 +50,23 @@ class SendMail {
 	}
 	
 	// NOTE: Attachments for mail
-	function MailHeaderAttachments() {
+	private function MailHeaderAttachments() {
 		$this->header .= "Content-Type: multipart/mixed; boundary=\"".$this->uid."\"\r\n\r\n";
 		$this->header .= "This is a multi-part message in MIME format.\r\n";
 	}
 	
 	// NOTE: HTML mail
-	function MailHeaderHtml() {
+	private function MailHeaderHtml() {
 		$this->header .= "Content-Type: text/html; charset=utf-8\n\n";
 	}
 	
 	// NOTE Plain text mail
-	function MailHeaderPlain() {
+	private function MailHeaderPlain() {
 		$this->header .= "Content-Type: text/plain; charset=utf-8\n\n";
 	}
 	
 	// NOTE: Add the attachemnts
-	function AddAttachments($filenames, $path, $message) {
+	private function AddAttachments($filenames, $path, $message) {
 		$this->header .= "--".$this->uid."\r\n";
 		$this->header .= "Content-type:text/plain; charset=iso-8859-1\r\n";
 		$this->header .= "Content-Transfer-Encoding: 7bit\r\n\r\n";
@@ -81,7 +83,7 @@ class SendMail {
 	}
 	
 	// NOTE: Add a file to the message
-	function AddFile($filename, $path) {
+	private function AddFile($filename, $path) {
 		$file = $path.$filename;
 		$file_size = filesize($file);
 		$handle = fopen($file, "r");
@@ -99,12 +101,12 @@ class SendMail {
 	}
 	
 	// NOTE: Add the message to the mail
-	function AddMessage(&$message) {
+	private function AddMessage(&$message) {
 		$this->message .= $message;
 	}
 	
 	// NOTE: Send out the mail
-	function OutputMail($mailto, $subject) {
+	private function OutputMail($mailto, $subject) {
 		$sent = mail($mailto, $subject, $this->message, $this->header);
 		if ($sent) return true;
 		else {

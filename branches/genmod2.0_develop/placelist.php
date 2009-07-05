@@ -366,7 +366,7 @@ if ($level > 0) {
 					}
 					if ($prt) {
 						$myindilist["$gid"] = GetSortableName($gid);
-						if (HasChinese($myindilist["$gid"])) $myindilist["$gid"] .= " (".GetSortableAddName($gid).")";
+						if (HasChinese($myindilist["$gid"])) $myindilist["$gid"] .= " (".GetSortableAddName($gid, $indirec).")";
 					}
 				}
 				else if ($type == "FAM") {

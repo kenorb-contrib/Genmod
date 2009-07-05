@@ -35,48 +35,29 @@ require("config.php");
 */
 $note_controller = new NoteController();
 
-if ($note_controller->isempty) {
-	print_header($gm_lang["note_not_found"]);
-	print "<span class=\"error\">".$gm_lang["note_not_found"]."</span>";
-	print_footer();
-	exit;
-}
+print_header($note_controller->pagetitle);
 
-print_header($note_controller->getPageTitle());
+$note_controller->CheckNoResult($gm_lang["note_not_found"]);
+
+$note_controller->CheckPrivate();
+
+$note_controller->CheckRawEdited();
 	
 ?>
 <div id="show_changes"></div>
-<script type="text/javascript">
-<!--
-	function show_gedcom_record() {
-		var recwin = window.open("gedrecord.php?pid=<?php print $oid ?>", "", "top=0,left=0,width=300,height=400,scrollbars=1,scrollable=1,resizable=1");
-	}
-	function showchanges() {
-		sndReq('show_changes', 'set_show_changes', 'set_show_changes', '<?php if ($show_changes == "yes") print "no"; else print "yes"; ?>');
-		window.location.reload();
-	}
-	function reload() {
-		window.location.reload();
-	}
-//-->
-</script>
-<table width="100%"><tr><td>
-<?php
-print "\n\t<span class=\"name_head\">";
-print $note_controller->note->GetTitle(40, $note_controller->note->showchanges);
-if ($SHOW_ID_NUMBERS) print " &lrm;($oid)&lrm;";
-print "</span><br />";
-if($SHOW_COUNTER) {
-	print "\n<br /><br /><span style=\"margin-left: 3px;\">".$gm_lang["hit_count"]."&nbsp;".$hits."</span>\n";
-}
-print "<br />";
+<?php $note_controller->PrintDetailJS(); ?>
 
-if ($note_controller->note->isempty && !$note_controller->note->changed) {
-	print "&nbsp;&nbsp;&nbsp;<span class=\"warning\"><i>".$gm_lang["no_results"]."</i></span>";
-	print "<br /><br /><br /><br /><br /><br />\n";
-	print_footer();
-	exit;
-}
+<table class="list_table">
+	<tr>
+		<td>
+		<span class="name_head"><?php print PrintReady($note_controller->note->GetTitle(40, $note_controller->note->show_changes).$note_controller->note->addxref); ?></span><br />
+		<?php if($SHOW_COUNTER) print "\n<br /><br /><span style=\"margin-left: 3px;\">".$gm_lang["hit_count"]."&nbsp;".$hits."</span>\n"; ?><br />
+		</td>
+	</tr>
+</table>
+
+<?php 
+
 // Print the tabs
 $note_controller->PrintTabs();
 

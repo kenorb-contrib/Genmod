@@ -355,7 +355,7 @@ if ($action=="general") {
 			}
 			if ((count($sindilist)==0 || !isset($srindi))&&(count($sfamlist)==0)&&(count($ssourcelist)==0) && (count($srepolist)==0) && (count($media->medialist)==0) && count($note_controller->notelist) == 1) {
 				foreach($note_controller->notelist as $oid=>$note) {
-					header("Location: note.php?oid=".$note->GetXref()."&ged=".get_gedcom_from_id($note->gedcomid));
+					header("Location: note.php?oid=".$note->xref."&ged=".get_gedcom_from_id($note->gedcomid));
 					exit;
 				}
 			}

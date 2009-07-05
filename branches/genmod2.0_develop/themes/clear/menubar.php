@@ -30,7 +30,7 @@ if (strstr($_SERVER["PHP_SELF"],"menubar.php")) {
 	print "Why do you want to do that?";
 	exit;
 }
-global $gm_lang, $controller, $note_controller, $source_controller, $rid;
+global $gm_lang, $controller, $note_controller, $source_controller, $repository_controller, $media_controller, $rid;
 $menubar = new MenuBar();
 $filemenu = $menubar->GetFileMenu();
 $editmenu = $menubar->GetEditMenu();
@@ -44,10 +44,11 @@ if (isset($controller) && $controller->classname == "FamilyRoot") $familymenu = 
 else $familymenu = "";
 if (isset($source_controller) && $source_controller->classname == "SourceController") $sourcemenu = $menubar->GetThisSourceMenu($source_controller);
 else $sourcemenu = "";
-if (isset($controller) && $controller->classname == "MediaControllerRoot") $mediamenu = $menubar->GetThisMediaMenu($controller);
-else $mediamenu = "";
-if (isset($rid)) $repomenu = $menubar->GetThisRepoMenu();
+if (isset($repository_controller) && $repository_controller->classname == "RepositoryController") $repomenu = $menubar->GetThisRepoMenu($repository_controller);
 else $repomenu = "";
+if (isset($media_controller) && $media_controller->classname == "MediaController") $mediamenu = $menubar->GetThisMediaMenu($media_controller);
+else $mediamenu = "";
+
 $reportmenu = $menubar->GetReportMenu();
 $listmenu = $menubar->GetListMenu();
 $helpmenu = $menubar->GetHelperMenu();

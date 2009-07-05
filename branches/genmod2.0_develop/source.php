@@ -1,6 +1,6 @@
 <?php
 /**
- * Displays the details about a source record. Also shows how many people and families
+ * Displays the details about a source record. Also shows how many people, families and other records
  * reference this source.
  *
  * Genmod: Genealogy Viewer
@@ -35,40 +35,23 @@ require("config.php");
 */
 $source_controller = new SourceController();
 
-if ($source_controller->source->isempty) {
-	print_header($gm_lang["source_not_found"]);
-	print "<span class=\"error\">".$gm_lang["source_not_found"]."</span>";
-	print_footer();
-	exit;
-}
+print_header($source_controller->pagetitle);
 
-print_header($source_controller->getPageTitle());
+$source_controller->CheckNoResult($gm_lang["source_not_found"]);
+
+$source_controller->CheckPrivate();
+
+$source_controller->CheckRawEdited();
+
 ?>
 <div id="show_changes"></div>
+<?php $source_controller->PrintDetailJS(); ?>
 
-<script language="JavaScript" type="text/javascript">
-<!--
-	function show_gedcom_record() {
-		var recwin = window.open("gedrecord.php?pid=<?php print $source_controller->source->xref ?>", "", "top=0,left=0,width=300,height=400,scrollbars=1,scrollable=1,resizable=1");
-	}
-	function showchanges() {
-		sndReq('show_changes', 'set_show_changes', 'set_show_changes', '<?php if ($show_changes == "yes") print "no"; else print "yes"; ?>');
-		window.location.reload();
-	}
-	
-	function reload() {
-		window.location.reload();
-	}
-
-//-->
-</script>
 <table class="list_table">
 	<tr>
 		<td>
 		<span class="name_head"><?php print PrintReady($source_controller->source->title.$source_controller->source->addxref);?></span><br />
-		<?php if($SHOW_COUNTER) {
-			print "\n<br /><br /><span style=\"margin-left: 3px;\">".$gm_lang["hit_count"]."&nbsp;".$hits."</span>\n";
-		}?>
+		<?php if($SHOW_COUNTER) print "\n<br /><br /><span style=\"margin-left: 3px;\">".$gm_lang["hit_count"]."&nbsp;".$hits."</span>\n"; ?>
 		</td>
 	</tr>
 	<tr>

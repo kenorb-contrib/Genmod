@@ -30,93 +30,44 @@ if (stristr($_SERVER["SCRIPT_NAME"],basename(__FILE__))) {
  
 class Note extends GedcomRecord {
 
+	// General class information
 	public $classname = "Note";
+	public $datatype = "NOTE";
 	
-	private $indilist = null;
-	private $indi_count = null;
-	private $famlist = null;
-	private $fam_count = null;
-	private $medialist = null;
-	private $media_count = null;
-	private $sourcelist = null;
-	private $sour_count = null;
-	private $repolist = null;
-	private $repo_count = null;
-	
+	// Data
 	private $text = null;
 	private $newtext = null;
 	private $title = null;
 	private $newtitle = null;
-	private $notefacts = null;
-	
-	private $canedit = null;
-	private $textchanged = false;
-	private $newgedrec = null;
+	private $textchanged = null;
 	
 	/**
 	 * Constructor for note object
 	 * @param string $gedrec	the raw note gedcom record
 	 */
-	public function __construct($id, $gedrec="", $new=false) {
-		global $otherlist, $GEDCOMID;
+	public function __construct($id, $gedrec="", $gedcomid="", $new=false) {
+		global $GEDCOMID;
 
-		if (empty($gedrec)) {
-			if (isset($sourcelist[$id])) $gedrec = $sourcelist[$id]["gedcom"];
-			else $gedrec = FindOtherRecord($id);
-		}
-		if (empty($gedrec)) $gedrec = "0 @".$id."@ NOTE\r\n";
-		else $otherlist[$id]["gedcom"] = $gedrec;
+		parent::__construct($id, $gedrec, $gedcomid);
 		
-		parent::__construct($id, $gedrec);
-		
-		$this->gedcomid = $GEDCOMID;
+		$this->exclude_facts = "CONC,CONT";
 		
 		if ($this->disp) {
 			// If the record is changed, check WHAT is changed.
-			if ($this->changed && ($this->GetNoteText() != $this->GetNoteText(true))) $this->textchanged = true;
+			if ($this->ThisChanged() && ($this->GetNoteText() != $this->GetNoteText(true))) $this->textchanged = true;
 			
 		}
 	}
 	
 	public function __get($property) {
-		$result = NULL;
+		
 		switch ($property) {
 			case "text":
 				return $this->GetNoteText();
 				break;
-			case "indilist":
-				return $this->GetNoteIndis();
+			case "textchanged":
+				return $this->textchanged;
 				break;
-			case "indi_count":
-				if (is_null($this->indi_count)) $this->GetNoteIndis();
-				return $this->indi_count;
-				break;
-			case "famlist":
-				return $this->GetNoteFams();
-				break;
-			case "fam_count":
-				if (is_null($this->fam_count)) $this->GetNoteFams();
-				return $this->fam_count;
-				break;
-			case "medialist":
-				return $this->GetNoteMedia();
-				break;
-			case "media_count":
-				if (is_null($this->media_count)) $this->GetNoteMedia();
-				return $this->media_count;
-				break;
-			case "sourcelist":
-				return $this->GetNoteSources();
-				break;
-			case "sour_count":
-				if (is_null($this->sour_count)) $this->GetNoteSources();
-				return $this->sour_count;
-			case "repolist":
-				return $this->GetNoteRepos();
-				break;
-			case "repo_count":
-				if (is_null($this->repo_count)) $this->GetNoteRepos();
-				return $this->repo_count;
 			default:
 				return parent::__get($property);
 				break;
@@ -130,7 +81,12 @@ class Note extends GedcomRecord {
 	public function getTitle($l=40, $changed=false) {
 		global $gm_lang;
 
-		if ($changed && !is_null($this->newgedrec)) {
+		if (!$this->disp) {
+			$this->title = $gm_lang["private"];
+			return $this->title;
+		}
+		
+		if ($this->ThisChanged() && !is_null($this->GetChangedGedrec())) {
 			if (is_null($this->newtitle)) {
 				$this->newtitle = $this->GetNoteText($changed); // Get the text
 				$this->newtitle = trim($this->newtitle); // we must show some starting characters
@@ -147,7 +103,10 @@ class Note extends GedcomRecord {
 			$this->title = trim($this->title); // we must show some starting characters
 			$this->title = preg_replace("~[\r|\n]+~", " ", $this->title);
 			$this->title = preg_replace("~<br />~", " ", $this->title);
-			if (empty($this->title)) $this->title = $gm_lang["unknown"];
+			if (empty($this->title)) {
+				$this->title = $gm_lang["unknown"];
+				return $this->title;
+			}
 		}
 		if ($l >= strlen($this->title)) return $this->title;
 		else return substr($this->title, 0, $l).".....";
@@ -157,14 +116,18 @@ class Note extends GedcomRecord {
 	 * get the text of the note
 	 */
 	public function getNoteText($changed=false) {
-		global $WORD_WRAPPED_NOTES;
+		
+		if (!$this->disp) {
+			$this->newtext = $gm_lang["private"];
+			return $this->newtext;
+		}
 
-		if ($changed && !is_null($this->newgedrec)) {
+		if ($this->ThisChanged() && !is_null($this->GetChangedGedrec())) {
 			if (!is_null($this->newtext)) return $this->newtext;
 			$this->newtext = "";
-			$nt = preg_match("/0 @.+@ NOTE (.*)/", $this->newgedrec, $n1match);
+			$nt = preg_match("/0 @.+@ NOTE (.*)/", $this->GetChangedGedrec(), $n1match);
 			if ($nt>0) $this->newtext = preg_replace("/~~/", "<br />", $n1match[1]);
-			$this->newtext .= GetCont(1, $this->newgedrec);
+			$this->newtext .= GetCont(1, $this->GetChangedGedrec());
 			return $this->newtext;
 		}
 		else {
@@ -177,123 +140,148 @@ class Note extends GedcomRecord {
 		}
 	}		
 		
-	/**
-	 * get the list of individuals connected to this note
-	 * @return array
-	 */
-	private function getNoteIndis() {
-		global $GEDCOMID;
-		
+	protected function GetLinksFromIndis() {
+		global $TBLPREFIX, $indilist;
+
 		if (!is_null($this->indilist)) return $this->indilist;
 		$this->indilist = array();
+		$this->indi_hide = 0;
+		if (!isset($indilist)) $indilist = array();
 		
-		$links = GetNoteLinks($this->xref, "INDI", true);
-		if (count($links) > 0) {
-			$linkslist = implode("[".$GEDCOMID."]','", $links);
-			$linkslist .= "[".$GEDCOMID."]'";
-			$linkslist = "'".$linkslist;
-			$this->indilist = GetIndiList("", $linkslist, true);
-			uasort($this->indilist, "ItemSort");
+		$sql = "SELECT DISTINCT i_key, i_gedcom, i_isdead, i_id, i_file  FROM ".$TBLPREFIX."other_mapping, ".$TBLPREFIX."individuals WHERE om_oid='".$this->xref."' AND om_gedfile='".$this->gedcomid."' AND om_type='INDI' AND om_gid=i_id AND om_gedfile=i_file";
+		$res = NewQuery($sql);
+		while($row = $res->FetchAssoc()){
+			$indi = array();
+			$indi["gedcom"] = $row["i_gedcom"];
+			$indi["isdead"] = $row["i_isdead"];
+			$indi["gedfile"] = $row["i_file"];
+			$person = null;
+			$person = new Person($row["i_id"], $row["i_gedcom"]);
+			if ($person->disp_name) {
+				$indi["names"] = $person->name_array;
+				$this->indilist[$row["i_key"]] = $person;
+				$indilist[$row["i_id"]] = $indi;
+			}
+			else $this->indi_hide++;
 		}
+		uasort($this->indilist, "ItemObjSort");
 		$this->indi_count=count($this->indilist);
 		return $this->indilist;
 	}
 	
-	/**
-	 * get the list of families connected to this note
-	 * @return array
-	 */
-	private function getNoteFams() {
-		global $REGEXP_DB, $GEDCOMID;
+	protected function GetLinksFromFams() {
+		global $TBLPREFIX, $famlist;
+
 		if (!is_null($this->famlist)) return $this->famlist;
 		$this->famlist = array();
-		$links = GetNoteLinks($this->xref, "FAM", true);
-		if (count($links) > 0) {
-			$linkslist = implode("[".$GEDCOMID."]','", $links);
-			$linkslist .= "[".$GEDCOMID."]'";
-			$linkslist = "'".$linkslist;
-			$this->famlist = GetFamList("", $linkslist, true);
-			uasort($this->famlist, "ItemSort");
+		$this->fam_hide = 0;
+		if (!isset($famlist)) $famlist = array();
+		
+		$sql = "SELECT DISTINCT f_key, f_gedcom, f_id, f_file, f_husb, f_wife  FROM ".$TBLPREFIX."other_mapping, ".$TBLPREFIX."families WHERE om_oid='".$this->xref."' AND om_gedfile='".$this->gedcomid."' AND om_type='FAM' AND om_gid=f_id AND om_gedfile=f_file";
+		$res = NewQuery($sql);
+		while($row = $res->FetchAssoc()){
+			$fam = array();
+			$fam["gedcom"] = $row["f_gedcom"];
+			$fam["HUSB"] = SplitKey($row["f_husb"], "id");
+			$fam["WIFE"] = SplitKey($row["f_wife"], "id");
+			$fam["gedfile"] = $row["f_file"];
+			$family = null;
+			$family = new Family($row["f_id"], $row["f_gedcom"]);
+			if ($family->disp) {
+				$this->famlist[$row["f_key"]] = $family;
+				$famlist[$row["f_id"]] = $fam;
+			}
+			else $this->fam_hide++;
 		}
-		$this->fam_count=count($this->famlist);
+		uasort($this->famlist, "ItemObjSort");
+		$this->fam_count = count($this->famlist);
 		return $this->famlist;
 	}
 	
-	/**
-	 * get the list of media connected to this note
-	 * @return array
-	 */
-	private function getNoteMedia() {
-		global $TBLPREFIX, $GEDCOMID;
+	protected function GetLinksFromMedia() {
+		global $TBLPREFIX, $medialist;
 		
 		if (!is_null($this->medialist)) return $this->medialist;
+		if (!isset($medialist)) $medialist = array();
 		$this->medialist = array();
-		$links = GetNoteLinks($this->xref, "OBJE", true, false);
-		foreach ($links as $key => $link) {
-			$media = array();
-			$media["gedfile"] = $GEDCOMID;
-			$media["name"] = GetMediaDescriptor($link);
-			$this->medialist[$link] = $media;
+		$this->media_hide = 0;
+		
+		$sql = "SELECT DISTINCT m_media, m_gedrec, m_gedfile FROM ".$TBLPREFIX."other_mapping, ".$TBLPREFIX."media WHERE om_oid='".$this->xref."' AND om_gedfile='".$this->gedcomid."' AND om_type='OBJE' AND om_gid=m_media AND m_gedfile=om_gedfile";
+		$res = NewQuery($sql);
+		while($row = $res->FetchAssoc()) {
+			$mediaitem = null;
+			$medialist[$row["m_media"]]["gedcom"] = $row["m_gedrec"];
+			$medialist[$row["m_media"]]["gedfile"] = $row["m_gedfile"];
+			$mediaitem = new MediaItem($row["m_media"], $row["m_gedrec"], $row["m_gedfile"]);
+			if ($mediaitem->disp) $this->medialist[JoinKey($row["m_media"], $row["m_gedfile"])] = $mediaitem;
+			else $this->media_hide++;
 		}
-		uasort($this->medialist, "ItemSort");
+		uasort($this->medialist, "ItemObjSort");
 		$this->media_count=count($this->medialist);
 		return $this->medialist;
 	}
 	
 	/**
-	 * get the list of repositories connected to this note
+	 * get the list of sources connected to a record
 	 * @return array
 	 */
-	private function getNoteRepos() {
-		global $TBLPREFIX, $GEDCOMID;
+	protected function GetLinksFromSources() {
+		global $TBLPREFIX, $sourcelist;
+
+		if(!is_null($this->sourcelist)) return $this->sourcelist;
+		if (!isset($sourcelist)) $sourcelist = array();
+		$this->sourcelist = array();
+		$this->sour_hide = 0;
+		
+		$sql = 	"SELECT DISTINCT s_key, s_id, s_gedcom, s_file FROM ".$TBLPREFIX."other_mapping, ".$TBLPREFIX."sources WHERE om_oid='".$this->xref."' AND om_gedfile='".$this->gedcomid."' AND om_type='SOUR' AND s_file=om_gedfile AND s_id=om_gid";
+		$res = NewQuery($sql);
+		while($row = $res->FetchAssoc()){
+			$source = null;
+			$sourcelist[$row["s_id"]]["gedcom"] = $row["s_gedcom"];
+			$sourcelist[$row["s_id"]]["gedfile"] = $row["s_file"];
+			$source = new Source($row["s_id"], $row["s_gedcom"]);
+			if ($source->disp) $this->sourcelist[$row["s_key"]] = $source;
+			else $this->sour_hide++;
+		}
+		uasort($this->sourcelist, "GedcomObjSort");
+		$this->sour_count = count($this->sourcelist);
+		return $this->sourcelist;
+	}
+	
+	/**
+	 * get the list of repositories connected to this record
+	 * @return array
+	 */
+	protected function GetLinksFromRepos() {
+		global $TBLPREFIX;
 		
 		if (!is_null($this->repolist)) return $this->repolist;
+		
 		$this->repolist = array();
-		$links = GetNoteLinks($this->xref, "REPO", true, false);
-		if (count($links) > 0) {
-			$linkslist = implode("','", $links);
-			$linkslist .= "'";
-			$linkslist = "'".$linkslist;
-			$this->repolist = GetRepoList("", $linkslist);
+		$this->repo_hide = 0;
+		
+		// repositories can be linked from 
+		$sql = 	"SELECT o_key, o_id, o_gedcom FROM ".$TBLPREFIX."other_mapping, ".$TBLPREFIX."other WHERE om_oid='".$this->xref."' AND om_gedfile='".$this->gedcomid."' AND o_type='REPO' AND o_file=om_gedfile AND o_id=om_gid";
+		$res = NewQuery($sql);
+		while($row = $res->FetchAssoc()){
+			$repo = null;
+			$repo = new Repository($row["o_id"], $row["o_gedcom"], $this->gedcomid);
+			if ($repo->disp) $this->repolist[$row["o_key"]] = $repo;
+			else $this->repo_hide++;
 		}
 		uasort($this->repolist, "ItemSort");
 		$this->repo_count=count($this->repolist);
 		return $this->repolist;
 	}
-
-	/**
-	 * get the list of sources connected to this note
-	 * @return array
-	 */
-	private function getNoteSources() {
-		global $TBLPREFIX, $GEDCOMID;
 		
-		if (!is_null($this->sourcelist)) return $this->sourcelist;
-		$this->sourcelist = array();
-		$links = GetNoteLinks($this->xref, "SOUR", true, false);
-		if (count($links) > 0) {
-			$linkslist = implode("','", $links);
-			$linkslist .= "'";
-			$linkslist = "'".$linkslist;
-			$this->sourcelist = GetSourceList($linkslist);
-		}
-		uasort($this->sourcelist, "Sourcesort");
-		$this->sour_count=count($this->sourcelist);
-		return $this->sourcelist;
-	}
-	
 	public function PrintListNote($len=60) {
-		global $GEDCOM, $SHOW_ID_NUMBERS, $GEDCOM, $TEXT_DIRECTION;
 		
 		if (!$this->disp) return false;
 
 		if (begRTLText($this->GetTitle())) print "\n\t\t\t<li class=\"rtl\" dir=\"rtl\">";
 		else print "\n\t\t\t<li class=\"ltr\" dir=\"ltr\">";
-		print "\n\t\t\t<a href=\"note.php?oid=".$this->xref."&amp;ged=".$GEDCOM."\" class=\"list_item\">".PrintReady($this->GetTitle($len));
-		if ($SHOW_ID_NUMBERS) {
-			if ($TEXT_DIRECTION=="ltr") print " &lrm;(".$this->xref.")&lrm;";
-			else print " &rlm;(".$this->xref.")&rlm;";
-		}
+		print "\n\t\t\t<a href=\"note.php?oid=".$this->xref."&amp;gedid=".$this->gedcomid."\" class=\"list_item\">".PrintReady($this->GetTitle($len));
+		print $this->addxref;
 		print "</a>\n";
 		print "</li>\n";
 	}	

@@ -429,7 +429,7 @@ if ($disp1 == "block") {
 					print "onmouseout=\"moveout('".$filename."'); return false;\">";
 					print "<b>".$gm_lang["mm_links"]."</b><br />";
 					foreach($file["objects"] as $pipo => $media) {
-						print "\n\t<a href=\"mediadetail.php?mid=".$media->m_media."&amp;GEDCOMID=".$media->m_gedfile."\" target=\"_blank\">".$media->m_titl."</a><br />";
+						print "\n\t<a href=\"mediadetail.php?mid=".$media->xref."&amp;GEDCOMID=".$media->gedcomid."\" target=\"_blank\">".$media->title."</a><br />";
 					}
 					print "</div>";
 					print "<img src=\"".$GM_IMAGE_DIR."/".$GM_IMAGES["link"]["other"]."\" border=\"0\" alt=\"".$gm_lang["click_mm_links"]."\" style=\"vertical-align:middle;\" onclick=\"showbox(this, '".$filename."', 'relatives'); return false;\" onmouseout=\"moveout('".$filename."');return false;\" />";

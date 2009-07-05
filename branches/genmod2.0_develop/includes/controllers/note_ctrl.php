@@ -32,30 +32,26 @@ if (stristr($_SERVER["SCRIPT_NAME"],basename(__FILE__))) {
  * Main controller class for the Note page.
  */
 class NoteController extends DetailController {
-	var $classname = "NoteController";
-	var $oid;
-	var $show_changes = "yes";
-	var $action = "";
-	var $note = null;
-	var $uname = "";
-	var $canedit = false;
-	var $isempty = false;
-	var $display_other_menu = false;
-	var $notelist = array();
+	
+	public $classname = "NoteController";
+	
+	public $note = null;
+	
+	private $display_other_menu = false;
+	private $pagetitle = null;
 	
 	/**
 	 * constructor
 	 */
 	public function __construct() {
-		global $gm_lang, $CONTACT_EMAIL, $GEDCOM;
+		global $gm_lang, $CONTACT_EMAIL, $GEDCOM, $GEDCOMID;
 		global $ENABLE_CLIPPINGS_CART, $Users, $show_changes, $nonfacts;
 		
 		parent::__construct();
 
 		$nonfacts = array();
 				
-		if ($show_changes == "yes" && $Users->UserCanEdit($this->uname)) $this->show_changes = true;
-		if (!empty($_REQUEST["action"])) $this->action = $_REQUEST["action"];
+		$this->show_changes = $show_changes;
 		if (!empty($_REQUEST["oid"])) $this->xref = strtoupper($_REQUEST["oid"]);
 		
 		$this->uname = $Users->GetUserName();
@@ -63,47 +59,30 @@ class NoteController extends DetailController {
 		if (!is_null($this->xref)) {
 			$this->xref = CleanInput($this->xref);
 		
-			$noterec = FindOtherRecord($this->xref, $GEDCOM, false, "NOTE");
-			if (!$noterec) {
-				if (!GetChangeData(true, $this->xref, true, "", "")) $this->isempty = true;
-				$noterec = "0 @".$this->xref."@ NOTE\r\n";
-				$this->note = new Note($this->xref, $noterec, true);
-			}
-			else $this->note = new Note($this->xref, $noterec);
+			$this->note = new Note($this->xref);
 		
-			if (!$this->note->disp) {
-				print_header($gm_lang["private"]." ".$gm_lang["note_info"]);
-				print_privacy_error($CONTACT_EMAIL);
-				print_footer();
-				exit;
-			}
-		
-			//-- perform the desired action
-			switch($this->action) {
-				case "addfav":
-					$this->addFavorite();
-					break;
-				case "accept":
-					$this->acceptChanges();
-					break;
-			}
-			
-			if ($this->note->disp) {
-				$this->canedit = $Users->userCanEdit($this->uname);
-			}
-			
 			if ($this->note->disp && ($Users->userCanViewGedlines() || $ENABLE_CLIPPINGS_CART >= $Users->getUserAccessLevel() || !empty($this->uname))) {
 				$this->display_other_menu = true;
 			}
 		}
-		// This is to hide ThisNote menu if there is not just one note to display (notelist)
-		else $this->isempty = true;
 	}
 	
+	public function __get($property) {
+		switch($property) {
+			case "pagetitle":
+				return $this->GetPageTitle();
+				break;
+			case "display_other_menu":
+				return $this->display_other_menu;
+				break;
+			default:
+				parent::__get($property);
+		}
+	}
 	/**
 	 * Add a new favorite for the action user
 	 */
-	function addFavorite() {
+	protected function addFavorite() {
 		global $GEDCOMID, $Favorites;
 		if (empty($this->uname)) return;
 		if (!empty($_REQUEST["oid"])) {
@@ -124,23 +103,16 @@ class NoteController extends DetailController {
 	 * get the title for this page
 	 * @return string
 	 */
-	function getPageTitle() {
+	private function getPageTitle() {
 		global $gm_lang;
 		return $this->note->getTitle()." - ".$this->xref." - ".$gm_lang["note_info"];
-	}
-	/**
-	 * check if use can edit this person
-	 * @return boolean
-	 */
-	function userCanEdit() {
-		return $this->canedit;
 	}
 	
 	/**
 	 * get edit menut
 	 * @return Menu
 	 */
-	function &getEditMenu() {
+	public function &getEditMenu() {
 		global $TEXT_DIRECTION, $GEDCOM, $gm_lang, $Users, $show_changes;
 		
 		if ($TEXT_DIRECTION=="rtl") $ff="_rtl";
@@ -149,7 +121,7 @@ class NoteController extends DetailController {
 		// edit note menu
 		$menu = new Menu($gm_lang['edit_note']);
 
-		if ($this->userCanEdit()) {
+		if ($this->note->canedit) {
 			// edit note / edit_raw
 			if ($Users->userCanEditGedlines()) {
 				$submenu = new Menu($gm_lang['edit_raw']);
@@ -162,14 +134,14 @@ class NoteController extends DetailController {
 			$submenu->addLink("if (confirm('".$gm_lang["confirm_delete_note"]."'))  deletegnote('".$this->xref."', 'delete_note'); ");
 			$menu->addSubmenu($submenu);
 
-			if (GetChangeData(true, $this->xref, true)) {
+			if ($this->note->ischanged) {
 				// edit_note / seperator
 				$submenu = new Menu();
 				$submenu->isSeperator();
 				$menu->addSubmenu($submenu);
 
 				// edit_note / show/hide changes
-				if ($show_changes == "no") $submenu = new Menu($gm_lang['show_changes']);
+				if (!$show_changes) $submenu = new Menu($gm_lang['show_changes']);
 				else $submenu = new Menu($gm_lang['hide_changes']);
 				$submenu->addLink('showchanges();');
 				$menu->addSubmenu($submenu);
@@ -182,7 +154,7 @@ class NoteController extends DetailController {
 	 * get the other menu
 	 * @return Menu
 	 */
-	function &getOtherMenu() {
+	public function &getOtherMenu() {
 		global $TEXT_DIRECTION, $GEDCOM, $gm_lang;
 		global $ENABLE_CLIPPINGS_CART, $Users;
 		
@@ -193,7 +165,7 @@ class NoteController extends DetailController {
 		$menu = new Menu($gm_lang['other']);
 		if ($Users->userCanViewGedlines()) {
 				// other / view_gedcom
-				if ($this->show_changes == 'yes' && $this->userCanEdit()) $execute = "show_gedcom_record('new');";
+				if ($this->show_changes) $execute = "show_gedcom_record('new');";
 				else $execute = "show_gedcom_record();";
 				$submenu = new Menu($gm_lang['view_gedcom']);
 				$submenu->addLink($execute);
@@ -214,7 +186,7 @@ class NoteController extends DetailController {
 		return $menu;
 	}
 	
-	function GetNoteList($filter="", $selection="") {
+	public function GetNoteList($filter="", $selection="") {
 		global $TBLPREFIX, $GEDCOMID, $note_hide;
 		
  		$sql = "SELECT * FROM ".$TBLPREFIX."other WHERE o_type='NOTE' AND o_file='".$GEDCOMID."'";
@@ -222,7 +194,7 @@ class NoteController extends DetailController {
  		if (!empty($selection)) $sql .= " AND o_id IN (".$selection.")";
  		$res = NewQuery($sql);
  		while ($row = $res->FetchAssoc()) {
-	 		$note = new Note($row["o_id"], $row["o_gedcom"]);
+	 		$note = new Note($row["o_id"], $row["o_gedcom"], $row["o_file"]);
 	 		$note->GetTitle(40);
 	 		if ($note->disp) $this->notelist[] = $note;
 	 		else $note_hide++;
@@ -231,73 +203,72 @@ class NoteController extends DetailController {
 	}
 
 	//-- search through the gedcom records for notes, full text
-	function FTSearchNotes($query, $allgeds=false, $ANDOR="AND") {
-	global $TBLPREFIX, $GEDCOM, $DBCONN, $REGEXP_DB, $GEDCOMS, $GEDCOMID, $ftminwlen, $ftmaxwlen, $note_hide, $note_total;
-	
-	// Get the min and max search word length
-	GetFTWordLengths();
-
-	$cquery = ParseFTSearchQuery($query);
-	$addsql = "";
-	
-	$mlen = GetFTMinLen($cquery);
-	
-	if ($mlen < $ftminwlen || HasMySQLStopwords($cquery)) {
-		if (isset($cquery["includes"])) {
-			foreach ($cquery["includes"] as $index => $keyword) {
-				if (HasChinese($keyword["term"])) $addsql .= " ".$keyword["operator"]." o_gedcom REGEXP '".$DBCONN->EscapeQuery($keyword["term"]).$keyword["wildcard"]."'";
-				else $addsql .= " ".$keyword["operator"]." o_gedcom REGEXP '[[:<:]]".$DBCONN->EscapeQuery($keyword["term"]).$keyword["wildcard"]."[[:>:]]'";
-			}
-		}
-		if (isset($cquery["excludes"])) {
-			foreach ($cquery["excludes"] as $index => $keyword) {
-				if (HasChinese($keyword["term"])) $addsql .= " AND o_gedcom NOT REGEXP '".$DBCONN->EscapeQuery($keyword["term"]).$keyword["wildcard"]."'";
-				else $addsql .= " AND o_gedcom NOT REGEXP '[[:<:]]".$DBCONN->EscapeQuery($keyword["term"]).$keyword["wildcard"]."[[:>:]]'";
-			}
-		}
-		$sql = "SELECT * FROM ".$TBLPREFIX."other WHERE (".substr($addsql,4).")";
-	}
-	else {
-		$sql = "SELECT * FROM ".$TBLPREFIX."other WHERE (MATCH (o_gedcom) AGAINST ('".$DBCONN->EscapeQuery($query)."' IN BOOLEAN MODE))";
-	}
-
-	if (!$allgeds) $sql .= " AND o_file='".$GEDCOMID."'";
-	
-	$sql .= " AND o_type='NOTE'";
-
-	if ((is_array($allgeds) && count($allgeds) != 0) && count($allgeds) != count($GEDCOMS)) {
-		$sql .= " AND (";
-		for ($i=0; $i<count($allgeds); $i++) {
-			$sql .= "o_file='".$DBCONN->EscapeQuery($GEDCOMS[$allgeds[$i]]["id"])."'";
-			if ($i < count($allgeds)-1) $sql .= " OR ";
-		}
-		$sql .= ")";
-	}
-
-	$note_total = array();
-	$note_hide = array();
-	$res = NewQuery($sql);
-	if ($res) {
- 		while ($row = $res->FetchAssoc()) {
-	 		$note = new Note($row["o_id"], $row["o_gedcom"]);
-	 		$note->GetTitle(40);
-	 		$note->gedcomid = $row["o_file"];
-	 		SwitchGedcom($row["o_file"]);
-			$note_total[$note->xref."[".$GEDCOM."]"] = 1;
-	 		if ($note->disp) $this->notelist[] = $note;
-	 		else $note_hide[$note->xref."[".$GEDCOM."]"] = 1;
-	 		SwitchGedcom();
- 		}
- 		$this->NotelistSort();
-	}
-}
-	
+	public function FTSearchNotes($query, $allgeds=false, $ANDOR="AND") {
+		global $TBLPREFIX, $GEDCOM, $DBCONN, $REGEXP_DB, $GEDCOMS, $GEDCOMID, $ftminwlen, $ftmaxwlen, $note_hide, $note_total;
 		
-	function NotelistSort() {
+		// Get the min and max search word length
+		GetFTWordLengths();
+	
+		$cquery = ParseFTSearchQuery($query);
+		$addsql = "";
+		
+		$mlen = GetFTMinLen($cquery);
+		
+		if ($mlen < $ftminwlen || HasMySQLStopwords($cquery)) {
+			if (isset($cquery["includes"])) {
+				foreach ($cquery["includes"] as $index => $keyword) {
+					if (HasChinese($keyword["term"])) $addsql .= " ".$keyword["operator"]." o_gedcom REGEXP '".$DBCONN->EscapeQuery($keyword["term"]).$keyword["wildcard"]."'";
+					else $addsql .= " ".$keyword["operator"]." o_gedcom REGEXP '[[:<:]]".$DBCONN->EscapeQuery($keyword["term"]).$keyword["wildcard"]."[[:>:]]'";
+				}
+			}
+			if (isset($cquery["excludes"])) {
+				foreach ($cquery["excludes"] as $index => $keyword) {
+					if (HasChinese($keyword["term"])) $addsql .= " AND o_gedcom NOT REGEXP '".$DBCONN->EscapeQuery($keyword["term"]).$keyword["wildcard"]."'";
+					else $addsql .= " AND o_gedcom NOT REGEXP '[[:<:]]".$DBCONN->EscapeQuery($keyword["term"]).$keyword["wildcard"]."[[:>:]]'";
+				}
+			}
+			$sql = "SELECT * FROM ".$TBLPREFIX."other WHERE (".substr($addsql,4).")";
+		}
+		else {
+			$sql = "SELECT * FROM ".$TBLPREFIX."other WHERE (MATCH (o_gedcom) AGAINST ('".$DBCONN->EscapeQuery($query)."' IN BOOLEAN MODE))";
+		}
+	
+		if (!$allgeds) $sql .= " AND o_file='".$GEDCOMID."'";
+		
+		$sql .= " AND o_type='NOTE'";
+	
+		if ((is_array($allgeds) && count($allgeds) != 0) && count($allgeds) != count($GEDCOMS)) {
+			$sql .= " AND (";
+			for ($i=0; $i<count($allgeds); $i++) {
+				$sql .= "o_file='".$DBCONN->EscapeQuery($GEDCOMS[$allgeds[$i]]["id"])."'";
+				if ($i < count($allgeds)-1) $sql .= " OR ";
+			}
+			$sql .= ")";
+		}
+	
+		$note_total = array();
+		$note_hide = array();
+		$res = NewQuery($sql);
+		if ($res) {
+	 		while ($row = $res->FetchAssoc()) {
+		 		$note = new Note($row["o_id"], $row["o_gedcom"], $row["o_file"]);
+		 		$note->GetTitle(40);
+		 		$note->gedcomid = $row["o_file"];
+		 		SwitchGedcom($row["o_file"]);
+				$note_total[$note->xref."[".$GEDCOM."]"] = 1;
+		 		if ($note->disp) $this->notelist[] = $note;
+		 		else $note_hide[$note->xref."[".$GEDCOM."]"] = 1;
+		 		SwitchGedcom();
+	 		}
+	 		$this->NotelistSort();
+		}
+	}
+	
+	private function NotelistSort() {
 		uasort($this->notelist, array($this, "NotelistObjSort"));
 	}
 	
-	function NotelistObjSort($a, $b) {
+	private function NotelistObjSort($a, $b) {
 		if ($a->title != $b->title) return StringSort(ltrim($a->title), ltrim($b->title));
 		else {
 			$anum = preg_replace("/\D*/", "", $a->xref);
@@ -320,13 +291,13 @@ class NoteController extends DetailController {
 		global $GM_IMAGES, $GEDCOM;
 
 		if (!$this->note->disp) return false;
-		
+
 		if (($this->note->textchanged || $this->note->isdeleted) && $this->note->show_changes && !($this->view == "preview")) {
 			$styleadd = "change_old";
 			print "\n\t\t<tr><td class=\"shade2 $styleadd center\" style=\"vertical-align: middle;\"><img src=\"".$GM_IMAGE_DIR."/".$GM_IMAGES["note"]["other"]."\" width=\"50\" height=\"50\" alt=\"\" /><br />".$gm_lang["note"].":";
 			print " </td>\n<td class=\"shade1 $styleadd wrap\">";
 			if (showFactDetails("NOTE", $this->note->xref)) {
-				print PrintReady($this->note->GetNoteText())."<br />\n";
+				print PrintReady($this->note->text)."<br />\n";
 				// See if RESN tag prevents display or edit/delete
 			 	$resn_tag = preg_match("/2 RESN (.*)/", $this->note->gedrec, $match);
 	 			if ($resn_tag > 0) $resn_value = strtolower(trim($match[1]));
@@ -342,7 +313,7 @@ class NoteController extends DetailController {
 		if (($this->note->textchanged || $this->note->isnew) && !$this->note->isdeleted && $this->show_changes && !($this->view == "preview")) $styleadd = "change_new";
 		if (!$this->note->isdeleted || !$this->show_changes) {
 			print "\n\t\t<tr><td class=\"shade2 $styleadd center\" style=\"vertical-align: middle;\"><img src=\"".$GM_IMAGE_DIR."/".$GM_IMAGES["note"]["other"]."\" width=\"50\" height=\"50\" alt=\"\" /><br />".$gm_lang["note"].":";
-			if ($this->canedit && !FactEditRestricted($this->note->xref, $this->note->gedrec, 0) && ($styleadd!="change_old")&&($view!="preview")&& $mayedit) {
+			if ($this->note->canedit && ($styleadd!="change_old")&&($view!="preview")&& $mayedit) {
 				$menu = array();
 				$menu["label"] = $gm_lang["edit"];
 				$menu["labelpos"] = "right";

@@ -40,28 +40,14 @@ require_once 'includes/functions/functions_charts.php';
 $controller = new IndividualController();
 
 print_header($controller->PageTitle);
-// NOTE: If the person is not found, display message
-if ($controller->indi->isempty) {
-	print $gm_lang["person_not_found"];
-	print_footer();
-	exit;
-}
-else if (!$controller->indi->dispname) {
-	print_privacy_error($CONTACT_EMAIL);
-	print_footer();
-	exit;
-}
-$controller->indi->getActionList();
 
-// Check if the record is raw-edited
-if($controller->show_changes && GetChangeData(true, $controller->pid, true)) {
-	$sql = "SELECT COUNT(ch_id) FROM ".$TBLPREFIX."changes WHERE ch_gedfile='".$GEDCOMID."' AND ch_type='edit_raw' AND ch_gid='".$controller->pid."'";
-	if ($res = NewQuery($sql)) {
-		$row = $res->FetchRow();
-		$res->FreeResult();
-		if ($row[0]>0) print $gm_lang["is_rawedited"];
-	}
-}
+$controller->CheckNoResult($gm_lang["person_not_found"]);
+
+$controller->CheckPrivate();
+
+$controller->CheckRawEdited();
+
+$controller->indi->getActionList();
 
 if(!isset($FACT_COUNT)) $FACT_COUNT = 0;
 $namesprinted = false;
@@ -97,7 +83,7 @@ $prtcount = 0;
 				$changed = false;
 				print "<div class=\"indi_spacer $TEXT_DIRECTION";
 				if($controller->show_changes) {
-					if ($controller->indi->indideleted) print " change_old";
+					if ($controller->indi->isdeleted) print " change_old";
 					else if (isset($value[3]) && $value[3] == "new") print " change_new";
 					else if (IsChangedFact($controller->indi->xref, $value[1])) {
 						print " change_old";
@@ -109,7 +95,7 @@ $prtcount = 0;
 				print "<span class=\"label $TEXT_DIRECTION\">".PrintReady($gm_lang["sex"].":    ")."</span><span class=\"field\">".$controller->indi->sexdetails["gender"];
 				print " <img src=\"".$controller->indi->sexdetails["image"]."\" title=\"".$controller->indi->sexdetails["gender"]."\" alt=\"".$controller->indi->sexdetails["gender"];
 				print "\" width=\"0\" height=\"0\" class=\"sex_image\" border=\"0\" />";
-				if (!$controller->indi->indideleted && !$changed && $controller->canedit) {
+				if (!$controller->indi->isdeleted && !$changed && $controller->indi->canedit) {
 					if ($controller->indi->sexdetails["add"]) print "<br /><a class=\"font9\" href=\"#\" onclick=\"add_new_record('".$controller->pid."', 'SEX'); return false;\">".$gm_lang["edit"]."</a>";
 					else {
 						print "<br /><a class=\"font9\" href=\"#\" onclick=\"edit_record('".$controller->pid."', 'SEX', 1, 'edit_gender'); return false;\">".$gm_lang["edit"]."</a> | ";
@@ -127,7 +113,7 @@ $prtcount = 0;
 					print "<span class=\"label\">".$gm_lang["sex"].":    </span><span class=\"field\">".$controller->indi->sexdetails["gender"];
 					print " <img src=\"".$controller->indi->sexdetails["image"]."\" title=\"".$controller->indi->sexdetails["gender"]."\" alt=\"".$controller->indi->sexdetails["gender"];
 					print "\" width=\"0\" height=\"0\" class=\"sex_image\" border=\"0\" />";
-					if (!$controller->indi->indideleted) {
+					if (!$controller->indi->isdeleted) {
 						if ($controller->indi->sexdetails["add"] || $add) print "<br /><a class=\"font9\" href=\"#\" onclick=\"add_new_record('".$controller->pid."', 'SEX'); return false;\">".$gm_lang["edit"]."</a>";
 						else {
 							print "<br /><a class=\"font9\" href=\"#\" onclick=\"edit_record('".$controller->pid."', 'SEX', 1, 'edit_gender'); return false;\">".$gm_lang["edit"]."</a> | ";
@@ -147,7 +133,7 @@ $prtcount = 0;
 							// Name not changed
 							if ($name["old"] == $name["new"]) {
 								print "<div class=\"indi_spacer";
-								if ($controller->indi->indideleted) print " change_old";
+								if ($controller->indi->isdeleted) print " change_old";
 								print "\">";
 								$controller->print_name_record($name["old"], $num);
 								print "</div>";
@@ -155,7 +141,7 @@ $prtcount = 0;
 								continue;
 							}
 							// Name changed
-							if ($controller->caneditown && $show_changes != "no" && $name["old"] != $name["new"] && !empty($name["new"])&& !empty($name["old"])) {
+							if ($controller->indi->can_editown && $show_changes && $name["old"] != $name["new"] && !empty($name["new"])&& !empty($name["old"])) {
 								print "<div>";
 								print "<table class=\"indi_spacer\">";
 								print "<tr><td class=\"change_old\">";
@@ -169,14 +155,14 @@ $prtcount = 0;
 								continue;
 							}
 							// Name added
-							if ($controller->caneditown && $show_changes != "no" && empty($name["old"]) && !empty($name["new"])) {
+							if ($controller->indi->can_editown && $show_changes && empty($name["old"]) && !empty($name["new"])) {
 								print "<div class=\"indi_spacer change_new\">";
 								$controller->print_name_record($name["new"], $num);
 								print "</div>";
 								$num++;
 							}
 							// Name deleted
-							if ($controller->caneditown && $show_changes != "no" && empty($name["new"]) && !empty($name["old"])) {
+							if ($controller->indi->can_editown && $show_changes && empty($name["new"]) && !empty($name["old"])) {
 								print "<div class=\"indi_spacer change_old\">";
 								$controller->print_name_record($name["old"], $num, false);
 								print "</div>";
@@ -195,8 +181,8 @@ $prtcount = 0;
 		print "<table>";
 		//-- - put the birth info in this section
 		if ($controller->show_changes) {
-			if ($controller->indi->indideleted) {
-				if (!empty($controller->brec)) {
+			if ($controller->indi->isdeleted) {
+				if (!$controller->indi->brec == "") {
 					print "<tr><td class=\"change_old\">";
 					print "<span class=\"label\">".$factarray["BIRT"].":</span>";
 					print "<span class=\"field\">";
@@ -206,7 +192,7 @@ $prtcount = 0;
 				}
 			}
 			else {
-				if ($controller->indi->indinew && !empty($controller->indi->brec)) {
+				if ($controller->indi->isnew && !$controller->indi->brec == "") {
 					print "<tr><td class=\"change_new\">";
 					print "<span class=\"label\">".$factarray["BIRT"].":</span>";
 					print "<span class=\"field\">";
@@ -215,8 +201,8 @@ $prtcount = 0;
 					print "</span></td></tr>";
 				}
 				else {
-					if (!empty($controller->indi->newbrec)) {
-						if (!empty($controller->indi->brec)) {
+					if (!$controller->indi->newbrec == "") {
+						if (!$controller->indi->brec == "") {
 							print "<tr><td class=\"change_old\">";
 							print "<span class=\"label\">".$factarray["BIRT"].":</span>";
 							print "<span class=\"field\">";
@@ -232,7 +218,7 @@ $prtcount = 0;
 						print "</span></td></tr>";
 					}
 					else {
-						if (!empty($controller->indi->brec)) { 
+						if (!$controller->indi->brec == "") { 
 							print "<tr><td class=\"$TEXT_DIRECTION\"><span class=\"label\">".$factarray["BIRT"].":"."</span>";
 							print "<span class=\"field\">";
 							print_fact_date($controller->indi->brec);
@@ -244,7 +230,7 @@ $prtcount = 0;
 			}
 		}
 		else {
-			if (!empty($controller->indi->brec)) { 
+			if (!$controller->indi->brec == "") { 
 				print "<tr><td><span class=\"label\">".$factarray["BIRT"].":"."</span>";
 				print "<span class=\"field\">";
 				print_fact_date($controller->indi->brec);
@@ -255,7 +241,7 @@ $prtcount = 0;
 		// RFE [ 1229233 ] "DEAT" vs "DEAT Y"
 		// The check $deathrec != "1 DEAT" will not show any records that only have 1 DEAT in them
 		if ($controller->show_changes) {
-			if ($controller->indi->indideleted && !empty($controller->drec)) {
+			if ($controller->indi->isdeleted && !$controller->indi->drec == "") {
 				print "<tr><td class=\"change_old\">";
 				print "<span class=\"label\">".$factarray["DEAT"].":</span>";
 				print "<span class=\"field\">";
@@ -264,7 +250,7 @@ $prtcount = 0;
 				print "</span></td></tr>";
 			}
 			else {
-				if ($controller->indi->indinew && !empty($controller->indi->drec)) {
+				if ($controller->indi->isnew && !$controller->indi->drec == "") {
 					print "<tr><td class=\"change_new\">";
 					print "<span class=\"label\">".$factarray["DEAT"].":</span>";
 					print "<span class=\"field\">";
@@ -274,7 +260,7 @@ $prtcount = 0;
 				}
 				else {
 					if (!empty($controller->indi->newdrec)) {
-						if (!empty($controller->indi->drec)) {
+						if (!$controller->indi->drec == "") {
 							print "<tr><td class=\"change_old\">";
 							print "<span class=\"label\">".$factarray["DEAT"].":</span>";
 							print "<span class=\"field\">";
@@ -290,7 +276,7 @@ $prtcount = 0;
 						print "</span></td></tr>";
 					}
 					else {
-						if (!empty($controller->indi->drec)&& trim($controller->indi->drec) != "1 DEAT") { 
+						if (!$controller->indi->drec == ""&& trim($controller->indi->drec) != "1 DEAT") { 
 							print "<tr><td><span class=\"label\">".$factarray["DEAT"].":</span>";
 							print "<span class=\"field\">";
 							print_fact_date($controller->indi->drec);
@@ -302,7 +288,7 @@ $prtcount = 0;
 			}
 		}
 		else {
-			if (!empty($controller->indi->drec)&& trim($controller->indi->drec) != "1 DEAT") { 
+			if (!$controller->indi->drec == "" && trim($controller->indi->drec) != "1 DEAT") { 
 				print "<tr><td><span class=\"label\">".$factarray["DEAT"].":</span>";
 				print "<span class=\"field\">";
 				print_fact_date($controller->indi->drec);
@@ -366,7 +352,7 @@ function reload() {
 }
 
 function showchanges() {
-		sndReq('show_changes', 'set_show_changes', 'set_show_changes', '<?php if ($show_changes == "yes") print "no"; else print "yes"; ?>');
+		sndReq('show_changes', 'set_show_changes', 'set_show_changes', '<?php if ($show_changes) print false; else print true; ?>');
 		window.location.reload();
 }
 // The function below does not go well with validation.
@@ -452,76 +438,71 @@ $show_full = true;
 // NOTE: parent families
 ?>
 	<?php
-	if (isset($controller->indi->parents)) {
-		foreach ($controller->indi->parents as $famid => $family) {
+	if (is_array($controller->indi->childfamilies)) {
+		foreach ($controller->indi->childfamilies as $famid => $family) {
 			?>
 			<table>
 			<tr>
 				<td><img src="<?php print $GM_IMAGE_DIR."/".$GM_IMAGES["cfamily"]["small"]; ?>" border="0" class="icon" alt="" /></td>
-				<td><span class="subheaders"><?php print $family["label"];?></span>
-				<?php 
+				<td><span class="subheaders"><?php print $family->label;?></span>
+				<?php  
 			if (!$controller->view) { ?>
-				 - <a href="family.php?famid=<?php print $famid; ?>">[<?php print $gm_lang["view_family"]; ?><?php if ($SHOW_FAM_ID_NUMBERS) print " &lrm;(".$famid.")&lrm;"; ?>]</a>&nbsp;&nbsp;
-				 <?php if (empty($family["HUSB"]) && $controller->canedit) { 
+				 - <a href="family.php?famid=<?php print $famid; ?>">[<?php print $gm_lang["view_family"]; ?><?php if ($SHOW_FAM_ID_NUMBERS) print " &lrm;(".$family->xref.")&lrm;"; ?>]</a>&nbsp;&nbsp;
+				 <?php if ($family->husb_id == "" && $controller->indi->canedit) { 
 				 	print_help_link("edit_add_parent_help", "qm"); ?>
-					<a href="javascript <?php print $gm_lang["add_father"]; ?>" onclick="return addnewparentfamily('', 'HUSB', '<?php print $famid; ?>', 'add_father');"><?php print $gm_lang["add_father"]; ?></a>
+					<a href="javascript <?php print $gm_lang["add_father"]; ?>" onclick="return addnewparentfamily('', 'HUSB', '<?php print $fam->xref; ?>', 'add_father');"><?php print $gm_lang["add_father"]; ?></a>
 				<?php }
-				if (empty($family["WIFE"]) && $controller->canedit) {
+				if ($family->wife_id == "" && $controller->indi->canedit) {
 					print_help_link("edit_add_parent_help", "qm"); ?>
-					<a href="javascript <?php print $gm_lang["add_mother"]; ?>" onclick="return addnewparentfamily('', 'WIFE', '<?php print $famid; ?>', 'add_mother');"><?php print $gm_lang["add_mother"]; ?></a>
+					<a href="javascript <?php print $gm_lang["add_mother"]; ?>" onclick="return addnewparentfamily('', 'WIFE', '<?php print $fam->xref; ?>', 'add_mother');"><?php print $gm_lang["add_mother"]; ?></a>
 				<?php } 
 			}?>
 				</td>
 			</tr>
 			</table>
 			<table class="facts_table">
-			<?php if(!empty($family["HUSB"])) { ?>
+			<?php if($family->husb_id != "") { ?>
 			<tr>
 				<td class="width20 shade2 center"
-				<?php if ($controller->show_changes && !empty($family["HUSB"]->indinew)) print " style=\"border: solid #0000FF 2px; vertical-align: middle;\"";
+				<?php if ($controller->show_changes && $family->husb->isnew) print " style=\"border: solid #0000FF 2px; vertical-align: middle;\"";
 				else print " style=\"vertical-align: middle;\"";?>
 				>
-				<?php print $family["HUSB"]->label; ?></td>
-				<td class="<?php print $controller->getPersonStyle($family["HUSB"]); ?>">
+				<?php print $family->husb->label; ?></td>
+				<td class="<?php print $controller->getPersonStyle($family->husb); ?>">
 				<?php
-				if (isset($family["HUSB"])) {
-					print_pedigree_person($family["HUSB"]->xref,2,!$controller->view, $prtcount);
+					print_pedigree_person($family->husb->xref,2,!$controller->view, $prtcount);
 					$prtcount++;
-				}
 				?>
 				</td>
 			</tr>
 			<?php }
-			if(!empty($family["WIFE"])) { ?>
+			if($family->wife_id != "") { ?>
 			<tr>
 				<td class="width20 shade2 center"
-				<?php if ($controller->show_changes && !empty($family["WIFE"]->indinew)) print " style=\"border: solid #0000FF 2px; vertical-align: middle;\"";
+				<?php if ($controller->show_changes && $family->wife->isnew) print " style=\"border: solid #0000FF 2px; vertical-align: middle;\"";
 				else print " style=\"vertical-align: middle;\"";?>
 				>
-				<?php print $family["WIFE"]->label; ?></td>
-				<td class="<?php print $controller->getPersonStyle($family["WIFE"]); ?>">
+				<?php print $family->wife->label; ?></td>
+				<td class="<?php print $controller->getPersonStyle($family->wife); ?>">
 				<?php
-				if (isset($family["WIFE"])) {
-					print_pedigree_person($family["WIFE"]->xref,2,!$controller->view, $prtcount);
+					print_pedigree_person($family->wife->xref,2,!$controller->view, $prtcount);
 					$prtcount++;
-				}
 				?>
 				</td>
 			</tr>
 	<?php }
-	if (isset($controller->indi->siblings)) {
-		foreach ($controller->indi->siblings as $sibid => $sibling) {
-			if (isset($sibling->label[$famid])) {
+		foreach ($family->children as $childid => $child) {
+			if (isset($child->label[$famid])) {
 			?>
 			<tr>
 				<td class="width20 shade2 center"
-				<?php if ($controller->show_changes && !empty($sibling->indinew)) print " style=\"border: solid #0000FF 2px; vertical-align: middle;\"";
+				<?php if ($controller->show_changes && $child->isnew) print " style=\"border: solid #0000FF 2px; vertical-align: middle;\"";
 				else print " style=\"vertical-align: middle;\"";?>
 				>
-				<?php print $sibling->label[$famid]; ?></td>
-				<td class="<?php print $controller->getPersonStyle($sibling); ?>">
+				<?php print $child->label[$famid]; ?></td>
+				<td class="<?php print $controller->getPersonStyle($child); ?>">
 				<?php
-				print_pedigree_person($sibid,2,!$controller->view, $prtcount);
+				print_pedigree_person($child->xref, 2 , !$controller->view, $prtcount);
 				$prtcount++;
 				?>
 				</td>
@@ -529,116 +510,114 @@ $show_full = true;
 			<?php
 			}
 		}
-	}
 	print "</table>";
-}
+	}
 }
 	?>
 
 <?php
 // NOTE: Half-siblings father
-	if (isset($controller->indi->father_family)) {
-		foreach ($controller->indi->father_family as $famid => $family) {
-		?>
-		<table><tr>
-			<td><img src="<?php print $GM_IMAGE_DIR."/".$GM_IMAGES["cfamily"]["small"]; ?>" border="0" class="icon" alt="" /></td>
-			<td><span class="subheaders"><?php print $family["label"];?></span>
-			<?php 
-		if (!$controller->view) { ?>
-			 - <a href="family.php?famid=<?php print $famid; ?>">[<?php print $gm_lang["view_family"]; ?><?php if ($SHOW_FAM_ID_NUMBERS) print " &lrm;(".$famid.")&lrm;"; ?>]</a>
-		<?php } ?>
-			</td>
-		</tr>
-		</table>
-		<table class="facts_table">
-		<tr>
-			<td class="width20 shade2 center" style="vertical-align: middle;"><?php print $controller->indi->father_family[$famid]["WIFE"]->label; ?></td>
-			<td class="<?php print $controller->getPersonStyle($controller->indi->father_family[$famid]["WIFE"]); ?>">
-			<?php
-			if (isset($controller->indi->father_family[$famid]["WIFE"])) {
-				print_pedigree_person($controller->indi->father_family[$famid]["WIFE"]->xref,2,!$controller->view, $prtcount);
-				$prtcount++;
-			}
-			?>
-			</td>
-		</tr>
-	<?php
-			foreach ($family["kids"] as $sibid => $sibling) {
-				?>
-				<tr>
-					<td class="width20 shade2 center" style="vertical-align: middle;"><?php print $sibling->label; ?></td>
-					<td class="<?php print $controller->getPersonStyle($sibling); ?>">
-					<?php
-					print_pedigree_person($sibid,2,!$controller->view, $prtcount);
-					$prtcount++;
+		foreach ($controller->indi->childfamilies as $id => $fam) {
+			foreach ($fam->husb->spousefamilies as $famid => $family) {
+				if ($fam->xref != $family->xref) {
 					?>
-					</td>
-				</tr>
+					<table><tr>
+						<td><img src="<?php print $GM_IMAGE_DIR."/".$GM_IMAGES["cfamily"]["small"]; ?>" border="0" class="icon" alt="" /></td>
+						<td><span class="subheaders"><?php print $family->label;?></span>
+						<?php 
+					if (!$controller->view) { ?>
+						 - <a href="family.php?famid=<?php print $famid; ?>">[<?php print $gm_lang["view_family"]; ?><?php if ($SHOW_FAM_ID_NUMBERS) print " &lrm;(".$famid.")&lrm;"; ?>]</a>
+					<?php } ?>
+						</td>
+					</tr>
+					</table>
+					<table class="facts_table">
+					<tr>
+						<td class="width20 shade2 center" style="vertical-align: middle;"><?php print $family->wife->label; ?></td>
+						<td class="<?php print $controller->getPersonStyle($family->wife); ?>">
+						<?php
+						if (is_object($family->wife)) {
+							print_pedigree_person($family->wife->xref,2,!$controller->view, $prtcount);
+							$prtcount++;
+						}
+						?>
+						</td>
+					</tr>
 				<?php
+				foreach ($family->children as $sibid => $sibling) {
+					?>
+					<tr>
+						<td class="width20 shade2 center" style="vertical-align: middle;"><?php print $sibling->label; ?></td>
+						<td class="<?php print $controller->getPersonStyle($sibling); ?>">
+						<?php
+						print_pedigree_person($sibling->xref,2,!$controller->view, $prtcount);
+						$prtcount++;
+						?>
+						</td>
+					</tr>
+					<?php
+				}
+			print "</table>";
 			}
-		print "</table>";
 		}
 	}
 	?>
 <?php
 
 // NOTE: Half-siblings mother
-	if (isset($controller->indi->mother_family)) {
-		foreach ($controller->indi->mother_family as $famid => $family) {
-		?>
-		<table><tr>
-			<td><img src="<?php print $GM_IMAGE_DIR."/".$GM_IMAGES["cfamily"]["small"]; ?>" border="0" class="icon" alt="" /></td>
-			<td><span class="subheaders"><?php print $family["label"];?></span>
-			<?php 
-		if (!$controller->view) { ?>
-			 - <a href="family.php?famid=<?php print $famid; ?>">[<?php print $gm_lang["view_family"]; ?><?php if ($SHOW_FAM_ID_NUMBERS) print " &lrm;(".$famid.")&lrm;"; ?>]</a>
-		<?php } ?>
-			</td>
-		</tr>
-		</table>
-		<table class="facts_table">
-		<?php
-		if (!empty($family["HUSB"]->xref)) {?>
-			
-			<tr>
-				<td class="width20 shade2 center"  style="vertical-align: middle;"><?php print $family["HUSB"]->label; ?></td>
-				<td class="<?php print $controller->getPersonStyle($family["HUSB"]); ?>">
-				<?php
-				if (isset($family["HUSB"])) {
-					print_pedigree_person($family["HUSB"]->xref,2,!$controller->view, $prtcount);
-					$prtcount++;
-				}
-				?>
-				</td>
-			</tr>
-		<?php
-		}
-		foreach ($family["kids"] as $sibid => $sibling) {
-				?>
-				<tr>
-					<td class="width20 shade2 center" style="vertical-align: middle;"><?php print $sibling->label; ?></td>
-					<td class="<?php print $controller->getPersonStyle($sibling); ?>">
-					<?php
-					print_pedigree_person($sibid,2,!$controller->view, $prtcount);
-					$prtcount++;
+		foreach ($controller->indi->childfamilies as $id => $fam) {
+			foreach ($fam->wife->spousefamilies as $famid => $family) {
+				if ($fam->xref != $family->xref) {
 					?>
-					</td>
-				</tr>
+					<table><tr>
+						<td><img src="<?php print $GM_IMAGE_DIR."/".$GM_IMAGES["cfamily"]["small"]; ?>" border="0" class="icon" alt="" /></td>
+						<td><span class="subheaders"><?php print $family->label;?></span>
+						<?php 
+					if (!$controller->view) { ?>
+						 - <a href="family.php?famid=<?php print $famid; ?>">[<?php print $gm_lang["view_family"]; ?><?php if ($SHOW_FAM_ID_NUMBERS) print " &lrm;(".$famid.")&lrm;"; ?>]</a>
+					<?php } ?>
+						</td>
+					</tr>
+					</table>
+					<table class="facts_table">
+					<tr>
+						<td class="width20 shade2 center" style="vertical-align: middle;"><?php print $family->wife->label; ?></td>
+						<td class="<?php print $controller->getPersonStyle($family->husb); ?>">
+						<?php
+						if (is_object($family->husb)) {
+							print_pedigree_person($family->husb->xref,2,!$controller->view, $prtcount);
+							$prtcount++;
+						}
+						?>
+						</td>
+					</tr>
 				<?php
+				foreach ($family->children as $sibid => $sibling) {
+					?>
+					<tr>
+						<td class="width20 shade2 center" style="vertical-align: middle;"><?php print $sibling->label; ?></td>
+						<td class="<?php print $controller->getPersonStyle($sibling); ?>">
+						<?php
+						print_pedigree_person($sibling->xref,2,!$controller->view, $prtcount);
+						$prtcount++;
+						?>
+						</td>
+					</tr>
+					<?php
+				}
+			print "</table>";
 			}
-		print "</table>";
 		}
 	}
 	?>
 <?php
 // NOTE: spouses and children
-if (isset($controller->indi->spouses)) {
-	foreach ($controller->indi->spouses as $famid => $family) {
+	foreach ($controller->indi->spousefamilies as $famid => $family) {
 		?>
 		<table>
 		<tr>
 			<td><img src="<?php print $GM_IMAGE_DIR."/".$GM_IMAGES["cfamily"]["small"]; ?>" border="0" class="icon" alt="" /></td>
-			<td><span class="subheaders"><?php print PrintReady($family["label"]);?></span>
+			<td><span class="subheaders"><?php print PrintReady($family->label);?></span>
 			<?php 
 		if (!$controller->view) { ?>
 			 - <a href="family.php?famid=<?php print $famid; ?>">[<?php print $gm_lang["view_family"]; ?><?php if ($SHOW_FAM_ID_NUMBERS) print " &lrm;($famid)&lrm;"; ?>]</a>
@@ -647,40 +626,40 @@ if (isset($controller->indi->spouses)) {
 		</tr>
 		</table>
 		<table class="facts_table">
-		<?php if (!empty($family["parents"]["HUSB"])) { ?>
+		<?php if (!empty($family->parents["HUSB"])) { ?>
 		<tr>
 			<td class="width20 shade2 center
 			<?php
-				if ($family["parents"]["HUSB"]->indinew) print " change_new";
-				else if ($family["parents"]["HUSB"]->indideleted) print " change_old";
+				if ($family->parents["HUSB"]->isnew) print " change_new";
+				else if ($family->parents["HUSB"]->isdeleted) print " change_old";
 			?>
 			" style="vertical-align: middle;">
-			<?php print $family["parents"]["HUSB"]->label; ?></td>
-			<td class="<?php print $controller->getPersonStyle($family["parents"]["HUSB"]); ?>">
+			<?php print $family->parents["HUSB"]->label; ?></td>
+			<td class="<?php print $controller->getPersonStyle($family->parents["HUSB"]); ?>">
 			<?php
-			if (isset($family["parents"]["HUSB"])) {
-				if ($family["parents"]["HUSB"]->show_changes) print_pedigree_person($family["parents"]["HUSB"]->xref,2,!$controller->view, $prtcount, "", $family["parents"]["HUSB"]->newgedrec);
-				else print_pedigree_person($family["parents"]["HUSB"]->xref,2,!$controller->view, $prtcount);
+			if (isset($family->parents["HUSB"])) {
+				if ($family->parents["HUSB"]->show_changes) print_pedigree_person($family->parents["HUSB"]->xref,2,!$controller->view, $prtcount, "", $family->parents["HUSB"]->newgedrec);
+				else print_pedigree_person($family->parents["HUSB"]->xref,2,!$controller->view, $prtcount);
 				$prtcount++;
 			}
 			?>
 			</td>
 		</tr>
 		<?php }
-			if (!empty($family["parents"]["WIFE"])) { ?>
+			if (!empty($family->parents["WIFE"])) { ?>
 		<tr>
 			<td class="width20 shade2 center 
 			<?php
-				if ($family["parents"]["WIFE"]->indinew) print " change_new";
-				else if ($family["parents"]["WIFE"]->indideleted) print " change_old";
+				if ($family->parents["WIFE"]->isnew) print " change_new";
+				else if ($family->parents["WIFE"]->isdeleted) print " change_old";
 			?>
 			" style="vertical-align: middle;">
-			<?php print $family["parents"]["WIFE"]->label; ?></td>
-			<td class="<?php print $controller->getPersonStyle($family["parents"]["WIFE"]); ?>">
+			<?php print $family->parents["WIFE"]->label; ?></td>
+			<td class="<?php print $controller->getPersonStyle($family->parents["WIFE"]); ?>">
 			<?php
-			if (isset($family["parents"]["WIFE"])) {
-				if ($family["parents"]["WIFE"]->show_changes) print_pedigree_person($family["parents"]["WIFE"]->xref,2,!$controller->view, $prtcount, "", $family["parents"]["WIFE"]->newgedrec);
-				else print_pedigree_person($family["parents"]["WIFE"]->xref,2,!$controller->view, $prtcount);
+			if (isset($family->parents["WIFE"])) {
+				if ($family->parents["WIFE"]->show_changes) print_pedigree_person($family->parents["WIFE"]->xref,2,!$controller->view, $prtcount, "", $family->parents["WIFE"]->newgedrec);
+				else print_pedigree_person($family->parents["WIFE"]->xref,2,!$controller->view, $prtcount);
 				$prtcount++;
 			}
 			?>
@@ -688,35 +667,31 @@ if (isset($controller->indi->spouses)) {
 		</tr>
 		<?php
 			}
-		if (isset($family["kids"])) {
-			foreach ($family["kids"] as $kidid => $kid) {
-//				print_r($kid);
+			foreach ($family->children as $kidid => $kid) {
 				?>
 				<tr>
 					<td class="width20 shade2 center 
 					<?php
-					if (!empty($family["kids"][$kidid]->xref) && $controller->show_changes) {
-						if ($family["kids"][$kidid]->indinew) print " change_new";
-						else if ($family["kids"][$kidid]->indideleted) print " change_old";
+					if ($controller->show_changes) {
+						if ($kid->isnew) print " change_new";
+						else if ($kid->isdeleted) print " change_old";
 					}
 					?>
 					" style="vertical-align: middle;">
-					<?php print $family["kids"][$kidid]->label; ?></td>
+					<?php print $kid->label; ?></td>
 					<td class="<?php print $controller->getPersonStyle($kid); ?>">
 					<?php
-					print_pedigree_person($family["kids"][$kidid]->xref,2,!$controller->view, $prtcount);
+					print_pedigree_person($kid->xref,2,!$controller->view, $prtcount);
 					$prtcount++;
 					?>
 					</td>
 				</tr>
 				<?php
 			}
-		}
 		?>
 		</table>
 		<?php
 	}
-}
 if (!$controller->indi->close_relatives) print "<tr><td id=\"no_tab5\" colspan=\"2\" class=\"shade1\">".$gm_lang["no_tab5"]."</td></tr>\n";
 ?>
 <br />
@@ -734,6 +709,7 @@ if (!$controller->indi->disp) {
 else {
 	if (count($controller->indi->indifacts) == 0) print "<tr><td id=\"no_tab1\" colspan=\"2\" class=\"shade1\">".$gm_lang["no_tab1"]."</td></tr>\n";
 	echo '<tr id="row_top"><td></td><td class="shade2 rela">';
+//	print "Facts found: ".count($controller->indi->indifacts);
 	echo '<a href="#" onclick="togglerow(\'row_rela\'); return false;">';
 	echo '<img style="display:none;" id="rela_plus" src="'.$GM_IMAGE_DIR.'/'.$GM_IMAGES["plus"]["other"].'" border="0" width="11" height="11" alt="'.$gm_lang["show_details"].'" title="'.$gm_lang["show_details"].'" />';
 	echo '<img id="rela_minus" src="'.$GM_IMAGE_DIR.'/'.$GM_IMAGES["minus"]["other"].'" border="0" width="11" height="11" alt="'.$gm_lang["hide_details"].'" title="'.$gm_lang["hide_details"].'" />';
@@ -752,33 +728,33 @@ else {
 		}
 		else $pid = $controller->pid;
 		if (!$controller->show_changes) {
-			if ($controller->indi->indideleted) print_fact($value[1], $pid, $value[0], $value[2], $controller->indi->gedrec, "deleted");
-			else print_fact($value[1], $pid, $value[0], $value[2], $controller->indi->gedrec, "", $controller->canedit);
+			if ($controller->indi->isdeleted) print_fact($value[1], $pid, $value[0], $value[2], $controller->indi->gedrec, "deleted");
+			else print_fact($value[1], $pid, $value[0], $value[2], $controller->indi->gedrec, "", $controller->indi->canedit);
 		}
 		else {
-			if ($controller->indi->indideleted && $controller->show_changes) print_fact($value[1], $pid, $value[0], $value[2], $controller->indi->gedrec, "change_old");
+			if ($controller->indi->isdeleted && $controller->show_changes) print_fact($value[1], $pid, $value[0], $value[2], $controller->indi->gedrec, "change_old");
 			else {
 				if ($controller->show_changes && IsChangedFact($pid, $value[1])) {
 					$adds = "";
 					if (!isset($value[3]) || $value[3] != "new") {
-						print_fact($value[1], $pid, $value[0], $value[2], $controller->indi->gedrec, "change_old", $controller->canedit);
+						print_fact($value[1], $pid, $value[0], $value[2], $controller->indi->gedrec, "change_old", $controller->indi->canedit);
 					}
 					$cts = preg_match("/1 _GMS @(.*)@/", $value[1], $matchs);
 					if ($cts>0) $adds = $matchs[0]."\r\n";
 					$newfact = RetrieveChangedFact($pid, $value[0], $value[1]);
-					if (!empty($newfact)) print_fact($newfact.$addfam.$adds, $controller->pid, $value[0], $value[2], $controller->indi->gedrec, "change_new", $controller->canedit);
+					if (!empty($newfact)) print_fact($newfact.$addfam.$adds, $controller->pid, $value[0], $value[2], $controller->indi->gedrec, "change_new", $controller->indi->canedit);
 				}
 				else if ($controller->show_changes && isset($value[3]) && $value[3] == "new" ) {
-					print_fact($value[1], $pid, $value[0], $value[2], $controller->indi->gedrec, "change_new", $controller->canedit);
+					print_fact($value[1], $pid, $value[0], $value[2], $controller->indi->gedrec, "change_new", $controller->indi->canedit);
 				}
-				else print_fact($value[1], $pid, $value[0], $value[2], $controller->indi->gedrec, "", $controller->canedit);
+				else print_fact($value[1], $pid, $value[0], $value[2], $controller->indi->gedrec, "", $controller->indi->canedit);
 			}
 		}
 		$FACT_COUNT++;
 	}
 }
 //-- new fact link
-if ((!$controller->view) &&($controller->canedit)&&($controller->indi->disp) && !$controller->indi->indideleted) {
+if ((!$controller->view) &&($controller->indi->canedit)&&($controller->indi->disp) && !$controller->indi->isdeleted) {
 	PrintAddNewFact($controller->pid, $controller->indi->indifacts, "INDI");
 }
 ?>
@@ -808,18 +784,18 @@ if ((!$controller->view) &&($controller->canedit)&&($controller->indi->disp) && 
 				$fact = trim($value[0]);
 				if ($fact=="SOUR") {
 					if (!$controller->show_changes) {
-						if ($controller->indi->indideleted) print_main_sources($value[1], 1, $pid, $value[2], "deleted");
-						else print_main_sources($value[1], 1, $pid, $value[2], "", $controller->canedit);
+						if ($controller->indi->isdeleted) print_main_sources($value[1], 1, $pid, $value[2], "deleted");
+						else print_main_sources($value[1], 1, $pid, $value[2], "", $controller->indi->canedit);
 					}
 					else {
-						if ($controller->indi->indideleted) print_main_sources($value[1], 1, $pid, $value[2], "change_old", $controller->canedit);
+						if ($controller->indi->isdeleted) print_main_sources($value[1], 1, $pid, $value[2], "change_old", $controller->indi->canedit);
 						else {
 							if (IsChangedFact($pid, $value[1])) {
-								if (!isset($value[3]) || $value[3] != "new") print_main_sources($value[1], 1, $pid, $value[2], "change_old", $controller->canedit);
-								print_main_sources(RetrieveChangedFact($pid, $value[0], $value[1]), 1, $pid, $value[2], "change_new", $controller->canedit);
+								if (!isset($value[3]) || $value[3] != "new") print_main_sources($value[1], 1, $pid, $value[2], "change_old", $controller->indi->canedit);
+								print_main_sources(RetrieveChangedFact($pid, $value[0], $value[1]), 1, $pid, $value[2], "change_new", $controller->indi->canedit);
 							}
-							else if (isset($value[3]) && $value[3] == "new") print_main_sources($value[1], 1, $pid, $value[2], "change_new", $controller->canedit);
-							else print_main_sources($value[1], 1, $pid, $value[2], "", $controller->canedit);
+							else if (isset($value[3]) && $value[3] == "new") print_main_sources($value[1], 1, $pid, $value[2], "change_new", $controller->indi->canedit);
+							else print_main_sources($value[1], 1, $pid, $value[2], "", $controller->indi->canedit);
 						}
 					}
 					$FACT_COUNT++;
@@ -828,7 +804,7 @@ if ((!$controller->view) &&($controller->canedit)&&($controller->indi->disp) && 
 			//-- New Source Link
 		}
 		else print "<tr><td id=\"no_tab3\" colspan=\"2\" class=\"shade1\">".$gm_lang["no_tab3"]."</td></tr>\n";
-		if (!$controller->view && $controller->canedit && $controller->indi->disp && !$controller->indi->indideleted) { ?>
+		if (!$controller->view && $controller->indi->canedit && $controller->indi->disp && !$controller->indi->isdeleted) { ?>
 			<tr>
 			<td class="width20 shade2"><?php print_help_link("add_source_help", "qm"); ?><?php echo $gm_lang["add_source_lbl"]; ?></td>
 			<td class="shade1">
@@ -862,32 +838,32 @@ else {
 			$media_id = $match[1];
 			$mediaged = FindMediaRecord($media_id);
 			if (!$controller->show_changes) {
-				if ($controller->indi->indideleted) print_main_media($mediarecord[1], $pid, 0, $mediarecord[2], false, "deleted", $controller->canedit);
-				else print_main_media($mediarecord[1], $pid, 0, $mediarecord[2], false, "", $controller->canedit);
+				if ($controller->indi->isdeleted) print_main_media($mediarecord[1], $pid, 0, $mediarecord[2], false, "deleted", $controller->indi->canedit);
+				else print_main_media($mediarecord[1], $pid, 0, $mediarecord[2], false, "", $controller->indi->canedit);
 			}
 			else {
-				if ($controller->show_changes && $controller->indi->indideleted) {
-					print_main_media($mediarecord[1], $pid, 0, $mediarecord[2], false, "change_old", $controller->canedit);
+				if ($controller->show_changes && $controller->indi->isdeleted) {
+					print_main_media($mediarecord[1], $pid, 0, $mediarecord[2], false, "change_old", $controller->indi->canedit);
 				}
 				else {
 					if ($controller->show_changes && (IsChangedFact($pid, $mediarecord[1]) || IsChangedFact($media_id, $mediaged))) {
 						if (!isset($mediarecord[3]) || $mediarecord[3] != "new") {
-							print_main_media($mediarecord[1], $pid, 0, $mediarecord[2], false, "change_old", $controller->canedit);
+							print_main_media($mediarecord[1], $pid, 0, $mediarecord[2], false, "change_old", $controller->indi->canedit);
 						}
 						$factnew = RetrieveChangedFact($pid, $mediarecord[0], $mediarecord[1]);
 						if (!empty($factnew)) {
-							print_main_media($factnew, $pid, 0, $mediarecord[2], true,  "change_new", $controller->canedit);
+							print_main_media($factnew, $pid, 0, $mediarecord[2], true,  "change_new", $controller->indi->canedit);
 						}
 					}
-					else if ($controller->show_changes && isset($mediarecord[3]) && $mediarecord[3] == "new") print_main_media($mediarecord[1], $pid, 0, $mediarecord[2], true, "change_new", $controller->canedit);
-					else print_main_media($mediarecord[1], $pid, 0, $mediarecord[2], false, "", $controller->canedit);
+					else if ($controller->show_changes && isset($mediarecord[3]) && $mediarecord[3] == "new") print_main_media($mediarecord[1], $pid, 0, $mediarecord[2], true, "change_new", $controller->indi->canedit);
+					else print_main_media($mediarecord[1], $pid, 0, $mediarecord[2], false, "", $controller->indi->canedit);
 				}
 			}
 		}
 	}
 	else print "<tr><td id=\"no_tab4\" colspan=\"2\" class=\"shade1\">".$gm_lang["no_tab4"]."</td></tr>\n";
 	//-- New Media link
-	if (!$controller->view && $controller->canedit && $controller->indi->disp && !$controller->indi->indideleted) {
+	if (!$controller->view && $controller->indi->canedit && $controller->indi->disp && !$controller->indi->isdeleted) {
 	?>
 		<tr>
 			<td class="shade2 width20"><?php print_help_link("add_media_help", "qm"); ?><?php print $gm_lang["add_media_lbl"]; ?></td>
@@ -918,18 +894,18 @@ else {
 			$fact = trim($value[0]);
 			if ($fact=="NOTE") {
 				if (!$controller->show_changes) {
-					if ($controller->indi->indideleted) print_main_notes($value[1], 1, $pid, $value[2], "deleted", $controller->canedit);
-					else print_main_notes($value[1], 1, $pid, $value[2], "", $controller->canedit);
+					if ($controller->indi->isdeleted) print_main_notes($value[1], 1, $pid, $value[2], "deleted", $controller->indi->canedit);
+					else print_main_notes($value[1], 1, $pid, $value[2], "", $controller->indi->canedit);
 				}
 				else {
-					if ($controller->indi->indideleted) print_main_notes($value[1], 1, $pid, $value[2], "change_old", $controller->canedit);
+					if ($controller->indi->isdeleted) print_main_notes($value[1], 1, $pid, $value[2], "change_old", $controller->indi->canedit);
 					else {
 						if (IsChangedFact($pid, $value[1])) {
-							if (!isset($value[3]) || $value[3] != "new") print_main_notes($value[1], 1, $pid, $value[2], "change_old", $controller->canedit);
-								print_main_notes(RetrieveChangedFact($pid, $value[0], $value[1]), 1, $pid, $value[2], "change_new", $controller->canedit);
+							if (!isset($value[3]) || $value[3] != "new") print_main_notes($value[1], 1, $pid, $value[2], "change_old", $controller->indi->canedit);
+								print_main_notes(RetrieveChangedFact($pid, $value[0], $value[1]), 1, $pid, $value[2], "change_new", $controller->indi->canedit);
 						}
-						else if (isset($value[3]) && $value[3] == "new") print_main_notes($value[1], 1, $pid, $value[2], "change_new", $controller->canedit);
-						else print_main_notes($value[1], 1, $pid, $value[2], "", $controller->canedit);
+						else if (isset($value[3]) && $value[3] == "new") print_main_notes($value[1], 1, $pid, $value[2], "change_new", $controller->indi->canedit);
+						else print_main_notes($value[1], 1, $pid, $value[2], "", $controller->indi->canedit);
 					}
 				}
 				$FACT_COUNT++;
@@ -938,7 +914,7 @@ else {
 	}
 	else print "<tr><td id=\"no_tab2\" colspan=\"2\" class=\"shade1\">".$gm_lang["no_tab2"]."</td></tr>\n";
 	//-- New Note Link
-		if (!$controller->view && $controller->canedit && $controller->indi->disp && !$controller->indi->indideleted) { ?>
+		if (!$controller->view && $controller->indi->canedit && $controller->indi->disp && !$controller->indi->isdeleted) { ?>
 		<tr>
 			<td class="shade2 width20"><?php print_help_link("add_note_help", "qm"); ?><?php echo $gm_lang["add_note_lbl"]; ?></td>
 			<td class="shade1"><a href="javascript: <?php echo $gm_lang["add_note"]; ?>" onclick="add_new_record('<?php echo $controller->pid; ?>','NOTE', 'add_note'); return false;"><?php echo $gm_lang["add_note"]; ?></a>
@@ -978,7 +954,7 @@ else {
 	}
 	else print "<tr><td id=\"no_tab6\" colspan=\"2\" class=\"shade1\">".$gm_lang["no_tab6"]."</td></tr>\n";
 	//-- New action Link
-		if (!$controller->view && $controller->canedit && $controller->indi->disp && !$controller->indi->indideleted) { 
+		if (!$controller->view && $controller->indi->canedit && $controller->indi->disp && !$controller->indi->isdeleted) { 
 			$Actions->PrintAddLink();
 	}
 }

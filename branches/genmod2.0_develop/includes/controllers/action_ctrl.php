@@ -74,20 +74,6 @@ class ActionController {
 		return $this->actionlist;
 	}
 			
-	function GetActionListByRepo($repo, $status="") {
-		global $TBLPREFIX, $GEDCOMID;
-
-		$this->actionlist = array();
-		$sql = "SELECT * FROM ".$TBLPREFIX."actions WHERE a_gedfile='".$GEDCOMID."' AND a_repo='".$repo."'";
-		if ($status != "") $sql .= " AND a_status='".$status."'";
-		else $sql .= " ORDER BY a_status ASC";
-		$res = NewQuery($sql);
-		while ($row = $res->FetchAssoc()) {
-			$this->actionlist[] = new ActionItem($row);
-		}
-		return $this->actionlist;
-	}
-
 	function GetActionList($status="", $reposort=false) {
 		global $TBLPREFIX, $GEDCOMID;
 		

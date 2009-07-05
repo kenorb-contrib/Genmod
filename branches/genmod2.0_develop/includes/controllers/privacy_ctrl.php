@@ -62,10 +62,10 @@ class PrivacyController {
 	
 	// This deletes settings for a specific gedcomid from cache and from the DB
 	function DeletePrivacy($gedcomid) {
-		global $TBLPREFIX, $DBLAYER, $GEDCOMS;
+		global $TBLPREFIX, $DBCONN, $GEDCOMS;
 
 		if (!isset($gedcomid)) return false;
-		if (!$DBLAYER->connected) return false;
+		if (!$DBCONN->connected) return false;
 		
 		if (!isset($this->GEDPRIV[$gedcomid])) return false;
 		

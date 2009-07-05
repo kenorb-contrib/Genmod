@@ -342,10 +342,10 @@ function RemoveLanguage($removelang) {
  * @return 	array          The array with the loaded language
  */
 function LoadEnglish($return=false, $help=false, $altlang = false) {
-	global $gm_lang, $TBLPREFIX, $CONFIGURED, $DBLAYER, $LANGUAGE, $GM_BASE_DIRECTORY, $language_settings;
+	global $gm_lang, $TBLPREFIX, $CONFIGURED, $DBCONN, $LANGUAGE, $GM_BASE_DIRECTORY, $language_settings;
 //	print $LANGUAGE;
 	$temp = array();
-	if ($CONFIGURED && $DBLAYER->connected) {
+	if ($CONFIGURED && $DBCONN->connected) {
 		$sql = "SELECT COUNT(*) as total FROM ".$TBLPREFIX."language";
 		if ($help) $sql .= "_help";
 		$res = NewQuery($sql);
@@ -418,11 +418,11 @@ function LoadEnglish($return=false, $help=false, $altlang = false) {
 }
 
 function LoadEnglishFacts($return=false, $help=false, $altlang = false) {
-	global $gm_lang, $factarray, $TBLPREFIX, $CONFIGURED, $DBLAYER, $LANGUAGE, $GM_BASE_DIRECTORY, $language_settings;
+	global $gm_lang, $factarray, $TBLPREFIX, $CONFIGURED, $DBCONN, $LANGUAGE, $GM_BASE_DIRECTORY, $language_settings;
 	
 	$temp = array();
 	$factarray = array();
-	if ($CONFIGURED && $DBLAYER->connected) {
+	if ($CONFIGURED && $DBCONN->connected) {
 		$sql = "SELECT COUNT(*) as total FROM ".$TBLPREFIX."facts";
 		$res = NewQuery($sql);
 		if ($res) $total_columns = $res->FetchAssoc($res->result);

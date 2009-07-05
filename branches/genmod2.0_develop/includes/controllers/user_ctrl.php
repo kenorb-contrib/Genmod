@@ -43,9 +43,9 @@ class UserController {
 	* @return array the user array to return
 	*/
 	function GetUser($username="", $userfields="") {
-		global $TBLPREFIX, $DBLAYER;
+		global $TBLPREFIX, $DBCONN;
 
-		if (!$DBLAYER->connected) return false;
+		if (!$DBCONN->connected) return false;
 		if (empty($username)) return new user("");
 		if (!isset($this->userobjects[$username])) {
 			$this->userobjects[$username] = new user($username, $userfields);
@@ -759,8 +759,10 @@ class UserController {
 		return false;
 	}
 	
-	function ShowActionLog($username) {
-		global $SHOW_ACTION_LIST;
+	function ShowActionLog($username="") {
+		global $SHOW_ACTION_LIST, $gm_username;
+		
+		if (empty($username)) $username = $gm_username;
 
 		if ($SHOW_ACTION_LIST >= $this->getUserAccessLevel($username)) return true;
 		else return false;

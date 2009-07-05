@@ -120,7 +120,7 @@ print_header($gm_lang["configure_head"]);
 			}
 			else $error_db3 = true;
 			mysql_close($conn);
-			$DBLAYER = New DbLayer();
+			$DBCONN = New DbLayer();
 		}
 		if (!$error_db2 && !$error_db3) {
 			$DBHOST = $_POST["NEW_DBHOST"];

@@ -56,9 +56,9 @@ class MenuBar {
 	 * @return Menu		the menu item
 	 */
 	function GetCustomMenu() {
-		global $TBLPREFIX, $gm_lang, $TEXT_DIRECTION, $CONFIGURED, $DBLAYER, $Users;
+		global $TBLPREFIX, $gm_lang, $TEXT_DIRECTION, $CONFIGURED, $DBCONN, $Users;
 		
-		if (!$DBLAYER->connected) return false;
+		if (!$DBCONN->connected) return false;
 		
 		// NOTE: Check if table exists, if not, do print the menu
 		$sql = "SHOW TABLES LIKE '".$TBLPREFIX."pages'";
@@ -589,6 +589,11 @@ class MenuBar {
 				$submenu = new Menu($label);
 				$submenu->addLink("reportengine.php?action=setup&report=".$file."&repo=".$pid);
 			}
+			// family report
+			else if ($type == "sour") {
+				$submenu = new Menu($label);
+				$submenu->addLink("reportengine.php?action=setup&report=".$file."&sid=".$pid);
+			}
 			// default
 			else {
 				$submenu = new Menu($label);
@@ -596,7 +601,8 @@ class MenuBar {
 			}
 			$menu->addSubmenu($submenu);
 		}
-		return $menu;
+		if(isset($submenu)) return $menu;
+		return false;
 	}
 	
 	/**
@@ -749,10 +755,8 @@ class MenuBar {
 		$menu->addSubmenu($submenu);
 		
 		// Reports menu
-		if (file_exists("reports/individual.xml")) {
-			$submenu = $this->GetReportMenu($controller->pid, "indi");
-			$menu->addSubmenu($submenu);
-		}
+		$submenu = $this->GetReportMenu($controller->pid, "indi");
+		if ($submenu) $menu->addSubmenu($submenu);
 		
 		// Edit menu
 		if ($controller->show_menu_edit && $ALLOW_EDIT_GEDCOM) {
@@ -770,9 +774,9 @@ class MenuBar {
 	}
 	
 	function GetThisFamilyMenu(&$controller) {
-		global $gm_lang, $Users, $ALLOW_EDIT_GEDCOM;
+		global $gm_lang;
 		
-		if ($controller->exists) {
+		if (!$controller->family->isempty) {
 			//-- main edit menu item
 			$menu = new Menu($gm_lang["this_family"]);
 			
@@ -782,10 +786,10 @@ class MenuBar {
 			
 			// Reports menu
 			$submenu = $this->GetReportMenu($controller->famid, "fam");
-			$menu->addSubmenu($submenu);
+			if ($submenu) $menu->addSubmenu($submenu);
 			
 			// Edit menu
-			if ($Users->userCanEdit($controller->uname) && $ALLOW_EDIT_GEDCOM) {
+			if ($controller->family->canedit) {
 				$submenu = $controller->getEditMenu();
 				$menu->addSubmenu($submenu);
 			}
@@ -801,14 +805,18 @@ class MenuBar {
 	}
 	
 	function GetThisSourceMenu(&$source_controller) {
-		global $gm_lang, $Users, $ALLOW_EDIT_GEDCOM;
+		global $gm_lang;
 		
-		if (!$source_controller->isempty && !$source_controller->source->isdeleted) {
+		if ($source_controller->source->canedit || $source_controller->display_other_menu) {
 			//-- main edit menu item
 			$menu = new Menu($gm_lang["this_source"]);
-			
+
+			// Reports menu
+			$submenu = $this->GetReportMenu($source_controller->xref, "sour");
+			if ($submenu) $menu->addSubmenu($submenu);
+		
 			// Edit menu
-			if ($Users->userCanEdit($source_controller->uname) && $ALLOW_EDIT_GEDCOM) {
+			if ($source_controller->source->canedit) {
 				$submenu = $source_controller->getEditMenu();
 				$menu->addSubmenu($submenu);
 			}
@@ -818,86 +826,50 @@ class MenuBar {
 				$submenu = $source_controller->getOtherMenu();
 				$menu->addSubmenu($submenu);
 			}
-			
-			return $menu;
+			if (isset($submenu)) return $menu;
 		}
-		else return false;
+		return false;
 	}
 	
-	function GetThisRepoMenu() {
-		global $gm_lang, $rid, $ENABLE_CLIPPINGS_CART, $controller, $gm_username, $Users, $ALLOW_EDIT_GEDCOM, $show_changes;
+	function GetThisRepoMenu(&$repository_controller) {
+		global $gm_lang;
 		
-		//-- main edit menu item
-		$menu = new Menu($gm_lang["this_repository"]);
+		if ($repository_controller->repo->canedit || $repository_controller->display_other_menu) {
+			//-- main edit menu item
+			$menu = new Menu($gm_lang["this_repository"]);
 		
-		// Reports menu
-		$submenu = $this->GetReportMenu($rid, "repo");
-		$menu->addSubmenu($submenu);
+			// Reports menu
+			$submenu = $this->GetReportMenu($repository_controller->xref, "repo");
+			if ($submenu) $menu->addSubmenu($submenu);
 			
-		// Edit menu
-		if ($Users->userCanEdit($gm_username) && $ALLOW_EDIT_GEDCOM) {
-			$submenu = new Menu($gm_lang["edit"]);
-			$menu->addSubmenu($submenu);
-		
-			// Edit menu items
-			// Edit raw record
-			if ($Users->userCanEditGedlines()) {
-				$submenu = new Menu($gm_lang["edit_raw"]);
-				$submenu->addLink("edit_raw('$rid', 'edit_raw');");
-				$menu->submenus[count($menu->submenus)-1]->submenus[]=$submenu;
+			// Edit menu
+			if ($repository_controller->repo->canedit) {
+				$submenu = $repository_controller->getEditMenu();
+				$menu->addSubmenu($submenu);
 			}
-			
-			// Delete repository
-			$submenu = new Menu($gm_lang["delete_repo"]);
-			$submenu->addLink("if (confirm('".$gm_lang["confirm_delete_repo"]."')) deleterepository('$rid', 'delete_repo');");
-			$menu->submenus[count($menu->submenus)-1]->submenus[]=$submenu;
-			
-			if (GetChangeData(true, $rid, true)) {
-//				// edit_sour / seperator
-//				$submenu = new Menu();
-//				$submenu->isSeperator();
-//				$menu->addSubmenu($submenu);
-
-				// edit_sour / show/hide changes
-				if ($show_changes == "no") $submenu = new Menu($gm_lang['show_changes']);
-				else $submenu = new Menu($gm_lang['hide_changes']);
-				$submenu->addLink('showchanges();');
-				$menu->submenus[count($menu->submenus)-1]->submenus[]=$submenu;
-			}
-		}
 		
-		if ($Users->userCanViewGedlines() || $ENABLE_CLIPPINGS_CART >= $Users->getUserAccessLevel()) {
 			// Other menu
-			$submenu = new Menu($gm_lang["other"]);
-			$menu->addSubmenu($submenu);
-			
-				// Other menu items
-				// Show Gedcom record
-				if ($Users->userCanViewGedlines()) {
-					$submenu = new Menu($gm_lang["view_gedcom"]);
-					$submenu->addLink("show_gedcom_record();");
-					$menu->submenus[count($menu->submenus)-1]->submenus[]=$submenu;
-				}
-				
-				// Add to clippings cart
-				if ($ENABLE_CLIPPINGS_CART >= $Users->getUserAccessLevel()) {
-					$submenu = new Menu($gm_lang["add_to_cart"]);
-					$submenu->addLink("clippings.php?action=add&id=$rid&type=repository");
-					$menu->submenus[count($menu->submenus)-1]->submenus[]=$submenu;
-				}
+			if ($repository_controller->display_other_menu) {
+				$submenu = $repository_controller->getOtherMenu();
+				$menu->addSubmenu($submenu);
+			}
 		}
-		
-		return $menu;
+		if (isset($submenu)) return $menu;
 	}
+	
 	function GetThisMediaMenu(&$controller) {
-		global $gm_lang, $Users, $ALLOW_EDIT_GEDCOM;
+		global $gm_lang;
 		
-		if (!$controller->isempty && !$controller->media->mediadeleted) {
+		if ($controller->media->canedit || !$controller->display_other_menu) {
 			//-- main edit menu item
 			$menu = new Menu($gm_lang["this_media"]);
 			
+			// Reports menu
+			$submenu = $this->GetReportMenu($controller->xref, "media");
+			if ($submenu) $menu->addSubmenu($submenu);
+			
 			// Edit menu
-			if ($Users->userCanEdit($controller->uname) && $ALLOW_EDIT_GEDCOM) {
+			if ($controller->media->canedit) {
 				$submenu = $controller->getEditMenu();
 				$menu->addSubmenu($submenu);
 			}
@@ -913,14 +885,18 @@ class MenuBar {
 		else return false;
 	}
 	function GetThisNoteMenu(&$controller) {
-		global $gm_lang, $Users, $ALLOW_EDIT_GEDCOM;
+		global $gm_lang;
 		
 		if (!$controller->isempty && !$controller->note->deleted) {
 			//-- main edit menu item
 			$menu = new Menu($gm_lang["this_note"]);
 			
+			// Reports menu
+			$submenu = $this->GetReportMenu($controller->xref, "note");
+			if ($submenu) $menu->addSubmenu($submenu);
+			
 			// Edit menu
-			if ($Users->userCanEdit($controller->uname) && $ALLOW_EDIT_GEDCOM) {
+			if ($controller->note->canedit) {
 				$submenu = $controller->getEditMenu();
 				$menu->addSubmenu($submenu);
 			}

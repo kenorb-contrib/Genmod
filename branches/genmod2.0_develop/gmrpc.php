@@ -43,7 +43,7 @@ switch($action) {
 		if (!isset($xref) || !isset($tab_tab) || !isset($type)) print "";
 		else {
 			if (empty($tab_tab)) $tab_tab = 0;
-			if (in_array($type, array("indi", "sour", "note"))) $_SESSION[$type][$xref] = $tab_tab;
+			if (in_array($type, array("indi", "sour", "note", "repo"))) $_SESSION[$type][$xref] = $tab_tab;
 		}
 	break;
 	

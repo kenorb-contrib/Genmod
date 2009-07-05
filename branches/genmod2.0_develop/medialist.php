@@ -108,22 +108,22 @@ foreach($media->medialist as $index => $mediaitem) {
 	print '<td class="list_value wrap width50">';
 	print '<table class="'.$TEXT_DIRECTION.'"><tr><td valign="top" class="wrap">';
 
-	if ($USE_GREYBOX && $mediaitem->m_fileobj->f_is_image) print "<a href=\"".FilenameEncode($mediaitem->m_fileobj->f_main_file)."\" title=\"".$mediaitem->m_titl."\" rel=\"gb_imageset[]\">";
-	else print "<a href=\"#\" onclick=\"return openImage('".$mediaitem->m_fileobj->f_main_file."','".$mediaitem->m_fileobj->f_width."','".$mediaitem->m_fileobj->f_height."','".$mediaitem->m_fileobj->f_is_image."');\">";
+	if ($USE_GREYBOX && $mediaitem->fileobj->f_is_image) print "<a href=\"".FilenameEncode($mediaitem->fileobj->f_main_file)."\" title=\"".$mediaitem->title."\" rel=\"gb_imageset[]\">";
+	else print "<a href=\"#\" onclick=\"return openImage('".$mediaitem->fileobj->f_main_file."','".$mediaitem->fileobj->f_width."','".$mediaitem->fileobj->f_height."','".$mediaitem->fileobj->f_is_image."');\">";
 	// NOTE: print the thumbnail
-	print '<img src="'.$mediaitem->m_fileobj->f_thumb_file.'" border="0" align="left" class="thumbnail" alt="" />';
-	if ($MEDIA_EXTERNAL || $mediaitem->m_fileobj->f_file_exists) print "</a>";
+	print '<img src="'.$mediaitem->fileobj->f_thumb_file.'" border="0" align="left" class="thumbnail" alt="" />';
+	if ($MEDIA_EXTERNAL || $mediaitem->fileobj->f_file_exists) print "</a>";
 	print '</td><td class="list_value wrap width100" style="border: none;">';
 
-	if (!$MEDIA_EXTERNAL && !$mediaitem->m_fileobj->f_file_exists);
-//	else print '<a href="#" onclick="return openImage(\''.urlencode($mediaitem->m_fileobj->f_file).'\','.$mediaitem->m_fileobj->f_width.','.$mediaitem->m_fileobj->f_height.');">';
-	else print "<a href=\"mediadetail.php?mid=".$mediaitem->m_media."\">";
+	if (!$MEDIA_EXTERNAL && !$mediaitem->fileobj->f_file_exists);
+//	else print '<a href="#" onclick="return openImage(\''.urlencode($mediaitem->fileobj->f_file).'\','.$mediaitem->fileobj->f_width.','.$mediaitem->fileobj->f_height.');">';
+	else print "<a href=\"mediadetail.php?mid=".$mediaitem->xref."\">";
 
-	if ($mediaitem->m_titl==$mediaitem->m_file) print '<b>&lrm;'.$mediaitem->m_titl.'</b>';
-	else if ($mediaitem->m_titl != "") print '<b>'.PrintReady($mediaitem->m_titl).'</b>';
-	else print '<b>'.PrintReady($mediaitem->m_file).'</b>';
+	if ($mediaitem->title==$mediaitem->filename) print '<b>&lrm;'.$mediaitem->title.'</b>';
+	else if ($mediaitem->title != "") print '<b>'.PrintReady($mediaitem->title).'</b>';
+	else print '<b>'.PrintReady($mediaitem->filename).'</b>';
 	
-	if (!$MEDIA_EXTERNAL && !$mediaitem->m_fileobj->f_file_exists);
+	if (!$MEDIA_EXTERNAL && !$mediaitem->fileobj->f_file_exists);
 	else print '</a>';
 	if (count($mediaitem->links) != 0) {
 		$indiexists = 0;
@@ -148,17 +148,17 @@ foreach($media->medialist as $index => $mediaitem) {
 			}
 		}
 	}
-	if (empty($mediaitem->m_file)) print '<br /><span class="error">'.$gm_lang["file_empty"].' '.$mediaitem->m_file.'</span>';
-	else if ((!strstr($mediaitem->m_file, "://")) && (!$mediaitem->m_fileobj->f_file_exists)) {
-		print '<br /><span class="error">'.$gm_lang["file_not_found"].'<br />'.$mediaitem->m_file.'</span>';
-	}
+	if (is_null($mediaitem->filename) || $mediaitem->filename == "") print '<br /><span class="error">'.$gm_lang["file_empty"].' '.$mediaitem->filename.'</span>';
+	else if (!strstr($mediaitem->filename, "://") && !$mediaitem->fileobj->f_file_exists) print '<br /><span class="error">'.$gm_lang["file_not_found"].'<br />'.$mediaitem->filename.'</span>';
+	
 	print '<br /><br /><div class="indent wrap width95">';
-	print_fact_notes($mediaitem->m_gedrec, $mediaitem->m_level+1);
+	print_fact_notes($mediaitem->m_gedrec, $mediaitem->level+1);
 	
 	print '</div>';
-	if (!empty($mediaitem->m_fileobj->f_mimedescr)) print '<span class="label"><br />'.$gm_lang["media_format"].': </span> <span class="field" style="direction: ltr;">'.$mediaitem->m_fileobj->f_mimedescr."</span>";
-	if ($mediaitem->m_fileobj->f_is_image && $mediaitem->m_fileobj->f_width > 0) print '<span class="label"><br />'.$gm_lang["image_size"].': </span> <span class="field" style="direction: ltr;">'.$mediaitem->m_fileobj->f_width.($TEXT_DIRECTION =="rtl"?" &rlm;x&rlm; " : " x ").$mediaitem->m_fileobj->f_height.'</span>';
-	if ($mediaitem->m_fileobj->f_file_size > 0) print '<span class="label"><br />'.$gm_lang["media_file_size"].': </span> <span class="field" style="direction: ltr;">'.GetFileSize($mediaitem->m_fileobj->f_file_size).'</span>';
+	if (!is_null($mediaitem->filename) && $mediaitem->filename != "") print "<span class=\"label\"><br />".$gm_lang["filename"]." : </span> <span class=\"field\" style=\"direction: ltr;\">".$mediaitem->filename."</span>";
+	if ($mediaitem->fileobj->f_mimedescr != "") print '<span class="label"><br />'.$gm_lang["media_format"].': </span> <span class="field" style="direction: ltr;">'.$mediaitem->fileobj->f_mimedescr."</span>";
+	if ($mediaitem->fileobj->f_is_image && $mediaitem->fileobj->f_width > 0) print '<span class="label"><br />'.$gm_lang["image_size"].': </span> <span class="field" style="direction: ltr;">'.$mediaitem->fileobj->f_width.($TEXT_DIRECTION =="rtl"?" &rlm;x&rlm; " : " x ").$mediaitem->fileobj->f_height.'</span>';
+	if ($mediaitem->fileobj->f_file_size > 0) print '<span class="label"><br />'.$gm_lang["media_file_size"].': </span> <span class="field" style="direction: ltr;">'.GetFileSize($mediaitem->fileobj->f_file_size).'</span>';
 	
 	print '</td></tr></table>';
 	print '</td>';

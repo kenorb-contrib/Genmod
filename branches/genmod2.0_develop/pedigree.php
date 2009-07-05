@@ -40,7 +40,7 @@ require("config.php");
 require("includes/functions/functions_charts.php");
 
 $log2 = log(2);
-$show_changes = "no";
+$show_changes = false;
 function adjust_subtree($index, $diff) {
 	global $offsetarray, $treeid, $PEDIGREE_GENERATIONS, $log2, $talloffset,$boxspacing, $mdiff, $SHOW_EMPTY_BOXES;
 	$f = ($index*2)+1; //-- father index

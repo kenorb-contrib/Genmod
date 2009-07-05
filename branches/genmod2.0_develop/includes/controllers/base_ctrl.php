@@ -33,28 +33,44 @@ if (stristr($_SERVER["SCRIPT_NAME"],basename(__FILE__))) {
 /**
  * The base controller for all classes
  *
- * The base controller for all classes. Also check if it is a print preview.
- *
  * @author	Genmod Development Team
  * @param		string	$view		Show the data
  * @return 	string	Return the value of $view
  * @todo Update this description
  */
 class BaseController {
+	public $classname = "BaseController";
 	public $view = "";
 	public $xref = null;
+	protected $action = null;
+	public $gedcomid = null;
 	public $show_changes = null;
+	protected $uname = "";
+	
 	/**
 	 * constructor for this class
 	 */
 	protected function __construct() {
-		global $show_changes;
+		global $show_changes, $Users, $GEDCOMID;
 		
 		if (isset($_REQUEST["view"])) $this->view = $_REQUEST["view"];
+		if (!empty($_REQUEST["action"])) $this->action = $_REQUEST["action"];
 		
 		$this->show_changes = $show_changes;
+		
+		$this->uname = $Users->GetUserName();
+		
+		$this->gedcomid = $GEDCOMID;
+		
+		//-- perform the desired action
+		switch($this->action) {
+			case "addfav":
+				$this->addFavorite();
+				break;
+		}
 
 	}
+	
 	/**
 	 * check if this controller should be in print preview mode
 	 */

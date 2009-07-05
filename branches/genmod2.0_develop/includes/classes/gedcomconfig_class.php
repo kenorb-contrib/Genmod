@@ -146,9 +146,9 @@ class GedcomConfig {
 	 * @param		string	$gedcom		GEDCOM name for which the values are to be deleted.
 	**/
 	public function DeleteGedcomConfig($gedcom) {
-		global $TBLPREFIX, $DBLAYER;
+		global $TBLPREFIX, $DBCONN;
 	
-		if (!$DBLAYER->connected) return false;
+		if (!$DBCONN->connected) return false;
 		$this->GEDCONF = array();
 		$sql = "DELETE FROM ".$TBLPREFIX."gedconf WHERE gc_gedcom='".$gedcom."'";
 		$res = NewQuery($sql);
