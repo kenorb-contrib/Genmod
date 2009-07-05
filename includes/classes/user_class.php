@@ -71,12 +71,12 @@ class User {
 	}
 	
 	public function GetUser($username, $userfields="") {
-		global $TBLPREFIX, $userobjects, $REGEXP_DB, $GEDCOMS, $DBLAYER, $DBCONN;
+		global $TBLPREFIX, $userobjects, $REGEXP_DB, $GEDCOMS, $DBCONN;
 
 		if (empty($username)) return false;
 
 		if (!is_array($userfields)) {
-			if (!$DBLAYER->connected) return false;
+			if (!$DBCONN->connected) return false;
 			$username = $DBCONN->EscapeQuery($username);
 			$sql = "SELECT * FROM ".$TBLPREFIX."users_gedcoms ug RIGHT JOIN ".$TBLPREFIX."users u ON BINARY u.u_username = BINARY ug.ug_username WHERE BINARY u_username='".$username."'";
 //			$sql = "SELECT * FROM ".$TBLPREFIX."users ";

@@ -31,10 +31,9 @@ if (stristr($_SERVER["SCRIPT_NAME"],basename(__FILE__))) {
 /**
  * Main controller class for the media page.
  */
-class MediaControllerRoot extends DetailController {
-	var $classname = "MediaControllerRoot";
+class MediaController extends DetailController {
+	var $classname = "MediaController";
 	var $mid;
-	var $show_changes = "yes";
 	var $action = "";
 	var $media = null;
 	var $uname = "";
@@ -47,25 +46,16 @@ class MediaControllerRoot extends DetailController {
 	 */
 	public function __construct() {
 		global $gm_lang, $CONTACT_EMAIL, $GEDCOM;
-		global $ENABLE_CLIPPINGS_CART, $Users, $nonfacts;
+		global $ENABLE_CLIPPINGS_CART, $Users, $nonfacts, $show_changes;
 		
 		parent::__construct();
 		
 		$nonfacts = array();
 				
-		if ((!isset($_REQUEST["show_changes"]) || $_REQUEST["show_changes"] != "no") && $Users->UserCanEdit($this->uname)) $this->show_changes = true;
-		if (!empty($_REQUEST["action"])) $this->action = $_REQUEST["action"];
 		if (!empty($_REQUEST["mid"])) $this->mid = strtoupper($_REQUEST["mid"]);
 		$this->mid = CleanInput($this->mid);
 		
-		$mediarec = FindMediaRecord($this->mid);
-		if (!$mediarec) {
-			if (!GetChangeData(true, $this->mid, true, "", "")) $this->isempty = true;
-			$mediarec = "0 @".$this->mid."@ OBJE\r\n";
-		}
-
-		if ($this->show_changes) $this->media = new MediaItem($this->mid, true);
-		else $this->media = new MediaItem($this->mid);
+		$this->media = new MediaItem($this->mid);
 		
 		$this->uname = $Users->GetUserName();
 		
@@ -77,11 +67,11 @@ class MediaControllerRoot extends DetailController {
 			}
 		
 		
-		if ($this->media->canDisplayDetails()) {
+		if ($this->media->disp) {
 			$this->canedit = $Users->userCanEdit($this->uname);
 		}
 		
-		if ($this->media->canDisplayDetails() && ($Users->userCanViewGedlines() || $ENABLE_CLIPPINGS_CART >= $Users->getUserAccessLevel() || !empty($this->uname))) {
+		if ($this->media->disp && ($Users->userCanViewGedlines() || $ENABLE_CLIPPINGS_CART >= $Users->getUserAccessLevel() || !empty($this->uname))) {
 			$this->display_other_menu = true;
 		}
 	}
@@ -102,7 +92,7 @@ class MediaControllerRoot extends DetailController {
 				$favorite->gid = $mid;
 				$favorite->type = 'OBJE';
 				$favorite->file = $GEDCOMID;
-				$favorite->title = $this->media->m_titl;
+				$favorite->title = $this->media->title;
 				$favorite->SetFavorite();
 			}
 		}
@@ -114,7 +104,7 @@ class MediaControllerRoot extends DetailController {
 	 */
 	function getPageTitle() {
 		global $gm_lang;
-		return $this->media->getTitle()." - ".$this->mid." - ".$gm_lang["media_info"];
+		return $this->media->title." - ".$this->media->xref." - ".$gm_lang["media_info"];
 	}
 	/**
 	 * check if use can edit this person
@@ -141,33 +131,26 @@ class MediaControllerRoot extends DetailController {
 			// edit media / edit_raw
 			if ($Users->userCanEditGedlines()) {
 				$submenu = new Menu($gm_lang['edit_raw']);
-				$submenu->addLink("edit_raw('".$this->mid."', 'edit_raw');");
+				$submenu->addLink("edit_raw('".$this->media->xref."', 'edit_raw');");
 				$menu->addSubmenu($submenu);
 			}
 
 			// edit media / delete_media
 			$submenu = new Menu($gm_lang['delete_media']);
-			$submenu->addLink("if (confirm('".$gm_lang["confirm_delete_media"]."'))  deletemedia('".$this->mid."', 'delete_media'); ");
+			$submenu->addLink("if (confirm('".$gm_lang["confirm_delete_media"]."'))  deletemedia('".$this->media->xref."', 'delete_media'); ");
 			$menu->addSubmenu($submenu);
 
-			if (GetChangeData(true, $this->mid, true)) {
+			if ($this->media->ischanged) {
 				// edit_sour / seperator
 				$submenu = new Menu();
 				$submenu->isSeperator();
 				$menu->addSubmenu($submenu);
 
 				// edit_sour / show/hide changes
-				if ($show_changes == "no") $submenu = new Menu($gm_lang['show_changes']);
+				if (!$show_changes) $submenu = new Menu($gm_lang['show_changes']);
 				else $submenu = new Menu($gm_lang['hide_changes']);
 				$submenu->addLink('showchanges();');
 				$menu->addSubmenu($submenu);
-
-				if ($Users->userCanAccept($this->uname)) {
-					// edit_media / accept_all
-					$submenu = new Menu($gm_lang['accept_all']);
-					$submenu->addLink('mediadetail.php?mid='.$this->mid.'&action=accept');
-					$menu->addSubmenu($submenu);
-				}
 			}
 		}
 		return $menu;
@@ -188,7 +171,7 @@ class MediaControllerRoot extends DetailController {
 		$menu = new Menu($gm_lang['other']);
 		if ($Users->userCanViewGedlines()) {
 				// other / view_gedcom
-				if ($this->show_changes == 'yes' && $this->userCanEdit()) $execute = "show_gedcom_record('new');";
+				if ($this->show_changes) $execute = "show_gedcom_record('new');";
 				else $execute = "show_gedcom_record();";
 				$submenu = new Menu($gm_lang['view_gedcom']);
 				$submenu->addLink($execute);
@@ -197,28 +180,17 @@ class MediaControllerRoot extends DetailController {
 		if ($ENABLE_CLIPPINGS_CART >= $Users->getUserAccessLevel()) {
 				// other / add_to_cart
 				$submenu = new Menu($gm_lang['add_to_cart']);
-				$submenu->addLink('clippings.php?action=add&id='.$this->mid.'&type=sour');
+				$submenu->addLink('clippings.php?action=add&id='.$this->media->xref.'&type=sour');
 				$menu->addSubmenu($submenu);
 		}
-		if ($this->media->canDisplayDetails() && !empty($this->uname)) {
+		if ($this->media->disp && !empty($this->uname)) {
 				// other / add_to_my_favorites
 				$submenu = new Menu($gm_lang['add_to_my_favorites']);
-				$submenu->addLink('mediadetail.php?action=addfav&mid='.$this->mid.'&gid='.$this->mid);
+				$submenu->addLink('mediadetail.php?action=addfav&mid='.$this->media->xref.'&gid='.$this->media->xref);
 				$menu->addSubmenu($submenu);
 		}
 		return $menu;
 	}
 }
 // -- end of class
-//-- load a user extended class if one exists
-if (file_exists('includes/controllers/media_ctrl_user.php'))
-{
-	include_once 'includes/controllers/media_ctrl_user.php';
-}
-else
-{
-	class mediaController extends mediaControllerRoot
-	{
-	}
-}
 ?>

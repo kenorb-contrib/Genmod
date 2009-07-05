@@ -39,7 +39,7 @@ $title = "";
 if ($SHOW_ID_NUMBERS) {
 	foreach($controller->people as $p=>$indi) {
 		if (!empty($title)) $title .= '/';
-		$title .= $indi->getXref();
+		$title .= $indi->xref;
 	}
 	if (!empty ($title)) $title .= " - ";
 }
@@ -266,14 +266,14 @@ $controller->checkPrivacy();
 	if (!$controller->isPrintPreview()) $half++;
 	foreach($controller->people as $p=>$indi) {
 		$sex = $indi->getSex();
-		$pid = $indi->getXref();
+		$pid = $indi->xref;
 		$col = $p % 6;
 		if ($i==$half) print "</tr><tr>";
 		$i++;
 		?>
 		<td class="person<?php print $col; ?>" style="padding: 5px;">
 		<?php
-		if ((!is_null($indi))&&($indi->canDisplayDetails())) {
+		if ((!is_null($indi))&&($indi->disp)) {
 			switch($sex) {
 			case "M":
 				$seximage = $GM_IMAGE_DIR."/".$GM_IMAGES["sex"]["small"];
@@ -388,7 +388,7 @@ if (count($controller->people)>0) {
 
 	// print the age boxes
 	foreach($controller->people as $p=>$indi) {
-		$pid = $indi->getXref();
+		$pid = $indi->xref;
 		$ageyoffset = $baseyoffset + ($controller->bheight*$p);
 		$col = $p % 6;
 		?>
@@ -432,7 +432,7 @@ if (count($controller->people)>0) {
 	var birthdays = new Array();
 	<?php
 	foreach($controller->people as $c=>$indi) {
-		$pid = $indi->getXref();
+		$pid = $indi->xref;
 		if (!empty($controller->birthyears[$pid])) print "\nbirthyears[".$c."]=".$controller->birthyears[$pid].";";
 		if (!empty($controller->birthmonths[$pid])) print "\nbirthmonths[".$c."]=".$controller->birthmonths[$pid].";";
 		if (!empty($controller->birthdays[$pid])) print "\nbirthdays[".$c."]=".$controller->birthdays[$pid].";";

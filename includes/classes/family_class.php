@@ -31,108 +31,206 @@ if (stristr($_SERVER["SCRIPT_NAME"],basename(__FILE__))) {
 }
 
 class Family extends GedcomRecord {
-	var $husb = null;
-	var $wife = null;
-	var $children = array();
-	var $disp = true;
-	var $famdeleted = false;
-	var $famnew = false;
-	var $marr_rec = null;
-	var $marr_date = null;
-	var $marr_type = null;
-	var $show_changes = false;
-	var $show_primary = false;
-	var $media_count = null;
 	
+	// General class information
+	public $classname = "Family";
+	public $datatype = "FAM";
+
+	// data
+	private $sortable_name = null;
+	private $sortable_addname = null;
+	public $label = null;
+		
+	// Family members
+	private $husb = null;
+	private $husb_id = null;
+	private $wife = null;
+	private $wife_id = null;
+//	private $parents = null;
+	private $children = null;
+	private $children_ids = null;
+	private $children_count = null;
+	
+	// Marriage events
+	private $marr_rec = null;
+	private $marr_date = null;
+	private $marr_type = null;
+	private $marr_plac = null;
+	
+	// Relations from the FAMC link
+	public $showprimary = null;
+	public $pedigreetype = null;
+	public $status = null;
 	/**
 	 * constructor
 	 * @param string $gedrec	the gedcom record
 	 */
-	public function __construct($id, $gedrec, $changed=false) {
+	public function __construct($id, $gedrec="", $gedcomid="", $changed=false) {
 		global $GEDCOM, $show_changes, $Users;
 		
-		parent::__construct($id, $gedrec);
-		$this->disp = displayDetailsById($this->xref, "FAM");
+		parent::__construct($id, $gedrec, $gedcomid);
+		$this->exclude_facts = "";
+	
+		// for now, initialize
+//		$this->GetFamilyDescriptor();
+//		$this->GetFamilyAddDescriptor();
+	}
 
-		if ((!isset($show_changes) || $show_changes != "no") && $Users->UserCanEdit($Users->GetUserName())) $this->show_changes = true;
+	public function __get($property) {
 
-		if ($changed) $this->famnew = true;
+		switch($property) {
+			case "husb":
+				return $this->GetHusband();
+				break;
+			case "wife":
+				return $this->GetWife();
+				break;
+			case "husb_id":
+				return $this->GetHusbID();
+				break;
+			case "wife_id":
+				return $this->GetWifeID();
+				break;
+			case "parents":
+				return array("HUSB" => $this->GetHusband(), "WIFE" => $this->GetWife());
+				break;
+			case "children":
+				return $this->GetChildren();
+				break;
+			case "children_count":
+				return $this->GetNumberOfChildren();
+				break;
+			case "sortable_name":
+				return $this->GetFamilyDescriptor();
+				break;
+			case "sortable_addname":
+				return $this->GetFamilyAddDescriptor();
+				break;
+			case "marr_rec":
+				return $this->getMarriageRecord();
+				break;
+			case "marr_date":
+				return $this->getMarriageDate();
+				break;
+			case "marr_type":
+				return $this->getMarriageType();
+				break;
+			case "marr_plac":
+				return $this->getMarriagePlace();
+				break;
+			case "media_count":
+				return $this->GetNumberOfMedia();
+				break;
+			case "label":
+				return $this->label;
+				break;
+			default:
+				return parent::__get($property);
+				break;
+		}
+	}
 
-		if ($this->show_changes && GetChangeData(true, $this->xref, true, "", "")) {
-			$rec = GetChangeData(false, $this->xref, true, "gedlines", "");
-			if (empty($rec[$GEDCOM][$this->xref])) $this->famdeleted = true;
-		}
-		$husbrec = GetSubRecord(1, "1 HUSB", $gedrec);
-		if (!empty($husbrec)) {
-			//-- get the husbands ids
-			$husb = GetGedcomValue("HUSB", 1, $husbrec);
-			if ($this->show_changes && GetChangeData(true, $husb, true, "", "INDI")) {
-				$rec = GetChangeData(false, $husb, true, "gedlines");
-				$indirec = $rec[$GEDCOM][$husb];
-			}
-			else $indirec = FindPersonRecord($husb);
-			$this->husb = new Person($husb, $indirec);
-		}
-		$wiferec = GetSubRecord(1, "1 WIFE", $gedrec);
-		if (!empty($wiferec)) {
-			//-- get the wifes ids
-			$wife = GetGedcomValue("WIFE", 1, $wiferec);
-			if ($this->show_changes && GetChangeData(true, $wife, true, "", "INDI")) {
-				$rec = GetChangeData(false, $wife, true, "gedlines");
-				$indirec = $rec[$GEDCOM][$wife];
-			}
-			else $indirec = FindPersonRecord($wife);
-			$this->wife = new Person($wife, $indirec);
-		}
+	
+	/**
+	 * get the children
+	 * @return array 	array of children Persons
+	 */
+	private function GetChildren() {
+		global $GEDCOM;
 
-		if ($this->show_changes && GetChangeData(true, $this->xref, true, "", "CHIL")) {
-			$rec = GetChangeData(false, $this->xref, true, "gedlines", "CHIL");
-			$gedrec = $rec[$GEDCOM][$this->xref];
-		}
-		$num = preg_match_all("/1\s*CHIL\s*@(.*)@/", $gedrec, $smatch, PREG_SET_ORDER);
-		for($i=0; $i<$num; $i++) {
-			//-- get the childs ids
-			$chil = trim($smatch[$i][1]);
-			// NOTE: Check if the indi has a change
-			if ($this->show_changes && GetChangeData(true, $chil, true, "", "INDI")) {
-				$rec = GetChangeData(false, $chil, true, "gedlines", "INDI");
-				$indirec = $rec[$GEDCOM][$chil];
-				$this->children[] = new Person($chil, $indirec, true);
-			}
-			else {
-				$indirec = FindPersonRecord($chil);
-				$this->children[] = new Person($chil, $indirec);
+		if (is_null($this->children)) {
+		
+			if ($this->show_changes && $this->ThisChanged()) $gedrec = $this->GetChangedGedrec();
+			else $gedrec = $this->gedrec;
+			
+			$this->children = array();
+				
+			$num = preg_match_all("/1\s*CHIL\s*@(.*)@/", $gedrec, $smatch, PREG_SET_ORDER);
+			for($i=0; $i<$num; $i++) {
+				//-- get the childs ids
+				$chil = trim($smatch[$i][1]);
+				$this->children[] = new Person($chil);
 			}
 		}
+		return $this->children;
+	}
+
+	private function GetFamilyDescriptor() {
+		
+		if (is_null($this->sortable_name)) $this->sortable_name = GetFamilyDescriptor($this->xref, false, $this->gedrec);
+		return $this->sortable_name;
+	}
+	
+	private function GetFamilyAddDescriptor() {
+		
+		if (is_null($this->sortable_addname)) $this->sortable_addname = GetFamilyAddDescriptor($this->xref, false, $this->gedrec);
+		return $this->sortable_addname;
+	}
+
+	/**
+	 * get the husbands ID
+	 * @return string
+	 */
+	private function getHusbId() {
+		if (is_null($this->husb)) {
+			$this->getHusband();
+			if ($this->husb != "") $this->husb_id = $this->husb->xref;
+			else $this->husb_id = "";
+		}		
+		return $this->husb_id;
 	}
 	
 	/**
 	 * get the husbands ID
 	 * @return string
 	 */
-	function getHusbId() {
-		if (!is_null($this->husb)) return $this->husb->getXref();
-		else return "";
+	private function getHusband() {
+		global $GEDCOM;
+		
+		if (is_null($this->husb)) {
+			if ($this->show_changes && $this->ThisChanged()) $gedrec = $this->GetChangedGedrec();
+			else $gedrec = $this->gedrec;
+			$husb = GetGedcomValue("HUSB", 1, $gedrec);
+			if (!empty($husb)) $this->husb = new Person($husb);
+			else $this->husb = "";
+		}
+		return $this->husb;
 	}
-	
 	/**
 	 * get the wife ID
 	 * @return string
 	 */
-	function getWifeId() {
-		if (!is_null($this->wife)) return $this->wife->getXref();
-		else return "";
+	private function getWifeId() {
+		if (is_null($this->wife)) {
+			$this->getWife();
+			if ($this->wife != "") $this->wife_id = $this->wife->xref;
+			else $this->wife_id = "";
+		}		
+		return $this->wife_id;
 	}
 
+	private function getWife() {
+		global $GEDCOM;
+		
+		if (is_null($this->wife)) {
+			if ($this->show_changes && $this->ThisChanged()) $gedrec = $this->GetChangedGedrec();
+			else $gedrec = $this->gedrec;
+			$wife = GetGedcomValue("WIFE", 1, $gedrec);
+			if (!empty($wife)) $this->wife = new Person($wife);
+			else $this->wife = "";
+		}
+		return $this->wife;
+	}
+	
 	/**
 	 * get the number of level 1 media items 
 	 * @return string
 	 */
-	function getNumberOfMedia() {
+	private function getNumberOfMedia() {
 		
 		if (!is_null($this->media_count)) return $this->media_count;
 		
-		if ($this->show_changes) $gedrec = $this->getchangedGedRec();
+		if ($this->show_changes && $this->ThisChanged()) $gedrec = $this->GetChangedGedRec();
 		else $gedrec = $this->gedrec;
 		$i = 1;
 		do {
@@ -145,104 +243,53 @@ class Family extends GedcomRecord {
 	}
 	
 	/**
-	 * get the husband's person object
-	 * @return Person
-	 */
-	function &getHusband() {
-		return $this->husb;
-	}
-	/**
-	 * get the wife's person object
-	 * @return Person
-	 */
-	function &getWife() {
-		return $this->wife;
-	}
-	/**
-	 * get the children
-	 * @return array 	array of children Persons
-	 */
-	function getChildren() {
-		return $this->children;
-	}
-	/**
 	 * get the children IDs
 	 * @return array 	array of children Ids
 	 */
-	function getChildrenIds() {
-		$children = array();
+	private function getChildrenIds() {
+
+		if (!is_null($this->children_ids)) return $this->children_ids;
+		if (is_null($this->children)) $this->GetChildren();
+
+		$this->children_ids = array();
 		foreach ($this->children as $id => $child) {
-			$children[$id] = $child->getXref();
+			$this->children_ids[$id] = $child->xref;
 		}
-		return $children;
+		return $this->children_ids;
 	}
 	
 	/**
 	 * get the number of children in this family
 	 * @return int 	the number of children
 	 */
-	function getNumberOfChildren() {
-		return count($this->children);
+	private function getNumberOfChildren() {
+		
+		if(is_null($this->children_count)) {
+			$this->GetChildren();
+			$this->children_count = count($this->children);
+		}
+		return $this->children_count;
 	}
 	  
 	/**
-	 * get updated Family
-	 * If there is an updated family record in the gedcom file
-	 * return a new family object for it
-	 */
-	function getUpdatedFamily() {
-		global $GEDCOM, $gm_username;
-		if ($this->changed) return null;
-//		if (userCanEdit($gm_username)&&($this->disp)) {
-//			if (GetChangeData(true, $this->xref, true, false)) {
-//				$rec = GetChangeData(false, $this->xref, true, "gedlines");
-//				$newrec = $rec[$GEDCOM][$this->xref];
-//				if (!empty($newrec)) {
-//					$newfamily = new Family($newrec, true);
-//					return $newfamily;
-//				}
-//			}
-//		}
-		return null;
-	}
-	/**
-	 * check if this family has the given person
-	 * as a parent in the family
-	 * @param Person $person
-	 */
-	function hasParent(&$person) {
-		if (is_null($person)) return false;
-		if ($person->equals($this->husb)) return true;
-		if ($person->equals($this->wife)) return true;
-		return false;
-	}
-	/**
-	 * check if this family has the given person
-	 * as a child in the family
-	 * @param Person $person
-	 */
-	function hasChild(&$person) {
-		if (is_null($person)) return false;
-		foreach($this->children as $key=>$child) {
-			if ($person->equals($child)) return true;
-		}
-		return false;
-	}
-	
-	/**
 	 * parse marriage record
 	 */
-	function _parseMarriageRecord() {
+	private function _parseMarriageRecord() {
+		
+		if ($this->show_changes && $this->ThisChanged()) $gedrec = $this->GetChangedGedRec();
+		else $gedrec = $this->gedrec;
+
 		$this->marr_rec = GetSubRecord(1, "1 MARR", $this->gedrec);
 		$this->marr_date = GetSubRecord(2, "2 DATE", $this->marr_rec);
 		$this->marr_type = GetSubRecord(2, "2 TYPE", $this->marr_rec);
+		$this->marr_plac = GetSubRecord(2, "2 PLAC", $this->marr_rec);
 	}
 	
 	/**
 	 * get marriage record
 	 * @return string
 	 */
-	function getMarriageRecord() {
+	private function getMarriageRecord() {
 		if (is_null($this->marr_rec)) $this->_parseMarriageRecord();
 		return $this->marr_rec;
 	}
@@ -251,7 +298,7 @@ class Family extends GedcomRecord {
 	 * get marriage date
 	 * @return string
 	 */
-	function getMarriageDate() {
+	private function getMarriageDate() {
 		if (is_null($this->marr_date)) $this->_parseMarriageRecord();
 		return $this->marr_date;
 	}
@@ -260,9 +307,18 @@ class Family extends GedcomRecord {
 	 * get the type for this marriage
 	 * @return string
 	 */
-	function getMarriageType() {
+	private function getMarriageType() {
 		if (is_null($this->marr_type)) $this->_parseMarriageRecord();
 		return $this->marr_type;
+	}
+	
+	/**
+	 * get the type for this marriage
+	 * @return string
+	 */
+	private function getMarriagePlace() {
+		if (is_null($this->marr_plac)) $this->_parseMarriageRecord();
+		return $this->marr_plac;
 	}
 }
 ?>

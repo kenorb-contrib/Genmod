@@ -154,7 +154,7 @@ function FindPersonRecord($pid, $gedfile="", $renew = false, $nocache = false) {
 	
 	$gedfileid = $GEDCOMS[$gedfile]["id"];
 	// print $pid." ".$gedfileid."<br />";
-	
+	if ($pid == "REPO71") print $pipo;
 	//-- first check the indilist cache
 	if (!$renew && isset($indilist[$pid]["gedcom"]) && $indilist[$pid]["gedfile"]==$gedfileid) return $indilist[$pid]["gedcom"];
 	if (!$renew && isset($indilist[JoinKey($pid, $gedfileid)]["gedcom"])) return $indilist[JoinKey($pid, $gedfileid)]["gedcom"];
@@ -269,7 +269,7 @@ function FindOtherRecord($oid, $gedfile="", $renew = false, $type="") {
 
 	if ($oid=="") return false;
 	if (empty($gedfile)) $gedfile = $GEDCOM;
-	
+
 	if (!$renew && isset($otherlist[$oid]["gedcom"]) && ($otherlist[$oid]["gedfile"]==$GEDCOMS[$gedfile]["id"])) return $otherlist[$oid]["gedcom"];
 
 	$sql = "SELECT o_gedcom, o_file FROM ".$TBLPREFIX."other WHERE o_id LIKE '".$DBCONN->EscapeQuery($oid)."' AND o_file='".$DBCONN->EscapeQuery($GEDCOMS[$gedfile]["id"])."'";
@@ -358,9 +358,8 @@ function FindRepoRecord($rid, $gedfile="") {
 
 	if ($rid=="") return false;
 	if (empty($gedfile)) $gedfile = $GEDCOM;
-	
 	if (isset($repolist[$rid]["gedcom"]) && ($repolist[$rid]["gedfile"]==$GEDCOMS[$gedfile]["id"])) return $repolist[$rid]["gedcom"];
-
+	
 	$sql = "SELECT o_id, o_gedcom, o_file FROM ".$TBLPREFIX."other WHERE o_type='REPO' AND o_id LIKE '".$DBCONN->EscapeQuery($rid)."' AND o_file='".$DBCONN->EscapeQuery($GEDCOMS[$gedfile]["id"])."'";
 	$res = NewQuery($sql);
 	if ($res->NumRows()!=0) {
@@ -713,7 +712,7 @@ function ImportRecord($indirec, $update=false) {
 				else $name .= $match[$i][1];
 			}
 		}
-		$sql = "INSERT INTO ".$TBLPREFIX."sources VALUES ('".$DBCONN->EscapeQuery($gid)."','".$DBCONN->EscapeQuery($GEDCOMS[$FILE]["id"])."','".$DBCONN->EscapeQuery($name)."','".$DBCONN->EscapeQuery($indirec)."')";
+		$sql = "INSERT INTO ".$TBLPREFIX."sources VALUES ('".Joinkey($gid, $GEDCOMID)."', '".$DBCONN->EscapeQuery($gid)."','".$DBCONN->EscapeQuery($GEDCOMS[$FILE]["id"])."','".$DBCONN->EscapeQuery($name)."','".$DBCONN->EscapeQuery($indirec)."')";
 		$res = NewQuery($sql);
 		if ($res) $res->FreeResult();
 	}
@@ -729,7 +728,7 @@ function ImportRecord($indirec, $update=false) {
 				$indirec .= "\r\n1 DATE ".date("d")." ".date("M")." ".date("Y");
 			}
 		}
-		$sql = "INSERT INTO ".$TBLPREFIX."other VALUES ('".$DBCONN->EscapeQuery($gid)."','".$DBCONN->EscapeQuery($GEDCOMS[$FILE]["id"])."','".$DBCONN->EscapeQuery($type)."','".$DBCONN->EscapeQuery($indirec)."')";
+		$sql = "INSERT INTO ".$TBLPREFIX."other VALUES ('".Joinkey($gid, $GEDCOMID)."', '".$DBCONN->EscapeQuery($gid)."','".$DBCONN->EscapeQuery($GEDCOMS[$FILE]["id"])."','".$DBCONN->EscapeQuery($type)."','".$DBCONN->EscapeQuery($indirec)."')";
 		$res = NewQuery($sql);
 		if ($res) $res->FreeResult();
 	}
@@ -2872,7 +2871,7 @@ function GetFaqData($id='') {
  *							Gedcom the Log record applies to
  */
 function WriteToLog($LogString, $type="I", $cat="S", $ged="", $chkconn = true) {
-	global $TBLPREFIX, $GEDCOM, $GEDCOMS, $gm_username, $DBLAYER, $INDEX_DIRECTORY;
+	global $TBLPREFIX, $GEDCOM, $GEDCOMS, $gm_username, $DBCONN, $INDEX_DIRECTORY;
 	
 	$user = $gm_username;
 	
@@ -2883,7 +2882,7 @@ function WriteToLog($LogString, $type="I", $cat="S", $ged="", $chkconn = true) {
 	if ($type == "E") $new = "1";
 	else $new = "0";
 	
-	if ($chkconn && (!is_object($DBLAYER) || (isset($DBLAYER->connected) && !$DBLAYER->connected))) {
+	if ($chkconn && (!is_object($DBCONN) || (isset($DBCONN->connected) && !$DBCONN->connected))) {
 		if ($cat == "S") {
 			$emlog = $INDEX_DIRECTORY."emergency_syslog.txt";
 			$string = "INSERT INTO ".$TBLPREFIX."log (l_type, l_category, l_timestamp, l_ip, l_user, l_text, l_gedcom, l_new) VALUES('".$type."','".$cat."','".time()."', '".$_SERVER['REMOTE_ADDR']."', '".addslashes($user)."', '".addslashes($LogString)."', '', '".$new."')\r\n";
@@ -3039,7 +3038,7 @@ function IsChangedFact($gid, $oldfactrec) {
 	global $GEDCOMID, $TBLPREFIX, $gm_username, $show_changes, $Users;
 	
 //print "checking ".$gid." ".$oldfactrec."<br />";
-	if ((!isset($show_changes) || $show_changes != "no") && $Users->UserCanEditOwn($gm_username, $gid) && GetChangeData(true, $gid, true)) {
+	if ($show_changes && $Users->UserCanEditOwn($gm_username, $gid) && GetChangeData(true, $gid, true)) {
 		$string = trim($oldfactrec);
 		if (empty($string)) return false;
 		$sql = "SELECT ch_old, ch_new FROM ".$TBLPREFIX."changes where ch_gid = '".$gid."' AND ch_gedfile = '".$GEDCOMID."' ORDER BY ch_time ASC";
@@ -3058,7 +3057,7 @@ function IsChangedFact($gid, $oldfactrec) {
 function RetrieveChangedFact($gid, $fact, $oldfactrec) {
 	global $GEDCOMID, $TBLPREFIX, $show_changes, $gm_username, $Users;
 	
-	if ((!isset($show_changes) || $show_changes != "no") && $Users->UserCanEditOwn($gm_username, $gid) && GetChangeData(true, $gid, true)) {
+	if ($show_changes && $Users->UserCanEditOwn($gm_username, $gid) && GetChangeData(true, $gid, true)) {
 		$sql = "SELECT ch_old, ch_new FROM ".$TBLPREFIX."changes where ch_gid = '".$gid."' AND ch_fact = '".$fact."' AND ch_gedfile = '".$GEDCOMID."' ORDER BY ch_time ASC";
 		$res = NewQuery($sql);
 		$factrec = $oldfactrec;
@@ -3080,7 +3079,7 @@ function RetrieveNewFacts($gid, $includeall=false) {
 	
 	$facts = array();
 	$newfacts = array();
-	if ((!isset($show_changes) || $show_changes != "no") && GetChangeData(true, $gid, true)) {
+	if ($show_changes && GetChangeData(true, $gid, true)) {
 		$sql = "SELECT ch_old, ch_new FROM ".$TBLPREFIX."changes where ch_gid = '".$gid."' AND ch_gedfile = '".$GEDCOMID."' ORDER BY ch_time ASC";
 		$res = NewQuery($sql);
 		if ($res) {
@@ -4058,8 +4057,8 @@ function HasUnapprovedLinks($pid, $gedid="") {
 	global $TBLPREFIX, $GEDCOMID, $Users, $gm_username, $show_changes;
 	
 	if (empty($gedid)) $gedid = $GEDCOMID;
-	if ((!isset($show_changes) || $show_changes != "no") && $Users->UserCanEdit($gm_username)) {
-		$sql = "SELECT count(ch_id) FROM ".$TBLPREFIX."changes WHERE ch_gedfile='".$GEDCOMID."' AND (ch_new LIKE '%@".$pid."@%' OR ch_old LIKE '%@".$pid."@%')";
+	if ($show_changes && $Users->UserCanEdit($gm_username)) {
+		$sql = "SELECT count(ch_id) FROM ".$TBLPREFIX."changes WHERE ch_gedfile='".$GEDCOMID."' AND ((ch_new LIKE '%@".$pid."@%' AND ch_new NOT LIKE '%0 @".$pid."@%') OR (ch_old LIKE '%@".$pid."@%' AND ch_old NOT LIKE '0 @".$pid."@%'))";
 		$res = NewQuery($sql);
 		$row = $res->FetchRow();
 		return $row[0];
@@ -4169,24 +4168,6 @@ function GetNoteLinks($oid, $type="", $applypriv=true) {
 	return $links;
 }
 	
-function GetRepoLinks($rid, $type="", $applypriv=true) {
-	global $TBLPREFIX, $GEDCOMID;
-
-	if (empty($rid)) return false;
-	
-	$links = array();
-	$sql = 	"SELECT om_gid, om_type FROM ".$TBLPREFIX."other_mapping WHERE om_oid='".$rid."' AND om_gedfile='".$GEDCOMID."'";
-	if (!empty($type)) $sql .= " AND om_type='".$type."'";
-	$res = NewQuery($sql);
-	while($row = $res->FetchAssoc()){
-		if (!$applypriv || ShowFact("REPO", $row["om_gid"], $row["om_type"])) {
-			if (empty($type)) $links[] = array($row["om_gid"], $row["om_type"]);
-			else $links[] = $row["om_gid"];
-		}
-	}
-	return $links;
-}	
-
 function GetSourceLinks($pid, $type="", $applypriv=true, $getfamindi=true) {
 	global $TBLPREFIX, $GEDCOMID;
 	global $alllinks, $indilist, $famlist, $LINK_PRIVACY;

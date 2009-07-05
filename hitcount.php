@@ -38,11 +38,11 @@ if($SHOW_COUNTER) {
 	// First check if any id is set. If not, we assume it's the index page
 	if (isset($pid) || isset($famid) || isset($sid) || isset($rid) || isset($oid)) {
 		// See if the ID exists. If not, we set the counter to 0.
-		if((isset($pid) && FindPersonRecord($pid) != "") 
-		|| (isset($famid) && FindFamilyRecord($famid) != "")
-		|| (isset($sid) && FindSourceRecord($sid) != "")
-		|| (isset($rid) && FindRepoRecord($rid) != "")
-		|| (isset($oid) && FindOtherRecord($oid, "", false, "NOTE") != "")
+		if((isset($pid) && FindPersonRecord(strtoupper($pid)) != "") 
+		|| (isset($famid) && FindFamilyRecord(strtoupper($famid)) != "")
+		|| (isset($sid) && FindSourceRecord(strtoupper($sid)) != "")
+		|| (isset($rid) && FindRepoRecord(strtoupper($rid)) != "")
+		|| (isset($oid) && FindOtherRecord(strtoupper($oid), "", false, "NOTE") != "")
 		) {
 			
 			if (isset($pid)) $cpid = $pid;

@@ -87,29 +87,28 @@ class TimelineControllerRoot extends BaseController {
 			if ($value!=$remove) {
 				$value = CleanInput($value);
 				$this->pids[$key] = $value;
-				$indirec = FindPersonRecord($value);
-				$this->people[] = new Person($value, $indirec);
+				$this->people[] = new Person($value);
 			}
 		}
 		
 		$this->pidlinks = "";
 		foreach($this->people as $p=>$indi) {
-			if (!is_null($indi) && $indi->canDisplayDetails()) {
+			if (!is_null($indi) && $indi->disp) {
 				//-- setup string of valid pids for links
-				$this->pidlinks .= "pids[]=".$indi->getXref()."&amp;";
+				$this->pidlinks .= "pids[]=".$indi->xref."&amp;";
 				$bdate = $indi->bdate;
 				if (!empty($bdate) && (stristr($bdate, "hebrew")===false)) {
 					$date = ParseDate($bdate);
 					if (!empty($date[0]["year"])) {
-						$this->birthyears[$indi->getXref()] = $date[0]["year"];
-						if (!empty($date[0]["mon"])) $this->birthmonths[$indi->getXref()] = $date[0]["mon"];
-						else $this->birthmonths[$indi->getXref()] = 1;
-						if (!empty($date[0]["day"])) $this->birthdays[$indi->getXref()] = $date[0]["day"];
-						$this->birthdays[$indi->getXref()] = 1;
+						$this->birthyears[$indi->xref] = $date[0]["year"];
+						if (!empty($date[0]["mon"])) $this->birthmonths[$indi->xref] = $date[0]["mon"];
+						else $this->birthmonths[$indi->xref] = 1;
+						if (!empty($date[0]["day"])) $this->birthdays[$indi->xref] = $date[0]["day"];
+						$this->birthdays[$indi->xref] = 1;
 					}
 				}
 				// find all the fact information
-				$facts = GetAllSubrecords($indi->getGedcomRecord(), $this->nonfacts, true, false);
+				$facts = GetAllSubrecords($indi->gedrec, $this->nonfacts, true, false);
 				foreach($facts as $indexval => $factrec) {
 					//-- get the fact type
 					$ct = preg_match("/1 (\w+)(.*)/", $factrec, $match);
@@ -125,12 +124,12 @@ class TimelineControllerRoot extends BaseController {
 							if ((stristr($date[0]["ext"], "hebrew")===false)&&($date[0]["year"]!=0)) {
 								if ($date[0]["year"]<$this->baseyear) $this->baseyear=$date[0]["year"];
 								if ($date[0]["year"]>$this->topyear) $this->topyear=$date[0]["year"];
-								if (!IsDeadId($indi->getXref())) {
+								if (!IsDeadId($indi->xref)) {
 									if ($this->topyear < date("Y")) $this->topyear = date("Y");
 								}
 								$tfact = array();
 								$tfact["p"] = $p;
-								$tfact["pid"] = $indi->getXref();
+								$tfact["pid"] = $indi->xref;
 								$tfact[1] = $factrec;
 								$this->indifacts[] = $tfact;
 							}
@@ -159,9 +158,9 @@ class TimelineControllerRoot extends BaseController {
 		
 		$printed = false;
 		for($i=0; $i<count($this->people); $i++) {
-			if (!$this->people[$i]->canDisplayDetails()) {
-				if ($this->people[$i]->canDisplayName()) {
-					print "&nbsp;<a href=\"individual.php?pid=".$this->people[$i]->getXref()."\">".PrintReady($this->people[$i]->getName())."</a>";
+			if (!$this->people[$i]->disp) {
+				if ($this->people[$i]->disp_name) {
+					print "&nbsp;<a href=\"individual.php?pid=".$this->people[$i]->xref."\">".PrintReady($this->people[$i]->getName())."</a>";
 					print_privacy_error($CONTACT_EMAIL);
 					print "<br />";
 					$printed = true;

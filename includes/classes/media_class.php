@@ -30,10 +30,10 @@ if (stristr($_SERVER["SCRIPT_NAME"],basename(__FILE__))) {
 
 class Media {
 	
-	var $classname = "Media";
-	var $totalmediaitems = 0;
-	var $medialist = array();
-	var $mediainlist = 0;
+	public $classname = "Media";
+	public $totalmediaitems = 0;
+	public $medialist = array();
+	public $mediainlist = 0;
 	
 	function CountMediaItems() {
 		return $this->totalmediaitems;
@@ -56,7 +56,7 @@ class Media {
 		$this->totalmediaitems = $db->NumRows();
 		while($row = $db->FetchAssoc()) {
 			$media = new MediaItem($row);
-			if ($media->disp == true) {
+			if ($media->disp) {
 				if ($count) {
 					$this->medialist[$row["m_media"]."_".$row["m_gedfile"]] = $media;
 					$added++;
@@ -231,7 +231,7 @@ class Media {
 		if (count($this->medialist) > 0) {
 			$sql = "SELECT * FROM ".$TBLPREFIX."media_mapping WHERE mm_gedfile='".$GEDCOMID."' AND mm_media in (";
 			foreach($this->medialist as $key => $media) {
-				$sql .= "'".$media->m_media."',";
+				$sql .= "'".$media->xref."',";
 			}
 			$sql = substr($sql, 0, -1);
 			$sql .= ")";
@@ -248,10 +248,10 @@ class Media {
 		}
 	}
 	function mediasort($a, $b) {
-		if (!empty($a->m_titl)) $atitl = $a->m_titl;
-		else $atitl = $a->m_file;
-		if (!empty($b->m_titl)) $btitl = $b->m_titl;
-		else $btitl = $b->m_file;
+		if (!empty($a->title)) $atitl = $a->title;
+		else $atitl = $a->filename;
+		if (!empty($b->title)) $btitl = $b->title;
+		else $btitl = $b->filename;
 		return strnatcasecmp($atitl, $btitl);
 	}
 }

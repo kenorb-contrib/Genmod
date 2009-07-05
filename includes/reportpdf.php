@@ -2312,16 +2312,16 @@ function GMRHighlightedImageSHandler($attrs) {
 		$mfile = new MediaItem($media["id"]);
 		//print_r($mfile);
 		//print "<br /><br />";
-		if ($mfile->m_fileobj->f_is_image) {
-			if (($width>0) && ($mfile->m_fileobj->f_width > $mfile->m_fileobj->f_height)) {
-				$perc = $width / $mfile->m_fileobj->f_width;
-				$height= round($mfile->m_fileobj->f_height*$perc);
+		if ($mfile->fileobj->f_is_image) {
+			if (($width>0) && ($mfile->fileobj->f_width > $mfile->fileobj->f_height)) {
+				$perc = $width / $mfile->fileobj->f_width;
+				$height= round($mfile->fileobj->f_height*$perc);
 			}
-			if (($height>0) && ($mfile->m_fileobj->f_height > $mfile->m_fileobj->f_width)) {
-				$perc = $height / $mfile->m_fileobj->f_height;
-				$width= round($mfile->m_fileobj->f_width*$perc);
+			if (($height>0) && ($mfile->fileobj->f_height > $mfile->fileobj->f_width)) {
+				$perc = $height / $mfile->fileobj->f_height;
+				$width= round($mfile->fileobj->f_width*$perc);
 			}
-			$image = new GMRImage($SERVER_URL.$mfile->m_fileobj->f_main_file, $left, $top, $width, $height, $mfile->m_fileobj->f_ext);
+			$image = new GMRImage($SERVER_URL.$mfile->fileobj->f_main_file, $left, $top, $width, $height, $mfile->fileobj->f_ext);
 			$gmreport->addElement($image);
 		}
 	}
@@ -2506,8 +2506,9 @@ function GMRListSHandler($attrs) {
 				if ($vars["status"]["id"] == "action0") $select = "0";
 				else if ($vars["status"]["id"] == "action1") $select = "1";
 			}
-			if (isset($vars["repo"]) && !empty($vars["repo"]["id"])) $alist = $Actions->GetActionListByRepo($vars["repo"]["id"], $select);
-			else $alist = $Actions->GetActionList($select, true);
+			$repo_obj = new Repository($vars["repo"]["id"]);
+			if (isset($vars["repo"]) && !empty($vars["repo"]["id"])) $alist = $repo_obj->GetRepoActions($vars["repo"]["id"], $select);
+			else $alist = $Actionlist->GetActionList($select, true);
 			$list = array();
 			$oldrepo = "";
 			foreach ($alist as $key => $action) {

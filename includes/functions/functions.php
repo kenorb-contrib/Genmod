@@ -67,8 +67,8 @@ function get_gedcom_from_id($ged_id) {
 	global $GEDCOMS;
 
 	if (isset($GEDCOMS[$ged_id])) return $ged_id;
-	foreach($GEDCOMS as $ged=>$gedarray) {
-		if ($gedarray["id"]==$ged_id) return $ged;
+	foreach($GEDCOMS as $ged => $gedarray) {
+		if ($gedarray["id"] == $ged_id) return $ged;
 	}
 
 	return $ged_id;
@@ -611,7 +611,7 @@ function FindParents($famid) {
 		if ($Users->userCanEdit($gm_username)) {
 			$famrec = FindGedcomRecord($famid);
 			if (empty($famrec)) {
-				if ((!isset($show_changes) || $show_changes != "no") && GetChangeData(true, $famid, true, "", "FAM")) {
+				if ($show_changes && GetChangeData(true, $famid, true, "", "FAM")) {
 					$f = GetChangeData(false, $famid, true, "gedlines", "FAM");
 					$famrec = $f[$GEDCOM][$famid];
 				}
@@ -709,7 +709,7 @@ function FindFamilyIds($pid, $indirec="", $newfams = false) {
 	
 	// We must get the families from the gedcom record to preserve the order. 
 	$gedrec = FindGedcomRecord($pid);
-	if ($newfams && $Users->UserCanEdit($Users->GetUserName()) && $show_changes != "no" && GetChangeData(true, $pid, true, "", "")) {
+	if ($newfams && $Users->UserCanEdit($Users->GetUserName()) && $show_changes && GetChangeData(true, $pid, true, "", "")) {
 		$rec = GetChangeData(false, $pid, true, "gedlines", "");
 		$gedrec = $rec[$GEDCOM][$pid];
 	}
@@ -758,7 +758,7 @@ function FindSfamilyIds($pid, $newfams = false) {
 //	}
 	// We must get the families from the gedcom record to preserve the order. 
 	$gedrec = FindGedcomRecord($pid);
-	if ($newfams && $Users->UserCanEdit($Users->GetUserName()) && $show_changes != "no" && GetChangeData(true, $pid, true, "", "")) {
+	if ($newfams && $Users->UserCanEdit($Users->GetUserName()) && $show_changes && GetChangeData(true, $pid, true, "", "")) {
 		$rec = GetChangeData(false, $pid, true, "gedlines", "");
 		$gedrec = $rec[$GEDCOM][$pid];
 	}
@@ -947,7 +947,7 @@ function GetRelationship($pid1, $pid2, $followspouse=true, $maxlength=0, $ignore
 	$pid1 = strtoupper($pid1);
 	$pid2 = strtoupper($pid2);
 	$indirec = FindPersonRecord($pid2);
-	if ($Users->UserCanEdit($gm_username) && isset($show_changes) && $show_changes == "yes") {
+	if ($show_changes) {
 		if (GetChangeData(true, $pid2, true)) {
 			$rec = GetChangeData(false, $pid2, true, "gedlines");
 			$indirec = $rec[$GEDCOM][$pid2];
@@ -1010,7 +1010,7 @@ function GetRelationship($pid1, $pid2, $followspouse=true, $maxlength=0, $ignore
 		for($j=0; $j<$numfams; $j++) {
 			// Get the family record
 			$famrec = FindFamilyRecord($fmatch[$j][1]);
-			if ($Users->UserCanEdit($gm_username)&& isset($show_changes) && $show_changes == "yes") {
+			if ($show_changes) {
 				if (GetChangeData(true, $fmatch[$j][1], true)) {
 					$rec = GetChangeData(false, $fmatch[$j][1], true, "gedlines");
 					$famrec = $rec[$GEDCOM][$fmatch[$j][1]];
@@ -1022,7 +1022,7 @@ function GetRelationship($pid1, $pid2, $followspouse=true, $maxlength=0, $ignore
 			for($i=0; $i<$ct; $i++) {
 				// Get each child's record
 				$childrec = FindPersonRecord($cmatch[$i][1]);
-				if ($Users->UserCanEdit($gm_username)&& isset($show_changes) && $show_changes == "yes") {
+				if ($show_changes) {
 					if (GetChangeData(true, $cmatch[$i][1], true)) {
 						$rec = GetChangeData(false, $cmatch[$i][1], true, "gedlines");
 						$childrec = $rec[$GEDCOM][$cmatch[$i][1]];
@@ -1109,7 +1109,7 @@ function GetRelationship($pid1, $pid2, $followspouse=true, $maxlength=0, $ignore
 
 				//-- generate heuristic values based of the birthdates of the current node and p2
 				$indirec = FindPersonRecord($node["pid"]);
-				if ($Users->UserCanEdit($gm_username)&& isset($show_changes) && $show_changes == "yes") {
+				if ($show_changes) {
 					if (GetChangeData(true, $node["pid"], true)) {
 						$rec = GetChangeData(false, $node["pid"], true, "gedlines");
 						$indirec = $rec[$GEDCOM][$node["pid"]];
@@ -1189,7 +1189,7 @@ function GetRelationship($pid1, $pid2, $followspouse=true, $maxlength=0, $ignore
 				foreach($famids as $indexval => $fam) {
 					$visited[$fam] = true;
 					$famrec = FindFamilyRecord($fam);
-					if ($Users->UserCanEdit($gm_username)&& isset($show_changes) && $show_changes == "yes") {
+					if ($show_changes) {
 						if (GetChangeData(true, $fam, true)) {
 							$rec = GetChangeData(false, $fam, true, "gedlines");
 							$famrec = $rec[$GEDCOM][$fam];
@@ -1267,7 +1267,7 @@ function GetRelationship($pid1, $pid2, $followspouse=true, $maxlength=0, $ignore
 				foreach($famids as $indexval => $fam) {
 					$visited[$fam] = true;
 					$famrec = FindFamilyRecord($fam);
-					if ($Users->UserCanEdit($gm_username)&& isset($show_changes) && $show_changes == "yes") {
+					if ($show_changes) {
 						if (GetChangeData(true, $fam, true)) {
 							$rec = GetChangeData(false, $fam, true, "gedlines");
 							$famrec = $rec[$GEDCOM][$fam];

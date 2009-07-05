@@ -845,4 +845,40 @@ function GedcomSort($a, $b) {
 
 	return StringSort($aname, $bname);
 }
+
+function GedcomObjSort($a, $b) {
+	$aname = Str2Upper($a->title);
+	$bname = Str2Upper($b->title);
+
+	return StringSort($aname, $bname);
+}
+function NotelistObjSort($a, $b) {
+	if ($a->title != $b->title) return StringSort(ltrim($a->title), ltrim($b->title));
+	else {
+		$anum = preg_replace("/\D*/", "", $a->xref);
+		$bnum = preg_replace("/\D*/", "", $b->xref);
+		return $anum > $bnum;
+	}
+}
+function ItemObjSort($a, $b) {
+	
+	if (is_object($a)) {
+		if (!is_null($a->sortable_name)) $aname = $a->sortable_name;
+		else if (!is_null($a->name_array)) $aname = SortableNameFromName($a->name_array[0][0]);
+	}
+	else if (is_array($a)) $aname = SortableNameFromName($a[0]);
+	else if (is_string($a)) $aname = $a;
+
+	if (is_object($b)) {
+		if (!is_null($b->sortable_name)) $bname = $b->sortable_name;
+		else if (!is_null($b->name_array)) $bname = SortableNameFromName($b->name_array[0][0]);
+	}
+	else if (is_array($b)) $bname = SortableNameFromName($b[0]);
+	else if (is_string($b)) $aname = $b;
+
+	$aname = preg_replace("/([^ ]+)\*/", "$1", StripPrefix($aname));
+	$bname = preg_replace("/([^ ]+)\*/", "$1", StripPrefix($bname));
+	return StringSort($aname, $bname);
+}
+	
 ?>

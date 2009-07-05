@@ -253,8 +253,8 @@ if ($action=="update") {
 		else unset($person_privacy[$key]);
 	}
 	if ((!empty($v_new_person_privacy_access_ID))&&(!empty($v_new_person_privacy_acess_option))) {
-		$gedobj = new GedcomRecord(FindGedcomRecord($v_new_person_privacy_access_ID));
-		$v_new_person_privacy_access_ID = $gedobj->getXref();
+		$ged = FindGedcomRecord($v_new_person_privacy_access_ID);
+		$v_new_person_privacy_access_ID = GetRecID($ged);
 		if (!empty($v_new_person_privacy_access_ID)) $person_privacy[$v_new_person_privacy_access_ID] = $v_new_person_privacy_acess_option;
 	}
 	
@@ -275,8 +275,8 @@ if ($action=="update") {
 		}
 	}
 	if ((!empty($v_new_user_privacy_username))&&(!empty($v_new_user_privacy_access_ID))) {
-		$gedobj = new GedcomRecord(FindGedcomRecord($v_new_user_privacy_access_ID));
-		$v_new_user_privacy_access_ID = $gedobj->getXref();
+		$ged = FindGedcomRecord($v_new_user_privacy_access_ID);
+		$v_new_user_privacy_access_ID = GetRecID($ged);
 		if (!empty($v_new_user_privacy_access_ID)) $user_privacy[$v_new_user_privacy_username][$v_new_user_privacy_access_ID] = $v_new_user_privacy_acess_option;
 	}
 	$settings->user_privacy = $user_privacy;	
@@ -315,8 +315,8 @@ if ($action=="update") {
 		}
 	}
 	if (!empty($v_new_person_facts_access_ID) && !empty($v_new_person_facts_abbr) && !empty($v_new_global_facts_choice) && !empty($v_new_global_facts_access_option)) {
-		$gedobj = new GedcomRecord(FindGedcomRecord($v_new_person_facts_access_ID));
-		$v_new_person_facts_access_ID = $gedobj->getXref();
+		$ged = FindGedcomRecord($v_new_person_facts_access_ID);
+		$v_new_person_facts_access_ID = GetRecID($ged);
 		if (!empty($v_new_person_facts_access_ID)) $person_facts[$v_new_person_facts_access_ID][$v_new_person_facts_abbr][$v_new_person_facts_choice] = $v_new_person_facts_acess_option;
 	}
 	$settings->person_facts = $person_facts;	

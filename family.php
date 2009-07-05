@@ -37,49 +37,28 @@ $controller = new FamilyController();
 
 print_header($controller->getPageTitle());
 
-// Check if the record is raw-edited
-if($controller->show_changes && GetChangeData(true, $controller->getFamilyID(), true)) {
-	$sql = "SELECT COUNT(ch_id) FROM ".$TBLPREFIX."changes WHERE ch_gedfile='".$GEDCOMID."' AND ch_type='edit_raw' AND ch_gid='".$controller->getFamilyID()."'";
-	if ($res = NewQuery($sql)) {
-		$row = $res->FetchRow();
-		$res->FreeResult();
-		if ($row[0]>0) print $gm_lang["is_rawedited"];
-	}
-}
+$controller->CheckNoResult($gm_lang["family_not_found"]);
+
+$controller->CheckPrivate();
+
+$controller->CheckRawEdited();
 
 ?>
 <div id="show_changes"></div>
-<script language="JavaScript" type="text/javascript">
-	function show_gedcom_record(shownew) {
-		fromfile="";
-		if (shownew=="yes") fromfile='&fromfile=1';
-		var recwin = window.open("gedrecord.php?pid=<?php print $controller->getFamilyID(); ?>"+fromfile, "", "top=50,left=50,width=300,height=400,scrollbars=1,scrollable=1,resizable=1");
-	}
-	function showchanges() {
-		sndReq('show_changes', 'set_show_changes', 'set_show_changes', '<?php if ($show_changes == "yes") print "no"; else print "yes"; ?>');
-		window.location.reload();
-	}
-	
-	function reload() {
-		window.location.reload();
-	}
-	
-</script>
+<?php $controller->PrintDetailJS(); ?>
 <table>
 	<tr>
 		<td>
 		<?php
 		print PrintFamilyParents($controller->getFamilyID());
-		if (!$controller->isPrintPreview() && $controller->display && $controller->canedit) {
-		$husb = $controller->getHusband(); 
-		if (empty($husb) && !$controller->family->famdeleted) { ?>
+		if (!$controller->isPrintPreview() && $controller->display && $controller->family->canedit) {
+		if (empty($controller->family->husb) && !$controller->family->isdeleted) { ?>
 			<?php print_help_link("edit_add_parent_help", "qm"); ?> 
-			<a href="javascript <?php print $gm_lang["add_father"]; ?>" onclick="return addnewparentfamily('', 'HUSB', '<?php print $controller->famid; ?>', 'add_father');"><?php print $gm_lang["add_father"]; ?></a><br />
+			<a href="javascript <?php print $gm_lang["add_father"]; ?>" onclick="return addnewparentfamily('', 'HUSB', '<?php print $controller->family->xref; ?>', 'add_father');"><?php print $gm_lang["add_father"]; ?></a><br />
 		<?php }
-		$wife = $controller->getWife();
-		if (empty($wife) && !$controller->family->famdeleted)  { ?>
+		if (empty($controller->family->wife) && !$controller->family->isdeleted)  { ?>
 			<?php print_help_link("edit_add_parent_help", "qm"); ?>
-			<a href="javascript <?php print $gm_lang["add_mother"]; ?>" onclick="return addnewparentfamily('', 'WIFE', '<?php print $controller->famid; ?>', 'add_mother');"><?php print $gm_lang["add_mother"]; ?></a><br />
+			<a href="javascript <?php print $gm_lang["add_mother"]; ?>" onclick="return addnewparentfamily('', 'WIFE', '<?php print $controller->family->xref; ?>', 'add_mother');"><?php print $gm_lang["add_mother"]; ?></a><br />
 		<?php }
 		}
 		?></td>
@@ -101,7 +80,7 @@ if($controller->show_changes && GetChangeData(true, $controller->getFamilyID(), 
 			<?php PrintFamilyChildren($controller->getFamilyID());?>
 		</td>
 		<td valign="top">
-			<?php PrintFamilyFacts($controller->getFamilyID(), 0, $controller->canedit);?>
+			<?php PrintFamilyFacts($controller->getFamilyID(), 0, $controller->family->canedit);?>
 		</td>
 	</tr>
 </table>

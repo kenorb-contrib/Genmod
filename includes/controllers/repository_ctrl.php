@@ -1,6 +1,6 @@
 <?php
 /**
- * Controller for the source page view
+ * Controller for the repository page view
  * 
  * Genmod: Genealogy Viewer
  * Copyright (C) 2005 - 2008 Genmod Development Team
@@ -23,17 +23,18 @@
  * @subpackage Charts
  * @version $Id$
  */
-if (stristr($_SERVER["SCRIPT_NAME"],"source_ctrl")) {
+if (stristr($_SERVER["SCRIPT_NAME"],"repository_ctrl")) {
 	require "../../intrusion.php";
 }
 
 /**
- * Main controller class for the source page.
+ * Main controller class for the repository page.
  */
-class SourceController extends DetailController {
-	public $classname = "SourceController";
+class RepositoryController extends DetailController {
 	
-	public $source = null;
+	public $classname = "RepositoryController";
+	
+	public $repo = null;
 	
 	private $display_other_menu = false;
 	private $pagetitle = null;
@@ -42,21 +43,25 @@ class SourceController extends DetailController {
 	 * constructor
 	 */
 	public function __construct() {
-		global $gm_lang, $CONTACT_EMAIL, $GEDCOM, $ALLOW_EDIT_GEDCOM;
-		global $ENABLE_CLIPPINGS_CART, $Users, $nonfacts;
+		global $GEDCOMID, $ENABLE_CLIPPINGS_CART;
+		global $Users, $nonfacts;
 		
 		parent::__construct();
 
 		$nonfacts = array();
 		
-		if (!empty($_REQUEST["sid"])) $this->xref = strtoupper($_REQUEST["sid"]);
+		if (!empty($_REQUEST["action"])) $this->action = $_REQUEST["action"];
+		if (!empty($_REQUEST["rid"])) $this->xref = strtoupper($_REQUEST["rid"]);
 		$this->xref = CleanInput($this->xref);
+		$this->gedcomid = $GEDCOMID;
 		
-		$this->source = new Source($this->xref);
+		$reporec = FindRepoRecord($this->xref);
 		
-		if ($this->source->disp && ($Users->userCanViewGedlines() || $ENABLE_CLIPPINGS_CART >= $Users->getUserAccessLevel() || !empty($this->uname))) {
+		$this->repo = new Repository($this->xref, $reporec);
+				
+		if ($this->repo->disp && ($Users->userCanViewGedlines() || $ENABLE_CLIPPINGS_CART >= $Users->getUserAccessLevel() || !empty($this->uname))) {
 			$this->display_other_menu = true;
-		}		
+		}
 	}
 	
 	public function __get($property) {
@@ -79,11 +84,11 @@ class SourceController extends DetailController {
 		
 		if (empty($this->uname)) return;
 
-		if (!$this->source->isempty && !$this->source->isdeleted) {	
+		if (!$this->repo->isempty && !$this->repo->isdeleted) {	
 			$favorite = new Favorite();
 			$favorite->username = $this->uname;
-			$favorite->gid = $this->source->xref;
-			$favorite->type = 'SOUR';
+			$favorite->gid = $this->repo->xref;
+			$favorite->type = 'REPO';
 			$favorite->file = $GEDCOMID;
 			$favorite->SetFavorite();
 		}
@@ -96,8 +101,8 @@ class SourceController extends DetailController {
 	private function getPageTitle() {
 		global $gm_lang;
 
-		if ($this->source->title) $this->pagetitle = $this->source->title." - ".$this->source->xref." - ".$gm_lang["source_info"];
-		else $this->pagetitle =  $this->source->xref." - ".$gm_lang["source_info"];
+		if ($this->repo->title) $this->pagetitle = $this->repo->title." - ".$this->repo->xref." - ".$gm_lang["repo_info"];
+		else $this->pagetitle =  $this->repo->xref." - ".$gm_lang["repo_info"];
 		return $this->pagetitle;
 	}
 	
@@ -111,30 +116,30 @@ class SourceController extends DetailController {
 		if ($TEXT_DIRECTION=="rtl") $ff="_rtl";
 		else $ff="";
 		
-		// edit source menu
-		$menu = new Menu($gm_lang['edit_source']);
+		// edit repo menu
+		$menu = new Menu($gm_lang['edit_repo']);
 
-		if ($this->source->canedit) {
-			// edit source / edit_raw
+		if ($this->repo->canedit) {
+			// edit repo / edit_raw
 			if ($Users->userCanEditGedlines()) {
 				$submenu = new Menu($gm_lang['edit_raw']);
-				$submenu->addLink("edit_raw('".$this->source->xref."', 'edit_raw');");
+				$submenu->addLink("edit_raw('".$this->repo->xref."', 'edit_raw');");
 				$menu->addSubmenu($submenu);
 			}
 
-			// edit source / delete_source
-			$submenu = new Menu($gm_lang['delete_source']);
-			$submenu->addLink("if (confirm('".$gm_lang["confirm_delete_source"]."'))  deletesource('".$this->source->xref."', 'delete_source'); ");
+			// edit repo / delete_repo
+			$submenu = new Menu($gm_lang['delete_repo']);
+			$submenu->addLink("if (confirm('".$gm_lang["confirm_delete_repo"]."'))  deleterepository('".$this->repo->xref."', 'delete_repository'); ");
 			$menu->addSubmenu($submenu);
 
-			if ($this->source->ischanged) {
-				// edit_sour / seperator
+			if ($this->repo->ischanged) {
+				// edit_repo / seperator
 				$submenu = new Menu();
 				$submenu->isSeperator();
 				$menu->addSubmenu($submenu);
 
-				// edit_sour / show/hide changes
-				if (!$this->source->show_changes) $submenu = new Menu($gm_lang['show_changes']);
+				// edit_repo / show/hide changes
+				if (!$this->repo->show_changes) $submenu = new Menu($gm_lang['show_changes']);
 				else $submenu = new Menu($gm_lang['hide_changes']);
 				$submenu->addLink('showchanges();');
 				$menu->addSubmenu($submenu);
@@ -158,7 +163,7 @@ class SourceController extends DetailController {
 		$menu = new Menu($gm_lang['other']);
 		if ($Users->userCanViewGedlines()) {
 				// other / view_gedcom
-				if ($this->source->show_changes && $this->source->canedit) $execute = "show_gedcom_record('new');";
+				if ($this->repo->show_changes && $this->repo->canedit) $execute = "show_gedcom_record('new');";
 				else $execute = "show_gedcom_record();";
 				$submenu = new Menu($gm_lang['view_gedcom']);
 				$submenu->addLink($execute);
@@ -167,13 +172,13 @@ class SourceController extends DetailController {
 		if ($ENABLE_CLIPPINGS_CART >= $Users->getUserAccessLevel()) {
 				// other / add_to_cart
 				$submenu = new Menu($gm_lang['add_to_cart']);
-				$submenu->addLink('clippings.php?action=add&id='.$this->source->xref.'&type=sour');
+				$submenu->addLink('clippings.php?action=add&id='.$this->repo->xref.'&type=repo');
 				$menu->addSubmenu($submenu);
 		}
-		if ($this->source->disp && !empty($this->uname)) {
+		if ($this->repo->disp && !empty($this->uname)) {
 				// other / add_to_my_favorites
 				$submenu = new Menu($gm_lang['add_to_my_favorites']);
-				$submenu->addLink('source.php?action=addfav&sid='.$this->source->xref.'&gedid='.$GEDCOMID);
+				$submenu->addLink('repo.php?action=addfav&sid='.$this->repo->xref.'&gedid='.$GEDCOMID);
 				$menu->addSubmenu($submenu);
 		}
 		return $menu;

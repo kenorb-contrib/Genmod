@@ -814,9 +814,9 @@ switch ($action) {
 			$gedrec = $rec[$GEDCOM][$famid];
 		}
 		$family = new Family($famid, $gedrec);
-		$father = $family->getHusband();
-		$mother = $family->getWife();
-		$children = $family->getChildren();
+		$father = $family->husb;
+		$mother = $family->wife;
+		$children = $family->children;
 		if (count($children)>0) {
 			if (!is_null($father)) {
 				if ($father->getSex()=="F") $father->setLabel($gm_lang["mother"]);
@@ -874,7 +874,7 @@ switch ($action) {
 				<?php
 				if (!is_null($father)) {
 				?>
-					<td class="shade2 <?php print $TEXT_DIRECTION; ?>"><b><?php print $father->getLabel(); ?></b><input type="hidden" name="HUSB" value="<?php print $father->getXref();?>" /></td>
+					<td class="shade2 <?php print $TEXT_DIRECTION; ?>"><b><?php print $father->getLabel(); ?></b><input type="hidden" name="HUSB" value="<?php print $father->xref;?>" /></td>
 					<td id="HUSBName" class="shade1 <?php print $TEXT_DIRECTION; ?>"><?php print PrintReady($father->getName()); ?><br /><?php print_first_major_fact($father->xref, $father->gedrec); ?></td><td class="shade1">&nbsp;</td>
 				<?php
 				}
@@ -894,7 +894,7 @@ switch ($action) {
 				<?php
 				if (!is_null($mother)) {
 				?>
-					<td class="shade2 <?php print $TEXT_DIRECTION; ?>"><b><?php print $mother->getLabel(); ?></b><input type="hidden" name="WIFE" value="<?php print $mother->getXref();?>" /></td>
+					<td class="shade2 <?php print $TEXT_DIRECTION; ?>"><b><?php print $mother->getLabel(); ?></b><input type="hidden" name="WIFE" value="<?php print $mother->xref;?>" /></td>
 					<td id="WIFEName" class="shade1 <?php print $TEXT_DIRECTION; ?>"><?php print PrintReady($mother->getName()); ?><br /><?php print_first_major_fact($mother->xref, $mother->gedrec); ?></td><td class="shade1">&nbsp;</td>
 				<?php
 				}
@@ -920,7 +920,7 @@ switch ($action) {
 						$pedi = GetGedcomValue("PEDI", 2, $pedirec);
 					?>
 				<tr>
-					<td class="shade2 <?php print $TEXT_DIRECTION; ?>"><b><?php print $child->getLabel(); ?></b><input type="hidden" name="CHIL<?php print $i; ?>" value="<?php print $child->getXref();?>" /></td>
+					<td class="shade2 <?php print $TEXT_DIRECTION; ?>"><b><?php print $child->getLabel(); ?></b><input type="hidden" name="CHIL<?php print $i; ?>" value="<?php print $child->xref;?>" /></td>
 					<td id="CHILName<?php print $i; ?>" class="shade1"><?php print PrintReady($child->getName()); ?><br /><?php print_first_major_fact($child->xref, $child->gedrec); ?></td>
 					<td id="CHILPedi<?php print $i; ?>" class="shade1"><?php PrintPedi("CHILPedisel".$i, $pedi); ?></td>
 					<td class="shade1 <?php print $TEXT_DIRECTION; ?>">
@@ -961,9 +961,9 @@ switch ($action) {
 			$gedrec = $rec[$GEDCOM][$famid];
 		}
 		$family = new Family($famid, $gedrec);
-		$father = $family->getHusband();
-		$mother = $family->getWife();
-		$children = $family->getChildren();
+		$father = $family->husb;
+		$mother = $family->wife;
+		$children = $family->children;
 		$updated = false;
 		$success = true;
 		//-- action: replace existing father link

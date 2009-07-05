@@ -99,12 +99,12 @@ function PrintFamilyParents($famid, $sosa = 0, $label="", $parid="", $gparid="",
 	print "<a name=\"" . $parents["HUSB"] . "\"></a>\r\n";
 	print "<a name=\"" . $parents["WIFE"] . "\"></a>\r\n";
 
-	if ((!isset($show_changes) ||$show_changes != "no") && $Users->UserCanEdit($gm_username)) PrintFamilyHeader($famid, $famrec, true);
+	if ($show_changes && $Users->UserCanEdit($gm_username)) PrintFamilyHeader($famid, $famrec, true);
 	else PrintFamilyHeader($famid, $famrec);
 
 	// -- get the new record and parents if in editing show changes mode
 	$recchanged = false;
-	if ((!isset($show_changes) ||$show_changes != "no") && $Users->UserCanEdit($gm_username) && GetChangeData(true, $famid, true, "", "")) {
+	if ($show_changes && $Users->UserCanEdit($gm_username) && GetChangeData(true, $famid, true, "", "")) {
 		$rec = GetChangeData(false, $famid, true, "gedlines", "");
 		$newrec = $rec[$GEDCOM][$famid];
 		$newparents = FindParentsInRecord($newrec);
@@ -299,7 +299,7 @@ function PrintFamilyChildren($famid, $childid = "", $sosa = 0, $label="", $perso
 	global $gm_lang, $pbwidth, $pbheight, $view, $show_famlink, $show_cousins;
 	global $GM_IMAGE_DIR, $GM_IMAGES, $show_changes, $GEDCOM, $SHOW_ID_NUMBERS, $SHOW_FAM_ID_NUMBERS, $TEXT_DIRECTION, $gm_username, $Users;
 
-	if ((!isset($show_changes) ||$show_changes != "no") && $Users->UserCanEdit($gm_username)) $canshow = true;
+	if ($show_changes && $Users->UserCanEdit($gm_username)) $canshow = true;
 	else $canshow = false;
 	 
 	$children = GetChildrenIds($famid);
@@ -499,7 +499,7 @@ function PrintFamilyFacts($famid, $sosa = 0, $mayedit=true) {
 	global $nonfacts, $factarray;
 	global $TEXT_DIRECTION, $GEDCOM, $SHOW_ID_NUMBERS, $SHOW_FAM_ID_NUMBERS;
 	global $show_changes, $gm_username, $Users, $SHOW_COUNTER;
-	
+
 	// -- if both parents are displayable then print the marriage facts
 	if (displayDetailsByID($famid, "FAM")) {
 		// -- array of GEDCOM elements that will be found but should not be displayed
@@ -544,7 +544,7 @@ function PrintFamilyFacts($famid, $sosa = 0, $mayedit=true) {
 			}
 		} 
 		if (($sosa == 0) && $Users->userCanEdit($gm_username)) {
-			if ((!isset($show_changes)) || $show_changes != "no") {
+			if ($show_changes) {
 				$newrecs = RetrieveNewFacts($famid);
 				foreach ($newrecs as $key => $subrecord) {
 					$ft = preg_match("/1\s(\w+)(.*)/", $subrecord, $match);
@@ -851,8 +851,8 @@ function PedigreeArray($rootid) {
 				foreach($famids as $famid=>$family) {
 //					print "fsp:".$family->ShowPrimary."<br />";
 					if (!is_null($family) && $family->ShowPrimary) {
-						$wife = $family->getWife();
-						$husb = $family->getHusband();
+						$wife = $family->wife;
+						$husb = $family->husb;
 						if (!is_null($wife) || !is_null($husb)) {
 							$parents = true;
 							break;
@@ -863,8 +863,8 @@ function PedigreeArray($rootid) {
 				if (!$parents) {
 					foreach($famids as $famid=>$family) {
 						if (!is_null($family)) {
-							$wife = $family->getWife();
-							$husb = $family->getHusband();
+							$wife = $family->wife;
+							$husb = $family->wife;
 							if (!is_null($wife) || !is_null($husb)) {
 								$parents = true;
 								break;
@@ -876,9 +876,9 @@ function PedigreeArray($rootid) {
 				}
 
 				if ($parents) {
-					if (!is_null($husb)) $treeid[($i * 2) + 1] = $husb->getXref(); // -- set father id
+					if (!is_null($husb)) $treeid[($i * 2) + 1] = $husb->xref; // -- set father id
 					else $treeid[($i * 2) + 1] = false;
-					if (!is_null($wife)) $treeid[($i * 2) + 2] = $wife->getXref(); // -- set mother id
+					if (!is_null($wife)) $treeid[($i * 2) + 2] = $wife->xref; // -- set mother id
 					else $treeid[($i * 2) + 2] = false;
 				}
 			} else {

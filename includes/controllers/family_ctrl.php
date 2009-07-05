@@ -30,7 +30,7 @@ if (stristr($_SERVER["SCRIPT_NAME"],basename(__FILE__))) {
 	require "../../intrusion.php";
 }
 
-class FamilyRoot extends BaseController
+class FamilyController extends DetailController
 {
 	var $classname = "FamilyRoot";
 	var $user = null;
@@ -39,14 +39,11 @@ class FamilyRoot extends BaseController
 	var $showLivingWife = true;
 	var $parents = '';
 	var $display = false;
-	var $show_changes = false;
-	var $canedit = false;
 	var $famrec = '';
 	var $link_relation = 0;
 	var $title = '';
 	var $famid = '';
 	var $family = null;
-	var $difffam = null;
 	var $famnew = false;
 	var $famdeleted = false;
 	var $display_other_menu = false;
@@ -81,12 +78,7 @@ class FamilyRoot extends BaseController
 		$pbwidth = $bwidth + 12;
 		$pbheight = $bheight + 14;
 
-		if (!isset($_REQUEST['action'])) $_REQUEST['action'] = '';
-		if (!isset($_REQUEST['show_changes'])) $_REQUEST['show_changes'] = 'yes';
 		
-		if ($_REQUEST['show_changes'] == 'yes' && $Users->UserCanEdit($Users->GetUserName())) $this->show_changes = true;
-		else $this->show_changes = false;
-
 		if (!isset($_REQUEST['view'])) $_REQUEST['view'] = '';
 		$show_famlink = true;
 		if ($_REQUEST['view'] == 'preview') $show_famlink = false;
@@ -96,7 +88,6 @@ class FamilyRoot extends BaseController
 		$this->famid = $_REQUEST['famid'];
 		$this->famrec = FindFamilyRecord($this->famid);
 		$this->uname = $Users->GetUserName();
-		if ($Users->UserCanEdit($this->uname)) $this->canedit = true;
 		
 		//-- if the user can edit and there are changes then get the new changes
 		if (!empty($this->famid) && GetChangeData(true, $this->famid, true, "", "")) {
@@ -115,10 +106,6 @@ class FamilyRoot extends BaseController
 			exit;
 		}
 		
-		// Recheck editing permissions based on 1 RESN. This will only affect the editing menu
-		if (FactEditRestricted($this->famid, $this->famrec, 1)) {
-			$this->canedit = false;
-		}
 		$this->parents = FindParentsInRecord($this->famrec);
 		
 		//-- if no record was found create a default empty one
@@ -126,7 +113,6 @@ class FamilyRoot extends BaseController
 		if (empty($famrec)) $this->famrec = "0 @".$this->famid."@ FAM\r\n";
 		$this->display = displayDetailsByID($this->famid, 'FAM');
 		$this->family = new Family($this->famid, $this->famrec);
-		
 		
 		//-- check if we can display both parents
 		if ($this->display == false) {
@@ -141,7 +127,7 @@ class FamilyRoot extends BaseController
 			$this->user = $Users->getUser($this->uname);
 
 			//-- add favorites action
-			if (($_REQUEST['action'] == 'addfav') && (!empty($_REQUEST['gid']))) {
+			if ($this->action == 'addfav' && (!empty($_REQUEST['gid']))) {
 				$_REQUEST['gid'] = strtoupper($_REQUEST['gid']);
 				$indirec = FindGedcomRecord($_REQUEST['gid']);
 				if ($indirec) {
@@ -230,13 +216,11 @@ class FamilyRoot extends BaseController
 
 	function getHusband()
 	{
-		if (!is_null($this->difffam)) return $this->difffam->getHusbId();
 		return $this->parents['HUSB'];
 	}
 
 	function getWife()
 	{
-		if (!is_null($this->difffam)) return $this->difffam->getWifeId();
 		return $this->parents['WIFE'];
 	}
 
@@ -322,7 +306,7 @@ class FamilyRoot extends BaseController
 		
 		// edit_fam menu
 		$menu = new Menu($gm_lang['edit_fam']);
-		if (!$this->famdeleted && $this->canedit) {
+		if (!$this->family->isdeleted && $this->family->canedit) {
 
 			// edit_fam / members
 			$submenu = new Menu($gm_lang['change_family_members']);
@@ -335,21 +319,21 @@ class FamilyRoot extends BaseController
 			$menu->addSubmenu($submenu);
 
 			// edit_fam / reorder_children. Only show if #kids > 1
-			if ($this->family->getNumberOfChildren() > 1) {
+			if ($this->family->children_count > 1) {
 				$submenu = new Menu($gm_lang['reorder_children']);
 				$submenu->addLink("reorder_children('".$this->getFamilyID()."', 'reorder_children');");
 				$menu->addSubmenu($submenu);
 			}
 			
 			// edit_fam / reorder_media. Only show if #media > 1
-			if ($this->family->getNumberOfMedia() > 1) {
+			if ($this->family->media_count > 1) {
 				$submenu = new Menu($gm_lang['reorder_media']);
 				$submenu->addLink("reorder_media('".$this->getFamilyID()."', 'reorder_media');");
 				$menu->addSubmenu($submenu);
 			}
 			
 			// edit_fam / delete_family. Don't show if unapproved fam.
-			if (!$this->famnew && !$this->famdeleted) {
+			if (!$this->family->isnew && !$this->family->isdeleted) {
 				$submenu = new Menu($gm_lang['delete_family']);
 				$submenu->addLink("if (confirm('".$gm_lang["delete_family_confirm"]."')) delete_family('".$this->getFamilyID()."', 'delete_family');");
 				$menu->addSubmenu($submenu);
@@ -365,14 +349,14 @@ class FamilyRoot extends BaseController
 		// TODO: also show this option when media changed
 		if (GetChangeData(true, $this->getFamilyID(), true) || HasChangedMedia($this->famrec)) {
 			// edit_fam / seperator
-			if (!$this->family->famdeleted) {
+			if (!$this->family->isdeleted) {
 				$submenu = new Menu();
 				$submenu->isSeperator();
 				$menu->addSubmenu($submenu);
 			}
 
 			// edit_fam / show/hide changes
-				if ($show_changes == "no") $submenu = new Menu($gm_lang['show_changes']);
+				if (!$show_changes) $submenu = new Menu($gm_lang['show_changes']);
 				else $submenu = new Menu($gm_lang['hide_changes']);
 				$submenu->addLink('showchanges();');
 				$menu->addSubmenu($submenu);
@@ -414,17 +398,6 @@ class FamilyRoot extends BaseController
 				$menu->addSubmenu($submenu);
 		}
 		return $menu;
-	}
-}
-
-if (file_exists('includes/controllers/family_ctrl_user.php'))
-{
-	include_once 'includes/controllers/family_ctrl_user.php';
-}
-else
-{
-	class FamilyController extends FamilyRoot
-	{
 	}
 }
 ?>

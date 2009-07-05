@@ -305,11 +305,11 @@ class MediaFS {
 		$linked = false;
 		if (isset($file["objects"])) {
 			foreach ($file["objects"] as $index => $media) {
-				if (!empty($media->m_media)) {
+				if (!empty($media->xref)) {
 					if (!$linked) print $gm_lang["used_in"]."&nbsp;";
-					if ($media->m_titl != "") $title = "<b>".$media->m_titl."</b> (".$media->m_media.")";
+					if ($media->title != "") $title = "<b>".$media->title."</b> (".$media->xref.")";
 					else $title = "";
-					print "<a href=\"mediadetail.php?mid=".$media->m_media."&amp;gedcomid=".$media->m_gedfile."\" target=\"blank\">".PrintReady($title)."</a><br />";
+					print "<a href=\"mediadetail.php?mid=".$media->xref."&amp;gedcomid=".$media->m_gedcomid."\" target=\"blank\">".PrintReady($title)."</a><br />";
 					$linked = true;
 				}
 			}
@@ -1321,7 +1321,5 @@ class MediaFS {
 			return -1;
 		}
 	}
-		
-	
 }
 ?>

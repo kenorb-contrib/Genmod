@@ -26,14 +26,13 @@
  
 class DbLayer extends MysqlDb {
 	
-	function DbLayer() {
-		global $DBCONN, $SERVER_URL;
+	public $classname = "DbLayer";
+	
+	public function __construct() {
 		
-		$DBCONN = new MysqlDb();
+		parent::__construct();
 		
 		$this->connected = $this->MakeConnection();
-		if (!stristr($_SERVER["SCRIPT_NAME"], "login.php")) $this->checkdblayout = true;
-		else $this->checkdblayout = $this->CheckDBLayout();
 	}
 	
 	/**
@@ -47,7 +46,7 @@ class DbLayer extends MysqlDb {
 	 * @author	Genmod Development Team
 	 * @return 	bool 	return true if the database is correct otherwise returns false
 	 */
-	function CheckDBLayout() {
+	public function CheckDBLayout() {
 		global $DBNAME, $TBLPREFIX;
 		
 		if (file_exists("includes/values/db_layout.php")) require("includes/values/db_layout.php");

@@ -68,9 +68,9 @@ class PrivacyObject {
 	}
 	
 	function GetPrivacy($gedcomid="", $user_override) {
-		global $TBLPREFIX, $GEDCOMS, $DBLAYER, $gm_username, $Users;
+		global $TBLPREFIX, $GEDCOMS, $DBCONN, $gm_username, $Users;
 		
-		if (!$DBLAYER->connected) return false;
+		if (!$DBCONN->connected) return false;
 		
 		if (!empty($gedcomid)) {
 			$sql = "SELECT * FROM ".$TBLPREFIX."privacy WHERE (p_gedcomid='".$gedcomid."')";

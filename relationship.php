@@ -31,7 +31,7 @@
 */
 require("config.php");
 
-$show_changes = "no";
+$show_changes = false;
 
 if (!isset($show_full)) $show_full=$PEDIGREE_FULL_DETAILS;
 if (!isset($path_to_find)){

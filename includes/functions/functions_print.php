@@ -53,7 +53,7 @@ function print_repository_record($sid) {
 	global $gm_lang, $show_changes, $GEDCOM;
 	
 	$prt = false;
-	if ((!isset($show_changes) || $show_changes != "no") && GetChangeData(true, $sid, true)) {
+	if ($show_changes && GetChangeData(true, $sid, true)) {
 		$rec = GetChangeData(false, $sid, true, "gedlines");
 		$repo = $rec[$GEDCOM][$sid];
 	}
@@ -450,7 +450,7 @@ function print_pedigree_person($pid, $style=1, $show_famlink=true, $count=0, $pe
 	global $chart_style, $box_width, $generations, $gm_username, $show_changes, $Users;
 	global $CHART_BOX_TAGS, $SHOW_LDS_AT_GLANCE;
 
-	if ((!isset($show_changes) ||$show_changes != "no") && $Users->UserCanEdit($Users->GetUserName())) $canshow = true;
+	if ($show_changes && $Users->UserCanEdit($Users->GetUserName())) $canshow = true;
 	else $canshow = false;
 
 	if (!isset($OLD_PGENS)) $OLD_PGENS = $DEFAULT_PEDIGREE_GENERATIONS;
@@ -591,11 +591,11 @@ function print_pedigree_person($pid, $style=1, $show_famlink=true, $count=0, $pe
 			$media = New MediaItem($object["id"]);
 			// NOTE: IMG ID
 			$class = "pedigree_image_portrait";
-			if ($media->m_fileobj->f_width > $media->m_fileobj->f_height) $class = "pedigree_image_landscape";
+			if ($media->fileobj->f_width > $media->fileobj->f_height) $class = "pedigree_image_landscape";
 			if($TEXT_DIRECTION == "rtl") $class .= "_rtl";
 			// NOTE: IMG ID
 			print "<div class=\"$class\" style=\"float: left; border: none;\">";
-			print "<img id=\"box-$pid.$personcount.$count.-thumb\" src=\"".$media->m_fileobj->f_thumb_file."\" vspace=\"0\" hspace=\"0\" class=\"$class\" alt =\"\" title=\"\" ";
+			print "<img id=\"box-$pid.$personcount.$count.-thumb\" src=\"".$media->fileobj->f_thumb_file."\" vspace=\"0\" hspace=\"0\" class=\"$class\" alt =\"\" title=\"\" ";
 			$has_thumb = true;
 			if (!$show_full) print " style=\"display: none;\"";
 			print " /></div>\n";
@@ -1510,7 +1510,7 @@ function print_simple_fact($indirec, $fact, $pid) {
  * @param string $indirec	optional INDI record for age calculation at family event
  */
 function print_fact($factrec, $pid, $fact, $count=1, $indirec=false, $styleadd="", $mayedit=true) {
-	global $factarray, $Users;
+	global $factarray, $show_changes;
 	global $nonfacts, $birthyear, $birthmonth, $birthdate;
 	global $hebrew_birthyear, $hebrew_birthmonth, $hebrew_birthdate;
 	global $BOXFILLCOLOR, $GM_IMAGE_DIR;
@@ -1564,7 +1564,7 @@ function print_fact($factrec, $pid, $fact, $count=1, $indirec=false, $styleadd="
 		if (($fact!="EVEN" && $fact!="FACT" && $fact!="OBJE")) {
 			$factref = $fact;
 			if ($relafact && !ShowRelaFact($factrec)) return false;
-			else if (!showFact($factref, $pid)) return false;
+//			else if (!showFact($factref, $pid)) return false;
 			if ($relafact) $show_fact_details = showRelaFactDetails($factrec);
 			else $show_fact_details = showFactDetails($factref, $pid);
 			// The two lines below do not validate because when $styleadd does
@@ -1626,12 +1626,12 @@ print "\n\t\t<tr id=\"row_".$styleadd."\" name=\"row_".$styleadd."\" >";
 		}
 		else {
 			if ($fact == "OBJE") return false;
-			if (!showFact("EVEN", $pid)) return false;
+//			if (!showFact("EVEN", $pid)) return false;
 			// -- find generic type for each fact
 			$ct = preg_match("/2 TYPE (.*)/", $factrec, $match);
 			if ($ct>0) $factref = trim($match[1]);
 			else $factref = $fact;
-			if (!showFact($factref, $pid)) return false;
+//			if (!showFact($factref, $pid)) return false;
 			$show_fact_details = showFactDetails($factref, $pid) && showFactDetails("EVEN", $pid);
 			// The two lines below do not validate because when $styleadd does
 			// not have a value, we create several instances of the same ID.
@@ -1695,7 +1695,8 @@ print "\n\t\t<tr id=\"row_".$styleadd."\" name=\"row_".$styleadd."\" >";
 //print "Event: ".$event."<br />Fact: ".$fact."<br />";
 		$user = $Users->GetUser($gm_username);
 //		if ((showFactDetails($factref, $pid)) && (!FactViewRestricted($pid, $factrec))) {
-		if ($show_fact_details && (!FactViewRestricted($pid, $factrec))) {
+//		if ($show_fact_details && (!FactViewRestricted($pid, $factrec))) {
+		if ($show_fact_details) {
 			// -- first print TYPE for some facts
 			if ($fact!="EVEN" && $fact!="FACT") {
 				$ct = preg_match("/2 TYPE (.*)/", $factrec, $match);
@@ -1718,7 +1719,7 @@ print "\n\t\t<tr id=\"row_".$styleadd."\" name=\"row_".$styleadd."\" >";
 					 print "<a href=\"individual.php?pid=$spouse&amp;ged=$GEDCOM\">";
 					 if (showLivingNameById($spouse)) {
 						$srec = FindGedcomRecord($spouse);
-						if ((!isset($show_changes) || $show_changes != "no") && $Users->UserCanEdit($gm_username) && GetChangeData(true, $spouse, true)) {
+						if ($show_changes && $Users->UserCanEdit($gm_username) && GetChangeData(true, $spouse, true)) {
 							$rec = GetChangeData(false, $spouse, true, "gedlines");
 							$srec = $rec[$GEDCOM][$spouse];
 						}
@@ -1746,7 +1747,7 @@ print "\n\t\t<tr id=\"row_".$styleadd."\" name=\"row_".$styleadd."\" >";
 			if ($event!="" && $fact!="ASSO") {
 				$ct = preg_match("/@(.*)@/", $event, $match);
 				if ($ct>0) {
-					if ((!isset($show_changes) || $show_changes != "no") && GetChangeData(true, $match[1], true)) {
+					if ($show_changes && GetChangeData(true, $match[1], true)) {
 						$rec = GetChangeData(false, $match[1], true, "gedlines");
 						$gedrec = $rec[$GEDCOM][$match[1]];
 					}
@@ -2198,7 +2199,7 @@ function print_fact_notes($factrec, $level) {
 		else {
 			//-- print linked note records
 			$noterec = FindGedcomRecord($nmatch[1]);
-			if ((!isset($show_changes) || $show_changes != "no") && $Users->UserCanEdit($gm_username)) {
+			if ($show_changes && $Users->UserCanEdit($gm_username)) {
 				$rec = GetChangeData(false, $nmatch[1], true, "gedlines");
 				if (isset($rec[$GEDCOM][$nmatch[1]])) {
 					$noterec = $rec[$GEDCOM][$nmatch[1]];
@@ -2269,7 +2270,7 @@ function print_main_notes($factrec, $level, $pid, $count, $styleadd="", $mayedit
 		$nt = preg_match("/\d NOTE @(.*)@/", $match[$j][0], $nmatch);
 		if ($nt > 0) {
 			$noterec = FindGedcomRecord($nmatch[1]);
-			if ((!isset($show_changes) || $show_changes != "no") && $Users->UserCanEdit($gm_username)) {
+			if ($show_changes && $Users->UserCanEdit($gm_username)) {
 				$rec = GetChangeData(false, $nmatch[1], true, "gedlines");
 				if (isset($rec[$GEDCOM][$nmatch[1]])) {
 					$noterec = $rec[$GEDCOM][$nmatch[1]];
@@ -2383,14 +2384,14 @@ function print_main_media($factrec, $pid, $nlevel, $count=1, $change=false, $sty
 
 	if (!ShowFact("OBJE", $pid, "OBJE")) return false;
 // New from here
-	if ($change && $styleadd != "change_old") $media = new MediaItem($media_id, true);
+	if ($change && $styleadd != "change_old") $media = new MediaItem($media_id, '', true);
 	else $media = new MediaItem($media_id);
-//print_r($media);
+
 	// NOTE: Determine the size of the mediafile
 	$imgwidth = 300;
 	$imgheight = 300;
-	if (preg_match("'://'", $media->m_file)) {
-		if ($MediaFS->IsValidMedia($media->m_file)) {
+	if (preg_match("'://'", $media->filename)) {
+		if ($media->validmedia) {
 			$imgwidth = 400;
 			$imgheight = 500;
 		}
@@ -2399,10 +2400,10 @@ function print_main_media($factrec, $pid, $nlevel, $count=1, $change=false, $sty
 			$imgheight = 400;
 		}
 	}
-	else if ((preg_match("'://'", $MEDIA_DIRECTORY)>0)||($media->m_fileobj->f_file_exists)) {
-		if ($media->m_fileobj->f_width > 0 && $media->m_fileobj->f_height > 0) {
-			$imgwidth = $media->m_fileobj->f_width+50;
-			$imgheight = $media->m_fileobj->f_height + 50;
+	else if ((preg_match("'://'", $MEDIA_DIRECTORY)>0)||($media->fileobj->f_file_exists)) {
+		if ($media->fileobj->f_width > 0 && $media->fileobj->f_height > 0) {
+			$imgwidth = $media->fileobj->f_width+50;
+			$imgheight = $media->fileobj->f_height + 50;
 		}
 	}
 	
@@ -2457,29 +2458,29 @@ function print_main_media($factrec, $pid, $nlevel, $count=1, $change=false, $sty
 	// NOTE Print the title of the media
 	print "</td><td class=\"shade1 $styleadd wrap\"><span class=\"field\">";
 	if ($show_details) {
-		if (preg_match("'://'", $media->m_fileobj->f_thumb_file)||(preg_match("'://'", $MEDIA_DIRECTORY)>0)||($media->m_fileobj->f_file_exists)) {
-			if ($USE_GREYBOX && $media->m_fileobj->f_is_image) {
-				print "<a href=\"".FilenameEncode($media->m_fileobj->f_main_file)."\" title=\"".$media->m_titl."\" rel=\"gb_imageset[mainmedia]\">";
+		if (preg_match("'://'", $media->fileobj->f_thumb_file)||(preg_match("'://'", $MEDIA_DIRECTORY)>0)||($media->fileobj->f_file_exists)) {
+			if ($USE_GREYBOX && $media->fileobj->f_is_image) {
+				print "<a href=\"".FilenameEncode($media->fileobj->f_main_file)."\" title=\"".$media->title."\" rel=\"gb_imageset[mainmedia]\">";
 			}
-			else print "<a href=\"#\" onclick=\"return openImage('".$media->m_fileobj->f_main_file."', '".$imgwidth."', '".$imgheight."', '".$media->m_fileobj->f_is_image."');\">";
-			print "<img src=\"".$media->m_fileobj->f_thumb_file."\" border=\"0\" align=\"" . ($TEXT_DIRECTION== "rtl"?"right": "left") . "\" class=\"thumbnail\" alt=\"\" /></a>";
+			else print "<a href=\"#\" onclick=\"return openImage('".$media->fileobj->f_main_file."', '".$imgwidth."', '".$imgheight."', '".$media->fileobj->f_is_image."');\">";
+			print "<img src=\"".$media->fileobj->f_thumb_file."\" border=\"0\" align=\"" . ($TEXT_DIRECTION== "rtl"?"right": "left") . "\" class=\"thumbnail\" alt=\"\" /></a>";
 		}
 	}
-	print "<a href=\"mediadetail.php?mid=".$media->m_media."\">";
-	if ($TEXT_DIRECTION=="rtl" && !hasRTLText($media->m_titl)) print "<i>&lrm;".PrintReady($media->m_titl)."</i></a>";
+	print "<a href=\"mediadetail.php?mid=".$media->xref."\">";
+	if ($TEXT_DIRECTION=="rtl" && !hasRTLText($media->title)) print "<i>&lrm;".PrintReady($media->title)."</i></a>";
 	else {
-		print "<i>".PrintReady($media->m_titl)."</i></a>";
+		print "<i>".PrintReady($media->title)."</i></a>";
 	}
 
-	if (empty($media->m_fileobj->f_thumb_file) && preg_match("'://'", $media->m_file)) print "<br /><a href=\"".$media->m_file."\" target=\"_blank\">".$media->m_file."</a>";
+	if (empty($media->fileobj->f_thumb_file) && preg_match("'://'", $media->m_file)) print "<br /><a href=\"".$media->filename."\" target=\"_blank\">".$media->filename."</a>";
 
 	
 	if ($show_details) {
 		// NOTE: Print the format of the media
-		if (!empty($media->m_ext)) {
-			print "\n\t\t\t<br /><span class=\"label\">".$factarray["FORM"].": </span> <span class=\"field\">".$media->m_ext."</span>";
-			if ($media->m_fileobj->f_width != 0 &&  $media->m_fileobj->f_height != 0) {
-				print "\n\t\t\t<span class=\"label\"><br />".$gm_lang["image_size"].": </span> <span class=\"field\" style=\"direction: ltr;\">" . $media->m_fileobj->f_width . ($TEXT_DIRECTION =="rtl"?" &rlm;x&rlm; " : " x ") . $media->m_fileobj->f_height . "</span>";
+		if ($media->extension != "") {
+			print "\n\t\t\t<br /><span class=\"label\">".$factarray["FORM"].": </span> <span class=\"field\">".$media->extension."</span>";
+			if ($media->fileobj->f_width != 0 &&  $media->fileobj->f_height != 0) {
+				print "\n\t\t\t<span class=\"label\"><br />".$gm_lang["image_size"].": </span> <span class=\"field\" style=\"direction: ltr;\">" . $media->fileobj->f_width . ($TEXT_DIRECTION =="rtl"?" &rlm;x&rlm; " : " x ") . $media->fileobj->f_height . "</span>";
 			}
 		}
 		$ttype = preg_match("/3 TYPE (.*)/", $media->m_gedrec, $match);
@@ -2565,8 +2566,8 @@ function print_media_links($factrec, $level, $pid="", $nobr=true) {
 			// NOTE: Determine the size of the mediafile
 			$imgwidth = 300;
 			$imgheight = 300;
-			if (preg_match("'://'", $media->m_file)) {
-				if ($MediaFS->IsValidMedia($media->m_file)) {
+			if (preg_match("'://'", $media->filename)) {
+				if ($media->validmedia) {
 					$imgwidth = 400;
 					$imgheight = 500;
 				}
@@ -2575,29 +2576,29 @@ function print_media_links($factrec, $level, $pid="", $nobr=true) {
 					$imgheight = 400;
 				}
 			}
-			else if ((preg_match("'://'", $MEDIA_DIRECTORY)>0)||($media->m_fileobj->f_file_exists)) {
-				if ($media->m_fileobj->f_width > 0 && $media->m_fileobj->f_height > 0) {
-					$imgwidth = $media->m_fileobj->f_width + 50;
-					$imgheight = $media->m_fileobj->f_height + 50;
+			else if ((preg_match("'://'", $MEDIA_DIRECTORY)>0)||($media->fileobj->f_file_exists)) {
+				if ($media->fileobj->f_width > 0 && $media->fileobj->f_height > 0) {
+					$imgwidth = $media->fileobj->f_width + 50;
+					$imgheight = $media->fileobj->f_height + 50;
 				}
 			}
 			if (showFactDetails("OBJE", $pid)) {
-				if (preg_match("'://'", $media->m_fileobj->f_thumb_file) || preg_match("'://'", $MEDIA_DIRECTORY) > 0 || $media->m_fileobj->f_file_exists) {
-					if ($USE_GREYBOX && $media->m_fileobj->f_is_image) {
-						print "<a href=\"".FilenameEncode($media->m_fileobj->f_main_file)."\" title=\"".$media->m_titl."\" rel=\"gb_imageset[medialinks]\">";
+				if (preg_match("'://'", $media->fileobj->f_thumb_file) || preg_match("'://'", $MEDIA_DIRECTORY) > 0 || $media->fileobj->f_file_exists) {
+					if ($USE_GREYBOX && $media->fileobj->f_is_image) {
+						print "<a href=\"".FilenameEncode($media->fileobj->f_main_file)."\" title=\"".$media->title."\" rel=\"gb_imageset[medialinks]\">";
 					}
-					else print "<a href=\"#\" onclick=\"return openImage('".$media->m_fileobj->f_main_file."', '".$imgwidth."', '".$imgheight."', '".$media->m_fileobj->f_is_image."');\">";
-					print "<img src=\"".$media->m_fileobj->f_thumb_file."\" border=\"0\" align=\"" . ($TEXT_DIRECTION== "rtl"?"right": "left") . "\" class=\"thumbnail\" alt=\"\" /></a>";
+					else print "<a href=\"#\" onclick=\"return openImage('".$media->fileobj->f_main_file."', '".$imgwidth."', '".$imgheight."', '".$media->fileobj->f_is_image."');\">";
+					print "<img src=\"".$media->fileobj->f_thumb_file."\" border=\"0\" align=\"" . ($TEXT_DIRECTION== "rtl"?"right": "left") . "\" class=\"thumbnail\" alt=\"\" /></a>";
 				}
 				print "<a href=\"mediadetail.php?mid=".$media_id."\">";
-				if ($TEXT_DIRECTION=="rtl" && !hasRTLText($media->m_titl)) print "<i>&lrm;".PrintReady($media->m_titl)."</i></a>";
-				else print "<i>".PrintReady($media->m_titl)."</i></a>";
+				if ($TEXT_DIRECTION=="rtl" && !hasRTLText($media->title)) print "<i>&lrm;".PrintReady($media->title)."</i></a>";
+				else print "<i>".PrintReady($media->title)."</i></a>";
 
 				// NOTE: Print the format of the media
-				if (!empty($media->m_ext)) {
-					print "\n\t\t\t<br /><span class=\"label\">".$factarray["FORM"].": </span> <span class=\"field\">".$media->m_ext."</span>";
-					if ($media->m_fileobj->f_width != 0 && $media->m_fileobj->f_height != 0) {
-						print "\n\t\t\t<span class=\"label\"><br />".$gm_lang["image_size"].": </span> <span class=\"field\" style=\"direction: ltr;\">" . $media->m_fileobj->f_width . ($TEXT_DIRECTION =="rtl"?" &rlm;x&rlm; " : " x ") . $media->m_fileobj->f_height . "</span>";
+				if ($media->extension != "") {
+					print "\n\t\t\t<br /><span class=\"label\">".$factarray["FORM"].": </span> <span class=\"field\">".$media->extension."</span>";
+					if ($media->fileobj->f_width != 0 && $media->fileobj->f_height != 0) {
+						print "\n\t\t\t<span class=\"label\"><br />".$gm_lang["image_size"].": </span> <span class=\"field\" style=\"direction: ltr;\">" . $media->fileobj->f_width . ($TEXT_DIRECTION =="rtl"?" &rlm;x&rlm; " : " x ") . $media->fileobj->f_height . "</span>";
 					}
 				}
 				$ttype = preg_match("/\d TYPE (.*)/", $media->m_gedrec, $match);
@@ -3335,7 +3336,7 @@ function print_asso_rela_record($pid, $factrec, $linebr=false) {
 			// ASSOciate ID link
 			$gedrec = FindGedcomRecord($pid2);
 			$change = false;
-			if (empty($gedrec) && (!isset($show_changes) ||$show_changes != "no") && $Users->UserCanEdit($Users->GetUserName())) {
+			if (empty($gedrec) && $show_changes && $Users->UserCanEdit($Users->GetUserName())) {
 				if (GetChangeData(true, $pid2, true)) {
 					$change = true;
 					$rec = GetChangeData(false, $pid2, true, "gedlines");
@@ -3686,7 +3687,7 @@ function PrintAddNewFact($id, $usedfacts, $type) {
 	global $REPO_FACTS_ADD, $REPO_FACTS_UNIQUE, $REPO_QUICK_ADDFACTS;
 	global $MEDIA_FACTS_UNIQUE, $MEDIA_FACTS_ADD, $MEDIA_QUICK_ADDFACTS;
 	global $NOTE_FACTS_UNIQUE, $NOTE_FACTS_ADD, $NOTE_QUICK_ADDFACTS;
-	
+
 	if ($type == "SOUR") $addfacts = array_merge(CheckFactUnique(preg_split("/[, ;:]+/", $SOUR_FACTS_UNIQUE, -1, PREG_SPLIT_NO_EMPTY), $usedfacts, "SOUR"), preg_split("/[, ;:]+/", $SOUR_FACTS_ADD, -1, PREG_SPLIT_NO_EMPTY));
 	else if ($type == "REPO") $addfacts = array_merge(CheckFactUnique(preg_split("/[, ;:]+/", $REPO_FACTS_UNIQUE, -1, PREG_SPLIT_NO_EMPTY), $usedfacts, "REPO"), preg_split("/[, ;:]+/", $REPO_FACTS_ADD, -1, PREG_SPLIT_NO_EMPTY));
 	else if ($type == "INDI") $addfacts = array_merge(CheckFactUnique(preg_split("/[, ;:]+/", $INDI_FACTS_UNIQUE, -1, PREG_SPLIT_NO_EMPTY), $usedfacts, "INDI"), preg_split("/[, ;:]+/", $INDI_FACTS_ADD, -1, PREG_SPLIT_NO_EMPTY));

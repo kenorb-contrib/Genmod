@@ -110,7 +110,7 @@ function top10_botviews($block=true, $config="", $side, $index) {
 						print "<td class=\"name2 wrap\" ";
 						if ($block) print "width=\"86%\"";
 						print "><a href=\"individual.php?pid=".urlencode($id)."\">";
-						if (HasChinese($name)) print PrintReady($name." (".GetSortableAddName($id, true).")");
+						if (HasChinese($name)) print PrintReady($name." (".GetSortableAddName($id, "", true).")");
 						else print PrintReady($name);
 						print "</a></td>";
 						if ($CountSide=="right") {

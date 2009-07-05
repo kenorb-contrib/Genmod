@@ -94,7 +94,7 @@ function print_recent_changes($block=true, $config="", $side, $index) {
 					if ($lastgid!=$gid) {
 						$name = CheckNN(GetSortableName($gid));
 						print "<a href=\"individual.php?pid=$gid&amp;ged=".$GEDCOM."\"><b>";
-						if (HasChinese($name)) print PrintReady($name." (".GetSortableAddName($gid, false).")");
+						if (HasChinese($name)) print PrintReady($name." (".GetSortableAddName($gid, $indirec, false).")");
 						else print PrintReady($name);
 						print "</b>";
 						print "<img id=\"box-".$gid."-".$index."-sex\" src=\"$GM_IMAGE_DIR/";

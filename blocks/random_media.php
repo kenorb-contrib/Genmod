@@ -57,30 +57,30 @@ function print_random_media($block = true, $config="", $side, $index) {
 		print " >";
 		$imgwidth = 300;
 		$imgheight = 300;
-		if (preg_match("'://'", $value->m_file)) {
-			if (in_array(strtolower($value->m_ext), $MEDIATYPE)){
+		if (preg_match("'://'", $value->filename)) {
+			if (in_array(strtolower($value->extension), $MEDIATYPE)){
 			   $imgwidth = 400;
 			   $imgheight = 500;
 			} 
 		}
-		else if ((preg_match("'://'", $MEDIA_DIRECTORY)>0)||$value->m_fileobj->f_file_exists) {
-			   $imgwidth = $value->m_fileobj->f_width+50;
-			   $imgheight = $value->m_fileobj->f_height+50;
+		else if ((preg_match("'://'", $MEDIA_DIRECTORY)>0)||$value->fileobj->f_file_exists) {
+			   $imgwidth = $value->fileobj->f_width+50;
+			   $imgheight = $value->fileobj->f_height+50;
 		}
-		if ($USE_GREYBOX && $value->m_fileobj->f_is_image) {
-			print "<a href=\"".FilenameEncode($value->m_fileobj->f_main_file)."\" title=\"".$value->m_titl."\" rel=\"gb_imageset[random]\">";
+		if ($USE_GREYBOX && $value->fileobj->f_is_image) {
+			print "<a href=\"".FilenameEncode($value->fileobj->f_main_file)."\" title=\"".$value->title."\" rel=\"gb_imageset[random]\">";
 		}
-		else print "<a href=\"#\" onclick=\"return openImage('".$value->m_fileobj->f_main_file."', '".$imgwidth."', '".$imgheight."', '".$value->m_fileobj->f_is_image."');\">";
+		else print "<a href=\"#\" onclick=\"return openImage('".$value->fileobj->f_main_file."', '".$imgwidth."', '".$imgheight."', '".$value->fileobj->f_is_image."');\">";
 		if ($block) {
-			print "<img src=\"".$value->m_fileobj->f_thumb_file."\" border=\"0\" class=\"thumbnail\" alt=\"\" ";
-			if ($value->m_fileobj->f_twidth > 175) print "width=\"175\" ";
+			print "<img src=\"".$value->fileobj->f_thumb_file."\" border=\"0\" class=\"thumbnail\" alt=\"\" ";
+			if ($value->fileobj->f_twidth > 175) print "width=\"175\" ";
 			print "/>";
 		}
 		else {
-			if ($value->m_fileobj->f_file_exists || strstr($value->m_file, "://")) {
+			if ($value->fileobj->f_file_exists || strstr($value->filename, "://")) {
 				print "<img src=\"".$value->m_main_file."\" border=\"0\" class=\"thumbnail\" alt=\"\" ";
 				if (!stristr($value->m_main_file, "://")) {
-					if ($value->m_fileobj->f_width > 175) print "width=\"175\" ";
+					if ($value->fileobj->f_width > 175) print "width=\"175\" ";
 				}
 				else print "width=\"175\" ";
 				print "/>";
@@ -88,9 +88,9 @@ function print_random_media($block = true, $config="", $side, $index) {
 		}
 		print "</a>\n";
 		if ($block) print "<br />";
-		if ($value->m_titl!=$value->m_file) {
-		    print "<a href=\"mediadetail.php?mid=".$value->m_media."&amp;ged=".$GEDCOM."\">";
-		    if (strlen($value->m_titl) > 0) print "<b>".PrintReady($value->m_titl)."</b><br />";
+		if ($value->title!=$value->filename) {
+		    print "<a href=\"mediadetail.php?mid=".$value->xref."&amp;ged=".$GEDCOM."\">";
+		    if (strlen($value->title) > 0) print "<b>".PrintReady($value->title)."</b><br />";
 			print "</a>";
 		}
 		$links = $value->links;

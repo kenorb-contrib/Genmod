@@ -30,16 +30,27 @@ if (stristr($_SERVER["SCRIPT_NAME"],basename(__FILE__))) {
 
 class MysqlDb {
 	
+	public $classname = "MysqlDb";
+	
+	public $connected = null;
+	public $connection = null;
+	
+	public $sqlerror = false;
+	public $sqlerrordesc = null;
+	public $sqlerrorno = null;
+	public $sqlquery = null;
+	public $sqlfile	= null;
+	public $sqlline	= null;
+	
 	public function __construct() {
-		$this->sqlerror = false;
 	}
 	
-	function MakeConnection() {
+	public function MakeConnection() {
 		global $DBUSER, $DBPASS, $DBNAME, $DBHOST, $DBPERSIST;
 		
 		if (empty($DBUSER) || empty($DBPASS) || empty($DBNAME) || empty($DBHOST)) return false;
 		
-		if (!isset($this->connected)) {
+		if (is_null($this->connected)) {
 			if ($DBPERSIST) {
 				$this->connection = mysql_pconnect($DBHOST,$DBUSER,$DBPASS);
 				if (mysql_select_db($DBNAME)) {
@@ -60,7 +71,7 @@ class MysqlDb {
 	/**
 	 * @todo Add error handler
 	**/
-	function Query($sql, $noreport) {
+	public function Query($sql, $noreport) {
 		global $TOTAL_QUERIES, $debugcollector, $QUERY_EXECTIME;
 		
 		if (isset($debugcollector->show)) $debugcollector->OutputCollector($sql, "query");
@@ -85,11 +96,11 @@ class MysqlDb {
 		return $res;
 	}
 	
-	function EscapeQuery($text) {
+	public function EscapeQuery($text) {
 		return mysql_real_escape_string($text);
 	}
 	
-	function HandleError($sql) {
+	public function HandleError($sql) {
 		$this->sqlerror = true;
 		$this->sqlerrordesc = mysql_error();
 		$this->sqlerrorno = mysql_errno();
@@ -104,8 +115,11 @@ class MysqlDb {
 }
 
 class Result {
+	
+	public $classname = "Result";
+	public $result = null;
 		
-	function NumRows() {
+	public function NumRows() {
 		$rows = @mysql_num_rows($this->result);
 		//if ($rows === null) {
 		//    return $this->mysqlRaiseError();
@@ -113,26 +127,26 @@ class Result {
 		return $rows;
 	}
 	
-	function FetchAssoc() {
+	public function FetchAssoc() {
 		$rows = @mysql_fetch_assoc($this->result);
 		return $rows;
 	}
 	
-	function FreeResult() {
+	public function FreeResult() {
 		@mysql_free_result($this->result);
 	}
 	
-	function FetchRow() {
+	public function FetchRow() {
 		$rows = @mysql_fetch_row($this->result);
 		return $rows;
 	}
 	
-	function InsertID() {
+	public function InsertID() {
 		$rows = @mysql_insert_id($this->result);
 		return $rows;
 	}
 	
-	function AffectedRows() {
+	public function AffectedRows() {
 		$rows = @mysql_affected_rows($this->result);
 		return $rows;
 	}

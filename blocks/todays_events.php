@@ -114,7 +114,7 @@ function print_todays_events($block=true, $config="", $side, $index) {
 							if ($NAME_REVERSE) $name = str_replace(",", "", $factarray[4]);
 							else $name = $factarray[4];
 							print "<a href=\"individual.php?pid=$gid&amp;ged=".$GEDCOM."\"><b>";
-							if (HasChinese($name)) print PrintReady($name." (".GetSortableAddName($gid, false).")");
+							if (HasChinese($name)) print PrintReady($name." (".GetSortableAddName($gid, "", false).")");
 							else print PrintReady($name);
 							print "</b>";
 							print "<img id=\"box-".$gid."-".$key."-sex\" src=\"$GM_IMAGE_DIR/";

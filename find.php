@@ -593,12 +593,12 @@ if ($action=="filter") {
 		if (count($fmedialist->medialist > 0)) {
 			foreach ($fmedialist->medialist as $key => $media) {
 				print "\n\t\t<tr><td class=\"shade1 wrap $TEXT_DIRECTION\">";
-				if (!empty($media->m_fileobj->f_thumb_file)) {
-					if ($USE_GREYBOX && $media->m_fileobj->f_is_image) print "<a href=\"".FilenameEncode($media->m_fileobj->f_file)."\" title=\"".$media->m_titl."\" rel=\"gb_imageset[]\">";
-					else print "<a href=\"#\" onclick=\"return openImage('".$media->m_fileobj->f_main_file."','".($media->m_fileobj->f_width+50)."','".($media->m_fileobj->f_height+50)."', '".$media->m_fileobj->f_is_image."');\">";
-					print "<img src=\"".FilenameEncode($media->m_fileobj->f_thumb_file)."\" border=\"0\" width=\"50\" align=\"left\" ></a>\n";
+				if (!empty($media->fileobj->f_thumb_file)) {
+					if ($USE_GREYBOX && $media->fileobj->f_is_image) print "<a href=\"".FilenameEncode($media->fileobj->f_file)."\" title=\"".$media->title."\" rel=\"gb_imageset[]\">";
+					else print "<a href=\"#\" onclick=\"return openImage('".$media->fileobj->f_main_file."','".($media->fileobj->f_width+50)."','".($media->fileobj->f_height+50)."', '".$media->fileobj->f_is_image."');\">";
+					print "<img src=\"".FilenameEncode($media->fileobj->f_thumb_file)."\" border=\"0\" width=\"50\" align=\"left\" ></a>\n";
 				}
-				print "&nbsp;<a href=\"#\" onclick=\"pasteid('".$media->m_media."');\">".PrintReady($media->m_titl)."</a>";
+				print "&nbsp;<a href=\"#\" onclick=\"pasteid('".$media-xref."');\">".PrintReady($media->title)."</a>";
 				print "\n\t\t</td></tr>";
 			}
 		}
@@ -715,7 +715,7 @@ if ($action=="filter") {
 				SwitchGedcom($note->gedcomid);
 				if (DisplayDetailsByID($key, "NOTE", 1, true)) {
 					print "<li>";
-				    print "<a href=\"#\" onclick=\"sndReq(document.getElementById('dummy'), 'lastused', 'type', 'NOTE', 'id', '".JoinKey($note->GetXref(), $GEDCOMID)."'); pasteid('".$note->GetXref()."'); return false;\"><span class=\"list_item\">".PrintReady($note->GetTitle()." (".$note->GetXref().")")."</span></a>\n";
+				    print "<a href=\"#\" onclick=\"sndReq(document.getElementById('dummy'), 'lastused', 'type', 'NOTE', 'id', '".JoinKey($note->xref, $GEDCOMID)."'); pasteid('".$note->GetXref()."'); return false;\"><span class=\"list_item\">".PrintReady($note->GetTitle()." (".$note->GetXref().")")."</span></a>\n";
 				    print "</li>\n";
 			    }
 			    else $ctn--;

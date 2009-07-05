@@ -31,7 +31,6 @@ if ($DEBUG) {
 	$debugcollector->show = true;
 }
  
-
 if (strstr($_SERVER["SCRIPT_NAME"],"session")) {
 //	print "Now, why would you want to do that.  You're not hacking are you?";
 //	exit;
@@ -269,7 +268,7 @@ foreach($CONFIG_VARS as $indexval => $VAR) {
 			require_once("includes/functions/functions_authentication.php");      // -- load the authentication system
 			// NOTE: Setup the database connection, needed for logging
 			include("db_layer.php");
-			$DBLAYER = New DbLayer();
+			$DBCONN = New DbLayer();
 			WriteToLog("Session-> Config variable override detected. Possible hacking attempt. Script terminated.", "W", "S");
 			HandleIntrusion("Session-> Config variable override detected. Possible hacking attempt. Script terminated.\n");
 		}
@@ -332,7 +331,7 @@ if (phpversion() > '4.2.2') {
 				require_once("includes/functions/functions_authentication.php");      // -- load the authentication system
 				// NOTE: Setup the database connection, needed for logging
 				include("db_layer.php");
-				$DBLAYER = New DbLayer();
+				$DBCONN = New DbLayer();
 				WriteToLog("Session-> Possible SQL injection detected: $key=>$value. <b>$imatch[0]</b> Script terminated.", "W", "S");
 				HandleIntrusion("Session-> Possible SQL injection detected: $key=>$value.  <b>$imatch[0]</b> Script terminated.");
 				exit;
@@ -347,7 +346,7 @@ if (phpversion() > '4.2.2') {
 						require_once("includes/functions/functions_authentication.php");      // -- load the authentication system
 						// NOTE: Setup the database connection
 						include("db_layer.php");
-						$DBLAYER = New DbLayer();
+						$DBCONN = New DbLayer();
 						WriteToLog("Session-> Possible SQL injection detected: $key=>$val <b>$imatch[0]</b>.  Script terminated.", "W", "S");
 						HandleIntrusion("Session-> Possible SQL injection detected: $key=>$val <b>$imatch[0]</b>.  Script terminated.");
 						exit;
@@ -361,8 +360,8 @@ if (phpversion() > '4.2.2') {
 }
 
 // NOTE: Setup the database connection
-include("db_layer.php");
-$DBLAYER = New DbLayer();
+//include("db_layer.php");
+$DBCONN = New DbLayer();
 
 $SystemConfig = new SystemConfig();
 if (!isset($ALLOW_REMEMBER_ME)) $ALLOW_REMEMBER_ME = true;
@@ -378,7 +377,7 @@ CheckLockout();
 // -- Read the GEDCOMS array
 $GEDCOMS = array();
 $DEFAULT_GEDCOMID = "";
-if ($CONFIGURED) if ($DBLAYER->connected) ReadGedcoms();
+if ($CONFIGURED) if ($DBCONN->connected) ReadGedcoms();
 else $GEDCOMS = array();
 
 if (empty($_REQUEST["gedcomid"])) {
@@ -440,7 +439,7 @@ $without_close = true;
 
 require_once($GM_BASE_DIRECTORY."config_gedcom.php");
 $GedcomConfig = new GedcomConfig();
-if ($CONFIGURED) if ($DBLAYER->connected) $GedcomConfig->ReadGedcomConfig(get_gedcom_from_id($GEDCOMID));
+if ($CONFIGURED) if ($DBCONN->connected) $GedcomConfig->ReadGedcomConfig(get_gedcom_from_id($GEDCOMID));
 require_once($GM_BASE_DIRECTORY."includes/functions/functions_name.php");
 require_once($GM_BASE_DIRECTORY."includes/functions/functions_authentication.php");      // -- load the authentication system
 require_once($GM_BASE_DIRECTORY."includes/functions/functions_search.php");
@@ -627,13 +626,13 @@ if ($Users->userCanEdit($gm_username)) {
 	if (!isset($show_changes)) {
 		if (isset($_SESSION["show_changes"])) $show_changes = $_SESSION["show_changes"];
 		else {
-			$_SESSION["show_changes"] = "yes";
-			$show_changes = "yes";
+			$_SESSION["show_changes"] = true;
+			$show_changes = true;
 		}
 	}
 	else $_SESSION["show_changes"] = $show_changes;
 }
-else $show_changes = "no";
+else $show_changes = false;
 
 // NOTE: Load English as the default language
 LoadEnglish(false, false, true);
@@ -707,7 +706,7 @@ if (isset($SHOW_CONTEXT_HELP) && $show_context_help==='no') $_SESSION["show_cont
 if (!isset($USE_THUMBS_MAIN)) $USE_THUMBS_MAIN = false;
 
 if ((strstr($SCRIPT_NAME, "editconfig.php")===false) &&(strstr($SCRIPT_NAME, "editconfig_help.php")===false)) {
-	if ((!$DBLAYER->connected)||(!$Users->AdminUserExists())) {
+	if ((!$DBCONN->connected)||(!$Users->AdminUserExists())) {
 		header("Location: editconfig.php");
 		exit;
 	}
@@ -843,7 +842,8 @@ else $USE_GREYBOX = false;
 // Define the function to autoload the classes
 function __autoload($classname) {
 	global $GM_BASE_DIRECTORY;
-	if (stristr($classname, "controller")) require_once($GM_BASE_DIRECTORY."includes/controllers/".str_ireplace("controller", "", $classname)."_ctrl.php");
-	else require_once($GM_BASE_DIRECTORY."includes/classes/".$classname."_class.php");
+	
+	if (stristr($classname, "controller")) require_once($GM_BASE_DIRECTORY.strtolower("includes/controllers/".str_ireplace("controller", "", $classname)."_ctrl.php"));
+	else require_once($GM_BASE_DIRECTORY.strtolower("includes/classes/".$classname."_class.php"));
 }
 ?>

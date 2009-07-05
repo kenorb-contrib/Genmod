@@ -433,7 +433,7 @@ function GetSourceDescriptor($sid, $gedrec="") {
 
 	if (empty($gedrec)) {
 		$gedrec = FindSourceRecord($sid);
-		if ((!isset($show_changes) || $show_changes != "no") && GetChangeData(true, $sid, true)) {
+		if ($show_changes && GetChangeData(true, $sid, true)) {
 			$rec = GetChangeData(false, $sid, true, "gedlines");
 			$gedrec = $rec[$GEDCOM][$sid];
 		}
@@ -467,7 +467,7 @@ function GetRepoDescriptor($rid) {
 	if ($rid=="") return false;
 
 	$gedrec = FindRepoRecord($rid);
-	if ((!isset($show_changes) || $show_changes != "no") && GetChangeData(true, $rid, true)) {
+	if ($show_changes && GetChangeData(true, $rid, true)) {
 		$rec = GetChangeData(false, $rid, true, "gedlines");
 		$gedrec = $rec[$GEDCOM][$rid];
 	}
@@ -494,7 +494,7 @@ function GetAddSourceDescriptor($sid) {
 	if ($sid=="") return false;
 
 	$gedrec = FindSourceRecord($sid);
-	if ((!isset($show_changes) || $show_changes != "no") && GetChangeData(true, $sid, true)) {
+	if ($show_changes && GetChangeData(true, $sid, true)) {
 		$rec = GetChangeData(false, $sid, true, "gedlines");
 		$gedrec = $rec[$GEDCOM][$sid];
 	}
@@ -526,7 +526,7 @@ function GetAddRepoDescriptor($rid) {
 	if ($rid=="") return false;
 
 	$gedrec = FindRepoRecord($rid);
-	if ((!isset($show_changes) || $show_changes != "no") && GetChangeData(true, $rid, true)) {
+	if ($show_changes && GetChangeData(true, $rid, true)) {
 		$rec = GetChangeData(false, $rid, true, "gedlines");
 		$gedrec = $rec[$GEDCOM][$rid];
 	}
@@ -584,7 +584,7 @@ function GetFamilyAddDescriptor($fid, $rev = false, $famrec="", $changes = false
 	
 	if ($parents["HUSB"]) {
 		if (showLivingNameById($parents["HUSB"]))
-			$hname = GetSortableAddName($parents["HUSB"], $rev, $changes);
+			$hname = GetSortableAddName($parents["HUSB"], "", $rev, $changes);
 		else $hname = $gm_lang["private"];
 	}
 	else {
@@ -593,7 +593,7 @@ function GetFamilyAddDescriptor($fid, $rev = false, $famrec="", $changes = false
 	}
 	if ($parents["WIFE"]) {
 		if (showLivingNameById($parents["WIFE"]))
-			$wname = GetSortableAddName($parents["WIFE"], $rev, $changes);
+			$wname = GetSortableAddName($parents["WIFE"], "", $rev, $changes);
 		else $wname = $gm_lang["private"];
 	}
 	else {
@@ -619,7 +619,7 @@ function GetMediaDescriptor($mid, $gedrec="") {
 
 	if (empty($gedrec)) {
 		$gedrec = FindMediaRecord($mid);
-		if ((!isset($show_changes) || $show_changes != "no") && GetChangeData(true, $mid, true)) {
+		if ($show_changes && GetChangeData(true, $mid, true)) {
 			$rec = GetChangeData(false, $mid, true, "gedlines");
 			$gedrec = $rec[$GEDCOM][$mid];
 		}
@@ -691,12 +691,12 @@ function GetAddPersonNameInRecord($name_record, $keep_slash=false, $import=false
 }
 
 // -- find and return a given individual's second name in sort format: familyname, firstname
-function GetSortableAddName($pid, $rev = false, $changes = false) {
+function GetSortableAddName($pid, $record="", $rev = false, $changes = false) {
 	global $NAME_REVERSE;
 	global $NAME_FROM_GEDCOM, $GEDCOM;
 
 	//-- get the name from the indexes
-	$record = FindPersonRecord($pid);
+	if (empty($record)) $record = FindPersonRecord($pid);
 	if ($changes) {
 		if (GetChangeData(true, $pid, true, "", "")) {
 			$rec = GetChangeData(false, $pid, true, "", "");
@@ -749,6 +749,7 @@ function GetSortableAddName($pid, $rev = false, $changes = false) {
  * @return string	The updated name
  */
 function StripPrefix($lastname){
+//	if (is_object($lastname)) print $pipo;
 	$name = preg_replace(array("/ [jJsS][rR]\.?,/", "/ I+,/", "/^[a-z. ]*/"), array(",",",",""), $lastname);
 	$name = trim($name);
 	return $name;

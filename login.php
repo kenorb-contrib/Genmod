@@ -76,6 +76,8 @@ if ($action=="login") {
 	else $message = $gm_lang["no_login"];
 }
 else {
+	// Check the DB layout
+	$DBCONN->CheckDBLayout();
 	$tSERVER_URL = preg_replace(array("'https?://'", "'www.'", "'/$'"), array("","",""), $SERVER_URL);
 	$tLOGIN_URL = preg_replace(array("'https?://'", "'www.'", "'/$'"), array("","",""), $LOGIN_URL);
 	if (empty($url)) {
