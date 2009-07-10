@@ -203,7 +203,7 @@ class IndividualController extends DetailController {
 		global $SHOW_HIGHLIGHT_IMAGES, $USE_THUMBS_MAIN, $MEDIA_DIRECTORY;
 
 		if ($this->indi->disp && $SHOW_HIGHLIGHT_IMAGES && ShowFact("OBJE", $this->pid, "OBJE")) {
-			$firstmediarec = $this->indi->findHighlightedMedia();
+			$firstmediarec = $this->indi->highlightedimage;
 			if ($firstmediarec) {
 				// new from here
 				$media = new MediaItem($firstmediarec["id"]);
@@ -338,7 +338,7 @@ class IndividualController extends DetailController {
 				}
 				
 				// Reorder_media. Only show if #media > 1
-				if ($this->indi->media_count > 1) {
+				if ($this->indi->mediafacts_count > 1) {
 					$submenu = new Menu($gm_lang['reorder_media']);
 					$submenu->addLink("reorder_media('".$this->pid."', 'reorder_media');");
 					$menu->addSubmenu($submenu);
@@ -581,6 +581,49 @@ class IndividualController extends DetailController {
 				break;
 		}
 		return "person_box".$isf;
+	}
+	
+	function PrintToggleJS1() {
+		?>
+		<script type="text/javascript">
+		<!--
+		// The function below does not go well with validation.
+		// The option to use getElementsByName is used in connection with code from
+		// the functions_print.php file.
+		function togglerow(label) {
+			ebn = document.getElementsByName(label);
+			if (ebn.length) disp = ebn[0].style.display;
+			else disp="";
+			if (disp=="none") {
+				disp="table-row";
+				if (document.all) disp="inline"; // IE
+				document.getElementById('rela_plus').style.display="none";
+				document.getElementById('rela_minus').style.display="inline";
+			}
+			else {
+				disp="none";
+				document.getElementById('rela_plus').style.display="inline";
+				document.getElementById('rela_minus').style.display="none";
+			}
+			for (i=0; i<ebn.length; i++) ebn[i].style.display=disp;
+		}
+		//-->
+		</script>
+		<?php	
+	}
+	
+	function PrintToggleJS2() {
+		global $EXPAND_RELATIVES_EVENTS;
+		?>
+		<script language="JavaScript" type="text/javascript">
+		<!--
+		// hide button if list is empty
+		ebn = document.getElementsByName('row_rela');
+		if (ebn.length==0) document.getElementById('row_top').style.display="none";
+		<?php if (!$EXPAND_RELATIVES_EVENTS) print "togglerow('row_rela');"?>
+		//-->
+		</script>
+		<?php
 	}
 }
 ?>

@@ -36,7 +36,7 @@ class NoteController extends DetailController {
 	public $classname = "NoteController";
 	
 	public $note = null;
-	
+	public $notelist = null;
 	private $display_other_menu = false;
 	private $pagetitle = null;
 	
@@ -265,10 +265,10 @@ class NoteController extends DetailController {
 	}
 	
 	private function NotelistSort() {
-		uasort($this->notelist, array($this, "NotelistObjSort"));
+		uasort($this->notelist, array($this, "TitleObjSort"));
 	}
 	
-	private function NotelistObjSort($a, $b) {
+	private function TitleObjSort($a, $b) {
 		if ($a->title != $b->title) return StringSort(ltrim($a->title), ltrim($b->title));
 		else {
 			$anum = preg_replace("/\D*/", "", $a->xref);

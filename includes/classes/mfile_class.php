@@ -30,27 +30,35 @@ if (strstr($_SERVER["SCRIPT_NAME"],basename(__FILE__))) {
  
 class MFile {
 	
-	var $classname = "MFile";
-	var $f_thumb_file = "";
-	var $f_mimetype = "";
-	var $f_mimedescr = "";
-	var $f_is_image = false;
-	var $f_width = 0;
-	var $f_height = 0;
-	var $f_file_size = 0;
-	var $f_twidth = 0;
-	var $f_theight = 0;
-	var $f_tfile_size = 0;
-	var $f_file_exists = false;
-	var $f_link = "";
-	var $f_pastelink = "";
-	var $f_file = "";
-	var $f_main_file = "";
+	public $classname = "MFile";	// Name of this class
 	
-	public function __construct($file) {
-		global $MEDIA_IN_DB, $TBLPREFIX, $MediaFS, $SERVER_URL, $INDEX_DIRECTORY;
+	private $f_id = null;				// ID of the file in the database (if media in DB) - class internal
+	private $f_file = null;				// Complete path and filename/ext including the media directory OR URL to the external file
+	private $f_fname = null;			// filename and extension of the file (not set if external file) - class internal
+	private $f_path = null;				// Psysical pathname to the file (including the media directory) (not set if external file) - class internal
+	private $f_ext = null;				// Extension of the file
+	
+	private $f_main_file = null;		// Physical location (including mediadir) of the file, or showblob with correct params (if media in DB) OR URL to the external file
+	private $f_width = 0;				// Width of the file (not set if external file)
+	private $f_height = 0;				// Height of the file (not set if external file)
+	private $f_file_size = 0;			// Size of the file in bytes (not set if external file)
+	
+	private $f_thumb_file = null;		// Physical location (including mediadir) of the thumnailfile, or showblob with correct params (if media in DB)
+	private $f_twidth = 0;				// Width of the thumbfile
+	private $f_theight = 0;				// Height of the thumbfile
+	private $f_tfile_size = 0;			// Size of the thumbfile in bytes - class internal
+	
+	private $f_mimetype = null;			// Mimetype of the file (not set if external file)
+	private $f_mimedescr = null;		// Descriptive mimetype of the file (not set if external file)
+	private $f_is_image = false;		// Wether the file is an image and can be displayed
+	private $f_file_exists = false;		// Wether the file exists or not
+	private $f_link = null;				// URL of external file (not set for internal file)
+	private $f_pastelink = null;		// path/file for pasting the filename. Without the media directory! OR URL to external file
+
 		
-		//print "creating object for: $file<br />";
+	public function __construct($file) {
+		global $MEDIA_IN_DB, $TBLPREFIX, $MediaFS, $INDEX_DIRECTORY;
+		
 		if ($MEDIA_IN_DB) {
 			if (!is_array($file)) {
 				if (stristr($file, "://")) {
@@ -70,7 +78,7 @@ class MFile {
 				// If link, we try to create a thumbnail and try again.
 				if ($res->NumRows() == 0) {
 					if (isset($linkfile)) {
-						$thumb = $MediaFS->ThumbNailFile($linkfile, $MEDIA_IN_DB);
+						$thumb = $MediaFS->ThumbNailFile($linkfile);
 					}
 					if (!empty($thumb)) {
 						$sql = "SELECT * FROM ".$TBLPREFIX."media_files WHERE mf_file='".$file."'";
@@ -125,9 +133,9 @@ class MFile {
 						}
 						$res->FreeResult();
 					}
-					else $this->f_thumb_file = $MediaFS->ThumbNailFile($this->f_file, $MEDIA_IN_DB);
+					else $this->f_thumb_file = $MediaFS->ThumbNailFile($this->f_file);
 				}
-				else $this->f_thumb_file = $MediaFS->ThumbNailFile($this->f_file, $MEDIA_IN_DB);
+				else $this->f_thumb_file = $MediaFS->ThumbNailFile($this->f_file);
 				//print $this->f_thumb_file;
 				$this->f_link = $file["mf_link"];
 				if (!empty($this->f_link)) $this->f_file = $this->f_link;
@@ -155,7 +163,7 @@ class MFile {
 				}
 				$this->f_file_exists = true;
 //				if (empty($this->f_thumb_file)) {
-//					$this->f_thumb_file = $MediaFS->ThumbNailFile($this->f_file, $MEDIA_IN_DB);
+//					$this->f_thumb_file = $MediaFS->ThumbNailFile($this->f_file);
 //					if (!empty($this->f_thumb_file)) {
 //						$this->f_is_image=true;
 //						$this->f_file_exists = true;
@@ -170,17 +178,19 @@ class MFile {
 			$this->f_main_file = $file;
 			// check this!
 			$this->f_pastelink = $MediaFS->CheckMediaDepth($this->f_file);
-			$this->f_thumb_file = $MediaFS->ThumbnailFile($this->f_file, $MEDIA_IN_DB);
+			$this->f_thumb_file = $MediaFS->ThumbnailFile($this->f_file);
+			
 			$this->f_file_exists = true;
 
 			// Don't get the details of the remote file everytime, SLOW!
 			$mimetypedetect = New MimeTypeDetect;
 			if (stristr($file, "://")) {
-				$this->f_file_size = filesize($this->f_thumb_file);
+				$this->f_link = $file;
+				$this->f_tfile_size = filesize($this->f_thumb_file);
 				$mimetype = $mimetypedetect->FindMimeType($this->f_thumb_file);
 				if ($file_details = getimagesize($this->f_thumb_file)) {
-					$this->f_width = $file_details[0];
-					$this->f_height = $file_details[1];
+					$this->f_twidth = $file_details[0];
+					$this->f_theight = $file_details[1];
 					$this->f_is_image = true;
 				}
 				else $this->f_is_image = false;
@@ -194,6 +204,14 @@ class MFile {
 					$this->f_is_image = true;
 				}
 				else $this->f_is_image = false;
+				
+				if ($this->f_is_image) {
+					$this->f_tfile_size = filesize($this->f_thumb_file);
+					if ($file_details = @getimagesize($this->f_thumb_file)) {
+						$this->f_twidth = $file_details[0];
+						$this->f_theight = $file_details[1];
+					}
+				}
 			}
 			$this->f_mimetype = $mimetype["mime_type"];
 			$this->f_mimedescr = $mimetype["description"];
@@ -203,6 +221,63 @@ class MFile {
 			if ($et>0) $this->f_ext = substr(trim($ematch[1]),1);
 		}
 		else $this->f_file_exists = false;
+		
+//		print "<pre>";
+//		print_r($this);
+//		print "</pre>";
+	}
+	
+	public function __get($property) {
+		switch ($property) {
+			case "f_file":
+				return $this->f_file;
+				break;
+			case "f_ext":
+				return $this->f_ext;
+				break;
+			case "f_main_file":
+				return $this->f_main_file;
+				break;
+			case "f_width":
+				return $this->f_width;
+				break;
+			case "f_height":
+				return $this->f_height;
+				break;
+			case "f_file_size":
+				return $this->f_file_size;
+				break;
+			case "f_thumb_file":
+				return $this->f_thumb_file;
+				break;
+			case "f_twidth":
+				return $this->f_twidth;
+				break;
+			case "f_theight":
+				return $this->f_theight;
+				break;
+			case "f_mimetype":
+				return $this->f_mimetype;
+				break;
+			case "f_mimedescr":
+				return $this->f_mimedescr;
+				break;
+			case "f_is_image":
+				return $this->f_is_image;
+				break;
+			case "f_file_exists":
+				return $this->f_thumb_file;
+				break;
+			case "f_link":
+				return $this->f_link;
+				break;
+			case "f_pastelink":
+				return $this->f_pastelink;
+				break;
+			default: 
+				print "Error getting ".$property."<br />";
+				break;
+		}
 	}
 }
 ?>

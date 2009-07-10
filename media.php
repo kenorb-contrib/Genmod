@@ -54,13 +54,13 @@ $AUTO_GENERATE_THUMBS = $autothumbs;
 print_header($gm_lang["manage_media"]." - ".$GEDCOMS[$GEDCOM]['title']);
 
 if ($action == "delete") {
-	$MediaFS->DeleteFile(basename($file), RelativePathFile($directory), $MEDIA_IN_DB);
+	$MediaFS->DeleteFile(basename($file), RelativePathFile($directory));
 }
 if ($disp1 == "block") {
-	$dirs = $MediaFS->GetMediaDirList($MEDIA_DIRECTORY, true, 1, false, true, $MEDIA_IN_DB);
+	$dirs = $MediaFS->GetMediaDirList($MEDIA_DIRECTORY, true, 1, false, true);
 //	if (!in_array($MEDIA_DIRECTORY, $dirs)) $dirs[] = $MEDIA_DIRECTORY;
 	sort($dirs);
-	$files = $MediaFS->GetMediaFileList($directory, $filter, $MEDIA_IN_DB);
+	$files = $MediaFS->GetMediaFileList($directory, $filter);
 	ksort($files);
 }
 
@@ -89,7 +89,7 @@ if ($action == "select_action") {
 			$delfile = "select".preg_replace(array("/\(/","/\)/","/\./","/-/","/ /","/\//","/\+/"), array("_","_","_","_","_","_","_"), $filename); 
 			if (isset($$delfile)) {
 				$changed = true;
-				$result = $MediaFS->DeleteFile(basename($filename), RelativePathFile($directory), $MEDIA_IN_DB);
+				$result = $MediaFS->DeleteFile(basename($filename), RelativePathFile($directory));
 				if(!$result) $errors = true;
 			}
 		}
@@ -101,7 +101,7 @@ if ($action == "select_action") {
 	}
 	if ($changed) {
 		// Get the file list again, it's changed by the mass update
-		$files = $MediaFS->GetMediaFileList($directory, $filter, $MEDIA_IN_DB);
+		$files = $MediaFS->GetMediaFileList($directory, $filter);
 		ksort($files);
 	}
 }
@@ -118,7 +118,7 @@ if ($action == "directory_action") {
 			else $error = $gm_lang["dirdel_fail"];
 		}
 	}
-	$dirs = $MediaFS->GetMediaDirList($MEDIA_DIRECTORY, true, 1, false, true, $MEDIA_IN_DB);
+	$dirs = $MediaFS->GetMediaDirList($MEDIA_DIRECTORY, true, 1, false, true);
 //	if (!in_array($MEDIA_DIRECTORY, $dirs)) $dirs[] = $MEDIA_DIRECTORY;
 	sort($dirs);
 }
@@ -234,9 +234,8 @@ if ($disp1 == "block") {
 					if ($directory == "external_links") print "</span>";
 				print "</a><br />";
 			
-			$canwrite = true;
 			foreach ($dirs as $key => $dir) {
-				if (!$MEDIA_IN_DB) $canwrite = DirIsWritable($dir);
+				$canwrite = $MediaFS->DirIsWritable($dir);
 				$indent = preg_match_all("/\//", RelativePathFile($dir), $m)*10;
 				$d = preg_split("/\//",$dir);
 				$d = array_reverse($d);
@@ -319,7 +318,7 @@ if ($disp1 == "block") {
 			print "<select name=\"move_folder\">";
 			$d = RelativePathFile($directory);
 			foreach($dirs as $key => $dir) {
-				if ($MEDIA_IN_DB || DirIsWritable($dir)) {
+				if ($MediaFS->DirIsWritable($dir)) {
 					if ($dir != $d) print "<option value=\"".urlencode($dir)."\">".$dir."</option>";
 				}
 			}
@@ -340,7 +339,7 @@ if ($disp1 == "block") {
 			print "<div style=\"overflow-x:scroll; width:99%; overflow: -moz-scrollbars-horizontal;\">";			
 			print "<select name=\"parent_dir\">";
 			foreach($dirs as $key => $dir) {
-				if ($MEDIA_IN_DB || DirIsWritable($dir)) {
+				if ($MediaFS->DirIsWritable($dir)) {
 					$d = RelativePathFile($dir);
 					$l = preg_split("/\//", $d);
 					if (count($l)-1 <= $MEDIA_DIRECTORY_LEVELS) print "<option value=\"".urlencode($dir)."\">".$dir."</option>";
@@ -354,7 +353,7 @@ if ($disp1 == "block") {
 			$sel .= "<select name=\"del_dir\">";
 			// To fix: only dirs with no subdirs
 			foreach($dirs as $key => $dir) {
-				if (($MEDIA_IN_DB || DirIsWritable($dir)) && $MediaFS->DeleteDir($dir, $MEDIA_IN_DB, true) && $dir != RelativePathFile($MEDIA_DIRECTORY)) {
+				if ($MediaFS->DirIsWritable($dir) && $MediaFS->DeleteDir($dir, $MEDIA_IN_DB, true) && $dir != RelativePathFile($MEDIA_DIRECTORY)) {
 					$sel .= "<option value=\"".urlencode($dir)."\">".$dir."</option>";
 					$csel++;
 				}

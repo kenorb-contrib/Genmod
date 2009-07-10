@@ -82,11 +82,11 @@ class Family extends GedcomRecord {
 			case "husb":
 				return $this->GetHusband();
 				break;
-			case "wife":
-				return $this->GetWife();
-				break;
 			case "husb_id":
 				return $this->GetHusbID();
+				break;
+			case "wife":
+				return $this->GetWife();
 				break;
 			case "wife_id":
 				return $this->GetWifeID();
@@ -136,7 +136,6 @@ class Family extends GedcomRecord {
 	 * @return array 	array of children Persons
 	 */
 	private function GetChildren() {
-		global $GEDCOM;
 
 		if (is_null($this->children)) {
 		
@@ -162,8 +161,11 @@ class Family extends GedcomRecord {
 	}
 	
 	private function GetFamilyAddDescriptor() {
+		global $DISPLAY_PINYIN, $LANGUAGE;
 		
-		if (is_null($this->sortable_addname)) $this->sortable_addname = GetFamilyAddDescriptor($this->xref, false, $this->gedrec);
+		if (is_null($this->sortable_addname)) {
+			$this->sortable_addname = GetFamilyAddDescriptor($this->xref, false, $this->gedrec);
+		}
 		return $this->sortable_addname;
 	}
 
@@ -172,8 +174,9 @@ class Family extends GedcomRecord {
 	 * @return string
 	 */
 	private function getHusbId() {
-		if (is_null($this->husb)) {
-			$this->getHusband();
+		
+		if (is_null($this->husb_id)) {
+			if (is_null($this->husb)) $this->getHusband();
 			if ($this->husb != "") $this->husb_id = $this->husb->xref;
 			else $this->husb_id = "";
 		}		
@@ -185,7 +188,6 @@ class Family extends GedcomRecord {
 	 * @return string
 	 */
 	private function getHusband() {
-		global $GEDCOM;
 		
 		if (is_null($this->husb)) {
 			if ($this->show_changes && $this->ThisChanged()) $gedrec = $this->GetChangedGedrec();
@@ -201,8 +203,9 @@ class Family extends GedcomRecord {
 	 * @return string
 	 */
 	private function getWifeId() {
-		if (is_null($this->wife)) {
-			$this->getWife();
+		
+		if (is_null($this->wife_id)) {
+			if (is_null($this->wife)) $this->getWife();
 			if ($this->wife != "") $this->wife_id = $this->wife->xref;
 			else $this->wife_id = "";
 		}		
@@ -210,7 +213,6 @@ class Family extends GedcomRecord {
 	}
 
 	private function getWife() {
-		global $GEDCOM;
 		
 		if (is_null($this->wife)) {
 			if ($this->show_changes && $this->ThisChanged()) $gedrec = $this->GetChangedGedrec();
@@ -274,15 +276,24 @@ class Family extends GedcomRecord {
 	/**
 	 * parse marriage record
 	 */
-	private function _parseMarriageRecord() {
+	private function parseMarriageRecord() {
 		
 		if ($this->show_changes && $this->ThisChanged()) $gedrec = $this->GetChangedGedRec();
 		else $gedrec = $this->gedrec;
 
-		$this->marr_rec = GetSubRecord(1, "1 MARR", $this->gedrec);
-		$this->marr_date = GetSubRecord(2, "2 DATE", $this->marr_rec);
-		$this->marr_type = GetSubRecord(2, "2 TYPE", $this->marr_rec);
-		$this->marr_plac = GetSubRecord(2, "2 PLAC", $this->marr_rec);
+		$subrecord = GetSubRecord(1, "1 MARR", $this->gedrec);
+		if (ShowFact("MARR", $this->xref, "FAM") && ShowFactDetails("MARR", $this->xref) && !FactViewRestricted($this->xref, $subrecord, 2)) {
+			$this->marr_rec = $subrecord;
+			$this->marr_date = GetSubRecord(2, "2 DATE", $this->marr_rec);
+			$this->marr_type = GetSubRecord(2, "2 TYPE", $this->marr_rec);
+			$this->marr_plac = GetSubRecord(2, "2 PLAC", $this->marr_rec);
+		}
+		else {
+			$this->marr_rec = "";
+			$this->marr_date = "";
+			$this->marr_type = "";
+			$this->marr_plac = "";
+		}
 	}
 	
 	/**
@@ -290,7 +301,8 @@ class Family extends GedcomRecord {
 	 * @return string
 	 */
 	private function getMarriageRecord() {
-		if (is_null($this->marr_rec)) $this->_parseMarriageRecord();
+		
+		if (is_null($this->marr_rec)) $this->parseMarriageRecord();
 		return $this->marr_rec;
 	}
 	
@@ -299,7 +311,8 @@ class Family extends GedcomRecord {
 	 * @return string
 	 */
 	private function getMarriageDate() {
-		if (is_null($this->marr_date)) $this->_parseMarriageRecord();
+		
+		if (is_null($this->marr_date)) $this->parseMarriageRecord();
 		return $this->marr_date;
 	}
 	
@@ -308,17 +321,41 @@ class Family extends GedcomRecord {
 	 * @return string
 	 */
 	private function getMarriageType() {
-		if (is_null($this->marr_type)) $this->_parseMarriageRecord();
+		
+		if (is_null($this->marr_type)) $this->parseMarriageRecord();
 		return $this->marr_type;
 	}
 	
 	/**
-	 * get the type for this marriage
+	 * get the place for this marriage
 	 * @return string
 	 */
 	private function getMarriagePlace() {
-		if (is_null($this->marr_plac)) $this->_parseMarriageRecord();
+		
+		if (is_null($this->marr_plac)) $this->parseMarriageRecord();
 		return $this->marr_plac;
+	}
+	
+	public function PrintListFamily() {
+		global $gm_lang;
+		
+		if (!$this->disp) return false;
+		
+		if (begRTLText($this->GetFamilyDescriptor())) print "\n\t\t\t<li class=\"rtl\" dir=\"rtl\">";
+		else print "\n\t\t\t<li class=\"ltr\" dir=\"ltr\">";
+		print "\n\t\t\t<a href=\"family.php?famid=".$this->xref."&amp;gedid=".$this->gedcomid."\" class=\"list_item\"><b>".$this->GetFamilyDescriptor();
+		if ($this->GetFamilyAddDescriptor() != "") print "&nbsp;(".$this->GetFamilyAddDescriptor().")";
+		print "</b>";
+		print $this->addxref;
+		if ($this->GetMarriageRecord() != "") {
+			print " -- <i>".$gm_lang["marriage"]." ";
+			print_fact_date($this->GetMarriageRecord());
+			print_fact_place($this->GetMarriageRecord());
+			print "</i>";
+		}
+		print "</a>\n";
+		print "</li>\n";
+		
 	}
 }
 ?>

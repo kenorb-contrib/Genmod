@@ -44,7 +44,7 @@ if (!isset($action)) $action = "backup";
 if (!isset($step)) $step = "1";
 
 if ($action == "backup") {
-	if ($MEDIA_IN_DB && (2 * $MediaFS->GetTotalMediaSize() >= disk_free_space($INDEX_DIRECTORY) || !DirIsWritable($MEDIA_DIRECTORY))) $nomedia = true;
+	if ($MEDIA_IN_DB && (2 * $MediaFS->GetTotalMediaSize() >= disk_free_space($INDEX_DIRECTORY) || !$MediaFS->DirIsWritable($MEDIA_DIRECTORY, false))) $nomedia = true;
 	else $nomedia = false;
 }
 

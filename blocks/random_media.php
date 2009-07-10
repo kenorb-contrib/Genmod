@@ -45,7 +45,7 @@ function print_random_media($block = true, $config="", $side, $index) {
 	$mediaobjs->RetrieveMedia($random,0,1); 
 	$ct = count($mediaobjs);
 	if ($mediaobjs->mediainlist > 0) {
-		$value = array_pop($mediaobjs->medialist);
+		$value = $mediaobjs->lastitem;
 		print "<div id=\"random_picture\" class=\"block\">\n";
 		print "<div class=\"blockhc ltr\">";
 		print_help_link("index_media_help", "qm", "random_picture");

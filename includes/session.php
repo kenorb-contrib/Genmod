@@ -291,6 +291,7 @@ require_once($GM_BASE_DIRECTORY."includes/functions/functions_language.php");
 require_once($GM_BASE_DIRECTORY."includes/functions/functions_db.php");
 // -- load print functions
 require_once($GM_BASE_DIRECTORY."includes/functions/functions_print.php");
+require_once($GM_BASE_DIRECTORY."includes/functions/functions_objprint.php");
 //-- load RTL functions
 require_once($GM_BASE_DIRECTORY."includes/functions/functions_rtl.php");
 //-- load date functions

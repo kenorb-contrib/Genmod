@@ -36,7 +36,7 @@ $filemenu = $menubar->GetFileMenu();
 $editmenu = $menubar->GetEditMenu();
 $viewmenu = $menubar->GetViewMenu();
 $chartmenu = $menubar->GetChartMenu();
-if (isset($note_controller) && $note_controller->classname == "NoteController") $notemenu = $menubar->GetThisNoteMenu($note_controller);
+if (isset($note_controller) && $note_controller->classname == "NoteController" && is_object($note_controller->note)) $notemenu = $menubar->GetThisNoteMenu($note_controller);
 else $notemenu = "";
 if (isset($controller) && $controller->classname == "IndividualController") $personmenu = $menubar->GetThisPersonMenu($controller);
 else $personmenu = "";

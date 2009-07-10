@@ -31,13 +31,13 @@ if (stristr($_SERVER["SCRIPT_NAME"],basename(__FILE__))) {
 class Source extends GedcomRecord {
 	
 	// General class information
-	public $classname = "Source";
-	public $datatype = "SOUR";
+	public $classname = "Source";	// Name of the class
+	public $datatype = "SOUR";		// Type of data collected here
 	
 	// Data
-	private $name = null;
-	private $descriptor = null;
-	private $adddescriptor = null;
+	private $name = null;			// Title of the source (both descriptors), privacy applied
+	private $descriptor = null;		// Main title of the source, privacy applied
+	private $adddescriptor = null;	// Additional title, privacy applied
 	
 	/**
 	 * Constructor for source object
@@ -106,14 +106,14 @@ class Source extends GedcomRecord {
 				if (!empty($gedrec)) {
 					$tt = preg_match("/1 TITL (.*)/", $gedrec, $smatch);
 					if ($tt>0) {
+						$subrec = GetSubRecord(1, "1 TITL", $gedrec);
 						if (!ShowFact("TITL", $this->xref, "SOUR")) {
 							$this->descriptor = $gm_lang["unknown"];
 						}
-						else if(!ShowFactDetails("TITL", $this->xref, "SOUR") || !$this->disp) {
+						else if(!ShowFactDetails("TITL", $this->xref, "SOUR") || FactViewRestricted($this->xref, $subrec, 2) || !$this->disp) {
 							$this->descriptor = $gm_lang["private"];
 						}
 						else {
-							$subrec = GetSubRecord(1, "1 TITL", $gedrec);
 							// This automatically handles CONC/CONT lines below the title record
 							$this->descriptor = GetGedcomValue("TITL", 1, $subrec);
 						}				
@@ -191,12 +191,12 @@ class Source extends GedcomRecord {
 			$indi["gedcom"] = $row["i_gedcom"];
 			$indi["isdead"] = $row["i_isdead"];
 			$indi["gedfile"] = $row["i_file"];
+			$indilist[$row["i_id"]] = $indi;
 			$person = null;
 			$person = new Person($row["i_id"], $row["i_gedcom"]);
 			if ($person->disp_name) {
-				$indi["names"] = $person->name_array;
+				$indilist[$row["i_id"]]["names"] = $person->name_array;
 				$this->indilist[$row["i_key"]] = $person;
-				$indilist[$row["i_id"]] = $indi;
 			}
 			else $this->indi_hide++;
 		}
@@ -221,11 +221,11 @@ class Source extends GedcomRecord {
 			$fam["gedfile"] = $row["f_file"];
 			$fam["HUSB"] = SplitKey($row["f_husb"], "id");
 			$fam["WIFE"] = SplitKey($row["f_wife"], "id");
+			$famlist[$row["f_id"]] = $fam;
 			$family = null;
 			$family = new Family($row["f_id"], $row["f_gedcom"]);
 			if ($family->disp) {
 				$this->famlist[$row["f_key"]] = $family;
-				$famlist[$row["f_id"]] = $fam;
 			}
 			else $this->fam_hide++;
 		}
@@ -252,7 +252,7 @@ class Source extends GedcomRecord {
 			if ($note->disp) $this->notelist[$row["o_key"]] = $note;
 			else $this->note_hide++;
 		}
-		uasort($this->notelist, "NotelistObjSort");
+		uasort($this->notelist, "TitleObjSort");
 		$this->note_count=count($this->notelist);
 		return $this->notelist;
 	}
@@ -275,7 +275,7 @@ class Source extends GedcomRecord {
 			if ($mediaitem->disp) $this->medialist[JoinKey($row["m_media"], $row["m_gedfile"])] = $mediaitem;
 			else $this->media_hide++;
 		}
-		uasort($this->medialist, "ItemObjSort");
+		uasort($this->medialist, "TitleObjSort");
 		$this->media_count=count($this->medialist);
 		return $this->medialist;
 	}

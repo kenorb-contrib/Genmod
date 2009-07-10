@@ -128,9 +128,9 @@ class GedcomRecord {
 		if ($GEDCOMID != $this->gedcomid) SwitchGedcom($this->gedcomid);
 		
 		$this->disp = displayDetailsByID($this->xref, $this->type, 1, true);
+		$this->disp_name = $this->disp;
 		
 		if (!$this->disp && $this->datatype == "INDI") $this->disp_name = ShowLivingNameByID($this->xref, "INDI");
-		else $this->disp_name = $this->disp;
 		
 		if ($this->disp && $ALLOW_EDIT_GEDCOM && $Users->userCanEdit($gm_username) && !FactEditRestricted($this->xref, $this->gedrec, 1)) $this->canedit = true;
 		else $this->canedit = false;
@@ -150,6 +150,9 @@ class GedcomRecord {
 				break;
 			case "disp":
 				return $this->disp;
+				break;
+			case "disp_name":
+				return $this->disp_name;
 				break;
 			case "isempty":
 				return $this->isempty;
@@ -366,6 +369,8 @@ class GedcomRecord {
 		if (!is_null($this->facts)) return $this->facts;
 		
 		$this->facts = array();
+		if (!$this->disp) return $this->facts;
+		
 		// Get the subrecords/facts. Don't apply privacy here, as it will disturb
 		// the fact numbering which is needed for editing (get the right fact number)
 		$allsubs = GetAllSubrecords($this->gedrec, $this->exclude_facts, false, false, false);

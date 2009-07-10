@@ -160,21 +160,6 @@ function FileIsWriteable($file) {
 	return($err_write);
 }
 
-// This functions checks if an existing directory is physically writeable
-// The standard PHP function only checks for the R/O attribute and doesn't
-// detect authorisation by ACL.
-function DirIsWritable($dir) {
-	
-	if (substr($dir,-1) !="/") $dir .="/";
-	$err_write = false;
-	$handle = @fopen($dir."foo.txt","w+");
-	if	($handle) {
-		$i = fclose($handle);
-		$err_write = true;
-		@unlink($dir."foo.txt");
-	}
-	return($err_write);
-}
 
 /**
  * GM Error Handling function
@@ -867,8 +852,8 @@ function CleanupTagsY($irec) {
  * @return array an object array with indexes "thumb" and "file" for thumbnail and filename
  */
 function FindHighlightedObject($pid, $indirec) {
-	global $MEDIA_DIRECTORY, $MEDIA_DIRECTORY_LEVELS, $GM_IMAGE_DIR, $GM_IMAGES, $MEDIA_EXTERNAL;
-	global $TBLPREFIX, $GEDCOMID, $MediaFS, $MEDIA_IN_DB;
+	global $MEDIA_DIRECTORY, $GM_IMAGE_DIR, $GM_IMAGES, $MEDIA_EXTERNAL;
+	global $TBLPREFIX, $GEDCOMID, $MediaFS;
 	
 	if (!showFactDetails("OBJE", $pid)) return false;
 	$object = array();
@@ -920,7 +905,7 @@ function FindHighlightedObject($pid, $indirec) {
 		 
 	$object["use_thum"] = $thum;
 	$object["file"] = $MediaFS->CheckMediaDepth($primfile);
-	$object["thumb"] = $MediaFS->ThumbnailFile($MEDIA_DIRECTORY.RelativePathFile($object["file"]), $MEDIA_IN_DB);
+	$object["thumb"] = $MediaFS->ThumbnailFile($MEDIA_DIRECTORY.RelativePathFile($object["file"]));
 	$object["id"] = $id;
 	return $object;
 }

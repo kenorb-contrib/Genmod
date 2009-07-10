@@ -1250,7 +1250,7 @@ function print_footer() {
 // -- print the html to close the page
 function print_simple_footer() {
 	global $gm_lang, $start_time, $buildindex;
-	global $SHOW_STATS, $CONFIG_PARMS, $MEDIA_IN_DB;
+	global $SHOW_STATS, $CONFIG_PARMS, $MediaFS;
 	global $SCRIPT_NAME, $QUERY_STRING, $debugcollector;
 	
 	if (empty($SCRIPT_NAME)) {
@@ -1261,7 +1261,7 @@ function print_simple_footer() {
 	print_contact_links();
 	print "<br />Running <a href=\"http://www.genmod.net/\" target=\"_blank\">Genmod";
 	if (count($CONFIG_PARMS) >1) print " Enterprise";
-	if ($MEDIA_IN_DB) print " VFS";
+	print $MediaFS->GetStorageType();
 	print "</a> Version ".GM_VERSION." ".GM_VERSION_RELEASE;
 	if ($SHOW_STATS) print_execution_stats();
 	print "</div>";
@@ -1521,7 +1521,7 @@ function print_fact($factrec, $pid, $fact, $count=1, $indirec=false, $styleadd="
 	global $CONTACT_EMAIL, $view, $FACT_COUNT, $monthtonum;
 	global $dHebrew;
 	global $n_chil, $n_gchi;
-// print $factrec."<br />";
+
 	$FACT_COUNT++;
 	$estimates = array("abt","aft","bef","est","cir");
 
@@ -2362,7 +2362,7 @@ function print_main_notes($factrec, $level, $pid, $count, $styleadd="", $mayedit
 // TODO: FIX delete_record AND copy_record
 function print_main_media($factrec, $pid, $nlevel, $count=1, $change=false, $styleadd="", $mayedit=true) {
 	global $TBLPREFIX, $SHOW_ID_NUMBERS, $SHOW_FAM_ID_NUMBERS, $MEDIA_EXTERNAL;
-	global $gm_lang, $factarray, $view, $GEDCOMID, $USE_GREYBOX, $MEDIA_IN_DB;
+	global $gm_lang, $factarray, $view, $GEDCOMID, $USE_GREYBOX;
 	global $GEDCOMS, $GEDCOM, $MEDIATYPE, $gm_username, $Users, $MediaFS;
 	global $WORD_WRAPPED_NOTES, $MEDIA_DIRECTORY, $GM_IMAGE_DIR, $GM_IMAGES, $TEXT_DIRECTION;
 	
@@ -2408,7 +2408,6 @@ function print_main_media($factrec, $pid, $nlevel, $count=1, $change=false, $sty
 	}
 	
 	// NOTE: Start printing the media details
-//	$thumbnail = $MediaFS->ThumbnailFile($rowm["m_file"], $MEDIA_IN_DB);
 	$show_details = showFactDetails("OBJE", $pid);
 	print "\n\t\t<tr><td class=\"shade2 $styleadd center\" style=\"vertical-align: middle;\">".$factarray["OBJE"].":";
 	if ($Users->userCanEdit($gm_username) && !FactEditRestricted($pid, $factrec) && $show_details && $styleadd!="change_old" && $view!="preview" && !$deleted && $mayedit) {
@@ -4672,5 +4671,4 @@ function PrintBlockAddFavorite($command, $type) {
 	print "\n<br /><input type=\"submit\" value=\"".$gm_lang["add"]."\" style=\"font-size: 8pt; \" />";
 	print "\n</form></div>\n";
 }
-
 ?>
