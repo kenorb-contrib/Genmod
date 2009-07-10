@@ -1432,7 +1432,7 @@ function SubmitterRecord($level, $gedrec) {
 	}
 }
 function ShowMediaForm($pid, $action="newentry", $change_type="add_media") {
-	global $GEDCOM, $gm_lang, $TEXT_DIRECTION, $MEDIA_ID_PREFIX, $GEDCOMS, $WORD_WRAPPED_NOTES, $MediaFS, $MEDIA_DIRECTORY, $MEDIA_IN_DB;
+	global $GEDCOM, $gm_lang, $TEXT_DIRECTION, $MEDIA_ID_PREFIX, $GEDCOMS, $WORD_WRAPPED_NOTES, $MediaFS, $MEDIA_DIRECTORY;
 	global $MEDIA_FACTS_ADD, $MEDIA_FACTS_UNIQUE, $Users, $gm_username;
 	
 	$facts_add = explode(",", $MEDIA_FACTS_ADD);
@@ -1538,7 +1538,7 @@ function ShowMediaForm($pid, $action="newentry", $change_type="add_media") {
 			// Box for user to choose to upload file from local computer
 			print "<tr><td class=\"shade2\">".$gm_lang["upload_file"]."</td><td class=\"shade1\"><input type=\"file\" name=\"picture\" size=\"60\"></td></tr>";
 			// Box for user to choose the folder to store the image
-			$dirlist = $MediaFS->GetMediaDirList($MEDIA_DIRECTORY, true, 1, true, false, $MEDIA_IN_DB);
+			$dirlist = $MediaFS->GetMediaDirList($MEDIA_DIRECTORY, true, 1, true, false);
 			print "<tr><td class=\"shade2\">".$gm_lang["upload_to_folder"]."</td><td class=\"shade1\">";
 	//		<input type=\"text\" name=\"folder\" size=\"60\">
 			print "<select name=\"folder\">";
@@ -1755,7 +1755,7 @@ function SortFactDetails($gedrec) {
 }
 
 function AddMissingTags($tags) {
-	global $templefacts, $nondatefacts, $nonplacfacts, $gm_lang, $MediaFS, $MEDIA_DIRECTORY, $MEDIA_IN_DB, $focus;
+	global $templefacts, $nondatefacts, $nonplacfacts, $gm_lang, $MediaFS, $MEDIA_DIRECTORY, $focus;
 
 	// Now add some missing tags :
 	if (in_array($tags[0], $templefacts)) {
@@ -1819,7 +1819,7 @@ function AddMissingTags($tags) {
 		// Box for user to choose to upload file from local computer
 		print "<tr><td class=\"shade2\">".$gm_lang["upload_file"]."</td><td class=\"shade1\"><input type=\"file\" name=\"picture\" size=\"60\"></td></tr>";
 		// Box for user to choose the folder to store the image
-		$dirlist = $MediaFS->GetMediaDirList($MEDIA_DIRECTORY, true, 1, true, false, $MEDIA_IN_DB);
+		$dirlist = $MediaFS->GetMediaDirList($MEDIA_DIRECTORY, true, 1, true, false);
 		print "<tr><td class=\"shade2\">".$gm_lang["upload_to_folder"]."</td><td class=\"shade1\">";
 		print "<select name=\"folder\">";
 		foreach($dirlist as $key => $dir) {

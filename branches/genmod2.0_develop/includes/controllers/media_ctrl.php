@@ -33,7 +33,6 @@ if (stristr($_SERVER["SCRIPT_NAME"],basename(__FILE__))) {
  */
 class MediaController extends DetailController {
 	var $classname = "MediaController";
-	var $mid;
 	var $action = "";
 	var $media = null;
 	var $uname = "";
@@ -52,10 +51,10 @@ class MediaController extends DetailController {
 		
 		$nonfacts = array();
 				
-		if (!empty($_REQUEST["mid"])) $this->mid = strtoupper($_REQUEST["mid"]);
-		$this->mid = CleanInput($this->mid);
+		if (!empty($_REQUEST["mid"])) $this->xref = strtoupper($_REQUEST["mid"]);
+		$this->xref = CleanInput($this->xref);
 		
-		$this->media = new MediaItem($this->mid);
+		$this->media = new MediaItem($this->xref);
 		
 		$this->uname = $Users->GetUserName();
 		

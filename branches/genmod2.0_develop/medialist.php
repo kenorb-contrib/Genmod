@@ -72,7 +72,7 @@ else $media->RetrieveFilterMedia($filter, $start, $max);
 $count = $max;
 if ($count > $media->mediainlist) $count = $media->mediainlist;
 
-print '<div align="center">'.$media->CountMediaItems().' '.$gm_lang["media_found"].'<br />';
+print '<div align="center">'.$media->totalmediaitems.' '.$gm_lang["media_found"].'<br />';
 
 // Dropdown selector for number of items to show
 if ($media->totalmediaitems > 0) {

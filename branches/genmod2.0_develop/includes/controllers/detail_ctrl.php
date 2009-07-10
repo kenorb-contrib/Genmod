@@ -1,6 +1,6 @@
 <?php
 /**
- * Base controller for most detail pages (source, note, repository, media)
+ * Base controller for most detail pages (individual, source, note, repository, media)
  *
  * Genmod: Genealogy Viewer
  * Copyright (C) 2005 - 2008 Genmod Development Team
@@ -59,7 +59,7 @@ class DetailController extends BaseController{
 		// The array always starts with '0', which indicates the "all" option.
 		switch (get_class($this)) {
 			case "IndividualController":
-				$this->tabs = array();
+				$this->tabs = array('0', 'relatives', 'facts', 'sources', 'media', 'notes', 'actions_person');
 				$this->tabtype = "indi";
 				$this->object_name = "indi";
 				break;
@@ -69,22 +69,22 @@ class DetailController extends BaseController{
 				$this->object_name = "family";
 				break;
 			case "SourceController":
-				$this->tabs = array('0','facts','individuals','families','notes','media');
+				$this->tabs = array('0','facts','individuals_links','families_links','notes_links','media_links');
 				$this->tabtype = "sour";
 				$this->object_name = "source";
 				break;
 			case "MediaController":
-				$this->tabs = array('0','facts','individuals','families','sources','repositories');
+				$this->tabs = array('0','facts','individuals_links','families_links','sources_links','repositories_links');
 				$this->tabtype = "obje";
 				$this->object_name = "media";
 				break;
 			case "NoteController":
-				$this->tabs = array('0','facts','individuals','families','sources','media','repositories');
+				$this->tabs = array('0','facts','individuals_links','families_links','sources_links','media_links','repositories_links');
 				$this->tabtype = "note";
 				$this->object_name = "note";
 				break;
 			case "RepositoryController":
-				$this->tabs = array('0','facts','sources','actions');
+				$this->tabs = array('0','facts','sources_links','actions_links');
 				$this->tabtype = "repo";
 				$this->object_name = "repo";
 				break;
@@ -100,9 +100,8 @@ class DetailController extends BaseController{
 	}
 	
 	public function PrintTabs() {
-		global $GEDCOMID, $Users, $gm_username, $gm_lang;
+		global $GEDCOMID, $Users, $gm_username, $gm_lang, $Actions;
 		global $GM_IMAGE_DIR, $GM_IMAGES, $TEXT_DIRECTION;
-		global $indi_hide, $fam_hide, $media_hide, $repo_hide, $note_hide;
 		
 		$object_name = $this->object_name;
 		?>
@@ -153,13 +152,18 @@ class DetailController extends BaseController{
 				if ($index != 0) {
 					print "<dd id=\"door".$index."\"><a href=\"javascript:;\" onclick=\"tabswitch(".$index.")\" >";
 					if ($tab == "facts") print $gm_lang["facts"]."</a></dd>\n";
-					if ($tab == "individuals") print $gm_lang["indi_linking"]." (".$this->$object_name->indi_count.")</a></dd>\n";
-					if ($tab == "families") print $gm_lang["fam_linking"]." (".$this->$object_name->fam_count.")</a></dd>\n";
-					if ($tab == "notes") print $gm_lang["note_linking"]." (".$this->$object_name->note_count.")</a></dd>\n";
-					if ($tab == "media") print $gm_lang["mm_linking"]." (".$this->$object_name->media_count.")</a></dd>\n";
-					if ($tab == "sources") print $gm_lang["sour_linking"]." (".$this->$object_name->sour_count.")</a></dd>\n";
-					if ($tab == "repositories") print $gm_lang["repo_linking"]." (".$this->$object_name->repo_count.")</a></dd>\n";
-					if ($tab == "actions") print $gm_lang["action_linking"]." (".$this->$object_name->action_count.")</a></dd>\n";
+					if ($tab == "individuals_links") print $gm_lang["indi_linking"]." (".$this->$object_name->indi_count.")</a></dd>\n";
+					if ($tab == "families_links") print $gm_lang["fam_linking"]." (".$this->$object_name->fam_count.")</a></dd>\n";
+					if ($tab == "notes_links") print $gm_lang["note_linking"]." (".$this->$object_name->note_count.")</a></dd>\n";
+					if ($tab == "media_links") print $gm_lang["mm_linking"]." (".$this->$object_name->media_count.")</a></dd>\n";
+					if ($tab == "sources_links") print $gm_lang["sour_linking"]." (".$this->$object_name->sour_count.")</a></dd>\n";
+					if ($tab == "repositories_links") print $gm_lang["repo_linking"]." (".$this->$object_name->repo_count.")</a></dd>\n";
+					if ($tab == "actions_links") print $gm_lang["action_linking"]." (".$this->$object_name->action_count.")</a></dd>\n";
+					if ($tab == "relatives") print $gm_lang["relatives"]."</a></dd>\n";
+					if ($tab == "sources") print $gm_lang["ssourcess"]."</a></dd>\n";
+					if ($tab == "media") print $gm_lang["media"]."</a></dd>\n";
+					if ($tab == "notes") print $gm_lang["notes"]."</a></dd>\n";
+					if ($tab == "actions_person") print $gm_lang["research_log"]."</a></dd>\n";
 				}
 			}
 			print "<dd id=\"door0\"><a href=\"javascript:;\" onclick=\"tabswitch(0)\" >".$gm_lang["all"]."</a></dd>\n";
@@ -168,27 +172,44 @@ class DetailController extends BaseController{
 		}
 		foreach ($this->tabs as $index => $tab) {
 			if ($tab == "facts") {
+				
+				if ($this->tabtype == "indi") {
+					$this->PrintToggleJS1();
+					global $n_chil, $n_gchi;
+					$n_chil = 1; // counter for children on facts page
+					$n_gchi = 1;
+				}
+				
 				// Facts
 				print "<div id=\"facts\" class=\"tab_page\" style=\"display:none;\" >";
-				
-				$facts = $this->$object_name->facts;
+					
 				print "\n<table class=\"facts_table\">";
+				
+				if ($this->tabtype == "indi") {
+					echo '<tr id="row_top"><td></td><td class="shade2 rela">';
+					echo '<a href="#" onclick="togglerow(\'row_rela\'); return false;">';
+					echo '<img style="display:none;" id="rela_plus" src="'.$GM_IMAGE_DIR.'/'.$GM_IMAGES["plus"]["other"].'" border="0" width="11" height="11" alt="'.$gm_lang["show_details"].'" title="'.$gm_lang["show_details"].'" />';
+					echo '<img id="rela_minus" src="'.$GM_IMAGE_DIR.'/'.$GM_IMAGES["minus"]["other"].'" border="0" width="11" height="11" alt="'.$gm_lang["hide_details"].'" title="'.$gm_lang["hide_details"].'" />';
+					echo ' '.$gm_lang["relatives_events"];
+					echo '</a></td></tr>';
+				}
+				
 				if ($this->tabtype == "note") $this->PrintGeneralNote();
 				foreach($this->$object_name->facts as $key => $value) {
 					$fact = trim($value[0]);
 					if (!empty($fact)) {
 						$styleadd = $value[3];
 						if ($fact=="OBJE") {
-							print_main_media($value[1], $this->xref, 0, $value[2], ($this->$object_name->show_changes), $value[3]);
+							if ($object_name != "indi") print_main_media($value[1], $this->$object_name->xref, 0, $value[2], ($this->$object_name->show_changes), $value[3]);
 						}
 						else if ($fact=="SOUR") {
-							print_main_sources($value[1], 1, $this->xref, $value[2], $value[3], $this->$object_name->canedit);
+							if ($object_name != "indi") print_main_sources($value[1], 1, $this->$object_name->xref, $value[2], $value[3], $this->$object_name->canedit);
 						}
 						else if ($fact=="NOTE") {
-							print_main_notes($value[1], 1, $this->xref, $value[2], $value[3]);
+							if ($object_name != "indi") print_main_notes($value[1], 1, $this->$object_name->xref, $value[2], $value[3]);
 						}
 						else {
-							print_fact($value[1], $this->xref, $value[0], $value[2], false, $value[3]);
+							if ($object_name != "indi" || ($object_name == "indi" && $fact != "SEX" && $fact != "NAME")) print_fact($value[1], $this->$object_name->xref, $value[0], $value[2], false, $value[3]);
 						}
 					}
 				}
@@ -206,10 +227,11 @@ class DetailController extends BaseController{
 					else print $gm_lang["other_".$this->tabtype."_records"];
 					print "</span>";
 				}
+				if ($this->tabtype == "indi") $this->PrintToggleJS2();
 			}
-			if ($tab == "individuals") {
+			if ($tab == "individuals_links") {
 				// -- array of individuals
-				print "<div id=\"individuals\" class=\"tab_page\" style=\"display:none;\" >";
+				print "<div id=\"individuals_links\" class=\"tab_page\" style=\"display:none;\" >";
 				
 				if ($this->$object_name->indi_count>0) {
 					print "\n\t<table class=\"list_table $TEXT_DIRECTION\">\n\t\t<tr><td class=\"shade2 center\"";
@@ -222,8 +244,7 @@ class DetailController extends BaseController{
 					foreach ($this->$object_name->indilist as $key => $indi) {
 						$addname = "";
 						if (HasChinese($indi->name_array[0][0])) $addname = " (".$indi->sortable_addname.")";
-						print_list_person($indi->xref, array(CheckNN(GetSortableName($indi->xref)).$addname, get_gedcom_from_id($indi->gedcomid)));
-						print "\n";
+						$indi->PrintListPerson();
 						if ($i==ceil($this->$object_name->indi_count/2) && $this->$object_name->indi_count>12) print "</ul></td><td class=\"shade1 wrap\"><ul>\n";
 						$i++;
 					}
@@ -242,9 +263,9 @@ class DetailController extends BaseController{
 				else print "<div id=\"no_tab".$index."\"></div>";
 				print "</div>";
 			}
-			if ($tab == "families") {
+			if ($tab == "families_links") {
 				// -- array of families
-				print "<div id=\"families\" class=\"tab_page\" style=\"display:none;\" >";
+				print "<div id=\"families_links\" class=\"tab_page\" style=\"display:none;\" >";
 				
 				if ($this->$object_name->fam_count>0) {
 					print "\n\t<table class=\"list_table  $TEXT_DIRECTION\">\n\t\t<tr><td class=\"shade2 center\"";
@@ -254,9 +275,7 @@ class DetailController extends BaseController{
 					print "</td></tr><tr><td class=\"$TEXT_DIRECTION shade1 wrap\"><ul>";
 					$i=1;
 					foreach ($this->$object_name->famlist as $key => $family) {
-						$addname = "";
-						if (HasChinese($family->sortable_name)) $addname = " (".$family->sortable_addname.")";
-						print_list_family($family->xref, array($family->sortable_name.$addname, get_gedcom_from_id($family->gedfile)));
+						$family->PrintListFamily();
 						if ($i==ceil($this->$object_name->fam_count/2) && $this->$object_name->fam_count>12) print "</ul></td><td class=\"shade1 wrap\"><ul>\n";
 						$i++;
 					}
@@ -274,9 +293,9 @@ class DetailController extends BaseController{
 				else print "<div id=\"no_tab".$index."\"></div>";
 				print "</div>";
 			}
-			if ($tab == "notes") {
+			if ($tab == "notes_links") {
 				// array of notes
-				print "<div id=\"notes\" class=\"tab_page\" style=\"display:none;\" >";
+				print "<div id=\"notes_links\" class=\"tab_page\" style=\"display:none;\" >";
 				
 				if ($this->$object_name->note_count>0) {
 					print "\n\t<table class=\"list_table $TEXT_DIRECTION\">\n\t\t<tr><td class=\"shade2 center\"";
@@ -305,9 +324,9 @@ class DetailController extends BaseController{
 				print "</div>";
 
 			}
-			if ($tab == "sources") {
+			if ($tab == "sources_links") {
 				// -- array of sources
-				print "<div id=\"sources\" class=\"tab_page\" style=\"display:none;\" >";
+				print "<div id=\"sources_links\" class=\"tab_page\" style=\"display:none;\" >";
 				
 				if ($this->$object_name->sour_count>0 || $this->$object_name->sour_hide>0) {
 					print "\n\t<table class=\"list_table  $TEXT_DIRECTION\">\n\t\t<tr><td class=\"shade2 center\"";
@@ -337,9 +356,9 @@ class DetailController extends BaseController{
 				else print "<div id=\"no_tab".$index."\"></div>";
 				print "</div>";
 			}
-			if ($tab == "media") {
+			if ($tab == "media_links") {
 				// -- array of media
-				print "<div id=\"media\" class=\"tab_page\" style=\"display:none;\" >";
+				print "<div id=\"media_links\" class=\"tab_page\" style=\"display:none;\" >";
 				
 				if ($this->$object_name->media_count > 0 || $this->$object_name->media_hide > 0) {
 					print "\n\t<table class=\"list_table  $TEXT_DIRECTION\">\n\t\t<tr><td class=\"shade2 center\"";
@@ -367,9 +386,9 @@ class DetailController extends BaseController{
 				else print "<div id=\"no_tab".$index."\"></div>";
 				print "</div>";
 			}
-			if ($tab == "repositories") {
+			if ($tab == "repositories_links") {
 				// -- array of repositories
-				print "<div id=\"repositories\" class=\"tab_page\" style=\"display:none;\" >";
+				print "<div id=\"repositories_links\" class=\"tab_page\" style=\"display:none;\" >";
 				
 				if ($this->$object_name->repo_count > 0 || $this->$object_name->repo_hide > 0) {
 					print "\n\t<table class=\"list_table  $TEXT_DIRECTION\">\n\t\t<tr><td class=\"shade2 center\"";
@@ -396,8 +415,8 @@ class DetailController extends BaseController{
 				else print "<div id=\"no_tab".$index."\"></div>";
 				print "</div>";
 			}
-			if ($tab == "actions") {
-				print "<div id=\"actions\" class=\"tab_page\" style=\"display:none;\" >";
+			if ($tab == "actions_links") {
+				print "<div id=\"actions_links\" class=\"tab_page\" style=\"display:none;\" >";
 				if ($this->$object_name->action_count>0 || $this->$object_name->action_hide>0) {
 					
 					// Start of todo list
@@ -420,7 +439,296 @@ class DetailController extends BaseController{
 				else print "<div id=\"no_tab".$index."\"></div>";
 				print "</div>";
 			}
-		}
+			if ($tab == "relatives") {
+				print "<div id=\"relatives\" class=\"tab_page\" style=\"display:none;\" >";
+				if ($this->$object_name->close_relatives) {
+					$show_full = true;
+					$prtcount = 0;
+					// NOTE: parent families
+					if (is_array($this->$object_name->childfamilies)) {
+						foreach ($this->$object_name->childfamilies as $famid => $family) {
+							// Family header
+							print "<table>";
+							print "<tr>";
+							print "<td><img src=\"".$GM_IMAGE_DIR."/".$GM_IMAGES["cfamily"]["small"]."\" border=\"0\" class=\"icon\" alt=\"\" /></td>";
+							print "<td><span class=\"subheaders\">".$family->label."</span>";
+							if (!$this->view) {
+						 		print " - <a href=\"family.php?famid=".$family->xref."\">[".$gm_lang["view_family"].$family->addxref."]</a>&nbsp;&nbsp";
+					 			if ($family->husb_id == "" && $this->$object_name->canedit) { 
+					 				print_help_link("edit_add_parent_help", "qm");
+									print "<a href=\"javascript ".$gm_lang["add_father"]."\" onclick=\"return addnewparentfamily('', 'HUSB', '".$family->xref."', 'add_father');\">".$gm_lang["add_father"]."</a>";
+								}
+					 			if ($family->wife_id == "" && $this->$object_name->canedit) { 
+					 				print_help_link("edit_add_parent_help", "qm");
+									print "<a href=\"javascript ".$gm_lang["add_mother"]."\" onclick=\"return addnewparentfamily('', 'WIFE', '".$family->xref."', 'add_mother');\">".$gm_lang["add_mother"]."</a>";
+								}
+							}
+							print "</td></tr>";
+							print "</table>";
+							// Husband and wife
+							print "<table class=\"facts_table\">";
+							if ($family->husb_id != "") {
+								print "<tr><td class=\"width20 shade2 center\"";
+								if ($this->show_changes && $family->husb->isnew) print " style=\"border: solid #0000FF 2px; vertical-align: middle;\"";
+								else print " style=\"vertical-align: middle;\"";
+								print ">";	
+								print $family->husb->label."</td>";
+								print "<td class=\"".$this->getPersonStyle($family->husb)."\">";
+								PrintPedigreePerson($family->husb, 2, true, $prtcount, 1, $this->view);
+								$prtcount++;
+								print "</td></tr>";
+							}
+							if ($family->wife_id != "") {
+								print "<tr><td class=\"width20 shade2 center\"";
+								if ($this->show_changes && $family->wife->isnew) print " style=\"border: solid #0000FF 2px; vertical-align: middle;\"";
+								else print " style=\"vertical-align: middle;\"";
+								print ">";	
+								print $family->wife->label."</td>";
+								print "<td class=\"".$this->getPersonStyle($family->wife)."\">";
+								PrintPedigreePerson($family->wife, 2, true, $prtcount, 1, $this->view);
+								$prtcount++;
+								print "</td></tr>";
+							}
+							// Children
+							foreach ($family->children as $childid => $child) {
+								if (isset($child->label[$famid])) {
+									print "<tr><td class=\"width20 shade2 center";
+									if ($this->show_changes) {
+										if ($child->isnew) print " change_new";
+										elseif ($child->isdeleted) print " change_old";
+									}
+									print "\" style=\"vertical-align: middle;\">";
+									print $child->label[$famid]."</td>";
+									print "<td class=\"".$this->getPersonStyle($child)."\">";
+									PrintPedigreePerson($child, 2 , true, $prtcount, 1, $this->view);
+									$prtcount++;
+									print "</td></tr>";
+								}
+							}
+							print "</table>";
+						}
+						// NOTE: Half-siblings father
+						foreach ($this->$object_name->childfamilies as $id => $fam) {
+							if ($fam->husb_id != "") {
+								foreach ($fam->husb->spousefamilies as $famid => $family) {
+									if ($fam->xref != $family->xref && $family->label != "") {
+										print "<table><tr>";
+										print "<td><img src=\"".$GM_IMAGE_DIR."/".$GM_IMAGES["cfamily"]["small"]."\" border=\"0\" class=\"icon\" alt=\"\" /></td>";
+										print "<td><span class=\"subheaders\">".$family->label."</span>";
+										if (!$this->view) print " - <a href=\"family.php?famid=".$family->xref."\">[".$gm_lang["view_family"].$family->addxref."]</a>";
+										print "</td></tr></table>";
+										
+										print "<table class=\"facts_table\">";
+										if ($family->wife_id != "") {
+											print "<tr><td class=\"width20 shade2 center\" style=\"vertical-align: middle;\">".$family->wife->label."</td>";
+											print "<td class=\"".$this->getPersonStyle($family->wife)."\">";
+											PrintPedigreePerson($family->wife,2, true, $prtcount, 1, $this->view);
+											$prtcount++;
+											print "</td></tr>";
+										}
+										foreach ($family->children as $sibid => $sibling) {
+											print "<tr><td class=\"width20 shade2 center\" style=\"vertical-align: middle;\">".$sibling->label."</td>";
+											print "<td class=\"".$this->getPersonStyle($sibling)."\">";
+											PrintPedigreePerson($sibling,2,true, $prtcount, 1, $this->view);
+											$prtcount++;
+											print "</td></tr>";
+										}
+										print "</table>";
+									}
+								}
+							}
+						}
+	
+						// NOTE: Half-siblings mother
+						foreach ($this->$object_name->childfamilies as $id => $fam) {
+							if ($fam->wife_id != "") {
+								foreach ($fam->wife->spousefamilies as $famid => $family) {
+									if ($fam->xref != $family->xref && $family->label != "") {
+										print "<table><tr>";
+										print "<td><img src=\"".$GM_IMAGE_DIR."/".$GM_IMAGES["cfamily"]["small"]."\" border=\"0\" class=\"icon\" alt=\"\" /></td>";
+										print "<td><span class=\"subheaders\">".$family->label."</span>";
+										if (!$this->view) print " - <a href=\"family.php?famid=".$family->xref."\">[".$gm_lang["view_family"].$family->addxref."]</a>";
+										print "</td></tr></table>";
+										
+										print "<table class=\"facts_table\">";
+										if ($family->husb_id != "") { 
+											print "<tr><td class=\"width20 shade2 center\" style=\"vertical-align: middle;\">".$family->wife->label."</td>";
+											print "<td class=\"".$this->getPersonStyle($family->husb)."\">";
+											PrintPedigreePerson($family->husb,2,true, $prtcount, 1, $this->view);
+											$prtcount++;
+											print "</td></tr>";
+										}
+										foreach ($family->children as $sibid => $sibling) {
+											print "<tr><td class=\"width20 shade2 center\" style=\"vertical-align: middle;\">".$sibling->label."</td>";
+											print "<td class=\"".$this->getPersonStyle($sibling)."\">";
+											PrintPedigreePerson($sibling,2,true, $prtcount, 1, $this->view);
+											$prtcount++;
+											print "</td></tr>";
+										}
+										print "</table>";
+									}
+								}
+							}
+						}
+					}
+					// NOTE: spouses and children
+					if (is_array($this->$object_name->spousefamilies)) {
+						foreach ($this->$object_name->spousefamilies as $famid => $family) {
+							print "<table>";
+							print "<tr>";
+							print "<td><img src=\"".$GM_IMAGE_DIR."/".$GM_IMAGES["cfamily"]["small"]."\" border=\"0\" class=\"icon\" alt=\"\" /></td>";
+							print "<td><span class=\"subheaders\">".$family->label."</span>";
+							if (!$this->view) print " - <a href=\"family.php?famid=".$family->xref."\">[".$gm_lang["view_family"].$family->addxref."]</a>";
+							print "</td></tr>";
+							print "</table>";
+							
+							print "<table class=\"facts_table\">";
+							if ($family->husb_id != "") {
+								print "<tr><td class=\"width20 shade2 center";
+								if ($this->show_changes) {
+									if ($family->husb->isnew) print " change_new";
+									elseif ($family->husb->isdeleted) print " change_old";
+								}
+								print "\" style=\"vertical-align: middle;\">";
+								print $family->husb->label."</td>";
+								print "<td class=\"".$this->getPersonStyle($family->husb)."\">";
+								PrintPedigreePerson($family->husb, 2, true, $prtcount, 1, $this->view);
+								$prtcount++;
+								print "</td></tr>";
+							}
+							if ($family->wife_id != "") {
+								print "<tr><td class=\"width20 shade2 center";
+								if ($this->show_changes) {
+									if ($family->wife->isnew) print " change_new";
+									elseif ($family->wife->isdeleted) print " change_old";
+								}
+								print "\" style=\"vertical-align: middle;\">";
+								print $family->wife->label."</td>";
+								print "<td class=\"".$this->getPersonStyle($family->wife)."\">";
+								PrintPedigreePerson($family->wife, 2, true, $prtcount, 1, $this->view);
+								$prtcount++;
+								print "</td></tr>";
+							}
+							foreach ($family->children as $kidid => $kid) {
+								print "<tr><td class=\"width20 shade2 center"; 
+								if ($this->show_changes) {
+									if ($kid->isnew) print " change_new";
+									else if ($kid->isdeleted) print " change_old";
+								}
+								print "\" style=\"vertical-align: middle;\">";
+								print $kid->label."</td>";
+								print "<td class=\"".$this->getPersonStyle($kid)."\">";
+								PrintPedigreePerson($kid, 2, true, $prtcount, 1, $this->view);
+								$prtcount++;
+								print "</td></tr>";
+							}
+							print "</table>";
+						}
+					}
+				}
+				else print "<div id=\"no_tab".$index."\" colspan=\"2\" class=\"shade1\">".$gm_lang["no_tab5"]."</div>\n";
+				print "</div>";
+			}
+			if ($tab == "sources") {
+				print "<div id=\"sources\" class=\"tab_page\" style=\"display:none;\" >";
+				
+				print "\n<table class=\"facts_table\">";
+				if ($this->$object_name->sourfacts_count > 0) {
+					foreach($this->$object_name->facts as $key => $value) {
+						$fact = trim($value[0]);
+						if (!empty($fact) && $fact == "SOUR") {
+							$styleadd = $value[3];
+							print_main_sources($value[1], 1, $this->xref, $value[2], $value[3], $this->$object_name->canedit);
+						}
+					}
+				}
+				else print "<div id=\"no_tab".$index."\" colspan=\"2\" class=\"shade1\"></div>\n";
+					//-- new fact link
+				if ($this->view != "preview" && $this->$object_name->canedit && !$this->$object_name->isdeleted) {
+					print "<tr><td class=\"width20 shade2\">";
+					print_help_link("add_source_help", "qm");
+					print $gm_lang["add_source_lbl"]."</td><td class=\"shade1\">";
+					print "<a href=\"javascript: ".$gm_lang["add_source"]."\" onclick=\"add_new_record('".$this->$object_name->xref."','SOUR', 'add_source'); return false;\">".$gm_lang["add_source"]."</a>";
+					print "<br /></td></tr>";
+				}
+				print "</table>\n\n<br />";
+				print "</div>";
+			}
+
+			if ($tab == "media") {
+				print "<div id=\"media\" class=\"tab_page\" style=\"display:none;\" >";
+				
+				print "\n<table class=\"facts_table\">";
+				if ($this->$object_name->mediafacts_count > 0) {
+					foreach($this->$object_name->facts as $key => $value) {
+						$fact = trim($value[0]);
+						if (!empty($fact) && $fact == "OBJE") {
+							$styleadd = $value[3];
+							print_main_media($value[1], $this->xref, 0, $value[2], ($this->$object_name->show_changes), $value[3]);
+						}
+					}
+				}
+				else print "<div id=\"no_tab".$index."\" colspan=\"2\" class=\"shade1\"></div>\n";
+				if (!$this->isPrintPreview() && $this->$object_name->canedit && !$this->$object_name->isdeleted) {
+					print "<tr><td class=\"shade2 width20\">";
+					print_help_link("add_media_help", "qm");
+					print $gm_lang["add_media_lbl"]."</td><td class=\"shade1\">";
+					print "<a href=\"javascript: ".$gm_lang["add_media_lbl"]."\" onclick=\"add_new_record('".$this->$object_name->xref."','OBJE', 'add_media'); return false;\">".$gm_lang["add_media"]."</a>";
+					print "</td></tr>";
+				}
+				print "</table>\n\n<br />";
+				print "</div>";
+			}
+			if ($tab == "notes") {
+				print "<div id=\"notes\" class=\"tab_page\" style=\"display:none;\" >";
+				
+				print "\n<table class=\"facts_table\">";
+				if ($this->$object_name->notefacts_count > 0) {
+					foreach($this->$object_name->facts as $key => $value) {
+						$fact = trim($value[0]);
+						if (!empty($fact) && $fact == "NOTE") {
+							$styleadd = $value[3];
+							print_main_notes($value[1], 1, $this->xref, $value[2], $value[3]);
+						}
+					}
+				}
+				else print "<div id=\"no_tab".$index."\" colspan=\"2\" class=\"shade1\"></div>\n";
+				if (!$this->isPrintPreview() && $this->$object_name->canedit && !$this->$object_name->isdeleted) { 
+					print "<tr><td class=\"shade2 width20\">";
+					print_help_link("add_note_help", "qm");
+					print $gm_lang["add_note_lbl"]."</td><td class=\"shade1\">";
+					print "<a href=\"javascript: ".$gm_lang["add_note"]."\" onclick=\"add_new_record('".$this->$object_name->xref."','NOTE', 'add_note'); return false;\">".$gm_lang["add_note"]."</a>";
+					print "</td></tr>";
+					print "<tr><td class=\"shade2 width20\">";
+					print_help_link("add_general_note_help", "qm");
+					print $gm_lang["add_gnote_lbl"]."</td><td class=\"shade1\"><a href=\"javascript: ".$gm_lang["add_gnote"]."\" onclick=\"add_new_record('".$this->$object_name->xref."','GNOTE', 'add_gnote'); return false;\">".$gm_lang["add_gnote"]."</a>";
+					print "</td></tr>";
+				}
+				print "</table>\n\n<br />";
+				print "</div>";
+			}
+			if ($tab == "actions_person") {
+				print "<div id=\"actions_person\" class=\"tab_page\" style=\"display:none;\" >";
+				if ($Users->ShowActionLog()) {
+					print "<br />";
+					print "<form name=\"actionform\" method=\"post\" action=\"individual.php\">";
+					print "<input name=\"pid\" type=\"hidden\" value=\"".$this->$object_name->xref."\" />";
+					print "<table class=\"facts_table\">";
+					if (count($this->$object_name->actionlist) > 0) {
+						foreach ($this->$object_name->actionlist as $key => $action) {
+							$action->PrintThis();
+						}
+					}
+					else print "<tr><td id=\"no_tab".$index."\" colspan=\"2\" class=\"shade1\"></td></tr>\n";
+					//-- New action Link
+					if (!$this->isPrintPreview() && $this->$object_name->canedit && !$this->$object_name->isdeleted) { 
+						$Actions->PrintAddLink();
+					}
+				}
+				print "</table></form>";
+				print "</div>";
+			}
+		}	
 		print "<script type=\"text/javascript\">\n<!--\n";
 		if ($this->isPrintPreview()) print "tabswitch(0)";
 		else if (isset($_SESSION[$this->tabtype][JoinKey($this->$object_name->xref, $GEDCOMID)])) print "tabswitch(".$_SESSION[$this->tabtype][JoinKey($this->$object_name->xref, $GEDCOMID)].")";

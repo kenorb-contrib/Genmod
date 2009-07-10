@@ -155,12 +155,12 @@ class Note extends GedcomRecord {
 			$indi["gedcom"] = $row["i_gedcom"];
 			$indi["isdead"] = $row["i_isdead"];
 			$indi["gedfile"] = $row["i_file"];
+			$indilist[$row["i_id"]] = $indi;
 			$person = null;
 			$person = new Person($row["i_id"], $row["i_gedcom"]);
 			if ($person->disp_name) {
-				$indi["names"] = $person->name_array;
+				$indilist[$row["i_id"]]["names"] = $person->name_array;
 				$this->indilist[$row["i_key"]] = $person;
-				$indilist[$row["i_id"]] = $indi;
 			}
 			else $this->indi_hide++;
 		}
@@ -185,11 +185,11 @@ class Note extends GedcomRecord {
 			$fam["HUSB"] = SplitKey($row["f_husb"], "id");
 			$fam["WIFE"] = SplitKey($row["f_wife"], "id");
 			$fam["gedfile"] = $row["f_file"];
+			$famlist[$row["f_id"]] = $fam;
 			$family = null;
 			$family = new Family($row["f_id"], $row["f_gedcom"]);
 			if ($family->disp) {
 				$this->famlist[$row["f_key"]] = $family;
-				$famlist[$row["f_id"]] = $fam;
 			}
 			else $this->fam_hide++;
 		}
@@ -216,7 +216,7 @@ class Note extends GedcomRecord {
 			if ($mediaitem->disp) $this->medialist[JoinKey($row["m_media"], $row["m_gedfile"])] = $mediaitem;
 			else $this->media_hide++;
 		}
-		uasort($this->medialist, "ItemObjSort");
+		uasort($this->medialist, "TitleObjSort");
 		$this->media_count=count($this->medialist);
 		return $this->medialist;
 	}

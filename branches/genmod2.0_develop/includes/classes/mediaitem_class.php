@@ -40,8 +40,8 @@ class MediaItem extends GedcomRecord {
 	private $validmedia = null;
 	public $fileobj = null;
 	
-	var $links = array(); // set in media class
-	var $linked = false; // set in media class
+	public $links = array(); // set in media class
+	public $linked = false; // set in media class
 
 	public function __construct($details, $gedrec="", $gedcomid="", $changed = false) {
 		global $TBLPREFIX, $GEDCOMID, $MediaFS, $MEDIA_DIRECTORY;
@@ -167,12 +167,12 @@ class MediaItem extends GedcomRecord {
 			$indi["gedcom"] = $row["i_gedcom"];
 			$indi["isdead"] = $row["i_isdead"];
 			$indi["gedfile"] = $row["i_file"];
+			$indilist[$row["i_id"]] = $indi;
 			$person = null;
 			$person = new Person($row["i_id"], $row["i_gedcom"]);
 			if ($person->disp_name) {
-				$indi["names"] = $person->name_array;
+				$indilist[$row["i_id"]]["names"] = $person->name_array;
 				$this->indilist[$row["i_key"]] = $person;
-				$indilist[$row["i_id"]] = $indi;
 			}
 			else $this->indi_hide++;
 		}
@@ -201,11 +201,11 @@ class MediaItem extends GedcomRecord {
 			$fam["gedfile"] = $row["f_file"];
 			$fam["HUSB"] = SplitKey($row["f_husb"], "id");
 			$fam["WIFE"] = SplitKey($row["f_wife"], "id");
+			$famlist[$row["f_id"]] = $fam;
 			$family = null;
 			$family = new Family($row["f_id"], $row["f_gedcom"]);
 			if ($family->disp) {
 				$this->famlist[$row["f_key"]] = $family;
-				$famlist[$row["f_id"]] = $fam;
 			}
 			else $this->fam_hide++;
 		}

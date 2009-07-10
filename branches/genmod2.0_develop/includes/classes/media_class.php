@@ -30,13 +30,27 @@ if (stristr($_SERVER["SCRIPT_NAME"],basename(__FILE__))) {
 
 class Media {
 	
-	public $classname = "Media";
-	public $totalmediaitems = 0;
-	public $medialist = array();
-	public $mediainlist = 0;
+	public $classname = "Media";	// Name of this class
 	
-	function CountMediaItems() {
-		return $this->totalmediaitems;
+	private $totalmediaitems = 0;	// Total media items found, before privacy
+	private $medialist = array();	// Array of media items found
+	private $mediainlist = 0;		// Total media items returned after applying privacy
+	
+	public function __get($property) {
+		switch ($property) {
+			case "totalmediaitems":
+				return $this->totalmediaitems;
+				break;
+			case "medialist":
+				return $this->medialist;
+				break;
+			case "mediainlist":
+				return $this->mediainlist;
+				break;
+			case "lastitem":
+				return end($this->medialist);
+				break;
+		}
 	}
 	/*
 	** Retrieve the medialist including all linked records.
@@ -45,7 +59,7 @@ class Media {
 	** @param $start	which item to start with (counted after privacy is applied)
 	** @param $max		how many max to return (counted after privacy is applied
 	*/	
-	function RetrieveMedia($count=0, $start=0, $max=0) {
+	public function RetrieveMedia($count=0, $start=0, $max=0) {
 		global $TBLPREFIX, $GEDCOMID;
 		$found = 0;
 		$added = 0;
@@ -77,7 +91,7 @@ class Media {
 		$this->RetrieveMediaLink();
 	}
 		
-	function RetrieveFilterMedia($filter, $start=0, $max=0) {
+	public function RetrieveFilterMedia($filter, $start=0, $max=0) {
 		global $GEDCOMID, $TBLPREFIX;
 		$found = 0;
 		$added = 0;
@@ -143,7 +157,7 @@ class Media {
 		$this->RetrieveMediaLink();
 	}
 
-	function RetrieveFilterMediaList($filter) {
+	public function RetrieveFilterMediaList($filter) {
 		global $GEDCOMID, $TBLPREFIX;
 		$sql = "SELECT *, concat(m_titl, if(substr(if(substr(m_file,1,1)='.',substr(m_file,2),m_file),1,1)='/',substr(if(substr(m_file,1,1)='.',substr(m_file,2),m_file),2),if(substr(m_file,1,1)='.',substr(m_file,2),m_file))) as k FROM ".$TBLPREFIX."media WHERE m_gedfile='".$GEDCOMID."'";
 		if (!empty($filter)) $sql .= " AND (m_titl LIKE '%".$filter."%' OR m_file LIKE '%".$filter."%')";
@@ -156,12 +170,13 @@ class Media {
 				$this->medialist[$row["m_media"]."_".$row["m_gedfile"]] = $media;
 			}
 		}
+		$this->mediainlist = count($this->medialist);
 		$db->FreeResult();
 	}
 
 	
 	//-- search through the gedcom records for media, full text
-	function FTSearchMedia($query, $allgeds=false, $ANDOR="AND") {
+	public function FTSearchMedia($query, $allgeds=false, $ANDOR="AND") {
 		global $TBLPREFIX, $GEDCOM, $DBCONN, $REGEXP_DB, $GEDCOMS, $GEDCOMID, $ftminwlen, $ftmaxwlen, $media_hide, $media_total;
 		
 		// Get the min and max search word length
@@ -226,7 +241,7 @@ class Media {
 	** If link privacy is on, privacy is already checked 2 levels deep	
 	** If off, the linked items are checked
 	*/
-	function RetrieveMediaLink() {
+	private function RetrieveMediaLink() {
 		global $TBLPREFIX, $GEDCOMID, $LINK_PRIVACY;
 		if (count($this->medialist) > 0) {
 			$sql = "SELECT * FROM ".$TBLPREFIX."media_mapping WHERE mm_gedfile='".$GEDCOMID."' AND mm_media in (";
@@ -247,12 +262,13 @@ class Media {
 			}
 		}
 	}
-	function mediasort($a, $b) {
-		if (!empty($a->title)) $atitl = $a->title;
-		else $atitl = $a->filename;
-		if (!empty($b->title)) $btitl = $b->title;
-		else $btitl = $b->filename;
-		return strnatcasecmp($atitl, $btitl);
-	}
+	
+//	function mediasort($a, $b) {
+//		if (!empty($a->title)) $atitl = $a->title;
+//		else $atitl = $a->filename;
+//		if (!empty($b->title)) $btitl = $b->title;
+//		else $btitl = $b->filename;
+//		return strnatcasecmp($atitl, $btitl);
+//	}
 }
 ?>

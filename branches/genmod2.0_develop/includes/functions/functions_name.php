@@ -704,6 +704,7 @@ function GetSortableAddName($pid, $record="", $rev = false, $changes = false) {
 		}
 	}
 	$name_record = GetSubRecord(1, "1 NAME", $record);
+	$name = "";
 
 	// Check for ROMN name
 	$romn = preg_match("/(2 ROMN (.*)|2 _HEB (.*))/", $name_record, $romn_match);
@@ -734,7 +735,7 @@ function GetSortableAddName($pid, $record="", $rev = false, $changes = false) {
 		}
 	}
 
-	else $name = GetSortableName($pid, "", "", false, $rev, $changes);
+//	else $name = GetSortableName($pid, "", "", false, $rev, $changes);
 
 	return $name;
 }

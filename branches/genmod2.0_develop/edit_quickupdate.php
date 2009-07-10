@@ -1716,7 +1716,7 @@ if (count($addfacts)>0) { ?>
 <?php }
 
 // NOTE: Add photo
-if (DirIsWritable($MEDIA_DIRECTORY)) { ?>
+if ($MediaFS->DirIsWritable($MEDIA_DIRECTORY)) { ?>
 <tr><td>&nbsp;</td></tr>
 <tr><td class="topbottombar" colspan="4"><b><?php print_help_link("quick_update_photo_help", "qm"); print $gm_lang["update_photo"]; ?></b></td></tr>
 <tr>

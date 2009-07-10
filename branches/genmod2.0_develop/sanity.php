@@ -1473,7 +1473,7 @@ if (!empty($check_filesys)) {
 		print "<tr><td class=\"shade1 wrap\">".$gm_lang["sc_fs_main"]."</td><td class=\"shade1 wrap\">";
 		$dir = "/"; // From PHP5 dir will not read ./ as the current dir. The dot is removed here.
 		$errors1 = false;
-		if (DirIsWritable($dir)) {
+		if ($MediaFS->DirIsWritable($dir, false)) {
 			print $error_icon.$gm_lang["sc_fs_main_error"]."<br />";
 			$errors1 = true;
 		}
@@ -1504,7 +1504,7 @@ if (!empty($check_filesys)) {
 		print "<tr><td class=\"shade1 wrap\">".$gm_lang["sc_fs_index"]."</td><td class=\"shade1 wrap\">";
 		$dir = $INDEX_DIRECTORY;
 		$errors1 = false;
-		if (!DirIsWritable($dir)) {
+		if (!$MediaFS->DirIsWritable($dir, false)) {
 			print $error_icon.$gm_lang["sc_fs_index_error"]."<br />";
 			$errors1 = true;
 		}
@@ -1537,7 +1537,7 @@ if (!empty($check_filesys)) {
 		$dir = "./languages/";
 		$write1 = false;
 		$num = 0;
-		if (DirIsWritable($dir)) $write1 = true;
+		if ($MediaFS->DirIsWritable($dir, false)) $write1 = true;
 		$d = @dir($dir);
 		if (!is_object($d)) print $warn_icon.$gm_lang["sc_dir_noaccess"]." ".$dir;
 		else {
@@ -1573,7 +1573,7 @@ if (!empty($check_filesys)) {
 						print "<br />";
 					}
 					print $gm_lang["sc_gedname"].$GEDCOMS[$value]["title"]."<br />";
-					if (!DirIsWritable($dir)) print $warn_icon.$gm_lang["sc_fs_media_ro"]." ".$dir;
+					if (!$MediaFS->DirIsWritable($dir, false)) print $warn_icon.$gm_lang["sc_fs_media_ro"]." ".$dir;
 					else print $warn_icon.$gm_lang["sc_fs_media_rw"]." ".$dir;
 					print "<br />";
 					$first = false;
@@ -1686,7 +1686,7 @@ if (!empty($check_filesys)) {
 		$dirs = GetDirList(array("./blocks/", "./fonts/", "./hooks/", "./images/", "./includes/", "./modules/", "./places/", "./reports/", "./themes/", "./ufpdf/"));
 		$errors1 = false;
 		foreach ($dirs as $key=>$dir) {
-			if (DirIsWritable($dir)) {
+			if ($MediaFS->DirIsWritable($dir, false)) {
 				if (!$errors1) {
 					$errors1 = true;
 					print $error_icon.$gm_lang["sc_fs_dirrw"]."<br />";

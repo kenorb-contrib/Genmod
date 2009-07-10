@@ -507,7 +507,7 @@ if ($action=="filter") {
 	else if ($type == "media") {
 		
 //		print "find dir: ".$directory."<br />";
-		$dirs = $MediaFS->GetMediaDirList($directory, false, 1, false, false, $MEDIA_IN_DB);
+		$dirs = $MediaFS->GetMediaDirList($directory, false, 1, false, false);
 		//print_r($dirs);
 		print "<br />";
 		print "<div align=\"center\">";
@@ -566,7 +566,7 @@ if ($action=="filter") {
 		print "<br />";
 		
 		if ($external_links == "1") $directory = "external_links";
-		$medialist = $MediaFS->GetMediaFilelist($directory, $filter, $MEDIA_IN_DB);
+		$medialist = $MediaFS->GetMediaFilelist($directory, $filter);
 
 		// Privacy is already checked in the function
 		// An empty media object is returned for not coupled files

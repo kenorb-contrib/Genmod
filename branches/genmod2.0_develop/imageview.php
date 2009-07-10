@@ -182,12 +182,12 @@ else {
 	print "<input type=\"button\" value=\"".$gm_lang["reset"]."\" onclick=\"resetimage(); return false;\" />\n";
 	
 	if (!strstr($filename, "://")) {
-		if (!$MEDIA_IN_DB) $details = $MediaFS->GetFileDetails($filename);
+		if (!$MEDIA_IN_DB) $details = $MediaFS->GetFileDetails($filename, false);
 		else {
 			// we must strip showblob?file= from the filename, to get the real file
 			$fn = preg_replace("/showblob.php\?file=/", "", $filename);
 			$fn = preg_replace("/&.*/", "", $fn);
-			$details = $MediaFS->GetDBFileDetails($fn);
+			$details = $MediaFS->GetFileDetails($fn, true);
 		}
 		if (!empty($details["width"]) && !empty($details["height"])) {
 			$imgwidth = $details["width"]+2;

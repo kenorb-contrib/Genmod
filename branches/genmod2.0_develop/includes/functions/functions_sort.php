@@ -852,7 +852,7 @@ function GedcomObjSort($a, $b) {
 
 	return StringSort($aname, $bname);
 }
-function NotelistObjSort($a, $b) {
+function TitleObjSort($a, $b) {
 	if ($a->title != $b->title) return StringSort(ltrim($a->title), ltrim($b->title));
 	else {
 		$anum = preg_replace("/\D*/", "", $a->xref);
