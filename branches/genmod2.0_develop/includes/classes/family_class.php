@@ -3,7 +3,7 @@
  * Class file for a Family
  *
  * Genmod: Genealogy Viewer
- * Copyright (C) 2005 - 2008 Genmod Development Team
+ * Copyright (C) 2005 - 2009 Genmod Development Team
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,7 +19,6 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
- * Page does not validate see line number 1109 -> 15 August 2005
  *
  * @package Genmod
  * @subpackage DataModel
@@ -33,47 +32,54 @@ if (stristr($_SERVER["SCRIPT_NAME"],basename(__FILE__))) {
 class Family extends GedcomRecord {
 	
 	// General class information
-	public $classname = "Family";
-	public $datatype = "FAM";
+	public $classname = "Family";		// Name of this class
+	public $datatype = "FAM";			// Type of data collected here
 
 	// data
-	private $sortable_name = null;
-	private $sortable_addname = null;
-	public $label = null;
+	private $sortable_name = null;		// Printable and sortable name of the family, after applying privacy (can be unknown of private)
+	private $sortable_addname = null;	// Printable and sortable addname of the family, after applying privacy (can be blank)
+	public $label = null;				// Label set in the person class as a specific label for this family of the person
+	private $title = null;				// Printable name for the family in normal order
 		
 	// Family members
-	private $husb = null;
-	private $husb_id = null;
-	private $wife = null;
-	private $wife_id = null;
+	private $husb = null;				// Holder for the husband object (or new, if showing changes)
+	private $husb_id = null;			// Id for the husband object (or new, if showing changes)
+	private $husbold = null;			// Holder for the deleted husband object (or none if not showing changes)
+	private $husbold_id = null;			// Id for the deleted husband object (or none if not showing changes)
+	private $husb_status = null;		// Status af the husband in this family: "deleted", "new", "changed", "" (=unchanged)
+	private $wife = null;				// Holder for the wifes object (or new, if showing changes)
+	private $wife_id = null;			// Id for the wifes object (or new, if showing changes)
+	private $wifeold = null;			// Holder for the deleted wife object (or none if not showing changes)
+	private $wifeold_id = null;			// Id for the deleted wife object (or none if not showing changes)
+	private $wife_status = null;		// Status af the wife in this family: "deleted", "new", "changed", "" (=unchanged)
 //	private $parents = null;
-	private $children = null;
-	private $children_ids = null;
-	private $children_count = null;
+	private $children = null;			// Array of children the new/remaining in order, the deleted added at the end
+	private $children_ids = null;		// Id's of the children in the array
+	private $children_count = null;		// Number of children in the old (not changed) situation
+	private $child_status = null;		// Status af the child in this family: "deleted", "new", "" (=unchanged)
 	
 	// Marriage events
-	private $marr_rec = null;
-	private $marr_date = null;
-	private $marr_type = null;
-	private $marr_plac = null;
+	private $marr_rec = null;			// Gedcom marriage subrecord (after showfact, showfactdetails and factviewrestricted)
+	private $marr_date = null;			// Marriage date (after showfact, showfactdetails and factviewrestricted)
+	private $marr_type = null;			// Marriage type (after showfact, showfactdetails and factviewrestricted)
+	private $marr_plac = null;			// Marriage place (after showfact, showfactdetails and factviewrestricted)
 	
 	// Relations from the FAMC link
-	public $showprimary = null;
-	public $pedigreetype = null;
-	public $status = null;
+	public $showprimary = null;			// Show this family as primary from the childs perspective (set in person class)
+	public $pedigreetype = null;		// Pedigree type of this family from the childs perspective (set in person class)
+	public $status = null;				// Status of this family from the childs perspective (set in person class)
+	
+	
 	/**
 	 * constructor
 	 * @param string $gedrec	the gedcom record
 	 */
-	public function __construct($id, $gedrec="", $gedcomid="", $changed=false) {
+	public function __construct($id, $gedrec="", $gedcomid="") {
 		global $GEDCOM, $show_changes, $Users;
 		
 		parent::__construct($id, $gedrec, $gedcomid);
 		$this->exclude_facts = "";
 	
-		// for now, initialize
-//		$this->GetFamilyDescriptor();
-//		$this->GetFamilyAddDescriptor();
 	}
 
 	public function __get($property) {
@@ -85,11 +91,31 @@ class Family extends GedcomRecord {
 			case "husb_id":
 				return $this->GetHusbID();
 				break;
+			case "husbold":
+				return $this->GetOldHusb();
+				break;
+			case "husbold_id":
+				return $this->GetOldHusbID();
+				break;
+			case "husb_status":
+				if (is_null($this->husb_status)) $this->GetHusband();
+				return $this->husb_status;
+				break;
 			case "wife":
 				return $this->GetWife();
 				break;
 			case "wife_id":
 				return $this->GetWifeID();
+				break;
+			case "wifeold":
+				return $this->GetOldWife();
+				break;
+			case "wifeold_id":
+				return $this->GetOldWifeID();
+				break;
+			case "wife_status":
+				if (is_null($this->wife_status)) $this->GetWife();
+				return $this->wife_status;
 				break;
 			case "parents":
 				return array("HUSB" => $this->GetHusband(), "WIFE" => $this->GetWife());
@@ -99,6 +125,9 @@ class Family extends GedcomRecord {
 				break;
 			case "children_count":
 				return $this->GetNumberOfChildren();
+				break;
+			case "children_ids":
+				return $this->GetChildrenIds();
 				break;
 			case "sortable_name":
 				return $this->GetFamilyDescriptor();
@@ -124,6 +153,9 @@ class Family extends GedcomRecord {
 			case "label":
 				return $this->label;
 				break;
+			case "title":
+				return $this->GetTitle();
+				break;
 			default:
 				return parent::__get($property);
 				break;
@@ -139,21 +171,46 @@ class Family extends GedcomRecord {
 
 		if (is_null($this->children)) {
 		
-			if ($this->show_changes && $this->ThisChanged()) $gedrec = $this->GetChangedGedrec();
-			else $gedrec = $this->gedrec;
-			
 			$this->children = array();
-				
+			$this->child_status = array();
+			if ($this->show_changes && $this->ThisChanged()) {
+				$changed = true;
+				$gedrec = $this->GetChangedGedrec();
+				$num = preg_match_all("/1\s*CHIL\s*@(.*)@/", $gedrec, $smatch, PREG_SET_ORDER);
+				$this->children_count = $num;
+				for($i=0; $i<$num; $i++) {
+					//-- get the childs ids
+					$chil = trim($smatch[$i][1]);
+					$this->children[$chil] = new Person($chil);
+					$this->child_status[$chil] = "new";
+				}
+			}
+			else $changed = false;
+			$gedrec = $this->gedrec;
 			$num = preg_match_all("/1\s*CHIL\s*@(.*)@/", $gedrec, $smatch, PREG_SET_ORDER);
+			if (is_null($this->children_count)) $this->children_count = $num;
 			for($i=0; $i<$num; $i++) {
 				//-- get the childs ids
 				$chil = trim($smatch[$i][1]);
-				$this->children[] = new Person($chil);
+				if (!isset($this->children[$chil])) {
+					$this->children[$chil] = new Person($chil);
+					if ($changed) $this->child_status[$chil] = "deleted";
+					else $this->child_status[$chil] = "";
+				}
+				else $this->child_status[$chil] = "";
 			}
 		}
 		return $this->children;
 	}
 
+	public function GetChildStatus($chil) {
+		
+		if (is_null($this->child_status)) $this->GetChildren();
+		
+		return $this->child_status[$chil];
+	}
+			
+	
 	private function GetFamilyDescriptor() {
 		
 		if (is_null($this->sortable_name)) $this->sortable_name = GetFamilyDescriptor($this->xref, false, $this->gedrec);
@@ -169,6 +226,23 @@ class Family extends GedcomRecord {
 		return $this->sortable_addname;
 	}
 
+	private function GetTitle() {
+		
+		if (is_null($this->title)) {
+			$this->title = GetFamilyDescriptor($this->xref, true, $this->gedrec);
+		}
+		return $this->title;
+	}
+	
+	private function getOldHusbId() {
+		
+		if (is_null($this->husbold_id)) {
+			if (is_null($this->husbold)) $this->getOldHusb();
+			if (is_object($this->husbold)) $this->husbold_id = $this->husbold->xref;
+			else $this->husbold_id = "";
+		}		
+		return $this->husbold_id;
+	}
 	/**
 	 * get the husbands ID
 	 * @return string
@@ -190,14 +264,43 @@ class Family extends GedcomRecord {
 	private function getHusband() {
 		
 		if (is_null($this->husb)) {
-			if ($this->show_changes && $this->ThisChanged()) $gedrec = $this->GetChangedGedrec();
-			else $gedrec = $this->gedrec;
-			$husb = GetGedcomValue("HUSB", 1, $gedrec);
+			$husbold = "";
+			$husb = GetGedcomValue("HUSB", 1, $this->gedrec);
+			$this->husb_status = "";
+			if ($this->show_changes && $this->ThisChanged()) {
+				$gedrec = $this->GetChangedGedrec();
+				$husbnew = GetGedcomValue("HUSB", 1, $gedrec);
+				if ($husb == "" && $husbnew != "") {
+					$this->husb_status = "new";
+					$husb = $husbnew;
+					$husbold = "";
+				}
+				elseif ($husb != "" && $husbnew == "") {
+					$this->husb_status = "deleted";
+					$husbold = $husb;
+					$husb = "";
+				}
+				elseif ($husb != $husbnew) {
+					$husbold = $husb;
+					$husb = $husbnew;
+					$this->husb_status = "changed";
+				}
+				else $husb = $husbnew;
+			}
 			if (!empty($husb)) $this->husb = new Person($husb);
 			else $this->husb = "";
+			if (!empty($husbold)) $this->husbold = new Person($husbold);
+			else $this->husbold = "";
 		}
 		return $this->husb;
 	}
+	
+	private function GetOldHusb() {
+		
+		if (is_null($this->husbold)) $this->GetHusband();
+		return $this->husbold;
+	}
+	
 	/**
 	 * get the wife ID
 	 * @return string
@@ -212,18 +315,57 @@ class Family extends GedcomRecord {
 		return $this->wife_id;
 	}
 
+	private function getOldWifeId() {
+		
+		if (is_null($this->wifeold_id)) {
+			if (is_null($this->wifeold)) $this->getOldWife();
+			if (is_object($this->wifeold)) $this->wifeold_id = $this->wifeold->xref;
+			else $this->wifeold_id = "";
+		}		
+		return $this->wifeold_id;
+	}
+	
 	private function getWife() {
 		
 		if (is_null($this->wife)) {
-			if ($this->show_changes && $this->ThisChanged()) $gedrec = $this->GetChangedGedrec();
-			else $gedrec = $this->gedrec;
-			$wife = GetGedcomValue("WIFE", 1, $gedrec);
+			$wifeold = "";
+			$wife = GetGedcomValue("WIFE", 1, $this->gedrec);
+			$this->wife_status = "";
+			if ($this->show_changes && $this->ThisChanged()) {
+				$gedrec = $this->GetChangedGedrec();
+				$wifenew = GetGedcomValue("WIFE", 1, $gedrec);
+				if ($wife == "" && $wifenew != "") {
+					$this->wife_status = "new";
+					$wife = $wifenew;
+					$wifeold = "";
+				}
+				elseif ($wife != "" && $wifenew == "") {
+					$this->wife_status = "deleted";
+					$wifeold = $wife;
+					$wife = "";
+				}
+				elseif ($wife != $wifenew) {
+					$wifeold = $wife;
+					$wife = $wifenew;
+					$this->wife_status = "changed";
+				}
+				else $wife = $wifenew;
+			}
 			if (!empty($wife)) $this->wife = new Person($wife);
 			else $this->wife = "";
+			if (!empty($wifeold)) $this->wifeold = new Person($wifeold);
+			else $this->wifeold = "";
 		}
 		return $this->wife;
 	}
+
+	private function GetOldWife() {
+		
+		if (is_null($this->wifeold)) $this->GetWife();
+		return $this->wifeold;
+	}
 	
+		
 	/**
 	 * get the number of level 1 media items 
 	 * @return string
@@ -266,10 +408,7 @@ class Family extends GedcomRecord {
 	 */
 	private function getNumberOfChildren() {
 		
-		if(is_null($this->children_count)) {
-			$this->GetChildren();
-			$this->children_count = count($this->children);
-		}
+		if(is_null($this->children_count)) $this->GetChildren();
 		return $this->children_count;
 	}
 	  

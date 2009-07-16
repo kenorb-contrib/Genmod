@@ -47,6 +47,7 @@ class DetailController extends BaseController{
 	private $tabs = null;
 	private $tabtype = null;
 	private $object_name = null;
+	private $fact_filter = null; // These facts will not be printed in the fact tab (but later in the separate tabs)
 	
 	// Holders and counters for linked objects
 	
@@ -62,31 +63,37 @@ class DetailController extends BaseController{
 				$this->tabs = array('0', 'relatives', 'facts', 'sources', 'media', 'notes', 'actions_person');
 				$this->tabtype = "indi";
 				$this->object_name = "indi";
+				$this->fact_filter = array("OBJE", "SOUR", "NOTE", "SEX", "NAME");
 				break;
 			case "FamilyController":
-				$this->tabs = array();
+				$this->tabs = array('0', 'facts', 'sources', 'media', 'notes');
 				$this->tabtype = "fam";
 				$this->object_name = "family";
+				$this->fact_filter = array("OBJE", "SOUR", "NOTE");
 				break;
 			case "SourceController":
 				$this->tabs = array('0','facts','individuals_links','families_links','notes_links','media_links');
 				$this->tabtype = "sour";
 				$this->object_name = "source";
+				$this->fact_filter = array();
 				break;
 			case "MediaController":
 				$this->tabs = array('0','facts','individuals_links','families_links','sources_links','repositories_links');
 				$this->tabtype = "obje";
 				$this->object_name = "media";
+				$this->fact_filter = array();
 				break;
 			case "NoteController":
 				$this->tabs = array('0','facts','individuals_links','families_links','sources_links','media_links','repositories_links');
 				$this->tabtype = "note";
 				$this->object_name = "note";
+				$this->fact_filter = array();
 				break;
 			case "RepositoryController":
 				$this->tabs = array('0','facts','sources_links','actions_links');
 				$this->tabtype = "repo";
 				$this->object_name = "repo";
+				$this->fact_filter = array();
 				break;
 			default:
 				return false;
@@ -145,7 +152,7 @@ class DetailController extends BaseController{
 		<?php
 		if (!$this->IsPrintPreview()) {
 			// Print message is any changes to links are present
-			if (HasUnapprovedLinks($this->xref) && $this->show_changes) print $gm_lang["unapproved_link"];
+			if ($this->show_changes && $this->HasUnapprovedLinks()) print "<br />".$gm_lang["unapproved_link"];
 			print "<div class=\"door center\">";
 			print "<dl>";
 			foreach ($this->tabs as $index => $tab) {
@@ -168,7 +175,7 @@ class DetailController extends BaseController{
 			}
 			print "<dd id=\"door0\"><a href=\"javascript:;\" onclick=\"tabswitch(0)\" >".$gm_lang["all"]."</a></dd>\n";
 			print "</dl>\n";
-			print "</div><div id=\"dummy\"></div><br /><br />\n";
+			print "</div><div id=\"dummy\"></div><br />\n";
 		}
 		foreach ($this->tabs as $index => $tab) {
 			if ($tab == "facts") {
@@ -200,16 +207,16 @@ class DetailController extends BaseController{
 					if (!empty($fact)) {
 						$styleadd = $value[3];
 						if ($fact=="OBJE") {
-							if ($object_name != "indi") print_main_media($value[1], $this->$object_name->xref, 0, $value[2], ($this->$object_name->show_changes), $value[3]);
+							if (!in_array($fact, $this->fact_filter)) print_main_media($value[1], $this->$object_name->xref, 0, $value[2], ($this->$object_name->show_changes), $value[3]);
 						}
 						else if ($fact=="SOUR") {
-							if ($object_name != "indi") print_main_sources($value[1], 1, $this->$object_name->xref, $value[2], $value[3], $this->$object_name->canedit);
+							if (!in_array($fact, $this->fact_filter)) print_main_sources($value[1], 1, $this->$object_name->xref, $value[2], $value[3], $this->$object_name->canedit);
 						}
 						else if ($fact=="NOTE") {
-							if ($object_name != "indi") print_main_notes($value[1], 1, $this->$object_name->xref, $value[2], $value[3]);
+							if (!in_array($fact, $this->fact_filter)) print_main_notes($value[1], 1, $this->$object_name->xref, $value[2], $value[3]);
 						}
 						else {
-							if ($object_name != "indi" || ($object_name == "indi" && $fact != "SEX" && $fact != "NAME")) print_fact($value[1], $this->$object_name->xref, $value[0], $value[2], false, $value[3]);
+							if (!in_array($fact, $this->fact_filter)) print_fact($value[1], $this->$object_name->xref, $value[0], $value[2], false, $value[3]);
 						}
 					}
 				}
@@ -465,46 +472,13 @@ class DetailController extends BaseController{
 							}
 							print "</td></tr>";
 							print "</table>";
+							
 							// Husband and wife
 							print "<table class=\"facts_table\">";
-							if ($family->husb_id != "") {
-								print "<tr><td class=\"width20 shade2 center\"";
-								if ($this->show_changes && $family->husb->isnew) print " style=\"border: solid #0000FF 2px; vertical-align: middle;\"";
-								else print " style=\"vertical-align: middle;\"";
-								print ">";	
-								print $family->husb->label."</td>";
-								print "<td class=\"".$this->getPersonStyle($family->husb)."\">";
-								PrintPedigreePerson($family->husb, 2, true, $prtcount, 1, $this->view);
-								$prtcount++;
-								print "</td></tr>";
-							}
-							if ($family->wife_id != "") {
-								print "<tr><td class=\"width20 shade2 center\"";
-								if ($this->show_changes && $family->wife->isnew) print " style=\"border: solid #0000FF 2px; vertical-align: middle;\"";
-								else print " style=\"vertical-align: middle;\"";
-								print ">";	
-								print $family->wife->label."</td>";
-								print "<td class=\"".$this->getPersonStyle($family->wife)."\">";
-								PrintPedigreePerson($family->wife, 2, true, $prtcount, 1, $this->view);
-								$prtcount++;
-								print "</td></tr>";
-							}
+							$prtcount = $this->PrintIndiParents($family, $prtcount);
+							
 							// Children
-							foreach ($family->children as $childid => $child) {
-								if (isset($child->label[$famid])) {
-									print "<tr><td class=\"width20 shade2 center";
-									if ($this->show_changes) {
-										if ($child->isnew) print " change_new";
-										elseif ($child->isdeleted) print " change_old";
-									}
-									print "\" style=\"vertical-align: middle;\">";
-									print $child->label[$famid]."</td>";
-									print "<td class=\"".$this->getPersonStyle($child)."\">";
-									PrintPedigreePerson($child, 2 , true, $prtcount, 1, $this->view);
-									$prtcount++;
-									print "</td></tr>";
-								}
-							}
+							$prtcount = $this->PrintIndiChildren($family, $prtcount);
 							print "</table>";
 						}
 						// NOTE: Half-siblings father
@@ -519,20 +493,8 @@ class DetailController extends BaseController{
 										print "</td></tr></table>";
 										
 										print "<table class=\"facts_table\">";
-										if ($family->wife_id != "") {
-											print "<tr><td class=\"width20 shade2 center\" style=\"vertical-align: middle;\">".$family->wife->label."</td>";
-											print "<td class=\"".$this->getPersonStyle($family->wife)."\">";
-											PrintPedigreePerson($family->wife,2, true, $prtcount, 1, $this->view);
-											$prtcount++;
-											print "</td></tr>";
-										}
-										foreach ($family->children as $sibid => $sibling) {
-											print "<tr><td class=\"width20 shade2 center\" style=\"vertical-align: middle;\">".$sibling->label."</td>";
-											print "<td class=\"".$this->getPersonStyle($sibling)."\">";
-											PrintPedigreePerson($sibling,2,true, $prtcount, 1, $this->view);
-											$prtcount++;
-											print "</td></tr>";
-										}
+										$prtcount = $this->PrintIndiParents($family, $prtcount, "husb");
+										$prtcount = $this->PrintIndiChildren($family, $prtcount);
 										print "</table>";
 									}
 								}
@@ -551,20 +513,8 @@ class DetailController extends BaseController{
 										print "</td></tr></table>";
 										
 										print "<table class=\"facts_table\">";
-										if ($family->husb_id != "") { 
-											print "<tr><td class=\"width20 shade2 center\" style=\"vertical-align: middle;\">".$family->wife->label."</td>";
-											print "<td class=\"".$this->getPersonStyle($family->husb)."\">";
-											PrintPedigreePerson($family->husb,2,true, $prtcount, 1, $this->view);
-											$prtcount++;
-											print "</td></tr>";
-										}
-										foreach ($family->children as $sibid => $sibling) {
-											print "<tr><td class=\"width20 shade2 center\" style=\"vertical-align: middle;\">".$sibling->label."</td>";
-											print "<td class=\"".$this->getPersonStyle($sibling)."\">";
-											PrintPedigreePerson($sibling,2,true, $prtcount, 1, $this->view);
-											$prtcount++;
-											print "</td></tr>";
-										}
+										$prtcount = $this->PrintIndiParents($family, $prtcount, "wife");
+										$prtcount = $this->PrintIndiChildren($family, $prtcount);
 										print "</table>";
 									}
 								}
@@ -583,45 +533,8 @@ class DetailController extends BaseController{
 							print "</table>";
 							
 							print "<table class=\"facts_table\">";
-							if ($family->husb_id != "") {
-								print "<tr><td class=\"width20 shade2 center";
-								if ($this->show_changes) {
-									if ($family->husb->isnew) print " change_new";
-									elseif ($family->husb->isdeleted) print " change_old";
-								}
-								print "\" style=\"vertical-align: middle;\">";
-								print $family->husb->label."</td>";
-								print "<td class=\"".$this->getPersonStyle($family->husb)."\">";
-								PrintPedigreePerson($family->husb, 2, true, $prtcount, 1, $this->view);
-								$prtcount++;
-								print "</td></tr>";
-							}
-							if ($family->wife_id != "") {
-								print "<tr><td class=\"width20 shade2 center";
-								if ($this->show_changes) {
-									if ($family->wife->isnew) print " change_new";
-									elseif ($family->wife->isdeleted) print " change_old";
-								}
-								print "\" style=\"vertical-align: middle;\">";
-								print $family->wife->label."</td>";
-								print "<td class=\"".$this->getPersonStyle($family->wife)."\">";
-								PrintPedigreePerson($family->wife, 2, true, $prtcount, 1, $this->view);
-								$prtcount++;
-								print "</td></tr>";
-							}
-							foreach ($family->children as $kidid => $kid) {
-								print "<tr><td class=\"width20 shade2 center"; 
-								if ($this->show_changes) {
-									if ($kid->isnew) print " change_new";
-									else if ($kid->isdeleted) print " change_old";
-								}
-								print "\" style=\"vertical-align: middle;\">";
-								print $kid->label."</td>";
-								print "<td class=\"".$this->getPersonStyle($kid)."\">";
-								PrintPedigreePerson($kid, 2, true, $prtcount, 1, $this->view);
-								$prtcount++;
-								print "</td></tr>";
-							}
+							$prtcount = $this->PrintIndiParents($family, $prtcount);
+							$prtcount = $this->PrintIndiChildren($family, $prtcount);
 							print "</table>";
 						}
 					}
@@ -789,6 +702,86 @@ class DetailController extends BaseController{
 		
 		$object_name = $this->object_name;
 		if ($this->$object_name->israwedited) print $gm_lang["is_rawedited"];
+	}
+	
+	private function HasUnapprovedLinks() {
+		global $TBLPREFIX;
+		
+		if ($this->show_changes) {
+			$sql = "SELECT count(ch_id) FROM ".$TBLPREFIX."changes WHERE ch_gedfile='".$this->gedcomid."' AND ch_fact NOT IN ('HUSB', 'WIFE', 'CHIL', 'FAMC', 'FAMS', 'INDI') AND ((ch_new LIKE '%@".$this->xref."@%' AND ch_new NOT LIKE '%0 @".$this->xref."@%') OR (ch_old LIKE '%@".$this->xref."@%' AND ch_old NOT LIKE '0 @".$this->xref."@%'))";
+			$res = NewQuery($sql);
+			$row = $res->FetchRow();
+			return $row[0];
+		}
+		else return false;
+	}
+	
+	private function PrintIndiParents($family, $prtcount, $suppress = "") {
+		
+		if ($suppress != "husb") {
+			if ($family->show_changes && $family->husbold_id != "") {
+				$style = " change_old";
+				print "<tr><td class=\"width20 shade2 center".$style."\" style=\"vertical-align: middle;\">";
+				print "&nbsp;</td>"; // No relation for former wives
+				print "<td class=\"".$this->getPersonStyle($family->husbold).$style."\">";
+				PrintPedigreePerson($family->husbold, 2, true, $prtcount, 1, $this->view);
+				$prtcount++;
+				print "</td></tr>";
+			}
+			if ($family->husb_id != "") {
+				$style = "";
+				if ($this->show_changes && $family->husb_status != "") $style = " change_new";
+				print "<tr><td class=\"width20 shade2 center".$style."\" style=\"vertical-align: middle;\">";
+				print $family->husb->label."</td>";
+				print "<td class=\"".$this->getPersonStyle($family->husb).$style."\">";
+				PrintPedigreePerson($family->husb, 2, true, $prtcount, 1, $this->view);
+				$prtcount++;
+				print "</td></tr>";
+			}
+		}
+		if ($suppress != "wife") {
+			if ($family->show_changes && $family->wifeold_id != "") {
+				$style = " change_old";
+				print "<tr><td class=\"width20 shade2 center".$style."\" style=\"vertical-align: middle;\">";
+				print "&nbsp;</td>"; // No relation for former husbands
+				print "<td class=\"".$this->getPersonStyle($family->wifeold).$style."\">";
+				PrintPedigreePerson($family->wifeold, 2, true, $prtcount, 1, $this->view);
+				$prtcount++;
+				print "</td></tr>";
+			}
+			if ($family->wife_id != "") {
+				$style = "";
+				if ($this->show_changes && $family->wife_status != "") $style = " change_new";
+				print "<tr><td class=\"width20 shade2 center".$style."\" style=\"vertical-align: middle;\">";
+				print $family->wife->label."</td>";
+				print "<td class=\"".$this->getPersonStyle($family->wife).$style."\">";
+				PrintPedigreePerson($family->wife, 2, true, $prtcount, 1, $this->view);
+				$prtcount++;
+				print "</td></tr>";
+			}
+		}
+		return $prtcount;
+	}
+
+	private function PrintIndiChildren($family, $prtcount) {
+		
+		foreach ($family->children as $childid => $child) {
+
+			if (isset($child->label[$family->xref])) {
+				$style = "";
+				if ($child->show_changes) {
+					if ($family->child_status[$childid] == "new") $style = " change_new";
+					elseif ($family->child_status[$childid] == "deleted") $style = " change_old";
+				}
+				print "<tr><td class=\"width20 shade2 center".$style."\" style=\"vertical-align: middle;\">";
+				print $child->label[$family->xref]."</td>";
+				print "<td class=\"".$this->getPersonStyle($child).$style."\">";
+				PrintPedigreePerson($child, 2 , true, $prtcount, 1, $this->view);
+				$prtcount++;
+				print "</td></tr>";
+			}
+		}
+		return $prtcount;
 	}
 }
 ?>

@@ -818,31 +818,32 @@ switch ($action) {
 		$mother = $family->wife;
 		$children = $family->children;
 		if (count($children)>0) {
-			if (!is_null($father)) {
-				if ($father->getSex()=="F") $father->setLabel($gm_lang["mother"]);
+			if (is_object($father)) {
+				if ($father->sex=="F") $father->setLabel($gm_lang["mother"]);
 				else $father->setLabel($gm_lang["father"]);
 			}
-			if (!is_null($mother)) {
-				if ($mother->getSex()=="M") $mother->setLabel($gm_lang["father"]);
+			if (is_object($mother)) {
+				if ($mother->sex=="M") $mother->setLabel($gm_lang["father"]);
 				else $mother->setLabel($gm_lang["mother"]);
 			}
-			for($i=0; $i<count($children); $i++) {
-				if (!is_null($children[$i])) {
-					if ($children[$i]->getSex()=="M") $children[$i]->setLabel($gm_lang["son"]);
-					else if ($children[$i]->getSex()=="F") $children[$i]->setLabel($gm_lang["daughter"]);
+//			for($i=0; $i<count($children); $i++) {
+			foreach ($children as $i => $child) {
+				if (is_object($children[$i])) {
+					if ($children[$i]->sex=="M") $children[$i]->setLabel($gm_lang["son"]);
+					else if ($children[$i]->sex=="F") $children[$i]->setLabel($gm_lang["daughter"]);
 					else $children[$i]->setLabel($gm_lang["child"]);
 				}
 			}
 		}
 		else {
-			if (!is_null($father)) {
-				if ($father->getSex()=="F") $father->setLabel($gm_lang["wife"]);
-				else if ($father->getSex()=="M") $father->setLabel($gm_lang["husband"]);
+			if (is_object($father)) {
+				if ($father->sex=="F") $father->setLabel($gm_lang["wife"]);
+				else if ($father->sex=="M") $father->setLabel($gm_lang["husband"]);
 				else $father->setLabel($gm_lang["spouse"]);
 			}
-			if (!is_null($mother)) {
-				if ($mother->getSex()=="F") $mother->setLabel($gm_lang["wife"]);
-				else if ($mother->getSex()=="M") $mother->setLabel($gm_lang["husband"]);
+			if (is_object($mother)) {
+				if ($mother->sex=="F") $mother->setLabel($gm_lang["wife"]);
+				else if ($mother->sex=="M") $mother->setLabel($gm_lang["husband"]);
 				else $father->setLabel($gm_lang["spouse"]);
 			}
 		}
@@ -872,10 +873,10 @@ switch ($action) {
 				<tr><td colspan="4" class="topbottombar"><?php print_help_link("change_family_instr","qm","change_family_instr"); ?><?php print $gm_lang["change_family_members"]; ?></td></tr>
 				<tr>
 				<?php
-				if (!is_null($father)) {
+				if (is_object($father)) {
 				?>
 					<td class="shade2 <?php print $TEXT_DIRECTION; ?>"><b><?php print $father->getLabel(); ?></b><input type="hidden" name="HUSB" value="<?php print $father->xref;?>" /></td>
-					<td id="HUSBName" class="shade1 <?php print $TEXT_DIRECTION; ?>"><?php print PrintReady($father->getName()); ?><br /><?php print_first_major_fact($father->xref, $father->gedrec); ?></td><td class="shade1">&nbsp;</td>
+					<td id="HUSBName" class="shade1 <?php print $TEXT_DIRECTION; ?>"><?php print PrintReady($father->name); ?><br /><?php print_first_major_fact($father->xref, $father->gedrec); ?></td><td class="shade1">&nbsp;</td>
 				<?php
 				}
 				else {
@@ -886,16 +887,16 @@ switch ($action) {
 				}
 				?>
 					<td class="shade1 <?php print $TEXT_DIRECTION; ?>">
-						<a href="#" id="husbrem" style="display: <?php print is_null($father) ? 'none':'block'; ?>;" onclick="document.changefamform.HUSB.value=''; document.getElementById('HUSBName').innerHTML=''; this.style.display='none'; return false;"><?php print $gm_lang["remove"]; ?></a>
+						<a href="#" id="husbrem" style="display: <?php print !is_object($father) ? 'none':'block'; ?>;" onclick="document.changefamform.HUSB.value=''; document.getElementById('HUSBName').innerHTML=''; this.style.display='none'; return false;"><?php print $gm_lang["remove"]; ?></a>
 						<a href="#" onclick="nameElement = document.getElementById('HUSBName'); remElement = document.getElementById('husbrem'); return findIndi(document.changefamform.HUSB);"><?php print $gm_lang["change"]; ?></a><br />
 					</td>
 				</tr>
 				<tr>
 				<?php
-				if (!is_null($mother)) {
+				if (is_object($mother)) {
 				?>
 					<td class="shade2 <?php print $TEXT_DIRECTION; ?>"><b><?php print $mother->getLabel(); ?></b><input type="hidden" name="WIFE" value="<?php print $mother->xref;?>" /></td>
-					<td id="WIFEName" class="shade1 <?php print $TEXT_DIRECTION; ?>"><?php print PrintReady($mother->getName()); ?><br /><?php print_first_major_fact($mother->xref, $mother->gedrec); ?></td><td class="shade1">&nbsp;</td>
+					<td id="WIFEName" class="shade1 <?php print $TEXT_DIRECTION; ?>"><?php print PrintReady($mother->name); ?><br /><?php print_first_major_fact($mother->xref, $mother->gedrec); ?></td><td class="shade1">&nbsp;</td>
 				<?php
 				}
 				else {
@@ -906,7 +907,7 @@ switch ($action) {
 				}
 				?>
 					<td class="shade1 <?php print $TEXT_DIRECTION; ?>">
-						<a href="#" id="wiferem" style="display: <?php print is_null($mother) ? 'none':'block'; ?>;" onclick="document.changefamform.WIFE.value=''; document.getElementById('WIFEName').innerHTML=''; this.style.display='none'; return false;"><?php print $gm_lang["remove"]; ?></a>
+						<a href="#" id="wiferem" style="display: <?php print !is_object($mother) ? 'none':'block'; ?>;" onclick="document.changefamform.WIFE.value=''; document.getElementById('WIFEName').innerHTML=''; this.style.display='none'; return false;"><?php print $gm_lang["remove"]; ?></a>
 						<a href="#" onclick="nameElement = document.getElementById('WIFEName'); remElement = document.getElementById('wiferem'); return findIndi(document.changefamform.WIFE);"><?php print $gm_lang["change"]; ?></a><br />
 					</td>
 				</tr>
@@ -921,7 +922,7 @@ switch ($action) {
 					?>
 				<tr>
 					<td class="shade2 <?php print $TEXT_DIRECTION; ?>"><b><?php print $child->getLabel(); ?></b><input type="hidden" name="CHIL<?php print $i; ?>" value="<?php print $child->xref;?>" /></td>
-					<td id="CHILName<?php print $i; ?>" class="shade1"><?php print PrintReady($child->getName()); ?><br /><?php print_first_major_fact($child->xref, $child->gedrec); ?></td>
+					<td id="CHILName<?php print $i; ?>" class="shade1"><?php print PrintReady($child->name); ?><br /><?php print_first_major_fact($child->xref, $child->gedrec); ?></td>
 					<td id="CHILPedi<?php print $i; ?>" class="shade1"><?php PrintPedi("CHILPedisel".$i, $pedi); ?></td>
 					<td class="shade1 <?php print $TEXT_DIRECTION; ?>">
 						<a href="#" id="childrem<?php print $i; ?>" style="display:block;" onclick="document.changefamform.CHIL<?php print $i; ?>.value=''; document.getElementById('CHILName<?php print $i; ?>').innerHTML=''; this.style.display='none'; return false;"><?php print $gm_lang["remove"]; ?></a>
@@ -976,7 +977,7 @@ switch ($action) {
 
 			// Remove the fam link from the old father record
 			$famids = FindSfamilyIds($father->xref, true);
-			$frec = $father->GetchangedGedcomRecord();
+			$frec = $father->changedgedrec;
 			foreach ($famids as $key => $fam) {
 				if ($fam["famid"] == $famid) {
 					$oldfath = GetSubrecord(1, "1 FAMS @$famid@", $frec, 1);
@@ -1008,7 +1009,7 @@ switch ($action) {
 			
 			// Remove the fam link from the old father record
 			$famids = FindSfamilyIds($father->xref, true);
-			$frec = $father->GetchangedGedcomRecord();
+			$frec = $father->changedgedrec;
 			foreach ($famids as $key => $fam) {
 				if ($fam["famid"] == $famid) {
 					$oldfath = GetSubrecord(1, "1 FAMS @$famid@", $frec, 1);
@@ -1052,7 +1053,7 @@ switch ($action) {
 			
 			// Remove the fam link from the old mother record
 			$famids = FindSfamilyIds($mother->xref, true);
-			$mrec = $mother->GetchangedGedcomRecord();
+			$mrec = $mother->changedgedrec;
 			foreach ($famids as $key => $fam) {
 				if ($fam["famid"] == $famid) {
 					$oldmoth = GetSubrecord(1, "1 FAMS @$famid@", $mrec, 1);
@@ -1085,7 +1086,7 @@ switch ($action) {
 			
 			// Remove the fam link from the old mother record
 			$famids = FindSfamilyIds($mother->xref, true);
-			$mrec = $mother->GetchangedGedcomRecord();
+			$mrec = $mother->changedgedrec;
 			foreach ($famids as $key => $fam) {
 				if ($fam["famid"] == $famid) {
 					$oldmoth = GetSubrecord(1, "1 FAMS @$famid@", $mrec, 1);
@@ -1183,7 +1184,7 @@ switch ($action) {
 					$success = $success && ReplaceGedrec($famid, $oldrec, "", "CHIL", $change_id, $change_type);
 					
 					//-- remove the FAMC link from the child record
-					$chgedrec = $child->getchangedGedcomrecord();
+					$chgedrec = $child->changedgedrec;
 					$oldrec = GetSubrecord(1, "1 FAMC @$famid@", $chgedrec, 1);
 					$success = $success && ReplaceGedrec($child->xref, $oldrec, "" , "FAMC", $change_id, $change_type);
 				}

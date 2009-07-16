@@ -81,7 +81,7 @@ function PrintFamilyHeader($famid, $famrec="", $changes = false) {
  * @param string $parid optional parent ID (descendancy booklet)
  * @param string $gparid optional gd-parent ID (descendancy booklet)
  */
-function PrintFamilyParents($famid, $sosa = 0, $label="", $parid="", $gparid="", $personcount="1") {
+function print_family_parents($famid, $sosa = 0, $label="", $parid="", $gparid="", $personcount="1") {
 	global $gm_lang, $view, $show_full, $show_famlink;
 	global $TEXT_DIRECTION, $SHOW_EMPTY_BOXES, $SHOW_ID_NUMBERS, $SHOW_FAM_ID_NUMBERS, $LANGUAGE;
 	global $pbwidth, $pbheight;
@@ -295,7 +295,7 @@ function PrintFamilyParents($famid, $sosa = 0, $label="", $parid="", $gparid="",
  * @param int $sosa optional child sosa number
  * @param string $label optional indi label (descendancy booklet)
  */
-function PrintFamilyChildren($famid, $childid = "", $sosa = 0, $label="", $personcount="1") {
+function print_family_children($famid, $childid = "", $sosa = 0, $label="", $personcount="1") {
 	global $gm_lang, $pbwidth, $pbheight, $view, $show_famlink, $show_cousins;
 	global $GM_IMAGE_DIR, $GM_IMAGES, $show_changes, $GEDCOM, $SHOW_ID_NUMBERS, $SHOW_FAM_ID_NUMBERS, $TEXT_DIRECTION, $gm_username, $Users;
 
@@ -726,11 +726,11 @@ function PrintSosaFamily($famid, $childid, $sosa, $label="", $parid="", $gparid=
 	if ($view != "preview") print "<hr />";
 	print "\r\n\r\n<p style='page-break-before:always' />\r\n";
 	print "<a name=\"$famid\"></a>\r\n";
-	PrintFamilyParents($famid, $sosa, $label, $parid, $gparid, $personcount);
+	print_family_parents($famid, $sosa, $label, $parid, $gparid, $personcount);
 	$personcount++;
 	print "\n\t<br />\n";
 	print "<table width=\"95%\"><tr><td valign=\"top\" style=\"width: " . ($pbwidth) . "px;\">\n";
-	PrintFamilyChildren($famid, $childid, $sosa, $label, $personcount);
+	print_family_children($famid, $childid, $sosa, $label, $personcount);
 	print "</td><td valign=\"top\">";
 	if ($sosa == 0) PrintFamilyFacts($famid, $sosa);
 	print "</td></tr></table>\n";
@@ -839,21 +839,19 @@ function PedigreeArray($rootid) {
 	for($i = 0; $i < ($treesize / 2); $i++) {
 		if (!empty($treeid[$i])) {
 			print " ";
-			$person = new Person($treeid[$i], FindPersonRecord($treeid[$i]));
-			$famids = $person->getChildFamilies();
+			$person = new Person($treeid[$i]);
+			$famids = $person->childfamilies;
 			// $famids = FindFamilyIds($treeid[$i]);
 			if (count($famids) > 0) {
 				$parents = false;
-//				$j = 0;
 				$wife = null;
 				$husb = null;
 				// First see if there is a primary family
 				foreach($famids as $famid=>$family) {
-//					print "fsp:".$family->ShowPrimary."<br />";
-					if (!is_null($family) && $family->ShowPrimary) {
+					if (is_object($family) && $family->showprimary) {
 						$wife = $family->wife;
 						$husb = $family->husb;
-						if (!is_null($wife) || !is_null($husb)) {
+						if (is_object($wife) || is_object($husb)) {
 							$parents = true;
 							break;
 						}
@@ -862,10 +860,10 @@ function PedigreeArray($rootid) {
 				// If no primary found, take the first fam with at least one parent
 				if (!$parents) {
 					foreach($famids as $famid=>$family) {
-						if (!is_null($family)) {
+						if (is_object($family)) {
 							$wife = $family->wife;
-							$husb = $family->wife;
-							if (!is_null($wife) || !is_null($husb)) {
+							$husb = $family->husb;
+							if (is_object($wife) || is_object($husb)) {
 								$parents = true;
 								break;
 							}
@@ -876,9 +874,9 @@ function PedigreeArray($rootid) {
 				}
 
 				if ($parents) {
-					if (!is_null($husb)) $treeid[($i * 2) + 1] = $husb->xref; // -- set father id
+					if (is_object($husb)) $treeid[($i * 2) + 1] = $husb->xref; // -- set father id
 					else $treeid[($i * 2) + 1] = false;
-					if (!is_null($wife)) $treeid[($i * 2) + 2] = $wife->xref; // -- set mother id
+					if (is_object($wife)) $treeid[($i * 2) + 2] = $wife->xref; // -- set mother id
 					else $treeid[($i * 2) + 2] = false;
 				}
 			} else {

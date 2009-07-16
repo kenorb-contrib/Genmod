@@ -184,7 +184,7 @@ class IndividualController extends DetailController {
 			
 			// NOTE: Get the parents and siblings labels
 			$this->indi->getParentFamily($this->pid);
-			
+
 			// NOTE: Get the spouses and kids
 			$this->indi->getSpouseFamily($this->pid);
 			

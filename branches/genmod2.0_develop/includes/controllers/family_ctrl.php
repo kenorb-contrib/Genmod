@@ -32,20 +32,15 @@ if (stristr($_SERVER["SCRIPT_NAME"],basename(__FILE__))) {
 
 class FamilyController extends DetailController
 {
-	var $classname = "FamilyRoot";
+	public $classname = "FamilyRoot";
 	var $user = null;
 	var $uname = '';
 	var $showLivingHusb = true;
 	var $showLivingWife = true;
-	var $parents = '';
-	var $display = false;
-	var $famrec = '';
 	var $link_relation = 0;
 	var $title = '';
-	var $famid = '';
+	var $xref = '';
 	var $family = null;
-	var $famnew = false;
-	var $famdeleted = false;
 	var $display_other_menu = false;
 	var $exists = true;
 	
@@ -69,7 +64,9 @@ class FamilyController extends DetailController
 			$ENABLE_CLIPPINGS_CART,
 			$Users,
 			$SHOW_ID_NUMBERS,
-			$Favorites
+			$Favorites,
+			$nonfacts,
+			$GEDCOM_DEFAULT_TAB
 		;
 		
 		parent::__construct();
@@ -77,48 +74,22 @@ class FamilyController extends DetailController
 		$bwidth = $Dbwidth;
 		$pbwidth = $bwidth + 12;
 		$pbheight = $bheight + 14;
-
+		$nonfacts = array("FAMS", "FAMC", "MAY", "BLOB", "HUSB", "WIFE", "CHIL", "_MEND", "");
 		
-		if (!isset($_REQUEST['view'])) $_REQUEST['view'] = '';
 		$show_famlink = true;
-		if ($_REQUEST['view'] == 'preview') $show_famlink = false;
-		if (!isset($_REQUEST['famid'])) $_REQUEST['famid'] = '';
-		$_REQUEST['famid'] = CleanInput($_REQUEST['famid']);
+		if ($this->view) $show_famlink = false;
+		if (!empty($_REQUEST["famid"])) $this->xref = strtoupper($_REQUEST["famid"]);
+		$this->xref = CleanInput($this->xref);
 		
-		$this->famid = $_REQUEST['famid'];
-		$this->famrec = FindFamilyRecord($this->famid);
-		$this->uname = $Users->GetUserName();
+		// NOTE: Determine which tab should be shown global value
+		$this->default_tab = $GEDCOM_DEFAULT_TAB;
 		
-		//-- if the user can edit and there are changes then get the new changes
-		if (!empty($this->famid) && GetChangeData(true, $this->famid, true, "", "")) {
-			$rec = GetChangeData(false, $this->famid, true, "gedlines", "");
-			$newrec = $rec[$GEDCOM][$this->famid];
-			if (empty($newrec) && !empty($this->famrec)) $this->famdeleted = true;
-			if (!empty($newrec) && empty($this->famrec)) $this->famnew = true;
-			if ($this->show_changes) $this->famrec = $newrec;
-		}
-
-		if (empty($this->famrec) && !$this->famdeleted) {
-			$this->exists = false;
-			print_header($gm_lang['family_info']);
-			print $gm_lang["family_not_found"];
-			print_footer();
-			exit;
-		}
-		
-		$this->parents = FindParentsInRecord($this->famrec);
-		
-		//-- if no record was found create a default empty one
-		$famrec = trim($this->famrec);
-		if (empty($famrec)) $this->famrec = "0 @".$this->famid."@ FAM\r\n";
-		$this->display = displayDetailsByID($this->famid, 'FAM');
-		$this->family = new Family($this->famid, $this->famrec);
-		
+		$this->family = new Family($this->xref);
 		//-- check if we can display both parents
-		if ($this->display == false) {
-			$this->showLivingHusb = showLivingNameByID($this->parents['HUSB']);
-			$this->showLivingWife = showLivingNameByID($this->parents['WIFE']);
-		}
+//		if ($this->display == false) {
+//			$this->showLivingHusb = showLivingNameByID($this->parents['HUSB']);
+//			$this->showLivingWife = showLivingNameByID($this->parents['WIFE']);
+//		}
 
 		// Check if we can display the Other menu
 		if ($Users->userCanViewGedlines() || ($ENABLE_CLIPPINGS_CART >= $Users->getUserAccessLevel()) || ($this->display && !empty($this->uname))) $this->display_other_menu = true;
@@ -141,18 +112,12 @@ class FamilyController extends DetailController
 			}
 		}
 
-		//-- make sure we have the true id from the record
-		$ct = preg_match("/0 @(.*)@/", $this->famrec, $match);
-		if ($ct > 0) {
-			$this->famid = trim($match[1]);
-		}
-
-		if ($this->showLivingHusb == false && $this->showLivingWife == false) {
-			print_header("{$gm_lang['private']} ({$this->famid}) {$gm_lang['family_info']}");
-			print_privacy_error($CONTACT_EMAIL);
-			print_footer();
-			exit;
-		}
+//		if ($this->showLivingHusb == false && $this->showLivingWife == false) {
+//			print_header("{$gm_lang['private']} ({$this->famid}) {$gm_lang['family_info']}");
+//			print_privacy_error($CONTACT_EMAIL);
+//			print_footer();
+//			exit;
+//		}
 		
 		$none = true;
 		if ($this->showLivingHusb == true) {
@@ -204,38 +169,12 @@ class FamilyController extends DetailController
 		}
 	}
 
-	function getFamilyID()
-	{
-		return $this->famid;
-	}
-
-	function getFamilyRecord()
-	{
-		return $this->famrec;
-	}
-
-	function getHusband()
-	{
-		return $this->parents['HUSB'];
-	}
-
-	function getWife()
-	{
-		return $this->parents['WIFE'];
-	}
-
-	function getChildren()
-	{
-		return FindChildrenInRecord($this->famrec);
-	}
-
 	function getChildrenUrlTimeline($start=0)
 	{
-		$children = $this->getChildren();
-		$c = count($children);
-		for ($i = 0; $i < $c; $i++)
-		{
-			$children[$i] = 'pids['.($i + $start).']='.$children[$i];
+		$children = $this->family->children_ids;
+		$c = 0;
+		foreach($children as $id => $child) {
+			$children[$id] = 'pids['.($c + $start).']='.$children[$id];
 		}
 		return join('&amp;', $children);
 	}
@@ -270,7 +209,7 @@ class FamilyController extends DetailController
 		
 		// charts / family_timeline
 		$submenu = new Menu($gm_lang['family_timeline']);
-		$submenu->addLink('timeline.php?pids[0]='.$this->getHusband().'&pids[1]='.$this->getWife().'&'.$this->getChildrenUrlTimeline(2));
+		$submenu->addLink('timeline.php?pids[0]='.$this->husb_id.'&pids[1]='.$this->wife_id.'&'.$this->getChildrenUrlTimeline(2));
 		$menu->addSubmenu($submenu);
 		
 		return $menu;
@@ -310,44 +249,44 @@ class FamilyController extends DetailController
 
 			// edit_fam / members
 			$submenu = new Menu($gm_lang['change_family_members']);
-			$submenu->addLink("change_family_members('".$this->getFamilyID()."', 'change_family_members');");
+			$submenu->addLink("change_family_members('".$this->family->xref."', 'change_family_members');");
 			$menu->addSubmenu($submenu);
 
 			// edit_fam / add child
 			$submenu = new Menu($gm_lang['add_child_to_family']);
-			$submenu->addLink("addnewchild('".$this->getFamilyID()."', 'add_child_to_family');");
+			$submenu->addLink("addnewchild('".$this->family->xref."', 'add_child_to_family');");
 			$menu->addSubmenu($submenu);
 
 			// edit_fam / reorder_children. Only show if #kids > 1
 			if ($this->family->children_count > 1) {
 				$submenu = new Menu($gm_lang['reorder_children']);
-				$submenu->addLink("reorder_children('".$this->getFamilyID()."', 'reorder_children');");
+				$submenu->addLink("reorder_children('".$this->family->xref."', 'reorder_children');");
 				$menu->addSubmenu($submenu);
 			}
 			
 			// edit_fam / reorder_media. Only show if #media > 1
 			if ($this->family->media_count > 1) {
 				$submenu = new Menu($gm_lang['reorder_media']);
-				$submenu->addLink("reorder_media('".$this->getFamilyID()."', 'reorder_media');");
+				$submenu->addLink("reorder_media('".$this->family->xref."', 'reorder_media');");
 				$menu->addSubmenu($submenu);
 			}
 			
 			// edit_fam / delete_family. Don't show if unapproved fam.
 			if (!$this->family->isnew && !$this->family->isdeleted) {
 				$submenu = new Menu($gm_lang['delete_family']);
-				$submenu->addLink("if (confirm('".$gm_lang["delete_family_confirm"]."')) delete_family('".$this->getFamilyID()."', 'delete_family');");
+				$submenu->addLink("if (confirm('".$gm_lang["delete_family_confirm"]."')) delete_family('".$this->family->xref."', 'delete_family');");
 				$menu->addSubmenu($submenu);
 			}
 
 			// edit_fam / edit_raw
 			if ($Users->userCanEditGedlines()) {
 				$submenu = new Menu($gm_lang['edit_raw']);
-				$submenu->addLink("edit_raw('".$this->getFamilyID()."', 'edit_raw');");
+				$submenu->addLink("edit_raw('".$this->family->xref."', 'edit_raw');");
 				$menu->addSubmenu($submenu);
 			}
 		}
 		// TODO: also show this option when media changed
-		if (GetChangeData(true, $this->getFamilyID(), true) || HasChangedMedia($this->famrec)) {
+		if ($this->family->ischanged || HasChangedMedia($this->family->gedrec)) {
 			// edit_fam / seperator
 			if (!$this->family->isdeleted) {
 				$submenu = new Menu();
@@ -388,16 +327,28 @@ class FamilyController extends DetailController
 		if ($ENABLE_CLIPPINGS_CART >= $Users->getUserAccessLevel()) {
 				// other / add_to_cart
 				$submenu = new Menu($gm_lang['add_to_cart']);
-				$submenu->addLink('clippings.php?action=add&id='.$this->getFamilyID().'&type=fam');
+				$submenu->addLink('clippings.php?action=add&id='.$this->family->xref.'&type=fam');
 				$menu->addSubmenu($submenu);
 		}
 		if ($this->display && !empty($this->uname)) {
 				// other / add_to_my_favorites
 				$submenu = new Menu($gm_lang['add_to_my_favorites']);
-				$submenu->addLink('family.php?action=addfav&famid='.$this->getFamilyID().'&gid='.$this->getFamilyID());
+				$submenu->addLink('family.php?action=addfav&famid='.$this->family->xref.'&gid='.$this->getFamilyID());
 				$menu->addSubmenu($submenu);
 		}
 		return $menu;
+	}
+	
+	public function PrintFamilyGroupHeader() {
+		global $gm_lang, $SHOW_COUNTER, $hits;
+		
+		print "\n\t<br /><span class=\"subheaders\">" . $gm_lang["family_group_info"];
+		print $this->family->addxref;
+		print "</span>";
+		if($SHOW_COUNTER) {
+			// Print indi counter only if displaying a non-private person
+			print "\n<span style=\"margin-left: 3px; vertical-align:bottom;\">".$gm_lang["hit_count"]."&nbsp;".$hits."</span>\n";
+		}
 	}
 }
 ?>

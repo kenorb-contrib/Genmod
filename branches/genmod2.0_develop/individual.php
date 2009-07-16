@@ -60,7 +60,6 @@ $namesprinted = false;
 		print "</div>";
 	}
 	?>
-	
 	<!-- NOTE: Print person name and ID -->
 	<span class="name_head"><?php print $controller->indi->name; ?>
 	<span><?php print $controller->indi->addxref; ?></span>
