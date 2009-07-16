@@ -154,7 +154,6 @@ function FindPersonRecord($pid, $gedfile="", $renew = false, $nocache = false) {
 	
 	$gedfileid = $GEDCOMS[$gedfile]["id"];
 	// print $pid." ".$gedfileid."<br />";
-	if ($pid == "REPO71") print $pipo;
 	//-- first check the indilist cache
 	if (!$renew && isset($indilist[$pid]["gedcom"]) && $indilist[$pid]["gedfile"]==$gedfileid) return $indilist[$pid]["gedcom"];
 	if (!$renew && isset($indilist[JoinKey($pid, $gedfileid)]["gedcom"])) return $indilist[JoinKey($pid, $gedfileid)]["gedcom"];
@@ -3589,7 +3588,7 @@ function GetChangeNames($pid) {
 	global $GEDCOM, $GEDCOMS, $TBLPREFIX, $changes, $gm_lang, $GEDCOMID, $gm_username, $show_changes, $Users;
 	
 	$name = array();
-	if ((!isset($show_changes) || (isset($show_changes) && $show_changes !="no")) && $Users->UserCanEditOwn($gm_username, $pid)) $onlyold = false;
+	if ($show_changes && $Users->UserCanEditOwn($gm_username, $pid)) $onlyold = false;
 	else $onlyold = true;
 
 	if(!isset($pid) || empty($pid)) return $name;
@@ -4053,18 +4052,6 @@ function HasOtherChanges($pid, $change_id, $gedid="") {
 	else return false;
 }
 
-function HasUnapprovedLinks($pid, $gedid="") {
-	global $TBLPREFIX, $GEDCOMID, $Users, $gm_username, $show_changes;
-	
-	if (empty($gedid)) $gedid = $GEDCOMID;
-	if ($show_changes && $Users->UserCanEdit($gm_username)) {
-		$sql = "SELECT count(ch_id) FROM ".$TBLPREFIX."changes WHERE ch_gedfile='".$GEDCOMID."' AND ((ch_new LIKE '%@".$pid."@%' AND ch_new NOT LIKE '%0 @".$pid."@%') OR (ch_old LIKE '%@".$pid."@%' AND ch_old NOT LIKE '0 @".$pid."@%'))";
-		$res = NewQuery($sql);
-		$row = $res->FetchRow();
-		return $row[0];
-	}
-	else return false;
-}
 
 function ShowSourceFromAnyGed() {
 	global $TBLPREFIX, $gm_username;

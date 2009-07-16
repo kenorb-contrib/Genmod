@@ -75,7 +75,11 @@ class GedcomRecord {
 	protected $action_hide = null;
 	protected $action_open = null;
 	protected $action_closed = null;
-	
+
+	protected $sourfacts_count = null;	// Count of level 1 source facts. Showfact, Factviewrestricted are applied, also link privacy.
+	protected $notefacts_count = null;	// Count of level 1 note facts. Showfact, Factviewrestricted are applied, also link privacy.
+	protected $mediafacts_count = null;	// Count of level 1 media facts. Showfact, Factviewrestricted are applied, also link privacy.
+		
 	// Informational
 	protected $disp = null;
 	protected $disp_name = null;
@@ -87,6 +91,7 @@ class GedcomRecord {
 	protected $isempty = null;
 	protected $israwedited = null;
 	protected $exclude_facts = "";
+	protected $view = null;
 	
 	/**
 	 * constructor for this class
@@ -113,7 +118,16 @@ class GedcomRecord {
 				case "OBJE": $this->gedrec = FindMediaRecord($this->xref); break;
 				case "NOTE": $this->gedrec = FindOtherRecord($this->xref); break;
 			}
-			if (empty($this->gedrec)) $this->isempty = true;
+			if (empty($this->gedrec)) {
+				if (!$this->show_changes) $this->isempty = true;
+				else {
+					$this->GetChangedGedrec();
+					if (empty($this->changedgedrec)) $this->isempty = true;
+					else $this->isempty = false;
+				}
+			}
+			else $this->isempty = false;
+				
 		}
 		else {
 			$this->isempty = false;
@@ -185,7 +199,7 @@ class GedcomRecord {
 				return $this->type;
 				break;
 			case "addxref":
-				if ($SHOW_ID_NUMBERS) {
+				if ($SHOW_ID_NUMBERS && $this->disp_name) {
 					if ($TEXT_DIRECTION=="ltr")	return " &lrm;(".$this->xref.")&lrm;";
 					else return " &rlm;(".$this->xref.")&rlm;";
 				}
@@ -279,6 +293,21 @@ class GedcomRecord {
 			case "action_closed":
 			if (is_null($this->action_closed)) $this->GetLinksFromActionCount();
 				return $this->action_closed;
+				break;
+			case "sourfacts_count":
+				if (is_null($this->facts)) $this->ParseFacts();
+				return $this->sourfacts_count;
+				break;
+			case "notefacts_count":
+				if (is_null($this->facts)) $this->ParseFacts();
+				return $this->notefacts_count;
+				break;
+			case "mediafacts_count":
+				if (is_null($this->facts)) $this->ParseFacts();
+				return $this->mediafacts_count;
+				break;
+			case "view":
+				return $this->IsPreview();
 				break;
 		}
 	}
@@ -400,6 +429,9 @@ class GedcomRecord {
 						$this->facts[] = array($fact, $subrecord, $count[$fact], "");
 					}
 				}
+				if ($fact == "SOUR") $this->sourfacts_count++;
+				elseif ($fact == "NOTE") $this->notefacts_count++;
+				elseif ($fact == "OBJE") $this->mediafacts_count++;
 			}
 		}
 		// if we don't show changes, don't parse the facts
@@ -480,6 +512,16 @@ class GedcomRecord {
 		$add = GetGedcomValue("CHAN:DATE:TIME", 1, $this->gedrec);
 		if ($add) $this->lastchanged .= " - ".$add;
 		return $this->lastchanged;
+	}
+	
+	protected function IsPreview() {
+		global $view;
+		
+		if (is_null($this->view)) {
+			if (isset($view) && $view == "preview") $this->view = true;
+			else $this->view = false;
+		}
+		return $this->view;
 	}
 }
 ?>

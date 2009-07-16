@@ -1,4 +1,4 @@
-"ABBREVIATE_CHART_LABELS";"Afgekorte veldtitels"
+﻿"ABBREVIATE_CHART_LABELS";"Afgekorte veldtitels"
 "ALLOW_CHANGE_GEDCOM";"Sta wisselen van GEDCOM-bestand toe"
 "ALLOW_EDIT_GEDCOM";"Sta wijzigen toe"
 "ALLOW_REMEMBER_ME";"Toon "Onthoudt mij" op inlogpagina"
@@ -936,6 +936,7 @@
 "halfbrother";"Halfbroer"
 "halfsibling";"Halfbroer of -zus"
 "halfsister";"Halfzuster"
+"no_relation";"Geen relatie"
 "hashcode";"Verificatiecode:"
 "header";"Kopregel"
 "hebrew_and_gregorian";"Hebreeuws en Gregoriaans"

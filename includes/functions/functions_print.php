@@ -3356,7 +3356,7 @@ function print_asso_rela_record($pid, $factrec, $linebr=false) {
 				print "<a href=\"individual.php?pid=$pid2&amp;ged=$GEDCOM\">" . PrintReady($name);
 	//			if (!empty($addname)) print "<br />" . PrintReady($addname);
 				if (!empty($addname)) print " - " . PrintReady($addname);
-				if ($SHOW_ID_NUMBERS) print " <span dir=\"$TEXT_DIRECTION\">($pid2)</span>";
+				if ($SHOW_ID_NUMBERS && showLivingNameByID($pid2)) print " <span dir=\"$TEXT_DIRECTION\">($pid2)</span>";
 				print "</a>";
 				// ID age. The age and relationship links should only be printed if relevant, i.e. if the details of pid2 are not hidden.
 				if (DisplayDetailsById($pid2, "INDI")) {

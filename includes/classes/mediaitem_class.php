@@ -27,7 +27,6 @@
 if (stristr($_SERVER["SCRIPT_NAME"],basename(__FILE__))) {
 	require "../../intrusion.php";
 }
-// changed gedrec ok
 class MediaItem extends GedcomRecord {
 	
 	public $classname = "MediaItem";
@@ -43,7 +42,7 @@ class MediaItem extends GedcomRecord {
 	public $links = array(); // set in media class
 	public $linked = false; // set in media class
 
-	public function __construct($details, $gedrec="", $gedcomid="", $changed = false) {
+	public function __construct($details, $gedrec="", $gedcomid="") {
 		global $TBLPREFIX, $GEDCOMID, $MediaFS, $MEDIA_DIRECTORY;
 		
 		if (is_array($details)) parent::__construct($details["m_media"], $details["m_gedrec"], $details["m_gedfile"]);

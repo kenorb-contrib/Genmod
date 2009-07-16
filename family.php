@@ -50,13 +50,16 @@ $controller->CheckRawEdited();
 	<tr>
 		<td>
 		<?php
-		print PrintFamilyParents($controller->getFamilyID());
+		print "<p class=\"name_head\">".PrintReady($controller->family->title);
+		print "</p>\r\n";
+
+		print PrintFamilyParents($controller->family);
 		if (!$controller->isPrintPreview() && $controller->display && $controller->family->canedit) {
-		if (empty($controller->family->husb) && !$controller->family->isdeleted) { ?>
+		if (!is_object($controller->family->husb) && !$controller->family->isdeleted) { ?>
 			<?php print_help_link("edit_add_parent_help", "qm"); ?> 
 			<a href="javascript <?php print $gm_lang["add_father"]; ?>" onclick="return addnewparentfamily('', 'HUSB', '<?php print $controller->family->xref; ?>', 'add_father');"><?php print $gm_lang["add_father"]; ?></a><br />
 		<?php }
-		if (empty($controller->family->wife) && !$controller->family->isdeleted)  { ?>
+		if (!is_object($controller->family->wife) && !$controller->family->isdeleted)  { ?>
 			<?php print_help_link("edit_add_parent_help", "qm"); ?>
 			<a href="javascript <?php print $gm_lang["add_mother"]; ?>" onclick="return addnewparentfamily('', 'WIFE', '<?php print $controller->family->xref; ?>', 'add_mother');"><?php print $gm_lang["add_mother"]; ?></a><br />
 		<?php }
@@ -66,7 +69,7 @@ $controller->CheckRawEdited();
 			<div class="accesskeys">
 				<a class="accesskeys" href="<?php print 'timeline.php?pids[0]=' . $controller->parents['HUSB'].'&amp;pids[1]='.$controller->parents['WIFE'];?>" title="<?php print $gm_lang['parents_timeline'] ?>" tabindex="-1" accesskey="<?php print $gm_lang['accesskey_family_parents_timeline']; ?>"><?php print $gm_lang['parents_timeline'] ?></a>
 				<a class="accesskeys" href="<?php print 'timeline.php?' . $controller->getChildrenUrlTimeline();?>" title="<?php print $gm_lang["children_timeline"] ?>" tabindex="-1" accesskey="<?php print $gm_lang['accesskey_family_children_timeline']; ?>"><?php print $gm_lang['children_timeline'] ?></a>
-				<a class="accesskeys" href="<?php print 'timeline.php?pids[0]=' .$controller->getHusband().'&amp;pids[1]='.$controller->getWife().'&amp;'.$controller->getChildrenUrlTimeline(2);?>" title="<?php print $gm_lang['family_timeline'] ?>" tabindex="-1" accesskey="<?php print $gm_lang['accesskey_family_timeline']; ?>"><?php print $gm_lang['family_timeline'] ?></a>
+				<a class="accesskeys" href="<?php print 'timeline.php?pids[0]=' .$controller->family->husb_id.'&amp;pids[1]='.$controller->family->wife_id.'&amp;'.$controller->getChildrenUrlTimeline(2);?>" title="<?php print $gm_lang['family_timeline'] ?>" tabindex="-1" accesskey="<?php print $gm_lang['accesskey_family_timeline']; ?>"><?php print $gm_lang['family_timeline'] ?></a>
 				<?php if ($Users->userCanViewGedlines()) { ?>
 				<a class="accesskeys" href="javascript:show_gedcom_record();" title="<?php print $gm_lang["view_gedcom"] ?>" tabindex="-1" accesskey="<?php print $gm_lang["accesskey_family_gedcom"]; ?>"><?php print $gm_lang["view_gedcom"] ?></a>
 				<?php } ?>
@@ -76,11 +79,14 @@ $controller->CheckRawEdited();
 </table>
 <table class="width95">
 	<tr>
-		<td valign="top" style="width: <?php print $pbwidth?>px;">
-			<?php PrintFamilyChildren($controller->getFamilyID());?>
+		<td valign="top" style="width: <?php print $pbwidth+38?>px;">
+			<?php PrintFamilyChildren($controller->family);?>
 		</td>
 		<td valign="top">
-			<?php PrintFamilyFacts($controller->getFamilyID(), 0, $controller->family->canedit);?>
+			<?php 
+			$controller->PrintFamilyGroupHeader();
+			$controller->PrintTabs();
+			?>
 		</td>
 	</tr>
 </table>

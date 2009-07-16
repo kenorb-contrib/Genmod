@@ -208,6 +208,7 @@
 "halfsibling";"Half-Sibling"
 "halfbrother";"Half-Brother"
 "halfsister";"Half-Sister"
+"no_relation";"No relation"
 "family_timeline";"Show family on timeline chart"
 "children_timeline";"Show children on timeline chart"
 "other";"Other"

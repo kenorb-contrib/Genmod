@@ -592,8 +592,9 @@ function GetFamilyAddDescriptor($fid, $rev = false, $famrec="", $changes = false
 		else $hname = "@N.N., @P.N.";
 	}
 	if ($parents["WIFE"]) {
-		if (showLivingNameById($parents["WIFE"]))
+		if (showLivingNameById($parents["WIFE"])) {
 			$wname = GetSortableAddName($parents["WIFE"], "", $rev, $changes);
+		}
 		else $wname = $gm_lang["private"];
 	}
 	else {
