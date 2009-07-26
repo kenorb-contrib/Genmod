@@ -752,11 +752,15 @@ print_header($gm_lang["configure_head"]);
 	</form>
 	<?php if (!$CONFIGURED) { ?>
 		<script language="JavaScript" type="text/javascript">
+		<!--
 			helpPopup('welcome_new_help');
+		//-->
 		</script>
 	<?php } ?>
 	<script language="JavaScript" type="text/javascript">
+	<!--
 		document.configform.NEW_DBHOST.focus();
+	//-->
 	</script>
 </div>
 <?php

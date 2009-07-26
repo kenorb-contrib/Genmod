@@ -157,8 +157,10 @@ if ($action=="updateconfig") {
 	}
 	print $gm_lang["config_update_ok"]."<br />\n";?>
 	<script language="JavaScript" type="text/javascript">
+	<!--
 	opener.location.reload();
 	window.close();
+	//-->
 	</script>
 	<?php
 }
@@ -198,8 +200,10 @@ if ($action=="update") {
 	}
 	$newublocks->SetValues($setdefault);?>
 	<script language="JavaScript" type="text/javascript">
+	<!--
 	opener.location.reload();
 	window.close();
+	//-->
 	</script>
 	<?php
 }
@@ -217,8 +221,10 @@ if ($action == "storefav") {
 	if (isset($favtitle)) $favorite->title = $favtitle;
 	if ($favorite->SetFavorite()) { ?>
 		<script language="JavaScript" type="text/javascript">
+		<!--
 		opener.location.reload();
 		window.close();
+		//-->
 		</script>
 		<?php
 	}

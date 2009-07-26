@@ -111,10 +111,12 @@ if (!empty($pid2)) {
 //	print_help_link("relationship_help", "page_help");
 ?>
 <script language="JavaScript" type="text/javascript">
+<!--
 var pastefield;
 function paste_id(value) {
 	pastefield.value=value;
 }
+//-->
 </script>
 <?php
 print "<div style=\"position: relative; z-index: 1; width:98%;\">\n";
@@ -492,12 +494,14 @@ if ((!empty($pid1))&&(!empty($pid2))) {
 $maxyoffset += 100;
 ?>
 <script language="JavaScript" type="text/javascript">
+<!--
 	relationship_chart_div = document.getElementById("relationship_chart");
 	if (!relationship_chart_div) relationship_chart_div = document.getElementById("relationship_chart_rtl");
 	if (relationship_chart_div) {
 		relationship_chart_div.style.height = <?php print $maxyoffset; ?> + "px";
 		relationship_chart_div.style.width = "100%";
 	}
+//-->
 </script>
 <?php
 print_footer();

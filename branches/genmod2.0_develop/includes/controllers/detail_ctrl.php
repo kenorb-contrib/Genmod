@@ -1,6 +1,6 @@
 <?php
 /**
- * Base controller for most detail pages (individual, source, note, repository, media)
+ * Base controller for all detail pages (individual, source, note, repository, media)
  *
  * Genmod: Genealogy Viewer
  * Copyright (C) 2005 - 2008 Genmod Development Team
@@ -30,26 +30,17 @@ if (stristr($_SERVER["SCRIPT_NAME"],basename(__FILE__))) {
 	require "../../intrusion.php";
 }
  
-/**
- * The base controller for all classes
- *
- * The base controller for all classes. Also check if it is a print preview.
- *
- * @author	Genmod Development Team
- * @param		string	$view		Show the data
- * @return 	string	Return the value of $view
- * @todo Update this description
- */
-class DetailController extends BaseController{
+abstract class DetailController extends BaseController{
 	
-	public $classname = "DetailController";
+	public $classname = "DetailController";	// Name of this class
 	
-	private $tabs = null;
-	private $tabtype = null;
-	private $object_name = null;
-	private $fact_filter = null; // These facts will not be printed in the fact tab (but later in the separate tabs)
-	
-	// Holders and counters for linked objects
+	protected $action = null;				// Action parameter in the query string
+	protected $pagetitle = null;			// Title of the page, set in each child controller
+	protected $tabs = null;					// Determine which tabs to print
+	private $tabtype = null;				// Type of tab
+	private $object_name = null;			// Object name which is printed
+	private $fact_filter = null; 			// These facts will not be printed in the fact tab (but later in the separate tabs)
+	protected $default_tab = 1;				// Default tab for the tabs. Set in the child controller.
 	
 	public function __construct() {
 		
@@ -103,7 +94,28 @@ class DetailController extends BaseController{
 	
 	public function __get($property) {
 		switch($property) {
+			case "pagetitle":
+				return $this->GetPageTitle();
+				break;
+			case "display_other_menu":
+				return $this->CanDisplayOtherMenu();
+				break;
+			case "action":
+				return $this->action;
+				break;
+			default:
+				return parent::__get($property);
+				break;
 		}
+	}
+	
+	public function CanDisplayOtherMenu() {
+		global $Users, $ENABLE_CLIPPINGS_CART;
+		
+		$object_name = $this->object_name;
+		if ($Users->userCanViewGedlines() || ($ENABLE_CLIPPINGS_CART >= $Users->getUserAccessLevel()) || ($this->$object_name->disp && $this->uname != "")) return true;
+		else return false;
+		
 	}
 	
 	public function PrintTabs() {
@@ -175,7 +187,7 @@ class DetailController extends BaseController{
 			}
 			print "<dd id=\"door0\"><a href=\"javascript:;\" onclick=\"tabswitch(0)\" >".$gm_lang["all"]."</a></dd>\n";
 			print "</dl>\n";
-			print "</div><div id=\"dummy\"></div><br />\n";
+			print "</div><div id=\"dummy\"></div><br /><br />\n";
 		}
 		foreach ($this->tabs as $index => $tab) {
 			if ($tab == "facts") {
@@ -202,21 +214,20 @@ class DetailController extends BaseController{
 				}
 				
 				if ($this->tabtype == "note") $this->PrintGeneralNote();
-				foreach($this->$object_name->facts as $key => $value) {
-					$fact = trim($value[0]);
-					if (!empty($fact)) {
-						$styleadd = $value[3];
-						if ($fact=="OBJE") {
-							if (!in_array($fact, $this->fact_filter)) print_main_media($value[1], $this->$object_name->xref, 0, $value[2], ($this->$object_name->show_changes), $value[3]);
+				foreach($this->$object_name->facts as $key => $factobj) {
+					if ($factobj->fact != "" && !in_array($factobj->fact, $this->fact_filter)) {
+//						$styleadd = $value[3];
+						if ($factobj->fact == "OBJE") {
+							print_main_media($factobj->factrec, $this->$object_name->xref, 0, $factobj->count, ($this->$object_name->show_changes), $factobj->style);
 						}
-						else if ($fact=="SOUR") {
-							if (!in_array($fact, $this->fact_filter)) print_main_sources($value[1], 1, $this->$object_name->xref, $value[2], $value[3], $this->$object_name->canedit);
+						else if ($factobj->fact == "SOUR") {
+							print_main_sources($factobj->factrec, 1, $this->$object_name->xref, $factobj->count, $factobj->style, $this->$object_name->canedit);
 						}
-						else if ($fact=="NOTE") {
-							if (!in_array($fact, $this->fact_filter)) print_main_notes($value[1], 1, $this->$object_name->xref, $value[2], $value[3]);
+						else if ($factobj->fact == "NOTE") {
+							print_main_notes($factobj->factrec, 1, $this->$object_name->xref, $factobj->count, $factobj->style);
 						}
 						else {
-							if (!in_array($fact, $this->fact_filter)) print_fact($value[1], $this->$object_name->xref, $value[0], $value[2], false, $value[3]);
+							print_fact($factobj->factrec, $this->$object_name->xref, $factobj->fact, $factobj->count, false, $factobj->style);
 						}
 					}
 				}
@@ -231,7 +242,7 @@ class DetailController extends BaseController{
 					print "<br /><span class=\"label\">";
 					if ($this->tabtype == "sour") print $gm_lang["other_records"];
 					else if ($this->tabtype == "media") print $gm_lang["other_mmrecords"];
-					else print $gm_lang["other_".$this->tabtype."_records"];
+					elseif ($this->tabtype != "indi" && $this->tabtype != "fam") print $gm_lang["other_".$this->tabtype."_records"];
 					print "</span>";
 				}
 				if ($this->tabtype == "indi") $this->PrintToggleJS2();
@@ -460,7 +471,7 @@ class DetailController extends BaseController{
 							print "<td><img src=\"".$GM_IMAGE_DIR."/".$GM_IMAGES["cfamily"]["small"]."\" border=\"0\" class=\"icon\" alt=\"\" /></td>";
 							print "<td><span class=\"subheaders\">".$family->label."</span>";
 							if (!$this->view) {
-						 		print " - <a href=\"family.php?famid=".$family->xref."\">[".$gm_lang["view_family"].$family->addxref."]</a>&nbsp;&nbsp";
+						 		print " - <a href=\"family.php?famid=".$family->xref."\">[".$gm_lang["view_family"].$family->addxref."]</a>&nbsp;&nbsp;";
 					 			if ($family->husb_id == "" && $this->$object_name->canedit) { 
 					 				print_help_link("edit_add_parent_help", "qm");
 									print "<a href=\"javascript ".$gm_lang["add_father"]."\" onclick=\"return addnewparentfamily('', 'HUSB', '".$family->xref."', 'add_father');\">".$gm_lang["add_father"]."</a>";
@@ -539,74 +550,98 @@ class DetailController extends BaseController{
 						}
 					}
 				}
-				else print "<div id=\"no_tab".$index."\" colspan=\"2\" class=\"shade1\">".$gm_lang["no_tab5"]."</div>\n";
+				else print "<div id=\"no_tab".$index."\" class=\"shade1\">".$gm_lang["no_tab5"]."</div>\n";
 				print "</div>";
 			}
 			if ($tab == "sources") {
 				print "<div id=\"sources\" class=\"tab_page\" style=\"display:none;\" >";
 				
-				print "\n<table class=\"facts_table\">";
-				if ($this->$object_name->sourfacts_count > 0) {
-					foreach($this->$object_name->facts as $key => $value) {
-						$fact = trim($value[0]);
-						if (!empty($fact) && $fact == "SOUR") {
-							$styleadd = $value[3];
-							print_main_sources($value[1], 1, $this->xref, $value[2], $value[3], $this->$object_name->canedit);
+				if ($this->$object_name->sourfacts_count <= 0) {
+					print "<div id=\"no_tab".$index."\" class=\"shade1\"></div>\n";
+					$table = false;
+				}
+				else {
+					print "\n<table class=\"facts_table\">";
+					$table = true;
+					foreach($this->$object_name->facts as $key => $factobj) {
+//						$fact = trim($value[0]);
+						if ($factobj->fact != "" && $factobj->fact == "SOUR") {
+//							$styleadd = $value[3];
+							print_main_sources($factobj->factrec, 1, $this->xref, $factobj->count, $factobj->style, $this->$object_name->canedit);
 						}
 					}
 				}
-				else print "<div id=\"no_tab".$index."\" colspan=\"2\" class=\"shade1\"></div>\n";
 					//-- new fact link
 				if ($this->view != "preview" && $this->$object_name->canedit && !$this->$object_name->isdeleted) {
+					if (!$table) {
+						print "\n<table class=\"facts_table\">"; 
+						$table = true;
+					}
 					print "<tr><td class=\"width20 shade2\">";
 					print_help_link("add_source_help", "qm");
 					print $gm_lang["add_source_lbl"]."</td><td class=\"shade1\">";
 					print "<a href=\"javascript: ".$gm_lang["add_source"]."\" onclick=\"add_new_record('".$this->$object_name->xref."','SOUR', 'add_source'); return false;\">".$gm_lang["add_source"]."</a>";
 					print "<br /></td></tr>";
 				}
-				print "</table>\n\n<br />";
+				if ($table) print "</table>";
 				print "</div>";
 			}
 
 			if ($tab == "media") {
 				print "<div id=\"media\" class=\"tab_page\" style=\"display:none;\" >";
 				
-				print "\n<table class=\"facts_table\">";
-				if ($this->$object_name->mediafacts_count > 0) {
-					foreach($this->$object_name->facts as $key => $value) {
-						$fact = trim($value[0]);
-						if (!empty($fact) && $fact == "OBJE") {
-							$styleadd = $value[3];
-							print_main_media($value[1], $this->xref, 0, $value[2], ($this->$object_name->show_changes), $value[3]);
+				if ($this->$object_name->mediafacts_count <= 0) {
+					print "<div id=\"no_tab".$index."\" class=\"shade1\"></div>\n";
+					$table = false;
+				}
+				else {
+					print "\n<table class=\"facts_table\">";
+					$table = true;
+					foreach($this->$object_name->facts as $key => $factobj) {
+						if ($factobj->fact != "" && $factobj->fact == "OBJE") {
+//							$styleadd = $value[3];
+							print_main_media($factobj->factrec, $this->xref, 0, $factobj->count, ($this->$object_name->show_changes), $factobj->style);
 						}
 					}
+//					print "</table>\n\n<br />";
 				}
-				else print "<div id=\"no_tab".$index."\" colspan=\"2\" class=\"shade1\"></div>\n";
 				if (!$this->isPrintPreview() && $this->$object_name->canedit && !$this->$object_name->isdeleted) {
+					if (!$table) {
+						print "\n<table class=\"facts_table\">"; 
+						$table = true;
+					}
 					print "<tr><td class=\"shade2 width20\">";
 					print_help_link("add_media_help", "qm");
 					print $gm_lang["add_media_lbl"]."</td><td class=\"shade1\">";
 					print "<a href=\"javascript: ".$gm_lang["add_media_lbl"]."\" onclick=\"add_new_record('".$this->$object_name->xref."','OBJE', 'add_media'); return false;\">".$gm_lang["add_media"]."</a>";
 					print "</td></tr>";
 				}
-				print "</table>\n\n<br />";
+				if ($table) print "</table>";
 				print "</div>";
 			}
 			if ($tab == "notes") {
 				print "<div id=\"notes\" class=\"tab_page\" style=\"display:none;\" >";
 				
-				print "\n<table class=\"facts_table\">";
-				if ($this->$object_name->notefacts_count > 0) {
-					foreach($this->$object_name->facts as $key => $value) {
-						$fact = trim($value[0]);
-						if (!empty($fact) && $fact == "NOTE") {
-							$styleadd = $value[3];
-							print_main_notes($value[1], 1, $this->xref, $value[2], $value[3]);
+				if ($this->$object_name->notefacts_count <= 0) {
+					print "<div id=\"no_tab".$index."\" class=\"shade1\"></div>\n";
+					$table = false;
+				}
+				else {
+					print "\n<table class=\"facts_table\">";
+					$table = true;
+					foreach($this->$object_name->facts as $key => $factobj) {
+//						$fact = trim($value[0]);
+						if ($factobj->fact != "" && $factobj->fact == "NOTE") {
+//							$styleadd = $value[3];
+							print_main_notes($factobj->factrec, 1, $this->xref, $factobj->count, $factobj->style);
 						}
 					}
 				}
-				else print "<div id=\"no_tab".$index."\" colspan=\"2\" class=\"shade1\"></div>\n";
 				if (!$this->isPrintPreview() && $this->$object_name->canedit && !$this->$object_name->isdeleted) { 
+					if (!$table) {
+						print "\n<table class=\"facts_table\">"; 
+						$table = true;
+					}
 					print "<tr><td class=\"shade2 width20\">";
 					print_help_link("add_note_help", "qm");
 					print $gm_lang["add_note_lbl"]."</td><td class=\"shade1\">";
@@ -617,7 +652,7 @@ class DetailController extends BaseController{
 					print $gm_lang["add_gnote_lbl"]."</td><td class=\"shade1\"><a href=\"javascript: ".$gm_lang["add_gnote"]."\" onclick=\"add_new_record('".$this->$object_name->xref."','GNOTE', 'add_gnote'); return false;\">".$gm_lang["add_gnote"]."</a>";
 					print "</td></tr>";
 				}
-				print "</table>\n\n<br />";
+				if ($table) print "</table>";
 				print "</div>";
 			}
 			if ($tab == "actions_person") {
@@ -632,19 +667,21 @@ class DetailController extends BaseController{
 							$action->PrintThis();
 						}
 					}
-					else print "<tr><td id=\"no_tab".$index."\" colspan=\"2\" class=\"shade1\"></td></tr>\n";
+					else print "<tr><td id=\"no_tab".$index."\" class=\"shade1\"></td></tr>\n";
 					//-- New action Link
 					if (!$this->isPrintPreview() && $this->$object_name->canedit && !$this->$object_name->isdeleted) { 
 						$Actions->PrintAddLink();
 					}
+					print "</table></form>";
 				}
-				print "</table></form>";
+				else print "<div id=\"no_tab".$index."\" class=\"shade1\"></div>\n";
 				print "</div>";
 			}
 		}	
 		print "<script type=\"text/javascript\">\n<!--\n";
-		if ($this->isPrintPreview()) print "tabswitch(0)";
+		if ($this->isPrintPreview()) print "tabswitch(".count($this->tabs).")";
 		else if (isset($_SESSION[$this->tabtype][JoinKey($this->$object_name->xref, $GEDCOMID)])) print "tabswitch(".$_SESSION[$this->tabtype][JoinKey($this->$object_name->xref, $GEDCOMID)].")";
+		else if ($object_name == "indi") print "tabswitch(".$this->default_tab.")";
 		else print "tabswitch(1)";
 		print "\n//-->\n</script>\n";
 	}
@@ -732,9 +769,9 @@ class DetailController extends BaseController{
 				$style = "";
 				if ($this->show_changes && $family->husb_status != "") $style = " change_new";
 				print "<tr><td class=\"width20 shade2 center".$style."\" style=\"vertical-align: middle;\">";
-				print $family->husb->label."</td>";
+				print $family->husb->label[$family->xref]."</td>";
 				print "<td class=\"".$this->getPersonStyle($family->husb).$style."\">";
-				PrintPedigreePerson($family->husb, 2, true, $prtcount, 1, $this->view);
+				PrintPedigreePerson($family->husb, 2, true, $prtcount, 2, $this->view);
 				$prtcount++;
 				print "</td></tr>";
 			}
@@ -753,9 +790,9 @@ class DetailController extends BaseController{
 				$style = "";
 				if ($this->show_changes && $family->wife_status != "") $style = " change_new";
 				print "<tr><td class=\"width20 shade2 center".$style."\" style=\"vertical-align: middle;\">";
-				print $family->wife->label."</td>";
+				print $family->wife->label[$family->xref]."</td>";
 				print "<td class=\"".$this->getPersonStyle($family->wife).$style."\">";
-				PrintPedigreePerson($family->wife, 2, true, $prtcount, 1, $this->view);
+				PrintPedigreePerson($family->wife, 2, true, $prtcount, 2, $this->view);
 				$prtcount++;
 				print "</td></tr>";
 			}
@@ -783,5 +820,23 @@ class DetailController extends BaseController{
 		}
 		return $prtcount;
 	}
+	
+	protected function addFavorite() {
+		global $GEDCOMID;
+		
+		if (empty($this->uname)) return;
+		
+		$object_name = $this->object_name;
+		if (!$this->$object_name->isempty && !$this->$object_name->isdeleted) {	
+			$favorite = new Favorite();
+			$favorite->username = $this->uname;
+			$favorite->gid = $this->$object_name->xref;
+			$favorite->type = $this->$object_name->datatype;
+			// Don't set the type (only for URL's)
+			$favorite->file = $GEDCOMID;
+			$favorite->SetFavorite();
+		}
+	}
+
 }
 ?>

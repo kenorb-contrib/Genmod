@@ -33,18 +33,16 @@ if (stristr($_SERVER["SCRIPT_NAME"],basename(__FILE__))) {
  */
 class NoteController extends DetailController {
 	
-	public $classname = "NoteController";
+	public $classname = "NoteController";	// Name of this class
 	
-	public $note = null;
-	public $notelist = null;
-	private $display_other_menu = false;
-	private $pagetitle = null;
+	public $note = null;					// Holder for the note object
+	public $notelist = null;				// Holder for the notelist array
 	
 	/**
 	 * constructor
 	 */
 	public function __construct() {
-		global $gm_lang, $CONTACT_EMAIL, $GEDCOM, $GEDCOMID;
+		global $GEDCOMID;
 		global $ENABLE_CLIPPINGS_CART, $Users, $show_changes, $nonfacts;
 		
 		parent::__construct();
@@ -54,48 +52,24 @@ class NoteController extends DetailController {
 		$this->show_changes = $show_changes;
 		if (!empty($_REQUEST["oid"])) $this->xref = strtoupper($_REQUEST["oid"]);
 		
-		$this->uname = $Users->GetUserName();
-
 		if (!is_null($this->xref)) {
 			$this->xref = CleanInput($this->xref);
 		
-			$this->note = new Note($this->xref);
+			$this->note =& Note::GetInstance($this->xref);
 		
-			if ($this->note->disp && ($Users->userCanViewGedlines() || $ENABLE_CLIPPINGS_CART >= $Users->getUserAccessLevel() || !empty($this->uname))) {
-				$this->display_other_menu = true;
+			//-- perform the desired action
+			switch($this->action) {
+				case "addfav":
+					$this->addFavorite();
+					break;
 			}
 		}
 	}
 	
 	public function __get($property) {
 		switch($property) {
-			case "pagetitle":
-				return $this->GetPageTitle();
-				break;
-			case "display_other_menu":
-				return $this->display_other_menu;
-				break;
 			default:
-				parent::__get($property);
-		}
-	}
-	/**
-	 * Add a new favorite for the action user
-	 */
-	protected function addFavorite() {
-		global $GEDCOMID, $Favorites;
-		if (empty($this->uname)) return;
-		if (!empty($_REQUEST["oid"])) {
-			$oid = strtoupper($_REQUEST["oid"]);
-			$indirec = FindOtherRecord($oid);
-			if ($indirec) {
-				$favorite = new Favorite();
-				$favorite->username = $this->uname;
-				$favorite->gid = $oid;
-				$favorite->type = 'NOTE';
-				$favorite->file = $GEDCOMID;
-				$favorite->SetFavorite();
-			}
+				return parent::__get($property);
 		}
 	}
 	
@@ -103,9 +77,16 @@ class NoteController extends DetailController {
 	 * get the title for this page
 	 * @return string
 	 */
-	private function getPageTitle() {
-		global $gm_lang;
-		return $this->note->getTitle()." - ".$this->xref." - ".$gm_lang["note_info"];
+	protected function getPageTitle() {
+		global $gm_lang, $SHOW_ID_NUMBERS;
+
+		if (is_null($this->pagetitle)) {
+			$this->pagetitle = "";
+			$this->pagetitle .= $this->note->getTitle()." - ";
+			if ($SHOW_ID_NUMBERS) $this->pagetitle .= $this->note->xref." - ";
+			$this->pagetitle .= $gm_lang["note_info"];
+		}
+		return $this->pagetitle;
 	}
 	
 	/**
@@ -113,7 +94,7 @@ class NoteController extends DetailController {
 	 * @return Menu
 	 */
 	public function &getEditMenu() {
-		global $TEXT_DIRECTION, $GEDCOM, $gm_lang, $Users, $show_changes;
+		global $TEXT_DIRECTION, $gm_lang, $Users, $show_changes;
 		
 		if ($TEXT_DIRECTION=="rtl") $ff="_rtl";
 		else $ff="";
@@ -121,7 +102,7 @@ class NoteController extends DetailController {
 		// edit note menu
 		$menu = new Menu($gm_lang['edit_note']);
 
-		if ($this->note->canedit) {
+		if (!$this->note->isdeleted) {
 			// edit note / edit_raw
 			if ($Users->userCanEditGedlines()) {
 				$submenu = new Menu($gm_lang['edit_raw']);
@@ -134,18 +115,18 @@ class NoteController extends DetailController {
 			$submenu->addLink("if (confirm('".$gm_lang["confirm_delete_note"]."'))  deletegnote('".$this->xref."', 'delete_note'); ");
 			$menu->addSubmenu($submenu);
 
-			if ($this->note->ischanged) {
-				// edit_note / seperator
-				$submenu = new Menu();
-				$submenu->isSeperator();
-				$menu->addSubmenu($submenu);
+		}
+		if ($this->note->ischanged) {
+			// edit_note / seperator
+			$submenu = new Menu();
+			$submenu->isSeperator();
+			$menu->addSubmenu($submenu);
 
-				// edit_note / show/hide changes
-				if (!$show_changes) $submenu = new Menu($gm_lang['show_changes']);
-				else $submenu = new Menu($gm_lang['hide_changes']);
-				$submenu->addLink('showchanges();');
-				$menu->addSubmenu($submenu);
-			}
+			// edit_note / show/hide changes
+			if (!$show_changes) $submenu = new Menu($gm_lang['show_changes']);
+			else $submenu = new Menu($gm_lang['hide_changes']);
+			$submenu->addLink('showchanges();');
+			$menu->addSubmenu($submenu);
 		}
 		return $menu;
 	}
@@ -155,7 +136,7 @@ class NoteController extends DetailController {
 	 * @return Menu
 	 */
 	public function &getOtherMenu() {
-		global $TEXT_DIRECTION, $GEDCOM, $gm_lang;
+		global $TEXT_DIRECTION, $GEDCOMID, $gm_lang;
 		global $ENABLE_CLIPPINGS_CART, $Users;
 		
 		if ($TEXT_DIRECTION=="rtl") $ff="_rtl";
@@ -180,7 +161,7 @@ class NoteController extends DetailController {
 		if ($this->note->disp && !empty($this->uname)) {
 				// other / add_to_my_favorites
 				$submenu = new Menu($gm_lang['add_to_my_favorites']);
-				$submenu->addLink('note.php?action=addfav&oid='.$this->xref.'&gid='.$this->xref);
+				$submenu->addLink('note.php?action=addfav&oid='.$this->xref.'&gedid='.$GEDCOMID);
 				$menu->addSubmenu($submenu);
 		}
 		return $menu;
@@ -194,7 +175,7 @@ class NoteController extends DetailController {
  		if (!empty($selection)) $sql .= " AND o_id IN (".$selection.")";
  		$res = NewQuery($sql);
  		while ($row = $res->FetchAssoc()) {
-	 		$note = new Note($row["o_id"], $row["o_gedcom"], $row["o_file"]);
+	 		$note =& Note::GetInstance($row["o_id"], $row["o_gedcom"], $row["o_file"]);
 	 		$note->GetTitle(40);
 	 		if ($note->disp) $this->notelist[] = $note;
 	 		else $note_hide++;
@@ -249,9 +230,9 @@ class NoteController extends DetailController {
 		$note_total = array();
 		$note_hide = array();
 		$res = NewQuery($sql);
-		if ($res) {
+		if ($res && $res->NumRows() > 0) {
 	 		while ($row = $res->FetchAssoc()) {
-		 		$note = new Note($row["o_id"], $row["o_gedcom"], $row["o_file"]);
+		 		$note =& Note::GetInstance($row["o_id"], $row["o_gedcom"], $row["o_file"]);
 		 		$note->GetTitle(40);
 		 		$note->gedcomid = $row["o_file"];
 		 		SwitchGedcom($row["o_file"]);
@@ -288,7 +269,7 @@ class NoteController extends DetailController {
 		global $gm_lang, $gm_username, $Users;
 		global $factarray, $view, $show_changes;
 		global $WORD_WRAPPED_NOTES, $GM_IMAGE_DIR;
-		global $GM_IMAGES, $GEDCOM;
+		global $GM_IMAGES;
 
 		if (!$this->note->disp) return false;
 

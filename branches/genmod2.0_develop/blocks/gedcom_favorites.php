@@ -72,14 +72,7 @@ function print_gedcom_favorites_config($favid="") {
 	$fav = $userfave[0];
 	
 	print "<br />";
-	if ($fav->type == "INDI") print GetPersonName($fav->gid);
-	if ($fav->type == "FAM") print GetFamilyDescriptor($fav->gid);
-	if ($fav->type == "SOUR") print $fav->object->descriptor;
-	if ($fav->type == "OBJE") print GetMediaDescriptor($fav->gid);
-	if ($fav->type == "NOTE") {
-		$note_controller = new NoteController($fav->gid);
-		print $note_controller->note->GetTitle();
-	}
+	print $fav->title;
 	print "<br />";
 	print "<input type=\"hidden\" name=\"action\" value=\"storefav\" />\n";
 	print "<input type=\"hidden\" name=\"id\" value=\"".$fav->id."\" />\n";

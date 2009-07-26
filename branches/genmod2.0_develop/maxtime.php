@@ -57,11 +57,11 @@ if ($maxtime == 0) {
 else {
 	@set_time_limit(0);
 	$secs = 0;
-	print $gm_lang["maxtime_now"]."&nbsp<div id=\"max_progress\"></div>";
+	print $gm_lang["maxtime_now"]."&nbsp;<div id=\"max_progress\"></div>";
 	while($secs < $maxtime) {
 		$secs++;
 //	print "Maximum execution time is at least ".$secs." seconds<br />";
-		print "<script>document.getElementById('max_progress').innerHTML='".$secs."';</script>";
+		print "<script><!--\ndocument.getElementById('max_progress').innerHTML='".$secs."';//-->\n</script>";
 		flush();
 		@ob_flush();
 		$SystemConfig->SetConfigDBValue('max_execution_time', $secs);

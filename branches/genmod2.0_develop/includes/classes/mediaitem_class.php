@@ -31,17 +31,28 @@ class MediaItem extends GedcomRecord {
 	
 	public $classname = "MediaItem";
 	public $datatype = "OBJE";
+	private static $mediaitemcache = array(); // Holder of the instances for this class
 	
 	private $extension = null;
 	private $title = null; 
 	private $filename = null;
 	private $level = 0;
 	private $validmedia = null;
-	public $fileobj = null;
+	public  $fileobj = null;
 	
-	public $links = array(); // set in media class
-	public $linked = false; // set in media class
+	public  $links = array(); // set in media class
+	public  $linked = false; // set in media class
 
+	public static function GetInstance($details, $gedrec="", $gedcomid="") {
+		
+		if (is_array($details)) $xref = $details["m_media"];
+		else $xref = $details;
+		if (!isset(self::$mediaitemcache[$xref])) {
+			self::$mediaitemcache[$xref] = new MediaItem($details, $gedrec, $gedcomid);
+		}
+		return self::$mediaitemcache[$xref];
+	}
+	
 	public function __construct($details, $gedrec="", $gedcomid="") {
 		global $TBLPREFIX, $GEDCOMID, $MediaFS, $MEDIA_DIRECTORY;
 		
@@ -157,20 +168,20 @@ class MediaItem extends GedcomRecord {
 		if (!is_null($this->indilist)) return $this->indilist;
 		$this->indilist = array();
 		$this->indi_hide = 0;
-		if (!isset($indilist)) $indilist = array();
+//		if (!isset($indilist)) $indilist = array();
 		
 		$sql = "SELECT DISTINCT i_key, i_gedcom, i_isdead, i_id, i_file  FROM ".$TBLPREFIX."media_mapping, ".$TBLPREFIX."individuals WHERE mm_media='".$this->xref."' AND mm_gedfile='".$this->gedcomid."' AND mm_type='INDI' AND mm_gid=i_id AND mm_gedfile=i_file";
 		$res = NewQuery($sql);
 		while($row = $res->FetchAssoc()){
-			$indi = array();
-			$indi["gedcom"] = $row["i_gedcom"];
-			$indi["isdead"] = $row["i_isdead"];
-			$indi["gedfile"] = $row["i_file"];
-			$indilist[$row["i_id"]] = $indi;
+//			$indi = array();
+//			$indi["gedcom"] = $row["i_gedcom"];
+//			$indi["isdead"] = $row["i_isdead"];
+//			$indi["gedfile"] = $row["i_file"];
+//			$indilist[$row["i_id"]] = $indi;
 			$person = null;
-			$person = new Person($row["i_id"], $row["i_gedcom"]);
+			$person =& Person::GetInstance($row["i_id"], $row["i_gedcom"]);
 			if ($person->disp_name) {
-				$indilist[$row["i_id"]]["names"] = $person->name_array;
+//				$indilist[$row["i_id"]]["names"] = $person->name_array;
 				$this->indilist[$row["i_key"]] = $person;
 			}
 			else $this->indi_hide++;
@@ -190,19 +201,19 @@ class MediaItem extends GedcomRecord {
 		if (!is_null($this->famlist)) return $this->famlist;
 		$this->famlist = array();
 		$this->fam_hide = 0;
-		if (!isset($famlist)) $famlist = array();
+//		if (!isset($famlist)) $famlist = array();
 		
 		$sql = "SELECT DISTINCT f_key, f_gedcom, f_id, f_file, f_husb, f_wife  FROM ".$TBLPREFIX."media_mapping, ".$TBLPREFIX."families WHERE mm_media='".$this->xref."' AND mm_gedfile='".$this->gedcomid."' AND mm_type='FAM' AND mm_gid=f_id AND mm_gedfile=f_file";
 		$res = NewQuery($sql);
 		while($row = $res->FetchAssoc()){
-			$fam = array();
-			$fam["gedcom"] = $row["f_gedcom"];
-			$fam["gedfile"] = $row["f_file"];
-			$fam["HUSB"] = SplitKey($row["f_husb"], "id");
-			$fam["WIFE"] = SplitKey($row["f_wife"], "id");
-			$famlist[$row["f_id"]] = $fam;
+//			$fam = array();
+//			$fam["gedcom"] = $row["f_gedcom"];
+//			$fam["gedfile"] = $row["f_file"];
+//			$fam["HUSB"] = SplitKey($row["f_husb"], "id");
+//			$fam["WIFE"] = SplitKey($row["f_wife"], "id");
+//			$famlist[$row["f_id"]] = $fam;
 			$family = null;
-			$family = new Family($row["f_id"], $row["f_gedcom"]);
+			$family =& Family::GetInstance($row["f_id"], $row["f_gedcom"]);
 			if ($family->disp) {
 				$this->famlist[$row["f_key"]] = $family;
 			}
@@ -221,7 +232,7 @@ class MediaItem extends GedcomRecord {
 		global $TBLPREFIX, $sourcelist;
 
 		if(!is_null($this->sourcelist)) return $this->sourcelist;
-		if (!isset($sourcelist)) $sourcelist = array();
+//		if (!isset($sourcelist)) $sourcelist = array();
 		$this->sourcelist = array();
 		$this->sour_hide = 0;
 		
@@ -229,9 +240,9 @@ class MediaItem extends GedcomRecord {
 		$res = NewQuery($sql);
 		while($row = $res->FetchAssoc()){
 			$source = null;
-			$sourcelist[$row["s_id"]]["gedcom"] = $row["s_gedcom"];
-			$sourcelist[$row["s_id"]]["gedfile"] = $row["s_file"];
-			$source = new Source($row["s_id"], $row["s_gedcom"]);
+//			$sourcelist[$row["s_id"]]["gedcom"] = $row["s_gedcom"];
+//			$sourcelist[$row["s_id"]]["gedfile"] = $row["s_file"];
+			$source =& Source::GetInstance($row["s_id"], $row["s_gedcom"]);
 			if ($source->disp) $this->sourcelist[$row["s_key"]] = $source;
 			else $this->sour_hide++;
 		}
@@ -257,7 +268,7 @@ class MediaItem extends GedcomRecord {
 		$res = NewQuery($sql);
 		while($row = $res->FetchAssoc()){
 			$repo = null;
-			$repo = new Repository($row["o_id"], $row["o_gedcom"], $this->gedcomid);
+			$repo =& Repository::GetInstance($row["o_id"], $row["o_gedcom"], $this->gedcomid);
 			if ($repo->disp) $this->repolist[$row["o_key"]] = $repo;
 			else $this->repo_hide++;
 		}

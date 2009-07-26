@@ -273,7 +273,9 @@ if ($chart_style) {
 	// expand the layer
 	echo <<< END
 	<script language="JavaScript" type="text/javascript">
+	<!--
 		expandbox("$rootid.1", 2);
+	//-->
 	</script>
 	<br />
 END;

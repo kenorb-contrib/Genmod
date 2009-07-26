@@ -210,7 +210,9 @@ function paste_id(value) {
 					if ($firstrun == 0) {
 						?>
 						<script language="JavaScript" type="text/javascript">
+						<!--
 							document.getElementById('<?php print $input["name"]; ?>').focus();
+						//-->
 						</script>
 						<?php
 						$firstrun++;

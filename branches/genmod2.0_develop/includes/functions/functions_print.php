@@ -443,7 +443,7 @@ function InitListCounters($action = "reset") {
  * @param int $count	on some charts it is important to keep a count of how many boxes were printed
  */
 function print_pedigree_person($pid, $style=1, $show_famlink=true, $count=0, $personcount="1", $indirec="") {
-	global $HIDE_LIVE_PEOPLE, $SHOW_LIVING_NAMES, $PRIV_PUBLIC, $factarray, $ZOOM_BOXES, $LINK_ICONS, $view, $SCRIPT_NAME, $GEDCOM;
+	global $HIDE_LIVE_PEOPLE, $SHOW_LIVING_NAMES, $PRIV_PUBLIC, $factarray, $ZOOM_BOXES, $LINK_ICONS, $view, $SCRIPT_NAME, $GEDCOMID, $GEDCOM;
 	global $gm_lang, $SHOW_HIGHLIGHT_IMAGES, $bwidth, $bheight, $show_full, $PEDIGREE_FULL_DETAILS, $SHOW_ID_NUMBERS, $SHOW_PEDIGREE_PLACES, $view;
 	global $CONTACT_EMAIL, $CONTACT_METHOD, $TEXT_DIRECTION, $DEFAULT_PEDIGREE_GENERATIONS, $OLD_PGENS, $talloffset, $PEDIGREE_LAYOUT, $MEDIA_DIRECTORY;
 	global $GM_IMAGE_DIR, $GM_IMAGES, $ABBREVIATE_CHART_LABELS;
@@ -588,7 +588,7 @@ function print_pedigree_person($pid, $style=1, $show_famlink=true, $count=0, $pe
 		$object = FindHighlightedObject($pid, $indirec);
 		// NOTE: Print the pedigree tumbnail
 		if (!empty($object["thumb"])) {
-			$media = New MediaItem($object["id"]);
+			$media =& MediaItem::GetInstance($object["id"]);
 			// NOTE: IMG ID
 			$class = "pedigree_image_portrait";
 			if ($media->fileobj->f_width > $media->fileobj->f_height) $class = "pedigree_image_landscape";
@@ -789,9 +789,9 @@ function print_pedigree_person($pid, $style=1, $show_famlink=true, $count=0, $pe
 			// NOTE: Zoom icon
 			if ($ZOOM_BOXES != "disabled" && $show_full && !$view == "preview" && ($disp || $dispname)) {
 				print "<a href=\"javascript: ".$gm_lang["zoom_box"]."\"";
-				if ($ZOOM_BOXES=="mouseover") print " onmouseover=\"expandbox('".$pid.".".$personcount.".".$count."', $style, '".$random."'); if(document.getElementById('inout-$pid.$personcount.$count.$random').innerHTML=='') sndReq('inout-$pid.$personcount.$count.$random', 'getzoomfacts', 'pid', '".$pid."', 'canshow', '".$canshow."', 'view', '".$view."');\" onmouseout=\"restorebox('".$pid.".".$personcount.".".$count."', $style, '".$random."');\" onclick=\"return false;\"";
-				if ($ZOOM_BOXES=="mousedown") print " onmousedown=\"expandbox('".$pid.".".$personcount.".".$count."', $style, '".$random."'); if(document.getElementById('inout-$pid.$personcount.$count.$random').innerHTML=='') sndReq('inout-$pid.$personcount.$count.$random', 'getzoomfacts', 'pid', '".$pid."', 'canshow', '".$canshow."', 'view', '".$view."');\" onmouseup=\"restorebox('".$pid.".".$personcount.".".$count."', $style, '".$random."');\" onclick=\"return false;\"";
-				if ($ZOOM_BOXES=="click") print " onclick=\"expandbox('".$pid.".".$personcount.".".$count."', $style, '".$random."'); if(document.getElementById('inout-$pid.$personcount.$count.$random').innerHTML=='') sndReq('inout-$pid.$personcount.$count.$random', 'getzoomfacts', 'pid', '".$pid."', 'canshow', '".$canshow."', 'view', '".$view."'); return false;\"";
+				if ($ZOOM_BOXES=="mouseover") print " onmouseover=\"expandbox('".$pid.".".$personcount.".".$count."', $style, '".$random."'); if(document.getElementById('inout-$pid.$personcount.$count.$random').innerHTML=='') sndReq('inout-$pid.$personcount.$count.$random', 'getzoomfacts', 'pid', '".$pid."', 'gedcomid', '".$GEDCOMID."', 'canshow', '".$canshow."', 'view', '".$view."');\" onmouseout=\"restorebox('".$pid.".".$personcount.".".$count."', $style, '".$random."');\" onclick=\"return false;\"";
+				if ($ZOOM_BOXES=="mousedown") print " onmousedown=\"expandbox('".$pid.".".$personcount.".".$count."', $style, '".$random."'); if(document.getElementById('inout-$pid.$personcount.$count.$random').innerHTML=='') sndReq('inout-$pid.$personcount.$count.$random', 'getzoomfacts', 'pid', '".$pid."', 'gedcomid', '".$GEDCOMID."', 'canshow', '".$canshow."', 'view', '".$view."');\" onmouseup=\"restorebox('".$pid.".".$personcount.".".$count."', $style, '".$random."');\" onclick=\"return false;\"";
+				if ($ZOOM_BOXES=="click") print " onclick=\"expandbox('".$pid.".".$personcount.".".$count."', $style, '".$random."'); if(document.getElementById('inout-$pid.$personcount.$count.$random').innerHTML=='') sndReq('inout-$pid.$personcount.$count.$random', 'getzoomfacts', 'pid', '".$pid."', 'gedcomid', '".$GEDCOMID."', 'canshow', '".$canshow."', 'view', '".$view."'); return false;\"";
 				print "><img id=\"iconz-$pid.$personcount.$count\" src=\"".$GM_IMAGE_DIR."/".$GM_IMAGES["zoomin"]["other"]."\" width=\"25\" height=\"25\" border=\"0\" alt=\"".$gm_lang["zoom_box"]."\" title=\"".$gm_lang["zoom_box"]."\" /></a>";
 			}
 			// NOTE: Popup box icon (don't show if the person is private)
@@ -851,7 +851,7 @@ function print_header($title, $head="",$use_alternate_styles=true) {
 	global $META_AUTHOR, $META_PUBLISHER, $META_COPYRIGHT, $META_DESCRIPTION, $META_PAGE_TOPIC, $META_AUDIENCE, $META_PAGE_TYPE, $META_ROBOTS, $META_REVISIT, $META_KEYWORDS, $META_TITLE, $META_SURNAME_KEYWORDS;
 	// globals for the bot 304 mechanism
 	global $bot, $_SERVER, $GEDCOMID, $pid, $famid, $rid, $sid;
-	
+
 	// Determine browser type
 	if (!isset($_SERVER["HTTP_USER_AGENT"])) $BROWSERTYPE = "other";
 	else if (stristr($_SERVER["HTTP_USER_AGENT"], "Opera"))
@@ -991,6 +991,7 @@ function print_header($title, $head="",$use_alternate_styles=true) {
 	else {
 ?>
 <script language="JavaScript" type="text/javascript">
+<!--
 function hidePrint() {
 	 var printlink = document.getElementById('printlink');
 	 var printlinktwo = document.getElementById('printlinktwo');
@@ -1005,11 +1006,13 @@ function showBack() {
 		  backlink.style.display='block';
 	 }
 }
+//-->
 </script>
 <?php
 }
 ?>
 <script language="JavaScript" type="text/javascript">
+<!--
 	 <?php print "query = \"$query_string\";\n"; ?>
 	 <?php print "textDirection = \"$TEXT_DIRECTION\";\n"; ?>
 	 <?php print "browserType = \"$BROWSERTYPE\";\n"; ?>
@@ -1045,14 +1048,17 @@ function message(username, method, url, subject) {
 	 return false;
 }
 var whichhelp = 'help_<?php print basename($SCRIPT_NAME)."&amp;action=".$action; ?>';
+//-->
 </script>
 <script src="genmod.js" language="JavaScript" type="text/javascript"></script>
 <script src="gmrpc.js" language="JavaScript" type="text/javascript"></script>
 <?php if ($USE_GREYBOX) { ?>
 <script type="text/javascript">
+<!--
     var GB_ROOT_DIR = "<?php print $SERVER_URL."modules/greybox/";?>";
+//-->
 </script>
-
+<link href="modules/greybox/gb_styles.css" rel="stylesheet" type="text/css" />
 <?php }
 	 print $head;
 	 print "</head>\n\t<body";
@@ -1087,7 +1093,6 @@ var whichhelp = 'help_<?php print basename($SCRIPT_NAME)."&amp;action=".$action;
 		<script type="text/javascript" src="modules/greybox/AJS.js"></script>
 		<script type="text/javascript" src="modules/greybox/AJS_fx.js"></script>
 		<script type="text/javascript" src="modules/greybox/gb_scripts.js"></script>
-		<link href="modules/greybox/gb_styles.css" rel="stylesheet" type="text/css" />
 	 <?php
  	}
 	 // Unset the indilist as it is contaminated with ID's from other gedcoms
@@ -1201,8 +1206,11 @@ function print_simple_header($title) {
 	<script src="gmrpc.js" language="JavaScript" type="text/javascript"></script>
 	<?php if ($USE_GREYBOX) { ?>
 		<script type="text/javascript">
+		<!--
 	    	var GB_ROOT_DIR = "<?php print $SERVER_URL."modules/greybox/";?>";
+	    //-->
 		</script>
+		<link href="modules/greybox/gb_styles.css" rel="stylesheet" type="text/css" />
 	<?php }
 	print "</head>\n\t<body style=\"margin: 5px;\"";
 	print " onload=\"loadHandler();\">\n\t";
@@ -1210,7 +1218,6 @@ function print_simple_header($title) {
 		<script type="text/javascript" src="modules/greybox/AJS.js"></script>
 		<script type="text/javascript" src="modules/greybox/AJS_fx.js"></script>
 		<script type="text/javascript" src="modules/greybox/gb_scripts.js"></script>
-		<link href="modules/greybox/gb_styles.css" rel="stylesheet" type="text/css" />
 	 <?php
  	}
 }
@@ -1521,6 +1528,11 @@ function print_fact($factrec, $pid, $fact, $count=1, $indirec=false, $styleadd="
 	global $CONTACT_EMAIL, $view, $FACT_COUNT, $monthtonum;
 	global $dHebrew;
 	global $n_chil, $n_gchi;
+	static $rowcnt;
+	static $relacnt;
+	
+	if (!isset($relacnt)) $relacnt = 0;
+	if (!isset($rowcnt)) $rowcnt = 0;
 
 	$FACT_COUNT++;
 	$estimates = array("abt","aft","bef","est","cir");
@@ -1571,7 +1583,14 @@ function print_fact($factrec, $pid, $fact, $count=1, $indirec=false, $styleadd="
 			// not have a value, we create several instances of the same ID.
 //			print "\n\t\t<tr>";
 // Temporarily restored the following line; removing styleadd breaks display relatives events
-print "\n\t\t<tr id=\"row_".$styleadd."\" name=\"row_".$styleadd."\" >";
+			if ($styleadd == "") {
+				print "\n\t\t<tr id=\"row_".$rowcnt."\" >";
+				$rowcnt++;
+			}
+			else {
+				print "\n\t\t<tr id=\"row_".$styleadd.$relacnt."\" >";
+				$relacnt++;
+			}
 			//print "\n\t\t\t<td class=\"facts_label facts_label$styleadd\">";
 			print "\n\t\t\t<td class=\"shade2 $styleadd center width20\" style=\"vertical-align: middle\">";
 			print $factarray[$fact];
@@ -1636,7 +1655,14 @@ print "\n\t\t<tr id=\"row_".$styleadd."\" name=\"row_".$styleadd."\" >";
 			// The two lines below do not validate because when $styleadd does
 			// not have a value, we create several instances of the same ID.
 			// Furthermore, "name" is not valid for a TR tag.
-			print "\n\t\t<tr id=\"row_".$styleadd."\" name=\"row_".$styleadd."\">";
+			if ($styleadd == "") {
+				print "\n\t\t<tr id=\"row_".$rowcnt."\" >";
+				$rowcnt++;
+			}
+			else {
+				print "\n\t\t<tr id=\"row_".$styleadd.$relacnt."\" >";
+				$relacnt++;
+			}
 			if (isset($factarray["$factref"])) $label = $factarray[$factref];
 			else $label = $factref;
 			//print "<td class=\"facts_label facts_label$styleadd\">" . $label;
@@ -1716,16 +1742,20 @@ print "\n\t\t<tr id=\"row_".$styleadd."\" name=\"row_".$styleadd."\" >";
 			if ($ct>0) {
 				$spouse=$match[1];
 				if ($spouse!=="") {
+					$spouseobj =& Person::GetInstance($spouse);
 					 print "<a href=\"individual.php?pid=$spouse&amp;ged=$GEDCOM\">";
-					 if (showLivingNameById($spouse)) {
-						$srec = FindGedcomRecord($spouse);
-						if ($show_changes && $Users->UserCanEdit($gm_username) && GetChangeData(true, $spouse, true)) {
-							$rec = GetChangeData(false, $spouse, true, "gedlines");
-							$srec = $rec[$GEDCOM][$spouse];
-						}
-						print PrintReady(GetPersonName($spouse, $srec));
-						$addname = GetAddPersonName($spouse, $srec);
-						if ($addname!="") print " - ".PrintReady($addname);
+					 if ($spouseobj->disp_name) {
+//					 if (showLivingNameById($spouse)) {
+//						$srec = FindGedcomRecord($spouse);
+//						if ($show_changes && $Users->UserCanEdit($gm_username) && GetChangeData(true, $spouse, true)) {
+//							$rec = GetChangeData(false, $spouse, true, "gedlines");
+//							$srec = $rec[$GEDCOM][$spouse];
+//						}
+						print $spouseobj->name;
+//						print PrintReady(GetPersonName($spouse, $srec));
+//						$addname = GetAddPersonName($spouse, $srec);
+						if ($spouseobj->addname != "") print " - ".$spouseobj->addname;
+//						if ($addname!="") print " - ".PrintReady($addname);
 					 }
 					 else print $gm_lang["private"];
 					 print "</a>";
@@ -1911,6 +1941,9 @@ function print_fact_sources($factrec, $level, $pid="", $nobr=true) {
 	global $gm_lang, $gm_username;
 	global $factarray;
 	global $WORD_WRAPPED_NOTES, $FACT_COUNT, $GM_IMAGE_DIR, $FACT_COUNT, $GM_IMAGES, $SHOW_SOURCES;
+	static $cnt;
+	
+	if (!isset($cnt)) $cnt = 0;
 	
 	if (!$nobr) print "<br />";
 	$nlevel = $level+1;
@@ -1944,7 +1977,7 @@ function print_fact_sources($factrec, $level, $pid="", $nobr=true) {
 			$newline = true;
 			print "\n\t\t<span class=\"label\">";
 			$sid = $match[$j][1];
-			if ($lt>0 && $show_details) print "<a href=\"#\" onclick=\"expand_layer('$sid$j-$FACT_COUNT'); return false;\"><img id=\"{$sid}{$j}-{$FACT_COUNT}_img\" src=\"".$GM_IMAGE_DIR."/".$GM_IMAGES["plus"]["other"]."\" border=\"0\" width=\"11\" height=\"11\" alt=\"\" /></a> ";
+			if ($lt>0 && $show_details) print "<a href=\"#\" onclick=\"expand_layer('$sid$j-$FACT_COUNT-$cnt'); return false;\"><img id=\"{$sid}{$j}-{$FACT_COUNT}_img\" src=\"".$GM_IMAGE_DIR."/".$GM_IMAGES["plus"]["other"]."\" border=\"0\" width=\"11\" height=\"11\" alt=\"\" /></a> ";
 			print $gm_lang["source"].":</span> <span class=\"field\"><a href=\"source.php?sid=".$sid."\">";
 			print PrintReady(GetSourceDescriptor($sid));
 			//-- Print additional source title
@@ -1953,7 +1986,7 @@ function print_fact_sources($factrec, $level, $pid="", $nobr=true) {
 			print "</a></span>";
 			if ($show_details) {
 				$first = true;
-				print "<div id=\"$sid$j-$FACT_COUNT\" class=\"source_citations\">";
+				print "<div id=\"$sid$j-$FACT_COUNT-$cnt\" class=\"source_citations\">";
 				$cs1 = preg_match("/$nlevel PAGE (.*)/", $srec, $cmatch);
 				if ($cs1>0) {
 					$first = false;
@@ -2020,6 +2053,7 @@ function print_fact_sources($factrec, $level, $pid="", $nobr=true) {
 				print "</div>";
 			}			
 			$printed = true;
+			$cnt++;
 		}
 	}
 	return $printed;
@@ -2034,13 +2068,6 @@ function print_main_sources($factrec, $level, $pid, $count, $styleadd="", $mayed
 	 if (!showFact("SOUR", $pid) || FactViewRestricted($pid, $factrec)) return false;
 	
 	 $nlevel = $level+1;
-	 if (empty($styleadd)) {
-		 $styleadd="";
-	 	$ct = preg_match("/GM_NEW/", $factrec, $match);
-	 	if ($ct>0) $styleadd="change_new";
-	 	$ct = preg_match("/GM_OLD/", $factrec, $match);
-	 	if ($ct>0) $styleadd="change_old";
- 	}
 	 // -- find source for each fact
 	 $ct = preg_match_all("/$level SOUR @(.*)@/", $factrec, $match, PREG_SET_ORDER);
 	 $spos2 = 0;
@@ -2365,6 +2392,9 @@ function print_main_media($factrec, $pid, $nlevel, $count=1, $change=false, $sty
 	global $gm_lang, $factarray, $view, $GEDCOMID, $USE_GREYBOX;
 	global $GEDCOMS, $GEDCOM, $MEDIATYPE, $gm_username, $Users, $MediaFS;
 	global $WORD_WRAPPED_NOTES, $MEDIA_DIRECTORY, $GM_IMAGE_DIR, $GM_IMAGES, $TEXT_DIRECTION;
+	static $rowcnt;
+	
+	if (!isset($rowcnt)) $rowcnt = 0;
 	
 	$deleted = false;
 	if ($styleadd == "deleted") {
@@ -2384,8 +2414,8 @@ function print_main_media($factrec, $pid, $nlevel, $count=1, $change=false, $sty
 
 	if (!ShowFact("OBJE", $pid, "OBJE")) return false;
 // New from here
-	if ($change && $styleadd != "change_old") $media = new MediaItem($media_id, '', true);
-	else $media = new MediaItem($media_id);
+	if ($change && $styleadd != "change_old") $media =& MediaItem::GetInstance($media_id, '', true);
+	else $media =& MediaItem::GetInstance($media_id);
 
 	// NOTE: Determine the size of the mediafile
 	$imgwidth = 300;
@@ -2409,7 +2439,8 @@ function print_main_media($factrec, $pid, $nlevel, $count=1, $change=false, $sty
 	
 	// NOTE: Start printing the media details
 	$show_details = showFactDetails("OBJE", $pid);
-	print "\n\t\t<tr><td class=\"shade2 $styleadd center\" style=\"vertical-align: middle;\">".$factarray["OBJE"].":";
+	print "\n\t\t<tr id=\"mrow_".$rowcnt."\"><td class=\"shade2 $styleadd width20 center\" style=\"vertical-align: middle;\">".$factarray["OBJE"].":";
+	$rowcnt++;
 	if ($Users->userCanEdit($gm_username) && !FactEditRestricted($pid, $factrec) && $show_details && $styleadd!="change_old" && $view!="preview" && !$deleted && $mayedit) {
 		$menu = array();
 		$menu["label"] = $gm_lang["edit"];
@@ -2471,7 +2502,7 @@ function print_main_media($factrec, $pid, $nlevel, $count=1, $change=false, $sty
 		print "<i>".PrintReady($media->title)."</i></a>";
 	}
 
-	if (empty($media->fileobj->f_thumb_file) && preg_match("'://'", $media->m_file)) print "<br /><a href=\"".$media->filename."\" target=\"_blank\">".$media->filename."</a>";
+	if (empty($media->fileobj->f_thumb_file) && preg_match("'://'", $media->filename)) print "<br /><a href=\"".$media->filename."\" target=\"_blank\">".$media->filename."</a>";
 
 	
 	if ($show_details) {
@@ -2482,7 +2513,7 @@ function print_main_media($factrec, $pid, $nlevel, $count=1, $change=false, $sty
 				print "\n\t\t\t<span class=\"label\"><br />".$gm_lang["image_size"].": </span> <span class=\"field\" style=\"direction: ltr;\">" . $media->fileobj->f_width . ($TEXT_DIRECTION =="rtl"?" &rlm;x&rlm; " : " x ") . $media->fileobj->f_height . "</span>";
 			}
 		}
-		$ttype = preg_match("/3 TYPE (.*)/", $media->m_gedrec, $match);
+		$ttype = preg_match("/3 TYPE (.*)/", $media->gedrec, $match);
 		if ($ttype>0){
 			print "\n\t\t\t<br /><span class=\"label\">".$gm_lang["type"].": </span> <span class=\"field\">".$match[1]."</span>";
 		}
@@ -2502,7 +2533,7 @@ function print_main_media($factrec, $pid, $nlevel, $count=1, $change=false, $sty
 			print "\n\t\t\t<br /><span class=\"label\">".$factarray["_THUM"].": </span> <span class=\"field\">".$gm_lang[$val]."</span>";
 		}
 
-		print "</span>";
+//		print "</span>";
 		print "<br />\n";
 		//-- print spouse name for marriage events
 		$ct = preg_match("/GM_SPOUSE: (.*)/", $factrec, $match);
@@ -2529,10 +2560,10 @@ function print_main_media($factrec, $pid, $nlevel, $count=1, $change=false, $sty
 		}
 		print "<br />\n";
 		// Print the notes in the MM link
-		if (print_fact_notes($factrec, 2)) print "<br /><br />";
+//		if (print_fact_notes($factrec, 2)) print "<br /><br />";
 		// Print the notes in the media record
-		if (print_fact_notes($media->m_gedrec, $nlevel+1)) print "<br /><br />";
-		print_fact_sources($media->m_gedrec, $nlevel+1);
+//		if (print_fact_notes($media->gedrec, $nlevel+1)) print "<br /><br />";
+//		print_fact_sources($media->gedrec, $nlevel+1);
 	}
 	print "</span></td></tr>";
 	
@@ -2557,11 +2588,11 @@ function print_media_links($factrec, $level, $pid="", $nobr=true) {
 	$ct = preg_match_all("/$level OBJE(.*)/", $factrec, $omatch, PREG_SET_ORDER);
 	if (count($omatch) > 0) {
 		$printed = true;
-		print "<table class=\"facts_table\">";
+		print "<!-- Start media link table //--><table class=\"facts_table\">";
 		foreach ($omatch as $key => $media) {
 			print "<tr><td>";
 			$media_id = preg_replace("/@/", "", trim($media[1]));
-			$media = New MediaItem($media_id);
+			$media =& MediaItem::GetInstance($media_id);
 			// NOTE: Determine the size of the mediafile
 			$imgwidth = 300;
 			$imgheight = 300;
@@ -2600,11 +2631,11 @@ function print_media_links($factrec, $level, $pid="", $nobr=true) {
 						print "\n\t\t\t<span class=\"label\"><br />".$gm_lang["image_size"].": </span> <span class=\"field\" style=\"direction: ltr;\">" . $media->fileobj->f_width . ($TEXT_DIRECTION =="rtl"?" &rlm;x&rlm; " : " x ") . $media->fileobj->f_height . "</span>";
 					}
 				}
-				$ttype = preg_match("/\d TYPE (.*)/", $media->m_gedrec, $match);
+				$ttype = preg_match("/\d TYPE (.*)/", $media->gedrec, $match);
 				if ($ttype>0){
 					print "\n\t\t\t<br /><span class=\"label\">".$gm_lang["type"].": </span> <span class=\"field\">$match[1]</span>";
 				}
-				print "</span>";
+//				print "</span>";
 				print "<br />\n";
 				//-- print spouse name for marriage events
 				$ct = preg_match("/GM_SPOUSE: (.*)/", $factrec, $match);
@@ -2631,16 +2662,16 @@ function print_media_links($factrec, $level, $pid="", $nobr=true) {
 				}
 //				print "<br />\n";
 				if (ShowFact("NOTE", $media_id) && ShowFactDetails("NOTE", $media_id)) {
-					$prtd = !print_fact_notes($media->m_gedrec, 1); // Level is 1 because the notes are subordinate to the linked record, NOT to the link!
+					$prtd = !print_fact_notes($media->gedrec, 1); // Level is 1 because the notes are subordinate to the linked record, NOT to the link!
 				}
 				else $prtd = true;
 				if (ShowFact("SOUR", $media_id) && ShowFactDetails("SOUR", $media_id)) {
-					print_fact_sources($media->m_gedrec, 1, "", $prtd); // Level is 1 because the sourcelinks are subordinate to the linked record, NOT to the link!
+					print_fact_sources($media->gedrec, 1, "", $prtd); // Level is 1 because the sourcelinks are subordinate to the linked record, NOT to the link!
 				}
 			}
 			print "</td></tr>";
 		 }
-		 print "</table>";
+		 print "</table><!-- End media link table //-->";
 	 }
 	 return $printed;
 }
@@ -4573,64 +4604,35 @@ function PrintBlockFavorites($userfavs, $side, $index, $style) {
 			print "<li><a href=\"".$favorite->url."\">".PrintReady($favorite->title)."</a></li>";
 			print "</ul>";
 			print "<span class=\"favorite_padding\">".PrintReady($favorite->note)."</span>";
-			print "</div>\n";
 		}
 		else {
-			if ($favorite->type=="SOUR" && $favorite->object->disp) {
-				print "<div id=\"box".$favorite->object->xref.".0\" class=\"person_box";
+			$favorite->GetObject();
+			print "<div id=\"box".$favorite->object->xref.".0\" class=\"person_box";
+			if ($favorite->type == "INDI") {
+				if ($favorite->object->sex == "F") print "F\">\n";
+				elseif ($favorite->object->sex == "U") print "NN\">\n";
+				else print "\">\n";
+				PrintPedigreePerson($favorite->object, $style, 1, $key);
+			}
+			else {
 				print "\"><ul>\n";
-				print_list_source($favorite->object->xref, array("name"=>$favorite->object->descriptor, "gedfile"=>$favorite->file));
+				if ($favorite->type=="SOUR") $favorite->object->PrintListSource();
+				elseif ($favorite->type=="REPO") $favorite->object->PrintListRepository();
+				elseif ($favorite->type=="NOTE") $favorite->object->PrintListNote();
+				elseif ($favorite->type=="FAM") $favorite->object->PrintListFamily();
+				elseif ($favorite->type=="OBJE") $favorite->object->PrintListMedia();
 				print "</ul>";
-				if (!empty($favorite->note)) print "<span class=\"favorite_padding\">".PrintReady($gm_lang["note"].": ".$favorite->note)."</span>";
-				print "</div>\n";
 			}
-			else if (DisplayDetailsByID($favorite->gid, $favorite->type, 1, true)) {
-				$indirec = FindGedcomRecord($favorite->gid);
-				if ($favorite->type=="INDI") {
-					print "<div id=\"box".$favorite->gid.".0\" class=\"person_box";
-					if (preg_match("/1 SEX F/", $indirec)>0) print "F";
-					else if (preg_match("/1 SEX M/", $indirec)>0) print "";
-					else print "NN";
-					print "\">\n";
-					print_pedigree_person($favorite->gid, $style, 1, $key);
-//					print "</div>\n";
-					if (!empty($favorite->note)) print "<span class=\"favorite_padding\">".PrintReady($gm_lang["note"].": ".$favorite->note)."</span>";
-					print "</div>\n";
-				}
-				if ($favorite->type=="FAM") {
-					print "<div id=\"box".$favorite->gid.".0\" class=\"person_box";
-					print "\"><ul>\n";
-					print_list_family($favorite->gid, array(GetFamilyDescriptor($favorite->gid), get_gedcom_from_id($favorite->file)));
-					print "</ul>";
-					if (!empty($favorite->note)) print "<span class=\"favorite_padding\">".PrintReady($gm_lang["note"].": ".$favorite->note)."</span>";
-					print "</div>\n";
-				}
-				if ($favorite->type=="OBJE") {
-					print "<div id=\"box".$favorite->gid.".0\" class=\"person_box";
-					print "\"><ul>\n";
-					print_media_links("0 OBJE @".$favorite->gid."@", 0);
-					print "</ul>";
-					if (!empty($favorite->note)) print "<span class=\"favorite_padding\">".PrintReady($gm_lang["note"].": ".$favorite->note)."</span>";
-					print "</div>\n";
-				}
-				if ($favorite->type=="NOTE") {
-					print "<div id=\"box".$favorite->gid.".0\" class=\"person_box";
-					print "\"><ul>\n";
-					$note_controller = new NoteController($favorite->gid);
-						$note_controller->note->PrintListNote(80);
-					print "</ul>";
-					if (!empty($favorite->note)) print "<span class=\"favorite_padding\">".PrintReady($gm_lang["note"].": ".$favorite->note)."</span>";
-					print "</div>\n";
-				}
-			}
-			if ($command=="user" || $Users->userIsAdmin($gm_username)) {
-				if (!empty($favorite->note)) print "&nbsp;&nbsp;";
-				print "<a class=\"font9\" href=\"index.php?command=$command&amp;action=deletefav&amp;fv_id=".$key."\" onclick=\"return confirm('".$gm_lang["confirm_fav_remove"]."');\">".$gm_lang["remove"]."</a>\n";
-				print "&nbsp;";
-				print "<a class=\"font9\" href=\"javascript: ".$gm_lang["config_block"]."\" onclick=\"window.open('index_edit.php?favid=$key&amp;name=$gm_username&amp;command=$command&amp;action=configure&amp;side=$side&amp;index=$index', '', 'top=50,left=50,width=600,height=400,scrollbars=1,resizable=1'); return false;\">".$gm_lang["edit"]."</a>";
-			}
-			SwitchGedcom();
 		}
+		if (!empty($favorite->note)) print "<span class=\"favorite_padding\">".PrintReady($gm_lang["note"].": ".$favorite->note)."</span>";
+		print "</div>\n";
+		if ($command=="user" || $Users->userIsAdmin($gm_username)) {
+			if (!empty($favorite->note)) print "&nbsp;&nbsp;";
+			print "<a class=\"font9\" href=\"index.php?command=$command&amp;action=deletefav&amp;fv_id=".$key."\" onclick=\"return confirm('".$gm_lang["confirm_fav_remove"]."');\">".$gm_lang["remove"]."</a>\n";
+			print "&nbsp;";
+			print "<a class=\"font9\" href=\"javascript: ".$gm_lang["config_block"]."\" onclick=\"window.open('index_edit.php?favid=$key&amp;name=$gm_username&amp;command=$command&amp;action=configure&amp;side=$side&amp;index=$index', '', 'top=50,left=50,width=600,height=400,scrollbars=1,resizable=1'); return false;\">".$gm_lang["edit"]."</a>";
+		}
+		SwitchGedcom();
 	}
 }
 function PrintBlockAddFavorite($command, $type) {
@@ -4648,7 +4650,7 @@ function PrintBlockAddFavorite($command, $type) {
 		<br />
 	<?php
 	print_help_link("index_add_favorites_help", "qm", "add_favorite");
-	print "<b><a href=\"javascript: ".$gm_lang["add_favorite"]." \" onclick=\"expand_layer('add_".$type."_fav'); return false;\"><img id=\"add_ged_fav_img\" src=\"".$GM_IMAGE_DIR."/".$GM_IMAGES["plus"]["other"]."\" border=\"0\" />&nbsp;".$gm_lang["add_favorite"]."</a></b>";
+	print "<b><a href=\"javascript: ".$gm_lang["add_favorite"]." \" onclick=\"expand_layer('add_".$type."_fav'); return false;\"><img id=\"add_ged_fav_img\" src=\"".$GM_IMAGE_DIR."/".$GM_IMAGES["plus"]["other"]."\" border=\"0\" alt=\"".$gm_lang["add_favorite"]."\" />&nbsp;".$gm_lang["add_favorite"]."</a></b>";
 	print "<br /><div id=\"add_".$type."_fav\" style=\"display: none;\">\n";
 	print "<form name=\"addfavform\" method=\"get\" action=\"index.php\">\n";
 	print "<input type=\"hidden\" name=\"action\" value=\"addfav\" />\n";

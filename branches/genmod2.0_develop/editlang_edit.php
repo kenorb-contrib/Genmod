@@ -54,7 +54,7 @@ if (!isset($realtime)) $realtime = false;
 print_simple_header($gm_lang["editlang"]);
 
 print "<script language=\"JavaScript\" type=\"text/javascript\">";
-print "self.focus();";
+print "<!--\nself.focus();\n//-->";
 print "</script>\n";
 
 switch ($file_type) {
@@ -116,7 +116,9 @@ if ($action != "save") {
 	print "</form>";
 	?>
 	<script language="JavaScript" type="text/javascript">
+	<!--
 		document.Form1.new_message.focus();
+	//-->
 	</script>
 	<?php
 }

@@ -193,7 +193,7 @@ function FindGedcomRecord($pid, $gedfile = "", $renew = false, $nocache = false)
 	global $gm_lang, $TBLPREFIX, $GEDCOMS, $MEDIA_ID_PREFIX;
 	global $GEDCOM, $GEDCOMID, $indilist, $famlist, $sourcelist, $otherlist, $repolist, $medialist, $DBCONN;
 	global $GEDCOM_ID_PREFIX, $FAM_ID_PREFIX, $SOURCE_ID_PREFIX, $MEDIA_ID_PREFIX, $NOTE_ID_PREFIX;
-
+// print "hit on findgecomrecord for: ".$pid."<br />".$pipo;
 	if (empty($pid)) return false;
 	if (empty($gedfile)) $gedfile = $GEDCOM;
 	$gedfileid = $GEDCOMS[$gedfile]["id"];

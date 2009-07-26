@@ -603,9 +603,9 @@ if ($view != "preview") {
 	print "\n\t\t</form><br />";
 } 
 else {
-	print "<script language='JavaScript' type='text/javascript'>";
+	print "<script language='JavaScript' type='text/javascript'><!--\n";
 	print "if (IE) document.write('<span class=\"warning\">".str_replace("'", "\'", $gm_lang["fanchart_IE"])."</span>');";
-	print "</script>";
+	print "//--></script>";
 }
 print "</td></tr></table>";
 

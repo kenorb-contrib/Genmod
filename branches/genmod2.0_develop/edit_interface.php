@@ -813,7 +813,7 @@ switch ($action) {
 			$rec = GetChangeData(false, $famid, true, "gedlines", "");
 			$gedrec = $rec[$GEDCOM][$famid];
 		}
-		$family = new Family($famid, $gedrec);
+		$family =& Family::GetInstance($famid, $gedrec);
 		$father = $family->husb;
 		$mother = $family->wife;
 		$children = $family->children;
@@ -961,7 +961,7 @@ switch ($action) {
 			$rec = GetChangeData(false, $famid, true, "gedlines", "");
 			$gedrec = $rec[$GEDCOM][$famid];
 		}
-		$family = new Family($famid, $gedrec);
+		$family =& Family::GetInstance($famid, $gedrec);
 		$father = $family->husb;
 		$mother = $family->wife;
 		$children = $family->children;
@@ -1307,7 +1307,9 @@ switch ($action) {
 			if (isset($focus)) {
 				?>
 				<script>
+				<!--
 				document.getElementById('<?php print $focus; ?>').focus();
+				//-->
 				</script>
 				<?php
 			}
@@ -1685,7 +1687,7 @@ switch ($action) {
 		print "</table>\n";
 		print "</form>\n";
 		print "<script>";
-		print "addchildform.famid.focus();";
+		print "<!--\naddchildform.famid.focus();\n//-->";
 		print "</script>";
 		break;
 		
@@ -2406,9 +2408,9 @@ switch ($action) {
 		print "</td></tr>";
 		print "</table>\n";
 		print "</form>\n";
-		print "<script>";
+		print "<script><!--\n";
 		print "linkspouseform.spouseid.focus();";
-		print "</script>";
+		print "//--></script>";
 		break;
 	
 	// NOTE: linkspouseaction done

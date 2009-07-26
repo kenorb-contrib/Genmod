@@ -31,18 +31,14 @@ if (stristr($_SERVER["SCRIPT_NAME"],"source_ctrl")) {
  * Main controller class for the source page.
  */
 class SourceController extends DetailController {
-	public $classname = "SourceController";
 	
-	public $source = null;
-	
-	private $display_other_menu = false;
-	private $pagetitle = null;
+	public $classname = "SourceController";	// Name of this class
+	public $source = null;					// Holder for the source object
 	
 	/**
 	 * constructor
 	 */
 	public function __construct() {
-		global $gm_lang, $CONTACT_EMAIL, $GEDCOM, $ALLOW_EDIT_GEDCOM;
 		global $ENABLE_CLIPPINGS_CART, $Users, $nonfacts;
 		
 		parent::__construct();
@@ -52,40 +48,21 @@ class SourceController extends DetailController {
 		if (!empty($_REQUEST["sid"])) $this->xref = strtoupper($_REQUEST["sid"]);
 		$this->xref = CleanInput($this->xref);
 		
-		$this->source = new Source($this->xref);
+		$this->source =& Source::GetInstance($this->xref);
 		
-		if ($this->source->disp && ($Users->userCanViewGedlines() || $ENABLE_CLIPPINGS_CART >= $Users->getUserAccessLevel() || !empty($this->uname))) {
-			$this->display_other_menu = true;
-		}		
+		//-- perform the desired action
+		switch($this->action) {
+			case "addfav":
+				$this->addFavorite();
+				break;
+		}
 	}
 	
 	public function __get($property) {
 		switch($property) {
-			case "pagetitle":
-				return $this->GetPageTitle();
-				break;
-			case "display_other_menu":
-				return $this->display_other_menu;
-				break;
 			default:
-				parent::__get($property);
-		}
-	}
-	/**
-	 * Add a new favorite for the action user
-	 */
-	protected function addFavorite() {
-		global $GEDCOMID;
-		
-		if (empty($this->uname)) return;
-
-		if (!$this->source->isempty && !$this->source->isdeleted) {	
-			$favorite = new Favorite();
-			$favorite->username = $this->uname;
-			$favorite->gid = $this->source->xref;
-			$favorite->type = 'SOUR';
-			$favorite->file = $GEDCOMID;
-			$favorite->SetFavorite();
+				return parent::__get($property);
+				break;
 		}
 	}
 	
@@ -93,11 +70,17 @@ class SourceController extends DetailController {
 	 * get the title for this page
 	 * @return string
 	 */
-	private function getPageTitle() {
-		global $gm_lang;
+	protected function getPageTitle() {
+		global $gm_lang, $SHOW_ID_NUMBERS;
 
-		if ($this->source->title) $this->pagetitle = $this->source->title." - ".$this->source->xref." - ".$gm_lang["source_info"];
-		else $this->pagetitle =  $this->source->xref." - ".$gm_lang["source_info"];
+		if (is_null($this->pagetitle)) {
+			$this->pagetitle = "";
+			if ($this->source->title) {
+				$this->pagetitle .= $this->source->title." - ";
+				if ($SHOW_ID_NUMBERS) $this->pagetitle .= $this->source->xref." - ";
+			}
+			$this->pagetitle .= $gm_lang["source_info"];
+		}
 		return $this->pagetitle;
 	}
 	
@@ -106,15 +89,14 @@ class SourceController extends DetailController {
 	 * @return Menu
 	 */
 	public function &getEditMenu() {
-		global $TEXT_DIRECTION, $GEDCOM, $gm_lang, $Users;
+		global $TEXT_DIRECTION, $gm_lang, $Users;
 		
 		if ($TEXT_DIRECTION=="rtl") $ff="_rtl";
 		else $ff="";
 		
 		// edit source menu
 		$menu = new Menu($gm_lang['edit_source']);
-
-		if ($this->source->canedit) {
+		if (!$this->source->isdeleted) {
 			// edit source / edit_raw
 			if ($Users->userCanEditGedlines()) {
 				$submenu = new Menu($gm_lang['edit_raw']);
@@ -126,19 +108,18 @@ class SourceController extends DetailController {
 			$submenu = new Menu($gm_lang['delete_source']);
 			$submenu->addLink("if (confirm('".$gm_lang["confirm_delete_source"]."'))  deletesource('".$this->source->xref."', 'delete_source'); ");
 			$menu->addSubmenu($submenu);
+		}
+		if ($this->source->ischanged) {
+			// edit_sour / seperator
+			$submenu = new Menu();
+			$submenu->isSeperator();
+			$menu->addSubmenu($submenu);
 
-			if ($this->source->ischanged) {
-				// edit_sour / seperator
-				$submenu = new Menu();
-				$submenu->isSeperator();
-				$menu->addSubmenu($submenu);
-
-				// edit_sour / show/hide changes
-				if (!$this->source->show_changes) $submenu = new Menu($gm_lang['show_changes']);
-				else $submenu = new Menu($gm_lang['hide_changes']);
-				$submenu->addLink('showchanges();');
-				$menu->addSubmenu($submenu);
-			}
+			// edit_sour / show/hide changes
+			if (!$this->source->show_changes) $submenu = new Menu($gm_lang['show_changes']);
+			else $submenu = new Menu($gm_lang['hide_changes']);
+			$submenu->addLink('showchanges();');
+			$menu->addSubmenu($submenu);
 		}
 		return $menu;
 	}
@@ -148,7 +129,7 @@ class SourceController extends DetailController {
 	 * @return Menu
 	 */
 	public function &getOtherMenu() {
-		global $TEXT_DIRECTION, $GEDCOM, $GEDCOMID, $gm_lang;
+		global $TEXT_DIRECTION, $GEDCOMID, $gm_lang;
 		global $ENABLE_CLIPPINGS_CART, $Users;
 		
 		if ($TEXT_DIRECTION=="rtl") $ff="_rtl";

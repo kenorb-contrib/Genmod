@@ -457,6 +457,7 @@ if ($step == 4) {
 		print "<br />";
 		?>
 		<script language="JavaScript" type="text/javascript">
+		<!--
 			function checkform(frm) {
 				if (frm.username.value=="") {
 					alert("<?php print $gm_lang["enter_username"]; ?>");
@@ -490,6 +491,7 @@ if ($step == 4) {
 				}
 				return true;
 			}
+		//-->
 		</script>
 		<br />
 		<form method="post" action="<?php print $_SERVER["SCRIPT_NAME"];?>" onsubmit="return checkform(this);">

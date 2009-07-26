@@ -160,7 +160,7 @@ function print_recent_changes($block=true, $config="", $side, $index) {
 			}
 
 			if ($factarr[2]=="SOUR") {
-				$source = new source($factarr[0]);
+				$source =& Source::GetInstance($factarr[0]);
 				$gid = $factarr[0];
 				$factrec = $factarr[1];
 				if ($source->disp) {

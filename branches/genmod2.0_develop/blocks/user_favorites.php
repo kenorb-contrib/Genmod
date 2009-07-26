@@ -39,7 +39,8 @@ function print_user_favorites($block=true, $config="", $side, $index) {
 
 		$userfavs = $Favorites->getUserFavorites($gm_username);
 		if (!is_array($userfavs)) $userfavs = array();
-		print "<div id=\"user_favorites\" class=\"block\">\n";
+		print "<!-- Start of user favorites //-->";
+		print "<div id=\"user_favorites\" class=\"block\">\n"; // block
 		print "<div class=\"blockhc\">";
 		print_help_link("mygedview_favorites_help", "qm", "my_favorites");
 		print $gm_lang["my_favorites"]." &lrm;(".count($userfavs).")&lrm;";
@@ -59,6 +60,7 @@ function print_user_favorites($block=true, $config="", $side, $index) {
 		if ($block) print "</div>\n";
 		print "</div>\n"; // content
 		print "</div>";   // block
+		print "<!-- end of user favorites //-->";
 }
 
 function print_user_favorites_config($favid="") {
@@ -72,14 +74,7 @@ function print_user_favorites_config($favid="") {
 	$fav = $userfave[0];
 	
 	print "<br />";
-	if ($fav->type == "INDI") print GetPersonName($fav->gid);
-	if ($fav->type == "FAM") print GetFamilyDescriptor($fav->gid);
-	if ($fav->type == "SOUR") print GetSourceDescriptor($fav->gid);
-	if ($fav->type == "OBJE") print GetMediaDescriptor($fav->gid);
-	if ($fav->type == "NOTE") {
-		$note_controller = new NoteController($fav->gid);
-		print $note_controller->note->GetTitle();
-	}
+	print $fav->title;
 	print "<br />";
 	print "<input type=\"hidden\" name=\"action\" value=\"storefav\" />\n";
 	print "<input type=\"hidden\" name=\"id\" value=\"".$fav->id."\" />\n";

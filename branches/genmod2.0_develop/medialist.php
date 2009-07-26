@@ -152,7 +152,7 @@ foreach($media->medialist as $index => $mediaitem) {
 	else if (!strstr($mediaitem->filename, "://") && !$mediaitem->fileobj->f_file_exists) print '<br /><span class="error">'.$gm_lang["file_not_found"].'<br />'.$mediaitem->filename.'</span>';
 	
 	print '<br /><br /><div class="indent wrap width95">';
-	print_fact_notes($mediaitem->m_gedrec, $mediaitem->level+1);
+	print_fact_notes($mediaitem->gedrec, $mediaitem->level+1);
 	
 	print '</div>';
 	if (!is_null($mediaitem->filename) && $mediaitem->filename != "") print "<span class=\"label\"><br />".$gm_lang["filename"]." : </span> <span class=\"field\" style=\"direction: ltr;\">".$mediaitem->filename."</span>";

@@ -129,6 +129,7 @@ if ($action=="compose") {
 	print '<span class="subheaders">'.$gm_lang["message"].'</span>';
 	$_SESSION["good_to_send"] = true;
 	?>
+	<!--
 	<script language="JavaScript" type="text/javascript">
 		function validateEmail(email) {
 			if (email.value.search("(.*)@(.*)")==-1) {
@@ -151,6 +152,7 @@ if ($action=="compose") {
 			}
 			return true;
 		}
+	//-->
 	</script>
 	<?php
 	$username = $gm_username;

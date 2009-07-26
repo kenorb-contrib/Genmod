@@ -28,7 +28,7 @@ if (stristr($_SERVER["SCRIPT_NAME"],basename(__FILE__))) {
 	require "../../intrusion.php";
 }
 
-class MysqlDb {
+abstract class MysqlDb {
 	
 	public $classname = "MysqlDb";
 	

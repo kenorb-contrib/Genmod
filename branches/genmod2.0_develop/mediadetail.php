@@ -35,7 +35,7 @@ require("config.php");
 */
 $media_controller = new mediaController();
 
-print_header($media_controller->getPageTitle());
+print_header($media_controller->pagetitle);
 
 $media_controller->CheckNoResult($gm_lang["media_not_found"]);
 

@@ -87,7 +87,7 @@ class TimelineControllerRoot extends BaseController {
 			if ($value!=$remove) {
 				$value = CleanInput($value);
 				$this->pids[$key] = $value;
-				$this->people[] = new Person($value);
+				$this->people[] =& Person::GetInstance($value);
 			}
 		}
 		

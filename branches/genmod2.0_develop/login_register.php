@@ -70,7 +70,9 @@ switch ($action) {
 		  </form>
 		</div>
 		<script language="JavaScript" type="text/javascript">
+		<!--
 			document.requestpwform.user_name.focus();
+		//-->
 		</script>
 		<?php
 		break;
@@ -345,7 +347,9 @@ switch ($action) {
 			</form>
 			</div>
 			<script language="JavaScript" type="text/javascript">
+			<!--
 				document.registerform.user_name.focus();
+			//-->
 			</script>
 			<?php
 			break;
@@ -516,7 +520,9 @@ switch ($action) {
 		</form>
 		</div>
 		<script language="JavaScript" type="text/javascript">
+		<!--
 			document.verifyform.user_password.focus();
+		//-->
 		</script>
 		<?php
 		break;

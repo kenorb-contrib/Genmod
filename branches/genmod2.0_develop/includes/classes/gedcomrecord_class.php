@@ -30,68 +30,68 @@ if (stristr($_SERVER["SCRIPT_NAME"],basename(__FILE__))) {
 	require "../../intrusion.php";
 }
  
-class GedcomRecord {
+abstract class GedcomRecord {
 	
 	// General class information
-	public $classname = "GedcomRecord";
+	public $classname = "GedcomRecord";	// Name of this class
 	
 	// Data
-	protected $gedrec = null;
-	protected $gedcomid = null;
-	protected $changedgedrec = null;
-	protected $xref = null;
-	protected $type = null;
-	protected $facts = null;
-	protected $lastchanged = null;
+	protected $gedrec = null;			// Gedcom record of the object
+	protected $gedcomid = null;			// Gedcom id in which this object exists
+	protected $changedgedrec = null;	// The gedcom record after changes would be applied
+	protected $xref = null;				// ID of the object
+	protected $type = null;				// Type of the object: INDI, FAM, SOUR, REPO, NOTE or OBJE
+	protected $facts = null;			// Array of fact objects for this object
+	protected $lastchanged = null;		// Date and time from the CHAN fact
 	
 	// Arrays of records that link to this record
 	// and counters
-	protected $indilist = null;
-	protected $indi_count = null;
-	protected $indi_hide = null;
+	protected $indilist = null;			// Array of person objects that link to this object
+	protected $indi_count = null;		// Count of the above
+	protected $indi_hide = null;		// Number of person objects that are omitted because privacy doesn't allow it
 	
-	protected $famlist = null;
-	protected $fam_count = null;
-	protected $fam_hide = null;
+	protected $famlist = null;			// Array of family objects that link to this object
+	protected $fam_count = null;		// Count of the above
+	protected $fam_hide = null;			// Number of family objects that are omitted because privacy doesn't allow it
 	
-	protected $medialist = null;
-	protected $media_count = null;
-	protected $media_hide = null;
+	protected $medialist = null;		// Array of media objects that link to this object
+	protected $media_count = null;		// Count of the above
+	protected $media_hide = null;		// Number of media objects that are omitted because privacy doesn't allow it
 	
-	protected $sourcelist = null;
-	protected $sour_count = null;
-	protected $sour_hide = null;
+	protected $sourcelist = null;		// Array of source objects that link to this object
+	protected $sour_count = null;		// Count of the above
+	protected $sour_hide = null;		// Number of source objects that are omitted because privacy doesn't allow it
 	
-	protected $repolist = null;
-	protected $repo_count = null;
-	protected $repo_hide = null;
+	protected $repolist = null;			// Array of repository objects that link to this object
+	protected $repo_count = null;		// Count of the above
+	protected $repo_hide = null;		// Number of repository objects that are omitted because privacy doesn't allow it
 	
-	protected $notelist = null;
-	protected $note_count = null;
-	protected $note_hide = null;
+	protected $notelist = null;			// Array of note objects that link to this object
+	protected $note_count = null;		// Count of the above
+	protected $note_hide = null;		// Number of note objects that are omitted because privacy doesn't allow it
 	
-	protected $actionlist = null;
-	protected $action_count = null;
-	protected $action_hide = null;
-	protected $action_open = null;
-	protected $action_closed = null;
+	protected $actionlist = null;		// Array of action objects that link to this object
+	protected $action_count = null;		// Count of the above
+	protected $action_hide = null;		// Number of action objects that are omitted because privacy doesn't allow it
+	protected $action_open = null;		// Number of action objects with status open
+	protected $action_closed = null;	// Number of action objects with status close
 
 	protected $sourfacts_count = null;	// Count of level 1 source facts. Showfact, Factviewrestricted are applied, also link privacy.
 	protected $notefacts_count = null;	// Count of level 1 note facts. Showfact, Factviewrestricted are applied, also link privacy.
 	protected $mediafacts_count = null;	// Count of level 1 media facts. Showfact, Factviewrestricted are applied, also link privacy.
 		
 	// Informational
-	protected $disp = null;
-	protected $disp_name = null;
-	protected $show_changes = null;
-	protected $canedit = null;
-	protected $ischanged = null;
-	protected $isdeleted = null;
-	protected $isnew = null;
-	protected $isempty = null;
-	protected $israwedited = null;
-	protected $exclude_facts = "";
-	protected $view = null;
+	protected $disp = null;				// If privacy allows display of this object
+	protected $disp_name = null;		// Person only: if privacy allows display of the name
+	protected $show_changes = null;		// If changes must be shown
+	protected $canedit = null;			// If this record can be edited (facts must be checked separately)
+	protected $ischanged = null;		// If this record is changed (added, deleted, changed)
+	protected $isdeleted = null;		// If this record is deleted (unapproved)
+	protected $isnew = null;			// If this record is new (unapproved)
+	protected $isempty = null;			// If this record exists
+	protected $israwedited = null;		// If this record is changed using raw editing
+	protected $exclude_facts = "";		// Facts that should be excluded while parsing the facts
+	protected $view = null;				// If preview mode is on
 	
 	/**
 	 * constructor for this class
@@ -144,7 +144,7 @@ class GedcomRecord {
 		$this->disp = displayDetailsByID($this->xref, $this->type, 1, true);
 		$this->disp_name = $this->disp;
 		
-		if (!$this->disp && $this->datatype == "INDI") $this->disp_name = ShowLivingNameByID($this->xref, "INDI");
+		if (!$this->disp && $this->datatype == "INDI") $this->disp_name = ShowLivingNameByID($this->xref, "INDI", $this->gedrec);
 		
 		if ($this->disp && $ALLOW_EDIT_GEDCOM && $Users->userCanEdit($gm_username) && !FactEditRestricted($this->xref, $this->gedrec, 1)) $this->canedit = true;
 		else $this->canedit = false;
@@ -210,6 +210,9 @@ class GedcomRecord {
 				break;
 			case "facts":
 				return $this->parseFacts();
+				break;
+			case "factlist":
+				return $this->getFactList();
 				break;
 			// Media info
 			case "indilist":
@@ -309,6 +312,9 @@ class GedcomRecord {
 			case "view":
 				return $this->IsPreview();
 				break;
+			default:
+				print "<span class=\"error\">Invalid property ".$property." for __get in gedcomrecord class</span><br />";
+				break;
 		}
 	}
 
@@ -389,7 +395,7 @@ class GedcomRecord {
 		if ($this->xref==$obj->xref) return true;
 		return false;
 	}
-	
+
 	/**
 	 * Parse the facts from the record
 	 */
@@ -426,12 +432,13 @@ class GedcomRecord {
 				}
 				if (!empty($fact) && ShowFact($fact, $this->xref, $this->type) && $typeshow && !FactViewRestricted($this->xref, $subrecord, 2)) {
 					if (empty($gid) || DisplayDetailsByID($gid, $fact, 1, true)) {
-						$this->facts[] = array($fact, $subrecord, $count[$fact], "");
+						$this->facts[] = new Fact($this->xref, $fact, $subrecord, $count[$fact], "");
+//						$this->facts[] = array($fact, $subrecord, $count[$fact], "");
+						if ($fact == "SOUR") $this->sourfacts_count++;
+						elseif ($fact == "NOTE") $this->notefacts_count++;
+						elseif ($fact == "OBJE") $this->mediafacts_count++;
 					}
 				}
-				if ($fact == "SOUR") $this->sourfacts_count++;
-				elseif ($fact == "NOTE") $this->notefacts_count++;
-				elseif ($fact == "OBJE") $this->mediafacts_count++;
 			}
 		}
 		// if we don't show changes, don't parse the facts
@@ -454,54 +461,61 @@ class GedcomRecord {
 				if (!isset($count[$fact])) $count[$fact] = 1;
 				else $count[$fact]++;
 				if (!empty($fact) && !in_array($fact, array($this->exclude_facts)) && ShowFact($fact, $this->xref, $this->type) && !FactViewRestricted($this->xref, $newrec, 2)) {
-					$this->facts[] = array($fact, $newrec, $count[$fact], "change_new");
+//					$this->facts[] = array($fact, $newrec, $count[$fact], "change_new");
+					$this->facts[] = new Fact($this->xref, $fact, $newrec, $count[$fact], "change_new");
 				}
 			}
 			// After sorting, add the changed facts at the appropriate places
-			SortFacts($this->facts, $this->type);
+			SortFactObjs($this->facts, $this->type);
 			$newfacts = array();
-			foreach($this->facts as $key => $factarray) {
+			foreach($this->facts as $key => $factobj) {
 				// For a new fact, always show
-				if ($factarray[3] == "change_new") {
+				if ($factobj->style == "change_new") {
 					// but if the record is deleted, show everything as old
-					if ($this->isdeleted) $newfacts[] = array($factarray[0], $factarray[1], $factarray[2], "change_old");
-					else $newfacts[] = $factarray;
+					if ($this->isdeleted) $factobj->style = "change_old";
+					$newfacts[] = $factobj;
 				}
 				else {
 					// if anything changed but is not new........
-					if ($factarray[3] != "change_new" && ($this->isdeleted || IsChangedFact($this->xref, $factarray[1]))) {
+					if ($factobj->style != "change_new" && ($this->isdeleted || IsChangedFact($this->xref, $factobj->factrec))) {
 						// if the record is changed, also show the new value
-						$cfact = RetrieveChangedFact($this->xref, $factarray[0], $factarray[1]);
+						$cfact = RetrieveChangedFact($this->xref, $factobj->fact, $factobj->factrec);
 						// if only a fact is changed/deleted.....
 						if (!$this->isdeleted) {
 							// Add the old fact.
-							$factarray[3] = "change_old";
-							$newfacts[] = $factarray;
+							$factobj->style = "change_old";
+							$newfacts[] = $factobj;
 							// an empty record indicates deletion, so only add the new record if not empty
 							if (!empty($cfact)) {
-								$factarray[1] = $cfact;
-								$factarray[3] = "change_new";
+								$newfact = new Fact($this->xref, $factobj->fact, $cfact, $factobj->count, "change_new");
+//								$factarray[1] = $cfact;
+//								$factarray[3] = "change_new";
 								// add the new fact
-								$newfacts[] = $factarray;
+//								$newfacts[] = $factarray;
+								$newfacts[] = $newfact;
 							}
 						}
 						// The record is deleted. Show the latest visible value of the fact
 						else {
-							if (!empty($cfact)) $factarray[1] = $cfact;
-							$factarray[3] = "change_old";
+//							if (!empty($cfact)) $factarray[1] = $cfact;
+//							$factarray[3] = "change_old";
+//							// add the new fact
+//							$newfacts[] = $factarray;
+							if (!empty($cfact)) $factobj->factrec = $cfact;
+							$factobj->style = "change_old";
 							// add the new fact
-							$newfacts[] = $factarray;
+							$newfacts[] = $factobj;
 						}
 					}
 					else {
 						// Nothing changed for this fact. Just add it
-						$newfacts[] = $factarray;
+						$newfacts[] = $factobj;
 					}
 				}
 			}
 			$this->facts = $newfacts;
 		}
-		else SortFacts($this->facts, $this->type);
+		else SortFactObjs($this->facts, $this->type);
 		return $this->facts;
 	}
 	

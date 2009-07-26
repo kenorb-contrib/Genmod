@@ -112,7 +112,7 @@ function print_random_media($block = true, $config="", $side, $index) {
 			}
 		}
 		print "<br /><div class=\"indent" . ($TEXT_DIRECTION=="rtl"?"_rtl":"") . "\">";
-		print_fact_notes($value->m_gedrec, "1");
+		print_fact_notes($value->gedrec, "1");
 		print "</div>";
 		print "</div>"; // blockcontent
 		print "</div>"; // block

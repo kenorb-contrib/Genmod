@@ -54,6 +54,7 @@ if ($action=="compose") {
 	print '<span class="subheaders">'.$gm_lang["edit_news"].'</span>';
 	?>
 	<script language="JavaScript" type="text/javascript">
+	<!--
 		function checkForm(frm) {
 			if (frm.title.value=="") {
 				alert('<?php print $gm_lang["enter_title"]; ?>');
@@ -70,6 +71,7 @@ if ($action=="compose") {
 			<?php } ?>
 			return true;
 		}
+	//-->
 	</script>
 	<?php
 	print "<br /><form name=\"messageform\" method=\"post\" onsubmit=\"return checkForm(this);";

@@ -536,10 +536,12 @@ print "</div>\n";
 $maxyoffset+=140;
 ?>
 <script language="JavaScript" type="text/javascript">
+<!--
 	content_div = document.getElementById("content_pedigree");
 	if (content_div) {
 		content_div.style.height = <?php print $maxyoffset; ?> + "px";
 	}
+//-->
 </script>
 <?php
 if ($view=="preview") print "<br /><br /><br />";

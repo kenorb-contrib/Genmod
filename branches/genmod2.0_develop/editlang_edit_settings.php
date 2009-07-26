@@ -95,6 +95,7 @@ else if(!isset($v_flagsfile)) $v_flagsfile = "";
 
 if ($action != "save" && $action != "toggleActive") { ?>
 	<script language="JavaScript" type="text/javascript">
+	<!--
 		function CheckFileSelect() {
 			if (document.Form1.v_u_lang_filename.value != ""){
 				document.Form1.v_lang_filename.value = document.Form1.v_u_lang_filename.value;
@@ -105,6 +106,7 @@ if ($action != "save" && $action != "toggleActive") { ?>
 			document.Form1.action.value = "";
 			self.close();
 		}
+	//-->
 	</script>
 	
 	<div class="admin_topbottombar">
@@ -500,8 +502,10 @@ else if ($action == "toggleActive") {
 }
 else { ?>
 	<script language="JavaScript" type="text/javascript">
+	<!--
 		opener.location.reload();
 		self.close();
+	//-->
 	</script>
 	<?php
 }

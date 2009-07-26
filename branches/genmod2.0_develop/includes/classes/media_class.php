@@ -69,7 +69,7 @@ class Media {
 		$db = NewQuery($sql);
 		$this->totalmediaitems = $db->NumRows();
 		while($row = $db->FetchAssoc()) {
-			$media = new MediaItem($row);
+			$media =& MediaItem::GetInstance($row);
 			if ($media->disp) {
 				if ($count) {
 					$this->medialist[$row["m_media"]."_".$row["m_gedfile"]] = $media;
@@ -142,7 +142,7 @@ class Media {
 		$db = NewQuery($sql);
 		$this->totalmediaitems = $db->NumRows();
 		while($row = $db->FetchAssoc()) {
-			$media = new MediaItem($row);
+			$media =& MediaItem::GetInstance($row);
 			if ($media->disp) {
 				$found++;
 				if ($found > $start) {
@@ -165,7 +165,7 @@ class Media {
 		$db = NewQuery($sql);
 		$this->totalmediaitems = $db->NumRows();
 		while($row = $db->FetchAssoc()) {
-			$media = new MediaItem($row);
+			$media =& MediaItem::GetInstance($row);
 			if ($media->disp) {
 				$this->medialist[$row["m_media"]."_".$row["m_gedfile"]] = $media;
 			}
