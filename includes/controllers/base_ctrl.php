@@ -38,14 +38,13 @@ if (stristr($_SERVER["SCRIPT_NAME"],basename(__FILE__))) {
  * @return 	string	Return the value of $view
  * @todo Update this description
  */
-class BaseController {
-	public $classname = "BaseController";
-	public $view = "";
-	public $xref = null;
-	protected $action = null;
-	public $gedcomid = null;
-	public $show_changes = null;
-	protected $uname = "";
+abstract class BaseController {
+	public $classname = "BaseController";	// Name of this class
+	protected $view = "";					// View mode of the page (preview or blank)
+	protected $xref = null;					// Xref of the record that is loaded by the child controller
+	protected $gedcomid = null;				// Active gedcomid while loading the child controller
+	protected $show_changes = null;			// Wether of not changes to the records will be displayed
+	protected $uname = null;				// Name of the currently signed on user 
 	
 	/**
 	 * constructor for this class
@@ -62,15 +61,31 @@ class BaseController {
 		
 		$this->gedcomid = $GEDCOMID;
 		
-		//-- perform the desired action
-		switch($this->action) {
-			case "addfav":
-				$this->addFavorite();
+	}
+
+	public function __get($property) {
+		switch($property) {
+			case "view":
+				return $this->view;
+				break;
+			case "xref":
+				return $this->xref;
+				break;
+			case "gedcomid":
+				return $this->gedcomid;
+				break;
+			case "show_changes":
+				return $this->show_changes;
+				break;
+			case "uname":
+				return $this->uname;
+				break;
+			default:
+				print "<span class=\"error\">Invalid property ".$property." for __get in base controller</span><br />";
 				break;
 		}
-
 	}
-	
+		
 	/**
 	 * check if this controller should be in print preview mode
 	 */

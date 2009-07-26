@@ -31,20 +31,20 @@ if (stristr($_SERVER["SCRIPT_NAME"],basename(__FILE__))) {
 class ActionItem {
 	
 	// General class information
-	public $classname = "ActionItem";
+	public $classname = "ActionItem";	// The name of this class
 	
 	// Data
-	private $id = 0;
-	private $pid = "";
-	private $gedfile = "";
-	private $text = "";
-	private $repo = null;
-	private $status = 0;
-	private $disp = null;
-	private $canshow = null;
-	private $me = null;
-	private $repodesc = null;
-	private $indidesc = null;
+	private $id = 0;					// The ID of this item in the database
+	private $pid = null;				// The xref of the person that this action relates to
+	private $gedfile = "";				// The gedfile ID in which this action exists
+	private $text = "";					// Text for the item
+	private $repo = null;				// The xref of the repository that this action relates to
+	private $status = 0;				// Status 0 = closed or 1 = open
+	private $disp = null;				// If we can display both the individual and the repository related to this action
+	private $canshow = null;			// If we can show actions at all
+	private $me = null;					// The xref that will display this action
+	private $repodesc = null;			// Descriptor for the repository
+	private $indidesc = null;			// Name of the person
 
 	public function __construct($values="", $me="") {
 		global $Users;
@@ -141,7 +141,7 @@ class ActionItem {
 		if (is_null($this->repodesc)) {
 			if (is_null($this->repo) || empty($this->repo)) $this->repodesc = "";
 			else {
-				$repo = new Repository($this->repo);
+				$repo =& Repository::GetInstance($this->repo);
 				$this->repodesc = $repo->title;	
 			}
 		}
@@ -153,7 +153,7 @@ class ActionItem {
 		if (is_null($this->indidesc)) {
 			if (is_null($this->pid) || empty($this->pid)) $this->indidesc = "";
 			else {
-				$indi = new Person($this->pid);
+				$indi =& Person::GetInstance($this->pid);
 				$this->indidesc = $indi->name;
 			}
 		}

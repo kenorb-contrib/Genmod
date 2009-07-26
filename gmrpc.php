@@ -125,7 +125,7 @@ switch($action) {
 		$sid = strtoupper($sid);
 		if (empty($sid)) print "";
 		else {
-			$source = new source($sid);
+			$source =& Source::GetInstance($sid);
 			if ($source->disp) print $source->descriptor.$source->addxref;
 			else print "";
 		}
@@ -161,12 +161,12 @@ switch($action) {
 		$oid = strtoupper($oid);
 		if (empty($oid)) print "";
 		else {
-			$note_controller = new NoteController();
+			$note =& Note::GetInstance($oid);
 			// Note is deleted or doesn't exist
-			if ($note_controller->isempty) {
+			if ($note->isempty) {
 				print "<span class=\"error\">".$gm_lang["note_id_no_exists"]."</span>";
 			}
-			else if ($note_controller->note->disp) print $note_controller->note->GetTitle(40, true)." (".$oid.")";
+			else if ($note->disp) print $note->GetTitle(40, true)." (".$oid.")";
 			else print "";
 		}
 	break;
@@ -231,6 +231,7 @@ switch($action) {
 	// End actions for the ToDo list 
 
 	case "getzoomfacts":
+		SwitchGedcom($gedcomid);
 		$indirec=FindPersonRecord($pid);
 		if ($canshow && GetChangeData(true, $pid, true)) {
 			$rec = GetChangeData(false, $pid, true, "gedlines", "");

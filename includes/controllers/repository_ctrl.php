@@ -33,11 +33,7 @@ if (stristr($_SERVER["SCRIPT_NAME"],"repository_ctrl")) {
 class RepositoryController extends DetailController {
 	
 	public $classname = "RepositoryController";
-	
 	public $repo = null;
-	
-	private $display_other_menu = false;
-	private $pagetitle = null;
 	
 	/**
 	 * constructor
@@ -50,47 +46,26 @@ class RepositoryController extends DetailController {
 
 		$nonfacts = array();
 		
-		if (!empty($_REQUEST["action"])) $this->action = $_REQUEST["action"];
 		if (!empty($_REQUEST["rid"])) $this->xref = strtoupper($_REQUEST["rid"]);
 		$this->xref = CleanInput($this->xref);
 		$this->gedcomid = $GEDCOMID;
 		
 		$reporec = FindRepoRecord($this->xref);
 		
-		$this->repo = new Repository($this->xref, $reporec);
-				
-		if ($this->repo->disp && ($Users->userCanViewGedlines() || $ENABLE_CLIPPINGS_CART >= $Users->getUserAccessLevel() || !empty($this->uname))) {
-			$this->display_other_menu = true;
+		$this->repo =& Repository::GetInstance($this->xref, $reporec);
+		
+		//-- perform the desired action
+		switch($this->action) {
+			case "addfav":
+				$this->addFavorite();
+				break;
 		}
 	}
 	
 	public function __get($property) {
 		switch($property) {
-			case "pagetitle":
-				return $this->GetPageTitle();
-				break;
-			case "display_other_menu":
-				return $this->display_other_menu;
-				break;
 			default:
-				parent::__get($property);
-		}
-	}
-	/**
-	 * Add a new favorite for the action user
-	 */
-	protected function addFavorite() {
-		global $GEDCOMID;
-		
-		if (empty($this->uname)) return;
-
-		if (!$this->repo->isempty && !$this->repo->isdeleted) {	
-			$favorite = new Favorite();
-			$favorite->username = $this->uname;
-			$favorite->gid = $this->repo->xref;
-			$favorite->type = 'REPO';
-			$favorite->file = $GEDCOMID;
-			$favorite->SetFavorite();
+				return parent::__get($property);
 		}
 	}
 	
@@ -98,11 +73,17 @@ class RepositoryController extends DetailController {
 	 * get the title for this page
 	 * @return string
 	 */
-	private function getPageTitle() {
-		global $gm_lang;
+	protected function getPageTitle() {
+		global $gm_lang, $SHOW_ID_NUMBERS;
 
-		if ($this->repo->title) $this->pagetitle = $this->repo->title." - ".$this->repo->xref." - ".$gm_lang["repo_info"];
-		else $this->pagetitle =  $this->repo->xref." - ".$gm_lang["repo_info"];
+		if (is_null($this->pagetitle)) {
+			$this->pagetitle = "";
+			if ($this->repo->title) {
+				$this->pagetitle .= $this->repo->title." - ";
+				if ($SHOW_ID_NUMBERS) $this->pagetitle .= $this->repo->xref." - ";
+			}
+			$this->pagetitle .= $gm_lang["repo_info"];
+		}
 		return $this->pagetitle;
 	}
 	
@@ -119,7 +100,7 @@ class RepositoryController extends DetailController {
 		// edit repo menu
 		$menu = new Menu($gm_lang['edit_repo']);
 
-		if ($this->repo->canedit) {
+		if (!$this->repo->isdeleted) {
 			// edit repo / edit_raw
 			if ($Users->userCanEditGedlines()) {
 				$submenu = new Menu($gm_lang['edit_raw']);
@@ -132,18 +113,18 @@ class RepositoryController extends DetailController {
 			$submenu->addLink("if (confirm('".$gm_lang["confirm_delete_repo"]."'))  deleterepository('".$this->repo->xref."', 'delete_repository'); ");
 			$menu->addSubmenu($submenu);
 
-			if ($this->repo->ischanged) {
-				// edit_repo / seperator
-				$submenu = new Menu();
-				$submenu->isSeperator();
-				$menu->addSubmenu($submenu);
+		}
+		if ($this->repo->ischanged) {
+			// edit_repo / seperator
+			$submenu = new Menu();
+			$submenu->isSeperator();
+			$menu->addSubmenu($submenu);
 
-				// edit_repo / show/hide changes
-				if (!$this->repo->show_changes) $submenu = new Menu($gm_lang['show_changes']);
-				else $submenu = new Menu($gm_lang['hide_changes']);
-				$submenu->addLink('showchanges();');
-				$menu->addSubmenu($submenu);
-			}
+			// edit_repo / show/hide changes
+			if (!$this->repo->show_changes) $submenu = new Menu($gm_lang['show_changes']);
+			else $submenu = new Menu($gm_lang['hide_changes']);
+			$submenu->addLink('showchanges();');
+			$menu->addSubmenu($submenu);
 		}
 		return $menu;
 	}
@@ -178,7 +159,7 @@ class RepositoryController extends DetailController {
 		if ($this->repo->disp && !empty($this->uname)) {
 				// other / add_to_my_favorites
 				$submenu = new Menu($gm_lang['add_to_my_favorites']);
-				$submenu->addLink('repo.php?action=addfav&sid='.$this->repo->xref.'&gedid='.$GEDCOMID);
+				$submenu->addLink('repo.php?action=addfav&rid='.$this->repo->xref.'&gedid='.$GEDCOMID);
 				$menu->addSubmenu($submenu);
 		}
 		return $menu;

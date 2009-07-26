@@ -35,12 +35,12 @@ $menubar = new MenuBar();
 $filemenu = $menubar->GetFileMenu();
 $editmenu = $menubar->GetEditMenu();
 $viewmenu = $menubar->GetViewMenu();
-$chartmenu = $menubar->GetChartMenu();
+$chartmenu = $menubar->GetChartsMenu();
 if (isset($note_controller) && $note_controller->classname == "NoteController" && is_object($note_controller->note)) $notemenu = $menubar->GetThisNoteMenu($note_controller);
 else $notemenu = "";
 if (isset($controller) && $controller->classname == "IndividualController") $personmenu = $menubar->GetThisPersonMenu($controller);
 else $personmenu = "";
-if (isset($controller) && $controller->classname == "FamilyRoot") $familymenu = $menubar->GetThisFamilyMenu($controller);
+if (isset($controller) && $controller->classname == "FamilyController") $familymenu = $menubar->GetThisFamilyMenu($controller);
 else $familymenu = "";
 if (isset($source_controller) && $source_controller->classname == "SourceController") $sourcemenu = $menubar->GetThisSourceMenu($source_controller);
 else $sourcemenu = "";
@@ -117,6 +117,7 @@ $outputmenu["Calendar"] = Array
 <div id="header" class="<?php echo $TEXT_DIRECTION; ?>">
 	<script type="text/javascript" src="transmenu.js"></script>
 	<script type="text/javascript">
+	<!--
 		function init() {
 			//==========================================================================================
 			// if supported, initialize TransMenus
@@ -135,11 +136,12 @@ $outputmenu["Calendar"] = Array
 				// instead of simple rollover to get the effect where the button stays hightlit until
 				// the menu is closed.
 				<?php foreach (array_keys($showmenu) as $number => $name) { ?>
-					menu<?php echo $number+1 ?>.onactivate = function() { document.getElementById("<?php echo str_replace(" ", "", $name); ?>").className = "hover"; };
-					menu<?php echo $number+1 ?>.ondeactivate = function() { document.getElementById("<?php echo str_replace(" ", "", $name); ?>").className = ""; };
+					menu<?php echo $number+1 ?>.onactivate = function() { document.getElementById("<?php echo preg_replace("/[^a-zA-Z]/", "", $name); ?>").className = "hover"; };
+					menu<?php echo $number+1 ?>.ondeactivate = function() { document.getElementById("<?php echo preg_replace("/[^a-zA-Z]/", "", $name); ?>").className = ""; };
 				<?php } ?>
 			}
 		}
+	//-->
 	</script>
 	<?php
 	global $gm_lang, $gm_username, $GEDCOMS, $GEDCOM, $HOME_SITE_URL, $HOME_SITE_TEXT,$GM_IMAGE_DIR, $GM_IMAGES, $Users;
@@ -165,7 +167,7 @@ $outputmenu["Calendar"] = Array
 	<div id="menu" class="shade1 <?php echo $TEXT_DIRECTION; ?>">
 		<div class="shade1" style="float: <?php print $ldir; ?>;">
 			<?php foreach (array_keys($showmenu) as $number => $name) { ?>
-				<a id="<?php echo str_replace(" ", "", $name); ?>" href="#"><?php echo $name; ?></a>
+				<a id="<?php echo preg_replace("/[^a-zA-Z]/", "", $name); ?>" href="#"><?php echo $name; ?></a>
 				&nbsp;&nbsp;
 			<?php } ?>
 		</div>
@@ -190,6 +192,7 @@ $outputmenu["Calendar"] = Array
 	<br clear="all" />
 	
 	<script type="text/javascript">
+	<!--
 	// set up drop downs anywhere in the body of the page. I think the bottom of the page is better.. 
 	// but you can experiment with effect on loadtime.
 	if (TransMenu.isSupported()) {
@@ -224,7 +227,7 @@ $outputmenu["Calendar"] = Array
 		$link = "";
 		$pass = false;
 		foreach ($showmenu as $maintitle => $submenu) {
-			$menubar .= 'var menu'.$maintitlecount.' = ms.addMenu(document.getElementById("'.str_replace(" ", "", $maintitle).'"));'.chr(10);
+			$menubar .= 'var menu'.$maintitlecount.' = ms.addMenu(document.getElementById("'.preg_replace("/[^a-zA-Z]/", "", $maintitle).'"));'.chr(10);
 			$itemcount = 0;
 			foreach ($submenu as $subtitle => $subitems) {
 				if (isset($subitems) && !is_array($subitems)) $link = $subitems;
@@ -265,5 +268,6 @@ $outputmenu["Calendar"] = Array
 		//==================================================================================================
 		TransMenu.renderAll();
 	}
+	//-->
 	</script>
 </div>

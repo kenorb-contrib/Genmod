@@ -32,43 +32,51 @@ if (stristr($_SERVER["SCRIPT_NAME"],basename(__FILE__))) {
 class Family extends GedcomRecord {
 	
 	// General class information
-	public $classname = "Family";		// Name of this class
-	public $datatype = "FAM";			// Type of data collected here
+	public $classname = "Family";			// Name of this class
+	public $datatype = "FAM";				// Type of data collected here
+	private static $familycache = array(); // Holder of the instances for this class
 
 	// data
-	private $sortable_name = null;		// Printable and sortable name of the family, after applying privacy (can be unknown of private)
-	private $sortable_addname = null;	// Printable and sortable addname of the family, after applying privacy (can be blank)
-	public $label = null;				// Label set in the person class as a specific label for this family of the person
-	private $title = null;				// Printable name for the family in normal order
+	private $sortable_name = null;			// Printable and sortable name of the family, after applying privacy (can be unknown of private)
+	private $sortable_addname = null;		// Printable and sortable addname of the family, after applying privacy (can be blank)
+	public $label = null;					// Label set in the person class as a specific label for this family of the person
+	private $title = null;					// Printable name for the family in normal order
 		
 	// Family members
-	private $husb = null;				// Holder for the husband object (or new, if showing changes)
-	private $husb_id = null;			// Id for the husband object (or new, if showing changes)
-	private $husbold = null;			// Holder for the deleted husband object (or none if not showing changes)
-	private $husbold_id = null;			// Id for the deleted husband object (or none if not showing changes)
-	private $husb_status = null;		// Status af the husband in this family: "deleted", "new", "changed", "" (=unchanged)
-	private $wife = null;				// Holder for the wifes object (or new, if showing changes)
-	private $wife_id = null;			// Id for the wifes object (or new, if showing changes)
-	private $wifeold = null;			// Holder for the deleted wife object (or none if not showing changes)
-	private $wifeold_id = null;			// Id for the deleted wife object (or none if not showing changes)
-	private $wife_status = null;		// Status af the wife in this family: "deleted", "new", "changed", "" (=unchanged)
-//	private $parents = null;
-	private $children = null;			// Array of children the new/remaining in order, the deleted added at the end
-	private $children_ids = null;		// Id's of the children in the array
-	private $children_count = null;		// Number of children in the old (not changed) situation
-	private $child_status = null;		// Status af the child in this family: "deleted", "new", "" (=unchanged)
+	private $husb = null;					// Holder for the husband object (or new, if showing changes)
+	private $husb_id = null;				// Id for the husband object (or new, if showing changes)
+	private $husbold = null;				// Holder for the deleted husband object (or none if not showing changes)
+	private $husbold_id = null;				// Id for the deleted husband object (or none if not showing changes)
+	private $husb_status = null;			// Status af the husband in this family: "deleted", "new", "changed", "" (=unchanged)
+	private $wife = null;					// Holder for the wifes object (or new, if showing changes)
+	private $wife_id = null;				// Id for the wifes object (or new, if showing changes)
+	private $wifeold = null;				// Holder for the deleted wife object (or none if not showing changes)
+	private $wifeold_id = null;				// Id for the deleted wife object (or none if not showing changes)
+	private $wife_status = null;			// Status af the wife in this family: "deleted", "new", "changed", "" (=unchanged)
+	private $children = null;				// Array of children the new/remaining in order, the deleted added at the end
+	private $children_ids = null;			// Id's of the children in the array
+	private $children_count = null;			// Number of children in the old (not changed) situation
+	public $child_status = null;			// Status af the child in this family: "deleted", "new", "" (=unchanged)
 	
 	// Marriage events
-	private $marr_rec = null;			// Gedcom marriage subrecord (after showfact, showfactdetails and factviewrestricted)
-	private $marr_date = null;			// Marriage date (after showfact, showfactdetails and factviewrestricted)
-	private $marr_type = null;			// Marriage type (after showfact, showfactdetails and factviewrestricted)
-	private $marr_plac = null;			// Marriage place (after showfact, showfactdetails and factviewrestricted)
+	private $marr_rec = null;				// Gedcom marriage subrecord (after showfact, showfactdetails and factviewrestricted)
+	private $marr_date = null;				// Marriage date (after showfact, showfactdetails and factviewrestricted)
+	private $marr_type = null;				// Marriage type (after showfact, showfactdetails and factviewrestricted)
+	private $marr_plac = null;				// Marriage place (after showfact, showfactdetails and factviewrestricted)
 	
 	// Relations from the FAMC link
-	public $showprimary = null;			// Show this family as primary from the childs perspective (set in person class)
-	public $pedigreetype = null;		// Pedigree type of this family from the childs perspective (set in person class)
-	public $status = null;				// Status of this family from the childs perspective (set in person class)
+	public $showprimary = null;				// Show this family as primary from the childs perspective (set in person class)
+	public $pedigreetype = null;			// Pedigree type of this family from the childs perspective (set in person class)
+	public $status = null;					// Status of this family from the childs perspective (set in person class)
 	
+	
+	public static function GetInstance($xref, $gedrec="", $gedcomid="") {
+		
+		if (!isset(self::$familycache[$xref])) {
+			self::$familycache[$xref] = new Family($xref, $gedrec, $gedcomid);
+		}
+		return self::$familycache[$xref];
+	}
 	
 	/**
 	 * constructor
@@ -181,7 +189,7 @@ class Family extends GedcomRecord {
 				for($i=0; $i<$num; $i++) {
 					//-- get the childs ids
 					$chil = trim($smatch[$i][1]);
-					$this->children[$chil] = new Person($chil);
+					$this->children[$chil] =& Person::GetInstance($chil);
 					$this->child_status[$chil] = "new";
 				}
 			}
@@ -193,7 +201,7 @@ class Family extends GedcomRecord {
 				//-- get the childs ids
 				$chil = trim($smatch[$i][1]);
 				if (!isset($this->children[$chil])) {
-					$this->children[$chil] = new Person($chil);
+					$this->children[$chil] =& Person::GetInstance($chil);
 					if ($changed) $this->child_status[$chil] = "deleted";
 					else $this->child_status[$chil] = "";
 				}
@@ -234,15 +242,6 @@ class Family extends GedcomRecord {
 		return $this->title;
 	}
 	
-	private function getOldHusbId() {
-		
-		if (is_null($this->husbold_id)) {
-			if (is_null($this->husbold)) $this->getOldHusb();
-			if (is_object($this->husbold)) $this->husbold_id = $this->husbold->xref;
-			else $this->husbold_id = "";
-		}		
-		return $this->husbold_id;
-	}
 	/**
 	 * get the husbands ID
 	 * @return string
@@ -257,6 +256,16 @@ class Family extends GedcomRecord {
 		return $this->husb_id;
 	}
 	
+	private function getOldHusbId() {
+		
+		if (is_null($this->husbold_id)) {
+			if (is_null($this->husbold)) $this->getOldHusb();
+			if (is_object($this->husbold)) $this->husbold_id = $this->husbold->xref;
+			else $this->husbold_id = "";
+		}		
+		return $this->husbold_id;
+	}
+	
 	/**
 	 * get the husbands ID
 	 * @return string
@@ -265,11 +274,15 @@ class Family extends GedcomRecord {
 		
 		if (is_null($this->husb)) {
 			$husbold = "";
-			$husb = GetGedcomValue("HUSB", 1, $this->gedrec);
+			$ct = preg_match("/1 HUSB @(.+)@/", $this->gedrec, $match);
+			if ($ct == 0) $husb = "";
+			else $husb = $match[1];
 			$this->husb_status = "";
 			if ($this->show_changes && $this->ThisChanged()) {
 				$gedrec = $this->GetChangedGedrec();
-				$husbnew = GetGedcomValue("HUSB", 1, $gedrec);
+				$ct = preg_match("/1 HUSB @(.+)@/", $gedrec, $match);
+				if ($ct == 0) $husbnew = "";
+				else $husbnew = $match[1];
 				if ($husb == "" && $husbnew != "") {
 					$this->husb_status = "new";
 					$husb = $husbnew;
@@ -287,9 +300,9 @@ class Family extends GedcomRecord {
 				}
 				else $husb = $husbnew;
 			}
-			if (!empty($husb)) $this->husb = new Person($husb);
+			if (!empty($husb)) $this->husb =& Person::GetInstance($husb);
 			else $this->husb = "";
-			if (!empty($husbold)) $this->husbold = new Person($husbold);
+			if (!empty($husbold)) $this->husbold =& Person::GetInstance($husbold);
 			else $this->husbold = "";
 		}
 		return $this->husb;
@@ -329,11 +342,15 @@ class Family extends GedcomRecord {
 		
 		if (is_null($this->wife)) {
 			$wifeold = "";
-			$wife = GetGedcomValue("WIFE", 1, $this->gedrec);
+			$ct = preg_match("/1 WIFE @(.+)@/", $this->gedrec, $match);
+			if ($ct == 0) $wife = "";
+			else $wife = $match[1];
 			$this->wife_status = "";
 			if ($this->show_changes && $this->ThisChanged()) {
 				$gedrec = $this->GetChangedGedrec();
-				$wifenew = GetGedcomValue("WIFE", 1, $gedrec);
+				$ct = preg_match("/1 WIFE @(.+)@/", $gedrec, $match);
+				if ($ct == 0) $wifenew = "";
+				else $wifenew = $match[1];
 				if ($wife == "" && $wifenew != "") {
 					$this->wife_status = "new";
 					$wife = $wifenew;
@@ -351,9 +368,9 @@ class Family extends GedcomRecord {
 				}
 				else $wife = $wifenew;
 			}
-			if (!empty($wife)) $this->wife = new Person($wife);
+			if (!empty($wife)) $this->wife =& Person::GetInstance($wife);
 			else $this->wife = "";
-			if (!empty($wifeold)) $this->wifeold = new Person($wifeold);
+			if (!empty($wifeold)) $this->wifeold =& Person::GetInstance($wifeold);
 			else $this->wifeold = "";
 		}
 		return $this->wife;
@@ -488,7 +505,7 @@ class Family extends GedcomRecord {
 		print $this->addxref;
 		if ($this->GetMarriageRecord() != "") {
 			print " -- <i>".$gm_lang["marriage"]." ";
-			print_fact_date($this->GetMarriageRecord());
+			print_fact_date($this->GetMarriageRecord(), false, false, false, $this->xref, $this->gedrec);
 			print_fact_place($this->GetMarriageRecord());
 			print "</i>";
 		}

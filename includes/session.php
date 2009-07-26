@@ -267,7 +267,7 @@ foreach($CONFIG_VARS as $indexval => $VAR) {
 			require_once("includes/functions/functions_db.php");
 			require_once("includes/functions/functions_authentication.php");      // -- load the authentication system
 			// NOTE: Setup the database connection, needed for logging
-			include("db_layer.php");
+//			include("db_layer.php");
 			$DBCONN = New DbLayer();
 			WriteToLog("Session-> Config variable override detected. Possible hacking attempt. Script terminated.", "W", "S");
 			HandleIntrusion("Session-> Config variable override detected. Possible hacking attempt. Script terminated.\n");
@@ -331,7 +331,7 @@ if (phpversion() > '4.2.2') {
 			if (preg_match("/((DELETE)|(INSERT)|(UPDATE)|(ALTER)|(CREATE)|( TABLE)|(DROP))\s[A-Za-z0-9 ]{0,200}(\s(FROM)|(INTO)|(TABLE)\s)/i", $value, $imatch) > 0 && $SCRIPT_NAME != "/editlang_edit.php") {
 				require_once("includes/functions/functions_authentication.php");      // -- load the authentication system
 				// NOTE: Setup the database connection, needed for logging
-				include("db_layer.php");
+//				include("db_layer.php");
 				$DBCONN = New DbLayer();
 				WriteToLog("Session-> Possible SQL injection detected: $key=>$value. <b>$imatch[0]</b> Script terminated.", "W", "S");
 				HandleIntrusion("Session-> Possible SQL injection detected: $key=>$value.  <b>$imatch[0]</b> Script terminated.");
@@ -346,7 +346,7 @@ if (phpversion() > '4.2.2') {
 					if (preg_match("/((DELETE)|(INSERT)|(UPDATE)|(ALTER)|(CREATE)|( TABLE)|(DROP))\s[A-Za-z0-9 ]{0,200}(\s(FROM)|(INTO)|(TABLE)\s)/i", $val, $imatch)>0) {
 						require_once("includes/functions/functions_authentication.php");      // -- load the authentication system
 						// NOTE: Setup the database connection
-						include("db_layer.php");
+//						include("db_layer.php");
 						$DBCONN = New DbLayer();
 						WriteToLog("Session-> Possible SQL injection detected: $key=>$val <b>$imatch[0]</b>.  Script terminated.", "W", "S");
 						HandleIntrusion("Session-> Possible SQL injection detected: $key=>$val <b>$imatch[0]</b>.  Script terminated.");
@@ -381,7 +381,7 @@ $DEFAULT_GEDCOMID = "";
 if ($CONFIGURED) if ($DBCONN->connected) ReadGedcoms();
 else $GEDCOMS = array();
 
-if (empty($_REQUEST["gedcomid"])) {
+if (empty($_REQUEST["gedid"])) {
 	if (isset($_SESSION["GEDCOMID"]) && !empty($_SESSION["GEDCOMID"])) $GEDCOMID = $_SESSION["GEDCOMID"];
 	else {
 		// NOTE: There is no session Gedcom ID yet, and no ID was specified so get the default gedcom
@@ -390,8 +390,8 @@ if (empty($_REQUEST["gedcomid"])) {
 }
 else {
 	// NOTE: There is a value in the URL for GEDCOMID. Make sure it is a number
-	settype($_REQUEST["gedcomid"], "integer");
-	$GEDCOMID = $_REQUEST["gedcomid"];
+	settype($_REQUEST["gedid"], "integer");
+	$GEDCOMID = $_REQUEST["gedid"];
 }
 
 // TODO: Delete the code below
@@ -630,6 +630,8 @@ if ($Users->userCanEdit($gm_username)) {
 			$_SESSION["show_changes"] = true;
 			$show_changes = true;
 		}
+		// Force show_changes off if no changes are present. This will save some queries
+		if (!GetChangeData(true, "", true)) $show_changes = false;
 	}
 	else $_SESSION["show_changes"] = $show_changes;
 }

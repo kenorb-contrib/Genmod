@@ -28,17 +28,19 @@ if (stristr($_SERVER["SCRIPT_NAME"],basename(__FILE__))) {
 	require "../../intrusion.php";
 }
 
-class Favorite extends Favorites {
+class Favorite {
 	
-	var $classname = "Favorite";
-	var $id = "0";
-	var $username = "";
-	var $gid = "";
-	var $type = "";
-	var $file = "";
-	var $title = "";
-	var $note = "";
-	var $url = "";
+	public $classname = "Favorite";	// Name of this class
+	public $id = "0";				// ID of the favorite in the DB
+	public $username = null;		// Username of the user having this favorite or blank if a gedcom favorite
+	public $gid = null;				// xref of the favorite object
+	public $type = null;			// Type of the favorite object (INDI, FAM, SOUR, REPO, NOTE, OBJ)
+	public $file = null;			// Gedcom ID in which this favorite exists
+	private $title = null;			// Title (descriptive) if the favorite is an URL
+	public $note = null;			// Remarks, note to the favorite
+	public $url = null;				// If URL, the URL, else blank.
+	private $link = null;			// Quick, short URL to the favorite
+	public $object = null;			// Holder of the object to which this favorite references
 	
 	public function __construct($favdata="") {
 		
@@ -51,8 +53,76 @@ class Favorite extends Favorites {
 			$this->title = $favdata["fv_title"];
 			$this->note = $favdata["fv_note"];
 			$this->url = $favdata["fv_url"];
-			if ($this->type == "SOUR") $this->object = new source($this->gid);
 		}
+	}
+
+	public function __get($property) {
+		switch($property) {
+			
+			case "title":
+				return $this->GetTitle();
+				break;
+			case "link":
+				return $this->GetLink();
+				break;
+			default:
+				return "<span class=\"error\">Invalid property: ".$property." for __get in favorite class</span>";
+				break;
+		}
+	}
+	
+	public function __set($property, $value) {
+		switch($property) {
+			
+			case "title":
+				$this->title = $value;
+				break;
+			default:
+				return "<span class=\"error\">Invalid property: ".$property." for __set in favorite class</span>";
+				break;
+		}
+	}
+	
+	public function GetObject() {
+		
+		if (is_null($this->object)) {
+			if ($this->type == "INDI") $this->object =& Person::GetInstance($this->gid);
+			elseif ($this->type == "FAM") $this->object =& Family::GetInstance($this->gid);
+			elseif ($this->type == "SOUR") $this->object =& Source::GetInstance($this->gid);
+			elseif ($this->type == "REPO") $this->object =& Repository::GetInstance($this->gid);
+			elseif ($this->type == "OBJE") $this->object =& MediaItem::GetInstance($this->gid);
+			elseif ($this->type == "NOTE") $this->object =& Note::GetInstance($this->gid);
+		}
+	}
+
+	private function GetTitle() {
+		global $SHOW_ID_NUMBERS;
+		
+		if (is_null($this->title) || $this->title == "") {
+			SwitchGedcom($this->file);
+			$this->GetObject();
+			$this->title = $this->object->title;
+			if ($SHOW_ID_NUMBERS) $this->title .= " (".$this->object->xref.")";
+			SwitchGedcom();
+		}
+		return $this->title;
+	}
+				
+	private function GetLink() {
+		
+		if (is_null($this->link)) {
+			SwitchGedcom($this->file);
+			$this->GetObject();
+			if ($this->url != "") $this->link = $this->url;
+			if ($this->type == "INDI") $this->link = "individual.php?pid=".$this->gid."&gedid=".$this->file;
+			elseif ($this->type == "FAM") $this->link = "family.php?famid=".$this->gid."&gedid=".$this->file;
+			elseif ($this->type == "SOUR") $this->link = "source.php?sid=".$this->gid."&gedid=".$this->file;
+			elseif ($this->type == "REPO") $this->link = "repo.php?rid=".$this->gid."&gedid=".$this->file;
+			elseif ($this->type == "OBJE") $this->link = "mediadetail.php?mid=".$this->gid."&gedid=".$this->file;
+			elseif ($this->type == "NOTE") $this->link = "note.php?oid=".$this->gid."&gedid=".$this->file;
+			SwitchGedcom();
+		}
+		return $this->link;
 	}
 	
 	public function SetFavorite() {
@@ -65,13 +135,13 @@ class Favorite extends Favorites {
 			// NOTE: make sure a favorite is added
 			
 			// NOTE: Construct the query
-			$sql = "UPDATE ".$TBLPREFIX."favorites SET fv_url = '".$this->url."'";
-			$sql .= ", fv_note = '".$this->note."'";
-			$sql .= ", fv_title = '".$this->title."' ";
+			$sql = "UPDATE ".$TBLPREFIX."favorites SET fv_url = '".$DBCONN->EscapeQuery($this->url)."'";
+			$sql .= ", fv_note = '".$DBCONN->EscapeQuery($this->note)."'";
+			$sql .= ", fv_title = '".$DBCONN->EscapeQuery($this->title)."' ";
 			$sql .= "WHERE fv_id = ".$this->id;
 			
 			$res = NewQuery($sql);
-			if ($res)  return true;
+			if ($res) return true;
 			else {
 				WriteToLog("Favorite->SetFavorite-> Error editing favorite ".$this->gid, "E", "S");
 				return false;

@@ -1812,10 +1812,12 @@ function GetLdsGlance($indirec) {
  function CheckFactUnique($uniquefacts, $recfacts, $type) {
 
 	 foreach($recfacts as $indexval => $fact) {
-		$ft = preg_match("/1 (\w+)(.*)/", $fact[1], $match);
-		if ($ft>0) {
-			$fact = trim($match[1]);
-			$key = array_search($fact, $uniquefacts);
+
+//		$ft = preg_match("/1 (\w+)(.*)/", $fact[1], $match);
+//		if ($ft>0) {
+		if ($fact->fact != "") {
+//			$fact = trim($match[1]);
+			$key = array_search($fact->fact, $uniquefacts);
 			if ($key !== false) unset($uniquefacts[$key]);
 		}
 	 }

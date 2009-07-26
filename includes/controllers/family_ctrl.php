@@ -32,17 +32,8 @@ if (stristr($_SERVER["SCRIPT_NAME"],basename(__FILE__))) {
 
 class FamilyController extends DetailController
 {
-	public $classname = "FamilyRoot";
-	var $user = null;
-	var $uname = '';
-	var $showLivingHusb = true;
-	var $showLivingWife = true;
-	var $link_relation = 0;
-	var $title = '';
-	var $xref = '';
-	var $family = null;
-	var $display_other_menu = false;
-	var $exists = true;
+	public $classname = "FamilyController";
+	public $family = null;
 	
 	/**
 	 * constructor
@@ -59,8 +50,6 @@ class FamilyController extends DetailController
 			$GEDCOMID,
 			$gm_lang,
 			$CONTACT_EMAIL,
-			$show_famlink,
-			$show_changes,
 			$ENABLE_CLIPPINGS_CART,
 			$Users,
 			$SHOW_ID_NUMBERS,
@@ -76,101 +65,46 @@ class FamilyController extends DetailController
 		$pbheight = $bheight + 14;
 		$nonfacts = array("FAMS", "FAMC", "MAY", "BLOB", "HUSB", "WIFE", "CHIL", "_MEND", "");
 		
-		$show_famlink = true;
-		if ($this->view) $show_famlink = false;
 		if (!empty($_REQUEST["famid"])) $this->xref = strtoupper($_REQUEST["famid"]);
 		$this->xref = CleanInput($this->xref);
 		
-		// NOTE: Determine which tab should be shown global value
-		$this->default_tab = $GEDCOM_DEFAULT_TAB;
-		
-		$this->family = new Family($this->xref);
-		//-- check if we can display both parents
-//		if ($this->display == false) {
-//			$this->showLivingHusb = showLivingNameByID($this->parents['HUSB']);
-//			$this->showLivingWife = showLivingNameByID($this->parents['WIFE']);
-//		}
+		$this->family =& Family::GetInstance($this->xref);
 
-		// Check if we can display the Other menu
-		if ($Users->userCanViewGedlines() || ($ENABLE_CLIPPINGS_CART >= $Users->getUserAccessLevel()) || ($this->display && !empty($this->uname))) $this->display_other_menu = true;
-				
-		if (!empty($this->uname)) {
-			$this->user = $Users->getUser($this->uname);
-
-			//-- add favorites action
-			if ($this->action == 'addfav' && (!empty($_REQUEST['gid']))) {
-				$_REQUEST['gid'] = strtoupper($_REQUEST['gid']);
-				$indirec = FindGedcomRecord($_REQUEST['gid']);
-				if ($indirec) {
-					$favorite = new Favorite();
-					$favorite->username = $this->uname;
-					$favorite->gid = $_REQUEST['gid'];
-					$favorite->type = 'FAM';
-					$favorite->file = $GEDCOMID;
-					$favorite->SetFavorite();
-				}
-			}
-		}
-
-//		if ($this->showLivingHusb == false && $this->showLivingWife == false) {
-//			print_header("{$gm_lang['private']} ({$this->famid}) {$gm_lang['family_info']}");
-//			print_privacy_error($CONTACT_EMAIL);
-//			print_footer();
-//			exit;
-//		}
-		
-		$none = true;
-		if ($this->showLivingHusb == true) {
-			$gedrec = "";
-			if ($this->show_changes && !empty($this->parents['HUSB']) && GetChangeData(true, $this->parents['HUSB'], true)) {
-				$rec = GetChangeData(false, $this->parents['HUSB'], true, "gedlines");
-				$gedrec = $rec[$GEDCOM][$this->parents['HUSB']];
-			}
-			if (GetPersonName($this->parents['HUSB'], $gedrec) !== 'Individual ') {
-				$this->title .= GetPersonName($this->parents['HUSB'], $gedrec);
-				$none = false;
-			}
-		}
-		else
-		{
-			$this->title .= $gm_lang['private'];
-			$none = false;
-		}
-		if ($this->showLivingWife) {
-			$gedrec = "";
-			if ($this->show_changes && !empty($this->parents['WIFE']) && GetChangeData(true, $this->parents['WIFE'], true)) {
-				$rec = GetChangeData(false, $this->parents['WIFE'], true, "gedlines");
-				$gedrec = $rec[$GEDCOM][$this->parents['WIFE']];
-			}
-			if (GetPersonName($this->parents['WIFE'], $gedrec) !== 'Individual ') {
-				if ($none == false) {
-					$this->title .= ' + ';
-				}
-				$this->title .= GetPersonName($this->parents['WIFE'], $gedrec);
-				$none = false;
-			}
-		}
-		else
-		{
-			if ($none == false) {
-				$this->title .= ' + ';
-			}
-			$this->title .= $gm_lang['private'];
-			$none = false;
-		}
-		if ($SHOW_ID_NUMBERS) $this->title .= " - ".$this->famid;
-		$this->title .= " - ".$gm_lang['family_info'];
-
-		if (empty($this->parents['HUSB']) || empty($this->parents['WIFE'])) {
-			$this->link_relation = 0;
-		}
-		else {
-			$this->link_relation = 1;
+		//-- perform the desired action
+		switch($this->action) {
+			case "addfav":
+				$this->addFavorite();
+				break;
 		}
 	}
-
-	function getChildrenUrlTimeline($start=0)
-	{
+	
+	public function __get($property) {
+		switch($property) {
+			default:
+				return parent::__get($property);
+		}
+	}
+	
+	protected function GetPageTitle() {
+		global $SHOW_ID_NUMBERS, $gm_lang;
+		
+		if (is_null($this->pagetitle)) {
+			
+			if (is_object($this->family->husb)) $hname = $this->family->husb->name;
+			else $hname = CheckNN("@P.N. @N.N.");
+			
+			if (is_object($this->family->wife)) $wname = $this->family->wife->name;
+			else $wname = CheckNN("@P.N. @N.N.");
+			
+			$this->pagetitle = $hname." + ".$wname;
+			if ($SHOW_ID_NUMBERS) $this->pagetitle .= " - ".$this->family->xref;
+			$this->pagetitle .= " - ".$gm_lang['family_info'];
+		}
+		return $this->pagetitle;
+	}
+	
+	public function getChildrenUrlTimeline($start=0) {
+		
 		$children = $this->family->children_ids;
 		$c = 0;
 		foreach($children as $id => $child) {
@@ -179,27 +113,22 @@ class FamilyController extends DetailController
 		return join('&amp;', $children);
 	}
 
-	function getPageTitle()
-	{
-		return $this->title;
-	}
-	
 	/**
 	 * get the family page charts menu
 	 * @return Menu
 	 */
-	function &getChartsMenu() {
-		global $TEXT_DIRECTION, $GEDCOM, $gm_lang;
+	public function &getChartsMenu() {
+		global $TEXT_DIRECTION, $gm_lang;
 		if ($TEXT_DIRECTION=="rtl") $ff="_rtl";
 		else $ff="";
 		
 		// charts menu
 		$menu = new Menu($gm_lang['charts']);
-		$menu->addLink('timeline.php?pids[0]='.$this->parents['HUSB'].'&pids[1]='.$this->parents['WIFE']);
+		$menu->addLink('timeline.php?pids[0]='.$this->family->husb_id.'&pids[1]='.$this->family->wife_id);
 		
 		// charts / parents_timeline
 		$submenu = new Menu($gm_lang['parents_timeline']);
-		$submenu->addLink('timeline.php?pids[0]='.$this->parents['HUSB'].'&pids[1]='.$this->parents['WIFE']);
+		$submenu->addLink('timeline.php?pids[0]='.$this->family->husb_id.'&pids[1]='.$this->family->wife_id);
 		$menu->addSubmenu($submenu);
 		
 		// charts / children_timeline
@@ -209,27 +138,7 @@ class FamilyController extends DetailController
 		
 		// charts / family_timeline
 		$submenu = new Menu($gm_lang['family_timeline']);
-		$submenu->addLink('timeline.php?pids[0]='.$this->husb_id.'&pids[1]='.$this->wife_id.'&'.$this->getChildrenUrlTimeline(2));
-		$menu->addSubmenu($submenu);
-		
-		return $menu;
-	}
-	
-	/**
-	 * get the family page reports menu
-	 * @return Menu
-	 */
-	function &getReportsMenu() {
-		global $TEXT_DIRECTION, $GEDCOM, $gm_lang;
-		if ($TEXT_DIRECTION=="rtl") $ff="_rtl";
-		else $ff="";
-		
-		$menu = new Menu($gm_lang['reports']);
-		$menu->addLink('reportengine.php?action=setup&report=reports/familygroup.xml&famid='.$this->getFamilyID());
-
-		// reports / family_group_report
-		$submenu = new Menu($gm_lang['family_group_report']);
-		$submenu->addLink('reportengine.php?action=setup&report=reports/familygroup.xml&famid='.$this->getFamilyID());
+		$submenu->addLink('timeline.php?pids[0]='.$this->family->husb_id.'&pids[1]='.$this->family->wife_id.'&'.$this->getChildrenUrlTimeline(2));
 		$menu->addSubmenu($submenu);
 		
 		return $menu;
@@ -238,8 +147,8 @@ class FamilyController extends DetailController
 	/**
 	 * get the family page edit menu
 	 */
-	function &getEditMenu() {
-		global $TEXT_DIRECTION, $GEDCOM, $gm_lang, $Users, $show_changes;
+	public function &getEditMenu() {
+		global $TEXT_DIRECTION, $GEDCOM, $gm_lang, $Users;
 		if ($TEXT_DIRECTION=="rtl") $ff="_rtl";
 		else $ff="";
 		
@@ -295,7 +204,7 @@ class FamilyController extends DetailController
 			}
 
 			// edit_fam / show/hide changes
-				if (!$show_changes) $submenu = new Menu($gm_lang['show_changes']);
+				if (!$this->show_changes) $submenu = new Menu($gm_lang['show_changes']);
 				else $submenu = new Menu($gm_lang['hide_changes']);
 				$submenu->addLink('showchanges();');
 				$menu->addSubmenu($submenu);
@@ -307,8 +216,8 @@ class FamilyController extends DetailController
 	 * get the other menu
 	 * @return Menu
 	 */
-	function &getOtherMenu() {
-		global $TEXT_DIRECTION, $GEDCOM, $gm_lang;
+	public function &getOtherMenu() {
+		global $TEXT_DIRECTION, $gm_lang;
 		global $ENABLE_CLIPPINGS_CART, $Users;
 		
 		if ($TEXT_DIRECTION=="rtl") $ff="_rtl";
@@ -330,10 +239,10 @@ class FamilyController extends DetailController
 				$submenu->addLink('clippings.php?action=add&id='.$this->family->xref.'&type=fam');
 				$menu->addSubmenu($submenu);
 		}
-		if ($this->display && !empty($this->uname)) {
+		if ($this->family->disp && $this->uname != "") {
 				// other / add_to_my_favorites
 				$submenu = new Menu($gm_lang['add_to_my_favorites']);
-				$submenu->addLink('family.php?action=addfav&famid='.$this->family->xref.'&gid='.$this->getFamilyID());
+				$submenu->addLink('family.php?action=addfav&famid='.$this->family->xref.'&gedid='.$this->family->gedcomid);
 				$menu->addSubmenu($submenu);
 		}
 		return $menu;

@@ -55,7 +55,6 @@ $repository_controller->CheckRawEdited();
 		}?>
 		</td>
 	</tr>
-	<tr>
 </table>
 <?php
 

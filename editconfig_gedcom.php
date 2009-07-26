@@ -1543,7 +1543,9 @@ print "&nbsp;<a href=\"javascript: ".$gm_lang["meta_conf"]."\" onclick=\"expand_
 <br />
 <?php if (count($GEDCOMS)==0) { ?>
 <script language="JavaScript" type="text/javascript">
+<!--
 	helpPopup('welcome_new_help');
+//-->
 </script>
 <?php
 }
@@ -1551,8 +1553,10 @@ print "&nbsp;<a href=\"javascript: ".$gm_lang["meta_conf"]."\" onclick=\"expand_
 // NOTE: needs no changing
 ?>
 <script language="JavaScript" type="text/javascript">
+<!--
 	<?php if ($source == "") print "document.configform.gedcom_title.focus();";
 	else print "document.configform.GEDCOMPATH.focus();";?>
+//-->
 </script>
 <?php
 SwitchGedcom();

@@ -210,7 +210,7 @@ else {
 		}
 	}
 //	print $imgwidth." ".$imgheight;
-	print "<script language=\"JavaScript\" type=\"text/javascript\">\n";
+	print "<script language=\"JavaScript\" type=\"text/javascript\"><!--\n";
 //	print "var height = document.documentElement.clientHeight;";
 //	print "if (height < ".$imgheight.") {";
 //	print "zoom = zoom * height / ".$imgheight.";";
@@ -220,7 +220,7 @@ else {
 	print "var imgwidth = $imgwidth-5;\n var imgheight = $imgheight-5;\n";
 	print "var landscape = false;\n";
 	print "if (imgwidth > imgheight) landscape = true;\n";
-	print "</script>\n";
+	print "//--></script>\n";
 	print '<br /><div id="imagecropper" style="position: relative; border: outset white 3px; background-color: black; overflow: auto; vertical-align: middle; text-align: center; width: '.$imgwidth.'px; height: '.$imgheight.'px; ">';
 	print "\n<img id=\"theimage\" src=\"$filename\" style=\"position: absolute; left: 1px; top: 1px; cursor: move;\" onmousedown=\"panimage(); return false;\" alt=\"\" />\n";
 	print '</div>';

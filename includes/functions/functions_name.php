@@ -894,6 +894,7 @@ function CheckNN($names, $starred=true) {
 		if (HasChinese($names, true)) $names = preg_replace(array("~ /~","~/,~","~/~"), array("", ",", ""), $names);
 		else $names = preg_replace(array("~ /~","~/,~","~/~"), array(" ", ",", " "), $names);
 		$names = preg_replace(array("/@N.N.?/","/@P.N.?/"), array($NN,$PN), trim($names));
+
 		if ($UNDERLINE_NAME_QUOTES) {
 			if ($starred) $names = preg_replace("/\"(.+)\"/", "<span class=\"starredname\">$1</span>", $names);
 			else $names = preg_replace("/\"(.+)\"/", "$1", $names);

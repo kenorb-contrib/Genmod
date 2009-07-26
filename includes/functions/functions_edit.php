@@ -590,7 +590,7 @@ function PrintIndiForm($nextaction, $famid, $linenum="", $namerec="", $famtag="C
 	</script>
 	<?php
 	// force name expand on form load (maybe optional in a further release...)
-	print "<script type='text/javascript'>togglename(); document.getElementById('".$focusfld."').focus();</script>";
+	print "<script type='text/javascript'><!--\ntogglename(); document.getElementById('".$focusfld."').focus();\n//-->\n</script>";
 }
 
 /**
@@ -891,9 +891,9 @@ function AddSimpleTag($tag, $upperlevel="", $tab="1") {
 	}
 	// MARRiage TYPE : hide text field and show a selection list
 	if ($fact=="TYPE" and $tags[0]=="MARR") {
-		print "<script type='text/javascript'>";
+		print "<script type='text/javascript'><!--\n";
 		print "document.getElementById('".$element_id."').style.display='none'";
-		print "</script>";
+		print "\n//-->\n</script>";
 		print "<select tabindex=\"".$tabkey."\" id=\"".$element_id."_sel\" onchange=\"document.getElementById('".$element_id."').value=this.value;\" >\n";
 		foreach (array("Unknown", "Civil", "Religious", "Partners") as $indexval => $key) {
 			if ($key=="Unknown") print "<option value=\"\"";
@@ -958,7 +958,9 @@ function AddSimpleTag($tag, $upperlevel="", $tab="1") {
 			print "</span>";
 			?>
 			<script>
+			<!--
 			sndReq('<?php print $element_id."_gnote";?>', 'getnotedescriptor', 'oid', '<?php print $value;?>', '', '');
+			//-->
 			</script>
 		<?php
 		}
@@ -972,7 +974,9 @@ function AddSimpleTag($tag, $upperlevel="", $tab="1") {
 						print "<span id=\"".$element_id."_gnote2\"></span></a>";
 						?>
 						<script>
+						<!--
 						sndReq('<?php print $element_id."_gnote2";?>', 'getnotedescriptor', 'oid', '<?php print $id;?>', '', '');
+						//-->
 						</script>
 						<?php
 					}
@@ -1054,7 +1058,9 @@ function PrintAddLayer($tag, $level=2, $addfact=false) {
 		$sour_focus_element = AddSimpleTag("$level SOUR @");
 		?>
 		<script type="text/javascript">
+		<!--
 		var addsourcefocus = <?php print "'".$sour_focus_element."'"; ?>;
+		//-->
 		</script>
 		<?php
 		// 3 PAGE
@@ -1084,7 +1090,9 @@ function PrintAddLayer($tag, $level=2, $addfact=false) {
 		$asso_focus_element = AddSimpleTag(($level)." ASSO @");
 		?>
 		<script type="text/javascript">
+		<!--
 		var addassofocus = <?php print "'".$asso_focus_element."'"; ?>;
+		//-->
 		</script>
 		<?php
 		// 3 RELA
@@ -1104,7 +1112,9 @@ function PrintAddLayer($tag, $level=2, $addfact=false) {
 		$note_focus_element = AddSimpleTag(($level)." NOTE");
 		?>
 		<script type="text/javascript">
+		<!--
 		var addnotefocus = <?php print "'".$note_focus_element."'"; ?>;
+		//-->
 		</script>
 		<?php
 		print "</table></div>";
@@ -1120,7 +1130,9 @@ function PrintAddLayer($tag, $level=2, $addfact=false) {
 		$gnote_focus_element = AddSimpleTag("$level NOTE @");
 		?>
 		<script type="text/javascript">
+		<!--
 		var addgnotefocus = <?php print "'".$gnote_focus_element."'"; ?>;
+		//-->
 		</script>
 		<?php
 		print "</table></div>";
@@ -1136,7 +1148,9 @@ function PrintAddLayer($tag, $level=2, $addfact=false) {
 		$obje_focus_element = AddSimpleTag(($level)." OBJE @");
 		?>
 		<script type="text/javascript">
+		<!--
 		var addobjefocus = <?php print "'".$obje_focus_element."'"; ?>;
+		//-->
 		</script>
 		<?php
 		// 2 OBJE <=== as embedded new object
@@ -1479,7 +1493,7 @@ function ShowMediaForm($pid, $action="newentry", $change_type="add_media") {
 			alert( "<?php print $gm_lang["invalid_file"]; ?>" ) ;
 			return false;
 	}
-	-->
+	//-->
 	</script> <?php
 	// 0 OBJE
 	// 1 FILE

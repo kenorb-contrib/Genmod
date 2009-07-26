@@ -607,9 +607,9 @@ else {
 		    	}
 		    	else {
 				    if($clipping['type']=='note') {
-						$note_controller = new NoteController($clipping['id']);
+						$note =& Note::GetInstance($clipping['id']);
 						print "<a href=\"note.php?oid=".$clipping['id']."\">";
-						if ($note_controller->note->disp) print $note_controller->note->GetTitle(40)." (".$clipping['id'].")";
+						if ($note->disp) print $note->GetTitle(40)." (".$clipping['id'].")";
 						else print $gm_lang["private"];
 			      		print "</a>";
 			    	}

@@ -52,10 +52,12 @@ switch ($action) {
 }
 ?>
 <script language="JavaScript" type="text/javascript">
+<!--
 	function postform(which) {
 		window.open('editlang_edit_settings.php?action=new_lang&new_shortcut=' + document.new_lang_form.new_shortcut.value, '', 'top=50,left=10,width=1000,height=600,scrollbars=1,resizable=1');
 		return false;
 	}
+//-->
 </script>
 
 <?php

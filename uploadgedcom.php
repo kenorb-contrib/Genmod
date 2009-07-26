@@ -764,7 +764,7 @@ print "<form enctype=\"multipart/form-data\" method=\"post\" name=\"configform\"
 					print "<div class=\"inner_progress_bar\">\n";
 						print "<div id=\"progress_div\" class=\"progress_bar\">";
 						if (isset($_SESSION["TOTAL_BYTES"])) {
-							print "\n<script type=\"text/javascript\">update_progress(".$_SESSION["TOTAL_BYTES"].",".$_SESSION["exectime_start"].");</script>\n";
+							print "\n<script type=\"text/javascript\"><!--\nupdate_progress(".$_SESSION["TOTAL_BYTES"].",".$_SESSION["exectime_start"].");\n//-->\n</script>\n";
 						}
 						else print "1%";
 						print "</div>\n";
@@ -941,7 +941,7 @@ print "<form enctype=\"multipart/form-data\" method=\"post\" name=\"configform\"
 					if ($i%10==0) {
 						$newtime = time();
 						$exectime = $newtime - $oldtime;
-						print "\n<script type=\"text/javascript\">update_progress($TOTAL_BYTES, $exectime);</script>\n";
+						print "\n<script type=\"text/javascript\"><!--\nupdate_progress($TOTAL_BYTES, $exectime);\n//-->\n</script>\n";
 						flush();
 						@ob_flush();
 					}
@@ -1021,7 +1021,7 @@ print "<form enctype=\"multipart/form-data\" method=\"post\" name=\"configform\"
 				$exec_text = $gm_lang["exec_time"];
 				$go_pedi = $gm_lang["click_here_to_go_to_pedigree_tree"];
 				$go_welc = $gm_lang["welcome_page"];
-				print "<script type=\"text/javascript\">complete_progress(".$importtime.", '".$exec_text."', '".$go_pedi."', '".$go_welc."');</script>";
+				print "<script type=\"text/javascript\"><!--\ncomplete_progress(".$importtime.", '".$exec_text."', '".$go_pedi."', '".$go_welc."');\n//-->\n</script>";
 				flush();
 				@ob_flush();
 			}
@@ -1086,7 +1086,7 @@ print "<form enctype=\"multipart/form-data\" method=\"post\" name=\"configform\"
 					if ($i%10==0) {
 						$newtime = time();
 						$exectime = $newtime - $oldtime;
-						print "\n<script type=\"text/javascript\">update_progress($i, $exectime);</script>\n";
+						print "\n<script type=\"text/javascript\"><!--\nupdate_progress($i, $exectime);\n//-->\n</script>\n";
 						flush();
 						@ob_flush();
 	
@@ -1144,7 +1144,7 @@ print "<form enctype=\"multipart/form-data\" method=\"post\" name=\"configform\"
 				$exectime = $newtime - $oldtime;
 				$show_exectime = $exectime - $exectime_start;
 				$show_table_marr .= "<tr><td class=\"shade1 indent_rtl rtl\">$show_exectime ".$gm_lang["sec"]."</td>\n";
-				$show_table_marr .= "<td class=\"shade1 indent_rtl rtl\">$names_added<script type=\"text/javascript\">update_progress($i, $exectime);</script></td>";
+				$show_table_marr .= "<td class=\"shade1 indent_rtl rtl\">$names_added<script type=\"text/javascript\"><!--\nupdate_progress($i, $exectime);//-->\n</script></td>";
 				$show_table_marr .= "<td class=\"shade1\">&nbsp;INDI&nbsp;</td></tr>\n";
 				$show_table_marr .= "</table>\n";
 				$stage=10;
@@ -1166,7 +1166,7 @@ print "<form enctype=\"multipart/form-data\" method=\"post\" name=\"configform\"
 				$show_table1 .= "<td class=\"shade1 rtl\">&nbsp;".$type["type"]."&nbsp;</td></tr>\n";
 			}
 			$show_table1 .= "<tr><td class=\"shade1 indent_rtl rtl \">$importtime ".$gm_lang["sec"]."</td>";
-			$show_table1 .= "<td class=\"shade1 indent_rtl rtl \">$TOTAL_BYTES<script type=\"text/javascript\">update_progress($TOTAL_BYTES, $exectime);</script></td>\n";
+			$show_table1 .= "<td class=\"shade1 indent_rtl rtl \">$TOTAL_BYTES<script type=\"text/javascript\"><!--\nupdate_progress($TOTAL_BYTES, $exectime);\n//-->\n</script></td>\n";
 			$show_table1 .= "<td class=\"shade1 indent_rtl rtl \">".($i-1)."</td>";
 			$show_table1 .= "<td class=\"shade1\">&nbsp;</td></tr>\n";
 			$show_table1 .= "</table>\n";

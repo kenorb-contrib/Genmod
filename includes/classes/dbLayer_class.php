@@ -26,7 +26,7 @@
  
 class DbLayer extends MysqlDb {
 	
-	public $classname = "DbLayer";
+	public $classname = "DbLayer";	// Name of this class
 	
 	public function __construct() {
 		

@@ -693,7 +693,7 @@ if (!function_exists("showLivingNameByID")) {
 	 * @param		string 	$pid 	the GEDCOM XRef ID for the entity to check privacy settings for
 	 * @return	boolean 	return true to show the person's name, return false to keep it private
 	 */
-	function showLivingNameByID($pid, $type="INDI") {
+	function showLivingNameByID($pid, $type="INDI", $gedrec = "") {
 		global $SHOW_LIVING_NAMES, $PRIV_PUBLIC, $PRIV_USER, $PRIV_NONE, $person_privacy, $user_privacy, $gm_username, $COMBIKEY, $Users, $USE_RELATIONSHIP_PRIVACY, $CHECK_MARRIAGE_RELATIONS, $GEDCOM, $MAX_RELATION_PATH_LENGTH;
 		
 		// If we can show the details, we can also show the name
@@ -719,7 +719,8 @@ if (!function_exists("showLivingNameByID")) {
 		}
 		
 		// If RESN privacy on level 1 prevents the pid to be displayed, we also cannot show the name
-		if (FactViewRestricted($pid, FindGedcomRecord($pid), 1)) return false;
+		if (empty($gedrec)) $gedrec = FindGedcomRecord($pid); 
+		if (FactViewRestricted($pid, $gedrec, 1)) return false;
 		
 		// Now split dead and alive people
 		$isdead = IsDeadId($pid);
@@ -1006,10 +1007,9 @@ function FactViewRestricted($pid, $factrec, $level=2) {
 		if (($match[1] == "confidential") && (($Users->userIsAdmin($gm_username)) || ($Users->userGedcomAdmin($gm_username)))) return false;
 		if (($match[1] == "privacy") && (($Users->userIsAdmin($gm_username)) || ($myindi == $pid) || ($Users->userGedcomAdmin($gm_username)))) return false;
 		if (IDType($pid) == "FAM"){
-			$famrec = FindFamilyRecord($pid);
-			$parents = FindParentsInRecord($famrec);
-			if (($match[1] == "privacy") && (($Users->userIsAdmin($gm_username)) || ($myindi == $parents["WIFE"]) || ($Users->userGedcomAdmin($gm_username)))) return false;
-			if (($match[1] == "privacy") && (($Users->userIsAdmin($gm_username)) || ($myindi == $parents["HUSB"]) || ($Users->userGedcomAdmin($gm_username)))) return false;
+			$family =& Family::GetInstance($pid); 
+			if (($match[1] == "privacy") && (($Users->userIsAdmin($gm_username)) || ($myindi == $family->wifeid) || ($Users->userGedcomAdmin($gm_username)))) return false;
+			if (($match[1] == "privacy") && (($Users->userIsAdmin($gm_username)) || ($myindi == $family->husbid) || ($Users->userGedcomAdmin($gm_username)))) return false;
 		}
 	}
 	return true;

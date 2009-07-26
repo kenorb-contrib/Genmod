@@ -1450,8 +1450,8 @@ if (!empty($check_gedcoms)) {
 						print $warn_icon.$gm_lang["sc_unu_nref"];
 					}
 					print "<br />";
-					$note_controller = new NoteController($oid);
-					print "<a href=\"note.php?oid=".$oid."&amp;ged=".$GEDCOM."\">".$note_controller->note->GetTitle(40, true)." (".$oid.")</a>";
+					$note =& Note::GetInstance($oid);
+					print "<a href=\"note.php?oid=".$oid."&amp;ged=".$GEDCOM."\">".$note->GetTitle(40, true)." (".$oid.")</a>";
 				}
 			}
 			if (!$error) print $info_icon.$gm_lang["sc_ok_all_nref"]." ";

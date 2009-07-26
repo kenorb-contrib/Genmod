@@ -187,14 +187,14 @@ class MediaFS {
 				if ($directory == "external_links") {
 					if (!isset($files[$row["mf_link"]]["filedata"])) $files[$row["mf_link"]]["filedata"] = New MFile($row);
 					if (!empty($row["m_media"])) {
-						$media = new MediaItem($row);
+						$media =& MediaItem::GetInstance($row);
 						$files[$row["mf_link"]]["objects"][] = $media;
 					}
 				}
 				else {
 					if (!isset($files[$row["mf_file"]]["filedata"])) $files[$row["mf_file"]]["filedata"] = New MFile($row);
 					if (!empty($row["m_media"])) {
-						$media = new MediaItem($row);
+						$media =& MediaItem::GetInstance($row);
 						$files[$row["mf_file"]]["objects"][] = $media;
 					}
 				}
@@ -238,7 +238,7 @@ class MediaFS {
 //				print "f: ".$f;
 				if (in_array($f, $dirfiles)) {
 //					print "added";
-					$files[$f]["objects"][] = new MediaItem($row);
+					$files[$f]["objects"][] =& MediaItem::GetInstance($row);
 				}
 			}
 			foreach ($files as $filename => $objects) {
@@ -311,7 +311,7 @@ class MediaFS {
 					if (!$linked) print $gm_lang["used_in"]."&nbsp;";
 					if ($media->title != "") $title = "<b>".$media->title."</b> (".$media->xref.")";
 					else $title = "";
-					print "<a href=\"mediadetail.php?mid=".$media->xref."&amp;gedcomid=".$media->m_gedcomid."\" target=\"blank\">".PrintReady($title)."</a><br />";
+					print "<a href=\"mediadetail.php?mid=".$media->xref."&amp;gedid=".$media->m_gedcomid."\" target=\"blank\">".PrintReady($title)."</a><br />";
 					$linked = true;
 				}
 			}

@@ -39,7 +39,7 @@ require_once 'includes/functions/functions_charts.php';
 */
 $controller = new IndividualController();
 
-print_header($controller->PageTitle);
+print_header($controller->pagetitle);
 
 $controller->CheckNoResult($gm_lang["person_not_found"]);
 
@@ -47,14 +47,13 @@ $controller->CheckPrivate();
 
 $controller->CheckRawEdited();
 
-$namesprinted = false;
 // ?><pre><?php
 // print_r($controller);
 // ?></pre><?php
 ?>
 <div id="indi_content" class="<?php echo $TEXT_DIRECTION;?>">
 	<!-- NOTE: Display person picture -->
-	<?php if ($controller->canShowHighlightedObject && !empty($controller->HighlightedObject)) {
+	<?php if ($controller->canshowhighlightedobj && $controller->HighlightedObject != "") {
 		print '<div id="indi_picture" class="'.$TEXT_DIRECTION.'">';
 			print $controller->HighlightedObject;
 		print "</div>";
@@ -63,244 +62,99 @@ $namesprinted = false;
 	<!-- NOTE: Print person name and ID -->
 	<span class="name_head"><?php print $controller->indi->name; ?>
 	<span><?php print $controller->indi->addxref; ?></span>
-	<span><?php print PrintReady($controller->uname); ?></span>
+	<span><?php print PrintReady($controller->indi_userlink); ?></span>
 	</span><br />
 	
 	<!-- NOTE: Print person additional name(s) and ID -->
 	<?php if (strlen($controller->indi->addname) > 0) print "<span class=\"name_head\">".$controller->indi->addname."</span><br />"; ?>
 	
 	<!-- NOTE: Display details of person if privacy allows -->
-	<?php if ($controller->indi->disp) { ?>
-		<?php
-		foreach ($controller->indi->globalfacts as $key => $value) {
-			$fact = trim($value[0]);
-			if ($fact=="SEX") {
-				$changed = false;
-				print "<div class=\"indi_spacer $TEXT_DIRECTION";
-				if($controller->show_changes) {
-					if ($controller->indi->isdeleted) print " change_old";
-					else if (isset($value[3]) && $value[3] == "new") print " change_new";
-					else if (IsChangedFact($controller->indi->xref, $value[1])) {
-						print " change_old";
-						$changed = true;
-					}
-				}
+	<?php if ($controller->indi->disp) { 
+		$names = $controller->indi->changednames;
+		$num = 0;
+		foreach($names as $key=>$name) {
+			// Name not changed
+			if ($name["old"] == $name["new"]) {
+				print "<div class=\"indi_spacer";
+				if ($controller->indi->isdeleted && $controller->show_changes) print " change_old";
 				print "\">";
-				print PrintReady($controller->gender_record($value[1], $value[0]));
+				$controller->PrintNameRecord($name["old"], $num);
+				print "</div>";
+				$num++;
+			}
+			// Name changed
+			elseif ($controller->caneditown && $controller->show_changes) {
+				print "<div>";
+				print "<table class=\"indi_spacer\">";
+				if (!empty($name["old"])) {
+					print "<tr><td class=\"change_old\">";
+					$controller->PrintNameRecord($name["old"], $num, false);
+					print "</td></tr>";
+				}
+				if (!empty($name["new"])) {
+					$controller->name_count--;
+					print "<tr><td class=\"change_new\">";
+					$controller->PrintNameRecord($name["new"], $num);
+					print "</td></tr>";
+				}
+				print "</table></div>";
+				$num++;
+			}
+			else {
+				if (!empty($name["old"]))print "<div class=\"indi_spacer\">".$controller->PrintNameRecord($name["old"], $num)."</div>";
+				$num++;
+			}
+		}
+		foreach ($controller->indi->facts as $key => $factobj) {
+			if ($factobj->fact == "SEX") {
+				print "<div class=\"indi_spacer $TEXT_DIRECTION ";
+				if($controller->show_changes) print $factobj->style;
+				print "\">";
+				$controller->GenderRecord($factobj->factrec, $factobj->fact);
 				print "<span class=\"label $TEXT_DIRECTION\">".PrintReady($gm_lang["sex"].":    ")."</span><span class=\"field\">".$controller->indi->sexdetails["gender"];
 				print " <img src=\"".$controller->indi->sexdetails["image"]."\" title=\"".$controller->indi->sexdetails["gender"]."\" alt=\"".$controller->indi->sexdetails["gender"];
 				print "\" width=\"0\" height=\"0\" class=\"sex_image\" border=\"0\" />";
-				if (!$controller->indi->isdeleted && !$changed && $controller->indi->canedit) {
-					if ($controller->indi->sexdetails["add"]) print "<br /><a class=\"font9\" href=\"#\" onclick=\"add_new_record('".$controller->pid."', 'SEX'); return false;\">".$gm_lang["edit"]."</a>";
+				if (!$controller->indi->isdeleted && $factobj->style != "change_old" && $controller->indi->canedit) {
+					if ($controller->indi->sexdetails["add"]) print "<br /><a class=\"font9\" href=\"#\" onclick=\"add_new_record('".$controller->xref."', 'SEX'); return false;\">".$gm_lang["edit"]."</a>";
 					else {
-						print "<br /><a class=\"font9\" href=\"#\" onclick=\"edit_record('".$controller->pid."', 'SEX', 1, 'edit_gender'); return false;\">".$gm_lang["edit"]."</a> | ";
-						print "<a class=\"font9\" href=\"#\" onclick=\"delete_record('".$controller->pid."', 'SEX', 1, 'edit_gender'); return false;\">".$gm_lang["delete"]."</a>\n";
+						print "<br /><a class=\"font9\" href=\"#\" onclick=\"edit_record('".$controller->xref."', 'SEX', 1, 'edit_gender'); return false;\">".$gm_lang["edit"]."</a> | ";
+						print "<a class=\"font9\" href=\"#\" onclick=\"delete_record('".$controller->xref."', 'SEX', 1, 'edit_gender'); return false;\">".$gm_lang["delete"]."</a>\n";
 					}
 				}
 				print "</span>";
 				print "</div>";
-				if ($changed && $controller->show_changes) {
-					print "<div class=\"indi_spacer change_new\">";
-					$newrec = RetrieveChangedFact($controller->indi->xref, "SEX", $value[1]);
-					print $controller->gender_record($newrec, $value[0]);
-					if (empty($newrec)) $add = true;
-					else $add = false;
-					print "<span class=\"label\">".$gm_lang["sex"].":    </span><span class=\"field\">".$controller->indi->sexdetails["gender"];
-					print " <img src=\"".$controller->indi->sexdetails["image"]."\" title=\"".$controller->indi->sexdetails["gender"]."\" alt=\"".$controller->indi->sexdetails["gender"];
-					print "\" width=\"0\" height=\"0\" class=\"sex_image\" border=\"0\" />";
-					if (!$controller->indi->isdeleted) {
-						if ($controller->indi->sexdetails["add"] || $add) print "<br /><a class=\"font9\" href=\"#\" onclick=\"add_new_record('".$controller->pid."', 'SEX'); return false;\">".$gm_lang["edit"]."</a>";
-						else {
-							print "<br /><a class=\"font9\" href=\"#\" onclick=\"edit_record('".$controller->pid."', 'SEX', 1, 'edit_gender'); return false;\">".$gm_lang["edit"]."</a> | ";
-							print "<a class=\"font9\" href=\"#\" onclick=\"delete_record('".$controller->pid."', 'SEX', 1, 'edit_gender'); return false;\">".$gm_lang["delete"]."</a>\n";
-						}
-					}
-					print "</span>";
-					print "</div>";
-				}
-			}
-			else {
-				if ($fact=="NAME") {
-					if (!$namesprinted) {
-						$names = $controller->indi->changednames;
-						$num = 0;
-						foreach($names as $key=>$name) {
-							// Name not changed
-							if ($name["old"] == $name["new"]) {
-								print "<div class=\"indi_spacer";
-								if ($controller->indi->isdeleted) print " change_old";
-								print "\">";
-								$controller->print_name_record($name["old"], $num);
-								print "</div>";
-								$num++;
-								continue;
-							}
-							// Name changed
-							if ($controller->indi->can_editown && $controller->show_changes && $name["old"] != $name["new"] && !empty($name["new"])&& !empty($name["old"])) {
-								print "<div>";
-								print "<table class=\"indi_spacer\">";
-								print "<tr><td class=\"change_old\">";
-								$controller->print_name_record($name["old"], $num, false);
-								$controller->name_count--;
-								print "</td></tr>";
-								print "<tr><td class=\"change_new\">";
-								$controller->print_name_record($name["new"], $num);
-								print "</td></tr></table></div>";
-								$num++;
-								continue;
-							}
-							// Name added
-							if ($controller->indi->can_editown && $show_changes && empty($name["old"]) && !empty($name["new"])) {
-								print "<div class=\"indi_spacer change_new\">";
-								$controller->print_name_record($name["new"], $num);
-								print "</div>";
-								$num++;
-							}
-							// Name deleted
-							if ($controller->indi->can_editown && $show_changes && empty($name["new"]) && !empty($name["old"])) {
-								print "<div class=\"indi_spacer change_old\">";
-								$controller->print_name_record($name["old"], $num, false);
-								print "</div>";
-								$num++;
-							}
-							else {
-								if (!empty($name["old"]))print "<div class=\"indi_spacer\">".$controller->print_name_record($name["old"], $num)."</div>";
-								$num++;
-							}
-						}
-					$namesprinted = true;
-					}
-				}
 			}
 		}
-		print "<table>";
-		//-- - put the birth info in this section
-		if ($controller->show_changes) {
-			if ($controller->indi->isdeleted) {
-				if (!$controller->indi->brec == "") {
-					print "<tr><td class=\"change_old\">";
-					print "<span class=\"label\">".$factarray["BIRT"].":</span>";
-					print "<span class=\"field\">";
-					print_fact_date($controller->indi->brec);
-					print_fact_place($controller->indi->brec);
-					print "</span></td></tr>";
-				}
-			}
-			else {
-				if ($controller->indi->isnew && !$controller->indi->brec == "") {
-					print "<tr><td class=\"change_new\">";
-					print "<span class=\"label\">".$factarray["BIRT"].":</span>";
-					print "<span class=\"field\">";
-					print_fact_date($controller->indi->brec);
-					print_fact_place($controller->indi->brec);
-					print "</span></td></tr>";
-				}
-				else {
-					if (!$controller->indi->newbrec == "") {
-						if (!$controller->indi->brec == "") {
-							print "<tr><td class=\"change_old\">";
-							print "<span class=\"label\">".$factarray["BIRT"].":</span>";
-							print "<span class=\"field\">";
-							print_fact_date($controller->indi->brec);
-							print_fact_place($controller->indi->brec);
-							print "</span></td></tr>";
-						}
-						print "<tr><td class=\"change_new\">";
-						print "<span class=\"label\">".$factarray["BIRT"].":</span>";
-						print "<span class=\"field\">";
-						print_fact_date($controller->indi->newbrec);
-						print_fact_place($controller->indi->newbrec);
-						print "</span></td></tr>";
-					}
-					else {
-						if (!$controller->indi->brec == "") { 
-							print "<tr><td class=\"$TEXT_DIRECTION\"><span class=\"label\">".$factarray["BIRT"].":"."</span>";
-							print "<span class=\"field\">";
-							print_fact_date($controller->indi->brec);
-							print_fact_place($controller->indi->brec);
-							print "</span></td></tr>";
-						}
-					}
-				}
-			}
+		
+		//-- - put the birth and death info in this section
+		print "<div class=\"indi_spacer\" style=\"line-height:20px;\">";
+		$bfacts = $controller->SelectFacts("BIRT");
+		foreach ($bfacts as $key => $factobj) {
+			if ($factobj->style != "") $style = " class=\"".$factobj->style."\"";
+			else $style = "";
+			print "<span".$style.">".$factobj->descr.": ";
+			print_fact_date($factobj->factrec, false, false, false, $controller->indi->xref, $controller->indi->gedrec);
+			print_fact_place($factobj->factrec);
+			print "</span><br />";
 		}
-		else {
-			if (!$controller->indi->brec == "") { 
-				print "<tr><td><span class=\"label\">".$factarray["BIRT"].":"."</span>";
-				print "<span class=\"field\">";
-				print_fact_date($controller->indi->brec);
-				print_fact_place($controller->indi->brec);
-				print "</span></td></tr>";
-			}
-		}
-		// RFE [ 1229233 ] "DEAT" vs "DEAT Y"
-		// The check $deathrec != "1 DEAT" will not show any records that only have 1 DEAT in them
-		if ($controller->show_changes) {
-			if ($controller->indi->isdeleted && !$controller->indi->drec == "") {
-				print "<tr><td class=\"change_old\">";
-				print "<span class=\"label\">".$factarray["DEAT"].":</span>";
-				print "<span class=\"field\">";
-				print_fact_date($controller->indi->drec);
-				print_fact_place($controller->indi->drec);
-				print "</span></td></tr>";
-			}
-			else {
-				if ($controller->indi->isnew && !$controller->indi->drec == "") {
-					print "<tr><td class=\"change_new\">";
-					print "<span class=\"label\">".$factarray["DEAT"].":</span>";
-					print "<span class=\"field\">";
-					print_fact_date($controller->indi->drec);
-					print_fact_place($controller->indi->drec);
-					print "</span></td></tr>";
-				}
-				else {
-					if (!empty($controller->indi->newdrec)) {
-						if (!$controller->indi->drec == "") {
-							print "<tr><td class=\"change_old\">";
-							print "<span class=\"label\">".$factarray["DEAT"].":</span>";
-							print "<span class=\"field\">";
-							print_fact_date($controller->indi->drec);
-							print_fact_place($controller->indi->drec);
-							print "</span></td></tr>";
-						}
-						print "<tr><td class=\"change_new\">";
-						print "<span class=\"label\">".$factarray["DEAT"].":</span>";
-						print "<span class=\"field\">";
-						print_fact_date($controller->indi->newdrec);
-						print_fact_place($controller->indi->newdrec);
-						print "</span></td></tr>";
-					}
-					else {
-						if (!$controller->indi->drec == ""&& trim($controller->indi->drec) != "1 DEAT") { 
-							print "<tr><td><span class=\"label\">".$factarray["DEAT"].":</span>";
-							print "<span class=\"field\">";
-							print_fact_date($controller->indi->drec);
-							print_fact_place($controller->indi->drec);
-							print "</span></td></tr>";
-						}
-					}
-				}
-			}
-		}
-		else {
-			if (!$controller->indi->drec == "" && trim($controller->indi->drec) != "1 DEAT") { 
-				print "<tr><td><span class=\"label\">".$factarray["DEAT"].":</span>";
-				print "<span class=\"field\">";
-				print_fact_date($controller->indi->drec);
-				print_fact_place($controller->indi->drec);
-				print "</span></td></tr>";
-			} 
+		$dfacts = $controller->SelectFacts("DEAT");
+		foreach ($dfacts as $key => $factobj) {
+			if ($factobj->style != "") $style = " class=\"".$factobj->style."\"";
+			else $style = "";
+			print "<span".$style.">".$factobj->descr.": ";
+			print_fact_date($factobj->factrec, false, false, false, $controller->indi->xref, $controller->indi->gedrec);
+			print_fact_place($factobj->factrec);
+			print "</span><br style=\"line-height:30px;\" />";
 		}
 		if ($SHOW_LDS_AT_GLANCE) print "<br /><b>".GetLdsGlance($controller->indi->gedrec)."</b>";
 		?>
-		</table>
+		</div>
 		<?php 
 	}
-	if($SHOW_COUNTER) {
-		// Print indi counter only if displaying a non-private person
-		print "\n<br /><br /><span style=\"margin-left: 3px;\">".$gm_lang["hit_count"]."&nbsp;".$hits."</span>\n";
-	}
-print "</div>";
+	// Print indi counter only if displaying a non-private person
+	if($SHOW_COUNTER) print "\n<br /><br /><div style=\"margin-left: 3px; width: 100%;\">".$gm_lang["hit_count"]."&nbsp;".$hits."</div>\n";
+	
+print "</div><br />";
 
 // Print the accesskeys
 if (!$controller->view) {
@@ -312,9 +166,9 @@ if (!$controller->view) {
 		<?php
 		if (!empty($controller->user)&&!empty($controller->user->gedcomid[$GEDCOM])) {
 			?>
-		<a class="accesskeys" href="<?php print "relationship.php?pid1=".$controller->user->gedcomid[$GEDCOM]."&amp;pid2=".$controller->pid;?>" title="<?php print $gm_lang["relationship_to_me"] ?>" tabindex="-1" accesskey="<?php print $gm_lang["accesskey_individual_relation_to_me"]; ?>"><?php print $gm_lang["relationship_to_me"] ?></a>
+		<a class="accesskeys" href="<?php print "relationship.php?pid1=".$controller->user->gedcomid[$GEDCOM]."&amp;pid2=".$controller->xref;?>" title="<?php print $gm_lang["relationship_to_me"] ?>" tabindex="-1" accesskey="<?php print $gm_lang["accesskey_individual_relation_to_me"]; ?>"><?php print $gm_lang["relationship_to_me"] ?></a>
 		<?php 	}
-		if ($controller->canShowGedcomRecord) {?>
+		if ($controller->canshowgedrec) {?>
 		<a class="accesskeys" href="javascript:show_gedcom_record();" title="<?php print $gm_lang["view_gedcom"] ?>" tabindex="-1" accesskey="<?php print $gm_lang["accesskey_individual_gedcom"]; ?>"><?php print $gm_lang["view_gedcom"] ?></a>
 		<?php } ?>
 	</div>

@@ -359,6 +359,70 @@ function SortFacts(&$arr, $type="", $desc=false) {
 	}
 }
 
+// Sort the facts, using three conflicting rules (family sequence,
+// date sequence and fact sequence).
+// We sort by fact first (preserving family order where possible) and then
+// resort by date (preserving fact order where possible).
+// This results in the dates always being in sequence, and the facts
+// *mostly* being in sequence.
+function SortFactObjs(&$arr, $type="", $desc=false) {
+	
+	// Pass one - insertion sort on fact type
+	$lastDate = "";
+	for ($i=0; $i<count($arr); ++$i) {
+		if ($i>0) {
+			$tmp=$arr[$i];
+			$j=$i;
+			while ($j>0 && CompareFactsType($arr[$j-1]->factrec, $tmp->factrec, $type)>0) {
+				$arr[$j]=$arr[$j-1];
+				--$j;
+			}
+			$arr[$j]=$tmp;
+		}
+	}
+
+	//-- add extra codes for the next pass of sorting
+	//-- add a fake date for the date sorting based on the previous fact that came before
+	$lastDate = "";
+	for ($i=0; $i<count($arr); $i++) {
+		//-- add a fake date for the date sorting based on the previous fact that came before
+		if (is_object($arr[$i])) {
+			if (preg_match("/2 DATE (.+)/", $arr[$i]->factrec, $match)==0 && !empty($lastDate))
+				$arr[$i]->factrec .= "\r\n2 _DATE ".$lastDate."\r\n";
+			else
+				$lastDate = @$match[1];
+			//-- also add a sort field so that we can compare based on how they were sorted by the previous pass when the date does not give enough information
+			$arr[$i]->factrec .= "\r\n2 _SORT ".$i."\r\n";
+		} else {
+			if (preg_match("/2 DATE (.+)/", $arr[$i], $match)==0 && !empty($lastDate))
+				$arr[$i].="\r\n2 _DATE ".$lastDate."\r\n";
+			else
+				$lastDate = @$match[1];
+			$arr[$i].="\r\n2 _SORT ".$i."\r\n";
+		}
+	}
+	
+	// Pass two - modified bubble/insertion sort on date
+	for ($i=0; $i<count($arr)-1; ++$i)
+		for ($j=count($arr)-1; $j>$i; --$j)
+			if ((!$desc && CompareFactsDate($arr[$i]->factrec,$arr[$j]->factrec)>0) || ($desc && CompareFactsDate($arr[$i]->factrec,$arr[$j]->factrec)<0)) {
+				$tmp=$arr[$i];
+				for ($k=$i; $k<$j; ++$k)
+					$arr[$k]=$arr[$k+1];
+				$arr[$j]=$tmp;
+			}
+			
+	//-- delete the temporary fields
+	for ($i=0; $i<count($arr); $i++) {
+		if (is_object($arr[$i])) {
+			$arr[$i]->factrec = trim(preg_replace("/2 _(DATE|SORT) (.+)/", "", $arr[$i]->factrec));
+		} 
+		else {
+			$arr[$i] = trim(preg_replace("/2 _(DATE|SORT) (.+)/", "", $arr[$i]));
+		}
+	}
+}
+
 
 // ************************************************* START OF SORTING FUNCTIONS ********************************* //
 /**

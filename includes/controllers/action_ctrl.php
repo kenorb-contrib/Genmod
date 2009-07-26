@@ -29,10 +29,10 @@ if (stristr($_SERVER["SCRIPT_NAME"],basename(__FILE__))) {
 
 class ActionController {
 	
-	var $classname = "Actions";
-	var $actionlist= array();
+	public $classname = "Actions";
+	public $actionlist= array();
 
-	function AddItem($pid, $text, $repo, $status=0) {
+	public function AddItem($pid, $text, $repo, $status=0) {
 		global $GEDCOMID;
 
 		$item = new ActionItem();
@@ -45,14 +45,14 @@ class ActionController {
 		return $item;
 	}
 	
-	function DeleteItem($id) {
+	public function DeleteItem($id) {
 		
 		$item = $this->GetItem($id);
 		$item->DeleteThis();
 		return true;
 	}
 	
-	function GetItem($id) {
+	public function GetItem($id) {
 		global $TBLPREFIX;
 		
 		$sql = "SELECT * FROM ".$TBLPREFIX."actions WHERE a_id='".$id."'";
@@ -62,7 +62,7 @@ class ActionController {
 		}
 	}
 	
-	function GetActionListByID($pid) {
+	public function GetActionListByID($pid) {
 		global $TBLPREFIX, $GEDCOMID;
 		
 		$this->actionlist = array();
@@ -74,7 +74,7 @@ class ActionController {
 		return $this->actionlist;
 	}
 			
-	function GetActionList($status="", $reposort=false) {
+	public function GetActionList($status="", $reposort=false) {
 		global $TBLPREFIX, $GEDCOMID;
 		
 		$this->actionlist = array();
@@ -91,7 +91,7 @@ class ActionController {
 		return $this->actionlist;
 	}
 
-	function PrintAddLink() {
+	public function PrintAddLink() {
 		global $gm_lang;
 		
 		print "<tr>";
@@ -103,15 +103,15 @@ class ActionController {
 		print "</tr>";
 	}
 
-	function RepoSort() {
+	private function RepoSort() {
 		uasort($this->actionlist, array($this, "ActionObjSort"));
 	}
 	
-	function ActionObjSort($a, $b) {
+	private function ActionObjSort($a, $b) {
 		return StringSort($a->repodesc, $b->repodesc);
 	}
 	
-	function GetNewItem() {
+	public function GetNewItem() {
 		return new ActionItem();
 	}
 }

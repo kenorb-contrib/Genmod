@@ -139,7 +139,7 @@ class MenuBar {
 		// NOTE: Add GEDCOMS to open
 			foreach($GEDCOMS as $ged=>$gedarray) {
 				$submenu = new Menu($this->GetSubmenuText(PrintReady($gedarray["title"]), ($ged == $GEDCOM)), false);
-				$submenu->addLink("index.php?command=gedcom&ged=".$ged."&gedcomid=".$gedarray["id"]);
+				$submenu->addLink("index.php?command=gedcom&gedid=".$gedarray["id"]);
 				$menu->submenus[count($menu->submenus)-1]->submenus[]=$submenu;
 			}
 		}
@@ -164,7 +164,7 @@ class MenuBar {
 		// NOTE: Print preview
 		$submenu = new Menu($gm_lang["print_preview"]);
 		// TODO: Querystring contains htmlcode, kills the JS
-		$submenu->addLink($SCRIPT_NAME."?view=preview&".GetQueryString());
+		$submenu->addLink($SCRIPT_NAME."?view=preview&".htmlentities(GetQueryString()));
 		$menu->addSubmenu($submenu);
 		
 		// NOTE: Logout link
@@ -231,7 +231,7 @@ class MenuBar {
 			foreach ($gm_language as $key=>$value) {
 				if ($language_settings[$key]["gm_lang_use"]) {
 					$submenu = new Menu($this->GetSubmenuText($gm_lang[$key], ($LANGUAGE == $key)), false);
-					$submenu->addLink($SCRIPT_NAME."?changelanguage=yes&NEWLANGUAGE=".$key."&".GetQueryString());
+					$submenu->addLink($SCRIPT_NAME."?changelanguage=yes&NEWLANGUAGE=".$key."&".htmlentities(GetQueryString()));
 					$menu->submenus[count($menu->submenus)-1]->submenus[]=$submenu;
 				}
 			}
@@ -290,95 +290,28 @@ class MenuBar {
 	}
 	
 	function GetFavoritesMenu() {
-		global $gm_lang, $gm_username, $GEDCOM, $REQUIRE_AUTHENTICATION, $GEDCOMID, $GEDCOMS;
-		global $SHOW_ID_NUMBERS, $SHOW_FAM_ID_NUMBERS, $TEXT_DIRECTION;
-		global $pid, $famid, $sid;
-		global $Privacy, $Favorites;
+		global $gm_lang, $gm_username, $REQUIRE_AUTHENTICATION;
+		global $Favorites, $GEDCOMID;
 		
 		// NOTE: Favorites
 		$menu = new Menu($gm_lang["menu_favorites"]);
 		
-		// NOTE: User Favorites
-		$username = $gm_username;
-		if (empty($pid)&&(!empty($famid))) $pid = $famid;
-		if (empty($pid)&&(!empty($sid))) $pid = $sid;
-		
-		
-		if (!empty($username)) {
+		if (!empty($gm_username)) {
 			$submenu = new Menu($gm_lang["my_favorites"]);
 			$menu->addSubmenu($submenu);
-			$userfavs = $Favorites->getUserFavorites($username);
+			$userfavs = $Favorites->getUserFavorites($gm_username);
 		}
 		else {
 			if ($REQUIRE_AUTHENTICATION) return false;
 			$userfavs = array();
 		}
 		
-		$mygedcom = $GEDCOM;
-		$mygedcomid = $GEDCOMID;
-		$mypid = $pid;
 		foreach($userfavs as $key => $favorite) {
-			SwitchGedcom($favorite->file);
-			if ($favorite->type=="SOUR" && $favorite->object->disp) {
-				if ($SHOW_ID_NUMBERS) $addid = " (".$favorite->gid.")";
-				else $addid = "";
-				$sourname = PrintReady(trim($favorite->object->title).$addid);
-				$submenu = new Menu($sourname, true);
-				$submenu->addLink("source.php?sid=".$favorite->gid."&ged=$GEDCOM");
-				$menu->submenus[count($menu->submenus)-1]->submenus[]=$submenu;
-			}
-			if (displayDetailsById($favorite->gid, $favorite->type, 1, true)) {
-				$indirec = FindGedcomRecord($favorite->gid);
-				if ($favorite->type=="INDI") {
-					if ($SHOW_ID_NUMBERS) $addid = " (".$favorite->gid.")";
-					else $addid = "";
-					$indiname = PrintReady(GetPersonName($favorite->gid, $indirec, false).$addid);
-					$submenu = new Menu($indiname);
-					$submenu->addLink("individual.php?pid=".$favorite->gid."&ged=$GEDCOM");
-					$menu->submenus[count($menu->submenus)-1]->submenus[]=$submenu;
-				}
-				if ($favorite->type=="FAM") {
-					if ($SHOW_FAM_ID_NUMBERS) $addid = " (".$favorite->gid.")";
-					else $addid = "";
-					$famname = PrintReady(GetFamilyDescriptor($favorite->gid, false, $indirec, false, false).$addid);
-					$submenu = new Menu($famname);
-					$submenu->addLink("family.php?famid=".$favorite->gid."&ged=$GEDCOM");
-					$menu->submenus[count($menu->submenus)-1]->submenus[]=$submenu;
-				}
-				if ($favorite->type=="OBJE") {
-					if ($SHOW_ID_NUMBERS) $addid = " (".$favorite->gid.")";
-					else $addid = "";
-					$medianame = PrintReady(GetMediaDescriptor($favorite->gid).$addid);
-					$submenu = new Menu($medianame);
-					$submenu->addLink("mediadetail.php?mid=".$favorite->gid."&ged=$GEDCOM");
-					$menu->submenus[count($menu->submenus)-1]->submenus[]=$submenu;
-				}
-				if ($favorite->type=="NOTE") {
-					if ($SHOW_ID_NUMBERS) $addid = " (".$favorite->gid.")";
-					else $addid = "";
-					$note_controller = new NoteController($favorite->gid);
-					// Note is deleted or doesn't exist
-					if (!$note_controller->note->isempty && $note_controller->note->disp) {
-						$notename = $note_controller->note->GetTitle(80, false).$addid;
-						$submenu = new Menu($notename);
-						$submenu->addLink("note.php?oid=".$favorite->gid."&gedid=$GEDCOMID");
-						$menu->submenus[count($menu->submenus)-1]->submenus[]=$submenu;
-					}
-				}
-			}
+			$submenu = new Menu($favorite->title);
+			$submenu->addLink($favorite->link);
+			$menu->submenus[count($menu->submenus)-1]->submenus[]=$submenu;
 		}
-		SwitchGedcom();
-		
-		// NOTE: Link to add new favorites
-		$pid = $mypid;
-		$GEDCOM = $mygedcom;
-		$GEDCOMID = $mygedcomid;
-		if ((!empty($username))&&(strpos($_SERVER["SCRIPT_NAME"], "individual.php")!==false)) {
-			$submenu = new Menu($gm_lang["add_to_my_favorites"]);
-			$submenu->addLink("individual.php?action=addfav&gid=$pid&pid=$pid");
-			$menu->addSubmenu($submenu);
-		}
-		
+			
 		// NOTE: Gedcom Favorites
 		$gedcomfavs = $Favorites->getGedcomFavorites($GEDCOMID);
 		if (count($gedcomfavs)>0) {
@@ -386,60 +319,9 @@ class MenuBar {
 			$menu->addSubmenu($submenu);
 			
 			foreach($gedcomfavs as $key => $favorite) {
-				if ($favorite->type=="URL" && !empty($favorite->url)) {
-					if (!empty($favorite->title)) $urlname = PrintReady($favorite->title);
-					else $urlname = $favorite->url;
-					$submenu = new Menu($urlname);
-					$submenu->addLink($favorite->url);
-					$menu->submenus[count($menu->submenus)-1]->submenus[]=$submenu;
-				}
-				elseif ($favorite->type=="SOUR" && $favorite->object->disp) {
-						if ($SHOW_ID_NUMBERS) $addid = " (".$favorite->gid.")";
-						else $addid = "";
-						$sourname = PrintReady(trim($favorite->object->title).$addid);
-						$submenu = new Menu($sourname);
-						$submenu->addLink("source.php?sid=".$favorite->gid."&gedid=$GEDCOMID");
-						$menu->submenus[count($menu->submenus)-1]->submenus[]=$submenu;
-				}
-				else if (displayDetailsById($favorite->gid, $favorite->type, 1, true)) {
-					$indirec = FindGedcomRecord($favorite->gid);
-					if ($favorite->type=="INDI") {
-						if ($SHOW_ID_NUMBERS) $addid = " (".$favorite->gid.")";
-						else $addid = "";
-						$indiname = PrintReady(GetPersonName($favorite->gid, $indirec, false).$addid);
-						$submenu = new Menu($indiname);
-						$submenu->addLink("individual.php?pid=".$favorite->gid."&ged=$GEDCOM");
-						$menu->submenus[count($menu->submenus)-1]->submenus[]=$submenu;
-					}
-					if ($favorite->type=="FAM") {
-						if ($SHOW_FAM_ID_NUMBERS) $addid = " (".$favorite->gid.")";
-						else $addid = "";
-						$famname = PrintReady(GetFamilyDescriptor($favorite->gid, false, $indirec, false, false).$addid);
-						$submenu = new Menu($famname);
-						$submenu->addLink("family.php?famid=".$favorite->gid."&ged=$GEDCOM");
-						$menu->submenus[count($menu->submenus)-1]->submenus[]=$submenu;
-					}
-					if ($favorite->type=="OBJE") {
-						if ($SHOW_ID_NUMBERS) $addid = " (".$favorite->gid.")";
-						else $addid = "";
-						$medianame = PrintReady(GetMediaDescriptor($favorite->gid).$addid);
-						$submenu = new Menu($medianame);
-						$submenu->addLink("mediadetail.php?mid=".$favorite->gid."&ged=$GEDCOM");
-						$menu->submenus[count($menu->submenus)-1]->submenus[]=$submenu;
-					}
-					if ($favorite->type=="NOTE") {
-						if ($SHOW_ID_NUMBERS) $addid = " (".$favorite->gid.")";
-						else $addid = "";
-						$note_controller = new NoteController($favorite->gid);
-						// Note is deleted or doesn't exist
-						if (!$note_controller->note->isempty && $note_controller->note->disp) {
-							$notename = $note_controller->note->GetTitle(80, false).$addid;
-							$submenu = new Menu($notename);
-							$submenu->addLink("note.php?oid=".$favorite->gid."&gedid=$GEDCOMID");
-							$menu->submenus[count($menu->submenus)-1]->submenus[]=$submenu;
-						}
-					}
-				}
+				$submenu = new Menu($favorite->title);
+				$submenu->addLink($favorite->link);
+				$menu->submenus[count($menu->submenus)-1]->submenus[]=$submenu;
 			}
 		}
 		
@@ -450,7 +332,7 @@ class MenuBar {
 	 * get the menu for the charts
 	 * @return Menu		the menu item
 	 */
-	function GetChartMenu($rootid='',$myid='') {
+	function GetChartsMenu($rootid='',$myid='') {
 		global $TEXT_DIRECTION, $GEDCOM, $gm_lang, $gm_username, $Users;
 		
 		//-- main charts menu item
@@ -745,27 +627,27 @@ class MenuBar {
 	}
 	
 	function GetThisPersonMenu(&$controller) {
-		global $gm_lang, $ALLOW_EDIT_GEDCOM;
+		global $gm_lang;
 		
 		//-- main edit menu item
 		$menu = new Menu($gm_lang["this_individual"]);
 		
 		// Charts menu
-		$submenu = $this->GetChartMenu($controller->pid);
+		$submenu = $this->GetChartsMenu($controller->xref);
 		$menu->addSubmenu($submenu);
 		
 		// Reports menu
-		$submenu = $this->GetReportMenu($controller->pid, "indi");
+		$submenu = $this->GetReportMenu($controller->xref, "indi");
 		if ($submenu) $menu->addSubmenu($submenu);
 		
 		// Edit menu
-		if ($controller->show_menu_edit && $ALLOW_EDIT_GEDCOM) {
+		if ($controller->indi->canedit || $controller->caneditown) {
 			$submenu = $controller->getEditMenu();
 			$menu->addSubmenu($submenu);
 		}
 		
 		// Other menu
-		if ($controller->show_menu_other) {
+		if ($controller->display_other_menu) {
 			$submenu = $controller->getOtherMenu();
 			$menu->addSubmenu($submenu);
 		}
@@ -785,7 +667,7 @@ class MenuBar {
 			$menu->addSubmenu($submenu);
 			
 			// Reports menu
-			$submenu = $this->GetReportMenu($controller->famid, "fam");
+			$submenu = $this->GetReportMenu($controller->xref, "fam");
 			if ($submenu) $menu->addSubmenu($submenu);
 			
 			// Edit menu
@@ -887,7 +769,7 @@ class MenuBar {
 	function GetThisNoteMenu(&$controller) {
 		global $gm_lang;
 		
-		if (!$controller->isempty && !$controller->note->deleted) {
+		if (!$controller->note->isempty && !$controller->note->isdeleted) {
 			//-- main edit menu item
 			$menu = new Menu($gm_lang["this_note"]);
 			

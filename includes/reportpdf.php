@@ -2309,7 +2309,7 @@ function GMRHighlightedImageSHandler($attrs) {
 		$media = FindHighlightedObject($id, $gedrec);
 		//print_r($media);
 		//print "<br /><br />";
-		$mfile = new MediaItem($media["id"]);
+		$mfile =& MediaItem::GetInstance($media["id"]);
 		//print_r($mfile);
 		//print "<br /><br />";
 		if ($mfile->fileobj->f_is_image) {
@@ -2506,7 +2506,7 @@ function GMRListSHandler($attrs) {
 				if ($vars["status"]["id"] == "action0") $select = "0";
 				else if ($vars["status"]["id"] == "action1") $select = "1";
 			}
-			$repo_obj = new Repository($vars["repo"]["id"]);
+			$repo_obj =& Repository::GetInstance($vars["repo"]["id"]);
 			if (isset($vars["repo"]) && !empty($vars["repo"]["id"])) $alist = $repo_obj->GetRepoActions($vars["repo"]["id"], $select);
 			else $alist = $Actionlist->GetActionList($select, true);
 			$list = array();

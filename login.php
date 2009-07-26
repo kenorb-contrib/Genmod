@@ -204,7 +204,9 @@ if ($USE_REGISTRATION_MODULE) {?>
 print "</div><br /><br />";
 ?>
 <script language="JavaScript" type="text/javascript">
+<!--
 	document.loginform.username.focus();
+//-->
 </script>
 <?php
 if ($type=="full") print_footer();

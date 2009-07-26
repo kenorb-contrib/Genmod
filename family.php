@@ -35,7 +35,7 @@ require_once 'includes/functions/functions_charts.php';
 
 $controller = new FamilyController();
 
-print_header($controller->getPageTitle());
+print_header($controller->pagetitle);
 
 $controller->CheckNoResult($gm_lang["family_not_found"]);
 
@@ -54,7 +54,7 @@ $controller->CheckRawEdited();
 		print "</p>\r\n";
 
 		print PrintFamilyParents($controller->family);
-		if (!$controller->isPrintPreview() && $controller->display && $controller->family->canedit) {
+		if (!$controller->isPrintPreview() && $controller->family->disp && $controller->family->canedit) {
 		if (!is_object($controller->family->husb) && !$controller->family->isdeleted) { ?>
 			<?php print_help_link("edit_add_parent_help", "qm"); ?> 
 			<a href="javascript <?php print $gm_lang["add_father"]; ?>" onclick="return addnewparentfamily('', 'HUSB', '<?php print $controller->family->xref; ?>', 'add_father');"><?php print $gm_lang["add_father"]; ?></a><br />
@@ -67,7 +67,7 @@ $controller->CheckRawEdited();
 		?></td>
 		<td valign="top">
 			<div class="accesskeys">
-				<a class="accesskeys" href="<?php print 'timeline.php?pids[0]=' . $controller->parents['HUSB'].'&amp;pids[1]='.$controller->parents['WIFE'];?>" title="<?php print $gm_lang['parents_timeline'] ?>" tabindex="-1" accesskey="<?php print $gm_lang['accesskey_family_parents_timeline']; ?>"><?php print $gm_lang['parents_timeline'] ?></a>
+				<a class="accesskeys" href="<?php print 'timeline.php?pids[0]=' . $controller->family->husb_id.'&amp;pids[1]='.$controller->family->wife_id;?>" title="<?php print $gm_lang['parents_timeline'] ?>" tabindex="-1" accesskey="<?php print $gm_lang['accesskey_family_parents_timeline']; ?>"><?php print $gm_lang['parents_timeline'] ?></a>
 				<a class="accesskeys" href="<?php print 'timeline.php?' . $controller->getChildrenUrlTimeline();?>" title="<?php print $gm_lang["children_timeline"] ?>" tabindex="-1" accesskey="<?php print $gm_lang['accesskey_family_children_timeline']; ?>"><?php print $gm_lang['children_timeline'] ?></a>
 				<a class="accesskeys" href="<?php print 'timeline.php?pids[0]=' .$controller->family->husb_id.'&amp;pids[1]='.$controller->family->wife_id.'&amp;'.$controller->getChildrenUrlTimeline(2);?>" title="<?php print $gm_lang['family_timeline'] ?>" tabindex="-1" accesskey="<?php print $gm_lang['accesskey_family_timeline']; ?>"><?php print $gm_lang['family_timeline'] ?></a>
 				<?php if ($Users->userCanViewGedlines()) { ?>

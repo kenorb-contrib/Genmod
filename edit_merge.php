@@ -443,7 +443,9 @@ if ($action=="choose") {
 	print "</div>";
 	?>
 	<script language="JavaScript" type="text/javascript">
+	<!--
 		merge.gid1.focus();
+	//-->
 	</script>
 	<?php
 }

@@ -143,6 +143,7 @@ if ($action=="edituser2") {
 //-- print the form to edit a user
 ?>
 <script language="JavaScript" type="text/javascript">
+<!--
 	function checkform(frm) {
 		if (frm.username.value=="") {
 			alert("<?php print $gm_lang["enter_username"]; ?>");
@@ -171,6 +172,7 @@ if ($action=="edituser2") {
 		pastefield.value=value;
 		pastefield.focus();
 	}
+//-->
 </script>
 <form name="editform" method="post" action="" onsubmit="return checkform(this);">
 <input type="hidden" name="action" value="edituser2" />

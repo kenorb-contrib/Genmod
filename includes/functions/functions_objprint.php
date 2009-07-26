@@ -85,7 +85,7 @@ function PrintPedigreePerson($person, $style=1, $show_famlink=true, $count=0, $p
 	
 	$random = rand();
 	if ($person->disp_name) {
-		if ($show_famlink) {
+		if ($show_famlink && $view == "") {
 			// NOTE: Go ahead if we can show the popup box for the links to other pages and family members
 			if ($LINK_ICONS!="disabled") {
 				// NOTE: draw a popup box for the links to other pages and family members
@@ -147,8 +147,8 @@ function PrintPedigreePerson($person, $style=1, $show_famlink=true, $count=0, $p
 	// NOTE: determine what mouse behavior to add
 	if ($ZOOM_BOXES != "disabled" && !$show_full && $person->disp_name) {
 		if ($ZOOM_BOXES == "mouseover") print " onmouseover=\"expandbox('".$person->xref.".".$personcount.".".$count."', $style, '".$random."'); return false;\" onmouseout=\"restorebox('".$person->xref.".".$personcount.".".$count."', $style, '".$random."'); return false;\"";
-		if ($ZOOM_BOXES == "mousedown") print " onmousedown=\"expandbox('".$person->xref.".".$personcount.".".$count."', $style, '".$random."');\" onmouseup=\"restorebox('".$person->xref.".".$personcount.".".$count."', $style, '".$random."');\"";
-		if ($ZOOM_BOXES == "click" && $how->famlink) print " onclick=\"expandbox('".$person->xref.".".$personcount.".".$count."', $style, '".$random."');\"";
+		elseif ($ZOOM_BOXES == "mousedown") print " onmousedown=\"expandbox('".$person->xref.".".$personcount.".".$count."', $style, '".$random."');\" onmouseup=\"restorebox('".$person->xref.".".$personcount.".".$count."', $style, '".$random."');\"";
+		elseif ($ZOOM_BOXES == "click") print " onclick=\"expandbox('".$person->xref.".".$personcount.".".$count."', $style, '".$random."');\"";
 	}
 	print ">";
 	
@@ -157,7 +157,7 @@ function PrintPedigreePerson($person, $style=1, $show_famlink=true, $count=0, $p
 		$object = $person->highlightedimage;
 		// NOTE: Print the pedigree tumbnail
 		if (!empty($object["thumb"])) {
-			$media = New MediaItem($object["id"]);
+			$media =& MediaItem::GetInstance($object["id"]);
 			// NOTE: IMG ID
 			$class = "pedigree_image_portrait";
 			if ($media->fileobj->f_width > $media->fileobj->f_height) $class = "pedigree_image_landscape";
@@ -355,9 +355,9 @@ function PrintPedigreePerson($person, $style=1, $show_famlink=true, $count=0, $p
 			// NOTE: Zoom icon
 			if ($ZOOM_BOXES != "disabled" && $show_full && !$view && ($person->disp_name)) {
 				print "<a href=\"javascript: ".$gm_lang["zoom_box"]."\"";
-				if ($ZOOM_BOXES=="mouseover") print " onmouseover=\"expandbox('".$person->xref.".".$personcount.".".$count."', $style, '".$random."'); if(document.getElementById('inout-".$person->xref.".".$personcount.".".$count.".".$random."').innerHTML=='') sndReq('inout-".$person->xref.".".$personcount.".".$count.".".$random."', 'getzoomfacts', 'pid', '".$person->xref."', 'canshow', '".$canshow."', 'view', '".$view."');\" onmouseout=\"restorebox('".$person->xref.".".$personcount.".".$count."', $style, '".$random."');\" onclick=\"return false;\"";
-				if ($ZOOM_BOXES=="mousedown") print " onmousedown=\"expandbox('".$person->xref.".".$personcount.".".$count."', $style, '".$random."'); if(document.getElementById('inout-".$person->xref.".".$personcount.".".$count.".".$random."').innerHTML=='') sndReq('inout-".$person->xref.".".$personcount.".".$count.".".$random."', 'getzoomfacts', 'pid', '".$person->xref."', 'canshow', '".$canshow."', 'view', '".$view."');\" onmouseup=\"restorebox('".$person->xref.".".$personcount.".".$count."', $style, '".$random."');\" onclick=\"return false;\"";
-				if ($ZOOM_BOXES=="click") print " onclick=\"expandbox('".$person->xref.".".$personcount.".".$count."', $style, '".$random."'); if(document.getElementById('inout-".$person->xref.".".$personcount.".".$count.".".$random."').innerHTML=='') sndReq('inout-".$person->xref.".".$personcount.".".$count.".".$random."', 'getzoomfacts', 'pid', '".$person->xref."', 'canshow', '".$canshow."', 'view', '".$view."'); return false;\"";
+				if ($ZOOM_BOXES=="mouseover") print " onmouseover=\"expandbox('".$person->xref.".".$personcount.".".$count."', $style, '".$random."'); if(document.getElementById('inout-".$person->xref.".".$personcount.".".$count.".".$random."').innerHTML=='') sndReq('inout-".$person->xref.".".$personcount.".".$count.".".$random."', 'getzoomfacts', 'pid', '".$person->xref."', 'gedcomid', '".$person->gedcomid."', 'canshow', '".$canshow."', 'view', '".$view."');\" onmouseout=\"restorebox('".$person->xref.".".$personcount.".".$count."', $style, '".$random."');\" onclick=\"return false;\"";
+				if ($ZOOM_BOXES=="mousedown") print " onmousedown=\"expandbox('".$person->xref.".".$personcount.".".$count."', $style, '".$random."'); if(document.getElementById('inout-".$person->xref.".".$personcount.".".$count.".".$random."').innerHTML=='') sndReq('inout-".$person->xref.".".$personcount.".".$count.".".$random."', 'getzoomfacts', 'pid', '".$person->xref."', 'gedcomid', '".$person->gedcomid."', 'canshow', '".$canshow."', 'view', '".$view."');\" onmouseup=\"restorebox('".$person->xref.".".$personcount.".".$count."', $style, '".$random."');\" onclick=\"return false;\"";
+				if ($ZOOM_BOXES=="click") print " onclick=\"expandbox('".$person->xref.".".$personcount.".".$count."', $style, '".$random."'); if(document.getElementById('inout-".$person->xref.".".$personcount.".".$count.".".$random."').innerHTML=='') sndReq('inout-".$person->xref.".".$personcount.".".$count.".".$random."', 'getzoomfacts', 'pid', '".$person->xref."', 'gedcomid', '".$person->gedcomid."', 'canshow', '".$canshow."', 'view', '".$view."'); return false;\"";
 				print "><img id=\"iconz-".$person->xref.".".$personcount.".".$count."\" src=\"".$GM_IMAGE_DIR."/".$GM_IMAGES["zoomin"]["other"]."\" width=\"25\" height=\"25\" border=\"0\" alt=\"".$gm_lang["zoom_box"]."\" title=\"".$gm_lang["zoom_box"]."\" /></a>";
 			}
 			// NOTE: Popup box icon (don't show if the person is private)
@@ -402,7 +402,7 @@ function PrintPedigreePerson($person, $style=1, $show_famlink=true, $count=0, $p
  * @param string $gparid optional gd-parent ID (descendancy booklet)
  */
 function PrintFamilyParents(&$family, $sosa = 0, $label="", $parid="", $gparid="", $personcount="1") {
-	global $gm_lang, $view, $show_full, $show_famlink;
+	global $gm_lang, $view, $show_full;
 	global $TEXT_DIRECTION, $SHOW_EMPTY_BOXES;
 	global $pbwidth, $pbheight;
 	global $GM_IMAGE_DIR, $GM_IMAGES;
@@ -425,7 +425,7 @@ function PrintFamilyParents(&$family, $sosa = 0, $label="", $parid="", $gparid="
 	}
 	elseif ($family->husb_status == "new" || $family->husb_status == "changed") $style = " class=\"facts_valueblue\""; 
 	print "\n\t<td style=\"vertical-align:middle;\"".$style.">";
-	PrintPedigreePerson($family->$husb, 1, $show_famlink, 2, $personcount);
+	PrintPedigreePerson($family->$husb, 1, true, 1, $personcount, $family->view);
 	print "</td></tr></table>";
 	print "</td>\n";
 	
@@ -450,7 +450,7 @@ function PrintFamilyParents(&$family, $sosa = 0, $label="", $parid="", $gparid="
 			if ($sosa > 0) PrintSosaNumber($sosa * 4);
 			if (is_object($fath) && $fath->xref == $gparid) PrintSosaNumber(trim(substr($label,0,-3),".").".");
 			print "\n\t<td style=\"vertical-align:middle;\">";
-			PrintPedigreePerson($fath, 1, $show_famlink, 4, $personcount);
+			PrintPedigreePerson($fath, 1, true, 1, $personcount, $family->view);
 			print "</td></tr></table>";
 //		}
 		print "</td>";
@@ -468,7 +468,7 @@ function PrintFamilyParents(&$family, $sosa = 0, $label="", $parid="", $gparid="
 		if ($sosa > 0) PrintSosaNumber($sosa * 4 + 1);
 		if (is_object($moth) && $moth->xref == $gparid) PrintSosaNumber(trim(substr($label,0,-3),".").".");
 		print "\n\t<td style=\"vertical-align:middle;\">";
-		PrintPedigreePerson($moth, 1, $show_famlink, 4, $personcount);
+		PrintPedigreePerson($moth, 1, true, 1, $personcount, $family->view);
 		print "</td></tr></table>";
 		print "</td>\n";
 	}
@@ -502,7 +502,7 @@ function PrintFamilyParents(&$family, $sosa = 0, $label="", $parid="", $gparid="
 	}
 	elseif ($family->wife_status == "new" || $family->wife_status == "changed") $style = " class=\"facts_valueblue\""; 
 	print "\n\t<td style=\"vertical-align:middle;\"".$style.">";
-	PrintPedigreePerson($family->$wife, 1, $show_famlink, 2, $personcount);
+	PrintPedigreePerson($family->$wife, 1, true, 1, $personcount, $family->view);
 	print "</td></tr></table>";
 	print "</td>\n";
 	
@@ -527,7 +527,7 @@ function PrintFamilyParents(&$family, $sosa = 0, $label="", $parid="", $gparid="
 			if ($sosa > 0) PrintSosaNumber($sosa * 4 + 2);
 			if (is_object($fath) && $fath->xref == $gparid) PrintSosaNumber(trim(substr($label,0,-3),".").".");
 			print "\n\t<td style=\"vertical-align:middle;\">";
-			PrintPedigreePerson($fath, 1, $show_famlink, 4, $personcount);
+			PrintPedigreePerson($fath, 1, true, 1, $personcount, $family->view);
 			print "</td></tr></table>";
 //		}
 		print "</td>\n";
@@ -545,7 +545,7 @@ function PrintFamilyParents(&$family, $sosa = 0, $label="", $parid="", $gparid="
 		if ($sosa > 0) PrintSosaNumber($sosa * 4 + 1);
 		if (is_object($moth) && $moth->xref == $gparid) PrintSosaNumber(trim(substr($label,0,-3),".").".");
 		print "\n\t<td style=\"vertical-align:middle;\">";
-		PrintPedigreePerson($moth, 1, $show_famlink, 4, $personcount);
+		PrintPedigreePerson($moth, 1, true, 1, $personcount, $family->view);
 		print "</td></tr></table>";
 		print "</td>\n";
 	}
@@ -590,7 +590,7 @@ function PrintFamilyChildren($family, $childid = "", $sosa = 0, $label="", $pers
 				
 				print "<td ".$style."style=\"vertical-align:middle;\" >";
 				print GetPediName($chil->famc[$family->xref]["relation"], $chil->sex);
-				PrintPedigreePerson($chil, 1, $show_famlink, 1, $personcount, $chil->view);
+				PrintPedigreePerson($chil, 1, true, 1, $personcount, $chil->view);
 				$personcount++;
 				print "</td>";
 /*				if ($sosa != 0) {

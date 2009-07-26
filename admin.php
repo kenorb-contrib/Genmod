@@ -47,10 +47,11 @@ if ($action == "loadlanguage" && isset($language)) {
 print_header($gm_lang["administration"]);
 ?>
 <script type="text/javascript">
-
+<!--
 function reload() {
 	window.location.reload();
 }
+//-->
 </script>
 <?php
 

@@ -30,17 +30,16 @@ if (stristr($_SERVER["SCRIPT_NAME"],basename(__FILE__))) {
 
 class Blocks {
 	
-	var $classname = "Blocks";
-	var $main = array();
-	var $right = array();
-	var $id = NULL;
-	var $type = "gedcom";
-	var $username = "";
-	var $gedid = NULL;
-	var $welcome_block_present = false;
-	var $gedcom_block_present = false;
-	var $top10_block_present = false;
-	var $login_block_present = false;
+	public $classname = "Blocks";			// Name of this class
+	public $main = array();					// Array of block for the main part of the page
+	public $right = array();				// Array of blocks for the right part of the page
+	public $type = "gedcom";				// What type: gedcom or user
+	public $username = "";					// Username for user blocks, blank for gedcom blocks
+	public $gedid = null;					// Gedcom ID in which the blocks exist
+	public $welcome_block_present = false;	// Switch to indicate if the welcome block is present
+	public $gedcom_block_present = false;	// Switch to indicate if the gedcom block is present
+	public $top10_block_present = false;	// Switch to indicate if the top10 block is present
+	public $login_block_present = false;	// Switch to indicate if the login block is present
 	
 	public function __construct($type, $id="", $action="") {
 		global $GEDCOMID;

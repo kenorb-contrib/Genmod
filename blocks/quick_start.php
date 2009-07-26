@@ -106,8 +106,8 @@ function print_quickstart_block($block = true, $config="", $side, $index) {
 	print "</td></tr>";
 	print "</table></form>\n";
 	print "</div>";
-	print "<script language=\"JavaScript\" type=\"text/javascript\">";
-	print "document.searchform.lastname.focus()";
+	print "<script language=\"JavaScript\" type=\"text/javascript\"><!--\n";
+	print "document.searchform.lastname.focus();\n//-->\n";
 	print "</script>";
 
 }

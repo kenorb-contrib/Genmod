@@ -63,7 +63,9 @@ class SearchHelp {
 	function AddFooter() {
 		?>
 		<script language="JavaScript" type="text/javascript">
+		<!--
 			document.entersearch.searchtext.focus();
+		//-->
 		</script>
 		<?php
 		print_simple_footer();
