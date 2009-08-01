@@ -494,7 +494,7 @@ function print_family_children($famid, $childid = "", $sosa = 0, $label="", $per
  * @param string $famid family gedcom ID
  * @param int $sosa optional child sosa number
  */
-function PrintFamilyFacts($famid, $sosa = 0, $mayedit=true) {
+/*function PrintFamilyFacts($famid, $sosa = 0, $mayedit=true) {
 	global $gm_lang, $pbwidth, $pbheight, $view, $hits;
 	global $nonfacts, $factarray;
 	global $TEXT_DIRECTION, $GEDCOM, $SHOW_ID_NUMBERS, $SHOW_FAM_ID_NUMBERS;
@@ -708,7 +708,7 @@ function PrintFamilyFacts($famid, $sosa = 0, $mayedit=true) {
 		print "\n\t</table>\n";
 	}
 }
-
+*/
 /**
  * print a family with Sosa-Stradonitz numbering system
  * ($rootid=1, father=2, mother=3 ...)
@@ -732,7 +732,7 @@ function PrintSosaFamily($famid, $childid, $sosa, $label="", $parid="", $gparid=
 	print "<table width=\"95%\"><tr><td valign=\"top\" style=\"width: " . ($pbwidth) . "px;\">\n";
 	print_family_children($famid, $childid, $sosa, $label, $personcount);
 	print "</td><td valign=\"top\">";
-	if ($sosa == 0) PrintFamilyFacts($famid, $sosa);
+//	if ($sosa == 0) PrintFamilyFacts($famid, $sosa);
 	print "</td></tr></table>\n";
 	print "<br />";
 }

@@ -45,7 +45,7 @@ require("config.php");
 
 print_header($gm_lang["actionlist"]);
 
-if (!$Users->userGedcomAdmin($gm_username)) {
+if (!$Users->ShowActionLog($gm_username)) {
 	print "<span class=\"error\">".$gm_lang["access_denied"]."</span>";
 	print_footer();
 	exit;
@@ -90,7 +90,7 @@ if ($view != "preview") {
 }
        
 // Get the data
-$actionlist = $Actions->GetActionList($status, true);
+$actionlist = $Actions->GetActionList($status, $sort == "repo");
 print "<br />";
 
 if (count($actionlist) == 0) {
@@ -100,47 +100,30 @@ else {
 	print "<div class=\"width90 center\"><table class=\"$TEXT_DIRECTION center\">";
 	if ($sort == "person") {
 		print "<tr><td class=\"shade2\">".$gm_lang["action_for_id"]."</td><td class=\"shade2\">".$gm_lang["repo"]."</td><td class=\"shade2\">".$gm_lang["status"]."</td><td class=\"shade2\">".$gm_lang["description"]."</td></tr>";
-		// Get the pids
-		$pidlist = array();
-		foreach ($actionlist as $key => $action) {
-			if (!empty($action->pid)) $pidlist[] = $action->pid;
-		}
-		$pidlist = array_flip(array_flip($pidlist));
-		$pidlist = implode("[".$GEDCOMID."]','", $pidlist);
-		$pidlist .= "[".$GEDCOMID."]'";
-		$pidlist = "'".$pidlist;
-	
-		$indis = GetIndiList("no", $pidlist);
-		uasort($indis, "ItemSort");
-		// First print the actions without pid.
 		foreach($actionlist as $key => $action) {
-			if (empty($action->pid)) {
-				print "<tr><td class=\"shade1\">&nbsp;</td><td class=\"shade1\"><a href=\"repo.php?rid=".$action->repo."\">".GetRepoDescriptor($action->repo)."</a></td><td class=\"shade1\">".$gm_lang["action".$action->status]."</td><td class=\"shade1 wrap\">".nl2br(stripslashes($action->text))."</td></tr>";
-			}
-		}
-		// Now scan the indilist and print the action records that belong to it
-		foreach($indis as $ipid=>$indi) {
-			foreach($actionlist as $key => $action) {
-				if ($action->pid == $ipid) {
-					print "<tr><td class=\"shade1 wrap\">";
-					print_list_person($action->pid, array(CheckNN(GetSortableName($action->pid)), $GEDCOM), false, "", false);
-					print "</td><td class=\"shade1 wrap\">";
-					if (!empty($action->repo)) print "<a href=\"repo.php?rid=".$action->repo."\">".GetRepoDescriptor($action->repo)."</a>";
-					else print "&nbsp;";
-					print "</td><td class=\"shade1\">".$gm_lang["action".$action->status]."</td><td class=\"shade1 wrap\">".nl2br(stripslashes($action->text))."</td></tr>";
-				}
+			if ($action->disp) {
+				print "<tr><td class=\"shade1 wrap\">";
+				if (is_object($action->indi_obj)) $action->indi_obj->PrintListPerson(false, true);
+				else print "&nbsp;";
+				print "</td><td class=\"shade1 wrap\">";
+				if (is_object($action->repo_obj)) $action->repo_obj->PrintListRepository(false, false);
+				else print "&nbsp;";
+				print "</td><td class=\"shade1\">".$gm_lang["action".$action->status]."</td><td class=\"shade1 wrap\">".nl2br(stripslashes($action->text))."</td></tr>";
 			}
 		}
 	}
 	if ($sort == "repo") {
 		print "<tr><td class=\"shade2\">".$gm_lang["repo"]."</td><td class=\"shade2\">".$gm_lang["action_for_id"]."</td><td class=\"shade2\">".$gm_lang["status"]."</td><td class=\"shade2\">".$gm_lang["description"]."</td></tr>";
 		foreach($actionlist as $key => $action) {
-			print "<tr><td class=\"shade1 wrap\">";
-			if (!empty($action->repo)) print "<a href=\"repo.php?rid=".$action->repo."\">".GetRepoDescriptor($action->repo)."</a>";
-			else print "&nbsp;";
-			print "</td><td class=\"shade1 wrap\">";
-					print_list_person($action->pid, array(CheckNN(GetSortableName($action->pid)), $GEDCOM), false, "", false);
-			print "</td><td class=\"shade1\">".$gm_lang["action".$action->status]."</td><td class=\"shade1 wrap\">".nl2br(stripslashes($action->text))."</td></tr>";
+			if ($action->disp) {
+				print "<tr><td class=\"shade1 wrap\">";
+				if (is_object($action->repo_obj)) $action->repo_obj->PrintListRepository(false, false);
+				else print "&nbsp;";
+				print "</td><td class=\"shade1 wrap\">";
+				if (is_object($action->indi_obj)) $action->indi_obj->PrintListPerson(false, true);
+				else print "&nbsp;";
+				print "</td><td class=\"shade1\">".$gm_lang["action".$action->status]."</td><td class=\"shade1 wrap\">".nl2br(stripslashes($action->text))."</td></tr>";
+			}
 		}
 	}
 	print "</table></div>";

@@ -558,7 +558,7 @@ class MenuBar {
 			$menu->addSubmenu($submenu);
 		}
 		//-- Actionlist (admins only!)
-		if (file_exists("actionlist.php") && $Users->userGedcomAdmin($Users->GetUserName(), $GEDCOM)) {
+		if (file_exists("actionlist.php") && $Users->ShowActionLog($Users->GetUserName())) {
 			$submenu = new Menu($gm_lang["actionlist"]);
 			$submenu->addLink("actionlist.php");
 			$menu->addSubmenu($submenu);

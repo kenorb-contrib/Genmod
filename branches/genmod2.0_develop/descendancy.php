@@ -194,6 +194,8 @@ function print_family_descendancy($pid, $famid, $depth) {
 }
 
 // -- args
+if (isset($show_details)) $show_full = ($show_details == 1 ? 1 : 0);
+else $show_details = ($PEDIGREE_FULL_DETAILS == 1 ? 1 : -1);
 if (!isset($show_full)) $show_full=$PEDIGREE_FULL_DETAILS;
 if (!isset($chart_style)) $chart_style = 0;
 if ($chart_style=="") $chart_style = 0;
@@ -314,14 +316,14 @@ if ($view!="preview") {
 
 	// NOTE: show full
 	print "<td class=\"shade2\">";
-	print "<input type=\"hidden\" name=\"show_full\" value=\"$show_full\" />";
+	print "<input type=\"hidden\" name=\"show_details\" value=\"$show_details\" />";
 	print_help_link("show_full_help", "qm");
 	print $gm_lang["show_details"];
 	print "</td>";
 	print "<td class=\"shade1 vmiddle\">";
 	print "<input type=\"checkbox\" value=\"";
-	if ($show_full) print "1\" checked=\"checked\" onclick=\"document.people.show_full.value='0';\"";
-	else print "0\" onclick=\"document.people.show_full.value='1';\"";
+	if ($show_full) print "1\" checked=\"checked\" onclick=\"document.people.show_details.value='0';\"";
+	else print "0\" onclick=\"document.people.show_details.value='1';\"";
 	print " />";
 	print "</td></tr>";
 

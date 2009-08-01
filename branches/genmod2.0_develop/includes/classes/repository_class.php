@@ -223,26 +223,30 @@ class Repository extends GedcomRecord {
 		$this->actioncount = $this->action_open + $this->action_closed;
 	}
 	
-	public function PrintListRepository() {
+	public function PrintListRepository($useli=true, $prtact=true) {
 		global $TEXT_DIRECTION;
 
-		if (begRTLText($this->title)) print "\n\t\t\t<li class=\"rtl\" dir=\"rtl\">";
-		else print "\n\t\t\t<li class=\"ltr\" dir=\"ltr\">";
+		if ($useli) {
+			if (begRTLText($this->title)) print "\n\t\t\t<li class=\"rtl\" dir=\"rtl\">";
+			else print "\n\t\t\t<li class=\"ltr\" dir=\"ltr\">";
+		}
 
 		print "<a href=\"repo.php?rid=".$this->xref."&amp;gedid=".$this->gedcomid."\" class=\"list_item\">";
-		print PrintReady($this->title);
+		print PrintReady($this->GetTitle());
 		print $this->addxref;
 		
-		if ($this->action_closed > 0) {
-			if ($TEXT_DIRECTION=="ltr") print "<span class=\"error\"> &lrm;(".$this->action_closed.")&lrm;</span>";
-			else print "<span class=\"error\"> &rlm;(".$this->action_closed.")&rlm;</span>";
-		}
-		if ($this->action_open > 0) {
-			if ($TEXT_DIRECTION=="ltr") print "<span class=\"okay\"> &lrm;(".$this->action_open.")&lrm;</span>";
-			else print "<span class=\"okay\"> &rlm;(".$this->action_open.")&rlm;</span>";
-		}
-			
-		print "</a></li>\n";
+		if ($prtact) {
+			if ($this->action_closed > 0) {
+				if ($TEXT_DIRECTION=="ltr") print "<span class=\"error\"> &lrm;(".$this->action_closed.")&lrm;</span>";
+				else print "<span class=\"error\"> &rlm;(".$this->action_closed.")&rlm;</span>";
+			}
+			if ($this->action_open > 0) {
+				if ($TEXT_DIRECTION=="ltr") print "<span class=\"okay\"> &lrm;(".$this->action_open.")&lrm;</span>";
+				else print "<span class=\"okay\"> &rlm;(".$this->action_open.")&rlm;</span>";
+			}
+		}			
+		print "</a>\n";
+		if ($useli) print "</li>\n";
 	}
 }
 ?>

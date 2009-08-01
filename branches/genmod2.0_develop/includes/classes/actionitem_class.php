@@ -36,9 +36,13 @@ class ActionItem {
 	// Data
 	private $id = 0;					// The ID of this item in the database
 	private $pid = null;				// The xref of the person that this action relates to
+	private $indi_obj = null;			// The person object
+	private $indi_disp = null;		 	// Can we display the person
 	private $gedfile = "";				// The gedfile ID in which this action exists
 	private $text = "";					// Text for the item
 	private $repo = null;				// The xref of the repository that this action relates to
+	private $repo_obj = null;			// The repository object
+	private $repo_disp = null;			// Can we display the repository
 	private $status = 0;				// Status 0 = closed or 1 = open
 	private $disp = null;				// If we can display both the individual and the repository related to this action
 	private $canshow = null;			// If we can show actions at all
@@ -49,8 +53,6 @@ class ActionItem {
 	public function __construct($values="", $me="") {
 		global $Users;
 		
-		$this->canshow = $Users->ShowActionLog();
-		
 		if (is_array($values)) {
 			$this->id = $values["a_id"];
 			$this->pid = $values["a_pid"];
@@ -60,6 +62,7 @@ class ActionItem {
 			$this->status = $values["a_status"];
 		}
 		
+		$this->canShow();
 		if (!empty($me) && ($me == $this->pid || $me == $this->repo)) $this->me = $me;
 	}
 
@@ -90,8 +93,14 @@ class ActionItem {
 				case "repodesc":
 					return $this->GetRepoDesc();
 					break;
+				case "repo_obj":
+					return $this->getRepoObj();
+					break;
 				case "indidesc":
 					return $this->GetIndiDesc();
+					break;
+				case "indi_obj":
+					return $this->getIndiObj();
 					break;
 			}
 		}
@@ -119,30 +128,59 @@ class ActionItem {
 		}
 	}
 	
+	private function getIndiObj() {
+		
+		if (!is_object($this->indi_obj) && $this->pid != "") {
+			$this->indi_obj =& Person::GetInstance($this->pid);
+		}
+		return $this->indi_obj;
+	}
+	
+	private function getRepoObj() {
+		
+		if (!is_object($this->repo_obj) && $this->repo != "") {
+			$this->repo_obj =& Repository::GetInstance($this->repo);
+		}
+		return $this->repo_obj;
+	}
+	
 	private function canDisplay() {
 		
-		if (!is_null($this->disp)) return $this->disp;
-		
-		if (is_null($this->me)) {
-			if (!DisplayDetailsByID($this->pid, "INDI", 1, true)) $this->disp = false;
-			else if (!DisplayDetailsByID($this->repo, "REPO", 1, true)) $this->disp = false;
+		if (is_null($this->disp)) {
+			
+			if ($this->pid != "" && !is_object($this->indi_obj)) $this->getIndiObj();
+			if (is_object($this->indi_obj)) $this->indi_disp = $this->indi_obj->disp;
+			else $this->indi_disp = true;
+			
+			if ($this->repo != "" && !is_object($this->repo_obj)) $this->getRepoObj();
+			if (is_object($this->repo_obj)) $this->repo_disp = $this->repo_obj->disp;
+			else $this->repo_disp = true;
+			
+			if (is_null($this->me)) {
+				if (!$this->indi_disp) $this->disp = false;
+				else if (!$this->repo_disp) $this->disp = false;
+				else $this->disp = true;
+			}
+			else if ($this->repo == $this->me) {
+				$this->disp = $this->indi_disp;
+			}
+			else if ($this->pid == $this->me) {
+				$this->disp = $this->repo_disp;
+			}
+			else if (!$this->indi_disp || !$this->repo_disp) $this->disp = false;
 			else $this->disp = true;
-			return $this->disp;
 		}
-		else if ($this->repo == $this->me) $this->disp = DisplayDetailsByID($this->pid, "INDI", 1, true);
-		else if ($this->pid == $this->me) $this->disp = DisplayDetailsByID($this->repo, "REPO", 1, true);
-		else if (!DisplayDetailsByID($this->pid, "INDI", 1, true) || !DisplayDetailsByID($this->repo, "REPO", 1, true)) $this->disp = false;
-		else $this->disp = true;
 		return $this->disp;
 	}
 		
-	private function GetRepoDesc() {
+	private function getRepoDesc() {
 		
 		if (is_null($this->repodesc)) {
 			if (is_null($this->repo) || empty($this->repo)) $this->repodesc = "";
 			else {
-				$repo =& Repository::GetInstance($this->repo);
-				$this->repodesc = $repo->title;	
+				if (!is_object($this->repo_obj)) $this->getRepoObj();
+				if (is_object($this->repo_obj)) $this->repodesc = $this->repo_obj->title;
+				else $this->repodesc = "";
 			}
 		}
 		return $this->repodesc;
@@ -153,13 +191,21 @@ class ActionItem {
 		if (is_null($this->indidesc)) {
 			if (is_null($this->pid) || empty($this->pid)) $this->indidesc = "";
 			else {
-				$indi =& Person::GetInstance($this->pid);
-				$this->indidesc = $indi->name;
+				if (!is_object($this->indi_obj)) $this->getIndiObj();
+				if (is_object($this->indi_obj)) $this->indidesc = $this->indi_obj->sortable_name;
+				else $this->indidesc = "";
 			}
 		}
 		return $this->indidesc;
 	}
-	
+
+	private function canShow() {
+		global $Users;
+		
+		if (is_null($this->canshow)) $this->canshow = $Users->ShowActionLog();
+		return $this->canshow;
+	}
+ 	
 	public function AddThis() {
 		global $GEDCOMID, $TBLPREFIX, $DBCONN;
 		

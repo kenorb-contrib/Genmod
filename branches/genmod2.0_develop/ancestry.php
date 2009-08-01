@@ -102,7 +102,8 @@ function print_child_ascendancy($pid, $sosa, $depth) {
 }
 
 // -- args
-
+if (isset($show_details)) $show_full = ($show_details == 1 ? 1 : 0);
+else $show_details = ($PEDIGREE_FULL_DETAILS == 1 ? 1 : -1);
 if (!isset($show_full)) $show_full = $PEDIGREE_FULL_DETAILS;
 if ($show_full == "") $show_full = 0;
 if (!isset($chart_style)) $chart_style = 0;
@@ -176,7 +177,7 @@ if ($view != "preview") {
 	if (isset($min_generation) == true) print "<span class=\"error\">" . $gm_lang["min_generation"] . "</span>";
 	print "\n\t</td><td><form name=\"people\" id=\"people\" method=\"get\" action=\"?\">";
 	print "<input type=\"hidden\" name=\"chart_style\" value=\"$chart_style\" />";
-	print "<input type=\"hidden\" name=\"show_full\" value=\"$show_full\" />";
+	print "<input type=\"hidden\" name=\"show_details\" value=\"$show_details\" />";
 	print "<input type=\"hidden\" name=\"show_cousins\" value=\"$show_cousins\" />";
 	print "\n\t\t<table class=\"list_table $TEXT_DIRECTION\">\n\t\t";
 
@@ -252,14 +253,14 @@ if ($view != "preview") {
 
 	// NOTE: show full
 	print "<td class=\"shade2\">";
-	print "<input type=\"hidden\" name=\"show_full\" value=\"$show_full\" />";
+//	print "<input type=\"hidden\" name=\"show_full\" value=\"$show_full\" />";
 	print_help_link("show_full_help", "qm");
 	print $gm_lang["show_details"];
 	print "</td>";
 	print "<td class=\"shade1 vmiddle\">";
 	print "<input type=\"checkbox\" value=\"";
-	if ($show_full) print "1\" checked=\"checked\" onclick=\"document.people.show_full.value='0';\"";
-	else print "0\" onclick=\"document.people.show_full.value='1';\"";
+	if ($show_full == 1) print "1\" checked=\"checked\" onclick=\"document.people.show_details.value='-1';\"";
+	else print "0\" onclick=\"document.people.show_details.value='1';\"";
 	print " />";
 	print "</td></tr>";
 	print "</table>";
