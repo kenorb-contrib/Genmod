@@ -54,7 +54,7 @@ class Source extends GedcomRecord {
 	 * @param string $gedrec	the raw source gedcom record
 	 */
 	public function __construct($id, $gedrec="", $gedcomid="") {
-		
+
 		parent::__construct($id, $gedrec, $gedcomid);
 		$this->exclude_facts = "";
 	}
@@ -104,7 +104,7 @@ class Source extends GedcomRecord {
 	 * @param string $sid the gedcom xref id for the source to find
 	 * @return string the title of the source
 	 */
-	private function GetSourceDescriptor() {
+	private function getSourceDescriptor() {
 		global $gm_lang;
 		
 		if (is_null($this->descriptor)) {
@@ -154,7 +154,7 @@ class Source extends GedcomRecord {
 	 * @param string $sid the gedcom xref id for the source to find
 	 * @return string the additional title of the source
 	 */
-	private function GetAddSourceDescriptor() {
+	private function getAddSourceDescriptor() {
 	
 		if (is_null($this->adddescriptor)) {
 			if ($this->disp) {
@@ -186,7 +186,7 @@ class Source extends GedcomRecord {
 		return $this->adddescriptor;
 	}
 	
-	protected function GetLinksFromIndis() {
+	protected function getLinksFromIndis() {
 		global $TBLPREFIX, $indilist;
 
 		if (!is_null($this->indilist)) return $this->indilist;
@@ -215,7 +215,7 @@ class Source extends GedcomRecord {
 		return $this->indilist;
 	}
 	
-	protected function GetLinksFromFams() {
+	protected function getLinksFromFams() {
 		global $TBLPREFIX, $famlist;
 
 		if (!is_null($this->famlist)) return $this->famlist;
@@ -244,7 +244,7 @@ class Source extends GedcomRecord {
 		return $this->famlist;
 	}
 	
-	protected function GetLinksFromNotes() {
+	protected function getLinksFromNotes() {
 		global $TBLPREFIX, $otherlist;
 
 		if (!is_null($this->notelist)) return $this->notelist;
@@ -267,7 +267,7 @@ class Source extends GedcomRecord {
 		return $this->notelist;
 	}
 	
-	protected function GetLinksFromMedia() {
+	protected function getLinksFromMedia() {
 		global $TBLPREFIX, $medialist;
 		
 		if (!is_null($this->medialist)) return $this->medialist;

@@ -847,6 +847,7 @@ function __autoload($classname) {
 	global $GM_BASE_DIRECTORY;
 	
 	if (stristr($classname, "controller")) require_once($GM_BASE_DIRECTORY.strtolower("includes/controllers/".str_ireplace("controller", "", $classname)."_ctrl.php"));
+	else if (stristr($classname, "functions")) require_once($GM_BASE_DIRECTORY.strtolower("includes/functions/functions_".str_ireplace("functions", "", $classname)."_class.php"));
 	else require_once($GM_BASE_DIRECTORY.strtolower("includes/classes/".$classname."_class.php"));
 }
 ?>

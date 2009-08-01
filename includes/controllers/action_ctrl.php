@@ -88,6 +88,7 @@ class ActionController {
 		if ($reposort) {
 			$this->RepoSort();
 		}
+		else $this->IndiSort();
 		return $this->actionlist;
 	}
 
@@ -104,11 +105,21 @@ class ActionController {
 	}
 
 	private function RepoSort() {
-		uasort($this->actionlist, array($this, "ActionObjSort"));
+		uasort($this->actionlist, array($this, "ActionRepoSort"));
 	}
 	
-	private function ActionObjSort($a, $b) {
-		return StringSort($a->repodesc, $b->repodesc);
+	private function IndiSort() {
+		uasort($this->actionlist, array($this, "ActionIndiSort"));
+	}
+	
+	private function ActionRepoSort($a, $b) {
+		if ($a->repodesc != $b->repodesc) return StringSort($a->repodesc, $b->repodesc);
+		else return StringSort($a->indidesc, $b->indidesc);
+	}
+	
+	private function ActionIndiSort($a, $b) {
+		if ($a->indidesc != $b->indidesc) return StringSort($a->indidesc, $b->indidesc);
+		else return StringSort($a->repodesc, $b->repodesc);
 	}
 	
 	public function GetNewItem() {

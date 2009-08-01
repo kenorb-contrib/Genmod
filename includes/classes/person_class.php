@@ -153,7 +153,7 @@ class Person extends GedcomRecord {
 				break;
 			case "primaryfamily":
 				return $this->GetPrimaryChildFamily();
-			break;
+				break;
 			case "spousefamilies":
 				return $this->GetSpouseFamilies();
 				break;
@@ -650,7 +650,7 @@ if ($this->tracefacts) print "AddChildrenFacts (".$option.") - Adding for ".$chi
 								}
 								$factrec .= "\n2 ASSO @".$childfam->xref."@";
 								$factrec .= "\n3 RELA family";
-								$arec = GetSubRecord(2, "2 ASSO @".$child->xref."@", $childfam->marr_rec);
+								$arec = GetSubRecord(2, "2 ASSO @".$child->xref."@", $childfam->marr_fact->factrec);
 								if ($arec) $factrec .= "\n".$arec;
 if ($this->tracefacts) print "AddChildrenFacts (".$option.") - Adding for ".$child->xref.": ".$fact." ".$factrec."<br />";
 								$this->facts[] = new Fact($child->xref, "X$fact", $factrec, 0, "");
@@ -852,7 +852,7 @@ if ($this->tracefacts) print "AddSpouseFacts - Adding for ".$fam->$spperson->xre
 	
 	public function getSpouseFamily() {
 		global $gm_lang, $GEDCOM, $gm_username, $Users;
-			
+
 		if (count($this->spousefamilies) > 0) {
 			$this->close_relatives = true;
 			foreach ($this->spousefamilies as $id => $fam) {
@@ -889,7 +889,7 @@ if ($this->tracefacts) print "AddSpouseFacts - Adding for ".$fam->$spperson->xre
 							$married = "";
 							$divorced = GetSubRecord(1, "DIV", $this->spousefamilies[$id]->gedrec);
 							if ($parent->xref == $this->xref) $label = "<img src=\"images/selected.png\" alt=\"\" />";
-							else $label = $parent->gender($sex, "spouseparents", $divorced, $this->spousefamilies[$id]->marr_rec);
+							else $label = $parent->gender($sex, "spouseparents", $divorced, (is_object($this->spousefamilies[$id]->marr_fact) ? $this->spousefamilies[$id]->marr_fact->factrec : ""));
 							$type = strtolower($type);
 							$this->spousefamilies[$id]->$type->setFamLabel($this->spousefamilies[$id]->xref, $label);
 						}
@@ -1003,6 +1003,7 @@ if ($this->tracefacts) print "AddSpouseFacts - Adding for ".$fam->$spperson->xre
 	
 	public function gender($sex, $type, $divorced="", $married = "") {
 		global $gm_lang;
+//		print "married: ".$married;
 		$label = $gm_lang["unknown"];
 		switch ($type) {
 			case "spousekids" :
@@ -1353,19 +1354,22 @@ if ($this->tracefacts) print "AddSpouseFacts - Adding for ".$fam->$spperson->xre
 		$this->actioncount = $this->action_open + $this->action_closed;
 	}
 
-	public function PrintListPerson() {
+	public function PrintListPerson($useli=true, $break=false) {
 		
 		if (!$this->disp) return false;
 		
-		if (begRTLText($this->GetSortableName())) print "<li class=\"rtl\" dir=\"rtl\">";
-		else print "<li class=\"ltr\" dir=\"ltr\">";
+		if ($useli) {
+			if (begRTLText($this->GetSortableName())) print "<li class=\"rtl\" dir=\"rtl\">";
+			else print "<li class=\"ltr\" dir=\"ltr\">";
+		}
 		
 		if (HasChinese($this->name_array[0][0])) $addname = " (".$this->GetSortableAddName().")";
 		else $addname = "";
 		print "<a href=\"individual.php?pid=".$this->xref."&amp;gedid=".$this->gedcomid."\" class=\"list_item\"><b>";
 		print CheckNN($this->GetSortableName()).$addname."</b>".$this->addxref;
-		print_first_major_fact($this->xref, $this->gedrec, true);
+		print_first_major_fact($this->xref, $this->gedrec, true, $break);
 		print "</a>\n";
+		if ($useli) print "</li>";
 		
 
 	}

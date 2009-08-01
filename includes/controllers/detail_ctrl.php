@@ -218,16 +218,16 @@ abstract class DetailController extends BaseController{
 					if ($factobj->fact != "" && !in_array($factobj->fact, $this->fact_filter)) {
 //						$styleadd = $value[3];
 						if ($factobj->fact == "OBJE") {
-							print_main_media($factobj->factrec, $this->$object_name->xref, 0, $factobj->count, ($this->$object_name->show_changes), $factobj->style);
+							FactFunctions::PrintMainmedia($factobj, $this->$object_name->xref, 0, $factobj->count, ($this->$object_name->show_changes), $factobj->style);
 						}
 						else if ($factobj->fact == "SOUR") {
-							print_main_sources($factobj->factrec, 1, $this->$object_name->xref, $factobj->count, $factobj->style, $this->$object_name->canedit);
+							FactFunctions::PrintMainSources($factobj, $this->$object_name->xref, $factobj->count, $factobj->style, $this->$object_name->canedit);
 						}
 						else if ($factobj->fact == "NOTE") {
-							print_main_notes($factobj->factrec, 1, $this->$object_name->xref, $factobj->count, $factobj->style);
+							FactFunctions::PrintMainNotes($factobj, 1, $this->$object_name->xref, $factobj->count, $factobj->style);
 						}
 						else {
-							print_fact($factobj->factrec, $this->$object_name->xref, $factobj->fact, $factobj->count, false, $factobj->style);
+							FactFunctions::PrintFact($factobj, $this->$object_name->xref, $factobj->fact, $factobj->count, false, $factobj->style);
 						}
 					}
 				}
@@ -564,10 +564,8 @@ abstract class DetailController extends BaseController{
 					print "\n<table class=\"facts_table\">";
 					$table = true;
 					foreach($this->$object_name->facts as $key => $factobj) {
-//						$fact = trim($value[0]);
 						if ($factobj->fact != "" && $factobj->fact == "SOUR") {
-//							$styleadd = $value[3];
-							print_main_sources($factobj->factrec, 1, $this->xref, $factobj->count, $factobj->style, $this->$object_name->canedit);
+							FactFunctions::PrintMainSources($factobj, $this->xref, $factobj->count, $factobj->style, $this->$object_name->canedit);
 						}
 					}
 				}
@@ -600,7 +598,7 @@ abstract class DetailController extends BaseController{
 					foreach($this->$object_name->facts as $key => $factobj) {
 						if ($factobj->fact != "" && $factobj->fact == "OBJE") {
 //							$styleadd = $value[3];
-							print_main_media($factobj->factrec, $this->xref, 0, $factobj->count, ($this->$object_name->show_changes), $factobj->style);
+							FactFunctions::PrintMainMedia($factobj, $this->xref, 0, $factobj->count, ($this->$object_name->show_changes), $factobj->style);
 						}
 					}
 //					print "</table>\n\n<br />";
@@ -633,7 +631,7 @@ abstract class DetailController extends BaseController{
 //						$fact = trim($value[0]);
 						if ($factobj->fact != "" && $factobj->fact == "NOTE") {
 //							$styleadd = $value[3];
-							print_main_notes($factobj->factrec, 1, $this->xref, $factobj->count, $factobj->style);
+							FactFunctions::PrintMainNotes($factobj, 1, $this->xref, $factobj->count, $factobj->style);
 						}
 					}
 				}

@@ -106,7 +106,7 @@ abstract class GedcomRecord {
 		if (empty($gedcomid)) $this->gedcomid = $GEDCOMID;
 		else $this->gedcomid = $gedcomid;
 		
-		if (empty($this->gedrec)) {
+		if ($this->gedrec == "") {
 			$this->xref = $id;
 			$this->type = $this->datatype;
 			// Get the gedcom record

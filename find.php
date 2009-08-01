@@ -715,7 +715,7 @@ if ($action=="filter") {
 				SwitchGedcom($note->gedcomid);
 				if (DisplayDetailsByID($key, "NOTE", 1, true)) {
 					print "<li>";
-				    print "<a href=\"#\" onclick=\"sndReq(document.getElementById('dummy'), 'lastused', 'type', 'NOTE', 'id', '".JoinKey($note->xref, $GEDCOMID)."'); pasteid('".$note->GetXref()."'); return false;\"><span class=\"list_item\">".PrintReady($note->GetTitle()." (".$note->GetXref().")")."</span></a>\n";
+				    print "<a href=\"#\" onclick=\"sndReq(document.getElementById('dummy'), 'lastused', 'type', 'NOTE', 'id', '".JoinKey($note->xref, $GEDCOMID)."'); pasteid('".$note->xref."'); return false;\"><span class=\"list_item\">".PrintReady($note->GetTitle()." ".$note->addxref)."</span></a>\n";
 				    print "</li>\n";
 			    }
 			    else $ctn--;

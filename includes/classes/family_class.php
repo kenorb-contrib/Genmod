@@ -59,7 +59,7 @@ class Family extends GedcomRecord {
 	public $child_status = null;			// Status af the child in this family: "deleted", "new", "" (=unchanged)
 	
 	// Marriage events
-	private $marr_rec = null;				// Gedcom marriage subrecord (after showfact, showfactdetails and factviewrestricted)
+	private $marr_fact = null;				// Fact object of marriage record (after showfact, showfactdetails and factviewrestricted)
 	private $marr_date = null;				// Marriage date (after showfact, showfactdetails and factviewrestricted)
 	private $marr_type = null;				// Marriage type (after showfact, showfactdetails and factviewrestricted)
 	private $marr_plac = null;				// Marriage place (after showfact, showfactdetails and factviewrestricted)
@@ -143,8 +143,8 @@ class Family extends GedcomRecord {
 			case "sortable_addname":
 				return $this->GetFamilyAddDescriptor();
 				break;
-			case "marr_rec":
-				return $this->getMarriageRecord();
+			case "marr_fact":
+				return $this->getMarriageFact();
 				break;
 			case "marr_date":
 				return $this->getMarriageDate();
@@ -432,20 +432,20 @@ class Family extends GedcomRecord {
 	/**
 	 * parse marriage record
 	 */
-	private function parseMarriageRecord() {
+	private function parseMarriageFact() {
 		
 		if ($this->show_changes && $this->ThisChanged()) $gedrec = $this->GetChangedGedRec();
 		else $gedrec = $this->gedrec;
 
 		$subrecord = GetSubRecord(1, "1 MARR", $this->gedrec);
-		if (ShowFact("MARR", $this->xref, "FAM") && ShowFactDetails("MARR", $this->xref) && !FactViewRestricted($this->xref, $subrecord, 2)) {
-			$this->marr_rec = $subrecord;
-			$this->marr_date = GetSubRecord(2, "2 DATE", $this->marr_rec);
-			$this->marr_type = GetSubRecord(2, "2 TYPE", $this->marr_rec);
-			$this->marr_plac = GetSubRecord(2, "2 PLAC", $this->marr_rec);
+		if (!empty($subrecord) && ShowFact("MARR", $this->xref, "FAM") && !FactViewRestricted($this->xref, $subrecord, 2)) {
+			$this->marr_fact = new Fact($this->xref, "MARR", $subrecord);
+			$this->marr_date = $this->marr_fact->simpledate;
+			$this->marr_type = $this->marr_fact->simpletype;
+			$this->marr_plac = $this->marr_fact->simpleplace;
 		}
 		else {
-			$this->marr_rec = "";
+			$this->marr_fact = "";
 			$this->marr_date = "";
 			$this->marr_type = "";
 			$this->marr_plac = "";
@@ -456,10 +456,10 @@ class Family extends GedcomRecord {
 	 * get marriage record
 	 * @return string
 	 */
-	private function getMarriageRecord() {
+	private function getMarriageFact() {
 		
-		if (is_null($this->marr_rec)) $this->parseMarriageRecord();
-		return $this->marr_rec;
+		if (is_null($this->marr_fact)) $this->parseMarriageFact();
+		return $this->marr_fact;
 	}
 	
 	/**
@@ -468,7 +468,7 @@ class Family extends GedcomRecord {
 	 */
 	private function getMarriageDate() {
 		
-		if (is_null($this->marr_date)) $this->parseMarriageRecord();
+		if (is_null($this->marr_date)) $this->parseMarriageFact();
 		return $this->marr_date;
 	}
 	
@@ -478,7 +478,7 @@ class Family extends GedcomRecord {
 	 */
 	private function getMarriageType() {
 		
-		if (is_null($this->marr_type)) $this->parseMarriageRecord();
+		if (is_null($this->marr_type)) $this->parseMarriageFact();
 		return $this->marr_type;
 	}
 	
@@ -488,7 +488,7 @@ class Family extends GedcomRecord {
 	 */
 	private function getMarriagePlace() {
 		
-		if (is_null($this->marr_plac)) $this->parseMarriageRecord();
+		if (is_null($this->marr_plac)) $this->parseMarriageFact();
 		return $this->marr_plac;
 	}
 	
@@ -503,10 +503,10 @@ class Family extends GedcomRecord {
 		if ($this->GetFamilyAddDescriptor() != "") print "&nbsp;(".$this->GetFamilyAddDescriptor().")";
 		print "</b>";
 		print $this->addxref;
-		if ($this->GetMarriageRecord() != "") {
+		if ($this->GetMarriageFact() != "") {
 			print " -- <i>".$gm_lang["marriage"]." ";
-			print_fact_date($this->GetMarriageRecord(), false, false, false, $this->xref, $this->gedrec);
-			print_fact_place($this->GetMarriageRecord());
+			$this->marr_fact->PrintFactDate(false, false, false, $this->xref, $this->gedrec);
+			$this->marr_fact->PrintFactPlace();
 			print "</i>";
 		}
 		print "</a>\n";
