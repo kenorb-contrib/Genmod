@@ -180,7 +180,7 @@ print "<div id=\"content_pedigree\">";
 		print "</td>";
 		print "<td class=\"shade1\">";
 		print "<input class=\"pedigree_form\" type=\"text\" id=\"rootid\" name=\"rootid\" size=\"3\" value=\"$rootid\" />";
-		PrintFindIndiLink("rootid","");
+		LinkFunctions::PrintFindIndiLink("rootid","");
 		print "</td></tr>";
 	
 		print "<tr><td class=\"shade2 wrap\">";

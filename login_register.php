@@ -338,7 +338,7 @@ switch ($action) {
 				?>
 				<tr><td class="shade2 nowrap ltr"><?php print_help_link("edituser_email_help", "qm", "emailadress");print $gm_lang["emailadress"];?></td><td class="shade1 ltr"><input type="text" size="30" name="user_email" value="<?php if (!$user_email_false) print $user_email;?>" tabindex="<?php print $i++;?>" onchange="sndReq('errem', 'checkemail', 'email', this.value);" /> * <span id="errem"></span></td></tr>
 				<?php if ($REQUIRE_AUTHENTICATION && $SHOW_LIVING_NAMES>=$PRIV_PUBLIC) { ?>
-				<tr><td class="shade2 nowrap ltr"><?php print_help_link("register_gedcomid_help", "qm", "gedcomid");print $gm_lang["gedcomid"];?></td><td class="shade1 ltr" valign="top" ><input type="text" size="10" name="user_gedcomid" id="user_gedcomid" value="" tabindex="<?php print $i++;?>" /><?php PrintFindIndiLink("user_gedcomid",""); ?></td></tr>
+				<tr><td class="shade2 nowrap ltr"><?php print_help_link("register_gedcomid_help", "qm", "gedcomid");print $gm_lang["gedcomid"];?></td><td class="shade1 ltr" valign="top" ><input type="text" size="10" name="user_gedcomid" id="user_gedcomid" value="" tabindex="<?php print $i++;?>" /><?php LinkFunctions::PrintFindIndiLink("user_gedcomid",""); ?></td></tr>
 				<?php } ?>
 				<tr><td class="shade2 nowrap ltr"><?php print_help_link("register_comments_help", "qm", "comments");print $gm_lang["comments"];?></td><td class="shade1 ltr" valign="top" ><textarea cols="50" rows="5" name="user_comments" tabindex="<?php print $i++;?>"><?php if (!$user_comments_false) print $user_comments;?></textarea> *</td></tr>
 				<tr><td class="topbottombar" colspan="2"><input type="submit" value="<?php print $gm_lang["requestaccount"]; ?>" tabindex="<?php print $i++;?>" /></td></tr>

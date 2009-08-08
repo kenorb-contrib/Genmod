@@ -128,22 +128,22 @@ $controller->CheckRawEdited();
 		
 		//-- - put the birth and death info in this section
 		print "<div class=\"indi_spacer\" style=\"line-height:20px;\">";
-		$bfacts = $controller->SelectFacts("BIRT");
+		$bfacts = $controller->indi->SelectFacts("BIRT");
 		foreach ($bfacts as $key => $factobj) {
 			if ($factobj->style != "") $style = " class=\"".$factobj->style."\"";
 			else $style = "";
 			print "<span".$style.">".$factobj->descr.": ";
-			print_fact_date($factobj->factrec, false, false, false, $controller->indi->xref, $controller->indi->gedrec);
-			print_fact_place($factobj->factrec);
+			$factobj->PrintFactDate(false, false, false, $controller->indi->xref);
+			$factobj->PrintFactPlace();
 			print "</span><br />";
 		}
-		$dfacts = $controller->SelectFacts("DEAT");
+		$dfacts = $controller->indi->SelectFacts("DEAT");
 		foreach ($dfacts as $key => $factobj) {
 			if ($factobj->style != "") $style = " class=\"".$factobj->style."\"";
 			else $style = "";
 			print "<span".$style.">".$factobj->descr.": ";
-			print_fact_date($factobj->factrec, false, false, false, $controller->indi->xref, $controller->indi->gedrec);
-			print_fact_place($factobj->factrec);
+			$factobj->PrintFactDate(false, false, false, $controller->indi->xref);
+			$factobj->PrintFactPlace();
 			print "</span><br style=\"line-height:30px;\" />";
 		}
 		if ($SHOW_LDS_AT_GLANCE) print "<br /><b>".GetLdsGlance($controller->indi->gedrec)."</b>";

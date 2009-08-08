@@ -587,7 +587,7 @@ print "&nbsp;<a href=\"javascript: ".$gm_lang["gedcom_conf"]."\" onclick=\"expan
 					print $gm_lang["unable_to_find_indi"];
 					print "</span>";
 				}
-				PrintFindIndiLink("NEW_PEDIGREE_ROOT_ID","");
+				LinkFunctions::PrintFindIndiLink("NEW_PEDIGREE_ROOT_ID","");
 			}
 		?>
 		</td>

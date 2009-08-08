@@ -876,8 +876,8 @@ function AddSimpleTag($tag, $upperlevel="", $tab="1") {
 		// split PLAC
 		if ($fact=="PLAC") {
 			print "<div id=\"".$element_id."_pop\" style=\"display: inline;\">\n";
-			print_specialchar_link($element_id);
-			print_findplace_link($element_id);
+			LinkFunctions::PrintSpecialCharLink($element_id);
+			LinkFunctions::PrintFindPlaceLink($element_id);
 			print "</div>\n";
 			if ($SPLIT_PLACES) {
 				if (!function_exists("print_place_subfields")) require("includes/functions/functions_places.php");
@@ -885,8 +885,8 @@ function AddSimpleTag($tag, $upperlevel="", $tab="1") {
 			}
 		}
 		else if ($cols>20 && $fact!="NPFX" && !in_array($fact, $emptyfacts)) {
-			if (in_array($fact, array("GIVN", "SURN", "NPSX"))) print_specialchar_link($element_id);
-			else print_specialchar_link($element_id);
+			if (in_array($fact, array("GIVN", "SURN", "NPSX"))) LinkFunctions::PrintSpecialCharLink($element_id);
+			else LinkFunctions::PrintSpecialCharLink($element_id);
 		}
 	}
 	// MARRiage TYPE : hide text field and show a selection list
@@ -908,25 +908,25 @@ function AddSimpleTag($tag, $upperlevel="", $tab="1") {
 
 	// popup links
 	if ($fact=="DATE") PrintCalendarPopup($element_id);
-	if ($fact=="FAMC") print_findfamily_link($element_id);
-	if ($fact=="FAMS") print_findfamily_link($element_id);
-	if ($fact=="ASSO") PrintFindIndiLink($element_id,"");
-	if ($fact=="FILE") print_findmedia_link($element_id);
+	if ($fact=="FAMC") LinkFunctions::PrintFindFamilyLink($element_id);
+	if ($fact=="FAMS") LinkFunctions::PrintFindFamilyLink($element_id);
+	if ($fact=="ASSO") LinkFunctions::PrintFindIndiLink($element_id,"");
+	if ($fact=="FILE") LinkFunctions::PrintFindMediaLink($element_id);
 	if ($fact=="OBJE" && $islink) {
-		print_findobject_link($element_id);
-		print_addnewobject_link($element_id);
+		LinkFunctions::PrintFindObjectLink($element_id);
+		LinkFunctions::PrintAddNewObjectLink($element_id);
 	}
 	if ($fact=="SOUR") {
-		print_findsource_link($element_id);
-		print_addnewsource_link($element_id);
+		LinkFunctions::PrintFindSourceLink($element_id);
+		LinkFunctions::PrintAddNewSourceLink($element_id);
 	}
 	if ($fact=="REPO") {
-		print_findrepository_link($element_id);
-		print_addnewrepository_link($element_id);
+		LinkFunctions::PrintFindRepositoryLink($element_id);
+		LinkFunctions::PrintAddNewRepositoryLink($element_id);
 	}
 	if ($fact=="NOTE" && $islink) {
-		print_findnote_link($element_id);
-		print_addnewgnote_link($element_id);
+		LinkFunctions::PrintFindNoteLink($element_id);
+		LinkFunctions::PrintAddNewGNoteLink($element_id);
 	}
 
 	// current value
@@ -1022,9 +1022,9 @@ function AddSimpleTag($tag, $upperlevel="", $tab="1") {
 		else $Link = $text;
 		print "&nbsp;".$Link;
 	}
-	if ($fact=="SPFX") print_autopaste_link($element_id, $SPFX_accept);
-	if ($fact=="NSFX") print_autopaste_link($element_id, $NSFX_accept);
-	if ($fact=="FORM") print_autopaste_link($element_id, $FILE_FORM_accept, false, false);
+	if ($fact=="SPFX") LinkFunctions::PrintAutoPasteLink($element_id, $SPFX_accept);
+	if ($fact=="NSFX") LinkFunctions::PrintAutoPasteLink($element_id, $NSFX_accept);
+	if ($fact=="FORM") LinkFunctions::PrintAutoPasteLink($element_id, $FILE_FORM_accept, false, false);
 
 	// split NAME
 	if ($fact=="NAME") {
@@ -1464,9 +1464,9 @@ function ShowMediaForm($pid, $action="newentry", $change_type="add_media") {
 	if ($pid == "") {
 		print "<tr><td class=\"shade2\">".$gm_lang["add_fav_enter_id"]."</td>";
 		print "<td class=\"shade1\"><input type=\"text\" name=\"gid\" id=\"gid\" size=\"3\" value=\"\" />";
-		PrintFindIndiLink("gid","");
-		print_findfamily_link("gid");
-		print_findsource_link("gid");
+		LinkFunctions::PrintFindIndiLink("gid","");
+		LinkFunctions::PrintFindFamilyLink("gid");
+		LinkFunctions::PrintFindSourceLink("gid");
 		print "</td></tr>";
 	}
 	if (IdType($pid) == "OBJE") {

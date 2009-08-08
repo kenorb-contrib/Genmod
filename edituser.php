@@ -194,7 +194,7 @@ if ($action=="edituser2") {
 		?>
 	</td></tr>
 	<tr><td class="shade2 wrap"><div class="helpicon"><?php print_help_link("edituser_rootid_help", "qm"); print "</div><div class=\"description\">"; print $gm_lang["rootid"];?></div></td><td class="shade1"><input type="text" name="rootid" id="rootid" tabindex="<?php $tab++; print $tab; ?>" value="<?php if (isset($user->rootid[$GEDCOM])) print $user->rootid[$GEDCOM]; ?>" />
-	<?php PrintFindIndiLink("rootid",$GEDCOMID); ?>
+	<?php LinkFunctions::PrintFindIndiLink("rootid",$GEDCOMID); ?>
 	</td></tr>
 	<tr><td class="shade2 wrap"><div class="helpicon"><?php print_help_link("edituser_password_help", "qm"); print "</div><div class=\"description\">"; print $gm_lang["password"];?></div></td><td class="shade1"><input type="password" name="pass1" tabindex="<?php $tab++; print $tab; ?>" /><br /><?php print $gm_lang["leave_blank"];?></td></tr>
 	<tr><td class="shade2 wrap"><div class="helpicon"><?php print_help_link("edituser_conf_password_help", "qm"); print "</div><div class=\"description\">"; print $gm_lang["confirm"];?></div></td><td class="shade1"><input type="password" name="pass2" tabindex="<?php $tab++; print $tab; ?>" /></td></tr>

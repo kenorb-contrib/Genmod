@@ -1264,7 +1264,7 @@ if ($action=="choosepid") {
 	<tr>
 		<td><?php print $gm_lang["enter_pid"]; ?></td>
 		<td><input type="text" size="6" name="pid" id="pid" />
-		<?php PrintFindIndiLink("pid","");?>
+		<?php LinkFunctions::PrintFindIndiLink("pid","");?>
                 </td>
 	</tr>
 	</table>
@@ -1620,7 +1620,7 @@ foreach($indifacts as $f=>$fact) {
 		if (empty($temp) && (!in_array($fact_tag, $nonplacfacts))) { ?>
 			<td class="optionbox">
 				<input type="text" size="30" tabindex="<?php print $tabkey; $tabkey++; ?>" name="PLACS[]" id="place<?php echo $f; ?>" value="<?php print PrintReady(htmlspecialchars($plac)); ?>" />
-				<?php print_findplace_link("place$f"); ?>
+				<?php LinkFunctions::PrintFindPlaceLink("place$f"); ?>
 				<input type="hidden" name="TEMPS[]" value="" />
 			</td>
 		<?php
@@ -1708,7 +1708,7 @@ if (count($addfacts)>0) { ?>
 	<td class="optionbox"><input type="text" tabindex="<?php print $tabkey; ?>" size="15" name="DATE" id="DATE" onblur="valid_date(this);" />&nbsp;<?php PrintCalendarPopup("DATE");?></td>
 	<?php $tabkey++; ?>
 	<td class="optionbox"><input type="text" tabindex="<?php print $tabkey; ?>" name="PLAC" id="place" />
-	<?php print_findplace_link("place"); ?>
+	<?php LinkFunctions::PrintFindPlaceLink("place"); ?>
 	</td>
 	<td class="optionbox">&nbsp;</td></tr>
 	<?php $tabkey++; ?>
@@ -1873,7 +1873,7 @@ for($i=1; $i<=count($sfams); $i++) {
 <tr>
 	<td class="descriptionbox"><?php print $gm_lang["enter_pid"]; ?></td>
 	<td class="optionbox" colspan="3"><input type="text" size="10" name="SPID[<?php echo $i; ?>]" id="SPID<?php echo $i; ?>" value="<?php echo $spid; ?>" />
-		<?php PrintFindindiLink("SPID$i","");?>
+		<?php LinkFunctions::PrintFindindiLink("SPID$i","");?>
      </td>
 	</tr>
 <?php if (empty($spid)) { ?>
@@ -1929,7 +1929,7 @@ for($i=1; $i<=count($sfams); $i++) {
 	<?php $tabkey++; ?>
 	<td class="descriptionbox"><?php print_help_link("edit_PLAC_help", "qm"); print $factarray["PLAC"];?></td>
 	<td class="optionbox" colspan="3"><input size="30" type="text" tabindex="<?php print $tabkey; ?>" name="BPLAC<?php echo $i; ?>" id="bplace<?php echo $i; ?>" /><img src="<?php print $GM_IMAGE_DIR."/".$GM_IMAGES["spacer"]["other"];?>" name="banchor1x" id="banchor1x" alt="" />
-	<?php print_findplace_link("place$f"); ?>
+	<?php LinkFunctions::PrintFindPlaceLink("place$f"); ?>
 	<?php $tabkey++; ?>
 	</td>
 </tr>
@@ -1964,7 +1964,7 @@ foreach($famfacts as $f=>$fact) {
 				<td class="optionbox"><input type="text" tabindex="<?php print $tabkey; $tabkey++;?>" size="15" name="F<?php echo $i; ?>DATES[]" id="F<?php echo $i; ?>DATE<?php echo $f; ?>" onblur="valid_date(this);" value="<?php echo htmlspecialchars($date); ?>" /><?php PrintCalendarPopup("F{$i}DATE{$f}");?></td>
 				<?php if (empty($temp) && (!in_array($fact_tag, $nonplacfacts))) { ?>
 					<td class="optionbox"><input type="text" size="30" tabindex="<?php print $tabkey; $tabkey++; ?>" name="F<?php echo $i; ?>PLACS[]" id="F<?php echo $i; ?>place<?php echo $f; ?>" value="<?php print PrintReady(htmlspecialchars($plac)); ?>" />
-                                        <?php print_findplace_link("F".$i."place$f"); ?>
+                                        <?php LinkFunctions::PrintFindPlaceLink("F".$i."place$f"); ?>
                                         </td>
 				<?php }
 				else {
@@ -2024,7 +2024,7 @@ if (count($famaddfacts)>0) { ?>
 	<td class="optionbox"><input type="text" tabindex="<?php print $tabkey; ?>" size="15" name="F<?php echo $i; ?>DATE" id="F<?php echo $i; ?>DATE" onblur="valid_date(this);" /><?php PrintCalendarPopup("F".$i."DATE");?></td>
 	<?php $tabkey++; ?>
 	<td class="optionbox"><input type="text" tabindex="<?php print $tabkey; ?>" name="F<?php echo $i; ?>PLAC" id="F<?php echo $i; ?>place" />
-	<?php print_findplace_link("F".$i."place"); ?>
+	<?php LinkFunctions::PrintFindPlaceLink("F".$i."place"); ?>
 	</td>
 	<?php $tabkey++; ?>
 	<td class="optionbox">&nbsp;</td>
@@ -2101,7 +2101,7 @@ $chil = FindChildrenInRecord($famrec);
 			<tr>
 				<td class="descriptionbox"><?php print $gm_lang["add_new_chil"]; ?></td>
 				<td class="optionbox" colspan="3"><input type="text" size="10" name="CHIL[]" id="CHIL<?php echo $i; ?>" />
-                                <?php PrintFindindiLink("CHIL$i","");?>
+                                <?php LinkFunctions::PrintFindindiLink("CHIL$i","");?>
                                 </td>
 			</tr>
 <?php 
@@ -2162,7 +2162,7 @@ if (empty($child_surname)) $child_surname = "";
 	<tr>
 	<td class="descriptionbox"><?php print_help_link("edit_PLAC_help", "qm"); print $factarray["PLAC"];?></td>
 	<td class="optionbox" colspan="3"><input size="30" type="text" tabindex="<?php print $tabkey; ?>" name="C<?php echo $i; ?>PLAC" id="c<?php echo $i; ?>place" /><img src="<?php print $GM_IMAGE_DIR."/".$GM_IMAGES["spacer"]["other"];?>" name="canchor1x" id="canchor1x" alt="" />
-	<?php print_findplace_link("c".$i."place"); ?>
+	<?php LinkFunctions::PrintFindPlaceLink("c".$i."place"); ?>
 	</td>
 	<?php $tabkey++; ?>
 </tr>
@@ -2233,7 +2233,7 @@ if (empty($child_surname)) $child_surname = "";
 	<tr>
 	<td class="descriptionbox"><?php print_help_link("edit_PLAC_help", "qm"); print $factarray["PLAC"];?></td>
 	<td class="optionbox" colspan="3"><input size="30" type="text" tabindex="<?php print $tabkey; ?>" name="BPLAC" id="bplace" /><img src="<?php print $GM_IMAGE_DIR."/".$GM_IMAGES["spacer"]["other"];?>" name="banchor1x" id="banchor1x" alt="" />
-	<?php print_findplace_link("bplace"); ?>
+	<?php LinkFunctions::PrintFindPlaceLink("bplace"); ?>
 	<?php $tabkey++; ?>
 	</td>
 </tr>
@@ -2254,7 +2254,7 @@ if (empty($child_surname)) $child_surname = "";
 	<tr>
 	<td class="descriptionbox"><?php print_help_link("edit_PLAC_help", "qm"); print $factarray["PLAC"];?></td>
 	<td class="optionbox" colspan="3"><input size="30" type="text" tabindex="<?php print $tabkey; ?>" name="MPLAC" id="mplace" /><img src="<?php print $GM_IMAGE_DIR."/".$GM_IMAGES["spacer"]["other"];?>" name="manchor1x" id="manchor1x" alt="" />
-	<?php print_findplace_link("mplace"); ?>
+	<?php LinkFunctions::PrintFindPlaceLink("mplace"); ?>
 	<?php $tabkey++; ?>
 	</td>
 </tr>
@@ -2317,7 +2317,7 @@ if (empty($child_surname)) $child_surname = "";
 	<tr>
 	<td class="descriptionbox"><?php print_help_link("edit_PLAC_help", "qm"); print $factarray["PLAC"];?></td>
 	<td class="optionbox" colspan="3"><input size="30" type="text" tabindex="<?php print $tabkey; ?>" name="CPLAC" id="cplace" /><img src="<?php print $GM_IMAGE_DIR."/".$GM_IMAGES["spacer"]["other"];?>" name="canchor2x" id="canchor2x" alt="" />
-	<?php print_findplace_link("cplace"); ?>
+	<?php LinkFunctions::PrintFindPlaceLink("cplace"); ?>
 	</td>
 	<?php $tabkey++; ?>
 </tr>
@@ -2404,7 +2404,7 @@ for($j=1; $j<=count($cfams); $j++) {
 	else print $label." ".$gm_lang["unknown"];
 	print "</td></tr>";
 	print "<tr><td class=\"descriptionbox\">".$gm_lang["enter_pid"]."<td  class=\"optionbox\" colspan=\"3\"><input type=\"text\" size=\"10\" name=\"FATHER[$i]\" id=\"FATHER$i\" value=\"".$parents['HUSB']."\" />";
-	PrintFindIndiLink("FATHER$i","");
+	LinkFunctions::PrintFindIndiLink("FATHER$i","");
 	print "</td></tr>";
 ?>
 <?php if (empty($parents["HUSB"])) { ?>
@@ -2462,7 +2462,7 @@ for($j=1; $j<=count($cfams); $j++) {
 	<tr>
 	<td class="descriptionbox"><?php print_help_link("edit_PLAC_help", "qm"); print $factarray["PLAC"];?></td>
 	<td class="optionbox" colspan="3"><input size="30" type="text" tabindex="<?php print $tabkey; ?>" name="FBPLAC<?php echo $i; ?>" id="Fbplace<?php echo $i; ?>" /><img src="<?php print $GM_IMAGE_DIR."/".$GM_IMAGES["spacer"]["other"];?>" name="banchor1x" id="banchor1x" alt="" />
-	<?php print_findplace_link("Fbplace$i"); ?>
+	<?php LinkFunctions::PrintFindPlaceLink("Fbplace$i"); ?>
 	<?php $tabkey++; ?>
 	</td>
 	</tr>
@@ -2477,7 +2477,7 @@ for($j=1; $j<=count($cfams); $j++) {
 	<tr>
 	<td class="descriptionbox"><?php print_help_link("edit_PLAC_help", "qm"); print $factarray["PLAC"];?></td>
 	<td class="optionbox" colspan="3"><input size="30" type="text" tabindex="<?php print $tabkey; ?>" name="FDPLAC<?php echo $i; ?>" id="Fdplace<?php echo $i; ?>" /><img src="<?php print $GM_IMAGE_DIR."/".$GM_IMAGES["spacer"]["other"];?>" name="danchor1x" id="danchor1x" alt="" />
-	<?php print_findplace_link("Fdplace$i"); ?>
+	<?php LinkFunctions::PrintFindPlaceLink("Fdplace$i"); ?>
 	<?php $tabkey++; ?>
 	</td>
 	</tr>
@@ -2512,7 +2512,7 @@ for($j=1; $j<=count($cfams); $j++) {
 	else print $label." ".$gm_lang["unknown"];
 	print "</td></tr>\n";
 	print "<tr><td  class=\"descriptionbox\">".$gm_lang["enter_pid"]."<td  class=\"optionbox\" colspan=\"3\"><input type=\"text\" size=\"10\" name=\"MOTHER[$i]\" id=\"MOTHER$i\" value=\"".$parents['WIFE']."\" />";
-	PrintFindIndiLink("MOTHER$i","");
+	LinkFunctions::PrintFindIndiLink("MOTHER$i","");
 	?>
 </td></tr>
 <?php if (empty($parents["WIFE"])) { ?>
@@ -2570,7 +2570,7 @@ for($j=1; $j<=count($cfams); $j++) {
 	<tr>
 	<td class="descriptionbox"><?php print_help_link("edit_PLAC_help", "qm"); print $factarray["PLAC"];?></td>
 	<td class="optionbox" colspan="3"><input size="30" type="text" tabindex="<?php print $tabkey; ?>" name="MBPLAC<?php echo $i; ?>" id="Mbplace<?php echo $i; ?>" /><img src="<?php print $GM_IMAGE_DIR."/".$GM_IMAGES["spacer"]["other"];?>" name="banchor1x" id="banchor1x" alt="" />
-	<?php print_findplace_link("Mbplace$i"); ?>
+	<?php LinkFunctions::PrintFindPlaceLink("Mbplace$i"); ?>
 	<?php $tabkey++; ?>
 	</td>
 </tr>
@@ -2585,7 +2585,7 @@ for($j=1; $j<=count($cfams); $j++) {
 	<tr>
 	<td class="descriptionbox"><?php print_help_link("edit_PLAC_help", "qm"); print $factarray["PLAC"];?></td>
 	<td class="optionbox" colspan="3"><input size="30" type="text" tabindex="<?php print $tabkey; ?>" name="MDPLAC<?php echo $i; ?>" id="Mdplace<?php echo $i; ?>" /><img src="<?php print $GM_IMAGE_DIR."/".$GM_IMAGES["spacer"]["other"];?>" name="danchor1x" id="danchor1x" alt="" />
-	<?php print_findplace_link("Mdplace$i"); ?>
+	<?php LinkFunctions::PrintFindPlaceLink("Mdplace$i"); ?>
 	<?php $tabkey++; ?>
 	</td>
 </tr>
@@ -2619,7 +2619,7 @@ foreach($famfacts as $f=>$fact) {
 				<td class="optionbox"><input type="text" tabindex="<?php print $tabkey; $tabkey++;?>" size="15" name="F<?php echo $i; ?>DATES[]" id="F<?php echo $i; ?>DATE<?php echo $f; ?>" onblur="valid_date(this);" value="<?php echo htmlspecialchars($date); ?>" /><?php PrintCalendarPopup("F{$i}DATE$f");?></td>
 				<?php if (empty($temp) && (!in_array($fact_tag, $nonplacfacts))) { ?>
 					<td class="optionbox"><input size="30" type="text" tabindex="<?php print $tabkey; $tabkey++; ?>" name="F<?php echo $i; ?>PLACS[]" id="F<?php echo $i; ?>place<?php echo $f; ?>" value="<?php print PrintReady(htmlspecialchars($plac)); ?>" />
-					<?php print_findplace_link("F".$i."place$f"); ?>
+					<?php LinkFunctions::PrintFindPlaceLink("F".$i."place$f"); ?>
                          </td>
 				<?php }
 				else {
@@ -2683,7 +2683,7 @@ foreach($famfacts as $f=>$fact) {
 		<td class="optionbox"><input type="text" tabindex="<?php print $tabkey; ?>" size="15" name="F<?php echo $i; ?>DATE" id="F<?php echo $i; ?>DATE" onblur="valid_date(this);" /><?php PrintCalendarPopup("F".$i."DATE");?></td>
 		<?php $tabkey++; ?>
 		<td class="optionbox"><input size="30" type="text" tabindex="<?php print $tabkey; ?>" name="F<?php echo $i; ?>PLAC" id="F<?php echo $i; ?>place" />
-		<?php print_findplace_link("F".$i."place"); ?>
+		<?php LinkFunctions::PrintFindPlaceLink("F".$i."place"); ?>
 		</td>
 		<?php $tabkey++; ?>
 		<td class="optionbox">&nbsp;</td>
@@ -2760,7 +2760,7 @@ $chil = FindChildrenInRecord($famrec);
 			<tr>
 				<td class="descriptionbox"><?php print $gm_lang["add_child_to_family"]; ?></td>
 				<td class="optionbox" colspan="3"><input type="text" size="10" name="CHIL[<?php echo $i; ?>]" id="CHIL<?php echo $i; ?>" />
-                                <?php PrintFindIndiLink("CHIL$i","");?>
+                                <?php LinkFunctions::PrintFindIndiLink("CHIL$i","");?>
                                 </td>
 			</tr>
 <?php
@@ -2816,7 +2816,7 @@ $chil = FindChildrenInRecord($famrec);
 	<tr>
 	<td class="descriptionbox"><?php print_help_link("edit_PLAC_help", "qm"); print $factarray["PLAC"];?></td>
 	<td class="optionbox" colspan="3"><input size="30" type="text" tabindex="<?php print $tabkey; ?>" name="C<?php echo $i; ?>PLAC" id="C<?php echo $i; ?>place" /><img src="<?php print $GM_IMAGE_DIR."/".$GM_IMAGES["spacer"]["other"];?>" name="canchor3x" id="canchor3x" alt="" />
-	<?php print_findplace_link("c".$i."place"); ?>
+	<?php LinkFunctions::PrintFindPlaceLink("c".$i."place"); ?>
 	</td>
 	<?php $tabkey++; ?>
 </tr>

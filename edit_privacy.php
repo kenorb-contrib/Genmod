@@ -527,11 +527,11 @@ if ($action=="update") {
               <td class="shade1">
                 <input type="text" class="pedigree_form" name="v_new_person_privacy_access_ID" id="v_new_person_privacy_access_ID" size="4" />
                 <?php
-			 PrintFindIndiLink("v_new_person_privacy_access_ID", $ged);
-			 print_findfamily_link("v_new_person_privacy_access_ID");
-			 print_findsource_link("v_new_person_privacy_access_ID");
-			 print_findobject_link("v_new_person_privacy_access_ID");             
-			 print_findnote_link("v_new_person_privacy_access_ID");             
+			 LinkFunctions::PrintFindIndiLink("v_new_person_privacy_access_ID", get_id_from_gedcom($ged));
+			 LinkFunctions::PrintFindFamilyLink("v_new_person_privacy_access_ID");
+			 LinkFunctions::PrintFindSourceLink("v_new_person_privacy_access_ID");
+			 LinkFunctions::PrintFindObjectLink("v_new_person_privacy_access_ID");             
+			 LinkFunctions::PrintFindNoteLink("v_new_person_privacy_access_ID");             
 			 ?>
               </td>
               <td class="shade1">
@@ -625,11 +625,11 @@ if ($action=="update") {
               <td class="shade1">
                 <input type="text" class="pedigree_form" name="v_new_user_privacy_access_ID" id="v_new_user_privacy_access_ID" size="4" />
                 <?php
-			 PrintFindIndiLink("v_new_user_privacy_access_ID","");
-			 print_findfamily_link("v_new_user_privacy_access_ID");
-			 print_findsource_link("v_new_user_privacy_access_ID");
-			 print_findobject_link("v_new_user_privacy_access_ID");             
-			 print_findnote_link("v_new_user_privacy_access_ID");             
+			 LinkFunctions::PrintFindIndiLink("v_new_user_privacy_access_ID","");
+			 LinkFunctions::PrintFindFamilyLink("v_new_user_privacy_access_ID");
+			 LinkFunctions::PrintFindSourceLink("v_new_user_privacy_access_ID");
+			 LinkFunctions::PrintFindObjectLink("v_new_user_privacy_access_ID");             
+			 LinkFunctions::PrintFindNoteLink("v_new_user_privacy_access_ID");             
                 ?>
               </td>
               <td class="shade1">
@@ -794,11 +794,11 @@ if ($action=="update") {
               <td class="shade1">
                 <input type="text" class="pedigree_form" name="v_new_person_facts_access_ID" id="v_new_person_facts_access_ID" size="4" />
                 <?php
-             printFindIndiLink("v_new_person_facts_access_ID","");
-			 print_findfamily_link("v_new_person_facts_access_ID");
-			 print_findsource_link("v_new_person_facts_access_ID");
-			 print_findobject_link("v_new_person_facts_access_ID");             
-			 print_findnote_link("v_new_person_facts_access_ID");             
+             LinkFunctions::PrintFindIndiLink("v_new_person_facts_access_ID","");
+			 LinkFunctions::PrintFindFamilyLink("v_new_person_facts_access_ID");
+			 LinkFunctions::PrintFindSourceLink("v_new_person_facts_access_ID");
+			 LinkFunctions::PrintFindObjectLink("v_new_person_facts_access_ID");             
+			 LinkFunctions::PrintFindNoteLink("v_new_person_facts_access_ID");             
                 ?>
               </td>
               <td class="shade1">

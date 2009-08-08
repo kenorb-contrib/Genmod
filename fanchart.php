@@ -554,7 +554,7 @@ if ($view != "preview") {
 	print $gm_lang["root_person"]."</td>";
 	print "<td class=\"shade1\">";
 	print "<input class=\"pedigree_form\" type=\"text\" name=\"rootid\" id=\"rootid\" size=\"3\" value=\"$rootid\" />";
-     PrintFindIndiLink("rootid","");
+    LinkFunctions::PrintFindIndiLink("rootid","");
 	print "</td>";
 	
 	// NOTE: fan style

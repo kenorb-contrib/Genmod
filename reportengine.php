@@ -242,10 +242,10 @@ function paste_id(value) {
 					}		
 					if (isset($input["lookup"])) {
 						print "<input type=\"hidden\" name=\"type[".$input["name"]."]\" value=\"".$input["lookup"]."\" />";
-						if ($input["lookup"]=="FAM") print_findfamily_link("famid");
-						if ($input["lookup"]=="INDI") PrintFindIndiLink("pid","");
-						if ($input["lookup"]=="PLAC") print_findplace_link($input["name"]);
-						if ($input["lookup"]=="REPO") print_findrepository_link($input["name"]);
+						if ($input["lookup"]=="FAM") LinkFunctions::PrintFindFamilyLink("famid");
+						if ($input["lookup"]=="INDI") LinkFunctions::PrintFindIndiLink("pid","");
+						if ($input["lookup"]=="PLAC") LinkFunctions::PrintFindPlaceLink($input["name"]);
+						if ($input["lookup"]=="REPO") LinkFunctions::PrintFindRepositoryLink($input["name"]);
 						if ($input["lookup"]=="DATE") {
 							$text = $gm_lang["select_date"];
 							if (isset($GM_IMAGES["calendar"]["button"])) $Link = "<img src=\"".$GM_IMAGE_DIR."/".$GM_IMAGES["calendar"]["button"]."\" name=\"a_".$input["name"]."\" id=\"a_".$input["name"]."\" alt=\"".$text."\" title=\"".$text."\" border=\"0\" align=\"middle\" />";

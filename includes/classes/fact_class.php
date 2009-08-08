@@ -36,6 +36,7 @@ class Fact {
 	
 	// Data
 	private $fact = null;			// Fact/event
+	private $factref = null;		// Either the fact, or if fact is EVEN, the event type
 	private $factrec = null;		// The complete record
 	private $simpledate = null;		// Date in gedcom format
 	private $simpletype = null;		// Type in gedcom format
@@ -45,10 +46,7 @@ class Fact {
 	private $resnvalue = null;		// The value for the 2 RESN tag
 	
 	// Links
-	private $factsources = null;	// Array of sources this fact links to
-	private $factmedia = null;		// Array of media this fact links to
-	private $factnotes = null;		// Array of notes this fact links to
-	private $factassos = null;		// Array of associates this fact links to
+//	private $factassos = null;		// Array of associates this fact links to
 	
 	// Other attributes
 	private $owner = null;			// Xref of the owner of this fact
@@ -65,6 +63,9 @@ class Fact {
 		$this->owner = $parent;
 		$this->count = $count;
 		$this->style = $style;
+		$ct = preg_match("/2 TYPE (.*)/", $this->factrec, $match);
+		if ($ct>0) $this->factref = trim($match[1]);
+		else $this->factref = $this->fact;
 	}
 
 	public function __get($property) {
@@ -72,6 +73,9 @@ class Fact {
 		switch ($property) {
 			case "fact":
 				return $this->fact;
+				break;
+			case "factref":
+				return $this->factref;
 				break;
 			case "factrec":
 				return $this->factrec;
@@ -94,18 +98,9 @@ class Fact {
 			case "resnvalue":
 				return $this->getResnValue();
 				break;
-			case "factsources":
-				return $this->getFactSources();
-				break;
-			case "factmedia":
-				return $this->getFactMedia();
-				break;
-			case "factnotes":
-				return $this->getFactNotes();
-				break;
-			case "factassos":
-				return $this->getFactAssos();
-				break;
+//			case "factassos":
+//				return $this->getFactAssos();
+//				break;
 			case "owner":
 				return $this->getOwner();
 				break;
@@ -148,7 +143,7 @@ class Fact {
 	private function getSimpleDate() {
 		
 		if (is_null($this->simpledate)) {
-			if ($this->disp) $this->simpledate = GetSubRecord(2, "2 DATE", $this->marr_rec);
+			if ($this->disp) $this->simpledate = GetSubRecord(2, "2 DATE", $this->factrec);
 			else $this->simpledate = "";
 		}
 		return $this->simpledate;
@@ -157,7 +152,7 @@ class Fact {
 	private function getSimpleType() {
 		
 		if (is_null($this->simpletype)) {
-			if ($this->disp) $this->simpletype = GetSubRecord(2, "2 TYPE", $this->marr_rec);
+			if ($this->disp) $this->simpletype = GetSubRecord(2, "2 TYPE", $this->factrec);
 			else $this->simpletype = "";
 		}
 		return $this->simpletype;
@@ -166,7 +161,7 @@ class Fact {
 	private function getSimplePlace() {
 		
 		if (is_null($this->simpleplace)) {
-			if ($this->disp) $this->simpleplace = GetSubRecord(2, "2 PLAC", $this->marr_rec);
+			if ($this->disp) $this->simpleplace = GetSubRecord(2, "2 PLAC", $this->factrec);
 			else $this->simpleplace = "";
 		}
 		return $this->simpleplace;
@@ -205,62 +200,32 @@ class Fact {
  		return $this->resnvalue;
 	}
 	
-	private function getFactSources() {
-		
-		if (is_null($this->factsources)) {
-			$this->factsources = array();
-			$ct = preg_match_all("/2 SOUR @(.*)@/", $this->factrec, $match, PREG_SET_ORDER);
-			if ($ct > 0) {
-				for($j=0; $j<$ct; $j++) {
-					$this->factsources[] =& Source::GetInstance($match[$j][1]);
-				}
-			}
-		}
-		return $this->factsources;
-	}
-		
-	private function getFactMedia() {
-		
-		if (is_null($this->factmedia)) {
-			$this->factmedia = array();
-			$ct = preg_match_all("/2 OBJE @(.*)@/", $this->factrec, $match, PREG_SET_ORDER);
-			if ($ct > 0) {
-				for($j=0; $j<$ct; $j++) {
-					$this->factmedia[] =& MediaItem::GetInstance($match[$j][1]);
-				}
-			}
-		}
-		return $this->factmedia;
-	}
-		
-	private function getFactNotes() {
-		
-		if (is_null($this->factnotes)) {
-			$this->factnotes = array();
-			$ct = preg_match_all("/2 NOTE @(.*)@/", $this->factrec, $match, PREG_SET_ORDER);
-			if ($ct > 0) {
-				for($j=0; $j<$ct; $j++) {
-					$this->factnotes[] =& Note::GetInstance($match[$j][1]);
-				}
-			}
-		}
-		return $this->factnotes;
-	}
-		
-	private function getFactAssos() {
+/*	private function getFactAssos() {
 		
 		if (is_null($this->factassos)) {
+			$this->factassos = array();
+			if ($this->ShowDetails()) {
+				$i = 1;
+				do {
+					$rec = GetSubRecord(2, "2 ASSO", $this->factrec, $i);
+					if ($rec != "") $this->factassos[] = $rec;
+					$i++;
+				} while ($rec != "");
+			}
 		}
 		return $this->factassos;
 	}
-		
+*/		
 	private function getFactDescription() {
 		global $factarray;
 		
 		if (is_null($this->descr)) {
-			if (substr($this->fact, 0, 1) == "X") $fact = substr($this->fact, 1);
-			else $fact = $this->fact;
-			$this->descr = $factarray[$fact];
+			if ($this->ShowDetails()) {
+				if (substr($this->fact, 0, 1) == "X") $fact = substr($this->fact, 1);
+				else $fact = $this->fact;
+				$this->descr = $factarray[$fact];
+			}
+			else $this->descr = "";
 		}
 		return $this->descr;
 	}
@@ -269,9 +234,8 @@ class Fact {
 		global $global_facts, $person_facts, $gm_username, $Users;
 		
 		if ($this->disp == null) {
-	
 			$facts = array();
-			// Handle the close relatives facts just as if they were normal facts
+			// Close relatives facts are already checked against their own xref while adding them
 			$f = substr($this->fact, 1, 6);
 			if ($f == "_BIRT_" || $f == "_DEAT_" && $f == "_MARR_") {
 				$facts[] = substr($this->fact, 2, 4);
@@ -314,8 +278,12 @@ class Fact {
 	private function canEdit() {
 		
 		if (is_null($this->canedit)) {
-			$this->canedit = $this->getOwner()->canedit;
-			if ($this->canedit == true) $this->canedit = !FactEditRestricted($this->getOwner()->xref, $this->factrec);
+			// We cannot edit CHAN records and records that are added as relatives events.
+			if ($this->fact == "CHAN" || substr($this->fact, 0, 2) == "X_") $this->canedit = false;
+			else {
+				$this->canedit = $this->getOwner()->canedit;
+				if ($this->canedit == true) $this->canedit = !FactEditRestricted($this->getOwner()->xref, $this->factrec);
+			}
 		}
 		return $this->canedit;
 	}
@@ -330,7 +298,7 @@ class Fact {
 	 * @param string $pid		optional person ID (to print age)
 	 * @param string $indirec	optional individual record (to print age)
 	 */
-	public function PrintFactDate($anchor=false, $time=false, $fact=false, $pid=false, $indirec=false, $prt=true) {
+	public function PrintFactDate($anchor=false, $time=false, $fact=false, $pid=false, $prt=true) {
 		global $factarray, $gm_lang;
 	
 		$prtstr = "";
@@ -353,10 +321,11 @@ class Fact {
 				if ($fact=="BIRT") print_parents_age($pid, $match[1]);
 				// age at event
 				else if ($fact!="CHAN") {
-					if (!$indirec) $indirec=FindPersonRecord($pid);
 					// do not print age after death
 					$deatrec=GetSubRecord(1, "1 DEAT", $this->GetOwner()->gedrec);
-					if ((CompareFacts($this->factrec, $deatrec)!=1)||(strstr($this->factrec, "1 DEAT"))) $prtstr .= GetAge($this->GetOwner()->gedrec,$match[1]);
+					if ((CompareFacts($this->factrec, $this->GetOwner()->drec)!=1)||(strstr($this->factrec, "1 DEAT"))) {
+						$prtstr .= $this->GetOwner()->GetAge($match[1]);
+					}
 				}
 			}
 			$prtstr .= " ";
@@ -367,28 +336,34 @@ class Fact {
 			// It is not proper GEDCOM form to use a N(o) value with an event tag to infer that it did not happen.
 			if (preg_match("/^1\s(BIRT|DEAT|MARR|DIV|CHR|CREM|BURI)\sY/", $this->factrec) && !preg_match("/\n2\s(DATE|PLAC)/", $this->factrec)) $prtstr .= $gm_lang["yes"]."&nbsp;";
 		}
+		
 		// gedcom indi age
 		$ages=array();
 		$agerec = GetSubRecord(2, "2 AGE", $this->factrec);
-		$daterec = GetSubRecord(2, "2 DATE", $this->factrec);
-		if (empty($agerec)) $agerec = GetSubRecord(3, "3 AGE", $daterec);
+		if (empty($agerec)) {
+			$daterec = GetSubRecord(2, "2 DATE", $this->factrec);
+			$agerec = GetSubRecord(3, "3 AGE", $daterec);
+		}
 		$ages[0] = $agerec;
+		
 		// gedcom husband age
 		$husbrec = GetSubRecord(2, "2 HUSB", $this->factrec);
 		if (!empty($husbrec)) $agerec = GetSubRecord(3, "3 AGE", $husbrec);
 		else $agerec = "";
 		$ages[1] = $agerec;
+		
 		// gedcom wife age
 		$wiferec = GetSubRecord(2, "2 WIFE", $this->factrec);
 		if (!empty($wiferec)) $agerec = GetSubRecord(3, "3 AGE", $wiferec);
 		else $agerec = "";
 		$ages[2] = $agerec;
+		
 		// print gedcom ages
 		foreach ($ages as $indexval=>$agerec) {
 			if (!empty($agerec)) {
 				$prtstr .= "<span class=\"label\">";
-				if ($indexval==1) $prtstr .= $gm_lang["husband"];
-				else if ($indexval==2) $prtstr .= $gm_lang["wife"];
+				if ($indexval == 1) $prtstr .= $gm_lang["husband"];
+				else if ($indexval == 2) $prtstr .= $gm_lang["wife"];
 				else $prtstr .= $factarray["AGE"];
 				$prtstr .= "</span>: ";
 				$age = GetAgeAtEvent(substr($agerec,5));
@@ -508,7 +483,7 @@ class Fact {
 				$ctn = preg_match("/\d NOTE (.*)/", $placerec, $match);
 				if ($ctn>0) {
 					// To be done: part of returnstring of this function
-					print_fact_notes($placerec, 3);
+					FactFunctions::PrintFactNotes($placerec, 3);
 					$out = true;
 				}
 			}

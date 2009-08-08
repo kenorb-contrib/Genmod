@@ -784,7 +784,7 @@ if ($action=="edituser" || $action == "createform") { ?>
 							print "<input type=\"text\" name=\"gedcomid_".$gedcom."\" id=\"gedcomid_".$gedcom."\" size=\"6\" tabindex=\"".$tab."\" value=\"";
 							if ($action == "edituser") if (isset($user->gedcomid[$file])) print $user->gedcomid[$file];
 							print "\" onblur=\"sndReq('usgid".$gedarray["id"]."', 'getpersonnamefact', 'pid', this.value, 'gedid', '".$gedarray["id"]."');\" />";
-							PrintFindIndiLink("gedcomid_$gedcom",$gedarray["id"]);
+							LinkFunctions::PrintFindIndiLink("gedcomid_$gedcom",$gedarray["id"]);
 							print "\n<span id=\"usgid".$gedarray["id"]."\" class=\"list_item\"> ";
 							if ($action == "edituser") {
 								if (isset($user->gedcomid[$file]) && !empty($user->gedcomid[$file])) {
@@ -816,7 +816,7 @@ if ($action=="edituser" || $action == "createform") { ?>
 								print "<input type=\"text\" name=\"rootid_".$gedcom."\" id=\"rootid_".$gedcom."\" tabindex=\"".$tab."\" size=\"6\" value=\"";
 								if ($action == "edituser") if (isset($user->rootid[$file])) print $user->rootid[$file];
 								print "\" onblur=\"sndReq('usroot".$gedarray["id"]."', 'getpersonnamefact', 'pid', this.value, 'gedid', '".$gedarray["id"]."');\" />";
-								PrintFindIndiLink("rootid_$gedcom",$gedarray["id"]);
+								LinkFunctions::PrintFindIndiLink("rootid_$gedcom",$gedarray["id"]);
 								print "\n<span id=\"usroot".$gedarray["id"]."\" class=\"list_item\"> ";
 								if ($action == "edituser") {
 									if (isset($user->rootid[$file]) && !empty($user->rootid[$file])) {
@@ -1284,7 +1284,7 @@ if ($action == "massupdate") {
 							<div class="width80 choice_right">
 								<?php $tab++; ?>
 								<input type="text" size="6" name="new_rootid_<?php print $gedcom;?>" id="new_rootid_<?php print $gedcom;?>" tabindex="<?php print $tab;?>" value="" onblur="sndReq('usroot<?php print $gedarray["id"];?>', 'getpersonnamefact', 'pid', this.value, 'gedid', '<?php print $gedarray["id"];?>');" />
-								<?php PrintFindIndiLink("new_rootid_$gedcom",$gedarray["id"]);
+								<?php LinkFunctions::PrintFindIndiLink("new_rootid_$gedcom",$gedarray["id"]);
 								print "\n<span id=\"usroot".$gedarray["id"]."\" class=\"list_item\"> </span>";?>
 							</div>
 						</div>

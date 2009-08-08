@@ -151,7 +151,7 @@ if ($view!="preview") {
 	print $gm_lang["person1"]."</td>";
 	print "<td class=\"shade1 vmiddle\">";
 	print "<input tabindex=\"1\" class=\"pedigree_form\" type=\"text\" name=\"pid1\" id=\"pid1\" size=\"3\" value=\"$pid1\" />";
-	PrintFindIndiLink("pid1","");
+	LinkFunctions::PrintFindIndiLink("pid1","");
         print "</td>";
 
 	// Empty space
@@ -176,7 +176,7 @@ if ($view!="preview") {
 	print $gm_lang["person2"]."</td>\n";
 	print "<td class=\"shade1 vmiddle\">";
 	print "<input tabindex=\"2\" class=\"pedigree_form\" type=\"text\" name=\"pid2\" id=\"pid2\" size=\"3\" value=\"$pid2\" />";
-        PrintFindIndiLink("pid2","");
+        LinkFunctions::PrintFindIndiLink("pid2","");
         print "</td>";
 
 	// Empty space
@@ -301,7 +301,7 @@ print "</div>\n";
 
 $maxyoffset = $Dbaseyoffset;
 if ((!empty($pid1))&&(!empty($pid2))) {
-	if (!$disp) print_privacy_error($CONTACT_EMAIL);
+	if (!$disp) PrintPrivacyError($CONTACT_EMAIL);
 	else {
 		if (isset($_SESSION["relationships"][$path_to_find])) $node = $_SESSION["relationships"][$path_to_find];
 		else $node = GetRelationship($pid1, $pid2, $followspouse, 0, true, $path_to_find);

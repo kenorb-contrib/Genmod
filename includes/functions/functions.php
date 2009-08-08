@@ -314,6 +314,7 @@ function GetAllSubrecords($gedrec, $ignore="", $families=true, $sort=true, $Appl
 	if ($gt > 0) {
 		$type = $gmatch[1];
 	}
+	if ($id == "" && $type == "") $gedrec = "\n".$gedrec;
 	$prev_tags = array();
 	$ct = preg_match_all("/\n1 (\w+)(.*)/", $gedrec, $match, PREG_SET_ORDER);
 	for($i=0; $i<$ct; $i++) {
@@ -538,7 +539,7 @@ function GetGedcomValue($tag, $level, $gedrec, $truncate='', $convert=true) {
 function GetCont($nlevel, $nrec) {
 	global $WORD_WRAPPED_NOTES;
 	$text = "";
-	$tt = preg_match_all("/$nlevel CON[CT](.*)/", $nrec, $cmatch, PREG_SET_ORDER);
+	$tt = preg_match_all("/$nlevel CON[CT](.*)(?:\r\n|\r|\n)/", $nrec, $cmatch, PREG_SET_ORDER);
 	for($i=0; $i<$tt; $i++) {
 		if (strstr($cmatch[$i][0], "CONT")) $text.="<br />\n";
 		else if ($WORD_WRAPPED_NOTES) $text.=" ";
@@ -810,8 +811,7 @@ function CleanupTagsY($irec) {
 	// Genmod also supports BURI Y and CREM Y
 	$canhavey_facts = array("MARR","DIV","BIRT","DEAT","CHR","BURI","CREM"); 
 
-	// add the \n because sometimes $irec will be level 1 and GetAllSubrecords will in that case return nothing!
-	$subs = GetAllSubrecords("\n".$irec, "", false, false, false);
+	$subs = GetAllSubrecords($irec, "", false, false, false);
 	foreach ($subs as $key => $subrec) {
 		$oldsub = $subrec;
 		$ft = preg_match("/1\s(\w+)/", $subrec, $match);

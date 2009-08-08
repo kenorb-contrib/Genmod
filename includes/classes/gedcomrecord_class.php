@@ -211,9 +211,6 @@ abstract class GedcomRecord {
 			case "facts":
 				return $this->parseFacts();
 				break;
-			case "factlist":
-				return $this->getFactList();
-				break;
 			// Media info
 			case "indilist":
 				return $this->GetLinksFromIndis();
@@ -518,6 +515,20 @@ abstract class GedcomRecord {
 		else SortFactObjs($this->facts, $this->type);
 		return $this->facts;
 	}
+	
+	public function	SelectFacts($fact) {
+		
+		if (is_null($this->facts)) $this->ParseFacts();
+		
+		$facts = array();
+		foreach ($this->facts as $key => $factobj) {
+			if ($factobj->fact == $fact) {
+				$facts[] = $factobj;
+			}
+		}
+		return $facts;
+	}
+	
 	
 	protected function GetLastChangeDate() {
 		

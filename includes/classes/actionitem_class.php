@@ -289,8 +289,8 @@ class ActionItem {
 			print "<textarea id=\"actiontext\" name=\"actiontext\" rows=\"4\" cols=\"60\">".stripslashes($this->text)."</textarea>";
 			print "<br /><br /><b>".$gm_lang["repo"]."</b><br />";
 			print "<input type=\"text\" size=\"10\" value=\"".$this->repo."\" id=\"repo\" name=\"repo\" onblur=\"sndReq('desc_".$this->id."', 'getrepodescriptor', 'rid', this.value,'','');\">";
-			print_findrepository_link('repo');
-			print_addnewrepository_link('repo');
+			LinkFunctions::PrintFindRepositoryLink('repo');
+			LinkFunctions::PrintAddNewRepositoryLink('repo');
 		
 			print "&nbsp;&nbsp;<span id=\"desc_".$this->id."\">".$this->GetRepoDesc()."</span>";
 			print "<br /><br /><b>".$gm_lang["status"]."</b><br />";
@@ -316,8 +316,8 @@ class ActionItem {
 			print "<textarea id=\"actiontext\" name=\"actiontext\" rows=\"4\" cols=\"60\"></textarea>";
 			print "<br /><br /><b>".$gm_lang["repo"]."</b><br />";
 			print "<input type=\"text\" size=\"10\" value=\"\" id=\"repo\" name=\"repo\" onblur=\"sndReq('desc_".$this->id."', 'getrepodescriptor', 'rid', this.value,'','');\">";
-			print_findrepository_link('repo');
-			print_addnewrepository_link('repo');
+			LinkFunctions::PrintFindRepositoryLink('repo');
+			LinkFunctions::PrintAddNewRepositoryLink('repo');
 	
 			print "&nbsp;&nbsp;<span id=\"desc_".$this->id."\"></span>";
 			print "<br /><br /><b>".$gm_lang["status"]."</b><br />";

@@ -81,31 +81,27 @@ switch($action) {
 	case "getpersonname":
 		if (!isset($gedid)) $gedid = $GEDCOMID;
 		SwitchGedcom($gedid);
-		if (!empty($pid) && DisplayDetailsByID($pid, "INDI")) {
-			$pid = strtoupper($pid);
-			$rec = FindPersonRecord($pid);
-			if (!empty($rec)) {
-				print GetPersonName($pid, $rec)." (".$pid.")";
+		if (empty($pid)) print "";
+		else {
+			$person =& Person::GetInstance($pid);
+			if ($person->isempty) {
+				print "<span class=\"error\">".$gm_lang["indi_id_no_exists"]."</span>";
 			}
-			else print "<span class=\"error\">".$gm_lang["indi_id_no_exists"]."</span>";
-//			else print "";
+			else if ($person->disp_name) print $person->name.$person->addxref;
+			else print "";
 		}
-		else print "";
 		SwitchGedcom();
 	break;
 	
 	case "getpersonnamefact":
+		if (!isset($gedid)) $gedid = $GEDCOMID;
 		SwitchGedcom($gedid);
-		if (DisplayDetailsByID($pid, "INDI")) {
-			$pid = strtoupper($pid);
-			$rec = FindPersonRecord($pid);
-			if (!empty($rec)) {
-				print GetPersonName($pid, $rec);
-				print_first_major_fact($pid, $rec);
-			}
-			else print "";
+		if (empty($pid)) print "";
+		else {
+			$person =& Person::GetInstance($pid);
+			print $person->name;
+			FactFunctions::PrintFirstMajorFact($person);
 		}
-		else print "";
 		SwitchGedcom();
 	break;
 	
@@ -113,11 +109,12 @@ switch($action) {
 		$famid = strtoupper($famid);
 		if (empty($famid)) print "";
 		else {
-			$famrec = FindFamilyRecord($famid);
-			if (!$famrec && !GetChangeData(true, $famid, true, "", "")) {
+			$family =& Family::GetInstance($famid);
+			if ($family->isempty) {
 				print "<span class=\"error\">".$gm_lang["fam_id_no_exists"]."</span>";
 			}
-			else print GetFamilyDescriptor($famid, false, $famrec)." (".$famid.")";
+			else if ($family->disp) print $family->title.$family->addxref;
+			else print "";
 		}
 	break;
 	
@@ -126,7 +123,10 @@ switch($action) {
 		if (empty($sid)) print "";
 		else {
 			$source =& Source::GetInstance($sid);
-			if ($source->disp) print $source->descriptor.$source->addxref;
+			if ($source->isempty) {
+				print "<span class=\"error\">".$gm_lang["source_id_no_exists"]."</span>";
+			}
+			else if ($source->disp) print $source->descriptor.$source->addxref;
 			else print "";
 		}
 	break;
@@ -135,11 +135,11 @@ switch($action) {
 		$rid = strtoupper($rid);
 		if (empty($rid)) print "";
 		else {
-			$reporec = FindRepoRecord($rid);
-			if (!$reporec && !GetChangeData(true, $rid, true, "", "")) {
+			$repo =& Repository::GetInstance($rid);
+			if ($repo->isempty) {
 				print "<span class=\"error\">".$gm_lang["repo_id_no_exists"]."</span>";
 			}
-			else if (DisplayDetailsByID($rid, "REPO", 1, true)) print GetRepoDescriptor($rid)." (".$rid.")";
+			else if ($repo->disp) print $repo->title.$repo->addxref;
 			else print "";
 		}
 	break;
@@ -148,11 +148,11 @@ switch($action) {
 		$rid = strtoupper($mid);
 		if (empty($mid)) print "";
 		else {
-			$mediarec = FindMediaRecord($mid);
-			if (!$mediarec && !GetChangeData(true, $mid, true, "", "")) {
+			$media =& MediaItem::GetInstance($mid);
+			if ($media->isempty) {
 				print "<span class=\"error\">".$gm_lang["media_id_no_exists"]."</span>";
 			}
-			else if (DisplayDetailsByID($mid, "OBJE", 1, true)) print GetMediaDescriptor($mid)." (".$mid.")";
+			else if ($media->disp) print $media->title.$media->addxref;
 			else print "";
 		}
 	break;
@@ -166,7 +166,7 @@ switch($action) {
 			if ($note->isempty) {
 				print "<span class=\"error\">".$gm_lang["note_id_no_exists"]."</span>";
 			}
-			else if ($note->disp) print $note->GetTitle(40, true)." (".$oid.")";
+			else if ($note->disp) print $note->GetTitle(40, true).$note->addxref;
 			else print "";
 		}
 	break;
@@ -232,66 +232,62 @@ switch($action) {
 
 	case "getzoomfacts":
 		SwitchGedcom($gedcomid);
-		$indirec=FindPersonRecord($pid);
-		if ($canshow && GetChangeData(true, $pid, true)) {
-			$rec = GetChangeData(false, $pid, true, "gedlines", "");
-			if (isset($rec[$GEDCOM][$pid])) $indirec = $rec[$GEDCOM][$pid];
-			$newindi = true;
-		}
-		$skipfacts = array("SEX","FAMS","FAMC","NAME","TITL","NOTE","SOUR","SSN","OBJE","HUSB","WIFE","CHIL","ALIA","ADDR","PHON","SUBM","_EMAIL","CHAN","URL","EMAIL","WWW","RESI");
-		$subfacts = GetAllSubrecords($indirec, implode(",", $skipfacts));
+		$indi =& Person::GetInstance($pid);
+		$nonfacts = array("SEX","FAMS","FAMC","NAME","TITL","NOTE","SOUR","SSN","OBJE","HUSB","WIFE","CHIL","ALIA","ADDR","PHON","SUBM","_EMAIL","CHAN","URL","EMAIL","WWW","RESI","RESN");
+		$nonfamfacts = array("_UID", "RESN");
+		$indi->ParseIndiFacts();
+		$indi->AddFamilyFacts(false);
 		$f2 = 0;
-		foreach($subfacts as $indexval => $factrec) {
-			if (!FactViewRestricted($pid, $factrec)){
+		foreach($indi->facts as $indexval => $factobj) {
+			if (!in_array($factobj->fact, $nonfacts) && $factobj->disp){
 				if ($f2>0) print "<br />\n";
 				$f2++;
 				// NOTE: Handle ASSO record
-				if (strstr($factrec, "1 ASSO")) {
-					print_asso_rela_record($pid, $factrec, false);
-					continue;
-				}
-				$fft = preg_match("/^1 (\w+)(.*)/m", $factrec, $ffmatch);
+				$prted = FactFunctions::PrintAssoRelaRecord($pid, $factobj, false);
+				if ($prted) continue;
+				$fft = preg_match("/^1 (\w+)(.*)/m", $factobj->factrec, $ffmatch);
 				if ($fft>0) {
 					$fact = trim($ffmatch[1]);
 					$details = trim($ffmatch[2]);
 				}
-				if (($fact!="EVEN")&&($fact!="FACT")) {
+				if ($factobj->fact != "EVEN" && $factobj->fact != "FACT") {
 					print "<span class=\"details_label\">";
-					if (isset($factarray[$fact])) print $factarray[$fact];
-					else print $fact;
+					if (isset($factarray[$factobj->fact])) print $factarray[$factobj->fact];
+					else print $factobj->fact;
 					print "</span> ";
 				}
 				else {
-					$tct = preg_match("/2 TYPE (.*)/", $factrec, $match);
-					if ($tct>0) {
-						$facttype = trim($match[1]);
+					if ($factobj->fact != $factobj->factref) {
+//					$tct = preg_match("/2 TYPE (.*)/", $factrec, $match);
+//					if ($tct>0) {
+//						$facttype = trim($match[1]);
 						print "<span class=\"details_label\">";
-						if (isset($factarray[$facttype])) print PrintReady($factarray[$facttype]);
-						else print $facttype;
+						if (isset($factarray[$factobj->factref])) print PrintReady($factarray[$factobj->factref]);
+						else print $factobj->factref;
 						print "</span> ";
 					}
 				}
-				print_fact_date($factrec, false, false, $fact, $pid, $indirec);
-				if (GetSubRecord(2, "2 DATE", $factrec)=="") {
+				$factobj->PrintFactDate(false, false, $factobj->fact, $pid);
+				if (GetSubRecord(2, "2 DATE", $factobj->factrec)=="") {
 					if ($details!="Y" && $details!="N") print PrintReady($details);
 				}
 				else print PrintReady($details);
 				//-- print spouse name for marriage events
-				$ct = preg_match("/_GMFS @(.*)@/", $factrec, $match);
+				$ct = preg_match("/_GMFS @(.*)@/", $factobj->factrec, $match);
 				if ($ct>0) $famid = $match[1];
-				$ct = preg_match("/_GMS @(.*)@/", $factrec, $match);
+				$ct = preg_match("/_GMS @(.*)@/", $factobj->factrec, $match);
 				if ($ct>0) {
 					$spouse=$match[1];
 					if ($spouse!=="") {
-						print " <a href=\"individual.php?pid=$spouse&amp;ged=$GEDCOM\">";
-						if (showLivingNameById($spouse)) print PrintReady(GetPersonName($spouse));
-						else print $gm_lang["private"];
+						$sp =& Person::GetInstance($spouse);
+						print " <a href=\"individual.php?pid=".$sp->xref."&amp;gedid=".$sp->gedcomid."\">";
+						print $sp->name;
 						print "</a>";
 					}
-					if (($view!="preview") && ($spouse!=="")) print " - ";
-					if ($view!="preview") print "<a href=\"family.php?famid=$famid\">[".$gm_lang["view_family"]."]</a>\n";
+					if ($spouse != "" && !$factobj->owner->view) print " - ";
+					if (!$factobj->owner->view) print "<a href=\"family.php?famid=".$famid."&amp;gedid=".$GEDCOMID."\">[".$gm_lang["view_family"]."]</a>\n";
 				}
-				print_fact_place($factrec, true, true);
+				$factobj->PrintFactPlace(true, true);
 			}
 		}
 	break;

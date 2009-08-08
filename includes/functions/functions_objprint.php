@@ -694,4 +694,36 @@ function PrintFamilyChildren($family, $childid = "", $sosa = 0, $label="", $pers
    }
    print "</table><br />";
 }
+
+//-- function to print a privacy error with contact method
+function PrintPrivacyError($username) {
+	 global $gm_lang, $CONTACT_METHOD, $SUPPORT_METHOD, $WEBMASTER_EMAIL, $Users;
+	
+	 $method = $CONTACT_METHOD;
+	
+	 if ($username==$WEBMASTER_EMAIL) $method = $SUPPORT_METHOD;
+	 $user = $Users->GetUser($username);
+	 if (empty($user->username)) $method = "mailto";
+	 print "<br /><span class=\"error\">".$gm_lang["privacy_error"];
+	 if ($method=="none") {
+		  print "</span><br />\n";
+		  return;
+	 }
+	 print $gm_lang["more_information"];
+	 if ($method=="mailto") {
+		  if (!$user) {
+			   $email = $username;
+			   $fullname = $username;
+		  }
+		  else {
+			   $email = $user->email;
+			   $fullname = $user->firstname." ".$user->lastname;
+		  }
+		  print " <a href=\"mailto:$email\">".$fullname."</a></span><br />";
+	 }
+	 else {
+		  print " <a href=\"#\" onclick=\"message('$username','$method'); return false;\">".$user->firstname." ".$user->lastname."</a></span><br />";
+	 }
+}
+
 ?>
