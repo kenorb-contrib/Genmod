@@ -43,11 +43,13 @@ class Note extends GedcomRecord {
 	private $textchanged = null;
 	
 	public static function GetInstance($xref, $gedrec="", $gedcomid="") {
+		global $GEDCOMID;
 		
-		if (!isset(self::$notecache[$xref])) {
-			self::$notecache[$xref] = new Note($xref, $gedrec, $gedcomid);
+		if (empty($gedcomid)) $gedcomid = $GEDCOMID;
+		if (!isset(self::$notecache[$gedcomid][$xref])) {
+			self::$notecache[$gedcomid][$xref] = new Note($xref, $gedrec, $gedcomid);
 		}
-		return self::$notecache[$xref];
+		return self::$notecache[$gedcomid][$xref];
 	}
 	
 	/**
@@ -106,7 +108,7 @@ class Note extends GedcomRecord {
 				$this->newtitle = preg_replace("~<br />~", " ", $this->newtitle);
 				if (empty($this->newtitle)) $this->newtitle = $gm_lang["unknown"];
 			}
-			if ($l >= strlen($this->newtitle)) return $this->newtitle;
+			if ($l >= strlen($this->newtitle) || $l == 0) return $this->newtitle;
 			else return substr($this->newtitle, 0, $l).".....";
 		}
 		
@@ -120,7 +122,7 @@ class Note extends GedcomRecord {
 				return $this->title;
 			}
 		}
-		if ($l >= strlen($this->title)) return $this->title;
+		if ($l >= strlen($this->title) || $l == 0) return $this->title;
 		else return substr($this->title, 0, $l).".....";
 	}
 	
@@ -131,13 +133,12 @@ class Note extends GedcomRecord {
 		
 		if (!$this->disp) {
 			$this->newtext = $gm_lang["private"];
-			return $this->newtext;
+			return $this->text;
 		}
-
-		if ($this->ThisChanged() && !is_null($this->GetChangedGedrec())) {
+		else if ($this->ThisChanged() && !is_null($this->GetChangedGedrec())) {
 			if (!is_null($this->newtext)) return $this->newtext;
 			$this->newtext = "";
-			$nt = preg_match("/0 @.+@ NOTE (.*)/", $this->GetChangedGedrec(), $n1match);
+			$nt = preg_match("/0 @.+@ NOTE (.*)(?:\r\n|\n|\r)/", $this->GetChangedGedrec(), $n1match);
 			if ($nt>0) $this->newtext = preg_replace("/~~/", "<br />", $n1match[1]);
 			$this->newtext .= GetCont(1, $this->GetChangedGedrec());
 			return $this->newtext;
@@ -145,7 +146,7 @@ class Note extends GedcomRecord {
 		else {
 			if (!is_null($this->text)) return $this->text;
 			$this->text = "";
-			$nt = preg_match("/0 @.+@ NOTE (.*)/", $this->gedrec, $n1match);
+			$nt = preg_match("/0 @.+@ NOTE (.*)(?:\r\n|\n|\r)/", $this->gedrec, $n1match);
 			if ($nt>0) $this->text = preg_replace("/~~/", "<br />", $n1match[1]);
 			$this->text .= GetCont(1, $this->gedrec);
 			return $this->text;
@@ -153,25 +154,18 @@ class Note extends GedcomRecord {
 	}		
 		
 	protected function GetLinksFromIndis() {
-		global $TBLPREFIX, $indilist;
+		global $TBLPREFIX;
 
 		if (!is_null($this->indilist)) return $this->indilist;
 		$this->indilist = array();
 		$this->indi_hide = 0;
-//		if (!isset($indilist)) $indilist = array();
 		
 		$sql = "SELECT DISTINCT i_key, i_gedcom, i_isdead, i_id, i_file  FROM ".$TBLPREFIX."other_mapping, ".$TBLPREFIX."individuals WHERE om_oid='".$this->xref."' AND om_gedfile='".$this->gedcomid."' AND om_type='INDI' AND om_gid=i_id AND om_gedfile=i_file";
 		$res = NewQuery($sql);
 		while($row = $res->FetchAssoc()){
-//			$indi = array();
-//			$indi["gedcom"] = $row["i_gedcom"];
-//			$indi["isdead"] = $row["i_isdead"];
-//			$indi["gedfile"] = $row["i_file"];
-//			$indilist[$row["i_id"]] = $indi;
 			$person = null;
 			$person =& Person::GetInstance($row["i_id"], $row["i_gedcom"]);
 			if ($person->disp_name) {
-//				$indilist[$row["i_id"]]["names"] = $person->name_array;
 				$this->indilist[$row["i_key"]] = $person;
 			}
 			else $this->indi_hide++;
@@ -182,22 +176,15 @@ class Note extends GedcomRecord {
 	}
 	
 	protected function GetLinksFromFams() {
-		global $TBLPREFIX, $famlist;
+		global $TBLPREFIX;
 
 		if (!is_null($this->famlist)) return $this->famlist;
 		$this->famlist = array();
 		$this->fam_hide = 0;
-//		if (!isset($famlist)) $famlist = array();
 		
 		$sql = "SELECT DISTINCT f_key, f_gedcom, f_id, f_file, f_husb, f_wife  FROM ".$TBLPREFIX."other_mapping, ".$TBLPREFIX."families WHERE om_oid='".$this->xref."' AND om_gedfile='".$this->gedcomid."' AND om_type='FAM' AND om_gid=f_id AND om_gedfile=f_file";
 		$res = NewQuery($sql);
 		while($row = $res->FetchAssoc()){
-//			$fam = array();
-//			$fam["gedcom"] = $row["f_gedcom"];
-//			$fam["HUSB"] = SplitKey($row["f_husb"], "id");
-//			$fam["WIFE"] = SplitKey($row["f_wife"], "id");
-//			$fam["gedfile"] = $row["f_file"];
-//			$famlist[$row["f_id"]] = $fam;
 			$family = null;
 			$family =& Family::GetInstance($row["f_id"], $row["f_gedcom"]);
 			if ($family->disp) {
@@ -211,10 +198,9 @@ class Note extends GedcomRecord {
 	}
 	
 	protected function GetLinksFromMedia() {
-		global $TBLPREFIX, $medialist;
+		global $TBLPREFIX;
 		
 		if (!is_null($this->medialist)) return $this->medialist;
-//		if (!isset($medialist)) $medialist = array();
 		$this->medialist = array();
 		$this->media_hide = 0;
 		
@@ -222,8 +208,6 @@ class Note extends GedcomRecord {
 		$res = NewQuery($sql);
 		while($row = $res->FetchAssoc()) {
 			$mediaitem = null;
-//			$medialist[$row["m_media"]]["gedcom"] = $row["m_gedrec"];
-//			$medialist[$row["m_media"]]["gedfile"] = $row["m_gedfile"];
 			$mediaitem =& MediaItem::GetInstance($row["m_media"], $row["m_gedrec"], $row["m_gedfile"]);
 			if ($mediaitem->disp) $this->medialist[JoinKey($row["m_media"], $row["m_gedfile"])] = $mediaitem;
 			else $this->media_hide++;
@@ -238,10 +222,9 @@ class Note extends GedcomRecord {
 	 * @return array
 	 */
 	protected function GetLinksFromSources() {
-		global $TBLPREFIX, $sourcelist;
+		global $TBLPREFIX;
 
 		if(!is_null($this->sourcelist)) return $this->sourcelist;
-//		if (!isset($sourcelist)) $sourcelist = array();
 		$this->sourcelist = array();
 		$this->sour_hide = 0;
 		
@@ -249,8 +232,6 @@ class Note extends GedcomRecord {
 		$res = NewQuery($sql);
 		while($row = $res->FetchAssoc()){
 			$source = null;
-//			$sourcelist[$row["s_id"]]["gedcom"] = $row["s_gedcom"];
-//			$sourcelist[$row["s_id"]]["gedfile"] = $row["s_file"];
 			$source =& Source::GetInstance($row["s_id"], $row["s_gedcom"]);
 			if ($source->disp) $this->sourcelist[$row["s_key"]] = $source;
 			else $this->sour_hide++;
@@ -286,16 +267,18 @@ class Note extends GedcomRecord {
 		return $this->repolist;
 	}
 		
-	public function PrintListNote($len=60) {
+	public function PrintListNote($len=60, $useli=true) {
 		
 		if (!$this->disp) return false;
-
-		if (begRTLText($this->GetTitle())) print "\n\t\t\t<li class=\"rtl\" dir=\"rtl\">";
-		else print "\n\t\t\t<li class=\"ltr\" dir=\"ltr\">";
+		
+		if ($useli) {
+			if (begRTLText($this->GetTitle())) print "\n\t\t\t<li class=\"rtl\" dir=\"rtl\">";
+			else print "\n\t\t\t<li class=\"ltr\" dir=\"ltr\">";
+		}
 		print "\n\t\t\t<a href=\"note.php?oid=".$this->xref."&amp;gedid=".$this->gedcomid."\" class=\"list_item\">".PrintReady($this->GetTitle($len));
 		print $this->addxref;
 		print "</a>\n";
-		print "</li>\n";
+		if ($useli) print "</li>\n";
 	}	
 }
 ?>

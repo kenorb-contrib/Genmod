@@ -291,7 +291,7 @@ function print_place_subfields($element_id) {
 				else $Link = $text;
 				print "&nbsp;".$Link."&nbsp;";
 			}
-			print_specialchar_link($subtagid);
+			LinkFunctions::PrintSpecialCharLink($subtagid);
 		}
 		// clickable map
 		if ($i<$icountry or $i>$icounty) print "<br />\n";

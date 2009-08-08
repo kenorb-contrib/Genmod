@@ -42,7 +42,7 @@ if ((!$Users->userCanViewGedlines()) && (!$Users->UserCanAccept($username))) {
 }
 
 if ((FindPersonRecord($pid))&&(!displayDetailsByID($pid))) {
-	print_privacy_error($CONTACT_EMAIL);
+	PrintPrivacyError($CONTACT_EMAIL);
 	print "</body></html>";
 	exit;
 }

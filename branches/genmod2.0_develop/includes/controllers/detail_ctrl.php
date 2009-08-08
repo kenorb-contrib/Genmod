@@ -234,7 +234,7 @@ abstract class DetailController extends BaseController{
 				
 				//-- new fact link
 				if ($this->view != "preview" && $this->$object_name->canedit && !$this->$object_name->isdeleted) {
-					PrintAddNewFact($this->$object_name->xref, $this->$object_name->facts, strtoupper($this->tabtype));
+					FactFunctions::PrintAddNewFact($this->$object_name->xref, $this->$object_name->facts, strtoupper($this->tabtype));
 				}
 				print "</table>\n\n<br />";
 				print "</div>";
@@ -726,7 +726,7 @@ abstract class DetailController extends BaseController{
 		$object_name = $this->object_name;
 		if (!$this->$object_name->disp && !($this->$object_name->datatype == "INDI" && $this->$object_name->disp_name)) {
 			$this->PrintDetailJS();
-			print_privacy_error($CONTACT_EMAIL);
+			PrintPrivacyError($CONTACT_EMAIL);
 			print_footer();
 			exit;
 		}

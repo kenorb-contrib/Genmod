@@ -265,7 +265,7 @@ $controller->checkPrivacy();
 	if ($count>5) $half = ceil($count/2);
 	if (!$controller->isPrintPreview()) $half++;
 	foreach($controller->people as $p=>$indi) {
-		$sex = $indi->getSex();
+		$sex = $indi->sex;
 		$pid = $indi->xref;
 		$col = $p % 6;
 		if ($i==$half) print "</tr><tr>";
@@ -295,8 +295,8 @@ $controller->checkPrivacy();
 				break;
 			}
 		?>
- 			<a href="individual.php?pid=<?php print $pid; ?>">&nbsp;<?php print PrintReady($indi->getName()); ?><br />
- 			<?php $addname = $indi->getAddName(); if (strlen($addname) > 0) print PrintReady($addname); ?> 
+ 			<a href="individual.php?pid=<?php print $pid; ?>">&nbsp;<?php print PrintReady($indi->name); ?><br />
+ 			<?php $addname = $indi->addname; if (strlen($addname) > 0) print PrintReady($addname); ?> 
 			</a>
 			<input type="hidden" name="pids[<?php print $p; ?>]" value="<?php print $pid; ?>" />
 			<?php if (!$controller->isPrintPreview()) {
@@ -317,7 +317,7 @@ $controller->checkPrivacy();
 		<?php
 		}
 		else {
-			print_privacy_error($CONTACT_EMAIL);
+			PrintPrivacyError($CONTACT_EMAIL);
 			?>
 			<input type="hidden" name="pids[<?php print $p; ?>]" value="<?php print $pid; ?>" />
 			<?php if (!$controller->isPrintPreview()) {
@@ -338,7 +338,7 @@ $controller->checkPrivacy();
 			<?php print_help_link("add_person_help", "qm"); ?>
 			<?php print $gm_lang["add_another"];?>&nbsp;
 			<input class="pedigree_form" type="text" size="5" id="newpid" name="newpid" />&nbsp;
-			<?php PrintFindIndiLink("newpid","");?>
+			<?php LinkFunctions::PrintFindIndiLink("newpid","");?>
 			<br />
 			<br />
 			<div style="text-align: center"><input type="submit" value="<?php print $gm_lang["show"]; ?>" /></div>

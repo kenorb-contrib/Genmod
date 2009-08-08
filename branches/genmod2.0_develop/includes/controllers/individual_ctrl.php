@@ -476,10 +476,10 @@ class IndividualController extends DetailController {
 		if ($ct>0) {
 			// -- find sources for this name
 			print "<div class=\"indent\">";
-			print_fact_sources($factrec, 2);
+			FactFunctions::PrintFactSources($factrec, 2);
 			//-- find the notes for this name
 			print "&nbsp;&nbsp;&nbsp;";
-			print_fact_notes($factrec, 2);
+			FactFunctions::PrintFactNotes($factrec, 2);
 			print "</div><br />";
 		}
 	}
@@ -524,17 +524,6 @@ class IndividualController extends DetailController {
 		return true;
 	}
 
-	public function	SelectFacts($fact) {
-		
-		$facts = array();
-		foreach ($this->indi->facts as $key => $factobj) {
-			if ($factobj->fact == $fact) {
-				$facts[] = $factobj;
-			}
-		}
-		return $facts;
-	}
-	
 	/**
 	 * get the person box stylesheet class
 	 * for the given person

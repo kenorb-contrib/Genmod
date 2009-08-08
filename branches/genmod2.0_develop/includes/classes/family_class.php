@@ -71,11 +71,13 @@ class Family extends GedcomRecord {
 	
 	
 	public static function GetInstance($xref, $gedrec="", $gedcomid="") {
+		global $GEDCOMID;
 		
-		if (!isset(self::$familycache[$xref])) {
-			self::$familycache[$xref] = new Family($xref, $gedrec, $gedcomid);
+		if (empty($gedcomid)) $gedcomid = $GEDCOMID;
+		if (!isset(self::$familycache[$gedcomid][$xref])) {
+			self::$familycache[$gedcomid][$xref] = new Family($xref, $gedrec, $gedcomid);
 		}
-		return self::$familycache[$xref];
+		return self::$familycache[$gedcomid][$xref];
 	}
 	
 	/**
@@ -492,25 +494,27 @@ class Family extends GedcomRecord {
 		return $this->marr_plac;
 	}
 	
-	public function PrintListFamily() {
+	public function PrintListFamily($useli=true) {
 		global $gm_lang;
 		
 		if (!$this->disp) return false;
 		
-		if (begRTLText($this->GetFamilyDescriptor())) print "\n\t\t\t<li class=\"rtl\" dir=\"rtl\">";
-		else print "\n\t\t\t<li class=\"ltr\" dir=\"ltr\">";
+		if ($useli) {
+			if (begRTLText($this->GetFamilyDescriptor())) print "\n\t\t\t<li class=\"rtl\" dir=\"rtl\">";
+			else print "\n\t\t\t<li class=\"ltr\" dir=\"ltr\">";
+		}
 		print "\n\t\t\t<a href=\"family.php?famid=".$this->xref."&amp;gedid=".$this->gedcomid."\" class=\"list_item\"><b>".$this->GetFamilyDescriptor();
 		if ($this->GetFamilyAddDescriptor() != "") print "&nbsp;(".$this->GetFamilyAddDescriptor().")";
 		print "</b>";
 		print $this->addxref;
 		if ($this->GetMarriageFact() != "") {
 			print " -- <i>".$gm_lang["marriage"]." ";
-			$this->marr_fact->PrintFactDate(false, false, false, $this->xref, $this->gedrec);
+			$this->marr_fact->PrintFactDate(false, false, false, $this->xref);
 			$this->marr_fact->PrintFactPlace();
 			print "</i>";
 		}
 		print "</a>\n";
-		print "</li>\n";
+		if ($useli) print "</li>\n";
 		
 	}
 }

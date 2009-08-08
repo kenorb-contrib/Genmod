@@ -69,10 +69,13 @@ class Person extends GedcomRecord {
 
 	
 	public static function GetInstance($xref, $gedrec="", $gedcomid="") {
-		if (!isset(self::$personcache[$xref])) {
-			self::$personcache[$xref] = new Person($xref, $gedrec, $gedcomid);
+		global $GEDCOMID;
+		
+		if (empty($gedcomid)) $gedcomid = $GEDCOMID;
+		if (!isset(self::$personcache[$gedcomid][$xref])) {
+			self::$personcache[$gedcomid][$xref] = new Person($xref, $gedrec, $gedcomid);
 		}
-		return self::$personcache[$xref];
+		return self::$personcache[$gedcomid][$xref];
 	}
 		
 	/**
@@ -129,7 +132,6 @@ class Person extends GedcomRecord {
 				break;
 			case "facts":
 				if (!$this->facts_parsed) $this->ParseIndiFacts();
-//				SortFacts($this->facts, $this->type);
 				return $this->facts;
 				break;
 			case "globalfacts":
@@ -289,16 +291,18 @@ class Person extends GedcomRecord {
 				$this->drec = "";
 				$this->ddate = "";
 			}
-			
-			if (empty($this->ddate) && !empty($this->bdate)) {
-				$pdate=ParseDate(substr($this->bdate,6));
-				if ($pdate[0]["year"]>0) $this->ddate = "2 DATE BEF ".($pdate[0]["year"]+$MAX_ALIVE_AGE);
+/*			if ($assume) {
+				if (empty($this->ddate) && !empty($this->bdate)) {
+					$pdate=ParseDate(substr($this->bdate,6));
+					print_r($pdate);
+					if ($pdate[0]["year"]>0) $this->ddate = "2 DATE BEF ".($pdate[0]["year"]+$MAX_ALIVE_AGE);
+				}
+				if (empty($this->bdate) && !empty($this->ddate)) {
+					$pdate=ParseDate(substr($this->ddate,6));
+					if ($pdate[0]["year"]>0) $this->bdate = "2 DATE AFT ".($pdate[0]["year"]-$MAX_ALIVE_AGE);
+				}
 			}
-			if (empty($this->bdate) && !empty($this->ddate)) {
-				$pdate=ParseDate(substr($this->ddate,6));
-				if ($pdate[0]["year"]>0) $this->bdate = "2 DATE AFT ".($pdate[0]["year"]-$MAX_ALIVE_AGE);
-			}
-		}
+*/		}
 		return;
 	}
 	
@@ -385,7 +389,7 @@ class Person extends GedcomRecord {
 	/**
 	 * add facts from the family record
 	 */
-	public function AddFamilyFacts() {
+	public function AddFamilyFacts($continue=true) {
 		global $GEDCOM, $nonfacts, $nonfamfacts;
 		
 		if (!$this->disp) return;
@@ -399,31 +403,29 @@ class Person extends GedcomRecord {
 				// No need to check privacy. Already done in ParseFacts.
 				$count_facts = array(); 
 				foreach ($fam->facts as $key => $factobj) {
-	//				$fact = $factarr[0];
-	//				$subrecord = $factarr[1];
-	//				$type = $factarr[3];
 					if (!isset($count_facts[$factobj->fact])) $count_facts[$factobj->fact] = 1;
 					else $count_facts[$factobj->fact]++;
 					// -- handle special source fact case
 					if (($factobj->fact!="SOUR") && ($factobj->fact!="OBJE") && ($factobj->fact!="NOTE") && ($factobj->fact!="CHAN") && ($factobj->fact!="_UID") && ($factobj->fact!="RIN")) {
 						if ((!in_array($factobj->fact, $nonfacts))&&(!in_array($factobj->fact, $nonfamfacts))) {
-//							$oldsub = $factobj->factrec;
 							$subrecord = trim($factobj->factrec)."\r\n";
 							if (is_object($fam->$spperson)) $subrecord.="1 _GMS @".$fam->$spperson->xref."@\r\n";
 							$subrecord.="1 _GMFS @".$fam->xref."@\r\n";
 if ($this->tracefacts) print "AddFamilyFacts - Adding for ".$fam->xref.": ".$factobj->fact." ".$subrecord."<br />";
-							$this->facts[] = new fact($fam->xref, $factobj->fact, $subrecord, $count_facts[$factobj->fact], $factobj->style);
+							$this->facts[] = new fact($this->xref, $factobj->fact, $subrecord, $count_facts[$factobj->fact], $factobj->style);
 						}
 					}
 				}
 				// Only add spouses and kidsfacts if the family is not hidden.
-				if (is_object($fam->$spperson)) $this->AddSpouseFacts($fam, $spperson);
-				$this->AddChildrenFacts($fam);
+				if ($continue && is_object($fam->$spperson)) $this->AddSpouseFacts($fam, $spperson);
+				if ($continue) $this->AddChildrenFacts($fam);
 			}
 		}
-		$this->AddParentsFacts($this);
-		$this->add_historical_facts();
-		$this->AddAssoFacts($this->xref);
+		if ($continue) {
+			$this->AddParentsFacts($this);
+			$this->add_historical_facts();
+			$this->AddAssoFacts($this->xref);
+		}
 		SortFactObjs($this->facts, $this->type);
 
 	}
@@ -450,14 +452,14 @@ if ($this->tracefacts) print "AddFamilyFacts - Adding for ".$fam->xref.": ".$fac
 				if ($fam->husb_id != "") {
 					// add father death
 					if ($sosa==1) $fact="_DEAT_FATH"; else $fact="_DEAT_GPAR";
-					if (strstr($SHOW_RELATIVES_EVENTS, $fact)) {
+					if (strstr($SHOW_RELATIVES_EVENTS, $fact) && ShowFact("DEAT", $fam->husb->xref, "INDI") && ShowFactDetails("DEAT", $fam->husb->xref)) {
 						if (CompareFacts($this->GetBirthDate(), $fam->husb->GetDeathDate())<0 && CompareFacts($fam->husb->GetDeathDate(), $this->GetDeathDate())<0) {
 							$factrec = "1 ".$fact;
 							$factrec .= "\n".trim($fam->husb->GetDeathDate());
 							$factrec .= "\n2 ASSO @".$fam->husb->xref."@";
 							$factrec .= "\n3 RELA ".(GetSosaName($sosa*2));
 	if ($this->tracefacts) print "AddParentsFacts sosa ".$sosa."- Adding for ".$fam->xref.": ".$fact." ".$factrec."<br />";
-							$this->facts[] = new Fact($fam->xref, "X$fact", $factrec, 0, "");
+							$this->facts[] = new Fact($this->xref, "X$fact", $factrec, 0, "");
 						}
 					}
 					if ($sosa==1) $this->AddStepSiblingsFacts($fam->husb, $fam->xref); // stepsiblings with father
@@ -467,7 +469,7 @@ if ($this->tracefacts) print "AddFamilyFacts - Adding for ".$fam->xref.": ".$fac
 				if ($fam->wife_id != "") {
 					// add mother death
 					if ($sosa==1) $fact="_DEAT_MOTH"; else $fact="_DEAT_GPAR";
-					if (strstr($SHOW_RELATIVES_EVENTS, $fact)) {
+					if (strstr($SHOW_RELATIVES_EVENTS, $fact) && ShowFact("DEAT", $fam->wife->xref, "INDI") && ShowFactDetails("DEAT", $fam->wife->xref)) {
 						if (CompareFacts($this->GetBirthDate(), $fam->wife->GetDeathDate())<0 && CompareFacts($fam->wife->GetDeathDate(), $this->GetDeathDate())<0) {
 							$factrec = "1 ".$fact;
 							$factrec .= "\n".trim($fam->wife->GetDeathDate());
@@ -475,7 +477,7 @@ if ($this->tracefacts) print "AddFamilyFacts - Adding for ".$fam->xref.": ".$fac
 							$factrec .= "\n3 RELA ".(GetSosaName($sosa*2+1));
 	if ($this->tracefacts) print "AddParentsFacts sosa ".$sosa."- Adding for ".$fam->xref.": ".$fact." ".$factrec."<br />";
 	//print $this->GetBirthDate()."  ".$fam->wife->GetDeathDate()."  ".$fam->wife->GetDeathDate()."  ".$this->GetDeathDate()."<br />";
-							$this->facts[] = new Fact($fam->xref, "X$fact", $factrec, 0, "");
+							$this->facts[] = new Fact($this->xref, "X$fact", $factrec, 0, "");
 						}
 					}
 					if ($sosa==1) $this->AddStepSiblingsFacts($fam->wife, $fam->xref); // stepsiblings with mother
@@ -493,7 +495,7 @@ if ($this->tracefacts) print "AddFamilyFacts - Adding for ".$fam->xref.": ".$fac
 						$fact="_MARR_MOTH";
 						$rela="mother";
 					}
-					if (strstr($SHOW_RELATIVES_EVENTS, $fact) && is_object($parent)) {
+					if (strstr($SHOW_RELATIVES_EVENTS, $fact) && is_object($parent) && ShowFact("MARR", $fam->xref, "FAM") && ShowFactDetails("MARR", $fam->xref)) {
 						$parent->GetSpouseFamilies();
 						foreach ($parent->spousefamilies as $indexval => $psfam) {
 							if ($psfam->xref == $fam->xref and $rela=="mother") continue; // show current family marriage only for father
@@ -514,7 +516,7 @@ if ($this->tracefacts) print "AddFamilyFacts - Adding for ".$fam->xref.": ".$fac
 								$factrec .= "\n2 ASSO @".$psfam->xref."@";
 								$factrec .= "\n3 RELA family";
 if ($this->tracefacts) print "AddParentsFacts sosa ".$sosa."- Adding for ".$fam->xref.": ".$fact." ".$factrec."<br />";
-								$this->facts[] = new Fact($psfam->xref, "X$fact", $factrec, 0, "");
+								$this->facts[] = new Fact($this->xref, "X$fact", $factrec, 0, "");
 							}
 						}
 					}
@@ -588,14 +590,14 @@ if ($this->tracefacts) print "AddParentsFacts sosa ".$sosa."- Adding for ".$fam-
 				if ($option=="2") $fact = "_BIRT_FSIB";
 				if ($option=="3") $fact = "_BIRT_MSIB";
 				if (strstr($SHOW_RELATIVES_EVENTS, $fact) && ShowFact("BIRT", $child->xref, "INDI") && ShowFactDetails("BIRT", $child->xref)) {
-					if (CompareFacts($this->GetBirthDate(), $child->GetBirthDate()) < 0 and CompareFacts($child->GetBirthDate(), $this->GetDeathDate()) < 0) {
+					if (CompareFacts($this->GetBirthDate(), $child->GetBirthDate()) < 0 && CompareFacts($child->GetBirthDate(), $this->GetDeathDate()) < 0) {
 						$factrec = "1 ".$fact;
 						$factrec .= "\n".trim($child->bdate);
 						$factrec .= "\n2 ASSO @".$child->xref."@";
 						$factrec .= "\n3 RELA ".$rela;
 if ($this->tracefacts) print "AddChildrenFacts (".$option.") - Adding for ".$child->xref.": ".$fact." ".$factrec."<br />";
 
-						$this->facts[] = new Fact($child->xref, "X$fact", $factrec, 0, "");
+						$this->facts[] = new Fact($this->xref, "X$fact", $factrec, 0, "");
 					}
 				}
 				// add child death
@@ -613,7 +615,7 @@ if ($this->tracefacts) print "AddChildrenFacts (".$option.") - Adding for ".$chi
 						$factrec .= "\n2 ASSO @".$child->xref."@";
 						$factrec .= "\n3 RELA ".$rela;
 if ($this->tracefacts) print "AddChildrenFacts (".$option.") - Adding for ".$child->xref.": ".$fact." ".$factrec."<br />";
-						$this->facts[] = new Fact($child->xref, "X$fact", $factrec, 0, "");
+						$this->facts[] = new Fact($this->xref, "X$fact", $factrec, 0, "");
 					}
 				}
 				// add child marriage
@@ -653,7 +655,7 @@ if ($this->tracefacts) print "AddChildrenFacts (".$option.") - Adding for ".$chi
 								$arec = GetSubRecord(2, "2 ASSO @".$child->xref."@", $childfam->marr_fact->factrec);
 								if ($arec) $factrec .= "\n".$arec;
 if ($this->tracefacts) print "AddChildrenFacts (".$option.") - Adding for ".$child->xref.": ".$fact." ".$factrec."<br />";
-								$this->facts[] = new Fact($child->xref, "X$fact", $factrec, 0, "");
+								$this->facts[] = new Fact($this->xref, "X$fact", $factrec, 0, "");
 							}
 						}
 					}
@@ -693,14 +695,14 @@ if ($this->tracefacts) print "AddChildrenFacts (".$option.") - Adding for ".$chi
 		if (strstr($fam->gedrec, "1 DIV")) return;
 		// add spouse death
 		$fact = "_DEAT_SPOU";
-		if (strstr($SHOW_RELATIVES_EVENTS, $fact)) {
+		if (strstr($SHOW_RELATIVES_EVENTS, $fact) && ShowFact("DEAT", $fam->$spperson->xref, "INDI") && ShowFactDetails("DEAT", $fam->$spperson->xref)) {
 			if (CompareFacts($this->GetBirthDate(), $fam->$spperson->GetDeathDate())<0 and CompareFacts($fam->$spperson->GetDeathDate(), $this->GetDeathDate())<0) {
 				$factrec = "1 ".$fact;
 				$factrec .= "\n".trim($fam->$spperson->ddate);
 				$factrec .= "\n2 ASSO @".$fam->$spperson->xref."@";
 				$factrec .= "\n3 RELA spouse";
 if ($this->tracefacts) print "AddSpouseFacts - Adding for ".$fam->$spperson->xref.": ".$fact." ".$factrec."<br />";
-				$this->facts[] = new Fact($fam->$spperson->xref, "X$fact", $factrec, 0, "");
+				$this->facts[] = new Fact($this->xref, "X$fact", $factrec, 0, "");
 			}
 		}
 	}
@@ -796,7 +798,7 @@ if ($this->tracefacts) print "AddSpouseFacts - Adding for ".$fam->$spperson->xre
 									else $factrec .= "\n2 ASSO @".$rid."@\n3 RELA ".$label;
 									//$factrec .= "\n3 NOTE ".$rela;
 									$factrec .= "\n2 ASSO @".$pid."@\n3 RELA ".$rela;
-									$this->facts[] = new Fact($rid, "X_$fact", $factrec, 0, "");
+									$this->facts[] = new Fact($this->xref, "X_$fact", $factrec, 0, "");
 								}
 							}
 						}
@@ -835,10 +837,6 @@ if ($this->tracefacts) print "AddSpouseFacts - Adding for ".$fam->$spperson->xre
 					if ($fam->pedigreetype == "") {
 						$child->GetChildFamilyIds();
 						$rela = $child->famc[$id]["relation"];
-//						$famlink = GetSubRecord(1, "1 FAMC @".$fam->xref."@", $child->gedrec);
-//						$ft = preg_match("/2 PEDI (.*)/", $famlink, $fmatch);
-//						if ($ft>0 && $fmatch[1] != "birth") $rela = trim($fmatch[1]);
-//						else $rela = "";
 					}
 					else $rela = $fam->pedigreetype;
 					$sex = $child->getSex();
@@ -856,61 +854,53 @@ if ($this->tracefacts) print "AddSpouseFacts - Adding for ".$fam->$spperson->xre
 		if (count($this->spousefamilies) > 0) {
 			$this->close_relatives = true;
 			foreach ($this->spousefamilies as $id => $fam) {
-//				if ($fam->disp) {
-					$this->close_relatives = true;
-					
-					// NOTE: Get the label for the family
-					$this->spousefamilies[$id]->label = $gm_lang["family_with"] . " ";
-					// Check if the husband is equal to the person we are displaying
-					// If so, add the wife to the tag
-					if ($this->xref == $this->spousefamilies[$id]->husb_id) {
-						if (is_object($this->spousefamilies[$id]->wife)) {
-							$name = $this->spousefamilies[$id]->wife->GetName();
-							if (HasChinese($name)) $name = PrintReady($name." (".$this->spousefamilies[$id]->wife->GetAddName().")");
-							if ($fam->wife->disp_name) $this->spousefamilies[$id]->label .= $name;
-							else $this->spousefamilies[$id]->label .= $gm_lang["private"];
-						}
-						else $this->spousefamilies[$id]->label .= $gm_lang["unknown"];
+				$this->close_relatives = true;
+				
+				// NOTE: Get the label for the family
+				$this->spousefamilies[$id]->label = $gm_lang["family_with"] . " ";
+				// Check if the husband is equal to the person we are displaying
+				// If so, add the wife to the tag
+				if ($this->xref == $this->spousefamilies[$id]->husb_id) {
+					if (is_object($this->spousefamilies[$id]->wife)) {
+						$name = $this->spousefamilies[$id]->wife->GetName();
+						if (HasChinese($name)) $name = PrintReady($name." (".$this->spousefamilies[$id]->wife->GetAddName().")");
+						if ($fam->wife->disp_name) $this->spousefamilies[$id]->label .= $name;
+						else $this->spousefamilies[$id]->label .= $gm_lang["private"];
 					}
-					else {
-						if (is_object($this->spousefamilies[$id]->husb)) {
-							$name = $this->spousefamilies[$id]->husb->getName();
-							if (HasChinese($name)) $name = PrintReady($name." (".$this->spousefamilies[$id]->husb->getAddName().")");
-							if ($fam->husb->disp_name) $this->spousefamilies[$id]->label .= $name;
-							else $this->spousefamilies[$id]->label .= $gm_lang["private"];
-						}
-						else $this->spousefamilies[$id]->label .= $gm_lang["unknown"];
+					else $this->spousefamilies[$id]->label .= $gm_lang["unknown"];
+				}
+				else {
+					if (is_object($this->spousefamilies[$id]->husb)) {
+						$name = $this->spousefamilies[$id]->husb->getName();
+						if (HasChinese($name)) $name = PrintReady($name." (".$this->spousefamilies[$id]->husb->getAddName().")");
+						if ($fam->husb->disp_name) $this->spousefamilies[$id]->label .= $name;
+						else $this->spousefamilies[$id]->label .= $gm_lang["private"];
 					}
-					// NOTE: Create the parents and set their label
-					foreach ($this->spousefamilies[$id]->parents as $type => $parent) {
-						if (is_object($parent)) {
-							$sex = $parent->getSex();
-							$divorced = "";
-							$married = "";
-							$divorced = GetSubRecord(1, "DIV", $this->spousefamilies[$id]->gedrec);
-							if ($parent->xref == $this->xref) $label = "<img src=\"images/selected.png\" alt=\"\" />";
-							else $label = $parent->gender($sex, "spouseparents", $divorced, (is_object($this->spousefamilies[$id]->marr_fact) ? $this->spousefamilies[$id]->marr_fact->factrec : ""));
-							$type = strtolower($type);
-							$this->spousefamilies[$id]->$type->setFamLabel($this->spousefamilies[$id]->xref, $label);
-						}
+					else $this->spousefamilies[$id]->label .= $gm_lang["unknown"];
+				}
+				// NOTE: Create the parents and set their label
+				foreach ($this->spousefamilies[$id]->parents as $type => $parent) {
+					if (is_object($parent)) {
+						$sex = $parent->getSex();
+						$divorced = "";
+						$married = "";
+						$divorced = GetSubRecord(1, "DIV", $this->spousefamilies[$id]->gedrec);
+						if ($parent->xref == $this->xref) $label = "<img src=\"images/selected.png\" alt=\"\" />";
+						else $label = $parent->gender($sex, "spouseparents", $divorced, (is_object($this->spousefamilies[$id]->marr_fact) ? $this->spousefamilies[$id]->marr_fact->factrec : ""));
+						$type = strtolower($type);
+						$this->spousefamilies[$id]->$type->setFamLabel($this->spousefamilies[$id]->xref, $label);
 					}
-					// NOTE: Create the children and set their label
-					foreach ($this->spousefamilies[$id]->children as $key => $child) {
-						$sex = $child->getSex();
-						// Get the type of family relationship
-						$child->GetChildFamilyIds();
-//						print $child->xref;
-//						print_r($child->famc);
-						$rela = $child->famc[$id]["relation"];
-//						$famlink = GetSubRecord(1, "1 FAMC @".$this->spousefamilies[$id]->xref."@", $child->gedrec);
-//						$ft = preg_match("/2 PEDI (.*)/", $famlink, $fmatch);
-//						if ($ft>0 && $fmatch[1] != "birth") $rela = trim($fmatch[1]);
-//						else $rela = "";
-						if ($child->xref == $this->xref) $label = "<img src=\"images/selected.png\" alt=\"\" />";
-						else $label = $child->gender($sex, $rela."spousekids");
-						$this->spousefamilies[$id]->children[$key]->setFamLabel($fam->xref, $label);
-					}
-//				}
+				}
+				// NOTE: Create the children and set their label
+				foreach ($this->spousefamilies[$id]->children as $key => $child) {
+					$sex = $child->getSex();
+					// Get the type of family relationship
+					$child->GetChildFamilyIds();
+					$rela = $child->famc[$id]["relation"];
+					if ($child->xref == $this->xref) $label = "<img src=\"images/selected.png\" alt=\"\" />";
+					else $label = $child->gender($sex, $rela."spousekids");
+					$this->spousefamilies[$id]->children[$key]->setFamLabel($fam->xref, $label);
+				}
 			}
 		}
 	}
@@ -1003,7 +993,7 @@ if ($this->tracefacts) print "AddSpouseFacts - Adding for ".$fam->$spperson->xre
 	
 	public function gender($sex, $type, $divorced="", $married = "") {
 		global $gm_lang;
-//		print "married: ".$married;
+		
 		$label = $gm_lang["unknown"];
 		switch ($type) {
 			case "spousekids" :
@@ -1312,6 +1302,127 @@ if ($this->tracefacts) print "AddSpouseFacts - Adding for ".$fam->$spperson->xre
 		return $this->famc;
 	}
 	
+	/**
+	 * get an individuals age at the given date
+	 *
+	 * get an individuals age at the given date
+	 * @param string $indirec the individual record so that we can get the birth date
+	 * @param string $datestr the date string (everything after DATE) to calculate the age for
+	 * @param string $style optional style (default 1=HTML style)
+	 * @return string the age in a string
+	 */
+	public function GetAge($datestr, $style=1) {
+		global $gm_lang,$monthtonum, $USE_RTL_FUNCTIONS;
+		
+		$estimates = array("abt","aft","bef","est","cir");
+		$realbirthdt="";
+		$bdatestr = "";
+		
+		//-- get birth date for age calculations
+		$birthrec = $this->GetBirthRecord();
+		if ($birthrec == "") return "";
+		
+		$hct = preg_match("/2 DATE.*(@#DHEBREW@)/", $birthrec, $match);
+		if ($hct>0) {
+			$dct = preg_match("/2 DATE (.+)/", $birthrec, $match);
+			$hebrew_birthdate = ParseDate(trim($match[1]));
+			if ($USE_RTL_FUNCTIONS && $index==1) $birthdate = JewishGedcomDateToGregorian($hebrew_birthdate);
+		}
+		else {
+			$dct = preg_match("/2 DATE (.+)/", $birthrec, $match);
+			if ($dct>0) $birthdate = ParseDate(trim($match[1]));
+		}
+	
+		$convert_hebrew = false;
+		//-- check if it is a hebrew date
+		$hct = preg_match("/@#DHEBREW@/", $datestr, $match);
+		if ($USE_RTL_FUNCTIONS && $hct>0) {
+			if (isset($hebrew_birthdate)) $birthdate = $hebrew_birthdate;
+			else $convert_hebrew = true;
+		}
+		if ((strtoupper(trim($datestr))!="UNKNOWN")&&(!empty($birthdate[0]["year"]))) {
+			$bt = preg_match("/(\d\d\d\d).*(\d\d\d\d)/", $datestr, $bmatch);
+			if ($bt>0) {
+				$date = ParseDate($datestr);
+				if ($convert_hebrew) $date = JewishGedcomDateToGregorian($date);
+				$age1 = $date[0]["year"]-$birthdate[0]["year"];
+				$age2 = $date[1]["year"]-$birthdate[0]["year"];
+				if ($style) $realbirthdt = " <span class=\"age\">(".$gm_lang["age"]." ";
+				$age1n = ConvertNumber($age1);
+				$age2n = ConvertNumber($age2);
+				$realbirthdt .= $gm_lang["apx"]." ".$age1n;
+				if ($age2n > $age1n) $realbirthdt .= "-".$age2n;
+				if ($style) $realbirthdt .= ")</span>";
+			}
+			else {
+				$date = ParseDate($datestr);
+				if ($convert_hebrew) $date = JewishGedcomDateToGregorian($date);
+				if (!empty($date[0]["year"])) {
+					$age = $date[0]["year"]-$birthdate[0]["year"];
+					if (!empty($birthdate[0]["mon"])) {
+						if (!empty($date[0]["mon"])) {
+							if ($date[0]["mon"]<$birthdate[0]["mon"]) $age--;
+							else if (($date[0]["mon"]==$birthdate[0]["mon"])&&(!empty($birthdate[0]["day"]))) {
+								if (!empty($date[0]["day"])) {
+									if ($date[0]["day"]<$birthdate[0]["day"]) $age--;
+								}
+							}
+						}
+					}
+					if ($style) $realbirthdt = " <span class=\"age\">(".$gm_lang["age"];
+					$at = preg_match("/([a-zA-Z]{3})\.?/", $birthdate[0]["ext"], $amatch);
+					if ($at==0) $at = preg_match("/([a-zA-Z]{3})\.?/", $datestr, $amatch);
+					if ($at>0) {
+						if (in_array(strtolower($amatch[1]), $estimates)) {
+							$realbirthdt .= " ".$gm_lang["apx"];
+						}
+					}
+					// age in months if < 2 years
+					if ($age<2) {
+						$y1 = $birthdate[0]["year"];
+						$y2 = $date[0]["year"];
+						$m1 = $birthdate[0]["mon"];
+						$m2 = $date[0]["mon"];
+						$d1 = $birthdate[0]["day"];
+						$d2 = $date[0]["day"];
+						$apx = (empty($m2) or empty($m1) or empty($d2) or empty($d1)); // approx
+						if ($apx) $realbirthdt .= " ".$gm_lang["apx"];
+						if (empty($m2)) $m2=$m1;
+						if (empty($m1)) $m1=$m2;
+						if (empty($d2)) $d2=$d1;
+						if (empty($d1)) $d1=$d2;
+						if ($y2>$y1) $m2 +=($y2-$y1)*12;
+						$age = $m2-$m1;
+						if ($d2<$d1) $age--;
+						// age in days if < 1 month
+						if ($age<1) {
+							if ($m2>$m1) {
+								if ($m1==2) $d2+=28;
+								else if ($m1==4 or $m1==6 or $m1==9 or $m1==11) $d2+=30;
+								else $d2+=31;
+							}
+							$age = $d2-$d1;
+							$realbirthdt .= " ".$age." ";
+							if ($age < 2) $realbirthdt .= $gm_lang["day1"];
+							else $realbirthdt .= $gm_lang["days"];
+						} else if ($age==12 and $apx) {
+							$realbirthdt .= " 1 ".$gm_lang["year1"]; // approx 1 year
+						} else {
+							$realbirthdt .= " ".$age." ";
+							if ($age < 2) $realbirthdt .= $gm_lang["month1"];
+							else $realbirthdt .= $gm_lang["months"];
+						}
+					}
+					else $realbirthdt .= " ".ConvertNumber($age);
+					if ($style) $realbirthdt .= ")</span>";
+					if ($age == 0) $realbirthdt = ""; // empty age
+				}
+			}
+		}
+		if ($style) return $realbirthdt;
+		else return trim($realbirthdt);
+	}
+	
 	protected function GetLinksFromActions($status="") {
 		global $TBLPREFIX, $Users;
 
@@ -1367,7 +1478,7 @@ if ($this->tracefacts) print "AddSpouseFacts - Adding for ".$fam->$spperson->xre
 		else $addname = "";
 		print "<a href=\"individual.php?pid=".$this->xref."&amp;gedid=".$this->gedcomid."\" class=\"list_item\"><b>";
 		print CheckNN($this->GetSortableName()).$addname."</b>".$this->addxref;
-		print_first_major_fact($this->xref, $this->gedrec, true, $break);
+		FactFunctions::PrintFirstMajorFact($this, true, $break);
 		print "</a>\n";
 		if ($useli) print "</li>";
 		

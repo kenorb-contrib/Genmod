@@ -41,11 +41,13 @@ class Repository extends GedcomRecord {
 	private $adddescriptor = null;
 		
 	public static function GetInstance($xref, $gedrec="", $gedcomid="") {
+		global $GEDCOMID;
 		
-		if (!isset(self::$repocache[$xref])) {
-			self::$repocache[$xref] = new Repository($xref, $gedrec, $gedcomid);
+		if (empty($gedcomid)) $gedcomid = $GEDCOMID;
+		if (!isset(self::$repocache[$gedcomid][$xref])) {
+			self::$repocache[$gedcomid][$xref] = new Repository($xref, $gedrec, $gedcomid);
 		}
-		return self::$repocache[$xref];
+		return self::$repocache[$gedcomid][$xref];
 	}
 	
 	public function __construct($id, $gedrec="", $gedcomid="") {
@@ -159,10 +161,9 @@ class Repository extends GedcomRecord {
 	 * @return array
 	 */
 	protected function GetLinksFromSources() {
-		global $TBLPREFIX, $sourcelist;
+		global $TBLPREFIX;
 
 		if(!is_null($this->sourcelist)) return $this->sourcelist;
-//		if (!isset($sourcelist)) $sourcelist = array();
 		$this->sourcelist = array();
 		$this->sour_hide = 0;
 		
@@ -170,8 +171,6 @@ class Repository extends GedcomRecord {
 		$res = NewQuery($sql);
 		while($row = $res->FetchAssoc()){
 			$source = null;
-//			$sourcelist[$row["s_id"]]["gedcom"] = $row["s_gedcom"];
-//			$sourcelist[$row["s_id"]]["gedfile"] = $row["s_file"];
 			$source =& Source::GetInstance($row["s_id"], $row["s_gedcom"]);
 			if ($source->disp) $this->sourcelist[$row["s_key"]] = $source;
 			else $this->sour_hide++;

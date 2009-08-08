@@ -267,7 +267,7 @@ if ($view!="preview") {
 	print $gm_lang["root_person"]."&nbsp;</td>";
 	print "<td class=\"shade1 vmiddle\">";
 	print "\n\t\t<input class=\"pedigree_form\" type=\"text\" id=\"pid\" name=\"pid\" size=\"3\" value=\"$pid\" />";
-	PrintFindIndiLink("pid","");
+	LinkFunctions::PrintFindIndiLink("pid","");
 	print "</td>";
 
 	// NOTE: box width

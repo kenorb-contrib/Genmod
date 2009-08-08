@@ -2373,7 +2373,8 @@ function GetSurnameFams($surname, $allgeds="no") {
 		}
 	}
 	$select = "'".implode("', '", $select)."'";
-	$f = GetFamlist($allgeds, $select, false, $trans);
+	if ($select != "''") $f = GetFamlist($allgeds, $select, false, $trans);
+	else $f = array();
 	$SHOW_MARRIED_NAMES = $temp;
 	return $f;
 }

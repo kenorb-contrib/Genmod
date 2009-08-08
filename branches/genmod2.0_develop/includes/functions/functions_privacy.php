@@ -1014,7 +1014,7 @@ function FactViewRestricted($pid, $factrec, $level=2) {
 	}
 	return true;
 }
-
+// used in old print_fact
 function ShowRelaFact($factrec) {
 	
 	$fact = substr($factrec, 3, 4);
@@ -1029,7 +1029,7 @@ function ShowRelaFact($factrec) {
 		return ShowFact($fact, $id);
 	}
 }
-
+// used in old print_fact
 function ShowRelaFactDetails($factrec) {
 	
 	$fact = substr($factrec, 3, 4);

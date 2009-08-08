@@ -1243,9 +1243,9 @@ switch ($action) {
 				print "<input type=\"hidden\" name=\"islink[]\" value=\"1\" />\n";
 				print "<input type=\"hidden\" name=\"tag[]\" value=\"OBJE\" />\n";
 				print "<input type=\"hidden\" name=\"text[]\" value=\"".$pid."\" />\n";
-			 	PrintFindIndiLink("pid", $GEDCOMID);
-			 	print_findfamily_link("pid");
-			 	print_findsource_link("pid");
+			 	LinkFunctions::PrintFindIndiLink("pid", $GEDCOMID);
+			 	LinkFunctions::PrintFindFamilyLink("pid");
+			 	LinkFunctions::PrintFindSourceLink("pid");
 			 	print "</td></tr>";
 		 	}
 			if ($fact=="GNOTE") {
@@ -1671,7 +1671,7 @@ switch ($action) {
 		AddTagSeparator("link_as_child");
 		print "<td class=\"shade2\">".$gm_lang["family"]."</td>";
 		print "<td class=\"shade1\"><input type=\"text\" id=\"famid\" name=\"famid\" size=\"8\" onblur=\"sndReq('famlink', 'getfamilydescriptor', 'famid', this.value, '', '');\"/> ";
-		print_findfamily_link("famid");
+		LinkFunctions::PrintFindFamilyLink("famid");
 		print "&nbsp;<span id=\"famlink\"></span>";
 		print "\n</td></tr>";
 		if ($famtag == "CHIL") {
@@ -1986,10 +1986,10 @@ switch ($action) {
 			<table class="facts_table">
 				<?php AddTagSeparator("create_repository"); ?>
 				<tr><td class="shade2"><?php print $factarray["NAME"]; ?></td>
-				<td class="shade1"><input tabindex="<?php print $tabkey; ?>" type="text" name="NAME" id="NAME" value="" size="40" maxlength="255" /> <?php print_specialchar_link("NAME"); ?></td></tr>
+				<td class="shade1"><input tabindex="<?php print $tabkey; ?>" type="text" name="NAME" id="NAME" value="" size="40" maxlength="255" /> <?php LinkFunctions::PrintSpecialCharLink("NAME"); ?></td></tr>
 				<?php $tabkey++; ?>
 				<tr><td class="shade2"><?php print $factarray["ADDR"]; ?></td>
-				<td class="shade1"><textarea tabindex="<?php print $tabkey; ?>" name="ADDR" id="ADDR" rows="5" cols="60"></textarea><?php print_specialchar_link("ADDR"); ?> </td></tr>
+				<td class="shade1"><textarea tabindex="<?php print $tabkey; ?>" name="ADDR" id="ADDR" rows="5" cols="60"></textarea><?php LinkFunctions::PrintSpecialCharLink("ADDR"); ?> </td></tr>
 				<?php $tabkey++; ?>
 				<tr><td class="shade2"><?php print $factarray["PHON"]; ?></td>
 				<td class="shade1"><input tabindex="<?php print $tabkey; ?>" type="text" name="PHON" id="PHON" value="" size="40" maxlength="255" /> </td></tr>
@@ -2326,7 +2326,7 @@ switch ($action) {
 			print "<input type=\"hidden\" name=\"pid\" value=\"$pid\" />\n";
 			print "<input type=\"hidden\" name=\"oldrec\" value=\"".urlencode($oldrec)."\" />\n";
 			print "<input type=\"hidden\" name=\"change_type\" value=\"$change_type\" />\n";
-			print_specialchar_link("newgedrec");
+			LinkFunctions::PrintSpecialCharLink("newgedrec");
 			print "<textarea name=\"newgedrec\" id=\"newgedrec\" rows=\"20\" cols=\"82\" dir=\"ltr\">".$gedrec."</textarea>\n<br />";
 			if ($Users->UserCanAccept($gm_username) && !$Users->userAutoAccept($gm_username)) print "<br /><input name=\"aa_attempt\" type=\"checkbox\" value=\"1\" />".$gm_lang["attempt_auto_acc"]."<br />\n";
 			print "<input type=\"submit\" value=\"".$gm_lang["save"]."\" /><br />\n";
@@ -2394,7 +2394,7 @@ switch ($action) {
 		else print $gm_lang["husband"];
 		print "</td>";
 		print "<td class=\"shade1\"><input id=\"spouseid\" type=\"text\" name=\"spid\" size=\"8\"  onblur=\"sndReq('spouselink', 'getpersonname', 'pid', this.value, '', '');\"/> ";
-		PrintFindIndiLink("spouseid", "");
+		LinkFunctions::PrintFindIndiLink("spouseid", "");
 		print "&nbsp;<span id=\"spouselink\"></span>";
 		print "\n</td></tr>";
 		AddTagSeparator("MARR");
