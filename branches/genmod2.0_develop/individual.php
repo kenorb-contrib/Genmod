@@ -128,7 +128,7 @@ $controller->CheckRawEdited();
 		
 		//-- - put the birth and death info in this section
 		print "<div class=\"indi_spacer\" style=\"line-height:20px;\">";
-		$bfacts = $controller->indi->SelectFacts("BIRT");
+		$bfacts = $controller->indi->SelectFacts(array("BIRT"));
 		foreach ($bfacts as $key => $factobj) {
 			if ($factobj->style != "") $style = " class=\"".$factobj->style."\"";
 			else $style = "";
@@ -137,7 +137,7 @@ $controller->CheckRawEdited();
 			$factobj->PrintFactPlace();
 			print "</span><br />";
 		}
-		$dfacts = $controller->indi->SelectFacts("DEAT");
+		$dfacts = $controller->indi->SelectFacts(array("DEAT"));
 		foreach ($dfacts as $key => $factobj) {
 			if ($factobj->style != "") $style = " class=\"".$factobj->style."\"";
 			else $style = "";

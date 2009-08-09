@@ -116,7 +116,8 @@ abstract class GedcomRecord {
 				case "SOUR": $this->gedrec = FindSourceRecord($this->xref); break;
 				case "REPO": $this->gedrec = FindOtherRecord($this->xref); break;
 				case "OBJE": $this->gedrec = FindMediaRecord($this->xref); break;
-				case "NOTE": $this->gedrec = FindOtherRecord($this->xref); break;
+				case "NOTE": $this->gedrec = FindOtherRecord($this->xref, "", false, "NOTE"); break;
+				case "SUBM": $this->gedrec = FindOtherRecord($this->xref, "", false, "SUBM"); break;
 			}
 			if (empty($this->gedrec)) {
 				if (!$this->show_changes) $this->isempty = true;
@@ -516,14 +517,17 @@ abstract class GedcomRecord {
 		return $this->facts;
 	}
 	
-	public function	SelectFacts($fact) {
+	public function	SelectFacts($factarray) {
 		
 		if (is_null($this->facts)) $this->ParseFacts();
 		
 		$facts = array();
-		foreach ($this->facts as $key => $factobj) {
-			if ($factobj->fact == $fact) {
-				$facts[] = $factobj;
+		// We must retain the order of the fact array
+		foreach ($factarray as $key => $fact) {
+			foreach ($this->facts as $key => $factobj) {
+				if ($factobj->fact == $fact) {
+					$facts[] = $factobj;
+				}
 			}
 		}
 		return $facts;
