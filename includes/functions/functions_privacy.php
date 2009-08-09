@@ -356,7 +356,7 @@ if (!function_exists("displayDetailsByID")) {
 		global $global_facts, $person_privacy, $user_privacy, $HIDE_LIVE_PEOPLE, $GEDCOM, $SHOW_DEAD_PEOPLE, $MAX_ALIVE_AGE, $PRIVACY_BY_YEAR;
 		global $PRIVACY_CHECKS, $PRIVACY_BY_RESN, $SHOW_SOURCES, $SHOW_LIVING_NAMES, $LINK_PRIVACY, $Users;
 		static $pcache;
-		
+
 		//print "Check ".$pid." type ".$type." recursive ".$recursive." checklinks ".$checklinks."<br />";
 		// Return the value from the cache, if set
 		if (!isset($pcache)) $pcache = array();

@@ -43,16 +43,13 @@ abstract class FactFunctions {
 	 */
 	public function PrintFact($factobj, $pid, $fact, $count=1, $indirec=false, $styleadd="", $mayedit=true) {
 		global $factarray, $show_changes;
-		global $nonfacts, $birthyear, $birthmonth, $birthdate;
-		global $hebrew_birthyear, $hebrew_birthmonth, $hebrew_birthdate;
-		global $BOXFILLCOLOR, $GM_IMAGE_DIR;
-		global $gm_lang, $GEDCOM, $GEDCOMID, $gm_username, $Users;
+		global $nonfacts;
+		global $GM_IMAGE_DIR;
+		global $gm_lang, $GEDCOM, $GEDCOMID;
 		global $WORD_WRAPPED_NOTES;
 		global $TEXT_DIRECTION;
-		global $HIDE_GEDCOM_ERRORS, $SHOW_ID_NUMBERS, $SHOW_FAM_ID_NUMBERS;
-		global $CONTACT_EMAIL, $view, $FACT_COUNT, $monthtonum;
-		global $dHebrew;
-		global $n_chil, $n_gchi;
+		global $HIDE_GEDCOM_ERRORS, $SHOW_FAM_ID_NUMBERS;
+		global $CONTACT_EMAIL, $FACT_COUNT;
 		static $rowcnt;
 		static $relacnt;
 		
@@ -106,7 +103,6 @@ abstract class FactFunctions {
 			$prted = false;
 			print "<td class=\"shade1 $styleadd wrap\">";
 	//print "Event: ".$event."<br />Fact: ".$fact."<br />";
-			$user = $Users->GetUser($gm_username);
 			if ($factobj->disp) {
 				// -- first print TYPE for some facts
 				if ($fact!="EVEN" && $fact!="FACT") {
@@ -138,7 +134,7 @@ abstract class FactFunctions {
 						 print "</a>";
 					}
 					$ct = preg_match("/_GMFS @(.*)@/", $factobj->factrec, $match);
-					if (($view != "preview") && ($spouse !== "") && ($ct > 0)) {
+					if ((!$factobj->owner->view) && ($spouse !== "") && ($ct > 0)) {
 						print " - ";
 						$famid = $match[1];
 						print "<a href=\"family.php?famid=".$famid."&amp;gedid=".$GEDCOMID."\">";
@@ -151,25 +147,26 @@ abstract class FactFunctions {
 					}
 				}
 				//-- print other characterizing fact information
-				if ($event!="" && $fact!="ASSO") {
+				if ($event != "" && $fact != "ASSO") {
 					$ct = preg_match("/@(.*)@/", $event, $match);
 					if ($ct>0) {
-						if ($show_changes && GetChangeData(true, $match[1], true)) {
-							$rec = GetChangeData(false, $match[1], true, "gedlines");
-							$gedrec = $rec[$GEDCOM][$match[1]];
+						if (IdType($match[1]) == "INDI") {
+							$person =& Person::GetInstance($match[1]);
+							print "<a href=\"individual.php?pid=".$person->xref."&amp;gedid=".$person->gedcomid."\">".$person->name."</a><br />";
 						}
-						else $gedrec = FindGedcomRecord($match[1]);
-						if (strstr($gedrec, "INDI")!==false) print "<a href=\"individual.php?pid=$match[1]&amp;ged=$GEDCOM\">".GetPersonName($match[1])."</a><br />";
-						else if ($fact=="REPO") {
+						else if ($fact == "REPO") {
 							$repo =& Repository::GetInstance($match[1]);
 							if (!$repo->isempty) {
 								print "<span class=\"label\">".$gm_lang["repo_name"]."</span><br /><span class=\"field\"><a href=\"repo.php?rid=".$repo->xref."&amp;gedid=".$repo->gedcomid."\">".$repo->title."</a></span>";
 								$prt = true;
 							}
-							$prt = print_address_structure($repo->gedrec, 1, $prt) || $prt;
+							$prt = self::PrintAddressStructure($repo, 1, $prt) || $prt;
 							$prted = self::PrintFactNotes($repo, 1) || $prt;
 						}
-						else print_submitter_info($match[1]);
+						else if ($fact == "SUBM") {
+							$subm =& Submitter::GetInstance($match[1]);
+							$prted = self::PrintSubmitterInfo($subm) || $prted;
+						}
 					}
 					else if ($fact=="ALIA") {
 						 //-- strip // from ALIA tag for FTM generated gedcoms
@@ -212,7 +209,7 @@ abstract class FactFunctions {
 				$ct = preg_match("/2 DESC (.*)/", $factobj->factrec, $match);
 				if ($ct>0) print PrintReady($match[1]);
 				// -- print PLACe, TEMPle and STATus
-				$prted  = $factobj->PrintFactPlace(true, true, true) || $prted;
+				$prted = $factobj->PrintFactPlace(true, true, true) || $prted;
 				// -- print BURIal -> CEMEtery
 				$ct = preg_match("/2 CEME (.*)/", $factobj->factrec, $match);
 				if ($ct>0) {
@@ -222,14 +219,13 @@ abstract class FactFunctions {
 				}
 				//-- print address structure
 				if ($fact!="ADDR" && $fact!="PHON") {
-					$prted = print_address_structure($factobj->factrec, 2, $prted) || $prted;
+					$prted = self::PrintAddressStructure($factobj, 2, $prted) || $prted;
 				}
 				else {
-					$prted = print_address_structure($factobj->factrec, 1, $prted) || $prted;
+					$prted = self::PrintAddressStructure($factobj, 1, $prted) || $prted;
 				}
 				// -- Enhanced ASSOciates > RELAtionship
-				$prted = self::PrintAssoRelaRecord($pid, $factobj, $prted);
-	
+				$prted = self::PrintAssoRelaRecord($pid, $factobj, $prted) || $prted;
 				// -- find _GMU field
 				$ct = preg_match("/2 _GMU (.*)/", $factobj->factrec, $match);
 				if ($ct>0) print $factarray["_GMU"].": ".$match[1];
@@ -250,11 +246,20 @@ abstract class FactFunctions {
 							}
 							if (isset($factarray[$factref])) $label = $factarray[$factref];
 							else $label = $factref;
+							if ($factref == "SUBM") print "<br />";
 							if (file_exists($GM_IMAGE_DIR."/facts/".$factref.".gif")) print "<img src=\"".$GM_IMAGE_DIR."/facts/".$factref.".gif\" alt=\"".$label."\" title=\"".$label."\" align=\"middle\" /> ";
 							else print "<span class=\"label\">".$label.": </span>";
 							$value = trim($match[$i][2]);
-							if (isset($gm_lang[strtolower($value)])) print $gm_lang[strtolower($value)];
-							else print PrintReady($value);
+							if (stristr($value, "@")) {
+								if ($factref == "SUBM") {
+									$subm =& Submitter::GetInstance(str_replace("@", "", $value));
+									self::PrintSubmitterInfo($subm);
+								}
+							}
+							else {
+								if (isset($gm_lang[strtolower($value)])) print $gm_lang[strtolower($value)];
+								else print PrintReady($value);
+							}
 	//						print "<br />\n";
 							$prted = true;
 							if ($fact == "FILE") {
@@ -287,19 +292,20 @@ abstract class FactFunctions {
 						}
 					}
 				}
-				if (preg_match("/ (PLAC)|(STAT)|(TEMP)|(SOUR) /", $factobj->factrec)>0 || (!empty($event) && $fact!="ADDR" && $fact!="ASSO" && $fact!="PHON")) print "<br />\n";
-//				if ($prted && $fact != "ASSO") print "<br />";
-				if ($prted) print "<br />";
+				if ($prted) print "<br /><br />";
+				
 				// -- find source for each fact
 				if (ShowFact("SOUR", $pid, "SOUR")) $n1 = self::PrintFactSources($factobj, 2, $prted);
+				
 				// -- find notes for each fact
-//				if ($fact != "ASSO" && ShowFact("NOTE", $pid, "NOTE")) $n2 = self::PrintFactNotes($factobj, 2, !$prted);
 				if (ShowFact("NOTE", $pid, "NOTE")) $n2 = self::PrintFactNotes($factobj, 2, !$prted);
+				
 				//-- find multimedia objects
-				if (ShowFact("OBJE", $pid, "OBJE")) $n3 = self::PrintFactMedia($factobj, 2, $prted);
+				if (ShowFact("OBJE", $pid, "OBJE")) $n3 = self::PrintFactMedia($factobj, 2, !$prted);
+				
 				// -- Find RESN tag
 				if (isset($resn_value)) {
-//					if ($n1 ||$n2 || $n3) print "<br />";
+					if ($n1 ||$n2 || $n3) print "<br />";
 					print_help_link("RESN_help", "qm");
 					print PrintReady($factarray["RESN"].": ".$gm_lang[$resn_value])."\n";
 				}
@@ -516,15 +522,14 @@ abstract class FactFunctions {
 	}
 	
 	public function PrintFactNotes($factobj, $level, $nobr=true) {
-		global $gm_lang, $show_changes, $gm_username, $Users, $GEDCOM;
+		global $gm_lang, $GEDCOM;
 		global $factarray;
-		global $WORD_WRAPPED_NOTES, $INDI_EXT_FAM_FACTS;
+		global $INDI_EXT_FAM_FACTS;
 		
 		// This is to prevent that notes are printed as part of the fact for family facts displayed on the indipage
 		if ($level == 2 && is_object($factobj) && !$INDI_EXT_FAM_FACTS && preg_match("/\n1 _GMFS @(.*)@/", $factobj->factrec)) return false;
 	
 		$factnotesprinted = false;
-		if (!$nobr) print "<br />";
 		$nlevel = $level+1;
 		$n2level = $level+2;
 		$first = true;
@@ -558,6 +563,7 @@ abstract class FactFunctions {
 				}
 			}
 		}
+		if (!$nobr && count($factnotes) > 0) print "<br />";
 		foreach($factnotes as $key => $noterec) {
 			$ct = preg_match("/$level NOTE @(.+)@/", $noterec, $match);
 			if ($ct > 0) {
@@ -743,100 +749,121 @@ abstract class FactFunctions {
 	public function PrintFactMedia($factobj, $level, $nobr=true) {
 		global $TEXT_DIRECTION, $TBLPREFIX, $GEDCOMS, $MEDIATYPE;
 		global $gm_lang, $factarray, $GM_IMAGE_DIR, $GM_IMAGES, $GEDCOM, $MediaFS;
-		global $WORD_WRAPPED_NOTES, $MEDIA_DIRECTORY, $MEDIA_EXTERNAL, $GEDCOMID, $USE_GREYBOX, $INDI_EXT_FAM_FACTS;
+		global $MEDIA_DIRECTORY, $MEDIA_EXTERNAL, $GEDCOMID, $USE_GREYBOX, $INDI_EXT_FAM_FACTS;
 		
 		// This is to prevent that notes are printed as part of the fact for family facts displayed on the indipage
 		if ($level == 2 && !$INDI_EXT_FAM_FACTS && preg_match("/\n1 _GMFS @(.*)@/", $factobj->factrec)) return false;
 		
-		if (!$nobr) print "<br />";
-	
 		$printed = false;
 		$nlevel = $level+1;
 		if ($level==1) $size=50;
 		else $size=25;
-
+		
 		$factmedia = array();
-		if ($factobj->disp) {
+		if (is_string($factobj)) {
 			$i = 1;
 			do {
-				$rec = GetSubRecord(2, "$level OBJE", $factobj->factrec, $i);
+				$rec = GetSubRecord(2, "$level OBJE", $factobj, $i);
 				if ($rec != "") $factmedia[] = $rec;
 				$i++;
 			} while ($rec != "");
 		}
-		print "<!-- Start media link table //-->";
-		print "\n<table class=\"facts_table\">";
-		foreach($factmedia as $key => $linkrec) {
-			$ct = preg_match("/$level OBJE @(.+)@/", $linkrec, $match);
-			if ($ct > 0) {
-				$media =& MediaItem::GetInstance($match[1]);
-				$disp = $media->disp;
-				$link = true;
+		elseif ($factobj->disp) {
+			// We have a factobject as input, and must print the level 2 or higher media
+			if ($level > 1 && $factobj->datatype == "sub") {
+				$i = 1;
+				do {
+					$rec = GetSubRecord(2, "$level OBJE", $factobj->factrec, $i);
+					if ($rec != "") $factmedia[] = $rec;
+					$i++;
+				} while ($rec != "");
 			}
-			else {
-				$disp = true;
-				$link = false;
-			}
-			// Check if we can display the source
-			if ($disp) {
-				$printed = true;
-				print "<tr><td>";
-				// NOTE: Determine the size of the mediafile
-				$imgwidth = 300;
-				$imgheight = 300;
-				if (preg_match("'://'", $media->filename)) {
-					if ($media->validmedia) {
-						$imgwidth = 400;
-						$imgheight = 500;
-					}
-					else {
-						$imgwidth = 800;
-						$imgheight = 400;
+			// We have a main entity as input
+			elseif ($level == 1 && $factobj->datatype != "sub") {
+				foreach($factobj->facts as $key => $fact) {
+					if ($fact->fact == "OBJE" && $fact->disp) {
+						$factmedia[] = $fact->factrec;
 					}
 				}
-				else if ((preg_match("'://'", $MEDIA_DIRECTORY)>0)||($media->fileobj->f_file_exists)) {
-					if ($media->fileobj->f_width > 0 && $media->fileobj->f_height > 0) {
-						$imgwidth = $media->fileobj->f_width + 50;
-						$imgheight = $media->fileobj->f_height + 50;
-					}
+			}
+		}
+
+		if (count($factmedia) > 0) {
+			if (!$nobr) print "<br />";
+			print "<!-- Start media link table //-->";
+			print "\n<table class=\"facts_table\">";
+			foreach($factmedia as $key => $linkrec) {
+				$ct = preg_match("/$level OBJE @(.+)@/", $linkrec, $match);
+				if ($ct > 0) {
+					$media =& MediaItem::GetInstance($match[1]);
+					$disp = $media->disp;
+					$link = true;
 				}
-				if ($factobj->disp) {
-					if (preg_match("'://'", $media->fileobj->f_thumb_file) || preg_match("'://'", $MEDIA_DIRECTORY) > 0 || $media->fileobj->f_file_exists) {
-						if ($USE_GREYBOX && $media->fileobj->f_is_image) {
-							print "<a href=\"".FilenameEncode($media->fileobj->f_main_file)."\" title=\"".$media->title."\" rel=\"gb_imageset[medialinks]\">";
+				else {
+					$disp = true;
+					$link = false;
+				}
+				// Check if we can display the source
+				if ($disp) {
+					$printed = true;
+					print "<tr><td>";
+					// NOTE: Determine the size of the mediafile
+					$imgwidth = 300;
+					$imgheight = 300;
+					if (preg_match("'://'", $media->filename)) {
+						if ($media->validmedia) {
+							$imgwidth = 400;
+							$imgheight = 500;
 						}
-						else print "<a href=\"#\" onclick=\"return openImage('".$media->fileobj->f_main_file."', '".$imgwidth."', '".$imgheight."', '".$media->fileobj->f_is_image."');\">";
-						print "<img src=\"".$media->fileobj->f_thumb_file."\" border=\"0\" align=\"" . ($TEXT_DIRECTION== "rtl"?"right": "left") . "\" class=\"thumbnail\" alt=\"\" /></a>";
-					}
-					print "<a href=\"mediadetail.php?mid=".$media->xref."&amp;gedid=".$media->gedcomid."\">";
-					if ($TEXT_DIRECTION=="rtl" && !hasRTLText($media->title)) print "<i>&lrm;".PrintReady($media->title)."</i></a>";
-					else print "<i>".PrintReady($media->title)."</i></a>";
-	
-					// NOTE: Print the format of the media
-					if ($media->extension != "") {
-						print "\n\t\t\t<br /><span class=\"label\">".$factarray["FORM"].": </span> <span class=\"field\">".$media->extension."</span>";
-						if ($media->fileobj->f_width != 0 && $media->fileobj->f_height != 0) {
-							print "\n\t\t\t<span class=\"label\"><br />".$gm_lang["image_size"].": </span> <span class=\"field\" style=\"direction: ltr;\">" . $media->fileobj->f_width . ($TEXT_DIRECTION =="rtl"?" &rlm;x&rlm; " : " x ") . $media->fileobj->f_height . "</span>";
+						else {
+							$imgwidth = 800;
+							$imgheight = 400;
 						}
 					}
-					$ttype = preg_match("/\d TYPE (.*)/", $media->gedrec, $match);
-					if ($ttype>0){
-						print "\n\t\t\t<br /><span class=\"label\">".$gm_lang["type"].": </span> <span class=\"field\">$match[1]</span>";
+					else if ((preg_match("'://'", $MEDIA_DIRECTORY)>0)||($media->fileobj->f_file_exists)) {
+						if ($media->fileobj->f_width > 0 && $media->fileobj->f_height > 0) {
+							$imgwidth = $media->fileobj->f_width + 50;
+							$imgheight = $media->fileobj->f_height + 50;
+						}
 					}
-					print "<br />\n";
-					if (ShowFact("NOTE", $media->xref) && ShowFactDetails("NOTE", $media->xref)) {
-						$prtd = !self::PrintFactNotes($media, 1, !$printed); // Level is 1 because the notes are subordinate to the linked record, NOT to the link!
+					if ($factobj->disp) {
+						if (preg_match("'://'", $media->fileobj->f_thumb_file) || preg_match("'://'", $MEDIA_DIRECTORY) > 0 || $media->fileobj->f_file_exists) {
+							if ($USE_GREYBOX && $media->fileobj->f_is_image) {
+								print "<a href=\"".FilenameEncode($media->fileobj->f_main_file)."\" title=\"".$media->title."\" rel=\"gb_imageset[medialinks]\">";
+							}
+							else print "<a href=\"#\" onclick=\"return openImage('".$media->fileobj->f_main_file."', '".$imgwidth."', '".$imgheight."', '".$media->fileobj->f_is_image."');\">";
+							print "<img src=\"".$media->fileobj->f_thumb_file."\" border=\"0\" align=\"" . ($TEXT_DIRECTION== "rtl"?"right": "left") . "\" class=\"thumbnail\" alt=\"\" /></a>";
+						}
+						print "<a href=\"mediadetail.php?mid=".$media->xref."&amp;gedid=".$media->gedcomid."\">";
+						if ($TEXT_DIRECTION=="rtl" && !hasRTLText($media->title)) print "<i>&lrm;".PrintReady($media->title)."</i></a>";
+						else print "<i>".PrintReady($media->title)."</i></a>";
+		
+						// NOTE: Print the format of the media
+						if ($media->extension != "") {
+							print "\n\t\t\t<br /><span class=\"label\">".$factarray["FORM"].": </span> <span class=\"field\">".$media->extension."</span>";
+							if ($media->fileobj->f_width != 0 && $media->fileobj->f_height != 0) {
+								print "\n\t\t\t<span class=\"label\"><br />".$gm_lang["image_size"].": </span> <span class=\"field\" style=\"direction: ltr;\">" . $media->fileobj->f_width . ($TEXT_DIRECTION =="rtl"?" &rlm;x&rlm; " : " x ") . $media->fileobj->f_height . "</span>";
+							}
+						}
+						$ttype = preg_match("/\d TYPE (.*)/", $media->gedrec, $match);
+						if ($ttype>0){
+							print "\n\t\t\t<br /><span class=\"label\">".$gm_lang["type"].": </span> <span class=\"field\">$match[1]</span>";
+						}
+						print "<br />\n";
+						if (ShowFact("NOTE", $media->xref) && ShowFactDetails("NOTE", $media->xref)) {
+							$prtd = self::PrintFactNotes($media, 1, !$printed); // Level is 1 because the notes are subordinate to the linked record, NOT to the link!
+						}
+						else $prtd = true;
+						if (ShowFact("SOUR", $media->xref) && ShowFactDetails("SOUR", $media->xref)) {
+							self::PrintFactSources($media, 1, !$prtd); // Level is 1 because the sourcelinks are subordinate to the linked record, NOT to the link!
+						}
 					}
-					else $prtd = true;
-					if (ShowFact("SOUR", $media->xref) && ShowFactDetails("SOUR", $media->xref)) {
-						self::PrintFactSources($media, 1, $prtd); // Level is 1 because the sourcelinks are subordinate to the linked record, NOT to the link!
-					}
+					print "</td></tr>";
 				}
-				print "</td></tr>";
 			 }
+			 print "</table>\n";
+			 print "<!-- End media link table //-->";
 		 }
-		 print "</table>\n";
-		 print "<!-- End media link table //-->";
 		 return $printed;
 	}
 	
@@ -1085,30 +1112,189 @@ abstract class FactFunctions {
 		
 		$majorfacts = array("BIRT", "CHR", "BAPM", "DEAT", "BURI", "BAPL", "ADOP");
 		$retstr = "";
-		foreach ($majorfacts as $indexval => $fact) {
-			$facts = $person->SelectFacts($fact);
-			if (isset($facts[0])) {
-				$factobj = $facts[0]; 
-				if (strlen($factobj->factrec) > 7 && $factobj->disp) {
-					if ($break) $retstr .= "<br />";
-					else $retstr .= " -- ";
-					$retstr .= "<i>";
-					if (isset($gm_lang[$fact])) $retstr .= $gm_lang[$fact];
-					else if (isset($factarray[$fact])) $retstr .= $factarray[$fact];
-					else $retstr .= $fact;
-					$retstr .= " ";
-					$retstr .= $factobj->PrintFactDate(false, false, false, false, false, false);
-					$retstr .= $factobj->PrintFactPlace(false, false, false, false);
-					$retstr .= "</i>";
-					break;
-				}
+		$facts = $person->SelectFacts($majorfacts);
+		foreach ($facts as $key => $factobj) {
+			$factobj = $facts[0]; 
+			if (strlen($factobj->factrec) > 7 && $factobj->disp) {
+				if ($break) $retstr .= "<br />";
+				else $retstr .= " -- ";
+				$retstr .= "<i>";
+				if (isset($gm_lang[$factobj->fact])) $retstr .= $gm_lang[$factobj->fact];
+				else if (isset($factarray[$factobj->fact])) $retstr .= $factarray[$factobj->fact];
+				else $retstr .= $factobj->fact;
+				$retstr .= " ";
+				$retstr .= $factobj->PrintFactDate(false, false, false, false, false, false);
+				$retstr .= $factobj->PrintFactPlace(false, false, false, false);
+				$retstr .= "</i>";
+				break;
 			}
 		}
 		if ($prt) {
 			print $retstr;
-			return $fact;
+			return $factobj->fact;
 		}
 		else return addslashes($retstr);
+	}
+	
+	/**
+	 * print an address structure
+	 *
+	 * takes a gedcom ADDR structure and prints out a human readable version of it.
+	 * @param string $factrec	The ADDR subrecord
+	 * @param int $level		The gedcom line level of the main ADDR record
+	 */
+	public function PrintAddressStructure($object, $level, $br=false) {
+		global $gm_lang;
+		global $factarray;
+		global $POSTAL_CODE;
+	
+		//	 $POSTAL_CODE = 'false' - before city, 'true' - after city and/or state
+		//-- define per gedcom till can do per address countries in address languages
+		//-- then this will be the default when country not recognized or does not exist
+		//-- both Finland and Suomi are valid for Finland etc.
+		//-- see http://www.bitboost.com/ref/international-address-formats.html
+		
+		if ($object->datatype != "sub") {
+			$facts = $object->SelectFacts(array("ADDR", "WWW", "URL", "FAX", "EMAIL", "PHON"));
+			if (count($facts) == 0) return 0;
+			$found = false;
+			foreach ($facts as $key => $factobj) {
+				$found = self::PrintAddressStructure($factobj, 1, ($found || $br)) || $found;
+			}
+			return $found;
+		}
+		
+		$hasany = preg_match("/$level (WWW|URL|FAX|EMAIL|PHON|ADDR)/", $object->factrec);
+		$hasmore = preg_match("/$level (WWW|URL|FAX|EMAIL|PHON)/", $object->factrec);
+		if ($br && $hasany) print "<br />";
+		$firstline = true;
+		
+		$nlevel = $level+1;
+		$ct = preg_match_all("/$level ADDR(.*)/", $object->factrec, $omatch, PREG_SET_ORDER);
+		for($i=0; $i<$ct; $i++) {
+			$firstline = false;
+	 		$arec = GetSubRecord($level, "$level ADDR", $object->factrec, $i+1);
+	 		if ($level>1) print "\n\t\t<span class=\"label\">".$factarray["ADDR"].": </span><br /><div class=\"indent\">";
+			$cn = preg_match("/$nlevel _NAME (.*)/", $arec, $cmatch);
+			if ($cn>0) print str_replace("/", "", $cmatch[1])."<br />\n";
+			if (strlen(trim($omatch[$i][1])) > 0 && $cn > 0) print "<br />";
+			print PrintReady(trim($omatch[$i][1]));
+			$cont = GetCont($nlevel, $arec);
+			if (!empty($cont)) print PrintReady($cont);
+			else {
+				if (strlen(trim($omatch[$i][1])) > 0) print "<br />";
+				$cs = preg_match("/$nlevel ADR1 (.*)/", $arec, $cmatch);
+				if ($cs>0) {
+					if ($cn==0) {
+						print "<br />";
+						$cn=0;
+					}
+					print PrintReady($cmatch[1]);
+				}
+				$cs = preg_match("/$nlevel ADR2 (.*)/", $arec, $cmatch);
+				if ($cs>0) {
+					if ($cn==0) {
+						print "<br />";
+						$cn=0;
+					}
+					print PrintReady($cmatch[1]);
+				}
+	
+				if (!$POSTAL_CODE) {
+					$cs = preg_match("/$nlevel POST (.*)/", $arec, $cmatch);
+					if ($cs>0) {
+						print "<br />";
+					  	print PrintReady($cmatch[1]);
+					}
+					$cs = preg_match("/$nlevel CITY (.*)/", $arec, $cmatch);
+					if ($cs>0) {
+						print " ".PrintReady($cmatch[1]);
+					}
+					$cs = preg_match("/$nlevel STAE (.*)/", $arec, $cmatch);
+					if ($cs>0) {
+						print ", ".PrintReady($cmatch[1]);
+					}
+				}
+				else {
+					$cs = preg_match("/$nlevel CITY (.*)/", $arec, $cmatch);
+					if ($cs>0) {
+						print "<br />";
+						print PrintReady($cmatch[1]);
+					}
+					$cs = preg_match("/$nlevel STAE (.*)/", $arec, $cmatch);
+					if ($cs>0) {
+						print ", ".PrintReady($cmatch[1]);
+					}
+	 				$cs = preg_match("/$nlevel POST (.*)/", $arec, $cmatch);
+	 				if ($cs>0) {
+	 					print " ".PrintReady($cmatch[1]);
+	 				}
+				}
+				$cs = preg_match("/$nlevel CTRY (.*)/", $arec, $cmatch);
+				if ($cs>0) {
+					print "<br />";
+					print PrintReady($cmatch[1]);
+				}
+			}
+			if ($level>1) print "</div>\n";
+			$firstline = false;
+			if ($hasmore && $level == 1) print "<br />";
+		}
+		$ct = preg_match_all("/$level PHON (.*)/", $object->factrec, $omatch, PREG_SET_ORDER);
+		if ($ct>0) {
+			  for($i=0; $i<$ct; $i++) {
+				  if (!$firstline) print "<br />";
+				  else $firstline = false;
+				   if ($level>1) print "\n\t\t<span class=\"label\">".$factarray["PHON"].": </span><span class=\"field\">";
+				   print "&lrm;".$omatch[$i][1]."&lrm;";
+				   if ($level>1) print "</span>\n";
+			  }
+		 }
+		 $ct = preg_match_all("/$level EMAIL (.*)/", $object->factrec, $omatch, PREG_SET_ORDER);
+		 if ($ct>0) {
+			  for($i=0; $i<$ct; $i++) {
+				  if (!$firstline) print "<br />";
+				  else $firstline = false;
+				   if ($level>1) print "\n\t\t<span class=\"label\">".$factarray["EMAIL"].": </span><span class=\"field\">";
+				   print "<a href=\"mailto:".$omatch[$i][1]."\">".$omatch[$i][1]."</a>\n";
+				   if ($level>1) print "</span>\n";
+			  }
+		 }
+		 $ct = preg_match_all("/$level FAX (.*)/", $object->factrec, $omatch, PREG_SET_ORDER);
+		 if ($ct>0) {
+			  for($i=0; $i<$ct; $i++) {
+				  if (!$firstline) print "<br />";
+				  else $firstline = false;
+				   if ($level>1) print "\n\t\t<span class=\"label\">".$factarray["FAX"].": </span><span class=\"field\">";
+	 			   print "&lrm;".$omatch[$i][1]."&lrm;";
+				   if ($level>1) print "</span>\n";
+			  }
+		 }
+		 $ct = preg_match_all("/$level (WWW|URL) (.*)/", $object->factrec, $omatch, PREG_SET_ORDER);
+		 if ($ct>0) {
+			  for($i=0; $i<$ct; $i++) {
+				  if (!$firstline) print "<br />";
+				  else $firstline = false;
+				   if ($level>1) print "\n\t\t<span class=\"label\">".$factarray["URL"].": </span><span class=\"field\">";
+				   print "<a href=\"".$omatch[$i][2]."\" target=\"_blank\">".$omatch[$i][2]."</a>\n";
+				   if ($level>1) print "</span>\n";
+			  }
+		 }
+		 return $hasany;
+	}
+	
+	/**
+	 * print a submitter record
+	 *
+	 * find and print submitter information
+	 * @param string $sid  the Gedcom Xref ID of the submitter to print
+	 */
+	private function PrintSubmitterInfo($subm, $br=false) {
+
+		if ($br) print "<br />"; 
+		print $subm->name."<br />";
+		self::PrintAddressStructure($subm, 1);
+		self::PrintFactMedia($subm, 1);
 	}
 
 }

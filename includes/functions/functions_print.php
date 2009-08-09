@@ -29,21 +29,6 @@ if (strstr($_SERVER["SCRIPT_NAME"],basename(__FILE__))) {
 	require "../../intrusion.php";
 }
 /**
- * print a submitter record
- *
- * find and print submitter information
- * @param string $sid  the Gedcom Xref ID of the submitter to print
- */
-function print_submitter_info($sid) {
-	 $srec = FindGedcomRecord($sid);
-	 preg_match("/1 NAME (.*)/", $srec, $match);
-	 // PAF creates REPO record without a name
-	 // Check here if REPO NAME exists or not
-	 if (isset($match[1])) print "$match[1]<br />";
-	 print_address_structure($srec, 1);
-	 print_media_links($srec, 1);
-}
-/**
  * print a person in a list
  *
  * This function will print a
@@ -1480,145 +1465,6 @@ function print_simple_fact($indirec, $fact, $pid) {
 	print "<br />\n";
 }
 
-/**
- * print an address structure
- *
- * takes a gedcom ADDR structure and prints out a human readable version of it.
- * @param string $factrec	The ADDR subrecord
- * @param int $level		The gedcom line level of the main ADDR record
- */
-function print_address_structure($factrec, $level, $br=false) {
-	 global $gm_lang;
-	 global $factarray;
-	 global $WORD_WRAPPED_NOTES;
-	 global $POSTAL_CODE;
-
-	 //	 $POSTAL_CODE = 'false' - before city, 'true' - after city and/or state
-	 //-- define per gedcom till can do per address countries in address languages
-	 //-- then this will be the default when country not recognized or does not exist
-	 //-- both Finland and Suomi are valid for Finland etc.
-	 //-- see http://www.bitboost.com/ref/international-address-formats.html
-	
-	$hasany = preg_match("/$level (WWW|URL|FAX|EMAIL|PHON|ADDR)/", $factrec);
-	$hasmore = preg_match("/$level (WWW|URL|FAX|EMAIL|PHON)/", $factrec);
-	 if ($br && $hasany) print "<br />";
-	
-	 $firstline = true;
-	
-	 $nlevel = $level+1;
-	 $ct = preg_match_all("/$level ADDR(.*)/", $factrec, $omatch, PREG_SET_ORDER);
-	 for($i=0; $i<$ct; $i++) {
-		 $firstline = false;
- 		  $arec = GetSubRecord($level, "$level ADDR", $factrec, $i+1);
- 		  if ($level>1) print "\n\t\t<span class=\"label\">".$factarray["ADDR"].": </span><br /><div class=\"indent\">";
-		  $cn = preg_match("/$nlevel _NAME (.*)/", $arec, $cmatch);
-		  if ($cn>0) print str_replace("/", "", $cmatch[1])."<br />\n";
-		  if (strlen(trim($omatch[$i][1])) > 0 && $cn > 0) print "<br />";
-		  print PrintReady(trim($omatch[$i][1]));
-		  $cont = GetCont($nlevel, $arec);
-		  if (!empty($cont)) print PrintReady($cont);
-		  else {
-			  if (strlen(trim($omatch[$i][1])) > 0) print "<br />";
-			  $cs = preg_match("/$nlevel ADR1 (.*)/", $arec, $cmatch);
-			  if ($cs>0) {
-				  if ($cn==0) {
-					  print "<br />";
-					  $cn=0;
-				  }
-				  print PrintReady($cmatch[1]);
-			  }
-			  $cs = preg_match("/$nlevel ADR2 (.*)/", $arec, $cmatch);
-			  if ($cs>0) {
-				  if ($cn==0) {
-					  print "<br />";
-					  $cn=0;
-				  }
-				  print PrintReady($cmatch[1]);
-			  }
-
-			  if (!$POSTAL_CODE) {
-			 	  $cs = preg_match("/$nlevel POST (.*)/", $arec, $cmatch);
-				  if ($cs>0) {
-				  	  print "<br />";
-				  	  print PrintReady($cmatch[1]);
-				  }
-				  $cs = preg_match("/$nlevel CITY (.*)/", $arec, $cmatch);
-				  if ($cs>0) {
-					  print " ".PrintReady($cmatch[1]);
-				  }
-				  $cs = preg_match("/$nlevel STAE (.*)/", $arec, $cmatch);
-				  if ($cs>0) {
-					  print ", ".PrintReady($cmatch[1]);
-				  }
-			  }
-			  else {
-				  $cs = preg_match("/$nlevel CITY (.*)/", $arec, $cmatch);
-				  if ($cs>0) {
-					  print "<br />";
-					  print PrintReady($cmatch[1]);
-				  }
-				  $cs = preg_match("/$nlevel STAE (.*)/", $arec, $cmatch);
-				  if ($cs>0) {
-					  print ", ".PrintReady($cmatch[1]);
-				  }
- 				  $cs = preg_match("/$nlevel POST (.*)/", $arec, $cmatch);
- 				  if ($cs>0) {
- 					  print " ".PrintReady($cmatch[1]);
- 				  }
-             }
-
-             $cs = preg_match("/$nlevel CTRY (.*)/", $arec, $cmatch);
-			  if ($cs>0) {
-				  print "<br />";
-				  print PrintReady($cmatch[1]);
-			  }
-		  }
-		  if ($level>1) print "</div>\n";
-		  $firstline = false;
-		  if ($hasmore && $level == 1) print "<br />";
-	 }
-	 $ct = preg_match_all("/$level PHON (.*)/", $factrec, $omatch, PREG_SET_ORDER);
-	 if ($ct>0) {
-		  for($i=0; $i<$ct; $i++) {
-			  if (!$firstline) print "<br />";
-			  else $firstline = false;
-			   if ($level>1) print "\n\t\t<span class=\"label\">".$factarray["PHON"].": </span><span class=\"field\">";
-			   print "&lrm;".$omatch[$i][1]."&lrm;";
-			   if ($level>1) print "</span>\n";
-		  }
-	 }
-	 $ct = preg_match_all("/$level EMAIL (.*)/", $factrec, $omatch, PREG_SET_ORDER);
-	 if ($ct>0) {
-		  for($i=0; $i<$ct; $i++) {
-			  if (!$firstline) print "<br />";
-			  else $firstline = false;
-			   if ($level>1) print "\n\t\t<span class=\"label\">".$factarray["EMAIL"].": </span><span class=\"field\">";
-			   print "<a href=\"mailto:".$omatch[$i][1]."\">".$omatch[$i][1]."</a>\n";
-			   if ($level>1) print "</span>\n";
-		  }
-	 }
-	 $ct = preg_match_all("/$level FAX (.*)/", $factrec, $omatch, PREG_SET_ORDER);
-	 if ($ct>0) {
-		  for($i=0; $i<$ct; $i++) {
-			  if (!$firstline) print "<br />";
-			  else $firstline = false;
-			   if ($level>1) print "\n\t\t<span class=\"label\">".$factarray["FAX"].": </span><span class=\"field\">";
- 			   print "&lrm;".$omatch[$i][1]."&lrm;";
-			   if ($level>1) print "</span>\n";
-		  }
-	 }
-	 $ct = preg_match_all("/$level (WWW|URL) (.*)/", $factrec, $omatch, PREG_SET_ORDER);
-	 if ($ct>0) {
-		  for($i=0; $i<$ct; $i++) {
-			  if (!$firstline) print "<br />";
-			  else $firstline = false;
-			   if ($level>1) print "\n\t\t<span class=\"label\">".$factarray["URL"].": </span><span class=\"field\">";
-			   print "<a href=\"".$omatch[$i][2]."\" target=\"_blank\">".$omatch[$i][2]."</a>\n";
-			   if ($level>1) print "</span>\n";
-		  }
-	 }
-	 return $hasany;
-}
 
 /* Function to print popup help boxes
  * @param string $help		The variable that needs to be processed.
@@ -2930,7 +2776,7 @@ function PrintFilterEvent($filterev) {
 	print "</select>\n";
 }
 
-function PrintBlockFavorites($userfavs, $side, $index, $style) {
+function PrintBlockFavorites(&$userfavs, $side, $index, $style) {
 	global $GEDCOM, $command, $Users, $gm_username, $gm_lang;
 	
 	$mygedcom = $GEDCOM;

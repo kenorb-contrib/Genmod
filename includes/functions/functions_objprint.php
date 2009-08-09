@@ -40,7 +40,7 @@ if (strstr($_SERVER["SCRIPT_NAME"],basename(__FILE__))) {
  * @param boolean $show_famlink	set to true to show the icons for the popup links and the zoomboxes
  * @param int $count	on some charts it is important to keep a count of how many boxes were printed
  */
-function PrintPedigreePerson($person, $style=1, $show_famlink=true, $count=0, $personcount="1", $view="") {
+function PrintPedigreePerson(&$person, $style=1, $show_famlink=true, $count=0, $personcount="1", $view="") {
 	// Global settings
 	global $ZOOM_BOXES, $LINK_ICONS, $SCRIPT_NAME, $GEDCOM, $SHOW_HIGHLIGHT_IMAGES, $PEDIGREE_FULL_DETAILS, $SHOW_ID_NUMBERS;
 	global $CONTACT_EMAIL, $CONTACT_METHOD, $TEXT_DIRECTION, $DEFAULT_PEDIGREE_GENERATIONS, $PEDIGREE_LAYOUT;
