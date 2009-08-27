@@ -81,6 +81,7 @@ $bots = array(
 	'www.galaxy.com',
 	'Googlebot',
 	'MSNbot',
+	'msnbot',
 	'Scooter',
 	'Slurp',
 	'appie',
@@ -585,7 +586,7 @@ else {
 	            		$parts = preg_split("/-/", $accept_langs);
 	            		if (isset ($parts[0]) && !empty($langcode[$parts[0]])) {
                				$LANGUAGE = $langcode[$parts[0]];
-               				break;
+               				//break;
 	            		}
          			}
       			}

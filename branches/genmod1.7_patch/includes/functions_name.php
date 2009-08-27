@@ -474,7 +474,7 @@ function GetRepoDescriptor($rid) {
 	if (!empty($gedrec)) {
 		$tt = preg_match("/1 NAME (.*)/", $gedrec, $smatch);
 		if ($tt>0) {
-			if (!ShowFact("NAME", $rid, "REPO") || !ShowFactDetails("TITL", $rid, "REPO")) return $gm_lang["private"];
+			if (!ShowFact("NAME", $rid, "REPO") || !ShowFactDetails("NAME", $rid, "REPO")) return $gm_lang["private"];
 			return $smatch[1];
 		}
 	}
