@@ -1,0 +1,4 @@
+"cookie_login_help";"Šitas puslapis prisimena jus iš praeito  pasisveikinimo. Tai įgalina jums pasiekti privačią informaciją ir kitas vartotojų funkcijas. Saugumo padidinimui bet  kokiems pataisymams ar puslapio administravimui jūs turite pasisveikinti iš naujo."
+"ah1_help";"_Atnaujinti"
+"SHOW_CONTEXT_HELP";"Rodyti kontekstinę pagalbą"
+"page_help";"Pagalba"

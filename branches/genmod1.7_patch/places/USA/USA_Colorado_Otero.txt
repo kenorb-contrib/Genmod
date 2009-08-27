@@ -1,0 +1,9 @@
+<!-- @version $Id: USA_Colorado_Otero.txt,v 1.1 2005/10/23 22:08:17 roland-d Exp $ -->
+<!-- @see http://www.naco.org/ -->
+Cheraw
+Fowler
+La Junta
+Manzanola
+Rocky Ford
+Swink
+Timpas

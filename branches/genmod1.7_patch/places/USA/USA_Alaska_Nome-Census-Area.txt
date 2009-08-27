@@ -1,0 +1,20 @@
+<!-- @version $Id: USA_Alaska_Nome-Census-Area.txt,v 1.1 2005/10/23 22:08:16 roland-d Exp $ -->
+<!-- @see http://www.naco.org/ -->
+Brevig Mission
+Diomede
+Elim
+Gambell
+Golovin
+Koyuk
+Little Diomede
+Nome
+Nome Census Area
+Saint Michael
+Savoonga
+Shaktoolik
+Shishmaref
+Stebbins
+Teller
+Unalakleet
+Wales
+White Mountain

@@ -1,0 +1,12 @@
+<!-- @version $Id: USA_Alabama_Morgan.txt,v 1.1 2005/10/23 22:08:16 roland-d Exp $ -->
+<!-- @see http://www.naco.org/ -->
+Danville
+Decatur
+Eva
+Falkville
+Hartselle
+Laceys Spring
+Priceville
+Somerville
+Trinity
+Valhermoso Springs

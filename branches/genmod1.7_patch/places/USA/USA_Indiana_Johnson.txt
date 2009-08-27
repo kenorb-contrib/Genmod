@@ -1,0 +1,20 @@
+<!-- @version $Id: USA_Indiana_Johnson.txt,v 1.1 2005/10/23 22:08:18 roland-d Exp $ -->
+<!-- @see http://www.naco.org/ -->
+Atterbury
+Bargersville
+Blue River Township
+Camp Atterbury
+Clark Township
+Edinburgh
+Franklin
+Greenwood
+Hensley Township
+Needham Township
+New Whiteland
+Nineveh Township
+Pleasant Township
+Princes Lakes
+Trafalgar
+Union Township
+White River Township
+Whiteland

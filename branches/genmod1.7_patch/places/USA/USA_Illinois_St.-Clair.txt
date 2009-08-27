@@ -1,0 +1,44 @@
+<!-- @version $Id: USA_Illinois_St.-Clair.txt,v 1.1 2005/10/23 22:08:17 roland-d Exp $ -->
+<!-- @see http://www.naco.org/ -->
+Alorton
+Belleville Township
+Brooklyn
+Cahokia
+Canteen Township
+Caseyville
+Centreville
+Collinsville
+Dupo
+East Carondelet
+East St. Louis Township
+Engelmann Township
+Fairmont City
+Fairview Heights
+Fayetteville Township
+Freeburg Township
+Lebanon
+Lenzburg Township
+Lovejoy
+Madison
+Marissa
+Mascoutah
+Millstadt Township
+National City
+National Stock Yards
+New Athens
+New Baden
+O'Fallon
+Prairie Du Long Township
+Saint Clair Township
+Saint Libory
+Sauget
+Scott Air Force Base
+Shiloh
+Shiloh Valley Township
+Smithton Township
+Stites Township
+Stookey Township
+Sugar Loaf Township
+Summerfield
+Swansea
+Washington Park

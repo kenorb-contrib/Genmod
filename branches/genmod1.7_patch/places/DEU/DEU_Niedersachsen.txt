@@ -1,0 +1,48 @@
+<!-- THIS FILE MUST BE SAVED IN UTF-8 ENCODING (or some special characters will be lost) -->
+<!-- @version $Id: DEU_Niedersachsen.txt,v 1.1 2005/10/23 21:49:12 roland-d Exp $ -->
+Kreis Ammerland
+Kreis Aurich
+Kreis Celle
+Kreis Cloppenburg
+Kreis Cuxhaven
+Kreis Diepholz
+Kreis Emsland
+Kreis Friesland
+Kreis Göttingen
+Kreis Gifhorn
+Kreis Goslar
+Kreis Grafschaft Bentheim
+Kreis Hameln-Pyrmont
+Kreis Harburg
+Kreis Helmstedt
+Kreis Hildesheim
+Kreis Holzminden
+Kreis Lüchow-Dannenberg
+Kreis Lüneburg
+Kreis Leer
+Kreis Nienburg/Weser
+Kreis Northeim
+Kreis Oldenburg
+Kreis Osnabrück
+Kreis Osterholz
+Kreis Osterode am Harz
+Kreis Peine
+Kreis Rotenburg/Wümme
+Kreis Schaumburg
+Kreis Soltau-Fallingbostel
+Kreis Stade
+Kreis Uelzen
+Kreis Vechta
+Kreis Verden
+Kreis Wesermarsch
+Kreis Wittmund
+Kreis Wolfenbüttel
+Region Hannover
+Stadt Braunschweig
+Stadt Delmenhorst
+Stadt Emden
+Stadt Oldenburg
+Stadt Osnabrück
+Stadt Salzgitter
+Stadt Wilhelmshaven
+Stadt Wolfsburg
