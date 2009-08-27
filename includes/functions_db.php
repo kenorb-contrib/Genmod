@@ -3553,7 +3553,7 @@ function GetSurnameFams($surname, $allgeds="no") {
 	$temp = $SHOW_MARRIED_NAMES;
 	$SHOW_MARRIED_NAMES = false;
 
-	$sql = "SELECT DISTINCT if_fkey, if_pkey, n_name FROM ".$TBLPREFIX."names, ".$TBLPREFIX."individual_family WHERE n_key=if_pkey AND if_role='S' AND n_surname='".$DBCONN->EscapeQuery($surname)."'";
+	$sql = "SELECT DISTINCT if_fkey, if_pkey, n_name FROM ".$TBLPREFIX."names, ".$TBLPREFIX."individual_family WHERE n_key=if_pkey AND if_role='S' AND n_surname LIKE '".$DBCONN->EscapeQuery($surname)."'";
 	if ($allgeds != "yes") $sql .= " AND n_file = '".$GEDCOMID."' ";
 	$sql .= "GROUP BY if_fkey";
 	// The previous query works for all surnames, including @N.N.
@@ -3574,7 +3574,8 @@ function GetSurnameFams($surname, $allgeds="no") {
 		}
 	}
 	$select = "'".implode("', '", $select)."'";
-	$f = GetFamlist($allgeds, $select, false, $trans);
+	if ($select != "''") $f = GetFamlist($allgeds, $select, false, $trans);
+	else $f = array();
 	$SHOW_MARRIED_NAMES = $temp;
 	return $f;
 }
