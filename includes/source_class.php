@@ -3,7 +3,7 @@
  * Class file for a Source (SOUR) object
  * 
  * Genmod: Genealogy Viewer
- * Copyright (C) 2005 Genmod Development Team
+ * Copyright (C) 2005 - 2008 Genmod Development Team
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,7 +21,7 @@
  *
  * @package Genmod
  * @subpackage DataModel
- * @version $Id: source_class.php,v 1.2 2005/12/18 21:16:58 roland-d Exp $
+ * @version $Id$
  */
 require_once 'includes/gedcomrecord.php';
 class Source extends GedcomRecord {
@@ -30,17 +30,31 @@ class Source extends GedcomRecord {
 	var $sourcefacts = null;
 	var $indilist = null;
 	var $famlist = null;
+	var $medialist = null;
+	var $notelist = null;
+	var $sournew = false;
+	var $sourdeleted = false;
+	var $showchanges = false;
 	
 	/**
 	 * Constructor for source object
 	 * @param string $gedrec	the raw source gedcom record
 	 */
 	function Source($gedrec) {
+		global $gm_username, $GEDCOM, $Users;
 		parent::GedcomRecord($gedrec);
-		$this->disp = displayDetailsByID($this->xref, "SOUR");
-		$this->name = get_source_descriptor($this->xref);
-		$add_descriptor = get_add_source_descriptor($this->xref);
-		if ($add_descriptor) $this->name .= " - ".$add_descriptor;
+		$this->disp = displayDetailsByID($this->xref, "SOUR", 1, true);
+		if ($this->disp) {
+			$this->name = GetSourceDescriptor($this->xref);
+			$add_descriptor = GetAddSourceDescriptor($this->xref);
+			if ($add_descriptor) $this->name .= " - ".$add_descriptor;
+			if ((!isset($show_changes) || $show_changes != "no") && $Users->UserCanEdit($gm_username)) $this->showchanges = true;
+			if ($this->showchanges && GetChangeData(true, $this->xref, true, "", "")) {
+				$rec = GetChangeData(false, $this->xref, true, "gedlines", "");
+				if (empty($rec[$GEDCOM][$this->xref])) $this->sourdeleted = true;
+			}
+		}
+		
 	}
 	
 	/**
@@ -77,7 +91,7 @@ class Source extends GedcomRecord {
 	function parseFacts() {
 		if (!is_null($this->sourcefacts)) return;
 		$this->sourcefacts = array();
-		$this->allsourcesubs = get_all_subrecords($this->gedrec, "", true, false);
+		$this->allsourcesubs = GetAllSubrecords($this->gedrec, "", true, false, false);
 		foreach ($this->allsourcesubs as $key => $subrecord) {
 			$ft = preg_match("/1\s(\w+)(.*)/", $subrecord, $match);
 			if ($ft>0) {
@@ -95,8 +109,26 @@ class Source extends GedcomRecord {
 				$this->sourcefacts[] = array($fact, $subrecord, $count[$fact]);
 			}
 		}
+		$newrecs = RetrieveNewFacts($this->xref);
+		foreach($newrecs as $key=> $newrec) {
+			$ft = preg_match("/1\s(\w+)(.*)/", $newrec, $match);
+			if ($ft>0) {
+				$fact = $match[1];
+				$gid = trim(str_replace("@", "", $match[2]));
+			}
+			else {
+				$fact = "";
+				$gid = "";
+			}
+			$fact = trim($fact);
+			if (!isset($count[$fact])) $count[$fact] = 1;
+			else $count[$fact]++;
+			if (!empty($fact) ) {
+				$this->sourcefacts[] = array($fact, $newrec, $count[$fact], "new");
+			}
+		}
+		SortFacts($this->sourcefacts, "SOUR");
 	}
-	
 	/**
 	 * Merge the facts from another Source object into this object
 	 * for generating a diff view
@@ -143,13 +175,17 @@ class Source extends GedcomRecord {
 	 * @return array
 	 */
 	function getSourceIndis() {
-		global $REGEXP_DB;
+		global $REGEXP_DB, $GEDCOMID;
 		if (!is_null($this->indilist)) return $this->indilist;
-		$query = "SOUR @".$this->xref."@";
-		if (!$REGEXP_DB) $query = "%".$query."%";
-		
-		$this->indilist = search_indis($query);
-		uasort($this->indilist, "itemsort");
+		$links = GetSourceLinks($this->xref, "INDI", true, false);
+		if (count($links) > 0) {
+			$linkslst = implode("[".$GEDCOMID."]','", $links);
+			$linkslst .= "[".$GEDCOMID."]'";
+			$linkslst = "'".$linkslst;
+			$this->indilist = GetIndiList("", $linkslst, true);
+			uasort($this->indilist, "ItemSort");
+		}
+		else $this->indilist = array();
 		return $this->indilist;
 	}
 	
@@ -158,13 +194,60 @@ class Source extends GedcomRecord {
 	 * @return array
 	 */
 	function getSourceFams() {
-		global $REGEXP_DB;
+		global $REGEXP_DB, $GEDCOMID;
 		if (!is_null($this->famlist)) return $this->famlist;
-		$query = "SOUR @".$this->xref."@";
-		if (!$REGEXP_DB) $query = "%".$query."%";
-		$this->famlist = search_fams($query);
-		uasort($this->famlist, "itemsort");
+		$links = GetSourceLinks($this->xref, "FAM", true, false);
+		if (count($links) > 0) {
+			$linkslst = implode("[".$GEDCOMID."]','", $links);
+			$linkslst .= "[".$GEDCOMID."]'";
+			$linkslst = "'".$linkslst;
+			$this->famlist = GetFamList("", $linkslst, true);
+			uasort($this->famlist, "ItemSort");
+		}
+		else $this->famlist = array();
 		return $this->famlist;
+	}
+	
+	/**
+	 * get the list of media connected to this source
+	 * @return array
+	 */
+	function getSourceMedia() {
+		global $TBLPREFIX, $GEDCOMID;
+		
+		if (!is_null($this->medialist)) return $this->medialist;
+		$this->medialist = array();
+		
+		$links = GetSourceLinks($this->xref, "OBJE", true, false);
+		foreach ($links as $key => $link) {
+			$media = array();
+			$media["gedfile"] = $GEDCOMID;
+			$media["name"] = GetMediaDescriptor($link);
+			$this->medialist[$link] = $media;
+		}
+		uasort($this->medialist, "ItemSort");
+		return $this->medialist;
+	}
+	/**
+	 * get the list of media connected to this source
+	 * @return array
+	 */
+	function getSourceNotes() {
+		global $TBLPREFIX, $GEDCOMID;
+
+		if (!is_null($this->notelist)) return $this->notelist;
+		$this->notelist = array();
+		
+		$links = GetSourceLinks($this->xref, "NOTE", true, false);
+		if (is_array($links) && count($links) > 0) {
+			$links = implode("','", $links);
+			$links .= "'";
+			$links = "'".$links;
+			require_once("includes/controllers/note_ctrl.php");
+			$note_controller->GetNoteList("", $links);
+			$this->notelist = $note_controller->notelist;
+		}
+		return $this->notelist;
 	}
 }
 ?>

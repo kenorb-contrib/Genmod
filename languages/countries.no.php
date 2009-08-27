@@ -4,23 +4,23 @@
  * @see http://www.foseid.priv.no/gustav/iso3166/iso3166-nb.txt
  * @package Genmod
  * @subpackage Languages
- * @version $Id: countries.no.php,v 1.1 2005/10/23 21:54:42 roland-d Exp $
+ * @version $Id$
  */
 if (preg_match("/lang\...\.php$/", $_SERVER["SCRIPT_NAME"])>0) {
 		print "You cannot access a language file directly.";
 		exit;
 }
 
+$countries["AFG"]="Afghanistan";
+$countries["AGO"]="Angola";
+$countries["ALA"]="Åland";
 $countries["AND"]="Andorra";
 $countries["ARE"]="De forente arabiske emirater";
-$countries["AFG"]="Afghanistan";
 $countries["ATG"]="Antigua og Barbuda";
 $countries["AIA"]="Anguilla";
-$countries["ALA"]="Åland";
 $countries["ALB"]="Albania";
 $countries["DZA"]="Algerie";
 $countries["ASM"]="Amerikansk Samoa";
-$countries["AGO"]="Angola";
 $countries["ARG"]="Argentina";
 $countries["ARM"]="Armenia";
 $countries["ABW"]="Aruba";

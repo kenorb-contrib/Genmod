@@ -1,10 +1,10 @@
 <?php
 /**
- * MyGedView page allows a logged in user the abilty
+ * MyGenMod page allows a logged in user the abilty
  * to keep bookmarks, see a list of upcoming events, etc.
  *
  * Genmod: Genealogy Viewer
- * Copyright (C) 2005 Genmod Development Team
+ * Copyright (C) 2005 - 2008 Genmod Development Team
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,9 +22,10 @@
  *
  * @package Genmod
  * @subpackage Display
- * @version $Id: index.php,v 1.6 2006/05/28 13:00:03 roland-d Exp $
+ * @version $Id$
  */
 
+ 
 /**
  * Inclusion of the module extension
 */
@@ -42,7 +43,6 @@ if (!isset($CONFIGURED)) {
 	print "Unable to include the config.php file.  Make sure that . is in your PHP include path in the php.ini file.";
 	exit;
 }
-
 /**
  * Block definition array
  *
@@ -77,18 +77,18 @@ if ($USE_RTL_FUNCTIONS) {
 	//-------> Today's Hebrew Day with Gedcom Month
 	$datearray = array();
  	$datearray[0]["day"]   = $day;
- 	$datearray[0]["mon"]   = $monthtonum[str2lower(trim($month))];
+ 	$datearray[0]["mon"]   = $monthtonum[Str2Lower(trim($month))];
  	$datearray[0]["year"]  = $year;
  	$datearray[0]["month"] = $month;
 
-    $date   = gregorianToJewishGedcomDate($datearray);
+    $date   = GregorianToJewishGedcomDate($datearray);
     $hDay   = $date[0]["day"];
     $hMonth = $date[0]["month"];
     $hYear	= $date[0]["year"];
 
 //    $currhDay   = $hDay;
 //    $currhMon   = trim($date[0]["month"]);
-//    $currhMonth = $monthtonum[str2lower($currhMon)];
+//    $currhMonth = $monthtonum[Str2Lower($currhMon)];
     $currhYear 	= $hYear;
 }
 
@@ -100,13 +100,14 @@ $uname = $gm_username;
 if (empty($uname)) {
 	if (!empty($command)) {
 		if ($command=="user") {
-			header("Location: login.php?help_message=mygedview_login_help&url=".urlencode("index.php?command=user"));
+			if (empty($LOGIN_URL)) header("Location: login.php?help_message=mygedview_login_help&url=".urlencode("index.php?command=user"));
+			else header("Location: ".$LOGIN_URL."?help_message=mygedview_login_help&url=".urlencode("index.php?command=user"));
 			exit;
 		}
 	}
 	$command="gedcom";
 }
-else $user = getUser($uname);
+else $user = $Users->getUser($uname);
 
 if (empty($command)) $command="user";
 
@@ -115,7 +116,7 @@ if (!empty($uname)) {
 	if (($action=="addfav")&&(!empty($gid))) {
 		$gid = strtoupper($gid);
 		if (!isset($favnote)) $favnote = "";
-		$indirec = find_gedcom_record($gid);
+		$indirec = FindGedcomRecord($gid);
 		$ct = preg_match("/0 @(.*)@ (.*)/", $indirec, $match);
 		if ($indirec && $ct>0) {
 			$favorite = array();
@@ -176,6 +177,7 @@ if (!empty($uname)) {
 if ($command=="user") {
 	$ublocks = getBlocks($uname);
 	if ((count($ublocks["main"])==0) && (count($ublocks["right"])==0)) {
+		$ublocks["main"][] = array("print_quickstart_block", "");
 		$ublocks["main"][] = array("print_todays_events", "");
 		$ublocks["main"][] = array("print_user_messages", "");
 		$ublocks["main"][] = array("print_user_favorites", "");
@@ -189,6 +191,7 @@ if ($command=="user") {
 else {
 	$ublocks = getBlocks($GEDCOM);
 	if ((count($ublocks["main"])==0) && (count($ublocks["right"])==0)) {
+		$ublocks["main"][] = array("print_quickstart_block", "");
 		$ublocks["main"][] = array("print_gedcom_stats", "");
 		$ublocks["main"][] = array("print_gedcom_news", "");
 		$ublocks["main"][] = array("print_gedcom_favorites", "");
@@ -224,7 +227,7 @@ if ($command=="user") {
 	print_header($gm_lang["mygedview"]);
 }
 else {
-	print_header($GEDCOMS[$GEDCOM]["title"]);
+	print_header("");
 }
 ?>
 <script language="JavaScript" type="text/javascript">
@@ -248,7 +251,7 @@ else {
 //-- start of main content section
 if ($command=="user") {
 	print "<div>";
-	print "<h1>".$gm_lang["mygedview"]."</h1>";
+	print "<h3>".$gm_lang["mygedview"]."</h3>";
 	print $gm_lang["mygedview_desc"];
 	print "</div>\n";
 }
@@ -257,12 +260,8 @@ if (count($ublocks["main"]) != 0) {
 	else print "\t<div id=\"index_full_blocks\">\n";
 
 	foreach($ublocks["main"] as $bindex=>$block) {
-//		$time1 = getmicrotime();
 		if (function_exists($block[0])) eval($block[0]."(false, \$block[1], \"main\", $bindex);");
-//		$time2 = getmicrotime();
-//		$time = $time2 - $time1;
-//		printf(" %.3f ", $time);
-//		print "<br />";
+//		print $TOTAL_QUERIES." ";
 	}
 	print "</div>\n";
 }
@@ -280,6 +279,7 @@ if (count($ublocks["right"]) != 0) {
 //		$time = $time2 - $time1;
 //		printf(" %.3f ", $time);
 //		print "<br />";
+//		print $TOTAL_QUERIES." ";
 	}
 	print "\t</div>\n";
 }
@@ -292,7 +292,7 @@ if (($command=="user") and (!$welcome_block_present)) {
 	print "</div>";
 }
 if (($command=="gedcom") and (!$gedcom_block_present)) {
-	if (userIsAdmin($gm_username)) {
+	if ($Users->userIsAdmin($gm_username)) {
 		print "<div>";
 		print "<a href=\"#\" onclick=\"window.open('index_edit.php?name=$GEDCOM&amp;command=gedcom', '', 'top=50,left=10,width=1000,height=400,scrollbars=1,resizable=1');\">".$gm_lang["customize_gedcom_page"]."</a>\n";
 		print "</div>";

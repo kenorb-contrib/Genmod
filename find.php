@@ -3,7 +3,7 @@
  * Popup window that will allow a user to search for a family id, person id
  *
  * Genmod: Genealogy Viewer
- * Copyright (C) 2005 Genmod Development Team
+ * Copyright (C) 2005 - 2008 Genmod Development Team
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,15 +21,17 @@
  *
  * @package Genmod
  * @subpackage Display
- * @version $Id: find.php,v 1.13 2006/04/30 18:44:14 roland-d Exp $
+ * @version $Id$
  */
 
 /**
  * Inclusion of the configuration file
 */
 require("config.php");
-
+if (!isset($gedid)) $gedid = $GEDCOMID;
+if (isset($GEDCOMS[$gedid])) $gedid = $GEDCOMS[$gedid]["id"];
 if (!isset($type)) $type = "indi";
+if (!isset($external_links)) $external_links = "";
 if (!isset($filter)) $filter="";
 else $filter = trim($filter);
 if (!isset($callback)) $callback="paste_id";
@@ -57,7 +59,7 @@ if (!isset($level)) $level=0;
 if (($level < 0) || ($level > $MEDIA_DIRECTORY_LEVELS)){
 	$directory = $MEDIA_DIRECTORY;
 	$level = 0;
-} elseif (preg_match("'^$MEDIA_DIRECTORY'", $directory)==0){
+} elseif (preg_match("'^".RelativePathFile($MEDIA_DIRECTORY)."'", $directory)==0){
 	$directory = $MEDIA_DIRECTORY;
 	$level = 0;
 }
@@ -99,6 +101,10 @@ switch ($type) {
 		break;
 	case "source" :
 		print_simple_header($gm_lang["find_source"]);
+		$action="filter";
+		break;
+	case "note" :
+		print_simple_header($gm_lang["find_note"]);
 		$action="filter";
 		break;
 	case "specialchar" :
@@ -151,6 +157,7 @@ $options["option"][]= "findobject";
 $options["option"][]= "findplace";
 $options["option"][]= "findrepo";
 $options["option"][]= "findsource";
+$options["option"][]= "findnote";
 $options["option"][]= "findspecialchar";
 $options["form"][]= "formindi";
 $options["form"][]= "formfam";
@@ -159,9 +166,10 @@ $options["form"][]= "formobject";
 $options["form"][]= "formplace";
 $options["form"][]= "formrepo";
 $options["form"][]= "formsource";
+$options["form"][]= "formnote";
 $options["form"][]= "formspecialchar";
 
-global $TEXT_DIRECTION, $MULTI_MEDIA;
+global $TEXT_DIRECTION;
 print "<div class=\"topbottombar width60\">";
 // print "<table class=\"list_table $TEXT_DIRECTION center width60\">";
 //print "<tr><td class=\"topbottombar width50\">"; // start column for find text header
@@ -188,6 +196,9 @@ switch ($type) {
 	case "source" :
 		print $gm_lang["find_source"];
 		break;
+	case "note" :
+		print $gm_lang["find_note"];
+		break;
 	case "specialchar" :
 		print $gm_lang["find_specialchar"];
 		break;
@@ -201,13 +212,14 @@ if ($type == "indi") {
 	print "<input type=\"hidden\" name=\"callback\" value=\"$callback\" />";
 	print "<input type=\"hidden\" name=\"action\" value=\"filter\" />";
 	print "<input type=\"hidden\" name=\"type\" value=\"indi\" />";
+	print "<input type=\"hidden\" name=\"gedid\" value=\"".$gedid."\" />";
 	print "<label class=\"width10\" style=\"padding: 5px;\">";
 	print $gm_lang["name_contains"]."</label> <input type=\"text\" name=\"filter\" value=\"";
-	if (isset($filter)) print $filter;
+	if (isset($filter)) print stripslashes($filter);
 	print "\" />";
 	print "</div>";
 	print "<div class=\"width60 center\" style=\"padding: 5px;\">";
-	print "<input type=\"submit\" value=\"".$gm_lang["filter"]."\" /><br />";
+	print "<input type=\"submit\"  value=\"".$gm_lang["filter"]."\" /><br />";
 	print "</form></div>";
 }		
 
@@ -221,17 +233,17 @@ else if ($type == "fam") {
 	print "<table class=\"list_table $TEXT_DIRECTION\" width=\"30%\" border=\"0\">";
 	print "<tr><td class=\"list_label\" width=\"10%\" style=\"padding: 5px;\">";
 	print $gm_lang["name_contains"]." <input type=\"text\" name=\"filter\" value=\"";
-	if (isset($filter)) print $filter;
+	if (isset($filter)) print stripslashes($filter);
 	print "\" />";
 	print "</td></tr>";
 	print "<tr><td class=\"list_label\" width=\"10%\" style=\"padding: 5px;\">";
-	print "<input type=\"submit\" value=\"".$gm_lang["filter"]."\" /><br />";
+	print "<input type=\"submit\"  value=\"".$gm_lang["filter"]."\" /><br />";
 	print "</td></tr></table>";
 	print "</form></div>";
 }
 
 // Show media and hide the rest
-else if ($type == "media" && $MULTI_MEDIA) {
+else if ($type == "media") {
 	print "<div align=\"center\">";
 	print "<form name=\"filtermedia\" method=\"post\" onsubmit=\"return checknames(this);\" action=\"find.php\">";
 	print "<input type=\"hidden\" name=\"embed\" value=\"".$embed."\" />";
@@ -239,6 +251,7 @@ else if ($type == "media" && $MULTI_MEDIA) {
 	print "<input type=\"hidden\" name=\"thumbdir\" value=\"".$thumbdir."\" />";
 	print "<input type=\"hidden\" name=\"level\" value=\"".$level."\" />";
 	print "<input type=\"hidden\" name=\"action\" value=\"filter\" />";
+	print "<input type=\"hidden\" name=\"external_links\" value=\"".$external_links."\" />";
 	print "<input type=\"hidden\" name=\"type\" value=\"media\" />";
 	print "<input type=\"hidden\" name=\"callback\" value=\"$callback\" />";
 	print "<input type=\"hidden\" name=\"subclick\">"; // This is for passing the name of which submit button was clicked		
@@ -256,29 +269,30 @@ else if ($type == "media" && $MULTI_MEDIA) {
 	print_help_link("show_thumb_help","qm");
 	print "</td></tr>";
 	print "<tr><td class=\"list_label\" width=\"10%\" style=\"padding: 5px;\">";
-	print "<input type=\"submit\" name=\"search\" value=\"".$gm_lang["filter"]."\" onclick=\"this.form.subclick.value=this.name\" />&nbsp;";
-	print "<input type=\"submit\" name=\"all\" value=\"".$gm_lang["display_all"]."\" onclick=\"this.form.subclick.value=this.name\" />";
+	print "<input type=\"submit\"  name=\"search\" value=\"".$gm_lang["filter"]."\" onclick=\"this.form.subclick.value=this.name\" />&nbsp;";
+	print "<input type=\"submit\"  name=\"all\" value=\"".$gm_lang["display_all"]."\" onclick=\"this.form.subclick.value=this.name\" />";
 	print "</td></tr></table>";
 	print "</form></div>";
 }
 
-else	if ($type == "object" && $MULTI_MEDIA) {
+else if ($type == "object") {
 	print "<div class=\"center\">";
-	print "<form name=\"filterobje\" method=\"post\" onsubmit=\"return checknames(this);\" action=\"find.php\">";
+	print "<form name=\"filterobject\" method=\"post\" onsubmit=\"return checknames(this);\" action=\"find.php\">";
 	print "<input type=\"hidden\" name=\"action\" value=\"filter\" />";
 	print "<input type=\"hidden\" name=\"type\" value=\"object\" />";
 	print "<input type=\"hidden\" name=\"callback\" value=\"$callback\" />";
 	print "<input type=\"hidden\" name=\"subclick\">"; // This is for passing the name of which submit button was clicked		
+	print "<input type=\"hidden\" name=\"clicked\" value=\"dikkedeur\" />";
 	print "<table class=\"list_table $TEXT_DIRECTION width30\">";
 	print "<tr><td class=\"list_label width10\" style=\"padding: 5px;\">";
 	print_help_link("simple_filter_help","qm");
 	print $gm_lang["media_contains"]." <input type=\"text\" name=\"filter\" value=\"";
-	if (isset($filter)) print $filter;
+	if (isset($filter)) print stripslashes($filter);
 	print "\" />";
 	print "</td></tr>";
 	print "<tr><td class=\"list_label width10\" style=\"padding: 5px;\">";
-	print "<input type=\"submit\" name=\"search\" value=\"".$gm_lang["filter"]."\" onclick=\"this.form.subclick.value=this.name\" />&nbsp;";
-	print "<input type=\"submit\" name=\"all\" value=\"".$gm_lang["display_all"]."\" onclick=\"this.form.subclick.value=this.name\" />";
+	print "<input type=\"submit\"  name=\"search\" value=\"".$gm_lang["filter"]."\" onclick=\"this.form.subclick.value=this.name\" />&nbsp;";
+	print "<input type=\"submit\"  name=\"all\" value=\"".$gm_lang["display_all"]."\" onclick=\"this.form.subclick.value=this.name\" />";
 	print "</td></tr></table>";
 	print "</form></div>";
 }
@@ -294,18 +308,18 @@ else if ($type == "place") {
 	print "<table class=\"list_table $TEXT_DIRECTION\" width=\"30%\" border=\"0\">";
 	print "<tr><td class=\"list_label\" width=\"10%\" style=\"padding: 5px;\">";
 	print $gm_lang["place_contains"]." <input type=\"text\" name=\"filter\" value=\"";
-	if (isset($filter)) print $filter;
+	if (isset($filter)) print stripslashes($filter);
 	print "\" />";
 	print "</td></tr>";
 	print "<tr><td class=\"list_label\" width=\"10%\" style=\"padding: 5px;\">";
-	print "<input type=\"submit\" name=\"search\" value=\"".$gm_lang["filter"]."\" onclick=\"this.form.subclick.value=this.name\" />&nbsp;";
-	print "<input type=\"submit\" name=\"all\" value=\"".$gm_lang["display_all"]."\" onclick=\"this.form.subclick.value=this.name\" />";
+	print "<input type=\"submit\"  name=\"search\" value=\"".$gm_lang["filter"]."\" onclick=\"this.form.subclick.value=this.name\" />&nbsp;";
+	print "<input type=\"submit\"  name=\"all\" value=\"".$gm_lang["display_all"]."\" onclick=\"this.form.subclick.value=this.name\" />";
 	print "</td></tr></table>";
 	print "</form></div>";
 }
 
 // Show repo and hide the rest
-else if ($type == "repo" && $SHOW_SOURCES>=getUserAccessLevel($gm_username)) {
+else if ($type == "repo" && $SHOW_SOURCES >= $Users->getUserAccessLevel($gm_username)) {
 	print "<div align=\"center\">";
 	print "<form name=\"filterrepo\" method=\"post\" onsubmit=\"return checknames(this);\" action=\"find.php\">";
 	print "<input type=\"hidden\" name=\"action\" value=\"filter\" />";
@@ -315,33 +329,56 @@ else if ($type == "repo" && $SHOW_SOURCES>=getUserAccessLevel($gm_username)) {
 	print "<table class=\"list_table $TEXT_DIRECTION\" width=\"30%\" border=\"0\">";
 	print "<tr><td class=\"list_label\" width=\"10%\" style=\"padding: 5px;\">";
 	print $gm_lang["repo_contains"]." <input type=\"text\" name=\"filter\" value=\"";
-	if (isset($filter)) print $filter;
+	if (isset($filter)) print stripslashes($filter);
 	print "\" />";
 	print "</td></tr>";
 	print "<tr><td class=\"list_label\" width=\"10%\" style=\"padding: 5px;\">";
-	print "<input type=\"submit\" name=\"search\" value=\"".$gm_lang["filter"]."\" onclick=\"this.form.subclick.value=this.name\" />&nbsp;";
-	print "<input type=\"submit\" name=\"all\" value=\"".$gm_lang["display_all"]."\" onclick=\"this.form.subclick.value=this.name\" />";
+	print "<input type=\"submit\"  name=\"search\" value=\"".$gm_lang["filter"]."\" onclick=\"this.form.subclick.value=this.name\" />&nbsp;";
+	print "<input type=\"submit\"  name=\"all\" value=\"".$gm_lang["display_all"]."\" onclick=\"this.form.subclick.value=this.name\" />";
+	print "</td></tr></table>";
+	print "</form></div>";
+}
+
+// Show note and hide the rest
+else if ($type == "note") {
+	print "<div align=\"center\">";
+	print "<form name=\"filternote\" method=\"post\" onsubmit=\"return checknames(this);\" action=\"find.php\">";
+	print "<input type=\"hidden\" name=\"action\" value=\"filter\" />";
+	print "<input type=\"hidden\" name=\"clicked\" value=\"dikkedeur\" />";
+	print "<input type=\"hidden\" name=\"type\" value=\"note\" />";
+	print "<input type=\"hidden\" name=\"callback\" value=\"$callback\" />";
+	print "<input type=\"hidden\" name=\"subclick\">"; // This is for passing the name of which submit button was clicked				
+	print "<table class=\"list_table $TEXT_DIRECTION\" width=\"30%\" border=\"0\">";
+	print "<tr><td class=\"list_label\" width=\"10%\" style=\"padding: 5px;\">";
+	print $gm_lang["note_contains"]." <input type=\"text\" name=\"filter\" value=\"";
+	if (isset($filter)) print stripslashes($filter);
+	print "\" />";
+	print "</td></tr>";
+	print "<tr><td class=\"list_label\" width=\"10%\" style=\"padding: 5px;\">";
+	print "<input type=\"submit\"  name=\"search\" value=\"".$gm_lang["filter"]."\" onclick=\"this.form.subclick.value=this.name\" />&nbsp;";
+	print "<input type=\"submit\"  name=\"all\" value=\"".$gm_lang["display_all"]."\" onclick=\"this.form.subclick.value=this.name\" />";
 	print "</td></tr></table>";
 	print "</form></div>";
 }
 
 // Show source and hide the rest
-else if ($type == "source" && $SHOW_SOURCES>=getUserAccessLevel($gm_username)) {
+else if ($type == "source" && $SHOW_SOURCES >= $Users->getUserAccessLevel($gm_username)) {
 	print "<div align=\"center\">";
 	print "<form name=\"filtersource\" method=\"post\" onsubmit=\"return checknames(this);\" action=\"find.php\">";
 	print "<input type=\"hidden\" name=\"action\" value=\"filter\" />";
+	print "<input type=\"hidden\" name=\"clicked\" value=\"dikkedeur\" />";
 	print "<input type=\"hidden\" name=\"type\" value=\"source\" />";
 	print "<input type=\"hidden\" name=\"callback\" value=\"$callback\" />";
 	print "<input type=\"hidden\" name=\"subclick\">"; // This is for passing the name of which submit button was clicked
 	print "<table class=\"list_table $TEXT_DIRECTION\" width=\"30%\" border=\"0\">";
 	print "<tr><td class=\"list_label\" width=\"10%\" style=\"padding: 5px;\">";
 	print $gm_lang["source_contains"]." <input type=\"text\" name=\"filter\" value=\"";
-	if (isset($filter)) print $filter;
+	if (isset($filter)) print stripslashes($filter);
 	print "\" />";
 	print "</td></tr>";
 	print "<tr><td class=\"list_label\" width=\"10%\" style=\"padding: 5px;\">";
-	print "<input type=\"submit\" name=\"search\" value=\"".$gm_lang["filter"]."\" onclick=\"this.form.subclick.value=this.name\" />&nbsp;";
-	print "<input type=\"submit\" name=\"all\" value=\"".$gm_lang["display_all"]."\" onclick=\"this.form.subclick.value=this.name\" />";
+	print "<input type=\"submit\"  name=\"search\" value=\"".$gm_lang["filter"]."\" onclick=\"this.form.subclick.value=this.name\" />&nbsp;";
+	print "<input type=\"submit\"  name=\"all\" value=\"".$gm_lang["display_all"]."\" onclick=\"this.form.subclick.value=this.name\" />";
 	print "</td></tr></table>";
 	print "</form></div>";
 }
@@ -378,78 +415,39 @@ if ($action=="filter") {
 	// Output Individual
 	if ($type == "indi") {
 		$oldged = $GEDCOM;
-		// print "\n\t<table class=\"tabs_table $TEXT_DIRECTION center\" width=\"90%\">\n\t\t<tr>";
-		$myindilist = search_indis_names($filter);
+		$oldgedid = $GEDCOMID;
+		$myindilist = SearchIndisNames($filter,false,$gedid);
 		$cti=count($myindilist);
 		if ($cti>0) {
-			PrintPersonList($myindilist, true);
-			/**
-			$curged = $GEDCOM;
-			$printname = array();
-			$names = preg_split("/[\s,]+/", $filter);
-			print "<td class=\"list_value_wrap\"><ul>";
-			foreach ($myindilist as $key => $value) {
-				foreach($value["names"] as $indexval => $namearray) {
-					foreach($names as $ni=>$name) {
-						$found = true;
-						if (preg_match("/".$name."/i", $namearray[0])==0) $found=false;
-					}
-					if ($found) $printname[] = array(sortable_name_from_name($namearray[0]), $key, get_gedcom_from_id($value["gedfile"]));
-				}
-			}
-			uasort($printname, "itemsort");
-			foreach($printname as $pkey => $pvalue) {
-				$GEDCOM = $pvalue[2];
-				if ($GEDCOM != $curged) {
-					ReadPrivacy($GEDCOM);
-					$curged = $GEDCOM;
-				}
-				print_list_person($pvalue[1], array(check_NN($pvalue[0]), $pvalue[2]), true);
-				print "\n";
-			}
-			print "\n\t\t</ul></td>";
-			$GEDCOM = $oldged;
-			if ($GEDCOM != $curged) {
-				ReadPrivacy($GEDCOM);
-				$curged = $GEDCOM;
-			}
-			print "</tr>";
-			if ($cti > 0) {
-				print "<tr><td class=\"list_value\">".$gm_lang["total_indis"]." ".$cti;
-				if (count($indi_private)>0) print "  (".$gm_lang["private"]." ".count($indi_private).")";
-				if (count($indi_hide)>0) print "  --  ".$gm_lang["hidden"]." ".count($indi_hide);
-				if (count($indi_private)>0 || count($indi_hide)>0) print_help_link("privacy_error_help", "qm");
-				print "</td></tr>";
-			}
-			**/
+			PrintPersonList($myindilist, true, true);
 		}
 		else {
 			print "<div class=\"center width60\">";
 			print $gm_lang["no_results"];
 			print "</div>";
 		}
-		// print "</table>";
 	}
 
 	// Output Family
 	else if ($type == "fam") {
 		$oldged = $GEDCOM;
+		$oldgedid = $GEDCOMID;
 		$myindilist = array();
 		$myfamlist = array();
 		$myfamlist2 = array();
 		$famquery = array();
 		
 		print "\n\t<table class=\"tabs_table $TEXT_DIRECTION center\" width=\"90%\">\n\t\t<tr>";
-		if (find_person_record($filter)) {
-			$printname = search_fams_members($filter);
+		if (FindPersonRecord($filter)) {
+			$printname = SearchFamsMembers($filter);
 			$ctf = count($printname);
 		}
 		else {
-			$myindilist = search_indis($filter);
+			$myindilist = SearchIndis($filter);
 			foreach($myindilist as $key1 => $myindi) {
 				foreach($myindi["names"] as $key2 => $name) {
-					if ((preg_match("/".$filter."/i", $name[2]) > 0)) {
-						$famquery[] = array($key1, $GEDCOM);
+					if ((preg_match("/".$filter."/i", $name[0]) > 0)) {
+						$famquery[] = array($key1, $GEDCOMID);
 						break;
 					}
 				}
@@ -458,10 +456,10 @@ if ($action=="filter") {
 			$printname = array();
 			if ($ctf>0) {
 				// Get the famrecs with hits on names from the family table
-				$myfamlist = search_fams_names($famquery, "OR", true);
+				$myfamlist = SearchFamsNames($famquery, "OR", true);
 				// Get the famrecs with hits in the gedcom record from the family table
-				$myfamlist2 = search_fams($filter, false, "OR", true);		
-				$myfamlist = gm_array_merge($myfamlist, $myfamlist2);
+				$myfamlist2 = SearchFams($filter, false, "OR", true);		
+				$myfamlist = GmArrayMerge($myfamlist, $myfamlist2);
 				foreach ($myfamlist as $key => $found) {
 					foreach ($found["name"] as $foundkey => $foundname) {
 						if (stristr($foundname[$foundkey], $filter)) $found = true;
@@ -473,22 +471,22 @@ if ($action=="filter") {
 					foreach($value["name"] as $nkey => $famname) {
 						$famsplit = preg_split("/(\s\+\s)/", trim($famname));
 						if (preg_match("/".$filter."/i", $famsplit[0]) != 0) {
-							$printname[]=array(check_NN($famname), $key, get_gedcom_from_id($value["gedfile"]));
+							$printname[]=array(CheckNN($famname), $key, get_gedcom_from_id($value["gedfile"]));
 							break;
 						}
 				    }
 				}		
 			}					
 		}
-		
-		if ($ctf>0) {
+		if (!empty($printname)) {
 			$curged = $GEDCOM;
 			print "\n\t\t<td class=\"list_value_wrap $TEXT_DIRECTION\"><ul>";
-			uasort($printname, "itemsort");
+			uasort($printname, "ItemSort");
 			foreach($printname as $pkey => $pvalue) {
-				$GEDCOM = $pvalue[2];
+				$GEDCOMID = $pvalue[2];
+				$GEDCOM = get_gedcom_from_id($GEDCOMID);
 				if ($GEDCOM != $curged) {
-					ReadPrivacy($GEDCOM);
+					$Privacy->ReadPrivacy($GEDCOMID);
 					$curged = $GEDCOM;
 				}
 				print_list_family($pvalue[1], array($pvalue[0], $pvalue[2]), true);
@@ -496,8 +494,9 @@ if ($action=="filter") {
 			}
 			print "\n\t\t</ul></td>";
 			$GEDCOM = $oldged;
+			$GEDCOMID = $oldgedid;
 			if ($GEDCOM != $curged) {
-				ReadPrivacy($GEDCOM);
+				$Privacy->ReadPrivacy($GEDCOMID);
 				$curged = $GEDCOM;
 			}
 			print "</tr>\n";
@@ -517,11 +516,16 @@ if ($action=="filter") {
 
 	// Output Media
 	else if ($type == "media") {
-		global $dirs;
 		
-		$medialist = get_medialist(false, $directory);
+//		print "find dir: ".$directory."<br />";
+		$dirs = $MediaFS->GetMediaDirList($directory, false, 1, false, false, $MEDIA_IN_DB);
+		//print_r($dirs);
+		print "<br />";
 		print "<div align=\"center\">";
-		print "\n\t<table class=\"tabs_table center $TEXT_DIRECTION width90\">\n\t\t";
+		print "\n\t<table class=\"tabs_table center $TEXT_DIRECTION width80\">\n\t\t";
+		$directory = RelativePathFile($directory);
+		$mdir = RelativePathFile($MEDIA_DIRECTORY);
+		
 		// Show link to previous folder		
 		if ($level>0) {
 			$levels = preg_split("'/'", $directory);
@@ -530,96 +534,60 @@ if ($action=="filter") {
 			$levels = preg_split("'/'", $thumbdir);
 			$pthumb = "";
 			for($i=0; $i<count($levels)-2; $i++) $pthumb.=$levels[$i]."/";
-			$uplink = "<a href=\"find.php?embed=$embed&amp;directory=$pdir&amp;thumbdir=$pthumb&amp;level=".($level-1).$thumbget."&type=media\">&nbsp;&nbsp;&nbsp;&lt;-- $pdir&nbsp;&nbsp;&nbsp;</a><br />\n";
+			$uplink = "<a href=\"find.php?embed=$embed&amp;directory=$pdir&amp;thumbdir=$pthumb&amp;level=".($level-1).$thumbget."&amp;type=media&amp;filter=".$filter."\">&nbsp;&nbsp;&nbsp;&lt;-- $pdir&nbsp;&nbsp;&nbsp;</a><br />\n";
 		}
 
-		// Start of media directory table
-		print "<table class=\"width30\">";
-	
 		// Tell the user where he is
-		print "<tr><td class=\"list_value $TEXT_DIRECTION\" colspan=\"2\">".$gm_lang["current_dir"].substr($directory,0,-1)."</td></tr>";
+		print "<tr><td class=\"list_value wrap $TEXT_DIRECTION\" colspan=\"4\">".$gm_lang["current_dir"];
+		if ($external_links == "1") print $gm_lang["external_media"];
+		else print $directory;
+		print "</td></tr>";
+
 		
 		// display the directory list
 		if (count($dirs) || $level) {
 			sort($dirs);
 			if ($level){
-				print "<tr><td class=\"list_value $TEXT_DIRECTION\" colspan=\"2\">";
+				print "<tr><td class=\"list_value $TEXT_DIRECTION\" colspan=\"4\">";
 				print $uplink."</td></tr>";
 			}
-			print "<tr><td class=\"shade2 $TEXT_DIRECTION\" colspan=\"2\">";
-			print "<a href=\"find.php?directory=$directory&amp;thumbdir=$directory&amp;level=".$level.$thumbget."&amp;external_links=http&amp;type=media\">External media</a>";
+			print "<tr><td class=\"shade2 $TEXT_DIRECTION\" colspan=\"4\">";
+			print "<a href=\"find.php?directory=&amp;external_links=1&amp;type=media".$thumbget."&amp;level=0\">".$gm_lang["external_media"]."</a>";
 			print "</td></tr>";
-			foreach ($dirs as $indexval => $dir) {
-				print "<tr><td class=\"list_value $TEXT_DIRECTION\" width=\"45%\">";
-				print "<a href=\"find.php?directory=$directory$dir/&thumbdir=$directory$dir/&level=".($level+1).$thumbget."&type=media\">$dir</a>";
+			// If we view the external links, add a link to the main directory
+			if ($external_links == "1") {
+				print "<tr><td class=\"list_value wrap $TEXT_DIRECTION\" colspan=\"4\" width=\"45%\">";
+				print "<a href=\"find.php?directory=".$MEDIA_DIRECTORY."&thumbdir=".$MEDIA_DIRECTORY.$thumbget."&level=0&amp;type=media&amp;filter=".$filter."\">".$mdir."</a>";
 				print "</td></tr>";
 			}
+			if ($level < $MEDIA_DIRECTORY_LEVELS) {
+				foreach ($dirs as $indexval => $dir) {
+					if ($dir != $directory) {
+						print "<tr><td class=\"list_value wrap $TEXT_DIRECTION\" colspan=\"4\" width=\"45%\">";
+						print "<a href=\"find.php?directory=$dir&thumbdir=$dir&level=".($level+1).$thumbget."&amp;type=media&amp;filter=".$filter."\">".$dir."</a>";
+						print "</td></tr>";
+					}
+				}
+			}
 		}
-		print "<tr><td class=\"list_value $TEXT_DIRECTION\">";
+//		print "<tr><td class=\"list_value $TEXT_DIRECTION\">";
+		print "<tr>";
 		
 		$applyfilter = ($filter != "");
 		print "<br />";
+		
+		if ($external_links == "1") $directory = "external_links";
+		$medialist = $MediaFS->GetMediaFilelist($directory, $filter, $MEDIA_IN_DB);
 
-		// display the images TODO x across if lots of files??
+		// Privacy is already checked in the function
+		// An empty media object is returned for not coupled files
 		if (count($medialist) > 0) {
-			foreach ($medialist as $indexval => $media) {
-				
-				// Check if the media belongs to the current folder
-				preg_match_all("/\//", $media["FILE"], $hits);
-				$ct = count($hits[0]);
-				
-				if ($ct <= $level+1) {
-					// simple filter to reduce the number of items to view
-					if ($applyfilter) $isvalid = (strpos(str2lower($media["FILE"]),str2lower($filter)) !== false);
-					else $isvalid = true;
-					if ($isvalid) {
-						print "<tr>";
-						
-						//-- thumbnail field
-						if ($showthumb) {
-							print "\n\t\t\t<td class=\"list_value $TEXT_DIRECTION\">";
-							if (isset($media["THUMB"])) print "<a href=\"#\" onclick=\"return openImage('".preg_replace("/'/", "\'", urlencode($media["FILE"]))."','".($media["WIDTH"]+50)."','".($media["HEIGHT"]+50)."');\"><img src=\"".filename_encode($media["THUMB"])."\" border=\"0\" width=\"50\"></a>\n";
-							else print "&nbsp;";
-						}
-						
-						//-- name and size field
-						print "\n\t\t\t<td class=\"list_value $TEXT_DIRECTION\">";
-						if ($media["TITL"] != "") $title = "<b>".$media["TITL"]."</b> (".$media["XREF"].")";
-						else $title = "";
-						print PrintReady($title)."<br />";
-						if (!$embed){
-							print "<a href=\"#\" onclick=\"pasteid('".preg_replace("/'/", "\'", filename_encode($media["FILE"]))."');\">".filename_encode($media["FILE"])."</a> -- ";
-						}
-						else print "&nbsp;".$imag." -- ";
-						print "<a href=\"#\" onclick=\"return openImage('".preg_replace("/'/", "\'", filename_encode($media["FILE"]))."','".($media["WIDTH"]+50)."','".($media["HEIGHT"]+50)."');\">".$gm_lang["view"]."</a><br />";
-						if (!file_exists($media["FILE"]) && !stristr($media["FILE"], "://")) print filename_encode($media["FILE"])."<br /><span class=\"error\">".$gm_lang["file_not_exists"]."</span><br />";
-						else if (!stristr($media["FILE"], "://")) {
-							print "<br /><sub>&nbsp;&nbsp;".$gm_lang["image_size"]." -- ".$media["WIDTH"]."x".$media["HEIGHT"]."</sub><br />";
-						}
-						if ($media["LINKED"]) {
-							print $gm_lang["media_linked"]."<br />";
-							foreach ($media["LINKS"] as $indi => $type_record) {
-								if ($type_record=="INDI") {
-						            print " <br /><a href=\"individual.php?pid=".$indi."\"> ".$gm_lang["view_person"]." - ".PrintReady(get_person_name($indi))."</a>";
-								}
-								else if ($type_record=="FAM") {
-						           	print "<br /> <a href=\"family.php?famid=".$indi."\"> ".$gm_lang["view_family"]." - ".PrintReady(get_family_descriptor($indi))."</a>";
-								}
-								else if ($type_record=="SOUR") {
-						            	print "<br /> <a href=\"source.php?sid=".$indi."\"> ".$gm_lang["view_source"]." - ".PrintReady(get_source_descriptor($indi))."</a>";
-								}
-								//-- no reason why we might not get media linked to media. eg stills from movie clip, or differents resolutions of the same item
-								else if ($type_record=="OBJE") {
-									//-- TODO add a similar function get_media_descriptor($gid)
-								}
-							}
-						}
-						else {
-							print $gm_lang["media_not_linked"];
-						}
-						print "\n\t\t\t</td>";
-					}
-				}
+			$prt = 0;
+			foreach ($medialist as $file => $mediaobjs) {
+				if ($prt%2 == 0) print "<tr>";
+				$MediaFS->PrintViewLink($mediaobjs, $showthumb, true);
+				$prt++;
+				if ($prt%2 == 0) print "</tr>";
 			}
 		}
 		else {
@@ -627,25 +595,22 @@ if ($action=="filter") {
 			print $gm_lang["no_results"];
 			print "</td></tr>";
 		}
-		print "</table></div>";
+		print "</table></table></div>";
 	}
-	else if ($type == "object") {
+	else if ($type == "object" && isset($clicked)) {
 		print "\n\t<table class=\"list_table center $TEXT_DIRECTION\">\n\t\t";
-		get_medialist();
-		$isvalid = false;
-		if (count($medialist > 0)) {
-			foreach ($medialist as $key => $media) {
-				if ($filter) $isvalid = (strpos(str2lower($media["FILE"]),str2lower($filter)) !== false || strpos(str2lower($media["TITL"]),str2lower($filter)) !== false);
-				else $isvalid = true;
-				if ($isvalid) {
-					print "\n\t\t<tr><td class=\"shade1 wrap $TEXT_DIRECTION\">";
-					if ($media["TITL"] != "") $title = $media["TITL"]." (".$media["XREF"].")";
-					else $title = $media["FILE"];
-					if (isset($media["THUMB"])) print "<a href=\"#\" onclick=\"return openImage('".preg_replace("/'/", "\'", urlencode($media["FILE"]))."','".($media["WIDTH"]+50)."','".($media["HEIGHT"]+50)."');\"><img src=\"".filename_encode($media["THUMB"])."\" border=\"0\" width=\"50\" align=\"left\" ></a>\n";
-					print "&nbsp;<a href=\"#\" onclick=\"pasteid('".$media["XREF"]."');\">".PrintReady($title)."</a>";
-					print "\n\t\t</td></tr>";
-					$isvalid = false;
+		$fmedialist = new Media;
+		$fmedialist->RetrieveFilterMediaList($filter);
+		if (count($fmedialist->medialist > 0)) {
+			foreach ($fmedialist->medialist as $key => $media) {
+				print "\n\t\t<tr><td class=\"shade1 wrap $TEXT_DIRECTION\">";
+				if (!empty($media->m_fileobj->f_thumb_file)) {
+					if ($USE_GREYBOX && $media->m_fileobj->f_is_image) print "<a href=\"".FilenameEncode($media->m_fileobj->f_file)."\" title=\"".$media->m_titl."\" rel=\"gb_imageset[]\">";
+					else print "<a href=\"#\" onclick=\"return openImage('".$media->m_fileobj->f_main_file."','".($media->m_fileobj->f_width+50)."','".($media->m_fileobj->f_height+50)."', '".$media->m_fileobj->f_is_image."');\">";
+					print "<img src=\"".FilenameEncode($media->m_fileobj->f_thumb_file)."\" border=\"0\" width=\"50\" align=\"left\" ></a>\n";
 				}
+				print "&nbsp;<a href=\"#\" onclick=\"pasteid('".$media->m_media."');\">".PrintReady($media->m_titl)."</a>";
+				print "\n\t\t</td></tr>";
 			}
 		}
 		else {
@@ -657,13 +622,13 @@ if ($action=="filter") {
 	}
 	// Output Places
 	else if ($type == "place") {
-		print "\n\t<table class=\"tabs_table $TEXT_DIRECTION\" width=\"90%\">\n\t\t<tr>";
+		print "\n\t<table class=\"tabs_table $TEXT_DIRECTION\" width=\"90%\">\n\t\t";
 		$placelist = array();
-		find_place_list($filter);
+		FindPlaceList($filter);
 		uasort($placelist, "stringsort");
 		$ctplace = count($placelist);
 		if ($ctplace>0) {
-			print "\n\t\t<td class=\"list_value_wrap $TEXT_DIRECTION\"><ul>";
+			print "\n\t\t<tr><td class=\"list_value_wrap $TEXT_DIRECTION\"><ul>";
 			foreach($placelist as $indexval => $revplace) {
 				$levels = preg_split ("/,/", $revplace);		// -- split the place into comma seperated values
 				$levels = array_reverse($levels);				// -- reverse the array so that we get the top level first
@@ -690,17 +655,17 @@ if ($action=="filter") {
 
 	// Output Repositories
 	else if ($type == "repo") {
-		print "\n\t<table class=\"tabs_table $TEXT_DIRECTION\" width=\"90%\">\n\t\t<tr>";
-		$repolist = get_repo_list();
+		print "\n\t<table class=\"tabs_table $TEXT_DIRECTION\" width=\"90%\">\n\t\t";
+		$repolist = GetRepoList($filter);
 		$ctrepo = count($repolist);
 		if ($ctrepo>0) {
-			print "\n\t\t<td class=\"list_value_wrap\"><ul>";
-			?><pre><?php
-			print_r($repolist);
-			?></pre><?php
+			print "\n\t\t<tr><td class=\"list_value_wrap\"><ul>";
 			foreach ($repolist as $key => $value) {
 				$id = $value["id"];
-			    print "<li><a href=\"#\" onclick=\"pasteid('$id');\"><span class=\"list_item\">".PrintReady($key)."</span></a></li>";
+				if (DisplayDetailsByID($id, "REPO", 1, true)) {
+			    	print "<li><a href=\"#\" onclick=\"sndReq(document.getElementById('dummy'), 'lastused', 'type', 'REPO', 'id', '".JoinKey($id, $GEDCOMID)."'); pasteid('$id');\"><span id=\"dummy\"></span><span class=\"list_item\">".PrintReady($key)."</span></a></li>";
+		    	}
+		    	else $ctrepo--;
 			}
 			print "</ul></td></tr>";
 			print "<tr><td class=\"list_label\">".$gm_lang["repos_found"]." ".$ctrepo;
@@ -715,27 +680,73 @@ if ($action=="filter") {
 
 	}
 	// Output Sources
-	else if ($type == "source") {
+	else if ($type == "source" && isset($clicked)) {
 		$oldged = $GEDCOM;
-		print "\n\t<table class=\"tabs_table $TEXT_DIRECTION\" width=\"90%\">\n\t\t<tr>\n\t\t<td class=\"list_value\"><tr>";
-		if (!isset($filter) || !$filter) $mysourcelist = get_source_list();
-		else $mysourcelist = search_sources($filter);
+		$oldgedid = $GEDCOMID;
+		print "\n\t<table class=\"tabs_table $TEXT_DIRECTION\" width=\"90%\">\n\t\t<tr>\n\t\t<td class=\"list_value\">";
+		if (!isset($filter) || !$filter) {
+			$mysourcelist = GetSourceList();
+			GetAllSourceLinks(false);
+		}
+		else {
+			$mysourcelist = SearchSources($filter);
+		}
 		$cts=count($mysourcelist);
 		if ($cts>0) {
 			$curged = $GEDCOM;
-			print "\n\t\t<td class=\"list_value_wrap\"><ul>";
+			print "\n\t\t<tr><td class=\"list_value_wrap\"><ul>";
 			foreach ($mysourcelist as $key => $value) {
-				print "<li>";
-			    print "<a href=\"#\" onclick=\"pasteid('$key'); return false;\"><span class=\"list_item\">".PrintReady($value["name"])."</span></a>\n";
-			    print "</li>\n";
+				if (DisplayDetailsByID($key, "SOUR", 1, true)) {
+					print "<li>";
+				    print "<a href=\"#\" onclick=\"sndReq(document.getElementById('dummy'), 'lastused', 'type', 'SOUR', 'id', '".JoinKey($key, $GEDCOMID)."'); pasteid('$key'); return false;\"><span class=\"list_item\">".PrintReady($value["name"])."</span></a>\n";
+				    print "</li>\n";
+			    }
+			    else $cts--;
 			}
 			print "</ul></td></tr>";
 			$GEDCOM = $oldged;
+			$GEDCOMID = $oldgedid;
 			if ($GEDCOM != $curged) {
-				ReadPrivacy($GEDCOM);
+				$Privacy->ReadPrivacy($GEDCOMID);
 				$curged = $GEDCOM;
 			}
 			if ($cts > 0) print "<tr><td class=\"list_label\">".$gm_lang["total_sources"]." ".$cts."</td></tr>";
+		}
+		else {
+			print "<tr><td class=\"list_value_wrap\">";
+			print $gm_lang["no_results"];
+			print "</td></tr>";
+		}
+		print "</table>";
+	}
+	
+	// Output Notes
+	else if ($type == "note" && isset($clicked)) {
+		require_once("includes/controllers/note_ctrl.php");
+		$note_controller->GetNoteList($filter);
+		$oldged = $GEDCOM;
+		$oldgedid = $GEDCOMID;
+		print "\n\t<table class=\"tabs_table $TEXT_DIRECTION\" width=\"90%\">\n\t\t<tr>\n\t\t<td class=\"list_value\">";
+		$ctn = count($note_controller->notelist);
+		if ($ctn>0) {
+			$curged = $GEDCOM;
+			print "\n\t\t<tr><td class=\"list_value_wrap\"><ul>";
+			foreach ($note_controller->notelist as $key => $note) {
+				if (DisplayDetailsByID($key, "NOTE", 1, true)) {
+					print "<li>";
+				    print "<a href=\"#\" onclick=\"sndReq(document.getElementById('dummy'), 'lastused', 'type', 'NOTE', 'id', '".JoinKey($note->GetXref(), $GEDCOMID)."'); pasteid('".$note->GetXref()."'); return false;\"><span class=\"list_item\">".PrintReady($note->GetTitle()." (".$note->GetXref().")")."</span></a>\n";
+				    print "</li>\n";
+			    }
+			    else $ctn--;
+			}
+			print "</ul></td></tr>";
+			$GEDCOM = $oldged;
+			$GEDCOMID = $oldgedid;
+			if ($GEDCOM != $curged) {
+				$Privacy->ReadPrivacy($GEDCOMID);
+				$curged = $GEDCOM;
+			}
+			if ($ctn > 0) print "<tr><td class=\"list_label\">".$gm_lang["total_notes"]." ".$ctn."</td></tr>";
 		}
 		else {
 			print "<tr><td class=\"list_value_wrap\">";
@@ -781,12 +792,12 @@ if ($action=="filter") {
 	}
 }
 print "</div>";
-?>
+if ($type != "specialchar") {?>
 <script language="JavaScript" type="text/javascript">
 <!--
 	document.filter<?php print $type;?>.filter.focus();
 //-->
 </script>
-<?php
+<?php }
 print_simple_footer();
 ?>

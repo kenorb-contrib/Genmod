@@ -6,7 +6,7 @@
  * This file is only loaded if the $LANGUAGE is hebrew, or if the $CALENDAR_FORMAT is hebrew or jewish
  *
  * Genmod: Genealogy Viewer
- * Copyright (C) 2005 Genmod Development Team
+ * Copyright (C) 2005 - 2008 Genmod Development Team
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -24,15 +24,14 @@
  *
  * @package Genmod
  * @subpackage Dates
- * @version $Id: functions_date_hijri.php,v 1.2 2005/10/27 08:41:30 roland-d Exp $
+ * @version $Id$
  */
 
 /**
  * security check to prevent hackers from directly accessing this file
  */
 if (strstr($_SERVER["SCRIPT_NAME"],"functions_date_hijri.php")) {
-	print "Why do you want to do that?";
-	exit;
+	require "../intrusion.php";
 }
 
 /**
@@ -42,10 +41,9 @@ if (strstr($_SERVER["SCRIPT_NAME"],"functions_date_hijri.php")) {
  * @return float a nicely rounded number?
  * @author VisualMind (visualmind@php.net)
  */
-function _ardInt($float) 
-{
+function ArdInt($float) {
        return ($float < -0.0000001) ? ceil($float-0.0000001) : floor($float+0.0000001);
- }
+}
 
  
 /**
@@ -58,10 +56,9 @@ function _ardInt($float)
  * @author VisualMind (visualmind@php.net).
  * @author sfezz (sfezz@users.sourceforge.net).
  */
-function getHijri($d, $m, $y) 
-{
+function GetHijri($d, $m, $y) {
 	// note: see the $format string to change the form of the Hijri returned
-
+	
 	// manipulated by sfezz to use UTF-8 and to work nicely in Genmod
 	// Hijri dates run according to the moon cycle and loose about 11 days per year.
 	// Due to the nature of the moon not being in sync with the sun, it is possible
@@ -78,49 +75,49 @@ function getHijri($d, $m, $y)
 	
 	$use_span=true;
 
-	$arDay = array("Sat"=>"السبت", 
-	         "Sun"=>"الأحد", 
-	         "Mon"=>"الأثنين", 
-	         "Tue"=>"الثلاثاء", 
-	         "Wed"=>"الأربعاء", 
-	         "Thu"=>"الخميس", 
-	         "Fri"=>"الجمعه");
-	$ampm=array('am'=>'صباح','pm'=>'مساء'); 
+	$arDay = array("Sat"=>"?????", 
+	         "Sun"=>"?????", 
+	         "Mon"=>"???????", 
+	         "Tue"=>"????????", 
+	         "Wed"=>"????????", 
+	         "Thu"=>"??????", 
+	         "Fri"=>"??????");
+	$ampm=array('am'=>'????','pm'=>'????'); 
 
 	// -- commented out because the date function will not work on dates < 1970
 	// list($d,$m,$y,$dayname,$monthname,$am)=explode(' ',date('d m Y D M a', $timestamp));
 
 
 	if (($y>1582)||(($y==1582)&&($m>10))||(($y==1582)&&($m==10)&&($d>14))) {
-		$jd = _ardInt((1461*($y+4800+ _ardInt(($m-14)/12)))/4);
-		$jd += _ardInt((367*($m-2-12*( _ardInt(($m-14)/12))))/12);
-		$jd -= _ardInt((3*( _ardInt(($y+4900 + _ardInt(($m-14)/12))/100)))/4);
+		$jd = ArdInt((1461*($y+4800+ ArdInt(($m-14)/12)))/4);
+		$jd += ArdInt((367*($m-2-12*( ArdInt(($m-14)/12))))/12);
+		$jd -= ArdInt((3*( ArdInt(($y+4900 + ArdInt(($m-14)/12))/100)))/4);
 		$jd +=$d-32075;
 	} else 	{
-		$jd = 367*$y- _ardInt((7*($y+5001+ _ardInt(($m-9)/7)))/4)+ _ardInt((275*$m)/9)+$d+1729777;
+		$jd = 367*$y- ArdInt((7*($y+5001+ ArdInt(($m-9)/7)))/4)+ ArdInt((275*$m)/9)+$d+1729777;
 	}
 	$l=$jd-1948440+10632;
-	$n= _ardInt(($l-1)/10631);
+	$n= ArdInt(($l-1)/10631);
 	$l=$l-10631*$n+355;  // Correction: 355 instead of 354
-	$j=( _ardInt((10985-$l)/5316))*( _ardInt((50*$l)/17719))+( _ardInt($l/5670))*( _ardInt((43*$l)/15238));
-	$l=$l -( _ardInt((30-$j)/15))*( _ardInt((17719*$j)/50))-( _ardInt($j/16))*( _ardInt((15238*$j)/43))+29;
-	$m=_ardInt((24*$l)/709);
-	$d=$l- _ardInt((709*$m)/24);
+	$j=( ArdInt((10985-$l)/5316))*( ArdInt((50*$l)/17719))+( ArdInt($l/5670))*( ArdInt((43*$l)/15238));
+	$l=$l -( ArdInt((30-$j)/15))*( ArdInt((17719*$j)/50))-( ArdInt($j/16))*( ArdInt((15238*$j)/43))+29;
+	$m=ArdInt((24*$l)/709);
+	$d=$l- ArdInt((709*$m)/24);
 	$y=30*$n+$j-30;		
 	
 	
-	$hjMonth = array("محرّم", 
-				"صفر", 
-				"ربيع الأول", 
-				"ربيع الثانى", 
-				"جمادى الأول", 
-				"جمادى الثاني", 
-				"رجب", 
-				"شعبان", 
-				"رمضان", 
-				"شوّال", 
-				"ذو القعدة", 
-				"ذو الحجة"); 
+	$hjMonth = array("?????", 
+				"???", 
+				"???? ?????", 
+				"???? ??????", 
+				"????? ?????", 
+				"????? ??????", 
+				"???", 
+				"?????", 
+				"?????", 
+				"?????", 
+				"?? ??????", 
+				"?? ?????"); 
 	
 	$format = "F/j/Y"; // <------------- Change this to show different forms of the Hijri system
 	
@@ -143,6 +140,7 @@ function getHijri($d, $m, $y)
 /**
  * Get the Gregorian from a Hijri date.
  *
+ * @todo Check if hte function is necessary, currently not used.
  * @param int $d the Hijri day
  * @param int $m the Hijri month
  * @param int $y the Hijri year
@@ -150,30 +148,29 @@ function getHijri($d, $m, $y)
  * @author VisualMind (visualmind@php.net)
  * @author sfezz (sfezz@users.sourceforge.net)
  */
-function dateHijri2Greg($d, $m, $y) 
-{
+function DateHijriToGreg($d, $m, $y) {
 	
-	$jd=_ardInt((11*$y+3)/30)+354*$y+30*$m-_ardInt(($m-1)/2)+$d+1948440-386;
+	$jd=ArdInt((11*$y+3)/30)+354*$y+30*$m-ArdInt(($m-1)/2)+$d+1948440-386;
 	if ($jd> 2299160 ) {
 		$l=$jd+68569;
-		$n=_ardInt((4*$l)/146097);
-		$l=$l-_ardInt((146097*$n+3)/4);
-		$i=_ardInt((4000*($l+1))/1461001);
-		$l=$l-_ardInt((1461*$i)/4)+31;
-		$j=_ardInt((80*$l)/2447);
-		$d=$l-_ardInt((2447*$j)/80);
-		$l=_ardInt($j/11);
+		$n=ArdInt((4*$l)/146097);
+		$l=$l-ArdInt((146097*$n+3)/4);
+		$i=ArdInt((4000*($l+1))/1461001);
+		$l=$l-ArdInt((1461*$i)/4)+31;
+		$j=ArdInt((80*$l)/2447);
+		$d=$l-ArdInt((2447*$j)/80);
+		$l=ArdInt($j/11);
 		$m=$j+2-12*$l;
 		$y=100*($n-49)+$i+$l;
 	} else	{
 		$j=$jd+1402;
-		$k=_ardInt(($j-1)/1461);
+		$k=ArdInt(($j-1)/1461);
 		$l=$j-1461*$k;
-		$n=_ardInt(($l-1)/365)-_ardInt($l/1461);
+		$n=ArdInt(($l-1)/365)-ArdInt($l/1461);
 		$i=$l-365*$n+30;
-		$j=_ardInt((80*$i)/2447);
-		$d=$i-_ardInt((2447*$j)/80);
-		$i=_ardInt($j/11);
+		$j=ArdInt((80*$i)/2447);
+		$d=$i-ArdInt((2447*$j)/80);
+		$i=ArdInt($j/11);
 		$m=$j+2-12*$i;
 		$y=4*$k+$n+$i-4716;
 	}
@@ -193,37 +190,36 @@ function dateHijri2Greg($d, $m, $y)
  * @author VisualMind (visualmind@php.net)
  * @author sfezz (sfezz@users.sourceforge.net)
  */
-function getArabic($d, $m, $y) 
-{
+function GetArabic($d, $m, $y) {
 
 	// This is the same as the Gregorian date, although the names of things are different.
 
 	$use_span=true;
 
-		$arDay = array("Sat"=>"السبت", 
-	         "Sun"=>"الأحد", 
-	         "Mon"=>"الأثنين", 
-	         "Tue"=>"الثلاثاء", 
-	         "Wed"=>"الأربعاء", 
-	         "Thu"=>"الخميس", 
-	         "Fri"=>"الجمعه");
-	$ampm=array('am'=>'صباح','pm'=>'مساء'); 
+		$arDay = array("Sat"=>"?????", 
+	         "Sun"=>"?????", 
+	         "Mon"=>"???????", 
+	         "Tue"=>"????????", 
+	         "Wed"=>"????????", 
+	         "Thu"=>"??????", 
+	         "Fri"=>"??????");
+	$ampm=array('am'=>'????','pm'=>'????'); 
 
 	// -- commented out because the date function will not work on dates < 1970
 	// list($d,$m,$y,$dayname,$monthname,$am)=explode(' ',date('d m Y D M a', $timestamp));
 
-	$arMonth=array("ياناير",
-			"فبراير",
-			"مارس",
-			"ابريل",
-			"مايو",
-			"يونيو",
-			"يوليو",
-			"اغسطس",
-			"سبتمبر",
-			"اكتوبر",
-			"نوفمبر",
-			"ديسمبر");
+	$arMonth=array("??????",
+			"??????",
+			"????",
+			"?????",
+			"????",
+			"?????",
+			"?????",
+			"?????",
+			"??????",
+			"??????",
+			"??????",
+			"??????");
 			
 	
 	$format = "F/j/Y"; // <------------- Change this to show different forms of the Arabic date

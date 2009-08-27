@@ -3,7 +3,7 @@
  * Allow visitor to change the theme
  *
  * Genmod: Genealogy Viewer
- * Copyright (C) 2005 Genmod Development Team
+ * Copyright (C) 2005 - 2008 Genmod Development Team
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,7 +22,7 @@
  * @author Genmod Development Team
  * @package Genmod
  * @subpackage Themes
- * @version $Id: themechange.php,v 1.2 2006/01/09 14:19:30 sjouke Exp $
+ * @version $Id$
  */
 
 /**
@@ -37,14 +37,14 @@ require("config.php");
 	}
 	$uname = $gm_username;
 	if ($uname) {
-		$olduser = getUser($uname);
-		if ($olduser["editaccount"]) {
+		$olduser = $Users->getUser($uname);
+		if ($olduser->editaccount) {
 			$newuser = array();
-			$newuser = $olduser;
-			deleteUser($uname, "changed");
-			$newuser["theme"] = $theme_dir;
-			addUser($newuser, "changed");
-			$user = $newuser;
+			$newuser = CloneObj($olduser);
+			$Users->DeleteUser($uname, "changed");
+			$newuser->theme = $theme_dir;
+			$Users->AddUser($newuser, "changed");
+			$user = CloneObj($newuser);
 		}
 	}
 	

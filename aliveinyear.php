@@ -18,7 +18,7 @@
  * Depending on the current status of the list.
  *
  * Genmod: Genealogy Viewer
- * Copyright (C) 2005 Genmod Development Team
+ * Copyright (C) 2005 - 2008 Genmod Development Team
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -36,7 +36,7 @@
  *
  * @package Genmod
  * @subpackage Lists
- * @version $Id: aliveinyear.php,v 1.4 2006/04/30 18:44:14 roland-d Exp $
+ * @version $Id$
  */
 
 /**
@@ -54,79 +54,36 @@ require("config.php");
  * @author	GM Development Team
  * @param 	string 	$indirec	the persons raw gedcom record
  * @param 	int 		$year	the year to check if they are alive in
- * @return 	int		return 0 if the person is alive, negative number if they died earlier, positive number if they will be born in the future
+ * @return 	int		return 0 if the person is alive, positive number if they died earlier, negative number if they will be born in the future
  */
-function check_alive($indirec, $year) {
+function check_alive($indirec, $year, $type, $useMAA=false) {
 	global $MAX_ALIVE_AGE;
-	if (is_dead($indirec, $year)) return -1;
 
-	//-- if death date after year return 0
-	$deathrec = get_sub_record(1, "1 DEAT", $indirec);
-	if (!empty($deathrec)) {
-		$ct = preg_match("/\d DATE (.*)/", $deathrec, $match);
-		if ($ct>0) {
-			if (strstr($match[1], "@#DHEBREW@")===false) {
-				$ddate = parse_date($match[1]);
-				if ($year>$ddate[0]["year"]) {
-					//print "A".$indirec;
-					return -1;
-				}
-			}
+	$bddates = estimateBD($indirec, $type);
+	// First check if we must assume something
+	if ($useMAA) {
+		if (isset($bddates["birth"]["year"]) && $bddates["birth"]["type"] == "true" && (!isset($bddates["death"]["year"]) || $bddates["death"]["type"] != "true")) {
+			$bddates["death"]["year"] = $bddates["birth"]["year"] + $MAX_ALIVE_AGE;
+			$bddates["death"]["type"] = "est";
 		}
-	}
-
-	//-- if birthdate less than $MAX_ALIVE_AGE return false
-	$birthrec = get_sub_record(1, "1 BIRT", $indirec);
-	if (!empty($birthrec)) {
-		$ct = preg_match("/\d DATE (.*)/", $birthrec, $match);
-		if ($ct>0) {
-			if (strstr($match[1], "@#DHEBREW@")===false) {
-				$bdate = parse_date($match[1]);
-				if ($year<$bdate[0]["year"]) {
-					//print "B".$indirec;
-					return 1;
-				}
-			}
+		if (isset($bddates["death"]["year"]) && $bddates["death"]["type"] == "true" && (!isset($bddates["birth"]["year"]) || $bddates["birth"]["type"] != "true")) {
+			$bddates["birth"]["year"] = $bddates["death"]["year"] + $MAX_ALIVE_AGE;
+			$bddates["birth"]["type"] = "est";
 		}
 	}
 	
-	//-- check if year is between birth and death
-	if (isset($bdate) && isset($ddate)) {
-		//print "HERE $year>={$bdate[0]["year"]} && $year<={$ddate[0]["year"]}";
-		if ($year>=$bdate[0]["year"] && $year<=$ddate[0]["year"]) {
-			//print "C".$indirec;
-			return 0;
-		}
-	}
-
-	// If no death record than check all dates;
-	$years = array();
-	$subrecs = get_all_subrecords($indirec, "CHAN", true, true, false);
-	foreach($subrecs as $ind=>$subrec) {
-		$ct = preg_match("/\d DATE (.*)/", $subrec, $match);
-		
-		if ($ct>0 && strstr($match[0], "@#DHEBREW@")===false) {
-			$bdate = parse_date($match[1]);
-			if (!empty($bdate[0]["year"])) $years[] = $bdate[0]["year"];
-		}
-	}
-	//print_r($years);
-	if (count($years)>1) {
-		//print "HERE $year>={$years[0]} && $year<={$years[count($years)-1]}";
-		if ($year>=$years[0] && $year<=$years[count($years)-1]) {
-			//print "E".$indirec;
-			return 0;
-		}
-	}
+	// For sure born after
+	if (isset($bddates["birth"]["year"]) && $bddates["birth"]["year"] > $year) return -1;
 	
-	foreach($years as $ind=>$year1) {
-		if (($year1-$year) > $MAX_ALIVE_AGE) {
-			//print "F".$match[$i][0].$indirec;
-			return -1;
-		}
-	}
-
-	return 0;
+	// For sure died before
+	if (isset($bddates["death"]["year"]) && $bddates["death"]["year"] < $year) return 1;
+	
+	// For sure lived in that year
+	if (isset($bddates["death"]["year"]) && isset($bddates["birth"]["year"]) && $bddates["birth"]["year"] <= $year && $bddates["death"]["year"] >= $year) return 0;
+	
+	// All else don't know, we assume not living
+	return -1;
+	
 }
 //-- end functions
 
@@ -135,32 +92,54 @@ if (empty($show_all)) $show_all = "no";
 if (empty($show_all_firstnames)) $show_all_firstnames = "no";
 if (empty($year)) $year=date("Y");
 
+// Type can be either "true", "wide" or "narrow"
+if (!isset($type)) $type = "narrow";
+if (!isset($useMAA)) $useMAA = 0;
+
 // Remove slashes
 if (isset($alpha)) $alpha = stripslashes($alpha);
 if (isset($surname)) $surname = stripslashes($surname);
 
 print_header($gm_lang["alive_in_year"]);
 print "<div class =\"center\">";
-print "\n\t<h2>";
+print "\n\t<h3>";
 print_help_link("alive_in_year_help", "qm");
 print str_replace("#YEAR#", $year, $gm_lang["is_alive_in"]);
 
-print "</h2>";
+print "</h3>";
 
 if ($view != "preview") {
 	print "\n\t<form name=\"newyear\" action=\"aliveinyear.php\" method=\"get\">";
 	if (!empty($alpha)) print "\n\t\t<input type=\"hidden\" name=\"alpha\" value=\"$alpha\" />";
 	if (!empty($surname)) print "\n\t\t<input type=\"hidden\" name=\"surname\" value=\"$surname\" />";
 	print "\n\t\t<input type=\"hidden\" name=\"surname_sublist\" value=\"$surname_sublist\" />";
+	print "\n\t\t<input type=\"hidden\" name=\"show_all\" value=\"$show_all\" />";
 	print "\n\t\t<table class=\"list_table center $TEXT_DIRECTION\">\n\t\t\t<tr>";
-	print "\n\t\t\t<td class=\"shade1\">";
+	print "\n\t\t\t<td class=\"shade3 center\" colspan=\"4\">".$gm_lang["choose"]."</td></tr>";
+	print "<tr><td class=\"shade1\" rowspan=\"4\" style=\"vertical-align: middle; text-align: center; padding: 5px;\" >";
 	print_help_link("year_help", "qm");
 	print $gm_lang["year"]."</td>";
-	print "\n\t\t\t<td class=\"shade2\">";
+	print "\n\t\t\t<td class=\"shade2\" rowspan=\"4\" style=\"vertical-align: middle;\" >";
 	print "\n\t\t\t\t<input class=\"pedigree_form\" type=\"text\" name=\"year\" size=\"3\" value=\"$year\" />";
 	print "\n\t\t\t\t";
 	print "\n\t\t\t</td>";
-	print "\n\t\t\t<td rowspan=\"3\" class=\"shade3\">";
+	print "<td class=\"shade1\">".$gm_lang["aiy_usemaa"]."</td>";
+	print "<td class=\"shade2\" style=\"vertical-align: middle;\"><input type=\"checkbox\" name=\"useMAA\" value=\"1\" onclick=\"submit()\"";
+	if ($useMAA == "1") print " checked=\"checked\"";
+	print " /></td></tr>";
+	print "<tr><td class=\"shade1\">".$gm_lang["aiy_trueyears"]."</td>";
+	print "<td class=\"shade2\" style=\"vertical-align: middle;\"><input type=\"radio\" name=\"type\" value=\"true\" onclick=\"submit()\"";
+	if ($type == "true") print " checked=\"checked\"";
+	print " /></td></tr>";
+	print "<tr><td class=\"shade1\">".$gm_lang["aiy_narrowyears"]."</td>";
+	print "<td class=\"shade2\" style=\"vertical-align: middle;\"><input type=\"radio\" name=\"type\" value=\"narrow\" onclick=\"submit()\"";
+	if ($type == "narrow") print " checked=\"checked\"";
+	print " /></td></tr>";
+	print "<tr><td class=\"shade1\">".$gm_lang["aiy_wideyears"]."</td>";
+	print "<td class=\"shade2\" style=\"vertical-align: middle;\"><input type=\"radio\" name=\"type\" value=\"wide\" onclick=\"submit()\"";
+	if ($type == "wide") print " checked=\"checked\"";
+	print " /></td></tr>";
+	print "\n\t\t\t<tr><td colspan=\"4\" class=\"center\">";
 	print "<input type=\"submit\" value=\"".$gm_lang["view"]."\" /></td>";
 	print "\n\t\t\t</tr>\n\t\t</table>";
 	print "\n\t</form>\n";
@@ -192,7 +171,7 @@ $tindilist = array();
  */
 $indialpha = GetIndiAlpha();
 
-uasort($indialpha, "stringsort");
+uasort($indialpha, "StringSort");
 
 if (isset($alpha) && !isset($indialpha["$alpha"])) unset($alpha);
 print_help_link("alpha_help", "qm");
@@ -200,7 +179,7 @@ if (count($indialpha) > 0) {
 	foreach($indialpha as $letter=>$list) {
 		if (empty($alpha)) {
 			if (!empty($surname)) {
-				$alpha = get_first_letter(strip_prefix($surname));
+				$alpha = GetFirstLetter(StripPrefix($surname));
 			}
 		}
 		if ($letter != "@") {
@@ -208,7 +187,7 @@ if (count($indialpha) > 0) {
 				$startalpha = $letter;
 				$alpha = $letter;
 			}
-			print "<a href=\"aliveinyear.php?year=$year&amp;alpha=".urlencode($letter)."&amp;surname_sublist=$surname_sublist\">";
+			print "<a href=\"aliveinyear.php?year=$year&amp;alpha=".urlencode($letter)."&amp;surname_sublist=$surname_sublist&amp;type=$type&amp;useMAA=$useMAA&amp;year=$year\">";
 			if (($alpha==$letter)&&($show_all=="no")) print "<span class=\"warning\">".$letter."</span>";
 			else print $letter;
 			print "</a> | \n";
@@ -216,13 +195,13 @@ if (count($indialpha) > 0) {
 		if ($letter === "@") $pass = TRUE;
 	}
 	if ($pass == TRUE) {
-		if (isset($alpha) && $alpha == "@") print "<a href=\"aliveinyear.php?year=$year&amp;alpha=@&amp;surname_sublist=yes&amp;surname=@N.N.\"><span class=\"warning\">".PrintReady($gm_lang["NN"])."</span></a>";
-		else print "<a href=\"aliveinyear.php?year=$year&amp;alpha=@&amp;surname_sublist=yes&amp;surname=@N.N.\">".PrintReady($gm_lang["NN"])."</a>";
+		if (isset($alpha) && $alpha == "@") print "<a href=\"aliveinyear.php?year=$year&amp;alpha=@&amp;surname_sublist=yes&amp;surname=@N.N.&amp;type=$type&amp;useMAA=$useMAA&amp;year=$year\"><span class=\"warning\">".PrintReady($gm_lang["NN"])."</span></a>";
+		else print "<a href=\"aliveinyear.php?year=$year&amp;alpha=@&amp;surname_sublist=yes&amp;surname=@N.N.&amp;type=$type&amp;useMAA=$useMAA&amp;year=$year\">".PrintReady($gm_lang["NN"])."</a>";
 		print " | \n";
 		$pass = FALSE;
 	}
-	if ($show_all=="yes") print "<a href=\"aliveinyear.php?year=$year&amp;show_all=yes&amp;surname_sublist=$surname_sublist\"><span class=\"warning\">".$gm_lang["all"]."</span>\n";
-	else print "<a href=\"aliveinyear.php?year=$year&amp;show_all=yes&amp;surname_sublist=$surname_sublist\">".$gm_lang["all"]."</a>\n";
+	if ($show_all=="yes") print "<a href=\"aliveinyear.php?year=$year&amp;show_all=yes&amp;surname_sublist=$surname_sublist&amp;type=$type&amp;useMAA=$useMAA&amp;year=$year\"><span class=\"warning\">".$gm_lang["all"]."</span>\n";
+	else print "<a href=\"aliveinyear.php?year=$year&amp;show_all=yes&amp;surname_sublist=$surname_sublist&amp;type=$type&amp;useMAA=$useMAA&amp;year=$year\">".$gm_lang["all"]."</a>\n";
 	if (isset($startalpha)) $alpha = $startalpha;
 }
 
@@ -235,7 +214,7 @@ print_help_link("name_list_help", "qm");
 
 print "<br /><table class=\"list_table $TEXT_DIRECTION\"><tr>";
 if (($surname_sublist=="yes")&&($show_all=="yes")) {
-	GetIndiList();
+	GetIndiList("no");
 	if (!isset($alpha)) $alpha="";
 	$surnames = array();
 	$indi_hide=array();
@@ -244,24 +223,24 @@ if (($surname_sublist=="yes")&&($show_all=="yes")) {
 	$indi_alive = 0;
 	foreach($indilist as $gid=>$indi) {
 		// NOTE: Make sure that favorites from other gedcoms are not shown
-		if ($indi["gedfile"]==$GEDCOMS[$GEDCOM]["id"]) {
-			if (displayDetailsById($gid)||showLivingNameById($gid)) {
-				$ret = check_alive($indi["gedcom"], $year);
+		if ($indi["gedfile"]==$GEDCOMID) {
+			if (showLivingNameById($gid)) {
+				$ret = check_alive($indi["gedcom"], $year, $type, $useMAA);
 				if ($ret==0) {
 					foreach($indi["names"] as $indexval => $name) {
-						surname_count($name[2]);
+						SurnameCount($name[2]);
 						$indi_alive++;
 					}
 				}
-				else if ($ret<0) $indi_dead++;
+				else if ($ret>0) $indi_dead++;
 				else $indi_unborn++;
 			}
 			else $indi_hide[$gid."[".$indi["gedfile"]."]"]=1;
 		}
 	}
 	$i = 0;
-	uasort($surnames, "itemsort");
-	PrintSurnameList($surnames, $_SERVER["SCRIPT_NAME"]);
+	uasort($surnames, "ItemSort");
+	PrintSurnameList($surnames, $_SERVER["SCRIPT_NAME"], "no", "&amp;type=$type&amp;useMAA=$useMAA&amp;year=$year");
 }
 else if (($surname_sublist=="yes")&&(empty($surname))&&($show_all=="no")) {
 	if (!isset($alpha)) $alpha="";
@@ -276,8 +255,9 @@ else if (($surname_sublist=="yes")&&(empty($surname))&&($show_all=="no")) {
 	$temp = 0;
 	$surnames = array();
 	foreach($tindilist as $gid=>$indi) {
-		if ((displayDetailsByID($gid))||(showLivingNameById($gid))) {
-			$ret = check_alive($indi["gedcom"], $year);
+		$indi = $indilist[$gid];
+		if (showLivingNameById($gid)) {
+			$ret = check_alive($indi["gedcom"], $year, $type, $useMAA);
 			if ($ret==0) {
 				$indi_alive++;
 				foreach($indi["names"] as $name) {
@@ -286,59 +266,96 @@ else if (($surname_sublist=="yes")&&(empty($surname))&&($show_all=="no")) {
 						else if ($alpha == "Æ") $text = "AE";
 						else if ($alpha == "Å") $text = "AA";
 						if (isset($text)) {
-							if ((preg_match("/^$expalpha/", $name[1])>0)||(preg_match("/^$text/", $name[1])>0)) surname_count($name[2]);
+							if ((preg_match("/^$expalpha/", $name[1])>0)||(preg_match("/^$text/", $name[1])>0)) SurnameCount($name[2], $alpha);
 						}
-						else if (preg_match("/^$expalpha/", $name[1])>0) surname_count($name[2]);
+						else if (preg_match("/^$expalpha/", $name[1])>0) SurnameCount($name[2], $alpha);
 					}
 					else {
-						if (preg_match("/^$expalpha/", $name[1])>0) surname_count($name[2]);
+						if (preg_match("/^$expalpha/", $name[1])>0) SurnameCount($name[2], $alpha);
 					}
 				}
 			}
-			else if ($ret<0) $indi_dead++;
+			else if ($ret>0) $indi_dead++;
 			else $indi_unborn++;
 		}
 		else $indi_hide[$gid."[".$indi["gedfile"]."]"]=1;
 	}
 	$i = 0;
-	uasort($surnames, "itemsort");
-	print "<div class=\"topbar\">".$gm_lang["surnames"]."</div>\n";
-	PrintSurnameList($surnames, $_SERVER["SCRIPT_NAME"]);
+	uasort($surnames, "ItemSort");
+	print "<td class=\"topbar\">".$gm_lang["surnames"]."</td>\n";
+	PrintSurnameList($surnames, $_SERVER["SCRIPT_NAME"], "no", "&amp;type=$type&amp;useMAA=$useMAA&amp;year=$year&amp;show_all=$show_all");
 }
 else {
 	$firstname_alpha = false;
 	$indi_dead=0;
 	$indi_unborn=0;
+	$indi_alive=0;
 	// NOTE: If the surname is set then only get the names in that surname list
 	if ((!empty($surname))&&($surname_sublist=="yes")) {
 		$surname = trim($surname);
-		$tindilist = get_surname_indis($surname);
+		$tindilist = GetSurnameIndis($surname);
 	}
-	
 	if (($surname_sublist=="no")&&(!empty($alpha))&&($show_all=="no")) $tindilist = GetAlphaIndis($alpha);
+	foreach($tindilist as $gid=>$indi) {
+		$indi = $indilist[$gid];
+		if (!showLivingNameById($gid)) {
+			unset($tindilist[$gid]);
+			$indi_hide[$gid."[".$indi["gedfile"]."]"]=1;
+		}
+		else {
+			$ret = check_alive($indi["gedcom"], $year, $type, $useMAA);
+			if ($ret==0) $indi_alive++;
+			else if ($ret>0) {
+				$indi_dead++;
+				unset($tindilist[$gid]);
+			}
+			else {
+				$indi_unborn++;
+				unset($tindilist[$gid]);
+			}
+		}
+	}
+		
 	
 	// NOTE: Simplify processing for ALL indilist
 	// NOTE: Skip surname is yes and ALL is chosen
 	if (($surname_sublist=="no")&&($show_all=="yes")) {
-		$tindilist = GetIndiList();
+		$tindilist = GetIndiList("no");
+		foreach($tindilist as $gid=>$indi) {
+			if (!showLivingNameById($gid)) {
+				unset($tindilist[$gid]);
+				$indi_hide[$gid."[".$indi["gedfile"]."]"]=1;
+			}
+			else {
+				$ret = check_alive($indi["gedcom"], $year, $type, $useMAA);
+				if ($ret==0) $indi_alive++;
+				else if ($ret<0) {
+					$indi_dead++;
+					unset($tindilist[$gid]);
+				}
+				else {
+					$indi_unborn++;
+					unset($tindilist[$gid]);
+				}
+			}
+		}
 		PrintPersonList($tindilist);
 	}
 	else {
 		// NOTE: If user wishes to skip surname do not print the surname
-		print "<div class=\"topbar\">";
+		print "<td class=\"topbar\">";
 		if ($surname_sublist == "no") print $gm_lang["surnames"];
-		else	print PrintReady(str_replace("#surname#", check_NN($surname), $gm_lang["indis_with_surname"]));
-		print "</div>\n";
+		else	print PrintReady(str_replace("#surname#", CheckNN($surname), $gm_lang["indis_with_surname"]));
+		print "</td>\n";
 		PrintPersonList($tindilist);
 	}
 }
 print "</tr></table>";
 if ($alpha != "@") {
 	print_help_link("skip_sublist_help", "qm");
-	if ($surname_sublist=="yes") print "<a href=\"aliveinyear.php?year=$year&amp;alpha=$alpha&amp;surname_sublist=no&amp;show_all=$show_all\">".$gm_lang["skip_surnames"]."</a>";
-	else print "<a href=\"aliveinyear.php?year=$year&amp;alpha=$alpha&amp;surname_sublist=yes&amp;show_all=$show_all\">".$gm_lang["show_surnames"]."</a>";
+	if ($surname_sublist=="yes") print "<a href=\"aliveinyear.php?year=$year&amp;alpha=".urlencode($alpha)."&amp;surname_sublist=no&amp;show_all=$show_all&amp;type=$type&amp;useMAA=$useMAA&amp;year=$year\">".$gm_lang["skip_surnames"]."</a>";
+	else print "<a href=\"aliveinyear.php?year=$year&amp;alpha=".urlencode($alpha)."&amp;surname_sublist=yes&amp;show_all=$show_all&amp;type=$type&amp;useMAA=$useMAA&amp;year=$year\">".$gm_lang["show_surnames"]."</a>";
 }
 print "</div>\n";
 print_footer();
-
 ?>

@@ -2,9 +2,9 @@
     Genmod
 
     Version 1.0
-    Copyright 2005 Genmod Development team
+    Copyright 2005 - 2007 Genmod Development team
 
-    # $Id: readme.txt,v 1.9 2006/03/18 19:28:55 roland-d Exp $
+    # $Id: readme.txt,v 1.13 2008/07/13 13:22:25 sjouke Exp $
 =======================================================
 
 CONTENTS
@@ -18,20 +18,19 @@ CONTENTS
      8.  THEMES
      9.  MULTIMEDIA OBJECTS
     10.  RSS FEED
-    11.  MANUAL CONFIGURATION
-    12.  SECURITY
-    13.  LANGUAGES
-    14.  NON-STANDARD GEDCOM CODES
-    15.  LANGUAGE EXTENSION FILES
-    16.  BACKUP
-    17.  RESTORE
-    18.  ENTERPRISE VERSION
+    11.  SECURITY
+    12.  LANGUAGES
+    13.  NON-STANDARD GEDCOM CODES
+    14.  LANGUAGE EXTENSION FILES
+    15.  BACKUP
+    16.  RESTORE
+    17.  ENTERPRISE VERSION
 
 -------------------------------------------------------
 LICENSE
 
 Genmod: Genealogy Editor and Viewer
-Copyright (C) 2005  Genmod Development team
+Copyright (C) 2005 - 2007  Genmod Development team
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -74,7 +73,7 @@ SYSTEM REQUIREMENTS
 Genmod requires the following:
 * A web server (Apache, IIS)
 * PHP 4.3.0 or higher
-* MySQL 4.0.2 or higher
+* MySQL 4.1 or higher
 * Enough diskspace (around 20MB)
 
 The default installations of PHP on most servers should provide
@@ -130,7 +129,7 @@ web applications.
  4.  Enter your configuration settings.  If you moved the index directory, 
      be sure to specify the correct location to it on this page.  Save the 
      configuration parameters.
- 5.  Enter the default administrator user.
+ 5.  You are taken through the installation process.
  6.  Login as this user and upload your GEDCOM file.
  7.  Save the GEDCOM configuration settings.
  8.  Import the GEDCOM.
@@ -162,18 +161,19 @@ installing PHP applications.
 To install Genmod, unzip the compressed package and upload the files to 
 a directory on your web server.  If you have limited space on your server, 
 you can save space in the following ways:
-1.  Do not upload the "docs" folder.
-2.  Delete the themes from the themes folder that you do not plan to use.
-3.  Delete some of the language files that you do not want.  English files 
-    are named configure_help.en.php, countries.en.php, facts.en.php, 
-    help_text.en.php and lang.en.php.  French files, for example, are named 
+1.  Delete the themes from the themes folder that you do not plan to use.
+2.  Delete some or all of the language files that you do not want. English 
+    files are named configure_help.en.txt, countries.en.txt, facts.en.txt, 
+    help_text.en.txt and lang.en.txt.  French files, for example, are named 
     with ".fr." in place of ".en.".  Hebrew files use ".he." in place of 
-    ".en.", and so on.  
-    The English language files cannot be deleted.  They are always loaded 
+    ".en.", and so on. All active languages are loaded into the database,
+    therefore they can be removed. If you need to restore any of the languages
+    make sure the files are back in the languages folder.
+    The English language files should not be deleted.  They are always loaded 
     before the files for the selected language are loaded.  This ensures 
     that all language variables are defined, and that the English version 
     will be used when a given variable is missing in the new language.
-4.  Do not upload the "places" folder.  This folder contains maps for some
+3.  Do not upload the "places" folder.  This folder contains maps for some
     countries.  It also contains text files containing state, county, and 
     place names.  Its purpose is to allow you to enter place names by 
     picking them from lists.    
@@ -216,24 +216,13 @@ begin the online configuration process.  Information about each of the
 configuration options can be found online by clicking on the question mark 
 (?) near each label.
 
-Genmod has support for importing your GEDCOMs into a PEAR:DB supported 
-database like MySQL or PostgreSQL.  Currently, MySQL is the only fully tested 
-database.  Using a database requires that an existing user, password, and database already
-exist.
+You may reconfigure Genmod at any time by taken the following steps:
+1. Log in as an administrator
+2. Go to the admin page
+3. Click on "maintenance"
+4. Click on "Restart setup"
 
-You may reconfigure Genmod at any time by going to Genmod/admin.php 
-and logging in as an administrator user and clicking on the "Configuration" 
-link.
-
-*D.  Create Admin User
-After you click the Save button, you will be asked to create an 
-administrator user and login as this user.  Then click on the link labelled 
-"Click here to continue" where you will be taken to the "Manage GEDCOMs" 
-area.  In the "Manage GEDCOMs" area you can add GEDCOMs to your site, edit 
-the GEDCOM configuration, edit Privacy settings, and import the GEDCOM into 
-the data store.
-
-*E.  Add GEDCOM file
+*D.  Add GEDCOM file
 To add GEDCOM files to the system, you can upload your GEDCOM file using 
 the "Upload GEDCOM" option from the Admin menu.  All files uploaded using 
 the "Upload GEDCOM" page are saved in your index directory.  You can also 
@@ -245,19 +234,19 @@ also upload your GEDCOM in ZIP format, either manually or using the
 Genmod will automatically unpack the ZIP file and use the GEDCOM file 
 inside it.  Be sure to create the ZIP file to contain only one GEDCOM file.
 
-*F.  Set GEDCOM Configuration Settings
+*E.  Set GEDCOM Configuration Settings
 After uploading your GEDCOM, you will be asked to set the configuration
 parameters for it.  There are too many parameters to list all of their 
 options in this document.  Please use the online Help documentation to 
 guide you through the configuration process.
 
-*G.  Validate GEDCOM
+*F.  Validate GEDCOM
 After you save the GEDCOM configuration Genmod will validate your 
 GEDCOM and automatically fix any errors that it can.  If any errors found 
 in the GEDCOM require user input, you will be prompted to choose how to 
 proceed.  Again use the online Help ? for more information.
 
-*H.  Import GEDCOM
+*G.  Import GEDCOM
 You are almost done.  This is the final step before you can begin viewing 
 your data.  After validating the GEDCOM and fixing any errors, you will 
 need to import the GEDCOM into the data store.  During the Import you will 
@@ -266,7 +255,7 @@ completed successfully you will see a blue "Import Complete" message.
 Everything is now set up and you can begin using Genmod with your 
 GEDCOM.
 
-*I.  Deleting GEDCOMs
+*H.  Deleting GEDCOMs
 You may delete GEDCOMs from your site from the "Manage GEDCOMs" area.
 Deleting a GEDCOM from the site will remove it from the database but will 
 not delete the original GEDCOM file that you imported.  It will also not
@@ -274,19 +263,19 @@ delete any of the cache or privacy files related to this GEDCOM.  These
 retained files, which are no longer required by Genmod, are all located 
 in the "index" directory.
 
-*J.  Reset config.php Permissions
+*I.  Reset config.php Permissions
 For security you should set the permissions of config.php back to Read-only
 (chmod 755) when you have finished configuring for the first time.  Write
 permissions will only need to be set for config.php when you use the
 Admin->Configuration link.  Everything else will be stored in the index
 directory.
 
-*K.  Custom Themes
+*J.  Custom Themes
 You can customize the look and feel of Genmod by modifying one of the
 provided themes.  See the THEMES section of this readme file for more
 information.
 
-*L.  HTTP Compression
+*K.  HTTP Compression
 Pages generated by Genmod can be large and use up a lot of bandwidth.
 Compression of the data between the server and browser using GZip 
 compression can compress the bandwidth by up to 90% (usually 80% - 90% for 
@@ -408,8 +397,8 @@ like this:
     media/Genealogy/photo.jpg
     media/Scans/scan1.jpg
     media/scan2.jpg
-    media/thumbs/Genealogy/photo.jpg
-    media/thumbs/Scans/scan1.jpg
+    media/Genealogy/thumbs/photo.jpg
+    media/Scans/thumbs/scan1.jpg
     media/thumbs/scan2.jpg
 
 With the media depth set to 2 you need to set up your directory structure 
@@ -417,8 +406,8 @@ like this:
     media/Pictures/Genealogy/photo.jpg
     media/Pictures/Scans/scan1.jpg
     media/scan2.jpg
-    media/thumbs/Pictures/Genealogy/photo.jpg
-    media/thumbs/Pictures/Scans/scan1.jpg
+    media/Pictures/Genealogy/thumbs/photo.jpg
+    media/Pictures/Scans/thumbs/scan1.jpg
     media/thumbs/scan2.jpg
 
 -------------------------------------------------------
@@ -450,37 +439,6 @@ Stats block.
 These parameters can be chained so that
 /Genmod/rss.php?lang=hebrew&module=GEDCOMStats&rssStyle=HTML 
 will output the GEDCOM Stats module in Hebrew in HTML.
-
--------------------------------------------------------
-MANUAL CONFIGURATION
-
-Advanced users who understand PHP may want to configure manually by editing 
-the configuration file config.php  When you have finished editing 
-config.php make sure that the variable $CONFIGURED=true; so that the 
-program does not try to forward you to the configuration.php script when 
-you launch it for the first time.
-
-You can manually add GEDCOMS to the system by adding them to the $GEDCOMS 
-array in the index/GEDCOMs.php file.  The GEDCOM array looks like this:
-  $gedarray = array();
-  $gedarray["GEDCOM"] = "surname.ged";
-  $gedarray["config"] = "./index/surname.ged_conf.php";
-  $gedarray["privacy"] = "./index/surname.ged_priv.php";
-  $gedarray["title"] = "Surname Genealogy";
-  $gedarray["path"] = "./surname.ged";
-  $GEDCOMS["surname.ged"] = $gedarray;
-"surname" above could be anything, for example, "johnson" or "private".  
-You must pay attention to the case of what you enter.  Genmod is case 
-sensitive.
-
-Each GEDCOM will need a configuration file.  You can copy the 
-config_GEDCOM.php file which has all of the default values for each GEDCOM 
-you add manually.  Then set the "config" item of the GEDCOMS array to point 
-to the file you copied.
-
-Each GEDCOM also needs a Privacy file.  Make a copy the privacy.php file 
-for each GEDCOM and set the "privacy" item of the GEDCOMS array to the 
-location of the new privacy.php file.
 
 -------------------------------------------------------
 SECURITY
@@ -521,8 +479,9 @@ In the end it is YOUR responsibility to guarantee that there has been no
 violation of an individual's privacy and YOU could be held liable should
 private information be made public on the web sites that you administer.
 
-For more privacy options visit:
-http://www.Genmod.net/privacy.php
+N.B. Another option is to remove the imported GEDCOM file from the directory
+where you placed it. Genmod doesn't need the GEDCOM file for normal operation.
+
 
 -------------------------------------------------------
 LANGUAGES
@@ -539,36 +498,26 @@ UTF-8.  Simply open your Unicode GEDCOM file in Windows Notepad and select
 You shouldn't lose any of the characters in the translation.
 
 You should check the Patches section of
-http://sourceforge.net/projects/Genmod to get the latest language 
+http://sourceforge.net/projects/genmod to get the latest language 
 files.
 
 Discussion and questions about the multiple language features of Genmod
 including translations, should be posted in the Translations forum 
 available from the Genmod project page here:
-http://sourceforge.net/forum/forum.php?forum_id=294245
+http://www.genmod.net/forum/viewforum.php?f=4
 
 To translate Genmod into another language that is not currently 
 supported you must first login to Genmod as an administrator and go to 
-the Language Edit Utility by clicking on "Admin-> Translator Tools".  At 
-the bottom of that page is an option to Add a new language.  Choose your l
-anguage from the dropdown list and click on the "Add new Language" button.  
-A popup window will appear that allows you to edit the default settings for 
-your language.  Each of the settings has online help available by clicking 
-on the "?".  You might want to look at the settings for some of the other 
-languages on the edit language page to see how they are set up.  When you 
-have finished editing the settings, click the Save button.  This will 
-create a new lang_settings.php file in the index directory.  You will 
-notice that your language now appears in the supported languages list.
-
-Next create a copy of the "configure_help.en.php", "facts.en.php", 
-"help_text.en.php", and "lang.en.php" files located in the "./languages/" 
-and change the "en" part to match the two letter language code of your 
-language.  
-
-The "facts" file contains all of the translations for the various GEDCOM 
-tags such as BIRT = Birth.  The "lang" file contains all of the language 
-variables used throughout the site.  The "configure_help.en.php" and
-"help_text.en.php" provide configuration and help instructions.
+the Language Edit Utility by clicking on "Admin -> Translator Tools". Click on
+"Add files and settings for a new language".  Choose your language from the 
+dropdown list and click on the "Add new Language" button. A popup window will 
+appear that allows you to edit the default settings for your language.  Each 
+of the settings has online help available by clicking on the "?".  You might 
+want to look at the settings for some of the other languages on the edit 
+language page to see how they are set up.  When you have finished editing the 
+settings, click the Save button.  The new language will be stored in the
+database. Use the Lanugauge File Export Utility to save your language in a file.
+You will notice that your language now appears in the supported languages list.
 
 You can translate these files using the online Language File Edit utility.
 Just select your language from the drop-down list and then select the file 
@@ -683,6 +632,7 @@ to rebuild your Genmod site to the situation at backup time.
 
 The backup can contain the following files, as selected on the Backup page:
   - config.php with all configuration settings of your installation
+  - include_top.php and include_bottom.php with admin customised code
   - language settings and language extension files
   - all genealogical data, exported to a GEDCOM file
   - all GEDCOM options and privacy settings for the above files
@@ -696,8 +646,8 @@ clicking the link on the page.
 Note: The database itself will not be included in the backup, since it can 
 be rebuilt using the files in the backup.
 
-Note: Multimedia files are also not included in the backup, and should be copied
-to a local computer on a regular basis.
+Note: Multimedia files can be included in the backup, but preferably they should be
+copied to a local computer manually, on a regular basis.
 
 Note: The SQL queries that are created by the Backup cannot be used to
 restore the database with tools like PhpMyAdmin. The data may contain 
@@ -723,7 +673,9 @@ There are a few rules though that apply:
 - The backup files cannot be used across versions. Possible difference in 
 database table layout prevent this.
 - Site URL, database name, database user and password and table prefix should
-be the same. If you forgot them, look in the config.php file.
+be the same. If you forgot them, look in the config.php file. If they differ from
+the origination installation, don't restore the config.php file.
+- Table prefixes MUST be the same, they are included in the restore queries.
 - If you are running Enterprise Version of Genmod, you need to perform a restore
 on every site. However, the steps 1. and 2. should only be done once.
 - It is possible to do a partial restore of the data. However, keep in mind that
@@ -735,9 +687,10 @@ To rebuild your site(s) from scratch:
  1. Install Genmod on your server, following the instructions in chapter 
 "6. Installation", parts A and B. Make sure all the necessary Index folders
 are created.
- 2. From the backup ZIP file, restore the config.php file. If present in the ZIP file,
-also restore the lang_settings.php file to the Index directory, and the language
-extension files (xx.extra.php) to the Languages directory. 
+ 2. From the backup ZIP file, restore the config.php file. Also restore the files 
+include_top.php and include_bottom.php to the includes folder. If present in the ZIP
+file, also restore the lang_settings.php file to the Index directory, and the 
+language extension files (xx.extra.php) to the Languages directory. 
  3. Also upload the other files (.sql and .ged) to the apporpriate index directory.
  4. Adjust the filenames of the Gedccom files by removing the "export_" prefix.
  5. Startup Genmod, this should bring you to the page for creating an admin user.

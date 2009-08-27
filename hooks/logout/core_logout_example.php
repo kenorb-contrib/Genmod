@@ -1,5 +1,5 @@
 <?php
-// $Id: core_logout_example.php,v 1.1 2005/10/23 21:42:25 roland-d Exp $
+// $Id$
 
 class core_logout_example
 {

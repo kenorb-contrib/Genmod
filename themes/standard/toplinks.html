@@ -3,7 +3,7 @@
  * Top menu for Standard theme
  *
  * Genmod: Genealogy Viewer
- * Copyright (C) 2002 to 2003 John Finlay and Others
+ * Copyright (C) 2005 Genmod Development Team
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,54 +19,107 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  *
- * $Id: toplinks.html,v 1.10 2006/03/18 19:28:55 roland-d Exp $
+ * $Id: toplinks.html,v 1.18 2007/01/28 11:19:57 roland-d Exp $
  *
  * @package Genmod
  * @subpackage Themes
  */
 
+ // NOTE: Get the different menus
 $menubar = new MenuBar();
+$gedcommenu = $menubar->getGedcomMenu();
+$mygedviewmenu = $menubar->getMygedviewMenu();
+$custommenu = $menubar->getCustomMenu();
+$chartsmenu = $menubar->getChartsMenu();
+$listsmenu = $menubar->getListsMenu();
+$calendarmenu = $menubar->getCalendarMenu();
+$reportsmenu = $menubar->getReportsMenu();
+$clippingsmenu = $menubar->getClippingsMenu();
+$searchmenu = $menubar->getSearchMenu();
+$helpmenu = $menubar->getHelpMenu();
 ?>
 <div style="position: relative; z-index: 100; width: 98%">
 	<img src="<?php print $GM_IMAGE_DIR."/".$GM_IMAGES["hline"]["other"]; ?>" width="99%" height="3" alt="" />
-	<table width="100%">
-		<tr>
-			<td width="10%" valign="top">
-				<?php $menu = $menubar->getGedcomMenu(); $menu->printMenu(); ?>
-			</td>
-			<td width="10%" valign="top">
-				<?php $menu = $menubar->getMygedviewMenu(); $menu->printMenu(); ?>
-			</td>
-				<?php $menu = $menubar->getCustomMenu(); 
-				if (!is_null($menu)) {?>
-					<td width="10%" valign="top">
-					<?php $menu->printMenu(); ?>
-					</td>
-				<?php } ?>
-			<td width="10%" valign="top">
-				<?php $menu = $menubar->getChartsMenu(); $menu->printMenu(); ?>
-			</td>
-			<td width="10%" valign="top">
-				<?php $menu = $menubar->getListsMenu(); $menu->printMenu(); ?>
-			</td>
-			<td width="10%" valign="top">
-				<?php $menu = $menubar->getCalendarMenu(); $menu->printMenu(); ?>
-			</td>
-			<td width="10%" valign="top">
-				<?php $menu = $menubar->getReportsMenu(); $menu->printMenu(); ?>
-			</td>
-			<?php $menu = $menubar->getClippingsMenu(); 
-			if (!is_null($menu)) { ?> 
-			<td width="10%" valign="top"><?php $menu->printMenu(); ?></td>
+	<div class="chromestyle">
+		<ul>
+			<?php
+				if (!empty($gedcommenu->submenus)) { ?>
+					<li><a href="<?php print $gedcommenu->link ?>" onmouseover="cssdropdown.dropit(this,event,'dropmenu1')"><?php print $gedcommenu->label; ?></a></li>
+				<?php }
+				else { ?>
+					<li><a href="<?php print $gedcommenu->link ?>"><?php print $gedcommenu->label; ?></a></li>
+				<?php }
+			?>
+			
+			<?php
+				if (!empty($mygedviewmenu->submenus)) {?>
+					<li><a href="<?php print $mygedviewmenu->link ?>" onmouseover="cssdropdown.dropit(this,event,'dropmenu2')"><?php print $mygedviewmenu->label; ?></a></li>
+				<?php }
+			?>
+			
+			<?php
+				if (!empty($custommenu->submenus)) {?>
+					<li><a href="#" onmouseover="cssdropdown.dropit(this,event,'dropmenu3')"><?php print $custommenu->label; ?></a></li>
+				<?php }
+			?>
+			<li><a href="<?php print $chartsmenu->link ?>" onmouseover="cssdropdown.dropit(this,event,'dropmenu4')"><img class="chromeimages" src="<?php print $GM_IMAGE_DIR."/".$GM_IMAGES["charts"]["large"]?>" alt="<?php print $chartsmenu->label; ?>"/><?php print $chartsmenu->label; ?></a></li>
+			<li><a href="<?php print $listsmenu->link ?>" onmouseover="cssdropdown.dropit(this,event,'dropmenu5')"><img class="chromeimages" src="<?php print $GM_IMAGE_DIR."/".$GM_IMAGES["list"]["large"]?>" alt="<?php print $listsmenu->label; ?>"/><?php print $listsmenu->label; ?></a></li>
+			<li><a href="<?php print $calendarmenu->link ?>" onmouseover="cssdropdown.dropit(this,event,'dropmenu6')"><img class="chromeimages" src="<?php print $GM_IMAGE_DIR."/".$GM_IMAGES["calendar"]["large"]?>" alt="<?php print $calendarmenu->label; ?>" /><?php print $calendarmenu->label; ?></a></li>
+			<li><a href="<?php print $reportsmenu->link ?>" onmouseover="cssdropdown.dropit(this,event,'dropmenu7')"><img class="chromeimages" src="<?php print $GM_IMAGE_DIR."/".$GM_IMAGES["reports"]["large"]?>" alt="<?php print $reportsmenu->label; ?>" /><?php print $reportsmenu->label; ?></a></li>
+			<?php
+			if (is_object($clippingsmenu)) { ?>
+				<li><a href="<?php print $clippingsmenu->link ?>"><img class="chromeimages" src="<?php print $GM_IMAGE_DIR."/".$GM_IMAGES["clippings"]["large"]?>" alt="<?php print $clippingsmenu->label; ?>" /><?php print $clippingsmenu->label; ?></a></li>
 			<?php } ?>
-			<td width="10%" valign="top">
-				<?php $menu = $menubar->getSearchMenu(); $menu->printMenu(); ?>
-			</td>
-			<td width="10%" valign="top">
-				<?php $menu = $menubar->getHelpMenu(); $menu->printMenu(); ?>
-			</td>
-		</tr>
-	</table>
+			<li><a href="<?php print $searchmenu->link ?>" onmouseover="cssdropdown.dropit(this,event,'dropmenu9')"><img class="chromeimages" src="<?php print $GM_IMAGE_DIR."/".$GM_IMAGES["search"]["large"]?>" alt="<?php print $searchmenu->label; ?>" /><?php print $searchmenu->label; ?></a></li>
+			<li><a href="<?php print $helpmenu->link ?>" onmouseover="cssdropdown.dropit(this,event,'dropmenu10')"><?php print $helpmenu->label; ?></a></li>
+		</ul>
+	</div>
 	<img src="<?php print $GM_IMAGE_DIR."/".$GM_IMAGES["hline"]["other"]; ?>" width="99%" height="3" alt="" />
+</div>
+<!--1st drop down menu --> 
+<div id="dropmenu1" class="dropmenudiv">
+	<?php 
+	$gedcommenu->printMenuCSS();
+	?>
+</div>
+<!--2nd drop down menu --> 
+<div id="dropmenu2" class="dropmenudiv">
+	<?php
+	if (!empty($mygedviewmenu->submenus)) $mygedviewmenu->printMenuCSS();
+	?>
+</div>
+
+<!--3rd drop down menu --> 
+<div id="dropmenu3" class="dropmenudiv">
+	<?php 
+	if (!empty($custommenu->submenus)) $custommenu->printMenuCSS();
+	?>
+</div>
+
+<!--4th drop down menu --> 
+<div id="dropmenu4" class="dropmenudiv">
+	<?php $chartsmenu->printMenuCSS(); ?>
+</div>
+<!--5th drop down menu --> 
+<div id="dropmenu5" class="dropmenudiv">
+	<?php $listsmenu->printMenuCSS(); ?>
+</div>
+<!--6th drop down menu --> 
+<div id="dropmenu6" class="dropmenudiv">
+	<?php $calendarmenu->printMenuCSS(); ?>
+</div>
+<!--7th drop down menu --> 
+<div id="dropmenu7" class="dropmenudiv">
+	<?php $reportsmenu->printMenuCSS(); ?>
+</div>
+<!--8th drop down menu --> 
+<!-- Not used -->
+<!--9th drop down menu --> 
+<div id="dropmenu9" class="dropmenudiv">
+	<?php $searchmenu->printMenuCSS(); ?>
+</div>
+<!--10th drop down menu --> 
+<div id="dropmenu10" class="dropmenudiv">
+	<?php $helpmenu->printMenuCSS(); ?>
 </div>
 <?php include("accesskeyHeaders.php"); ?>

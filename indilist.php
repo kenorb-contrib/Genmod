@@ -19,7 +19,7 @@
  *
  * @package Genmod
  * @subpackage Lists
- * @version $Id: indilist.php,v 1.5 2006/04/30 18:44:14 roland-d Exp $
+ * @version $Id$
  */
 
 /**
@@ -27,19 +27,36 @@
 */
 require("config.php");
 
-print_header($gm_lang["individual_list"]);
-print "<div class =\"center\">";
-print "\n\t<h2>";
-print_help_link("name_list_help", "qm", "name_list");
-print $gm_lang["individual_list"]."</h2>";
+$COMBIKEY = true;
+$addheader = "";
+// Remove slashes
+if (isset($alpha)) {
+	$alpha = stripslashes($alpha);
+	$addheader = "(".$alpha.")";
+}
+if (isset($surname)) {
+	$surname = stripslashes($surname);
+	$addheader = "(".CheckNN($surname).")";
+}
 
 if (empty($surname_sublist)) $surname_sublist = "yes";
 if (empty($show_all)) $show_all = "no";
 if (empty($show_all_firstnames)) $show_all_firstnames = "no";
+// Added if any of the gedcoms require authentication and the user is not logged on, we cannot do allgeds.
+if (!isset($allgeds) || $allgeds != "yes" || !$ALLOW_CHANGE_GEDCOM) $allgeds = "no";
+if ($allgeds == "yes" && empty($gm_username)) {
+	foreach($GEDCOMS as $key => $ged) {
+		SwitchGedcom($key);
+		if ($REQUIRE_AUTHENTICATION) $allgeds = "no";
+	}
+	SwitchGedcom();
+}
 
-// Remove slashes
-if (isset($alpha)) $alpha = stripslashes($alpha);
-if (isset($surname)) $surname = stripslashes($surname);
+print_header($gm_lang["individual_list"]." ".$addheader);
+print "<div class =\"center\">";
+print "\n\t<h3>";
+print_help_link("name_list_help", "qm", "name_list");
+print $gm_lang["individual_list"]."</h3>";
 
 /**
  * Check for the @ symbol
@@ -64,7 +81,7 @@ $tindilist = array();
  * lastname.
  * @var array $indialpha
  */
-$indialpha = GetIndiAlpha();
+$indialpha = GetIndiAlpha($allgeds);
 
 uasort($indialpha, "stringsort");
 
@@ -75,16 +92,19 @@ if (count($indialpha) > 0) {
 	foreach($indialpha as $letter=>$list) {
 		if (empty($alpha)) {
 			if (!empty($surname)) {
-				$alpha = get_first_letter(strip_prefix($surname));
+				$alpha = GetFirstLetter(StripPrefix($surname));
 			}
 		}
 		if ($letter != "@") {
-			if (!isset($startalpha) && !isset($alpha)) {
-				$startalpha = $letter;
-				$alpha = $letter;
-			}
-			print "<a href=\"indilist.php?alpha=".urlencode($letter)."&amp;surname_sublist=$surname_sublist\">";
-			if (($alpha==$letter)&&($show_all=="no")) print "<span class=\"warning\">".$letter."</span>";
+//			if (!isset($startalpha) && !isset($alpha)) {
+//				$startalpha = $letter;
+//				$alpha = $letter;
+//			}
+//			print "<a href=\"indilist.php?alpha=".urlencode($letter)."&amp;surname_sublist=".$surname_sublist."&amp;show_all=".$show_all;
+			print "<a href=\"indilist.php?alpha=".urlencode($letter)."&amp;surname_sublist=".$surname_sublist."&amp;show_all=no";
+			if ($allgeds == "yes") print "&amp;allgeds=yes";
+			print "\">";
+			if (isset($alpha) && $alpha == $letter && $show_all == "no") print "<span class=\"warning\">".$letter."</span>";
 			else print $letter;
 			print "</a> | \n";
 		}
@@ -96,101 +116,169 @@ if (count($indialpha) > 0) {
 		}
 	}
 	if ($pass == TRUE) {
-		if (isset($alpha) && $alpha == "@") print "<a href=\"indilist.php?alpha=@&amp;surname_sublist=yes&amp;surname=@N.N.\"><span class=\"warning\">".PrintReady($gm_lang["NN"])."</span></a>";
-		else print "<a href=\"indilist.php?alpha=@&amp;surname_sublist=yes&amp;surname=@N.N.\">".PrintReady($gm_lang["NN"])."</a>";
-		print " | \n";
+		if (isset($alpha) && $alpha == "@") {
+			print "<a href=\"indilist.php?alpha=@&amp;surname_sublist=yes&amp;surname=@N.N.";
+			if ($allgeds == "yes") print "&amp;allgeds=yes";
+			print "\"><span class=\"warning\">".PrintReady($gm_lang["NN"])."</span></a>";
+		}
+		else {
+			print "<a href=\"indilist.php?alpha=@&amp;surname_sublist=yes&amp;surname=@N.N.";
+			if ($allgeds == "yes") print "&amp;allgeds=yes";
+			print "\">".PrintReady($gm_lang["NN"])."</a>";
+		}
 		/**
 		 * @ignore
 		*/
 		$pass = FALSE;
 	}
-	if ($show_all=="yes") print "<a href=\"indilist.php?show_all=yes&amp;surname_sublist=$surname_sublist\"><span class=\"warning\">".$gm_lang["all"]."</span></a>\n";
-	else print "<a href=\"indilist.php?show_all=yes&amp;surname_sublist=$surname_sublist\">".$gm_lang["all"]."</a>\n";
+	if ($LISTS_ALL) {
+		print " | \n";
+		if ($show_all=="yes") {
+			print "<a href=\"indilist.php?show_all=yes&amp;surname_sublist=$surname_sublist";
+			if ($allgeds == "yes") print "&amp;allgeds=yes";
+			print "\"><span class=\"warning\">".$gm_lang["all"]."</span></a>\n";
+		}
+		else {
+			print "<a href=\"indilist.php?show_all=yes&amp;surname_sublist=$surname_sublist";
+			if ($allgeds == "yes") print "&amp;allgeds=yes";
+			print "\">".$gm_lang["all"]."</a>\n";
+		}
+	}
 	if (isset($startalpha)) $alpha = $startalpha;
 }
 
 //-- escaped letter for regular expressions
+if (!isset($alpha)) $alpha = "";
 $expalpha = $alpha;
 if ($expalpha=="(" || $expalpha=="[" || $expalpha=="?" || $expalpha=="/" || $expalpha=="*" || $expalpha=="+") $expalpha = "\\".$expalpha;
 print "<br /><br />";
 
 if (($surname_sublist=="yes")&&($show_all=="yes")) {
-	GetIndiList();
-	if (!isset($alpha)) $alpha="";
+	GetIndiList($allgeds);
 	$surnames = array();
 	$indi_hide=array();
+	$thisged = $GEDCOM;
+	$thisgedid = $GEDCOMID;
+	$oldged = $GEDCOM;
+	$oldgedid = $GEDCOMID;
 	foreach($indilist as $gid=>$indi) {
-		if (displayDetailsById($gid)||showLivingNameById($gid)) {
+		$thisgid = splitkey($gid, "id");
+		$thisgedid = splitkey($gid, "gedid");
+		$thisged = splitkey($gid, "ged");
+		if ($thisged != $GEDCOM) {
+			$GEDCOM = $thisged;
+			$GEDCOMID = $thisgedid;
+			$Privacy->ReadPrivacy($GEDCOMID);
+		}
+		$indi_total[$thisgid."[".$indi["gedfile"]."]"] = 1;
+		if (showLivingNameById($thisgid)) {
 			foreach($indi["names"] as $indexval => $name) {
-				surname_count($name[2], $name[1]);
+				SurnameCount($name[2], $name[1]);
 			}
 		}
-		else $indi_hide[$gid."[".$indi["gedfile"]."]"] = 1;
+		else $indi_hide[$thisgid."[".$indi["gedfile"]."]"] = 1;
 	}
-	uasort($surnames, "itemsort");
+	if ($GEDCOM != $oldged) {
+		$GEDCOM = $oldged;
+		$GEDCOMID = $oldgedid;
+		$Privacy->ReadPrivacy($GEDCOMID);
+	}
+	uasort($surnames, "ItemSort");
 	print "<div class=\"topbar\">".$gm_lang["surnames"]."</div>\n";
-	PrintSurnameList($surnames, $_SERVER["SCRIPT_NAME"]);
+	PrintSurnameList($surnames, $_SERVER["SCRIPT_NAME"], $allgeds);
 }
 else if (($surname_sublist=="yes")&&(empty($surname))&&($show_all=="no")) {
+
 	if (!isset($alpha)) $alpha="";
 	// NOTE: Get all of the individuals whose last names start with this letter
-	$tindilist = GetAlphaIndis($alpha);
-	$surnames = array();
-	$indi_hide=array();
-	foreach($tindilist as $gid=>$indi) {
-		if ((displayDetailsByID($gid))||(showLivingNameById($gid))) {
-			foreach($indi["names"] as $name) {
-				if ($LANGUAGE == "danish" || $LANGUAGE == "norwegian") {
-					if ($alpha == "Ø") $text = "OE";
-					else if ($alpha == "Æ") $text = "AE";
-					else if ($alpha == "Å") $text = "AA";
-					if (isset($text)) {
-						if ((preg_match("/^$expalpha/", $name[1])>0)||(preg_match("/^$text/", $name[1])>0)) surname_count($name[2], $alpha);
+	if (!empty($alpha)) {
+		$tindilist = GetAlphaIndis($alpha, $allgeds);
+		$surnames = array();
+		$indi_hide = array();
+		$thisged = $GEDCOM;
+		$thisgedid = $GEDCOMID;
+		$oldged = $GEDCOM;
+		$oldgedid = $GEDCOMID;
+		$indi_total = array();
+		foreach($tindilist as $gid=>$indi) {
+			$indi = $indilist[$gid];
+			$thisgid = splitkey($gid, "id");
+			$thisged = splitkey($gid, "ged");
+			$thisgedid = splitkey($gid, "gedid");
+			if ($thisged != $GEDCOM) {
+				$GEDCOM = $thisged;
+				$GEDCOMID = $thisgedid;
+				$Privacy->ReadPrivacy($GEDCOMID);
+			}
+			$indi_total[$thisgid."[".$indi["gedfile"]."]"] = 1;
+			if (showLivingNameById($thisgid)) {
+				foreach($indi["names"] as $name) {
+					if ($LANGUAGE == "danish" || $LANGUAGE == "norwegian") {
+						if ($alpha == "Ø") $text = "OE";
+						else if ($alpha == "Æ") $text = "AE";
+						else if ($alpha == "Å") $text = "AA";
+						if (isset($text)) {
+							if ((preg_match("/^$expalpha/", $name[1])>0)||(preg_match("/^$text/", $name[1])>0)) SurnameCount($name[2], $alpha);
+						}
+						else if (preg_match("/^$expalpha/", $name[1])>0) SurnameCount($name[2], $alpha);
 					}
-					else if (preg_match("/^$expalpha/", $name[1])>0) surname_count($name[2], $alpha);
-				}
-				else {
-					if (preg_match("/^$expalpha/", $name[1])>0) surname_count($name[2], $alpha);
+					else {
+						if (preg_match("/^$expalpha/", $name[1])>0) SurnameCount($name[2], $alpha);
+					}
 				}
 			}
+			else $indi_hide[$thisgid."[".$indi["gedfile"]."]"] = 1;
 		}
-		else $indi_hide[$gid."[".$indi["gedfile"]."]"] = 1;
+		if ($GEDCOM != $oldged) {
+			$GEDCOM = $oldged;
+			$GEDCOMID = $oldgedid;
+			$Privacy->ReadPrivacy($GEDCOMID);
+		}
+		$i = 0;
+		uasort($surnames, "ItemSort");
+		print "<div class=\"topbar\">".$gm_lang["surnames"]."</div>\n";
+		PrintSurnameList($surnames, $_SERVER["SCRIPT_NAME"], $allgeds);
 	}
-	$i = 0;
-	uasort($surnames, "itemsort");
-	print "<div class=\"topbar\">".$gm_lang["surnames"]."</div>\n";
-	PrintSurnameList($surnames, $_SERVER["SCRIPT_NAME"]);
 }
 else {
 	// NOTE: If the surname is set then only get the names in that surname list
 	if ((!empty($surname))&&($surname_sublist=="yes")) {
 		$surname = trim($surname);
-		$tindilist = get_surname_indis($surname);
+		$tindilist = GetSurnameIndis($surname, $allgeds);
 	}
 	// NOTE: Get all individuals for the sublist
-	if (($surname_sublist=="no")&&(!empty($alpha))&&($show_all=="no")) $tindilist = GetAlphaIndis($alpha);
+	if (($surname_sublist=="no")&&(!empty($alpha))&&($show_all=="no")) {
+		$tindilist = GetAlphaIndis($alpha, $allgeds);
+	}
 	
 	// NOTE: Simplify processing for ALL indilist
 	// NOTE: Skip surname is yes and ALL is chosen
 	if (($surname_sublist=="no")&&($show_all=="yes")) {
-		$tindilist = GetIndiList();
-		PrintPersonList($tindilist);
+		$tindilist = GetIndiList($allgeds);
+		PrintPersonList($tindilist, true, false, $allgeds);
 	}
 	else {
 		// NOTE: If user wishes to skip surname do not print the surname
 		print "<div class=\"topbar\">";
 		if ($surname_sublist == "no") print $gm_lang["surnames"];
-		else	print PrintReady(str_replace("#surname#", check_NN($surname), $gm_lang["indis_with_surname"]));
+		else	print PrintReady(str_replace("#surname#", CheckNN($surname), $gm_lang["indis_with_surname"]));
 		print "</div>\n";
-		PrintPersonList($tindilist);
+		PrintPersonList($tindilist, true, false, $allgeds);
 	}
 }
-print "</tr></table>";
 
 if ($alpha != "@") {
 	print_help_link("skip_sublist_help", "qm", "skip_surnames");
-	if ($surname_sublist=="yes") print "<br /><a href=\"indilist.php?alpha=$alpha&amp;surname_sublist=no&amp;show_all=$show_all\">".$gm_lang["skip_surnames"]."</a>";
-	else print "<br /><a href=\"indilist.php?alpha=$alpha&amp;surname_sublist=yes&amp;show_all=$show_all\">".$gm_lang["show_surnames"]."</a>";
+	if ($surname_sublist=="yes") {
+		print "<br /><a href=\"indilist.php?alpha=$alpha&amp;surname_sublist=no&amp;show_all=$show_all";
+		if ($allgeds == "yes") print "&amp;allgeds=yes";
+		print "\">".$gm_lang["skip_surnames"]."</a>";
+	}
+	else {
+		print "<br /><a href=\"indilist.php?alpha=$alpha&amp;surname_sublist=yes&amp;show_all=$show_all";
+		if ($allgeds == "yes") print "&amp;allgeds=yes";
+		print "\">".$gm_lang["show_surnames"]."</a>";
+	}
 }
 print "</div>\n";
 print_footer();

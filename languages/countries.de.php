@@ -5,7 +5,7 @@
  * @see http://susning.nu/Landskod  (list #7) for another list, taken from ISO standards
  * @package Genmod
  * @subpackage Languages
- * @version $Id: countries.de.php,v 1.1 2005/10/23 21:54:42 roland-d Exp $
+ * @version $Id$
  */
 if (preg_match("/lang\...\.php$/", $_SERVER["SCRIPT_NAME"])>0) {
 		print "You cannot access a language file directly.";

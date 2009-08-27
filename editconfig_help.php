@@ -3,7 +3,7 @@
  * English Language Configure Help file for Genmod
  *
  * Genmod: Genealogy Viewer
- * Copyright (C) 2005 Genmod Development Team
+ * Copyright (C) 2005 - 2008 Genmod Development Team
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,7 +19,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
- * @version $Id: editconfig_help.php,v 1.3 2006/01/22 19:50:24 roland-d Exp $
+ * @version $Id$
  * @package Genmod
  * @subpackage Admin
  */
@@ -32,13 +32,13 @@ require "config.php";
 /**
  * Inclusion of the help text variables
 */
-require ("help_text_vars.php");
+require ("helptext_vars.php");
 print_simple_header($gm_lang["help_config"]);
 print '<span class="helpheader">';
 print $gm_lang["help_config"];
 print '</span><br /><br /><span class="helptext">';
 if ($help == "help_contents_help") {
-		if (userIsAdmin($gm_username)) {
+		if ($Users->userIsAdmin($gm_username)) {
 		$help = "admin_help_contents_help";
 		print_text("admin_help_contents_head_help");
 	}

@@ -5,7 +5,7 @@
  * Provides links for administrators to get to other administrative areas of the site
  *
  * Genmod: Genealogy Viewer
- * Copyright (C) 2005 Genmod Development Team
+ * Copyright (C) 2005 - 2008 Genmod Development Team
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,7 +23,7 @@
  *
  * @package Genmod
  * @subpackage Admin
- * @version $Id: gminfo.php,v 1.3 2006/02/19 11:32:04 roland-d Exp $
+ * @version $Id$
  */
 
 /**
@@ -31,18 +31,12 @@
 */
 require "config.php";
 
-if (!userGedcomAdmin($gm_username)) {
-	 header("Location: login.php?url=gminfo.php?action=".$action);
+if (!$Users->userGedcomAdmin($gm_username)) {
+	if (empty($LOGIN_URL)) header("Location: login.php?url=gminfo.php?action=".$action);
+	else header("Location: ".$LOGIN_URL."?url=gminfo.php?action=".$action);
 exit;
 }
 
-/**
- * Inclusion of the language files
-*/
-/*
-require $GM_BASE_DIRECTORY . $confighelpfile["english"];
-if (file_exists($GM_BASE_DIRECTORY . $confighelpfile[$LANGUAGE])) require $GM_BASE_DIRECTORY . $confighelpfile[$LANGUAGE];
-*/
 if (!isset($action)) $action = "";
 
 if ($action == "phpinfo") {
@@ -92,9 +86,9 @@ if ($action == "phpinfo") {
 
 if ($action=="confighelp") {
 	print_header($gm_lang["help_config"]);
-	print "<h2 class=\"center\">".str2upper($gm_lang["help_config"])."</h2><br />";
+	print "<h3 class=\"center\">".Str2Upper($gm_lang["help_config"])."</h3><br />";
 	$language_array = array();
-	$language_array = loadLanguage($LANGUAGE,true, true);
+	$language_array = LoadLanguage($LANGUAGE,true, true);
 	
 	print "<ol>";
 	foreach ($language_array as $string => $text) {

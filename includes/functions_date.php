@@ -6,7 +6,7 @@
  * routines and sorting functions.
  *
  * Genmod: Genealogy Viewer
- * Copyright (C) 2005 Genmod Development Team
+ * Copyright (C) 2005 - 2008 Genmod Development Team
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -24,15 +24,14 @@
  *
  * @package Genmod
  * @subpackage Dates
- * @version $Id: functions_date.php,v 1.2 2005/10/27 08:41:30 roland-d Exp $
+ * @version $Id$
  */
 
 /**
  * security check to prevent hackers from directly accessing this file
  */
 if (strstr($_SERVER["SCRIPT_NAME"],"functions_date.php")) {
-	print "Why do you want to do that?";
-	exit;
+	require "../intrusion.php";
 }
 global $CALENDAR_FORMAT;
 if ($CALENDAR_FORMAT=="hijri" || $CALENDAR_FORMAT=="arabic") {
@@ -56,7 +55,7 @@ if ($CALENDAR_FORMAT=="hijri" || $CALENDAR_FORMAT=="arabic") {
  * @param int $year the year (ie 1900, 2004, etc)
  * @return string the new converted date
  */
-function convert_date($dstr_beg, $dstr_end, $day, $month, $year) {
+function ConvertDate($dstr_beg, $dstr_end, $day, $month, $year) {
 	global $gm_lang, $DATE_FORMAT, $LANGUAGE, $CALENDAR_FORMAT, $monthtonum, $TEXT_DIRECTION;
 	$altDay=30;
 
@@ -89,17 +88,17 @@ function convert_date($dstr_beg, $dstr_end, $day, $month, $year) {
 		$altHebrewDate = jdtojewish($altJd);
 		list ($altHebrewMonth, $altHebrewDay, $altHebrewYear) = split ('/', $altHebrewDate);
 
-		$hebrewMonthName = getJewishMonthName($hebrewMonth, $hebrewYear);
+		$hebrewMonthName = GetJewishMonthName($hebrewMonth, $hebrewYear);
 		if($skipday && !$skipmonth && $altHebrewMonth !=0 && $altHebrewYear !=0 && $hebrewMonth != $altHebrewMonth && $hebrewYear != $altHebrewYear) { //elul tishrai
 			$hebrewMonthName .= " ";
 			$hebrewMonthName .= $hebrewYear;
 			$hebrewYear = " / ";
-			$hebrewYear .= getJewishMonthName($altHebrewMonth, $altHebrewYear);
+			$hebrewYear .= GetJewishMonthName($altHebrewMonth, $altHebrewYear);
 			$hebrewYear .= " ";
 			$hebrewYear .= $altHebrewYear;
 		} else if($skipday && !$skipmonth && $altHebrewMonth !=0 && $hebrewMonth != $altHebrewMonth) {
 			$hebrewMonthName .= " / ";
-			$hebrewMonthName .= getJewishMonthName($altHebrewMonth, $altHebrewYear);
+			$hebrewMonthName .= GetJewishMonthName($altHebrewMonth, $altHebrewYear);
 		} else if($altHebrewYear !=0 && $hebrewYear != $altHebrewYear && $skipday) {
 			$hebrewYear .= " / ";
 			$hebrewYear .= $altHebrewYear;
@@ -122,18 +121,18 @@ function convert_date($dstr_beg, $dstr_end, $day, $month, $year) {
 		$altJd = gregoriantojd($monthnum, $altDay, $year);
 		$altHebrewDate = jdtojewish($altJd);
 		list ($altHebrewMonth, $altHebrewDay, $altHebrewYear) = split ('/', $altHebrewDate);
-		$hebrewMonthName = getJewishMonthName($hebrewMonth, $hebrewYear);
+		$hebrewMonthName = GetJewishMonthName($hebrewMonth, $hebrewYear);
 
 		if($skipday && !$skipmonth && $altHebrewMonth !=0 && $altHebrewYear !=0 && $hebrewMonth != $altHebrewMonth && $hebrewYear != $altHebrewYear ) { //elul tishrai
 			$hebrewMonthName .= " ";
 			$hebrewMonthName .= $hebrewYear;
 			$hebrewYear = " / ";
-			$hebrewYear .= getJewishMonthName($altHebrewMonth, $altHebrewYear);
+			$hebrewYear .= GetJewishMonthName($altHebrewMonth, $altHebrewYear);
 			$hebrewYear .= " ";
 			$hebrewYear .= $altHebrewYear;
 		} else if($skipday && !$skipmonth && $altHebrewMonth !=0 && $hebrewMonth != $altHebrewMonth) {
 			$hebrewMonthName .= " / ";
-			$hebrewMonthName .= getJewishMonthName($altHebrewMonth, $altHebrewYear);
+			$hebrewMonthName .= GetJewishMonthName($altHebrewMonth, $altHebrewYear);
 		} else if($altHebrewYear !=0 && $hebrewYear != $altHebrewYear && $skipday) {
 			$hebrewYear .= " / ";
 			$hebrewYear .= $altHebrewYear;
@@ -172,7 +171,7 @@ function convert_date($dstr_beg, $dstr_end, $day, $month, $year) {
 
 		if ($skipday) $hebrewDay = "";
 		if ($skipmonth) $hebrewMonth = "";
-		$newdate = getFullHebrewJewishDates($hebrewYear, $hebrewMonth, $hebrewDay, $altHebrewYear, $altHebrewMonth);
+		$newdate = GetFullHebrewJewishDates($hebrewYear, $hebrewMonth, $hebrewDay, $altHebrewYear, $altHebrewMonth);
 		$datestr = $dstr_beg . $newdate . $dstr_end;
 	}
 	else if (($CALENDAR_FORMAT=="hebrew_and_gregorian" || ($CALENDAR_FORMAT=="jewish_and_gregorian" && $LANGUAGE == "hebrew")) && !empty($year) && ! (preg_match("/^\d+$/", $year)==0)) {
@@ -188,7 +187,7 @@ function convert_date($dstr_beg, $dstr_end, $day, $month, $year) {
 
 		if ($skipday) $hebrewDay = "";
 		if ($skipmonth) $hebrewMonth = "";
-		if (!empty($year)) $newdate = getFullHebrewJewishDates($hebrewYear, $hebrewMonth, $hebrewDay, $altHebrewYear, $altHebrewMonth);
+		if (!empty($year)) $newdate = GetFullHebrewJewishDates($hebrewYear, $hebrewMonth, $hebrewDay, $altHebrewYear, $altHebrewMonth);
 		else $newdate = "";
 		if ($skipday) $day = "";
 		if ($skipmonth) $month = "";
@@ -215,7 +214,7 @@ function convert_date($dstr_beg, $dstr_end, $day, $month, $year) {
 	}
 	else if ($CALENDAR_FORMAT=="hijri") {
 		$monthnum = $monthtonum[$month];
-		$hDate = getHijri($day, $monthnum, $year);
+		$hDate = GetHijri($day, $monthnum, $year);
 		list ($hMonthName, $hDay, $hYear) = split ('/', $hDate);
 		if ($skipday) $hDay = "";
 		if ($skipmonth) $hMonthName = "";
@@ -230,7 +229,7 @@ function convert_date($dstr_beg, $dstr_end, $day, $month, $year) {
 	}
 	else if ($CALENDAR_FORMAT=="arabic") {
 		$monthnum = $monthtonum[$month];
-		$aDate = getArabic($day, $monthnum, $year);
+		$aDate = GetArabic($day, $monthnum, $year);
 		list ($aMonthName, $aDay, $aYear) = split ('/', $aDate);
 		if ($skipday) $aDay = "";
 		if ($skipmonth) $aMonthName = "";
@@ -290,11 +289,11 @@ function convert_date($dstr_beg, $dstr_end, $day, $month, $year) {
 		$newdate = trim(substr($temp_format,1));
 
 		if ($LANGUAGE=="chinese") {
-			$day = convert_number($day);
+			$day = ConvertNumber($day);
 			$yearStr = "".$year;
 			$year="";
 			for($i=0; $i<strlen($yearStr); $i++) {
-				$year .= convert_number($yearStr{$i});
+				$year .= ConvertNumber($yearStr{$i});
 			}
 		}
 		$newdate = preg_replace("/D/", $day, $newdate);
@@ -310,7 +309,7 @@ function convert_date($dstr_beg, $dstr_end, $day, $month, $year) {
 //-- functions to take a date and display it in Finnish.
 //-- provided by: KurtNorgaz
 //-- updated by Meliza
-function getFinnishDate($datestr, $day) {
+function GetFinnishDate($datestr, $day) {
 
 	global $gm_lang;
 
@@ -377,8 +376,7 @@ function getFinnishDate($datestr, $day) {
 
 //-- functions to take a date and display it in Turkish.
 //-- provided by: KurtNorgaz
-function getTurkishDate($datestr)
-{
+function GetTurkishDate($datestr) {
 	global $gm_lang;
 
 	$array_short = array("jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep", "oct", "nov", "dec", "est");
@@ -507,11 +505,11 @@ function getTurkishDate($datestr)
  * parse a gedcom date
  *
  * this function will parse a gedcom date and convert it to the form defined by the language file
- * by calling the convert_date function
+ * by calling the ConvertDate function
  * @param string $datestr the date string (ie everything after the DATE tag)
  * @return string the new date string
  */
-function get_changed_date($datestr) {
+function GetChangedDate($datestr) {
 	global $gm_lang, $DATE_FORMAT, $LANGUAGE, $CALENDAR_FORMAT, $monthtonum, $dHebrew;
 	global $USE_RTL_FUNCTIONS; //--- required??
 	global $CalYear;   //-- Hebrew calendar year
@@ -523,33 +521,33 @@ function get_changed_date($datestr) {
 	// INFANT CHILD STILLBORN DEAD DECEASED Y AUG ...
 	if (preg_match("/\d/", $datestr)==0) 	{
 		if (isset($gm_lang[$datestr])) return $gm_lang[$datestr];
-		if (isset($gm_lang[str2upper($datestr)])) return $gm_lang[str2upper($datestr)];
-		if (isset($gm_lang[str2lower($datestr)])) return $gm_lang[str2lower($datestr)];
+		if (isset($gm_lang[Str2Upper($datestr)])) return $gm_lang[Str2Upper($datestr)];
+		if (isset($gm_lang[Str2Lower($datestr)])) return $gm_lang[Str2Lower($datestr)];
 
 	    if (stristr($datestr, "#DHEBREW")) {
 			$datestr = preg_replace("/@([#A-Z]+)@/", "", $datestr);
-			$pdate = parse_date($datestr);
+			$pdate = ParseDate($datestr);
 			if (isset($gm_lang[$pdate[0]["ext"]])) 				$tmp = $gm_lang[$pdate[0]["ext"]]." ";
-			else if (isset($gm_lang[str2upper($pdate[0]["ext"])])) $tmp = $gm_lang[str2upper($pdate[0]["ext"])]." ";
-			else if (isset($gm_lang[str2lower($pdate[0]["ext"])])) $tmp = $gm_lang[str2lower($pdate[0]["ext"])]." ";
+			else if (isset($gm_lang[Str2Upper($pdate[0]["ext"])])) $tmp = $gm_lang[Str2Upper($pdate[0]["ext"])]." ";
+			else if (isset($gm_lang[Str2Lower($pdate[0]["ext"])])) $tmp = $gm_lang[Str2Lower($pdate[0]["ext"])]." ";
 			else if ($pdate[0]["ext"]=="") $tmp = "";
 	   	 	else return $datestr;
 	   		if (isset($pdate[0]["mon"]))
-		   		if ($LANGUAGE=="hebrew") $tmp .= getHebrewJewishMonth($pdate[0]["mon"], $CalYear);
-		   		else                     $tmp .= getJewishMonthName($pdate[0]["mon"], $CalYear);
+		   		if ($LANGUAGE=="hebrew") $tmp .= GetHebrewJewishMonth($pdate[0]["mon"], $CalYear);
+		   		else                     $tmp .= GetJewishMonthName($pdate[0]["mon"], $CalYear);
 	    	else return $datestr;
         	return $tmp;
 		}
 		// abt Aug
 		else {
-		$pdate = parse_date($datestr);
+		$pdate = ParseDate($datestr);
 		if (isset($gm_lang[$pdate[0]["ext"]])) 				$tmp = $gm_lang[$pdate[0]["ext"]];
-		else if (isset($gm_lang[str2upper($pdate[0]["ext"])])) $tmp = $gm_lang[str2upper($pdate[0]["ext"])];
-		else if (isset($gm_lang[str2lower($pdate[0]["ext"])])) $tmp = $gm_lang[str2lower($pdate[0]["ext"])];
+		else if (isset($gm_lang[Str2Upper($pdate[0]["ext"])])) $tmp = $gm_lang[Str2Upper($pdate[0]["ext"])];
+		else if (isset($gm_lang[Str2Lower($pdate[0]["ext"])])) $tmp = $gm_lang[Str2Lower($pdate[0]["ext"])];
 		else return $datestr;
 		if (isset($gm_lang[$pdate[0]["month"]])) 				  $tmp .= " ".$gm_lang[$pdate[0]["month"]];
-		else if (isset($gm_lang[str2upper($pdate[0]["month"])])) $tmp .= " ".$gm_lang[str2upper($pdate[0]["month"])];
-		else if (isset($gm_lang[str2lower($pdate[0]["month"])])) $tmp .= " ".$gm_lang[str2lower($pdate[0]["month"])];
+		else if (isset($gm_lang[Str2Upper($pdate[0]["month"])])) $tmp .= " ".$gm_lang[Str2Upper($pdate[0]["month"])];
+		else if (isset($gm_lang[Str2Lower($pdate[0]["month"])])) $tmp .= " ".$gm_lang[Str2Lower($pdate[0]["month"])];
 		else return $datestr;
         return $tmp;
         // 2 DATE from aug to sep or 2 DATE bet aug and sep still printed as are
@@ -559,14 +557,13 @@ function get_changed_date($datestr) {
 	// need day of the week ?
 	if (!strpos($datestr, "#") && (strpos($DATE_FORMAT, "F") or strpos($DATE_FORMAT, "d") or strpos($DATE_FORMAT, "j"))) {
 		$dateged = "";
-		$pdate = parse_date($datestr);
+		$pdate = ParseDate($datestr);
 		$i=0;
 		while (!empty($pdate[$i]["year"])) {
 			$day = @$pdate[$i]["day"];
 			$mon = @$pdate[$i]["mon"];
 			$year = $pdate[$i]["year"];
 			if (!empty($day)) {
-				if (!defined('ADODB_DATE_VERSION')) require("adodb-time.inc.php");
 				$fmt = $DATE_FORMAT; // D j F Y
 				$fmt = str_replace("R", "", $fmt); // R = french Revolution date
 				$adate = adodb_date($fmt, adodb_mktime(0, 0, 0, $mon, $day, $year));
@@ -655,12 +652,12 @@ function get_changed_date($datestr) {
 				//<-- Day zero-suppress
 				if ($day > 0 && $day < 10) $day = preg_replace("/0/", ""."\$1", $day);
 				if (!$dHebrew) {
-					$datestr = convert_date($dstr_beg, $dstr_end, $day, $month, $year);
+					$datestr = ConvertDate($dstr_beg, $dstr_end, $day, $month, $year);
 					if ($day != "") $Dt = $day;
 				}
 				else {
-					if (!function_exists("convert_hdate")) require_once("includes/functions_date_hebrew.php");
-					$datestr = convert_hdate($dstr_beg, $dstr_end, $day, $month, $year);
+					if (!function_exists("ConvertHdate")) require_once("includes/functions_date_hebrew.php");
+					$datestr = ConvertHdate($dstr_beg, $dstr_end, $day, $month, $year);
 
 					$Dt = "";
 				}
@@ -690,8 +687,8 @@ function get_changed_date($datestr) {
 					$pos2 = $pos1 + strlen($match[$i][0]);
 					$dstr_beg = substr($datestr, 0, $pos1);
 					$dstr_end = substr($datestr, $pos2);
-					if (!$dHebrew) $datestr = convert_date($dstr_beg, $dstr_end, $day, $month, $year);
-					else $datestr = convert_hdate($dstr_beg, $dstr_end, $day, $month, $year);
+					if (!$dHebrew) $datestr = ConvertDate($dstr_beg, $dstr_end, $day, $month, $year);
+					else $datestr = ConvertHdate($dstr_beg, $dstr_end, $day, $month, $year);
 				}
 			}
 		}
@@ -710,15 +707,15 @@ function get_changed_date($datestr) {
 					$pos2 = $pos1 + strlen($match[$i][0]);
 					$dstr_beg = substr($datestr, 0, $pos1);
 					$dstr_end = substr($datestr, $pos2);
-					$datestr = convert_date($dstr_beg, $dstr_end, $day, $month, $year);
+					$datestr = ConvertDate($dstr_beg, $dstr_end, $day, $month, $year);
 				//}
 			}
 		}
 	}
 
-	if ($LANGUAGE == "turkish") $datestr = getTurkishDate($datestr);
+	if ($LANGUAGE == "turkish") $datestr = GetTurkishDate($datestr);
 	else {
-	if ($LANGUAGE == "finnish") $datestr = getFinnishDate($datestr, $Dt);
+	if ($LANGUAGE == "finnish") $datestr = GetFinnishDate($datestr, $Dt);
 	else {
 		$array_short = array("jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep", "oct", "nov", "dec", "abt", "aft", "and", "bef", "bet", "cal", "est", "from", "int", "to", "cir", "apx");
 		foreach($array_short as $indexval => $value){
@@ -731,21 +728,21 @@ function get_changed_date($datestr) {
 }
 
 /**
- * create an anchor url to the calendar for a date
+ * Create an anchor url to the calendar for a date
  *
- * create an anchor url to the calendar for a date and parses the date using the get changed date
+ * Create an anchor url to the calendar for a date and parses the date using the get changed date
  * function
+ *
+ * @todo Do not create a url link for dates as stillborn, infant, child, dead, deceased, Y
+ * @todo Do not create a today url link for dates from the monthly Day not set box, inform editors about the error
  * @author Roland (botak)
  * @param string $datestr the date string (ie everything after the DATE tag)
  * @return string a converted date with anchor html tags around it <a href="">date</a>
  */
-function get_date_url($datestr){
+function GetDateUrl($datestr){
 	global $monthtonum, $USE_RTL_FUNCTIONS;
 	global $CalYear;   //-- Hebrew calendar year
-
-//TODO Do not create a url link for dates as stillborn, infant, child, dead, deceased, Y
-//TODO Do not create a today url link for dates from the monthly Day not set box, inform editors about the error
-
+	
     if (!stristr($datestr, "#DHEBREW") || $USE_RTL_FUNCTIONS) {
 
 //		Commented out 2 lines as I don't know why they are here
@@ -773,7 +770,7 @@ function get_date_url($datestr){
 						    else if (trim($match_bet[5][0])==trim($match_bet[5][4]) && trim($match_bet[11][0])==trim($match_bet[11][4]))
 						    							$date[0]["day"]   = '30';
 						    else               			$date[0]["day"]   = '01';
-						    if ($match_bet[5][4]!="")   $date[0]["mon"]   = $monthtonum[str2lower($match_bet[5][4])];
+						    if ($match_bet[5][4]!="")   $date[0]["mon"]   = $monthtonum[Str2Lower($match_bet[5][4])];
  							else               			$date[0]["mon"]   = '01';
  							if (isset($match_bet[5][5]) && $match_bet[5][5]!="") $date[0]["year"]  = $match_bet[5][5];
  							$date[0]["month"] = "";
@@ -784,9 +781,9 @@ function get_date_url($datestr){
 						         $date[1]["day"]   = $match_bet[11][3];
 						    else $date[1]["day"]   = '30';
 						    if (isset($match_bet[12][4]) && $match_bet[12][4]!="rew" && $match_bet[12][4]!="")
-						         $date[1]["mon"]   = $monthtonum[str2lower($match_bet[12][4])];
+						         $date[1]["mon"]   = $monthtonum[Str2Lower($match_bet[12][4])];
 						    else if (isset($match_bet[11][4]) && $match_bet[11][4]!="rew" && $match_bet[11][4]!="")
-						         $date[1]["mon"]   = $monthtonum[str2lower($match_bet[11][4])];
+						         $date[1]["mon"]   = $monthtonum[Str2Lower($match_bet[11][4])];
  							else $date[1]["mon"]   = '13';
  							if (isset($match_bet[12][5]) && $match_bet[12][5]!="")
  							     $date[1]["year"]  = $match_bet[12][5];
@@ -806,11 +803,11 @@ function get_date_url($datestr){
  							}
 
  							if (!empty($date[0]["year"]) && !empty($date[1]["year"])) {
-                                                		$dateheb = jewishGedcomDateToGregorian($date);
+                                                		$dateheb = JewishGedcomDateToGregorian($date);
                                                 		$action = "year";
                             }
                             else {
-                            							$dateheb = jewishGedcomDateToCurrentGregorian($date);
+                            							$dateheb = JewishGedcomDateToCurrentGregorian($date);
                                                 		$action = "today";
                                  }
                             if (trim($match_bet[5][0])==trim($match_bet[5][4]) && trim($match_bet[11][0])==trim($match_bet[11][4])) {
@@ -895,8 +892,8 @@ function get_date_url($datestr){
 					$datelink .= "&amp;filterof=all&amp;action=".$action."\">";
                     if (isset($match_bet[5][4])	&& isset($match_bet[11][4])) {
 						if (trim($match_bet[5][0])==trim($match_bet[5][4]) && trim($match_bet[11][0])==trim($match_bet[11][4])) {
-							$tmp       = get_changed_date($match_bet[0][1]." @#DHEBREW@ ".$match_bet[5][0]);
-							$tmp      .= " ".get_changed_date($match_bet[6][1]." @#DHEBREW@ ".$match_bet[11][0]);
+							$tmp       = GetChangedDate($match_bet[0][1]." @#DHEBREW@ ".$match_bet[5][0]);
+							$tmp      .= " ".GetChangedDate($match_bet[6][1]." @#DHEBREW@ ".$match_bet[11][0]);
 							$datelink .= $tmp."</a>";
 						}
 			        }
@@ -904,11 +901,11 @@ function get_date_url($datestr){
 			        else //---- MA
  			        if ($action == "calendar" && $match_bet[0][2]=="" && isset($match_bet[0][3]) && $match_bet[1][2]=="" && isset($match_bet[1][3]))
  			        {
- 				        	$tmp       = get_changed_date($match_bet[0][0]);
- 							$tmp      .= " ".get_changed_date($match_bet[1][0]);
+ 				        	$tmp       = GetChangedDate($match_bet[0][0]);
+ 							$tmp      .= " ".GetChangedDate($match_bet[1][0]);
  							$datelink .= $tmp."</a>";
 			        }
- 			        else $datelink .= get_changed_date($datestr)."</a>";
+ 			        else $datelink .= GetChangedDate($datestr)."</a>";
 			}
 			else {
 				$match[$i][0] = trim($match[$i][0]);
@@ -941,7 +938,7 @@ function get_date_url($datestr){
 						    else if ($tmpdatelink=="calendar") $date[0]["day"]   = '30';
 						         else                   $date[0]["day"]   = '01';
 						    if ($month>0 && $month<14)  $date[0]["mon"]   = $month;
-						    else if ($month!="")    	$date[0]["mon"]   = $monthtonum[str2lower($month)];
+						    else if ($month!="")    	$date[0]["mon"]   = $monthtonum[Str2Lower($month)];
  							     else               	$date[0]["mon"]   = '01';
  							if (!empty($year)) 		    $date[0]["year"]  = $year;
  							else if (!empty($CalYear) && $tmpdatelink=="today") $date[0]["year"] = $CalYear;
@@ -952,8 +949,8 @@ function get_date_url($datestr){
 						    }
 
                             if (!empty($date[0]["year"]))
-                                                		$dateheb = jewishGedcomDateToGregorian($date);
-                            else                  		$dateheb = jewishGedcomDateToCurrentGregorian($date);
+                                                		$dateheb = JewishGedcomDateToGregorian($date);
+                            else                  		$dateheb = JewishGedcomDateToCurrentGregorian($date);
 
     						if (!empty($dateheb[0]["day"]))
     													$day 	= $dateheb[0]["day"];
@@ -974,7 +971,7 @@ function get_date_url($datestr){
 					else 									 $datelink .= "&amp;";
 					$datelink .= "filterof=all&amp;action=";
 					$datelink .= $tmpdatelink.$tmplink;
-					$datelink .= get_changed_date($datestr)."</a>";
+					$datelink .= GetChangedDate($datestr)."</a>";
 				}
 			}
 		}
@@ -982,7 +979,7 @@ function get_date_url($datestr){
 		return $datelink;
 	}
 	else {
-		$datelink = get_changed_date($datestr);
+		$datelink = GetChangedDate($datestr);
 		return $datelink;
 	}
 }
@@ -996,30 +993,36 @@ function get_date_url($datestr){
  * @param string $style optional style (default 1=HTML style)
  * @return string the age in a string
  */
-function get_age($indirec, $datestr, $style=1) {
+function GetAge($indirec, $datestr, $style=1) {
 	global $gm_lang,$monthtonum, $USE_RTL_FUNCTIONS;
 	$estimates = array("abt","aft","bef","est","cir");
 	$realbirthdt="";
 	$bdatestr = "";
-
+	
+	$ct = preg_match("/0 @(.*)@ INDI/", $indirec, $match);
+	if ($ct>0) $pid = trim($match[1]);
+	if (empty($pid)) return "";
+	
 	//-- get birth date for age calculations
 	$bpos1 = strpos($indirec, "1 BIRT");
 	if ($bpos1) {
 		$index = 1;
-		$birthrec = get_sub_record(1, "1 BIRT", $indirec, $index);
+		$birthrec = GetSubRecord(1, "1 BIRT", $indirec, $index);
 		while(!empty($birthrec)) {
-			$hct = preg_match("/2 DATE.*(@#DHEBREW@)/", $birthrec, $match);
-			if ($hct>0) {
-				$dct = preg_match("/2 DATE (.+)/", $birthrec, $match);
-				$hebrew_birthdate = parse_date(trim($match[1]));
-				if ($USE_RTL_FUNCTIONS && $index==1) $birthdate = jewishGedcomDateToGregorian($hebrew_birthdate);
-			}
-			else {
-				$dct = preg_match("/2 DATE (.+)/", $birthrec, $match);
-				if ($dct>0) $birthdate = parse_date(trim($match[1]));
+			if (!FactViewRestricted($pid, $birthrec) && !FactViewRestricted($pid, $indirec, 1)) {
+				$hct = preg_match("/2 DATE.*(@#DHEBREW@)/", $birthrec, $match);
+				if ($hct>0) {
+					$dct = preg_match("/2 DATE (.+)/", $birthrec, $match);
+					$hebrew_birthdate = ParseDate(trim($match[1]));
+					if ($USE_RTL_FUNCTIONS && $index==1) $birthdate = JewishGedcomDateToGregorian($hebrew_birthdate);
+				}
+				else {
+					$dct = preg_match("/2 DATE (.+)/", $birthrec, $match);
+					if ($dct>0) $birthdate = ParseDate(trim($match[1]));
+				}
 			}
 			$index++;
-			$birthrec = get_sub_record(1, "1 BIRT", $indirec, $index);
+			$birthrec = GetSubRecord(1, "1 BIRT", $indirec, $index);
 		}
 	}
 
@@ -1033,20 +1036,20 @@ function get_age($indirec, $datestr, $style=1) {
 	if ((strtoupper(trim($datestr))!="UNKNOWN")&&(!empty($birthdate[0]["year"]))) {
 		$bt = preg_match("/(\d\d\d\d).*(\d\d\d\d)/", $datestr, $bmatch);
 		if ($bt>0) {
-			$date = parse_date($datestr);
-			if ($convert_hebrew) $date = jewishGedcomDateToGregorian($date);
+			$date = ParseDate($datestr);
+			if ($convert_hebrew) $date = JewishGedcomDateToGregorian($date);
 			$age1 = $date[0]["year"]-$birthdate[0]["year"];
 			$age2 = $date[1]["year"]-$birthdate[0]["year"];
 			if ($style) $realbirthdt = " <span class=\"age\">(".$gm_lang["age"]." ";
-			$age1n = convert_number($age1);
-			$age2n = convert_number($age2);
+			$age1n = ConvertNumber($age1);
+			$age2n = ConvertNumber($age2);
 			$realbirthdt .= $gm_lang["apx"]." ".$age1n;
 			if ($age2n > $age1n) $realbirthdt .= "-".$age2n;
 			if ($style) $realbirthdt .= ")</span>";
 		}
 		else {
-			$date = parse_date($datestr);
-			if ($convert_hebrew) $date = jewishGedcomDateToGregorian($date);
+			$date = ParseDate($datestr);
+			if ($convert_hebrew) $date = JewishGedcomDateToGregorian($date);
 			if (!empty($date[0]["year"])) {
 				$age = $date[0]["year"]-$birthdate[0]["year"];
 				if (!empty($birthdate[0]["mon"])) {
@@ -1103,7 +1106,7 @@ function get_age($indirec, $datestr, $style=1) {
 						else $realbirthdt .= $gm_lang["months"];
 					}
 				}
-				else $realbirthdt .= " ".convert_number($age);
+				else $realbirthdt .= " ".ConvertNumber($age);
 				if ($style) $realbirthdt .= ")</span>";
 				if ($age == 0) $realbirthdt = ""; // empty age
 			}
@@ -1126,7 +1129,7 @@ function get_age($indirec, $datestr, $style=1) {
  * @see http://homepages.rootsweb.com/~pmcbride/gedcom/55gcch2.htm#AGE_AT_EVENT
  */
 
-function get_age_at_event($agestring) {
+function GetAgeAtEvent($agestring) {
 	global $gm_lang;
 
 	$age = "";
@@ -1169,8 +1172,25 @@ function get_age_at_event($agestring) {
  * @param string $datestr		The date to parse
  * @return array		returns an array with indexes "day"=1 "month"=JAN "mon"=1 "year"=2002 "ext" = abt
  */
-function parse_date($datestr) {
-	global $monthtonum;
+function ParseDate($datestr) {
+	global $monthtonum, $MON_SHORT, $gm_lang;
+	static $monthshort, $ests;
+
+	if (!isset($ests)) $ests = array("abt", "aft", "and", "bef", "bet", "cal", "from", "int", "to", "cir", "est", "apx");
+	
+	// Setup the locale translation
+	if (!empty($MON_SHORT)) {
+		if (!isset($monthshort)) {
+			$array_short = array("JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC");
+			$ms = preg_split("/,/", $MON_SHORT);
+			if (count($ms) == count($array_short)) {
+				$monthshort = array();
+				foreach ($array_short as $key => $value) {
+					$monthshort[Str2Upper($ms[$key])] = Str2Upper($value);
+				}
+			}
+		}
+	}
 
 	$datestr = trim($datestr);
 	$dates = array();
@@ -1179,28 +1199,51 @@ function parse_date($datestr) {
 	$dates[0]["mon"] = ""; //1;
 	$dates[0]["year"] = 0;
 	$dates[0]["ext"] = "";
-	$strs = preg_split("/[\s\.,\-\\/\(\)\[\]\+'<>]+/", $datestr, -1, PREG_SPLIT_NO_EMPTY);
+	$strs = preg_split("/[\s\.,\-\\/\(\)\[\]\+'<>\&]+/", $datestr, -1, PREG_SPLIT_NO_EMPTY);
+//	print "<br /><br />strs: ";
+//	print_r($strs);
+//	print "<br />";
 	$index = 0;
-	$longmonth = array("january"=>"jan", "february"=>"feb", "march"=>"mar", "april"=>"apr", "may"=>"may", "june"=>"jun", "july"=>"jul", "august"=>"aug", "september"=>"sep", "october"=>"oct", "november"=>"nov", "december"=>"dec");
+//	$longmonth = array("january"=>"jan", "february"=>"feb", "march"=>"mar", "april"=>"apr", "may"=>"may", "june"=>"jun", "july"=>"jul", "august"=>"aug", "september"=>"sep", "october"=>"oct", "november"=>"nov", "december"=>"dec");
+	// Removed may, as this causes updates on every May, MAY, etc.
+	$longmonth = array("january"=>"jan", "february"=>"feb", "march"=>"mar", "april"=>"apr", "june"=>"jun", "july"=>"jul", "august"=>"aug", "september"=>"sep", "october"=>"oct", "november"=>"nov", "december"=>"dec");
+	$loclongmonth = array($gm_lang["jan"]=>"jan", $gm_lang["feb"]=>"feb", $gm_lang["mar"]=>"mar", $gm_lang["apr"]=>"apr", $gm_lang["may"]=>"may", $gm_lang["jun"]=>"jun", $gm_lang["jul"]=>"jul", $gm_lang["aug"]=>"aug", $gm_lang["sep"]=>"sep", $gm_lang["oct"]=>"oct", $gm_lang["nov"]=>"nov", $gm_lang["dec"]=>"dec");
 
+	// This converts english long month names to short ones (january -> jan)
+	// If not found, it tries to convert the locale month name to a short one (mei -> MAY)
 	for($i=0; $i<count($strs); $i++) {
-		if (isset($longmonth[strtolower($strs[$i])])) {
+		if (isset($loclongmonth[strtolower($strs[$i])])) {
+			$strs[$i] = $loclongmonth[strtolower($strs[$i])];
+		}
+		elseif (isset($longmonth[strtolower($strs[$i])])) {
 			$strs[$i] = $longmonth[strtolower($strs[$i])];
 		}
+		else {
+			if (isset($monthshort[Str2Upper($strs[$i])])) {
+				$strs[$i] = $monthshort[Str2Upper($strs[$i])];
+			}
+		}
 	}
+	
+	//-- this section will convert a date like 2005.10.10 to 10 oct 2005
 	if (count($strs)==3) {
-		//-- this section will convert a date like 2005.10.10 to 10 oct 2005
 		if ($strs[0]>31) {
 			$strs[1] = array_search($strs[1], $monthtonum);
 			$strs = array_reverse($strs);
 		}
 	}
 
+	
 	for($i=0; $i<count($strs); $i++) {
+//		print "Processing ".$strs[$i]."<br />";
 		$ct = preg_match("/^\d+$/", $strs[$i]);
 		if ($ct>0) {
+			// If it's the first or second element AND the value <32, we have day or month.
+			// Otherwise it's only a year. The last element always is year.
 			if (isset($strs[$i+1]) && ($strs[$i]<32)) {
+				// If day is not yet set, fill day
 				if (empty($dates[$index]["day"])) $dates[$index]["day"] = $strs[$i];
+				// Otherwise, it's month
 				else if (empty($dates[$index]["mon"])) {
 					$dates[$index]["mon"] = $strs[$i];
 					$dates[$index]["month"] = array_search($strs[$i], $monthtonum);
@@ -1212,45 +1255,21 @@ function parse_date($datestr) {
 			}
 		}
 		else {
+			// it's not a number, so we try to recognize a month name
 			if (isset($monthtonum[strtolower($strs[$i])])) {
 				$dates[$index]["month"] = $strs[$i];
 				$dates[$index]["mon"] = $monthtonum[strtolower($strs[$i])];
 			}
 			else {
+				// If no month name found, we presume it's a prefix
 				if (!isset($dates[$index]["ext"])) $dates[$index]["ext"] = "";
-				$dates[$index]["ext"] .= $strs[$i];
+				// Check if the user typed the prefix in his language
+				$pref = strtolower(array_search($strs[$i], $gm_lang));
+				if ($pref && in_array($pref, $ests)) $strs[$i] = strtoupper($pref);
+				$dates[$index]["ext"] .= strtoupper($strs[$i]);
 			}
 		}
 	}
 	return $dates;
 }
-
-/* ---- function to search the day of the week
-   ---- $sw_day = int  $sw_mont = int or alpha (like "jan" or "dec") $sw_year = int
-   ---- $weekday (=int) will be returned (1 = monday)
-   ---- calculations by Michael Gudaitis (in Java), converted by Jans Luder
-*/
-function search_weekday( $sw_day, $sw_month, $sw_year) {
-	global $monthtonum;
-	$sw_month = $monthtonum[strtolower($sw_month)];
-	if($sw_month >= 3)$sw_month -= 2;
-	else $sw_month += 10;
-	if( ($sw_month == 11) || ($sw_month == 12) )$sw_year--;
-	$centnum  = floor($sw_year / 100);
-	$yearnum  = $sw_year % 100;
-	$weekday  = floor(2.6 * $sw_month - .2);
-	$weekday += floor($sw_day + $yearnum);
-	$weekday += $yearnum / 4;
-	$weekday  = floor($weekday);
-	$weekday += floor($centnum / 4);
-	$weekday -= floor(2 * $centnum);
-	$weekday %= 7;
-	if($sw_year >= 1700 && $sw_year <= 1751) $weekday -= 3;
-	else if($sw_year <= 1699) $weekday -= 4;
-	if($weekday < 0) $weekday += 7;
-	return $weekday;
-}
-
-// end function search_weekday
-
 ?>

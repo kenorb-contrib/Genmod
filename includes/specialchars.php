@@ -21,7 +21,7 @@
  * Other special characters are all listed at the bottom.
  * 
  * Genmod: Genealogy Viewer
- * Copyright (C) 2002 to 2005  GM Development Team
+ * Copyright (C) 2005 - 2008 Genmod Development Team
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -39,7 +39,7 @@
  *
  * @package Genmod
  * @subpackage Languages
- * @version $Id: specialchars.php,v 1.2 2006/04/30 18:44:15 roland-d Exp $
+ * @version $Id$
  */
 $specialchar_languages = array(
 	"af" => "Afrikaans",

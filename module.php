@@ -3,7 +3,7 @@
  * Module system for adding features to Genmod.
  *
  * Genmod: Genealogy Viewer
- * Copyright (C) 2005 Genmod Development Team
+ * Copyright (C) 2005 - 2008 Genmod Development Team
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,7 +21,7 @@
  *
  * @package Genmod
  * @subpackage Display
- * @version $Id: module.php,v 1.1 2005/10/23 21:36:54 roland-d Exp $
+ * @version $Id$
  * @author Patrick Kellum
  */
 

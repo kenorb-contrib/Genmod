@@ -3,7 +3,7 @@
  * Parses gedcom file and displays record for given id in raw text
  *
  * Genmod: Genealogy Viewer
- * Copyright (C) 2005 Genmod Development Team
+ * Copyright (C) 2005 - 2008 Genmod Development Team
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,7 +21,7 @@
  *
  * @package Genmod
  * @subpackage Charts
- * @version $Id: gedrecord.php,v 1.6 2006/02/19 18:40:23 roland-d Exp $
+ * @version $Id$
  */
 
 /**
@@ -31,25 +31,26 @@ require("config.php");
 
 if (!isset($pid)) $pid = "";
 if (!isset($changed)) $changed = false;
-$pid = clean_input($pid);
+$pid = CleanInput($pid);
 print_simple_header($pid);
 $username = $gm_username;
 
-if ((!$SHOW_GEDCOM_RECORD) && (!UserCanAccept($username))) {
+if ((!$Users->userCanViewGedlines()) && (!$Users->UserCanAccept($username))) {
 	print "<span class=\"error\">".$gm_lang["ged_noshow"]."</span>\n";
 	print "</body></html>";
 	exit;
 }
 
-if ((find_person_record($pid))&&(!displayDetailsByID($pid))) {
+if ((FindPersonRecord($pid))&&(!displayDetailsByID($pid))) {
 	print_privacy_error($CONTACT_EMAIL);
 	print "</body></html>";
 	exit;
 }
 if ($changed) {
-	$newrec = change_present($pid);
+	$getrec = GetChangeData(false, $pid, true);
+	$newrec = $getrec[$GEDCOM][$pid];
 	$newrec = privatize_gedcom($newrec);
-	$oldrec = find_gedcom_record($pid);
+	$oldrec = FindGedcomRecord($pid);
 	$oldrec = privatize_gedcom($oldrec);
 	print "<table class=\"facts_table\">\r\n";
 	print "<tr class=\"topbottombar\"><td>".$gm_lang["old_record"]."</td><td>".$gm_lang["new_record"]."</td></tr>\r\n";
@@ -57,7 +58,7 @@ if ($changed) {
 	print "<tr class=\"topbottombar\"><td colspan=\"2\">&nbsp;</td></tr></table>\r\n";
 }
 else {
-	$indirec = find_gedcom_record($pid);
+	$indirec = FindGedcomRecord($pid);
 	$indirec = privatize_gedcom($indirec);
 	print nl2br($indirec);
 	print "<br />";

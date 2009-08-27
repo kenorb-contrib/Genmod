@@ -1,37 +1,39 @@
-<GMReport access="GM_PUBLIC" icon="cfamily">
-<!-- $Id: relativelist.xml,v 1.1 2005/10/23 22:06:23 roland-d Exp $ -->
+<GMReport access="PRIV_PUBLIC" icon="cfamily" type="indi">
+	<!-- $Id: relativelist.xml,v 1.6 2009/05/03 12:58:25 sjouke Exp $ -->
 	<GMRTitle><GMRvar var="gm_lang[relatives_report]" /></GMRTitle>
 	<GMRDescription>Prints a list of individuals related to a specific person</GMRDescription>
 	<GMRInput name="pid" lookup="INDI" type="text"><GMRvar var="gm_lang[enter_pid]" /></GMRInput>
 	<GMRInput name="relatives" type="select" options="child-family,spouse-family,direct-ancestors,ancestors,descendants,all"><GMRvar var="gm_lang[choose_relatives]" /></GMRInput>
-	<GMRInput name="sortby" type="select" options="none,BIRT,DEAT,NAME"><GMRvar var="gm_lang[sort_by]" /></GMRInput>
+	<GMRInput name="sortby" type="select" options="none,BIRT,DEAT,NAME,ID"><GMRvar var="gm_lang[sort_by]" /></GMRInput>
+	<GMRInput name="showIndID" type="checkbox" default="SHOW_ID_NUMBERS"><GMRvar var="gm_lang[SHOW_ID_NUMBERS]" /></GMRInput>
+	<GMRInput name="pageSize" type="select" options="AVAIL_PAGE_SIZES" default="DEFAULT_PAGE_SIZE"><GMRvar var="gm_lang[page_size]" /></GMRInput>
 	<GMRStyle name="header" font="LucidaSansUnicode" size="14" style="b" />
 	<GMRStyle name="pagenum" font="LucidaSansUnicode" size="8" style="" />
 	<GMRStyle name="text" font="LucidaSansUnicode" size="9" style="" />
 	<GMRStyle name="label" font="LucidaSansUnicode" size="9" style="b" />
-	<GMRDoc pageSize="A4" orientation="P" margin="24">
+	<GMRDoc pageSize="$pageSize" orientation="P" margin="24">
 		<GMRHeader>
 			<GMRCell width="0" height="20" align="center" style="header"><GMRvar var="gm_lang[relatives_report]" /></GMRCell>
-			<GMRCell width="0" height="10" align="right" style="pagenum"><GMRvar var="gm_lang[page]" /> <GMRPageNum /> <GMRvar var="gm_lang[of]" /> <GMRTotalPages /></GMRCell>
-			<GMRTextBox width="35" height="12" border="1">
-				<GMRText style="label"> </GMRText>
+			<!-- GMRCell width="0" height="10" align="right" style="pagenum"><GMRvar var="gm_lang[page]" /> <GMRPageNum /> <GMRvar var="gm_lang[of]" /> <GMRTotalPages /> - <GMRNow /></GMRCell -->
+			<GMRTextBox width="50%" height="10" border="0">
+				<GMRText style="pagenum"><GMRNow /></GMRText>
 			</GMRTextBox>
-			<GMRTextBox width="160" height="12" border="1">
+			<GMRTextBox width="0" height="10" border="0" newline="1">
+				<GMRText style="pagenum" align="right"><GMRvar var="gm_lang[page]" /> <GMRPageNum /> <GMRvar var="gm_lang[of]" /> <GMRTotalPages /></GMRText>
+			</GMRTextBox>
+			<GMRTextBox width="195" height="14" border="1" fill="#DDDDDD">
 				<GMRText style="label"><GMRvar var="gm_lang[name]" /></GMRText>
 			</GMRTextBox>
-			<GMRTextBox width="170" height="12" border="1">
+			<GMRTextBox width="170" height="14" border="1" fill="#DDDDDD">
 				<GMRText style="label"><GMRvar var="factarray[BIRT]" /></GMRText>
 			</GMRTextBox>
-			<GMRTextBox width="0" height="12" border="1" newline="1">
+			<GMRTextBox width="0" height="14" border="1" fill="#DDDDDD" newline="1">
 				<GMRText style="label"><GMRvar var="factarray[DEAT]" /></GMRText>
 			</GMRTextBox>
 		</GMRHeader>
 		<GMRBody>
 			<GMRRelatives id="$pid" group="$relatives" sortby="$sortby">
-				<GMRTextBox width="35" height="12" border="0">
-					<GMRText style="text"><GMRGedcomValue tag="@id" /></GMRText>
-				</GMRTextBox>
-				<GMRTextBox width="160" height="12" border="0">
+				<GMRTextBox width="195" height="12" border="0">
 					<GMRText style="text"><GMRGetPersonName id="" /></GMRText>
 				</GMRTextBox>
 				<GMRTextBox width="170" height="12" border="0">
@@ -40,14 +42,10 @@
 				<GMRTextBox width="0" height="12" border="0" newline="1">
 					<GMRText style="text"><GMRGedcomValue tag="DEAT:DATE" />  <GMRGedcomValue tag="DEAT:PLAC" /></GMRText>
 				</GMRTextBox>
-				<GMRLine x1="25" x2="575" />
 			</GMRRelatives>
 			<GMRCell width="0" height="15" border="0" align="right" style="label">
 				<br /><GMRvar var="gm_lang[total_indis]" />: <GMRListTotal />
 			</GMRCell>
 		</GMRBody>
-		<GMRFooter>
-			<GMRCell width="0" height="10"><GMRNow /></GMRCell>
-		</GMRFooter>
 	</GMRDoc>
 </GMReport>

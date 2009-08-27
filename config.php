@@ -26,8 +26,8 @@
  * @package Genmod
  * @subpackage Admin
  * @see editconfig.php
- * @version $Id: config.php,v 1.7 2005/12/13 10:24:00 sjouke Exp $
+ * @version $Id$
  */
 
-require_once($GM_BASE_DIRECTORY."includes/session.php");
+require_once("includes/session.php");
 ?>

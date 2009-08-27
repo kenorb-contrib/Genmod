@@ -3,7 +3,7 @@
  * Popup window for Editing news items
  *
  * Genmod: Genealogy Viewer
- * Copyright (C) 2005 Genmod Development Team
+ * Copyright (C) 2005 - 2008 Genmod Development Team
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,7 +20,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  * @package Genmod
- * @version $Id: editnews.php,v 1.2 2006/01/09 14:19:30 sjouke Exp $
+ * @version $Id$
  */
 
 /**
@@ -103,7 +103,7 @@ if ($action=="compose") {
 		$oFCKeditor->BasePath =  './modules/FCKeditor/';
 		$oFCKeditor->Value = $news["text"];
 		$oFCKeditor->Width = 700;
-		$oFCKeditor->Height = 250;
+		$oFCKeditor->Height = 450;
 		$oFCKeditor->Config['AutoDetectLanguage'] = false ;
 		$oFCKeditor->Config['DefaultLanguage'] = $language_settings[$LANGUAGE]["lang_short_cut"];
 		$oFCKeditor->Create() ;
@@ -111,7 +111,7 @@ if ($action=="compose") {
 		print "<textarea name=\"text\" cols=\"80\" rows=\"10\">".$news["text"]."</textarea>";
 	}
 	print "<br /></td></tr>\n";
-	print "<tr><td></td><td><input type=\"submit\" value=\"".$gm_lang["save"]."\" /></td></tr>\n";
+	print "<tr><td></td><td><input type=\"submit\"  value=\"".$gm_lang["save"]."\" /></td></tr>\n";
 	print "</table>\n";
 	print "</form>\n";
 }
@@ -126,7 +126,6 @@ else if ($action=="save") {
 	$message["title"] = $title;
 	$message["text"] = $text;
 	if (addNews($message)) {
-		if (isset($gm_language[$LANGUAGE]) && (file_exists($GM_BASE_DIRECTORY . $gm_language[$LANGUAGE]))) require($GM_BASE_DIRECTORY . $gm_language[$LANGUAGE]);
 		print $gm_lang["news_saved"];
 	}
 }

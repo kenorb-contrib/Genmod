@@ -730,7 +730,6 @@
 "ALPHA_INDEX_LISTS";"Break up long lists by the first letter:"
 "SHOW_ID_NUMBERS";"Show ID numbers next to names:"
 "SHOW_PEDIGREE_PLACES";"Place levels to show in person boxes"
-"MULTI_MEDIA";"Enable multimedia features:"
 "MEDIA_DIRECTORY";"MultiMedia directory:"
 "MEDIA_DIRECTORY_LEVELS";"Multi-Media Directory Levels to Keep:"
 "SHOW_HIGHLIGHT_IMAGES";"Show highlight images in people boxes:"

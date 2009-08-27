@@ -3,7 +3,7 @@
  * @see http://unstats.un.org/unsd/methods/m49/m49alpha.htm
  * @package Genmod
  * @subpackage Languages
- * @version $Id: countries.sv.php,v 1.1 2005/10/23 21:54:42 roland-d Exp $
+ * @version $Id$
  */
 if (preg_match("/lang\...\.php$/", $_SERVER["SCRIPT_NAME"])>0) {
 		print "You cannot access a language file directly.";

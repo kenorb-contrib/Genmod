@@ -3,7 +3,7 @@
  * Counts how many hits.
  *
  * Genmod: Genealogy Viewer
- * Copyright (C) 2005 Genmod Development Team
+ * Copyright (C) 2005 - 2008 Genmod Development Team
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,48 +21,67 @@
  *
  * @package Genmod
  * @subpackage Admin
- * @version $Id: hitcount.php,v 1.3 2005/11/24 21:40:32 sjouke Exp $
+ * @version $Id$
  */
-if (strstr($_SERVER["SCRIPT_NAME"],"hitcount")) {
-	print "Now, why would you want to do that.  You're not hacking are you?";
-	exit;
+if (strstr($_SERVER["SCRIPT_NAME"],"hitcount.php")) {
+	require "intrusion.php";
 }
 
 //only do counter stuff if counters are enabled
 if($SHOW_COUNTER) {
+	// set some vars global if this script is called from within a function
+	global $GEDCOM, $GEDCOMID, $GM_IMAGES, $GM_IMAGE_DIR, $bot;
+
 	$GM_COUNTER_NAME     = $GEDCOM."gm_counter";
 	$GM_INDI_COUNTER_NAME = $GEDCOM."gm_indi_counter";
 
-	if(isset($pid) && find_person_record($pid)) { //individual counter
-  
-  		// Capitalize ID to make sure we have a correct hitcount on the individual
-  		$pid = strtoupper($pid);
-  	
-  		//see if already viewed individual this session
-    	if(isset($_SESSION[$GM_INDI_COUNTER_NAME][$pid])) {
-			$hits = $_SESSION[$GM_INDI_COUNTER_NAME][$pid];
-  		}
-  		else { 
-  		//haven't viewed individual this session
-			$id = $pid."[".$GEDCOM."]";
-			$hits = UpdateCounter($id);
+	// First check if any id is set. If not, we assume it's the index page
+	if (isset($pid) || isset($famid) || isset($sid) || isset($rid) || isset($oid)) {
+		// See if the ID exists. If not, we set the counter to 0.
+		if((isset($pid) && FindPersonRecord($pid) != "") 
+		|| (isset($famid) && FindFamilyRecord($famid) != "")
+		|| (isset($sid) && FindSourceRecord($sid) != "")
+		|| (isset($rid) && FindRepoRecord($rid) != "")
+		|| (isset($oid) && FindOtherRecord($oid, "", false, "NOTE") != "")
+		) {
+			
+			if (isset($pid)) $cpid = $pid;
+			if (isset($famid)) $cpid = $famid;
+			if (isset($sid)) $cpid = $sid;
+			if (isset($rid)) $cpid = $rid;
+			if (isset($oid)) $cpid = $oid;
+			
+	  		// Capitalize ID to make sure we have a correct hitcount on the individual
+	  		$cpid = strtoupper($cpid);
+	  	
+	  		// see if already viewed individual this session
+	  		// exclude bots because we want to see the real number of hits.
+	    	if(isset($_SESSION[$GM_INDI_COUNTER_NAME][$cpid]) && !$bot) {
+				$hits = $_SESSION[$GM_INDI_COUNTER_NAME][$cpid];
+	  		}
+	  		else { 
+	  		//haven't viewed individual this session
+				$id = $cpid."[".$GEDCOMID."]";
+				$hits = UpdateCounter($id, $bot);
+			}
+			$_SESSION[$GM_INDI_COUNTER_NAME][$cpid] = $hits;
 		}
-		$_SESSION[$GM_INDI_COUNTER_NAME][$pid] = $hits;
+		else $hits = 0;
 	}
 	else { 
 		//web site counter
 	    // has user started a session on site yet
     	if(isset($_SESSION[$GM_COUNTER_NAME])) $hits = $_SESSION[$GM_COUNTER_NAME];
     	else { //new user so increment counter and save
-			$id = "Index"."[".$GEDCOM."]";
-			$hits = UpdateCounter($id);
+			$id = "Index"."[".$GEDCOMID."]";
+			$hits = UpdateCounter($id, $bot);
 			$_SESSION[$GM_COUNTER_NAME]=$hits;
   		}
 	}
 
 	//replace the numbers with their images
 	for($i=0;$i<10;$i++)
-    $hits = str_replace("$i","<img src=\"".$GM_IMAGE_DIR."/".$GM_IMAGES[$i]["digit"]."\" alt=\"gm_counter\" />","$hits");
+    $hits = str_replace("$i","<img src=\"".$GM_IMAGE_DIR."/".$GM_IMAGES[$i]["digit"]."\" alt=\"".$gm_lang["hit_count"]."\" />","$hits");
 	$hits = '<span dir="ltr">'.$hits.'</span>';
 }
 ?>

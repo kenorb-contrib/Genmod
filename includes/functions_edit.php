@@ -3,7 +3,7 @@
  * Various functions used by the Edit interface
  *
  * Genmod: Genealogy Viewer
- * Copyright (C) 2005 Genmod Development Team
+ * Copyright (C) 2005 - 2008 Genmod Development Team
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,33 +22,26 @@
  * @package Genmod
  * @subpackage Edit
  * @see functions_places.php
- * @version $Id: functions_edit.php,v 1.33 2006/04/30 18:44:15 roland-d Exp $
+ * @version $Id$
  */
 
 if (strstr($_SERVER["SCRIPT_NAME"],"functions")) {
-	print "Now, why would you want to do that.  You're not hacking are you?";
-	exit;
+	require "../intrusion.php";
 }
-
-/**
- * The DEBUG variable allows you to turn on debugging
- * which will write all communication output to the gm log files
- * in the index directory and print other information to the screen.
- * Set this to true to enable debugging,
- * but be sure to set it back to false when you are done debugging.
- * @global boolean $DEBUG
- */
-$DEBUG = false;
 
 $NPFX_accept = array("Adm", "Amb", "Brig", "Can", "Capt", "Chan", "Chapln", "Cmdr", "Col", "Cpl", "Cpt", "Dr", "Gen", "Gov", "Hon", "Lady", "Lt", "Mr", "Mrs", "Ms", "Msgr", "Pfc", "Pres", "Prof", "Pvt", "Rep", "Rev", "Sen", "Sgt", "Sir", "Sr", "Sra", "Srta", "Ven");
 $SPFX_accept = array("al", "da", "de", "den", "dem", "der", "di", "du", "el", "la", "van", "von");
 $NSFX_accept = array("Jr", "Sr", "I", "II", "III", "IV", "MD", "PhD");
 $FILE_FORM_accept = array("avi", "bmp", "gif", "jpeg", "mp3", "ole", "pcx", "tiff", "wav");
-$emptyfacts = array("BIRT","CHR","DEAT","BURI","CREM","ADOP","BAPM","BARM","BASM","BLES","CHRA","CONF","FCOM","ORDN","NATU","EMIG","IMMI","CENS","PROB","WILL","GRAD","RETI","BAPL","CONL","ENDL","SLGC","EVEN","MARR","SLGS","MARL","ANUL","CENS","DIV","DIVF","ENGA","MARB","MARC","MARS","OBJE","CHAN","_SEPR","RESI", "DATA", "MAP");
+// Removed EVEN from empty facts
+$emptyfacts = array("BIRT","CHR","DEAT","BURI","CREM","ADOP","BAPM","BARM","BASM","BLES","CHRA","CONF","FCOM","ORDN","NATU","EMIG","IMMI","CENS","PROB","WILL","GRAD","RETI","BAPL","CONL","ENDL","SLGC","MARR","MARR_CIVIL","MARR_RELIGIOUS","MARR_PARTNERS","MARR_UNKNOWN","SLGS","MARL","ANUL","CENS","DIV","DIVF","ENGA","MARB","MARC","MARS","CHAN","_SEPR","RESI", "DATA", "MAP");
+//$separatorfacts = array("BIRT","CHR","DEAT","BURI","CREM","ADOP","BAPM","BARM","BASM","BLES","CHRA","CONF","FCOM","ORDN","NATU","EMIG","IMMI","CENS","PROB","WILL","GRAD","RETI","BAPL","CONL","ENDL","SLGC","EVEN","MARR","SLGS","MARL","ANUL","CENS","DIV","DIVF","ENGA","MARB","MARC","MARS","CHAN","_SEPR","RESI","MAP","SOUR","REPO","OBJE","SEX","NAME","ASSO","NOTE","EMAIL","TITL");
+$separatorfacts = array("SOUR","REPO","OBJE","ASSO","NOTE","RESN","GNOTE");
 $templefacts = array("SLGC","SLGS","BAPL","ENDL","CONL");
-$nonplacfacts = array("SLGC","SLGS","ENDL");
-$nondatefacts = array("ABBR","ADDR","AFN","AUTH","EMAIL","FAX","NAME","NOTE","OBJE","PHON","PUBL","REPO","SEX","SOUR","TEXT","TITL","WWW","_EMAIL","REFN");
+$nonplacfacts = array("SLGC","SLGS","ENDL","ASSO","RESN");
+$nondatefacts = array("ABBR","ADDR","ASSO","AFN","AUTH","EMAIL","FAX","NAME","NOTE","GNOTE","OBJE","PHON","PUBL","REPO","SEX","SOUR","TEXT","TITL","WWW","_EMAIL","EMAIL","REFN","NCHI","RIN","FILE","FORM","_PRIM","_SSHOW","_TYPE","_SCBK","RESN");
 $typefacts = array();	//-- special facts that go on 2 TYPE lines
+$canhavey_facts = array("MARR","DIV","BIRT","DEAT","CHR","BURI","CREM"); 
 
 /**
  * Replace a gedcom record
@@ -67,10 +60,25 @@ $typefacts = array();	//-- special facts that go on 2 TYPE lines
  * @param		string	$change_type	The name of the change
  * @return 	boolean	true if succeed/false if failed
  */
-function replace_gedrec($gid, $oldrec, $newrec, $fact="", $change_id, $change_type) {
-	global $GEDCOM, $manual_save, $GEDCOMS, $TBLPREFIX, $gm_username;
-	
+function ReplaceGedrec($gid, $oldrec, $newrec, $fact="", $change_id, $change_type, $gedid="") {
+	global $GEDCOM, $manual_save, $GEDCOMS, $TBLPREFIX, $gm_username, $GEDCOMID, $chcache, $can_auto_accept, $DBCONN, $Users, $aa_attempt;
+
+	// NOTE: Check if auto accept is possible. If there are already changes present for any ID in one $change_id, changes cannot be auto accepted.
+	if (!isset($can_auto_accept)) $can_auto_accept = true;
+	if ($can_auto_accept) {
+		if (HasOtherChanges($gid, $change_id)) {
+			// We already have changes for this ID, so we cannot auto accept!
+			$can_auto_accept = false;
+		}
+	}
+	// NOTE: Uppercase the ID to make sure it is consistent
 	$gid = strtoupper($gid);
+	$newrec = preg_replace(array("/(\r\n)+/", "/\r+/", "/\n+/"), array("\r\n", "\r", "\n"), $newrec);
+	$newrec = trim($newrec);
+	// NOTE: Determine which gedcom is being updated
+	if ($gedid == "") $gedid = $GEDCOMID;
+//	else $gedid = $GEDCOMS[$gedid]["id"];
+	
 	//-- the following block of code checks if the XREF was changed in this record.
 	//-- if it was changed we add a warning to the change log
 	$ct = preg_match("/0 @(.*)@/", $newrec, $match);
@@ -78,127 +86,185 @@ function replace_gedrec($gid, $oldrec, $newrec, $fact="", $change_id, $change_ty
 		$oldgid = $gid;
 		$gid = trim($match[1]);
 		if ($oldgid!=$gid) {
-			WriteToLog("Warning: $oldgid was changed to $gid", "W", "G", $GEDCOM);
+			WriteToLog("ReplaceGedrec-> Warning: $oldgid was changed to $gid", "W", "G", get_gedcom_from_id($gedid));
 		}
 	}
 	
 	// NOTE: Check if there are changes present, if so flag pending changes so they cannot be approved
-	if (change_present($gid,true) && ($change_type == "raw_edit" || $change_type == "reorder_families" || $change_type == "reorder_children")) {
-		$sql = "select ch_cid as cid from ".$TBLPREFIX."changes where ch_gid = '".$gid."' and ch_gedfile = '".$GEDCOMS[$GEDCOM]["id"]."' order by ch_cid ASC";
-		$res = dbquery($sql);
-		while($row = $res->fetchRow(DB_FETCHMODE_ASSOC)){
+	if (GetChangeData(true, $gid, true) && ($change_type == "raw_edit" || $change_type == "reorder_families" || $change_type == "reorder_children")) {
+		$sql = "select ch_cid as cid from ".$TBLPREFIX."changes where ch_gid = '".$gid."' and ch_gedfile = '".$gedid."' order by ch_cid ASC";
+		$res = NewQuery($sql);
+		while($row = $res->FetchAssoc()){
 			$sqlcid = "update ".$TBLPREFIX."changes set ch_delete = '1' where ch_cid = '".$row["cid"]."'";
-			$rescid = dbquery($sqlcid);
+			$rescid = NewQuery($sqlcid);
 		}
 	}
+
+	$sql = "INSERT INTO ".$TBLPREFIX."changes (ch_cid, ch_gid, ch_gedfile, ch_type, ch_user, ch_time, ch_fact, ch_old, ch_new)";
+	$sql .= "VALUES ('".$change_id."', '".$gid."', '".$gedid."', '".$change_type."', '".$gm_username."', '".time()."'";
+	$sql .= ", '".$fact."', '".$DBCONN->EscapeQuery($oldrec)."', '".$DBCONN->EscapeQuery($newrec)."')";
+	$res = NewQuery($sql);
 	
-	if (userAutoAccept()) {
-		update_record($newrec);
-	}
-	else {
-		
-		$sql = "INSERT INTO ".$TBLPREFIX."changes (ch_cid, ch_gid, ch_gedfile, ch_type, ch_user, ch_time, ch_fact, ch_old, ch_new)";
-		$sql .= "VALUES ('".$change_id."', '".$gid."', '".$GEDCOMS[$GEDCOM]["id"]."', '".$change_type."', '".$gm_username."', '".time()."'";
-		$sql .= ", '".$fact."', '".mysql_real_escape_string($oldrec)."', '".mysql_real_escape_string($newrec)."')";
-		$res = dbquery($sql);
-	}
-	// if (!isset($manual_save) || ($manual_save==false)) {
-		WriteToLog("Replacing gedcom record $gid ->" . $gm_username ."<-", "I", "G", $GEDCOM);
-		// return write_changes();
-	//}
+	WriteToLog("ReplaceGedrec-> Replacing gedcom record $gid ->" . $gm_username ."<-", "I", "G", get_gedcom_from_id($gedid));
+	// Clear the GetChangeData cache
+	ResetChangeCaches();
 	return true;
 }
 
-//-------------------------------------------- append_gedrec
+//-------------------------------------------- AppendGedrec
 //-- this function will append a new gedcom record at
 //-- the end of the gedcom file.
-function append_gedrec($newrec, $fact="", $change_id, $change_type) {
-	global $GEDCOM, $gm_changes, $manual_save, $TBLPREFIX, $GEDCOMS, $gm_username;
+function AppendGedrec($newrec, $fact="", $change_id, $change_type, $gedid="") {
+	global $GEDCOM, $manual_save, $TBLPREFIX, $GEDCOMS, $gm_username, $GEDCOMID, $chcache, $DBCONN, $Users;
+
+	$newrec = preg_replace(array("/(\r\n)+/", "/\r+/", "/\n+/"), array("\r\n", "\r", "\n"), $newrec);
+	$newrec = stripslashes(trim($newrec));
+	// NOTE: Determine which gedcom is being updated
+	if ($gedid == "") $gedid = $GEDCOMID;
 	
-	$ct = preg_match("/0 @(.*)@ (.*)/", $newrec, $match);
+	$ct = preg_match("/0 @(.*)@\s(\w+)/", $newrec, $match);
 	$type = trim($match[2]);
-	$xref = get_new_xref($type);
+	$xref = GetNewXref($type);
+	$_SESSION["last_used"][$type] = JoinKey($xref, $GEDCOMID);
 	$newrec = preg_replace("/0 @(.*)@/", "0 @$xref@", $newrec);
-	if (userAutoAccept()) update_record($newrec);
-	else {
-		$sql = "INSERT INTO ".$TBLPREFIX."changes (ch_cid, ch_gid, ch_gedfile, ch_type, ch_user, ch_time, ch_fact, ch_new)";
-		$sql .= "VALUES ('".$change_id."', '".$xref."', '".$GEDCOMS[$GEDCOM]["id"]."', '".$change_type."', '".$gm_username."', '".time()."', '".$fact."', '".mysql_real_escape_string($newrec)."')";
-		$res = dbquery($sql);
-	}
-	WriteToLog("Appending new $type record $xref ->" . $gm_username ."<-", "I", "G", $GEDCOM);
+	
+	$sql = "INSERT INTO ".$TBLPREFIX."changes (ch_cid, ch_gid, ch_gedfile, ch_type, ch_user, ch_time, ch_fact, ch_new)";
+	$sql .= "VALUES ('".$change_id."', '".$xref."', '".$gedid."', '".$change_type."', '".$gm_username."', '".time()."', '".$fact."', '".$DBCONN->EscapeQuery($newrec)."')";
+	$res = NewQuery($sql);
+	WriteToLog("AppendGedrec-> Appending new $type record $xref ->" . $gm_username ."<-", "I", "G", get_gedcom_from_id($gedid));
+
+	// Clear the GetChangeData cache
+	ResetChangeCaches();
 	return $xref;
 }
 
 //-------------------------------------------- delete_gedrec
 //-- this function will delete the gedcom record with
 //-- the given $gid
-function delete_gedrec($gid, $change_id, $change_type) {
-	global $GEDCOMS, $GEDCOM, $manual_save, $TBLPREFIX, $gm_username;
-	
+function DeleteGedrec($gid, $change_id, $change_type) {
+	global $GEDCOMS, $GEDCOM, $manual_save, $TBLPREFIX, $gm_username, $GEDCOMID, $chcache, $can_auto_accept, $DBCONN, $Users, $aa_attempt;
 	$gid = strtoupper($gid);
 	
-	// NOTE: Check if there are changes present, if so flag pending changes so they cannot be approved
-	if (change_present($gid,true)) {
-		$sql = "select ch_cid as cid from ".$TBLPREFIX."changes where ch_gid = '".$gid."' and ch_gedfile = '".$GEDCOMS[$GEDCOM]["id"]."' order by ch_cid ASC";
-		$res = dbquery($sql);
-		while($row = $res->fetchRow(DB_FETCHMODE_ASSOC)){
-			$sqlcid = "update ".$TBLPREFIX."changes set ch_delete = '1' where ch_cid = '".$row["cid"]."'";
-			$rescid = dbquery($sqlcid);
+	// NOTE: Check if auto accept is possible. If there are already changes present for any ID in one $change_id, changes cannot be auto accepted.
+	if ($can_auto_accept) {
+		if (HasOtherChanges($gid, $change_id)) {
+			// We already have changes for this ID, so we cannot auto accept!
+			$can_auto_accept = false;
 		}
+	}
+	// NOTE: Check if there are changes present, if so flag pending changes so they cannot be approved
+	if (GetChangeData(true, $gid, true)) {
+		$sql = "SELECT ch_cid AS cid FROM ".$TBLPREFIX."changes WHERE ch_gid = '".$gid."' AND ch_gedfile = '".$GEDCOMID."' ORDER BY ch_cid ASC";
+		$res = NewQuery($sql);
+		while($row = $res->FetchAssoc()){
+			$sqlcid = "UPDATE ".$TBLPREFIX."changes SET ch_delete = '1' WHERE ch_cid = '".$row["cid"]."'";
+			$rescid = NewQuery($sqlcid);
+		}
+		// Clear the GetChangeData cache
+		ResetChangeCaches();
 	}
 	
 	// NOTE Check if record exists in the database
-	if (!find_gedcom_record($gid)) {
-		print "ERROR 4: Could not find gedcom record with xref: $gid. <br />";
-		WriteToLog("ERROR 4: Could not find gedcom record with xref: $gid ->" . $gm_username ."<-", "E", "G", $GEDCOM);
+	if (!FindGedcomRecord($gid) && !GetChangeData(true, $gid, true)) {
+		print "DeleteGedrec-> Could not find gedcom record with xref: $gid. <br />";
+		WriteToLog("DeleteGedrec-> Could not find gedcom record with xref: $gid ->" . $gm_username ."<-", "E", "G", $GEDCOM);
 		return false;
 	}
 	else {
-		if (userAutoAccept()) {
-			update_record($undo, true);
+		$rec = GetChangeData(false, $gid, true, "gedlines","");
+		if (isset($rec[$GEDCOM][$gid])) $oldrec = $rec[$GEDCOM][$gid];
+		else $oldrec = FindGedcomRecord($gid);
+		$ct = preg_match("/0 @.*@\s(\w+)\s/", $oldrec, $match);
+		$ch_fact = $match[1];
+		$sql = "INSERT INTO ".$TBLPREFIX."changes (ch_cid, ch_gid, ch_fact, ch_old, ch_gedfile, ch_type, ch_user, ch_time)";
+		$sql .= "VALUES ('".$change_id."', '".$gid."', '".$ch_fact."', '".$DBCONN->EscapeQuery($oldrec)."', '".$GEDCOMID."', '".$change_type."', '".$gm_username."', '".time()."')";
+		$res = NewQuery($sql);
+		// Also delete the asso recs to an indi, to preserve referential integrity
+		if ($ch_fact == "INDI" || $ch_fact == "FAM") {
+			$assos = GetAssoList($ch_fact, $gid);
+			foreach ($assos as $p1key => $pidassos) {
+				foreach ($pidassos as $nothing =>$asso) {
+					$pid1 = SplitKey($p1key, "id");
+					$pid2 = SplitKey($asso["pid2"], "id");
+					$arec = GetChangeData(false, $pid2, true, "gedlines","");
+					if (isset($rec[$GEDCOM][$pid2])) $arec = $rec[$GEDCOM][$pid2];
+					else $arec = FindGedcomRecord($pid2);
+					if (strstr($arec, "1 ASSO")) {
+						$i = 1;
+						do {
+							$asubrec = GetSubrecord(1, "1 ASSO @".$pid1."@", $arec, $i);
+							if (!empty($asubrec)) {
+								$sql = "INSERT INTO ".$TBLPREFIX."changes (ch_cid, ch_gid, ch_fact, ch_old, ch_gedfile, ch_type, ch_user, ch_time)";
+								$sql .= "VALUES ('".$change_id."', '".$pid2."', 'ASSO', '".$DBCONN->EscapeQuery($asubrec)."', '".$GEDCOMID."', '".$change_type."', '".$gm_username."', '".time()."')";
+							}
+							$i++;
+						} while (!empty($asubrec));
+					}
+					if (strstr($arec, "2 ASSO")) {
+						$recs = GetAllSubrecords($arec, "CHAN", false, false, false);
+						foreach ($recs as $sub => $subrec) {
+							if (preg_match("/\n2 ASSO @$pid1@/", $subrec, $match)) {
+								$asubrec = GetSubrecord(2, "2 ASSO @".$pid1."@", $subrec);
+								$newsubrec = preg_replace($asubrec, "", $subrec);
+								$sql = "INSERT INTO ".$TBLPREFIX."changes (ch_cid, ch_gid, ch_fact, ch_old, ch_new, ch_gedfile, ch_type, ch_user, ch_time)";
+								$sql .= "VALUES ('".$change_id."', '".$pid2."', 'ASSO', '".$DBCONN->EscapeQuery($subrec)."', '".$DBCONN->EscapeQuery($newsubrec)."', '".$GEDCOMID."', '".$change_type."', '".$gm_username."', '".time()."')";
+							}
+						}
+					}
+				}
+			}
 		}
-		else {
-			$sql = "INSERT INTO ".$TBLPREFIX."changes (ch_cid, ch_gid, ch_gedfile, ch_type, ch_user, ch_time)";
-			$sql .= "VALUES ('".$change_id."', '".$gid."', '".$GEDCOMS[$GEDCOM]["id"]."', '".$change_type."', '".$gm_username."', '".time()."')";
-			$res = dbquery($sql);
-		}
+					
+			
 	}
-	WriteToLog("Deleting gedcom record $gid ->" . $gm_username ."<-", "I", "G", $GEDCOM);
-	//if (!isset($manual_save)) return write_changes();
+	WriteToLog("DeleteGedrec-> Deleting gedcom record $gid ->" . $gm_username ."<-", "I", "G", $GEDCOM);
+	// Clear the GetChangeData cache
+	ResetChangeCaches();
 	return true;
 }
 
 //-------------------------------------------- check_gedcom
 //-- this function will check a GEDCOM record for valid gedcom format
-function check_gedcom($gedrec, $chan=true) {
+function CheckGedcom($gedrec, $chan=true, $user="", $tstamp="") {
 	global $gm_lang, $DEBUG, $GEDCOM, $gm_username;
 
 	$gedrec = stripslashes($gedrec);
 	$ct = preg_match("/0 @(.*)@ (.*)/", $gedrec, $match);
 	
 	if ($ct==0) {
-		print "ERROR 20: Invalid GEDCOM 5.5 format.\n";
-		WriteToLog("ERROR 20: Invalid GEDCOM 5.5 format.->" . $gm_username ."<-", "I", "G", $GEDCOM);
-		if ($GLOBALS["DEBUG"]) print "<pre>$gedrec</pre>\n";
-		return false;
+		$ct2 = preg_match("/0 HEAD/", $gedrec, $match2);
+		if ($ct2 == 0) {
+			print "CheckGedcom-> Invalid GEDCOM 5.5 format.\n";
+			WriteToLog("CheckGedcom-> Invalid GEDCOM 5.5 format.->" . $gm_username ."<-", "I", "G", $GEDCOM);
+			return false;
+		}
 	}
 	$gedrec = trim($gedrec);
 	if ($chan) {
+		if(empty($user)) $user = $gm_username;
+		if (!empty($tstamp)) {
+			$newd = date("d M Y", $tstamp);
+			$newt = date("H:i:s", $tstamp);
+		}
+		else {
+			$newd = date("d M Y");
+			$newt = date("H:i:s");
+		}
 		$pos1 = strpos($gedrec, "1 CHAN");
 		if ($pos1!==false) {
 			$pos2 = strpos($gedrec, "\n1", $pos1+4);
 			if ($pos2===false) $pos2 = strlen($gedrec);
 			$newgedrec = substr($gedrec, 0, $pos1);
-			$newgedrec .= "1 CHAN\r\n2 DATE ".date("d M Y")."\r\n";
-			$newgedrec .= "3 TIME ".date("H:i:s")."\r\n";
-			$newgedrec .= "2 _GMU ".$gm_username."\r\n";
+			$newgedrec .= "1 CHAN\r\n2 DATE ".$newd."\r\n";
+			$newgedrec .= "3 TIME ".$newt."\r\n";
+			$newgedrec .= "2 _GMU ".$user."\r\n";
 			$newgedrec .= substr($gedrec, $pos2);
 			$gedrec = $newgedrec;
 		}
-		else {
-			$newgedrec = "\r\n1 CHAN\r\n2 DATE ".date("d M Y")."\r\n";
-			$newgedrec .= "3 TIME ".date("H:i:s")."\r\n";
-			$newgedrec .= "2 _GMU ".$gm_username;
+		else if (!isset($ct2)) {
+			$newgedrec = "\r\n1 CHAN\r\n2 DATE ".$newd."\r\n";
+			$newgedrec .= "3 TIME ".$newt."\r\n";
+			$newgedrec .= "2 _GMU ".$user;
 			$gedrec .= $newgedrec;
 		}
 	}
@@ -214,40 +280,66 @@ function check_gedcom($gedrec, $chan=true) {
  * @param string $namerec		the name subrecord when editing a name
  * @param string $famtag		how the new person is added to the family
  */
-function print_indi_form($nextaction, $famid, $linenum="", $namerec="", $famtag="CHIL") {
+function PrintIndiForm($nextaction, $famid, $linenum="", $namerec="", $famtag="CHIL") {
 	global $gm_lang, $factarray, $pid, $GM_IMAGE_DIR, $GM_IMAGES, $monthtonum, $WORD_WRAPPED_NOTES;
 	global $NPFX_accept, $SPFX_accept, $NSFX_accept, $FILE_FORM_accept, $USE_RTL_FUNCTIONS, $change_type;
+	global $GEDCOM, $gm_username, $Users;
 
 	init_calendar_popup();
-	print "<form method=\"post\" name=\"addchildform\" onsubmit=\"return checkform();\">\n";
+	print "<form method=\"post\" name=\"addchildform\" action=\"edit_interface.php\">\n";
 	print "<input type=\"hidden\" name=\"action\" value=\"".$nextaction."\" />\n";
 	print "<input type=\"hidden\" name=\"famid\" value=\"".$famid."\" />\n";
 	print "<input type=\"hidden\" name=\"pid\" value=\"".$pid."\" />\n";
 	print "<input type=\"hidden\" name=\"change_type\" value=\"".$change_type."\" />\n";
 	print "<input type=\"hidden\" name=\"famtag\" value=\"".$famtag."\" />\n";
 	print "<table class=\"facts_table\">";
-
+	
 	// preset child/father SURN
 	$surn = "";
 	if (empty($namerec)) {
 		$indirec = "";
 		if ($famtag=="CHIL" and $nextaction=="addchildaction") {
-			$famrec = find_family_record($famid);
-			if (empty($famrec)) $famrec = find_gedcom_record($famid);
-			$parents = find_parents_in_record($famrec);
-			$indirec = find_person_record($parents["HUSB"]);
+			if (!empty($famid) && GetChangeData(true, $famid, true, "", "FAM")) {
+				$rec = GetChangeData(false, $famid, true, "gedlines", "FAM");
+				$famrec = $rec[$GEDCOM][$famid];
+			}
+			else $famrec = FindGedcomRecord($famid);
+			$parents = FindParentsInRecord($famrec);
+			if (!empty($famid) && !empty($parents["HUSB"]) && GetChangeData(true, $parents["HUSB"], true, "", "INDI")) {
+				$rec = GetChangeData(false, $parents["HUSB"], true, "gedlines", "INDI");
+				$indirec = $rec[$GEDCOM][$parents["HUSB"]];
+			}
+			else $indirec = FindPersonRecord($parents["HUSB"]);
 		}
 		if ($famtag=="HUSB" and $nextaction=="addnewparentaction") {
-			$indirec = find_person_record($pid);
+			$famrec = FindGedcomRecord($famid);
+			$parents = FindParentsInRecord($famrec);
+			if (!empty($parents["HUSB"]) && GetChangeData(true, $parents["HUSB"], true, "", "INDI")) {
+				$rec = GetChangeData(false, $parents["HUSB"], true, "gedlines", "INDI");
+				$indirec = $rec[$GEDCOM][$parents["HUSB"]];
+			}
+			else $indirec = FindPersonRecord($parents["HUSB"]);
 		}
-		$nt = preg_match("/\d SURN (.*)/", $indirec, $ntmatch);
-		if ($nt) $surn = $ntmatch[1];
-		else {
+		if ($famtag=="WIFE" and $nextaction=="addnewparentaction") {
+			$famrec = FindGedcomRecord($famid);
+			$parents = FindParentsInRecord($famrec);
+			if (!empty($parents["WIFE"]) && GetChangeData(true, $parents["WIFE"], true, "", "INDI")) {
+				$rec = GetChangeData(false, $parents["WIFE"], true, "gedlines", "INDI");
+				$indirec = $rec[$GEDCOM][$parents["WIFE"]];
+			}
+			else $indirec = FindPersonRecord($parents["WIFE"]);
+		}
+		// If the surname is split in SPFX and SURN we get the wrong surname. So, as NAME is most reliable
+		// we get it from there
+//		$nt = preg_match("/\d SURN (.*)/", $indirec, $ntmatch);
+//		if ($nt) $surn = $ntmatch[1];
+//		else {
 			$nt = preg_match("/1 NAME (.*)[\/](.*)[\/]/", $indirec, $ntmatch);
 			if ($nt) $surn = $ntmatch[2];
-		}
+//		}
 		if ($surn) $namerec = "1 NAME  /".trim($surn,"\r\n")."/";
 	}
+	AddTagSeparator("NAME");
 	// handle PAF extra NPFX [ 961860 ]
 	$nt = preg_match("/\d NPFX (.*)/", $namerec, $nmatch);
 	$npfx=trim(@$nmatch[1]);
@@ -255,67 +347,89 @@ function print_indi_form($nextaction, $famid, $linenum="", $namerec="", $famtag=
 	$nt = preg_match("/\d NAME (.*)/", $namerec, $nmatch);
 	$name=@$nmatch[1];
 	if (strlen($npfx) and strpos($name, $npfx)===false) $name = $npfx." ".$name;
-	add_simple_tag("0 NAME ".$name);
+	AddSimpleTag("0 NAME ".$name);
 	// 2 NPFX
-	add_simple_tag("0 NPFX ".$npfx);
+	AddSimpleTag("0 NPFX ".$npfx);
 	// 2 GIVN
+	// Start input field is here
 	$nt = preg_match("/\d GIVN (.*)/", $namerec, $nmatch);
-	add_simple_tag("0 GIVN ".@$nmatch[1]);
+	$focusfld = AddSimpleTag("0 GIVN ".@$nmatch[1]);
 	// 2 NICK
 	$nt = preg_match("/\d NICK (.*)/", $namerec, $nmatch);
-	add_simple_tag("0 NICK ".@$nmatch[1]);
+	AddSimpleTag("0 NICK ".@$nmatch[1]);
 	// 2 SPFX
 	$nt = preg_match("/\d SPFX (.*)/", $namerec, $nmatch);
-	add_simple_tag("0 SPFX ".@$nmatch[1]);
+	AddSimpleTag("0 SPFX ".@$nmatch[1]);
 	// 2 SURN
 	$nt = preg_match("/\d SURN (.*)/", $namerec, $nmatch);
-	add_simple_tag("0 SURN ".@$nmatch[1]);
+	AddSimpleTag("0 SURN ".@$nmatch[1]);
 	// 2 NSFX
 	$nt = preg_match("/\d NSFX (.*)/", $namerec, $nmatch);
-	add_simple_tag("0 NSFX ".@$nmatch[1]);
+	AddSimpleTag("0 NSFX ".@$nmatch[1]);
 	// 2 _HEB
 	$nt = preg_match("/\d _HEB (.*)/", $namerec, $nmatch);
 	if ($nt>0 || $USE_RTL_FUNCTIONS) {
-		add_simple_tag("0 _HEB ".@$nmatch[1]);
+		AddSimpleTag("0 _HEB ".@$nmatch[1]);
 	}
 	// 2 ROMN
 	$nt = preg_match("/\d ROMN (.*)/", $namerec, $nmatch);
-	add_simple_tag("0 ROMN ".@$nmatch[1]);
+	AddSimpleTag("0 ROMN ".@$nmatch[1]);
 
 	if ($surn) $namerec = ""; // reset if modified
 
 	if (empty($namerec)) {
 		// 2 _MARNM
-		add_simple_tag("0 _MARNM");
+		AddSimpleTag("0 _MARNM");
 		// 1 SEX
-		if ($famtag=="HUSB") add_simple_tag("0 SEX M");
-		else if ($famtag=="WIFE") add_simple_tag("0 SEX F");
-		else add_simple_tag("0 SEX");
+		AddTagSeparator("SEX");
+		if ($famtag=="HUSB") AddSimpleTag("0 SEX M");
+		else if ($famtag=="WIFE") AddSimpleTag("0 SEX F");
+		else AddSimpleTag("0 SEX");
 		// 1 BIRT
 		// 2 DATE
 		// 2 PLAC
-		add_simple_tag("0 BIRT");
-		add_simple_tag("0 DATE", "BIRT");
-		add_simple_tag("0 PLAC", "BIRT");
+		AddTagSeparator("BIRT");
+		AddSimpleTag("0 BIRT");
+		AddSimpleTag("0 DATE", "BIRT");
+		AddSimpleTag("0 TIME", "BIRT");
+		AddSimpleTag("0 PLAC", "BIRT");
+		// 1 CHR
+		// 2 DATE
+		// 2 PLAC
+		AddTagSeparator("CHR");
+		AddSimpleTag("0 CHR");
+		AddSimpleTag("0 DATE", "CHR");
+		AddSimpleTag("0 TIME", "CHR");
+		AddSimpleTag("0 PLAC", "CHR");
 		// 1 DEAT
 		// 2 DATE
 		// 2 PLAC
-		add_simple_tag("0 DEAT");
-		add_simple_tag("0 DATE", "DEAT");
-		add_simple_tag("0 PLAC", "DEAT");
-		print "</table>\n";
+		AddTagSeparator("DEAT");
+		AddSimpleTag("0 DEAT");
+		AddSimpleTag("0 DATE", "DEAT");
+		AddSimpleTag("0 TIME", "DEAT");
+		AddSimpleTag("0 PLAC", "DEAT");
+		// print $famtag." ".$nextaction;
+//		if (($famtag=="CHIL" and $nextaction=="addchildaction") || (($famtag == "HUSB" || $famtag == "WIFE") && $nextaction == "addnewparentaction")) 
+		if ($famtag=="CHIL" and $nextaction=="addchildaction" and !empty($famid)) {
+			AddTagSeparator("PEDI");
+			AddSimpleTag("0 PEDI");
+		}
 		//-- if adding a spouse add the option to add a marriage fact to the new family
 		if ($nextaction=='addspouseaction' || ($nextaction=='addnewparentaction' && $famid!='new')) {
-			print "<br />\n";
-			print "<table class=\"facts_table\">";
-			add_simple_tag("0 MARR");
-			add_simple_tag("0 DATE", "MARR");
-			add_simple_tag("0 PLAC", "MARR");
-			print "</table>\n";
+			print "\n";
+			AddTagSeparator("MARR");
+			AddSimpleTag("0 MARR");
+			AddSimpleTag("0 DATE", "MARR");
+			AddSimpleTag("0 PLAC", "MARR");
 		}
-		print_add_layer("SOUR", 1);
-		print_add_layer("NOTE", 1);
-		print_add_layer("OBJE", 1);
+		print "</table>\n";
+		PrintAddLayer("SOUR", 1, true);
+		PrintAddLayer("OBJE", 1);
+		PrintAddLayer("NOTE", 1);
+		PrintAddLayer("GNOTE", 1);
+//		print "<input type=\"checkbox\" name=\"addsource\" />".$gm_lang["add_source_to_fact"]."<br />\n";
+		if ($Users->UserCanAccept($gm_username) && !$Users->userAutoAccept($gm_username)) print "<br /><input name=\"aa_attempt\" type=\"checkbox\" value=\"1\" />".$gm_lang["attempt_auto_acc"]."<br /><br />\n";
 		print "<input type=\"submit\" value=\"".$gm_lang["save"]."\" /><br />\n";
 	}
 	else {
@@ -344,7 +458,7 @@ function print_indi_form($nextaction, $famid, $linenum="", $namerec="", $famtag=
 						$text .= $cmatch[2];
 						$i++;
 					}
-					add_simple_tag($level." ".$type." ".$text);
+					AddSimpleTag($level." ".$type." ".$text);
 				}
 				$tags[]=$type;
 				$i++;
@@ -356,14 +470,18 @@ function print_indi_form($nextaction, $famid, $linenum="", $namerec="", $famtag=
 			} while (($level>$glevel)&&($i<count($gedlines)));
 		}
 		// 2 _MARNM
-		add_simple_tag("0 _MARNM");
+		AddSimpleTag("0 _MARNM");
 		print "</tr>\n";
 		print "</table>\n";
-		print_add_layer("SOUR");
-		print_add_layer("NOTE");
-		print "<input type=\"submit\" value=\"".$gm_lang["save"]."\" /><br />\n";
+		PrintAddLayer("SOUR");
+		PrintAddLayer("NOTE");
+		PrintAddLayer("GNOTE");
+//		print "<input type=\"submit\" value=\"".$gm_lang["save"]."\" /><br />\n";
+		if ($Users->UserCanAccept($gm_username) && !$Users->userAutoAccept($gm_username)) print "<br /><input name=\"aa_attempt\" type=\"checkbox\" value=\"1\" />".$gm_lang["attempt_auto_acc"]."<br /><br />\n";
+		print "<input type=\"button\" value=\"".$gm_lang["save"]."\" onclick=\"document.addchildform.submit(); return false;\"/><br />\n";
 	}
 	print "</form>\n";
+	if ($nextaction != "update") print "<br /><div id=\"show_ids\"><a href=\"javascript: ".$gm_lang["show_next_id"]."\" onclick=\"sndReq('show_ids', 'getnextids'); return false;\">".$gm_lang["show_next_id"]."</a></div>";
 	?>
 	<script type="text/javascript" src="autocomplete.js"></script>
 	<script type="text/javascript">
@@ -485,7 +603,7 @@ function print_indi_form($nextaction, $famid, $linenum="", $namerec="", $famtag=
 	</script>
 	<?php
 	// force name expand on form load (maybe optional in a further release...)
-	print "<script type='text/javascript'>togglename();</script>";
+	print "<script type='text/javascript'>togglename(); document.getElementById('".$focusfld."').focus();</script>";
 }
 
 /**
@@ -494,7 +612,7 @@ function print_indi_form($nextaction, $famid, $linenum="", $namerec="", $famtag=
  * @param string id		form text element id where to return date value
  * @see init_calendar_popup()
  */
-function print_calendar_popup($id) {
+function PrintCalendarPopup($id) {
 	global $gm_lang, $GM_IMAGE_DIR, $GM_IMAGES;
 
 	// calendar button
@@ -506,6 +624,19 @@ function print_calendar_popup($id) {
 	print "</a>\n";
 	print "<div id=\"caldiv".$id."\" style=\"position:absolute;visibility:hidden;background-color:white;layer-background-color:white;\"></div>\n";
 }
+
+function AddTagSeparator($fact="") {
+	global $factarray, $gm_lang;
+	
+	print "<tr><td colspan=\"2\" class=\"shade3 center\">";
+	if(!empty($fact)) {
+		if (isset($gm_lang[$fact])) print $gm_lang[$fact];
+		else if (isset($factarray[$fact])) print $factarray[$fact];
+		else print $fact;
+	}
+	print "</td></tr>";
+}
+
 
 /**
  * add a new tag input field
@@ -521,22 +652,19 @@ function print_calendar_popup($id) {
  * @param string $tag			fact record to edit (eg 2 DATE xxxxx)
  * @param string $upperlevel	optional upper level tag (eg BIRT)
  */
-function add_simple_tag($tag, $upperlevel="") {
+function AddSimpleTag($tag, $upperlevel="", $tab="1") {
 	global $factarray, $gm_lang, $GM_IMAGE_DIR, $GM_IMAGES, $MEDIA_DIRECTORY, $TEMPLE_CODES, $STATUS_CODES, $REPO_ID_PREFIX, $SPLIT_PLACES;
-	global $assorela, $tags, $emptyfacts, $TEXT_DIRECTION, $confighelpfile, $GM_BASE_DIRECTORY;
-	global $NPFX_accept, $SPFX_accept, $NSFX_accept, $FILE_FORM_accept, $upload_count;
+	global $assorela, $tags, $emptyfacts, $TEXT_DIRECTION, $confighelpfile, $GM_BASE_DIRECTORY, $GEDCOM, $GEDCOMID;
+	global $NPFX_accept, $SPFX_accept, $NSFX_accept, $FILE_FORM_accept, $upload_count, $separatorfacts, $canhavey_facts;
 	static $tabkey;
-
-	if (!isset($tabkey)) $tabkey = 1;
-
-	// Work around for $emptyfacts being mysteriously unset
-	// if (empty($emptyfacts))
-     	// $emptyfacts = array("BIRT","CHR","DEAT","BURI","CREM","ADOP","BAPM","BARM","BASM","BLES","CHRA","CONF","FCOM","ORDN","NATU","EMIG","IMMI","CENS","PROB","WILL","GRAD","RETI","BAPL","CONL","ENDL","SLGC","EVEN","MARR","SLGS","MARL","ANUL","CENS","DIV","DIVF","ENGA","MARB","MARC","MARS","OBJE","CHAN","_SEPR","RESI", "DATA", "MAP");
+	if (!isset($tabkey)) $tabkey = $tab;
+	
+	@list($level, $fact, $value) = explode(" ", $tag);
+// 	print "adding ".$tag." at level ".$level." upperlevel ".$upperlevel.", fact is ". $fact." value is ".nl2br($value)."<br />";
 
 	$largetextfacts = array("TEXT","PUBL","NOTE");
 	$subnamefacts = array("NPFX", "GIVN", "NICK", "SPFX", "SURN", "NSFX");
 
-	@list($level, $fact, $value) = explode(" ", $tag);
 
 	// element name : used to POST data
 	if ($upperlevel) $element_name=$upperlevel."_".$fact; // ex: BIRT_DATE | DEAT_DATE | ...
@@ -550,68 +678,71 @@ function add_simple_tag($tag, $upperlevel="") {
 
 	// field value
 	$islink = (substr($value,0,1)=="@" && substr($value,0,2)!="@#");
-	if ($islink) $value=trim($value, " @");
-	else $value=trim(substr($tag, strlen($fact)+3));
+	if ($islink) {
+		$value=trim(trim($value), "@");
+	}
+	else $value = rtrim(substr($tag, strlen($fact)+3));
 	
 	// rows & cols
 	$rows=1;
 	$cols=60;
 	if ($islink) $cols=10;
-	if ($fact=="FORM") $cols=5;
-	if ($fact=="DATE" or $fact=="TIME" or $fact=="TYPE") $cols=20;
-	if ($fact=="LATI" or $fact=="LONG") $cols=12;
-	if (in_array($fact, $subnamefacts)) $cols=25;
-	if (in_array($fact, $largetextfacts)) { $rows=10; $cols=70; }
-	if ($fact=="ADDR") $rows=5;
-	if ($fact=="REPO") $cols = strlen($REPO_ID_PREFIX) + 4;
+	else if ($fact=="NCHI" || $fact == "NMR") $cols=3;
+	else if ($fact=="FORM") $cols=5;
+	else if ($fact=="DATE" or $fact=="TIME" or $fact=="TYPE" or $fact=="PEDI") $cols=20;
+	else if ($fact=="LATI" or $fact=="LONG") $cols=12;
+	else if (in_array($fact, $subnamefacts)) $cols=25;
+	else if (in_array($fact, $largetextfacts)) { $rows=10; $cols=70; }
+	else if ($fact=="ADDR") $rows=5;
+	else if ($fact=="REPO") $cols = strlen($REPO_ID_PREFIX) + 4;
 
 	// label
+	if (in_array($fact, $separatorfacts) && $level <= 2) AddTagSeparator($fact, $islink);
 	$style="";
 	print "<tr id=\"".$element_id."_tr\" ";
 	if (in_array($fact, $subnamefacts)) print " style=\"display:none;\""; // hide subname facts
 	print " >\n";
-	print "<td class=\"shade2 $TEXT_DIRECTION\">";
-	// help link
-	if (!in_array($fact, $emptyfacts)) {
+	// NOTE: Help link
+	if (!in_array($fact, $emptyfacts) || in_array($fact, $canhavey_facts)) {
+		print "<td class=\"shade2 $TEXT_DIRECTION\">";
 		if ($fact=="DATE") print_help_link("def_gedcom_date_help", "qm", "date");
 		else if ($fact=="RESN") print_help_link($fact."_help", "qm");
 		else print_help_link("edit_".$fact."_help", "qm");
+		if (isset($gm_lang[$fact])) print $gm_lang[$fact];
+		else if (isset($factarray[$fact])) print $factarray[$fact];
+		else print $fact;
+		print "\n";
+		print "\n</td>";
 	}
-	if ($GLOBALS["DEBUG"]) print $element_name."<br />\n";
-	if (isset($gm_lang[$fact])) print $gm_lang[$fact];
-	else if (isset($factarray[$fact])) print $factarray[$fact];
-	else print $fact;
-	print "\n";
 	
-	// tag level
+	// NOTE: Tag level
 	if ($level>0) {
-		if ($fact=="TEXT") {
-			print "<input type=\"hidden\" name=\"glevels[]\" value=\"".($level-1)."\" />";
-			print "<input type=\"hidden\" name=\"islink[]\" value=\"0\" />";
-			print "<input type=\"hidden\" name=\"tag[]\" value=\"DATA\" />";
-			print "<input type=\"hidden\" name=\"text[]\" value=\" \" />";
-		}
 		print "<input type=\"hidden\" name=\"glevels[]\" value=\"".$level."\" />\n";
 		print "<input type=\"hidden\" name=\"islink[]\" value=\"".($islink)."\" />\n";
 		print "<input type=\"hidden\" name=\"tag[]\" value=\"".$fact."\" />\n";
 	}
-	print "\n</td>";
 	
-	// value
-	print "<td class=\"shade1\">\n";
-	
-	// retrieve linked NOTE
-	if ($fact=="NOTE" && $islink) {
-		$noteid = $value;
-		print "<input type=\"hidden\" name=\"text[]\" value=\"".$noteid."\" />\n";
-		$noterec = find_gedcom_record($noteid);
-		$nt = preg_match("/0 @$value@ NOTE (.*)/", $noterec, $n1match);
-		if ($nt!==false) $value=trim(strip_tags(@$n1match[1].get_cont(1, $noterec)));
-		$element_name="NOTE[".$noteid."]";
-	}
-	if (in_array($fact, $emptyfacts) && empty($value)) {
+	// NOTE: value
+	if (!in_array($fact, $emptyfacts) || in_array($fact, $canhavey_facts)) print "<td class=\"shade1\">\n";
+	// NOTE: Retrieve linked NOTE
+	// we must disable editing for this field if the note already has changes.
+	$disable_edit = false;
+	if(in_array($fact, $emptyfacts) && !in_array($fact, $canhavey_facts)) print "<input type=\"hidden\" name=\"text[]\" value=\"\" />\n"; 
+	if (in_array($fact, $canhavey_facts)&& (empty($value) || $value=="y" || $value=="Y")) {
+		$value = strtoupper($value);
+		//-- don't default anything to Y when adding events through people
+		//-- default to Y when specifically adding one of these events
+		if ($level==1) $value="Y"; // default YES
 		print "<input type=\"hidden\" id=\"".$element_id."\" name=\"".$element_name."\" value=\"".$value."\" />";
+		if ($level<=1) {
+			print "<input type=\"checkbox\" tabindex=\"".$tabkey."\"";
+			$tabkey++;
+			if ($value=="Y") print " checked=\"checked\"";
+			print " onClick=\"if (this.checked) ".$element_id.".value='Y'; else ".$element_id.".value=''; \" />";
+			print $gm_lang["yes"];
+		}
 	}
+	// Added
 	else if ($fact=="TEMP") {
 		print "<select tabindex=\"".$tabkey."\" name=\"".$element_name."\" >\n";
 		print "<option value=''>".$gm_lang["no_temple"]."</option>\n";
@@ -645,29 +776,17 @@ function add_simple_tag($tag, $upperlevel="") {
 		print "</select>\n";
 	}
 	else if ($fact=="RESN") {
-		?>
-		<script type="text/javascript">
-		<!--
-		function update_RESN(resn_val) {
-			if (resn_val=='none') resn_val='';
-			document.getElementById("<?php print $element_id?>").value=resn_val;	
-		}
-		//-->
-		</script>
-		<?php
-		print "<input type=\"hidden\" id=\"".$element_id."\" name=\"".$element_name."\" />\n";
 		print "<table><tr valign=\"top\">\n";
 		foreach (array("none", "locked", "privacy", "confidential") as $resn_index => $resn_val) {
 			if ($resn_val=="none") $resnv=""; else $resnv=$resn_val;
-			print "<td><input tabindex=\"".$tabkey."\" type=\"radio\" name=\"RESN_radio\"  onclick=\"update_RESN('".$resn_val."')\"";
-			print " value=\"".$resnv."\"";
+			print "<td><input tabindex=\"".$tabkey."\" type=\"radio\" id=\"".$element_id."\" name=\"".$element_name."\" value=\"".$resnv."\"";
 			if ($value==$resnv) print " checked=\"checked\"";
 			print " /><small>".$gm_lang[$resn_val]."</small>";
 			print "</td>\n";
 		}
 		print "</tr></table>\n";
 	}
-	else if ($fact=="_PRIM" or $fact=="_THUM") {
+	else if ($fact=="_PRIM" or $fact=="_THUM" or $fact=="_SSHOW" or $fact=="_SCBK") {
 		print "<select tabindex=\"".$tabkey."\" id=\"".$element_id."\" name=\"".$element_name."\" >\n";
 		print "<option value=\"\"></option>\n";
 		print "<option value=\"Y\"";
@@ -686,6 +805,27 @@ function add_simple_tag($tag, $upperlevel="") {
 		print ">".$gm_lang["female"]."</option>\n<option value=\"U\"";
 		if ($value=="U" || empty($value)) print " selected=\"selected\"";
 		print ">".$gm_lang["unknown"]."</option>\n</select>\n";
+	}
+	else if ($fact=="PEDI") {
+		print "<select tabindex=\"".$tabkey."\" id=\"".$element_id."\" name=\"".$element_name."\">\n";
+		
+		print "<option value=\"birth\"";
+		if ($value=="birth") print " selected=\"selected\"";
+		print ">".$gm_lang["biological"]."</option>\n";
+		
+		print "<option value=\"adopted\"";
+		if ($value=="adopted") print " selected=\"selected\"";
+		print ">".$gm_lang["adopted"]."</option>\n";
+
+		print "<option value=\"foster\"";
+		if ($value=="foster") print " selected=\"selected\"";
+		print ">".$gm_lang["foster"]."</option>\n";
+		
+		print "<option value=\"sealing\"";
+		if ($value=="sealing") print " selected=\"selected\"";
+		print ">".$gm_lang["sealing"]."</option>\n";
+		
+		print "</select>\n";
 	}
 	else if ($fact == "TYPE" && $level == '3') {?>
 		<select name="text[]">
@@ -720,19 +860,36 @@ function add_simple_tag($tag, $upperlevel="") {
 	}
 	else {
 		// textarea
-		if ($rows>1) print "<textarea tabindex=\"".$tabkey."\" id=\"".$element_id."\" name=\"".$element_name."\" rows=\"".$rows."\" cols=\"".$cols."\">".$value."</textarea>\n";
+		if ($rows>1 && !($fact == "NOTE" && $islink)) {
+			if ($disable_edit) {
+				print "<textarea tabindex=\"".$tabkey."\" rows=\"".$rows."\" cols=\"".$cols."\" disabled=\"disabled\">".$value."</textarea>\n";
+				print "<input type=\"hidden\" id=\"".$element_id."\" name=\"".$element_name."\" value=\"".$value."\" />";
+			}
+			else {
+				// The \n before the value is a workaround for stupid browsers not handling the starting newline correctly.
+				print "<textarea tabindex=\"".$tabkey."\" id=\"".$element_id."\" name=\"".$element_name."\" rows=\"".$rows."\" cols=\"".$cols."\">"."\n".$value."</textarea>\n";
+			}
+		}
 		// text
 		else {
-			print "<input tabindex=\"".$tabkey."\" type=\"text\" id=\"".$element_id."\" name=\"".$element_name."\" value=\"".htmlspecialchars($value)."\" size=\"".$cols."\" dir=\"ltr\"";
-			if ($fact=="NPFX") print " onkeyup=\"wactjavascript_autoComplete(npfx_accept,this,event)\" autocomplete=\"off\" ";
-			if (in_array($fact, $subnamefacts)) print " onchange=\"updatewholename();\"";
-			if ($fact=="DATE") print " onblur=\"valid_date(this);\"";
-			print " />\n";
+			if (!in_array($fact, $emptyfacts)) {
+				print "<input tabindex=\"".$tabkey."\" type=\"text\" id=\"".$element_id."\" name=\"".$element_name."\" value=\"".htmlspecialchars($value)."\" size=\"".$cols."\" dir=\"ltr\"";
+				if ($fact=="NPFX") print " onkeyup=\"wactjavascript_autoComplete(npfx_accept,this,event)\" autocomplete=\"off\" ";
+				if (in_array($fact, $subnamefacts)) print " onchange=\"updatewholename();\"";
+				if ($fact=="DATE") print " onblur=\"valid_date(this); sndReq('".$element_id."_date', 'getchangeddate', 'date', this.value, '', '');\"";
+				if ($fact=="EMAIL") print " onblur=\"sndReq('".$element_id."_email', 'checkemail', 'email', this.value, '', '');\"";
+				if ($fact == "SOUR") print " onblur=\"sndReq('".$element_id."_src', 'getsourcedescriptor', 'sid', this.value, '', '');\"";
+				if ($fact == "REPO") print " onblur=\"sndReq('".$element_id."_repo', 'getrepodescriptor', 'rid', this.value, '', '');\"";
+				if ($fact == "ASSO") print " onblur=\"sndReq('".$element_id."_asso', 'getpersonname', 'pid', this.value, '', '');\"";
+				if ($fact == "NOTE") print " onblur=\"sndReq('".$element_id."_gnote', 'getnotedescriptor', 'oid', this.value, '', '');\"";
+				if ($fact == "OBJE") print " onblur=\"sndReq('".$element_id."_obj', 'getmediadescriptor', 'mid', this.value, '', '');\"";
+				print " />\n";
+			}
 		}
 		// split PLAC
 		if ($fact=="PLAC") {
 			print "<div id=\"".$element_id."_pop\" style=\"display: inline;\">\n";
-			print_specialchar_link($element_id, false);
+			print_specialchar_link($element_id);
 			print_findplace_link($element_id);
 			print "</div>\n";
 			if ($SPLIT_PLACES) {
@@ -740,7 +897,10 @@ function add_simple_tag($tag, $upperlevel="") {
 				print_place_subfields($element_id);
 			}
 		}
-		else if ($cols>20 and $fact!="NPFX") print_specialchar_link($element_id, false);
+		else if ($cols>20 && $fact!="NPFX" && !in_array($fact, $emptyfacts)) {
+			if (in_array($fact, array("GIVN", "SURN", "NPSX"))) print_specialchar_link($element_id);
+			else print_specialchar_link($element_id);
+		}
 	}
 	// MARRiage TYPE : hide text field and show a selection list
 	if ($fact=="TYPE" and $tags[0]=="MARR") {
@@ -760,12 +920,15 @@ function add_simple_tag($tag, $upperlevel="") {
 	}
 
 	// popup links
-	if ($fact=="DATE") print_calendar_popup($element_id);
+	if ($fact=="DATE") PrintCalendarPopup($element_id);
 	if ($fact=="FAMC") print_findfamily_link($element_id);
 	if ($fact=="FAMS") print_findfamily_link($element_id);
-	if ($fact=="ASSO") print_findindi_link($element_id);
+	if ($fact=="ASSO") PrintFindIndiLink($element_id,"");
 	if ($fact=="FILE") print_findmedia_link($element_id);
-	if ($fact=="OBJE") print_findobject_link($element_id);
+	if ($fact=="OBJE" && $islink) {
+		print_findobject_link($element_id);
+		print_addnewobject_link($element_id);
+	}
 	if ($fact=="SOUR") {
 		print_findsource_link($element_id);
 		print_addnewsource_link($element_id);
@@ -774,12 +937,93 @@ function add_simple_tag($tag, $upperlevel="") {
 		print_findrepository_link($element_id);
 		print_addnewrepository_link($element_id);
 	}
+	if ($fact=="NOTE" && $islink) {
+		print_findnote_link($element_id);
+		print_addnewgnote_link($element_id);
+	}
 
 	// current value
-	if ($fact=="DATE") print get_changed_date($value);
-	if ($fact=="ASSO" && $value) print " ".get_person_name($value)." (".$value.")";
-	if ($fact=="SOUR" && $value) print " ".get_source_descriptor($value)." (".$value.")";
+	if ($fact=="DATE") print " <span id=\"".$element_id."_date\">".GetChangedDate($value)."</span>";
+	if ($fact=="REPO") {
+		print " <span id=\"".$element_id."_repo\">";
+		if ($value) print GetRepoDescriptor($value)." (".$value.")";
+		else {
+			if (isset($_SESSION["last_used"]["REPO"])) {
+				$gedid = SplitKey($_SESSION["last_used"]["REPO"], "gedid");
+				if ($gedid == $GEDCOMID) {
+					$id = SplitKey($_SESSION["last_used"]["REPO"], "id");
+					if (CheckExists($id, "REPO")) print "<a href=\"javascript\" onclick=\"document.getElementById('".$element_id."').value='".$id."'; sndReq('".$element_id."_repo', 'getrepodescriptor', 'rid', '".$id."', '', ''); return false;\">".$gm_lang["click_for"]." ".GetRepoDescriptor($id)."</a>";
+				}
+			}
+		}
+		print "</span>";
+		print "<br />";
+	}
+	if ($fact=="EMAIL") print " <span id=\"".$element_id."_email\"></span>";
+	if ($fact=="ASSO") {
+		print " <span id=\"".$element_id."_asso\">";
+		if ($value) print GetPersonName($value)." (".$value.")";
+		print "</span>";
+	}
+	if ($fact=="NOTE" && $islink) {
+		print " <span id=\"".$element_id."_gnote\">";
+		if ($value) {
+			print "</span>";
+			?>
+			<script>
+			sndReq('<?php print $element_id."_gnote";?>', 'getnotedescriptor', 'oid', '<?php print $value;?>', '', '');
+			</script>
+		<?php
+		}
+		else {
+			if (isset($_SESSION["last_used"]["NOTE"])) {
+				$gedid = SplitKey($_SESSION["last_used"]["NOTE"], "gedid");
+				if ($gedid == $GEDCOMID) {
+					$id = SplitKey($_SESSION["last_used"]["NOTE"], "id");
+					if (CheckExists($id, "NOTE")) {
+						print "<a href=\"javascript\" onclick=\"document.getElementById('".$element_id."').value='".$id."'; sndReq('".$element_id."_gnote', 'getnotedescriptor', 'oid', '".$id."', '', ''); return false;\">".$gm_lang["click_for"]." ";
+						print "<span id=\"".$element_id."_gnote2\"></span></a>";
+						?>
+						<script>
+						sndReq('<?php print $element_id."_gnote2";?>', 'getnotedescriptor', 'oid', '<?php print $id;?>', '', '');
+						</script>
+						<?php
+					}
+				}
+			}
+			print "</span>";
+		}
+	}
+	if ($fact=="SOUR") {
+		print " <span id=\"".$element_id."_src\">";
+		if ($value) print GetSourceDescriptor($value)." (".$value.")";
+		else {
+			if (isset($_SESSION["last_used"]["SOUR"])) {
+				$gedid = SplitKey($_SESSION["last_used"]["SOUR"], "gedid");
+				if ($gedid == $GEDCOMID) {
+					$id = SplitKey($_SESSION["last_used"]["SOUR"], "id");
+					if (CheckExists($id, "SOUR")) print "<a href=\"javascript\" onclick=\"document.getElementById('".$element_id."').value='".$id."'; sndReq('".$element_id."_src', 'getsourcedescriptor', 'sid', '".$id."', '', ''); return false;\">".$gm_lang["click_for"]." ".GetSourceDescriptor($id)."</a>";
+				}
+			}
+		}
+		print "</span>";
+	}
 
+	if ($fact=="OBJE") {
+		print " <span id=\"".$element_id."_obj\">";
+		if ($value) print GetMediaDescriptor($value)." (".$value.")";
+		else {
+			if (isset($_SESSION["last_used"]["OBJE"])) {
+				$gedid = SplitKey($_SESSION["last_used"]["OBJE"], "gedid");
+				if ($gedid == $GEDCOMID) {
+					$id = SplitKey($_SESSION["last_used"]["OBJE"], "id");
+					if (CheckExists($id, "OBJE")) print "<a href=\"javascript\" onclick=\"document.getElementById('".$element_id."').value='".$id."'; sndReq('".$element_id."_obj', 'getmediadescriptor', 'mid', '".$id."', '', ''); return false;\">".$gm_lang["click_for"]." ".GetMediaDescriptor($id)."</a>";
+				}
+			}
+		}
+		print "</span>";
+	}
+	
 	// pastable values
 	if ($fact=="NPFX") {
 		$text = $gm_lang["autocomplete"];
@@ -789,7 +1033,7 @@ function add_simple_tag($tag, $upperlevel="") {
 	}
 	if ($fact=="SPFX") print_autopaste_link($element_id, $SPFX_accept);
 	if ($fact=="NSFX") print_autopaste_link($element_id, $NSFX_accept);
-	if ($fact=="FORM") print_autopaste_link($element_id, $FILE_FORM_accept, false);
+	if ($fact=="FORM") print_autopaste_link($element_id, $FILE_FORM_accept, false, false);
 
 	// split NAME
 	if ($fact=="NAME") {
@@ -797,8 +1041,10 @@ function add_simple_tag($tag, $upperlevel="") {
 		print "<a href=\"javascript: ".$gm_lang["show_details"]."\" onclick=\"togglename(); return false;\"><img style=\"display:none;\" id=\"".$element_id."_minus\" src=\"".$GM_IMAGE_DIR."/".$GM_IMAGES["minus"]["other"]."\" border=\"0\" width=\"11\" height=\"11\" alt=\"\" title=\"\" /></a>\n";
 	}
 	
-	print "</td></tr>\n";
+	if (!in_array($fact, $emptyfacts) || in_array($fact, $canhavey_facts)) print "</td>";
+	print "</tr>\n";
 	$tabkey++;
+	return $element_id;
 }
 
 /**
@@ -806,87 +1052,122 @@ function add_simple_tag($tag, $upperlevel="") {
  *
  * @param string $tag		Gedcom tag name
  */
-function print_add_layer($tag, $level=2) {
-	global $factarray, $gm_lang, $GM_IMAGE_DIR, $GM_IMAGES;
+function PrintAddLayer($tag, $level=2, $addfact=false) {
+	global $factarray, $gm_lang, $GM_IMAGE_DIR, $GM_IMAGES, $TEXT_DIRECTION;
 	global $MEDIA_DIRECTORY;
 
 	if ($tag=="SOUR") {
 		//-- Add new source to fact
-		print "<a href=\"#\" onclick=\"return expand_layer('newsource');\"><img id=\"newsource_img\" src=\"".$GM_IMAGE_DIR."/".$GM_IMAGES["plus"]["other"]."\" border=\"0\" width=\"11\" height=\"11\" alt=\"\" title=\"\" /> ".$gm_lang["add_source"]."</a>";
+		print "<a href=\"#\" onclick=\"expand_layer('newsource'); if(document.getElementById('newsource').style.display == 'block') document.getElementById(addsourcefocus).focus(); return false;\"><img id=\"newsource_img\" src=\"".$GM_IMAGE_DIR."/".$GM_IMAGES["plus"]["other"]."\" border=\"0\" width=\"11\" height=\"11\" alt=\"\" title=\"\" /> ".$gm_lang["add_source"]."</a>";
 		print_help_link("edit_add_SOUR_help", "qm");
 		print "<br />";
 		print "<div id=\"newsource\" style=\"display: none;\">\n";
 		print "<table class=\"facts_table\">\n";
 		// 2 SOUR
-		add_simple_tag("$level SOUR @");
+		$sour_focus_element = AddSimpleTag("$level SOUR @");
+		?>
+		<script type="text/javascript">
+		var addsourcefocus = <?php print "'".$sour_focus_element."'"; ?>;
+		</script>
+		<?php
 		// 3 PAGE
-		add_simple_tag(($level+1)." PAGE");
+		AddSimpleTag(($level+1)." PAGE");
 		// 3 DATA
+		AddSimpleTag(($level+1)." DATA");
+		// 4 DATE
+		AddSimpleTag(($level+2)." DATE");
 		// 4 TEXT
-		add_simple_tag(($level+2)." TEXT");
+		AddSimpleTag(($level+2)." TEXT");
+		if ($addfact) {
+			print "<tr><td colspan=\"2\" class=\"shade2 $TEXT_DIRECTION\"><input type=\"radio\" name=\"addsource\" value=\"0\" />".$gm_lang["add_source_citation_to_person"]."<br />\n";
+			print "<input type=\"radio\" name=\"addsource\" value=\"1\" />".$gm_lang["add_source_reference_to_fact"]."<br />\n";
+			print "<input type=\"radio\" name=\"addsource\" value=\"2\" checked=\"checked\" />".$gm_lang["add_source_citation_to_fact"]."<br />\n";
+			print "</td></tr>";
+		}
 		print "</table></div>";
 	}
 	if ($tag=="ASSO") {
 		//-- Add a new ASSOciate
-		print "<a href=\"#\" onclick=\"return expand_layer('newasso');\"><img id=\"newasso_img\" src=\"".$GM_IMAGE_DIR."/".$GM_IMAGES["plus"]["other"]."\" border=\"0\" width=\"11\" height=\"11\" alt=\"\" title=\"\" /> ".$gm_lang["add_asso"]."</a>";
+		print "<a href=\"#\" onclick=\"expand_layer('newasso'); if(document.getElementById('newasso').style.display == 'block') document.getElementById(addassofocus).focus(); return false;\"><img id=\"newasso_img\" src=\"".$GM_IMAGE_DIR."/".$GM_IMAGES["plus"]["other"]."\" border=\"0\" width=\"11\" height=\"11\" alt=\"\" title=\"\" /> ".$gm_lang["add_asso"]."</a>";
 		print_help_link("edit_add_ASSO_help", "qm");
 		print "<br />";
 		print "<div id=\"newasso\" style=\"display: none;\">\n";
 		print "<table class=\"facts_table\">\n";
 		// 2 ASSO
-		add_simple_tag(($level)." ASSO @");
+		$asso_focus_element = AddSimpleTag(($level)." ASSO @");
+		?>
+		<script type="text/javascript">
+		var addassofocus = <?php print "'".$asso_focus_element."'"; ?>;
+		</script>
+		<?php
 		// 3 RELA
-		add_simple_tag(($level+1)." RELA");
+		AddSimpleTag(($level+1)." RELA");
 		// 3 NOTE
-		add_simple_tag(($level+1)." NOTE");
+		AddSimpleTag(($level+1)." NOTE");
 		print "</table></div>";
 	}
 	if ($tag=="NOTE") {
 		//-- Add new note to fact
-		print "<a href=\"#\" onclick=\"return expand_layer('newnote');\"><img id=\"newnote_img\" src=\"".$GM_IMAGE_DIR."/".$GM_IMAGES["plus"]["other"]."\" border=\"0\" width=\"11\" height=\"11\" alt=\"\" title=\"\" /> ".$gm_lang["add_note"]."</a>";
+		print "<a href=\"#\" onclick=\"expand_layer('newnote'); if(document.getElementById('newnote').style.display == 'block') document.getElementById(addnotefocus).focus(); return false;\"><img id=\"newnote_img\" src=\"".$GM_IMAGE_DIR."/".$GM_IMAGES["plus"]["other"]."\" border=\"0\" width=\"11\" height=\"11\" alt=\"\" title=\"\" /> ".$gm_lang["add_note"]."</a>";
 		print_help_link("edit_add_NOTE_help", "qm");
 		print "<br />\n";
 		print "<div id=\"newnote\" style=\"display: none;\">\n";
 		print "<table class=\"facts_table\">\n";
 		// 2 NOTE
-		add_simple_tag(($level)." NOTE");
+		$note_focus_element = AddSimpleTag(($level)." NOTE");
+		?>
+		<script type="text/javascript">
+		var addnotefocus = <?php print "'".$note_focus_element."'"; ?>;
+		</script>
+		<?php
+		print "</table></div>";
+	}
+	if ($tag=="GNOTE") {
+		//-- Add new general note to fact
+		print "<a href=\"#\" onclick=\"expand_layer('newgnote'); if(document.getElementById('newgnote').style.display == 'block') document.getElementById(addgnotefocus).focus(); return false;\"><img id=\"newnote_img\" src=\"".$GM_IMAGE_DIR."/".$GM_IMAGES["plus"]["other"]."\" border=\"0\" width=\"11\" height=\"11\" alt=\"\" title=\"\" /> ".$gm_lang["add_gnote"]."</a>";
+		print_help_link("edit_add_NOTE_help", "qm");
+		print "<br />";
+		print "<div id=\"newgnote\" style=\"display: none;\">\n";
+		print "<table class=\"facts_table\">\n";
+		// 2 NOTE
+		$gnote_focus_element = AddSimpleTag("$level NOTE @");
+		?>
+		<script type="text/javascript">
+		var addgnotefocus = <?php print "'".$gnote_focus_element."'"; ?>;
+		</script>
+		<?php
 		print "</table></div>";
 	}
 	if ($tag=="OBJE") {
 		//-- Add new obje to fact
-		print "<a href=\"#\" onclick=\"return expand_layer('newobje');\"><img id=\"newobje_img\" src=\"".$GM_IMAGE_DIR."/".$GM_IMAGES["plus"]["other"]."\" border=\"0\" width=\"11\" height=\"11\" alt=\"\" title=\"\" /> ".$gm_lang["add_obje"]."</a>";
+		print "<a href=\"#\" onclick=\"expand_layer('newobje'); if(document.getElementById('newobje').style.display == 'block') document.getElementById(addobjefocus).focus(); return false;\"><img id=\"newobje_img\" src=\"".$GM_IMAGE_DIR."/".$GM_IMAGES["plus"]["other"]."\" border=\"0\" width=\"11\" height=\"11\" alt=\"\" title=\"\" /> ".$gm_lang["add_obje"]."</a>";
 		print_help_link("add_media_help", "qm");
 		print "<br />";
 		print "<div id=\"newobje\" style=\"display: none;\">\n";
 		print "<table class=\"facts_table\">\n";
-		// 2 OBJE
-		add_simple_tag(($level)." OBJE");
+		// 2 OBJE <=== as link
+		$obje_focus_element = AddSimpleTag(($level)." OBJE @");
+		?>
+		<script type="text/javascript">
+		var addobjefocus = <?php print "'".$obje_focus_element."'"; ?>;
+		</script>
+		<?php
+		// 2 OBJE <=== as embedded new object
+//		AddSimpleTag(($level)." OBJE");
 		// 3 FORM
-		add_simple_tag(($level+1)." FORM");
+//		AddSimpleTag(($level+1)." FORM");
 		// 3 FILE
-		add_simple_tag(($level+1)." FILE");
+//		AddSimpleTag(($level+1)." FILE");
 		// 3 TITL
-		add_simple_tag(($level+1)." TITL");
+//		AddSimpleTag(($level+1)." TITL");
 		if ($level==1) {
 			// 3 _PRIM
-			add_simple_tag(($level+1)." _PRIM");
+			AddSimpleTag(($level+1)." _PRIM");
 			// 3 _THUM
-			add_simple_tag(($level+1)." _THUM");
+			AddSimpleTag(($level+1)." _THUM");
 		}
 		print "</table></div>";
 	}
-}
-/**
- * Add Debug Log
- *
- * This function checks the if the global $DEBUG
- * variable is true and adds debugging information
- * to the log file
- * @param string $logstr	the string to add to the log
- */
-function addDebugLog($logstr) {
-	global $DEBUG;
-	if ($DEBUG) WriteToLog($logstr, "I", "G", $GEDCOM);
 }
 
 /**
@@ -894,126 +1175,174 @@ function addDebugLog($logstr) {
  * @param string $newged	the new gedcom record to add the lines to
  * @return string	The updated gedcom record
  */
-function handle_updates($newged) {
-	global $glevels, $islink, $tag, $uploaded_files, $text, $NOTE;
+function HandleUpdates($newged) {
+	global $glevels, $islink, $tag, $uploaded_files, $text, $NOTE, $change_id, $change_type, $success, $GEDCOM, $can_auto_accept, $gm_lang, $link_error;
 	
+	$link_error = false;
+//	print_r($_POST);
 	// NOTE: Cleanup text fields
 	foreach ($text as $key => $line) {
 		$text[$key] = trim($line);
 	}
 	for($j=0; $j<count($glevels); $j++) {
-		//-- update external note records first
-		if (($islink[$j])&&($tag[$j]=="NOTE")) {
-			if (empty($NOTE[$text[$j]])) {
-				delete_gedrec($text[$j]);
-				$text[$j] = "";
-			}
-			else {
-				$noterec = find_gedcom_record($text[$j]);
-				$newnote = "0 @$text[$j]@ NOTE\r\n";
-				$newline = "1 CONC ".$NOTE[$text[$j]];
-				$newlines = preg_split("/\r?\n/", $newline);
-				for($k=0; $k<count($newlines); $k++) {
-					if ($k>0) $newlines[$k] = "1 CONT ".$newlines[$k];
-					if (strlen($newlines[$k])>255) {
-						while(strlen($newlines[$k])>255) {
-							$newnote .= substr($newlines[$k], 0, 255)."\r\n";
-							$newlines[$k] = substr($newlines[$k], 255);
-							$newlines[$k] = "1 CONC ".$newlines[$k];
-						}
-						$newnote .= trim($newlines[$k])."\r\n";
-					}
-					else {
-						$newnote .= trim($newlines[$k])."\r\n";
-					}
-				}
-				$notelines = preg_split("/\r?\n/", $noterec);
-				for($k=1; $k<count($notelines); $k++) {
-					if (preg_match("/1 CON[CT] /", $notelines[$k])==0) $newnote .= trim($notelines[$k])."\r\n";
-				}
-				if ($GLOBALS["DEBUG"]) print "<pre>$newnote</pre>";
-				replace_gedrec($text[$j], $newnote);
-			}
-		} //-- end of external note handling code
+		//print "value j: ".$j."<br />";
+		// NOTE: update external note records first
 		
-		//print $glevels[$j]." ".$tag[$j];
+		// print "value j:".$j."glevels: ".$glevels[$j]." tag: ".$tag[$j]." text: ".$text[$j]." strl: ".strlen($text[$j])." islink: ".$islink[$j]."<br />";
 		//-- for facts with empty values they must have sub records
 		//-- this section checks if they have subrecords
-		$k=$j+1;
-		$pass=false;
-		while(($k<count($glevels))&&($glevels[$k]>$glevels[$j])) {
-			if (!empty($text[$k])) {
-				if (($tag[$j]!="OBJE")||($tag[$k]=="FILE")) {
-					$pass=true;
-					break;
-				}
-			}
-			if (($tag[$k]=="FILE")&&(count($uploaded_files)>0)) {
-				$filename = array_shift($uploaded_files);
-				if (!empty($filename)) {
-					$text[$k] = $filename;
-					$pass=true;
-					break;
-				}
-			}
-			$k++;
-		}
-		//-- if the value is not empty then write the line to the gedcom record
-		if ((!empty($text[$j]))||($pass==true)) {
-			if ($islink[$j]) $text[$j]="@".$text[$j]."@";
-			$newline = $glevels[$j]." ".$tag[$j];
-			
-			// NOTE: Check if the new record already contains this line, if so, empty the new record
-			if (trim($newged) == trim($newline)) $newged = "";
-			
-			//-- check and translate the incoming dates
-			if ($tag[$j]=="DATE" && !empty($text[$j])) {
-				$text[$j] = check_input_date($text[$j]);
-			}
-			// NOTE: Check if it is a pointer record
-			if (!empty($text[$j]) && $newline == "2 SOUR" && !stristr($text[$j], "@")) $newline .= " @".$text[$j]."@";
-			else if (!empty($text[$j]) && $newline == "2 OBJE" && !stristr($text[$j], "@")) $newline .= " @".$text[$j]."@";
-			else if (!empty($text[$j]) && $newline == "1 REPO" && !stristr($text[$j], "@")) $newline .= " @".$text[$j]."@";
-			else if (!empty($text[$j])) $newline .= " ".$text[$j];
-			
-			//-- convert returns to CONT lines and break up lines longer than 255 chars
-			$newlines = preg_split("/\r?\n/", $newline);
-			for($k=0; $k<count($newlines); $k++) {
-				if ($k>0) $newlines[$k] = ($glevels[$j]+1)." CONT ".$newlines[$k];
-				if (strlen($newlines[$k])>255) {
-					while(strlen($newlines[$k])>255) {
-						$newged .= substr($newlines[$k], 0, 255)."\r\n";
-						$newlines[$k] = substr($newlines[$k], 255);
-						$newlines[$k] = ($glevels[$j]+1)." CONC ".$newlines[$k];
+		if (empty($text[$j])) {
+			$k=$j+1;
+			$pass=false;
+			while(($k<count($glevels))&&($glevels[$k]>$glevels[$j])) {
+				if (!empty($text[$k])) {
+					if (($tag[$j]!="OBJE")||($tag[$k]=="FILE")) {
+						$pass=true;
+						break;
 					}
-					$newged .= trim($newlines[$k])."\r\n";
+				}
+				if (($tag[$k]=="FILE")&&(count($uploaded_files)>0)) {
+					$filename = array_shift($uploaded_files);
+					if (!empty($filename)) {
+						$text[$k] = $filename;
+						$pass=true;
+						break;
+					}
+				}
+				$k++;
+			}
+		}
+		else $pass = true;
+		
+		//print "pass: ".$pass."<br />";	
+		// NOTE: if the value is not empty then write the line to the gedcom record
+		// The value 0 is considered as empty, se we must check this separately (1 NCHI 0)
+		if ($pass == true) {			
+			// Only add a link if an ID is given
+			$skip = false;
+			//print "check for link ".$islink[$j];
+			if ($islink[$j]) {
+				$passlink = false;
+				//print "link found<br />";
+				if (!empty($text[$j]) || $text[$j] == "0") {
+					//print "ok link found".$text[$j];
+					$trec = FindGedcomRecord($text[$j]);
+					if (!empty($trec)) $passlink = true;
+					if (GetChangeData(true, $text[$j], true, "", "")) {
+						$t = GetChangeData(false, $text[$j], true, "gedlines", "");
+						$ctrec = $t[$GEDCOM][$text[$j]];
+						if (!empty($ctrec)) $passlink = true;
+						else $passlink = false;
+					}
+					if (!$passlink) {
+						print "<span class=\"error\">".$gm_lang["link_not_added"].": ".$text[$j]."</span><br />";
+						$link_error = true;
+					}
+					else {
+						$text[$j]="@".$text[$j]."@";
+						$newline = $glevels[$j]." ".$tag[$j];
+					}
+				}
+				if (!$passlink) {
+					//print "empty link found<br />";
+					// We found an empty link. Also the subsequent subrecords must be skipped.
+					$newline = "";
+					$lev = $glevels[$j];
+					for ($a=$j+1; $a<count($glevels); $a++) {
+						if ($glevels[$a] == $lev) {
+							$j = $a - 1;
+							$skip = true;
+							break;
+						}
+					}
+					if (!$skip) $j = count($glevels) - 1;
+				}
+			}
+			if (!$skip) {
+			
+				// NOTE: check and translate the incoming dates
+				if ($tag[$j]=="DATE" && !empty($text[$j])) {
+					$text[$j] = CheckInputDate($text[$j]);
+				}
+			
+				if (!empty($text[$j]) || $text[$j] == "0") {
+					$newline = $glevels[$j]." ".$tag[$j];
+					if (($newline == "2 SOUR" || $newline == "1 SOUR") && !stristr($text[$j], "@")) $newline .= " @".strtoupper($text[$j])."@";
+					else if (($newline == "2 OBJE" || $newline == "1 OBJE") && !stristr($text[$j], "@")) $newline .= " @".strtoupper($text[$j])."@";
+					else if ($newline == "1 REPO" && !stristr($text[$j], "@")) $newline .= " @".strtoupper($text[$j])."@";
+					else if ($newline == "2 ASSO" && !stristr($text[$j], "@")) $newline .= " @".strtoupper($text[$j])."@";
+					else if (!empty($newline)) $newline .= " ".$text[$j]; // This is for note text in the link record
 				}
 				else {
-					$newged .= trim($newlines[$k])."\r\n";
+					// Handle empty tags because lower level tags may follow
+					if (isset($glevels[$j+1]) && $glevels[$j+1] > $glevels[$j]) {
+						$newline = $glevels[$j]." ".$tag[$j];
+						// print "1: ".$newline."<br />";
+					}
 				}
+						
+				// NOTE: Check if the new record already contains this line, if so, empty the new record
+				if (isset($newline) && trim($newged) == trim($newline)) $newged = "";
+				
+				// NOTE: convert returns to CONT lines and break up lines longer than 255 chars
+				$newlines = preg_split("/\r?\n/", $newline);
+				for($k=0; $k<count($newlines); $k++) {
+					if ($k>0) $newlines[$k] = ($glevels[$j]+1)." CONT ".$newlines[$k];
+					if (strlen($newlines[$k])>255) {
+						while(strlen($newlines[$k])>255) {
+							for ($ch = 255;1;$ch--) {
+								if (substr($newlines[$k],$ch-1,1) != " ") break;
+							}
+							$str = substr($newlines[$k], 0, $ch);
+							$newged .= $str."\r\n";
+							$newlines[$k] = substr($newlines[$k], $ch);
+							$newlines[$k] = ($glevels[$j]+1)." CONC ".$newlines[$k];
+						}
+						$newged .= trim($newlines[$k])."\r\n";
+					}
+					else {
+						$newged .= trim($newlines[$k])."\r\n";
+					}
+				}
+				// print "2: ".$newline."<br />";
+				// print "2 newged: ".$newged."<br />";
 			}
 		}
 	}
+	$newged = CleanupTagsY($newged);
 	return $newged;
 }
 
 /**
  * check the given date that was input by a user and convert it
  * to proper gedcom date if possible
- * @author John Finlay
+ * @author Genmod Development Team
  * @param string $datestr	the date input by the user
  * @return string	the converted date string
  */
-function check_input_date($datestr) {
-	$date = parse_date($datestr);
-	//print_r($date);
-	if ((count($date)==1)&&empty($date[0]['ext'])&&!empty($date[0]['month'])) {
-		$datestr = $date[0]['day']." ".$date[0]['month']." ".$date[0]['year'];
+function CheckInputDate($datestr) {
+	$date = ParseDate($datestr);
+
+//	if (count($date)==1 && empty($date[0]['ext']) && !empty($date[0]['month'])) {
+//		$datestr = $date[0]['day']." ".$date[0]['month']." ".$date[0]['year'];
+//	}
+	$str = "";
+	if (isset($date[0]['ext']) && !empty($date[0]['ext'])) $str .= $date[0]['ext']." ";
+	if (isset($date[0]['day']) && !empty($date[0]['day'])) $str .= $date[0]['day']." ";
+	if (isset($date[0]['month']) && !empty($date[0]['month'])) $str .= $date[0]['month']." ";
+	if (isset($date[0]['year']) && !empty($date[0]['year'])) $str .= $date[0]['year']." ";
+	if (isset($date[1])) {
+		if (isset($date[1]['ext']) && !empty($date[1]['ext'])) $str .= $date[1]['ext']." ";
+		if (isset($date[1]['day']) && !empty($date[1]['day'])) $str .= $date[1]['day']." ";
+		if (isset($date[1]['month']) && !empty($date[1]['month'])) $str .= $date[1]['month']." ";
+		if (isset($date[1]['year']) && !empty($date[1]['year'])) $str .= $date[1]['year']." ";
 	}
-	return $datestr;
+	$str = trim ($str);
+	if (!empty($str)) return $str;
+	else return $datestr;
 }
 
-function print_quick_resn($name) {
+function PrintQuickResn($name, $default="") {
 	global $SHOW_QUICK_RESN, $align, $factarray, $gm_lang, $tabkey;
 	
 	if ($SHOW_QUICK_RESN) {
@@ -1023,253 +1352,109 @@ function print_quick_resn($name) {
 		print "</td>\n";
 		print "<td class=\"shade1\" colspan=\"3\">\n";
 		print "<select name=\"$name\" tabindex=\"".$tabkey."\" ><option value=\"\"></option><option value=\"confidential\"";
+		if ($default == "confidential") print "selected=\"selected\"";
 		$tabkey++;
 		print ">".$gm_lang["confidential"]."</option><option value=\"locked\"";
+		if ($default == "locked") print "selected=\"selected\"";
 		print ">".$gm_lang["locked"]."</option><option value=\"privacy\"";
+		if ($default == "privacy") print "selected=\"selected\"";
 		print ">".$gm_lang["privacy"]."</option>";
 		print "</select>\n";
 		print "</td>\n";
 		print "</tr>\n";
 	}
 }
-/**
- * Print an edit form for facts or records
- *
- * This function prints an edit form based on the fact or record that is being
- * edited. The structures hold the table layout. The details only have table rows.
- * The add_simple_tag only returns a table row.
- *
- * @author	Genmod Development Team
- * @param		string	$gid		The record being edited. Empty if it is a new record
- * @param		string	$fact	The fact to be edited
- */
-function print_form($pid="", $fact) {
-	global $gm_lang, $TEXT_DIRECTION, $GEDCOM, $factarray, $GM_IMAGE_DIR, $GM_IMAGES;
-	
-	// NOTE: Get the record for the person/family
-	$gedrec = "";
-	if (id_type($pid) == "OBJE") $gedrec = find_media_record($pid);
-	else $gedrec = find_gedcom_record($pid);
-	
-	switch ($fact) {
-		case "BIRT" :
-			print "<tr><td class=\"topbottombar\" colspan=\"2\">".$gm_lang["birth"]."</td></tr>";
-			$subrecord = get_sub_record(1, $fact, $gedrec);
-			event_detail(1, $subrecord);
-			
-			// NOTE: n FAMC
-			// NOTE: Family record
-			if ($subrecord == "") $gedfamc = "FAMC";
-			else {
-				$gedfamc = get_sub_record(2, "FAMC", $subrecord);
-				if (empty($gedfamc)) $gedfamc = "FAMC";
-			}
-			add_simple_tag("2 $gedfamc");
-			print "<tr><td class=\"topbottombar\" colspan=\"2\">".$gm_lang["add_fact"]."</td></tr>";
-			add_simple_tag("2 SOUR ");
-			add_simple_tag("2 OBJE ");
-			print "<tr><td class=\"topbottombar\" colspan=\"2\"><input type=\"submit\" value=\"".$gm_lang["save"]."\" /></td></tr>\n";
-			break;
+function PrintPedi($name, $value="", $showbio=true) {
+	global $align, $factarray, $gm_lang, $tabkey;
+
+	print "<select tabindex=\"".$tabkey."\" id=\"".$name."\" name=\"".$name."\">\n";
+		
+	if ($showbio) {
+		print "<option value=\"birth\"";
+		if ($value=="birth" || $value=="") print " selected=\"selected\"";
+		print ">".$gm_lang["biological"]."</option>\n";
 	}
+		
+	print "<option value=\"adopted\"";
+	if ($value=="adopted") print " selected=\"selected\"";
+	print ">".$gm_lang["adopted"]."</option>\n";
+
+	print "<option value=\"foster\"";
+	if ($value=="foster") print " selected=\"selected\"";
+	print ">".$gm_lang["foster"]."</option>\n";
+		
+	print "<option value=\"sealing\"";
+	if ($value=="sealing") print " selected=\"selected\"";
+	print ">".$gm_lang["sealing"]."</option>\n";
+		
+	print "</select>\n";
 }
 
-/**
- * Print the event details for an edit form
- *
- * <Long description of your function. 
- * What does it do?
- * How does it work?
- * All that goes into the long description>
- *
- * @author	Genmod Development Team
- * @param		int		$level	Level of fact the event details are being added to
- * @param		string	$gedrec	The gedcom record in case the fact is being edited
- */
-function event_detail($level, $gedrec) {
+function SubmitterRecord($level, $gedrec) {
 	if ($gedrec == "") {
-		add_simple_tag(($level+1)." TYPE");
-		add_simple_tag(($level+1)." DATE");
-		add_simple_tag(($level+1)." PLAC");
-		add_simple_tag(($level+1)." ADDR");
-		add_simple_tag(($level+1)." AGNC");
-		add_simple_tag(($level+1)." RELI");
-		add_simple_tag(($level+1)." CAUS");
-		add_simple_tag(($level+1)." RESN");
-		add_simple_tag(($level+1)." NOTE ");
-		add_simple_tag(($level+1)." SOUR");
-		add_simple_tag(($level+1)." OBJE");
+		AddSimpleTag(($level+1)." NAME");
+		AddSimpleTag(($level+1)." ADDR");
+		AddSimpleTag(($level+2)." CTRY");
+		AddSimpleTag(($level+1)." PHON");
+		AddSimpleTag(($level+1)." EMAIL");
+		AddSimpleTag(($level+1)." NOTE");
 	}
 	else {
-		// NOTE: n TYPE
-		// NOTE: EVENT_OR_FACT_CLASSIFICATION
-		$gedtype = get_sub_record(($level+1), "TYPE", $gedrec);
-		if (empty($gedtype)) $gedtype = "TYPE";
-		add_simple_tag(($level+1)." ".$gedtype);
+		$gedtype = GetSubRecord(($level+1), "NAME", $gedrec);
+		if (empty($gedtype)) $gedtype = "NAME";
+		AddSimpleTag(($level+1)." ".$gedtype);
 		
-		// NOTE: n DATE
-		// NOTE: DATE_VALUE
-		$geddate = get_sub_record(($level+1), "DATE", $gedrec);
-		if (empty($geddate)) $geddate = "DATE";
-		add_simple_tag(($level+1)." ".$geddate);
+		$gedtype = GetSubRecord(($level+1), "ADDR", $gedrec);
+		if (empty($gedtype)) $gedtype = "ADDR";
 		
-		// NOTE: n PLAC
-		// NOTE: PLACE_STRUCTURE
-		$gedplac = get_sub_record(($level+1), "PLAC", $gedrec);
-		if (empty($gedplac)) $gedplac = "PLAC";
-		add_simple_tag(($level+1)." ".$gedplac);
+		$gedlines = split("\r\n", $gedtype);
+		$fields = preg_split("/\s/", $gedlines[0]);
 		
-		// NOTE: n ADDR
-		// NOTE: ADDRESS_STRUCTURE
-		$gedaddr = get_sub_record(($level+1), "ADDR", $gedrec);
-		if (empty($gedaddr)) $gedaddr = "ADDR";
-		add_simple_tag(($level+1)." ".$gedaddr);
+		$i = 0;
+		$text = "";
+		// NOTE: This retrieves the data for each fact
+		for($j=1; $j<count($fields); $j++) {
+			if ($j>1) $text .= " ";
+			$text .= $fields[$j];
+		}
+		// NOTE: This retrieves the continuance of the address
+		while(($i+1<count($gedlines))&&(preg_match("/".($level+2)." (CON[CT])\s?(.*)/", $gedlines[$i+1], $cmatch)>0)) {
+			$iscont=true;
+			if ($cmatch[1]=="CONT") $text.="\n";
+			else if ($WORD_WRAPPED_NOTES) $text .= " ";
+			$text .= $cmatch[2];
+			$i++;
+		}
+		AddSimpleTag(($level+1)." ADDR ".$text);
 		
-		// NOTE: n AGNC
-		// NOTE: RESPONSIBLE_AGENCY
-		$gedagnc = get_sub_record(($level+1), "AGNC", $gedrec);
-		if (empty($gedagnc)) $gedagnc = "AGNC";
-		add_simple_tag(($level+1)." ".$gedagnc);
+		$gedtype = GetSubRecord(($level+2), "CTRY", $gedtype);
+		if (empty($gedtype)) $gedtype = "CTRY";
+		AddSimpleTag(($level+2)." ".$gedtype);
 		
-		// NOTE: n RELI
-		// NOTE: RELIGIOUS_AFFILIATION
-		$gedreli = get_sub_record(($level+1), "RELI", $gedrec);
-		if (empty($gedreli)) $gedreli = "RELI";
-		add_simple_tag(($level+1)." ".$gedreli);
+		$gedtype = GetSubRecord(($level+1), "PHON", $gedrec);
+		if (empty($gedtype)) $gedtype = "PHON";
+		AddSimpleTag(($level+1)." ".$gedtype);
 		
-		// NOTE: n CAUS
-		// NOTE: CAUSE_OF_EVENT
-		$gedcaus = get_sub_record(($level+1), "CAUS", $gedrec);
-		if (empty($gedcaus)) $gedcaus = "CAUS";
-		add_simple_tag(($level+1)." ".$gedcaus);
-		
-		// NOTE: n RESN
-		// NOTE: RESTRICTION_NOTICE
-		$gedresn = get_sub_record(($level+1), "RESN", $gedrec);
-		if (empty($gedresn)) $gedresn = "RESN";
-		add_simple_tag(($level+1)." ".$gedresn);
-		
-		// NOTE: n NOTE
-		// NOTE: NOTE_STRUCTURE
-		$gednote = get_gedcom_value("NOTE", ($level+1), $gedrec);
+		$gedtype = GetSubRecord(($level+1), "EMAIL", $gedrec);
+		if (empty($gedtype)) $gedtype = "EMAIL";
+		AddSimpleTag(($level+1)." ".$gedtype);
+
+		$gednote = GetGedcomValue("NOTE", ($level+1), $gedrec);
 		if (empty($gednote)) $gednote = "";
-		add_simple_tag(($level+1)." NOTE ".$gednote);
-		
-		// NOTE: n SOUR
-		// NOTE: SOURCE_CITATION
-		source_citation($level+1, $gedrec);
-		
-		// NOTE: n OBJE
-		// NOTE: MULTIMEDIA_LINK
-		preg_match_all("/".($level+1)."\sOBJE\s@(.*)@/", $gedrec, $gedobje);
-		if (count($gedobje[0]) == 0) $gedobje = "OBJE";
-		if (is_array($gedobje)) {
-			foreach ($gedobje[1] as $key => $obje) {
-				add_simple_tag(($level+1)." OBJE ".$obje);
-			}
-		}
-		else add_simple_tag(($level+1)." ".$gedobje);
+		AddSimpleTag(($level+1)." NOTE ".$gednote);
 	}
 }
-
-function source_citation($level, $gedrec) {
-	if ($gedrec == "") {
-		add_simple_tag(($level+1)." PAGE");
-		add_simple_tag(($level+1)." EVEN");
-		add_simple_tag(($level+2)." ROLE");
-		add_simple_tag(($level+1)." DATA");
-		add_simple_tag(($level+2)." DATE");
-		add_simple_tag(($level+2)." TEXT");
-		add_simple_tag(($level+1)." OBJE");
-		add_simple_tag(($level+1)." NOTE");
-		add_simple_tag(($level+1)." QUAY");
-	}
-	else {
-		$count_source = preg_match_all("/".($level)."\sSOUR\s@(.*)@/", $gedrec, $gedsour);
-		if (count($gedsour[0]) == 0) $gedsour = "SOUR";
-		// NOTE: Print all source references
-		if (is_array($gedsour)) {
-			for ($get_facts=1; $get_facts < ($count_source+1); $get_facts++) {
-				$sour_fact = get_sub_record(2, "$level SOUR", $gedrec, $get_facts);
-				if ($gedsour[0][$get_facts-1] == trim($sour_fact)) add_simple_tag($level." SOUR ".$gedsour[1][$get_facts-1]);
-				else {
-					// NOTE: Get array with all facts
-					$sour_data = preg_match_all("/\d\s([A-Z]{4})\s(.*)/", trim($sour_fact), $geddata);
-					
-					// NOTE: Add Source
-					add_simple_tag($level." SOUR ".$gedsour[1][$get_facts-1]);
-					
-					// NOTE: Add Page
-					if (in_array("PAGE", $geddata[1])) {
-						$key = array_keys($geddata[1], "PAGE");
-						add_simple_tag(($level+1)." PAGE ".$geddata[2][$key[0]]);
-					}
-					else add_simple_tag(($level+1)." PAGE");
-						
-					
-					// NOTE: Add Role
-					if (in_array("EVEN", $geddata[1])) {
-						$key = array_keys($geddata[1], "EVEN");
-						add_simple_tag(($level+1)." EVEN ".$geddata[2][$key[0]]);
-						if (in_array("ROLE", $geddata[1])) {
-							$key = array_keys($geddata[1], "ROLE");
-							add_simple_tag(($level+1)." ROLE ".$geddata[2][$key[0]]);
-						}
-						else add_simple_tag(($level+1)." ROLE");
-					}
-					else {
-						add_simple_tag(($level+1)." EVEN");
-						add_simple_tag(($level+1)." ROLE");
-					}
-					
-					// NOTE: Add Data
-					if (in_array("DATA", $geddata[1])) {
-						$key = array_keys($geddata[1], "DATA");
-						add_simple_tag(($level+1)." DATA ".$geddata[2][$key[0]]);
-						if (in_array("DATE", $geddata[1])) {
-							$key = array_keys($geddata[1], "DATE");
-							add_simple_tag(($level+2)." DATE ".$geddata[2][$key[0]]);
-						}
-						else add_simple_tag(($level+2)." DATE");
-						if (in_array("TEXT", $geddata[1])) {
-							$key = array_keys($geddata[1], "TEXT");
-							add_simple_tag(($level+2)." TEXT ".$geddata[2][$key[0]]);
-						}
-						else add_simple_tag(($level+2)." TEXT");
-					}
-					
-					// NOTE: Media
-					if (in_array("OBJE", $geddata[1])) {
-						$key = array_keys($geddata[1], "OBJE");
-						add_simple_tag(($level+1)." OBJE ".str_replace("@", "", $geddata[2][$key[0]]));
-					}
-					else add_simple_tag(($level+1)." OBJE");
-					
-					// NOTE: Add Note
-					if (in_array("NOTE", $geddata[1])) {
-						$key = array_keys($geddata[1], "NOTE");
-						$text = $geddata[2][$key[0]];
-						$text .= get_cont($level+2, $sour_fact);
-						$text = preg_replace("/\<br \/\>/", "", trim($text));
-						add_simple_tag(($level+1)." NOTE ".$text);
-					}
-					
-					// NOTE: Quality of information
-					if (in_array("QUAY", $geddata[1])) {
-						$key = array_keys($geddata[1], "QUAY");
-						add_simple_tag(($level+1)." QUAY ".$geddata[2][$key[0]]);
-					}
-					else add_simple_tag(($level+1)." QUAY");
-				}
-			}
-		}
-		else add_simple_tag($level." ".$gedsour);
-	}
-}
-function show_media_form($pid, $action="newentry", $change_type="add_media") {
-	global $GEDCOM, $gm_lang, $TEXT_DIRECTION, $MEDIA_ID_PREFIX, $GEDCOMS, $WORD_WRAPPED_NOTES;
+function ShowMediaForm($pid, $action="newentry", $change_type="add_media") {
+	global $GEDCOM, $gm_lang, $TEXT_DIRECTION, $MEDIA_ID_PREFIX, $GEDCOMS, $WORD_WRAPPED_NOTES, $MediaFS, $MEDIA_DIRECTORY, $MEDIA_IN_DB;
+	global $MEDIA_FACTS_ADD, $MEDIA_FACTS_UNIQUE, $Users, $gm_username;
+	
+	$facts_add = explode(",", $MEDIA_FACTS_ADD);
+	$facts_unique = explode(",", $MEDIA_FACTS_UNIQUE);
+	
 	// NOTE: add a table and form to easily add new values to the table
 	print "<form method=\"post\" name=\"newmedia\" action=\"addmedia.php\" enctype=\"multipart/form-data\">\n";
 	print "<input type=\"hidden\" name=\"action\" value=\"$action\" />\n";
+	print "<input type=\"hidden\" name=\"paste\" value=\"1\" />\n";
 	print "<input type=\"hidden\" name=\"change_type\" value=\"$change_type\" />\n";
 	print "<input type=\"hidden\" name=\"ged\" value=\"$GEDCOM\" />\n";
 	if (isset($pid)) print "<input type=\"hidden\" name=\"pid\" value=\"$pid\" />\n";
@@ -1278,116 +1463,394 @@ function show_media_form($pid, $action="newentry", $change_type="add_media") {
 	if ($pid == "") {
 		print "<tr><td class=\"shade2\">".$gm_lang["add_fav_enter_id"]."</td>";
 		print "<td class=\"shade1\"><input type=\"text\" name=\"gid\" id=\"gid\" size=\"3\" value=\"\" />";
-		print_findindi_link("gid");
+		PrintFindIndiLink("gid","");
 		print_findfamily_link("gid");
 		print_findsource_link("gid");
 		print "</td></tr>";
 	}
-	if (id_type($pid) == "OBJE") $gedrec = find_media_record($pid);
+	if (IdType($pid) == "OBJE") {
+		$gedrec = FindMediaRecord($pid);
+		if (GetChangeData(true, $pid, true)) {
+			$rec = GetChangeData(false, $pid, true, "gedlines");
+			$gedrec = $rec[$GEDCOM][$pid];
+		}
+	}
 	else {
 		$gedrec = "";
-		$gedrec = find_gedcom_record($pid);
 	}
+	// Store the gedcom rec to compare with the new values
+	print "<input type=\"hidden\" name=\"oldgedrec\" value=\"$gedrec\" />\n";
+
+	// Print the JS to check for valid characters in the filename
+	?><script language="JavaScript">
+	<!--
+	function check( filename ) {
+		if( !filename.value ) return true;
+		if( filename.match( /^[a-zA-Z]:[\w- \\\\]+\..*$/ ) ) 
+			return true;
+		else
+			alert( "<?php print $gm_lang["invalid_file"]; ?>" ) ;
+			return false;
+	}
+	-->
+	</script> <?php
 	// 0 OBJE
 	// 1 FILE
-	if ($gedrec == "") $gedfile = "FILE";
-	else {
-		$gedfile = get_sub_record(1, "FILE", $gedrec);
-		if (empty($gedfile)) $gedfile = "FILE";
-	}
-	add_simple_tag("1 $gedfile");
-	// Box for user to choose to upload file from local computer
-	print "<tr><td class=\"shade2\">&nbsp;</td><td class=\"shade1\"><input type=\"file\" name=\"picture\" size=\"60\"></td></tr>";
-	// Box for user to choose the folder to store the image
-	print "<tr><td class=\"shade2\">".$gm_lang["folder"]."</td><td class=\"shade1\"><input type=\"text\" name=\"folder\" size=\"60\"></td></tr>";
-	// 2 FORM
-	if ($gedrec == "") $gedform = "FORM";
-	else {
-		$gedform = get_sub_record(2, "FORM", $gedrec);
-		if (empty($gedform)) $gedform = "FORM";
-	}
-	add_simple_tag("2 $gedform");
-	// 3 TYPE
-	if ($gedrec == "") $gedtype = "TYPE";
-	else {
-		$types = preg_match("/3\sTYPE(.*)\r\n/", $gedrec, $matches);
-		if (empty($matches[0])) $gedtype = "TYPE";
-		else $gedtype = "TYPE ".trim($matches[1]);
-	}
-	add_simple_tag("3 $gedtype");
-	// 2 TITL
-	if ($gedrec == "") $gedtitl = "TITL";
-	else {
-		$gedtitl = get_sub_record(2, "TITL", $gedrec);
-		if (empty($gedtitl)) $gedtitl = "TITL";
-	}
-	add_simple_tag("2 $gedtitl");
-	// 1 REFN
-	if ($gedrec == "") $gedrefn = "REFN";
-	else {
-		$gedrefn = get_sub_record(1, "REFN", $gedrec);
-		if (empty($gedrefn)) $gedrefn = "REFN";
-	}
-	add_simple_tag("1 $gedrefn");
-	// 2 TYPE
-	if ($gedrec == "") $gedtype2 = "TYPE";
-	else {
-		$types = preg_match("/2 TYPE(.*)\r\n/", $gedrec, $matches);
-		if (empty($matches[0])) $gedtype2 = "TYPE";
-		else $gedtype2 = "TYPE ".trim($matches[1]);
-	}
-	add_simple_tag("2 $gedtype2");
-	// 1 RIN
-	if ($gedrec == "") $gedrin = "RIN";
-	else {
-		$gedrin = get_sub_record(1, "RIN", $gedrec);
-		if (empty($gedrin)) $gedrin = "RIN";
-	}
-	add_simple_tag("1 $gedrin");
-	// 1 NOTE
-	if ($gedrec == "") $text = "NOTE";
-	else {
-		$gednote = get_sub_record(1, "NOTE", $gedrec);
-		$gedlines = split("\r\n", $gednote);
-		$level = 1;
-		$i = 0;
-		$text = preg_replace("/NOTE\s/", "", $gedlines[0]);
-		if (count($gedlines) > 1) {
-			while(($i+1<count($gedlines))&&(preg_match("/".($level+1)." (CON[CT])\s?(.*)/", $gedlines[$i+1], $cmatch)>0)) {
-				$iscont=true;
-				if ($cmatch[1]=="CONT") $text.="\n";
-				else if ($WORD_WRAPPED_NOTES) $text .= " ";
-				$text .= $cmatch[2];
-				$i++;
+	// NOTE: probably this part of the code for existing media is not in use anymore.
+	if (!empty($gedrec)) {
+		$chan = GetSubrecord(1, "CHAN", $gedrec, 1);
+		if (!empty($chan)) $gedrec = preg_replace("/$chan/", "", $gedrec);
+		$facts = GetAllSubrecords($gedrec, "", false, false, false);
+		$notefound = false;
+		$foundfacts = array();
+		foreach($facts as $key=>$fact) {
+			$ct = preg_match_all("/(\d)\s(\w+)\s(.*)/", $fact, $match);
+			for($i=0;$i<$ct;$i++) {
+				$level = $match[1][$i];
+				$tag = $match[2][$i];
+				if (!in_array(array($tag, $level), $foundfacts)) $foundfacts[] = array($tag, $level);
+				$value = $match[3][$i];
+				if ($tag == "NOTE") {
+					// if already in a note, write the old note first
+					if ($notefound) AddSimpleTag("$notelevel, NOTE, $notetext");
+					// Start build the note
+					$notetext = $value;
+					$notelevel = $level;
+					$notefound = true;
+				}
+				else if ($tag == "CONT" || $tag == "CONC") {
+					// strip the newline from the text as CONC should not start on a new line
+					$notetext = preg_replace("/[\r|\n]+$/", "", $notetext);
+					if ($tag == "CONT") $notetext.="\n";
+					else if ($WORD_WRAPPED_NOTES) $notetext .= " ";
+					$notetext .= $value;
+				}
+				else AddSimpleTag("$level $tag $value");
+				if ($tag == "FILE") {
+					// Box for user to choose to upload file from local computer
+					print "<tr><td class=\"shade2\">&nbsp;</td><td class=\"shade1\"><input type=\"file\" name=\"picture\" size=\"60\"></td></tr>";
+					// Box for user to choose the folder to store the image
+					print "<tr><td class=\"shade2\">".$gm_lang["folder"]."</td><td class=\"shade1\"><input type=\"text\" name=\"folder\" size=\"60\"></td></tr>";
+				}
 			}
-			$text = "NOTE ".$text;
 		}
-		if (empty($gednote)) $text = "NOTE";
+		if (!in_array(array("FILE", 1), $foundfacts)) AddSimpleTag("1 FILE");
+		if (!in_array(array("FORM", 2), $foundfacts)) AddSimpleTag("2 FORM");
+		if (!in_array(array("TYPE", 3), $foundfacts)) AddSimpleTag("3 TYPE");
+		if (!in_array(array("TITL", 2), $foundfacts)) AddSimpleTag("2 TITL");
+		AddSimpleTag("1 REFN");
+		AddSimpleTag("2 TYPE");
+		AddSimpleTag("1 RIN");
+		if ($notefound == true) AddSimpleTag("1 NOTE $notetext");
+		AddSimpleTag("1 NOTE");
+		AddSimpleTag("1 SOUR");
 	}
-	add_simple_tag("1 $text");
-	// 1 SOUR
-	if ($gedrec == "") $gedsour = "SOUR";
 	else {
-		$gedsour = get_sub_record(1, "SOUR", $gedrec);
-		if (empty($gedsour)) $gedsour = "SOUR";
+		if (in_array("FILE", $facts_add) || in_array("FILE", $facts_unique)) {
+			$element_id = AddSimpleTag("1 FILE");
+			// Box for user to choose to upload file from local computer
+			print "<tr><td class=\"shade2\">".$gm_lang["upload_file"]."</td><td class=\"shade1\"><input type=\"file\" name=\"picture\" size=\"60\"></td></tr>";
+			// Box for user to choose the folder to store the image
+			$dirlist = $MediaFS->GetMediaDirList($MEDIA_DIRECTORY, true, 1, true, false, $MEDIA_IN_DB);
+			print "<tr><td class=\"shade2\">".$gm_lang["upload_to_folder"]."</td><td class=\"shade1\">";
+	//		<input type=\"text\" name=\"folder\" size=\"60\">
+			print "<select name=\"folder\">";
+			foreach($dirlist as $key => $dir) {
+				print "<option value=\"".$dir."\">".$dir."</option>";
+			}
+			print "</select></td></tr>";
+			AddSimpleTag("2 FORM");
+			AddSimpleTag("3 TYPE");
+			AddSimpleTag("2 TITL");
+		}
+		if (in_array("REFN", $facts_add) || in_array("REFN", $facts_unique)) {
+			AddSimpleTag("1 REFN");
+			AddSimpleTag("2 TYPE");
+		}
+		if (in_array("RIN", $facts_add) || in_array("RIN", $facts_unique)) AddSimpleTag("1 RIN");
+// 		PRIM and THUM are added at linklevel		
+		if (in_array("NOTE", $facts_add) || in_array("NOTE", $facts_unique)) AddSimpleTag("1 NOTE");
+//		if (in_array("SOUR", $facts_add) || in_array("SOUR", $facts_unique)) AddSimpleTag("1 SOUR");
+		if (in_array("SOUR", $facts_add) || in_array("SOUR", $facts_unique)) {
+			print "<tr><td colspan=\"2\">";
+			PrintAddLayer("SOUR", 1);
+			print"</td></tr>";
+		}
 	}
-	add_simple_tag("1 $gedsour");
-	// 2 _PRIM
-	if ($gedrec == "") $gedprim = "_PRIM";
-	else {
-		$gedprim = get_sub_record(1, "_PRIM", $gedrec);
-		if (empty($gedprim)) $gedprim = "_PRIM";
-	}
-	add_simple_tag("1 $gedprim");
-	// 2 _THUM
-	if ($gedrec == "") $gedthum = "_THUM";
-	else {
-		$gedthum = get_sub_record(1, "_THUM", $gedrec);
-		if (empty($gedthum)) $gedthum = "_THUM";
-	}
-	add_simple_tag("1 $gedthum");
-	print "<tr><td class=\"center\" colspan=\"2\"><input type=\"submit\" value=\"".$gm_lang["add_media_button"]."\" /></td></tr>\n";
+		
+	if ($Users->UserCanAccept($gm_username) && !$Users->userAutoAccept($gm_username)) print "<tr><td class=\"shade1\" colspan=\"2\"><input name=\"aa_attempt\" type=\"checkbox\" value=\"1\" />".$gm_lang["attempt_auto_acc"]."</td></tr>";
+	print "<tr><td class=\"topbottombar\" colspan=\"2\"><input type=\"submit\" onclick=\"return check(document.newmedia.picture.value);\" value=\"".$gm_lang["add_media_button"]."\" /></td></tr>\n";
 	print "</table>\n";
 	print "</form>\n";
+	if (isset($element_id)) print "\n<script type=\"text/javascript\">\n<!--\ndocument.getElementById(\"".$element_id."\").focus();\n//-->\n</script>";
+}
+
+function ReplaceLinks($oldgid, $newgid, $mtype, $change_id, $change_type, $ged) {
+	global $TBLPREFIX;
+
+	$records = GetLinkedGedRecs($oldgid, $mtype, $ged);
+		
+	foreach ($records as $key1=>$record) {	
+		$tt = preg_match("/0 @(.+)@ (.+)/", $record, $match);
+		$gid = $match[1];
+		$type = $match[2];
+		$subs = Getallsubrecords($record, "", false, false, false);
+		foreach ($subs as $key=>$sub) {
+			if (preg_match("/@$oldgid@/", $sub)) {
+				$tag = substr($sub, 2, 4);
+				if ($tag != "CHIL" && $tag != "HUSB" && $tag != "WIFE" && $tag != "FAMC" && $tag != "FAMS") {
+					$newsub = preg_replace("/(\d) (\w+) @$oldgid@/", "$1 $2 @$newgid@", $sub);
+					ReplaceGedrec($gid, $sub, $newsub, $tag, $change_id, $change_type, $ged);
+				}
+			}
+		}
+	}
+}
+
+function DeleteLinks($oldgid, $mtype, $change_id, $change_type, $ged) {
+	global $TBLPREFIX, $GEDCOM;
+
+	// We miss the links on new records, which are only in the _changes table
+	$records = GetLinkedGedRecs($oldgid, $mtype, $ged);
+	$success = true;
+	foreach ($records as $key1=>$record) {	
+		$tt = preg_match("/0 @(.+)@ (.+)/", $record, $match);
+		$gid = $match[1];
+		$type = $match[2];
+		if (GetChangeData(true, $gid, true, "", "")) {
+			$rec = GetChangeData(false, $gid, true, "gedlines", "");
+			$record = $rec[$GEDCOM][$gid];
+		}
+		$subs = Getallsubrecords($record, "", false, false, false);
+		foreach ($subs as $key=>$sub) {
+			$ttt = preg_match("/1\s(\w+)/", $sub, $match3);
+			$fact = $match3[1];
+			if (preg_match("/(\d) (\w+) @$oldgid@/", $sub, $match2)) {
+				$subdel = GetSubRecord($match2[1], $match2[1]." ".$match2[2]." @".$oldgid."@", $sub);
+				$subnew = preg_replace("/$subdel/", "", $sub);
+				$success = $success && ReplaceGedrec($gid, $sub, $subnew, $fact, $change_id, $change_type);
+			}
+		}
+	}
+	return $success;
+}
+
+function GetLinkedGedrecs($oldgid, $mtype, $ged) {
+	global $TBLPREFIX;
+	
+	$records = array();
+	
+	//-- Collect all gedcom records
+	
+	//-- References from sources (REPO, OBJE, NOTE)
+	if ($mtype == "REPO" || $mtype == "OBJE" || $mtype == "NOTE") {
+		$sql = "SELECT s_gedcom, s_id FROM ".$TBLPREFIX."sources WHERE s_gedcom REGEXP '[1-9] [[:alnum:]]+ @".$oldgid."@' AND s_file='".$ged."'";
+		$res = NewQuery($sql);
+		if ($res) {
+			while ($row = $res->FetchAssoc()) {
+				$records[] = $row["s_gedcom"];
+			}
+		}
+	}
+	
+	//-- References from individuals (SOUR, INDI, FAM, NOTE, OBJE)
+	if ($mtype == "SOUR" || $mtype == "INDI" || $mtype == "FAM" || $mtype == "NOTE" || $mtype == "OBJE") {
+		$sql = "SELECT i_gedcom, i_id FROM ".$TBLPREFIX."individuals WHERE i_gedcom REGEXP '[1-9] [[:alnum:]]+ @".$oldgid."@' AND i_file='".$ged."'";
+		$res = NewQuery($sql);
+		if ($res) {
+			while ($row = $res->FetchAssoc()) {
+				$records[] = $row["i_gedcom"];
+			}
+		}
+	}
+
+	//-- References from families (SOUR, INDI, NOTE, OBJE)
+	if ($mtype == "SOUR" || $mtype == "INDI" || $mtype == "NOTE" || $mtype == "OBJE") {
+		$sql = "SELECT f_gedcom, f_id FROM ".$TBLPREFIX."families WHERE f_gedcom REGEXP '[1-9] [[:alnum:]]+ @".$oldgid."@' AND f_file='".$ged."'";
+		$res = NewQuery($sql);
+		if ($res) {
+			while ($row = $res->FetchAssoc()) {
+				$records[] = $row["f_gedcom"];
+			}
+		}
+	}
+	
+	//-- References from multimedia (SOUR, NOTE)
+	if ($mtype == "SOUR" || $mtype == "NOTE") {
+		$sql = "SELECT m_gedrec, m_media FROM ".$TBLPREFIX."media WHERE m_gedrec REGEXP '[1-9] [[:alnum:]]+ @".$oldgid."@' AND m_gedfile='".$ged."'";
+		$res = NewQuery($sql);
+		if ($res) {
+			while ($row = $res->FetchAssoc()) {
+				$records[] = $row["m_gedrec"];
+			}
+		}
+	}
+
+	//-- References from notes, submitter recs (SOUR, INDI) <== links to notes and repositories
+	if ($mtype == "SOUR" || $mtype == "INDI" || $mtype == "REPO" || $mtype == "OBJE") {
+		$sql = "SELECT o_gedcom, o_id FROM ".$TBLPREFIX."other WHERE o_gedcom REGEXP '[1-9] [[:alnum:]]+ @".$oldgid."@' AND o_file='".$ged."'";
+		$res = NewQuery($sql);
+		if ($res) {
+			while ($row = $res->FetchAssoc()) {
+				$records[] = $row["f_gedcom"];
+			}
+		}
+	}
+	
+	return $records;
+}
+
+function DeleteFamIfEmpty($famid, $change_id, $change_type, $ged="") {
+	global $GEDCOM, $GEDCOMID;
+	
+	if (empty($ged)) $ged = $GEDCOMID;
+	$famrec = FindFamilyRecord($famid, get_gedcom_from_id($ged));
+	if (GetChangeData(true, $famid, true)) {
+		$rec = GetChangeData(false, $famid, true, "gedlines");
+		$famrec = $rec[$GEDCOM][$famid];
+	}
+	$ct = preg_match("/1 CHIL|HUSB|WIFE/", $famrec);
+//	print $famrec."<br />".$ct."<br />";
+	if ($ct == 0) return ReplaceGedRec($famid, $famrec, "", "FAM", $change_id, $change_type, $ged);
+	else return true;
+}
+
+function SortFactDetails($gedrec) {
+	
+	// Check for level 1
+	if (substr($gedrec,0,1) != 1) return $gedrec;
+	
+	// Split the level 2 records
+	$gedlines = split("\r\n2 ", trim($gedrec));
+	if (count($gedlines) <= 2) return $gedrec;
+	
+	// Keep the level 1 apart
+	$l1rec = array_shift($gedlines);
+	
+	// Split the level 2 recs into their arrays
+	$other = array();
+	$asso = array();
+	$sour = array();
+	$obje = array();
+	$note = array();
+	$resn = array();
+	foreach($gedlines as $key=>$gedline) {
+		$tag = substr($gedline, 0, strpos($gedline, " ")); 
+		if ($tag == "SOUR") $sour[] = $gedline;
+		else if ($tag == "OBJE") $obje[] = $gedline;
+		else if ($tag == "RESN") $resn[] = $gedline;
+		else if ($tag == "ASSO") $asso[] = $gedline;
+		else if ($tag == "NOTE") $note[] = $gedline;
+		else $other[] = $gedline;
+	}
+	// Add the missing tags to the basic info
+//	$tags = array();
+//	print_r($other);
+//	$otherrec = $l1rec."\r\n2 ".implode("\r\n2 ", $other);
+//	$ct = preg_match_all("/\d\s(\w+).+/", $otherrec, $match);
+//	if ($ct > 0) {
+//		foreach($match[1] as $index=>$tag) {
+//			$tags[] = $tag;
+//		}
+//		print_r($tags);	
+//	}
+	
+	// Recompose the record
+	$all = array_merge($other, $asso);
+	$all = array_merge($all, $obje);
+	$all = array_merge($all, $sour);
+	$all = array_merge($all, $note);
+	$all = array_merge($all, $resn);
+		
+	// Rebuild the string
+	$gedrec = $l1rec."\r\n2 ".implode("\r\n2 ", $all);
+	return $gedrec;
+}
+
+function AddMissingTags($tags) {
+	global $templefacts, $nondatefacts, $nonplacfacts, $gm_lang, $MediaFS, $MEDIA_DIRECTORY, $MEDIA_IN_DB, $focus;
+
+	// Now add some missing tags :
+	if (in_array($tags[0], $templefacts)) {
+		// 2 TEMP
+		if (!in_array("TEMP", $tags)) AddSimpleTag("2 TEMP");
+		// 2 STAT
+		if (!in_array("STAT", $tags)) AddSimpleTag("2 STAT");
+	}
+	if ($tags[0]=="EVEN" or $tags[0]=="GRAD" or $tags[0]=="MARR") {
+		// 1 EVEN|GRAD|MARR
+		// 2 TYPE
+		if (!in_array("TYPE", $tags)) AddSimpleTag("2 TYPE");
+	}
+	if ($tags[0]=="EDUC" or $tags[0]=="GRAD" or $tags[0]=="OCCU") {
+		// 1 EDUC|GRAD|OCCU
+		// 2 CORP
+		if (!in_array("CORP", $tags)) AddSimpleTag("2 CORP");
+	}
+	if ($tags[0]=="DEAT") {
+		// 1 DEAT
+		// 2 CAUS
+		if (!in_array("CAUS", $tags)) AddSimpleTag("2 CAUS");
+	}
+	if ($tags[0]=="REPO") {
+		//1 REPO
+		//2 CALN
+		if (!in_array("CALN", $tags)) AddSimpleTag("2 CALN");
+		}
+	if (!in_array($tags[0], $nondatefacts)) {
+		// 2 DATE
+		// 3 TIME
+		if (!in_array("DATE", $tags)) {
+			AddSimpleTag("2 DATE");
+			AddSimpleTag("3 TIME");
+		}
+		// 2 PLAC
+		if (!in_array("PLAC", $tags) && !in_array($tags[0], $nonplacfacts) && !in_array("TEMP", $tags)) AddSimpleTag("2 PLAC");
+	}
+	if ($tags[0]=="BURI") {
+		// 1 BURI
+		// 2 CEME
+		if (!in_array("CEME", $tags)) AddSimpleTag("2 CEME");
+	}
+	if ($tags[0]=="BIRT" or $tags[0]=="DEAT"
+	or $tags[0]=="EDUC" or $tags[0]=="GRAD"
+	or $tags[0]=="OCCU" or $tags[0]=="ORDN" or $tags[0]=="RESI") {
+		// 1 BIRT|DEAT|EDUC|GRAD|ORDN|RESI
+		// 2 ADDR
+		if (!in_array("ADDR", $tags)) AddSimpleTag("2 ADDR");
+	}
+	if ($tags[0]=="OCCU" or $tags[0]=="RESI") {
+		// 1 OCCU|RESI
+		// 2 PHON|FAX|EMAIL|URL
+		if (!in_array("PHON", $tags)) AddSimpleTag("2 PHON");
+		if (!in_array("FAX", $tags)) AddSimpleTag("2 FAX");
+		if (!in_array("EMAIL", $tags)) AddSimpleTag("2 EMAIL");
+		if (!in_array("URL", $tags)) AddSimpleTag("2 URL");
+	}
+	if ($tags[0]=="FILE") {
+		// 1 FILE
+		// Box for user to choose to upload file from local computer
+		print "<tr><td class=\"shade2\">".$gm_lang["upload_file"]."</td><td class=\"shade1\"><input type=\"file\" name=\"picture\" size=\"60\"></td></tr>";
+		// Box for user to choose the folder to store the image
+		$dirlist = $MediaFS->GetMediaDirList($MEDIA_DIRECTORY, true, 1, true, false, $MEDIA_IN_DB);
+		print "<tr><td class=\"shade2\">".$gm_lang["upload_to_folder"]."</td><td class=\"shade1\">";
+		print "<select name=\"folder\">";
+		foreach($dirlist as $key => $dir) {
+			print "<option value=\"".$dir."\">".$dir."</option>";
+		}
+		print "</select></td></tr>";
+		// 2 TITL
+		if (!in_array("TITL", $tags)) AddSimpleTag("2 TITL");
+		// 2 FORM
+		if (!in_array("FORM", $tags)) AddSimpleTag("2 FORM");
+		// 3 TYPE
+		if (!in_array("TYPE", $tags)) AddSimpleTag("3 TYPE");
+	}
+	if (in_array($tags[0], $templefacts)) {
+		// 2 TEMP
+		AddSimpleTag("2 TEMP");
+		// 2 STAT
+		AddSimpleTag("2 STAT");
+	}
 }
 ?>

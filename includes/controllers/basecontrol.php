@@ -3,7 +3,7 @@
  * Base controller for all controller classes
  *
  * Genmod: Genealogy Viewer
- * Copyright (C) 2005 Genmod Development Team
+ * Copyright (C) 2005 - 2008 Genmod Development Team
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,7 +23,7 @@
  *
  * @package Genmod
  * @subpackage Controllers
- * @version $Id: basecontrol.php,v 1.2 2005/10/27 09:09:54 roland-d Exp $
+ * @version $Id$
  */
  
 /**
@@ -48,7 +48,8 @@ class BaseController {
 	 * check if this controller should be in print preview mode
 	 */
 	function isPrintPreview() {
-		if ($this->view=="preview") return true;
+		if ($this->view == "preview") return true;
+		else return false;
 	}
 }
 ?>

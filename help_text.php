@@ -3,7 +3,7 @@
  * Shows helptext to the users
  *
  * Genmod: Genealogy Viewer
- * Copyright (C) 2005 Genmod Development Team
+ * Copyright (C) 2005 - 2008 Genmod Development Team
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -24,7 +24,7 @@
  * @author Genmod Development Team
  * @package Genmod
  * @subpackage Admin
- * @version $Id: help_text.php,v 1.6 2006/04/17 20:01:52 roland-d Exp $
+ * @version $Id$
  */
 
 /**
@@ -32,18 +32,12 @@
 */
 require "config.php";
 
-/**
- * Inclusion of the language files
-*/
-require($GM_BASE_DIRECTORY.$factsfile["english"]);
-if (file_exists($GM_BASE_DIRECTORY . $factsfile[$LANGUAGE])) require $GM_BASE_DIRECTORY . $factsfile[$LANGUAGE];
-
 if (!isset($help)) $help = "";
 
 /**
  * Inclusion of the help text variables
 */
-require ("help_text_vars.php");
+require ("helptext_vars.php");
 print_simple_header($gm_lang["help_header"]);
 print "<a name=\"top\"></a><span class=\"helpheader\">".$gm_lang["help_header"]."</span><br /><br />\n<div class=\"left\">\n";
 $actione = "";
@@ -52,14 +46,29 @@ if (isset($action)) $actione = $action;
 if (($help == "help_useradmin.php")&& ($actione == "edituser")) $help = "edit_useradmin_help";
 if (($help == "help_login_register.php")&& ($actione == "pwlost")) $help = "help_login_lost_pw.php";
 if ($help == "help_contents_help") {
-	if (userIsAdmin($gm_username)) {
+	if ($Users->userIsAdmin($gm_username)) {
 		$help = "admin_help_contents_help";
 		print_text("admin_help_contents_head_help");
 	}
 	else print_text("help_contents_head_help");
 	print_help_index($help);
 }
-else print_text($help);
+else {
+	$text = print_text($help, 0, 1);
+	print $text;
+	if ($Users->UserIsAdmin($gm_username)) {
+		$stat = GetLangvarStatus($help, $LANGUAGE, $type="help");
+		// Already translated, edit it
+		if ($stat == 0) print "<br /><a href=\"#\" onclick=\"window.name='help'; window.open('editlang_edit.php?ls01=$help&amp;ls02=$help&amp;language2=$LANGUAGE&amp;file_type=help_text&amp;realtime=true', '', 'top=50,left=50,width=700,height=400,scrollbars=1,resizable=1');\">".$gm_lang["thishelp_edit_trans"]."</a><br />";
+		// Add translation in the current language
+		if ($stat == 1) print "<br /><a href=\"#\" onclick=\"window.name='help'; window.open('editlang_edit.php?ls01=$help&amp;ls02=-1&amp;language2=$LANGUAGE&amp;file_type=help_text&amp;realtime=true', '', 'top=50,left=50,width=700,height=400,scrollbars=1,resizable=1');\">".$gm_lang["thishelp_add_trans"]."</a><br />";
+		// Add English helptext, only if the var is truly not found (may be in helptext_vars)
+		if ($stat == 2 && stristr($gm_lang['help_not_exist'], $text)) {
+			print "<br /><a href=\"#\" onclick=\"window.name='help'; window.open('editlang_edit.php?ls01=$help&amp;ls02=-1&amp;language2=english&amp;file_type=help_text&amp;realtime=true', '', 'top=50,left=50,width=700,height=400,scrollbars=1,resizable=1');\">".$gm_lang["thishelp_add_text"]."</a><br />";
+		}
+	}
+}
+
 print "\n</div>\n";
 print "<div class=\"left\">";
 print "<a href=\"#top\" title=\"".$gm_lang["move_up"]."\">$UpArrow</a><br />";
