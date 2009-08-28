@@ -1376,7 +1376,7 @@ function GetThemeNames() {
  * @return string a html text string that can be printed
  */
 function GetCalendarFact($factrec, $action, $filterof, $pid, $filterev="all") {
-	global $gm_lang, $factarray, $year, $month, $day, $TEMPLE_CODES, $CALENDAR_FORMAT, $monthtonum, $TEXT_DIRECTION, $SHOW_PEDIGREE_PLACES, $caltype;
+	global $gm_lang, $year, $month, $day, $TEMPLE_CODES, $CALENDAR_FORMAT, $monthtonum, $TEXT_DIRECTION, $SHOW_PEDIGREE_PLACES, $caltype;
 	global $CalYear, $currhYear, $USE_RTL_FUNCTIONS;
 	
 	$Upcoming = false;
@@ -1440,13 +1440,13 @@ function GetCalendarFact($factrec, $action, $filterof, $pid, $filterev="all") {
 	if (!$Filtered) {
 		if ($fact=="EVEN" || $fact=="FACT") {
 			if ($ct>0) {
-				if (isset($factarray["$factref"])) $text .= $factarray["$factref"];
+				if (defined("GM_FACT_".$factref)) $text .= constant("GM_FACT_".$factref);
 				else $text .= $factref;
 			}
-			else $text .= $factarray[$fact];
+			else $text .= constant("GM_FACT_".$fact);
 		}
 		else {
-			if (isset($factarray[$fact])) $text .= $factarray[$fact];
+			if (defined("GM_FACT_".$fact)) $text .= constant("GM_FACT_".$fact);
 			else $text .= $fact;
 		}
 //		if ($filterev!="all" && $filterev!=$fact && $filterev!=$factref) return "filter";

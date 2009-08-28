@@ -1005,24 +1005,32 @@ print "&nbsp;<a href=\"javascript: ".$gm_lang["displ_layout_conf"]."\" onclick=\
 		<td class="shade1">
 			<input type="hidden" name="NEW_SHOW_RELATIVES_EVENTS" value="<?php echo $SHOW_RELATIVES_EVENTS?>" />
 <?php
-$previous="_DEAT_";
+
+$previous = "_DEAT_";
 print "<table>";
-foreach ($factarray as $factkey=>$factlabel) {
-	$f6=substr($factkey,0,6);
-	if ($f6=="_BIRT_" or $f6=="_MARR_" or $f6=="_DEAT_") {
-		if ($f6=="_BIRT_") print "<tr>";
-		if ($f6=="_MARR_" and $previous!="_BIRT_") print "<tr><td>&nbsp;</td>";
-		if ($f6=="_DEAT_" and $previous=="_DEAT_") print "<tr><td>&nbsp;</td>";
-		if ($f6=="_DEAT_" and $previous!="_MARR_") print "<td>&nbsp;</td>";
-		print "\n<td><input type=\"checkbox\" name=\"SHOW_RELATIVES_EVENTS_checkbox\" value=\"".$factkey."\"";
-		if (strstr($SHOW_RELATIVES_EVENTS,$factkey)) print " checked=\"checked\"";
-		print " onchange=\"var old=document.configform.NEW_SHOW_RELATIVES_EVENTS.value; if (this.checked) old+=','+this.value; else old=old.replace(/".$factkey."/g,''); old=old.replace(/[,]+/gi,','); old=old.replace(/^[,]/gi,''); old=old.replace(/[,]$/gi,''); document.configform.NEW_SHOW_RELATIVES_EVENTS.value=old\" ";
-		print " /> ".$factlabel."</td>";
-		if ($f6=="_DEAT_") print "</tr>";
-		$previous=$f6;
+
+$factarr = get_defined_constants(true);
+foreach ($factarr["user"] as $factkey=>$factlabel) {
+	$fcheck = substr($factkey, 0, 8);
+	if ($fcheck == "GM_FACT_") {
+		$f6=substr($factkey,8,6);
+		$factkey = substr($factkey, 8);
+		if ($f6=="_BIRT_" or $f6=="_MARR_" or $f6=="_DEAT_") {
+			if ($f6=="_BIRT_") print "<tr>";
+			if ($f6=="_MARR_" and $previous!="_BIRT_") print "<tr><td>&nbsp;</td>";
+			if ($f6=="_DEAT_" and $previous=="_DEAT_") print "<tr><td>&nbsp;</td>";
+			if ($f6=="_DEAT_" and $previous!="_MARR_") print "<td>&nbsp;</td>";
+			print "\n<td><input type=\"checkbox\" name=\"SHOW_RELATIVES_EVENTS_checkbox\" value=\"".$factkey."\"";
+			if (strstr($SHOW_RELATIVES_EVENTS,$factkey)) print " checked=\"checked\"";
+			print " onchange=\"var old=document.configform.NEW_SHOW_RELATIVES_EVENTS.value; if (this.checked) old+=','+this.value; else old=old.replace(/".$factkey."/g,''); old=old.replace(/[,]+/gi,','); old=old.replace(/^[,]/gi,''); old=old.replace(/[,]$/gi,''); document.configform.NEW_SHOW_RELATIVES_EVENTS.value=old\" ";
+			print " /> ".$factlabel."</td>";
+			if ($f6=="_DEAT_") print "</tr>";
+			$previous=$f6;
+		}
 	}
 }
-print "</table>"; ?>
+print "</table>"; 
+?>
 		</td>
 	</tr>
 	<tr>

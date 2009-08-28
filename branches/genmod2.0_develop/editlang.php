@@ -303,10 +303,10 @@ class EditLang {
 					print $gm_lang["lang_name_".$this->language2];
 					// read the english lang.en.php file into array
 					$english_language_array = array();
-					$english_language_array = LoadEnglishFacts(true, true);
+					$english_language_array = LoadEnglishFacts(true);
 					// read the chosen lang.xx.php file into array
 					$new_language_array = array();
-					$new_language_array = LoadFacts($this->language2, true, true);
+					$new_language_array = LoadFacts($this->language2);
 					break;					
 			}
 			print "\"<br />\n";
@@ -496,7 +496,7 @@ class EditLang {
 				else print "<span class=\"error\">".$gm_lang["lang_help_not_stored"]."</span><br />";
 				
 				$data = "";
-				$storefacts = LoadFacts($this->language2, true);
+				$storefacts = LoadFacts($this->language2);
 				ksort($storefacts);
 				foreach($storefacts as $string => $value) {
 					$data .= "\"".$string."\";\"".$value."\"\r\n";
@@ -595,7 +595,7 @@ class EditLang {
 				<?php print $gm_lang["comparing_facts"];?>
 			</div>
 			<?php
-			$this->ShowLanguageCompare($genmod, LoadFacts($this->language1, true), LoadFacts($this->language2, true), true);
+			$this->ShowLanguageCompare($genmod, LoadFacts($this->language1), LoadFacts($this->language2), true);
 				?>
 			<img src="<?php print $genmod['gm_image_dir']."/".$genmod['gm_images']["hline"]["other"];?>" width="100%" height="6" alt="" /><br />
 			<div class="topbottombar subheaders">

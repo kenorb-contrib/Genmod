@@ -137,8 +137,8 @@ $outputmenu["Calendar"] = Array
 				// instead of simple rollover to get the effect where the button stays hightlit until
 				// the menu is closed.
 				<?php foreach (array_keys($showmenu) as $number => $name) { ?>
-					menu<?php echo $number+1 ?>.onactivate = function() { document.getElementById("<?php echo preg_replace("/[^a-zA-Z]/", "", $name); ?>").className = "hover"; };
-					menu<?php echo $number+1 ?>.ondeactivate = function() { document.getElementById("<?php echo preg_replace("/[^a-zA-Z]/", "", $name); ?>").className = ""; };
+					menu<?php echo $number+1 ?>.onactivate = function() { document.getElementById("<?php echo $name; ?>").className = "hover"; };
+					menu<?php echo $number+1 ?>.ondeactivate = function() { document.getElementById("<?php echo $name; ?>").className = ""; };
 				<?php } ?>
 			}
 		}
@@ -168,7 +168,7 @@ $outputmenu["Calendar"] = Array
 	<div id="menu" class="shade1 <?php echo $TEXT_DIRECTION; ?>">
 		<div class="shade1" style="float: <?php print $ldir; ?>;">
 			<?php foreach (array_keys($showmenu) as $number => $name) { ?>
-				<a id="<?php echo preg_replace("/[^a-zA-Z]/", "", $name); ?>" href="#"><?php echo $name; ?></a>
+			<a id="<?php echo $name; ?>" href="#"><?php echo $name; ?></a> 
 				&nbsp;&nbsp;
 			<?php } ?>
 		</div>
@@ -228,7 +228,7 @@ $outputmenu["Calendar"] = Array
 		$link = "";
 		$pass = false;
 		foreach ($showmenu as $maintitle => $submenu) {
-			$menubar .= 'var menu'.$maintitlecount.' = ms.addMenu(document.getElementById("'.preg_replace("/[^a-zA-Z]/", "", $maintitle).'"));'.chr(10);
+			$menubar .= 'var menu'.$maintitlecount.' = ms.addMenu(document.getElementById("'.$maintitle.'"));'.chr(10);
 			$itemcount = 0;
 			foreach ($submenu as $subtitle => $subitems) {
 				if (isset($subitems) && !is_array($subitems)) $link = $subitems;

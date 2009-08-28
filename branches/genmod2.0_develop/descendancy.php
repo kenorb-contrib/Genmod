@@ -34,7 +34,6 @@ require("config.php");
  * Inclusion of the chart functions
 */
 require("includes/functions/functions_charts.php");
-
 /**
  * print a child family
  *
@@ -129,7 +128,7 @@ function print_child_descendancy($pid, $depth) {
  * @param int $depth the descendancy depth to show
  */
 function print_family_descendancy($pid, $famid, $depth) {
-	global $gm_lang, $factarray, $view, $show_full, $generations, $box_width, $bwidth;
+	global $gm_lang, $view, $show_full, $generations, $box_width, $bwidth;
 	global $GEDCOM, $GM_IMAGE_DIR, $GM_IMAGES, $Dindent, $personcount;
 
 	if ($famid=="") return;
@@ -181,7 +180,7 @@ function print_family_descendancy($pid, $famid, $depth) {
 		$children = GetChildrenIds($famid);
 		print "<tr><td colspan=\"3\" class=\"details1\" >&nbsp;";
 		if (count($children)<1) print $gm_lang["no_children"];
-		else print $factarray["NCHI"].": ".count($children);
+		else print GM_FACT_NCHI.": ".count($children);
 		print "</td></tr></table>";
 		print "</li>\r\n";
 		foreach ($children as $indexval => $child) {

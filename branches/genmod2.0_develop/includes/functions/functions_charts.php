@@ -496,7 +496,7 @@ function print_family_children($famid, $childid = "", $sosa = 0, $label="", $per
  */
 /*function PrintFamilyFacts($famid, $sosa = 0, $mayedit=true) {
 	global $gm_lang, $pbwidth, $pbheight, $view, $hits;
-	global $nonfacts, $factarray;
+	global $nonfacts;
 	global $TEXT_DIRECTION, $GEDCOM, $SHOW_ID_NUMBERS, $SHOW_FAM_ID_NUMBERS;
 	global $show_changes, $gm_username, $Users, $SHOW_COUNTER;
 

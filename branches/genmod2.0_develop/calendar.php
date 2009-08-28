@@ -512,7 +512,6 @@ if ($view!="preview") {
 
 	if ($HIDE_LIVE_PEOPLE >= $Users->GetUserAccessLevel($username)) {
 		print "</td>\n ";
-		global $factarray;
 		print "<td class=\"shade2 vmiddle\">";
 		print_help_link("annivers_event_help", "qm", "showcal");
 		print $gm_lang["showcal"]."&nbsp;</td>\n";
@@ -1435,7 +1434,7 @@ if ($view=="preview"){
 	}
 	if ($filterev != "all"){
 		if (!empty($showfilter)) $showfilter .= " - ";
-		if (isset($factarray[$filterev])) $showfilter .= $factarray[$filterev];
+		if (defined("GM_FACT_".$filterev)) $showfilter .= constant("GM_FACT_".$filterev);
 		else if (isset($gm_lang[$filterev])) $showfilter .= $gm_lang[$filterev];
 	}
 	print "<br />".$showfile." (".$gm_lang["filter"].": ";

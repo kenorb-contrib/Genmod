@@ -312,7 +312,7 @@ if ($action!="choose") {
 								$skip2[] = $j;
 								$equal_count++;
 								print "<tr><td>";
-								if (isset($factarray[$fact1["fact"]])) print $factarray[$fact1["fact"]];
+								if (defined("GM_FACT_".$fact1["fact"])) print constant("GM_FACT_".$fact1["fact"]);
 								else print $fact1["fact"];
 								print "<input type=\"hidden\" name=\"keep1[]\" value=\"$i\" /></td>\n<td>".nl2br($fact1["subrec"])."</td></tr>\n";
 							}

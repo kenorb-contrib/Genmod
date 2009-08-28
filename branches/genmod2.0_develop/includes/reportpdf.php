@@ -1405,7 +1405,6 @@ function GMRGedcomSHandler($attrs) {
 		$processGedcoms++;
 		return;
 	}
-
 	$id = "";
 	$gt = preg_match("/0 @(.+)@/", $gedrec, $gmatch);
 	if ($gt > 0) {
@@ -1490,10 +1489,11 @@ function GMRGedcomSHandler($attrs) {
 		DisplayDetailsById($id, $rectype)) {
 			if ($debug) print "can show<br />";
 //			$newgedrec = privatize_gedcom($newgedrec);
-			$gedObj = new GedcomRecord($newgedrec);
+//			$gedObj = new GedcomRecord($newgedrec);
 			array_push($gedrecStack, array($gedrec, $fact, $desc));
 			//print "[$newgedrec]";
-			$gedrec = $gedObj->getGedcomRecord();
+//			$gedrec = $gedObj->getGedcomRecord();
+			$gedrec = FindGedcomRecord($id);
 			$ct = preg_match("/(\d+) (_?[A-Z0-9]+) (.*)/", $gedrec, $match);
 			if ($debug) print_r($match);
 			if ($ct>0) {
@@ -1906,7 +1906,7 @@ function GMRRepeatTagEHandler() {
 }
 
 function GMRvarSHandler($attrs) {
-	global $currentElement, $vars, $gedrec, $gedrecStack, $gm_lang, $factarray, $fact, $desc, $type;
+	global $currentElement, $vars, $gedrec, $gedrecStack, $gm_lang, $fact, $desc, $type;
 //print_r($attrs);
 //print "<br />";
 	$var = $attrs["var"];
@@ -1934,7 +1934,7 @@ function GMRvarSHandler($attrs) {
 }
 
 function GMRvarLetterSHandler($attrs) {
-	global $currentElement, $factarray, $fact, $desc;
+	global $currentElement, $fact, $desc;
 
 	$var = $attrs["var"];
 	if (!empty($var)) {
@@ -2092,7 +2092,7 @@ function NumToRoman($num, $lower) {
 }
 
 function GMRSetVarSHandler($attrs) {
-	global $vars, $gedrec, $gedrecStack, $gm_lang, $factarray, $fact, $desc, $type, $generation;
+	global $vars, $gedrec, $gedrecStack, $gm_lang, $fact, $desc, $type, $generation;
 
 	$name = $attrs["name"];
 	$value = $attrs["value"];
@@ -2120,8 +2120,12 @@ function GMRSetVarSHandler($attrs) {
 		if ($gt > 0) $value = preg_replace("/@/", "", trim($gmatch[1]));
 	}
 
-	if ((substr($value, 0, 9) == "\$gm_lang[") || (substr($value, 0, 11) == "\$factarray[")) {
+	if ((substr($value, 0, 9) == "\$gm_lang[")) {
 		$var = preg_replace(array("/\[/","/\]/"), array("['","']"), $value);
+		eval("\$value = $var;");
+	}
+	if (substr($value, 0, 11) == "\$factarray[") {
+		$var = preg_replace(array("/\$factarray\[/","/\]/"), array("GM_FACT_",""), $value);
 		eval("\$value = $var;");
 	}
 
@@ -2506,14 +2510,16 @@ function GMRListSHandler($attrs) {
 				if ($vars["status"]["id"] == "action0") $select = "0";
 				else if ($vars["status"]["id"] == "action1") $select = "1";
 			}
-			$repo_obj =& Repository::GetInstance($vars["repo"]["id"]);
-			if (isset($vars["repo"]) && !empty($vars["repo"]["id"])) $alist = $repo_obj->GetRepoActions($vars["repo"]["id"], $select);
-			else $alist = $Actionlist->GetActionList($select, true);
+			if (isset($vars["repo"]) && !empty($vars["repo"]["id"])) {
+				$repo_obj =& Repository::GetInstance($vars["repo"]["id"]);
+				$alist = $repo_obj->GetRepoActions($vars["repo"]["id"], $select);
+			}
+			else $alist = $Actions->GetActionList($select, true);
 			$list = array();
 			$oldrepo = "";
 			foreach ($alist as $key => $action) {
 				// Skip action with no repo
-				if (!empty($action->repo)) {
+				if ($action->repo != "") {
 					if ($action->repo != $oldrepo) {
 						if ($oldrepo != "") {
 							$list[$oldrepo]["gedcom"] = $gedline;

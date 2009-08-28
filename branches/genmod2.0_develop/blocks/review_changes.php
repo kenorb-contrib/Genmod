@@ -38,7 +38,7 @@ $GM_BLOCKS["review_changes_block"]["rss"]       = false;
  * Prints a block allowing the user review all changes pending approval
  */
 function review_changes_block($block = true, $config="", $side, $index) {
-	global $gm_lang, $GEDCOM, $GEDCOMS, $command, $SCRIPT_NAME, $QUERY_STRING, $factarray, $GM_IMAGE_DIR, $GM_IMAGES;
+	global $gm_lang, $GEDCOM, $GEDCOMS, $command, $SCRIPT_NAME, $QUERY_STRING, $GM_IMAGE_DIR, $GM_IMAGES;
 	global $gm_changes, $LAST_CHANGE_EMAIL, $ALLOW_EDIT_GEDCOM, $SERVER_URL, $TEXT_DIRECTION, $SHOW_SOURCES, $TIME_FORMAT, $GM_BLOCKS, $TBLPREFIX, $gm_username, $Users, $GedcomConfig;
 
 	if (!$ALLOW_EDIT_GEDCOM) return;
@@ -134,7 +134,7 @@ function review_changes_block($block = true, $config="", $side, $index) {
 						else if ($type == "OBJE") {
 							print "<b>".PrintReady(GetMediaDescriptor($gid))."</b> &lrm;(".$gid.")&lrm;\n";
 						}
-						else print "<b>".$factarray[$type]."</b> &lrm;(".$gid.")&lrm;\n";
+						else print "<b>".constant("GM_FACT_".$type)."</b> &lrm;(".$gid.")&lrm;\n";
 						if ($block) print "<br />";
 						if ($type=="INDI") print " <a href=\"individual.php?pid=".$gid."&amp;ged=".$gedcom."\">".$gm_lang["view_change_diff"]."</a>\n<br />";
 						if ($type=="FAM") print " <a href=\"family.php?famid=".$gid."&amp;ged=".$gedcom."\">".$gm_lang["view_change_diff"]."</a>\n<br />";

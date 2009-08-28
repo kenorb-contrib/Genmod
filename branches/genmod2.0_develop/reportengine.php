@@ -76,13 +76,16 @@ foreach($vars as $name=>$var) {
 	}
 }
 $vars = $newvars;
-
+//print "<pre>";
+//print_r($vars);
+//print "<br /><br />";
 foreach($varnames as $indexval => $name) {
 	if (!isset($vars[$name])) {
 		$vars[$name]["id"] = "";
 	}
 }
-
+//print_r($vars);
+//print "</pre>";
 $reports = GetReportList();
 if (!empty($report)) {
 	$r = basename($report);
@@ -234,7 +237,7 @@ function paste_id(value) {
 							print ">";
 							if (isset($gm_lang[$option])) print $gm_lang[$option];
 							else if (isset($gm_lang["p_".$option])) print $gm_lang["p_".$option];
-							else if (isset($factarray[$option])) print $factarray[$option];
+							else if (defined("GM_FACT_".$option)) print constant("GM_FACT_".$option);
 							else print $option;
 							print "</option>\n";
 						}

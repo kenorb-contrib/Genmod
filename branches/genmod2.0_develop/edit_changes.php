@@ -371,7 +371,7 @@ else {
 		print "<tr class=\"topbottombar shade2 $TEXT_DIRECTION\"><td colspan=\"2\">".$gm_lang["change_type"].": ";
 		if (isset($gm_lang[$changegroup[$groupid][0]["type"]])) print $gm_lang[$changegroup[$groupid][0]["type"]];
 		else print $changegroup[$groupid][0]["type"];
-		if (isset($factarray[$changegroup[$groupid][0]["fact"]])) print ": ".$factarray[$changegroup[$groupid][0]["fact"]];
+		if (defined("GM_FACT_".$changegroup[$groupid][0]["fact"])) print ": ".constant("GM_FACT_".$changegroup[$groupid][0]["fact"]);
 		print "</td><td>";
 		if ($changegroup[$groupid]["canaccept"]) print "<a href=\"edit_changes.php?action=accept&amp;cid=$groupid&amp;gedfile=".$changegroup[$groupid][0]["gedfile"]."\">".$gm_lang["accept"]."</a>";
 		if ($changegroup[$groupid]["canaccept"] && $changegroup[$groupid]["canreject"]) print " | ";

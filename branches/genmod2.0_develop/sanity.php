@@ -560,7 +560,7 @@ if (!empty($check_gedcoms)) {
 							foreach($subs as $keyf2 => $sub) {
 								preg_match("/(\d)\s(\w+)[\s.+\r\n|\r\n]/", $sub, $tags);
 								$numcf++;
-								if (isset($tags[2]) && !isset($factarray[$tags[2]]) && !in_array($tags[2],$rightfacts)) $wrongfacts[$tags[2]][] = array($key, $GEDCOM, "INDI");
+								if (isset($tags[2]) && !defined("GM_FACT_".$tags[2]) && !in_array($tags[2],$rightfacts)) $wrongfacts[$tags[2]][] = array($key, $GEDCOM, "INDI");
 							}
 						}
 						// Source citations
@@ -670,7 +670,7 @@ if (!empty($check_gedcoms)) {
 						foreach($subs as $keyf2 => $sub) {
 							preg_match("/(\d)\s(\w+)[\s.+\r\n|\r\n]/", $sub, $tags);
 							$numcf++;
-							if (isset($tags[2]) && !isset($factarray[$tags[2]]) && !in_array($tags[2],$rightfacts)) $wrongfacts[$tags[2]][] = array($key, $GEDCOM, "MEDIA", $gedlines["file"], $gedlines["title"]);
+							if (isset($tags[2]) && !defined("GM_FACT_".$tags[2]) && !in_array($tags[2],$rightfacts)) $wrongfacts[$tags[2]][] = array($key, $GEDCOM, "MEDIA", $gedlines["file"], $gedlines["title"]);
 						}
 					}
 				}
@@ -723,7 +723,7 @@ if (!empty($check_gedcoms)) {
 						foreach($subs as $keyf2 => $sub) {
 							preg_match("/(\d)\s(\w+)[\s.+\r\n|\r\n]/", $sub, $tags);
 							$numcf++;
-							if (isset($tags[2]) && !isset($factarray[$tags[2]]) && !in_array($tags[2],$rightfacts)) {
+							if (isset($tags[2]) && !defined("GM_FACT_".$tags[2]) && !in_array($tags[2],$rightfacts)) {
 								$wrongfacts[$tags[2]][] = array($key, $GEDCOM, "FAM", $gedlines["gedcom"]);
 								$inames = true;
 							}
@@ -797,7 +797,7 @@ if (!empty($check_gedcoms)) {
 						foreach($subs as $keyf2 => $sub) {
 							preg_match("/(\d)\s(\w+)[\s.+\r\n|\r\n]/", $sub, $tags);
 							$numcf++;
-							if (isset($tags[2]) && !isset($factarray[$tags[2]]) && !in_array($tags[2],$rightfacts)) $wrongfacts[$tags[2]][] = array($key, $GEDCOM, "SOUR");
+							if (isset($tags[2]) && !defined("GM_FACT_".$tags[2]) && !in_array($tags[2],$rightfacts)) $wrongfacts[$tags[2]][] = array($key, $GEDCOM, "SOUR");
 						}
 					}
 				}
@@ -892,7 +892,7 @@ if (!empty($check_gedcoms)) {
 						foreach($subs as $keyf2 => $sub) {
 							preg_match("/(\d)\s(\w+)[\s.+\r\n|\r\n]/", $sub, $tags);
 							$numcf++;
-							if (isset($tags[2]) && !isset($factarray[$tags[2]]) && !in_array($tags[2],$rightfacts)) $wrongfacts[$tags[2]][] = array($key, $GEDCOM, "REPO", $value["gedcom"]);
+							if (isset($tags[2]) && !defined("GM_FACT_".$tags[2]) && !in_array($tags[2],$rightfacts)) $wrongfacts[$tags[2]][] = array($key, $GEDCOM, "REPO", $value["gedcom"]);
 						}
 					}
 				}

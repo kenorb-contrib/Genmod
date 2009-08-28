@@ -105,7 +105,7 @@ abstract class GedcomRecord {
 		$this->show_changes = $show_changes;
 		if (empty($gedcomid)) $this->gedcomid = $GEDCOMID;
 		else $this->gedcomid = $gedcomid;
-		
+	
 		if ($this->gedrec == "") {
 			$this->xref = $id;
 			$this->type = $this->datatype;
@@ -486,19 +486,12 @@ abstract class GedcomRecord {
 							// an empty record indicates deletion, so only add the new record if not empty
 							if (!empty($cfact)) {
 								$newfact = new Fact($this->xref, $factobj->fact, $cfact, $factobj->count, "change_new");
-//								$factarray[1] = $cfact;
-//								$factarray[3] = "change_new";
 								// add the new fact
-//								$newfacts[] = $factarray;
 								$newfacts[] = $newfact;
 							}
 						}
 						// The record is deleted. Show the latest visible value of the fact
 						else {
-//							if (!empty($cfact)) $factarray[1] = $cfact;
-//							$factarray[3] = "change_old";
-//							// add the new fact
-//							$newfacts[] = $factarray;
 							if (!empty($cfact)) $factobj->factrec = $cfact;
 							$factobj->style = "change_old";
 							// add the new fact
@@ -517,13 +510,13 @@ abstract class GedcomRecord {
 		return $this->facts;
 	}
 	
-	public function	SelectFacts($factarray) {
+	public function	SelectFacts($factarr) {
 		
 		if (is_null($this->facts)) $this->ParseFacts();
 		
 		$facts = array();
 		// We must retain the order of the fact array
-		foreach ($factarray as $key => $fact) {
+		foreach ($factarr as $key => $fact) {
 			foreach ($this->facts as $key => $factobj) {
 				if ($factobj->fact == $fact) {
 					$facts[] = $factobj;

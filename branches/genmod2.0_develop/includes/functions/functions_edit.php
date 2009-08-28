@@ -268,7 +268,7 @@ function CheckGedcom($gedrec, $chan=true, $user="", $tstamp="") {
  * @param string $famtag		how the new person is added to the family
  */
 function PrintIndiForm($nextaction, $famid, $linenum="", $namerec="", $famtag="CHIL") {
-	global $gm_lang, $factarray, $pid, $GM_IMAGE_DIR, $GM_IMAGES, $monthtonum, $WORD_WRAPPED_NOTES;
+	global $gm_lang, $pid, $GM_IMAGE_DIR, $GM_IMAGES, $monthtonum, $WORD_WRAPPED_NOTES;
 	global $NPFX_accept, $SPFX_accept, $NSFX_accept, $FILE_FORM_accept, $USE_RTL_FUNCTIONS, $change_type;
 	global $GEDCOM, $gm_username, $Users;
 
@@ -580,7 +580,7 @@ function PrintIndiForm($nextaction, $famid, $linenum="", $namerec="", $famtag="C
 		fname=fname.replace(/ /g,'');
 		fname=fname.replace(/\//g,'');
 		if (fname=="") {
-			alert('<?php print $gm_lang["must_provide"]; print " ".$factarray["NAME"]; ?>');
+			alert('<?php print $gm_lang["must_provide"]; print " ".GM_FACT_NAME; ?>');
 			frm.NAME.focus();
 			return false;
 		}
@@ -613,12 +613,12 @@ function PrintCalendarPopup($id) {
 }
 
 function AddTagSeparator($fact="") {
-	global $factarray, $gm_lang;
+	global $gm_lang;
 	
 	print "<tr><td colspan=\"2\" class=\"shade3 center\">";
 	if(!empty($fact)) {
 		if (isset($gm_lang[$fact])) print $gm_lang[$fact];
-		else if (isset($factarray[$fact])) print $factarray[$fact];
+		else if (defined("GM_FACT_".$fact)) print constant("GM_FACT_".$fact);
 		else print $fact;
 	}
 	print "</td></tr>";
@@ -640,7 +640,7 @@ function AddTagSeparator($fact="") {
  * @param string $upperlevel	optional upper level tag (eg BIRT)
  */
 function AddSimpleTag($tag, $upperlevel="", $tab="1") {
-	global $factarray, $gm_lang, $GM_IMAGE_DIR, $GM_IMAGES, $MEDIA_DIRECTORY, $TEMPLE_CODES, $STATUS_CODES, $REPO_ID_PREFIX, $SPLIT_PLACES;
+	global $gm_lang, $GM_IMAGE_DIR, $GM_IMAGES, $MEDIA_DIRECTORY, $TEMPLE_CODES, $STATUS_CODES, $REPO_ID_PREFIX, $SPLIT_PLACES;
 	global $assorela, $tags, $emptyfacts, $TEXT_DIRECTION, $confighelpfile, $GM_BASE_DIRECTORY, $GEDCOM, $GEDCOMID;
 	global $NPFX_accept, $SPFX_accept, $NSFX_accept, $FILE_FORM_accept, $upload_count, $separatorfacts, $canhavey_facts;
 	static $tabkey;
@@ -696,7 +696,7 @@ function AddSimpleTag($tag, $upperlevel="", $tab="1") {
 		else if ($fact=="RESN") print_help_link($fact."_help", "qm");
 		else print_help_link("edit_".$fact."_help", "qm");
 		if (isset($gm_lang[$fact])) print $gm_lang[$fact];
-		else if (isset($factarray[$fact])) print $factarray[$fact];
+		else if (defined("GM_FACT_".$fact)) print constant("GM_FACT_".$fact);
 		else print $fact;
 		print "\n";
 		print "\n</td>";
@@ -901,7 +901,7 @@ function AddSimpleTag($tag, $upperlevel="", $tab="1") {
 			$a=strtolower($key);
 			$b=strtolower($value);
 			if (@strpos($a, $b)!==false or @strpos($b, $a)!==false) print " selected=\"selected\"";
-			print ">".$factarray["MARR_".strtoupper($key)]."</option>\n";
+			print ">".constant("GM_FACT_MARR_".strtoupper($key))."</option>\n";
 		}
 		print "</select>";
 	}
@@ -1044,7 +1044,7 @@ function AddSimpleTag($tag, $upperlevel="", $tab="1") {
  * @param string $tag		Gedcom tag name
  */
 function PrintAddLayer($tag, $level=2, $addfact=false) {
-	global $factarray, $gm_lang, $GM_IMAGE_DIR, $GM_IMAGES, $TEXT_DIRECTION;
+	global $gm_lang, $GM_IMAGE_DIR, $GM_IMAGES, $TEXT_DIRECTION;
 	global $MEDIA_DIRECTORY;
 
 	if ($tag=="SOUR") {
@@ -1344,12 +1344,12 @@ function CheckInputDate($datestr) {
 }
 
 function PrintQuickResn($name, $default="") {
-	global $SHOW_QUICK_RESN, $align, $factarray, $gm_lang, $tabkey;
+	global $SHOW_QUICK_RESN, $align, $gm_lang, $tabkey;
 	
 	if ($SHOW_QUICK_RESN) {
 		print "<tr><td class=\"shade2\">";
 		print_help_link("RESN_help", "qm");
-		print $factarray["RESN"]; 
+		print GM_FACT_RESN; 
 		print "</td>\n";
 		print "<td class=\"shade1\" colspan=\"3\">\n";
 		print "<select name=\"$name\" tabindex=\"".$tabkey."\" ><option value=\"\"></option><option value=\"confidential\"";
@@ -1366,7 +1366,7 @@ function PrintQuickResn($name, $default="") {
 	}
 }
 function PrintPedi($name, $value="", $showbio=true) {
-	global $align, $factarray, $gm_lang, $tabkey;
+	global $align, $gm_lang, $tabkey;
 
 	print "<select tabindex=\"".$tabkey."\" id=\"".$name."\" name=\"".$name."\">\n";
 		

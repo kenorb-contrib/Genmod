@@ -117,7 +117,8 @@ function StoreEnglish($setup=false,$only_english=false) {
 			$data[1] = substr(trim($data[1]), 0, -1);
 //			print $data[0]." - ".$data[1]."<br />";
 			// NOTE: Add the facts variable to the facts array
-			$factarray[$data[0]] = $data[1];
+//			$factarray[$data[0]] = $data[1];
+			
 			
 			// NOTE: Store the language variable in the database
 			if (!isset($data[1])) WriteToLog($line, "E", "S");
@@ -416,41 +417,48 @@ function LoadEnglish($return=false, $help=false, $altlang = false) {
 	}
 	if ($return) return $temp;
 }
-
-function LoadEnglishFacts($return=false, $help=false, $altlang = false) {
-	global $gm_lang, $factarray, $TBLPREFIX, $CONFIGURED, $DBCONN, $LANGUAGE, $GM_BASE_DIRECTORY, $language_settings;
+// param return returns the factarray for editing purposes
+// param altlang if true fills in missing texts in the designated language with english ones
+function LoadEnglishFacts($return=false, $altlang = false) {
+	global $gm_lang, $TBLPREFIX, $CONFIGURED, $DBCONN, $LANGUAGE, $GM_BASE_DIRECTORY, $language_settings;
 	
 	$temp = array();
-	$factarray = array();
 	if ($CONFIGURED && $DBCONN->connected) {
 		$sql = "SELECT COUNT(*) as total FROM ".$TBLPREFIX."facts";
 		$res = NewQuery($sql);
 		if ($res) $total_columns = $res->FetchAssoc($res->result);
 		else $total_columns["total"] = 0 ;
 		if ($total_columns["total"] > 0) {
+			// Load the extra files BEFORE the DB
+			if (!$return) {
+					// NOTE: include the extra file
+				if (file_exists($GM_BASE_DIRECTORY . "languages/facts.".$language_settings[$LANGUAGE]["lang_short_cut"].".extra.php")) {
+						require_once $GM_BASE_DIRECTORY . "languages/facts.".$language_settings[$LANGUAGE]["lang_short_cut"].".extra.php";
+				}
+				// NOTE: include the extra english file
+				if ($altlang && file_exists($GM_BASE_DIRECTORY . "languages/facts.".$language_settings["english"]["lang_short_cut"].".extra.php")) {
+					require_once $GM_BASE_DIRECTORY . "languages/facts.".$language_settings["english"]["lang_short_cut"].".extra.php";
+				}
+			}
 			if ($altlang) $sql = "SELECT lg_string, lg_english, lg_".$LANGUAGE." FROM ".$TBLPREFIX."facts";
 			else $sql = "SELECT lg_string, lg_english FROM ".$TBLPREFIX."facts";
 			$res = NewQuery($sql);
 			while ($row = $res->FetchAssoc($res->result)) {
 				if (!$return) {
-					if (!empty($row["lg_".$LANGUAGE]) && $altlang) $factarray[$row["lg_string"]] = $row["lg_".$LANGUAGE];
-					else $factarray[$row["lg_string"]] = $row["lg_english"];
+					if (!empty($row["lg_".$LANGUAGE])) {
+						if (!defined("GM_FACT_".$row["lg_string"])) {
+							define("GM_FACT_".$row["lg_string"], $row["lg_".$LANGUAGE]);
+						}
+					}
+					else {
+						if ($altlang && !defined("GM_FACT_".$row["lg_string"])) {
+							define("GM_FACT_".$row["lg_string"], $row["lg_english"]);
+						}
+					}
 				}
 				else {
 					if (!empty($row["lg_".$LANGUAGE])&& $altlang) $temp[$row["lg_string"]] = $row["lg_".$LANGUAGE];
 					else $temp[$row["lg_string"]] = $row["lg_english"];
-				}
-			}
-			if (!$return) {
-			// NOTE: include the extra english file
-				if (file_exists($GM_BASE_DIRECTORY . "languages/facts.".$language_settings["english"]["lang_short_cut"].".extra.php")) {
-					require_once $GM_BASE_DIRECTORY . "languages/facts.".$language_settings["english"]["lang_short_cut"].".extra.php";
-				}
-				if ($altlang) {
-					// NOTE: include the extra file
-					if (file_exists($GM_BASE_DIRECTORY . "languages/facts.".$language_settings[$LANGUAGE]["lang_short_cut"].".extra.php")) {
-						require_once $GM_BASE_DIRECTORY . "languages/facts.".$language_settings[$LANGUAGE]["lang_short_cut"].".extra.php";
-					}
 				}
 			}
 		}
@@ -460,20 +468,26 @@ function LoadEnglishFacts($return=false, $help=false, $altlang = false) {
 			// NOTE: If both string arrays are empty, no data came out of the database
 			// NOTE: We load the language from the file and write an error to the log
 			if (file_exists("languages/facts.en.txt")) {
+				$found = false;
 				// NOTE: Load the English language into memory
 				$lines = file("languages/facts.en.txt");
 				foreach ($lines as $key => $line) {
 					$data = preg_split("/\";\"/", $line, 2);
 					// NOTE: Add the facts variable to the facts array
-					if (!$return) $factarray[substr($data[0],1)] = substr(trim($data[1]),0,(strlen(trim($data[1]))-1));
+					if (!$return) {
+						define("GM_FACT_".substr($data[0],1), substr(trim($data[1]),0,(strlen(trim($data[1]))-1)));
+						$found = true;
+					}
 					else $temp[$row["lg_string"]] = substr(trim($data[1]),0,(strlen(trim($data[1]))-1));
 				}
-				if (count($factarray) > 0) {
-					$number = count($factarray);
-					WriteToLog("LoadEnglishFacts-> Factarray successfully loaded from file.","I","S");
+				if (!$return) {
+					if ($found) {
+						WriteToLog("LoadEnglishFacts-> Factarray successfully loaded from file.","I","S");
+					}
+					else WriteToLog("LoadEnglishFacts-> Factarray was not loaded from file.","E","S");
 				}
-				else WriteToLog("LoadEnglishFacts-> Factarray was not loaded from file.","E","S");
 			}
+			else WriteToLog("LoadEnglishFacts-> Factarray was not loaded from file.","E","S");
 		}
 	}
 	if ($return) return $temp;
@@ -520,8 +534,9 @@ function LoadLanguage($language, $return=false, $help=false) {
 	}
 }
 
-function LoadFacts($language, $return=false) {
-	global $gm_language, $gm_lang, $factarray, $TBLPREFIX, $CONFIGURED;
+// Used for editing languages. Returns an array with facts and their description in the designated language
+function LoadFacts($language) {
+	global $gm_language, $TBLPREFIX, $CONFIGURED;
 	
 	if (isset($gm_language[$language]) && $CONFIGURED) {
 		$temp = array();
@@ -530,10 +545,9 @@ function LoadFacts($language, $return=false) {
 		$res = NewQuery($sql);
 		if ($res) {
 			while ($row = $res->FetchAssoc($res->result)) {
-				if (!$return) $factarray[$row["lg_string"]] = $row["lg_".$language];
-				else $temp[$row["lg_string"]] = $row["lg_".$language];
+				$temp[$row["lg_string"]] = $row["lg_".$language];
 			}
-			if ($return) return $temp;
+			return $temp;
 		}
 		else return false;
 	}

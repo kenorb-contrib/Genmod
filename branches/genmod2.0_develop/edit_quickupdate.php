@@ -125,7 +125,7 @@ $gedrec = privatize_gedcom($gedrec);
 //-- put the updates into the gedcom record
 if ($action=="update") {
 	function check_updated_facts($i, &$famrec, $TAGS, $prefix){
-		global $typefacts, $pid, $gm_lang, $factarray, $change_type, $change_id, $can_auto_accept;
+		global $typefacts, $pid, $gm_lang, $change_type, $change_id, $can_auto_accept;
 		$famrec = trim($famrec);
 		$ct = preg_match("/0 @(.+)@/", $famrec, $match);
 //		print "famrec: ".$famrec;
