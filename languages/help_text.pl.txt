@@ -41,7 +41,7 @@
 "menu_help_help";"~Help Menu ~<br />#gm_lang[help_help_items]#|"
 "messaging2_help";"Po wysłaniu tej wiadomości otrzymasz jej kopię na adres email, który podałeś."
 "more_config_help";"<br /><b>Więcej pomocy</b><br />#gm_lang[context_help]#<br /><br />"
-"more_help";"<br />Jeśli chcesz mieć dostępną pomoc kontekstu na każdej stronie, upewnij sie że opcja <b>#gm_lang[show_context_help]#</b> (w Menu Pomoc) jest włączona i kliknij na znak <b>?</b> za tematem.<br />"
+"more_help";"<br />Jeśli chcesz mieć dostępną pomoc kontekstu na każdej stronie, upewnij sie że opcja <b>#gm_lang[show_contexthelp]#</b> (w Menu Pomoc) jest włączona i kliknij na znak <b>?</b> za tematem.<br />"
 "mygedview_myjournal_help";"~MÓJ DZIENNIK ~<br />Mo?esz u?ywa? tego dziennka do zapisywania notatek na w?asyn u?ytek.<br />Oczywi?cie notatki zostan? zapisane i nast?pnym razem kiedy wejdziesz na t? stron? b?d? tam nadal.<br /><br />Do dziennika nie maj? dost?pu inni u?ytkownicy.<br />"
 "name_list_help";"~LISTA NAZWISK~<br /><br />W tym oknie pojawi się lista nazwisk lub lista nazwisk z imionami.<br /> W obu przypadkach nazwiska będą zaczynać sie od litery którą wybrałeś z indeksu alfabetycznego. O ile nie kliknąłęść "Wszystkie"<br /><br />To czy będziesz widzieć w liste nazwisk czy kompletną listę zależy od ustawień."
 "new_password_help";"~POPROŚ O NEW HASŁO~<br />Jeżeli zapomniałeś swojego hasła, możesz uzyskać je klikając na odnośnik aby otworzyć je.<br />Zostaniesz przeniesiony do Strony "Prośba o zagubione hasło".|"

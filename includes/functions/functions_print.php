@@ -40,7 +40,7 @@ if (strstr($_SERVER["SCRIPT_NAME"],basename(__FILE__))) {
  * @param array $value is an array of the form array($name, $GEDCOM)
  */
 function print_list_person($key, $value, $findid=false, $asso="", $useli=true, $fact="") {
-	global $gm_lang, $SCRIPT_NAME, $pass, $indi_private, $indi_hide, $indi_total, $factarray, $NAME_REVERSE, $Privacy;
+	global $gm_lang, $SCRIPT_NAME, $pass, $indi_private, $indi_hide, $indi_total, $NAME_REVERSE, $Privacy;
 	global $GEDCOM, $GEDCOMS, $GEDCOMID, $SHOW_ID_NUMBERS, $TEXT_DIRECTION, $SHOW_PEDIGREE_PLACES, $GM_IMAGE_DIR, $GM_IMAGES, $SHOW_DEATH_LISTS;
 	
 	$key = splitkey($key, "id");
@@ -95,7 +95,7 @@ function print_list_person($key, $value, $findid=false, $asso="", $useli=true, $
 					$factrec = GetSubRecord(1, "1 DEAT", $indirec);
 					if (strlen($factrec)>7 && showFact("DEAT", $key, "INDI") && !FactViewRestricted($key, $factrec)) {
 						print " -- <i>";
-						print $factarray["DEAT"];
+						print GM_FACT_DEAT;
 						print " ";
 						print_fact_date($factrec);
 						print_fact_place($factrec);
@@ -106,7 +106,7 @@ function print_list_person($key, $value, $findid=false, $asso="", $useli=true, $
 		}
 		if (!empty($fact)) {
 			print " <i>(";
-			if (isset($factarray[$fact])) print $factarray[$fact];
+			if (defined("GM_FACT_".$fact)) print constant("GM_FACT_".$fact);
 			else print $fact;
 			print ")</i>";
 		}
@@ -131,7 +131,7 @@ function print_list_person($key, $value, $findid=false, $asso="", $useli=true, $
 				print ": ".$name;
 				if (!empty($avalue[2]) || !empty($avalue[3])) {
 					print " - ";
-					if (!empty($avalue[2])) print $factarray[$avalue[2]];
+					if (!empty($avalue[2])) print constant("GM_FACT_".$avalue[2]);
 					if(!empty($avalue[2]) && !empty($avalue[3])) print " : ";
 					if (isset($gm_lang[$avalue[3]])) print $gm_lang[$avalue[3]];
 					else print $avalue[3];
@@ -155,7 +155,7 @@ function print_list_person($key, $value, $findid=false, $asso="", $useli=true, $
 function print_list_family($key, $value, $findid=false, $asso="", $useli=true, $fact="") {
 	global $gm_lang, $pass, $fam_private, $fam_hide, $fam_total, $SHOW_ID_NUMBERS, $SHOW_FAM_ID_NUMBERS;
 	global $GEDCOM, $GEDCOMS, $GEDCOMID, $HIDE_LIVE_PEOPLE, $SHOW_PEDIGREE_PLACES;
-	global $TEXT_DIRECTION, $COMBIKEY, $Privacy, $factarray;
+	global $TEXT_DIRECTION, $COMBIKEY, $Privacy;
 
 	SwitchGedcom($value[1]);
 	
@@ -226,7 +226,7 @@ function print_list_family($key, $value, $findid=false, $asso="", $useli=true, $
 		}
 		if (!empty($fact)) {
 			print " <i>(";
-			if (isset($factarray[$fact])) print $factarray[$fact];
+			if (defined("GM_FACT_".$fact)) print constant("GM_FACT_".$fact);
 			else print $fact;
 			print ")</i>";
 		}
@@ -251,7 +251,7 @@ function print_list_family($key, $value, $findid=false, $asso="", $useli=true, $
 				print ": ".$name;
 				if(!empty($avalue[2]) || !empty($avalue[3])) {
 					print " - ";
-					if (!empty($avalue[2])) print $factarray[$avalue[2]];
+					if (!empty($avalue[2])) print constant("GM_FACT_".$avalue[2]);
 					if(!empty($avalue[2]) && !empty($avalue[3])) print " : ";
 					if (isset($gm_lang[$avalue[3]])) print $gm_lang[$avalue[3]];
 					else print $avalue[3];
@@ -402,7 +402,7 @@ function InitListCounters($action = "reset") {
  * @param int $count	on some charts it is important to keep a count of how many boxes were printed
  */
 function print_pedigree_person($pid, $style=1, $show_famlink=true, $count=0, $personcount="1", $indirec="") {
-	global $HIDE_LIVE_PEOPLE, $SHOW_LIVING_NAMES, $PRIV_PUBLIC, $factarray, $ZOOM_BOXES, $LINK_ICONS, $view, $SCRIPT_NAME, $GEDCOMID, $GEDCOM;
+	global $HIDE_LIVE_PEOPLE, $SHOW_LIVING_NAMES, $PRIV_PUBLIC, $ZOOM_BOXES, $LINK_ICONS, $view, $SCRIPT_NAME, $GEDCOMID, $GEDCOM;
 	global $gm_lang, $SHOW_HIGHLIGHT_IMAGES, $bwidth, $bheight, $show_full, $PEDIGREE_FULL_DETAILS, $SHOW_ID_NUMBERS, $SHOW_PEDIGREE_PLACES, $view;
 	global $CONTACT_EMAIL, $CONTACT_METHOD, $TEXT_DIRECTION, $DEFAULT_PEDIGREE_GENERATIONS, $OLD_PGENS, $talloffset, $PEDIGREE_LAYOUT, $MEDIA_DIRECTORY;
 	global $GM_IMAGE_DIR, $GM_IMAGES, $ABBREVIATE_CHART_LABELS;
@@ -1433,13 +1433,14 @@ function print_contact_links($style=0) {
  * @param string $pid the id of the individual to print, required to check privacy
  */
 function print_simple_fact($indirec, $fact, $pid) {
-	global $gm_lang, $SHOW_PEDIGREE_PLACES, $factarray, $ABBREVIATE_CHART_LABELS;
+	global $gm_lang, $SHOW_PEDIGREE_PLACES, $ABBREVIATE_CHART_LABELS;
+	
 	$emptyfacts = array("BIRT","CHR","DEAT","BURI","CREM","ADOP","BAPM","BARM","BASM","BLES","CHRA","CONF","FCOM","ORDN","NATU","EMIG","IMMI","CENS","PROB","WILL","GRAD","RETI","BAPL","CONL","ENDL","SLGC","EVEN","MARR","SLGS","MARL","ANUL","CENS","DIV","DIVF","ENGA","MARB","MARC","MARS","OBJE","CHAN","_SEPR","RESI", "DATA", "MAP");
 	$factrec = GetSubRecord(1, "1 $fact", $indirec);
 	if ((empty($factrec))||(FactViewRestricted($pid, $factrec))) return;
 	$label = "";
 	if (isset($gm_lang[$fact])) $label = $gm_lang[$fact];
-	else if (isset($factarray[$fact])) $label = $factarray[$fact];
+	else if (defined("GM_FACT_".$fact)) $label = constant("GM_FACT_".$fact);
 	if ($ABBREVIATE_CHART_LABELS) $label = GetFirstLetter($label);
 	// RFE [ 1229233 ] "DEAT" vs "DEAT Y"
 	// The check $factrec != "1 DEAT" will not show any records that only have 1 DEAT in them
@@ -1529,14 +1530,14 @@ function print_help_link($help, $helpText, $show_desc="", $use_print_text=false,
  * @param int $noprint		The switch if the text needs to be printed or returned
  */
 function print_text($help, $level=0, $noprint=0){
-	 global $gm_lang, $factarray, $COMMON_NAMES_THRESHOLD;
+	 global $gm_lang, $COMMON_NAMES_THRESHOLD;
 	 global $INDEX_DIRECTORY, $GEDCOMS, $GEDCOM, $GEDCOM_TITLE, $LANGUAGE;
 	 global $GUESS_URL, $UpArrow, $DAYS_TO_SHOW_LIMIT, $MEDIA_DIRECTORY;
 	 global $repeat, $thumbnail, $xref, $pid, $LANGUAGE;
 	
 	 if (!isset($_SESSION["DEBUG_LANG"])) $DEBUG_LANG = "no";
 	 else $DEBUG_LANG = $_SESSION["DEBUG_LANG"];
-	 if ($DEBUG_LANG == "yes") print "[LANG_DEBUG] Variable called: ".$help."<br /><br />";
+	 if ($DEBUG_LANG == "yes") print "[LANG_DEBUG] Variable called: ".$help." at level: ".$level."<br /><br />";
 	
 	 $sentence = "";
 	 if ($level>0) {
@@ -1546,6 +1547,8 @@ function print_text($help, $level=0, $noprint=0){
 		 else if (defined($help)) $sentence = constant($help);
 		 // check constant with prefix
 		 else if (defined("GM_".$help)) $sentence = constant("GM_".$help);
+		 // check fact constant
+		 else if (defined("GM_FACT_".$help)) $sentence = constant("GM_FACT_".$help);
 		 // check langvar
 		 else !isset($gm_lang[$help]) ? $sentence = GetString($help, $LANGUAGE) : $sentence = $gm_lang[$help];
 	 }
@@ -1572,7 +1575,7 @@ function print_text($help, $level=0, $noprint=0){
 	 $ct = preg_match_all("/#([a-zA-Z0-9_.\-\[\]]+)#/", $sentence, $match, PREG_SET_ORDER);
 	 for($i=0; $i<$ct; $i++) {
 		  $value = "";
-		  $newreplace = preg_replace(array("/gm_lang/","/\[/","/\]/"), array("","",""), $match[$i][1]);
+		  $newreplace = preg_replace(array("/factarray/","/gm_lang/","/\[/","/\]/"), array("","","",""), $match[$i][1]);
 		  if ($DEBUG_LANG == "yes") print "[LANG_DEBUG] Embedded variable: ".$match[$i][1]."<br /><br />";
 		  $value = print_text($newreplace, $level+1);
 		  if (!empty($value)) $sentence = str_replace($match[$i][0], $value, $sentence);
@@ -1594,7 +1597,8 @@ function print_text($help, $level=0, $noprint=0){
 	 print $sentence;
 }
 function print_help_index($help){
-	 global $gm_lang, $factarray;
+	 global $gm_lang;
+
 	 $sentence = $gm_lang[$help];
 	 $mod_sentence = "";
 	 $replace = "";
@@ -1617,9 +1621,10 @@ function print_help_index($help){
 			$var = print_text($items[1],0,1);
 		}
 		$sub = preg_replace(array("/factarray\\[/","/\]/"), array("",""), $replace);
-		if (isset($factarray[$sub])) {
-			$items = preg_split("/,/", $factarray[$sub]);
-			$var = $factarray[$items[1]];
+		print "sub: ".$sub."<br />";
+		if (defined("GM_FACT_".$sub)) {
+			$items = preg_split("/,/", constant("GM_FACT_".$sub));
+			$var = constant("GM_FACT_".$items[1]);
 		}
 		if (substr($var,0,1)=="_") {
 			$admcol=true;
@@ -1982,7 +1987,7 @@ function print_parents_age($pid, $bdate) {
  * @param string $indirec	optional individual record (to print age)
  */
 function print_fact_date($factrec, $anchor=false, $time=false, $fact=false, $pid=false, $indirec=false, $prt=true) {
-	global $factarray, $gm_lang;
+	global $gm_lang;
 
 	$prtstr = "";
 	$ct = preg_match("/2 DATE (.+)/", $factrec, $match);
@@ -2040,7 +2045,7 @@ function print_fact_date($factrec, $anchor=false, $time=false, $fact=false, $pid
 			$prtstr .= "<span class=\"label\">";
 			if ($indexval==1) $prtstr .= $gm_lang["husband"];
 			else if ($indexval==2) $prtstr .= $gm_lang["wife"];
-			else $prtstr .= $factarray["AGE"];
+			else $prtstr .= GM_FACT_AGE;
 			$prtstr .= "</span>: ";
 			$age = GetAgeAtEvent(substr($agerec,5));
 			$prtstr .= PrintReady($age);
@@ -2063,7 +2068,7 @@ function print_fact_date($factrec, $anchor=false, $time=false, $fact=false, $pid
  * @param boolean $lds		option to print LDS TEMPle and STATus
  */
 function print_fact_place($factrec, $anchor=false, $sub=false, $lds=false, $prt=true) {
-	global $SHOW_PEDIGREE_PLACES, $TEMPLE_CODES, $gm_lang, $factarray;
+	global $SHOW_PEDIGREE_PLACES, $TEMPLE_CODES, $gm_lang;
 
 	$printed = false;
 	$out = false;
@@ -2131,7 +2136,6 @@ function print_fact_place($factrec, $anchor=false, $sub=false, $lds=false, $prt=
 			}
 			$cts = preg_match("/\d _HEB (.*)/", $placerec, $match);
 			if ($cts>0) {
-//				if ($ct>0) print "<br />\n";
 				if ($ct>0) $prtstr .= " - ";
 				$prtstr .= " ".PrintReady($match[1]);
 			}
@@ -2139,13 +2143,13 @@ function print_fact_place($factrec, $anchor=false, $sub=false, $lds=false, $prt=
 			$cts = preg_match("/\d LATI (.*)/", $placerec, $match);
 			if ($cts>0) {
 				$map_lati = trim($match[1]);
-				$prtstr .= "<br />".$factarray["LATI"].": ".$match[1];
+				$prtstr .= "<br />".GM_FACT_LATI.": ".$match[1];
 			}
 			$map_long="";
 			$cts = preg_match("/\d LONG (.*)/", $placerec, $match);
 			if ($cts>0) {
 				$map_long = trim($match[1]);
-				$prtstr .= " ".$factarray["LONG"].": ".$match[1];
+				$prtstr .= " ".GM_FACT_LONG.": ".$match[1];
 			}
 			if (!empty($map_lati) and !empty($map_long)) {
 				$prtstr .= " <a target=\"_BLANK\" href=\"http://www.mapquest.com/maps/map.adp?searchtype=address&formtype=latlong&latlongtype=decimal&latitude=".$map_lati."&longitude=".$map_long."\"><img src=\"images/mapq.gif\" border=\"0\" alt=\"Mapquest &copy;\" title=\"Mapquest &copy;\" /></a>";
@@ -2193,7 +2197,7 @@ function print_fact_place($factrec, $anchor=false, $sub=false, $lds=false, $prt=
  * @param string $key	indi pid
  */
 function print_first_major_fact($key, $indirec="", $prt=true, $break=false) {
-	global $gm_lang, $factarray, $GM_BASE_DIRECTORY, $factsfile, $LANGUAGE;
+	global $gm_lang, $GM_BASE_DIRECTORY, $factsfile, $LANGUAGE;
 	
 	$majorfacts = array("BIRT", "CHR", "BAPM", "DEAT", "BURI", "BAPL", "ADOP");
 	if (empty($indirec)) $indirec = FindPersonRecord($key);
@@ -2205,7 +2209,7 @@ function print_first_major_fact($key, $indirec="", $prt=true, $break=false) {
 			else $retstr .= " -- ";
 			$retstr .= "<i>";
 			if (isset($gm_lang[$fact])) $retstr .= $gm_lang[$fact];
-			else if (isset($factarray[$fact])) $retstr .= $factarray[$fact];
+			else if (defined("GM_FACT_".$fact)) $retstr .= constant("GM_FACT_".$fact);
 			else $retstr .= $fact;
 			$retstr .= " ";
 			$retstr .= print_fact_date($factrec, false, false, false, false, false, false);
@@ -2728,7 +2732,7 @@ function ExpandUrl($text) {
 }
 
 function PrintFilterEvent($filterev) {
-	global $gm_lang, $factarray;
+	global $gm_lang;
 	
 	print "<option value=\"all\"";
 	if ($filterev == "all") print " selected=\"selected\"";
@@ -2736,40 +2740,40 @@ function PrintFilterEvent($filterev) {
 	
 	print "<option value=\"BIRT\"";
 	if ($filterev == "BIRT") print " selected=\"selected\"";
-	print ">".$factarray["BIRT"]."</option>\n";
+	print ">".GM_FACT_BIRT."</option>\n";
 	print "<option value=\"CHR\"";
 	if ($filterev == "CHR") print " selected=\"selected\"";
-	print ">".$factarray["CHR"]."</option>\n";
+	print ">".GM_FACT_CHR."</option>\n";
 	print "<option value=\"CHRA\"";
 	if ($filterev == "CHRA") print " selected=\"selected\"";
-	print ">".$factarray["CHRA"]."</option>\n";
+	print ">".GM_FACT_CHRA."</option>\n";
 	print "<option value=\"BAPM\"";
 	if ($filterev == "BAPM") print " selected=\"selected\"";
-	print ">".$factarray["BAPM"]."</option>\n";
+	print ">".GM_FACT_BAPM."</option>\n";
 	print "<option value=\"_COML\"";
 	if ($filterev == "_COML") print " selected=\"selected\"";
-	print ">".$factarray["_COML"]."</option>\n";
+	print ">".GM_FACT__COML."</option>\n";
 	print "<option value=\"MARR\"";
 	if ($filterev == "MARR") print " selected=\"selected\"";
-	print ">".$factarray["MARR"]."</option>\n";
+	print ">".GM_FACT_MARR."</option>\n";
 //	print "<option value=\"_SEPR\"";
 //	if ($filterev == "_SEPR") print " selected=\"selected\"";
 //	print ">".$factarray["_SEPR"]."</option>\n";
 	print "<option value=\"DIV\"";
 	if ($filterev == "DIV") print " selected=\"selected\"";
-	print ">".$factarray["DIV"]."</option>\n";
+	print ">".GM_FACT_DIV."</option>\n";
 	print "<option value=\"DEAT\"";
 	if ($filterev == "DEAT") print " selected=\"selected\"";
-	print ">".$factarray["DEAT"]."</option>\n";
+	print ">".GM_FACT_DEAT."</option>\n";
 	print "<option value=\"BURI\"";
 	if ($filterev == "BURI") print " selected=\"selected\"";
-	print ">".$factarray["BURI"]."</option>\n";
+	print ">".GM_FACT_BURI."</option>\n";
 	print "<option value=\"IMMI\"";
 	if ($filterev == "IMMI") print " selected=\"selected\"";
-	print ">".$factarray["IMMI"]."</option>\n";
+	print ">".GM_FACT_IMMI."</option>\n";
 	print "<option value=\"EMIG\"";
 	if ($filterev == "EMIG") print " selected=\"selected\"";
-	print ">".$factarray["EMIG"]."</option>\n";
+	print ">".GM_FACT_EMIG."</option>\n";
 	print "<option value=\"EVEN\"";
 	if ($filterev == "EVEN") print " selected=\"selected\"";
 	print ">".$gm_lang["custom_event"]."</option>\n";

@@ -267,7 +267,7 @@ class NoteController extends DetailController {
 	 */
 	protected function PrintGeneralNote($styleadd="", $mayedit=true) {
 		global $gm_lang, $gm_username, $Users;
-		global $factarray, $view, $show_changes;
+		global $view, $show_changes;
 		global $WORD_WRAPPED_NOTES, $GM_IMAGE_DIR;
 		global $GM_IMAGES;
 

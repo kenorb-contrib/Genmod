@@ -100,12 +100,12 @@ function getUpcomingEvents() {
 	$OutputDone = false;
 	$PrivateFacts = false;
 	$lastgid="";
-	foreach($found_facts as $key=>$factarray) {
-		$datestamp = $factarray[3];
+	foreach($found_facts as $key=>$factarr) {
+		$datestamp = $factarr[3];
 		if (($datestamp>=$monthstart) && ($datestamp<=$monthstart+(60*60*24*$daysprint))) {
-			if ($factarray[2]=="INDI") {
-				$gid = $factarray[0];
-				$factrec = $factarray[1];
+			if ($factarr[2]=="INDI") {
+				$gid = $factarr[0];
+				$factrec = $factarr[1];
 				$disp = true;
 				if ($filter=="living" and IsDeadId($gid)){
 					$disp = false;
@@ -143,9 +143,9 @@ function getUpcomingEvents() {
 				}
 			}
 
-			if ($factarray[2]=="FAM") {
-				$gid = $factarray[0];
-				$factrec = $factarray[1];
+			if ($factarr[2]=="FAM") {
+				$gid = $factarr[0];
+				$factrec = $factarr[1];
 
 				$disp = true;
 				if ($filter=="living") {
@@ -248,10 +248,10 @@ function getTodaysEvents() {
 	$found_facts = GetCachedEvents($action, 1, $filter, "no", $skipfacts);
 
 	$lastgid="";
-	foreach($found_facts as $index=>$factarray) {
-		if ($factarray[2]=="INDI") {
-			$gid = $factarray[0];
-			$factrec = $factarray[1];
+	foreach($found_facts as $index=>$factarr) {
+		if ($factarr[2]=="INDI") {
+			$gid = $factarr[0];
+			$factrec = $factarr[1];
 	  		if ((displayDetailsById($gid)) && (!FactViewRestricted($gid, $factrec))) {
 				$indirec = FindPersonRecord($gid);
 				$text = GetCalendarFact($factrec, $action, $filter, $gid);
@@ -271,9 +271,9 @@ function getTodaysEvents() {
 			}
 		}
 
-		if ($factarray[2]=="FAM") {
-			$gid = $factarray[0];
-			$factrec = $factarray[1];
+		if ($factarr[2]=="FAM") {
+			$gid = $factarr[0];
+			$factrec = $factarr[1];
 	  		if ((displayDetailsById($gid, "FAM")) && (!FactViewRestricted($gid, $factrec))) {
 				$famrec = FindFamilyRecord($gid);
 				$name = GetFamilyDescriptor($gid);
@@ -528,7 +528,7 @@ function getTop10Surnames() {
  * @todo Find out why TOTAL_QUERIES is here???
  */
 function getRecentChanges() {
-	global $gm_lang, $factarray, $month, $year, $day, $monthtonum, $HIDE_LIVE_PEOPLE, $SHOW_ID_NUMBERS, $command, $TEXT_DIRECTION, $SHOW_FAM_ID_NUMBERS;
+	global $gm_lang, $month, $year, $day, $monthtonum, $HIDE_LIVE_PEOPLE, $SHOW_ID_NUMBERS, $command, $TEXT_DIRECTION, $SHOW_FAM_ID_NUMBERS;
 	global $GM_IMAGE_DIR, $GM_IMAGES, $GEDCOM, $REGEXP_DB, $DEBUG, $ASC, $IGNORE_FACTS, $IGNORE_YEAR, $TOTAL_QUERIES, $LAST_QUERY, $GM_BLOCKS, $SHOW_SOURCES,$SERVER_URL;
 	global $medialist, $gm_username, $Users;
 
@@ -592,7 +592,7 @@ function getRecentChanges() {
 						$recentText .= "</a><br />\n";
 						$lastgid=$gid;
 					}
-					$recentText .= $factarray["CHAN"];
+					$recentText .= GM_FACT_CHAN;
 					$ct = preg_match("/\d DATE (.*)/", $factrec, $match);
 					if ($ct>0) {
 							$recentText .= " - ".GetChangedDate($match[1]);
@@ -621,7 +621,7 @@ function getRecentChanges() {
 						$recentText .= "</a><br />\n";
 						$lastgid=$gid;
 					}
-					$recentText .= $factarray["CHAN"];
+					$recentText .= GM_FACT_CHAN;
 					$ct = preg_match("/\d DATE (.*)/", $factrec, $match);
 					if ($ct>0) {
 							$recentText .= " - ".GetChangedDate($match[1]);
@@ -650,7 +650,7 @@ function getRecentChanges() {
 						$recentText .= "</a><br />\n";
 						$lastgid=$gid;
 					}
-					$recentText .= $factarray["CHAN"];
+					$recentText .= GM_FACT_CHAN;
 					$ct = preg_match("/\d DATE (.*)/", $factrec, $match);
 					if ($ct>0) {
 							$recentText .= " - ".GetChangedDate($match[1]);
@@ -679,7 +679,7 @@ function getRecentChanges() {
 						$recentText .= "</a><br />\n";
 						$lastgid=$gid;
 					}
-					$recentText .= $factarray["CHAN"];
+					$recentText .= GM_FACT_CHAN;
 					$ct = preg_match("/\d DATE (.*)/", $factrec, $match);
 					if ($ct>0) {
 							$recentText .= " - ".GetChangedDate($match[1]);
@@ -709,7 +709,7 @@ function getRecentChanges() {
 						$recentText .= "</a><br />\n";
 						$lastgid=$gid;
 					}
-					$recentText .= $factarray["CHAN"];
+					$recentText .= GM_FACT_CHAN;
 					$ct = preg_match("/\d DATE (.*)/", $factrec, $match);
 					if ($ct>0) {
 							$recentText .= " - ".GetChangedDate($match[1]);

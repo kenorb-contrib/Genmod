@@ -222,7 +222,7 @@
 "_SSHOW";"Diavoorstelling"
 "_STAT";"Burgerlijke staat"
 "_SUBQ";"Verkorte versie"
-"_THUM";"Gebruik deze afbeelding als de miniweergave?"
+"_THUM";"Gebruik deze afbeelding als de miniweergave"
 "_TODO";"Te doen"
 "_TYPE";"Multimediatype"
 "_UID";"Universeel kenmerk (UID)"

@@ -44,7 +44,7 @@ if (strstr($_SERVER["SCRIPT_NAME"],basename(__FILE__))) {
  */
 function print_place_subfields($element_id) {
 	global $gm_lang, $GM_IMAGE_DIR, $GM_IMAGES, $lang_short_cut, $LANGUAGE;
-	global $countries, $factarray;
+	global $countries;
 
 	if ($element_id=="DEAT_PLAC") return; // known bug - waiting for a patch
 
@@ -55,7 +55,7 @@ function print_place_subfields($element_id) {
 	if (empty($HEAD_PLAC_FORM)) $HEAD_PLAC_FORM = $gm_lang["default_form"];
 	$plac_label = preg_split ("/,/", $HEAD_PLAC_FORM);
 	$plac_label = array_reverse($plac_label);
-	if ($HEAD_PLAC_FORM == $gm_lang["default_form"]) $plac_label[0] = $factarray["CTRY"];
+	if ($HEAD_PLAC_FORM == $gm_lang["default_form"]) $plac_label[0] = GM_FACT_CTRY;
 	?>
 	<script type="text/javascript" src="strings.js"></script>
 	<script type="text/javascript">
@@ -248,7 +248,7 @@ function print_place_subfields($element_id) {
 		$subtagid=$element_id."_".$i;
 		$subtagname=$element_id."_".$i;
 		$plac_label[$i]=trim($plac_label[$i]);
-		if (in_array($plac_label[$i], array("Country", "Pays", "Land", "Zeme", "�lke", "Pa�s", "Orsz�g", "Nazione", "Kraj", "Maa", $factarray["CTRY"]))) {
+		if (in_array($plac_label[$i], array("Country", "Pays", "Land", "Zeme", "�lke", "Pa�s", "Orsz�g", "Nazione", "Kraj", "Maa", GM_FACT_CTRY))) {
 			$cols="8";
 			$subtagname="PLAC_CTRY";
 			$icountry=$i;

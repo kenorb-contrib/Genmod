@@ -217,13 +217,12 @@ class Fact {
 	}
 */		
 	private function getFactDescription() {
-		global $factarray;
 		
 		if (is_null($this->descr)) {
 			if ($this->ShowDetails()) {
 				if (substr($this->fact, 0, 1) == "X") $fact = substr($this->fact, 1);
 				else $fact = $this->fact;
-				$this->descr = $factarray[$fact];
+				$this->descr = constant("GM_FACT_".$fact);
 			}
 			else $this->descr = "";
 		}
@@ -299,7 +298,7 @@ class Fact {
 	 * @param string $indirec	optional individual record (to print age)
 	 */
 	public function PrintFactDate($anchor=false, $time=false, $fact=false, $pid=false, $prt=true) {
-		global $factarray, $gm_lang;
+		global $gm_lang;
 	
 		$prtstr = "";
 		$ct = preg_match("/2 DATE (.+)/", $this->factrec, $match);
@@ -364,7 +363,7 @@ class Fact {
 				$prtstr .= "<span class=\"label\">";
 				if ($indexval == 1) $prtstr .= $gm_lang["husband"];
 				else if ($indexval == 2) $prtstr .= $gm_lang["wife"];
-				else $prtstr .= $factarray["AGE"];
+				else $prtstr .= GM_FACT_AGE;
 				$prtstr .= "</span>: ";
 				$age = GetAgeAtEvent(substr($agerec,5));
 				$prtstr .= PrintReady($age);
@@ -387,7 +386,7 @@ class Fact {
 	 * @param boolean $lds		option to print LDS TEMPle and STATus
 	 */
 	public function PrintFactPlace($anchor=false, $sub=false, $lds=false, $prt=true) {
-		global $SHOW_PEDIGREE_PLACES, $TEMPLE_CODES, $gm_lang, $factarray;
+		global $SHOW_PEDIGREE_PLACES, $TEMPLE_CODES, $gm_lang;
 	
 		$printed = false;
 		$out = false;
@@ -463,13 +462,13 @@ class Fact {
 				$cts = preg_match("/\d LATI (.*)/", $placerec, $match);
 				if ($cts>0) {
 					$map_lati = trim($match[1]);
-					$prtstr .= "<br />".$factarray["LATI"].": ".$match[1];
+					$prtstr .= "<br />".GM_FACT_LATI.": ".$match[1];
 				}
 				$map_long="";
 				$cts = preg_match("/\d LONG (.*)/", $placerec, $match);
 				if ($cts>0) {
 					$map_long = trim($match[1]);
-					$prtstr .= " ".$factarray["LONG"].": ".$match[1];
+					$prtstr .= " ".GM_FACT_LONG.": ".$match[1];
 				}
 				if (!empty($map_lati) and !empty($map_long)) {
 					$prtstr .= " <a target=\"_BLANK\" href=\"http://www.mapquest.com/maps/map.adp?searchtype=address&formtype=latlong&latlongtype=decimal&latitude=".$map_lati."&longitude=".$map_long."\"><img src=\"images/mapq.gif\" border=\"0\" alt=\"Mapquest &copy;\" title=\"Mapquest &copy;\" /></a>";

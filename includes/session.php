@@ -641,7 +641,7 @@ else $show_changes = false;
 LoadEnglish(false, false, true);
 
 //NOTE: Load factsfile
-LoadEnglishFacts(false, false, true);
+LoadEnglishFacts(false, true);
 
 // Check for page views exceeding the limit
 CheckPageViews();

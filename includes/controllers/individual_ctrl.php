@@ -418,7 +418,7 @@ class IndividualController extends DetailController {
 	 * @param int $linenum		the line number from the original INDI gedcom record where this name record started, used for editing
 	 */
 	public function PrintNameRecord($factrec, $count, $showedit=true) {
-		global $gm_lang, $factarray, $NAME_REVERSE;
+		global $gm_lang, $NAME_REVERSE;
 		
 		if ((!showFact("NAME", $this->xref))||(!showFactDetails("NAME", $this->xref))) return false;
 		
@@ -453,7 +453,7 @@ class IndividualController extends DetailController {
 			if (($fact!="SOUR")&&($fact!="NOTE")) {
 				print "\n\t\t\t<span class=\"label\">";
 				if (isset($gm_lang[$fact])) print $gm_lang[$fact];
-				else if (isset($factarray[$fact])) print $factarray[$fact];
+				else if (defined("GM_FACT_".$fact)) print constant("GM_FACT_".$fact);
 				else print $fact;
 				print ":</span><span class=\"field\"> ";
 				if (isset($nmatch[$i][2])) {

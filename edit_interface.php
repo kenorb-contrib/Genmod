@@ -320,7 +320,7 @@ else if (strstr($action,"addnewparent")) {
 	else print "<b>".$gm_lang["add_father"]."</b><br />\n";
 }
 else {
-	if (isset($factarray[$type])) print "<b>".$factarray[$type]."</b><br />";
+	if (defined("GM_FACT_".$type)) print "<b>".constant("GM_FACT_".$type)."</b><br />";
 }
 
 switch ($action) {
@@ -721,7 +721,7 @@ switch ($action) {
 				<?php print $gm_lang["relation_families"]; ?>
 				</td></tr>
 				<?php
-				print "<tr class=\"shade2\"><td>".$factarray["PEDI"]."</td><td>".$gm_lang["family"]."</td><td>".$gm_lang["primary"]."</tr>";
+				print "<tr class=\"shade2\"><td>".GM_FACT_PEDI."</td><td>".$gm_lang["family"]."</td><td>".$gm_lang["primary"]."</tr>";
 				$famids = FindFamilyIds($pid, "", true);
 				$hasprimary = false;
 				foreach($famids as $famid=>$fam) {
@@ -1614,7 +1614,7 @@ switch ($action) {
 					break;
 				}
 			}
-			print "<tr><td class=\"shade2\">".$factarray["PEDI"]."</td>";
+			print "<tr><td class=\"shade2\">".GM_FACT_PEDI."</td>";
 			print "<td class=\"shade1\">";
 			PrintPedi("PEDI", "", $showbio);
 			print "</td></tr>";
@@ -1675,7 +1675,7 @@ switch ($action) {
 		print "&nbsp;<span id=\"famlink\"></span>";
 		print "\n</td></tr>";
 		if ($famtag == "CHIL") {
-			print "<tr><td class=\"shade2\">".$factarray["PEDI"]."</td>";
+			print "<tr><td class=\"shade2\">".GM_FACT_PEDI."</td>";
 			print "<td class=\"shade1\">";
 			PrintPedi("PEDI");
 			print "</td></tr>";
@@ -1731,7 +1731,7 @@ switch ($action) {
 						if ($famtag == "HUSB") print $gm_lang["husb_present"];
 						else if ($famtag == "WIFE") print $gm_lang["wife_present"];
 						print "<br />";
-						print $factarray[$famtag].": ".PrintReady(GetPersonName($spid));
+						print constant("GM_FACT_".$famtag).": ".PrintReady(GetPersonName($spid));
 						$success = false;
 					}
 					else {
@@ -1915,7 +1915,7 @@ switch ($action) {
 		<!--
 			function check_ansform(frm) {
 				if (document.getElementById("<?php print $element_id?>").value=="") {
-					alert('<?php print $gm_lang["must_provide"].$factarray["TITL"]; ?>');
+					alert('<?php print $gm_lang["must_provide"].GM_FACT_TITL; ?>');
 					document.getElementById("<?php print $element_id?>").focus();
 					return false;
 				}
@@ -1968,7 +1968,7 @@ switch ($action) {
 		<!--
 			function check_form(frm) {
 				if (frm.NAME.value=="") {
-					alert('<?php print $gm_lang["must_provide"]." ".$factarray["NAME"]; ?>');
+					alert('<?php print $gm_lang["must_provide"]." ".GM_FACT_NAME; ?>');
 					frm.NAME.focus();
 					return false;
 				}
@@ -1985,22 +1985,22 @@ switch ($action) {
 			<input type="hidden" name="change_type" value="<?php print $change_type; ?>" />
 			<table class="facts_table">
 				<?php AddTagSeparator("create_repository"); ?>
-				<tr><td class="shade2"><?php print $factarray["NAME"]; ?></td>
+				<tr><td class="shade2"><?php print GM_FACT_NAME; ?></td>
 				<td class="shade1"><input tabindex="<?php print $tabkey; ?>" type="text" name="NAME" id="NAME" value="" size="40" maxlength="255" /> <?php LinkFunctions::PrintSpecialCharLink("NAME"); ?></td></tr>
 				<?php $tabkey++; ?>
-				<tr><td class="shade2"><?php print $factarray["ADDR"]; ?></td>
+				<tr><td class="shade2"><?php print GM_FACT_ADDR; ?></td>
 				<td class="shade1"><textarea tabindex="<?php print $tabkey; ?>" name="ADDR" id="ADDR" rows="5" cols="60"></textarea><?php LinkFunctions::PrintSpecialCharLink("ADDR"); ?> </td></tr>
 				<?php $tabkey++; ?>
-				<tr><td class="shade2"><?php print $factarray["PHON"]; ?></td>
+				<tr><td class="shade2"><?php print GM_FACT_PHON; ?></td>
 				<td class="shade1"><input tabindex="<?php print $tabkey; ?>" type="text" name="PHON" id="PHON" value="" size="40" maxlength="255" /> </td></tr>
 				<?php $tabkey++; ?>
-				<tr><td class="shade2"><?php print $factarray["FAX"]; ?></td>
+				<tr><td class="shade2"><?php print GM_FACT_FAX; ?></td>
 				<td class="shade1"><input tabindex="<?php print $tabkey; ?>" type="text" name="FAX" id="FAX" value="" size="40" /></td></tr>
 				<?php $tabkey++; ?>
-				<tr><td class="shade2"><?php print $factarray["EMAIL"]; ?></td>
+				<tr><td class="shade2"><?php print GM_FACT_EMAIL; ?></td>
 				<td class="shade1"><input tabindex="<?php print $tabkey; ?>" type="text" name="EMAIL" id="EMAIL" value="" size="40" maxlength="255" onchange="sndReq('errem', 'checkemail', 'email', this.value);" />&nbsp;&nbsp;<span id="errem"></span></td></tr>
 				<?php $tabkey++; ?>
-				<tr><td class="shade2"><?php print $factarray["WWW"]; ?></td>
+				<tr><td class="shade2"><?php print GM_FACT_WWW; ?></td>
 				<td class="shade1"><input tabindex="<?php print $tabkey; ?>" type="text" name="WWW" id="WWW" value="" size="40" maxlength="255" /> </td></tr>
 				<?php if ($Users->UserCanAccept($gm_username) && !$Users->userAutoAccept($gm_username)) {?>
 					<tr><td class="shade1" colspan="2"><input name="aa_attempt" type="checkbox" value="1" /><?php print $gm_lang["attempt_auto_acc"]?></td></tr>

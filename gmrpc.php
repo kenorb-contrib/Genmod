@@ -243,8 +243,7 @@ switch($action) {
 				if ($f2>0) print "<br />\n";
 				$f2++;
 				// NOTE: Handle ASSO record
-				$prted = FactFunctions::PrintAssoRelaRecord($pid, $factobj, false);
-				if ($prted) continue;
+//				if ($prted) continue;
 				$fft = preg_match("/^1 (\w+)(.*)/m", $factobj->factrec, $ffmatch);
 				if ($fft>0) {
 					$fact = trim($ffmatch[1]);
@@ -252,7 +251,7 @@ switch($action) {
 				}
 				if ($factobj->fact != "EVEN" && $factobj->fact != "FACT") {
 					print "<span class=\"details_label\">";
-					if (isset($factarray[$factobj->fact])) print $factarray[$factobj->fact];
+					if (defined("GM_FACT_".$factobj->fact)) print constant("GM_FACT_".$factobj->fact);
 					else print $factobj->fact;
 					print "</span> ";
 				}
@@ -262,7 +261,7 @@ switch($action) {
 //					if ($tct>0) {
 //						$facttype = trim($match[1]);
 						print "<span class=\"details_label\">";
-						if (isset($factarray[$factobj->factref])) print PrintReady($factarray[$factobj->factref]);
+						if (defined("GM_FACT_".$factobj->factref)) print PrintReady(constant("GM_FACT_".$factobj->factref));
 						else print $factobj->factref;
 						print "</span> ";
 					}
@@ -288,6 +287,7 @@ switch($action) {
 					if (!$factobj->owner->view) print "<a href=\"family.php?famid=".$famid."&amp;gedid=".$GEDCOMID."\">[".$gm_lang["view_family"]."]</a>\n";
 				}
 				$factobj->PrintFactPlace(true, true);
+				$prted = FactFunctions::PrintAssoRelaRecord($factobj, $pid, true);
 			}
 		}
 	break;

@@ -169,17 +169,21 @@ function search_ID_details($checkVar, $outputVar) {
 }
 
 function PrintFactChoice() {
-	global $factarray;
-	
-	foreach($factarray as $tag=>$label) {
-		$f6=substr($tag,0,6);
-		if ($f6 != "_BIRT_" && $f6 != "_DEAT_" && $f6 != "_MARR_") {
-			print "<option";
-			print " value=\"";
-			print $tag;
-			print "\">";
-			print $tag . " - " . str_replace("<br />", " ", $label);
-			print "</option>";
+
+	$factarr = get_defined_constants(true);
+	foreach ($factarr["user"] as $factkey=>$label) {
+		$fcheck = substr($factkey, 0, 8);
+		if ($fcheck == "GM_FACT_") {
+			$f6=substr($factkey,8,6);
+			$tag = substr($factkey, 8);
+			if ($f6 != "_BIRT_" && $f6 != "_DEAT_" && $f6 != "_MARR_") {
+				print "<option";
+				print " value=\"";
+				print $tag;
+				print "\">";
+				print $tag . " - " . str_replace("<br />", " ", $label);
+				print "</option>";
+			}
 		}
 	}
 }
@@ -742,7 +746,7 @@ if ($action=="update") {
               <input type="checkbox" name="v_global_facts_del[<?php print $tag; ?>][<?php print $key; ?>]" value="1" /></td>
               <td class="shade1">
               <?php
-                if (isset($factarray[$tag])) print $factarray[$tag];
+                if (defined("GM_FACT_".$tag)) print constant("GM_FACT_".$tag);
                 else print $tag;
                 ?>
               </td>
@@ -850,7 +854,7 @@ if ($action=="update") {
           ?></td>
           <td class="shade1">
           <?php
-            print $tag. " - ".$factarray[$tag];
+            print $tag. " - ".constant("GM_FACT_".$tag);
           ?></td>
           <td class="shade1"><?php
           if ($key == "show") print $gm_lang["fact_show"];

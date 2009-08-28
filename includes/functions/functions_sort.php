@@ -33,7 +33,6 @@ if (strstr($_SERVER["SCRIPT_NAME"],basename(__FILE__))) {
 // ************************************************* START OF SORTING FUNCTIONS ********************************* //
 // Helper function to sort facts.
 function CompareFactsType($arec, $brec, $type) {
-	global $factarray;
 	static $factsort, $facttype;
 
 	if (is_array($arec)) $arec = $arec[1];
@@ -47,8 +46,8 @@ function CompareFactsType($arec, $brec, $type) {
 	$afact=$matcha[1];
 	$bfact=$matchb[1];
 
-	if (($afact=="EVEN" || $afact=="FACT") && preg_match("/2\s+TYPE\s+(\w+)/", $arec, $match) && isset($factarray[$match[1]])) $afact=$match[1];
-	if (($bfact=="EVEN" || $bfact=="FACT") && preg_match("/2\s+TYPE\s+(\w+)/", $brec, $match) && isset($factarray[$match[1]])) $bfact=$match[1];
+	if (($afact=="EVEN" || $afact=="FACT") && preg_match("/2\s+TYPE\s+(\w+)/", $arec, $match) && defined("GM_FACT_".$match[1])) $afact=$match[1];
+	if (($bfact=="EVEN" || $bfact=="FACT") && preg_match("/2\s+TYPE\s+(\w+)/", $brec, $match) && defined("GM_FACT_".$match[1])) $bfact=$match[1];
 
 	if (!is_array($factsort)) {
 		$facttype = $type;
@@ -423,16 +422,15 @@ function SortFactObjs(&$arr, $type="", $desc=false) {
 	}
 }
 
-
 // ************************************************* START OF SORTING FUNCTIONS ********************************* //
 /**
  * Function to sort GEDCOM fact tags based on their tanslations
  */
 function FactSort($a, $b) {
-   global $factarray;
 
-   return StringSort(trim(strip_tags($factarray[$a])), trim(strip_tags($factarray[$b])));
+	return StringSort(trim(strip_tags(constant("GM_FACT_".$a))), trim(strip_tags(constant("GM_FACT_".$b))));
 }
+
 /**
  * String sorting function
  * @param string $a
@@ -684,7 +682,7 @@ function SourceSort($a, $b) {
  * @return int -1 if $a should be sorted first, 0 if they are the same, 1 if $b should be sorted first
  */
 function CompareFacts($a, $b) {
-	global $factarray, $gm_lang, $ASC, $IGNORE_YEAR, $IGNORE_FACTS, $DEBUG, $USE_RTL_FUNCTIONS, $CIRCULAR_BASE;
+	global $gm_lang, $ASC, $IGNORE_YEAR, $IGNORE_FACTS, $DEBUG, $USE_RTL_FUNCTIONS, $CIRCULAR_BASE;
 	if (!isset($ASC)) $ASC = 0;
 	if (!isset($IGNORE_YEAR)) $IGNORE_YEAR = 0;
 	if (!isset($IGNORE_FACTS)) $IGNORE_FACTS = 0;
@@ -797,9 +795,9 @@ function CompareFacts($a, $b) {
 			}
 		}
 		else $bfact = "";
-		if (isset($factarray[$afact])) $afact = $factarray[$afact];
+		if (defined("GM_FACT_".$afact)) $afact = constant("GM_FACT_".$afact);
 		else if (isset($gm_lang[$afact])) $afact = $gm_lang[$afact];
-		if (isset($factarray[$bfact])) $bfact = $factarray[$bfact];
+		if (defined("GM_FACT_".$bfact)) $bfact = constant("GM_FACT_".$bfact);
 		else if (isset($gm_lang[$bfact])) $bfact = $gm_lang[$bfact];
 		return StringSort($afact, $bfact);
 	}

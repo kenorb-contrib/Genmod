@@ -38,7 +38,7 @@ $GM_BLOCKS["print_recent_changes"]["rss"]       = true;
  * @todo Find out why TOTAL_QUERIES is here???
 **/
 function print_recent_changes($block=true, $config="", $side, $index) {
-	global $gm_lang, $factarray, $month, $year, $day, $monthtonum, $HIDE_LIVE_PEOPLE, $SHOW_ID_NUMBERS, $command, $TEXT_DIRECTION, $SHOW_FAM_ID_NUMBERS;
+	global $gm_lang, $month, $year, $day, $monthtonum, $HIDE_LIVE_PEOPLE, $SHOW_ID_NUMBERS, $command, $TEXT_DIRECTION, $SHOW_FAM_ID_NUMBERS;
 	global $GM_IMAGE_DIR, $GM_IMAGES, $GEDCOM, $GEDCOMID, $REGEXP_DB, $DEBUG, $ASC, $IGNORE_FACTS, $IGNORE_YEAR, $TOTAL_QUERIES, $LAST_QUERY, $GM_BLOCKS, $SHOW_SOURCES;
 	global $medialist, $gm_username, $Users;
 
@@ -111,7 +111,7 @@ function print_recent_changes($block=true, $config="", $side, $index) {
 						$lastgid=$gid;
 					}
 					print "<div class=\"indent" . ($TEXT_DIRECTION=="rtl"?"_rtl":"") . "\">";
-					print $factarray["CHAN"];
+					print GM_FACT_CHAN;
 					$ct = preg_match("/\d DATE (.*)/", $factrec, $match);
 					if ($ct>0) {
 							print " - <span class=\"date\">".GetChangedDate($match[1]);
@@ -145,7 +145,7 @@ function print_recent_changes($block=true, $config="", $side, $index) {
 						$lastgid=$gid;
 					}
 					print "<div class=\"indent" . ($TEXT_DIRECTION=="rtl"?"_rtl":"") . "\">";
-					print $factarray["CHAN"];
+					print GM_FACT_CHAN;
 					$ct = preg_match("/\d DATE (.*)/", $factrec, $match);
 					if ($ct>0) {
 							print " - <span class=\"date\">".GetChangedDate($match[1]);
@@ -171,7 +171,7 @@ function print_recent_changes($block=true, $config="", $side, $index) {
 						$lastgid=$gid;
 					}
 					print "<div class=\"indent" . ($TEXT_DIRECTION=="rtl"?"_rtl":"") . "\">";
-					print $factarray["CHAN"];
+					print GM_FACT_CHAN;
 					print " - <span class=\"date\">".$source->lastchanged."</span>\n";
 					print "</div><br />";
 				}
@@ -194,7 +194,7 @@ function print_recent_changes($block=true, $config="", $side, $index) {
 						$lastgid=$gid;
 					}
 					print "<div class=\"indent" . ($TEXT_DIRECTION=="rtl"?"_rtl":"") . "\">";
-					print $factarray["CHAN"];
+					print GM_FACT_CHAN;
 					$ct = preg_match("/\d DATE (.*)/", $factrec, $match);
 					if ($ct>0) {
 							print " - <span class=\"date\">".GetChangedDate($match[1]);
@@ -226,7 +226,7 @@ function print_recent_changes($block=true, $config="", $side, $index) {
 						$lastgid=$gid;
 					}
 					print "<div class=\"indent" . ($TEXT_DIRECTION=="rtl"?"_rtl":"") . "\">";
-					print $factarray["CHAN"];
+					print GM_FACT_CHAN;
 					$ct = preg_match("/\d DATE (.*)/", $factrec, $match);
 					if ($ct>0) {
 							print " - <span class=\"date\">".GetChangedDate($match[1]);

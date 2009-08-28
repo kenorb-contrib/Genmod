@@ -85,9 +85,9 @@ function print_upcoming_events($block=true, $config="", $side, $index) {
 	// Cache the selected indi's and fams in the indilist and famlist
 	$selindi = array();
 	$selfam = array();
-	foreach($found_facts as $key=>$factarray) {
-		if ($factarray[2] == "INDI") $selindi[] = $factarray[0];
-		if ($factarray[2] == "FAM") $selfam[] = $factarray[0];
+	foreach($found_facts as $key=>$factarr) {
+		if ($factarr[2] == "INDI") $selindi[] = $factarr[0];
+		if ($factarr[2] == "FAM") $selfam[] = $factarr[0];
 	}
 	$selindi = implode("[".$GEDCOMID."]','", $selindi);
 	$selindi .= "[".$GEDCOMID."]'";
@@ -98,11 +98,11 @@ function print_upcoming_events($block=true, $config="", $side, $index) {
 	$selfam = "'".$selfam;
 	GetFamList("no", $selfam);
 	
-	foreach($found_facts as $key=>$factarray) {
-		$datestamp = $factarray[3];
-		if ($factarray[2]=="INDI") {
-			$gid = $factarray[0];
-			$factrec = $factarray[1];
+	foreach($found_facts as $key=>$factarr) {
+		$datestamp = $factarr[3];
+		if ($factarr[2]=="INDI") {
+			$gid = $factarr[0];
+			$factrec = $factarr[1];
 			$disp = true;
 			if (($filter=="living" and IsDeadId($gid)) || !ShowLivingNameByID($gid)) $disp = false;
 			if ($disp) {
@@ -116,15 +116,15 @@ function print_upcoming_events($block=true, $config="", $side, $index) {
 					else {
 						if ($lastgid!=$gid) {
 							if ($lastgid != "") print "<br />";
-							if ($NAME_REVERSE) $name = str_replace(",", "", $factarray[4]);
-							else $name = $factarray[4];
+							if ($NAME_REVERSE) $name = str_replace(",", "", $factarr[4]);
+							else $name = $factarr[4];
 							print "<a href=\"individual.php?pid=$gid&amp;ged=".$GEDCOM."\"><b>";
 							if (HasChinese($name)) print PrintReady($name." (".GetSortableAddName($gid, "", false).")");
 							else print PrintReady($name);
 							print "</b>";
 							print "<img id=\"box-".$gid."-".$key."-sex\" src=\"$GM_IMAGE_DIR/";
-							if ($factarray[5] == "M") print $GM_IMAGES["sex"]["small"]."\" title=\"".$gm_lang["male"]."\" alt=\"".$gm_lang["male"];
-							else if ($factarray[5] == "F") print $GM_IMAGES["sexf"]["small"]."\" title=\"".$gm_lang["female"]."\" alt=\"".$gm_lang["female"];
+							if ($factarr[5] == "M") print $GM_IMAGES["sex"]["small"]."\" title=\"".$gm_lang["male"]."\" alt=\"".$gm_lang["male"];
+							else if ($factarr[5] == "F") print $GM_IMAGES["sexf"]["small"]."\" title=\"".$gm_lang["female"]."\" alt=\"".$gm_lang["female"];
 							else print $GM_IMAGES["sexn"]["small"]."\" title=\"".$gm_lang["unknown"]."\" alt=\"".$gm_lang["unknown"];
 							print "\" class=\"sex_image\" />";
 							if ($SHOW_ID_NUMBERS) {
@@ -143,9 +143,9 @@ function print_upcoming_events($block=true, $config="", $side, $index) {
 			}
 		}
 
-		if ($factarray[2]=="FAM") {
-			$gid = $factarray[0];
-			$factrec = $factarray[1];
+		if ($factarr[2]=="FAM") {
+			$gid = $factarr[0];
+			$factrec = $factarr[1];
 			$disp = true;
 			if ($filter=="living") {
 				$parents = FindParents($gid);

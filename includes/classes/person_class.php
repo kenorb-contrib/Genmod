@@ -759,7 +759,7 @@ if ($this->tracefacts) print "AddSpouseFacts - Adding for ".$fam->$spperson->xre
 	 *
 	 */
 	private function AddAssoFacts($pid) {
-		global $factarray, $gm_lang;
+		global $gm_lang;
 		global $assolist, $GEDCOMID;
 
 		if (!function_exists("GetAssoList")) return;
@@ -781,19 +781,19 @@ if ($this->tracefacts) print "AddSpouseFacts - Adding for ".$fam->$spperson->xre
 							if ($arec) {
 								$fact = trim(substr($srec, 2, 5));
 								if (ShowFact($fact, $rid, $typ) && ShowFactDetails($fact, $rid)) {
-									$label = strip_tags($factarray[$fact]);
+									$label = strip_tags(constant("GM_FACT_".$fact));
 									$sdate = GetSubRecord(2, "2 DATE", $srec);
 									// relationship ?
 									if (empty($asso["role"])) $rela = "ASSO";
 									if (isset($gm_lang[$asso["role"]])) $rela = $gm_lang[$asso["role"]];
-									else if (isset($factarray[$asso["role"]])) $rela = $factarray[$asso["role"]];
+									else if (defined("GM_FACT_".$asso["role"])) $rela = constant("GM_FACT_".$asso["role"]);
 									// add an event record
 									$factrec = "1 EVEN\n2 TYPE ".$label."<br/>[".$rela."]";
 									$factrec .= "\n".trim($sdate);
 									if (trim($typ) == "FAM") {
 										$fam =& Family::GetInstance($rid);
-										if ($fam->husb_id != "") $factrec .= "\n2 ASSO @".$fam->husb_id."@"; //\n3 RELA ".$factarray[$fact];
-										if ($fam->wife_id != "") $factrec .= "\n2 ASSO @".$fam->wife_id."@"; //\n3 RELA ".$factarray[$fact];
+										if ($fam->husb_id != "") $factrec .= "\n2 ASSO @".$fam->husb_id."@"; 
+										if ($fam->wife_id != "") $factrec .= "\n2 ASSO @".$fam->wife_id."@"; 
 									}
 									else $factrec .= "\n2 ASSO @".$rid."@\n3 RELA ".$label;
 									//$factrec .= "\n3 NOTE ".$rela;

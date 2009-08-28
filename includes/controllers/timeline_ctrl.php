@@ -175,7 +175,7 @@ class TimelineControllerRoot extends BaseController {
 	
 	function print_time_fact($factitem) {
 		global $basexoffset, $baseyoffset, $factcount, $TEXT_DIRECTION;
-		global $factarray, $gm_lang, $GM_IMAGE_DIR, $GM_IMAGES, $SHOW_PEDIGREE_PLACES, $placements;
+		global $gm_lang, $GM_IMAGE_DIR, $GM_IMAGES, $SHOW_PEDIGREE_PLACES, $placements;
 		global $familyfacts, $GEDCOM;
 	
 		$factrec = $factitem[1];
@@ -235,7 +235,7 @@ class TimelineControllerRoot extends BaseController {
 					$col = $factitem["p"] % 6;
 					print "</td><td valign=\"top\" class=\"person".$col."\">\n";
 					if (count($this->pids) > 6)print GetPersonName($factitem["pid"])." - ";
-					if (isset($factarray[$fact])) print $factarray[$fact];
+					if (defined("GM_FACT_".$fact)) print constant("GM_FACT_".$fact);
 					else if (isset($gm_lang[$fact])) print $gm_lang[$fact];
 					else print $fact;
 					print "--";
