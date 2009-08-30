@@ -286,7 +286,7 @@ class MenuBar {
 	
 	function GetFavoritesMenu() {
 		global $gm_lang, $gm_username, $REQUIRE_AUTHENTICATION;
-		global $Favorites, $GEDCOMID;
+		global $GEDCOMID;
 		
 		// NOTE: Favorites
 		$menu = new Menu($gm_lang["menu_favorites"]);
@@ -294,7 +294,7 @@ class MenuBar {
 		if (!empty($gm_username)) {
 			$submenu = new Menu($gm_lang["my_favorites"]);
 			$menu->addSubmenu($submenu);
-			$userfavs = $Favorites->getUserFavorites($gm_username);
+			$userfavs = FavoritesController::getUserFavorites($gm_username);
 		}
 		else {
 			if ($REQUIRE_AUTHENTICATION) return false;
@@ -308,7 +308,7 @@ class MenuBar {
 		}
 			
 		// NOTE: Gedcom Favorites
-		$gedcomfavs = $Favorites->getGedcomFavorites($GEDCOMID);
+		$gedcomfavs = FavoritesController::getGedcomFavorites($GEDCOMID);
 		if (count($gedcomfavs)>0) {
 			$submenu = new Menu($gm_lang["gedcom_favorites"]);
 			$menu->addSubmenu($submenu);

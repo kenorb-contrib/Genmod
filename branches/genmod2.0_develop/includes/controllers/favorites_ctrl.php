@@ -1,6 +1,6 @@
 <?php
 /**
- * Class file for favorites
+ * Controller file for favorites
  *
  * Genmod: Genealogy Viewer
  * Copyright (C) 2005 - 2008 Genmod Development Team
@@ -28,10 +28,9 @@ if (stristr($_SERVER["SCRIPT_NAME"],basename(__FILE__))) {
 	require "../../intrusion.php";
 }
 
-class Favorites {
+abstract class FavoritesController {
 	
-	var $classname = "Favorites";
-	var $favorites = array();
+	public $classname = "FavoritesController";	// Name of this class
 	
 	
 	/**
@@ -46,7 +45,7 @@ class Favorites {
 		$res = NewQuery($sql);
 		if ($res) return true;
 		else {
-			WriteToLog("Favorites->DeleteFavorite-> Error deleting favorite ".$fv_id, "E", "S");
+			WriteToLog("FavoritesController::DeleteFavorite-> Error deleting favorite ".$fv_id, "E", "S");
 			return false;
 		}
 	}
@@ -59,21 +58,21 @@ class Favorites {
 	public function getUserFavorites($username, $favid="") {
 		global $TBLPREFIX, $GEDCOMS, $DBCONN, $CONFIGURED;
 	
-		$this->favorites = array();
+		$favorites = array();
 		//-- make sure we don't try to look up favorites for unconfigured sites
-		if (!$CONFIGURED) return $this->favorites;
+		if (!$CONFIGURED) return $favorites;
 		
 		$sql = "SELECT * FROM ".$TBLPREFIX."favorites WHERE fv_username='".$DBCONN->EscapeQuery($username)."'";
 		if ($favid != "") $sql .= " AND fv_id = '".$favid."'";
 		$res = NewQuery($sql);
-		if (!$res) return $this->favorites;
+		if (!$res) return $favorites;
 		while($row = $res->FetchAssoc()){
 			if (isset($GEDCOMS[get_gedcom_from_id($row["fv_file"])])) {
-				$this->favorites[] = new Favorite($row);
+				$favorites[] = new Favorite($row);
 			}
 		}
 		$res->FreeResult();
-		return $this->favorites;
+		return $favorites;
 	}
 	
 	/**
@@ -84,21 +83,21 @@ class Favorites {
 	public function getGedcomFavorites($gedid, $favid="") {
 		global $TBLPREFIX, $GEDCOMS, $DBCONN, $CONFIGURED;
 	
-		$this->favorites = array();
+		$favorites = array();
 		//-- make sure we don't try to look up favorites for unconfigured sites
-		if (!$CONFIGURED) return $this->favorites;
+		if (!$CONFIGURED) return $favorites;
 		
 		$sql = "SELECT * FROM ".$TBLPREFIX."favorites WHERE fv_file='".$gedid."' AND fv_username=''";
 		if ($favid != "") $sql .= " AND fv_id = '".$favid."'";
 		$res = NewQuery($sql);
-		if (!$res) return $this->favorites;
+		if (!$res) return $favorites;
 		while($row = $res->FetchAssoc()){
 			if (isset($GEDCOMS[get_gedcom_from_id($row["fv_file"])])) {
-				$this->favorites[] = new Favorite($row);
+				$favorites[] = new Favorite($row);
 			}
 		}
 		$res->FreeResult();
-		return $this->favorites;
+		return $favorites;
 	}
 }
 ?>

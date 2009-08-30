@@ -110,7 +110,6 @@ if (empty($gm_username)) {
 if (empty($command)) $command="user";
 
 if (!empty($gm_username)) {
-	if ($action == "addfav" || $action == "deletefav") $Favorites = new Favorites();
 	//-- add favorites action
 	if (($action=="addfav")&&(!empty($gid))) {
 		$gid = strtoupper($gid);
@@ -155,7 +154,7 @@ if (!empty($gm_username)) {
 		$favorite->SetFavorite();
 	}
 	if (($action=="deletefav")&&(isset($fv_id))) {
-		$Favorites->deleteFavorite($fv_id);
+		FavoritesController::deleteFavorite($fv_id);
 	}
 	else if ($action=="deletemessage") {
 		if (isset($message_id)) {

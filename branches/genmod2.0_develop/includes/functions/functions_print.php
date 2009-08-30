@@ -799,7 +799,7 @@ function print_pedigree_person($pid, $style=1, $show_famlink=true, $count=0, $pe
  * @param boolean $use_alternate_styles
  */
 function print_header($title, $head="",$use_alternate_styles=true) {
-	global $gm_lang, $bwidth, $gm_username, $Favorites;
+	global $gm_lang, $bwidth, $gm_username;
 	global $HOME_SITE_URL, $HOME_SITE_TEXT, $SERVER_URL;
 	global $BROWSERTYPE, $indilist, $INDILIST_RETRIEVED;
 	global $view, $cart, $menubar, $USE_GREYBOX;
@@ -1038,10 +1038,6 @@ var whichhelp = 'help_<?php print basename($SCRIPT_NAME)."&amp;action=".$action;
 	 // print "<div id=\"container\">";
 	 print "<!-- begin header section -->\n";
 	 include("includes/values/include_top.php");
-	 
-	 // Initialize the favorites class here, as it always comes with the menus.
-	 // Exception: index_edit for editing a user favorite.
-	 $Favorites = new Favorites();
 	 
 	 if ($view!="preview") include($menubar);
 	 else include($print_headerfile);

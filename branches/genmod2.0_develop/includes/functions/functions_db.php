@@ -1563,24 +1563,22 @@ function GetSourceList($selection="") {
 
 //-- get the repositorylist from the datastore
 function GetRepoList($filter = "", $selection="") {
-	global $GEDCOMID, $Actions, $gm_username;
+	global $GEDCOMID, $gm_username;
 	global $TBLPREFIX, $DBCONN;
 	
 	$repolist = array();
 	$repoaction = array();
-	if (is_object($Actions)) {
-		$actionlist = $Actions->GetActionList();
-		foreach ($actionlist as $key => $action) {
-			if ($action->status == 0) {
-				if (isset($repoaction[$action->repo][0])) $repoaction[$action->repo][0]++;
-				else $repoaction[$action->repo][0] = 1;
-			}
+	$actionlist = ActionController::GetActionList();
+	foreach ($actionlist as $key => $action) {
+		if ($action->status == 0) {
+			if (isset($repoaction[$action->repo][0])) $repoaction[$action->repo][0]++;
+			else $repoaction[$action->repo][0] = 1;
 		}
-		foreach ($actionlist as $key => $action) {
-			if ($action->status == 1) {
-				if (isset($repoaction[$action->repo][1])) $repoaction[$action->repo][1]++;
-				else $repoaction[$action->repo][1] = 1;
-			}
+	}
+	foreach ($actionlist as $key => $action) {
+		if ($action->status == 1) {
+			if (isset($repoaction[$action->repo][1])) $repoaction[$action->repo][1]++;
+			else $repoaction[$action->repo][1] = 1;
 		}
 	}
 
@@ -1640,23 +1638,21 @@ function GetRepoIdList() {
  * @return array the array of repository-titles
  */
 function GetRepoAddTitleList() {
-	global $GEDCOMID, $TBLPREFIX, $DBCONN, $Actions, $gm_username;
+	global $GEDCOMID, $TBLPREFIX, $DBCONN, $gm_username;
 
 	$addrepolist = array();
 	$repoaction = array();
-	if (is_object($Actions)) {
-		$actionlist = $Actions->GetActionList();
-		foreach ($actionlist as $key => $action) {
-			if ($action->status == 0) {
-				if (isset($repoaction[$action->repo][0])) $repoaction[$action->repo][0]++;
-				else $repoaction[$action->repo][0] = 1;
-			}
+	$actionlist = ActionController::GetActionList();
+	foreach ($actionlist as $key => $action) {
+		if ($action->status == 0) {
+			if (isset($repoaction[$action->repo][0])) $repoaction[$action->repo][0]++;
+			else $repoaction[$action->repo][0] = 1;
 		}
-		foreach ($actionlist as $key => $action) {
-			if ($action->status == 1) {
-				if (isset($repoaction[$action->repo][1])) $repoaction[$action->repo][1]++;
-				else $repoaction[$action->repo][1] = 1;
-			}
+	}
+	foreach ($actionlist as $key => $action) {
+		if ($action->status == 1) {
+			if (isset($repoaction[$action->repo][1])) $repoaction[$action->repo][1]++;
+			else $repoaction[$action->repo][1] = 1;
 		}
 	}
 

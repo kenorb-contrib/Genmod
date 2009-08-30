@@ -2419,7 +2419,7 @@ function GMRLineSHandler($attrs) {
 
 function GMRListSHandler($attrs) {
 	global $gmreport, $gedrec, $repeats, $repeatBytes, $list, $repeatsStack, $processRepeats, $parser, $vars, $sortby;
-	global $GEDCOM, $Actions, $status, $gm_lang;
+	global $GEDCOM, $status, $gm_lang;
 
 	$processRepeats++;
 	if ($processRepeats>1) return;
@@ -2514,7 +2514,7 @@ function GMRListSHandler($attrs) {
 				$repo_obj =& Repository::GetInstance($vars["repo"]["id"]);
 				$alist = $repo_obj->GetRepoActions($vars["repo"]["id"], $select);
 			}
-			else $alist = $Actions->GetActionList($select, true);
+			else $alist = ActionController::GetActionList($select, true);
 			$list = array();
 			$oldrepo = "";
 			foreach ($alist as $key => $action) {

@@ -52,7 +52,6 @@ class FamilyController extends DetailController
 			$CONTACT_EMAIL,
 			$ENABLE_CLIPPINGS_CART,
 			$SHOW_ID_NUMBERS,
-			$Favorites,
 			$nonfacts,
 			$GEDCOM_DEFAULT_TAB
 		;
