@@ -181,16 +181,6 @@ class Person extends GedcomRecord {
 		return $count;
 	}	
 	
-	protected function getActionList() {
-		global $Actions;
-		
-		if (is_null($this->actionlist)) {
-			if (is_object($Actions)) $this->actionlist = $Actions->GetActionListByID($this->xref);
-		}
-		return $this->actionlist;
-			
-	}
-		
 	private function getName() {
 		global $gm_lang;
 		
@@ -1431,24 +1421,15 @@ if ($this->tracefacts) print "AddSpouseFacts - Adding for ".$fam->$spperson->xre
 	protected function GetLinksFromActions($status="") {
 		global $TBLPREFIX, $gm_user;
 
+		global $TBLPREFIX, $gm_user;
+
 		if(!is_null($this->actionlist)) return $this->actionlist;
 		$this->actionlist = array();
-		if ($gm_user->ShowActionLog()) { 
-			$sql = "SELECT * FROM ".$TBLPREFIX."actions WHERE a_gedfile='".$this->gedcomid."' AND a_pid='".$this->xref."'";
-			if ($status != "") $sql .= " AND a_status='".$status."'";
-			else $sql .= " ORDER BY a_status ASC";
-			$res = NewQuery($sql);
-			while ($row = $res->FetchAssoc()) {
-				$action = null;
-				$action = new ActionItem($row, $this->xref);
-				if ($action->disp) {
-					if ($action->status == 1) $this->action_open++;
-					else $this->action_closed++;
-					$this->actionlist[] = $action;
-				}
-				else $this->action_hide++;
-			}
-		}
+		$search = ActionController::GetSelectActionList("", $this->xref, $this->gedcomid, $status);
+		$this->actionlist = $search[0];
+		$this->action_open = $search[1];
+		$this->action_closed = $search[2];
+		$this->action_hide = $search[3];
 		$this->action_count = count($this->actionlist);
 		return $this->actionlist;
 	}
@@ -1459,15 +1440,10 @@ if ($this->tracefacts) print "AddSpouseFacts - Adding for ".$fam->$spperson->xre
 		if(!is_null($this->action_open)) return;
 
 		$this->actionlist = array();
-		$sql = "SELECT count(a_status) as count, a_status FROM ".$TBLPREFIX."actions WHERE a_gedfile='".$this->gedcomid."' AND a_pid='".$this->xref."' GROUP BY a_status";
-		$res = NewQuery($sql);
-		while ($row = $res->FetchAssoc()) {
-			if ($row["a_status"] == "1") $this->action_open = $row["count"];
-			else if ($row["a_status"] == "0") $this->action_closed = $row["count"];
-		}
-		if (is_null($this->action_open)) $this->action_open = 0;
-		if (is_null($this->action_closed)) $this->action_closed = 0;
-		$this->actioncount = $this->action_open + $this->action_closed;
+		$search = ActionController::GetSelectActionList("", $this->xref, $this->gedcomid, "", true);
+		$this->action_open = $search[1];
+		$this->action_closed = $search[2];
+		$this->action_count = $this->action_open + $this->action_closed;
 	}
 
 	public function PrintListPerson($useli=true, $break=false) {

@@ -34,9 +34,9 @@ $GM_BLOCKS["print_gedcom_favorites"]["rss"]				= false;
 //-- print gedcom favorites
 function print_gedcom_favorites($block = true, $config="", $side, $index) {
 	global $gm_lang, $GM_IMAGE_DIR, $GM_IMAGES, $command, $sourcelist, $TEXT_DIRECTION, $gm_username, $GEDCOMID;
-	global $gm_user, $Favorites;
+	global $gm_user;
 	
-	$userfavs = $Favorites->getGedcomFavorites($GEDCOMID);
+	$userfavs = FavoritesController::getGedcomFavorites($GEDCOMID);
 	if (!is_array($userfavs)) $userfavs = array();
 	print "<div id=\"gedcom_favorites\" class=\"block\">\n";
 	print "<div class=\"blockhc\">";
@@ -63,12 +63,10 @@ function print_gedcom_favorites($block = true, $config="", $side, $index) {
 }
 function print_gedcom_favorites_config($favid="") {
 	global $GEDCOMID, $gm_lang;
-	global $Favorites;
 	
 	if ($favid == "" && isset($_GET["favid"])) $favid = $_GET["favid"];
 	
-	if(!is_object($Favorites)) $Favorites = new Favorites();
-	$userfave = $Favorites->getGedcomFavorites($GEDCOMID, $favid);
+	$userfave = FavoritesController::getGedcomFavorites($GEDCOMID, $favid);
 	$fav = $userfave[0];
 	
 	print "<br />";

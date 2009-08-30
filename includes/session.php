@@ -651,12 +651,6 @@ require_once($GM_BASE_DIRECTORY . "includes/values/templecodes.php");		//-- load
 //-- load the privacy file
 $Privacy = new PrivacyController($GEDCOMID);
 
-//-- Load the action controller
-if ($gm_user->ShowActionLog()) {
-	$Actions = new ActionController();
-}
-else $Actions = "";
-
 //-- load the privacy functions
 require_once($GM_BASE_DIRECTORY."includes/functions/functions_privacy.php");
 

@@ -177,56 +177,41 @@ switch($action) {
 	break;
 	
 	case "action_edit":
-		if (is_object($Actions)) {
-			$action = $Actions->GetItem($aid);
-			$action->EditThisItem();
-		}
-		else print "";
+		$action = ActionController::GetItem($aid);
+		$action->EditThisItem();
 	break;
 	
 	// Actions for the ToDo list 
 	case "action_delete":
-		if (is_object($Actions)) {
-			$action = $Actions->GetItem($aid);
-			$action->DeleteThis();
-		}
-		else print "";
+		$action = ActionController::GetItem($aid);
+		$action->DeleteThis();
 	break;
 	
 	case "action_update":
-		if (is_object($Actions)) {
-			$action = $Actions->GetItem($aid);
-			if (isset($actiontext))$action->text = urldecode($actiontext);
-			if (isset($repo))$action->repo = $repo;
-			if (isset($status)) $action->status = $status;
-			$action->pid = $pid;
-			$action->gedfile = $GEDCOMID;
-			$action->UpdateThis();
-			$action->PrintThisItem();
-		}
-		else print "";
+		$action = ActionController::GetItem($aid);
+		if (isset($actiontext))$action->text = urldecode($actiontext);
+		if (isset($repo))$action->repo = $repo;
+		if (isset($status)) $action->status = $status;
+		$action->pid = $pid;
+		$action->gedfile = $GEDCOMID;
+		$action->UpdateThis();
+		$action->PrintThisItem();
 	break;
 
 	case "action_add":
-		if (is_object($Actions)) {
-			$action = $Actions->GetNewItem();
-			$action->AddThisItem();
-		}
-		else print "";
+		$action = ActionController::GetNewItem();
+		$action->AddThisItem();
 	break;
 	
 	case "action_add2":
-		if (is_object($Actions)) {
-			$action = $Actions->GetNewItem();
-			if (isset($actiontext))$action->text = urldecode($actiontext);
-			if (isset($repo))$action->repo = $repo;
-			if (isset($status)) $action->status = $status;
-			$action->pid = $pid;
-			$action->gedfile = $GEDCOMID;
-			$action->AddThis();
-			print "";
-		}
-		else print "";
+		$action = ActionController::GetNewItem();
+		if (isset($actiontext))$action->text = urldecode($actiontext);
+		if (isset($repo))$action->repo = $repo;
+		if (isset($status)) $action->status = $status;
+		$action->pid = $pid;
+		$action->gedfile = $GEDCOMID;
+		$action->AddThis();
+		print "";
 	break;
 	// End actions for the ToDo list 
 

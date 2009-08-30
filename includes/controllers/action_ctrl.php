@@ -27,10 +27,10 @@ if (stristr($_SERVER["SCRIPT_NAME"],basename(__FILE__))) {
 	require "../../intrusion.php";
 }
 
-class ActionController {
+abstract class ActionController {
 	
 	public $classname = "Actions";
-	public $actionlist= array();
+	private static $actionlist = array();
 
 	public function AddItem($pid, $text, $repo, $status=0) {
 		global $GEDCOMID;
@@ -47,7 +47,7 @@ class ActionController {
 	
 	public function DeleteItem($id) {
 		
-		$item = $this->GetItem($id);
+		$item = self::GetItem($id);
 		$item->DeleteThis();
 		return true;
 	}
@@ -62,34 +62,68 @@ class ActionController {
 		}
 	}
 	
-	public function GetActionListByID($pid) {
-		global $TBLPREFIX, $GEDCOMID;
+	public function GetSelectActionList($repo="", $pid="", $gedcomid="", $status="", $countonly=false) {
+		global $TBLPREFIX, $GEDCOMID, $gm_user;
 		
-		$this->actionlist = array();
-		$sql = "SELECT * FROM ".$TBLPREFIX."actions WHERE a_gedfile='".$GEDCOMID."' AND a_pid='".$pid."'";
-		$res = NewQuery($sql);
-		while ($row = $res->FetchAssoc()) {
-			$this->actionlist[] = new ActionItem($row);
+		self::$actionlist = array();
+		$action_open = 0;
+		$action_closed = 0;
+		$action_hide = 0;
+		if ($gm_user->ShowActionLog()) { 
+			if ($gedcomid == "") $gedcomid = $GEDCOMID;
+			if ($countonly) {
+				$sql = "SELECT count(a_status) as count, a_status FROM ".$TBLPREFIX."actions WHERE a_gedfile='".$gedcomid."'";
+				if (!empty($repo)) $sql .= " AND a_repo='".$repo."'";
+				if (!empty($pid)) $sql .= " AND a_pid='".$pid."'";
+				if (!empty($status)) $sql .= " AND a_status='".$status."'";
+				$sql .= " GROUP BY a_status";
+				$res = NewQuery($sql);
+				while ($row = $res->FetchAssoc()) {
+					if ($row["a_status"] == "1") $action_open = $row["count"];
+					else if ($row["a_status"] == "0") $action_closed = $row["count"];
+				}
+			}
+			else {
+				$sql = "SELECT * FROM ".$TBLPREFIX."actions WHERE a_gedfile='".$gedcomid."' AND a_repo='".$repo."'";
+				if ($status != "") $sql .= " AND a_status='".$status."'";
+				$res = NewQuery($sql);
+				while ($row = $res->FetchAssoc()) {
+					$action = null;
+					$action = new ActionItem($row, $repo);
+					if ($action->disp) {
+						if ($action->status == 1) $action_open++;
+						else $action_closed++;
+						self::$actionlist[] = $action;
+					}
+					else $action_hide++;
+				}
+				if (empty($repo)) self::RepoSort();
+				else self::IndiSort();
+			}
 		}
-		return $this->actionlist;
+		return array(self::$actionlist, $action_open, $action_closed, $action_hide);
 	}
-			
+
 	public function GetActionList($status="", $reposort=false) {
-		global $TBLPREFIX, $GEDCOMID;
+		global $TBLPREFIX, $GEDCOMID, $gm_user;
 		
-		$this->actionlist = array();
-		$sql = "SELECT * FROM ".$TBLPREFIX."actions WHERE a_gedfile='".$GEDCOMID."'";
-		if ($status == "0" || $status == "1") $sql .= " AND a_status='".$status."'";
-		$sql .= " ORDER BY a_repo ASC, a_status ASC";
-		$res = NewQuery($sql);
-		while ($row = $res->FetchAssoc()) {
-			$this->actionlist[] = new ActionItem($row);
+		self::$actionlist = array();
+		$actionopen = 0;
+		$actionclosed = 0;
+		if ($gm_user->ShowActionLog()) { 
+			$sql = "SELECT * FROM ".$TBLPREFIX."actions WHERE a_gedfile='".$GEDCOMID."'";
+			if ($status == "0" || $status == "1") $sql .= " AND a_status='".$status."'";
+			$sql .= " ORDER BY a_repo ASC, a_status ASC";
+			$res = NewQuery($sql);
+			while ($row = $res->FetchAssoc()) {
+				self::$actionlist[] = new ActionItem($row);
+			}
+			if ($reposort) {
+				self::RepoSort();
+			}
+			else self::IndiSort();
 		}
-		if ($reposort) {
-			$this->RepoSort();
-		}
-		else $this->IndiSort();
-		return $this->actionlist;
+		return self::$actionlist;
 	}
 
 	public function PrintAddLink() {
@@ -105,11 +139,11 @@ class ActionController {
 	}
 
 	private function RepoSort() {
-		uasort($this->actionlist, array($this, "ActionRepoSort"));
+		uasort(self::$actionlist, array("ActionController", "ActionRepoSort"));
 	}
 	
 	private function IndiSort() {
-		uasort($this->actionlist, array($this, "ActionIndiSort"));
+		uasort(self::$actionlist, array("ActionController", "ActionIndiSort"));
 	}
 	
 	private function ActionRepoSort($a, $b) {

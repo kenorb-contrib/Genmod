@@ -45,7 +45,7 @@ require("config.php");
 
 print_header($gm_lang["actionlist"]);
 
-if (!$gm_user->showactionlog) {
+if (!$gm_user->ShowActionLog()) {
 	print "<span class=\"error\">".$gm_lang["access_denied"]."</span>";
 	print_footer();
 	exit;
@@ -90,7 +90,7 @@ if ($view != "preview") {
 }
        
 // Get the data
-$actionlist = $Actions->GetActionList($status, $sort == "repo");
+$actionlist = ActionController::GetActionList($status, $sort == "repo");
 print "<br />";
 
 if (count($actionlist) == 0) {

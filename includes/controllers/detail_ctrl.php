@@ -119,7 +119,7 @@ abstract class DetailController extends BaseController{
 	}
 	
 	public function PrintTabs() {
-		global $GEDCOMID, $gm_user, $gm_username, $gm_lang, $Actions;
+		global $GEDCOMID, $gm_user, $gm_username, $gm_lang;
 		global $GM_IMAGE_DIR, $GM_IMAGES, $TEXT_DIRECTION;
 		
 		$object_name = $this->object_name;
@@ -668,7 +668,7 @@ abstract class DetailController extends BaseController{
 					else print "<tr><td id=\"no_tab".$index."\" class=\"shade1\"></td></tr>\n";
 					//-- New action Link
 					if (!$this->isPrintPreview() && $this->$object_name->canedit && !$this->$object_name->isdeleted) { 
-						$Actions->PrintAddLink();
+						ActionController::PrintAddLink();
 					}
 					print "</table></form>";
 				}
