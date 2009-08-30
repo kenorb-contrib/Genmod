@@ -38,13 +38,12 @@ $GM_BLOCKS["print_gedcom_news"]["rss"]			= true;
  * @todo Add an allowed HTML translation
  */
 function print_gedcom_news($block = true, $config="", $side, $index) {
-	global $gm_lang, $GM_IMAGE_DIR, $GM_IMAGES, $TEXT_DIRECTION, $GEDCOM, $command, $TIME_FORMAT, $gm_username, $Users;
+	global $gm_lang, $GM_IMAGE_DIR, $GM_IMAGES, $TEXT_DIRECTION, $GEDCOM, $command, $TIME_FORMAT, $gm_username, $gm_user;
 
-	$uname = $gm_username;
 	$usernews = getUserNews($GEDCOM);
 	print "<div id=\"gedcom_news\" class=\"block\">\n";
 	print "<div class=\"blockhc\">";
-	if ($Users->userGedcomAdmin($gm_username)) print_help_link("index_gedcom_news_ahelp", "qm_ah");
+	if ($gm_user->userGedcomAdmin()) print_help_link("index_gedcom_news_ahelp", "qm_ah");
 	else print_help_link("index_gedcom_news_help", "qm", "gedcom_news");
 	print $gm_lang["gedcom_news"];
 	print "</div>";
@@ -70,7 +69,7 @@ function print_gedcom_news($block = true, $config="", $side, $index) {
 		$news["text"] = strtr($news["text"], $trans);
 		$news["text"] = nl2br($news["text"]);
 		print PrintReady($news["text"])."<br />\n";
-		if ($Users->userGedcomAdmin($uname)) {
+		if ($gm_user->userGedcomAdmin()) {
 			print "<hr size=\"1\" />";
 			print "<a href=\"#\" onclick=\"editnews('$key'); return false;\">".$gm_lang["edit"]."</a> | ";
 			print "<a href=\"index.php?action=deletenews&amp;news_id=$key&amp;command=$command\" onclick=\"return confirm('".$gm_lang["confirm_news_delete"]."');\">".$gm_lang["delete"]."</a><br />";
@@ -78,7 +77,7 @@ function print_gedcom_news($block = true, $config="", $side, $index) {
 		print "</div>\n";
 	}
 	if ($block) print "</div>\n";
-	if ($Users->userGedcomAdmin($uname)) print "<a href=\"#\" onclick=\"addnews('".preg_replace("/'/", "\'", $GEDCOM)."'); return false;\">".$gm_lang["add_news"]."</a>\n";
+	if ($gm_user->userGedcomAdmin()) print "<a href=\"#\" onclick=\"addnews('".preg_replace("/'/", "\'", $GEDCOM)."'); return false;\">".$gm_lang["add_news"]."</a>\n";
 	print "</div>\n";
 	print "</div>";
 }

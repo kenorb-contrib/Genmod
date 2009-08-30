@@ -34,7 +34,7 @@ $GM_BLOCKS["print_user_messages"]["rss"]		= false;
 
 //-- print user messages
 function print_user_messages($block=true, $config="", $side, $index) {
-		global $gm_lang, $GM_IMAGE_DIR, $TEXT_DIRECTION, $TIME_FORMAT, $GM_STORE_MESSAGES, $GM_IMAGES, $gm_username, $Users;
+		global $gm_lang, $GM_IMAGE_DIR, $TEXT_DIRECTION, $TIME_FORMAT, $GM_STORE_MESSAGES, $GM_IMAGES, $gm_username, $gm_user;
 
 		$usermessages = getUserMessages($gm_username);
 
@@ -75,7 +75,7 @@ function print_user_messages($block=true, $config="", $side, $index) {
 				// if outgoing, print the to address.
 				if ($message["from"] == $gm_username) $mdir = "to";
 				else $mdir = "from";
-				$tempuser = $Users->getUser($message[$mdir]);
+				$tempuser =& User::GetInstance($message[$mdir]);
 				print "<td class=\"wrap\"".$separatortd.">".GetChangedDate("$day $mon $year")." - ".date($TIME_FORMAT, $time)."</td>\n";
 				print "<td class=\"wrap\"".$separatortd.">";
 				// If it's an existing user, print the details. Also do this if it doesn't appear to be a valid e-mail address
@@ -108,17 +108,17 @@ function print_user_messages($block=true, $config="", $side, $index) {
 			print "</table>\n";
 			print "<input type=\"submit\"  value=\"".$gm_lang["delete"]."\" /><br /><br />\n";
 		}
-		$users = $Users->GetUsers("lastname", "asc", "firstname");
+		$users = UserController::GetUsers("lastname", "asc", "firstname");
 		if (count($users)>1) {
 			print $gm_lang["message"]." <select name=\"touser\">\n";
 			$username = $gm_username;
-			if ($Users->userIsAdmin($username)) {
+			if ($gm_user->userIsAdmin()) {
 				print "<option value=\"all\">".$gm_lang["broadcast_all"]."</option>\n";
 				print "<option value=\"never_logged\">".$gm_lang["broadcast_never_logged_in"]."</option>\n";
 				print "<option value=\"last_6mo\">".$gm_lang["broadcast_not_logged_6mo"]."</option>\n";
 			}
 			foreach($users as $indexval => $user) {
-				if ($username!=$user->username && $user->verified_by_admin)  {
+				if ($username != $user->username && $user->verified_by_admin)  {
 					print "<option value=\"".$user->username."\"";
 					print ">".PrintReady($user->lastname.", ".$user->firstname);
 					if ($TEXT_DIRECTION=="ltr") print " &lrm; - ".$user->username."&lrm;</option>\n";

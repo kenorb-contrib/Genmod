@@ -39,7 +39,7 @@ $GM_BLOCKS["review_changes_block"]["rss"]       = false;
  */
 function review_changes_block($block = true, $config="", $side, $index) {
 	global $gm_lang, $GEDCOM, $GEDCOMS, $command, $SCRIPT_NAME, $QUERY_STRING, $GM_IMAGE_DIR, $GM_IMAGES;
-	global $gm_changes, $LAST_CHANGE_EMAIL, $ALLOW_EDIT_GEDCOM, $SERVER_URL, $TEXT_DIRECTION, $SHOW_SOURCES, $TIME_FORMAT, $GM_BLOCKS, $TBLPREFIX, $gm_username, $Users, $GedcomConfig;
+	global $gm_changes, $LAST_CHANGE_EMAIL, $ALLOW_EDIT_GEDCOM, $SERVER_URL, $TEXT_DIRECTION, $SHOW_SOURCES, $TIME_FORMAT, $GM_BLOCKS, $TBLPREFIX, $gm_username, $GedcomConfig, $gm_user;
 
 	if (!$ALLOW_EDIT_GEDCOM) return;
 
@@ -56,9 +56,9 @@ function review_changes_block($block = true, $config="", $side, $index) {
 			if (time()-$lastmail[$gedvalue] > (60*60*24*$config["days"])) {
 				$GedcomConfig->SetLastNotifMail($gedvalue);
 				if ($config["sendmail"]=="yes") {
-					$users = $Users->GetUsers();
+					$users = UserController::GetUsers();
 					foreach($users as $username=>$user) {
-						if ($Users->userCanAccept($username)) {
+						if ($user->userCanAccept()) {
 							if (!in_array($username, $sent)) {
 								$sent[] = $username;
 								//-- send message
@@ -79,15 +79,14 @@ function review_changes_block($block = true, $config="", $side, $index) {
 			}
 		}
 	}
-	if ($display_block && $Users->userCanEdit($gm_username)) {
+	if ($display_block && $gm_user->userCanEdit()) {
 		print "<div id=\"review_changes_block\" class=\"block\">\n";
 		print "<div class=\"blockhc\">";
 		print_help_link("review_changes_help", "qm", "review_changes");
 		if ($GM_BLOCKS["review_changes_block"]["canconfig"]) {
-			$username = $gm_username;
-			if ((($command=="gedcom")&&($Users->userGedcomAdmin($username))) || (($command=="user")&&(!empty($username)))) {
+			if ((($command=="gedcom")&&($gm_user->userGedcomAdmin())) || (($command=="user")&&(!empty($gm_username)))) {
 				if ($command=="gedcom") $name = preg_replace("/'/", "\'", $GEDCOM);
-				else $name = $username;
+				else $name = $gm_username;
 				print "<a href=\"javascript: ".$gm_lang["config_block"]."\" onclick=\"window.open('index_edit.php?name=$name&amp;command=$command&amp;action=configure&amp;side=$side&amp;index=$index', '', 'top=50,left=50,width=500,height=250,scrollbars=1,resizable=1'); return false;\">";
 				print "<img class=\"adminicon\" src=\"$GM_IMAGE_DIR/".$GM_IMAGES["admin"]["small"]."\" width=\"15\" height=\"15\" border=\"0\" alt=\"".$gm_lang["config_block"]."\" /></a>\n";
 			}
@@ -95,7 +94,7 @@ function review_changes_block($block = true, $config="", $side, $index) {
 		print $gm_lang["review_changes"];
 		print "</div>";
 		print "<div class=\"blockcontent\">";
-		if ($Users->userCanAccept($gm_username)) print "<a href=\"#\" onclick=\"window.open('edit_changes.php','','width=600,height=600,resizable=1,scrollbars=1'); return false;\">".$gm_lang["accept_changes"]."</a><br />\n";
+		if ($gm_user->userCanAccept()) print "<a href=\"#\" onclick=\"window.open('edit_changes.php','','width=600,height=600,resizable=1,scrollbars=1'); return false;\">".$gm_lang["accept_changes"]."</a><br />\n";
 		if ($block) print "<div class=\"small_inner_block, $TEXT_DIRECTION\">\n";
 		if ($config["sendmail"]=="yes" && $LAST_CHANGE_EMAIL != 0) {
 			$day = date("j", $LAST_CHANGE_EMAIL);
@@ -126,10 +125,10 @@ function review_changes_block($block = true, $config="", $side, $index) {
 						}
 						else if ($type=="FAM") print "<b>".PrintReady(GetFamilyDescriptor($gid))."</b> &lrm;(".$gid.")&lrm;\n";
 						else if ($type=="SOUR") {
-							if ($SHOW_SOURCES>=$Users->getUserAccessLevel($gm_username)) print "<b>".PrintReady(GetSourceDescriptor($gid))."</b> &lrm;(".$gid.")&lrm;\n";
+							if ($SHOW_SOURCES >= $gm_user->getUserAccessLevel()) print "<b>".PrintReady(GetSourceDescriptor($gid))."</b> &lrm;(".$gid.")&lrm;\n";
 						}
 						else if ($type=="REPO") {
-							if ($SHOW_SOURCES>=$Users->getUserAccessLevel($gm_username)) print "<b>".PrintReady(GetRepoDescriptor($gid))."</b> &lrm;(".$gid.")&lrm;\n";
+							if ($SHOW_SOURCES >= $gm_user->getUserAccessLevel()) print "<b>".PrintReady(GetRepoDescriptor($gid))."</b> &lrm;(".$gid.")&lrm;\n";
 						}
 						else if ($type == "OBJE") {
 							print "<b>".PrintReady(GetMediaDescriptor($gid))."</b> &lrm;(".$gid.")&lrm;\n";
@@ -139,8 +138,8 @@ function review_changes_block($block = true, $config="", $side, $index) {
 						if ($type=="INDI") print " <a href=\"individual.php?pid=".$gid."&amp;ged=".$gedcom."\">".$gm_lang["view_change_diff"]."</a>\n<br />";
 						if ($type=="FAM") print " <a href=\"family.php?famid=".$gid."&amp;ged=".$gedcom."\">".$gm_lang["view_change_diff"]."</a>\n<br />";
 						if ($type=="OBJE") print " <a href=\"mediadetail.php?mid=".$gid."&amp;ged=".$gedcom."\">".$gm_lang["view_change_diff"]."</a>\n<br />";
-						if (($type=="SOUR") && ($SHOW_SOURCES>=$Users->getUserAccessLevel($gm_username))) print " <a href=\"source.php?sid=".$gid."&amp;ged=".$gedcom."\">".$gm_lang["view_change_diff"]."</a>\n<br />";
-						if (($type=="REPO") && ($SHOW_SOURCES>=$Users->getUserAccessLevel($gm_username))) print " <a href=\"repo.php?rid=".$gid."&amp;ged=".$gedcom."\">".$gm_lang["view_change_diff"]."</a>\n<br />";
+						if (($type=="SOUR") && ($SHOW_SOURCES >= $gm_user->getUserAccessLevel())) print " <a href=\"source.php?sid=".$gid."&amp;ged=".$gedcom."\">".$gm_lang["view_change_diff"]."</a>\n<br />";
+						if (($type=="REPO") && ($SHOW_SOURCES >= $gm_user->getUserAccessLevel())) print " <a href=\"repo.php?rid=".$gid."&amp;ged=".$gedcom."\">".$gm_lang["view_change_diff"]."</a>\n<br />";
 						if ($type=="NOTE") print " <a href=\"note.php?oid=".$gid."&amp;ged=".$gedcom."\">".$gm_lang["view_change_diff"]."</a>\n<br />";
 					}
 

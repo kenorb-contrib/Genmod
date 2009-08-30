@@ -110,16 +110,16 @@ abstract class DetailController extends BaseController{
 	}
 	
 	public function CanDisplayOtherMenu() {
-		global $Users, $ENABLE_CLIPPINGS_CART;
+		global $gm_user, $ENABLE_CLIPPINGS_CART;
 		
 		$object_name = $this->object_name;
-		if ($Users->userCanViewGedlines() || ($ENABLE_CLIPPINGS_CART >= $Users->getUserAccessLevel()) || ($this->$object_name->disp && $this->uname != "")) return true;
+		if ($gm_user->userCanViewGedlines() || ($ENABLE_CLIPPINGS_CART >= $gm_user->getUserAccessLevel()) || ($this->$object_name->disp && $this->uname != "")) return true;
 		else return false;
 		
 	}
 	
 	public function PrintTabs() {
-		global $GEDCOMID, $Users, $gm_username, $gm_lang, $Actions;
+		global $GEDCOMID, $gm_user, $gm_username, $gm_lang, $Actions;
 		global $GM_IMAGE_DIR, $GM_IMAGES, $TEXT_DIRECTION;
 		
 		$object_name = $this->object_name;
@@ -142,7 +142,7 @@ abstract class DetailController extends BaseController{
 				for (i=0; i<tabid.length; i++) {
 					var elt = document.getElementById('door'+i);
 					if (document.getElementById('no_tab'+i)) { // empty ?
-						if (<?php if ($Users->userCanEdit($gm_username)) echo 'true'; else echo 'false';?>) {
+						if (<?php if ($gm_user->userCanEdit()) echo 'true'; else echo 'false';?>) {
 							elt.style.display='block';
 							elt.style.opacity='0.4';
 							elt.style.filter='alpha(opacity=40)';
@@ -655,7 +655,7 @@ abstract class DetailController extends BaseController{
 			}
 			if ($tab == "actions_person") {
 				print "<div id=\"actions_person\" class=\"tab_page\" style=\"display:none;\" >";
-				if ($Users->ShowActionLog()) {
+				if ($gm_user->ShowActionLog()) {
 					print "<br />";
 					print "<form name=\"actionform\" method=\"post\" action=\"individual.php\">";
 					print "<input name=\"pid\" type=\"hidden\" value=\"".$this->$object_name->xref."\" />";

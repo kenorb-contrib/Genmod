@@ -45,7 +45,7 @@ $GEDCOM = $ged;
 print_simple_header($gm_lang["add_media_tool"]);
 
 //-- only allow users with edit privileges to access script.
-if (!$Users->userGedcomAdmin($gm_username)) {
+if (!$gm_user->userGedcomAdmin()) {
 	print $gm_lang["access_denied"];
 	print_simple_footer();
 	exit;
@@ -139,7 +139,7 @@ if ($action=="newentry") {
 			$newged = HandleUpdates($newged);
 			$xref = AppendGedrec($newged, "OBJE", $change_id, $change_type);
 		
-			if ($can_auto_accept && (($Users->UserCanAccept($gm_username) && $aa_attempt) || $Users->userAutoAccept())) {
+			if ($can_auto_accept && (($gm_user->UserCanAccept() && $aa_attempt) || $gm_user->userAutoAccept())) {
 				AcceptChange($change_id, $GEDCOMID);
 			}
 			

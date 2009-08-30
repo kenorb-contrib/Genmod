@@ -124,9 +124,9 @@ class CustomPage {
 	}
 	
 	function CheckAccess() {
-		global $Users;
+		global $gm_user;
 		// If no admin, always search in user help
-		if (!$Users->userIsAdmin($Users->GetUserName())) return false;
+		if (!$gm_user->userIsAdmin()) return false;
 		else return true;
 	}
 	

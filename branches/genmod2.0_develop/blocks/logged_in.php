@@ -42,19 +42,17 @@ $GM_BLOCKS["print_logged_in_users"]["rss"]     		= false;
  * prints a list of other users who are logged in
  */
 function print_logged_in_users($block=true, $config="", $side, $index) {
-		global $gm_lang, $GM_SESSION_TIME, $TEXT_DIRECTION, $gm_username, $NAME_REVERSE, $Users;
+		global $gm_lang, $GM_SESSION_TIME, $TEXT_DIRECTION, $gm_username, $NAME_REVERSE, $gm_user;
 		
 		$block = true;			// Always restrict this block's height
 		
-		$cusername = $gm_username;
-		$thisuser = $Users->getUser($cusername);
 		$NumAnonymous = 0;
-		$users = $Users->GetUsers("username", "asc", "firstname", "u_loggedin='Y'");
+		$users = UserController::GetUsers("username", "asc", "firstname", "u_loggedin='Y'");
 		$loggedusers = array();
 		foreach($users as $indexval => $user) {
-			if (time() - $user->sessiontime > $GM_SESSION_TIME) $Users->UserLogout($user->username);
+			if (time() - $user->sessiontime > $GM_SESSION_TIME) UserController::UserLogout($user->username);
 			else {
-				if (($Users->userIsAdmin($cusername)) or (($user->visibleonline) and ($thisuser->visibleonline))) $loggedusers[] = $user;
+				if (($gm_user->userIsAdmin()) or (($user->visibleonline) and ($gm_user->visibleonline))) $loggedusers[] = $user;
 				else $NumAnonymous ++;
 			}
 		}
@@ -89,7 +87,7 @@ function print_logged_in_users($block=true, $config="", $side, $index) {
 			if ($NAME_REVERSE) print PrintReady($user->lastname." ".$user->firstname);
 			else print PrintReady($user->firstname." ".$user->lastname);
 			print " - ".$user->username;
-			if (($cusername != $user->username) and ($user->contactmethod != "none")) {
+			if (($gm_username != $user->username) and ($user->contactmethod != "none")) {
 				print "<br /><a href=\"#\" onclick=\"return message('".$user->username."');\">".$gm_lang["message"]."</a>";
 			}
 			print "</td></tr>";

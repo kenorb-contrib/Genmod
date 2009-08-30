@@ -79,6 +79,14 @@ class Source extends GedcomRecord {
 		}
 	}
 
+	public function ObjCount() {
+		$count = 0;
+		foreach(self::$sourcecache as $ged => $source) {
+			$count += count($source);
+		}
+		return $count;
+	}	
+	
 	/**
 	 * get the title of this source record
 	 * @return string

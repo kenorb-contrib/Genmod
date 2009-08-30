@@ -33,7 +33,7 @@ $GM_BLOCKS["top10_pageviews"]["config"] 	= array("num"=>10, "count_placement"=>"
 $GM_BLOCKS["top10_pageviews"]["rss"]		= false;
 
 function top10_pageviews($block=true, $config="", $side, $index) {
-	global $gm_lang, $GEDCOM, $GEDCOMID, $INDEX_DIRECTORY, $GM_BLOCKS, $command, $GM_IMAGES, $GM_IMAGE_DIR, $SHOW_SOURCES, $TEXT_DIRECTION, $TBLPREFIX, $gm_username, $Users;
+	global $gm_lang, $GEDCOM, $GEDCOMID, $INDEX_DIRECTORY, $GM_BLOCKS, $command, $GM_IMAGES, $GM_IMAGE_DIR, $SHOW_SOURCES, $TEXT_DIRECTION, $TBLPREFIX, $gm_username, $gm_user;
 
 	if (empty($config)) $config = $GM_BLOCKS["top10_pageviews"]["config"];
 	if (isset($config["count_placement"])) $CountSide = $config["count_placement"];
@@ -53,7 +53,7 @@ function top10_pageviews($block=true, $config="", $side, $index) {
 
 	//-- if no results are returned then don't do anything
 	if (count($ids) == 0) {
-		if ($Users->userIsAdmin($gm_username)) {
+		if ($gm_user->userIsAdmin()) {
 			print "<div id=\"top10\" class=\"block\">\n";
 			print "<div class=\"blockhc\">";
 			print_help_link("index_top10_pageviews_help", "qm");
@@ -72,10 +72,9 @@ function top10_pageviews($block=true, $config="", $side, $index) {
 	print "<div class=\"blockhc\">";
 	print_help_link("index_top10_pageviews_help", "qm", "top10_pageviews");
 	if ($GM_BLOCKS["top10_pageviews"]["canconfig"]) {
-		$username = $gm_username;
-		if ((($command=="gedcom")&&($Users->userGedcomAdmin($username))) || (($command=="user")&&(!empty($username)))) {
+		if ((($command=="gedcom")&&($gm_user->userGedcomAdmin())) || (($command=="user")&&(!empty($gm_username)))) {
 			if ($command=="gedcom") $name = preg_replace("/'/", "\'", $GEDCOM);
-			else $name = $username;
+			else $name = $gm_username;
 			print "<a href=\"javascript: ".$gm_lang["config_block"]."\" onclick=\"window.open('index_edit.php?name=$name&amp;command=$command&amp;action=configure&amp;side=$side&amp;index=$index', '', 'top=50,left=50,width=500,height=250,scrollbars=1,resizable=1'); return false;\">";
 			print "<img class=\"adminicon\" src=\"$GM_IMAGE_DIR/".$GM_IMAGES["admin"]["small"]."\" width=\"15\" height=\"15\" border=\"0\" alt=\"".$gm_lang["config_block"]."\" /></a>\n";
 		}
@@ -146,7 +145,7 @@ function top10_pageviews($block=true, $config="", $side, $index) {
 						$i++;
 					}
 					if ($type=="REPO") {
-						if ($SHOW_SOURCES>=$Users->getUserAccessLevel($gm_username)) {
+						if ($SHOW_SOURCES>=$gm_user->getUserAccessLevel()) {
 							print "<tr valign=\"top\">";
 							if ($CountSide=="left") {
 								print "<td dir=\"ltr\" align=\"right\">";
@@ -168,7 +167,7 @@ function top10_pageviews($block=true, $config="", $side, $index) {
 						}
 					}
 					if ($type=="SOUR") {
-						if ($SHOW_SOURCES>=$Users->getUserAccessLevel($gm_username)) {
+						if ($SHOW_SOURCES>=$gm_user->getUserAccessLevel()) {
 							print "<tr valign=\"top\">";
 							if ($CountSide=="left") {
 								print "<td dir=\"ltr\" align=\"right\">";

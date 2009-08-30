@@ -198,13 +198,34 @@ function FindGedcomRecord($pid, $gedfile = "", $renew = false, $nocache = false)
 	if (empty($gedfile)) $gedfile = $GEDCOM;
 	$gedfileid = $GEDCOMS[$gedfile]["id"];
 	if (!$renew) {
-		if (isset($indilist[$pid."[".$gedfileid."]"]["gedcom"])) return $indilist[$pid."[".$gedfileid."]"]["gedcom"];
-		if ((isset($indilist[$pid]["gedcom"]))&&($indilist[$pid]["gedfile"]==$gedfileid)) return $indilist[$pid]["gedcom"];
-		if ((isset($famlist[$pid]["gedcom"]))&&($famlist[$pid]["gedfile"]==$gedfileid)) return $famlist[$pid]["gedcom"];
-		if ((isset($sourcelist[$pid]["gedcom"]))&&($sourcelist[$pid]["gedfile"]==$gedfileid)) return $sourcelist[$pid]["gedcom"];
-		if ((isset($repolist[$pid]["gedcom"])) && ($repolist[$pid]["gedfile"]==$gedfileid)) return $repolist[$pid]["gedcom"];
-		if ((isset($otherlist[$pid]["gedcom"]))&&($otherlist[$pid]["gedfile"]==$gedfileid)) return $otherlist[$pid]["gedcom"];
-		if ((isset($medialist[$pid]["gedcom"]))&&($medialist[$pid]["gedfile"]==$gedfileid)) return $medialist[$pid]["gedcom"];
+		if (isset($indilist[$pid."[".$gedfileid."]"]["gedcom"])) {
+//			print "Hit on indilist for ".$pid."<br />";
+			return $indilist[$pid."[".$gedfileid."]"]["gedcom"];
+		}
+		if ((isset($indilist[$pid]["gedcom"]))&&($indilist[$pid]["gedfile"]==$gedfileid)) {
+//			print "Hit on indilist for ".$pid."<br />";
+			return $indilist[$pid]["gedcom"];
+		}
+		if ((isset($famlist[$pid]["gedcom"]))&&($famlist[$pid]["gedfile"]==$gedfileid)) {
+//			print "Hit on famlist for ".$pid."<br />";
+			return $famlist[$pid]["gedcom"];
+		}
+		if ((isset($sourcelist[$pid]["gedcom"]))&&($sourcelist[$pid]["gedfile"]==$gedfileid)) {
+//			print "Hit on sourcelist for ".$pid."<br />";
+			return $sourcelist[$pid]["gedcom"];
+		}
+		if ((isset($repolist[$pid]["gedcom"])) && ($repolist[$pid]["gedfile"]==$gedfileid)) {
+//			print "Hit on repolist for ".$pid."<br />";
+			return $repolist[$pid]["gedcom"];
+		}
+		if ((isset($otherlist[$pid]["gedcom"]))&&($otherlist[$pid]["gedfile"]==$gedfileid)) {
+//			print "Hit on otherlist for ".$pid."<br />";
+			return $otherlist[$pid]["gedcom"];
+		}
+		if ((isset($medialist[$pid]["gedcom"]))&&($medialist[$pid]["gedfile"]==$gedfileid)) {
+//			print "Hit on medialist for ".$pid."<br />";
+			return $medialist[$pid]["gedcom"];
+		}
 	
 	}
 
@@ -1542,7 +1563,7 @@ function GetSourceList($selection="") {
 
 //-- get the repositorylist from the datastore
 function GetRepoList($filter = "", $selection="") {
-	global $GEDCOMID, $Users, $Actions, $gm_username;
+	global $GEDCOMID, $Actions, $gm_username;
 	global $TBLPREFIX, $DBCONN;
 	
 	$repolist = array();
@@ -1619,7 +1640,7 @@ function GetRepoIdList() {
  * @return array the array of repository-titles
  */
 function GetRepoAddTitleList() {
-	global $GEDCOMID, $TBLPREFIX, $DBCONN, $Users, $Actions, $gm_username;
+	global $GEDCOMID, $TBLPREFIX, $DBCONN, $Actions, $gm_username;
 
 	$addrepolist = array();
 	$repoaction = array();
@@ -2631,7 +2652,7 @@ function RejectChange($cid, $gedfile, $all=false) {
  */
 function UpdateRecord($indirec, $delete=false) {
 	global $TBLPREFIX, $GEDCOM, $DBCONN, $GEDCOMS, $FILE, $GEDCOMID, $PEDIGREE_ROOT_ID;
-	global $Users, $Privacy, $GedcomConfig;
+	global $Privacy, $GedcomConfig;
 
 	if (empty($FILE)) $FILE = $GEDCOM;
 	$tt = preg_match("/0 @(.+)@ (.+)/", $indirec, $match);
@@ -2754,7 +2775,7 @@ function UpdateRecord($indirec, $delete=false) {
 		}
 		if ($type == "INDI") {
 			// Clear users
-			$Users->ClearUserGedcomIDs($gid, $GEDCOM);
+			UserController::ClearUserGedcomIDs($gid, $GEDCOM);
 			if ($PEDIGREE_ROOT_ID == $gid) {
 				$PEDIGREE_ROOT_ID = "";
 				$GedcomConfig->SetPedigreeRootId("", $GEDCOM);
@@ -3035,10 +3056,10 @@ function ImportEmergencyLog() {
 }
 	
 function IsChangedFact($gid, $oldfactrec) {
-	global $GEDCOMID, $TBLPREFIX, $gm_username, $show_changes, $Users;
+	global $GEDCOMID, $TBLPREFIX, $gm_username, $show_changes, $gm_user;
 	
 //print "checking ".$gid." ".$oldfactrec."<br />";
-	if ($show_changes && $Users->UserCanEditOwn($gm_username, $gid) && GetChangeData(true, $gid, true)) {
+	if ($show_changes && $gm_user->UserCanEditOwn($gid) && GetChangeData(true, $gid, true)) {
 		$string = trim($oldfactrec);
 		if (empty($string)) return false;
 		$sql = "SELECT ch_old, ch_new FROM ".$TBLPREFIX."changes where ch_gid = '".$gid."' AND ch_gedfile = '".$GEDCOMID."' ORDER BY ch_time ASC";
@@ -3055,9 +3076,9 @@ function IsChangedFact($gid, $oldfactrec) {
 
 
 function RetrieveChangedFact($gid, $fact, $oldfactrec) {
-	global $GEDCOMID, $TBLPREFIX, $show_changes, $gm_username, $Users;
+	global $GEDCOMID, $TBLPREFIX, $show_changes, $gm_username, $gm_user;
 	
-	if ($show_changes && $Users->UserCanEditOwn($gm_username, $gid) && GetChangeData(true, $gid, true)) {
+	if ($show_changes && $gm_user->UserCanEditOwn($gid) && GetChangeData(true, $gid, true)) {
 		$sql = "SELECT ch_old, ch_new FROM ".$TBLPREFIX."changes where ch_gid = '".$gid."' AND ch_fact = '".$fact."' AND ch_gedfile = '".$GEDCOMID."' ORDER BY ch_time ASC";
 		$res = NewQuery($sql);
 		$factrec = $oldfactrec;
@@ -3586,10 +3607,10 @@ function ResetChangeCaches() {
 }
 
 function GetChangeNames($pid) {
-	global $GEDCOM, $GEDCOMS, $TBLPREFIX, $changes, $gm_lang, $GEDCOMID, $gm_username, $show_changes, $Users;
+	global $GEDCOM, $GEDCOMS, $TBLPREFIX, $changes, $gm_lang, $GEDCOMID, $gm_username, $show_changes, $gm_user;
 	
 	$name = array();
-	if ($show_changes && $Users->UserCanEditOwn($gm_username, $pid)) $onlyold = false;
+	if ($show_changes && $gm_user->UserCanEditOwn($pid)) $onlyold = false;
 	else $onlyold = true;
 
 	if(!isset($pid) || empty($pid)) return $name;
@@ -4056,9 +4077,9 @@ function HasOtherChanges($pid, $change_id, $gedid="") {
 
 function ShowSourceFromAnyGed() {
 	global $TBLPREFIX, $gm_username;
-	global $PRIV_PUBLIC, $PRIV_USER, $PRIV_NONE, $PRIV_HIDE, $SHOW_SOURCES, $Users;
-		
-	$acclevel = $Users->getUserAccessLevel($gm_username);
+	global $PRIV_PUBLIC, $PRIV_USER, $PRIV_NONE, $PRIV_HIDE, $SHOW_SOURCES, $gm_user;
+	
+	$acclevel = $gm_user->getUserAccessLevel();
 	$sql = "SELECT p_show_sources FROM ".$TBLPREFIX."privacy";
 	$res = NewQuery($sql);
 	while($row = $res->FetchRow()) {
@@ -4343,7 +4364,9 @@ function GetLastChangeDate($type, $pid, $gedid, $head=false) {
 }
 
 function GetRecentChangeFacts($day, $month, $year, $days) {
-	global $monthtonum, $Users, $gm_username, $SHOW_SOURCES, $TOTAL_QUERIES;
+	global $monthtonum, $gm_user, $gm_username, $SHOW_SOURCES, $TOTAL_QUERIES;
+	
+	$user =& User::GetInstance($gm_username);
 	
 	$dayindilist = array();
 	$dayfamlist = array();
@@ -4368,8 +4391,8 @@ function GetRecentChangeFacts($day, $month, $year, $days) {
 	
 	$dayindilist = SearchIndisDateRange($mday2, $monthtonum[$mmon2], $myear2, $mday3, $monthtonum[$mmon], $year, "", "no", "", false, "CHAN");
 	$dayfamlist = SearchFamsDateRange($mday2, $monthtonum[$mmon2], $myear2, $mday3, $monthtonum[$mmon], $year, "no", "", false, "CHAN");
-	if ($SHOW_SOURCES >= $Users->getUserAccessLevel($gm_username)) $dayrepolist = SearchOtherDateRange($mday2, $monthtonum[$mmon2], $myear2, $mday3, $monthtonum[$mmon], $year, "", false, "CHAN");
-	if ($SHOW_SOURCES >= $Users->getUserAccessLevel($gm_username)) $daysourcelist = SearchSourcesDateRange($mday2, $monthtonum[$mmon2], $myear2, $mday3, $monthtonum[$mmon], $year, "", false, "CHAN");
+	if ($SHOW_SOURCES >= $gm_user->getUserAccessLevel()) $dayrepolist = SearchOtherDateRange($mday2, $monthtonum[$mmon2], $myear2, $mday3, $monthtonum[$mmon], $year, "", false, "CHAN");
+	if ($SHOW_SOURCES >= $gm_user->getUserAccessLevel()) $daysourcelist = SearchSourcesDateRange($mday2, $monthtonum[$mmon2], $myear2, $mday3, $monthtonum[$mmon], $year, "", false, "CHAN");
 	$daymedialist = SearchMediaDateRange($mday2, $monthtonum[$mmon2], $myear2, $mday3, $monthtonum[$mmon], $year, "", false, "CHAN");
 
 	if (count($dayindilist)>0 || count($dayfamlist)>0 || count($daysourcelist)>0 || count($dayrepolist) > 0 || count($daymedialist) > 0) {

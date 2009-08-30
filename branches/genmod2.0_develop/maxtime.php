@@ -29,7 +29,7 @@
 */
 require("config.php");
 print_header($gm_lang["max_time"]);
-if(!$Users->UserIsAdmin($gm_username)) exit;
+if(!$gm_user->UserIsAdmin()) exit;
 if (!isset($maxtime)) $maxtime = 0;
 
 // Fix by Thomas for compression problems on Apache

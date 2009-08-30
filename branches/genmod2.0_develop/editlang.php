@@ -104,11 +104,11 @@ class EditLang {
 //		if ($_SERVER['SCRIPT_NAME'] == '/editlang.php') header('Location: editlang.php');
 	}
 	
-	function CheckAccess($gm_username) {
-		global $Users;
+	function CheckAccess($gm_user) {
+		global $gm_user;
 		
 		// If no admin, always search in user help
-		if (!$Users->UserIsAdmin($gm_username)) return false;
+		if (!$gm_user->UserIsAdmin()) return false;
 		else return true;
 	}
 	

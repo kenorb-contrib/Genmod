@@ -48,7 +48,7 @@ if (isset($refreshlist)) $action="listusers";
 $message = "";
 //-- make sure that they have admin status before they can use this page
 //-- otherwise have them login again
-if (!$Users->userIsAdmin($gm_username)) {
+if (!$gm_user->userIsAdmin()) {
 	if (empty($LOGIN_URL)) header("Location: login.php?url=useradmin.php?".GetQueryString(true));
 	else header("Location: ".$LOGIN_URL."?url=useradmin.php?".GetQueryString(true));
 	exit;
@@ -111,7 +111,7 @@ if ($action=="createuser") {
 		$i++;
 	}
 	if ($pass == TRUE){
-		$uuser = $Users->getUser($uusername);
+		$uuser =& User::GetInstance($uusername);
 		if (!$uuser->is_empty) {
 			print "<span class=\"error\">".$gm_lang["duplicate_username"]."</span><br />";
 		}
@@ -176,7 +176,7 @@ if ($action=="createuser") {
 				if (isset($$varname)) $user->max_relation_path[$file] = $$varname;
 			}
 			
-			$au = $Users->AddUser($user, "added");
+			$au = UserController::AddUser($user, "added");
 			
 			if ($au) {
 				$message .= $gm_lang["user_created"];
@@ -232,7 +232,7 @@ if ($action=="createuser") {
 }
 //-- section to delete a user
 if ($action=="deleteuser") {
-	if ($Users->DeleteUser($username, "deleted")) $message .= $gm_lang["delete_user_ok"];
+	if (UserController::DeleteUser($username, "deleted")) $message .= $gm_lang["delete_user_ok"];
 	else $message .= "<span class=\"error\">".$gm_lang["delete_user_nok"]."</span>";
 }
 //-- section to update a user by first deleting them
@@ -250,7 +250,7 @@ if ($action=="edituser2") {
 		$i++;
 	}
 	if ($pass == TRUE){
-		$u = $Users->getUser($uusername);
+		$u =& User::GetInstance($uusername);
 		if ($uusername!=$oldusername && !$u->is_empty) {
 			print "<span class=\"error\">".$gm_lang["duplicate_username"]."</span><br />";
 			$action="edituser";
@@ -258,12 +258,12 @@ if ($action=="edituser2") {
 		}
 		else if ($pass1==$pass2) {
 			$sync_data_changed = false;
-			$olduser = $Users->getUser($oldusername);
+			$olduser =& User::GetInstance($oldusername);
 			$newuser = CloneObj($olduser);
 
 			if (empty($pass1)) $newuser->password=$olduser->password;
 			else $newuser->password=crypt($pass1);
-			$Users->DeleteUser($oldusername, "changed");
+			UserController::DeleteUser($oldusername, "changed");
 			$newuser->username=$uusername;
 			$newuser->firstname=$ufirstname;
 			$newuser->lastname=$ulastname;
@@ -323,7 +323,7 @@ if ($action=="edituser2") {
 			else $newuser->visibleonline=false;
 			if ((isset($editaccount))&&($editaccount=="yes")) $newuser->editaccount=true;
 			else $newuser->editaccount=false;
-			$Users->AddUser($newuser, "changed");
+			UserController::AddUser($newuser, "changed");
 			
 			//-- update Gedcom record with new email address
 			if ($newuser->sync_gedcom=="Y" && $sync_data_changed && !empty($newuser->email)) {
@@ -428,7 +428,7 @@ if ($action=="edituser" || $action == "createform") { ?>
 		<?php
 		switch ($action) {
 			case "edituser": 
-				$user = $Users->getUser($username);
+				$user =& User::GetInstance($username);
 				if (!empty($user->username)) {
 					if (!isset($user->contactmethod)) $user->contactmethod = "none"; ?>
 					<form name="editform" method="post" action="useradmin.php" onsubmit="return checkform(this);">
@@ -607,7 +607,7 @@ if ($action=="edituser" || $action == "createform") { ?>
 					<input type="checkbox" name="verified_by_admin" tabindex="<?php $tab++; print $tab; ?>" value="yes" <?php if ($action == "edituser") { if ($user->verified_by_admin) print "checked=\"checked\""; } else print "checked=\"checked\"";?> />
 				</div>
 			</div>
-			<?php if ($action == "createform") $user = $Users->GetUser($gm_username);
+			<?php if ($action == "createform") $user =& User::GetInstance($gm_username);
 			if ($ENABLE_MULTI_LANGUAGE) { ?>
 				<div class="admin_item_box">
 					<div class="width30 choice_left">
@@ -730,7 +730,7 @@ if ($action=="edituser" || $action == "createform") { ?>
 					</select>
 				</div>
 			</div>
-			<?php if ($Users->userIsAdmin($gm_username)) { ?>
+			<?php if ($gm_user->userIsAdmin()) { ?>
 				<div class="admin_item_box">
 					<div class="width30 choice_left">
 						<div class="helpicon">
@@ -1014,7 +1014,7 @@ if ($action=="edituser" || $action == "createform") { ?>
 
 if ($action == "massupdate") {
 	// -- Count the number of users to be updated
-	$userlist = $Users->GetUsers();
+	$userlist = UserController::GetUsers();
 
 	foreach ($userlist as $key => $user) {
 		$str = "select".preg_replace(array("/\./","/-/","/ /"), array("_","_","_"), $key);
@@ -1499,7 +1499,7 @@ if ($action == "massupdate") {
 // -- Perform the mass update
 if ($action == "massupdate2") {
 	// -- Get the users to be updated
-	$userlist = $Users->GetUsers();
+	$userlist = UserController::GetUsers();
 	foreach ($userlist as $key => $user) {
 		$str = "select".preg_replace(array("/\./","/-/","/ /"), array("_","_","_"), $key);
 		if (!isset($$str)) unset($userlist[$key]);
@@ -1616,8 +1616,8 @@ if ($action == "massupdate2") {
 			}
 			else $newuser->sync_gedcom = "N";
 		}
-		if ($Users->DeleteUser($user->username, "changed")) {
-			if ($Users->AddUser($newuser, "changed")) $update = true;
+		if (UserController::DeleteUser($user->username, "changed")) {
+			if (UserController::AddUser($newuser, "changed")) $update = true;
 			else $update = false;
 		}
 		else $update = false;
@@ -1635,28 +1635,28 @@ if (($action == "listusers") || ($action == "edituser2") || ($action == "deleteu
 
 	switch ($sort) {
 		case "sortfname":
-			$users = $Users->GetUsers("firstname","asc", "lastname");
+			$users = UserController::GetUsers("firstname","asc", "lastname");
 			break;
 		case "sortlname":
-			$users = $Users->GetUsers("lastname","asc", "firstname");
+			$users = UserController::GetUsers("lastname","asc", "firstname");
 			break;
 		case "sortllgn":
-			$users = $Users->GetUsers("sessiontime","desc");
+			$users = UserController::GetUsers("sessiontime","desc");
 			break;
 		case "sortuname":
-			$users = $Users->GetUsers("username","asc");
+			$users = UserController::GetUsers("username","asc");
 			break;
 		case "sortreg":
-			$users = $Users->GetUsers("reg_timestamp","desc");
+			$users = UserController::GetUsers("reg_timestamp","desc");
 			break;
 		case "sortver":
-			$users = $Users->GetUsers("verified","asc");
+			$users = UserController::GetUsers("verified","asc");
 			break;
 		case "sortveradm":
-			$users = $Users->GetUsers("verified_by_admin","asc");
+			$users = UserController::GetUsers("verified_by_admin","asc");
 			break;
 		default: 
-			$users = $Users->GetUsers("username","asc");
+			$users = UserController::GetUsers("username","asc");
 			break;
 	}
 	
@@ -1942,7 +1942,7 @@ if ($action == "cleanup") {
 			</div>
 			<?php
 			// Check users not logged in too long
-			$users = $Users->GetUsers();
+			$users = UserController::GetUsers();
 			$ucnt = 0;
 			foreach($users as $key=>$user) {
 				if ($user->sessiontime == "0") $datelogin = $user->reg_timestamp;
@@ -2037,11 +2037,11 @@ if ($action == "cleanup") {
 	<?php
 }
 if ($action == "cleanup2") {
-	$users = $Users->GetUsers();
+	$users = UserController::GetUsers();
 	foreach($users as $key=>$user) {
 		$var = "del_".preg_replace(array("/\./","/-/","/ /"), array("_","_","_"), $user->username);
 		if (isset($$var)) {
-			if ($Users->DeleteUser($key)) $message .= $gm_lang["usr_deleted"].$user->username."<br />";
+			if (UserController::DeleteUser($key)) $message .= $gm_lang["usr_deleted"].$user->username."<br />";
 		}
 		else {
 			foreach($user->canedit as $gedid=>$data) {
@@ -2057,8 +2057,8 @@ if ($action == "cleanup2") {
 						unset($user->gedcomid[$gedid]);
 						$message .= $gedid.":&nbsp;&nbsp;".$gm_lang["usr_unset_gedcomid"].$user->username."<br />";
 					}
-					$Users->DeleteUser($key, "changed");
-					$Users->AddUser($user, "changed");
+					UserController::DeleteUser($key, "changed");
+					UserController::AddUser($user, "changed");
 				}
 			}
 		}
@@ -2096,7 +2096,7 @@ if ($action == "") {
 		}?>
 		<div class="admin_topbottombar"><?php print $gm_lang["admin_info"]; ?></div>
 		<?php
-		$users = $Users->GetUsers();
+		$users = UserController::GetUsers();
 		$totusers = 0;			// Total number of users
 		$warnusers = 0;			// Users with warning
 		$applusers = 0;			// Users who have not verified themselves
@@ -2264,7 +2264,7 @@ if ($action == "") {
 
 // Cleanup message boxes
 if ($action == "cleanup_messbox") {
-	$users = $Users->GetUsers();
+	$users = UserController::GetUsers();
 	foreach ($users as $key => $user) {
 		$fld = "msg_".$user->username;
 		if (isset($$fld)) {
@@ -2319,7 +2319,7 @@ if ($action == "cleanup_messages") {
 				</div><br />
 			</div>
 			<?php
-			if (!isset($users)) $users = $Users->GetUsers();
+			if (!isset($users)) $users = UserController::GetUsers();
 			$count = 0;
 			$mons = array();
 			foreach($users as $key=>$user) {

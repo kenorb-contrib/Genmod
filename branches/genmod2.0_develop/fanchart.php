@@ -118,7 +118,7 @@ function split_align_text($data, $maxlen) {
 function print_fan_chart($treeid, $fanw=640, $fandeg=270) {
 	global $PEDIGREE_GENERATIONS, $fan_width, $fan_style, $cw, $fontsize;
 	global $name, $gm_lang, $SHOW_ID_NUMBERS, $view, $TEXT_DIRECTION;
-	global $stylesheet, $print_stylesheet, $gm_username, $Users;
+	global $stylesheet, $print_stylesheet, $gm_username;
 	global $GM_IMAGE_DIR, $GM_IMAGES, $LINK_ICONS, $GEDCOM;
 
 	// check for GD 2.x library
@@ -217,7 +217,7 @@ require_once("fonts/".$ff[0].".php");
 	$reltome=false;
 	$username = $gm_username;
 	if (!empty($username)) {
-		$tuser = $Users->getUser($username);
+		$tuser =& User::GetInstance($username);
 		if (!empty($tuser->gedcomid[$GEDCOM])) $reltome=true;
 	}
 

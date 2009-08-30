@@ -70,9 +70,9 @@ class DownloadGedcom {
 	}
 	
 	function CheckAccess(&$gm_username) {
-		global $Users;
+		global $gm_user;
 		
-		if ((!$Users->userGedcomAdmin($gm_username))||(empty($this->ged))) {
+		if ((!$gm_user->userGedcomAdmin())||(empty($this->ged))) {
 			// header("Location: editgedcoms.php");
 			// exit;
 			return false;
@@ -162,7 +162,7 @@ class DownloadGedcom {
 	}
 	
 	function DownloadZip($genmod, $gm_username) {
-		global $Users, $MEDIATYPE;
+		global $MEDIATYPE;
 		// TODO: Remove below line in the future when all vars are in $genmod
 		$INDEX_DIRECTORY = $genmod['index_directory'];
 		require('includes/pclzip.lib.php');

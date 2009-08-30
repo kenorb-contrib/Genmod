@@ -38,7 +38,7 @@ function print_todays_events($block=true, $config="", $side, $index) {
 	global $gm_lang, $month, $year, $day, $monthtonum, $HIDE_LIVE_PEOPLE, $SHOW_ID_NUMBERS, $command, $TEXT_DIRECTION, $SHOW_FAM_ID_NUMBERS;
 	global $GM_IMAGE_DIR, $GM_IMAGES, $GEDCOM, $REGEXP_DB, $DEBUG, $ASC, $IGNORE_FACTS, $IGNORE_YEAR, $LAST_QUERY, $GM_BLOCKS;
 	global $INDEX_DIRECTORY, $USE_RTL_FUNCTIONS, $NAME_REVERSE, $GEDCOMID;
-	global $hDay, $hMonth, $hYear, $gm_username, $Users;
+	global $hDay, $hMonth, $hYear, $gm_username, $gm_user;
 
 	$block = true;// Always restrict this block's height
 
@@ -58,12 +58,10 @@ function print_todays_events($block=true, $config="", $side, $index) {
 	print "<div id=\"on_this_day_events\" class=\"block\">";
 	print "<div class=\"blockhc\">";
 	print_help_link("index_onthisday_help", "qm", "on_this_day");
-	$username = $gm_username;
 	if ($GM_BLOCKS["print_upcoming_events"]["canconfig"]) {
-		$username = $gm_username;
-		if ((($command=="gedcom")&&($Users->userGedcomAdmin($username))) || (($command=="user")&&(!empty($username)))) {
+		if ((($command=="gedcom")&&($gm_user->userGedcomAdmin())) || (($command=="user")&&(!empty($gm_username)))) {
 			if ($command=="gedcom") $name = preg_replace("/'/", "\'", $GEDCOM);
-			else $name = $username;
+			else $name = $gm_username;
 			print "<a href=\"javascript: ".$gm_lang["config_block"]."\" onclick=\"window.open('index_edit.php?name=$name&amp;command=$command&amp;action=configure&amp;side=$side&amp;index=$index', '', 'top=50,left=50,width=500,height=250,scrollbars=1,resizable=1'); return false;\">";
 			print "<img class=\"adminicon\" src=\"$GM_IMAGE_DIR/".$GM_IMAGES["admin"]["small"]."\" width=\"15\" height=\"15\" border=\"0\" alt=\"".$gm_lang["config_block"]."\" /></a>\n";
 		}

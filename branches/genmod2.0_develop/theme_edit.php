@@ -40,7 +40,7 @@ if (empty($uname)) {
 	else header("Location: ".$LOGIN_URL."?url=theme_edit.php");
 	exit;
 }
-$user = $Users->getUser($uname);
+$user =& User::GetInstance($uname);
 
 // -- print html header information
 print_header("Theme editor");

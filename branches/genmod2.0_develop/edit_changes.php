@@ -34,7 +34,7 @@ require "config.php";
 */
 require "includes/functions/functions_edit.php";
 
-if (!$Users->userCanAccept($gm_username)) {
+if (!$gm_user->userCanAccept()) {
 	if (empty($LOGIN_URL)) header("Location: login.php?url=edit_changes.php");
 	else header("Location: ".$LOGIN_URL."?url=edit_changes.php");
 	exit;
@@ -439,7 +439,7 @@ else {
 				if ($trace) print "a".$changegroup[$groupid]["canaccept"]."r".$changegroup[$groupid]["canreject"];
 				print "</td>";
 				print "<td>";
-				$cuser = $Users->getUser($change["user"]);
+				$cuser =& User::GetInstance($change["user"]);
 				if (!$cuser->is_empty) print PrintReady($cuser->firstname." ".$cuser->lastname);
 				print "</td>";
 				// NOTE: Use European time format if none is specified.

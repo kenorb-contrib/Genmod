@@ -40,8 +40,8 @@ if (!isset($ged)) $ged = "";
 
 // NOTE: make sure that they have admin status before they can use this page
 // NOTE: otherwise have them login again
-$username = $gm_username;
-if (!$Users->userGedcomAdmin($username)) {
+
+if (!$gm_user->userGedcomAdmin()) {
 	if (empty($LOGIN_URL)) header("Location: login.php?url=editgedcoms.php");
 	else header("Location: ".$LOGIN_URL."?url=editgedcoms.php");
 	exit;
@@ -73,7 +73,7 @@ if ($action == "deletecount") {
 <!-- Setup the left box -->
 <div id="admin_genmod_left">
 	<div class="admin_link"><a href="admin.php"><?php print $gm_lang["admin"];?></a></div>
-	<?php if ($Users->userIsAdmin($username)) { ?>
+	<?php if ($gm_user->userIsAdmin()) { ?>
 		<div class="admin_link">
 			<?php print_help_link("add_gedcom_help", "qm", "add_gedcom"); ?>
 			<a href="editconfig_gedcom.php?source=add_form"><?php print $gm_lang["add_gedcom"];?></a>
@@ -104,7 +104,7 @@ if ($action == "deletecount") {
 			<?php
 			// Default gedcom choice
 			if (count($GEDCOMS)>0) {
-				if ($Users->userIsAdmin($username)) {
+				if ($gm_user->userIsAdmin()) {
 					print_help_link("default_gedcom_help", "qm");
 					print $gm_lang["DEFAULT_GEDCOM"]."&nbsp;";
 					print "<select name=\"default_ged\" class=\"header_select\" onchange=\"document.defaultform.submit();\">";
@@ -128,7 +128,7 @@ if ($action == "deletecount") {
 	if (count($GEDCOMS)>0) {
 		print "<table class=\"gedcom_table\">";
 		foreach($GEDCOMS as $gedc=>$gedarray) {
-			if ($Users->userGedcomAdmin($username, $gedc)) {
+			if ($gm_user->userGedcomAdmin($gedc)) {
 				if (empty($DEFAULT_GEDCOM)) $DEFAULT_GEDCOM = $gedc;
 				
 				// Row 0: Separator line

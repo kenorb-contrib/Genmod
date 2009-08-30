@@ -145,7 +145,7 @@ $outputmenu["Calendar"] = Array
 	//-->
 	</script>
 	<?php
-	global $gm_lang, $gm_username, $GEDCOMS, $GEDCOM, $HOME_SITE_URL, $HOME_SITE_TEXT,$GM_IMAGE_DIR, $GM_IMAGES, $Users;
+	global $gm_lang, $gm_username, $GEDCOMS, $GEDCOM, $HOME_SITE_URL, $HOME_SITE_TEXT,$GM_IMAGE_DIR, $GM_IMAGES, $gm_user;
 	if ($TEXT_DIRECTION == "ltr") {
 		$rdir = "right";
 		$ldir = "left";
@@ -174,9 +174,8 @@ $outputmenu["Calendar"] = Array
 		</div>
 		<div class="shade1" style="float: <?php print $rdir; ?>; text-align: <?php print $ldir; ?>; margin-<?php print $rdir; ?>: 0em; width: 20em;">
 			<?php 
-			$user = $Users->GetUser($gm_username);
-			if (isset($user->gedcomid[$GEDCOM]) && !empty($user->gedcomid[$GEDCOM]) && DisplayDetailsByID($user->gedcomid[$GEDCOM])) print "<a href=\"individual.php?pid=".$user->gedcomid[$GEDCOM]."\">".$user->firstname.' '.$user->lastname."</a><br />";
-			else echo $user->firstname.' '.$user->lastname.'<br />';
+			if (isset($gm_user->gedcomid[$GEDCOM]) && !empty($gm_user->gedcomid[$GEDCOM]) && DisplayDetailsByID($gm_user->gedcomid[$GEDCOM])) print "<a href=\"individual.php?pid=".$gm_user->gedcomid[$GEDCOM]."\">".$gm_user->firstname.' '.$gm_user->lastname."</a><br />";
+			else echo $gm_user->firstname.' '.$gm_user->lastname.'<br />';
 			echo "<a href=\"".$HOME_SITE_URL."\">".$HOME_SITE_TEXT."</a>";
 			?>
 		</div>

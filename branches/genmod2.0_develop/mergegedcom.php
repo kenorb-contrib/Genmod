@@ -54,7 +54,7 @@
 
 require "config.php";
 //print_r($_POST);
-if (!$Users->userGedcomAdmin($gm_username)) {
+if (!$gm_user->userGedcomAdmin()) {
 	if (empty($LOGIN_URL)) header("Location: login.php?url=mergegedcom.php");
 	else header("Location: ".$LOGIN_URL."?url=mergegedcom.php");
 	exit;

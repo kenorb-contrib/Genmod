@@ -38,7 +38,7 @@ print '<span class="helpheader">';
 print $gm_lang["help_config"];
 print '</span><br /><br /><span class="helptext">';
 if ($help == "help_contents_help") {
-		if ($Users->userIsAdmin($gm_username)) {
+		if ($gm_user->userIsAdmin()) {
 		$help = "admin_help_contents_help";
 		print_text("admin_help_contents_head_help");
 	}

@@ -49,7 +49,7 @@ if (strstr($_SERVER["SCRIPT_NAME"],basename(__FILE__))) {
  * @return 	boolean	True if mail has been stored/send or false if this failed
  */
 function AddMessage($message, $admincopy=false) {
-	global $TBLPREFIX, $CONTACT_METHOD, $gm_lang,$CHARACTER_SET, $LANGUAGE, $GM_STORE_MESSAGES, $SERVER_URL, $gm_language, $GM_BASE_DIRECTORY, $GM_SIMPLE_MAIL, $WEBMASTER_EMAIL, $DBCONN, $Users;
+	global $TBLPREFIX, $CONTACT_METHOD, $gm_lang,$CHARACTER_SET, $LANGUAGE, $GM_STORE_MESSAGES, $SERVER_URL, $gm_language, $GM_BASE_DIRECTORY, $GM_SIMPLE_MAIL, $WEBMASTER_EMAIL, $DBCONN;
 	global $TEXT_DIRECTION, $TEXT_DIRECTION_array, $DATE_FORMAT, $DATE_FORMAT_array, $TIME_FORMAT, $TIME_FORMAT_array, $WEEK_START, $WEEK_START_array, $NAME_REVERSE, $NAME_REVERSE_array;
 
 	// NOTE: Strip slashes from the body text
@@ -96,7 +96,7 @@ function AddMessage($message, $admincopy=false) {
 	
 	// NOTE: E-mail from
 	$from ="";
-	$fuser = $Users->GetUser($message["from_name"]);
+	$fuser =& User::GetInstance($message["from_name"]);
 	
 	if (empty($fuser->username)) {
 		$from = $message["from_email"];
@@ -112,7 +112,7 @@ function AddMessage($message, $admincopy=false) {
 	// NOTE: Details e-mail for the recipient
 	$message_recipient = "";
 	
-	$tuser = $Users->GetUser($message["to"]);
+	$tuser =& User::GetInstance($message["to"]);
 	
 	// NOTE: Load the recipients language
 	$oldlanguage = $LANGUAGE;
@@ -166,7 +166,7 @@ function AddMessage($message, $admincopy=false) {
 		// NOTE: Message body
 		$message_recipient .= $messagebody."<br /><br />";
 		
-		$tuser = $Users->GetUser($message["to"]);
+		$tuser =& User::GetInstance($message["to"]);
 		// NOTE: the recipient must be a valid user in the system before it will send any mails
 		if (!is_object($tuser)) return false;
 		else {
@@ -198,7 +198,7 @@ function AddMessage($message, $admincopy=false) {
 	if ($message["method"] != "messaging") {
 		if (!isset($message["no_from"])) {
 			if (stristr($from, "Genmod-noreply@")){
-				$admuser = $Users->GetUser($WEBMASTER_EMAIL);
+				$admuser =& User::GetInstance($WEBMASTER_EMAIL);
 				$from = $admuser->email;
 			}
 			if (!empty($from)) {

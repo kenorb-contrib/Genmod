@@ -51,15 +51,15 @@ if ($action=="login") {
 	else $password="";
 	if (isset($_POST['remember'])) $remember = $_POST['remember'];
 	else $remember = "no";
-	$auth = $Users->AuthenticateUser($username, $password);
+	$auth = UserController::AuthenticateUser($username, $password);
 	if ($auth) {
 		if (!empty($_POST["usertime"])) {
 			$_SESSION["usertime"]=@strtotime($_POST["usertime"]);
 		}
 		else $_SESSION["usertime"]=time();
 		$_SESSION["timediff"]=time()-$_SESSION["usertime"];
-		$MyUserName = $Users->GetUserName();
-		$MyUser = $Users->GetUser($MyUserName);
+		$MyUserName = UserController::GetUserName();
+		$MyUser =& User::GetInstance($MyUserName);
 		if (isset($MyUser->language)) {
 		  if (isset($_SESSION['CLANGUAGE']))$_SESSION['CLANGUAGE'] = $MyUser->language;
 		  else if (isset($HTTP_SESSION_VARS['CLANGUAGE'])) $HTTP_SESSION_VARS['CLANGUAGE'] = $MyUser->language;

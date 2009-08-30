@@ -31,7 +31,7 @@
 */
 require "config.php";
 
-if (!$Users->userGedcomAdmin($gm_username)) {
+if (!$gm_user->userGedcomAdmin()) {
 	if (empty($LOGIN_URL)) header("Location: login.php?url=gminfo.php?action=".$action);
 	else header("Location: ".$LOGIN_URL."?url=gminfo.php?action=".$action);
 exit;

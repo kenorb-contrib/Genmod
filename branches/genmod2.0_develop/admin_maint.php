@@ -30,7 +30,7 @@
  * load the main configuration and context
  */
 require "config.php";
-if (!$Users->userGedcomAdmin($gm_username)) {
+if (!$gm_user->userGedcomAdmin()) {
 	if (empty($LOGIN_URL)) header("Location: login.php?url=admin_maint.php");
 	else header("Location: ".$LOGIN_URL."?url=admin_maint.php");
 	exit;
@@ -89,7 +89,7 @@ switch ($action) {
 print_header($gm_lang["administration_maintenance"]);
 $err_write = FileIsWriteable("config.php");
 
-$users = $Users->GetUsers();
+$users = UserController::GetUsers();
 $verify_msg = false;
 $warn_msg = false;
 foreach($users as $indexval => $user) {

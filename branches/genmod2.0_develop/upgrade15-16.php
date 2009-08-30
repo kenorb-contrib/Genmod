@@ -30,8 +30,7 @@ require("config.php");
 
 if (!function_exists("userIsAdmin")) {
 	function userIsAdmin($username) {
-		global $Users;
-		return $Users->userIsAdmin($username);
+		return UserController::userIsAdmin($username);
 	}
 }
 

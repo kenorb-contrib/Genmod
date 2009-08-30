@@ -30,50 +30,91 @@ if (stristr($_SERVER["SCRIPT_NAME"],basename(__FILE__))) {
 
 class User {
 
-	var $classname = "User";
-	var $username = "";
-	var $password = "";
-	var $firstname = "";
-	var $lastname = "";
-	var $canadmin = false;
-	var $canedit = array();
-	var $email = "";
-	var $verified = "";
-	var $verified_by_admin = "";
-	var $language = "";
-	var $pwrequested = "";
-	var $reg_timestamp = "";
-	var	$reg_hashcode = "";
-	var	$theme = "";
-	var	$loggedin = "";
-	var	$sessiontime = "";
-	var	$contactmethod = "";
-	var	$visibleonline = false;
-	var	$editaccount = false;
-	var	$default_tab = "9";
-	var	$comment = "";
-	var	$comment_exp = "";
-	var	$sync_gedcom = "";
-	var	$auto_accept = false;
-	var $u_username = "";
-	var $gedcomid = array();
-	var $rootid = array();
-	var $privgroup = array();
-	var $gedcomadmin = array();
-	var	$relationship_privacy = array();
-	var	$max_relation_path = array();
-	var $hide_live_people = array();
-	var $show_living_names = array();
-	var $is_empty = true;
+	public $classname = "User";				// Name of this class
+	private static $usercache = array();	// Holder of the instances for this class
+	public $username = "";						// Name of the user (used to logon)
+	public $password = "";
+	public $firstname = "";
+	public $lastname = "";
+	public $canadmin = false;
+	public $canedit = array();
+	public $email = "";
+	public $verified = "";
+	public $verified_by_admin = "";
+	public $language = "";
+	public $pwrequested = "";
+	public $reg_timestamp = "";
+	public $reg_hashcode = "";
+	public $theme = "";
+	public $loggedin = "";
+	public $sessiontime = "";
+	public $contactmethod = "";
+	public $visibleonline = false;
+	public $editaccount = false;
+	public $default_tab = "9";
+	public $comment = "";
+	public $comment_exp = "";
+	public $sync_gedcom = "";
+	public $auto_accept = false;
+	public $u_username = "";
+	public $gedcomid = array();
+	public $rootid = array();
+	public $privgroup = array();
+	public $gedcomadmin = array();
+	public $relationship_privacy = array();
+	public $max_relation_path = array();
+	public $hide_live_people = array();
+	public $show_living_names = array();
+	public $show_action_log = null;
+	public $is_empty = true;
+	
+	public static function getInstance($username, $userdata="") {
+		global $gm_username;
+		
+		if (empty($username)) $username = $gm_username;
+		
+		if (empty($username)) $cachename = "empty";
+		else $cachename = $username;
+		
+		if (!isset(self::$usercache[$cachename])) {
+			self::$usercache[$cachename] = new User($username, $userdata="");
+		}
+		return self::$usercache[$cachename];
+	}
+	
+	public static function RenewInstance($username) {
+		
+		if (isset(self::$usercache[$username])) unset(self::$usercache[$username]);
+		if (!empty($username)) self::$usercache[$username] = new User($username);
+
+	}
+		
+	public static function DeleteInstance($username) {
+		
+		if (isset(self::$usercache[$username])) unset(self::$usercache[$username]);
+
+	}
 	
 	public function __construct($username="", $userfields="") {
 		return $this->GetUser($username, $userfields);
 	}
+
+	public function __get($property) {
+		
+		switch ($property) {
+			default:
+				break;
+		}
+	}
 	
-	public function GetUser($username, $userfields="") {
+	public function ObjCount() {
+		return count(self::$usercache);
+	}	
+	
+	private function GetUser($username, $userfields="") {
 		global $TBLPREFIX, $userobjects, $REGEXP_DB, $GEDCOMS, $DBCONN;
 
-		if (empty($username)) return false;
+		if (empty($username) || $username == "empty") return false;
 
 		if (!is_array($userfields)) {
 			if (!$DBCONN->connected) return false;
@@ -103,7 +144,7 @@ class User {
 		}
 	}
 
-	public function FillUser($username, $user_data) {
+	private function FillUser($username, $user_data) {
 		global $userobjects, $TBLPREFIX;
 		
 		foreach ($user_data as $key => $user_row) {
@@ -153,5 +194,221 @@ class User {
 			if (isset($user_row["ug_rootid"])) $this->rootid[$ged] = $user_row["ug_rootid"];
 		}
 	}
+	
+	public function ShowActionLog() {
+		global $SHOW_ACTION_LIST;
+		
+		if ($SHOW_ACTION_LIST >= $this->getUserAccessLevel()) return true;
+		else return false;
+	}
+	
+	/**
+	* get current user's access level
+	*
+	* checks the current user and returns their privacy access level
+	* @return int		their access level
+	*/
+	public function getUserAccessLevel() {
+		global $PRIV_PUBLIC, $PRIV_NONE, $PRIV_USER, $GEDCOM;
+
+		if ($this->username == "") return $PRIV_PUBLIC;
+
+		if ($this->userGedcomAdmin()) return $PRIV_NONE;
+		if ($this->userPrivAccess()) return $PRIV_USER;
+		return $PRIV_PUBLIC;
+	}
+	
+	/**
+	* check if the given user has access privileges on this gedcom
+	*
+	* takes a username and checks if the user has access privileges to view the private
+	* gedcom data.
+	* @param string $username the username of the user to check
+	* @return boolean true if user can access false if they cannot
+	*/
+	public function userPrivAccess() {
+		global $GEDCOM;
+
+		if ($this->username == "") return false;
+		if ($this->userIsAdmin()) return true;
+		if (isset($this->privgroup[$GEDCOM])) {
+			if ($this->privgroup[$GEDCOM]!="none") return true;
+			else return false;
+		}
+		else return false;
+	}
+	
+	/**
+	* check if given username is an admin for the current gedcom
+	*
+	* takes a username and checks if the
+	* user has administrative privileges
+	* to change the configuration files for the currently active gedcom
+	*/
+	public function userGedcomAdmin($ged="") {
+		global $GEDCOM;
+
+		if (empty($ged)) $ged = $GEDCOM;
+
+		if ($_SESSION['cookie_login']) return false;
+		if ($this->username == "") return false;
+		if ($this->userIsAdmin()) return true;
+		if (isset($this->gedcomadmin[$ged]) && $user->gedcomadmin[$ged]) return true;
+		else return false;
+	}
+	
+	/**
+	* check if given username is an admin
+	*
+	* takes a username and checks if the
+	* user has administrative privileges
+	* to change the configuration files
+	*/
+	public function userIsAdmin() {
+	
+		if ($this->username == "") return false;
+		if ($_SESSION['cookie_login']) return false;
+		return $this->canadmin;
+	}
+	
+	/**
+	* check if the given user has write privileges on this gedcom
+	*
+	* takes a username and checks if the user has write privileges to change
+	* the gedcom data. First check if the administrator has turned on editing privileges for this gedcom
+	* @param string $username the username of the user to check
+	* @return boolean true if user can edit false if they cannot
+	*/
+	public function userCanEdit($ged="") {
+		global $ALLOW_EDIT_GEDCOM, $GEDCOM;
+
+		if (empty($ged)) $ged = $GEDCOM;
+
+		if (!$ALLOW_EDIT_GEDCOM) return false;
+		if ($this->username == "empty" || $this->username == "") return false;
+		
+		// Site admins can edit all
+		if ($this->userIsAdmin()) return true;
+		
+		if (isset($this->canedit[$ged])) {
+			// yes and true are old values
+			if ($this->canedit[$ged]=="yes" || $this->canedit[$ged]=="edit" || $this->gedcomadmin[$ged] || $this->canedit[$ged]=="accept" || $this->canedit[$ged]===true) return true;
+			else return false;
+		}
+		else return false;
+	}
+	/**
+	* Can user accept changes
+	* 
+	* takes a username and checks if the user has write privileges to 
+	* change the gedcom data and accept changes
+	* @param string $username	the username of the user check privileges
+	* @return boolean true if user can accept false if user cannot accept
+	*/ 
+	public function userCanAccept($ged="") {
+		global $ALLOW_EDIT_GEDCOM, $GEDCOM;
+
+		if (empty($ged)) $ged = $GEDCOM;
+
+		if (!$ALLOW_EDIT_GEDCOM) return false;
+		if ($this->username == "") return false;
+		
+		// Site admins can accept all
+		if ($this->userIsAdmin()) return true;
+		
+		if (isset($this->gedcomadmin[$ged]) && $this->gedcomadmin[$ged]) return true;
+		if (isset($this->canedit[$ged])) {
+			if ($this->canedit[$ged]=="accept") return true;
+			else return false;
+		}
+		else return false;
+	}
+
+	/**
+	* Should user's changed automatically be accepted 
+	* @param string $username	the user name of the user to check
+	* @return boolean 		true if the changes should automatically be accepted
+	*/
+	public function userAutoAccept() {
+		
+		if ($this->username == "") return false;
+		if (!$this->userCanAccept()) return false;
+		if ($this->auto_accept) return true;
+	}
+	
+	/**
+	* Determine if the user can view raw GEDCOM lines
+	* @author	Genmod Development Team
+	* @param		string	$username		The username or if not set, the current user
+	* @param		string	$ged			The GEDCOM file or if not set, the current user
+	* @return 		boolean					Return true or false as a result
+	*/ 
+	public function userCanViewGedlines($ged="") {
+		global $GEDCOM, $SHOW_GEDCOM_RECORD;
+		
+		if ($this->username == "empty" || $this->username == "") return false;
+
+		if ($SHOW_GEDCOM_RECORD == -1) return false;
+		if ($SHOW_GEDCOM_RECORD == 0) return true;
+		if ($SHOW_GEDCOM_RECORD == 1 && $this->UserPrivAccess($GEDCOM)) return true;
+		if ($SHOW_GEDCOM_RECORD == 2 && $this->UserCanEdit($GEDCOM)) return true;
+		if ($SHOW_GEDCOM_RECORD == 3 && $this->UserCanAccept($GEDCOM)) return true;
+		if ($SHOW_GEDCOM_RECORD == 4 && $this->UserGedcomAdmin($GEDCOM)) return true;
+		if ($SHOW_GEDCOM_RECORD == 5 && $this->UserIsAdmin()) return true;
+		return false;
+	}
+
+	/**
+	* Determine if the user can edit raw GEDCOM lines
+	* @author	Genmod Development Team
+	* @param		string	$username		The username or if not set, the current user
+	* @param		string	$ged			The GEDCOM file or if not set, the current user
+	* @return 		boolean					Return true or false as a result
+	*/ 
+	public function userCanEditGedlines($username="", $ged="") {
+		global $GEDCOM, $ALLOW_EDIT_GEDCOM, $EDIT_GEDCOM_RECORD;
+		
+		if (!$ALLOW_EDIT_GEDCOM) return false;
+	
+		if ($this->username == "empty" || $this->username == "") return false;
+		
+		// Note: options 0 and 1 are not configurable in the settings.
+		if ($EDIT_GEDCOM_RECORD == -1) return false;
+		if ($EDIT_GEDCOM_RECORD == 0) return true;
+		if ($EDIT_GEDCOM_RECORD == 1 && $this->UserPrivAccess($GEDCOM)) return true;
+		if ($EDIT_GEDCOM_RECORD == 2 && $this->UserCanEdit($GEDCOM)) return true;
+		if ($EDIT_GEDCOM_RECORD == 3 && $this->UserCanAccept($GEDCOM)) return true;
+		if ($EDIT_GEDCOM_RECORD == 4 && $this->UserGedcomAdmin($GEDCOM)) return true;
+		if ($EDIT_GEDCOM_RECORD == 5 && $this->UserIsAdmin()) return true;
+		return false;
+	}
+	
+	public function UserCanEditOwn($pid) {
+		global $GEDCOM, $USE_QUICK_UPDATE;
+	
+		if ($this->UserCanEdit()) return true;
+		if (!$USE_QUICK_UPDATE) return false;
+		if (empty($pid)) return false;
+
+		if (!empty($this->gedcomid[$GEDCOM])) {
+			if ($pid == $this->gedcomid[$GEDCOM]) return true;
+			else {
+				$famids = Array_Merge(FindSfamilyIds($this->gedcomid[$GEDCOM]), FindFamilyIds($this->gedcomid[$GEDCOM]));
+				foreach($famids as $indexval => $fam) {
+					$famid = $fam["famid"];
+					if (GetChangeData(true, $famid, true)) {
+						$rec = GetChangeData(false, $famid, true, "gedlines");
+						$famrec = $rec[$GEDCOM][$famid];
+					}
+					else $famrec = FindFamilyRecord($famid);
+					if (preg_match("/1 HUSB @$pid@/", $famrec)>0) return true;
+					if (preg_match("/1 WIFE @$pid@/", $famrec)>0) return true;
+					if (preg_match("/1 CHIL @$pid@/", $famrec)>0) return true;
+				}
+			}
+		}
+		return false;
+	}	 
+	
 }
 ?>

@@ -530,7 +530,7 @@ function getTop10Surnames() {
 function getRecentChanges() {
 	global $gm_lang, $month, $year, $day, $monthtonum, $HIDE_LIVE_PEOPLE, $SHOW_ID_NUMBERS, $command, $TEXT_DIRECTION, $SHOW_FAM_ID_NUMBERS;
 	global $GM_IMAGE_DIR, $GM_IMAGES, $GEDCOM, $REGEXP_DB, $DEBUG, $ASC, $IGNORE_FACTS, $IGNORE_YEAR, $TOTAL_QUERIES, $LAST_QUERY, $GM_BLOCKS, $SHOW_SOURCES,$SERVER_URL;
-	global $medialist, $gm_username, $Users;
+	global $medialist;
 
 	if ($command=="user") $filter = "living";
 	else $filter = "all";

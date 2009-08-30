@@ -37,13 +37,13 @@ require("config.php");
 	}
 	$uname = $gm_username;
 	if ($uname) {
-		$olduser = $Users->getUser($uname);
+		$olduser =& User::GetInstance($uname);
 		if ($olduser->editaccount) {
 			$newuser = array();
 			$newuser = CloneObj($olduser);
-			$Users->DeleteUser($uname, "changed");
+			UserController::DeleteUser($uname, "changed");
 			$newuser->theme = $theme_dir;
-			$Users->AddUser($newuser, "changed");
+			UserController::AddUser($newuser, "changed");
 			$user = CloneObj($newuser);
 		}
 	}

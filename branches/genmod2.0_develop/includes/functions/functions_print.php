@@ -406,10 +406,10 @@ function print_pedigree_person($pid, $style=1, $show_famlink=true, $count=0, $pe
 	global $gm_lang, $SHOW_HIGHLIGHT_IMAGES, $bwidth, $bheight, $show_full, $PEDIGREE_FULL_DETAILS, $SHOW_ID_NUMBERS, $SHOW_PEDIGREE_PLACES, $view;
 	global $CONTACT_EMAIL, $CONTACT_METHOD, $TEXT_DIRECTION, $DEFAULT_PEDIGREE_GENERATIONS, $OLD_PGENS, $talloffset, $PEDIGREE_LAYOUT, $MEDIA_DIRECTORY;
 	global $GM_IMAGE_DIR, $GM_IMAGES, $ABBREVIATE_CHART_LABELS;
-	global $chart_style, $box_width, $generations, $gm_username, $show_changes, $Users;
+	global $chart_style, $box_width, $generations, $gm_username, $show_changes, $gm_user;
 	global $CHART_BOX_TAGS, $SHOW_LDS_AT_GLANCE;
 
-	if ($show_changes && $Users->UserCanEdit($Users->GetUserName())) $canshow = true;
+	if ($show_changes && $gm_user->UserCanEdit()) $canshow = true;
 	else $canshow = false;
 
 	if (!isset($OLD_PGENS)) $OLD_PGENS = $DEFAULT_PEDIGREE_GENERATIONS;
@@ -469,7 +469,7 @@ function print_pedigree_person($pid, $style=1, $show_famlink=true, $count=0, $pe
 				print "<br /><a href=\"descendancy.php?pid=$pid&amp;show_full=$show_full&amp;generations=$generations&amp;box_width=$box_width&amp;ged=$GEDCOM\"><b>".$gm_lang["descend_chart"]."</b></a><br />\n";
 				$username = $gm_username;
 				if (!empty($username)) {
-					$tuser = $Users->GetUser($username);
+					$tuser =& User::GetInstance($username);
 					if (!empty($tuser->gedcomid[$GEDCOM])) {
 						print "<a href=\"relationship.php?pid1=".$tuser->gedcomid[$GEDCOM]."&amp;pid2=".$pid."&amp;ged=$GEDCOM\"><b>".$gm_lang["relationship_to_me"]."</b></a><br />\n";
 					}
@@ -544,7 +544,7 @@ function print_pedigree_person($pid, $style=1, $show_famlink=true, $count=0, $pe
 	
 	// NOTE: Show the persons primary picture if possible, but only in large boxes ($show_full)
 	if ($SHOW_HIGHLIGHT_IMAGES && $disp && showFact("OBJE", $pid, "INDI") && $show_full) {
-		$object = FindHighlightedObject($pid, $indirec);
+		$object = FindHighlightedObject($pid);
 		// NOTE: Print the pedigree tumbnail
 		if (!empty($object["thumb"])) {
 			$media =& MediaItem::GetInstance($object["id"]);
@@ -602,7 +602,7 @@ function print_pedigree_person($pid, $style=1, $show_famlink=true, $count=0, $pe
 				print "</a>";
 			}
 			else {
-				$user = $Users->GetUser($CONTACT_EMAIL);
+				$user =& User::GetInstance($CONTACT_EMAIL);
 				print "<a href=\"javascript: ".$gm_lang["private"]."\" onclick=\"if (confirm('".preg_replace("'<br />'", " ", $gm_lang["privacy_error"])."\\n\\n".str_replace("#user[fullname]#", $user->firstname." ".$user->lastname, $gm_lang["clicking_ok"])."')) ";
 				if ($CONTACT_METHOD!="none") {
 					if ($CONTACT_METHOD=="mailto") print "window.location = 'mailto:".$user->email."'; ";
@@ -799,7 +799,7 @@ function print_pedigree_person($pid, $style=1, $show_famlink=true, $count=0, $pe
  * @param boolean $use_alternate_styles
  */
 function print_header($title, $head="",$use_alternate_styles=true) {
-	global $gm_lang, $bwidth, $gm_username, $Users, $Favorites;
+	global $gm_lang, $bwidth, $gm_username, $Favorites;
 	global $HOME_SITE_URL, $HOME_SITE_TEXT, $SERVER_URL;
 	global $BROWSERTYPE, $indilist, $INDILIST_RETRIEVED;
 	global $view, $cart, $menubar, $USE_GREYBOX;
@@ -917,7 +917,7 @@ function print_header($title, $head="",$use_alternate_styles=true) {
 		 $old_META_COPYRIGHT = $META_COPYRIGHT;
 		 $old_META_DESCRIPTION = $META_DESCRIPTION;
 		 $old_META_PAGE_TOPIC = $META_PAGE_TOPIC;
-		  $cuser = $Users->GetUser($CONTACT_EMAIL);
+		  $cuser =& User::GetInstance($CONTACT_EMAIL);
 		  if (!empty($cuser->username)) {
 			  if (empty($META_AUTHOR)) $META_AUTHOR = $cuser->firstname." ".$cuser->lastname;
 			  if (empty($META_PUBLISHER)) $META_PUBLISHER = $cuser->firstname." ".$cuser->lastname;
@@ -1070,7 +1070,7 @@ var whichhelp = 'help_<?php print basename($SCRIPT_NAME)."&amp;action=".$action;
  * @param boolean $use_alternate_styles
  */
 function print_simple_header($title) {
-	 global $gm_lang, $Users;
+	 global $gm_lang;
 	 global $HOME_SITE_URL, $USE_GREYBOX, $SERVER_URL;
 	 global $HOME_SITE_TEXT;
 	 global $view, $rtl_stylesheet;
@@ -1094,7 +1094,7 @@ function print_simple_header($title) {
 	$old_META_COPYRIGHT = $META_COPYRIGHT;
 	$old_META_DESCRIPTION = $META_DESCRIPTION;
 	$old_META_PAGE_TOPIC = $META_PAGE_TOPIC;
-	$cuser = $Users->GetUser($CONTACT_EMAIL);
+	$cuser =& User::GetInstance($CONTACT_EMAIL);
 	if (!empty($cuser->username)) {
 		if (empty($META_AUTHOR)) $META_AUTHOR = $cuser->firstname." ".$cuser->lastname;
 		if (empty($META_PUBLISHER)) $META_PUBLISHER = $cuser->firstname." ".$cuser->lastname;
@@ -1304,7 +1304,7 @@ function print_execution_stats() {
  * contact user and the technical support contact user
  */
 function print_contact_links($style=0) {
-	global $WEBMASTER_EMAIL, $SUPPORT_METHOD, $CONTACT_EMAIL, $CONTACT_METHOD, $gm_lang, $Users;
+	global $WEBMASTER_EMAIL, $SUPPORT_METHOD, $CONTACT_EMAIL, $CONTACT_METHOD, $gm_lang, $gm_user;
 	if ($SUPPORT_METHOD=="none" && $CONTACT_METHOD=="none") return array();
 	if ($SUPPORT_METHOD=="none") $WEBMASTER_EMAIL = $CONTACT_EMAIL;
 	if ($CONTACT_METHOD=="none") $CONTACT_EMAIL = $WEBMASTER_EMAIL;
@@ -1312,35 +1312,35 @@ function print_contact_links($style=0) {
 		case 0:
 			print "<div class=\"contact_links\">\n";
 			//--only display one message if the contact users are the same
-			if ($CONTACT_EMAIL==$WEBMASTER_EMAIL) {
-				$user = $Users->GetUser($WEBMASTER_EMAIL);
-				if (($user)&&($SUPPORT_METHOD!="mailto")) {
+			if ($CONTACT_EMAIL == $WEBMASTER_EMAIL) {
+				$user =& User::GetInstance($WEBMASTER_EMAIL);
+				if (!$user->is_empty && $SUPPORT_METHOD!="mailto") {
 					print $gm_lang["for_all_contact"]." <a href=\"#\" accesskey=\"". $gm_lang["accesskey_contact"] ."\" onclick=\"message('$WEBMASTER_EMAIL', '$SUPPORT_METHOD'); return false;\">".$user->firstname." ".$user->lastname."</a><br />\n";
 				}
 				else {
 					print $gm_lang["for_support"]." <a href=\"mailto:";
-					if (!empty($user->username)) print $user->email."\" accesskey=\"". $gm_lang["accesskey_contact"] ."\">".$user->firstname." ".$user->lastname."</a><br />\n";
+					if (!empty($gm_user->username)) print $user->email."\" accesskey=\"". $gm_lang["accesskey_contact"] ."\">".$gm_user->firstname." ".$gm_user->lastname."</a><br />\n";
 					else print $WEBMASTER_EMAIL."\">".$WEBMASTER_EMAIL."</a><br />\n";
 				}
 			}
 			//-- display two messages if the contact users are different
 			else {
-				  $user = $Users->GetUser($CONTACT_EMAIL);
-				  if (($user)&&($CONTACT_METHOD!="mailto")) {
-					  print $gm_lang["for_contact"]." <a href=\"#\" accesskey=\"". $gm_lang["accesskey_contact"] ."\" onclick=\"message('$CONTACT_EMAIL', '$CONTACT_METHOD'); return false;\">".$user->firstname." ".$user->lastname."</a><br /><br />\n";
+				  $user =& User::GetInstance($CONTACT_EMAIL);
+				  if (!$user->is_empty && $CONTACT_METHOD!="mailto") {
+					  print $gm_lang["for_contact"]." <a href=\"#\" accesskey=\"". $gm_lang["accesskey_contact"] ."\" onclick=\"message('$CONTACT_EMAIL', '$CONTACT_METHOD'); return false;\">".$gm_user->firstname." ".$gm_user->lastname."</a><br /><br />\n";
 				  }
 				  else {
 					   print $gm_lang["for_contact"]." <a href=\"mailto:";
-					   if (!empty($user->username)) print $user->email."\" accesskey=\"". $gm_lang["accesskey_contact"] ."\">".$user->firstname." ".$user->lastname."</a><br />\n";
+					   if (!empty($gm_user->username)) print $user->email."\" accesskey=\"". $gm_lang["accesskey_contact"] ."\">".$gm_user->firstname." ".$gm_user->lastname."</a><br />\n";
 					   else print $CONTACT_EMAIL."\">".$CONTACT_EMAIL."</a><br />\n";
 				  }
-				  $user = $Users->GetUser($WEBMASTER_EMAIL);
+				  $user =& User::GetInstance($WEBMASTER_EMAIL);
 				  if (($user)&&($SUPPORT_METHOD!="mailto")) {
-					  print $gm_lang["for_support"]." <a href=\"#\" onclick=\"message('$WEBMASTER_EMAIL', '$SUPPORT_METHOD'); return false;\">".$user->firstname." ".$user->lastname."</a><br />\n";
+					  print $gm_lang["for_support"]." <a href=\"#\" onclick=\"message('$WEBMASTER_EMAIL', '$SUPPORT_METHOD'); return false;\">".$gm_user->firstname." ".$gm_user->lastname."</a><br />\n";
 				  }
 				  else {
 					   print $gm_lang["for_support"]." <a href=\"mailto:";
-					   if (!empty($user->username)) print $user->email."\">".$user->firstname." ".$user->lastname."</a><br />\n";
+					   if (!empty($gm_user->username)) print $gm_user->email."\">".$gm_user->firstname." ".$gm_user->lastname."</a><br />\n";
 					   else print $WEBMASTER_EMAIL."\">".$WEBMASTER_EMAIL."</a><br />\n";
 				  }
 			}
@@ -1348,19 +1348,19 @@ function print_contact_links($style=0) {
 			break;
 		case 1:
 			$menuitems = array();
-			if ($CONTACT_EMAIL==$WEBMASTER_EMAIL) {
+			if ($CONTACT_EMAIL == $WEBMASTER_EMAIL) {
+				$user =& User::GetInstance($WEBMASTER_EMAIL);
 				$submenu = array();
-				$user = $Users->GetUser($WEBMASTER_EMAIL);
-				if (($user)&&($SUPPORT_METHOD!="mailto")) {
-					$submenu["label"] = $gm_lang["support_contact"]." ".$user->firstname." ".$user->lastname;
+				if (!$user->is_empty && $SUPPORT_METHOD!="mailto") {
+					$submenu["label"] = $gm_lang["support_contact"]." ".$gm_user->firstname." ".$gm_user->lastname;
 					$submenu["link"] = "message('$WEBMASTER_EMAIL', '$SUPPORT_METHOD');";
 				}
 				else {
 					$submenu["label"] = $gm_lang["support_contact"]." ";
 					$submenu["link"] = "mailto:";
-					if (!empty($user->username)) {
-						$submenu["link"] .= $user->email;
-						$submenu["label"] .= $user->firstname." ".$user->lastname;
+					if (!empty($gm_user->username)) {
+						$submenu["link"] .= $gm_user->email;
+						$submenu["label"] .= $gm_user->firstname." ".$gm_user->lastname;
 					}
 					else {
 						$submenu["link"] .= $WEBMASTER_EMAIL;
@@ -1374,18 +1374,18 @@ function print_contact_links($style=0) {
 	            $menuitems[] = $submenu;
 			}
 			else {
+				$user =& User::GetInstance($CONTACT_EMAIL);
 				$submenu = array();
-				$user = $Users->GetUser($CONTACT_EMAIL);
-				if (($user)&&($CONTACT_METHOD!="mailto")) {
-					$submenu["label"] = $gm_lang["genealogy_contact"]." ".$user->firstname." ".$user->lastname;
+				if (!$user->is_empty && $CONTACT_METHOD!="mailto") {
+					$submenu["label"] = $gm_lang["genealogy_contact"]." ".$gm_user->firstname." ".$gm_user->lastname;
 					$submenu["link"] = "message('$CONTACT_EMAIL', '$CONTACT_METHOD');";
 				}
 				else {
 					$submenu["label"] = $gm_lang["genealogy_contact"]." ";
 					$submenu["link"] = "mailto:";
-					if (!empty($user->username)) {
-						$submenu["link"] .= $user->email;
-						$submenu["label"] .= $user->firstname." ".$user->lastname;
+					if (!empty($gm_user->username)) {
+						$submenu["link"] .= $gm_user->email;
+						$submenu["label"] .= $gm_user->firstname." ".$gm_user->lastname;
 					}
 					else {
 						$submenu["link"] .= $CONTACT_EMAIL;
@@ -1397,17 +1397,16 @@ function print_contact_links($style=0) {
 	            $submenu["hoverclass"] = "submenuitem_hover";
 	            $menuitems[] = $submenu;
 	            $submenu = array();
-				$user = $Users->GetUser($WEBMASTER_EMAIL);
 				if (($user)&&($SUPPORT_METHOD!="mailto")) {
-					$submenu["label"] = $gm_lang["support_contact"]." ".$user->firstname." ".$user->lastname;
+					$submenu["label"] = $gm_lang["support_contact"]." ".$gm_user->firstname." ".$gm_user->lastname;
 					$submenu["link"] = "message('$WEBMASTER_EMAIL', '$SUPPORT_METHOD');";
 				}
 				else {
 					$submenu["label"] = $gm_lang["support_contact"]." ";
 					$submenu["link"] = "mailto:";
-					if (!empty($user->username)) {
-						$submenu["link"] .= $user->email;
-						$submenu["label"] .= $user->firstname." ".$user->lastname;
+					if (!empty($gm_user->username)) {
+						$submenu["link"] .= $gm_user->email;
+						$submenu["label"] .= $gm_user->firstname." ".$gm_user->lastname;
 					}
 					else {
 						$submenu["link"] .= $WEBMASTER_EMAIL;
@@ -1475,13 +1474,14 @@ function print_simple_fact($indirec, $fact, $pid) {
  * @param boolean $output	return the text instead of printing it
  */
 function print_help_link($help, $helpText, $show_desc="", $use_print_text=false, $return=false) {
-	global $SHOW_CONTEXT_HELP, $gm_lang,$view, $GM_USE_HELPIMG, $GM_IMAGES, $GM_IMAGE_DIR, $gm_username, $Users;
+	global $SHOW_CONTEXT_HELP, $gm_lang,$view, $GM_USE_HELPIMG, $GM_IMAGES, $GM_IMAGE_DIR, $gm_username, $gm_user;
+	
 	if ($GM_USE_HELPIMG) $sentense = "<img src=\"".$GM_IMAGE_DIR."/".$GM_IMAGES["help"]["small"]."\" class=\"icon\" width=\"15\" height=\"15\" alt=\"\" />";
 	else $sentense = $gm_lang[$helpText];
 	$output = "";
 	if (($view!="preview")&&($_SESSION["show_context_help"])){
 		if ($helpText=="qm_ah"){
-			if ($Users->userIsAdmin($gm_username)){
+			if ($gm_user->userIsAdmin()){
 				 $output .= " <a class=\"error help\" tabindex=\"0\" href=\"javascript:";
 				 if ($show_desc == "") $output .= $help;
 				 else if ($use_print_text) $output .= print_text($show_desc, 0, 1);
@@ -2781,7 +2781,7 @@ function PrintFilterEvent($filterev) {
 }
 
 function PrintBlockFavorites(&$userfavs, $side, $index, $style) {
-	global $GEDCOM, $command, $Users, $gm_username, $gm_lang;
+	global $GEDCOM, $command, $gm_user, $gm_username, $gm_lang;
 	
 	$mygedcom = $GEDCOM;
 	$current_gedcom = $GEDCOM;
@@ -2816,7 +2816,7 @@ function PrintBlockFavorites(&$userfavs, $side, $index, $style) {
 		}
 		if (!empty($favorite->note)) print "<span class=\"favorite_padding\">".PrintReady($gm_lang["note"].": ".$favorite->note)."</span>";
 		print "</div>\n";
-		if ($command=="user" || $Users->userIsAdmin($gm_username)) {
+		if ($command=="user" || $gm_user->userIsAdmin()) {
 			if (!empty($favorite->note)) print "&nbsp;&nbsp;";
 			print "<a class=\"font9\" href=\"index.php?command=$command&amp;action=deletefav&amp;fv_id=".$key."\" onclick=\"return confirm('".$gm_lang["confirm_fav_remove"]."');\">".$gm_lang["remove"]."</a>\n";
 			print "&nbsp;";

@@ -29,7 +29,7 @@
 */
 require "config.php";
 
-if (($Users->AdminUserExists() && !$Users->userIsAdmin($gm_username)) && $CONFIGURED) {
+if ((UserController::AdminUserExists() && !$gm_user->userIsAdmin()) && $CONFIGURED) {
 	header("Location: admin.php");
 	exit;
 }

@@ -88,7 +88,7 @@ class MediaController extends DetailController {
 	 * @return Menu
 	 */
 	public function &getEditMenu() {
-		global $TEXT_DIRECTION, $gm_lang, $Users;
+		global $TEXT_DIRECTION, $gm_lang, $gm_user;
 		
 		if ($TEXT_DIRECTION=="rtl") $ff="_rtl";
 		else $ff="";
@@ -98,7 +98,7 @@ class MediaController extends DetailController {
 
 		if (!$this->media->isdeleted) {
 			// edit media / edit_raw
-			if ($Users->userCanEditGedlines()) {
+			if ($gm_user->userCanEditGedlines()) {
 				$submenu = new Menu($gm_lang['edit_raw']);
 				$submenu->addLink("edit_raw('".$this->media->xref."', 'edit_raw');");
 				$menu->addSubmenu($submenu);
@@ -131,14 +131,14 @@ class MediaController extends DetailController {
 	 */
 	public function &getOtherMenu() {
 		global $TEXT_DIRECTION, $gm_lang;
-		global $ENABLE_CLIPPINGS_CART, $Users;
+		global $ENABLE_CLIPPINGS_CART, $gm_user;
 		
 		if ($TEXT_DIRECTION=="rtl") $ff="_rtl";
 		else $ff="";
 		
 		// other menu
 		$menu = new Menu($gm_lang['other']);
-		if ($Users->userCanViewGedlines()) {
+		if ($gm_user->userCanViewGedlines()) {
 				// other / view_gedcom
 				if ($this->show_changes) $execute = "show_gedcom_record('new');";
 				else $execute = "show_gedcom_record();";
@@ -146,7 +146,7 @@ class MediaController extends DetailController {
 				$submenu->addLink($execute);
 				$menu->addSubmenu($submenu);
 		}
-		if ($ENABLE_CLIPPINGS_CART >= $Users->getUserAccessLevel()) {
+		if ($ENABLE_CLIPPINGS_CART >= $gm_user->getUserAccessLevel()) {
 				// other / add_to_cart
 				$submenu = new Menu($gm_lang['add_to_cart']);
 				$submenu->addLink('clippings.php?action=add&id='.$this->media->xref.'&type=sour');

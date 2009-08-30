@@ -230,7 +230,7 @@ class Fact {
 	}
 	
 	private function ShowDetails() {
-		global $global_facts, $person_facts, $gm_username, $Users;
+		global $global_facts, $person_facts, $gm_username, $gm_user;
 		
 		if ($this->disp == null) {
 			$facts = array();
@@ -253,13 +253,13 @@ class Fact {
 				if (isset($global_facts[$fact])) {
 					//-- first check the global facts array
 					if (isset($global_facts[$fact]["details"])) {
-						if ($global_facts[$fact]["details"] < $Users->getUserAccessLevel($gm_username)) $this->disp = false;
+						if ($global_facts[$fact]["details"] < $gm_user->getUserAccessLevel()) $this->disp = false;
 					}
 				}
 				
 				//-- check the person facts array
 				if (isset($person_facts[$this->owner][$fact]["details"])) {
-					if ($person_facts[$this->owner][$fact]["details"] < $Users->getUserAccessLevel($gm_username)) $this->disp = false;
+					if ($person_facts[$this->owner][$fact]["details"] < $gm_user->getUserAccessLevel()) $this->disp = false;
 				}
 			}
 		}

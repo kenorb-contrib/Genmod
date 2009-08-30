@@ -38,7 +38,7 @@ $Privacy->ReadPrivacy($GEDCOMID, false);
 if (empty($ged)) $ged = $GEDCOM;
 $GEDCOMID = $GEDCOMS[$GEDCOM]["id"];
 
-if ((!$Users->userGedcomAdmin($gm_username, $ged))||(empty($ged))) {
+if ((!$gm_user->userGedcomAdmin($ged))||(empty($ged))) {
 	header("Location: editgedcoms.php");
 	exit;
 }
@@ -196,9 +196,9 @@ print_header($gm_lang["privacy_header"]);
 	<tr>
 		<td colspan="2" class="admin_topbottombar"><?php
 			print "<h3>".$gm_lang["edit_privacy_title"]." - ".$GEDCOMS[$ged]["title"]. "</h3>";
-			if ($Users->CheckPrivacyOverrides($GEDCOMS[$ged]["id"])) {
+			if (UserController::CheckPrivacyOverrides($GEDCOMS[$ged]["id"])) {
 				print "<span class=\"error\">".$gm_lang["user_overr_exists"];
-				if ($Users->UserIsAdmin($gm_username)) print "<a href=\"useradmin.php?action=listusers&amp;filter=privoverride&amp;ged=$ged\"> ".$gm_lang["user_overr_show"]."</a>";
+				if ($gm_user->UserIsAdmin()) print "<a href=\"useradmin.php?action=listusers&amp;filter=privoverride&amp;ged=$ged\"> ".$gm_lang["user_overr_show"]."</a>";
 				print "</span><br />";
 			}
 			print "<br /><a href=\"editgedcoms.php\"><b>";
@@ -612,7 +612,7 @@ if ($action=="update") {
               <td class="shade1">
                 <select size="1" name="v_new_user_privacy_username">
                 <?php
-                $users = $Users->GetUsers("lastname", "asc", "firstname");
+                $users = UserController::GetUsers("lastname", "asc", "firstname");
                 foreach($users as $username => $user)
                 {
                   print "<option";

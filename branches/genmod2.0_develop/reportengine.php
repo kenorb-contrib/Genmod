@@ -90,7 +90,7 @@ $reports = GetReportList();
 if (!empty($report)) {
 	$r = basename($report);
 	if (!isset($reports[$r]["access"])) $action = "choose";
-	else if ($reports[$r]["access"] < $Users->getUserAccessLevel($gm_username)) $action = "choose";
+	else if ($reports[$r]["access"] < $gm_user->getUserAccessLevel()) $action = "choose";
 }
 
 //-- choose a report to run
@@ -182,7 +182,7 @@ function paste_id(value) {
 		$firstrun = 0;
 		if (!isset($report_array["inputs"])) $report_array["inputs"] = array();
 		foreach($report_array["inputs"] as $indexval => $input) {
-			if ((($input["name"] == "sources") && ($SHOW_SOURCES >= $Users->getUserAccessLevel($gm_username))) || ($input["name"] != "sources")) {
+			if ((($input["name"] == "sources") && ($SHOW_SOURCES >= $gm_user->getUserAccessLevel())) || ($input["name"] != "sources")) {
 				if (!($input["name"] == "photos" && $MEDIA_IN_DB)) {
 					print "<tr><td class=\"shade2 wrap\">\n";
 					print "<input type=\"hidden\" name=\"varnames[]\" value=\"".$input["name"]."\" />\n";

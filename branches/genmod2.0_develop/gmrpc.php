@@ -48,7 +48,7 @@ switch($action) {
 	break;
 	
 	case "set_show_changes":
-		if (!$Users->userCanEdit($gm_username)) {
+		if (!$gm_user->userCanEdit()) {
 			print "";
 			exit;
 		}
@@ -56,7 +56,7 @@ switch($action) {
 	break;
 
 	case "getnextids":
-		if (!$Users->userCanEdit($gm_username)) {
+		if (!$gm_user->userCanEdit()) {
 			print "";
 			exit;
 		}
@@ -68,7 +68,7 @@ switch($action) {
 	break;
 	
 	case "checkuser":
-		$u = $Users->GetUser($username);
+		$u =& User::GetInstance($username);
 		if (!$u->is_empty) print "<span class=\"error\">".$gm_lang["duplicate_username"]."</span>";
 		else print "";
 	break;

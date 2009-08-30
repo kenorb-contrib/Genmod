@@ -97,7 +97,7 @@ abstract class GedcomRecord {
 	 * constructor for this class
 	 */
 	protected function __construct($id, $gedrec="", $gedcomid="") {
-		global $show_changes, $GEDCOMID, $Users, $gm_username, $ALLOW_EDIT_GEDCOM;
+		global $show_changes, $GEDCOMID, $gm_username, $gm_user, $ALLOW_EDIT_GEDCOM;
 		
 		// The class might be called with an ID or with a gedcom record.
 		// The gedcom record might be empty, in which case it's a new or non existent record.
@@ -147,7 +147,7 @@ abstract class GedcomRecord {
 		
 		if (!$this->disp && $this->datatype == "INDI") $this->disp_name = ShowLivingNameByID($this->xref, "INDI", $this->gedrec);
 		
-		if ($this->disp && $ALLOW_EDIT_GEDCOM && $Users->userCanEdit($gm_username) && !FactEditRestricted($this->xref, $this->gedrec, 1)) $this->canedit = true;
+		if ($this->disp && $ALLOW_EDIT_GEDCOM && $gm_user->userCanEdit() && !FactEditRestricted($this->xref, $this->gedrec, 1)) $this->canedit = true;
 		else $this->canedit = false;
 		SwitchGedcom();
 	}
@@ -318,8 +318,7 @@ abstract class GedcomRecord {
 
 	public function __set($property, $value) {
 	}
-		
-	
+
 	protected function ThisDeleted() {
 		
 		if (is_null($this->isdeleted)) {

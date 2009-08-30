@@ -590,11 +590,11 @@ function MakeCont($newged, $newline) {
  * @return array returns a two element array with indexes HUSB and WIFE for the parent ids
  */
 function FindParents($famid) {
-	global $gm_lang, $gm_username, $GEDCOM, $show_changes, $Users;
+	global $gm_lang, $gm_username, $GEDCOM, $show_changes, $gm_user;
 
 	$famrec = FindFamilyRecord($famid);
 	if (empty($famrec)) {
-		if ($Users->userCanEdit($gm_username)) {
+		if ($gm_user->userCanEdit($gm_username)) {
 			$famrec = FindGedcomRecord($famid);
 			if (empty($famrec)) {
 				if ($show_changes && GetChangeData(true, $famid, true, "", "FAM")) {
@@ -642,11 +642,11 @@ function FindParentsInRecord($famrec) {
  * @return array
  */
 function FindChildren($famid, $me='') {
-	global $gm_lang, $gm_username, $Users;
+	global $gm_lang, $gm_username, $gm_user;
 
 	$famrec = FindFamilyRecord($famid);
 	if (empty($famrec)) {
-		if ($Users->userCanEdit($gm_username)) {
+		if ($gm_user->userCanEdit($gm_username)) {
 			$famrec = FindGedcomRecord($famid);
 			if (empty($famrec)) return false;
 		}
@@ -688,14 +688,14 @@ function FindChildrenInRecord($famrec, $me='') {
  * @return array array of family ids
  */
 function FindFamilyIds($pid, $indirec="", $newfams = false) {
-	global $TBLPREFIX, $GEDCOMID, $show_changes, $GEDCOM, $Users;
+	global $TBLPREFIX, $GEDCOMID, $show_changes, $GEDCOM, $gm_user;
 	
 	$resultarray = array();
 	if (empty($pid)) return $resultarray;
 	
 	// We must get the families from the gedcom record to preserve the order. 
 	$gedrec = FindGedcomRecord($pid);
-	if ($newfams && $Users->UserCanEdit($Users->GetUserName()) && $show_changes && GetChangeData(true, $pid, true, "", "")) {
+	if ($newfams && $gm_user->UserCanEdit() && $show_changes && GetChangeData(true, $pid, true, "", "")) {
 		$rec = GetChangeData(false, $pid, true, "gedlines", "");
 		$gedrec = $rec[$GEDCOM][$pid];
 	}
@@ -730,7 +730,7 @@ function FindFamilyIds($pid, $indirec="", $newfams = false) {
  * @return array array of family ids
  */
 function FindSfamilyIds($pid, $newfams = false) {
-	global $TBLPREFIX, $GEDCOMID, $GEDCOM, $show_changes, $Users;
+	global $TBLPREFIX, $GEDCOMID, $GEDCOM, $show_changes, $gm_user;
 	
 	$resultarray = array();
 	if (empty($pid)) return $resultarray;
@@ -744,7 +744,7 @@ function FindSfamilyIds($pid, $newfams = false) {
 //	}
 	// We must get the families from the gedcom record to preserve the order. 
 	$gedrec = FindGedcomRecord($pid);
-	if ($newfams && $Users->UserCanEdit($Users->GetUserName()) && $show_changes && GetChangeData(true, $pid, true, "", "")) {
+	if ($newfams && $gm_user->UserCanEdit() && $show_changes && GetChangeData(true, $pid, true, "", "")) {
 		$rec = GetChangeData(false, $pid, true, "gedlines", "");
 		$gedrec = $rec[$GEDCOM][$pid];
 	}
@@ -848,10 +848,9 @@ function CleanupTagsY($irec) {
  * - default to first (existing) files
  * - first _PRIM and _THUM with Y override defaults
  * @param string $pid the individual, source, or family id
- * @param string $indirec the gedcom record to look in
  * @return array an object array with indexes "thumb" and "file" for thumbnail and filename
  */
-function FindHighlightedObject($pid, $indirec) {
+function FindHighlightedObject($pid) {
 	global $MEDIA_DIRECTORY, $GM_IMAGE_DIR, $GM_IMAGES, $MEDIA_EXTERNAL;
 	global $TBLPREFIX, $GEDCOMID, $MediaFS;
 	
@@ -860,10 +859,12 @@ function FindHighlightedObject($pid, $indirec) {
 	$media_ids = array();
 		
 	// NOTE: Find the media items for that person
-	$sql = "select m_file, m_media, mm_gedrec, m_gedrec from ".$TBLPREFIX."media, ".$TBLPREFIX."media_mapping where mm_gid LIKE '".$pid."' AND m_gedfile = '".$GEDCOMID."' AND m_gedfile = mm_gedfile AND m_media = mm_media AND mm_gedrec NOT LIKE '%\_PRIM N%' AND mm_gedrec LIKE '1 OBJE%' ORDER BY mm_order";
+	$sql = "select m_file, m_media, mm_gedrec, m_gedrec, m_gedfile, m_ext, m_titl from ".$TBLPREFIX."media, ".$TBLPREFIX."media_mapping where mm_gid LIKE '".$pid."' AND m_gedfile = '".$GEDCOMID."' AND m_gedfile = mm_gedfile AND m_media = mm_media AND mm_gedrec NOT LIKE '%\_PRIM N%' AND mm_gedrec LIKE '1 OBJE%' ORDER BY mm_order";
 	$res = NewQuery($sql);
 	while ($row = $res->FetchAssoc()) {
-		if (DisplayDetailsByID($row["m_media"], "OBJE", 1, true)) $media_ids[] = $row;
+		$media =& Mediaitem::GetInstance($row);
+		if ($media->disp) $media_ids[] = $row;
+//		if (DisplayDetailsByID($row["m_media"], "OBJE", 1, true)) $media_ids[] = $row;
 	}
 	$ids = count($media_ids);
 	if ($ids==0) return false;
@@ -927,7 +928,7 @@ function FindHighlightedObject($pid, $indirec) {
  * @param int $path_to_find which path in the relationship to find, 0 is the shortest path, 1 is the next shortest path, etc
  */
 function GetRelationship($pid1, $pid2, $followspouse=true, $maxlength=0, $ignore_cache=false, $path_to_find=0) {
-	global $TIME_LIMIT, $start_time, $gm_lang, $NODE_CACHE, $NODE_CACHE_LENGTH, $USE_RELATIONSHIP_PRIVACY, $GEDCOM, $gm_username, $show_changes, $Users;
+	global $TIME_LIMIT, $start_time, $gm_lang, $NODE_CACHE, $NODE_CACHE_LENGTH, $USE_RELATIONSHIP_PRIVACY, $GEDCOM, $gm_username, $show_changes;
 
 	$pid1 = strtoupper($pid1);
 	$pid2 = strtoupper($pid2);
@@ -2455,13 +2456,13 @@ function GetNewsItems() {
 
 
 function PrintGedcom($ged, $convert, $remove, $zip, $privatize_export, $privatize_export_level, $gedname, $embedmm) {
-	GLOBAL $GEDCOM, $GEDCOMS, $gm_lang, $CHARACTER_SET, $GM_BASE_DIRECTORY, $gm_username, $TBLPREFIX, $Users;
+	GLOBAL $GEDCOM, $GEDCOMS, $gm_lang, $CHARACTER_SET, $GM_BASE_DIRECTORY, $gm_username, $TBLPREFIX, $gm_user;
 	if ($zip == "yes") {
 		$gedout = fopen($gedname, "w");
 	}
 
 	if ($privatize_export == "yes") {
-		$Users->CreateExportUser($privatize_export_level);
+		UserController::CreateExportUser($privatize_export_level);
 		if (isset($_SESSION)) {
 			$_SESSION["org_user"] = $_SESSION["gm_user"];
 			$_SESSION["gm_user"] = "export";
@@ -2470,7 +2471,8 @@ function PrintGedcom($ged, $convert, $remove, $zip, $privatize_export, $privatiz
 			$HTTP_SESSION_VARS["org_user"] = $HTTP_SESSION_VARS["gm_user"];
 			$HTTP_SESSION_VARS["gm_user"] = "export";
 		}
-		$gm_username = $Users->GetUserName();
+		$gm_username = UserController::GetUserName();
+		$gm_user =& User::GetInstance($gm_username); 
 	}
 
 	SwitchGedcom($ged);
@@ -2603,8 +2605,9 @@ function PrintGedcom($ged, $convert, $remove, $zip, $privatize_export, $privatiz
 		if (isset($HTTP_SESSION_VARS)) {
 			$HTTP_SESSION_VARS["gm_user"] = $HTTP_SESSION_VARS["org_user"];
 		}
-		$Users->DeleteUser("export");
-		$gm_username = $Users->GetUserName();
+		UserController::DeleteUser("export");
+		$gm_username = UserController::GetUserName();
+		$gm_user =& User::GetInstance($gm_username); 
 	}
 	SwitchGedcom();
 	if ($zip == "yes") {

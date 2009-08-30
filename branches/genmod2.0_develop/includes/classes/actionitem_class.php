@@ -51,7 +51,6 @@ class ActionItem {
 	private $indidesc = null;			// Name of the person
 
 	public function __construct($values="", $me="") {
-		global $Users;
 		
 		if (is_array($values)) {
 			$this->id = $values["a_id"];
@@ -200,9 +199,9 @@ class ActionItem {
 	}
 
 	private function canShow() {
-		global $Users;
+		global $gm_user;
 		
-		if (is_null($this->canshow)) $this->canshow = $Users->ShowActionLog();
+		if (is_null($this->canshow)) $this->canshow = $gm_user->ShowActionLog();
 		return $this->canshow;
 	}
  	
@@ -235,12 +234,12 @@ class ActionItem {
 	}
 			
 	public function PrintThis() {
-		global $gm_lang, $Users, $gm_username;
+		global $gm_lang, $gm_user, $gm_username;
 		
 		if ($this->canshow) {
 			print "<tr>";
 			print "\n\t\t\t<td id=\"actionfull_".$this->id."\" class=\"shade2 center width20\" style=\"vertical-align: middle\">";
-			if ($Users->userCanEdit($gm_username)) {
+			if ($gm_user->userCanEdit()) {
 				$menu = array();
 				$menu["label"] = $gm_lang["edit"];
 				$menu["labelpos"] = "right";

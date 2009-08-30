@@ -46,7 +46,7 @@ if (isset($action)) $actione = $action;
 if (($help == "help_useradmin.php")&& ($actione == "edituser")) $help = "edit_useradmin_help";
 if (($help == "help_login_register.php")&& ($actione == "pwlost")) $help = "help_login_lost_pw.php";
 if ($help == "help_contents_help") {
-	if ($Users->userIsAdmin($gm_username)) {
+	if ($gm_user->userIsAdmin()) {
 		$help = "admin_help_contents_help";
 		print_text("admin_help_contents_head_help");
 	}
@@ -56,7 +56,7 @@ if ($help == "help_contents_help") {
 else {
 	$text = print_text($help, 0, 1);
 	print $text;
-	if ($Users->UserIsAdmin($gm_username)) {
+	if ($gm_user->UserIsAdmin()) {
 		$stat = GetLangvarStatus($help, $LANGUAGE, $type="help");
 		// Already translated, edit it
 		if ($stat == 0) print "<br /><a href=\"#\" onclick=\"window.name='help'; window.open('editlang_edit.php?ls01=$help&amp;ls02=$help&amp;language2=$LANGUAGE&amp;file_type=help_text&amp;realtime=true', '', 'top=50,left=50,width=700,height=400,scrollbars=1,resizable=1');\">".$gm_lang["thishelp_edit_trans"]."</a><br />";

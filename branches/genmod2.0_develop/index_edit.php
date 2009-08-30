@@ -45,7 +45,7 @@ if (empty($gm_username) || empty($name)) {
 	print_simple_footer();
 	exit;
 }
-if (!$Users->userIsAdmin($gm_username)) $setdefault=false;
+if (!$gm_user->userIsAdmin()) $setdefault=false;
 
 if (!isset($action)) $action="";
 if (!isset($command)) $command="user";
@@ -509,7 +509,7 @@ else {
 			
 			// NOTE: Print the submit buttons
 			print "<div>";
-				if (($Users->userIsAdmin($gm_username))&&($command=='user')) {
+				if (($gm_user->userIsAdmin())&&($command=='user')) {
 					print $gm_lang["use_blocks_for_default"]."<input type=\"checkbox\" name=\"setdefault\" value=\"1\" /><br />\n";
 				}
 				

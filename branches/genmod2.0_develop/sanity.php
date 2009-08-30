@@ -35,7 +35,7 @@ include "includes/functions/functions_edit.php";
 
 //-- make sure that they have gedcom admin status before they can use this page
 //-- otherwise have them login again
-if (!$Users->userGedcomAdmin($gm_username)) {
+if (!$gm_user->userGedcomAdmin()) {
 	if (empty($LOGIN_URL)) header("Location: login.php?url=sanity.php");
 	else header("Location: ".$LOGIN_URL."?url=sanity.php");
 	exit;
@@ -334,7 +334,7 @@ if (!empty($check_oldgeds)) {
 	$gedcheck[] = array("gs_gedcom", "statscache", "gednames", "sc_oldged_stats");
 	$gedcheck[] = array("ug_gedfile", "users_gedcoms", "geds", "sc_oldged_ug");
 		
-	$users = $Users->GetUsers();
+	$users = UserController::GetUsers();
 	
 	foreach($gedcheck as $key => $check) {
 		if (isset($cleanged) && isset($clean) && $cleanged == $check[1]) {

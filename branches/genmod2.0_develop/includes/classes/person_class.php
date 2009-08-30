@@ -65,8 +65,7 @@ class Person extends GedcomRecord {
 	private $facts_parsed = false;			// True if all facts from this person him/herself are parsed
 	private $close_relatives = false;		// True if all labels have been set for display on the individual page; if false the close relatives tab hides
 	private $sosamax = 7;					// Maximum sosa number for parents facts
-	private $tracefacts = false;			// traces all relatives events that are added to the indifacts array 
-
+	private $tracefacts = false;			// traces all relatives events that are added to the indifacts array
 	
 	public static function GetInstance($xref, $gedrec="", $gedcomid="") {
 		global $GEDCOMID;
@@ -174,7 +173,13 @@ class Person extends GedcomRecord {
 		}
 	}
 
-	
+	public function ObjCount() {
+		$count = 0;
+		foreach(self::$personcache as $ged => $person) {
+			$count += count($person);
+		}
+		return $count;
+	}	
 	
 	protected function getActionList() {
 		global $Actions;
@@ -258,7 +263,7 @@ class Person extends GedcomRecord {
 	private function findHighlightedMedia() {
 		
 		if (is_null($this->highlightedimage)) {
-			$this->highlightedimage = FindHighlightedObject($this->xref, $this->gedrec);
+			$this->highlightedimage = FindHighlightedObject($this->xref);
 		}
 		return $this->highlightedimage;
 	}
@@ -849,7 +854,7 @@ if ($this->tracefacts) print "AddSpouseFacts - Adding for ".$fam->$spperson->xre
 	}
 	
 	public function getSpouseFamily() {
-		global $gm_lang, $GEDCOM, $gm_username, $Users;
+		global $gm_lang, $GEDCOM, $gm_username;
 
 		if (count($this->spousefamilies) > 0) {
 			$this->close_relatives = true;
@@ -1424,11 +1429,11 @@ if ($this->tracefacts) print "AddSpouseFacts - Adding for ".$fam->$spperson->xre
 	}
 	
 	protected function GetLinksFromActions($status="") {
-		global $TBLPREFIX, $Users;
+		global $TBLPREFIX, $gm_user;
 
 		if(!is_null($this->actionlist)) return $this->actionlist;
 		$this->actionlist = array();
-		if ($Users->ShowActionLog()) { 
+		if ($gm_user->ShowActionLog()) { 
 			$sql = "SELECT * FROM ".$TBLPREFIX."actions WHERE a_gedfile='".$this->gedcomid."' AND a_pid='".$this->xref."'";
 			if ($status != "") $sql .= " AND a_status='".$status."'";
 			else $sql .= " ORDER BY a_status ASC";

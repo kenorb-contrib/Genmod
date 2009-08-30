@@ -42,8 +42,8 @@ if ($action != "download") print_simple_header("Print logfile");
 //-- make sure that they have admin status before they can use this page
 // $uname = $gm_username;
 $auth = false;
-if (($cat == "S") && ($Users->userIsAdmin($gm_username))) $auth = true;
-if ((($cat == "G") || ($cat == "F"))  && ($Users->userGedcomAdmin($gm_username, $ged))) $auth = true;
+if (($cat == "S") && ($gm_user->userIsAdmin())) $auth = true;
+if ((($cat == "G") || ($cat == "F"))  && ($gm_user->userGedcomAdmin($ged))) $auth = true;
 
 if ($auth) {
 	if (!empty($action)) {
