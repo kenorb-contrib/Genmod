@@ -1493,7 +1493,7 @@ function GMRGedcomSHandler($attrs) {
 			array_push($gedrecStack, array($gedrec, $fact, $desc));
 			//print "[$newgedrec]";
 //			$gedrec = $gedObj->getGedcomRecord();
-			$gedrec = FindGedcomRecord($id);
+			$gedrec = $newgedrec;
 			$ct = preg_match("/(\d+) (_?[A-Z0-9]+) (.*)/", $gedrec, $match);
 			if ($debug) print_r($match);
 			if ($ct>0) {
@@ -1927,7 +1927,7 @@ function GMRvarSHandler($attrs) {
 			$var = preg_replace(array("/\[/","/\]/","/@fact/","/@desc/"), array("['","']",$tfact,$desc), $var);
 			eval("if (!empty(\$$var)) \$var = \$$var;");
 			$ct = preg_match("/factarray\['(.*)'\]/", $var, $match);
-			if ($ct>0) $var = $match[1];
+			if ($ct>0) $var = constant("GM_FACT_".$match[1]);
 		}
 		$currentElement->addText($var);
 	}
