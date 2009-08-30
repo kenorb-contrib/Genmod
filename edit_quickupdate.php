@@ -56,26 +56,23 @@ print_simple_header($gm_lang["quick_update_title"]);
 //print "</pre>";
 
 //-- only allow logged in users to access this page
-$uname = $Users->getUserName();
-if ((!$ALLOW_EDIT_GEDCOM)||(!$USE_QUICK_UPDATE)||(empty($uname))) {
+if ((!$ALLOW_EDIT_GEDCOM)||(!$USE_QUICK_UPDATE)||(empty($gm_username))) {
 	print $gm_lang["access_denied"];
 	print_simple_footer();
 	exit;
 }
 
-$user = $Users->getUser($uname);
-
 $can_auto_accept = true;
 if (!isset($action)) $action="";
 if (!isset($closewin)) $closewin=0;
 if (empty($pid)) {
-	if (!empty($user->gedcomid[$GEDCOM])) $pid = $user->gedcomid[$GEDCOM];
+	if (!empty($gm_user->gedcomid[$GEDCOM])) $pid = $gm_user->gedcomid[$GEDCOM];
 	else $pid = "";
 }
 $pid = CleanInput($pid);
 
 //-- only allow editors or users who are editing their own individual or their immediate relatives
-if (!$Users->userCanEditOwn($uname, $pid)) {
+if (!$gm_user->userCanEditOwn($pid)) {
 	print $gm_lang["access_denied"];
 	print_simple_footer();
 	exit;
@@ -107,7 +104,7 @@ if ((!$disp)||(!$ALLOW_EDIT_GEDCOM)) {
 
 	print $gm_lang["access_denied"];
 	//-- display messages as to why the editing access was denied
-	if (!$Users->userCanEdit($Users->getUserName())) print "<br />".$gm_lang["user_cannot_edit"];
+	if (!$gm_user->userCanEdit()) print "<br />".$gm_lang["user_cannot_edit"];
 	if (!$ALLOW_EDIT_GEDCOM) print "<br />".$gm_lang["gedcom_editing_disabled"];
 	if (!$disp) {
 		print "<br />".$gm_lang["privacy_prevented_editing"];
@@ -1219,7 +1216,7 @@ if ($action=="update") {
 	if (!empty($error)) {
 		print "<span class=\"error\">".$error."</span>";
 	}
-		if ($can_auto_accept && ($Users->UserCanAccept($gm_username) || $Users->userAutoAccept())) {
+		if ($can_auto_accept && ($gm_user->UserCanAccept() || $gm_user->userAutoAccept())) {
 		AcceptChange($change_id, $GEDCOMID);
 	}
 

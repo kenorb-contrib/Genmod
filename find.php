@@ -319,7 +319,7 @@ else if ($type == "place") {
 }
 
 // Show repo and hide the rest
-else if ($type == "repo" && $SHOW_SOURCES >= $Users->getUserAccessLevel($gm_username)) {
+else if ($type == "repo" && $SHOW_SOURCES >= $gm_user->getUserAccessLevel()) {
 	print "<div align=\"center\">";
 	print "<form name=\"filterrepo\" method=\"post\" onsubmit=\"return checknames(this);\" action=\"find.php\">";
 	print "<input type=\"hidden\" name=\"action\" value=\"filter\" />";
@@ -362,7 +362,7 @@ else if ($type == "note") {
 }
 
 // Show source and hide the rest
-else if ($type == "source" && $SHOW_SOURCES >= $Users->getUserAccessLevel($gm_username)) {
+else if ($type == "source" && $SHOW_SOURCES >= $gm_user->getUserAccessLevel()) {
 	print "<div align=\"center\">";
 	print "<form name=\"filtersource\" method=\"post\" onsubmit=\"return checknames(this);\" action=\"find.php\">";
 	print "<input type=\"hidden\" name=\"action\" value=\"filter\" />";

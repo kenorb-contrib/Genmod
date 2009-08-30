@@ -31,7 +31,7 @@
 require("config.php");
 
 // Only gedcom admins may do this
-if (!$Users->userGedcomAdmin($gm_username)) {
+if (!$gm_user->userGedcomAdmin()) {
 	if (empty($LOGIN_URL)) header("Location: login.php?".GetQueryString(true));
 	else header("Location: ".$LOGIN_URL."?url=media.php&amp;".GetQueryString(true));
 	exit;

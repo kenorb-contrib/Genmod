@@ -34,7 +34,7 @@ require "config.php";
 
 if (empty($action)) $action="";
 if (empty($source)) $source="";		// Set when loaded from uploadgedcom.php
-if (!$Users->userGedcomAdmin($gm_username)) {
+if (!$gm_user->userGedcomAdmin()) {
 	header("Location: editgedcoms.php");
 	exit;
 }
@@ -1383,7 +1383,7 @@ print "&nbsp;<a href=\"javascript: ".$gm_lang["contact_conf"]."\" onclick=\"expa
 		<td class="shade1"><select name="NEW_CONTACT_EMAIL" tabindex="<?php $i++; print $i?>">
 		<?php
 			if ($CONTACT_EMAIL=="you@yourdomain.com") $CONTACT_EMAIL = $gm_username;
-			$users = $Users->GetUsers("lastname", "asc", "firstname");
+			$users = UserController::GetUsers("lastname", "asc", "firstname");
 			foreach($users as $indexval => $user) {
 				if ($user->verified_by_admin=="yes") {
 					print "<option value=\"".$user->username."\"";
@@ -1413,10 +1413,10 @@ print "&nbsp;<a href=\"javascript: ".$gm_lang["contact_conf"]."\" onclick=\"expa
 		<td class="shade2 wrap"><div class="helpicon"><?php print_help_link("WEBMASTER_EMAIL_help", "qm", "WEBMASTER_EMAIL"); print "</div><div class=\"description\">"; print $gm_lang["WEBMASTER_EMAIL"];?></div></td>
 		<td class="shade1"><select name="NEW_WEBMASTER_EMAIL" tabindex="<?php $i++; print $i?>">
 		<?php
-			$users = $Users->GetUsers("lastname", "asc", "firstname");
+			$users = UserController::GetUsers("lastname", "asc", "firstname");
 			if ($WEBMASTER_EMAIL=="webmaster@yourdomain.com") $WEBMASTER_EMAIL = $gm_username;
 			foreach($users as $indexval => $user) {
-				if ($Users->userIsAdmin($user->username)) {
+				if ($user->userIsAdmin()) {
 					print "<option value=\"".$user->username."\"";
 					if ($WEBMASTER_EMAIL==$user->username) print " selected=\"selected\"";
 					print ">".$user->lastname.", ".$user->firstname." - ".$user->username."</option>\n";

@@ -28,32 +28,14 @@ if (stristr($_SERVER["SCRIPT_NAME"],basename(__FILE__))) {
 	require "../../intrusion.php";
 }
 
-class UserController {
+abstract class UserController {
 
-	var $classname = "UserController";
-	var $userobjects = array();
-	var $userobjsortfields = array("username", "");
-	var $userobjsortorder = "asc";
+	public $classname = "UserController";
 	
-	/**
-	* Get a user array
-	*
-	* Finds a user from the given username and returns a user array 
-	* @param string $username the username of the user to return
-	* @return array the user array to return
-	*/
-	function GetUser($username="", $userfields="") {
-		global $TBLPREFIX, $DBCONN;
-
-		if (!$DBCONN->connected) return false;
-		if (empty($username)) return new user("");
-		if (!isset($this->userobjects[$username])) {
-			$this->userobjects[$username] = new user($username, $userfields);
-		}
-		if (isset($this->userobjects[$username])) return $this->userobjects[$username];
-		else return false;
-	}
-
+	private static $userobjsortfields = array("username", "");
+	private static $userobjsortorder = "asc";
+	private static $adm_user_exists = null;
+	
 	/**
 	 * get a user from a gedcom id
 	 *
@@ -62,8 +44,8 @@ class UserController {
 	 * @param string $gedcom	the gedcom filename to match
 	 * @return string 	returns a username
 	 */
-	function getUserByGedcomId($id, $gedcom) {
-		global $TBLPREFIX, $users, $REGEXP_DB, $DBCONN, $GEDCOMS;
+	public function getUserByGedcomId($id, $gedcom) {
+		global $TBLPREFIX, $DBCONN, $GEDCOMS;
 
 		if (empty($id) || empty($gedcom)) return false;
 	
@@ -89,9 +71,9 @@ class UserController {
 	* @param string gedcom 	the gedcom filename to match
 	* @return boolean		true if any update took place
 	*/
-	function ClearUserGedcomIDs($gid, $gedcom) {
+	public function ClearUserGedcomIDs($gid, $gedcom) {
 		
-		$users = $this->GetUsers();
+		$users = self::GetUsers();
 		foreach ($users as $username => $user) {
 			$changed = false;
 			if (isset($user->gedcomid[$gedcom]) && $user->gedcomid[$gedcom] == $gid) {
@@ -103,9 +85,8 @@ class UserController {
 				$changed = true;
 			}
 			if ($changed) {
-				$this->DeleteUser($user->username, "changed");
-				$this->AddUser($user, "changed");
-				$this->userobjects[$username] = $user;
+				UserController::DeleteUser($user->username, "changed");
+				UserController::AddUser($user, "changed");
 			}
 		}
 	}
@@ -117,22 +98,21 @@ class UserController {
 	* Checks to see if an admin user has been created 
 	* @return boolean true if an admin user has been defined
 	*/ 
-	function AdminUserExists() {
-		global $TBLPREFIX, $DBCONN;
+	public static function AdminUserExists() {
+		global $TBLPREFIX;
 		
-		if (isset($this->adm_user_exists)) return $this->adm_user_exists;
-		
-		$sql = "SELECT COUNT(u_username) as admins FROM ".$TBLPREFIX."users WHERE u_canadmin = 'Y'";
-		$res = NewQuery($sql);
-		if ($res) {
-			$row = $res->FetchRow();
-			if ($row[0] > 0) {
-				$this->adm_user_exists = true;
-				return true;
+		if (is_null(self::$adm_user_exists)) {
+			$sql = "SELECT COUNT(u_username) as admins FROM ".$TBLPREFIX."users WHERE u_canadmin = 'Y'";
+			$res = NewQuery($sql);
+			if ($res) {
+				$row = $res->FetchRow();
+				if ($row[0] > 0) {
+					self::$adm_user_exists = true;
+				}
 			}
+			else self::$adm_user_exists = false;
 		}
-		$this->adm_user_exists = false;
-		return false;
+		return self::$adm_user_exists;
 	}			
 	
 	/**
@@ -143,7 +123,7 @@ class UserController {
 	* 2. then checks the remember cookie
 	* @return string 	the username of the user or an empty string if the user is not logged in
 	*/
-	function GetUserName() {
+	public function GetUserName() {
 		global $ALLOW_REMEMBER_ME, $DBCONN, $logout, $SERVER_URL;
 		//-- this section checks if the session exists and uses it to get the username
 		if (isset($_SESSION)) {
@@ -157,7 +137,7 @@ class UserController {
 			if ((isset($_SERVER['HTTP_REFERER'])) && (stristr($_SERVER['HTTP_REFERER'],$tSERVER_URL)!==false)) $referrer_found=true;
 			if (!empty($_COOKIE["gm_rem"])&& (empty($referrer_found)) && empty($logout)) {
 				if (!is_object($DBCONN)) return $_COOKIE["gm_rem"];
-				$user = $this->GetUser($_COOKIE["gm_rem"]);
+				$user =& User::GetInstance($_COOKIE["gm_rem"]);
 				if (!empty($user->username)) {
 					if (time() - $user->sessiontime < 60*60*24*7) {
 						$_SESSION['gm_user'] = $_COOKIE["gm_rem"];
@@ -180,20 +160,20 @@ class UserController {
 	* @param string $password the plain text password to test
 	* @return bool return true if the username and password credentials match a user in the database return false if they don't
 	*/
-	function AuthenticateUser($username, $password) {
+	public function AuthenticateUser($username, $password) {
 		global $TBLPREFIX, $GEDCOM, $gm_lang;
 
-		$user = $this->GetUser($username);
+		$user =& User::GetInstance($username);
+
 		if (!empty($user->username)) {
 			if (crypt($password, $user->password) == $user->password) {
 	        	if ((($user->verified == "yes") and ($user->verified_by_admin == "yes")) or ($user->canadmin != "")){
 					$sql = "UPDATE ".$TBLPREFIX."users SET u_loggedin='Y', u_sessiontime='".time()."' WHERE u_username='$username'";
 					$res = NewQuery($sql);
-					unset($this->userobjects[$username]);
-					$user = $this->GetUser($username);
+					$user =& User::GetInstance($username);
 					
 					//-- reset the user's session
-						$_SESSION = array();
+					$_SESSION = array();
 					$_SESSION['gm_user'] = $username;
 					
 					// -- set the IP on which authentication took place.
@@ -239,7 +219,7 @@ class UserController {
 	 * @param		string	$username		The user to be logged out
 	 * @param		string	$logtext		Optional text to write to the log for reason of user logout
 	 */
-	function UserLogout($username, $logtext = "") {
+	public function UserLogout($username, $logtext = "") {
 		global $TBLPREFIX, $GEDCOM, $LANGUAGE, $gm_username;
 
 		if ($username=="") {
@@ -249,8 +229,8 @@ class UserController {
 		}
 		$sql = "UPDATE ".$TBLPREFIX."users SET u_loggedin='N' WHERE BINARY u_username='".$username."'";
 		$res = NewQuery($sql);
-		if ($logtext == "") WriteToLog("Users->UserLogout: Succesful logout for " . $username . " <-", "I", "S");
-		else WriteToLog("Users->UserLogout: ".$logtext." -> " . $username . " <-", "I", "S");
+		if ($logtext == "") WriteToLog("UserController::UserLogout: Succesful logout for " . $username . " <-", "I", "S");
+		else WriteToLog("UserController::UserLogout: ".$logtext." -> " . $username . " <-", "I", "S");
 
 		if ((isset($_SESSION['gm_user']) && ($_SESSION['gm_user']==$username)) || (isset($_COOKIE['gm_rem'])&&$_COOKIE['gm_rem']==$username)) {
 			if ($_SESSION['gm_user']==$username) {
@@ -265,7 +245,7 @@ class UserController {
 				if($tmphits>=0) $_SESSION["gm_counter"]=$tmphits; //set since it was set before so don't get double hits
 			}
 		}
-		$gm_username = $this->GetUserName();
+		$gm_username = self::GetUserName();
 	}
 	
 	/**
@@ -277,7 +257,7 @@ class UserController {
 	* @param string $order asc or dec
 	* @return array returns a sorted array of users
 	*/
-	function GetUsers($field = "username", $order = "asc", $sort2 = "firstname", $select="") {
+	public function GetUsers($field = "username", $order = "asc", $sort2 = "firstname", $select="") {
 		global $TBLPREFIX;
 	
 		$selusers = array();
@@ -291,12 +271,12 @@ class UserController {
 			}
 		}
 		foreach ($users as $user => $data) {
-			$selusers[$user] = $this->GetUser($user, $data);
+			$selusers[$user] =& User::GetInstance($user, $data);
 		}
-		if (!empty($field)) $this->userobjsortfields = array($field);
-		if (!empty($sort2)) $this->userobjsortfields[] = $sort2;
-		if (!empty($order)) $this->userobjsortorder = $order;
-		uasort($selusers, array($this, "UserObjSort"));
+		if (!empty($field)) self::$userobjsortfields = array($field);
+		if (!empty($sort2)) self::$userobjsortfields[] = $sort2;
+		if (!empty($order)) self::$userobjsortorder = $order;
+		uasort($selusers, array("UserController", "UserObjSort"));
 		return $selusers;
 	}
 	
@@ -304,7 +284,7 @@ class UserController {
 	* Count the number of users present in Genmod
 	* Returns either the number or false
 	*/
-	function CountUsers() {
+	public function CountUsers() {
 		global $TBLPREFIX;
 	
 		$sql = "SELECT count(u_username) FROM ".$TBLPREFIX."users";
@@ -315,137 +295,6 @@ class UserController {
 		}
 		return false;
 	}
-
-	
-	/**
-	* check if the given user has access privileges on this gedcom
-	*
-	* takes a username and checks if the user has access privileges to view the private
-	* gedcom data.
-	* @param string $username the username of the user to check
-	* @return boolean true if user can access false if they cannot
-	*/
-	function userPrivAccess($username) {
-		global $GEDCOM;
-
-		if (empty($username)) return false;
-		if ($this->userIsAdmin($username)) return true;
-		$user = $this->GetUser($username);
-		if (empty($user->username)) return false;
-		if (isset($user->privgroup[$GEDCOM])) {
-			if ($user->privgroup[$GEDCOM]!="none") return true;
-			else return false;
-		}
-		else return false;
-	}
-
-	/**
-	* check if the given user has write privileges on this gedcom
-	*
-	* takes a username and checks if the user has write privileges to change
-	* the gedcom data. First check if the administrator has turned on editing privileges for this gedcom
-	* @param string $username the username of the user to check
-	* @return boolean true if user can edit false if they cannot
-	*/
-	function userCanEdit($username, $ged="") {
-		global $ALLOW_EDIT_GEDCOM, $GEDCOM;
-
-		if (empty($ged)) $ged = $GEDCOM;
-
-		if (!$ALLOW_EDIT_GEDCOM) return false;
-		if (empty($username)) return false;
-		
-		// Site admins can edit all
-		if ($this->userIsAdmin($username)) return true;
-		
-		$user = $this->GetUser($username);
-		if (empty($user->username)) return false;
-		if (isset($user->canedit[$ged])) {
-			// yes and true are old values
-			if ($user->canedit[$ged]=="yes" || $user->canedit[$ged]=="edit" || $user->gedcomadmin[$ged] || $user->canedit[$ged]=="accept" || $user->canedit[$ged]===true) return true;
-			else return false;
-		}
-		else return false;
-	}
-	
-	/**
-	* Can user accept changes
-	* 
-	* takes a username and checks if the user has write privileges to 
-	* change the gedcom data and accept changes
-	* @param string $username	the username of the user check privileges
-	* @return boolean true if user can accept false if user cannot accept
-	*/ 
-	function userCanAccept($username, $ged="") {
-		global $ALLOW_EDIT_GEDCOM, $GEDCOM;
-
-		if (empty($ged)) $ged = $GEDCOM;
-
-		if (!$ALLOW_EDIT_GEDCOM) return false;
-		if (empty($username)) return false;
-		
-		// Site admins can accept all
-		if ($this->userIsAdmin($username)) return true;
-		
-		$user = $this->GetUser($username);
-		if (empty($user->username)) return false;
-		if (isset($user->gedcomadmin[$ged]) && $user->gedcomadmin[$ged]) return true;
-		if (isset($user->canedit[$ged])) {
-			if ($user->canedit[$ged]=="accept") return true;
-			else return false;
-		}
-		else return false;
-	}
-	
-	/**
-	* check if given username is an admin for the current gedcom
-	*
-	* takes a username and checks if the
-	* user has administrative privileges
-	* to change the configuration files for the currently active gedcom
-	*/
-	function userGedcomAdmin($username, $ged="") {
-		global $GEDCOM;
-
-		if (empty($ged)) $ged = $GEDCOM;
-
-		if ($_SESSION['cookie_login']) return false;
-		if (empty($username)) return false;
-		if ($this->userIsAdmin($username)) return true;
-		$user = $this->GetUser($username);
-		if (empty($user->username)) return false;
-		if (isset($user->gedcomadmin[$ged]) && $user->gedcomadmin[$ged]) return true;
-		else return false;
-	}
-	/**
-	* check if given username is an admin
-	*
-	* takes a username and checks if the
-	* user has administrative privileges
-	* to change the configuration files
-	*/
-	function userIsAdmin($username) {
-	
-		if (empty($username)) return false;
-		if ($_SESSION['cookie_login']) return false;
-		$user = $this->GetUser($username);
-		if (empty($user->username)) return false;
-		return $user->canadmin;
-	}
-	
-	/**
-	* Should user's changed automatically be accepted 
-	* @param string $username	the user name of the user to check
-	* @return boolean 		true if the changes should automatically be accepted
-	*/
-	function userAutoAccept($username = "") {
-		if (empty($username)) $username = $this->GetUserName();
-		if (empty($username)) return false;
-		
-		if (!$this->userCanAccept($username)) return false;
-		$user = $this->GetUser($username);
-		if ($user->auto_accept) return true;
-	}
 	
 	/**
 	* Add a new user
@@ -454,13 +303,9 @@ class UserController {
 	* @param array $newuser	The new user array to add
 	* @param string $msg		The log message to write to the log
 	*/
-	function AddUser($newuser, $msg = "added") {
+	public function AddUser($newuser, $msg = "added") {
 		global $TBLPREFIX, $DBCONN, $USE_RELATIONSHIP_PRIVACY, $MAX_RELATION_PATH_LENGTH, $GEDCOMS;
 
-//		if (!isset($newuser->relationship_privacy)) {
-//			if ($USE_RELATIONSHIP_PRIVACY) $newuser->relationship_privacy = "Y";
-//			else $newuser->relationship_privacy = "N";
-//		} 
 		if (!isset($newuser->auto_accept)) $newuser->auto_accept = "N";
 		$newuser->firstname = preg_replace("/\//", "", $newuser->firstname);
 		$newuser->lastname = preg_replace("/\//", "", $newuser->lastname);
@@ -517,10 +362,10 @@ class UserController {
 				
 				$res = NewQuery($sql);
 			}
-			$activeuser = $this->GetUserName();
+			$activeuser = self::GetUserName();
 			if ($activeuser == "") $activeuser = "Anonymous user";
-			$this->userobjects[$newuser->username] = $newuser;
-			WriteToLog("Users->AddUser: ".$activeuser." ".$msg." user -> ".$newuser->username." <-", "I", "S");
+			$newuser =& User::GetInstance($newuser->username);
+			WriteToLog("UserController::AddUser: ".$activeuser." ".$msg." user -> ".$newuser->username." <-", "I", "S");
 			return true;
 		}
 		else return false;
@@ -531,19 +376,21 @@ class UserController {
 	* @param string $username	the username to delete
 	* @param string $msg		a message to write to the log file
 	*/
-	function DeleteUser($username, $msg = "deleted") {
+	public function DeleteUser($username, $msg = "deleted") {
 		global $TBLPREFIX, $DBCONN;
 	
-		if (isset($this->userobjects[$username])) unset($this->userobjects[$username]);
 		$username = $DBCONN->EscapeQuery($username);
 		$sql = "DELETE FROM ".$TBLPREFIX."users WHERE BINARY u_username='$username'";
 		$res = NewQuery($sql);
 		$sql = "DELETE FROM ".$TBLPREFIX."users_gedcoms WHERE BINARY ug_username='$username'";
 		$res = NewQuery($sql);
-		$activeuser = $this->GetUserName();
+		$activeuser = self::GetUserName();
 		if ($activeuser == "") $activeuser = "Anonymous user";
-		if (($msg != "changed") && ($msg != "requested password for") && ($msg != "verified")) WriteToLog("Users->DeleteUser: ".$activeuser." ".$msg." user -&gt; ".$username." &lt;-", "I", "S");
-		if ($res) return true;
+		if (($msg != "changed") && ($msg != "requested password for") && ($msg != "verified")) WriteToLog("UserController::DeleteUser: ".$activeuser." ".$msg." user -&gt; ".$username." &lt;-", "I", "S");
+		if ($res) {
+			User::DeleteInstance($username);
+			return true;
+		}
 		else return false;
 	}
 
@@ -551,11 +398,11 @@ class UserController {
 	* creates a user as reference for a gedcom export
 	* @param string $export_accesslevel
 	*/
-	function CreateExportUser($export_accesslevel) {
+	public function CreateExportUser($export_accesslevel) {
 		global $GEDCOM;
 		
-		$u = $this->GetUser("export");
-		if (!$u->is_empty) $this->DeleteUser("export");
+		$u =& User::GetInstance("export");
+		if (!$u->is_empty) self::DeleteUser("export");
 		$newuser = new User("");
 		$newuser->firstname = "Export";
 		$newuser->lastname = "useraccount";
@@ -599,7 +446,7 @@ class UserController {
 		$newuser->canedit = array();
 		$newuser->privgroup = array();
 		$newuser->auto_accept = "N";
-		$this->AddUser($newuser);
+		self::AddUser($newuser);
 	}
 
 	/**
@@ -614,132 +461,40 @@ class UserController {
 	* @param		string	$username		The username that needs to be updated
 	* @return 	boolean	Return true or false as a result of the update
 	*/
-	function UpdateSessiontime($username) {
+	public function UpdateSessiontime($username) {
 		global $TBLPREFIX, $users, $GM_SESSION_TIME;
 	
-		if (isset($this->userobjects[$username]) && time() - $this->userobjects[$username]->sessiontime > $GM_SESSION_TIME) {
-			$this->UserLogout($username);
-			return false;
+		$user =& User::GetInstance($username);
+		if (!$user->is_empty) {
+			if(time() - $user->sessiontime > $GM_SESSION_TIME) {
+				self::UserLogout($username);
+				return false;
+			}
 		}
 		else {
-			if ($this->GetUser($username)) {
-				$sql = "UPDATE ".$TBLPREFIX."users SET u_loggedin='Y', u_sessiontime='".time()."' WHERE BINARY u_username='".$username."'";
-				$res = NewQuery($sql);
-				if ($res) {
-					$this->userobjects[$username]->sessiontime = time();
-					return true;
-				}
-				else return false;
+			$sql = "UPDATE ".$TBLPREFIX."users SET u_loggedin='Y', u_sessiontime='".time()."' WHERE BINARY u_username='".$username."'";
+			$res = NewQuery($sql);
+			if ($res) {
+				User::RenewInstance($username);
+				return true;
 			}
 			else return false;
 		}
 	}
 
-	/**
-	* Determine if the user can view raw GEDCOM lines
-	* @author	Genmod Development Team
-	* @param		string	$username		The username or if not set, the current user
-	* @param		string	$ged			The GEDCOM file or if not set, the current user
-	* @return 		boolean					Return true or false as a result
-	*/ 
-	function userCanViewGedlines($username="", $ged="") {
-		global $gm_username, $GEDCOM, $GEDCOMID, $SHOW_GEDCOM_RECORD;
+	private function UserObjSort($a, $b) {
 		
-		if (empty($username)) $username = $gm_username;
-
-		if ($SHOW_GEDCOM_RECORD == -1) return false;
-		if ($SHOW_GEDCOM_RECORD == 0) return true;
-		if ($SHOW_GEDCOM_RECORD == 1 && $this->UserPrivAccess($username, $GEDCOM)) return true;
-		if ($SHOW_GEDCOM_RECORD == 2 && $this->UserCanEdit($username, $GEDCOM)) return true;
-		if ($SHOW_GEDCOM_RECORD == 3 && $this->UserCanAccept($username, $GEDCOM)) return true;
-		if ($SHOW_GEDCOM_RECORD == 4 && $this->UserGedcomAdmin($username, $GEDCOM)) return true;
-		if ($SHOW_GEDCOM_RECORD == 5 && $this->UserIsAdmin($username)) return true;
-		return false;
-	}
-
-	/**
-	* Determine if the user can edit raw GEDCOM lines
-	* @author	Genmod Development Team
-	* @param		string	$username		The username or if not set, the current user
-	* @param		string	$ged			The GEDCOM file or if not set, the current user
-	* @return 		boolean					Return true or false as a result
-	*/ 
-	function userCanEditGedlines($username="", $ged="") {
-		global $gm_username, $GEDCOM, $GEDCOMID, $ALLOW_EDIT_GEDCOM, $EDIT_GEDCOM_RECORD;
-		
-		if (!$ALLOW_EDIT_GEDCOM) return false;
-	
-		if (empty($username)) $username = $gm_username;
-		
-		// Note: options 0 and 1 are not configurable in the settings.
-		if ($EDIT_GEDCOM_RECORD == -1) return false;
-		if ($EDIT_GEDCOM_RECORD == 0) return true;
-		if ($EDIT_GEDCOM_RECORD == 1 && $this->UserPrivAccess($username, $GEDCOM)) return true;
-		if ($EDIT_GEDCOM_RECORD == 2 && $this->UserCanEdit($username, $GEDCOM)) return true;
-		if ($EDIT_GEDCOM_RECORD == 3 && $this->UserCanAccept($username, $GEDCOM)) return true;
-		if ($EDIT_GEDCOM_RECORD == 4 && $this->UserGedcomAdmin($username, $GEDCOM)) return true;
-		if ($EDIT_GEDCOM_RECORD == 5 && $this->UserIsAdmin($username)) return true;
-		return false;
-	}
-	
-	function UserCanEditOwn($username, $pid) {
-		global $GEDCOM, $USE_QUICK_UPDATE;
-	
-		if ($this->UserCanEdit($username)) return true;
-		if (!$USE_QUICK_UPDATE) return false;
-		if (empty($pid)) return false;
-
-		$user = $this->GetUser($username);	
-		if (!empty($user->gedcomid[$GEDCOM])) {
-			if ($pid==$user->gedcomid[$GEDCOM]) return true;
-			else {
-				$famids = Array_Merge(FindSfamilyIds($user->gedcomid[$GEDCOM]), FindFamilyIds($user->gedcomid[$GEDCOM]));
-				foreach($famids as $indexval => $fam) {
-					$famid = $fam["famid"];
-					if (GetChangeData(true, $famid, true)) {
-						$rec = GetChangeData(false, $famid, true, "gedlines");
-						$famrec = $rec[$GEDCOM][$famid];
-					}
-					else $famrec = FindFamilyRecord($famid);
-					if (preg_match("/1 HUSB @$pid@/", $famrec)>0) return true;
-					if (preg_match("/1 WIFE @$pid@/", $famrec)>0) return true;
-					if (preg_match("/1 CHIL @$pid@/", $famrec)>0) return true;
-				}
-			}
-		}
-		return false;
-	}	 
-	
-	/**
-	* get current user's access level
-	*
-	* checks the current user and returns their privacy access level
-	* @return int		their access level
-	*/
-	function getUserAccessLevel($username="") {
-		global $PRIV_PUBLIC, $PRIV_NONE, $PRIV_USER, $GEDCOM, $gm_username;
-
-		if (empty($username)) $username = $gm_username;
-		if (empty($username)) return $PRIV_PUBLIC;
-
-		if ($this->userGedcomAdmin($username)) return $PRIV_NONE;
-		if ($this->userPrivAccess($username)) return $PRIV_USER;
-		return $PRIV_PUBLIC;
-	}
-	
-	function UserObjSort($a, $b) {
-		
-		foreach($this->userobjsortfields as $ind=>$field) {
+		foreach(self::$userobjsortfields as $ind=>$field) {
 			if (!isset($a->$field)) $aname = "";
 			else $aname = str2upper($a->$field);
 			if (!isset($b->$field)) $bname = "";
 			else $bname = str2upper($b->$field);
 			if ($aname != $bname) {
 				if (is_numeric($aname) && is_numeric($bname)) {
-					if ($this->userobjsortorder == "asc") return ($aname > $bname);
+					if (self::$userobjsortorder == "asc") return ($aname > $bname);
 					else return ($bname > $aname);
 				}
-				else if ($this->userobjsortorder == "asc") return StringSort($aname, $bname);
+				else if (self::$userobjsortorder == "asc") return StringSort($aname, $bname);
 				else return !StringSort($aname, $bname);
 				break;
 			}
@@ -747,7 +502,7 @@ class UserController {
 		return 0;
 	}
 	
-	function CheckPrivacyOverrides($gedid) {
+	public function CheckPrivacyOverrides($gedid) {
 		global $TBLPREFIX;
 		
 		$sql = "SELECT count(ug_username) FROM ".$TBLPREFIX."users_gedcoms WHERE (ug_relationship_privacy<>'' OR ug_hide_live_people<>'' OR ug_show_living_names<>'') AND ug_gedfile='".$gedid."'";
@@ -757,15 +512,6 @@ class UserController {
 			return ($row[0] == 0 ? false : true);
 		}
 		return false;
-	}
-	
-	function ShowActionLog($username="") {
-		global $SHOW_ACTION_LIST, $gm_username;
-		
-		if (empty($username)) $username = $gm_username;
-
-		if ($SHOW_ACTION_LIST >= $this->getUserAccessLevel($username)) return true;
-		else return false;
 	}
 }
 ?>

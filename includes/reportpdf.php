@@ -2310,7 +2310,7 @@ function GMRHighlightedImageSHandler($attrs) {
 	if (isset($attrs["height"])) $height = $attrs["height"];
 
 	if (showFact("OBJE", $id)) {
-		$media = FindHighlightedObject($id, $gedrec);
+		$media = FindHighlightedObject($id);
 		//print_r($media);
 		//print "<br /><br />";
 		$mfile =& MediaItem::GetInstance($media["id"]);

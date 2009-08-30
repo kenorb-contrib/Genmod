@@ -107,6 +107,13 @@ class MediaItem extends GedcomRecord {
 		}
 	}
 
+	public function ObjCount() {
+		$count = 0;
+		foreach(self::$mediaitemcache as $ged => $media) {
+			$count += count($media);
+		}
+		return $count;
+	}	
 	private function getTitle() {
 		global $gm_lang;
 		

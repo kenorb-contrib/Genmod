@@ -81,7 +81,7 @@ switch ($action) {
 		if (!isset($user_name)) $user_name = "";
 		print_header("Genmod - " . $gm_lang["lost_pw_reset"]);
 		print "<div class=\"center\">";
-		$newuser = $Users->getUser($user_name);
+		$newuser =& User::GetInstance($user_name);
 		if ($newuser->is_empty) {
 			print "<span class=\"warning\">";
 			print_text("user_not_found");
@@ -95,12 +95,12 @@ switch ($action) {
 		else {
 			$user_new_pw = md5 (uniqid (rand()));
 			$olduser = CloneObj($newuser);
-			$Users->DeleteUser($user_name, "reqested new password for");
+			UserController::DeleteUser($user_name, "reqested new password for");
 			
 			$newuser->password = crypt($user_new_pw, $user_new_pw);
 			$newuser->pwrequested = "1";
 			//$newuser->reg_timestamp = date("U");
-			$Users->addUser($newuser, "reqested new password for");
+			UserController::addUser($newuser, "reqested new password for");
 
 			// switch language to user settings
 			$oldlanguage = $LANGUAGE;
@@ -154,7 +154,7 @@ switch ($action) {
 				$message .= $gm_lang["enter_username"]."<br />";
 				$user_name_false = true;
 			}
-			$u = $Users->GetUser($user_name);
+			$u =& User::GetInstance($user_name);
 			if (!$u->is_empty) {
 				$message .= $gm_lang["duplicate_username"]."<br />";
 				$user_name_false = true;
@@ -395,7 +395,7 @@ switch ($action) {
 			$user->comment = "";
 			$user->comment_exp = "";
 			$user->auto_accept = false;
-			$au = $Users->AddUser($user, "added");
+			$au = UserController::AddUser($user, "added");
 			if ($au) $user_created_ok = true;
 			else {
 			    print "<span class=\"warning\">";
@@ -438,7 +438,7 @@ switch ($action) {
 				GmMail($user_email, str_replace("#SERVER_NAME#", $SERVER_URL, $gm_lang["mail01_subject"]), $mail_body, "", "", "", "", "", true);
 				
 				// switch language to webmaster settings
-				$admuser = $Users->getuser($WEBMASTER_EMAIL);
+				$admuser =& User::GetInstance($WEBMASTER_EMAIL);
 				$LANGUAGE = $admuser->language;
 				if (isset($gm_language[$LANGUAGE])) LoadEnglish(false, false, true);	//-- load language file
 				$TEXT_DIRECTION = $TEXT_DIRECTION_array[$LANGUAGE];
@@ -535,22 +535,22 @@ switch ($action) {
 		print "<tr><td class=\"topbottombar\">".$gm_lang["user_verify"]."</td></tr>";
 		print "<tr><td class=\"shade1\">";
 		print str_replace("#user_name#", $user_name, $gm_lang["pls_note08"]);
-		$user = $Users->getUser($user_name);
+		$user =& User::GetInstance($user_name);
 		if (!$user->is_empty) {
 			$pw_ok = ($user->password == crypt($user_password, $user->password));
 			$hc_ok = ($user->reg_hashcode == $user_hashcode);
 			if (($pw_ok) and ($hc_ok)) {
 				$newuser = CloneObj($user);
 				$olduser = CloneObj($user);
-				$Users->DeleteUser($user_name, "verified");
+				UserController::DeleteUser($user_name, "verified");
 				$newuser->verified = "yes";
 				$newuser->pwrequested = "";
 				$newuser->reg_timestamp = date("U");
 				$newuser->hashcode = "";
 				if (!$REQUIRE_ADMIN_AUTH_REGISTRATION) $newuser->verified_by_admin = "yes";
-				$Users->AddUser($newuser, "verified");
+				UserController::AddUser($newuser, "verified");
 				// switch language to webmaster settings
-				$admuser = $Users->getuser($WEBMASTER_EMAIL);
+				$admuser =& User::GetInstance($WEBMASTER_EMAIL);
 				$oldlanguage = $LANGUAGE;
 				$LANGUAGE = $admuser->language;
 				if (isset($gm_language[$LANGUAGE])) LoadEnglish(false, false, true);

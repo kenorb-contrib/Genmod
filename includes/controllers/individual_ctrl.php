@@ -48,7 +48,7 @@ class IndividualController extends DetailController {
 	
 	public function __construct() {
 		global $GEDCOM_DEFAULT_TAB, $USE_RIN, $gm_lang, $GM_IMAGE_DIR, $GM_IMAGES, $nonfacts, $nonfamfacts;
-		global $ENABLE_CLIPPINGS_CART, $show_changes, $GEDCOM, $gm_username, $Users, $SHOW_ID_NUMBERS;
+		global $ENABLE_CLIPPINGS_CART, $show_changes, $GEDCOM, $gm_user, $SHOW_ID_NUMBERS;
 		
 		parent::__construct();
 
@@ -74,18 +74,18 @@ class IndividualController extends DetailController {
 		
 		// NOTE: Get the user details
 		if (!empty($this->uname)) {
-			$this->user = $Users->getUser($this->uname);
+			$this->user =& User::GetInstance($this->uname);
 			
 			// Set the default tab
 			if ($this->user->default_tab != $this->default_tab && $this->user->default_tab != 9) $this->default_tab = $this->user->default_tab;
 			
 			// Only display the user link for authenticated users
-			$indi_username = $Users->getUserByGedcomId($this->xref, $GEDCOM);
+			$indi_username = UserController::getUserByGedcomId($this->xref, $GEDCOM);
 			$this->indi_userlink = "";
 			if ($indi_username) {
-				if ($Users->UserIsAdmin($gm_username)) $this->indi_userlink = "<a href=\"useradmin.php?action=edituser&username=".$indi_username."\">";
+				if ($gm_user->UserIsAdmin()) $this->indi_userlink = "<a href=\"useradmin.php?action=edituser&username=".$indi_username."\">";
 				$this->indi_userlink .= "<img src=\"".$GM_IMAGE_DIR."/".$GM_IMAGES["indis"]["small"]."\" border=\"0\" alt=\"".PrintReady($gm_lang["gm_username"]." ".$indi_username)."\" />";
-				if ($Users->UserIsAdmin($gm_username)) $this->indi_userlink .= "</a>";
+				if ($gm_user->UserIsAdmin()) $this->indi_userlink .= "</a>";
 			}
 		}
 		// Translate the (system or user) default tab to the correct tab in the definition in the detail controller
@@ -94,7 +94,7 @@ class IndividualController extends DetailController {
 		$this->default_tab = array_search($tab, $this->tabs);
 		
 		// Note this is for Quick Update
-		if ($Users->UserCanEditOwn($gm_username, $this->xref)) $this->caneditown = true;
+		if ($gm_user->UserCanEditOwn($this->xref)) $this->caneditown = true;
 
 		
 		// NOTE: Create the person Object
@@ -108,7 +108,7 @@ class IndividualController extends DetailController {
 		}
 		
 		// NOTE: Can we show the gedcom record?
-		if ($Users->userCanViewGedlines() && $this->indi->disp) $this->canshowgedrec = true;
+		if ($gm_user->userCanViewGedlines() && $this->indi->disp) $this->canshowgedrec = true;
 		else $this->canshowgedrec = false;
 		
 		// NOTE: Parse all facts into arrays
@@ -206,7 +206,7 @@ class IndividualController extends DetailController {
 	 * @return Menu
 	 */
 	public function &getEditMenu() {
-		global $TEXT_DIRECTION, $GEDCOM, $TOTAL_NAMES, $Users;
+		global $TEXT_DIRECTION, $GEDCOM, $TOTAL_NAMES, $gm_user;
 		global $NAME_LINENUM, $SEX_LINENUM, $gm_lang, $USE_QUICK_UPDATE, $show_changes;
 		
 		if ($TEXT_DIRECTION=="rtl") $ff="_rtl";
@@ -355,7 +355,7 @@ class IndividualController extends DetailController {
 				$menu->addSubmenu($submenu);
 			
 				// NOTE: Raw editing
-				if ($Users->userCanEditGedlines()) {
+				if ($gm_user->userCanEditGedlines()) {
 					$submenu = new Menu($gm_lang["edit_raw"]);
 					$submenu->addLink("edit_raw('".$this->xref."', 'edit_raw');");
 					$menu->addSubmenu($submenu);
@@ -379,7 +379,7 @@ class IndividualController extends DetailController {
 	 * @return Menu
 	 */
 	public function &getOtherMenu() {
-		global $ENABLE_CLIPPINGS_CART, $gm_lang, $Users, $GEDCOMID;
+		global $ENABLE_CLIPPINGS_CART, $gm_lang, $gm_user, $GEDCOMID;
 		
 		//-- main other menu item
 		$menu = new Menu($gm_lang["other"]);
@@ -394,7 +394,7 @@ class IndividualController extends DetailController {
 				$menu->addSubmenu($submenu);
 			}
 			// Clippings Cart
-			if ($this->indi->disp && $ENABLE_CLIPPINGS_CART >= $Users->getUserAccessLevel()) {
+			if ($this->indi->disp && $ENABLE_CLIPPINGS_CART >= $gm_user->getUserAccessLevel()) {
 				$submenu = new Menu($gm_lang["add_to_cart"]);
 				$submenu->addLink("clippings.php?action=add&id=".$this->xref."&type=indi");
 				$menu->addSubmenu($submenu);

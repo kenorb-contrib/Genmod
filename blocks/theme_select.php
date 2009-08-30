@@ -33,19 +33,17 @@ $GM_BLOCKS["print_block_theme_select"]["canconfig"]	= false;
 $GM_BLOCKS["print_block_theme_select"]["rss"]       = false;
 
 function print_block_theme_select($style=0, $config="", $side, $index) {
-	global $gm_lang, $Users;
+	global $ALLOW_THEME_DROPDOWN, $ALLOW_USER_THEMES, $THEME_DIR, $gm_lang, $gm_user, $themeformcount;
+	
 	print "<div id=\"theme_select\" class=\"block\">\n";
 	print "<div class=\"blockhc\">";
 	print_help_link("change_theme", "qm", "change_theme");
 	print $gm_lang["change_theme"];
 	print "</div>";
 	print "<div class=\"blockcontent center\">";
-	global $ALLOW_THEME_DROPDOWN, $ALLOW_USER_THEMES, $THEME_DIR, $gm_lang, $themeformcount;
 
 	if (!isset($themeformcount)) $themeformcount = 0;
 	$themeformcount++;
-	$uname = $Users->GetUserName();
-	$user = $Users->getUser($uname);
 	isset($_SERVER["QUERY_STRING"]) == true?$tqstring = "?".$_SERVER["QUERY_STRING"]:$tqstring = "";
 	$frompage = $_SERVER["SCRIPT_NAME"].$tqstring;
 	$themes = GetThemeNames();
@@ -56,7 +54,7 @@ function print_block_theme_select($style=0, $config="", $side, $index) {
 	foreach($themes as $indexval => $themedir) {
 			print "<option value=\"".$themedir["dir"]."\"";
 			if ($uname) {
-					if ($themedir["dir"] == $user->theme) print " class=\"selected-option\"";
+					if ($themedir["dir"] == $gm_user->theme) print " class=\"selected-option\"";
 			}
 			else {
 					 if ($themedir["dir"] == $THEME_DIR) print " class=\"selected-option\"";

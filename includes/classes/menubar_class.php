@@ -56,7 +56,7 @@ class MenuBar {
 	 * @return Menu		the menu item
 	 */
 	function GetCustomMenu() {
-		global $TBLPREFIX, $gm_lang, $TEXT_DIRECTION, $CONFIGURED, $DBCONN, $Users;
+		global $TBLPREFIX, $gm_lang, $TEXT_DIRECTION, $CONFIGURED, $DBCONN, $gm_user;
 		
 		if (!$DBCONN->connected) return false;
 		
@@ -96,7 +96,7 @@ class MenuBar {
 				}
 			}
 			else $menu = "";
-			if ($Users->userIsAdmin($Users->GetUserName())) {
+			if ($gm_user->userIsAdmin()) {
 				if (!is_object($menu)) $menu = new Menu($gm_lang["my_pages"]);
 				$submenu = new Menu($gm_lang["edit_pages"], "");
 				$submenu->addLink("custompage.php?action=edit");
@@ -114,17 +114,17 @@ class MenuBar {
 	function GetFileMenu() {
 		global $TEXT_DIRECTION, $GEDCOM, $gm_lang, $debugcollector;
 		global $SCRIPT_NAME, $LOGIN_URL, $SERVER_URL, $QUERY_STRING, $gm_username;
-		global $ALLOW_CHANGE_GEDCOM, $GEDCOMS, $GEDCOM, $Users;
+		global $ALLOW_CHANGE_GEDCOM, $GEDCOMS, $GEDCOM, $gm_user;
 		
 		 $username = $gm_username;
-		 $user = $Users->GetUser($username);
+		 $user =& User::GetInstance($username);
 
 		if ($TEXT_DIRECTION=="rtl") $ff="_rtl"; else $ff="";
 		//-- main file menu item
 		$menu = new Menu($gm_lang["menu_file"]);
 		
 		// NOTE: Login link
-		if (empty($user->username)) {
+		if (empty($gm_user->username)) {
 			$submenu = new Menu($gm_lang["login"]);
 			if (!empty($LOGIN_URL)) $submenu->addLink($LOGIN_URL."?url=".urlencode(basename($SCRIPT_NAME)."?".$QUERY_STRING."&ged=$GEDCOM"));
 			else $submenu->addLink($SERVER_URL."login.php?url=".urlencode(basename($SCRIPT_NAME)."?".$QUERY_STRING."&ged=$GEDCOM"));
@@ -145,7 +145,7 @@ class MenuBar {
 		}
 		
 		// NOTE: Admin link
-		if ($user->canadmin || ($Users->userGedcomAdmin($username, $GEDCOM))) {
+		if ($gm_user->canadmin || ($gm_user->userGedcomAdmin($GEDCOM))) {
 			$submenu = new Menu($gm_lang["admin"]);
 			$submenu->addLink("admin.php");
 			$menu->addSubmenu($submenu);
@@ -182,17 +182,14 @@ class MenuBar {
 		global $SCRIPT_NAME, $LOGIN_URL, $QUERY_STRING, $GEDCOM, $gm_username;
 		global $ALLOW_CHANGE_GEDCOM, $GEDCOMS;
 		
-		global $ENABLE_CLIPPINGS_CART, $Users;
+		global $ENABLE_CLIPPINGS_CART, $gm_user;
 		global $TEXT_DIRECTION, $GEDCOM, $gm_lang;
-		
-		$username = $gm_username;
-		$user = $Users->GetUser($username);
 		
 		//-- main edit menu item
 		$menu = new Menu($gm_lang["edit"], "#");
 		
 		// Clippings menu
-		if (file_exists("clippings.php") &&($ENABLE_CLIPPINGS_CART > $Users->getUserAccessLevel())) {
+		if (file_exists("clippings.php") &&($ENABLE_CLIPPINGS_CART > $gm_user->getUserAccessLevel())) {
 			//-- main clippings menu item
 			$submenu = new Menu($gm_lang["clippings_cart"]);
 			$submenu->addLink("clippings.php");
@@ -204,7 +201,7 @@ class MenuBar {
 		$submenu->addLink("search.php");
 		$menu->addSubmenu($submenu);
 		
-		if ($user->editaccount) {
+		if ($gm_user->editaccount) {
 			$submenu = new Menu($gm_lang["editowndata"]);
 			$submenu->addLink("edituser.php");
 			$menu->addSubmenu($submenu);
@@ -216,7 +213,7 @@ class MenuBar {
 	function GetViewMenu() {
 		global $gm_lang, $SCRIPT_NAME, $gm_language, $language_settings;
 		global $LANGUAGE, $ENABLE_MULTI_LANGUAGE;
-		global $ALLOW_THEME_DROPDOWN, $ALLOW_USER_THEMES, $Users, $THEME_DIR;
+		global $ALLOW_THEME_DROPDOWN, $ALLOW_USER_THEMES, $gm_user, $THEME_DIR;
 		
 		//-- main edit menu item
 		$menu = new Menu($gm_lang["menu_view"]);
@@ -254,13 +251,11 @@ class MenuBar {
 				if(!strstr("&mod",$frompage))$frompage.="&mod=".$_REQUEST['mod'];
 			}
 
-			$uname = $Users->GetUserName();
-			$user = $Users->getUser($uname);
 
 			// NOTE: add themes
 			$themes = GetThemeNames();
 			foreach ($themes as $indexval => $themedir) {
-				$submenu = new Menu($this->GetSubmenuText($themedir["name"], (($themedir["dir"] == $user->theme)||(empty($user->theme)&&($themedir["dir"]==$THEME_DIR)))), false);
+				$submenu = new Menu($this->GetSubmenuText($themedir["name"], (($themedir["dir"] == $gm_user->theme)||(empty($gm_user->theme)&&($themedir["dir"]==$THEME_DIR)))), false);
 //LERMAN - for some reason "...&amp;mytheme=..." does not work for Firefox 1.5.0.4 on Linux, but does work on IE. Changing it to "...&mytheme=..." works in both places
 				$submenu->addLink("themechange.php?frompage=".urlencode($frompage)."&mytheme=".$themedir["dir"]);
 				$menu->submenus[count($menu->submenus)-1]->submenus[]=$submenu;
@@ -333,7 +328,7 @@ class MenuBar {
 	 * @return Menu		the menu item
 	 */
 	function GetChartsMenu($rootid='',$myid='') {
-		global $TEXT_DIRECTION, $GEDCOM, $gm_lang, $gm_username, $Users;
+		global $TEXT_DIRECTION, $GEDCOM, $gm_lang, $gm_username, $gm_user;
 		
 		//-- main charts menu item
 		$link = "pedigree.php";
@@ -405,8 +400,8 @@ class MenuBar {
 			if ($rootid and empty($myid)) {
 				$username = $gm_username;
 				if (!empty($username)) {
-					$user = $Users->GetUser($username);
-					$myid = @$user->gedcomid[$GEDCOM];
+					$user =& User::GetInstance($username);
+					$myid = @$gm_user->gedcomid[$GEDCOM];
 				}
 			}
 			if (($myid and $myid!=$rootid) or empty($rootid)) {
@@ -432,7 +427,7 @@ class MenuBar {
 	}
 	
 	function GetReportMenu($pid="", $type="") {
-		global $TEXT_DIRECTION, $GEDCOMS, $GEDCOM, $gm_lang, $Users;
+		global $TEXT_DIRECTION, $GEDCOMS, $GEDCOM, $gm_lang, $gm_user;
 		global $LANGUAGE, $PRIV_PUBLIC, $PRIV_USER, $PRIV_NONE, $PRIV_HIDE, $gm_username;
 
 		if ($TEXT_DIRECTION=="rtl") $ff="_rtl"; else $ff="";
@@ -447,7 +442,7 @@ class MenuBar {
 		foreach($reports as $file=>$report) {
 			if (empty($type) || $report["type"] == $type) {
 				if (!isset($report["access"])) $report["access"] = $PRIV_PUBLIC;
-				if ($report["access"] >= $Users->getUserAccessLevel($username)) {
+				if ($report["access"] >= $gm_user->getUserAccessLevel()) {
 					if (!empty($report["title"][$LANGUAGE])) $label = $report["title"][$LANGUAGE];
 					else $label = implode("", $report["title"]);
 					$sortreports[$report["file"]]=$label;
@@ -492,9 +487,10 @@ class MenuBar {
 	 * @return Menu		the menu item
 	 */
 	function GetListMenu() {
-		global $TEXT_DIRECTION, $GEDCOM, $gm_lang, $Users;
+		global $TEXT_DIRECTION, $GEDCOM, $gm_lang, $gm_user;
 		global $SHOW_SOURCES, $gm_username;
 		
+		$user =& User::GetInstance($gm_username);
 		if ($TEXT_DIRECTION=="rtl") $ff="_rtl"; else $ff="";
 		//-- main lists menu item
 		$menu = new Menu($gm_lang["lists"]);
@@ -510,13 +506,13 @@ class MenuBar {
 			$menu->addSubmenu($submenu);
 		}
 		//-- source
-		if (file_exists("sourcelist.php") && $SHOW_SOURCES >= $Users->getUserAccessLevel($gm_username)) {
+		if (file_exists("sourcelist.php") && $SHOW_SOURCES >= $gm_user->getUserAccessLevel()) {
 			$submenu = new Menu($gm_lang["source_list"]);
 			$submenu->addLink("sourcelist.php");
 			$menu->addSubmenu($submenu);
 		}
 		//-- repository
-		if (file_exists("repolist.php")&& $SHOW_SOURCES >= $Users->getUserAccessLevel($gm_username)) {
+		if (file_exists("repolist.php")&& $SHOW_SOURCES >= $gm_user->getUserAccessLevel()) {
 			$submenu = new Menu($gm_lang["repo_list"]);
 			$submenu->addLink("repolist.php");
 			$menu->addSubmenu($submenu);
@@ -558,7 +554,7 @@ class MenuBar {
 			$menu->addSubmenu($submenu);
 		}
 		//-- Actionlist (admins only!)
-		if (file_exists("actionlist.php") && $Users->ShowActionLog($Users->GetUserName())) {
+		if (file_exists("actionlist.php") && $gm_user->ShowActionLog()) {
 			$submenu = new Menu($gm_lang["actionlist"]);
 			$submenu->addLink("actionlist.php");
 			$menu->addSubmenu($submenu);

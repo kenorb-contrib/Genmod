@@ -35,7 +35,7 @@ $GM_BLOCKS["print_user_favorites"]["rss"]		= false;
 //-- print user favorites
 function print_user_favorites($block=true, $config="", $side, $index) {
 	global $gm_lang, $GM_IMAGE_DIR, $GM_IMAGES, $GEDCOMS, $GEDCOM, $GEDCOMID, $TEXT_DIRECTION, $INDEX_DIRECTORY, $MEDIA_DIRECTORY,  $MEDIA_DIRECTORY_LEVELS, $command, $indilist, $sourcelist, $gm_username;
-	global $Privacy, $Users, $Favorites;
+	global $Privacy, $Favorites;
 
 		$userfavs = $Favorites->getUserFavorites($gm_username);
 		if (!is_array($userfavs)) $userfavs = array();

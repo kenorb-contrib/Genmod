@@ -53,7 +53,7 @@
 */
 require "config.php";
 
-if (!$Users->userGedcomAdmin($gm_username)) {
+if (!$gm_user->userGedcomAdmin()) {
 	if (empty($LOGIN_URL)) header("Location: login.php?url=uploadgedcom.php");
 	else header("Location: ".$LOGIN_URL."?url=uploadgedcom.php");
 	exit;

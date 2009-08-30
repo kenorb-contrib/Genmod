@@ -52,7 +52,7 @@ if (empty($rssStyle) || ($rssStyle != "HTML" && $rssStyle != "JS" && $rssStyle !
 
 if (!isset($_SERVER['QUERY_STRING'])) $_SERVER['QUERY_STRING'] = "lang=".$LANGUAGE;
 
-$user = $Users->getUser($CONTACT_EMAIL);
+$user =& User::GetInstance($CONTACT_EMAIL);
 $author =$user->firstname." ".$user->lastname;
 
 $rss = new UniversalFeedCreator();

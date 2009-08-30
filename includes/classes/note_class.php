@@ -88,6 +88,14 @@ class Note extends GedcomRecord {
 		}
 	}
 	
+	public function ObjCount() {
+		$count = 0;
+		foreach(self::$notecache as $ged => $note) {
+			$count += count($note);
+		}
+		return $count;
+	}	
+	
 	/**
 	 * get the title of this note record
 	 * @return string

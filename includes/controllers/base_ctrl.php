@@ -50,14 +50,14 @@ abstract class BaseController {
 	 * constructor for this class
 	 */
 	protected function __construct() {
-		global $show_changes, $Users, $GEDCOMID;
+		global $show_changes, $gm_user, $gm_username, $GEDCOMID;
 		
 		if (isset($_REQUEST["view"])) $this->view = $_REQUEST["view"];
 		if (!empty($_REQUEST["action"])) $this->action = $_REQUEST["action"];
 		
 		$this->show_changes = $show_changes;
 		
-		$this->uname = $Users->GetUserName();
+		$this->uname = $gm_username;
 		
 		$this->gedcomid = $GEDCOMID;
 		

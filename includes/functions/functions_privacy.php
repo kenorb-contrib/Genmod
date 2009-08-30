@@ -354,15 +354,15 @@ if (!function_exists("displayDetailsByID")) {
 	function displayDetailsByID($pid, $type = "INDI", $recursive=1, $checklinks=false) {
 		global $PRIV_PUBLIC, $PRIV_USER, $PRIV_NONE, $PRIV_HIDE, $USE_RELATIONSHIP_PRIVACY, $CHECK_MARRIAGE_RELATIONS, $MAX_RELATION_PATH_LENGTH, $gm_username, $COMBIKEY, $GEDCOMID;
 		global $global_facts, $person_privacy, $user_privacy, $HIDE_LIVE_PEOPLE, $GEDCOM, $SHOW_DEAD_PEOPLE, $MAX_ALIVE_AGE, $PRIVACY_BY_YEAR;
-		global $PRIVACY_CHECKS, $PRIVACY_BY_RESN, $SHOW_SOURCES, $SHOW_LIVING_NAMES, $LINK_PRIVACY, $Users;
+		global $PRIVACY_CHECKS, $PRIVACY_BY_RESN, $SHOW_SOURCES, $SHOW_LIVING_NAMES, $LINK_PRIVACY, $gm_user;
 		static $pcache;
 
 		//print "Check ".$pid." type ".$type." recursive ".$recursive." checklinks ".$checklinks."<br />";
 		// Return the value from the cache, if set
 		if (!isset($pcache)) $pcache = array();
 		if (isset($pcache[$GEDCOMID][$type][$recursive][$checklinks][$pid])) return $pcache[$GEDCOMID][$type][$recursive][$checklinks][$pid];
-		$username = $gm_username;
-		$ulevel = $Users->getUserAccessLevel($gm_username);
+		
+		$ulevel = $gm_user->getUserAccessLevel();
 
 		if (empty($pid)) return true;
 		if (empty($type)) $type = "INDI";
@@ -387,7 +387,7 @@ if (!function_exists("displayDetailsByID")) {
 
 		// If a user is logged on, check for user related privacy first---------------------------------------------------------------
 //		 print "checking privacy for pid: $pid, type: $type<br />";
-		if (!empty($username)) {
+		if (!empty($gm_username)) {
 			// Check user privacy for all users (hide/show)
 			if (isset($user_privacy["all"][$pid])) {
 				if ($user_privacy["all"][$pid] == 1) {
@@ -400,8 +400,8 @@ if (!function_exists("displayDetailsByID")) {
 				}
 			}
 			// Check user privacy for this user (hide/show)
-			if (isset($user_privacy[$username][$pid])) {
-				if ($user_privacy[$username][$pid] == 1) return true;
+			if (isset($user_privacy[$gm_username][$pid])) {
+				if ($user_privacy[$gm_username][$pid] == 1) return true;
 				else return false;
 			}
 			// Check person privacy (access level)
@@ -419,7 +419,6 @@ if (!function_exists("displayDetailsByID")) {
 			// Check privacy by isdead status
 			if ($type == "INDI") {
 				$isdead = IsDeadId($pid);
-				$user = $Users->getUser($username);
 				// The person is still hidden at this point and cannot be shown, either dead or alive.
 				// Check the relation privacy. If within the range, people can be shown. 
 				if ($USE_RELATIONSHIP_PRIVACY) {
@@ -620,7 +619,7 @@ if (!function_exists("displayDetailsByID")) {
 				    if ($recursive >=0) {
 				    	$links = GetMediaLinks($pid);
 					    foreach($links as $key => $link) {
-						    $disp = $disp && DisplayDetailsByID($link, IdType($link), $recursive, true);
+						    $disp = DisplayDetailsByID($link, IdType($link), $recursive, true) && $disp;
 						    if (!$disp) break;
 				    	}
 			    	}
@@ -694,27 +693,28 @@ if (!function_exists("showLivingNameByID")) {
 	 * @return	boolean 	return true to show the person's name, return false to keep it private
 	 */
 	function showLivingNameByID($pid, $type="INDI", $gedrec = "") {
-		global $SHOW_LIVING_NAMES, $PRIV_PUBLIC, $PRIV_USER, $PRIV_NONE, $person_privacy, $user_privacy, $gm_username, $COMBIKEY, $Users, $USE_RELATIONSHIP_PRIVACY, $CHECK_MARRIAGE_RELATIONS, $GEDCOM, $MAX_RELATION_PATH_LENGTH;
+		global $SHOW_LIVING_NAMES, $PRIV_PUBLIC, $PRIV_USER, $PRIV_NONE, $person_privacy, $user_privacy, $gm_username, $COMBIKEY, $gm_user, $USE_RELATIONSHIP_PRIVACY, $CHECK_MARRIAGE_RELATIONS, $GEDCOM, $MAX_RELATION_PATH_LENGTH;
 		
 		// If we can show the details, we can also show the name
 		if (displayDetailsByID($pid, $type)) return true;
 		
 		// If a pid is hidden or shown due to user privacy, the name is hidden or shown also
-		$username = $gm_username;
-		if (!empty($username)) {
+		if (!empty($gm_username)) {
 			if (isset($user_privacy["all"][$pid])) {
 				if ($user_privacy["all"][$pid] == 1) return true;
 				else return false;
 			}
-			if (isset($user_privacy[$username][$pid])) {
-				if ($user_privacy[$username][$pid] == 1) return true;
+			if (isset($user_privacy[$gm_username][$pid])) {
+				if ($user_privacy[$gm_username][$pid] == 1) return true;
 				else return false;
 			}
 		}
 		
+		$user =& User::GetInstance($gm_username);
+		
 		// If a pid is hidden or shown due to person privacy, the name also is
 		if (isset($person_privacy[$pid])) {
-			if ($person_privacy[$pid] >= $Users->getUserAccessLevel($username)) return true;
+			if ($person_privacy[$pid] >= $gm_user->getUserAccessLevel()) return true;
 			else return false;
 		}
 		
@@ -727,12 +727,11 @@ if (!function_exists("showLivingNameByID")) {
 		// If dead, we follow DisplayDetailsByID
 		// If alive, we check if the general rule allows displaying the name. If not, return false.
 		if ($isdead) return false;
-		else if ($SHOW_LIVING_NAMES < $Users->getUserAccessLevel($username)) return false;
+		else if ($SHOW_LIVING_NAMES < $gm_user->getUserAccessLevel()) return false;
 		
 		// Now we check if we must further narrow what can be seen
 		// At this point we have a pid that cannot be displayed by detail and is alive,
 		// and without relationship privacy the name would be shown.
-		$user = $Users->getUser($username);
 		if ($USE_RELATIONSHIP_PRIVACY) {
 			
 			// If we don't know the user's gedcom ID, we cannot determine the relationship,
@@ -769,26 +768,24 @@ if (!function_exists("showFact")) {
  */
 function showFact($fact, $pid, $type="") {
 	global $PRIV_PUBLIC, $PRIV_USER, $PRIV_NONE, $PRIV_HIDE, $LINK_PRIVACY;
-	global $global_facts, $person_facts, $SHOW_SOURCES, $gm_username, $Users;
+	global $global_facts, $person_facts, $SHOW_SOURCES, $gm_username, $gm_user;
 	static $ulevel;
 	
-	if (!isset($ulevel)) $ulevel = $Users->getUserAccessLevel($gm_username);
-//	$username = $gm_username;
+	$user = User::GetInstance($gm_username);
+	
+	if (!isset($ulevel)) $ulevel = $gm_user->getUserAccessLevel();
 //	print "Checking ".$fact." for ".$pid. "type ".$type."<br />";
 
 	//-- first check the global facts array
 	if (isset($global_facts[$fact]["show"])) {
-//		if ($global_facts[$fact]["show"] < $Users->getUserAccessLevel($username)) return false;
 		if ($global_facts[$fact]["show"] < $ulevel) return false;
 	}
 	//-- check the person facts array
 	if (isset($person_facts[$pid][$fact]["show"])) {
-//		if ($person_facts[$pid][$fact]["show"] < $Users->getUserAccessLevel($username)) return false;
 		if ($person_facts[$pid][$fact]["show"] < $ulevel) return false;
 	}
 
 	if ($fact=="SOUR") {
-//		if ($SHOW_SOURCES >= $Users->getUserAccessLevel($username)) return true;
 		if ($SHOW_SOURCES >= $ulevel) return true;
 		else return false;
     }
@@ -822,10 +819,9 @@ if (!function_exists("showFactDetails")) {
  */
 function showFactDetails($fact, $pid) {
 	global $PRIV_PUBLIC, $PRIV_USER, $PRIV_NONE, $PRIV_HIDE;
-	global $global_facts, $person_facts, $gm_username, $Users;
+	global $global_facts, $person_facts, $gm_username, $gm_user;
 
-	$username = $gm_username;
-	
+
 	// Handle the close relatives facts just as if they were normal facts
 	$f = substr($fact, 0, 6);
 	if ($f == "_BIRT_" || $f == "_DEAT_" && $f == "_MARR_") {
@@ -836,13 +832,13 @@ function showFactDetails($fact, $pid) {
 	if (isset($global_facts[$fact])) {
 		//-- first check the global facts array
 		if (isset($global_facts[$fact]["details"])) {
-			if ($global_facts[$fact]["details"] < $Users->getUserAccessLevel($username)) return false;
+			if ($global_facts[$fact]["details"] < $gm_user->getUserAccessLevel()) return false;
 		}
 	}
 		
 	//-- check the person facts array
 	if (isset($person_facts[$pid][$fact]["details"])) {
-			if ($person_facts[$pid][$fact]["details"] < $Users->getUserAccessLevel($username)) return false;
+			if ($person_facts[$pid][$fact]["details"] < $gm_user->getUserAccessLevel()) return false;
 	}
 	return true;
 }
@@ -857,7 +853,7 @@ function showFactDetails($fact, $pid) {
  * @return string the privatized gedcom record
  */
 function privatize_gedcom($gedrec) {
-	global $gm_lang, $GEDCOM, $gm_username, $Users;
+	global $gm_lang, $GEDCOM, $gm_username, $gm_user;
 	$gt = preg_match("/0 @(.+)@ (.+)/", $gedrec, $gmatch);
 	if ($gt > 0) {
 		$gid = trim($gmatch[1]);
@@ -926,7 +922,6 @@ function privatize_gedcom($gedrec) {
 			$newrec = "0 @".$gid."@ $type\r\n";
 			//-- check all of the sub facts for access
 			$subs = GetAllSubrecords($gedrec, "", false, false, false);
-			$user = $Users->getUser($gm_username);
 			foreach($subs as $indexval => $sub) {
 				$ft = preg_match("/1\s(\w+)(.*)/", $sub, $match);
 				$fact = $match[1];
@@ -959,24 +954,24 @@ function privatize_gedcom($gedrec) {
  * @return int		Allowed or not allowed
  */
 function FactEditRestricted($pid, $factrec, $level=2) {
-	global $GEDCOM, $gm_username, $PRIVACY_BY_RESN, $Users;
+	global $GEDCOM, $gm_username, $PRIVACY_BY_RESN, $gm_user;
 	
 	$ct = preg_match("/$level RESN (.*)/", $factrec, $match);
 	if ($ct == 0) return false;
 	if ($level == 1 && !$PRIVACY_BY_RESN) return false;
-	$user = $Users->getUser($gm_username);
+	$user =& User::GetInstance($gm_username);
 	$myindi = "";
 	if (isset($user->gedcomid[$GEDCOM])) trim($myindi = $user->gedcomid[$GEDCOM]);
 	if ($ct > 0) {
 		$match[1] = strtolower(trim($match[1]));
 		if ($match[1] == "none") return false;
-		if ((($match[1] == "confidential") || ($match[1] == "locked")) && (($Users->userIsAdmin($gm_username)) || ($Users->userGedcomAdmin($gm_username)))) return false;
-		if (($match[1] == "privacy") && (($Users->userIsAdmin($gm_username)) || ($myindi == $pid) || ($Users->userGedcomAdmin($gm_username)))) return false;
+		if ((($match[1] == "confidential") || ($match[1] == "locked")) && (($gm_user->userIsAdmin()) || ($gm_user->userGedcomAdmin()))) return false;
+		if (($match[1] == "privacy") && (($gm_user->userIsAdmin()) || ($myindi == $pid) || ($gm_user->userGedcomAdmin()))) return false;
 		if (IDType($pid) == "FAM"){
 			$famrec = FindFamilyRecord($pid);
 			$parents = FindParentsInRecord($famrec);
-			if (($match[1] == "privacy") && (($Users->userIsAdmin($gm_username)) || ($myindi == $parents["HUSB"]) || ($Users->userGedcomAdmin($gm_username)))) return false;
-			if (($match[1] == "privacy") && (($Users->userIsAdmin($gm_username)) || ($myindi == $parents["WIFE"]) || ($Users->userGedcomAdmin($gm_username)))) return false;
+			if (($match[1] == "privacy") && (($gm_user->userIsAdmin()) || ($myindi == $parents["HUSB"]) || ($gm_user->userGedcomAdmin()))) return false;
+			if (($match[1] == "privacy") && (($gm_user->userIsAdmin()) || ($myindi == $parents["WIFE"]) || ($gm_user->userGedcomAdmin()))) return false;
 		}
 	}
 	return true;
@@ -991,25 +986,24 @@ function FactEditRestricted($pid, $factrec, $level=2) {
  * @return int		Allowed or not allowed
  */
 function FactViewRestricted($pid, $factrec, $level=2) {
-	global $GEDCOM, $gm_username, $PRIVACY_BY_RESN, $Users;
+	global $GEDCOM, $gm_username, $PRIVACY_BY_RESN, $gm_user;
 	
 	$ct = preg_match("/$level RESN (.*)/", $factrec, $match);
 	if ($ct == 0) return false;
 	if ($level == 1 && !$PRIVACY_BY_RESN) return false;
-	$user = $Users->getUser($gm_username);
 	$myindi = "";
-	if (isset($user->gedcomid[$GEDCOM])) $myindi = trim($user->gedcomid[$GEDCOM]);
+	if (isset($gm_user->gedcomid[$GEDCOM])) $myindi = trim($gm_user->gedcomid[$GEDCOM]);
 	$pid = trim($pid);
 	if ($ct > 0) {
 		$match[1] = strtolower(trim($match[1]));
 		if ($match[1] == "none") return false;
 		if ($match[1] == "locked") return false;
-		if (($match[1] == "confidential") && (($Users->userIsAdmin($gm_username)) || ($Users->userGedcomAdmin($gm_username)))) return false;
-		if (($match[1] == "privacy") && (($Users->userIsAdmin($gm_username)) || ($myindi == $pid) || ($Users->userGedcomAdmin($gm_username)))) return false;
+		if (($match[1] == "confidential") && (($gm_user->userIsAdmin()) || ($gm_user->userGedcomAdmin()))) return false;
+		if (($match[1] == "privacy") && (($gm_user->userIsAdmin()) || ($myindi == $pid) || ($gm_user->userGedcomAdmin()))) return false;
 		if (IDType($pid) == "FAM"){
 			$family =& Family::GetInstance($pid); 
-			if (($match[1] == "privacy") && (($Users->userIsAdmin($gm_username)) || ($myindi == $family->wifeid) || ($Users->userGedcomAdmin($gm_username)))) return false;
-			if (($match[1] == "privacy") && (($Users->userIsAdmin($gm_username)) || ($myindi == $family->husbid) || ($Users->userGedcomAdmin($gm_username)))) return false;
+			if (($match[1] == "privacy") && (($gm_user->userIsAdmin()) || ($myindi == $family->wifeid) || ($gm_user->userGedcomAdmin()))) return false;
+			if (($match[1] == "privacy") && (($gm_user->userIsAdmin()) || ($myindi == $family->husbid) || ($gm_user->userGedcomAdmin()))) return false;
 		}
 	}
 	return true;
@@ -1067,7 +1061,7 @@ if (!function_exists("GetIDAccessLevel")) {
 	function GetIDAccessLevel($pid, $type = "INDI", $recursive=0, $checklinks=false) {
 		global $PRIV_PUBLIC, $PRIV_USER, $PRIV_NONE, $PRIV_HIDE, $USE_RELATIONSHIP_PRIVACY, $CHECK_MARRIAGE_RELATIONS, $MAX_RELATION_PATH_LENGTH, $gm_username, $COMBIKEY, $GEDCOMID;
 		global $global_facts, $person_privacy, $user_privacy, $HIDE_LIVE_PEOPLE, $GEDCOM, $SHOW_DEAD_PEOPLE, $MAX_ALIVE_AGE, $PRIVACY_BY_YEAR;
-		global $PRIVACY_CHECKS, $PRIVACY_BY_RESN, $SHOW_SOURCES, $SHOW_LIVING_NAMES, $LINK_PRIVACY, $Users;
+		global $PRIVACY_CHECKS, $PRIVACY_BY_RESN, $SHOW_SOURCES, $SHOW_LIVING_NAMES, $LINK_PRIVACY, $gm_user;
 //		static $pcache;
 		
 		//print "Check ".$pid." type ".$type." recursive ".$recursive." checklinks ".$checklinks."<br />";
@@ -1075,7 +1069,7 @@ if (!function_exists("GetIDAccessLevel")) {
 //		if (!isset($pcache)) $pcache = array();
 //		if (isset($pcache[$GEDCOMID][$type][$recursive][$checklinks][$pid])) return $pcache[$GEDCOMID][$type][$recursive][$checklinks][$pid];
 //		$username = $gm_username;
-//		$ulevel = $Users->getUserAccessLevel($gm_username);
+//		$ulevel = $gm_user->ggetUserAccessLevel();
 
 		if (empty($pid)) return true;
 		if (empty($type)) $type = "INDI";
@@ -1131,7 +1125,7 @@ if (!function_exists("GetIDAccessLevel")) {
 			// Check privacy by isdead status
 			if ($type == "INDI") {
 				$isdead = IsDeadId($pid);
-				$user = $Users->getUser($username);
+				$user =& User::GetInstance($username);
 				// The person is still hidden at this point and cannot be shown, either dead or alive.
 				// Check the relation privacy. If within the range, people can be shown. 
 				if ($USE_RELATIONSHIP_PRIVACY) {

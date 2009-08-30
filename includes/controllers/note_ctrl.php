@@ -43,7 +43,7 @@ class NoteController extends DetailController {
 	 */
 	public function __construct() {
 		global $GEDCOMID;
-		global $ENABLE_CLIPPINGS_CART, $Users, $show_changes, $nonfacts;
+		global $ENABLE_CLIPPINGS_CART, $show_changes, $nonfacts;
 		
 		parent::__construct();
 
@@ -94,7 +94,7 @@ class NoteController extends DetailController {
 	 * @return Menu
 	 */
 	public function &getEditMenu() {
-		global $TEXT_DIRECTION, $gm_lang, $Users, $show_changes;
+		global $TEXT_DIRECTION, $gm_lang, $gm_user, $show_changes;
 		
 		if ($TEXT_DIRECTION=="rtl") $ff="_rtl";
 		else $ff="";
@@ -104,7 +104,7 @@ class NoteController extends DetailController {
 
 		if (!$this->note->isdeleted) {
 			// edit note / edit_raw
-			if ($Users->userCanEditGedlines()) {
+			if ($gm_user->userCanEditGedlines()) {
 				$submenu = new Menu($gm_lang['edit_raw']);
 				$submenu->addLink("edit_raw('".$this->xref."', 'edit_raw');");
 				$menu->addSubmenu($submenu);
@@ -137,14 +137,14 @@ class NoteController extends DetailController {
 	 */
 	public function &getOtherMenu() {
 		global $TEXT_DIRECTION, $GEDCOMID, $gm_lang;
-		global $ENABLE_CLIPPINGS_CART, $Users;
+		global $ENABLE_CLIPPINGS_CART, $gm_user;
 		
 		if ($TEXT_DIRECTION=="rtl") $ff="_rtl";
 		else $ff="";
 		
 		// other menu
 		$menu = new Menu($gm_lang['other']);
-		if ($Users->userCanViewGedlines()) {
+		if ($gm_user->userCanViewGedlines()) {
 				// other / view_gedcom
 				if ($this->show_changes) $execute = "show_gedcom_record('new');";
 				else $execute = "show_gedcom_record();";
@@ -152,7 +152,7 @@ class NoteController extends DetailController {
 				$submenu->addLink($execute);
 				$menu->addSubmenu($submenu);
 		}
-		if ($ENABLE_CLIPPINGS_CART >= $Users->getUserAccessLevel()) {
+		if ($ENABLE_CLIPPINGS_CART >= $gm_user->getUserAccessLevel()) {
 				// other / add_to_cart
 				$submenu = new Menu($gm_lang['add_to_cart']);
 				$submenu->addLink('clippings.php?action=add&id='.$this->xref.'&type=note');
@@ -266,7 +266,7 @@ class NoteController extends DetailController {
 	 * @param string $pid		The gedcom XREF id for the level 0 record that this note is a part of
 	 */
 	protected function PrintGeneralNote($styleadd="", $mayedit=true) {
-		global $gm_lang, $gm_username, $Users;
+		global $gm_lang, $gm_username;
 		global $view, $show_changes;
 		global $WORD_WRAPPED_NOTES, $GM_IMAGE_DIR;
 		global $GM_IMAGES;

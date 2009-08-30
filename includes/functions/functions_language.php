@@ -683,7 +683,7 @@ function DeactivateLanguage($lang) {
  ** else return true or false
  */
 function LanguageInUse($lang="") {
-	global $GEDCOMS, $GEDCOMLANG, $Users;
+	global $GEDCOMS, $GEDCOMLANG;
 	static $configuredlanguages, $inuse;
 	
 	if (!isset($configuredlanguages)) {
@@ -700,7 +700,7 @@ function LanguageInUse($lang="") {
 		SwitchGedcom();
 		
 		// Read user configuration and collect language data
-		$users = $Users->GetUsers("username","asc");
+		$users = UserController::GetUsers("username","asc");
 		foreach($users as $username=>$user) {
 			if (!isset($configuredlanguages["users"][$user->language][$username])) $configuredlanguages["users"][$user->language][$username] = TRUE;
 			$inuse[$user->language] = true;

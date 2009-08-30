@@ -53,8 +53,7 @@ print_header($gm_lang["merge_records"]);
 $can_auto_accept = true;
 
 //-- make sure they have accept access privileges
-$uname = $gm_username;
-if (!$Users->userCanAccept($uname)) {
+if (!$gm_user->userCanAccept()) {
 	print "<span class=\"error\">".$gm_lang["access_denied"]."</span>";
 	print_footer();
 	exit;
@@ -281,7 +280,7 @@ if ($action!="choose") {
 
 					// Now update all links in other records from ged2 to ged1
 					ReplaceLinks($gid2, $gid1, $mtype, $change_id, $change_type, $ged);
-					if (isset($change_id) && $can_auto_accept &&  $Users->userAutoAccept()) {
+					if (isset($change_id) && $can_auto_accept &&  $gm_user->userAutoAccept()) {
 						AcceptChange($change_id, $GEDCOMID);
 						print $gm_lang["merge_success_auto"];
 					}
@@ -409,7 +408,7 @@ if ($action=="choose") {
 				if (!isset($ged) || empty($ged)) $ged = $GEDCOMID;
 				foreach($GEDCOMS as $gedc=>$gedarray) {
 					$gedid = $gedarray["id"];
-					if ($Users->userGedcomAdmin($gm_username, $gedc)) {
+					if ($gm_user->userGedcomAdmin($gedc)) {
 						print "<option value=\"$gedid\"";
 						if ($ged == $gedid) print " selected=\"selected\"";
 						print ">".$gedarray["title"]."</option>\n";

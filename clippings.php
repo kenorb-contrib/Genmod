@@ -34,7 +34,7 @@ require("config.php");
 
 if (!isset($ENABLE_CLIPPINGS_CART)) $ENABLE_CLIPPINGS_CART = $PRIV_HIDE;
 if ($ENABLE_CLIPPINGS_CART===true) $ENABLE_CLIPPING_CART=$PRIV_PUBLIC;
-if ($ENABLE_CLIPPINGS_CART < $Users->getUserAccessLevel())
+if ($ENABLE_CLIPPINGS_CART < $gm_user->getUserAccessLevel())
 {
   header("Location: index.php");
   exit;
@@ -76,7 +76,7 @@ function id_in_cart($id) {
 }
 
 function add_clipping($clipping) {
-	global $cart, $gm_lang, $SHOW_SOURCES, $Users, $GEDCOMID;
+	global $cart, $gm_lang, $SHOW_SOURCES, $GEDCOMID;
 	
 	if (($clipping['id']==false)||($clipping['id']=="")) return false;
 
@@ -519,7 +519,7 @@ else if($action=='download') {
 		else $filetext .= trim($record)."\r\n";
 	}
 	$filetext .= "0 @SGM1@ SOUR\r\n";
-	$tuser = $Users->getUser($CONTACT_EMAIL);
+	$tuser =& User::GetInstance($CONTACT_EMAIL);
 	if ($tuser) {
 		$filetext .= "1 AUTH ".$tuser->firstname." ".$tuser->lastname."\r\n";
 	}

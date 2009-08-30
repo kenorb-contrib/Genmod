@@ -51,7 +51,6 @@ class FamilyController extends DetailController
 			$gm_lang,
 			$CONTACT_EMAIL,
 			$ENABLE_CLIPPINGS_CART,
-			$Users,
 			$SHOW_ID_NUMBERS,
 			$Favorites,
 			$nonfacts,
@@ -148,7 +147,7 @@ class FamilyController extends DetailController
 	 * get the family page edit menu
 	 */
 	public function &getEditMenu() {
-		global $TEXT_DIRECTION, $GEDCOM, $gm_lang, $Users;
+		global $TEXT_DIRECTION, $GEDCOM, $gm_lang, $gm_user;
 		if ($TEXT_DIRECTION=="rtl") $ff="_rtl";
 		else $ff="";
 		
@@ -188,7 +187,7 @@ class FamilyController extends DetailController
 			}
 
 			// edit_fam / edit_raw
-			if ($Users->userCanEditGedlines()) {
+			if ($gm_user->userCanEditGedlines()) {
 				$submenu = new Menu($gm_lang['edit_raw']);
 				$submenu->addLink("edit_raw('".$this->family->xref."', 'edit_raw');");
 				$menu->addSubmenu($submenu);
@@ -218,14 +217,14 @@ class FamilyController extends DetailController
 	 */
 	public function &getOtherMenu() {
 		global $TEXT_DIRECTION, $gm_lang;
-		global $ENABLE_CLIPPINGS_CART, $Users;
+		global $ENABLE_CLIPPINGS_CART, $gm_user;
 		
 		if ($TEXT_DIRECTION=="rtl") $ff="_rtl";
 		else $ff="";
 		
 		// other menu
 		$menu = new Menu($gm_lang['other']);
-		if ($Users->userCanViewGedlines()) {
+		if ($gm_user->userCanViewGedlines()) {
 				// other / view_gedcom
 				if ($this->show_changes) $execute = "show_gedcom_record('new');";
 				else $execute = "show_gedcom_record();";
@@ -233,7 +232,7 @@ class FamilyController extends DetailController
 				$submenu->addLink($execute);
 				$menu->addSubmenu($submenu);
 		}
-		if ($ENABLE_CLIPPINGS_CART >= $Users->getUserAccessLevel()) {
+		if ($ENABLE_CLIPPINGS_CART >= $gm_user->getUserAccessLevel()) {
 				// other / add_to_cart
 				$submenu = new Menu($gm_lang['add_to_cart']);
 				$submenu->addLink('clippings.php?action=add&id='.$this->family->xref.'&type=fam');

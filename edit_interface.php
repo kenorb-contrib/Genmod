@@ -275,10 +275,10 @@ if ($action == "edit" || $action == "editraw") {
 	}
 }
 // TODO edit submitter from other than $GEDCOM
-if ((!$Users->userCanEdit($gm_username))||(!$disp)||(!$ALLOW_EDIT_GEDCOM) || (!$Users->userCanEditGedlines() && $action == "editraw")) {
+if ((!$gm_user->userCanEdit())||(!$disp)||(!$ALLOW_EDIT_GEDCOM) || (!$gm_user->userCanEditGedlines() && $action == "editraw")) {
 	print $gm_lang["access_denied"];
 	//-- display messages as to why the editing access was denied
-	if (!$Users->userCanEdit($gm_username)) print "<br />".$gm_lang["user_cannot_edit"];
+	if (!$gm_user->userCanEdit()) print "<br />".$gm_lang["user_cannot_edit"];
 	else if (!$ALLOW_EDIT_GEDCOM) print "<br />".$gm_lang["gedcom_editing_disabled"];
 	else if (!$disp) {
 		print "<br />".$gm_lang["privacy_prevented_editing"];
@@ -348,7 +348,7 @@ switch ($action) {
 		print "<table class=\"facts_table\">";
 		SubmitterRecord(0, $record);
 		print "</table>";
-		if ($Users->UserCanAccept($gm_username) && !$Users->userAutoAccept($gm_username)) print "<br /><input name=\"aa_attempt\" type=\"checkbox\" value=\"1\" />".$gm_lang["attempt_auto_acc"]."<br />\n";
+		if ($gm_user->UserCanAccept() && !$gm_user->userAutoAccept()) print "<br /><input name=\"aa_attempt\" type=\"checkbox\" value=\"1\" />".$gm_lang["attempt_auto_acc"]."<br />\n";
 		print "<br /><input type=\"submit\" value=\"".$gm_lang["save"]."\" /><br />\n";
 		print "</form>\n";
 		$disp = true;
@@ -1299,7 +1299,7 @@ switch ($action) {
 				}
 				print"</td></tr>";
 			}
-			if ($Users->UserCanAccept($gm_username) && !$Users->userAutoAccept($gm_username)) print "<tr><td class=\"shade1\" colspan=\"2\"><input name=\"aa_attempt\" type=\"checkbox\" value=\"1\" />".$gm_lang["attempt_auto_acc"]."</td></tr>";
+			if ($gm_user->UserCanAccept() && !$gm_user->userAutoAccept()) print "<tr><td class=\"shade1\" colspan=\"2\"><input name=\"aa_attempt\" type=\"checkbox\" value=\"1\" />".$gm_lang["attempt_auto_acc"]."</td></tr>";
 			print "<tr><td class=\"topbottombar\" colspan=\"2\">";
 			print "<input type=\"submit\" value=\"".$gm_lang["add"]."\" /></td></tr>\n";
 			print "</table>";
@@ -1619,7 +1619,7 @@ switch ($action) {
 			PrintPedi("PEDI", "", $showbio);
 			print "</td></tr>";
 		}
-		if ($Users->UserCanAccept($gm_username) && !$Users->userAutoAccept($gm_username)) print "<tr><td class=\"shade1\" colspan=\"2\"><input name=\"aa_attempt\" type=\"checkbox\" value=\"1\" />".$gm_lang["attempt_auto_acc"]."</td></tr>";
+		if ($gm_user->UserCanAccept() && !$gm_user->userAutoAccept()) print "<tr><td class=\"shade1\" colspan=\"2\"><input name=\"aa_attempt\" type=\"checkbox\" value=\"1\" />".$gm_lang["attempt_auto_acc"]."</td></tr>";
 		print "\n<tr><td class=\"topbottombar\" colspan=\"2\">";
 		print "<input type=\"submit\" value=\"".$gm_lang["add"]."\" />\n";
 		print "\n</td></tr>";
@@ -1680,7 +1680,7 @@ switch ($action) {
 			PrintPedi("PEDI");
 			print "</td></tr>";
 		}
-		if ($Users->UserCanAccept($gm_username) && !$Users->userAutoAccept($gm_username)) print "<tr><td class=\"shade1\" colspan=\"2\"><input name=\"aa_attempt\" type=\"checkbox\" value=\"1\" />".$gm_lang["attempt_auto_acc"]."</td></tr>";
+		if ($gm_user->UserCanAccept() && !$gm_user->userAutoAccept()) print "<tr><td class=\"shade1\" colspan=\"2\"><input name=\"aa_attempt\" type=\"checkbox\" value=\"1\" />".$gm_lang["attempt_auto_acc"]."</td></tr>";
 		print "\n<tr><td class=\"topbottombar\" colspan=\"2\">";
 		print "<input type=\"submit\" id=\"submit\" value=\"".$gm_lang["set_link"]."\" />\n";
 		print "\n</td></tr>";
@@ -1941,7 +1941,7 @@ switch ($action) {
 		// 1 NOTE
 		PrintAddLayer("NOTE", 1);
 		PrintAddLayer("GNOTE", 1);
-		if ($Users->UserCanAccept($gm_username) && !$Users->userAutoAccept($gm_username)) print "<br /><input name=\"aa_attempt\" type=\"checkbox\" value=\"1\" />".$gm_lang["attempt_auto_acc"]."<br />";
+		if ($gm_user->UserCanAccept() && !$gm_user->userAutoAccept()) print "<br /><input name=\"aa_attempt\" type=\"checkbox\" value=\"1\" />".$gm_lang["attempt_auto_acc"]."<br />";
 		print "<br /><input class=\"center\" type=\"submit\" value=\"".$gm_lang["create_source"]."\" /><br />";
 		print "</form>";
 		print "\n<script type=\"text/javascript\">\n<!--\ndocument.getElementById(\"".$element_id."\").focus();\n//-->\n</script>";
@@ -2002,7 +2002,7 @@ switch ($action) {
 				<?php $tabkey++; ?>
 				<tr><td class="shade2"><?php print GM_FACT_WWW; ?></td>
 				<td class="shade1"><input tabindex="<?php print $tabkey; ?>" type="text" name="WWW" id="WWW" value="" size="40" maxlength="255" /> </td></tr>
-				<?php if ($Users->UserCanAccept($gm_username) && !$Users->userAutoAccept($gm_username)) {?>
+				<?php if ($gm_user->UserCanAccept() && !$gm_user->userAutoAccept()) {?>
 					<tr><td class="shade1" colspan="2"><input name="aa_attempt" type="checkbox" value="1" /><?php print $gm_lang["attempt_auto_acc"]?></td></tr>
 				<?php } ?>
 			<tr><td class="topbottombar" colspan="2">
@@ -2073,7 +2073,7 @@ switch ($action) {
 		AddSimpleTag("1 RESN");
 		print "</table>";
 		print PrintAddLayer("SOUR", 1);
-		if ($Users->UserCanAccept($gm_username) && !$Users->userAutoAccept($gm_username)) print "<br /><input name=\"aa_attempt\" type=\"checkbox\" value=\"1\" />".$gm_lang["attempt_auto_acc"]."<br />";
+		if ($gm_user->UserCanAccept() && !$gm_user->userAutoAccept($gm_urname)) print "<br /><input name=\"aa_attempt\" type=\"checkbox\" value=\"1\" />".$gm_lang["attempt_auto_acc"]."<br />";
 		print "<br /><input class=\"center\" type=\"submit\" value=\"".$gm_lang["create_general_note"]."\" /><br />";
 		print "</form>";
 		print "\n<script type=\"text/javascript\">\n<!--\ndocument.getElementById(\"".$element_id."\").focus();\n//-->\n</script>";
@@ -2301,7 +2301,7 @@ switch ($action) {
 					PrintAddLayer("GNOTE");
 				}
 			}
-			if ($Users->UserCanAccept($gm_username) && !$Users->userAutoAccept($gm_username)) print "<br /><input name=\"aa_attempt\" type=\"checkbox\" value=\"1\" />".$gm_lang["attempt_auto_acc"]."<br />\n";
+			if ($gm_user->UserCanAccept() && !$gm_user->userAutoAccept()) print "<br /><input name=\"aa_attempt\" type=\"checkbox\" value=\"1\" />".$gm_lang["attempt_auto_acc"]."<br />\n";
 			print "<br /><input type=\"submit\" value=\"".$gm_lang["save"]."\" /><br />\n";
 			print "</form>\n";
 //		}
@@ -2328,7 +2328,7 @@ switch ($action) {
 			print "<input type=\"hidden\" name=\"change_type\" value=\"$change_type\" />\n";
 			LinkFunctions::PrintSpecialCharLink("newgedrec");
 			print "<textarea name=\"newgedrec\" id=\"newgedrec\" rows=\"20\" cols=\"82\" dir=\"ltr\">".$gedrec."</textarea>\n<br />";
-			if ($Users->UserCanAccept($gm_username) && !$Users->userAutoAccept($gm_username)) print "<br /><input name=\"aa_attempt\" type=\"checkbox\" value=\"1\" />".$gm_lang["attempt_auto_acc"]."<br />\n";
+			if ($gm_user->UserCanAccept() && !$gm_user->userAutoAccept()) print "<br /><input name=\"aa_attempt\" type=\"checkbox\" value=\"1\" />".$gm_lang["attempt_auto_acc"]."<br />\n";
 			print "<input type=\"submit\" value=\"".$gm_lang["save"]."\" /><br />\n";
 			print "</form>\n";
 		}
@@ -2402,7 +2402,7 @@ switch ($action) {
 		AddSimpleTag("0 TYPE", "MARR");
 		AddSimpleTag("0 DATE", "MARR");
 		AddSimpleTag("0 PLAC", "MARR");
-		if ($Users->UserCanAccept($gm_username) && !$Users->userAutoAccept($gm_username)) print "<tr><td class=\"shade1\" colspan=\"2\"><input name=\"aa_attempt\" type=\"checkbox\" value=\"1\" />".$gm_lang["attempt_auto_acc"]."</td></tr>";
+		if ($gm_user->UserCanAccept() && !$gm_user->userAutoAccept()) print "<tr><td class=\"shade1\" colspan=\"2\"><input name=\"aa_attempt\" type=\"checkbox\" value=\"1\" />".$gm_lang["attempt_auto_acc"]."</td></tr>";
 		print "<tr><td class=\"topbottombar\" colspan=\"2\">";
 		print "<input type=\"submit\" id=\"submit\" value=\"".$gm_lang["set_link"]."\" />\n";
 		print "</td></tr>";
@@ -2632,7 +2632,7 @@ switch ($action) {
 // if there were link errors, don't auto-accept and don't auto-close.
 if (!isset($link_error)) $link_error = false;
 
-if (isset($change_id) && $can_auto_accept && !$link_error && (($Users->UserCanAccept($gm_username) && $aa_attempt) || $Users->userAutoAccept())) {
+if (isset($change_id) && $can_auto_accept && !$link_error && (($gm_user->UserCanAccept() && $aa_attempt) || $gm_user->userAutoAccept())) {
 	AcceptChange($change_id, $GEDCOMID);
 }
 

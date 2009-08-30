@@ -33,7 +33,7 @@ $GM_BLOCKS["print_html_block"]["config"]      = array("html"=>$gm_lang["html_blo
 $GM_BLOCKS["print_html_block"]["rss"]			= false;
 
 function print_html_block($block=true, $config="", $side, $index) {
-	global $gm_lang, $GM_IMAGE_DIR, $TEXT_DIRECTION, $GM_IMAGES, $HTML_BLOCK_COUNT, $GM_BLOCKS, $command, $GEDCOM, $gm_username, $Users;
+	global $gm_lang, $GM_IMAGE_DIR, $TEXT_DIRECTION, $GM_IMAGES, $HTML_BLOCK_COUNT, $GM_BLOCKS, $command, $GEDCOM, $gm_username, $gm_user;
 
 	if (empty($config)) $config = $GM_BLOCKS["print_html_block"]["config"];
 	if ($config["only_show_logged_in"] != "no" && empty($gm_username)) return;
@@ -49,7 +49,7 @@ function print_html_block($block=true, $config="", $side, $index) {
 	if ($block) print "</div>\n";
 	if ($GM_BLOCKS["print_html_block"]["canconfig"]) {
 		$username = $gm_username;
-		if ((($command=="gedcom")&&($Users->userGedcomAdmin($username))) || (($command=="user")&&(!empty($username)))) {
+		if ((($command=="gedcom")&&($gm_user->userGedcomAdmin())) || (($command=="user")&&(!empty($username)))) {
 			if ($command=="gedcom") $name = preg_replace("/'/", "\'", $GEDCOM);
 			else $name = $username;
 			print "<br /><a href=\"javascript: ".$gm_lang["config_block"]."\" onclick=\"window.open('index_edit.php?name=$name&amp;command=$command&amp;action=configure&amp;side=$side&amp;index=$index', '', 'top=50,left=50,width=750,height=550,scrollbars=1,resizable=1'); return false;\">";

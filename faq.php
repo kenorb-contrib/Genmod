@@ -33,7 +33,7 @@ require("config.php");
 
 global $GM_IMAGES, $faqs;
 
-if ($Users->userGedcomAdmin($gm_username)) $canconfig = true;
+if ($gm_user->userGedcomAdmin()) $canconfig = true;
 else $canconfig = false;
 if (!isset($action)) $action = "show";
 if (!isset($adminedit) && $canconfig) $adminedit = true;

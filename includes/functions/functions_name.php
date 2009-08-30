@@ -72,10 +72,10 @@ function GetCommonSurnamesIndex($ged) {
  * @param int $min the number of times a surname must occur before it is added to the array
  */
 function GetCommonSurnames($min) {
-	global $TBLPREFIX, $GEDCOM, $indilist, $CONFIGURED, $GEDCOMS, $COMMON_NAMES_ADD, $COMMON_NAMES_REMOVE, $gm_lang, $HNN, $ANN, $Users;
+	global $TBLPREFIX, $GEDCOM, $indilist, $CONFIGURED, $GEDCOMS, $COMMON_NAMES_ADD, $COMMON_NAMES_REMOVE, $gm_lang, $HNN, $ANN;
 
 	$surnames = array();
-	if (!$CONFIGURED || !$Users->AdminUserExists() || (count($GEDCOMS)==0) || (!CheckForImport($GEDCOM))) return $surnames;
+	if (!$CONFIGURED || !UserController::AdminUserExists() || (count($GEDCOMS)==0) || (!CheckForImport($GEDCOM))) return $surnames;
 	//-- this line causes a bug where the common surnames list is not properly updated
 	// if ((!isset($indilist))||(!is_array($indilist))) return $surnames;
 	$surnames = GetTopSurnames(100);

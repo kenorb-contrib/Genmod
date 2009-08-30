@@ -48,7 +48,7 @@ require_once("includes/values/edit_data.php");
  * @return 	boolean	true if succeed/false if failed
  */
 function ReplaceGedrec($gid, $oldrec, $newrec, $fact="", $change_id, $change_type, $gedid="") {
-	global $GEDCOM, $manual_save, $GEDCOMS, $TBLPREFIX, $gm_username, $GEDCOMID, $chcache, $can_auto_accept, $DBCONN, $Users, $aa_attempt;
+	global $GEDCOM, $manual_save, $GEDCOMS, $TBLPREFIX, $gm_username, $GEDCOMID, $chcache, $can_auto_accept, $DBCONN, $aa_attempt;
 
 	// NOTE: Check if auto accept is possible. If there are already changes present for any ID in one $change_id, changes cannot be auto accepted.
 	if (!isset($can_auto_accept)) $can_auto_accept = true;
@@ -102,7 +102,7 @@ function ReplaceGedrec($gid, $oldrec, $newrec, $fact="", $change_id, $change_typ
 //-- this function will append a new gedcom record at
 //-- the end of the gedcom file.
 function AppendGedrec($newrec, $fact="", $change_id, $change_type, $gedid="") {
-	global $GEDCOM, $manual_save, $TBLPREFIX, $GEDCOMS, $gm_username, $GEDCOMID, $chcache, $DBCONN, $Users;
+	global $GEDCOM, $manual_save, $TBLPREFIX, $GEDCOMS, $gm_username, $GEDCOMID, $chcache, $DBCONN;
 
 	$newrec = preg_replace(array("/(\r\n)+/", "/\r+/", "/\n+/"), array("\r\n", "\r", "\n"), $newrec);
 	$newrec = stripslashes(trim($newrec));
@@ -129,7 +129,7 @@ function AppendGedrec($newrec, $fact="", $change_id, $change_type, $gedid="") {
 //-- this function will delete the gedcom record with
 //-- the given $gid
 function DeleteGedrec($gid, $change_id, $change_type) {
-	global $GEDCOMS, $GEDCOM, $manual_save, $TBLPREFIX, $gm_username, $GEDCOMID, $chcache, $can_auto_accept, $DBCONN, $Users, $aa_attempt;
+	global $GEDCOMS, $GEDCOM, $manual_save, $TBLPREFIX, $gm_username, $GEDCOMID, $chcache, $can_auto_accept, $DBCONN, $aa_attempt;
 	$gid = strtoupper($gid);
 	
 	// NOTE: Check if auto accept is possible. If there are already changes present for any ID in one $change_id, changes cannot be auto accepted.
@@ -270,7 +270,7 @@ function CheckGedcom($gedrec, $chan=true, $user="", $tstamp="") {
 function PrintIndiForm($nextaction, $famid, $linenum="", $namerec="", $famtag="CHIL") {
 	global $gm_lang, $pid, $GM_IMAGE_DIR, $GM_IMAGES, $monthtonum, $WORD_WRAPPED_NOTES;
 	global $NPFX_accept, $SPFX_accept, $NSFX_accept, $FILE_FORM_accept, $USE_RTL_FUNCTIONS, $change_type;
-	global $GEDCOM, $gm_username, $Users;
+	global $GEDCOM, $gm_username, $gm_user;
 
 	init_calendar_popup();
 	print "<form method=\"post\" name=\"addchildform\" action=\"edit_interface.php\">\n";
@@ -416,7 +416,7 @@ function PrintIndiForm($nextaction, $famid, $linenum="", $namerec="", $famtag="C
 		PrintAddLayer("NOTE", 1);
 		PrintAddLayer("GNOTE", 1);
 //		print "<input type=\"checkbox\" name=\"addsource\" />".$gm_lang["add_source_to_fact"]."<br />\n";
-		if ($Users->UserCanAccept($gm_username) && !$Users->userAutoAccept($gm_username)) print "<br /><input name=\"aa_attempt\" type=\"checkbox\" value=\"1\" />".$gm_lang["attempt_auto_acc"]."<br /><br />\n";
+		if ($gm_user->UserCanAccept() && !$gm_user->userAutoAccept()) print "<br /><input name=\"aa_attempt\" type=\"checkbox\" value=\"1\" />".$gm_lang["attempt_auto_acc"]."<br /><br />\n";
 		print "<input type=\"submit\" value=\"".$gm_lang["save"]."\" /><br />\n";
 	}
 	else {
@@ -464,7 +464,7 @@ function PrintIndiForm($nextaction, $famid, $linenum="", $namerec="", $famtag="C
 		PrintAddLayer("NOTE");
 		PrintAddLayer("GNOTE");
 //		print "<input type=\"submit\" value=\"".$gm_lang["save"]."\" /><br />\n";
-		if ($Users->UserCanAccept($gm_username) && !$Users->userAutoAccept($gm_username)) print "<br /><input name=\"aa_attempt\" type=\"checkbox\" value=\"1\" />".$gm_lang["attempt_auto_acc"]."<br /><br />\n";
+		if ($gm_user->UserCanAccept() && !$gm_user->userAutoAccept()) print "<br /><input name=\"aa_attempt\" type=\"checkbox\" value=\"1\" />".$gm_lang["attempt_auto_acc"]."<br /><br />\n";
 		print "<input type=\"button\" value=\"".$gm_lang["save"]."\" onclick=\"document.addchildform.submit(); return false;\"/><br />\n";
 	}
 	print "</form>\n";
@@ -1447,7 +1447,7 @@ function SubmitterRecord($level, $gedrec) {
 }
 function ShowMediaForm($pid, $action="newentry", $change_type="add_media") {
 	global $GEDCOM, $gm_lang, $TEXT_DIRECTION, $MEDIA_ID_PREFIX, $GEDCOMS, $WORD_WRAPPED_NOTES, $MediaFS, $MEDIA_DIRECTORY;
-	global $MEDIA_FACTS_ADD, $MEDIA_FACTS_UNIQUE, $Users, $gm_username;
+	global $MEDIA_FACTS_ADD, $MEDIA_FACTS_UNIQUE, $gm_user;
 	
 	$facts_add = explode(",", $MEDIA_FACTS_ADD);
 	$facts_unique = explode(",", $MEDIA_FACTS_UNIQUE);
@@ -1579,7 +1579,7 @@ function ShowMediaForm($pid, $action="newentry", $change_type="add_media") {
 		}
 	}
 		
-	if ($Users->UserCanAccept($gm_username) && !$Users->userAutoAccept($gm_username)) print "<tr><td class=\"shade1\" colspan=\"2\"><input name=\"aa_attempt\" type=\"checkbox\" value=\"1\" />".$gm_lang["attempt_auto_acc"]."</td></tr>";
+	if ($gm_user->UserCanAccept() && !$gm_user->userAutoAccept()) print "<tr><td class=\"shade1\" colspan=\"2\"><input name=\"aa_attempt\" type=\"checkbox\" value=\"1\" />".$gm_lang["attempt_auto_acc"]."</td></tr>";
 	print "<tr><td class=\"topbottombar\" colspan=\"2\"><input type=\"submit\" onclick=\"return check(document.newmedia.picture.value);\" value=\"".$gm_lang["add_media_button"]."\" /></td></tr>\n";
 	print "</table>\n";
 	print "</form>\n";

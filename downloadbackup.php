@@ -35,7 +35,7 @@ $legal = array_merge(array("zip", "ged"), $MEDIATYPE);
 $et = preg_match("/(\.\w+)$/", $fname, $ematch);
 if ($et>0) $ext = substr(trim($ematch[1]),1);
 else $ext = "";
-if (!in_array(strtolower($ext), $legal) || !$Users->userGedcomAdmin($gm_username) || empty($fname)) {
+if (!in_array(strtolower($ext), $legal) || !$gm_user->userGedcomAdmin() || empty($fname)) {
 	WriteToLog("DownloadBackup-> Illegal download attempt. File: ".$fname, "W", "S");
 	header("HTTP/1.1 403 Forbidden");
 	exit;

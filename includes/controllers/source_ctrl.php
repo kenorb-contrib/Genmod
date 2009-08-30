@@ -39,7 +39,7 @@ class SourceController extends DetailController {
 	 * constructor
 	 */
 	public function __construct() {
-		global $ENABLE_CLIPPINGS_CART, $Users, $nonfacts;
+		global $ENABLE_CLIPPINGS_CART, $nonfacts;
 		
 		parent::__construct();
 
@@ -89,7 +89,7 @@ class SourceController extends DetailController {
 	 * @return Menu
 	 */
 	public function &getEditMenu() {
-		global $TEXT_DIRECTION, $gm_lang, $Users;
+		global $TEXT_DIRECTION, $gm_lang, $gm_user;
 		
 		if ($TEXT_DIRECTION=="rtl") $ff="_rtl";
 		else $ff="";
@@ -98,7 +98,7 @@ class SourceController extends DetailController {
 		$menu = new Menu($gm_lang['edit_source']);
 		if (!$this->source->isdeleted) {
 			// edit source / edit_raw
-			if ($Users->userCanEditGedlines()) {
+			if ($gm_user->userCanEditGedlines()) {
 				$submenu = new Menu($gm_lang['edit_raw']);
 				$submenu->addLink("edit_raw('".$this->source->xref."', 'edit_raw');");
 				$menu->addSubmenu($submenu);
@@ -130,14 +130,14 @@ class SourceController extends DetailController {
 	 */
 	public function &getOtherMenu() {
 		global $TEXT_DIRECTION, $GEDCOMID, $gm_lang;
-		global $ENABLE_CLIPPINGS_CART, $Users;
+		global $ENABLE_CLIPPINGS_CART, $gm_user;
 		
 		if ($TEXT_DIRECTION=="rtl") $ff="_rtl";
 		else $ff="";
 		
 		// other menu
 		$menu = new Menu($gm_lang['other']);
-		if ($Users->userCanViewGedlines()) {
+		if ($gm_user->userCanViewGedlines()) {
 				// other / view_gedcom
 				if ($this->source->show_changes && $this->source->canedit) $execute = "show_gedcom_record('new');";
 				else $execute = "show_gedcom_record();";
@@ -145,7 +145,7 @@ class SourceController extends DetailController {
 				$submenu->addLink($execute);
 				$menu->addSubmenu($submenu);
 		}
-		if ($ENABLE_CLIPPINGS_CART >= $Users->getUserAccessLevel()) {
+		if ($ENABLE_CLIPPINGS_CART >= $gm_user->getUserAccessLevel()) {
 				// other / add_to_cart
 				$submenu = new Menu($gm_lang['add_to_cart']);
 				$submenu->addLink('clippings.php?action=add&id='.$this->source->xref.'&type=sour');

@@ -85,7 +85,6 @@ class Family extends GedcomRecord {
 	 * @param string $gedrec	the gedcom record
 	 */
 	public function __construct($id, $gedrec="", $gedcomid="") {
-		global $GEDCOM, $show_changes, $Users;
 		
 		parent::__construct($id, $gedrec, $gedcomid);
 		$this->exclude_facts = "";
@@ -172,6 +171,13 @@ class Family extends GedcomRecord {
 		}
 	}
 
+	public function ObjCount() {
+		$count = 0;
+		foreach(self::$familycache as $ged => $family) {
+			$count += count($family);
+		}
+		return $count;
+	}	
 	
 	/**
 	 * get the children

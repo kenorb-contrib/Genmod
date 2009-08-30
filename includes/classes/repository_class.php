@@ -74,6 +74,14 @@ class Repository extends GedcomRecord {
 		}
 	}
 		
+	public function ObjCount() {
+		$count = 0;
+		foreach(self::$repocache as $ged => $repo) {
+			$count += count($repo);
+		}
+		return $count;
+	}	
+	
 	/**
 	 * get the title of this repository record
 	 * Titles consist of the name, the additional name.
@@ -181,11 +189,11 @@ class Repository extends GedcomRecord {
 	}
 	
 	protected function GetLinksFromActions($status="") {
-		global $TBLPREFIX, $Users;
+		global $TBLPREFIX, $gm_user;
 
 		if(!is_null($this->actionlist)) return $this->actionlist;
 		$this->actionlist = array();
-		if ($Users->ShowActionLog()) { 
+		if ($gm_user->ShowActionLog()) { 
 			$sql = "SELECT * FROM ".$TBLPREFIX."actions WHERE a_gedfile='".$this->gedcomid."' AND a_repo='".$this->xref."'";
 			if ($status != "") $sql .= " AND a_status='".$status."'";
 			else $sql .= " ORDER BY a_status ASC";

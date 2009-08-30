@@ -421,7 +421,6 @@ if ($view!="preview") {
 	print "<td class=\"shade2 vmiddle\">";
 	print_help_link("annivers_year_select_help", "qm", "year");
 	print $gm_lang["year"]."</td>\n";
-	$username = $gm_username;
 	print "<td class=\"shade1 vmiddle\">";
 	if (strlen($year)<5){
 		if ($year<"AA") print " <a href=\"calendar.php?day=$day&amp;month=$month&amp;year=".($year-1)."&amp;action=".($action=="calendar"?"calendar":"year")."&amp;filterev=$filterev&amp;filterof=$filterof&amp;filtersx=$filtersx\" title=\"".($year-1)."\" >-1</a> ";
@@ -434,7 +433,7 @@ if ($view!="preview") {
 	print " <a href=\"calendar.php?day=$day&amp;month=$month&amp;year=".adodb_date("Y")."&amp;action=".($action=="calendar"?"calendar":"year")."&amp;filterev=$filterev&amp;filterof=$filterof&amp;filtersx=$filtersx\"><b>".strtolower(adodb_date("Y"))."</b></a> | ";
 
 	print "</td>\n ";
-	if ($HIDE_LIVE_PEOPLE >= $Users->GetUserAccessLevel($username)) {
+	if ($HIDE_LIVE_PEOPLE >= $gm_user->GetUserAccessLevel()) {
 		print "<td class=\"shade2 vmiddle\">";
 		print_help_link("annivers_show_help", "qm", "show");
 		print $gm_lang["show"].":&nbsp;</td>\n";
@@ -469,7 +468,7 @@ if ($view!="preview") {
 	}
 	
 
-	if ($HIDE_LIVE_PEOPLE >= $Users->GetUserAccessLevel($username)) {
+	if ($HIDE_LIVE_PEOPLE >= $gm_user->GetUserAccessLevel()) {
 		print "</td>\n ";
 		print "<td class=\"shade2 vmiddle\">";
 		print_help_link("annivers_sex_help", "qm", "sex");
@@ -510,13 +509,13 @@ if ($view!="preview") {
 		
 	}
 
-	if ($HIDE_LIVE_PEOPLE >= $Users->GetUserAccessLevel($username)) {
+	if ($HIDE_LIVE_PEOPLE >= $gm_user->GetUserAccessLevel()) {
 		print "</td>\n ";
 		print "<td class=\"shade2 vmiddle\">";
 		print_help_link("annivers_event_help", "qm", "showcal");
 		print $gm_lang["showcal"]."&nbsp;</td>\n";
 		print "<td class=\"shade1\"";
-		if ($HIDE_LIVE_PEOPLE >= $Users->GetUserAccessLevel($username)) print ">";
+		if ($HIDE_LIVE_PEOPLE >= $gm_user->GetUserAccessLevel()) print ">";
 		else print " colspan=\"3\">";
 		print "<input type=\"hidden\" name=\"filterev\" value=\"$filterev\" />";
 		print "<select class=\"list_value\" name=\"filterev\" onchange=\"document.dateform.submit();\">\n";

@@ -34,7 +34,7 @@ $GM_BLOCKS["print_gedcom_favorites"]["rss"]				= false;
 //-- print gedcom favorites
 function print_gedcom_favorites($block = true, $config="", $side, $index) {
 	global $gm_lang, $GM_IMAGE_DIR, $GM_IMAGES, $command, $sourcelist, $TEXT_DIRECTION, $gm_username, $GEDCOMID;
-	global $Users, $Favorites;
+	global $gm_user, $Favorites;
 	
 	$userfavs = $Favorites->getGedcomFavorites($GEDCOMID);
 	if (!is_array($userfavs)) $userfavs = array();
@@ -46,7 +46,7 @@ function print_gedcom_favorites($block = true, $config="", $side, $index) {
 	print "<div class=\"blockcontent\">";
 	if ($block) print "<div class=\"small_inner_block\">\n";
 	if (count($userfavs)==0) {
-		if ($Users->userGedcomAdmin($gm_username)) print_text("no_favorites");
+		if ($gm_user->userGedcomAdmin()) print_text("no_favorites");
 		else print_text("no_gedcom_favorites");
 	}
 	else {
@@ -54,7 +54,7 @@ function print_gedcom_favorites($block = true, $config="", $side, $index) {
 		else $style = 2;
 		PrintBlockFavorites($userfavs, $side, $index, $style);
 	}
-	if ($Users->userGedcomAdmin($gm_username)) { 
+	if ($gm_user->userGedcomAdmin()) { 
 		PrintBlockAddFavorite($command, "gedcom");
 	}
 	if ($block) print "</div>\n";

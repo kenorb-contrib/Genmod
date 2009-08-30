@@ -33,7 +33,7 @@
  */
 require "config.php";
 
-if (!$Users->userGedcomAdmin($gm_username)) {
+if (!$gm_user->userGedcomAdmin()) {
 	if (empty($LOGIN_URL)) header("Location: login.php?url=admin.php");
 	else header("Location: ".$LOGIN_URL."?url=admin.php");
 	exit;
@@ -56,7 +56,7 @@ function reload() {
 <?php
 
 $err_write = FileIsWriteable("config.php");
-$users = $Users->GetUsers();
+$users = UserController::GetUsers();
 
 $verify_msg = false;		// Users to be verified by admin
 $emergency_msg = false;		// Emergency logfile exists
@@ -113,7 +113,7 @@ if (file_exists($INDEX_DIRECTORY."emergency_syslog.txt")) {
      	<div class="admin_topbottombar">Messages</div>
           <div class="admin_genmod_content">
           <?php
-          if ($Users->userIsAdmin($gm_username)) {
+          if ($gm_user->userIsAdmin()) {
                if ($err_write) {
                     print "<div class=\"error admin_genmod_content\">";
                     print $gm_lang["config_still_writable"];
@@ -205,7 +205,7 @@ if (file_exists($INDEX_DIRECTORY."emergency_syslog.txt")) {
 		</div>
 	<?php } ?>
 	
-	<?php if ($Users->userIsAdmin($gm_username)) { ?>
+	<?php if ($gm_user->userIsAdmin()) { ?>
 		<div class="admin_topbottombar" style="margin-top: 1em;"><?php print $gm_lang["admin_site"]; ?></div>
 		<div class="admin_item_box">
 			<div class="admin_item_left"><div class="helpicon"><?php print_help_link("help_editconfig.php", "qm"); ?></div><div class="description"><a href="editconfig.php"><?php print $gm_lang["configuration"];?></a></div></div>

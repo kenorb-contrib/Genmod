@@ -50,10 +50,10 @@ class SearchHelp {
 	}
 	
 	function CheckAccess($gm_username) {
-		global $Users;
+		global $gm_user;
 		
 		// If no admin, always search in user help
-		if (!$Users->UserGedcomAdmin($gm_username)) $this->searchuser = "yes";
+		if (!$gm_user->UserGedcomAdmin()) $this->searchuser = "yes";
 	}
 	
 	function AddHeader(&$gm_lang) {

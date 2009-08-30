@@ -51,7 +51,7 @@ $GM_BLOCKS["print_gedcom_stats"]["rss"]			= true;
 
 function print_gedcom_stats($block = true, $config="", $side, $index) {
 		global $GM_BLOCKS, $gm_lang, $GEDCOM, $GEDCOMS, $ALLOW_CHANGE_GEDCOM, $command, $COMMON_NAMES_THRESHOLD, $GM_IMAGE_DIR, $GM_IMAGES;
-		global $top10_block_present, $TBLPREFIX, $monthtonum, $gm_username, $Users;		// Set in index.php
+		global $top10_block_present, $TBLPREFIX, $monthtonum, $gm_username, $gm_user;		// Set in index.php
 
 		if (empty($config)) $config = $GM_BLOCKS["print_gedcom_stats"]["config"];
 		if (!isset($config['stat_indi'])) $config = $GM_BLOCKS["print_gedcom_stats"]["config"];
@@ -61,7 +61,7 @@ function print_gedcom_stats($block = true, $config="", $side, $index) {
 		print_help_link("index_stats_help", "qm", "gedcom_stats");
 		if ($GM_BLOCKS["print_gedcom_stats"]["canconfig"]) {
 			$username = $gm_username;
-			if ((($command=="gedcom")&&($Users->userGedcomAdmin($username))) || (($command=="user")&&(!empty($username)))) {
+			if ((($command=="gedcom")&&($gm_user->userGedcomAdmin())) || (($command=="user")&&(!empty($username)))) {
 				if ($command=="gedcom") $name = preg_replace("/'/", "\'", $GEDCOM);
 				else $name = $username;
 				print "<a href=\"javascript: ".$gm_lang["config_block"]."\" onclick=\"window.open('index_edit.php?name=$name&amp;command=$command&amp;action=configure&amp;side=$side&amp;index=$index', '', 'top=50,left=50,width=600,height=350,scrollbars=1,resizable=1'); return false;\">";
@@ -88,7 +88,7 @@ function print_gedcom_stats($block = true, $config="", $side, $index) {
 		if ($config["stat_events"]=="yes") {
 			print "<tr><td>".$gm_lang["stat_events"]." </td><td class=\"rtl\"><b>&nbsp;".$stats["gs_nr_events"]."</b></td></tr>";
 		}
-		if ($config["stat_users"]=="yes") print "<tr><td>".$gm_lang["stat_users"]." </td><td class=\"rtl\"><b>&nbsp;".$Users->CountUsers()."</b></td></tr>";
+		if ($config["stat_users"]=="yes") print "<tr><td>".$gm_lang["stat_users"]." </td><td class=\"rtl\"><b>&nbsp;".UserController::CountUsers()."</b></td></tr>";
 		print "</table></td><td><br /></td><td valign=\"top\">";
 		print "<table cellspacing=\"0\" cellpadding=\"1\" border=\"0\">";
 		if ($config["stat_first_birth"]=="yes" && !empty($stats["gs_earliest_birth_gid"])) {

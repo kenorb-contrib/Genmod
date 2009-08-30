@@ -68,7 +68,7 @@ class PrivacyObject {
 	}
 	
 	function GetPrivacy($gedcomid="", $user_override) {
-		global $TBLPREFIX, $GEDCOMS, $DBCONN, $gm_username, $Users;
+		global $TBLPREFIX, $GEDCOMS, $DBCONN, $gm_username, $gm_user;
 		
 		if (!$DBCONN->connected) return false;
 		
@@ -150,18 +150,17 @@ class PrivacyObject {
 		}
 		if ($user_override && !empty($gm_username)) {
 			$ged = get_gedcom_from_id($gedcomid);
-			$us = $Users->GetUser($gm_username);
-			if (isset($us->relationship_privacy[$ged]) && !empty($us->relationship_privacy[$ged])) {
+			if (isset($gm_user->relationship_privacy[$ged]) && !empty($gm_user->relationship_privacy[$ged])) {
 				$this->USE_RELATIONSHIP_PRIVACY = ($us->relationship_privacy[$ged] == "Y" ? true : false);
 			}
-			if (isset($us->max_relation_path_length[$ged]) && $us->max_relation_path_length[$ged] > 0) {
+			if (isset($gm_user->max_relation_path_length[$ged]) && $gm_user->max_relation_path_length[$ged] > 0) {
 				$this->MAX_RELATION_PATH_LENGTH = $us->relationship_privacy[$ged];
 			}
-			if (isset($us->hide_live_people[$ged]) && !empty($us->hide_live_people[$ged])) {
+			if (isset($gm_user->hide_live_people[$ged]) && !empty($gm_user->hide_live_people[$ged])) {
 				// If yes, give HIDE_LIVE_PEOPLE the lowest possible value. This will always hide them to any user with this override, no matter what status this user has (except site admin)
 				// If no, give HIDE_LIVE_PEOPLE the highest possible value. This will always show them to any user with this override
-				$this->HIDE_LIVE_PEOPLE = ($us->hide_live_people[$ged] == "N" ? $this->PRIV_PUBLIC : $this->PRIV_HIDE);
-				$this->SHOW_LIVING_NAMES = ($us->hide_live_people[$ged] == "N" ? $this->PRIV_PUBLIC : $this->PRIV_HIDE);
+				$this->HIDE_LIVE_PEOPLE = ($gm_user->hide_live_people[$ged] == "N" ? $this->PRIV_PUBLIC : $this->PRIV_HIDE);
+				$this->SHOW_LIVING_NAMES = ($gm_user->hide_live_people[$ged] == "N" ? $this->PRIV_PUBLIC : $this->PRIV_HIDE);
 			}
 		}
 		return $this;

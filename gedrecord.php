@@ -35,7 +35,7 @@ $pid = CleanInput($pid);
 print_simple_header($pid);
 $username = $gm_username;
 
-if ((!$Users->userCanViewGedlines()) && (!$Users->UserCanAccept($username))) {
+if ((!$gm_user->userCanViewGedlines()) && (!$gm_user->UserCanAccept())) {
 	print "<span class=\"error\">".$gm_lang["ged_noshow"]."</span>\n";
 	print "</body></html>";
 	exit;

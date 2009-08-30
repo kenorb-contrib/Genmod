@@ -613,16 +613,13 @@ if ($ENABLE_MULTI_LANGUAGE) {
 
 // if ($spider) WriteToLog("Spider ".$spider." set language to ".$LANGUAGE, "I", "S");
 
-// Load the User controller
-$Users = new UserController();
-
 // Get the username
-$gm_username = $Users->GetUserName();
+$gm_username = UserController::GetUserName();
 
-$user = $Users->GetUser($gm_username);
+$gm_user =& User::GetInstance($gm_username);
 // Only show changes for authenticated users with edit rights
 
-if ($Users->userCanEdit($gm_username)) {
+if ($gm_user->userCanEdit()) {
 	// setting in the query string may overrule the session setting
 	if (!isset($show_changes)) {
 		if (isset($_SESSION["show_changes"])) $show_changes = $_SESSION["show_changes"];
@@ -655,7 +652,7 @@ require_once($GM_BASE_DIRECTORY . "includes/values/templecodes.php");		//-- load
 $Privacy = new PrivacyController($GEDCOMID);
 
 //-- Load the action controller
-if ($Users->ShowActionLog($gm_username)) {
+if ($gm_user->ShowActionLog()) {
 	$Actions = new ActionController();
 }
 else $Actions = "";
@@ -709,7 +706,7 @@ if (isset($SHOW_CONTEXT_HELP) && $show_context_help==='no') $_SESSION["show_cont
 if (!isset($USE_THUMBS_MAIN)) $USE_THUMBS_MAIN = false;
 
 if ((strstr($SCRIPT_NAME, "editconfig.php")===false) &&(strstr($SCRIPT_NAME, "editconfig_help.php")===false)) {
-	if ((!$DBCONN->connected)||(!$Users->AdminUserExists())) {
+	if ((!$DBCONN->connected)||(!UserController::AdminUserExists())) {
 		header("Location: editconfig.php");
 		exit;
 	}
@@ -742,9 +739,9 @@ if ((strstr($SCRIPT_NAME, "editconfig.php")===false) &&(strstr($SCRIPT_NAME, "ed
 	//-----------------------------------
 	//-- if user wishes to logout this is where we will do it
 	if ((!empty($logout))&&($logout==1)) {
-		$Users->UserLogout($gm_username);
+		UserController::UserLogout($gm_username);
 		$Action = "";
-		$user = $Users->GetUser($gm_username);
+		$gm_user =& User::GetInstance($gm_username);
 		if ($REQUIRE_AUTHENTICATION) {
 			header("Location: ".$HOME_SITE_URL);
 			exit;
@@ -793,7 +790,7 @@ if ((strstr($SCRIPT_NAME, "editconfig.php")===false) &&(strstr($SCRIPT_NAME, "ed
 
 //-- load the user specific theme
 if ((!empty($gm_username))&&(!isset($logout))) {
-	$usertheme = $user->theme;
+	$usertheme = $gm_user->theme;
 	if ((!empty($_POST["user_theme"]))&&(!empty($_POST["oldusername"]))&&($_POST["oldusername"]==$gm_username)) $usertheme = $_POST["user_theme"];
 	if ((!empty($usertheme)) && (file_exists($usertheme."theme.php")))  {
 		$THEME_DIR = $usertheme;
@@ -803,7 +800,7 @@ if ((!empty($gm_username))&&(!isset($logout))) {
 if (isset($_SESSION["theme_dir"])) {
 	$THEME_DIR = $_SESSION["theme_dir"];
 	if (!empty($gm_username)) {
-		if ($user->editaccount) unset($_SESSION["theme_dir"]);
+		if ($gm_user->editaccount) unset($_SESSION["theme_dir"]);
 	}
 }
 
@@ -825,15 +822,15 @@ if ($Languages_Default) {					// If Languages not yet configured
 
 // NOTE: Update the user sessiontime since the user is not sleeping
 // NOTE: This will keep the user logged in while being busy
-$Users->UpdateSessiontime($gm_username);
+UserController::UpdateSessiontime($gm_username);
 
 // NOTE: Check every 15 minutes if there are users who are idle
 // NOTE: Any user passing the GM_SESSION_TIME will be logged out
 if (!isset($_SESSION["check_login"])) $_SESSION["check_login"] = time();
 if ((time() - $_SESSION["check_login"]) > 900) {
-	$users = $Users->GetUsers("username", "asc", "firstname", "u_loggedin='Y'");
+	$users = UserController::GetUsers("username", "asc", "firstname", "u_loggedin='Y'");
 	foreach($users as $indexval => $user) {
-		if (time() - $user->sessiontime > $GM_SESSION_TIME) $Users->UserLogout($user->username, "Session expired");
+		if (time() - $user->sessiontime > $GM_SESSION_TIME) UserController::UserLogout($user->username, "Session expired");
 	}
 	$_SESSION["check_login"] = time();
 }

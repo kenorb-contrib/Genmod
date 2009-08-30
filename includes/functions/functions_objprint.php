@@ -49,9 +49,9 @@ function PrintPedigreePerson(&$person, $style=1, $show_famlink=true, $count=0, $
 	global $bwidth, $bheight;
 	// Settings for pedigree, descendancy, ancestry etc.
 	global $show_full, $OLD_PGENS, $talloffset, $chart_style, $box_width, $generations;
-	global $gm_lang, $Users, $GEDCOM, $gm_username;
+	global $gm_lang, $gm_user, $GEDCOM, $gm_username;
 
-	if (is_object($person) && $person->show_changes && $Users->UserCanEdit($Users->GetUserName())) $canshow = true;
+	if (is_object($person) && $person->show_changes && $gm_user->UserCanEdit()) $canshow = true;
 	else $canshow = false;
 
 	if (!isset($OLD_PGENS)) $OLD_PGENS = $DEFAULT_PEDIGREE_GENERATIONS;
@@ -100,7 +100,7 @@ function PrintPedigreePerson(&$person, $style=1, $show_famlink=true, $count=0, $
 				print "<br /><a href=\"descendancy.php?pid=".$person->xref."&amp;show_full=$show_full&amp;generations=$generations&amp;box_width=$box_width&amp;gedid=".$person->gedcomid."\"><b>".$gm_lang["descend_chart"]."</b></a><br />\n";
 				$username = $gm_username;
 				if (!empty($username)) {
-					$tuser = $Users->GetUser($username);
+					$tuser =& User::GetInstance($username);
 					if (!empty($tuser->gedcomid[$GEDCOM])) {
 						print "<a href=\"relationship.php?pid1=".$tuser->gedcomid[$GEDCOM]."&amp;pid2=".$person->xref."&amp;ged=".$person->gedcomid."\"><b>".$gm_lang["relationship_to_me"]."</b></a><br />\n";
 					}
@@ -208,7 +208,7 @@ function PrintPedigreePerson(&$person, $style=1, $show_famlink=true, $count=0, $
 				print "</a>";
 			}
 			else {
-				$user = $Users->GetUser($CONTACT_EMAIL);
+				$user =& User::GetInstance($CONTACT_EMAIL);
 				print "<a href=\"javascript: ".$gm_lang["private"]."\" onclick=\"if (confirm('".preg_replace("'<br />'", " ", $gm_lang["privacy_error"])."\\n\\n".str_replace("#user[fullname]#", $user->firstname." ".$user->lastname, $gm_lang["clicking_ok"])."')) ";
 				if ($CONTACT_METHOD!="none") {
 					if ($CONTACT_METHOD=="mailto") print "window.location = 'mailto:".$user->email."'; ";
@@ -562,9 +562,9 @@ function PrintFamilyParents(&$family, $sosa = 0, $label="", $parid="", $gparid="
  */
 function PrintFamilyChildren($family, $childid = "", $sosa = 0, $label="", $personcount="1") {
 	global $gm_lang, $pbwidth, $pbheight, $view, $show_famlink, $show_cousins;
-	global $GM_IMAGE_DIR, $GM_IMAGES, $show_changes, $GEDCOM, $SHOW_ID_NUMBERS, $SHOW_FAM_ID_NUMBERS, $TEXT_DIRECTION, $gm_username, $Users;
+	global $GM_IMAGE_DIR, $GM_IMAGES, $show_changes, $GEDCOM, $SHOW_ID_NUMBERS, $SHOW_FAM_ID_NUMBERS, $TEXT_DIRECTION, $gm_username, $gm_user;
 
-	if ($show_changes && $Users->UserCanEdit($gm_username)) $canshow = true;
+	if ($show_changes && $gm_user->UserCanEdit()) $canshow = true;
 	else $canshow = false;
 	 
 	print "<table border=\"0\" cellpadding=\"0\" cellspacing=\"2\"><tr>";
@@ -697,12 +697,12 @@ function PrintFamilyChildren($family, $childid = "", $sosa = 0, $label="", $pers
 
 //-- function to print a privacy error with contact method
 function PrintPrivacyError($username) {
-	 global $gm_lang, $CONTACT_METHOD, $SUPPORT_METHOD, $WEBMASTER_EMAIL, $Users;
+	 global $gm_lang, $CONTACT_METHOD, $SUPPORT_METHOD, $WEBMASTER_EMAIL;
 	
 	 $method = $CONTACT_METHOD;
 	
 	 if ($username==$WEBMASTER_EMAIL) $method = $SUPPORT_METHOD;
-	 $user = $Users->GetUser($username);
+	 $user =& User::GetInstance($username);
 	 if (empty($user->username)) $method = "mailto";
 	 print "<br /><span class=\"error\">".$gm_lang["privacy_error"];
 	 if ($method=="none") {

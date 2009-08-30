@@ -46,7 +46,7 @@ if (empty($to)) {
 	print_simple_footer();
 	exit;
 }
-if ($to=="all" && !$Users->userIsAdmin($gm_username)) {
+if ($to=="all" && !$gm_user->userIsAdmin()) {
 	print "<span class=\"error\">".$gm_lang["no_to_user"]."</span><br />";
 	print_simple_footer();
 	exit;
@@ -56,7 +56,7 @@ if ($to=="all" && !$Users->userIsAdmin($gm_username)) {
 if (($action=="send")&&(isset($_SESSION["good_to_send"]))&&($_SESSION["good_to_send"]===true)) {
 	$_SESSION["good_to_send"] = false;
 	if (!empty($from_email)) $from = $from_email;
-	$tuser = $Users->GetUser($from);
+	$tuser =& User::GetInstance($from);
 	if ($tuser->is_empty) {
 		if (!CheckEmailAddress($from)) {
 			print "<center><br /><span class=\"error\">".$gm_lang["invalid_email"]."</span>\n";
@@ -76,12 +76,12 @@ if (($action=="send")&&(isset($_SESSION["good_to_send"]))&&($_SESSION["good_to_s
 		$toarray[] = $to;
 		if ($to == "all") {
 			$toarray = array();
-			$users = $Users->GetUsers();
+			$users = UserController::GetUsers();
 			foreach($users as $indexval => $tuser) $toarray[] = $tuser->username;
 		}
 		if ($to == "never_logged") {
 			$toarray = array();
-			$users = $Users->GetUsers();
+			$users = UserController::GetUsers();
 			foreach($users as $indexval => $tuser) {
 				if ($tuser->reg_timestamp > $tuser->sessiontime) {
 					$toarray[] = $tuser->username;
@@ -90,7 +90,7 @@ if (($action=="send")&&(isset($_SESSION["good_to_send"]))&&($_SESSION["good_to_s
 		}
 		if ($to == "last_6mo") {
 			$toarray = array();
-			$users = $Users->GetUsers();
+			$users = UserController::GetUsers();
 			$sixmos = 60*60*24*30*6;	//-- timestamp for six months
 			foreach($users as $indexval => $tuser) {
 				if (time() - $tuser->sessiontime > $sixmos) {
@@ -116,7 +116,7 @@ if (($action=="send")&&(isset($_SESSION["good_to_send"]))&&($_SESSION["good_to_s
 			if ($i>0) $message["no_from"] = true;
 			if (AddMessage($message)) {
 				print $gm_lang["message_sent"]." - ";
-				$touser = $Users->GetUser($to);
+				$touser =& User::GetInstance($to);
 				if ($touser->username != $from) print $touser->firstname."&nbsp;".$touser->lastname."<br />";
 				else print $to;
 			}
@@ -164,7 +164,7 @@ if ($action=="compose") {
 	else print "return checkForm(this);";
 	print "\">\n";
 	print "<table>\n";
-	$touser = $Users->getUser($to);
+	$touser =& User::GetInstance($to);
 	$lang_temp = "lang_name_".$touser->language;
 	if (!empty($touser->username)) {
 		print "<tr><td></td><td>".str_replace("#TO_USER#", "<b>".$touser->firstname." ".$touser->lastname."</b>", $gm_lang["sending_to"])."<br />";

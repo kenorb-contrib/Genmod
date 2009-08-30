@@ -139,7 +139,7 @@ if (isset($topsearch)) {
 		}
 
 		// see if it's an source ID. If it's found and privacy allows it, JUMP!!!!
-		if ($SHOW_SOURCES >= $Users->getUserAccessLevel($gm_username)) {
+		if ($SHOW_SOURCES >= $gm_user->getUserAccessLevel()) {
 			if (FindSourceRecord($query)) {
 				header("Location: source.php?sid=".$query."&ged=".$GEDCOM);
 				exit;
@@ -147,7 +147,7 @@ if (isset($topsearch)) {
 		}
 
 		// see if it's a repository ID. If it's found and privacy allows it, JUMP!!!!
-		if ($SHOW_SOURCES >= $Users->getUserAccessLevel($gm_username)) {
+		if ($SHOW_SOURCES >= $gm_user->getUserAccessLevel()) {
 			if (FindRepoRecord($query)) {
 				header("Location: repo.php?rid=".$query."&ged=".$GEDCOM);
 				exit;
@@ -898,7 +898,7 @@ if ($action=="general") {
 		//--- Results in these tags will be ignored when the tagfilter is on
 
 		// Never show results in _UID
-		if ($Users->userIsAdmin($gm_username)) $skiptags = "_UID";
+		if ($gm_user->userIsAdmin()) $skiptags = "_UID";
 		
 		// If not admin, also hide searches in RESN tags
 		else $skiptags = "RESN, _UID";
@@ -906,7 +906,7 @@ if ($action=="general") {
 		// Add the optional tags
 		$skiptags_option = ", _GMU, FILE, FORM, CHAN, SUBM, REFN";
     	if ($tagfilter == "on") $skiptags .= $skiptags_option;
-   		$userlevel = $Users->GetUserAccessLevel();
+   		$userlevel = $gm_user->GetUserAccessLevel();
 
 		// printqueues for indi's and fams
 		$printindiname = array();

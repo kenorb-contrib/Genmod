@@ -43,16 +43,15 @@ $GM_BLOCKS["print_RSS_block"]["rss"]		= false;
  * Prints a block allowing the user to login to the site directly from the portal
  */
 function print_RSS_block($block = true, $config="", $side, $index) {
-	global $LANGUAGE, $gm_lang, $GEDCOM, $GEDCOMS, $command, $SCRIPT_NAME, $QUERY_STRING, $ENABLE_MULTI_LANGUAGE, $RSS_FORMAT, $GM_BLOCKS, $gm_username, $Users, $GM_IMAGE_DIR, $GM_IMAGES;
+	global $LANGUAGE, $gm_lang, $GEDCOM, $GEDCOMS, $command, $SCRIPT_NAME, $QUERY_STRING, $ENABLE_MULTI_LANGUAGE, $RSS_FORMAT, $GM_BLOCKS, $gm_username, $gm_user, $GM_IMAGE_DIR, $GM_IMAGES;
 
 	print "<div id=\"login_block\" class=\"block\">\n";
 	print "<div class=\"blockhc\">";
 	print_help_link("rss_feed_help", "qm", "rss_feeds");
 	if ($GM_BLOCKS["print_RSS_block"]["canconfig"]) {
-		$username = $gm_username;
-		if ((($command=="gedcom")&&($Users->userGedcomAdmin($username))) || (($command=="user")&&(!empty($username)))) {
+		if ((($command=="gedcom")&&($gm_user->userGedcomAdmin())) || (($command=="user")&&(!empty($username)))) {
 			if ($command=="gedcom") $name = preg_replace("/'/", "\'", $GEDCOM);
-			else $name = $username;
+			else $name = $gm_username;
 			print "<a href=\"javascript: ".$gm_lang["config_block"]."\" onclick=\"window.open('index_edit.php?name=$name&amp;command=$command&amp;action=configure&amp;side=$side&amp;index=$index', '', 'top=50,left=50,width=600,height=350,scrollbars=1,resizable=1'); return false;\">";
 			print "<img class=\"adminicon\" src=\"$GM_IMAGE_DIR/".$GM_IMAGES["admin"]["small"]."\" width=\"15\" height=\"15\" border=\"0\" alt=\"".$gm_lang["config_block"]."\" /></a>\n";
 		}

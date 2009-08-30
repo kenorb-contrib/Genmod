@@ -226,7 +226,7 @@ print_header($gm_lang["configure_head"]);
 				</div>
 			</div>
 			<div class="choice_right">
-				<input type="text" dir="ltr" name="NEW_DBHOST" value="<?php if ($Users->UserIsAdmin($gm_username)) print $DBHOST?>" size="40" tabindex="<?php $i++; print $i?>" />
+				<input type="text" dir="ltr" name="NEW_DBHOST" value="<?php if ($gm_user->UserIsAdmin()) print $DBHOST?>" size="40" tabindex="<?php $i++; print $i?>" />
 			</div>
 		</div>
 		<div class="admin_item_box">
@@ -239,7 +239,7 @@ print_header($gm_lang["configure_head"]);
 				</div>
 			</div>
 			<div class="choice_right">
-				<input type="text" dir="ltr" name="NEW_DBUSER" value="<?php if ($Users->UserIsAdmin($gm_username)) print $DBUSER?>" size="40" tabindex="<?php $i++; print $i?>" />
+				<input type="text" dir="ltr" name="NEW_DBUSER" value="<?php if ($gm_user->UserIsAdmin()) print $DBUSER?>" size="40" tabindex="<?php $i++; print $i?>" />
 			</div>
 		</div>
 		<div class="admin_item_box">
@@ -265,7 +265,7 @@ print_header($gm_lang["configure_head"]);
 				</div>
 			</div>
 			<div class="choice_right">
-				<input type="text" dir="ltr" name="NEW_DBNAME" value="<?php if ($Users->UserIsAdmin($gm_username)) print $DBNAME?>" size="40" tabindex="<?php $i++; print $i?>" />
+				<input type="text" dir="ltr" name="NEW_DBNAME" value="<?php if ($gm_user->UserIsAdmin()) print $DBNAME?>" size="40" tabindex="<?php $i++; print $i?>" />
 			</div>
 		</div>
 		<div class="admin_item_box">

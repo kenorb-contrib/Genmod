@@ -45,7 +45,7 @@ require("config.php");
 
 print_header($gm_lang["actionlist"]);
 
-if (!$Users->ShowActionLog($gm_username)) {
+if (!$gm_user->showactionlog) {
 	print "<span class=\"error\">".$gm_lang["access_denied"]."</span>";
 	print_footer();
 	exit;

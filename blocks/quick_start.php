@@ -39,7 +39,7 @@ $GM_BLOCKS["print_quickstart_block"]["rss"]       	= false;
  * Prints a block allowing the user to login to the site directly from the portal
  */
 function print_quickstart_block($block = true, $config="", $side, $index) {
-	global $gm_lang, $GEDCOM, $GEDCOMS, $command, $SCRIPT_NAME, $QUERY_STRING, $USE_REGISTRATION_MODULE, $LOGIN_URL, $ALLOW_REMEMBER_ME, $gm_username, $TEXT_DIRECTION, $GM_IMAGE_DIR, $GM_IMAGES, $user, $ALLOW_CHANGE_GEDCOM, $GM_BLOCKS, $Users;
+	global $gm_lang, $GEDCOM, $GEDCOMS, $command, $SCRIPT_NAME, $QUERY_STRING, $USE_REGISTRATION_MODULE, $LOGIN_URL, $ALLOW_REMEMBER_ME, $gm_username, $TEXT_DIRECTION, $GM_IMAGE_DIR, $GM_IMAGES, $ALLOW_CHANGE_GEDCOM, $GM_BLOCKS, $gm_user;
 	if (empty($config)) $config = $GM_BLOCKS["print_quickstart_block"]["config"];
 	if (!isset($config['search_all_geds'])) $config = $GM_BLOCKS["print_quickstart_block"]["config"];
 
@@ -47,10 +47,9 @@ function print_quickstart_block($block = true, $config="", $side, $index) {
 	print "<div class=\"blockhc\">";
 	print_help_link("index_quickstart_help", "qm", "quickstart");
 	if ($GM_BLOCKS["print_quickstart_block"]["canconfig"]) {
-		$username = $gm_username;
-		if ((($command=="gedcom")&&($Users->userGedcomAdmin($username))) || (($command=="user")&&(!empty($username)))) {
+		if ((($command=="gedcom")&&($gm_user->userGedcomAdmin())) || (($command=="user")&&(!empty($gm_username)))) {
 			if ($command=="gedcom") $name = preg_replace("/'/", "\'", $GEDCOM);
-			else $name = $username;
+			else $name = $gm_username;
 			print "<a href=\"javascript: ".$gm_lang["config_block"]."\" onclick=\"window.open('index_edit.php?name=$name&amp;command=$command&amp;action=configure&amp;side=$side&amp;index=$index', '', 'top=50,left=50,width=600,height=350,scrollbars=1,resizable=1'); return false;\">";
 			print "<img class=\"adminicon\" src=\"$GM_IMAGE_DIR/".$GM_IMAGES["admin"]["small"]."\" width=\"15\" height=\"15\" border=\"0\" alt=\"".$gm_lang["config_block"]."\" /></a>\n";
 		}
@@ -83,7 +82,7 @@ function print_quickstart_block($block = true, $config="", $side, $index) {
 		print "<a href=\"login_register.php?action=register\">".$gm_lang["requestaccount"]."</a><br />";
 	}
 	else {
-		if (!empty($user->gedcomid[$GEDCOM])) print "<a href=\"pedigree.php?rootid=".$user->gedcomid[$GEDCOM]."\">".$gm_lang["my_pedigree"]."</a><br />";
+		if (!empty($gm_user->gedcomid[$GEDCOM])) print "<a href=\"pedigree.php?rootid=".$gm_user->gedcomid[$GEDCOM]."\">".$gm_lang["my_pedigree"]."</a><br />";
 	}
 	print "<br /><br />";
 	print_help_link("QS_search_help", "qm", "QS_search_tips");

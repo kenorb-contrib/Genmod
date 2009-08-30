@@ -86,7 +86,7 @@ function print_family_parents($famid, $sosa = 0, $label="", $parid="", $gparid="
 	global $TEXT_DIRECTION, $SHOW_EMPTY_BOXES, $SHOW_ID_NUMBERS, $SHOW_FAM_ID_NUMBERS, $LANGUAGE;
 	global $pbwidth, $pbheight;
 	global $GM_IMAGE_DIR, $GM_IMAGES;
-	global $show_changes, $GEDCOM, $gm_username, $Users;
+	global $show_changes, $GEDCOM, $gm_username, $gm_user;
 
 	$hfamids = 0;
 	$famrec = FindFamilyRecord($famid);
@@ -99,12 +99,12 @@ function print_family_parents($famid, $sosa = 0, $label="", $parid="", $gparid="
 	print "<a name=\"" . $parents["HUSB"] . "\"></a>\r\n";
 	print "<a name=\"" . $parents["WIFE"] . "\"></a>\r\n";
 
-	if ($show_changes && $Users->UserCanEdit($gm_username)) PrintFamilyHeader($famid, $famrec, true);
+	if ($show_changes && $gm_user->UserCanEdit()) PrintFamilyHeader($famid, $famrec, true);
 	else PrintFamilyHeader($famid, $famrec);
 
 	// -- get the new record and parents if in editing show changes mode
 	$recchanged = false;
-	if ($show_changes && $Users->UserCanEdit($gm_username) && GetChangeData(true, $famid, true, "", "")) {
+	if ($show_changes && $gm_user->UserCanEdit() && GetChangeData(true, $famid, true, "", "")) {
 		$rec = GetChangeData(false, $famid, true, "gedlines", "");
 		$newrec = $rec[$GEDCOM][$famid];
 		$newparents = FindParentsInRecord($newrec);
@@ -297,9 +297,9 @@ function print_family_parents($famid, $sosa = 0, $label="", $parid="", $gparid="
  */
 function print_family_children($famid, $childid = "", $sosa = 0, $label="", $personcount="1") {
 	global $gm_lang, $pbwidth, $pbheight, $view, $show_famlink, $show_cousins;
-	global $GM_IMAGE_DIR, $GM_IMAGES, $show_changes, $GEDCOM, $SHOW_ID_NUMBERS, $SHOW_FAM_ID_NUMBERS, $TEXT_DIRECTION, $gm_username, $Users;
+	global $GM_IMAGE_DIR, $GM_IMAGES, $show_changes, $GEDCOM, $SHOW_ID_NUMBERS, $SHOW_FAM_ID_NUMBERS, $TEXT_DIRECTION, $gm_username, $gm_user;
 
-	if ($show_changes && $Users->UserCanEdit($gm_username)) $canshow = true;
+	if ($show_changes && $gm_user->UserCanEdit($gm_username)) $canshow = true;
 	else $canshow = false;
 	 
 	$children = GetChildrenIds($famid);
@@ -312,7 +312,7 @@ function print_family_children($famid, $childid = "", $sosa = 0, $label="", $per
 
 	$newchildren = array();
 	$oldchildren = array();
-	if ($Users->userCanEdit($gm_username)) {
+	if ($gm_user->userCanEdit($gm_username)) {
 		$oldchil = array();
 		if (!empty($famid) && $canshow && (GetChangeData(true, $famid, true, "", "CHIL,FAM"))) {
 			$rec = GetChangeData(false, $famid, true, "gedlines", "CHIL,FAM");
@@ -349,7 +349,7 @@ function print_family_children($famid, $childid = "", $sosa = 0, $label="", $per
 	$nchi=1;
 	if ((count($children) > 0) || (count($newchildren) > 0) || (count($oldchildren) > 0)) {
 		// Get the new order of children
-		if ($Users->userCanEdit($gm_username)) {
+		if ($gm_user->userCanEdit()) {
 			if ($canshow && GetChangeData(true, $famid, true, "", "")) {
 				$nowchildren = array();
 				$rec = GetChangeData(false, $famid, true, "gedlines", "");
@@ -482,233 +482,12 @@ function print_family_children($famid, $childid = "", $sosa = 0, $label="", $per
    }
    print "</table><br />";
 
-	if (($view != "preview") && ($sosa == 0) && ($Users->userCanEdit($gm_username))) {
+	if (($view != "preview") && ($sosa == 0) && ($gm_user->userCanEdit())) {
 		if (GetChangeData(true, $famid, true, "", "FAM")) {
 			$rec = GetChangeData(false, $famid, true, "gedlines", "FAM");
 		}
 	}
 }
-/**
- * print the facts table for a family
- *
- * @param string $famid family gedcom ID
- * @param int $sosa optional child sosa number
- */
-/*function PrintFamilyFacts($famid, $sosa = 0, $mayedit=true) {
-	global $gm_lang, $pbwidth, $pbheight, $view, $hits;
-	global $nonfacts;
-	global $TEXT_DIRECTION, $GEDCOM, $SHOW_ID_NUMBERS, $SHOW_FAM_ID_NUMBERS;
-	global $show_changes, $gm_username, $Users, $SHOW_COUNTER;
-
-	// -- if both parents are displayable then print the marriage facts
-	if (displayDetailsByID($famid, "FAM")) {
-		// -- array of GEDCOM elements that will be found but should not be displayed
-		$nonfacts = array("FAMS", "FAMC", "MAY", "BLOB", "HUSB", "WIFE", "CHIL", "_MEND", "");
-		// -- find all the fact information
-		$indifacts = array(); // -- array to store the fact records in for sorting and displaying
-		$otheritems = array();
-		$allfamsubs = GetAllSubrecords(FindFamilyRecord($famid), "", true, false, false);
-		$f = 0;
-		$count = array();
-		foreach ($allfamsubs as $key => $subrecord) {
-			$ft = preg_match("/1\s(\w+)(.*)/", $subrecord, $match);
-			if ($ft > 0) {
-				$fact = $match[1];
-				$gid = trim(str_replace("@", "", $match[2]));
-			}
-			else {
-				$fact = "";
-				$gid = "";
-			}
-			$fact = trim($fact);
-			if (!isset($count[$fact])) $count[$fact] = 1;
-			else $count[$fact]++;
-			
-			// -- handle special source fact case
-			if ($fact == "SOUR") {
-				$otheritems[] = array($fact, $subrecord, $count[$fact]);
-			}
-			// -- handle special media object case
-			else if ($fact == "OBJE") {
-				$otheritems[] = array($fact, $subrecord, $count[$fact]);
-			}
-			// -- handle special note fact case
-			else if ($fact == "NOTE") {
-				$otheritems[] = array($fact, $subrecord, $count[$fact]);
-			} 
-			else {
-				if (!in_array($fact, $nonfacts)) {
-					$indifacts[$f] = array($fact, $subrecord, $count[$fact]);
-					$f++;
-				}
-			}
-		} 
-		if (($sosa == 0) && $Users->userCanEdit($gm_username)) {
-			if ($show_changes) {
-				$newrecs = RetrieveNewFacts($famid);
-				foreach ($newrecs as $key => $subrecord) {
-					$ft = preg_match("/1\s(\w+)(.*)/", $subrecord, $match);
-					if ($ft > 0) {
-						$fact = $match[1];
-						$gid = trim(str_replace("@", "", $match[2]));
-					}
-					else {
-						$fact = "";
-						$gid = "";
-					}
-					$fact = trim($fact);
-					if (!isset($count[$fact])) $count[$fact] = 1;
-					else $count[$fact]++;
-			
-					// -- handle special source fact case
-					if ($fact == "SOUR") {
-						$otheritems[] = array($fact, $subrecord, $count[$fact], "new");
-					}
-					// -- handle special media object case
-					else if ($fact == "OBJE") {
-						$otheritems[] = array($fact, $subrecord, $count[$fact], "new");
-					}
-					// -- handle special note fact case
-					else if ($fact == "NOTE") {
-						$otheritems[] = array($fact, $subrecord, $count[$fact], "new");
-					} 
-					else {
-						if (!in_array($fact, $nonfacts)) {
-							$indifacts[$f] = array($fact, $subrecord, $count[$fact], "new");
-							$f++;
-						}
-					}
-				} 
-			}
-		}
-		if ((count($indifacts) > 0) || (count($otheritems) > 0)) {
-			//usort($indifacts, "CompareFacts");
-			SortFacts($indifacts);
-			
-			print "\n\t<span class=\"subheaders\">" . $gm_lang["family_group_info"];
-			if ($SHOW_FAM_ID_NUMBERS and $famid != "") print " ($famid)";
-			print "</span>";
-			if($SHOW_COUNTER) {
-				// Print indi counter only if displaying a non-private person
-				print "\n<span style=\"margin-left: 3px; vertical-align:bottom;\">".$gm_lang["hit_count"]."&nbsp;".$hits."</span>\n";
-			}
-			
-			print "<br />\n\t<table class=\"facts_table\">";
-			foreach ($indifacts as $key => $value) {
-				if (IsChangedFact($famid, $value[1])) {
-					if (!isset($value[3]) || $value[3] != "new") print_fact($value[1], $famid, $value[0], $value[2], false, "change_old", $mayedit);
-					$changedfact = RetrieveChangedFact($famid, $value[0], $value[1]);
-					if ($changedfact) print_fact($changedfact, $famid, $value[0], $value[2], false, "change_new", $mayedit);
-				}
-				else if (isset($value[3]) && $value[3] == "new") print_fact($value[1], $famid, $value[0], $value[2], false, "change_new", $mayedit);
-				else print_fact($value[1], $famid, $value[0], $value[2], false, "", $mayedit);
-			}
-			// do not print otheritems for sosa
-			if ($sosa == 0) {
-				foreach($otheritems as $key => $value) {
-					$ft = preg_match("/1\s(\w+)\s(.*)/", $value[1], $match);
-					if ($ft > 0) $fact = $match[1];
-					else $fact = "";
-					$fact = trim($fact);
-					// -- handle special source fact case
-					if ($fact == "SOUR") {
-						if (IsChangedFact($famid, $value[1])) {
-							if (!isset($value[3]) || $value[3] != "new") print_main_sources($value[1], 1, $famid, $value[2], "change_old", $mayedit);
-							print_main_sources(RetrieveChangedFact($famid, $value[0], $value[1]), 1, $famid, $value[2], "change_new", $mayedit);
-						}
-						else if (isset($value[3]) && $value[3] == "new") print_main_sources($value[1], 1, $famid, $value[2], "change_new", $mayedit);
-						else print_main_sources($value[1], 1, $famid, $value[2], "", $mayedit);
-					}
-					// -- handle special note fact case
-					else if ($fact == "NOTE") {
-						if (IsChangedFact($famid, $value[1])) {
-						if (!isset($value[3]) || $value[3] != "new") print_main_notes($value[1], 1, $famid, $value[2], "change_old", $mayedit);
-						print_main_notes(RetrieveChangedFact($famid, $value[0], $value[1]), 1, $famid, $value[2], "change_new", $mayedit);
-					}
-					else if (isset($value[3]) && $value[3] == "new") print_main_notes($value[1], 1, $famid, $value[2], "change_new", $mayedit);
-					else print_main_notes($value[1], 1, $famid, $value[2], "", $mayedit);
-					}
-					// NOTE: Print the media
-					else if ($fact == "OBJE") {
-						$ct = preg_match("/\d\sOBJE\s@(.*)@/", $value[1], $match);
-						$media_id = $match[1];
-						$mediaged = FindMediaRecord($media_id);
-						if (IsChangedFact($famid, $value[1]) || IsChangedFact($media_id, $mediaged)) {
-							if (!isset($value[3]) || $value[3] != "new") print_main_media($value[1], $famid, 0, $value[2], false, "change_old", $mayedit);
-							$factnew = RetrieveChangedFact($famid, $value[0], $value[1]);
-							if (empty($factnew)) print_main_media($value[1], $famid, 0, true,  "change_new", $mayedit);
-							else print_main_media($factnew, $famid, 0, true,  "change_new", $mayedit);
-						}
-						else if (isset($value[3]) && $value[3] == "new") print_main_media($value[1], $famid, 0, $value[2], true, "change_new", $mayedit);
-						else print_main_media($value[1], $famid, 0, $value[2], false, "", $mayedit);
-					}
-				}
-			}
-		}
-		else {
-			if ($sosa==0) {
-				print "\n\t<span class=\"subheaders\">" . $gm_lang["family_group_info"];
-				if ($SHOW_FAM_ID_NUMBERS and $famid != "") print " ($famid)";
-				print "</span><br />\n\t";
-			}
-			print "<table class=\"facts_table\">";
-			if ($sosa == 0) {
-				print "<tr><td class=\"messagebox\" colspan=\"2\">";
-				print $gm_lang["no_family_facts"];
-				print "</td></tr>\n";
-			}
-		}
-		// -- new fact link
-   		$print_add_link = false;
-		if ($view != "preview" && $sosa == 0 && $Users->userCanEdit($gm_username) && $mayedit) {
-			$print_add_link = true;
-			if (GetChangeData(true, $famid, true, "", "FAM")) {
-				$rec = GetChangeData(false, $famid, true, "gedlines", "FAM");
-				if (empty($rec[$GEDCOM][$famid])) {
-					$print_add_link = false;
-   				}
-			}
-		}
-		if ($print_add_link && $mayedit) {
-			PrintAddNewFact($famid, $indifacts, "FAM");
-			// -- new source citation
-			print "<tr><td class=\"shade2\">";
-			print_help_link("add_source_help", "qm", "add_source_lbl");
-			print $gm_lang["add_source_lbl"] . "</td>";
-			print "<td class=\"shade1\">";
-			print "<a href=\"#\" onclick=\"return add_new_record('$famid','SOUR', 'add_source');\">" . $gm_lang["add_source"] . "</a>";
-			print "<br />\n";
-			print "</td></tr>\n";
-			// -- new media
-			print "<tr><td class=\"shade2\">";
-			print_help_link("add_media_help", "qm", "add_media_lbl");
-			print $gm_lang["add_media_lbl"] . "</td>";
-			print "<td class=\"shade1\">";
-			print "<a href=\"javascript: ".$gm_lang["add_media_lbl"]."\" onclick=\"add_new_record('".$famid."', 'OBJE', 'add_media'); return false;\">".$gm_lang["add_media"]."</a>";
-			print "<br />\n";
-			print "</td></tr>\n";
-			// -- new note
-			print "<tr><td class=\"shade2\">";
-			print_help_link("add_note_help", "qm" ,"add_note_lbl");
-			print $gm_lang["add_note_lbl"] . "</td>";
-			print "<td class=\"shade1\">";
-			print "<a href=\"#\" onclick=\"return add_new_record('$famid','NOTE', 'add_note');\">" . $gm_lang["add_note"] . "</a>";
-			print "<br />\n";
-			print "</td></tr>\n";
-			// -- new general note
-			print "<tr><td class=\"shade2\">";
-			print_help_link("add_general_note_help", "qm" ,"add_gnote_lbl");
-			print $gm_lang["add_gnote_lbl"] . "</td>";
-			print "<td class=\"shade1\">";
-			print "<a href=\"#\" onclick=\"return add_new_record('$famid','GNOTE', 'add_gnote');\">" . $gm_lang["add_gnote"] . "</a>";
-			print "<br />\n";
-			print "</td></tr>\n";
-			// -- end new objects
-		}
-		print "\n\t</table>\n";
-	}
-}
-*/
 /**
  * print a family with Sosa-Stradonitz numbering system
  * ($rootid=1, father=2, mother=3 ...)
@@ -743,13 +522,12 @@ function PrintSosaFamily($famid, $childid, $sosa, $label="", $parid="", $gparid=
  * @return string $rootid validated root ID
  */
 function CheckRootId($rootid) {
-	global $user, $GEDCOM, $GEDCOM_ID_PREFIX, $PEDIGREE_ROOT_ID, $USE_RIN, $gm_username, $Users;
+	global $user, $GEDCOM, $GEDCOM_ID_PREFIX, $PEDIGREE_ROOT_ID, $USE_RIN, $gm_username, $gm_user;
 	
 	// -- if the $rootid is not already there then find the first person in the file and make him the root
 	if (empty($rootid)) {
-		$user = $Users->getUser($gm_username);
-		if ((!empty($user->rootid[$GEDCOM])) && (FindPersonRecord($user->rootid[$GEDCOM]))) $rootid = $user->rootid[$GEDCOM];
-		else if ((!empty($user->gedcomid[$GEDCOM])) && (FindPersonRecord($user->gedcomid[$GEDCOM]))) $rootid = $user->gedcomid[$GEDCOM];
+		if ((!empty($gm_user->rootid[$GEDCOM])) && (FindPersonRecord($gm_user->rootid[$GEDCOM]))) $rootid = $gm_user->rootid[$GEDCOM];
+		else if ((!empty($gm_user->gedcomid[$GEDCOM])) && (FindPersonRecord($gm_user->gedcomid[$GEDCOM]))) $rootid = $gm_user->gedcomid[$GEDCOM];
 		
 		// -- allow users to overide default id in the config file.
 		if (empty($rootid)) {

@@ -36,7 +36,7 @@ if (empty($action)) $action="";
 
 //-- make sure that they have gedcom admin status before they can use this page
 //-- otherwise have them login again
-if (!$Users->userIsAdmin($gm_username)) {
+if (!$gm_user->userIsAdmin()) {
 	if (empty($LOGIN_URL)) header("Location: login.php?url=lockout_maint.php");
 	else header("Location: ".$LOGIN_URL."?url=lockout_maint.php");
 	exit;
@@ -82,7 +82,7 @@ print_header($gm_lang["lockout_maint"]);
 			}
 		}
 		else {
-			$u = $Users->GetUser($add_user);
+			$u =& User::GetInstance($add_user);
 			if ($u->is_empty) {
 				$error2 = true;
 			}

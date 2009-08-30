@@ -246,7 +246,7 @@ if (($command=="user") and (!$ublocks->welcome_block_present)) {
 	print "</div>";
 }
 if (($command=="gedcom") and (!$ublocks->gedcom_block_present)) {
-	if ($Users->userIsAdmin($gm_username)) {
+	if ($gm_user->userIsAdmin()) {
 		print "<div>";
 		print "<a href=\"#\" onclick=\"window.open('index_edit.php?name=$GEDCOM&amp;command=gedcom', '', 'top=50,left=10,width=1000,height=400,scrollbars=1,resizable=1');\">".$gm_lang["customize_gedcom_page"]."</a>\n";
 		print "</div>";
