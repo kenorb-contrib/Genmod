@@ -265,7 +265,6 @@ foreach($CONFIG_VARS as $indexval => $VAR) {
 			require_once("includes/functions/functions.php");
 			//-- load db specific functions
 			require_once("includes/functions/functions_db.php");
-			require_once("includes/functions/functions_authentication.php");      // -- load the authentication system
 			// NOTE: Setup the database connection, needed for logging
 //			include("db_layer.php");
 			$DBCONN = New DbLayer();
@@ -332,7 +331,6 @@ if (phpversion() > '4.2.2') {
 	foreach($_REQUEST as $key=>$value) {
 		if (!is_array($value)) {
 			if (preg_match("/((DELETE)|(INSERT)|(UPDATE)|(ALTER)|(CREATE)|( TABLE)|(DROP))\s[A-Za-z0-9 ]{0,200}(\s(FROM)|(INTO)|(TABLE)\s)/i", $value, $imatch) > 0 && $SCRIPT_NAME != "/editlang_edit.php") {
-				require_once("includes/functions/functions_authentication.php");      // -- load the authentication system
 				// NOTE: Setup the database connection, needed for logging
 //				include("db_layer.php");
 				$DBCONN = New DbLayer();
@@ -347,7 +345,6 @@ if (phpversion() > '4.2.2') {
 			foreach($value as $key1=>$val) {
 				if (!is_array($val)) {
 					if (preg_match("/((DELETE)|(INSERT)|(UPDATE)|(ALTER)|(CREATE)|( TABLE)|(DROP))\s[A-Za-z0-9 ]{0,200}(\s(FROM)|(INTO)|(TABLE)\s)/i", $val, $imatch)>0) {
-						require_once("includes/functions/functions_authentication.php");      // -- load the authentication system
 						// NOTE: Setup the database connection
 //						include("db_layer.php");
 						$DBCONN = New DbLayer();
@@ -444,7 +441,6 @@ $without_close = true;
 require_once($GM_BASE_DIRECTORY."config_gedcom.php");
 if (CONFIGURED) if ($DBCONN->connected) GedcomConfig::ReadGedcomConfig(get_gedcom_from_id($GEDCOMID));
 require_once($GM_BASE_DIRECTORY."includes/functions/functions_name.php");
-require_once($GM_BASE_DIRECTORY."includes/functions/functions_authentication.php");      // -- load the authentication system
 require_once($GM_BASE_DIRECTORY."includes/functions/functions_search.php");
 
 if (empty($PEDIGREE_GENERATIONS)) $PEDIGREE_GENERATIONS = $DEFAULT_PEDIGREE_GENERATIONS;
@@ -649,9 +645,6 @@ require_once($GM_BASE_DIRECTORY . "includes/values/templecodes.php");		//-- load
 
 //-- load the privacy settings
 PrivacyController::ReadPrivacy($GEDCOMID);
-
-//-- load the privacy functions
-//require_once($GM_BASE_DIRECTORY."includes/functions/functions_privacy.php");
 
 if (!isset($SCRIPT_NAME)) $SCRIPT_NAME=$_SERVER["SCRIPT_NAME"];
 

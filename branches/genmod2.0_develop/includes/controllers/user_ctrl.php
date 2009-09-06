@@ -85,8 +85,8 @@ abstract class UserController {
 				$changed = true;
 			}
 			if ($changed) {
-				UserController::DeleteUser($user->username, "changed");
-				UserController::AddUser($user, "changed");
+				self::DeleteUser($user->username, "changed");
+				self::AddUser($user, "changed");
 			}
 		}
 	}

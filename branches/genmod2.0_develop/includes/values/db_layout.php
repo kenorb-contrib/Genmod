@@ -528,7 +528,7 @@ $db_original[TBLPREFIX."names"]["key"]["name_type"] = "KEY `name_type` (`n_type`
 $db_original[TBLPREFIX."names"]["key"]["name_surn_file"] = "KEY `name_surn_file` (`n_surname`, `n_file`)";
 $db_original[TBLPREFIX."names"]["key"]["name_file"] = "KEY `name_file` (`n_file`)";
              
-$db_original[TBLPREFIX."news"]["row"]["n_id"]["details"] = "INT NOT NULL";
+$db_original[TBLPREFIX."news"]["row"]["n_id"]["details"] = "INT AUTO_INCREMENT";
 $db_original[TBLPREFIX."news"]["row"]["n_username"]["details"] = "VARBINARY(30) NOT NULL DEFAULT ''";
 $db_original[TBLPREFIX."news"]["row"]["n_date"]["details"] = "INT";
 $db_original[TBLPREFIX."news"]["row"]["n_title"]["details"] = "VARCHAR(255) CHARACTER SET #charset# COLLATE #collate# ";

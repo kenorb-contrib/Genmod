@@ -40,7 +40,7 @@ $GM_BLOCKS["print_gedcom_news"]["rss"]			= true;
 function print_gedcom_news($block = true, $config="", $side, $index) {
 	global $gm_lang, $GM_IMAGE_DIR, $GM_IMAGES, $TEXT_DIRECTION, $GEDCOM, $command, $TIME_FORMAT, $gm_username, $gm_user;
 
-	$usernews = getUserNews($GEDCOM);
+	$usernews = NewsController::getUserNews($GEDCOM);
 	print "<div id=\"gedcom_news\" class=\"block\">\n";
 	print "<div class=\"blockhc\">";
 	if ($gm_user->userGedcomAdmin()) print_help_link("index_gedcom_news_ahelp", "qm_ah");
@@ -54,25 +54,24 @@ function print_gedcom_news($block = true, $config="", $side, $index) {
 		print $gm_lang["no_news"];
 		print "<br />";
 	}
-	foreach($usernews as $key=>$news) {
-		$day = date("j", $news["date"]);
-		$mon = date("M", $news["date"]);
-		$year = date("Y", $news["date"]);
-		print "<div id=\"".$news["anchor"]."\">\n";
-		$news["title"] = ReplaceEmbedText($news["title"]);
-		//print "<span class=\"news_title\"><a name=\"".PrintReady($news["title"])."\" class=\"news_title\" style=\"text-decoration: none\">".PrintReady($news["title"])."</a></span><br />\n";
-		print "<span class=\"news_title\">".PrintReady($news["title"])."</span><br />\n";
-		print "<span class=\"news_date\">".GetChangedDate("$day $mon $year")." - ".date($TIME_FORMAT, $news["date"])."</span><br /><br />\n";
-		$news["text"] = ReplaceEmbedText($news["text"]);
+	foreach($usernews as $key => $news) {
+		$day = date("j", $news->date);
+		$mon = date("M", $news->date);
+		$year = date("Y", $news->date);
+		print "<div id=\"".$news->anchor."\">\n";
+		$news->title = ReplaceEmbedText($news->title);
+		print "<span class=\"news_title\">".PrintReady($news->title)."</span><br />\n";
+		print "<span class=\"news_date\">".GetChangedDate("$day $mon $year")." - ".date($TIME_FORMAT, $news->date)."</span><br /><br />\n";
+		$news->text = ReplaceEmbedText($news->text);
 		$trans = get_html_translation_table(HTML_SPECIALCHARS);
 		$trans = array_flip($trans);
-		$news["text"] = strtr($news["text"], $trans);
-		$news["text"] = nl2br($news["text"]);
-		print PrintReady($news["text"])."<br />\n";
+		$news->text = strtr($news->text, $trans);
+		$news->text = nl2br($news->text);
+		print PrintReady($news->text)."<br />\n";
 		if ($gm_user->userGedcomAdmin()) {
 			print "<hr size=\"1\" />";
-			print "<a href=\"#\" onclick=\"editnews('$key'); return false;\">".$gm_lang["edit"]."</a> | ";
-			print "<a href=\"index.php?action=deletenews&amp;news_id=$key&amp;command=$command\" onclick=\"return confirm('".$gm_lang["confirm_news_delete"]."');\">".$gm_lang["delete"]."</a><br />";
+			print "<a href=\"#\" onclick=\"editnews('".$news->id."'); return false;\">".$gm_lang["edit"]."</a> | ";
+			print "<a href=\"index.php?action=deletenews&amp;news_id=".$news->id."&amp;command=$command\" onclick=\"return confirm('".$gm_lang["confirm_news_delete"]."');\">".$gm_lang["delete"]."</a><br />";
 		}
 		print "</div>\n";
 	}
