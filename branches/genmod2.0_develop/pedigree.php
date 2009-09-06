@@ -119,7 +119,7 @@ if (!isset($rootid)) $rootid="";
 $rootid = CleanInput($rootid);
 $rootid = CheckRootId($rootid);
 
-if (showLivingNameByID($rootid)) {
+if (PrivacyFunctions::showLivingNameByID($rootid)) {
 	$name = GetPersonName($rootid);
 	$addname = GetAddPersonName($rootid);
 }
@@ -425,7 +425,7 @@ print "<div id=\"content_pedigree\">";
 		}
 	}
 	
-	if (showLivingNameByID($rootid)) {
+	if (PrivacyFunctions::showLivingNameByID($rootid)) {
 		// -- print left arrow for decendants so that we can move down the tree
 		$yoffset += ($pbheight / 2)-10;
 		$famids = FindSfamilyIds($rootid);
@@ -466,7 +466,7 @@ print "<div id=\"content_pedigree\">";
 						else $spid=$parents["WIFE"];
 						if (!empty($spid)) {
 							print "\n\t\t\t\t<a href=\"pedigree.php?PEDIGREE_GENERATIONS=$OLD_PGENS&amp;rootid=$spid&amp;show_full=$show_full&amp;talloffset=$talloffset\"><span ";
-							if (showLivingNameById($spid)) {
+							if (PrivacyFunctions::showLivingNameByID($spid)) {
 								$name = GetPersonName($spid);
 								$name = rtrim($name);
 								if (hasRTLText($name))
@@ -485,7 +485,7 @@ print "<div id=\"content_pedigree\">";
 						if ($i>=$num) break;
 						$pid = $smatch[$i][1];
 						print "\n\t\t\t\t&nbsp;&nbsp;<a href=\"pedigree.php?PEDIGREE_GENERATIONS=$OLD_PGENS&amp;rootid=$pid&amp;show_full=$show_full&amp;talloffset=$talloffset\"><span ";
-						if (showLivingNameById($pid)) {
+						if (PrivacyFunctions::showLivingNameByID($pid)) {
 							$name = GetPersonName($pid);
 							$name = rtrim($name);
 							if (hasRTLText($name))
@@ -510,7 +510,7 @@ print "<div id=\"content_pedigree\">";
 						$pid = $smatch[$i][1];
 						if ($pid!=$rootid) {
 							print "\n\t\t\t\t&nbsp;&nbsp;<a href=\"pedigree.php?PEDIGREE_GENERATIONS=$OLD_PGENS&amp;rootid=$pid&amp;show_full=$show_full&amp;talloffset=$talloffset\"><span ";
-							if (showLivingNameById($pid)) {
+							if (PrivacyFunctions::showLivingNameByID($pid)) {
 								$name = GetPersonName($pid);
 								$name = rtrim($name);
 								if (hasRTLText($name))

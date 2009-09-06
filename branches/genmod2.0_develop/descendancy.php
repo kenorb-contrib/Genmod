@@ -146,7 +146,7 @@ function print_family_descendancy($pid, $famid, $depth) {
 		print "<img src=\"".$GM_IMAGE_DIR."/".$GM_IMAGES["spacer"]["other"]."\" height=\"2\" width=\"$Dindent\" border=\"0\" alt=\"\" />";
 		print "<span class=\"details1\" style=\"white-space: nowrap; \" >";
 		print "<a href=\"#\" onclick=\"expand_layer('".$famid.$personcount."'); return false;\" class=\"top\"><img id=\"".$famid.$personcount."_img\" src=\"".$GM_IMAGE_DIR."/".$GM_IMAGES["minus"]["other"]."\" align=\"middle\" hspace=\"0\" vspace=\"3\" border=\"0\" alt=\"".$gm_lang["view_family"]."\" /></a> ";
-		if (showFact("MARR", $famid) && DisplayDetailsByID($famid, "FAM")) print_simple_fact($famrec, "MARR", $id); else print $gm_lang["private"];
+		if (PrivacyFunctions::showFact("MARR", $famid) && PrivacyFunctions::DisplayDetailsByID($famid, "FAM")) print_simple_fact($famrec, "MARR", $id); else print $gm_lang["private"];
 		print "</span>";
 
 		// print spouse
@@ -220,7 +220,7 @@ $pbheight = $bheight+14;
 if (!isset($pid)) $pid="";
 $pid = CleanInput($pid);
 $pid=CheckRootId($pid);
-if (showLivingNameByID($pid)) {
+if (PrivacyFunctions::showLivingNameByID($pid)) {
 	$name = GetPersonName($pid);
 	$addname = GetAddPersonName($pid);
 }

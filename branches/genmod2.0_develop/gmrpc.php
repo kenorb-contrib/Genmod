@@ -199,12 +199,12 @@ switch($action) {
 	break;
 
 	case "action_add":
-		$action = ActionController::GetNewItem();
+		$action = ActionController::GetNewItem($type);
 		$action->AddThisItem();
 	break;
 	
 	case "action_add2":
-		$action = ActionController::GetNewItem();
+		$action = ActionController::GetNewItem($type);
 		if (isset($actiontext))$action->text = urldecode($actiontext);
 		if (isset($repo))$action->repo = $repo;
 		if (isset($status)) $action->status = $status;
@@ -220,15 +220,12 @@ switch($action) {
 		$indi =& Person::GetInstance($pid);
 		$nonfacts = array("SEX","FAMS","FAMC","NAME","TITL","NOTE","SOUR","SSN","OBJE","HUSB","WIFE","CHIL","ALIA","ADDR","PHON","SUBM","_EMAIL","CHAN","URL","EMAIL","WWW","RESI","RESN");
 		$nonfamfacts = array("_UID", "RESN");
-		$indi->ParseIndiFacts();
 		$indi->AddFamilyFacts(false);
 		$f2 = 0;
 		foreach($indi->facts as $indexval => $factobj) {
 			if (!in_array($factobj->fact, $nonfacts) && $factobj->disp){
 				if ($f2>0) print "<br />\n";
 				$f2++;
-				// NOTE: Handle ASSO record
-//				if ($prted) continue;
 				$fft = preg_match("/^1 (\w+)(.*)/m", $factobj->factrec, $ffmatch);
 				if ($fft>0) {
 					$fact = trim($ffmatch[1]);
@@ -242,18 +239,15 @@ switch($action) {
 				}
 				else {
 					if ($factobj->fact != $factobj->factref) {
-//					$tct = preg_match("/2 TYPE (.*)/", $factrec, $match);
-//					if ($tct>0) {
-//						$facttype = trim($match[1]);
 						print "<span class=\"details_label\">";
-						if (defined("GM_FACT_".$factobj->factref)) print PrintReady(constant("GM_FACT_".$factobj->factref));
-						else print $factobj->factref;
+						print $factobj->descr;
 						print "</span> ";
 					}
 				}
 				$factobj->PrintFactDate(false, false, $factobj->fact, $pid);
-				if (GetSubRecord(2, "2 DATE", $factobj->factrec)=="") {
-					if ($details!="Y" && $details!="N") print PrintReady($details);
+				if (GetSubRecord(2, "2 DATE", $factobj->factrec) == "") {
+					// Don't display Y, N and ASSO links
+					if ($details!="Y" && $details!="N" && $factobj->fact != "ASSO") print PrintReady($details);
 				}
 				else print PrintReady($details);
 				//-- print spouse name for marriage events

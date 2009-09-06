@@ -199,7 +199,8 @@ print_header($gm_lang["configure_head"]);
 		if (!$error_db && !$error_db2 && !$error_db3 && !$error_indexdir && !$error_url && !$error_cnf && !$error_ali && !$error_ali_login) WriteToLog("EditConfig-> System configuration updated successfully.","I","S");
 		else WriteToLog("EditConfig-> System configuration update failed.","E","S");
 	}
-	if (isset($SERVER_URL) && isset($CONFIG_SITE) && $SERVER_URL != $CONFIG_SITE) $SERVER_URL = $CONFIG_SITE;
+	if (defined(SERVER_URL) && isset($CONFIG_SITE) && SERVER_URL != $CONFIG_SITE) $SERVER_URL = $CONFIG_SITE;
+	else $SERVER_URL = SERVER_URL;
 	?>
 	<form method="post" name="configform" action="editconfig.php">
 		<input type="hidden" name="action" value="update" />
@@ -279,8 +280,8 @@ print_header($gm_lang["configure_head"]);
 			</div>
 			<div class="choice_right">
 				<select name="NEW_DBPERSIST" tabindex="<?php $i++; print $i?>">
-					<option value="yes" <?php if ($DBPERSIST) print "selected=\"selected\""; ?>><?php print $gm_lang["yes"];?></option>
-					<option value="no" <?php if (!$DBPERSIST) print "selected=\"selected\""; ?>><?php print $gm_lang["no"];?></option>
+					<option value="yes" <?php if (DBPERSIST) print "selected=\"selected\""; ?>><?php print $gm_lang["yes"];?></option>
+					<option value="no" <?php if (!DBPERSIST) print "selected=\"selected\""; ?>><?php print $gm_lang["no"];?></option>
 				</select>
 			</div>
 		</div>
@@ -294,7 +295,7 @@ print_header($gm_lang["configure_head"]);
 				</div>
 			</div>
 			<div class="choice_right">
-				<input type="text" name="NEW_TBLPREFIX" value="<?php print $TBLPREFIX?>" size="40" tabindex="<?php $i++; print $i?>" />
+				<input type="text" name="NEW_TBLPREFIX" value="<?php print TBLPREFIX?>" size="40" tabindex="<?php $i++; print $i?>" />
 				<?php if ($error_db) print "<div class=\"error\">".$gm_lang["duplicatedb"]."</div>"; ?>
 				<?php if ($error_db2) print "<div class=\"error\">".$gm_lang["bad_host_user_pass"]."</div>"; ?>
 				<?php if ($error_db3) print "<div class=\"error\">".$gm_lang["bad_database_name"]."</div>"; ?>
@@ -326,7 +327,7 @@ print_header($gm_lang["configure_head"]);
 				</div>
 			</div>
 			<div class="choice_right">
-				<input type="text" size="40" name="NEW_INDEX_DIRECTORY" value="<?php print $INDEX_DIRECTORY?>" dir="ltr" tabindex="<?php $i++; print $i?>" />
+				<input type="text" size="40" name="NEW_INDEX_DIRECTORY" value="<?php print INDEX_DIRECTORY?>" dir="ltr" tabindex="<?php $i++; print $i?>" />
 				<?php if ($error_indexdir) print "<div class=\"error\">".$gm_lang["duplicateindexdir"]."</div>"; ?>
 			</div>
 		</div>
@@ -584,7 +585,7 @@ print_header($gm_lang["configure_head"]);
 				</div>
 			</div>
 			<div class="choice_right">
-				<input type="text" name="NEW_LOGIN_URL" value="<?php print $LOGIN_URL?>" dir="ltr" tabindex="<?php $i++; print $i?>" size="40" />
+				<input type="text" name="NEW_LOGIN_URL" value="<?php print LOGIN_URL?>" dir="ltr" tabindex="<?php $i++; print $i?>" size="40" />
 				<?php if ($error_ali_login) print "<div class=\"error\">".$gm_lang["aliaslogin"]."</div>"; ?>
 			</div>
 		</div>
@@ -638,7 +639,7 @@ print_header($gm_lang["configure_head"]);
 				</div>
 			</div>
 			<div class="choice_right">
-				<input type="text" dir="ltr" name="NEW_GM_SESSION_SAVE_PATH" value="<?php print $GM_SESSION_SAVE_PATH;?>" tabindex="<?php $i++; print $i?>" size="40" />
+				<input type="text" dir="ltr" name="NEW_GM_SESSION_SAVE_PATH" value="<?php print GM_SESSION_SAVE_PATH;?>" tabindex="<?php $i++; print $i?>" size="40" />
 			</div>
 		</div>
 		<div class="admin_item_box">
@@ -750,7 +751,7 @@ print_header($gm_lang["configure_head"]);
 			<input type="submit" value="<?php print $gm_lang["save"];?>" />
 		</div>
 	</form>
-	<?php if (!$CONFIGURED) { ?>
+	<?php if (!CONFIGURED) { ?>
 		<script language="JavaScript" type="text/javascript">
 		<!--
 			helpPopup('welcome_new_help');

@@ -39,13 +39,13 @@ $GM_BLOCKS["review_changes_block"]["rss"]       = false;
  */
 function review_changes_block($block = true, $config="", $side, $index) {
 	global $gm_lang, $GEDCOM, $GEDCOMS, $command, $SCRIPT_NAME, $QUERY_STRING, $GM_IMAGE_DIR, $GM_IMAGES;
-	global $gm_changes, $LAST_CHANGE_EMAIL, $ALLOW_EDIT_GEDCOM, $SERVER_URL, $TEXT_DIRECTION, $SHOW_SOURCES, $TIME_FORMAT, $GM_BLOCKS, $TBLPREFIX, $gm_username, $GedcomConfig, $gm_user;
+	global $gm_changes, $LAST_CHANGE_EMAIL, $ALLOW_EDIT_GEDCOM, $TEXT_DIRECTION, $SHOW_SOURCES, $TIME_FORMAT, $GM_BLOCKS, $gm_username, $gm_user;
 
 	if (!$ALLOW_EDIT_GEDCOM) return;
 
 	if (empty($config)) $config = $GM_BLOCKS["review_changes_block"]["config"];
 
-	$lastmail = $GedcomConfig->GetLastNotifMail();
+	$lastmail = GedcomConfig::GetLastNotifMail();
 	$display_block = false;
 	$geds = GetChangeData(false, "", false, "gedcoms");
 	$sent = array();
@@ -54,7 +54,7 @@ function review_changes_block($block = true, $config="", $side, $index) {
 		if (isset($lastmail[$gedvalue])) {
 			//-- if the time difference from the last email is greater than 24 hours then send out another email
 			if (time()-$lastmail[$gedvalue] > (60*60*24*$config["days"])) {
-				$GedcomConfig->SetLastNotifMail($gedvalue);
+				GedcomConfig::SetLastNotifMail($gedvalue);
 				if ($config["sendmail"]=="yes") {
 					$users = UserController::GetUsers();
 					foreach($users as $username=>$user) {
@@ -62,16 +62,16 @@ function review_changes_block($block = true, $config="", $side, $index) {
 							if (!in_array($username, $sent)) {
 								$sent[] = $username;
 								//-- send message
-								$message = array();
-								$message["to"]=$username;
+								$message = new Message();
+								$message->to = $username;
 								$host = preg_replace("/^www\./i", "", $_SERVER["SERVER_NAME"]);
-								$message["from"] = "Genmod-noreply@".$host;
-								$message["subject"] = $gm_lang["review_changes_subject"];
-								$message["body"] = $gm_lang["review_changes_body"];
-								$message["method"] = $user->contactmethod;
-								$message["url"] = basename($SCRIPT_NAME)."?".$QUERY_STRING;
-								$message["no_from"] = true;
-								AddMessage($message);
+								$message->from = "Genmod-noreply@".$host;
+								$message->subject = $gm_lang["review_changes_subject"];
+								$message->body = $gm_lang["review_changes_body"];
+								$message->method = $user->contactmethod;
+								$message->url = basename($SCRIPT_NAME)."?".$QUERY_STRING;
+								$message->no_from = true;
+								$message->AddMessage();
 							}
 						}
 					}

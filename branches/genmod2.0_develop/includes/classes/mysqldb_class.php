@@ -48,19 +48,19 @@ abstract class MysqlDb {
 	public function MakeConnection() {
 		global $DBUSER, $DBPASS, $DBNAME, $DBHOST, $DBPERSIST;
 		
-		if (empty($DBUSER) || empty($DBPASS) || empty($DBNAME) || empty($DBHOST)) return false;
+		if (DBUSER == "" || DBPASS == "" || DBNAME == "" || DBHOST == "") return false;
 		
 		if (is_null($this->connected)) {
-			if ($DBPERSIST) {
-				$this->connection = mysql_pconnect($DBHOST,$DBUSER,$DBPASS);
-				if (mysql_select_db($DBNAME)) {
+			if (DBPERSIST) {
+				$this->connection = mysql_pconnect(DBHOST,DBUSER,DBPASS);
+				if (mysql_select_db(DBNAME)) {
 					return true;
 				}
 				else return false;
 			}
 			else {
-				$this->connection = mysql_connect($DBHOST,$DBUSER,$DBPASS);
-				if (mysql_select_db($DBNAME)) {
+				$this->connection = mysql_connect(DBHOST,DBUSER,DBPASS);
+				if (mysql_select_db(DBNAME)) {
 					return true;
 				}
 				else return false;
@@ -72,9 +72,9 @@ abstract class MysqlDb {
 	 * @todo Add error handler
 	**/
 	public function Query($sql, $noreport) {
-		global $TOTAL_QUERIES, $debugcollector, $QUERY_EXECTIME;
+		global $TOTAL_QUERIES, $QUERY_EXECTIME;
 		
-		if (isset($debugcollector->show)) $debugcollector->OutputCollector($sql, "query");
+		if (DebugCollector::$show) Debugcollector::OutputCollector($sql, "query");
 		if (!isset($QUERY_EXECTIME)) $QUERY_EXECTIME = 0;
 		
 		// NOTE: Execute the query

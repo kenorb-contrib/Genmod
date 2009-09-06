@@ -1009,7 +1009,7 @@ function GetAge($indirec, $datestr, $style=1) {
 		$index = 1;
 		$birthrec = GetSubRecord(1, "1 BIRT", $indirec, $index);
 		while(!empty($birthrec)) {
-			if (!FactViewRestricted($pid, $birthrec) && !FactViewRestricted($pid, $indirec, 1)) {
+			if (!PrivacyFunctions::FactViewRestricted($pid, $birthrec) && !PrivacyFunctions::FactViewRestricted($pid, $indirec, 1)) {
 				$hct = preg_match("/2 DATE.*(@#DHEBREW@)/", $birthrec, $match);
 				if ($hct>0) {
 					$dct = preg_match("/2 DATE (.+)/", $birthrec, $match);

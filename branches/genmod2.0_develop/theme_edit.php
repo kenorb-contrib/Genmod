@@ -36,8 +36,8 @@ if (!isset($choose_theme)) $choose_theme="";
 //-- otherwise have them login again
 $uname = $gm_username;
 if (empty($uname)) {
-	if (empty($LOGIN_URL)) header("Location: login.php?url=theme_edit.php");
-	else header("Location: ".$LOGIN_URL."?url=theme_edit.php");
+	if (LOGIN_URL == "") header("Location: login.php?url=theme_edit.php");
+	else header("Location: ".LOGIN_URL."?url=theme_edit.php");
 	exit;
 }
 $user =& User::GetInstance($uname);

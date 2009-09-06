@@ -28,31 +28,24 @@ if (stristr($_SERVER["SCRIPT_NAME"],basename(__FILE__))) {
 	require "../../intrusion.php";
 }
 
-class PrivacyController {
+abstract class PrivacyController {
 
-	var $classname = "Privacy";
-	var $GEDPRIV = array();
-	
+	public $classname = "PrivacyController";
+		
 	// This reads the settings for a specified gedcomid.
 	// If the ID is empty, it will return settings from the default values in the PrivacyObject class.
-	public function __construct($gedcomid="") {
-		$this->ReadPrivacy($gedcomid);
-	}
-	
-	// This actually reads the settings from the object array or, if not present, creates a new object.
 	// The settings from the specified object are globalized here.
-	function ReadPrivacy($gedcomid="", $user_override=true) {
+	public function ReadPrivacy($gedcomid="", $user_override=true) {
 		global $GEDCOMS, $GEDCOMID;
 
 		if (empty($gedcomid)) $gedcomid = $GEDCOMID;
 		
-		// If we read the settings with no user overrides, we must renew. Cached are the ones read from session.php, WITH override
-		if (!$user_override || !isset($this->GEDPRIV[$gedcomid])) $this->GEDPRIV[$gedcomid] = new PrivacyObject($gedcomid, $user_override);
-		
-		$vars = Get_Object_vars($this->GEDPRIV[$gedcomid]);
+		// If we read the settings with no user overrides, we must renew it. Cached are the ones read from session.php, WITH overrides from the user privacy settings.
+		$priv =& PrivacyObject::GetInstance($gedcomid, $user_override);
+		$vars = Get_Object_vars($priv);
 
 		foreach ($vars as $name => $value) {
-			if ($name != "GEDCOM" && $name != "GEDCOMID") {
+			if ($name != "GEDCOM" && $name != "GEDCOMID" && $name != "classname" && $name != "is_empty") {
 				global $$name;
 				$$name = $value;
 			}
@@ -61,17 +54,19 @@ class PrivacyController {
 	}
 	
 	// This deletes settings for a specific gedcomid from cache and from the DB
-	function DeletePrivacy($gedcomid) {
-		global $TBLPREFIX, $DBCONN, $GEDCOMS;
+	public function DeletePrivacy($gedcomid) {
+		global $DBCONN, $GEDCOMS;
 
 		if (!isset($gedcomid)) return false;
 		if (!$DBCONN->connected) return false;
 		
-		if (!isset($this->GEDPRIV[$gedcomid])) return false;
+		$priv =& PrivacyObject::GetInstance($gedcomid);
 		
-		unset($this->GEDPRIV[$gedcomid]);
+		if ($priv->is_empty) return false;
+		
+		PrivacyObject::UnsetInstance($gedcomid);
 
-		$sql = "DELETE FROM ".$TBLPREFIX."privacy WHERE p_gedcomid='".$gedcomid."'";
+		$sql = "DELETE FROM ".TBLPREFIX."privacy WHERE p_gedcomid='".$gedcomid."'";
 		$res = NewQuery($sql);
 		$ct = $res->NumRows($res->result);
 		if ($ct == "0") return false;
@@ -80,15 +75,15 @@ class PrivacyController {
 	}
 	
 	// Here a new set of values is stored in the DB and in the cache.
-	function StorePrivacy($settings) {
+	public function StorePrivacy($settings) {
 		
 		$gedcomid = $settings->GEDCOMID;
-		$this->DeletePrivacy($gedcomid);
+		self::DeletePrivacy($gedcomid);
 		$settings->WritePrivacy();
-		$this->ReadPrivacy($gedcomid);
+		self::ReadPrivacy($gedcomid);
 	}
 	
-	function ClearPrivacyGedcomIDs($pid, $gedcom) {
+	public function ClearPrivacyGedcomIDs($pid, $gedcom) {
 		
 		$gedid = get_id_from_gedcom($gedcom);
 		if (!$gedid) return false;

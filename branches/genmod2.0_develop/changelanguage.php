@@ -33,8 +33,8 @@ require "config.php";
 //-- otherwise have them login again
 $uname = $gm_username;
 if (empty($uname)) {
-	if (empty($LOGIN_URL)) header("Location: login.php?url=changelanguage.php");
-	else header("Location: ".$LOGIN_URL."?url=changelanguage.php");
+	if (LOGIN_URL == "") header("Location: login.php?url=changelanguage.php");
+	else header("Location: ".LOGIN_URL."?url=changelanguage.php");
 	exit;
 }
 

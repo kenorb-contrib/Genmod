@@ -31,8 +31,8 @@
  */
 require "config.php";
 if (!$gm_user->userGedcomAdmin()) {
-	if (empty($LOGIN_URL)) header("Location: login.php?url=admin_maint.php");
-	else header("Location: ".$LOGIN_URL."?url=admin_maint.php");
+	if (LOGIN_URL == "") header("Location: login.php?url=admin_maint.php");
+	else header("Location: ".LOGIN_URL."?url=admin_maint.php");
 	exit;
 }
 
@@ -62,7 +62,7 @@ switch ($action) {
 		else $message = "<span class=\"error\">".$gm_lang["isdead_not_reset"]."</span>";
 		break;
 	case "buildisdead":
-		$sql = "SELECT i_id FROM ".$TBLPREFIX."individuals WHERE i_isdead=-1 AND i_file='".$GEDCOMID."'";
+		$sql = "SELECT i_id FROM ".TBLPREFIX."individuals WHERE i_isdead=-1 AND i_file='".$GEDCOMID."'";
 		$res = NewQuery($sql);
 		while ($row = $res->FetchAssoc()) {
 			IsDeadId($row["i_id"]);
@@ -71,14 +71,14 @@ switch ($action) {
 	case "dispdbsettings":
 		$url = "http://".$_SERVER["SERVER_NAME"]."/";
 		$message = $gm_lang["disp_db_settings"];
-		$output = $gm_lang["DBHOST"].": ".$DBHOST."<br />";
-		$output .= $gm_lang["DBUSER"].": ".$DBUSER."<br />";
-		$output .= $gm_lang["DBNAME"].": ".$DBNAME."<br />";
-		$output .= $gm_lang["TBLPREFIX"].": ".$TBLPREFIX."<br />";
-		$output .= $gm_lang["DBPERSIST"].": ".$DBPERSIST;
+		$output = $gm_lang["DBHOST"].": ".DBHOST."<br />";
+		$output .= $gm_lang["DBUSER"].": ".DBUSER."<br />";
+		$output .= $gm_lang["DBNAME"].": ".DBNAME."<br />";
+		$output .= $gm_lang["TBLPREFIX"].": ".TBLPREFIX."<br />";
+		$output .= $gm_lang["DBPERSIST"].": ".DBPERSIST;
 		break;
 	case "resetcaches":
-		$GedcomConfig->ResetCaches();
+		GedcomConfig::ResetCaches();
 		$message = $gm_lang["reset_caches_ok"];
 		break;
 	default:

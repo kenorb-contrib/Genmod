@@ -21,15 +21,15 @@ if (stristr($_SERVER["SCRIPT_NAME"],basename(__FILE__))) {
 
 class MimeTypeDetect {
 	
-	var $classname = "MimeTypeDetect";
-	var $mime_types = array();
-	var $found_mime_type = array();
+	public $classname = "MimeTypeDetect";
+	private $mime_types = array();
+	private $found_mime_type = array();
 	
 	public function __construct() {
 		$this->LoadMimeTypes();
 	}
 	
-	function LoadMimeTypes() {
+	private function LoadMimeTypes() {
 		// Signatures
 		$this->mime_types[0]['signature'] = '474946383761';
 		$this->mime_types[1]['signature'] = '424D';
@@ -387,7 +387,7 @@ class MimeTypeDetect {
 		$this->mime_types[86]['mime_type'] = 'image/gif';
 	}
 	
-	function FindMimeType($filename) {
+	public function FindMimeType($filename) {
 		if (file_exists($filename) && !is_dir($filename)) {
 			$handle = fopen($filename, "r");
 			$string = fread($handle, 20);

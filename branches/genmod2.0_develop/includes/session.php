@@ -24,12 +24,9 @@
  * @version $Id$
  */
 
-// NOTE: Load and start the debug collector
+// NOTE: Start the debug collector
 $DEBUG = false;
-if ($DEBUG) {
-	$debugcollector = new DebugCollector();
-	$debugcollector->show = true;
-}
+if ($DEBUG) DebugCollector::$show = true;
  
 if (strstr($_SERVER["SCRIPT_NAME"],"session")) {
 //	print "Now, why would you want to do that.  You're not hacking are you?";
@@ -181,6 +178,7 @@ if (isset($CONFIG_PARMS)) {
 			$CONFIG_SITE = $key;
 			foreach($config as $var => $value) {
 				$$var = $value;
+				define($var, $value);
 			}
 		break;
 		}
@@ -196,8 +194,10 @@ if (isset($CONFIG_PARMS)) {
 						$CONFIG_SITE = $key;
 						foreach($config as $var => $value) {
 							$$var = $value;
+							if ($var != "SERVER_URL") define($var, $value);
 						}
-						$SERVER_URL = $alias;
+						define('SERVER_URL', $alias);
+//						$SERVER_URL = $alias;
 						break;
 					}
 				}
@@ -207,7 +207,7 @@ if (isset($CONFIG_PARMS)) {
 	}
 }
 //-- if not configured then redirect to the configuration script
-if (!$CONFIGURED) {
+if (!CONFIGURED) {
 	if (file_exists("install/install.php")) {
 	header("Location: install/install.php");
 	exit;
@@ -277,15 +277,18 @@ foreach($CONFIG_VARS as $indexval => $VAR) {
 }
 
 if (empty($CONFIG_VERSION)) $CONFIG_VERSION = "2.65";
-if (empty($SERVER_URL)) {
+//if (empty($SERVER_URL)) {
+if (!defined('SERVER_URL')) {
 	$SERVER_URL = "http://".$_SERVER["SERVER_NAME"];
 	if ($_SERVER["SERVER_PORT"] != 80) $SERVER_URL .= ":".$SERVER["SERVER_PORT"];
 	$SERVER_URL .= dirname($SCRIPT_NAME)."/";
 	$SERVER_URL = stripslashes($SERVER_URL);
+	define('SERVER_URL', $SERVER_URL);
 }
 
 //--load common functions
 require_once($GM_BASE_DIRECTORY."includes/functions/functions.php");
+require_once($GM_BASE_DIRECTORY."includes/functions/functions_admin.php");
 require_once($GM_BASE_DIRECTORY."includes/functions/functions_language.php");
 //-- load db specific functions
 require_once($GM_BASE_DIRECTORY."includes/functions/functions_db.php");
@@ -315,7 +318,7 @@ $time = time()+$GM_SESSION_TIME;
 $date = date("D M j H:i:s T Y", $time);
 session_set_cookie_params($date, "/");
 if (($GM_SESSION_TIME>0)&&(function_exists('session_cache_expire'))) session_cache_expire($GM_SESSION_TIME/60);
-if (!empty($GM_SESSION_SAVE_PATH)) session_save_path($GM_SESSION_SAVE_PATH);
+if (GM_SESSION_SAVE_PATH != "") session_save_path(GM_SESSION_SAVE_PATH);
 if (isset($MANUAL_SESSION_START) && !empty($SID)) session_id($SID);
 @session_start();
 
@@ -378,7 +381,7 @@ CheckLockout();
 // -- Read the GEDCOMS array
 $GEDCOMS = array();
 $DEFAULT_GEDCOMID = "";
-if ($CONFIGURED) if ($DBCONN->connected) ReadGedcoms();
+if (CONFIGURED) if ($DBCONN->connected) ReadGedcoms();
 else $GEDCOMS = array();
 
 if (empty($_REQUEST["gedid"])) {
@@ -439,14 +442,10 @@ $FAMLIST_RETRIEVED = false;
 $without_close = true;
 
 require_once($GM_BASE_DIRECTORY."config_gedcom.php");
-$GedcomConfig = new GedcomConfig();
-if ($CONFIGURED) if ($DBCONN->connected) $GedcomConfig->ReadGedcomConfig(get_gedcom_from_id($GEDCOMID));
+if (CONFIGURED) if ($DBCONN->connected) GedcomConfig::ReadGedcomConfig(get_gedcom_from_id($GEDCOMID));
 require_once($GM_BASE_DIRECTORY."includes/functions/functions_name.php");
 require_once($GM_BASE_DIRECTORY."includes/functions/functions_authentication.php");      // -- load the authentication system
 require_once($GM_BASE_DIRECTORY."includes/functions/functions_search.php");
-
-//-- load media specific functions
-$MediaFS = new MediaFS();
 
 if (empty($PEDIGREE_GENERATIONS)) $PEDIGREE_GENERATIONS = $DEFAULT_PEDIGREE_GENERATIONS;
 
@@ -597,7 +596,7 @@ if (!empty($CLANGUAGE) && !$spider) {
 
 // If we still don't know the language, set it to the gedcom language. If all else fails, pick english.
 if (!isset($LANGUAGE)) {
-	if (isset($GedcomConfig->GEDCONF[$GEDCOM])) $LANGUAGE = $GedcomConfig->GEDCONF[$GEDCOM]["GEDCOMLANG"];
+	if (isset(GedcomConfig::$GEDCONF[$GEDCOM])) $LANGUAGE = GedcomConfig::$GEDCONF[$GEDCOM]["GEDCOMLANG"];
 	else $LANGUAGE="english";
 }
 
@@ -648,11 +647,11 @@ CheckSessionIP();
 
 require_once($GM_BASE_DIRECTORY . "includes/values/templecodes.php");		//-- load in the LDS temple code translations
 
-//-- load the privacy file
-$Privacy = new PrivacyController($GEDCOMID);
+//-- load the privacy settings
+PrivacyController::ReadPrivacy($GEDCOMID);
 
 //-- load the privacy functions
-require_once($GM_BASE_DIRECTORY."includes/functions/functions_privacy.php");
+//require_once($GM_BASE_DIRECTORY."includes/functions/functions_privacy.php");
 
 if (!isset($SCRIPT_NAME)) $SCRIPT_NAME=$_SERVER["SCRIPT_NAME"];
 
@@ -742,8 +741,8 @@ if ((strstr($SCRIPT_NAME, "editconfig.php")===false) &&(strstr($SCRIPT_NAME, "ed
 		}
 		else {
 			if (count($GEDCOMS)==0) {
-				if (empty($LOGIN_URL)) header("Location: login.php");
-				else header("Location: ".$LOGIN_URL);
+				if (LOGIN_URL == "") header("Location: login.php");
+				else header("Location: ".LOGIN_URL);
 				exit;
 			}
 		}
@@ -758,14 +757,14 @@ if ((strstr($SCRIPT_NAME, "editconfig.php")===false) &&(strstr($SCRIPT_NAME, "ed
 				$url = basename($_SERVER["SCRIPT_NAME"])."?".$QUERY_STRING;
 				if (stristr($url, "index.php")!==false) {
 					if (stristr($url, "command=")===false) {
-						if ((!isset($_SERVER['HTTP_REFERER'])) || (stristr($_SERVER['HTTP_REFERER'],$SERVER_URL)===false)) $url .= "&command=gedcom";
+						if ((!isset($_SERVER['HTTP_REFERER'])) || (stristr($_SERVER['HTTP_REFERER'],SERVER_URL)===false)) $url .= "&command=gedcom";
 					}
 				}
 				if (stristr($url, "ged=")===false)  {
 					$url.="&ged=".$GEDCOM;
 				}
-				if (empty($LOGIN_URL)) header("Location: login.php?url=".urlencode($url));
-				else header("Location: ".$LOGIN_URL."?url=".urlencode($url));
+				if (LOGIN_URL == "") header("Location: login.php?url=".urlencode($url));
+				else header("Location: ".LOGIN_URL."?url=".urlencode($url));
 				exit;
 			}
 		}

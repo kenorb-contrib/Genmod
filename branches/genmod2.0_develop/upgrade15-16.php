@@ -35,8 +35,8 @@ if (!function_exists("userIsAdmin")) {
 }
 
 if (!userIsAdmin($gm_username)) {
-	if (empty($LOGIN_URL)) header("Location: login.php?url=upgrade15-16.php?".GetQueryString(true));
-	else header("Location: ".$LOGIN_URL."?url=upgrade15-16.php?".GetQueryString(true));
+	if (LOGIN_URL == "") header("Location: login.php?url=upgrade15-16.php?".GetQueryString(true));
+	else header("Location: ".LOGIN_URL."?url=upgrade15-16.php?".GetQueryString(true));
 	exit;
 }
 
@@ -51,10 +51,10 @@ if (file_exists("includes/values/db_layout.php") || file_exists("values/db_layou
 
 // This modification will not be done by CheckDB, so we must do it manually
 print "<br /><br /><b>Upgrade Configuration fields</b><br /><br />";
-$sql = "ALTER TABLE ".$TBLPREFIX."gedconf MODIFY gc_meta_keywords VARCHAR(128), MODIFY gc_alpha_index_lists INT(11)";
+$sql = "ALTER TABLE ".TBLPREFIX."gedconf MODIFY gc_meta_keywords VARCHAR(128), MODIFY gc_alpha_index_lists INT(11)";
 $res = NewQuery($sql);
 if ($res) {
-	$sql = "UPDATE ".$TBLPREFIX."gedconf set gc_alpha_index_lists='500' WHERE gc_alpha_index_lists='1'";
+	$sql = "UPDATE ".TBLPREFIX."gedconf set gc_alpha_index_lists='500' WHERE gc_alpha_index_lists='1'";
 	$res2 = NewQuery($sql);
 	if ($res2) print "Configuration fields succesfully changed";
 }
@@ -63,7 +63,7 @@ if (!$res || !$res2) print "There was a problem executing the query: <br />".$DB
 // This part of the script copies the user rights from the users table to the newly created users_gedcoms table. 
 // The next login will remove the old columns from the users table.
 print "<br /><br /><b>Upgrade User Data</b>";
-$sql = "SHOW tables like '".$TBLPREFIX."users_gedcoms'";
+$sql = "SHOW tables like '".TBLPREFIX."users_gedcoms'";
 $res = NewQuery($sql);
 if ($res->NumRows() != 0) {
 	print "<br /><br />Upgrade not needed, the new database table already exists, and is filled with values at an earlier stage.";
@@ -72,7 +72,7 @@ else {
 	$res->FreeResult();
 	print "<b>Upgrade user data</b><br />";
 	print "Step 1: Creating new database table for user rights<br />";
-	$sql = "CREATE TABLE ".$TBLPREFIX."users_gedcoms (ug_ID int(11) NOT NULL auto_increment, ug_username varbinary(30) NOT NULL default '', ug_gedfile int(11) NOT NULL default '0', ug_gedcomid varchar(255) default NULL, ug_rootid varchar(255) default NULL, ug_canedit varchar(7) default NULL, PRIMARY KEY  (ug_ID), KEY ug_user (ug_username), KEY ug_ged (ug_gedcomid,ug_gedfile)) ENGINE=MyISAM";
+	$sql = "CREATE TABLE ".TBLPREFIX."users_gedcoms (ug_ID int(11) NOT NULL auto_increment, ug_username varbinary(30) NOT NULL default '', ug_gedfile int(11) NOT NULL default '0', ug_gedcomid varchar(255) default NULL, ug_rootid varchar(255) default NULL, ug_canedit varchar(7) default NULL, PRIMARY KEY  (ug_ID), KEY ug_user (ug_username), KEY ug_ged (ug_gedcomid,ug_gedfile)) ENGINE=MyISAM";
 	$res = NewQuery($sql);
 	if (!$res) {
 		print "There was a problem creating the table: <br />".$DBCONN->sqlerrordesc."<br />".$DBCONN->sqlquery."<br />";
@@ -84,7 +84,7 @@ else {
 			if (is_object($user)) $user = get_object_vars($user);
 			$success = true;
 			foreach ($GEDCOMS as $id=>$value) {
-				$sql = "INSERT INTO ".$TBLPREFIX."users_gedcoms VALUES('0','";
+				$sql = "INSERT INTO ".TBLPREFIX."users_gedcoms VALUES('0','";
 				$sql .= $user["username"]."','".$value["id"]."','";
 				if (isset($user["gedcomid"][get_gedcom_from_id($id)])) $sql .= $user["gedcomid"][get_gedcom_from_id($id)];
 				$sql .= "','";
@@ -103,7 +103,7 @@ else {
 }
 
 print "<br /><br /><b>Upgrade User fields</b><br /><br />";
-$sql = "ALTER TABLE ".$TBLPREFIX."users MODIFY u_username VARBINARY(30)";
+$sql = "ALTER TABLE ".TBLPREFIX."users MODIFY u_username VARBINARY(30)";
 $res = NewQuery($sql);
 if ($res) print "User fields succesfully changed";
 else print "There was a problem executing the query: <br />".$DBCONN->sqlerrordesc."<br />".$DBCONN->sqlquery."<br />";
@@ -113,50 +113,50 @@ print "<br /><br /><b>Upgrade Privacy Data</b>";
 print "<br /><br />Attempting to add new fields to the privacy table and fill initial values";
 
 $update1 = false;
-$sql = "SHOW COLUMNS FROM ".$TBLPREFIX."privacy LIKE 'p_gedcomid'";
+$sql = "SHOW COLUMNS FROM ".TBLPREFIX."privacy LIKE 'p_gedcomid'";
 $res = NewQuery($sql);
 if ($res && ($res->NumRows() == 0)) {
-	$sql = "ALTER TABLE ".$TBLPREFIX."privacy ADD p_gedcomid INT(11) AFTER p_gedcom,  ADD KEY p_gedcomid (p_gedcomid)";
+	$sql = "ALTER TABLE ".TBLPREFIX."privacy ADD p_gedcomid INT(11) AFTER p_gedcom,  ADD KEY p_gedcomid (p_gedcomid)";
 	$res1 = NewQuery($sql);
 	if($res1) $update1 = true;
 }
 if (!$res) print "<br /><br />There was a problem altering the Database.<br />Error: ".$DBCONN->sqlerrordesc;
 
 $update2 = false;
-$sql = "SHOW COLUMNS FROM ".$TBLPREFIX."privacy LIKE 'p_link_privacy'";
+$sql = "SHOW COLUMNS FROM ".TBLPREFIX."privacy LIKE 'p_link_privacy'";
 $res = NewQuery($sql);
 if ($res && ($res->NumRows() == 0)) {
-	$sql = "ALTER TABLE ".$TBLPREFIX."privacy ADD p_link_privacy TINYINT(1) AFTER p_enable_clippings_cart";
+	$sql = "ALTER TABLE ".TBLPREFIX."privacy ADD p_link_privacy TINYINT(1) AFTER p_enable_clippings_cart";
 	$res2 = NewQuery($sql);
 	if($res2) $update2 = true;
 }
 if (!$res) print "<br /><br />There was a problem altering the Database.<br />Error: ".$DBCONN->sqlerrordesc;
 
 $update5 = false;
-$sql = "SHOW COLUMNS FROM ".$TBLPREFIX."privacy LIKE 'p_hide_live_people'";
+$sql = "SHOW COLUMNS FROM ".TBLPREFIX."privacy LIKE 'p_hide_live_people'";
 $res = NewQuery($sql);
 if ($res && ($res->NumRows() == 0)) {
-	$sql = "ALTER TABLE ".$TBLPREFIX."privacy ADD p_hide_live_people VARCHAR(12) AFTER p_priv_none";
+	$sql = "ALTER TABLE ".TBLPREFIX."privacy ADD p_hide_live_people VARCHAR(12) AFTER p_priv_none";
 	$res5 = NewQuery($sql);
 	if($res5) $update5 = true;
 }
 if (!$res) print "<br /><br />There was a problem altering the Database.<br />Error: ".$DBCONN->sqlerrordesc;
 
 $update3 = false;
-$sql = "SHOW COLUMNS FROM ".$TBLPREFIX."privacy LIKE 'p_show_dead_people'";
+$sql = "SHOW COLUMNS FROM ".TBLPREFIX."privacy LIKE 'p_show_dead_people'";
 $res = NewQuery($sql);
 if ($res && ($res->NumRows() == 0)) {
-	$sql = "ALTER TABLE ".$TBLPREFIX."privacy ADD p_show_dead_people VARCHAR(12) AFTER p_hide_live_people";
+	$sql = "ALTER TABLE ".TBLPREFIX."privacy ADD p_show_dead_people VARCHAR(12) AFTER p_hide_live_people";
 	$res3 = NewQuery($sql);
 	if($res3) $update3 = true;
 }
 if (!$res) print "<br /><br />There was a problem altering the Database.<br />Error: ".$DBCONN->sqlerrordesc;
 
 $update4 = false;
-$sql = "SHOW COLUMNS FROM ".$TBLPREFIX."privacy LIKE 'p_check_child_dates'";
+$sql = "SHOW COLUMNS FROM ".TBLPREFIX."privacy LIKE 'p_check_child_dates'";
 $res = NewQuery($sql);
 if ($res && ($res->NumRows() == 0)) {
-	$sql = "ALTER TABLE ".$TBLPREFIX."privacy ADD p_check_child_dates TINYINT(1) AFTER p_check_marriage_relations";
+	$sql = "ALTER TABLE ".TBLPREFIX."privacy ADD p_check_child_dates TINYINT(1) AFTER p_check_marriage_relations";
 	$res4 = NewQuery($sql);
 	if($res4) $update4 = true;
 }
@@ -164,12 +164,12 @@ if (!$res) print "<br /><br />There was a problem altering the Database.<br />Er
 
 if ($update1 || $update2 || $update3 || $update4 || $update5) {
 	foreach ($GEDCOMS as $gedc => $values) {
-		$sql = "UPDATE ".$TBLPREFIX."privacy set ";
+		$sql = "UPDATE ".TBLPREFIX."privacy set ";
 		if ($update1) $sql .= "p_gedcomid='".$values["id"]."', ";
 		if ($update2) $sql .= "p_link_privacy='1', ";
 		if ($update3) $sql .= "p_show_dead_people='PRIV_PUBLIC', ";
 		if ($update4) {
-			$sql2 = "select gc_check_child_dates FROM ".$TBLPREFIX."gedconf WHERE gc_gedcom='".$gedc."'";
+			$sql2 = "select gc_check_child_dates FROM ".TBLPREFIX."gedconf WHERE gc_gedcom='".$gedc."'";
 			$r = NewQuery($sql2);
 			$val = $res->FetchRow();
 			$sql .= "p_check_child_dates='".$val[0]."', ";

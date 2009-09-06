@@ -174,7 +174,7 @@ $outputmenu["Calendar"] = Array
 		</div>
 		<div class="shade1" style="float: <?php print $rdir; ?>; text-align: <?php print $ldir; ?>; margin-<?php print $rdir; ?>: 0em; width: 20em;">
 			<?php 
-			if (isset($gm_user->gedcomid[$GEDCOM]) && !empty($gm_user->gedcomid[$GEDCOM]) && DisplayDetailsByID($gm_user->gedcomid[$GEDCOM])) print "<a href=\"individual.php?pid=".$gm_user->gedcomid[$GEDCOM]."\">".$gm_user->firstname.' '.$gm_user->lastname."</a><br />";
+			if (isset($gm_user->gedcomid[$GEDCOM]) && !empty($gm_user->gedcomid[$GEDCOM]) && PrivacyFunctions::DisplayDetailsByID($gm_user->gedcomid[$GEDCOM])) print "<a href=\"individual.php?pid=".$gm_user->gedcomid[$GEDCOM]."\">".$gm_user->firstname.' '.$gm_user->lastname."</a><br />";
 			else echo $gm_user->firstname.' '.$gm_user->lastname.'<br />';
 			echo "<a href=\"".$HOME_SITE_URL."\">".$HOME_SITE_TEXT."</a>";
 			?>

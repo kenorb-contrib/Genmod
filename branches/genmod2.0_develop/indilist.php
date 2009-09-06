@@ -96,11 +96,6 @@ if (count($indialpha) > 0) {
 			}
 		}
 		if ($letter != "@") {
-//			if (!isset($startalpha) && !isset($alpha)) {
-//				$startalpha = $letter;
-//				$alpha = $letter;
-//			}
-//			print "<a href=\"indilist.php?alpha=".urlencode($letter)."&amp;surname_sublist=".$surname_sublist."&amp;show_all=".$show_all;
 			print "<a href=\"indilist.php?alpha=".urlencode($letter)."&amp;surname_sublist=".$surname_sublist."&amp;show_all=no";
 			if ($allgeds == "yes") print "&amp;allgeds=yes";
 			print "\">";
@@ -165,7 +160,7 @@ if (($surname_sublist=="yes")&&($show_all=="yes")) {
 		$thisged = splitkey($gid, "ged");
 		SwitchGedcom($thisgedid);
 		$indi_total[$thisgid."[".$indi["gedfile"]."]"] = 1;
-		if (showLivingNameById($thisgid)) {
+		if (PrivacyFunctions::showLivingNameByID($thisgid)) {
 			foreach($indi["names"] as $indexval => $name) {
 				SurnameCount($name[2], $name[1]);
 			}
@@ -195,7 +190,7 @@ else if (($surname_sublist=="yes")&&(empty($surname))&&($show_all=="no")) {
 			$thisgedid = splitkey($gid, "gedid");
 			SwitchGedcom($thisgedid);
 			$indi_total[$thisgid."[".$indi["gedfile"]."]"] = 1;
-			if (showLivingNameById($thisgid)) {
+			if (PrivacyFunctions::showLivingNameByID($thisgid)) {
 				foreach($indi["names"] as $name) {
 					if ($LANGUAGE == "danish" || $LANGUAGE == "norwegian") {
 						if ($alpha == "Ø") $text = "OE";

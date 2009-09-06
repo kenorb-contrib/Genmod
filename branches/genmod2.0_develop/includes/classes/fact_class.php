@@ -200,29 +200,13 @@ class Fact {
  		return $this->resnvalue;
 	}
 	
-/*	private function getFactAssos() {
-		
-		if (is_null($this->factassos)) {
-			$this->factassos = array();
-			if ($this->ShowDetails()) {
-				$i = 1;
-				do {
-					$rec = GetSubRecord(2, "2 ASSO", $this->factrec, $i);
-					if ($rec != "") $this->factassos[] = $rec;
-					$i++;
-				} while ($rec != "");
-			}
-		}
-		return $this->factassos;
-	}
-*/		
 	private function getFactDescription() {
 		
 		if (is_null($this->descr)) {
 			if ($this->ShowDetails()) {
-				if (substr($this->fact, 0, 1) == "X") $fact = substr($this->fact, 1);
-				else $fact = $this->fact;
-				$this->descr = constant("GM_FACT_".$fact);
+				$fact = preg_replace("/^X_/", "_", $this->factref);
+				if (defined("GM_FACT_".$fact)) $this->descr = constant("GM_FACT_".$fact);
+				else $this->descr = $fact;
 			}
 			else $this->descr = "";
 		}
@@ -281,7 +265,7 @@ class Fact {
 			if ($this->fact == "CHAN" || substr($this->fact, 0, 2) == "X_") $this->canedit = false;
 			else {
 				$this->canedit = $this->getOwner()->canedit;
-				if ($this->canedit == true) $this->canedit = !FactEditRestricted($this->getOwner()->xref, $this->factrec);
+				if ($this->canedit == true) $this->canedit = !PrivacyFunctions::FactEditRestricted($this->getOwner()->xref, $this->factrec);
 			}
 		}
 		return $this->canedit;
@@ -317,7 +301,7 @@ class Fact {
 			}
 			if ($fact && $pid) {
 				// age of parents at child birth
-				if ($fact=="BIRT") print_parents_age($pid, $match[1]);
+				if ($fact=="BIRT") $this->GetOwner()->PrintParentsAge($match[1]);
 				// age at event
 				else if ($fact!="CHAN") {
 					// do not print age after death

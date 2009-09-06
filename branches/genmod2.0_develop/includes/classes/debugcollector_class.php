@@ -28,32 +28,28 @@ if (stristr($_SERVER["SCRIPT_NAME"],basename(__FILE__))) {
 	require "../../intrusion.php";
 }
 
-class DebugCollector {
+abstract class DebugCollector {
 	
-	var $classname = "DebugCollector";
-	var $show = false;
+	public $classname = "DebugCollector"; 	// Name of this class
+	public static $show = false;
+	private static $debugoutput = array("output" => array(), "query" => array());	// Collector for the debug output
 	
-	function DebugCollector() {
-		$this->debugoutput["output"] = array();
-		$this->debugoutput["query"] = array();
+	private function PrintRecord($record) {
+		self::OutputCollector(print_r($record, true));
 	}
 	
-	function PrintRecord($record) {
-		$this->OutputCollector(print_r($record, true));
+	private function debugoutputselect($type="output") {
+		if ($type == "output") return self::$debugoutput["output"];
+		else if ($type == "queries") return self::$debugoutput["query"];
 	}
 	
-	function debugoutputselect($type="output") {
-		if ($type == "output") return $this->debugoutput["output"];
-		else if ($type == "queries") return $this->debugoutput["query"];
+	public function OutputCollector($output, $type="output") {
+		if ($type == "output") self::$debugoutput["output"][] = $output;
+		else if ($type == "query") self::$debugoutput["query"][] = $output;
 	}
 	
-	function OutputCollector($output, $type="output") {
-		if ($type == "output") $this->debugoutput["output"][] = $output;
-		else if ($type == "query") $this->debugoutput["query"][] = $output;
-	}
-	
-	function PrintRHtml($arr, $style = "display: none; margin-left: 10px;") {
-		if (!$this->show) return false;
+	private function PrintRHtml($arr, $style = "display: none; margin-left: 10px;") {
+		if (!self::$show) return false;
 		else {
 			static $i = 0; $i++;
 			echo "\n<div id=\"array_tree_$i\" class=\"array_tree\">\n";
@@ -71,7 +67,7 @@ class DebugCollector {
 							echo "'none' : 'block';\"\n";
 							echo "name=\"array_tree_link_$i\" href=\"#array_tree_link_$i\">".htmlspecialchars($key)."</a><br />\n";
 							echo "<div class=\"array_tree_element_\" id=\"array_tree_element_$i\" style=\"$style\">";
-							echo $this->PrintRHtml($val);
+							echo self::PrintRHtml($val);
 							echo "</div>";
 							break;
 						case "integer":
@@ -91,7 +87,7 @@ class DebugCollector {
 							echo  "<br />\n";
 							break;
 						case "string":
-							echo "<b>".htmlspecialchars($key)."</b> => <code><pre>".htmlspecialchars($val)."</pre></code><br />";
+							echo "<code><pre><b>".htmlspecialchars($key)."</b> => ".htmlspecialchars($val)."</pre></code>";
 							break;
 						default:
 							echo "<b>".htmlspecialchars($key)."</b> => ".gettype($val)."<br />";
@@ -101,6 +97,74 @@ class DebugCollector {
 				}
 			}
 			echo "</div>\n";
+		}
+	}
+	
+	/**
+	 * Creates a list of div ids to hide
+	 *
+	 * A list of divs to hide for a menu.
+	 *
+	 * @author	Genmod Development Team
+	 * @param		array	$pages	The array with pages to hide
+	 * @param		string	$show	The name of the page to show
+	 */
+	private function HideDivs($pages, $show) {
+		foreach ($pages as $id => $page) {
+			if ($page == $show) {
+				echo "expand_layer('".$page."', true); ";
+				echo "ChangeClass('".$page."_tab', 'current'); ";
+			}
+			else {
+				echo "expand_layer('".$page."', false); ";
+				echo "ChangeClass('".$page."_tab', ''); ";
+			}
+		}
+	}
+	
+	/**
+	 * Shows debug information
+	 *
+	 * Creates a menu with different sections to show debug info
+	 * It shows info on output (defined by developer), database queries,
+	 * _session, _post and _get variable
+	 *
+	 * @author	Genmod Development Team
+	 * @param		array	$pages	The array with pages to hide
+	 * @param		string	$show	The name of the page to show
+	 */
+	public function PrintDebug() {
+		
+		// If we don't show the debug, return empty
+		if (!self::$show) return false;
+		else {
+			$pages = array("output", "queries", "session", "post", "get");
+			?>
+			<div id="debug_output">
+			<ul>
+				<li id="output_tab" class="current" ><a href="#" onclick="<?php self::HideDivs($pages, 'output');  ?> return false;">Output</a></li>
+				<li id="queries_tab"><a href="#" onclick="<?php self::HideDivs($pages, 'queries');  ?> return false;">Queries</a></li>
+				<li id="session_tab"><a href="#" onclick="<?php self::HideDivs($pages, 'session');  ?> return false;">SESSION</a></li>
+				<li id="post_tab"><a href="#" onclick="<?php self::HideDivs($pages, 'post');  ?> return false;">POST</a></li>
+				<li id="get_tab"><a href="#" onclick="<?php self::HideDivs($pages, 'get');  ?> return false;">GET</a></li>
+			</ul>
+			</div>
+			<?php
+			echo '<div id="output" style="display: show;">';
+			echo self::PrintRHtml(self::debugoutputselect("output"));
+			echo '</div>';
+			echo '<div id="queries" style="display: none;">';
+			echo self::PrintRHtml(self::debugoutputselect("queries"));
+			echo '</div>';
+			echo '<div id="session" style="display: none;">';
+			echo self::PrintRHtml($_SESSION);
+			echo '</div>';
+			echo '<div id="post" style="display: none;">';
+			echo self::PrintRHtml($_POST);
+			echo '</div>';
+			echo '<div id="get" style="display: none;">';
+			echo self::PrintRHtml($_GET);
+			echo '</div>';
 		}
 	}
 }

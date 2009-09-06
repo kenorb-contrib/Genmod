@@ -89,7 +89,7 @@ if (!empty($pid1)) {
 	//-- check if the id is valid
 	$indirec = FindPersonRecord($pid1);
 	if (empty($indirec)) $pid1 = "";
-	if ((!displayDetailsByID($pid1))&&(!showLivingNameByID($pid1))) $title_string .= ": ".$gm_lang["private"];
+	if ((!PrivacyFunctions::displayDetailsByID($pid1))&&(!PrivacyFunctions::showLivingNameByID($pid1))) $title_string .= ": ".$gm_lang["private"];
 	else $title_string .= ":<br />".GetPersonName($pid1);
 	if (!empty($_SESSION["pid1"]) && ($_SESSION["pid1"]!=$pid1)) {
 		unset($_SESSION["relationships"]);
@@ -101,7 +101,7 @@ if (!empty($pid2)) {
 	//-- check if the id is valid
 	$indirec = FindPersonRecord($pid2);
 	if (empty($indirec)) $pid2 = "";
-	if ((!displayDetailsByID($pid2))&&(!showLivingNameByID($pid2))) $title_string .= " - " . $gm_lang["private"]." ";
+	if ((!PrivacyFunctions::displayDetailsByID($pid2))&&(!PrivacyFunctions::showLivingNameByID($pid2))) $title_string .= " - " . $gm_lang["private"]." ";
 	else $title_string .= " ".$gm_lang["and"]." ".GetPersonName($pid2)." ";
 	if (!empty($_SESSION["pid2"]) && ($_SESSION["pid2"]!=$pid2)) {
 		unset($_SESSION["relationships"]);
@@ -245,8 +245,8 @@ if ($view!="preview") {
 	}
 	else {
 		if ((!empty($pid1))&&(!empty($pid2))) {
-			if ((!displayDetailsByID($pid1))&&(!showLivingNameByID($pid1))) $disp = false;
-			else if ((!displayDetailsByID($pid2))&&(!showLivingNameByID($pid2))) $disp = false;
+			if ((!PrivacyFunctions::displayDetailsByID($pid1))&&(!PrivacyFunctions::showLivingNameByID($pid1))) $disp = false;
+			else if ((!PrivacyFunctions::displayDetailsByID($pid2))&&(!PrivacyFunctions::showLivingNameByID($pid2))) $disp = false;
 			if ($disp) {
 				print $gm_lang["show_path"].": </td>";
 				print "\n\t\t<td class=\"shade1\">";

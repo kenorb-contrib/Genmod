@@ -37,8 +37,8 @@ if (empty($action)) $action="";
 //-- make sure that they have gedcom admin status before they can use this page
 //-- otherwise have them login again
 if (!$gm_user->userIsAdmin()) {
-	if (empty($LOGIN_URL)) header("Location: login.php?url=lockout_maint.php");
-	else header("Location: ".$LOGIN_URL."?url=lockout_maint.php");
+	if (LOGIN_URL == "") header("Location: login.php?url=lockout_maint.php");
+	else header("Location: ".LOGIN_URL."?url=lockout_maint.php");
 	exit;
 }
 
@@ -66,7 +66,7 @@ print_header($gm_lang["lockout_maint"]);
 		foreach ($dellock as $key => $value) {
 			$value = explode ("#", $value);
 			if (!isset($value[1])) $value[1] = "";
-			$sql = "DELETE FROM ".$TBLPREFIX."lockout WHERE lo_ip='".trim($value[0])."' AND lo_username='".trim($value[1])."'";
+			$sql = "DELETE FROM ".TBLPREFIX."lockout WHERE lo_ip='".trim($value[0])."' AND lo_username='".trim($value[1])."'";
 			$res = NewQuery($sql);
 			if (!$res) print "error";
 		}
@@ -77,7 +77,7 @@ print_header($gm_lang["lockout_maint"]);
 				$error1 = true;
 			}
 			else {
-				$sql = "INSERT INTO ".$TBLPREFIX."lockout VALUES ('".$add_ip."' , '".time()."', '0', '') ON DUPLICATE KEY UPDATE lo_timestamp='".time()."', lo_release='0'";
+				$sql = "INSERT INTO ".TBLPREFIX."lockout VALUES ('".$add_ip."' , '".time()."', '0', '') ON DUPLICATE KEY UPDATE lo_timestamp='".time()."', lo_release='0'";
 				$res = NewQuery($sql);
 			}
 		}
@@ -87,7 +87,7 @@ print_header($gm_lang["lockout_maint"]);
 				$error2 = true;
 			}
 			else {
-				$sql = "INSERT INTO ".$TBLPREFIX."lockout VALUES ('' , '".time()."', '0', '".$add_user."') ON DUPLICATE KEY UPDATE lo_timestamp='".time()."', lo_release='0'";
+				$sql = "INSERT INTO ".TBLPREFIX."lockout VALUES ('' , '".time()."', '0', '".$add_user."') ON DUPLICATE KEY UPDATE lo_timestamp='".time()."', lo_release='0'";
 				$res = NewQuery($sql);
 			}
 		}
@@ -102,7 +102,7 @@ print_header($gm_lang["lockout_maint"]);
 			</h3>
 		</div>
 		<?php
-		$sql = "SELECT * FROM ".$TBLPREFIX."lockout ORDER BY lo_timestamp ASC";
+		$sql = "SELECT * FROM ".TBLPREFIX."lockout ORDER BY lo_timestamp ASC";
 		$res = NewQuery($sql);
 		if ($res && $res->NumRows() > 0) {
 			?><div class="admin_item_box shade2">

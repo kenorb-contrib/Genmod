@@ -267,7 +267,7 @@ class TimelineControllerRoot extends BaseController {
 							if ($p==count($this->pids)) $p = $factitem["p"];
 							$col = $p % 6;
 							print " <span class=\"person$col\"> <a href=\"individual.php?pid=$spouse&amp;ged=$GEDCOM\">";
-							if (displayDetailsByID($spouse)||showLivingNameByID($spouse)) print GetPersonName($spouse);
+							if (PrivacyFunctions::displayDetailsByID($spouse)||PrivacyFunctions::showLivingNameByID($spouse)) print GetPersonName($spouse);
 							else print $gm_lang["private"];
 							print "</a> </span>";
 						}

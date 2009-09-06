@@ -39,7 +39,7 @@ if (isset ($_REQUEST['mod'])) {
 */
 require("config.php");
 
-if (!isset($CONFIGURED)) {
+if (!defined('CONFIGURED')) {
 	print "Unable to include the config.php file.  Make sure that . is in your PHP include path in the php.ini file.";
 	exit;
 }
@@ -99,8 +99,8 @@ if (!isset($action)) $action="";
 if (empty($gm_username)) {
 	if (!empty($command)) {
 		if ($command=="user") {
-			if (empty($LOGIN_URL)) header("Location: login.php?help_message=mygedview_login_help&url=".urlencode("index.php?command=user"));
-			else header("Location: ".$LOGIN_URL."?help_message=mygedview_login_help&url=".urlencode("index.php?command=user"));
+			if (LOGIN_URL == "") header("Location: login.php?help_message=mygedview_login_help&url=".urlencode("index.php?command=user"));
+			else header("Location: ".LOGIN_URL."?help_message=mygedview_login_help&url=".urlencode("index.php?command=user"));
 			exit;
 		}
 	}
@@ -158,10 +158,10 @@ if (!empty($gm_username)) {
 	}
 	else if ($action=="deletemessage") {
 		if (isset($message_id)) {
-			if (!is_array($message_id)) deleteMessage($message_id);
+			if (!is_array($message_id)) MessageController::deleteMessage($message_id);
 			else {
 				foreach($message_id as $indexval => $mid) {
-					if (isset($mid)) deleteMessage($mid);
+					if (isset($mid)) MessageController::deleteMessage($mid);
 				}
 			}
 		}

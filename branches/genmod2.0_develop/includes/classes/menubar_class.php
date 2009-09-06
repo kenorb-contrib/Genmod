@@ -56,19 +56,19 @@ class MenuBar {
 	 * @return Menu		the menu item
 	 */
 	function GetCustomMenu() {
-		global $TBLPREFIX, $gm_lang, $TEXT_DIRECTION, $CONFIGURED, $DBCONN, $gm_user;
+		global $gm_lang, $TEXT_DIRECTION, $gm_user, $DBCONN;
 		
 		if (!$DBCONN->connected) return false;
 		
 		// NOTE: Check if table exists, if not, do print the menu
-		$sql = "SHOW TABLES LIKE '".$TBLPREFIX."pages'";
+		$sql = "SHOW TABLES LIKE '".TBLPREFIX."pages'";
 		$res = NewQuery($sql);
 		if ($res) {
 			if ($TEXT_DIRECTION=="rtl") $ff="_rtl";
 			else $ff="";
 			
 			// Retrieve the current pages stored in the DB
-			$sql = "SELECT * FROM ".$TBLPREFIX."pages";
+			$sql = "SELECT * FROM ".TBLPREFIX."pages";
 			$result = NewQuery($sql);
 			if (!$result) {
 				$message  = 'Invalid query: ' . mysql_error() . "\n";
@@ -112,8 +112,8 @@ class MenuBar {
 	 * @return Menu		the menu item
 	 */
 	function GetFileMenu() {
-		global $TEXT_DIRECTION, $GEDCOM, $gm_lang, $debugcollector;
-		global $SCRIPT_NAME, $LOGIN_URL, $SERVER_URL, $QUERY_STRING, $gm_username;
+		global $TEXT_DIRECTION, $GEDCOM, $gm_lang;
+		global $SCRIPT_NAME, $QUERY_STRING, $gm_username;
 		global $ALLOW_CHANGE_GEDCOM, $GEDCOMS, $GEDCOM, $gm_user;
 		
 		 $username = $gm_username;
@@ -126,8 +126,8 @@ class MenuBar {
 		// NOTE: Login link
 		if (empty($gm_user->username)) {
 			$submenu = new Menu($gm_lang["login"]);
-			if (!empty($LOGIN_URL)) $submenu->addLink($LOGIN_URL."?url=".urlencode(basename($SCRIPT_NAME)."?".$QUERY_STRING."&ged=$GEDCOM"));
-			else $submenu->addLink($SERVER_URL."login.php?url=".urlencode(basename($SCRIPT_NAME)."?".$QUERY_STRING."&ged=$GEDCOM"));
+			if (!LOGIN_URL == "") $submenu->addLink(LOGIN_URL."?url=".urlencode(basename($SCRIPT_NAME)."?".$QUERY_STRING."&ged=$GEDCOM"));
+			else $submenu->addLink(SERVER_URL."login.php?url=".urlencode(basename($SCRIPT_NAME)."?".$QUERY_STRING."&ged=$GEDCOM"));
 			$menu->addSubmenu($submenu);
 		}
 		
@@ -178,8 +178,8 @@ class MenuBar {
 	}
 
 	function GetEditMenu() {
-		global $TEXT_DIRECTION, $GEDCOM, $gm_lang, $debugcollector;
-		global $SCRIPT_NAME, $LOGIN_URL, $QUERY_STRING, $GEDCOM, $gm_username;
+		global $TEXT_DIRECTION, $GEDCOM, $gm_lang;
+		global $SCRIPT_NAME, $QUERY_STRING, $GEDCOM, $gm_username;
 		global $ALLOW_CHANGE_GEDCOM, $GEDCOMS;
 		
 		global $ENABLE_CLIPPINGS_CART, $gm_user;

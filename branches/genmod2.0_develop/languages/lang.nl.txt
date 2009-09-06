@@ -1930,7 +1930,7 @@
 "sort_by";"Sorteren op"
 "sort_by_birth";"Sorteren op geboortedatum"
 "sort_by_marriage";"Sorteren op huwelijksdatum"
-"sort_by_person";"Sorteren op persoon"
+"sort_by_person";"Sorteren op actie voor"
 "sort_by_repo";"Sorteren op bewaarplaats"
 "sosa_10";"opper"
 "sosa_11";"hoog"

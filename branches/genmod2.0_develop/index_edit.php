@@ -86,7 +86,7 @@ $GM_BLOCKS = array();
 
 //-- See if https is used for login
 $httpslogin = false;
-if ((empty($LOGIN_URL) && substr($SERVER_URL,0,5) == "https") || substr($LOGIN_URL,0,5) == "https") $httpslogin = true;
+if ((LOGIN_URL == "" && substr(SERVER_URL,0,5) == "https") || substr(LOGIN_URL,0,5) == "https") $httpslogin = true;
 //-- load all of the blocks
 
 $d = dir("blocks");

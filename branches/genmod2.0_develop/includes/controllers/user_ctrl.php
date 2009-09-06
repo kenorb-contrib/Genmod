@@ -45,13 +45,13 @@ abstract class UserController {
 	 * @return string 	returns a username
 	 */
 	public function getUserByGedcomId($id, $gedcom) {
-		global $TBLPREFIX, $DBCONN, $GEDCOMS;
+		global $GEDCOMS;
 
 		if (empty($id) || empty($gedcom)) return false;
 	
 		$user = false;
-		$id = $DBCONN->EscapeQuery($id);
-		$sql = "SELECT ug_username FROM ".$TBLPREFIX."users_gedcoms WHERE ";
+		$id = DbLayer::EscapeQuery($id);
+		$sql = "SELECT ug_username FROM ".TBLPREFIX."users_gedcoms WHERE ";
 		$sql .= "ug_gedfile='".$GEDCOMS[$gedcom]["id"]."'";
 		$sql .= "AND ug_gedcomid='".$id."'";
 		$res = NewQuery($sql, false);
@@ -99,10 +99,9 @@ abstract class UserController {
 	* @return boolean true if an admin user has been defined
 	*/ 
 	public static function AdminUserExists() {
-		global $TBLPREFIX;
 		
 		if (is_null(self::$adm_user_exists)) {
-			$sql = "SELECT COUNT(u_username) as admins FROM ".$TBLPREFIX."users WHERE u_canadmin = 'Y'";
+			$sql = "SELECT COUNT(u_username) as admins FROM ".TBLPREFIX."users WHERE u_canadmin = 'Y'";
 			$res = NewQuery($sql);
 			if ($res) {
 				$row = $res->FetchRow();
@@ -124,7 +123,7 @@ abstract class UserController {
 	* @return string 	the username of the user or an empty string if the user is not logged in
 	*/
 	public function GetUserName() {
-		global $ALLOW_REMEMBER_ME, $DBCONN, $logout, $SERVER_URL;
+		global $ALLOW_REMEMBER_ME, $logout, $DBCONN;
 		//-- this section checks if the session exists and uses it to get the username
 		if (isset($_SESSION)) {
 			if (!empty($_SESSION['gm_user'])) return $_SESSION['gm_user'];
@@ -133,7 +132,7 @@ abstract class UserController {
 			if (!empty($HTTP_SESSION_VARS['gm_user'])) return $HTTP_SESSION_VARS['gm_user'];
 		}
 		if ($ALLOW_REMEMBER_ME) {
-			$tSERVER_URL = preg_replace(array("'https?://'", "'www.'", "'/$'"), array("","",""), $SERVER_URL);
+			$tSERVER_URL = preg_replace(array("'https?://'", "'www.'", "'/$'"), array("","",""), SERVER_URL);
 			if ((isset($_SERVER['HTTP_REFERER'])) && (stristr($_SERVER['HTTP_REFERER'],$tSERVER_URL)!==false)) $referrer_found=true;
 			if (!empty($_COOKIE["gm_rem"])&& (empty($referrer_found)) && empty($logout)) {
 				if (!is_object($DBCONN)) return $_COOKIE["gm_rem"];
@@ -161,14 +160,14 @@ abstract class UserController {
 	* @return bool return true if the username and password credentials match a user in the database return false if they don't
 	*/
 	public function AuthenticateUser($username, $password) {
-		global $TBLPREFIX, $GEDCOM, $gm_lang;
+		global $GEDCOM, $gm_lang;
 
 		$user =& User::GetInstance($username);
 
 		if (!empty($user->username)) {
 			if (crypt($password, $user->password) == $user->password) {
 	        	if ((($user->verified == "yes") and ($user->verified_by_admin == "yes")) or ($user->canadmin != "")){
-					$sql = "UPDATE ".$TBLPREFIX."users SET u_loggedin='Y', u_sessiontime='".time()."' WHERE u_username='$username'";
+					$sql = "UPDATE ".TBLPREFIX."users SET u_loggedin='Y', u_sessiontime='".time()."' WHERE u_username='$username'";
 					$res = NewQuery($sql);
 					$user =& User::GetInstance($username);
 					
@@ -220,14 +219,14 @@ abstract class UserController {
 	 * @param		string	$logtext		Optional text to write to the log for reason of user logout
 	 */
 	public function UserLogout($username, $logtext = "") {
-		global $TBLPREFIX, $GEDCOM, $LANGUAGE, $gm_username;
+		global $GEDCOM, $LANGUAGE, $gm_username;
 
 		if ($username=="") {
 			if (isset($_SESSION["gm_user"])) $username = $_SESSION["gm_user"];
 			else if (isset($_COOKIE["gm_rem"])) $username = $_COOKIE["gm_rem"];
 			else return;
 		}
-		$sql = "UPDATE ".$TBLPREFIX."users SET u_loggedin='N' WHERE BINARY u_username='".$username."'";
+		$sql = "UPDATE ".TBLPREFIX."users SET u_loggedin='N' WHERE BINARY u_username='".$username."'";
 		$res = NewQuery($sql);
 		if ($logtext == "") WriteToLog("UserController::UserLogout: Succesful logout for " . $username . " <-", "I", "S");
 		else WriteToLog("UserController::UserLogout: ".$logtext." -> " . $username . " <-", "I", "S");
@@ -258,11 +257,10 @@ abstract class UserController {
 	* @return array returns a sorted array of users
 	*/
 	public function GetUsers($field = "username", $order = "asc", $sort2 = "firstname", $select="") {
-		global $TBLPREFIX;
 	
 		$selusers = array();
 		$users = array();
-		$sql = "SELECT * FROM ".$TBLPREFIX."users_gedcoms ug RIGHT JOIN ".$TBLPREFIX."users u ON BINARY u.u_username = BINARY ug.ug_username";
+		$sql = "SELECT * FROM ".TBLPREFIX."users_gedcoms ug RIGHT JOIN ".TBLPREFIX."users u ON BINARY u.u_username = BINARY ug.ug_username";
 		if (!empty($select)) $sql .= " WHERE ".$select;
 		$res = NewQuery($sql);
 		if ($res) {
@@ -285,9 +283,8 @@ abstract class UserController {
 	* Returns either the number or false
 	*/
 	public function CountUsers() {
-		global $TBLPREFIX;
 	
-		$sql = "SELECT count(u_username) FROM ".$TBLPREFIX."users";
+		$sql = "SELECT count(u_username) FROM ".TBLPREFIX."users";
 		$res = NewQuery($sql);
 		if ($res) {
 			$row = $res->FetchRow();
@@ -304,33 +301,33 @@ abstract class UserController {
 	* @param string $msg		The log message to write to the log
 	*/
 	public function AddUser($newuser, $msg = "added") {
-		global $TBLPREFIX, $DBCONN, $USE_RELATIONSHIP_PRIVACY, $MAX_RELATION_PATH_LENGTH, $GEDCOMS;
+		global $USE_RELATIONSHIP_PRIVACY, $MAX_RELATION_PATH_LENGTH, $GEDCOMS;
 
 		if (!isset($newuser->auto_accept)) $newuser->auto_accept = "N";
 		$newuser->firstname = preg_replace("/\//", "", $newuser->firstname);
 		$newuser->lastname = preg_replace("/\//", "", $newuser->lastname);
-		$sql = "INSERT INTO ".$TBLPREFIX."users VALUES('".$newuser->username."','".$newuser->password."','".$DBCONN->EscapeQuery($newuser->firstname)."','".$DBCONN->EscapeQuery($newuser->lastname)."'";
+		$sql = "INSERT INTO ".TBLPREFIX."users VALUES('".$newuser->username."','".$newuser->password."','".DbLayer::EscapeQuery($newuser->firstname)."','".DbLayer::EscapeQuery($newuser->lastname)."'";
 		if ($newuser->canadmin) $sql .= ",'Y'";
 		else $sql .= ",'N'";
-		$sql .= ",'".$DBCONN->EscapeQuery($newuser->email)."'";
-		$sql .= ",'".$DBCONN->EscapeQuery($newuser->verified)."'";
-		$sql .= ",'".$DBCONN->EscapeQuery($newuser->verified_by_admin)."'";
-		$sql .= ",'".$DBCONN->EscapeQuery($newuser->language)."'";
-		$sql .= ",'".$DBCONN->EscapeQuery($newuser->pwrequested)."'";
-		$sql .= ",'".$DBCONN->EscapeQuery($newuser->reg_timestamp)."'";
-		$sql .= ",'".$DBCONN->EscapeQuery($newuser->reg_hashcode)."'";
-		$sql .= ",'".$DBCONN->EscapeQuery($newuser->theme)."'";
-		$sql .= ",'".$DBCONN->EscapeQuery($newuser->loggedin)."'";
-		$sql .= ",'".$DBCONN->EscapeQuery($newuser->sessiontime)."'";
-		$sql .= ",'".$DBCONN->EscapeQuery($newuser->contactmethod)."'";
+		$sql .= ",'".DbLayer::EscapeQuery($newuser->email)."'";
+		$sql .= ",'".DbLayer::EscapeQuery($newuser->verified)."'";
+		$sql .= ",'".DbLayer::EscapeQuery($newuser->verified_by_admin)."'";
+		$sql .= ",'".DbLayer::EscapeQuery($newuser->language)."'";
+		$sql .= ",'".DbLayer::EscapeQuery($newuser->pwrequested)."'";
+		$sql .= ",'".DbLayer::EscapeQuery($newuser->reg_timestamp)."'";
+		$sql .= ",'".DbLayer::EscapeQuery($newuser->reg_hashcode)."'";
+		$sql .= ",'".DbLayer::EscapeQuery($newuser->theme)."'";
+		$sql .= ",'".DbLayer::EscapeQuery($newuser->loggedin)."'";
+		$sql .= ",'".DbLayer::EscapeQuery($newuser->sessiontime)."'";
+		$sql .= ",'".DbLayer::EscapeQuery($newuser->contactmethod)."'";
 		if ($newuser->visibleonline) $sql .= ",'Y'";
 		else $sql .= ",'N'";
 		if ($newuser->editaccount) $sql .= ",'Y'";
 		else $sql .= ",'N'";
-		$sql .= ",'".$DBCONN->EscapeQuery($newuser->default_tab)."'";
-		$sql .= ",'".$DBCONN->EscapeQuery($newuser->comment)."'";
-		$sql .= ",'".$DBCONN->EscapeQuery($newuser->comment_exp)."'";
-		if (isset($newuser->sync_gedcom)) $sql .= ",'".$DBCONN->EscapeQuery($newuser->sync_gedcom)."'";
+		$sql .= ",'".DbLayer::EscapeQuery($newuser->default_tab)."'";
+		$sql .= ",'".DbLayer::EscapeQuery($newuser->comment)."'";
+		$sql .= ",'".DbLayer::EscapeQuery($newuser->comment_exp)."'";
+		if (isset($newuser->sync_gedcom)) $sql .= ",'".DbLayer::EscapeQuery($newuser->sync_gedcom)."'";
 		else $sql .= ",'N'";
 		if (isset($newuser->auto_accept) && $newuser->auto_accept==true) $sql .= ",'Y'";
 		else $sql .= ",'N'";
@@ -339,7 +336,7 @@ abstract class UserController {
 			// Now write the rights
 			foreach ($GEDCOMS as $id=>$value) {
 				$ged = get_gedcom_from_id($id);
-				$sql = "INSERT INTO ".$TBLPREFIX."users_gedcoms VALUES('0','";
+				$sql = "INSERT INTO ".TBLPREFIX."users_gedcoms VALUES('0','";
 				$sql .= $newuser->username."','".$value["id"]."','";
 				if (isset($newuser->gedcomid[$ged])) $sql .= $newuser->gedcomid[$ged];
 				$sql .= "','";
@@ -377,12 +374,11 @@ abstract class UserController {
 	* @param string $msg		a message to write to the log file
 	*/
 	public function DeleteUser($username, $msg = "deleted") {
-		global $TBLPREFIX, $DBCONN;
 	
-		$username = $DBCONN->EscapeQuery($username);
-		$sql = "DELETE FROM ".$TBLPREFIX."users WHERE BINARY u_username='$username'";
+		$username = DbLayer::EscapeQuery($username);
+		$sql = "DELETE FROM ".TBLPREFIX."users WHERE BINARY u_username='$username'";
 		$res = NewQuery($sql);
-		$sql = "DELETE FROM ".$TBLPREFIX."users_gedcoms WHERE BINARY ug_username='$username'";
+		$sql = "DELETE FROM ".TBLPREFIX."users_gedcoms WHERE BINARY ug_username='$username'";
 		$res = NewQuery($sql);
 		$activeuser = self::GetUserName();
 		if ($activeuser == "") $activeuser = "Anonymous user";
@@ -462,7 +458,7 @@ abstract class UserController {
 	* @return 	boolean	Return true or false as a result of the update
 	*/
 	public function UpdateSessiontime($username) {
-		global $TBLPREFIX, $users, $GM_SESSION_TIME;
+		global $users, $GM_SESSION_TIME;
 	
 		$user =& User::GetInstance($username);
 		if (!$user->is_empty) {
@@ -472,7 +468,7 @@ abstract class UserController {
 			}
 		}
 		else {
-			$sql = "UPDATE ".$TBLPREFIX."users SET u_loggedin='Y', u_sessiontime='".time()."' WHERE BINARY u_username='".$username."'";
+			$sql = "UPDATE ".TBLPREFIX."users SET u_loggedin='Y', u_sessiontime='".time()."' WHERE BINARY u_username='".$username."'";
 			$res = NewQuery($sql);
 			if ($res) {
 				User::RenewInstance($username);
@@ -503,9 +499,8 @@ abstract class UserController {
 	}
 	
 	public function CheckPrivacyOverrides($gedid) {
-		global $TBLPREFIX;
 		
-		$sql = "SELECT count(ug_username) FROM ".$TBLPREFIX."users_gedcoms WHERE (ug_relationship_privacy<>'' OR ug_hide_live_people<>'' OR ug_show_living_names<>'') AND ug_gedfile='".$gedid."'";
+		$sql = "SELECT count(ug_username) FROM ".TBLPREFIX."users_gedcoms WHERE (ug_relationship_privacy<>'' OR ug_hide_live_people<>'' OR ug_show_living_names<>'') AND ug_gedfile='".$gedid."'";
 		$res = NewQuery($sql);
 		if ($res) {
 			$row = $res->FetchRow();

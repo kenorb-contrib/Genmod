@@ -90,7 +90,7 @@ function print_child_ascendancy($pid, $sosa, $depth) {
 		print "<img src=\"".$GM_IMAGE_DIR."/".$GM_IMAGES["spacer"]["other"]."\" height=\"2\" width=\"$Dindent\" border=\"0\" align=\"middle\" alt=\"\" /><a href=\"javascript: ".$gm_lang["view_family"]."\" onclick=\"expand_layer('sosa_".$sosa."'); return false;\" class=\"top\"><img id=\"sosa_".$sosa."_img\" src=\"".$GM_IMAGE_DIR."/".$GM_IMAGES["minus"]["other"]."\" align=\"middle\" hspace=\"0\" vspace=\"3\" border=\"0\" alt=\"".$gm_lang["view_family"]."\" /></a> ";
 		print "&nbsp;<span class=\"person_box\">&nbsp;".($sosa*2)."&nbsp;</span>&nbsp;".$gm_lang["and"];
  		print "&nbsp;<span class=\"person_boxF\">&nbsp;".($sosa*2+1)." </span>&nbsp;";
-		if (showFact("MARR", $famid)) print_simple_fact($famrec, "MARR", $parents["WIFE"]); else print $gm_lang["private"];
+		if (PrivacyFunctions::showFact("MARR", $famid)) print_simple_fact($famrec, "MARR", $parents["WIFE"]); else print $gm_lang["private"];
 		print "</span>";
 		// display parents recursively
 		print "<ul style=\"list-style: none; display: block;\" id=\"sosa_$sosa\">";
@@ -139,7 +139,7 @@ $bheight=$Dbheight;
 $pbwidth = $bwidth+12;
 $pbheight = $bheight+14;
 
-if (showLivingNameByID($rootid)) {
+if (PrivacyFunctions::showLivingNameByID($rootid)) {
 	$name = GetPersonName($rootid);
 	$addname = GetAddPersonName($rootid);
 }

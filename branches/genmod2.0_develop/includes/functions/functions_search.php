@@ -32,9 +32,6 @@ if (strstr($_SERVER["SCRIPT_NAME"],basename(__FILE__))) {
 	require "../../intrusion.php";
 }
 
-//-- set the REGEXP status of databases
-$REGEXP_DB = true;
-
 //-- search through the gedcom records for individuals
 /**
  * Search the database for individuals that match the query
@@ -48,16 +45,16 @@ $REGEXP_DB = true;
  * @return	array $myindilist array with all individuals that matched the query
  */
 function SearchIndis($query, $allgeds=false, $ANDOR="AND") {
-	global $TBLPREFIX, $indilist, $DBCONN, $REGEXP_DB, $GEDCOMID, $GEDCOMS, $GEDCOM;
+	global $indilist, $GEDCOMS, $GEDCOM;
 	
 	$myindilist = array();
-	if (!is_array($query)) $sql = "SELECT i_key, i_id, i_file, i_gedcom, i_isdead FROM ".$TBLPREFIX."individuals WHERE (i_gedcom REGEXP '".$DBCONN->EscapeQuery($query)."')";
+	if (!is_array($query)) $sql = "SELECT i_key, i_id, i_file, i_gedcom, i_isdead FROM ".TBLPREFIX."individuals WHERE (i_gedcom REGEXP '".DbLayer::EscapeQuery($query)."')";
 	else {
-		$sql = "SELECT i_key, i_id, i_file, i_gedcom, i_isdead FROM ".$TBLPREFIX."individuals WHERE (";
+		$sql = "SELECT i_key, i_id, i_file, i_gedcom, i_isdead FROM ".TBLPREFIX."individuals WHERE (";
 		$i=0;
 		foreach($query as $indexval => $q) {
 			if ($i>0) $sql .= " $ANDOR ";
-			$sql .= "(i_gedcom REGEXP '".$DBCONN->EscapeQuery($q)."')";
+			$sql .= "(i_gedcom REGEXP '".DbLayer::EscapeQuery($q)."')";
 			$i++;
 		}
 		$sql .= ")";
@@ -68,7 +65,7 @@ function SearchIndis($query, $allgeds=false, $ANDOR="AND") {
 		if (count($allgeds) != count($GEDCOMS)) {
 			$sql .= " AND (";
 			for ($i=0; $i<count($allgeds); $i++) {
-				$sql .= "i_file='".$DBCONN->EscapeQuery($GEDCOMS[$allgeds[$i]]["id"])."'";
+				$sql .= "i_file='".DbLayer::EscapeQuery($GEDCOMS[$allgeds[$i]]["id"])."'";
 				if ($i < count($allgeds)-1) $sql .= " OR ";
 			}
 			$sql .= ")";
@@ -103,7 +100,7 @@ function SearchIndis($query, $allgeds=false, $ANDOR="AND") {
  * @return	array $myindilist array with all individuals that matched the query
  */
 function FTSearchIndis($query, $allgeds=false, $ANDOR="AND") {
-	global $TBLPREFIX, $indilist, $DBCONN, $REGEXP_DB, $GEDCOMID, $GEDCOMS, $GEDCOM, $ftminwlen, $ftmaxwlen, $COMBIKEY;
+	global $indilist, $GEDCOMID, $GEDCOMS, $GEDCOM, $ftminwlen, $ftmaxwlen, $COMBIKEY;
 	
 	// Get the min and max search word length
 	GetFTWordLengths();
@@ -121,20 +118,20 @@ function FTSearchIndis($query, $allgeds=false, $ANDOR="AND") {
 	if ($mlen < $ftminwlen || HasMySQLStopwords($cquery)) {
 		if (isset($cquery["includes"])) {
 			foreach ($cquery["includes"] as $index => $keyword) {
-				if (!Utf8_isascii($keyword["term"])) $addsql .= " ".$keyword["operator"]." i_gedcom REGEXP '".$DBCONN->EscapeQuery($keyword["term"]).$keyword["wildcard"]."'";
-				else $addsql .= " ".$keyword["operator"]." i_gedcom REGEXP '[[:<:]]".$DBCONN->EscapeQuery($keyword["term"]).$keyword["wildcard"]."[[:>:]]'";
+				if (!Utf8_isascii($keyword["term"])) $addsql .= " ".$keyword["operator"]." i_gedcom REGEXP '".DbLayer::EscapeQuery($keyword["term"]).$keyword["wildcard"]."'";
+				else $addsql .= " ".$keyword["operator"]." i_gedcom REGEXP '[[:<:]]".DbLayer::EscapeQuery($keyword["term"]).$keyword["wildcard"]."[[:>:]]'";
 			}
 		}
 		if (isset($cquery["excludes"])) {
 			foreach ($cquery["excludes"] as $index => $keyword) {
-				if (!Utf8_isascii($keyword["term"])) $addsql .= " AND i_gedcom NOT REGEXP '".$DBCONN->EscapeQuery($keyword["term"]).$keyword["wildcard"]."'";
-				else $addsql .= " AND i_gedcom NOT REGEXP '[[:<:]]".$DBCONN->EscapeQuery($keyword["term"]).$keyword["wildcard"]."[[:>:]]'";
+				if (!Utf8_isascii($keyword["term"])) $addsql .= " AND i_gedcom NOT REGEXP '".DbLayer::EscapeQuery($keyword["term"]).$keyword["wildcard"]."'";
+				else $addsql .= " AND i_gedcom NOT REGEXP '[[:<:]]".DbLayer::EscapeQuery($keyword["term"]).$keyword["wildcard"]."[[:>:]]'";
 			}
 		}
-		$sql = "SELECT i_key, i_id, i_file, i_gedcom, i_isdead, n_name, n_letter, n_type, n_surname FROM ".$TBLPREFIX."individuals, ".$TBLPREFIX."names WHERE i_key=n_key AND (".substr($addsql,4).")";
+		$sql = "SELECT i_key, i_id, i_file, i_gedcom, i_isdead, n_name, n_letter, n_type, n_surname FROM ".TBLPREFIX."individuals, ".TBLPREFIX."names WHERE i_key=n_key AND (".substr($addsql,4).")";
 	}
 	else {
-		$sql = "SELECT i_key, i_id, i_file, i_gedcom, i_isdead, n_name, n_letter, n_type, n_surname FROM ".$TBLPREFIX."individuals, ".$TBLPREFIX."names WHERE i_key=n_key AND (MATCH (i_gedcom) AGAINST ('".$DBCONN->EscapeQuery($query)."' IN BOOLEAN MODE))";
+		$sql = "SELECT i_key, i_id, i_file, i_gedcom, i_isdead, n_name, n_letter, n_type, n_surname FROM ".TBLPREFIX."individuals, ".TBLPREFIX."names WHERE i_key=n_key AND (MATCH (i_gedcom) AGAINST ('".DbLayer::EscapeQuery($query)."' IN BOOLEAN MODE))";
 	}
 		
 	if (!$allgeds) $sql .= " AND i_file='".$GEDCOMID."'";
@@ -143,7 +140,7 @@ function FTSearchIndis($query, $allgeds=false, $ANDOR="AND") {
 		if (count($allgeds) != count($GEDCOMS)) {
 			$sql .= " AND (";
 			for ($i=0; $i<count($allgeds); $i++) {
-				$sql .= "i_file='".$DBCONN->EscapeQuery($GEDCOMS[$allgeds[$i]]["id"])."'";
+				$sql .= "i_file='".DbLayer::EscapeQuery($GEDCOMS[$allgeds[$i]]["id"])."'";
 				if ($i < count($allgeds)-1) $sql .= " OR ";
 			}
 			$sql .= ")";
@@ -177,9 +174,9 @@ function FTSearchIndis($query, $allgeds=false, $ANDOR="AND") {
  * @subpackage Calendar
 **/
 function SearchIndisFam($add2myindilist) {
-	global $TBLPREFIX, $GEDCOM, $indilist, $myindilist, $GEDCOMID;
+	global $GEDCOM, $indilist, $myindilist, $GEDCOMID;
 
-	$sql = "SELECT i_id, i_file, i_gedcom, i_isdead, n_name, n_type, n_surname, n_letter FROM ".$TBLPREFIX."individuals, ".$TBLPREFIX."names WHERE i_key=n_key AND i_file='".$GEDCOMID."'";
+	$sql = "SELECT i_id, i_file, i_gedcom, i_isdead, n_name, n_type, n_surname, n_letter FROM ".TBLPREFIX."individuals, ".TBLPREFIX."names WHERE i_key=n_key AND i_file='".$GEDCOMID."'";
 	$res = NewQuery($sql);
 	while($row = $res->fetchAssoc()){
 		if (isset($add2myindilist[$row["i_id"]])){
@@ -204,15 +201,14 @@ function SearchIndisFam($add2myindilist) {
 * @subpackage Calendar
 **/
 function SearchIndisYearRange($startyear, $endyear, $allgeds=false) {
-	global $TBLPREFIX, $GEDCOM, $indilist, $DBCONN, $REGEXP_DB, $GEDCOMS, $GEDCOMID;
+	global $GEDCOM, $indilist, $GEDCOMS, $GEDCOMID;
 
 	$myindilist = array();
-	$sql = "SELECT i_id, i_file, i_gedcom, i_isdead, n_name, n_surname, n_letter, n_type FROM ".$TBLPREFIX."individuals, ".$TBLPREFIX."names WHERE i_key=n_key AND (";
+	$sql = "SELECT i_id, i_file, i_gedcom, i_isdead, n_name, n_surname, n_letter, n_type FROM ".TBLPREFIX."individuals, ".TBLPREFIX."names WHERE i_key=n_key AND (";
 	$i=$startyear;
 	while($i <= $endyear) {
 		if ($i > $startyear) $sql .= " OR ";
-		if ($REGEXP_DB) $sql .= "i_gedcom REGEXP '".$DBCONN->EscapeQuery("2 DATE[^\n]* ".$i)."'";
-		else $sql .= "i_gedcom LIKE '".$DBCONN->EscapeQuery("%2 DATE%".$i)."%'";
+		$sql .= "i_gedcom REGEXP '".DbLayer::EscapeQuery("2 DATE[^\n]* ".$i)."'";
 		$i++;
 	}
 	$sql .= ")";
@@ -240,28 +236,23 @@ function SearchIndisYearRange($startyear, $endyear, $allgeds=false) {
  * @subpackage Find
 **/
 function SearchIndisNames($query, $allgeds=false, $gedid=0) {
-	global $TBLPREFIX, $GEDCOM, $indilist, $DBCONN, $REGEXP_DB, $GEDCOMS, $GEDCOMID;
+	global $GEDCOM, $indilist, $GEDCOMS, $GEDCOMID;
 	
 	//-- split up words and find them anywhere in the record... important for searching names
 	//-- like "givenname surname"
 	if (!is_array($query)) {
 		$query = preg_split("/[\s,]+/", $query);
-		if (!$REGEXP_DB) {
-			for($i=0; $i<count($query); $i++){
-				$query[$i] = "%".$query[$i]."%";
-			}
-		}
 	}
 
 	$myindilist = array();
-	if (!is_array($query)) $sql = "SELECT i_id, i_file, i_gedcom, i_isdead, n_name, n_letter, n_type, n_surname FROM ".$TBLPREFIX."individuals, ".$TBLPREFIX."names WHERE i_key=n_key AND n_name REGEXP '".$DBCONN->EscapeQuery($query)."'";
+	if (!is_array($query)) $sql = "SELECT i_id, i_file, i_gedcom, i_isdead, n_name, n_letter, n_type, n_surname FROM ".TBLPREFIX."individuals, ".TBLPREFIX."names WHERE i_key=n_key AND n_name REGEXP '".DbLayer::EscapeQuery($query)."'";
 	else {
-		$sql = "SELECT i_id, i_file, i_gedcom, i_isdead, n_name, n_letter, n_type, n_surname FROM ".$TBLPREFIX."individuals, ".$TBLPREFIX."names WHERE i_key=n_key AND (";
+		$sql = "SELECT i_id, i_file, i_gedcom, i_isdead, n_name, n_letter, n_type, n_surname FROM ".TBLPREFIX."individuals, ".TBLPREFIX."names WHERE i_key=n_key AND (";
 		$i=0;
 		foreach($query as $indexval => $q) {
 			if (!empty($q)) {
 				if ($i>0) $sql .= " AND ";
-				$sql .= "n_name REGEXP '".$DBCONN->EscapeQuery($q)."'";
+				$sql .= "n_name REGEXP '".DbLayer::EscapeQuery($q)."'";
 				$i++;
 			}
 		}
@@ -302,13 +293,13 @@ function SearchIndisNames($query, $allgeds=false, $gedid=0) {
  * @return	array $myindilist array with all individuals that matched the query
  */
 function SearchIndisDates($day="", $month="", $year="", $fact="", $allgeds=false, $ANDOR="AND") {
-	global $TBLPREFIX, $GEDCOM, $indilist, $DBCONN, $REGEXP_DB, $GEDCOMS, $GEDCOMID;
+	global $GEDCOM, $indilist, $GEDCOMS, $GEDCOMID;
 	$myindilist = array();
 	
-	$sql = "SELECT i_id, i_file, i_gedcom, i_isdead, d_gid, d_fact, n_name, n_surname, n_type, n_letter FROM ".$TBLPREFIX."dates, ".$TBLPREFIX."individuals, ".$TBLPREFIX."names WHERE i_key=d_key AND n_key=i_key ";
-	if (!empty($day)) $sql .= "AND d_day='".$DBCONN->EscapeQuery($day)."' ";
-	if (!empty($month)) $sql .= "AND d_month='".$DBCONN->EscapeQuery($month)."' ";
-	if (!empty($year)) $sql .= "AND d_year='".$DBCONN->EscapeQuery($year)."' ";
+	$sql = "SELECT i_id, i_file, i_gedcom, i_isdead, d_gid, d_fact, n_name, n_surname, n_type, n_letter FROM ".TBLPREFIX."dates, ".TBLPREFIX."individuals, ".TBLPREFIX."names WHERE i_key=d_key AND n_key=i_key ";
+	if (!empty($day)) $sql .= "AND d_day='".DbLayer::EscapeQuery($day)."' ";
+	if (!empty($month)) $sql .= "AND d_month='".DbLayer::EscapeQuery($month)."' ";
+	if (!empty($year)) $sql .= "AND d_year='".DbLayer::EscapeQuery($year)."' ";
 	if (!empty($fact)) {
 		$sql .= "AND (";
 		$facts = preg_split("/[,:; ]/", $fact);
@@ -318,10 +309,10 @@ function SearchIndisDates($day="", $month="", $year="", $fact="", $allgeds=false
 			$ct = preg_match("/!(\w+)/", $fact, $match);
 			if ($ct > 0) {
 				$fact = $match[1];
-				$sql .= "d_fact!='".$DBCONN->EscapeQuery($fact)."'";
+				$sql .= "d_fact!='".DbLayer::EscapeQuery($fact)."'";
 			}
 			else {
-				$sql .= "d_fact='".$DBCONN->EscapeQuery($fact)."'";
+				$sql .= "d_fact='".DbLayer::EscapeQuery($fact)."'";
 			}
 			$i++;
 		}
@@ -361,13 +352,13 @@ function SearchIndisDates($day="", $month="", $year="", $fact="", $allgeds=false
  * @return	array $myindilist array with all individuals that matched the query
  */
 function SearchIndisDateRange($dstart="1", $mstart="1", $ystart="", $dend="31", $mend="12", $yend="", $filter="all", $onlyBDM="no", $skipfacts="", $allgeds=false, $onlyfacts="") {
-	global $TBLPREFIX, $GEDCOMID, $indilist, $DBCONN, $REGEXP_DB, $GEDCOMS, $GEDCOM;
+	global $GEDCOMID, $indilist, $GEDCOMS, $GEDCOM;
 	$myindilist = array();
 //print "Dstart: ".$dstart."<br />";
 //print "Mstart: ".$mstart." ".date("M", mktime(1,0,0,$mstart,1))."<br />";
 //print "Dend: ".$dend."<br />";
 //print "Mend: ".$mend." ".date("M", mktime(1,0,0,$mend,1))."<br />";
-	$sql = "SELECT i_id, i_file, i_gedcom, i_isdead, n_name, n_surname, n_letter, n_type FROM ".$TBLPREFIX."dates, ".$TBLPREFIX."individuals, ".$TBLPREFIX."names WHERE i_key=d_key AND n_key=i_key ";
+	$sql = "SELECT i_id, i_file, i_gedcom, i_isdead, n_name, n_surname, n_letter, n_type FROM ".TBLPREFIX."dates, ".TBLPREFIX."individuals, ".TBLPREFIX."names WHERE i_key=d_key AND n_key=i_key ";
 	if ($onlyBDM == "yes") $sql .= " AND d_fact NOT IN ('BIRT', 'DEAT')";
 	if ($filter == "alive") $sql .= "AND i_isdead!='0'";
 
@@ -481,9 +472,9 @@ function DateRangeforQuery($dstart="1", $mstart="1", $ystart="", $dend="31", $me
  * @return	array $myfamlist array with all individuals that matched the query
  */
 function SearchFamsDateRange($dstart="1", $mstart="1", $ystart, $dend="31", $mend="12", $yend, $onlyBDM="no", $skipfacts="", $allgeds=false, $onlyfacts="") {
-	global $TBLPREFIX, $GEDCOMID, $famlist, $DBCONN, $REGEXP_DB, $GEDCOM, $GEDCOMS, $GEDCOMID;
+	global $GEDCOMID, $famlist, $GEDCOM, $GEDCOMS, $GEDCOMID;
 	$myfamlist = array();
-	$sql = "SELECT f_key, f_id, f_husb, f_wife, f_file, f_gedcom FROM ".$TBLPREFIX."dates, ".$TBLPREFIX."families WHERE f_key=d_key ";
+	$sql = "SELECT f_key, f_id, f_husb, f_wife, f_file, f_gedcom FROM ".TBLPREFIX."dates, ".TBLPREFIX."families WHERE f_key=d_key ";
 
 	$sql .= DateRangeforQuery($dstart, $mstart, $ystart, $dend, $mend, $yend, $skipfacts, $allgeds, $onlyfacts);
 
@@ -518,16 +509,16 @@ function SearchFamsDateRange($dstart="1", $mstart="1", $ystart, $dend="31", $men
 
 //-- search through the gedcom records for families
 function SearchFams($query, $allgeds=false, $ANDOR="AND", $allnames=false) {
-	global $TBLPREFIX, $GEDCOM, $famlist, $DBCONN, $REGEXP_DB, $GEDCOMS, $GEDCOMID;
+	global $GEDCOM, $famlist, $GEDCOMS, $GEDCOMID;
 	
 	$myfamlist = array();
-	if (!is_array($query)) $sql = "SELECT f_id, f_husb, f_wife, f_file, f_gedcom FROM ".$TBLPREFIX."families WHERE (f_gedcom REGEXP '".$DBCONN->EscapeQuery($query)."')";
+	if (!is_array($query)) $sql = "SELECT f_id, f_husb, f_wife, f_file, f_gedcom FROM ".TBLPREFIX."families WHERE (f_gedcom REGEXP '".DbLayer::EscapeQuery($query)."')";
 	else {
-		$sql = "SELECT f_key, f_id, f_husb, f_wife, f_file, f_gedcom FROM ".$TBLPREFIX."families WHERE (";
+		$sql = "SELECT f_key, f_id, f_husb, f_wife, f_file, f_gedcom FROM ".TBLPREFIX."families WHERE (";
 		$i=0;
 		foreach($query as $indexval => $q) {
 			if ($i>0) $sql .= " $ANDOR ";
-			$sql .= "(f_gedcom REGEXP '".$DBCONN->EscapeQuery($q)."')";
+			$sql .= "(f_gedcom REGEXP '".DbLayer::EscapeQuery($q)."')";
 			$i++;
 		}
 		$sql .= ")";
@@ -538,7 +529,7 @@ function SearchFams($query, $allgeds=false, $ANDOR="AND", $allnames=false) {
 	if ((is_array($allgeds)) && (count($allgeds) != 0)) {
 		$sql .= " AND (";
 		for ($i=0, $max=count($allgeds); $i<$max; $i++) {
-			$sql .= "f_file='".$DBCONN->EscapeQuery($GEDCOMS[$allgeds[$i]]["id"])."'";
+			$sql .= "f_file='".DbLayer::EscapeQuery($GEDCOMS[$allgeds[$i]]["id"])."'";
 			if ($i < $max-1) $sql .= " OR ";
 		}
 		$sql .= ")";
@@ -608,7 +599,7 @@ function GetFTWordLengths() {
 
 //-- search through the gedcom records for families
 function FTSearchFams($query, $allgeds=false, $ANDOR="AND", $allnames=false) {
-	global $TBLPREFIX, $GEDCOM, $famlist, $DBCONN, $REGEXP_DB, $GEDCOMS, $GEDCOMID, $ftminwlen, $ftmaxwlen, $COMBIKEY;
+	global $GEDCOM, $famlist, $GEDCOMS, $GEDCOMID, $ftminwlen, $ftmaxwlen, $COMBIKEY;
 
 	// Get the min and max search word length
 	GetFTWordLengths();
@@ -622,20 +613,20 @@ function FTSearchFams($query, $allgeds=false, $ANDOR="AND", $allnames=false) {
 	if ($mlen < $ftminwlen || HasMySQLStopwords($cquery)) {
 		if (isset($cquery["includes"])) {
 			foreach ($cquery["includes"] as $index => $keyword) {
-				if (HasChinese($keyword["term"])) $addsql .= " ".$keyword["operator"]." f_gedcom REGEXP '".$DBCONN->EscapeQuery($keyword["term"]).$keyword["wildcard"]."'";
-				else $addsql .= " ".$keyword["operator"]." f_gedcom REGEXP '[[:<:]]".$DBCONN->EscapeQuery($keyword["term"]).$keyword["wildcard"]."[[:>:]]'";
+				if (HasChinese($keyword["term"])) $addsql .= " ".$keyword["operator"]." f_gedcom REGEXP '".DbLayer::EscapeQuery($keyword["term"]).$keyword["wildcard"]."'";
+				else $addsql .= " ".$keyword["operator"]." f_gedcom REGEXP '[[:<:]]".DbLayer::EscapeQuery($keyword["term"]).$keyword["wildcard"]."[[:>:]]'";
 			}
 		}
 		if (isset($cquery["excludes"])) {
 			foreach ($cquery["excludes"] as $index => $keyword) {
-				if (HasChinese($keyword["term"])) $addsql .= " AND f_gedcom NOT REGEXP '".$DBCONN->EscapeQuery($keyword["term"]).$keyword["wildcard"]."'";
-				else $addsql .= " AND f_gedcom NOT REGEXP '[[:<:]]".$DBCONN->EscapeQuery($keyword["term"]).$keyword["wildcard"]."[[:>:]]'";
+				if (HasChinese($keyword["term"])) $addsql .= " AND f_gedcom NOT REGEXP '".DbLayer::EscapeQuery($keyword["term"]).$keyword["wildcard"]."'";
+				else $addsql .= " AND f_gedcom NOT REGEXP '[[:<:]]".DbLayer::EscapeQuery($keyword["term"]).$keyword["wildcard"]."[[:>:]]'";
 			}
 		}
-		$sql = "SELECT f_key, f_id, f_husb, f_wife, f_file, f_gedcom FROM ".$TBLPREFIX."families WHERE (".substr($addsql,4).")";
+		$sql = "SELECT f_key, f_id, f_husb, f_wife, f_file, f_gedcom FROM ".TBLPREFIX."families WHERE (".substr($addsql,4).")";
 	}
 	else {
-		$sql = "SELECT f_key, f_id, f_husb, f_wife, f_file, f_gedcom FROM ".$TBLPREFIX."families WHERE (MATCH (f_gedcom) AGAINST ('".$DBCONN->EscapeQuery($query)."' IN BOOLEAN MODE))";
+		$sql = "SELECT f_key, f_id, f_husb, f_wife, f_file, f_gedcom FROM ".TBLPREFIX."families WHERE (MATCH (f_gedcom) AGAINST ('".DbLayer::EscapeQuery($query)."' IN BOOLEAN MODE))";
 	}
 	
 	if (!$allgeds) $sql .= " AND f_file='".$GEDCOMID."'";
@@ -643,7 +634,7 @@ function FTSearchFams($query, $allgeds=false, $ANDOR="AND", $allnames=false) {
 	if ((is_array($allgeds)) && (count($allgeds) != 0) && count($allgeds) != count($GEDCOMS)) {
 		$sql .= " AND (";
 		for ($i=0, $max=count($allgeds); $i<$max; $i++) {
-			$sql .= "f_file='".$DBCONN->EscapeQuery($GEDCOMS[$allgeds[$i]]["id"])."'";
+			$sql .= "f_file='".DbLayer::EscapeQuery($GEDCOMS[$allgeds[$i]]["id"])."'";
 			if ($i < $max-1) $sql .= " OR ";
 		}
 		$sql .= ")";
@@ -695,15 +686,15 @@ function FTSearchFams($query, $allgeds=false, $ANDOR="AND", $allnames=false) {
 
 //-- search through the gedcom records for families
 function SearchFamsNames($query, $ANDOR="AND", $allnames=false) {
-	global $TBLPREFIX, $GEDCOM, $famlist, $DBCONN, $REGEXP_DB, $GEDCOMS, $GEDCOMID, $COMBIKEY;
+	global $GEDCOM, $famlist, $GEDCOMS, $GEDCOMID, $COMBIKEY;
 
 	$myfamlist = array();
-	$sql = "SELECT f_key, f_id, f_husb, f_wife, f_file, f_gedcom FROM ".$TBLPREFIX."families WHERE (";
+	$sql = "SELECT f_key, f_id, f_husb, f_wife, f_file, f_gedcom FROM ".TBLPREFIX."families WHERE (";
 	$i=0;
 	foreach($query as $indexval => $q) {
 
 		if ($i>0) $sql .= " $ANDOR ";
-		$sql .= "((f_husb='".$DBCONN->EscapeQuery(JoinKey($q[0], $q[1]))."' OR f_wife='".$DBCONN->EscapeQuery(JoinKey($q[0], $q[1]))."') AND f_file='".$DBCONN->EscapeQuery($q[1])."')";
+		$sql .= "((f_husb='".DbLayer::EscapeQuery(JoinKey($q[0], $q[1]))."' OR f_wife='".DbLayer::EscapeQuery(JoinKey($q[0], $q[1]))."') AND f_file='".DbLayer::EscapeQuery($q[1])."')";
 		$i++;
 	}
 	$sql .= ")";
@@ -764,13 +755,13 @@ function SearchFamsNames($query, $ANDOR="AND", $allnames=false) {
  * @return	array $myfamlist array with all families that matched the query
  */
 function SearchFamsMembers($query, $allgeds=false, $ANDOR="AND", $allnames=false) {
-	global $TBLPREFIX, $GEDCOM, $famlist, $DBCONN, $REGEXP_DB, $GEDCOMS, $GEDCOMID;
+	global $GEDCOM, $famlist, $GEDCOMS, $GEDCOMID;
 	
 	if (is_array($query)) $id = JoinKey($q[0], $q[1]);
 	else $id = JoinKey($query, $GEDCOMID);
 	
 	$myfamlist = array();
-	$sql = "SELECT f_key, f_id, f_husb, f_wife, f_file FROM ".$TBLPREFIX."individual_family, ".$TBLPREFIX."families WHERE if_pkey='".$DBCONN->EscapeQuery($id)."' AND f_key = if_fkey";
+	$sql = "SELECT f_key, f_id, f_husb, f_wife, f_file FROM ".TBLPREFIX."individual_family, ".TBLPREFIX."families WHERE if_pkey='".DbLayer::EscapeQuery($id)."' AND f_key = if_fkey";
 	
 	$res = NewQuery($sql);
 	while($row = $res->fetchAssoc()){
@@ -798,15 +789,14 @@ function SearchFamsMembers($query, $allgeds=false, $ANDOR="AND", $allnames=false
  * @subpackage Calendar
 **/
 function SearchFamsYearRange($startyear, $endyear, $allgeds=false) {
-	global $TBLPREFIX, $GEDCOM, $famlist, $DBCONN, $REGEXP_DB, $GEDCOMS, $GEDCOMID;
+	global $GEDCOM, $famlist, $GEDCOMS, $GEDCOMID;
 
 	$myfamlist = array();
-	$sql = "SELECT f_id, f_husb, f_wife, f_file, f_gedcom FROM ".$TBLPREFIX."families WHERE (";
+	$sql = "SELECT f_id, f_husb, f_wife, f_file, f_gedcom FROM ".TBLPREFIX."families WHERE (";
 	$i=$startyear;
 	while($i <= $endyear) {
 		if ($i > $startyear) $sql .= " OR ";
-		if ($REGEXP_DB) $sql .= "f_gedcom REGEXP '".$DBCONN->EscapeQuery("2 DATE[^\n]* ".$i)."'";
-		else $sql .= "f_gedcom LIKE '".$DBCONN->EscapeQuery("%2 DATE%".$i)."%'";
+		$sql .= "f_gedcom REGEXP '".DbLayer::EscapeQuery("2 DATE[^\n]* ".$i)."'";
 		$i++;
 	}
 	$sql .= ")";
@@ -843,13 +833,13 @@ function SearchFamsYearRange($startyear, $endyear, $allgeds=false) {
  * @return	array $myfamlist array with all individuals that matched the query
  */
 function SearchFamsDates($day="", $month="", $year="", $fact="", $allgeds=false) {
-	global $TBLPREFIX, $GEDCOM, $famlist, $DBCONN, $REGEXP_DB, $GEDCOM, $GEDCOMS, $GEDCOMID;
+	global $GEDCOM, $famlist, $GEDCOM, $GEDCOMS, $GEDCOMID;
 	$myfamlist = array();
 	
-	$sql = "SELECT f_id, f_husb, f_wife, f_file, f_gedcom, d_gid, d_fact FROM ".$TBLPREFIX."dates, ".$TBLPREFIX."families WHERE f_key=d_key ";
-	if (!empty($day)) $sql .= "AND d_day='".$DBCONN->EscapeQuery($day)."' ";
-	if (!empty($month)) $sql .= "AND d_month='".$DBCONN->EscapeQuery(Str2Upper($month))."' ";
-	if (!empty($year)) $sql .= "AND d_year='".$DBCONN->EscapeQuery($year)."' ";
+	$sql = "SELECT f_id, f_husb, f_wife, f_file, f_gedcom, d_gid, d_fact FROM ".TBLPREFIX."dates, ".TBLPREFIX."families WHERE f_key=d_key ";
+	if (!empty($day)) $sql .= "AND d_day='".DbLayer::EscapeQuery($day)."' ";
+	if (!empty($month)) $sql .= "AND d_month='".DbLayer::EscapeQuery(Str2Upper($month))."' ";
+	if (!empty($year)) $sql .= "AND d_year='".DbLayer::EscapeQuery($year)."' ";
 	if (!empty($fact)) {
 		$sql .= "AND (";
 		$facts = preg_split("/[,:; ]/", $fact);
@@ -859,10 +849,10 @@ function SearchFamsDates($day="", $month="", $year="", $fact="", $allgeds=false)
 			$ct = preg_match("/!(\w+)/", $fact, $match);
 			if ($ct > 0) {
 				$fact = $match[1];
-				$sql .= "d_fact!='".$DBCONN->EscapeQuery(Str2Upper($fact))."'";
+				$sql .= "d_fact!='".DbLayer::EscapeQuery(Str2Upper($fact))."'";
 			}
 			else {
-				$sql .= "d_fact='".$DBCONN->EscapeQuery(Str2Upper($fact))."'";
+				$sql .= "d_fact='".DbLayer::EscapeQuery(Str2Upper($fact))."'";
 			}
 			$i++;
 		}
@@ -907,16 +897,16 @@ function SearchFamsDates($day="", $month="", $year="", $fact="", $allgeds=false)
 
 //-- search through the gedcom records for sources
 function SearchSources($query, $allgeds=false, $ANDOR="AND") {
-	global $TBLPREFIX, $GEDCOM, $DBCONN, $REGEXP_DB, $GEDCOMS, $GEDCOMID;
+	global $GEDCOM, $GEDCOMS, $GEDCOMID;
 	
 	$mysourcelist = array();	
-	if (!is_array($query)) $sql = "SELECT s_id, s_name, s_file, s_gedcom FROM ".$TBLPREFIX."sources WHERE (s_gedcom REGEXP '".$DBCONN->EscapeQuery($query)."')";
+	if (!is_array($query)) $sql = "SELECT s_id, s_name, s_file, s_gedcom FROM ".TBLPREFIX."sources WHERE (s_gedcom REGEXP '".DbLayer::EscapeQuery($query)."')";
 	else {
-		$sql = "SELECT s_id, s_name, s_file, s_gedcom FROM ".$TBLPREFIX."sources WHERE (";
+		$sql = "SELECT s_id, s_name, s_file, s_gedcom FROM ".TBLPREFIX."sources WHERE (";
 		$i=0;
 		foreach($query as $indexval => $q) {
 			if ($i>0) $sql .= " $ANDOR ";
-			$sql .= "(s_gedcom REGEXP '".$DBCONN->EscapeQuery($q)."')";
+			$sql .= "(s_gedcom REGEXP '".DbLayer::EscapeQuery($q)."')";
 			$i++;
 		}
 		$sql .= ")";
@@ -926,7 +916,7 @@ function SearchSources($query, $allgeds=false, $ANDOR="AND") {
 	if ((is_array($allgeds)) && (count($allgeds) != 0)) {
 		$sql .= " AND (";
 		for ($i=0; $i<count($allgeds); $i++) {
-			$sql .= "s_file='".$DBCONN->EscapeQuery($GEDCOMS[$allgeds[$i]]["id"])."'";
+			$sql .= "s_file='".DbLayer::EscapeQuery($GEDCOMS[$allgeds[$i]]["id"])."'";
 			if ($i < count($allgeds)-1) $sql .= " OR ";
 		}
 		$sql .= ")";
@@ -954,7 +944,7 @@ function SearchSources($query, $allgeds=false, $ANDOR="AND") {
 
 //-- search through the gedcom records for sources, full text
 function FTSearchSources($query, $allgeds=false, $ANDOR="AND") {
-	global $TBLPREFIX, $GEDCOM, $DBCONN, $REGEXP_DB, $GEDCOMS, $GEDCOMID, $ftminwlen, $ftmaxwlen;
+	global $GEDCOM, $GEDCOMS, $GEDCOMID, $ftminwlen, $ftmaxwlen;
 	
 	// Get the min and max search word length
 	GetFTWordLengths();
@@ -968,20 +958,20 @@ function FTSearchSources($query, $allgeds=false, $ANDOR="AND") {
 	if ($mlen < $ftminwlen || HasMySQLStopwords($cquery)) {
 		if (isset($cquery["includes"])) {
 			foreach ($cquery["includes"] as $index => $keyword) {
-				if (HasChinese($keyword["term"])) $addsql .= " ".$keyword["operator"]." s_gedcom REGEXP '".$DBCONN->EscapeQuery($keyword["term"]).$keyword["wildcard"]."'";
-				else $addsql .= " ".$keyword["operator"]." s_gedcom REGEXP '[[:<:]]".$DBCONN->EscapeQuery($keyword["term"]).$keyword["wildcard"]."[[:>:]]'";
+				if (HasChinese($keyword["term"])) $addsql .= " ".$keyword["operator"]." s_gedcom REGEXP '".DbLayer::EscapeQuery($keyword["term"]).$keyword["wildcard"]."'";
+				else $addsql .= " ".$keyword["operator"]." s_gedcom REGEXP '[[:<:]]".DbLayer::EscapeQuery($keyword["term"]).$keyword["wildcard"]."[[:>:]]'";
 			}
 		}
 		if (isset($cquery["excludes"])) {
 			foreach ($cquery["excludes"] as $index => $keyword) {
-				if (HasChinese($keyword["term"])) $addsql .= " AND s_gedcom NOT REGEXP '".$DBCONN->EscapeQuery($keyword["term"]).$keyword["wildcard"]."'";
-				else $addsql .= " AND s_gedcom NOT REGEXP '[[:<:]]".$DBCONN->EscapeQuery($keyword["term"]).$keyword["wildcard"]."[[:>:]]'";
+				if (HasChinese($keyword["term"])) $addsql .= " AND s_gedcom NOT REGEXP '".DbLayer::EscapeQuery($keyword["term"]).$keyword["wildcard"]."'";
+				else $addsql .= " AND s_gedcom NOT REGEXP '[[:<:]]".DbLayer::EscapeQuery($keyword["term"]).$keyword["wildcard"]."[[:>:]]'";
 			}
 		}
-		$sql = "SELECT s_id, s_name, s_file, s_gedcom FROM ".$TBLPREFIX."sources WHERE (".substr($addsql,4).")";
+		$sql = "SELECT s_id, s_name, s_file, s_gedcom FROM ".TBLPREFIX."sources WHERE (".substr($addsql,4).")";
 	}
 	else {
-		$sql = "SELECT s_id, s_name, s_file, s_gedcom FROM ".$TBLPREFIX."sources WHERE (MATCH (s_gedcom) AGAINST ('".$DBCONN->EscapeQuery($query)."' IN BOOLEAN MODE))";
+		$sql = "SELECT s_id, s_name, s_file, s_gedcom FROM ".TBLPREFIX."sources WHERE (MATCH (s_gedcom) AGAINST ('".DbLayer::EscapeQuery($query)."' IN BOOLEAN MODE))";
 	}
 
 	if (!$allgeds) $sql .= " AND s_file='".$GEDCOMID."'";
@@ -989,7 +979,7 @@ function FTSearchSources($query, $allgeds=false, $ANDOR="AND") {
 	if ((is_array($allgeds) && count($allgeds) != 0) && count($allgeds) != count($GEDCOMS)) {
 		$sql .= " AND (";
 		for ($i=0; $i<count($allgeds); $i++) {
-			$sql .= "s_file='".$DBCONN->EscapeQuery($GEDCOMS[$allgeds[$i]]["id"])."'";
+			$sql .= "s_file='".DbLayer::EscapeQuery($GEDCOMS[$allgeds[$i]]["id"])."'";
 			if ($i < count($allgeds)-1) $sql .= " OR ";
 		}
 		$sql .= ")";
@@ -1017,7 +1007,7 @@ function FTSearchSources($query, $allgeds=false, $ANDOR="AND") {
 
 //-- search through the gedcom records for repositories, full text
 function FTSearchRepos($query, $allgeds=false, $ANDOR="AND") {
-	global $TBLPREFIX, $GEDCOM, $DBCONN, $REGEXP_DB, $GEDCOMS, $GEDCOMID, $ftminwlen, $ftmaxwlen;
+	global $GEDCOM, $GEDCOMS, $GEDCOMID, $ftminwlen, $ftmaxwlen;
 	
 	// Get the min and max search word length
 	GetFTWordLengths();
@@ -1031,20 +1021,20 @@ function FTSearchRepos($query, $allgeds=false, $ANDOR="AND") {
 	if ($mlen < $ftminwlen || HasMySQLStopwords($cquery)) {
 		if (isset($cquery["includes"])) {
 			foreach ($cquery["includes"] as $index => $keyword) {
-				if (HasChinese($keyword["term"])) $addsql .= " ".$keyword["operator"]." o_gedcom REGEXP '".$DBCONN->EscapeQuery($keyword["term"]).$keyword["wildcard"]."'";
-				else $addsql .= " ".$keyword["operator"]." o_gedcom REGEXP '[[:<:]]".$DBCONN->EscapeQuery($keyword["term"]).$keyword["wildcard"]."[[:>:]]'";
+				if (HasChinese($keyword["term"])) $addsql .= " ".$keyword["operator"]." o_gedcom REGEXP '".DbLayer::EscapeQuery($keyword["term"]).$keyword["wildcard"]."'";
+				else $addsql .= " ".$keyword["operator"]." o_gedcom REGEXP '[[:<:]]".DbLayer::EscapeQuery($keyword["term"]).$keyword["wildcard"]."[[:>:]]'";
 			}
 		}
 		if (isset($cquery["excludes"])) {
 			foreach ($cquery["excludes"] as $index => $keyword) {
-				if (HasChinese($keyword["term"])) $addsql .= " AND o_gedcom NOT REGEXP '".$DBCONN->EscapeQuery($keyword["term"]).$keyword["wildcard"]."'";
-				else $addsql .= " AND o_gedcom NOT REGEXP '[[:<:]]".$DBCONN->EscapeQuery($keyword["term"]).$keyword["wildcard"]."[[:>:]]'";
+				if (HasChinese($keyword["term"])) $addsql .= " AND o_gedcom NOT REGEXP '".DbLayer::EscapeQuery($keyword["term"]).$keyword["wildcard"]."'";
+				else $addsql .= " AND o_gedcom NOT REGEXP '[[:<:]]".DbLayer::EscapeQuery($keyword["term"]).$keyword["wildcard"]."[[:>:]]'";
 			}
 		}
-		$sql = "SELECT o_id, o_file, o_type, o_gedcom FROM ".$TBLPREFIX."other WHERE (".substr($addsql,4).")";
+		$sql = "SELECT o_id, o_file, o_type, o_gedcom FROM ".TBLPREFIX."other WHERE (".substr($addsql,4).")";
 	}
 	else {
-		$sql = "SELECT o_id, o_file, o_type, o_gedcom FROM ".$TBLPREFIX."other WHERE (MATCH (o_gedcom) AGAINST ('".$DBCONN->EscapeQuery($query)."' IN BOOLEAN MODE))";
+		$sql = "SELECT o_id, o_file, o_type, o_gedcom FROM ".TBLPREFIX."other WHERE (MATCH (o_gedcom) AGAINST ('".DbLayer::EscapeQuery($query)."' IN BOOLEAN MODE))";
 	}
 
 	if (!$allgeds) $sql .= " AND o_file='".$GEDCOMID."'";
@@ -1054,7 +1044,7 @@ function FTSearchRepos($query, $allgeds=false, $ANDOR="AND") {
 	if ((is_array($allgeds) && count($allgeds) != 0) && count($allgeds) != count($GEDCOMS)) {
 		$sql .= " AND (";
 		for ($i=0; $i<count($allgeds); $i++) {
-			$sql .= "o_file='".$DBCONN->EscapeQuery($GEDCOMS[$allgeds[$i]]["id"])."'";
+			$sql .= "o_file='".DbLayer::EscapeQuery($GEDCOMS[$allgeds[$i]]["id"])."'";
 			if ($i < count($allgeds)-1) $sql .= " OR ";
 		}
 		$sql .= ")";
@@ -1093,14 +1083,14 @@ function FTSearchRepos($query, $allgeds=false, $ANDOR="AND") {
  * @return	array $myfamlist array with all individuals that matched the query
  */
 function SearchSourcesDates($day="", $month="", $year="", $fact="", $allgeds=false) {
-	global $TBLPREFIX, $GEDCOM, $famlist, $DBCONN, $REGEXP_DB, $GEDCOMS, $GEDCOMID;
+	global $GEDCOM, $famlist, $GEDCOMS, $GEDCOMID;
 	$mysourcelist = array();
 	
-	$sql = "SELECT s_id, s_name, s_file, s_gedcom, d_gid FROM ".$TBLPREFIX."dates, ".$TBLPREFIX."sources WHERE s_id=d_gid AND s_file=d_file ";
-	if (!empty($day)) $sql .= "AND d_day='".$DBCONN->EscapeQuery($day)."' ";
-	if (!empty($month)) $sql .= "AND d_month='".$DBCONN->EscapeQuery(Str2Upper($month))."' ";
-	if (!empty($year)) $sql .= "AND d_year='".$DBCONN->EscapeQuery($year)."' ";
-	if (!empty($fact)) $sql .= "AND d_fact='".$DBCONN->EscapeQuery(Str2Upper($fact))."' ";
+	$sql = "SELECT s_id, s_name, s_file, s_gedcom, d_gid FROM ".TBLPREFIX."dates, ".TBLPREFIX."sources WHERE s_id=d_gid AND s_file=d_file ";
+	if (!empty($day)) $sql .= "AND d_day='".DbLayer::EscapeQuery($day)."' ";
+	if (!empty($month)) $sql .= "AND d_month='".DbLayer::EscapeQuery(Str2Upper($month))."' ";
+	if (!empty($year)) $sql .= "AND d_year='".DbLayer::EscapeQuery($year)."' ";
+	if (!empty($fact)) $sql .= "AND d_fact='".DbLayer::EscapeQuery(Str2Upper($fact))."' ";
 	if (!$allgeds) $sql .= "AND d_file='".$GEDCOMID."' ";
 	$sql .= "GROUP BY s_id ORDER BY d_year, d_month, d_day DESC";
 	
@@ -1131,10 +1121,10 @@ function SearchSourcesDates($day="", $month="", $year="", $fact="", $allgeds=fal
  * @return	array $myfamlist array with all individuals that matched the query
  */
 function SearchSourcesDateRange($dstart="1", $mstart="1", $ystart="", $dend="31", $mend="12", $yend="", $skipfacts="", $allgeds=false, $onlyfacts="") {
-	global $TBLPREFIX, $GEDCOM, $famlist, $DBCONN, $REGEXP_DB, $GEDCOMS, $GEDCOMID;
+	global $GEDCOM, $famlist, $GEDCOMS, $GEDCOMID;
 	$mysourcelist = array();
 	
-	$sql = "SELECT s_id, s_name, s_file, s_gedcom, d_gid FROM ".$TBLPREFIX."dates, ".$TBLPREFIX."sources WHERE s_id=d_gid AND s_file=d_file ";
+	$sql = "SELECT s_id, s_name, s_file, s_gedcom, d_gid FROM ".TBLPREFIX."dates, ".TBLPREFIX."sources WHERE s_id=d_gid AND s_file=d_file ";
 	
 	$sql .= DateRangeforQuery($dstart, $mstart, $ystart, $dend, $mend, $yend, $skipfacts, $allgeds, $onlyfacts);
 	
@@ -1167,14 +1157,14 @@ function SearchSourcesDateRange($dstart="1", $mstart="1", $ystart="", $dend="31"
  * @return	array $myfamlist array with all individuals that matched the query
  */
 function SearchOtherDates($day="", $month="", $year="", $fact="", $allgeds=false) {
-	global $TBLPREFIX, $GEDCOM, $famlist, $DBCONN, $REGEXP_DB, $GEDCOMS, $GEDCOMID;
+	global $GEDCOM, $famlist, $GEDCOMS, $GEDCOMID;
 	$myrepolist = array();
 	
-	$sql = "SELECT o_id, o_file, o_type, o_gedcom, d_gid FROM ".$TBLPREFIX."dates, ".$TBLPREFIX."other WHERE o_id=d_gid AND o_file=d_file ";
-	if (!empty($day)) $sql .= "AND d_day='".$DBCONN->EscapeQuery($day)."' ";
-	if (!empty($month)) $sql .= "AND d_month='".$DBCONN->EscapeQuery(Str2Upper($month))."' ";
-	if (!empty($year)) $sql .= "AND d_year='".$DBCONN->EscapeQuery($year)."' ";
-	if (!empty($fact)) $sql .= "AND d_fact='".$DBCONN->EscapeQuery(Str2Upper($fact))."' ";
+	$sql = "SELECT o_id, o_file, o_type, o_gedcom, d_gid FROM ".TBLPREFIX."dates, ".TBLPREFIX."other WHERE o_id=d_gid AND o_file=d_file ";
+	if (!empty($day)) $sql .= "AND d_day='".DbLayer::EscapeQuery($day)."' ";
+	if (!empty($month)) $sql .= "AND d_month='".DbLayer::EscapeQuery(Str2Upper($month))."' ";
+	if (!empty($year)) $sql .= "AND d_year='".DbLayer::EscapeQuery($year)."' ";
+	if (!empty($fact)) $sql .= "AND d_fact='".DbLayer::EscapeQuery(Str2Upper($fact))."' ";
 	if (!$allgeds) $sql .= "AND d_file='".$GEDCOMID."' ";
 	$sql .= "GROUP BY o_id ORDER BY d_year, d_month, d_day DESC";
 	
@@ -1209,10 +1199,10 @@ function SearchOtherDates($day="", $month="", $year="", $fact="", $allgeds=false
  * @return	array $myfamlist array with all individuals that matched the query
  */
 function SearchOtherDateRange($dstart="1", $mstart="1", $ystart="", $dend="31", $mend="12", $yend="", $skipfacts="", $allgeds=false, $onlyfacts="") {
-	global $TBLPREFIX, $GEDCOM, $DBCONN, $REGEXP_DB, $GEDCOMS, $GEDCOMID;
+	global $GEDCOM, $GEDCOMS, $GEDCOMID;
 	$myrepolist = array();
 	
-	$sql = "SELECT o_id, o_file, o_type, o_gedcom, d_gid FROM ".$TBLPREFIX."dates, ".$TBLPREFIX."other WHERE o_id=d_gid AND o_file=d_file ";
+	$sql = "SELECT o_id, o_file, o_type, o_gedcom, d_gid FROM ".TBLPREFIX."dates, ".TBLPREFIX."other WHERE o_id=d_gid AND o_file=d_file ";
 	
 	$sql .= DateRangeforQuery($dstart, $mstart, $ystart, $dend, $mend, $yend, $skipfacts, $allgeds, $onlyfacts);
 	
@@ -1249,10 +1239,10 @@ function SearchOtherDateRange($dstart="1", $mstart="1", $ystart="", $dend="31", 
  * @return	array $mymedia array with all individuals that matched the query
  */
 function SearchMediaDateRange($dstart="1", $mstart="1", $ystart="", $dend="31", $mend="12", $yend="", $skipfacts="", $allgeds=false, $onlyfacts="") {
-	global $TBLPREFIX, $GEDCOM, $DBCONN, $REGEXP_DB, $GEDCOMS, $GEDCOMID, $MediaFS;
+	global $GEDCOM, $GEDCOMS, $GEDCOMID;
 	$mymedia = array();
 	
-	$sql = "SELECT m_media, m_file, m_gedfile, m_ext, m_titl, m_gedrec FROM ".$TBLPREFIX."dates, ".$TBLPREFIX."media WHERE m_media=d_gid AND m_gedfile=d_file ";
+	$sql = "SELECT m_media, m_file, m_gedfile, m_ext, m_titl, m_gedrec FROM ".TBLPREFIX."dates, ".TBLPREFIX."media WHERE m_media=d_gid AND m_gedfile=d_file ";
 	
 	$sql .= DateRangeforQuery($dstart, $mstart, $ystart, $dend, $mend, $yend, $skipfacts, $allgeds, $onlyfacts);
 	
@@ -1266,7 +1256,7 @@ function SearchMediaDateRange($dstart="1", $mstart="1", $ystart="", $dend="31", 
 		else $mid = $row["m_media"];
 		$mymedia[$mid]["ext"] = $row["m_ext"];
 		$mymedia[$mid]["title"] = $row["m_titl"];
-		$mymedia[$mid]["file"] = $MediaFS->CheckMediaDepth($row["m_file"]);
+		$mymedia[$mid]["file"] = MediaFS::CheckMediaDepth($row["m_file"]);
 		$mymedia[$mid]["gedcom"] = $row["m_gedrec"];
 		$mymedia[$mid]["gedfile"] = $row["m_gedfile"];
 	}

@@ -59,7 +59,7 @@ function PrintFamilyHeader($famid, $famrec="", $changes = false) {
 	if (empty($famrec)) $parents = FindParents($famid);
 	else $parents = FindParentsInRecord($famrec);
 
-	if (displayDetailsByID($famid, "FAM") || showLivingNameByID($parents["HUSB"]) || showLivingNameByID($parents["WIFE"])) {
+	if (PrivacyFunctions::displayDetailsByID($famid, "FAM") || PrivacyFunctions::showLivingNameByID($parents["HUSB"]) || PrivacyFunctions::showLivingNameByID($parents["WIFE"])) {
 		$fam = GetFamilyDescriptor($famid, true, $famrec, $changes);
 		$addfam = GetFamilyAddDescriptor($famid, true, $famrec, $changes);
 	}
@@ -208,7 +208,7 @@ function print_family_parents($famid, $sosa = 0, $label="", $parid="", $gparid="
 		print "<a href=\"family.php?famid=$famid\" class=\"details1\">";
 		if ($SHOW_FAM_ID_NUMBERS) print "($famid)&nbsp;&nbsp;";
 		else print str_repeat("&nbsp;", 10);
-		if (showFact("MARR", $famid) && DisplayDetailsByID($parents["WIFE"]) && DisplayDetailsByID($parents["HUSB"])) print_simple_fact($famrec, "MARR", $parents["WIFE"]); else print $gm_lang["private"];
+		if (PrivacyFunctions::showFact("MARR", $famid) && PrivacyFunctions::DisplayDetailsByID($parents["WIFE"]) && PrivacyFunctions::DisplayDetailsByID($parents["HUSB"])) print_simple_fact($famrec, "MARR", $parents["WIFE"]); else print $gm_lang["private"];
 		print "</a>";
 	}
 	else print "<br />\n";
@@ -404,7 +404,7 @@ function print_family_children($famid, $childid = "", $sosa = 0, $label="", $per
 						}
 						print "<td class=\"details1\" style=\"vertical-align:middle;\" align=\"center\">";
  						$divrec = "";
-						if (showFact("MARR", $famid) && DisplayDetailsByID($chil) && DisplayDetailsByID($spouse)) {
+						if (PrivacyFunctions::showFact("MARR", $famid) && PrivacyFunctions::DisplayDetailsByID($chil) && PrivacyFunctions::DisplayDetailsByID($spouse)) {
 							// marriage date
 							$famrec = FindFamilyRecord($famid);
 							$ct = preg_match("/2 DATE.*(\d\d\d\d)/", GetSubRecord(1, "1 MARR", $famrec), $match);

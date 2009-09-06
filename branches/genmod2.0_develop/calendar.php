@@ -212,8 +212,7 @@ if ($m_name == "feb") {
 		if ($day >= '28') {
 			$day = "28";
 			$pregquery = "2 DATE[^\n]*2[8|9] $month";
-			if ($REGEXP_DB) $query = "2 DATE[^\n]*2[8|9] $month";
-			else $query = "%2 DATE%2%$month%";
+			$query = "2 DATE[^\n]*2[8|9] $month";
 		}
 	}
 	else {
@@ -221,8 +220,7 @@ if ($m_name == "feb") {
 		if ($day >= '29') {
 			$day = "29";
 			$pregquery = "2 DATE[^\n]*29 $month";
-			if ($REGEXP_DB) $query = "2 DATE[^\n]*29 $month";
-			else $query = "%2 DATE%29 $month%";
+			$query = "2 DATE[^\n]*29 $month";
 		}
 	}
 }
@@ -231,21 +229,18 @@ else if ($m_name == "apr" || $m_name == "jun" || $m_name == "sep" || $m_name == 
 	if ($day >= '30') {
 		$day = "30";
 		$pregquery = "2 DATE[^\n]*30 $month";
-		if ($REGEXP_DB) $query = "2 DATE[^\n]*30 $month";
-		else $query = "%2 DATE%30 $month%";
+		i$query = "2 DATE[^\n]*30 $month";
 	}
 }
 
 if (!isset($query)) {
 	if ($day<10) {
 		$pregquery = "2 DATE[^\n]*[ |0]$day $month";
-		if ($REGEXP_DB) $query = "2 DATE[^\n]*[ |0]$day $month";
-		else $query = "%2 DATE%$day $month%";
+		$query = "2 DATE[^\n]*[ |0]$day $month";
 	}
 	else {
 		$pregquery = "2 DATE[^\n]*$day $month";
-		if ($REGEXP_DB) $query = "2 DATE[^\n]*$day $month";
-		else $query = "%2 DATE%$day $month%";
+		$query = "2 DATE[^\n]*$day $month";
 	}
 }
 
@@ -297,13 +292,11 @@ If (!isset($datearray[4]["year"]) && $USE_RTL_FUNCTIONS) {
     if (!isset($queryhb) && $action!="year") {   //---- ?????? does not work - see I90 in 1042 @@@@@
     	if ($hDay<10) {
 			$preghbquery = "2 DATE[^\n]*[ |0]$hDay $hMonth";
-			if ($REGEXP_DB) $queryhb = "2 DATE[^\n]*[ |0]$hDay $hMonth";
-			else $queryhb = "%2 DATE%$hDay $hMonth%";
+			$queryhb = "2 DATE[^\n]*[ |0]$hDay $hMonth";
 		}
 		else {
 			$preghbquery = "2 DATE[^\n]*$hDay $hMonth";
-			if ($REGEXP_DB) $queryhb = "2 DATE[^\n]*$hDay $hMonth";
-			else $queryhb = "%2 DATE%$hDay $hMonth%";
+			$queryhb = "2 DATE[^\n]*$hDay $hMonth";
 		}
 	}
 }
@@ -311,7 +304,7 @@ print_header($gm_lang["anniversary_calendar"]);
 print "<div style=\" text-align: center;\" id=\"calendar_page\">\n";
 
 	//-- moved here from session.php, should probably be moved somewhere else still
-	$sql = "SELECT i_id FROM ".$TBLPREFIX."individuals where i_file='".$GEDCOMID."' AND i_gedcom like '%@#DHEBREW@%'";
+	$sql = "SELECT i_id FROM ".TBLPREFIX."individuals where i_file='".$GEDCOMID."' AND i_gedcom like '%@#DHEBREW@%'";
 	$res = NewQuery($sql);
 	if ($res->NumRows()>0) $HEBREWFOUND[$GEDCOM] = true;
 	else $HEBREWFOUND[$GEDCOM] = false;
@@ -549,11 +542,9 @@ if (($action=="today") || ($action=="year")) {
 	if ($action=="year"){
 		if (isset($year_query)) $year=$year_query;
 		$pregquery = "2 DATE[^\n]*(bet|$year)";
-		if ($REGEXP_DB) $query = "2 DATE[^\n]*(bet|$year)";
-		else $query = "%2 DATE%bet%";
+		$query = "2 DATE[^\n]*(bet|$year)";
 		$pregquery1 = "2 DATE[^\n]*$year";
-		if ($REGEXP_DB) $query1 = "2 DATE[^\n]*$year";
-		else $query1 = "%2 DATE%$year%";                          //--- should this remain $query ??? MA @@@@
+		$query1 = "2 DATE[^\n]*$year";
 		
 		if ($endyear>0){
 			$myindilist = SearchIndisYearRange($startyear,$endyear);
@@ -727,7 +718,7 @@ if (($action=="today") || ($action=="year")) {
 				     else $text_fact .= $text_temp;
 				$factrec.=$line."\n";
 			}
-			if (!empty($text_fact) && displayDetailsById($gid)) {
+			if (!empty($text_fact) && PrivacyFunctions::displayDetailsById($gid)) {
 				
 				// $text_indi .= "<tr><td>";
 				$text_indi .= "<li><a href=\"individual.php?pid=$gid&amp;GEDCOM=".get_gedcom_from_id($indi["gedfile"])."\"><b>";
@@ -892,7 +883,7 @@ if (($action=="today") || ($action=="year")) {
 					else $text_fact .= $text_temp;
 					$factrec.=$line."\n";
 				}
-				if (!empty($text_fact) && displayDetailsById($gid, "FAM")) {
+				if (!empty($text_fact) && PrivacyFunctions::displayDetailsById($gid, "FAM")) {
 					$text_fam .= "<li><a href=\"family.php?famid=$gid&amp;GEDCOM=".get_gedcom_from_id($fam["gedfile"])."\"><b>";
 					$n = GetFamilyDescriptor($gid);
 					if (HasChinese($n)) $text_fam .= PrintReady($n." (".GetPinYin($n).")");
@@ -1027,8 +1018,7 @@ else if ($action=="calendar") {
 	$myindilist = array();
 	$myfamlist = array();
 	$pregquery = "2 DATE[^\n]*$mmon";
-	if ($REGEXP_DB) $query = "2 DATE[^\n]*$mmon";
-	else $query = "%2 DATE%$mmon%";
+	$query = "2 DATE[^\n]*$mmon";
 
 	$fact = "";	
 	if ($filterev=="bdm") $fact = "BIRT,DEAT,MARR";
@@ -1059,8 +1049,7 @@ else if ($action=="calendar") {
 		$HBMonth3 = $date[2]["month"];
 		
 		$preghbquery1 = "2 DATE[^\n]*$HBMonth1";
-		if ($REGEXP_DB) $query1 = "2 DATE[^\n]*$HBMonth1";
-		else $query1 = "%2 DATE%$HBMonth1%";
+		$query1 = "2 DATE[^\n]*$HBMonth1";
 		
 		$myindilist1 = SearchIndisDates("", $HBMonth1, "", $fact);
 		$myfamlist1 = SearchFamsDates("", $HBMonth1, "", $fact);
@@ -1070,8 +1059,7 @@ else if ($action=="calendar") {
 		
 		if ($HBMonth1 != $HBMonth2) {		
 			$preghbquery2 = "2 DATE[^\n]*$HBMonth2";
-			if ($REGEXP_DB) $query2 = "2 DATE[^\n]*$HBMonth2";
-			else $query2 = "%2 DATE%$HBMonth2%";
+			$query2 = "2 DATE[^\n]*$HBMonth2";
 				
 			$myindilist1 = SearchIndisDates("", $HBMonth2, "", $fact);
 			$myfamlist1 = SearchFamsDates("", $HBMonth2, "", $fact);
@@ -1082,8 +1070,7 @@ else if ($action=="calendar") {
 		
 		if ($HBMonth2 != $HBMonth3) {		
 			$preghbquery3 = "2 DATE[^\n]*$HBMonth3";
-			if ($REGEXP_DB) $query3 = "2 DATE[^\n]*$HBMonth3";
-			else $query3 = "%2 DATE%$HBMonth3%";
+			$query3 = "2 DATE[^\n]*$HBMonth3";
 				
 			$myindilist1 = SearchIndisDates("", $HBMonth3, "", $fact);
 			$myfamlist1 = SearchFamsDates("", $HBMonth3, "", $fact);
@@ -1095,8 +1082,7 @@ else if ($action=="calendar") {
 		if (!IsJewishLeapYear($HBYear1) && ($HBMonth1 == "adr" || $HBMonth2 == "adr" || $HBMonth3 == "adr")) {
 			$HBMonth4 = "ads"; 
 			$preghbquery4 = "2 DATE[^\n]*$HBMonth4";
-			if ($REGEXP_DB) $query4 = "2 DATE[^\n]*$HBMonth4";
-			else $query4 = "%2 DATE%$HBMonth4%";
+			$query4 = "2 DATE[^\n]*$HBMonth4";
 		
 			$myindilist1 = SearchIndisDates("", $HBMonth4, "", $fact);
 			$myfamlist1 = SearchFamsDates("", $HBMonth4, "", $fact);
@@ -1294,7 +1280,7 @@ else if ($action=="calendar") {
 								else $text_fact .= $text_temp;
 								$factrec.=$line."\n";
 							}
-							if (!empty($text_fact) && displayDetailsById($gid)) {
+							if (!empty($text_fact) && PrivacyFunctions::displayDetailsById($gid)) {
 								$text_day .= "<a href=\"individual.php?pid=$gid&amp;GEDCOM=".get_gedcom_from_id($indi["gedfile"])."\"><b>";
 								$n = CheckNN(GetSortableName($gid));
 								if (HasChinese($n)) $text_day .= PrintReady($n." (".GetPinYin($n).")")."</b>";
@@ -1358,7 +1344,7 @@ else if ($action=="calendar") {
 									else $text_fact .= $text_temp;
 									$factrec.=$line."\n";
 								}
-								if (!empty($text_fact) && displayDetailsById($gid, "FAM")) {
+								if (!empty($text_fact) && PrivacyFunctions::displayDetailsById($gid, "FAM")) {
 									$text_day .= "<a href=\"family.php?famid=$gid&amp;GEDCOM=".get_gedcom_from_id($fam["gedfile"])."\"><b>";
 									$n = GetFamilyDescriptor($gid);
 									if (HasChinese($n)) $text_day .= PrintReady($n." (".GetPinYin($n).")");

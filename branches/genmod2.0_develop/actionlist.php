@@ -103,7 +103,10 @@ else {
 		foreach($actionlist as $key => $action) {
 			if ($action->disp) {
 				print "<tr><td class=\"shade1 wrap\">";
-				if (is_object($action->indi_obj)) $action->indi_obj->PrintListPerson(false, true);
+				if (is_object($action->pid_obj)) {
+					if ($action->type == "INDI") $action->pid_obj->PrintListPerson(false, true);
+					elseif ($action->type == "FAM") $action->pid_obj->PrintListFamily(false);
+				}
 				else print "&nbsp;";
 				print "</td><td class=\"shade1 wrap\">";
 				if (is_object($action->repo_obj)) $action->repo_obj->PrintListRepository(false, false);
@@ -120,7 +123,10 @@ else {
 				if (is_object($action->repo_obj)) $action->repo_obj->PrintListRepository(false, false);
 				else print "&nbsp;";
 				print "</td><td class=\"shade1 wrap\">";
-				if (is_object($action->indi_obj)) $action->indi_obj->PrintListPerson(false, true);
+				if (is_object($action->pid_obj)) {
+					if ($action->type == "INDI") $action->pid_obj->PrintListPerson(false, true);
+					elseif ($action->type == "FAM") $action->pid_obj->PrintListFamily(false);
+				}
 				else print "&nbsp;";
 				print "</td><td class=\"shade1\">".$gm_lang["action".$action->status]."</td><td class=\"shade1 wrap\">".nl2br(stripslashes($action->text))."</td></tr>";
 			}

@@ -164,7 +164,6 @@ class DownloadGedcom {
 	function DownloadZip($genmod, $gm_username) {
 		global $MEDIATYPE;
 		// TODO: Remove below line in the future when all vars are in $genmod
-		$INDEX_DIRECTORY = $genmod['index_directory'];
 		require('includes/pclzip.lib.php');
 		$this->zipname = "dl".adodb_date("YmdHis").".zip";
 		$this->zipfile = $genmod['index_directory'].$this->zipname;

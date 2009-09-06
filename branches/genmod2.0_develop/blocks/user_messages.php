@@ -36,7 +36,7 @@ $GM_BLOCKS["print_user_messages"]["rss"]		= false;
 function print_user_messages($block=true, $config="", $side, $index) {
 		global $gm_lang, $GM_IMAGE_DIR, $TEXT_DIRECTION, $TIME_FORMAT, $GM_STORE_MESSAGES, $GM_IMAGES, $gm_username, $gm_user;
 
-		$usermessages = getUserMessages($gm_username);
+		$usermessages = MessageController::getUserMessages($gm_username);
 
 		print "<div id=\"user_messages\" class=\"block\">\n";
 		print "<div class=\"blockhc\">";
@@ -60,46 +60,46 @@ function print_user_messages($block=true, $config="", $side, $index) {
 			$separatortr = "";
 			$separatortd = "";
 			foreach($usermessages as $key=>$message) {
-				if (isset($message["id"])) $key = $message["id"];
+				if (!is_null($message->id)) $key = $message->id;
 				print "<tr".$separatortr.">";
 				print "<td class=\"wrap shade1\"".$separatortd."><input type=\"checkbox\" name=\"message_id[]\" value=\"$key\" /></td>\n";
-				$showmsg=preg_replace("/(\w)\/(\w)/","\$1/<span style=\"font-size:1px;\"> </span>\$2",PrintReady($message["subject"]));
+				$showmsg=preg_replace("/(\w)\/(\w)/","\$1/<span style=\"font-size:1px;\"> </span>\$2",PrintReady($message->subject));
 				$showmsg=preg_replace("/@/","@<span style=\"font-size:1px;\"> </span>",$showmsg);
 				print "<td class=\"wrap\"".$separatortd."><a href=\"#\" onclick=\"expand_layer('message$key'); return false;\"><b>".$showmsg."</b> <img id=\"message${key}_img\" src=\"".$GM_IMAGE_DIR."/".$GM_IMAGES["plus"]["other"]."\" border=\"0\" alt=\"\" title=\"\" /></a></td>\n";
-				if (!empty($message["created"])) $time = strtotime($message["created"]);
+				if (!is_null($message->created) && $message->created != "") $time = strtotime($message->created);
 				else $time = time();
 				$day = date("j", $time);
 				$mon = date("M", $time);
 				$year = date("Y", $time);
 				// if incoming, print the from address.
 				// if outgoing, print the to address.
-				if ($message["from"] == $gm_username) $mdir = "to";
+				if ($message->from == $gm_username) $mdir = "to";
 				else $mdir = "from";
-				$tempuser =& User::GetInstance($message[$mdir]);
+				$tempuser =& User::GetInstance($message->$mdir);
 				print "<td class=\"wrap\"".$separatortd.">".GetChangedDate("$day $mon $year")." - ".date($TIME_FORMAT, $time)."</td>\n";
 				print "<td class=\"wrap\"".$separatortd.">";
 				// If it's an existing user, print the details. Also do this if it doesn't appear to be a valid e-mail address
-				if (!empty($tempuser->username) || stristr($message[$mdir], "Genmod-noreply") || !CheckEmailAddress($message[$mdir])) {
+				if (!empty($tempuser->username) || stristr($message->$mdir, "Genmod-noreply") || !CheckEmailAddress($message->$mdir)) {
 					print PrintReady($tempuser->firstname." ".$tempuser->lastname);
 					if (!empty($tempuser->username)) $prt = " - ";
 					else $prt = "";
-					if ($TEXT_DIRECTION=="ltr") print " &lrm;".$prt.htmlspecialchars($message[$mdir])."&lrm;";
-					else print " &rlm;".$prt.htmlspecialchars($message[$mdir])."&rlm;";
+					if ($TEXT_DIRECTION=="ltr") print " &lrm;".$prt.htmlspecialchars($message->$mdir)."&lrm;";
+					else print " &rlm;".$prt.htmlspecialchars($message->$mdir)."&rlm;";
 				}
-				else print "<a href=\"mailto:".$message[$mdir]."?SUBJECT=".$message["subject"]."\">".preg_replace("/@/","@<span style=\"font-size:1px;\"> </span>",$message[$mdir])."</a>";
+				else print "<a href=\"mailto:".$message->$mdir."?SUBJECT=".$message->subject."\">".preg_replace("/@/","@<span style=\"font-size:1px;\"> </span>",$message->$mdir)."</a>";
 				print "</td>\n";
 				print "</tr>\n";
 				print "<tr><td class=\"wrap\" colspan=\"4\"><div id=\"message$key\" style=\"display: none;\" class=\"wrap\">\n";
-				$message["body"] = nl2br(preg_replace('#\( (http://\S+) \)#', "<a href=\"$1\" dir =\"ltr\">$1</a>", $message["body"]));
+				$message->body = nl2br(preg_replace('#\( (http://\S+) \)#', "<a href=\"$1\" dir =\"ltr\">$1</a>", $message->body));
 
-				print PrintReady($message["body"])."<br /><br />\n";
-				if (preg_match("/RE:/", $message["subject"])==0) $message["subject"]="RE:".$message["subject"];
+				print PrintReady($message->body)."<br /><br />\n";
+				if (preg_match("/RE:/", $message->subject)==0) $message->subject = "RE:".$message->subject;
 				// Only print the reply link if it's an incoming message.
 				// Also, we don't use Genmod to send mail to non-users.
 				// If the originator is not a user, let the Genmod user send a mail from his own mail system
 				if ($mdir == "from") {
-					if (!empty($tempuser->username)) print "<a href=\"#\" onclick=\"reply('".$message[$mdir]."', '".addslashes($message["subject"])."'); return false;\">".$gm_lang["reply"]."</a> | ";
-					else if (!stristr($message[$mdir], "Genmod-noreply")) print "<a href=\"mailto:".$message["from"]."?SUBJECT=".$message["subject"]."\">".$gm_lang["reply"]."</a> | ";
+					if (!empty($tempuser->username)) print "<a href=\"#\" onclick=\"reply('".$message->$mdir."', '".addslashes($message->subject)."'); return false;\">".$gm_lang["reply"]."</a> | ";
+					else if (!stristr($message->$mdir, "Genmod-noreply")) print "<a href=\"mailto:".$message->from."?SUBJECT=".$message->subject."\">".$gm_lang["reply"]."</a> | ";
 				}
 				print "<a href=\"index.php?action=deletemessage&amp;message_id=$key\" onclick=\"return confirm('".$gm_lang["confirm_message_delete"]."');\">".$gm_lang["delete"]."</a></div></td></tr>\n";
 				$separatortr = " style=\"border-collapse:collapse;\"";

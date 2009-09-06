@@ -43,7 +43,7 @@ $genmod['gedcomid'] = $GEDCOMID;
 $genmod['gedcomname'] = $GEDCOM;
 
 // Get some general settings
-$genmod['index_directory'] = $INDEX_DIRECTORY;
+$genmod['index_directory'] = INDEX_DIRECTORY;
 $genmod['text_direction'] = $TEXT_DIRECTION;
 $genmod['version'] = GM_VERSION;
 $genmod['version_release'] = GM_VERSION_RELEASE;
@@ -55,7 +55,7 @@ $genmod['query_string'] = $QUERY_STRING;
 $genmod['gm_language'] = $gm_language;
 $genmod['language_settings'] = $language_settings;
 $genmod['gm_lang'] = $gm_lang;
-$genmod['tblprefix'] = $TBLPREFIX;
+$genmod['tblprefix'] = TBLPREFIX;
 //$genmod['factarray'] = $factarray;
 $genmod['gm_images'] = $GM_IMAGES;
 $genmod['gm_image_dir'] = $GM_IMAGE_DIR;

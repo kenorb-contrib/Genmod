@@ -33,7 +33,7 @@ $GM_BLOCKS["top10_botviews"]["config"] 		= array("num"=>10, "count_placement"=>"
 $GM_BLOCKS["top10_botviews"]["rss"]       	= false;
 
 function top10_botviews($block=true, $config="", $side, $index) {
-	global $gm_lang, $GEDCOM, $GEDCOMID, $INDEX_DIRECTORY, $GM_BLOCKS, $command, $GM_IMAGES, $GM_IMAGE_DIR, $SHOW_SOURCES, $TEXT_DIRECTION, $TBLPREFIX, $gm_username, $gm_user;
+	global $gm_lang, $GEDCOM, $GEDCOMID, $GM_BLOCKS, $command, $GM_IMAGES, $GM_IMAGE_DIR, $SHOW_SOURCES, $TEXT_DIRECTION, $gm_username, $gm_user;
 
 	// This block is only for admins
 	if (!$gm_user->userGedcomAdmin()) return;
@@ -44,7 +44,7 @@ function top10_botviews($block=true, $config="", $side, $index) {
 	//-- load the lines from the database
 	$ids = array();
 	$limit = $config["num"]+1;
-	$sql = "SELECT * from ".$TBLPREFIX."counters WHERE (c_id like '%[".$GEDCOMID."]%') AND c_bot_number>0 ORDER BY c_bot_number DESC LIMIT ".$limit;
+	$sql = "SELECT * from ".TBLPREFIX."counters WHERE (c_id like '%[".$GEDCOMID."]%') AND c_bot_number>0 ORDER BY c_bot_number DESC LIMIT ".$limit;
 	$res = NewQuery($sql);
 	while($row = $res->FetchAssoc()){
 		$p1 = strpos($row["c_id"],"[");
@@ -94,7 +94,7 @@ function top10_botviews($block=true, $config="", $side, $index) {
 			$ct = preg_match("/0 @(.*)@ (.*)/", $gedrec, $match);
 			if ($ct>0) {
 				$type = trim($match[2]);
-				$disp = showLivingNameByID($id, $type);
+				$disp = PrivacyFunctions::showLivingNameByID($id, $type);
 				if ($disp) {
 					if ($type=="INDI") {
 						print "<tr valign=\"top\">";

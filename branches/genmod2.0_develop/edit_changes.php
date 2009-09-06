@@ -35,8 +35,8 @@ require "config.php";
 require "includes/functions/functions_edit.php";
 
 if (!$gm_user->userCanAccept()) {
-	if (empty($LOGIN_URL)) header("Location: login.php?url=edit_changes.php");
-	else header("Location: ".$LOGIN_URL."?url=edit_changes.php");
+	if (LOGIN_URL == "") header("Location: login.php?url=edit_changes.php");
+	else header("Location: ".LOGIN_URL."?url=edit_changes.php");
 	exit;
 }
 
@@ -122,10 +122,10 @@ else {
 	$changegids = array();
 	
 	// First read all changes
-	$sql = "SELECT DISTINCT ch_cid AS cid FROM ".$TBLPREFIX."changes WHERE ch_gedfile = '".$GEDCOMID."' ORDER BY ch_cid ASC, ch_fact ASC, ch_time DESC";
+	$sql = "SELECT DISTINCT ch_cid AS cid FROM ".TBLPREFIX."changes WHERE ch_gedfile = '".$GEDCOMID."' ORDER BY ch_cid ASC, ch_fact ASC, ch_time DESC";
 	$res = NewQuery($sql);
 	while($row = $res->FetchAssoc()){
-		$sqlcid = "SELECT * FROM ".$TBLPREFIX."changes WHERE ch_cid = '".$row["cid"]."' AND ch_gedfile = '".$GEDCOMID."' ORDER BY ch_id ASC";
+		$sqlcid = "SELECT * FROM ".TBLPREFIX."changes WHERE ch_cid = '".$row["cid"]."' AND ch_gedfile = '".$GEDCOMID."' ORDER BY ch_id ASC";
 		$rescid = NewQuery($sqlcid);
 		$change_row = 0;
 		while($rowcid = $rescid->FetchAssoc()){

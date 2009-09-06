@@ -39,9 +39,8 @@ abstract class FavoritesController {
 	 * @param int $fv_id	the id of the favorite to delete
 	 */
 	public function DeleteFavorite($fv_id) {
-		global $TBLPREFIX;
 	
-		$sql = "DELETE FROM ".$TBLPREFIX."favorites WHERE fv_id=".$fv_id;
+		$sql = "DELETE FROM ".TBLPREFIX."favorites WHERE fv_id=".$fv_id;
 		$res = NewQuery($sql);
 		if ($res) return true;
 		else {
@@ -56,13 +55,13 @@ abstract class FavoritesController {
 	 * @param string $username		the username to get the favorites for
 	 */
 	public function getUserFavorites($username, $favid="") {
-		global $TBLPREFIX, $GEDCOMS, $DBCONN, $CONFIGURED;
+		global $GEDCOMS;
 	
 		$favorites = array();
 		//-- make sure we don't try to look up favorites for unconfigured sites
-		if (!$CONFIGURED) return $favorites;
+		if (!CONFIGURED) return $favorites;
 		
-		$sql = "SELECT * FROM ".$TBLPREFIX."favorites WHERE fv_username='".$DBCONN->EscapeQuery($username)."'";
+		$sql = "SELECT * FROM ".TBLPREFIX."favorites WHERE fv_username='".DbLayer::EscapeQuery($username)."'";
 		if ($favid != "") $sql .= " AND fv_id = '".$favid."'";
 		$res = NewQuery($sql);
 		if (!$res) return $favorites;
@@ -81,13 +80,13 @@ abstract class FavoritesController {
 	 * @param string $username		the username to get the favorites for
 	 */
 	public function getGedcomFavorites($gedid, $favid="") {
-		global $TBLPREFIX, $GEDCOMS, $DBCONN, $CONFIGURED;
+		global $GEDCOMS;
 	
 		$favorites = array();
 		//-- make sure we don't try to look up favorites for unconfigured sites
-		if (!$CONFIGURED) return $favorites;
+		if (!CONFIGURED) return $favorites;
 		
-		$sql = "SELECT * FROM ".$TBLPREFIX."favorites WHERE fv_file='".$gedid."' AND fv_username=''";
+		$sql = "SELECT * FROM ".TBLPREFIX."favorites WHERE fv_file='".$gedid."' AND fv_username=''";
 		if ($favid != "") $sql .= " AND fv_id = '".$favid."'";
 		$res = NewQuery($sql);
 		if (!$res) return $favorites;

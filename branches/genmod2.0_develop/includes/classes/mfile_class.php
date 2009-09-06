@@ -57,20 +57,20 @@ class MFile {
 
 		
 	public function __construct($file) {
-		global $MEDIA_IN_DB, $TBLPREFIX, $MediaFS, $INDEX_DIRECTORY;
+		global $MEDIA_IN_DB;
 		
 		if ($MEDIA_IN_DB) {
 			if (!is_array($file)) {
 				if (stristr($file, "://")) {
 					// If link, normalize it so we know the DB filename
 					$linkfile = $file;
-					$file = $MediaFS->NormalizeLink($file);
+					$file = MediaFS::NormalizeLink($file);
 				}
 				else {
 					// Strip heading stuff
 					$file = RelativePathFile($file);
 				}
-				$sql = "SELECT * FROM ".$TBLPREFIX."media_files WHERE mf_file='".$file."'";
+				$sql = "SELECT * FROM ".TBLPREFIX."media_files WHERE mf_file='".$file."'";
 				$res = NewQuery($sql);
 				// We find nothing if 
 				// - link, and no thumb exists
@@ -78,10 +78,10 @@ class MFile {
 				// If link, we try to create a thumbnail and try again.
 				if ($res->NumRows() == 0) {
 					if (isset($linkfile)) {
-						$thumb = $MediaFS->ThumbNailFile($linkfile);
+						$thumb = MediaFS::ThumbNailFile($linkfile);
 					}
 					if (!empty($thumb)) {
-						$sql = "SELECT * FROM ".$TBLPREFIX."media_files WHERE mf_file='".$file."'";
+						$sql = "SELECT * FROM ".TBLPREFIX."media_files WHERE mf_file='".$file."'";
 						$res = NewQuery($sql);
 					}
 				}
@@ -107,9 +107,9 @@ class MFile {
 				if ($this->f_is_image && $this->f_tfile_size != 0) $this->f_thumb_file = "showblob.php?file=".urlencode($this->f_file)."&amp;type=thumb";
 				else if ($this->f_is_image) {
 //					print "Is image with no thumb: ".$this->f_file."<br />";
-					$thumb = $INDEX_DIRECTORY.$this->f_fname;
+					$thumb = INDEX_DIRECTORY.$this->f_fname;
 					// copy the file from DB to filesys
-					$sql = "SELECT mdf_data FROM ".$TBLPREFIX."media_datafiles WHERE mdf_file='".$this->f_file."' ORDER BY mdf_id ASC";
+					$sql = "SELECT mdf_data FROM ".TBLPREFIX."media_datafiles WHERE mdf_file='".$this->f_file."' ORDER BY mdf_id ASC";
 					$res = NewQuery($sql);
 					if ($res) {
 						$fp = @fopen($thumb, "wb");
@@ -118,24 +118,24 @@ class MFile {
 						}
 						fclose($fp);
 					}
-					$hasthumb = $MediaFS->GenerateThumbNail($thumb, $thumb."_t", true);
+					$hasthumb = MediaFS::GenerateThumbNail($thumb, $thumb."_t", true);
 					@unlink($thumb);
 					if ($hasthumb) {
 //						print "Making thumb for: ".$this->f_file."<br />";
-						$details = $MediaFS->GetThumbDetails($thumb."_t");
-						$MediaFS->WriteDBThumbfile($this->f_file, $thumb."_t", true, true);
-						$MediaFS->UpdateDBThumbDetails($this->f_file, $details["tsize"], $details["twidth"], $details["theight"]);
+						$details = MediaFS::GetThumbDetails($thumb."_t");
+						MediaFS::WriteDBThumbfile($this->f_file, $thumb."_t", true, true);
+						MediaFS::UpdateDBThumbDetails($this->f_file, $details["tsize"], $details["twidth"], $details["theight"]);
 						$this->f_thumb_file = "showblob.php?file=".urlencode($this->f_file)."&amp;type=thumb";
-						$sql = "SELECT * FROM ".$TBLPREFIX."media_files WHERE mf_file='".$file."'";
+						$sql = "SELECT * FROM ".TBLPREFIX."media_files WHERE mf_file='".$file."'";
 						$res = NewQuery($sql);
 						if ($res->NumRows() > 0) {
 							$file = $res->FetchAssoc();
 						}
 						$res->FreeResult();
 					}
-					else $this->f_thumb_file = $MediaFS->ThumbNailFile($this->f_file);
+					else $this->f_thumb_file = MediaFS::ThumbNailFile($this->f_file);
 				}
-				else $this->f_thumb_file = $MediaFS->ThumbNailFile($this->f_file);
+				else $this->f_thumb_file = MediaFS::ThumbNailFile($this->f_file);
 				//print $this->f_thumb_file;
 				$this->f_link = $file["mf_link"];
 				if (!empty($this->f_link)) $this->f_file = $this->f_link;
@@ -147,7 +147,7 @@ class MFile {
 				$this->f_tfile_size = $file["mf_tsize"];
 				$this->f_mimetype = $file["mf_mimetype"];
 				$this->f_mimedescr = $file["mf_mimedesc"];
-				$this->f_pastelink = $MediaFS->CheckMediaDepth($this->f_file);
+				$this->f_pastelink = MediaFS::CheckMediaDepth($this->f_file);
 				if ($this->f_link) {
 					$this->f_main_file = $this->f_file;
 				}
@@ -163,7 +163,7 @@ class MFile {
 				}
 				$this->f_file_exists = true;
 //				if (empty($this->f_thumb_file)) {
-//					$this->f_thumb_file = $MediaFS->ThumbNailFile($this->f_file);
+//					$this->f_thumb_file = MediaFS::ThumbNailFile($this->f_file);
 //					if (!empty($this->f_thumb_file)) {
 //						$this->f_is_image=true;
 //						$this->f_file_exists = true;
@@ -177,8 +177,8 @@ class MFile {
 //			print "getting details for ".$this->f_file."<br />";
 			$this->f_main_file = $file;
 			// check this!
-			$this->f_pastelink = $MediaFS->CheckMediaDepth($this->f_file);
-			$this->f_thumb_file = $MediaFS->ThumbnailFile($this->f_file);
+			$this->f_pastelink = MediaFS::CheckMediaDepth($this->f_file);
+			$this->f_thumb_file = MediaFS::ThumbnailFile($this->f_file);
 			
 			$this->f_file_exists = true;
 

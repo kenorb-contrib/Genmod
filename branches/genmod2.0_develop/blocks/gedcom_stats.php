@@ -51,7 +51,7 @@ $GM_BLOCKS["print_gedcom_stats"]["rss"]			= true;
 
 function print_gedcom_stats($block = true, $config="", $side, $index) {
 		global $GM_BLOCKS, $gm_lang, $GEDCOM, $GEDCOMS, $ALLOW_CHANGE_GEDCOM, $command, $COMMON_NAMES_THRESHOLD, $GM_IMAGE_DIR, $GM_IMAGES;
-		global $top10_block_present, $TBLPREFIX, $monthtonum, $gm_username, $gm_user;		// Set in index.php
+		global $top10_block_present, $monthtonum, $gm_username, $gm_user;		// Set in index.php
 
 		if (empty($config)) $config = $GM_BLOCKS["print_gedcom_stats"]["config"];
 		if (!isset($config['stat_indi'])) $config = $GM_BLOCKS["print_gedcom_stats"]["config"];

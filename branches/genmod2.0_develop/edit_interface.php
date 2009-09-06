@@ -41,8 +41,8 @@ if (file_exists($GM_BASE_DIRECTORY."languages/countries.".$lang_short_cut[$LANGU
 asort($countries);
 
 if ($_SESSION["cookie_login"]) {
-	if (empty($LOGIN_URL)) header("Location: login.php?type=simple&ged=$GEDCOM&url=edit_interface.php".urlencode("?".$QUERY_STRING));
-	else header("Location: ".$LOGIN_URL."?type=simple&ged=$GEDCOM&url=edit_interface.php".urlencode("?".$QUERY_STRING));
+	if (LOGIN_URL == "") header("Location: login.php?type=simple&ged=$GEDCOM&url=edit_interface.php".urlencode("?".$QUERY_STRING));
+	else header("Location: ".LOGIN_URL."?type=simple&ged=$GEDCOM&url=edit_interface.php".urlencode("?".$QUERY_STRING));
 	exit;
 }
 
@@ -144,36 +144,36 @@ if (!empty($pid)) {
 		if ($type) {
 			//-- if the record is for an INDI then check for display privileges for that indi
 			if ($type=="INDI") {
-				$disp = displayDetailsById($pid);
+				$disp = PrivacyFunctions::displayDetailsById($pid);
 				//-- if disp is true, also check for resn access
 				if ($disp == true){
 					// First check level 1 RESN
-					if (FactViewRestricted($pid, $gedrec, 1)) $factdisp = false;
-					if (FactEditRestricted($pid, $gedrec, 1)) $factedit = false;
+					if (PrivacyFunctions::FactViewRestricted($pid, $gedrec, 1)) $factdisp = false;
+					if (PrivacyFunctions::FactEditRestricted($pid, $gedrec, 1)) $factedit = false;
 					// Then check level 2 RESN
 					$subs = GetAllSubrecords($gedrec, "", false, false);
 					foreach($subs as $indexval => $sub) {
-						if (FactViewRestricted($pid, $sub)==true) $factdisp = false;
-						if (FactEditRestricted($pid, $sub)==true) $factedit = false;
+						if (PrivacyFunctions::FactViewRestricted($pid, $sub)==true) $factdisp = false;
+						if (PrivacyFunctions::FactEditRestricted($pid, $sub)==true) $factedit = false;
 					}
 				}
 			}
 			//-- for FAM check for display privileges on both parents
 			else if ($type=="FAM") {
 				// First check level 1 RESN
-				if (FactViewRestricted($pid, $gedrec, 1)) $factdisp = false;
-				if (FactEditRestricted($pid, $gedrec, 1)) $factedit = false;
+				if (PrivacyFunctions::FactViewRestricted($pid, $gedrec, 1)) $factdisp = false;
+				if (PrivacyFunctions::FactEditRestricted($pid, $gedrec, 1)) $factedit = false;
 				// Then check level 2 RESN
 				$subs = GetAllSubrecords($gedrec, "", false, false);
 				foreach($subs as $indexval => $sub) {
-					if (FactViewRestricted($pid, $sub)==true) $factdisp = false;
-					if (FactEditRestricted($pid, $sub)==true) $factedit = false;
+					if (PrivacyFunctions::FactViewRestricted($pid, $sub)==true) $factdisp = false;
+					if (PrivacyFunctions::FactEditRestricted($pid, $sub)==true) $factedit = false;
 				}
 				//-- check if we can display both parents
 				$parents = FindParentsInRecord($gedrec);
-				$disp = displayDetailsById($parents["HUSB"]);
+				$disp = PrivacyFunctions::displayDetailsById($parents["HUSB"]);
 				if ($disp) {
-					$disp = displayDetailsById($parents["WIFE"]);
+					$disp = PrivacyFunctions::displayDetailsById($parents["WIFE"]);
 				}
 			}
 			else {
@@ -204,33 +204,33 @@ else if (!empty($famid)) {
 			$type = trim($match[1]);
 			//-- if the record is for an INDI then check for display privileges for that indi
 			if ($type=="INDI") {
-				$disp = displayDetailsById($famid);
+				$disp = PrivacyFunctions::displayDetailsById($famid);
 				//-- if disp is true, also check for resn access
 				if ($disp == true){
-					if (FactViewRestricted($famid, $gedrec, 1)) $factdisp = false;
-					if (FactEditRestricted($famid, $gedrec, 1)) $factedit = false;
+					if (PrivacyFunctions::FactViewRestricted($famid, $gedrec, 1)) $factdisp = false;
+					if (PrivacyFunctions::FactEditRestricted($famid, $gedrec, 1)) $factedit = false;
 					$subs = GetAllSubrecords($gedrec, "", false, false);
 					foreach($subs as $indexval => $sub) {
-						if (FactViewRestricted($famid, $sub)==true) $factdisp = false;
-						if (FactEditRestricted($famid, $sub)==true) $factedit = false;
+						if (PrivacyFunctions::FactViewRestricted($famid, $sub)==true) $factdisp = false;
+						if (PrivacyFunctions::FactEditRestricted($famid, $sub)==true) $factedit = false;
 					}
 				}
 			}
 			//-- for FAM check for display privileges on both parents
 			else if ($type=="FAM") {
 				//-- check if there are restrictions on the facts
-				if (FactViewRestricted($famid, $gedrec, 1)) $factdisp = false;
-				if (FactEditRestricted($famid, $gedrec, 1)) $factedit = false;
+				if (PrivacyFunctions::FactViewRestricted($famid, $gedrec, 1)) $factdisp = false;
+				if (PrivacyFunctions::FactEditRestricted($famid, $gedrec, 1)) $factedit = false;
 				$subs = GetAllSubrecords($gedrec, "", false, false);
 				foreach($subs as $indexval => $sub) {
-					if (FactViewRestricted($famid, $sub)==true) $factdisp = false;
-					if (FactEditRestricted($famid, $sub)==true) $factedit = false;
+					if (PrivacyFunctions::FactViewRestricted($famid, $sub)==true) $factdisp = false;
+					if (PrivacyFunctions::FactEditRestricted($famid, $sub)==true) $factedit = false;
 				}
 				//-- check if we can display both parents
 				$parents = FindParentsInRecord($gedrec);
-				$disp = displayDetailsById($parents["HUSB"]);
+				$disp = PrivacyFunctions::displayDetailsById($parents["HUSB"]);
 				if ($disp) {
-					$disp = displayDetailsById($parents["WIFE"]);
+					$disp = PrivacyFunctions::displayDetailsById($parents["WIFE"]);
 				}
 			}
 			else {
@@ -270,7 +270,7 @@ if ($action == "edit" || $action == "editraw") {
 	// Check links from the fact to hidden sources, media, etc.
 	$cl = preg_match_all("/[1-9]\s(.+)\s@(.+)@/", $oldrec, $match);
 	for ($i=0; $i<$cl;$i++) {
-		$disp = $disp && DisplayDetailsByID($match[2][$i], $match[1][$i], 1, true);
+		$disp = $disp && PrivacyFunctions::DisplayDetailsByID($match[2][$i], $match[1][$i], 1, true);
 		// print "2: ".$match[2][$i]." 1: ".$match[1][$i]." disp: ".$disp."<br />";
 	}
 }
@@ -2420,7 +2420,7 @@ switch ($action) {
 		$exist = false;
 		if (!empty($spid)) {
 			// NOTE: Check if the relation doesn't exist yet
-			$sql = "SELECT f_id FROM ".$TBLPREFIX."families WHERE f_husb = ";
+			$sql = "SELECT f_id FROM ".TBLPREFIX."families WHERE f_husb = ";
 			if ($famtag == "HUSB") $sql .= "'".JoinKey($spid, $GEDCOMID)."' AND f_wife = '".JoinKey($pid, $GEDCOMID)."'";
 			else if ($famtag == "WIFE") $sql .= "'".JoinKey($pid, $GEDCOMID)."' AND f_wife = '".JoinKey($spid, $GEDCOMID)."'";
 			$res = NewQuery($sql);
@@ -2496,7 +2496,7 @@ switch ($action) {
 		
 		// NOTE: Check for uploaded files
 		if (count($_FILES)>0) {
-			$MediaFS->UploadFiles($_FILES, $folder, true);
+			MediaFS::UploadFiles($_FILES, $folder, true);
 		}
 		
 		// NOTE: Build the new record
@@ -2609,7 +2609,7 @@ switch ($action) {
 		
 		//-- check for photo update
 		if (count($_FILES)>0) {
-			$result = $MediaFS->UploadFiles($_FILES, $folder, true);
+			$result = MediaFS::UploadFiles($_FILES, $folder, true);
 			if ($result["errno"] != 0) {
 				print "<span class=\"error\">".$gm_lang["upload_error"]."<br />".$result["error"]."</span><br />";
 			}

@@ -224,7 +224,7 @@ if (($surname_sublist=="yes")&&($show_all=="yes")) {
 	foreach($indilist as $gid=>$indi) {
 		// NOTE: Make sure that favorites from other gedcoms are not shown
 		if ($indi["gedfile"]==$GEDCOMID) {
-			if (showLivingNameById($gid)) {
+			if (PrivacyFunctions::showLivingNameById($gid)) {
 				$ret = check_alive($indi["gedcom"], $year, $type, $useMAA);
 				if ($ret==0) {
 					foreach($indi["names"] as $indexval => $name) {
@@ -256,7 +256,7 @@ else if (($surname_sublist=="yes")&&(empty($surname))&&($show_all=="no")) {
 	$surnames = array();
 	foreach($tindilist as $gid=>$indi) {
 		$indi = $indilist[$gid];
-		if (showLivingNameById($gid)) {
+		if (PrivacyFunctions::showLivingNameById($gid)) {
 			$ret = check_alive($indi["gedcom"], $year, $type, $useMAA);
 			if ($ret==0) {
 				$indi_alive++;
@@ -298,7 +298,7 @@ else {
 	if (($surname_sublist=="no")&&(!empty($alpha))&&($show_all=="no")) $tindilist = GetAlphaIndis($alpha);
 	foreach($tindilist as $gid=>$indi) {
 		$indi = $indilist[$gid];
-		if (!showLivingNameById($gid)) {
+		if (!PrivacyFunctions::showLivingNameById($gid)) {
 			unset($tindilist[$gid]);
 			$indi_hide[$gid."[".$indi["gedfile"]."]"]=1;
 		}
@@ -322,7 +322,7 @@ else {
 	if (($surname_sublist=="no")&&($show_all=="yes")) {
 		$tindilist = GetIndiList("no");
 		foreach($tindilist as $gid=>$indi) {
-			if (!showLivingNameById($gid)) {
+			if (!PrivacyFunctions::showLivingNameById($gid)) {
 				unset($tindilist[$gid]);
 				$indi_hide[$gid."[".$indi["gedfile"]."]"]=1;
 			}

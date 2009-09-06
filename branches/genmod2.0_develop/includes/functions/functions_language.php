@@ -46,23 +46,23 @@ if (strstr($_SERVER["SCRIPT_NAME"],basename(__FILE__))) {
  * @return	boolean	true or false depending on the outcome
  */
 function StoreEnglish($setup=false,$only_english=false) {
-	global $TBLPREFIX, $gm_username, $language_settings;
+	global $gm_username, $language_settings;
 	
 	if (!$setup) {
 		// Empty the table
-		$sql = "TRUNCATE TABLE ".$TBLPREFIX."language";
+		$sql = "TRUNCATE TABLE ".TBLPREFIX."language";
 		if (!$result = NewQuery($sql)) {
 			WriteToLog("StoreEnglish-> Language table could not be dropped", "E", "S");
 			return false;
 		}
 		// Empty the table
-		$sql = "TRUNCATE TABLE ".$TBLPREFIX."language_help";
+		$sql = "TRUNCATE TABLE ".TBLPREFIX."language_help";
 		if (!$result = NewQuery($sql)) {
 			WriteToLog("StoreEnglish-> Language help table could not be dropped", "E", "S");
 			return false;
 		}
 		// Empty the table
-		$sql = "TRUNCATE TABLE ".$TBLPREFIX."facts";
+		$sql = "TRUNCATE TABLE ".TBLPREFIX."facts";
 		if (!$result = NewQuery($sql)) {
 			WriteToLog("StoreEnglish-> Facts table could not be dropped", "E", "S");
 			return false;
@@ -85,7 +85,7 @@ function StoreEnglish($setup=false,$only_english=false) {
 			// NOTE: Store the language variable in the database
 			if (!isset($data[1])) WriteToLog($line, "E", "S");
 			else {
-				$sql = "INSERT INTO ".$TBLPREFIX."language VALUES ('".mysql_real_escape_string($data[0])."', '".mysql_real_escape_string($data[1])."', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '".time()."', '".$gm_username."')";
+				$sql = "INSERT INTO ".TBLPREFIX."language VALUES ('".mysql_real_escape_string($data[0])."', '".mysql_real_escape_string($data[1])."', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '".time()."', '".$gm_username."')";
 				if (!$result = NewQuery($sql)) {
 					WriteToLog("StoreEnglish-> Could not add language string ".$line." for language English to table ", "E", "S");
 				}
@@ -93,14 +93,14 @@ function StoreEnglish($setup=false,$only_english=false) {
 			 }
 		}
 		
-		$sql = "SELECT ls_gm_langname FROM ".$TBLPREFIX."lang_settings WHERE ls_gm_langname='english'";
+		$sql = "SELECT ls_gm_langname FROM ".TBLPREFIX."lang_settings WHERE ls_gm_langname='english'";
 		$res = NewQuery($sql);
 		if ($res->NumRows() > 0 ) {
-			$sql = "UPDATE ".$TBLPREFIX."lang_settings SET ls_translated = '0', ls_md5_lang = '".md5_file("languages/lang.en.txt")."', ls_md5_help = '".md5_file("languages/help_text.en.txt")."', ls_md5_facts = '".md5_file("languages/facts.en.txt")."' WHERE ls_gm_langname='english'";
+			$sql = "UPDATE ".TBLPREFIX."lang_settings SET ls_translated = '0', ls_md5_lang = '".md5_file("languages/lang.en.txt")."', ls_md5_help = '".md5_file("languages/help_text.en.txt")."', ls_md5_facts = '".md5_file("languages/facts.en.txt")."' WHERE ls_gm_langname='english'";
 			$res = NewQuery($sql);
 		}
 		else {
-			$sql = "INSERT INTO ".$TBLPREFIX."lang_settings (ls_gm_langname, ls_translated, ls_md5_lang, ls_md5_help, ls_md5_facts) VALUES ('english', '0','".md5_file("languages/lang.en.txt")."', '".md5_file("languages/help_text.en.txt")."', '".md5_file("languages/facts.en.txt")."')";
+			$sql = "INSERT INTO ".TBLPREFIX."lang_settings (ls_gm_langname, ls_translated, ls_md5_lang, ls_md5_help, ls_md5_facts) VALUES ('english', '0','".md5_file("languages/lang.en.txt")."', '".md5_file("languages/help_text.en.txt")."', '".md5_file("languages/facts.en.txt")."')";
 			$res = NewQuery($sql);
 		}
 		WriteToLog("StoreEnglish-> English language added to the database", "I", "S");
@@ -123,7 +123,7 @@ function StoreEnglish($setup=false,$only_english=false) {
 			// NOTE: Store the language variable in the database
 			if (!isset($data[1])) WriteToLog($line, "E", "S");
 			else {
-				$sql = "INSERT INTO ".$TBLPREFIX."facts VALUES ('".mysql_real_escape_string($data[0])."', '".mysql_real_escape_string($data[1])."', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '".time()."', '".$gm_username."')";
+				$sql = "INSERT INTO ".TBLPREFIX."facts VALUES ('".mysql_real_escape_string($data[0])."', '".mysql_real_escape_string($data[1])."', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '".time()."', '".$gm_username."')";
 				if (!$result = NewQuery($sql)) {
 					WriteToLog("Could not add facts string ".$line." for language English to table ", "E", "S");
 				}
@@ -147,7 +147,7 @@ function StoreEnglish($setup=false,$only_english=false) {
 				else {
 					$data[0] = substr(trim($data[0]), 1);
 					$data[1] = substr(trim($data[1]), 0, -1);
-					$sql = "INSERT INTO ".$TBLPREFIX."language_help VALUES ('".mysql_real_escape_string($data[0])."', '".mysql_real_escape_string($data[1])."', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '".time()."', '".$gm_username."')";
+					$sql = "INSERT INTO ".TBLPREFIX."language_help VALUES ('".mysql_real_escape_string($data[0])."', '".mysql_real_escape_string($data[1])."', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '".time()."', '".$gm_username."')";
 					if (!$result = NewQuery($sql)) {
 						WriteToLog("Could not add language help string ".$line." for language English to table ", "E", "S");
 					}
@@ -180,7 +180,7 @@ function StoreEnglish($setup=false,$only_english=false) {
  * @param	     string	     $storelang	The name of the language to store
  */
 function StoreLanguage($storelang) {
-	global $TBLPREFIX, $gm_username, $language_settings;
+	global $gm_username, $language_settings;
 
 	if (file_exists("languages/lang.".$language_settings[$storelang]["lang_short_cut"].".txt")) {
 		$lines = file("languages/lang.".$language_settings[$storelang]["lang_short_cut"].".txt");
@@ -191,10 +191,10 @@ function StoreLanguage($storelang) {
        		    $data[0] = substr(ltrim($data[0]), 1);
                 $data[1] = substr(rtrim($data[1]), 0, -1);
                 if ($storelang == "english") {
-	                $sql = "SELECT lg_english FROM ".$TBLPREFIX."language WHERE lg_string='".$data[0]."'";
+	                $sql = "SELECT lg_english FROM ".TBLPREFIX."language WHERE lg_string='".$data[0]."'";
 	                $res = NewQuery($sql);
 	                if ($res->NumRows() == 0) {
-						$sql = "INSERT INTO ".$TBLPREFIX."language VALUES ('".mysql_real_escape_string($data[0])."', '".mysql_real_escape_string($data[1])."', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '".time()."', '".$gm_username."')";
+						$sql = "INSERT INTO ".TBLPREFIX."language VALUES ('".mysql_real_escape_string($data[0])."', '".mysql_real_escape_string($data[1])."', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '".time()."', '".$gm_username."')";
 						if (!$result = NewQuery($sql)) {
 							WriteToLog("StoreLanguage-> Could not add language string ".$line." for language English to table ", "E", "S");
 						}
@@ -202,7 +202,7 @@ function StoreLanguage($storelang) {
 					}
 					else {
 						$res->FreeResult();
-		       			$sql = "UPDATE ".$TBLPREFIX."language SET `lg_".$storelang."` = '".mysql_real_escape_string($data[1])."', lg_last_update_date='".time()."', lg_last_update_by='".$gm_username."' WHERE lg_string = '".$data[0]."' LIMIT 1";
+		       			$sql = "UPDATE ".TBLPREFIX."language SET `lg_".$storelang."` = '".mysql_real_escape_string($data[1])."', lg_last_update_date='".time()."', lg_last_update_by='".$gm_username."' WHERE lg_string = '".$data[0]."' LIMIT 1";
     		   			if (!$result = NewQuery($sql)) {
             	            WriteToLog("StoreLanguage-> Could not update language string ".$line." for language ".$storelang." to table ", "E", "S");
 	                    }
@@ -210,7 +210,7 @@ function StoreLanguage($storelang) {
 					}
 				}
 				else {
-	       			$sql = "UPDATE ".$TBLPREFIX."language SET `lg_".$storelang."` = '".mysql_real_escape_string($data[1])."', lg_last_update_date='".time()."', lg_last_update_by='".$gm_username."' WHERE lg_string = '".$data[0]."' LIMIT 1";
+	       			$sql = "UPDATE ".TBLPREFIX."language SET `lg_".$storelang."` = '".mysql_real_escape_string($data[1])."', lg_last_update_date='".time()."', lg_last_update_by='".$gm_username."' WHERE lg_string = '".$data[0]."' LIMIT 1";
     	   			if (!$result = NewQuery($sql)) {
            	            WriteToLog("StoreLanguage-> Could not update language string ".$line." for language ".$storelang." to table ", "E", "S");
 	                }
@@ -228,10 +228,10 @@ function StoreLanguage($storelang) {
                 $data[0] = substr(ltrim($data[0]), 1);
                 $data[1] = substr(rtrim($data[1]), 0, -1);
                 if ($storelang == "english") {
-	                $sql = "SELECT lg_english FROM ".$TBLPREFIX."language_help WHERE lg_string='".$data[0]."'";
+	                $sql = "SELECT lg_english FROM ".TBLPREFIX."language_help WHERE lg_string='".$data[0]."'";
 	                $res = NewQuery($sql);
 	                if ($res->NumRows() == 0) {
-						$sql = "INSERT INTO ".$TBLPREFIX."language_help VALUES ('".mysql_real_escape_string($data[0])."', '".mysql_real_escape_string($data[1])."', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '".time()."', '".$gm_username."')";
+						$sql = "INSERT INTO ".TBLPREFIX."language_help VALUES ('".mysql_real_escape_string($data[0])."', '".mysql_real_escape_string($data[1])."', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '".time()."', '".$gm_username."')";
 						if (!$result = NewQuery($sql)) {
 							WriteToLog("StoreLanguage-> Could not add language help string ".$line." for language English to table ", "E", "S");
 						}
@@ -239,7 +239,7 @@ function StoreLanguage($storelang) {
 					}
 					else {
 						$res->FreeResult();
-	                	$sql = "UPDATE ".$TBLPREFIX."language_help SET `lg_".$storelang."` = '".mysql_real_escape_string($data[1])."', lg_last_update_date='".time()."', lg_last_update_by='".$gm_username."' WHERE lg_string = '".$data[0]."' LIMIT 1";
+	                	$sql = "UPDATE ".TBLPREFIX."language_help SET `lg_".$storelang."` = '".mysql_real_escape_string($data[1])."', lg_last_update_date='".time()."', lg_last_update_by='".$gm_username."' WHERE lg_string = '".$data[0]."' LIMIT 1";
     	            	if (!$result = NewQuery($sql)) {
         	                  WriteToLog("StoreLanguage-> Could not update language help string ".$line." for language ".$storelang." to table ", "E", "S");
             	        }
@@ -247,7 +247,7 @@ function StoreLanguage($storelang) {
 					}
                	}
                	else {
-	            	$sql = "UPDATE ".$TBLPREFIX."language_help SET `lg_".$storelang."` = '".mysql_real_escape_string($data[1])."', lg_last_update_date='".time()."', lg_last_update_by='".$gm_username."' WHERE lg_string = '".$data[0]."' LIMIT 1";
+	            	$sql = "UPDATE ".TBLPREFIX."language_help SET `lg_".$storelang."` = '".mysql_real_escape_string($data[1])."', lg_last_update_date='".time()."', lg_last_update_by='".$gm_username."' WHERE lg_string = '".$data[0]."' LIMIT 1";
     	            if (!$result = NewQuery($sql)) {
         	            WriteToLog("StoreLanguage-> Could not update language help string ".$line." for language ".$storelang." to table ", "E", "S");
             	    }
@@ -265,10 +265,10 @@ function StoreLanguage($storelang) {
                 $data[0] = substr(ltrim($data[0]), 1);
                 $data[1] = substr(rtrim($data[1]), 0, -1);
                 if ($storelang == "english") {
-	                $sql = "SELECT lg_english FROM ".$TBLPREFIX."facts WHERE lg_string='".$data[0]."'";
+	                $sql = "SELECT lg_english FROM ".TBLPREFIX."facts WHERE lg_string='".$data[0]."'";
 	                $res = NewQuery($sql);
 	                if ($res->NumRows() == 0) {
-						$sql = "INSERT INTO ".$TBLPREFIX."facts VALUES ('".mysql_real_escape_string($data[0])."', '".mysql_real_escape_string($data[1])."', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '".time()."', '".$gm_username."')";
+						$sql = "INSERT INTO ".TBLPREFIX."facts VALUES ('".mysql_real_escape_string($data[0])."', '".mysql_real_escape_string($data[1])."', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '".time()."', '".$gm_username."')";
 						if (!$result = NewQuery($sql)) {
 							WriteToLog("StoreLanguage-> Could not add facts string ".$line." for language English to table ", "E", "S");
 						}
@@ -276,7 +276,7 @@ function StoreLanguage($storelang) {
 					}
 					else {
 						$res->FreeResult();
-    	            	$sql = "UPDATE ".$TBLPREFIX."facts SET `lg_".$storelang."` = '".mysql_real_escape_string($data[1])."', lg_last_update_date='".time()."', lg_last_update_by='".$gm_username."' WHERE lg_string = '".$data[0]."' LIMIT 1";
+    	            	$sql = "UPDATE ".TBLPREFIX."facts SET `lg_".$storelang."` = '".mysql_real_escape_string($data[1])."', lg_last_update_date='".time()."', lg_last_update_by='".$gm_username."' WHERE lg_string = '".$data[0]."' LIMIT 1";
         	        	if (!$result = NewQuery($sql)) {
             	              WriteToLog("StoreLanguage-> Could not add facts string ".$line." for language ".$storelang." to table ", "E", "S");
                 	    }
@@ -284,7 +284,7 @@ function StoreLanguage($storelang) {
 					}
                	}
                	else {
-   	            	$sql = "UPDATE ".$TBLPREFIX."facts SET `lg_".$storelang."` = '".mysql_real_escape_string($data[1])."', lg_last_update_date='".time()."', lg_last_update_by='".$gm_username."' WHERE lg_string = '".$data[0]."' LIMIT 1";
+   	            	$sql = "UPDATE ".TBLPREFIX."facts SET `lg_".$storelang."` = '".mysql_real_escape_string($data[1])."', lg_last_update_date='".time()."', lg_last_update_by='".$gm_username."' WHERE lg_string = '".$data[0]."' LIMIT 1";
        	        	if (!$result = NewQuery($sql)) {
 						WriteToLog("StoreLanguage-> Could not add facts string ".$line." for language ".$storelang." to table ", "E", "S");
                 	}
@@ -293,14 +293,14 @@ function StoreLanguage($storelang) {
           	}
      	}
  	}
-	$sql = "SELECT ls_gm_langname FROM ".$TBLPREFIX."lang_settings WHERE ls_gm_langname='".$storelang."'";
+	$sql = "SELECT ls_gm_langname FROM ".TBLPREFIX."lang_settings WHERE ls_gm_langname='".$storelang."'";
 	$res = NewQuery($sql);
 	if ($res->NumRows() > 0 ) {
-		$sql = "UPDATE ".$TBLPREFIX."lang_settings SET ls_translated = '0', ls_md5_lang = '".md5_file("languages/lang.".$language_settings[$storelang]["lang_short_cut"].".txt")."', ls_md5_help = '".md5_file("languages/help_text.".$language_settings[$storelang]["lang_short_cut"].".txt")."', ls_md5_facts = '".md5_file("languages/facts.".$language_settings[$storelang]["lang_short_cut"].".txt")."' WHERE ls_gm_langname='".$storelang."'";
+		$sql = "UPDATE ".TBLPREFIX."lang_settings SET ls_translated = '0', ls_md5_lang = '".md5_file("languages/lang.".$language_settings[$storelang]["lang_short_cut"].".txt")."', ls_md5_help = '".md5_file("languages/help_text.".$language_settings[$storelang]["lang_short_cut"].".txt")."', ls_md5_facts = '".md5_file("languages/facts.".$language_settings[$storelang]["lang_short_cut"].".txt")."' WHERE ls_gm_langname='".$storelang."'";
 		$res = NewQuery($sql);
 	}
 	else {
-		$sql = "INSERT INTO ".$TBLPREFIX."lang_settings (ls_gm_langname, ls_translated, ls_md5_lang, ls_md5_help, ls_md5_facts) VALUES ('".$storelang."', '0','".md5_file("languages/lang.".$language_settings[$storelang]["lang_short_cut"].".txt")."', '".md5_file("languages/help_text.".$language_settings[$storelang]["lang_short_cut"].".txt")."', '".md5_file("languages/facts.".$language_settings[$storelang]["lang_short_cut"].".txt")."')";
+		$sql = "INSERT INTO ".TBLPREFIX."lang_settings (ls_gm_langname, ls_translated, ls_md5_lang, ls_md5_help, ls_md5_facts) VALUES ('".$storelang."', '0','".md5_file("languages/lang.".$language_settings[$storelang]["lang_short_cut"].".txt")."', '".md5_file("languages/help_text.".$language_settings[$storelang]["lang_short_cut"].".txt")."', '".md5_file("languages/facts.".$language_settings[$storelang]["lang_short_cut"].".txt")."')";
 		$res = NewQuery($sql);
 	}
      
@@ -314,16 +314,15 @@ function StoreLanguage($storelang) {
  * @param	     string	     $storelang	The name of the language to remove
  */
 function RemoveLanguage($removelang) {
-	global $TBLPREFIX;
 	
 	if ($removelang != "english") {
-		$sql = "UPDATE  ".$TBLPREFIX."language SET lg_".$removelang."=''";
+		$sql = "UPDATE  ".TBLPREFIX."language SET lg_".$removelang."=''";
 		$result = NewQuery($sql);
-		$sql = "UPDATE  ".$TBLPREFIX."language_help SET lg_".$removelang."=''";
+		$sql = "UPDATE  ".TBLPREFIX."language_help SET lg_".$removelang."=''";
 		$result = NewQuery($sql);
-		$sql = "UPDATE  ".$TBLPREFIX."facts SET lg_".$removelang."=''";
+		$sql = "UPDATE  ".TBLPREFIX."facts SET lg_".$removelang."=''";
 		$result = NewQuery($sql);
-		$sql = "UPDATE ".$TBLPREFIX."lang_settings SET ls_translated='0', ls_md5_lang='', ls_md5_help='', ls_md5_facts='' WHERE ls_gm_langname='".$removelang."'";
+		$sql = "UPDATE ".TBLPREFIX."lang_settings SET ls_translated='0', ls_md5_lang='', ls_md5_help='', ls_md5_facts='' WHERE ls_gm_langname='".$removelang."'";
 		$result = NewQuery($sql);
 		
 	}
@@ -343,18 +342,18 @@ function RemoveLanguage($removelang) {
  * @return 	array          The array with the loaded language
  */
 function LoadEnglish($return=false, $help=false, $altlang = false) {
-	global $gm_lang, $TBLPREFIX, $CONFIGURED, $DBCONN, $LANGUAGE, $GM_BASE_DIRECTORY, $language_settings;
+	global $gm_lang, $DBCONN, $LANGUAGE, $GM_BASE_DIRECTORY, $language_settings;
 //	print $LANGUAGE;
 	$temp = array();
-	if ($CONFIGURED && $DBCONN->connected) {
-		$sql = "SELECT COUNT(*) as total FROM ".$TBLPREFIX."language";
+	if (CONFIGURED && $DBCONN->connected) {
+		$sql = "SELECT COUNT(*) as total FROM ".TBLPREFIX."language";
 		if ($help) $sql .= "_help";
 		$res = NewQuery($sql);
 		if ($res) $total_columns = $res->FetchAssoc($res->result);
 		else $total_columns["total"] = 0 ;
 		if ($total_columns["total"] > 0) {
-			if ($altlang) $sql = "SELECT lg_string, lg_english, lg_".$LANGUAGE." FROM ".$TBLPREFIX."language";
-			else $sql = "SELECT lg_string, lg_english FROM ".$TBLPREFIX."language";
+			if ($altlang) $sql = "SELECT lg_string, lg_english, lg_".$LANGUAGE." FROM ".TBLPREFIX."language";
+			else $sql = "SELECT lg_string, lg_english FROM ".TBLPREFIX."language";
 			if ($help) $sql .= "_help";
 			$res = NewQuery($sql);
 			while ($row = $res->FetchAssoc($res->result)) {
@@ -420,11 +419,11 @@ function LoadEnglish($return=false, $help=false, $altlang = false) {
 // param return returns the factarray for editing purposes
 // param altlang if true fills in missing texts in the designated language with english ones
 function LoadEnglishFacts($return=false, $altlang = false) {
-	global $gm_lang, $TBLPREFIX, $CONFIGURED, $DBCONN, $LANGUAGE, $GM_BASE_DIRECTORY, $language_settings;
+	global $gm_lang, $DBCONN, $LANGUAGE, $GM_BASE_DIRECTORY, $language_settings;
 	
 	$temp = array();
-	if ($CONFIGURED && $DBCONN->connected) {
-		$sql = "SELECT COUNT(*) as total FROM ".$TBLPREFIX."facts";
+	if (CONFIGURED && $DBCONN->connected) {
+		$sql = "SELECT COUNT(*) as total FROM ".TBLPREFIX."facts";
 		$res = NewQuery($sql);
 		if ($res) $total_columns = $res->FetchAssoc($res->result);
 		else $total_columns["total"] = 0 ;
@@ -440,8 +439,8 @@ function LoadEnglishFacts($return=false, $altlang = false) {
 					require_once $GM_BASE_DIRECTORY . "languages/facts.".$language_settings["english"]["lang_short_cut"].".extra.php";
 				}
 			}
-			if ($altlang) $sql = "SELECT lg_string, lg_english, lg_".$LANGUAGE." FROM ".$TBLPREFIX."facts";
-			else $sql = "SELECT lg_string, lg_english FROM ".$TBLPREFIX."facts";
+			if ($altlang) $sql = "SELECT lg_string, lg_english, lg_".$LANGUAGE." FROM ".TBLPREFIX."facts";
+			else $sql = "SELECT lg_string, lg_english FROM ".TBLPREFIX."facts";
 			$res = NewQuery($sql);
 			while ($row = $res->FetchAssoc($res->result)) {
 				if (!$return) {
@@ -515,11 +514,11 @@ function LoadEnglishFacts($return=false, $altlang = false) {
  * @return 	array          The array with the loaded language
  */
 function LoadLanguage($language, $return=false, $help=false) {
-	global $gm_language, $gm_lang, $TBLPREFIX, $CONFIGURED;
+	global $gm_language, $gm_lang;
 	
-	if (isset($gm_language[$language]) && $CONFIGURED) {
+	if (isset($gm_language[$language]) && CONFIGURED) {
 		$temp = array();
-		$sql = "SELECT `lg_string`, `lg_".$language."` FROM `".$TBLPREFIX."language";
+		$sql = "SELECT `lg_string`, `lg_".$language."` FROM `".TBLPREFIX."language";
 		if ($help) $sql .= "_help";
 		$sql .= "` WHERE `lg_".$language."` != ''";
 		$res = NewQuery($sql);
@@ -536,11 +535,11 @@ function LoadLanguage($language, $return=false, $help=false) {
 
 // Used for editing languages. Returns an array with facts and their description in the designated language
 function LoadFacts($language) {
-	global $gm_language, $TBLPREFIX, $CONFIGURED;
+	global $gm_language;
 	
-	if (isset($gm_language[$language]) && $CONFIGURED) {
+	if (isset($gm_language[$language]) && CONFIGURED) {
 		$temp = array();
-		$sql = "SELECT `lg_string`, `lg_".$language."` FROM `".$TBLPREFIX."facts";
+		$sql = "SELECT `lg_string`, `lg_".$language."` FROM `".TBLPREFIX."facts";
 		$sql .= "` WHERE `lg_".$language."` != ''";
 		$res = NewQuery($sql);
 		if ($res) {
@@ -569,14 +568,13 @@ function LoadFacts($language) {
  * @return 	string	The string in the requested language
  */
 function GetString($string, $language2, $file_type="") {
-	global $TBLPREFIX;
 
 	if ($file_type == "facts") {
-		$sql = "SELECT lg_".$language2.", lg_english FROM ".$TBLPREFIX."facts";
+		$sql = "SELECT lg_".$language2.", lg_english FROM ".TBLPREFIX."facts";
 		$sql .= " WHERE lg_string = '".$string."'";
 	}
 	else {
-		$sql = "SELECT lg_".$language2.", lg_english FROM ".$TBLPREFIX."language";
+		$sql = "SELECT lg_".$language2.", lg_english FROM ".TBLPREFIX."language";
 		if (substr($string, -5) == "_help") $sql .= "_help";
 		$sql .= " WHERE lg_string = '".$string."'";
 	}
@@ -603,19 +601,18 @@ function GetString($string, $language2, $file_type="") {
  */
 
 function WriteString($string, $value, $language2, $file_type="") {
-	global $TBLPREFIX;
 	
 	if ($file_type == "facts") {
-		$sql = "UPDATE ".$TBLPREFIX."facts";
+		$sql = "UPDATE ".TBLPREFIX."facts";
 		$sql .= " SET lg_".$language2."= '".$string."' WHERE lg_string = '".$value."'";
 	}
 	else {
-		$sql = "UPDATE ".$TBLPREFIX."language";
+		$sql = "UPDATE ".TBLPREFIX."language";
 		if (substr($value, -5) == "_help") $sql .= "_help";
 		$sql .= " SET lg_".$language2."= '".$string."' WHERE lg_string = '".$value."'";
 	}
 	if ($res = NewQuery($sql)) {
-		$sql = "UPDATE ".$TBLPREFIX."lang_settings SET ls_translated='1' WHERE ls_gm_langname='".$language2."'";
+		$sql = "UPDATE ".TBLPREFIX."lang_settings SET ls_translated='1' WHERE ls_gm_langname='".$language2."'";
 		$res2 = NewQuery($sql);
 		return true;
 	}
@@ -623,10 +620,9 @@ function WriteString($string, $value, $language2, $file_type="") {
 }
 
 function LoadLangVars($langname="") {
-	global $TBLPREFIX;
 	
 	$langsettings = array();
-	$sql = "SELECT * FROM ".$TBLPREFIX."lang_settings";
+	$sql = "SELECT * FROM ".TBLPREFIX."lang_settings";
 	if (!empty($lang)) $sql .= " WHERE ls_gm_langname='".$langname."'";
 	$res = NewQuery($sql);
 	while ($row = $res->FetchAssoc()) {
@@ -640,17 +636,16 @@ function LoadLangVars($langname="") {
 }
 
 function StoreLangVars($vars) {
-	global $TBLPREFIX, $DBCONN;
 	
 	$string = "";
 	$first = true;
-	$sql = "UPDATE ".$TBLPREFIX."lang_settings SET ";
+	$sql = "UPDATE ".TBLPREFIX."lang_settings SET ";
 	foreach ($vars as $fname => $fvalue) {
 		if (!$first) $string .= ", ";
 		$first = false;
 //		if ($fvalue == false) $fvalue = "0";
 //		else $fvalue = "1";
-		$string .= "ls_".$fname."='".$DBCONN->EscapeQuery($fvalue)."'";
+		$string .= "ls_".$fname."='".DbLayer::EscapeQuery($fvalue)."'";
 	}
 	$sql .= $string;
 	$sql .= " WHERE ls_gm_langname='".$vars["gm_langname"]."'";
@@ -660,9 +655,8 @@ function StoreLangVars($vars) {
 
 // Activate the given language
 function ActivateLanguage($lang) {
-	global $TBLPREFIX;
 	
-	$sql = "UPDATE ".$TBLPREFIX."lang_settings SET ls_gm_lang_use='1' WHERE ls_gm_langname='".$lang."'";
+	$sql = "UPDATE ".TBLPREFIX."lang_settings SET ls_gm_lang_use='1' WHERE ls_gm_langname='".$lang."'";
 	$res = NewQuery($sql);
 	if ($res) return true;
 	else return false;
@@ -670,9 +664,8 @@ function ActivateLanguage($lang) {
 
 // Activate the given language
 function DeactivateLanguage($lang) {
-	global $TBLPREFIX;
 	
-	$sql = "UPDATE ".$TBLPREFIX."lang_settings SET ls_gm_lang_use='0' WHERE ls_gm_langname='".$lang."'";
+	$sql = "UPDATE ".TBLPREFIX."lang_settings SET ls_gm_lang_use='0' WHERE ls_gm_langname='".$lang."'";
 	$res = NewQuery($sql);
 	if ($res) return true;
 	else return false;
@@ -715,11 +708,11 @@ function LanguageInUse($lang="") {
 /* Get the language file and translation info for the admin messages
  */
 function GetLangfileInfo($impexp) {
-	global $TBLPREFIX, $language_settings, $gm_lang;
+	global $language_settings, $gm_lang;
 	static $implangs, $explangs;
 	
 	if (!isset($implangs)) {
-		$sql = "SELECT ls_gm_langname, ls_md5_lang, ls_md5_help, ls_md5_facts, ls_translated FROM ".$TBLPREFIX."lang_settings";
+		$sql = "SELECT ls_gm_langname, ls_md5_lang, ls_md5_help, ls_md5_facts, ls_translated FROM ".TBLPREFIX."lang_settings";
 		$res = NewQuery($sql);
 		if ($res->NumRows() > 0) {
 			$implangs = array();

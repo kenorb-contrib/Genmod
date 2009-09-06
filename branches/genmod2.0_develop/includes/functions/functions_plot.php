@@ -33,20 +33,19 @@ if (strstr($_SERVER["SCRIPT_NAME"],basename(__FILE__))) {
 }
 
 function GetPlotData($gedcomid="") {
-	global $TBLPREFIX, $GEDCOMID, $DBCONN;
+	global $GEDCOMID;
 	global $nrfam, $famgeg, $nrpers, $persgeg, $key2ind, $nrman, $nrvrouw;
-	global $GedcomConfig;
 	
 	if (empty($gedcomid)) $gedcomid = $GEDCOMID;
 	
 	// check if we must update the cache anyway
-	$cache_load = $GedcomConfig->GetLastCacheDate("plotdata", get_gedcom_from_id($gedcomid));
+	$cache_load = GedcomConfig::GetLastCacheDate("plotdata", get_gedcom_from_id($gedcomid));
 	if (!$cache_load) {
-		$sql = "DELETE FROM ".$TBLPREFIX."pdata WHERE pd_file='".$gedcomid."'";
+		$sql = "DELETE FROM ".TBLPREFIX."pdata WHERE pd_file='".$gedcomid."'";
 		$res = NewQuery($sql);
 	}
 	else {
-		$sql = "SELECT pd_data FROM ".$TBLPREFIX."pdata WHERE pd_file='".$gedcomid."' ORDER BY pd_id";
+		$sql = "SELECT pd_data FROM ".TBLPREFIX."pdata WHERE pd_file='".$gedcomid."' ORDER BY pd_id";
 		$res = NewQuery($sql);
 		if ($res->NumRows() == 0) $cache_load = false;
 		else {
@@ -84,18 +83,18 @@ function GetPlotData($gedcomid="") {
 		$pdata["key2ind"] = $key2ind;
 		$pdata["nrman"] = $nrman;
 		$pdata["nrvrouw"] = $nrvrouw;
-		$sql = "DELETE FROM ".$TBLPREFIX."pdata WHERE pd_file='".$gedcomid."'";
+		$sql = "DELETE FROM ".TBLPREFIX."pdata WHERE pd_file='".$gedcomid."'";
 		$res = NewQuery($sql);
 		$str = serialize($pdata);
 		$l = strlen($str);
 		$start = 0;
 		while ($start <= $l) {
-			$data = $DBCONN->EscapeQuery(substr($str, $start, 65535));
-			$sql = "INSERT INTO ".$TBLPREFIX."pdata VALUES ('0', '".$gedcomid."', '".$data."')";
+			$data = DbLayer::EscapeQuery(substr($str, $start, 65535));
+			$sql = "INSERT INTO ".TBLPREFIX."pdata VALUES ('0', '".$gedcomid."', '".$data."')";
 			$res = NewQuery($sql);
 			$start += 65535;
 		}
-		$GedcomConfig->SetLastCacheDate("plotdata", "1", get_gedcom_from_id($gedcomid));
+		GedcomConfig::SetLastCacheDate("plotdata", "1", get_gedcom_from_id($gedcomid));
 	}
 }		
 function GetPlotPerson() {

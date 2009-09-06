@@ -29,13 +29,13 @@ if (stristr($_SERVER["SCRIPT_NAME"],basename(__FILE__))) {
 }
  
  
-class MediaFS {
+abstract class MediaFS {
 	
-	var $classname = "MediaFS";
-	var $fdetails = array();
+	public  $classname = "MediaFS";
+	public static $fdetails = array();
 	
-	function GetMediaDirList($directory="", $all=true, $level=1, $checkwrite=true, $incthumbdir=false, $dbmode="unset") {
-		global $TBLPREFIX, $MEDIA_DIRECTORY_LEVELS, $MEDIA_DIRECTORY, $MEDIA_IN_DB, $INDEX_DIRECTORY;
+	public function GetMediaDirList($directory="", $all=true, $level=1, $checkwrite=true, $incthumbdir=false, $dbmode="unset") {
+		global $MEDIA_DIRECTORY_LEVELS, $MEDIA_DIRECTORY, $MEDIA_IN_DB;
 		
 		if ($dbmode == "unset") $dbmode = $MEDIA_IN_DB;
 // print "Dir in dirlist: ".$directory."<br />";
@@ -49,7 +49,7 @@ class MediaFS {
 			$thislevel = count($l)-1;
 //			print "thislevel: ".$thislevel."<br />";
 //			print_r($l);
-			$sql = "SELECT mf_path FROM ".$TBLPREFIX."media_files";
+			$sql = "SELECT mf_path FROM ".TBLPREFIX."media_files";
 			if (!empty($directory)) $sql .= " WHERE mf_path LIKE '".$directory."%'";
 			else $sql .= " WHERE mf_link NOT LIKE '%://%'";
 			$sql .= " AND mf_file='<DIR>' ORDER BY mf_path";
@@ -71,7 +71,7 @@ class MediaFS {
 			if (empty($directory)) $directory = $MEDIA_DIRECTORY;
 			//print "Getting : ".$directory."<br />";
 			$canwrite = true;
-			$exclude_dirs = array($INDEX_DIRECTORY, "./languages/", "./fonts/", "./hooks/", "./images/", "./includes", "./languages/", "./modules/", "./places/", "./reports/", "./ufpdf/", "./themes/", "./blocks/", "./install/", "./includes/", "./pgvnuke/");
+			$exclude_dirs = array(INDEX_DIRECTORY, "./languages/", "./fonts/", "./hooks/", "./images/", "./includes", "./languages/", "./modules/", "./places/", "./reports/", "./ufpdf/", "./themes/", "./blocks/", "./install/", "./includes/", "./pgvnuke/");
 			if ($level <= $MEDIA_DIRECTORY_LEVELS) {
 				$d = @dir($directory);
 				if (is_object($d)) {
@@ -79,9 +79,9 @@ class MediaFS {
 						if ($entry != ".." && $entry != "." && $entry != "CVS" && ($incthumbdir || $entry != "thumbs")) {
 							$entry = $directory.$entry."/";
 							if(is_dir($entry)) {
-								if ($checkwrite) $canwrite = $this->DirIsWritable($entry, false);
+								if ($checkwrite) $canwrite = self::DirIsWritable($entry, false);
 								if (!in_array($entry, $exclude_dirs) && $canwrite) {
-									if ($all) $dirs = array_merge($dirs, $this->GetMediaDirList($entry, $all, $level+1, $checkwrite, $incthumbdir, $dbmode));
+									if ($all) $dirs = array_merge($dirs, self::GetMediaDirList($entry, $all, $level+1, $checkwrite, $incthumbdir, $dbmode));
 									else $dirs[] = $entry;
 								}
 							}
@@ -95,15 +95,15 @@ class MediaFS {
 		return $dirs;
 	}
 
-	function GetFileList($directory, $filter="", $dbmode=false) {
-		global $MEDIATYPE, $MEDIA_DIRECTORY, $TBLPREFIX;
+	public function GetFileList($directory, $filter="", $dbmode=false) {
+		global $MEDIATYPE, $MEDIA_DIRECTORY;
 		
 		$dirfiles = array();
 		if (!$dbmode) {
 			if ($directory == "external_links") {
 				// External links pics don't exist in Genmod.
 				// We must check the MM items for links instead of files
-				$sql = "SELECT m_gedrec FROM ".$TBLPREFIX."media WHERE m_gedrec LIKE '%://%'";
+				$sql = "SELECT m_gedrec FROM ".TBLPREFIX."media WHERE m_gedrec LIKE '%://%'";
 				$res = NewQuery($sql);
 				while($row = $res->FetchRow()) {
 					$link = GetGedcomValue("FILE", 1, $row[0]);
@@ -123,7 +123,7 @@ class MediaFS {
 						if ($entry != ".." && $entry != ".") {
 							if (!is_dir($directory.$entry)) {
 								// Get the extension
-								if ($this->IsValidMedia($entry)) {
+								if (self::IsValidMedia($entry)) {
 									if (!empty($filter)) {
 										if (stristr($entry, $filter)) {
 											$dirfiles[] = RelativePathFile($directory.$entry);
@@ -143,12 +143,12 @@ class MediaFS {
 			$directory = RelativePathFile($directory);
 			$m = RelativePathFile($MEDIA_DIRECTORY);
 			if ($directory == "external_links") {
-				$sql = "SELECT mf_link FROM ".$TBLPREFIX."media_files WHERE";
+				$sql = "SELECT mf_link FROM ".TBLPREFIX."media_files WHERE";
 				$sql .= " mf_link NOT LIKE ''";
 				// Reset the directory, as the media items have no path recorded.
 				$directory = "";
 			}
-			else $sql = "SELECT mf_file FROM ".$TBLPREFIX."media_files WHERE mf_path LIKE '".$directory."' AND mf_link LIKE ''";
+			else $sql = "SELECT mf_file FROM ".TBLPREFIX."media_files WHERE mf_path LIKE '".$directory."' AND mf_link LIKE ''";
 			if (!empty($filter)) $sql .= " AND (mf_file LIKE '%".$filter."%' OR m_titl LIKE '%".$filter."%')"; 
 			$sql .= " AND mf_file NOT LIKE '<DIR>' ORDER BY mf_file";
 //			print $sql."<br /><br />";
@@ -161,8 +161,8 @@ class MediaFS {
 	}
 		
 		
-	function GetMediaFilelist($directory, $filter="", $dbmode="unset") {
-		global $TBLPREFIX, $MEDIA_IN_DB, $MEDIA_DIRECTORY, $MEDIATYPE, $AUTO_GENERATE_THUMBS, $DBCONN;
+	public function GetMediaFilelist($directory, $filter="", $dbmode="unset") {
+		global $MEDIA_IN_DB, $MEDIA_DIRECTORY, $MEDIATYPE, $AUTO_GENERATE_THUMBS;
  //print "Dir in filelist: ".$directory."<br />";
  		if ($dbmode == "unset") $dbmode = $MEDIA_IN_DB;
 		$directory = RelativePathFile($directory);
@@ -171,7 +171,7 @@ class MediaFS {
 		$files = array();
 		if ($dbmode) {
 			// For DB media
-			$sql = "SELECT ".$TBLPREFIX."media.*, ".$TBLPREFIX."media_files.* FROM ".$TBLPREFIX."media_files LEFT JOIN ".$TBLPREFIX."media ON mf_file=CONCAT('".$m."', m_file) WHERE";
+			$sql = "SELECT ".TBLPREFIX."media.*, ".TBLPREFIX."media_files.* FROM ".TBLPREFIX."media_files LEFT JOIN ".TBLPREFIX."media ON mf_file=CONCAT('".$m."', m_file) WHERE";
 			if ($directory == "external_links") {
 				$sql .= " mf_link NOT LIKE ''";
 				// Reset the directory, as the media items have no path recorded.
@@ -210,21 +210,21 @@ class MediaFS {
 		}
 		else {
 			if (empty($directory)) $directory = "./";
-			$dirfiles = $this->GetFileList($directory, $filter, $dbmode);
+			$dirfiles = self::GetFileList($directory, $filter, $dbmode);
 //			print_r($dirfiles);
 			if (!count($dirfiles)) return $dirfiles;
-			$sql = "SELECT * FROM ".$TBLPREFIX."media WHERE (";
+			$sql = "SELECT * FROM ".TBLPREFIX."media WHERE (";
 			$first = true;
 			foreach ($dirfiles as $key => $dir) {
-				$dir = $this->NormalizeLink($dir);
+				$dir = self::NormalizeLink($dir);
 //				print "search ".$dir."<br />";
 				if (!$first) $sql .= " OR ";
 				else $first = false;
 				if (!empty($m)) $dir = preg_replace("~".$m."~", "", $dir); 
-				$sql .= "m_file LIKE '%".$DBCONN->EscapeQuery($dir)."'";
+				$sql .= "m_file LIKE '%".DbLayer::EscapeQuery($dir)."'";
 			}
 			$sql .=")";
-			if (!empty($filter)) $sql .= " AND m_file LIKE '%".$DBCONN->EscapeQuery($filter)."%'"; 
+			if (!empty($filter)) $sql .= " AND m_file LIKE '%".DbLayer::EscapeQuery($filter)."%'"; 
 			$sql .= " ORDER BY m_file";
 //			print $sql;
 			$res = NewQuery($sql);
@@ -232,8 +232,8 @@ class MediaFS {
 //				print "<br />";
 //				print_r($row);
 //				$mi = new MediaItem($row);
-//				$f = $m.RelativePathFile($this->CheckMediaDepth($mi->m_file));
-				if ($directory != "external_links") $f = $m.RelativePathFile($this->CheckMediaDepth($row["m_file"]));
+//				$f = $m.RelativePathFile(self::CheckMediaDepth($mi->m_file));
+				if ($directory != "external_links") $f = $m.RelativePathFile(self::CheckMediaDepth($row["m_file"]));
 				else $f = GetGedcomValue("FILE", "1", $row["m_gedrec"]);
 //				print "f: ".$f;
 				if (in_array($f, $dirfiles)) {
@@ -256,8 +256,8 @@ class MediaFS {
 		}
 	}
 	
-	function PrintViewLink($file, $thumb=false, $paste=false) {
-		global $MEDIA_IN_DB, $SERVER_URL, $USE_GREYBOX, $TEXT_DIRECTION, $gm_lang, $MEDIA_DIRECTORY, $AUTO_GENERATE_THUMBS;
+	public function PrintViewLink($file, $thumb=false, $paste=false) {
+		global $MEDIA_IN_DB, $USE_GREYBOX, $TEXT_DIRECTION, $gm_lang, $MEDIA_DIRECTORY, $AUTO_GENERATE_THUMBS;
 
 		$fileobj = $file["filedata"];
 //		print_r($fileobj);
@@ -275,7 +275,7 @@ class MediaFS {
 			// If not an image, let the function take care of what to display
 			// Also, if MM-items are attached, there will probably be thumbs, also let the function handle this.
 			// Else use the original file for display
-			if (!$fileobj->f_is_image || isset($file["objects"])) $thumbfile = $this->ThumbNailFile($realfile, $MEDIA_IN_DB);
+			if (!$fileobj->f_is_image || isset($file["objects"])) $thumbfile = self::ThumbNailFile($realfile, $MEDIA_IN_DB);
 			else $thumbfile = $realfile;
 		}
 
@@ -329,9 +329,9 @@ class MediaFS {
 	 * @param		string $filename The full filename of the media item
 	 * @return 	string the location of the thumbnail
 	 */
-	function ThumbnailFile($filename, $dbmode="unset", $placeholder=true) {
+	public function ThumbnailFile($filename, $dbmode="unset", $placeholder=true) {
 		global $MEDIA_DIRECTORY, $GM_IMAGE_DIR, $GM_IMAGES, $AUTO_GENERATE_THUMBS, $MEDIA_DIRECTORY_LEVELS;
-		global $MEDIA_EXTERNAL, $TBLPREFIX, $MEDIA_IN_DB, $INDEX_DIRECTORY;
+		global $MEDIA_EXTERNAL, $MEDIA_IN_DB;
 
 		if ($dbmode == "unset") $dbmode = $MEDIA_IN_DB;
 		if (strlen($filename) == 0) return false;
@@ -350,13 +350,13 @@ class MediaFS {
 				if (stristr($filename, "://")) $dirname = RelativePathFile($MEDIA_DIRECTORY);
 				// NOTE: Construct dirname according to media levels to keep
 				if (!is_dir($dirname."thumbs/urls/") && $dirname == RelativePathFile($MEDIA_DIRECTORY)) {
-					$this->CreateDir("thumbs", $dirname); 
-					$this->CreateDir("urls", $dirname."thumbs/"); 
+					self::CreateDir("thumbs", $dirname); 
+					self::CreateDir("urls", $dirname."thumbs/"); 
 				}
 				if ($MEDIA_DIRECTORY_LEVELS == 0) $dirname = RelativePathFile($MEDIA_DIRECTORY);
 				if (!is_dir($dirname."thumbs/")&& !stristr($dirname, "thumbs")) {
 //					print "dirname: ".$dirname."<br />";
-					$this->CreateDir("thumbs", $dirname); 
+					self::CreateDir("thumbs", $dirname); 
 				}
 //			}
 			// NOTE: First check if the thumbnail exists by its exact name
@@ -368,55 +368,55 @@ class MediaFS {
 			if ($dbmode) {
 				$file_basename = preg_replace(array("/http:\/\//", "/\//"), array("","_"),$filename);
 				// See if the thumb exists
-				if (!$this->GetFileDetails($file_basename, true)) {
+				if (!self::GetFileDetails($file_basename, true)) {
 					// Nothing in the DB for this external link, first try to make a thumb
 					// If not there, no need to proceed
 					//print "generating for ".$filename."<br />";
-					if (!$this->GenerateThumbnail($filename, $INDEX_DIRECTORY.$file_basename, $ignoremediadir=true, $ext="")) {
+					if (!self::GenerateThumbnail($filename, INDEX_DIRECTORY.$file_basename, $ignoremediadir=true, $ext="")) {
 						WriteToLog("MediaFS->ThumbnailFile: Cannot generate thumbnail from ".$filename.".", "E", "S");
 						return "";
 					}
 					
 					// Get the file details
-					$this->GetFileDetails($file_basename, false);
+					self::GetFileDetails($file_basename, false);
 					
 					// it's a link
-					$this->fdetails["link"] = $filename;
+					self::$fdetails["link"] = $filename;
 					
 					// Whatever was taken from the file, we know it's a pic
-					$this->fdetails["is_image"] = true;
+					self::$fdetails["is_image"] = true;
 					// Find an extension 
-					$exts = preg_split("/;/", $this->fdetails["extension"]);
+					$exts = preg_split("/;/", self::$fdetails["extension"]);
 					$ext = $exts[0];
 					if (!empty($ext)) $ext = substr($ext,1);
 					
 					// Get the thumb details
-					$this->GetThumbDetails($INDEX_DIRECTORY.$file_basename);
+					self::GetThumbDetails(INDEX_DIRECTORY.$file_basename);
 					
 					// Store the file information
-					$this->fdetails["file"] = $file_basename;
-					$this->WriteDBFileDetails();
+					self::$fdetails["file"] = $file_basename;
+					self::WriteDBFileDetails();
 					
 					// Store the thumb
-					$this->WriteDBThumbFile($this->fdetails["file"], $INDEX_DIRECTORY.$file_basename, true, true);
+					self::WriteDBThumbFile(self::$fdetails["file"], INDEX_DIRECTORY.$file_basename, true, true);
 					
 					// return the link
-					return "showblob.php?file=".urlencode($this->fdetails["file"])."&amp;type=thumb";
+					return "showblob.php?file=".urlencode(self::$fdetails["file"])."&amp;type=thumb";
 				}
 				else {
 					// We found the file
 					// return the link
-					return "showblob.php?file=".urlencode($this->fdetails["file"])."&amp;type=thumb";
+					return "showblob.php?file=".urlencode(self::$fdetails["file"])."&amp;type=thumb";
 				}
 			}
 			else {
-				$file_basename = $this->NormalizeLink($filename);
+				$file_basename = self::NormalizeLink($filename);
 				if (file_exists(FilenameDecode($MEDIA_DIRECTORY."thumbs/urls/".$file_basename))) {
 					return $MEDIA_DIRECTORY."thumbs/urls/".$file_basename;
 				}
 				else {
 					if ($AUTO_GENERATE_THUMBS && is_dir($MEDIA_DIRECTORY."thumbs/urls/")) {
-						if ($this->GenerateThumbnail($filename, $MEDIA_DIRECTORY."thumbs/urls/".$file_basename)) {
+						if (self::GenerateThumbnail($filename, $MEDIA_DIRECTORY."thumbs/urls/".$file_basename)) {
 							return $MEDIA_DIRECTORY."thumbs/urls/".$file_basename;
 						}
 						else WriteToLog("MediaFS->ThumbnailFile: Cannot generate thumbnail from ".$filename.".", "E", "S");
@@ -437,7 +437,7 @@ class MediaFS {
 				}
 				else {
 					if ($AUTO_GENERATE_THUMBS && is_dir($dirname."thumbs/")) {				
-						if ($this->GenerateThumbnail($dirname.$file_basename, $dirname."thumbs/".$file_basename)) {
+						if (self::GenerateThumbnail($dirname.$file_basename, $dirname."thumbs/".$file_basename)) {
 							return $dirname."thumbs/".$file_basename;
 						}
 					}
@@ -475,7 +475,7 @@ class MediaFS {
 	 * @param		string	$filename		The filename that needs to be checked for media depth
 	 * @return 	string	A filename validated for the media depth
 	 */
-	function CheckMediaDepth($filename) {
+	public function CheckMediaDepth($filename) {
 		global $MEDIA_DIRECTORY, $MEDIA_DIRECTORY_LEVELS, $MEDIA_EXTERNAL;
 	
 		// NOTE: If the media depth is 0, no need to check it
@@ -528,11 +528,11 @@ class MediaFS {
 		if (!$AUTO_GENERATE_THUMBS) return false;
 		if (!$MEDIA_IN_DB && file_exists($thumbnail)) return false;
 		
-		if (!$ignoremediadir && !$this->DirIsWritable($dirname, false)) return false;
+		if (!$ignoremediadir && !self::DirIsWritable($dirname, false)) return false;
 	
 		if (!$ignoremediadir && strstr($filename, "://") && !is_dir($MEDIA_DIRECTORY."thumbs/urls")) {
-			$this->CreateDir($MEDIA_DIRECTORY, "thumbs");
-			$this->CreateDir($MEDIA_DIRECTORY."thums/", "urls");
+			self::CreateDir($MEDIA_DIRECTORY, "thumbs");
+			self::CreateDir($MEDIA_DIRECTORY."thums/", "urls");
 			WriteToLog("MediaFS->GenerateThumbnail: Folder ".$MEDIA_DIRECTORY."thumbs/urls/ created.", "I", "S");
 		}
 		if (!strstr($filename, "://")) {
@@ -555,7 +555,7 @@ class MediaFS {
 			}
 		}
 		else {
-			if (!$ignoremediadir && !$this->DirIsWritable($MEDIA_DIRECTORY."thumbs/urls", false)) return false;
+			if (!$ignoremediadir && !self::DirIsWritable($MEDIA_DIRECTORY."thumbs/urls", false)) return false;
 			$filename = preg_replace("/ /", "%20", $filename);
 			if ($fp = @fopen($filename, "rb")) {
 				if ($fp===false) return false;
@@ -640,8 +640,8 @@ class MediaFS {
 	}
 	
 	
-	function UploadFiles($files, $path, $overwrite=false) {
-		global $MEDIA_DIRECTORY, $MEDIA_IN_DB, $gm_lang, $INDEX_DIRECTORY, $TBLPREFIX, $DBCONN, $MEDIATYPE, $AUTO_GENERATE_THUMBS, $error;
+	public function UploadFiles($files, $path, $overwrite=false) {
+		global $MEDIA_DIRECTORY, $MEDIA_IN_DB, $gm_lang, $MEDIATYPE, $AUTO_GENERATE_THUMBS, $error;
 		
 		$error = "";
 		$result = array("filename"=>"", "error"=>"", "errno"=>"0");
@@ -658,7 +658,7 @@ class MediaFS {
 		if (count($files)>0) {
 			$upload_errors = array($gm_lang["file_success"], $gm_lang["file_too_big"], $gm_lang["file_too_big"],$gm_lang["file_partial"], $gm_lang["file_missing"]);
 			if (!empty($path)) {
-				$path = RelativePathFile($this->CheckMediaDepth($path));
+				$path = RelativePathFile(self::CheckMediaDepth($path));
 				if (!empty($path) && substr($path,-1,1) != "/") $path .= "/";
 			}
 			foreach($files as $type =>$upload) {
@@ -687,33 +687,33 @@ class MediaFS {
 							if ($MEDIA_IN_DB) {
 							
 								// check if already exists
-								$exists = $this->GetFileDetails($file, true);
+								$exists = self::GetFileDetails($file, true);
 								if (!$exists || $overwrite) {
 								
 									// Get the new details
 									
 									// Try to create a thumb
-									$thumb = $INDEX_DIRECTORY.basename($upload["name"]);
+									$thumb = INDEX_DIRECTORY.basename($upload["name"]);
 									$AUTO_GENERATE_THUMBS = true;
-									$hasthumb = $this->GenerateThumbNail($upload["tmp_name"], $thumb, true, $ext);
+									$hasthumb = self::GenerateThumbNail($upload["tmp_name"], $thumb, true, $ext);
 							
 									// and get the details
-									if ($hasthumb) $this->GetThumbDetails($thumb);
+									if ($hasthumb) self::GetThumbDetails($thumb);
 							
 									// Add the file attributes to the virtual directory
-									$this->GetFileDetails($upload["tmp_name"], false);
+									self::GetFileDetails($upload["tmp_name"], false);
 									// assign the name if new. Also when old, because GetFileDetails of the upload file 
 									// returns path of the PHP upload directory
-									$this->fdetails["file"] = $file;
-									$this->fdetails["path"] = $path;
-									$this->fdetails["fname"] = $fname;
-									$this->WriteDBFileDetails($exists);
+									self::$fdetails["file"] = $file;
+									self::$fdetails["path"] = $path;
+									self::$fdetails["fname"] = $fname;
+									self::WriteDBFileDetails($exists);
 							
 									// Add the file to the DB
-									$this->WriteDBDatafile($upload["tmp_name"], $exists);
+									self::WriteDBDatafile($upload["tmp_name"], $exists);
 							
 									// Add the thumb to the DB
-									if ($hasthumb) $this->WriteDBThumbfile($this->fdetails["file"], $thumb, $exists, true);
+									if ($hasthumb) self::WriteDBThumbfile(self::$fdetails["file"], $thumb, $exists, true);
 								}
 								else {
 									$result["error"] = $gm_lang["file_exists"];
@@ -723,16 +723,16 @@ class MediaFS {
 							}
 							else {	
 								// Real file system mode
-								$exists = $this->GetFileDetails($file, false);
+								$exists = self::GetFileDetails($file, false);
 								if (!$exists || $overwrite) {
-									if ($exists) $this->DeleteFile($fname, $path, $MEDIA_IN_DB);
+									if ($exists) self::DeleteFile($fname, $path, $MEDIA_IN_DB);
 									if (!empty($upload['tmp_name'])) {
 										if (!move_uploaded_file($upload['tmp_name'], $file)) {
 											$result["error"] = "<br />".$gm_lang["upload_error"]."<br />".$upload_errors[$upload['error']];
 											$result["errno"] = $upload['error'];
 										}
 										else {
-											$thumbnail = $this->ThumbnailFile($file);
+											$thumbnail = self::ThumbnailFile($file);
 										}
 									}
 								}
@@ -762,138 +762,135 @@ class MediaFS {
 		return $result;
 	}
 	
-	function GetFileDetails($filename, $dbmode="unset") {
-		global $TBLPREFIX, $MEDIA_IN_DB;
+	public function GetFileDetails($filename, $dbmode="unset") {
+		global $MEDIA_IN_DB;
 		
 		if ($dbmode == "unset") $dbmode = $MEDIA_IN_DB;
 
 		if ($dbmode) {
-			$this->fdetails = array();
-			$this->fdetails["file"] = "";
-			$this->fdetails["path"] = "";
-			$this->fdetails["fname"] = "";
-			$this->fdetails["is_image"] = false;
-			$this->fdetails["width"] = "0";
-			$this->fdetails["height"] = "0";
-			$this->fdetails["size"] = "0";
-			$this->fdetails["twidth"] = "0";
-			$this->fdetails["theight"] = "0";
-			$this->fdetails["tsize"] = "0";
-			$this->fdetails["mimetype"] = "";
-			$this->fdetails["mimedesc"] = "";
-			$this->fdetails["link"] = "";
+			self::$fdetails = array();
+			self::$fdetails["file"] = "";
+			self::$fdetails["path"] = "";
+			self::$fdetails["fname"] = "";
+			self::$fdetails["is_image"] = false;
+			self::$fdetails["width"] = "0";
+			self::$fdetails["height"] = "0";
+			self::$fdetails["size"] = "0";
+			self::$fdetails["twidth"] = "0";
+			self::$fdetails["theight"] = "0";
+			self::$fdetails["tsize"] = "0";
+			self::$fdetails["mimetype"] = "";
+			self::$fdetails["mimedesc"] = "";
+			self::$fdetails["link"] = "";
 					
-			$sql = "SELECT * FROM ".$TBLPREFIX."media_files WHERE mf_file='".$filename."'";
+			$sql = "SELECT * FROM ".TBLPREFIX."media_files WHERE mf_file='".$filename."'";
 			$res = NewQuery($sql);
 			if ($res->NumRows() > 0) {
 				$row = $res->FetchAssoc();
-				foreach ($this->fdetails as $index => $value) {
-					$this->fdetails[$index] = $row["mf_".$index];
+				foreach (self::$fdetails as $index => $value) {
+					self::$fdetails[$index] = $row["mf_".$index];
 				}
-				return $this->fdetails;
+				return self::$fdetails;
 			}
 			return false;
 		}
 		else {		
 			// Initialise
-			$this->fdetails["width"] = 0;
-			$this->fdetails["height"] = 0;
-			$this->fdetails["size"] = 0;
-			$this->fdetails["mimetype"] = "";
-			$this->fdetails["mimedesc"] = "";
-			$this->fdetails["extension"] = "";
-			$this->fdetails["is_image"] = false;
-			$this->fdetails["link"] = false;
+			self::$fdetails["width"] = 0;
+			self::$fdetails["height"] = 0;
+			self::$fdetails["size"] = 0;
+			self::$fdetails["mimetype"] = "";
+			self::$fdetails["mimedesc"] = "";
+			self::$fdetails["extension"] = "";
+			self::$fdetails["is_image"] = false;
+			self::$fdetails["link"] = false;
 			
 			// and get the details
 			if (file_exists($filename)) {
-				if (stristr($filename, "://")) $this->fdetails["link"] = true;
-				else $this->fdetails["link"] = false;
+				if (stristr($filename, "://")) self::$fdetails["link"] = true;
+				else self::$fdetails["link"] = false;
 				$path = pathinfo($filename);
-				$this->fdetails["path"] = $path["dirname"];
-				if (!empty($this->fdetails["path"]) && substr($this->fdetails["path"],-1) != "/") $this->fdetails["path"] = $this->fdetails["path"]."/";
-				$this->fdetails["fname"] = $path["basename"];
-				$this->fdetails["size"] = @filesize($filename);
+				self::$fdetails["path"] = $path["dirname"];
+				if (!empty(self::$fdetails["path"]) && substr(self::$fdetails["path"],-1) != "/") self::$fdetails["path"] = self::$fdetails["path"]."/";
+				self::$fdetails["fname"] = $path["basename"];
+				self::$fdetails["size"] = @filesize($filename);
 				if ($file_details = @getimagesize($filename)) {
-					$this->fdetails["width"] = $file_details[0];
-					$this->fdetails["height"] = $file_details[1];
-					$this->fdetails["is_image"] = true;
+					self::$fdetails["width"] = $file_details[0];
+					self::$fdetails["height"] = $file_details[1];
+					self::$fdetails["is_image"] = true;
 				}
 				$mimetypedetect = New MimeTypeDetect();
 				$mime = $mimetypedetect->FindMimeType($filename);
-				$this->fdetails["mimetype"] = $mime["mime_type"];
-				$this->fdetails["mimedesc"] = $mime["description"];
+				self::$fdetails["mimetype"] = $mime["mime_type"];
+				self::$fdetails["mimedesc"] = $mime["description"];
 				$exts = preg_split("/;/", $mime["extension"]);
 				$ext = $exts[0];
 				if (!empty($ext)) $ext = substr($ext,1);
-				$this->fdetails["extension"] = $ext;
-				return $this->fdetails;
+				self::$fdetails["extension"] = $ext;
+				return self::$fdetails;
 			}
 			else return false;
 		}
 	}
 	
-	function GetThumbDetails($filename) {
+	public function GetThumbDetails($filename) {
 
 		// Initialise
-		$this->fdetails["twidth"] = 0;
-		$this->fdetails["theight"] = 0;
-		$this->fdetails["tsize"] = 0;
+		self::$fdetails["twidth"] = 0;
+		self::$fdetails["theight"] = 0;
+		self::$fdetails["tsize"] = 0;
 		
 		// and get the details
-		$this->fdetails["tsize"] = @filesize($filename);
+		self::$fdetails["tsize"] = @filesize($filename);
 		if ($file_details = @getimagesize($filename)) {
-			$this->fdetails["twidth"] = $file_details[0];
-			$this->fdetails["theight"] = $file_details[1];
+			self::$fdetails["twidth"] = $file_details[0];
+			self::$fdetails["theight"] = $file_details[1];
 		}
-		return $this->fdetails;
+		return self::$fdetails;
 	}
 	
-	function UpdateDBThumbDetails($file, $size, $width, $height) {
-		global $TBLPREFIX;
+	public function UpdateDBThumbDetails($file, $size, $width, $height) {
 
-		$sql = "UPDATE ".$TBLPREFIX."media_files SET mf_twidth='".$width."', mf_theight='".$height."', mf_tsize='".$size."' WHERE mf_file='".$file."'";
+		$sql = "UPDATE ".TBLPREFIX."media_files SET mf_twidth='".$width."', mf_theight='".$height."', mf_tsize='".$size."' WHERE mf_file='".$file."'";
 		$res = NewQuery($sql);
 		if ($res) return true;
 		else return false;
 	}
 				
 	
-	function WriteDBFileDetails($delete=false) {
-		global $TBLPREFIX;
+	public function WriteDBFileDetails($delete=false) {
 
 		// delete old data
 		if ($delete) {
-			$sql = "DELETE FROM ".$TBLPREFIX."media_files WHERE mf_file='".$this->fdetails["file"]."'";
+			$sql = "DELETE FROM ".TBLPREFIX."media_files WHERE mf_file='".self::$fdetails["file"]."'";
 			$ires = NewQuery($sql);
 		}
 		
 		// Insert the file details
-		$sql = "INSERT INTO ".$TBLPREFIX."media_files (mf_id, mf_file, mf_path, mf_fname, mf_is_image, mf_width, mf_height, mf_size, mf_twidth, mf_theight, mf_tsize, mf_mimetype, mf_mimedesc, mf_link) VALUES ('0', '".$this->fdetails["file"]."', '".$this->fdetails["path"]."', '".$this->fdetails["fname"]."', '".$this->fdetails["is_image"]."', '".$this->fdetails["width"]."', '".$this->fdetails["height"]."', '".$this->fdetails["size"]."', '".$this->fdetails["twidth"]."', '".$this->fdetails["theight"]."', '".$this->fdetails["tsize"]."', '".$this->fdetails["mimetype"]."', '".$this->fdetails["mimedesc"]."', '".$this->fdetails["link"]."')";
+		$sql = "INSERT INTO ".TBLPREFIX."media_files (mf_id, mf_file, mf_path, mf_fname, mf_is_image, mf_width, mf_height, mf_size, mf_twidth, mf_theight, mf_tsize, mf_mimetype, mf_mimedesc, mf_link) VALUES ('0', '".self::$fdetails["file"]."', '".self::$fdetails["path"]."', '".self::$fdetails["fname"]."', '".self::$fdetails["is_image"]."', '".self::$fdetails["width"]."', '".self::$fdetails["height"]."', '".self::$fdetails["size"]."', '".self::$fdetails["twidth"]."', '".self::$fdetails["theight"]."', '".self::$fdetails["tsize"]."', '".self::$fdetails["mimetype"]."', '".self::$fdetails["mimedesc"]."', '".self::$fdetails["link"]."')";
 		$ires = NewQuery($sql);
 		if ($ires) return true;
 		else return false;
 	}
 	
-	function WriteDBDatafile($data, $delete=false, $unlink=false) {
-		global $TBLPREFIX, $DBCONN;
+	public function WriteDBDatafile($data, $delete=false, $unlink=false) {
 		
 		$fp = fopen(FileNameEncode($data), "rb");
 		if ($fp) {
 			if ($delete) {
 				// Clean previous versions
-				$sql = "DELETE FROM ".$TBLPREFIX."media_datafiles WHERE mdf_file='".$this->fdetails["file"]."'";
+				$sql = "DELETE FROM ".TBLPREFIX."media_datafiles WHERE mdf_file='".self::$fdetails["file"]."'";
 				$ires = NewQuery($sql);
-				$sql = "DELETE FROM ".$TBLPREFIX."media_thumbfiles WHERE mtf_file='".$this->fdetails["file"]."'";
+				$sql = "DELETE FROM ".TBLPREFIX."media_thumbfiles WHERE mtf_file='".self::$fdetails["file"]."'";
 				$ires = NewQuery($sql);
 			}
 			// Insert the new one
 			while (!feof($fp)) {
 				// Make the data mysql insert safe
-				$binarydata = $DBCONN->EscapeQuery(fread($fp, 65535));
+				$binarydata = DbLayer::EscapeQuery(fread($fp, 65535));
 
-				$sql = "INSERT INTO ".$TBLPREFIX."media_datafiles (mdf_id, mdf_file, mdf_data) VALUES (";
-				$sql .= "'0', '".$this->fdetails["file"]."', '".$binarydata."')";
+				$sql = "INSERT INTO ".TBLPREFIX."media_datafiles (mdf_id, mdf_file, mdf_data) VALUES (";
+				$sql .= "'0', '".self::$fdetails["file"]."', '".$binarydata."')";
 				$ires = NewQuery($sql);
 				if (!$ires) return false;
 			}
@@ -905,8 +902,7 @@ class MediaFS {
 		else return true;
 	}
 	
-	function WriteDBThumbfile($file, $thumb, $delete=false, $unlink=false) {
-		global $TBLPREFIX, $DBCONN;
+	public function WriteDBThumbfile($file, $thumb, $delete=false, $unlink=false) {
 
 		if (empty($thumb)) return false;
 						
@@ -914,15 +910,15 @@ class MediaFS {
 		if ($fp) {
 			if ($delete) {
 				// Clean previous versions
-				$sql = "DELETE FROM ".$TBLPREFIX."media_thumbfiles WHERE mtf_file='".$file."'";
+				$sql = "DELETE FROM ".TBLPREFIX."media_thumbfiles WHERE mtf_file='".$file."'";
 				$ires = NewQuery($sql);
 			}
 			// Insert the new one
 			while (!feof($fp)) {
 				// Make the data mysql insert safe
-				$binarydata = $DBCONN->EscapeQuery(fread($fp, 65535));
+				$binarydata = DbLayer::EscapeQuery(fread($fp, 65535));
 
-				$sql = "insert into ".$TBLPREFIX."media_thumbfiles (mtf_id, mtf_file, mtf_data) values (";
+				$sql = "insert into ".TBLPREFIX."media_thumbfiles (mtf_id, mtf_file, mtf_data) values (";
 				$sql .= "'0', '".$file."', '".$binarydata."')";
 				$ires = NewQuery($sql);
 				if (!$ires) return false;
@@ -935,44 +931,44 @@ class MediaFS {
 		else return true;
 	}
 
-	function CreateFile($filename, $delete=false, $dbmode=false, $delonimport=false, $exportthum="no") {
-		global $MEDIA_IN_DB, $TBLPREFIX, $gm_lang, $MEDIA_DIRECTORY;
+	public function CreateFile($filename, $delete=false, $dbmode=false, $delonimport=false, $exportthum="no") {
+		global $MEDIA_IN_DB, $gm_lang, $MEDIA_DIRECTORY;
 
 		// File system to DB
 		if ($dbmode) {
 
-			if (!$delete &&	$this->GetFileDetails($filename, true)) {
+			if (!$delete &&	self::GetFileDetails($filename, true)) {
 				WriteToLog("MediaFS->CreateFile: File already exists in DB: ".$filename, "W", "S");
 				return false;
 			}
 			
-//			$realfile = RelativePathFile($MEDIA_DIRECTORY.$this->CheckMediaDepth($filename));
-//			$this->fdetails["file"] = $realfile;
-			$this->fdetails["file"] = $filename;
-			if (!$this->GetFileDetails($filename, false)) {
+//			$realfile = RelativePathFile($MEDIA_DIRECTORY.self::CheckMediaDepth($filename));
+//			self::$fdetails["file"] = $realfile;
+			self::$fdetails["file"] = $filename;
+			if (!self::GetFileDetails($filename, false)) {
 				WriteToLog("MediaFS->CreateFile: Error getting file details of ".$filename, "W", "S");
 				return false;
 			}
-			$this->CreateDir($this->fdetails["path"], "", true);
+			self::CreateDir(self::$fdetails["path"], "", true);
 			
-			if ($this->fdetails["is_image"]) {
-				$thumb = $this->ThumbNailFile($filename, false, false);
-				$this->GetThumbDetails($thumb);
+			if (self::$fdetails["is_image"]) {
+				$thumb = self::ThumbNailFile($filename, false, false);
+				self::GetThumbDetails($thumb);
 			}
-			else $this->GetThumbDetails("");
+			else self::GetThumbDetails("");
 		
-			$success = $this->WriteDBFileDetails($delete);
+			$success = self::WriteDBFileDetails($delete);
 			if (!$success) {
 				WriteToLog("MediaFS->CreateFile: Error writing media file details for ".$filename, "W", "S");
 				return false;
 			}
-			else $success = $this->WriteDBDatafile($filename, $delete, $delonimport);
+			else $success = self::WriteDBDatafile($filename, $delete, $delonimport);
 			if (!$success) {
 				WriteToLog("MediaFS->CreateFile: Error writing media file data for ".$filename, "W", "S");
 				return false;
 			}
-			else if ($this->fdetails["is_image"] && !empty($thumb)) {
-				$success = $this->WriteDBThumbfile($this->fdetails["file"], $thumb, $delete, $delonimport);
+			else if (self::$fdetails["is_image"] && !empty($thumb)) {
+				$success = self::WriteDBThumbfile(self::$fdetails["file"], $thumb, $delete, $delonimport);
 				if (!$success) {
 					WriteToLog("MediaFS->CreateFile: Error writing media thumb data for ".$filename, "W", "S");
 					return false;
@@ -982,7 +978,7 @@ class MediaFS {
 		}
 		else {
 			// Get the details of the FS-file
-			if ($this->GetFileDetails($filename, false)) {
+			if (self::GetFileDetails($filename, false)) {
 				// If present and we don't overwrite, return error
 				if (!$delete) {
 					WriteToLog("MediaFS->CreateFile: File already exists in filesys: ".$filename, "W", "S");
@@ -990,7 +986,7 @@ class MediaFS {
 				}
 				else {
 					// Else delete the FS-file
-					if (!$this->DeleteFile($this->fdetails["fname"], $this->fdetails["path"], false)) {
+					if (!self::DeleteFile(self::$fdetails["fname"], self::$fdetails["path"], false)) {
 						WriteToLog("MediaFS->CreateFile: Cannot delete from filesys: ".$filename, "W", "S");
 						return false;
 					}
@@ -1000,51 +996,51 @@ class MediaFS {
 			$islink = stristr($filename, "://");
 			
 			if ($islink) {
-				$realfile = $this->NormalizeLink($filename);
+				$realfile = self::NormalizeLink($filename);
 			}
 			else {
-//				$realfile = RelativePathFile($MEDIA_DIRECTORY.$this->CheckMediaDepth($filename));
+//				$realfile = RelativePathFile($MEDIA_DIRECTORY.self::CheckMediaDepth($filename));
 				$realfile = $filename;
 			}
 //			print $realfile."<br />";
-			$this->fdetails["file"] = $realfile;
-			if (!$this->GetFileDetails($realfile, true)) {
+			self::$fdetails["file"] = $realfile;
+			if (!self::GetFileDetails($realfile, true)) {
 				WriteToLog("MediaFS->CreateFile: Error getting DB file details of ".$filename, "W", "S");
 				return false;
 			}
 			// Create the directory in file mode
-			if (empty($this->fdetails["path"])) $this->fdetails["path"] = $MEDIA_DIRECTORY;
+			if (empty(self::$fdetails["path"])) self::$fdetails["path"] = $MEDIA_DIRECTORY;
 			// 1. main directory
-			if (!$this->CreateDir($this->fdetails["path"], "", false)) {
-				WriteToLog("MediaFS->CreateFile: Cannot create folder ".$this->fdetails["path"], "W", "S");
+			if (!self::CreateDir(self::$fdetails["path"], "", false)) {
+				WriteToLog("MediaFS->CreateFile: Cannot create folder ".self::$fdetails["path"], "W", "S");
 				return false;
 			}
 			// 2. Thumb directory
-			if (!$this->CreateDir("thumbs", $this->fdetails["path"], false)) {
-				WriteToLog("MediaFS->CreateFile: Cannot create folder ".$this->fdetails["path"]."thumbs", "W", "S");
+			if (!self::CreateDir("thumbs", self::$fdetails["path"], false)) {
+				WriteToLog("MediaFS->CreateFile: Cannot create folder ".self::$fdetails["path"]."thumbs", "W", "S");
 				return false;
 			}
 			// 3. If llink, url directory
-			if ($islink && !$this->CreateDir("urls", $this->fdetails["path"]."thumbs/", false)) {
-				WriteToLog("MediaFS->CreateFile: Cannot create folder ".$this->fdetails["path"]."thumbs/urls", "W", "S");
+			if ($islink && !self::CreateDir("urls", self::$fdetails["path"]."thumbs/", false)) {
+				WriteToLog("MediaFS->CreateFile: Cannot create folder ".self::$fdetails["path"]."thumbs/urls", "W", "S");
 				return false;
 			}
-			if (!$this->DirIsWritable($this->fdetails["path"], false)) {
-				WriteToLog("MediaFS->CreateFile: Folder not writable: ".$this->fdetails["path"],"W", "S");
+			if (!self::DirIsWritable(self::$fdetails["path"], false)) {
+				WriteToLog("MediaFS->CreateFile: Folder not writable: ".self::$fdetails["path"],"W", "S");
 				return false;
 			}
-			if ($exportthum != "no" && !$this->DirIsWritable($this->fdetails["path"]."thumbs", false)) {
-				WriteToLog("MediaFS->CreateFile: Folder not writable: ".$this->fdetails["path"]."thumbs", "W", "S");
+			if ($exportthum != "no" && !self::DirIsWritable(self::$fdetails["path"]."thumbs", false)) {
+				WriteToLog("MediaFS->CreateFile: Folder not writable: ".self::$fdetails["path"]."thumbs", "W", "S");
 				return false;
 			}
-			if ($islink && $exportthum != "no" && !$this->DirIsWritable($MEDIA_DIRECTORY."thumbs/urls", false)) {
+			if ($islink && $exportthum != "no" && !self::DirIsWritable($MEDIA_DIRECTORY."thumbs/urls", false)) {
 				WriteToLog("MediaFS->CreateFile: Folder not writable: ".$MEDIA_DIRECTORY."thumbs/urls", "W", "S");
 				return false;
 			}
 			
 			// copy the file from DB to filesys
 			if (!$islink) {
-				$sql = "SELECT mdf_data FROM ".$TBLPREFIX."media_datafiles WHERE mdf_file='".$realfile."' ORDER BY mdf_id ASC";
+				$sql = "SELECT mdf_data FROM ".TBLPREFIX."media_datafiles WHERE mdf_file='".$realfile."' ORDER BY mdf_id ASC";
 				$res = NewQuery($sql);
 				if ($res) {
 					$fp = @fopen($realfile, "wb");
@@ -1054,12 +1050,12 @@ class MediaFS {
 					fclose($fp);
 				}
 			}
-			if ($exportthum == "yes" && $this->fdetails["is_image"]) {
-				$sql = "SELECT mtf_data FROM ".$TBLPREFIX."media_thumbfiles WHERE mtf_file='".$realfile."' ORDER BY mtf_id ASC";
+			if ($exportthum == "yes" && self::$fdetails["is_image"]) {
+				$sql = "SELECT mtf_data FROM ".TBLPREFIX."media_thumbfiles WHERE mtf_file='".$realfile."' ORDER BY mtf_id ASC";
 				$res = NewQuery($sql);
 				if ($res && $res->NumRows() > 0) {
-					if ($islink) $fp = @fopen($MEDIA_DIRECTORY."thumbs/urls/".$this->fdetails["file"], "wb");
-					else $fp = @fopen($this->fdetails["path"]."thumbs/".$this->fdetails["fname"], "wb");
+					if ($islink) $fp = @fopen($MEDIA_DIRECTORY."thumbs/urls/".self::$fdetails["file"], "wb");
+					else $fp = @fopen(self::$fdetails["path"]."thumbs/".self::$fdetails["fname"], "wb");
 					while ($row = $res->FetchRow()) {
 						fwrite($fp, $row[0]);
 					}
@@ -1067,19 +1063,19 @@ class MediaFS {
 				}
 			}
 			
-			if ($delonimport) $this->DeleteFile($realfile, "", true);
+			if ($delonimport) self::DeleteFile($realfile, "", true);
 			
 			return true;
 		}
 	}
 	
-	function NormalizeLink($link) {
+	public function NormalizeLink($link) {
 		if (stristr($link, "://")) return preg_replace(array("/http:\/\//", "/\//"), array("","_"),$link);
 		else return $link;
 	}
 
-	function CreateDir($dir, $parent, $dbmode=false, $recurse=false) {
-		global $MEDIA_IN_DB, $TBLPREFIX, $gm_lang;
+	public function CreateDir($dir, $parent, $dbmode=false, $recurse=false) {
+		global $MEDIA_IN_DB, $gm_lang;
 		static $dirlist;
 	
 		//Cleanup the dir
@@ -1102,7 +1098,7 @@ class MediaFS {
 			foreach($dirlevels as $pipo =>$directory) {
 				if (!empty($directory)) {
 					$directory .= "/";
-					if (!$this->CreateDir($directory, $basedir, $dbmode, true)) {
+					if (!self::CreateDir($directory, $basedir, $dbmode, true)) {
 						WriteToLog("MediaFS->CreateDir: Cannot create folder ".$basedir.$directory." for tree ".$parent.$dir, "W", "S");
 						return false;
 					}
@@ -1114,13 +1110,13 @@ class MediaFS {
 			$parent = RelativePathFile($parent);
 			$full = $parent.$dir;
 			if (empty($full)) return true;
-			$sql = "SELECT * FROM ".$TBLPREFIX."media_files WHERE mf_path='".$parent.$dir."' AND mf_file='<DIR>'";
+			$sql = "SELECT * FROM ".TBLPREFIX."media_files WHERE mf_path='".$parent.$dir."' AND mf_file='<DIR>'";
 			$res = NewQuery($sql);
 			if ($res->NumRows() > 0 ) {
 				$dirlist[$dbmode][] = $parent.$dir;
 				return true;
 			}
-			$sql = "INSERT INTO ".$TBLPREFIX."media_files (mf_file, mf_path) VALUES('<DIR>', '".$parent.$dir."')";
+			$sql = "INSERT INTO ".TBLPREFIX."media_files (mf_file, mf_path) VALUES('<DIR>', '".$parent.$dir."')";
 			$res = NewQuery($sql);
 			if ($res) {
 				$dirlist[$dbmode][] = $parent.$dir;
@@ -1151,8 +1147,8 @@ class MediaFS {
 		}
 	}
 	
-	function MoveFile($file, $from, $to) {
-		global $MEDIA_IN_DB, $TBLPREFIX, $GEDCOMID, $DBCONN, $MEDIA_DIRECTORY;
+	public function MoveFile($file, $from, $to) {
+		global $MEDIA_IN_DB, $GEDCOMID, $MEDIA_DIRECTORY;
 		static $change_id;
 		require_once("includes/functions/functions_edit.php");
 		
@@ -1179,17 +1175,17 @@ class MediaFS {
 		if ($from == $to) return false;
 		
 		// Cannot overwrite if target already exists
-		if ($this->FileExists($to.$file)) return false;
+		if (self::FileExists($to.$file)) return false;
 		
 		// Check is any changes for this file are pending. If so, we cannot move the stuff.
-		$sql = "SELECT count(ch_id) FROM ".$TBLPREFIX."changes WHERE ch_new LIKE '%1 FILE ".$mfrom.$file."%'";
+		$sql = "SELECT count(ch_id) FROM ".TBLPREFIX."changes WHERE ch_new LIKE '%1 FILE ".$mfrom.$file."%'";
 		$res = NewQuery($sql);
 		$cnt = $res->FetchRow();
 		if ($cnt[0] > 0) return false;
 		
-		if ($MEDIA_IN_DB || ($this->DirIsWritable($from, false) && $this->DirIsWritable($to, false) && FileIsWriteable($from.$file))) {
+		if ($MEDIA_IN_DB || (self::DirIsWritable($from, false) && self::DirIsWritable($to, false) && FileIsWriteable($from.$file))) {
 			// Retrieve the media in which this file is used
-			$sql = "SELECT m_media, m_gedrec FROM ".$TBLPREFIX."media WHERE m_file LIKE '".$DBCONN->EscapeQuery($mfrom.$file)."%' AND m_gedfile LIKE '".$GEDCOMID."'";
+			$sql = "SELECT m_media, m_gedrec FROM ".TBLPREFIX."media WHERE m_file LIKE '".DbLayer::EscapeQuery($mfrom.$file)."%' AND m_gedfile LIKE '".$GEDCOMID."'";
 //			print $sql;
 			$res = NewQuery ($sql);
 			if ($res->NumRows() > 0) {
@@ -1223,29 +1219,29 @@ class MediaFS {
 					WriteToLog("MediaFS->MoveFile: Cannot copy file to its new destination: <br />File: ".$file." From: ".$from." To ".$to, "W", "S");
 					return false;
 				}
-				return $this->DeleteFile($file, $from, false);
+				return self::DeleteFile($file, $from, false);
 			}
-			$sql = "UPDATE ".$TBLPREFIX."media_thumbfiles SET mtf_file='".$DBCONN->EscapeQuery($to.$file)."' WHERE mtf_file LIKE '".$DBCONN->EscapeQuery($from.$file)."'";
+			$sql = "UPDATE ".TBLPREFIX."media_thumbfiles SET mtf_file='".DbLayer::EscapeQuery($to.$file)."' WHERE mtf_file LIKE '".DbLayer::EscapeQuery($from.$file)."'";
 			$res = NewQuery($sql);
-			$sql = "UPDATE ".$TBLPREFIX."media_datafiles SET mdf_file='".$DBCONN->EscapeQuery($to.$file)."' WHERE mdf_file LIKE '".$DBCONN->EscapeQuery($from.$file)."'";
+			$sql = "UPDATE ".TBLPREFIX."media_datafiles SET mdf_file='".DbLayer::EscapeQuery($to.$file)."' WHERE mdf_file LIKE '".DbLayer::EscapeQuery($from.$file)."'";
 			$res = NewQuery($sql);
-			$sql = "UPDATE ".$TBLPREFIX."media_files SET mf_file='".$DBCONN->EscapeQuery($to.$file)."', mf_path='".$DBCONN->EscapeQuery($to)."' WHERE mf_file LIKE '".$DBCONN->EscapeQuery($from.$file)."'";
+			$sql = "UPDATE ".TBLPREFIX."media_files SET mf_file='".DbLayer::EscapeQuery($to.$file)."', mf_path='".DbLayer::EscapeQuery($to)."' WHERE mf_file LIKE '".DbLayer::EscapeQuery($from.$file)."'";
 			$res = NewQuery($sql);
 			return true;
 		}
 	}
 	
-	function DeleteFile($file, $folder, $fromdb="unset") {
-		global $MEDIA_IN_DB, $TBLPREFIX, $DBCONN, $MEDIA_DIRECTORY;
+	public function DeleteFile($file, $folder, $fromdb="unset") {
+		global $MEDIA_IN_DB, $MEDIA_DIRECTORY;
 	
 		if ($fromdb == "unset") $fromdb = $MEDIA_IN_DB;
 		if ($fromdb) {
 			if ($folder == "external_links") $folder = "";
-			$sql = "DELETE FROM ".$TBLPREFIX."media_thumbfiles WHERE mtf_file LIKE '".$DBCONN->EscapeQuery($folder.$file)."'";
+			$sql = "DELETE FROM ".TBLPREFIX."media_thumbfiles WHERE mtf_file LIKE '".DbLayer::EscapeQuery($folder.$file)."'";
 			$res = NewQuery($sql);
-			$sql = "DELETE FROM ".$TBLPREFIX."media_datafiles WHERE mdf_file LIKE '".$DBCONN->EscapeQuery($folder.$file)."'";
+			$sql = "DELETE FROM ".TBLPREFIX."media_datafiles WHERE mdf_file LIKE '".DbLayer::EscapeQuery($folder.$file)."'";
 			$res = NewQuery($sql);
-			$sql = "DELETE FROM ".$TBLPREFIX."media_files WHERE mf_file LIKE '".$DBCONN->EscapeQuery($folder.$file)."'";
+			$sql = "DELETE FROM ".TBLPREFIX."media_files WHERE mf_file LIKE '".DbLayer::EscapeQuery($folder.$file)."'";
 			$res = NewQuery($sql);
 			return true;
 		}
@@ -1257,12 +1253,12 @@ class MediaFS {
 		}
 	}
 	
-	function DeleteDir($folder, $dbmode=false, $fake=false) {
-		global $MEDIA_IN_DB, $TBLPREFIX, $DBCONN;
+	public function DeleteDir($folder, $dbmode=false, $fake=false) {
+		global $MEDIA_IN_DB;
 	
 		if ($dbmode) {
-			if (!$fake) $sql = "SELECT count(mf_path) as count FROM ".$TBLPREFIX."media_files WHERE mf_path='".$DBCONN->EscapeQuery($folder)."' GROUP BY mf_path";
-			else $sql = "SELECT count(mf_path) as count FROM ".$TBLPREFIX."media_files WHERE mf_path LIKE '".$DBCONN->EscapeQuery($folder)."%' GROUP BY mf_path";
+			if (!$fake) $sql = "SELECT count(mf_path) as count FROM ".TBLPREFIX."media_files WHERE mf_path='".DbLayer::EscapeQuery($folder)."' GROUP BY mf_path";
+			else $sql = "SELECT count(mf_path) as count FROM ".TBLPREFIX."media_files WHERE mf_path LIKE '".DbLayer::EscapeQuery($folder)."%' GROUP BY mf_path";
 			$res = NewQuery($sql);
 			// If there are more DIR entries starting with this name, it's not the lowest level. We cannot delete.
 			if ($res->NumRows() > 1) return false;
@@ -1272,7 +1268,7 @@ class MediaFS {
 				return false;
 			}
 			if ($fake) return true;
-			$sql = "DELETE FROM ".$TBLPREFIX."media_files WHERE mf_path LIKE '".$DBCONN->EscapeQuery($folder)."' AND mf_file LIKE '<DIR>'";
+			$sql = "DELETE FROM ".TBLPREFIX."media_files WHERE mf_path LIKE '".DbLayer::EscapeQuery($folder)."' AND mf_file LIKE '<DIR>'";
 			$res = NewQuery($sql);
 			return true;
 		}
@@ -1297,7 +1293,7 @@ class MediaFS {
 		}
 	}
 	
-	function IsValidMedia($filename) {
+	public function IsValidMedia($filename) {
 		global $MEDIATYPE;
 		
 		$et = preg_match("/(\.\w+)$/", $filename, $ematch);
@@ -1306,11 +1302,11 @@ class MediaFS {
 		return in_array(strtolower($ext), $MEDIATYPE);
 	}
 	
-	function FileExists($filename) {
-		global $TBLPREFIX, $MEDIA_IN_DB, $DBCONN;
+	public function FileExists($filename) {
+		global $MEDIA_IN_DB;
 		
 		if ($MEDIA_IN_DB) {
-			$res = NewQuery("SELECT mf_file FROM ".$TBLPREFIX."media_files WHERE mf_file LIKE '".$DBCONN->EscapeQuery($filename)."'");
+			$res = NewQuery("SELECT mf_file FROM ".TBLPREFIX."media_files WHERE mf_file LIKE '".DbLayer::EscapeQuery($filename)."'");
 			return $res->NumRows();
 		}
 		else {
@@ -1318,11 +1314,11 @@ class MediaFS {
 		}
 	}
 	
-	function GetTotalMediaSize() {
-		global $TBLPREFIX, $MEDIA_IN_DB, $DBCONN;
+	public function GetTotalMediaSize() {
+		global $MEDIA_IN_DB;
 		
 		if ($MEDIA_IN_DB) {
-			$res = NewQuery("SELECT sum(mf_size) FROM ".$TBLPREFIX."media_files");
+			$res = NewQuery("SELECT sum(mf_size) FROM ".TBLPREFIX."media_files");
 			$row = $res->FetchRow();
 			return $row[0];
 		}
@@ -1331,7 +1327,7 @@ class MediaFS {
 		}
 	}
 	
-	function GetStorageType() {
+	public function GetStorageType() {
 		global $MEDIA_IN_DB;
 		
 		if ($MEDIA_IN_DB) return "VFS";
@@ -1341,7 +1337,7 @@ class MediaFS {
 	// This functions checks if an existing directory is physically writeable
 	// The standard PHP function only checks for the R/O attribute and doesn't
 	// detect authorisation by ACL.
-	function DirIsWritable($dir, $dbmode="unset") {
+	public function DirIsWritable($dir, $dbmode="unset") {
 		global $MEDIA_IN_DB;
 		
 		if ($dbmode == "unset") $dbmode = $MEDIA_IN_DB;
