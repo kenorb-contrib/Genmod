@@ -408,27 +408,27 @@ function getGedcomStats() {
 function getGedcomNews() {
 	global $gm_lang, $GM_IMAGE_DIR, $GM_IMAGES, $TEXT_DIRECTION, $GEDCOM, $command, $TIME_FORMAT, $lastcachedate;
 
-	$usernews = getUserNews($GEDCOM);
+	$usernews = NewsController::getUserNews($GEDCOM);
 
 	$dataArray = array();
 	foreach($usernews as $key=>$news) {
 
-		$day = date("j", $news["date"]);
-		$mon = date("M", $news["date"]);
-		$year = date("Y", $news["date"]);
+		$day = date("j", $news->date);
+		$mon = date("M", $news->date);
+		$year = date("Y", $news->date);
 		$data = "";
-		$news["title"] = ReplaceEmbedText($news["title"]);
-		$itemArray[0] = $news["title"];
+		$news->title = ReplaceEmbedText($news->title);
+		$itemArray[0] = $news->title;
 
-		$itemArray[1] = iso8601_date($news["date"]);
-		$news["text"] = ReplaceEmbedText($news["text"]);
+		$itemArray[1] = iso8601_date($news->date);
+		$news->text = ReplaceEmbedText($news->text);
 		$trans = get_html_translation_table(HTML_SPECIALCHARS);
 		$trans = array_flip($trans);
-		$news["text"] = strtr($news["text"], $trans);
-		$news["text"] = nl2br($news["text"]);
-		$data .= $news["text"];
+		$news->text = strtr($news->text, $trans);
+		$news->text = nl2br($news->text);
+		$data .= $news->text;
 		$itemArray[2] = $data;
-		$itemArray[3] = $news["anchor"];
+		$itemArray[3] = $news->anchor;
 		$dataArray[] = $itemArray;
 
 	}
