@@ -40,7 +40,7 @@ function print_user_news($block=true, $config="", $side, $index) {
 	global $gm_lang, $GM_IMAGE_DIR, $GM_IMAGES, $TEXT_DIRECTION, $command, $TIME_FORMAT, $gm_username;
 
 	$uname = $gm_username;
-	$usernews = getUserNews($uname);
+	$usernews = NewsController::getUserNews($uname);
 
 	print "<div id=\"user_news\" class=\"block\">\n";
 	print "<div class=\"blockhc\">";
@@ -50,28 +50,28 @@ function print_user_news($block=true, $config="", $side, $index) {
 	print "<div class=\"blockcontent\">";
 	if ($block) print "<div class=\"small_inner_block, $TEXT_DIRECTION\">\n";
 	if (count($usernews)==0) print $gm_lang["no_journal"];
-	foreach($usernews as $key=>$news) {
-		$day = date("j", $news["date"]);
-		$mon = date("M", $news["date"]);
-		$year = date("Y", $news["date"]);
+	foreach($usernews as $key => $news) {
+		$day = date("j", $news->date);
+		$mon = date("M", $news->date);
+		$year = date("Y", $news->date);
 		print "<div class=\"person_box\">\n";
 		
-		$news["title"] = ReplaceEmbedText($news["title"]);
-		print "<span class=\"news_title\">".PrintReady($news["title"])."</span><br />\n";
-		print "<span class=\"news_date\">".GetChangedDate("$day $mon $year")." - ".date($TIME_FORMAT, $news["date"])."</span><br /><br />\n";
+		$news->title = ReplaceEmbedText($news->title);
+		print "<span class=\"news_title\">".PrintReady($news->title)."</span><br />\n";
+		print "<span class=\"news_date\">".GetChangedDate("$day $mon $year")." - ".date($TIME_FORMAT, $news->date)."</span><br /><br />\n";
 		
-		$news["text"] = ReplaceEmbedText($news["text"]);
+		$news->text = ReplaceEmbedText($news->text);
 		$trans = get_html_translation_table(HTML_SPECIALCHARS);
 		$trans = array_flip($trans);
-		$news["text"] = strtr($news["text"], $trans);
-		$news["text"] = nl2br($news["text"]);
-		print PrintReady($news["text"])."<br /><br />\n";
-		print "<a href=\"#\" onclick=\"editnews('$key'); return false;\">".$gm_lang["edit"]."</a> | ";
-		print "<a href=\"index.php?action=deletenews&amp;news_id=$key&amp;command=$command\" onclick=\"return confirm('".$gm_lang["confirm_journal_delete"]."');\">".$gm_lang["delete"]."</a><br />";
+		$news->text = strtr($news->text, $trans);
+		$news->text = nl2br($news->text);
+		print PrintReady($news->text)."<br /><br />\n";
+		print "<a href=\"#\" onclick=\"editnews('".$news->id."'); return false;\">".$gm_lang["edit"]."</a> | ";
+		print "<a href=\"index.php?action=deletenews&amp;news_id=".$news->id."&amp;command=$command\" onclick=\"return confirm('".$gm_lang["confirm_journal_delete"]."');\">".$gm_lang["delete"]."</a><br />";
 		print "</div><br />\n";
 	}
 	if ($block) print "</div>\n";
-	if (!empty($uname)) print "<br /><a href=\"#\" onclick=\"addnews('$uname'); return false;\">".$gm_lang["add_journal"]."</a>\n";
+	if (!empty($uname)) print "<br /><a href=\"#\" onclick=\"addnews('".$uname."'); return false;\">".$gm_lang["add_journal"]."</a>\n";
 	print "</div>\n";
 	print "</div>";
 }
