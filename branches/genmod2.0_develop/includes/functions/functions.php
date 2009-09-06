@@ -2381,7 +2381,7 @@ function IdType($id) {
  * @author	Genmod Development Team
  * @return	array	Array with news items
  */
-function GetNewsItems() {
+function GetGMNewsItems() {
 	global $NEWS_TYPE, $PROXY_ADDRESS, $PROXY_PORT;
 
 	// -- If the news is already retrieved, get it from the session data.
@@ -2432,7 +2432,7 @@ function GetNewsItems() {
 		}
 	}
 	else {
-		WriteToLog("GetNewsItems-> News cannot be reached on Genmod News Server", "E");
+		WriteToLog("GetGMNewsItems-> News cannot be reached on Genmod News Server", "E");
 		$item["date"] = "";
 		$item["type"] = "Urgent";
 		$item["header"] = "Warning: News cannot be retrieved";

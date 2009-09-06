@@ -2431,8 +2431,7 @@ function DeleteGedcom($ged) {
 	$res = NewQuery($sql);
 	$sql = "DELETE FROM ".TBLPREFIX."names WHERE n_file='".DbLayer::EscapeQuery($gedid)."'";
 	$res = NewQuery($sql);
-	$sql = "DELETE FROM ".TBLPREFIX."news WHERE n_username='".DbLayer::EscapeQuery($ged)."'";
-	$res = NewQuery($sql);
+	NewsController::DeleteUserNews($ged);
 	$sql = "DELETE FROM ".TBLPREFIX."other WHERE o_file='".DbLayer::EscapeQuery($gedid)."'";
 	$res = NewQuery($sql);
 	$sql = "DELETE FROM ".TBLPREFIX."other_mapping WHERE om_gedfile='".DbLayer::EscapeQuery($gedid)."'";
