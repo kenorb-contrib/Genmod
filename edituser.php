@@ -43,8 +43,8 @@ if (isset($lastname)) $lastname = stripslashes($lastname);
 //-- make sure that they have admin status before they can use this page
 //-- otherwise have them login again
 if (empty($gm_username)||$_SESSION["cookie_login"]) {
-	if (empty($LOGIN_URL)) header("Location: login.php?url=edituser.php");
-	else header("Location: ".$LOGIN_URL."?url=edituser.php");
+	if (LOGIN_URL == "") header("Location: login.php?url=edituser.php");
+	else header("Location: ".LOGIN_URL."?url=edituser.php");
 	exit;
 }
 

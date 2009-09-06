@@ -142,12 +142,12 @@ abstract class GedcomRecord {
 		
 		if ($GEDCOMID != $this->gedcomid) SwitchGedcom($this->gedcomid);
 		
-		$this->disp = displayDetailsByID($this->xref, $this->type, 1, true);
+		$this->disp = PrivacyFunctions::displayDetailsByID($this->xref, $this->type, 1, true);
 		$this->disp_name = $this->disp;
 		
-		if (!$this->disp && $this->datatype == "INDI") $this->disp_name = ShowLivingNameByID($this->xref, "INDI", $this->gedrec);
+		if (!$this->disp && $this->datatype == "INDI") $this->disp_name = PrivacyFunctions::showLivingNameByID($this->xref, "INDI", $this->gedrec);
 		
-		if ($this->disp && $ALLOW_EDIT_GEDCOM && $gm_user->userCanEdit() && !FactEditRestricted($this->xref, $this->gedrec, 1)) $this->canedit = true;
+		if ($this->disp && $ALLOW_EDIT_GEDCOM && $gm_user->userCanEdit() && !PrivacyFunctions::FactEditRestricted($this->xref, $this->gedrec, 1)) $this->canedit = true;
 		else $this->canedit = false;
 		SwitchGedcom();
 	}
@@ -354,10 +354,9 @@ abstract class GedcomRecord {
 	}
 		
 	protected function ThisRawEdited() {
-		global $TBLPREFIX;
 		
 		if (is_null($this->israwedited) && $this->show_changes) {
-			$sql = "SELECT COUNT(ch_id) FROM ".$TBLPREFIX."changes WHERE ch_gedfile='".$this->gedcomid."' AND ch_type='edit_raw' AND ch_gid='".$this->xref."'";
+			$sql = "SELECT COUNT(ch_id) FROM ".TBLPREFIX."changes WHERE ch_gedfile='".$this->gedcomid."' AND ch_type='edit_raw' AND ch_gid='".$this->xref."'";
 			if ($res = NewQuery($sql)) {
 				$row = $res->FetchRow();
 				$res->FreeResult();
@@ -381,17 +380,6 @@ abstract class GedcomRecord {
 		}
 		return $this->changedgedrec;
 	}			
-	/**
-	 * check if this object is equal to the given object
-	 * basically just checks if the IDs are the same
-	 * @param GedcomRecord $obj
-	 */
-	protected function equals(&$obj) {
-		
-		if (is_null($obj)) return false;
-		if ($this->xref==$obj->xref) return true;
-		return false;
-	}
 
 	/**
 	 * Parse the facts from the record
@@ -425,10 +413,10 @@ abstract class GedcomRecord {
 				$typeshow = true;
 				if ($fact == "EVEN") {
 					$ct = preg_match("/2 TYPE (.*)/", $subrecord, $match);
-					if ($ct>0) $typeshow = ShowFact(trim($match[1]), $this->xref, $this->type);
+					if ($ct>0) $typeshow = PrivacyFunctions::showFact(trim($match[1]), $this->xref, $this->type);
 				}
-				if (!empty($fact) && ShowFact($fact, $this->xref, $this->type) && $typeshow && !FactViewRestricted($this->xref, $subrecord, 2)) {
-					if (empty($gid) || DisplayDetailsByID($gid, $fact, 1, true)) {
+				if (!empty($fact) && PrivacyFunctions::showFact($fact, $this->xref, $this->type) && $typeshow && !PrivacyFunctions::FactViewRestricted($this->xref, $subrecord, 2)) {
+					if (empty($gid) || PrivacyFunctions::DisplayDetailsByID($gid, $fact, 1, true)) {
 						$this->facts[] = new Fact($this->xref, $fact, $subrecord, $count[$fact], "");
 //						$this->facts[] = array($fact, $subrecord, $count[$fact], "");
 						if ($fact == "SOUR") $this->sourfacts_count++;
@@ -457,7 +445,7 @@ abstract class GedcomRecord {
 				$fact = trim($fact);
 				if (!isset($count[$fact])) $count[$fact] = 1;
 				else $count[$fact]++;
-				if (!empty($fact) && !in_array($fact, array($this->exclude_facts)) && ShowFact($fact, $this->xref, $this->type) && !FactViewRestricted($this->xref, $newrec, 2)) {
+				if (!empty($fact) && !in_array($fact, array($this->exclude_facts)) && PrivacyFunctions::showFact($fact, $this->xref, $this->type) && !PrivacyFunctions::FactViewRestricted($this->xref, $newrec, 2)) {
 //					$this->facts[] = array($fact, $newrec, $count[$fact], "change_new");
 					$this->facts[] = new Fact($this->xref, $fact, $newrec, $count[$fact], "change_new");
 				}
@@ -506,6 +494,21 @@ abstract class GedcomRecord {
 			$this->facts = $newfacts;
 		}
 		else SortFactObjs($this->facts, $this->type);
+		if ($this->type == "INDI") {
+			$sexfound = false;
+			foreach($this->facts as $key => $factobj) {
+				if ($factobj->fact == "NAME") $this->globalfacts[] = $factobj;
+				elseif ($factobj->fact == "SEX") {
+					$this->globalfacts[] = $factobj;
+					$sexfound = true;
+				}
+			}
+	
+			//-- add a new sex fact if one was not found
+			if (!$sexfound) {
+				$this->globalfacts[] = array('new', "1 SEX U");
+			}
+		}
 		return $this->facts;
 	}
 	

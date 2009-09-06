@@ -257,7 +257,7 @@ require_once("fonts/".$ff[0].".php");
 				ImageFilledArc($image, $cx, $cy, $rx, $rx, $deg1, $deg2, $bg, IMG_ARC_PIE);
 				$maxpix = sin(deg2rad($deg2-$deg1))*$rx/2;
 				print "strlen kan: ".$maxpix." ";
-				if (!showLivingNameByID($pid)) {
+				if (!PrivacyFunctions::showLivingNameByID($pid)) {
 					$name = $gm_lang["private"];
 					$addname = "";
 				}
@@ -275,14 +275,14 @@ $wmax = floor($maxpix/$fontsize);
 				$name = AbbreviateName($name, $wmax);
 print " ".strlen($altname)." ".$wmax." ".$name." ";
 				$text = ltr_string($name) . "\r\n" . ltr_string($addname). "\r\n";
-				if (displayDetailsByID($pid)) {
+				if (PrivacyFunctions::displayDetailsByID($pid)) {
 					$birthrec = GetSubRecord(1, "1 BIRT", $indirec);
-					if (!FactViewRestricted($pid, $birthrec)) {
+					if (!PrivacyFunctions::FactViewRestricted($pid, $birthrec)) {
 						$ctb = preg_match("/2 DATE.*(\d\d\d\d)/", $birthrec, $matchb);
 					}
 					else $ctb=0;
 					$deathrec = GetSubRecord(1, "1 DEAT", $indirec);
-					if (!FactViewRestricted($pid, $deathrec)) {
+					if (!PrivacyFunctions::FactViewRestricted($pid, $deathrec)) {
 						$ctd = preg_match("/2 DATE.*(\d\d\d\d)/", $deathrec, $matchd);
 					}
 					else $ctd=0;
@@ -509,7 +509,7 @@ if (!isset($fan_width)) $fan_width = "100";
 $fan_width=max($fan_width, 50);
 $fan_width=min($fan_width, 300);
 
-if (showLivingNameByID($rootid)) {
+if (PrivacyFunctions::showLivingNameByID($rootid)) {
 	$name = GetPersonName($rootid);
 	$addname = GetAddPersonName($rootid);
 }

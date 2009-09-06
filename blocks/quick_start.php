@@ -39,7 +39,7 @@ $GM_BLOCKS["print_quickstart_block"]["rss"]       	= false;
  * Prints a block allowing the user to login to the site directly from the portal
  */
 function print_quickstart_block($block = true, $config="", $side, $index) {
-	global $gm_lang, $GEDCOM, $GEDCOMS, $command, $SCRIPT_NAME, $QUERY_STRING, $USE_REGISTRATION_MODULE, $LOGIN_URL, $ALLOW_REMEMBER_ME, $gm_username, $TEXT_DIRECTION, $GM_IMAGE_DIR, $GM_IMAGES, $ALLOW_CHANGE_GEDCOM, $GM_BLOCKS, $gm_user;
+	global $gm_lang, $GEDCOM, $GEDCOMS, $command, $SCRIPT_NAME, $QUERY_STRING, $USE_REGISTRATION_MODULE, $ALLOW_REMEMBER_ME, $gm_username, $TEXT_DIRECTION, $GM_IMAGE_DIR, $GM_IMAGES, $ALLOW_CHANGE_GEDCOM, $GM_BLOCKS, $gm_user;
 	if (empty($config)) $config = $GM_BLOCKS["print_quickstart_block"]["config"];
 	if (!isset($config['search_all_geds'])) $config = $GM_BLOCKS["print_quickstart_block"]["config"];
 

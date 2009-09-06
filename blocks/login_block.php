@@ -38,12 +38,12 @@ $GM_BLOCKS["print_login_block"]["rss"]     		= false;
  * Prints a block allowing the user to login to the site directly from the portal
  */
 function print_login_block($block = true, $config="", $side, $index) {
-	global $gm_lang, $GEDCOM, $GEDCOMS, $command, $SCRIPT_NAME, $QUERY_STRING, $USE_REGISTRATION_MODULE, $LOGIN_URL, $ALLOW_REMEMBER_ME, $gm_username, $TEXT_DIRECTION, $SERVER_URL;
-	if ((empty($LOGIN_URL) && substr($SERVER_URL,0,5) != "https") || substr($LOGIN_URL,0,5) != "https") {
+	global $gm_lang, $GEDCOM, $GEDCOMS, $command, $SCRIPT_NAME, $QUERY_STRING, $USE_REGISTRATION_MODULE, $ALLOW_REMEMBER_ME, $gm_username, $TEXT_DIRECTION;
+	if ((LOGIN_URL == "" && substr(SERVER_URL,0,5) != "https") || substr(LOGIN_URL,0,5) != "https") {
 		$uname = $gm_username;
 		if (!empty($uname)) return;
-		if (empty($LOGIN_URL)) $login = "login.php";
-		else $login = $LOGIN_URL;
+		if (LOGIN_URL == "") $login = "login.php";
+		else $login = LOGIN_URL;
 		print "<div id=\"login_block\" class=\"block\">\n";
 		print "<div class=\"blockhc\">";
 		if ($USE_REGISTRATION_MODULE) print_help_link("index_login_register_help", "qm");

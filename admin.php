@@ -34,8 +34,8 @@
 require "config.php";
 
 if (!$gm_user->userGedcomAdmin()) {
-	if (empty($LOGIN_URL)) header("Location: login.php?url=admin.php");
-	else header("Location: ".$LOGIN_URL."?url=admin.php");
+	if (LOGIN_URL == "") header("Location: login.php?url=admin.php");
+	else header("Location: ".LOGIN_URL."?url=admin.php");
 	exit;
 }
 if (!isset($action)) $action="";
@@ -79,7 +79,7 @@ if (count($implangs) > 0) $import_msg = true;
 $explangs = GetLangfileInfo("export");
 if (count($explangs) > 0) $export_msg = true;
 
-if (file_exists($INDEX_DIRECTORY."emergency_syslog.txt")) {
+if (file_exists(INDEX_DIRECTORY."emergency_syslog.txt")) {
 	$emergency_msg = true;
 	$emergency_text = ImportEmergencyLog();
 }

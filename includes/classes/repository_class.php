@@ -122,7 +122,7 @@ class Repository extends GedcomRecord {
 		if (!empty($gedrec)) {
 			$tt = preg_match("/1 NAME (.*)/", $gedrec, $smatch);
 			if ($tt>0) {
-				if (!ShowFact("NAME", $this->xref, "REPO") || !ShowFactDetails("NAME", $this->xref, "REPO")) return $gm_lang["private"];
+				if (!PrivacyFunctions::showFact("NAME", $this->xref, "REPO") || !PrivacyFunctions::showFactDetails("NAME", $this->xref, "REPO")) return $gm_lang["private"];
 				$subrec = GetSubRecord(1, "1 NAME", $gedrec);
 				// This automatically handles CONC/CONT lines below the title record
 				$this->descriptor = GetGedcomValue("NAME", 1, $subrec);
@@ -149,13 +149,13 @@ class Repository extends GedcomRecord {
 		if (!empty($gedrec)) {
 			$ct = preg_match("/\d ROMN (.*)/", $gedrec, $match);
 	 		if ($ct>0) {
-				if (!ShowFact("ROMN", $this->xref, "SOUR") || !ShowFactDetails("ROMN", $this->xref, "REPO")) return false;
+				if (!PrivacyFunctions::showFact("ROMN", $this->xref, "SOUR") || !PrivacyFunctions::showFactDetails("ROMN", $this->xref, "REPO")) return false;
 				$this->adddescriptor = $smatch[1];
 				return $this->adddescriptor;
 	 		}
 			$ct = preg_match("/\d _HEB (.*)/", $gedrec, $match);
 	 		if ($ct>0) {
-				if (!ShowFact("_HEB", $this->xref, "SOUR")|| !ShowFactDetails("_HEB", $this->xref, "REPO")) return false;
+				if (!PrivacyFunctions::showFact("_HEB", $this->xref, "SOUR")|| !PrivacyFunctions::showFactDetails("_HEB", $this->xref, "REPO")) return false;
 				$this->adddescriptor = $smatch[1];
 				return $this->adddescriptor;
 	 		}
@@ -169,13 +169,12 @@ class Repository extends GedcomRecord {
 	 * @return array
 	 */
 	protected function GetLinksFromSources() {
-		global $TBLPREFIX;
 
 		if(!is_null($this->sourcelist)) return $this->sourcelist;
 		$this->sourcelist = array();
 		$this->sour_hide = 0;
 		
-		$sql = 	"SELECT DISTINCT s_key, s_id, s_gedcom, s_file FROM ".$TBLPREFIX."other_mapping, ".$TBLPREFIX."sources WHERE om_oid='".$this->xref."' AND om_gedfile='".$this->gedcomid."' AND om_type='SOUR' AND s_file=om_gedfile AND s_id=om_gid";
+		$sql = 	"SELECT DISTINCT s_key, s_id, s_gedcom, s_file FROM ".TBLPREFIX."other_mapping, ".TBLPREFIX."sources WHERE om_oid='".$this->xref."' AND om_gedfile='".$this->gedcomid."' AND om_type='SOUR' AND s_file=om_gedfile AND s_id=om_gid";
 		$res = NewQuery($sql);
 		while($row = $res->FetchAssoc()){
 			$source = null;

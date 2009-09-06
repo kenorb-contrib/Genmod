@@ -33,7 +33,7 @@ $GM_BLOCKS["top10_pageviews"]["config"] 	= array("num"=>10, "count_placement"=>"
 $GM_BLOCKS["top10_pageviews"]["rss"]		= false;
 
 function top10_pageviews($block=true, $config="", $side, $index) {
-	global $gm_lang, $GEDCOM, $GEDCOMID, $INDEX_DIRECTORY, $GM_BLOCKS, $command, $GM_IMAGES, $GM_IMAGE_DIR, $SHOW_SOURCES, $TEXT_DIRECTION, $TBLPREFIX, $gm_username, $gm_user;
+	global $gm_lang, $GEDCOM, $GEDCOMID, $GM_BLOCKS, $command, $GM_IMAGES, $GM_IMAGE_DIR, $SHOW_SOURCES, $TEXT_DIRECTION, $gm_username, $gm_user;
 
 	if (empty($config)) $config = $GM_BLOCKS["top10_pageviews"]["config"];
 	if (isset($config["count_placement"])) $CountSide = $config["count_placement"];
@@ -42,7 +42,7 @@ function top10_pageviews($block=true, $config="", $side, $index) {
 	//-- load the lines from the database
 	$ids = array();
 	$limit = $config["num"]+1;
-	$sql = "SELECT * from ".$TBLPREFIX."counters WHERE (c_id like '%[".$GEDCOMID."]%') ORDER BY c_number DESC LIMIT ".$limit;
+	$sql = "SELECT * from ".TBLPREFIX."counters WHERE (c_id like '%[".$GEDCOMID."]%') ORDER BY c_number DESC LIMIT ".$limit;
 	$res = NewQuery($sql);
 	while($row = $res->FetchAssoc()){
 		$p1 = strpos($row["c_id"],"[");
@@ -92,7 +92,7 @@ function top10_pageviews($block=true, $config="", $side, $index) {
 			$ct = preg_match("/0 @(.*)@ (.*)/", $gedrec, $match);
 			if ($ct>0) {
 				$type = trim($match[2]);
-				$disp = showLivingNameByID($id, $type);
+				$disp = PrivacyFunctions::showLivingNameByID($id, $type);
 				if ($disp) {
 					if ($type=="INDI") {
 						print "<tr valign=\"top\">";

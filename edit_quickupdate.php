@@ -30,8 +30,8 @@ require("config.php");
 require("includes/functions/functions_edit.php");
 
 if ($_SESSION["cookie_login"]) {
-	if (empty($LOGIN_URL)) header("Location: login.php?type=simple&url=edit_interface.php");
-	else header("Location: ".$LOGIN_URL."?type=simple&url=edit_interface.php");
+	if (LOGIN_URL == "") header("Location: login.php?type=simple&url=edit_interface.php");
+	else header("Location: ".LOGIN_URL."?type=simple&url=edit_interface.php");
 	exit;
 }
 
@@ -91,7 +91,7 @@ $ct = preg_match("/0 @$pid@ (.*)/", $gedrec, $match);
 if ($ct>0) {
 	$type = trim($match[1]);
 	if ($type=="INDI") {
-		$disp = displayDetailsById($pid);
+		$disp = PrivacyFunctions::displayDetailsById($pid);
 	}
 	else {
 		print $gm_lang["access_denied"];
@@ -117,7 +117,7 @@ if ((!$disp)||(!$ALLOW_EDIT_GEDCOM)) {
 //-- privatize the record so that line numbers etc. match what was in the display
 //-- data that is hidden because of privacy is stored in the $gm_private_records array
 //-- any private data will be restored when the record is replaced
-$gedrec = privatize_gedcom($gedrec);
+$gedrec = PrivacyFunctions::privatize_gedcom($gedrec);
 
 //-- put the updates into the gedcom record
 if ($action=="update") {
@@ -188,7 +188,7 @@ if ($action=="update") {
 					$pos2 = strpos($famrec, "\n1 ", $pos1+5);
 					if ($pos2===false) $pos2 = strlen($famrec);
 					$oldfac = trim(substr($famrec, $pos1, $pos2-$pos1));
-					$noupdfact = FactEditRestricted($pid, $oldfac);
+					$noupdfact = PrivacyFunctions::FactEditRestricted($pid, $oldfac);
 					if ($noupdfact) {
 						print "<br />".$gm_lang["update_fact_restricted"]." ".$factarray[$fact]."<br /><br />";
 					}
@@ -1280,7 +1280,7 @@ if ($action=="choosepid") {
 	$SURN = "";
 	$subrec = GetSubRecord(1, "1 NAME", $gedrec);
 	$namerec = $subrec;
-	if (!empty($subrec) && !FactEditRestricted($pid, $subrec)) {
+	if (!empty($subrec) && !PrivacyFunctions::FactEditRestricted($pid, $subrec)) {
 		$ct = preg_match("/2 GIVN (.*)/", $subrec, $match);
 		if ($ct>0) $GIVN = trim($match[1]);
 		else {
@@ -1325,7 +1325,7 @@ if ($action=="choosepid") {
 	}
 	$ADDR = "";
 	$subrec = GetSubRecord(1, "1 ADDR", $gedrec);
-	if (!empty($subrec) && !FactEditRestricted($pid, $subrec)) {
+	if (!empty($subrec) && !PrivacyFunctions::FactEditRestricted($pid, $subrec)) {
 		$ct = preg_match("/1 ADDR (.*)/", $subrec, $match);
 		if ($ct>0) $ADDR = trim($match[1]);
 		$ADDR_CONT = GetCont(2, $subrec);
@@ -1362,7 +1362,7 @@ if ($action=="choosepid") {
 	}
 	$PHON = "";
 	$subrec = GetSubRecord(1, "1 PHON", $gedrec);
-	if (!empty($subrec) && !FactEditRestricted($pid, $subrec)) {
+	if (!empty($subrec) && !PrivacyFunctions::FactEditRestricted($pid, $subrec)) {
 		$ct = preg_match("/1 PHON (.*)/", $subrec, $match);
 		if ($ct>0) $PHON = trim($match[1]);
 		$PHON .= GetCont(2, $subrec);
@@ -1371,14 +1371,14 @@ if ($action=="choosepid") {
 	$ct = preg_match("/1 (_?EMAIL) (.*)/", $gedrec, $match);
 	if ($ct>0) {
 		$subrec = GetSubRecord(1, "1 ".$match[1], $gedrec);
-		if (!FactEditRestricted($pid, $subrec)) {
+		if (!PrivacyFunctions::FactEditRestricted($pid, $subrec)) {
 			$EMAIL = trim($match[2]);
 			$EMAIL .= GetCont(2, $subrec);
 		}
 	}
 	$FAX = "";
 	$subrec = GetSubRecord(1, "1 FAX", $gedrec);
-	if (!empty($subrec) && !FactEditRestricted($pid, $subrec)) {
+	if (!empty($subrec) && !PrivacyFunctions::FactEditRestricted($pid, $subrec)) {
 			$ct = preg_match("/1 FAX (.*)/", $subrec, $match);
 			if ($ct>0) $FAX = trim($match[1]);
 			$FAX .= GetCont(2, $subrec);
@@ -1406,7 +1406,7 @@ if ($action=="choosepid") {
 				if ($rfact!=$fact) $newreqd[] = $rfact;
 			}
 			$reqdfacts = $newreqd;
-			if (!FactEditRestricted($pid, $subrec)) $indifacts[] = array($fact, $subrec, false, $repeat_tags[$fact]);
+			if (!PrivacyFunctions::FactEditRestricted($pid, $subrec)) $indifacts[] = array($fact, $subrec, false, $repeat_tags[$fact]);
 		}
 	}
 	foreach($reqdfacts as $ind=>$fact) {
@@ -1492,7 +1492,7 @@ function checkform(frm) {
 						
 			print "<td id=\"pagetab$i\" class=\"tab_cell_inactive\" onclick=\"switch_tab($i); return false;\"><a href=\"javascript: ".$gm_lang["family_with"]."&nbsp;";
 			if (!empty($spid)) {
-				if (displayDetailsById($spid) && showLivingNameById($spid)) {
+				if (PrivacyFunctions::displayDetailsById($spid) && PrivacyFunctions::showLivingNameById($spid)) {
 					print PrintReady(str_replace(array("<span class=\"starredname\">", "</span>"), "", GetPersonName($spid, $parrec)));
 					print "\" onclick=\"switch_tab($i); return false;\">".$gm_lang["family_with"]." ";
 					print PrintReady(GetPersonName($spid, $parrec));
@@ -1713,7 +1713,7 @@ if (count($addfacts)>0) { ?>
 <?php }
 
 // NOTE: Add photo
-if ($MediaFS->DirIsWritable($MEDIA_DIRECTORY)) { ?>
+if (MediaFS::DirIsWritable($MEDIA_DIRECTORY)) { ?>
 <tr><td>&nbsp;</td></tr>
 <tr><td class="topbottombar" colspan="4"><b><?php print_help_link("quick_update_photo_help", "qm"); print $gm_lang["update_photo"]; ?></b></td></tr>
 <tr>
@@ -1828,7 +1828,7 @@ for($i=1; $i<=count($sfams); $i++) {
 			$rec = GetChangeData(false, $spid, true, "gedlines");
 			$parrec = $rec[$GEDCOM][$spid];
 		}
-		if (displayDetailsById($spid) && showLivingNameById($spid)) {
+		if (PrivacyFunctions::displayDetailsById($spid) && PrivacyFunctions::showLivingNameById($spid)) {
 			print "<a href=\"#\" onclick=\"return quickEdit('".$spid."');\">";
 			$name = PrintReady(GetPersonName($spid, $parrec));
 			if ($SHOW_ID_NUMBERS) $name .= " (".$spid.")";
@@ -2051,10 +2051,10 @@ $chil = FindChildrenInRecord($famrec);
 					}
 					print "<tr><td class=\"optionbox\">";
 					$name = GetPersonName($child, $childrec);
-					$disp = displayDetailsById($child);
+					$disp = PrivacyFunctions::displayDetailsById($child);
 					if ($SHOW_ID_NUMBERS) $name .= " (".$child.")";
 					else $childrec = FindPersonRecord($child);
-					if ($disp||showLivingNameById($child)) {
+					if ($disp || PrivacyFunctions::showLivingNameById($child)) {
 						$isF = GetGedcomValue("SEX", 1, $childrec, "", false);
 						$name .= "<img id=\"box-F.$i.$child-sex\" src=\"$GM_IMAGE_DIR/";
 						if ($isF=="M") $name .= $GM_IMAGES["sex"]["small"]."\" title=\"".$gm_lang["male"]."\" alt=\"".$gm_lang["male"];
@@ -2069,7 +2069,7 @@ $chil = FindChildrenInRecord($famrec);
 					if ($disp) {
 						$birtrec = GetSubRecord(1, "BIRT", $childrec);
 						if (!empty($birtrec)) {
-							if (showFact("BIRT", $child) && !FactViewRestricted($child, $birtrec)) {
+							if (PrivacyFunctions::showFact("BIRT", $child) && !PrivacyFunctions::FactViewRestricted($child, $birtrec)) {
 								print GetGedcomValue("DATE", 2, $birtrec);
 								print " -- ";
 								print GetGedcomValue("PLAC", 2, $birtrec);
@@ -2378,7 +2378,7 @@ for($j=1; $j<=count($cfams); $j++) {
 	<?php
 	$label = $gm_lang["father"];
 	if (!empty($parents["HUSB"])) {
-		if (displayDetailsById($parents["HUSB"]) && showLivingNameById($parents["HUSB"])) {
+		if (PrivacyFunctions::displayDetailsById($parents["HUSB"]) && PrivacyFunctions::showLivingNameById($parents["HUSB"])) {
 			$fatherrec = FindPersonRecord($parents["HUSB"]);
 			if (GetChangeData(true, $parents["HUSB"], true)) {
 				$rec = GetChangeData(false, $parents["HUSB"], true, "gedlines");
@@ -2489,7 +2489,7 @@ for($j=1; $j<=count($cfams); $j++) {
 <?php
 	$label = $gm_lang["mother"];
 	if (!empty($parents["WIFE"])) {
-		if (displayDetailsById($parents["WIFE"]) && showLivingNameById($parents["WIFE"])) {
+		if (PrivacyFunctions::displayDetailsById($parents["WIFE"]) && PrivacyFunctions::showLivingNameById($parents["WIFE"])) {
 			$motherrec = FindPersonRecord($parents["WIFE"]);
 			if (GetChangeData(true, $parents["WIFE"], true)) {
 				$rec = GetChangeData(false, $parents["WIFE"], true, "gedlines");
@@ -2711,9 +2711,9 @@ $chil = FindChildrenInRecord($famrec);
 						$childrec = $rec[$GEDCOM][$child];
 					}
 					$name = GetPersonName($child, $childrec);
-					$disp = displayDetailsById($child);
+					$disp = PrivacyFunctions::displayDetailsById($child);
 					if ($SHOW_ID_NUMBERS) $name .= " (".$child.")";
-					if ($disp||showLivingNameById($child)) {
+					if ($disp || PrivacyFunctions::showLivingNameById($child)) {
 						$isF = GetGedcomValue("SEX", 1, $childrec, "", false);
 						$name .= "<img id=\"box-F.$i.$child-sex\" src=\"$GM_IMAGE_DIR/";
 						if ($isF=="M") $name .= $GM_IMAGES["sex"]["small"]."\" title=\"".$gm_lang["male"]."\" alt=\"".$gm_lang["male"];
@@ -2728,7 +2728,7 @@ $chil = FindChildrenInRecord($famrec);
 					if ($disp) {
 						$birtrec = GetSubRecord(1, "BIRT", $childrec);
 						if (!empty($birtrec)) {
-							if (showFact("BIRT", $child) && !FactViewRestricted($child, $birtrec)) {
+							if (PrivacyFunctions::showFact("BIRT", $child) && !PrivacyFunctions::FactViewRestricted($child, $birtrec)) {
 								print GetGedcomValue("DATE", 2, $birtrec);
 								print " -- ";
 								print GetGedcomValue("PLAC", 2, $birtrec);

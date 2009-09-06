@@ -47,7 +47,6 @@ class DbLayer extends MysqlDb {
 	 * @return 	bool 	return true if the database is correct otherwise returns false
 	 */
 	public function CheckDBLayout() {
-		global $DBNAME, $TBLPREFIX;
 		
 		if (file_exists("includes/values/db_layout.php")) require("includes/values/db_layout.php");
 		else if (file_exists("values/db_layout.php")) require("values/db_layout.php");
@@ -74,17 +73,17 @@ class DbLayer extends MysqlDb {
 			$sql = "SET SQL_QUOTE_SHOW_CREATE=0";
 			$res = NewQuery($sql);
 		}
-		$sql = "SHOW CREATE DATABASE `".$DBNAME."`";
+		$sql = "SHOW CREATE DATABASE `".DBNAME."`";
 		$res = NewQuery($sql);
 		$string = $res->FetchRow();
 		$ct = preg_match("/DEFAULT CHARACTER SET (.+)\*/", $string[1], $charset);
 		if ($charset[1] != $server_charset) {
-			$sql = "ALTER DATABASE `".$DBNAME."` CHARACTER SET ".$server_charset;
+			$sql = "ALTER DATABASE `".DBNAME."` CHARACTER SET ".$server_charset;
 			$res = NewQuery($sql);
 		}
 		
 		// Now get the tables
-		$sql = "SHOW TABLES FROM `".$DBNAME."` LIKE '".preg_replace("/_/","\_", $TBLPREFIX)."%'";
+		$sql = "SHOW TABLES FROM `".DBNAME."` LIKE '".preg_replace("/_/","\_", TBLPREFIX)."%'";
 		$result = NewQuery($sql);
 		$deleterows = array();
 		$deletekeys = array();
@@ -154,7 +153,7 @@ class DbLayer extends MysqlDb {
 		}
 		$result->FreeResult();
 		if (count($db_layout) > 0 || count($deleterows) > 0 || count($deletekeys) > 0 || count($deletetables) > 0) {
-			$tablename = $TBLPREFIX."log";
+			$tablename = TBLPREFIX."log";
 			// NOTE: Check if the log table is affected. If so, restore it
 			if (array_key_exists($tablename, $db_layout)) {
 				$fields = $db_layout[$tablename];
@@ -251,7 +250,7 @@ class DbLayer extends MysqlDb {
 			foreach ($db_layout as $tablename => $fields) {
 				$fmsg = "";
 				$kmsg = "";
-				if ($tablename != $TBLPREFIX."log") {
+				if ($tablename != TBLPREFIX."log") {
 					$res = NewQuery("SHOW TABLES LIKE '".$tablename."'");
 					if ($res->NumRows() > 0) {
 						// NOTE: Table exists, only add the missing entries

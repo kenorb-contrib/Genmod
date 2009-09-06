@@ -41,7 +41,7 @@ $file=urldecode($file);
 $et = preg_match("/(\.\w+)$/", $file, $ematch);
 if ($et>0) $ext = substr(trim($ematch[1]),1);
 else $ext = "";
-if (!$MediaFS->IsValidMedia($file)) {
+if (!MediaFS::IsValidMedia($file)) {
 	WriteToLog("ShowBlob-> Illegal display attempt. File: ".$file, "W", "S");
 	exit;
 }
@@ -50,12 +50,12 @@ if (!$MediaFS->IsValidMedia($file)) {
 $m = RelativePathFile($MEDIA_DIRECTORY);
 if (!empty($m)) $mfile = preg_replace("~^$m~", "", $file);
 else $mfile = $file;
-$sql = "SELECT m_media FROM ".$TBLPREFIX."media WHERE m_file='".$mfile."' AND m_gedfile='".$GEDCOMID."'";
+$sql = "SELECT m_media FROM ".TBLPREFIX."media WHERE m_file='".$mfile."' AND m_gedfile='".$GEDCOMID."'";
 $res = NewQuery($sql);
 
 // Check the privacy settings
 while ($row = $res->FetchRow()) {
-	if (!DisplayDetailsByID($row[0], "OBJE", 2, true)) {
+	if (!PrivacyFunctions::DisplayDetailsByID($row[0], "OBJE", 2, true)) {
 		WriteToLog("ShowBlob-> Unauthorised access to media: ".$file, "W", "S");
 		header("HTTP/1.1 403 Forbidden");
 		exit;
@@ -64,8 +64,8 @@ while ($row = $res->FetchRow()) {
 // Unlinked files are not checked for privacy. We can block them, but then we cannot display unlinked files anymore!
 
 if (!isset($type)) $type = "";
-if ($type != "thumb") $sql = "SELECT mdf_data FROM ".$TBLPREFIX."media_datafiles WHERE mdf_file='".$file."' ORDER BY mdf_id ASC";
-else $sql = "SELECT mtf_data FROM ".$TBLPREFIX."media_thumbfiles WHERE mtf_file='".$file."' ORDER BY mtf_id ASC";
+if ($type != "thumb") $sql = "SELECT mdf_data FROM ".TBLPREFIX."media_datafiles WHERE mdf_file='".$file."' ORDER BY mdf_id ASC";
+else $sql = "SELECT mtf_data FROM ".TBLPREFIX."media_thumbfiles WHERE mtf_file='".$file."' ORDER BY mtf_id ASC";
 $res = NewQuery($sql);
 
 if ($res->NumRows() == 0) {

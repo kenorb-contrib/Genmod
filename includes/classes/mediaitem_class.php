@@ -59,7 +59,7 @@ class MediaItem extends GedcomRecord {
 	}
 	
 	public function __construct($details, $gedrec="", $gedcomid="") {
-		global $TBLPREFIX, $GEDCOMID, $MediaFS, $MEDIA_DIRECTORY;
+		global $GEDCOMID, $MEDIA_DIRECTORY;
 		
 		if (is_array($details)) parent::__construct($details["m_media"], $details["m_gedrec"], $details["m_gedfile"]);
 		else parent::__construct($details, $gedrec, $gedcomid);
@@ -71,12 +71,12 @@ class MediaItem extends GedcomRecord {
 			$this->extension = $details["m_ext"];
 			$t = trim($details["m_titl"]);
 			if (!empty($t) && $this->disp) $this->title = $t;
-			if ($this->show_changes && $this->ThisChanged()) $this->filename = RelativePathFile(FilenameDecode($MediaFS->CheckMediaDepth(GetGedcomValue("FILE", 1, $this->GetChangedGedrec()))));
-			else $this->filename = RelativePathFile(FilenameDecode($MediaFS->CheckMediaDepth($details["m_file"])));
+			if ($this->show_changes && $this->ThisChanged()) $this->filename = RelativePathFile(FilenameDecode(MediaFS::CheckMediaDepth(GetGedcomValue("FILE", 1, $this->GetChangedGedrec()))));
+			else $this->filename = RelativePathFile(FilenameDecode(MediaFS::CheckMediaDepth($details["m_file"])));
 		}
 		else {
-			if ($this->show_changes && $this->ThisChanged()) $this->filename = RelativePathFile(FilenameDecode($MediaFS->CheckMediaDepth(GetGedcomValue("FILE", 1, $this->GetChangedGedrec()))));
-			else $this->filename = RelativePathFile(FilenameDecode($MediaFS->CheckMediaDepth(GetGedcomValue("FILE", 1,$this->gedrec))));
+			if ($this->show_changes && $this->ThisChanged()) $this->filename = RelativePathFile(FilenameDecode(MediaFS::CheckMediaDepth(GetGedcomValue("FILE", 1, $this->GetChangedGedrec()))));
+			else $this->filename = RelativePathFile(FilenameDecode(MediaFS::CheckMediaDepth(GetGedcomValue("FILE", 1,$this->gedrec))));
 			
 		}
 		if (stristr($this->filename, "://")) $this->fileobj = new MFile($this->filename);
@@ -122,8 +122,8 @@ class MediaItem extends GedcomRecord {
 				if ($this->show_changes && $this->ThisChanged()) $gedrec = $this->GetChangedGedRec();
 				else $gedrec = $this->gedrec;
 
-				if (!ShowFactDetails("TITL", $this->xref, "OBJE") || !ShowFactDetails("FILE", $this->xref, "OBJE")) $this->title = $gm_lang["private"];
-				else if (!ShowFact("TITL", $this->xref, "OBJE")) $this->title = $gm_lang["unknown"];
+				if (!PrivacyFunctions::ShowFactDetails("TITL", $this->xref, "OBJE") || !PrivacyFunctions::showFactDetails("FILE", $this->xref, "OBJE")) $this->title = $gm_lang["private"];
+				else if (!PrivacyFunctions::showFact("TITL", $this->xref, "OBJE")) $this->title = $gm_lang["unknown"];
 				else $this->title = $this->GetMediaDescriptor();
 			}
 			else $this->title = $gm_lang["private"];
@@ -175,13 +175,12 @@ class MediaItem extends GedcomRecord {
 	 * @return array
 	 */
 	protected function GetLinksFromIndis() {
-		global $TBLPREFIX;
 
 		if (!is_null($this->indilist)) return $this->indilist;
 		$this->indilist = array();
 		$this->indi_hide = 0;
 		
-		$sql = "SELECT DISTINCT i_key, i_gedcom, i_isdead, i_id, i_file  FROM ".$TBLPREFIX."media_mapping, ".$TBLPREFIX."individuals WHERE mm_media='".$this->xref."' AND mm_gedfile='".$this->gedcomid."' AND mm_type='INDI' AND mm_gid=i_id AND mm_gedfile=i_file";
+		$sql = "SELECT DISTINCT i_key, i_gedcom, i_isdead, i_id, i_file  FROM ".TBLPREFIX."media_mapping, ".TBLPREFIX."individuals WHERE mm_media='".$this->xref."' AND mm_gedfile='".$this->gedcomid."' AND mm_type='INDI' AND mm_gid=i_id AND mm_gedfile=i_file";
 		$res = NewQuery($sql);
 		while($row = $res->FetchAssoc()){
 			$person = null;
@@ -201,13 +200,12 @@ class MediaItem extends GedcomRecord {
 	 * @return array
 	 */
 	protected function GetLinksFromFams() {
-		global $TBLPREFIX;
 
 		if (!is_null($this->famlist)) return $this->famlist;
 		$this->famlist = array();
 		$this->fam_hide = 0;
 		
-		$sql = "SELECT DISTINCT f_key, f_gedcom, f_id, f_file, f_husb, f_wife  FROM ".$TBLPREFIX."media_mapping, ".$TBLPREFIX."families WHERE mm_media='".$this->xref."' AND mm_gedfile='".$this->gedcomid."' AND mm_type='FAM' AND mm_gid=f_id AND mm_gedfile=f_file";
+		$sql = "SELECT DISTINCT f_key, f_gedcom, f_id, f_file, f_husb, f_wife  FROM ".TBLPREFIX."media_mapping, ".TBLPREFIX."families WHERE mm_media='".$this->xref."' AND mm_gedfile='".$this->gedcomid."' AND mm_type='FAM' AND mm_gid=f_id AND mm_gedfile=f_file";
 		$res = NewQuery($sql);
 		while($row = $res->FetchAssoc()){
 			$family = null;
@@ -227,13 +225,12 @@ class MediaItem extends GedcomRecord {
 	 * @return array
 	 */
 	protected function GetLinksFromSources() {
-		global $TBLPREFIX;
 
 		if(!is_null($this->sourcelist)) return $this->sourcelist;
 		$this->sourcelist = array();
 		$this->sour_hide = 0;
 		
-		$sql = 	"SELECT DISTINCT s_key, s_id, s_gedcom, s_file FROM ".$TBLPREFIX."media_mapping, ".$TBLPREFIX."sources WHERE mm_media='".$this->xref."' AND mm_gedfile='".$this->gedcomid."' AND mm_type='SOUR' AND s_file=mm_gedfile AND s_id=mm_gid";
+		$sql = 	"SELECT DISTINCT s_key, s_id, s_gedcom, s_file FROM ".TBLPREFIX."media_mapping, ".TBLPREFIX."sources WHERE mm_media='".$this->xref."' AND mm_gedfile='".$this->gedcomid."' AND mm_type='SOUR' AND s_file=mm_gedfile AND s_id=mm_gid";
 		$res = NewQuery($sql);
 		while($row = $res->FetchAssoc()){
 			$source = null;
@@ -251,7 +248,6 @@ class MediaItem extends GedcomRecord {
 	 * @return array
 	 */
 	protected function GetLinksFromRepos() {
-		global $TBLPREFIX;
 		
 		if (!is_null($this->repolist)) return $this->repolist;
 		
@@ -259,7 +255,7 @@ class MediaItem extends GedcomRecord {
 		$this->repo_hide = 0;
 		
 		// repositories can be linked from 
-		$sql = 	"SELECT o_id, o_gedcom FROM ".$TBLPREFIX."media_mapping, ".$TBLPREFIX."other WHERE mm_media='".$this->xref."' AND mm_gedfile='".$this->gedcomid."' AND mm_type='REPO' AND o_type='REPO' AND o_file=mm_gedfile AND o_id=mm_gid";
+		$sql = 	"SELECT o_id, o_gedcom FROM ".TBLPREFIX."media_mapping, ".TBLPREFIX."other WHERE mm_media='".$this->xref."' AND mm_gedfile='".$this->gedcomid."' AND mm_type='REPO' AND o_type='REPO' AND o_file=mm_gedfile AND o_id=mm_gid";
 		$res = NewQuery($sql);
 		while($row = $res->FetchAssoc()){
 			$repo = null;
@@ -275,12 +271,12 @@ class MediaItem extends GedcomRecord {
 	/** Get the ID's linked to this media
 	*/
 	public function GetMediaLinks($pid, $type="", $applypriv=true) {
-		global $TBLPREFIX, $GEDCOMID;
+		global $GEDCOMID;
 	
 		if (empty($pid)) return false;
 
 		$links = array();	
-		$sql = "SELECT mm_gid FROM ".$TBLPREFIX."media_mapping WHERE mm_media='".$pid."'";
+		$sql = "SELECT mm_gid FROM ".TBLPREFIX."media_mapping WHERE mm_media='".$pid."'";
 		if (!empty($type)) $sql .= " AND mm_type='".$type."'";
 		$sql .= " AND mm_gedfile='".$GEDCOMID."'";
 		$res = NewQuery($sql);
@@ -289,7 +285,7 @@ class MediaItem extends GedcomRecord {
 				$links[] = $row[0];
 			}
 			else {
-				if (ShowFact("OBJE", $row[0], $type)) {
+				if (PrivacyFunctions::showFact("OBJE", $row[0], $type)) {
 					$links[] = $row[0];
 				}
 			}

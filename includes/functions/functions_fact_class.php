@@ -293,15 +293,16 @@ abstract class FactFunctions {
 					}
 				}
 				if ($prted) print "<br /><br />";
+				$prted = true; // Set this so regardless if anything is printed before, source/notes/obje's will print on a new line
 				
 				// -- find source for each fact
-				if (ShowFact("SOUR", $pid, "SOUR")) $n1 = self::PrintFactSources($factobj, 2, $prted);
+				if (PrivacyFunctions::showFact("SOUR", $pid, "SOUR")) $n1 = self::PrintFactSources($factobj, 2, $prted);
 				
 				// -- find notes for each fact
-				if (ShowFact("NOTE", $pid, "NOTE")) $n2 = self::PrintFactNotes($factobj, 2, !$prted);
+				if (PrivacyFunctions::showFact("NOTE", $pid, "NOTE")) $n2 = self::PrintFactNotes($factobj, 2, !$prted);
 				
 				//-- find multimedia objects
-				if (ShowFact("OBJE", $pid, "OBJE")) $n3 = self::PrintFactMedia($factobj, 2, !$prted);
+				if (PrivacyFunctions::showFact("OBJE", $pid, "OBJE")) $n3 = self::PrintFactMedia($factobj, 2, !$prted);
 				
 				// -- Find RESN tag
 				if (isset($resn_value)) {
@@ -490,16 +491,16 @@ abstract class FactFunctions {
 	 * @param string $pid		The gedcom XREF id for the level 0 record that this note is a part of
 	 */
 	public function PrintMainNotes($factobj, $pid, $mayedit=true) {
-
-		 if ($factobj->linktype == "Note") $note =& Note::GetInstance($factobj->linkxref);
-		 if ($factobj->linktype != "Note" || $note->disp) {
+		
+		if ($factobj->linktype == "Note") $note =& Note::GetInstance($factobj->linkxref);
+		if ($factobj->linktype != "Note" || $note->disp) {
 			print "\n\t\t\t<tr>";
 			self::PrintFactTagBox(&$factobj, $mayedit);
 			print "\n<td class=\"shade1 ".$factobj->style." wrap\">";
 			if ($factobj->disp) {
 				if ($factobj->linktype == "") {
 					$text = "";
-					$nt = preg_match("/1 NOTE (.*)(?:\r\n|\n|\r)/", $factobj->factrec, $n1match);
+					$nt = preg_match("/1 NOTE (.*)(\r\n|\n|\r)*/", $factobj->factrec, $n1match);
 					if ($nt>0) $text = preg_replace("/~~/", "<br />", $n1match[1]);
 					$text .= GetCont(2, $factobj->factrec);
 					$text = ExpandUrl($text);
@@ -746,8 +747,8 @@ abstract class FactFunctions {
 	
 	//-- Print the links to multi-media objects
 	public function PrintFactMedia($factobj, $level, $nobr=true) {
-		global $TEXT_DIRECTION, $TBLPREFIX, $GEDCOMS, $MEDIATYPE;
-		global $gm_lang, $GM_IMAGE_DIR, $GM_IMAGES, $GEDCOM, $MediaFS;
+		global $TEXT_DIRECTION, $GEDCOMS, $MEDIATYPE;
+		global $gm_lang, $GM_IMAGE_DIR, $GM_IMAGES, $GEDCOM;
 		global $MEDIA_DIRECTORY, $MEDIA_EXTERNAL, $GEDCOMID, $USE_GREYBOX, $INDI_EXT_FAM_FACTS;
 		
 		// This is to prevent that notes are printed as part of the fact for family facts displayed on the indipage
@@ -849,11 +850,11 @@ abstract class FactFunctions {
 							print "\n\t\t\t<br /><span class=\"label\">".$gm_lang["type"].": </span> <span class=\"field\">$match[1]</span>";
 						}
 						print "<br />\n";
-						if (ShowFact("NOTE", $media->xref) && ShowFactDetails("NOTE", $media->xref)) {
+						if (PrivacyFunctions::showFact("NOTE", $media->xref) && PrivacyFunctions::showFactDetails("NOTE", $media->xref)) {
 							$prtd = self::PrintFactNotes($media, 1, !$printed); // Level is 1 because the notes are subordinate to the linked record, NOT to the link!
 						}
 						else $prtd = true;
-						if (ShowFact("SOUR", $media->xref) && ShowFactDetails("SOUR", $media->xref)) {
+						if (PrivacyFunctions::showFact("SOUR", $media->xref) && PrivacyFunctions::showFactDetails("SOUR", $media->xref)) {
 							self::PrintFactSources($media, 1, !$prtd); // Level is 1 because the sourcelinks are subordinate to the linked record, NOT to the link!
 						}
 					}
@@ -896,9 +897,10 @@ abstract class FactFunctions {
 			$edit_actions = array("edit_media_link", "edit_media_link", "copy_media", "delete_media");
 		}
 		else {
-			$label = preg_replace("/^X_/", "_", $factobj->factref);
-			if (defined("GM_FACT_".$label)) print constant("GM_FACT_".$label);
-			else print $label;
+			print $factobj->descr;
+//			$label = preg_replace("/^X_/", "_", $factobj->factref);
+//			if (defined("GM_FACT_".$label)) print constant("GM_FACT_".$label);
+//			else print $label;
 			if ($factobj->factref == "X_BIRT_CHIL" && isset($n_chil)) print "<br />".$gm_lang["number_sign"].$n_chil++;
 			if ($factobj->factref == "X_BIRT_GCHI" && isset($n_gchi)) print "<br />".$gm_lang["number_sign"].$n_gchi++;
 			$edit_actions = array("edit_fact", "edit_fact", "copy_fact", "delete_fact");
@@ -981,7 +983,9 @@ abstract class FactFunctions {
 		for ($i=0; $i<$ct; $i++) {
 			$level = substr($match[$i][0],0,1);
 			$pid2 = $match[$i][1];
-			if (!empty($pid2)) {
+			$asso =& Person::GetInstance($pid2);
+			if ($asso->isempty) $asso =& Family::GetInstance($pid2); 
+			if (!$asso->isempty) {
 				// get RELAtionship field
 				$assorec = GetSubRecord($level, " ASSO ", $factobj->factrec, $i+1);
 				$rct = preg_match("/\d RELA (.*)/", $assorec, $rmatch);
@@ -999,8 +1003,7 @@ abstract class FactFunctions {
 				else $rela = GM_FACT_RELA; // default
 	
 				// ASSOciate ID link
-				$asso =& Person::GetInstance($pid2);
-				if (!$asso->isempty) {
+				if ($asso->datatype == "INDI") {
 					print "<a href=\"individual.php?pid=".$asso->xref."&amp;gedid=".$asso->gedcomid."\">" . $asso->name;
 					if (!empty($asso->addname)) print " - " . PrintReady($asso->addname);
 					print $asso->addxref;
@@ -1022,12 +1025,10 @@ abstract class FactFunctions {
 						}
 					}
 				}
-				else if (strstr($gedrec, "@ FAM")!==false) {
+				else if ($asso->disp) {
 					print "<a href=\"family.php?famid=$pid2\">";
-					if ($TEXT_DIRECTION == "ltr") print " &lrm;"; else print " &rlm;";
-					print "[".$gm_lang["view_family"];
-		  			if ($SHOW_FAM_ID_NUMBERS) print " &lrm;($pid2)&lrm;";
-		  			if ($TEXT_DIRECTION == "ltr") print "&lrm;]</a>\n"; else print "&rlm;]</a>\n";
+					print $asso->sortable_name.$asso->addxref;
+					print "</a>\n";
 				}
 				else {
 					print $gm_lang["unknown"];

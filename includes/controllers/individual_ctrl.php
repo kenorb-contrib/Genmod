@@ -111,9 +111,6 @@ class IndividualController extends DetailController {
 		if ($gm_user->userCanViewGedlines() && $this->indi->disp) $this->canshowgedrec = true;
 		else $this->canshowgedrec = false;
 		
-		// NOTE: Parse all facts into arrays
-		$this->indi->parseIndiFacts();
-		
 		// NOTE: add_family_facts parses all facts as it calls the parseFacts function
 		$this->indi->AddFamilyFacts();
 		
@@ -180,7 +177,7 @@ class IndividualController extends DetailController {
 		global $SHOW_HIGHLIGHT_IMAGES, $USE_THUMBS_MAIN, $MEDIA_DIRECTORY;
 
 		if (is_null($this->canshowhighlightedobj)) {
-			if ($this->indi->disp && $SHOW_HIGHLIGHT_IMAGES && ShowFact("OBJE", $this->xref, "OBJE")) {
+			if ($this->indi->disp && $SHOW_HIGHLIGHT_IMAGES && PrivacyFunctions::showFact("OBJE", $this->xref, "OBJE")) {
 				$firstmediarec = $this->indi->highlightedimage;
 				if ($firstmediarec) {
 					// new from here
@@ -420,7 +417,7 @@ class IndividualController extends DetailController {
 	public function PrintNameRecord($factrec, $count, $showedit=true) {
 		global $gm_lang, $NAME_REVERSE;
 		
-		if ((!showFact("NAME", $this->xref))||(!showFactDetails("NAME", $this->xref))) return false;
+		if ((!PrivacyFunctions::showFact("NAME", $this->xref))||(!PrivacyFunctions::showFactDetails("NAME", $this->xref))) return false;
 		
 		$lines = split("\n", $factrec);
 		$this->name_count++;
@@ -495,7 +492,7 @@ class IndividualController extends DetailController {
 	public function GenderRecord($factrec, $linenum) {
 		global $gm_lang, $sex, $GM_IMAGE_DIR, $GM_IMAGES;
 		
-		if ((!showFact("SEX", $this->xref))||(!showFactDetails("SEX", $this->xref))) return false;
+		if ((!PrivacyFunctions::showFact("SEX", $this->xref))||(!PrivacyFunctions::showFactDetails("SEX", $this->xref))) return false;
 		
 		$this->indi->sexdetails["add"] = false;
 		$ft = preg_match("/\d\s(\w+)(.*)/", $factrec, $match);

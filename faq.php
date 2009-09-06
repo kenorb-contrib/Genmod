@@ -58,22 +58,22 @@ if ($canconfig && $adminedit) {?>
 			if (isset($faqs[$order])) {
 				foreach ($faqs as $key => $item) {
 					if ($key >= $order) {
-						$sql = "UPDATE ".$TBLPREFIX."blocks SET b_order='".($key+1)."' WHERE b_id='".$faqs[$key]["header"]["pid"]."' and b_location='header'";;
+						$sql = "UPDATE ".TBLPREFIX."blocks SET b_order='".($key+1)."' WHERE b_id='".$faqs[$key]["header"]["pid"]."' and b_location='header'";;
 						$res = NewQuery($sql);
-						$sql = "UPDATE ".$TBLPREFIX."blocks SET b_order='".($key+1)."' WHERE b_id='".$faqs[$key]["body"]["pid"]."' and b_location='body'";
+						$sql = "UPDATE ".TBLPREFIX."blocks SET b_order='".($key+1)."' WHERE b_id='".$faqs[$key]["body"]["pid"]."' and b_location='body'";
 						$res = NewQuery($sql);
 					}
 				}
 			}
-			$sql = "UPDATE ".$TBLPREFIX."blocks SET b_order='".$order."', b_config='".$DBCONN->EscapeQuery(serialize($header))."' WHERE b_id='".$pidh."' and b_username='".$GEDCOMID."' and b_location='header'";
+			$sql = "UPDATE ".TBLPREFIX."blocks SET b_order='".$order."', b_config='".DbLayer::EscapeQuery(serialize($header))."' WHERE b_id='".$pidh."' and b_username='".$GEDCOMID."' and b_location='header'";
 			$res = NewQuery($sql);
-			$sql = "UPDATE ".$TBLPREFIX."blocks SET b_order='".$order."', b_config='".$DBCONN->EscapeQuery(serialize($body))."' WHERE b_id='".$pidb."'  and b_username='".$GEDCOMID."' and b_location='body'";
+			$sql = "UPDATE ".TBLPREFIX."blocks SET b_order='".$order."', b_config='".DbLayer::EscapeQuery(serialize($body))."' WHERE b_id='".$pidb."'  and b_username='".$GEDCOMID."' and b_location='body'";
 			$res = NewQuery($sql);
 			WriteToLog("FAQ-> FAQ item has been edited.<br />Header ID: ".$pidh.".<br />Body ID: ".$pidb, "I", "G", $GEDCOM);
 			$action = "show";
 		}
 		else if ($type == "delete") {
-			$sql = "DELETE FROM ".$TBLPREFIX."blocks WHERE b_order='".$id."' AND b_name='faq' AND b_username='".$GEDCOMID."'";
+			$sql = "DELETE FROM ".TBLPREFIX."blocks WHERE b_order='".$id."' AND b_name='faq' AND b_username='".$GEDCOMID."'";
 			$res = NewQuery($sql);
 			WriteToLog("FAQ-> FAQ item has been deleted.<br />Header ID: ".$pidh.".<br />Body ID: ".$pidb, "I", "G", $GEDCOM);
 			$action = "show";
@@ -83,17 +83,17 @@ if ($canconfig && $adminedit) {?>
 			if (isset($faqs[$order])) {
 				foreach ($faqs as $key => $item) {
 					if ($key >= $order) {
-						$sql = "UPDATE ".$TBLPREFIX."blocks SET b_order='".($key+1)."' WHERE b_id='".$faqs[$key]["header"]["pid"]."' and b_location='header'";;
+						$sql = "UPDATE ".TBLPREFIX."blocks SET b_order='".($key+1)."' WHERE b_id='".$faqs[$key]["header"]["pid"]."' and b_location='header'";;
 						$res = NewQuery($sql);
-						$sql = "UPDATE ".$TBLPREFIX."blocks SET b_order='".($key+1)."' WHERE b_id='".$faqs[$key]["body"]["pid"]."' and b_location='body'";
+						$sql = "UPDATE ".TBLPREFIX."blocks SET b_order='".($key+1)."' WHERE b_id='".$faqs[$key]["body"]["pid"]."' and b_location='body'";
 						$res = NewQuery($sql);
 					}
 				}
 			}
 			$newid = GetNextId("blocks", "b_id");
-			$sql = "INSERT INTO ".$TBLPREFIX."blocks VALUES ($newid, '".$GEDCOMID."', 'header', '$order', 'faq', '".$DBCONN->EscapeQuery(serialize($header))."')";
+			$sql = "INSERT INTO ".TBLPREFIX."blocks VALUES ($newid, '".$GEDCOMID."', 'header', '$order', 'faq', '".DbLayer::EscapeQuery(serialize($header))."')";
 			$res = NewQuery($sql);
-			$sql = "INSERT INTO ".$TBLPREFIX."blocks VALUES (".($newid+1).", '".$GEDCOMID."', 'body', '".$order."', 'faq', '".$DBCONN->EscapeQuery(serialize($body))."')";
+			$sql = "INSERT INTO ".TBLPREFIX."blocks VALUES (".($newid+1).", '".$GEDCOMID."', 'body', '".$order."', 'faq', '".DbLayer::EscapeQuery(serialize($body))."')";
 			$res = NewQuery($sql);
 			WriteToLog("FAQ-> FAQ item has been added.<br />Header ID: ".$newid.".<br />Body ID: ".($newid+1), "I", "G", $GEDCOM);
 			$action = "show";
@@ -102,14 +102,14 @@ if ($canconfig && $adminedit) {?>
 			$faqs = GetFaqData();
 			if ($id-1 != 0) {
 				if (isset($faqs[$id-1])) {
-					$sql = "UPDATE ".$TBLPREFIX."blocks SET b_order='".($id)."' WHERE b_id='".$faqs[$id-1]["header"]["pid"]."' and b_location='header'";;
+					$sql = "UPDATE ".TBLPREFIX."blocks SET b_order='".($id)."' WHERE b_id='".$faqs[$id-1]["header"]["pid"]."' and b_location='header'";;
 					$res = NewQuery($sql);
-					$sql = "UPDATE ".$TBLPREFIX."blocks SET b_order='".($id)."' WHERE b_id='".$faqs[$id-1]["body"]["pid"]."' and b_location='body'";
+					$sql = "UPDATE ".TBLPREFIX."blocks SET b_order='".($id)."' WHERE b_id='".$faqs[$id-1]["body"]["pid"]."' and b_location='body'";
 					$res = NewQuery($sql);
 				}
-				$sql = "UPDATE ".$TBLPREFIX."blocks SET b_order='".($id-1)."' WHERE b_id='".$pidh."' and b_location='header'";;
+				$sql = "UPDATE ".TBLPREFIX."blocks SET b_order='".($id-1)."' WHERE b_id='".$pidh."' and b_location='header'";;
 				$res = NewQuery($sql);
-				$sql = "UPDATE ".$TBLPREFIX."blocks SET b_order='".($id-1)."' WHERE b_id='".$pidb."' and b_location='body'";
+				$sql = "UPDATE ".TBLPREFIX."blocks SET b_order='".($id-1)."' WHERE b_id='".$pidb."' and b_location='body'";
 				$res = NewQuery($sql);
 				WriteToLog("FAQ-> FAQ item has been moved up.<br />Header ID: ".$pidh.".<br />Body ID: ".$pidb, "I", "G", $GEDCOM);
 			}
@@ -119,15 +119,15 @@ if ($canconfig && $adminedit) {?>
 		else if ($type == "movedown") {
 			$faqs = GetFaqData();
 			if (isset($faqs[$id+1])) {
-				$sql = "UPDATE ".$TBLPREFIX."blocks SET b_order='".($id)."' WHERE b_id='".$faqs[$id+1]["header"]["pid"]."' and b_location='header'";;
+				$sql = "UPDATE ".TBLPREFIX."blocks SET b_order='".($id)."' WHERE b_id='".$faqs[$id+1]["header"]["pid"]."' and b_location='header'";;
 				$res = NewQuery($sql);
-				$sql = "UPDATE ".$TBLPREFIX."blocks SET b_order='".($id)."' WHERE b_id='".$faqs[$id+1]["body"]["pid"]."' and b_location='body'";
+				$sql = "UPDATE ".TBLPREFIX."blocks SET b_order='".($id)."' WHERE b_id='".$faqs[$id+1]["body"]["pid"]."' and b_location='body'";
 				$res = NewQuery($sql);
 			}
 			
-			$sql = "UPDATE ".$TBLPREFIX."blocks SET b_order='".($id+1)."' WHERE b_id='".$pidh."' and b_location='header'";;
+			$sql = "UPDATE ".TBLPREFIX."blocks SET b_order='".($id+1)."' WHERE b_id='".$pidh."' and b_location='header'";;
 			$res = NewQuery($sql);
-			$sql = "UPDATE ".$TBLPREFIX."blocks SET b_order='".($id+1)."' WHERE b_id='".$pidb."' and b_location='body'";
+			$sql = "UPDATE ".TBLPREFIX."blocks SET b_order='".($id+1)."' WHERE b_id='".$pidb."' and b_location='body'";
 			$res = NewQuery($sql);
 			WriteToLog("FAQ item has been moved down.<br />Header ID: ".$pidh.".<br />Body ID: ".$pidb, "I", "G", $GEDCOM);
 			$action = "show";

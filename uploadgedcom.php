@@ -54,8 +54,8 @@
 require "config.php";
 
 if (!$gm_user->userGedcomAdmin()) {
-	if (empty($LOGIN_URL)) header("Location: login.php?url=uploadgedcom.php");
-	else header("Location: ".$LOGIN_URL."?url=uploadgedcom.php");
+	if (LOGIN_URL == "") header("Location: login.php?url=uploadgedcom.php");
+	else header("Location: ".LOGIN_URL."?url=uploadgedcom.php");
 	exit;
 }
 
@@ -101,9 +101,9 @@ else if ($check == "add") {
 	$ok = true;
 }
 else if ($check == "add_new") {
-	if (((!file_exists($INDEX_DIRECTORY.$GEDFILENAME)) && !file_exists($path.$GEDFILENAME))  || $override == "yes") {
+	if (((!file_exists(INDEX_DIRECTORY.$GEDFILENAME)) && !file_exists($path.$GEDFILENAME))  || $override == "yes") {
 		if ($path != "") $fp = fopen($path.$GEDFILENAME, "wb");
-		else	$fp = fopen($INDEX_DIRECTORY.$GEDFILENAME, "wb");
+		else	$fp = fopen(INDEX_DIRECTORY.$GEDFILENAME, "wb");
 		if ($fp) {
 			$newgedcom = "0 HEAD
 1 SOUR Genmod
@@ -136,7 +136,7 @@ else if ($check == "add_new") {
 	}
 	else {
 		if ($path != "") $fp = fopen($path.$GEDFILENAME.".bak", "wb");
-		else	$fp = fopen($INDEX_DIRECTORY.$GEDFILENAME.".bak", "wb");
+		else	$fp = fopen(INDEX_DIRECTORY.$GEDFILENAME.".bak", "wb");
 		if ($fp) {
 			$newgedcom = '0 HEAD
 1 SOUR Genmod
@@ -158,7 +158,7 @@ else if ($check == "add_new") {
 			fwrite($fp, $newgedcom);
 			fclose($fp);
 			if ($path != "") $bakfile = $path.$GEDFILENAME.".bak";
-			else	$bakfile = $INDEX_DIRECTORY.$GEDFILENAME.".bak";
+			else	$bakfile = INDEX_DIRECTORY.$GEDFILENAME.".bak";
 			$ok = false;
 			$verify = "verify_gedcom";
 			$exists = true;
@@ -169,7 +169,7 @@ else if ($check == "cancel_upload") {
 	if ($exists) {
 		unset($GEDCOMS[$GEDFILENAME]);
 		StoreGedcoms();
-		if ($action == "add_new_form") @unlink($INDEX_DIRECTORY.$GEDFILENAME);
+		if ($action == "add_new_form") @unlink(INDEX_DIRECTORY.$GEDFILENAME);
 	}
 	// NOTE: Cleanup everything no longer needed
 	if (isset($bakfile) && file_exists($bakfile)) unlink($bakfile);
@@ -193,7 +193,7 @@ if ($cleanup_needed == "cleanup_needed" && $continue == $gm_lang["del_proceed"])
 		$l_datecleanup=false;
 		$l_isansi = false;
 		$fp = fopen($GEDCOMS[$GEDFILENAME]["path"], "rb");
-		$fw = fopen($INDEX_DIRECTORY."/".$GEDFILENAME.".bak", "wb");
+		$fw = fopen(INDEX_DIRECTORY."/".$GEDFILENAME.".bak", "wb");
 		//-- read the gedcom and test it in 8KB chunks
 		while(!feof($fp)) {
 			$fcontents = fread($fp, 1024*8);
@@ -252,7 +252,7 @@ if ($cleanup_needed == "cleanup_needed" && $continue == $gm_lang["del_proceed"])
 		}
 		fclose($fp);
 		fclose($fw);
-		copy($INDEX_DIRECTORY."/".$GEDFILENAME.".bak", $GEDCOMS[$GEDFILENAME]["path"]);
+		copy(INDEX_DIRECTORY."/".$GEDFILENAME.".bak", $GEDCOMS[$GEDFILENAME]["path"]);
 		$cleanup_needed = false;
 		$import = "true";
 	}
@@ -702,10 +702,6 @@ print "<form enctype=\"multipart/form-data\" method=\"post\" name=\"configform\"
 		print "</div>";
 	}
 	if ($startimport == "true") {
-		//-- set the building index flag to tell the rest of the program that we are importing and so shouldn't
-		//-- perform some of the same checks
-		$BUILDING_INDEX = true;
-		
 		if (isset($exectime)){
 			$oldtime=time()-$exectime;
 			$skip_table=0;

@@ -135,7 +135,7 @@ function print_descendency($pid, $count) {
 	// NOTE: If statement OK
 	if ($count==0) {
 		// NOTE: If statement OK
-		if (showLivingNameByID($pid)) {
+		if (PrivacyFunctions::showLivingNameByID($pid)) {
 			// -- print left arrow for decendants so that we can move down the tree
 			$famids = FindSfamilyIds($pid);
 			//-- make sure there is more than 1 child in the family with parents
@@ -173,7 +173,7 @@ function print_descendency($pid, $count) {
 							else $spid=$parents["WIFE"];
 							if (!empty($spid)) {
 								print "\n\t\t\t\t<a href=\"familybook.php?pid=$spid&amp;show_spouse=$show_spouse&amp;show_full=$show_full&amp;generations=$generations&amp;box_width=$box_width\"><span ";
-								if (showLivingNameById($spid)) {
+								if (PrivacyFunctions::showLivingNameByID($spid)) {
 									$name = GetPersonName($spid);
 									$name = rtrim($name);
 									if (hasRTLText($name))
@@ -191,7 +191,7 @@ function print_descendency($pid, $count) {
 							if ($i>=$num) break;
 							$cid = $smatch[$i][1];
 							print "\n\t\t\t\t&nbsp;&nbsp;<a href=\"familybook.php?pid=$cid&amp;show_spouse=$show_spouse&amp;show_full=$show_full&amp;generations=$generations&amp;box_width=$box_width\"><span ";
-							if (showLivingNameById($cid)) {
+							if (PrivacyFunctions::showLivingNameByID($cid)) {
 								$name = GetPersonName($cid);
 								$name = rtrim($name);
 								if (hasRTLText($name))
@@ -214,7 +214,7 @@ function print_descendency($pid, $count) {
 							if (!empty($parents["HUSB"])) {
 								$spid = $parents["HUSB"];
 								print "\n\t\t\t\t&nbsp;&nbsp;<a href=\"familybook.php?pid=$spid&amp;show_spouse=$show_spouse&amp;show_full=$show_full&amp;generations=$generations&amp;box_width=$box_width\"><span ";
-								if (showLivingNameById($spid)) {
+								if (PrivacyFunctions::showLivingNameByID($spid)) {
 									$name = GetPersonName($spid);
 									$name = rtrim($name);
 									if (hasRTLText($name))
@@ -228,7 +228,7 @@ function print_descendency($pid, $count) {
 							if (!empty($parents["WIFE"])) {
 								$spid = $parents["WIFE"];
 								print "\n\t\t\t\t&nbsp;&nbsp;<a href=\"familybook.php?pid=$spid&amp;show_spouse=$show_spouse&amp;show_full=$show_full&amp;generations=$generations&amp;box_width=$box_width\"><span ";
-								if (showLivingNameById($spid)) {
+								if (PrivacyFunctions::showLivingNameByID($spid)) {
 									$name = GetPersonName($spid);
 									$name = rtrim($name);
 									if (hasRTLText($name))
@@ -248,7 +248,7 @@ function print_descendency($pid, $count) {
 							$cid = $smatch[$i][1];
 							if ($cid!=$pid) {
 								print "\n\t\t\t\t&nbsp;&nbsp;<a href=\"familybook.php?pid=$cid&amp;show_spouse=$show_spouse&amp;show_full=$show_full&amp;generations=$generations&amp;box_width=$box_width\"><span ";
-								if (showLivingNameById($cid)) {
+								if (PrivacyFunctions::showLivingNameByID($cid)) {
 									$name = GetPersonName($cid);
 									$name = rtrim($name);
 									if (hasRTLText($name))
@@ -336,7 +336,7 @@ function print_family_book($pid, $descent)
     if (count($famids)>0 || empty($firstrun)) {
     	$firstrun = true;
         $pid=CheckRootId($pid);
-        if (showLivingNameByID($pid)) $name = GetPersonName($pid);
+        if (PrivacyFunctions::showLivingNameByID($pid)) $name = GetPersonName($pid);
         else $name = $gm_lang["private"];
         
         print "\n\t<h3 style=\"text-align: center\">"."Family of".": ".PrintReady($name)."</h3>";
@@ -362,7 +362,7 @@ function print_family_book($pid, $descent)
             $ct = preg_match_all("/1 CHIL @(.*)@/", $famrec, $match, PREG_SET_ORDER);
             for($i=0; $i<$ct; $i++) {
                 $chil = trim($match[$i][1]);
-                if (displayDetailsById($chil)) print_family_book($chil, $descent-1);
+                if (PrivacyFunctions::displayDetailsById($chil)) print_family_book($chil, $descent-1);
             }
         }
     }
@@ -389,7 +389,7 @@ if ($show_full==false) {
 // -- root id
 if (!isset($pid)) $pid="";
 $pid=CheckRootId($pid);
-if (showLivingNameByID($pid)) $name = GetPersonName($pid);
+if (PrivacyFunctions::showLivingNameByID($pid)) $name = GetPersonName($pid);
 else $name = $gm_lang["private"];
 
 // -- print html header information

@@ -115,7 +115,7 @@ if (isset($topsearch)) {
 
 		// see if it's an indi ID. If it's found and privacy allows it, JUMP!!!!
 		if (FindPersonRecord($query)) {
-			if (showLivingNameByID(str2upper($query))) {
+			if (PrivacyFunctions::showLivingNameByID(str2upper($query))) {
 				header("Location: individual.php?pid=".$query."&ged=".$GEDCOM);
 				exit;
 			}
@@ -125,9 +125,9 @@ if (isset($topsearch)) {
 		$f = FindFamilyRecord($query); 
 		if ($f) {
 			//-- check if we can display both parents
-			if (displayDetailsByID(str2upper($query), "FAM") == true) {
+			if (PrivacyFunctions::displayDetailsByID(str2upper($query), "FAM") == true) {
 				$parents = FindParents($query);
-				if (showLivingNameByID($parents["HUSB"]) && showLivingNameByID($parents["WIFE"])) {
+				if (PrivacyFunctions::showLivingNameByID($parents["HUSB"]) && PrivacyFunctions::showLivingNameByID($parents["WIFE"])) {
 					$ct = preg_match("/0 @(.*)@ (.*)/", $f, $match);
 					if ($ct>0) {
 						$fid = trim($match[1]);
@@ -156,14 +156,14 @@ if (isset($topsearch)) {
 		
 		// see if it's a media ID. If it's found and privacy allows it, JUMP!!!!
 		$f = FindMediaRecord($query);
-		if (!empty($f) && DisplayDetailsByID(str2upper($query), "OBJE", 1, true)) {
+		if (!empty($f) && PrivacyFunctions::DisplayDetailsByID(str2upper($query), "OBJE", 1, true)) {
 			header("Location: mediadetail.php?mid=".$query."&ged=".$GEDCOM);
 			exit;
 		}
 		
 		// see if it's a note ID. If it's found and privacy allows it, JUMP!!!!
 		$f = FindOtherRecord($query);
-		if (!empty($f) && DisplayDetailsByID(str2upper($query), "NOTE", 1, true)) {
+		if (!empty($f) && PrivacyFunctions::DisplayDetailsByID(str2upper($query), "NOTE", 1, true)) {
 			$type = GetRecType($f);
 			if ($type == "NOTE") {
 				header("Location: note.php?oid=".$query."&ged=".$GEDCOM);
@@ -306,7 +306,7 @@ if ($action=="general") {
 					$pid = SplitKey($key, "id");
 					SwitchGedcom($ged);
 					if (!isset($assolist[$key])) {
-						if (showLivingNameByID($pid)) {
+						if (PrivacyFunctions::showLivingNameByID($pid)) {
 							header("Location: individual.php?pid=".$pid."&ged=".get_gedcom_from_id($indi["gedfile"]));
 							exit;
 						}
@@ -319,9 +319,9 @@ if ($action=="general") {
 					$ged = SplitKey($famid, "ged");
 					$famid = SplitKey($famid, "id");
 					SwitchGedcom($ged);
-					if (displayDetailsByID($famid, "FAM") == true) {
+					if (PrivacyFunctions::displayDetailsByID($famid, "FAM") == true) {
 						$parents = FindParents($famid);
-						if (showLivingNameByID($parents["HUSB"]) && showLivingNameByID($parents["WIFE"])) {
+						if (PrivacyFunctions::showLivingNameByID($parents["HUSB"]) && PrivacyFunctions::showLivingNameByID($parents["WIFE"])) {
 							header("Location: family.php?famid=".$famid."&ged=".$GEDCOM);
 							exit;
 						}
@@ -334,7 +334,7 @@ if ($action=="general") {
 					$ged = SplitKey($sid, "ged");
 					$sid = SplitKey($sid, "id");
 					SwitchGedcom($ged);
-					if (displayDetailsByID($sid, "SOUR", 1, true)) {
+					if (PrivacyFunctions::displayDetailsByID($sid, "SOUR", 1, true)) {
 						header("Location: source.php?sid=".$sid."&ged=".get_gedcom_from_id($source["gedfile"]));
 						exit;
 					}
@@ -346,7 +346,7 @@ if ($action=="general") {
 					$ged = SplitKey($rid, "ged");
 					$rid = SplitKey($rid, "id");
 					SwitchGedcom($ged);
-					if (displayDetailsByID($rid, "REPO", 1, true)) {
+					if (PrivacyFunctions::displayDetailsByID($rid, "REPO", 1, true)) {
 						header("Location: repo.php?rid=".$rid."&ged=".get_gedcom_from_id($repo["gedfile"]));
 						exit;
 					}
@@ -395,10 +395,7 @@ if ($action=="soundex") {
 		if (isset($year)) {
 			// We must be able to search regexp in the DB for years
 	    	if (strlen($year) == 1) $year = preg_replace(array("/\?/", "/\|/", "/\*/"), array("\\\?","\\\|", "\\\\\*") , $year);
-			if ($REGEXP_DB) $year = preg_replace(array("/\s+/", "/\(/", "/\)/"), array(".*",'\(','\)'), $year);
-			else {
-				$year = "%".preg_replace("/\s+/", "%", $year)."%";
-			}		
+			$year = preg_replace(array("/\s+/", "/\(/", "/\)/"), array(".*",'\(','\)'), $year);
 		}
 		$sindilist = array();
 			
@@ -441,9 +438,9 @@ if ($action=="soundex") {
 		// Build the query
 		$sql = "SELECT DISTINCT n_id, i_key, i_id, i_gedcom, i_file, i_isdead, n_name, n_surname, n_type, n_letter FROM ";
 
-		if (isset($farr)) $sql .= $TBLPREFIX."soundex as s1, ";
-		if (isset($larr)) $sql .= $TBLPREFIX."soundex as s2, ";
-		$sql .= $TBLPREFIX."individuals, ".$TBLPREFIX."names WHERE i_key=n_key AND ";
+		if (isset($farr)) $sql .= TBLPREFIX."soundex as s1, ";
+		if (isset($larr)) $sql .= TBLPREFIX."soundex as s2, ";
+		$sql .= TBLPREFIX."individuals, ".TBLPREFIX."names WHERE i_key=n_key AND ";
 		
 		if (isset($farr)) {
 			
@@ -660,7 +657,7 @@ if ($action=="soundex") {
 		if (count($printindiname)==1) {
 			$GEDCOM = $printindiname[0][2];
 			SwitchGedcom($GEDCOM);
-			if (showLivingNameByID($printindiname[0][1])) {
+			if (PrivacyFunctions::showLivingNameByID($printindiname[0][1])) {
 				header("Location: individual.php?pid=".$printindiname[0][1]."&ged=".$printindiname[0][2]);
 				exit;
 			}
@@ -948,7 +945,7 @@ if ($action=="general") {
 					foreach($cquery["includes"] as $qindex => $squery) {
 		    			if (strpos(Str2Upper($key), Str2Upper($squery["term"])) !== false) {
 			    			$hit = true;
-			    			if (DisplayDetailsByID($key, "INDI") || ShowLivingNameByID($key)) $found = true;
+			    			if (PrivacyFunctions::DisplayDetailsByID($key, "INDI") || PrivacyFunctions::showLivingNameByID($key)) $found = true;
 			    			else {
 				    			$nodisplay = true;
 			    			}
@@ -984,7 +981,7 @@ if ($action=="general") {
 												else if ($result2[1] == "SOUR") $rtype = "SOUR";
 												else $rtype = "OBJE";
 //												print "Check ".$match9[1]." leveltag ".$result2[1]." type ".$rtype." subrec ".$subrec2." for display<br />";
-												if (!DisplayDetailsByID($match9[1], $rtype)) {
+												if (!PrivacyFunctions::DisplayDetailsByID($match9[1], $rtype)) {
 //													print "Don't show!<br />";
 													$hit = true;
 													$nodisplay = true;
@@ -1051,7 +1048,7 @@ if ($action=="general") {
 		    	if ($tagfilter == "off") {
 					foreach ($cquery["includes"] as $qindex => $squery) {
 			    		if (strpos(Str2Upper($key), Str2Upper($squery["term"])) !== false) {
-				    		if (DisplayDetailsByID($key, "FAM")) $found = true;
+				    		if (PrivacyFunctions::DisplayDetailsByID($key, "FAM")) $found = true;
 				    		else {
 					    		$nodisplay = true;
 				    			$hit = true;
@@ -1100,7 +1097,7 @@ if ($action=="general") {
 												else if ($result2[1] == "SOUR") $rtype = "SOUR";
 												else $rtype = "OBJE";
 //												print "Check ".$match9[1]." leveltag ".$result2[1]." type ".$rtype." subrec ".$subrec2." for display<br />";
-												if (!DisplayDetailsByID($match9[1], $rtype)) {
+												if (!PrivacyFunctions::DisplayDetailsByID($match9[1], $rtype)) {
 //													print "Don't show!<br />";
 													$hit = true;
 													$nodisplay = true;

@@ -30,25 +30,27 @@ if (stristr($_SERVER["SCRIPT_NAME"],basename(__FILE__))) {
 
 class SystemConfig {
 
-	var $classname = "SystemConfig";
-	var $max_execution_time = 0;
+	// Classname of this class
+	private $classname = "SystemConfig";
+	
+	// Default value for this setting, that stores the maximum tried execution time
+	public $max_execution_time = 0;
 	
 	// To store the names and values of the variables read from the database. Used for determining the changes made.
-	var $configdb_list = array(); 	
+	private $configdb_list = array(); 	
 	
-	// Initialize the exclude parameter array. These variables are excluded from the database and will be stored in coonfig.php
+	// Initialize the exclude parameter array. These variables are excluded from the database and will be stored in config.php
 	// INDEX_DIRECTORY must NOT be stored in the DB, as changes to this parameter must be checked against the values for all sites.
-	var $exclude_parms = array("DBHOST", "DBUSER", "DBPASS", "DBNAME", "DBPERSIST", "TBLPREFIX", "SERVER_URL", "LOGIN_URL", "SITE_ALIAS", "CONFIGURED", "INDEX_DIRECTORY", "GM_SESSION_SAVE_PATH", "GM_SESSION_TIME");
+	private $exclude_parms = array("DBHOST", "DBUSER", "DBPASS", "DBNAME", "DBPERSIST", "TBLPREFIX", "SERVER_URL", "LOGIN_URL", "SITE_ALIAS", "CONFIGURED", "INDEX_DIRECTORY", "GM_SESSION_SAVE_PATH", "GM_SESSION_TIME");
 	
 	// Array of boolean type variables
-	var $boolean  = array("DBPERSIST", "GM_STORE_MESSAGES", "GM_SIMPLE_MAIL", "USE_REGISTRATION_MODULE", "REQUIRE_ADMIN_AUTH_REGISTRATION", "ALLOW_USER_THEMES", "ALLOW_CHANGE_GEDCOM", "ALLOW_REMEMBER_ME", "CONFIGURED", "MEDIA_IN_DB");
+	private $boolean  = array("DBPERSIST", "GM_STORE_MESSAGES", "GM_SIMPLE_MAIL", "USE_REGISTRATION_MODULE", "REQUIRE_ADMIN_AUTH_REGISTRATION", "ALLOW_USER_THEMES", "ALLOW_CHANGE_GEDCOM", "ALLOW_REMEMBER_ME", "CONFIGURED", "MEDIA_IN_DB");
 	
 	// On instantiation, only the vars from the DB are read. The vars stored in the config.php are already read.
 	public function __construct() {
-		global $TBLPREFIX;
 		
 		// Read the current config parms
-		$sql = "SELECT * FROM ".$TBLPREFIX."sysconf WHERE 1";
+		$sql = "SELECT * FROM ".TBLPREFIX."sysconf WHERE 1";
 		$res = NewQuery($sql);
 		if ($res) {
 			while($row = $res->FetchAssoc()) {
@@ -70,10 +72,9 @@ class SystemConfig {
 	}
 	
 	public function SetConfigDBValue($name, $value) {
-		global $TBLPREFIX;
 		
 		if (in_array($name, $this->exclude_parms)) return false;
-		$sql = "INSERT INTO ".$TBLPREFIX."sysconf (s_name, s_value) VALUES ('s_".$name."', '".$value."') ON DUPLICATE KEY UPDATE s_value='".$value."'";
+		$sql = "INSERT INTO ".TBLPREFIX."sysconf (s_name, s_value) VALUES ('s_".$name."', '".$value."') ON DUPLICATE KEY UPDATE s_value='".$value."'";
 		$res = NewQuery($sql);
 		if ($value == "false") $this->$name = false;
 		else if ($value == "true") $this->$name = true;
@@ -166,9 +167,8 @@ class SystemConfig {
 			
 		
 	private function DeleteConfigDBValue($name) {
-		global $TBLPREFIX;
 		
-		$sql = "DELETE FROM ".$TBLPREFIX."sysconf WHERE s_name='s_".$name."'";
+		$sql = "DELETE FROM ".TBLPREFIX."sysconf WHERE s_name='s_".$name."'";
 		$res = NewQuery($sql);
 		unset($this->configdb_list[$name]);
 	}

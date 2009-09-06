@@ -168,9 +168,9 @@ class NoteController extends DetailController {
 	}
 	
 	public function GetNoteList($filter="", $selection="") {
-		global $TBLPREFIX, $GEDCOMID, $note_hide;
+		global $GEDCOMID, $note_hide;
 		
- 		$sql = "SELECT * FROM ".$TBLPREFIX."other WHERE o_type='NOTE' AND o_file='".$GEDCOMID."'";
+ 		$sql = "SELECT * FROM ".TBLPREFIX."other WHERE o_type='NOTE' AND o_file='".$GEDCOMID."'";
  		if (!empty($filter)) $sql .= " AND o_gedcom LIKE '%".$filter."%'";
  		if (!empty($selection)) $sql .= " AND o_id IN (".$selection.")";
  		$res = NewQuery($sql);
@@ -185,7 +185,7 @@ class NoteController extends DetailController {
 
 	//-- search through the gedcom records for notes, full text
 	public function FTSearchNotes($query, $allgeds=false, $ANDOR="AND") {
-		global $TBLPREFIX, $GEDCOM, $DBCONN, $REGEXP_DB, $GEDCOMS, $GEDCOMID, $ftminwlen, $ftmaxwlen, $note_hide, $note_total;
+		global $GEDCOM, $GEDCOMS, $GEDCOMID, $ftminwlen, $ftmaxwlen, $note_hide, $note_total;
 		
 		// Get the min and max search word length
 		GetFTWordLengths();
@@ -198,20 +198,20 @@ class NoteController extends DetailController {
 		if ($mlen < $ftminwlen || HasMySQLStopwords($cquery)) {
 			if (isset($cquery["includes"])) {
 				foreach ($cquery["includes"] as $index => $keyword) {
-					if (HasChinese($keyword["term"])) $addsql .= " ".$keyword["operator"]." o_gedcom REGEXP '".$DBCONN->EscapeQuery($keyword["term"]).$keyword["wildcard"]."'";
-					else $addsql .= " ".$keyword["operator"]." o_gedcom REGEXP '[[:<:]]".$DBCONN->EscapeQuery($keyword["term"]).$keyword["wildcard"]."[[:>:]]'";
+					if (HasChinese($keyword["term"])) $addsql .= " ".$keyword["operator"]." o_gedcom REGEXP '".DbLayer::EscapeQuery($keyword["term"]).$keyword["wildcard"]."'";
+					else $addsql .= " ".$keyword["operator"]." o_gedcom REGEXP '[[:<:]]".DbLayer::EscapeQuery($keyword["term"]).$keyword["wildcard"]."[[:>:]]'";
 				}
 			}
 			if (isset($cquery["excludes"])) {
 				foreach ($cquery["excludes"] as $index => $keyword) {
-					if (HasChinese($keyword["term"])) $addsql .= " AND o_gedcom NOT REGEXP '".$DBCONN->EscapeQuery($keyword["term"]).$keyword["wildcard"]."'";
-					else $addsql .= " AND o_gedcom NOT REGEXP '[[:<:]]".$DBCONN->EscapeQuery($keyword["term"]).$keyword["wildcard"]."[[:>:]]'";
+					if (HasChinese($keyword["term"])) $addsql .= " AND o_gedcom NOT REGEXP '".DbLayer::EscapeQuery($keyword["term"]).$keyword["wildcard"]."'";
+					else $addsql .= " AND o_gedcom NOT REGEXP '[[:<:]]".DbLayer::EscapeQuery($keyword["term"]).$keyword["wildcard"]."[[:>:]]'";
 				}
 			}
-			$sql = "SELECT * FROM ".$TBLPREFIX."other WHERE (".substr($addsql,4).")";
+			$sql = "SELECT * FROM ".TBLPREFIX."other WHERE (".substr($addsql,4).")";
 		}
 		else {
-			$sql = "SELECT * FROM ".$TBLPREFIX."other WHERE (MATCH (o_gedcom) AGAINST ('".$DBCONN->EscapeQuery($query)."' IN BOOLEAN MODE))";
+			$sql = "SELECT * FROM ".TBLPREFIX."other WHERE (MATCH (o_gedcom) AGAINST ('".DbLayer::EscapeQuery($query)."' IN BOOLEAN MODE))";
 		}
 	
 		if (!$allgeds) $sql .= " AND o_file='".$GEDCOMID."'";
@@ -221,7 +221,7 @@ class NoteController extends DetailController {
 		if ((is_array($allgeds) && count($allgeds) != 0) && count($allgeds) != count($GEDCOMS)) {
 			$sql .= " AND (";
 			for ($i=0; $i<count($allgeds); $i++) {
-				$sql .= "o_file='".$DBCONN->EscapeQuery($GEDCOMS[$allgeds[$i]]["id"])."'";
+				$sql .= "o_file='".DbLayer::EscapeQuery($GEDCOMS[$allgeds[$i]]["id"])."'";
 				if ($i < count($allgeds)-1) $sql .= " OR ";
 			}
 			$sql .= ")";
@@ -277,7 +277,7 @@ class NoteController extends DetailController {
 			$styleadd = "change_old";
 			print "\n\t\t<tr><td class=\"shade2 $styleadd center\" style=\"vertical-align: middle;\"><img src=\"".$GM_IMAGE_DIR."/".$GM_IMAGES["note"]["other"]."\" width=\"50\" height=\"50\" alt=\"\" /><br />".$gm_lang["note"].":";
 			print " </td>\n<td class=\"shade1 $styleadd wrap\">";
-			if (showFactDetails("NOTE", $this->note->xref)) {
+			if (PrivacyFunctions::showFactDetails("NOTE", $this->note->xref)) {
 				print PrintReady($this->note->text)."<br />\n";
 				// See if RESN tag prevents display or edit/delete
 			 	$resn_tag = preg_match("/2 RESN (.*)/", $this->note->gedrec, $match);
@@ -330,7 +330,7 @@ class NoteController extends DetailController {
 				print "</div>";
 			}
 			print " </td>\n<td class=\"shade1 $styleadd wrap\">";
-			if (showFactDetails("NOTE", $this->note->xref)) {
+			if (PrivacyFunctions::showFactDetails("NOTE", $this->note->xref)) {
 				if ($styleadd == "change_new") print PrintReady($this->note->GetNoteText(true))."<br />\n";
 				else print PrintReady($this->note->GetNoteText())."<br />\n";
 				// See if RESN tag prevents display or edit/delete

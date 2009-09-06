@@ -37,7 +37,7 @@ class Submitter extends GedcomRecord {
 	public $datatype = "SUBM";					// Type of data collected here
 	private static $submittercache = array(); 	// Holder of the instances for this class
 	
-	private $name = null;					// Printable name of the person, after applying privacy (can be unknown of private)
+	private $name = null;						// Printable name of the person, after applying privacy (can be unknown of private)
 
 	
 	public static function GetInstance($xref, $gedrec="", $gedcomid="") {

@@ -50,23 +50,19 @@ class Blocks {
 		
 		// action init gets an empty object to be filled
 		if ($action != "init") {
+			
 			// action reset returns to the default
 			if ($action == "reset") $this->GetDefaults();
-			else {
-				$this->GetBlocks();
-//				if ($this->type == "user") $this->GetUserBlocks();
-//				else $this->GetGedcomBlocks();
-			}
+			else $this->GetBlocks();
 		
 			$this->Presency();
 		}
 	}
 	
 	private function GetBlocks() {
-		global $TBLPREFIX, $DBCONN;
 		
 		// Try to retrieve a user stored blocks config
-		$sql = "SELECT * FROM ".$TBLPREFIX."blocks WHERE b_username='".$DBCONN->EscapeQuery($this->username)."' AND b_file='".$this->gedid."' ORDER BY b_location, b_order";
+		$sql = "SELECT * FROM ".TBLPREFIX."blocks WHERE b_username='".DbLayer::EscapeQuery($this->username)."' AND b_file='".$this->gedid."' ORDER BY b_location, b_order";
 		$res = NewQuery($sql);
 		if ($res->NumRows() > 0) {
 			while($row = $res->FetchAssoc()){
@@ -79,7 +75,7 @@ class Blocks {
 		else {
 			if ($this->type == "user") {
 				// Try to retrieve a stored default blocks config
-				$sql = "SELECT * FROM ".$TBLPREFIX."blocks WHERE b_username='defaultuser' AND b_file='".$this->gedid."' ORDER BY b_location, b_order";
+				$sql = "SELECT * FROM ".TBLPREFIX."blocks WHERE b_username='defaultuser' AND b_file='".$this->gedid."' ORDER BY b_location, b_order";
 				$res2 = NewQuery($sql);
 				if ($res2->NumRows() > 0) {
 					while($row = $res2->FetchAssoc()){
@@ -98,35 +94,33 @@ class Blocks {
 	}
 
 	public function setValues($setdefault=false) {
-		global $TBLPREFIX, $DBCONN;
 	
 		// Delete old settings
-		$sql = "DELETE FROM ".$TBLPREFIX."blocks WHERE b_username='".$DBCONN->EscapeQuery($this->username)."' AND b_file='".$this->gedid."'";
+		$sql = "DELETE FROM ".TBLPREFIX."blocks WHERE b_username='".DbLayer::EscapeQuery($this->username)."' AND b_file='".$this->gedid."'";
 		$res = NewQuery($sql);
 		// Insert new values for the main column
 		foreach($this->main as $order=>$block) {
-			$sql = "INSERT INTO ".$TBLPREFIX."blocks VALUES ('0', '".$DBCONN->EscapeQuery($this->username)."', 'main', '$order', '".$DBCONN->EscapeQuery($block[0])."', '".$DBCONN->EscapeQuery(serialize($block[1]))."', '".$this->gedid."')";
+			$sql = "INSERT INTO ".TBLPREFIX."blocks VALUES ('0', '".DbLayer::EscapeQuery($this->username)."', 'main', '$order', '".DbLayer::EscapeQuery($block[0])."', '".DbLayer::EscapeQuery(serialize($block[1]))."', '".$this->gedid."')";
 			$res = NewQuery($sql);
 			if ($setdefault && $this->type == "user") {
-				$sql = "INSERT INTO ".$TBLPREFIX."blocks VALUES ('0', 'defaultuser', 'main', '$order', '".$DBCONN->EscapeQuery($block[0])."', '".$DBCONN->EscapeQuery(serialize($block[1]))."', '".$this->gedid."')";
+				$sql = "INSERT INTO ".TBLPREFIX."blocks VALUES ('0', 'defaultuser', 'main', '$order', '".DbLayer::EscapeQuery($block[0])."', '".DbLayer::EscapeQuery(serialize($block[1]))."', '".$this->gedid."')";
 				$res = NewQuery($sql);
 			}
 		}
 		// Insert new values for the right column
 		foreach($this->right as $order=>$block) {
-			$sql = "INSERT INTO ".$TBLPREFIX."blocks VALUES ('0', '".$DBCONN->EscapeQuery($this->username)."', 'right', '$order', '".$DBCONN->EscapeQuery($block[0])."', '".$DBCONN->EscapeQuery(serialize($block[1]))."', '".$this->gedid."')";
+			$sql = "INSERT INTO ".TBLPREFIX."blocks VALUES ('0', '".DbLayer::EscapeQuery($this->username)."', 'right', '$order', '".DbLayer::EscapeQuery($block[0])."', '".DbLayer::EscapeQuery(serialize($block[1]))."', '".$this->gedid."')";
 			$res = NewQuery($sql);
 			if ($setdefault && $this->type == "user") {
-				$sql = "INSERT INTO ".$TBLPREFIX."blocks VALUES ('0', 'defaultuser', 'right', '$order', '".$DBCONN->EscapeQuery($block[0])."', '".$DBCONN->EscapeQuery(serialize($block[1]))."', '".$this->gedid."')";
+				$sql = "INSERT INTO ".TBLPREFIX."blocks VALUES ('0', 'defaultuser', 'right', '$order', '".DbLayer::EscapeQuery($block[0])."', '".DbLayer::EscapeQuery(serialize($block[1]))."', '".$this->gedid."')";
 				$res = NewQuery($sql);
 			}
 		}
 	}
 
 	public function SetConfig($id, $config) {
-		global $TBLPREFIX, $DBCONN;
 
-		$sql = "UPDATE SET b_config='".$DBCONN->EscapeQuery(serialize($config))."' WHERE b_id='".$id."'";	
+		$sql = "UPDATE SET b_config='".DbLayer::EscapeQuery(serialize($config))."' WHERE b_id='".$id."'";	
 		$res = NewQuery($sql);
 	}
 		

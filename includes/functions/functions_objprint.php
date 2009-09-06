@@ -153,7 +153,7 @@ function PrintPedigreePerson(&$person, $style=1, $show_famlink=true, $count=0, $
 	print ">";
 	
 	// NOTE: Show the persons primary picture if possible, but only in large boxes ($show_full)
-	if ($SHOW_HIGHLIGHT_IMAGES && $person->disp && showFact("OBJE", $person->xref, "INDI") && $show_full) {
+	if ($SHOW_HIGHLIGHT_IMAGES && $person->disp && PrivacyFunctions::showFact("OBJE", $person->xref, "INDI") && $show_full) {
 		$object = $person->highlightedimage;
 		// NOTE: Print the pedigree tumbnail
 		if (!empty($object["thumb"])) {
@@ -314,7 +314,7 @@ function PrintPedigreePerson(&$person, $style=1, $show_famlink=true, $count=0, $
 			// Get the subrecords and sort them
 			$factstoprint = array();
 			foreach ($tagstoprint as $key => $tag) {
-				if (ShowFact($tag, $person->xref, "INDI")) $factstoprint[] = GetSubrecord(1, "1 ".$tag, $person->gedrec);
+				if (PrivacyFunctions::showFact($tag, $person->xref, "INDI")) $factstoprint[] = GetSubrecord(1, "1 ".$tag, $person->gedrec);
 			}
 			SortFacts($factstoprint, "INDI");
 			// Print the facts
@@ -425,7 +425,9 @@ function PrintFamilyParents(&$family, $sosa = 0, $label="", $parid="", $gparid="
 	}
 	elseif ($family->husb_status == "new" || $family->husb_status == "changed") $style = " class=\"facts_valueblue\""; 
 	print "\n\t<td style=\"vertical-align:middle;\"".$style.">";
-	PrintPedigreePerson($family->$husb, 1, true, 1, $personcount, $family->view);
+	// Fix for overloading error of array object
+	$husband = $family->$husb;
+	PrintPedigreePerson($husband, 1, true, 1, $personcount, $family->view);
 	print "</td></tr></table>";
 	print "</td>\n";
 	
@@ -477,7 +479,7 @@ function PrintFamilyParents(&$family, $sosa = 0, $label="", $parid="", $gparid="
 		print "<a href=\"family.php?famid=".$family->xref."\" class=\"details1\">";
 		print $family->addxref;
 //		else print str_repeat("&nbsp;", 10);
-		if (showFact("MARR", $family->xref) && $family->disp) print_simple_fact($family->gedrec, "MARR", $family->wife->xref); else print $gm_lang["private"];
+		if (PrivacyFunctions::showFact("MARR", $family->xref) && $family->disp) print_simple_fact($family->gedrec, "MARR", $family->wife->xref); else print $gm_lang["private"];
 		print "</a>";
 	}
 	else print "<br />\n";
@@ -502,7 +504,9 @@ function PrintFamilyParents(&$family, $sosa = 0, $label="", $parid="", $gparid="
 	}
 	elseif ($family->wife_status == "new" || $family->wife_status == "changed") $style = " class=\"facts_valueblue\""; 
 	print "\n\t<td style=\"vertical-align:middle;\"".$style.">";
-	PrintPedigreePerson($family->$wife, 1, true, 1, $personcount, $family->view);
+	// Fix for overloading error of array object
+	$wwife = $family->$wife;
+	PrintPedigreePerson($wwife, 1, true, 1, $personcount, $family->view);
 	print "</td></tr></table>";
 	print "</td>\n";
 	
@@ -617,7 +621,7 @@ function PrintFamilyChildren($family, $childid = "", $sosa = 0, $label="", $pers
 						}
 						print "<td class=\"details1\" style=\"vertical-align:middle;\" align=\"center\">";
  						$divrec = "";
-						if (showFact("MARR", $famid) && DisplayDetailsByID($chil) && DisplayDetailsByID($spouse)) {
+						if (PrivacyFunctions::showFact("MARR", $famid) && PrivacyFunctions::DisplayDetailsByID($chil) && DisplayDetailsByID($spouse)) {
 							// marriage date
 							$famrec = FindFamilyRecord($famid);
 							$ct = preg_match("/2 DATE.*(\d\d\d\d)/", GetSubRecord(1, "1 MARR", $famrec), $match);

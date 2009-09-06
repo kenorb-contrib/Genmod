@@ -507,7 +507,7 @@ if ($action=="filter") {
 	else if ($type == "media") {
 		
 //		print "find dir: ".$directory."<br />";
-		$dirs = $MediaFS->GetMediaDirList($directory, false, 1, false, false);
+		$dirs = MediaFS::GetMediaDirList($directory, false, 1, false, false);
 		//print_r($dirs);
 		print "<br />";
 		print "<div align=\"center\">";
@@ -566,7 +566,7 @@ if ($action=="filter") {
 		print "<br />";
 		
 		if ($external_links == "1") $directory = "external_links";
-		$medialist = $MediaFS->GetMediaFilelist($directory, $filter);
+		$medialist = MediaFS::GetMediaFilelist($directory, $filter);
 
 		// Privacy is already checked in the function
 		// An empty media object is returned for not coupled files
@@ -574,7 +574,7 @@ if ($action=="filter") {
 			$prt = 0;
 			foreach ($medialist as $file => $mediaobjs) {
 				if ($prt%2 == 0) print "<tr>";
-				$MediaFS->PrintViewLink($mediaobjs, $showthumb, true);
+				MediaFS::PrintViewLink($mediaobjs, $showthumb, true);
 				$prt++;
 				if ($prt%2 == 0) print "</tr>";
 			}
@@ -651,7 +651,7 @@ if ($action=="filter") {
 			print "\n\t\t<tr><td class=\"list_value_wrap\"><ul>";
 			foreach ($repolist as $key => $value) {
 				$id = $value["id"];
-				if (DisplayDetailsByID($id, "REPO", 1, true)) {
+				if (PrivacyFunctions::DisplayDetailsByID($id, "REPO", 1, true)) {
 			    	print "<li><a href=\"#\" onclick=\"sndReq(document.getElementById('dummy'), 'lastused', 'type', 'REPO', 'id', '".JoinKey($id, $GEDCOMID)."'); pasteid('$id');\"><span id=\"dummy\"></span><span class=\"list_item\">".PrintReady($key)."</span></a></li>";
 		    	}
 		    	else $ctrepo--;
@@ -683,7 +683,7 @@ if ($action=="filter") {
 			print "\n\t\t<tr><td class=\"list_value_wrap\"><ul>";
 			foreach ($mysourcelist as $key => $value) {
 				SwitchGedcom($value["gedfile"]);
-				if (DisplayDetailsByID($key, "SOUR", 1, true)) {
+				if (PrivacyFunctions::DisplayDetailsByID($key, "SOUR", 1, true)) {
 					print "<li>";
 				    print "<a href=\"#\" onclick=\"sndReq(document.getElementById('dummy'), 'lastused', 'type', 'SOUR', 'id', '".JoinKey($key, $GEDCOMID)."'); pasteid('$key'); return false;\"><span class=\"list_item\">".PrintReady($value["name"])."</span></a>\n";
 				    print "</li>\n";
@@ -713,7 +713,7 @@ if ($action=="filter") {
 			print "\n\t\t<tr><td class=\"list_value_wrap\"><ul>";
 			foreach ($note_controller->notelist as $key => $note) {
 				SwitchGedcom($note->gedcomid);
-				if (DisplayDetailsByID($key, "NOTE", 1, true)) {
+				if (PrivacyFunctions::DisplayDetailsByID($key, "NOTE", 1, true)) {
 					print "<li>";
 				    print "<a href=\"#\" onclick=\"sndReq(document.getElementById('dummy'), 'lastused', 'type', 'NOTE', 'id', '".JoinKey($note->xref, $GEDCOMID)."'); pasteid('".$note->xref."'); return false;\"><span class=\"list_item\">".PrintReady($note->GetTitle()." ".$note->addxref)."</span></a>\n";
 				    print "</li>\n";

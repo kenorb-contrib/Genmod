@@ -96,7 +96,7 @@ function print_random_media($block = true, $config="", $side, $index) {
 		$links = $value->links;
 		if (count($links) != 0){
 			foreach($links as $key=>$id) {
-				if (($id=="INDI")&&(displayDetailsByID($key))) {
+				if (($id=="INDI")&&(PrivacyFunctions::displayDetailsByID($key))) {
 					print " <a href=\"individual.php?pid=".$key."\">".$gm_lang["view_person"]." - ";
 					if (HasChinese(GetPersonName($key))) print PrintReady(GetPersonName($key)." (".GetPinYin(GetPersonName($key)).")");
 					else print PrintReady(GetPersonName($key));

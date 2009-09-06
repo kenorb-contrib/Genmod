@@ -42,7 +42,7 @@ class CustomPage {
 			case 'show':
 				if ($this->id > 0) {
 					// Retrieve the page to be shown
-					$sql = "SELECT * FROM ".$genmod['tblprefix']."pages WHERE `pag_id` = '".$this->id."'";
+					$sql = "SELECT * FROM ".TBLPREFIX."pages WHERE `pag_id` = '".$this->id."'";
 					$result = NewQuery($sql);
 					if (!$result) {
 						$message  = 'Invalid query: ' . mysql_error() . "\n";
@@ -66,8 +66,8 @@ class CustomPage {
 					$this->AddHeader($genmod['gm_lang']['my_pages']);
 					switch ($genmod['task']) {
 						case $genmod['gm_lang']['save']:
-							if ($this->storenew == "newpage") $sql = "INSERT INTO ".$genmod['tblprefix']."pages (`pag_content`, `pag_title`) VALUES ('".mysql_real_escape_string($this->html)."', '".mysql_real_escape_string($this->title)."')";
-							else $sql = "UPDATE ".$genmod['tblprefix']."pages SET `pag_content` = '".mysql_real_escape_string($this->html)."', `pag_title` = '".mysql_real_escape_string($this->title)."' WHERE `pag_id` = '".$this->page_id."'";
+							if ($this->storenew == "newpage") $sql = "INSERT INTO ".TBLPREFIX."pages (`pag_content`, `pag_title`) VALUES ('".mysql_real_escape_string($this->html)."', '".mysql_real_escape_string($this->title)."')";
+							else $sql = "UPDATE ".TBLPREFIX."pages SET `pag_content` = '".mysql_real_escape_string($this->html)."', `pag_title` = '".mysql_real_escape_string($this->title)."' WHERE `pag_id` = '".$this->page_id."'";
 							$result = NewQuery($sql);
 							if (!$result) {
 							   $message  = 'Invalid query: ' . mysql_error() . "\n";
@@ -76,7 +76,7 @@ class CustomPage {
 							}
 							break;
 						case $genmod['gm_lang']['delete']:
-							$sql = "DELETE FROM ".$genmod['tblprefix']."pages WHERE `pag_id` = '".$this->page_id."'";
+							$sql = "DELETE FROM ".TBLPREFIX."pages WHERE `pag_id` = '".$this->page_id."'";
 							$result = NewQuery($sql);
 							if (!$result) {
 							   $message  = 'Invalid query: ' . mysql_error() . "\n";
@@ -88,7 +88,7 @@ class CustomPage {
 							break;
 					}
 					// Retrieve the current pages stored in the DB
-					$sql = "SELECT * FROM ".$genmod['tblprefix']."pages";
+					$sql = "SELECT * FROM ".TBLPREFIX."pages";
 					$result = NewQuery($sql);
 					if (!$result) {
 						$message  = 'Invalid query: ' . mysql_error() . "\n";

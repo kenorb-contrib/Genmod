@@ -66,8 +66,8 @@ if ($action=="login") {
 		}
 		session_write_close();
 		$url = preg_replace("/logout=1/", "", $url);
-		if (stristr($SERVER_URL, $url) === false) $url = $SERVER_URL . $url;
-		else $url = $SERVER_URL;
+		if (stristr(SERVER_URL, $url) === false) $url = SERVER_URL . $url;
+		else $url = SERVER_URL;
 		if ($remember=="yes") setcookie("gm_rem", $username, time()+60*60*24*7);
 		else setcookie("gm_rem", "", time()-60*60*24*7);
 		header("Location: $url");
@@ -77,21 +77,21 @@ if ($action=="login") {
 }
 else {
 	// Check the DB layout
-	$DBCONN->CheckDBLayout();
-	$tSERVER_URL = preg_replace(array("'https?://'", "'www.'", "'/$'"), array("","",""), $SERVER_URL);
-	$tLOGIN_URL = preg_replace(array("'https?://'", "'www.'", "'/$'"), array("","",""), $LOGIN_URL);
+	DbLayer::CheckDBLayout();
+	$tSERVER_URL = preg_replace(array("'https?://'", "'www.'", "'/$'"), array("","",""), SERVER_URL);
+	$tLOGIN_URL = preg_replace(array("'https?://'", "'www.'", "'/$'"), array("","",""), LOGIN_URL);
 	if (empty($url)) {
 		if ((isset($_SERVER['HTTP_REFERER'])) && ((stristr($_SERVER['HTTP_REFERER'],$tSERVER_URL)!==false)||(stristr($_SERVER['HTTP_REFERER'],$tLOGIN_URL)!==false))) {
 			$url = basename($_SERVER['HTTP_REFERER']);
 			if (stristr($url, ".php")===false) {
-				$url = $SERVER_URL."index.php?command=gedcom&amp;ged=$GEDCOM";
+				$url = SERVER_URL."index.php?command=gedcom&amp;ged=$GEDCOM";
 			}
 		}
 		else {
 			if (isset($url)) {
-				if (stristr($url,$SERVER_URL)!==false) $url = $SERVER_URL;
+				if (stristr($url,SERVER_URL)!==false) $url = $SERVER_URL;
 			}
-			else $url = $SERVER_URL;
+			else $url = SERVER_URL;
 		}
 	}
 	else if (stristr($url, "index.php")&&!stristr($url, "command=")) {
@@ -145,7 +145,7 @@ else {
 	}
 }
 	?>
-	<form name="loginform" method="post" action="<?php print $LOGIN_URL; ?>" onsubmit="t = new Date(); document.loginform.usertime.value=t.getFullYear()+'-'+(t.getMonth()+1)+'-'+t.getDate()+' '+t.getHours()+':'+t.getMinutes()+':'+t.getSeconds(); return true;">
+	<form name="loginform" method="post" action="<?php print LOGIN_URL; ?>" onsubmit="t = new Date(); document.loginform.usertime.value=t.getFullYear()+'-'+(t.getMonth()+1)+'-'+t.getDate()+' '+t.getHours()+':'+t.getMinutes()+':'+t.getSeconds(); return true;">
 		<?php $i = 0;?>
 		<input type="hidden" name="action" value="login" />
 		<input type="hidden" name="url" value="<?php print htmlspecialchars($url); ?>" />

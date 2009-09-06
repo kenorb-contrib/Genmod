@@ -32,17 +32,17 @@ class User {
 
 	public $classname = "User";				// Name of this class
 	private static $usercache = array();	// Holder of the instances for this class
-	public $username = "";						// Name of the user (used to logon)
-	public $password = "";
-	public $firstname = "";
-	public $lastname = "";
-	public $canadmin = false;
-	public $canedit = array();
-	public $email = "";
-	public $verified = "";
-	public $verified_by_admin = "";
-	public $language = "";
-	public $pwrequested = "";
+	public $username = "";					// Name of the user (used to logon)
+	public $password = "";					// Encrypted password of the user
+	public $firstname = "";					// Firstname of the user
+	public $lastname = "";					// Lastname of the user
+	public $canadmin = false;				// If the user is administrator (sitewide)
+	public $canedit = array();				// If the user has edit rights (per gedcom)
+	public $email = "";						// Email address of the user
+	public $verified = "";					// If the user has verified his/her request for an account
+	public $verified_by_admin = "";			// If the admin has approved the user's request for an account
+	public $language = "";					// Default language for the user
+	public $pwrequested = "";				// 
 	public $reg_timestamp = "";
 	public $reg_hashcode = "";
 	public $theme = "";
@@ -99,28 +99,20 @@ class User {
 		return $this->GetUser($username, $userfields);
 	}
 
-	public function __get($property) {
-		
-		switch ($property) {
-			default:
-				break;
-		}
-	}
-	
 	public function ObjCount() {
 		return count(self::$usercache);
 	}	
 	
 	private function GetUser($username, $userfields="") {
-		global $TBLPREFIX, $userobjects, $REGEXP_DB, $GEDCOMS, $DBCONN;
+		global $userobjects, $GEDCOMS, $DBCONN;
 
 		if (empty($username) || $username == "empty") return false;
 
 		if (!is_array($userfields)) {
 			if (!$DBCONN->connected) return false;
-			$username = $DBCONN->EscapeQuery($username);
-			$sql = "SELECT * FROM ".$TBLPREFIX."users_gedcoms ug RIGHT JOIN ".$TBLPREFIX."users u ON BINARY u.u_username = BINARY ug.ug_username WHERE BINARY u_username='".$username."'";
-//			$sql = "SELECT * FROM ".$TBLPREFIX."users ";
+			$username = DbLayer::EscapeQuery($username);
+			$sql = "SELECT * FROM ".TBLPREFIX."users_gedcoms ug RIGHT JOIN ".TBLPREFIX."users u ON BINARY u.u_username = BINARY ug.ug_username WHERE BINARY u_username='".$username."'";
+//			$sql = "SELECT * FROM ".TBLPREFIX."users ";
 			$res = NewQuery($sql);
 			if ($res===false) return false;
 			if ($res->NumRows()==0) return false;
@@ -145,7 +137,7 @@ class User {
 	}
 
 	private function FillUser($username, $user_data) {
-		global $userobjects, $TBLPREFIX;
+		global $userobjects;
 		
 		foreach ($user_data as $key => $user_row) {
 			if (empty($this->username) && !empty($username)) {

@@ -37,8 +37,8 @@ if (empty($action)) $action="";
 //-- make sure that they have gedcom admin status before they can use this page
 //-- otherwise have them login again
 if (!$gm_user->userIsAdmin()) {
-	if (empty($LOGIN_URL)) header("Location: login.php?url=config_maint.php");
-	else header("Location: ".$LOGIN_URL."?url=config_maint.php");
+	if (LOGIN_URL == "") header("Location: login.php?url=config_maint.php");
+	else header("Location: ".LOGIN_URL."?url=config_maint.php");
 	exit;
 }
 
@@ -86,7 +86,7 @@ print_header($gm_lang["config_maint"]);
 				?>
 				<div class="admin_item_box">
 				<div class="width10 choice_left"><input type="checkbox" name="delconf[]" value="<?php print $site."\"";
-				if ($site == $SERVER_URL) print " disabled=\"disabled\"";
+				if ($site == SERVER_URL) print " disabled=\"disabled\"";
 				?>/>
 				</div>
 				<div class="width30 choice_right"><?php print $site; ?></div>

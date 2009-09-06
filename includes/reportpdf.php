@@ -1462,7 +1462,7 @@ function GMRGedcomSHandler($attrs) {
 					//$newgedrec = FindGedcomRecord($gmatch[1]);
 					$temp = preg_split("/\s+/", trim($tgedrec));
 					$level = $temp[0] + 1;
-					if (showFact($tag, $id)&&showFactDetails($tag,$id)) {
+					if (PrivacyFunctions::showFact($tag, $id) && PrivacyFunctions::showFactDetails($tag,$id)) {
 						$newgedrec = GetSubRecord($level, "$level $tag", $tgedrec);
 						$tgedrec = $newgedrec;
 					}
@@ -1484,9 +1484,9 @@ function GMRGedcomSHandler($attrs) {
 			print "newgedrec: ".$newgedrec."<br />";
 			print "tag: ".$tags[0]."<br />fact: ".$fact."<br />id: ".$id."<br />desc: ".$desc."<br />gedrec: ".$gedrec."<br />rectype: ".$rectype."<br />";
 		}
-		if (($newreclevel == 1 && !FactViewRestricted($id, $newgedrec)) || 
-		($newreclevel == 0 && DisplayDetailsByID($newid, $newrectype)) &&
-		DisplayDetailsById($id, $rectype)) {
+		if (($newreclevel == 1 && !PrivacyFunctions::FactViewRestricted($id, $newgedrec)) || 
+		($newreclevel == 0 && PrivacyFunctions::DisplayDetailsByID($newid, $newrectype)) &&
+		PrivacyFunctions::DisplayDetailsById($id, $rectype)) {
 			if ($debug) print "can show<br />";
 //			$newgedrec = privatize_gedcom($newgedrec);
 //			$gedObj = new GedcomRecord($newgedrec);
@@ -1638,7 +1638,7 @@ function GMRGetPersonNameSHandler($attrs) {
 		}
 	}
 	if (!empty($id)) {
-		if (!displayDetailsById($id) && !showLivingNameByID($id)) {
+		if (!PrivacyFunctions::displayDetailsById($id) && !PrivacyFunctions::showLivingNameByID($id)) {
 			$name=$gm_lang["private"];
 		} else {
 			$name = trim(GetPersonName($id));
@@ -1681,7 +1681,7 @@ function GMRGedcomValueSHandler($attrs) {
 	//		print "tag: ".$tag." fact: ".$fact." desc: ".$desc."<br />";
 	if (!empty($tag)) {
 		if ($tag=="@desc") {
-			if (showFact($fact, $id) && showFactDetails($fact,$id)) $value = $desc;
+			if (PrivacyFunctions::showFact($fact, $id) && PrivacyFunctions::showFactDetails($fact,$id)) $value = $desc;
 			else $value = $gm_lang["private"];
 			$value = trim($value);
 			if (HasChinese($value, true)) $currentElement->addText(GetPinYin($value, true));
@@ -1711,7 +1711,7 @@ function GMRGedcomValueSHandler($attrs) {
 			//-- check all of the tags for privacy
 			foreach($tags as $t=>$subtag) {
 				if (!empty($subtag)) {
-					if (!showFact($tag, $id)||!showFactDetails($tag,$id)) return;
+					if (!PrivacyFunctions::showFact($tag, $id)||!PrivacyFunctions::showFactDetails($tag,$id)) return;
 				}
 			}
 //LERMAN - add ability to get changed data
@@ -1730,10 +1730,10 @@ function GMRGedcomValueSHandler($attrs) {
 			}
 			if ($debug) print "gedrec: ".$gedrec." tag: ".$tag." value: ".$value." fact: ".$fact."<br /><br />";
 //		print "tag: ".$tags[0]."<br />fact: ".$fact."<br />id: ".$id."<br />desc: ".$desc."<br />type: ".$type."<br />gedrec: ".$gedrec."<br />value: ".$value."<br /><br />";
-			if (showFact($tags[0], $id) && showFactDetails($tags[0],$id)) {
+			if (PrivacyFunctions::showFact($tags[0], $id) && PrivacyFunctions::showFactDetails($tags[0],$id)) {
 				if (!empty($id)) $factrec = GetSubRecord(1, $tags[0], $gedrec);
 				else $factrec = "";
-				if (!FactViewRestricted($id, $factrec)) {
+				if (!PrivacyFunctions::FactViewRestricted($id, $factrec)) {
 					if (HasChinese($value, true)) $currentElement->addText(GetPinYin($value, true));
 					else $currentElement->addText($value);
 				}
@@ -1768,15 +1768,15 @@ function GMRRepeatTagSHandler($attrs) {
 		print "Start debug<br />";
 		print "tag: ".$tag."<br />fact: ".$fact."<br />id: ".$id."<br />desc: ".$desc."<br />gedrec: ".$gedrec."<br /><br />";
 	}
-	if (!empty($tag) && DisplayDetailsById($id)) {
+	if (!empty($tag) && PrivacyFunctions::DisplayDetailsById($id)) {
 		// Get the factrec to check RESN privacy
 		$sub = GetSubRecord(1, "1 ".$tag, $gedrec);
 		if ($debug) print "sub: ".$sub;
-		if (!FactViewRestricted($id, $sub)) {
+		if (!PrivacyFunctions::FactViewRestricted($id, $sub)) {
 			if ($debug) print "processing......<br />";
 			if ($tag=="@desc") {
 				if ($debug) Print "@desc branch<br />";
-				if (showFact($fact, $id)&&showFactDetails($fact,$id)) $value = $desc;
+				if (PrivacyFunctions::showFact($fact, $id) && PrivacyFunctions::showFactDetails($fact,$id)) $value = $desc;
 				else $value = "";
 				$value = trim($value);
 				$currentElement->addText($value);
@@ -1794,7 +1794,7 @@ function GMRRepeatTagSHandler($attrs) {
 				for($i=0; $i<count($tags); $i++) {
 					$t = $tags[$i];
 					if (!empty($t)) {
-						if ($level==1 && strstr("CHIL,FAMS,FAMC", $t)===false && (!showFact($t, $id) || !showFactDetails($t,$id))) return;
+						if ($level==1 && strstr("CHIL,FAMS,FAMC", $t)===false && (!PrivacyFunctions::showFact($t, $id) || !PrivacyFunctions::showFactDetails($t,$id))) return;
 						if ($i<count($tags)-1) {
 							$subrec = GetSubRecord($level, "$level $t", $subrec);
 							if ($debug) print "<br />subrec: ".$subrec."<br />";
@@ -1810,7 +1810,7 @@ function GMRRepeatTagSHandler($attrs) {
 					}
 				}
 				$level--;
-				if ($level!=1 || strstr("CHIL,FAMS,FAMC", $t)!==false || (showFact($t, $id) && showFactDetails($t,$id))) {
+				if ($level!=1 || strstr("CHIL,FAMS,FAMC", $t)!==false || (PrivacyFunctions::showFact($t, $id) && PrivacyFunctions::showFactDetails($t,$id))) {
 					$ct = preg_match_all("/$level $t(.*)/", $subrec, $match, PREG_SET_ORDER);
 					if ($debug) print "$ct $subrec";
 					for($i=0; $i<$ct; $i++) {
@@ -2292,7 +2292,7 @@ function brSHandler($attrs) {
 }
 
 function GMRHighlightedImageSHandler($attrs) {
-	global $gedrec, $gmreport, $MediaFS, $SERVER_URL;
+	global $gedrec, $gmreport;
 
 	$id = "";
 	$gt = preg_match("/0 @(.+)@/", $gedrec, $gmatch);
@@ -2309,7 +2309,7 @@ function GMRHighlightedImageSHandler($attrs) {
 	if (isset($attrs["width"])) $width = $attrs["width"];
 	if (isset($attrs["height"])) $height = $attrs["height"];
 
-	if (showFact("OBJE", $id)) {
+	if (PrivacyFunctions::showFact("OBJE", $id)) {
 		$media = FindHighlightedObject($id);
 		//print_r($media);
 		//print "<br /><br />";
@@ -2325,7 +2325,7 @@ function GMRHighlightedImageSHandler($attrs) {
 				$perc = $height / $mfile->fileobj->f_height;
 				$width= round($mfile->fileobj->f_width*$perc);
 			}
-			$image = new GMRImage($SERVER_URL.$mfile->fileobj->f_main_file, $left, $top, $width, $height, $mfile->fileobj->f_ext);
+			$image = new GMRImage(SERVER_URL.$mfile->fileobj->f_main_file, $left, $top, $width, $height, $mfile->fileobj->f_ext);
 			$gmreport->addElement($image);
 		}
 	}
@@ -2713,7 +2713,7 @@ function GMRListEHandler() {
 	$list_private = 0;
 	foreach($list as $key=>$value) {
 		$rectype = GetRecType($value["gedcom"]);
-		if (displayDetailsById($key, $rectype)) {
+		if (PrivacyFunctions::displayDetailsById($key, $rectype)) {
 			$gedrec = $value["gedcom"];
 //			print $gedrec."<br />";
 //			$gedrec = FindGedcomRecord($key);
@@ -2797,7 +2797,7 @@ function GMRRelativesSHandler($attrs) {
 
 	$list = array();
 	$indirec = FindPersonRecord($id);
-	if (!empty($indirec) && (DisplayDetailsByID($id, "INDI") || ShowLivingNameByID($id))) {
+	if (!empty($indirec) && (PrivacyFunctions::DisplayDetailsByID($id, "INDI") || PrivacyFunctions::showLivingNameByID($id))) {
 		$list[$id] = $indilist[$id];
 		if ($debug) print "we have group: ".$group." id: ".$id."<br />";
 		switch ($group) {
@@ -2805,7 +2805,7 @@ function GMRRelativesSHandler($attrs) {
 				$famids = FindPrimaryFamilyId($id);
 				foreach($famids as $indexval => $ffamid) {
 					$famid = $ffamid["famid"];
-					if (DisplayDetailsByID($famid, "FAM")) {
+					if (PrivacyFunctions::DisplayDetailsByID($famid, "FAM")) {
 						if ($debug) print "we can show ".$famid."<br />";
 						$parents = FindParents($famid);
 						if (!empty($parents["HUSB"])) {
@@ -2829,7 +2829,7 @@ function GMRRelativesSHandler($attrs) {
 				$famids = FindSfamilyIds($id);
 				foreach($famids as $indexval => $fams) {
 					$famid = $fams["famid"];
-					if (DisplayDetailsByID($famid, "FAM")) {
+					if (PrivacyFunctions::DisplayDetailsByID($famid, "FAM")) {
 						$parents = FindParents($famid);
 						FindPersonRecord($parents["HUSB"]);
 						FindPersonRecord($parents["WIFE"]);
@@ -2839,7 +2839,7 @@ function GMRRelativesSHandler($attrs) {
 						$num = preg_match_all("/1\s*CHIL\s*@(.*)@/", $famrec, $smatch,PREG_SET_ORDER);
 						for($i=0; $i<$num; $i++) {
 							FindPersonRecord($smatch[$i][1]);
-							if (DisplayDetailsByID($smatch[$i][1])) $list[$smatch[$i][1]] = $indilist[$smatch[$i][1]];
+							if (PrivacyFunctions::DisplayDetailsByID($smatch[$i][1])) $list[$smatch[$i][1]] = $indilist[$smatch[$i][1]];
 						}
 					}
 				}
@@ -2921,7 +2921,7 @@ function GMRRelativesEHandler() {
 	$list_private = 0;
 	foreach($list as $key=>$value) {
 		if (isset($value["generation"])) $generation = $value["generation"];
-//KN		if (displayDetailsById($key)) {
+//KN		if (PrivacyFunctions::displayDetailsById($key)) {
 			$gedrec = FindGedcomRecord($key);
 //		print "5 rec added: ".$gedrec."<br />";
 			//-- start the sax parser

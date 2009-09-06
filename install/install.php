@@ -122,7 +122,7 @@ if ($step > 2) {
 		$step = 2;
 		$error = $gm_lang["error"].": ". mysql_error();
 	}
-	if (!$upgrade && in_array($INDEX_DIRECTORY, $index_inuse)) {
+	if (!$upgrade && in_array(INDEX_DIRECTORY, $index_inuse)) {
 		$step = 2;
 		$error .= "<br />".$gm_lang["error"].": Index directory already in use by another site.";
 	}

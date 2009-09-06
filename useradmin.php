@@ -49,8 +49,8 @@ $message = "";
 //-- make sure that they have admin status before they can use this page
 //-- otherwise have them login again
 if (!$gm_user->userIsAdmin()) {
-	if (empty($LOGIN_URL)) header("Location: login.php?url=useradmin.php?".GetQueryString(true));
-	else header("Location: ".$LOGIN_URL."?url=useradmin.php?".GetQueryString(true));
+	if (LOGIN_URL == "") header("Location: login.php?url=useradmin.php?".GetQueryString(true));
+	else header("Location: ".LOGIN_URL."?url=useradmin.php?".GetQueryString(true));
 	exit;
 }
 print_header("Genmod ".$gm_lang["user_admin"]);
@@ -374,23 +374,23 @@ if ($action=="edituser2") {
 				$WEEK_START	= $WEEK_START_array[$LANGUAGE];
 				$NAME_REVERSE	= $NAME_REVERSE_array[$LANGUAGE];
 
-				$message = array();
-				$message["to"] = $newuser->username;
+				$message = new Message();
+				$message->to = $newuser->username;
 				$host = preg_replace("/^www\./i", "", $_SERVER["SERVER_NAME"]);
-				$message["from_email"] = "Genmod-noreply@".$host;
-				$message["from_name"] = $user->firstname.' '.$user->lastname;
-				$message["from"] = "genmod-noreply@".$host;
-				if (substr($SERVER_URL, -1) == "/"){
-					$message["subject"] = str_replace("#SERVER_NAME#", substr($SERVER_URL,0, (strlen($SERVER_URL)-1)), $gm_lang["admin_approved"]);
-					$message["body"] = str_replace("#SERVER_NAME#", $SERVER_URL, $gm_lang["admin_approved"])." ".$gm_lang["you_may_login"]."\r\n\r\n"."<a href=\"".substr($SERVER_URL,0, (strlen($SERVER_URL)-1))."/index.php?command=user\">".substr($SERVER_URL,0, (strlen($SERVER_URL)-1))."/index.php?command=user</a>\r\n";
+				$message->from_email = "Genmod-noreply@".$host;
+				$message->from_name = $newuser->firstname.' '.$newuser->lastname;
+				$message->from = "genmod-noreply@".$host;
+				if (substr(SERVER_URL, -1) == "/"){
+					$message->subject = str_replace("#SERVER_NAME#", substr(SERVER_URL,0, (strlen(SERVER_URL)-1)), $gm_lang["admin_approved"]);
+					$message->body = str_replace("#SERVER_NAME#", SERVER_URL, $gm_lang["admin_approved"])." ".$gm_lang["you_may_login"]."\r\n\r\n"."<a href=\"".substr(SERVER_URL,0, (strlen(SERVER_URL)-1))."/index.php?command=user\">".substr(SERVER_URL,0, (strlen(SERVER_URL)-1))."/index.php?command=user</a>\r\n";
 				}
 				else {
-					$message["subject"] = str_replace("#SERVER_NAME#", $SERVER_URL, $gm_lang["admin_approved"]);
-					$message["body"] = str_replace("#SERVER_NAME#", $SERVER_URL, $gm_lang["admin_approved"])." ".$gm_lang["you_may_login"]."\r\n\r\n"."<a href=\"".$SERVER_URL."/index.php?command=user\">".$SERVER_URL."/index.php?command=user</a>\r\n";
+					$message->subject = str_replace("#SERVER_NAME#", SERVER_URL, $gm_lang["admin_approved"]);
+					$message->body = str_replace("#SERVER_NAME#", SERVER_URL, $gm_lang["admin_approved"])." ".$gm_lang["you_may_login"]."\r\n\r\n"."<a href=\"".SERVER_URL."/index.php?command=user\">".SERVER_URL."/index.php?command=user</a>\r\n";
 				}
-				$message["created"] = "";
-				$message["method"] = "messaging2";
-				AddMessage($message, true);
+				$message->created = "";
+				$message->method = "messaging2";
+				$message->AddMessage(true);
 
 				// Switch back to the page language
 				$LANGUAGE = $oldlanguage;
@@ -2268,7 +2268,7 @@ if ($action == "cleanup_messbox") {
 	foreach ($users as $key => $user) {
 		$fld = "msg_".$user->username;
 		if (isset($$fld)) {
-			DeleteUserMessages($user->username);
+			MessageController::DeleteUserMessages($user->username);
 		}
 	}
 	$action = "cleanup_messages";
@@ -2276,10 +2276,9 @@ if ($action == "cleanup_messbox") {
 
 // Cleanup old messages
 if ($action == "cleanup_messold") {
-	$messages = GetUserMessages("");
+	$messages = MessageController::GetUserMessages();
 	foreach ($messages as $key => $message) {
-		$age = GetMessageAge($message);
-		if ($age >= $cleanup) DeleteMessage($message["id"]);
+		if ($message->age >= $cleanup) MessageController::DeleteMessage($message->id);
 	}
 	$action = "cleanup_messages";
 }
@@ -2323,14 +2322,14 @@ if ($action == "cleanup_messages") {
 			$count = 0;
 			$mons = array();
 			foreach($users as $key=>$user) {
-				$messages = GetUserMessages($user->username);
+				$messages = MessageController::GetUserMessages($user->username);
 				// Only print users with messages
 				if (count($messages) > 0) {
 					$count++;
 					
 					// Meanwhile, we get the age of the messages
 					foreach($messages as $id => $message) {
-						$mmon = GetMessageAge($message);
+						$mmon = $message->age;
 						if (isset($mons[$mmon])) $mons[$mmon]++;
 						else $mons[$mmon] = 1;
 					}

@@ -522,7 +522,7 @@ class EditLang {
 				}
 				else print "<span class=\"error\">".$gm_lang["lang_facts_not_stored"]."</span><br />";
 				if (!$storeerror) {
-					$sql = "UPDATE ".$genmod['tblprefix']."lang_settings SET ls_translated = '0', ls_md5_lang = '".md5_file("languages/lang.".$genmod['language_settings'][$this->language2]["lang_short_cut"].".txt")."', ls_md5_help = '".md5_file("languages/help_text.".$genmod['language_settings'][$this->language2]["lang_short_cut"].".txt")."', ls_md5_facts = '".md5_file("languages/facts.".$genmod['language_settings'][$this->language2]["lang_short_cut"].".txt")."' WHERE ls_gm_langname='".$this->language2."'";
+					$sql = "UPDATE ".TBLPREFIX."lang_settings SET ls_translated = '0', ls_md5_lang = '".md5_file("languages/lang.".$genmod['language_settings'][$this->language2]["lang_short_cut"].".txt")."', ls_md5_help = '".md5_file("languages/help_text.".$genmod['language_settings'][$this->language2]["lang_short_cut"].".txt")."', ls_md5_facts = '".md5_file("languages/facts.".$genmod['language_settings'][$this->language2]["lang_short_cut"].".txt")."' WHERE ls_gm_langname='".$this->language2."'";
 					$res = NewQuery($sql);
 				}
 			print "</div>";
@@ -658,8 +658,8 @@ $editlang = new EditLang($genmod, $gm_lang, $gm_username);
 // NOTE: otherwise have them login again
 $uname = $gm_username;
 if (empty($uname)) {
-	if (empty($LOGIN_URL)) header("Location: login.php?url=editlang.php");
-	else header("Location: ".$LOGIN_URL."?url=editlang.php");
+	if (LOGIN_URL == "") header("Location: login.php?url=editlang.php");
+	else header("Location: ".LOGIN_URL."?url=editlang.php");
 	exit;
 }
 

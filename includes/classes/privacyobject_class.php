@@ -29,35 +29,57 @@ if (stristr($_SERVER["SCRIPT_NAME"],basename(__FILE__))) {
 }
 
 class PrivacyObject {
+	
+	public $classname = "PrivacyObject";
 
 	// These vars are the same as (uppercase) the fields in the DB.
 	// The values for $PRIV_XX are filled in here as defaults.
-	var $GEDCOMID = "";
-	var $GEDCOM = "";
-	var $PRIVACY_VERSION = "3.3";
-	var $PRIV_HIDE = -1;
-	var $PRIV_PUBLIC = 2;
-	var $PRIV_USER = 1;
-	var $PRIV_NONE = 0;
-	var $SHOW_DEAD_PEOPLE = 2;
-	var $HIDE_LIVE_PEOPLE = 1;
-	var $SHOW_LIVING_NAMES = 1;
-	var $SHOW_SOURCES = 1;
-	var $LINK_PRIVACY = 1;
-	var $MAX_ALIVE_AGE = 120;
-	var $ENABLE_CLIPPINGS_CART = 1;
-	var $SHOW_ACTION_LIST = 0;
-	var $USE_RELATIONSHIP_PRIVACY = 0;
-	var $MAX_RELATION_PATH_LENGTH = 3;
-	var $CHECK_MARRIAGE_RELATIONS = 1;
-	var $CHECK_CHILD_DATES = 1;
-	var $PRIVACY_BY_YEAR = 0;
-	var $PRIVACY_BY_RESN = 1;
-	var $person_privacy = array();
-	var $user_privacy = array();
-	var $global_facts = array();
-	var $person_facts = array();
+	public $GEDCOMID = "";
+	public $GEDCOM = "";
+	public $PRIVACY_VERSION = "3.3";
 	
+	public $PRIV_HIDE = -1;
+	public $PRIV_PUBLIC = 2;
+	public $PRIV_USER = 1;
+	public $PRIV_NONE = 0;
+	public $SHOW_DEAD_PEOPLE = 2;
+	public $HIDE_LIVE_PEOPLE = 1;
+	public $SHOW_LIVING_NAMES = 1;
+	public $SHOW_SOURCES = 1;
+	public $LINK_PRIVACY = 1;
+	public $MAX_ALIVE_AGE = 120;
+	public $ENABLE_CLIPPINGS_CART = 1;
+	public $SHOW_ACTION_LIST = 0;
+	public $USE_RELATIONSHIP_PRIVACY = 0;
+	public $MAX_RELATION_PATH_LENGTH = 3;
+	public $CHECK_MARRIAGE_RELATIONS = 1;
+	public $CHECK_CHILD_DATES = 1;
+	public $PRIVACY_BY_YEAR = 0;
+	public $PRIVACY_BY_RESN = 1;
+	public $person_privacy = array();
+	public $user_privacy = array();
+	public $global_facts = array();
+	public $person_facts = array();
+	public $is_empty = false;
+	
+	private static $GEDPRIV = array();	// Holder of the instances for this class
+
+	public static function GetInstance($gedcomid, $user_override=true) {
+	
+		if ($user_override == false) $override = "0";
+		else $override = "1";
+		if (!isset(self::$GEDPRIV[$gedcomid][$override])) {
+			self::$GEDPRIV[$gedcomid][$override] = new PrivacyObject($gedcomid, $user_override);
+		}
+		return self::$GEDPRIV[$gedcomid][$override];
+	}
+
+	public static function UnsetInstance($gedcomid) {
+		
+		if(isset(self::$GEDPRIV[$gedcomid][0])) unset(self::$GEDPRIV[$gedcomid][0]);
+		if(isset(self::$GEDPRIV[$gedcomid][1])) unset(self::$GEDPRIV[$gedcomid][1]);
+	}
+		
 	public function __construct($gedcomid, $user_override=true) {
 		
 		// Initialize some values, which cannot be done with var, as in PHP4 it only accepts constants
@@ -67,13 +89,13 @@ class PrivacyObject {
 		$this->GetPrivacy($gedcomid, $user_override);
 	}
 	
-	function GetPrivacy($gedcomid="", $user_override) {
-		global $TBLPREFIX, $GEDCOMS, $DBCONN, $gm_username, $gm_user;
+	public function GetPrivacy($gedcomid="", $user_override) {
+		global $GEDCOMS, $DBCONN, $gm_username, $gm_user;
 		
 		if (!$DBCONN->connected) return false;
 		
 		if (!empty($gedcomid)) {
-			$sql = "SELECT * FROM ".$TBLPREFIX."privacy WHERE (p_gedcomid='".$gedcomid."')";
+			$sql = "SELECT * FROM ".TBLPREFIX."privacy WHERE (p_gedcomid='".$gedcomid."')";
 			$res = NewQuery($sql);
 			if ($res) {
 				$ct = $res->NumRows();
@@ -145,6 +167,7 @@ class PrivacyObject {
 						}
 					}
 				}
+				else $this->is_empty = true;
 				$res->FreeResult();
 			}
 		}
@@ -166,13 +189,14 @@ class PrivacyObject {
 		return $this;
 	}
 	
-	function WritePrivacy() {
-		global $TBLPREFIX;
+	public function WritePrivacy() {
 	
 		$settings = Get_Object_vars($this);
 		
 		$settings["PRIVACY_VERSION"] = $this->PRIVACY_VERSION;
-	
+		unset($settings["classname"]);
+		unset($settings["is_empty"]);
+		
 		$col = "(";
 		$val = "(";
 		$i = "0";
@@ -202,14 +226,13 @@ class PrivacyObject {
 		}
 		$col .= ")";
 		$val .= ")";
-		$sql = "INSERT INTO ".$TBLPREFIX."privacy ".$col." VALUES ".$val;
+		$sql = "INSERT INTO ".TBLPREFIX."privacy ".$col." VALUES ".$val;
 		$res = NewQuery($sql);
 		if ($res) return true;
 		else return false;
 	}
 	
-	function StoreArrays() {
-		global $TBLPREFIX;
+	public function StoreArrays() {
 		
 		$PRIVACY_CONSTANTS = array();
 		$PRIVACY_CONSTANTS[$this->PRIV_HIDE] = "PRIV_HIDE";
@@ -232,7 +255,7 @@ class PrivacyObject {
 		}
 		
 		
-		$sql = "UPDATE ".$TBLPREFIX."privacy SET p_person_privacy='".serialize($this->person_privacy)."', p_user_privacy='".serialize($this->user_privacy)."', p_person_facts='".serialize($this->person_facts)."' WHERE p_gedcomid='".$this->GEDCOMID."'";
+		$sql = "UPDATE ".TBLPREFIX."privacy SET p_person_privacy='".serialize($this->person_privacy)."', p_user_privacy='".serialize($this->user_privacy)."', p_person_facts='".serialize($this->person_facts)."' WHERE p_gedcomid='".$this->GEDCOMID."'";
 		$res = NewQuery($sql);
 		if ($res) return true;
 		else return false;

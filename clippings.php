@@ -82,7 +82,7 @@ function add_clipping($clipping) {
 
 	if (!id_in_cart($clipping['id'])) {
 		if ($clipping['type']=="indi") {
-			if (showLivingNameById($clipping['id'])) {
+			if (PrivacyFunctions::showLivingNameById($clipping['id'])) {
 				$cart[$GEDCOMID][]=$clipping;
 				$gedrec = FindGedcomRecord($clipping['id']);
 				$st = preg_match_all("/\d (\w+) @(.*)@/", $gedrec, $match, PREG_SET_ORDER);
@@ -91,7 +91,7 @@ function add_clipping($clipping) {
 					$clipping['type'] = strtolower($match[$i][1]);
 					if (in_array($clipping['type'], array("note", "sour", "repo", "obje"))) {
 						$clipping['id'] = $match[$i][2];
-						if (displayDetailsById($clipping['id'], $clipping["type"], 1, true)) {
+						if (PrivacyFunctions::displayDetailsById($clipping['id'], $clipping["type"], 1, true)) {
 							add_clipping($clipping);
 						}
 					}
@@ -101,7 +101,7 @@ function add_clipping($clipping) {
 		}
 		else if ($clipping['type']=="fam") {
 			$parents = FindParents($clipping['id']);
-			if (showLivingNameById($parents['HUSB']) && showLivingNameById($parents['WIFE'])) {
+			if (PrivacyFunctions::showLivingNameById($parents['HUSB']) && PrivacyFunctions::showLivingNameByID($parents['WIFE'])) {
 				$cart[$GEDCOMID][]=$clipping;
 				$gedrec = FindGedcomRecord($clipping['id']);
 				$st = preg_match_all("/\d (\w+) @(.*)@/", $gedrec, $match, PREG_SET_ORDER);
@@ -110,7 +110,7 @@ function add_clipping($clipping) {
 					$clipping['type'] = strtolower($match[$i][1]);
 					if (in_array($clipping['type'], array("note", "sour", "repo", "obje"))) {
 						$clipping['id'] = $match[$i][2];
-						if (displayDetailsById($clipping['id'], $clipping["type"], 1, true)) {
+						if (PrivacyFunctions::displayDetailsById($clipping['id'], $clipping["type"], 1, true)) {
 							add_clipping($clipping);
 						}
 					}
@@ -119,7 +119,7 @@ function add_clipping($clipping) {
 			else return false;
 		}
 		else {
-			if (displayDetailsById($clipping['id'], $clipping['type'], 1, true)) {
+			if (PrivacyFunctions::displayDetailsById($clipping['id'], $clipping['type'], 1, true)) {
 				$cart[$GEDCOMID][]=$clipping;
 				$gedrec = FindGedcomRecord($clipping['id']);
 				$nt = preg_match_all("/\d (\w+) @(.*)@/", $gedrec, $match, PREG_SET_ORDER);
@@ -402,11 +402,11 @@ else if($action=='download') {
 	$path = substr($SCRIPT_NAME, 0, strrpos($SCRIPT_NAME, "/"));
 	if (empty($path)) $path="/";
 	if ($path[strlen($path)-1]!="/") $path .= "/";
-	if ($SERVER_URL[strlen($SERVER_URL)-1] == "/")
+	if (SERVER_URL[strlen(SERVER_URL)-1] == "/")
 	{
-	  $dSERVER_URL = substr($SERVER_URL, 0, strlen($SERVER_URL) - 1);
+	  $dSERVER_URL = substr(SERVER_URL, 0, strlen(SERVER_URL) - 1);
 	}
-	else $dSERVER_URL = $SERVER_URL;
+	else $dSERVER_URL = SERVER_URL;
 	usort($cart[$GEDCOMID], "same_group");
 	$media = array();
 	$mediacount=0;
@@ -426,7 +426,7 @@ else if($action=='download') {
 	{
 		$clipping = $cart[$GEDCOMID][$i];
 		$record = FindGedcomRecord($clipping['id']);
-		$record = privatize_gedcom($record);
+		$record = PrivacyFunctions::privatize_gedcom($record);
 		$record = RemoveCustomTags($record, $remove);
 		if ($convert=="yes") $record = utf8_decode($record);
 		if ($clipping['type']=='indi') {
@@ -444,7 +444,7 @@ else if($action=='download') {
 			}
 			$ft = preg_match_all("/\d FILE (.*)/", $record, $match, PREG_SET_ORDER);
 			for ($k=0; $k<$ft; $k++) {
-				$filename = $MediaFS->CheckMediaDepth(trim($match[$k][1]));
+				$filename = MediaFS::CheckMediaDepth(trim($match[$k][1]));
 				$media[$mediacount]=$filename;
 				$filename = substr($match[$k][1], strrpos($match[$k][1], "\\"));
 				$mediacount++;
@@ -488,7 +488,7 @@ else if($action=='download') {
 
 			$ft = preg_match_all("/\d FILE (.*)/", $record, $match, PREG_SET_ORDER);
 			for ($k=0; $k<$ft; $k++) {
-				$filename = $MediaFS->CheckMediaDepth($match[$k][1]);
+				$filename = MediaFS::CheckMediaDepth($match[$k][1]);
 				 	$media[$mediacount]=$filename;
 				 		$mediacount++;
 			   	 	$record = preg_replace("@(\d FILE )".addslashes($match[$k][1])."@", "$1".$filename, $record);
@@ -568,7 +568,7 @@ else {
 
 		$id_ok = true;
 		if($clipping['type']=='indi') {
-			if (showLivingNameByID($clipping['id'])) $id_ok = true;
+			if (PrivacyFunctions::showLivingNameByID($clipping['id'])) $id_ok = true;
 			else $id_ok = false;
 			if ($id_ok) $dName = GetSortableName($clipping['id']); else $dName = $gm_lang["person_private"];
 		  	$names = preg_split("/,/", $dName);
@@ -585,14 +585,14 @@ else {
 			    $husb_ok = true;
 			    $ct01 = preg_match("/1 HUSB @(.*)@/", $famrec, $match);
 		    	if ($ct01 > 0) {
-					if (showLivingNameByID($match[1])) $husb_ok = true;
+					if (PrivacyFunctions::showLivingNameByID($match[1])) $husb_ok = true;
 					else $husb_ok = false;
 		    	}
 
 		    	$wife_ok = true;
 		    	$ct02 = preg_match("/1 WIFE @(.*)@/", $famrec, $match);
 		    	if ($ct02 > 0) {
-		      		if (showLivingNameByID($match[1])) $wife_ok = true;
+		      		if (PrivacyFunctions::showLivingNameByID($match[1])) $wife_ok = true;
 		      		else $wife_ok = false;
 		    	}
 		    	if (($husb_ok) && ($wife_ok)) $dName = GetFamilyDescriptor($clipping['id']); else $dName = $gm_lang["family_private"];

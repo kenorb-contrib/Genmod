@@ -57,7 +57,7 @@ abstract class DetailController extends BaseController{
 				$this->fact_filter = array("OBJE", "SOUR", "NOTE", "SEX", "NAME");
 				break;
 			case "FamilyController":
-				$this->tabs = array('0', 'facts', 'sources', 'media', 'notes');
+				$this->tabs = array('0', 'facts', 'sources', 'media', 'notes', 'actions_person');
 				$this->tabtype = "fam";
 				$this->object_name = "family";
 				$this->fact_filter = array("OBJE", "SOUR", "NOTE");
@@ -445,7 +445,7 @@ abstract class DetailController extends BaseController{
 						print "<tr>";
 						print "<td class=\"shade1 wrap\">".nl2br(stripslashes($item->text))."</td>";
 						print "<td class=\"shade1\">";
-						print "<a href=\"individual.php?pid=".$item->pid."\">".$item->indidesc."</a>";
+						print "<a href=\"individual.php?pid=".$item->pid."\">".$item->piddesc."</a>";
 						print "</td>";
 						print "<td class=\"shade1\">".$gm_lang["action".$item->status]."</td>";
 						print "</tr>";
@@ -668,7 +668,7 @@ abstract class DetailController extends BaseController{
 					else print "<tr><td id=\"no_tab".$index."\" class=\"shade1\"></td></tr>\n";
 					//-- New action Link
 					if (!$this->isPrintPreview() && $this->$object_name->canedit && !$this->$object_name->isdeleted) { 
-						ActionController::PrintAddLink();
+						ActionController::PrintAddLink($this->tabtype);
 					}
 					print "</table></form>";
 				}
@@ -740,10 +740,9 @@ abstract class DetailController extends BaseController{
 	}
 	
 	private function HasUnapprovedLinks() {
-		global $TBLPREFIX;
 		
 		if ($this->show_changes) {
-			$sql = "SELECT count(ch_id) FROM ".$TBLPREFIX."changes WHERE ch_gedfile='".$this->gedcomid."' AND ch_fact NOT IN ('HUSB', 'WIFE', 'CHIL', 'FAMC', 'FAMS', 'INDI') AND ((ch_new LIKE '%@".$this->xref."@%' AND ch_new NOT LIKE '%0 @".$this->xref."@%') OR (ch_old LIKE '%@".$this->xref."@%' AND ch_old NOT LIKE '0 @".$this->xref."@%'))";
+			$sql = "SELECT count(ch_id) FROM ".TBLPREFIX."changes WHERE ch_gedfile='".$this->gedcomid."' AND ch_fact NOT IN ('HUSB', 'WIFE', 'CHIL', 'FAMC', 'FAMS', 'INDI') AND ((ch_new LIKE '%@".$this->xref."@%' AND ch_new NOT LIKE '%0 @".$this->xref."@%') OR (ch_old LIKE '%@".$this->xref."@%' AND ch_old NOT LIKE '0 @".$this->xref."@%'))";
 			$res = NewQuery($sql);
 			$row = $res->FetchRow();
 			return $row[0];

@@ -33,7 +33,7 @@
 require "config.php";
 
 // Reload the privacy settings with no user overrides
-$Privacy->ReadPrivacy($GEDCOMID, false);
+PrivacyController::ReadPrivacy($GEDCOMID, false);
 
 if (empty($ged)) $ged = $GEDCOM;
 $GEDCOMID = $GEDCOMS[$GEDCOM]["id"];
@@ -219,7 +219,7 @@ if ($action=="update") {
 	print "<tr><td class=\"shade2\">";
 	print $gm_lang["performing_update"];
 	print "<br />";
-	$settings = $Privacy->GetPrivacyObject($GEDCOMID);
+	$settings = PrivacyController::GetPrivacyObject($GEDCOMID);
 	$settings->GEDCOM = $GEDCOM;
 	$settings->GEDCOMID = $GEDCOMID;
 	$settings->PRIV_USER = $PRIV_USER;
@@ -324,7 +324,7 @@ if ($action=="update") {
 		if (!empty($v_new_person_facts_access_ID)) $person_facts[$v_new_person_facts_access_ID][$v_new_person_facts_abbr][$v_new_person_facts_choice] = $v_new_person_facts_acess_option;
 	}
 	$settings->person_facts = $person_facts;	
-	$Privacy->StorePrivacy($settings);
+	PrivacyController::StorePrivacy($settings);
 	WriteToLog("Privacy-> Privacy file updated", "I", "G", $GEDCOM);
 	
 }

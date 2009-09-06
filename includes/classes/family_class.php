@@ -446,7 +446,7 @@ class Family extends GedcomRecord {
 		else $gedrec = $this->gedrec;
 
 		$subrecord = GetSubRecord(1, "1 MARR", $this->gedrec);
-		if (!empty($subrecord) && ShowFact("MARR", $this->xref, "FAM") && !FactViewRestricted($this->xref, $subrecord, 2)) {
+		if (!empty($subrecord) && PrivacyFunctions::showFact("MARR", $this->xref, "FAM") && !PrivacyFunctions::FactViewRestricted($this->xref, $subrecord, 2)) {
 			$this->marr_fact = new Fact($this->xref, "MARR", $subrecord);
 			$this->marr_date = $this->marr_fact->simpledate;
 			$this->marr_type = $this->marr_fact->simpletype;
@@ -498,6 +498,19 @@ class Family extends GedcomRecord {
 		
 		if (is_null($this->marr_plac)) $this->parseMarriageFact();
 		return $this->marr_plac;
+	}
+	
+	protected function GetLinksFromActions($status="") {
+
+		if(!is_null($this->actionlist)) return $this->actionlist;
+		$this->actionlist = array();
+		$search = ActionController::GetSelectActionList("", $this->xref, $this->gedcomid, $status);
+		$this->actionlist = $search[0];
+		$this->action_open = $search[1];
+		$this->action_closed = $search[2];
+		$this->action_hide = $search[3];
+		$this->action_count = count($this->actionlist);
+		return $this->actionlist;
 	}
 	
 	public function PrintListFamily($useli=true) {

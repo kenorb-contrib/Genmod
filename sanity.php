@@ -36,8 +36,8 @@ include "includes/functions/functions_edit.php";
 //-- make sure that they have gedcom admin status before they can use this page
 //-- otherwise have them login again
 if (!$gm_user->userGedcomAdmin()) {
-	if (empty($LOGIN_URL)) header("Location: login.php?url=sanity.php");
-	else header("Location: ".$LOGIN_URL."?url=sanity.php");
+	if (LOGIN_URL == "") header("Location: login.php?url=sanity.php");
+	else header("Location: ".LOGIN_URL."?url=sanity.php");
 	exit;
 }
 print_header("Genmod ".$gm_lang["sc_sanity_check_short"]);
@@ -197,28 +197,28 @@ if (!empty($check_settings)) {
 		
 		// MySQL connect user rights
 		print "<tr><td class=\"shade1\">".$gm_lang["sc_mysql_user"]."</td><td class=\"shade1 wrap\">";
-		$res = NewQuery("DROP TABLE ".$TBLPREFIX."testsanity", true);
-		$res = NewQuery("CREATE TABLE ".$TBLPREFIX."testsanity (s_text VARCHAR(255))", true);
+		$res = NewQuery("DROP TABLE ".TBLPREFIX."testsanity", true);
+		$res = NewQuery("CREATE TABLE ".TBLPREFIX."testsanity (s_text VARCHAR(255))", true);
 		if (!$res) print $error_icon.$gm_lang["sc_no_rights"];
 		else {
-			$res = NewQuery("ALTER TABLE ".$TBLPREFIX."testsanity CHANGE s_text s_text VARCHAR(200)", true);
+			$res = NewQuery("ALTER TABLE ".TBLPREFIX."testsanity CHANGE s_text s_text VARCHAR(200)", true);
 			if (!$res) print $error_icon.$gm_lang["sc_no_rights"];
 			else {
-				$res = NewQuery("INSERT INTO ".$TBLPREFIX."testsanity VALUES ('testdata1')", true);
-				$res = NewQuery("INSERT INTO ".$TBLPREFIX."testsanity VALUES ('testdata2')", true);
+				$res = NewQuery("INSERT INTO ".TBLPREFIX."testsanity VALUES ('testdata1')", true);
+				$res = NewQuery("INSERT INTO ".TBLPREFIX."testsanity VALUES ('testdata2')", true);
 				if (!$res) print $error_icon.$gm_lang["sc_no_rights"];
 				else {
-					$res = NewQuery("UPDATE ".$TBLPREFIX."testsanity SET s_text='newtestdata' WHERE s_text='testdata1'", true);
+					$res = NewQuery("UPDATE ".TBLPREFIX."testsanity SET s_text='newtestdata' WHERE s_text='testdata1'", true);
 					if (!$res) print $error_icon.$gm_lang["sc_no_rights"];
 					else {
-						$res = NewQuery("SELECT * FROM ".$TBLPREFIX."testsanity", true);
+						$res = NewQuery("SELECT * FROM ".TBLPREFIX."testsanity", true);
 						if (!$res) print $error_icon.$gm_lang["sc_no_rights"];
 						else {
 							$res->FreeResult();
-							$res = NewQuery("DELETE FROM ".$TBLPREFIX."testsanity WHERE s_text='testdata2'", true);
+							$res = NewQuery("DELETE FROM ".TBLPREFIX."testsanity WHERE s_text='testdata2'", true);
 							if (!$res) print $error_icon.$gm_lang["sc_no_rights"];
 							else {
-								$res = NewQuery("DROP TABLE ".$TBLPREFIX."testsanity", true);
+								$res = NewQuery("DROP TABLE ".TBLPREFIX."testsanity", true);
 								if (!$res) print $gm_lang["sc_no_rights"];
 								else print $info_icon.$gm_lang["sc_ok"];
 							}
@@ -243,8 +243,8 @@ if (!empty($check_settings)) {
 			if ($res->NumRows() > 1) {
 				// For MySQL 5 there is always usage access to INFORMATION_SCHEMA.
 				while ($row = $res->FetchRow()) {
-					if ($row[0] != "information_schema" && $row[0] != $DBNAME) {
-						print $warn_icon.$gm_lang["sc_mysql_databases"]." ".$DBNAME."."."<br />";
+					if ($row[0] != "information_schema" && $row[0] != DBNAME) {
+						print $warn_icon.$gm_lang["sc_mysql_databases"]." ".DBNAME."."."<br />";
 						$errors = true;
 						break;
 					}
@@ -339,12 +339,12 @@ if (!empty($check_oldgeds)) {
 	foreach($gedcheck as $key => $check) {
 		if (isset($cleanged) && isset($clean) && $cleanged == $check[1]) {
 			if (($check[2] == "geds" && !in_array($clean, $ageds)) || ($check[2] == "gednames" && !in_array($clean, $agednames))) {
-				$sql = "DELETE FROM ".$TBLPREFIX.$check[1]." WHERE ".$check[0]."='".$clean."'";
+				$sql = "DELETE FROM ".TBLPREFIX.$check[1]." WHERE ".$check[0]."='".$clean."'";
 				$res = NewQuery($sql);
 			}
 			else print $error_icon.$error_icon.$gm_lang["sc_oldgedclean_error"]."<br />";
 		}
-		$sql = "SELECT DISTINCT ".$check[0]." FROM ".$TBLPREFIX.$check[1];
+		$sql = "SELECT DISTINCT ".$check[0]." FROM ".TBLPREFIX.$check[1];
 		if (count($GEDCOMS)>0) $sql .= " WHERE ".$check[0]." NOT IN (".$$check[2].")";
 		if ($check[1] == "log") {
 			if (count($GEDCOMS)>0) $sql .= " AND l_category<>'S'";
@@ -384,7 +384,7 @@ if (!empty($check_gedcoms)) {
 			print "<tr><td class=\"shade1 wrap\" rowspan=\"23\">".$value["title"]."</td><td class=\"shade1 wrap\">";
 			
 			// Get the partial indilist
-			$sql = "SELECT i_id, i_gedcom, i_file FROM ".$TBLPREFIX."individuals WHERE i_file='".$id."'";
+			$sql = "SELECT i_id, i_gedcom, i_file FROM ".TBLPREFIX."individuals WHERE i_file='".$id."'";
 			$res = NewQuery($sql);
 			if ($res) {
 				$indilist = array();
@@ -419,7 +419,7 @@ if (!empty($check_gedcoms)) {
 			print "</td></tr>";
 
 			// Get the partial indilist with asso's and alia's
-			$sql = "SELECT i_id, i_gedcom FROM ".$TBLPREFIX."individuals WHERE (i_gedcom LIKE '%ASSO @%' OR i_gedcom LIKE '%ALIA @') AND i_file='".$id."'";
+			$sql = "SELECT i_id, i_gedcom FROM ".TBLPREFIX."individuals WHERE (i_gedcom LIKE '%ASSO @%' OR i_gedcom LIKE '%ALIA @') AND i_file='".$id."'";
 			$res = NewQuery($sql);
 			if ($res) {
 				$cirelalist = array();
@@ -429,7 +429,7 @@ if (!empty($check_gedcoms)) {
 			}
 		
 			// Get the partial famlist
-			$sql = "SELECT f_id, f_gedcom FROM ".$TBLPREFIX."families WHERE f_file='".$id."'";
+			$sql = "SELECT f_id, f_gedcom FROM ".TBLPREFIX."families WHERE f_file='".$id."'";
 			$res = NewQuery($sql);
 			if ($res) {
 				$cfamlist = array();
@@ -439,7 +439,7 @@ if (!empty($check_gedcoms)) {
 			}
 		
 			// Get the partial famlist with asso's
-			$sql = "SELECT f_id, f_gedcom FROM ".$TBLPREFIX."families WHERE (f_gedcom LIKE '%ASSO @%') AND f_file='".$id."'";
+			$sql = "SELECT f_id, f_gedcom FROM ".TBLPREFIX."families WHERE (f_gedcom LIKE '%ASSO @%') AND f_file='".$id."'";
 			$res = NewQuery($sql);
 			if ($res) {
 				$cfrelalist = array();
@@ -449,7 +449,7 @@ if (!empty($check_gedcoms)) {
 			}
 
 			// Get the partial sourcelist
-			$sql = "SELECT s_id, s_gedcom, s_file, s_name FROM ".$TBLPREFIX."sources WHERE s_file='".$id."'";
+			$sql = "SELECT s_id, s_gedcom, s_file, s_name FROM ".TBLPREFIX."sources WHERE s_file='".$id."'";
 			$res = NewQuery($sql);
 			if ($res) {
 				$sourcelist = array();
@@ -464,7 +464,7 @@ if (!empty($check_gedcoms)) {
 			}
 
 			// Get the partial repolist
-			$sql = "SELECT o_id, o_gedcom FROM ".$TBLPREFIX."other WHERE o_file='".$id."' AND o_type='REPO'";
+			$sql = "SELECT o_id, o_gedcom FROM ".TBLPREFIX."other WHERE o_file='".$id."' AND o_type='REPO'";
 			$res = NewQuery($sql);
 			if ($res) {
 				$crepolist = array();
@@ -477,7 +477,7 @@ if (!empty($check_gedcoms)) {
 			}
 			
 			// Get the partial level 0 notelist
-			$sql = "SELECT o_id, o_gedcom FROM ".$TBLPREFIX."other WHERE o_file='".$id."' AND o_type='NOTE'";
+			$sql = "SELECT o_id, o_gedcom FROM ".TBLPREFIX."other WHERE o_file='".$id."' AND o_type='NOTE'";
 			$res = NewQuery($sql);
 			if ($res) {
 				$cnotelist = array();
@@ -490,7 +490,7 @@ if (!empty($check_gedcoms)) {
 			}
 			
 			// Get the partial MMlist
-			$sql = "SELECT m_media, m_gedrec, m_file, m_titl, m_gedfile FROM ".$TBLPREFIX."media WHERE m_gedfile='".$id."'";
+			$sql = "SELECT m_media, m_gedrec, m_file, m_titl, m_gedfile FROM ".TBLPREFIX."media WHERE m_gedfile='".$id."'";
 			$res = NewQuery($sql);
 			if ($res) {
 				$cmedialist = array();
@@ -1301,7 +1301,7 @@ if (!empty($check_gedcoms)) {
 				$dirs = GetDirList(array($MEDIA_DIRECTORY));
 				
 				// exclude the GM trees
-				$tpath = array($MEDIA_DIRECTORY."/thumbs", "/thumbs/", "./fonts/", "./hooks/", "./images/", "./includes", "./languages/", "./modules/", "./pgvnuke/", "./places/", "./reports/", "./ufpdf/", "./themes/", "./blocks/", "./install/", $INDEX_DIRECTORY);
+				$tpath = array($MEDIA_DIRECTORY."/thumbs", "/thumbs/", "./fonts/", "./hooks/", "./images/", "./includes", "./languages/", "./modules/", "./pgvnuke/", "./places/", "./reports/", "./ufpdf/", "./themes/", "./blocks/", "./install/", INDEX_DIRECTORY);
 				$tpath = str_replace("//", "/", $tpath);
 				foreach($dirs as $key => $dir) {
 					if ($dir == "./") unset ($dirs[$key]);
@@ -1321,7 +1321,7 @@ if (!empty($check_gedcoms)) {
 						while (false !== ($entry = $d->read())) {
 							if(!is_dir($entry) && $entry != ".") {
 								$num++;
-								if ($MediaFS->IsValidMedia($entry)) {
+								if (MediaFS::IsValidMedia($entry)) {
 									$file = RelativePathFile($d->path.$entry);
 									$flist[$file] = false;
 								}	
@@ -1332,7 +1332,7 @@ if (!empty($check_gedcoms)) {
 				}
 			}
 			else {
-				$res = NewQuery("SELECT mf_file, mf_link FROM ".$TBLPREFIX."media_files WHERE mf_file NOT LIKE '<DIR>'");
+				$res = NewQuery("SELECT mf_file, mf_link FROM ".TBLPREFIX."media_files WHERE mf_file NOT LIKE '<DIR>'");
 				if ($res) {
 					while ($row = $res->FetchRow()) {
 						if (empty($row[1])) $flist[$row[0]] = false;
@@ -1352,7 +1352,7 @@ if (!empty($check_gedcoms)) {
 						$file = trim($file);
 						if (substr($file,0,7) != "http://") {
 							if (substr($file,0,2) != "./") $file = "./".$file;
-							$file = RelativePathFile($MEDIA_DIRECTORY.$MediaFS->CheckMediaDepth($file));
+							$file = RelativePathFile($MEDIA_DIRECTORY.MediaFS::CheckMediaDepth($file));
 						}
 						$num++;
 						if (isset($flist[$file])) {
@@ -1473,7 +1473,7 @@ if (!empty($check_filesys)) {
 		print "<tr><td class=\"shade1 wrap\">".$gm_lang["sc_fs_main"]."</td><td class=\"shade1 wrap\">";
 		$dir = "/"; // From PHP5 dir will not read ./ as the current dir. The dot is removed here.
 		$errors1 = false;
-		if ($MediaFS->DirIsWritable($dir, false)) {
+		if (MediaFS::DirIsWritable($dir, false)) {
 			print $error_icon.$gm_lang["sc_fs_main_error"]."<br />";
 			$errors1 = true;
 		}
@@ -1502,9 +1502,9 @@ if (!empty($check_filesys)) {
 		
 		// Index dir
 		print "<tr><td class=\"shade1 wrap\">".$gm_lang["sc_fs_index"]."</td><td class=\"shade1 wrap\">";
-		$dir = $INDEX_DIRECTORY;
+		$dir = INDEX_DIRECTORY;
 		$errors1 = false;
-		if (!$MediaFS->DirIsWritable($dir, false)) {
+		if (!MediaFS::DirIsWritable($dir, false)) {
 			print $error_icon.$gm_lang["sc_fs_index_error"]."<br />";
 			$errors1 = true;
 		}
@@ -1537,7 +1537,7 @@ if (!empty($check_filesys)) {
 		$dir = "./languages/";
 		$write1 = false;
 		$num = 0;
-		if ($MediaFS->DirIsWritable($dir, false)) $write1 = true;
+		if (MediaFS::DirIsWritable($dir, false)) $write1 = true;
 		$d = @dir($dir);
 		if (!is_object($d)) print $warn_icon.$gm_lang["sc_dir_noaccess"]." ".$dir;
 		else {
@@ -1561,7 +1561,7 @@ if (!empty($check_filesys)) {
 		// Check only if media is stored in the physical file system
 		if (!$MEDIA_IN_DB) {
 			print "<tr><td class=\"shade1 wrap\">".$gm_lang["sc_fs_media"]."</td><td class=\"shade1 wrap\">";
-			$res = NewQuery("SELECT gc_media_directory, gc_gedcom FROM ".$TBLPREFIX."gedconf");
+			$res = NewQuery("SELECT gc_media_directory, gc_gedcom FROM ".TBLPREFIX."gedconf");
 			if ($res) {
 				$dirs = array();
 				while ($row = $res->FetchRow()) {
@@ -1573,7 +1573,7 @@ if (!empty($check_filesys)) {
 						print "<br />";
 					}
 					print $gm_lang["sc_gedname"].$GEDCOMS[$value]["title"]."<br />";
-					if (!$MediaFS->DirIsWritable($dir, false)) print $warn_icon.$gm_lang["sc_fs_media_ro"]." ".$dir;
+					if (!MediaFS::DirIsWritable($dir, false)) print $warn_icon.$gm_lang["sc_fs_media_ro"]." ".$dir;
 					else print $warn_icon.$gm_lang["sc_fs_media_rw"]." ".$dir;
 					print "<br />";
 					$first = false;
@@ -1590,7 +1590,7 @@ if (!empty($check_filesys)) {
 			
 			// 1. Get the files
 			$filedata = array();
-			$res = NewQuery("SELECT DISTINCT mdf_file FROM ".$TBLPREFIX."media_datafiles");
+			$res = NewQuery("SELECT DISTINCT mdf_file FROM ".TBLPREFIX."media_datafiles");
 			if ($res) {
 				while ($row = $res->FetchRow()) {
 					$filedata[] = $row[0];
@@ -1603,7 +1603,7 @@ if (!empty($check_filesys)) {
 			
 			// 2. Get the thumbfiles
 			$thumbdata = array();
-			$res = NewQuery("SELECT DISTINCT mtf_file FROM ".$TBLPREFIX."media_thumbfiles");
+			$res = NewQuery("SELECT DISTINCT mtf_file FROM ".TBLPREFIX."media_thumbfiles");
 			if ($res) {
 				while ($row = $res->FetchRow()) {
 					$thumbdata[] = $row[0];
@@ -1615,7 +1615,7 @@ if (!empty($check_filesys)) {
 			// 3. Get the directory data
 			$dirdata = array();
 			$dirprinted = array();
-			$res = NewQuery("SELECT mf_path FROM ".$TBLPREFIX."media_files WHERE mf_file LIKE '<DIR>'");
+			$res = NewQuery("SELECT mf_path FROM ".TBLPREFIX."media_files WHERE mf_file LIKE '<DIR>'");
 			if ($res) {
 				while ($row = $res->FetchRow()) {
 					$dirdata[] = $row[0];
@@ -1626,7 +1626,7 @@ if (!empty($check_filesys)) {
 			$num = 0;
 			$fsize = 0;
 			$tsize = 0;
-			$res = NewQuery("SELECT mf_file, mf_path, mf_size, mf_tsize, mf_link FROM ".$TBLPREFIX."media_files WHERE mf_file NOT LIKE '<DIR>'");
+			$res = NewQuery("SELECT mf_file, mf_path, mf_size, mf_tsize, mf_link FROM ".TBLPREFIX."media_files WHERE mf_file NOT LIKE '<DIR>'");
 			if ($res) {
 				while ($row = $res->FetchAssoc()) {
 					// Check if directory entry, thumbfile and file data are present if they should
@@ -1686,7 +1686,7 @@ if (!empty($check_filesys)) {
 		$dirs = GetDirList(array("./blocks/", "./fonts/", "./hooks/", "./images/", "./includes/", "./modules/", "./places/", "./reports/", "./themes/", "./ufpdf/"));
 		$errors1 = false;
 		foreach ($dirs as $key=>$dir) {
-			if ($MediaFS->DirIsWritable($dir, false)) {
+			if (MediaFS::DirIsWritable($dir, false)) {
 				if (!$errors1) {
 					$errors1 = true;
 					print $error_icon.$gm_lang["sc_fs_dirrw"]."<br />";

@@ -39,7 +39,7 @@ $GM_BLOCKS["print_recent_changes"]["rss"]       = true;
 **/
 function print_recent_changes($block=true, $config="", $side, $index) {
 	global $gm_lang, $month, $year, $day, $monthtonum, $HIDE_LIVE_PEOPLE, $SHOW_ID_NUMBERS, $command, $TEXT_DIRECTION, $SHOW_FAM_ID_NUMBERS;
-	global $GM_IMAGE_DIR, $GM_IMAGES, $GEDCOM, $GEDCOMID, $REGEXP_DB, $DEBUG, $ASC, $IGNORE_FACTS, $IGNORE_YEAR, $TOTAL_QUERIES, $LAST_QUERY, $GM_BLOCKS, $SHOW_SOURCES;
+	global $GM_IMAGE_DIR, $GM_IMAGES, $GEDCOM, $GEDCOMID, $DEBUG, $ASC, $IGNORE_FACTS, $IGNORE_YEAR, $TOTAL_QUERIES, $LAST_QUERY, $GM_BLOCKS, $SHOW_SOURCES;
 	global $medialist, $gm_username, $gm_user;
 
 	$block = true;			// Always restrict this block's height
@@ -89,7 +89,7 @@ function print_recent_changes($block=true, $config="", $side, $index) {
 			if ($factarr[2]=="INDI") {
 				$gid = $factarr[0];
 				$factrec = $factarr[1];
-				if (displayDetailsById($gid)) {
+				if (PrivacyFunctions::displayDetailsById($gid)) {
 					$indirec = FindPersonRecord($gid);
 					if ($lastgid!=$gid) {
 						$name = CheckNN(GetSortableName($gid));
@@ -128,7 +128,7 @@ function print_recent_changes($block=true, $config="", $side, $index) {
 			if ($factarr[2]=="FAM") {
 				$gid = $factarr[0];
 				$factrec = $factarr[1];
-				if (displayDetailsById($gid, "FAM")) {
+				if (PrivacyFunctions::displayDetailsById($gid, "FAM")) {
 					$famrec = FindFamilyRecord($gid);
 					$name = GetFamilyDescriptor($gid);
 					if ($lastgid!=$gid) {
@@ -180,7 +180,7 @@ function print_recent_changes($block=true, $config="", $side, $index) {
 			if ($factarr[2]=="REPO") {
 				$gid = $factarr[0];
 				$factrec = $factarr[1];
-				if (displayDetailsById($gid, "REPO")) {
+				if (PrivacyFunctions::displayDetailsById($gid, "REPO")) {
 					$reporec = FindRepoRecord($gid);
 					$name = GetRepoDescriptor($gid);
 					if ($lastgid!=$gid) {
@@ -210,7 +210,7 @@ function print_recent_changes($block=true, $config="", $side, $index) {
 			if ($factarr[2]=="OBJE") {
 				$gid = $factarr[0];
 				$factrec = $factarr[1];
-				if (displayDetailsById($gid, "OBJE", 1, true)) {
+				if (PrivacyFunctions::displayDetailsById($gid, "OBJE", 1, true)) {
 					$mediarec = FindMediaRecord($gid);
 					if (isset($medialist[$gid]["title"]) && $medialist[$gid]["title"] != "") $title=$medialist[$gid]["title"];
 					else $title = $medialist[$gid]["file"];

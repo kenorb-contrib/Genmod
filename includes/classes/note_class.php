@@ -146,7 +146,7 @@ class Note extends GedcomRecord {
 		else if ($this->ThisChanged() && !is_null($this->GetChangedGedrec())) {
 			if (!is_null($this->newtext)) return $this->newtext;
 			$this->newtext = "";
-			$nt = preg_match("/0 @.+@ NOTE (.*)(?:\r\n|\n|\r)/", $this->GetChangedGedrec(), $n1match);
+			$nt = preg_match("/0 @.+@ NOTE (.*)(\r\n|\n|\r)*/", $this->GetChangedGedrec(), $n1match);
 			if ($nt>0) $this->newtext = preg_replace("/~~/", "<br />", $n1match[1]);
 			$this->newtext .= GetCont(1, $this->GetChangedGedrec());
 			return $this->newtext;
@@ -154,7 +154,7 @@ class Note extends GedcomRecord {
 		else {
 			if (!is_null($this->text)) return $this->text;
 			$this->text = "";
-			$nt = preg_match("/0 @.+@ NOTE (.*)(?:\r\n|\n|\r)/", $this->gedrec, $n1match);
+			$nt = preg_match("/0 @.+@ NOTE (.*)(\r\n|\n|\r)*/", $this->gedrec, $n1match);
 			if ($nt>0) $this->text = preg_replace("/~~/", "<br />", $n1match[1]);
 			$this->text .= GetCont(1, $this->gedrec);
 			return $this->text;
@@ -162,13 +162,12 @@ class Note extends GedcomRecord {
 	}		
 		
 	protected function GetLinksFromIndis() {
-		global $TBLPREFIX;
 
 		if (!is_null($this->indilist)) return $this->indilist;
 		$this->indilist = array();
 		$this->indi_hide = 0;
 		
-		$sql = "SELECT DISTINCT i_key, i_gedcom, i_isdead, i_id, i_file  FROM ".$TBLPREFIX."other_mapping, ".$TBLPREFIX."individuals WHERE om_oid='".$this->xref."' AND om_gedfile='".$this->gedcomid."' AND om_type='INDI' AND om_gid=i_id AND om_gedfile=i_file";
+		$sql = "SELECT DISTINCT i_key, i_gedcom, i_isdead, i_id, i_file  FROM ".TBLPREFIX."other_mapping, ".TBLPREFIX."individuals WHERE om_oid='".$this->xref."' AND om_gedfile='".$this->gedcomid."' AND om_type='INDI' AND om_gid=i_id AND om_gedfile=i_file";
 		$res = NewQuery($sql);
 		while($row = $res->FetchAssoc()){
 			$person = null;
@@ -184,13 +183,12 @@ class Note extends GedcomRecord {
 	}
 	
 	protected function GetLinksFromFams() {
-		global $TBLPREFIX;
 
 		if (!is_null($this->famlist)) return $this->famlist;
 		$this->famlist = array();
 		$this->fam_hide = 0;
 		
-		$sql = "SELECT DISTINCT f_key, f_gedcom, f_id, f_file, f_husb, f_wife  FROM ".$TBLPREFIX."other_mapping, ".$TBLPREFIX."families WHERE om_oid='".$this->xref."' AND om_gedfile='".$this->gedcomid."' AND om_type='FAM' AND om_gid=f_id AND om_gedfile=f_file";
+		$sql = "SELECT DISTINCT f_key, f_gedcom, f_id, f_file, f_husb, f_wife  FROM ".TBLPREFIX."other_mapping, ".TBLPREFIX."families WHERE om_oid='".$this->xref."' AND om_gedfile='".$this->gedcomid."' AND om_type='FAM' AND om_gid=f_id AND om_gedfile=f_file";
 		$res = NewQuery($sql);
 		while($row = $res->FetchAssoc()){
 			$family = null;
@@ -206,13 +204,12 @@ class Note extends GedcomRecord {
 	}
 	
 	protected function GetLinksFromMedia() {
-		global $TBLPREFIX;
 		
 		if (!is_null($this->medialist)) return $this->medialist;
 		$this->medialist = array();
 		$this->media_hide = 0;
 		
-		$sql = "SELECT DISTINCT m_media, m_gedrec, m_gedfile FROM ".$TBLPREFIX."other_mapping, ".$TBLPREFIX."media WHERE om_oid='".$this->xref."' AND om_gedfile='".$this->gedcomid."' AND om_type='OBJE' AND om_gid=m_media AND m_gedfile=om_gedfile";
+		$sql = "SELECT DISTINCT m_media, m_gedrec, m_gedfile FROM ".TBLPREFIX."other_mapping, ".TBLPREFIX."media WHERE om_oid='".$this->xref."' AND om_gedfile='".$this->gedcomid."' AND om_type='OBJE' AND om_gid=m_media AND m_gedfile=om_gedfile";
 		$res = NewQuery($sql);
 		while($row = $res->FetchAssoc()) {
 			$mediaitem = null;
@@ -230,13 +227,12 @@ class Note extends GedcomRecord {
 	 * @return array
 	 */
 	protected function GetLinksFromSources() {
-		global $TBLPREFIX;
 
 		if(!is_null($this->sourcelist)) return $this->sourcelist;
 		$this->sourcelist = array();
 		$this->sour_hide = 0;
 		
-		$sql = 	"SELECT DISTINCT s_key, s_id, s_gedcom, s_file FROM ".$TBLPREFIX."other_mapping, ".$TBLPREFIX."sources WHERE om_oid='".$this->xref."' AND om_gedfile='".$this->gedcomid."' AND om_type='SOUR' AND s_file=om_gedfile AND s_id=om_gid";
+		$sql = 	"SELECT DISTINCT s_key, s_id, s_gedcom, s_file FROM ".TBLPREFIX."other_mapping, ".TBLPREFIX."sources WHERE om_oid='".$this->xref."' AND om_gedfile='".$this->gedcomid."' AND om_type='SOUR' AND s_file=om_gedfile AND s_id=om_gid";
 		$res = NewQuery($sql);
 		while($row = $res->FetchAssoc()){
 			$source = null;
@@ -254,7 +250,6 @@ class Note extends GedcomRecord {
 	 * @return array
 	 */
 	protected function GetLinksFromRepos() {
-		global $TBLPREFIX;
 		
 		if (!is_null($this->repolist)) return $this->repolist;
 		
@@ -262,7 +257,7 @@ class Note extends GedcomRecord {
 		$this->repo_hide = 0;
 		
 		// repositories can be linked from 
-		$sql = 	"SELECT o_key, o_id, o_gedcom FROM ".$TBLPREFIX."other_mapping, ".$TBLPREFIX."other WHERE om_oid='".$this->xref."' AND om_gedfile='".$this->gedcomid."' AND o_type='REPO' AND o_file=om_gedfile AND o_id=om_gid";
+		$sql = 	"SELECT o_key, o_id, o_gedcom FROM ".TBLPREFIX."other_mapping, ".TBLPREFIX."other WHERE om_oid='".$this->xref."' AND om_gedfile='".$this->gedcomid."' AND o_type='REPO' AND o_file=om_gedfile AND o_id=om_gid";
 		$res = NewQuery($sql);
 		while($row = $res->FetchAssoc()){
 			$repo = null;

@@ -228,3 +228,4 @@
 "SERV";"Remote Server"
 "_GEDF";"GEDCOM File"
 "_PRIMARY";"Display as primary in charts"
+"_HIST";"Historical event"

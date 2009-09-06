@@ -74,7 +74,7 @@ if ($auth) {
 			$str = "-".substr($cleanup, 0, -1)." month";
 			$timestamp = strtotime($str);
 			print $gm_lang["cleanup_older"]."&nbsp;".date("d.m.Y H:i:s", $timestamp)."<br />";
-			$sql = 	"DELETE FROM ".$TBLPREFIX."log WHERE (l_category='".$cat."' AND l_timestamp<'".$timestamp."'";
+			$sql = 	"DELETE FROM ".TBLPREFIX."log WHERE (l_category='".$cat."' AND l_timestamp<'".$timestamp."'";
 			if ($cat != "S") $sql .= " AND l_gedcom='".$ged."'";
 			$sql .= ")";
 			$res = NewQuery($sql);

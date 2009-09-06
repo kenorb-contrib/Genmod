@@ -126,7 +126,6 @@ class Favorite {
 	}
 	
 	public function SetFavorite() {
-		global $TBLPREFIX, $DBCONN;
 		
 		// -- make sure something favorite is added
 		if (empty($this->gid) && empty($this->url)) return false;
@@ -135,9 +134,9 @@ class Favorite {
 			// NOTE: make sure a favorite is added
 			
 			// NOTE: Construct the query
-			$sql = "UPDATE ".$TBLPREFIX."favorites SET fv_url = '".$DBCONN->EscapeQuery($this->url)."'";
-			$sql .= ", fv_note = '".$DBCONN->EscapeQuery($this->note)."'";
-			$sql .= ", fv_title = '".$DBCONN->EscapeQuery($this->title)."' ";
+			$sql = "UPDATE ".TBLPREFIX."favorites SET fv_url = '".DbLayer::EscapeQuery($this->url)."'";
+			$sql .= ", fv_note = '".DbLayer::EscapeQuery($this->note)."'";
+			$sql .= ", fv_title = '".DbLayer::EscapeQuery($this->title)."' ";
 			$sql .= "WHERE fv_id = ".$this->id;
 			
 			$res = NewQuery($sql);
@@ -150,21 +149,21 @@ class Favorite {
 		else {
 	
 			//-- make sure this is not a duplicate entry
-			$sql = "SELECT * FROM ".$TBLPREFIX."favorites WHERE ";
-			if (!empty($this->gid)) $sql .= "fv_gid='".$DBCONN->EscapeQuery($this->gid)."' ";
-			if (!empty($this->url)) $sql .= "fv_url='".$DBCONN->EscapeQuery($this->url)."' ";
-			$sql .= "AND fv_file='".$DBCONN->EscapeQuery($this->file)."' AND fv_username='".$DBCONN->EscapeQuery($this->username)."'";
+			$sql = "SELECT * FROM ".TBLPREFIX."favorites WHERE ";
+			if (!empty($this->gid)) $sql .= "fv_gid='".DbLayer::EscapeQuery($this->gid)."' ";
+			if (!empty($this->url)) $sql .= "fv_url='".DbLayer::EscapeQuery($this->url)."' ";
+			$sql .= "AND fv_file='".DbLayer::EscapeQuery($this->file)."' AND fv_username='".DbLayer::EscapeQuery($this->username)."'";
 			$res = NewQuery($sql);
 			if ($res->NumRows()>0) return false;
 			
 			//-- get the next favorite id number for the primary key
 			//-- add the favorite to the database
-			$sql = "INSERT INTO ".$TBLPREFIX."favorites VALUES ('0', '".$DBCONN->EscapeQuery($this->username)."'," .
-					"'".$DBCONN->EscapeQuery($this->gid)."','".$DBCONN->EscapeQuery($this->type)."'," .
-					"'".$DBCONN->EscapeQuery($this->file)."'," .
-					"'".$DBCONN->EscapeQuery($this->url)."'," .
-					"'".$DBCONN->EscapeQuery($this->title)."'," .
-					"'".$DBCONN->EscapeQuery($this->note)."')";
+			$sql = "INSERT INTO ".TBLPREFIX."favorites VALUES ('0', '".DbLayer::EscapeQuery($this->username)."'," .
+					"'".DbLayer::EscapeQuery($this->gid)."','".DbLayer::EscapeQuery($this->type)."'," .
+					"'".DbLayer::EscapeQuery($this->file)."'," .
+					"'".DbLayer::EscapeQuery($this->url)."'," .
+					"'".DbLayer::EscapeQuery($this->title)."'," .
+					"'".DbLayer::EscapeQuery($this->note)."')";
 			$res = NewQuery($sql);
 			if ($res) return true;
 			else {

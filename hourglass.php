@@ -134,7 +134,7 @@ function print_descendency($pid, $count) {
 	// NOTE: If statement OK
 	if ($count==0) {
 		// NOTE: If statement OK
-		if (showLivingNameByID($pid)) {
+		if (PrivacyFunctions::showLivingNameByID($pid)) {
 			// -- print left arrow for decendants so that we can move down the tree
 			$famids = FindSfamilyIds($pid);
 			//-- make sure there is more than 1 child in the family with parents
@@ -172,7 +172,7 @@ function print_descendency($pid, $count) {
 							else $spid=$parents["WIFE"];
 							if (!empty($spid)) {
 								print "\n\t\t\t\t<a href=\"hourglass.php?pid=$spid&amp;show_spouse=$show_spouse&amp;show_full=$show_full&amp;generations=$generations&amp;box_width=$box_width\"><span ";
-								if (showLivingNameById($spid)) {
+								if (PrivacyFunctions::showLivingNameByID($spid)) {
 									$name = GetPersonName($spid);
 									$name = rtrim($name);
 									if (hasRTLText($name))
@@ -190,7 +190,7 @@ function print_descendency($pid, $count) {
 							if ($i>=$num) break;
 							$cid = $smatch[$i][1];
 							print "\n\t\t\t\t&nbsp;&nbsp;<a href=\"hourglass.php?pid=$cid&amp;show_spouse=$show_spouse&amp;show_full=$show_full&amp;generations=$generations&amp;box_width=$box_width\"><span ";
-							if (showLivingNameById($cid)) {
+							if (PrivacyFunctions::showLivingNameByID($cid)) {
 								$name = GetPersonName($cid);
 								$name = rtrim($name);
 								if (hasRTLText($name))
@@ -213,7 +213,7 @@ function print_descendency($pid, $count) {
 							if (!empty($parents["HUSB"])) {
 								$spid = $parents["HUSB"];
 								print "\n\t\t\t\t&nbsp;&nbsp;<a href=\"hourglass.php?pid=$spid&amp;show_spouse=$show_spouse&amp;show_full=$show_full&amp;generations=$generations&amp;box_width=$box_width\"><span ";
-								if (showLivingNameById($spid)) {
+								if (PrivacyFunctions::showLivingNameByID($spid)) {
 									$name = GetPersonName($spid);
 									$name = rtrim($name);
 									if (hasRTLText($name))
@@ -227,7 +227,7 @@ function print_descendency($pid, $count) {
 							if (!empty($parents["WIFE"])) {
 								$spid = $parents["WIFE"];
 								print "\n\t\t\t\t&nbsp;&nbsp;<a href=\"hourglass.php?pid=$spid&amp;show_spouse=$show_spouse&amp;show_full=$show_full&amp;generations=$generations&amp;box_width=$box_width\"><span ";
-								if (showLivingNameById($spid)) {
+								if (PrivacyFunctions::showLivingNameByID($spid)) {
 									$name = GetPersonName($spid);
 									$name = rtrim($name);
 									if (hasRTLText($name))
@@ -247,7 +247,7 @@ function print_descendency($pid, $count) {
 							$cid = $smatch[$i][1];
 							if ($cid!=$pid) {
 								print "\n\t\t\t\t&nbsp;&nbsp;<a href=\"hourglass.php?pid=$cid&amp;show_spouse=$show_spouse&amp;show_full=$show_full&amp;generations=$generations&amp;box_width=$box_width\"><span ";
-								if (showLivingNameById($cid)) {
+								if (PrivacyFunctions::showLivingNameByID($cid)) {
 									$name = GetPersonName($cid);
 									$name = rtrim($name);
 									if (hasRTLText($name))
@@ -349,7 +349,7 @@ if ($show_full==false) {
 // -- root id
 if (!isset($pid)) $pid="";
 $pid=CheckRootId($pid);
-if (showLivingNameByID($pid)) {
+if (PrivacyFunctions::showLivingNameByID($pid)) {
 	$name = GetPersonName($pid);
 	$addname = GetAddPersonName($pid);
 }

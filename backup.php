@@ -35,8 +35,8 @@ require "config.php";
 //-- make sure that they have admin status before they can use this page
 //-- otherwise have them login again
 if (!$gm_user->userIsAdmin()) {
-	if (empty($LOGIN_URL)) header("Location: login.php?url=backup.php");
-	else header("Location: ".$LOGIN_URL."?url=backup.php");
+	if (LOGIN_URL == "") header("Location: login.php?url=backup.php");
+	else header("Location: ".LOGIN_URL."?url=backup.php");
 	exit;
 }
 
@@ -44,7 +44,7 @@ if (!isset($action)) $action = "backup";
 if (!isset($step)) $step = "1";
 
 if ($action == "backup") {
-	if ($MEDIA_IN_DB && (2 * $MediaFS->GetTotalMediaSize() >= disk_free_space($INDEX_DIRECTORY) || !$MediaFS->DirIsWritable($MEDIA_DIRECTORY, false))) $nomedia = true;
+	if ($MEDIA_IN_DB && (2 * MediaFS::GetTotalMediaSize() >= disk_free_space(INDEX_DIRECTORY) || !MediaFS::DirIsWritable($MEDIA_DIRECTORY, false))) $nomedia = true;
 	else $nomedia = false;
 }
 
@@ -122,7 +122,7 @@ switch ($action) {
 		<?php
 		}
 		else {
-			$time_limit = $GedcomConfig->GetHighMaxTime();
+			$time_limit = GedcomConfig::GetHighMaxTime();
 			@set_time_limit($time_limit);
 			// print "Time limit set to ".$time_limit;
 			
@@ -140,7 +140,7 @@ switch ($action) {
 				
 				$flist = GetMediaFiles();
 				foreach ($flist as $key => $mfile) {
-					$MediaFS->CreateFile(RelativePathFile($MEDIA_DIRECTORY.$MediaFS->CheckMediaDepth($mfile)));
+					MediaFS::CreateFile(RelativePathFile($MEDIA_DIRECTORY.MediaFS::CheckMediaDepth($mfile)));
 				}
 				print "<div class=\"shade2\"><br />".$gm_lang["um_mediaexp"]."<br /></div>";
 				print "<div class=\"admin_item_box center\">";
@@ -174,7 +174,7 @@ switch ($action) {
 				
 				// backup language settings and extra language files
 				if (isset($_POST["um_lang"])) {
-					if (file_exists($INDEX_DIRECTORY."lang_settings.php")) $flist[] = $INDEX_DIRECTORY."lang_settings.php";
+					if (file_exists(INDEX_DIRECTORY."lang_settings.php")) $flist[] = INDEX_DIRECTORY."lang_settings.php";
 					$d = dir("languages");
 					while (false !== ($entry = $d->read())) {
 						if (strstr($entry, ".extra")==".extra.php") {
@@ -190,8 +190,8 @@ switch ($action) {
 				if (isset($_POST["um_gedcoms"])) {
 					foreach($GEDCOMS as $key=> $gedcom) {
 						$ged = $gedcom["gedcom"];
-						if (file_exists($INDEX_DIRECTORY."export_".$ged)) unlink($INDEX_DIRECTORY."export_".$ged);
-						$gedname = $INDEX_DIRECTORY."export_".$ged;
+						if (file_exists(INDEX_DIRECTORY."export_".$ged)) unlink(INDEX_DIRECTORY."export_".$ged);
+						$gedname = INDEX_DIRECTORY."export_".$ged;
 						PrintGedcom($ged, "no", "no", "yes", "no", "", $gedname, "");
 						$flist[] = $gedname;
 					}
@@ -203,7 +203,7 @@ switch ($action) {
 				if (isset($_POST["um_media"])) {
 					$mlist = GetMediaFiles($GEDCOMID);
 					foreach ($mlist as $key => $mfile) {
-						$file = RelativePathFile($MEDIA_DIRECTORY.$MediaFS->CheckMediaDepth($mfile));
+						$file = RelativePathFile($MEDIA_DIRECTORY.MediaFS::CheckMediaDepth($mfile));
 						if (file_exists($file)) $flist[] = $file;
 					}
 				}
@@ -249,7 +249,7 @@ switch ($action) {
 				if (count($flist) > 0) {
 					require "includes/pclzip.lib.php";
 					$buname = adodb_date("YmdHis").".zip";
-					$fname = $INDEX_DIRECTORY.$buname;
+					$fname = INDEX_DIRECTORY.$buname;
 					$comment = "Created by Genmod ".GM_VERSION." ".GM_VERSION_RELEASE." on ".adodb_date("r").".";
 					$archive = new PclZip($fname);
 					$v_list = $archive->create($flist, PCLZIP_OPT_COMMENT, $comment);
@@ -257,7 +257,7 @@ switch ($action) {
 					if ($v_list == 0) print "Error : ".$archive->errorInfo(true)."</div>";
 					else {
 						print $gm_lang["um_zip_succ"]."</div>";
-						$url = $SERVER_URL;
+						$url = SERVER_URL;
 						if (substr($url,-1,1)!="/") $url .= "/";
 						print "<div class=\"shade1\"><a href=".$url."downloadbackup.php?fname=".urlencode($fname)." target=_blank>".$gm_lang["um_zip_dl"]." ".$fname."</a>  (";
 						printf("%.0f Kb", (filesize($fname)/1024));
@@ -266,7 +266,7 @@ switch ($action) {
 					
 					// Remove temporary files again
 					foreach ($flist as $key=>$fn) {
-						if (substr($fn, strlen($INDEX_DIRECTORY), 7) == "export_") unlink($fn);
+						if (substr($fn, strlen(INDEX_DIRECTORY), 7) == "export_") unlink($fn);
 					}
 				}
 				else print "<div class=\"shade2\"><br />".$gm_lang["um_nofiles"]."<br /></div>";
@@ -283,7 +283,7 @@ switch ($action) {
 		<?php
 		// If first time, let the user choose the options
 		if (!isset($_POST["um_counters"]) && !isset($_POST["um_changes"]) && !isset($_POST["um_gedsets"]) && !isset($_POST["um_logs"]) && !isset($_POST["um_usinfo"]) && !isset($_POST["um_mypages"]) && !isset($_POST["um_config"]) && !isset($_POST["um_actions"])) {
-			$handle = opendir($INDEX_DIRECTORY);
+			$handle = opendir(INDEX_DIRECTORY);
 			
 			// Check if export files exist in the index dir. If not, we will display a message
 			$files = array();
@@ -359,7 +359,7 @@ switch ($action) {
 			<?php
 		}
 		else {
-			$time_limit = $GedcomConfig->GetHighMaxTime();
+			$time_limit = GedcomConfig::GetHighMaxTime();
 			@set_time_limit($time_limit);
 		
 			$error = false;
@@ -463,10 +463,10 @@ switch ($action) {
 
 
 function GetMediaFiles($gedid="") {
-	global $TBLPREFIX, $MEDIA_IN_DB;
+	global $MEDIA_IN_DB;
 	
 	$mlist = array();
-	$sql = "SELECT m_file from ".$TBLPREFIX."media WHERE m_file NOT LIKE '%://%'";
+	$sql = "SELECT m_file from ".TBLPREFIX."media WHERE m_file NOT LIKE '%://%'";
 	if (!empty($gedid)) $sql .= " AND m_gedfile='".$gedid."'";
 	$sql .= "ORDER BY m_file ASC";
 	$res = NewQuery($sql);

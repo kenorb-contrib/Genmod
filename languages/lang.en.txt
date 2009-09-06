@@ -2494,7 +2494,7 @@
 "media_id_no_exists";"This media ID does not exist, please enter a valid one!"
 "faq_page";"Frequently Asked Questions"
 "actionlist";"ToDo List"
-"sort_by_person";"Sort list by person name"
+"sort_by_person";"Sort list by relation"
 "sort_by_repo";"Sort list by repository name"
 "show_status";"Show ToDo's with status:"
 "action_for_id";"ToDo relates to"

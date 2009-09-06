@@ -75,7 +75,7 @@ if (isset($GEDCOMPATH)) {
 		else $parts = preg_split("/[\/\\\]/", $GEDCOMPATH);
 		$path = "";
 		$ctparts = count($parts)-1;
-		if (count($parts) == 1) $path = $INDEX_DIRECTORY;
+		if (count($parts) == 1) $path = INDEX_DIRECTORY;
 		else {
 			foreach ($parts as $key => $pathpart) {
 				if ($key < $ctparts) $path .= $pathpart."/";
@@ -107,7 +107,7 @@ if (isset($ged)) {
 		$path = "";
 		$parts = preg_split("/[\/\\\]/", $GEDCOMPATH);
 		$ctparts = count($parts)-1;
-		if (count($parts) == 1) $path = $INDEX_DIRECTORY;
+		if (count($parts) == 1) $path = INDEX_DIRECTORY;
 		else {
 			foreach ($parts as $key => $pathpart) {
 				if ($key < $ctparts) $path .= $pathpart."/";
@@ -329,8 +329,8 @@ if ($action=="update") {
 	$newconf["time_limit"] = $_POST["NEW_TIME_LIMIT"];
 	$newconf["last_change_email"] = $_POST["NEW_LAST_CHANGE_EMAIL"];
 
-	$GedcomConfig->SetGedcomConfig($newconf);
-	$MediaFS->CreateDir(RelativePathFile($newconf["media_directory"]), "")
+	GedcomConfig::SetGedcomConfig($newconf);
+	MediaFS::CreateDir(RelativePathFile($newconf["media_directory"]), "")
 	;
 	foreach($_POST as $key=>$value) {
 		if ($key != "path") {

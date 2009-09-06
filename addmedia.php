@@ -52,8 +52,8 @@ if (!$gm_user->userGedcomAdmin()) {
 }
 
 if ($_SESSION["cookie_login"]) {
-	if (empty($LOGIN_URL)) header("Location: login.php?ged=$GEDCOM&url=addmedia.php");
-	else header("Location: ".$LOGIN_URL."?ged=$GEDCOM&url=addmedia.php");
+	if (empty(LOGIN_URL)) header("Location: login.php?ged=$GEDCOM&url=addmedia.php");
+	else header("Location: ".LOGIN_URL."?ged=$GEDCOM&url=addmedia.php");
 	exit;
 }
 
@@ -102,7 +102,7 @@ if ($action=="newentry") {
 	if (isset($gid)) $pid = $gid;
 	
 	// NOTE: Check for file upload
-	$result = $MediaFS->UploadFiles($_FILES, $folder);
+	$result = MediaFS::UploadFiles($_FILES, $folder);
 	
 	if ($result["errno"] != 0) {
 		print "<span class=\"error\">".$gm_lang["upload_error"]."<br />".$result["error"]."</span><br />";

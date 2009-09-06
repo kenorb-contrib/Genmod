@@ -55,8 +55,8 @@
 require "config.php";
 //print_r($_POST);
 if (!$gm_user->userGedcomAdmin()) {
-	if (empty($LOGIN_URL)) header("Location: login.php?url=mergegedcom.php");
-	else header("Location: ".$LOGIN_URL."?url=mergegedcom.php");
+	if (LOGIN_URL == "") header("Location: login.php?url=mergegedcom.php");
+	else header("Location: ".LOGIN_URL."?url=mergegedcom.php");
 	exit;
 }
 
@@ -215,7 +215,7 @@ if (isset($UPFILE) && !empty($UPFILE["name"])) {
 		else $parts = preg_split("/[\/\\\]/", $UPFILE);
 		$path = "";
 		$ctparts = count($parts)-1;
-		if (count($parts) == 1) $path = $INDEX_DIRECTORY;
+		if (count($parts) == 1) $path = INDEX_DIRECTORY;
 		else {
 			foreach ($parts as $key => $pathpart) {
 				if ($key < $ctparts) $path .= $pathpart."/";
@@ -277,7 +277,7 @@ print "<form enctype=\"multipart/form-data\" method=\"post\" name=\"configform\"
 					<?php
 					$i = 0;
 					if (!empty($GEDFILENAME)) {
-						if (!file_exists($GEDFILENAME) && file_exists($INDEX_DIRECTORY.$GEDFILENAME)) $GEDFILENAME = $INDEX_DIRECTORY.$GEDFILENAME;
+						if (!file_exists($GEDFILENAME) && file_exists(INDEX_DIRECTORY.$GEDFILENAME)) $GEDFILENAME = INDEX_DIRECTORY.$GEDFILENAME;
 						if (!file_exists($GEDFILENAME)) $error = $gm_lang["file_not_found"];
 					}
 					if (!empty($error)) {
@@ -562,8 +562,8 @@ print "<form enctype=\"multipart/form-data\" method=\"post\" name=\"configform\"
 //						print_r($transtab);
 //						print "</pre>";
 //						exit;
-						@unlink($INDEX_DIRECTORY."transtab.txt");
-						$fp = fopen($INDEX_DIRECTORY."transtab.txt", "wb");
+						@unlink(INDEX_DIRECTORY."transtab.txt");
+						$fp = fopen(INDEX_DIRECTORY."transtab.txt", "wb");
 						if ($fp) {
 							fwrite($fp, serialize($transtab));
 							fclose($fp);
@@ -750,10 +750,6 @@ print "<form enctype=\"multipart/form-data\" method=\"post\" name=\"configform\"
 		print "</div>";
 	}
 	if ($startimport == "true") {
-		//-- set the building index flag to tell the rest of the program that we are importing and so shouldn't
-		//-- perform some of the same checks
-		$BUILDING_INDEX = true;
-		
 		if (isset($exectime)){
 			$oldtime=time()-$exectime;
 			$skip_table=0;
@@ -847,7 +843,7 @@ print "<form enctype=\"multipart/form-data\" method=\"post\" name=\"configform\"
 		$TITLE = $GEDCOMS[$merge_ged]["title"];
 		SwitchGedcom($GEDCOMS[$merge_ged]["gedcom"]);
 		if ($LANGUAGE <> $_SESSION["CLANGUAGE"]) $LANGUAGE = $_SESSION["CLANGUAGE"];
-		$GedcomConfig->ResetCaches($merge_ged);
+		GedcomConfig::ResetCaches($merge_ged);
 		$temp2 = $THEME_DIR;
 		$THEME_DIR = $temp;
 		$THEME_DIR = $temp2;
@@ -886,8 +882,8 @@ print "<form enctype=\"multipart/form-data\" method=\"post\" name=\"configform\"
 //			$sourcelist = array();
 //			$otherlist = array();
 			$i=0;
-			$ft = fopen($INDEX_DIRECTORY."transtab.txt", "rb");
-			$ftt = fread($ft, filesize($INDEX_DIRECTORY."transtab.txt"));
+			$ft = fopen(INDEX_DIRECTORY."transtab.txt", "rb");
+			$ftt = fread($ft, filesize(INDEX_DIRECTORY."transtab.txt"));
 			fclose($ft);
 			$transtab = unserialize($ftt);
 			reset($transtab);
@@ -1270,7 +1266,7 @@ print "<form enctype=\"multipart/form-data\" method=\"post\" name=\"configform\"
 			unset($_SESSION["exectime_start"]);
 			unset($_SESSION["i"]);
 			if (!ini_get('safe_mode')) @set_time_limit($TIME_LIMIT);
-			@unlink($INDEX_DIRECTORY."transtab.txt");
+			@unlink(INDEX_DIRECTORY."transtab.txt");
 		}
 	}
 	print "<div class=\"center\" style=\"margin-top: 5px;\">";

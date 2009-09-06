@@ -121,13 +121,13 @@ switch ($action) {
 			$mail_body .= $gm_lang["mail04_line04"] . "\r\n";
 			$mail_body .= print_text("mail04_line05", 0, 1) . "\r\n\r\n";
 			
-			if (empty($LOGIN_URL)) $target = $SERVER_URL;
-			else $target = $LOGIN_URL;
+			if (LOGIN_URL == "") $target = SERVER_URL;
+			else $target = LOGIN_URL;
 			if (substr($target, -1) == "/") $target = substr($target,0, (strlen($target)-1));
-			if (empty($LOGIN_URL)) $target .= "/login.php";
+			if (LOGIN_URL == "") $target .= "/login.php";
 			$mail_body .= "<a href=\"".$target."\">".$target."</a>";
 			
-			GmMail($newuser->email, str_replace("#SERVER_NAME#", $SERVER_URL, $gm_lang["mail04_subject"]), $mail_body, "", "", "", "", "", true);
+			GmMail($newuser->email, str_replace("#SERVER_NAME#", SERVER_URL, $gm_lang["mail04_subject"]), $mail_body, "", "", "", "", "", true);
 			
 			// Reset language to original page language
 			$LANGUAGE = $oldlanguage;
@@ -415,15 +415,15 @@ switch ($action) {
 				
 				$mail_body = "";
 				$mail_body .= str_replace("#user_fullname#", $user_firstname." ".$user_lastname, $gm_lang["mail01_line01"]) . "\r\n\r\n";
-				$mail_body .= str_replace("#user_email#", $user_email, str_replace("#SERVER_NAME#", $SERVER_URL, $gm_lang["mail01_line02"])) . "\r\n";
+				$mail_body .= str_replace("#user_email#", $user_email, str_replace("#SERVER_NAME#", SERVER_URL, $gm_lang["mail01_line02"])) . "\r\n";
 				$mail_body .= $gm_lang["mail01_line03"] . "\r\n\r\n";
 				// $mail_body .= $gm_lang["mail01_line04"] . "\r\n\r\n";
-				if (substr($SERVER_URL, -1) == "/") {
-					$link = substr($SERVER_URL,0, (strlen($SERVER_URL)-1)). "/login_register.php?action=userverify&user_name=".urlencode($user_name)."&user_hashcode=".urlencode($user->reg_hashcode);
+				if (substr(SERVER_URL, -1) == "/") {
+					$link = substr(SERVER_URL,0, (strlen(SERVER_URL)-1)). "/login_register.php?action=userverify&user_name=".urlencode($user_name)."&user_hashcode=".urlencode($user->reg_hashcode);
 					$mail_body .= "<a href=\"". $link . "\">".$gm_lang["mail01_line04"]."</a>\r\n";
 				}
 				else {
-					$link = $SERVER_URL. "/login_register.php?action=userverify&user_name=".urlencode($user_name)."&user_hashcode=".urlencode($user->reg_hashcode);
+					$link = SERVER_URL. "/login_register.php?action=userverify&user_name=".urlencode($user_name)."&user_hashcode=".urlencode($user->reg_hashcode);
 					$mail_body .= "<a href=\"". $link . "\">".$gm_lang["mail01_line04"]."</a>\r\n";
 				}
 				$mail_body .= $gm_lang["username"] . " " . $user_name . "\r\n";
@@ -435,7 +435,7 @@ switch ($action) {
 				$mail_body .= $gm_lang["mail01_line06"] . "\r\n";
 				
 				/* Send a confirmation mail to the user */
-				GmMail($user_email, str_replace("#SERVER_NAME#", $SERVER_URL, $gm_lang["mail01_subject"]), $mail_body, "", "", "", "", "", true);
+				GmMail($user_email, str_replace("#SERVER_NAME#", SERVER_URL, $gm_lang["mail01_subject"]), $mail_body, "", "", "", "", "", true);
 				
 				// switch language to webmaster settings
 				$admuser =& User::GetInstance($WEBMASTER_EMAIL);
@@ -449,7 +449,7 @@ switch ($action) {
 				
 				$mail_body = "";
 				$mail_body .= $gm_lang["mail02_line01"] . "\r\n\r\n";
-				$mail_body .= str_replace("#SERVER_NAME#", $SERVER_URL, $gm_lang["mail02_line02"]) . "\r\n\r\n";
+				$mail_body .= str_replace("#SERVER_NAME#", SERVER_URL, $gm_lang["mail02_line02"]) . "\r\n\r\n";
 				$mail_body .= $gm_lang["username"] . " " . $user_name . "\r\n";
 				$mail_body .= $gm_lang["firstname"] . " " . $user_firstname . "\r\n";
 				$mail_body .= $gm_lang["lastname"] . " " . $user_lastname . "\r\n\r\n";
@@ -462,18 +462,18 @@ switch ($action) {
 					$mail_body .= $gm_lang["mail02_line04a"] . "\r\n";
 				}
 				/* 2 lines below seem obsolete */
-				$message = array();
-				$message["to"]=$WEBMASTER_EMAIL;
-				$message["from"]=$user_name;
-				$message["from_email"]=$user_email;
-				$message["from_name"]=$user_firstname.' '.$user_lastname;
-				$message["subject"] = str_replace("#SERVER_NAME#", $SERVER_URL, str_replace("#user_email#", $user_email, $gm_lang["mail02_subject"]));
-				$message["body"] = $mail_body;
-				$message["created"] = $time;
-				$message["method"] = $SUPPORT_METHOD;
-				$message["no_from"] = true;
+				$message = new Message();
+				$message->to = $WEBMASTER_EMAIL;
+				$message->from = $user_name;
+				$message->from_email = $user_email;
+				$message->from_name = $user_firstname.' '.$user_lastname;
+				$message->subject = str_replace("#SERVER_NAME#", SERVER_URL, str_replace("#user_email#", $user_email, $gm_lang["mail02_subject"]));
+				$message->body = $mail_body;
+				$message->created = $time;
+				$message->method = $SUPPORT_METHOD;
+				$message->no_from = true;
 				/* Store a message for the admin in the database and send out the email */
-				AddMessage($message);
+				$message->AddMessage();
 				
 				// switch language back to earlier settings
 				$LANGUAGE = $oldlanguage;
@@ -496,8 +496,8 @@ switch ($action) {
 			print "</div>";
 		}
 		else {
-			if (empty($LOGIN_URL)) header("Location: login.php");
-			else header("Location: ".$LOGIN_URL);
+			if (LOGIN_URL == "") header("Location: login.php");
+			else header("Location: ".LOGIN_URL);
 			header("Location: login.php");
 			exit;
 		}			
@@ -564,21 +564,21 @@ switch ($action) {
 				$mail_body .= str_replace("#newuser[username]# ( #newuser[fullname]# )", $newuser->username . " (" . $newuser->firstname." ".$newuser->lastname . ") ", $gm_lang["mail03_line02"]) . "\r\n\r\n";
 				if ($REQUIRE_ADMIN_AUTH_REGISTRATION) $mail_body .= $gm_lang["mail03_line03"] . "\r\n";
 				else $mail_body .= $gm_lang["mail03_line03a"] . "\r\n";
-				$reflink = $SERVER_URL;
-				if (substr($SERVER_URL, -1) != "/") $reflink .= "/";
+				$reflink = SERVER_URL;
+				if (substr(SERVER_URL, -1) != "/") $reflink .= "/";
 				$reflink .= "useradmin.php?action=edituser&username=".urlencode($newuser->username);
 				$mail_body .= "<a href=\"".$reflink."\">".$reflink."</a>\r\n";
 				$host = preg_replace("/^www\./i", "", $_SERVER["SERVER_NAME"]);
 				$headers = "From: Genmod-noreply@".$host;
-				$message = array();
-				$message["to"]=$WEBMASTER_EMAIL;
-				$message["from"]="Genmod-noreply@".$host;
-				$message["subject"] = str_replace("#SERVER_NAME#", $SERVER_URL, $gm_lang["mail03_subject"]);
-				$message["body"] = $mail_body;
-				$message["created"] = $time;
-				$message["method"] = $SUPPORT_METHOD;
-				$message["no_from"] = true;
-				AddMessage($message, true);
+				$message = new Message();
+				$message->to = $WEBMASTER_EMAIL;
+				$message->from = "Genmod-noreply@".$host;
+				$message->subject = str_replace("#SERVER_NAME#", SERVER_URL, $gm_lang["mail03_subject"]);
+				$message->body = $mail_body;
+				$message->created = $time;
+				$message->method = $SUPPORT_METHOD;
+				$message->no_from = true;
+				$message->AddMessage(true);
 				
 				// Reset language to original page language
 				$LANGUAGE = $oldlanguage;
@@ -611,7 +611,7 @@ switch ($action) {
 		print "</div>";
 		break;
 	default :
-  		if (stristr($SERVER_URL, $url)) $url = $SERVER_URL;
+  		if (stristr(SERVER_URL, $url)) $url = SERVER_URL;
 		header("Location: $url"); 
 		break;
 }

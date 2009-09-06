@@ -48,7 +48,7 @@ require_once("includes/values/edit_data.php");
  * @return 	boolean	true if succeed/false if failed
  */
 function ReplaceGedrec($gid, $oldrec, $newrec, $fact="", $change_id, $change_type, $gedid="") {
-	global $GEDCOM, $manual_save, $GEDCOMS, $TBLPREFIX, $gm_username, $GEDCOMID, $chcache, $can_auto_accept, $DBCONN, $aa_attempt;
+	global $GEDCOM, $manual_save, $GEDCOMS, $gm_username, $GEDCOMID, $chcache, $can_auto_accept, $aa_attempt;
 
 	// NOTE: Check if auto accept is possible. If there are already changes present for any ID in one $change_id, changes cannot be auto accepted.
 	if (!isset($can_auto_accept)) $can_auto_accept = true;
@@ -79,17 +79,17 @@ function ReplaceGedrec($gid, $oldrec, $newrec, $fact="", $change_id, $change_typ
 	
 	// NOTE: Check if there are changes present, if so flag pending changes so they cannot be approved
 	if (GetChangeData(true, $gid, true) && ($change_type == "raw_edit" || $change_type == "reorder_families" || $change_type == "reorder_children")) {
-		$sql = "select ch_cid as cid from ".$TBLPREFIX."changes where ch_gid = '".$gid."' and ch_gedfile = '".$gedid."' order by ch_cid ASC";
+		$sql = "select ch_cid as cid from ".TBLPREFIX."changes where ch_gid = '".$gid."' and ch_gedfile = '".$gedid."' order by ch_cid ASC";
 		$res = NewQuery($sql);
 		while($row = $res->FetchAssoc()){
-			$sqlcid = "update ".$TBLPREFIX."changes set ch_delete = '1' where ch_cid = '".$row["cid"]."'";
+			$sqlcid = "update ".TBLPREFIX."changes set ch_delete = '1' where ch_cid = '".$row["cid"]."'";
 			$rescid = NewQuery($sqlcid);
 		}
 	}
 
-	$sql = "INSERT INTO ".$TBLPREFIX."changes (ch_cid, ch_gid, ch_gedfile, ch_type, ch_user, ch_time, ch_fact, ch_old, ch_new)";
+	$sql = "INSERT INTO ".TBLPREFIX."changes (ch_cid, ch_gid, ch_gedfile, ch_type, ch_user, ch_time, ch_fact, ch_old, ch_new)";
 	$sql .= "VALUES ('".$change_id."', '".$gid."', '".$gedid."', '".$change_type."', '".$gm_username."', '".time()."'";
-	$sql .= ", '".$fact."', '".$DBCONN->EscapeQuery($oldrec)."', '".$DBCONN->EscapeQuery($newrec)."')";
+	$sql .= ", '".$fact."', '".DbLayer::EscapeQuery($oldrec)."', '".DbLayer::EscapeQuery($newrec)."')";
 	$res = NewQuery($sql);
 	
 	WriteToLog("ReplaceGedrec-> Replacing gedcom record $gid ->" . $gm_username ."<-", "I", "G", get_gedcom_from_id($gedid));
@@ -102,7 +102,7 @@ function ReplaceGedrec($gid, $oldrec, $newrec, $fact="", $change_id, $change_typ
 //-- this function will append a new gedcom record at
 //-- the end of the gedcom file.
 function AppendGedrec($newrec, $fact="", $change_id, $change_type, $gedid="") {
-	global $GEDCOM, $manual_save, $TBLPREFIX, $GEDCOMS, $gm_username, $GEDCOMID, $chcache, $DBCONN;
+	global $GEDCOM, $manual_save, $GEDCOMS, $gm_username, $GEDCOMID, $chcache;
 
 	$newrec = preg_replace(array("/(\r\n)+/", "/\r+/", "/\n+/"), array("\r\n", "\r", "\n"), $newrec);
 	$newrec = stripslashes(trim($newrec));
@@ -115,8 +115,8 @@ function AppendGedrec($newrec, $fact="", $change_id, $change_type, $gedid="") {
 	$_SESSION["last_used"][$type] = JoinKey($xref, $GEDCOMID);
 	$newrec = preg_replace("/0 @(.*)@/", "0 @$xref@", $newrec);
 	
-	$sql = "INSERT INTO ".$TBLPREFIX."changes (ch_cid, ch_gid, ch_gedfile, ch_type, ch_user, ch_time, ch_fact, ch_new)";
-	$sql .= "VALUES ('".$change_id."', '".$xref."', '".$gedid."', '".$change_type."', '".$gm_username."', '".time()."', '".$fact."', '".$DBCONN->EscapeQuery($newrec)."')";
+	$sql = "INSERT INTO ".TBLPREFIX."changes (ch_cid, ch_gid, ch_gedfile, ch_type, ch_user, ch_time, ch_fact, ch_new)";
+	$sql .= "VALUES ('".$change_id."', '".$xref."', '".$gedid."', '".$change_type."', '".$gm_username."', '".time()."', '".$fact."', '".DbLayer::EscapeQuery($newrec)."')";
 	$res = NewQuery($sql);
 	WriteToLog("AppendGedrec-> Appending new $type record $xref ->" . $gm_username ."<-", "I", "G", get_gedcom_from_id($gedid));
 
@@ -129,7 +129,7 @@ function AppendGedrec($newrec, $fact="", $change_id, $change_type, $gedid="") {
 //-- this function will delete the gedcom record with
 //-- the given $gid
 function DeleteGedrec($gid, $change_id, $change_type) {
-	global $GEDCOMS, $GEDCOM, $manual_save, $TBLPREFIX, $gm_username, $GEDCOMID, $chcache, $can_auto_accept, $DBCONN, $aa_attempt;
+	global $GEDCOMS, $GEDCOM, $manual_save, $gm_username, $GEDCOMID, $chcache, $can_auto_accept, $aa_attempt;
 	$gid = strtoupper($gid);
 	
 	// NOTE: Check if auto accept is possible. If there are already changes present for any ID in one $change_id, changes cannot be auto accepted.
@@ -141,10 +141,10 @@ function DeleteGedrec($gid, $change_id, $change_type) {
 	}
 	// NOTE: Check if there are changes present, if so flag pending changes so they cannot be approved
 	if (GetChangeData(true, $gid, true)) {
-		$sql = "SELECT ch_cid AS cid FROM ".$TBLPREFIX."changes WHERE ch_gid = '".$gid."' AND ch_gedfile = '".$GEDCOMID."' ORDER BY ch_cid ASC";
+		$sql = "SELECT ch_cid AS cid FROM ".TBLPREFIX."changes WHERE ch_gid = '".$gid."' AND ch_gedfile = '".$GEDCOMID."' ORDER BY ch_cid ASC";
 		$res = NewQuery($sql);
 		while($row = $res->FetchAssoc()){
-			$sqlcid = "UPDATE ".$TBLPREFIX."changes SET ch_delete = '1' WHERE ch_cid = '".$row["cid"]."'";
+			$sqlcid = "UPDATE ".TBLPREFIX."changes SET ch_delete = '1' WHERE ch_cid = '".$row["cid"]."'";
 			$rescid = NewQuery($sqlcid);
 		}
 		// Clear the GetChangeData cache
@@ -163,8 +163,8 @@ function DeleteGedrec($gid, $change_id, $change_type) {
 		else $oldrec = FindGedcomRecord($gid);
 		$ct = preg_match("/0 @.*@\s(\w+)\s/", $oldrec, $match);
 		$ch_fact = $match[1];
-		$sql = "INSERT INTO ".$TBLPREFIX."changes (ch_cid, ch_gid, ch_fact, ch_old, ch_gedfile, ch_type, ch_user, ch_time)";
-		$sql .= "VALUES ('".$change_id."', '".$gid."', '".$ch_fact."', '".$DBCONN->EscapeQuery($oldrec)."', '".$GEDCOMID."', '".$change_type."', '".$gm_username."', '".time()."')";
+		$sql = "INSERT INTO ".TBLPREFIX."changes (ch_cid, ch_gid, ch_fact, ch_old, ch_gedfile, ch_type, ch_user, ch_time)";
+		$sql .= "VALUES ('".$change_id."', '".$gid."', '".$ch_fact."', '".DbLayer::EscapeQuery($oldrec)."', '".$GEDCOMID."', '".$change_type."', '".$gm_username."', '".time()."')";
 		$res = NewQuery($sql);
 		// Also delete the asso recs to an indi, to preserve referential integrity
 		if ($ch_fact == "INDI" || $ch_fact == "FAM") {
@@ -181,8 +181,8 @@ function DeleteGedrec($gid, $change_id, $change_type) {
 						do {
 							$asubrec = GetSubrecord(1, "1 ASSO @".$pid1."@", $arec, $i);
 							if (!empty($asubrec)) {
-								$sql = "INSERT INTO ".$TBLPREFIX."changes (ch_cid, ch_gid, ch_fact, ch_old, ch_gedfile, ch_type, ch_user, ch_time)";
-								$sql .= "VALUES ('".$change_id."', '".$pid2."', 'ASSO', '".$DBCONN->EscapeQuery($asubrec)."', '".$GEDCOMID."', '".$change_type."', '".$gm_username."', '".time()."')";
+								$sql = "INSERT INTO ".TBLPREFIX."changes (ch_cid, ch_gid, ch_fact, ch_old, ch_gedfile, ch_type, ch_user, ch_time)";
+								$sql .= "VALUES ('".$change_id."', '".$pid2."', 'ASSO', '".DbLayer::EscapeQuery($asubrec)."', '".$GEDCOMID."', '".$change_type."', '".$gm_username."', '".time()."')";
 							}
 							$i++;
 						} while (!empty($asubrec));
@@ -193,8 +193,8 @@ function DeleteGedrec($gid, $change_id, $change_type) {
 							if (preg_match("/\n2 ASSO @$pid1@/", $subrec, $match)) {
 								$asubrec = GetSubrecord(2, "2 ASSO @".$pid1."@", $subrec);
 								$newsubrec = preg_replace($asubrec, "", $subrec);
-								$sql = "INSERT INTO ".$TBLPREFIX."changes (ch_cid, ch_gid, ch_fact, ch_old, ch_new, ch_gedfile, ch_type, ch_user, ch_time)";
-								$sql .= "VALUES ('".$change_id."', '".$pid2."', 'ASSO', '".$DBCONN->EscapeQuery($subrec)."', '".$DBCONN->EscapeQuery($newsubrec)."', '".$GEDCOMID."', '".$change_type."', '".$gm_username."', '".time()."')";
+								$sql = "INSERT INTO ".TBLPREFIX."changes (ch_cid, ch_gid, ch_fact, ch_old, ch_new, ch_gedfile, ch_type, ch_user, ch_time)";
+								$sql .= "VALUES ('".$change_id."', '".$pid2."', 'ASSO', '".DbLayer::EscapeQuery($subrec)."', '".DbLayer::EscapeQuery($newsubrec)."', '".$GEDCOMID."', '".$change_type."', '".$gm_username."', '".time()."')";
 							}
 						}
 					}
@@ -1446,7 +1446,7 @@ function SubmitterRecord($level, $gedrec) {
 	}
 }
 function ShowMediaForm($pid, $action="newentry", $change_type="add_media") {
-	global $GEDCOM, $gm_lang, $TEXT_DIRECTION, $MEDIA_ID_PREFIX, $GEDCOMS, $WORD_WRAPPED_NOTES, $MediaFS, $MEDIA_DIRECTORY;
+	global $GEDCOM, $gm_lang, $TEXT_DIRECTION, $MEDIA_ID_PREFIX, $GEDCOMS, $WORD_WRAPPED_NOTES, $MEDIA_DIRECTORY;
 	global $MEDIA_FACTS_ADD, $MEDIA_FACTS_UNIQUE, $gm_user;
 	
 	$facts_add = explode(",", $MEDIA_FACTS_ADD);
@@ -1552,7 +1552,7 @@ function ShowMediaForm($pid, $action="newentry", $change_type="add_media") {
 			// Box for user to choose to upload file from local computer
 			print "<tr><td class=\"shade2\">".$gm_lang["upload_file"]."</td><td class=\"shade1\"><input type=\"file\" name=\"picture\" size=\"60\"></td></tr>";
 			// Box for user to choose the folder to store the image
-			$dirlist = $MediaFS->GetMediaDirList($MEDIA_DIRECTORY, true, 1, true, false);
+			$dirlist = MediaFS::GetMediaDirList($MEDIA_DIRECTORY, true, 1, true, false);
 			print "<tr><td class=\"shade2\">".$gm_lang["upload_to_folder"]."</td><td class=\"shade1\">";
 	//		<input type=\"text\" name=\"folder\" size=\"60\">
 			print "<select name=\"folder\">";
@@ -1587,7 +1587,6 @@ function ShowMediaForm($pid, $action="newentry", $change_type="add_media") {
 }
 
 function ReplaceLinks($oldgid, $newgid, $mtype, $change_id, $change_type, $ged) {
-	global $TBLPREFIX;
 
 	$records = GetLinkedGedRecs($oldgid, $mtype, $ged);
 		
@@ -1609,7 +1608,7 @@ function ReplaceLinks($oldgid, $newgid, $mtype, $change_id, $change_type, $ged) 
 }
 
 function DeleteLinks($oldgid, $mtype, $change_id, $change_type, $ged) {
-	global $TBLPREFIX, $GEDCOM;
+	global $GEDCOM;
 
 	// We miss the links on new records, which are only in the _changes table
 	$records = GetLinkedGedRecs($oldgid, $mtype, $ged);
@@ -1637,7 +1636,6 @@ function DeleteLinks($oldgid, $mtype, $change_id, $change_type, $ged) {
 }
 
 function GetLinkedGedrecs($oldgid, $mtype, $ged) {
-	global $TBLPREFIX;
 	
 	$records = array();
 	
@@ -1645,7 +1643,7 @@ function GetLinkedGedrecs($oldgid, $mtype, $ged) {
 	
 	//-- References from sources (REPO, OBJE, NOTE)
 	if ($mtype == "REPO" || $mtype == "OBJE" || $mtype == "NOTE") {
-		$sql = "SELECT s_gedcom, s_id FROM ".$TBLPREFIX."sources WHERE s_gedcom REGEXP '[1-9] [[:alnum:]]+ @".$oldgid."@' AND s_file='".$ged."'";
+		$sql = "SELECT s_gedcom, s_id FROM ".TBLPREFIX."sources WHERE s_gedcom REGEXP '[1-9] [[:alnum:]]+ @".$oldgid."@' AND s_file='".$ged."'";
 		$res = NewQuery($sql);
 		if ($res) {
 			while ($row = $res->FetchAssoc()) {
@@ -1656,7 +1654,7 @@ function GetLinkedGedrecs($oldgid, $mtype, $ged) {
 	
 	//-- References from individuals (SOUR, INDI, FAM, NOTE, OBJE)
 	if ($mtype == "SOUR" || $mtype == "INDI" || $mtype == "FAM" || $mtype == "NOTE" || $mtype == "OBJE") {
-		$sql = "SELECT i_gedcom, i_id FROM ".$TBLPREFIX."individuals WHERE i_gedcom REGEXP '[1-9] [[:alnum:]]+ @".$oldgid."@' AND i_file='".$ged."'";
+		$sql = "SELECT i_gedcom, i_id FROM ".TBLPREFIX."individuals WHERE i_gedcom REGEXP '[1-9] [[:alnum:]]+ @".$oldgid."@' AND i_file='".$ged."'";
 		$res = NewQuery($sql);
 		if ($res) {
 			while ($row = $res->FetchAssoc()) {
@@ -1667,7 +1665,7 @@ function GetLinkedGedrecs($oldgid, $mtype, $ged) {
 
 	//-- References from families (SOUR, INDI, NOTE, OBJE)
 	if ($mtype == "SOUR" || $mtype == "INDI" || $mtype == "NOTE" || $mtype == "OBJE") {
-		$sql = "SELECT f_gedcom, f_id FROM ".$TBLPREFIX."families WHERE f_gedcom REGEXP '[1-9] [[:alnum:]]+ @".$oldgid."@' AND f_file='".$ged."'";
+		$sql = "SELECT f_gedcom, f_id FROM ".TBLPREFIX."families WHERE f_gedcom REGEXP '[1-9] [[:alnum:]]+ @".$oldgid."@' AND f_file='".$ged."'";
 		$res = NewQuery($sql);
 		if ($res) {
 			while ($row = $res->FetchAssoc()) {
@@ -1678,7 +1676,7 @@ function GetLinkedGedrecs($oldgid, $mtype, $ged) {
 	
 	//-- References from multimedia (SOUR, NOTE)
 	if ($mtype == "SOUR" || $mtype == "NOTE") {
-		$sql = "SELECT m_gedrec, m_media FROM ".$TBLPREFIX."media WHERE m_gedrec REGEXP '[1-9] [[:alnum:]]+ @".$oldgid."@' AND m_gedfile='".$ged."'";
+		$sql = "SELECT m_gedrec, m_media FROM ".TBLPREFIX."media WHERE m_gedrec REGEXP '[1-9] [[:alnum:]]+ @".$oldgid."@' AND m_gedfile='".$ged."'";
 		$res = NewQuery($sql);
 		if ($res) {
 			while ($row = $res->FetchAssoc()) {
@@ -1689,7 +1687,7 @@ function GetLinkedGedrecs($oldgid, $mtype, $ged) {
 
 	//-- References from notes, submitter recs (SOUR, INDI) <== links to notes and repositories
 	if ($mtype == "SOUR" || $mtype == "INDI" || $mtype == "REPO" || $mtype == "OBJE") {
-		$sql = "SELECT o_gedcom, o_id FROM ".$TBLPREFIX."other WHERE o_gedcom REGEXP '[1-9] [[:alnum:]]+ @".$oldgid."@' AND o_file='".$ged."'";
+		$sql = "SELECT o_gedcom, o_id FROM ".TBLPREFIX."other WHERE o_gedcom REGEXP '[1-9] [[:alnum:]]+ @".$oldgid."@' AND o_file='".$ged."'";
 		$res = NewQuery($sql);
 		if ($res) {
 			while ($row = $res->FetchAssoc()) {
@@ -1769,7 +1767,7 @@ function SortFactDetails($gedrec) {
 }
 
 function AddMissingTags($tags) {
-	global $templefacts, $nondatefacts, $nonplacfacts, $gm_lang, $MediaFS, $MEDIA_DIRECTORY, $focus;
+	global $templefacts, $nondatefacts, $nonplacfacts, $gm_lang, $MEDIA_DIRECTORY, $focus;
 
 	// Now add some missing tags :
 	if (in_array($tags[0], $templefacts)) {
@@ -1833,7 +1831,7 @@ function AddMissingTags($tags) {
 		// Box for user to choose to upload file from local computer
 		print "<tr><td class=\"shade2\">".$gm_lang["upload_file"]."</td><td class=\"shade1\"><input type=\"file\" name=\"picture\" size=\"60\"></td></tr>";
 		// Box for user to choose the folder to store the image
-		$dirlist = $MediaFS->GetMediaDirList($MEDIA_DIRECTORY, true, 1, true, false);
+		$dirlist = MediaFS::GetMediaDirList($MEDIA_DIRECTORY, true, 1, true, false);
 		print "<tr><td class=\"shade2\">".$gm_lang["upload_to_folder"]."</td><td class=\"shade1\">";
 		print "<select name=\"folder\">";
 		foreach($dirlist as $key => $dir) {

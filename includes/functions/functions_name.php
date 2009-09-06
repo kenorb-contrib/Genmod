@@ -38,7 +38,7 @@ if (strstr($_SERVER["SCRIPT_NAME"],basename(__FILE__))) {
  * @param int $min the number of times a surname must occur before it is added to the array
  */
 function GetCommonSurnamesIndex($ged) {
-	global $GEDCOMS, $GEDCOM, $COMMON_NAMES_THRESHOLD, $TBLPREFIX, $DBCONN;
+	global $GEDCOMS, $GEDCOM, $COMMON_NAMES_THRESHOLD;
 
 	if (empty($GEDCOMS[$ged]["commonsurnames"])) {
 		SwitchGedcom($ged);
@@ -48,7 +48,7 @@ function GetCommonSurnamesIndex($ged) {
 			foreach($surnames as $indexval => $surname) {
 				$sns .= $surname["name"].", ";
 			}
-			$sql = "UPDATE ".$TBLPREFIX."gedcoms SET g_commonsurnames='".$DBCONN->EscapeQuery($sns)."' WHERE g_gedcom='".$ged."'";
+			$sql = "UPDATE ".TBLPREFIX."gedcoms SET g_commonsurnames='".DbLayer::EscapeQuery($sns)."' WHERE g_gedcom='".$ged."'";
 			$res = NewQuery($sql);
 			$GEDCOMS[$ged]["commonsurnames"] = $sns;
 		}
@@ -72,10 +72,10 @@ function GetCommonSurnamesIndex($ged) {
  * @param int $min the number of times a surname must occur before it is added to the array
  */
 function GetCommonSurnames($min) {
-	global $TBLPREFIX, $GEDCOM, $indilist, $CONFIGURED, $GEDCOMS, $COMMON_NAMES_ADD, $COMMON_NAMES_REMOVE, $gm_lang, $HNN, $ANN;
+	global $GEDCOM, $indilist, $GEDCOMS, $COMMON_NAMES_ADD, $COMMON_NAMES_REMOVE, $gm_lang, $HNN, $ANN;
 
 	$surnames = array();
-	if (!$CONFIGURED || !UserController::AdminUserExists() || (count($GEDCOMS)==0) || (!CheckForImport($GEDCOM))) return $surnames;
+	if (!CONFIGURED || !UserController::AdminUserExists() || (count($GEDCOMS)==0) || (!CheckForImport($GEDCOM))) return $surnames;
 	//-- this line causes a bug where the common surnames list is not properly updated
 	// if ((!isset($indilist))||(!is_array($indilist))) return $surnames;
 	$surnames = GetTopSurnames(100);
@@ -210,7 +210,7 @@ function GetNameInRecord($indirec, $import=false) {
  * @return string the sortable name
  */
 function GetSortableName($pid, $alpha="", $surname="", $allnames=false, $rev = false, $changes = false) {
-	global $TBLPREFIX, $SHOW_LIVING_NAMES, $PRIV_PUBLIC, $GEDCOM, $GEDCOMID, $COMBIKEY;
+	global $SHOW_LIVING_NAMES, $PRIV_PUBLIC, $GEDCOM, $GEDCOMID, $COMBIKEY;
 	global $indilist, $gm_lang, $GEDCOMID, $NAME_REVERSE;
 
 	$mynames = array();
@@ -426,7 +426,7 @@ function ReverseName($name) {
  * @return string the title of the source
  */
 function GetSourceDescriptor($sid, $gedrec="") {
-	global $TBLPREFIX, $WORD_WRAPPED_NOTES;
+	global $WORD_WRAPPED_NOTES;
 	global $GEDCOM, $sourcelist, $show_changes, $gm_lang;
 
 	if ($sid=="") return false;
@@ -441,12 +441,12 @@ function GetSourceDescriptor($sid, $gedrec="") {
 	if (!empty($gedrec)) {
 		$tt = preg_match("/1 TITL (.*)/", $gedrec, $smatch);
 		if ($tt>0) {
-			if (!ShowFact("TITL", $sid, "SOUR") || !ShowFactDetails("TITL", $sid, "SOUR")) return $gm_lang["private"];
+			if (!PrivacyFunctions::showFact("TITL", $sid, "SOUR") || !PrivacyFunctions::showFactDetails("TITL", $sid, "SOUR")) return $gm_lang["private"];
 			return $smatch[1];
 		}
 		$et = preg_match("/1 ABBR (.*)/", $gedrec, $smatch);
 		if ($et>0) {
-			if (!ShowFact("ABBR", $sid, "SOUR") || !ShowFactDetails("ABBR", $sid, "SOUR")) return $gm_lang["private"];
+			if (!PrivacyFunctions::showFact("ABBR", $sid, "SOUR") || !PrivacyFunctions::showFactDetails("ABBR", $sid, "SOUR")) return $gm_lang["private"];
 			return $smatch[1];
 		}
 		return $sid;
@@ -461,7 +461,7 @@ function GetSourceDescriptor($sid, $gedrec="") {
  * @return string the title of the repository
  */
 function GetRepoDescriptor($rid) {
-	global $TBLPREFIX, $WORD_WRAPPED_NOTES;
+	global $WORD_WRAPPED_NOTES;
 	global $GEDCOM, $repo_id_list, $show_changes, $gm_lang;
 
 	if ($rid=="") return false;
@@ -474,7 +474,7 @@ function GetRepoDescriptor($rid) {
 	if (!empty($gedrec)) {
 		$tt = preg_match("/1 NAME (.*)/", $gedrec, $smatch);
 		if ($tt>0) {
-			if (!ShowFact("NAME", $rid, "REPO") || !ShowFactDetails("NAME", $rid, "REPO")) return $gm_lang["private"];
+			if (!PrivacyFunctions::showFact("NAME", $rid, "REPO") || !PrivacyFunctions::showFactDetails("NAME", $rid, "REPO")) return $gm_lang["private"];
 			return $smatch[1];
 		}
 	}
@@ -488,7 +488,7 @@ function GetRepoDescriptor($rid) {
  * @return string the additional title of the source
  */
 function GetAddSourceDescriptor($sid) {
-	global $TBLPREFIX, $WORD_WRAPPED_NOTES;
+	global $WORD_WRAPPED_NOTES;
 	global $GEDCOM, $sourcelist, $show_changes;
 	$title = "";
 	if ($sid=="") return false;
@@ -501,12 +501,12 @@ function GetAddSourceDescriptor($sid) {
 	if (!empty($gedrec)) {
 		$ct = preg_match("/\d ROMN (.*)/", $gedrec, $match);
  		if ($ct>0) {
-			if (!ShowFact("ROMN", $sid, "SOUR") || !ShowFactDetails("ROMN", $sid, "SOUR")) return false;
+			if (!PrivacyFunctions::showFact("ROMN", $sid, "SOUR") || !PrivacyFunctions::showFactDetails("ROMN", $sid, "SOUR")) return false;
 	 		return($match[1]);
  		}
 		$ct = preg_match("/\d _HEB (.*)/", $gedrec, $match);
  		if ($ct>0) {
-			if (!ShowFact("_HEB", $sid, "SOUR")|| !ShowFactDetails("_HEB", $sid, "SOUR")) return false;
+			if (!PrivacyFunctions::showFact("_HEB", $sid, "SOUR")|| !PrivacyFunctions::showFactDetails("_HEB", $sid, "SOUR")) return false;
 	 		return($match[1]);
  		}
  	}
@@ -520,7 +520,7 @@ function GetAddSourceDescriptor($sid) {
  * @return string the additional title of the repository
  */
 function GetAddRepoDescriptor($rid) {
-	global $TBLPREFIX, $WORD_WRAPPED_NOTES;
+	global $WORD_WRAPPED_NOTES;
 	global $GEDCOM, $repolist, $show_changes;
 	$title = "";
 	if ($rid=="") return false;
@@ -533,12 +533,12 @@ function GetAddRepoDescriptor($rid) {
 	if (!empty($gedrec)) {
 		$ct = preg_match("/\d ROMN (.*)/", $gedrec, $match);
  		if ($ct>0) {
-			if (!ShowFact("ROMN", $rid, "REPO") || !ShowFactDetails("ROMN", $rid, "REPO")) return false;
+			if (!PrivacyFunctions::showFact("ROMN", $rid, "REPO") || !PrivacyFunctions::showFactDetails("ROMN", $rid, "REPO")) return false;
 	 		return($match[1]);
  		}
 		$ct = preg_match("/\d _HEB (.*)/", $gedrec, $match);
  		if ($ct>0) {
-			if (!ShowFact("_HEB", $rid, "REPO")|| !ShowFactDetails("_HEB", $rid, "REPO")) return false;
+			if (!PrivacyFunctions::showFact("_HEB", $rid, "REPO")|| !PrivacyFunctions::showFactDetails("_HEB", $rid, "REPO")) return false;
 	 		return($match[1]);
  		}
  	}
@@ -553,7 +553,7 @@ function GetFamilyDescriptor($fid, $rev = false, $famrec="", $changes = false, $
 	else $parents = FindParentsInRecord($famrec);
 
 	if ($parents["HUSB"]) {
-		if (showLivingNameById($parents["HUSB"]))
+		if (PrivacyFunctions::showLivingNameByID($parents["HUSB"]))
 			$hname = GetSortableName($parents["HUSB"], "", "", false, $rev, $changes);
 		else $hname = $gm_lang["private"];
 	}
@@ -562,7 +562,7 @@ function GetFamilyDescriptor($fid, $rev = false, $famrec="", $changes = false, $
 		else $hname = "@N.N., @P.N.";
 	}
 	if ($parents["WIFE"]) {
-		if (showLivingNameById($parents["WIFE"]))
+		if (PrivacyFunctions::showLivingNameByID($parents["WIFE"]))
 			$wname = GetSortableName($parents["WIFE"], "", "", false, $rev, $changes);
 		else $wname = $gm_lang["private"];
 	}
@@ -583,7 +583,7 @@ function GetFamilyAddDescriptor($fid, $rev = false, $famrec="", $changes = false
 	else $parents = FindParentsInRecord($famrec);
 	
 	if ($parents["HUSB"]) {
-		if (showLivingNameById($parents["HUSB"]))
+		if (PrivacyFunctions::showLivingNameByID($parents["HUSB"]))
 			$hname = GetSortableAddName($parents["HUSB"], "", $rev, $changes);
 		else $hname = $gm_lang["private"];
 	}
@@ -592,7 +592,7 @@ function GetFamilyAddDescriptor($fid, $rev = false, $famrec="", $changes = false
 		else $hname = "@N.N., @P.N.";
 	}
 	if ($parents["WIFE"]) {
-		if (showLivingNameById($parents["WIFE"])) {
+		if (PrivacyFunctions::showLivingNameByID($parents["WIFE"])) {
 			$wname = GetSortableAddName($parents["WIFE"], "", $rev, $changes);
 		}
 		else $wname = $gm_lang["private"];
@@ -613,7 +613,6 @@ function GetFamilyAddDescriptor($fid, $rev = false, $famrec="", $changes = false
  * @return string the title of the object
  */
 function GetMediaDescriptor($mid, $gedrec="") {
-	global $TBLPREFIX;
 	global $GEDCOM, $show_changes;
 	$title = "";
 	if ($mid=="") return false;
@@ -1161,7 +1160,7 @@ function GetIndiNames($indirec, $import=false, $marr_names=true) {
  */
 
 function DMSoundex($name, $option = "") {
-	global $GM_BASE_DIRECTORY, $dmsoundexlist, $dmcoding, $maxchar, $INDEX_DIRECTORY, $cachecount, $cachename;
+	global $GM_BASE_DIRECTORY, $dmsoundexlist, $dmcoding, $maxchar, $cachecount, $cachename;
 	
 //	Check for empty string
 	if (empty($name)) return array();
@@ -1174,7 +1173,7 @@ function DMSoundex($name, $option = "") {
 
 	// Load the previously saved cachefile and return. Keep the cache global!
 	if ($option == "opencache") {
-		$cachename = $INDEX_DIRECTORY."DM".date("mdHis", filemtime($GM_BASE_DIRECTORY."includes/values/dmarray.full.utf-8.php")).".dat";
+		$cachename = INDEX_DIRECTORY."DM".date("mdHis", filemtime($GM_BASE_DIRECTORY."includes/values/dmarray.full.utf-8.php")).".dat";
 		if (file_exists($cachename) && filesize($cachename) != 0) {
 //			print "Opening cache file<br />";
 			$fp = fopen($cachename, "rb");
@@ -1192,9 +1191,9 @@ function DMSoundex($name, $option = "") {
 			$dmsoundexlist = array();
 			$cachecount = 0;
 			// clean up old cache
-			$handle = opendir($INDEX_DIRECTORY);
+			$handle = opendir(INDEX_DIRECTORY);
 			while (($file = readdir ($handle)) != false) {
-				if ((substr($file, 0, 2) == "DM") && (substr($file, -4) == ".dat")) unlink($INDEX_DIRECTORY.$file);
+				if ((substr($file, 0, 2) == "DM") && (substr($file, -4) == ".dat")) unlink(INDEX_DIRECTORY.$file);
 			}
 			closedir($handle);
 			return;
@@ -1577,28 +1576,28 @@ function SearchAddAssos() {
 			if (array_key_exists($p2key, $indi_printed) || array_key_exists($p1key, $indi_printed) || array_key_exists($p1key, $fam_printed)) {
 				// p2key is always an indi, so check this first
 				$disp = true;
-				if (!ShowLivingNameByID(SplitKey($p2key, "id"))) $disp = false;
+				if (!PrivacyFunctions::showLivingNameByID(SplitKey($p2key, "id"))) $disp = false;
 				else {
-					if (!empty($asso["fact"]) &&!ShowFact($asso["fact"], SplitKey($p2key, "id"))) $disp = false;
+					if (!empty($asso["fact"]) &&!PrivacyFunctions::showFact($asso["fact"], SplitKey($p2key, "id"))) $disp = false;
 					else {
 						// assotype is the type of p1key
 						if ($asso["type"] == "indi") {
-							if (!ShowLivingNameByID(SplitKey($p1key, "id"))) $disp = false;
+							if (!PrivacyFunctions::showLivingNameByID(SplitKey($p1key, "id"))) $disp = false;
 						}
 						else {
 							$parents = FindParentsInRecord($asso["gedcom"]);
-							if (!ShowLivingNameByID($parents["HUSB"]) || !ShowLivingNameByID($parents["WIFE"])) $disp = false;
+							if (!PrivacyFunctions::showLivingNameByID($parents["HUSB"]) || !PrivacyFunctions::showLivingNameByID($parents["WIFE"])) $disp = false;
 						}
 					}
 				}
 				if ($disp && !empty($asso["resn"])) {
 					if (!empty($asso["fact"])) {
 						$rec = "1 ".$fact."\r\n2 ASSO @".SplitKey($p1key, "id")."@\r\n2 RESN ".$asso["resn"]."\r\n";
-						$disp = FactViewRestricted(SplitKey($p2key, "id"), $rec, 2);
+						$disp = PrivacyFunctions::FactViewRestricted(SplitKey($p2key, "id"), $rec, 2);
 					}
 					else {
 						$rec = "1 ASSO @".SplitKey($p1key, "id")."@\r\n2 RESN ".$asso["resn"]."\r\n";
-						$disp = FactViewRestricted(SplitKey($p2key, "id"), $rec, 2);
+						$disp = PrivacyFunctions::FactViewRestricted(SplitKey($p2key, "id"), $rec, 2);
 					}
 				}
 				// save his relation to existing search results

@@ -36,8 +36,8 @@ $GM_BLOCKS["print_todays_events"]["rss"]		= true;
 //-- this block prints a list of today's upcoming events of living people in your gedcom
 function print_todays_events($block=true, $config="", $side, $index) {
 	global $gm_lang, $month, $year, $day, $monthtonum, $HIDE_LIVE_PEOPLE, $SHOW_ID_NUMBERS, $command, $TEXT_DIRECTION, $SHOW_FAM_ID_NUMBERS;
-	global $GM_IMAGE_DIR, $GM_IMAGES, $GEDCOM, $REGEXP_DB, $DEBUG, $ASC, $IGNORE_FACTS, $IGNORE_YEAR, $LAST_QUERY, $GM_BLOCKS;
-	global $INDEX_DIRECTORY, $USE_RTL_FUNCTIONS, $NAME_REVERSE, $GEDCOMID;
+	global $GM_IMAGE_DIR, $GM_IMAGES, $GEDCOM, $DEBUG, $ASC, $IGNORE_FACTS, $IGNORE_YEAR, $LAST_QUERY, $GM_BLOCKS;
+	global $USE_RTL_FUNCTIONS, $NAME_REVERSE, $GEDCOMID;
 	global $hDay, $hMonth, $hYear, $gm_username, $gm_user;
 
 	$block = true;// Always restrict this block's height
@@ -97,7 +97,7 @@ function print_todays_events($block=true, $config="", $side, $index) {
 			$gid = $factarr[0];
 			$factrec = $factarr[1];
 			$disp = true;
-			if (($filter=="living" and IsDeadId($gid)) || !DisplayDetailsByID($gid, "INDI")) $disp = false;
+			if (($filter=="living" and IsDeadId($gid)) || !PrivacyFunctions::DisplayDetailsByID($gid, "INDI")) $disp = false;
 			if ($disp) {
 				if ($onlyBDM == "yes") $filterev = "bdm";
 				else $filterev = "all";
@@ -143,19 +143,19 @@ function print_todays_events($block=true, $config="", $side, $index) {
 			if ($filter=="living") {
 				$parents = FindParents($gid);
 				if (IsDeadId($parents["HUSB"])) $disp = false;
-				else if (!displayDetailsByID($parents["HUSB"])) {
+				else if (!PrivacyFunctions::displayDetailsByID($parents["HUSB"])) {
 					$disp = false;
 					$PrivateFacts = true;
 				}
 				if ($disp) {
 					if (IsDeadId($parents["WIFE"])) $disp = false;
-					else if (!displayDetailsByID($parents["WIFE"])) {
+					else if (!PrivacyFunctions::displayDetailsByID($parents["WIFE"])) {
 						$disp = false;
 						$PrivateFacts = true;
 					}
 				}
 			}
-			else if (!displayDetailsByID($gid, "FAM")) {
+			else if (!PrivacyFunctions::displayDetailsByID($gid, "FAM")) {
 				$disp = false;
 				$PrivateFacts = true;
 			}

@@ -42,19 +42,19 @@ if (!isset($ged)) $ged = "";
 // NOTE: otherwise have them login again
 
 if (!$gm_user->userGedcomAdmin()) {
-	if (empty($LOGIN_URL)) header("Location: login.php?url=editgedcoms.php");
-	else header("Location: ".$LOGIN_URL."?url=editgedcoms.php");
+	if (LOGIN_URL == "") header("Location: login.php?url=editgedcoms.php");
+	else header("Location: ".LOGIN_URL."?url=editgedcoms.php");
 	exit;
 }
 print_header($gm_lang["gedcom_adm_head"]);
 print "<center>\n";
 if ($action=="delete") {
 	if (isset($GEDCOMS[$delged])) {
-		$Privacy->DeletePrivacy($GEDCOMS[$delged]["id"]);
+		PrivacyController::DeletePrivacy($GEDCOMS[$delged]["id"]);
 		DeleteGedcom($delged);
 		unset($GEDCOMS[$delged]);
 		StoreGedcoms();
-		$GedcomConfig->DeleteGedcomConfig($delged);
+		GedcomConfig::DeleteGedcomConfig($delged);
 		print "<br />".str_replace("#GED#", $delged, $gm_lang["gedcom_deleted"])."<br />\n";
 	}
 	else print "<br /><span class=\"error\">".$gm_lang["gedcom_not_exist"]."</span>";
@@ -66,7 +66,7 @@ if (($action=="setdefault") && isset($default_ged)) {
 }
 
 if ($action == "deletecount") {
-	$sql = "DELETE FROM ".$TBLPREFIX."counters WHERE c_id LIKE '%[".$GEDCOMS[$delged]["id"]."]%'";
+	$sql = "DELETE FROM ".TBLPREFIX."counters WHERE c_id LIKE '%[".$GEDCOMS[$delged]["id"]."]%'";
 	$res = NewQuery($sql);
 }
 ?>

@@ -40,7 +40,7 @@ if (strstr($_SERVER["SCRIPT_NAME"],basename(__FILE__))) {
  * @param array $value is an array of the form array($name, $GEDCOM)
  */
 function print_list_person($key, $value, $findid=false, $asso="", $useli=true, $fact="") {
-	global $gm_lang, $SCRIPT_NAME, $pass, $indi_private, $indi_hide, $indi_total, $NAME_REVERSE, $Privacy;
+	global $gm_lang, $SCRIPT_NAME, $pass, $indi_private, $indi_hide, $indi_total, $NAME_REVERSE;
 	global $GEDCOM, $GEDCOMS, $GEDCOMID, $SHOW_ID_NUMBERS, $TEXT_DIRECTION, $SHOW_PEDIGREE_PLACES, $GM_IMAGE_DIR, $GM_IMAGES, $SHOW_DEATH_LISTS;
 	
 	$key = splitkey($key, "id");
@@ -51,9 +51,9 @@ function print_list_person($key, $value, $findid=false, $asso="", $useli=true, $
 	if (!isset($indi_total)) $indi_total=array();
 	$indi_total[$key."[".$GEDCOM."]"] = 1;
 
-	$disp = displayDetailsByID($key);
+	$disp = PrivacyFunctions::displayDetailsByID($key);
 	if ($disp) $disp2 = true;
-	else $disp2 = showLivingNameByID($key);
+	else $disp2 = PrivacyFunctions::showLivingNameByID($key);
 	if ($disp2 || $disp) {
 		if ($useli) {
 			if (begRTLText($value[0]))                            //-- For future use
@@ -93,7 +93,7 @@ function print_list_person($key, $value, $findid=false, $asso="", $useli=true, $
 				if ($pfact!="DEAT") {
 					$indirec = FindPersonRecord($key);
 					$factrec = GetSubRecord(1, "1 DEAT", $indirec);
-					if (strlen($factrec)>7 && showFact("DEAT", $key, "INDI") && !FactViewRestricted($key, $factrec)) {
+					if (strlen($factrec)>7 && PrivacyFunctions::showFact("DEAT", $key, "INDI") && !PrivacyFunctions::FactViewRestricted($key, $factrec)) {
 						print " -- <i>";
 						print GM_FACT_DEAT;
 						print " ";
@@ -155,7 +155,7 @@ function print_list_person($key, $value, $findid=false, $asso="", $useli=true, $
 function print_list_family($key, $value, $findid=false, $asso="", $useli=true, $fact="") {
 	global $gm_lang, $pass, $fam_private, $fam_hide, $fam_total, $SHOW_ID_NUMBERS, $SHOW_FAM_ID_NUMBERS;
 	global $GEDCOM, $GEDCOMS, $GEDCOMID, $HIDE_LIVE_PEOPLE, $SHOW_PEDIGREE_PLACES;
-	global $TEXT_DIRECTION, $COMBIKEY, $Privacy;
+	global $TEXT_DIRECTION, $COMBIKEY;
 
 	SwitchGedcom($value[1]);
 	
@@ -164,16 +164,16 @@ function print_list_family($key, $value, $findid=false, $asso="", $useli=true, $
 	if (!isset($fam_total)) $fam_total=array();
 	$fam_total[$key."[".$GEDCOM."]"] = 1;
 	$famrec=FindFamilyRecord($key);
-	$display = displayDetailsByID($key, "FAM");
+	$display = PrivacyFunctions::displayDetailsByID($key, "FAM");
 	//print "display: ".$display." key: ".$key." famrec: ".$famrec;
 	$showLivingHusb=true;
 	$showLivingWife=true;
 	$parents = FindParents($key);
 	//-- check if we can display both parents
 	if (!$display) {
-		if (!FactViewRestricted($key, $famrec, 1)) {
-			$showLivingHusb=showLivingNameByID($parents["HUSB"]);
-			$showLivingWife=showLivingNameByID($parents["WIFE"]);
+		if (!PrivacyFunctions::FactViewRestricted($key, $famrec, 1)) {
+			$showLivingHusb=PrivacyFunctions::showLivingNameByID($parents["HUSB"]);
+			$showLivingWife=PrivacyFunctions::showLivingNameByID($parents["WIFE"]);
 		}
 	}
 	if ($showLivingWife && $showLivingHusb) {
@@ -211,7 +211,7 @@ function print_list_family($key, $value, $findid=false, $asso="", $useli=true, $
 			$bpos1 = strpos($famrec, "1 MARR");
 			if ($bpos1) {
 				$birthrec = GetSubRecord(1, "1 MARR", $famrec);
-				if (!FactViewRestricted($key, $birthrec) && ShowFact("MARR", $kid)) {
+				if (!PrivacyFunctions::FactViewRestricted($key, $birthrec) && PrivacyFunctions::showFact("MARR", $kid)) {
 					print " -- <i>".$gm_lang["marriage"]." ";
 					$bt = preg_match("/1 \w+/", $birthrec, $match);
 					if ($bt>0) {
@@ -271,13 +271,13 @@ function print_list_family($key, $value, $findid=false, $asso="", $useli=true, $
 
 // Prints the information for a source in a list view
 function print_list_source($key, $value) {
-	global $GEDCOM, $GEDCOMS, $GEDCOMID, $source_total, $source_hide, $SHOW_SOURCES, $SHOW_ID_NUMBERS, $GEDCOM, $TEXT_DIRECTION, $Privacy;
+	global $GEDCOM, $GEDCOMS, $GEDCOMID, $source_total, $source_hide, $SHOW_SOURCES, $SHOW_ID_NUMBERS, $GEDCOM, $TEXT_DIRECTION;
 	
 	SwitchGedcom($value["gedfile"]);
 	if (!isset($source_total)) $source_total=array();
 	$source_total[$key."[".$GEDCOM."]"] = 1;
 
-	if (displayDetailsByID($key, "SOUR", 1, true)) {
+	if (PrivacyFunctions::displayDetailsByID($key, "SOUR", 1, true)) {
 		if (begRTLText($value["name"])) print "\n\t\t\t<li class=\"rtl\" dir=\"rtl\">";
 		else print "\n\t\t\t<li class=\"ltr\" dir=\"ltr\">";
 		print "\n\t\t\t<a href=\"source.php?sid=$key&amp;ged=".get_gedcom_from_id($value["gedfile"])."\" class=\"list_item\">".PrintReady($value["name"]);
@@ -295,12 +295,12 @@ function print_list_source($key, $value) {
 }
 // Prints the information for media in a list view
 function print_list_media($key, $value, $skippriv=false) {
-	global $GEDCOM, $GEDCOMS, $GEDCOMID, $media_total, $media_hide, $SHOW_ID_NUMBERS, $GEDCOM, $TEXT_DIRECTION, $Privacy;
+	global $GEDCOM, $GEDCOMS, $GEDCOMID, $media_total, $media_hide, $SHOW_ID_NUMBERS, $GEDCOM, $TEXT_DIRECTION;
 	
 	SwitchGedcom($value["gedfile"]);
 	if (!isset($media_total)) $media_total=array();
 	$media_total[$key."[".$GEDCOM."]"] = 1;
-	if ($skippriv || displayDetailsByID($key, "OBJE", 1, true)) {
+	if ($skippriv || PrivacyFunctions::displayDetailsByID($key, "OBJE", 1, true)) {
 		if (begRTLText($value["name"])) print "\n\t\t\t<li class=\"rtl\" dir=\"rtl\">";
 		else print "\n\t\t\t<li class=\"ltr\" dir=\"ltr\">";
 		print "\n\t\t\t<a href=\"mediadetail.php?mid=$key&amp;ged=".get_gedcom_from_id($value["gedfile"])."\" class=\"list_item\">".PrintReady($value["name"]);
@@ -322,7 +322,7 @@ function print_list_repository($key, $value) {
 	SwitchGedcom($value["gedfile"]);
 	if (!isset($repo_total)) $repo_total=array();
 	$repo_total[$value["id"]."[".$GEDCOM."]"] = 1;
-	if (displayDetailsByID($value["id"], "REPO")) {
+	if (PrivacyFunctions::displayDetailsByID($value["id"], "REPO")) {
 		if (begRTLText($key))
 		     print "\n\t\t\t<li class=\"rtl\" dir=\"rtl\">";
 		else print "\n\t\t\t<li class=\"ltr\" dir=\"ltr\">";
@@ -450,8 +450,8 @@ function print_pedigree_person($pid, $style=1, $show_famlink=true, $count=0, $pe
 	$isF = "NN";
 	if (preg_match("/1 SEX F/", $indirec)>0) $isF="F";
 	else if (preg_match("/1 SEX M/", $indirec)>0) $isF="";
-	$disp = displayDetailsByID($pid, "INDI");
-	$dispname = showLivingNameByID($pid);
+	$disp = PrivacyFunctions::displayDetailsByID($pid, "INDI");
+	$dispname = PrivacyFunctions::showLivingNameByID($pid);
 	$random = rand();
 	if ($disp || $dispname) {
 		if ($show_famlink) {
@@ -504,7 +504,7 @@ function print_pedigree_person($pid, $style=1, $show_famlink=true, $count=0, $pe
 									$spouserec = $rec[$GEDCOM][$spouse];
 								}
 								print "<a href=\"individual.php?pid=$spouse&amp;ged=$GEDCOM\">";
-								if (($SHOW_LIVING_NAMES>=$PRIV_PUBLIC) || (displayDetailsByID($spouse))||(showLivingNameByID($spouse))) print PrintReady(GetPersonName($spouse, $spouserec));
+								if (($SHOW_LIVING_NAMES>=$PRIV_PUBLIC) || (PrivacyFunctions::displayDetailsByID($spouse))||(PrivacyFunctions::showLivingNameByID($spouse))) print PrintReady(GetPersonName($spouse, $spouserec));
 								else print $gm_lang["private"];
 								print "</a><br />\n";
 							}
@@ -512,7 +512,7 @@ function print_pedigree_person($pid, $style=1, $show_famlink=true, $count=0, $pe
 						for($j=0; $j<$num; $j++) {
 							$cpid = $smatch[$j][1];
 							print "\n\t\t\t\t&nbsp;&nbsp;<a href=\"individual.php?pid=$cpid&amp;ged=$GEDCOM\">";
-							if (($SHOW_LIVING_NAMES>=$PRIV_PUBLIC) || (displayDetailsByID($cpid))||(showLivingNameByID($cpid))) print PrintReady(GetPersonName($cpid));
+							if (($SHOW_LIVING_NAMES>=$PRIV_PUBLIC) || (PrivacyFunctions::displayDetailsByID($cpid))||(PrivacyFunctions::showLivingNameByID($cpid))) print PrintReady(GetPersonName($cpid));
 							else print $gm_lang["private"];
 							print "<br /></a>";
 						}
@@ -543,7 +543,7 @@ function print_pedigree_person($pid, $style=1, $show_famlink=true, $count=0, $pe
 	print ">";
 	
 	// NOTE: Show the persons primary picture if possible, but only in large boxes ($show_full)
-	if ($SHOW_HIGHLIGHT_IMAGES && $disp && showFact("OBJE", $pid, "INDI") && $show_full) {
+	if ($SHOW_HIGHLIGHT_IMAGES && $disp && PrivacyFunctions::showFact("OBJE", $pid, "INDI") && $show_full) {
 		$object = FindHighlightedObject($pid);
 		// NOTE: Print the pedigree tumbnail
 		if (!empty($object["thumb"])) {
@@ -707,7 +707,7 @@ function print_pedigree_person($pid, $style=1, $show_famlink=true, $count=0, $pe
 			// Get the subrecords and sort them
 			$factstoprint = array();
 			foreach ($tagstoprint as $key => $tag) {
-				if (ShowFact($tag, $pid, "INDI")) $factstoprint[] = GetSubrecord(1, "1 ".$tag, $indirec);
+				if (PrivacyFunctions::showFact($tag, $pid, "INDI")) $factstoprint[] = GetSubrecord(1, "1 ".$tag, $indirec);
 			}
 			SortFacts($factstoprint, "INDI");
 			// Print the facts
@@ -800,10 +800,10 @@ function print_pedigree_person($pid, $style=1, $show_famlink=true, $count=0, $pe
  */
 function print_header($title, $head="",$use_alternate_styles=true) {
 	global $gm_lang, $bwidth, $gm_username;
-	global $HOME_SITE_URL, $HOME_SITE_TEXT, $SERVER_URL;
+	global $HOME_SITE_URL, $HOME_SITE_TEXT;
 	global $BROWSERTYPE, $indilist, $INDILIST_RETRIEVED;
 	global $view, $cart, $menubar, $USE_GREYBOX;
-	global $CHARACTER_SET, $GM_IMAGE_DIR, $GEDCOMS, $GEDCOM, $CONTACT_EMAIL, $COMMON_NAMES_THRESHOLD, $INDEX_DIRECTORY;
+	global $CHARACTER_SET, $GM_IMAGE_DIR, $GEDCOMS, $GEDCOM, $CONTACT_EMAIL, $COMMON_NAMES_THRESHOLD;
 	global $SCRIPT_NAME, $QUERY_STRING, $action, $query, $changelanguage,$theme_name;
 	global $FAVICON, $stylesheet, $print_stylesheet, $rtl_stylesheet, $headerfile, $toplinks, $THEME_DIR, $print_headerfile;
 	global $GM_IMAGES, $TEXT_DIRECTION, $ONLOADFUNCTION,$REQUIRE_AUTHENTICATION, $SHOW_SOURCES;
@@ -888,7 +888,7 @@ function print_header($title, $head="",$use_alternate_styles=true) {
 	if (isset($GEDCOMS[$GEDCOM]["title"])) $title = $GEDCOMS[$GEDCOM]["title"]." :: ".$title;
 	print "<title>".PrintReady(strip_tags($title)." - ".$META_TITLE." - Genmod", TRUE)."</title>\n\t";
 	 if (!$REQUIRE_AUTHENTICATION){
-		print "<link href=\"" . $SERVER_URL .  "rss.php\" rel=\"alternate\" type=\"application/rss+xml\" title=\"RSS\"></link>\n\t";
+		print "<link href=\"" . SERVER_URL .  "rss.php\" rel=\"alternate\" type=\"application/rss+xml\" title=\"RSS\"></link>\n\t";
 	 }
 	 print "<link rel=\"stylesheet\" href=\"$stylesheet\" type=\"text/css\" media=\"all\"></link>\n\t";
 	 if ((!empty($rtl_stylesheet))&&($TEXT_DIRECTION=="rtl")) print "<link rel=\"stylesheet\" href=\"$rtl_stylesheet\" type=\"text/css\" media=\"all\"></link>\n\t";
@@ -1014,7 +1014,7 @@ var whichhelp = 'help_<?php print basename($SCRIPT_NAME)."&amp;action=".$action;
 <?php if ($USE_GREYBOX) { ?>
 <script type="text/javascript">
 <!--
-    var GB_ROOT_DIR = "<?php print $SERVER_URL."modules/greybox/";?>";
+    var GB_ROOT_DIR = "<?php print SERVER_URL."modules/greybox/";?>";
 //-->
 </script>
 <link href="modules/greybox/gb_styles.css" rel="stylesheet" type="text/css" />
@@ -1067,7 +1067,7 @@ var whichhelp = 'help_<?php print basename($SCRIPT_NAME)."&amp;action=".$action;
  */
 function print_simple_header($title) {
 	 global $gm_lang;
-	 global $HOME_SITE_URL, $USE_GREYBOX, $SERVER_URL;
+	 global $HOME_SITE_URL, $USE_GREYBOX;
 	 global $HOME_SITE_TEXT;
 	 global $view, $rtl_stylesheet;
 	 global $CHARACTER_SET, $GM_IMAGE_DIR;
@@ -1162,7 +1162,7 @@ function print_simple_header($title) {
 	<?php if ($USE_GREYBOX) { ?>
 		<script type="text/javascript">
 		<!--
-	    	var GB_ROOT_DIR = "<?php print $SERVER_URL."modules/greybox/";?>";
+	    	var GB_ROOT_DIR = "<?php print SERVER_URL."modules/greybox/";?>";
 	    //-->
 		</script>
 		<link href="modules/greybox/gb_styles.css" rel="stylesheet" type="text/css" />
@@ -1180,7 +1180,7 @@ function print_simple_header($title) {
 function print_footer() {
 	global $without_close, $gm_lang, $view, $buildindex;
 	global $SHOW_STATS, $SCRIPT_NAME, $QUERY_STRING, $footerfile, $print_footerfile, $GEDCOMS, $ALLOW_CHANGE_GEDCOM, $printlink;
-	global $GM_IMAGE_DIR, $theme_name, $GM_IMAGES, $TEXT_DIRECTION, $footer_count, $debugcollector;
+	global $GM_IMAGE_DIR, $theme_name, $GM_IMAGES, $TEXT_DIRECTION, $footer_count;
 	
 	if (!isset($footer_count)) $footer_count = 1;
 	else $footer_count++;
@@ -1202,7 +1202,7 @@ function print_footer() {
 	}
 	// print "<!-- close container -->\n";
 	// print "</div>";
-	if (isset($debugcollector->show)) PrintDebug();
+	if (DebugCollector::$show) DebugCollector::PrintDebug();
 	include("includes/values/include_bottom.php");	
 	print "\n\t</body>\n</html>";
 	//-- We write the session data and close it. Fix for intermittend logoff.
@@ -1212,8 +1212,8 @@ function print_footer() {
 // -- print the html to close the page
 function print_simple_footer() {
 	global $gm_lang, $start_time, $buildindex;
-	global $SHOW_STATS, $CONFIG_PARMS, $MediaFS;
-	global $SCRIPT_NAME, $QUERY_STRING, $debugcollector;
+	global $SHOW_STATS, $CONFIG_PARMS;
+	global $SCRIPT_NAME, $QUERY_STRING;
 	
 	if (empty($SCRIPT_NAME)) {
 		$SCRIPT_NAME = $_SERVER["SCRIPT_NAME"];
@@ -1223,11 +1223,11 @@ function print_simple_footer() {
 	print_contact_links();
 	print "<br />Running <a href=\"http://www.genmod.net/\" target=\"_blank\">Genmod";
 	if (count($CONFIG_PARMS) >1) print " Enterprise";
-	print $MediaFS->GetStorageType();
+	print MediaFS::GetStorageType();
 	print "</a> Version ".GM_VERSION." ".GM_VERSION_RELEASE;
 	if ($SHOW_STATS) print_execution_stats();
 	print "</div>";
-	if (isset($debugcollector->show)) PrintDebug();
+	if (DebugCollector::$show) DebugCollector::PrintDebug();
 	print "\n\t</body>\n</html>";
 	//-- We write the session data and close it. Fix for intermittend logoff.
 	session_write_close();
@@ -1432,7 +1432,7 @@ function print_simple_fact($indirec, $fact, $pid) {
 	
 	$emptyfacts = array("BIRT","CHR","DEAT","BURI","CREM","ADOP","BAPM","BARM","BASM","BLES","CHRA","CONF","FCOM","ORDN","NATU","EMIG","IMMI","CENS","PROB","WILL","GRAD","RETI","BAPL","CONL","ENDL","SLGC","EVEN","MARR","SLGS","MARL","ANUL","CENS","DIV","DIVF","ENGA","MARB","MARC","MARS","OBJE","CHAN","_SEPR","RESI", "DATA", "MAP");
 	$factrec = GetSubRecord(1, "1 $fact", $indirec);
-	if ((empty($factrec))||(FactViewRestricted($pid, $factrec))) return;
+	if ((empty($factrec))||(PrivacyFunctions::FactViewRestricted($pid, $factrec))) return;
 	$label = "";
 	if (isset($gm_lang[$fact])) $label = $gm_lang[$fact];
 	else if (defined("GM_FACT_".$fact)) $label = constant("GM_FACT_".$fact);
@@ -1442,7 +1442,7 @@ function print_simple_fact($indirec, $fact, $pid) {
 	if (trim($factrec) != "1 DEAT"){
 	   print "<span class=\"details_label\">".$label."</span> ";
 	}
-	if (showFactDetails($fact, $pid)) {
+	if (PrivacyFunctions::showFactDetails($fact, $pid)) {
 		if (!in_array($fact, $emptyfacts)) {
 			$ct = preg_match("/1 $fact(.*)/", $factrec, $match);
 			if ($ct>0) print PrintReady(trim($match[1]));
@@ -1527,7 +1527,7 @@ function print_help_link($help, $helpText, $show_desc="", $use_print_text=false,
  */
 function print_text($help, $level=0, $noprint=0){
 	 global $gm_lang, $COMMON_NAMES_THRESHOLD;
-	 global $INDEX_DIRECTORY, $GEDCOMS, $GEDCOM, $GEDCOM_TITLE, $LANGUAGE;
+	 global $GEDCOMS, $GEDCOM, $GEDCOM_TITLE, $LANGUAGE;
 	 global $GUESS_URL, $UpArrow, $DAYS_TO_SHOW_LIMIT, $MEDIA_DIRECTORY;
 	 global $repeat, $thumbnail, $xref, $pid, $LANGUAGE;
 	
@@ -1958,13 +1958,13 @@ function print_parents_age($pid, $bdate) {
 			$parents = FindParents($famids[0]["famid"]);
 			// father
 			$spouse = $parents["HUSB"];
-			if ($spouse && showFact("BIRT", $spouse)) {
+			if ($spouse && PrivacyFunctions::showFact("BIRT", $spouse)) {
 				$age = ConvertNumber(GetAge(FindPersonRecord($spouse), $bdate, false));
 				if (10<$age && $age<80) $father_text = "<img src=\"$GM_IMAGE_DIR/" . $GM_IMAGES["sex"]["small"] . "\" title=\"" . $gm_lang["father"] . "\" alt=\"" . $gm_lang["father"] . "\" class=\"sex_image\" />$age";
 			}
 			// mother
 			$spouse = $parents["WIFE"];
-			if ($spouse && showFact("BIRT", $spouse)) {
+			if ($spouse && PrivacyFunctions::showFact("BIRT", $spouse)) {
 				$age = ConvertNumber(GetAge(FindPersonRecord($spouse), $bdate, false));
 				if (10<$age && $age<80) $mother_text = "<img src=\"$GM_IMAGE_DIR/" . $GM_IMAGES["sexf"]["small"] . "\" title=\"" . $gm_lang["mother"] . "\" alt=\"" . $gm_lang["mother"] . "\" class=\"sex_image\" />$age";
 			}
@@ -1989,7 +1989,7 @@ function print_fact_date($factrec, $anchor=false, $time=false, $fact=false, $pid
 	$ct = preg_match("/2 DATE (.+)/", $factrec, $match);
 	if ($ct>0) {
 		$prtstr .= " ";
-		// link to calendar
+		// link to calendar ==> $anchor is never set to true
 		if ($anchor) $prtstr .= GetDateUrl($match[1]);
 		// simple date
 		else $prtstr .= GetChangedDate(trim($match[1]));
@@ -2200,7 +2200,7 @@ function print_first_major_fact($key, $indirec="", $prt=true, $break=false) {
 	$retstr = "";
 	foreach ($majorfacts as $indexval => $fact) {
 		$factrec = GetSubRecord(1, "1 $fact", $indirec);
-		if (strlen($factrec)>7 and showFact("$fact", $key) and !FactViewRestricted($key, $factrec)) {
+		if (strlen($factrec)>7 and PrivacyFunctions::showFact("$fact", $key) and !PrivacyFunctions::FactViewRestricted($key, $factrec)) {
 			if ($break) $retstr .= "<br />";
 			else $retstr .= " -- ";
 			$retstr .= "<i>";
@@ -2639,74 +2639,6 @@ function PrintFamilyList($familylist, $print_all=true, $find=false, $allgeds="no
 	print "</tr></table>";
 }
 
-/**
- * Creates a list of div ids to hide
- *
- * A list of divs to hide for a menu.
- *
- * @author	Genmod Development Team
- * @param		array	$pages	The array with pages to hide
- * @param		string	$show	The name of the page to show
- */
-function HideDivs($pages, $show) {
-	foreach ($pages as $id => $page) {
-		if ($page == $show) {
-			echo "expand_layer('".$page."', true); ";
-			echo "ChangeClass('".$page."_tab', 'current'); ";
-		}
-		else {
-			echo "expand_layer('".$page."', false); ";
-			echo "ChangeClass('".$page."_tab', ''); ";
-		}
-	}
-}
-
-/**
- * Shows debug information
- *
- * Creates a menu with different sections to show debug info
- * It shows info on output (defined by developer), database queries,
- * _session, _post and _get variable
- *
- * @author	Genmod Development Team
- * @param		array	$pages	The array with pages to hide
- * @param		string	$show	The name of the page to show
- */
-function PrintDebug() {
-	global $debugcollector;
-	
-	// If we don't show the debug, return empty
-	if (!$debugcollector->show) return false;
-	else {
-		$pages = array("output", "queries", "session", "post", "get");
-		?>
-		<div id="debug_output">
-		<ul>
-			<li id="output_tab" class="current" ><a href="#" onclick="<?php HideDivs($pages, 'output');  ?> return false;">Output</a></li>
-			<li id="queries_tab"><a href="#" onclick="<?php HideDivs($pages, 'queries');  ?> return false;">Queries</a></li>
-			<li id="session_tab"><a href="#" onclick="<?php HideDivs($pages, 'session');  ?> return false;">SESSION</a></li>
-			<li id="post_tab"><a href="#" onclick="<?php HideDivs($pages, 'post');  ?> return false;">POST</a></li>
-			<li id="get_tab"><a href="#" onclick="<?php HideDivs($pages, 'get');  ?> return false;">GET</a></li>
-		</ul>
-		</div>
-		<?php
-		echo '<div id="output" style="display: show;">';
-		echo $debugcollector->PrintRHtml($debugcollector->debugoutputselect("output"));
-		echo '</div>';
-		echo '<div id="queries" style="display: none;">';
-		echo $debugcollector->PrintRHtml($debugcollector->debugoutputselect("queries"));
-		echo '</div>';
-		echo '<div id="session" style="display: none;">';
-		echo $debugcollector->PrintRHtml($_SESSION);
-		echo '</div>';
-		echo '<div id="post" style="display: none;">';
-		echo $debugcollector->PrintRHtml($_POST);
-		echo '</div>';
-		echo '<div id="get" style="display: none;">';
-		echo $debugcollector->PrintRHtml($_GET);
-		echo '</div>';
-	}
-}
 
 function ExpandUrl($text) {
   // Some versions of RFC3987 have an appendix B which gives the following regex

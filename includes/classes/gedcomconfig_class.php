@@ -28,17 +28,12 @@ if (stristr($_SERVER["SCRIPT_NAME"],basename(__FILE__))) {
 	require "../../intrusion.php";
 }
 
-class GedcomConfig {
+abstract class GedcomConfig {
 
-	var $classname = "GedcomConfig";
-	var $current_gedcom = "";
-	var $GEDCONF = array();
-	var $lastmail = array();
-	var $cachenames = array("upcoming", "today", "stats", "plotdata");
-	
-	public function __construct($ged="") {
-		if (!empty($ged)) $this->ReadGedcomConfig($ged);
-	}
+	public $classname = "GedcomConfig";
+	public static $GEDCONF = array();
+	private static $lastmail = null;
+	private static $cachenames = array("upcoming", "today", "stats", "plotdata");
 	
 	/** Read the Gedcom configuration settings from the database
 	 *
@@ -50,16 +45,16 @@ class GedcomConfig {
 	 * @return 	boolean		true if success, false if failed
 	**/
 	public function ReadGedcomConfig($gedcom) {
-		global $TBLPREFIX, $GEDCOM;
+		global $GEDCOM;
 	
-		if (isset($this->GEDCONF[$gedcom])) {
-			foreach ($this->GEDCONF[$gedcom] as $var => $value) {
+		if (isset(self::$GEDCONF[$gedcom])) {
+			foreach (self::$GEDCONF[$gedcom] as $var => $value) {
 				global $$var;
 				$$var = $value;
 			}
 		}
 		else {
-			$sql = "SELECT * FROM ".$TBLPREFIX."gedconf WHERE (gc_gedcom='".$gedcom."')";
+			$sql = "SELECT * FROM ".TBLPREFIX."gedconf WHERE (gc_gedcom='".$gedcom."')";
 			$res = NewQuery($sql);
 			if ($res) {
 				$ct = $res->NumRows($res->result);
@@ -73,7 +68,7 @@ class GedcomConfig {
 						$gc[$var] = $value;
 					}
 				}
-				$this->GEDCONF[$gedcom] = $gc;
+				self::$GEDCONF[$gedcom] = $gc;
 				$res->FreeResult($res->result);
 			}
 		}
@@ -91,13 +86,13 @@ class GedcomConfig {
 	 * @param		array	$settings	Array with GEDCOM settings
 	**/
 	public function SetGedcomConfig($settings) {
-		global $TBLPREFIX, $GEDCOM;
+		global $GEDCOM;
 		
 		// Clear the cache
-		$this->GEDCONF = array();
+		self::$GEDCONF = array();
 	
 		// -- First see if the settings already exist
-		$sql = "SELECT gc_gedcom FROM ".$TBLPREFIX."gedconf WHERE (gc_gedcom='".$settings["gedcom"]."')";
+		$sql = "SELECT gc_gedcom FROM ".TBLPREFIX."gedconf WHERE (gc_gedcom='".$settings["gedcom"]."')";
 		$res = NewQuery($sql);
 		$ct = $res->NumRows($res->result);
 		if ($ct == "0") {
@@ -117,7 +112,7 @@ class GedcomConfig {
 			}
 			$col .= ")";
 			$val .= ")";
-			$sql = "INSERT INTO ".$TBLPREFIX."gedconf ".$col." VALUES ".$val;
+			$sql = "INSERT INTO ".TBLPREFIX."gedconf ".$col." VALUES ".$val;
 	  		$res = NewQuery($sql);
 		}
 		else {
@@ -128,7 +123,7 @@ class GedcomConfig {
 				$str .= "gc_".$key."='".$value."'";
 				$i++;
 			}
-			$sql = "UPDATE ".$TBLPREFIX."gedconf SET ".$str." WHERE gc_gedcom='".$settings["gedcom"]."'";
+			$sql = "UPDATE ".TBLPREFIX."gedconf SET ".$str." WHERE gc_gedcom='".$settings["gedcom"]."'";
 	  		$res = NewQuery($sql);
 		}
 		//-- This is copied from the config_gedcom.php. Added: only re-set the limit 
@@ -146,59 +141,59 @@ class GedcomConfig {
 	 * @param		string	$gedcom		GEDCOM name for which the values are to be deleted.
 	**/
 	public function DeleteGedcomConfig($gedcom) {
-		global $TBLPREFIX, $DBCONN;
+		global $DBCONN;
 	
 		if (!$DBCONN->connected) return false;
-		$this->GEDCONF = array();
-		$sql = "DELETE FROM ".$TBLPREFIX."gedconf WHERE gc_gedcom='".$gedcom."'";
+		unset(self::$GEDCONF[$gedcom]);
+		$sql = "DELETE FROM ".TBLPREFIX."gedconf WHERE gc_gedcom='".$gedcom."'";
 		$res = NewQuery($sql);
 		return;
 	}
 	
 	public function GetHighMaxTime() {
-		global $TBLPREFIX, $TIME_LIMIT;
+		global $TIME_LIMIT;
 
 		// Retrieve the maximum maximum execution time from the gedcom settings
-		$sql = "SELECT max(gc_time_limit) FROM ".$TBLPREFIX."gedconf";
+		$sql = "SELECT max(gc_time_limit) FROM ".TBLPREFIX."gedconf";
 		$res = NewQuery($sql);
 		if ($res) while($row = $res->FetchRow()) return $row["0"];
 		else return $TIME_LIMIT;
 	}
 
 	public function GetLastNotifMail() {
-		global $TBLPREFIX;
 		
-		$sql = "SELECT gc_gedcom, gc_last_change_email from ".$TBLPREFIX."gedconf";
-		$res = NewQuery($sql);
-		if ($res) {
-			while ($row = $res->FetchAssoc()) {
-				$this->lastmail[$row["gc_gedcom"]] = $row["gc_last_change_email"];
+		if (is_null(self::$lastmail)) {
+			$sql = "SELECT gc_gedcom, gc_last_change_email from ".TBLPREFIX."gedconf";
+			$res = NewQuery($sql);
+			if ($res) {
+				while ($row = $res->FetchAssoc()) {
+					self::$lastmail[$row["gc_gedcom"]] = $row["gc_last_change_email"];
+				}
 			}
 		}
-		return $this->lastmail;
+		return self::$lastmail;
 	}
 	
 	public function SetLastNotifMail($ged) {
-		global $TBLPREFIX;
 		
-		$sql = "UPDATE ".$TBLPREFIX."gedconf SET gc_last_change_email='".time()."' WHERE gc_gedcom='".$ged."'";
+		$time = time();
+		$sql = "UPDATE ".TBLPREFIX."gedconf SET gc_last_change_email='".$time."' WHERE gc_gedcom='".$ged."'";
 		$res = NewQuery($sql);
+		self::$lastmail[$ged] = $time;
 		return true;
 	}
 	
 	public function SetPedigreeRootId($id, $ged) {
-		global $TBLPREFIX;
 	
-		$sql = "UPDATE ".$TBLPREFIX."gedconf SET gc_pedigree_root_id='".$id."' WHERE gc_gedcom='".$ged."'";
+		$sql = "UPDATE ".TBLPREFIX."gedconf SET gc_pedigree_root_id='".$id."' WHERE gc_gedcom='".$ged."'";
 		$res = NewQuery($sql);
 		return true;
 	}
 
 	public function GetLastCacheDate($cache, $ged) {
-		global $TBLPREFIX;
 
-		if (!in_array($cache, $this->cachenames)) return false;
-		$sql = "SELECT gc_gedcom, gc_last_".$cache." FROM ".$TBLPREFIX."gedconf WHERE gc_gedcom='".$ged."'";
+		if (!in_array($cache, self::$cachenames)) return false;
+		$sql = "SELECT gc_gedcom, gc_last_".$cache." FROM ".TBLPREFIX."gedconf WHERE gc_gedcom='".$ged."'";
 		$res = NewQuery($sql);
 		if ($res) {
 			if ($res->NumRows() == 0) return false;
@@ -212,10 +207,10 @@ class GedcomConfig {
 	}
 	
 	public function GetAllLastCacheDates($ged="") {
-		global $TBLPREFIX, $GEDCOM;
+		global $GEDCOM;
 	
 		if (empty($ged)) $ged = $GEDCOM;
-		$sql = "SELECT gc_last_upcoming, gc_last_today, gc_last_stats FROM ".$TBLPREFIX."gedconf WHERE gc_gedcom='".$ged."'";
+		$sql = "SELECT gc_last_upcoming, gc_last_today, gc_last_stats FROM ".TBLPREFIX."gedconf WHERE gc_gedcom='".$ged."'";
 		$res = NewQuery($sql);
 		if ($res) {
 			$row = $res->fetchAssoc();
@@ -225,28 +220,25 @@ class GedcomConfig {
 	}
 	
 	public function SetLastCacheDate($cache, $value, $ged) {
-		global $TBLPREFIX;
 		
-		if (!in_array($cache, $this->cachenames)) return false;
-		$sql = "UPDATE ".$TBLPREFIX."gedconf SET gc_last_".$cache."='".$value."' WHERE gc_gedcom='".$ged."'";
+		if (!in_array($cache, self::$cachenames)) return false;
+		$sql = "UPDATE ".TBLPREFIX."gedconf SET gc_last_".$cache."='".$value."' WHERE gc_gedcom='".$ged."'";
 		$res = NewQuery($sql);
 		return true;
 	}
 
 	public function ResetCaches($ged="") {
-		global $TBLPREFIX;
 	
 		// Reset todays events cache
-		$sql = "UPDATE ".$TBLPREFIX."gedconf SET gc_last_today='0', gc_last_upcoming='0', gc_last_stats='0', gc_last_plotdata='0' ";
+		$sql = "UPDATE ".TBLPREFIX."gedconf SET gc_last_today='0', gc_last_upcoming='0', gc_last_stats='0', gc_last_plotdata='0' ";
 		if (!empty($ged)) $sql .= "WHERE gc_gedcom='".$ged."'";
 		$res = NewQuery($sql);
 		return true;
 	}
 	
 	public function GetGedcomLanguage($ged) {
-		global $TBLPREFIX;
 	
-		$sql = "SELECT gc_gedcomlang FROM ".$TBLPREFIX."gedconf WHERE gc_gedcom='".$ged."'";
+		$sql = "SELECT gc_gedcomlang FROM ".TBLPREFIX."gedconf WHERE gc_gedcom='".$ged."'";
 		$res = NewQuery($sql);
 		if ($res->NumRows() == 0) return false;
 		$lang = $res->FetchAssoc();

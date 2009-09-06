@@ -77,7 +77,9 @@ if (($action=="send")&&(isset($_SESSION["good_to_send"]))&&($_SESSION["good_to_s
 		if ($to == "all") {
 			$toarray = array();
 			$users = UserController::GetUsers();
-			foreach($users as $indexval => $tuser) $toarray[] = $tuser->username;
+			foreach($users as $indexval => $tuser) {
+				if ($tuser->username != $gm_username) $toarray[] = $tuser->username;
+			}
 		}
 		if ($to == "never_logged") {
 			$toarray = array();
@@ -100,21 +102,22 @@ if (($action=="send")&&(isset($_SESSION["good_to_send"]))&&($_SESSION["good_to_s
 		}
 		$i = 0;
 		foreach($toarray as $indexval => $to) {
-			$message = array();
-			$message["to"]=$to;
-			$message["from"]=$from;
+			$message = null;
+			$message = new Message();
+			$message->to = $to;
+			$message->from = $from;
 			if (!empty($from_name)) {
-				$message["from_name"] = $from_name;
-				$message["from_email"] = $from_email;
+				$message->from_name = $from_name;
+				$message->from_email = $from_email;
 			}
-			$message["subject"] = $subject;
+			$message->subject = $subject;
 			$url = preg_replace("/".session_name()."=.*/", "", $url);
-			$message["body"] = $body;
-			$message["created"] = $time;
-			$message["method"] = $method;
-			$message["url"] = $url;
-			if ($i>0) $message["no_from"] = true;
-			if (AddMessage($message)) {
+			$message->body = $body;
+			$message->created = $time;
+			$message->method = $method;
+			$message->url = $url;
+			if ($i>0) $message->no_from = true;
+			if ($message->AddMessage()) {
 				print $gm_lang["message_sent"]." - ";
 				$touser =& User::GetInstance($to);
 				if ($touser->username != $from) print $touser->firstname."&nbsp;".$touser->lastname."<br />";
@@ -193,7 +196,7 @@ if ($action=="compose") {
 	if ($method=="messaging2") print_text("messaging2_help");
 }
 else if ($action=="delete") {
-	if (deleteMessage($id)) print $gm_lang["message_deleted"];
+	if (MessageController::deleteMessage($id)) print $gm_lang["message_deleted"];
 }
 print "<center><br /><br /><a href=\"#\" onclick=\"if (window.opener.refreshpage) window.opener.refreshpage(); window.close();\">".$gm_lang["close_window"]."</a><br /></center>";
 

@@ -36,25 +36,27 @@ class ActionItem {
 	// Data
 	private $id = 0;					// The ID of this item in the database
 	private $pid = null;				// The xref of the person that this action relates to
-	private $indi_obj = null;			// The person object
-	private $indi_disp = null;		 	// Can we display the person
+	private $type = null;				// Type of pid: INDI, FAM, etc.
+	private $pid_obj = null;			// The related object
+	private $pid_disp = null;		 	// Can we display the related object
 	private $gedfile = "";				// The gedfile ID in which this action exists
 	private $text = "";					// Text for the item
 	private $repo = null;				// The xref of the repository that this action relates to
 	private $repo_obj = null;			// The repository object
 	private $repo_disp = null;			// Can we display the repository
 	private $status = 0;				// Status 0 = closed or 1 = open
-	private $disp = null;				// If we can display both the individual and the repository related to this action
+	private $disp = null;				// If we can display both the individual/family and the repository related to this action
 	private $canshow = null;			// If we can show actions at all
 	private $me = null;					// The xref that will display this action
 	private $repodesc = null;			// Descriptor for the repository
-	private $indidesc = null;			// Name of the person
+	private $piddesc = null;			// Name of the person/family/etc.
 
 	public function __construct($values="", $me="") {
 		
 		if (is_array($values)) {
 			$this->id = $values["a_id"];
 			$this->pid = $values["a_pid"];
+			$this->type = $values["a_type"];
 			$this->repo = $values["a_repo"];
 			$this->gedfile = $values["a_gedfile"];
 			$this->text = stripslashes($values["a_text"]);
@@ -70,6 +72,9 @@ class ActionItem {
 			switch ($property) {
 				case "pid":
 					return $this->pid;
+					break;
+				case "type":
+					return $this->type;
 					break;
 				case "gedfile":
 					return $this->gedfile;
@@ -95,11 +100,11 @@ class ActionItem {
 				case "repo_obj":
 					return $this->getRepoObj();
 					break;
-				case "indidesc":
-					return $this->GetIndiDesc();
+				case "piddesc":
+					return $this->GetPidDesc();
 					break;
-				case "indi_obj":
-					return $this->getIndiObj();
+				case "pid_obj":
+					return $this->getPidObj();
 					break;
 			}
 		}
@@ -110,6 +115,9 @@ class ActionItem {
 			switch ($property) {
 				case "pid":
 					$this->pid = $value;
+					break;
+				case "type":
+					$this->type = $value;
 					break;
 				case "gedfile":
 					if (is_numeric($value)) $this->gedfile = $value;
@@ -127,12 +135,13 @@ class ActionItem {
 		}
 	}
 	
-	private function getIndiObj() {
+	private function getPidObj() {
 		
-		if (!is_object($this->indi_obj) && $this->pid != "") {
-			$this->indi_obj =& Person::GetInstance($this->pid);
+		if (!is_object($this->pid_obj) && $this->pid != "") {
+			if ($this->type == "INDI") $this->pid_obj =& Person::GetInstance($this->pid);
+			else if ($this->type == "FAM") $this->pid_obj =& Family::GetInstance($this->pid);
 		}
-		return $this->indi_obj;
+		return $this->pid_obj;
 	}
 	
 	private function getRepoObj() {
@@ -147,26 +156,26 @@ class ActionItem {
 		
 		if (is_null($this->disp)) {
 			
-			if ($this->pid != "" && !is_object($this->indi_obj)) $this->getIndiObj();
-			if (is_object($this->indi_obj)) $this->indi_disp = $this->indi_obj->disp;
-			else $this->indi_disp = true;
+			if ($this->pid != "" && !is_object($this->pid_obj)) $this->getPidObj();
+			if (is_object($this->pid_obj)) $this->pid_disp = $this->pid_obj->disp;
+			else $this->pid_disp = true;
 			
 			if ($this->repo != "" && !is_object($this->repo_obj)) $this->getRepoObj();
 			if (is_object($this->repo_obj)) $this->repo_disp = $this->repo_obj->disp;
 			else $this->repo_disp = true;
 			
 			if (is_null($this->me)) {
-				if (!$this->indi_disp) $this->disp = false;
+				if (!$this->pid_disp) $this->disp = false;
 				else if (!$this->repo_disp) $this->disp = false;
 				else $this->disp = true;
 			}
 			else if ($this->repo == $this->me) {
-				$this->disp = $this->indi_disp;
+				$this->disp = $this->pid_disp;
 			}
 			else if ($this->pid == $this->me) {
 				$this->disp = $this->repo_disp;
 			}
-			else if (!$this->indi_disp || !$this->repo_disp) $this->disp = false;
+			else if (!$this->pid_disp || !$this->repo_disp) $this->disp = false;
 			else $this->disp = true;
 		}
 		return $this->disp;
@@ -185,17 +194,17 @@ class ActionItem {
 		return $this->repodesc;
 	}
 		
-	private function GetIndiDesc() {
+	private function GetPidDesc() {
 		
-		if (is_null($this->indidesc)) {
-			if (is_null($this->pid) || empty($this->pid)) $this->indidesc = "";
+		if (is_null($this->piddesc)) {
+			if (is_null($this->pid) || empty($this->pid)) $this->piddesc = "";
 			else {
-				if (!is_object($this->indi_obj)) $this->getIndiObj();
-				if (is_object($this->indi_obj)) $this->indidesc = $this->indi_obj->sortable_name;
-				else $this->indidesc = "";
+				if (!is_object($this->pid_obj)) $this->getPidObj();
+				if (is_object($this->pid_obj)) $this->piddesc = $this->pid_obj->sortable_name;
+				else $this->piddesc = "";
 			}
 		}
-		return $this->indidesc;
+		return $this->piddesc;
 	}
 
 	private function canShow() {
@@ -206,29 +215,27 @@ class ActionItem {
 	}
  	
 	public function AddThis() {
-		global $GEDCOMID, $TBLPREFIX, $DBCONN;
+		global $GEDCOMID;
 		
 		if ($this->canshow) {
-			$sql = "INSERT INTO ".$TBLPREFIX."actions VALUES('', '".$this->pid."', '".$this->repo."','".$this->gedfile."', '".$DBCONN->EscapeQuery($this->text)."','".$this->status."')";
+			$sql = "INSERT INTO ".TBLPREFIX."actions VALUES('', '".$this->pid."', '".$this->type."', '".$this->repo."','".$this->gedfile."', '".DbLayer::EscapeQuery($this->text)."','".$this->status."')";
 			$res = NewQuery($sql);
 			$this->id = $res->InsertID();
 		}
 	}
 	
 	public function DeleteThis() {
-		global $TBLPREFIX;
 		
 		if ($this->canshow) {
-			$sql = "DELETE FROM ".$TBLPREFIX."actions WHERE a_id='".$this->id."'";
+			$sql = "DELETE FROM ".TBLPREFIX."actions WHERE a_id='".$this->id."'";
 			$res = NewQuery($sql);
 		}
 	}
 
 	public function UpdateThis() {
-		global $TBLPREFIX, $DBCONN;
 
 		if ($this->canshow) {
-			$sql = "UPDATE ".$TBLPREFIX."actions SET a_pid='".$this->pid."', a_text='".$DBCONN->EscapeQuery($this->text)."', a_repo='".$this->repo."', a_status='".$this->status."' WHERE a_id='".$this->id."'";
+			$sql = "UPDATE ".TBLPREFIX."actions SET a_pid='".$this->pid."', a_text='".DbLayer::EscapeQuery($this->text)."', a_repo='".$this->repo."', a_status='".$this->status."' WHERE a_id='".$this->id."'";
 			$res = NewQuery($sql);
 		}
 	}
@@ -324,7 +331,7 @@ class ActionItem {
 			print "<option value=\"0\" selected=\"selected\" >".$gm_lang["action0"]."</option>";
 			print "<option value=\"1\" >".$gm_lang["action1"]."</option>";
 			print "</select><br /><br />";
-			print "<input type=\"button\" value=\"".$gm_lang["save"]."\" onclick=\"sndReq('add_todo', 'action_add2', 'aid','".$this->id."','actiontext', encodeURI(document.actionform.actiontext.value), 'repo', document.actionform.repo.value, 'status', document.actionform.status.value, 'pid', document.actionform.pid.value); window.location.reload()\" />";
+			print "<input type=\"button\" value=\"".$gm_lang["save"]."\" onclick=\"sndReq('add_todo', 'action_add2', 'aid','".$this->id."','actiontext', encodeURI(document.actionform.actiontext.value), 'repo', document.actionform.repo.value, 'status', document.actionform.status.value, 'pid', document.actionform.pid.value, 'type', '".strtoupper($this->type)."'); window.location.reload()\" />";
 		}
 	}
 	

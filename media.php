@@ -32,8 +32,8 @@ require("config.php");
 
 // Only gedcom admins may do this
 if (!$gm_user->userGedcomAdmin()) {
-	if (empty($LOGIN_URL)) header("Location: login.php?".GetQueryString(true));
-	else header("Location: ".$LOGIN_URL."?url=media.php&amp;".GetQueryString(true));
+	if (LOGIN_URL == "") header("Location: login.php?".GetQueryString(true));
+	else header("Location: ".LOGIN_URL."?url=media.php&amp;".GetQueryString(true));
 	exit;
 }
 if (!isset($directory)) $directory = $MEDIA_DIRECTORY;
@@ -54,13 +54,13 @@ $AUTO_GENERATE_THUMBS = $autothumbs;
 print_header($gm_lang["manage_media"]." - ".$GEDCOMS[$GEDCOM]['title']);
 
 if ($action == "delete") {
-	$MediaFS->DeleteFile(basename($file), RelativePathFile($directory));
+	MediaFS::DeleteFile(basename($file), RelativePathFile($directory));
 }
 if ($disp1 == "block") {
-	$dirs = $MediaFS->GetMediaDirList($MEDIA_DIRECTORY, true, 1, false, true);
+	$dirs = MediaFS::GetMediaDirList($MEDIA_DIRECTORY, true, 1, false, true);
 //	if (!in_array($MEDIA_DIRECTORY, $dirs)) $dirs[] = $MEDIA_DIRECTORY;
 	sort($dirs);
-	$files = $MediaFS->GetMediaFileList($directory, $filter);
+	$files = MediaFS::GetMediaFileList($directory, $filter);
 	ksort($files);
 }
 
@@ -73,7 +73,7 @@ if ($action == "select_action") {
 			if (isset($$movefrom)) {
 				$changed = true;
 //				print "found move for ".$filename." - ".$$movefrom." from ".$directory." to ".urldecode($move_folder)."<br />";
-				$result = $MediaFS->MoveFile($filename, RelativePathFile($directory), RelativePathFile(urldecode($move_folder)));
+				$result = MediaFS::MoveFile($filename, RelativePathFile($directory), RelativePathFile(urldecode($move_folder)));
 				if(!$result) $errors = true;
 			}
 		}
@@ -89,7 +89,7 @@ if ($action == "select_action") {
 			$delfile = "select".preg_replace(array("/\(/","/\)/","/\./","/-/","/ /","/\//","/\+/"), array("_","_","_","_","_","_","_"), $filename); 
 			if (isset($$delfile)) {
 				$changed = true;
-				$result = $MediaFS->DeleteFile(basename($filename), RelativePathFile($directory));
+				$result = MediaFS::DeleteFile(basename($filename), RelativePathFile($directory));
 				if(!$result) $errors = true;
 			}
 		}
@@ -101,24 +101,24 @@ if ($action == "select_action") {
 	}
 	if ($changed) {
 		// Get the file list again, it's changed by the mass update
-		$files = $MediaFS->GetMediaFileList($directory, $filter);
+		$files = MediaFS::GetMediaFileList($directory, $filter);
 		ksort($files);
 	}
 }
 	
 if ($action == "directory_action") {
 	if ($dir_action == "create" && isset($new_dir) && !empty($new_dir)) {
-		if ($MediaFS->CreateDir($new_dir, $parent_dir, $MEDIA_IN_DB)) $error = $gm_lang["dir_created"];
+		if (MediaFS::CreateDir($new_dir, $parent_dir, $MEDIA_IN_DB)) $error = $gm_lang["dir_created"];
 		else $error = $gm_lang["dir_not_created"];
 	}
 	if ($dir_action == "delete") {
 		if (!isset($del_dir)) $error = $gm_lang["dirdel_fail"];
 		else {
-			if ($MediaFS->DeleteDir(urldecode($del_dir), $MEDIA_IN_DB)) $error = $gm_lang["dirdel_ok"];
+			if (MediaFS::DeleteDir(urldecode($del_dir), $MEDIA_IN_DB)) $error = $gm_lang["dirdel_ok"];
 			else $error = $gm_lang["dirdel_fail"];
 		}
 	}
-	$dirs = $MediaFS->GetMediaDirList($MEDIA_DIRECTORY, true, 1, false, true);
+	$dirs = MediaFS::GetMediaDirList($MEDIA_DIRECTORY, true, 1, false, true);
 //	if (!in_array($MEDIA_DIRECTORY, $dirs)) $dirs[] = $MEDIA_DIRECTORY;
 	sort($dirs);
 }
@@ -135,24 +135,24 @@ if ($action == "import_action") {
 	// Linked only
 	if ($linked) {
 		// Read the files into the table
-		$sql = "SELECT m_file, m_gedrec FROM ".$TBLPREFIX."media WHERE m_gedfile='".$GEDCOMID."'";
+		$sql = "SELECT m_file, m_gedrec FROM ".TBLPREFIX."media WHERE m_gedfile='".$GEDCOMID."'";
 		$res = NewQuery($sql);
 		while ($row = $res->Fetchrow()) {
 			$filefromged = GetGedcomValue("FILE", 1, $row[1]);
 			if (stristr($filefromged, "://")) $file = $filefromged;
 			else $file = $MEDIA_DIRECTORY.$row[0];
 			// dbmode is always true for import
-			if ($MediaFS->CreateFile($file, $delexist, true, $delold)) $count++;
+			if (MediaFS::CreateFile($file, $delexist, true, $delold)) $count++;
 			else $error = $gm_lang["m_imp_err"]."<br />";
 		}
 	}
 	else {
-		$dirs = $MediaFS->GetMediaDirList($MEDIA_DIRECTORY, true, 1, false, false, false);
+		$dirs = MediaFS::GetMediaDirList($MEDIA_DIRECTORY, true, 1, false, false, false);
 		foreach ($dirs as $pipo => $dir) {
-			$files = $MediaFS->GetFileList($dir, "", false);
+			$files = MediaFS::GetFileList($dir, "", false);
 			foreach ($files as $dikkedeur => $file) {
 				// dbmode is always true for import
-				if ($MediaFS->CreateFile($file, $delexist, true, $delold)) $count++;
+				if (MediaFS::CreateFile($file, $delexist, true, $delold)) $count++;
 				else $error = $gm_lang["m_imp_err"]."<br />";
 			}
 		}
@@ -172,23 +172,23 @@ if ($action == "export_action") {
 
 	// Linked only
 	if ($linked) {
-		$sql = "SELECT m_file, m_gedrec FROM ".$TBLPREFIX."media WHERE m_gedfile='".$GEDCOMID."'";
+		$sql = "SELECT m_file, m_gedrec FROM ".TBLPREFIX."media WHERE m_gedfile='".$GEDCOMID."'";
 		$res = NewQuery($sql);
 		while ($row = $res->Fetchrow()) {
 			$filefromged = GetGedcomValue("FILE", 1, $row[1]);
 			if (stristr($filefromged, "://")) $file = $filefromged;
 			else $file = $MEDIA_DIRECTORY.$row[0];
-			if ($MediaFS->CreateFile($file, $delexist, false, $delold, $genthumbs)) $count++;
+			if (MediaFS::CreateFile($file, $delexist, false, $delold, $genthumbs)) $count++;
 			else $error = $gm_lang["m_imp_err"]."<br />";
 		}
 	}
 	else {
-		$dirs = $MediaFS->GetMediaDirList($MEDIA_DIRECTORY, true, 1, false, false, true); 
+		$dirs = MediaFS::GetMediaDirList($MEDIA_DIRECTORY, true, 1, false, false, true); 
 		$dirs[] = "external_links";
 		foreach ($dirs as $pipo => $dir) {
-			$files = $MediaFS->GetFileList($dir, "", true);
+			$files = MediaFS::GetFileList($dir, "", true);
 			foreach ($files as $dikkedeur => $file) {
-				if ($MediaFS->CreateFile($file, $delexist, false, $delold, $genthumbs)) $count++;
+				if (MediaFS::CreateFile($file, $delexist, false, $delold, $genthumbs)) $count++;
 				else $error = $gm_lang["m_imp_err"]."<br />";
 			}
 		}
@@ -202,7 +202,7 @@ if ($action == "upload_action" && (!empty($picture))) {
 	// folder - Folder to place the new file
 	// delupl - Overwrite if exists
 	if (!isset($delupl)) $delupl = false;
-	$result = $MediaFS->UploadFiles($_FILES, $folder, $delupl);
+	$result = MediaFS::UploadFiles($_FILES, $folder, $delupl);
 	$filename = $result["filename"];
 	if ($result["errno"] != 0) {
 		$error = $gm_lang["upload_error"]."<br />".$result["error"];
@@ -235,7 +235,7 @@ if ($disp1 == "block") {
 				print "</a><br />";
 			
 			foreach ($dirs as $key => $dir) {
-				$canwrite = $MediaFS->DirIsWritable($dir);
+				$canwrite = MediaFS::DirIsWritable($dir);
 				$indent = preg_match_all("/\//", RelativePathFile($dir), $m)*10;
 				$d = preg_split("/\//",$dir);
 				$d = array_reverse($d);
@@ -318,7 +318,7 @@ if ($disp1 == "block") {
 			print "<select name=\"move_folder\">";
 			$d = RelativePathFile($directory);
 			foreach($dirs as $key => $dir) {
-				if ($MediaFS->DirIsWritable($dir)) {
+				if (MediaFS::DirIsWritable($dir)) {
 					if ($dir != $d) print "<option value=\"".urlencode($dir)."\">".$dir."</option>";
 				}
 			}
@@ -339,7 +339,7 @@ if ($disp1 == "block") {
 			print "<div style=\"overflow-x:scroll; width:99%; overflow: -moz-scrollbars-horizontal;\">";			
 			print "<select name=\"parent_dir\">";
 			foreach($dirs as $key => $dir) {
-				if ($MediaFS->DirIsWritable($dir)) {
+				if (MediaFS::DirIsWritable($dir)) {
 					$d = RelativePathFile($dir);
 					$l = preg_split("/\//", $d);
 					if (count($l)-1 <= $MEDIA_DIRECTORY_LEVELS) print "<option value=\"".urlencode($dir)."\">".$dir."</option>";
@@ -353,7 +353,7 @@ if ($disp1 == "block") {
 			$sel .= "<select name=\"del_dir\">";
 			// To fix: only dirs with no subdirs
 			foreach($dirs as $key => $dir) {
-				if ($MediaFS->DirIsWritable($dir) && $MediaFS->DeleteDir($dir, $MEDIA_IN_DB, true) && $dir != RelativePathFile($MEDIA_DIRECTORY)) {
+				if (MediaFS::DirIsWritable($dir) && MediaFS::DeleteDir($dir, $MEDIA_IN_DB, true) && $dir != RelativePathFile($MEDIA_DIRECTORY)) {
 					$sel .= "<option value=\"".urlencode($dir)."\">".$dir."</option>";
 					$csel++;
 				}
@@ -440,7 +440,7 @@ if ($disp1 == "block") {
 				// Delete 
 				print "<td style=\"border-bottom:1px solid #493424; text-align:center\">";
 				if ($canwrite) {
-					print "<a href=\"media.php?action=delete&amp;file=".urlencode($MediaFS->NormalizeLink($filename))."&amp;directory=".$directory."&amp;thumbs=".$thumbs."&amp;filter=".$filter."\" onclick=\"return confirm('".$gm_lang["del_mm_file1"];
+					print "<a href=\"media.php?action=delete&amp;file=".urlencode(MediaFS::NormalizeLink($filename))."&amp;directory=".$directory."&amp;thumbs=".$thumbs."&amp;filter=".$filter."\" onclick=\"return confirm('".$gm_lang["del_mm_file1"];
 					if (isset($file["objects"])) print $gm_lang["del_mm_file2"];
 					print "');\">";
 					print "<img src=\"".$GM_IMAGE_DIR."/".$GM_IMAGES["delete"]["other"]."\" border=\"0\" alt=\"".$gm_lang["delete_file"]."\" style=\"vertical-align:middle;\"/></a>";
@@ -566,7 +566,7 @@ if ($disp2 == "block") {
 					// Box for user to choose to upload thumb from local computer
 //					print "<input type=\"file\" name=\"thumbnail\" size=\"30\" />&nbsp;&nbsp;&nbsp;".$gm_lang["upl_thumb"]."<br /><br />";
 					// Box for user to choose the folder to store the image
-					$dirlist = $MediaFS->GetMediaDirList($MEDIA_DIRECTORY, true, 1, true, false, $MEDIA_IN_DB);
+					$dirlist = MediaFS::GetMediaDirList($MEDIA_DIRECTORY, true, 1, true, false, $MEDIA_IN_DB);
 //					if (!in_array($MEDIA_DIRECTORY, $dirlist)) $dirlist[] = $MEDIA_DIRECTORY;
 					sort($dirlist);
 					print "<select name=\"folder\">";

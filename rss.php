@@ -64,14 +64,14 @@ $rss->descriptionTruncSize = 500;
 $rss->descriptionHtmlSyndicated = true;
 $rss->cssStyleSheet="";
 
-$rss->link = $SERVER_URL;
-$syndURL = $SERVER_URL."rss.php?".$_SERVER['QUERY_STRING'];
+$rss->link = SERVER_URL;
+$syndURL = SERVER_URL."rss.php?".$_SERVER['QUERY_STRING'];
 $syndURL = preg_replace("/&/", "&amp;", $syndURL);
 $rss->syndicationURL = $syndURL;
 
 $image = new FeedImage();
 $image->title = $gm_lang["rss_logo_descr"];
-$image->url = $SERVER_URL."images/gedcom.gif";
+$image->url = SERVER_URL."images/gedcom.gif";
 $image->link = "http://www.Genmod.net";
 $image->description = $gm_lang["rss_logo_descr"];
 
@@ -123,8 +123,8 @@ if((empty($module) || $module == "print_gedcom_news") && (isset($bconfig["print_
 		if (! empty($newsItem[1])) {
 			$item = new FeedItem();
 			$item->title = $newsItem[0];
-			//$item->link = $SERVER_URL . "index.php?command=gedcom#" . $newsItem[0];
-			$item->link = $SERVER_URL . "index.php?command=gedcom#" . $newsItem[3];
+			//$item->link = SERVER_URL . "index.php?command=gedcom#" . $newsItem[0];
+			$item->link = SERVER_URL . "index.php?command=gedcom#" . $newsItem[3];
 			$item->description = $newsItem[2];
 
 			//optional
@@ -132,7 +132,7 @@ if((empty($module) || $module == "print_gedcom_news") && (isset($bconfig["print_
 			$item->descriptionHtmlSyndicated = true;
 
 			$item->date = $newsItem[1];
-			$item->source = $SERVER_URL ;
+			$item->source = SERVER_URL ;
 			$item->author = $author;
 			$rss->addItem($item);
 		}
@@ -144,8 +144,8 @@ if((empty($module) || $module == "print_gedcom_stats") && (isset($bconfig["print
 	if (! empty($gedcomStats[2])) {
 		$item = new FeedItem();
 		$item->title = $gedcomStats[0];
-		//$item->link = $SERVER_URL. "index.php?command=gedcom";
-		$item->link = $SERVER_URL. "index.php?command=gedcom#gedcom_stats";
+		//$item->link = SERVER_URL. "index.php?command=gedcom";
+		$item->link = SERVER_URL. "index.php?command=gedcom#gedcom_stats";
 		$item->description = $gedcomStats[2];
 
 		//optional
@@ -155,7 +155,7 @@ if((empty($module) || $module == "print_gedcom_stats") && (isset($bconfig["print
 		if (! empty($gedcomStats[1])) {
 		$item->date = $gedcomStats[1];
 		}
-		$item->source = $SERVER_URL;
+		$item->source = SERVER_URL;
 		$item->author = $author;
 
 		$rss->addItem($item);
@@ -167,7 +167,7 @@ if((empty($module) || $module == "print_todays_events") && (isset($bconfig["prin
 	if (! empty($todaysEvents[2])) {
 		$item = new FeedItem();
 		$item->title = $todaysEvents[0];
-		$item->link = $SERVER_URL. "calendar.php?action=today";
+		$item->link = SERVER_URL. "calendar.php?action=today";
 		$item->description = $todaysEvents[2];
 
 		//optional
@@ -175,7 +175,7 @@ if((empty($module) || $module == "print_todays_events") && (isset($bconfig["prin
 		$item->descriptionHtmlSyndicated = true;
 
 		$item->date = $todaysEvents[1];
-		$item->source = $SERVER_URL;
+		$item->source = SERVER_URL;
 		$item->author = $author;
 		$rss->addItem($item);
 	}
@@ -186,7 +186,7 @@ if((empty($module) || $module == "print_upcoming_events") && (isset($bconfig["pr
 	if (! empty($upcomingEvent[2])) {
 		$item = new FeedItem();
 		$item->title = $upcomingEvent[0];
-		$item->link = $SERVER_URL. "calendar.php?action=calendar";
+		$item->link = SERVER_URL. "calendar.php?action=calendar";
 		$item->description = $upcomingEvent[2];
 
 		//optional
@@ -194,7 +194,7 @@ if((empty($module) || $module == "print_upcoming_events") && (isset($bconfig["pr
 		$item->descriptionHtmlSyndicated = true;
 
 		$item->date = $upcomingEvent[1];
-		$item->source = $SERVER_URL;
+		$item->source = SERVER_URL;
 		$item->author = $author;
 
 		$rss->addItem($item);
@@ -206,7 +206,7 @@ if((empty($module) || $module == "print_block_name_top10") && (isset($bconfig["p
 	if (! empty($top10[2])) {
 		$item = new FeedItem();
 		$item->title = $top10[0];
-		$item->link = $SERVER_URL. "indilist.php";
+		$item->link = SERVER_URL. "indilist.php";
 		$item->description = $top10[2];
 
 		//optional
@@ -216,7 +216,7 @@ if((empty($module) || $module == "print_block_name_top10") && (isset($bconfig["p
 		if (! empty($top10[1])) {
 			$item->date = $top10[1];
 		}
-		$item->source = $SERVER_URL;
+		$item->source = SERVER_URL;
 		$item->author = $author;
 
 		$rss->addItem($item);
@@ -228,7 +228,7 @@ if((empty($module) || $module == "print_recent_changes") && (isset($bconfig["pri
 	if (! empty($recentChanges[2])) {
 		$item = new FeedItem();
 		$item->title = $recentChanges[0];
-		$item->link = $SERVER_URL. "indilist.php";
+		$item->link = SERVER_URL. "indilist.php";
 		$item->description = $recentChanges[2];
 
 		//optional
@@ -238,7 +238,7 @@ if((empty($module) || $module == "print_recent_changes") && (isset($bconfig["pri
 		if (! empty($recentChanges[1])) {
 			$item->date = $recentChanges[1];
 		}
-		$item->source = $SERVER_URL;
+		$item->source = SERVER_URL;
 		$item->author = $author;
 
 		$rss->addItem($item);
