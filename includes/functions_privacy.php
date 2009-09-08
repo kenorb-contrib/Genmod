@@ -583,6 +583,7 @@ if (!function_exists("displayDetailsByID")) {
 						    if (!$disp) break;
 					    }
 				    }
+				    $recursive++;
 			    }
 			    // We can show the source, and there are no links that prevent this
 			    if ($disp) {
@@ -624,6 +625,7 @@ if (!function_exists("displayDetailsByID")) {
 						    if (!$disp) break;
 				    	}
 			    	}
+				    $recursive++;
 			    }
 			    if ($disp) {
 					$pcache[$GEDCOMID][$type][$recursive][$checklinks][$pid] = true;
@@ -656,6 +658,7 @@ if (!function_exists("displayDetailsByID")) {
 						    if (!$disp) break;
 				    	}
 			    	}
+				    $recursive++;
 			    }
 			    if ($disp) {
 					$pcache[$GEDCOMID][$type][$recursive][$checklinks][$pid] = true;
