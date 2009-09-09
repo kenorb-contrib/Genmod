@@ -8,6 +8,7 @@
 	# $Id: changelog.txt,v 1.510 2009/05/29 07:43:05 sjouke Exp $
 =====================================================================
 Version 1.7-patch
+- Fixed marriages don't display in hourglass and family book (sjouke)
 - Fixed double privacy checking for link privacy, minor impact (sjouke)
 - Fixed break error in session.php (sjouke)
 - Fixed error in famlist if name does not exist (sjouke)
