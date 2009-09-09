@@ -124,7 +124,7 @@ function print_descendency($pid, $count) {
 				$marrec = GetSubRecord(1, "1 MARR", $famrec);
 				if (!empty($marrec)) {
 					print "<br />";
-					print_simple_fact($famrec, "1 MARR", $famid);
+					print_simple_fact($famrec, "MARR", $famid);
 				}
 				if ($parents["HUSB"]!=$pid) print_pedigree_person($parents["HUSB"], 1, true, $boxcount);
 				else print_pedigree_person($parents["WIFE"], 1, true, $boxcount);
