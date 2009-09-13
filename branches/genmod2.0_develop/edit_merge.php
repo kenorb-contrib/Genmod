@@ -39,7 +39,7 @@ require("includes/functions/functions_edit.php");
 if (empty($action)) $action="choose";
 if (empty($gid1)) $gid1="";
 if (empty($gid2)) $gid2="";
-if (empty($ged)) $ged=$GEDCOMID;
+if (empty($gedid)) $gedid=$GEDCOMID;
 if (empty($keep1)) $keep1=array();
 if (empty($keep2)) $keep2=array();
 if (empty($skip1)) $skip1=array();
@@ -191,11 +191,8 @@ if ($action!="choose") {
 					print "Performing Record Merge<br /></div>\n";
 					// Delete the old record2
 					$ogedid = $GEDCOMID;
-					$oged = $GEDCOM;
 					$GEDCOMID = $ged;
-					$GEDCOM = get_gedcom_from_id($GEDCOMID);
 					DeleteGedrec($gid2, $change_id, $change_type);
-					$GEDCOM = $oged;
 					$GEDCOMID = $ogedid;
 
 					// First add facts 2-> 1

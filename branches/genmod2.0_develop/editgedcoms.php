@@ -50,11 +50,11 @@ print_header($gm_lang["gedcom_adm_head"]);
 print "<center>\n";
 if ($action=="delete") {
 	if (isset($GEDCOMS[$delged])) {
-		PrivacyController::DeletePrivacy($GEDCOMS[$delged]["id"]);
+		PrivacyController::DeletePrivacy($GEDCOMS[$delged]);
 		DeleteGedcom($delged);
 		unset($GEDCOMS[$delged]);
 		StoreGedcoms();
-		GedcomConfig::DeleteGedcomConfig($delged);
+		GedcomConfig::DeleteGedcomConfig($GEDCOMS[$delged]);
 		print "<br />".str_replace("#GED#", $delged, $gm_lang["gedcom_deleted"])."<br />\n";
 	}
 	else print "<br /><span class=\"error\">".$gm_lang["gedcom_not_exist"]."</span>";
@@ -122,14 +122,14 @@ if ($action == "deletecount") {
 		</div>
 	<?php
 	
-	$current_ged = $GEDCOM;
+	$current_ged = $GEDCOMID;
 	$GedCount = 0;
 	// Print the table of available GEDCOMs
 	if (count($GEDCOMS)>0) {
 		print "<table class=\"gedcom_table\">";
 		foreach($GEDCOMS as $gedc=>$gedarray) {
 			if ($gm_user->userGedcomAdmin($gedc)) {
-				if (empty($DEFAULT_GEDCOM)) $DEFAULT_GEDCOM = $gedc;
+				if (empty($DEFAULT_GEDCOMID)) $DEFAULT_GEDCOMID = $gedc;
 				
 				// Row 0: Separator line
 				if ($GedCount!=0) {
@@ -144,7 +144,7 @@ if ($action == "deletecount") {
 				// Row 1: Title
 				print "<tr>";
 				print "<td colspan=\"5\" class=\"topbottombar width20\">";
-				if ($DEFAULT_GEDCOM==$gedc) print "<span class=\"label\">".PrintReady($gedarray["title"])."</span></td>";
+				if ($DEFAULT_GEDCOMID==$gedc) print "<span class=\"label\">".PrintReady($gedarray["title"])."</span></td>";
 				else print PrintReady($gedarray["title"])."</td>";
 				print "</tr>";
 				
@@ -187,42 +187,42 @@ if ($action == "deletecount") {
 				print "<td>&nbsp;</td>";
 				print "<td>";
 				if (file_exists($gedarray["path"])) {
-					print "<a href=\"uploadgedcom.php?GEDFILENAME=$gedc&amp;verify=verify_gedcom&amp;action=add_form&amp;import_existing=1\">".$gm_lang["ged_import"]."</a>";
+					print "<a href=\"uploadgedcom.php?FILEID=$gedc&amp;verify=verify_gedcom&amp;action=add_form&amp;import_existing=1\">".$gm_lang["ged_import"]."</a>";
 					if (!$imported) {
 						print "<br /><span class=\"error\">".$gm_lang["gedcom_not_imported"]."</span>";
 					}
 				}
 				else print "&nbsp;";
 				print "</td>";
-				print "<td><a href=\"editconfig_gedcom.php?ged=".urlencode($gedc)."\">".$gm_lang["ged_config"]."</a></td>";
-				print "<td><a href=\"javascript: ".$gm_lang["view_searchlog"]."\" onclick=\"window.open('viewlog.php?cat=F&amp;ged=".urlencode($gedc)."', '', 'top=50,left=10,width=700,height=600,scrollbars=1,resizable=1'); return false;\">";
+				print "<td><a href=\"editconfig_gedcom.php?gedid=".$gedc."\">".$gm_lang["ged_config"]."</a></td>";
+				print "<td><a href=\"javascript: ".$gm_lang["view_searchlog"]."\" onclick=\"window.open('viewlog.php?cat=F&amp;gedid=".$gedarray["id"]."', '', 'top=50,left=10,width=700,height=600,scrollbars=1,resizable=1'); return false;\">";
 				if (NewLogRecs("F", $gedc)) print "<span class=\"error\">".$gm_lang["view_searchlog"]."</span>";
 				else print $gm_lang["view_searchlog"];
 				print "</a></td>";
-				print "<td><a href=\"editgedcoms.php?action=delete&amp;delged=".urlencode($gedc)."\" onclick=\"return confirm('".$gm_lang["confirm_gedcom_delete"]." ".preg_replace("/'/", "\'", $gedc)."?');\">".$gm_lang["ged_gedcom"]."</a></td>";
+				print "<td><a href=\"editgedcoms.php?action=delete&amp;delged=".$gedc."\" onclick=\"return confirm('".$gm_lang["confirm_gedcom_delete"]." ".preg_replace("/'/", "\'", $gedc)."?');\">".$gm_lang["ged_gedcom"]."</a></td>";
 				print "</tr>";
 				
 				// Row 4: Options
 				print "<tr>";
 				print "<td>&nbsp;</td>";
 				print "<td>";
-				if ($imported) print "<a href=\"downloadgedcom.php?ged=$gedc\">".$gm_lang["ged_download"]."</a>";
+				if ($imported) print "<a href=\"downloadgedcom.php?gedid=$gedc\">".$gm_lang["ged_download"]."</a>";
 				else print "&nbsp;";
 				print "</td>";
-				print "<td><a href=\"edit_privacy.php?action=edit&amp;ged=".urlencode($gedc)."\">".$gm_lang["ged_privacy"]."</a></td>";
+				print "<td><a href=\"edit_privacy.php?action=edit&amp;gedid=".$gedc."\">".$gm_lang["ged_privacy"]."</a></td>";
 	
-			  print "<td><a href=\"javascript: ".$gm_lang["view_gedlog"]."\" onclick=\"window.open('viewlog.php?cat=G&amp;ged=".urlencode($gedc)."', '', 'top=50,left=10,width=700,height=600,scrollbars=1,resizable=1'); ChangeClass('gedlog".$GedCount."', ''); return false; \">";
+			  print "<td><a href=\"javascript: ".$gm_lang["view_gedlog"]."\" onclick=\"window.open('viewlog.php?cat=G&amp;gedid=".$gedarray["id"]."', '', 'top=50,left=10,width=700,height=600,scrollbars=1,resizable=1'); ChangeClass('gedlog".$GedCount."', ''); return false; \">";
 			  if (NewLogRecs("G", $gedc)) print "<span id=\"gedlog".$GedCount."\" class=\"error\">".$gm_lang["view_gedlog"]."</span>";
 			  else print "<span id=\"gedlog".$GedCount."\">".$gm_lang["view_gedlog"]."</span>";
 				print "</a></td>";
-				print "<td><a href=\"editgedcoms.php?action=deletecount&amp;delged=".urlencode($gedc)."\" onclick=\"return confirm('".$gm_lang["confirm_count_delete"]." ".preg_replace("/'/", "\'", $gedc)."?');\">".$gm_lang["counters"]."</a></td>";
+				print "<td><a href=\"editgedcoms.php?action=deletecount&amp;delged=".$gedc."\" onclick=\"return confirm('".$gm_lang["confirm_count_delete"]." ".preg_replace("/'/", "\'", $gedc)."?');\">".$gm_lang["counters"]."</a></td>";
 				print "</tr>";
 				
 				// Row 5: Options
 				print "<tr>";
 				print "<td>&nbsp;</td>";
 				print "<td>";
-				print "<a href=\"editconfig_gedcom.php?source=reupload_form&amp;ged=$gedc\">".$gm_lang["ged_reupload"]."</a>";
+				print "<a href=\"editconfig_gedcom.php?source=reupload_form&amp;gedid=$gedc\">".$gm_lang["ged_reupload"]."</a>";
 				print "</td>";
 				print "<td><a href=\"javascript: ".$gm_lang["submitter_record"]."\" onclick=\"window.open('edit_interface.php?action=submitter&amp;gedfile=".$gedc."','','width=800,height=600,resizable=1,scrollbars=1'); return false;\">".$gm_lang["submitter_record"]."</a></td>";
 				print "<td>&nbsp;</td>";

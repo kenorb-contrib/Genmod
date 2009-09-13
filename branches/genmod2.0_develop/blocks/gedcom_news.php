@@ -38,9 +38,9 @@ $GM_BLOCKS["print_gedcom_news"]["rss"]			= true;
  * @todo Add an allowed HTML translation
  */
 function print_gedcom_news($block = true, $config="", $side, $index) {
-	global $gm_lang, $GM_IMAGE_DIR, $GM_IMAGES, $TEXT_DIRECTION, $GEDCOM, $command, $TIME_FORMAT, $gm_username, $gm_user;
+	global $gm_lang, $GM_IMAGE_DIR, $GM_IMAGES, $TEXT_DIRECTION, $GEDCOMID, $command, $TIME_FORMAT, $gm_username, $gm_user;
 
-	$usernews = NewsController::getUserNews($GEDCOM);
+	$usernews = NewsController::getUserNews($GEDCOMID);
 	print "<div id=\"gedcom_news\" class=\"block\">\n";
 	print "<div class=\"blockhc\">";
 	if ($gm_user->userGedcomAdmin()) print_help_link("index_gedcom_news_ahelp", "qm_ah");
@@ -76,7 +76,7 @@ function print_gedcom_news($block = true, $config="", $side, $index) {
 		print "</div>\n";
 	}
 	if ($block) print "</div>\n";
-	if ($gm_user->userGedcomAdmin()) print "<a href=\"#\" onclick=\"addnews('".preg_replace("/'/", "\'", $GEDCOM)."'); return false;\">".$gm_lang["add_news"]."</a>\n";
+	if ($gm_user->userGedcomAdmin()) print "<a href=\"#\" onclick=\"addnews('".$GEDCOMID."'); return false;\">".$gm_lang["add_news"]."</a>\n";
 	print "</div>\n";
 	print "</div>";
 }

@@ -89,7 +89,7 @@ if (file_exists(INDEX_DIRECTORY."emergency_syslog.txt")) {
      <div class="<?php print $TEXT_DIRECTION ?>">
 
  	<?php
-	$news = GetNewsItems();
+	$news = GetGMNewsItems();
 	if (count($news)>0) { ?>
 	     <div class="admin_topbottombar"><?php print $gm_lang["genmodnews"]; ?></div>
           <div class="admin_genmod_content">

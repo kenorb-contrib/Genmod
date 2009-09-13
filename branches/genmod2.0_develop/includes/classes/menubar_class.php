@@ -112,9 +112,9 @@ class MenuBar {
 	 * @return Menu		the menu item
 	 */
 	function GetFileMenu() {
-		global $TEXT_DIRECTION, $GEDCOM, $gm_lang;
+		global $TEXT_DIRECTION, $GEDCOMID, $gm_lang;
 		global $SCRIPT_NAME, $QUERY_STRING, $gm_username;
-		global $ALLOW_CHANGE_GEDCOM, $GEDCOMS, $GEDCOM, $gm_user;
+		global $ALLOW_CHANGE_GEDCOM, $GEDCOMS, $gm_user;
 		
 		 $username = $gm_username;
 		 $user =& User::GetInstance($username);
@@ -126,8 +126,8 @@ class MenuBar {
 		// NOTE: Login link
 		if (empty($gm_user->username)) {
 			$submenu = new Menu($gm_lang["login"]);
-			if (!LOGIN_URL == "") $submenu->addLink(LOGIN_URL."?url=".urlencode(basename($SCRIPT_NAME)."?".$QUERY_STRING."&ged=$GEDCOM"));
-			else $submenu->addLink(SERVER_URL."login.php?url=".urlencode(basename($SCRIPT_NAME)."?".$QUERY_STRING."&ged=$GEDCOM"));
+			if (!LOGIN_URL == "") $submenu->addLink(LOGIN_URL."?url=".urlencode(basename($SCRIPT_NAME)."?".$QUERY_STRING."&gedid=$GEDCOMID"));
+			else $submenu->addLink(SERVER_URL."login.php?url=".urlencode(basename($SCRIPT_NAME)."?".$QUERY_STRING."&gedid=$GEDCOMID"));
 			$menu->addSubmenu($submenu);
 		}
 		
@@ -137,15 +137,15 @@ class MenuBar {
 			$menu->addSubmenu($submenu);
 		
 		// NOTE: Add GEDCOMS to open
-			foreach($GEDCOMS as $ged=>$gedarray) {
-				$submenu = new Menu($this->GetSubmenuText(PrintReady($gedarray["title"]), ($ged == $GEDCOM)), false);
-				$submenu->addLink("index.php?command=gedcom&gedid=".$gedarray["id"]);
+			foreach($GEDCOMS as $gedid => $gedarray) {
+				$submenu = new Menu($this->GetSubmenuText(PrintReady($gedarray["title"]), ($gedid == $GEDCOMID)), false);
+				$submenu->addLink("index.php?command=gedcom&gedid=".$gedid);
 				$menu->submenus[count($menu->submenus)-1]->submenus[]=$submenu;
 			}
 		}
 		
 		// NOTE: Admin link
-		if ($gm_user->canadmin || ($gm_user->userGedcomAdmin($GEDCOM))) {
+		if ($gm_user->canadmin || ($gm_user->userGedcomAdmin($GEDCOMID))) {
 			$submenu = new Menu($gm_lang["admin"]);
 			$submenu->addLink("admin.php");
 			$menu->addSubmenu($submenu);
@@ -178,12 +178,12 @@ class MenuBar {
 	}
 
 	function GetEditMenu() {
-		global $TEXT_DIRECTION, $GEDCOM, $gm_lang;
-		global $SCRIPT_NAME, $QUERY_STRING, $GEDCOM, $gm_username;
-		global $ALLOW_CHANGE_GEDCOM, $GEDCOMS;
+		global $TEXT_DIRECTION, $gm_lang;
+		global $SCRIPT_NAME, $QUERY_STRING, $gm_username;
+		global $ALLOW_CHANGE_GEDCOM;
 		
 		global $ENABLE_CLIPPINGS_CART, $gm_user;
-		global $TEXT_DIRECTION, $GEDCOM, $gm_lang;
+		global $TEXT_DIRECTION, $gm_lang;
 		
 		//-- main edit menu item
 		$menu = new Menu($gm_lang["edit"], "#");
@@ -328,7 +328,7 @@ class MenuBar {
 	 * @return Menu		the menu item
 	 */
 	function GetChartsMenu($rootid='',$myid='') {
-		global $TEXT_DIRECTION, $GEDCOM, $gm_lang, $gm_username, $gm_user;
+		global $TEXT_DIRECTION, $gm_lang, $gm_username, $gm_user;
 		
 		//-- main charts menu item
 		$link = "pedigree.php";
@@ -401,7 +401,7 @@ class MenuBar {
 				$username = $gm_username;
 				if (!empty($username)) {
 					$user =& User::GetInstance($username);
-					$myid = @$gm_user->gedcomid[$GEDCOM];
+					$myid = @$gm_user->gedcomid[$GEDCOMID];
 				}
 			}
 			if (($myid and $myid!=$rootid) or empty($rootid)) {
@@ -427,7 +427,7 @@ class MenuBar {
 	}
 	
 	function GetReportMenu($pid="", $type="") {
-		global $TEXT_DIRECTION, $GEDCOMS, $GEDCOM, $gm_lang, $gm_user;
+		global $TEXT_DIRECTION, $gm_lang, $gm_user;
 		global $LANGUAGE, $PRIV_PUBLIC, $PRIV_USER, $PRIV_NONE, $PRIV_HIDE, $gm_username;
 
 		if ($TEXT_DIRECTION=="rtl") $ff="_rtl"; else $ff="";
@@ -487,7 +487,7 @@ class MenuBar {
 	 * @return Menu		the menu item
 	 */
 	function GetListMenu() {
-		global $TEXT_DIRECTION, $GEDCOM, $gm_lang, $gm_user;
+		global $TEXT_DIRECTION, $gm_lang, $gm_user;
 		global $SHOW_SOURCES, $gm_username;
 		
 		$user =& User::GetInstance($gm_username);
@@ -567,7 +567,7 @@ class MenuBar {
 	 * @return Menu		the menu item
 	 */
 	function GetHelperMenu() {
-		global $TEXT_DIRECTION, $GEDCOM, $gm_lang, $spider;
+		global $TEXT_DIRECTION, $gm_lang, $spider;
 		global $SHOW_CONTEXT_HELP, $SCRIPT_NAME, $QUERY_STRING, $helpindex, $action;
 		
 		if ($TEXT_DIRECTION=="rtl") $ff="_rtl"; else $ff="";

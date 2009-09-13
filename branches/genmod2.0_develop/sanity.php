@@ -307,31 +307,31 @@ if (!empty($check_oldgeds)) {
 	// 3 - either 'geds' (gedcom is gedcom id) or 'gednames' (gedcom is gedcom names)
 	// 4 - Language variable name of the message that this table contains records of non-existent gedcoms
 	$gedcheck = array();
-	$gedcheck[] = array("a_gedfile", "actions", "geds", "sc_oldged_actions");
+	$gedcheck[] = array("a_file", "actions", "geds", "sc_oldged_actions");
 	$gedcheck[] = array("b_username", "blocks", "geds", "sc_oldged_blocks");
-	$gedcheck[] = array("ch_gedfile", "changes", "geds", "sc_oldged_changes");
+	$gedcheck[] = array("ch_file", "changes", "geds", "sc_oldged_changes");
 	$gedcheck[] = array("d_file", "dates", "geds", "sc_oldged_dates");
 	$gedcheck[] = array("ge_file", "eventcache", "geds", "sc_oldged_cache");
 	$gedcheck[] = array("f_file", "families", "geds", "sc_oldged_fams");
 	$gedcheck[] = array("fv_file", "favorites", "geds", "sc_oldged_favs");
-	$gedcheck[] = array("gc_gedcom", "gedconf", "gednames", "sc_oldged_gedconf");
+	$gedcheck[] = array("gc_gedcomid", "gedconf", "geds", "sc_oldged_gedconf");
 	$gedcheck[] = array("i_file", "individuals", "geds", "sc_oldged_indis");
 	$gedcheck[] = array("if_file", "individual_family", "geds", "sc_oldged_indifamily");
-	$gedcheck[] = array("l_gedcom", "log", "gednames", "sc_oldged_log");
+	$gedcheck[] = array("l_file", "log", "geds", "sc_oldged_log");
 	$gedcheck[] = array("m_gedfile", "media", "geds", "sc_oldged_media");
 	$gedcheck[] = array("mm_gedfile", "media_mapping", "geds", "sc_oldged_mediam");
 	$gedcheck[] = array("n_file", "names", "geds", "sc_oldged_names");
-	$gedcheck[] = array("n_username", "news", "gednames", "sc_oldged_news");
+	$gedcheck[] = array("n_username", "news", "geds", "sc_oldged_news");
 	$gedcheck[] = array("o_file", "other", "geds", "sc_oldged_other");
 	$gedcheck[] = array("om_gedfile", "other_mapping", "geds", "sc_oldged_otherm");
 	$gedcheck[] = array("pl_file", "placelinks", "geds", "sc_oldged_pl");
 	$gedcheck[] = array("p_file", "places", "geds", "sc_oldged_places");
 	$gedcheck[] = array("pd_file", "pdata", "geds", "sc_oldged_plot");
-	$gedcheck[] = array("p_gedcom", "privacy", "gednames", "sc_oldged_privacy");
+	$gedcheck[] = array("p_gedcomid", "privacy", "geds", "sc_oldged_privacy");
 	$gedcheck[] = array("s_file", "sources", "geds", "sc_oldged_sources");
 	$gedcheck[] = array("sm_gedfile", "source_mapping", "geds", "sc_oldged_sourcesm");
 	$gedcheck[] = array("s_file", "soundex", "geds", "sc_oldged_soundex");
-	$gedcheck[] = array("gs_gedcom", "statscache", "gednames", "sc_oldged_stats");
+	$gedcheck[] = array("gs_file", "statscache", "geds", "sc_oldged_stats");
 	$gedcheck[] = array("ug_gedfile", "users_gedcoms", "geds", "sc_oldged_ug");
 		
 	$users = UserController::GetUsers();
@@ -408,7 +408,7 @@ if (!empty($check_gedcoms)) {
 							print $warn_icon.$gm_lang["sc_ged_unlink"];
 						}
 						print "<br />";
-						print_list_person($row["i_id"], array(GetPersonName($row["i_id"]), $GEDCOM));
+						print_list_person($row["i_id"], array(GetPersonName($row["i_id"]), $GEDCOMID));
 					}
 					if ($found) print "<br />";
 				}
@@ -534,7 +534,7 @@ if (!empty($check_gedcoms)) {
 								print $error_icon.$gm_lang["sc_inv_sref"];
 							}
 							print "<br />".$gm_lang["source"]." ".$sid."<br />";
-							print_list_person($key, array(GetPersonName($key), $GEDCOM));
+							print_list_person($key, array(GetPersonName($key), $GEDCOMID));
 						}
 					}
 				}
@@ -560,7 +560,7 @@ if (!empty($check_gedcoms)) {
 							foreach($subs as $keyf2 => $sub) {
 								preg_match("/(\d)\s(\w+)[\s.+\r\n|\r\n]/", $sub, $tags);
 								$numcf++;
-								if (isset($tags[2]) && !defined("GM_FACT_".$tags[2]) && !in_array($tags[2],$rightfacts)) $wrongfacts[$tags[2]][] = array($key, $GEDCOM, "INDI");
+								if (isset($tags[2]) && !defined("GM_FACT_".$tags[2]) && !in_array($tags[2],$rightfacts)) $wrongfacts[$tags[2]][] = array($key, $GEDCOMID, "INDI");
 							}
 						}
 						// Source citations
@@ -571,7 +571,7 @@ if (!empty($check_gedcoms)) {
 								$numnc++;
 								if (stristr($fact, "2 SOUR") == 0 && !in_array($type, $non_cits_facts)) {
 //									print "found: ".$type."<br />";
-									$no_cits[$key."[".$GEDCOMID."]"] = array($key, $GEDCOM, "INDI", $type);
+									$no_cits[$key."[".$GEDCOMID."]"] = array($key, $GEDCOMID, "INDI", $type);
 								}
 							}
 						}
@@ -600,7 +600,7 @@ if (!empty($check_gedcoms)) {
 								print $error_icon.$gm_lang["sc_inv_aref"];
 							}
 							print "<br />".$gm_lang["asso_alia"].": ".$pid."<br />";
-							print_list_person($key, array(GetPersonName($key), $GEDCOM));
+							print_list_person($key, array(GetPersonName($key), $GEDCOMID));
 						}
 					}
 				}
@@ -618,7 +618,7 @@ if (!empty($check_gedcoms)) {
 								print $error_icon.$gm_lang["sc_inv_aref"];
 							}
 							print "<br />".$gm_lang["asso_alia"].": ".$pid."<br />";
-							print_list_family($key, array(GetFamilyDescriptor($key), $GEDCOM));
+							print_list_family($key, array(GetFamilyDescriptor($key), $GEDCOMID));
 						}
 					}
 				}
@@ -670,7 +670,7 @@ if (!empty($check_gedcoms)) {
 						foreach($subs as $keyf2 => $sub) {
 							preg_match("/(\d)\s(\w+)[\s.+\r\n|\r\n]/", $sub, $tags);
 							$numcf++;
-							if (isset($tags[2]) && !defined("GM_FACT_".$tags[2]) && !in_array($tags[2],$rightfacts)) $wrongfacts[$tags[2]][] = array($key, $GEDCOM, "MEDIA", $gedlines["file"], $gedlines["title"]);
+							if (isset($tags[2]) && !defined("GM_FACT_".$tags[2]) && !in_array($tags[2],$rightfacts)) $wrongfacts[$tags[2]][] = array($key, $GEDCOMID, "MEDIA", $gedlines["file"], $gedlines["title"]);
 						}
 					}
 				}
@@ -698,7 +698,7 @@ if (!empty($check_gedcoms)) {
 								print $error_icon.$gm_lang["sc_inv_sref_fam"];
 							}
 							print "<br />".$gm_lang["source"]." ".$sid."<br />";
-							print_list_family($key, array(GetFamilyDescriptor($key), $GEDCOM));
+							print_list_family($key, array(GetFamilyDescriptor($key), $GEDCOMID));
 						}
 					}
 				}
@@ -724,7 +724,7 @@ if (!empty($check_gedcoms)) {
 							preg_match("/(\d)\s(\w+)[\s.+\r\n|\r\n]/", $sub, $tags);
 							$numcf++;
 							if (isset($tags[2]) && !defined("GM_FACT_".$tags[2]) && !in_array($tags[2],$rightfacts)) {
-								$wrongfacts[$tags[2]][] = array($key, $GEDCOM, "FAM", $gedlines["gedcom"]);
+								$wrongfacts[$tags[2]][] = array($key, $GEDCOMID, "FAM", $gedlines["gedcom"]);
 								$inames = true;
 							}
 						}
@@ -735,7 +735,7 @@ if (!empty($check_gedcoms)) {
 								$type = $match[1];
 								if (stristr($fact, "2 SOUR") == 0 && !in_array($type, $non_cits_facts)) {
 //									print "found: ".$type."<br />";
-									$no_cits[$key."[".$GEDCOMID."]"] = array($key, $GEDCOM, "FAM", $gedlines["gedcom"], $type);
+									$no_cits[$key."[".$GEDCOMID."]"] = array($key, $GEDCOMID, "FAM", $gedlines["gedcom"], $type);
 									$numnc++;
 									$inames = true;
 								}
@@ -772,7 +772,7 @@ if (!empty($check_gedcoms)) {
 								print $error_icon.$gm_lang["sc_inv_rref_sour"];
 							}
 							print "<br />".$gm_lang["repo"]." ".$rid."<br />";
-							$srec = FindSourceRecord($key, $GEDCOM);
+							$srec = FindSourceRecord($key, $GEDCOMID);
 							print_list_source($key, $sourcelist[$key]);
 						}
 					}
@@ -797,7 +797,7 @@ if (!empty($check_gedcoms)) {
 						foreach($subs as $keyf2 => $sub) {
 							preg_match("/(\d)\s(\w+)[\s.+\r\n|\r\n]/", $sub, $tags);
 							$numcf++;
-							if (isset($tags[2]) && !defined("GM_FACT_".$tags[2]) && !in_array($tags[2],$rightfacts)) $wrongfacts[$tags[2]][] = array($key, $GEDCOM, "SOUR");
+							if (isset($tags[2]) && !defined("GM_FACT_".$tags[2]) && !in_array($tags[2],$rightfacts)) $wrongfacts[$tags[2]][] = array($key, $GEDCOMID, "SOUR");
 						}
 					}
 				}
@@ -821,7 +821,7 @@ if (!empty($check_gedcoms)) {
 						print $warn_icon.$gm_lang["sc_noref_sour_repo"];
 					}
 					print "<br />";
-					$srec = FindSourceRecord($key, $GEDCOM);
+					$srec = FindSourceRecord($key, $GEDCOMID);
 					print_list_source($key, $sourcelist[$key]);
 				}
 			}
@@ -842,7 +842,7 @@ if (!empty($check_gedcoms)) {
 						print $warn_icon.$gm_lang["sc_unu_sref"];
 					}
 					print "<br />";
-					$srec = FindSourceRecord($sid, $GEDCOM);
+					$srec = FindSourceRecord($sid, $GEDCOMID);
 					print_list_source($sid, $sourcelist[$sid]);
 				}
 			}
@@ -892,7 +892,7 @@ if (!empty($check_gedcoms)) {
 						foreach($subs as $keyf2 => $sub) {
 							preg_match("/(\d)\s(\w+)[\s.+\r\n|\r\n]/", $sub, $tags);
 							$numcf++;
-							if (isset($tags[2]) && !defined("GM_FACT_".$tags[2]) && !in_array($tags[2],$rightfacts)) $wrongfacts[$tags[2]][] = array($key, $GEDCOM, "REPO", $value["gedcom"]);
+							if (isset($tags[2]) && !defined("GM_FACT_".$tags[2]) && !in_array($tags[2],$rightfacts)) $wrongfacts[$tags[2]][] = array($key, $GEDCOMID, "REPO", $value["gedcom"]);
 						}
 					}
 				}
@@ -927,7 +927,7 @@ if (!empty($check_gedcoms)) {
 								print_list_repository($name, $repo);
 							}
 							else if ($wfact[2] == "MEDIA") {
-			    				print "<a href=\"mediadetail.php?mid=".$wfact[0]."&amp;ged=".$GEDCOM."\">";
+			    				print "<a href=\"mediadetail.php?mid=".$wfact[0]."&amp;gedid=".$GEDCOMID."\">";
 				    			if (!empty($wfact[4])) print $wfact[4];
 				    			else print $wfact[3];
 				    			print "</a><br />";
@@ -996,7 +996,7 @@ if (!empty($check_gedcoms)) {
 									print $warn_icon.$gm_lang["sc_order_fam"]."<br />";
 								}
 								if (!$printed) {
-									print_list_family($key, array(GetFamilyDescriptor($key), $GEDCOM));
+									print_list_family($key, array(GetFamilyDescriptor($key), $GEDCOMID));
 									$printed = true;
 								}
 							}
@@ -1038,7 +1038,7 @@ if (!empty($check_gedcoms)) {
 						$error = true;
 						print $error_icon.$gm_lang["sc_empty_fam"]."<br />";
 					}
-					print_list_family($key, array(GetFamilyDescriptor($key), $GEDCOM));
+					print_list_family($key, array(GetFamilyDescriptor($key), $GEDCOMID));
 				}
 			}
 			if (!$error) print $info_icon.$gm_lang["sc_ok_empty_fam"]." ";
@@ -1066,9 +1066,9 @@ if (!empty($check_gedcoms)) {
 							else {
 								if (!$error) print $error_icon.$gm_lang["sc_inv_pointer"]."<br />";
 								if (isset($cfamlist[$pointer])) {
-									print "<br />".$gm_lang["sc_no_backward_fam"]."<br />".$gm_lang["sc_indi"]." <a href=\"individual.php?ged=".$GEDCOM."&amp;pid=".$key."\" target=\"_BLANK\">".$key."</a><br />".$gm_lang["sc_fam"]." <a href=\"family.php?ged=".$GEDCOM."&amp;famid=".$pointer."\" target=\"_BLANK\">".$pointer."</a><br />".$gm_lang["sc_role"]." ".$role."<br />";
+									print "<br />".$gm_lang["sc_no_backward_fam"]."<br />".$gm_lang["sc_indi"]." <a href=\"individual.php?gedid=".$GEDCOMID."&amp;pid=".$key."\" target=\"_BLANK\">".$key."</a><br />".$gm_lang["sc_fam"]." <a href=\"family.php?gedid=".$GEDCOMID."&amp;famid=".$pointer."\" target=\"_BLANK\">".$pointer."</a><br />".$gm_lang["sc_role"]." ".$role."<br />";
 								}
-								else print "<br />".$gm_lang["sc_no_fam"]."<br />".$gm_lang["sc_indi"]." <a href=\"individual.php?ged=".$GEDCOM."&amp;pid=".$key."\" target=\"_BLANK\">".$key."</a><br />".$gm_lang["sc_fam"]." ".$pointer."<br />".$gm_lang["sc_role"]." ".$role."<br />";
+								else print "<br />".$gm_lang["sc_no_fam"]."<br />".$gm_lang["sc_indi"]." <a href=\"individual.php?gedid=".$GEDCOMID."&amp;pid=".$key."\" target=\"_BLANK\">".$key."</a><br />".$gm_lang["sc_fam"]." ".$pointer."<br />".$gm_lang["sc_role"]." ".$role."<br />";
 								$error = true;
 							}
 						}
@@ -1083,9 +1083,9 @@ if (!empty($check_gedcoms)) {
 							else {
 								if (!$error) print $error_icon.$gm_lang["sc_inv_pointer"]."<br />";
 								if (isset($cfamlist[$pointer])) {
-									print "<br />".$gm_lang["sc_no_backward_fam"]."<br />".$gm_lang["sc_indi"]." <a href=\"individual.php?ged=".$GEDCOM."&amp;pid=".$key."\" target=\"_BLANK\">".$key."</a><br />".$gm_lang["sc_fam"]." <a href=\"family.php?ged=".$GEDCOM."&amp;famid=".$pointer."\" target=\"_BLANK\">".$pointer."</a><br />".$gm_lang["sc_role"]." ".$role."<br />";
+									print "<br />".$gm_lang["sc_no_backward_fam"]."<br />".$gm_lang["sc_indi"]." <a href=\"individual.php?gedid=".$GEDCOMID."&amp;pid=".$key."\" target=\"_BLANK\">".$key."</a><br />".$gm_lang["sc_fam"]." <a href=\"family.php?gedid=".$GEDCOMID."&amp;famid=".$pointer."\" target=\"_BLANK\">".$pointer."</a><br />".$gm_lang["sc_role"]." ".$role."<br />";
 								}
-								else print "<br />".$gm_lang["sc_no_fam"]."<br />".$gm_lang["sc_indi"]." <a href=\"individual.php?ged=".$GEDCOM."&pid=".$key."\" target=\"_BLANK\">".$key."</a><br />".$gm_lang["sc_fam"]." ".$pointer."<br />".$gm_lang["sc_role"]." ".$role."<br />";
+								else print "<br />".$gm_lang["sc_no_fam"]."<br />".$gm_lang["sc_indi"]." <a href=\"individual.php?gedid=".$GEDCOMID."&pid=".$key."\" target=\"_BLANK\">".$key."</a><br />".$gm_lang["sc_fam"]." ".$pointer."<br />".$gm_lang["sc_role"]." ".$role."<br />";
 								$error = true;
 							}
 						}
@@ -1106,9 +1106,9 @@ if (!empty($check_gedcoms)) {
 							else {
 								if (!$error) print $error_icon.$gm_lang["sc_inv_pointer"]."<br />";
 								if (isset($indilist[$pointer])) {
-									print "<br />".$gm_lang["sc_no_backward_indi"]."<br />".$gm_lang["sc_indi"]." <a href=\"individual.php?ged=".$GEDCOM."&amp;pid=".$pointer."\" target=\"_BLANK\">".$pointer."</a><br />".$gm_lang["sc_fam"]." <a href=\"family.php?ged=".$GEDCOM."&amp;famid=".$key."\" target=\"_BLANK\">".$key."</a><br />".$gm_lang["sc_role"]." ".$role."<br />";
+									print "<br />".$gm_lang["sc_no_backward_indi"]."<br />".$gm_lang["sc_indi"]." <a href=\"individual.php?gedid=".$GEDCOMID."&amp;pid=".$pointer."\" target=\"_BLANK\">".$pointer."</a><br />".$gm_lang["sc_fam"]." <a href=\"family.php?gedid=".$GEDCOMID."&amp;famid=".$key."\" target=\"_BLANK\">".$key."</a><br />".$gm_lang["sc_role"]." ".$role."<br />";
 								}
-								else print "<br />".$gm_lang["sc_no_indi"]."<br />".$gm_lang["sc_indi"]." ".$pointer."<br />".$gm_lang["sc_fam"]." <a href=\"family.php?ged=".$GEDCOM."&amp;famid=".$key."\" target=\"_BLANK\">".$key."</a><br />".$gm_lang["sc_role"]." ".$role."<br />";
+								else print "<br />".$gm_lang["sc_no_indi"]."<br />".$gm_lang["sc_indi"]." ".$pointer."<br />".$gm_lang["sc_fam"]." <a href=\"family.php?gedid=".$GEDCOMID."&amp;famid=".$key."\" target=\"_BLANK\">".$key."</a><br />".$gm_lang["sc_role"]." ".$role."<br />";
 								$error = true;
 							}
 						}
@@ -1123,9 +1123,9 @@ if (!empty($check_gedcoms)) {
 							else {
 								if (!$error) print $error_icon.$gm_lang["sc_inv_pointer"]."<br />";
 								if (isset($indilist[$pointer])) {
-									print "<br />".$gm_lang["sc_no_backward_indi"]."<br />".$gm_lang["sc_indi"]." <a href=\"individual.php?ged=".$GEDCOM."&amp;pid=".$pointer."\" target=\"_BLANK\">".$pointer."</a><br />".$gm_lang["sc_fam"]." <a href=\"family.php?ged=".$GEDCOM."&amp;famid=".$key."\" target=\"_BLANK\">".$key."</a><br />".$gm_lang["sc_role"]." ".$role."<br />";
+									print "<br />".$gm_lang["sc_no_backward_indi"]."<br />".$gm_lang["sc_indi"]." <a href=\"individual.php?gedid=".$GEDCOMID."&amp;pid=".$pointer."\" target=\"_BLANK\">".$pointer."</a><br />".$gm_lang["sc_fam"]." <a href=\"family.php?gedid=".$GEDCOMID."&amp;famid=".$key."\" target=\"_BLANK\">".$key."</a><br />".$gm_lang["sc_role"]." ".$role."<br />";
 								}
-								else print "<br />".$gm_lang["sc_no_indi"]."<br />".$gm_lang["sc_indi"]." ".$pointer."<br />".$gm_lang["sc_fam"]." <a href=\"family.php?ged=".$GEDCOM."&amp;famid=".$key."\" target=\"_BLANK\">".$key."</a><br />".$gm_lang["sc_role"]." ".$role."<br />";
+								else print "<br />".$gm_lang["sc_no_indi"]."<br />".$gm_lang["sc_indi"]." ".$pointer."<br />".$gm_lang["sc_fam"]." <a href=\"family.php?gedid=".$GEDCOMID."&amp;famid=".$key."\" target=\"_BLANK\">".$key."</a><br />".$gm_lang["sc_role"]." ".$role."<br />";
 								$error = true;
 							}
 						}
@@ -1140,9 +1140,9 @@ if (!empty($check_gedcoms)) {
 							else {
 								if (!$error) print $error_icon.$gm_lang["sc_inv_pointer"]."<br />";
 								if (isset($indilist[$pointer])) {
-									print "<br />".$gm_lang["sc_no_backward_indi"]."<br />".$gm_lang["sc_indi"]." <a href=\"individual.php?ged=".$GEDCOM."&amp;pid=".$pointer."\" target=\"_BLANK\">".$pointer."</a><br />".$gm_lang["sc_fam"]." <a href=\"family.php?ged=".$GEDCOM."&amp;famid=".$key."\" target=\"_BLANK\">".$key."</a><br />".$gm_lang["sc_role"]." ".$role."<br />";
+									print "<br />".$gm_lang["sc_no_backward_indi"]."<br />".$gm_lang["sc_indi"]." <a href=\"individual.php?gedid=".$GEDCOMID."&amp;pid=".$pointer."\" target=\"_BLANK\">".$pointer."</a><br />".$gm_lang["sc_fam"]." <a href=\"family.php?gedid=".$GEDCOMID."&amp;famid=".$key."\" target=\"_BLANK\">".$key."</a><br />".$gm_lang["sc_role"]." ".$role."<br />";
 								}
-								else print "<br />".$gm_lang["sc_no_indi"]."<br />".$gm_lang["sc_indi"]." ".$pointer."<br />".$gm_lang["sc_fam"]." <a href=\"family.php?ged=".$GEDCOM."&amp;famid=".$key."\" target=\"_BLANK\">".$key."</a><br />".$gm_lang["sc_role"]." ".$role."<br />";
+								else print "<br />".$gm_lang["sc_no_indi"]."<br />".$gm_lang["sc_indi"]." ".$pointer."<br />".$gm_lang["sc_fam"]." <a href=\"family.php?gedid=".$GEDCOMID."&amp;famid=".$key."\" target=\"_BLANK\">".$key."</a><br />".$gm_lang["sc_role"]." ".$role."<br />";
 								$error = true;
 							}
 						}
@@ -1172,7 +1172,7 @@ if (!empty($check_gedcoms)) {
 								print $error_icon.$gm_lang["sc_inv_mref"];
 							}
 							print "<br />".$gm_lang["sc_media"]." ".$mid."<br />";
-							print_list_person($key, array(GetPersonName($key), $GEDCOM));
+							print_list_person($key, array(GetPersonName($key), $GEDCOMID));
 						}
 					}
 				}
@@ -1200,7 +1200,7 @@ if (!empty($check_gedcoms)) {
 								print $error_icon.$gm_lang["sc_inv_mref_fam"];
 							}
 							print "<br />".$gm_lang["sc_media"]." ".$mid."<br />";
-							print_list_family($key, array(GetFamilyDescriptor($key), $GEDCOM));
+							print_list_family($key, array(GetFamilyDescriptor($key), $GEDCOMID));
 						}
 					}
 				}
@@ -1228,7 +1228,7 @@ if (!empty($check_gedcoms)) {
 								print $error_icon.$gm_lang["sc_inv_mref_sour"];
 							}
 							print "<br />".$gm_lang["sc_media"]." ".$mid."<br />";
-							$srec = FindSourceRecord($key, $GEDCOM);
+							$srec = FindSourceRecord($key, $GEDCOMID);
 							print_list_source($key, $sourcelist[$sid]);
 						}
 					}
@@ -1404,12 +1404,12 @@ if (!empty($check_gedcoms)) {
 				foreach ($inv_noteref as $type => $keys) {
 					if ($type == "INDI") {
 						foreach ($keys as $key => $nothing) {
-							print_list_person($key, array(GetPersonName($key), $GEDCOM));
+							print_list_person($key, array(GetPersonName($key), $GEDCOMID));
 						}
 					}
 					if ($type == "FAM") {
 						foreach ($keys as $key => $nothing) {
-							print_list_family($key, array(GetFamilyDescriptor($key), $GEDCOM));
+							print_list_family($key, array(GetFamilyDescriptor($key), $GEDCOMID));
 						}
 					}
 					if ($type == "SOUR") {
@@ -1451,7 +1451,7 @@ if (!empty($check_gedcoms)) {
 					}
 					print "<br />";
 					$note =& Note::GetInstance($oid);
-					print "<a href=\"note.php?oid=".$oid."&amp;ged=".$GEDCOM."\">".$note->GetTitle(40, true)." (".$oid.")</a>";
+					print "<a href=\"note.php?oid=".$oid."&amp;gedid=".$GEDCOMID."\">".$note->GetTitle(40, true)." (".$oid.")</a>";
 				}
 			}
 			if (!$error) print $info_icon.$gm_lang["sc_ok_all_nref"]." ";
@@ -1561,7 +1561,7 @@ if (!empty($check_filesys)) {
 		// Check only if media is stored in the physical file system
 		if (!$MEDIA_IN_DB) {
 			print "<tr><td class=\"shade1 wrap\">".$gm_lang["sc_fs_media"]."</td><td class=\"shade1 wrap\">";
-			$res = NewQuery("SELECT gc_media_directory, gc_gedcom FROM ".TBLPREFIX."gedconf");
+			$res = NewQuery("SELECT gc_media_directory, gc_gedcomid FROM ".TBLPREFIX."gedconf");
 			if ($res) {
 				$dirs = array();
 				while ($row = $res->FetchRow()) {

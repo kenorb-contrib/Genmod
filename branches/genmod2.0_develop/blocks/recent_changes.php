@@ -39,7 +39,7 @@ $GM_BLOCKS["print_recent_changes"]["rss"]       = true;
 **/
 function print_recent_changes($block=true, $config="", $side, $index) {
 	global $gm_lang, $month, $year, $day, $monthtonum, $HIDE_LIVE_PEOPLE, $SHOW_ID_NUMBERS, $command, $TEXT_DIRECTION, $SHOW_FAM_ID_NUMBERS;
-	global $GM_IMAGE_DIR, $GM_IMAGES, $GEDCOM, $GEDCOMID, $DEBUG, $ASC, $IGNORE_FACTS, $IGNORE_YEAR, $TOTAL_QUERIES, $LAST_QUERY, $GM_BLOCKS, $SHOW_SOURCES;
+	global $GM_IMAGE_DIR, $GM_IMAGES, $GEDCOMID, $DEBUG, $ASC, $IGNORE_FACTS, $IGNORE_YEAR, $TOTAL_QUERIES, $LAST_QUERY, $GM_BLOCKS, $SHOW_SOURCES;
 	global $medialist, $gm_username, $gm_user;
 
 	$block = true;			// Always restrict this block's height
@@ -63,7 +63,7 @@ function print_recent_changes($block=true, $config="", $side, $index) {
 	if ($GM_BLOCKS["print_recent_changes"]["canconfig"]) {
 		$username = $gm_username;
 		if ((($command=="gedcom")&&($gm_user->userGedcomAdmin())) || (($command=="user")&&(!empty($username)))) {
-			if ($command=="gedcom") $name = preg_replace("/'/", "\'", $GEDCOM);
+			if ($command=="gedcom") $name = preg_replace("/'/", "\'", get_gedcom_from_id($GEDCOMID));
 			else $name = $username;
 			print "<a href=\"javascript: ".$gm_lang["config_block"]."\" onclick=\"window.open('index_edit.php?name=$name&amp;command=$command&amp;action=configure&amp;side=$side&amp;index=$index', '', 'top=50,left=50,width=500,height=250,scrollbars=1,resizable=1'); return false;\">";
 			print "<img class=\"adminicon\" src=\"$GM_IMAGE_DIR/".$GM_IMAGES["admin"]["small"]."\" width=\"15\" height=\"15\" border=\"0\" alt=\"".$gm_lang["config_block"]."\" /></a>\n";
@@ -93,7 +93,7 @@ function print_recent_changes($block=true, $config="", $side, $index) {
 					$indirec = FindPersonRecord($gid);
 					if ($lastgid!=$gid) {
 						$name = CheckNN(GetSortableName($gid));
-						print "<a href=\"individual.php?pid=$gid&amp;ged=".$GEDCOM."\"><b>";
+						print "<a href=\"individual.php?pid=$gid&amp;gedid=".$GEDCOMID."\"><b>";
 						if (HasChinese($name)) print PrintReady($name." (".GetSortableAddName($gid, $indirec, false).")");
 						else print PrintReady($name);
 						print "</b>";
@@ -132,7 +132,7 @@ function print_recent_changes($block=true, $config="", $side, $index) {
 					$famrec = FindFamilyRecord($gid);
 					$name = GetFamilyDescriptor($gid);
 					if ($lastgid!=$gid) {
-						print "<a href=\"family.php?famid=$gid&amp;ged=".$GEDCOM."\"><b>";
+						print "<a href=\"family.php?famid=$gid&amp;gedid=".$GEDCOMID."\"><b>";
 						if (HasChinese($name)) print PrintReady($name." (".GetFamilyAddDescriptor($gid).")");
 						else print PrintReady($name);
 						print "</b>";
@@ -184,7 +184,7 @@ function print_recent_changes($block=true, $config="", $side, $index) {
 					$reporec = FindRepoRecord($gid);
 					$name = GetRepoDescriptor($gid);
 					if ($lastgid!=$gid) {
-						print "<a href=\"repo.php?rid=$gid&amp;ged=".$GEDCOM."\"><b>".PrintReady($name)."</b>";
+						print "<a href=\"repo.php?rid=$gid&amp;gedid=".$GEDCOMID."\"><b>".PrintReady($name)."</b>";
 						if ($SHOW_FAM_ID_NUMBERS) {
 						   if ($TEXT_DIRECTION=="ltr")
 								print " &lrm;($gid)&lrm;";
@@ -216,7 +216,7 @@ function print_recent_changes($block=true, $config="", $side, $index) {
 					else $title = $medialist[$gid]["file"];
 					$SearchTitle = preg_replace("/ /","+",$title);
 					if ($lastgid!=$gid) {
- 						print "<a href=\"medialist.php?action=filter&amp;search=yes&amp;filter=$SearchTitle&amp;ged=".$GEDCOM."\"><b>".PrintReady($title)."</b>";
+ 						print "<a href=\"medialist.php?action=filter&amp;search=yes&amp;filter=$SearchTitle&amp;gedid=".$GEDCOMID."\"><b>".PrintReady($title)."</b>";
 						if ($SHOW_FAM_ID_NUMBERS) {
 						   if ($TEXT_DIRECTION=="ltr")
 								print " &lrm;($gid)&lrm;";

@@ -100,7 +100,7 @@ switch($action) {
 		else {
 			$person =& Person::GetInstance($pid);
 			print $person->name;
-			FactFunctions::PrintFirstMajorFact($person);
+			PersonFunctions::PrintFirstMajorFact($person);
 		}
 		SwitchGedcom();
 	break;

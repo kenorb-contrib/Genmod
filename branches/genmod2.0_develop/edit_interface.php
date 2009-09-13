@@ -41,8 +41,8 @@ if (file_exists($GM_BASE_DIRECTORY."languages/countries.".$lang_short_cut[$LANGU
 asort($countries);
 
 if ($_SESSION["cookie_login"]) {
-	if (LOGIN_URL == "") header("Location: login.php?type=simple&ged=$GEDCOM&url=edit_interface.php".urlencode("?".$QUERY_STRING));
-	else header("Location: ".LOGIN_URL."?type=simple&ged=$GEDCOM&url=edit_interface.php".urlencode("?".$QUERY_STRING));
+	if (LOGIN_URL == "") header("Location: login.php?type=simple&gedid=$GEDCOMID&url=edit_interface.php".urlencode("?".$QUERY_STRING));
+	else header("Location: ".LOGIN_URL."?type=simple&gedid=$GEDCOMID&url=edit_interface.php".urlencode("?".$QUERY_STRING));
 	exit;
 }
 
@@ -138,7 +138,7 @@ if (!empty($pid)) {
 		$gedrec = FindGedcomRecord($pid);
 		$rec = GetChangeData(false, $pid, true, "gedlines");
 //		print_r($rec);
-		if (isset($rec[$GEDCOM][$pid])) $gedrec = $rec[$GEDCOM][$pid];
+		if (isset($rec[$GEDCOMID][$pid])) $gedrec = $rec[$GEDCOMID][$pid];
 //		print $gedrec;
 		$type = GetRecType($gedrec);
 		if ($type) {
@@ -195,7 +195,7 @@ else if (!empty($famid)) {
 		// TODO: if the fam record has been changed, get the record from the changes table DONE
 		if (GetChangeData(true, $famid, true, "", "")) {
 			$rec = GetChangeData(false, $famid, true, "gedlines", "");
-			$gedrec = $rec[$GEDCOM][$famid];
+			$gedrec = $rec[$GEDCOMID][$famid];
 		}
 		else $gedrec = FindGedcomRecord($famid);
 		
@@ -326,7 +326,7 @@ else {
 switch ($action) {
 	case "submitter":
 		$change_id = GetNewXref("CHANGE");
-		$subid = FindSubmitter($GEDCOMS[$gedfile]["id"]);
+		$subid = FindSubmitter($gedfile);
 		if (!empty($subid)) {
 			$record = FindGedcomRecord($subid, $gedfile);
 			if (GetChangeData(true, $subid, true, "", "SUBM")) {
@@ -494,7 +494,7 @@ switch ($action) {
 			<?php
 				if (GetChangeData(true, $pid, true, "", "")) {
 					$rec = GetChangeData(false, $pid, true, "gedlines", "");
-					if (isset($rec[$GEDCOM][$pid])) $gedrec = $rec[$GEDCOM][$pid];
+					if (isset($rec[$GEDCOMID][$pid])) $gedrec = $rec[$GEDCOMID][$pid];
 				}
 				$ct = preg_match_all("/1\s+OBJE\s+@(.*)@.*/", $gedrec, $fmatch, PREG_SET_ORDER);
 				if ($ct>0) {
@@ -563,7 +563,7 @@ switch ($action) {
 				$children = array();
 				if (GetChangeData(true, $pid, true, "", "")) {
 					$rec = GetChangeData(false, $pid, true, "gedlines", "");
-					if (isset($rec[$GEDCOM][$pid])) $gedrec = $rec[$GEDCOM][$pid];
+					if (isset($rec[$GEDCOMID][$pid])) $gedrec = $rec[$GEDCOMID][$pid];
 				}
 				$childids = FindChildrenInRecord($gedrec);
 				$ct = count($childids);
@@ -573,7 +573,7 @@ switch ($action) {
 					// Always process changed records, they may contain changed birth dates
 					if (GetChangeData(true, $childid, true, "", "")) {
 						$rec = GetChangeData(false, $childid, true, "gedlines", "");
-						if (isset($rec[$GEDCOM][$childid])) $childrec = $rec[$GEDCOM][$childid];
+						if (isset($rec[$GEDCOMID][$childid])) $childrec = $rec[$GEDCOMID][$childid];
 						$children[$childid]["names"] = GetIndiNames($childrec);
 						$children[$childid]["gedfile"] = $GEDCOMID;
 						$children[$childid]["gedcom"] = $childrec;
@@ -654,7 +654,7 @@ switch ($action) {
 					if (isset($famlist[$famid])) $fams[$famid] = $famlist[$famid];
 					if (GetChangeData(true, $famid, true, "", "")) {
 						$rec = GetChangeData(false, $famid, true, "gedlines", "");
-						if (isset($rec[$GEDCOM][$famid])) $fams[$famid]["gedcom"] = $rec[$GEDCOM][$famid];
+						if (isset($rec[$GEDCOMID][$famid])) $fams[$famid]["gedcom"] = $rec[$GEDCOMID][$famid];
 					}
 				}
 				if ((!empty($option))&&($option=="bymarriage")) {
@@ -727,7 +727,7 @@ switch ($action) {
 				foreach($famids as $famid=>$fam) {
 					if (GetChangeData(true, $fam["famid"], true, "", "")) {
 						$rec = GetChangeData(false, $fam["famid"], true, "gedlines", "");
-						if (isset($rec[$GEDCOM][$fam["famid"]])) $famrec = $rec[$GEDCOM][$fam["famid"]];
+						if (isset($rec[$GEDCOMID][$fam["famid"]])) $famrec = $rec[$GEDCOMID][$fam["famid"]];
 					}
 					else $famrec = FindFamilyRecord($fam["famid"]);
 					print "<tr>\n<td class=\"shade2\">\n";
@@ -766,7 +766,7 @@ switch ($action) {
 		foreach($famids as $famid=>$fam) {
 			if (GetChangeData(true, $pid, true, "", "")) {
 				$rec = GetChangeData(false, $pid, true, "gedlines", "");
-				$pidrec = $rec[$GEDCOM][$pid];
+				$pidrec = $rec[$GEDCOMID][$pid];
 			}
 			else {
 				$pidrec = FindPersonRecord($pid);
@@ -788,7 +788,7 @@ switch ($action) {
 			}
 			if (GetChangeData(true, $pid, true, "", "")) {
 				$rec = GetChangeData(false, $pid, true, "gedlines", "");
-				$pidrec = $rec[$GEDCOM][$pid];
+				$pidrec = $rec[$GEDCOMID][$pid];
 			}
 			else $pidrec = FindPersonRecord($pid);
 
@@ -811,7 +811,7 @@ switch ($action) {
 	case "changefamily":
 		if(GetChangeData(true, $famid, true, "","")) {
 			$rec = GetChangeData(false, $famid, true, "gedlines", "");
-			$gedrec = $rec[$GEDCOM][$famid];
+			$gedrec = $rec[$GEDCOMID][$famid];
 		}
 		$family =& Family::GetInstance($famid, $gedrec);
 		$father = $family->husb;
@@ -959,7 +959,7 @@ switch ($action) {
 		$change_id = GetNewXref("CHANGE");
 		if(GetChangeData(true, $famid, true, "","")) {
 			$rec = GetChangeData(false, $famid, true, "gedlines", "");
-			$gedrec = $rec[$GEDCOM][$famid];
+			$gedrec = $rec[$GEDCOMID][$famid];
 		}
 		$family =& Family::GetInstance($famid, $gedrec);
 		$father = $family->husb;
@@ -1135,7 +1135,7 @@ switch ($action) {
 				$newchildren[] = $CHIL;
 				if (GetChangeData(true, $CHIL, false, "", "")) {
 					$rec = GetChangeData(false, $CHIL, false, "gedlines", "");
-					$indirec = $rec[$GEDCOM][$CHIL];
+					$indirec = $rec[$GEDCOMID][$CHIL];
 				}					
 				else $indirec = FindGedcomRecord($CHIL);
 				// NOTE: Check if child is already in family record
@@ -1194,7 +1194,7 @@ switch ($action) {
 		// Check if any family members are there
 		if (GetChangeData(true, $famid, true, "", "")) {
 			$rec = GetChangeData(false, $famid, true, "gedlines");
-			$newfamrec = $rec[$GEDCOM][$famid];
+			$newfamrec = $rec[$GEDCOMID][$famid];
 			$ct = preg_match("/1 CHIL|HUSB|WIFE/", $newfamrec, $match);
 			if ($ct == 0) $success = $success && ReplaceGedRec($famid, $newfamrec, "", "FAM", $change_id, $change_type);
 		}
@@ -1424,7 +1424,7 @@ switch ($action) {
 			if (!GetChangeData(true, $famid, true)) $newrec = FindGedcomRecord($famid);
 			else {
 				$rec = GetChangeData(false, $famid, true, "gedlines");
-				$newrec = $rec[$GEDCOM][$famid];
+				$newrec = $rec[$GEDCOMID][$famid];
 			}
 			$newrec = trim($newrec);
 			// NOTE: Check if the record already has a link to this family
@@ -1556,7 +1556,10 @@ switch ($action) {
 			$famrec = "";
 			// NOTE: Check if there are changes present, if not get the record otherwise the changed record
 			if (!GetChangeData(true, $famid, true)) $famrec = FindGedcomRecord($famid);
-			else $famrec = GetChangeData(false, $famid, true, "gedlines");
+			else {
+				$rec = GetChangeData(false, $famid, true, "gedlines");
+				$famrec = $rec[$GEDCOMID][$famid];
+			}
 			if (!empty($famrec)) {
 				$famrec = trim($famrec);
 				$newrec = "1 $famtag @$xref@\r\n";
@@ -1568,7 +1571,7 @@ switch ($action) {
 			// NOTE: Check if there are changes present, if not get the record otherwise the changed record
 			if (!GetChangeData(true, $xref, true)) $newrec = FindGedcomRecord($xref);
 			else $newrec = GetChangeData(false, $xref, true, "gedlines");
-			$newrec = trim($newrec[$GEDCOM][$xref]);
+			$newrec = trim($newrec[$GEDCOMID][$xref]);
 			// NOTE: Check if the record already has a link to this family
 			$ct = preg_match("/1 FAMS @$famid@/", $newrec, $match);
 			if ($ct == 0) {
@@ -1583,7 +1586,7 @@ switch ($action) {
 			if (!GetChangeData(true, $pid, true)) $newrec = trim(FindGedcomRecord($pid));
 			else {
 				$rec = GetChangeData(false, $pid, true, "gedlines");
-				$newrec = $rec[$GEDCOM][$pid];
+				$newrec = $rec[$GEDCOMID][$pid];
 			}
 			// NOTE: Check if the record already has a link to this family
 			$ct = preg_match("/1 FAMS @$famid@/", $newrec, $match);
@@ -1703,7 +1706,7 @@ switch ($action) {
 			if (!GetChangeData(true, $famid, true)) $famrec = FindGedcomRecord($famid);
 			else {
 				$rec = GetChangeData(false, $famid, true, "gedlines");
-				$famrec = $rec[$GEDCOM][$famid];
+				$famrec = $rec[$GEDCOMID][$famid];
 			}
 			
 			if (!empty($famrec)) {
@@ -1860,7 +1863,7 @@ switch ($action) {
 			$famrec = FindGedcomRecord($famid);
 			if (GetChangeData(true, $famid, true)) {
 				$rec = GetChangeData(false, $famid, true, "gedlines");
-				$famrec = $rec[$GEDCOM][$famid];
+				$famrec = $rec[$GEDCOMID][$famid];
 			}
 			if (!empty($famrec)) {
 				$newrec = "1 $famtag @$xref@\r\n";
@@ -2351,7 +2354,7 @@ switch ($action) {
 	case "editname":
 		if (GetChangeData(true, $pid, true)) {
 			$rec = GetChangeData(false, $pid, true, "gedlines");
-			$namerecnew = GetSubRecord(1, "1 NAME", $rec[$GEDCOM][$pid], $count);
+			$namerecnew = GetSubRecord(1, "1 NAME", $rec[$GEDCOMID][$pid], $count);
 		}
 		else $namerecnew = GetSubRecord(1, "1 NAME", $gedrec, $count);
 		PrintIndiForm("update", "", "", $namerecnew);
@@ -2437,7 +2440,7 @@ switch ($action) {
 				if (!GetChangeData(true, $spid, true)) $gedrec = FindGedcomRecord($spid);
 				else {
 					$rec = GetChangeData(false, $spid, true, "gedlines");
-					$gedrec = $rec[$GEDCOM][$spid];
+					$gedrec = $rec[$GEDCOMID][$spid];
 				}
 				if (!empty($gedrec)) {
 					// NOTE: Create a new family record
@@ -2524,7 +2527,7 @@ switch ($action) {
 		$oldrecord = FindGedcomRecord($pid, get_gedcom_from_id($gedfile));
 		if (GetChangeData(true, $pid, true, "", "")) {
 			$rec = GetChangeData(false, $pid, true, "gedlines", "");
-			if (isset($rec[get_gedcom_from_id($gedfile)][$pid])) $oldrecord = $rec[get_gedcom_from_id($gedfile)][$pid];
+			if (isset($rec[$gedfile][$pid])) $oldrecord = $rec[$gedfile][$pid];
 		}
 		$newrec = "0 @".$pid."@ SUBM\r\n";
 		$newrec = HandleUpdates($newrec);

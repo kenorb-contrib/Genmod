@@ -1668,7 +1668,7 @@ function GMRGetPersonNameSHandler($attrs) {
 
 function GMRGedcomValueSHandler($attrs) {
 	global $currentElement, $vars, $gedrec, $gedrecStack, $fact, $desc, $type;
-	global $SHOW_PEDIGREE_PLACES, $gm_lang, $GEDCOM, $debug;
+	global $SHOW_PEDIGREE_PLACES, $gm_lang, $debug;
 
 	$id = "";
 	$gt = preg_match("/0 @(.+)@/", $gedrec, $gmatch);
@@ -1718,7 +1718,7 @@ function GMRGedcomValueSHandler($attrs) {
                         if (isset($attrs["changed"]) && $attrs["changed"] && GetChangeData(true, $id, true, "gedlines")) {
 				$pend_gedcoms = GetChangeData(false, $id, true, "gedlinesCHAN");
 				foreach($pend_gedcoms as $gedcom=>$pend_indis) {
-					if ($gedcom == $GEDCOM) {
+					if ($gedcom == $GEDCOMID) {
 						foreach ($pend_indis as $key=>$changed) {
 							$value = GetGedcomValue($tag, $level, $changed, $truncate);
 						}
@@ -2419,7 +2419,7 @@ function GMRLineSHandler($attrs) {
 
 function GMRListSHandler($attrs) {
 	global $gmreport, $gedrec, $repeats, $repeatBytes, $list, $repeatsStack, $processRepeats, $parser, $vars, $sortby;
-	global $GEDCOM, $status, $gm_lang;
+	global $status, $gm_lang;
 
 	$processRepeats++;
 	if ($processRepeats>1) return;
@@ -2560,7 +2560,7 @@ function GMRListSHandler($attrs) {
 			if (GetChangeData(true, "", true, "gedlinesCHAN")) {
 				$pend_gedcoms = GetChangeData(false, "", true, "gedlinesCHAN");
 				foreach($pend_gedcoms as $gedcom=>$pend_indis) {
-					if ($gedcom == $GEDCOM) {
+					if ($gedcom == $GEDCOMID) {
 						foreach ($pend_indis as $key=>$changed) {
 							$list[$key] = $changed;
 						}

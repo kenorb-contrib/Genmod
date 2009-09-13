@@ -71,12 +71,11 @@ function db_cleanup($item) {
  * @param 	string 	$ged 	the filename or id of the gedcom to check for import
  * @return 	bool 	return true if the gedcom has been imported otherwise returns false
  */
-function CheckForImport($ged) {
-	global $GEDCOMS;
+function CheckForImport($gedid) {
 	
 	$sql = "SELECT COUNT(i_id) FROM ".TBLPREFIX."individuals WHERE i_file='";
-	if (is_int($ged)) $sql .= $ged;
-	else $sql .= DbLayer::EscapeQuery($GEDCOMS[$ged]["id"]);
+	if (is_int($gedid)) $sql .= $gedid;
+	else $sql .= DbLayer::EscapeQuery(get_id_from_gedcom($gedid));
 	$sql .= "' LIMIT 1";
 	if ($res = NewQuery($sql)) {
 		$row = $res->FetchRow();
@@ -99,18 +98,17 @@ function CheckForImport($ged) {
  */
 function FindFamilyRecord($famid, $gedfile="", $renew = false) {
 	global $COMBIKEY;
-	global $GEDCOMS, $GEDCOM, $GEDCOMID, $famlist, $COMBIKEY;
+	global $GEDCOMID, $famlist, $COMBIKEY;
 
 	if (empty($famid)) return false;
-	if (empty($gedfile)) $gedfile = $GEDCOM;
-	$gedfileid = $GEDCOMS[$gedfile]["id"];
+	if (empty($gedfile)) $gedfile = $GEDCOMID;
 	
-	if ($COMBIKEY) $key = JoinKey($famid, $gedfileid);
+	if ($COMBIKEY) $key = JoinKey($famid, $gedfile);
 	else $key = $famid;
 
-	if (!$renew && isset($famlist[$key]["gedcom"])&&($famlist[$key]["gedfile"]==$GEDCOMS[$gedfile]["id"])) return $famlist[$key]["gedcom"];
+	if (!$renew && isset($famlist[$key]["gedcom"])&&($famlist[$key]["gedfile"] == $gedfile)) return $famlist[$key]["gedcom"];
 
-	$sql = "SELECT f_gedcom, f_file, f_husb, f_wife FROM ".TBLPREFIX."families WHERE f_key='".DbLayer::EscapeQuery(JoinKey($famid, $gedfileid))."'";
+	$sql = "SELECT f_gedcom, f_file, f_husb, f_wife FROM ".TBLPREFIX."families WHERE f_key='".DbLayer::EscapeQuery(JoinKey($famid, $gedfile))."'";
 
 	$res = NewQuery($sql);
 	if (!$res || $res->NumRows()==0) {
@@ -141,21 +139,19 @@ function FindFamilyRecord($famid, $gedfile="", $renew = false) {
 function FindPersonRecord($pid, $gedfile="", $renew = false, $nocache = false) {
 	global $gm_lang;
 	global $COMBIKEY;
-	global $GEDCOM, $GEDCOMS, $GEDCOMID;
+	global $GEDCOMID;
 	global $indilist;
 
 	if (empty($pid)) return false;
-	if (is_int($GEDCOM)) $GEDCOM = get_gedcom_from_id($GEDCOM);
-	if (empty($gedfile)) $gedfile = $GEDCOM;
+	if (empty($gedfile)) $gedfile = $GEDCOMID;
 	if (empty($gedfile)) return "";
 	
-	$gedfileid = $GEDCOMS[$gedfile]["id"];
 	// print $pid." ".$gedfileid."<br />";
 	//-- first check the indilist cache
-	if (!$renew && isset($indilist[$pid]["gedcom"]) && $indilist[$pid]["gedfile"]==$gedfileid) return $indilist[$pid]["gedcom"];
-	if (!$renew && isset($indilist[JoinKey($pid, $gedfileid)]["gedcom"])) return $indilist[JoinKey($pid, $gedfileid)]["gedcom"];
+	if (!$renew && isset($indilist[$pid]["gedcom"]) && $indilist[$pid]["gedfile"]==$gedfile) return $indilist[$pid]["gedcom"];
+	if (!$renew && isset($indilist[JoinKey($pid, $gedfile)]["gedcom"])) return $indilist[JoinKey($pid, $gedfile)]["gedcom"];
 
-	$sql = "SELECT i_key, i_gedcom, i_isdead, i_file FROM ".TBLPREFIX."individuals WHERE i_key='".DbLayer::EscapeQuery(JoinKey($pid, $gedfileid))."'";
+	$sql = "SELECT i_key, i_gedcom, i_isdead, i_file FROM ".TBLPREFIX."individuals WHERE i_key='".DbLayer::EscapeQuery(JoinKey($pid, $gedfile))."'";
 	$res = NewQuery($sql);
 	if ($res) {
 		if ($res->NumRows()==0) {
@@ -187,39 +183,39 @@ function FindPersonRecord($pid, $gedfile="", $renew = false, $nocache = false) {
  * @return string the raw gedcom record is returned
  */
 function FindGedcomRecord($pid, $gedfile = "", $renew = false, $nocache = false) {
-	global $gm_lang, $GEDCOMS, $MEDIA_ID_PREFIX;
-	global $GEDCOM, $GEDCOMID, $indilist, $famlist, $sourcelist, $otherlist, $repolist, $medialist;
+	global $gm_lang, $MEDIA_ID_PREFIX;
+	global $GEDCOMID, $indilist, $famlist, $sourcelist, $otherlist, $repolist, $medialist;
 	global $GEDCOM_ID_PREFIX, $FAM_ID_PREFIX, $SOURCE_ID_PREFIX, $MEDIA_ID_PREFIX, $NOTE_ID_PREFIX;
+	
 // print "hit on findgecomrecord for: ".$pid."<br />".$pipo;
 	if (empty($pid)) return false;
-	if (empty($gedfile)) $gedfile = $GEDCOM;
-	$gedfileid = $GEDCOMS[$gedfile]["id"];
+	if (empty($gedfile)) $gedfile = $GEDCOMID;
 	if (!$renew) {
-		if (isset($indilist[$pid."[".$gedfileid."]"]["gedcom"])) {
+		if (isset($indilist[$pid."[".$gedfile."]"]["gedcom"])) {
 //			print "Hit on indilist for ".$pid."<br />";
-			return $indilist[$pid."[".$gedfileid."]"]["gedcom"];
+			return $indilist[$pid."[".$gedfile."]"]["gedcom"];
 		}
-		if ((isset($indilist[$pid]["gedcom"]))&&($indilist[$pid]["gedfile"]==$gedfileid)) {
+		if ((isset($indilist[$pid]["gedcom"]))&&($indilist[$pid]["gedfile"]==$gedfile)) {
 //			print "Hit on indilist for ".$pid."<br />";
 			return $indilist[$pid]["gedcom"];
 		}
-		if ((isset($famlist[$pid]["gedcom"]))&&($famlist[$pid]["gedfile"]==$gedfileid)) {
+		if ((isset($famlist[$pid]["gedcom"]))&&($famlist[$pid]["gedfile"]==$gedfile)) {
 //			print "Hit on famlist for ".$pid."<br />";
 			return $famlist[$pid]["gedcom"];
 		}
-		if ((isset($sourcelist[$pid]["gedcom"]))&&($sourcelist[$pid]["gedfile"]==$gedfileid)) {
+		if ((isset($sourcelist[$pid]["gedcom"]))&&($sourcelist[$pid]["gedfile"]==$gedfile)) {
 //			print "Hit on sourcelist for ".$pid."<br />";
 			return $sourcelist[$pid]["gedcom"];
 		}
-		if ((isset($repolist[$pid]["gedcom"])) && ($repolist[$pid]["gedfile"]==$gedfileid)) {
+		if ((isset($repolist[$pid]["gedcom"])) && ($repolist[$pid]["gedfile"]==$gedfile)) {
 //			print "Hit on repolist for ".$pid."<br />";
 			return $repolist[$pid]["gedcom"];
 		}
-		if ((isset($otherlist[$pid]["gedcom"]))&&($otherlist[$pid]["gedfile"]==$gedfileid)) {
+		if ((isset($otherlist[$pid]["gedcom"]))&&($otherlist[$pid]["gedfile"]==$gedfile)) {
 //			print "Hit on otherlist for ".$pid."<br />";
 			return $otherlist[$pid]["gedcom"];
 		}
-		if ((isset($medialist[$pid]["gedcom"]))&&($medialist[$pid]["gedfile"]==$gedfileid)) {
+		if ((isset($medialist[$pid]["gedcom"]))&&($medialist[$pid]["gedfile"]==$gedfile)) {
 //			print "Hit on medialist for ".$pid."<br />";
 			return $medialist[$pid]["gedcom"];
 		}
@@ -281,15 +277,14 @@ function FindGedcomRecord($pid, $gedfile = "", $renew = false, $nocache = false)
  */
 function FindOtherRecord($oid, $gedfile="", $renew = false, $type="") {
 	global $gm_lang;
-	global $GEDCOMS;
-	global $GEDCOM, $otherlist;
+	global $GEDCOMID, $otherlist;
 
 	if ($oid=="") return false;
-	if (empty($gedfile)) $gedfile = $GEDCOM;
+	if (empty($gedfile)) $gedfile = $GEDCOMID;
 
-	if (!$renew && isset($otherlist[$oid]["gedcom"]) && ($otherlist[$oid]["gedfile"]==$GEDCOMS[$gedfile]["id"])) return $otherlist[$oid]["gedcom"];
+	if (!$renew && isset($otherlist[$oid]["gedcom"]) && ($otherlist[$oid]["gedfile"] == $gedfile)) return $otherlist[$oid]["gedcom"];
 
-	$sql = "SELECT o_gedcom, o_file FROM ".TBLPREFIX."other WHERE o_id LIKE '".DbLayer::EscapeQuery($oid)."' AND o_file='".DbLayer::EscapeQuery($GEDCOMS[$gedfile]["id"])."'";
+	$sql = "SELECT o_gedcom, o_file FROM ".TBLPREFIX."other WHERE o_id LIKE '".DbLayer::EscapeQuery($oid)."' AND o_file='".($gedfile)."'";
 	if (!empty($type)) $sql .= " AND o_type='".$type."'";
 	$res = NewQuery($sql);
 	if ($res->NumRows()!=0) {
@@ -315,15 +310,14 @@ function FindOtherRecord($oid, $gedfile="", $renew = false, $type="") {
  */
 function FindSourceRecord($sid, $gedfile="", $renew = false) {
 	global $gm_lang;
-	global $GEDCOMS;
-	global $GEDCOM, $sourcelist;
+	global $GEDCOMID, $sourcelist;
 
 	if ($sid=="") return false;
-	if (empty($gedfile)) $gedfile = $GEDCOM;
+	if (empty($gedfile)) $gedfile = $GEDCOMID;
 	
-	if (!$renew && isset($sourcelist[$sid]["gedcom"]) && ($sourcelist[$sid]["gedfile"]==$GEDCOMS[$gedfile]["id"])) return $sourcelist[$sid]["gedcom"];
+	if (!$renew && isset($sourcelist[$sid]["gedcom"]) && ($sourcelist[$sid]["gedfile"] == $gedfile)) return $sourcelist[$sid]["gedcom"];
 
-	$sql = "SELECT s_gedcom, s_name, s_file FROM ".TBLPREFIX."sources WHERE s_id LIKE '".DbLayer::EscapeQuery($sid)."' AND s_file='".DbLayer::EscapeQuery($GEDCOMS[$gedfile]["id"])."'";
+	$sql = "SELECT s_gedcom, s_name, s_file FROM ".TBLPREFIX."sources WHERE s_id LIKE '".DbLayer::EscapeQuery($sid)."' AND s_file='".$gedfile."'";
 	$res = NewQuery($sql);
 	if ($res->NumRows()!=0) {
 		$row = $res->fetchAssoc();
@@ -339,7 +333,7 @@ function FindSourceRecord($sid, $gedfile="", $renew = false) {
 }
 // This function checks if a record exists. It also considers pending changes.
 function CheckExists($pid, $type="") {
-	global $GEDCOM;
+	global $GEDCOMID;
 
 	if (empty($pid)) return false;
 	$gedrec = "";
@@ -354,7 +348,7 @@ function CheckExists($pid, $type="") {
 	
 	if (GetChangeData(true, $pid, false, "", "")) {
 		$rec = GetChangeData(false, $pid, false, "gedlines", "");
-		$gedrec = $rec[$GEDCOM][$pid];
+		$gedrec = $rec[$GEDCOMID][$pid];
 		// There are changes. So the record may be new or changed (not empty) or deleted (empty)
 		if (empty($gedrec)) return false;
 		else return true;
@@ -370,14 +364,13 @@ function CheckExists($pid, $type="") {
  * @param string $gedfile	the gedcom file id
  */
 function FindRepoRecord($rid, $gedfile="") {
-	global $GEDCOMS;
-	global $GEDCOM, $repolist;
+	global $GEDCOMID, $repolist;
 
 	if ($rid=="") return false;
-	if (empty($gedfile)) $gedfile = $GEDCOM;
-	if (isset($repolist[$rid]["gedcom"]) && ($repolist[$rid]["gedfile"]==$GEDCOMS[$gedfile]["id"])) return $repolist[$rid]["gedcom"];
+	if (empty($gedfile)) $gedfile = $GEDCOMID;
+	if (isset($repolist[$rid]["gedcom"]) && ($repolist[$rid]["gedfile"] == $gedfile)) return $repolist[$rid]["gedcom"];
 	
-	$sql = "SELECT o_id, o_gedcom, o_file FROM ".TBLPREFIX."other WHERE o_type='REPO' AND o_id LIKE '".DbLayer::EscapeQuery($rid)."' AND o_file='".DbLayer::EscapeQuery($GEDCOMS[$gedfile]["id"])."'";
+	$sql = "SELECT o_id, o_gedcom, o_file FROM ".TBLPREFIX."other WHERE o_type='REPO' AND o_id LIKE '".DbLayer::EscapeQuery($rid)."' AND o_file='".$gedfile."'";
 	$res = NewQuery($sql);
 	if ($res->NumRows()!=0) {
 		$row = $res->fetchAssoc();
@@ -399,16 +392,15 @@ function FindRepoRecord($rid, $gedfile="") {
  * @param string $rid	the record id
  */
 function FindMediaRecord($rid, $gedfile='', $renew = false) {
-	global $GEDCOMS;
-	global $GEDCOM, $medialist, $GEDCOMID;
+	global $medialist, $GEDCOMID;
 	
 	if ($rid=="") return false;
-	if (empty($gedfile)) $gedfile = $GEDCOM;
+	if (empty($gedfile)) $gedfile = $GEDCOMID;
 	
 	//-- first check for the record in the cache
-	if (!$renew && isset($medialist[$rid]["gedcom"]) && ($medialist[$rid]["gedfile"]==$GEDCOMS[$gedfile]["id"])) return $medialist[$rid]["gedcom"];
+	if (!$renew && isset($medialist[$rid]["gedcom"]) && ($medialist[$rid]["gedfile"]==$gedfile)) return $medialist[$rid]["gedcom"];
 
-	$sql = "SELECT * FROM ".TBLPREFIX."media WHERE m_media LIKE '".DbLayer::EscapeQuery($rid)."' AND m_gedfile='".$GEDCOMID."'";
+	$sql = "SELECT * FROM ".TBLPREFIX."media WHERE m_media LIKE '".DbLayer::EscapeQuery($rid)."' AND m_gedfile='".$gedfile."'";
 	$res = NewQuery($sql);
 	if ($res->NumRows()!=0) {
 		$row = $res->FetchAssoc();
@@ -431,6 +423,7 @@ function FindMediaRecord($rid, $gedfile='', $renew = false) {
  */
 function FindFirstPerson() {
 	global $GEDCOMID;
+	
 	$sql = "SELECT i_id FROM ".TBLPREFIX."individuals WHERE i_file='".$GEDCOMID."' ORDER BY i_id LIMIT 1";
 	$res = NewQuery($sql);
 	$row = $res->FetchAssoc();
@@ -440,6 +433,7 @@ function FindFirstPerson() {
 
 function FindSubmitter($gedid) {
 	global $GEDCOMID;
+	
 	if (!isset($gedid)) $gedid = $GEDCOMID;
 	$sql = "SELECT o_id FROM ".TBLPREFIX."other WHERE o_file='".$gedid."' AND o_type='SUBM'";
 	$res = NewQuery($sql);
@@ -447,349 +441,13 @@ function FindSubmitter($gedid) {
 		// If there is a new unapproved submitter record, is has the default pid
 		if (GetChangeData(true, "SUB1", false, "", "")) {
 			$rec = GetChangeData(false, "SUB1", false, "gedlines", "");
-			if (isset($rec[get_gedcom_from_id($gedid)]["SUB1"])) return "SUB1";
+			if (isset($rec[$gedid]["SUB1"])) return "SUB1";
 			else return "";
 		}
 	}
 	$row = $res->FetchAssoc();
 	$res->FreeResult();
 	return $row["o_id"];
-}
-
-
-
-//=================== IMPORT FUNCTIONS ======================================
-
-/**
- * import record into database
- *
- * this function will parse the given gedcom record and add it to the database
- * @param string $indirec the raw gedcom record to parse
- * @param boolean $update whether or not this is an updated record that has been accepted
- */
-function ImportRecord($indirec, $update=false) {
-	global $gid, $type, $indilist,$famlist,$sourcelist,$otherlist, $prepared_statement;
-	global $GEDCOM_FILE, $FILE, $gm_lang, $USE_RIN, $gdfp, $placecache, $GEDCOM, $GEDCOMID;
-	global $ALPHABET_upper, $ALPHABET_lower, $place_id, $WORD_WRAPPED_NOTES, $GEDCOMS, $media_count;
-	
-	if (strlen(trim($indirec)) ==  0) return false;
-	//-- import different types of records
-	$ct = preg_match("/0 @(.*)@ ([A-Z_]+)/", $indirec, $match);
-	if ($ct > 0) {
-		$gid = $match[1];
-		$type = trim($match[2]);
-	}
-	else {
-		$ct = preg_match("/0 (.*)/", $indirec, $match);
-		if ($ct>0) {
-			$gid = trim($match[1]);
-			$type = trim($match[1]);
-		}
-		else {
-			print $gm_lang["invalid_gedformat"]; print "<br /><pre>$indirec</pre>\n";
-		}
-	}
-
-	//-- remove double @ signs
-	$indirec = preg_replace("/@+/", "@", $indirec);
-
-	// remove heading spaces
-	$indirec = preg_replace("/\n(\s*)/", "\n", $indirec);
-
-	//-- if this is an import from an online update then import the places
-	// NOTE: What's the difference? Oh... in uploadgedcom it's also done. So only do it here in case of updates
-	if ($update) {
-//		UpdatePlaces($gid, $indirec, $update);
-		UpdatePlaces($gid, $indirec, true);
-		UpdateDates($gid, $indirec);
-
-		//-- Also add the MM links to the DB
-		$lines = preg_split("/[\r\n]+/", trim($indirec));
-		$ct_lines = count($lines);
-		foreach($lines as $key => $line) {
-			$ct = preg_match_all("/([1-9])\sOBJE\s@(.+)@/", $line, $match);
-			for ($i=0;$i<$ct;$i++) {
-				$rec = $match[0][$i];
-//				print "rec: ".$rec."<br />";
-				$level = $match[1][$i];
-//				print "level: ".$level."<br />";
-				$media = $match[2][$i];
-//				print "media: ".$media."<br />";
-				$gedrec = GetSubRecord($level, $rec, $indirec, 1);
-//				print "gedrec: ".$gedrec."<br />";
-				AddDBLink($media, $gid, $gedrec, $GEDCOM, -1, $type);
-			}
-		}
-	}
-	$indirec = UpdateMedia($gid, $indirec, $update);
-	
-	// Insert the source links
-	// Recalculate $gid as it may have changed in UpdateMedia
-	$ct = preg_match_all("/([1-9])\sSOUR\s@(.+)@/", $indirec, $match);
-	if ($ct > 0) {
-		$cc = preg_match("/0 @(.*)@ ([A-Z_]+)/", $indirec, $cmatch);
-		if ($cc > 0) {
-			$gid = $cmatch[1];
-			$type = trim($cmatch[2]);
-		}
-		else {
-			$cc = preg_match("/0 (.*)/", $indirec, $cmatch);
-			if ($cc>0) {
-				$gid = trim($cmatch[1]);
-				$type = trim($cmatch[1]);
-			}
-		}
-	}
-	$kgid = JoinKey($gid, $GEDCOMID);
-	for ($i=0;$i<$ct;$i++) {
-		$rec = $match[0][$i];
-		$level = $match[1][$i];
-		$sour = $match[2][$i];
-		$gedrec = GetSubRecord($level, $rec, $indirec, 1);
-		$result = AddSourceLink($sour, $gid, $gedrec, $GEDCOMID, $type);
-	}
-	
-	// Insert the other links
-	// Recalculate $gid as it may have changed in UpdateMedia
-	$ct = preg_match_all("/([1-9])\s(NOTE|REPO)\s@(.+)@/", $indirec, $match);
-	if ($ct > 0) {
-		$cc = preg_match("/0 @(.*)@ ([A-Z_]+)/", $indirec, $cmatch);
-		if ($cc > 0) {
-			$gid = $cmatch[1];
-			$type = trim($cmatch[2]);
-		}
-		else {
-			$cc = preg_match("/0 (.*)/", $indirec, $cmatch);
-			if ($cc>0) {
-				$gid = trim($cmatch[1]);
-				$type = trim($cmatch[1]);
-			}
-		}
-	}
-	for ($i=0;$i<$ct;$i++) {
-		$rec = $match[0][$i];
-		$level = $match[1][$i];
-		$note = $match[3][$i];
-		$result = AddOtherLink($note, $gid, $type, $GEDCOMID);
-	}
-	if ($type == "INDI" || $type == "FAM") {
-		if (preg_match("/[1-9]\sASSO\s@/", $indirec, $match) > 0) {
-			$recs = GetAllSubrecords($indirec, "CHAN", false, false, false);
-			foreach ($recs as $key => $record) {
-				$ct = preg_match_all("/^1\sASSO\s@(.+)@/", $record, $match);
-				if ($ct > 0) {
-					$fact = "";
-					for ($i=0;$i<$ct;$i++) {
-						$pid1 = $match[1][$i];
-						$rela = trim(GetGedcomValue("RELA", 2, $record, "", false));
-						$resn = trim(GetGedcomValue("RESN", 2, $record, "", false));
-						AddAssoLink(JoinKey($pid1, $GEDCOMID), $kgid, $type, $fact, $rela, $resn, $GEDCOMID);
-					}
-				}
-				$ct = preg_match_all("/\n2\sASSO\s@(.+)@/", $record, $match);
-				// The resn value is valid for all asso's for this fact
-				$resn = trim(GetGedcomValue("RESN", 2, $record, "", false));
-				if ($ct > 0) {
-					$ct2 = preg_match("/1\s(.+)\s/", $record, $match2);
-					$fact = trim($match2[1]);
-					for ($i=0;$i<$ct;$i++) {
-						$pid1 = $match[1][$i];
-						$asso = GetSubRecord(2, "2 ASSO", $record, $i+1);
-						$rela = trim(GetGedcomValue("RELA", 3, $asso, "", false));
-						AddAssoLink(JoinKey($pid1, $GEDCOMID), $kgid, $type, $fact, $rela, $resn, $GEDCOMID);
-					}
-				}
-			}
-		}
-	}
-	
-	
-	if ($type == "INDI") {
-		$indirec = CleanupTagsY($indirec);
-		$ct = preg_match_all("/1 FAMS @(.*)@/", $indirec, $match, PREG_SET_ORDER);
-		$sfams = "";
-		$order = 1;
-		$kgid = JoinKey($gid, $GEDCOMID);
-		for($j=0; $j<$ct; $j++) {
-			$sql = "INSERT INTO ".TBLPREFIX."individual_family VALUES(NULL, '".$kgid."', '".JoinKey($match[$j][1], $GEDCOMID)."', '".$order."', 'S', '', '', '', '".DbLayer::EscapeQuery($GEDCOMS[$FILE]["id"])."') ON DUPLICATE KEY UPDATE if_order='".$order."'";
-			$res = NewQuery($sql);
-			$sfams .= $match[$j][1].";";
-			$order++;
-		}
-		$ct = preg_match_all("/1 FAMC @(.*)@/", $indirec, $match, PREG_SET_ORDER);
-		$cfams = "";
-		$i=1;
-		for($j=0; $j<$ct; $j++) {
-			// Get the primary status
-			$famcrec = GetSubRecord(1, "1 FAMC", $indirec, $i);
-			$ct2 = preg_match("/2\s+_PRIMARY\s(.+)/", $famcrec, $pmatch);
-			if ($ct2>0) $prim = trim($pmatch[1]);
-			else $prim = "";
-			// Get the pedi status
-			$ct2 = preg_match("/2\s+PEDI\s+(adopted|birth|foster|sealing)/", $famcrec, $pmatch);
-			$ped = "";
-			if ($ct2>0) $ped = substr(trim($pmatch[1]), 0, 1);
-			if ($ped == "b") $ped = "";
-			// Get the stat status
-			$ct2 = preg_match("/2\s+STAT\s+(challenged|proven|disproven)/", $famcrec, $pmatch);
-			$stat = "";
-			if ($ct2>0) $stat = substr(trim($pmatch[1]),0 ,1);
-			// Insert the stuff in the DB
-			$sql = "INSERT INTO ".TBLPREFIX."individual_family VALUES(NULL, '".$kgid."', '".JoinKey($match[$j][1], $GEDCOMID)."', '', 'C', '".$prim."', '".$ped."', '".$stat."', '".DbLayer::EscapeQuery($GEDCOMS[$FILE]["id"])."') ON DUPLICATE KEY UPDATE if_prim='".$prim."', if_pedi='".$ped."', if_stat='".$stat."'";
-			$res = NewQuery($sql);
-			$cfams .= $match[$j][1].";";
-			$i++;
-		}
-		$isdead = -1;
-		$indi = array();
-		$names = GetIndiNames($indirec, true);
-		$soundex_codes = GetSoundexStrings($names, true, $indirec);
-		foreach($names as $indexval => $name) {
-			$sql = "INSERT INTO ".TBLPREFIX."names VALUES('0', '".DbLayer::EscapeQuery($gid)."[".DbLayer::EscapeQuery($GEDCOMS[$FILE]["id"])."]','".DbLayer::EscapeQuery($gid)."','".DbLayer::EscapeQuery($GEDCOMS[$FILE]["id"])."','".DbLayer::EscapeQuery($name[0])."','".DbLayer::EscapeQuery($name[1])."','".DbLayer::EscapeQuery($name[2])."','".DbLayer::EscapeQuery($name[3])."')";
-			$res = NewQuery($sql);
-			if ($res) $res->FreeResult();
-		}
-		$indi["names"] = $names;
-		$indi["isdead"] = $isdead;
-		$indi["gedcom"] = $indirec;
-		$indi["gedfile"] = $GEDCOMS[$FILE]["id"];
-		$s = GetGedcomValue("SEX", 1, $indirec, '', false);
-		if (empty($s)) $indi["sex"] = "U";
-		else $indi["sex"] = $s;
-		if ($USE_RIN) {
-			$ct = preg_match("/1 RIN (.*)/", $indirec, $match);
-			if ($ct>0) $rin = trim($match[1]);
-			else $rin = $gid;
-			$indi["rin"] = $rin;
-		}
-		else $indi["rin"] = $gid;
-		
-		$sql = "INSERT INTO ".TBLPREFIX."individuals VALUES ('".$kgid."', '".DbLayer::EscapeQuery($gid)."','".DbLayer::EscapeQuery($indi["gedfile"])."','".DbLayer::EscapeQuery($indi["rin"])."', -1,'".DbLayer::EscapeQuery($indi["gedcom"])."','".$indi["sex"]."')";
-		$res = NewQuery($sql);
-		if ($res) $res->FreeResult();
-		$sqlstr = "";
-		$first = true;
-		foreach ($soundex_codes as $stype => $ncodes) {
-			foreach ($ncodes as $nametype => $tcodes) {
-				foreach ($tcodes as $key => $code) {
-					if (!$first) $sqlstr .= ", ";
-					$first = false;
-					$sqlstr .= "(NULL, '".$kgid."', '".$GEDCOMID."', '".$stype."', '".$nametype."', '".$code."')";
-				}
-			}
-		}
-		if (!empty($sqlstr)) {
-			$sql = "INSERT INTO ".TBLPREFIX."soundex VALUES ".$sqlstr;
-			$res = NewQuery($sql);
-			if ($res) $res->FreeResult();
-		}
-		else WriteToLog("Import->Soundex: Indi without soundex codes encountered: ".$kgid, "W", "G", $GEDCOM);
-	}
-	else if ($type == "FAM") {
-		$indirec = CleanupTagsY($indirec);
-		$parents = array();
-		$ct = preg_match("/1 HUSB @(.*)@/", $indirec, $match);
-		if ($ct>0) $parents["HUSB"]=$match[1];
-		else $parents["HUSB"]=false;
-		$ct = preg_match("/1 WIFE @(.*)@/", $indirec, $match);
-		if ($ct>0) $parents["WIFE"]=$match[1];
-		else $parents["WIFE"]=false;
-		$ct = preg_match_all("/\d CHIL @(.*)@/", $indirec, $match, PREG_SET_ORDER);
-		$chil = "";
-		// NOTE: only the children are added/updated here.
-		for($j=0; $j<$ct; $j++) {
-			$chil .= $match[$j][1].";";
-			$sql = "INSERT INTO ".TBLPREFIX."individual_family VALUES(NULL, '".Joinkey($match[$j][1], $GEDCOMID)."', '".JoinKey(DbLayer::EscapeQuery($gid), $GEDCOMID)."', '".($j+1)."', 'C', '', '', '', '".DbLayer::EscapeQuery($GEDCOMS[$FILE]["id"])."') ON DUPLICATE KEY UPDATE if_order='".($j+1)."'";
-			$res = NewQuery($sql);
-		}
-		$fam = array();
-		$fam["HUSB"] = $parents["HUSB"];
-		$fam["WIFE"] = $parents["WIFE"];
-		$fam["CHIL"] = $chil;
-		$fam["gedcom"] = $indirec;
-		$fam["gedfile"] = $GEDCOMS[$FILE]["id"];
-		$sql = "INSERT INTO ".TBLPREFIX."families (f_key, f_id, f_file, f_husb, f_wife, f_chil, f_gedcom, f_numchil) VALUES ('".DbLayer::EscapeQuery($gid)."[".DbLayer::EscapeQuery($fam["gedfile"])."]','".DbLayer::EscapeQuery($gid)."','".DbLayer::EscapeQuery($fam["gedfile"])."','".DbLayer::EscapeQuery(JoinKey($fam["HUSB"], $fam["gedfile"]))."','".DbLayer::EscapeQuery(JoinKey($fam["WIFE"], $GEDCOMID))."','".DbLayer::EscapeQuery($fam["CHIL"])."','".DbLayer::EscapeQuery($fam["gedcom"])."','".DbLayer::EscapeQuery($ct)."')";
-		$res = NewQuery($sql);
-		if ($res) $res->FreeResult();
-	}
-	else if ($type=="SOUR") {
-		$et = preg_match("/1 ABBR (.*)/", $indirec, $smatch);
-		if ($et>0) $name = $smatch[1];
-		$tt = preg_match("/1 TITL (.*)/", $indirec, $smatch);
-		if ($tt>0) $name = $smatch[1];
-		if (empty($name)) $name = $gid;
-		$subindi = preg_split("/1 TITL /",$indirec);
-		if (count($subindi)>1) {
-			$pos = strpos($subindi[1], "\n1", 0);
-			if ($pos) $subindi[1] = substr($subindi[1],0,$pos);
-			$ct = preg_match_all("/2 CON[C|T] (.*)/", $subindi[1], $match, PREG_SET_ORDER);
-			for($i=0; $i<$ct; $i++) {
-				$name = trim($name);
-				if ($WORD_WRAPPED_NOTES) $name .= " ".$match[$i][1];
-				else $name .= $match[$i][1];
-			}
-		}
-		$sql = "INSERT INTO ".TBLPREFIX."sources VALUES ('".Joinkey($gid, $GEDCOMID)."', '".DbLayer::EscapeQuery($gid)."','".DbLayer::EscapeQuery($GEDCOMS[$FILE]["id"])."','".DbLayer::EscapeQuery($name)."','".DbLayer::EscapeQuery($indirec)."')";
-		$res = NewQuery($sql);
-		if ($res) $res->FreeResult();
-	}
-	else if ($type=="OBJE") {
-		//-- don't duplicate OBJE records
-		//-- OBJE records are imported by UpdateMedia function
-	}
-	else if (preg_match("/_/", $type)==0) {
-		if ($type=="HEAD") {
-			$ct=preg_match("/1 DATE (.*)/", $indirec, $match);
-			if ($ct == 0) {
-				$indirec = trim($indirec);
-				$indirec .= "\r\n1 DATE ".date("d")." ".date("M")." ".date("Y");
-			}
-		}
-		$sql = "INSERT INTO ".TBLPREFIX."other VALUES ('".Joinkey($gid, $GEDCOMID)."', '".DbLayer::EscapeQuery($gid)."','".DbLayer::EscapeQuery($GEDCOMS[$FILE]["id"])."','".DbLayer::EscapeQuery($type)."','".DbLayer::EscapeQuery($indirec)."')";
-		$res = NewQuery($sql);
-		if ($res) $res->FreeResult();
-	}
-	return $gid;
-}
-
-/**
- * Adds a new link into the database.
- *
- * Replace the gedrec for an existing link record.
- *
- * @param string $media The gid of the record to be updated in the form Mxxxx.
- * @param string $indi The gid that this media is linked to Ixxx Fxxx ect.
- * @param string $gedrec The gedcom record as a string without the gid.
- * @param string $ged The gedcom file this action is to apply to.
- * @param integer $order The order that this record should be displayed on the gid. If not supplied then
- *                       the order is not replaced.
- */
- 
- // This function is used in ImportRecord only
- 
-function AddDBLink($media, $indi, $gedrec, $ged, $order=-1, $rectype) {
-	global $GEDCOMS, $GEDCOM;
-
-	// if no preference to order find the number of records and add to the end
-	if ($order=-1) {
-		$sql = "SELECT * FROM ".TBLPREFIX."media_mapping WHERE mm_gedfile='".$GEDCOMS[$ged]["id"]."' AND mm_gid='".addslashes($indi)."'";
-		$res = NewQuery($sql);
-		$ct = $res->NumRows();
-		$order = $ct + 1;
-	}
-
-	// add the new media link record
-	$sql = "INSERT INTO ".TBLPREFIX."media_mapping VALUES(NULL,'".addslashes($media)."','".addslashes($indi)."','".addslashes($order)."','".$GEDCOMS[$ged]["id"]."','".addslashes($gedrec)."', '".$rectype."')";
-	$res = NewQuery($sql);
-	if ($res) {
-		WriteToLog("New media link added to the database: ".$media, "I", "G", $GEDCOM);
-		return true;
-	}
-	else {
-		WriteToLog("There was a problem adding media record: ".$media, "E", "G", $GEDCOM);
-		return false;
-	}
-
 }
 
 /**
@@ -888,7 +546,7 @@ function ResetIsDeadLinked($pid, $type="INDI") {
  * @param string $letter	the letter for this name
  */
 function AddNewName($gid, $newname, $letter, $surname, $indirec) {
-	global $USE_RIN, $indilist, $FILE, $GEDCOMS, $GEDCOMID;
+	global $USE_RIN, $indilist, $FILE, $GEDCOMID;
 
 	$indilist[$gid]["names"][] = array($newname, $letter, $surname, 'C');
 	$indilist[$gid]["gedcom"] = $indirec;
@@ -909,524 +567,8 @@ function AddNewName($gid, $newname, $letter, $surname, $indirec) {
 	$sql = substr($sql, 0, strlen($sql)-2);
 	$res = NewQuery($sql);
 	if ($res) $res->FreeResult();
-	$sql = "UPDATE ".TBLPREFIX."individuals SET i_gedcom='".DbLayer::EscapeQuery($indirec)."' WHERE i_id='".DbLayer::EscapeQuery($gid)."' AND i_file='".DbLayer::EscapeQuery($GEDCOMS[$FILE]["id"])."'";
+	$sql = "UPDATE ".TBLPREFIX."individuals SET i_gedcom='".DbLayer::EscapeQuery($indirec)."' WHERE i_id='".DbLayer::EscapeQuery($gid)."' AND i_file='".get_id_from_gedcom($FILE)."'";
 	$res = NewQuery($sql);
-}
-
-/**
- * extract all places from the given record and insert them
- * into the places table
- * @param string $indirec
- */
-function UpdatePlaces($gid, $indirec, $update=false) {
-	global $FILE, $placecache, $GEDCOMS;
-// NOTE: $update=false causes double places to be added. Force true
-$update = true;
-	if (!isset($placecache)) $placecache = array();
-	//-- import all place locations
-	$pt = preg_match_all("/\d PLAC (.*)/", $indirec, $match, PREG_SET_ORDER);
-	for($i=0; $i<$pt; $i++) {
-		$place = trim($match[$i][1]);
-		// Split on chinese comma 239 188 140
-		$place = preg_replace("/".chr(239).chr(188).chr(140)."/", ",", $place);
-		$places = preg_split("/,/", $place);
-		$secalp = array_reverse($places);
-		$parent_id = 0;
-		$level = 0;
-		foreach($secalp as $indexval => $place) {
-			$place = trim($place);
-			$place=preg_replace('/\\\"/', "", $place);
-			$place=preg_replace("/[\><]/", "", $place);
-			if (empty($parent_id)) $parent_id=0;
-			$key = strtolower($place."_".$level."_".$parent_id);
-			$addgid = true;
-			if (isset($placecache[$key])) {
-				$parent_id = $placecache[$key][0];
-				if (strpos($placecache[$key][1], $gid.",")===false) {
-					$placecache[$key][1] = "$gid,".$placecache[$key][1];
-					$sql = "INSERT INTO ".TBLPREFIX."placelinks VALUES($parent_id, '".DbLayer::EscapeQuery($gid)."', '".DbLayer::EscapeQuery($GEDCOMS[$FILE]["id"])."')";
-					$res = NewQuery($sql);
-				}
-			}
-			else {
-				$skip = false;
-				if ($update) {
-//					print "Search: ".$place." ".$level."<br />";
-					$sql = "SELECT p_id FROM ".TBLPREFIX."places WHERE p_place LIKE '".DbLayer::EscapeQuery($place)."' AND p_level=$level AND p_parent_id='$parent_id' AND p_file='".DbLayer::EscapeQuery($GEDCOMS[$FILE]["id"])."'";
-					$res = NewQuery($sql);
-					if ($res->NumRows()>0) {
-//						if ($level == 0) print "Hit on: ".$place." ".$level."<br />";
-						$row = $res->FetchAssoc();
-						$res->FreeResult();
-						$parent_id = $row["p_id"];
-						$skip=true;
-						$placecache[$key] = array($parent_id, $gid.",");
-						$sql = "INSERT INTO ".TBLPREFIX."placelinks VALUES($parent_id, '".DbLayer::EscapeQuery($gid)."', '".DbLayer::EscapeQuery($GEDCOMS[$FILE]["id"])."')";
-						$res = NewQuery($sql);
-					}
-				}
-				if (!$skip) {
-					if (!isset($place_id)) {
-						$place_id = GetNextId("places", "p_id");
-					}
-					else $place_id++;
-//					if ($level == 0) print "Insert: ".$place." ".$level."<br />";
-					$sql = "INSERT INTO ".TBLPREFIX."places VALUES($place_id, '".DbLayer::EscapeQuery($place)."', $level, '$parent_id', '".DbLayer::EscapeQuery($GEDCOMS[$FILE]["id"])."')";
-					$res = NewQuery($sql);
-					$parent_id = $place_id;
-					$placecache[$key] = array($parent_id, $gid.",");
-					$sql = "INSERT INTO ".TBLPREFIX."placelinks VALUES($place_id, '".DbLayer::EscapeQuery($gid)."', '".DbLayer::EscapeQuery($GEDCOMS[$FILE]["id"])."')";
-					$res = NewQuery($sql);
-				}
-			}
-			$level++;
-		}
-	}
-	return $pt;
-}
-
-/**
- * extract all date info from the given record and insert them
- * into the dates table
- * @param string $indirec
- */
-function UpdateDates($gid, $indirec) {
-	global $FILE, $GEDCOMS, $GEDCOMID;
-	
-	$count = 0;
-	// NOTE: Check if the record has dates, if not return
-	$pt = preg_match("/\d DATE (.*)/", $indirec, $match);
-	if ($pt==0) return 0;
-	
-	// NOTE: Get all facts
-	preg_match_all("/(\d)\s(\w+)\r\n/", $indirec, $facts, PREG_SET_ORDER);
-	
-	$fact_count = array();
-	// NOTE: Get all the level 1 records
-	foreach($facts as $key => $subfact) {
-		$fact = $subfact[2];
-		
-		if (!isset($fact_count[$fact])) $fact_count[$fact] = 1;
-		else $fact_count[$fact]++;
-		$subrec = GetSubRecord($subfact[1], $fact, $indirec, $fact_count[$fact]);
-		$count_dates = preg_match("/\d DATE (.*)/", $subrec, $dates);
-		if ($count_dates > 0) {
-			$datestr = trim($dates[1]);
-			$date = ParseDate($datestr);
-			if (empty($date[0]["day"])) $date[0]["day"] = 0;
-			$sql = "INSERT INTO ".TBLPREFIX."dates VALUES('".DbLayer::EscapeQuery($date[0]["day"])."','".DbLayer::EscapeQuery(Str2Upper($date[0]["month"]))."','".DbLayer::EscapeQuery($date[0]["year"])."','".DbLayer::EscapeQuery($fact)."','".DbLayer::EscapeQuery($gid)."','".DbLayer::EscapeQuery(JoinKey($gid, $GEDCOMID))."','".DbLayer::EscapeQuery($GEDCOMS[$FILE]["id"])."',";
-			if (isset($date[0]["ext"])) {
-				preg_match("/@#D(.*)@/", $date[0]["ext"], $extract_type);
-				$date_types = array("@#DGREGORIAN@","@#DJULIAN@","@#DHEBREW@","@#DFRENCH R@", "@#DROMAN@", "@#DUNKNOWN@");
-				if (isset($extract_type[0]) && in_array($extract_type[0], $date_types)) $sql .= "'".$extract_type[0]."')";
-				else $sql .= "NULL)";
-			}
-			else $sql .= "NULL)";
-			$res = NewQuery($sql);
-			$count++;
-		}
-	}
-	return $count;
-}
-
-/**
- * import media items from record
- * @return string	an updated record
- */
-function UpdateMedia($gid, $indirec, $update=false) {
-	global $GEDCOMS, $FILE, $MEDIA_ID_PREFIX, $media_count, $found_ids;
-	global $zero_level_media;
-	
-	if (!isset($media_count)) $media_count = 0;
-	if (!isset($found_ids)) $found_ids = array();
-	if (!isset($zero_level_media)) $zero_level_media = false;
-	
-	// Get the type of record we have here
-	$ct = preg_match("/0 @.+@ (\w+)/", $indirec, $tmatch);
-	if ($ct) $rectype = $tmatch[1];
-	else {
-		$r = substr($indirec, 0, 6);
-		if ($r != "0 HEAD" && $r != "0 TRLR") WriteToLog("UpdateMedia-> Unknown record type encountered on import: ".$indirec, "E", "G", $FILE);
-		return $indirec;
-	}
-	
-	//-- handle level 0 media OBJE seperately
-	$ct = preg_match("/0 @(.*)@ OBJE/", $indirec, $match);
-	if ($ct>0) {
-		$old_m_media = $match[1];
-		$found = false;
-		// If it's an update from edit, the ID does not change.
-		if ($update) {
-			$new_m_media = $old_m_media;
-		}
-		else {
-			// It's a new record. If we already assigned a new ID, set it here.
-			if (array_key_exists($match[1], $found_ids)) {
-				$new_m_media = $found_ids[$match[1]]["new_id"];
-				$found = true;
-			}
-			else {
-				// If not, get a new ID
-				// Check if the own ID is already assigned
-				$exist = false;
-				foreach($found_ids as $key => $id) {
-					if ($id["new_id"] == $match[1]) {
-						$exist = true;
-						break;
-					}
-				}
-				// If not, keep the old ID. If assigned, generate a new one						
-				if ($exist) $new_m_media = GetNewXref("OBJE");
-				else $new_m_media = $match[1];
-				$found_ids[$match[1]]["old_id"] = $match[1];
-				$found_ids[$match[1]]["new_id"] = $new_m_media;
-			}
-		}
-		// Change the ID of the mediarecord and get some field values
-		$indirec = preg_replace("/@".$old_m_media."@/", "@".$new_m_media."@", $indirec);
-		$title = GetGedcomValue("TITL", 2, $indirec);
-		if (strlen(trim($title)) == 0) $title = GetGedcomValue("TITL", 1, $indirec);
-		$file = GetGedcomValue("FILE", 1, $indirec);
-		// If the file is a link, normalize it
-		if (stristr($file, "://")) $file = preg_replace(array("/http:\/\//", "/\//"), array("","_"),$file);
-		// Eliminate a heading dot from the filename
-		$file = RelativePathFile(MediaFS::CheckMediaDepth($file));
-		// Get the extension
-		$et = preg_match("/(\.\w+)$/", $file, $ematch);
-		$ext = "";
-		if ($et>0) $ext = substr(trim($ematch[1]),1);
-		if ($found) {
-			// It's the actual values for an inserted stub record. We only update the fields with the true values
-			$sql = "UPDATE ".TBLPREFIX."media SET m_ext = '".DbLayer::EscapeQuery($ext)."', m_titl = '".DbLayer::EscapeQuery($title)."', m_file = '".DbLayer::EscapeQuery($file)."', m_gedrec = '".DbLayer::EscapeQuery($indirec)."' WHERE m_media = '".$new_m_media."' AND m_gedfile='".$GEDCOMS[$FILE]["id"]."'";
-			$res = NewQuery($sql);
-		}
-		else {
-			// It's completely new, we insert a new record
-			$sql = "INSERT INTO ".TBLPREFIX."media (m_id, m_media, m_ext, m_titl, m_file, m_gedfile, m_gedrec)";
-			$sql .= " VALUES('0', '".DbLayer::EscapeQuery($new_m_media)."', '".DbLayer::EscapeQuery($ext)."', '".DbLayer::EscapeQuery($title)."', '".DbLayer::EscapeQuery($file)."', '".DbLayer::EscapeQuery($GEDCOMS[$FILE]["id"])."', '".DbLayer::EscapeQuery($indirec)."')";
-			$res = NewQuery($sql);
-		}
-		$found = false;
-		return $indirec;
-	}
-	
-	// Here we handle all records BUT level 0 media records.
-	//-- check to see if there are any media records
-	//-- if there aren't any media records then don't look for them just return
-	$pt = preg_match("/\d OBJE/", $indirec, $match);
-	if ($pt==0) return $indirec;
-	//-- go through all of the lines and replace any local
-	//--- OBJE to referenced OBJEs
-	$newrec = "";
-	$lines = preg_split("/[\r\n]+/", trim($indirec));
-	$ct_lines = count($lines);
-	$inobj = false;
-	$processed = false;
-	$objlevel = 0;
-	$objrec = "";
-	$count = 1;
-	foreach($lines as $key => $line) {
-		if (!empty($line)) {
-			// NOTE: Match lines that resemble n OBJE @0000@
-			// NOTE: Renumber the old ID to a new ID and save the old ID
-			// NOTE: in case there are more references to it
-			if (preg_match("/^[1-9]\sOBJE\s(.*)$/", $line, $match) != 0) {
-				// NOTE: Check if objlevel greater is than 0, if so then store the current object record
-				if ($objlevel > 0) {
-					$title = GetGedcomValue("TITL", $objlevel+1, $objrec);
-					if (strlen(trim($title)) == 0) $title = GetGedcomValue("TITL", $objlevel+2, $objrec);
-					$file = GetGedcomValue("FILE", $objlevel+1, $objrec);
-					// If the file is a link, normalize it
-					if (stristr($file, "://")) $file = preg_replace(array("/http:\/\//", "/\//"), array("","_"),$file);
-					$file = RelativePathFile(MediaFS::CheckMediaDepth($file));
-					
-					// Add a check for existing file here
-					$em = CheckDoubleMedia($file, $title, $GEDCOMS[$FILE]["id"]);
-					if (!$em) $m_media = GetNewXref("OBJE");
-					else $m_media = $em;
-					
-					// Get the extension
-					$et = preg_match("/(\.\w+)$/", $file, $ematch);
-					$ext = "";
-					if ($et>0) $ext = substr(trim($ematch[1]),1);
-					// NOTE: Make sure 1 OBJE @M1@ is treated correctly
-					if (preg_match("/\d+\s\w+\s@(.*)@/", $objrec) > 0) $objrec = preg_replace("/@(.*)@/", "@".$m_media."@", $objrec);
-					else $objrec = preg_replace("/ OBJE/", " @".$m_media."@ OBJE", $objrec);
-					$objrec = preg_replace("/^(\d+) /me", "($1-$objlevel).' '", $objrec);
-					
-					// Add the PRIM and THUM tags to the mapping
-					$r = GetSubRecord($objlevel, $line, $indirec);
-					$rlevel = $objlevel+1;
-					$prim = trim(GetSubRecord($rlevel, $rlevel." _PRIM", $r));
-					$thum = trim(GetSubRecord($rlevel, $rlevel." _THUM", $r));
-					$add = "\r\n";
-					if (!empty($prim)) {
-						$rec = $objlevel." ".$prim."\r\n";
-						$add .= $rlevel." ".$prim."\r\n";
-						$objrec = preg_replace("/$rec/", "", $objrec);
-					}
-					if (!empty($thum)) {
-						$rec = $objlevel." ".$thum."\r\n";
-						$add .= $rlevel." ".$thum."\r\n";
-						$objrec = preg_replace("/$rec/", "", $objrec);
-					}
-					if (!$em) {
-						$sql = "INSERT INTO ".TBLPREFIX."media (m_id, m_media, m_ext, m_titl, m_file, m_gedfile, m_gedrec)";
-						$sql .= " VALUES('0', '".DbLayer::EscapeQuery($m_media)."', '".DbLayer::EscapeQuery($ext)."', '".DbLayer::EscapeQuery($title)."', '".DbLayer::EscapeQuery($file)."', '".DbLayer::EscapeQuery($GEDCOMS[$FILE]["id"])."', '".DbLayer::EscapeQuery($objrec)."')";
-						$res = NewQuery($sql);
-					}
-					$sql = "INSERT INTO ".TBLPREFIX."media_mapping (mm_id, mm_media, mm_gid, mm_order, mm_gedfile, mm_gedrec, mm_type)";
-					$sql .= " VALUES ('0', '".DbLayer::EscapeQuery($m_media)."', '".DbLayer::EscapeQuery($gid)."', '".DbLayer::EscapeQuery($count)."', '".DbLayer::EscapeQuery($GEDCOMS[$FILE]['id'])."', '".addslashes(''.$objlevel.' OBJE @'.$m_media.'@'.$add)."', '".$rectype."')";
-					$res = NewQuery($sql);
-					$media_count++;
-					$count++;
-					// NOTE: Add the new media object to the record
-					$newrec .= $objlevel." OBJE @".$m_media."@".$add."\r\n";
-					
-					// NOTE: Set the details for the next media record
-					$objlevel = $match[0]{0};
-					$inobj = true;
-					$objrec = $line."\r\n";
-				}
-				else {
-					// NOTE: Set object level
-					$objlevel = $match[0]{0};
-					$inobj = true;
-					$objrec = trim($line)."\r\n";
-				}
-				// NOTE: Look for the @M00@ reference
-				if (stristr($match[1], "@") !== false) {
-					// NOTE: Retrieve the old media ID
-					$old_mm_media = preg_replace("/@/", "", $match[1]);
-					// NOTE: Check if the id already exists and there is a value behind OBJE (n OBJE @M001@)
-					if (!array_key_exists($old_mm_media, $found_ids) && !empty($match[1])) {
-						//-- use the old id if we are updating from an online edit
-						if ($update) {
-							$new_mm_media = $old_mm_media;
-						}
-						else {
-							// NOTE: Get a new media ID
-							$new_mm_media = GetNewXref("OBJE");
-						}
-						// NOTE: Put both IDs in the found_ids array in case we later find the 0-level
-						// NOTE: The 0-level ID will have to be changed also
-						$found_ids[$old_mm_media]["old_id"] = $old_mm_media;
-						$found_ids[$old_mm_media]["new_id"] = $new_mm_media;
-						
-						if (!$update) {
-							// NOTE: We found a media reference but no media item yet, we need to create an empty
-							// NOTE: media object, so we do not have orhpaned media mapping links
-							$sql = "INSERT INTO ".TBLPREFIX."media (m_id, m_media, m_ext, m_titl, m_file, m_gedfile, m_gedrec)";
-							$sql .= " VALUES('0', '".DbLayer::EscapeQuery($new_mm_media)."', '', '', '', '".DbLayer::EscapeQuery($GEDCOMS[$FILE]["id"])."', '0 @".DbLayer::EscapeQuery($new_mm_media)."@ OBJE\r\n')";
-							$res = NewQuery($sql);
-							
-							// NOTE: Add the mapping to the media reference
-							// The above code "forgets" all subrecords like THUM and PRIM. We therefore get the whole subrecord from the indirec.
-							$gedrec = GetSubRecord($objlevel, $line, $indirec);
-							$gedrec = preg_replace("/@(.*)@/", "@$new_mm_media@", $gedrec);
-							$line = preg_replace("/@(.*)@/", "@$new_mm_media@", $line);
-							$sql = "INSERT INTO ".TBLPREFIX."media_mapping (mm_id, mm_media, mm_gid, mm_order, mm_gedfile, mm_gedrec, mm_type) ";
-							$sql .= "VALUES ('0', '".DbLayer::EscapeQuery($new_mm_media)."', '".DbLayer::EscapeQuery($gid)."', '".DbLayer::EscapeQuery($count)."', '".DbLayer::EscapeQuery($GEDCOMS[$FILE]['id'])."', '".$gedrec."', '".$rectype."')";
-							$res = NewQuery($sql);
-						}
-						else {
-							// NOTE: This is an online update. Let's see if we already have a media mapping for this item
-							$sql = "SELECT mm_media FROM ".TBLPREFIX."media_mapping WHERE mm_media = '".$new_mm_media."' AND mm_gedfile = '".$GEDCOMS[$FILE]["id"]."'";
-							$res = NewQuery($sql);
-							$row = $res->FetchAssoc();
-							if (count($row) == 0) {
-								$gedrec = GetSubRecord($objlevel, $line, $indirec); // Added
-								$gedrec = preg_replace("/@(.*)@/", "@$new_mm_media@", $gedrec); // Added
-								// NOTE: Add the mapping to the media reference
-								$line = preg_replace("/@(.*)@/", "@$new_mm_media@", $line);
-								$sql = "INSERT INTO ".TBLPREFIX."media_mapping (mm_id, mm_media, mm_gid, mm_order, mm_gedfile, mm_gedrec, mm_type) ";
-								$sql .= "VALUES ('0', '".DbLayer::EscapeQuery($new_mm_media)."', '".DbLayer::EscapeQuery($gid)."', '".DbLayer::EscapeQuery($count)."', '".DbLayer::EscapeQuery($GEDCOMS[$FILE]['id'])."', '".$gedrec."', '".$rectype."')";
-								$res = NewQuery($sql);
-							}
-						}
-					}
-					else if (array_key_exists($old_mm_media, $found_ids) && !empty($match[1])) {
-
-						$new_mm_media = $found_ids[$old_mm_media]["new_id"];
-						if (!$update) {
-							$gedrec = GetSubRecord($objlevel, $line, $indirec);
-							$gedrec = preg_replace("/@(.*)@/", "@$new_mm_media@", $gedrec);
-							$line = preg_replace("/@(.*)@/", "@$new_mm_media@", $line);
-							$sql = "INSERT INTO ".TBLPREFIX."media_mapping (mm_id, mm_media, mm_gid, mm_order, mm_gedfile, mm_gedrec, mm_type) ";
-							$sql .= "VALUES ('0', '".DbLayer::EscapeQuery($new_mm_media)."', '".DbLayer::EscapeQuery($gid)."', '".DbLayer::EscapeQuery($count)."', '".DbLayer::EscapeQuery($GEDCOMS[$FILE]['id'])."', '".$gedrec."', '".$rectype."')";
-							$res = NewQuery($sql);
-						}
-						else {
-							// NOTE: This is an online update. Let's see if we already have a media mapping for this item
-							$sql = "SELECT mm_media FROM ".TBLPREFIX."media_mapping WHERE mm_media = '".$new_mm_media."' AND mm_gedfile = '".$GEDCOMS[$FILE]["id"]."'";
-							$res = NewQuery($sql);
-							$row = $res->FetchAssoc();
-							if (count($row) == 0) {
-								// NOTE: Add the mapping to the media reference
-								$line = preg_replace("/@(.+)@/", "@$new_mm_media@", $line);
-								$sql = "INSERT INTO ".TBLPREFIX."media_mapping (mm_id, mm_media, mm_gid, mm_order, mm_gedfile, mm_gedrec, mm_type) ";
-								$sql .= "VALUES ('0', '".DbLayer::EscapeQuery($new_mm_media)."', '".DbLayer::EscapeQuery($gid)."', '".DbLayer::EscapeQuery($count)."', '".DbLayer::EscapeQuery($GEDCOMS[$FILE]['id'])."', '".$line."', '".$rectype."')";
-								$res = NewQuery($sql);
-							}
-						}
-					}
-					$media_count++;
-					$count++;
-					$objlevel = 0;
-					$objrec = "";
-					$inobj = false;
-				}
-			}
-			// NOTE: Match lines 0 @0000@ OBJE
-			else if (preg_match("/^[1-9]\sOBJE$/", $line, $match)) {
-				if (!empty($objrec)) {
-					$title = GetGedcomValue("TITL", $objlevel+1, $objrec);
-					if (strlen(trim($title)) == 0) $title = GetGedcomValue("TITL", $objlevel+2, $objrec);
-					$file = GetGedcomValue("FILE", $objlevel+1, $objrec);
-					// If the file is a link, normalize it
-					if (stristr($file, "://")) $file = preg_replace(array("/http:\/\//", "/\//"), array("","_"),$file);
-					$file = RelativePathFile(MediaFS::CheckMediaDepth($file));
-					
-					// Add a check for existing file here
-					$em = CheckDoubleMedia($file, $title, $GEDCOMS[$FILE]["id"]);
-					if (!$em) $m_media = GetNewXref("OBJE");
-					else $m_media = $em;
-
-					// Get the extension
-					$et = preg_match("/(\.\w+)$/", $file, $ematch);
-					$ext = "";
-					if ($et>0) $ext = substr(trim($ematch[1]),1);
-					
-					// Add the PRIM and THUM tags to the mapping
-					$prim = trim(GetSubRecord($objlevel+1, " _PRIM", $objrec));						
-					$thum = trim(GetSubRecord($objlevel+1, " _THUM", $objrec));						
-					$add = "\r\n";
-					$rlevel = $objlevel+1;
-					if (!empty($prim)) {
-						$rec = $rlevel." ".$prim."\r\n";
-						$add .= $rec;
-						$objrec = preg_replace("/$rec/", "", $objrec);
-					}
-					if (!empty($thum)) {
-						$rec = $rlevel." ".$thum."\r\n";
-						$add .= $rec;
-						$objrec = preg_replace("/$rec/", "", $objrec);
-					}
-					
-					$objrec = preg_replace("/ OBJE/", " @".$m_media."@ OBJE", $objrec);
-					$objrec = preg_replace("/^(\d+) /me", "($1-$objlevel).' '", $objrec);
-					if (!$em) {
-						$sql = "INSERT INTO ".TBLPREFIX."media (m_id, m_media, m_ext, m_titl, m_file, m_gedfile, m_gedrec)";
-						$sql .= " VALUES('0', '".DbLayer::EscapeQuery($m_media)."', '".DbLayer::EscapeQuery($ext)."', '".DbLayer::EscapeQuery($title)."', '".DbLayer::EscapeQuery($file)."', '".DbLayer::EscapeQuery($GEDCOMS[$FILE]["id"])."', '".DbLayer::EscapeQuery($objrec)."')";
-						$res = NewQuery($sql);
-					}
-
-					
-					$sql = "INSERT INTO ".TBLPREFIX."media_mapping (mm_id, mm_media, mm_gid, mm_order, mm_gedfile, mm_gedrec, mm_type)";
-					$sql .= " VALUES ('0', '".DbLayer::EscapeQuery($m_media)."', '".DbLayer::EscapeQuery($gid)."', '".DbLayer::EscapeQuery($count)."', '".DbLayer::EscapeQuery($GEDCOMS[$FILE]['id'])."', '".addslashes(''.$objlevel.' OBJE @'.$m_media.'@'.$add)."', '".$rectype."')";
-					$res = NewQuery($sql);
-					$media_count++;
-					$count++;
-					// NOTE: Add the new media object to the record
-					$newrec .= $objlevel." OBJE @".$m_media."@".$add."\r\n";
-				}
-				// NOTE: Set the details for the next media record
-				$objlevel = $match[0]{0};
-				$inobj = true;
-				$objrec = $line."\r\n";
-			}
-			else {
-				$ct = preg_match("/(\d+)\s(\w+)(.*)/", $line, $match);
-				if ($ct > 0) {
-					$level = $match[1];
-					$fact = $match[2];
-					$desc = trim($match[3]);
-					if ($inobj && ($level<=$objlevel || $key == $ct_lines-1)) {
-						if ($key == $ct_lines-1 && $level>$objlevel) {
-							$objrec .= $line."\r\n";
-						}
-						$title = GetGedcomValue("TITL", $objlevel+1, $objrec);
-						if (strlen(trim($title)) == 0) $title = GetGedcomValue("TITL", $objlevel+2, $objrec);
-						$file = GetGedcomValue("FILE", $objlevel+1, $objrec);
-						// If the file is a link, normalize it
-						if (stristr($file, "://")) $file = preg_replace(array("/http:\/\//", "/\//"), array("","_"),$file);
-						$file = RelativePathFile(MediaFS::CheckMediaDepth($file));
-						// Get the extension
-						$et = preg_match("/(\.\w+)$/", $file, $ematch);
-						$ext = "";
-						if ($et>0) $ext = substr(trim($ematch[1]),1);
-						if ($objrec{0} != 0) {
-							
-							// Add a check for existing file here
-							$em = CheckDoubleMedia($file, $title, $GEDCOMS[$FILE]["id"]);
-							if (!$em) $m_media = GetNewXref("OBJE");
-							else $m_media = $em;
-							
-							if (preg_match("/^\d+\s\w+\s@(.*)@/", $objrec) > 0) {
-								$objrec = preg_replace("/@(.*)@/", "@".$m_media."@", $objrec);
-							}
-							else $objrec = preg_replace("/ OBJE/", " @".$m_media."@ OBJE", $objrec);
-							$objrec = preg_replace("/^(\d+) /me", "($1-$objlevel).' '", $objrec);
-							
-							// Add the PRIM and THUM tags to the mapping
-							$prim = trim(GetSubRecord($objlevel, " _PRIM", $objrec));
-							$thum = trim(GetSubRecord($objlevel, " _THUM", $objrec));
-							$add = "\r\n";
-							$rlevel = $objlevel+1;
-							if (!empty($prim)) {
-								$rec = $objlevel." ".$prim."\r\n";
-								$add .= $rlevel." ".$prim."\r\n";
-								$objrec = preg_replace("/$rec/", "", $objrec);
-							}
-							if (!empty($thum)) {
-								$rec = $objlevel." ".$thum."\r\n";
-								$add .= $rlevel." ".$thum."\r\n";
-								$objrec = preg_replace("/$rec/", "", $objrec);
-							}
-
-							if (!$em) {
-								$sql = "INSERT INTO ".TBLPREFIX."media (m_id, m_media, m_ext, m_titl, m_file, m_gedfile, m_gedrec)";
-								$sql .= " VALUES('0', '".DbLayer::EscapeQuery($m_media)."', '".DbLayer::EscapeQuery($ext)."', '".DbLayer::EscapeQuery($title)."', '".DbLayer::EscapeQuery($file)."', '".DbLayer::EscapeQuery($GEDCOMS[$FILE]["id"])."', '".DbLayer::EscapeQuery($objrec)."')";
-								$res = NewQuery($sql);
-							}
-							$sql = "INSERT INTO ".TBLPREFIX."media_mapping (mm_id, mm_media, mm_gid, mm_order, mm_gedfile, mm_gedrec, mm_type)";
-							$sql .= " VALUES ('0', '".DbLayer::EscapeQuery($m_media)."', '".DbLayer::EscapeQuery($gid)."', '".DbLayer::EscapeQuery($count)."', '".DbLayer::EscapeQuery($GEDCOMS[$FILE]['id'])."', '".addslashes(''.$objlevel.' OBJE @'.$m_media.'@'.$add)."', '".$rectype."')";
-							$res = NewQuery($sql);
-						}
-						else {
-							$oldid = preg_match("/0\s@(.*)@\sOBJE/", $objrec, $newmatch);
-							$m_media = $newmatch[1];
-							$sql = "UPDATE ".TBLPREFIX."media SET m_ext = '".DbLayer::EscapeQuery($ext)."', m_titl = '".DbLayer::EscapeQuery($title)."', m_file = '".DbLayer::EscapeQuery($file)."', m_gedrec = '".DbLayer::EscapeQuery($objrec)."' WHERE m_media = '".$m_media."'";
-							$res = NewQuery($sql);
-						}
-						$media_count++;
-						$count++;
-						$objrec = "";
-						if ($key == $ct_lines-1 && $level>$objlevel) {
-							$line = $objlevel." OBJE @".$m_media."@".$add;
-						}
-						else {
-							$line = $objlevel." OBJE @".$m_media."@\r\n".$line;
-						}
-						$inobj = false;
-						$objlevel = 0;
-					}
-					else {
-						if ($inobj) $objrec .= $line."\r\n";
-					}
-					if ($fact=="OBJE") {
-						$inobj = true;
-						$objlevel = $level;
-						$objrec = "";
-					}
-				}
-			}
-			if (!$inobj && !empty($line)) {
-				$newrec .= $line."\r\n";
-			}
-		}
-	}
-	return $newrec;
 }
 
 /*
@@ -1446,51 +588,6 @@ function CheckDoubleMedia($file, $title, $gedid) {
 		$row = $res->FetchAssoc();
 		return $row["m_media"];
 	}
-}
-
-
-/**
- * delete a gedcom from the database
- *
- * deletes all of the imported data about a gedcom from the database
- * @param string $FILE	the gedcom to remove from the database
- */
-function EmptyDatabase($FILE) {
-	global $GEDCOMS;
-
-	$FILE = DbLayer::EscapeQuery($GEDCOMS[$FILE]["id"]);
-	$sql = "DELETE FROM ".TBLPREFIX."individuals WHERE i_file='$FILE'";
-	$res = NewQuery($sql);
-	$sql = "DELETE FROM ".TBLPREFIX."asso WHERE as_file='$FILE'";
-	$res = NewQuery($sql);
-	$sql = "DELETE FROM ".TBLPREFIX."families WHERE f_file='$FILE'";
-	$res = NewQuery($sql);
-	$sql = "DELETE FROM ".TBLPREFIX."sources WHERE s_file='$FILE'";
-	$res = NewQuery($sql);
-	$sql = "DELETE FROM ".TBLPREFIX."source_mapping WHERE sm_gedfile='$FILE'";
-	$res = NewQuery($sql);
-	$sql = "DELETE FROM ".TBLPREFIX."other WHERE o_file='$FILE'";
-	$res = NewQuery($sql);
-	$sql = "DELETE FROM ".TBLPREFIX."other_mapping WHERE om_gedfile='$FILE'";
-	$res = NewQuery($sql);
-	$sql = "DELETE FROM ".TBLPREFIX."places WHERE p_file='$FILE'";
-	$res = NewQuery($sql);
-	$sql = "DELETE FROM ".TBLPREFIX."placelinks WHERE pl_file='$FILE'";
-	$res = NewQuery($sql);
-	$sql = "DELETE FROM ".TBLPREFIX."names WHERE n_file='$FILE'";
-	$res = NewQuery($sql);
-	$sql = "DELETE FROM ".TBLPREFIX."dates WHERE d_file='$FILE'";
-	$res = NewQuery($sql);
-	$sql = "DELETE FROM ".TBLPREFIX."media WHERE m_gedfile='$FILE'";
-	$res = NewQuery($sql);
-	$sql = "DELETE FROM ".TBLPREFIX."media_mapping WHERE mm_gedfile='$FILE'";
-	$res = NewQuery($sql);
-	$sql = "DELETE FROM ".TBLPREFIX."individual_family WHERE if_file='$FILE'";
-	$res = NewQuery($sql);
-	$sql = "DELETE FROM ".TBLPREFIX."soundex WHERE s_file='$FILE'";
-	$res = NewQuery($sql);
-	// Flush the caches
-	GedcomConfig::ResetCaches(get_gedcom_from_id($FILE));
 }
 
 /**
@@ -1696,7 +793,7 @@ function GetRepoAddTitleList() {
  * @return 	array	Array of all individuals of the active GEDCOM
  */
 function GetIndiList($allgeds="", $selection = "", $renew=true) {
-	global $indilist, $GEDCOMID, $COMBIKEY, $GEDCOMS;
+	global $indilist, $GEDCOMID, $COMBIKEY;
 	global $INDILIST_RETRIEVED;
 	
 	if ($renew) {
@@ -1715,7 +812,7 @@ function GetIndiList($allgeds="", $selection = "", $renew=true) {
 		$first = true;
 		foreach ($allgeds as $key => $ged) {
 			if (!$first) $sql .= " OR ";
-			$sql .= "i_file='".$GEDCOMS[$gedcom]["id"]."'";
+			$sql .= "i_file='".$ged."'";
 		}
 		$sql .= ")";
 	}
@@ -1745,14 +842,13 @@ function GetIndiList($allgeds="", $selection = "", $renew=true) {
 
 //-- get the assolist from the datastore
 function GetAssoList($type = "all", $id="") {
-	global $assolist, $GEDCOM, $GEDCOMS, $GEDCOMID;
+	global $assolist, $GEDCOMID;
 	global $ASSOLIST_RETRIEVED, $COMBIKEY, $ftminwlen, $ftmaxwlen;
 
 	if ($ASSOLIST_RETRIEVED) return $assolist;
 	$type = str2lower($type);
 	$assolist = array();
 	$resnvalues = array(""=>"", "n"=>"none", "l"=>"locked", "p"=>"privacy", "c"=>"confidential");
-	$oldged = $GEDCOM;
 	$oldgedid = $GEDCOMID;
 	if (($type == "all") || ($type == "fam")) {
 		$sql = "SELECT f_key, f_id, f_husb, f_wife, f_file, f_gedcom, as_pid, as_fact, as_rela, as_resn FROM ".TBLPREFIX."asso, ".TBLPREFIX."families WHERE f_key=as_of AND as_type='F'"; 
@@ -1770,7 +866,6 @@ function GetAssoList($type = "all", $id="") {
 			$asso["resn"] = $resnvalues[$row["as_resn"]];
 			$asso["role"] = $row["as_rela"];
 			// Get the family names
-			$GEDCOM = get_gedcom_from_id($row["f_file"]);
 			$GEDCOMID = $row["f_file"];
 			
 			$hname = GetSortableName(SplitKey($row["f_husb"], "id"), "", "", true);
@@ -1812,7 +907,6 @@ function GetAssoList($type = "all", $id="") {
 		$res->FreeResult();
 	}
 	
-	$GEDCOM = $oldged;
 	$GEDCOMID = $oldgedid;
 	$ASSOLIST_RETRIEVED = true;
 	return $assolist;
@@ -1820,7 +914,7 @@ function GetAssoList($type = "all", $id="") {
 
 //-- get the famlist from the datastore
 function GetFamList($allgeds="no", $selection="", $renew=true, $trans=array()) {
-	global $famlist, $GEDCOMID, $indilist, $GEDCOM;
+	global $famlist, $GEDCOMID, $indilist;
 	global $FAMLIST_RETRIEVED, $COMBIKEY;
 
 	if ($renew) {
@@ -1864,12 +958,10 @@ function GetFamList($allgeds="no", $selection="", $renew=true, $trans=array()) {
 			$selection = substr($selection, 0, strlen($selection)-2);
 			GetIndilist($allgeds, $selection, false);
 		}
-		$oldged = $GEDCOM;
 		$oldgedid = $GEDCOMID;
 		foreach ($famlist as $key => $fam) {
 			if (!isset($famlist[$key]["name"])) {
 				if ($COMBIKEY) {
-					$GEDCOM = SplitKey($key, "ged");
 					$GEDCOMID = SplitKey($key, "gedid");
 				}
 				if (isset($trans[$key])) {
@@ -1898,7 +990,6 @@ function GetFamList($allgeds="no", $selection="", $renew=true, $trans=array()) {
 				$famlist[$key]["name"] = $name;
 			}
 		}
-		$GEDCOM = $oldged;
 		$GEDCOMID = $oldgedid;
 	}
 	if ($allgeds == "no" && $selection = "") $FAMLIST_RETRIEVED = true;
@@ -1936,7 +1027,7 @@ function GetOtherList() {
  * @return int
  */
 function GetPlaceParentId($parent, $level) {
-	global $GEDCOM, $GEDCOMS, $GEDCOMID;
+	global $GEDCOMID;
 
 	$parent_id=0;
 	for($i=0; $i<$level; $i++) {
@@ -1963,7 +1054,7 @@ function GetPlaceParentId($parent, $level) {
  */
 function GetPlaceList() {
 	global $numfound, $j, $level, $parent, $found;
-	global $GEDCOM, $placelist, $positions, $GEDCOMS, $GEDCOMID;
+	global $placelist, $positions, $GEDCOMID;
 
 	// --- find all of the place in the file
 	if ($level==0) $sql = "SELECT p_place FROM ".TBLPREFIX."places WHERE p_level=0 AND p_file='".$GEDCOMID."' ORDER BY p_place";
@@ -1986,7 +1077,7 @@ function GetPlaceList() {
  * @return array
  */
 function GetPlacePositions($parent, $level) {
-	global $positions, $GEDCOM, $GEDCOMS, $GEDCOMID;
+	global $positions, $GEDCOMID;
 
 	$p_id = GetPlaceParentId($parent, $level);
 	$sql = "SELECT DISTINCT pl_gid FROM ".TBLPREFIX."placelinks WHERE pl_p_id=$p_id AND pl_file='".$GEDCOMID."'";
@@ -1999,7 +1090,7 @@ function GetPlacePositions($parent, $level) {
 
 //-- find all of the places
 function FindPlaceList($place) {
-	global $GEDCOM, $placelist, $indilist, $famlist, $sourcelist, $otherlist, $GEDCOMS, $GEDCOMID;
+	global $placelist, $indilist, $famlist, $sourcelist, $otherlist, $GEDCOMID;
 	
 	$sql = "SELECT p_id, p_place, p_parent_id  FROM ".TBLPREFIX."places WHERE p_file='".$GEDCOMID."' ORDER BY p_parent_id, p_id";
 	$res = NewQuery($sql);
@@ -2070,7 +1161,7 @@ function GetIndiAlpha($allgeds="no") {
 
 //-- get the first character in the list
 function GetFamAlpha($allgeds="no") {
-	global $CHARACTER_SET, $GEDCOM, $LANGUAGE, $famalpha, $GEDCOMS, $GEDCOMID;
+	global $CHARACTER_SET, $LANGUAGE, $famalpha, $GEDCOMID;
 
 	$famalpha = array();
 
@@ -2118,8 +1209,8 @@ function GetFamAlpha($allgeds="no") {
  * @return array	$indilist array
  */
 function GetAlphaIndis($letter, $allgeds="no") {
-	global $GEDCOM, $LANGUAGE, $indilist, $surname, $SHOW_MARRIED_NAMES;
-	global $GEDCOMS, $GEDCOMID, $COMBIKEY;
+	global $LANGUAGE, $indilist, $surname, $SHOW_MARRIED_NAMES;
+	global $GEDCOMID, $COMBIKEY;
 
 	$tindilist = array();
 	$search_letter = "";
@@ -2238,7 +1329,7 @@ function GetSurnameIndis($surname, $allgeds="no") {
 }
 
 function GetAlphaFamSurnames($letter, $allgeds="no") {
-	global $GEDCOMID, $GEDCOM, $famlist, $indilist, $gm_lang, $LANGUAGE, $SHOW_MARRIED_NAMES, $GEDCOMS, $COMBIKEY;
+	global $GEDCOMID, $famlist, $indilist, $gm_lang, $LANGUAGE, $SHOW_MARRIED_NAMES, $COMBIKEY;
 
 	$temp = $SHOW_MARRIED_NAMES;
 	$SHOW_MARRIED_NAMES = false;
@@ -2293,7 +1384,7 @@ function GetAlphaFamSurnames($letter, $allgeds="no") {
  * @see GetAlphaIndis()
  */
 function GetAlphaFams($letter, $allgeds="no") {
-	global $GEDCOMID, $GEDCOM, $famlist, $indilist, $gm_lang, $LANGUAGE, $SHOW_MARRIED_NAMES, $GEDCOMS, $COMBIKEY;
+	global $GEDCOMID, $famlist, $indilist, $gm_lang, $LANGUAGE, $SHOW_MARRIED_NAMES, $COMBIKEY;
 	
 	$search_letter = "";
 	
@@ -2355,7 +1446,7 @@ function GetAlphaFams($letter, $allgeds="no") {
  * @return array	$indilist array
  */
 function GetSurnameFams($surname, $allgeds="no") {
-	global $GEDCOMID, $GEDCOM, $famlist, $indilist, $gm_lang, $SHOW_MARRIED_NAMES, $GEDCOMS, $COMBIKEY;
+	global $GEDCOMID, $famlist, $indilist, $gm_lang, $SHOW_MARRIED_NAMES, $COMBIKEY;
 	
 	$trans = array();
 	$select = array();
@@ -2401,13 +1492,11 @@ function FindRinId($rin) {
 	return $rin;
 }
 
-function DeleteGedcom($ged) {
-	global $GEDCOMS;
+function DeleteGedcom($gedid) {
 
-	$gedid = $GEDCOMS[$ged]["id"];
-	$sql = "DELETE FROM ".TBLPREFIX."blocks WHERE b_username='".DbLayer::EscapeQuery($gedid)."'";
+	$sql = "DELETE FROM ".TBLPREFIX."blocks WHERE b_file='".DbLayer::EscapeQuery($gedid)."'";
 	$res = NewQuery($sql);
-	$sql = "DELETE FROM ".TBLPREFIX."changes WHERE ch_gedfile='".DbLayer::EscapeQuery($gedid)."'";
+	$sql = "DELETE FROM ".TBLPREFIX."changes WHERE ch_file='".DbLayer::EscapeQuery($gedid)."'";
 	$res = NewQuery($sql);
 	$sql = "DELETE FROM ".TBLPREFIX."dates WHERE d_file='".DbLayer::EscapeQuery($gedid)."'";
 	$res = NewQuery($sql);
@@ -2423,7 +1512,7 @@ function DeleteGedcom($ged) {
 	$res = NewQuery($sql);
 	$sql = "DELETE FROM ".TBLPREFIX."asso WHERE as_file='".DbLayer::EscapeQuery($gedid)."'";
 	$res = NewQuery($sql);
-	$sql = "DELETE FROM ".TBLPREFIX."log WHERE l_gedcom='".DbLayer::EscapeQuery($ged)."'";
+	$sql = "DELETE FROM ".TBLPREFIX."log WHERE l_file='".DbLayer::EscapeQuery($gedid)."'";
 	$res = NewQuery($sql);
 	$sql = "DELETE FROM ".TBLPREFIX."media WHERE m_gedfile='".DbLayer::EscapeQuery($gedid)."'";
 	$res = NewQuery($sql);
@@ -2431,7 +1520,7 @@ function DeleteGedcom($ged) {
 	$res = NewQuery($sql);
 	$sql = "DELETE FROM ".TBLPREFIX."names WHERE n_file='".DbLayer::EscapeQuery($gedid)."'";
 	$res = NewQuery($sql);
-	NewsController::DeleteUserNews($ged);
+	NewsController::DeleteUserNews($gedid);
 	$sql = "DELETE FROM ".TBLPREFIX."other WHERE o_file='".DbLayer::EscapeQuery($gedid)."'";
 	$res = NewQuery($sql);
 	$sql = "DELETE FROM ".TBLPREFIX."other_mapping WHERE om_gedfile='".DbLayer::EscapeQuery($gedid)."'";
@@ -2444,13 +1533,13 @@ function DeleteGedcom($ged) {
 	$res = NewQuery($sql);
 	$sql = "DELETE FROM ".TBLPREFIX."source_mapping WHERE sm_gedfile='".DbLayer::EscapeQuery($gedid)."'";
 	$res = NewQuery($sql);
-	$sql = "DELETE FROM ".TBLPREFIX."statscache WHERE gs_gedcom='".DbLayer::EscapeQuery($ged)."'";
+	$sql = "DELETE FROM ".TBLPREFIX."statscache WHERE gs_file='".DbLayer::EscapeQuery($gedid)."'";
 	$res = NewQuery($sql);
 	$sql = "DELETE FROM ".TBLPREFIX."counters WHERE c_id LIKE '%[".DbLayer::EscapeQuery($gedid)."]%'";
 	$res = NewQuery($sql);
 	$sql = "DELETE FROM ".TBLPREFIX."users_gedcoms WHERE ug_gedfile='".DbLayer::EscapeQuery($gedid)."'";
 	$res = NewQuery($sql);
-	$sql = "DELETE FROM ".TBLPREFIX."actions WHERE a_gedfile='".DbLayer::EscapeQuery($gedid)."'";
+	$sql = "DELETE FROM ".TBLPREFIX."actions WHERE a_file='".DbLayer::EscapeQuery($gedid)."'";
 	$res = NewQuery($sql);
 	$sql = "DELETE FROM ".TBLPREFIX."pdata WHERE pd_file='".DbLayer::EscapeQuery($gedid)."'";
 	$res = NewQuery($sql);
@@ -2461,7 +1550,7 @@ function DeleteGedcom($ged) {
 //-- return the current size of the given list
 //- list options are indilist famlist sourcelist and otherlist
 function GetListSize($list) {
-	global $GEDCOM, $GEDCOMS, $GEDCOMID;
+	global $GEDCOMID;
 
 	switch($list) {
 		case "indilist":
@@ -2507,17 +1596,17 @@ function GetListSize($list) {
  * @return 	boolean	true if changes were processed correctly, false if there was a problem
  */
 function AcceptChange($cid, $gedfile, $all=false) {
-	global $GEDCOM, $FILE, $GEDCOMS, $gm_username, $chcache;
+	global $GEDCOMID, $FILE, $gm_username, $chcache;
 	global $MEDIA_ID_PREFIX, $FAM_ID_PREFIX, $GEDCOM_ID_PREFIX, $SOURCE_ID_PREFIX, $REPO_ID_PREFIX, $NOTE_ID_PREFIX;
 	
 	$cidchanges = array();
-	if ($all) $sql = "SELECT ch_id, ch_cid, ch_gid, ch_gedfile, ch_old, ch_new, ch_type, ch_user, ch_time FROM ".TBLPREFIX."changes WHERE ch_gedfile = '".$gedfile."' ORDER BY ch_id ASC";
-	else $sql = "SELECT ch_id, ch_cid, ch_gid, ch_gedfile, ch_old, ch_new, ch_type, ch_user, ch_time FROM ".TBLPREFIX."changes WHERE ch_cid = '".$cid."' AND ch_gedfile = '".$gedfile."' ORDER BY ch_id ASC";
+	if ($all) $sql = "SELECT ch_id, ch_cid, ch_gid, ch_file, ch_old, ch_new, ch_type, ch_user, ch_time FROM ".TBLPREFIX."changes WHERE ch_file = '".$gedfile."' ORDER BY ch_id ASC";
+	else $sql = "SELECT ch_id, ch_cid, ch_gid, ch_file, ch_old, ch_new, ch_type, ch_user, ch_time FROM ".TBLPREFIX."changes WHERE ch_cid = '".$cid."' AND ch_file = '".$gedfile."' ORDER BY ch_id ASC";
 	$res = NewQuery($sql);
 	while ($row = $res->FetchAssoc()) {
 		$cidchanges[$row["ch_id"]]["cid"] = $row["ch_cid"];
 		$cidchanges[$row["ch_id"]]["gid"] = $row["ch_gid"];
-		$cidchanges[$row["ch_id"]]["gedfile"] = $row["ch_gedfile"];
+		$cidchanges[$row["ch_id"]]["file"] = $row["ch_file"];
 		$cidchanges[$row["ch_id"]]["old"] = $row["ch_old"];
 		$cidchanges[$row["ch_id"]]["new"] = $row["ch_new"];
 		$cidchanges[$row["ch_id"]]["type"] = $row["ch_type"];
@@ -2554,7 +1643,7 @@ function AcceptChange($cid, $gedfile, $all=false) {
 				$update_id = UpdateRecord(CheckGedcom(FindGedcomRecord($details["gid"]), true, $details["user"], $details["time"]), true);
 				
 				// NOTE: Delete change records related to this record
-				$sql = "select ch_cid from ".TBLPREFIX."changes where ch_gid = '".$details["gid"]."' AND ch_gedfile = '".$details["gedfile"]."'";
+				$sql = "select ch_cid from ".TBLPREFIX."changes where ch_gid = '".$details["gid"]."' AND ch_file = '".$details["file"]."'";
 				$res = NewQuery($sql);
 				while ($row = $res->FetchAssoc()) {
 					RejectChange($row["ch_cid"], $details["gedfile"]);
@@ -2572,9 +1661,9 @@ function AcceptChange($cid, $gedfile, $all=false) {
 //				print "Acceptchange: ".$gedrec;
 				$update_id = UpdateRecord(CheckGedcom($gedrec, true, $details["user"], $details["time"]));
 			}
-			WriteToLog("AcceptChange-> Accepted change for ".$details["gid"].". ->".$gm_username."<-", "I", "G", get_gedcom_from_id($gedfile));
+			WriteToLog("AcceptChange-> Accepted change for ".$details["gid"].". ->".$gm_username."<-", "I", "G", $gedfile);
 		}
-		GedcomConfig::ResetCaches($GEDCOM);
+		GedcomConfig::ResetCaches($GEDCOMID);
 		ResetChangeCaches();
 	}
 	// NOTE: record has been imported in DB, now remove the change
@@ -2598,15 +1687,15 @@ function AcceptChange($cid, $gedfile, $all=false) {
  * @return 	boolean	true if undo successful
  */
 function RejectChange($cid, $gedfile, $all=false) {
-	global $GEDCOMS, $GEDCOM, $manual_save, $gm_username;
+	global $manual_save, $gm_username;
 	
 	// NOTE: Get the details of the change id, to check if we need to unlock any records
-	$sql = "SELECT ch_type, ch_gid from ".TBLPREFIX."changes where ch_cid = '".$cid."' AND ch_gedfile = '".$gedfile."'";
+	$sql = "SELECT ch_type, ch_gid from ".TBLPREFIX."changes where ch_cid = '".$cid."' AND ch_file = '".$gedfile."'";
 	$res = NewQuery($sql);
 	while($row = $res->FetchAssoc()) {
 		$unlock_changes = array("raw_edit", "reorder_families", "reorder_children", "delete_source", "delete_indi", "delete_family", "delete_repo");
 		if (in_array($row["ch_type"], $unlock_changes)) {
-			$sql = "select ch_cid, ch_type from ".TBLPREFIX."changes where ch_gid = '".$row["ch_gid"]."' and ch_gedfile = '".$gedfile."' order by ch_cid ASC";
+			$sql = "select ch_cid, ch_type from ".TBLPREFIX."changes where ch_gid = '".$row["ch_gid"]."' and ch_file = '".$gedfile."' order by ch_cid ASC";
 			$res2 = NewQuery($sql);
 			while($row2 = $res2->FetchAssoc()) {
 				$sqlcid = "UPDATE ".TBLPREFIX."changes SET ch_delete = '0' WHERE ch_cid = '".$row2["ch_cid"]."'";
@@ -2616,17 +1705,19 @@ function RejectChange($cid, $gedfile, $all=false) {
 	}
 	
 	if ($all) {
-		$sql = "DELETE from ".TBLPREFIX."changes where ch_gedfile = '".$gedfile."'";
+		$sql = "DELETE from ".TBLPREFIX."changes where ch_file = '".$gedfile."'";
 		if ($res = NewQuery($sql)) {
-			WriteToLog("RejectChange-> Rejected all changes for $gedfile "." ->" . $gm_username ."<-", "I", "G", get_gedcom_from_id($gedfile));
+			WriteToLog("RejectChange-> Rejected all changes for $gedfile "." ->" . $gm_username ."<-", "I", "G", $gedfile);
+			ResetChangeCaches();
 			return true;
 		}
 		else return false;
 	}
 	else {
-		$sql = "DELETE from ".TBLPREFIX."changes where ch_cid = '".$cid."' AND ch_gedfile = '".$gedfile."'";
+		$sql = "DELETE from ".TBLPREFIX."changes where ch_cid = '".$cid."' AND ch_file = '".$gedfile."'";
 		if ($res = NewQuery($sql)) {
-			WriteToLog("RejectChange-> Rejected change $cid - $gedfile "." ->" . $gm_username ."<-", "I", "G", get_gedcom_from_id($gedfile));
+			WriteToLog("RejectChange-> Rejected change $cid - $gedfile "." ->" . $gm_username ."<-", "I", "G", $gedfile);
+			ResetChangeCaches();
 			return true;
 		}
 		else return false;
@@ -2638,9 +1729,8 @@ function RejectChange($cid, $gedfile, $all=false) {
  * @param string $indirec
  */
 function UpdateRecord($indirec, $delete=false) {
-	global $GEDCOM, $GEDCOMS, $FILE, $GEDCOMID, $PEDIGREE_ROOT_ID;
+	global $GEDCOMID, $PEDIGREE_ROOT_ID;
 
-	if (empty($FILE)) $FILE = $GEDCOM;
 	$tt = preg_match("/0 @(.+)@ (.+)/", $indirec, $match);
 	if ($tt>0) {
 		$gid = trim($match[1]);
@@ -2756,23 +1846,23 @@ function UpdateRecord($indirec, $delete=false) {
 	if ($delete) {
 		if ($type == "FAM" || $type = "INDI" || $type == "SOUR" || $type == "OBJE") {
 			// Delete favs
-			$sql = "DELETE FROM ".TBLPREFIX."favorites WHERE fv_gid='".$gid."' AND fv_type='".$type."' AND fv_file='".$GEDCOM."'";
+			$sql = "DELETE FROM ".TBLPREFIX."favorites WHERE fv_gid='".$gid."' AND fv_type='".$type."' AND fv_file='".$GEDCOMID."'";
 			$res = NewQuery($sql);
 		}
 		if ($type == "INDI") {
 			// Clear users
-			UserController::ClearUserGedcomIDs($gid, $GEDCOM);
+			UserController::ClearUserGedcomIDs($gid, $GEDCOMID);
 			if ($PEDIGREE_ROOT_ID == $gid) {
 				$PEDIGREE_ROOT_ID = "";
-				GedcomConfig::SetPedigreeRootId("", $GEDCOM);
+				GedcomConfig::SetPedigreeRootId("", $GEDCOMID);
 			}
 		}
 		// Clear privacy
-		PrivacyController::ClearPrivacyGedcomIDs($gid, $GEDCOM);
+		PrivacyController::ClearPrivacyGedcomIDs($gid, $GEDCOMID);
 	}
 
 	if (!$delete) {
-		ImportRecord($indirec, true);
+		ImportFunctions::ImportRecord($indirec, true);
 	}
 }
 
@@ -2876,8 +1966,8 @@ function GetFaqData($id='') {
  * @param		string	$ged		Used with Gedcom Log and Search Log
  *							Gedcom the Log record applies to
  */
-function WriteToLog($LogString, $type="I", $cat="S", $ged="", $chkconn = true) {
-	global $GEDCOM, $GEDCOMS, $gm_username;
+function WriteToLog($LogString, $type="I", $cat="S", $gedid="", $chkconn = true) {
+	global $gm_username;
 	global $DBCONN;
 	
 	$user = $gm_username;
@@ -2892,7 +1982,7 @@ function WriteToLog($LogString, $type="I", $cat="S", $ged="", $chkconn = true) {
 	if ($chkconn && (!is_object($DBCONN) || (isset($DBCONN->connected) && !$DBCONN->connected))) {
 		if ($cat == "S") {
 			$emlog = INDEX_DIRECTORY."emergency_syslog.txt";
-			$string = "INSERT INTO ".TBLPREFIX."log (l_type, l_category, l_timestamp, l_ip, l_user, l_text, l_gedcom, l_new) VALUES('".$type."','".$cat."','".time()."', '".$_SERVER['REMOTE_ADDR']."', '".addslashes($user)."', '".addslashes($LogString)."', '', '".$new."')\r\n";
+			$string = "INSERT INTO ".TBLPREFIX."log (l_type, l_category, l_timestamp, l_ip, l_user, l_text, l_file, l_new) VALUES('".$type."','".$cat."','".time()."', '".$_SERVER['REMOTE_ADDR']."', '".addslashes($user)."', '".addslashes($LogString)."', '', '".$new."')\r\n";
 			$fp = fopen($emlog, "ab");
 			flock($fp, 2);
 			fwrite($fp, $string);
@@ -2912,20 +2002,20 @@ function WriteToLog($LogString, $type="I", $cat="S", $ged="", $chkconn = true) {
 	}
 	
 	if ($cat == "S") {
-		$sql = "INSERT INTO ".TBLPREFIX."log (l_type, l_category, l_timestamp, l_ip, l_user, l_text, l_gedcom, l_new) VALUES('".$type."','".$cat."','".time()."', '".$_SERVER['REMOTE_ADDR']."', '".addslashes($user)."', '".addslashes($LogString)."', '', '".$new."')";
+		$sql = "INSERT INTO ".TBLPREFIX."log (l_type, l_category, l_timestamp, l_ip, l_user, l_text, l_file, l_new) VALUES('".$type."','".$cat."','".time()."', '".$_SERVER['REMOTE_ADDR']."', '".addslashes($user)."', '".addslashes($LogString)."', '', '".$new."')";
 		$res = NewQuery($sql);
 		return;
 	}
 	if ($cat == "G") {
-		$sql = "INSERT INTO ".TBLPREFIX."log (l_type, l_category, l_timestamp, l_ip, l_user, l_text, l_gedcom, l_new) VALUES('".$type."','".$cat."','".time()."', '".$_SERVER['REMOTE_ADDR']."', '".addslashes($user)."', '".addslashes($LogString)."', '".$ged."', '".$new."')";
+		$sql = "INSERT INTO ".TBLPREFIX."log (l_type, l_category, l_timestamp, l_ip, l_user, l_text, l_file, l_new) VALUES('".$type."','".$cat."','".time()."', '".$_SERVER['REMOTE_ADDR']."', '".addslashes($user)."', '".addslashes($LogString)."', '".$gedid."', '".$new."')";
 		$res = NewQuery($sql);
 		return;
 	}
 	if ($cat == "F") {
-		if (!isset($ged)) return;
-		if (count($ged) == 0) return;
-		foreach($ged as $indexval => $value) {
-			$sql = "INSERT INTO ".TBLPREFIX."log (l_type, l_category, l_timestamp, l_ip, l_user, l_text, l_gedcom, l_new) VALUES('".$type."','".$cat."','".time()."', '".$_SERVER['REMOTE_ADDR']."', '".addslashes($user)."', '".addslashes($LogString)."', '".$value."', '".$new."')";
+		if (!isset($gedid)) return;
+		if (count($gedid) == 0) return;
+		foreach($gedid as $indexval => $value) {
+			$sql = "INSERT INTO ".TBLPREFIX."log (l_type, l_category, l_timestamp, l_ip, l_user, l_text, l_file, l_new) VALUES('".$type."','".$cat."','".time()."', '".$_SERVER['REMOTE_ADDR']."', '".addslashes($user)."', '".addslashes($LogString)."', '".$value."', '".$new."')";
 			$res = NewQuery($sql);
 		}
 		return;
@@ -2950,18 +2040,18 @@ function WriteToLog($LogString, $type="I", $cat="S", $ged="", $chkconn = true) {
  *								I = Information
  *								W = Warning
  *								E = Error
- * @param		string	$ged	Used with Gedcom Log and Search Log
- *								Gedcom the Log record applies to
+ * @param		string	$gedid	Used with Gedcom Log and Search Log
+ *								Gedcomid the Log record applies to
  * @param		boolean $last	If true, return oldest log entries
  * @param		boolean $count	If true, return the number of logrecords matching criteria
  * @return 		array			Array with log records
  */
-function ReadLog($cat, $max="20", $type="", $ged="", $last=false, $count=false) {
+function ReadLog($cat, $max="20", $type="", $gedid="", $last=false, $count=false) {
 
 	if (!$count) {
 		$sql = "SELECT * FROM ".TBLPREFIX."log WHERE l_category='".$cat."'";
 		if (!empty($type)) $sql .= " AND l_type='".$type."'";
-		if (!empty($ged)) $sql .= " AND l_gedcom='".$ged."'";
+		if (!empty($gedid) && $cat != "S") $sql .= " AND l_file='".$gedid."'";
 		if ($last == false) $sql .= " ORDER BY l_num DESC";
 		else $sql .= " ORDER BY l_num ASC";
 		if ($max != "0") $sql .= " LIMIT ".$max;
@@ -2976,7 +2066,7 @@ function ReadLog($cat, $max="20", $type="", $ged="", $last=false, $count=false) 
 				$logline["ip"] = $log_row["l_ip"];
 				$logline["user"] = $log_row["l_user"];
 				$logline["text"] = $log_row["l_text"];
-				$logline["gedcom"] = $log_row["l_gedcom"];
+				$logline["gedcomid"] = $log_row["l_file"];
 				$loglines[] = $logline;
 			}
 		}
@@ -2986,7 +2076,7 @@ function ReadLog($cat, $max="20", $type="", $ged="", $last=false, $count=false) 
 	else {
 		$sql = "SELECT COUNT(l_type) FROM ".TBLPREFIX."log WHERE l_category='".$cat."'";
 		if (!empty($type)) $sql .= " AND l_type='".$type."'";
-		if (!empty($ged)) $sql .= " AND l_gedcom='".$ged."'";
+		if (!empty($gedid) && $cat != "S") $sql .= " AND l_file='".$gedid."'";
 		$res = NewQuery($sql);
 		if ($res) {
 			$number = $res->FetchRow();
@@ -2995,10 +2085,10 @@ function ReadLog($cat, $max="20", $type="", $ged="", $last=false, $count=false) 
 	}
 }
 
-function NewLogRecs($cat, $ged="") {
+function NewLogRecs($cat, $gedid="") {
 	
 	$sql = "SELECT count('i_type') FROM ".TBLPREFIX."log WHERE l_category='".$cat."' AND l_type='E' AND l_new='1'";
-	if (!empty($ged)) $sql .= " AND l_gedcom='".$ged."'";
+	if (!empty($ged)) $sql .= " AND l_file='".$gedid."'";
 	$res = NewQuery($sql);
 	if ($res) {
 		$number = $res->FetchRow();
@@ -3007,10 +2097,10 @@ function NewLogRecs($cat, $ged="") {
 	return false;
 }
 
-function HaveReadNewLogrecs($cat, $ged="") {
+function HaveReadNewLogrecs($cat, $gedid="") {
 	
 	$sql = "UPDATE ".TBLPREFIX."log SET l_new='0' WHERE l_category='".$cat."' AND l_type='E' AND l_new='1'";
-	if (!empty($ged)) $sql .= " AND l_gedcom='".$ged."'";
+	if (!empty($ged)) $sql .= " AND l_file='".$gedid."'";
 	$res = NewQuery($sql);
 }
 
@@ -3045,7 +2135,7 @@ function IsChangedFact($gid, $oldfactrec) {
 	if ($show_changes && $gm_user->UserCanEditOwn($gid) && GetChangeData(true, $gid, true)) {
 		$string = trim($oldfactrec);
 		if (empty($string)) return false;
-		$sql = "SELECT ch_old, ch_new FROM ".TBLPREFIX."changes where ch_gid = '".$gid."' AND ch_gedfile = '".$GEDCOMID."' ORDER BY ch_time ASC";
+		$sql = "SELECT ch_old, ch_new FROM ".TBLPREFIX."changes where ch_gid = '".$gid."' AND ch_file = '".$GEDCOMID."' ORDER BY ch_time ASC";
 		$res = NewQuery($sql);
 		if (!$res) return false;
 		while ($row = $res->FetchRow()) {
@@ -3062,7 +2152,7 @@ function RetrieveChangedFact($gid, $fact, $oldfactrec) {
 	global $GEDCOMID, $show_changes, $gm_username, $gm_user;
 	
 	if ($show_changes && $gm_user->UserCanEditOwn($gid) && GetChangeData(true, $gid, true)) {
-		$sql = "SELECT ch_old, ch_new FROM ".TBLPREFIX."changes where ch_gid = '".$gid."' AND ch_fact = '".$fact."' AND ch_gedfile = '".$GEDCOMID."' ORDER BY ch_time ASC";
+		$sql = "SELECT ch_old, ch_new FROM ".TBLPREFIX."changes where ch_gid = '".$gid."' AND ch_fact = '".$fact."' AND ch_file = '".$GEDCOMID."' ORDER BY ch_time ASC";
 		$res = NewQuery($sql);
 		$factrec = $oldfactrec;
 		$found = false;
@@ -3084,7 +2174,7 @@ function RetrieveNewFacts($gid, $includeall=false) {
 	$facts = array();
 	$newfacts = array();
 	if ($show_changes && GetChangeData(true, $gid, true)) {
-		$sql = "SELECT ch_old, ch_new FROM ".TBLPREFIX."changes where ch_gid = '".$gid."' AND ch_gedfile = '".$GEDCOMID."' ORDER BY ch_time ASC";
+		$sql = "SELECT ch_old, ch_new FROM ".TBLPREFIX."changes where ch_gid = '".$gid."' AND ch_file = '".$GEDCOMID."' ORDER BY ch_time ASC";
 		$res = NewQuery($sql);
 		if ($res) {
 			while($row = $res->FetchAssoc()){
@@ -3140,7 +2230,6 @@ function RetrieveNewFacts($gid, $includeall=false) {
 }
 
 function HasChangedMedia($gedrec) {
-	global $GEDCOM;
 	
 	if (empty($gedrec)) return false;
 	$ct = preg_match_all("/\d\sOBJE\s@(.*)@/", $gedrec, $match);
@@ -3159,7 +2248,7 @@ function HasChangedMedia($gedrec) {
  * @author	Genmod Development Team
  */
 function StoreGedcoms() {
-	global $GEDCOMS, $gm_lang, $DEFAULT_GEDCOM, $COMMON_NAMES_THRESHOLD, $GEDCOM;
+	global $GEDCOMS, $gm_lang, $DEFAULT_GEDCOM, $COMMON_NAMES_THRESHOLD;
 
 	if (!CONFIGURED) return false;
 	uasort($GEDCOMS, "GedcomSort");
@@ -3173,6 +2262,8 @@ function StoreGedcoms() {
 	
 	$maxid++;
 	foreach($GEDCOMS as $indexval => $GED) {
+//		print "<br /><br />Processing gedcom ".$indexval;
+//		print_r($GED);
 		$GED["config"] = str_replace(INDEX_DIRECTORY, "\${INDEX_DIRECTORY}", $GED["config"]);
 		if (isset($GED["privacy"])) $GED["privacy"] = str_replace(INDEX_DIRECTORY, "\${INDEX_DIRECTORY}", $GED["privacy"]);
 		else $GED["privacy"] = "privacy.php";
@@ -3186,7 +2277,7 @@ function StoreGedcoms() {
 		if (!isset($GED["id"]) || (empty($GED["id"]))) $GED["id"] = $maxid;
 
 		if (empty($GED["commonsurnames"])) {
-			if ($GED["gedcom"]==$GEDCOM) {
+			if ($GED["gedcom"] == get_gedcom_from_id($GEDCOMID)) {
 				$GED["commonsurnames"] = "";
 				$surnames = GetCommonSurnames($COMMON_NAMES_THRESHOLD);
 				foreach($surnames as $indexval => $surname) {
@@ -3195,8 +2286,6 @@ function StoreGedcoms() {
 			}
 			else $GED["commonsurnames"]="";
 		}
-		$GEDCOMS[$GED["gedcom"]]["commonsurnames"] = $GED["commonsurnames"];
-//		$GED["commonsurnames"] = addslashes($GED["commonsurnames"]);
 		if ($GED["gedcom"] == $DEFAULT_GEDCOM) $is_default = "Y";
 		else $is_default = "N";
 		$sql = "INSERT INTO ".TBLPREFIX."gedcoms VALUES('".DbLayer::EscapeQuery($GED["gedcom"])."','".DbLayer::EscapeQuery($GED["config"])."','".DbLayer::EscapeQuery($GED["privacy"])."','".DbLayer::EscapeQuery($GED["title"])."','".DbLayer::EscapeQuery($GED["path"])."','".DbLayer::EscapeQuery($GED["id"])."','".DbLayer::EscapeQuery($GED["commonsurnames"])."','".DbLayer::EscapeQuery($is_default)."')";
@@ -3238,7 +2327,7 @@ function ReadGedcoms() {
 					$DEFAULT_GEDCOM = $row["g_gedcom"];
 					$DEFAULT_GEDCOMID = $row["g_id"];
 				}
-				$GEDCOMS[$row["g_gedcom"]] = $g;
+				$GEDCOMS[$row["g_id"]] = $g;
 				if ($i == "0") {
 					$DEFAULT_GEDCOM = $row["g_gedcom"];
 					$DEFAULT_GEDCOMID = $row["g_id"];
@@ -3380,13 +2469,13 @@ function ImportTable($fn) {
 
 
 function GetNewFams($pid) {
-	global $GEDCOM, $GEDCOMID;
+	global $GEDCOMID;
 	
 	$newfams = array();
 
 	if (!empty($pid) && GetChangeData(true, $pid, true, "","")) {
 		$rec = GetChangeData(false, $pid, true, "gedlines","");
-		$gedrec = $rec[$GEDCOM][$pid];
+		$gedrec = $rec[$GEDCOMID][$pid];
 		$ct = preg_match_all("/1\s+FAMS\s+@(.*)@.*/", $gedrec, $fmatch, PREG_SET_ORDER);
 		if ($ct>0) {
 			$oldfams = FindSfamilyIds($pid);
@@ -3419,7 +2508,7 @@ function GetNewFams($pid) {
 					$fact for this fact
 */
 function GetChangeData($status=false, $gid="", $thisged=false, $data="gedlines", $fact="") {
-	global $GEDCOM, $GEDCOMS, $changes, $gm_lang, $GEDCOMID;
+	global $changes, $gm_lang, $GEDCOMID;
 	global $chcache, $chstatcache;
 	
 	// NOTE: If the file does not have an ID, go back
@@ -3431,11 +2520,11 @@ function GetChangeData($status=false, $gid="", $thisged=false, $data="gedlines",
 	// Initialise the status cache
 	if (!isset($chstatcache)) {
 		$chstatcache = array();
-		$sql = "SELECT ch_gid, ch_gedfile FROM ".TBLPREFIX."changes";
+		$sql = "SELECT ch_gid, ch_file FROM ".TBLPREFIX."changes";
 		$resc = NewQuery($sql);
 		if($resc) {
 			while ($row = $resc->FetchAssoc()) {
-				$chstatcache[$row["ch_gid"]][$row["ch_gedfile"]] = true;
+				$chstatcache[$row["ch_gid"]][$row["ch_file"]] = true;
 			}
 		}
 	}
@@ -3469,7 +2558,7 @@ function GetChangeData($status=false, $gid="", $thisged=false, $data="gedlines",
 	}
 	
 	$whereclause = "";
-	if ($thisged) $whereclause .= "ch_gedfile = '".$GEDCOMID."'";
+	if ($thisged) $whereclause .= "ch_file = '".$GEDCOMID."'";
 	if (!empty($gid)) {
 		if (!empty($whereclause)) $whereclause .= " AND ";
 		$whereclause .= "ch_gid = '".$gid."'";
@@ -3491,9 +2580,9 @@ function GetChangeData($status=false, $gid="", $thisged=false, $data="gedlines",
 
 	if ($status) $selectclause = "SELECT COUNT(ch_id) ";
 	else {
-		if ($data == "gedcoms") $selectclause = "SELECT ch_gedfile ";
+		if ($data == "gedcoms") $selectclause = "SELECT ch_file ";
 		else {
-			$selectclause = "SELECT ch_gid, ch_type, ch_fact, ch_gedfile, ch_old, ch_new";
+			$selectclause = "SELECT ch_gid, ch_type, ch_fact, ch_file, ch_old, ch_new";
 			$whereclause .= " ORDER BY";
 			if ($data == "gedlinesCHAN") {
 				$data = "gedlines";
@@ -3522,7 +2611,7 @@ function GetChangeData($status=false, $gid="", $thisged=false, $data="gedlines",
 			// NOTE: Return gedcoms which have changes
 			$gedfiles = array();
 			while ($row = $res->FetchAssoc($res->result)) {
-				$gedfiles[$row["ch_gedfile"]] = get_gedcom_from_id($row["ch_gedfile"]);
+				$gedfiles[$row["ch_file"]] = $row["ch_file"];
 			}
 			$chcache[$sql] = $gedfiles;
 			return $gedfiles;
@@ -3531,7 +2620,7 @@ function GetChangeData($status=false, $gid="", $thisged=false, $data="gedlines",
 			// NOTE: Construct the changed gedcom record
 			$gedlines = array();
 			while ($row = $res->FetchAssoc($res->result)) {
-				$gedname = get_gedcom_from_id($row["ch_gedfile"]);
+				$gedname = $row["ch_file"];
 				$chgid = $row["ch_gid"];
 				if (!isset($gedlines[$gedname][$chgid])) {
 					$gedlines[$gedname][$chgid] = trim(FindGedcomRecord($chgid, $gedname));
@@ -3587,7 +2676,7 @@ function ResetChangeCaches() {
 }
 
 function GetChangeNames($pid) {
-	global $GEDCOM, $GEDCOMS, $changes, $gm_lang, $GEDCOMID, $gm_username, $show_changes, $gm_user;
+	global $changes, $gm_lang, $GEDCOMID, $gm_username, $show_changes, $gm_user;
 	
 	$name = array();
 	if ($show_changes && $gm_user->UserCanEditOwn($pid)) $onlyold = false;
@@ -3603,7 +2692,7 @@ function GetChangeNames($pid) {
 		// And see if it's a new indi
 		if (GetChangeData(true, $pid, true, "", "INDI,FAMC")) {
 			$rec = GetChangeData(false, $pid, true, "gedlines", "INDI,FAMC");
-			$indirec = $rec[$GEDCOM][$pid];
+			$indirec = $rec[$GEDCOMID][$pid];
 			$fromchange = true;
 		}
 	}
@@ -3611,7 +2700,7 @@ function GetChangeNames($pid) {
 	$deleted = false;
 	if (!$onlyold && GetChangeData(true, $pid, true, "", "INDI")) {
 		$new = GetChangeData(false, $pid, true, "gedlines", "INDI");
-		if (empty($new[$GEDCOM][$pid])) $deleted = true;
+		if (empty($new[$GEDCOMID][$pid])) $deleted = true;
 	}
 
 	if (empty($indirec)) return false;
@@ -3631,7 +2720,7 @@ function GetChangeNames($pid) {
 	
 	// we have the original names, now we get all additions and changes TODO: DELETE
 	if (!$onlyold && GetChangeData(true, $pid, true)) {
-		$sql = "SELECT ch_type, ch_fact, ch_old, ch_new FROM ".TBLPREFIX."changes WHERE ch_gid='".$pid."' AND ch_fact='NAME' AND ch_gedfile='".$GEDCOMID."' ORDER BY ch_id";
+		$sql = "SELECT ch_type, ch_fact, ch_old, ch_new FROM ".TBLPREFIX."changes WHERE ch_gid='".$pid."' AND ch_fact='NAME' AND ch_file='".$GEDCOMID."' ORDER BY ch_id";
 		$res = NewQuery($sql);
 //		if (!$res) return false;
 	
@@ -3661,7 +2750,7 @@ function GetChangeNames($pid) {
 
 function GetCachedEvents($action, $daysprint, $filter, $onlyBDM="no", $skipfacts) {
 	global $gm_lang, $month, $year, $day, $monthtonum, $monthstart;
-	global $GEDCOM, $GEDCOMID, $DEBUG, $ASC, $IGNORE_FACTS, $IGNORE_YEAR;
+	global $GEDCOMID, $DEBUG, $ASC, $IGNORE_FACTS, $IGNORE_YEAR;
 	global $USE_RTL_FUNCTIONS, $DAYS_TO_SHOW_LIMIT;
 	global $CIRCULAR_BASE;
 	
@@ -3675,7 +2764,7 @@ function GetCachedEvents($action, $daysprint, $filter, $onlyBDM="no", $skipfacts
 	$cache_load = false;
 	$cache_refresh = false;
 	// Retrieve the last change date
-	$mday = GedcomConfig::GetLastCacheDate($action, $GEDCOM);
+	$mday = GedcomConfig::GetLastCacheDate($action, $GEDCOMID);
 // $mday = 0;  // to force cache rebuild
 	if ($mday==$monthstart) {
 		$cache_load = true;
@@ -3789,7 +2878,7 @@ function GetCachedEvents($action, $daysprint, $filter, $onlyBDM="no", $skipfacts
 			$error = mysql_error();
 			if (!empty($error)) print $error."<br />";
 		}
-		GedcomConfig::SetLastCacheDate($action, $monthstart, $GEDCOM);
+		GedcomConfig::SetLastCacheDate($action, $monthstart, $GEDCOMID);
 	}
 	
 	// load the cache from DB
@@ -3810,12 +2899,12 @@ function GetCachedEvents($action, $daysprint, $filter, $onlyBDM="no", $skipfacts
 }
 
 function GetCachedStatistics() {
-	global $GEDCOM, $gm_lang, $GEDCOMS, $monthtonum, $GEDCOMID;
+	global $gm_lang, $monthtonum, $GEDCOMID;
 	
 	// First see if the cache must be refreshed
-	$cache_load = GedcomConfig::GetLastCacheDate("stats", $GEDCOM);
+	$cache_load = GedcomConfig::GetLastCacheDate("stats", $GEDCOMID);
 	if (!$cache_load) {
-		$sql = "DELETE FROM ".TBLPREFIX."statscache WHERE gs_gedcom='".$GEDCOM."'";
+		$sql = "DELETE FROM ".TBLPREFIX."statscache WHERE gs_file='".$GEDCOMID."'";
 		$res = NewQuery($sql);
 	}
 	$stats = array();
@@ -3940,8 +3029,8 @@ function GetCachedStatistics() {
 		else $stats["gs_avg_children"] = "";
 		
 		$sql = "INSERT INTO ".TBLPREFIX."statscache ";
-		$sqlf = "(gs_gedcom";
-		$sqlv = "('".$GEDCOM."'";
+		$sqlf = "(gs_file";
+		$sqlv = "('".$GEDCOMID."'";
 		foreach($stats as $skey => $svalue) {
 			if ($skey != "gs_title") {
 				$sqlf .= ", ".$skey;
@@ -3952,9 +3041,9 @@ function GetCachedStatistics() {
 		$sqlv .= ")";
 		$sql .= $sqlf." VALUES ".$sqlv;
 		$res = NewQuery($sql);
-		GedcomConfig::SetLastCacheDate("stats", time(), $GEDCOM);
+		GedcomConfig::SetLastCacheDate("stats", time(), $GEDCOMID);
 	}
-	$sql = "SELECT * FROM ".TBLPREFIX."statscache WHERE gs_gedcom='".$GEDCOM."'";
+	$sql = "SELECT * FROM ".TBLPREFIX."statscache WHERE gs_file='".$GEDCOMID."'";
 	$res = NewQuery($sql);
 	while($row = $res->FetchAssoc($res->result)){
 		foreach ($row as $key => $value) {
@@ -3975,7 +3064,7 @@ function GetCachedStatistics() {
  * @return 	<type>	<description>
  */
 function GetUnlinked() {
-	global $TOTAL_COUNT, $GEDCOM, $GEDCOMS, $GEDCOMID, $indilist;
+	global $TOTAL_COUNT, $GEDCOMID, $indilist;
 	
 	$uindilist = array();
 	
@@ -4043,31 +3132,12 @@ function HasOtherChanges($pid, $change_id, $gedid="") {
 	
 	if (empty($gedid)) $gedid = $GEDCOMID;
 	if (GetChangeData(true, $pid, true)) {
-		$sql = "SELECT count(ch_id) FROM ".TBLPREFIX."changes WHERE ch_gedfile='".$gedid."' AND ch_gid='".$pid."' AND ch_cid<>'".$change_id."'";
+		$sql = "SELECT count(ch_id) FROM ".TBLPREFIX."changes WHERE ch_file='".$gedid."' AND ch_gid='".$pid."' AND ch_cid<>'".$change_id."'";
 		$res = NewQuery($sql);
 		$row = $res->FetchRow();
 		return $row[0];
 	}
 	else return false;
-}
-
-
-function ShowSourceFromAnyGed() {
-	global $gm_username;
-	global $PRIV_PUBLIC, $PRIV_USER, $PRIV_NONE, $PRIV_HIDE, $SHOW_SOURCES, $gm_user;
-	
-	$acclevel = $gm_user->getUserAccessLevel();
-	$sql = "SELECT p_show_sources FROM ".TBLPREFIX."privacy";
-	$res = NewQuery($sql);
-	while($row = $res->FetchRow()) {
-		if ($$row["0"] >= $acclevel) {
-			$res->FreeResult();
-			return true;
-		}
-	}
-	// also check the current setting, as it may not be in the database
-	if ($SHOW_SOURCES >= $acclevel) return true;
-	return false;
 }
 
 /* This function returns the state of a given language variable
@@ -4093,7 +3163,7 @@ function GetLangVarString($var, $value, $type) {
 
 	// This gets the langvar in the gedcom's language
 	if ($type == "gedcom" || $type = "gedcomid") {
-		if ($type = "gedcomid") $value = get_gedcom_from_id($value);
+		if ($type = "gedcom") $value = get_id_from_gedcom($value);
 		$language = GedcomConfig::GetGedcomLanguage($value);
 		if (!$language) return false;
 		$type = "lang";
@@ -4108,30 +3178,6 @@ function GetLangVarString($var, $value, $type) {
 		else return $lang[0];
 	}
 }
-	
-function AddSourceLink($sour, $gid, $gedrec, $gedid, $type) {
-	global $GEDCOMID;
-	
-	$sql = "INSERT INTO ".TBLPREFIX."source_mapping (sm_id, sm_sid, sm_type, sm_gid, sm_gedfile, sm_gedrec) VALUES ('0', '".$sour."', '".$type."', '".$gid."', '".$GEDCOMID."', '".DbLayer::EscapeQuery($gedrec)."')";
-	$res = NewQuery($sql);
-	if ($res) {
-		$res->FreeResult();
-		return true;
-	}
-	else return false;
-}
-
-function AddOtherLink($note, $gid, $type, $gedid) {
-	global $GEDCOMID;
-	
-	$sql = "INSERT INTO ".TBLPREFIX."other_mapping (om_id, om_oid, om_gid, om_type, om_gedfile) VALUES ('0', '".$note."', '".$gid."', '".$type."', '".$GEDCOMID."')";
-	$res = NewQuery($sql);
-	if ($res) {
-		$res->FreeResult();
-		return true;
-	}
-	else return false;
-}
 
 function GetNoteLinks($oid, $type="", $applypriv=true) {
 	global $GEDCOMID;
@@ -4139,7 +3185,7 @@ function GetNoteLinks($oid, $type="", $applypriv=true) {
 	if (empty($oid)) return false;
 	
 	$links = array();
-	$sql = 	"SELECT om_gid, om_type FROM ".TBLPREFIX."other_mapping WHERE om_oid='".$oid."' AND om_gedfile='".$GEDCOMID."'";
+	$sql = 	"SELECT DISTINCT om_gid, om_type FROM ".TBLPREFIX."other_mapping WHERE om_oid='".$oid."' AND om_gedfile='".$GEDCOMID."'";
 	if (!empty($type)) $sql .= " AND om_type='".$type."'";
 	$res = NewQuery($sql);
 	while($row = $res->FetchAssoc()){
@@ -4165,7 +3211,7 @@ function GetSourceLinks($pid, $type="", $applypriv=true, $getfamindi=true) {
 	$links = array();
 	$indisel = array();
 	$famsel = array();	
-	$sql = "SELECT sm_gid, sm_type FROM ".TBLPREFIX."source_mapping WHERE sm_sid='".$pid."' AND sm_gedfile='".$GEDCOMID."'";
+	$sql = "SELECT DISTINCT sm_gid, sm_type FROM ".TBLPREFIX."source_mapping WHERE sm_sid='".$pid."' AND sm_gedfile='".$GEDCOMID."'";
 	if (!empty($type)) $sql .= " AND sm_type='".$type."'";
 	$res = NewQuery($sql);
 	while($row = $res->FetchRow()){
@@ -4262,7 +3308,7 @@ function GetMediaLinks($pid, $type="", $applypriv=true) {
 	$links = array();	
 	$indisel = array();
 	$famsel = array();	
-	$sql = "SELECT mm_gid, mm_type FROM ".TBLPREFIX."media_mapping WHERE mm_media='".$pid."'";
+	$sql = "SELECT DISTINCT mm_gid, mm_type FROM ".TBLPREFIX."media_mapping WHERE mm_media='".$pid."'";
 	if (!empty($type)) $sql .= " AND mm_type='".$type."'";
 	$sql .= " AND mm_gedfile='".$GEDCOMID."'";
 	$res = NewQuery($sql);
@@ -4410,20 +3456,5 @@ function GetRecentChangeFacts($day, $month, $year, $days) {
 		}
 	}
 	return $found_facts;
-}
-
-function AddAssoLink($pid1, $pid2, $type, $fact, $rela, $resn, $ged) {
-
-	
-	if ($type == "INDI") $type = "I";
-	else $type = "F";
-	if (!empty($resn)) $resn = substr($resn, 0,1);
-	if (!in_array($resn, array("", "n", "l", "c", "p"))) $resn = "";
-	
-	$sql = "INSERT INTO ".TBLPREFIX."asso VALUES ('0', '".$pid1."', '".$pid2."', '".$type."', '".$fact."', '".$rela."', '".$resn."', '".$ged."')";
-	$res = NewQuery($sql);
-	if (!$res) return false;
-	else return true;
-	
 }
 ?>

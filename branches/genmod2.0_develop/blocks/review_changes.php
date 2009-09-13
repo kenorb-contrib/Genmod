@@ -38,7 +38,7 @@ $GM_BLOCKS["review_changes_block"]["rss"]       = false;
  * Prints a block allowing the user review all changes pending approval
  */
 function review_changes_block($block = true, $config="", $side, $index) {
-	global $gm_lang, $GEDCOM, $GEDCOMS, $command, $SCRIPT_NAME, $QUERY_STRING, $GM_IMAGE_DIR, $GM_IMAGES;
+	global $gm_lang, $GEDCOMID, $GEDCOMS, $command, $SCRIPT_NAME, $QUERY_STRING, $GM_IMAGE_DIR, $GM_IMAGES;
 	global $gm_changes, $LAST_CHANGE_EMAIL, $ALLOW_EDIT_GEDCOM, $TEXT_DIRECTION, $SHOW_SOURCES, $TIME_FORMAT, $GM_BLOCKS, $gm_username, $gm_user;
 
 	if (!$ALLOW_EDIT_GEDCOM) return;
@@ -50,7 +50,7 @@ function review_changes_block($block = true, $config="", $side, $index) {
 	$geds = GetChangeData(false, "", false, "gedcoms");
 	$sent = array();
 	foreach ($geds as $gedkey=>$gedvalue) {
-		if ($gedvalue == $GEDCOM) $display_block = true;
+		if ($gedvalue == $GEDCOMID) $display_block = true;
 		if (isset($lastmail[$gedvalue])) {
 			//-- if the time difference from the last email is greater than 24 hours then send out another email
 			if (time()-$lastmail[$gedvalue] > (60*60*24*$config["days"])) {
@@ -85,8 +85,8 @@ function review_changes_block($block = true, $config="", $side, $index) {
 		print_help_link("review_changes_help", "qm", "review_changes");
 		if ($GM_BLOCKS["review_changes_block"]["canconfig"]) {
 			if ((($command=="gedcom")&&($gm_user->userGedcomAdmin())) || (($command=="user")&&(!empty($gm_username)))) {
-				if ($command=="gedcom") $name = preg_replace("/'/", "\'", $GEDCOM);
-				else $name = $gm_username;
+				if ($command=="gedcom") $name = preg_replace("/'/", "\'", get_gedcom_from_id($GEDCOMID));
+				else $name = $gm_user->username;
 				print "<a href=\"javascript: ".$gm_lang["config_block"]."\" onclick=\"window.open('index_edit.php?name=$name&amp;command=$command&amp;action=configure&amp;side=$side&amp;index=$index', '', 'top=50,left=50,width=500,height=250,scrollbars=1,resizable=1'); return false;\">";
 				print "<img class=\"adminicon\" src=\"$GM_IMAGE_DIR/".$GM_IMAGES["admin"]["small"]."\" width=\"15\" height=\"15\" border=\"0\" alt=\"".$gm_lang["config_block"]."\" /></a>\n";
 			}
@@ -108,7 +108,7 @@ function review_changes_block($block = true, $config="", $side, $index) {
 		}
 		$gm_changes = GetChangeData(false, "", true, "gedlines");
 		foreach($gm_changes as $gedcom=>$changes) {
-			if ($gedcom == $GEDCOM) {
+			if ($gedcom == $GEDCOMID) {
 				foreach($changes as $gid=>$change) {
 					// if an INDI or FAM is deleted, get the data from the old record
 					if (empty($change)) $change = FindGedcomRecord($gid);
@@ -135,12 +135,12 @@ function review_changes_block($block = true, $config="", $side, $index) {
 						}
 						else print "<b>".constant("GM_FACT_".$type)."</b> &lrm;(".$gid.")&lrm;\n";
 						if ($block) print "<br />";
-						if ($type=="INDI") print " <a href=\"individual.php?pid=".$gid."&amp;ged=".$gedcom."\">".$gm_lang["view_change_diff"]."</a>\n<br />";
-						if ($type=="FAM") print " <a href=\"family.php?famid=".$gid."&amp;ged=".$gedcom."\">".$gm_lang["view_change_diff"]."</a>\n<br />";
-						if ($type=="OBJE") print " <a href=\"mediadetail.php?mid=".$gid."&amp;ged=".$gedcom."\">".$gm_lang["view_change_diff"]."</a>\n<br />";
-						if (($type=="SOUR") && ($SHOW_SOURCES >= $gm_user->getUserAccessLevel())) print " <a href=\"source.php?sid=".$gid."&amp;ged=".$gedcom."\">".$gm_lang["view_change_diff"]."</a>\n<br />";
-						if (($type=="REPO") && ($SHOW_SOURCES >= $gm_user->getUserAccessLevel())) print " <a href=\"repo.php?rid=".$gid."&amp;ged=".$gedcom."\">".$gm_lang["view_change_diff"]."</a>\n<br />";
-						if ($type=="NOTE") print " <a href=\"note.php?oid=".$gid."&amp;ged=".$gedcom."\">".$gm_lang["view_change_diff"]."</a>\n<br />";
+						if ($type=="INDI") print " <a href=\"individual.php?pid=".$gid."&amp;gedid=".$GEDCOMID."\">".$gm_lang["view_change_diff"]."</a>\n<br />";
+						if ($type=="FAM") print " <a href=\"family.php?famid=".$gid."&amp;gedid=".$GEDCOMID."\">".$gm_lang["view_change_diff"]."</a>\n<br />";
+						if ($type=="OBJE") print " <a href=\"mediadetail.php?mid=".$gid."&amp;gedid=".$GEDCOMID."\">".$gm_lang["view_change_diff"]."</a>\n<br />";
+						if (($type=="SOUR") && ($SHOW_SOURCES >= $gm_user->getUserAccessLevel())) print " <a href=\"source.php?sid=".$gid."&amp;gedid=".$GEDCOMID."\">".$gm_lang["view_change_diff"]."</a>\n<br />";
+						if (($type=="REPO") && ($SHOW_SOURCES >= $gm_user->getUserAccessLevel())) print " <a href=\"repo.php?rid=".$gid."&amp;gedid=".$GEDCOMID."\">".$gm_lang["view_change_diff"]."</a>\n<br />";
+						if ($type=="NOTE") print " <a href=\"note.php?oid=".$gid."&amp;gedid=".$GEDCOMID."\">".$gm_lang["view_change_diff"]."</a>\n<br />";
 					}
 
 				}

@@ -36,7 +36,7 @@ $GM_BLOCKS["print_todays_events"]["rss"]		= true;
 //-- this block prints a list of today's upcoming events of living people in your gedcom
 function print_todays_events($block=true, $config="", $side, $index) {
 	global $gm_lang, $month, $year, $day, $monthtonum, $HIDE_LIVE_PEOPLE, $SHOW_ID_NUMBERS, $command, $TEXT_DIRECTION, $SHOW_FAM_ID_NUMBERS;
-	global $GM_IMAGE_DIR, $GM_IMAGES, $GEDCOM, $DEBUG, $ASC, $IGNORE_FACTS, $IGNORE_YEAR, $LAST_QUERY, $GM_BLOCKS;
+	global $GM_IMAGE_DIR, $GM_IMAGES, $DEBUG, $ASC, $IGNORE_FACTS, $IGNORE_YEAR, $LAST_QUERY, $GM_BLOCKS;
 	global $USE_RTL_FUNCTIONS, $NAME_REVERSE, $GEDCOMID;
 	global $hDay, $hMonth, $hYear, $gm_username, $gm_user;
 
@@ -60,7 +60,7 @@ function print_todays_events($block=true, $config="", $side, $index) {
 	print_help_link("index_onthisday_help", "qm", "on_this_day");
 	if ($GM_BLOCKS["print_upcoming_events"]["canconfig"]) {
 		if ((($command=="gedcom")&&($gm_user->userGedcomAdmin())) || (($command=="user")&&(!empty($gm_username)))) {
-			if ($command=="gedcom") $name = preg_replace("/'/", "\'", $GEDCOM);
+			if ($command=="gedcom") $name = preg_replace("/'/", "\'", get_gedcom_from_id($GEDCOMID));
 			else $name = $gm_username;
 			print "<a href=\"javascript: ".$gm_lang["config_block"]."\" onclick=\"window.open('index_edit.php?name=$name&amp;command=$command&amp;action=configure&amp;side=$side&amp;index=$index', '', 'top=50,left=50,width=500,height=250,scrollbars=1,resizable=1'); return false;\">";
 			print "<img class=\"adminicon\" src=\"$GM_IMAGE_DIR/".$GM_IMAGES["admin"]["small"]."\" width=\"15\" height=\"15\" border=\"0\" alt=\"".$gm_lang["config_block"]."\" /></a>\n";
@@ -111,7 +111,7 @@ function print_todays_events($block=true, $config="", $side, $index) {
 							if ($lastgid != "") print "<br />";
 							if ($NAME_REVERSE) $name = str_replace(",", "", $factarr[4]);
 							else $name = $factarr[4];
-							print "<a href=\"individual.php?pid=$gid&amp;ged=".$GEDCOM."\"><b>";
+							print "<a href=\"individual.php?pid=$gid&amp;gedid=".$GEDCOMID."\"><b>";
 							if (HasChinese($name)) print PrintReady($name." (".GetSortableAddName($gid, "", false).")");
 							else print PrintReady($name);
 							print "</b>";
@@ -171,7 +171,7 @@ function print_todays_events($block=true, $config="", $side, $index) {
 						if ($lastgid!=$gid) {
 							$name = GetFamilyDescriptor($gid);
 							if ($lastgid != "") print "<br />";
-							print "<a href=\"family.php?famid=$gid&amp;ged=".$GEDCOM."\"><b>";
+							print "<a href=\"family.php?famid=$gid&amp;gedid=".$GEDCOMID."\"><b>";
 							if (HasChinese($name)) print PrintReady($name." (".GetFamilyAddDescriptor($gid).")");
 							else print PrintReady($name);
 							print "</b>";

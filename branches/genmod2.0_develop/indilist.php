@@ -152,12 +152,10 @@ if (($surname_sublist=="yes")&&($show_all=="yes")) {
 	GetIndiList($allgeds);
 	$surnames = array();
 	$indi_hide=array();
-	$thisged = $GEDCOM;
 	$thisgedid = $GEDCOMID;
 	foreach($indilist as $gid=>$indi) {
 		$thisgid = splitkey($gid, "id");
 		$thisgedid = splitkey($gid, "gedid");
-		$thisged = splitkey($gid, "ged");
 		SwitchGedcom($thisgedid);
 		$indi_total[$thisgid."[".$indi["gedfile"]."]"] = 1;
 		if (PrivacyFunctions::showLivingNameByID($thisgid)) {
@@ -180,13 +178,11 @@ else if (($surname_sublist=="yes")&&(empty($surname))&&($show_all=="no")) {
 		$tindilist = GetAlphaIndis($alpha, $allgeds);
 		$surnames = array();
 		$indi_hide = array();
-		$thisged = $GEDCOM;
 		$thisgedid = $GEDCOMID;
 		$indi_total = array();
 		foreach($tindilist as $gid=>$indi) {
 			$indi = $indilist[$gid];
 			$thisgid = splitkey($gid, "id");
-			$thisged = splitkey($gid, "ged");
 			$thisgedid = splitkey($gid, "gedid");
 			SwitchGedcom($thisgedid);
 			$indi_total[$thisgid."[".$indi["gedfile"]."]"] = 1;

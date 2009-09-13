@@ -129,7 +129,7 @@ function print_child_descendancy($pid, $depth) {
  */
 function print_family_descendancy($pid, $famid, $depth) {
 	global $gm_lang, $view, $show_full, $generations, $box_width, $bwidth;
-	global $GEDCOM, $GM_IMAGE_DIR, $GM_IMAGES, $Dindent, $personcount;
+	global $GM_IMAGE_DIR, $GM_IMAGES, $Dindent, $personcount;
 
 	if ($famid=="") return;
 

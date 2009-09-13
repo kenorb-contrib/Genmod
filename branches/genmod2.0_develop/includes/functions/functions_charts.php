@@ -86,14 +86,14 @@ function print_family_parents($famid, $sosa = 0, $label="", $parid="", $gparid="
 	global $TEXT_DIRECTION, $SHOW_EMPTY_BOXES, $SHOW_ID_NUMBERS, $SHOW_FAM_ID_NUMBERS, $LANGUAGE;
 	global $pbwidth, $pbheight;
 	global $GM_IMAGE_DIR, $GM_IMAGES;
-	global $show_changes, $GEDCOM, $gm_username, $gm_user;
+	global $show_changes, $GEDCOMID, $gm_username, $gm_user;
 
 	$hfamids = 0;
 	$famrec = FindFamilyRecord($famid);
 //	Removed, this causes changes in parents not to show
 //	if ((!isset($show_changes) ||$show_changes != "no") && UserCanEdit($gm_username) && GetChangeData(true, $famid, true, "", "")) {
 //		$rec = GetChangeData(false, $famid, true, "gedlines", "");
-//		$famrec = $rec[$GEDCOM][$famid];
+//		$famrec = $rec[$GEDCOMID][$famid];
 //	}
 	$parents = FindParentsInRecord($famrec);
 	print "<a name=\"" . $parents["HUSB"] . "\"></a>\r\n";
@@ -106,7 +106,7 @@ function print_family_parents($famid, $sosa = 0, $label="", $parid="", $gparid="
 	$recchanged = false;
 	if ($show_changes && $gm_user->UserCanEdit() && GetChangeData(true, $famid, true, "", "")) {
 		$rec = GetChangeData(false, $famid, true, "gedlines", "");
-		$newrec = $rec[$GEDCOM][$famid];
+		$newrec = $rec[$GEDCOMID][$famid];
 		$newparents = FindParentsInRecord($newrec);
 		$recchanged = true;
 	}
@@ -297,7 +297,7 @@ function print_family_parents($famid, $sosa = 0, $label="", $parid="", $gparid="
  */
 function print_family_children($famid, $childid = "", $sosa = 0, $label="", $personcount="1") {
 	global $gm_lang, $pbwidth, $pbheight, $view, $show_famlink, $show_cousins;
-	global $GM_IMAGE_DIR, $GM_IMAGES, $show_changes, $GEDCOM, $SHOW_ID_NUMBERS, $SHOW_FAM_ID_NUMBERS, $TEXT_DIRECTION, $gm_username, $gm_user;
+	global $GM_IMAGE_DIR, $GM_IMAGES, $show_changes, $GEDCOMID, $SHOW_ID_NUMBERS, $SHOW_FAM_ID_NUMBERS, $TEXT_DIRECTION, $gm_username, $gm_user;
 
 	if ($show_changes && $gm_user->UserCanEdit($gm_username)) $canshow = true;
 	else $canshow = false;
@@ -316,7 +316,7 @@ function print_family_children($famid, $childid = "", $sosa = 0, $label="", $per
 		$oldchil = array();
 		if (!empty($famid) && $canshow && (GetChangeData(true, $famid, true, "", "CHIL,FAM"))) {
 			$rec = GetChangeData(false, $famid, true, "gedlines", "CHIL,FAM");
-			$newrec = $rec[$GEDCOM][$famid];
+			$newrec = $rec[$GEDCOMID][$famid];
 			$ct = preg_match_all("/1 CHIL @(.*)@/", $newrec, $match, PREG_SET_ORDER);
 			for($i = 0; $i < $ct; $i++) {
 				if (!in_array($match[$i][1], $children)) $newchildren[] = $match[$i][1];
@@ -328,7 +328,7 @@ function print_family_children($famid, $childid = "", $sosa = 0, $label="", $per
 		}
 //		if ((!isset($show_changes) || $show_changes != "no") && (GetChangeData(true, $famid, true, "", "FAM"))) {
 //			$rec = GetChangeData(false, $famid, true, "gedlines", "FAM");
-//			$newrec = $rec[$GEDCOM][$famid];
+//			$newrec = $rec[$GEDCOMID][$famid];
 //			$ct = preg_match_all("/1 CHIL @(.*)@/", $newrec, $match, PREG_SET_ORDER);
 //			for($i = 0; $i < $ct; $i++) {
 //				if (!in_array($match[$i][1], $children)) $newchildren[] = $match[$i][1];
@@ -353,7 +353,7 @@ function print_family_children($famid, $childid = "", $sosa = 0, $label="", $per
 			if ($canshow && GetChangeData(true, $famid, true, "", "")) {
 				$nowchildren = array();
 				$rec = GetChangeData(false, $famid, true, "gedlines", "");
-				$newrec = $rec[$GEDCOM][$famid];
+				$newrec = $rec[$GEDCOMID][$famid];
 				$ct = preg_match_all("/1 CHIL @(.*)@/", $newrec, $match, PREG_SET_ORDER);
 				for($i = 0; $i < $ct; $i++) $nowchildren[] = $match[$i][1];
 			}
@@ -372,7 +372,7 @@ function print_family_children($famid, $childid = "", $sosa = 0, $label="", $per
 				$indirec = FindPersonRecord($chil);
 				if ($canshow && GetChangeData(true, $chil, true, "", "")) {
 					$rec = GetChangeData(false, $chil, true, "gedlines", "");
-					$indirec = $rec[$GEDCOM][$chil];
+					$indirec = $rec[$GEDCOMID][$chil];
 				}
 				$pedirec = GetSubRecord(1, "1 FAMC @".$famid."@", $indirec);
 				$pedi = GetGedcomValue("PEDI", 2, $pedirec);
@@ -445,7 +445,7 @@ function print_family_children($famid, $childid = "", $sosa = 0, $label="", $per
 			print "<td valign=\"top\" class=\"facts_valueblue\" style=\"vertical-align:middle; width: " . ($pbwidth) . "px; height: " . $pbheight . "px;\">\n";
 			if ($canshow && GetChangeData(true, $chil, true, "", "")) {
 				$rec = GetChangeData(false, $chil, true, "gedlines", "");
-				$indirec = $rec[$GEDCOM][$chil];
+				$indirec = $rec[$GEDCOMID][$chil];
 			}
 			else $indirec = FindPersonRecord($chil);
 			$pedirec = GetSubRecord(1, "1 FAMC @".$famid."@", $indirec);
@@ -522,12 +522,12 @@ function PrintSosaFamily($famid, $childid, $sosa, $label="", $parid="", $gparid=
  * @return string $rootid validated root ID
  */
 function CheckRootId($rootid) {
-	global $user, $GEDCOM, $GEDCOM_ID_PREFIX, $PEDIGREE_ROOT_ID, $USE_RIN, $gm_username, $gm_user;
+	global $user, $GEDCOMID, $GEDCOM_ID_PREFIX, $PEDIGREE_ROOT_ID, $USE_RIN, $gm_username, $gm_user;
 	
 	// -- if the $rootid is not already there then find the first person in the file and make him the root
 	if (empty($rootid)) {
-		if ((!empty($gm_user->rootid[$GEDCOM])) && (FindPersonRecord($gm_user->rootid[$GEDCOM]))) $rootid = $gm_user->rootid[$GEDCOM];
-		else if ((!empty($gm_user->gedcomid[$GEDCOM])) && (FindPersonRecord($gm_user->gedcomid[$GEDCOM]))) $rootid = $gm_user->gedcomid[$GEDCOM];
+		if ((!empty($gm_user->rootid[$GEDCOMID])) && (FindPersonRecord($gm_user->rootid[$GEDCOMID]))) $rootid = $gm_user->rootid[$GEDCOMID];
+		else if ((!empty($gm_user->gedcomid[$GEDCOMID])) && (FindPersonRecord($gm_user->gedcomid[$GEDCOMID]))) $rootid = $gm_user->gedcomid[$GEDCOMID];
 		
 		// -- allow users to overide default id in the config file.
 		if (empty($rootid)) {

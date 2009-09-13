@@ -48,7 +48,7 @@ require_once("includes/values/edit_data.php");
  * @return 	boolean	true if succeed/false if failed
  */
 function ReplaceGedrec($gid, $oldrec, $newrec, $fact="", $change_id, $change_type, $gedid="") {
-	global $GEDCOM, $manual_save, $GEDCOMS, $gm_username, $GEDCOMID, $chcache, $can_auto_accept, $aa_attempt;
+	global $manual_save, $gm_username, $GEDCOMID, $chcache, $can_auto_accept, $aa_attempt;
 
 	// NOTE: Check if auto accept is possible. If there are already changes present for any ID in one $change_id, changes cannot be auto accepted.
 	if (!isset($can_auto_accept)) $can_auto_accept = true;
@@ -73,13 +73,13 @@ function ReplaceGedrec($gid, $oldrec, $newrec, $fact="", $change_id, $change_typ
 		$oldgid = $gid;
 		$gid = trim($match[1]);
 		if ($oldgid!=$gid) {
-			WriteToLog("ReplaceGedrec-> Warning: $oldgid was changed to $gid", "W", "G", get_gedcom_from_id($gedid));
+			WriteToLog("ReplaceGedrec-> Warning: $oldgid was changed to $gid", "W", "G", $gedid);
 		}
 	}
 	
 	// NOTE: Check if there are changes present, if so flag pending changes so they cannot be approved
 	if (GetChangeData(true, $gid, true) && ($change_type == "raw_edit" || $change_type == "reorder_families" || $change_type == "reorder_children")) {
-		$sql = "select ch_cid as cid from ".TBLPREFIX."changes where ch_gid = '".$gid."' and ch_gedfile = '".$gedid."' order by ch_cid ASC";
+		$sql = "select ch_cid as cid from ".TBLPREFIX."changes where ch_gid = '".$gid."' and ch_file = '".$gedid."' order by ch_cid ASC";
 		$res = NewQuery($sql);
 		while($row = $res->FetchAssoc()){
 			$sqlcid = "update ".TBLPREFIX."changes set ch_delete = '1' where ch_cid = '".$row["cid"]."'";
@@ -87,12 +87,12 @@ function ReplaceGedrec($gid, $oldrec, $newrec, $fact="", $change_id, $change_typ
 		}
 	}
 
-	$sql = "INSERT INTO ".TBLPREFIX."changes (ch_cid, ch_gid, ch_gedfile, ch_type, ch_user, ch_time, ch_fact, ch_old, ch_new)";
+	$sql = "INSERT INTO ".TBLPREFIX."changes (ch_cid, ch_gid, ch_file, ch_type, ch_user, ch_time, ch_fact, ch_old, ch_new)";
 	$sql .= "VALUES ('".$change_id."', '".$gid."', '".$gedid."', '".$change_type."', '".$gm_username."', '".time()."'";
 	$sql .= ", '".$fact."', '".DbLayer::EscapeQuery($oldrec)."', '".DbLayer::EscapeQuery($newrec)."')";
 	$res = NewQuery($sql);
 	
-	WriteToLog("ReplaceGedrec-> Replacing gedcom record $gid ->" . $gm_username ."<-", "I", "G", get_gedcom_from_id($gedid));
+	WriteToLog("ReplaceGedrec-> Replacing gedcom record $gid ->" . $gm_username ."<-", "I", "G", $gedid);
 	// Clear the GetChangeData cache
 	ResetChangeCaches();
 	return true;
@@ -102,7 +102,7 @@ function ReplaceGedrec($gid, $oldrec, $newrec, $fact="", $change_id, $change_typ
 //-- this function will append a new gedcom record at
 //-- the end of the gedcom file.
 function AppendGedrec($newrec, $fact="", $change_id, $change_type, $gedid="") {
-	global $GEDCOM, $manual_save, $GEDCOMS, $gm_username, $GEDCOMID, $chcache;
+	global $manual_save, $gm_username, $GEDCOMID, $chcache;
 
 	$newrec = preg_replace(array("/(\r\n)+/", "/\r+/", "/\n+/"), array("\r\n", "\r", "\n"), $newrec);
 	$newrec = stripslashes(trim($newrec));
@@ -115,10 +115,10 @@ function AppendGedrec($newrec, $fact="", $change_id, $change_type, $gedid="") {
 	$_SESSION["last_used"][$type] = JoinKey($xref, $GEDCOMID);
 	$newrec = preg_replace("/0 @(.*)@/", "0 @$xref@", $newrec);
 	
-	$sql = "INSERT INTO ".TBLPREFIX."changes (ch_cid, ch_gid, ch_gedfile, ch_type, ch_user, ch_time, ch_fact, ch_new)";
+	$sql = "INSERT INTO ".TBLPREFIX."changes (ch_cid, ch_gid, ch_file, ch_type, ch_user, ch_time, ch_fact, ch_new)";
 	$sql .= "VALUES ('".$change_id."', '".$xref."', '".$gedid."', '".$change_type."', '".$gm_username."', '".time()."', '".$fact."', '".DbLayer::EscapeQuery($newrec)."')";
 	$res = NewQuery($sql);
-	WriteToLog("AppendGedrec-> Appending new $type record $xref ->" . $gm_username ."<-", "I", "G", get_gedcom_from_id($gedid));
+	WriteToLog("AppendGedrec-> Appending new $type record $xref ->" . $gm_username ."<-", "I", "G", $gedid);
 
 	// Clear the GetChangeData cache
 	ResetChangeCaches();
@@ -129,7 +129,7 @@ function AppendGedrec($newrec, $fact="", $change_id, $change_type, $gedid="") {
 //-- this function will delete the gedcom record with
 //-- the given $gid
 function DeleteGedrec($gid, $change_id, $change_type) {
-	global $GEDCOMS, $GEDCOM, $manual_save, $gm_username, $GEDCOMID, $chcache, $can_auto_accept, $aa_attempt;
+	global $manual_save, $gm_username, $GEDCOMID, $chcache, $can_auto_accept, $aa_attempt;
 	$gid = strtoupper($gid);
 	
 	// NOTE: Check if auto accept is possible. If there are already changes present for any ID in one $change_id, changes cannot be auto accepted.
@@ -141,7 +141,7 @@ function DeleteGedrec($gid, $change_id, $change_type) {
 	}
 	// NOTE: Check if there are changes present, if so flag pending changes so they cannot be approved
 	if (GetChangeData(true, $gid, true)) {
-		$sql = "SELECT ch_cid AS cid FROM ".TBLPREFIX."changes WHERE ch_gid = '".$gid."' AND ch_gedfile = '".$GEDCOMID."' ORDER BY ch_cid ASC";
+		$sql = "SELECT ch_cid AS cid FROM ".TBLPREFIX."changes WHERE ch_gid = '".$gid."' AND ch_file = '".$GEDCOMID."' ORDER BY ch_cid ASC";
 		$res = NewQuery($sql);
 		while($row = $res->FetchAssoc()){
 			$sqlcid = "UPDATE ".TBLPREFIX."changes SET ch_delete = '1' WHERE ch_cid = '".$row["cid"]."'";
@@ -154,16 +154,16 @@ function DeleteGedrec($gid, $change_id, $change_type) {
 	// NOTE Check if record exists in the database
 	if (!FindGedcomRecord($gid) && !GetChangeData(true, $gid, true)) {
 		print "DeleteGedrec-> Could not find gedcom record with xref: $gid. <br />";
-		WriteToLog("DeleteGedrec-> Could not find gedcom record with xref: $gid ->" . $gm_username ."<-", "E", "G", $GEDCOM);
+		WriteToLog("DeleteGedrec-> Could not find gedcom record with xref: $gid ->" . $gm_username ."<-", "E", "G", $GEDCOMID);
 		return false;
 	}
 	else {
 		$rec = GetChangeData(false, $gid, true, "gedlines","");
-		if (isset($rec[$GEDCOM][$gid])) $oldrec = $rec[$GEDCOM][$gid];
+		if (isset($rec[$GEDCOMID][$gid])) $oldrec = $rec[$GEDCOMID][$gid];
 		else $oldrec = FindGedcomRecord($gid);
 		$ct = preg_match("/0 @.*@\s(\w+)\s/", $oldrec, $match);
 		$ch_fact = $match[1];
-		$sql = "INSERT INTO ".TBLPREFIX."changes (ch_cid, ch_gid, ch_fact, ch_old, ch_gedfile, ch_type, ch_user, ch_time)";
+		$sql = "INSERT INTO ".TBLPREFIX."changes (ch_cid, ch_gid, ch_fact, ch_old, ch_file, ch_type, ch_user, ch_time)";
 		$sql .= "VALUES ('".$change_id."', '".$gid."', '".$ch_fact."', '".DbLayer::EscapeQuery($oldrec)."', '".$GEDCOMID."', '".$change_type."', '".$gm_username."', '".time()."')";
 		$res = NewQuery($sql);
 		// Also delete the asso recs to an indi, to preserve referential integrity
@@ -174,14 +174,14 @@ function DeleteGedrec($gid, $change_id, $change_type) {
 					$pid1 = SplitKey($p1key, "id");
 					$pid2 = SplitKey($asso["pid2"], "id");
 					$arec = GetChangeData(false, $pid2, true, "gedlines","");
-					if (isset($rec[$GEDCOM][$pid2])) $arec = $rec[$GEDCOM][$pid2];
+					if (isset($rec[$GEDCOMID][$pid2])) $arec = $rec[$GEDCOMID][$pid2];
 					else $arec = FindGedcomRecord($pid2);
 					if (strstr($arec, "1 ASSO")) {
 						$i = 1;
 						do {
 							$asubrec = GetSubrecord(1, "1 ASSO @".$pid1."@", $arec, $i);
 							if (!empty($asubrec)) {
-								$sql = "INSERT INTO ".TBLPREFIX."changes (ch_cid, ch_gid, ch_fact, ch_old, ch_gedfile, ch_type, ch_user, ch_time)";
+								$sql = "INSERT INTO ".TBLPREFIX."changes (ch_cid, ch_gid, ch_fact, ch_old, ch_file, ch_type, ch_user, ch_time)";
 								$sql .= "VALUES ('".$change_id."', '".$pid2."', 'ASSO', '".DbLayer::EscapeQuery($asubrec)."', '".$GEDCOMID."', '".$change_type."', '".$gm_username."', '".time()."')";
 							}
 							$i++;
@@ -193,7 +193,7 @@ function DeleteGedrec($gid, $change_id, $change_type) {
 							if (preg_match("/\n2 ASSO @$pid1@/", $subrec, $match)) {
 								$asubrec = GetSubrecord(2, "2 ASSO @".$pid1."@", $subrec);
 								$newsubrec = preg_replace($asubrec, "", $subrec);
-								$sql = "INSERT INTO ".TBLPREFIX."changes (ch_cid, ch_gid, ch_fact, ch_old, ch_new, ch_gedfile, ch_type, ch_user, ch_time)";
+								$sql = "INSERT INTO ".TBLPREFIX."changes (ch_cid, ch_gid, ch_fact, ch_old, ch_new, ch_file, ch_type, ch_user, ch_time)";
 								$sql .= "VALUES ('".$change_id."', '".$pid2."', 'ASSO', '".DbLayer::EscapeQuery($subrec)."', '".DbLayer::EscapeQuery($newsubrec)."', '".$GEDCOMID."', '".$change_type."', '".$gm_username."', '".time()."')";
 							}
 						}
@@ -204,7 +204,7 @@ function DeleteGedrec($gid, $change_id, $change_type) {
 					
 			
 	}
-	WriteToLog("DeleteGedrec-> Deleting gedcom record $gid ->" . $gm_username ."<-", "I", "G", $GEDCOM);
+	WriteToLog("DeleteGedrec-> Deleting gedcom record $gid ->" . $gm_username ."<-", "I", "G", $GEDCOMID);
 	// Clear the GetChangeData cache
 	ResetChangeCaches();
 	return true;
@@ -213,7 +213,7 @@ function DeleteGedrec($gid, $change_id, $change_type) {
 //-------------------------------------------- check_gedcom
 //-- this function will check a GEDCOM record for valid gedcom format
 function CheckGedcom($gedrec, $chan=true, $user="", $tstamp="") {
-	global $gm_lang, $DEBUG, $GEDCOM, $gm_username;
+	global $gm_lang, $DEBUG, $GEDCOMID, $gm_username;
 
 	$gedrec = stripslashes($gedrec);
 	$ct = preg_match("/0 @(.*)@ (.*)/", $gedrec, $match);
@@ -222,7 +222,7 @@ function CheckGedcom($gedrec, $chan=true, $user="", $tstamp="") {
 		$ct2 = preg_match("/0 HEAD/", $gedrec, $match2);
 		if ($ct2 == 0) {
 			print "CheckGedcom-> Invalid GEDCOM 5.5 format.\n";
-			WriteToLog("CheckGedcom-> Invalid GEDCOM 5.5 format.->" . $gm_username ."<-", "I", "G", $GEDCOM);
+			WriteToLog("CheckGedcom-> Invalid GEDCOM 5.5 format.->" . $gm_username ."<-", "I", "G", $GEDCOMID);
 			return false;
 		}
 	}
@@ -270,7 +270,7 @@ function CheckGedcom($gedrec, $chan=true, $user="", $tstamp="") {
 function PrintIndiForm($nextaction, $famid, $linenum="", $namerec="", $famtag="CHIL") {
 	global $gm_lang, $pid, $GM_IMAGE_DIR, $GM_IMAGES, $monthtonum, $WORD_WRAPPED_NOTES;
 	global $NPFX_accept, $SPFX_accept, $NSFX_accept, $FILE_FORM_accept, $USE_RTL_FUNCTIONS, $change_type;
-	global $GEDCOM, $gm_username, $gm_user;
+	global $GEDCOMID, $gm_username, $gm_user;
 
 	init_calendar_popup();
 	print "<form method=\"post\" name=\"addchildform\" action=\"edit_interface.php\">\n";
@@ -288,13 +288,13 @@ function PrintIndiForm($nextaction, $famid, $linenum="", $namerec="", $famtag="C
 		if ($famtag=="CHIL" and $nextaction=="addchildaction") {
 			if (!empty($famid) && GetChangeData(true, $famid, true, "", "FAM")) {
 				$rec = GetChangeData(false, $famid, true, "gedlines", "FAM");
-				$famrec = $rec[$GEDCOM][$famid];
+				$famrec = $rec[$GEDCOMID][$famid];
 			}
 			else $famrec = FindGedcomRecord($famid);
 			$parents = FindParentsInRecord($famrec);
 			if (!empty($famid) && !empty($parents["HUSB"]) && GetChangeData(true, $parents["HUSB"], true, "", "INDI")) {
 				$rec = GetChangeData(false, $parents["HUSB"], true, "gedlines", "INDI");
-				$indirec = $rec[$GEDCOM][$parents["HUSB"]];
+				$indirec = $rec[$GEDCOMID][$parents["HUSB"]];
 			}
 			else $indirec = FindPersonRecord($parents["HUSB"]);
 		}
@@ -303,7 +303,7 @@ function PrintIndiForm($nextaction, $famid, $linenum="", $namerec="", $famtag="C
 			$parents = FindParentsInRecord($famrec);
 			if (!empty($parents["HUSB"]) && GetChangeData(true, $parents["HUSB"], true, "", "INDI")) {
 				$rec = GetChangeData(false, $parents["HUSB"], true, "gedlines", "INDI");
-				$indirec = $rec[$GEDCOM][$parents["HUSB"]];
+				$indirec = $rec[$GEDCOMID][$parents["HUSB"]];
 			}
 			else $indirec = FindPersonRecord($parents["HUSB"]);
 		}
@@ -312,7 +312,7 @@ function PrintIndiForm($nextaction, $famid, $linenum="", $namerec="", $famtag="C
 			$parents = FindParentsInRecord($famrec);
 			if (!empty($parents["WIFE"]) && GetChangeData(true, $parents["WIFE"], true, "", "INDI")) {
 				$rec = GetChangeData(false, $parents["WIFE"], true, "gedlines", "INDI");
-				$indirec = $rec[$GEDCOM][$parents["WIFE"]];
+				$indirec = $rec[$GEDCOMID][$parents["WIFE"]];
 			}
 			else $indirec = FindPersonRecord($parents["WIFE"]);
 		}
@@ -641,7 +641,7 @@ function AddTagSeparator($fact="") {
  */
 function AddSimpleTag($tag, $upperlevel="", $tab="1") {
 	global $gm_lang, $GM_IMAGE_DIR, $GM_IMAGES, $MEDIA_DIRECTORY, $TEMPLE_CODES, $STATUS_CODES, $REPO_ID_PREFIX, $SPLIT_PLACES;
-	global $assorela, $tags, $emptyfacts, $TEXT_DIRECTION, $confighelpfile, $GM_BASE_DIRECTORY, $GEDCOM, $GEDCOMID;
+	global $assorela, $tags, $emptyfacts, $TEXT_DIRECTION, $confighelpfile, $GM_BASE_DIRECTORY, $GEDCOMID;
 	global $NPFX_accept, $SPFX_accept, $NSFX_accept, $FILE_FORM_accept, $upload_count, $separatorfacts, $canhavey_facts;
 	static $tabkey;
 	if (!isset($tabkey)) $tabkey = $tab;
@@ -1177,7 +1177,7 @@ function PrintAddLayer($tag, $level=2, $addfact=false) {
  * @return string	The updated gedcom record
  */
 function HandleUpdates($newged) {
-	global $glevels, $islink, $tag, $uploaded_files, $text, $NOTE, $change_id, $change_type, $success, $GEDCOM, $can_auto_accept, $gm_lang, $link_error;
+	global $glevels, $islink, $tag, $uploaded_files, $text, $NOTE, $change_id, $change_type, $success, $can_auto_accept, $gm_lang, $link_error;
 	
 	$link_error = false;
 //	print_r($_POST);
@@ -1231,7 +1231,7 @@ function HandleUpdates($newged) {
 					if (!empty($trec)) $passlink = true;
 					if (GetChangeData(true, $text[$j], true, "", "")) {
 						$t = GetChangeData(false, $text[$j], true, "gedlines", "");
-						$ctrec = $t[$GEDCOM][$text[$j]];
+						$ctrec = $t[$GEDCOMID][$text[$j]];
 						if (!empty($ctrec)) $passlink = true;
 						else $passlink = false;
 					}
@@ -1446,7 +1446,7 @@ function SubmitterRecord($level, $gedrec) {
 	}
 }
 function ShowMediaForm($pid, $action="newentry", $change_type="add_media") {
-	global $GEDCOM, $gm_lang, $TEXT_DIRECTION, $MEDIA_ID_PREFIX, $GEDCOMS, $WORD_WRAPPED_NOTES, $MEDIA_DIRECTORY;
+	global $GEDCOMID, $gm_lang, $TEXT_DIRECTION, $MEDIA_ID_PREFIX, $WORD_WRAPPED_NOTES, $MEDIA_DIRECTORY;
 	global $MEDIA_FACTS_ADD, $MEDIA_FACTS_UNIQUE, $gm_user;
 	
 	$facts_add = explode(",", $MEDIA_FACTS_ADD);
@@ -1457,7 +1457,7 @@ function ShowMediaForm($pid, $action="newentry", $change_type="add_media") {
 	print "<input type=\"hidden\" name=\"action\" value=\"$action\" />\n";
 	print "<input type=\"hidden\" name=\"paste\" value=\"1\" />\n";
 	print "<input type=\"hidden\" name=\"change_type\" value=\"$change_type\" />\n";
-	print "<input type=\"hidden\" name=\"ged\" value=\"$GEDCOM\" />\n";
+	print "<input type=\"hidden\" name=\"gedid\" value=\"$GEDCOMID\" />\n";
 	if (isset($pid)) print "<input type=\"hidden\" name=\"pid\" value=\"$pid\" />\n";
 	print "<table class=\"facts_table center $TEXT_DIRECTION\">\n";
 	print "<tr><td class=\"topbottombar\" colspan=\"2\">".$gm_lang["add_media"]."</td></tr>";
@@ -1473,7 +1473,7 @@ function ShowMediaForm($pid, $action="newentry", $change_type="add_media") {
 		$gedrec = FindMediaRecord($pid);
 		if (GetChangeData(true, $pid, true)) {
 			$rec = GetChangeData(false, $pid, true, "gedlines");
-			$gedrec = $rec[$GEDCOM][$pid];
+			$gedrec = $rec[$GEDCOMID][$pid];
 		}
 	}
 	else {
@@ -1608,7 +1608,7 @@ function ReplaceLinks($oldgid, $newgid, $mtype, $change_id, $change_type, $ged) 
 }
 
 function DeleteLinks($oldgid, $mtype, $change_id, $change_type, $ged) {
-	global $GEDCOM;
+	global $GEDCOMID;
 
 	// We miss the links on new records, which are only in the _changes table
 	$records = GetLinkedGedRecs($oldgid, $mtype, $ged);
@@ -1619,7 +1619,7 @@ function DeleteLinks($oldgid, $mtype, $change_id, $change_type, $ged) {
 		$type = $match[2];
 		if (GetChangeData(true, $gid, true, "", "")) {
 			$rec = GetChangeData(false, $gid, true, "gedlines", "");
-			$record = $rec[$GEDCOM][$gid];
+			$record = $rec[$GEDCOMID][$gid];
 		}
 		$subs = Getallsubrecords($record, "", false, false, false);
 		foreach ($subs as $key=>$sub) {
@@ -1700,13 +1700,13 @@ function GetLinkedGedrecs($oldgid, $mtype, $ged) {
 }
 
 function DeleteFamIfEmpty($famid, $change_id, $change_type, $ged="") {
-	global $GEDCOM, $GEDCOMID;
+	global $GEDCOMID;
 	
 	if (empty($ged)) $ged = $GEDCOMID;
 	$famrec = FindFamilyRecord($famid, get_gedcom_from_id($ged));
 	if (GetChangeData(true, $famid, true)) {
 		$rec = GetChangeData(false, $famid, true, "gedlines");
-		$famrec = $rec[$GEDCOM][$famid];
+		$famrec = $rec[$GEDCOMID][$famid];
 	}
 	$ct = preg_match("/1 CHIL|HUSB|WIFE/", $famrec);
 //	print $famrec."<br />".$ct."<br />";

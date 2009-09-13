@@ -34,7 +34,7 @@ $GM_BLOCKS["print_welcome_block"]["rss"]       	= false;
 
 //-- function to print the welcome block
 function print_welcome_block($block=true, $config="", $side, $index) {
-		global $gm_lang, $day, $month, $year, $GM_IMAGE_DIR, $GM_IMAGES, $user, $GEDCOM, $TIME_FORMAT,$command, $gm_username, $gm_user;
+		global $gm_lang, $day, $month, $year, $GM_IMAGE_DIR, $GM_IMAGES, $user, $GEDCOMID, $TIME_FORMAT,$command, $gm_username, $gm_user;
 
 		print "<div id=\"user_welcome\" class=\"block\">\n";
 		print "<div class=\"blockhc\">";
@@ -44,9 +44,9 @@ function print_welcome_block($block=true, $config="", $side, $index) {
 		if ($gm_user->editaccount) {
 			print "<div><a href=\"edituser.php\"><img src=\"".$GM_IMAGE_DIR."/".$GM_IMAGES["mygedview"]["small"]."\" border=\"0\" alt=\"".$gm_lang["myuserdata"]."\" title=\"".$gm_lang["myuserdata"]."\" /><br />".$gm_lang["myuserdata"]."</a></div>";
 		}
-		if (!empty($gm_user->gedcomid[$GEDCOM])) {
-			print "<div><a href=\"pedigree.php?rootid=".$gm_user->gedcomid[$GEDCOM]."\"><img src=\"".$GM_IMAGE_DIR."/".$GM_IMAGES["pedigree"]["small"]."\" border=\"0\" alt=\"".$gm_lang["my_pedigree"]."\" title=\"".$gm_lang["my_pedigree"]."\" /><br />".$gm_lang["my_pedigree"]."</a></div>";
-			print "<div><a href=\"individual.php?pid=".$gm_user->gedcomid[$GEDCOM]."\"><img src=\"".$GM_IMAGE_DIR."/".$GM_IMAGES["indis"]["small"]."\" border=\"0\" alt=\"".$gm_lang["my_indi"]."\" title=\"".$gm_lang["my_indi"]."\" /><br />".$gm_lang["my_indi"]."</a></div>\n";
+		if (!empty($gm_user->gedcomid[$GEDCOMID])) {
+			print "<div><a href=\"pedigree.php?rootid=".$gm_user->gedcomid[$GEDCOMID]."\"><img src=\"".$GM_IMAGE_DIR."/".$GM_IMAGES["pedigree"]["small"]."\" border=\"0\" alt=\"".$gm_lang["my_pedigree"]."\" title=\"".$gm_lang["my_pedigree"]."\" /><br />".$gm_lang["my_pedigree"]."</a></div>";
+			print "<div><a href=\"individual.php?pid=".$gm_user->gedcomid[$GEDCOMID]."\"><img src=\"".$GM_IMAGE_DIR."/".$GM_IMAGES["indis"]["small"]."\" border=\"0\" alt=\"".$gm_lang["my_indi"]."\" title=\"".$gm_lang["my_indi"]."\" /><br />".$gm_lang["my_indi"]."</a></div>\n";
 		}
 		print "<div>";
 		print_help_link("mygedview_customize_help", "qm", "customize_page");

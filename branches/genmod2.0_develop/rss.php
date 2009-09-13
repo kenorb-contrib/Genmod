@@ -56,8 +56,8 @@ $user =& User::GetInstance($CONTACT_EMAIL);
 $author =$user->firstname." ".$user->lastname;
 
 $rss = new UniversalFeedCreator();
-$rss->title = $GEDCOMS[$GEDCOM]["title"];
-$rss->description = str_replace("#GEDCOM_TITLE#", $GEDCOMS[$GEDCOM]["title"], $gm_lang["rss_descr"]);
+$rss->title = $GEDCOMS[$GEDCOMID]["title"];
+$rss->description = str_replace("#GEDCOM_TITLE#", $GEDCOMS[$GEDCOMID]["title"], $gm_lang["rss_descr"]);
 
 //optional
 $rss->descriptionTruncSize = 500;

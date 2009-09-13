@@ -686,7 +686,7 @@ function LanguageInUse($lang="") {
 		// Read GEDCOMS configuration and collect language data
 		foreach ($GEDCOMS as $key => $value) {
 			SwitchGedcom($value["gedcom"]);
-			if (!isset($configuredlanguages["gedcom"][$GEDCOMLANG][$key])) $configuredlanguages["gedcom"][$GEDCOMLANG][$key] = TRUE;
+			if (!isset($configuredlanguages["gedcom"][$GEDCOMLANG][$value["gedcom"]])) $configuredlanguages["gedcom"][$GEDCOMLANG][$value["gedcom"]] = TRUE;
 			$inuse[$GEDCOMLANG] = true;
 		}
 		// Restore the current settings

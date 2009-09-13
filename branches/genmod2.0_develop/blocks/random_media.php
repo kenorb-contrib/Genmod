@@ -34,7 +34,7 @@ $GM_BLOCKS["print_random_media"]["rss"]     = false;
 
 //-- function to display a random picture from the gedcom
 function print_random_media($block = true, $config="", $side, $index) {
-	global $gm_lang, $GEDCOM, $foundlist, $medialist, $TEXT_DIRECTION, $GM_IMAGE_DIR, $GM_IMAGES;
+	global $gm_lang, $GEDCOMID, $foundlist, $medialist, $TEXT_DIRECTION, $GM_IMAGE_DIR, $GM_IMAGES;
 	global $MEDIA_EXTERNAL, $MEDIA_DIRECTORY, $SHOW_SOURCES, $GEDCOM_ID_PREFIX, $FAM_ID_PREFIX, $SOURCE_ID_PREFIX;
 	global $MEDIATYPE, $medialist, $gm_username, $USE_GREYBOX;
 	
@@ -89,7 +89,7 @@ function print_random_media($block = true, $config="", $side, $index) {
 		print "</a>\n";
 		if ($block) print "<br />";
 		if ($value->title!=$value->filename) {
-		    print "<a href=\"mediadetail.php?mid=".$value->xref."&amp;ged=".$GEDCOM."\">";
+		    print "<a href=\"mediadetail.php?mid=".$value->xref."&amp;gedid=".$GEDCOMID."\">";
 		    if (strlen($value->title) > 0) print "<b>".PrintReady($value->title)."</b><br />";
 			print "</a>";
 		}

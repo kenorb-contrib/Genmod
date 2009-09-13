@@ -104,7 +104,7 @@ class User {
 	}	
 	
 	private function GetUser($username, $userfields="") {
-		global $userobjects, $GEDCOMS, $DBCONN;
+		global $userobjects, $DBCONN;
 
 		if (empty($username) || $username == "empty") return false;
 
@@ -171,7 +171,7 @@ class User {
 			}
 		
 			// Now get the rights
-			$ged = get_gedcom_from_id($user_row["ug_gedfile"]);
+			$ged = $user_row["ug_gedfile"];
 			if (isset($user_row["ug_canedit"])) $this->canedit[$ged] = $user_row["ug_canedit"];
 			if (isset($user_row["ug_privgroup"])) $this->privgroup[$ged] = $user_row["ug_privgroup"];
 			if (isset($user_row["ug_gedcomadmin"])) {
@@ -201,7 +201,7 @@ class User {
 	* @return int		their access level
 	*/
 	public function getUserAccessLevel() {
-		global $PRIV_PUBLIC, $PRIV_NONE, $PRIV_USER, $GEDCOM;
+		global $PRIV_PUBLIC, $PRIV_NONE, $PRIV_USER;
 
 		if ($this->username == "") return $PRIV_PUBLIC;
 
@@ -219,12 +219,12 @@ class User {
 	* @return boolean true if user can access false if they cannot
 	*/
 	public function userPrivAccess() {
-		global $GEDCOM;
+		global $GEDCOMID;
 
 		if ($this->username == "") return false;
 		if ($this->userIsAdmin()) return true;
-		if (isset($this->privgroup[$GEDCOM])) {
-			if ($this->privgroup[$GEDCOM]!="none") return true;
+		if (isset($this->privgroup[$GEDCOMID])) {
+			if ($this->privgroup[$GEDCOMID]!="none") return true;
 			else return false;
 		}
 		else return false;
@@ -237,15 +237,15 @@ class User {
 	* user has administrative privileges
 	* to change the configuration files for the currently active gedcom
 	*/
-	public function userGedcomAdmin($ged="") {
-		global $GEDCOM;
+	public function userGedcomAdmin($gedid="") {
+		global $GEDCOMID;
 
-		if (empty($ged)) $ged = $GEDCOM;
+		if (empty($gedid)) $gedid = $GEDCOMID;
 
 		if ($_SESSION['cookie_login']) return false;
 		if ($this->username == "") return false;
 		if ($this->userIsAdmin()) return true;
-		if (isset($this->gedcomadmin[$ged]) && $user->gedcomadmin[$ged]) return true;
+		if (isset($this->gedcomadmin[$gedid]) && $user->gedcomadmin[$gedid]) return true;
 		else return false;
 	}
 	
@@ -271,10 +271,10 @@ class User {
 	* @param string $username the username of the user to check
 	* @return boolean true if user can edit false if they cannot
 	*/
-	public function userCanEdit($ged="") {
-		global $ALLOW_EDIT_GEDCOM, $GEDCOM;
+	public function userCanEdit($gedid="") {
+		global $ALLOW_EDIT_GEDCOM, $GEDCOMID;
 
-		if (empty($ged)) $ged = $GEDCOM;
+		if (empty($gedid)) $gedid = $GEDCOMID;
 
 		if (!$ALLOW_EDIT_GEDCOM) return false;
 		if ($this->username == "empty" || $this->username == "") return false;
@@ -282,9 +282,9 @@ class User {
 		// Site admins can edit all
 		if ($this->userIsAdmin()) return true;
 		
-		if (isset($this->canedit[$ged])) {
+		if (isset($this->canedit[$gedid])) {
 			// yes and true are old values
-			if ($this->canedit[$ged]=="yes" || $this->canedit[$ged]=="edit" || $this->gedcomadmin[$ged] || $this->canedit[$ged]=="accept" || $this->canedit[$ged]===true) return true;
+			if ($this->canedit[$gedid]=="yes" || $this->canedit[$gedid]=="edit" || $this->gedcomadmin[$gedid] || $this->canedit[$gedid]=="accept" || $this->canedit[$gedid]===true) return true;
 			else return false;
 		}
 		else return false;
@@ -297,10 +297,10 @@ class User {
 	* @param string $username	the username of the user check privileges
 	* @return boolean true if user can accept false if user cannot accept
 	*/ 
-	public function userCanAccept($ged="") {
-		global $ALLOW_EDIT_GEDCOM, $GEDCOM;
+	public function userCanAccept($gedid="") {
+		global $ALLOW_EDIT_GEDCOM, $GEDCOMID;
 
-		if (empty($ged)) $ged = $GEDCOM;
+		if (empty($gedid)) $gedid = $GEDCOMID;
 
 		if (!$ALLOW_EDIT_GEDCOM) return false;
 		if ($this->username == "") return false;
@@ -308,9 +308,9 @@ class User {
 		// Site admins can accept all
 		if ($this->userIsAdmin()) return true;
 		
-		if (isset($this->gedcomadmin[$ged]) && $this->gedcomadmin[$ged]) return true;
-		if (isset($this->canedit[$ged])) {
-			if ($this->canedit[$ged]=="accept") return true;
+		if (isset($this->gedcomadmin[$gedid]) && $this->gedcomadmin[$gedid]) return true;
+		if (isset($this->canedit[$gedid])) {
+			if ($this->canedit[$gedid]=="accept") return true;
 			else return false;
 		}
 		else return false;
@@ -335,17 +335,19 @@ class User {
 	* @param		string	$ged			The GEDCOM file or if not set, the current user
 	* @return 		boolean					Return true or false as a result
 	*/ 
-	public function userCanViewGedlines($ged="") {
-		global $GEDCOM, $SHOW_GEDCOM_RECORD;
+	public function userCanViewGedlines($gedid="") {
+		global $GEDCOMID, $SHOW_GEDCOM_RECORD;
 		
 		if ($this->username == "empty" || $this->username == "") return false;
 
+		if (empty($gedid)) $gedid = $GEDCOMID;
+		
 		if ($SHOW_GEDCOM_RECORD == -1) return false;
 		if ($SHOW_GEDCOM_RECORD == 0) return true;
-		if ($SHOW_GEDCOM_RECORD == 1 && $this->UserPrivAccess($GEDCOM)) return true;
-		if ($SHOW_GEDCOM_RECORD == 2 && $this->UserCanEdit($GEDCOM)) return true;
-		if ($SHOW_GEDCOM_RECORD == 3 && $this->UserCanAccept($GEDCOM)) return true;
-		if ($SHOW_GEDCOM_RECORD == 4 && $this->UserGedcomAdmin($GEDCOM)) return true;
+		if ($SHOW_GEDCOM_RECORD == 1 && $this->UserPrivAccess($gedid)) return true;
+		if ($SHOW_GEDCOM_RECORD == 2 && $this->UserCanEdit($gedid)) return true;
+		if ($SHOW_GEDCOM_RECORD == 3 && $this->UserCanAccept($gedid)) return true;
+		if ($SHOW_GEDCOM_RECORD == 4 && $this->UserGedcomAdmin($gedid)) return true;
 		if ($SHOW_GEDCOM_RECORD == 5 && $this->UserIsAdmin()) return true;
 		return false;
 	}
@@ -357,40 +359,43 @@ class User {
 	* @param		string	$ged			The GEDCOM file or if not set, the current user
 	* @return 		boolean					Return true or false as a result
 	*/ 
-	public function userCanEditGedlines($username="", $ged="") {
-		global $GEDCOM, $ALLOW_EDIT_GEDCOM, $EDIT_GEDCOM_RECORD;
+	public function userCanEditGedlines($username="", $gedid="") {
+		global $GEDCOMID, $ALLOW_EDIT_GEDCOM, $EDIT_GEDCOM_RECORD;
 		
-		if (!$ALLOW_EDIT_GEDCOM) return false;
-	
-		if ($this->username == "empty" || $this->username == "") return false;
-		
-		// Note: options 0 and 1 are not configurable in the settings.
-		if ($EDIT_GEDCOM_RECORD == -1) return false;
-		if ($EDIT_GEDCOM_RECORD == 0) return true;
-		if ($EDIT_GEDCOM_RECORD == 1 && $this->UserPrivAccess($GEDCOM)) return true;
-		if ($EDIT_GEDCOM_RECORD == 2 && $this->UserCanEdit($GEDCOM)) return true;
-		if ($EDIT_GEDCOM_RECORD == 3 && $this->UserCanAccept($GEDCOM)) return true;
-		if ($EDIT_GEDCOM_RECORD == 4 && $this->UserGedcomAdmin($GEDCOM)) return true;
-		if ($EDIT_GEDCOM_RECORD == 5 && $this->UserIsAdmin()) return true;
-		return false;
+		if (empty($gedid)) $gedid = $GEDCOMID;
+		$can = false;
+		SwitchGedcom($gedid);
+		if ($ALLOW_EDIT_GEDCOM) {
+			if ($this->username == "empty" || $this->username == "") $can = false;
+			// Note: options 0 and 1 are not configurable in the settings.
+			elseif ($EDIT_GEDCOM_RECORD == -1) $can = false;
+			elseif ($EDIT_GEDCOM_RECORD == 0) $can = true;
+			elseif ($EDIT_GEDCOM_RECORD == 1 && $this->UserPrivAccess($GEDCOMID)) $can = true;
+			elseif ($EDIT_GEDCOM_RECORD == 2 && $this->UserCanEdit($GEDCOMID)) $can = true;
+			elseif ($EDIT_GEDCOM_RECORD == 3 && $this->UserCanAccept($GEDCOMID)) $can = true;
+			elseif ($EDIT_GEDCOM_RECORD == 4 && $this->UserGedcomAdmin($GEDCOMID)) $can = true;
+			elseif ($EDIT_GEDCOM_RECORD == 5 && $this->UserIsAdmin()) $can = true;
+		}
+		SwitchGedcom();
+		return $can;
 	}
 	
 	public function UserCanEditOwn($pid) {
-		global $GEDCOM, $USE_QUICK_UPDATE;
+		global $GEDCOMID, $USE_QUICK_UPDATE;
 	
 		if ($this->UserCanEdit()) return true;
 		if (!$USE_QUICK_UPDATE) return false;
 		if (empty($pid)) return false;
 
-		if (!empty($this->gedcomid[$GEDCOM])) {
-			if ($pid == $this->gedcomid[$GEDCOM]) return true;
+		if (!empty($this->gedcomid[$GEDCOMID])) {
+			if ($pid == $this->gedcomid[$GEDCOMID]) return true;
 			else {
-				$famids = Array_Merge(FindSfamilyIds($this->gedcomid[$GEDCOM]), FindFamilyIds($this->gedcomid[$GEDCOM]));
+				$famids = Array_Merge(FindSfamilyIds($this->gedcomid[$GEDCOMID]), FindFamilyIds($this->gedcomid[$GEDCOMID]));
 				foreach($famids as $indexval => $fam) {
 					$famid = $fam["famid"];
 					if (GetChangeData(true, $famid, true)) {
 						$rec = GetChangeData(false, $famid, true, "gedlines");
-						$famrec = $rec[$GEDCOM][$famid];
+						$famrec = $rec[$GEDCOMID][$famid];
 					}
 					else $famrec = FindFamilyRecord($famid);
 					if (preg_match("/1 HUSB @$pid@/", $famrec)>0) return true;
@@ -400,7 +405,6 @@ class User {
 			}
 		}
 		return false;
-	}	 
-	
+	}
 }
 ?>

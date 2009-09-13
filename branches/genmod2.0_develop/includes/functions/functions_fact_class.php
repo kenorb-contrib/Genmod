@@ -522,7 +522,7 @@ abstract class FactFunctions {
 	}
 	
 	public function PrintFactNotes($factobj, $level, $nobr=true) {
-		global $gm_lang, $GEDCOM;
+		global $gm_lang;
 		global $INDI_EXT_FAM_FACTS;
 		
 		// This is to prevent that notes are printed as part of the fact for family facts displayed on the indipage
@@ -600,7 +600,7 @@ abstract class FactFunctions {
 		return $factnotesprinted;
 	}
 
-	private function PrintFactSources($factobj, $level, $nobr=true) {
+	public function PrintFactSources($factobj, $level, $nobr=true) {
 		global $gm_lang;
 		global $FACT_COUNT, $GM_IMAGE_DIR, $GM_IMAGES;
 		static $cnt;
@@ -747,8 +747,8 @@ abstract class FactFunctions {
 	
 	//-- Print the links to multi-media objects
 	public function PrintFactMedia($factobj, $level, $nobr=true) {
-		global $TEXT_DIRECTION, $GEDCOMS, $MEDIATYPE;
-		global $gm_lang, $GM_IMAGE_DIR, $GM_IMAGES, $GEDCOM;
+		global $TEXT_DIRECTION, $MEDIATYPE;
+		global $gm_lang, $GM_IMAGE_DIR, $GM_IMAGES;
 		global $MEDIA_DIRECTORY, $MEDIA_EXTERNAL, $GEDCOMID, $USE_GREYBOX, $INDI_EXT_FAM_FACTS;
 		
 		// This is to prevent that notes are printed as part of the fact for family facts displayed on the indipage
@@ -1018,8 +1018,8 @@ abstract class FactFunctions {
 						if (!$asso->view) {
 							$family =& Family::GetInstance($pid);
 							if (!$family->isempty) {
-								if ($family->husb_id != "" && $family->husb_id != $asso->xref) print " - <a href=\"relationship.php?pid1=".$family->husb_id."&amp;pid2=".$asso->xref."&amp;followspouse=1&amp;ged=".$asso->gedcomid."\">[" . $gm_lang["relationship_chart"] . "<img src=\"".$GM_IMAGE_DIR."/" . $GM_IMAGES["sex"]["small"] . "\" title=\"" . $gm_lang["husband"] . "\" alt=\"" . $gm_lang["husband"] . "\" class=\"sex_image\" />]</a>";
-								if ($family->wife_id != "" && $family->wife_id != $asso->xref) print " - <a href=\"relationship.php?pid1=".$family->wife_id."&amp;pid2=".$asso->xref."&amp;followspouse=1&amp;ged=".$asso->gedcomid."\">[" . $gm_lang["relationship_chart"] . "<img src=\"".$GM_IMAGE_DIR."/" . $GM_IMAGES["sexf"]["small"] . "\" title=\"" . $gm_lang["wife"] . "\" alt=\"" . $gm_lang["wife"] . "\" class=\"sex_image\" />]</a>";
+								if ($family->husb_id != "" && $family->husb_id != $asso->xref) print " - <a href=\"relationship.php?pid1=".$family->husb_id."&amp;pid2=".$asso->xref."&amp;followspouse=1&amp;gedid=".$asso->gedcomid."\">[" . $gm_lang["relationship_chart"] . "<img src=\"".$GM_IMAGE_DIR."/" . $GM_IMAGES["sex"]["small"] . "\" title=\"" . $gm_lang["husband"] . "\" alt=\"" . $gm_lang["husband"] . "\" class=\"sex_image\" />]</a>";
+								if ($family->wife_id != "" && $family->wife_id != $asso->xref) print " - <a href=\"relationship.php?pid1=".$family->wife_id."&amp;pid2=".$asso->xref."&amp;followspouse=1&amp;gedid=".$asso->gedcomid."\">[" . $gm_lang["relationship_chart"] . "<img src=\"".$GM_IMAGE_DIR."/" . $GM_IMAGES["sexf"]["small"] . "\" title=\"" . $gm_lang["wife"] . "\" alt=\"" . $gm_lang["wife"] . "\" class=\"sex_image\" />]</a>";
 							}
 							else if ($pid != $asso->xref) print " - <a href=\"relationship.php?pid1=".$pid."&amp;pid2=".$asso->xref."&amp;followspouse=1&amp;gedid=".$asso->gedcomid."\">[" . $gm_lang["relationship_chart"] . "]</a>";
 						}
@@ -1102,42 +1102,7 @@ abstract class FactFunctions {
 		print "</form>\n";
 		print "</td></tr>\n";
 	}
-	
-	/**
-	 * print first major fact for an Individual
-	 *
-	 * @param string $key	indi pid
-	 */
-	public function PrintFirstMajorFact($person, $prt=true, $break=false) {
-		global $gm_lang, $GM_BASE_DIRECTORY, $factsfile, $LANGUAGE;
 		
-		$majorfacts = array("BIRT", "CHR", "BAPM", "DEAT", "BURI", "BAPL", "ADOP");
-		$retstr = "";
-		$foundfact = "";
-		$facts = $person->SelectFacts($majorfacts);
-		foreach ($facts as $key => $factobj) {
-			if (strlen($factobj->factrec) > 7 && $factobj->disp) {
-				if ($break) $retstr .= "<br />";
-				else $retstr .= " -- ";
-				$retstr .= "<i>";
-				if (isset($gm_lang[$factobj->fact])) $retstr .= $gm_lang[$factobj->fact];
-				else if (defined("GM_FACT_".$factobj->fact)) $retstr .= constant("GM_FACT_".$factobj->fact);
-				else $retstr .= $factobj->fact;
-				$retstr .= " ";
-				$retstr .= $factobj->PrintFactDate(false, false, false, false, false, false);
-				$retstr .= $factobj->PrintFactPlace(false, false, false, false);
-				$retstr .= "</i>";
-				$foundfact = $factobj->fact;
-				break;
-			}
-		}
-		if ($prt) {
-			print $retstr;
-			return $foundfact;
-		}
-		else return addslashes($retstr);
-	}
-	
 	/**
 	 * print an address structure
 	 *

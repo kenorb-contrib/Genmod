@@ -45,7 +45,7 @@ if (strstr($_SERVER["SCRIPT_NAME"],basename(__FILE__))) {
  * @return	array $myindilist array with all individuals that matched the query
  */
 function SearchIndis($query, $allgeds=false, $ANDOR="AND") {
-	global $indilist, $GEDCOMS, $GEDCOM;
+	global $indilist, $GEDCOMS, $GEDCOMID;
 	
 	$myindilist = array();
 	if (!is_array($query)) $sql = "SELECT i_key, i_id, i_file, i_gedcom, i_isdead FROM ".TBLPREFIX."individuals WHERE (i_gedcom REGEXP '".DbLayer::EscapeQuery($query)."')";
@@ -65,7 +65,7 @@ function SearchIndis($query, $allgeds=false, $ANDOR="AND") {
 		if (count($allgeds) != count($GEDCOMS)) {
 			$sql .= " AND (";
 			for ($i=0; $i<count($allgeds); $i++) {
-				$sql .= "i_file='".DbLayer::EscapeQuery($GEDCOMS[$allgeds[$i]]["id"])."'";
+				$sql .= "i_file='".$allgeds[$i]."'";
 				if ($i < count($allgeds)-1) $sql .= " OR ";
 			}
 			$sql .= ")";
@@ -81,7 +81,7 @@ function SearchIndis($query, $allgeds=false, $ANDOR="AND") {
 			$myindilist[$key]["gedfile"] = $row["i_file"];
 			$myindilist[$key]["gedcom"] = $row["i_gedcom"];
 			$myindilist[$key]["isdead"] = $row["i_isdead"];
-//			if ($myindilist[$row["i_key"]]["gedfile"] == $GEDCOM) $indilist[$row[0]] = $myindilist[$row[0]."[".$row[2]."]"];
+//			if ($myindilist[$row["i_key"]]["gedfile"] == $GEDCOMID) $indilist[$row[0]] = $myindilist[$row[0]."[".$row[2]."]"];
 		}
 		$res->FreeResult();
 	}
@@ -100,7 +100,7 @@ function SearchIndis($query, $allgeds=false, $ANDOR="AND") {
  * @return	array $myindilist array with all individuals that matched the query
  */
 function FTSearchIndis($query, $allgeds=false, $ANDOR="AND") {
-	global $indilist, $GEDCOMID, $GEDCOMS, $GEDCOM, $ftminwlen, $ftmaxwlen, $COMBIKEY;
+	global $indilist, $GEDCOMID, $GEDCOMS, $ftminwlen, $ftmaxwlen, $COMBIKEY;
 	
 	// Get the min and max search word length
 	GetFTWordLengths();
@@ -140,7 +140,7 @@ function FTSearchIndis($query, $allgeds=false, $ANDOR="AND") {
 		if (count($allgeds) != count($GEDCOMS)) {
 			$sql .= " AND (";
 			for ($i=0; $i<count($allgeds); $i++) {
-				$sql .= "i_file='".DbLayer::EscapeQuery($GEDCOMS[$allgeds[$i]]["id"])."'";
+				$sql .= "i_file='".$allgeds[$i]."'";
 				if ($i < count($allgeds)-1) $sql .= " OR ";
 			}
 			$sql .= ")";
@@ -174,7 +174,7 @@ function FTSearchIndis($query, $allgeds=false, $ANDOR="AND") {
  * @subpackage Calendar
 **/
 function SearchIndisFam($add2myindilist) {
-	global $GEDCOM, $indilist, $myindilist, $GEDCOMID;
+	global $indilist, $myindilist, $GEDCOMID;
 
 	$sql = "SELECT i_id, i_file, i_gedcom, i_isdead, n_name, n_type, n_surname, n_letter FROM ".TBLPREFIX."individuals, ".TBLPREFIX."names WHERE i_key=n_key AND i_file='".$GEDCOMID."'";
 	$res = NewQuery($sql);
@@ -201,7 +201,7 @@ function SearchIndisFam($add2myindilist) {
 * @subpackage Calendar
 **/
 function SearchIndisYearRange($startyear, $endyear, $allgeds=false) {
-	global $GEDCOM, $indilist, $GEDCOMS, $GEDCOMID;
+	global $indilist, $GEDCOMID;
 
 	$myindilist = array();
 	$sql = "SELECT i_id, i_file, i_gedcom, i_isdead, n_name, n_surname, n_letter, n_type FROM ".TBLPREFIX."individuals, ".TBLPREFIX."names WHERE i_key=n_key AND (";
@@ -236,7 +236,7 @@ function SearchIndisYearRange($startyear, $endyear, $allgeds=false) {
  * @subpackage Find
 **/
 function SearchIndisNames($query, $allgeds=false, $gedid=0) {
-	global $GEDCOM, $indilist, $GEDCOMS, $GEDCOMID;
+	global $indilist, $GEDCOMID;
 	
 	//-- split up words and find them anywhere in the record... important for searching names
 	//-- like "givenname surname"
@@ -293,7 +293,7 @@ function SearchIndisNames($query, $allgeds=false, $gedid=0) {
  * @return	array $myindilist array with all individuals that matched the query
  */
 function SearchIndisDates($day="", $month="", $year="", $fact="", $allgeds=false, $ANDOR="AND") {
-	global $GEDCOM, $indilist, $GEDCOMS, $GEDCOMID;
+	global $indilist, $GEDCOMID;
 	$myindilist = array();
 	
 	$sql = "SELECT i_id, i_file, i_gedcom, i_isdead, d_gid, d_fact, n_name, n_surname, n_type, n_letter FROM ".TBLPREFIX."dates, ".TBLPREFIX."individuals, ".TBLPREFIX."names WHERE i_key=d_key AND n_key=i_key ";
@@ -352,7 +352,7 @@ function SearchIndisDates($day="", $month="", $year="", $fact="", $allgeds=false
  * @return	array $myindilist array with all individuals that matched the query
  */
 function SearchIndisDateRange($dstart="1", $mstart="1", $ystart="", $dend="31", $mend="12", $yend="", $filter="all", $onlyBDM="no", $skipfacts="", $allgeds=false, $onlyfacts="") {
-	global $GEDCOMID, $indilist, $GEDCOMS, $GEDCOM;
+	global $GEDCOMID, $indilist;
 	$myindilist = array();
 //print "Dstart: ".$dstart."<br />";
 //print "Mstart: ".$mstart." ".date("M", mktime(1,0,0,$mstart,1))."<br />";
@@ -472,7 +472,7 @@ function DateRangeforQuery($dstart="1", $mstart="1", $ystart="", $dend="31", $me
  * @return	array $myfamlist array with all individuals that matched the query
  */
 function SearchFamsDateRange($dstart="1", $mstart="1", $ystart, $dend="31", $mend="12", $yend, $onlyBDM="no", $skipfacts="", $allgeds=false, $onlyfacts="") {
-	global $GEDCOMID, $famlist, $GEDCOM, $GEDCOMS, $GEDCOMID;
+	global $GEDCOMID, $famlist, $GEDCOMS, $GEDCOMID;
 	$myfamlist = array();
 	$sql = "SELECT f_key, f_id, f_husb, f_wife, f_file, f_gedcom FROM ".TBLPREFIX."dates, ".TBLPREFIX."families WHERE f_key=d_key ";
 
@@ -482,11 +482,10 @@ function SearchFamsDateRange($dstart="1", $mstart="1", $ystart, $dend="31", $men
 	$sql .= "GROUP BY f_id ORDER BY d_year, d_month, d_day DESC";
 
 	$res = NewQuery($sql);
-	$gedold = $GEDCOM;
+	$gedold = $GEDCOMID;
 	while($row = $res->fetchAssoc()){
 		$row = db_cleanup($row);
-		$GEDCOM = get_gedcom_from_id($row["f_file"]);
-		$GEDCOMID = $GEDCOMS[$GEDCOM]["id"];
+		$GEDCOMID = $row["f_file"];
 		$hname = GetSortableName(SplitKey($row["f_husb"], "id"));
 		$wname = GetSortableName(SplitKey($row["f_wife"], "id"));
 		if (empty($hname)) $hname = "@N.N.";
@@ -501,15 +500,14 @@ function SearchFamsDateRange($dstart="1", $mstart="1", $ystart, $dend="31", $men
 		$myfamlist[$key]["gedcom"] = $row["f_gedcom"];
 		$famlist[$key] = $myfamlist[$key];
 	}
-	$GEDCOM = $gedold;
-	$GEDCOMID = $GEDCOMS[$GEDCOM]["id"];
+	$GEDCOMID = $gedold;
 	$res->FreeResult();
 	return $myfamlist;
 }
 
 //-- search through the gedcom records for families
 function SearchFams($query, $allgeds=false, $ANDOR="AND", $allnames=false) {
-	global $GEDCOM, $famlist, $GEDCOMS, $GEDCOMID;
+	global $famlist, $GEDCOMS, $GEDCOMID;
 	
 	$myfamlist = array();
 	if (!is_array($query)) $sql = "SELECT f_id, f_husb, f_wife, f_file, f_gedcom FROM ".TBLPREFIX."families WHERE (f_gedcom REGEXP '".DbLayer::EscapeQuery($query)."')";
@@ -529,18 +527,17 @@ function SearchFams($query, $allgeds=false, $ANDOR="AND", $allnames=false) {
 	if ((is_array($allgeds)) && (count($allgeds) != 0)) {
 		$sql .= " AND (";
 		for ($i=0, $max=count($allgeds); $i<$max; $i++) {
-			$sql .= "f_file='".DbLayer::EscapeQuery($GEDCOMS[$allgeds[$i]]["id"])."'";
+			$sql .= "f_file='".$allgeds[$i]."'";
 			if ($i < $max-1) $sql .= " OR ";
 		}
 		$sql .= ")";
 	}
 	
 	$res = NewQuery($sql);
-	$gedold = $GEDCOM;
+	$gedold = $GEDCOMID;
 	while($row = $res->fetchAssoc()){
 		$row = db_cleanup($row);
-		$GEDCOM = get_gedcom_from_id($row["f_file"]);
-		$GEDCOMID = $GEDCOMS[$GEDCOM]["id"];
+		$GEDCOMID = $row["f_file"];
 		$husb = SplitKey($row["f_husb"], "id");
 		$wife = SplitKey($row["f_wife"], "id");
 		if ($allnames == true) {
@@ -571,8 +568,7 @@ function SearchFams($query, $allgeds=false, $ANDOR="AND", $allnames=false) {
 		$myfamlist[$key]["HUSB"] = $husb;
 		$myfamlist[$key]["WIFE"] = $wife;
 	}
-	$GEDCOM = $gedold;
-	$GEDCOMID = $GEDCOMS[$GEDCOM]["id"];
+	$GEDCOMID = $gedold;
 	$res->FreeResult();
 	return $myfamlist;
 }
@@ -599,7 +595,7 @@ function GetFTWordLengths() {
 
 //-- search through the gedcom records for families
 function FTSearchFams($query, $allgeds=false, $ANDOR="AND", $allnames=false) {
-	global $GEDCOM, $famlist, $GEDCOMS, $GEDCOMID, $ftminwlen, $ftmaxwlen, $COMBIKEY;
+	global $famlist, $GEDCOMS, $GEDCOMID, $ftminwlen, $ftmaxwlen, $COMBIKEY;
 
 	// Get the min and max search word length
 	GetFTWordLengths();
@@ -634,18 +630,17 @@ function FTSearchFams($query, $allgeds=false, $ANDOR="AND", $allnames=false) {
 	if ((is_array($allgeds)) && (count($allgeds) != 0) && count($allgeds) != count($GEDCOMS)) {
 		$sql .= " AND (";
 		for ($i=0, $max=count($allgeds); $i<$max; $i++) {
-			$sql .= "f_file='".DbLayer::EscapeQuery($GEDCOMS[$allgeds[$i]]["id"])."'";
+			$sql .= "f_file='".$allgeds[$i]."'";
 			if ($i < $max-1) $sql .= " OR ";
 		}
 		$sql .= ")";
 	}
 
 	$res = NewQuery($sql);
-	$gedold = $GEDCOM;
+	$gedold = $GEDCOMID;
 	while($row = $res->fetchAssoc()){
 		$row = db_cleanup($row);
-		$GEDCOM = get_gedcom_from_id($row["f_file"]);
-		$GEDCOMID = $GEDCOMS[$GEDCOM]["id"];
+		$GEDCOMID = $row["f_file"];
 		$husb = SplitKey($row["f_husb"], "id");
 		$wife = SplitKey($row["f_wife"], "id");
 		if ($allnames == true) {
@@ -677,8 +672,7 @@ function FTSearchFams($query, $allgeds=false, $ANDOR="AND", $allnames=false) {
 		$myfamlist[$key]["WIFE"] = $wife;
 		$famlist[$key] = $myfamlist[$key];
 	}
-	$GEDCOM = $gedold;
-	$GEDCOMID = $GEDCOMS[$GEDCOM]["id"];
+	$GEDCOMID = $gedold;
 	$res->FreeResult();
 	return $myfamlist;
 }
@@ -686,7 +680,7 @@ function FTSearchFams($query, $allgeds=false, $ANDOR="AND", $allnames=false) {
 
 //-- search through the gedcom records for families
 function SearchFamsNames($query, $ANDOR="AND", $allnames=false) {
-	global $GEDCOM, $famlist, $GEDCOMS, $GEDCOMID, $COMBIKEY;
+	global $famlist, $GEDCOMS, $GEDCOMID, $COMBIKEY;
 
 	$myfamlist = array();
 	$sql = "SELECT f_key, f_id, f_husb, f_wife, f_file, f_gedcom FROM ".TBLPREFIX."families WHERE (";
@@ -700,11 +694,10 @@ function SearchFamsNames($query, $ANDOR="AND", $allnames=false) {
 	$sql .= ")";
 
 	$res = NewQuery($sql);
-	$gedold = $GEDCOM;
+	$gedold = $GEDCOMID;
 	while($row = $res->fetchAssoc()){
 		$row = db_cleanup($row);
-		$GEDCOM = get_gedcom_from_id($row["f_file"]);
-		$GEDCOMID = $GEDCOMS[$GEDCOM]["id"];
+		$GEDCOMID = $row["f_file"];
 		$husb = SplitKey($row["f_husb"], "id");
 		$wife = SplitKey($row["f_wife"], "id");
 		if ($allnames == true) {
@@ -736,8 +729,7 @@ function SearchFamsNames($query, $ANDOR="AND", $allnames=false) {
 		$myfamlist[$key]["gedcom"] = $row["f_gedcom"];
 		$famlist[$key] = $myfamlist[$key];
 	}
-	$GEDCOM = $gedold;
-	$GEDCOMID = $GEDCOMS[$GEDCOM]["id"];
+	$GEDCOMID = $gedold;
 	$res->FreeResult();
 	return $myfamlist;
 }
@@ -755,7 +747,7 @@ function SearchFamsNames($query, $ANDOR="AND", $allnames=false) {
  * @return	array $myfamlist array with all families that matched the query
  */
 function SearchFamsMembers($query, $allgeds=false, $ANDOR="AND", $allnames=false) {
-	global $GEDCOM, $famlist, $GEDCOMS, $GEDCOMID;
+	global $famlist, $GEDCOMID;
 	
 	if (is_array($query)) $id = JoinKey($q[0], $q[1]);
 	else $id = JoinKey($query, $GEDCOMID);
@@ -789,7 +781,7 @@ function SearchFamsMembers($query, $allgeds=false, $ANDOR="AND", $allnames=false
  * @subpackage Calendar
 **/
 function SearchFamsYearRange($startyear, $endyear, $allgeds=false) {
-	global $GEDCOM, $famlist, $GEDCOMS, $GEDCOMID;
+	global $famlist, $GEDCOMID;
 
 	$myfamlist = array();
 	$sql = "SELECT f_id, f_husb, f_wife, f_file, f_gedcom FROM ".TBLPREFIX."families WHERE (";
@@ -833,7 +825,7 @@ function SearchFamsYearRange($startyear, $endyear, $allgeds=false) {
  * @return	array $myfamlist array with all individuals that matched the query
  */
 function SearchFamsDates($day="", $month="", $year="", $fact="", $allgeds=false) {
-	global $GEDCOM, $famlist, $GEDCOM, $GEDCOMS, $GEDCOMID;
+	global $famlist, $GEDCOMS, $GEDCOMID;
 	$myfamlist = array();
 	
 	$sql = "SELECT f_id, f_husb, f_wife, f_file, f_gedcom, d_gid, d_fact FROM ".TBLPREFIX."dates, ".TBLPREFIX."families WHERE f_key=d_key ";
@@ -862,11 +854,10 @@ function SearchFamsDates($day="", $month="", $year="", $fact="", $allgeds=false)
 	$sql .= "GROUP BY f_id ORDER BY d_year, d_month, d_day DESC";
 	
 	$res = NewQuery($sql);
-	$gedold = $GEDCOM;
+	$gedold = $GEDCOMID;
 	while($row = $res->fetchRow()){
 		$row = db_cleanup($row);
-		$GEDCOM = get_gedcom_from_id($row[3]);
-		$GEDCOMID = $GEDCOMS[$GEDCOM]["id"];
+		$GEDCOMID = $row[3];
 		$hname = GetSortableName(SplitKey($row[1], "id"));
 		$wname = GetSortableName(SplitKey($row[2], "id"));
 		if (empty($hname)) $hname = "@N.N.";
@@ -889,15 +880,14 @@ function SearchFamsDates($day="", $month="", $year="", $fact="", $allgeds=false)
 			$famlist[$row[0]] = $myfamlist[$row[0]];
 		}
 	}
-	$GEDCOM = $gedold;
-	$GEDCOMID = $GEDCOMS[$GEDCOM]["id"];
+	$GEDCOMID = $gedold;
 	$res->FreeResult();
 	return $myfamlist;
 }
 
 //-- search through the gedcom records for sources
 function SearchSources($query, $allgeds=false, $ANDOR="AND") {
-	global $GEDCOM, $GEDCOMS, $GEDCOMID;
+	global $GEDCOMID;
 	
 	$mysourcelist = array();	
 	if (!is_array($query)) $sql = "SELECT s_id, s_name, s_file, s_gedcom FROM ".TBLPREFIX."sources WHERE (s_gedcom REGEXP '".DbLayer::EscapeQuery($query)."')";
@@ -916,7 +906,7 @@ function SearchSources($query, $allgeds=false, $ANDOR="AND") {
 	if ((is_array($allgeds)) && (count($allgeds) != 0)) {
 		$sql .= " AND (";
 		for ($i=0; $i<count($allgeds); $i++) {
-			$sql .= "s_file='".DbLayer::EscapeQuery($GEDCOMS[$allgeds[$i]]["id"])."'";
+			$sql .= "s_file='".$allgeds[$i]."'";
 			if ($i < count($allgeds)-1) $sql .= " OR ";
 		}
 		$sql .= ")";
@@ -944,7 +934,7 @@ function SearchSources($query, $allgeds=false, $ANDOR="AND") {
 
 //-- search through the gedcom records for sources, full text
 function FTSearchSources($query, $allgeds=false, $ANDOR="AND") {
-	global $GEDCOM, $GEDCOMS, $GEDCOMID, $ftminwlen, $ftmaxwlen;
+	global $GEDCOMS, $GEDCOMID, $ftminwlen, $ftmaxwlen;
 	
 	// Get the min and max search word length
 	GetFTWordLengths();
@@ -979,7 +969,7 @@ function FTSearchSources($query, $allgeds=false, $ANDOR="AND") {
 	if ((is_array($allgeds) && count($allgeds) != 0) && count($allgeds) != count($GEDCOMS)) {
 		$sql .= " AND (";
 		for ($i=0; $i<count($allgeds); $i++) {
-			$sql .= "s_file='".DbLayer::EscapeQuery($GEDCOMS[$allgeds[$i]]["id"])."'";
+			$sql .= "s_file='".$allgeds[$i]."'";
 			if ($i < count($allgeds)-1) $sql .= " OR ";
 		}
 		$sql .= ")";
@@ -1007,7 +997,7 @@ function FTSearchSources($query, $allgeds=false, $ANDOR="AND") {
 
 //-- search through the gedcom records for repositories, full text
 function FTSearchRepos($query, $allgeds=false, $ANDOR="AND") {
-	global $GEDCOM, $GEDCOMS, $GEDCOMID, $ftminwlen, $ftmaxwlen;
+	global $GEDCOMS, $GEDCOMID, $ftminwlen, $ftmaxwlen;
 	
 	// Get the min and max search word length
 	GetFTWordLengths();
@@ -1044,7 +1034,7 @@ function FTSearchRepos($query, $allgeds=false, $ANDOR="AND") {
 	if ((is_array($allgeds) && count($allgeds) != 0) && count($allgeds) != count($GEDCOMS)) {
 		$sql .= " AND (";
 		for ($i=0; $i<count($allgeds); $i++) {
-			$sql .= "o_file='".DbLayer::EscapeQuery($GEDCOMS[$allgeds[$i]]["id"])."'";
+			$sql .= "o_file='".$allgeds[$i]."'";
 			if ($i < count($allgeds)-1) $sql .= " OR ";
 		}
 		$sql .= ")";
@@ -1083,7 +1073,7 @@ function FTSearchRepos($query, $allgeds=false, $ANDOR="AND") {
  * @return	array $myfamlist array with all individuals that matched the query
  */
 function SearchSourcesDates($day="", $month="", $year="", $fact="", $allgeds=false) {
-	global $GEDCOM, $famlist, $GEDCOMS, $GEDCOMID;
+	global $famlist, $GEDCOMID;
 	$mysourcelist = array();
 	
 	$sql = "SELECT s_id, s_name, s_file, s_gedcom, d_gid FROM ".TBLPREFIX."dates, ".TBLPREFIX."sources WHERE s_id=d_gid AND s_file=d_file ";
@@ -1095,7 +1085,7 @@ function SearchSourcesDates($day="", $month="", $year="", $fact="", $allgeds=fal
 	$sql .= "GROUP BY s_id ORDER BY d_year, d_month, d_day DESC";
 	
 	$res = NewQuery($sql);
-	$gedold = $GEDCOM;
+	$gedold = $GEDCOMID;
 	while($row = $res->fetchRow()){
 		$row = db_cleanup($row);
 		if ($allgeds) {
@@ -1109,7 +1099,7 @@ function SearchSourcesDates($day="", $month="", $year="", $fact="", $allgeds=fal
 			$mysourcelist[$row[0]]["gedcom"] = $row[3];
 		}
 	}
-	$GEDCOM = $gedold;
+	$GEDCOMID = $gedold;
 	$res->FreeResult();
 	return $mysourcelist;
 }
@@ -1121,7 +1111,7 @@ function SearchSourcesDates($day="", $month="", $year="", $fact="", $allgeds=fal
  * @return	array $myfamlist array with all individuals that matched the query
  */
 function SearchSourcesDateRange($dstart="1", $mstart="1", $ystart="", $dend="31", $mend="12", $yend="", $skipfacts="", $allgeds=false, $onlyfacts="") {
-	global $GEDCOM, $famlist, $GEDCOMS, $GEDCOMID;
+	global $famlist, $GEDCOMID;
 	$mysourcelist = array();
 	
 	$sql = "SELECT s_id, s_name, s_file, s_gedcom, d_gid FROM ".TBLPREFIX."dates, ".TBLPREFIX."sources WHERE s_id=d_gid AND s_file=d_file ";
@@ -1131,7 +1121,7 @@ function SearchSourcesDateRange($dstart="1", $mstart="1", $ystart="", $dend="31"
 	$sql .= "GROUP BY s_id ORDER BY d_year, d_month, d_day DESC";
 	
 	$res = NewQuery($sql);
-	$gedold = $GEDCOM;
+	$gedold = $GEDCOMID;
 	while($row = $res->fetchRow()){
 		$row = db_cleanup($row);
 		if ($allgeds) {
@@ -1145,7 +1135,7 @@ function SearchSourcesDateRange($dstart="1", $mstart="1", $ystart="", $dend="31"
 			$mysourcelist[$row[0]]["gedcom"] = $row[3];
 		}
 	}
-	$GEDCOM = $gedold;
+	$GEDCOMID = $gedold;
 	$res->FreeResult();
 	return $mysourcelist;
 }
@@ -1157,7 +1147,7 @@ function SearchSourcesDateRange($dstart="1", $mstart="1", $ystart="", $dend="31"
  * @return	array $myfamlist array with all individuals that matched the query
  */
 function SearchOtherDates($day="", $month="", $year="", $fact="", $allgeds=false) {
-	global $GEDCOM, $famlist, $GEDCOMS, $GEDCOMID;
+	global $famlist, $GEDCOMID;
 	$myrepolist = array();
 	
 	$sql = "SELECT o_id, o_file, o_type, o_gedcom, d_gid FROM ".TBLPREFIX."dates, ".TBLPREFIX."other WHERE o_id=d_gid AND o_file=d_file ";
@@ -1169,7 +1159,7 @@ function SearchOtherDates($day="", $month="", $year="", $fact="", $allgeds=false
 	$sql .= "GROUP BY o_id ORDER BY d_year, d_month, d_day DESC";
 	
 	$res = NewQuery($sql);
-	$gedold = $GEDCOM;
+	$gedold = $GEDCOMID;
 	while($row = $res->fetchRow()){
 		$row = db_cleanup($row);
 		$tt = preg_match("/1 NAME (.*)/", $row[2], $match);
@@ -1187,7 +1177,7 @@ function SearchOtherDates($day="", $month="", $year="", $fact="", $allgeds=false
 			$myrepolist[$row[0]]["gedcom"] = $row[3];
 		}
 	}
-	$GEDCOM = $gedold;
+	$GEDCOMID = $gedold;
 	$res->FreeResult();
 	return $myrepolist;
 }
@@ -1199,7 +1189,7 @@ function SearchOtherDates($day="", $month="", $year="", $fact="", $allgeds=false
  * @return	array $myfamlist array with all individuals that matched the query
  */
 function SearchOtherDateRange($dstart="1", $mstart="1", $ystart="", $dend="31", $mend="12", $yend="", $skipfacts="", $allgeds=false, $onlyfacts="") {
-	global $GEDCOM, $GEDCOMS, $GEDCOMID;
+	global $GEDCOMID;
 	$myrepolist = array();
 	
 	$sql = "SELECT o_id, o_file, o_type, o_gedcom, d_gid FROM ".TBLPREFIX."dates, ".TBLPREFIX."other WHERE o_id=d_gid AND o_file=d_file ";
@@ -1209,7 +1199,7 @@ function SearchOtherDateRange($dstart="1", $mstart="1", $ystart="", $dend="31", 
 	$sql .= "GROUP BY o_id ORDER BY d_year, d_month, d_day DESC";
 
 	$res = NewQuery($sql);
-	$gedold = $GEDCOM;
+	$gedold = $GEDCOMID;
 	while($row = $res->fetchRow()){
 		$row = db_cleanup($row);
 		$tt = preg_match("/1 NAME (.*)/", $row[2], $match);
@@ -1227,7 +1217,7 @@ function SearchOtherDateRange($dstart="1", $mstart="1", $ystart="", $dend="31", 
 			$myrepolist[$row[0]]["gedcom"] = $row[3];
 		}
 	}
-	$GEDCOM = $gedold;
+	$GEDCOMID = $gedold;
 	$res->FreeResult();
 	return $myrepolist;
 }
@@ -1239,7 +1229,7 @@ function SearchOtherDateRange($dstart="1", $mstart="1", $ystart="", $dend="31", 
  * @return	array $mymedia array with all individuals that matched the query
  */
 function SearchMediaDateRange($dstart="1", $mstart="1", $ystart="", $dend="31", $mend="12", $yend="", $skipfacts="", $allgeds=false, $onlyfacts="") {
-	global $GEDCOM, $GEDCOMS, $GEDCOMID;
+	global $GEDCOMID;
 	$mymedia = array();
 	
 	$sql = "SELECT m_media, m_file, m_gedfile, m_ext, m_titl, m_gedrec FROM ".TBLPREFIX."dates, ".TBLPREFIX."media WHERE m_media=d_gid AND m_gedfile=d_file ";
@@ -1249,7 +1239,7 @@ function SearchMediaDateRange($dstart="1", $mstart="1", $ystart="", $dend="31", 
 	$sql .= "GROUP BY m_media ORDER BY d_year, d_month, d_day DESC";
 
 	$res = NewQuery($sql);
-	$gedold = $GEDCOM;
+	$gedold = $GEDCOMID;
 
 	while($row = $res->fetchAssoc()){
 		if ($allgeds) $mid = $row["m_media"]."[".$row["m_gedfile"]."]";
@@ -1260,7 +1250,7 @@ function SearchMediaDateRange($dstart="1", $mstart="1", $ystart="", $dend="31", 
 		$mymedia[$mid]["gedcom"] = $row["m_gedrec"];
 		$mymedia[$mid]["gedfile"] = $row["m_gedfile"];
 	}
-	$GEDCOM = $gedold;
+	$GEDCOMID = $gedold;
 	$res->FreeResult();
 	return $mymedia;
 }

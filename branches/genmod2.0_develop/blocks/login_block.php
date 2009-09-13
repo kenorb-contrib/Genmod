@@ -38,10 +38,10 @@ $GM_BLOCKS["print_login_block"]["rss"]     		= false;
  * Prints a block allowing the user to login to the site directly from the portal
  */
 function print_login_block($block = true, $config="", $side, $index) {
-	global $gm_lang, $GEDCOM, $GEDCOMS, $command, $SCRIPT_NAME, $QUERY_STRING, $USE_REGISTRATION_MODULE, $ALLOW_REMEMBER_ME, $gm_username, $TEXT_DIRECTION;
+	global $gm_lang, $GEDCOMID, $command, $USE_REGISTRATION_MODULE, $ALLOW_REMEMBER_ME, $gm_user, $TEXT_DIRECTION;
+	
 	if ((LOGIN_URL == "" && substr(SERVER_URL,0,5) != "https") || substr(LOGIN_URL,0,5) != "https") {
-		$uname = $gm_username;
-		if (!empty($uname)) return;
+		if (!empty($gm_user->username)) return;
 		if (LOGIN_URL == "") $login = "login.php";
 		else $login = LOGIN_URL;
 		print "<div id=\"login_block\" class=\"block\">\n";
@@ -53,7 +53,7 @@ function print_login_block($block = true, $config="", $side, $index) {
 		print "<div class=\"blockcontent width100 center $TEXT_DIRECTION\">";
 		print "<form method=\"post\" action=\"$login\" name=\"loginform\" onsubmit=\"t = new Date(); document.loginform.usertime.value=t.getFullYear()+'-'+(t.getMonth()+1)+'-'+t.getDate()+' '+t.getHours()+':'+t.getMinutes()+':'+t.getSeconds(); return true;\">\n";
 		print "<input type=\"hidden\" name=\"url\" value=\"index.php?command=$command&amp;\" />\n";
-		print "<input type=\"hidden\" name=\"ged\" value=\"";if (isset($GEDCOM)) print $GEDCOM; print "\" />";
+		print "<input type=\"hidden\" name=\"gedid\" value=\"";if (isset($GEDCOMID)) print $GEDCOMID; print "\" />";
 		print "<input type=\"hidden\" name=\"pid\" value=\"";if (isset($pid)) print $pid; print "\" />";
 		print "<input type=\"hidden\" name=\"usertime\" value=\"\" />\n";
 		print "<input type=\"hidden\" name=\"action\" value=\"login\" />\n";

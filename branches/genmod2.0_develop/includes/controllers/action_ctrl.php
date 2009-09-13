@@ -71,7 +71,7 @@ abstract class ActionController {
 		if ($gm_user->ShowActionLog()) { 
 			if ($gedcomid == "") $gedcomid = $GEDCOMID;
 			if ($countonly) {
-				$sql = "SELECT count(a_status) as count, a_status FROM ".TBLPREFIX."actions WHERE a_gedfile='".$gedcomid."'";
+				$sql = "SELECT count(a_status) as count, a_status FROM ".TBLPREFIX."actions WHERE a_file='".$gedcomid."'";
 				if (!empty($repo)) $sql .= " AND a_repo='".$repo."'";
 				if (!empty($pid)) $sql .= " AND a_pid='".$pid."'";
 				if (!empty($status)) $sql .= " AND a_status='".$status."'";
@@ -83,7 +83,7 @@ abstract class ActionController {
 				}
 			}
 			else {
-				$sql = "SELECT * FROM ".TBLPREFIX."actions WHERE a_gedfile='".$gedcomid."'";
+				$sql = "SELECT * FROM ".TBLPREFIX."actions WHERE a_file='".$gedcomid."'";
 				if (!empty($repo)) $sql .= " AND a_repo='".$repo."'";
 				if (!empty($pid)) $sql .= " AND a_pid='".$pid."'";
 				if ($status != "") $sql .= " AND a_status='".$status."'";
@@ -112,7 +112,7 @@ abstract class ActionController {
 		$actionopen = 0;
 		$actionclosed = 0;
 		if ($gm_user->ShowActionLog()) { 
-			$sql = "SELECT * FROM ".TBLPREFIX."actions WHERE a_gedfile='".$GEDCOMID."'";
+			$sql = "SELECT * FROM ".TBLPREFIX."actions WHERE a_file='".$GEDCOMID."'";
 			if ($status == "0" || $status == "1") $sql .= " AND a_status='".$status."'";
 			$sql .= " ORDER BY a_repo ASC, a_status ASC";
 			$res = NewQuery($sql);

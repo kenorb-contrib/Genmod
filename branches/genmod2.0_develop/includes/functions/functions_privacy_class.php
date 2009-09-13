@@ -40,6 +40,7 @@ abstract class PrivacyFunctions {
 	 * See the documentation for the GetRelationship() function in the functions.php file.
 	 */
 	public static $NODE_CACHE = array();
+	private static $pcache = null;
 	
 	/**
 	 * check if a person is dead
@@ -58,14 +59,12 @@ abstract class PrivacyFunctions {
 	 * This function should only be called once per individual.  In index mode this is called during
 	 * the Gedcom import.  In MySQL mode this is called the first time the individual is accessed
 	 * and then the database table is updated.
-		 * @author Genmod Development Team
+	 * @author Genmod Development Team
 	 * @param string $indirec the raw gedcom record
 	 * @return bool true if dead false if alive
 	 */
 	public function IsDead($indirec, $cyear="") {
-		global $CHECK_CHILD_DATES, $MAX_ALIVE_AGE, $HIDE_LIVE_PEOPLE;
-		global $PRIVACY_BY_YEAR, $gm_lang, $COMBIKEY;
-		global $GEDCOM, $GEDCOMS, $GEDCOMID;
+		global $CHECK_CHILD_DATES, $MAX_ALIVE_AGE;
 	
 		$ct = preg_match("/0 @(.*)@ INDI/", $indirec, $match);
 		if ($ct>0) {
@@ -334,16 +333,18 @@ abstract class PrivacyFunctions {
 	 *          - "REPO" record is a repository
 	 * @return	boolean return true to show the persons details, return false to keep them private
 	 */
-	public function displayDetailsByID($pid, $type = "INDI", $recursive=1, $checklinks=false) {
-		global $PRIV_PUBLIC, $PRIV_USER, $PRIV_NONE, $PRIV_HIDE, $USE_RELATIONSHIP_PRIVACY, $CHECK_MARRIAGE_RELATIONS, $MAX_RELATION_PATH_LENGTH, $gm_username, $COMBIKEY, $GEDCOMID;
-		global $global_facts, $person_privacy, $user_privacy, $HIDE_LIVE_PEOPLE, $GEDCOM, $SHOW_DEAD_PEOPLE, $MAX_ALIVE_AGE, $PRIVACY_BY_YEAR;
+	public static function displayDetailsByID($pid, $type = "INDI", $recursive=1, $checklinks=false) {
+		global $USE_RELATIONSHIP_PRIVACY, $CHECK_MARRIAGE_RELATIONS, $MAX_RELATION_PATH_LENGTH, $gm_username, $GEDCOMID;
+		global $global_facts, $person_privacy, $user_privacy, $HIDE_LIVE_PEOPLE, $SHOW_DEAD_PEOPLE, $MAX_ALIVE_AGE, $PRIVACY_BY_YEAR;
 		global $PRIVACY_CHECKS, $PRIVACY_BY_RESN, $SHOW_SOURCES, $SHOW_LIVING_NAMES, $LINK_PRIVACY, $gm_user;
-		static $pcache;
 	
 		//print "Check ".$pid." type ".$type." recursive ".$recursive." checklinks ".$checklinks."<br />";
 		// Return the value from the cache, if set
-		if (!isset($pcache)) $pcache = array();
-		if (isset($pcache[$GEDCOMID][$type][$recursive][$checklinks][$pid])) return $pcache[$GEDCOMID][$type][$recursive][$checklinks][$pid];
+		if (is_null(self::$pcache)) self::$pcache = array();
+		if (isset(self::$pcache[$GEDCOMID][$type][$recursive][$checklinks][$pid])) {
+			// print "Cache hit for pid: $pid, type: $type<br />";
+			return self::$pcache[$GEDCOMID][$type][$recursive][$checklinks][$pid];
+		}
 		
 		$ulevel = $gm_user->getUserAccessLevel();
 	
@@ -352,6 +353,7 @@ abstract class PrivacyFunctions {
 	
 		if (!isset($PRIVACY_CHECKS)) $PRIVACY_CHECKS = 1;
 		else $PRIVACY_CHECKS++;
+		// print "checking privacy for pid: $pid, type: $type<br />";
 	
 		//-- look for an Ancestral File level 1 RESN (restriction) tag. This overrules all other settings if it prevents showing data.
 		if (isset($PRIVACY_BY_RESN) && ($PRIVACY_BY_RESN==true)) {
@@ -363,22 +365,21 @@ abstract class PrivacyFunctions {
 			else if ($type == "NOTE") $gedrec = FindOtherRecord($pid, "", false, "NOTE");
 			else $gedrec = FindGedcomRecord($pid);
 			if (self::FactViewRestricted($pid, $gedrec, 1)) {
-				$pcache[$GEDCOMID][$type][$recursive][$checklinks][$pid] = false;
+				self::$pcache[$GEDCOMID][$type][$recursive][$checklinks][$pid] = false;
 				return false;
 			}
 		}
 	
 		// If a user is logged on, check for user related privacy first---------------------------------------------------------------
-	//		 print "checking privacy for pid: $pid, type: $type<br />";
 		if (!empty($gm_username)) {
 			// Check user privacy for all users (hide/show)
 			if (isset($user_privacy["all"][$pid])) {
 				if ($user_privacy["all"][$pid] == 1) {
-					$pcache[$GEDCOMID][$type][$recursive][$checklinks][$pid] = true;
+					self::$pcache[$GEDCOMID][$type][$recursive][$checklinks][$pid] = true;
 					return true;
 				}
 				else {
-					$pcache[$GEDCOMID][$type][$recursive][$checklinks][$pid] = false;
+					self::$pcache[$GEDCOMID][$type][$recursive][$checklinks][$pid] = false;
 					return false;
 				}
 			}
@@ -390,11 +391,11 @@ abstract class PrivacyFunctions {
 			// Check person privacy (access level)
 			if (isset($person_privacy[$pid])) {
 				if ($person_privacy[$pid] >= $ulevel) {
-					$pcache[$GEDCOMID][$type][$recursive][$checklinks][$pid] = true;
+					self::$pcache[$GEDCOMID][$type][$recursive][$checklinks][$pid] = true;
 					return true;
 				}
 				else {
-					$pcache[$GEDCOMID][$type][$recursive][$checklinks][$pid] = false;
+					self::$pcache[$GEDCOMID][$type][$recursive][$checklinks][$pid] = false;
 					return false;
 				}
 			}
@@ -406,48 +407,48 @@ abstract class PrivacyFunctions {
 				// Check the relation privacy. If within the range, people can be shown. 
 				if ($USE_RELATIONSHIP_PRIVACY) {
 					// If we don't know the user's gedcom ID, we cannot determine the relationship so no reason to show
-					if (empty($user->gedcomid[$GEDCOM])) {
-						$pcache[$GEDCOMID][$type][$recursive][$checklinks][$pid] = false;
+					if (empty($user->gedcomid[$GEDCOMID])) {
+						self::$pcache[$GEDCOMID][$type][$recursive][$checklinks][$pid] = false;
 						return false;
 					}
 						
 					// If it's the user himself, we can show him
-					if ($user->gedcomid[$GEDCOM]==$pid) {
-						$pcache[$GEDCOMID][$type][$recursive][$checklinks][$pid] = true;
+					if ($user->gedcomid[$GEDCOMID]==$pid) {
+						self::$pcache[$GEDCOMID][$type][$recursive][$checklinks][$pid] = true;
 						return true;
 					}
 					
 					// Determine if the person is within range
 					$path_length = $MAX_RELATION_PATH_LENGTH;
-	//					if (isset($user->max_relation_path[$GEDCOM]) && $user->max_relation_path[$GEDCOM]>0) $path_length = $user->max_relation_path[$GEDCOM];
-					// print "get relation ".$user->gedcomid[$GEDCOM]." with ".$pid;
-					$relationship = GetRelationship($user->gedcomid[$GEDCOM], $pid, $CHECK_MARRIAGE_RELATIONS, $path_length);
+	//					if (isset($user->max_relation_path[$GEDCOMID]) && $user->max_relation_path[$GEDCOMID]>0) $path_length = $user->max_relation_path[$GEDCOMID];
+					// print "get relation ".$user->gedcomid[$GEDCOMID]." with ".$pid;
+					$relationship = GetRelationship($user->gedcomid[$GEDCOMID], $pid, $CHECK_MARRIAGE_RELATIONS, $path_length);
 					// Only limit access to live people!
 					if ($relationship == false && !$isdead) {
-						$pcache[$GEDCOMID][$type][$recursive][$checklinks][$pid] = false;
+						self::$pcache[$GEDCOMID][$type][$recursive][$checklinks][$pid] = false;
 						return false;
 					}
 					else {
 						// A relation is found. Do not return anything, as general rules will apply in this case.
-	//						$pcache[$GEDCOMID][$type][$recursive][$checklinks][$pid] = true;
+	//						self::$pcache[$GEDCOMID][$type][$recursive][$checklinks][$pid] = true;
 	//						return true;
 					}
 				}
 				
 				// First check if the person is dead. If so, it can be shown, depending on the setting for dead people.
 				if ($isdead && $SHOW_DEAD_PEOPLE >= $ulevel) {
-					$pcache[$GEDCOMID][$type][$recursive][$checklinks][$pid] = true;
+					self::$pcache[$GEDCOMID][$type][$recursive][$checklinks][$pid] = true;
 					return true;
 				}
 				
 				// Alive people. If the user is allowed to see the person, show it.
 				if (!$isdead && $HIDE_LIVE_PEOPLE >= $ulevel) {
-					$pcache[$GEDCOMID][$type][$recursive][$checklinks][$pid] = true;
+					self::$pcache[$GEDCOMID][$type][$recursive][$checklinks][$pid] = true;
 					return true;
 				}
 				
 				// No options left to show the person. Return false.
-				$pcache[$GEDCOMID][$type][$recursive][$checklinks][$pid] = false;
+				self::$pcache[$GEDCOMID][$type][$recursive][$checklinks][$pid] = false;
 				return false;
 			}
 		}
@@ -458,11 +459,11 @@ abstract class PrivacyFunctions {
 		// NOTE: This checks all record types! So no need to check later with fams, sources, etc.
 		if (isset($person_privacy[$pid])) {
 			if ($person_privacy[$pid] >= $ulevel) {
-				$pcache[$GEDCOMID][$type][$recursive][$checklinks][$pid] = true;
+				self::$pcache[$GEDCOMID][$type][$recursive][$checklinks][$pid] = true;
 				return true;
 			}
 			else {
-				$pcache[$GEDCOMID][$type][$recursive][$checklinks][$pid] = false;
+				self::$pcache[$GEDCOMID][$type][$recursive][$checklinks][$pid] = false;
 				return false;
 			}
 		}
@@ -508,11 +509,11 @@ abstract class PrivacyFunctions {
 			if (!$dead) {
 				// The person is alive, let's see if we can show him
 				if ($HIDE_LIVE_PEOPLE >= $ulevel) {
-					$pcache[$GEDCOMID][$type][$recursive][$checklinks][$pid] = true;
+					self::$pcache[$GEDCOMID][$type][$recursive][$checklinks][$pid] = true;
 					return true;
 				}
 				else {
-					$pcache[$GEDCOMID][$type][$recursive][$checklinks][$pid] = false;
+					self::$pcache[$GEDCOMID][$type][$recursive][$checklinks][$pid] = false;
 					return false;
 				}
 			}
@@ -522,11 +523,11 @@ abstract class PrivacyFunctions {
 	//				if ($SHOW_LIVING_NAMES>getUserAccessLevel($username)) return true;
 	//				else return false;
 				if ($SHOW_DEAD_PEOPLE >= $ulevel) {
-					$pcache[$GEDCOMID][$type][$recursive][$checklinks][$pid] = true;
+					self::$pcache[$GEDCOMID][$type][$recursive][$checklinks][$pid] = true;
 					return true;
 				}
 				else {
-					$pcache[$GEDCOMID][$type][$recursive][$checklinks][$pid] = false;
+					self::$pcache[$GEDCOMID][$type][$recursive][$checklinks][$pid] = false;
 					return false;
 				}
 			}
@@ -537,14 +538,14 @@ abstract class PrivacyFunctions {
 		    //-- check if we can display both parents. If not, the family will be hidden.
 			$parents = FindParents($pid);
 			if (!self::displayDetailsByID($parents["HUSB"])) {
-				$pcache[$GEDCOMID][$type][$recursive][$checklinks][$pid] = false;
+				self::$pcache[$GEDCOMID][$type][$recursive][$checklinks][$pid] = false;
 				return false;
 			}
 			if (!self::displayDetailsByID($parents["WIFE"])) {
-				$pcache[$GEDCOMID][$type][$recursive][$checklinks][$pid] = false;
+				self::$pcache[$GEDCOMID][$type][$recursive][$checklinks][$pid] = false;
 				return false;
 			}
-			$pcache[$GEDCOMID][$type][$recursive][$checklinks][$pid] = true;
+			self::$pcache[$GEDCOMID][$type][$recursive][$checklinks][$pid] = true;
 			return true;
 	    }
 	    
@@ -560,26 +561,28 @@ abstract class PrivacyFunctions {
 				    $recursive--;
 				    if ($recursive >=0) {
 			    		$links = GetSourceLinks($pid, "", false);
+			    		// print "Count of source links found: ".count($links)."<br />";
 					    foreach($links as $key => $link) {
 						    $disp = $disp && self::DisplayDetailsByID($link, IdType($link), $recursive, true);
 						    if (!$disp) break;
 					    }
 				    }
+				    $recursive++;
 			    }
 			    // We can show the source, and there are no links that prevent this
 			    if ($disp) {
-						$pcache[$GEDCOMID][$type][$recursive][$checklinks][$pid] = true;
+						self::$pcache[$GEDCOMID][$type][$recursive][$checklinks][$pid] = true;
 					return true;
 				}
 				// The links prevent displaying the source
 				else {
-					$pcache[$GEDCOMID][$type][$recursive][$checklinks][$pid] = false;
+					self::$pcache[$GEDCOMID][$type][$recursive][$checklinks][$pid] = false;
 					return false;
 				}
 			}
 			// The sources setting prevents display, so hide!
 			else {
-				$pcache[$GEDCOMID][$type][$recursive][$checklinks][$pid] = false;
+				self::$pcache[$GEDCOMID][$type][$recursive][$checklinks][$pid] = false;
 				return false;
 			}
 	    }
@@ -606,20 +609,21 @@ abstract class PrivacyFunctions {
 						    if (!$disp) break;
 				    	}
 			    	}
+				    $recursive++;
 			    }
 			    if ($disp) {
-					$pcache[$GEDCOMID][$type][$recursive][$checklinks][$pid] = true;
+					self::$pcache[$GEDCOMID][$type][$recursive][$checklinks][$pid] = true;
 				    return true;
 			    }
 			    else {
 				    // we cannot show it because of hidden links
-	   				$pcache[$GEDCOMID][$type][$recursive][$checklinks][$pid] = false;
+	   				self::$pcache[$GEDCOMID][$type][$recursive][$checklinks][$pid] = false;
 					return false;
 				}
 			}
 			// we cannot show the MM details
 			else {
-				$pcache[$GEDCOMID][$type][$recursive][$checklinks][$pid] = false;
+				self::$pcache[$GEDCOMID][$type][$recursive][$checklinks][$pid] = false;
 				return false;
 			}
 	    }
@@ -638,20 +642,21 @@ abstract class PrivacyFunctions {
 						    if (!$disp) break;
 				    	}
 			    	}
+				    $recursive++;
 			    }
 			    if ($disp) {
-					$pcache[$GEDCOMID][$type][$recursive][$checklinks][$pid] = true;
+					self::$pcache[$GEDCOMID][$type][$recursive][$checklinks][$pid] = true;
 				    return true;
 			    }
 			    else {
 				    // we cannot show it because of hidden links
-	   				$pcache[$GEDCOMID][$type][$recursive][$checklinks][$pid] = false;
+	   				self::$pcache[$GEDCOMID][$type][$recursive][$checklinks][$pid] = false;
 					return false;
 				}
 			}
 			// we cannot show the Note details
 			else {
-				$pcache[$GEDCOMID][$type][$recursive][$checklinks][$pid] = false;
+				self::$pcache[$GEDCOMID][$type][$recursive][$checklinks][$pid] = false;
 				return false;
 			}
 	    }
@@ -673,24 +678,23 @@ abstract class PrivacyFunctions {
 	 * @return	boolean 	return true to show the person's name, return false to keep it private
 	 */
 	public function showLivingNameByID($pid, $type="INDI", $gedrec = "") {
-		global $SHOW_LIVING_NAMES, $PRIV_PUBLIC, $PRIV_USER, $PRIV_NONE, $person_privacy, $user_privacy, $gm_username, $COMBIKEY, $gm_user, $USE_RELATIONSHIP_PRIVACY, $CHECK_MARRIAGE_RELATIONS, $GEDCOM, $MAX_RELATION_PATH_LENGTH;
+		global $SHOW_LIVING_NAMES, $person_privacy, $user_privacy, $gm_user, $USE_RELATIONSHIP_PRIVACY, $CHECK_MARRIAGE_RELATIONS, $GEDCOMID, $MAX_RELATION_PATH_LENGTH;
 		
 		// If we can show the details, we can also show the name
 		if (self::displayDetailsByID($pid, $type)) return true;
 		
 		// If a pid is hidden or shown due to user privacy, the name is hidden or shown also
-		if (!empty($gm_username)) {
+		if (!empty($gm_user->username)) {
 			if (isset($user_privacy["all"][$pid])) {
 				if ($user_privacy["all"][$pid] == 1) return true;
 				else return false;
 			}
-			if (isset($user_privacy[$gm_username][$pid])) {
-				if ($user_privacy[$gm_username][$pid] == 1) return true;
+			if (isset($user_privacy[$gm_user->username][$pid])) {
+				if ($user_privacy[$gm_user->username][$pid] == 1) return true;
 				else return false;
 			}
 		}
 		
-		$user =& User::GetInstance($gm_username);
 		
 		// If a pid is hidden or shown due to person privacy, the name also is
 		if (isset($person_privacy[$pid])) {
@@ -717,12 +721,12 @@ abstract class PrivacyFunctions {
 			// If we don't know the user's gedcom ID, we cannot determine the relationship,
 			// so we cannot further narrow what the user sees.
 			// The same applies if we know the user, and he is viewing himself
-			if (empty($user->gedcomid[$GEDCOM]) || $user->gedcomid[$GEDCOM]==$pid) return true;
+			if (empty($gm_user->gedcomid[$GEDCOMID]) || $gm_user->gedcomid[$GEDCOMID]==$pid) return true;
 			
 			// Determine if the person is within range
 			$path_length = $MAX_RELATION_PATH_LENGTH;
-	//			if (isset($user->max_relation_path[$GEDCOM]) && $user->max_relation_path[$GEDCOM] > 0) $path_length = $user->max_relation_path[$GEDCOM];
-			$relationship = GetRelationship($user->gedcomid[$GEDCOM], $pid, $CHECK_MARRIAGE_RELATIONS, $path_length);
+	//			if (isset($user->max_relation_path[$GEDCOMID]) && $user->max_relation_path[$GEDCOMID] > 0) $path_length = $user->max_relation_path[$GEDCOMID];
+			$relationship = GetRelationship($gm_user->gedcomid[$GEDCOMID], $pid, $CHECK_MARRIAGE_RELATIONS, $path_length);
 			// If we have a relation in range, we can display the name
 			// if not in range, we can display the name of dead people
 			if ($relationship != false) return true;
@@ -744,7 +748,7 @@ abstract class PrivacyFunctions {
 	 * @return	boolean return true to show the fact, return false to keep it private
 	 */
 	public function showFact($fact, $pid, $type="") {
-		global $PRIV_PUBLIC, $PRIV_USER, $PRIV_NONE, $PRIV_HIDE, $LINK_PRIVACY;
+		global $LINK_PRIVACY;
 		global $global_facts, $person_facts, $SHOW_SOURCES, $gm_username, $gm_user;
 		static $ulevel;
 		
@@ -794,7 +798,6 @@ abstract class PrivacyFunctions {
 	 * @return	boolean return true to show the fact details, return false to keep it private
 	 */
 	public function showFactDetails($fact, $pid) {
-		global $PRIV_PUBLIC, $PRIV_USER, $PRIV_NONE, $PRIV_HIDE;
 		global $global_facts, $person_facts, $gm_username, $gm_user;
 	
 	
@@ -828,7 +831,7 @@ abstract class PrivacyFunctions {
 	 * @return string the privatized gedcom record
 	 */
 	public function privatize_gedcom($gedrec) {
-		global $gm_lang, $GEDCOM, $gm_username, $gm_user;
+		global $gm_lang, $gm_username, $gm_user;
 		$gt = preg_match("/0 @(.+)@ (.+)/", $gedrec, $gmatch);
 		if ($gt > 0) {
 			$gid = trim($gmatch[1]);
@@ -929,14 +932,14 @@ abstract class PrivacyFunctions {
 	 * @return int		Allowed or not allowed
 	 */
 	public function FactEditRestricted($pid, $factrec, $level=2) {
-		global $GEDCOM, $gm_username, $PRIVACY_BY_RESN, $gm_user;
+		global $GEDCOMID, $gm_username, $PRIVACY_BY_RESN, $gm_user;
 		
 		$ct = preg_match("/$level RESN (.*)/", $factrec, $match);
 		if ($ct == 0) return false;
 		if ($level == 1 && !$PRIVACY_BY_RESN) return false;
 		$user =& User::GetInstance($gm_username);
 		$myindi = "";
-		if (isset($user->gedcomid[$GEDCOM])) trim($myindi = $user->gedcomid[$GEDCOM]);
+		if (isset($user->gedcomid[$GEDCOMID])) trim($myindi = $user->gedcomid[$GEDCOMID]);
 		if ($ct > 0) {
 			$match[1] = strtolower(trim($match[1]));
 			if ($match[1] == "none") return false;
@@ -961,13 +964,13 @@ abstract class PrivacyFunctions {
 	 * @return int		Allowed or not allowed
 	 */
 	public function FactViewRestricted($pid, $factrec, $level=2) {
-		global $GEDCOM, $gm_username, $PRIVACY_BY_RESN, $gm_user;
+		global $GEDCOMID, $gm_username, $PRIVACY_BY_RESN, $gm_user;
 		
 		$ct = preg_match("/$level RESN (.*)/", $factrec, $match);
 		if ($ct == 0) return false;
 		if ($level == 1 && !$PRIVACY_BY_RESN) return false;
 		$myindi = "";
-		if (isset($gm_user->gedcomid[$GEDCOM])) $myindi = trim($gm_user->gedcomid[$GEDCOM]);
+		if (isset($gm_user->gedcomid[$GEDCOMID])) $myindi = trim($gm_user->gedcomid[$GEDCOMID]);
 		$pid = trim($pid);
 		if ($ct > 0) {
 			$match[1] = strtolower(trim($match[1]));
@@ -1013,5 +1016,24 @@ abstract class PrivacyFunctions {
 			return self::ShowFactDetails($fact, $id);
 		}
 	}
+
+	public function ShowSourceFromAnyGed() {
+		global $SHOW_SOURCES, $gm_user;
+		global $PRIV_PUBLIC, $PRIV_USER, $PRIV_NONE, $PRIV_HIDE, $SHOW_SOURCES;
+		
+		$acclevel = $gm_user->getUserAccessLevel();
+		$sql = "SELECT p_show_sources FROM ".TBLPREFIX."privacy";
+		$res = NewQuery($sql);
+		while($row = $res->FetchRow()) {
+			if ($$row["0"] >= $acclevel) {
+				$res->FreeResult();
+				return true;
+			}
+		}
+		// also check the current setting, as it may not be in the database
+		if ($SHOW_SOURCES >= $acclevel) return true;
+		return false;
+	}
+
 }
 ?>

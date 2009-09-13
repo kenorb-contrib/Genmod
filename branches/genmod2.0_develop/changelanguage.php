@@ -230,7 +230,7 @@ $maxlines = max($active, $inactive);
 					print "<div class=\"width20 choice_middle\">";
 						// Print gedcom names
 						foreach($value as $gedcomname => $used) {
-							print "<a href=\"editconfig_gedcom.php?ged=".urlencode($gedcomname)."\" target=\"blank\">".$gedcomname."</a><br />";
+							print "<a href=\"editconfig_gedcom.php?gedid=".get_id_from_gedcom($gedcomname)."\" target=\"blank\">".$gedcomname."</a><br />";
 						}
 					print "<br /></div>";
 					print "<div class=\"choice_right\">";

@@ -414,7 +414,6 @@ print "</div>";
 if ($action=="filter") {
 	// Output Individual
 	if ($type == "indi") {
-		$oldged = $GEDCOM;
 		$oldgedid = $GEDCOMID;
 		$myindilist = SearchIndisNames($filter,false,$gedid);
 		$cti=count($myindilist);
@@ -430,8 +429,6 @@ if ($action=="filter") {
 
 	// Output Family
 	else if ($type == "fam") {
-		$oldged = $GEDCOM;
-		$oldgedid = $GEDCOMID;
 		$myindilist = array();
 		$myfamlist = array();
 		$myfamlist2 = array();
@@ -709,7 +706,7 @@ if ($action=="filter") {
 		print "\n\t<table class=\"tabs_table $TEXT_DIRECTION\" width=\"90%\">\n\t\t<tr>\n\t\t<td class=\"list_value\">";
 		$ctn = count($note_controller->notelist);
 		if ($ctn>0) {
-			$curged = $GEDCOM;
+			$curged = $GEDCOMID;
 			print "\n\t\t<tr><td class=\"list_value_wrap\"><ul>";
 			foreach ($note_controller->notelist as $key => $note) {
 				SwitchGedcom($note->gedcomid);

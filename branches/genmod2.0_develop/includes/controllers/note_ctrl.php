@@ -185,7 +185,7 @@ class NoteController extends DetailController {
 
 	//-- search through the gedcom records for notes, full text
 	public function FTSearchNotes($query, $allgeds=false, $ANDOR="AND") {
-		global $GEDCOM, $GEDCOMS, $GEDCOMID, $ftminwlen, $ftmaxwlen, $note_hide, $note_total;
+		global $GEDCOMS, $GEDCOMID, $ftminwlen, $ftmaxwlen, $note_hide, $note_total;
 		
 		// Get the min and max search word length
 		GetFTWordLengths();
@@ -221,7 +221,7 @@ class NoteController extends DetailController {
 		if ((is_array($allgeds) && count($allgeds) != 0) && count($allgeds) != count($GEDCOMS)) {
 			$sql .= " AND (";
 			for ($i=0; $i<count($allgeds); $i++) {
-				$sql .= "o_file='".DbLayer::EscapeQuery($GEDCOMS[$allgeds[$i]]["id"])."'";
+				$sql .= "o_file='".$allgeds[$i]."'";
 				if ($i < count($allgeds)-1) $sql .= " OR ";
 			}
 			$sql .= ")";
@@ -236,9 +236,9 @@ class NoteController extends DetailController {
 		 		$note->GetTitle(40);
 		 		$note->gedcomid = $row["o_file"];
 		 		SwitchGedcom($row["o_file"]);
-				$note_total[$note->xref."[".$GEDCOM."]"] = 1;
+				$note_total[$note->xref."[".$GEDCOMID."]"] = 1;
 		 		if ($note->disp) $this->notelist[] = $note;
-		 		else $note_hide[$note->xref."[".$GEDCOM."]"] = 1;
+		 		else $note_hide[$note->xref."[".$GEDCOMID."]"] = 1;
 		 		SwitchGedcom();
 	 		}
 	 		$this->NotelistSort();

@@ -32,7 +32,7 @@ require("config.php");
 
 print_header($gm_lang["unlink_list"]);
 print "<div class=\"center\"><h3>".$gm_lang["unlink_list"]."</h3></div>\n";
-global $GEDCOM;
+
 $indis = GetUnlinked();
 print "<div id=\"content\">";
 $printlist = array();

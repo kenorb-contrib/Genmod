@@ -384,8 +384,8 @@ switch ($action) {
 			$user->contactmethod = "messaging2";
 			$user->default_tab = 9;
 			if (!empty($user_gedcomid)) {
-				$user->gedcomid[$GEDCOM] = $user_gedcomid;
-				$user->rootid[$GEDCOM] = $user_gedcomid;
+				$user->gedcomid[$GEDCOMID] = $user_gedcomid;
+				$user->rootid[$GEDCOMID] = $user_gedcomid;
 			}
 			$user->password = crypt($user_password01, $user_password01);
 			if ((isset($canadmin)) && ($canadmin == "yes")) $user->canadmin = true;

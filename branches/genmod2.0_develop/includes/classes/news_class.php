@@ -35,7 +35,7 @@ class News {
 	
 	// Data
 	private $id = null;			// The ID of this item in the database
-	private $username = null;	// The username or gedcomname 
+	private $username = null;	// The username or gedcomid 
 	private $date = null;		// The date of the news 
 	private $title = null;		// The title to display for this item
 	private $text = null;		// The content of this news item

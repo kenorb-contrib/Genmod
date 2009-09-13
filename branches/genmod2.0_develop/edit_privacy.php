@@ -35,8 +35,7 @@ require "config.php";
 // Reload the privacy settings with no user overrides
 PrivacyController::ReadPrivacy($GEDCOMID, false);
 
-if (empty($ged)) $ged = $GEDCOM;
-$GEDCOMID = $GEDCOMS[$GEDCOM]["id"];
+if (empty($gedid)) $gedid = $GEDCOMID;
 
 if ((!$gm_user->userGedcomAdmin($ged))||(empty($ged))) {
 	header("Location: editgedcoms.php");
@@ -195,10 +194,10 @@ print_header($gm_lang["privacy_header"]);
 <table class="facts_table <?php print $TEXT_DIRECTION ?>">
 	<tr>
 		<td colspan="2" class="admin_topbottombar"><?php
-			print "<h3>".$gm_lang["edit_privacy_title"]." - ".$GEDCOMS[$ged]["title"]. "</h3>";
-			if (UserController::CheckPrivacyOverrides($GEDCOMS[$ged]["id"])) {
+			print "<h3>".$gm_lang["edit_privacy_title"]." - ".$GEDCOMS[get_id_from_gedcom($ged)]["title"]. "</h3>";
+			if (UserController::CheckPrivacyOverrides(get_id_from_gedcom($ged))) {
 				print "<span class=\"error\">".$gm_lang["user_overr_exists"];
-				if ($gm_user->UserIsAdmin()) print "<a href=\"useradmin.php?action=listusers&amp;filter=privoverride&amp;ged=$ged\"> ".$gm_lang["user_overr_show"]."</a>";
+				if ($gm_user->UserIsAdmin()) print "<a href=\"useradmin.php?action=listusers&amp;filter=privoverride&amp;gedid=$gedid\"> ".$gm_lang["user_overr_show"]."</a>";
 				print "</span><br />";
 			}
 			print "<br /><a href=\"editgedcoms.php\"><b>";
@@ -220,7 +219,7 @@ if ($action=="update") {
 	print $gm_lang["performing_update"];
 	print "<br />";
 	$settings = PrivacyController::GetPrivacyObject($GEDCOMID);
-	$settings->GEDCOM = $GEDCOM;
+	$settings->GEDCOM = get_gedcom_from_id($GEDCOMID);
 	$settings->GEDCOMID = $GEDCOMID;
 	$settings->PRIV_USER = $PRIV_USER;
 	$settings->PRIV_NONE = $PRIV_NONE;
@@ -325,7 +324,7 @@ if ($action=="update") {
 	}
 	$settings->person_facts = $person_facts;	
 	PrivacyController::StorePrivacy($settings);
-	WriteToLog("Privacy-> Privacy file updated", "I", "G", $GEDCOM);
+	WriteToLog("Privacy-> Privacy file updated", "I", "G", $GEDCOMID);
 	
 }
 
@@ -347,7 +346,7 @@ if ($action=="update") {
 
 <form name="editprivacyform" method="post" action="edit_privacy.php">
     <input type="hidden" name="action" value="update" />
-    <?php print "<input type=\"hidden\" name=\"ged\" value=\"".$GEDCOM."\" />\n";
+    <?php print "<input type=\"hidden\" name=\"gedid\" value=\"".$GEDCOMID."\" />\n";
 
     // NOTE: General Privacy Settings header bar
     ?>

@@ -54,9 +54,9 @@ class Submitter extends GedcomRecord {
 	 * Constructor for submitter object
 	 * @param string $gedrec	the raw submitter gedcom record
 	 */
-	public function __construct($id, $gedrec="", $changed=false) {
+	public function __construct($id, $gedrec="", $gedcomid) {
 		
-		parent::__construct($id, $gedrec);
+		parent::__construct($id, $gedrec, $gedcomid);
 
 		$this->tracefacts = false;
 		$this->exclude_facts = "";

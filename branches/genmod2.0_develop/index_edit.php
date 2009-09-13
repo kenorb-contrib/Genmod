@@ -130,9 +130,9 @@ if ($command=="user") $ublocks = new Blocks("user", $gm_username, $action);
 else $ublocks = new Blocks("gedcom", "", $action);
 
 if ($command=="user") print_simple_header($gm_lang["mygedview"]);
-else print_simple_header($GEDCOMS[$GEDCOM]["title"]);
+else print_simple_header($GEDCOMS[$GEDCOMID]["title"]);
 
-$GEDCOM_TITLE = PrintReady($GEDCOMS[$GEDCOM]["title"]);  // needed in $gm_lang["rss_descr"]
+$GEDCOM_TITLE = PrintReady($GEDCOMS[$GEDCOMID]["title"]);  // needed in $gm_lang["rss_descr"]
 
 if ($action=="updateconfig") {
 	$block = $ublocks->$side;

@@ -53,7 +53,7 @@ $controller->CheckRawEdited();
 		print "<p class=\"name_head\">".PrintReady($controller->family->title);
 		print "</p>\r\n";
 
-		print PrintFamilyParents($controller->family);
+		print PersonFunctions::PrintFamilyParents($controller->family);
 		if (!$controller->isPrintPreview() && $controller->family->disp && $controller->family->canedit) {
 		if (!is_object($controller->family->husb) && !$controller->family->isdeleted) { ?>
 			<?php print_help_link("edit_add_parent_help", "qm"); ?> 
@@ -80,7 +80,7 @@ $controller->CheckRawEdited();
 <table class="width95">
 	<tr>
 		<td valign="top" style="width: <?php print $pbwidth+38?>px;">
-			<?php PrintFamilyChildren($controller->family);?>
+			<?php PersonFunctions::PrintFamilyChildren($controller->family);?>
 		</td>
 		<td valign="top">
 			<?php 

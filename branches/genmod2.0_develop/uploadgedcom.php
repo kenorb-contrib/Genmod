@@ -86,6 +86,8 @@ if (!isset($continue)) $continue = false;
 if (!isset($import_existing)) $import_existing = false;
 if (!isset($skip_cleanup)) $skip_cleanup = false;
 if (!isset($merge_media)) $merge_media = $MERGE_DOUBLE_MEDIA;
+if (!isset($GEDFILENAME) && isset($FILEID)) $GEDFILENAME = get_gedcom_from_id($FILEID);
+if (!isset($gedid)) $gedid = get_id_from_gedcom($GEDFILENAME);
 
 // Override the gedcom default for the import process
 $MERGE_DOUBLE_MEDIA = $merge_media;
@@ -167,7 +169,7 @@ else if ($check == "add_new") {
 }
 else if ($check == "cancel_upload") {
 	if ($exists) {
-		unset($GEDCOMS[$GEDFILENAME]);
+		unset($GEDCOMS[get_id_from_gedcom($GEDFILENAME)]);
 		StoreGedcoms();
 		if ($action == "add_new_form") @unlink(INDEX_DIRECTORY.$GEDFILENAME);
 	}
@@ -182,23 +184,22 @@ else if ($check == "cancel_upload") {
 	header("Location: editgedcoms.php");
 }
 if ($cleanup_needed == "cleanup_needed" && $continue == $gm_lang["del_proceed"]) {
-	require_once("includes/functions/functions_tools.php");
 	
 	$filechanged=false;
-	if (FileIsWriteable($GEDCOMS[$GEDFILENAME]["path"]) && (file_exists($GEDCOMS[$GEDFILENAME]["path"]))) {
+	if (FileIsWriteable($GEDCOMS[$gedid]["path"]) && (file_exists($GEDCOMS[$gedid]["path"]))) {
 		$l_headcleanup = false;
 		$l_macfilecleanup = false;
 		$l_lineendingscleanup = false;
 		$l_placecleanup = false;
 		$l_datecleanup=false;
 		$l_isansi = false;
-		$fp = fopen($GEDCOMS[$GEDFILENAME]["path"], "rb");
+		$fp = fopen($GEDCOMS[$gedid]["path"], "rb");
 		$fw = fopen(INDEX_DIRECTORY."/".$GEDFILENAME.".bak", "wb");
 		//-- read the gedcom and test it in 8KB chunks
 		while(!feof($fp)) {
 			$fcontents = fread($fp, 1024*8);
 			$lineend = "\n";
-			if (need_macfile_cleanup($fcontents)) {
+			if (ImportFunctions::NeedMacfileCleanup($fcontents)) {
 				$l_macfilecleanup=true;
 				$lineend = "\r";
 			}
@@ -213,46 +214,46 @@ if ($cleanup_needed == "cleanup_needed" && $continue == $gm_lang["del_proceed"])
 			// Remove heading spaces from the gedlines
 			$fcontents = preg_replace("/\n\W+/", "\n", $fcontents);
 			
-			if (!$l_headcleanup && need_head_cleanup($fcontents)) {
-				head_cleanup();
+			if (!$l_headcleanup && ImportFunctions::NeedHeadCleanup($fcontents)) {
+				ImportFunctions::HeadCleanup($fcontents);
 				$l_headcleanup = true;
 			}
 	
 			if ($l_macfilecleanup) {
-				macfile_cleanup();
+				ImportFunctions::MacfileCleanup();
 			}
 	
 			if (isset($_POST["cleanup_places"]) && $_POST["cleanup_places"]=="YES") {
-				if(($sample = need_place_cleanup($fcontents)) !== false) {
+				if(($sample = ImportFunctions::NeedPlaceCleanup($fcontents)) !== false) {
 					$l_placecleanup=true;
-					place_cleanup();
+					ImportFunctions::PlaceCleanup();
 				}
 			}
 	
-			if (line_endings_cleanup()) {
+			if (ImportFunctions::LineEndingsCleanup()) {
 				$filechanged = true;
 			}
 	
 			if(isset($_POST["datetype"])) {
 				$filechanged=true;
 				//month first
-				date_cleanup($_POST["datetype"]);
+				ImportFunctions::DateCleanup($_POST["datetype"]);
 			}
 			/**
 			if($_POST["xreftype"]!="NA") {
 				$filechanged=true;
-				xref_change($_POST["xreftype"]);
+				ImportFunctions::XrefChange($_POST["xreftype"]);
 			}
 			**/
 			if (isset($_POST["utf8convert"])=="YES") {
 				$filechanged=true;
-				convert_ansi_utf8();
+				ImportFunctions::ConvertAnsiUtf8();
 			}
 			fwrite($fw, $fcontents);
 		}
 		fclose($fp);
 		fclose($fw);
-		copy(INDEX_DIRECTORY."/".$GEDFILENAME.".bak", $GEDCOMS[$GEDFILENAME]["path"]);
+		copy(INDEX_DIRECTORY."/".$GEDFILENAME.".bak", $GEDCOMS[$gedid]["path"]);
 		$cleanup_needed = false;
 		$import = "true";
 	}
@@ -308,7 +309,7 @@ print "<form enctype=\"multipart/form-data\" method=\"post\" name=\"configform\"
 					?>
 					<?php print_help_link("gedcom_path_help", "qm","gedcom_path");?>
 					<span style="vertical-align: 25%"><?php print $gm_lang["gedcom_file"]; ?></span>
-					<input type="text" name="GEDFILENAME" value="<?php if (isset($GEDFILENAME) && strlen($GEDFILENAME) > 4) print $GEDCOMS[$GEDFILENAME]["path"]; ?>" 
+					<input type="text" name="GEDFILENAME" value="<?php if (isset($GEDFILENAME) && strlen($GEDFILENAME) > 4) print $GEDCOMS[get_id_from_gedcom($GEDFILENAME)]["path"]; ?>" 
 					size="60" dir ="ltr" tabindex="<?php $i++; print $i?>"	<?php if ((!$no_upload && isset($GEDFILENAME)) && (empty($error))) print "disabled=\"disabled\" "; ?> />
 				<?php
 			print "</div>";
@@ -460,9 +461,8 @@ print "<form enctype=\"multipart/form-data\" method=\"post\" name=\"configform\"
 					if (!empty($error)) print "<span class=\"error\">".$error."</span>\n";
 					
 					if ($import != true && $skip_cleanup != $gm_lang["skip_cleanup"]) {
-						require_once("includes/functions/functions_tools.php");
 						if ($override == "yes") {
-							@copy($bakfile, $GEDCOMS[$GEDFILENAME]["path"]);
+							@copy($bakfile, $GEDCOMS[$gedid]["path"]);
 							if (file_exists($bakfile)) unlink($bakfile);
 							$bakfile = false;
 						}
@@ -472,18 +472,18 @@ print "<form enctype=\"multipart/form-data\" method=\"post\" name=\"configform\"
 						$l_placecleanup = false;
 						$l_datecleanup=false;
 						$l_isansi = false;
-						$fp = fopen($GEDCOMS[$GEDFILENAME]["path"], "r");
+						$fp = fopen($GEDCOMS[$gedid]["path"], "r");
 						//-- read the gedcom and test it in 8KB chunks
 						while(!feof($fp)) {
 							$fcontents = fread($fp, 1024*8);
 			$fcontents = preg_replace("/\n\W+/", "\n", $fcontents);
 							
-							if (!$l_headcleanup && need_head_cleanup($fcontents)) $l_headcleanup = true;
-							if (!$l_macfilecleanup && need_macfile_cleanup($fcontents)) $l_macfilecleanup = true;
-							if (!$l_lineendingscleanup && need_line_endings_cleanup($fcontents)) $l_lineendingscleanup = true;
-							if (!$l_placecleanup && ($placesample = need_place_cleanup($fcontents)) !== false) $l_placecleanup = true;
-							if (!$l_datecleanup && ($datesample = need_date_cleanup($fcontents)) !== false) $l_datecleanup = true;
-							if (!$l_isansi && is_ansi($fcontents)) $l_isansi = true;
+							if (!$l_headcleanup && ImportFunctions::NeedHeadCleanup($fcontents)) $l_headcleanup = true;
+							if (!$l_macfilecleanup && ImportFunctions::NeedMacfileCleanup($fcontents)) $l_macfilecleanup = true;
+							if (!$l_lineendingscleanup && ImportFunctions::NeedLineEndingsCleanup($fcontents)) $l_lineendingscleanup = true;
+							if (!$l_placecleanup && ($placesample = ImportFunctions::NeedPlaceCleanup($fcontents)) !== false) $l_placecleanup = true;
+							if (!$l_datecleanup && ($datesample = ImportFunctions::NeedDateCleanup($fcontents)) !== false) $l_datecleanup = true;
+							if (!$l_isansi && ImportFunctions::IsAnsi($fcontents)) $l_isansi = true;
 						}
 						fclose($fp);
 						
@@ -495,7 +495,7 @@ print "<form enctype=\"multipart/form-data\" method=\"post\" name=\"configform\"
 						else {
 							$cleanup_needed = true;
 							print "<input type=\"hidden\" name=\"cleanup_needed\" value=\"cleanup_needed\">";
-							if (!FileIsWriteable($GEDCOMS[$GEDFILENAME]["path"]) && (file_exists($GEDCOMS[$GEDFILENAME]["path"]))) {
+							if (!FileIsWriteable($GEDCOMS[$gedid]["path"]) && (file_exists($GEDCOMS[$gedid]["path"]))) {
 								print "<span class=\"error\">".str_replace("#GEDCOM#", $GEDCOM, $gm_lang["error_header_write"])."</span>\n";
 							}
 							// NOTE: Check for head cleanu
@@ -708,93 +708,14 @@ print "<form enctype=\"multipart/form-data\" method=\"post\" name=\"configform\"
 		}
 		else $oldtime=time();
 		
-		/**
-		 * function that sets up the html required to run the progress bar
-		 * @param long $FILE_SIZE	the size of the file
-		 */
-		function setup_progress_bar($FILE_SIZE) {
-			global $gm_lang, $ged, $timelimit;
-			?>
-			<script type="text/javascript">
-			<!--
-			function complete_progress(time, exectext, go_pedi, go_welc) {
-				progress = document.getElementById("progress_header");
-				if (progress) progress.innerHTML = '<?php print "<span class=\"error\"><b>".$gm_lang["import_complete"]."</b></span><br />";?>'+exectext+' '+time+' '+"<?php print $gm_lang["sec"]; ?>";
-				progress = document.getElementById("link1");
-				if (progress) progress.innerHTML = '<a href="pedigree.php?ged=<?php print preg_replace("/'/", "\'", $ged); ?>">'+go_pedi+'</a>';
-				progress = document.getElementById("link2");
-				if (progress) progress.innerHTML = '<a href="index.php?command=gedcom&ged=<?php print preg_replace("/'/", "\'", $ged); ?>">'+go_welc+'</a>';
-				progress = document.getElementById("link3");
-				if (progress) progress.innerHTML = '<a href="editgedcoms.php">'+"<?php print $gm_lang["manage_gedcoms"]."</a>"; ?>";
-			}
-			function wait_progress() {
-				progress = document.getElementById("progress_header");
-				if (progress) progress.innerHTML = '<?php print $gm_lang["please_be_patient"]; ?>';
-			}
-			
-			var FILE_SIZE = <?php print $FILE_SIZE; ?>;
-			var TIME_LIMIT = <?php print $timelimit; ?>;
-			function update_progress(bytes, time) {
-				perc = Math.round(100*(bytes / FILE_SIZE));
-				if (perc>100) perc = 100;
-				progress = document.getElementById("progress_div");
-				if (progress) {
-					progress.style.width = perc+"%";
-					progress.innerHTML = perc+"%";
-				}
-				perc = Math.round(100*(time / TIME_LIMIT));
-				if (perc>100) perc = 100;
-				progress = document.getElementById("time_div");
-				if (progress) {
-					progress.style.width = perc+"%";
-					progress.innerHTML = perc+"%";
-				}
-			}
-			//-->
-			</script>
-			<?php
-			// NOTE: Print the progress bar for the GEDCOM file
-			print "<div>";
-				print "<div id=\"progress_header\" class=\"progress_box\" style=\"float: left;\">\n";
-					print "<b>".$gm_lang["import_progress"]."</b>";
-					print "<div class=\"inner_progress_bar\">\n";
-						print "<div id=\"progress_div\" class=\"progress_bar\">";
-						if (isset($_SESSION["TOTAL_BYTES"])) {
-							print "\n<script type=\"text/javascript\"><!--\nupdate_progress(".$_SESSION["TOTAL_BYTES"].",".$_SESSION["exectime_start"].");\n//-->\n</script>\n";
-						}
-						else print "1%";
-						print "</div>\n";
-					print "</div>\n";
-				print "</div>\n";
-				
-				// NOTE: Print the links after import
-				print "<div class=\"progress_links\">";
-					print "<div id=\"link1\">&nbsp;</div>";
-					print "<div id=\"link2\">&nbsp;</div>";
-					print "<div id=\"link3\">&nbsp;</div>";
-				print "</div>";
-				
-				// NOTE: Print the progress bar for the time
-				print "<div id=\"progress_header\" class=\"progress_box\">\n";
-					if ($timelimit == 0) print "<b>".$gm_lang["time_limit"]." ".$gm_lang["none"]."</b>";
-					else print "<b>".$gm_lang["time_limit"]." ".$timelimit." ".$gm_lang["sec"]."</b>";
-					print "<div class=\"inner_progress_bar\">\n";
-						print "<div id=\"time_div\" class=\"progress_bar\">1%</div>\n";
-					print "</div>\n";
-				print "</div>\n";
-			print "</div>";
-			flush();
-			@ob_flush();
-		}
-		//-- end of setup_progress_bar function
-		
 		if (!isset($stage)) $stage = 0;
-		if ((empty($ged))||(!isset($GEDCOMS[$ged]))) $ged = $GEDCOM;
+		if ((empty($gedid))||(!isset($GEDCOMS[$gedid]))) $gedid = $GEDCOMID;
 		$temp = $THEME_DIR;
-		$GEDCOM_FILE = $GEDCOMS[$ged]["path"];
-		$FILE = $ged;
-		$TITLE = $GEDCOMS[$ged]["title"];
-		SwitchGedcom($GEDCOMS[$ged]["gedcom"]);
+		$GEDCOM_FILE = $GEDCOMS[$gedid]["path"];
+		$FILE = $GEDCOMS[$gedid]["gedcom"];
+		$FILEID = $gedid;
+		$TITLE = $GEDCOMS[$gedid]["title"];
+		SwitchGedcom($gedid);
 		if ($LANGUAGE <> $_SESSION["CLANGUAGE"]) $LANGUAGE = $_SESSION["CLANGUAGE"];
 		
 		$temp2 = $THEME_DIR;
@@ -810,7 +731,7 @@ print "<form enctype=\"multipart/form-data\" method=\"post\" name=\"configform\"
 		
 		if ($stage==0) {
 			$_SESSION["resumed"] = 0;
-			EmptyDatabase($FILE);
+			ImportFunctions::EmptyDatabase($FILEID);
 			$stage=1;
 		}
 		
@@ -826,7 +747,7 @@ print "<form enctype=\"multipart/form-data\" method=\"post\" name=\"configform\"
 			print "<div class=\"topbottombar $TEXT_DIRECTION\">";
 			print $gm_lang["reading_file"]." ".$GEDCOM_FILE;
 			print "</div>";
-			setup_progress_bar($FILE_SIZE);
+			ImportFunctions::SetupProgressBar($FILE_SIZE);
 			flush();
 			@ob_flush();
 			// ------------------------------------------------------ Begin importing data
@@ -897,11 +818,11 @@ print "<form enctype=\"multipart/form-data\" method=\"post\" name=\"configform\"
 					
 					//-- import anything that is not a blob
 					if (preg_match("/\n\d BLOB/", $indirec)==0) {
-						$gid = ImportRecord($indirec);
-						$place_count += UpdatePlaces($gid, $indirec);
-						$date_count += UpdateDates($gid, $indirec);
+						$gid = ImportFunctions::ImportRecord($indirec);
+						$place_count += ImportFunctions::UpdatePlaces($gid, $indirec);
+						$date_count += ImportFunctions::UpdateDates($gid, $indirec);
 					}
-					else WriteToLog("UploadGedcom -> Import skipped a aecord with a BLOB tag: ".$indirec, "E", "G", $FILE);
+					else WriteToLog("UploadGedcom -> Import skipped a aecord with a BLOB tag: ".$indirec, "E", "G", get_gedcom_from_id($FILE));
 						
 					//-- calculate some statistics
 					if (!isset($show_type)){
@@ -970,7 +891,7 @@ print "<form enctype=\"multipart/form-data\" method=\"post\" name=\"configform\"
 								
 							?>
 							<?php print $gm_lang["import_time_exceeded"]; ?>
-							<input type="hidden" name="ged" value="<?php print $ged; ?>" />
+							<input type="hidden" name="gedid" value="<?php print $gedid; ?>" />
 							<input type="hidden" name="stage" value="1" />
 							<input type="hidden" name="timelimit" value="<?php print $timelimit; ?>" />
 							<input type="hidden" name="importtime" value="<?php print $importtime; ?>" />
@@ -1027,7 +948,7 @@ print "<form enctype=\"multipart/form-data\" method=\"post\" name=\"configform\"
 				$flist = GetFemalesWithFAMS();
 				$famlist = GetFamListWithMARR();
 				print $gm_lang["calc_marr_names"];
-				setup_progress_bar(count($flist));
+				ImportFunctions::SetupProgressBar(count($flist));
 			
 				$i=0;
 				$newtime = time();
@@ -1110,7 +1031,7 @@ print "<form enctype=\"multipart/form-data\" method=\"post\" name=\"configform\"
 							?>
 							<div class="shade2"><?php print $gm_lang["import_time_exceeded"]; ?></div>
 							<div class="topbottombar">
-								<input type="hidden" name="ged" value="<?php print $ged; ?>" />
+								<input type="hidden" name="gedid" value="<?php print $gedid; ?>" />
 								<input type="hidden" name="stage" value="1" />
 								<input type="hidden" name="timelimit" value="<?php print $timelimit; ?>" />
 								<input type="hidden" name="importtime" value="<?php print $importtime; ?>" />

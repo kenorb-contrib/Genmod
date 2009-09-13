@@ -41,7 +41,7 @@ if (strstr($_SERVER["SCRIPT_NAME"],basename(__FILE__))) {
  */
 function print_list_person($key, $value, $findid=false, $asso="", $useli=true, $fact="") {
 	global $gm_lang, $SCRIPT_NAME, $pass, $indi_private, $indi_hide, $indi_total, $NAME_REVERSE;
-	global $GEDCOM, $GEDCOMS, $GEDCOMID, $SHOW_ID_NUMBERS, $TEXT_DIRECTION, $SHOW_PEDIGREE_PLACES, $GM_IMAGE_DIR, $GM_IMAGES, $SHOW_DEATH_LISTS;
+	global $GEDCOMID, $SHOW_ID_NUMBERS, $TEXT_DIRECTION, $SHOW_PEDIGREE_PLACES, $GM_IMAGE_DIR, $GM_IMAGES, $SHOW_DEATH_LISTS;
 	
 	$key = splitkey($key, "id");
 	SwitchGedcom($value[1]);
@@ -49,7 +49,7 @@ function print_list_person($key, $value, $findid=false, $asso="", $useli=true, $
 	if (!isset($indi_private)) $indi_private=array();
 	if (!isset($indi_hide)) $indi_hide=array();
 	if (!isset($indi_total)) $indi_total=array();
-	$indi_total[$key."[".$GEDCOM."]"] = 1;
+	$indi_total[$key."[".$GEDCOMID."]"] = 1;
 
 	$disp = PrivacyFunctions::displayDetailsByID($key);
 	if ($disp) $disp2 = true;
@@ -70,7 +70,7 @@ function print_list_person($key, $value, $findid=false, $asso="", $useli=true, $
 			print "</b>";
 		}
 		else {
-			print "<a href=\"individual.php?pid=$key&amp;ged=$value[1]\" class=\"list_item\"";
+			print "<a href=\"individual.php?pid=$key&amp;gedid=$value[1]\" class=\"list_item\"";
 			if (!empty($fact)) print " target=\"blank\" ";
 			print "><b>";
 //			if (HasChinese($value[0])) print PrintReady($value[0]." (".GetPinYin($value[0]).")");
@@ -85,7 +85,7 @@ function print_list_person($key, $value, $findid=false, $asso="", $useli=true, $
 
 		if (!$disp) {
 			print " -- <i>".$gm_lang["private"]."</i>";
-			$indi_private[$key."[".$GEDCOM."]"] = 1;
+			$indi_private[$key."[".$GEDCOMID."]"] = 1;
 		}
 		else {
 			$pfact = print_first_major_fact($key);
@@ -113,16 +113,16 @@ function print_list_person($key, $value, $findid=false, $asso="", $useli=true, $
 		print "</a>";
 		if (is_array($asso) && ($disp)) {
 			foreach ($asso as $akey => $avalue) {
-				$newged = splitkey($avalue[0], "ged");
+				$newged = splitkey($avalue[0], "gedid");
 				SwitchGedcom($newged);
 				$key = splitkey($avalue[0], "id");
 				if ($avalue[1] == "indi") {
 					$name = GetPersonName($key);
-					print "<br /><a href=\"individual.php?pid=$key&amp;ged=$GEDCOM\" title=\"$name\" class=\"list_item\">";
+					print "<br /><a href=\"individual.php?pid=$key&amp;gedid=$GEDCOMID\" title=\"$name\" class=\"list_item\">";
   				}
   				else {
 					$name = GetFamilyDescriptor($key);
-					print "<br /><a href=\"family.php?famid=$key&amp;ged=$GEDCOM\" title=\"$name\" class=\"list_item\">";
+					print "<br /><a href=\"family.php?famid=$key&amp;gedid=$GEDCOMID\" title=\"$name\" class=\"list_item\">";
 				}
 				if ($TEXT_DIRECTION=="ltr") print " <span dir=\"ltr\">";
 				else print " <span dir=\"rtl\">";
@@ -145,7 +145,7 @@ function print_list_person($key, $value, $findid=false, $asso="", $useli=true, $
 	}
 	else {
 		$pass = TRUE;
-		$indi_hide[$key."[".$GEDCOM."]"] = 1;
+		$indi_hide[$key."[".$GEDCOMID."]"] = 1;
 	}
 	SwitchGedcom();
 }
@@ -154,7 +154,7 @@ function print_list_person($key, $value, $findid=false, $asso="", $useli=true, $
 // param fact is for sanitycheck to print the fact and open a new page in a new window.
 function print_list_family($key, $value, $findid=false, $asso="", $useli=true, $fact="") {
 	global $gm_lang, $pass, $fam_private, $fam_hide, $fam_total, $SHOW_ID_NUMBERS, $SHOW_FAM_ID_NUMBERS;
-	global $GEDCOM, $GEDCOMS, $GEDCOMID, $HIDE_LIVE_PEOPLE, $SHOW_PEDIGREE_PLACES;
+	global $GEDCOMID, $HIDE_LIVE_PEOPLE, $SHOW_PEDIGREE_PLACES;
 	global $TEXT_DIRECTION, $COMBIKEY;
 
 	SwitchGedcom($value[1]);
@@ -162,7 +162,7 @@ function print_list_family($key, $value, $findid=false, $asso="", $useli=true, $
 	if (!isset($fam_private)) $fam_private=array();
 	if (!isset($fam_hide)) $fam_hide=array();
 	if (!isset($fam_total)) $fam_total=array();
-	$fam_total[$key."[".$GEDCOM."]"] = 1;
+	$fam_total[$key."[".$GEDCOMID."]"] = 1;
 	$famrec=FindFamilyRecord($key);
 	$display = PrivacyFunctions::displayDetailsByID($key, "FAM");
 	//print "display: ".$display." key: ".$key." famrec: ".$famrec;
@@ -191,7 +191,7 @@ function print_list_family($key, $value, $findid=false, $asso="", $useli=true, $
 			print "</b>";
 		}
 		else {
-			print "<a href=\"family.php?famid=$kid&amp;ged=$value[1]\" class=\"list_item\"";
+			print "<a href=\"family.php?famid=$kid&amp;gedid=$value[1]\" class=\"list_item\"";
 			if (!empty($fact)) print " target=\"blank\" ";
 			print "><b>";
 //			if (HasChinese($value[0])) print PrintReady($value[0]." (".GetPinYin($value[0]).")");
@@ -205,7 +205,7 @@ function print_list_family($key, $value, $findid=false, $asso="", $useli=true, $
 			}
 		if (!$display) {
 			print " -- <i>".$gm_lang["private"]."</i>";
-			$fam_private[$key."[".$GEDCOM."]"] = 1;
+			$fam_private[$key."[".$GEDCOMID."]"] = 1;
 		}
 		else {
 			$bpos1 = strpos($famrec, "1 MARR");
@@ -238,11 +238,11 @@ function print_list_family($key, $value, $findid=false, $asso="", $useli=true, $
 				$key = splitkey($avalue[0], "id");
 				if ($avalue[1] == "indi") {
 					$name = GetPersonName($key);
-					print "<br /><a href=\"individual.php?pid=$key&amp;ged=$GEDCOM\" title=\"$name\" class=\"list_item\">";
+					print "<br /><a href=\"individual.php?pid=$key&amp;gedid=$GEDCOMID\" title=\"$name\" class=\"list_item\">";
   				}
   				else {
 					$name = GetFamilyDescriptor($key);
-					print "<br /><a href=\"family.php?famid=$key&amp;ged=$GEDCOM\" title=\"$name\" class=\"list_item\">";
+					print "<br /><a href=\"family.php?famid=$key&amp;gedid=$GEDCOMID\" title=\"$name\" class=\"list_item\">";
 				}
 				if ($TEXT_DIRECTION=="ltr") print " <span dir=\"ltr\">";
 				else print " <span dir=\"rtl\">";
@@ -264,23 +264,23 @@ function print_list_family($key, $value, $findid=false, $asso="", $useli=true, $
 	}															//begin re-added by pluntke
 	else {				   	//fixed THIS line (changed && to ||)
 		$pass = true;
-		$fam_hide[$key."[".$GEDCOM."]"] = 1;
+		$fam_hide[$key."[".$GEDCOMID."]"] = 1;
 	}															//end re-added by pluntke
 	SwitchGedcom();
 }
 
 // Prints the information for a source in a list view
 function print_list_source($key, $value) {
-	global $GEDCOM, $GEDCOMS, $GEDCOMID, $source_total, $source_hide, $SHOW_SOURCES, $SHOW_ID_NUMBERS, $GEDCOM, $TEXT_DIRECTION;
+	global $GEDCOM, $source_total, $source_hide, $SHOW_SOURCES, $SHOW_ID_NUMBERS, $TEXT_DIRECTION;
 	
 	SwitchGedcom($value["gedfile"]);
 	if (!isset($source_total)) $source_total=array();
-	$source_total[$key."[".$GEDCOM."]"] = 1;
+	$source_total[$key."[".$GEDCOMID."]"] = 1;
 
 	if (PrivacyFunctions::displayDetailsByID($key, "SOUR", 1, true)) {
 		if (begRTLText($value["name"])) print "\n\t\t\t<li class=\"rtl\" dir=\"rtl\">";
 		else print "\n\t\t\t<li class=\"ltr\" dir=\"ltr\">";
-		print "\n\t\t\t<a href=\"source.php?sid=$key&amp;ged=".get_gedcom_from_id($value["gedfile"])."\" class=\"list_item\">".PrintReady($value["name"]);
+		print "\n\t\t\t<a href=\"source.php?sid=$key&amp;gedid=".$value["gedfile"]."\" class=\"list_item\">".PrintReady($value["name"]);
 		if ($SHOW_ID_NUMBERS) {
 		if ($TEXT_DIRECTION=="ltr") print " &lrm;($key)&lrm;";
 		else print " &rlm;($key)&rlm;";
@@ -288,22 +288,22 @@ function print_list_source($key, $value) {
 	print "</a>\n";
 	print "</li>\n";
 	}
-	else $source_hide[$key."[".$GEDCOM."]"] = 1;
+	else $source_hide[$key."[".$GEDCOMID."]"] = 1;
 	
 	SwitchGedcom();
 
 }
 // Prints the information for media in a list view
 function print_list_media($key, $value, $skippriv=false) {
-	global $GEDCOM, $GEDCOMS, $GEDCOMID, $media_total, $media_hide, $SHOW_ID_NUMBERS, $GEDCOM, $TEXT_DIRECTION;
+	global $GEDCOM, $media_total, $media_hide, $SHOW_ID_NUMBERS, $TEXT_DIRECTION;
 	
 	SwitchGedcom($value["gedfile"]);
 	if (!isset($media_total)) $media_total=array();
-	$media_total[$key."[".$GEDCOM."]"] = 1;
+	$media_total[$key."[".$GEDCOMID."]"] = 1;
 	if ($skippriv || PrivacyFunctions::displayDetailsByID($key, "OBJE", 1, true)) {
 		if (begRTLText($value["name"])) print "\n\t\t\t<li class=\"rtl\" dir=\"rtl\">";
 		else print "\n\t\t\t<li class=\"ltr\" dir=\"ltr\">";
-		print "\n\t\t\t<a href=\"mediadetail.php?mid=$key&amp;ged=".get_gedcom_from_id($value["gedfile"])."\" class=\"list_item\">".PrintReady($value["name"]);
+		print "\n\t\t\t<a href=\"mediadetail.php?mid=$key&amp;gedid=".$value["gedfile"]."\" class=\"list_item\">".PrintReady($value["name"]);
 		if ($SHOW_ID_NUMBERS) {
 			if ($TEXT_DIRECTION=="ltr") print " &lrm;($key)&lrm;";
 			else print " &rlm;($key)&rlm;";
@@ -311,23 +311,23 @@ function print_list_media($key, $value, $skippriv=false) {
 		print "</a>\n";
 		print "</li>\n";
 	}
-	else $media_hide[$key."[".$GEDCOM."]"] = 1;
+	else $media_hide[$key."[".$GEDCOMID."]"] = 1;
 	SwitchGedcom();
 }
 
 // Prints the information for a repository in a list view
 function print_list_repository($key, $value) {
-	global $GEDCOM, $GEDCOMS, $GEDCOMID, $repo_total, $repo_hide, $SHOW_ID_NUMBERS, $GEDCOM, $TEXT_DIRECTION;
+	global $GEDCOM, $GEDCOMID, $repo_total, $repo_hide, $SHOW_ID_NUMBERS, $TEXT_DIRECTION;
 
 	SwitchGedcom($value["gedfile"]);
 	if (!isset($repo_total)) $repo_total=array();
-	$repo_total[$value["id"]."[".$GEDCOM."]"] = 1;
+	$repo_total[$value["id"]."[".$GEDCOMID."]"] = 1;
 	if (PrivacyFunctions::displayDetailsByID($value["id"], "REPO")) {
 		if (begRTLText($key))
 		     print "\n\t\t\t<li class=\"rtl\" dir=\"rtl\">";
 		else print "\n\t\t\t<li class=\"ltr\" dir=\"ltr\">";
 
-		print "<a href=\"repo.php?rid=".$value["id"]."&amp;ged=".$GEDCOM."\" class=\"list_item\">";
+		print "<a href=\"repo.php?rid=".$value["id"]."&amp;gedid=".$GEDCOMID."\" class=\"list_item\">";
 		print PrintReady($key);
 		if ($SHOW_ID_NUMBERS) {
 			if ($TEXT_DIRECTION=="ltr") print " &lrm;(".$value["id"].")&lrm;";
@@ -344,7 +344,7 @@ function print_list_repository($key, $value) {
 			
 		print "</a></li>\n";
 	}
-	else $repo_hide[$value["id"]."[".$GEDCOM."]"] = 1;
+	else $repo_hide[$value["id"]."[".$GEDCOMID."]"] = 1;
 	SwitchGedcom();
 }
 
@@ -402,7 +402,7 @@ function InitListCounters($action = "reset") {
  * @param int $count	on some charts it is important to keep a count of how many boxes were printed
  */
 function print_pedigree_person($pid, $style=1, $show_famlink=true, $count=0, $personcount="1", $indirec="") {
-	global $HIDE_LIVE_PEOPLE, $SHOW_LIVING_NAMES, $PRIV_PUBLIC, $ZOOM_BOXES, $LINK_ICONS, $view, $SCRIPT_NAME, $GEDCOMID, $GEDCOM;
+	global $HIDE_LIVE_PEOPLE, $SHOW_LIVING_NAMES, $PRIV_PUBLIC, $ZOOM_BOXES, $LINK_ICONS, $view, $SCRIPT_NAME, $GEDCOMID;
 	global $gm_lang, $SHOW_HIGHLIGHT_IMAGES, $bwidth, $bheight, $show_full, $PEDIGREE_FULL_DETAILS, $SHOW_ID_NUMBERS, $SHOW_PEDIGREE_PLACES, $view;
 	global $CONTACT_EMAIL, $CONTACT_METHOD, $TEXT_DIRECTION, $DEFAULT_PEDIGREE_GENERATIONS, $OLD_PGENS, $talloffset, $PEDIGREE_LAYOUT, $MEDIA_DIRECTORY;
 	global $GM_IMAGE_DIR, $GM_IMAGES, $ABBREVIATE_CHART_LABELS;
@@ -443,7 +443,7 @@ function print_pedigree_person($pid, $style=1, $show_famlink=true, $count=0, $pe
 		$indirec=FindPersonRecord($pid);
 		if ($canshow && GetChangeData(true, $pid, true)) {
 			$rec = GetChangeData(false, $pid, true, "gedlines", "");
-			if (isset($rec[$GEDCOM][$pid])) $indirec = $rec[$GEDCOM][$pid];
+			if (isset($rec[$GEDCOMID][$pid])) $indirec = $rec[$GEDCOMID][$pid];
 			$newindi = true;
 		}
 	}
@@ -465,19 +465,19 @@ function print_pedigree_person($pid, $style=1, $show_famlink=true, $count=0, $pe
 				print "onmouseout=\"moveout('".$pid.".".$personcount.".".$count.".".$random."'); return false;\">";
 				// This div is filled by an AJAX call! Not yet as placement is a problem!
 				// NOTE: Zoom
-				print "<a href=\"pedigree.php?rootid=$pid&amp;PEDIGREE_GENERATIONS=$OLD_PGENS&amp;talloffset=$talloffset&amp;ged=$GEDCOM\"><b>".$gm_lang["index_header"]."</b></a>\n";
-				print "<br /><a href=\"descendancy.php?pid=$pid&amp;show_full=$show_full&amp;generations=$generations&amp;box_width=$box_width&amp;ged=$GEDCOM\"><b>".$gm_lang["descend_chart"]."</b></a><br />\n";
+				print "<a href=\"pedigree.php?rootid=$pid&amp;PEDIGREE_GENERATIONS=$OLD_PGENS&amp;talloffset=$talloffset&amp;gedid=$GEDCOMID\"><b>".$gm_lang["index_header"]."</b></a>\n";
+				print "<br /><a href=\"descendancy.php?pid=$pid&amp;show_full=$show_full&amp;generations=$generations&amp;box_width=$box_width&amp;gedid=$GEDCOMID\"><b>".$gm_lang["descend_chart"]."</b></a><br />\n";
 				$username = $gm_username;
 				if (!empty($username)) {
 					$tuser =& User::GetInstance($username);
-					if (!empty($tuser->gedcomid[$GEDCOM])) {
-						print "<a href=\"relationship.php?pid1=".$tuser->gedcomid[$GEDCOM]."&amp;pid2=".$pid."&amp;ged=$GEDCOM\"><b>".$gm_lang["relationship_to_me"]."</b></a><br />\n";
+					if (!empty($tuser->gedcomid[$GEDCOMID])) {
+						print "<a href=\"relationship.php?pid1=".$tuser->gedcomid[$GEDCOMID]."&amp;pid2=".$pid."&amp;gedid=$GEDCOMID\"><b>".$gm_lang["relationship_to_me"]."</b></a><br />\n";
 					}
 				}
 				// NOTE: Zoom
-				if (file_exists("ancestry.php")) print "<a href=\"ancestry.php?rootid=$pid&amp;chart_style=$chart_style&amp;PEDIGREE_GENERATIONS=$OLD_PGENS&amp;box_width=$box_width&amp;ged=$GEDCOM\"><b>".$gm_lang["ancestry_chart"]."</b></a><br />\n";
-				if (file_exists("fanchart.php") and defined("IMG_ARC_PIE") and function_exists("imagettftext"))  print "<a href=\"fanchart.php?rootid=$pid&amp;PEDIGREE_GENERATIONS=$OLD_PGENS&amp;ged=$GEDCOM\"><b>".$gm_lang["fan_chart"]."</b></a><br />\n";
-				if (file_exists("hourglass.php")) print "<a href=\"hourglass.php?pid=$pid&amp;chart_style=$chart_style&amp;PEDIGREE_GENERATIONS=$OLD_PGENS&amp;box_width=$box_width&amp;ged=$GEDCOM\"><b>".$gm_lang["hourglass_chart"]."</b></a><br />\n";
+				if (file_exists("ancestry.php")) print "<a href=\"ancestry.php?rootid=$pid&amp;chart_style=$chart_style&amp;PEDIGREE_GENERATIONS=$OLD_PGENS&amp;box_width=$box_width&amp;gedid=$GEDCOMID\"><b>".$gm_lang["ancestry_chart"]."</b></a><br />\n";
+				if (file_exists("fanchart.php") and defined("IMG_ARC_PIE") and function_exists("imagettftext"))  print "<a href=\"fanchart.php?rootid=$pid&amp;PEDIGREE_GENERATIONS=$OLD_PGENS&amp;gedid=$GEDCOMID\"><b>".$gm_lang["fan_chart"]."</b></a><br />\n";
+				if (file_exists("hourglass.php")) print "<a href=\"hourglass.php?pid=$pid&amp;chart_style=$chart_style&amp;PEDIGREE_GENERATIONS=$OLD_PGENS&amp;box_width=$box_width&amp;gedid=$GEDCOMID\"><b>".$gm_lang["hourglass_chart"]."</b></a><br />\n";
 				$ct = preg_match_all("/1\s*FAMS\s*@(.*)@/", $indirec, $match, PREG_SET_ORDER);
 				$fams = array();
 				for ($i=0; $i<$ct; $i++) {
@@ -487,7 +487,7 @@ function print_pedigree_person($pid, $style=1, $show_famlink=true, $count=0, $pe
 					$famrec = FindFamilyRecord($famid);
 					if ($canshow && GetChangeData(true, $famid, true, "gedlines", "")) {
 						$rec = GetChangeData(false, $famid, true, "gedlines", "");
-						$famrec = $rec[$GEDCOM][$famid];
+						$famrec = $rec[$GEDCOMID][$famid];
 					}
 					if ($famrec) {
 						$parents = FindParentsInRecord($famrec);
@@ -496,14 +496,14 @@ function print_pedigree_person($pid, $style=1, $show_famlink=true, $count=0, $pe
 						if ($pid==$parents["WIFE"]) $spouse = $parents["HUSB"];
 						$num = preg_match_all("/1\s*CHIL\s*@(.*)@/", $famrec, $smatch,PREG_SET_ORDER);
 						if ((!empty($spouse))||($num>0)) {
-							print "<a href=\"family.php?famid=$famid&amp;ged=$GEDCOM\"><b>".$gm_lang["fam_spouse"]."</b></a><br /> \n";
+							print "<a href=\"family.php?famid=$famid&amp;gedid=$GEDCOMID\"><b>".$gm_lang["fam_spouse"]."</b></a><br /> \n";
 							if (!empty($spouse)) {
 								$spouserec = "";
 								if ($canshow && GetChangeData(true, $spouse, true, "gedlines", "")) {
 									$rec = GetChangeData(false, $spouse, true, "gedlines", "");
-									$spouserec = $rec[$GEDCOM][$spouse];
+									$spouserec = $rec[$GEDCOMID][$spouse];
 								}
-								print "<a href=\"individual.php?pid=$spouse&amp;ged=$GEDCOM\">";
+								print "<a href=\"individual.php?pid=$spouse&amp;gedid=$GEDCOMID\">";
 								if (($SHOW_LIVING_NAMES>=$PRIV_PUBLIC) || (PrivacyFunctions::displayDetailsByID($spouse))||(PrivacyFunctions::showLivingNameByID($spouse))) print PrintReady(GetPersonName($spouse, $spouserec));
 								else print $gm_lang["private"];
 								print "</a><br />\n";
@@ -511,7 +511,7 @@ function print_pedigree_person($pid, $style=1, $show_famlink=true, $count=0, $pe
 						}
 						for($j=0; $j<$num; $j++) {
 							$cpid = $smatch[$j][1];
-							print "\n\t\t\t\t&nbsp;&nbsp;<a href=\"individual.php?pid=$cpid&amp;ged=$GEDCOM\">";
+							print "\n\t\t\t\t&nbsp;&nbsp;<a href=\"individual.php?pid=$cpid&amp;gedid=$GEDCOMID\">";
 							if (($SHOW_LIVING_NAMES>=$PRIV_PUBLIC) || (PrivacyFunctions::displayDetailsByID($cpid))||(PrivacyFunctions::showLivingNameByID($cpid))) print PrintReady(GetPersonName($cpid));
 							else print $gm_lang["private"];
 							print "<br /></a>";
@@ -573,7 +573,7 @@ function print_pedigree_person($pid, $style=1, $show_famlink=true, $count=0, $pe
 		if (!$disp) {
 			if ($dispname) {
 				// NOTE: Start span namedef-$personcount.$pid.$count
-				print "<a href=\"individual.php?pid=$pid&amp;ged=$GEDCOM\"><span id=\"namedef-$pid.$personcount.$count.$random\" ";
+				print "<a href=\"individual.php?pid=$pid&amp;gedid=$GEDCOMID\"><span id=\"namedef-$pid.$personcount.$count.$random\" ";
 				if (hasRTLText($name) && $style=="1")
 				print "class=\"name2\">";
 				else print "class=\"name$style\">";
@@ -627,7 +627,7 @@ function print_pedigree_person($pid, $style=1, $show_famlink=true, $count=0, $pe
 		}
 		else {
 			// Added this else to show zoomboxes even if details are hidden. Privacy should handle the contents
-			print "<a href=\"individual.php?pid=$pid&amp;ged=$GEDCOM\"";
+			print "<a href=\"individual.php?pid=$pid&amp;gedid=$GEDCOMID\"";
 			if (!$show_full) {
 				//not needed or wanted for mouseover //if ($ZOOM_BOXES=="mouseover") print " onmouseover=\"event.cancelBubble = true;\"";
 				if ($ZOOM_BOXES=="mousedown") print "onmousedown=\"event.cancelBubble = true;\"";
@@ -756,12 +756,12 @@ function print_pedigree_person($pid, $style=1, $show_famlink=true, $count=0, $pe
 			// NOTE: Popup box icon (don't show if the person is private)
 			if ($LINK_ICONS!="disabled" && $show_famlink && ($disp || $dispname)) {
 				$click_link="#";
-				if (preg_match("/pedigree.php/", $SCRIPT_NAME)>0) $click_link="pedigree.php?rootid=$pid&amp;PEDIGREE_GENERATIONS=$OLD_PGENS&amp;talloffset=$talloffset&amp;ged=$GEDCOM";
-				if (preg_match("/hourglass.php/", $SCRIPT_NAME)>0) $click_link="hourglass.php?pid=$pid&amp;generations=$generations&amp;box_width=$box_width&amp;ged=$GEDCOM";
-				if (preg_match("/ancestry.php/", $SCRIPT_NAME)>0) $click_link="ancestry.php?rootid=$pid&amp;chart_style=$chart_style&amp;PEDIGREE_GENERATIONS=$OLD_PGENS&amp;box_width=$box_width&amp;ged=$GEDCOM";
-				if (preg_match("/descendancy.php/", $SCRIPT_NAME)>0) $click_link="descendancy.php?pid=$pid&amp;show_full=$show_full&amp;generations=$generations&amp;box_width=$box_width&amp;ged=$GEDCOM";
-				if ((preg_match("/family.php/", $SCRIPT_NAME)>0)&&!empty($famid)) $click_link="family.php?famid=$famid&amp;ged=$GEDCOM";
-				if (preg_match("/individual.php/", $SCRIPT_NAME)>0) $click_link="individual.php?pid=$pid&amp;ged=$GEDCOM";
+				if (preg_match("/pedigree.php/", $SCRIPT_NAME)>0) $click_link="pedigree.php?rootid=$pid&amp;PEDIGREE_GENERATIONS=$OLD_PGENS&amp;talloffset=$talloffset&amp;gedid=$GEDCOMID";
+				if (preg_match("/hourglass.php/", $SCRIPT_NAME)>0) $click_link="hourglass.php?pid=$pid&amp;generations=$generations&amp;box_width=$box_width&amp;gedid=$GEDCOMID";
+				if (preg_match("/ancestry.php/", $SCRIPT_NAME)>0) $click_link="ancestry.php?rootid=$pid&amp;chart_style=$chart_style&amp;PEDIGREE_GENERATIONS=$OLD_PGENS&amp;box_width=$box_width&amp;gedid=$GEDCOMID";
+				if (preg_match("/descendancy.php/", $SCRIPT_NAME)>0) $click_link="descendancy.php?pid=$pid&amp;show_full=$show_full&amp;generations=$generations&amp;box_width=$box_width&amp;gedid=$GEDCOMID";
+				if ((preg_match("/family.php/", $SCRIPT_NAME)>0)&&!empty($famid)) $click_link="family.php?famid=$famid&amp;gedid=$GEDCOMID";
+				if (preg_match("/individual.php/", $SCRIPT_NAME)>0) $click_link="individual.php?pid=$pid&amp;gedid=$GEDCOMID";
 				print "<br /><img src=\"".$GM_IMAGE_DIR."/".$GM_IMAGES["pedigree"]["small"]."\" width=\"25\" border=\"0\" vspace=\"0\" hspace=\"0\" alt=\"".$gm_lang["person_links"]."\" title=\"".$gm_lang["person_links"]."\"";
 				if ($LINK_ICONS=="mouseover") print " onmouseover";
 				if ($LINK_ICONS=="click") print " onclick";
@@ -803,7 +803,7 @@ function print_header($title, $head="",$use_alternate_styles=true) {
 	global $HOME_SITE_URL, $HOME_SITE_TEXT;
 	global $BROWSERTYPE, $indilist, $INDILIST_RETRIEVED;
 	global $view, $cart, $menubar, $USE_GREYBOX;
-	global $CHARACTER_SET, $GM_IMAGE_DIR, $GEDCOMS, $GEDCOM, $CONTACT_EMAIL, $COMMON_NAMES_THRESHOLD;
+	global $CHARACTER_SET, $GM_IMAGE_DIR, $GEDCOMS, $CONTACT_EMAIL, $COMMON_NAMES_THRESHOLD;
 	global $SCRIPT_NAME, $QUERY_STRING, $action, $query, $changelanguage,$theme_name;
 	global $FAVICON, $stylesheet, $print_stylesheet, $rtl_stylesheet, $headerfile, $toplinks, $THEME_DIR, $print_headerfile;
 	global $GM_IMAGES, $TEXT_DIRECTION, $ONLOADFUNCTION,$REQUIRE_AUTHENTICATION, $SHOW_SOURCES;
@@ -885,7 +885,7 @@ function print_header($title, $head="",$use_alternate_styles=true) {
 	   print "<link rel=\"shortcut icon\" href=\"$FAVICON\" type=\"image/x-icon\"></link>\n\t\t";
 	}
 	if (!isset($META_TITLE)) $META_TITLE = "";
-	if (isset($GEDCOMS[$GEDCOM]["title"])) $title = $GEDCOMS[$GEDCOM]["title"]." :: ".$title;
+	if (isset($GEDCOMS[$GEDCOMID]["title"])) $title = $GEDCOMS[$GEDCOMID]["title"]." :: ".$title;
 	print "<title>".PrintReady(strip_tags($title)." - ".$META_TITLE." - Genmod", TRUE)."</title>\n\t";
 	 if (!$REQUIRE_AUTHENTICATION){
 		print "<link href=\"" . SERVER_URL .  "rss.php\" rel=\"alternate\" type=\"application/rss+xml\" title=\"RSS\"></link>\n\t";
@@ -927,13 +927,13 @@ function print_header($title, $head="",$use_alternate_styles=true) {
 		  if (!empty($META_PUBLISHER)) print "<meta name=\"publisher\" content=\"".$META_PUBLISHER."\" />\n";
 		  if (!empty($META_COPYRIGHT)) print "<meta name=\"copyright\" content=\"".$META_COPYRIGHT."\" />\n";
 		  print "<meta name=\"keywords\" content=\"".$META_KEYWORDS;
-		  $surnames = GetCommonSurnamesIndex($GEDCOM);
+		  $surnames = GetCommonSurnamesIndex($GEDCOMID);
 		  foreach($surnames as $surname=>$count) if (!empty($surname)) print ", $surname";
 		  print "\" />\n";
-		  if ((empty($META_PAGE_TOPIC))&&(!empty($GEDCOMS[$GEDCOM]["title"]))) $META_PAGE_TOPIC = $GEDCOMS[$GEDCOM]["title"];
+		  if ((empty($META_PAGE_TOPIC))&&(!empty($GEDCOMS[$GEDCOMID]["title"]))) $META_PAGE_TOPIC = $GEDCOMS[$GEDCOMID]["title"];
 		//LERMAN - make meta description unique, like the title
 		  if (empty($META_DESCRIPTION)) $META_DESCRIPTION = PrintReady(strip_tags($title)." - ".$META_TITLE." - Genmod", TRUE);
-		  //if ((empty($META_DESCRIPTION))&&(!empty($GEDCOMS[$GEDCOM]["title"]))) $META_DESCRIPTION = $GEDCOMS[$GEDCOM]["title"];
+		  //if ((empty($META_DESCRIPTION))&&(!empty($GEDCOMS[$GEDCOMID]["title"]))) $META_DESCRIPTION = $GEDCOMS[$GEDCOMID]["title"];
 		  if (!empty($META_DESCRIPTION)) print "<meta name=\"description\" content=\"".preg_replace("/\"/", "", $META_DESCRIPTION)."\" />\n";
 		  if (!empty($META_PAGE_TOPIC)) print "<meta name=\"page-topic\" content=\"".preg_replace("/\"/", "", $META_PAGE_TOPIC)."\" />\n";
 	 	  if (!empty($META_AUDIENCE)) print "<meta name=\"audience\" content=\"$META_AUDIENCE\" />\n";
@@ -1073,7 +1073,7 @@ function print_simple_header($title) {
 	 global $CHARACTER_SET, $GM_IMAGE_DIR;
 	 global $SCRIPT_NAME, $QUERY_STRING, $action, $query, $changelanguage;
 	 global $FAVICON, $stylesheet, $headerfile, $toplinks, $THEME_DIR, $print_headerfile, $SCRIPT_NAME;
-	 global $TEXT_DIRECTION, $GEDCOMS, $GEDCOM, $CONTACT_EMAIL, $COMMON_NAMES_THRESHOLD,$GM_IMAGES;
+	 global $TEXT_DIRECTION, $GEDCOMS, $GEDCOMID, $CONTACT_EMAIL, $COMMON_NAMES_THRESHOLD,$GM_IMAGES;
 	 global $META_AUTHOR, $META_PUBLISHER, $META_COPYRIGHT, $META_DESCRIPTION, $META_PAGE_TOPIC, $META_AUDIENCE, $META_PAGE_TYPE, $META_ROBOTS, $META_REVISIT, $META_KEYWORDS, $META_TITLE;
 	 header("Content-Type: text/html; charset=$CHARACTER_SET");
 	 print "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">\n";
@@ -1100,13 +1100,13 @@ function print_simple_header($title) {
 	if (!empty($META_PUBLISHER)) print "<meta name=\"publisher\" content=\"".$META_PUBLISHER."\" />\n";
 	if (!empty($META_COPYRIGHT)) print "<meta name=\"copyright\" content=\"".$META_COPYRIGHT."\" />\n";
 	print "<meta name=\"keywords\" content=\"".$META_KEYWORDS;
-	$surnames = GetCommonSurnamesIndex($GEDCOM);
+	$surnames = GetCommonSurnamesIndex($GEDCOMID);
 	foreach($surnames as $surname=>$count) print ", $surname";
 	print "\" />\n";
-	if ((empty($META_PAGE_TOPIC))&&(!empty($GEDCOMS[$GEDCOM]["title"]))) $META_PAGE_TOPIC = $GEDCOMS[$GEDCOM]["title"];
+	if ((empty($META_PAGE_TOPIC))&&(!empty($GEDCOMS[$GEDCOMID]["title"]))) $META_PAGE_TOPIC = $GEDCOMS[$GEDCOMID]["title"];
 	//LERMAN - make meta description unique, like the title
 	if (empty($META_DESCRIPTION)) $META_DESCRIPTION = PrintReady(strip_tags($title)." - ".$META_TITLE." - Genmod", TRUE);
-	//if ((empty($META_DESCRIPTION))&&(!empty($GEDCOMS[$GEDCOM]["title"]))) $META_DESCRIPTION = $GEDCOMS[$GEDCOM]["title"];
+	//if ((empty($META_DESCRIPTION))&&(!empty($GEDCOMS[$GEDCOMID]["title"]))) $META_DESCRIPTION = $GEDCOMS[$GEDCOMID]["title"];
 	if (!empty($META_DESCRIPTION)) print "<meta name=\"description\" content=\"".preg_replace("/\"/", "", $META_DESCRIPTION)."\" />\n";
 	if (!empty($META_PAGE_TOPIC)) print "<meta name=\"page-topic\" content=\"".preg_replace("/\"/", "", $META_PAGE_TOPIC)."\" />\n";
 	if (!empty($META_AUDIENCE)) print "<meta name=\"audience\" content=\"$META_AUDIENCE\" />\n";
@@ -1179,7 +1179,7 @@ function print_simple_header($title) {
 // -- print the html to close the page
 function print_footer() {
 	global $without_close, $gm_lang, $view, $buildindex;
-	global $SHOW_STATS, $SCRIPT_NAME, $QUERY_STRING, $footerfile, $print_footerfile, $GEDCOMS, $ALLOW_CHANGE_GEDCOM, $printlink;
+	global $SHOW_STATS, $SCRIPT_NAME, $QUERY_STRING, $footerfile, $print_footerfile, $ALLOW_CHANGE_GEDCOM, $printlink;
 	global $GM_IMAGE_DIR, $theme_name, $GM_IMAGES, $TEXT_DIRECTION, $footer_count;
 	
 	if (!isset($footer_count)) $footer_count = 1;
@@ -1428,7 +1428,7 @@ function print_contact_links($style=0) {
  * @param string $pid the id of the individual to print, required to check privacy
  */
 function print_simple_fact($indirec, $fact, $pid) {
-	global $gm_lang, $SHOW_PEDIGREE_PLACES, $ABBREVIATE_CHART_LABELS;
+	global $gm_lang, $ABBREVIATE_CHART_LABELS;
 	
 	$emptyfacts = array("BIRT","CHR","DEAT","BURI","CREM","ADOP","BAPM","BARM","BASM","BLES","CHRA","CONF","FCOM","ORDN","NATU","EMIG","IMMI","CENS","PROB","WILL","GRAD","RETI","BAPL","CONL","ENDL","SLGC","EVEN","MARR","SLGS","MARL","ANUL","CENS","DIV","DIVF","ENGA","MARB","MARC","MARS","OBJE","CHAN","_SEPR","RESI", "DATA", "MAP");
 	$factrec = GetSubRecord(1, "1 $fact", $indirec);
@@ -1527,7 +1527,7 @@ function print_help_link($help, $helpText, $show_desc="", $use_print_text=false,
  */
 function print_text($help, $level=0, $noprint=0){
 	 global $gm_lang, $COMMON_NAMES_THRESHOLD;
-	 global $GEDCOMS, $GEDCOM, $GEDCOM_TITLE, $LANGUAGE;
+	 global $GEDCOM_TITLE, $LANGUAGE;
 	 global $GUESS_URL, $UpArrow, $DAYS_TO_SHOW_LIMIT, $MEDIA_DIRECTORY;
 	 global $repeat, $thumbnail, $xref, $pid, $LANGUAGE;
 	
@@ -2268,7 +2268,7 @@ function init_calendar_popup() {
  * @param		boolean	$find		Set to yes to print links for the find pages
  */
 function PrintPersonList($personlist, $print_all=true, $find=false, $allgeds = "no") {
-	global $TEXT_DIRECTION, $GEDCOMS, $GEDCOM, $gm_lang, $SHOW_MARRIED_NAMES, $LISTS_ALL;
+	global $TEXT_DIRECTION, $gm_lang, $SHOW_MARRIED_NAMES, $LISTS_ALL;
 	global $indi_private, $indi_hide, $surname, $show_all_firstnames, $alpha, $falpha;
 	global $surname_sublist, $show_all, $GEDCOMID, $ALPHA_INDEX_LISTS, $indilist, $year;
 
@@ -2375,8 +2375,8 @@ function PrintPersonList($personlist, $print_all=true, $find=false, $allgeds = "
 					// NOTE: Only include married names if chosen to show so
 					// NOTE: Do not include calculated names. Identified by C.
 					if ($SHOW_MARRIED_NAMES || $namearray[3]!='C') {
-						if ($allgeds == "yes") $names[] = array($namearray[0], $namearray[1], $namearray[2], $namearray[3], splitkey($gid, "id"), splitkey($gid, "ged"));
-						else $names[] = array($namearray[0], $namearray[1], $namearray[2], $namearray[3], $gid, $GEDCOM);
+						if ($allgeds == "yes") $names[] = array($namearray[0], $namearray[1], $namearray[2], $namearray[3], splitkey($gid, "id"), splitkey($gid, "gedid"));
+						else $names[] = array($namearray[0], $namearray[1], $namearray[2], $namearray[3], $gid, $GEDCOMID);
 					}
 				}
 			}
@@ -2420,7 +2420,7 @@ function PrintPersonList($personlist, $print_all=true, $find=false, $allgeds = "
  * @param		string		$page		The page the links should point to
  */
 function PrintSurnameList($surnames, $page, $allgeds="no", $resturl="") {
-	global $TEXT_DIRECTION, $GEDCOMS, $GEDCOM, $gm_lang, $SHOW_MARRIED_NAMES;
+	global $TEXT_DIRECTION, $gm_lang, $SHOW_MARRIED_NAMES;
 	global $surname_sublist, $indilist, $indi_hide, $indi_total;
 	
 	if (stristr($page, "aliveinyear")) {
@@ -2507,7 +2507,7 @@ function PrintSurnameList($surnames, $page, $allgeds="no", $resturl="") {
  * @param		boolean	$find		Set to yes to print links for the find pages
  */
 function PrintFamilyList($familylist, $print_all=true, $find=false, $allgeds="no") {
-	global $TEXT_DIRECTION, $GEDCOMS, $GEDCOM, $gm_lang, $SHOW_MARRIED_NAMES, $COMBIKEY, $ALPHA_INDEX_LISTS, $LISTS_ALL;
+	global $TEXT_DIRECTION, $gm_lang, $SHOW_MARRIED_NAMES, $COMBIKEY, $ALPHA_INDEX_LISTS, $LISTS_ALL;
 	global $surname_sublist, $show_all, $famlist, $fam_hide, $alpha, $falpha;
 	global $firstname_alpha, $fam_private, $show_all_firstnames, $surname;
 	
@@ -2612,10 +2612,9 @@ function PrintFamilyList($familylist, $print_all=true, $find=false, $allgeds="no
 			$fam = $famlist[$gid];
 			$fam["name"] = CheckNN($fam["name"]);
 			$pass = false;
-			$famged = get_gedcom_from_id($fam["gedfile"]);
 			if ($COMBIKEY) $gid = SplitKey($gid, "id");
 			if (HasChinese($fam["name"])) $fam["name"] .= " (".GetFamilyAddDescriptor($gid, false, $fam["gedcom"], false).")";
-			print_list_family($gid, array($fam["name"], $famged));
+			print_list_family($gid, array($fam["name"], $fam["gedfile"]));
 			$i++;
 			if ($i==ceil($count/2) && $count>8) print "</td><td class=\"shade1 list_value indilist\">\n";
 		}
@@ -2709,12 +2708,11 @@ function PrintFilterEvent($filterev) {
 }
 
 function PrintBlockFavorites(&$userfavs, $side, $index, $style) {
-	global $GEDCOM, $command, $gm_user, $gm_username, $gm_lang;
+	global $command, $gm_user, $gm_username, $gm_lang;
 	
-	$mygedcom = $GEDCOM;
-	$current_gedcom = $GEDCOM;
 	foreach($userfavs as $key=>$favorite) {
 		if (isset($favorite->id)) $key=$favorite->id;
+		$oldgedid = 
 		SwitchGedcom($favorite->file);
 		if ($favorite->type=="URL") {
 			print "<div id=\"boxurl".$key.".0\" class=\"person_box";
@@ -2730,7 +2728,7 @@ function PrintBlockFavorites(&$userfavs, $side, $index, $style) {
 				if ($favorite->object->sex == "F") print "F\">\n";
 				elseif ($favorite->object->sex == "U") print "NN\">\n";
 				else print "\">\n";
-				PrintPedigreePerson($favorite->object, $style, 1, $key);
+				PersonFunctions::PrintPedigreePerson($favorite->object, $style, 1, $key);
 			}
 			else {
 				print "\"><ul>\n";

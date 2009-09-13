@@ -39,7 +39,7 @@ function GetPlotData($gedcomid="") {
 	if (empty($gedcomid)) $gedcomid = $GEDCOMID;
 	
 	// check if we must update the cache anyway
-	$cache_load = GedcomConfig::GetLastCacheDate("plotdata", get_gedcom_from_id($gedcomid));
+	$cache_load = GedcomConfig::GetLastCacheDate("plotdata", $gedcomid);
 	if (!$cache_load) {
 		$sql = "DELETE FROM ".TBLPREFIX."pdata WHERE pd_file='".$gedcomid."'";
 		$res = NewQuery($sql);
@@ -94,7 +94,7 @@ function GetPlotData($gedcomid="") {
 			$res = NewQuery($sql);
 			$start += 65535;
 		}
-		GedcomConfig::SetLastCacheDate("plotdata", "1", get_gedcom_from_id($gedcomid));
+		GedcomConfig::SetLastCacheDate("plotdata", "1", $gedcomid);
 	}
 }		
 function GetPlotPerson() {

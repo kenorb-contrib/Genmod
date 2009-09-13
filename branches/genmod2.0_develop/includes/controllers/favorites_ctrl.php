@@ -66,7 +66,7 @@ abstract class FavoritesController {
 		$res = NewQuery($sql);
 		if (!$res) return $favorites;
 		while($row = $res->FetchAssoc()){
-			if (isset($GEDCOMS[get_gedcom_from_id($row["fv_file"])])) {
+			if (isset($GEDCOMS[$row["fv_file"]])) {
 				$favorites[] = new Favorite($row);
 			}
 		}
@@ -91,7 +91,7 @@ abstract class FavoritesController {
 		$res = NewQuery($sql);
 		if (!$res) return $favorites;
 		while($row = $res->FetchAssoc()){
-			if (isset($GEDCOMS[get_gedcom_from_id($row["fv_file"])])) {
+			if (isset($GEDCOMS[$row["fv_file"]])) {
 				$favorites[] = new Favorite($row);
 			}
 		}

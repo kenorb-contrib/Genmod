@@ -39,9 +39,6 @@ require("config.php");
 */
 require("includes/functions/functions_edit.php");
 
-if (empty($ged)) $ged = $GEDCOM;
-$GEDCOM = $ged;
-
 print_simple_header($gm_lang["add_media_tool"]);
 
 //-- only allow users with edit privileges to access script.
@@ -52,8 +49,8 @@ if (!$gm_user->userGedcomAdmin()) {
 }
 
 if ($_SESSION["cookie_login"]) {
-	if (empty(LOGIN_URL)) header("Location: login.php?ged=$GEDCOM&url=addmedia.php");
-	else header("Location: ".LOGIN_URL."?ged=$GEDCOM&url=addmedia.php");
+	if (empty(LOGIN_URL)) header("Location: login.php?gedid=$GEDCOMID&url=addmedia.php");
+	else header("Location: ".LOGIN_URL."?gedid=$GEDCOMID&url=addmedia.php");
 	exit;
 }
 

@@ -44,15 +44,14 @@ abstract class UserController {
 	 * @param string $gedcom	the gedcom filename to match
 	 * @return string 	returns a username
 	 */
-	public function getUserByGedcomId($id, $gedcom) {
-		global $GEDCOMS;
+	public function getUserByGedcomId($id, $gedcomid) {
 
-		if (empty($id) || empty($gedcom)) return false;
+		if (empty($id) || empty($gedcomid)) return false;
 	
 		$user = false;
 		$id = DbLayer::EscapeQuery($id);
 		$sql = "SELECT ug_username FROM ".TBLPREFIX."users_gedcoms WHERE ";
-		$sql .= "ug_gedfile='".$GEDCOMS[$gedcom]["id"]."'";
+		$sql .= "ug_gedfile='".$gedcomid."'";
 		$sql .= "AND ug_gedcomid='".$id."'";
 		$res = NewQuery($sql, false);
 		if (!$res) return false;
@@ -71,17 +70,17 @@ abstract class UserController {
 	* @param string gedcom 	the gedcom filename to match
 	* @return boolean		true if any update took place
 	*/
-	public function ClearUserGedcomIDs($gid, $gedcom) {
+	public function ClearUserGedcomIDs($gid, $gedcomid) {
 		
 		$users = self::GetUsers();
 		foreach ($users as $username => $user) {
 			$changed = false;
-			if (isset($user->gedcomid[$gedcom]) && $user->gedcomid[$gedcom] == $gid) {
-				$user->gedcomid[$gedcom] = "";
+			if (isset($user->gedcomid[$gedcomid]) && $user->gedcomid[$gedcomid] == $gid) {
+				$user->gedcomid[$gedcomid] = "";
 				$changed = true;
 			}
-			if (isset($user->rootid[$gedcom]) && $user->rootid[$gedcom] == $gid) {
-				$user->rootid[$gedcom] = "";
+			if (isset($user->rootid[$gedcomid]) && $user->rootid[$gedcomid] == $gid) {
+				$user->rootid[$gedcomid] = "";
 				$changed = true;
 			}
 			if ($changed) {
@@ -160,7 +159,7 @@ abstract class UserController {
 	* @return bool return true if the username and password credentials match a user in the database return false if they don't
 	*/
 	public function AuthenticateUser($username, $password) {
-		global $GEDCOM, $gm_lang;
+		global $gm_lang;
 
 		$user =& User::GetInstance($username);
 
@@ -187,12 +186,12 @@ abstract class UserController {
 					
 					//-- only change the gedcom if the user does not have an gedcom id
 					//-- for the currently active gedcom
-					if (empty($user->gedcomid[$GEDCOM])) {
+					if (empty($user->gedcomid[$GEDCOMID])) {
 						//-- if the user is not in the currently active gedcom then switch them
 						//-- to the first gedcom for which they have an ID
 						foreach($user->gedcomid as $ged=>$id) {
 							if (!empty($id)) {
-								$_SESSION['GEDCOM']=$ged;
+								$_SESSION['GEDCOMID']=$ged;
 								break;
 							}
 						}
@@ -219,7 +218,7 @@ abstract class UserController {
 	 * @param		string	$logtext		Optional text to write to the log for reason of user logout
 	 */
 	public function UserLogout($username, $logtext = "") {
-		global $GEDCOM, $LANGUAGE, $gm_username;
+		global $GEDCOMID, $LANGUAGE, $gm_username;
 
 		if ($username=="") {
 			if (isset($_SESSION["gm_user"])) $username = $_SESSION["gm_user"];
@@ -238,7 +237,7 @@ abstract class UserController {
 				if (isset($_SESSION["gm_counter"])) $tmphits = $_SESSION["gm_counter"];
 				else $tmphits = -1;
 				@session_destroy();
-				$_SESSION["gedcom"]=$GEDCOM;
+				$_SESSION["GEDCOMID"]=$GEDCOMID;
 				$_SESSION["show_context_help"]="yes";
 				@setcookie("gm_rem", "", -1000);
 				if($tmphits>=0) $_SESSION["gm_counter"]=$tmphits; //set since it was set before so don't get double hits
@@ -335,26 +334,25 @@ abstract class UserController {
 		if ($res = NewQuery($sql)) {
 			// Now write the rights
 			foreach ($GEDCOMS as $id=>$value) {
-				$ged = get_gedcom_from_id($id);
 				$sql = "INSERT INTO ".TBLPREFIX."users_gedcoms VALUES('0','";
-				$sql .= $newuser->username."','".$value["id"]."','";
-				if (isset($newuser->gedcomid[$ged])) $sql .= $newuser->gedcomid[$ged];
+				$sql .= $newuser->username."','".$id."','";
+				if (isset($newuser->gedcomid[$id])) $sql .= $newuser->gedcomid[$id];
 				$sql .= "','";
-				if (isset($newuser->rootid[$ged])) $sql .= $newuser->rootid[$ged];
+				if (isset($newuser->rootid[$id])) $sql .= $newuser->rootid[$id];
 				$sql .= "','";
-				if (isset($newuser->canedit[$ged])) $sql .= $newuser->canedit[$ged]."','";
+				if (isset($newuser->canedit[$id])) $sql .= $newuser->canedit[$id]."','";
 				else $sql .= "none','";
-				if (isset($newuser->gedcomadmin[$ged]) && $newuser->gedcomadmin[$ged] == true) $sql .= "Y','";
+				if (isset($newuser->gedcomadmin[$id]) && $newuser->gedcomadmin[$id] == true) $sql .= "Y','";
 				else $sql .= "N','";
-				if (isset($newuser->privgroup[$ged])) $sql .= $newuser->privgroup[$ged]."','";
+				if (isset($newuser->privgroup[$id])) $sql .= $newuser->privgroup[$id]."','";
 				else $sql .= "access','";
-				if (isset($newuser->relationship_privacy[$ged])) $sql .= $newuser->relationship_privacy[$ged]."','";
+				if (isset($newuser->relationship_privacy[$id])) $sql .= $newuser->relationship_privacy[$id]."','";
 				else $sql .= "','";
-				if (isset($newuser->max_relation_path[$ged])) $sql .= $newuser->max_relation_path[$ged]."','";
+				if (isset($newuser->max_relation_path[$id])) $sql .= $newuser->max_relation_path[$id]."','";
 				else $sql .= $MAX_RELATION_PATH_LENGTH."','";
-				if (isset($newuser->hide_live_people[$ged])) $sql .= $newuser->hide_live_people[$ged]."','";
+				if (isset($newuser->hide_live_people[$id])) $sql .= $newuser->hide_live_people[$id]."','";
 				else $sql .= "','";
-				if (isset($newuser->show_living_names[$ged])) $sql .= $newuser->show_living_names[$ged]."')";
+				if (isset($newuser->show_living_names[$id])) $sql .= $newuser->show_living_names[$id]."')";
 				else $sql .= "')";
 				
 				$res = NewQuery($sql);
@@ -395,7 +393,7 @@ abstract class UserController {
 	* @param string $export_accesslevel
 	*/
 	public function CreateExportUser($export_accesslevel) {
-		global $GEDCOM;
+		global $GEDCOMID;
 		
 		$u =& User::GetInstance("export");
 		if (!$u->is_empty) self::DeleteUser("export");
@@ -414,9 +412,9 @@ abstract class UserController {
 		$newuser->rootid = "";
 		if ($export_accesslevel == "admin") $newuser->canadmin = true;
 		else $newuser->canadmin = false;
-		if ($export_accesslevel == "gedadmin") $newuser->canedit[$GEDCOM] = "admin";
-		elseif ($export_accesslevel == "user") $newuser->canedit[$GEDCOM] = "access";
-		else $newuser->canedit[$GEDCOM] = "none";
+		if ($export_accesslevel == "gedadmin") $newuser->canedit[$GEDCOMID] = "admin";
+		elseif ($export_accesslevel == "user") $newuser->canedit[$GEDCOMID] = "access";
+		else $newuser->canedit[$GEDCOMID] = "none";
 		$newuser->email = "";
 		$newuser->verified = "yes";
 		$newuser->verified_by_admin = "yes";

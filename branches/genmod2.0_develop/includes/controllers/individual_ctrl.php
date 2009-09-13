@@ -48,7 +48,7 @@ class IndividualController extends DetailController {
 	
 	public function __construct() {
 		global $GEDCOM_DEFAULT_TAB, $USE_RIN, $gm_lang, $GM_IMAGE_DIR, $GM_IMAGES, $nonfacts, $nonfamfacts;
-		global $ENABLE_CLIPPINGS_CART, $show_changes, $GEDCOM, $gm_user, $SHOW_ID_NUMBERS;
+		global $ENABLE_CLIPPINGS_CART, $show_changes, $GEDCOMID, $gm_user, $SHOW_ID_NUMBERS;
 		
 		parent::__construct();
 
@@ -80,7 +80,7 @@ class IndividualController extends DetailController {
 			if ($this->user->default_tab != $this->default_tab && $this->user->default_tab != 9) $this->default_tab = $this->user->default_tab;
 			
 			// Only display the user link for authenticated users
-			$indi_username = UserController::getUserByGedcomId($this->xref, $GEDCOM);
+			$indi_username = UserController::getUserByGedcomId($this->xref, $GEDCOMID);
 			$this->indi_userlink = "";
 			if ($indi_username) {
 				if ($gm_user->UserIsAdmin()) $this->indi_userlink = "<a href=\"useradmin.php?action=edituser&username=".$indi_username."\">";
@@ -203,7 +203,7 @@ class IndividualController extends DetailController {
 	 * @return Menu
 	 */
 	public function &getEditMenu() {
-		global $TEXT_DIRECTION, $GEDCOM, $TOTAL_NAMES, $gm_user;
+		global $TEXT_DIRECTION, $TOTAL_NAMES, $gm_user;
 		global $NAME_LINENUM, $SEX_LINENUM, $gm_lang, $USE_QUICK_UPDATE, $show_changes;
 		
 		if ($TEXT_DIRECTION=="rtl") $ff="_rtl";

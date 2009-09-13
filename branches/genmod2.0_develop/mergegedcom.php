@@ -114,7 +114,6 @@ else if ($check == "cancel_upload") {
 	header("Location: mergegedcoms.php");
 }
 if ($cleanup_needed == "cleanup_needed" && $continue == $gm_lang["del_proceed"]) {
-	require_once("includes/functions/functions_tools.php");
 	
 	$filechanged=false;
 	$inpfile = $GEDFILENAME;
@@ -131,7 +130,7 @@ if ($cleanup_needed == "cleanup_needed" && $continue == $gm_lang["del_proceed"])
 		while(!feof($fp)) {
 			$fcontents = fread($fp, 1024*8);
 			$lineend = "\n";
-			if (need_macfile_cleanup($fcontents)) {
+			if (ImportFunctions::NeedMacfileCleanup($fcontents)) {
 				$l_macfilecleanup=true;
 				$lineend = "\r";
 			}
@@ -146,40 +145,40 @@ if ($cleanup_needed == "cleanup_needed" && $continue == $gm_lang["del_proceed"])
 			// Remove heading spaces and other garbage from the gedlines
 			$fcontents = preg_replace("/\n\W+/", "\n", $fcontents);
 			
-			if (!$l_headcleanup && need_head_cleanup($fcontents)) {
-				head_cleanup();
+			if (!$l_headcleanup && ImportFunctions::NeedHeadCleanup($fcontents)) {
+				ImportFunctions::HeadCleanup($fcontents);
 				$l_headcleanup = true;
 			}
 	
 			if ($l_macfilecleanup) {
-				macfile_cleanup();
+				ImportFunctions::MacfileCleanup();
 			}
 	
 			if (isset($_POST["cleanup_places"]) && $_POST["cleanup_places"]=="YES") {
-				if(($sample = need_place_cleanup($fcontents)) !== false) {
+				if(($sample = ImportFunctions::NeedPlaceCleanup($fcontents)) !== false) {
 					$l_placecleanup=true;
-					place_cleanup();
+					ImportFunctions::PlaceCleanup();
 				}
 			}
 	
-			if (line_endings_cleanup()) {
+			if (ImportFunctions::LineEndingsCleanup()) {
 				$filechanged = true;
 			}
 	
 			if(isset($_POST["datetype"])) {
 				$filechanged=true;
 				//month first
-				date_cleanup($_POST["datetype"]);
+				ImportFunctions::DateCleanup($_POST["datetype"]);
 			}
 			/**
 			if($_POST["xreftype"]!="NA") {
 				$filechanged=true;
-				xref_change($_POST["xreftype"]);
+				ImportFunctions::XrefChange($_POST["xreftype"]);
 			}
 			**/
 			if (isset($_POST["utf8convert"])=="YES") {
 				$filechanged=true;
-				convert_ansi_utf8();
+				ImportFunctions::ConvertAnsiUtf8();
 			}
 			fwrite($fw, $fcontents);
 		}
@@ -225,7 +224,7 @@ if (isset($UPFILE) && !empty($UPFILE["name"])) {
 	$ctupload = count($_FILES);
 	if ($ctupload > 0) {
 		// NOTE: When uploading a file check if it doesn't exist yet
-		if (!isset($GEDCOMS[$GEDFILENAME]) || !file_exists($path.$GEDFILENAME)) {
+		if (!isset($GEDCOMS[get_id_from_gedcom($GEDFILENAME)]) || !file_exists($path.$GEDFILENAME)) {
 			if (move_uploaded_file($_FILES['UPFILE']['tmp_name'], $path.$GEDFILENAME)) {
 				WriteToLog("MergeGedcom-> Gedcom ".$path.$GEDFILENAME." uploaded", "I", "S");
 			}
@@ -361,11 +360,11 @@ print "<form enctype=\"multipart/form-data\" method=\"post\" name=\"configform\"
 					if ((!$no_upload && isset($GEDFILENAME)) && (empty($error))) print "disabled=\"disabled\" ";
 					print ">";
 					foreach($GEDCOMS as $gedc=>$gedarray) {
-						print "<option value=\"".urlencode($gedc)."\"";
+						print "<option value=\"".$gedc."\"";
 						if (isset($merge_ged)) {
 							if ($merge_ged==$gedc) print " selected=\"selected\"";
 						}
-						else if ($GEDCOM == $gedc) print " selected=\"selected\"";
+						else if ($GEDCOMID == $gedc) print " selected=\"selected\"";
 						print ">".PrintReady($gedarray["title"])."</option>";
 					}
 					print "</select>";
@@ -444,7 +443,6 @@ print "<form enctype=\"multipart/form-data\" method=\"post\" name=\"configform\"
 					if (!empty($error)) print "<span class=\"error\">".$error."</span>\n";
 					
 					if ($import != true && $skip_cleanup != $gm_lang["skip_cleanup"]) {
-						require_once("includes/functions/functions_tools.php");
 						if ($override == "yes") {
 							copy($bakfile, $GEDFILENAME);
 							if (file_exists($bakfile)) unlink($bakfile);
@@ -500,12 +498,12 @@ print "<form enctype=\"multipart/form-data\" method=\"post\" name=\"configform\"
 							// remove heading spaces and other stuff before the gedrec
 							$indirec = preg_replace("/\n\W+/", "\n", $indirec);
 							
-							if (!$l_headcleanup && need_head_cleanup($indirec)) $l_headcleanup = true;
-							if (!$l_macfilecleanup && need_macfile_cleanup($indirec)) $l_macfilecleanup = true;
-							if (!$l_lineendingscleanup && need_line_endings_cleanup($indirec)) $l_lineendingscleanup = true;
-							if (!$l_placecleanup && ($placesample = need_place_cleanup($indirec)) !== false) $l_placecleanup = true;
-							if (!$l_datecleanup && ($datesample = need_date_cleanup($indirec)) !== false) $l_datecleanup = true;
-							if (!$l_isansi && is_ansi($indirec)) $l_isansi = true;
+							if (!$l_headcleanup && ImportFunctions::NeedHeadCleanup($indirec)) $l_headcleanup = true;
+							if (!$l_macfilecleanup && ImportFunctions::NeedMacfileCleanup($indirec)) $l_macfilecleanup = true;
+							if (!$l_lineendingscleanup && ImportFunctions::NeedLineEndingsCleanup($indirec)) $l_lineendingscleanup = true;
+							if (!$l_placecleanup && ($placesample = ImportFunctions::NeedPlaceCleanup($indirec)) !== false) $l_placecleanup = true;
+							if (!$l_datecleanup && ($datesample = ImportFunctions::NeedDateCleanup($indirec)) !== false) $l_datecleanup = true;
+							if (!$l_isansi && ImportFunctions::IsAnsi($indirec)) $l_isansi = true;
 							
 							// Get all xrefs
 							$ct = preg_match_all("/\d\s+@(.*)@\s(\w*)/", $indirec, $match);
@@ -578,7 +576,7 @@ print "<form enctype=\"multipart/form-data\" method=\"post\" name=\"configform\"
 							$cleanup_needed = true;
 							print "<input type=\"hidden\" name=\"cleanup_needed\" value=\"cleanup_needed\">";
 							if (!FileIsWriteable($GEDFILENAME) && (file_exists($GEDFILENAME))) {
-								print "<span class=\"error\">".str_replace("#GEDCOM#", $GEDCOM, $gm_lang["error_header_write"])."</span>\n";
+								print "<span class=\"error\">".str_replace("#GEDCOM#", get_gedcom_from_id($GEDCOMID), $gm_lang["error_header_write"])."</span>\n";
 							}
 							// NOTE: Check for head cleanu
 							if ($l_headcleanup) {
@@ -761,7 +759,7 @@ print "<form enctype=\"multipart/form-data\" method=\"post\" name=\"configform\"
 		 * @param long $FILE_SIZE	the size of the file
 		 */
 		function setup_progress_bar($FILE_SIZE) {
-			global $gm_lang, $GEDCOM, $timelimit;
+			global $gm_lang, $GEDCOMID, $timelimit;
 			?>
 			<script type="text/javascript">
 			<!--
@@ -769,9 +767,9 @@ print "<form enctype=\"multipart/form-data\" method=\"post\" name=\"configform\"
 				progress = document.getElementById("progress_header");
 				if (progress) progress.innerHTML = '<?php print "<span class=\"error\"><b>".$gm_lang["import_complete"]."</b></span><br />";?>'+exectext+' '+time+' '+"<?php print $gm_lang["sec"]; ?>";
 				progress = document.getElementById("link1");
-				if (progress) progress.innerHTML = '<a href="pedigree.php?ged=<?php print preg_replace("/'/", "\'", $GEDCOM); ?>">'+go_pedi+'</a>';
+				if (progress) progress.innerHTML = '<a href="pedigree.php?gedid=<?php print $GEDCOMID; ?>">'+go_pedi+'</a>';
 				progress = document.getElementById("link2");
-				if (progress) progress.innerHTML = '<a href="index.php?command=gedcom&ged=<?php print preg_replace("/'/", "\'", $GEDCOM); ?>">'+go_welc+'</a>';
+				if (progress) progress.innerHTML = '<a href="index.php?command=gedcom&gedid=<?php print $GEDCOMID; ?>">'+go_welc+'</a>';
 				progress = document.getElementById("link3");
 				if (progress) progress.innerHTML = '<a href="editgedcoms.php">'+"<?php print $gm_lang["manage_gedcoms"]."</a>"; ?>";
 			}
@@ -839,11 +837,12 @@ print "<form enctype=\"multipart/form-data\" method=\"post\" name=\"configform\"
 		if (!isset($stage)) $stage = 0;
 		$temp = $THEME_DIR;
 		$GEDCOM_FILE = $GEDFILENAME;
-		$FILE = $merge_ged;
-		$TITLE = $GEDCOMS[$merge_ged]["title"];
-		SwitchGedcom($GEDCOMS[$merge_ged]["gedcom"]);
+		$FILEID = $merge_ged;
+		$FILE = get_gedcom_from_id($FILEID);
+		$TITLE = $GEDCOMS[$FILEID]["title"];
+		SwitchGedcom($FILEID);
 		if ($LANGUAGE <> $_SESSION["CLANGUAGE"]) $LANGUAGE = $_SESSION["CLANGUAGE"];
-		GedcomConfig::ResetCaches($merge_ged);
+		GedcomConfig::ResetCaches(get_id_from_gedcom($merge_ged));
 		$temp2 = $THEME_DIR;
 		$THEME_DIR = $temp;
 		$THEME_DIR = $temp2;
@@ -992,11 +991,11 @@ print "<form enctype=\"multipart/form-data\" method=\"post\" name=\"configform\"
 												
 						//-- import anything that is not a blob
 						if (preg_match("/\n1 BLOB/", $indirec)==0) {
-							$gid = ImportRecord($indirec);
-							$place_count += UpdatePlaces($gid, $indirec);
-							$date_count += UpdateDates($gid, $indirec);
+							$gid = ImportFunctions::ImportRecord($indirec);
+							$place_count += ImportFunctions::UpdatePlaces($gid, $indirec);
+							$date_count += ImportFunctions::UpdateDates($gid, $indirec);
 						}
-						else WriteToLog("MergeGedcom -> Import skipped a aecord with a BLOB tag: ".$indirec, "E", "G", $FILE);
+						else WriteToLog("MergeGedcom -> Import skipped a aecord with a BLOB tag: ".$indirec, "E", "G", get_gedcomid_from_file($FILE));
 						
 						//-- calculate some statistics
 						if (!isset($show_type)){

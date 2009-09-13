@@ -63,15 +63,17 @@ function GetMicrotime(){
  * @param int $ged_id	The gedcom database id to get the filename for
  * @return string
  */
-function get_gedcom_from_id($ged_id) {
+function get_id_from_gedcom($gedcom) {
 	global $GEDCOMS;
 
-	if (isset($GEDCOMS[$ged_id])) return $ged_id;
-	foreach($GEDCOMS as $ged => $gedarray) {
-		if ($gedarray["id"] == $ged_id) return $ged;
+	// If set, it is a mistake....
+	if (isset($GEDCOMS[$gedcom])) return $gedcom;
+	// Scan the array until found
+	foreach($GEDCOMS as $gedid => $gedarray) {
+		if ($gedarray["gedcom"] == $gedcom) return $gedid;
 	}
 
-	return $ged_id;
+	return false;
 }
 
 /**
@@ -79,10 +81,10 @@ function get_gedcom_from_id($ged_id) {
  * @param int $gedcom	The filename to get the gedcom database id for
  * @return string
  */
-function get_id_from_gedcom($gedcom) {
+function get_gedcom_from_id($ged_id) {
 	global $GEDCOMS;
 
-	if (isset($GEDCOMS[$gedcom])) return $GEDCOMS[$gedcom]["id"];
+	if (isset($GEDCOMS[$ged_id])) return $GEDCOMS[$ged_id]["gedcom"];
 	else return false;
 }
 
@@ -96,7 +98,7 @@ function get_id_from_gedcom($gedcom) {
  * @return boolean			True if dead, false if alive
  */
 function IsDeadId($pid) {
-	global $indilist, $GEDCOM, $GEDCOMS, $GEDCOMID, $COMBIKEY;
+	global $indilist, $GEDCOMID, $COMBIKEY;
 
 	if (empty($pid)) return true;
 	if ($COMBIKEY) $key = JoinKey($pid, $GEDCOMID);
@@ -105,7 +107,7 @@ function IsDeadId($pid) {
 	//-- if using indexes then first check the indi_isdead array
 	if (isset($indilist)) {
 		//-- check if the person is already in the $indilist cache
-		if (!isset($indilist[$key]["isdead"]) || $indilist[$key]["gedfile"]!=$GEDCOMS[$GEDCOM]['id']) {
+		if (!isset($indilist[$key]["isdead"]) || $indilist[$key]["gedfile"] != $GEDCOMID) {
 			//-- load the individual into the cache by calling the FindPersonRecord function
 			$gedrec = FindPersonRecord($pid);
 			if (empty($gedrec)) return true;
@@ -581,7 +583,7 @@ function MakeCont($newged, $newline) {
  * @return array returns a two element array with indexes HUSB and WIFE for the parent ids
  */
 function FindParents($famid) {
-	global $gm_lang, $gm_username, $GEDCOM, $show_changes, $gm_user;
+	global $gm_lang, $gm_username, $GEDCOMID, $show_changes, $gm_user;
 
 	$famrec = FindFamilyRecord($famid);
 	if (empty($famrec)) {
@@ -590,7 +592,7 @@ function FindParents($famid) {
 			if (empty($famrec)) {
 				if ($show_changes && GetChangeData(true, $famid, true, "", "FAM")) {
 					$f = GetChangeData(false, $famid, true, "gedlines", "FAM");
-					$famrec = $f[$GEDCOM][$famid];
+					$famrec = $f[$GEDCOMID][$famid];
 				}
 				else return false;
 			}
@@ -679,7 +681,7 @@ function FindChildrenInRecord($famrec, $me='') {
  * @return array array of family ids
  */
 function FindFamilyIds($pid, $indirec="", $newfams = false) {
-	global $GEDCOMID, $show_changes, $GEDCOM, $gm_user;
+	global $GEDCOMID, $show_changes, $GEDCOMID, $gm_user;
 	
 	$resultarray = array();
 	if (empty($pid)) return $resultarray;
@@ -688,7 +690,7 @@ function FindFamilyIds($pid, $indirec="", $newfams = false) {
 	$gedrec = FindGedcomRecord($pid);
 	if ($newfams && $gm_user->UserCanEdit() && $show_changes && GetChangeData(true, $pid, true, "", "")) {
 		$rec = GetChangeData(false, $pid, true, "gedlines", "");
-		$gedrec = $rec[$GEDCOM][$pid];
+		$gedrec = $rec[$GEDCOMID][$pid];
 	}
 	$ct = preg_match_all("/1\s+FAMC\s+@(.*)@.*/", $gedrec, $fmatch, PREG_SET_ORDER);
 	if ($ct>0) {
@@ -721,7 +723,7 @@ function FindFamilyIds($pid, $indirec="", $newfams = false) {
  * @return array array of family ids
  */
 function FindSfamilyIds($pid, $newfams = false) {
-	global $GEDCOMID, $GEDCOM, $show_changes, $gm_user;
+	global $GEDCOMID, $show_changes, $gm_user;
 	
 	$resultarray = array();
 	if (empty($pid)) return $resultarray;
@@ -737,7 +739,7 @@ function FindSfamilyIds($pid, $newfams = false) {
 	$gedrec = FindGedcomRecord($pid);
 	if ($newfams && $gm_user->UserCanEdit() && $show_changes && GetChangeData(true, $pid, true, "", "")) {
 		$rec = GetChangeData(false, $pid, true, "gedlines", "");
-		$gedrec = $rec[$GEDCOM][$pid];
+		$gedrec = $rec[$GEDCOMID][$pid];
 	}
 	$ct = preg_match_all("/1\s+FAMS\s+@(.*)@.*/", $gedrec, $fmatch, PREG_SET_ORDER);
 	if ($ct>0) {
@@ -848,7 +850,7 @@ function FindHighlightedObject($pid) {
 	if (!PrivacyFunctions::showFactDetails("OBJE", $pid)) return false;
 	$object = array();
 	$media_ids = array();
-		
+
 	// NOTE: Find the media items for that person
 	$sql = "select m_file, m_media, mm_gedrec, m_gedrec, m_gedfile, m_ext, m_titl from ".TBLPREFIX."media, ".TBLPREFIX."media_mapping where mm_gid LIKE '".$pid."' AND m_gedfile = '".$GEDCOMID."' AND m_gedfile = mm_gedfile AND m_media = mm_media AND mm_gedrec NOT LIKE '%\_PRIM N%' AND mm_gedrec LIKE '1 OBJE%' ORDER BY mm_order";
 	$res = NewQuery($sql);
@@ -919,7 +921,7 @@ function FindHighlightedObject($pid) {
  * @param int $path_to_find which path in the relationship to find, 0 is the shortest path, 1 is the next shortest path, etc
  */
 function GetRelationship($pid1, $pid2, $followspouse=true, $maxlength=0, $ignore_cache=false, $path_to_find=0) {
-	global $TIME_LIMIT, $start_time, $gm_lang, $NODE_CACHE_LENGTH, $USE_RELATIONSHIP_PRIVACY, $GEDCOM, $gm_username, $show_changes;
+	global $TIME_LIMIT, $start_time, $gm_lang, $NODE_CACHE_LENGTH, $USE_RELATIONSHIP_PRIVACY, $GEDCOMID, $gm_username, $show_changes;
 
 	$pid1 = strtoupper($pid1);
 	$pid2 = strtoupper($pid2);
@@ -927,7 +929,7 @@ function GetRelationship($pid1, $pid2, $followspouse=true, $maxlength=0, $ignore
 	if ($show_changes) {
 		if (GetChangeData(true, $pid2, true)) {
 			$rec = GetChangeData(false, $pid2, true, "gedlines");
-			$indirec = $rec[$GEDCOM][$pid2];
+			$indirec = $rec[$GEDCOMID][$pid2];
 		}
 	}
 	//-- check the cache
@@ -990,7 +992,7 @@ function GetRelationship($pid1, $pid2, $followspouse=true, $maxlength=0, $ignore
 			if ($show_changes) {
 				if (GetChangeData(true, $fmatch[$j][1], true)) {
 					$rec = GetChangeData(false, $fmatch[$j][1], true, "gedlines");
-					$famrec = $rec[$GEDCOM][$fmatch[$j][1]];
+					$famrec = $rec[$GEDCOMID][$fmatch[$j][1]];
 				}
 			}
 
@@ -1002,7 +1004,7 @@ function GetRelationship($pid1, $pid2, $followspouse=true, $maxlength=0, $ignore
 				if ($show_changes) {
 					if (GetChangeData(true, $cmatch[$i][1], true)) {
 						$rec = GetChangeData(false, $cmatch[$i][1], true, "gedlines");
-						$childrec = $rec[$GEDCOM][$cmatch[$i][1]];
+						$childrec = $rec[$GEDCOMID][$cmatch[$i][1]];
 					}
 				}
 				$birthrec = GetSubRecord(1, "1 BIRT", $childrec);
@@ -1089,7 +1091,7 @@ function GetRelationship($pid1, $pid2, $followspouse=true, $maxlength=0, $ignore
 				if ($show_changes) {
 					if (GetChangeData(true, $node["pid"], true)) {
 						$rec = GetChangeData(false, $node["pid"], true, "gedlines");
-						$indirec = $rec[$GEDCOM][$node["pid"]];
+						$indirec = $rec[$GEDCOMID][$node["pid"]];
 					}
 				}
 				$byear1 = -1;
@@ -1169,7 +1171,7 @@ function GetRelationship($pid1, $pid2, $followspouse=true, $maxlength=0, $ignore
 					if ($show_changes) {
 						if (GetChangeData(true, $fam, true)) {
 							$rec = GetChangeData(false, $fam, true, "gedlines");
-							$famrec = $rec[$GEDCOM][$fam];
+							$famrec = $rec[$GEDCOMID][$fam];
 						}
 					}
 					$parents = FindParentsInRecord($famrec);
@@ -1247,7 +1249,7 @@ function GetRelationship($pid1, $pid2, $followspouse=true, $maxlength=0, $ignore
 					if ($show_changes) {
 						if (GetChangeData(true, $fam, true)) {
 							$rec = GetChangeData(false, $fam, true, "gedlines");
-							$famrec = $rec[$GEDCOM][$fam];
+							$famrec = $rec[$GEDCOMID][$fam];
 						}
 					}
 					if ($followspouse) {
@@ -2001,14 +2003,14 @@ function GetFileSize($bytes) {
  * @return string			either the key or the gedcom name
  */
 function SplitKey($key, $type) {
-	global $GEDCOM, $GEDCOMID;
+	global $GEDCOMID;
 	
 	$p1 = strpos($key,"[");
 	if ($p1 === false) $id = $key;
 	else $id = substr($key,0,$p1);
 	if ($type == "id") return $id;
 	if ($p1 === false) {
-		if ($type == "ged") return $GEDCOM;
+		if ($type == "ged") return get_gedcom_from_id($GEDCOMID);
 		if ($type == "gedid") return $GEDCOMID;
 	}
 	$p2 = strpos($key,"]");
@@ -2262,40 +2264,40 @@ function CheckSessionIP() {
  */
 
 function GetNewXref($type='INDI') {
-	global $SOURCE_ID_PREFIX, $REPO_ID_PREFIX, $changes, $GEDCOM, $GEDCOMS;
+	global $SOURCE_ID_PREFIX, $REPO_ID_PREFIX, $changes;
 	global $MEDIA_ID_PREFIX, $FAM_ID_PREFIX, $GEDCOM_ID_PREFIX, $FILE, $GEDCOMID, $NOTE_ID_PREFIX;
 	
 	
-	if (isset($FILE) && !is_array($FILE)) $gedid = $GEDCOMS[$FILE]["id"];
+	if (isset($FILE) && !is_array($FILE)) $gedid = get_id_from_gedcom($FILE);
 	else $gedid = $GEDCOMID;
 
 	switch ($type) {
 		case "INDI":
-			$sqlc = "select max(cast(substring(ch_gid,".(strlen($GEDCOM_ID_PREFIX)+1).") as signed)) as xref from ".TBLPREFIX."changes where ch_gedfile = '".$gedid."' AND ch_gid LIKE '".$GEDCOM_ID_PREFIX."%'";
+			$sqlc = "select max(cast(substring(ch_gid,".(strlen($GEDCOM_ID_PREFIX)+1).") as signed)) as xref from ".TBLPREFIX."changes where ch_file = '".$gedid."' AND ch_gid LIKE '".$GEDCOM_ID_PREFIX."%'";
 			$sql = "select max(cast(substring(i_rin,".(strlen($GEDCOM_ID_PREFIX)+1).") as signed)) as xref from ".TBLPREFIX."individuals where i_file = '".$gedid."'";
 			break;
 		case "FAM":
-			$sqlc = "select max(cast(substring(ch_gid,".(strlen($FAM_ID_PREFIX)+1).") as signed)) as xref from ".TBLPREFIX."changes where ch_gedfile = '".$gedid."' AND ch_gid LIKE '".$FAM_ID_PREFIX."%'";
+			$sqlc = "select max(cast(substring(ch_gid,".(strlen($FAM_ID_PREFIX)+1).") as signed)) as xref from ".TBLPREFIX."changes where ch_file = '".$gedid."' AND ch_gid LIKE '".$FAM_ID_PREFIX."%'";
 			$sql = "select max(cast(substring(f_id,".(strlen($FAM_ID_PREFIX)+1).") as signed)) as xref from ".TBLPREFIX."families where f_file = '".$gedid."'";
 			break;
 		case "OBJE":
-			$sqlc = "select max(cast(substring(ch_gid,".(strlen($MEDIA_ID_PREFIX)+1).") as signed)) as xref from ".TBLPREFIX."changes where ch_gedfile = '".$gedid."' AND ch_gid LIKE '".$MEDIA_ID_PREFIX."%'";
+			$sqlc = "select max(cast(substring(ch_gid,".(strlen($MEDIA_ID_PREFIX)+1).") as signed)) as xref from ".TBLPREFIX."changes where ch_file = '".$gedid."' AND ch_gid LIKE '".$MEDIA_ID_PREFIX."%'";
 			$sql = "select max(cast(substring(m_media,".(strlen($MEDIA_ID_PREFIX)+1).") as signed)) as xref from ".TBLPREFIX."media where m_gedfile = '".$gedid."'";
 			break;
 		case "SOUR":
-			$sqlc = "select max(cast(substring(ch_gid,".(strlen($SOURCE_ID_PREFIX)+1).") as signed)) as xref from ".TBLPREFIX."changes where ch_gedfile = '".$gedid."' AND ch_gid LIKE '".$SOURCE_ID_PREFIX."%'";
+			$sqlc = "select max(cast(substring(ch_gid,".(strlen($SOURCE_ID_PREFIX)+1).") as signed)) as xref from ".TBLPREFIX."changes where ch_file = '".$gedid."' AND ch_gid LIKE '".$SOURCE_ID_PREFIX."%'";
 			$sql = "select max(cast(substring(s_id,".(strlen($SOURCE_ID_PREFIX)+1).") as signed)) as xref from ".TBLPREFIX."sources where s_file = '".$gedid."'";
 			break;
 		case "REPO":
-			$sqlc = "select max(cast(substring(ch_gid,".(strlen($REPO_ID_PREFIX)+1).") as signed)) as xref from ".TBLPREFIX."changes where ch_gedfile = '".$gedid."' AND ch_gid LIKE '".$REPO_ID_PREFIX."%'";
+			$sqlc = "select max(cast(substring(ch_gid,".(strlen($REPO_ID_PREFIX)+1).") as signed)) as xref from ".TBLPREFIX."changes where ch_file = '".$gedid."' AND ch_gid LIKE '".$REPO_ID_PREFIX."%'";
 			$sql = "select max(cast(substring(o_id,".(strlen($REPO_ID_PREFIX)+1).") as signed)) as xref from ".TBLPREFIX."other where o_file = '".$gedid."' and o_type = 'REPO'";
 			break;
 		case "NOTE":
-			$sqlc = "select max(cast(substring(ch_gid,".(strlen($NOTE_ID_PREFIX)+1).") as signed)) as xref from ".TBLPREFIX."changes where ch_gedfile = '".$gedid."' AND ch_gid LIKE '".$NOTE_ID_PREFIX."%'";
+			$sqlc = "select max(cast(substring(ch_gid,".(strlen($NOTE_ID_PREFIX)+1).") as signed)) as xref from ".TBLPREFIX."changes where ch_file = '".$gedid."' AND ch_gid LIKE '".$NOTE_ID_PREFIX."%'";
 			$sql = "select max(cast(substring(o_id,".(strlen($NOTE_ID_PREFIX)+1).") as signed)) as xref from ".TBLPREFIX."other where o_file = '".$gedid."' and o_type = 'NOTE'";
 			break;
 		case "CHANGE":
-			$sql = "select max(ch_cid) as xref from ".TBLPREFIX."changes where ch_gedfile = '".$gedid."'";
+			$sql = "select max(ch_cid) as xref from ".TBLPREFIX."changes where ch_file = '".$gedid."'";
 			break;
 		case "SUBM":
 			return "SUB1";
@@ -2446,7 +2448,7 @@ function GetGMNewsItems() {
 
 
 function PrintGedcom($ged, $convert, $remove, $zip, $privatize_export, $privatize_export_level, $gedname, $embedmm) {
-	GLOBAL $GEDCOM, $GEDCOMS, $gm_lang, $CHARACTER_SET, $GM_BASE_DIRECTORY, $gm_username, $gm_user;
+	GLOBAL $GEDCOMID, $gm_lang, $CHARACTER_SET, $GM_BASE_DIRECTORY, $gm_username, $gm_user;
 	if ($zip == "yes") {
 		$gedout = fopen($gedname, "w");
 	}
@@ -2507,7 +2509,7 @@ function PrintGedcom($ged, $convert, $remove, $zip, $privatize_export, $privatiz
 	if ($zip == "yes") fwrite($gedout, $head);
 	else print $head;
 
-	$sql = "SELECT i_gedcom FROM ".TBLPREFIX."individuals WHERE i_file=".$GEDCOMS[$GEDCOM]['id']." ORDER BY CAST(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(LOWER(i_id),'a',''),'b',''),'c',''),'d',''),'e',''),'f',''),'g',''),'h',''),'i',''),'j',''),'k',''),'l',''),'m',''),'n',''),'o',''),'p',''),'q',''),'r',''),'s',''),'t',''),'u',''),'v',''),'w',''),'x',''),'y',''),'z','') as unsigned)";
+	$sql = "SELECT i_gedcom FROM ".TBLPREFIX."individuals WHERE i_file=".$GEDCOMID." ORDER BY CAST(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(LOWER(i_id),'a',''),'b',''),'c',''),'d',''),'e',''),'f',''),'g',''),'h',''),'i',''),'j',''),'k',''),'l',''),'m',''),'n',''),'o',''),'p',''),'q',''),'r',''),'s',''),'t',''),'u',''),'v',''),'w',''),'x',''),'y',''),'z','') as unsigned)";
 	$res = NewQuery($sql);
 	if ($res) {
 		while($row = $res->FetchRow()){
@@ -2522,7 +2524,7 @@ function PrintGedcom($ged, $convert, $remove, $zip, $privatize_export, $privatiz
 		$res->FreeResult();
 	}
 	
-	$sql = "SELECT f_gedcom FROM ".TBLPREFIX."families WHERE f_file=".$GEDCOMS[$GEDCOM]['id']." ORDER BY cast(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(LOWER(f_id),'a',''),'b',''),'c',''),'d',''),'e',''),'f',''),'g',''),'h',''),'i',''),'j',''),'k',''),'l',''),'m',''),'n',''),'o',''),'p',''),'q',''),'r',''),'s',''),'t',''),'u',''),'v',''),'w',''),'x',''),'y',''),'z','') as unsigned)";
+	$sql = "SELECT f_gedcom FROM ".TBLPREFIX."families WHERE f_file=".$GEDCOMID." ORDER BY cast(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(LOWER(f_id),'a',''),'b',''),'c',''),'d',''),'e',''),'f',''),'g',''),'h',''),'i',''),'j',''),'k',''),'l',''),'m',''),'n',''),'o',''),'p',''),'q',''),'r',''),'s',''),'t',''),'u',''),'v',''),'w',''),'x',''),'y',''),'z','') as unsigned)";
 	$res = NewQuery($sql);
 	if ($res) {
 		while($row = $res->FetchRow()){
@@ -2537,7 +2539,7 @@ function PrintGedcom($ged, $convert, $remove, $zip, $privatize_export, $privatiz
 		$res->FreeResult();
 	}
 
-	$sql = "SELECT s_gedcom FROM ".TBLPREFIX."sources WHERE s_file=".$GEDCOMS[$GEDCOM]['id']." ORDER BY cast(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(LOWER(s_id),'a',''),'b',''),'c',''),'d',''),'e',''),'f',''),'g',''),'h',''),'i',''),'j',''),'k',''),'l',''),'m',''),'n',''),'o',''),'p',''),'q',''),'r',''),'s',''),'t',''),'u',''),'v',''),'w',''),'x',''),'y',''),'z','') as unsigned)";
+	$sql = "SELECT s_gedcom FROM ".TBLPREFIX."sources WHERE s_file=".$GEDCOMID." ORDER BY cast(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(LOWER(s_id),'a',''),'b',''),'c',''),'d',''),'e',''),'f',''),'g',''),'h',''),'i',''),'j',''),'k',''),'l',''),'m',''),'n',''),'o',''),'p',''),'q',''),'r',''),'s',''),'t',''),'u',''),'v',''),'w',''),'x',''),'y',''),'z','') as unsigned)";
 	$res = NewQuery($sql);
 	if ($res) {
 		while($row = $res->FetchRow()){
@@ -2553,7 +2555,7 @@ function PrintGedcom($ged, $convert, $remove, $zip, $privatize_export, $privatiz
 	}
 	
 	if ($embedmm != "yes") {
-		$sql = "SELECT m_gedrec FROM ".TBLPREFIX."media WHERE m_gedfile=".$GEDCOMS[$GEDCOM]['id']." ORDER BY cast(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(LOWER(m_media),'a',''),'b',''),'c',''),'d',''),'e',''),'f',''),'g',''),'h',''),'i',''),'j',''),'k',''),'l',''),'m',''),'n',''),'o',''),'p',''),'q',''),'r',''),'s',''),'t',''),'u',''),'v',''),'w',''),'x',''),'y',''),'z','') as unsigned)";
+		$sql = "SELECT m_gedrec FROM ".TBLPREFIX."media WHERE m_gedfile=".$GEDCOMID." ORDER BY cast(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(LOWER(m_media),'a',''),'b',''),'c',''),'d',''),'e',''),'f',''),'g',''),'h',''),'i',''),'j',''),'k',''),'l',''),'m',''),'n',''),'o',''),'p',''),'q',''),'r',''),'s',''),'t',''),'u',''),'v',''),'w',''),'x',''),'y',''),'z','') as unsigned)";
 		$res = NewQuery($sql);
 		if ($res) {
 			while($row = $res->FetchRow()){
@@ -2568,7 +2570,7 @@ function PrintGedcom($ged, $convert, $remove, $zip, $privatize_export, $privatiz
 		}
 	}
 
-	$sql = "SELECT o_gedcom, o_type FROM ".TBLPREFIX."other WHERE o_file=".$GEDCOMS[$GEDCOM]['id']." ORDER BY cast(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(LOWER(o_id),'a',''),'b',''),'c',''),'d',''),'e',''),'f',''),'g',''),'h',''),'i',''),'j',''),'k',''),'l',''),'m',''),'n',''),'o',''),'p',''),'q',''),'r',''),'s',''),'t',''),'u',''),'v',''),'w',''),'x',''),'y',''),'z','') as unsigned)";
+	$sql = "SELECT o_gedcom, o_type FROM ".TBLPREFIX."other WHERE o_file=".$GEDCOMID." ORDER BY cast(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(LOWER(o_id),'a',''),'b',''),'c',''),'d',''),'e',''),'f',''),'g',''),'h',''),'i',''),'j',''),'k',''),'l',''),'m',''),'n',''),'o',''),'p',''),'q',''),'r',''),'s',''),'t',''),'u',''),'v',''),'w',''),'x',''),'y',''),'z','') as unsigned)";
 	$res = NewQuery($sql);
 	if ($res) {
 		while($row = $res->FetchRow()){
@@ -2941,7 +2943,7 @@ function CheckLockout() {
 function EstimateBD($indirec, $type) {
 	global $CHECK_CHILD_DATES, $MAX_ALIVE_AGE, $HIDE_LIVE_PEOPLE;
 	global $PRIVACY_BY_YEAR, $gm_lang, $COMBIKEY;
-	global $GEDCOM, $GEDCOMS, $GEDCOMID;
+	global $GEDCOMID;
 
 	// Init values
 	$dates = array();
@@ -3325,37 +3327,32 @@ function CheckEmailAddress($address) {
 
 // Switch gedcoms on the fly. 
 // Call this function with an empty string to go back to the original values.
-function SwitchGedcom($ged="") {
-	global $GEDCOM, $GEDCOMID;
+function SwitchGedcom($gedid="") {
+	global $GEDCOMID;
 	static $orgged;
 	
 	// If we are already there, stay there.
-	if ($ged == $GEDCOM || $ged == $GEDCOMID) return;
+	if ($gedid == $GEDCOMID) return;
 	
 	// Switching back if nothing ever changed or back to the original.
-	if (empty($ged)) {
+	if (empty($gedid)) {
 		if (!isset($orgged)) return;
-		else $ged = $orgged;
+		else $gedid = $orgged;
 	}
-	
+
+	if (!is_numeric($gedid)) $gedid = get_id_from_gedcom($gedid);
+		
 	// Switch to something else.
-	if (is_numeric($ged)) {
+	if (is_numeric($gedid)) {
 		// Save the old value
 		if (!isset($orgged)) $orgged = $GEDCOMID;
 		// Set the new values
-		$GEDCOMID = $ged;
-		$GEDCOM = get_gedcom_from_id($GEDCOMID);
+		$GEDCOMID = $gedid;
 	}
-	else {
-		// Save the old value
-		if (!isset($orgged)) $orgged = get_id_from_gedcom($GEDCOM);
-		// Set the new values
-		$GEDCOM = $ged;
-		$GEDCOMID = get_id_from_gedcom($GEDCOM);
-	}
+	else return;
 	// Make the switch
 	PrivacyController::ReadPrivacy($GEDCOMID);
-	GedcomConfig::ReadGedcomConfig($GEDCOM);
+	GedcomConfig::ReadGedcomConfig($GEDCOMID);
 	return;
 }
 

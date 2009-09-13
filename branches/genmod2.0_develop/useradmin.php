@@ -42,7 +42,7 @@ if (!isset($action)) $action="";
 if (!isset($filter)) $filter="";
 if (!isset($namefilter)) $namefilter="";
 if (!isset($sort)) $sort="";
-if (!isset($ged)) $ged="";
+if (!isset($gedid)) $gedid="";
 if (!isset($usrlang)) $usrlang="";
 if (isset($refreshlist)) $action="listusers";
 $message = "";
@@ -153,27 +153,25 @@ if ($action=="createuser") {
 			else $user->sync_gedcom = "N";
 			$user->auto_accept = false;
 			if (isset($new_auto_accept))  $user->auto_accept = true;
-			foreach($GEDCOMS as $gedcom=>$gedarray) {
-				$file = $gedcom;
-				$gedcom = preg_replace(array("/\./","/-/","/ /"), array("_","_","_"), $gedcom);
-				$varname = "gedcomid_$gedcom";
-				if (isset($$varname)) $user->gedcomid[$file]=$$varname;
-				$varname = "rootid_$gedcom";
-				if (isset($$varname)) $user->rootid[$file]=$$varname;
-				$varname = "canedit_$gedcom";
-				if (isset($$varname)) $user->canedit[$file]=$$varname;
-				else $user->canedit[$file]="none";
-				$varname = "privgroup_$gedcom";
-				if (isset($$varname)) $user->privgroup[$file]=$$varname;
-				else $user->privgroup[$file]="none";
-				$varname = "new_gedadmin_$gedcom";
-				if (isset($$varname) && $$varname == "Y") $user->gedcomadmin[$file] = true;
-				else $user->gedcomadmin[$file] = false;
-				$varname = "new_relationship_privacy_$gedcom";
-				if (isset($$varname)) $user->relationship_privacy[$file] = $$varname;
-				else $user->relationship_privacy[$file] = "";
-				$varname = "new_max_relation_path_$gedcom";
-				if (isset($$varname)) $user->max_relation_path[$file] = $$varname;
+			foreach($GEDCOMS as $gedcomid=>$gedarray) {
+				$varname = "gedcomid_$gedcomid";
+				if (isset($$varname)) $user->gedcomid[$gedcomid]=$$varname;
+				$varname = "rootid_$gedcomid";
+				if (isset($$varname)) $user->rootid[$gedcomid]=$$varname;
+				$varname = "canedit_$gedcomid";
+				if (isset($$varname)) $user->canedit[$gedcomid]=$$varname;
+				else $user->canedit[$gedcomid]="none";
+				$varname = "privgroup_$gedcomid";
+				if (isset($$varname)) $user->privgroup[$gedcomid]=$$varname;
+				else $user->privgroup[$gedcomid]="none";
+				$varname = "new_gedadmin_$gedcomid";
+				if (isset($$varname) && $$varname == "Y") $user->gedcomadmin[$gedcomid] = true;
+				else $user->gedcomadmin[$gedcomid] = false;
+				$varname = "new_relationship_privacy_$gedcomid";
+				if (isset($$varname)) $user->relationship_privacy[$gedcomid] = $$varname;
+				else $user->relationship_privacy[$gedcomid] = "";
+				$varname = "new_max_relation_path_$gedcomid";
+				if (isset($$varname)) $user->max_relation_path[$gedcomid] = $$varname;
 			}
 			
 			$au = UserController::AddUser($user, "added");
@@ -182,14 +180,13 @@ if ($action=="createuser") {
 				$message .= $gm_lang["user_created"];
 				//-- update Gedcom record with new email address
 				if ($user->sync_gedcom=="Y" && !empty($user->email)) {
-					$oldged = $GEDCOM;
-					foreach($user->gedcomid as $gedc=>$gedid) {
-						if (!empty($gedid) && isset($GEDCOMS[$gedc])) {
-							$GEDCOM = $gedc;
-							$GEDCOMID = $GEDCOMS[$GEDCOM]["id"];
+					$oldged = $GEDCOMID;
+					foreach($user->gedcomid as $gedcid => $gedid) {
+						if (!empty($gedid) && isset($GEDCOMS[$gedcid])) {
+							$GEDCOMID = $gedcid;
 							$indirec = FindPersonRecord($gedid);
 							$rec = GetChangeData(false, $gedid, true, "gedlines", "");
-							if (isset($rec[$GEDCOM][$gedid])) $indirec = $rec[$GEDCOM][$gedid];
+							if (isset($rec[$GEDCOMID][$gedid])) $indirec = $rec[$GEDCOMID][$gedid];
 							if (!empty($indirec)) {
 								$subrecords = GetAllSubrecords($indirec, "", false, false, false);
 								$found = false;
@@ -213,8 +210,7 @@ if ($action=="createuser") {
 							}
 						}
 					}
-					$GEDCOM = $oldged;
-					$GEDCOMID = $GEDCOMS[$GEDCOM]["id"];
+					$GEDCOMID = $oldged;
 				}
 			}
 			else {
@@ -232,12 +228,16 @@ if ($action=="createuser") {
 }
 //-- section to delete a user
 if ($action=="deleteuser") {
-	if (UserController::DeleteUser($username, "deleted")) $message .= $gm_lang["delete_user_ok"];
+	if (UserController::DeleteUser($username, "deleted")) {
+		$message .= $gm_lang["delete_user_ok"];
+		NewsController::DeleteUserNews($username);
+	}
 	else $message .= "<span class=\"error\">".$gm_lang["delete_user_nok"]."</span>";
 }
 //-- section to update a user by first deleting them
 //-- and then adding them again
 if ($action=="edituser2") {
+	print_r($_POST);
 	$alphabet = GetAlphabet();
 	$alphabet .= "_-. ";
 	$i = 1;
@@ -288,33 +288,31 @@ if ($action=="edituser2") {
 
 			if (!isset($user_theme)) $user_theme="";
 			$newuser->theme = $user_theme;
-			foreach($GEDCOMS as $gedcom=>$gedarray) {
-				$file = $gedcom;
-				$gedcom = preg_replace(array("/\./","/-/","/ /"), array("_","_","_"), $gedcom);
-				$varname = "gedcomid_$gedcom";
-				if (isset($$varname)) $newuser->gedcomid[$file]=$$varname;
-				$varname = "rootid_$gedcom";
-				if (isset($$varname)) $newuser->rootid[$file]=$$varname;
-				$varname = "canedit_$gedcom";
-				if (isset($$varname)) $newuser->canedit[$file]=$$varname;
-				else $user->canedit[$file]="none";
-				$varname = "privgroup_$gedcom";
-				if (isset($$varname)) $newuser->privgroup[$file]=$$varname;
-				else $user->privgroup[$file]="access";
-				$varname = "new_gedadmin_$gedcom";
-				if (isset($$varname) && $$varname == "Y") $newuser->gedcomadmin[$file] = true;
-				else $newuser->gedcomadmin[$file] = false;
-				$varname = "new_relationship_privacy_$gedcom";
-				if (isset($$varname)) $newuser->relationship_privacy[$file] = $$varname;
-				else $newuser->relationship_privacy[$file] = "";
-				$varname = "new_max_relation_path_$gedcom";
-				if (isset($$varname)) $newuser->max_relation_path[$file] = $$varname;
-				$varname = "new_hide_live_people_$gedcom";
-				if (isset($$varname)) $newuser->hide_live_people[$file] = $$varname;
-				$varname = "new_show_living_names_$gedcom";
-				if (isset($$varname)) $newuser->show_living_names[$file] = $$varname;
+			foreach($GEDCOMS as $gedcomid=>$gedarray) {
+				$varname = "gedcomid_$gedcomid";
+				if (isset($$varname)) $newuser->gedcomid[$gedcomid]=$$varname;
+				$varname = "rootid_$gedcomid";
+				if (isset($$varname)) $newuser->rootid[$gedcomid]=$$varname;
+				$varname = "canedit_$gedcomid";
+				if (isset($$varname)) $newuser->canedit[$gedcomid]=$$varname;
+				else $user->canedit[$gedcomid]="none";
+				$varname = "privgroup_$gedcomid";
+				if (isset($$varname)) $newuser->privgroup[$gedcomid]=$$varname;
+				else $user->privgroup[$gedcomid]="access";
+				$varname = "new_gedadmin_$gedcomid";
+				if (isset($$varname) && $$varname == "Y") $newuser->gedcomadmin[$gedcomid] = true;
+				else $newuser->gedcomadmin[$gedcomid] = false;
+				$varname = "new_relationship_privacy_$gedcomid";
+				if (isset($$varname)) $newuser->relationship_privacy[$gedcomid] = $$varname;
+				else $newuser->relationship_privacy[$gedcomid] = "";
+				$varname = "new_max_relation_path_$gedcomid";
+				if (isset($$varname)) $newuser->max_relation_path[$gedcomid] = $$varname;
+				$varname = "new_hide_live_people_$gedcomid";
+				if (isset($$varname)) $newuser->hide_live_people[$gedcomid] = $$varname;
+				$varname = "new_show_living_names_$gedcomid";
+				if (isset($$varname)) $newuser->show_living_names[$gedcomid] = $$varname;
 			}
-			if ($olduser->username!=$gm_username) {
+			if ($olduser->username != $gm_username) {
 				if ((isset($canadmin))&&($canadmin=="yes")) $newuser->canadmin=true;
 				else $newuser->canadmin=false;
 			}
@@ -327,14 +325,13 @@ if ($action=="edituser2") {
 			
 			//-- update Gedcom record with new email address
 			if ($newuser->sync_gedcom=="Y" && $sync_data_changed && !empty($newuser->email)) {
-				$oldged = $GEDCOM;
-				foreach($newuser->gedcomid as $gedc=>$gedid) {
-					if (!empty($gedid) && isset($GEDCOMS[$gedc])) {
-						$GEDCOM = $gedc;
-						$GEDCOMID = $GEDCOMS[$GEDCOM]["id"];
+				$oldged = $GEDCOMID;
+				foreach($newuser->gedcomid as $gedcid => $gedid) {
+					if (!empty($gedid) && isset($GEDCOMS[$gedcid])) {
+						$GEDCOMID = $gedcid;
 						$indirec = FindPersonRecord($gedid);
 						$rec = GetChangeData(false, $gedid, true, "gedlines", "");
-						if (isset($rec[$GEDCOM][$gedid])) $indirec = $rec[$GEDCOM][$gedid];
+						if (isset($rec[$GEDCOMID][$gedid])) $indirec = $rec[$GEDCOMID][$gedid];
 						if (!empty($indirec)) {
 							$subrecords = GetAllSubrecords($indirec, "", false, false, false);
 							$found = false;
@@ -358,8 +355,7 @@ if ($action=="edituser2") {
 						}
 					}
 				}
-				$GEDCOM = $oldged;
-				$GEDCOMID = $GEDCOMS[$GEDCOM]["id"];
+				$GEDCOMID = $oldged;
 			}
 			
 			//-- if the user was just verified by the admin, then send the user a message
@@ -422,7 +418,7 @@ if ($action=="edituser" || $action == "createform") { ?>
 	<div id="admin_genmod_left">
 		<div class="admin_link"><a href="admin.php"><?php print $gm_lang["admin"];?></a></div>
 		<div class="admin_link"><a href="useradmin.php"><?php print $gm_lang["user_admin"];?></a></div>
-		<div class="admin_link"><a href="useradmin.php?action=listusers&amp;sort=<?php print $sort;?>&amp;filter=<?php print $filter;?>&amp;usrlang=<?php print $usrlang;?>&amp;ged=<?php print $ged;?>&amp;namefilter=<?php print $namefilter;?>"><?php print $gm_lang["current_users"];?></a></div>
+		<div class="admin_link"><a href="useradmin.php?action=listusers&amp;sort=<?php print $sort;?>&amp;filter=<?php print $filter;?>&amp;usrlang=<?php print $usrlang;?>&amp;gedid=<?php print $gedid;?>&amp;namefilter=<?php print $namefilter;?>"><?php print $gm_lang["current_users"];?></a></div>
 	</div>
 	<div id="content">
 		<?php
@@ -436,7 +432,7 @@ if ($action=="edituser" || $action == "createform") { ?>
 					<input type="hidden" name="filter" value="<?php print $filter; ?>" />
 					<input type="hidden" name="namefilter" value="<?php print $namefilter; ?>" />
 					<input type="hidden" name="sort" value="<?php print $sort; ?>" />
-					<input type="hidden" name="ged" value="<?php print $ged; ?>" />
+					<input type="hidden" name="gedid" value="<?php print $gedid; ?>" />
 					<input type="hidden" name="usrlang" value="<?php print $usrlang; ?>" />
 					<input type="hidden" name="oldusername" value="<?php print $username; ?>" />
 				<?php } 
@@ -761,9 +757,7 @@ if ($action=="edituser" || $action == "createform") { ?>
 		<?php
 			
 			
-		foreach($GEDCOMS as $gedcom=>$gedarray) {
-			$file = $gedcom;
-			$gedcom = preg_replace(array("/\./","/-/","/ /"), array("_","_","_"), $gedcom);
+		foreach($GEDCOMS as $gedcomid=>$gedarray) {
 			print "<div class=\"admin_topbottombar\">".$gedarray["title"]."</div>";
 			
 			?><div class="admin_item_box">
@@ -781,16 +775,19 @@ if ($action=="edituser" || $action == "createform") { ?>
 						<div class="choice_right">
 							<?php
 							$tab++;
-							print "<input type=\"text\" name=\"gedcomid_".$gedcom."\" id=\"gedcomid_".$gedcom."\" size=\"6\" tabindex=\"".$tab."\" value=\"";
-							if ($action == "edituser") if (isset($user->gedcomid[$file])) print $user->gedcomid[$file];
+							print "<input type=\"text\" name=\"gedcomid_".$gedcomid."\" id=\"gedcomid_".$gedcomid."\" size=\"6\" tabindex=\"".$tab."\" value=\"";
+							if ($action == "edituser") if (isset($user->gedcomid[$gedcomid])) print $user->gedcomid[$gedcomid];
 							print "\" onblur=\"sndReq('usgid".$gedarray["id"]."', 'getpersonnamefact', 'pid', this.value, 'gedid', '".$gedarray["id"]."');\" />";
-							LinkFunctions::PrintFindIndiLink("gedcomid_$gedcom",$gedarray["id"]);
+							LinkFunctions::PrintFindIndiLink("gedcomid_$gedcomid",$gedarray["id"]);
 							print "\n<span id=\"usgid".$gedarray["id"]."\" class=\"list_item\"> ";
 							if ($action == "edituser") {
-								if (isset($user->gedcomid[$file]) && !empty($user->gedcomid[$file])) {
-									SwitchGedcom($file);
-									print GetPersonName($user->gedcomid[$file]);
-									print_first_major_fact($user->gedcomid[$file]);
+								if (isset($user->gedcomid[$gedcomid]) && !empty($user->gedcomid[$gedcomid])) {
+									SwitchGedcom($gedcomid);
+									$person =& Person::GetInstance($user->gedcomid[$gedcomid], "", $gedcomid);
+										if (!$person->isempty) {
+										print $person->name;
+										PersonFunctions::PrintFirstMajorFact($person);
+									}
 									SwitchGedcom();								}
 							}
 							print "</span>\n";
@@ -813,16 +810,19 @@ if ($action=="edituser" || $action == "createform") { ?>
 							<div class="choice_right">
 								<?php
 								$tab++;
-								print "<input type=\"text\" name=\"rootid_".$gedcom."\" id=\"rootid_".$gedcom."\" tabindex=\"".$tab."\" size=\"6\" value=\"";
-								if ($action == "edituser") if (isset($user->rootid[$file])) print $user->rootid[$file];
+								print "<input type=\"text\" name=\"rootid_".$gedcomid."\" id=\"rootid_".$gedcomid."\" tabindex=\"".$tab."\" size=\"6\" value=\"";
+								if ($action == "edituser") if (isset($user->rootid[$gedcomid])) print $user->rootid[$gedcomid];
 								print "\" onblur=\"sndReq('usroot".$gedarray["id"]."', 'getpersonnamefact', 'pid', this.value, 'gedid', '".$gedarray["id"]."');\" />";
-								LinkFunctions::PrintFindIndiLink("rootid_$gedcom",$gedarray["id"]);
+								LinkFunctions::PrintFindIndiLink("rootid_$gedcomid",$gedarray["id"]);
 								print "\n<span id=\"usroot".$gedarray["id"]."\" class=\"list_item\"> ";
 								if ($action == "edituser") {
-									if (isset($user->rootid[$file]) && !empty($user->rootid[$file])) {
-										SwitchGedcom($file);
-										print GetPersonName($user->rootid[$file]);
-										print_first_major_fact($user->rootid[$file]);
+									if (isset($user->rootid[$gedcomid]) && !empty($user->rootid[$gedcomid])) {
+										SwitchGedcom($gedcomid);
+										$person =& Person::GetInstance($user->rootid[$gedcomid], "", $gedcomid);
+										if (!$person->isempty) {
+											print $person->name;
+											PersonFunctions::PrintFirstMajorFact($person);
+										}
 										SwitchGedcom();
 									}
 								}
@@ -842,7 +842,7 @@ if ($action=="edituser" || $action == "createform") { ?>
 					</div>
 				</div>
 				<div class="choice_right">
-					<input type="checkbox" name="new_gedadmin_<?php print $gedcom;?>" <?php if ($user->canadmin && $action == "edituser") print " disabled=\"disabled\""; ?>tabindex="<?php $tab++; print $tab; ?>" value="Y" <?php if ($action == "edituser") if (isset($user->gedcomadmin[$file]) && $user->gedcomadmin[$file]) print "checked=\"checked\"";?> />
+					<input type="checkbox" name="new_gedadmin_<?php print $gedcomid;?>" <?php if ($user->canadmin && $action == "edituser") print " disabled=\"disabled\""; ?>tabindex="<?php $tab++; print $tab; ?>" value="Y" <?php if ($action == "edituser") if (isset($user->gedcomadmin[$gedcomid]) && $user->gedcomadmin[$gedcomid]) print "checked=\"checked\"";?> />
 				</div>
 			</div>
 			<div class="admin_item_box">
@@ -859,20 +859,20 @@ if ($action=="edituser" || $action == "createform") { ?>
 							<div class="choice_right">
 								<?php
 								if ($action == "edituser") {
-									if (!isset($user->privgroup[$file])) $user->privgroup[$file]="access";
+									if (!isset($user->privgroup[$gedcomid])) $user->privgroup[$gedcomid]="access";
 								}
 								$tab++;
-								print "<select name=\"privgroup_$gedcom\" tabindex=\"".$tab."\"";
+								print "<select name=\"privgroup_$gedcomid\" tabindex=\"".$tab."\"";
 								if ($user->canadmin && $action == "edituser") print " disabled=\"disabled\"";
 								print ">\n";
 								print "<option value=\"none\"";
-								if ($action == "edituser") if ($user->privgroup[$file]=="none") print " selected=\"selected\"";
+								if ($action == "edituser") if ($user->privgroup[$gedcomid]=="none") print " selected=\"selected\"";
 								print ">".$gm_lang["visitor"]."</option>\n";
 								print "<option value=\"access\"";
-								if ($action == "edituser") if ($user->privgroup[$file]=="access") print " selected=\"selected\"";
+								if ($action == "edituser") if ($user->privgroup[$gedcomid]=="access") print " selected=\"selected\"";
 								print ">".$gm_lang["user"]."</option>\n";
 								print "<option value=\"admin\"";
-								if ($action == "edituser") if ($user->privgroup[$file]=="admin") print " selected=\"selected\"";
+								if ($action == "edituser") if ($user->privgroup[$gedcomid]=="admin" || $user->canadmin) print " selected=\"selected\"";
 								print ">".$gm_lang["administrator"]."</option>\n";
 //								print "<option value=\"admin\"";
 //								if ($action == "edituser") if ($user->canedit[$file]=="admin") print " selected=\"selected\"";
@@ -893,10 +893,10 @@ if ($action=="edituser" || $action == "createform") { ?>
 					</div>
 				</div>
 				<div class="choice_right">
-					<select name="new_relationship_privacy_<?php print $gedcom; ?>"<?php if ($user->canadmin && $action == "edituser") print " disabled=\"disabled\""; ?> tabindex="<?php $tab++; print $tab; ?>" >
-						<option value=""<?php if ($action == "edituser") if (isset($user->relationship_privacy[$file]) && $user->relationship_privacy[$file]=="") print " selected=\"selected\"";?>><?php print $gm_lang["default"]; ?></option>
-						<option value="Y"<?php if ($action == "edituser") if (isset($user->relationship_privacy[$file]) && $user->relationship_privacy[$file]=="Y") print " selected=\"selected\"";?>><?php print $gm_lang["yes"]; ?></option>
-						<option value="N"<?php if ($action == "edituser") if (isset($user->relationship_privacy[$file]) && $user->relationship_privacy[$file]=="N") print " selected=\"selected\"";?>><?php print $gm_lang["no"]; ?></option>
+					<select name="new_relationship_privacy_<?php print $gedcomid; ?>"<?php if ($user->canadmin && $action == "edituser") print " disabled=\"disabled\""; ?> tabindex="<?php $tab++; print $tab; ?>" >
+						<option value=""<?php if ($action == "edituser") if (isset($user->relationship_privacy[$gedcomid]) && $user->relationship_privacy[$gedcomid]=="") print " selected=\"selected\"";?>><?php print $gm_lang["default"]; ?></option>
+						<option value="Y"<?php if ($action == "edituser") if (isset($user->relationship_privacy[$gedcomid]) && $user->relationship_privacy[$gedcomid]=="Y") print " selected=\"selected\"";?>><?php print $gm_lang["yes"]; ?></option>
+						<option value="N"<?php if ($action == "edituser") if (isset($user->relationship_privacy[$gedcomid]) && $user->relationship_privacy[$gedcomid]=="N") print " selected=\"selected\"";?>><?php print $gm_lang["no"]; ?></option>
 						</select>
 				</div>
 			</div>
@@ -910,10 +910,10 @@ if ($action=="edituser" || $action == "createform") { ?>
 					</div>
 				</div>
 				<div class="choice_right">
-          			<select size="1" <?php if ($user->canadmin && $action == "edituser") print "disabled=\"disabled\""; ?> name="new_max_relation_path_<?php print $gedcom; ?>"><?php
+          			<select size="1" <?php if ($user->canadmin && $action == "edituser") print "disabled=\"disabled\""; ?> name="new_max_relation_path_<?php print $gedcomid; ?>"><?php
           				for ($y = 1; $y <= 10; $y++) {
             				print "<option";
-            				if ($action == "edituser" && isset($user->max_relation_path[$file]) && $y == $user->max_relation_path[$file]) print " selected=\"selected\"";
+            				if ($action == "edituser" && isset($user->max_relation_path[$gedcomid]) && $y == $user->max_relation_path[$gedcomid]) print " selected=\"selected\"";
             				else if ($y == 1) print " selected=\"selected\"";
 			            	print ">";
             				print $y;
@@ -932,10 +932,10 @@ if ($action=="edituser" || $action == "createform") { ?>
 					</div>
 				</div>
 				<div class="choice_right">
-					<select name="new_hide_live_people_<?php print $gedcom; ?>"<?php if ($user->canadmin && $action == "edituser") print " disabled=\"disabled\""; ?> tabindex="<?php $tab++; print $tab; ?>" >
-						<option value=""<?php if ($action == "edituser") if (isset($user->hide_live_people[$file]) && $user->hide_live_people[$file]=="") print " selected=\"selected\"";?>><?php print $gm_lang["default"]; ?></option>
-						<option value="Y"<?php if ($action == "edituser") if (isset($user->hide_live_people[$file]) && $user->hide_live_people[$file]=="Y") print " selected=\"selected\"";?>><?php print $gm_lang["yes"]; ?></option>
-						<option value="N"<?php if ($action == "edituser") if (isset($user->hide_live_people[$file]) && $user->hide_live_people[$file]=="N") print " selected=\"selected\"";?>><?php print $gm_lang["no"]; ?></option>
+					<select name="new_hide_live_people_<?php print $gedcomid; ?>"<?php if ($user->canadmin && $action == "edituser") print " disabled=\"disabled\""; ?> tabindex="<?php $tab++; print $tab; ?>" >
+						<option value=""<?php if ($action == "edituser") if (isset($user->hide_live_people[$gedcomid]) && $user->hide_live_people[$gedcomid]=="") print " selected=\"selected\"";?>><?php print $gm_lang["default"]; ?></option>
+						<option value="Y"<?php if ($action == "edituser") if (isset($user->hide_live_people[$gedcomid]) && $user->hide_live_people[$gedcomid]=="Y") print " selected=\"selected\"";?>><?php print $gm_lang["yes"]; ?></option>
+						<option value="N"<?php if ($action == "edituser") if (isset($user->hide_live_people[$gedcomid]) && $user->hide_live_people[$gedcomid]=="N") print " selected=\"selected\"";?>><?php print $gm_lang["no"]; ?></option>
 						</select>
 				</div>
 			</div>
@@ -949,10 +949,10 @@ if ($action=="edituser" || $action == "createform") { ?>
 					</div>
 				</div>
 				<div class="choice_right">
-					<select name="new_show_living_names_<?php print $gedcom; ?>"<?php if ($user->canadmin && $action == "edituser") print " disabled=\"disabled\""; ?> tabindex="<?php $tab++; print $tab; ?>" >
-						<option value=""<?php if ($action == "edituser") if (isset($user->show_living_names[$file]) && $user->show_living_names[$file]=="") print " selected=\"selected\"";?>><?php print $gm_lang["default"]; ?></option>
-						<option value="Y"<?php if ($action == "edituser") if (isset($user->show_living_names[$file]) && $user->show_living_names[$file]=="Y") print " selected=\"selected\"";?>><?php print $gm_lang["yes"]; ?></option>
-						<option value="N"<?php if ($action == "edituser") if (isset($user->show_living_names[$file]) && $user->show_living_names[$file]=="N") print " selected=\"selected\"";?>><?php print $gm_lang["no"]; ?></option>
+					<select name="new_show_living_names_<?php print $gedcomid; ?>"<?php if ($user->canadmin && $action == "edituser") print " disabled=\"disabled\""; ?> tabindex="<?php $tab++; print $tab; ?>" >
+						<option value=""<?php if ($action == "edituser") if (isset($user->show_living_names[$gedcomid]) && $user->show_living_names[$gedcomid]=="") print " selected=\"selected\"";?>><?php print $gm_lang["default"]; ?></option>
+						<option value="Y"<?php if ($action == "edituser") if (isset($user->show_living_names[$gedcomid]) && $user->show_living_names[$gedcomid]=="Y") print " selected=\"selected\"";?>><?php print $gm_lang["yes"]; ?></option>
+						<option value="N"<?php if ($action == "edituser") if (isset($user->show_living_names[$gedcomid]) && $user->show_living_names[$gedcomid]=="N") print " selected=\"selected\"";?>><?php print $gm_lang["no"]; ?></option>
 						</select>
 				</div>
 			</div>
@@ -970,23 +970,23 @@ if ($action=="edituser" || $action == "createform") { ?>
 							<div class="choice_right">
 								<?php
 								if ($action == "edituser") {
-									if (isset($user->canedit[$file])) {
-										if ($user->canedit[$file]===true) $user->canedit[$file]="yes";
+									if (isset($user->canedit[$gedcomid])) {
+										if ($user->canedit[$gedcomid]===true) $user->canedit[$gedcomid]="yes";
 									}
-									else $user->canedit[$file]="no";
+									else $user->canedit[$gedcomid]="no";
 								}
 								$tab++;
-								print "<select name=\"canedit_$gedcom\" tabindex=\"".$tab."\"";
+								print "<select name=\"canedit_$gedcomid\" tabindex=\"".$tab."\"";
 								if ($user->canadmin && $action == "edituser") print " disabled=\"disabled\"";
 								print ">\n";
 								print "<option value=\"none\"";
-								if ($action == "edituser") if ($user->canedit[$file]=="none") print " selected=\"selected\"";
+								if ($action == "edituser") if ($user->canedit[$gedcomid]=="none") print " selected=\"selected\"";
 								print ">".$gm_lang["none"]."</option>\n";
 								print "<option value=\"edit\"";
-								if ($action == "edituser") if ($user->canedit[$file]=="edit") print " selected=\"selected\"";
+								if ($action == "edituser") if ($user->canedit[$gedcomid]=="edit") print " selected=\"selected\"";
 								print ">".$gm_lang["edit"]."</option>\n";
 								print "<option value=\"accept\"";
-								if ($action == "edituser") if ($user->canedit[$file]=="accept") print " selected=\"selected\"";
+								if ($action == "edituser") if ($user->canedit[$gedcomid]=="accept") print " selected=\"selected\"";
 								print ">".$gm_lang["accept"]."</option>\n";
 //								print "<option value=\"admin\"";
 //								if ($action == "edituser") if ($user->canedit[$file]=="admin") print " selected=\"selected\"";
@@ -1025,7 +1025,7 @@ if ($action == "massupdate") {
 	<div id="admin_genmod_left">
 		<div class="admin_link"><a href="admin.php"><?php print $gm_lang["admin"];?></a></div>
 		<div class="admin_link"><a href="useradmin.php"><?php print $gm_lang["user_admin"];?></a></div>
-		<div class="admin_link"><a href="useradmin.php?action=listusers&amp;sort=<?php print $sort;?>&amp;filter=<?php print $filter;?>&amp;usrlang=<?php print $usrlang;?>&amp;ged=<?php print $ged;?>&amp;namefilter=<?php print $namefilter;?>"><?php print $gm_lang["current_users"];?></a></div>
+		<div class="admin_link"><a href="useradmin.php?action=listusers&amp;sort=<?php print $sort;?>&amp;filter=<?php print $filter;?>&amp;usrlang=<?php print $usrlang;?>&amp;gedid=<?php print $gedid;?>&amp;namefilter=<?php print $namefilter;?>"><?php print $gm_lang["current_users"];?></a></div>
 	</div>
 	<!-- Setup the right box -->
 	<div id="admin_genmod_right">
@@ -1037,7 +1037,7 @@ if ($action == "massupdate") {
 				<input type="hidden" name="sort" value="<?php print $sort;?>" />
 				<input type="hidden" name="filter" value="<?php print $filter;?>" />
 				<input type="hidden" name="usrlang" value="<?php print $usrlang;?>" />
-				<input type="hidden" name="ged" value="<?php print $ged; ?>" />
+				<input type="hidden" name="gedid" value="<?php print $gedid; ?>" />
 				<input type="hidden" name="namefilter" value="<?php print $namefilter;?>" />
 			<!-- Print the users -->
 			<?php
@@ -1261,9 +1261,7 @@ if ($action == "massupdate") {
 			</div>
 			<!-- Gedcom related settings -->
 			<?php
-			foreach($GEDCOMS as $gedcom=>$gedarray) {
-				$file = $gedcom;
-				$gedcom = preg_replace(array("/\./","/-/","/ /"), array("_","_","_"), $gedcom);
+			foreach($GEDCOMS as $gedcomid=>$gedarray) {
 				print "<div class=\"admin_topbottombar\">".$gedarray["title"]."</div>"; ?>
 				<!-- Rootid -->
 				<div class="admin_item_box">
@@ -1279,12 +1277,12 @@ if ($action == "massupdate") {
 						<div class="admin_item_box">
 							<div class="width15 choice_middle center">
 								<?php $tab++; ?>
-								<input type="checkbox" name="change_rootid_<?php print $gedcom;?>" tabindex="<?php print $tab;?>" value="Y" />
+								<input type="checkbox" name="change_rootid_<?php print $gedcomid;?>" tabindex="<?php print $tab;?>" value="Y" />
 							</div>
 							<div class="width80 choice_right">
 								<?php $tab++; ?>
-								<input type="text" size="6" name="new_rootid_<?php print $gedcom;?>" id="new_rootid_<?php print $gedcom;?>" tabindex="<?php print $tab;?>" value="" onblur="sndReq('usroot<?php print $gedarray["id"];?>', 'getpersonnamefact', 'pid', this.value, 'gedid', '<?php print $gedarray["id"];?>');" />
-								<?php LinkFunctions::PrintFindIndiLink("new_rootid_$gedcom",$gedarray["id"]);
+								<input type="text" size="6" name="new_rootid_<?php print $gedcomid;?>" id="new_rootid_<?php print $gedcomid;?>" tabindex="<?php print $tab;?>" value="" onblur="sndReq('usroot<?php print $gedarray["id"];?>', 'getpersonnamefact', 'pid', this.value, 'gedid', '<?php print $gedarray["id"];?>');" />
+								<?php LinkFunctions::PrintFindIndiLink("new_rootid_$gedcomid",$gedarray["id"]);
 								print "\n<span id=\"usroot".$gedarray["id"]."\" class=\"list_item\"> </span>";?>
 							</div>
 						</div>
@@ -1305,10 +1303,10 @@ if ($action == "massupdate") {
 						<div class="admin_item_box">
 							<div class="width15 choice_middle center">
 								<?php $tab++; ?>
-								<input type="checkbox" name="change_gedadmin_<?php print $gedcom;?>" tabindex="<?php print $tab;?>" value="Y" />
+								<input type="checkbox" name="change_gedadmin_<?php print $gedcomid;?>" tabindex="<?php print $tab;?>" value="Y" />
 							</div>
 							<div class="width80 choice_right">
-								<input type="checkbox" name="new_gedadmin_<?php print $gedcom;?>" <?php if ($user->canadmin && $action == "edituser") print " disabled=\"disabled\""; ?>tabindex="<?php $tab++; print $tab; ?>" value="Y" <?php if ($action == "edituser") if (isset($user->gedcomadmin[$file]) && $user->gedcomadmin[$file]) print "checked=\"checked\"";?> />
+								<input type="checkbox" name="new_gedadmin_<?php print $gedcomid;?>" <?php if ($user->canadmin && $action == "edituser") print " disabled=\"disabled\""; ?>tabindex="<?php $tab++; print $tab; ?>" value="Y" <?php if ($action == "edituser") if (isset($user->gedcomadmin[$gedcomid]) && $user->gedcomadmin[$gedcomid]) print "checked=\"checked\"";?> />
 							</div>
 						</div>
 					</div>
@@ -1328,12 +1326,12 @@ if ($action == "massupdate") {
 						<div class="admin_item_box">
 							<div class="width15 choice_middle center">
 								<?php $tab++; ?>
-								<input type="checkbox" name="change_privgroup_<?php print $gedcom;?>" tabindex="<?php print $tab;?>" value="Y" />
+								<input type="checkbox" name="change_privgroup_<?php print $gedcomid;?>" tabindex="<?php print $tab;?>" value="Y" />
 							</div>
 							<div class="width80 choice_right">
-								<?php if (!isset($user->privgroup[$file])) $user->privgroup[$file]="none";
+								<?php if (!isset($user->privgroup[$gedcomid])) $user->privgroup[$gedcomid]="none";
 								$tab++;
-								print "<select name=\"new_privgroup_$gedcom\" tabindex=\"".$tab."\">\n";
+								print "<select name=\"new_privgroup_$gedcomid\" tabindex=\"".$tab."\">\n";
 								print "<option value=\"none\" >".$gm_lang["visitor"]."</option>\n";
 								print "<option value=\"access\" selected=\"selected\">".$gm_lang["user"]."</option>\n";
 								print "<option value=\"admin\" >".$gm_lang["administrator"]."</option>\n";
@@ -1357,10 +1355,10 @@ if ($action == "massupdate") {
 					<div class="width65 choice_right">
 						<div class="admin_item_box">
 							<div class="width15 choice_middle center">
-								<input type="checkbox" name="change_relationship_privacy_<?php print $gedcom;?>" tabindex="<?php print $tab;?>" value="Y" />
+								<input type="checkbox" name="change_relationship_privacy_<?php print $gedcomid;?>" tabindex="<?php print $tab;?>" value="Y" />
 							</div>
 							<div class="width80 choice_right">
-								<select name="new_relationship_privacy_<?php print $gedcom; ?>" tabindex="<?php $tab++; print $tab; ?>" >
+								<select name="new_relationship_privacy_<?php print $gedcomid; ?>" tabindex="<?php $tab++; print $tab; ?>" >
 									<option value=""><?php print $gm_lang["default"]; ?></option>
 									<option value="Y"><?php print $gm_lang["yes"]; ?></option>
 									<option value="N"><?php print $gm_lang["no"]; ?></option>
@@ -1384,10 +1382,10 @@ if ($action == "massupdate") {
 					<div class="width65 choice_right">
 						<div class="admin_item_box">
 							<div class="width15 choice_middle center">
-								<input type="checkbox" name="change_max_relation_path_<?php print $gedcom;?>" tabindex="<?php print $tab;?>" value="Y" />
+								<input type="checkbox" name="change_max_relation_path_<?php print $gedcomid;?>" tabindex="<?php print $tab;?>" value="Y" />
 							</div>
 							<div class="width80 choice_right">
-          						<select size="1" name="new_max_relation_path_<?php print $gedcom; ?>"><?php
+          						<select size="1" name="new_max_relation_path_<?php print $gedcomid; ?>"><?php
           							for ($y = 1; $y <= 10; $y++) {
 	            						print "<option>".$y."</option>";
           							}?>
@@ -1411,10 +1409,10 @@ if ($action == "massupdate") {
 					<div class="width65 choice_right">
 						<div class="admin_item_box">
 							<div class="width15 choice_middle center">
-								<input type="checkbox" name="change_hide_live_people_<?php print $gedcom;?>" tabindex="<?php print $tab;?>" value="Y" />
+								<input type="checkbox" name="change_hide_live_people_<?php print $gedcomid;?>" tabindex="<?php print $tab;?>" value="Y" />
 							</div>
 							<div class="width80 choice_right">
-								<select name="new_hide_live_people_<?php print $gedcom; ?>" tabindex="<?php $tab++; print $tab; ?>" >
+								<select name="new_hide_live_people_<?php print $gedcomid; ?>" tabindex="<?php $tab++; print $tab; ?>" >
 									<option value=""><?php print $gm_lang["default"]; ?></option>
 									<option value="Y"><?php print $gm_lang["yes"]; ?></option>
 									<option value="N"><?php print $gm_lang["no"]; ?></option>
@@ -1438,10 +1436,10 @@ if ($action == "massupdate") {
 					<div class="width65 choice_right">
 						<div class="admin_item_box">
 							<div class="width15 choice_middle center">
-								<input type="checkbox" name="change_show_living_names_<?php print $gedcom;?>" tabindex="<?php print $tab;?>" value="Y" />
+								<input type="checkbox" name="change_show_living_names_<?php print $gedcomid;?>" tabindex="<?php print $tab;?>" value="Y" />
 							</div>
 							<div class="width80 choice_right">
-								<select name="new_show_living_names_<?php print $gedcom; ?>" tabindex="<?php $tab++; print $tab; ?>" >
+								<select name="new_show_living_names_<?php print $gedcomid; ?>" tabindex="<?php $tab++; print $tab; ?>" >
 									<option value=""><?php print $gm_lang["default"]; ?></option>
 									<option value="Y"><?php print $gm_lang["yes"]; ?></option>
 									<option value="N"><?php print $gm_lang["no"]; ?></option>
@@ -1465,13 +1463,13 @@ if ($action == "massupdate") {
 					<div class="width65 choice_right">
 						<div class="admin_item_box">
 							<div class="width15 choice_middle center">
-								<input type="checkbox" name="change_canedit_<?php print $gedcom;?>" tabindex="<?php print $tab;?>" value="Y" />
+								<input type="checkbox" name="change_canedit_<?php print $gedcomid;?>" tabindex="<?php print $tab;?>" value="Y" />
 							</div>
 							<div class="width80 choice_right">
 							
 								<?php
 								$tab++;
-								print "<select name=\"new_canedit_$gedcom\" tabindex=\"".$tab."\"";
+								print "<select name=\"new_canedit_$gedcomid\" tabindex=\"".$tab."\"";
 								print ">\n";
 								print "<option value=\"none\" >".$gm_lang["none"]."</option>\n";
 								print "<option value=\"edit\" >".$gm_lang["edit"]."</option>\n";
@@ -1509,56 +1507,54 @@ if ($action == "massupdate2") {
 	foreach ($userlist as $key => $user) {
 		$newuser = CloneObj($user);
 		
-		foreach($GEDCOMS as $gedcom=>$gedarray) {
-			$file = $gedcom;
-			$gedcom = preg_replace(array("/\./","/-/","/ /"), array("_","_","_"), $gedcom);
+		foreach($GEDCOMS as $gedcomid=>$gedarray) {
 			// Rootid
-			$varname = "new_rootid_$gedcom";
-			$chname = "change_rootid_$gedcom";
+			$varname = "new_rootid_$gedcomid";
+			$chname = "change_rootid_$gedcomid";
 			if (isset($$chname)) {
-				if (isset($$varname)) $newuser->rootid[$file]=$$varname;
+				if (isset($$varname)) $newuser->rootid[$gedcomid]=$$varname;
 			}
 			// Edit rights
-			$chname = "change_canedit_$gedcom";
-			$varname = "new_canedit_$gedcom";
-			if (isset($$chname)) $newuser->canedit[$file]=$$varname;
+			$chname = "change_canedit_$gedcomid";
+			$varname = "new_canedit_$gedcomid";
+			if (isset($$chname)) $newuser->canedit[$gedcomid]=$$varname;
 			// Relation privacy 
-			$chname = "change_relationship_privacy_$gedcom";
-			$varname = "new_relationship_privacy_$gedcom";
+			$chname = "change_relationship_privacy_$gedcomid";
+			$varname = "new_relationship_privacy_$gedcomid";
 			if (isset($$chname)) {
-				if ((isset($$varname))) $newuser->relationship_privacy[$file] = $$varname;
-				else $newuser->relationship_privacy[$file] = "";
+				if ((isset($$varname))) $newuser->relationship_privacy[$gedcomid] = $$varname;
+				else $newuser->relationship_privacy[$gedcomid] = "";
 			}
 			// Relationship privacy path
-			$chname = "change_max_relation_path_$gedcom";
-			$varname = "new_max_relation_path_$gedcom";
+			$chname = "change_max_relation_path_$gedcomid";
+			$varname = "new_max_relation_path_$gedcomid";
 			if (isset($$chname)) {
-				if (isset($$varname)) $newuser->max_relation_path[$file] = $$varname;
+				if (isset($$varname)) $newuser->max_relation_path[$gedcomid] = $$varname;
 			}
 			// Hide live people
-			$chname = "change_hide_live_people_$gedcom";
-			$varname = "new_hide_live_people_$gedcom";
+			$chname = "change_hide_live_people_$gedcomid";
+			$varname = "new_hide_live_people_$gedcomid";
 			if (isset($$chname)) {
-				if (isset($$varname)) $newuser->hide_live_people[$file] = $$varname;
+				if (isset($$varname)) $newuser->hide_live_people[$gedcomid] = $$varname;
 			}
 			// Show living names
-			$chname = "change_show_living_names_$gedcom";
-			$varname = "new_show_living_names_$gedcom";
+			$chname = "change_show_living_names_$gedcomid";
+			$varname = "new_show_living_names_$gedcomid";
 			if (isset($$chname)) {
-				if (isset($$varname)) $newuser->show_living_names[$file] = $$varname;
+				if (isset($$varname)) $newuser->show_living_names[$gedcomid] = $$varname;
 			}
 			// Privacy group
-			$chname = "change_privgroup_$gedcom";
-			$varname = "new_privgroup_$gedcom";
+			$chname = "change_privgroup_$gedcomid";
+			$varname = "new_privgroup_$gedcomid";
 			if (isset($$chname)) {
-				if (isset($$varname)) $newuser->privgroup[$file] = $$varname;
+				if (isset($$varname)) $newuser->privgroup[$gedcomid] = $$varname;
 			}
 			// Gedcom admin 
-			$chname = "change_gedadmin_$gedcom";
-			$varname = "new_gedadmin_$gedcom";
+			$chname = "change_gedadmin_$gedcomid";
+			$varname = "new_gedadmin_$gedcomid";
 			if (isset($$chname)) {
-				if ((isset($$varname)) && ($$varname == "Y")) $newuser->gedcomadmin[$file] = true;
-				else $newuser->gedcomadmin[$file] = false;
+				if ((isset($$varname)) && ($$varname == "Y")) $newuser->gedcomadmin[$gedcomid] = true;
+				else $newuser->gedcomadmin[$gedcomid] = false;
 			}
 		}
 		if (isset($change_auto_accept)) {
@@ -1587,14 +1583,13 @@ if ($action == "massupdate2") {
 			if (isset($new_sync_gedcom)) {
 				$newuser->sync_gedcom = "Y";
 				if (!empty($newuser->email)) {
-					$oldged = $GEDCOM;
+					$oldged = $GEDCOMID;
 					foreach($newuser->gedcomid as $gedc=>$gedid) {
 						if (!empty($gedid) && isset($GEDCOMS[$gedc])) {
-							$GEDCOM = $gedc;
-							$GEDCOMID = $GEDCOMS[$GEDCOM]["id"];
+							$GEDCOMID = $gedc;
 							$indirec = FindPersonRecord($gedid);
 							$rec = GetChangeData(false, $gedid, true, "gedlines", "");
-							if (isset($rec[$GEDCOM][$gedid])) $indirec = $rec[$GEDCOM][$gedid];
+							if (isset($rec[$GEDCOMID][$gedid])) $indirec = $rec[$GEDCOMID][$gedid];
 							if (!empty($indirec)) {
 								$change_id = GetNewXref("CHANGE");
 								if (preg_match("/(\d) (_?EMAIL .+)/", $indirec, $match)>0) {
@@ -1610,8 +1605,7 @@ if ($action == "massupdate2") {
 							}
 						}
 					}
-					$GEDCOM = $oldged;
-					$GEDCOMID = $GEDCOMS[$GEDCOM]["id"];
+					$GEDCOMID = $oldged;
 				}
 			}
 			else $newuser->sync_gedcom = "N";
@@ -1712,7 +1706,7 @@ if (($action == "listusers") || ($action == "edituser2") || ($action == "deleteu
 			<input type="hidden" name="sort" value="<?php print $sort; ?>" />
 			<input type="hidden" name="filter" value="<?php print $filter; ?>" />
 			<input type="hidden" name="usrlang" value="<?php print $usrlang; ?>" />
-			<input type="hidden" name="ged" value="<?php print $ged; ?>" />
+			<input type="hidden" name="gedid" value="<?php print $gedid; ?>" />
 		<div id="admin_genmod_left">
 			<div class="admin_link"><a href="admin.php"><?php print $gm_lang["admin"];?></a></div>
 			<div class="admin_link"><a href="useradmin.php"><?php print $gm_lang["user_admin"];?></a></div>
@@ -1747,10 +1741,10 @@ if (($action == "listusers") || ($action == "edituser2") || ($action == "deleteu
 				<div class="choice_middle width_deledit"><?php print $gm_lang["delete"]."<br />".$gm_lang["edit"];?></div>
 				<?php } ?>
 				<?php if ($view != "preview") { ?> <div class="choice_left width_username"> <?php } else { ?> <div class="choice_middle width_username"> <?php } ?> 
-					<?php print "<a href=\"useradmin.php?action=listusers&amp;sort=sortuname&amp;namefilter=".$namefilter."&amp;filter=".$filter."&amp;usrlang=".$usrlang."&amp;ged=".$ged."\">"; ?><?php print $gm_lang["username"]; ?></a>
+					<?php print "<a href=\"useradmin.php?action=listusers&amp;sort=sortuname&amp;namefilter=".$namefilter."&amp;filter=".$filter."&amp;usrlang=".$usrlang."&amp;gedid=".$gedid."\">"; ?><?php print $gm_lang["username"]; ?></a>
 				</div>
 				<div class="choice_middle width_fullname">
-					<?php print "<a href=\"useradmin.php?action=listusers&amp;sort=sortlname&amp;namefilter=".$namefilter."&amp;filter=".$filter."&amp;usrlang=".$usrlang."&amp;ged=".$ged."\">"; ?><?php print $gm_lang["full_name"]; ?></a>
+					<?php print "<a href=\"useradmin.php?action=listusers&amp;sort=sortlname&amp;namefilter=".$namefilter."&amp;filter=".$filter."&amp;usrlang=".$usrlang."&amp;gedid=".$gedid."\">"; ?><?php print $gm_lang["full_name"]; ?></a>
 				</div>
 				<div class="choice_middle width_languages">
 					<?php print $gm_lang["inc_languages"]; ?>
@@ -1772,16 +1766,16 @@ if (($action == "listusers") || ($action == "edituser2") || ($action == "deleteu
 					</div>
 				</div>
 				<div class="choice_middle width_registered">
-					<?php print "<a href=\"useradmin.php?action=listusers&amp;sort=sortreg&amp;namefilter=".$namefilter."&amp;filter=".$filter."&amp;usrlang=".$usrlang."&amp;ged=".$ged."\">"; ?><?php print $gm_lang["date_registered"]; ?></a>
+					<?php print "<a href=\"useradmin.php?action=listusers&amp;sort=sortreg&amp;namefilter=".$namefilter."&amp;filter=".$filter."&amp;usrlang=".$usrlang."&amp;gedid=".$gedid."\">"; ?><?php print $gm_lang["date_registered"]; ?></a>
 				</div>
 				<div class="choice_middle width_last_logged_in">
-					<?php print "<a href=\"useradmin.php?action=listusers&amp;sort=sortllgn&amp;namefilter=".$namefilter."&amp;filter=".$filter."&amp;usrlang=".$usrlang."&amp;ged=".$ged."\">"; ?><?php print $gm_lang["last_login"]; ?></a>
+					<?php print "<a href=\"useradmin.php?action=listusers&amp;sort=sortllgn&amp;namefilter=".$namefilter."&amp;filter=".$filter."&amp;usrlang=".$usrlang."&amp;gedid=".$gedid."\">"; ?><?php print $gm_lang["last_login"]; ?></a>
 				</div>
 				<div class="choice_middle user_verified">
-					<?php print "<a href=\"useradmin.php?action=listusers&amp;sort=sortver&amp;namefilter=".$namefilter."&amp;filter=".$filter."&amp;usrlang=".$usrlang."&amp;ged=".$ged."\">"; ?><?php print $gm_lang["verified"]; ?></a>
+					<?php print "<a href=\"useradmin.php?action=listusers&amp;sort=sortver&amp;namefilter=".$namefilter."&amp;filter=".$filter."&amp;usrlang=".$usrlang."&amp;gedid=".$gedid."\">"; ?><?php print $gm_lang["verified"]; ?></a>
 				</div>
 				<div class="choice_right admin_approved">
-					<?php print "<a href=\"useradmin.php?action=listusers&amp;sort=sortveradm&amp;namefilter=".$namefilter."&amp;filter=".$filter."&amp;usrlang=".$usrlang."&amp;ged=".$ged."\">"; ?><?php print $gm_lang["verified_by_admin"]; ?></a>
+					<?php print "<a href=\"useradmin.php?action=listusers&amp;sort=sortveradm&amp;namefilter=".$namefilter."&amp;filter=".$filter."&amp;usrlang=".$usrlang."&amp;gedid=".$gedid."\">"; ?><?php print $gm_lang["verified_by_admin"]; ?></a>
 				</div>
 			</div>
 			<?php
@@ -1796,11 +1790,11 @@ if (($action == "listusers") || ($action == "edituser2") || ($action == "deleteu
 						</div>
 						<div class="choice_middle width_deledit">
 							<?php if ($user->username != $gm_username) {
-								if ($TEXT_DIRECTION=="ltr") print "<a href=\"useradmin.php?action=deleteuser&amp;username=".urlencode($username)."&amp;sort=".$sort."&amp;filter=".$filter."&amp;usrlang=".$usrlang."&amp;ged=".$ged."&amp;namefilter=".$namefilter."\" onclick=\"return confirm('".$gm_lang["confirm_user_delete"]." $username?');\">".$gm_lang["delete"]."</a><br />\n";
-								else if (begRTLText($username)) print "<a href=\"useradmin.php?action=deleteuser&amp;username=".urlencode($username)."&amp;sort=".$sort."&amp;filter=".$filter."&amp;usrlang=".$usrlang."&amp;ged=".$ged."&amp;namefilter=".$namefilter."\" onclick=\"return confirm('?".$gm_lang["confirm_user_delete"]." $username');\">".$gm_lang["delete"]."</a><br />\n";
-								else print "<a href=\"useradmin.php?action=deleteuser&amp;username=".urlencode($username)."&amp;sort=".$sort."&amp;filter=".$filter."&amp;usrlang=".$usrlang."&amp;ged=".$ged."&amp;namefilter=".$namefilter."\" onclick=\"return confirm('?$username ".$gm_lang["confirm_user_delete"]." ');\">".$gm_lang["delete"]."</a><br />\n";
+								if ($TEXT_DIRECTION=="ltr") print "<a href=\"useradmin.php?action=deleteuser&amp;username=".urlencode($username)."&amp;sort=".$sort."&amp;filter=".$filter."&amp;usrlang=".$usrlang."&amp;gedid=".$gedid."&amp;namefilter=".$namefilter."\" onclick=\"return confirm('".$gm_lang["confirm_user_delete"]." $username?');\">".$gm_lang["delete"]."</a><br />\n";
+								else if (begRTLText($username)) print "<a href=\"useradmin.php?action=deleteuser&amp;username=".urlencode($username)."&amp;sort=".$sort."&amp;filter=".$filter."&amp;usrlang=".$usrlang."&amp;gedid=".$gedid."&amp;namefilter=".$namefilter."\" onclick=\"return confirm('?".$gm_lang["confirm_user_delete"]." $username');\">".$gm_lang["delete"]."</a><br />\n";
+								else print "<a href=\"useradmin.php?action=deleteuser&amp;username=".urlencode($username)."&amp;sort=".$sort."&amp;filter=".$filter."&amp;usrlang=".$usrlang."&amp;gedid=".$gedid."&amp;namefilter=".$namefilter."\" onclick=\"return confirm('?$username ".$gm_lang["confirm_user_delete"]." ');\">".$gm_lang["delete"]."</a><br />\n";
 							}
-							print "<a href=\"useradmin.php?action=edituser&amp;username=".urlencode($username)."&amp;sort=".$sort."&amp;filter=".$filter."&amp;usrlang=".$usrlang."&amp;ged=".$ged."&amp;namefilter=".$namefilter."\">".$gm_lang["edit"]."</a>\n";?>
+							print "<a href=\"useradmin.php?action=edituser&amp;username=".urlencode($username)."&amp;sort=".$sort."&amp;filter=".$filter."&amp;usrlang=".$usrlang."&amp;gedid=".$gedid."&amp;namefilter=".$namefilter."\">".$gm_lang["edit"]."</a>\n";?>
 						</div>
 					<?php }
 					if ($view != "preview") { ?> <div class="choice_left width_username <?php } else { ?> <div class="choice_middle width_username <?php }
@@ -1853,8 +1847,8 @@ if (($action == "listusers") || ($action == "edituser2") || ($action == "deleteu
 								if ($vval=="accept") print "<li class=\"warning\">"; 
 								else print "<li>";
 								print $gm_lang[$vval]." ";
-								if ($uged != "") print "<a href=\"individual.php?pid=".$uged."&amp;ged=".$gedid."\">".$gedid."</a></li>\n";
-								else print $gedid."</li>\n";
+								if ($uged != "") print "<a href=\"individual.php?pid=".$uged."&amp;gedid=".$gedid."\">".$gedcom["gedcom"]."</a></li>\n";
+								else print $gedcom["gedcom"]."</li>\n";
 							}
 							print "</ul>";
 						print "</div>";
@@ -2011,13 +2005,13 @@ if ($action == "cleanup") {
 				}
 			}
 			ksort($gedrights);
-			foreach($gedrights as $key=>$gedcom) { ?>
+			foreach($gedrights as $key=>$gedcomid) { ?>
 				<div class="admin_item_box">
 					<div class="width30 choice_left wrap">
-						<?php print $gedcom."</div><div class=\"width60 choice_left wrap\">".$gm_lang["del_gedrights"];?>
+						<?php print $GEDCOMS[$gedcomid]["title"]."</div><div class=\"width60 choice_left wrap\">".$gm_lang["del_gedrights"];?>
 					</div>
 					<div class="choice_right">
-						<input type="checkbox" checked="checked" name="<?php print "delg_".preg_replace(array("/\./","/-/","/ /"), array("_","_","_"), $gedcom); ?>" value="yes" />
+						<input type="checkbox" checked="checked" name="<?php print "delg_".$gedcomid; ?>" value="yes" />
 						<?php $ucnt++; ?>
 					</div>
 				</div>
@@ -2045,7 +2039,7 @@ if ($action == "cleanup2") {
 		}
 		else {
 			foreach($user->canedit as $gedid=>$data) {
-				$var = "delg_".preg_replace(array("/\./","/-/","/ /"), array("_","_","_"), $gedid);
+				$var = "delg_".$gedid;
 				if (isset($$var)) {
 					unset($user->canedit[$gedid]);
 					$message .= $gedid.":&nbsp;&nbsp;".$gm_lang["usr_unset_rights"].$user->username."<br />";
@@ -2179,7 +2173,7 @@ if ($action == "") {
 					<?php
 					$ind = 1;
 					if ($geds["number"] == 0) print $geds["name"];
-					else print "<a href=\"useradmin.php?action=listusers&amp;filter=gedadmin&amp;ged=".$geds["ged"]."\">".$geds["name"]."</a>";
+					else print "<a href=\"useradmin.php?action=listusers&amp;filter=gedadmin&amp;gedid=".$geds["ged"]."\">".$geds["name"]."</a>";
 					?>
 				</div>
 				<div class="choice_right">
