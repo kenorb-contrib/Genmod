@@ -135,7 +135,7 @@ class SystemConfig {
 			$configtext .= $this->AddConfigFooter();
 			// Write the config file
 			if ($this->WriteConfig($configtext)) {
-				WriteToLog("SystemConfig-> Admin has updated config for ".$config_name, "I", "S");
+				WriteToLog("SystemConfig-> Admin has updated config for ".$newconfig["SERVER_URL"], "I", "S");
 				return true;
 			}
 			else return false;
@@ -202,7 +202,7 @@ class SystemConfig {
 				}
 				//-- If not boolean, add the value in quotes
 				else $text .= "\$CONFIG[\"".$key."\"] = '".addslashes($conf)."';\n";
-				if ($CONFIG_PARMS[$config["SERVER_URL"]][$key] != $config[$key]) {
+				if (!isset($CONFIG_PARMS[$config["SERVER_URL"]][$key]) || $CONFIG_PARMS[$config["SERVER_URL"]][$key] != $config[$key]) {
 					WriteToLog("SystemConfig-> Admin has set ".$key." to ".$conf, "I", "S");
 					global $key;
 					$key = $conf;

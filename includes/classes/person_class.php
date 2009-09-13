@@ -80,9 +80,9 @@ class Person extends GedcomRecord {
 	 * Constructor for person object
 	 * @param string $gedrec	the raw individual gedcom record
 	 */
-	public function __construct($id, $gedrec="", $changed=false) {
+	public function __construct($id, $gedrec="", $gedcomid) {
 		
-		parent::__construct($id, $gedrec);
+		parent::__construct($id, $gedrec, $gedcomid);
 
 		$this->tracefacts = false;
 		$this->exclude_facts = "";
@@ -340,7 +340,7 @@ class Person extends GedcomRecord {
 	 * add facts from the family record
 	 */
 	public function AddFamilyFacts($continue=true) {
-		global $GEDCOM, $nonfacts, $nonfamfacts;
+		global $nonfacts, $nonfamfacts;
 		
 		if (!$this->disp) return;
 		if (is_null($this->facts)) $this->ParseFacts();
@@ -392,7 +392,7 @@ if ($this->tracefacts) print "AddFamilyFacts - Adding for ".$fam->xref.": ".$fac
 	 * @return records added to indifacts array
 	 */
 	private function AddParentsFacts($person, $sosa=1) {
-		global $SHOW_RELATIVES_EVENTS, $gm_username, $GEDCOM;
+		global $SHOW_RELATIVES_EVENTS, $gm_username;
 		
 		if (!$SHOW_RELATIVES_EVENTS) return;
 		if ($sosa > $this->sosamax) return;
@@ -489,7 +489,7 @@ if ($this->tracefacts) print "AddParentsFacts sosa ".$sosa."- Adding for ".$fam-
 	 * @return records added to indifacts array
 	 */
 	private function AddChildrenFacts($fam, $option="", $except="") {
-		global $SHOW_RELATIVES_EVENTS, $gm_username, $GEDCOM, $gm_lang;
+		global $SHOW_RELATIVES_EVENTS, $gm_username, $gm_lang;
 
 		if (!$SHOW_RELATIVES_EVENTS) return;
 		if (!$fam->disp) return;
@@ -620,6 +620,7 @@ if ($this->tracefacts) print "AddChildrenFacts (".$option.") - Adding for ".$chi
 				}
 				// first cousins
 				if ($option=="2" or $option=="3") {
+					$child->GetSpouseFamilies();
 					foreach ($child->spousefamilies as $indexval => $fam) {
 						$this->AddChildrenFacts($fam, "first");
 					}
@@ -764,7 +765,7 @@ if ($this->tracefacts) print "AddSpouseFacts - Adding for ".$fam->$spperson->xre
 	}
 	
 	public function getParentFamily() {
-		global $gm_lang, $gm_username, $GEDCOM;
+		global $gm_lang, $gm_username;
 		
 		$this->GetChildFamilies();
 		if (count($this->childfamilies) > 0) {
@@ -804,7 +805,7 @@ if ($this->tracefacts) print "AddSpouseFacts - Adding for ".$fam->$spperson->xre
 	}
 	
 	public function getSpouseFamily() {
-		global $gm_lang, $GEDCOM, $gm_username;
+		global $gm_lang, $gm_username;
 
 		if (count($this->spousefamilies) > 0) {
 			$this->close_relatives = true;
@@ -861,7 +862,7 @@ if ($this->tracefacts) print "AddSpouseFacts - Adding for ".$fam->$spperson->xre
 	}
 	
 	public function getParentOtherFamily() {
-		global $gm_lang, $GEDCOM, $gm_username;
+		global $gm_lang, $gm_username;
 		
 		// NOTE: Get the parents other families
 		// NOTE: Get the fathers families only if they have kids
@@ -1166,13 +1167,13 @@ if ($this->tracefacts) print "AddSpouseFacts - Adding for ".$fam->$spperson->xre
 	private function GetSpouseFamilies() {
 		
 		if (is_null($this->spousefamilies)) {
-		
+			
 			$this->spousefamilies = array();
 			$fams = $this->getSpouseFamilyIds();
 			
 			foreach($fams as $key=>$famid) {
 				if (!empty($famid)) {
-					$fam =& Family::GetInstance($famid);
+					$fam =& Family::GetInstance($famid, "", $this->gedcomid);
 					if ($fam->disp) $this->spousefamilies[$famid] = $fam;
 				}
 			}
@@ -1449,7 +1450,7 @@ if ($this->tracefacts) print "AddSpouseFacts - Adding for ".$fam->$spperson->xre
 		else $addname = "";
 		print "<a href=\"individual.php?pid=".$this->xref."&amp;gedid=".$this->gedcomid."\" class=\"list_item\"><b>";
 		print CheckNN($this->GetSortableName()).$addname."</b>".$this->addxref;
-		FactFunctions::PrintFirstMajorFact($this, true, $break);
+		PersonFunctions::PrintFirstMajorFact($this, true, $break);
 		print "</a>\n";
 		if ($useli) print "</li>";
 		

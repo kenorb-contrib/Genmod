@@ -42,13 +42,13 @@ if ((!$gm_user->userCanViewGedlines()) && (!$gm_user->UserCanAccept())) {
 }
 
 if ((FindPersonRecord($pid))&&(!PrivacyFunctions::displayDetailsByID($pid))) {
-	PrintPrivacyError($CONTACT_EMAIL);
+	PrintFunctions::PrintPrivacyError($CONTACT_EMAIL);
 	print "</body></html>";
 	exit;
 }
 if ($changed) {
 	$getrec = GetChangeData(false, $pid, true);
-	$newrec = $getrec[$GEDCOM][$pid];
+	$newrec = $getrec[$GEDCOMID][$pid];
 	$newrec = PrivacyFunctions::privatize_gedcom($newrec);
 	$oldrec = FindGedcomRecord($pid);
 	$oldrec = PrivacyFunctions::privatize_gedcom($oldrec);

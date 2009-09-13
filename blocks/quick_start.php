@@ -39,7 +39,8 @@ $GM_BLOCKS["print_quickstart_block"]["rss"]       	= false;
  * Prints a block allowing the user to login to the site directly from the portal
  */
 function print_quickstart_block($block = true, $config="", $side, $index) {
-	global $gm_lang, $GEDCOM, $GEDCOMS, $command, $SCRIPT_NAME, $QUERY_STRING, $USE_REGISTRATION_MODULE, $ALLOW_REMEMBER_ME, $gm_username, $TEXT_DIRECTION, $GM_IMAGE_DIR, $GM_IMAGES, $ALLOW_CHANGE_GEDCOM, $GM_BLOCKS, $gm_user;
+	global $gm_lang, $GEDCOMID, $command, $gm_user, $TEXT_DIRECTION, $GM_IMAGE_DIR, $GM_IMAGES, $ALLOW_CHANGE_GEDCOM, $GM_BLOCKS;
+	
 	if (empty($config)) $config = $GM_BLOCKS["print_quickstart_block"]["config"];
 	if (!isset($config['search_all_geds'])) $config = $GM_BLOCKS["print_quickstart_block"]["config"];
 
@@ -47,9 +48,9 @@ function print_quickstart_block($block = true, $config="", $side, $index) {
 	print "<div class=\"blockhc\">";
 	print_help_link("index_quickstart_help", "qm", "quickstart");
 	if ($GM_BLOCKS["print_quickstart_block"]["canconfig"]) {
-		if ((($command=="gedcom")&&($gm_user->userGedcomAdmin())) || (($command=="user")&&(!empty($gm_username)))) {
-			if ($command=="gedcom") $name = preg_replace("/'/", "\'", $GEDCOM);
-			else $name = $gm_username;
+		if ((($command=="gedcom")&&($gm_user->userGedcomAdmin())) || (($command=="user")&&($gm_user->username != ""))) {
+			if ($command=="gedcom") $name = preg_replace("/'/", "\'", get_gedcom_from_id($GEDCOMID));
+			else $name = $gm_user->username;
 			print "<a href=\"javascript: ".$gm_lang["config_block"]."\" onclick=\"window.open('index_edit.php?name=$name&amp;command=$command&amp;action=configure&amp;side=$side&amp;index=$index', '', 'top=50,left=50,width=600,height=350,scrollbars=1,resizable=1'); return false;\">";
 			print "<img class=\"adminicon\" src=\"$GM_IMAGE_DIR/".$GM_IMAGES["admin"]["small"]."\" width=\"15\" height=\"15\" border=\"0\" alt=\"".$gm_lang["config_block"]."\" /></a>\n";
 		}
@@ -77,12 +78,12 @@ function print_quickstart_block($block = true, $config="", $side, $index) {
 	if ($ALLOW_CHANGE_GEDCOM && $config["search_all_geds"] == "yes") print "?allgeds=yes";
 	print "\">".$gm_lang["qs_findfam"]."</a><br />";
 	print "<a href=\"calendar.php\">".$gm_lang["qs_calendar"]."</a><br />";
-	if (empty($gm_username)) {
+	if ($gm_user->username == "") {
 		print "<a href=\"login.php\">".$gm_lang["qs_login"]."</a><br />";
 		print "<a href=\"login_register.php?action=register\">".$gm_lang["requestaccount"]."</a><br />";
 	}
 	else {
-		if (!empty($gm_user->gedcomid[$GEDCOM])) print "<a href=\"pedigree.php?rootid=".$gm_user->gedcomid[$GEDCOM]."\">".$gm_lang["my_pedigree"]."</a><br />";
+		if (!empty($gm_user->gedcomid[$GEDCOMID])) print "<a href=\"pedigree.php?rootid=".$gm_user->gedcomid[$GEDCOMID]."\">".$gm_lang["my_pedigree"]."</a><br />";
 	}
 	print "<br /><br />";
 	print_help_link("QS_search_help", "qm", "QS_search_tips");

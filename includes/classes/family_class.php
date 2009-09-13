@@ -308,9 +308,9 @@ class Family extends GedcomRecord {
 				}
 				else $husb = $husbnew;
 			}
-			if (!empty($husb)) $this->husb =& Person::GetInstance($husb);
+			if (!empty($husb)) $this->husb =& Person::GetInstance($husb, "", $this->gedcomid);
 			else $this->husb = "";
-			if (!empty($husbold)) $this->husbold =& Person::GetInstance($husbold);
+			if (!empty($husbold)) $this->husbold =& Person::GetInstance($husbold, "", $this->gedcomid);
 			else $this->husbold = "";
 		}
 		return $this->husb;
@@ -376,9 +376,9 @@ class Family extends GedcomRecord {
 				}
 				else $wife = $wifenew;
 			}
-			if (!empty($wife)) $this->wife =& Person::GetInstance($wife);
+			if (!empty($wife)) $this->wife =& Person::GetInstance($wife, "", $this->gedcomid);
 			else $this->wife = "";
-			if (!empty($wifeold)) $this->wifeold =& Person::GetInstance($wifeold);
+			if (!empty($wifeold)) $this->wifeold =& Person::GetInstance($wifeold, "", $this->gedcomid);
 			else $this->wifeold = "";
 		}
 		return $this->wife;

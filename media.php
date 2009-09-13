@@ -51,7 +51,7 @@ if ($disp1 == "block") $disp2 = "none";
 
 $AUTO_GENERATE_THUMBS = $autothumbs;
 
-print_header($gm_lang["manage_media"]." - ".$GEDCOMS[$GEDCOM]['title']);
+print_header($gm_lang["manage_media"]." - ".$GEDCOMS[$GEDCOMID]['title']);
 
 if ($action == "delete") {
 	MediaFS::DeleteFile(basename($file), RelativePathFile($directory));
@@ -376,7 +376,7 @@ if ($disp1 == "block") {
 	$cols = 1; // 1 or 2
 	print "\n<div id=\"content\" style=\"display: ".$disp1.";\">";
 		print "\n<div class=\"".$TEXT_DIRECTION."\">";
-			print "<div class=\"admin_topbottombar\">".$gm_lang["manage_media"]." - ".$GEDCOMS[$GEDCOM]['title'];
+			print "<div class=\"admin_topbottombar\">".$gm_lang["manage_media"]." - ".$GEDCOMS[$GEDCOMID]['title'];
 			if (!empty($error)) print "<br /><span class=\"error\">".$error."</span>";
 			print "<br />".$gm_lang["files_found"]."&nbsp;".count($files);
 			print "</div>";
@@ -536,7 +536,7 @@ if ($disp2 == "block") {
 	// Setup the middle box
 	print "\n<div id=\"content\" style=\"display: ".$disp2.";\">";
 		print "\n<div class=\"".$TEXT_DIRECTION."\">";
-			print "<div class=\"admin_topbottombar\">".$gm_lang["manage_media"]." - ".$GEDCOMS[$GEDCOM]['title'];
+			print "<div class=\"admin_topbottombar\">".$gm_lang["manage_media"]." - ".$GEDCOMS[$GEDCOMID]['title'];
 			if (!empty($error)) print "<br /><span class=\"error\">".$error."</span>";
 			print "</div>";
 			

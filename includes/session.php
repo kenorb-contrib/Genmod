@@ -207,7 +207,8 @@ if (isset($CONFIG_PARMS)) {
 	}
 }
 //-- if not configured then redirect to the configuration script
-if (!CONFIGURED) {
+if (!defined("CONFIGURED") || CONFIGURED == false) {
+	print defined(CONFIGURED);
 	if (file_exists("install/install.php")) {
 	header("Location: install/install.php");
 	exit;
@@ -293,7 +294,6 @@ require_once($GM_BASE_DIRECTORY."includes/functions/functions_language.php");
 require_once($GM_BASE_DIRECTORY."includes/functions/functions_db.php");
 // -- load print functions
 require_once($GM_BASE_DIRECTORY."includes/functions/functions_print.php");
-require_once($GM_BASE_DIRECTORY."includes/functions/functions_objprint.php");
 //-- load RTL functions
 require_once($GM_BASE_DIRECTORY."includes/functions/functions_rtl.php");
 //-- load date functions
@@ -382,10 +382,18 @@ if (CONFIGURED) if ($DBCONN->connected) ReadGedcoms();
 else $GEDCOMS = array();
 
 if (empty($_REQUEST["gedid"])) {
+	// Try to get the gedcom id from the session
 	if (isset($_SESSION["GEDCOMID"]) && !empty($_SESSION["GEDCOMID"])) $GEDCOMID = $_SESSION["GEDCOMID"];
 	else {
 		// NOTE: There is no session Gedcom ID yet, and no ID was specified so get the default gedcom
 		if (empty($GEDCOMID)) $GEDCOMID=$DEFAULT_GEDCOMID;
+		// If still empty, get the first imported gedcom's id
+		else if ((empty($GEDCOMID))&&(count($GEDCOMS)>0)) {
+			foreach($GEDCOMS as $ged_file=>$ged_array) {
+				$GEDCOMID = $ged_file;
+				if (CheckForImport($ged_file)) break;
+			}
+		}
 	}
 }
 else {
@@ -393,43 +401,8 @@ else {
 	settype($_REQUEST["gedid"], "integer");
 	$GEDCOMID = $_REQUEST["gedid"];
 }
+//if (!empty($GEDCOMID)) $GEDCOM = $GEDCOMS[$GEDCOMID]["gedcom"];
 
-// TODO: Delete the code below
-// NOTE: Below the code for setting the GEDCOM name
-if (!isset($DEFAULT_GEDCOM)) $DEFAULT_GEDCOM = "";
-if (empty($_REQUEST["GEDCOM"])) {
-	if (isset($_SESSION["GEDCOM"]) && !empty($_SESSION["GEDCOM"]) && isset($GEDCOMS[$_SESSION["GEDCOM"]])) $GEDCOM = $_SESSION["GEDCOM"];
-	else {
-		if ((empty($GEDCOM))||(empty($GEDCOMS[$GEDCOM]))) $GEDCOM=$DEFAULT_GEDCOM;
-		else if ((empty($GEDCOM))&&(count($GEDCOMS)>0)) {
-			foreach($GEDCOMS as $ged_file=>$ged_array) {
-				$GEDCOM = $ged_file;
-				if (CheckForImport($ged_file)) break;
-			}
-		}
-	}
-}
-else {
-	// Check if garbage is feeded with the URL
-	if (isset($GEDCOMS[$GEDCOM])) $GEDCOM = $_REQUEST["GEDCOM"];
-	else {
-		$GEDCOM = $DEFAULT_GEDCOM;
-	}
-	$GEDCOMID = $GEDCOMID = $GEDCOMS[$GEDCOM]["id"];
-}
-
-if (isset($_REQUEST["ged"]) && !empty($_REQUEST["ged"])) {
-	$GEDCOM = trim($_REQUEST["ged"]);
-	// Check if garbage is feeded with the URL
-	if (isset($GEDCOMS[$GEDCOM])) $GEDCOMID = $GEDCOMS[$GEDCOM]["id"];
-	else {
-		$GEDCOM = $DEFAULT_GEDCOM;
-		$GEDCOMID = $GEDCOMID = $GEDCOMS[$GEDCOM]["id"];
-	}
-}
-
-if (is_int($GEDCOM)) $GEDCOM = get_gedcom_from_id($GEDCOM);
-$_SESSION["GEDCOM"] = $GEDCOM;
 $_SESSION["GEDCOMID"] = $GEDCOMID;
 
 $INDILIST_RETRIEVED = false;
@@ -439,7 +412,7 @@ $FAMLIST_RETRIEVED = false;
 $without_close = true;
 
 require_once($GM_BASE_DIRECTORY."config_gedcom.php");
-if (CONFIGURED) if ($DBCONN->connected) GedcomConfig::ReadGedcomConfig(get_gedcom_from_id($GEDCOMID));
+if (CONFIGURED) if ($DBCONN->connected) GedcomConfig::ReadGedcomConfig($GEDCOMID);
 require_once($GM_BASE_DIRECTORY."includes/functions/functions_name.php");
 require_once($GM_BASE_DIRECTORY."includes/functions/functions_search.php");
 
@@ -592,7 +565,7 @@ if (!empty($CLANGUAGE) && !$spider) {
 
 // If we still don't know the language, set it to the gedcom language. If all else fails, pick english.
 if (!isset($LANGUAGE)) {
-	if (isset(GedcomConfig::$GEDCONF[$GEDCOM])) $LANGUAGE = GedcomConfig::$GEDCONF[$GEDCOM]["GEDCOMLANG"];
+	if (isset(GedcomConfig::$GEDCONF[$GEDCOMID])) $LANGUAGE = GedcomConfig::$GEDCONF[$GEDCOMID]["GEDCOMLANG"];
 	else $LANGUAGE="english";
 }
 
@@ -716,7 +689,7 @@ if ((strstr($SCRIPT_NAME, "editconfig.php")===false) &&(strstr($SCRIPT_NAME, "ed
 	&&(strstr($SCRIPT_NAME, "useradmin.php")===false)
 	&&(strstr($SCRIPT_NAME, "validategedcom.php")===false)
 	&&(strstr($SCRIPT_NAME, "viewlog.php")===false)) {
-		if (((count($GEDCOMS)==0)||(!CheckForImport($GEDCOM)))&&empty($logout)) {
+		if (((count($GEDCOMS)==0)||(!CheckForImport($GEDCOMID)))&&empty($logout)) {
 			header("Location: editgedcoms.php");
 			exit;
 		}
@@ -753,8 +726,8 @@ if ((strstr($SCRIPT_NAME, "editconfig.php")===false) &&(strstr($SCRIPT_NAME, "ed
 						if ((!isset($_SERVER['HTTP_REFERER'])) || (stristr($_SERVER['HTTP_REFERER'],SERVER_URL)===false)) $url .= "&command=gedcom";
 					}
 				}
-				if (stristr($url, "ged=")===false)  {
-					$url.="&ged=".$GEDCOM;
+				if (stristr($url, "gedid=")===false)  {
+					$url.="&gedid=".$GEDCOMID;
 				}
 				if (LOGIN_URL == "") header("Location: login.php?url=".urlencode($url));
 				else header("Location: ".LOGIN_URL."?url=".urlencode($url));

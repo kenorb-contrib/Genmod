@@ -36,14 +36,13 @@ abstract class PrivacyController {
 	// If the ID is empty, it will return settings from the default values in the PrivacyObject class.
 	// The settings from the specified object are globalized here.
 	public function ReadPrivacy($gedcomid="", $user_override=true) {
-		global $GEDCOMS, $GEDCOMID;
+		global $GEDCOMID;
 
 		if (empty($gedcomid)) $gedcomid = $GEDCOMID;
 		
 		// If we read the settings with no user overrides, we must renew it. Cached are the ones read from session.php, WITH overrides from the user privacy settings.
 		$priv =& PrivacyObject::GetInstance($gedcomid, $user_override);
 		$vars = Get_Object_vars($priv);
-
 		foreach ($vars as $name => $value) {
 			if ($name != "GEDCOM" && $name != "GEDCOMID" && $name != "classname" && $name != "is_empty") {
 				global $$name;
@@ -55,7 +54,7 @@ abstract class PrivacyController {
 	
 	// This deletes settings for a specific gedcomid from cache and from the DB
 	public function DeletePrivacy($gedcomid) {
-		global $DBCONN, $GEDCOMS;
+		global $DBCONN;
 
 		if (!isset($gedcomid)) return false;
 		if (!$DBCONN->connected) return false;

@@ -119,7 +119,7 @@ function print_fan_chart($treeid, $fanw=640, $fandeg=270) {
 	global $PEDIGREE_GENERATIONS, $fan_width, $fan_style, $cw, $fontsize;
 	global $name, $gm_lang, $SHOW_ID_NUMBERS, $view, $TEXT_DIRECTION;
 	global $stylesheet, $print_stylesheet, $gm_username;
-	global $GM_IMAGE_DIR, $GM_IMAGES, $LINK_ICONS, $GEDCOM;
+	global $GM_IMAGE_DIR, $GM_IMAGES, $LINK_ICONS, $GEDCOMID;
 
 	// check for GD 2.x library
 	if (!defined("IMG_ARC_PIE")) {
@@ -218,7 +218,7 @@ require_once("fonts/".$ff[0].".php");
 	$username = $gm_username;
 	if (!empty($username)) {
 		$tuser =& User::GetInstance($username);
-		if (!empty($tuser->gedcomid[$GEDCOM])) $reltome=true;
+		if (!empty($tuser->gedcomid[$GEDCOMID])) $reltome=true;
 	}
 
 	// loop to create fan cells
@@ -375,7 +375,7 @@ print " ".strlen($altname)." ".$wmax." ".$name." ";
 				print "</a>\n";
 				print "<br /><a href=\"pedigree.php?rootid=$pid\" >".$gm_lang["index_header"]."</a>\n";
 				print "<br /><a href=\"descendancy.php?pid=$pid\" >".$gm_lang["descend_chart"]."</a>\n";
-				if ($reltome)  print "<br /><a href=\"relationship.php?pid1=".$tuser->gedcomid[$GEDCOM]."&amp;pid2=".$pid."&amp;ged=$GEDCOM\" onmouseover=\"clear_family_box_timeout('".$pid.".".$count."');\" onmouseout=\"family_box_timeout('".$pid.".".$count."');\">".$gm_lang["relationship_to_me"]."</a>\n";
+				if ($reltome)  print "<br /><a href=\"relationship.php?pid1=".$tuser->gedcomid[$GEDCOMID]."&amp;pid2=".$pid."&amp;ged=$GEDCOMID\" onmouseover=\"clear_family_box_timeout('".$pid.".".$count."');\" onmouseout=\"family_box_timeout('".$pid.".".$count."');\">".$gm_lang["relationship_to_me"]."</a>\n";
 				print "<br /><a href=\"ancestry.php?rootid=$pid\" onmouseover=\"clear_family_box_timeout('".$pid.".".$count."');\" onmouseout=\"family_box_timeout('".$pid.".".$count."');\">".$gm_lang["ancestry_chart"]."</a>\n";
 				print "<br /><a href=\"fanchart.php?rootid=$pid&amp;PEDIGREE_GENERATIONS=$PEDIGREE_GENERATIONS&amp;fan_width=$fan_width&amp;fan_style=$fan_style\" onmouseover=\"clear_family_box_timeout('".$pid.".".$count."');\" onmouseout=\"family_box_timeout('".$pid.".".$count."');\">".$gm_lang["fan_chart"]."</a>\n";
 				print "<br /><a href=\"hourglass.php?pid=$pid\" onmouseover=\"clear_family_box_timeout('".$pid.".".$count."');\" onmouseout=\"family_box_timeout('".$pid.".".$count."');\">".$gm_lang["hourglass_chart"]."</a>\n";

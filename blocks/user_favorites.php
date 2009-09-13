@@ -34,9 +34,9 @@ $GM_BLOCKS["print_user_favorites"]["rss"]		= false;
 
 //-- print user favorites
 function print_user_favorites($block=true, $config="", $side, $index) {
-	global $gm_lang, $GM_IMAGE_DIR, $GM_IMAGES, $GEDCOMS, $GEDCOM, $GEDCOMID, $TEXT_DIRECTION, $MEDIA_DIRECTORY,  $MEDIA_DIRECTORY_LEVELS, $command, $indilist, $sourcelist, $gm_username;
+	global $gm_lang, $GM_IMAGE_DIR, $GM_IMAGES, $command, $gm_user;
 
-		$userfavs = FavoritesController::getUserFavorites($gm_username);
+		$userfavs = FavoritesController::getUserFavorites($gm_user->username);
 		if (!is_array($userfavs)) $userfavs = array();
 		print "<!-- Start of user favorites //-->";
 		print "<div id=\"user_favorites\" class=\"block\">\n"; // block
@@ -63,11 +63,11 @@ function print_user_favorites($block=true, $config="", $side, $index) {
 }
 
 function print_user_favorites_config($favid="") {
-	global $gm_username, $gm_lang;
+	global $gm_user, $gm_lang;
 	
 	if ($favid == "" && isset($_GET["favid"])) $favid = $_GET["favid"];
 	
-	$userfave = FavoritesController::getUserFavorites($gm_username, $favid);
+	$userfave = FavoritesController::getUserFavorites($gm_user->username, $favid);
 	$fav = $userfave[0];
 	
 	print "<br />";

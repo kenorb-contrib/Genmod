@@ -430,7 +430,7 @@ if ($level > 0) {
 			print "\n\t\t<td class=\"shade1 wrap\">";
 			print "\n<ul>";
 			foreach ($indisurnames as $indexval => $value) {
-	    		print_list_person($value["gid"], array($value["name"], $GEDCOM));
+	    		print_list_person($value["gid"], array($value["name"], $GEDCOMID));
 				$i++;
 			}
 			/*
@@ -488,7 +488,7 @@ if ($level > 0) {
 			print "<td class=\"shade1 wrap\">";
 			print "\n<ul>";
 			foreach ($surnames as $indexval => $value) {
-				print_list_family($value["gid"], array($value["name"], $GEDCOM));
+				print_list_family($value["gid"], array($value["name"], $GEDCOMID));
 				$i++;
 			}
 			/*if ($fam_hide>0) {

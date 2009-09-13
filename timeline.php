@@ -317,7 +317,7 @@ $controller->checkPrivacy();
 		<?php
 		}
 		else {
-			PrintPrivacyError($CONTACT_EMAIL);
+			PrintFunctions::PrintPrivacyError($CONTACT_EMAIL);
 			?>
 			<input type="hidden" name="pids[<?php print $p; ?>]" value="<?php print $pid; ?>" />
 			<?php if (!$controller->isPrintPreview()) {

@@ -145,7 +145,7 @@ $outputmenu["Calendar"] = Array
 	//-->
 	</script>
 	<?php
-	global $gm_lang, $gm_username, $GEDCOMS, $GEDCOM, $HOME_SITE_URL, $HOME_SITE_TEXT,$GM_IMAGE_DIR, $GM_IMAGES, $gm_user;
+	global $gm_lang, $gm_username, $GEDCOMS, $HOME_SITE_URL, $HOME_SITE_TEXT,$GM_IMAGE_DIR, $GM_IMAGES, $gm_user;
 	if ($TEXT_DIRECTION == "ltr") {
 		$rdir = "right";
 		$ldir = "left";
@@ -155,10 +155,10 @@ $outputmenu["Calendar"] = Array
 		$ldir = "right";
 	}
 	?>
-	<?php if (isset($GEDCOMS[$GEDCOM])) { ?>
+	<?php if (isset($GEDCOMS[$GEDCOMID])) { ?>
 		<div style="width: 1em; height: 1em;">
 		<a href="index.php?command=gedcom">
-		<img src="<?php print $GM_IMAGE_DIR."/".$GM_IMAGES['gedcom']['small']; ?>" alt="<?php print $GEDCOMS[$GEDCOM]['title']; ?>" />
+		<img src="<?php print $GM_IMAGE_DIR."/".$GM_IMAGES['gedcom']['small']; ?>" alt="<?php print $GEDCOMS[$GEDCOMID]['title']; ?>" />
 		</a>
 		</div>
 	<?php } 
@@ -174,7 +174,7 @@ $outputmenu["Calendar"] = Array
 		</div>
 		<div class="shade1" style="float: <?php print $rdir; ?>; text-align: <?php print $ldir; ?>; margin-<?php print $rdir; ?>: 0em; width: 20em;">
 			<?php 
-			if (isset($gm_user->gedcomid[$GEDCOM]) && !empty($gm_user->gedcomid[$GEDCOM]) && PrivacyFunctions::DisplayDetailsByID($gm_user->gedcomid[$GEDCOM])) print "<a href=\"individual.php?pid=".$gm_user->gedcomid[$GEDCOM]."\">".$gm_user->firstname.' '.$gm_user->lastname."</a><br />";
+			if (isset($gm_user->gedcomid[$GEDCOMID]) && !empty($gm_user->gedcomid[$GEDCOMID]) && PrivacyFunctions::DisplayDetailsByID($gm_user->gedcomid[$GEDCOMID])) print "<a href=\"individual.php?pid=".$gm_user->gedcomid[$GEDCOMID]."\">".$gm_user->firstname.' '.$gm_user->lastname."</a><br />";
 			else echo $gm_user->firstname.' '.$gm_user->lastname.'<br />';
 			echo "<a href=\"".$HOME_SITE_URL."\">".$HOME_SITE_TEXT."</a>";
 			?>

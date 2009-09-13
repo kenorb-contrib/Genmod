@@ -726,7 +726,7 @@ abstract class DetailController extends BaseController{
 		$object_name = $this->object_name;
 		if (!$this->$object_name->disp && !($this->$object_name->datatype == "INDI" && $this->$object_name->disp_name)) {
 			$this->PrintDetailJS();
-			PrintPrivacyError($CONTACT_EMAIL);
+			PrintFunctions::PrintPrivacyError($CONTACT_EMAIL);
 			print_footer();
 			exit;
 		}
@@ -742,7 +742,7 @@ abstract class DetailController extends BaseController{
 	private function HasUnapprovedLinks() {
 		
 		if ($this->show_changes) {
-			$sql = "SELECT count(ch_id) FROM ".TBLPREFIX."changes WHERE ch_gedfile='".$this->gedcomid."' AND ch_fact NOT IN ('HUSB', 'WIFE', 'CHIL', 'FAMC', 'FAMS', 'INDI') AND ((ch_new LIKE '%@".$this->xref."@%' AND ch_new NOT LIKE '%0 @".$this->xref."@%') OR (ch_old LIKE '%@".$this->xref."@%' AND ch_old NOT LIKE '0 @".$this->xref."@%'))";
+			$sql = "SELECT count(ch_id) FROM ".TBLPREFIX."changes WHERE ch_file='".$this->gedcomid."' AND ch_fact NOT IN ('HUSB', 'WIFE', 'CHIL', 'FAMC', 'FAMS', 'INDI') AND ((ch_new LIKE '%@".$this->xref."@%' AND ch_new NOT LIKE '%0 @".$this->xref."@%') OR (ch_old LIKE '%@".$this->xref."@%' AND ch_old NOT LIKE '0 @".$this->xref."@%'))";
 			$res = NewQuery($sql);
 			$row = $res->FetchRow();
 			return $row[0];
@@ -758,7 +758,7 @@ abstract class DetailController extends BaseController{
 				print "<tr><td class=\"width20 shade2 center".$style."\" style=\"vertical-align: middle;\">";
 				print "&nbsp;</td>"; // No relation for former wives
 				print "<td class=\"".$this->getPersonStyle($family->husbold).$style."\">";
-				PrintPedigreePerson($family->husbold, 2, true, $prtcount, 1, $this->view);
+				PersonFunctions::PrintPedigreePerson($family->husbold, 2, true, $prtcount, 1, $this->view);
 				$prtcount++;
 				print "</td></tr>";
 			}
@@ -768,7 +768,7 @@ abstract class DetailController extends BaseController{
 				print "<tr><td class=\"width20 shade2 center".$style."\" style=\"vertical-align: middle;\">";
 				print $family->husb->label[$family->xref]."</td>";
 				print "<td class=\"".$this->getPersonStyle($family->husb).$style."\">";
-				PrintPedigreePerson($family->husb, 2, true, $prtcount, 2, $this->view);
+				PersonFunctions::PrintPedigreePerson($family->husb, 2, true, $prtcount, 2, $this->view);
 				$prtcount++;
 				print "</td></tr>";
 			}
@@ -779,7 +779,7 @@ abstract class DetailController extends BaseController{
 				print "<tr><td class=\"width20 shade2 center".$style."\" style=\"vertical-align: middle;\">";
 				print "&nbsp;</td>"; // No relation for former husbands
 				print "<td class=\"".$this->getPersonStyle($family->wifeold).$style."\">";
-				PrintPedigreePerson($family->wifeold, 2, true, $prtcount, 1, $this->view);
+				PersonFunctions::PrintPedigreePerson($family->wifeold, 2, true, $prtcount, 1, $this->view);
 				$prtcount++;
 				print "</td></tr>";
 			}
@@ -789,7 +789,7 @@ abstract class DetailController extends BaseController{
 				print "<tr><td class=\"width20 shade2 center".$style."\" style=\"vertical-align: middle;\">";
 				print $family->wife->label[$family->xref]."</td>";
 				print "<td class=\"".$this->getPersonStyle($family->wife).$style."\">";
-				PrintPedigreePerson($family->wife, 2, true, $prtcount, 2, $this->view);
+				PersonFunctions::PrintPedigreePerson($family->wife, 2, true, $prtcount, 2, $this->view);
 				$prtcount++;
 				print "</td></tr>";
 			}
@@ -810,7 +810,7 @@ abstract class DetailController extends BaseController{
 				print "<tr><td class=\"width20 shade2 center".$style."\" style=\"vertical-align: middle;\">";
 				print $child->label[$family->xref]."</td>";
 				print "<td class=\"".$this->getPersonStyle($child).$style."\">";
-				PrintPedigreePerson($child, 2 , true, $prtcount, 1, $this->view);
+				PersonFunctions::PrintPedigreePerson($child, 2 , true, $prtcount, 1, $this->view);
 				$prtcount++;
 				print "</td></tr>";
 			}

@@ -301,7 +301,7 @@ print "</div>\n";
 
 $maxyoffset = $Dbaseyoffset;
 if ((!empty($pid1))&&(!empty($pid2))) {
-	if (!$disp) PrintPrivacyError($CONTACT_EMAIL);
+	if (!$disp) PrintFunctions::PrintPrivacyError($CONTACT_EMAIL);
 	else {
 		if (isset($_SESSION["relationships"][$path_to_find])) $node = $_SESSION["relationships"][$path_to_find];
 		else $node = GetRelationship($pid1, $pid2, $followspouse, 0, true, $path_to_find);

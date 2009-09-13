@@ -30,10 +30,10 @@ if (strstr($_SERVER["SCRIPT_NAME"],"hitcount.php")) {
 //only do counter stuff if counters are enabled
 if($SHOW_COUNTER) {
 	// set some vars global if this script is called from within a function
-	global $GEDCOM, $GEDCOMID, $GM_IMAGES, $GM_IMAGE_DIR, $bot;
+	global $GEDCOMID, $GM_IMAGES, $GM_IMAGE_DIR, $bot;
 
-	$GM_COUNTER_NAME     = $GEDCOM."gm_counter";
-	$GM_INDI_COUNTER_NAME = $GEDCOM."gm_indi_counter";
+	$GM_COUNTER_NAME     = $GEDCOMID."gm_counter";
+	$GM_INDI_COUNTER_NAME = $GEDCOMID."gm_indi_counter";
 
 	// First check if any id is set. If not, we assume it's the index page
 	if (isset($pid) || isset($famid) || isset($sid) || isset($rid) || isset($oid)) {

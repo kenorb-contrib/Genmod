@@ -103,7 +103,7 @@ function print_descendency($pid, $count) {
 	if ($show_spouse) {
 		foreach($famids as $indexval => $famid) {
 			$famrec = FindFamilyRecord($famid["famid"]);
-			if (!empty($famrec)) {
+			if (!empty($famrec) && PrivacyFunctions::DisplayDetailsById($famid["famid"], "FAM")) {
 				$marrec = GetSubRecord(1, "1 MARR", $famrec);
 				if (!empty($marrec)) {
 					print "<br />";
@@ -118,12 +118,12 @@ function print_descendency($pid, $count) {
 	if ($show_spouse) {
 		foreach($famids as $indexval => $famid) {
 			$famrec = FindFamilyRecord($famid["famid"]);
-			if (!empty($famrec)) {
+			if (!empty($famrec) && PrivacyFunctions::DisplayDetailsById($famid["famid"], "FAM")) {
 				$parents = FindParentsInRecord($famrec);
 				$marrec = GetSubRecord(1, "1 MARR", $famrec);
 				if (!empty($marrec)) {
 					print "<br />";
-					print_simple_fact($famrec, "1 MARR", $famid);
+					print_simple_fact($famrec, "MARR", $famid["famid"]);
 				}
 				if ($parents["HUSB"]!=$pid) print_pedigree_person($parents["HUSB"], 1, true, $boxcount);
 				else print_pedigree_person($parents["WIFE"], 1, true, $boxcount);

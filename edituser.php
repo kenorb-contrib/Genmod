@@ -86,7 +86,7 @@ if ($action=="edituser2") {
 			$newuser->username = $username;
 			$newuser->firstname = $firstname;
 			$newuser->lastname = $lastname;
-			$newuser->rootid[$GEDCOM] = $rootid;
+			$newuser->rootid[$GEDCOMID] = $rootid;
 			if (isset($user_language)) $newuser->language = $user_language;
 			if ($olduser->email != $user_email) $sync_data_changed = true;
 			$newuser->email = $user_email;
@@ -100,14 +100,13 @@ if ($action=="edituser2") {
 			
 			//-- update Gedcom record with new email address
 			if ($gm_user->sync_gedcom == "Y" && $sync_data_changed && !empty($user->email)) {
-				$oldged = $GEDCOM;
-				foreach($gm_user->gedcomid as $gedc=>$gedid) {
-					if (!empty($gedid) && isset($GEDCOMS[$gedc])) {
-						$GEDCOM = $gedc;
-						$GEDCOMID = $GEDCOMS[$GEDCOM]["id"];
+				$oldged = $GEDCOMID;
+				foreach($gm_user->gedcomid as $gedcid=>$gedid) {
+					if (!empty($gedid) && isset($GEDCOMS[$gedcid])) {
+						$GEDCOMID = $gedcid;
 						$indirec = FindPersonRecord($gedid);
 						$rec = GetChangeData(false, $gedid, true, "gedlines", "");
-						if (isset($rec[$GEDCOM][$gedid])) $indirec = $rec[$GEDCOM][$gedid];
+						if (isset($rec[$GEDCOMID][$gedid])) $indirec = $rec[$GEDCOMID][$gedid];
 						if (!empty($indirec)) {
 							$change_id = GetNewXref("CHANGE");
 							if (preg_match("/(\d) (_?EMAIL .+)/", $indirec, $match)>0) {
@@ -123,8 +122,7 @@ if ($action=="edituser2") {
 						}
 					}
 				}
-				$GEDCOM = $oldged;
-				$GEDCOMID = $GEDCOMS[$GEDCOM]["id"];
+				$GEDCOMID = $oldged;
 			}
 		}
 		else {
@@ -181,15 +179,15 @@ if ($action=="edituser2") {
 	<tr><td class="shade2 wrap"><div class="helpicon"><?php print_help_link("edituser_lastname_help", "qm"); print "</div><div class=\"description\">"; print $gm_lang["lastname"];?></div></td><td class="shade1"><input type="text" name="lastname" tabindex="<?php $tab++; print $tab; ?>" value="<?php print $gm_user->lastname?>" /></td></tr>
 	<tr><td class="shade2 wrap"><div class="helpicon"><?php print_help_link("edituser_gedcomid_help", "qm"); print "</div><div class=\"description\">"; print $gm_lang["gedcomid"];?></div></td><td class="shade1">
 		<?php
-			if (!empty($gm_user->gedcomid[$GEDCOM])) {
+			if (!empty($gm_user->gedcomid[$GEDCOMID])) {
 				print "<ul>";
-				print_list_person($gm_user->gedcomid[$GEDCOM], array(GetPersonName($gm_user->gedcomid[$GEDCOM]), $GEDCOM));
+				print_list_person($gm_user->gedcomid[$GEDCOMID], array(GetPersonName($gm_user->gedcomid[$GEDCOMID]), $GEDCOMID));
 				print "</ul>";
 			}
 			else print "&nbsp;";
 		?>
 	</td></tr>
-	<tr><td class="shade2 wrap"><div class="helpicon"><?php print_help_link("edituser_rootid_help", "qm"); print "</div><div class=\"description\">"; print $gm_lang["rootid"];?></div></td><td class="shade1"><input type="text" name="rootid" id="rootid" tabindex="<?php $tab++; print $tab; ?>" value="<?php if (isset($gm_user->rootid[$GEDCOM])) print $gm_user->rootid[$GEDCOM]; ?>" />
+	<tr><td class="shade2 wrap"><div class="helpicon"><?php print_help_link("edituser_rootid_help", "qm"); print "</div><div class=\"description\">"; print $gm_lang["rootid"];?></div></td><td class="shade1"><input type="text" name="rootid" id="rootid" tabindex="<?php $tab++; print $tab; ?>" value="<?php if (isset($gm_user->rootid[$GEDCOMID])) print $gm_user->rootid[$GEDCOMID]; ?>" />
 	<?php LinkFunctions::PrintFindIndiLink("rootid",$GEDCOMID); ?>
 	</td></tr>
 	<tr><td class="shade2 wrap"><div class="helpicon"><?php print_help_link("edituser_password_help", "qm"); print "</div><div class=\"description\">"; print $gm_lang["password"];?></div></td><td class="shade1"><input type="password" name="pass1" tabindex="<?php $tab++; print $tab; ?>" /><br /><?php print $gm_lang["leave_blank"];?></td></tr>

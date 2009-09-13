@@ -48,7 +48,7 @@ if ($action == "quickstart") {
 	}
 	if (isset($crossged) && $crossged == "yes" && $ALLOW_CHANGE_GEDCOM) {
 		foreach ($GEDCOMS as $key=>$ged) {
-			$str = preg_replace(array("/\./","/-/","/ /"), array("_","_","_"), $key);
+			$str = "sg".$key;
 			$$str = "yes";
 		}
 	}
@@ -107,7 +107,7 @@ if (isset($topsearch)) {
 	$srindi = "yes";
 	
 	// Enable the default gedcom for search
-	$str = preg_replace(array("/\./","/-/","/ /"), array("_","_","_"), $GEDCOM);
+	$str = "sg".$GEDCOMID;
 	$$str = "yes";
 
 	// Then see if an ID is typed in. If so, we might want to jump there.
@@ -116,7 +116,7 @@ if (isset($topsearch)) {
 		// see if it's an indi ID. If it's found and privacy allows it, JUMP!!!!
 		if (FindPersonRecord($query)) {
 			if (PrivacyFunctions::showLivingNameByID(str2upper($query))) {
-				header("Location: individual.php?pid=".$query."&ged=".$GEDCOM);
+				header("Location: individual.php?pid=".$query."&gedid=".$GEDCOMID);
 				exit;
 			}
 		}
@@ -131,7 +131,7 @@ if (isset($topsearch)) {
 					$ct = preg_match("/0 @(.*)@ (.*)/", $f, $match);
 					if ($ct>0) {
 						$fid = trim($match[1]);
-						header("Location: family.php?famid=".$fid."&ged=".$GEDCOM);
+						header("Location: family.php?famid=".$fid."&gedid=".$GEDCOMID);
 						exit;
 					}
 				}
@@ -141,7 +141,7 @@ if (isset($topsearch)) {
 		// see if it's an source ID. If it's found and privacy allows it, JUMP!!!!
 		if ($SHOW_SOURCES >= $gm_user->getUserAccessLevel()) {
 			if (FindSourceRecord($query)) {
-				header("Location: source.php?sid=".$query."&ged=".$GEDCOM);
+				header("Location: source.php?sid=".$query."&gedid=".$GEDCOMID);
 				exit;
 			}
 		}
@@ -149,7 +149,7 @@ if (isset($topsearch)) {
 		// see if it's a repository ID. If it's found and privacy allows it, JUMP!!!!
 		if ($SHOW_SOURCES >= $gm_user->getUserAccessLevel()) {
 			if (FindRepoRecord($query)) {
-				header("Location: repo.php?rid=".$query."&ged=".$GEDCOM);
+				header("Location: repo.php?rid=".$query."&gedid=".$GEDCOMID);
 				exit;
 			}
 		}
@@ -157,7 +157,7 @@ if (isset($topsearch)) {
 		// see if it's a media ID. If it's found and privacy allows it, JUMP!!!!
 		$f = FindMediaRecord($query);
 		if (!empty($f) && PrivacyFunctions::DisplayDetailsByID(str2upper($query), "OBJE", 1, true)) {
-			header("Location: mediadetail.php?mid=".$query."&ged=".$GEDCOM);
+			header("Location: mediadetail.php?mid=".$query."&gedid=".$GEDCOMID);
 			exit;
 		}
 		
@@ -166,7 +166,7 @@ if (isset($topsearch)) {
 		if (!empty($f) && PrivacyFunctions::DisplayDetailsByID(str2upper($query), "NOTE", 1, true)) {
 			$type = GetRecType($f);
 			if ($type == "NOTE") {
-				header("Location: note.php?oid=".$query."&ged=".$GEDCOM);
+				header("Location: note.php?oid=".$query."&gedid=".$GEDCOMID);
 				exit;
 			}
 		}
@@ -178,17 +178,17 @@ $sgeds = array();
 if (($ALLOW_CHANGE_GEDCOM) && (count($GEDCOMS) > 1)) {
 	foreach ($GEDCOMS as $key=>$ged) {
 		// BUT we must NOT search in a gedcom with authentication required and a user not logged in!
-		$str = preg_replace(array("/\./","/-/","/ /"), array("_","_","_"), $key);
+		$str = "sg".$key;
 		SwitchGedcom($key);
 		if ($REQUIRE_AUTHENTICATION && empty($gm_username)) unset($$str);
 		if (isset($$str)) $sgeds[] = $key;
 	}
 	SwitchGedcom();
 }
-else $sgeds[] = $GEDCOM;
+else $sgeds[] = $GEDCOMID;
 
 // if no search gedcom is specified, take the default gedcom
-if (empty($sgeds)) $sgeds[] = $GEDCOM;
+if (empty($sgeds)) $sgeds[] = $GEDCOMID;
 
 // If we want to show associated persons, build the list
 if ($showasso == "on") GetAssoList();
@@ -302,12 +302,12 @@ if ($action=="general") {
 			// Check for privacy first. If ID cannot be displayed, continue to the search page.
 			if ((count($sindilist)==1)&&(count($sfamlist)==0)&&(count($ssourcelist)==0) && (count($srepolist)==0) && (count($media->medialist)==0) && count($note_controller->notelist) == 0 && (isset($srindi))) {
 				foreach($sindilist as $key=>$indi) {
-					$ged = SplitKey($key, "ged");
+					$ged = SplitKey($key, "gedid");
 					$pid = SplitKey($key, "id");
 					SwitchGedcom($ged);
 					if (!isset($assolist[$key])) {
 						if (PrivacyFunctions::showLivingNameByID($pid)) {
-							header("Location: individual.php?pid=".$pid."&ged=".get_gedcom_from_id($indi["gedfile"]));
+							header("Location: individual.php?pid=".$pid."&gedid=".$indi["gedfile"]);
 							exit;
 						}
 					}
@@ -316,13 +316,13 @@ if ($action=="general") {
 			}
 			if ((count($sindilist)==0 || !isset($srindi))&&(count($sfamlist)==1)&&(count($ssourcelist)==0) && (count($srepolist)==0) && (count($media->medialist)==0) && count($note_controller->notelist) == 0) {
 				foreach($sfamlist as $famid=>$fam) {
-					$ged = SplitKey($famid, "ged");
+					$ged = SplitKey($famid, "gedid");
 					$famid = SplitKey($famid, "id");
 					SwitchGedcom($ged);
 					if (PrivacyFunctions::displayDetailsByID($famid, "FAM") == true) {
 						$parents = FindParents($famid);
 						if (PrivacyFunctions::showLivingNameByID($parents["HUSB"]) && PrivacyFunctions::showLivingNameByID($parents["WIFE"])) {
-							header("Location: family.php?famid=".$famid."&ged=".$GEDCOM);
+							header("Location: family.php?famid=".$famid."&gedid=".$fam["gedfile"]);
 							exit;
 						}
 					}
@@ -331,11 +331,11 @@ if ($action=="general") {
 			}
 			if ((count($sindilist)==0 || !isset($srindi))&&(count($sfamlist)==0)&&(count($ssourcelist)==1) && (count($srepolist)==0) && (count($media->medialist)==0) && count($note_controller->notelist==0)) {
 				foreach($ssourcelist as $sid=>$source) {
-					$ged = SplitKey($sid, "ged");
+					$ged = SplitKey($sid, "gedid");
 					$sid = SplitKey($sid, "id");
 					SwitchGedcom($ged);
 					if (PrivacyFunctions::displayDetailsByID($sid, "SOUR", 1, true)) {
-						header("Location: source.php?sid=".$sid."&ged=".get_gedcom_from_id($source["gedfile"]));
+						header("Location: source.php?sid=".$sid."&gedid=".$source["gedfile"]);
 						exit;
 					}
 				}
@@ -343,11 +343,11 @@ if ($action=="general") {
 			}
 			if ((count($sindilist)==0 || !isset($srindi))&&(count($sfamlist)==0)&&(count($ssourcelist)==0) && (count($srepolist)==1)  && (count($media->medialist)==0)&& count($note_controller->notelist) == 0) {
 				foreach($srepolist as $rid=>$repo) {
-					$ged = SplitKey($rid, "ged");
+					$ged = SplitKey($rid, "gedid");
 					$rid = SplitKey($rid, "id");
 					SwitchGedcom($ged);
 					if (PrivacyFunctions::displayDetailsByID($rid, "REPO", 1, true)) {
-						header("Location: repo.php?rid=".$rid."&ged=".get_gedcom_from_id($repo["gedfile"]));
+						header("Location: repo.php?rid=".$rid."&gedid=".$repo["gedfile"]);
 						exit;
 					}
 				}
@@ -355,7 +355,7 @@ if ($action=="general") {
 			}
 			if ((count($sindilist)==0 || !isset($srindi))&&(count($sfamlist)==0)&&(count($ssourcelist)==0) && (count($srepolist)==0) && (count($media->medialist)==0) && count($note_controller->notelist) == 1) {
 				foreach($note_controller->notelist as $oid=>$note) {
-					header("Location: note.php?oid=".$note->xref."&ged=".get_gedcom_from_id($note->gedcomid));
+					header("Location: note.php?oid=".$note->xref."&gedid=".$note->gedcomid);
 					exit;
 				}
 			}
@@ -429,7 +429,7 @@ if ($action=="soundex") {
 			if ((!empty($place)) && ($soundex == "Russell")) $parr = soundex(trim($place));
 		}
 		// Start the search
-		$oldged = $GEDCOM;
+		$oldged = $GEDCOMID;
 		$printindiname = array();
 		$printfamname = array();
 		$indi_printed = array();
@@ -447,10 +447,10 @@ if ($action=="soundex") {
 			if (count($sgeds) != count($GEDCOMS)) {
 				$sql .= " (";
 				$i = 0;
-				foreach ($sgeds as $key => $gedcom) {
+				foreach ($sgeds as $key => $gedcomid) {
 					if ($i != 0) $sql .= " OR ";
 					$i++;
-					$sql .= "s1.s_file='".$GEDCOMS[$gedcom]["id"]."'";
+					$sql .= "s1.s_file='".$gedcomid."'";
 				}
 				$sql .= ") AND";
 			}
@@ -482,10 +482,10 @@ if ($action=="soundex") {
 				if (count($sgeds) != count($GEDCOMS)) {
 					$sql .= " (";
 					$i = 0;
-					foreach ($sgeds as $key => $gedcom) {
+					foreach ($sgeds as $key => $gedcomid) {
 						if ($i != 0) $sql .= " OR ";
 						$i++;
-						$sql .= "s2.s_file='".$GEDCOMS[$gedcom]["id"]."'";
+						$sql .= "s2.s_file='".$gedcomid."'";
 					}
 					$sql .= ") AND";
 				}
@@ -575,7 +575,7 @@ if ($action=="soundex") {
 			if ($save === true) {
 				if ($nameprt == "all") {
 					foreach($value["names"] as $indexval => $namearray) {
-						$printindiname[] = array(SortableNameFromName($namearray[0]), $ikey, get_gedcom_from_id($value["gedfile"]),"");
+						$printindiname[] = array(SortableNameFromName($namearray[0]), $ikey, $value["gedfile"],"");
 					}
 					$indi_printed[JoinKey($ikey, $value["gedfile"])] = "1";
 				}
@@ -624,7 +624,7 @@ if ($action=="soundex") {
 							}
 						}
 						if ($print) {
-							$printindiname[] = array(SortableNameFromName($namearray[0]), $ikey, get_gedcom_from_id($value["gedfile"]),"");
+							$printindiname[] = array(SortableNameFromName($namearray[0]), $ikey, $value["gedfile"],"");
 							$indi_printed[JoinKey($ikey, $value["gedfile"])] = "1";
 						}
 					}
@@ -632,8 +632,7 @@ if ($action=="soundex") {
 			}
 		}
 		DMSoundex("", "closecache");
-		$GEDCOM = $oldged;
-		$GEDCOMID = $GEDCOMS[$GEDCOM]["id"];
+		$GEDCOMID = $oldged;
 		// check the result on required characters
 		if (isset($barr)) {
 			foreach ($printindiname as $pkey=>$pname) {
@@ -655,10 +654,10 @@ if ($action=="soundex") {
 		if ($showasso == "on") SearchAddAssos();
 		//-- if only 1 item is returned, automatically forward to that item
 		if (count($printindiname)==1) {
-			$GEDCOM = $printindiname[0][2];
-			SwitchGedcom($GEDCOM);
+			$GEDCOMID = $printindiname[0][2];
+			SwitchGedcom($GEDCOMID);
 			if (PrivacyFunctions::showLivingNameByID($printindiname[0][1])) {
-				header("Location: individual.php?pid=".$printindiname[0][1]."&ged=".$printindiname[0][2]);
+				header("Location: individual.php?pid=".$printindiname[0][1]."&gedid=".$printindiname[0][2]);
 				exit;
 			}
 			SwitchGedcom();
@@ -727,9 +726,9 @@ else {
 			foreach ($GEDCOMS as $key=>$ged) {
 				SwitchGedcom($key);
 				if (!empty($gm_username) || !$REQUIRE_AUTHENTICATION) {
-					$str = preg_replace(array("/\./","/-/","/ /"), array("_","_","_"), $key);
+					$str = "sg".$key;
 					print "<input type=\"checkbox\" ";
-					if (($key == $GEDCOM) && ($action == "")) print "checked=\"checked\" ";
+					if (($key == $GEDCOMID) && ($action == "")) print "checked=\"checked\" ";
 					else {
 						if (in_array($key, $sgeds)) print "checked=\"checked\" ";
 					}
@@ -790,7 +789,7 @@ else {
 		print "<input type=\"checkbox\"";
 		if (isset($srfams)) print " checked=\"checked\"";
 		print " value=\"yes\" name=\"srfams\" />".$gm_lang["search_fams"]."<br />";
-		if (ShowSourceFromAnyGed()) {
+		if (PrivacyFunctions::ShowSourceFromAnyGed()) {
 			print "<input type=\"checkbox\"";
 			if (isset($srsour)) print " checked=\"checked\"";
 			print " value=\"yes\" name=\"srsour\" />".$gm_lang["search_sources"]."<br />";
@@ -910,9 +909,9 @@ if ($action=="general") {
 		$printfamname = array();
 		
 		$cti=count($sindilist);
-		$oldged = $GEDCOM;
+		$oldged = $GEDCOMID;
 		if (($cti>0) && (isset($srindi))) {
-			$curged = $GEDCOM;
+			$curged = $GEDCOMID;
 
 			// Add the facts in $global_facts that should not show
 			$skiptagsged = $skiptags;
@@ -923,12 +922,11 @@ if ($action=="general") {
   		  	}
 			foreach ($sindilist as $key => $value) {
 				$nodisplay = false;
-				$GEDCOM = SplitKey($key, "ged");
-				$GEDCOMID = $GEDCOMS[$GEDCOM]["id"];
+				$GEDCOMID = SplitKey($key, "gedid");
 				$key = SplitKey($key, "id");
-				if ($GEDCOM != $curged) {
+				if ($GEDCOMID != $curged) {
 					SwitchGedcom($GEDCOMID);
-					$curged = $GEDCOM;
+					$curged = $GEDCOMID;
 					// Recalculate the tags to skip
 					$skiptagsged = $skiptags;
 					foreach ($global_facts as $gfact => $gvalue) {
@@ -1004,19 +1002,20 @@ if ($action=="general") {
 				if ($found == true && $nodisplay == false) {
 					// print all names from the indi found
 			    	foreach($value["names"] as $indexval => $namearray) {
-						$printindiname[] = array(SortableNameFromName($namearray[0]), $key, get_gedcom_from_id($value["gedfile"]), "");
+						$printindiname[] = array(SortableNameFromName($namearray[0]), $key, $value["gedfile"], "");
 					}
 					$indi_printed[JoinKey($key, $GEDCOMID)] = "1";
 				}
-				else if ($hit == true) $indi_hide[$key."[".get_gedcom_from_id($value["gedfile"])."]"] = 1;
+				else if ($hit == true) $indi_hide[$key."[".$value["gedfile"]."]"] = 1;
 			}
 		}
-		
+		$GEDCOMID = $oldged;
+		SwitchGedcom($GEDCOMID);
 		// Get the fams to be printed
 		$ctf=count($sfamlist);
 		if ($ctf>0 || count($printfamname)>0) {
-			$oldged = $GEDCOM;
-			$curged = $GEDCOM;
+			$oldged = $GEDCOMID;
+			$curged = $GEDCOMID;
 			// Add the facts in $global_facts that should not show
 			$skiptagsged = $skiptags;
     		foreach ($global_facts as $gfact => $gvalue) {
@@ -1025,12 +1024,11 @@ if ($action=="general") {
 	    		}
   		  	}
 			foreach ($sfamlist as $key => $value) {
-				$GEDCOM = SplitKey($key, "ged");
-				$GEDCOMID = $GEDCOMS[$GEDCOM]["id"];
+				$GEDCOMID = SplitKey($key, "gedid");
 				$key = SplitKey($key, "id");
-				if ($GEDCOM != $curged) {
+				if ($GEDCOMID != $curged) {
 					SwitchGedcom($GEDCOMID);
-					$curged = $GEDCOM;
+					$curged = $GEDCOMID;
 					// Recalculate the tags to skip
 					$skiptagsged = $skiptags;
 					foreach ($global_facts as $gfact => $gvalue) {
@@ -1145,18 +1143,18 @@ if ($action=="general") {
 							 
 //							if ($foundf && !$founds && !$founde) // Not ok. Hit can be in both name parts!
 							if ($foundf && !$founde) {
-								$printfamname[]=array(CheckNN($famname), $key, get_gedcom_from_id($value["gedfile"]),"");
+								$printfamname[]=array(CheckNN($famname), $key, $value["gedfile"],"");
 								$fam_printed[JoinKey($key, $GEDCOMID)] = "1";
 								$printed = true;
 							}
 						}
 					}
 					if (!$printed && !$founde) {
-						$printfamname[]=array(CheckNN($value["name"][0]), $key, get_gedcom_from_id($value["gedfile"]),"");
+						$printfamname[]=array(CheckNN($value["name"][0]), $key, $value["gedfile"],"");
 						$fam_printed[JoinKey($key, $GEDCOMID)] = "1";
 					}						
 		    	}
-				else if ($hit == true) $fam_hide[$key."[".get_gedcom_from_id($value["gedfile"])."]"] = 1;
+				else if ($hit == true) $fam_hide[$key."[".$value["gedfile"]."]"] = 1;
 			}
 			SwitchGedcom();
 		}
@@ -1231,8 +1229,8 @@ if ($action=="general") {
 			$i=1;
 			uasort($printindiname, "ItemSort");
 			foreach($printindiname as $pkey => $pvalue) {
-				if (isset($sindilist[$pvalue[1]."[".$GEDCOMS[$pvalue[2]]["id"]."]"])) {
-					 $indilist[$pvalue[1]."[".$GEDCOMS[$pvalue[2]]["id"]."]"] = $sindilist[$pvalue[1]."[".$GEDCOMS[$pvalue[2]]["id"]."]"];
+				if (isset($sindilist[$pvalue[1]."[".$pvalue[2]."]"])) {
+					 $indilist[$pvalue[1]."[".$pvalue[2]."]"] = $sindilist[$pvalue[1]."[".$pvalue[2]."]"];
 				 }
 				print_list_person($pvalue[1], array(CheckNN($pvalue[0]), $pvalue[2]),"", $pvalue[3]);
 				print "\n";
@@ -1257,8 +1255,8 @@ if ($action=="general") {
 		print "<div id=\"fams\" class=\"tab_page\" style=\"display:none;\" >";
 		$ctf=count($sfamlist);
 		if ($ctf>0 || count($printfamname)>0) {
-			$oldged = $GEDCOM;
-			$curged = $GEDCOM;
+			$oldged = $GEDCOMID;
+			$curged = $GEDCOMID;
 
 			uasort($printfamname, "ItemSort");
 			print "\n\t<table class=\"list_table $TEXT_DIRECTION\">\n\t\t<tr><td class=\"shade2 center\"";
@@ -1269,7 +1267,7 @@ if ($action=="general") {
 			print "</td></tr><tr><td class=\"$TEXT_DIRECTION shade1 wrap\"><ul>";
 			$i=1;
 			foreach($printfamname as $pkey => $pvalue) {
-				$hkey = $pvalue[1]."[".$GEDCOMS[$pvalue[2]]["id"]."]";
+				$hkey = $pvalue[1]."[".$pvalue[2]."]";
 				if (isset($sfamlist[$hkey])) {
 					$famlist[$hkey] = $sfamlist[$hkey];
 				}
@@ -1296,8 +1294,8 @@ if ($action=="general") {
 		$cts=count($ssourcelist);
 		if ($cts>0) {
 			uasort($ssourcelist, "SourceSort"); 
-			$oldged = $GEDCOM;
-			$curged = $GEDCOM;
+			$oldged = $GEDCOMID;
+			$curged = $GEDCOMID;
 
 			// Add the facts in $global_facts that should not show
 			$skiptagsged = $skiptags;
@@ -1314,11 +1312,11 @@ if ($action=="general") {
 			print "</td></tr><tr><td class=\"$TEXT_DIRECTION shade1 wrap\"><ul>";
 			$i=1;
 			foreach ($ssourcelist as $key => $value) {
-				$GEDCOM = SplitKey($key, "ged");
+				$GEDCOMID = SplitKey($key, "gedid");
 				$key = SplitKey($key, "id");
-				if ($curged != $GEDCOM) {
-					SwitchGedcom($GEDCOM);
-					$curged = $GEDCOM;
+				if ($curged != $GEDCOMID) {
+					SwitchGedcom($GEDCOMID);
+					$curged = $GEDCOMID;
 					// Recalculate the tags to skip
 					$skiptagsged = $skiptags;
 					foreach ($global_facts as $gfact => $gvalue) {
@@ -1368,17 +1366,17 @@ if ($action=="general") {
 				}
 				if ($found == true) {
 					print_list_source($key, $value);
-					$sour_printed[$key."[".$GEDCOM."]"] = "1";
+					$sour_printed[$key."[".$GEDCOMID."]"] = "1";
 					if ($i==ceil($sour_count/2) && $sour_count>12) print "</ul></td><td class=\"shade1 wrap\"><ul>\n";
 					$i++;
 				}
-				else if ($hit == true) $source_hide[$key."[".get_gedcom_from_id($value["gedfile"])."]"] = 1;
+				else if ($hit == true) $source_hide[$key."[".$value["gedfile"]."]"] = 1;
 			}
 			print "\n\t\t</ul>&nbsp;</td></tr>";
 			SwitchGedcom();
 			if (count($source_total)>0) {
 			// if ($cts > 0) {
-				print "<tr><td>".$gm_lang["total_sources"]." ".count($source_total);
+				print "<tr><td>".$gm_lang["total_sources"]." ".$cts;
 				if (count($source_hide)>0) print "  --  ".$gm_lang["hidden"]." ".count($source_hide);
 				print "</td></tr>";
 			}
@@ -1392,8 +1390,8 @@ if ($action=="general") {
 		$ctr = count($srepolist);
 		if ($ctr > 0) {
 			uasort($srepolist, "SourceSort"); 
-			$oldged = $GEDCOM;
-			$curged = $GEDCOM;
+			$oldged = $GEDCOMID;
+			$curged = $GEDCOMID;
 
 			// Add the facts in $global_facts that should not show
 			$skiptagsged = $skiptags;
@@ -1410,12 +1408,11 @@ if ($action=="general") {
 			print "</td></tr><tr><td class=\"$TEXT_DIRECTION shade1 wrap\"><ul>";
 			$i=1;
 			foreach ($srepolist as $key => $value) {
-				$GEDCOM = SplitKey($key, "ged");
-				$GEDCOMID = $GEDCOMS[$GEDCOM]["id"];
+				$GEDCOMID = SplitKey($key, "gedid");
 				$key = SplitKey($key, "id");
-				if ($curged != $GEDCOM) {
+				if ($curged != $GEDCOMID) {
 					SwitchGedcom($GEDCOMID);
-					$curged = $GEDCOM;
+					$curged = $GEDCOMID;
 					// Recalculate the tags to skip
 					$skiptagsged = $skiptags;
 					foreach ($global_facts as $gfact => $gvalue) {
@@ -1465,11 +1462,11 @@ if ($action=="general") {
 				}
 				if ($found == true) {
 					print_list_repository($value["name"], $value);
-					$repo_printed[$key."[".$GEDCOM."]"] = "1";
+					$repo_printed[$key."[".$GEDCOMID."]"] = "1";
 					if ($i==ceil($repo_count/2) && $repo_count>12) print "</ul></td><td class=\"shade1 wrap\"><ul>\n";
 					$i++;
 				}
-				else if ($hit == true) $repo_hide[$key."[".get_gedcom_from_id($value["gedfile"])."]"] = 1;
+				else if ($hit == true) $repo_hide[$key."[".$value["gedfile"]."]"] = 1;
 			}
 			print "\n\t\t</ul>&nbsp;</td></tr>";
 			SwitchGedcom();
@@ -1529,7 +1526,7 @@ if ($action=="general") {
 	    		}
   		  	}
 			print "\n\t<table class=\"list_table $TEXT_DIRECTION\">\n\t\t<tr><td class=\"shade2 center\"";
-			$note_count = count($controller->notelist);
+			$note_count = count($note_controller->notelist);
 			if($note_count > 12) print " colspan=\"2\"";
 			print "><img src=\"".$GM_IMAGE_DIR."/".$GM_IMAGES["note"]["other"]."\" border=\"0\" alt=\"".$gm_lang["notes"]."\" />&nbsp;&nbsp;";
 			print $gm_lang["notes"];
@@ -1595,11 +1592,11 @@ if ($action=="general") {
 				}
 				if ($found == true) {
 					$note->PrintListNote();
-					$note_printed[$note->xref."[".$GEDCOM."]"] = "1";
+					$note_printed[$note->xref."[".$GEDCOMID."]"] = "1";
 					if ($i==ceil($note_count/2) && $note_count>12) print "</ul></td><td class=\"shade1 wrap\"><ul>\n";
 					$i++;
 				}
-				else if ($hit == true) $note_hide[$note->xref."[".get_gedcom_from_id($note->gedcomid)."]"] = 1;
+				else if ($hit == true) $note_hide[$note->xref."[".$note->gedcomid."]"] = 1;
 			}
 			print "\n\t\t</ul>&nbsp;</td></tr>";
 			SwitchGedcom();
@@ -1641,7 +1638,7 @@ if ($action=="soundex") {
 			print "</tr><tr>\n\t\t<td class=\"shade1 wrap\"><ul>";
 
 			foreach ($printindiname as $key => $pvalue) {
-				if (isset($sindilist[$pvalue[1]."[".$GEDCOMS[$pvalue[2]]["id"]."]"])) $indilist[$pvalue[1]."[".$GEDCOMS[$pvalue[2]]["id"]."]"] = $sindilist[$pvalue[1]."[".$GEDCOMS[$pvalue[2]]["id"]."]"];
+				if (isset($sindilist[$pvalue[1]."[".get_id_from_gedcom($pvalue[2])."]"])) $indilist[$pvalue[1]."[".get_id_from_gedcom($pvalue[2])."]"] = $sindilist[$pvalue[1]."[".get_id_from_gedcom($pvalue[2])."]"];
 				print_list_person($pvalue[1], array(CheckNN($pvalue[0]), $pvalue[2]), "", $pvalue[3]);
 				$indi_printed[$pvalue[1]."[".$pvalue[2]."]"] = 1;
 				print "\n";

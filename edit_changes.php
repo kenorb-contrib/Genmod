@@ -122,10 +122,10 @@ else {
 	$changegids = array();
 	
 	// First read all changes
-	$sql = "SELECT DISTINCT ch_cid AS cid FROM ".TBLPREFIX."changes WHERE ch_gedfile = '".$GEDCOMID."' ORDER BY ch_cid ASC, ch_fact ASC, ch_time DESC";
+	$sql = "SELECT DISTINCT ch_cid AS cid FROM ".TBLPREFIX."changes WHERE ch_file = '".$GEDCOMID."' ORDER BY ch_cid ASC, ch_fact ASC, ch_time DESC";
 	$res = NewQuery($sql);
 	while($row = $res->FetchAssoc()){
-		$sqlcid = "SELECT * FROM ".TBLPREFIX."changes WHERE ch_cid = '".$row["cid"]."' AND ch_gedfile = '".$GEDCOMID."' ORDER BY ch_id ASC";
+		$sqlcid = "SELECT * FROM ".TBLPREFIX."changes WHERE ch_cid = '".$row["cid"]."' AND ch_file = '".$GEDCOMID."' ORDER BY ch_id ASC";
 		$rescid = NewQuery($sqlcid);
 		$change_row = 0;
 		while($rowcid = $rescid->FetchAssoc()){
@@ -308,7 +308,7 @@ else {
 			}
 					
 			$changegroup[$rowcid["ch_cid"]][$change_row]["gid"] = $rowcid["ch_gid"];
-			$changegroup[$rowcid["ch_cid"]][$change_row]["gedfile"] = $rowcid["ch_gedfile"];
+			$changegroup[$rowcid["ch_cid"]][$change_row]["file"] = $rowcid["ch_file"];
 			$changegroup[$rowcid["ch_cid"]][$change_row]["type"] = $rowcid["ch_type"];
 			$changegroup[$rowcid["ch_cid"]][$change_row]["user"] = $rowcid["ch_user"];
 			$changegroup[$rowcid["ch_cid"]][$change_row]["time"] = $rowcid["ch_time"];
@@ -373,9 +373,9 @@ else {
 		else print $changegroup[$groupid][0]["type"];
 		if (defined("GM_FACT_".$changegroup[$groupid][0]["fact"])) print ": ".constant("GM_FACT_".$changegroup[$groupid][0]["fact"]);
 		print "</td><td>";
-		if ($changegroup[$groupid]["canaccept"]) print "<a href=\"edit_changes.php?action=accept&amp;cid=$groupid&amp;gedfile=".$changegroup[$groupid][0]["gedfile"]."\">".$gm_lang["accept"]."</a>";
+		if ($changegroup[$groupid]["canaccept"]) print "<a href=\"edit_changes.php?action=accept&amp;cid=$groupid&amp;gedfile=".$changegroup[$groupid][0]["file"]."\">".$gm_lang["accept"]."</a>";
 		if ($changegroup[$groupid]["canaccept"] && $changegroup[$groupid]["canreject"]) print " | ";
-		if ($changegroup[$groupid]["canreject"]) print "<a href=\"edit_changes.php?action=reject&amp;cid=$groupid&amp;gedfile=".$changegroup[$groupid][0]["gedfile"]."\">".$gm_lang["reject"]."</a>";
+		if ($changegroup[$groupid]["canreject"]) print "<a href=\"edit_changes.php?action=reject&amp;cid=$groupid&amp;gedfile=".$changegroup[$groupid][0]["file"]."\">".$gm_lang["reject"]."</a>";
 		print "</td></tr>";
 		print "<tr><td>".$gm_lang["name"]."</td><td>".$gm_lang["username"]."</td><td>".$gm_lang["date"]."</td></tr><tr>";
 		foreach ($changes as $key => $change) {
@@ -386,7 +386,7 @@ else {
 				if (empty($gedrec)) {
 					if (GetChangeData(true, $change["gid"], true)) {
 						$rec = GetChangeData(false, $change["gid"], true, "gedlines");
-						$gedrec = $rec[$GEDCOM][$change["gid"]];
+						$gedrec = $rec[$GEDCOMID][$change["gid"]];
 					}
 				}
 				$type = IdType($change["gid"]);

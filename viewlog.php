@@ -34,7 +34,7 @@ if (!isset($cat)) exit;
 if (!isset($max)) $max=20;
 if (!isset($type)) $type = "";
 if($type == "All") $type = "";
-if (!isset($ged)) $ged = "";
+if (!isset($gedid)) $gedid = $GEDCOMID;
 if (!isset($cleanup)) $cleanup = "";
 if (!isset($action)) $action = "";
 if ($action != "download") print_simple_header("Print logfile");
@@ -43,12 +43,12 @@ if ($action != "download") print_simple_header("Print logfile");
 // $uname = $gm_username;
 $auth = false;
 if (($cat == "S") && ($gm_user->userIsAdmin())) $auth = true;
-if ((($cat == "G") || ($cat == "F"))  && ($gm_user->userGedcomAdmin($ged))) $auth = true;
+if ((($cat == "G") || ($cat == "F"))  && ($gm_user->userGedcomAdmin($gedid))) $auth = true;
 
 if ($auth) {
 	if (!empty($action)) {
 		if ($action == "download") {
-			$loglines = ReadLog($cat, "0", "", $ged);
+			$loglines = ReadLog($cat, "0", "", $gedid);
 			if (count($loglines) > 1) {
 				if ($cat == "S") $expname = "syslog.csv";
 				if ($cat == "G") $expname = "gedlog.csv";
@@ -61,7 +61,7 @@ if ($auth) {
 				print "\r\n";
 				foreach($loglines as $key => $logline) {
 					print '"'.$logline["type"].'","'.date("d.m.Y H:i:s", $logline["time"]).'","'.$logline["user"].'","';
-					if ($cat != "S") print $logline["gedcom"].'","';
+					if ($cat != "S") print $logline["gedcomid"].'","';
 					$text = preg_replace(array("~[\r\n]~", "~<br />~"), array("", "; "), $logline["text"]);
 					print $text.'"';
 					print "\r\n";
@@ -75,26 +75,26 @@ if ($auth) {
 			$timestamp = strtotime($str);
 			print $gm_lang["cleanup_older"]."&nbsp;".date("d.m.Y H:i:s", $timestamp)."<br />";
 			$sql = 	"DELETE FROM ".TBLPREFIX."log WHERE (l_category='".$cat."' AND l_timestamp<'".$timestamp."'";
-			if ($cat != "S") $sql .= " AND l_gedcom='".$ged."'";
+			if ($cat != "S") $sql .= " AND l_file='".$gedid."'";
 			$sql .= ")";
 			$res = NewQuery($sql);
 			if ($res) {
 				print $gm_lang["cleanup_success"];
 				if ($cat == "F") {
 					$g = array();
-					$g[] = $ged;
+					$g[] = $gedid;
 				}
-				else $g = $ged;
+				else $g = $gedid;
 				WriteToLog("ViewLog-> Cleanup up logfile older than ".date("d.m.Y H:i:s", $timestamp), "I", $cat, $g);
 			}
 			else print $gm_lang["cleanup_failed"];
 		}
 	}
 	// Set the notifications to off
-	HaveReadNewLogrecs($cat, $ged);
+	HaveReadNewLogrecs($cat, $gedid);
 	
 	// Retrieve number of loglines
-	$logcount = ReadLog($cat, $max, $type, $ged, false, true);
+	$logcount = ReadLog($cat, $max, $type, $gedid, false, true);
 	
 	// Start form
 	print "<form action=\"viewlog.php\" method=\"get\">";
@@ -103,12 +103,12 @@ if ($auth) {
 	print "<div class=\"topbottombar center\">";
 	print $gm_lang["logfile_content"]." - ";
 	if ($cat == "S") print $gm_lang["syslog"];
-	else print $GEDCOMS[$ged]["title"];
+	else print $GEDCOMS[$gedid]["title"];
 	print " - ".$gm_lang["recs_present"]." ".$logcount;
 	print "</div>";
 
 	// -- Print the buttons bar
-	print"<div id=\"toplinks\" name=\"toplinks\" class=\"center\"><input  type=\"button\" value=\"".$gm_lang["back"]."\" onclick='self.close();' />&nbsp;<input  type=\"button\" value=\"".$gm_lang["refresh"]."\" onclick=\"document.location='viewlog.php?type=$type&amp;cat=$cat&amp;max=$max&amp;ged=$ged'; \" /></div>";
+	print"<div id=\"toplinks\" name=\"toplinks\" class=\"center\"><input  type=\"button\" value=\"".$gm_lang["back"]."\" onclick='self.close();' />&nbsp;<input  type=\"button\" value=\"".$gm_lang["refresh"]."\" onclick=\"document.location='viewlog.php?type=$type&amp;cat=$cat&amp;max=$max&amp;gedid=$gedid'; \" /></div>";
 	print "<hr />";
 	// -- Print the options title
 	print "<div id=\"viewlog_option\">".$gm_lang["select_an_option"]."<br />";
@@ -116,32 +116,32 @@ if ($auth) {
 		// -- Print the options line
 		print "<label for=\"viewlogoption\">".$gm_lang["show_last"]."</label>";
 		print "<select id=\"viewlogoption\" name=\"viewlogoption\" onchange=\"document.location=options[selectedIndex].value;\">";
-		print "<option value=\"viewlog.php?cat=".$cat."&amp;type=".$type."&amp;max=20&amp;ged=$ged&amp;cat=$cat\"";
+		print "<option value=\"viewlog.php?cat=".$cat."&amp;type=".$type."&amp;max=20&amp;gedid=$gedid&amp;cat=$cat\"";
 		if ($max == "20") print " selected=\"selected\"";
 		print " >"."20"."</option>";
-		print "<option value=\"viewlog.php?cat=".$cat."&amp;type=".$type."&amp;max=50&amp;ged=$ged&amp;cat=$cat\"";
+		print "<option value=\"viewlog.php?cat=".$cat."&amp;type=".$type."&amp;max=50&amp;gedid=$gedid&amp;cat=$cat\"";
 		if ($max == "50") print " selected=\"selected\"";
 		print " >"."50"."</option>";
-		print "<option value=\"viewlog.php?cat=".$cat."&amp;type=".$type."&amp;max=100&amp;ged=$ged&amp;cat=$cat\"";
+		print "<option value=\"viewlog.php?cat=".$cat."&amp;type=".$type."&amp;max=100&amp;gedid=$gedid&amp;cat=$cat\"";
 		if ($max == "100") print " selected=\"selected\"";
 		print " >"."100"."</option>";
-		print "<option value=\"viewlog.php?cat=".$cat."&amp;type=".$type."&amp;max=0&amp;ged=$ged&amp;cat=$cat\"";
+		print "<option value=\"viewlog.php?cat=".$cat."&amp;type=".$type."&amp;max=0&amp;gedid=$gedid&amp;cat=$cat\"";
 		if ($max == "0") print " selected=\"selected\"";
 		print " >".$gm_lang["all"]."</option>";
 		print "</select>";
 		print "<br />";
 		
 		print "<label for=\"type\">".$gm_lang["show_events"]."</label>";
-		print "<input type=\"radio\" name=\"type\" value=\"All\" onclick=\"document.location='viewlog.php?cat=$cat&amp;max=$max&amp;ged=$ged'\"";
+		print "<input type=\"radio\" name=\"type\" value=\"All\" onclick=\"document.location='viewlog.php?cat=$cat&amp;max=$max&amp;gedid=$gedid'\"";
 		if ($type == "") print " checked=\"checked\"";
 		print " />".$gm_lang["all"]."&nbsp;";
-		print "<input type=\"radio\" name=\"type\" value=\"I\" onclick=\"document.location='viewlog.php?type=I&amp;cat=$cat&amp;max=$max&amp;ged=$ged'\"";
+		print "<input type=\"radio\" name=\"type\" value=\"I\" onclick=\"document.location='viewlog.php?type=I&amp;cat=$cat&amp;max=$max&amp;gedid=$gedid'\"";
 		if ($type == "I") print " checked=\"checked\"";
 		print " /><img src=\"".$GM_IMAGE_DIR."/".$GM_IMAGES["log"]["information"]."\" alt=\"".$gm_lang["information"]."\" />&nbsp;";
-		print "<input type=\"radio\" name=\"type\" value=\"W\" onclick=\"document.location='viewlog.php?type=W&amp;cat=$cat&amp;max=$max&amp;ged=$ged'\"";
+		print "<input type=\"radio\" name=\"type\" value=\"W\" onclick=\"document.location='viewlog.php?type=W&amp;cat=$cat&amp;max=$max&amp;gedid=$gedid'\"";
 		if ($type == "W") print " checked=\"checked\"";
 		print " /><img src=\"".$GM_IMAGE_DIR."/".$GM_IMAGES["log"]["warning"]."\" alt=\"".$gm_lang["warning"]."\" />&nbsp;";
-		print "<input type=\"radio\" name=\"type\" value=\"E\" onclick=\"document.location='viewlog.php?type=E&amp;cat=$cat&amp;max=$max&amp;ged=$ged'\"";
+		print "<input type=\"radio\" name=\"type\" value=\"E\" onclick=\"document.location='viewlog.php?type=E&amp;cat=$cat&amp;max=$max&amp;gedid=$gedid'\"";
 		if ($type == "E") print " checked=\"checked\"";
 		print " /><img src=\"".$GM_IMAGE_DIR."/".$GM_IMAGES["log"]["error"]."\" alt=\"".$gm_lang["error"]."\" />&nbsp;";
 	print "</div>";
@@ -153,7 +153,7 @@ if ($auth) {
 
 	// -- Print the administration options line
 	// -- Calculate the number of months that can be deleted
-	$loglines = ReadLog($cat, "1", $type, $ged, true);
+	$loglines = ReadLog($cat, "1", $type, $gedid, true);
 	// if no loglines are present, do not display the cleanup option
 	if (count($loglines) > 0) {
 		$logline = $loglines[0];
@@ -178,18 +178,18 @@ if ($auth) {
 		print "<input type=\"hidden\" name=\"cat\" value=\"$cat\" />";
 		print "<input type=\"hidden\" name=\"max\" value=\"$max\" />";
 		print "<input type=\"hidden\" name=\"type\" value=\"$type\" />";
-		print "<input type=\"hidden\" name=\"ged\" value=\"$ged\" />";
+		print "<input type=\"hidden\" name=\"gedid\" value=\"$gedid\" />";
 		print "<input  type=\"submit\" name=\"action\" value=\"".$gm_lang["cleanup"]."\" />";
 	}
 	print "<br />";
 	print "<label for=\"cleanup\">".$gm_lang["export"]."</label>";
-	print "<input  type=\"button\" value=\"".$gm_lang["export_log"]."\" onclick=\"document.location='viewlog.php?type=$type&amp;cat=$cat&amp;max=$max&amp;ged=$ged&amp;action=download'; \" /></td></tr>";
+	print "<input  type=\"button\" value=\"".$gm_lang["export_log"]."\" onclick=\"document.location='viewlog.php?type=$type&amp;cat=$cat&amp;max=$max&amp;gedid=$gedid&amp;action=download'; \" /></td></tr>";
 	
 	print "</div>";
 	print "<br clear=\"all\" />";
 	
 	// Perform the query
-	$loglines = ReadLog($cat, $max, $type, $ged);
+	$loglines = ReadLog($cat, $max, $type, $gedid);
 	
 	// Print the loglines
 //	print "<div id=\"logdetails\">";

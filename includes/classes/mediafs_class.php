@@ -1348,6 +1348,7 @@ abstract class MediaFS {
 			$handle = @fopen($dir."foo.txt","w+");
 			if	($handle) {
 				$i = fclose($handle);
+				@unlink($dir."foo.txt");
 				$err_write = true;
 			}
 			return($err_write);

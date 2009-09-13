@@ -161,12 +161,12 @@ class TimelineControllerRoot extends BaseController {
 			if (!$this->people[$i]->disp) {
 				if ($this->people[$i]->disp_name) {
 					print "&nbsp;<a href=\"individual.php?pid=".$this->people[$i]->xref."\">".PrintReady($this->people[$i]->getName())."</a>";
-					PrintPrivacyError($CONTACT_EMAIL);
+					PrintFunctions::PrintPrivacyError($CONTACT_EMAIL);
 					print "<br />";
 					$printed = true;
 				}
 				else if (!$printed) {
-					PrintPrivacyError($CONTACT_EMAIL);
+					PrintFunctions::PrintPrivacyError($CONTACT_EMAIL);
 					print "<br />";
 				}
 			}
@@ -176,7 +176,7 @@ class TimelineControllerRoot extends BaseController {
 	function print_time_fact($factitem) {
 		global $basexoffset, $baseyoffset, $factcount, $TEXT_DIRECTION;
 		global $gm_lang, $GM_IMAGE_DIR, $GM_IMAGES, $SHOW_PEDIGREE_PLACES, $placements;
-		global $familyfacts, $GEDCOM;
+		global $familyfacts, $GEDCOMID;
 	
 		$factrec = $factitem[1];
 		$ct = preg_match("/1 (\w+)(.*)/", $factrec, $match);
@@ -266,7 +266,7 @@ class TimelineControllerRoot extends BaseController {
 							}
 							if ($p==count($this->pids)) $p = $factitem["p"];
 							$col = $p % 6;
-							print " <span class=\"person$col\"> <a href=\"individual.php?pid=$spouse&amp;ged=$GEDCOM\">";
+							print " <span class=\"person$col\"> <a href=\"individual.php?pid=$spouse&amp;gedid=$GEDCOMID\">";
 							if (PrivacyFunctions::displayDetailsByID($spouse)||PrivacyFunctions::showLivingNameByID($spouse)) print GetPersonName($spouse);
 							else print $gm_lang["private"];
 							print "</a> </span>";

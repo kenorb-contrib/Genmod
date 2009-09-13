@@ -44,8 +44,8 @@ if (!isset($_POST)) $_POST = $HTTP_POST_VARS;
 // Remove slashes
 if (isset($_POST["NEW_COMMON_NAMES_ADD"])) $_POST["NEW_COMMON_NAMES_ADD"] = stripslashes($_POST["NEW_COMMON_NAMES_ADD"]);
 if (isset($_POST["NEW_COMMON_NAMES_REMOVE"])) $_POST["NEW_COMMON_NAMES_REMOVE"] = stripslashes($_POST["NEW_COMMON_NAMES_REMOVE"]);
-if (empty($oldged)) $oldged = "";
-else $ged = $oldged;
+if (empty($oldgedid)) $oldgedid = "";
+else $gedid = $oldgedid;
 if (!isset($path)) $path = "";
 if (!isset($GEDFILENAME)) $GEDFILENAME = "";
 
@@ -62,7 +62,8 @@ if (isset($GEDCOMPATH)) {
 	// NOTE: Extract the GEDCOM filename
 	if (!empty($path)) $GEDFILENAME = basename($path);
 	else $GEDFILENAME = basename($GEDCOMPATH);
-
+print "gedcompath is ".$GEDCOMPATH."<br />";
+print " gedfilename set to: ".$GEDFILENAME."<br />";
 	// NOTE: Check if it is a zipfile
 	if ($path == "") if (strstr(strtolower(trim($GEDFILENAME)), ".zip")==".zip") {
 		if ($source == "add_form") $GEDFILENAME = GetGedFromZip($GEDCOMPATH);
@@ -85,7 +86,7 @@ if (isset($GEDCOMPATH)) {
 	$ctupload = count($_FILES);
 	if ($ctupload > 0) {
 		// NOTE: When uploading a file check if it doesn't exist yet
-		if (!isset($GEDCOMS[$GEDFILENAME]) || !file_exists($path.$GEDFILENAME)) {
+		if (!isset($GEDCOMS[get_id_from_gedcom($GEDFILENAME)]) || !file_exists($path.$GEDFILENAME)) {
 			if (move_uploaded_file($_FILES['GEDCOMPATH']['tmp_name'], $path.$GEDFILENAME)) {
 				WriteToLog("EditConfigGedcom-> Gedcom ".$path.$GEDFILENAME." uploaded", "I", "S");
 			}
@@ -100,10 +101,11 @@ if (isset($GEDCOMPATH)) {
 		if (strstr(strtolower(trim($GEDFILENAME)), ".zip")==".zip") $GEDFILENAME = GetGedFromZip($path.$GEDFILENAME);
 	}
 	$ged = $GEDFILENAME;
+	$gedid = get_id_from_gedcom($ged);
 }
-if (isset($ged)) {
-	if (isset($GEDCOMS[$ged])) {
-		$GEDCOMPATH = $GEDCOMS[$ged]["path"];
+if (isset($gedid)) {
+	if (isset($GEDCOMS[$gedid])) {
+		$GEDCOMPATH = $GEDCOMS[$gedid]["path"];
 		$path = "";
 		$parts = preg_split("/[\/\\\]/", $GEDCOMPATH);
 		$ctparts = count($parts)-1;
@@ -113,13 +115,13 @@ if (isset($ged)) {
 				if ($key < $ctparts) $path .= $pathpart."/";
 			}
 		}
-		$GEDFILENAME = $ged;
-		if (!isset($gedcom_title)) $gedcom_title = $GEDCOMS[$ged]["title"];
-		$gedcom_config = $GEDCOMS[$ged]["config"];
-		$gedcom_privacy = $GEDCOMS[$ged]["privacy"];
-		$gedcom_id = $GEDCOMS[$ged]["id"];
-		$FILE = $ged;
-		$oldged = $ged;
+		$GEDFILENAME = $GEDCOMS[$gedid]["gedcom"];
+		if (!isset($gedcom_title)) $gedcom_title = $GEDCOMS[$gedid]["title"];
+		$gedcom_config = $GEDCOMS[$gedid]["config"];
+		$gedcom_privacy = $GEDCOMS[$gedid]["privacy"];
+		$gedcom_id = $GEDCOMS[$gedid]["id"];
+		$FILE = $GEDFILENAME;
+		$oldgedid = $gedid;
 	}
 	else {
 		if (empty($_POST["GEDCOMPATH"])) {
@@ -143,8 +145,8 @@ else {
 $USERLANG = $LANGUAGE;
 $temp = $THEME_DIR;
 
-if (!isset($ged) || !isset($GEDCOMS[$ged])) require($gedcom_config);
-else SwitchGedcom($ged);
+if (!isset($gedid) || !isset($GEDCOMS[$gedid])) require($gedcom_config);
+else SwitchGedcom($gedid);
 
 if (!isset($GEDCOMLANG)) $GEDCOMLANG = $LANGUAGE;
 $LANGUAGE = $USERLANG;
@@ -175,7 +177,13 @@ if ($action=="update") {
 	$COMMON_NAMES_ADD = $_POST["NEW_COMMON_NAMES_ADD"];
 	$COMMON_NAMES_REMOVE = $_POST["NEW_COMMON_NAMES_REMOVE"];
 	$gedarray["commonsurnames"] = "";
-	$GEDCOMS[$FILE] = $gedarray;
+//	print "array: <pre>";
+//	print_r($GEDCOMS);
+//	print "</pre>";
+	$GEDCOMS[$gedid] = $gedarray;
+//	print "array: <pre>";
+//	print_r($GEDCOMS);
+//	print "</pre>";
 	StoreGedcoms();
 
 	ReadGedcoms();
@@ -204,6 +212,7 @@ if ($action=="update") {
 
 	$newconf = array();
 	$newconf["gedcom"] = $FILE;
+	$newconf["gedcomid"] = get_id_from_gedcom($FILE);
 	$newconf["name_from_gedcom"] = $boolarray[$NAME_FROM_GEDCOM]; // -- This value is used but defaults to false.
 	$newconf["abbreviate_chart_labels"] = $boolarray[$_POST["NEW_ABBREVIATE_CHART_LABELS"]];
 	$newconf["allow_edit_gedcom"] = $boolarray[$_POST["NEW_ALLOW_EDIT_GEDCOM"]];
@@ -340,21 +349,23 @@ if ($action=="update") {
 			else $$key=$value;
 		}
 	}
-	WriteToLog("EditConfigGedcom-> Gedcom configuration for ".$FILE."  updated by >".$gm_username."<", "I", "G", $FILE);
+	WriteToLog("EditConfigGedcom-> Gedcom configuration for ".$FILE."  updated by >".$gm_username."<", "I", "G", get_id_from_gedcom($FILE));
 	if (!$errors) {
-		$gednews = getUserNews($FILE);
+		$gednews = NewsController::getUserNews(get_id_from_gedcom($FILE));
 		if (count($gednews)==0) {
-			$news = array();
-			$news["title"] = "#default_news_title#";
-			$news["username"] = $FILE;
-			$news["text"] = "#default_news_text#";
-			$news["date"] = time()-$_SESSION["timediff"];
-			addNews($news);
+			$news = new News();
+			$news->title = "#default_news_title#";
+			$news->username = get_id_from_gedcom($FILE);
+			$news->text = "#default_news_text#";
+			$news->date = time()-$_SESSION["timediff"];
+			$news->addNews();
 		}
 		if ($source == "upload_form" || $source == "reupload_form") $check = "upload";
 		else if ($source == "add_form") $check = "add";
 		else if ($source == "add_new_form") $check = "add_new";
 		if (!isset($bakfile)) $bakfile = "";
+//		print "source: ".$source." check: ".$check." gedfilename: ".$GEDFILENAME." path: ".$path. " bakfile: ".$bakfile;
+//		exit;
 		if ($source !== "") header("Location: uploadgedcom.php?action=$source&check=$check&step=2&GEDFILENAME=$GEDFILENAME&path=$path&verify=verify_gedcom&bakfile=$bakfile");
 		else {
 			header("Location: editgedcoms.php");
@@ -412,8 +423,8 @@ if (!isset($themeselect)) $themeselect="";
 <table class="facts_table <?php print $TEXT_DIRECTION ?>">
   <tr>
     <td colspan="2" class="shade3 facts_label center"><?php
-    		print "<h3>".$gm_lang["gedconf_head"]." - ";
-		if (isset($ged) && isset($GEDCOMS[$ged])) print $GEDCOMS[$ged]["title"];
+    	print "<h3>".$gm_lang["gedconf_head"]." - ";
+		if (isset($gedid) && isset($GEDCOMS[$gedid])) print $GEDCOMS[$gedid]["title"];
 		else if ($source == "add_form") print $gm_lang["add_gedcom"];
 		else if ($source == "upload_form" || $source == "reupload_form") print $gm_lang["upload_gedcom"];
 		else if ($source == "add_new_form") print $gm_lang["add_new_gedcom"];
@@ -428,7 +439,7 @@ if (!isset($themeselect)) $themeselect="";
 
 <input type="hidden" name="action" value="update" />
 <input type="hidden" name="source" value="<?php print $source; ?>" />
-<input type="hidden" name="oldged" value="<?php print $oldged; ?>" />
+<input type="hidden" name="oldgedid" value="<?php print $oldgedid; ?>" />
 <input type="hidden" name="old_DAYS_TO_SHOW_LIMIT" value="<?php print $DAYS_TO_SHOW_LIMIT; ?>" />
 <input type="hidden" name="NEW_LAST_CHANGE_EMAIL" value="<?php print $LAST_CHANGE_EMAIL; ?>" />
 <?php
@@ -576,7 +587,7 @@ print "&nbsp;<a href=\"javascript: ".$gm_lang["gedcom_conf"]."\" onclick=\"expan
 						$indilist[$PEDIGREE_ROOT_ID]["gedcom"] = $indirec;
 						$indilist[$PEDIGREE_ROOT_ID]["names"] = GetIndiNames($indirec);
 						$indilist[$PEDIGREE_ROOT_ID]["isdead"] = 1;
-						$indilist[$PEDIGREE_ROOT_ID]["gedfile"] = $GEDCOM;
+						$indilist[$PEDIGREE_ROOT_ID]["gedfile"] = $GEDCOMID;
 						print "\n<span class=\"list_item\">".GetPersonName($PEDIGREE_ROOT_ID);
 						print_first_major_fact($PEDIGREE_ROOT_ID);
 						print "</span>\n";

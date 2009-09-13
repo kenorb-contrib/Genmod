@@ -46,7 +46,6 @@ class FamilyController extends DetailController
 			$pbheight,
 			$bheight,
 			$famlist,
-			$GEDCOM,
 			$GEDCOMID,
 			$gm_lang,
 			$CONTACT_EMAIL,
@@ -146,7 +145,7 @@ class FamilyController extends DetailController
 	 * get the family page edit menu
 	 */
 	public function &getEditMenu() {
-		global $TEXT_DIRECTION, $GEDCOM, $gm_lang, $gm_user;
+		global $TEXT_DIRECTION, $gm_lang, $gm_user;
 		if ($TEXT_DIRECTION=="rtl") $ff="_rtl";
 		else $ff="";
 		

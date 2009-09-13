@@ -177,7 +177,7 @@ class Media {
 	
 	//-- search through the gedcom records for media, full text
 	public function FTSearchMedia($query, $allgeds=false, $ANDOR="AND") {
-		global $GEDCOM, $GEDCOMS, $GEDCOMID, $ftminwlen, $ftmaxwlen, $media_hide, $media_total;
+		global $GEDCOMS, $GEDCOMID, $ftminwlen, $ftmaxwlen, $media_hide, $media_total;
 		
 		// Get the min and max search word length
 		GetFTWordLengths();
@@ -211,7 +211,7 @@ class Media {
 		if ((is_array($allgeds) && count($allgeds) != 0) && count($allgeds) != count($GEDCOMS)) {
 			$sql .= " AND (";
 			for ($i=0; $i<count($allgeds); $i++) {
-				$sql .= "m_gedfile='".DbLayer::EscapeQuery($GEDCOMS[$allgeds[$i]]["id"])."'";
+				$sql .= "m_gedfile='".$allgeds[$i]."'";
 				if ($i < count($allgeds)-1) $sql .= " OR ";
 			}
 			$sql .= ")";
@@ -224,14 +224,14 @@ class Media {
 	 		while ($row = $res->FetchAssoc()) {
 		 		$media = array();
 		 		SwitchGedcom($row["m_gedfile"]);
-				$media_total[$row["m_media"]."[".$GEDCOM."]"] = 1;
+				$media_total[$row["m_media"]."[".$GEDCOMID."]"] = 1;
 		 		if (PrivacyFunctions::DisplayDetailsByID($row["m_media"], "OBJE", 1, true)) {
 					$media = array();
 					$media["gedfile"] = $GEDCOMID;
 					$media["name"] = GetMediaDescriptor($row["m_media"], $row["m_gedrec"]);
 					$this->medialist[JoinKey($row["m_media"], $row["m_gedfile"])] = $media;
 	 			}
-		 		else $media_hide[$row["m_media"]."[".$GEDCOM."]"] = 1;
+		 		else $media_hide[$row["m_media"]."[".$GEDCOMID."]"] = 1;
 		 		SwitchGedcom();
 	 		}
 		}

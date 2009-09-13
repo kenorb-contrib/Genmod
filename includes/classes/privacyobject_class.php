@@ -90,7 +90,7 @@ class PrivacyObject {
 	}
 	
 	public function GetPrivacy($gedcomid="", $user_override) {
-		global $GEDCOMS, $DBCONN, $gm_username, $gm_user;
+		global $DBCONN, $gm_username, $gm_user;
 		
 		if (!$DBCONN->connected) return false;
 		

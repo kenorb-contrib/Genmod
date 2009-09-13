@@ -58,7 +58,7 @@ class ActionItem {
 			$this->pid = $values["a_pid"];
 			$this->type = $values["a_type"];
 			$this->repo = $values["a_repo"];
-			$this->gedfile = $values["a_gedfile"];
+			$this->gedfile = $values["a_file"];
 			$this->text = stripslashes($values["a_text"]);
 			$this->status = $values["a_status"];
 		}

@@ -229,7 +229,7 @@ else if ($m_name == "apr" || $m_name == "jun" || $m_name == "sep" || $m_name == 
 	if ($day >= '30') {
 		$day = "30";
 		$pregquery = "2 DATE[^\n]*30 $month";
-		i$query = "2 DATE[^\n]*30 $month";
+		$query = "2 DATE[^\n]*30 $month";
 	}
 }
 
@@ -306,8 +306,8 @@ print "<div style=\" text-align: center;\" id=\"calendar_page\">\n";
 	//-- moved here from session.php, should probably be moved somewhere else still
 	$sql = "SELECT i_id FROM ".TBLPREFIX."individuals where i_file='".$GEDCOMID."' AND i_gedcom like '%@#DHEBREW@%'";
 	$res = NewQuery($sql);
-	if ($res->NumRows()>0) $HEBREWFOUND[$GEDCOM] = true;
-	else $HEBREWFOUND[$GEDCOM] = false;
+	if ($res->NumRows()>0) $HEBREWFOUND[$GEDCOMID] = true;
+	else $HEBREWFOUND[$GEDCOMID] = false;
 	$res->FreeResult();
 
 	// Print top text
@@ -321,13 +321,13 @@ if ($action=="today") {
 	//-- the year is needed for alternate calendars
  	if ($CALENDAR_FORMAT!="gregorian") print GetChangedDate("$day $month $year");
 	else print GetChangedDate("$day $month");
-	if ($CALENDAR_FORMAT=="gregorian" && $USE_RTL_FUNCTIONS && $HEBREWFOUND[$GEDCOM] == true) print " / ".GetChangedDate("@#DHEBREW@ $hDay $hMonth $CalYear"); 
+	if ($CALENDAR_FORMAT=="gregorian" && $USE_RTL_FUNCTIONS && $HEBREWFOUND[$GEDCOMID] == true) print " / ".GetChangedDate("@#DHEBREW@ $hDay $hMonth $CalYear"); 
 }
 else if ($action=="calendar") {
 	print $gm_lang["in_this_month"]."</h3></td></tr>\n";
 	print "<tr><td class=\"topbottombar\">";
 	print GetChangedDate(" $month $year ");
-	if ($CALENDAR_FORMAT=="gregorian" && $USE_RTL_FUNCTIONS && $HEBREWFOUND[$GEDCOM] == true) {
+	if ($CALENDAR_FORMAT=="gregorian" && $USE_RTL_FUNCTIONS && $HEBREWFOUND[$GEDCOMID] == true) {
 		$hdd = $date[1]["day"];
 		$hmm = $date[1]["month"];
 		$hyy = $date[1]["year"];
@@ -344,7 +344,7 @@ else if ($action=="year") {
 	print $gm_lang["in_this_year"]."</h3></td></tr>\n";
 	print "<tr><td class=\"topbottombar\">";
 	print GetChangedDate(" $year_text ");
-	if ($CALENDAR_FORMAT=="gregorian" && $USE_RTL_FUNCTIONS && $HEBREWFOUND[$GEDCOM] == true) {
+	if ($CALENDAR_FORMAT=="gregorian" && $USE_RTL_FUNCTIONS && $HEBREWFOUND[$GEDCOMID] == true) {
 		$hdd = $date[3]["day"];
 		$hmm = $date[3]["month"];
 		$hstartyear = $date[3]["year"];
@@ -381,11 +381,11 @@ if ($view!="preview") {
 	$Yy = adodb_date("Y");
 //	print "<a href=\"calendar.php?filterev=$filterev&amp;filterof=$filterof&amp;filtersx=$filtersx\"><b>".GetChangedDate("$Dd $Mm $Yy")."</b></a> | ";
 	//-- for alternate calendars the year is needed
-  	if ($CALENDAR_FORMAT!="gregorian" || ($USE_RTL_FUNCTIONS && $HEBREWFOUND[$GEDCOM] == true)) $datestr = "$Dd $Mm $Yy";
+  	if ($CALENDAR_FORMAT!="gregorian" || ($USE_RTL_FUNCTIONS && $HEBREWFOUND[$GEDCOMID] == true)) $datestr = "$Dd $Mm $Yy";
 // 	if ($CALENDAR_FORMAT!="gregorian") $datestr = "$Dd $Mm $Yy"; // MA @@@
 	else $datestr = "$Dd $Mm";
 	print "<a href=\"calendar.php?filterev=$filterev&amp;filterof=$filterof&amp;filtersx=$filtersx&amp;year=$year\"><b>".GetChangedDate($datestr);
-	if ($USE_RTL_FUNCTIONS && $HEBREWFOUND[$GEDCOM] == true) {
+	if ($USE_RTL_FUNCTIONS && $HEBREWFOUND[$GEDCOMID] == true) {
 		$hdatestr = "@#DHEBREW@ $currhDay $currhMon $currhYear";
 		print " / ".GetChangedDate($hdatestr);
 	}
@@ -1150,22 +1150,22 @@ else if ($action=="calendar") {
 						$currentDay = true;
 					print "<span class=\"cal_day". ($currentDay?" current_day":"") ."\">".$mday."</span>";
 					if ($CALENDAR_FORMAT=="hebrew_and_gregorian" || $CALENDAR_FORMAT=="hebrew" ||
-						(($CALENDAR_FORMAT=="jewish_and_gregorian" || $CALENDAR_FORMAT=="jewish" || ($USE_RTL_FUNCTIONS &&  $HEBREWFOUND[$GEDCOM] == true)) && $LANGUAGE == "hebrew")) {
+						(($CALENDAR_FORMAT=="jewish_and_gregorian" || $CALENDAR_FORMAT=="jewish" || ($USE_RTL_FUNCTIONS &&  $HEBREWFOUND[$GEDCOMID] == true)) && $LANGUAGE == "hebrew")) {
 						$monthTemp = $monthtonum[strtolower($month)];
 						$jd = gregoriantojd($monthTemp, $mday, $year);
 						$hebrewDate = jdtojewish($jd);
-						// if ($USE_RTL_FUNCTIONS &&  $HEBREWFOUND[$GEDCOM] == true) {
+						// if ($USE_RTL_FUNCTIONS &&  $HEBREWFOUND[$GEDCOMID] == true) {
 							list ($hebrewMonth, $hebrewDay, $hebrewYear) = split ('/', $hebrewDate);
 							print "<span class=\"rtl_cal_day". ($currentDay?" current_day":"") ."\">";
 							print GetHebrewJewishDay($hebrewDay) . " " .GetHebrewJewishMonth($hebrewMonth, $hebrewYear) . "</span>";
 						// }
 					}
-					else if($CALENDAR_FORMAT=="jewish_and_gregorian" || $CALENDAR_FORMAT=="jewish" || ($USE_RTL_FUNCTIONS && $HEBREWFOUND[$GEDCOM] == true)) {
+					else if($CALENDAR_FORMAT=="jewish_and_gregorian" || $CALENDAR_FORMAT=="jewish" || ($USE_RTL_FUNCTIONS && $HEBREWFOUND[$GEDCOMID] == true)) {
 						// else if($CALENDAR_FORMAT=="jewish_and_gregorian" || $CALENDAR_FORMAT=="jewish" || $USE_RTL_FUNCTIONS) {
 						$monthTemp = $monthtonum[strtolower($month)];
 						$jd = gregoriantojd($monthTemp, $mday, $year);
 						$hebrewDate = jdtojewish($jd);
-						// if ($USE_RTL_FUNCTIONS &&  $HEBREWFOUND[$GEDCOM] == true) {
+						// if ($USE_RTL_FUNCTIONS &&  $HEBREWFOUND[$GEDCOMID] == true) {
 							list ($hebrewMonth, $hebrewDay, $hebrewYear) = split ('/', $hebrewDate);
 							print "<span class=\"rtl_cal_day". ($currentDay?" current_day":"") ."\">";
 							print $hebrewDay . " " . GetJewishMonthName($hebrewMonth, $hebrewYear) . "</span>";
@@ -1407,10 +1407,10 @@ else if ($action=="calendar") {
 }
 if ($view=="preview"){
 	if (isset($gid)) {
-		if (isset($myindilist[$gid]["gedfile"])) $showfile=get_gedcom_from_id($myindilist[$gid]["gedfile"]);
-		else $showfile=get_gedcom_from_id($myfamlist[$gid]["gedfile"]);
+		if (isset($myindilist[$gid]["gedfile"])) $showfile=$myindilist[$gid]["gedfile"];
+		else $showfile=$myfamlist[$gid]["gedfile"];
 	}
-	else $showfile = $GEDCOM;
+	else $showfile = $GEDCOMID;
 	$showfilter="";
 	if ($filterof!="all") $showfilter = ($filterof=="living"?$gm_lang["living_only"]:$gm_lang["recent_events"]);
 	if (!empty($filtersx)){

@@ -37,26 +37,26 @@ if (strstr($_SERVER["SCRIPT_NAME"],basename(__FILE__))) {
  * found in the individuals list.
  * @param int $min the number of times a surname must occur before it is added to the array
  */
-function GetCommonSurnamesIndex($ged) {
-	global $GEDCOMS, $GEDCOM, $COMMON_NAMES_THRESHOLD;
+function GetCommonSurnamesIndex($gedid) {
+	global $GEDCOMS, $COMMON_NAMES_THRESHOLD;
 
-	if (empty($GEDCOMS[$ged]["commonsurnames"])) {
-		SwitchGedcom($ged);
+	if (empty($GEDCOMS[$gedid]["commonsurnames"])) {
+		SwitchGedcom($gedid);
 		$surnames = GetCommonSurnames($COMMON_NAMES_THRESHOLD);
 		if (count($surnames) != 0) {
 			$sns = "";
 			foreach($surnames as $indexval => $surname) {
 				$sns .= $surname["name"].", ";
 			}
-			$sql = "UPDATE ".TBLPREFIX."gedcoms SET g_commonsurnames='".DbLayer::EscapeQuery($sns)."' WHERE g_gedcom='".$ged."'";
+			$sql = "UPDATE ".TBLPREFIX."gedcoms SET g_commonsurnames='".DbLayer::EscapeQuery($sns)."' WHERE g_id='".$gedid."'";
 			$res = NewQuery($sql);
-			$GEDCOMS[$ged]["commonsurnames"] = $sns;
+			$GEDCOMS[$gedid]["commonsurnames"] = $sns;
 		}
 		SwitchGedcom();
 	}
 	$surnames = array();
-	if (empty($GEDCOMS[$ged]["commonsurnames"]) || ($GEDCOMS[$ged]["commonsurnames"]==",")) return $surnames;
-	$names = preg_split("/[,;]/", $GEDCOMS[$ged]["commonsurnames"]);
+	if (empty($GEDCOMS[$gedid]["commonsurnames"]) || ($GEDCOMS[$gedid]["commonsurnames"]==",")) return $surnames;
+	$names = preg_split("/[,;]/", $GEDCOMS[$gedid]["commonsurnames"]);
 	foreach($names as $indexval => $name) {
 		$name = trim($name);
 		if (!empty($name)) $surnames[$name]["name"] = stripslashes($name);
@@ -72,10 +72,10 @@ function GetCommonSurnamesIndex($ged) {
  * @param int $min the number of times a surname must occur before it is added to the array
  */
 function GetCommonSurnames($min) {
-	global $GEDCOM, $indilist, $GEDCOMS, $COMMON_NAMES_ADD, $COMMON_NAMES_REMOVE, $gm_lang, $HNN, $ANN;
+	global $GEDCOMID, $indilist, $GEDCOMS, $COMMON_NAMES_ADD, $COMMON_NAMES_REMOVE, $gm_lang, $HNN, $ANN;
 
 	$surnames = array();
-	if (!CONFIGURED || !UserController::AdminUserExists() || (count($GEDCOMS)==0) || (!CheckForImport($GEDCOM))) return $surnames;
+	if (!CONFIGURED || !UserController::AdminUserExists() || (count($GEDCOMS)==0) || (!CheckForImport($GEDCOMID))) return $surnames;
 	//-- this line causes a bug where the common surnames list is not properly updated
 	// if ((!isset($indilist))||(!is_array($indilist))) return $surnames;
 	$surnames = GetTopSurnames(100);
@@ -210,7 +210,7 @@ function GetNameInRecord($indirec, $import=false) {
  * @return string the sortable name
  */
 function GetSortableName($pid, $alpha="", $surname="", $allnames=false, $rev = false, $changes = false) {
-	global $SHOW_LIVING_NAMES, $PRIV_PUBLIC, $GEDCOM, $GEDCOMID, $COMBIKEY;
+	global $SHOW_LIVING_NAMES, $PRIV_PUBLIC, $GEDCOMID, $COMBIKEY;
 	global $indilist, $gm_lang, $GEDCOMID, $NAME_REVERSE;
 
 	$mynames = array();
@@ -229,7 +229,7 @@ function GetSortableName($pid, $alpha="", $surname="", $allnames=false, $rev = f
 	if ($changes) {
 		if (GetChangeData(true, $pid, true, "", "")) {
 			$rec = GetChangeData(false, $pid, true, "", "");
-			$gedrec = $rec[$GEDCOM][$pid];
+			$gedrec = $rec[$GEDCOMID][$pid];
 			if (!empty($gedrec)) $names = GetIndiNames($gedrec);
 		}
 	}
@@ -343,7 +343,7 @@ function SortableNameFromName($name, $rev = false) {
 function GetPersonName($pid, $indirec="", $starred=true) {
 	global $NAME_REVERSE, $COMBIKEY;
 	global $NAME_FROM_GEDCOM;
-	global $indilist, $GEDCOMID, $GEDCOM;
+	global $indilist, $GEDCOMID;
 
 	if ($COMBIKEY) $key = JoinKey($pid, $GEDCOMID);
 	else $key = $pid;
@@ -371,13 +371,13 @@ function GetPersonName($pid, $indirec="", $starred=true) {
 		else {
 //			if (!empty($pid) && GetChangeData(true, $pid, true, "", "INDI")) {
 //					$rec = GetChangeData(false, $pid, true, "gedlines", "INDI");
-//					$names = GetIndiNames($rec[$GEDCOM][$pid]);
+//					$names = GetIndiNames($rec[$GEDCOMID][$pid]);
 //					$name = $names[0][0];
 //				}
 //				else {
 //					if (!empty($pid) && GetChangeData(true, $pid, true, "", "FAMC")) {
 //						$rec = GetChangeData(false, $pid, true, "gedlines", "FAMC");
-//						$names = GetIndiNames($rec[$GEDCOM][$pid]);
+//						$names = GetIndiNames($rec[$GEDCOMID][$pid]);
 //						$name = $names[0][0];
 //					}
 //				}
@@ -427,7 +427,7 @@ function ReverseName($name) {
  */
 function GetSourceDescriptor($sid, $gedrec="") {
 	global $WORD_WRAPPED_NOTES;
-	global $GEDCOM, $sourcelist, $show_changes, $gm_lang;
+	global $GEDCOMID, $sourcelist, $show_changes, $gm_lang;
 
 	if ($sid=="") return false;
 
@@ -435,7 +435,7 @@ function GetSourceDescriptor($sid, $gedrec="") {
 		$gedrec = FindSourceRecord($sid);
 		if ($show_changes && GetChangeData(true, $sid, true)) {
 			$rec = GetChangeData(false, $sid, true, "gedlines");
-			$gedrec = $rec[$GEDCOM][$sid];
+			$gedrec = $rec[$GEDCOMID][$sid];
 		}
 	}
 	if (!empty($gedrec)) {
@@ -462,14 +462,14 @@ function GetSourceDescriptor($sid, $gedrec="") {
  */
 function GetRepoDescriptor($rid) {
 	global $WORD_WRAPPED_NOTES;
-	global $GEDCOM, $repo_id_list, $show_changes, $gm_lang;
+	global $GEDCOMID, $repo_id_list, $show_changes, $gm_lang;
 
 	if ($rid=="") return false;
 
 	$gedrec = FindRepoRecord($rid);
 	if ($show_changes && GetChangeData(true, $rid, true)) {
 		$rec = GetChangeData(false, $rid, true, "gedlines");
-		$gedrec = $rec[$GEDCOM][$rid];
+		$gedrec = $rec[$GEDCOMID][$rid];
 	}
 	if (!empty($gedrec)) {
 		$tt = preg_match("/1 NAME (.*)/", $gedrec, $smatch);
@@ -489,14 +489,14 @@ function GetRepoDescriptor($rid) {
  */
 function GetAddSourceDescriptor($sid) {
 	global $WORD_WRAPPED_NOTES;
-	global $GEDCOM, $sourcelist, $show_changes;
+	global $GEDCOMID, $sourcelist, $show_changes;
 	$title = "";
 	if ($sid=="") return false;
 
 	$gedrec = FindSourceRecord($sid);
 	if ($show_changes && GetChangeData(true, $sid, true)) {
 		$rec = GetChangeData(false, $sid, true, "gedlines");
-		$gedrec = $rec[$GEDCOM][$sid];
+		$gedrec = $rec[$GEDCOMID][$sid];
 	}
 	if (!empty($gedrec)) {
 		$ct = preg_match("/\d ROMN (.*)/", $gedrec, $match);
@@ -521,14 +521,14 @@ function GetAddSourceDescriptor($sid) {
  */
 function GetAddRepoDescriptor($rid) {
 	global $WORD_WRAPPED_NOTES;
-	global $GEDCOM, $repolist, $show_changes;
+	global $GEDCOMID, $repolist, $show_changes;
 	$title = "";
 	if ($rid=="") return false;
 
 	$gedrec = FindRepoRecord($rid);
 	if ($show_changes && GetChangeData(true, $rid, true)) {
 		$rec = GetChangeData(false, $rid, true, "gedlines");
-		$gedrec = $rec[$GEDCOM][$rid];
+		$gedrec = $rec[$GEDCOMID][$rid];
 	}
 	if (!empty($gedrec)) {
 		$ct = preg_match("/\d ROMN (.*)/", $gedrec, $match);
@@ -613,7 +613,7 @@ function GetFamilyAddDescriptor($fid, $rev = false, $famrec="", $changes = false
  * @return string the title of the object
  */
 function GetMediaDescriptor($mid, $gedrec="") {
-	global $GEDCOM, $show_changes;
+	global $GEDCOMID, $show_changes;
 	$title = "";
 	if ($mid=="") return false;
 
@@ -621,7 +621,7 @@ function GetMediaDescriptor($mid, $gedrec="") {
 		$gedrec = FindMediaRecord($mid);
 		if ($show_changes && GetChangeData(true, $mid, true)) {
 			$rec = GetChangeData(false, $mid, true, "gedlines");
-			$gedrec = $rec[$GEDCOM][$mid];
+			$gedrec = $rec[$GEDCOMID][$mid];
 		}
 	}
 	$rec = GetSubRecord(1, "1 TITL", $gedrec, 1);
@@ -693,14 +693,14 @@ function GetAddPersonNameInRecord($name_record, $keep_slash=false, $import=false
 // -- find and return a given individual's second name in sort format: familyname, firstname
 function GetSortableAddName($pid, $record="", $rev = false, $changes = false) {
 	global $NAME_REVERSE;
-	global $NAME_FROM_GEDCOM, $GEDCOM;
+	global $NAME_FROM_GEDCOM, $GEDCOMID;
 
 	//-- get the name from the indexes
 	if (empty($record)) $record = FindPersonRecord($pid);
 	if ($changes) {
 		if (GetChangeData(true, $pid, true, "", "")) {
 			$rec = GetChangeData(false, $pid, true, "", "");
-			$record = $rec[$GEDCOM][$pid];
+			$record = $rec[$GEDCOMID][$pid];
 		}
 	}
 	$name_record = GetSubRecord(1, "1 NAME", $record);
@@ -1618,7 +1618,7 @@ function SearchAddAssos() {
 				$indi_printed[$add] = "1";
 				$names = GetIndiNames($arec);
 				foreach ($names as $nkey => $namearray) {
-					$printindiname[] = array(SortableNameFromName($namearray[0]), SplitKey($add, "id"), SplitKey($add, "ged"), "");
+					$printindiname[] = array(SortableNameFromName($namearray[0]), SplitKey($add, "id"), SplitKey($add, "gedid"), "");
 				}
 			}
 		}
@@ -1641,7 +1641,7 @@ function SearchAddAssos() {
 					$famsplit = preg_split("/(\s\+\s)/", trim($famname));
 					// Both names have to have the same direction and combination of chinese/not chinese
 					if (hasRTLText($famsplit[0]) == hasRTLText($famsplit[1]) && HasChinese($famsplit[0], true) == HasChinese($famsplit[1], true)) {
-						$printfamname[]=array(CheckNN($famname), SplitKey($add, "id"), get_gedcom_from_id($fam["gedfile"]),"");
+						$printfamname[]=array(CheckNN($famname), SplitKey($add, "id"), $fam["gedfile"],"");
 					}
 				}
 			}

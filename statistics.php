@@ -44,7 +44,7 @@ $key2ind= array();
 $match1= array();
 $match2= array();
 
-if (isset($cleanup) && $cleanup == "yes") unset($_SESSION[$GEDCOM."statisticsplot"]);
+if (isset($cleanup) && $cleanup == "yes") unset($_SESSION[$GEDCOMID."statisticsplot"]);
 
 global $nrfam, $famgeg, $nrpers, $persgeg,$key2ind,$nrman,$nrvrouw;
 global $match1,$match2;
@@ -77,8 +77,8 @@ print "<tr><td class=\"shade2 wrap width30 vmiddle\">".$gm_lang["statnmale"]."</
 print "<tr><td class=\"shade2 wrap width30 vmiddle\">".$gm_lang["statnfemale"]."</td><td class=\"shade1\">".$nrvrouw."</td></tr>";
 
 //if (!isset($plottype)) $plottype=0;
-if (isset($_SESSION[$GEDCOM."statisticsplot"])) {
-	foreach ($_SESSION[$GEDCOM."statisticsplot"] as $name => $value) {
+if (isset($_SESSION[$GEDCOMID."statisticsplot"])) {
+	foreach ($_SESSION[$GEDCOMID."statisticsplot"] as $name => $value) {
 		$$name = $value;
 	}
 }

@@ -92,7 +92,7 @@ class RepositoryController extends DetailController {
 	 * @return Menu
 	 */
 	public function &getEditMenu() {
-		global $TEXT_DIRECTION, $GEDCOM, $gm_lang, $gm_user;
+		global $TEXT_DIRECTION, $gm_lang, $gm_user;
 		
 		if ($TEXT_DIRECTION=="rtl") $ff="_rtl";
 		else $ff="";
@@ -134,7 +134,7 @@ class RepositoryController extends DetailController {
 	 * @return Menu
 	 */
 	public function &getOtherMenu() {
-		global $TEXT_DIRECTION, $GEDCOM, $GEDCOMID, $gm_lang;
+		global $TEXT_DIRECTION, $GEDCOMID, $gm_lang;
 		global $ENABLE_CLIPPINGS_CART, $gm_user;
 		
 		if ($TEXT_DIRECTION=="rtl") $ff="_rtl";

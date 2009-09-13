@@ -164,9 +164,9 @@ if (!$controller->view) {
 		<a class="accesskeys" href="<?php print "descendancy.php?pid=$pid";?>" title="<?php print $gm_lang["descend_chart"] ?>" tabindex="-1" accesskey="<?php print $gm_lang["accesskey_individual_descendancy"]; ?>"><?php print $gm_lang["descend_chart"] ?></a>
 		<a class="accesskeys" href="<?php print "timeline.php?pids[]=$pid";?>" title="<?php print $gm_lang["timeline_chart"] ?>" tabindex="-1" accesskey="<?php print $gm_lang["accesskey_individual_timeline"]; ?>"><?php print $gm_lang["timeline_chart"] ?></a>
 		<?php
-		if (!empty($controller->user)&&!empty($controller->user->gedcomid[$GEDCOM])) {
+		if (!empty($controller->user)&&!empty($controller->user->gedcomid[$GEDCOMID])) {
 			?>
-		<a class="accesskeys" href="<?php print "relationship.php?pid1=".$controller->user->gedcomid[$GEDCOM]."&amp;pid2=".$controller->xref;?>" title="<?php print $gm_lang["relationship_to_me"] ?>" tabindex="-1" accesskey="<?php print $gm_lang["accesskey_individual_relation_to_me"]; ?>"><?php print $gm_lang["relationship_to_me"] ?></a>
+		<a class="accesskeys" href="<?php print "relationship.php?pid1=".$controller->user->gedcomid[$GEDCOMID]."&amp;pid2=".$controller->xref;?>" title="<?php print $gm_lang["relationship_to_me"] ?>" tabindex="-1" accesskey="<?php print $gm_lang["accesskey_individual_relation_to_me"]; ?>"><?php print $gm_lang["relationship_to_me"] ?></a>
 		<?php 	}
 		if ($controller->canshowgedrec) {?>
 		<a class="accesskeys" href="javascript:show_gedcom_record();" title="<?php print $gm_lang["view_gedcom"] ?>" tabindex="-1" accesskey="<?php print $gm_lang["accesskey_individual_gedcom"]; ?>"><?php print $gm_lang["view_gedcom"] ?></a>

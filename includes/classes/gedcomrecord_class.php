@@ -111,13 +111,13 @@ abstract class GedcomRecord {
 			$this->type = $this->datatype;
 			// Get the gedcom record
 			switch ($this->type) {
-				case "INDI": $this->gedrec = FindPersonRecord($this->xref); break;
-				case "FAM": $this->gedrec = FindFamilyRecord($this->xref); break;
-				case "SOUR": $this->gedrec = FindSourceRecord($this->xref); break;
-				case "REPO": $this->gedrec = FindOtherRecord($this->xref); break;
-				case "OBJE": $this->gedrec = FindMediaRecord($this->xref); break;
-				case "NOTE": $this->gedrec = FindOtherRecord($this->xref, "", false, "NOTE"); break;
-				case "SUBM": $this->gedrec = FindOtherRecord($this->xref, "", false, "SUBM"); break;
+				case "INDI": $this->gedrec = FindPersonRecord($this->xref, $this->gedcomid); break;
+				case "FAM": $this->gedrec = FindFamilyRecord($this->xref, $this->gedcomid); break;
+				case "SOUR": $this->gedrec = FindSourceRecord($this->xref, $this->gedcomid); break;
+				case "REPO": $this->gedrec = FindOtherRecord($this->xref, $this->gedcomid); break;
+				case "OBJE": $this->gedrec = FindMediaRecord($this->xref, $this->gedcomid); break;
+				case "NOTE": $this->gedrec = FindOtherRecord($this->xref, $this->gedcomid, false, "NOTE"); break;
+				case "SUBM": $this->gedrec = FindOtherRecord($this->xref, $this->gedcomid, false, "SUBM"); break;
 			}
 			if (empty($this->gedrec)) {
 				if (!$this->show_changes) $this->isempty = true;
@@ -149,7 +149,7 @@ abstract class GedcomRecord {
 		
 		if ($this->disp && $ALLOW_EDIT_GEDCOM && $gm_user->userCanEdit() && !PrivacyFunctions::FactEditRestricted($this->xref, $this->gedrec, 1)) $this->canedit = true;
 		else $this->canedit = false;
-		SwitchGedcom();
+		SwitchGedcom($GEDCOMID);
 	}
 	
 
@@ -356,7 +356,7 @@ abstract class GedcomRecord {
 	protected function ThisRawEdited() {
 		
 		if (is_null($this->israwedited) && $this->show_changes) {
-			$sql = "SELECT COUNT(ch_id) FROM ".TBLPREFIX."changes WHERE ch_gedfile='".$this->gedcomid."' AND ch_type='edit_raw' AND ch_gid='".$this->xref."'";
+			$sql = "SELECT COUNT(ch_id) FROM ".TBLPREFIX."changes WHERE ch_file='".$this->gedcomid."' AND ch_type='edit_raw' AND ch_gid='".$this->xref."'";
 			if ($res = NewQuery($sql)) {
 				$row = $res->FetchRow();
 				$res->FreeResult();
@@ -371,12 +371,12 @@ abstract class GedcomRecord {
 	}
 	
 	protected function GetChangedGedRec() {
-		global $GEDCOM;
+		global $GEDCOMID;
 		
 		if (!$this->ThisChanged()) return "";
 		if (is_null($this->changedgedrec)) {
 			$rec = GetChangeData(false, $this->xref, true, "gedlines", "");
-			$this->changedgedrec = $rec[$GEDCOM][$this->xref];
+			$this->changedgedrec = $rec[$GEDCOMID][$this->xref];
 		}
 		return $this->changedgedrec;
 	}			
@@ -384,12 +384,12 @@ abstract class GedcomRecord {
 	/**
 	 * Parse the facts from the record
 	 */
-	protected function parseFacts() {
+	protected function parseFacts($selection="") {
 		
-		if (!is_null($this->facts)) return $this->facts;
-		
-		$this->facts = array();
-		if (!$this->disp) return $this->facts;
+		if (!is_null($this->facts) && !is_array($selection)) return $this->facts;
+
+		$facts = array();
+		if (!$this->disp) return $facts;
 		
 		// Get the subrecords/facts. Don't apply privacy here, as it will disturb
 		// the fact numbering which is needed for editing (get the right fact number)
@@ -415,13 +415,14 @@ abstract class GedcomRecord {
 					$ct = preg_match("/2 TYPE (.*)/", $subrecord, $match);
 					if ($ct>0) $typeshow = PrivacyFunctions::showFact(trim($match[1]), $this->xref, $this->type);
 				}
-				if (!empty($fact) && PrivacyFunctions::showFact($fact, $this->xref, $this->type) && $typeshow && !PrivacyFunctions::FactViewRestricted($this->xref, $subrecord, 2)) {
+				if (!empty($fact) && (!is_array($selection) || in_array($fact, $selection)) && PrivacyFunctions::showFact($fact, $this->xref, $this->type) && $typeshow && !PrivacyFunctions::FactViewRestricted($this->xref, $subrecord, 2)) {
 					if (empty($gid) || PrivacyFunctions::DisplayDetailsByID($gid, $fact, 1, true)) {
-						$this->facts[] = new Fact($this->xref, $fact, $subrecord, $count[$fact], "");
-//						$this->facts[] = array($fact, $subrecord, $count[$fact], "");
-						if ($fact == "SOUR") $this->sourfacts_count++;
-						elseif ($fact == "NOTE") $this->notefacts_count++;
-						elseif ($fact == "OBJE") $this->mediafacts_count++;
+						$facts[] = new Fact($this->xref, $fact, $subrecord, $count[$fact], "");
+						if (!is_array($selection)) {
+							if ($fact == "SOUR") $this->sourfacts_count++;
+							elseif ($fact == "NOTE") $this->notefacts_count++;
+							elseif ($fact == "OBJE") $this->mediafacts_count++;
+						}
 					}
 				}
 			}
@@ -446,14 +447,14 @@ abstract class GedcomRecord {
 				if (!isset($count[$fact])) $count[$fact] = 1;
 				else $count[$fact]++;
 				if (!empty($fact) && !in_array($fact, array($this->exclude_facts)) && PrivacyFunctions::showFact($fact, $this->xref, $this->type) && !PrivacyFunctions::FactViewRestricted($this->xref, $newrec, 2)) {
-//					$this->facts[] = array($fact, $newrec, $count[$fact], "change_new");
-					$this->facts[] = new Fact($this->xref, $fact, $newrec, $count[$fact], "change_new");
+					if (!is_array($selection) || in_array($fact, $selection)) $facts[] = new Fact($this->xref, $fact, $newrec, $count[$fact], "change_new");
 				}
 			}
 			// After sorting, add the changed facts at the appropriate places
-			SortFactObjs($this->facts, $this->type);
+			SortFactObjs($facts, $this->type);
+			
 			$newfacts = array();
-			foreach($this->facts as $key => $factobj) {
+			foreach($facts as $key => $factobj) {
 				// For a new fact, always show
 				if ($factobj->style == "change_new") {
 					// but if the record is deleted, show everything as old
@@ -491,12 +492,12 @@ abstract class GedcomRecord {
 					}
 				}
 			}
-			$this->facts = $newfacts;
+			$facts = $newfacts;
 		}
-		else SortFactObjs($this->facts, $this->type);
+		else SortFactObjs($facts, $this->type);
 		if ($this->type == "INDI") {
 			$sexfound = false;
-			foreach($this->facts as $key => $factobj) {
+			foreach($facts as $key => $factobj) {
 				if ($factobj->fact == "NAME") $this->globalfacts[] = $factobj;
 				elseif ($factobj->fact == "SEX") {
 					$this->globalfacts[] = $factobj;
@@ -509,23 +510,30 @@ abstract class GedcomRecord {
 				$this->globalfacts[] = array('new', "1 SEX U");
 			}
 		}
-		return $this->facts;
+		if (!is_array($selection)) $this->facts = $facts;
+		return $facts;
 	}
 	
 	public function	SelectFacts($factarr) {
 		
-		if (is_null($this->facts)) $this->ParseFacts();
-		
-		$facts = array();
-		// We must retain the order of the fact array
-		foreach ($factarr as $key => $fact) {
-			foreach ($this->facts as $key => $factobj) {
-				if ($factobj->fact == $fact) {
-					$facts[] = $factobj;
+		// if the facts are already parsed, we taken them from the fact array
+		if (!is_null($this->facts)) {
+			$facts = array();
+			// We must retain the order of the fact array
+			foreach ($factarr as $key => $fact) {
+				foreach ($this->facts as $key => $factobj) {
+					if (in_array($factobj->fact, $factarr)) {
+						$facts[] = $factobj;
+					}
 				}
 			}
+			return $facts;
 		}
-		return $facts;
+		// If not, we just select the facts that we need, to prevent unnecessary privacy checking 
+		// This causes load if link privacy is enabled
+		else {
+			return $this->ParseFacts($factarr);
+		}
 	}
 	
 	

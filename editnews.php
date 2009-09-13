@@ -48,7 +48,7 @@ if (!isset($action)) $action="compose";
 
 print_simple_header($gm_lang["edit_news"]);
 
-if (empty($uname)) $uname=$GEDCOM;
+if (empty($uname)) $uname = get_gedcom_from_id($GEDCOMID);
 
 if ($action=="compose") {
 	print '<span class="subheaders">'.$gm_lang["edit_news"].'</span>';
@@ -77,40 +77,40 @@ if ($action=="compose") {
 	print "<br /><form name=\"messageform\" method=\"post\" onsubmit=\"return checkForm(this);";
 	print "\">\n";
 	if (isset($news_id)) {
-		$news = getNewsItem($news_id);
+		$news = NewsController::getNewsItem($news_id);
 	}
 	else {
 		$news_id="";
-		$news = array();
-		$news["username"] = $uname;
-		$news["date"] = time()-$_SESSION["timediff"];
-		$news["title"] = "";
-		$news["text"] = "";
+		$news = new News();
+		$news->username = $uname;
+		$news->date = time()-$_SESSION["timediff"];
+		$news->title = "";
+		$news->text = "";
 	}
 	print "<input type=\"hidden\" name=\"action\" value=\"save\" />\n";
-	print "<input type=\"hidden\" name=\"uname\" value=\"".$news["username"]."\" />\n";
-	print "<input type=\"hidden\" name=\"news_id\" value=\"$news_id\" />\n";
-	print "<input type=\"hidden\" name=\"date\" value=\"".$news["date"]."\" />\n";
+	print "<input type=\"hidden\" name=\"uname\" value=\"".$news->username."\" />\n";
+	print "<input type=\"hidden\" name=\"news_id\" value=\"".$news->id."\" />\n";
+	print "<input type=\"hidden\" name=\"date\" value=\"".$news->date."\" />\n";
 	print "<table>\n";
-	print "<tr><td align=\"right\">".$gm_lang["title"]."</td><td><input type=\"text\" name=\"title\" size=\"50\" value=\"".$news["title"]."\" /><br /></td></tr>\n";
+	print "<tr><td align=\"right\">".$gm_lang["title"]."</td><td><input type=\"text\" name=\"title\" size=\"50\" value=\"".$news->title."\" /><br /></td></tr>\n";
 	print "<tr><td valign=\"top\" align=\"right\">".$gm_lang["article_text"]."<br /></td>";
 	print "<td>";
 	if ($useFCK) { // use FCKeditor module
 		$trans = get_html_translation_table(HTML_SPECIALCHARS);
 		$trans = array_flip($trans);
-		$news["text"] = strtr($news["text"], $trans);
-		$news["text"] = nl2br($news["text"]);
+		$news->text = strtr($news->text, $trans);
+		$news->text = nl2br($news->text);
 		
 		$oFCKeditor = new FCKeditor('text') ;
 		$oFCKeditor->BasePath =  './modules/FCKeditor/';
-		$oFCKeditor->Value = $news["text"];
+		$oFCKeditor->Value = $news->text;
 		$oFCKeditor->Width = 700;
 		$oFCKeditor->Height = 450;
 		$oFCKeditor->Config['AutoDetectLanguage'] = false ;
 		$oFCKeditor->Config['DefaultLanguage'] = $language_settings[$LANGUAGE]["lang_short_cut"];
 		$oFCKeditor->Create() ;
 	} else { //use standard textarea
-		print "<textarea name=\"text\" cols=\"80\" rows=\"10\">".$news["text"]."</textarea>";
+		print "<textarea name=\"text\" cols=\"80\" rows=\"10\">".$news->text."</textarea>";
 	}
 	print "<br /></td></tr>\n";
 	print "<tr><td></td><td><input type=\"submit\"  value=\"".$gm_lang["save"]."\" /></td></tr>\n";
@@ -118,21 +118,20 @@ if ($action=="compose") {
 	print "</form>\n";
 }
 else if ($action=="save") {
+	$news = new News($news_id);
 	$date=time()-$_SESSION["timediff"];
 	if (empty($title)) $title="No Title";
 	if (empty($text)) $text="No Text";
-	$message = array();
-	if (!empty($news_id)) $message["id"]=$news_id;
-	$message["username"] = $uname;
-	$message["date"]=$date;
-	$message["title"] = $title;
-	$message["text"] = $text;
-	if (addNews($message)) {
+	$news->username = $uname;
+	$news->date=$date;
+	$news->title = $title;
+	$news->text = $text;
+	if ($news->addNews()) {
 		print $gm_lang["news_saved"];
 	}
 }
 else if ($action=="delete") {
-	if (deleteNews($news_id)) print $gm_lang["news_deleted"];
+	if (NewsController::DeleteNews($news_id)) print $gm_lang["news_deleted"];
 }
 print "<center><br /><br /><a href=\"#\" onclick=\"if (window.opener.refreshpage) window.opener.refreshpage(); window.close();\">".$gm_lang["close_window"]."</a><br /></center>";
 
