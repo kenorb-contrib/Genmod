@@ -426,7 +426,7 @@ else if($action=='download') {
 	{
 		$clipping = $cart[$GEDCOMID][$i];
 		$record = FindGedcomRecord($clipping['id']);
-		$record = PrivacyFunctions::privatize_gedcom($record);
+		$record = PrivacyFunctions::PrivatizeGedcom($record);
 		$record = RemoveCustomTags($record, $remove);
 		if ($convert=="yes") $record = utf8_decode($record);
 		if ($clipping['type']=='indi') {

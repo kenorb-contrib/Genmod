@@ -334,7 +334,7 @@ abstract class PrivacyFunctions {
 	 * @return	boolean return true to show the persons details, return false to keep them private
 	 */
 	public static function displayDetailsByID($pid, $type = "INDI", $recursive=1, $checklinks=false) {
-		global $USE_RELATIONSHIP_PRIVACY, $CHECK_MARRIAGE_RELATIONS, $MAX_RELATION_PATH_LENGTH, $gm_username, $GEDCOMID;
+		global $USE_RELATIONSHIP_PRIVACY, $CHECK_MARRIAGE_RELATIONS, $MAX_RELATION_PATH_LENGTH, $GEDCOMID;
 		global $global_facts, $person_privacy, $user_privacy, $HIDE_LIVE_PEOPLE, $SHOW_DEAD_PEOPLE, $MAX_ALIVE_AGE, $PRIVACY_BY_YEAR;
 		global $PRIVACY_CHECKS, $PRIVACY_BY_RESN, $SHOW_SOURCES, $SHOW_LIVING_NAMES, $LINK_PRIVACY, $gm_user;
 	
@@ -371,7 +371,7 @@ abstract class PrivacyFunctions {
 		}
 	
 		// If a user is logged on, check for user related privacy first---------------------------------------------------------------
-		if (!empty($gm_username)) {
+		if ($gm_user->username != "") {
 			// Check user privacy for all users (hide/show)
 			if (isset($user_privacy["all"][$pid])) {
 				if ($user_privacy["all"][$pid] == 1) {
@@ -384,8 +384,8 @@ abstract class PrivacyFunctions {
 				}
 			}
 			// Check user privacy for this user (hide/show)
-			if (isset($user_privacy[$gm_username][$pid])) {
-				if ($user_privacy[$gm_username][$pid] == 1) return true;
+			if (isset($user_privacy[$gm_user->username][$pid])) {
+				if ($user_privacy[$gm_user->username][$pid] == 1) return true;
 				else return false;
 			}
 			// Check person privacy (access level)
@@ -407,22 +407,21 @@ abstract class PrivacyFunctions {
 				// Check the relation privacy. If within the range, people can be shown. 
 				if ($USE_RELATIONSHIP_PRIVACY) {
 					// If we don't know the user's gedcom ID, we cannot determine the relationship so no reason to show
-					if (empty($user->gedcomid[$GEDCOMID])) {
+					if ($gm_user->gedcomid[$GEDCOMID] == "") {
 						self::$pcache[$GEDCOMID][$type][$recursive][$checklinks][$pid] = false;
 						return false;
 					}
 						
 					// If it's the user himself, we can show him
-					if ($user->gedcomid[$GEDCOMID]==$pid) {
+					if ($gm_user->gedcomid[$GEDCOMID]==$pid) {
 						self::$pcache[$GEDCOMID][$type][$recursive][$checklinks][$pid] = true;
 						return true;
 					}
 					
 					// Determine if the person is within range
 					$path_length = $MAX_RELATION_PATH_LENGTH;
-	//					if (isset($user->max_relation_path[$GEDCOMID]) && $user->max_relation_path[$GEDCOMID]>0) $path_length = $user->max_relation_path[$GEDCOMID];
-					// print "get relation ".$user->gedcomid[$GEDCOMID]." with ".$pid;
-					$relationship = GetRelationship($user->gedcomid[$GEDCOMID], $pid, $CHECK_MARRIAGE_RELATIONS, $path_length);
+					// print "get relation ".$gm_user->gedcomid[$GEDCOMID]." with ".$pid;
+					$relationship = GetRelationship($gm_user->gedcomid[$GEDCOMID], $pid, $CHECK_MARRIAGE_RELATIONS, $path_length);
 					// Only limit access to live people!
 					if ($relationship == false && !$isdead) {
 						self::$pcache[$GEDCOMID][$type][$recursive][$checklinks][$pid] = false;
@@ -430,8 +429,6 @@ abstract class PrivacyFunctions {
 					}
 					else {
 						// A relation is found. Do not return anything, as general rules will apply in this case.
-	//						self::$pcache[$GEDCOMID][$type][$recursive][$checklinks][$pid] = true;
-	//						return true;
 					}
 				}
 				
@@ -749,13 +746,12 @@ abstract class PrivacyFunctions {
 	 */
 	public function showFact($fact, $pid, $type="") {
 		global $LINK_PRIVACY;
-		global $global_facts, $person_facts, $SHOW_SOURCES, $gm_username, $gm_user;
+		global $global_facts, $person_facts, $SHOW_SOURCES, $gm_user;
 		static $ulevel;
 		
 		// print "Checking ".$fact." for ".$pid. " type ".$type." show_sources: ".$SHOW_SOURCES." userlevel: ".$ulevel."<br />";
 		
 		if (!isset($ulevel)) {
-			$user =& User::GetInstance($gm_username);
 			$ulevel = $gm_user->getUserAccessLevel();
 		}
 	
@@ -798,7 +794,7 @@ abstract class PrivacyFunctions {
 	 * @return	boolean return true to show the fact details, return false to keep it private
 	 */
 	public function showFactDetails($fact, $pid) {
-		global $global_facts, $person_facts, $gm_username, $gm_user;
+		global $global_facts, $person_facts, $gm_user;
 	
 	
 		// Handle the close relatives facts just as if they were normal facts
@@ -830,14 +826,15 @@ abstract class PrivacyFunctions {
 	 * @param string $gedrec the raw gedcom record to privatize
 	 * @return string the privatized gedcom record
 	 */
-	public function privatize_gedcom($gedrec) {
-		global $gm_lang, $gm_username, $gm_user;
+	public function PrivatizeGedcom($gedrec) {
+		global $gm_lang, $gm_user;
+		
 		$gt = preg_match("/0 @(.+)@ (.+)/", $gedrec, $gmatch);
 		if ($gt > 0) {
 			$gid = trim($gmatch[1]);
 			$type = trim($gmatch[2]);
 			$disp = self::displayDetailsByID($gid, $type, 1, true);
-	//		if ($type == "SOUR") print "<br />"."[$gm_username $gid $type $disp]";
+	//		if ($type == "SOUR") print "<br />"."[$gm_user->username $gid $type $disp]";
 			//-- check if the whole record is private
 			if (!$disp) {
 				//-- check if name should be private
@@ -932,14 +929,13 @@ abstract class PrivacyFunctions {
 	 * @return int		Allowed or not allowed
 	 */
 	public function FactEditRestricted($pid, $factrec, $level=2) {
-		global $GEDCOMID, $gm_username, $PRIVACY_BY_RESN, $gm_user;
+		global $GEDCOMID, $PRIVACY_BY_RESN, $gm_user;
 		
 		$ct = preg_match("/$level RESN (.*)/", $factrec, $match);
 		if ($ct == 0) return false;
 		if ($level == 1 && !$PRIVACY_BY_RESN) return false;
-		$user =& User::GetInstance($gm_username);
 		$myindi = "";
-		if (isset($user->gedcomid[$GEDCOMID])) trim($myindi = $user->gedcomid[$GEDCOMID]);
+		if (isset($gm_user->gedcomid[$GEDCOMID])) trim($myindi = $gm_user->gedcomid[$GEDCOMID]);
 		if ($ct > 0) {
 			$match[1] = strtolower(trim($match[1]));
 			if ($match[1] == "none") return false;
@@ -964,7 +960,7 @@ abstract class PrivacyFunctions {
 	 * @return int		Allowed or not allowed
 	 */
 	public function FactViewRestricted($pid, $factrec, $level=2) {
-		global $GEDCOMID, $gm_username, $PRIVACY_BY_RESN, $gm_user;
+		global $GEDCOMID, $PRIVACY_BY_RESN, $gm_user;
 		
 		$ct = preg_match("/$level RESN (.*)/", $factrec, $match);
 		if ($ct == 0) return false;

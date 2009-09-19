@@ -27,14 +27,15 @@ if (stristr($_SERVER["SCRIPT_NAME"],basename(__FILE__))) {
 	require "../../intrusion.php";
 }
 
-class MenuBar {
+abstract class MenuBar {
 	
 	/**
 	 * Create text for sub-menu where one will be checked and others not
 	 * @return Text         the sub-menu text
 	 */
-	function GetSubmenuText($textIn, $selected=false) {
+	private function GetSubmenuText($textIn, $selected=false) {
 		global $GM_IMAGE_DIR;
+		
 		$checkImage = $GM_IMAGE_DIR."/checked.gif";
 		$noImage = $GM_IMAGE_DIR."/pix1.gif";
 		$displayImage = (file_exists($checkImage) && file_exists($noImage));
@@ -55,8 +56,8 @@ class MenuBar {
 	 * Get the links to the custom pages created by the user
 	 * @return Menu		the menu item
 	 */
-	function GetCustomMenu() {
-		global $gm_lang, $TEXT_DIRECTION, $gm_user, $DBCONN;
+	public function GetCustomMenu() {
+		global $gm_lang, $gm_user, $DBCONN;
 		
 		if (!$DBCONN->connected) return false;
 		
@@ -64,9 +65,6 @@ class MenuBar {
 		$sql = "SHOW TABLES LIKE '".TBLPREFIX."pages'";
 		$res = NewQuery($sql);
 		if ($res) {
-			if ($TEXT_DIRECTION=="rtl") $ff="_rtl";
-			else $ff="";
-			
 			// Retrieve the current pages stored in the DB
 			$sql = "SELECT * FROM ".TBLPREFIX."pages";
 			$result = NewQuery($sql);
@@ -111,15 +109,12 @@ class MenuBar {
 	 * Create the File menu
 	 * @return Menu		the menu item
 	 */
-	function GetFileMenu() {
-		global $TEXT_DIRECTION, $GEDCOMID, $gm_lang;
-		global $SCRIPT_NAME, $QUERY_STRING, $gm_username;
+	public function GetFileMenu() {
+		global $GEDCOMID, $gm_lang;
+		global $SCRIPT_NAME, $QUERY_STRING;
 		global $ALLOW_CHANGE_GEDCOM, $GEDCOMS, $gm_user;
 		
-		 $username = $gm_username;
-		 $user =& User::GetInstance($username);
 
-		if ($TEXT_DIRECTION=="rtl") $ff="_rtl"; else $ff="";
 		//-- main file menu item
 		$menu = new Menu($gm_lang["menu_file"]);
 		
@@ -138,7 +133,7 @@ class MenuBar {
 		
 		// NOTE: Add GEDCOMS to open
 			foreach($GEDCOMS as $gedid => $gedarray) {
-				$submenu = new Menu($this->GetSubmenuText(PrintReady($gedarray["title"]), ($gedid == $GEDCOMID)), false);
+				$submenu = new Menu(self::GetSubmenuText(PrintReady($gedarray["title"]), ($gedid == $GEDCOMID)), false);
 				$submenu->addLink("index.php?command=gedcom&gedid=".$gedid);
 				$menu->submenus[count($menu->submenus)-1]->submenus[]=$submenu;
 			}
@@ -168,7 +163,7 @@ class MenuBar {
 		$menu->addSubmenu($submenu);
 		
 		// NOTE: Logout link
-		if ($user && !empty($username)) {
+		if ($gm_user->username != "") {
 			$submenu = new Menu($gm_lang["logout"]);
 			$submenu->addLink("index.php?logout=1");
 			$menu->addSubmenu($submenu);
@@ -177,13 +172,12 @@ class MenuBar {
 		return $menu;
 	}
 
-	function GetEditMenu() {
-		global $TEXT_DIRECTION, $gm_lang;
-		global $SCRIPT_NAME, $QUERY_STRING, $gm_username;
+	public function GetEditMenu() {
+		global $SCRIPT_NAME, $QUERY_STRING;
 		global $ALLOW_CHANGE_GEDCOM;
 		
 		global $ENABLE_CLIPPINGS_CART, $gm_user;
-		global $TEXT_DIRECTION, $gm_lang;
+		global $gm_lang;
 		
 		//-- main edit menu item
 		$menu = new Menu($gm_lang["edit"], "#");
@@ -210,7 +204,7 @@ class MenuBar {
 		return $menu;
 	}
 	
-	function GetViewMenu() {
+	public function GetViewMenu() {
 		global $gm_lang, $SCRIPT_NAME, $gm_language, $language_settings;
 		global $LANGUAGE, $ENABLE_MULTI_LANGUAGE;
 		global $ALLOW_THEME_DROPDOWN, $ALLOW_USER_THEMES, $gm_user, $THEME_DIR;
@@ -227,7 +221,7 @@ class MenuBar {
 			// NOTE: Add languages available
 			foreach ($gm_language as $key=>$value) {
 				if ($language_settings[$key]["gm_lang_use"]) {
-					$submenu = new Menu($this->GetSubmenuText($gm_lang[$key], ($LANGUAGE == $key)), false);
+					$submenu = new Menu(self::GetSubmenuText($gm_lang[$key], ($LANGUAGE == $key)), false);
 					$submenu->addLink($SCRIPT_NAME."?changelanguage=yes&NEWLANGUAGE=".$key."&".htmlentities(GetQueryString()));
 					$menu->submenus[count($menu->submenus)-1]->submenus[]=$submenu;
 				}
@@ -255,7 +249,7 @@ class MenuBar {
 			// NOTE: add themes
 			$themes = GetThemeNames();
 			foreach ($themes as $indexval => $themedir) {
-				$submenu = new Menu($this->GetSubmenuText($themedir["name"], (($themedir["dir"] == $gm_user->theme)||(empty($gm_user->theme)&&($themedir["dir"]==$THEME_DIR)))), false);
+				$submenu = new Menu(self::GetSubmenuText($themedir["name"], (($themedir["dir"] == $gm_user->theme)||(empty($gm_user->theme)&&($themedir["dir"]==$THEME_DIR)))), false);
 //LERMAN - for some reason "...&amp;mytheme=..." does not work for Firefox 1.5.0.4 on Linux, but does work on IE. Changing it to "...&mytheme=..." works in both places
 				$submenu->addLink("themechange.php?frompage=".urlencode($frompage)."&mytheme=".$themedir["dir"]);
 				$menu->submenus[count($menu->submenus)-1]->submenus[]=$submenu;
@@ -284,17 +278,17 @@ class MenuBar {
 		return $menu;
 	}
 	
-	function GetFavoritesMenu() {
-		global $gm_lang, $gm_username, $REQUIRE_AUTHENTICATION;
+	public function GetFavoritesMenu() {
+		global $gm_lang, $gm_user, $REQUIRE_AUTHENTICATION;
 		global $GEDCOMID;
 		
 		// NOTE: Favorites
 		$menu = new Menu($gm_lang["menu_favorites"]);
 		
-		if (!empty($gm_username)) {
+		if ($gm_user->username != "") {
 			$submenu = new Menu($gm_lang["my_favorites"]);
 			$menu->addSubmenu($submenu);
-			$userfavs = FavoritesController::getUserFavorites($gm_username);
+			$userfavs = FavoritesController::getUserFavorites($gm_user->username);
 		}
 		else {
 			if ($REQUIRE_AUTHENTICATION) return false;
@@ -327,8 +321,8 @@ class MenuBar {
 	 * get the menu for the charts
 	 * @return Menu		the menu item
 	 */
-	function GetChartsMenu($rootid='',$myid='') {
-		global $TEXT_DIRECTION, $gm_lang, $gm_username, $gm_user;
+	public function GetChartsMenu($rootid='',$myid='') {
+		global $gm_lang, $gm_user;
 		
 		//-- main charts menu item
 		$link = "pedigree.php";
@@ -398,9 +392,7 @@ class MenuBar {
 		//-- relationship submenu
 		if (file_exists("relationship.php")) {
 			if ($rootid and empty($myid)) {
-				$username = $gm_username;
-				if (!empty($username)) {
-					$user =& User::GetInstance($username);
+				if ($gm_user->username != "") {
 					$myid = @$gm_user->gedcomid[$GEDCOMID];
 				}
 			}
@@ -426,17 +418,15 @@ class MenuBar {
 		return $menu;
 	}
 	
-	function GetReportMenu($pid="", $type="") {
-		global $TEXT_DIRECTION, $gm_lang, $gm_user;
-		global $LANGUAGE, $PRIV_PUBLIC, $PRIV_USER, $PRIV_NONE, $PRIV_HIDE, $gm_username;
+	public function GetReportMenu($pid="", $type="") {
+		global $gm_lang, $gm_user;
+		global $LANGUAGE, $PRIV_PUBLIC, $PRIV_USER, $PRIV_NONE, $PRIV_HIDE;
 
-		if ($TEXT_DIRECTION=="rtl") $ff="_rtl"; else $ff="";
 		if (!file_exists("reportengine.php")) return null;
 		$menu = new Menu($gm_lang["reports"]);
 		
 		//-- reports submenus
 		$reports = GetReportList();
-		$username = $gm_username;
 		$sortreports = array ();
 //		print_r($reports);
 		foreach($reports as $file=>$report) {
@@ -486,12 +476,10 @@ class MenuBar {
 	 * get the menu for the lists
 	 * @return Menu		the menu item
 	 */
-	function GetListMenu() {
-		global $TEXT_DIRECTION, $gm_lang, $gm_user;
-		global $SHOW_SOURCES, $gm_username;
+	public function GetListMenu() {
+		global $gm_lang, $gm_user;
+		global $SHOW_SOURCES;
 		
-		$user =& User::GetInstance($gm_username);
-		if ($TEXT_DIRECTION=="rtl") $ff="_rtl"; else $ff="";
 		//-- main lists menu item
 		$menu = new Menu($gm_lang["lists"]);
 		
@@ -566,11 +554,10 @@ class MenuBar {
 	 * get the help menu
 	 * @return Menu		the menu item
 	 */
-	function GetHelperMenu() {
-		global $TEXT_DIRECTION, $gm_lang, $spider;
+	public function GetHelperMenu() {
+		global $gm_lang, $spider;
 		global $SHOW_CONTEXT_HELP, $SCRIPT_NAME, $QUERY_STRING, $helpindex, $action;
 		
-		if ($TEXT_DIRECTION=="rtl") $ff="_rtl"; else $ff="";
 		//-- main help menu item
 		$menu = new Menu($gm_lang["help_page"]);
 
@@ -622,18 +609,18 @@ class MenuBar {
 		return $menu;
 	}
 	
-	function GetThisPersonMenu(&$controller) {
+	public function GetThisPersonMenu(&$controller) {
 		global $gm_lang;
 		
 		//-- main edit menu item
 		$menu = new Menu($gm_lang["this_individual"]);
 		
 		// Charts menu
-		$submenu = $this->GetChartsMenu($controller->xref);
+		$submenu = self::GetChartsMenu($controller->xref);
 		$menu->addSubmenu($submenu);
 		
 		// Reports menu
-		$submenu = $this->GetReportMenu($controller->xref, "indi");
+		$submenu = self::GetReportMenu($controller->xref, "indi");
 		if ($submenu) $menu->addSubmenu($submenu);
 		
 		// Edit menu
@@ -651,7 +638,7 @@ class MenuBar {
 		return $menu;
 	}
 	
-	function GetThisFamilyMenu(&$controller) {
+	public function GetThisFamilyMenu(&$controller) {
 		global $gm_lang;
 		
 		if (!$controller->family->isempty) {
@@ -663,7 +650,7 @@ class MenuBar {
 			$menu->addSubmenu($submenu);
 			
 			// Reports menu
-			$submenu = $this->GetReportMenu($controller->xref, "fam");
+			$submenu = self::GetReportMenu($controller->xref, "fam");
 			if ($submenu) $menu->addSubmenu($submenu);
 			
 			// Edit menu
@@ -682,7 +669,7 @@ class MenuBar {
 		}
 	}
 	
-	function GetThisSourceMenu(&$source_controller) {
+	public function GetThisSourceMenu(&$source_controller) {
 		global $gm_lang;
 		
 		if ($source_controller->source->canedit || $source_controller->display_other_menu) {
@@ -690,7 +677,7 @@ class MenuBar {
 			$menu = new Menu($gm_lang["this_source"]);
 
 			// Reports menu
-			$submenu = $this->GetReportMenu($source_controller->xref, "sour");
+			$submenu = self::GetReportMenu($source_controller->xref, "sour");
 			if ($submenu) $menu->addSubmenu($submenu);
 		
 			// Edit menu
@@ -709,7 +696,7 @@ class MenuBar {
 		return false;
 	}
 	
-	function GetThisRepoMenu(&$repository_controller) {
+	public function GetThisRepoMenu(&$repository_controller) {
 		global $gm_lang;
 		
 		if ($repository_controller->repo->canedit || $repository_controller->display_other_menu) {
@@ -717,7 +704,7 @@ class MenuBar {
 			$menu = new Menu($gm_lang["this_repository"]);
 		
 			// Reports menu
-			$submenu = $this->GetReportMenu($repository_controller->xref, "repo");
+			$submenu = self::GetReportMenu($repository_controller->xref, "repo");
 			if ($submenu) $menu->addSubmenu($submenu);
 			
 			// Edit menu
@@ -735,7 +722,7 @@ class MenuBar {
 		if (isset($submenu)) return $menu;
 	}
 	
-	function GetThisMediaMenu(&$controller) {
+	public function GetThisMediaMenu(&$controller) {
 		global $gm_lang;
 		
 		if ($controller->media->canedit || !$controller->display_other_menu) {
@@ -743,7 +730,7 @@ class MenuBar {
 			$menu = new Menu($gm_lang["this_media"]);
 			
 			// Reports menu
-			$submenu = $this->GetReportMenu($controller->xref, "media");
+			$submenu = self::GetReportMenu($controller->xref, "media");
 			if ($submenu) $menu->addSubmenu($submenu);
 			
 			// Edit menu
@@ -762,7 +749,8 @@ class MenuBar {
 		}
 		else return false;
 	}
-	function GetThisNoteMenu(&$controller) {
+	
+	public function GetThisNoteMenu(&$controller) {
 		global $gm_lang;
 		
 		if (!$controller->note->isempty && !$controller->note->isdeleted) {
@@ -770,7 +758,7 @@ class MenuBar {
 			$menu = new Menu($gm_lang["this_note"]);
 			
 			// Reports menu
-			$submenu = $this->GetReportMenu($controller->xref, "note");
+			$submenu = self::GetReportMenu($controller->xref, "note");
 			if ($submenu) $menu->addSubmenu($submenu);
 			
 			// Edit menu

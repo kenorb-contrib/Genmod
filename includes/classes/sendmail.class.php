@@ -6,11 +6,11 @@ if (stristr($_SERVER["SCRIPT_NAME"],basename(__FILE__))) {
 
 class SendMail {
 	
-	public $classname = 'SendMail';
+	public $classname = 'SendMail';	// Name of this class
 	
-	private $header = '';
-	private $message = '';
-	private $uid = '';
+	private $header = '';			// used to construct the mail header
+	private $message = '';			// Used to construct the mail body
+	private $uid = '';				// Help field
 	
 	// TODO: test the \r\n in the attachment functions
 	

@@ -34,9 +34,9 @@ $GM_BLOCKS["print_user_messages"]["rss"]		= false;
 
 //-- print user messages
 function print_user_messages($block=true, $config="", $side, $index) {
-		global $gm_lang, $GM_IMAGE_DIR, $TEXT_DIRECTION, $TIME_FORMAT, $GM_STORE_MESSAGES, $GM_IMAGES, $gm_username, $gm_user;
+		global $gm_lang, $GM_IMAGE_DIR, $TEXT_DIRECTION, $TIME_FORMAT, $GM_STORE_MESSAGES, $GM_IMAGES, $gm_user;
 
-		$usermessages = MessageController::getUserMessages($gm_username);
+		$usermessages = MessageController::getUserMessages($gm_user->username);
 
 		print "<div id=\"user_messages\" class=\"block\">\n";
 		print "<div class=\"blockhc\">";
@@ -73,7 +73,7 @@ function print_user_messages($block=true, $config="", $side, $index) {
 				$year = date("Y", $time);
 				// if incoming, print the from address.
 				// if outgoing, print the to address.
-				if ($message->from == $gm_username) $mdir = "to";
+				if ($message->from == $gm_user->username) $mdir = "to";
 				else $mdir = "from";
 				$tempuser =& User::GetInstance($message->$mdir);
 				print "<td class=\"wrap\"".$separatortd.">".GetChangedDate("$day $mon $year")." - ".date($TIME_FORMAT, $time)."</td>\n";
@@ -111,7 +111,7 @@ function print_user_messages($block=true, $config="", $side, $index) {
 		$users = UserController::GetUsers("lastname", "asc", "firstname");
 		if (count($users)>1) {
 			print $gm_lang["message"]." <select name=\"touser\">\n";
-			$username = $gm_username;
+			$username = $gm_user->username;
 			if ($gm_user->userIsAdmin()) {
 				print "<option value=\"all\">".$gm_lang["broadcast_all"]."</option>\n";
 				print "<option value=\"never_logged\">".$gm_lang["broadcast_never_logged_in"]."</option>\n";

@@ -180,7 +180,7 @@ if (($ALLOW_CHANGE_GEDCOM) && (count($GEDCOMS) > 1)) {
 		// BUT we must NOT search in a gedcom with authentication required and a user not logged in!
 		$str = "sg".$key;
 		SwitchGedcom($key);
-		if ($REQUIRE_AUTHENTICATION && empty($gm_username)) unset($$str);
+		if ($REQUIRE_AUTHENTICATION && $gm_user->username == "") unset($$str);
 		if (isset($$str)) $sgeds[] = $key;
 	}
 	SwitchGedcom();
@@ -206,6 +206,7 @@ if ($action=="general") {
 		$sfamlist2 = array();
 		$srepolist = array();
 		$smedialist = array();
+		$snotelist = array();
 
 		// Keep track of what indi's are already printed to keep a reliable counter
 		$indi_printed = array();
@@ -230,11 +231,11 @@ if ($action=="general") {
 			$query = preg_replace(array("/\(/", "/\)/", "/\//", "/\]/", "/\[/", "/\s+/"), array('\(','\)','\/','\]','\[', ' '), $query);
 			
 			// Get the cleaned up query to use in result comparisons
-			$cquery = ParseFTSearchQuery($query);
+			$cquery = SearchFunctions::ParseFTSearchQuery($query);
 			
 			// Search the indi's
 			if ((isset($srindi)) && (count($sgeds)>0)) {
-				$sindilist = FTSearchIndis($query, $sgeds);
+				$sindilist = SearchFunctions::FTSearchIndis($query, $sgeds);
 			}
 
 			// Search the fams
@@ -243,7 +244,7 @@ if ($action=="general") {
 				// the search array, so the fam records can be retrieved.
 				// This way we include hits on family names.
 				// If indi's are not searched yet, we have to search them first
-				if (!isset($srindi)) $sindilist = FTSearchIndis($query, $sgeds);
+				if (!isset($srindi)) $sindilist = SearchFunctions::FTSearchIndis($query, $sgeds);
 				$famquery = array();
 				foreach($sindilist as $key1 => $myindi) {
 					$found = false;
@@ -264,7 +265,7 @@ if ($action=="general") {
 				if (!empty($famquery)) $sfamlist = SearchFamsNames($famquery, "OR", true);
 
 				// Get the famrecs with hits in the gedcom record from the family table
-				if (!empty($query)) $sfamlist2 = FTSearchFams($query, $sgeds, "OR", true);
+				if (!empty($query)) $sfamlist2 = SearchFunctions::FTSearchFams($query, $sgeds, "OR", true);
 				$sfamlist = GmArrayMerge($sfamlist, $sfamlist2);
 				// clear the myindilist is no search was intended for indi's
 				// if (!isset($srindi)) $sindilist = array();
@@ -272,35 +273,31 @@ if ($action=="general") {
 
 			// Search the sources
 			if ((isset($srsour)) && (count($sgeds)>0)) {
-				if (!empty($query)) $ssourcelist = FTSearchSources($query, $sgeds);
+				if (!empty($query)) $ssourcelist = SearchFunctions::FTSearchSources($query, $sgeds);
 			}
 
 			// Search the repositories
 			if ((isset($srrepo)) && (count($sgeds)>0)) {
-				if (!empty($query)) $srepolist = FTSearchRepos($query, $sgeds);
-//				print_r($srepolist);
+				if (!empty($query)) $srepolist = SearchFunctions::FTSearchRepos($query, $sgeds);
 			}
 			
 			// Search the notes
-			$note_controller = new NoteController();
 			if ((isset($srnote)) && (count($sgeds)>0)) {
 				if (!empty($query)) {
-					$note_controller->FTSearchNotes($query, $sgeds);
-//					print_r($note_controller->notelist);
+					$snotelist = SearchFunctions::FTSearchNotes($query, $sgeds);
 				}
 			}
 			
 			// Search the media
-			$media = new Media;
 			if ((isset($srmedia)) && (count($sgeds)>0)) {
 				if (!empty($query)) {
-					$media->FTSearchMedia($query, $sgeds);
+					$smedialist = SearchFunctions::FTSearchMedia($query, $sgeds);
 				}
 			}
 			
 			//-- if only 1 item is returned, automatically forward to that item
 			// Check for privacy first. If ID cannot be displayed, continue to the search page.
-			if ((count($sindilist)==1)&&(count($sfamlist)==0)&&(count($ssourcelist)==0) && (count($srepolist)==0) && (count($media->medialist)==0) && count($note_controller->notelist) == 0 && (isset($srindi))) {
+			if ((count($sindilist)==1)&&(count($sfamlist)==0)&&(count($ssourcelist)==0) && (count($srepolist)==0) && (count($smedialist)==0) && count($snotelist) == 0 && (isset($srindi))) {
 				foreach($sindilist as $key=>$indi) {
 					$ged = SplitKey($key, "gedid");
 					$pid = SplitKey($key, "id");
@@ -314,7 +311,7 @@ if ($action=="general") {
 				}
 				SwitchGedcom();
 			}
-			if ((count($sindilist)==0 || !isset($srindi))&&(count($sfamlist)==1)&&(count($ssourcelist)==0) && (count($srepolist)==0) && (count($media->medialist)==0) && count($note_controller->notelist) == 0) {
+			if ((count($sindilist)==0 || !isset($srindi))&&(count($sfamlist)==1)&&(count($ssourcelist)==0) && (count($srepolist)==0) && (count($smedialist)==0) && count($snotelist) == 0) {
 				foreach($sfamlist as $famid=>$fam) {
 					$ged = SplitKey($famid, "gedid");
 					$famid = SplitKey($famid, "id");
@@ -329,7 +326,7 @@ if ($action=="general") {
 				}
 				SwitchGedcom();
 			}
-			if ((count($sindilist)==0 || !isset($srindi))&&(count($sfamlist)==0)&&(count($ssourcelist)==1) && (count($srepolist)==0) && (count($media->medialist)==0) && count($note_controller->notelist==0)) {
+			if ((count($sindilist)==0 || !isset($srindi))&&(count($sfamlist)==0)&&(count($ssourcelist)==1) && (count($srepolist)==0) && (count($smedialist)==0) && count($snotelist==0)) {
 				foreach($ssourcelist as $sid=>$source) {
 					$ged = SplitKey($sid, "gedid");
 					$sid = SplitKey($sid, "id");
@@ -341,7 +338,7 @@ if ($action=="general") {
 				}
 				SwitchGedcom();
 			}
-			if ((count($sindilist)==0 || !isset($srindi))&&(count($sfamlist)==0)&&(count($ssourcelist)==0) && (count($srepolist)==1)  && (count($media->medialist)==0)&& count($note_controller->notelist) == 0) {
+			if ((count($sindilist)==0 || !isset($srindi))&&(count($sfamlist)==0)&&(count($ssourcelist)==0) && (count($srepolist)==1)  && (count($smedialist)==0)&& count($snotelist) == 0) {
 				foreach($srepolist as $rid=>$repo) {
 					$ged = SplitKey($rid, "gedid");
 					$rid = SplitKey($rid, "id");
@@ -353,8 +350,8 @@ if ($action=="general") {
 				}
 				SwitchGedcom();
 			}
-			if ((count($sindilist)==0 || !isset($srindi))&&(count($sfamlist)==0)&&(count($ssourcelist)==0) && (count($srepolist)==0) && (count($media->medialist)==0) && count($note_controller->notelist) == 1) {
-				foreach($note_controller->notelist as $oid=>$note) {
+			if ((count($sindilist)==0 || !isset($srindi))&&(count($sfamlist)==0)&&(count($ssourcelist)==0) && (count($srepolist)==0) && (count($smedialist)==0) && count($snotelist) == 1) {
+				foreach($snotelist as $oid=>$note) {
 					header("Location: note.php?oid=".$note->xref."&gedid=".$note->gedcomid);
 					exit;
 				}
@@ -725,7 +722,7 @@ else {
 			echo '<input type="checkbox" onclick="CheckAllGed(this)" />'.$gm_lang['select_deselect_all'].'<br>';
 			foreach ($GEDCOMS as $key=>$ged) {
 				SwitchGedcom($key);
-				if (!empty($gm_username) || !$REQUIRE_AUTHENTICATION) {
+				if ($gm_user->username != "" || !$REQUIRE_AUTHENTICATION) {
 					$str = "sg".$key;
 					print "<input type=\"checkbox\" ";
 					if (($key == $GEDCOMID) && ($action == "")) print "checked=\"checked\" ";
@@ -1183,7 +1180,7 @@ if ($action=="general") {
 				for (i=0; i<tabid.length; i++) {
 					var elt = document.getElementById('door'+i);
 					if (document.getElementById('no_tab'+i)) { // empty ?
-						if (<?php if (!empty($gm_username)) echo 'true'; else echo 'false';?>) {
+						if (<?php if ($gm_user->username != "") echo 'true'; else echo 'false';?>) {
 							elt.style.display='block';
 							elt.style.opacity='0.4';
 							elt.style.filter='alpha(opacity=40)';
@@ -1491,7 +1488,7 @@ if ($action=="general") {
 			print $gm_lang["media"];
 			print "</td></tr><tr><td class=\"$TEXT_DIRECTION shade1 wrap\"><ul>";
 			$i=1;
-			foreach ($media->medialist as $key => $value) {
+			foreach ($smedialist as $key => $value) {
 				$ged = SplitKey($key, "gedid");
 				$id = SplitKey($key, "id");
 				print_list_media($id, $value, true);
@@ -1526,13 +1523,13 @@ if ($action=="general") {
 	    		}
   		  	}
 			print "\n\t<table class=\"list_table $TEXT_DIRECTION\">\n\t\t<tr><td class=\"shade2 center\"";
-			$note_count = count($note_controller->notelist);
+			$note_count = count($snotelist);
 			if($note_count > 12) print " colspan=\"2\"";
 			print "><img src=\"".$GM_IMAGE_DIR."/".$GM_IMAGES["note"]["other"]."\" border=\"0\" alt=\"".$gm_lang["notes"]."\" />&nbsp;&nbsp;";
 			print $gm_lang["notes"];
 			print "</td></tr><tr><td class=\"$TEXT_DIRECTION shade1 wrap\"><ul>";
 			$i=1;
-			foreach ($note_controller->notelist as $key => $note) {
+			foreach ($snotelist as $key => $note) {
 				if ($note->gedcomid != $GEDCOMID) {
 					SwitchGedcom($note->gedcomid);
 					$skiptagsged = $skiptags;

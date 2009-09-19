@@ -247,7 +247,6 @@ function InstallAddAdminUser($newuser, $msg = "added") {
 	$sql .= ",'".mysql_real_escape_string($newuser["verified"])."'";
 	$sql .= ",'".mysql_real_escape_string($newuser["verified_by_admin"])."'";
 	$sql .= ",'".mysql_real_escape_string($newuser["language"])."'";
-	$sql .= ",'".mysql_real_escape_string($newuser["pwrequested"])."'";
 	$sql .= ",'".mysql_real_escape_string($newuser["reg_timestamp"])."'";
 	$sql .= ",'".mysql_real_escape_string($newuser["reg_hashcode"])."'";
 	$sql .= ",'".mysql_real_escape_string($newuser["theme"])."'";

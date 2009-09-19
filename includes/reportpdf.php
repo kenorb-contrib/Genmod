@@ -1488,7 +1488,7 @@ function GMRGedcomSHandler($attrs) {
 		($newreclevel == 0 && PrivacyFunctions::DisplayDetailsByID($newid, $newrectype)) &&
 		PrivacyFunctions::DisplayDetailsById($id, $rectype)) {
 			if ($debug) print "can show<br />";
-//			$newgedrec = privatize_gedcom($newgedrec);
+//			$newgedrec = PrivatizeGedcom($newgedrec);
 //			$gedObj = new GedcomRecord($newgedrec);
 			array_push($gedrecStack, array($gedrec, $fact, $desc));
 			//print "[$newgedrec]";

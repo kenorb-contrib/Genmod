@@ -42,7 +42,7 @@ $GM_BLOCKS["print_logged_in_users"]["rss"]     		= false;
  * prints a list of other users who are logged in
  */
 function print_logged_in_users($block=true, $config="", $side, $index) {
-		global $gm_lang, $GM_SESSION_TIME, $TEXT_DIRECTION, $gm_username, $NAME_REVERSE, $gm_user;
+		global $gm_lang, $GM_SESSION_TIME, $TEXT_DIRECTION, $NAME_REVERSE, $gm_user;
 		
 		$block = true;			// Always restrict this block's height
 		
@@ -87,7 +87,7 @@ function print_logged_in_users($block=true, $config="", $side, $index) {
 			if ($NAME_REVERSE) print PrintReady($user->lastname." ".$user->firstname);
 			else print PrintReady($user->firstname." ".$user->lastname);
 			print " - ".$user->username;
-			if (($gm_username != $user->username) and ($user->contactmethod != "none")) {
+			if (($gm_user->username != $user->username) and ($user->contactmethod != "none")) {
 				print "<br /><a href=\"#\" onclick=\"return message('".$user->username."');\">".$gm_lang["message"]."</a>";
 			}
 			print "</td></tr>";

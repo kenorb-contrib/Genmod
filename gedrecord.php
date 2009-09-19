@@ -33,7 +33,6 @@ if (!isset($pid)) $pid = "";
 if (!isset($changed)) $changed = false;
 $pid = CleanInput($pid);
 print_simple_header($pid);
-$username = $gm_username;
 
 if ((!$gm_user->userCanViewGedlines()) && (!$gm_user->UserCanAccept())) {
 	print "<span class=\"error\">".$gm_lang["ged_noshow"]."</span>\n";
@@ -49,9 +48,9 @@ if ((FindPersonRecord($pid))&&(!PrivacyFunctions::displayDetailsByID($pid))) {
 if ($changed) {
 	$getrec = GetChangeData(false, $pid, true);
 	$newrec = $getrec[$GEDCOMID][$pid];
-	$newrec = PrivacyFunctions::privatize_gedcom($newrec);
+	$newrec = PrivacyFunctions::PrivatizeGedcom($newrec);
 	$oldrec = FindGedcomRecord($pid);
-	$oldrec = PrivacyFunctions::privatize_gedcom($oldrec);
+	$oldrec = PrivacyFunctions::PrivatizeGedcom($oldrec);
 	print "<table class=\"facts_table\">\r\n";
 	print "<tr class=\"topbottombar\"><td>".$gm_lang["old_record"]."</td><td>".$gm_lang["new_record"]."</td></tr>\r\n";
 	print "<tr class=\"shade1 wrap\"><td>".nl2br($oldrec)."</td><td>".nl2br($newrec)."</td></tr>\r\n";
@@ -59,7 +58,7 @@ if ($changed) {
 }
 else {
 	$indirec = FindGedcomRecord($pid);
-	$indirec = PrivacyFunctions::privatize_gedcom($indirec);
+	$indirec = PrivacyFunctions::PrivatizeGedcom($indirec);
 	print nl2br($indirec);
 	print "<br />";
 }

@@ -30,8 +30,8 @@ if (stristr($_SERVER["SCRIPT_NAME"],basename(__FILE__))) {
 
 abstract class DebugCollector {
 	
-	public $classname = "DebugCollector"; 	// Name of this class
-	public static $show = false;
+	public $classname = "DebugCollector"; 											// Name of this class
+	public static $show = false;													// Switch on/off the collector
 	private static $debugoutput = array("output" => array(), "query" => array());	// Collector for the debug output
 	
 	private function PrintRecord($record) {

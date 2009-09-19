@@ -31,8 +31,7 @@ require "config.php";
 
 //-- make sure that they have admin status before they can use this page
 //-- otherwise have them login again
-$uname = $gm_username;
-if (empty($uname)) {
+if ($gm_user->username = "") {
 	if (LOGIN_URL == "") header("Location: login.php?url=changelanguage.php");
 	else header("Location: ".LOGIN_URL."?url=changelanguage.php");
 	exit;

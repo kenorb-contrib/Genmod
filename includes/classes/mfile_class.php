@@ -274,8 +274,8 @@ class MFile {
 			case "f_pastelink":
 				return $this->f_pastelink;
 				break;
-			default: 
-				print "Error getting ".$property."<br />";
+			default:
+				print "<span class=\"error\">Invalid property ".$property." for __get in ".get_class($this)." class</span><br />";
 				break;
 		}
 	}

@@ -522,7 +522,7 @@ function PrintSosaFamily($famid, $childid, $sosa, $label="", $parid="", $gparid=
  * @return string $rootid validated root ID
  */
 function CheckRootId($rootid) {
-	global $user, $GEDCOMID, $GEDCOM_ID_PREFIX, $PEDIGREE_ROOT_ID, $USE_RIN, $gm_username, $gm_user;
+	global $user, $GEDCOMID, $GEDCOM_ID_PREFIX, $PEDIGREE_ROOT_ID, $USE_RIN, $gm_user;
 	
 	// -- if the $rootid is not already there then find the first person in the file and make him the root
 	if (empty($rootid)) {

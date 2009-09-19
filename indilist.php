@@ -44,7 +44,7 @@ if (empty($show_all)) $show_all = "no";
 if (empty($show_all_firstnames)) $show_all_firstnames = "no";
 // Added if any of the gedcoms require authentication and the user is not logged on, we cannot do allgeds.
 if (!isset($allgeds) || $allgeds != "yes" || !$ALLOW_CHANGE_GEDCOM) $allgeds = "no";
-if ($allgeds == "yes" && empty($gm_username)) {
+if ($allgeds == "yes" && $gm_user->username == "") {
 	foreach($GEDCOMS as $key => $ged) {
 		SwitchGedcom($key);
 		if ($REQUIRE_AUTHENTICATION) $allgeds = "no";

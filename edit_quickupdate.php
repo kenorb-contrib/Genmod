@@ -56,7 +56,7 @@ print_simple_header($gm_lang["quick_update_title"]);
 //print "</pre>";
 
 //-- only allow logged in users to access this page
-if ((!$ALLOW_EDIT_GEDCOM)||(!$USE_QUICK_UPDATE)||(empty($gm_username))) {
+if ((!$ALLOW_EDIT_GEDCOM)||(!$USE_QUICK_UPDATE)||(empty($gm_user->username))) {
 	print $gm_lang["access_denied"];
 	print_simple_footer();
 	exit;
@@ -117,7 +117,7 @@ if ((!$disp)||(!$ALLOW_EDIT_GEDCOM)) {
 //-- privatize the record so that line numbers etc. match what was in the display
 //-- data that is hidden because of privacy is stored in the $gm_private_records array
 //-- any private data will be restored when the record is replaced
-$gedrec = PrivacyFunctions::privatize_gedcom($gedrec);
+$gedrec = PrivacyFunctions::PrivatizeGedcom($gedrec);
 
 //-- put the updates into the gedcom record
 if ($action=="update") {
@@ -264,7 +264,7 @@ if ($action=="update") {
 	print "<h3>".$gm_lang["quick_update_title"]."</h3>\n";
 	print "<b>".PrintReady(GetPersonName($pid, $gedrec))."</b><br /><br />";
 	
-	WriteToLog("EditQuickUpdate-> Quick update attempted for $pid by >".$gm_username."<", "I", "G", $GEDCOMID);
+	WriteToLog("EditQuickUpdate-> Quick update attempted for $pid by >".$gm_user->username."<", "I", "G", $GEDCOMID);
 
 	$change_id = GetNewXref("CHANGE");
 	$updated = false;

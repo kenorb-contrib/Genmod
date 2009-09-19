@@ -33,15 +33,14 @@ if (stristr($_SERVER["SCRIPT_NAME"],basename(__FILE__))) {
  */
 class MediaController extends DetailController {
 	
-	public $classname = "MediaController";
-	public $media = null;
+	public $classname = "MediaController";	// Name of this class
+	public $media = null;					// Object it's controlling
 	
 	/**
 	 * constructor
 	 */
 	public function __construct() {
-		global $gm_lang;
-		global $ENABLE_CLIPPINGS_CART, $nonfacts;
+		global $nonfacts;
 		
 		parent::__construct();
 		
@@ -90,9 +89,6 @@ class MediaController extends DetailController {
 	public function &getEditMenu() {
 		global $TEXT_DIRECTION, $gm_lang, $gm_user;
 		
-		if ($TEXT_DIRECTION=="rtl") $ff="_rtl";
-		else $ff="";
-		
 		// edit media menu
 		$menu = new Menu($gm_lang['edit_media']);
 
@@ -132,9 +128,6 @@ class MediaController extends DetailController {
 	public function &getOtherMenu() {
 		global $TEXT_DIRECTION, $gm_lang;
 		global $ENABLE_CLIPPINGS_CART, $gm_user;
-		
-		if ($TEXT_DIRECTION=="rtl") $ff="_rtl";
-		else $ff="";
 		
 		// other menu
 		$menu = new Menu($gm_lang['other']);

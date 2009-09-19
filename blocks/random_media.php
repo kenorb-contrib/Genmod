@@ -36,7 +36,7 @@ $GM_BLOCKS["print_random_media"]["rss"]     = false;
 function print_random_media($block = true, $config="", $side, $index) {
 	global $gm_lang, $GEDCOMID, $foundlist, $medialist, $TEXT_DIRECTION, $GM_IMAGE_DIR, $GM_IMAGES;
 	global $MEDIA_EXTERNAL, $MEDIA_DIRECTORY, $SHOW_SOURCES, $GEDCOM_ID_PREFIX, $FAM_ID_PREFIX, $SOURCE_ID_PREFIX;
-	global $MEDIATYPE, $medialist, $gm_username, $USE_GREYBOX;
+	global $MEDIATYPE, $medialist, $USE_GREYBOX;
 	
 	$foundlist = array();
 	srand();

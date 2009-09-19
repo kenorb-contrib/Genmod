@@ -80,9 +80,9 @@ abstract class FactFunctions {
 		if (!$factobj->owner->canedit) {
 			//-- do not print empty facts to visitors. Editors may want to change them
 			$lines = preg_split("/\n/", trim($factobj->factrec));
-			if (count($lines) < 2 && $factobj->fact == $factobj->factref) return;
+			if (count($lines) < 2 && $event == "") return;
 		}
-		
+
 		// See if RESN tag prevents display or edit/delete
 		$resn_tag = preg_match("/2 RESN (.*)/", $factobj->factrec, $match);
 		if ($resn_tag == "1") $resn_value = strtolower(trim($match[1]));
@@ -397,6 +397,10 @@ abstract class FactFunctions {
 				}
 		
 				print "<br />\n";
+				
+				// print the media notes
+				self::PrintFactNotes($media, 1);
+				
 				// Print the notes in the MM link
 				self::PrintFactNotes($factobj, 2);
 			}
@@ -524,7 +528,7 @@ abstract class FactFunctions {
 	public function PrintFactNotes($factobj, $level, $nobr=true) {
 		global $gm_lang;
 		global $INDI_EXT_FAM_FACTS;
-		
+
 		// This is to prevent that notes are printed as part of the fact for family facts displayed on the indipage
 		if ($level == 2 && is_object($factobj) && !$INDI_EXT_FAM_FACTS && preg_match("/\n1 _GMFS @(.*)@/", $factobj->factrec)) return false;
 	
@@ -534,7 +538,7 @@ abstract class FactFunctions {
 		$first = true;
 
 		$factnotes = array();
-		
+	
 		if (is_string($factobj)) {
 			$i = 1;
 			do {
@@ -548,7 +552,7 @@ abstract class FactFunctions {
 			if ($level > 1 && $factobj->datatype == "sub") {
 				$i = 1;
 				do {
-					$rec = GetSubRecord(2, "$level NOTE", $factobj->factrec, $i);
+					$rec = GetSubRecord($level, "$level NOTE", $factobj->factrec, $i);
 					if ($rec != "") $factnotes[] = $rec;
 					$i++;
 				} while ($rec != "");
@@ -879,7 +883,7 @@ abstract class FactFunctions {
 	private function PrintFactTagBox($factobj, $mayedit) {
 		 global $GM_IMAGE_DIR, $GM_IMAGES, $gm_lang;
 		 global $n_chil, $n_gchi;
-		
+
 		print "<td class=\"shade2 ".$factobj->style." center width20\" style=\"vertical-align: middle;\">";
 		if ($factobj->fact == "SOUR") {
 			print "<img src=\"".$GM_IMAGE_DIR."/".$GM_IMAGES["source"]["large"]."\" width=\"50\" height=\"50\" alt=\"\" /><br />";
@@ -895,6 +899,11 @@ abstract class FactFunctions {
 			print "<img src=\"".$GM_IMAGE_DIR."/".$GM_IMAGES["media"]["large"]."\" width=\"50\" height=\"50\" alt=\"\" /><br />";
 			print GM_FACT_OBJE;
 			$edit_actions = array("edit_media_link", "edit_media_link", "copy_media", "delete_media");
+		}
+		else if ($factobj->factref == "_HIST") {
+			// We cannot edit historical events!
+			print GM_FACT__HIST;
+			$mayedit = false;
 		}
 		else {
 			print $factobj->descr;

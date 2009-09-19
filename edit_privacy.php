@@ -37,7 +37,7 @@ PrivacyController::ReadPrivacy($GEDCOMID, false);
 
 if (empty($gedid)) $gedid = $GEDCOMID;
 
-if ((!$gm_user->userGedcomAdmin($ged))||(empty($ged))) {
+if ((!$gm_user->userGedcomAdmin($gedid))||(empty($gedid))) {
 	header("Location: editgedcoms.php");
 	exit;
 }
@@ -194,8 +194,8 @@ print_header($gm_lang["privacy_header"]);
 <table class="facts_table <?php print $TEXT_DIRECTION ?>">
 	<tr>
 		<td colspan="2" class="admin_topbottombar"><?php
-			print "<h3>".$gm_lang["edit_privacy_title"]." - ".$GEDCOMS[get_id_from_gedcom($ged)]["title"]. "</h3>";
-			if (UserController::CheckPrivacyOverrides(get_id_from_gedcom($ged))) {
+			print "<h3>".$gm_lang["edit_privacy_title"]." - ".$GEDCOMS[$gedid]["title"]. "</h3>";
+			if (UserController::CheckPrivacyOverrides($gedid)) {
 				print "<span class=\"error\">".$gm_lang["user_overr_exists"];
 				if ($gm_user->UserIsAdmin()) print "<a href=\"useradmin.php?action=listusers&amp;filter=privoverride&amp;gedid=$gedid\"> ".$gm_lang["user_overr_show"]."</a>";
 				print "</span><br />";
@@ -530,7 +530,7 @@ if ($action=="update") {
               <td class="shade1">
                 <input type="text" class="pedigree_form" name="v_new_person_privacy_access_ID" id="v_new_person_privacy_access_ID" size="4" />
                 <?php
-			 LinkFunctions::PrintFindIndiLink("v_new_person_privacy_access_ID", get_id_from_gedcom($ged));
+			 LinkFunctions::PrintFindIndiLink("v_new_person_privacy_access_ID", $gedid);
 			 LinkFunctions::PrintFindFamilyLink("v_new_person_privacy_access_ID");
 			 LinkFunctions::PrintFindSourceLink("v_new_person_privacy_access_ID");
 			 LinkFunctions::PrintFindObjectLink("v_new_person_privacy_access_ID");             

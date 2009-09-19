@@ -40,7 +40,7 @@ abstract class PersonFunctions {
 	 * @param boolean $show_famlink	set to true to show the icons for the popup links and the zoomboxes
 	 * @param int $count	on some charts it is important to keep a count of how many boxes were printed
 	 */
-	function PrintPedigreePerson(&$person, $style=1, $show_famlink=true, $count=0, $personcount="1", $view="") {
+	public function PrintPedigreePerson(&$person, $style=1, $show_famlink=true, $count=0, $personcount="1", $view="") {
 		// Global settings
 		global $ZOOM_BOXES, $LINK_ICONS, $SCRIPT_NAME, $GEDCOMID, $SHOW_HIGHLIGHT_IMAGES, $PEDIGREE_FULL_DETAILS, $SHOW_ID_NUMBERS;
 		global $CONTACT_EMAIL, $CONTACT_METHOD, $TEXT_DIRECTION, $DEFAULT_PEDIGREE_GENERATIONS, $PEDIGREE_LAYOUT;
@@ -49,7 +49,7 @@ abstract class PersonFunctions {
 		global $bwidth, $bheight;
 		// Settings for pedigree, descendancy, ancestry etc.
 		global $show_full, $OLD_PGENS, $talloffset, $chart_style, $box_width, $generations;
-		global $gm_lang, $gm_user, $gm_username;
+		global $gm_lang, $gm_user;
 
 		if (is_object($person) && $person->show_changes && $gm_user->UserCanEdit()) $canshow = true;
 		else $canshow = false;
@@ -98,11 +98,9 @@ abstract class PersonFunctions {
 					// NOTE: Zoom
 					print "<a href=\"pedigree.php?rootid=".$person->xref."&amp;PEDIGREE_GENERATIONS=$OLD_PGENS&amp;talloffset=$talloffset&amp;gedid=".$person->gedcomid."\"><b>".$gm_lang["index_header"]."</b></a>\n";
 					print "<br /><a href=\"descendancy.php?pid=".$person->xref."&amp;show_full=$show_full&amp;generations=$generations&amp;box_width=$box_width&amp;gedid=".$person->gedcomid."\"><b>".$gm_lang["descend_chart"]."</b></a><br />\n";
-					$username = $gm_username;
-					if (!empty($username)) {
-						$tuser =& User::GetInstance($username);
-						if (!empty($tuser->gedcomid[$GEDCOMID])) {
-							print "<a href=\"relationship.php?pid1=".$tuser->gedcomid[$GEDCOMID]."&amp;pid2=".$person->xref."&amp;gedid=".$person->gedcomid."\"><b>".$gm_lang["relationship_to_me"]."</b></a><br />\n";
+					if ($gm_user->username != "") {
+						if (!empty($gm_user->gedcomid[$GEDCOMID])) {
+							print "<a href=\"relationship.php?pid1=".$gm_user->gedcomid[$GEDCOMID]."&amp;pid2=".$person->xref."&amp;gedid=".$person->gedcomid."\"><b>".$gm_lang["relationship_to_me"]."</b></a><br />\n";
 						}
 					}
 					// NOTE: Zoom
@@ -189,7 +187,6 @@ abstract class PersonFunctions {
 					else  if ($isF=="F")print $GM_IMAGES["sexf"]["small"]."\" title=\"".$gm_lang["female"]."\" alt=\"".$gm_lang["female"];
 					else  print $GM_IMAGES["sexn"]["small"]."\" title=\"".$gm_lang["unknown"]."\" alt=\"".$gm_lang["unknown"];
 					print "\" class=\"sex_image\" />";
-					print $person->addxref;
 					if ($SHOW_ID_NUMBERS) {
 						print "</span><span class=\"details$style\">";
 						print $person->addxref;
@@ -400,7 +397,7 @@ abstract class PersonFunctions {
 	 * @param string $parid optional parent ID (descendancy booklet)
 	 * @param string $gparid optional gd-parent ID (descendancy booklet)
 	 */
-	function PrintFamilyParents(&$family, $sosa = 0, $label="", $parid="", $gparid="", $personcount="1") {
+	public function PrintFamilyParents(&$family, $sosa = 0, $label="", $parid="", $gparid="", $personcount="1") {
 		global $gm_lang, $view, $show_full;
 		global $TEXT_DIRECTION, $SHOW_EMPTY_BOXES;
 		global $pbwidth, $pbheight;
@@ -563,9 +560,9 @@ abstract class PersonFunctions {
 	 * @param int $sosa optional child sosa number
 	 * @param string $label optional indi label (descendancy booklet)
 	 */
-	function PrintFamilyChildren($family, $childid = "", $sosa = 0, $label="", $personcount="1") {
+	public function PrintFamilyChildren($family, $childid = "", $sosa = 0, $label="", $personcount="1") {
 		global $gm_lang, $pbwidth, $pbheight, $view, $show_famlink, $show_cousins;
-		global $GM_IMAGE_DIR, $GM_IMAGES, $show_changes, $SHOW_ID_NUMBERS, $SHOW_FAM_ID_NUMBERS, $TEXT_DIRECTION, $gm_username, $gm_user;
+		global $GM_IMAGE_DIR, $GM_IMAGES, $show_changes, $SHOW_ID_NUMBERS, $TEXT_DIRECTION, $gm_user;
 	
 		if ($show_changes && $gm_user->UserCanEdit()) $canshow = true;
 		else $canshow = false;
@@ -704,7 +701,7 @@ abstract class PersonFunctions {
 	 * @param string $key	indi pid
 	 */
 	public function PrintFirstMajorFact($person, $prt=true, $break=false) {
-		global $gm_lang, $GM_BASE_DIRECTORY, $factsfile, $LANGUAGE;
+		global $gm_lang;
 		
 		$majorfacts = array("BIRT", "CHR", "BAPM", "DEAT", "BURI", "BAPL", "ADOP");
 		$retstr = "";

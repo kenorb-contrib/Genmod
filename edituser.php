@@ -170,7 +170,7 @@ if ($action=="edituser2") {
 </script>
 <form name="editform" method="post" action="" onsubmit="return checkform(this);">
 <input type="hidden" name="action" value="edituser2" />
-<input type="hidden" name="oldusername" value="<?php print $gm_username; ?>" />
+<input type="hidden" name="oldusername" value="<?php print $gm_user->username; ?>" />
 <?php $tab=0; ?>
 <table class="list_table <?php print $TEXT_DIRECTION; ?>">
 	<tr><td class="topbottombar" colspan="2"><h3><?php print $gm_lang["editowndata"];?></h3></td></tr>

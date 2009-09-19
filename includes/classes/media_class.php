@@ -50,6 +50,9 @@ class Media {
 			case "lastitem":
 				return end($this->medialist);
 				break;
+			default:
+				print "<span class=\"error\">Invalid property ".$property." for __get in ".get_class($this)." class</span><br />";
+				break;
 		}
 	}
 	/*
@@ -175,67 +178,6 @@ class Media {
 	}
 
 	
-	//-- search through the gedcom records for media, full text
-	public function FTSearchMedia($query, $allgeds=false, $ANDOR="AND") {
-		global $GEDCOMS, $GEDCOMID, $ftminwlen, $ftmaxwlen, $media_hide, $media_total;
-		
-		// Get the min and max search word length
-		GetFTWordLengths();
-	
-		$cquery = ParseFTSearchQuery($query);
-		$addsql = "";
-		
-		$mlen = GetFTMinLen($cquery);
-		
-		if ($mlen < $ftminwlen || HasMySQLStopwords($cquery)) {
-			if (isset($cquery["includes"])) {
-				foreach ($cquery["includes"] as $index => $keyword) {
-					if (HasChinese($keyword["term"])) $addsql .= " ".$keyword["operator"]." m_gedrec REGEXP '".DbLayer::EscapeQuery($keyword["term"]).$keyword["wildcard"]."'";
-					else $addsql .= " ".$keyword["operator"]." m_gedrec REGEXP '[[:<:]]".DbLayer::EscapeQuery($keyword["term"]).$keyword["wildcard"]."[[:>:]]'";
-				}
-			}
-			if (isset($cquery["excludes"])) {
-				foreach ($cquery["excludes"] as $index => $keyword) {
-					if (HasChinese($keyword["term"])) $addsql .= " AND m_gedrec NOT REGEXP '".DbLayer::EscapeQuery($keyword["term"]).$keyword["wildcard"]."'";
-					else $addsql .= " AND m_gedrec NOT REGEXP '[[:<:]]".DbLayer::EscapeQuery($keyword["term"]).$keyword["wildcard"]."[[:>:]]'";
-				}
-			}
-			$sql = "SELECT * FROM ".TBLPREFIX."media WHERE (".substr($addsql,4).")";
-		}
-		else {
-			$sql = "SELECT * FROM ".TBLPREFIX."media WHERE (MATCH (m_gedrec) AGAINST ('".DbLayer::EscapeQuery($query)."' IN BOOLEAN MODE))";
-		}
-	
-		if (!$allgeds) $sql .= " AND m_gedfile='".$GEDCOMID."'";
-		
-		if ((is_array($allgeds) && count($allgeds) != 0) && count($allgeds) != count($GEDCOMS)) {
-			$sql .= " AND (";
-			for ($i=0; $i<count($allgeds); $i++) {
-				$sql .= "m_gedfile='".$allgeds[$i]."'";
-				if ($i < count($allgeds)-1) $sql .= " OR ";
-			}
-			$sql .= ")";
-		}
-	
-		$media_total = array();
-		$media_hide = array();
-		$res = NewQuery($sql);
-		if ($res) {
-	 		while ($row = $res->FetchAssoc()) {
-		 		$media = array();
-		 		SwitchGedcom($row["m_gedfile"]);
-				$media_total[$row["m_media"]."[".$GEDCOMID."]"] = 1;
-		 		if (PrivacyFunctions::DisplayDetailsByID($row["m_media"], "OBJE", 1, true)) {
-					$media = array();
-					$media["gedfile"] = $GEDCOMID;
-					$media["name"] = GetMediaDescriptor($row["m_media"], $row["m_gedrec"]);
-					$this->medialist[JoinKey($row["m_media"], $row["m_gedfile"])] = $media;
-	 			}
-		 		else $media_hide[$row["m_media"]."[".$GEDCOMID."]"] = 1;
-		 		SwitchGedcom();
-	 		}
-		}
-	}
 	
 	/* Retrieves the medialinks for the items.
 	** If link privacy is on, privacy is already checked 2 levels deep	

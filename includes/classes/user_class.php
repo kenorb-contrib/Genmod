@@ -30,44 +30,50 @@ if (stristr($_SERVER["SCRIPT_NAME"],basename(__FILE__))) {
 
 class User {
 
-	public $classname = "User";				// Name of this class
-	private static $usercache = array();	// Holder of the instances for this class
-	public $username = "";					// Name of the user (used to logon)
-	public $password = "";					// Encrypted password of the user
-	public $firstname = "";					// Firstname of the user
-	public $lastname = "";					// Lastname of the user
-	public $canadmin = false;				// If the user is administrator (sitewide)
-	public $canedit = array();				// If the user has edit rights (per gedcom)
-	public $email = "";						// Email address of the user
-	public $verified = "";					// If the user has verified his/her request for an account
-	public $verified_by_admin = "";			// If the admin has approved the user's request for an account
-	public $language = "";					// Default language for the user
-	public $pwrequested = "";				// 
-	public $reg_timestamp = "";
-	public $reg_hashcode = "";
-	public $theme = "";
-	public $loggedin = "";
-	public $sessiontime = "";
-	public $contactmethod = "";
-	public $visibleonline = false;
-	public $editaccount = false;
-	public $default_tab = "9";
-	public $comment = "";
-	public $comment_exp = "";
-	public $sync_gedcom = "";
-	public $auto_accept = false;
-	public $u_username = "";
-	public $gedcomid = array();
-	public $rootid = array();
-	public $privgroup = array();
-	public $gedcomadmin = array();
-	public $relationship_privacy = array();
-	public $max_relation_path = array();
-	public $hide_live_people = array();
-	public $show_living_names = array();
-	public $show_action_log = null;
-	public $is_empty = true;
+	public $classname = "User";					// Name of this class
+	private static $usercache = array();		// Holder of the instances for this class
+
+	public $username = "";						// Name of the user (used to logon)
+	public $password = "";						// Encrypted password of the user
+	public $firstname = "";						// Firstname of the user
+	public $lastname = "";						// Lastname of the user
+	public $canadmin = false;					// If the user is administrator (sitewide), true/false
+	public $email = "";							// Email address of the user
+	public $verified = "";						// If the user has verified his/her request for an account, blank or Y
+	public $verified_by_admin = "";				// If the admin has approved the user's request for an account, blank or Y
+	public $language = "";						// Default language for the user
+	public $reg_timestamp = "";					// Timestamp of creation of this user
+	public $reg_hashcode = "";					// Hashcode for verification of the user, empty if added by an admin
+	public $theme = "";							// Theme for this user, empty if site default, otherwise the path to the theme
+	public $loggedin = "";						// If the user is currently logged in (until reset after timeout or logoff), Y or N
+	public $sessiontime = "";					// Timestamp of last access to a page
+	public $contactmethod = "";					// Contact method for this user:
+												//		messaging	-	Internal messages only
+												//		messaging2	-	Internal messages and emails
+												//		messaging3	-	Emails only
+												//		none		-	No messaging at all
+	public $visibleonline = false;				// If the user is visible in the logged in block (always is to admins), true or false
+	public $editaccount = false;				// If the user can edit his own settings, true or false
+	public $default_tab = "9";					// Default tab to show on individual pages. 9 is gedcom default, otherwise it overrides the gedcom default
+	public $comment = "";						// Admin's comment on this user
+	public $comment_exp = "";					// Date on which the admin is warned that this date is expired
+	public $sync_gedcom = "";					// Synchronise the users email address to his ID's email address in the gedcom, Y or N
+	public $auto_accept = false;				// If changes by this user are automatically accepted (if possible), Y or N
+	public $is_empty = true;					// if the user doesn't exist, this is true
 	
+	// Settings per gedcom ID
+	public $gedcomid = array();					// Own ID of the user in the gedcom
+	public $rootid = array();					// Root ID for various pages for this user
+	public $privgroup = array();				// Access level of the user: none, access or admin
+	public $gedcomadmin = array();				// User can administer this gedcom, true or false
+	public $canedit = array();					// If the user has edit rights
+	public $relationship_privacy = array();		// Override for the privacy settings, blank is default, Y or N the overrides
+	public $max_relation_path = array();		// Override for the privacy settings, if the above is Y, length of the path
+	public $check_marriage_relations = array();	// Override for the privacy settings, use spouse paths in determining path lengths
+	public $hide_live_people = array();			// Override for the privacy settings, blank is default, Y or N the overrides
+	public $show_living_names = array();		// Override for the privacy settings, blank is default, Y or N the overrides
+
+		
 	public static function getInstance($username, $userdata="") {
 		global $gm_username;
 		
@@ -150,7 +156,6 @@ class User {
 				$this->verified = $user_row["u_verified"];
 				$this->verified_by_admin = $user_row["u_verified_by_admin"];
 				$this->language = $user_row["u_language"];
-				$this->pwrequested = $user_row["u_pwrequested"];
 				$this->reg_timestamp = $user_row["u_reg_timestamp"];
 				$this->reg_hashcode = $user_row["u_reg_hashcode"];
 				$this->theme = $user_row["u_theme"];
@@ -180,6 +185,7 @@ class User {
 			}
 			if (isset($user_row["ug_relationship_privacy"])) $this->relationship_privacy[$ged] = $user_row["ug_relationship_privacy"];
 			if (isset($user_row["ug_max_relation_path"])) $this->max_relation_path[$ged] = $user_row["ug_max_relation_path"];
+			if (isset($user_row["ug_check_marriage_relations"])) $this->check_marriage_relations[$ged] = $user_row["ug_check_marriage_relations"];
 			if (isset($user_row["ug_hide_live_people"])) $this->hide_live_people[$ged] = $user_row["ug_hide_live_people"];
 			if (isset($user_row["ug_show_living_names"])) $this->show_living_names[$ged] = $user_row["ug_show_living_names"];
 			if (isset($user_row["ug_gedcomid"])) $this->gedcomid[$ged] = $user_row["ug_gedcomid"];
@@ -245,7 +251,7 @@ class User {
 		if ($_SESSION['cookie_login']) return false;
 		if ($this->username == "") return false;
 		if ($this->userIsAdmin()) return true;
-		if (isset($this->gedcomadmin[$gedid]) && $user->gedcomadmin[$gedid]) return true;
+		if (isset($this->gedcomadmin[$gedid]) && $this->gedcomadmin[$gedid]) return true;
 		else return false;
 	}
 	

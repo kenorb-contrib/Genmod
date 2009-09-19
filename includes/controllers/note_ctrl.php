@@ -94,10 +94,7 @@ class NoteController extends DetailController {
 	 * @return Menu
 	 */
 	public function &getEditMenu() {
-		global $TEXT_DIRECTION, $gm_lang, $gm_user, $show_changes;
-		
-		if ($TEXT_DIRECTION=="rtl") $ff="_rtl";
-		else $ff="";
+		global $gm_lang, $gm_user, $show_changes;
 		
 		// edit note menu
 		$menu = new Menu($gm_lang['edit_note']);
@@ -136,11 +133,8 @@ class NoteController extends DetailController {
 	 * @return Menu
 	 */
 	public function &getOtherMenu() {
-		global $TEXT_DIRECTION, $GEDCOMID, $gm_lang;
+		global $GEDCOMID, $gm_lang;
 		global $ENABLE_CLIPPINGS_CART, $gm_user;
-		
-		if ($TEXT_DIRECTION=="rtl") $ff="_rtl";
-		else $ff="";
 		
 		// other menu
 		$menu = new Menu($gm_lang['other']);
@@ -183,73 +177,12 @@ class NoteController extends DetailController {
  		$this->NotelistSort();
 	}
 
-	//-- search through the gedcom records for notes, full text
-	public function FTSearchNotes($query, $allgeds=false, $ANDOR="AND") {
-		global $GEDCOMS, $GEDCOMID, $ftminwlen, $ftmaxwlen, $note_hide, $note_total;
-		
-		// Get the min and max search word length
-		GetFTWordLengths();
-	
-		$cquery = ParseFTSearchQuery($query);
-		$addsql = "";
-		
-		$mlen = GetFTMinLen($cquery);
-		
-		if ($mlen < $ftminwlen || HasMySQLStopwords($cquery)) {
-			if (isset($cquery["includes"])) {
-				foreach ($cquery["includes"] as $index => $keyword) {
-					if (HasChinese($keyword["term"])) $addsql .= " ".$keyword["operator"]." o_gedcom REGEXP '".DbLayer::EscapeQuery($keyword["term"]).$keyword["wildcard"]."'";
-					else $addsql .= " ".$keyword["operator"]." o_gedcom REGEXP '[[:<:]]".DbLayer::EscapeQuery($keyword["term"]).$keyword["wildcard"]."[[:>:]]'";
-				}
-			}
-			if (isset($cquery["excludes"])) {
-				foreach ($cquery["excludes"] as $index => $keyword) {
-					if (HasChinese($keyword["term"])) $addsql .= " AND o_gedcom NOT REGEXP '".DbLayer::EscapeQuery($keyword["term"]).$keyword["wildcard"]."'";
-					else $addsql .= " AND o_gedcom NOT REGEXP '[[:<:]]".DbLayer::EscapeQuery($keyword["term"]).$keyword["wildcard"]."[[:>:]]'";
-				}
-			}
-			$sql = "SELECT * FROM ".TBLPREFIX."other WHERE (".substr($addsql,4).")";
-		}
-		else {
-			$sql = "SELECT * FROM ".TBLPREFIX."other WHERE (MATCH (o_gedcom) AGAINST ('".DbLayer::EscapeQuery($query)."' IN BOOLEAN MODE))";
-		}
-	
-		if (!$allgeds) $sql .= " AND o_file='".$GEDCOMID."'";
-		
-		$sql .= " AND o_type='NOTE'";
-	
-		if ((is_array($allgeds) && count($allgeds) != 0) && count($allgeds) != count($GEDCOMS)) {
-			$sql .= " AND (";
-			for ($i=0; $i<count($allgeds); $i++) {
-				$sql .= "o_file='".$allgeds[$i]."'";
-				if ($i < count($allgeds)-1) $sql .= " OR ";
-			}
-			$sql .= ")";
-		}
-	
-		$note_total = array();
-		$note_hide = array();
-		$res = NewQuery($sql);
-		if ($res && $res->NumRows() > 0) {
-	 		while ($row = $res->FetchAssoc()) {
-		 		$note =& Note::GetInstance($row["o_id"], $row["o_gedcom"], $row["o_file"]);
-		 		$note->GetTitle(40);
-		 		$note->gedcomid = $row["o_file"];
-		 		SwitchGedcom($row["o_file"]);
-				$note_total[$note->xref."[".$GEDCOMID."]"] = 1;
-		 		if ($note->disp) $this->notelist[] = $note;
-		 		else $note_hide[$note->xref."[".$GEDCOMID."]"] = 1;
-		 		SwitchGedcom();
-	 		}
-	 		$this->NotelistSort();
-		}
-	}
 	
 	private function NotelistSort() {
 		uasort($this->notelist, array($this, "TitleObjSort"));
 	}
 	
-	private function TitleObjSort($a, $b) {
+	public function TitleObjSort($a, $b) {
 		if ($a->title != $b->title) return StringSort(ltrim($a->title), ltrim($b->title));
 		else {
 			$anum = preg_replace("/\D*/", "", $a->xref);
@@ -266,7 +199,7 @@ class NoteController extends DetailController {
 	 * @param string $pid		The gedcom XREF id for the level 0 record that this note is a part of
 	 */
 	protected function PrintGeneralNote($styleadd="", $mayedit=true) {
-		global $gm_lang, $gm_username;
+		global $gm_lang;
 		global $view, $show_changes;
 		global $WORD_WRAPPED_NOTES, $GM_IMAGE_DIR;
 		global $GM_IMAGES;

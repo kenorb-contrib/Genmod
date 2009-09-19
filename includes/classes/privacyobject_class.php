@@ -31,38 +31,38 @@ if (stristr($_SERVER["SCRIPT_NAME"],basename(__FILE__))) {
 class PrivacyObject {
 	
 	public $classname = "PrivacyObject";
+	private static $GEDPRIV = array();			// Holder of the instances for this class
 
 	// These vars are the same as (uppercase) the fields in the DB.
 	// The values for $PRIV_XX are filled in here as defaults.
-	public $GEDCOMID = "";
-	public $GEDCOM = "";
-	public $PRIVACY_VERSION = "3.3";
+	public $GEDCOMID = "";						// Gedcom ID to which these settings apply
+	public $GEDCOM = "";						// Gedcom name (obsolete)
+	public $PRIVACY_VERSION = "3.3";			// Version of this class (not used anywhere)
 	
-	public $PRIV_HIDE = -1;
-	public $PRIV_PUBLIC = 2;
-	public $PRIV_USER = 1;
-	public $PRIV_NONE = 0;
-	public $SHOW_DEAD_PEOPLE = 2;
-	public $HIDE_LIVE_PEOPLE = 1;
-	public $SHOW_LIVING_NAMES = 1;
-	public $SHOW_SOURCES = 1;
-	public $LINK_PRIVACY = 1;
-	public $MAX_ALIVE_AGE = 120;
-	public $ENABLE_CLIPPINGS_CART = 1;
-	public $SHOW_ACTION_LIST = 0;
-	public $USE_RELATIONSHIP_PRIVACY = 0;
-	public $MAX_RELATION_PATH_LENGTH = 3;
-	public $CHECK_MARRIAGE_RELATIONS = 1;
-	public $CHECK_CHILD_DATES = 1;
-	public $PRIVACY_BY_YEAR = 0;
-	public $PRIVACY_BY_RESN = 1;
-	public $person_privacy = array();
-	public $user_privacy = array();
-	public $global_facts = array();
-	public $person_facts = array();
-	public $is_empty = false;
+	public $PRIV_HIDE = -1;						// Level for no access at all
+	public $PRIV_PUBLIC = 2;					// Level for visitor access
+	public $PRIV_USER = 1;						// Level for user access
+	public $PRIV_NONE = 0;						// Level for admin access
+	public $SHOW_DEAD_PEOPLE = 2;				// On or below this level users can see data of deceased people
+	public $HIDE_LIVE_PEOPLE = 1;				// On or below this level users can see data of alive people
+	public $SHOW_LIVING_NAMES = 1;				// On or below this level users can see the names of alive people
+	public $SHOW_SOURCES = 1;					// On or below this level users can see data of sources
+	public $LINK_PRIVACY = 1;					// Check if other hidden records prevent display (implemented for sources, media and notes)
+	public $MAX_ALIVE_AGE = 120;				// Number of years after which a person is assumed to be dead
+	public $ENABLE_CLIPPINGS_CART = 1;			// User level on or below which people may use the clippings cart
+	public $SHOW_ACTION_LIST = 0;				// User level on or below which people may see and use the action list
+	public $USE_RELATIONSHIP_PRIVACY = 0;		// Use relationship privacy or not
+	public $MAX_RELATION_PATH_LENGTH = 3;		// Path length if set to on. Paths go via parents, siblings and children
+	public $CHECK_MARRIAGE_RELATIONS = 1;		// A relationship path may follow spouses or not
+	public $CHECK_CHILD_DATES = 1;				// Check child dates for determining the is dead status
+	public $PRIVACY_BY_YEAR = 0;				// Check the age of events instead of the isdead status
+	public $PRIVACY_BY_RESN = 1;				// Check the level 1 RESN tag or not
+	public $person_privacy = array();			// Array of ID's to show on a certain user level
+	public $user_privacy = array();				// Array of ID's to hide or show to a specific user
+	public $global_facts = array();				// Restrict access to certain facts
+	public $person_facts = array();				// Restrict access to certain facts of specific ID's
+	public $is_empty = false;					// True if it's an empty (non existent) user
 	
-	private static $GEDPRIV = array();	// Holder of the instances for this class
 
 	public static function GetInstance($gedcomid, $user_override=true) {
 	
@@ -90,7 +90,7 @@ class PrivacyObject {
 	}
 	
 	public function GetPrivacy($gedcomid="", $user_override) {
-		global $DBCONN, $gm_username, $gm_user;
+		global $DBCONN, $gm_user;
 		
 		if (!$DBCONN->connected) return false;
 		
@@ -171,13 +171,16 @@ class PrivacyObject {
 				$res->FreeResult();
 			}
 		}
-		if ($user_override && !empty($gm_username)) {
-			$ged = get_gedcom_from_id($gedcomid);
+		if ($user_override && $gm_user->username != "") {
+			$ged = $gedcomid;
 			if (isset($gm_user->relationship_privacy[$ged]) && !empty($gm_user->relationship_privacy[$ged])) {
-				$this->USE_RELATIONSHIP_PRIVACY = ($us->relationship_privacy[$ged] == "Y" ? true : false);
+				$this->USE_RELATIONSHIP_PRIVACY = ($gm_user->relationship_privacy[$ged] == "Y" ? true : false);
 			}
-			if (isset($gm_user->max_relation_path_length[$ged]) && $gm_user->max_relation_path_length[$ged] > 0) {
-				$this->MAX_RELATION_PATH_LENGTH = $us->relationship_privacy[$ged];
+			if (isset($gm_user->max_relation_path[$ged]) && $gm_user->max_relation_path[$ged] > 0) {
+				$this->MAX_RELATION_PATH_LENGTH = $gm_user->max_relation_path[$ged];
+			}
+			if (isset($gm_user->check_marriage_relations[$ged]) && !empty($gm_user->check_marriage_relations[$ged])) {
+				$this->CHECK_MARRIAGE_RELATIONS = ($gm_user->check_marriage_relations[$ged] == "Y" ? true : false);
 			}
 			if (isset($gm_user->hide_live_people[$ged]) && !empty($gm_user->hide_live_people[$ged])) {
 				// If yes, give HIDE_LIVE_PEOPLE the lowest possible value. This will always hide them to any user with this override, no matter what status this user has (except site admin)

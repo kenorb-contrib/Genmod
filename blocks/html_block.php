@@ -33,10 +33,10 @@ $GM_BLOCKS["print_html_block"]["config"]      = array("html"=>$gm_lang["html_blo
 $GM_BLOCKS["print_html_block"]["rss"]			= false;
 
 function print_html_block($block=true, $config="", $side, $index) {
-	global $gm_lang, $GM_IMAGE_DIR, $TEXT_DIRECTION, $GM_IMAGES, $HTML_BLOCK_COUNT, $GM_BLOCKS, $command, $GEDCOMID, $gm_username, $gm_user;
+	global $gm_lang, $GM_IMAGE_DIR, $TEXT_DIRECTION, $GM_IMAGES, $HTML_BLOCK_COUNT, $GM_BLOCKS, $command, $GEDCOMID, $gm_user;
 
 	if (empty($config)) $config = $GM_BLOCKS["print_html_block"]["config"];
-	if ($config["only_show_logged_in"] != "no" && empty($gm_username)) return;
+	if ($config["only_show_logged_in"] != "no" && $gm_user->username == "") return;
 	if (!isset($HTML_BLOCK_COUNT)) $HTML_BLOCK_COUNT = 0;
 	$HTML_BLOCK_COUNT++;
 	print "<div id=\"html_block$HTML_BLOCK_COUNT\" class=\"block\">\n";
@@ -48,7 +48,7 @@ function print_html_block($block=true, $config="", $side, $index) {
 
 	if ($block) print "</div>\n";
 	if ($GM_BLOCKS["print_html_block"]["canconfig"]) {
-		$username = $gm_username;
+		$username = $gm_user->username;
 		if ((($command=="gedcom")&&($gm_user->userGedcomAdmin())) || (($command=="user")&&(!empty($username)))) {
 			if ($command=="gedcom") $name = preg_replace("/'/", "\'", get_gedcom_from_id($GEDCOMID));
 			else $name = $username;

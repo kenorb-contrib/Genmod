@@ -97,7 +97,7 @@ abstract class GedcomRecord {
 	 * constructor for this class
 	 */
 	protected function __construct($id, $gedrec="", $gedcomid="") {
-		global $show_changes, $GEDCOMID, $gm_username, $gm_user, $ALLOW_EDIT_GEDCOM;
+		global $show_changes, $GEDCOMID, $gm_user, $ALLOW_EDIT_GEDCOM;
 		
 		// The class might be called with an ID or with a gedcom record.
 		// The gedcom record might be empty, in which case it's a new or non existent record.
@@ -311,18 +311,23 @@ abstract class GedcomRecord {
 				return $this->IsPreview();
 				break;
 			default:
-				print "<span class=\"error\">Invalid property ".$property." for __get in gedcomrecord class</span><br />";
+				print "<span class=\"error\">Invalid property ".$property." for __get in ".get_class($this)." class</span><br />";
 				break;
 		}
 	}
 
 	public function __set($property, $value) {
+		switch ($property) {
+			default:
+				print "<span class=\"error\">Invalid property ".$property." for __set in ".get_class($this)." class</span><br />";
+				break;
+		}
 	}
 
 	protected function ThisDeleted() {
 		
 		if (is_null($this->isdeleted)) {
-			if (!$this->ThisChanged()) $this->deleted = false;
+			if (!$this->ThisChanged()) $this->isdeleted = false;
 			else {
 				$ch = $this->GetChangedGedRec();
 				if (empty($ch)) $this->isdeleted = true;

@@ -38,7 +38,7 @@ global $GEDCOM_TITLE;
 
 //-- make sure that they have user status before they can use this page
 //-- otherwise have them login again
-if (empty($gm_username) || empty($name)) {
+if (empty($gm_user->username) || empty($name)) {
 	print_simple_header("");
 	print $gm_lang["access_denied"];
 	print "<div class=\"center\"><a href=\"javascript:// ".$gm_lang["close_window"]."\" onclick=\"self.close();\">".$gm_lang["close_window"]."</a></div>\n";
@@ -126,7 +126,7 @@ foreach($SortedBlocks as $key => $b) {
 $SortedBlocks = array_flip($SortedBlocks);
 
 //-- get the blocks list
-if ($command=="user") $ublocks = new Blocks("user", $gm_username, $action);
+if ($command=="user") $ublocks = new Blocks("user", $gm_user->username, $action);
 else $ublocks = new Blocks("gedcom", "", $action);
 
 if ($command=="user") print_simple_header($gm_lang["mygedview"]);
