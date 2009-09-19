@@ -228,3 +228,4 @@
 "_UID";"Universeel kenmerk (UID)"
 "_WEIG";"Gewicht"
 "_YART";"Yartzeit"
+"_HIST";"Historische gebeurtenis"

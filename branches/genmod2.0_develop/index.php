@@ -96,7 +96,7 @@ if (!isset($action)) $action="";
 
 //-- make sure that they have user status before they can use this page
 //-- otherwise have them login again
-if (empty($gm_username)) {
+if ($gm_user->username == "") {
 	if (!empty($command)) {
 		if ($command=="user") {
 			if (LOGIN_URL == "") header("Location: login.php?help_message=mygedview_login_help&url=".urlencode("index.php?command=user"));
@@ -109,7 +109,7 @@ if (empty($gm_username)) {
 
 if (empty($command)) $command="user";
 
-if (!empty($gm_username)) {
+if ($gm_user->username != "") {
 	//-- add favorites action
 	if (($action=="addfav")&&(!empty($gid))) {
 		$gid = strtoupper($gid);
@@ -124,7 +124,7 @@ if (!empty($gm_username)) {
 			}
 			$favorite = new Favorite();
 			if ($favtype == "gedcom") $favorite->username = "";
-			else $favorite->username = $gm_username;
+			else $favorite->username = $gm_user->username;
 			$favorite->gid = $gid;
 			$favorite->type = trim($match[2]);
 			$favorite->file = $GEDCOMID;
@@ -144,7 +144,7 @@ if (!empty($gm_username)) {
 		}
 		$favorite = new Favorite();
 		if ($favtype == "gedcom") $favorite->username = "";
-		else $favorite->username = $gm_username;
+		else $favorite->username = $gm_user->username;
 		$favorite->gid = "";
 		$favorite->type = "URL";
 		$favorite->file = $GEDCOMID;
@@ -172,7 +172,7 @@ if (!empty($gm_username)) {
 }
 
 //-- get the blocks list
-if ($command=="user") $ublocks = new Blocks("user", $gm_username, $action);
+if ($command=="user") $ublocks = new Blocks("user", $gm_user->username, $action);
 else $ublocks = new Blocks("gedcom", "", $action);
 
 if ($command=="user") {
@@ -241,7 +241,7 @@ if (count($ublocks->right) != 0) {
 if (($command=="user") and (!$ublocks->welcome_block_present)) {
 	print "<div>";
 	print_help_link("mygedview_customize_help", "qm");
-	print "<a href=\"#\" onclick=\"window.open('index_edit.php?name=".$gm_username."&amp;command=user', '', 'top=50,left=10,width=1000,height=400,scrollbars=1,resizable=1');\">".$gm_lang["customize_page"]."</a>\n";
+	print "<a href=\"#\" onclick=\"window.open('index_edit.php?name=".$gm_user->username."&amp;command=user', '', 'top=50,left=10,width=1000,height=400,scrollbars=1,resizable=1');\">".$gm_lang["customize_page"]."</a>\n";
 	print "</div>";
 }
 if (($command=="gedcom") and (!$ublocks->gedcom_block_present)) {

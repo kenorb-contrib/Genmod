@@ -392,7 +392,7 @@ if ($this->tracefacts) print "AddFamilyFacts - Adding for ".$fam->xref.": ".$fac
 	 * @return records added to indifacts array
 	 */
 	private function AddParentsFacts($person, $sosa=1) {
-		global $SHOW_RELATIVES_EVENTS, $gm_username;
+		global $SHOW_RELATIVES_EVENTS;
 		
 		if (!$SHOW_RELATIVES_EVENTS) return;
 		if ($sosa > $this->sosamax) return;
@@ -489,7 +489,7 @@ if ($this->tracefacts) print "AddParentsFacts sosa ".$sosa."- Adding for ".$fam-
 	 * @return records added to indifacts array
 	 */
 	private function AddChildrenFacts($fam, $option="", $except="") {
-		global $SHOW_RELATIVES_EVENTS, $gm_username, $gm_lang;
+		global $SHOW_RELATIVES_EVENTS, $gm_lang;
 
 		if (!$SHOW_RELATIVES_EVENTS) return;
 		if (!$fam->disp) return;
@@ -765,7 +765,7 @@ if ($this->tracefacts) print "AddSpouseFacts - Adding for ".$fam->$spperson->xre
 	}
 	
 	public function getParentFamily() {
-		global $gm_lang, $gm_username;
+		global $gm_lang;
 		
 		$this->GetChildFamilies();
 		if (count($this->childfamilies) > 0) {
@@ -805,7 +805,7 @@ if ($this->tracefacts) print "AddSpouseFacts - Adding for ".$fam->$spperson->xre
 	}
 	
 	public function getSpouseFamily() {
-		global $gm_lang, $gm_username;
+		global $gm_lang;
 
 		if (count($this->spousefamilies) > 0) {
 			$this->close_relatives = true;
@@ -862,7 +862,7 @@ if ($this->tracefacts) print "AddSpouseFacts - Adding for ".$fam->$spperson->xre
 	}
 	
 	public function getParentOtherFamily() {
-		global $gm_lang, $gm_username;
+		global $gm_lang;
 		
 		// NOTE: Get the parents other families
 		// NOTE: Get the fathers families only if they have kids

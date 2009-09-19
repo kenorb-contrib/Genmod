@@ -31,14 +31,14 @@ if (stristr($_SERVER["SCRIPT_NAME"],basename(__FILE__))) {
 class Repository extends GedcomRecord {
 	
 	// General class information
-	public $classname = "Repository";
-	public $datatype = "REPO";
+	public $classname = "Repository";		// Name of this class
+	public $datatype = "REPO";				// Type of data
 	private static $repocache = array();	// Holder of the instances for this class
 	
 	// Data
-	private $name = null;
-	private $descriptor = null;
-	private $adddescriptor = null;
+	private $name = null;					// Full title of the repository, including all descriptors
+	private $descriptor = null;				// Name of the repository
+	private $adddescriptor = null;			// Additional names of this repository
 		
 	public static function GetInstance($xref, $gedrec="", $gedcomid="") {
 		global $GEDCOMID;

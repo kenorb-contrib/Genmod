@@ -118,7 +118,7 @@ function split_align_text($data, $maxlen) {
 function print_fan_chart($treeid, $fanw=640, $fandeg=270) {
 	global $PEDIGREE_GENERATIONS, $fan_width, $fan_style, $cw, $fontsize;
 	global $name, $gm_lang, $SHOW_ID_NUMBERS, $view, $TEXT_DIRECTION;
-	global $stylesheet, $print_stylesheet, $gm_username;
+	global $stylesheet, $print_stylesheet, $gm_user;
 	global $GM_IMAGE_DIR, $GM_IMAGES, $LINK_ICONS, $GEDCOMID;
 
 	// check for GD 2.x library
@@ -215,11 +215,7 @@ require_once("fonts/".$ff[0].".php");
 
 	// relationship to me
 	$reltome=false;
-	$username = $gm_username;
-	if (!empty($username)) {
-		$tuser =& User::GetInstance($username);
-		if (!empty($tuser->gedcomid[$GEDCOMID])) $reltome=true;
-	}
+	if (!empty($gm_user->gedcomid[$GEDCOMID])) $reltome=true;
 
 	// loop to create fan cells
 	while ($gen>=0) {

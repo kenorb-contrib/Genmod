@@ -31,29 +31,27 @@ if (strstr($_SERVER["PHP_SELF"],"menubar.php")) {
 	exit;
 }
 global $gm_lang, $controller, $note_controller, $source_controller, $repository_controller, $media_controller, $rid;
-$menubar = new MenuBar();
-$filemenu = $menubar->GetFileMenu();
-$editmenu = $menubar->GetEditMenu();
-$viewmenu = $menubar->GetViewMenu();
-$chartmenu = $menubar->GetChartsMenu();
-if (isset($note_controller) && $note_controller->classname == "NoteController" && is_object($note_controller->note)) $notemenu = $menubar->GetThisNoteMenu($note_controller);
+$filemenu = MenuBar::GetFileMenu();
+$editmenu = MenuBar::GetEditMenu();
+$viewmenu = MenuBar::GetViewMenu();
+$chartmenu = MenuBar::GetChartsMenu();
+if (isset($note_controller) && $note_controller->classname == "NoteController" && is_object($note_controller->note)) $notemenu = MenuBar::GetThisNoteMenu($note_controller);
 else $notemenu = "";
-if (isset($controller) && $controller->classname == "IndividualController") $personmenu = $menubar->GetThisPersonMenu($controller);
+if (isset($controller) && $controller->classname == "IndividualController") $personmenu = MenuBar::GetThisPersonMenu($controller);
 else $personmenu = "";
-if (isset($controller) && $controller->classname == "FamilyController") $familymenu = $menubar->GetThisFamilyMenu($controller);
+if (isset($controller) && $controller->classname == "FamilyController") $familymenu = MenuBar::GetThisFamilyMenu($controller);
 else $familymenu = "";
-if (isset($source_controller) && $source_controller->classname == "SourceController") $sourcemenu = $menubar->GetThisSourceMenu($source_controller);
+if (isset($source_controller) && $source_controller->classname == "SourceController") $sourcemenu = MenuBar::GetThisSourceMenu($source_controller);
 else $sourcemenu = "";
-if (isset($repository_controller) && $repository_controller->classname == "RepositoryController") $repomenu = $menubar->GetThisRepoMenu($repository_controller);
+if (isset($repository_controller) && $repository_controller->classname == "RepositoryController") $repomenu = MenuBar::GetThisRepoMenu($repository_controller);
 else $repomenu = "";
-if (isset($media_controller) && $media_controller->classname == "MediaController") $mediamenu = $menubar->GetThisMediaMenu($media_controller);
+if (isset($media_controller) && $media_controller->classname == "MediaController") $mediamenu = MenuBar::GetThisMediaMenu($media_controller);
 else $mediamenu = "";
-
-$reportmenu = $menubar->GetReportMenu();
-$listmenu = $menubar->GetListMenu();
-$helpmenu = $menubar->GetHelperMenu();
-$favoritesmenu = $menubar->GetFavoritesMenu();
-$custommenu = $menubar->GetCustomMenu();
+$reportmenu = MenuBar::GetReportMenu();
+$listmenu = MenuBar::GetListMenu();
+$helpmenu = MenuBar::GetHelperMenu();
+$favoritesmenu = MenuBar::GetFavoritesMenu();
+$custommenu = MenuBar::GetCustomMenu();
 function CreateMenu($menuobject, $level=0, $sub=false) {
 	global $outputmenu;
 	if (!$sub) $outputmenu = array();
@@ -136,16 +134,17 @@ $outputmenu["Calendar"] = Array
 				// hook all the highlight swapping of the main toolbar to menu activation/deactivation
 				// instead of simple rollover to get the effect where the button stays hightlit until
 				// the menu is closed.
-				<?php foreach (array_keys($showmenu) as $number => $name) { ?>
-					menu<?php echo $number+1 ?>.onactivate = function() { document.getElementById("<?php echo $name; ?>").className = "hover"; };
-					menu<?php echo $number+1 ?>.ondeactivate = function() { document.getElementById("<?php echo $name; ?>").className = ""; };
+				<?php foreach (array_keys($showmenu) as $number => $name) { 
+					$num = $number + 1;?>
+					menu<?php echo $number+1 ?>.onactivate = function() { document.getElementById("<?php echo "menutitle".$num; ?>").className = "hover"; };
+					menu<?php echo $number+1 ?>.ondeactivate = function() { document.getElementById("<?php echo "menutitle".$num; ?>").className = ""; };
 				<?php } ?>
 			}
 		}
 	//-->
 	</script>
 	<?php
-	global $gm_lang, $gm_username, $GEDCOMS, $HOME_SITE_URL, $HOME_SITE_TEXT,$GM_IMAGE_DIR, $GM_IMAGES, $gm_user;
+	global $gm_lang, $GEDCOMS, $HOME_SITE_URL, $HOME_SITE_TEXT,$GM_IMAGE_DIR, $GM_IMAGES, $gm_user;
 	if ($TEXT_DIRECTION == "ltr") {
 		$rdir = "right";
 		$ldir = "left";
@@ -167,8 +166,9 @@ $outputmenu["Calendar"] = Array
 	<?php } ?>
 	<div id="menu" class="shade1 <?php echo $TEXT_DIRECTION; ?>">
 		<div class="shade1" style="float: <?php print $ldir; ?>;">
-			<?php foreach (array_keys($showmenu) as $number => $name) { ?>
-			<a id="<?php echo $name; ?>" href="#"><?php echo $name; ?></a> 
+			<?php foreach (array_keys($showmenu) as $number => $name) { 
+				$num = $number + 1;?>
+			<a id="<?php echo "menutitle".$num; ?>" href="#"><?php echo $name; ?></a> 
 				&nbsp;&nbsp;
 			<?php } ?>
 		</div>
@@ -227,7 +227,7 @@ $outputmenu["Calendar"] = Array
 		$link = "";
 		$pass = false;
 		foreach ($showmenu as $maintitle => $submenu) {
-			$menubar .= 'var menu'.$maintitlecount.' = ms.addMenu(document.getElementById("'.$maintitle.'"));'.chr(10);
+			$menubar .= 'var menu'.$maintitlecount.' = ms.addMenu(document.getElementById("menutitle'.$maintitlecount.'"));'.chr(10);
 			$itemcount = 0;
 			foreach ($submenu as $subtitle => $subitems) {
 				if (isset($subitems) && !is_array($subitems)) $link = $subitems;

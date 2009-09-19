@@ -407,7 +407,6 @@ if ($step == 4) {
 		$user["email"]=$emailadress;
 		$user["verified"] = "yes";
 		$user["verified_by_admin"] = "yes";
-		$user["pwrequested"] = "";
 		$user["theme"] = "";
 		$user["theme"] = "Y";
 		$user["language"] = "english";

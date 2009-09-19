@@ -89,10 +89,7 @@ class SourceController extends DetailController {
 	 * @return Menu
 	 */
 	public function &getEditMenu() {
-		global $TEXT_DIRECTION, $gm_lang, $gm_user;
-		
-		if ($TEXT_DIRECTION=="rtl") $ff="_rtl";
-		else $ff="";
+		global $gm_lang, $gm_user;
 		
 		// edit source menu
 		$menu = new Menu($gm_lang['edit_source']);
@@ -129,11 +126,8 @@ class SourceController extends DetailController {
 	 * @return Menu
 	 */
 	public function &getOtherMenu() {
-		global $TEXT_DIRECTION, $GEDCOMID, $gm_lang;
+		global $GEDCOMID, $gm_lang;
 		global $ENABLE_CLIPPINGS_CART, $gm_user;
-		
-		if ($TEXT_DIRECTION=="rtl") $ff="_rtl";
-		else $ff="";
 		
 		// other menu
 		$menu = new Menu($gm_lang['other']);

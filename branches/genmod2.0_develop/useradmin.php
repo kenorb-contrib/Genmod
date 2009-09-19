@@ -127,7 +127,6 @@ if ($action=="createuser") {
 			$user->verified_by_admin = $verified_by_admin;
 			if (!empty($user_language)) $user->language = $user_language;
 			else $user->language = $LANGUAGE;
-			$user->pwrequested = $pwrequested;
 			$user->reg_timestamp = $reg_timestamp;
 			$user->reg_hashcode = $reg_hashcode;
 			$user->gedcomid=array();
@@ -237,7 +236,6 @@ if ($action=="deleteuser") {
 //-- section to update a user by first deleting them
 //-- and then adding them again
 if ($action=="edituser2") {
-	print_r($_POST);
 	$alphabet = GetAlphabet();
 	$alphabet .= "_-. ";
 	$i = 1;
@@ -309,10 +307,12 @@ if ($action=="edituser2") {
 				if (isset($$varname)) $newuser->max_relation_path[$gedcomid] = $$varname;
 				$varname = "new_hide_live_people_$gedcomid";
 				if (isset($$varname)) $newuser->hide_live_people[$gedcomid] = $$varname;
+				$varname = "new_check_marriage_relations_$gedcomid";
+				if (isset($$varname)) $newuser->check_marriage_relations[$gedcomid] = $$varname;
 				$varname = "new_show_living_names_$gedcomid";
 				if (isset($$varname)) $newuser->show_living_names[$gedcomid] = $$varname;
 			}
-			if ($olduser->username != $gm_username) {
+			if ($olduser->username != $gm_user->username) {
 				if ((isset($canadmin))&&($canadmin=="yes")) $newuser->canadmin=true;
 				else $newuser->canadmin=false;
 			}
@@ -440,7 +440,6 @@ if ($action=="edituser" || $action == "createform") { ?>
 			case "createform": ?>
 				<form name="newform" method="post" action="<?php print $SCRIPT_NAME;?>" onsubmit="return checkform(this);">
 				<input type="hidden" name="action" value="createuser" />
-				<input type="hidden" name="pwrequested" value="" />
 				<input type="hidden" name="reg_timestamp" value="<?php print date("U");?>" />
 				<input type="hidden" name="reg_hashcode" value="" />
 				<?php break;
@@ -548,7 +547,7 @@ if ($action=="edituser" || $action == "createform") { ?>
 					</div>
 				</div>
 				<div class="choice_right">
-					<input type="checkbox" name="canadmin" tabindex="<?php $tab++; print $tab; ?>" <?php if ($action == "edituser") {?> value="yes" <?php if ($user->canadmin) print "checked=\"checked\""; if ($user->username==$gm_username) print " disabled=\"disabled\""; }?> />
+					<input type="checkbox" name="canadmin" tabindex="<?php $tab++; print $tab; ?>" <?php if ($action == "edituser") {?> value="yes" <?php if ($user->canadmin) print "checked=\"checked\""; if ($user->username==$gm_user->username) print " disabled=\"disabled\""; }?> />
 				</div>
 			</div>
 			<div class="admin_item_box">
@@ -587,7 +586,7 @@ if ($action=="edituser" || $action == "createform") { ?>
 					</div>
 				</div>
 				<div class="choice_right">
-				<input type="checkbox" name="verified" tabindex="<?php $tab++; print $tab; ?>" value="yes" <?php if ($action == "edituser") { if ($user->verified) print "checked=\"checked\""; } else print "checked=\"checked\"";?> />
+				<input type="checkbox" name="verified" tabindex="<?php $tab++; print $tab; ?>" value="Y" <?php if ($action == "edituser") { if ($user->verified) print "checked=\"checked\""; } else print "checked=\"checked\"";?> />
 				</div>
 			</div>
 			<div class="admin_item_box">
@@ -600,10 +599,10 @@ if ($action=="edituser" || $action == "createform") { ?>
 					</div>
 				</div>
 				<div class="choice_right">
-					<input type="checkbox" name="verified_by_admin" tabindex="<?php $tab++; print $tab; ?>" value="yes" <?php if ($action == "edituser") { if ($user->verified_by_admin) print "checked=\"checked\""; } else print "checked=\"checked\"";?> />
+					<input type="checkbox" name="verified_by_admin" tabindex="<?php $tab++; print $tab; ?>" value="Y" <?php if ($action == "edituser") { if ($user->verified_by_admin) print "checked=\"checked\""; } else print "checked=\"checked\"";?> />
 				</div>
 			</div>
-			<?php if ($action == "createform") $user =& User::GetInstance($gm_username);
+			<?php if ($action == "createform") $user =& User::GetInstance($gm_user->username);
 			if ($ENABLE_MULTI_LANGUAGE) { ?>
 				<div class="admin_item_box">
 					<div class="width30 choice_left">
@@ -920,6 +919,23 @@ if ($action=="edituser" || $action == "createform") { ?>
             				print "</option>";
           				}?>
           			</select>
+				</div>
+			</div>
+			<div class="admin_item_box">
+				<div class="width30 choice_left">
+					<div class="helpicon">
+						<?php print_help_link("useradmin_marr_priv_help", "qm", "user_path_marr");?>
+					</div>
+					<div class="description">
+						<?php print $gm_lang["user_path_marr"]; ?>
+					</div>
+				</div>
+				<div class="choice_right">
+					<select name="new_check_marriage_relations_<?php print $gedcomid; ?>"<?php if ($user->canadmin && $action == "edituser") print " disabled=\"disabled\""; ?> tabindex="<?php $tab++; print $tab; ?>" >
+						<option value=""<?php if ($action == "edituser") if (isset($user->check_marriage_relations[$gedcomid]) && $user->check_marriage_relations[$gedcomid]=="") print " selected=\"selected\"";?>><?php print $gm_lang["default"]; ?></option>
+						<option value="Y"<?php if ($action == "edituser") if (isset($user->check_marriage_relations[$gedcomid]) && $user->check_marriage_relations[$gedcomid]=="Y") print " selected=\"selected\"";?>><?php print $gm_lang["yes"]; ?></option>
+						<option value="N"<?php if ($action == "edituser") if (isset($user->check_marriage_relations[$gedcomid]) && $user->check_marriage_relations[$gedcomid]=="N") print " selected=\"selected\"";?>><?php print $gm_lang["no"]; ?></option>
+						</select>
 				</div>
 			</div>
 			<div class="admin_item_box">
@@ -1396,6 +1412,33 @@ if ($action == "massupdate") {
 					</div>
 				</div>
 				<!-- End Relation path length -->
+				<!-- Start Check Marriage Relations -->
+				<div class="admin_item_box">
+					<div class="width30 choice_left">
+						<div class="helpicon">
+							<?php print_help_link("useradmin_marr_priv_help", "qm", "user_path_marr");?>
+						</div>
+						<div class="description">
+							<?php print $gm_lang["user_path_marr"]; ?>
+						</div>
+					</div>
+					<div class="width65 choice_right">
+						<div class="admin_item_box">
+							<div class="width15 choice_middle center">
+								<input type="checkbox" name="change_check_marriage_relations_<?php print $gedcomid;?>" tabindex="<?php print $tab;?>" value="Y" />
+							</div>
+							<div class="width80 choice_right">
+								<select name="new_check_marriage_relations_<?php print $gedcomid; ?>" tabindex="<?php $tab++; print $tab; ?>" >
+									<option value=""><?php print $gm_lang["default"]; ?></option>
+									<option value="Y"><?php print $gm_lang["yes"]; ?></option>
+									<option value="N"><?php print $gm_lang["no"]; ?></option>
+								</select>
+							</div>
+							<?php $tab++;?>
+						</div>
+					</div>
+				</div>
+				<!-- End Check Marriage Relations -->
 				<!-- Start Hide live people -->
 				<div class="admin_item_box">
 					<div class="width30 choice_left">
@@ -1531,6 +1574,12 @@ if ($action == "massupdate2") {
 			if (isset($$chname)) {
 				if (isset($$varname)) $newuser->max_relation_path[$gedcomid] = $$varname;
 			}
+			// Check marriage relation
+			$chname = "change_check_marriage_relations_$gedcomid";
+			$varname = "new_check_marriage_relations_$gedcomid";
+			if (isset($$chname)) {
+				if (isset($$varname)) $newuser->check_marriage_relations[$gedcomid] = $$varname;
+			}
 			// Hide live people
 			$chname = "change_hide_live_people_$gedcomid";
 			$varname = "new_hide_live_people_$gedcomid";
@@ -1662,7 +1711,7 @@ if (($action == "listusers") || ($action == "edituser2") || ($action == "deleteu
 				if ((strtotime($user->comment_exp) != "-1") && (strtotime($user->comment_exp) < time("U"))) $warn = true;
 			}
 			if (isset($users[$username])) {
-				if (((date("U") - $user->reg_timestamp) > 604800) && ($user->verified!="yes")) $warn = true;
+				if (((date("U") - $user->reg_timestamp) > 604800) && ($user->verified!="Y")) $warn = true;
 			}
 			if (!$warn) unset($users[$username]);
 		}
@@ -1670,24 +1719,25 @@ if (($action == "listusers") || ($action == "edituser2") || ($action == "deleteu
 			if (!$user->canadmin) unset($users[$username]);
 		}
 		else if ($filter == "usunver") {
-			if ($user->verified == "yes") unset($users[$username]);
+			if ($user->verified == "Y") unset($users[$username]);
 		}
 		else if ($filter == "admunver") {
-			if (($user->verified_by_admin == "yes") || ($user->verified != "yes")) unset($users[$username]);
+			if (($user->verified_by_admin == "Y") || ($user->verified != "yes")) unset($users[$username]);
 		}
 		else if ($filter == "language") {
 			if ($user->language != $usrlang) unset($users[$username]);
 		}
 		else if ($filter == "gedadmin") {
-			if (isset($user->gedcomadmin[$ged])) {
-				if (!$user->gedcomadmin[$ged] || $user->canadmin) unset($users[$username]);
+			if (isset($user->gedcomadmin[$gedid])) {
+				if (!$user->gedcomadmin[$gedid] || $user->canadmin) unset($users[$username]);
 			}
 			else unset($users[$username]);
 		}
 		else if ($filter == "privoverride") {
-			if ((!isset($user->relationship_privacy[$ged]) || empty($user->relationship_privacy[$ged])) &&
-			(!isset($user->hide_live_people[$ged]) || empty($user->hide_live_people[$ged])) &&
-			(!isset($user->show_living_names[$ged]) || empty($user->show_living_names[$ged]))) unset($users[$username]);
+			if ((!isset($user->relationship_privacy[$gedid]) || empty($user->relationship_privacy[$gedid])) &&
+			(!isset($user->hide_live_people[$gedid]) || empty($user->hide_live_people[$gedid])) &&
+			(!isset($user->check_marriage_relations[$gedid]) || empty($user->check_marriage_relations[$gedid])) &&
+			(!isset($user->show_living_names[$gedid]) || empty($user->show_living_names[$gedid]))) unset($users[$username]);
 		}
 	}
 	// If a name filter is entered, check for existence of the string in the user fullname
@@ -1789,7 +1839,7 @@ if (($action == "listusers") || ($action == "edituser2") || ($action == "deleteu
 							<input type="checkbox" name="select<?php print preg_replace(array("/\./","/-/","/ /"), array("_","_","_"), $username);?>" value="yes" />
 						</div>
 						<div class="choice_middle width_deledit">
-							<?php if ($user->username != $gm_username) {
+							<?php if ($user->username != $gm_user->username) {
 								if ($TEXT_DIRECTION=="ltr") print "<a href=\"useradmin.php?action=deleteuser&amp;username=".urlencode($username)."&amp;sort=".$sort."&amp;filter=".$filter."&amp;usrlang=".$usrlang."&amp;gedid=".$gedid."&amp;namefilter=".$namefilter."\" onclick=\"return confirm('".$gm_lang["confirm_user_delete"]." $username?');\">".$gm_lang["delete"]."</a><br />\n";
 								else if (begRTLText($username)) print "<a href=\"useradmin.php?action=deleteuser&amp;username=".urlencode($username)."&amp;sort=".$sort."&amp;filter=".$filter."&amp;usrlang=".$usrlang."&amp;gedid=".$gedid."&amp;namefilter=".$namefilter."\" onclick=\"return confirm('?".$gm_lang["confirm_user_delete"]." $username');\">".$gm_lang["delete"]."</a><br />\n";
 								else print "<a href=\"useradmin.php?action=deleteuser&amp;username=".urlencode($username)."&amp;sort=".$sort."&amp;filter=".$filter."&amp;usrlang=".$usrlang."&amp;gedid=".$gedid."&amp;namefilter=".$namefilter."\" onclick=\"return confirm('?$username ".$gm_lang["confirm_user_delete"]." ');\">".$gm_lang["delete"]."</a><br />\n";
@@ -1856,7 +1906,7 @@ if (($action == "listusers") || ($action == "edituser2") || ($action == "deleteu
 					</div>
 					<div class="choice_middle width_registered
 						<?php
-						if (((date("U") - $user->reg_timestamp) > 604800) && ($user->verified!="yes")) { ?>  red"> <?php }
+						if (((date("U") - $user->reg_timestamp) > 604800) && ($user->verified!="Y")) { ?>  red"> <?php }
 						else print " \">";
 						print GetChangedDate(date("d", $user->reg_timestamp)." ".date("M", $user->reg_timestamp)." ".date("Y", $user->reg_timestamp))."<br />".date($TIME_FORMAT, $user->reg_timestamp);
 						?>
@@ -1873,13 +1923,13 @@ if (($action == "listusers") || ($action == "edituser2") || ($action == "deleteu
 					</div>
 					<div class="choice_middle user_verified">
 						<?php
-						if ($user->verified=="yes") print $gm_lang["yes"];
+						if ($user->verified=="Y") print $gm_lang["yes"];
 						else print $gm_lang["no"];
 						?>
 					</div>
 					<div class="choice_right admin_approved">
 						<?php
-						if ($user->verified_by_admin=="yes") print $gm_lang["yes"];
+						if ($user->verified_by_admin=="Y") print $gm_lang["yes"];
 						else print $gm_lang["no"];
 						?>
 					</div>
@@ -1941,7 +1991,7 @@ if ($action == "cleanup") {
 			foreach($users as $key=>$user) {
 				if ($user->sessiontime == "0") $datelogin = $user->reg_timestamp;
 				else $datelogin = $user->sessiontime;
-				if ((mktime(0, 0, 0, date("m")-$month, date("d"), date("Y")) > $datelogin) && ($user->verified == "yes") && ($user->verified_by_admin == "yes")) {
+				if ((mktime(0, 0, 0, date("m")-$month, date("d"), date("Y")) > $datelogin) && ($user->verified == "Y") && ($user->verified_by_admin == "Y")) {
 					?>
 					<div class="admin_item_box">
 						<div class="width30 choice_left wrap">
@@ -1959,7 +2009,7 @@ if ($action == "cleanup") {
 			
 			// Check unverified users
 			foreach($users as $key=>$user) {
-				if (((date("U") - $user->reg_timestamp) > 604800) && ($user->verified!="yes")) {
+				if (((date("U") - $user->reg_timestamp) > 604800) && ($user->verified!="Y")) {
 				?>
 				<div class="admin_item_box">
 					<div class="width30 choice_left wrap">
@@ -1976,7 +2026,7 @@ if ($action == "cleanup") {
 			
 			// Check users not verified by admin
 			foreach($users as $key=>$user) {
-				if (($user->verified_by_admin!="yes") && ($user->verified == "yes")) {
+				if (($user->verified_by_admin!="yes") && ($user->verified == "Y")) {
 				?>
 				<div class="admin_item_box">
 					<div class="width30 choice_left wrap">
@@ -2101,14 +2151,14 @@ if ($action == "") {
 		foreach($users as $username=>$user) {
 			if (empty($user->language)) $user->language=$LANGUAGE;
 			$totusers = $totusers + 1;
-			if (((date("U") - $user->reg_timestamp) > 604800) && ($user->verified!="yes")) $warnusers++;
+			if (((date("U") - $user->reg_timestamp) > 604800) && ($user->verified!="Y")) $warnusers++;
 			else {
 				if (!empty($user->comment_exp)) {
 					if ((strtotime($user->comment_exp) != "-1") && (strtotime($user->comment_exp) < time("U"))) $warnusers++;
 				}
 			}
-			if (($user->verified_by_admin != "yes") && ($user->verified == "yes")) $nverusers++;
-			if ($user->verified != "yes") $applusers++;
+			if (($user->verified_by_admin != "yes") && ($user->verified == "Y")) $nverusers++;
+			if ($user->verified != "Y") $applusers++;
 			if ($user->canadmin) $adminusers++;
 			foreach($user->gedcomadmin as $gedid=>$rights) {
 				if ($rights == true && !$user->canadmin) {

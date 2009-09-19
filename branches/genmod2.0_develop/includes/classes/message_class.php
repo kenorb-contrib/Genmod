@@ -47,7 +47,7 @@ class Message {
 	private $from_name = null;	// The name (for visitors) of the sender. If not visitor, this is not set.
 	private $method = null;		// Messaging method to be used
 	private $url = null;		// URL where the message is sent from
-	private $no_from = null;	//
+	private $no_from = null;	// I guess this is for system generated messages
 	
 	private $cansend = true;	// is false if this message is created with information from the DB. Only new messages can be sent.
 
@@ -88,7 +88,7 @@ class Message {
 				return $this->GetMessageAge();
 				break;
 			default:
-				print "<span class=\"error\">Invalid property ".$property." for __get in message class</span><br />";
+				print "<span class=\"error\">Invalid property ".$property." for __get in ".get_class($this)." class</span><br />";
 				break;
 		}
 	}
@@ -126,7 +126,7 @@ class Message {
 				if (is_bool($value)) $this->no_from = $value;
 				break;
 			default:
-				print "<span class=\"error\">Invalid property ".$property." for __set in message class</span><br />";
+				print "<span class=\"error\">Invalid property ".$property." for __set in ".get_class($this)." class</span><br />";
 				break;
 		}
 	}

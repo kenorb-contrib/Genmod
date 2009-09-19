@@ -34,7 +34,7 @@ $GM_BLOCKS["print_welcome_block"]["rss"]       	= false;
 
 //-- function to print the welcome block
 function print_welcome_block($block=true, $config="", $side, $index) {
-		global $gm_lang, $day, $month, $year, $GM_IMAGE_DIR, $GM_IMAGES, $user, $GEDCOMID, $TIME_FORMAT,$command, $gm_username, $gm_user;
+		global $gm_lang, $day, $month, $year, $GM_IMAGE_DIR, $GM_IMAGES, $user, $GEDCOMID, $TIME_FORMAT,$command, $gm_user;
 
 		print "<div id=\"user_welcome\" class=\"block\">\n";
 		print "<div class=\"blockhc\">";
@@ -50,7 +50,7 @@ function print_welcome_block($block=true, $config="", $side, $index) {
 		}
 		print "<div>";
 		print_help_link("mygedview_customize_help", "qm", "customize_page");
-		print "<a href=\"#\" onclick=\"window.open('index_edit.php?name=".$gm_username."&amp;command=user', '', 'top=50,left=10,width=1000,height=400,scrollbars=1,resizable=1');\">".$gm_lang["customize_page"]."</a></div>\n";
+		print "<a href=\"#\" onclick=\"window.open('index_edit.php?name=".$gm_user->username."&amp;command=user', '', 'top=50,left=10,width=1000,height=400,scrollbars=1,resizable=1');\">".$gm_lang["customize_page"]."</a></div>\n";
 		print "\n<div>".GetChangedDate("$day $month $year")." - ".date($TIME_FORMAT, time()-$_SESSION["timediff"])."</div>\n";
 		print "</div>"; // blockcontent
 		print "</div>"; // block

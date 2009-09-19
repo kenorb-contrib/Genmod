@@ -50,14 +50,14 @@ abstract class BaseController {
 	 * constructor for this class
 	 */
 	protected function __construct() {
-		global $show_changes, $gm_user, $gm_username, $GEDCOMID;
+		global $show_changes, $gm_user, $GEDCOMID;
 		
 		if (isset($_REQUEST["view"])) $this->view = $_REQUEST["view"];
 		if (!empty($_REQUEST["action"])) $this->action = $_REQUEST["action"];
 		
 		$this->show_changes = $show_changes;
 		
-		$this->uname = $gm_username;
+		$this->uname = $gm_user->username;
 		
 		$this->gedcomid = $GEDCOMID;
 		
@@ -81,7 +81,7 @@ abstract class BaseController {
 				return $this->uname;
 				break;
 			default:
-				print "<span class=\"error\">Invalid property ".$property." for __get in base controller</span><br />";
+				print "<span class=\"error\">Invalid property ".$property." for __get in ".get_class($this)." class</span><br />";
 				break;
 		}
 	}

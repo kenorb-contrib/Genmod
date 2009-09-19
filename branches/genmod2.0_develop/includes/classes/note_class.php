@@ -31,16 +31,17 @@ if (stristr($_SERVER["SCRIPT_NAME"],basename(__FILE__))) {
 class Note extends GedcomRecord {
 
 	// General class information
-	public $classname = "Note";
-	public $datatype = "NOTE";
+	public $classname = "Note";				// Name of this class
+	public $datatype = "NOTE";				// Type od data
 	private static $notecache = array();	// Holder of the instances for this class
 	
 	// Data
-	private $text = null;
-	private $newtext = null;
-	private $title = null;
-	private $newtitle = null;
-	private $textchanged = null;
+	private $text = null;					// Text of the note
+	private $newtext = null;				// Text of the note including pending changes
+	private $title = null;					// Title is shortened text
+	private $newtitle = null;				// Title is shortened text after applying pending changes
+	
+	private $textchanged = null;			// If any pending changes exist for this note
 	
 	public static function GetInstance($xref, $gedrec="", $gedcomid="") {
 		global $GEDCOMID;

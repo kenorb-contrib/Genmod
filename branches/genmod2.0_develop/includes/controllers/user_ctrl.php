@@ -30,11 +30,11 @@ if (stristr($_SERVER["SCRIPT_NAME"],basename(__FILE__))) {
 
 abstract class UserController {
 
-	public $classname = "UserController";
+	public $classname = "UserController";						// Name of this class
 	
-	private static $userobjsortfields = array("username", "");
-	private static $userobjsortorder = "asc";
-	private static $adm_user_exists = null;
+	private static $userobjsortfields = array("username", "");	// Default sort fields for user lists
+	private static $userobjsortorder = "asc";					// Default sort order for user lists
+	private static $adm_user_exists = null;						// If an admin user exists
 	
 	/**
 	 * get a user from a gedcom id
@@ -159,13 +159,13 @@ abstract class UserController {
 	* @return bool return true if the username and password credentials match a user in the database return false if they don't
 	*/
 	public function AuthenticateUser($username, $password) {
-		global $gm_lang;
+		global $gm_lang, $GEDCOMID;
 
 		$user =& User::GetInstance($username);
 
 		if (!empty($user->username)) {
 			if (crypt($password, $user->password) == $user->password) {
-	        	if ((($user->verified == "yes") and ($user->verified_by_admin == "yes")) or ($user->canadmin != "")){
+	        	if ((($user->verified == "Y") and ($user->verified_by_admin == "Y")) or ($user->canadmin != "")){
 					$sql = "UPDATE ".TBLPREFIX."users SET u_loggedin='Y', u_sessiontime='".time()."' WHERE u_username='$username'";
 					$res = NewQuery($sql);
 					$user =& User::GetInstance($username);
@@ -184,7 +184,7 @@ abstract class UserController {
 					WriteToLog("Users->AuthenticateUser: Login Successful -> " . $username ." <-", "I", "S");
 					if (isset($gm_lang[$user->language])) $_SESSION['CLANGUAGE'] = $user->language;
 					
-					//-- only change the gedcom if the user does not have an gedcom id
+					//-- only change the gedcom if the user does not have a gedcom id
 					//-- for the currently active gedcom
 					if (empty($user->gedcomid[$GEDCOMID])) {
 						//-- if the user is not in the currently active gedcom then switch them
@@ -312,7 +312,6 @@ abstract class UserController {
 		$sql .= ",'".DbLayer::EscapeQuery($newuser->verified)."'";
 		$sql .= ",'".DbLayer::EscapeQuery($newuser->verified_by_admin)."'";
 		$sql .= ",'".DbLayer::EscapeQuery($newuser->language)."'";
-		$sql .= ",'".DbLayer::EscapeQuery($newuser->pwrequested)."'";
 		$sql .= ",'".DbLayer::EscapeQuery($newuser->reg_timestamp)."'";
 		$sql .= ",'".DbLayer::EscapeQuery($newuser->reg_hashcode)."'";
 		$sql .= ",'".DbLayer::EscapeQuery($newuser->theme)."'";
@@ -350,6 +349,8 @@ abstract class UserController {
 				else $sql .= "','";
 				if (isset($newuser->max_relation_path[$id])) $sql .= $newuser->max_relation_path[$id]."','";
 				else $sql .= $MAX_RELATION_PATH_LENGTH."','";
+				if (isset($newuser->check_marriage_relations[$id])) $sql .= $newuser->check_marriage_relations[$id]."','";
+				else $sql .= "','";
 				if (isset($newuser->hide_live_people[$id])) $sql .= $newuser->hide_live_people[$id]."','";
 				else $sql .= "','";
 				if (isset($newuser->show_living_names[$id])) $sql .= $newuser->show_living_names[$id]."')";
@@ -416,10 +417,9 @@ abstract class UserController {
 		elseif ($export_accesslevel == "user") $newuser->canedit[$GEDCOMID] = "access";
 		else $newuser->canedit[$GEDCOMID] = "none";
 		$newuser->email = "";
-		$newuser->verified = "yes";
-		$newuser->verified_by_admin = "yes";
+		$newuser->verified = "Y";
+		$newuser->verified_by_admin = "Y";
 		$newuser->language = "english";
-		$newuser->pwrequested = "";
 		$newuser->reg_timestamp = "";
 		$newuser->reg_hashcode = "";
 		$newuser->theme = "";
@@ -435,6 +435,7 @@ abstract class UserController {
 		$newuser->gedcomadmin = array();
 		$newuser->relationship_privacy = array();
 		$newuser->max_relation_path = array();
+		$newuser->check_marriage_relations = array();
 		$newuser->show_living_names = array();
 		$newuser->hide_live_people = array();
 		$newuser->canedit = array();
@@ -455,24 +456,23 @@ abstract class UserController {
 	* @param		string	$username		The username that needs to be updated
 	* @return 	boolean	Return true or false as a result of the update
 	*/
-	public function UpdateSessiontime($username) {
-		global $users, $GM_SESSION_TIME;
+	public function UpdateSessiontime() {
+		global $gm_user, $GM_SESSION_TIME;
 	
-		$user =& User::GetInstance($username);
-		if (!$user->is_empty) {
-			if(time() - $user->sessiontime > $GM_SESSION_TIME) {
-				self::UserLogout($username);
+		if (!$gm_user->is_empty) {
+			if(time() - $gm_user->sessiontime > $GM_SESSION_TIME) {
+				self::UserLogout($gm_user->username);
 				return false;
 			}
-		}
-		else {
-			$sql = "UPDATE ".TBLPREFIX."users SET u_loggedin='Y', u_sessiontime='".time()."' WHERE BINARY u_username='".$username."'";
-			$res = NewQuery($sql);
-			if ($res) {
-				User::RenewInstance($username);
-				return true;
+			else {
+				$sql = "UPDATE ".TBLPREFIX."users SET u_loggedin='Y', u_sessiontime='".time()."' WHERE BINARY u_username='".$gm_user->username."'";
+				$res = NewQuery($sql);
+				if ($res) {
+					User::RenewInstance($gm_user->username);
+					return true;
+				}
+				else return false;
 			}
-			else return false;
 		}
 	}
 

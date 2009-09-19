@@ -36,19 +36,18 @@ if (stristr($_SERVER["SCRIPT_NAME"],basename(__FILE__))) {
 class IndividualController extends DetailController {
 	
 	public $classname = "IndividualController";	// Name of this class
-	public $indi = null;
-	private $canshowhighlightedobj = null;
-	private $canshowgedrec = null;
-	private $SEX_COUNT = 0;
+	public $indi = null;						// Person object it's controlling
+	private $canshowhighlightedobj = null;		// If it can show the highlighted media object for this person
+	private $canshowgedrec = null;				// If it can show the gedcom record
+	private $SEX_COUNT = 0;						// Number of gender records
 	public $name_count = 0;						// Keeps track of the number of name records printed.
-	private $TOTAL_NAMES = 0;
-	private $caneditown = false;
+	private $TOTAL_NAMES = 0;					// Number of name records
+	private $caneditown = false;				// If the user can edit this person (=self)
 	private $indi_userlink = "";				// Link to user details, or username of the person showed
-	private $user = array();
 	
 	public function __construct() {
-		global $GEDCOM_DEFAULT_TAB, $USE_RIN, $gm_lang, $GM_IMAGE_DIR, $GM_IMAGES, $nonfacts, $nonfamfacts;
-		global $ENABLE_CLIPPINGS_CART, $show_changes, $GEDCOMID, $gm_user, $SHOW_ID_NUMBERS;
+		global $GEDCOM_DEFAULT_TAB, $gm_lang, $GM_IMAGE_DIR, $GM_IMAGES, $nonfacts, $nonfamfacts;
+		global $GEDCOMID, $gm_user;
 		
 		parent::__construct();
 
@@ -73,11 +72,10 @@ class IndividualController extends DetailController {
 		$this->default_tab = $GEDCOM_DEFAULT_TAB;
 		
 		// NOTE: Get the user details
-		if (!empty($this->uname)) {
-			$this->user =& User::GetInstance($this->uname);
+		if (!empty($gm_user->username)) {
 			
 			// Set the default tab
-			if ($this->user->default_tab != $this->default_tab && $this->user->default_tab != 9) $this->default_tab = $this->user->default_tab;
+			if ($gm_user->default_tab != $this->default_tab && $gm_user->default_tab != 9) $this->default_tab = $gm_user->default_tab;
 			
 			// Only display the user link for authenticated users
 			$indi_username = UserController::getUserByGedcomId($this->xref, $GEDCOMID);
@@ -174,7 +172,7 @@ class IndividualController extends DetailController {
 	 * @return boolean
 	 */
 	private function canShowHighlightedObject() {
-		global $SHOW_HIGHLIGHT_IMAGES, $USE_THUMBS_MAIN, $MEDIA_DIRECTORY;
+		global $SHOW_HIGHLIGHT_IMAGES, $USE_THUMBS_MAIN;
 
 		if (is_null($this->canshowhighlightedobj)) {
 			if ($this->indi->disp && $SHOW_HIGHLIGHT_IMAGES && PrivacyFunctions::showFact("OBJE", $this->xref, "OBJE")) {
@@ -203,11 +201,9 @@ class IndividualController extends DetailController {
 	 * @return Menu
 	 */
 	public function &getEditMenu() {
-		global $TEXT_DIRECTION, $TOTAL_NAMES, $gm_user;
-		global $NAME_LINENUM, $SEX_LINENUM, $gm_lang, $USE_QUICK_UPDATE, $show_changes;
+		global $gm_user;
+		global $SEX_LINENUM, $gm_lang, $USE_QUICK_UPDATE;
 		
-		if ($TEXT_DIRECTION=="rtl") $ff="_rtl";
-		else $ff="";
 		//-- main edit menu
 		$menu = new Menu($gm_lang["edit"]);
 		if (!$this->indi->isdeleted) {
@@ -490,7 +486,7 @@ class IndividualController extends DetailController {
 	 * @param int $linenum		the line number from the original INDI gedcom record where this sex record started, used for editing
 	 */
 	public function GenderRecord($factrec, $linenum) {
-		global $gm_lang, $sex, $GM_IMAGE_DIR, $GM_IMAGES;
+		global $gm_lang, $GM_IMAGE_DIR, $GM_IMAGES;
 		
 		if ((!PrivacyFunctions::showFact("SEX", $this->xref))||(!PrivacyFunctions::showFactDetails("SEX", $this->xref))) return false;
 		

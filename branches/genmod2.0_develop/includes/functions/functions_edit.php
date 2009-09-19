@@ -48,7 +48,7 @@ require_once("includes/values/edit_data.php");
  * @return 	boolean	true if succeed/false if failed
  */
 function ReplaceGedrec($gid, $oldrec, $newrec, $fact="", $change_id, $change_type, $gedid="") {
-	global $manual_save, $gm_username, $GEDCOMID, $chcache, $can_auto_accept, $aa_attempt;
+	global $manual_save, $gm_user, $GEDCOMID, $chcache, $can_auto_accept, $aa_attempt;
 
 	// NOTE: Check if auto accept is possible. If there are already changes present for any ID in one $change_id, changes cannot be auto accepted.
 	if (!isset($can_auto_accept)) $can_auto_accept = true;
@@ -88,11 +88,11 @@ function ReplaceGedrec($gid, $oldrec, $newrec, $fact="", $change_id, $change_typ
 	}
 
 	$sql = "INSERT INTO ".TBLPREFIX."changes (ch_cid, ch_gid, ch_file, ch_type, ch_user, ch_time, ch_fact, ch_old, ch_new)";
-	$sql .= "VALUES ('".$change_id."', '".$gid."', '".$gedid."', '".$change_type."', '".$gm_username."', '".time()."'";
+	$sql .= "VALUES ('".$change_id."', '".$gid."', '".$gedid."', '".$change_type."', '".$gm_user->name."', '".time()."'";
 	$sql .= ", '".$fact."', '".DbLayer::EscapeQuery($oldrec)."', '".DbLayer::EscapeQuery($newrec)."')";
 	$res = NewQuery($sql);
 	
-	WriteToLog("ReplaceGedrec-> Replacing gedcom record $gid ->" . $gm_username ."<-", "I", "G", $gedid);
+	WriteToLog("ReplaceGedrec-> Replacing gedcom record $gid ->" . $gm_user->username ."<-", "I", "G", $gedid);
 	// Clear the GetChangeData cache
 	ResetChangeCaches();
 	return true;
@@ -102,7 +102,7 @@ function ReplaceGedrec($gid, $oldrec, $newrec, $fact="", $change_id, $change_typ
 //-- this function will append a new gedcom record at
 //-- the end of the gedcom file.
 function AppendGedrec($newrec, $fact="", $change_id, $change_type, $gedid="") {
-	global $manual_save, $gm_username, $GEDCOMID, $chcache;
+	global $manual_save, $gm_user, $GEDCOMID, $chcache;
 
 	$newrec = preg_replace(array("/(\r\n)+/", "/\r+/", "/\n+/"), array("\r\n", "\r", "\n"), $newrec);
 	$newrec = stripslashes(trim($newrec));
@@ -116,9 +116,9 @@ function AppendGedrec($newrec, $fact="", $change_id, $change_type, $gedid="") {
 	$newrec = preg_replace("/0 @(.*)@/", "0 @$xref@", $newrec);
 	
 	$sql = "INSERT INTO ".TBLPREFIX."changes (ch_cid, ch_gid, ch_file, ch_type, ch_user, ch_time, ch_fact, ch_new)";
-	$sql .= "VALUES ('".$change_id."', '".$xref."', '".$gedid."', '".$change_type."', '".$gm_username."', '".time()."', '".$fact."', '".DbLayer::EscapeQuery($newrec)."')";
+	$sql .= "VALUES ('".$change_id."', '".$xref."', '".$gedid."', '".$change_type."', '".$gm_user->username."', '".time()."', '".$fact."', '".DbLayer::EscapeQuery($newrec)."')";
 	$res = NewQuery($sql);
-	WriteToLog("AppendGedrec-> Appending new $type record $xref ->" . $gm_username ."<-", "I", "G", $gedid);
+	WriteToLog("AppendGedrec-> Appending new $type record $xref ->" . $gm_user->username ."<-", "I", "G", $gedid);
 
 	// Clear the GetChangeData cache
 	ResetChangeCaches();
@@ -129,7 +129,7 @@ function AppendGedrec($newrec, $fact="", $change_id, $change_type, $gedid="") {
 //-- this function will delete the gedcom record with
 //-- the given $gid
 function DeleteGedrec($gid, $change_id, $change_type) {
-	global $manual_save, $gm_username, $GEDCOMID, $chcache, $can_auto_accept, $aa_attempt;
+	global $manual_save, $gm_user, $GEDCOMID, $chcache, $can_auto_accept, $aa_attempt;
 	$gid = strtoupper($gid);
 	
 	// NOTE: Check if auto accept is possible. If there are already changes present for any ID in one $change_id, changes cannot be auto accepted.
@@ -154,7 +154,7 @@ function DeleteGedrec($gid, $change_id, $change_type) {
 	// NOTE Check if record exists in the database
 	if (!FindGedcomRecord($gid) && !GetChangeData(true, $gid, true)) {
 		print "DeleteGedrec-> Could not find gedcom record with xref: $gid. <br />";
-		WriteToLog("DeleteGedrec-> Could not find gedcom record with xref: $gid ->" . $gm_username ."<-", "E", "G", $GEDCOMID);
+		WriteToLog("DeleteGedrec-> Could not find gedcom record with xref: $gid ->" . $gm_user->username ."<-", "E", "G", $GEDCOMID);
 		return false;
 	}
 	else {
@@ -164,7 +164,7 @@ function DeleteGedrec($gid, $change_id, $change_type) {
 		$ct = preg_match("/0 @.*@\s(\w+)\s/", $oldrec, $match);
 		$ch_fact = $match[1];
 		$sql = "INSERT INTO ".TBLPREFIX."changes (ch_cid, ch_gid, ch_fact, ch_old, ch_file, ch_type, ch_user, ch_time)";
-		$sql .= "VALUES ('".$change_id."', '".$gid."', '".$ch_fact."', '".DbLayer::EscapeQuery($oldrec)."', '".$GEDCOMID."', '".$change_type."', '".$gm_username."', '".time()."')";
+		$sql .= "VALUES ('".$change_id."', '".$gid."', '".$ch_fact."', '".DbLayer::EscapeQuery($oldrec)."', '".$GEDCOMID."', '".$change_type."', '".$gm_user->username."', '".time()."')";
 		$res = NewQuery($sql);
 		// Also delete the asso recs to an indi, to preserve referential integrity
 		if ($ch_fact == "INDI" || $ch_fact == "FAM") {
@@ -182,7 +182,7 @@ function DeleteGedrec($gid, $change_id, $change_type) {
 							$asubrec = GetSubrecord(1, "1 ASSO @".$pid1."@", $arec, $i);
 							if (!empty($asubrec)) {
 								$sql = "INSERT INTO ".TBLPREFIX."changes (ch_cid, ch_gid, ch_fact, ch_old, ch_file, ch_type, ch_user, ch_time)";
-								$sql .= "VALUES ('".$change_id."', '".$pid2."', 'ASSO', '".DbLayer::EscapeQuery($asubrec)."', '".$GEDCOMID."', '".$change_type."', '".$gm_username."', '".time()."')";
+								$sql .= "VALUES ('".$change_id."', '".$pid2."', 'ASSO', '".DbLayer::EscapeQuery($asubrec)."', '".$GEDCOMID."', '".$change_type."', '".$gm_user->username."', '".time()."')";
 							}
 							$i++;
 						} while (!empty($asubrec));
@@ -194,7 +194,7 @@ function DeleteGedrec($gid, $change_id, $change_type) {
 								$asubrec = GetSubrecord(2, "2 ASSO @".$pid1."@", $subrec);
 								$newsubrec = preg_replace($asubrec, "", $subrec);
 								$sql = "INSERT INTO ".TBLPREFIX."changes (ch_cid, ch_gid, ch_fact, ch_old, ch_new, ch_file, ch_type, ch_user, ch_time)";
-								$sql .= "VALUES ('".$change_id."', '".$pid2."', 'ASSO', '".DbLayer::EscapeQuery($subrec)."', '".DbLayer::EscapeQuery($newsubrec)."', '".$GEDCOMID."', '".$change_type."', '".$gm_username."', '".time()."')";
+								$sql .= "VALUES ('".$change_id."', '".$pid2."', 'ASSO', '".DbLayer::EscapeQuery($subrec)."', '".DbLayer::EscapeQuery($newsubrec)."', '".$GEDCOMID."', '".$change_type."', '".$gm_user->username."', '".time()."')";
 							}
 						}
 					}
@@ -204,7 +204,7 @@ function DeleteGedrec($gid, $change_id, $change_type) {
 					
 			
 	}
-	WriteToLog("DeleteGedrec-> Deleting gedcom record $gid ->" . $gm_username ."<-", "I", "G", $GEDCOMID);
+	WriteToLog("DeleteGedrec-> Deleting gedcom record $gid ->" . $gm_user->username ."<-", "I", "G", $GEDCOMID);
 	// Clear the GetChangeData cache
 	ResetChangeCaches();
 	return true;
@@ -213,7 +213,7 @@ function DeleteGedrec($gid, $change_id, $change_type) {
 //-------------------------------------------- check_gedcom
 //-- this function will check a GEDCOM record for valid gedcom format
 function CheckGedcom($gedrec, $chan=true, $user="", $tstamp="") {
-	global $gm_lang, $DEBUG, $GEDCOMID, $gm_username;
+	global $gm_lang, $DEBUG, $GEDCOMID, $gm_user;
 
 	$gedrec = stripslashes($gedrec);
 	$ct = preg_match("/0 @(.*)@ (.*)/", $gedrec, $match);
@@ -222,13 +222,13 @@ function CheckGedcom($gedrec, $chan=true, $user="", $tstamp="") {
 		$ct2 = preg_match("/0 HEAD/", $gedrec, $match2);
 		if ($ct2 == 0) {
 			print "CheckGedcom-> Invalid GEDCOM 5.5 format.\n";
-			WriteToLog("CheckGedcom-> Invalid GEDCOM 5.5 format.->" . $gm_username ."<-", "I", "G", $GEDCOMID);
+			WriteToLog("CheckGedcom-> Invalid GEDCOM 5.5 format.->" . $gm_user->username ."<-", "I", "G", $GEDCOMID);
 			return false;
 		}
 	}
 	$gedrec = trim($gedrec);
 	if ($chan) {
-		if(empty($user)) $user = $gm_username;
+		if(empty($user)) $user = $gm_user->username;
 		if (!empty($tstamp)) {
 			$newd = date("d M Y", $tstamp);
 			$newt = date("H:i:s", $tstamp);
@@ -270,7 +270,7 @@ function CheckGedcom($gedrec, $chan=true, $user="", $tstamp="") {
 function PrintIndiForm($nextaction, $famid, $linenum="", $namerec="", $famtag="CHIL") {
 	global $gm_lang, $pid, $GM_IMAGE_DIR, $GM_IMAGES, $monthtonum, $WORD_WRAPPED_NOTES;
 	global $NPFX_accept, $SPFX_accept, $NSFX_accept, $FILE_FORM_accept, $USE_RTL_FUNCTIONS, $change_type;
-	global $GEDCOMID, $gm_username, $gm_user;
+	global $GEDCOMID, $gm_user;
 
 	init_calendar_popup();
 	print "<form method=\"post\" name=\"addchildform\" action=\"edit_interface.php\">\n";

@@ -46,7 +46,6 @@ abstract class MysqlDb {
 	}
 	
 	public function MakeConnection() {
-		global $DBUSER, $DBPASS, $DBNAME, $DBHOST, $DBPERSIST;
 		
 		if (DBUSER == "" || DBPASS == "" || DBNAME == "" || DBHOST == "") return false;
 		

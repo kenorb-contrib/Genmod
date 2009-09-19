@@ -349,7 +349,7 @@ if ($action=="update") {
 			else $$key=$value;
 		}
 	}
-	WriteToLog("EditConfigGedcom-> Gedcom configuration for ".$FILE."  updated by >".$gm_username."<", "I", "G", get_id_from_gedcom($FILE));
+	WriteToLog("EditConfigGedcom-> Gedcom configuration for ".$FILE."  updated by >".$gm_user->username."<", "I", "G", get_id_from_gedcom($FILE));
 	if (!$errors) {
 		$gednews = NewsController::getUserNews(get_id_from_gedcom($FILE));
 		if (count($gednews)==0) {
@@ -1393,10 +1393,10 @@ print "&nbsp;<a href=\"javascript: ".$gm_lang["contact_conf"]."\" onclick=\"expa
 		<td class="shade2 wrap width20"><div class="helpicon"><?php print_help_link("CONTACT_EMAIL_help", "qm", "CONTACT_EMAIL"); print "</div><div class=\"description\">"; print $gm_lang["CONTACT_EMAIL"];?></div></td>
 		<td class="shade1"><select name="NEW_CONTACT_EMAIL" tabindex="<?php $i++; print $i?>">
 		<?php
-			if ($CONTACT_EMAIL=="you@yourdomain.com") $CONTACT_EMAIL = $gm_username;
+			if ($CONTACT_EMAIL=="you@yourdomain.com") $CONTACT_EMAIL = $gm_user->username;
 			$users = UserController::GetUsers("lastname", "asc", "firstname");
 			foreach($users as $indexval => $user) {
-				if ($user->verified_by_admin=="yes") {
+				if ($user->verified_by_admin=="Y") {
 					print "<option value=\"".$user->username."\"";
 					if ($CONTACT_EMAIL==$user->username) print " selected=\"selected\"";
 					print ">".$user->lastname.", ".$user->firstname." - ".$user->username."</option>\n";
@@ -1425,7 +1425,7 @@ print "&nbsp;<a href=\"javascript: ".$gm_lang["contact_conf"]."\" onclick=\"expa
 		<td class="shade1"><select name="NEW_WEBMASTER_EMAIL" tabindex="<?php $i++; print $i?>">
 		<?php
 			$users = UserController::GetUsers("lastname", "asc", "firstname");
-			if ($WEBMASTER_EMAIL=="webmaster@yourdomain.com") $WEBMASTER_EMAIL = $gm_username;
+			if ($WEBMASTER_EMAIL=="webmaster@yourdomain.com") $WEBMASTER_EMAIL = $gm_user->username;
 			foreach($users as $indexval => $user) {
 				if ($user->userIsAdmin()) {
 					print "<option value=\"".$user->username."\"";

@@ -271,7 +271,7 @@ function print_list_family($key, $value, $findid=false, $asso="", $useli=true, $
 
 // Prints the information for a source in a list view
 function print_list_source($key, $value) {
-	global $GEDCOM, $source_total, $source_hide, $SHOW_SOURCES, $SHOW_ID_NUMBERS, $TEXT_DIRECTION;
+	global $GEDCOMID, $source_total, $source_hide, $SHOW_SOURCES, $SHOW_ID_NUMBERS, $TEXT_DIRECTION;
 	
 	SwitchGedcom($value["gedfile"]);
 	if (!isset($source_total)) $source_total=array();
@@ -295,8 +295,8 @@ function print_list_source($key, $value) {
 }
 // Prints the information for media in a list view
 function print_list_media($key, $value, $skippriv=false) {
-	global $GEDCOM, $media_total, $media_hide, $SHOW_ID_NUMBERS, $TEXT_DIRECTION;
-	
+	global $GEDCOMID, $media_total, $media_hide, $SHOW_ID_NUMBERS, $TEXT_DIRECTION;
+
 	SwitchGedcom($value["gedfile"]);
 	if (!isset($media_total)) $media_total=array();
 	$media_total[$key."[".$GEDCOMID."]"] = 1;
@@ -317,7 +317,7 @@ function print_list_media($key, $value, $skippriv=false) {
 
 // Prints the information for a repository in a list view
 function print_list_repository($key, $value) {
-	global $GEDCOM, $GEDCOMID, $repo_total, $repo_hide, $SHOW_ID_NUMBERS, $TEXT_DIRECTION;
+	global $GEDCOMID, $repo_total, $repo_hide, $SHOW_ID_NUMBERS, $TEXT_DIRECTION;
 
 	SwitchGedcom($value["gedfile"]);
 	if (!isset($repo_total)) $repo_total=array();
@@ -406,7 +406,7 @@ function print_pedigree_person($pid, $style=1, $show_famlink=true, $count=0, $pe
 	global $gm_lang, $SHOW_HIGHLIGHT_IMAGES, $bwidth, $bheight, $show_full, $PEDIGREE_FULL_DETAILS, $SHOW_ID_NUMBERS, $SHOW_PEDIGREE_PLACES, $view;
 	global $CONTACT_EMAIL, $CONTACT_METHOD, $TEXT_DIRECTION, $DEFAULT_PEDIGREE_GENERATIONS, $OLD_PGENS, $talloffset, $PEDIGREE_LAYOUT, $MEDIA_DIRECTORY;
 	global $GM_IMAGE_DIR, $GM_IMAGES, $ABBREVIATE_CHART_LABELS;
-	global $chart_style, $box_width, $generations, $gm_username, $show_changes, $gm_user;
+	global $chart_style, $box_width, $generations, $show_changes, $gm_user;
 	global $CHART_BOX_TAGS, $SHOW_LDS_AT_GLANCE;
 
 	if ($show_changes && $gm_user->UserCanEdit()) $canshow = true;
@@ -467,11 +467,9 @@ function print_pedigree_person($pid, $style=1, $show_famlink=true, $count=0, $pe
 				// NOTE: Zoom
 				print "<a href=\"pedigree.php?rootid=$pid&amp;PEDIGREE_GENERATIONS=$OLD_PGENS&amp;talloffset=$talloffset&amp;gedid=$GEDCOMID\"><b>".$gm_lang["index_header"]."</b></a>\n";
 				print "<br /><a href=\"descendancy.php?pid=$pid&amp;show_full=$show_full&amp;generations=$generations&amp;box_width=$box_width&amp;gedid=$GEDCOMID\"><b>".$gm_lang["descend_chart"]."</b></a><br />\n";
-				$username = $gm_username;
-				if (!empty($username)) {
-					$tuser =& User::GetInstance($username);
-					if (!empty($tuser->gedcomid[$GEDCOMID])) {
-						print "<a href=\"relationship.php?pid1=".$tuser->gedcomid[$GEDCOMID]."&amp;pid2=".$pid."&amp;gedid=$GEDCOMID\"><b>".$gm_lang["relationship_to_me"]."</b></a><br />\n";
+				if ($gm_user->username != "") {
+					if (!empty($gm_user->gedcomid[$GEDCOMID])) {
+						print "<a href=\"relationship.php?pid1=".$gm_user->gedcomid[$GEDCOMID]."&amp;pid2=".$pid."&amp;gedid=$GEDCOMID\"><b>".$gm_lang["relationship_to_me"]."</b></a><br />\n";
 					}
 				}
 				// NOTE: Zoom
@@ -799,7 +797,7 @@ function print_pedigree_person($pid, $style=1, $show_famlink=true, $count=0, $pe
  * @param boolean $use_alternate_styles
  */
 function print_header($title, $head="",$use_alternate_styles=true) {
-	global $gm_lang, $bwidth, $gm_username;
+	global $gm_lang, $bwidth;
 	global $HOME_SITE_URL, $HOME_SITE_TEXT;
 	global $BROWSERTYPE, $indilist, $INDILIST_RETRIEVED;
 	global $view, $cart, $menubar, $USE_GREYBOX;
@@ -1470,7 +1468,7 @@ function print_simple_fact($indirec, $fact, $pid) {
  * @param boolean $output	return the text instead of printing it
  */
 function print_help_link($help, $helpText, $show_desc="", $use_print_text=false, $return=false) {
-	global $SHOW_CONTEXT_HELP, $gm_lang,$view, $GM_USE_HELPIMG, $GM_IMAGES, $GM_IMAGE_DIR, $gm_username, $gm_user;
+	global $SHOW_CONTEXT_HELP, $gm_lang,$view, $GM_USE_HELPIMG, $GM_IMAGES, $GM_IMAGE_DIR, $gm_user;
 	
 	if ($GM_USE_HELPIMG) $sentense = "<img src=\"".$GM_IMAGE_DIR."/".$GM_IMAGES["help"]["small"]."\" class=\"icon\" width=\"15\" height=\"15\" alt=\"\" />";
 	else $sentense = $gm_lang[$helpText];
@@ -2708,7 +2706,7 @@ function PrintFilterEvent($filterev) {
 }
 
 function PrintBlockFavorites(&$userfavs, $side, $index, $style) {
-	global $command, $gm_user, $gm_username, $gm_lang;
+	global $command, $gm_user, $gm_lang;
 	
 	foreach($userfavs as $key=>$favorite) {
 		if (isset($favorite->id)) $key=$favorite->id;
@@ -2746,7 +2744,7 @@ function PrintBlockFavorites(&$userfavs, $side, $index, $style) {
 			if (!empty($favorite->note)) print "&nbsp;&nbsp;";
 			print "<a class=\"font9\" href=\"index.php?command=$command&amp;action=deletefav&amp;fv_id=".$key."\" onclick=\"return confirm('".$gm_lang["confirm_fav_remove"]."');\">".$gm_lang["remove"]."</a>\n";
 			print "&nbsp;";
-			print "<a class=\"font9\" href=\"javascript: ".$gm_lang["config_block"]."\" onclick=\"window.open('index_edit.php?favid=$key&amp;name=$gm_username&amp;command=$command&amp;action=configure&amp;side=$side&amp;index=$index', '', 'top=50,left=50,width=600,height=400,scrollbars=1,resizable=1'); return false;\">".$gm_lang["edit"]."</a>";
+			print "<a class=\"font9\" href=\"javascript: ".$gm_lang["config_block"]."\" onclick=\"window.open('index_edit.php?favid=$key&amp;name=$gm_user->username&amp;command=$command&amp;action=configure&amp;side=$side&amp;index=$index', '', 'top=50,left=50,width=600,height=400,scrollbars=1,resizable=1'); return false;\">".$gm_lang["edit"]."</a>";
 		}
 		SwitchGedcom();
 	}

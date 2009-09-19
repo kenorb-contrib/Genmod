@@ -24,6 +24,10 @@
  * @subpackage Database
  */
  
+if (stristr($_SERVER["SCRIPT_NAME"],basename(__FILE__))) {
+	require "../../intrusion.php";
+}
+ 
 class DbLayer extends MysqlDb {
 	
 	public $classname = "DbLayer";	// Name of this class

@@ -32,8 +32,8 @@ if (stristr($_SERVER["SCRIPT_NAME"],basename(__FILE__))) {
 
 class FamilyController extends DetailController
 {
-	public $classname = "FamilyController";
-	public $family = null;
+	public $classname = "FamilyController";	// Name of this class
+	public $family = null;					// Family object it controls
 	
 	/**
 	 * constructor
@@ -115,9 +115,7 @@ class FamilyController extends DetailController
 	 * @return Menu
 	 */
 	public function &getChartsMenu() {
-		global $TEXT_DIRECTION, $gm_lang;
-		if ($TEXT_DIRECTION=="rtl") $ff="_rtl";
-		else $ff="";
+		global $gm_lang;
 		
 		// charts menu
 		$menu = new Menu($gm_lang['charts']);
@@ -145,9 +143,7 @@ class FamilyController extends DetailController
 	 * get the family page edit menu
 	 */
 	public function &getEditMenu() {
-		global $TEXT_DIRECTION, $gm_lang, $gm_user;
-		if ($TEXT_DIRECTION=="rtl") $ff="_rtl";
-		else $ff="";
+		global $gm_lang, $gm_user;
 		
 		// edit_fam menu
 		$menu = new Menu($gm_lang['edit_fam']);
@@ -214,11 +210,8 @@ class FamilyController extends DetailController
 	 * @return Menu
 	 */
 	public function &getOtherMenu() {
-		global $TEXT_DIRECTION, $gm_lang;
+		global $gm_lang;
 		global $ENABLE_CLIPPINGS_CART, $gm_user;
-		
-		if ($TEXT_DIRECTION=="rtl") $ff="_rtl";
-		else $ff="";
 		
 		// other menu
 		$menu = new Menu($gm_lang['other']);

@@ -106,6 +106,9 @@ class ActionItem {
 				case "pid_obj":
 					return $this->getPidObj();
 					break;
+				default:
+					print "<span class=\"error\">Invalid property ".$property." for __get in ".get_class($this)." class</span><br />";
+					break;
 			}
 		}
 	}
@@ -130,6 +133,9 @@ class ActionItem {
 					break;
 				case "status":
 					if ($value == "1" || $value == "0") $this->status = $value;
+					break;
+				default:
+					print "<span class=\"error\">Invalid property ".$property." for __set in ".get_class($this)." class</span><br />";
 					break;
 			}
 		}
@@ -241,7 +247,7 @@ class ActionItem {
 	}
 			
 	public function PrintThis() {
-		global $gm_lang, $gm_user, $gm_username;
+		global $gm_lang, $gm_user;
 		
 		if ($this->canshow) {
 			print "<tr>";

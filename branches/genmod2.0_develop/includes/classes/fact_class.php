@@ -120,7 +120,7 @@ class Fact {
 				return $this->getFactDescription();
 				break;
 			default:
-				print "<span class=\"error\">Invalid property ".$property." for __get in fact class</span><br />";
+				print "<span class=\"error\">Invalid property ".$property." for __get in ".get_class($this)." class</span><br />";
 				break;
 		}
 	}
@@ -135,7 +135,7 @@ class Fact {
 				$this->factrec = $value;
 				break;
 			default:
-				print "<span class=\"error\">Invalid property ".$property." for __set in fact class</span><br />";
+				print "<span class=\"error\">Invalid property ".$property." for __set in ".get_class($this)." class</span><br />";
 				break;
 		}
 	}
@@ -214,7 +214,7 @@ class Fact {
 	}
 	
 	private function ShowDetails() {
-		global $global_facts, $person_facts, $gm_username, $gm_user;
+		global $global_facts, $person_facts, $gm_user;
 		
 		if ($this->disp == null) {
 			$facts = array();

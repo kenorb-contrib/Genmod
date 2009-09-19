@@ -119,7 +119,7 @@ abstract class DetailController extends BaseController{
 	}
 	
 	public function PrintTabs() {
-		global $GEDCOMID, $gm_user, $gm_username, $gm_lang;
+		global $GEDCOMID, $gm_user, $gm_lang;
 		global $GM_IMAGE_DIR, $GM_IMAGES, $TEXT_DIRECTION;
 		
 		$object_name = $this->object_name;
@@ -192,7 +192,7 @@ abstract class DetailController extends BaseController{
 		foreach ($this->tabs as $index => $tab) {
 			if ($tab == "facts") {
 				
-				if ($this->tabtype == "indi") {
+				if ($this->tabtype == "indi" && count($this->$object_name->facts) > 0) {
 					$this->PrintToggleJS1();
 					global $n_chil, $n_gchi;
 					$n_chil = 1; // counter for children on facts page
@@ -204,7 +204,7 @@ abstract class DetailController extends BaseController{
 					
 				print "\n<table class=\"facts_table\">";
 				
-				if ($this->tabtype == "indi") {
+				if ($this->tabtype == "indi" && count($this->$object_name->facts) > 0) {
 					echo '<tr id="row_top"><td></td><td class="shade2 rela">';
 					echo '<a href="#" onclick="togglerow(\'row_rela\'); return false;">';
 					echo '<img style="display:none;" id="rela_plus" src="'.$GM_IMAGE_DIR.'/'.$GM_IMAGES["plus"]["other"].'" border="0" width="11" height="11" alt="'.$gm_lang["show_details"].'" title="'.$gm_lang["show_details"].'" />';
@@ -245,7 +245,7 @@ abstract class DetailController extends BaseController{
 					elseif ($this->tabtype != "indi" && $this->tabtype != "fam") print $gm_lang["other_".$this->tabtype."_records"];
 					print "</span>";
 				}
-				if ($this->tabtype == "indi") $this->PrintToggleJS2();
+				if ($this->tabtype == "indi" && count($this->$object_name->facts) > 0) $this->PrintToggleJS2();
 			}
 			if ($tab == "individuals_links") {
 				// -- array of individuals

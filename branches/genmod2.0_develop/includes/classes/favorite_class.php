@@ -66,7 +66,7 @@ class Favorite {
 				return $this->GetLink();
 				break;
 			default:
-				return "<span class=\"error\">Invalid property: ".$property." for __get in favorite class</span>";
+				print "<span class=\"error\">Invalid property ".$property." for __get in ".get_class($this)." class</span><br />";
 				break;
 		}
 	}
@@ -78,7 +78,7 @@ class Favorite {
 				$this->title = $value;
 				break;
 			default:
-				return "<span class=\"error\">Invalid property: ".$property." for __set in favorite class</span>";
+				print "<span class=\"error\">Invalid property ".$property." for __set in ".get_class($this)." class</span><br />";
 				break;
 		}
 	}

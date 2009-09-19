@@ -78,7 +78,7 @@ if (($action=="send")&&(isset($_SESSION["good_to_send"]))&&($_SESSION["good_to_s
 			$toarray = array();
 			$users = UserController::GetUsers();
 			foreach($users as $indexval => $tuser) {
-				if ($tuser->username != $gm_username) $toarray[] = $tuser->username;
+				if ($tuser->username != $gm_user->username) $toarray[] = $tuser->username;
 			}
 		}
 		if ($to == "never_logged") {
@@ -158,7 +158,7 @@ if ($action=="compose") {
 	//-->
 	</script>
 	<?php
-	$username = $gm_username;
+	$username = $gm_user->username;
 	if (empty($username)) {
 		print "<br /><br />".$gm_lang["message_instructions"];
 	}

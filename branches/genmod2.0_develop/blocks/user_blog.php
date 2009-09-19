@@ -37,10 +37,9 @@ $GM_BLOCKS["print_user_news"]["rss"]        = false;
  *
  */
 function print_user_news($block=true, $config="", $side, $index) {
-	global $gm_lang, $GM_IMAGE_DIR, $GM_IMAGES, $TEXT_DIRECTION, $command, $TIME_FORMAT, $gm_username;
+	global $gm_lang, $GM_IMAGE_DIR, $GM_IMAGES, $TEXT_DIRECTION, $command, $TIME_FORMAT, $gm_user;
 
-	$uname = $gm_username;
-	$usernews = NewsController::getUserNews($uname);
+	$usernews = NewsController::getUserNews($gm_user->username);
 
 	print "<div id=\"user_news\" class=\"block\">\n";
 	print "<div class=\"blockhc\">";
@@ -71,7 +70,7 @@ function print_user_news($block=true, $config="", $side, $index) {
 		print "</div><br />\n";
 	}
 	if ($block) print "</div>\n";
-	if (!empty($uname)) print "<br /><a href=\"#\" onclick=\"addnews('".$uname."'); return false;\">".$gm_lang["add_journal"]."</a>\n";
+	if ($gm_user->username != "") print "<br /><a href=\"#\" onclick=\"addnews('".$gm_user->username."'); return false;\">".$gm_lang["add_journal"]."</a>\n";
 	print "</div>\n";
 	print "</div>";
 }

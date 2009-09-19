@@ -654,7 +654,7 @@ function GetSourceList($selection="") {
 
 //-- get the repositorylist from the datastore
 function GetRepoList($filter = "", $selection="") {
-	global $GEDCOMID, $gm_username;
+	global $GEDCOMID;
 	
 	$repolist = array();
 	$repoaction = array();
@@ -728,7 +728,7 @@ function GetRepoIdList() {
  * @return array the array of repository-titles
  */
 function GetRepoAddTitleList() {
-	global $GEDCOMID, $gm_username;
+	global $GEDCOMID;
 
 	$addrepolist = array();
 	$repoaction = array();
@@ -1596,7 +1596,7 @@ function GetListSize($list) {
  * @return 	boolean	true if changes were processed correctly, false if there was a problem
  */
 function AcceptChange($cid, $gedfile, $all=false) {
-	global $GEDCOMID, $FILE, $gm_username, $chcache;
+	global $GEDCOMID, $FILE, $gm_user, $chcache;
 	global $MEDIA_ID_PREFIX, $FAM_ID_PREFIX, $GEDCOM_ID_PREFIX, $SOURCE_ID_PREFIX, $REPO_ID_PREFIX, $NOTE_ID_PREFIX;
 	
 	$cidchanges = array();
@@ -1661,7 +1661,7 @@ function AcceptChange($cid, $gedfile, $all=false) {
 //				print "Acceptchange: ".$gedrec;
 				$update_id = UpdateRecord(CheckGedcom($gedrec, true, $details["user"], $details["time"]));
 			}
-			WriteToLog("AcceptChange-> Accepted change for ".$details["gid"].". ->".$gm_username."<-", "I", "G", $gedfile);
+			WriteToLog("AcceptChange-> Accepted change for ".$details["gid"].". ->".$gm_user->username."<-", "I", "G", $gedfile);
 		}
 		GedcomConfig::ResetCaches($GEDCOMID);
 		ResetChangeCaches();
@@ -1687,7 +1687,7 @@ function AcceptChange($cid, $gedfile, $all=false) {
  * @return 	boolean	true if undo successful
  */
 function RejectChange($cid, $gedfile, $all=false) {
-	global $manual_save, $gm_username;
+	global $manual_save, $gm_user;
 	
 	// NOTE: Get the details of the change id, to check if we need to unlock any records
 	$sql = "SELECT ch_type, ch_gid from ".TBLPREFIX."changes where ch_cid = '".$cid."' AND ch_file = '".$gedfile."'";
@@ -1707,7 +1707,7 @@ function RejectChange($cid, $gedfile, $all=false) {
 	if ($all) {
 		$sql = "DELETE from ".TBLPREFIX."changes where ch_file = '".$gedfile."'";
 		if ($res = NewQuery($sql)) {
-			WriteToLog("RejectChange-> Rejected all changes for $gedfile "." ->" . $gm_username ."<-", "I", "G", $gedfile);
+			WriteToLog("RejectChange-> Rejected all changes for $gedfile "." ->" . $gm_user->username ."<-", "I", "G", $gedfile);
 			ResetChangeCaches();
 			return true;
 		}
@@ -1716,7 +1716,7 @@ function RejectChange($cid, $gedfile, $all=false) {
 	else {
 		$sql = "DELETE from ".TBLPREFIX."changes where ch_cid = '".$cid."' AND ch_file = '".$gedfile."'";
 		if ($res = NewQuery($sql)) {
-			WriteToLog("RejectChange-> Rejected change $cid - $gedfile "." ->" . $gm_username ."<-", "I", "G", $gedfile);
+			WriteToLog("RejectChange-> Rejected change $cid - $gedfile "." ->" . $gm_user->username ."<-", "I", "G", $gedfile);
 			ResetChangeCaches();
 			return true;
 		}
@@ -1967,10 +1967,9 @@ function GetFaqData($id='') {
  *							Gedcom the Log record applies to
  */
 function WriteToLog($LogString, $type="I", $cat="S", $gedid="", $chkconn = true) {
-	global $gm_username;
+	global $gm_user;
 	global $DBCONN;
 	
-	$user = $gm_username;
 	
 	// -- Remove the " from the logstring, as this disturbs the export
 	$LogString = str_replace("\"", "'", $LogString);
@@ -1982,7 +1981,7 @@ function WriteToLog($LogString, $type="I", $cat="S", $gedid="", $chkconn = true)
 	if ($chkconn && (!is_object($DBCONN) || (isset($DBCONN->connected) && !$DBCONN->connected))) {
 		if ($cat == "S") {
 			$emlog = INDEX_DIRECTORY."emergency_syslog.txt";
-			$string = "INSERT INTO ".TBLPREFIX."log (l_type, l_category, l_timestamp, l_ip, l_user, l_text, l_file, l_new) VALUES('".$type."','".$cat."','".time()."', '".$_SERVER['REMOTE_ADDR']."', '".addslashes($user)."', '".addslashes($LogString)."', '', '".$new."')\r\n";
+			$string = "INSERT INTO ".TBLPREFIX."log (l_type, l_category, l_timestamp, l_ip, l_user, l_text, l_file, l_new) VALUES('".$type."','".$cat."','".time()."', '".$_SERVER['REMOTE_ADDR']."', '".addslashes($gm_user->username)."', '".addslashes($LogString)."', '', '".$new."')\r\n";
 			$fp = fopen($emlog, "ab");
 			flock($fp, 2);
 			fwrite($fp, $string);
@@ -2002,12 +2001,12 @@ function WriteToLog($LogString, $type="I", $cat="S", $gedid="", $chkconn = true)
 	}
 	
 	if ($cat == "S") {
-		$sql = "INSERT INTO ".TBLPREFIX."log (l_type, l_category, l_timestamp, l_ip, l_user, l_text, l_file, l_new) VALUES('".$type."','".$cat."','".time()."', '".$_SERVER['REMOTE_ADDR']."', '".addslashes($user)."', '".addslashes($LogString)."', '', '".$new."')";
+		$sql = "INSERT INTO ".TBLPREFIX."log (l_type, l_category, l_timestamp, l_ip, l_user, l_text, l_file, l_new) VALUES('".$type."','".$cat."','".time()."', '".$_SERVER['REMOTE_ADDR']."', '".addslashes($gm_user->username)."', '".addslashes($LogString)."', '', '".$new."')";
 		$res = NewQuery($sql);
 		return;
 	}
 	if ($cat == "G") {
-		$sql = "INSERT INTO ".TBLPREFIX."log (l_type, l_category, l_timestamp, l_ip, l_user, l_text, l_file, l_new) VALUES('".$type."','".$cat."','".time()."', '".$_SERVER['REMOTE_ADDR']."', '".addslashes($user)."', '".addslashes($LogString)."', '".$gedid."', '".$new."')";
+		$sql = "INSERT INTO ".TBLPREFIX."log (l_type, l_category, l_timestamp, l_ip, l_user, l_text, l_file, l_new) VALUES('".$type."','".$cat."','".time()."', '".$_SERVER['REMOTE_ADDR']."', '".addslashes($gm_user->username)."', '".addslashes($LogString)."', '".$gedid."', '".$new."')";
 		$res = NewQuery($sql);
 		return;
 	}
@@ -2015,7 +2014,7 @@ function WriteToLog($LogString, $type="I", $cat="S", $gedid="", $chkconn = true)
 		if (!isset($gedid)) return;
 		if (count($gedid) == 0) return;
 		foreach($gedid as $indexval => $value) {
-			$sql = "INSERT INTO ".TBLPREFIX."log (l_type, l_category, l_timestamp, l_ip, l_user, l_text, l_file, l_new) VALUES('".$type."','".$cat."','".time()."', '".$_SERVER['REMOTE_ADDR']."', '".addslashes($user)."', '".addslashes($LogString)."', '".$value."', '".$new."')";
+			$sql = "INSERT INTO ".TBLPREFIX."log (l_type, l_category, l_timestamp, l_ip, l_user, l_text, l_file, l_new) VALUES('".$type."','".$cat."','".time()."', '".$_SERVER['REMOTE_ADDR']."', '".addslashes($gm_user->username)."', '".addslashes($LogString)."', '".$value."', '".$new."')";
 			$res = NewQuery($sql);
 		}
 		return;
@@ -2129,7 +2128,7 @@ function ImportEmergencyLog() {
 }
 	
 function IsChangedFact($gid, $oldfactrec) {
-	global $GEDCOMID, $gm_username, $show_changes, $gm_user;
+	global $GEDCOMID, $show_changes, $gm_user;
 	
 //print "checking ".$gid." ".$oldfactrec."<br />";
 	if ($show_changes && $gm_user->UserCanEditOwn($gid) && GetChangeData(true, $gid, true)) {
@@ -2149,7 +2148,7 @@ function IsChangedFact($gid, $oldfactrec) {
 
 
 function RetrieveChangedFact($gid, $fact, $oldfactrec) {
-	global $GEDCOMID, $show_changes, $gm_username, $gm_user;
+	global $GEDCOMID, $show_changes, $gm_user;
 	
 	if ($show_changes && $gm_user->UserCanEditOwn($gid) && GetChangeData(true, $gid, true)) {
 		$sql = "SELECT ch_old, ch_new FROM ".TBLPREFIX."changes where ch_gid = '".$gid."' AND ch_fact = '".$fact."' AND ch_file = '".$GEDCOMID."' ORDER BY ch_time ASC";
@@ -2168,7 +2167,7 @@ function RetrieveChangedFact($gid, $fact, $oldfactrec) {
 }
 
 function RetrieveNewFacts($gid, $includeall=false) {
-	global $GEDCOMID, $show_changes, $gm_username;
+	global $GEDCOMID, $show_changes;
 	global $gm_lang;
 	
 	$facts = array();
@@ -2676,7 +2675,7 @@ function ResetChangeCaches() {
 }
 
 function GetChangeNames($pid) {
-	global $changes, $gm_lang, $GEDCOMID, $gm_username, $show_changes, $gm_user;
+	global $changes, $gm_lang, $GEDCOMID, $show_changes, $gm_user;
 	
 	$name = array();
 	if ($show_changes && $gm_user->UserCanEditOwn($pid)) $onlyold = false;
@@ -3383,9 +3382,7 @@ function GetLastChangeDate($type, $pid, $gedid, $head=false) {
 }
 
 function GetRecentChangeFacts($day, $month, $year, $days) {
-	global $monthtonum, $gm_user, $gm_username, $SHOW_SOURCES, $TOTAL_QUERIES;
-	
-	$user =& User::GetInstance($gm_username);
+	global $monthtonum, $gm_user, $SHOW_SOURCES, $TOTAL_QUERIES;
 	
 	$dayindilist = array();
 	$dayfamlist = array();

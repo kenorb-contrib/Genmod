@@ -1543,6 +1543,7 @@
 "sync_gedcom";"Synchronize User Settings with GEDCOM Data"
 "user_relationship_priv";"Limit access to related people"
 "user_path_length";"Max relationship privacy path length"
+"user_path_marr";"Use partners in path calculation"
 "add_user";"Add a new user"
 "current_users";"User List"
 "select";"Select"

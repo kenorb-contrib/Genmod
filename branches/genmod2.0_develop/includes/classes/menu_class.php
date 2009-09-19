@@ -29,21 +29,21 @@ if (stristr($_SERVER["SCRIPT_NAME"],basename(__FILE__))) {
  
 class Menu {
 	
-	var $classname = "Menu";
-	var $seperator = false;
-	var $label = ' ';
-	var $labelpos = 'right';
-	var $link = '#';
-	var $onclick = null;
-	var $icon = null;
-	var $hovericon = null;
-	var $flyout = 'down';
-	var $class = '';
-	var $hoverclass = '';
-	var $submenuclass = '';
-	var $accesskey = null;
-	var $parentmenu = null;
-	var $submenus;
+	public $classname = "Menu";		// Name of this class
+	public $seperator = false;		// If this menu object is just a separator line
+	public $label = ' ';			// Label of the menu option
+	public $labelpos = 'right';	// Tells where the text should be positioned relative to the picture options are up down left right
+	public $link = '#';				// Link for the menu option: either # for JS or the actual link without server URL
+	public $onclick = null;		// JS to run on click
+	public $icon = null;			// Icon to show in front of the menu option
+	public $hovericon = null;		// Icon to show when hovering over the option
+	public $flyout = 'down';		// Options are up down left right
+	public $class = '';			// CSS class for the item
+	public $hoverclass = '';		// CSS class for the item when hovering over it
+	public $submenuclass = '';		// CSS class for the submenu
+	public $accesskey = null;		// Access key for the menu option
+	public $parentmenu = null;		// Parent menu of this menu
+	public $submenus;				// Array of submenu's for this menu
 
 	/**
 	 * Constructor for the menu class
@@ -56,47 +56,47 @@ class Menu {
 		else $this->addLabel($label);
 	}
 
-	function isSeperator() {
+	public function isSeperator() {
 		$this->seperator = true;
 	}
 
-	function addLabel($label=' ', $pos='right') {
+	public function addLabel($label=' ', $pos='right') {
 		if ($label) $this->label = $label;
 		$this->labelpos = $pos;
 	}
 
-	function addLink($link='#') {
+	public function addLink($link='#') {
 		$this->link = $link;
 	}
 	
-	function addOnclick($onclick) {
+	public function addOnclick($onclick) {
 		$this->onclick = $onclick;
 	}
-	function addFlyout($flyout='down') {
+	public function addFlyout($flyout='down') {
 		$this->flyout = $flyout;
 	}
 
-	function addClass($class, $hoverclass='', $submenuclass='') {
+	public function addClass($class, $hoverclass='', $submenuclass='') {
 		$this->class = $class;
 		$this->hoverclass = $hoverclass;
 		$this->submenuclass = $submenuclass;
 	}
 	
-	function addAccesskey($accesskey) {
+	public function addAccesskey($accesskey) {
 		$this->accesskey = $accesskey;
 	}
 
-	function addSubMenu($obj) {
+	public function addSubMenu($obj) {
 		$this->submenus[] = $obj;
 	}
 
-	function addSeperator() {
+	public function addSeperator() {
 		$submenu = new Menu();
 		$submenu->isSeperator();
 		$this->submenus[] = $submenu;
 	}
 	
-	function getMenu() {
+	public function getMenu() {
 		global
 			$menucount,
 			$TEXT_DIRECTION,
@@ -211,7 +211,7 @@ class Menu {
 		return $output;
 	}
 	
-	function printMenu() {
+	public function printMenu() {
 		print $this->getMenu();
 	}
 }

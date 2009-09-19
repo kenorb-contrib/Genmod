@@ -51,7 +51,7 @@ $GM_BLOCKS["print_gedcom_stats"]["rss"]			= true;
 
 function print_gedcom_stats($block = true, $config="", $side, $index) {
 		global $GM_BLOCKS, $gm_lang, $GEDCOMID, $GEDCOMS, $ALLOW_CHANGE_GEDCOM, $command, $COMMON_NAMES_THRESHOLD, $GM_IMAGE_DIR, $GM_IMAGES;
-		global $top10_block_present, $monthtonum, $gm_username, $gm_user;		// Set in index.php
+		global $top10_block_present, $monthtonum, $gm_user;		// Set in index.php
 
 		if (empty($config)) $config = $GM_BLOCKS["print_gedcom_stats"]["config"];
 		if (!isset($config['stat_indi'])) $config = $GM_BLOCKS["print_gedcom_stats"]["config"];
@@ -60,7 +60,7 @@ function print_gedcom_stats($block = true, $config="", $side, $index) {
 		print "<div class=\"blockhc\">";
 		print_help_link("index_stats_help", "qm", "gedcom_stats");
 		if ($GM_BLOCKS["print_gedcom_stats"]["canconfig"]) {
-			$username = $gm_username;
+			$username = $gm_user->username;
 			if ((($command=="gedcom")&&($gm_user->userGedcomAdmin())) || (($command=="user")&&(!empty($username)))) {
 				if ($command=="gedcom") $name = $GEDCOMID;
 				else $name = $username;

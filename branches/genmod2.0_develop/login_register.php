@@ -98,7 +98,6 @@ switch ($action) {
 			UserController::DeleteUser($user_name, "reqested new password for");
 			
 			$newuser->password = crypt($user_new_pw, $user_new_pw);
-			$newuser->pwrequested = "1";
 			//$newuser->reg_timestamp = date("U");
 			UserController::addUser($newuser, "reqested new password for");
 
@@ -371,7 +370,6 @@ switch ($action) {
 			$user->language = $user_language;
 			$user->verified = "";
 			$user->verified_by_admin = "";
-			$user->pwrequested = "";
 			$user->reg_timestamp = date("U");
 			srand((double)microtime()*1000000);
 			$user->reg_hashcode = crypt(rand(), $user_password01);
@@ -543,11 +541,10 @@ switch ($action) {
 				$newuser = CloneObj($user);
 				$olduser = CloneObj($user);
 				UserController::DeleteUser($user_name, "verified");
-				$newuser->verified = "yes";
-				$newuser->pwrequested = "";
+				$newuser->verified = "Y";
 				$newuser->reg_timestamp = date("U");
 				$newuser->hashcode = "";
-				if (!$REQUIRE_ADMIN_AUTH_REGISTRATION) $newuser->verified_by_admin = "yes";
+				if (!$REQUIRE_ADMIN_AUTH_REGISTRATION) $newuser->verified_by_admin = "Y";
 				UserController::AddUser($newuser, "verified");
 				// switch language to webmaster settings
 				$admuser =& User::GetInstance($WEBMASTER_EMAIL);

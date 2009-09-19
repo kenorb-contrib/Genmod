@@ -516,7 +516,7 @@ abstract class MediaFS {
 	 * @param string $thumbnail	Name of the thumbnail that will be generated
 	 * @return	boolean	true|false
 	 */
-	function GenerateThumbnail($filename, $thumbnail, $ignoremediadir=false, $ext="") {
+	public function GenerateThumbnail($filename, $thumbnail, $ignoremediadir=false, $ext="") {
 		global $MEDIA_DIRECTORY, $THUMBNAIL_WIDTH, $AUTO_GENERATE_THUMBS, $MEDIA_IN_DB;
 //						print "Generating thumb for: ".$filename."<br />";
 
