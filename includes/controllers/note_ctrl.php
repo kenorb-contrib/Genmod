@@ -169,7 +169,7 @@ class NoteController extends DetailController {
  		if (!empty($selection)) $sql .= " AND o_id IN (".$selection.")";
  		$res = NewQuery($sql);
  		while ($row = $res->FetchAssoc()) {
-	 		$note =& Note::GetInstance($row["o_id"], $row["o_gedcom"], $row["o_file"]);
+	 		$note =& Note::GetInstance($row["o_id"], $row, $row["o_file"]);
 	 		$note->GetTitle(40);
 	 		if ($note->disp) $this->notelist[] = $note;
 	 		else $note_hide++;
