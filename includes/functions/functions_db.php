@@ -141,7 +141,7 @@ function FindPersonRecord($pid, $gedfile="", $renew = false, $nocache = false) {
 	global $COMBIKEY;
 	global $GEDCOMID;
 	global $indilist;
-
+//print "person record".$pipo;
 	if (empty($pid)) return false;
 	if (empty($gedfile)) $gedfile = $GEDCOMID;
 	if (empty($gedfile)) return "";
@@ -278,6 +278,7 @@ function FindGedcomRecord($pid, $gedfile = "", $renew = false, $nocache = false)
 function FindOtherRecord($oid, $gedfile="", $renew = false, $type="") {
 	global $gm_lang;
 	global $GEDCOMID, $otherlist;
+//print "other record".$pipo;
 
 	if ($oid=="") return false;
 	if (empty($gedfile)) $gedfile = $GEDCOMID;
@@ -311,6 +312,7 @@ function FindOtherRecord($oid, $gedfile="", $renew = false, $type="") {
 function FindSourceRecord($sid, $gedfile="", $renew = false) {
 	global $gm_lang;
 	global $GEDCOMID, $sourcelist;
+//print "source record".$pipo;
 
 	if ($sid=="") return false;
 	if (empty($gedfile)) $gedfile = $GEDCOMID;
@@ -365,6 +367,7 @@ function CheckExists($pid, $type="") {
  */
 function FindRepoRecord($rid, $gedfile="") {
 	global $GEDCOMID, $repolist;
+//print "repo record".$pipo;
 
 	if ($rid=="") return false;
 	if (empty($gedfile)) $gedfile = $GEDCOMID;
@@ -393,6 +396,7 @@ function FindRepoRecord($rid, $gedfile="") {
  */
 function FindMediaRecord($rid, $gedfile='', $renew = false) {
 	global $medialist, $GEDCOMID;
+//print "media record".$pipo;
 	
 	if ($rid=="") return false;
 	if (empty($gedfile)) $gedfile = $GEDCOMID;
@@ -867,9 +871,12 @@ function GetAssoList($type = "all", $id="") {
 			$asso["role"] = $row["as_rela"];
 			// Get the family names
 			$GEDCOMID = $row["f_file"];
-			
-			$hname = GetSortableName(SplitKey($row["f_husb"], "id"), "", "", true);
-			$wname = GetSortableName(SplitKey($row["f_wife"], "id"), "", "", true);
+/*			
+			$husb = Person::GetInstance(SplitKey($row["f_husb"], "id"), "", $row["f_file"]);
+			$wife = Person::GetInstance(SplitKey($row["f_wife"], "id"), "", $row["f_file"]);
+			$hname = NameFunctions::GetSortableName($husb, "", "", true);
+			$wname = NameFunctions::GetSortableName($wife, "", "", true);
+			print $pipo;
 			if (empty($hname)) $hname = "@N.N.";
 			if (empty($wname)) $wname = "@N.N.";
 			$name = array();
@@ -880,7 +887,7 @@ function GetAssoList($type = "all", $id="") {
 				}
 			}
 			$asso["name"] = $name;
-			$assolist[$row["f_key"]][] = $asso;
+*/			$assolist[$row["f_key"]][] = $asso;
 		}
 		$res->FreeResult();
 	}
@@ -1114,50 +1121,6 @@ function FindPlaceList($place) {
 	}
 }
 
- /**
- * Get all first letters of individual's last names
- *
- * The function takes all the distinct lastname starting letters 
- * found in both the individual and names table. Then some language specific
- * letter substitution is done
- *
- * @see indilist.php
- * @author	Genmod Development Team
- * @return 	array	An array of all letters found in the active gedcom
- */
-
-function GetIndiAlpha($allgeds="no") {
-	global $CHARACTER_SET, $LANGUAGE, $SHOW_MARRIED_NAMES;
-	global $GEDCOMID;
-	$indialpha = array();
-	
-	$sql = "SELECT DISTINCT n_letter AS alpha ";
-	$sql .= "FROM ".TBLPREFIX."names ";
-	if ($allgeds == "no") $sql .= "WHERE n_file = '".$GEDCOMID."'";
-	$res = NewQuery($sql);
-	
-	$hungarianex = array("DZS", "CS", "DZ" , "GY", "LY", "NY", "SZ", "TY", "ZS");
-	$danishex = array("OE", "AE", "AA");
-	while($row = $res->FetchAssoc()){
-		$letter = $row["alpha"];
-		if ($LANGUAGE == "danish" || $LANGUAGE == "norwegian"){
-			if (in_array(strtoupper($letter), $danishex)) {
-				if (strtoupper($letter) == "OE") $letter = "Ø";
-				else if (strtoupper($letter) == "AE") $letter = "Æ";
-				else if (strtoupper($letter) == "AA") $letter = "Å";
-			}
-		}
-		if (strlen($letter) > 1){
-			if (ord($letter) < 92){
-				if ($LANGUAGE != "hungarian" && in_array($letter, $hungarianex)) $letter = substr($letter, 0, 1);
-				if (($LANGUAGE != "danish" || $LANGUAGE != "norwegian") && in_array($letter, $danishex)) $letter = substr($letter, 0, 1);
-			}
-		}
-		if (!isset($indialpha[$letter])) $indialpha[$letter]=$letter;
-	}
-	$res->FreeResult();
-	return $indialpha;
-}
 
 //-- get the first character in the list
 function GetFamAlpha($allgeds="no") {
@@ -2674,33 +2637,31 @@ function ResetChangeCaches() {
 	unset($GLOBALS['chstatcache']);
 }
 
-function GetChangeNames($pid) {
+
+function GetChangeNames($person) {
 	global $changes, $gm_lang, $GEDCOMID, $show_changes, $gm_user;
 	
 	$name = array();
-	if ($show_changes && $gm_user->UserCanEditOwn($pid)) $onlyold = false;
+	if ($show_changes && $gm_user->UserCanEditOwn($person->xref)) $onlyold = false;
 	else $onlyold = true;
 
-	if(!isset($pid) || empty($pid)) return $name;
+	if($person->isempty) return $name;
+	
 	$newindi = false;
 	// First see if the indi exists or is new
-	$indirec = FindGedcomRecord($pid);
+	$indirec = $person->gedrec;
 	$fromchange = false;
 	if (empty($indirec) && !$onlyold) {
 		$newindi = true;
 		// And see if it's a new indi
-		if (GetChangeData(true, $pid, true, "", "INDI,FAMC")) {
-			$rec = GetChangeData(false, $pid, true, "gedlines", "INDI,FAMC");
-			$indirec = $rec[$GEDCOMID][$pid];
+		if ($person->isnew) {
+			$indirec = $person->changedgedrec;
 			$fromchange = true;
 		}
 	}
 	// Check if the indi is flagged for delete
 	$deleted = false;
-	if (!$onlyold && GetChangeData(true, $pid, true, "", "INDI")) {
-		$new = GetChangeData(false, $pid, true, "gedlines", "INDI");
-		if (empty($new[$GEDCOMID][$pid])) $deleted = true;
-	}
+	if (!$onlyold && $person->isdeleted) $deleted = true;
 
 	if (empty($indirec)) return false;
 	$result = "aa";
@@ -2754,6 +2715,8 @@ function GetCachedEvents($action, $daysprint, $filter, $onlyBDM="no", $skipfacts
 	global $CIRCULAR_BASE;
 	
 	$found_facts = array();
+	$skip = preg_split("/[;, ]/", $skipfacts);
+	
 	// Add 1 to day to start from tomorrow
 	if ($action == "upcoming") $monthstart = mktime(1,0,0,$monthtonum[strtolower($month)],$day+1,$year);
 	else $monthstart = mktime(1,0,0,$monthtonum[strtolower($month)],$day,$year);
@@ -2789,76 +2752,75 @@ function GetCachedEvents($action, $daysprint, $filter, $onlyBDM="no", $skipfacts
 			$dend = $dstart;
 			$mend = date("n", $monthstart);
 		}
-		$indilist = array();
-		$indilist = SearchIndisDateRange($dstart, $mstart, "", $dend, $mend, "", $filter, "no", $skipfacts);
+		$indilist = SearchFunctions::SearchIndisDateRange($dstart, $mstart, "", $dend, $mend, "", $filter, "no", $skipfacts);
 		// Search database for raw Family data if no cache was found
-		$famlist = array();
-		$famlist = SearchFamsDateRange($dstart, $mstart, "", $dend, $mend, "", "no", $skipfacts);
-
+		$famlist = SearchFunctions::SearchFamsDateRange($dstart, $mstart, "", $dend, $mend, "", "no", $skipfacts);
 		// Apply filter criteria and perform other transformations on the raw data
 		foreach($indilist as $gid=>$indi) {
-			$facts = GetAllSubrecords($indi["gedcom"], $skipfacts, false, false, false);
-			foreach($facts as $key=>$factrec) {
-				$date = 0; //--- MA @@@
-				$hct = preg_match("/2 DATE.*(@#DHEBREW@)/", $factrec, $match);
-				if ($hct>0) {
-					if ($USE_RTL_FUNCTIONS) {
-						$dct = preg_match("/2 DATE (.+)/", $factrec, $match);
-						if ($dct>0) {
-							$hebrew_date = ParseDate(trim($match[1]));
-							$date = JewishGedcomDateToCurrentGregorian($hebrew_date);
+			foreach($indi->facts as $key => $factobj) {
+				if (!in_array($factobj->fact, $skip)) {
+					$factrec = $factobj->factrec;
+					$date = 0; //--- MA @@@
+					$hct = preg_match("/2 DATE.*(@#DHEBREW@)/", $factrec, $match);
+					if ($hct>0) {
+						if ($USE_RTL_FUNCTIONS) {
+							$dct = preg_match("/2 DATE (.+)/", $factrec, $match);
+							if ($dct>0) {
+								$hebrew_date = ParseDate(trim($match[1]));
+								$date = JewishGedcomDateToCurrentGregorian($hebrew_date);
+							}
 						}
 					}
-				}
-				else {
-					$dct = preg_match("/2 DATE (.+)/", $factrec, $match);
-					if ($dct>0) $date = ParseDate(trim($match[1]));
-				}
-				if (!empty($date[0]["mon"]) && !empty($date[0]["day"])) {
-					if ($date[0]["mon"]< $mstart) $y = $year+1;
-					else $y = $year;
-					$datestamp = mktime(1,0,0,$date[0]["mon"],$date[0]["day"],$y);
-					if (($datestamp >= $monthstart) && ($datestamp<=$monthend)) {
-						// Strip useless information:
-						//   NOTE, ADDR, OBJE, SOUR, PAGE, DATA, TEXT
-						$factrec = preg_replace("/\d\s+(NOTE|ADDR|OBJE|SOUR|PAGE|DATA|TEXT|CONT|CONC|QUAY|CAUS|CEME)\s+(.+)\n/", "", $factrec);
-						if (preg_match("/1 SEX M/", $indi["gedcom"])>0) $gender = "M";
-						else if (preg_match("/1 SEX F/", $indi["gedcom"])>0) $gender = "F";
-						else $gender = "";
-						$fct = preg_match("/1\s(\w+)/", $factrec, $fact);
-						$found_facts[] = array($gid, $factrec, "INDI", $datestamp, CheckNN(GetSortableName($gid)), $gender, $fact[1], $indi["isdead"]);
+					else {
+						$dct = preg_match("/2 DATE (.+)/", $factrec, $match);
+						if ($dct>0) $date = ParseDate(trim($match[1]));
+					}
+					if (!empty($date[0]["mon"]) && !empty($date[0]["day"])) {
+						if ($date[0]["mon"]< $mstart) $y = $year+1;
+						else $y = $year;
+						$datestamp = mktime(1,0,0,$date[0]["mon"],$date[0]["day"],$y);
+						if (($datestamp >= $monthstart) && ($datestamp<=$monthend)) {
+							// Strip useless information:
+							//   NOTE, ADDR, OBJE, SOUR, PAGE, DATA, TEXT
+							$factrec = preg_replace("/\d\s+(NOTE|ADDR|OBJE|SOUR|PAGE|DATA|TEXT|CONT|CONC|QUAY|CAUS|CEME)\s+(.+)\n/", "", $factrec);
+							$fct = preg_match("/1\s(\w+)/", $factrec, $fact);
+							// let op: naam moet incl addname en addxref.
+							$found_facts[] = array($indi->xref, $factrec, "INDI", $datestamp, $indi->sortable_name.($indi->sortable_addname == "" ? "" : "(".$indi->sortable_addname.")"), $indi->sex, $fact[1], $indi->isdead);
+						}
 					}
 				}
 			}
 		}
-		foreach($famlist as $gid=>$fam) {
-			$facts = GetAllSubrecords($fam["gedcom"], $skipfacts, false, false, false);
-			foreach($facts as $key=>$factrec) {
-				$date = 0; //--- MA @@@
-				$hct = preg_match("/2 DATE.*(@#DHEBREW@)/", $factrec, $match);
-				if ($hct>0) {
-					if ($USE_RTL_FUNCTIONS) {
-						$dct = preg_match("/2 DATE (.+)/", $factrec, $match);
-						$hebrew_date = ParseDate(trim($match[1]));
-						$date = JewishGedcomDateToCurrentGregorian($hebrew_date);
+		foreach($famlist as $gid => $family) {
+			foreach($family->facts as $key => $factobj) {
+				if (!in_array($factobj->fact, $skip)) {
+					$factrec = $factobj->factrec;
+					$date = 0; //--- MA @@@
+					$hct = preg_match("/2 DATE.*(@#DHEBREW@)/", $factrec, $match);
+					if ($hct>0) {
+						if ($USE_RTL_FUNCTIONS) {
+							$dct = preg_match("/2 DATE (.+)/", $factrec, $match);
+							$hebrew_date = ParseDate(trim($match[1]));
+							$date = JewishGedcomDateToCurrentGregorian($hebrew_date);
+						}
 					}
-				}
-				else {
-					$ct = preg_match("/2 DATE (.+)/", $factrec, $match);
-					if ($ct>0) $date = ParseDate(trim($match[1]));
-				}
-				if (!empty($date[0]["mon"]) && !empty($date[0]["day"])) {
-					if ($date[0]["mon"]< $mstart) $y = $year+1;
-					else $y = $year;
-					$datestamp = mktime(1,0,0,$date[0]["mon"],$date[0]["day"],$y);
-					if (($datestamp >= $monthstart) && ($datestamp<=$monthend)) {
-						// Strip useless information:
-						//   NOTE, ADDR, OBJE, SOUR, PAGE, DATA, TEXT
-						$factrec = preg_replace("/\d\s+(NOTE|ADDR|OBJE|SOUR|PAGE|DATA|TEXT|CONT|CONC|QUAY|CAUS|CEME)\s+(.+)\n/", "", $factrec);
-						if (IsDeadId($fam["HUSB"]) && IsDeadId($fam["WIFE"])) $isdead = "1";
-						else $isdead = 0;
-						$fct = preg_match("/1\s(\w+)/", $factrec, $fact);
-						$found_facts[] = array($gid, $factrec, "FAM", $datestamp, "", "", $fact[1], $isdead);
+					else {
+						$ct = preg_match("/2 DATE (.+)/", $factrec, $match);
+						if ($ct>0) $date = ParseDate(trim($match[1]));
+					}
+					if (!empty($date[0]["mon"]) && !empty($date[0]["day"])) {
+						if ($date[0]["mon"]< $mstart) $y = $year+1;
+						else $y = $year;
+						$datestamp = mktime(1,0,0,$date[0]["mon"],$date[0]["day"],$y);
+						if (($datestamp >= $monthstart) && ($datestamp<=$monthend)) {
+							// Strip useless information:
+							//   NOTE, ADDR, OBJE, SOUR, PAGE, DATA, TEXT
+							$factrec = preg_replace("/\d\s+(NOTE|ADDR|OBJE|SOUR|PAGE|DATA|TEXT|CONT|CONC|QUAY|CAUS|CEME)\s+(.+)\n/", "", $factrec);
+							if ((!is_object($family->husb) || $family->husb->isdead) && (!is_object($family->wife) || $family->wife->isdead)) $isdead = "1";
+							else $isdead = 0;
+							$fct = preg_match("/1\s(\w+)/", $factrec, $fact);
+							$found_facts[] = array($family->xref, $factrec, "FAM", $datestamp, "", "", $fact[1], $isdead);
+						}
 					}
 				}
 			}
@@ -2884,7 +2846,7 @@ function GetCachedEvents($action, $daysprint, $filter, $onlyBDM="no", $skipfacts
 
 	$monthend = $monthstart + (60*60*24*($daysprint-1));
 	$found_facts = array();
-	$sql = "SELECT ge_gid, ge_factrec, ge_type, ge_datestamp, ge_name, ge_gender FROM ".TBLPREFIX."eventcache WHERE ge_cache='".$action."' AND ge_file='".$GEDCOMID."' AND ge_datestamp BETWEEN ".$monthstart." AND ".$monthend;
+	$sql = "SELECT ge_gid, ge_factrec, ge_type, ge_datestamp, ge_name, ge_gender, ge_fact, ge_isdead FROM ".TBLPREFIX."eventcache WHERE ge_cache='".$action."' AND ge_file='".$GEDCOMID."' AND ge_datestamp BETWEEN ".$monthstart." AND ".$monthend;
 	if ($onlyBDM == "yes") $sql .= " AND ge_fact IN ('BIRT', 'DEAT', 'MARR')";
 	if ($filter == "alive") $sql .= " AND ge_isdead=0";
 	$sql .= " ORDER BY ge_order";
@@ -2909,7 +2871,13 @@ function GetCachedStatistics() {
 	$stats = array();
 	// The title must be generated every time because the language may differ
 	$stats["gs_title"] = "";
-	$head = FindGedcomRecord("HEAD");
+	$head = "";
+	$sql = "SELECT o_gedcom FROM ".TBLPREFIX."other WHERE o_id='HEAD' AND o_file='".$GEDCOMID."'";
+	$res = NewQuery($sql);
+	if ($res->NumRows() > 0) {
+		$row = $res->FetchAssoc();
+		$head = $row["o_gedcom"];
+	}
 	$ct=preg_match("/1 SOUR (.*)/", $head, $match);
 	
 	if ($ct>0) {
@@ -3405,50 +3373,53 @@ function GetRecentChangeFacts($day, $month, $year, $days) {
 	
 	$todate = $year.date("m", $monthstart).$mday3;
 	
-	$dayindilist = SearchIndisDateRange($mday2, $monthtonum[$mmon2], $myear2, $mday3, $monthtonum[$mmon], $year, "", "no", "", false, "CHAN");
-	$dayfamlist = SearchFamsDateRange($mday2, $monthtonum[$mmon2], $myear2, $mday3, $monthtonum[$mmon], $year, "no", "", false, "CHAN");
-	if ($SHOW_SOURCES >= $gm_user->getUserAccessLevel()) $dayrepolist = SearchOtherDateRange($mday2, $monthtonum[$mmon2], $myear2, $mday3, $monthtonum[$mmon], $year, "", false, "CHAN");
-	if ($SHOW_SOURCES >= $gm_user->getUserAccessLevel()) $daysourcelist = SearchSourcesDateRange($mday2, $monthtonum[$mmon2], $myear2, $mday3, $monthtonum[$mmon], $year, "", false, "CHAN");
-	$daymedialist = SearchMediaDateRange($mday2, $monthtonum[$mmon2], $myear2, $mday3, $monthtonum[$mmon], $year, "", false, "CHAN");
+	$dayindilist = SearchFunctions::SearchIndisDateRange($mday2, $monthtonum[$mmon2], $myear2, $mday3, $monthtonum[$mmon], $year, "", "no", "", false, "CHAN");
+	$dayfamlist = SearchFunctions::SearchFamsDateRange($mday2, $monthtonum[$mmon2], $myear2, $mday3, $monthtonum[$mmon], $year, "no", "", false, "CHAN");
+	if ($SHOW_SOURCES >= $gm_user->getUserAccessLevel()) $dayrepolist = SearchFunctions::SearchOtherDateRange($mday2, $monthtonum[$mmon2], $myear2, $mday3, $monthtonum[$mmon], $year, "", false, "CHAN");
+	if ($SHOW_SOURCES >= $gm_user->getUserAccessLevel()) $daysourcelist = SearchFunctions::SearchSourcesDateRange($mday2, $monthtonum[$mmon2], $myear2, $mday3, $monthtonum[$mmon], $year, "", false, "CHAN");
+	$daymedialist = SearchFunctions::SearchMediaDateRange($mday2, $monthtonum[$mmon2], $myear2, $mday3, $monthtonum[$mmon], $year, "", false, "CHAN");
 
 	if (count($dayindilist)>0 || count($dayfamlist)>0 || count($daysourcelist)>0 || count($dayrepolist) > 0 || count($daymedialist) > 0) {
 		$found_facts = array();
 		$last_total = $TOTAL_QUERIES;
 		foreach($dayindilist as $gid=>$indi) {
-			$disp = PrivacyFunctions::displayDetailsByID($gid);
-			if ($disp) {
-				$factrec = GetSubRecord(1, "1 CHAN", $indi["gedcom"], 1);
-				$found_facts[] = array($gid, $factrec, "INDI");
+			if ($indi->disp) {
+				$factrecs = $indi->SelectFacts(array("CHAN"));
+				foreach ($factrecs as $key => $fact) {
+					$found_facts[] = array($indi->xref, $fact->factrec, "INDI", $fact->fact);
+				}
 			}
 		}
 		foreach($dayfamlist as $gid=>$fam) {
-			$disp = PrivacyFunctions::displayDetailsByID($gid, "FAM");
-			if ($disp) {
-				$factrec = GetSubRecord(1, "1 CHAN", $fam["gedcom"], 1);
-				$found_facts[] = array($gid, $factrec, "FAM");
+			if ($fam->disp) {
+				$factrecs = $fam->SelectFacts(array("CHAN"));
+				foreach ($factrecs as $key => $fact) {
+					$found_facts[] = array($fam->xref, $fact->factrec, "FAM", $fact->fact);
+				}
 			}
 		}
 		foreach($daysourcelist as $gid=>$source) {
-			$disp = PrivacyFunctions::displayDetailsByID($gid, "SOUR", 1, true);
-			if ($disp) {
-				$factrec = GetSubRecord(1, "1 CHAN", $source["gedcom"], 1);
-				$found_facts[] = array($gid, $factrec, "SOUR");
+			if ($source->disp) {
+				$factrecs = $source->SelectFacts(array("CHAN"));
+				foreach ($factrecs as $key => $fact) {
+					$found_facts[] = array($source->xref, $fact->factrec, "SOUR", $fact->fact);
+				}
 			}
 		}
 		foreach($dayrepolist as $rid=>$repo) {
-			if ($repo["type"] == "REPO") {
-				$disp = PrivacyFunctions::displayDetailsByID($rid, "REPO");
-				if ($disp) {
-					$factrec = GetSubRecord(1, "1 CHAN", $repo["gedcom"], 1);
-					$found_facts[] = array($rid, $factrec, "REPO");
+			if ($repo->disp) {
+				$factrecs = $repo->SelectFacts(array("CHAN"));
+				foreach ($factrecs as $key => $fact) {
+					$found_facts[] = array($repo->xref, $fact->factrec, "REPO", $fact->fact);
 				}
 			}
 		}
 		foreach($daymedialist as $mid=>$media) {
-			$disp = PrivacyFunctions::displayDetailsByID($mid, "OBJE", 1, true);
-			if ($disp) {
-				$factrec = GetSubRecord(1, "1 CHAN", $media["gedcom"], 1);
-				$found_facts[] = array($mid, $factrec, "OBJE");
+			if ($media->disp) {
+				$factrecs = $media->SelectFacts(array("CHAN"));
+				foreach ($factrecs as $key => $fact) {
+					$found_facts[] = array($media->xref, $fact->factrec, "OBJE", $fact->fact);
+				}
 			}
 		}
 	}

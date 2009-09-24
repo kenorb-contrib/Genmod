@@ -292,23 +292,25 @@ abstract class FactFunctions {
 						}
 					}
 				}
-				if ($prted) print "<br /><br />";
-				$prted = true; // Set this so regardless if anything is printed before, source/notes/obje's will print on a new line
-				
-				// -- find source for each fact
-				if (PrivacyFunctions::showFact("SOUR", $pid, "SOUR")) $n1 = self::PrintFactSources($factobj, 2, $prted);
-				
-				// -- find notes for each fact
-				if (PrivacyFunctions::showFact("NOTE", $pid, "NOTE")) $n2 = self::PrintFactNotes($factobj, 2, !$prted);
-				
-				//-- find multimedia objects
-				if (PrivacyFunctions::showFact("OBJE", $pid, "OBJE")) $n3 = self::PrintFactMedia($factobj, 2, !$prted);
-				
-				// -- Find RESN tag
-				if (isset($resn_value)) {
-					if ($n1 ||$n2 || $n3) print "<br />";
-					print_help_link("RESN_help", "qm");
-					print PrintReady(GM_FACT_RESN.": ".$gm_lang[$resn_value])."\n";
+				if (!$relafact) {
+					if ($prted) print "<br /><br />";
+					$prted = true; // Set this so regardless if anything is printed before, source/notes/obje's will print on a new line
+					
+					// -- find source for each fact
+					if (PrivacyFunctions::showFact("SOUR", $pid, "SOUR")) $n1 = self::PrintFactSources($factobj, 2, $prted);
+					
+					// -- find notes for each fact
+					if (PrivacyFunctions::showFact("NOTE", $pid, "NOTE")) $n2 = self::PrintFactNotes($factobj, 2, !$prted);
+					
+					//-- find multimedia objects
+					if (PrivacyFunctions::showFact("OBJE", $pid, "OBJE")) $n3 = self::PrintFactMedia($factobj, 2, !$prted);
+					
+					// -- Find RESN tag
+					if (isset($resn_value)) {
+						if ($n1 ||$n2 || $n3) print "<br />";
+						print_help_link("RESN_help", "qm");
+						print PrintReady(GM_FACT_RESN.": ".$gm_lang[$resn_value])."\n";
+					}
 				}
 			}
 			if (!$factobj->disp) print $gm_lang["private"];
@@ -669,7 +671,7 @@ abstract class FactFunctions {
 					else $owner = $factobj->xref;
 				}
 				else $owner = rand();
-				if (strstr($sourcerec, "\n$n2level ")) print "<a href=\"#\" onclick=\"expand_layer('".$owner.$key."-".$FACT_COUNT."-".$cnt."'); return false;\"><img id=\"".$owner.$key."-".$FACT_COUNT."-".$cnt."_img\" src=\"".$GM_IMAGE_DIR."/".$GM_IMAGES["plus"]["other"]."\" border=\"0\" width=\"11\" height=\"11\" alt=\"\" /></a> ";
+				if (strstr($sourcerec, "\n$nlevel ")) print "<a href=\"#\" onclick=\"expand_layer('".$owner.$key."-".$FACT_COUNT."-".$cnt."'); return false;\"><img id=\"".$owner.$key."-".$FACT_COUNT."-".$cnt."_img\" src=\"".$GM_IMAGE_DIR."/".$GM_IMAGES["plus"]["other"]."\" border=\"0\" width=\"11\" height=\"11\" alt=\"\" /></a> ";
 				print $gm_lang["source"].":</span> <span class=\"field\">";
 				if ($link) $source->PrintListSource(false);
 				else {
@@ -737,10 +739,10 @@ abstract class FactFunctions {
 					print PrintReady($text);
 					print "</span>";
 				}
-//				print "<div class=\"indent\">";
+				print "<div class=\"indent\">";
 //				self::PrintFactMedia($sourcerec, $nlevel);
-//				self::PrintFactNotes($sourcerec, $nlevel, false);
-//				print "</div>";
+				self::PrintFactNotes($sourcerec, $nlevel, false);
+				print "</div>";
 				print "</div>";
 				$printed = true;
 				$cnt++;
@@ -1035,7 +1037,7 @@ abstract class FactFunctions {
 					}
 				}
 				else if ($asso->disp) {
-					print "<a href=\"family.php?famid=$pid2\">";
+					print "<a href=\"family.php?famid=".$pid2."&amp;gedid=".$asso->gedcomid."\">";
 					print $asso->sortable_name.$asso->addxref;
 					print "</a>\n";
 				}
@@ -1271,6 +1273,27 @@ abstract class FactFunctions {
 		self::PrintAddressStructure($subm, 1);
 		self::PrintFactMedia($subm, 1);
 	}
-
+	
+	public function PrintSimpleFact($factobj) {
+		global $gm_lang;
+		
+		$emptyfacts = array("BIRT","CHR","DEAT","BURI","CREM","ADOP","BAPM","BARM","BASM","BLES","CHRA","CONF","FCOM","ORDN","NATU","EMIG","IMMI","CENS","PROB","WILL","GRAD","RETI","BAPL","CONL","ENDL","SLGC","EVEN","MARR","SLGS","MARL","ANUL","CENS","DIV","DIVF","ENGA","MARB","MARC","MARS","OBJE","CHAN","_SEPR","RESI", "DATA", "MAP");
+		
+		// RFE [ 1229233 ] "DEAT" vs "DEAT Y"
+		// The check $factrec != "1 DEAT" will not show any records that only have 1 DEAT in them
+		if ($factobj->factrec != "1 DEAT"){
+		   print "<span class=\"details_label\">".$factobj->descr."</span> ";
+		}
+		if ($factobj->disp) {
+			if (!in_array($factobj->fact, $emptyfacts)) {
+				$ct = preg_match("/1 $fact(.*)/", $factobj->factrec, $match);
+				if ($ct>0) print PrintReady(trim($match[1]));
+			}
+			$factobj->PrintFactDate();
+			$factobj->PrintFactPlace();
+		}
+		else print $gm_lang["private"];
+		print "<br />\n";
+	}
 }
 ?>

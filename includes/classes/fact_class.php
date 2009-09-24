@@ -38,7 +38,9 @@ class Fact {
 	private $fact = null;			// Fact/event
 	private $factref = null;		// Either the fact, or if fact is EVEN, the event type
 	private $factrec = null;		// The complete record
+	private $datestring = null;		// Date in raw format, without gedcom level/tag.
 	private $simpledate = null;		// Date in gedcom format
+	private $timestring = null;		// Time in time (!) format (not in gedcom format)
 	private $simpletype = null;		// Type in gedcom format
 	private $simpleplace = null;	// Place in gedcom format
 	private $linktype = null;		// If this fact links to another objest, the type is set here
@@ -51,6 +53,7 @@ class Fact {
 	// Other attributes
 	private $owner = null;			// Xref of the owner of this fact
 	private $disp = null;			// Result of ShowFactDetails
+	private $show = null;			// Result of ShowFact
 	private $canedit = null;		// If privacy (resn) or the owner prevents editing
 	private $count = null;			// N-th fact of this type for the owner
 	private $style = null;			// Style to print this fact with
@@ -83,6 +86,12 @@ class Fact {
 			case "simpledate":
 				return $this->getSimpleDate();
 				break;
+			case "datestring":
+				return $this->getDateString();
+				break;
+			case "timestring":
+				return $this->getTimeString();
+				break;
 			case "simpletype":
 				return $this->getSimpleType();
 				break;
@@ -103,6 +112,9 @@ class Fact {
 //				break;
 			case "owner":
 				return $this->getOwner();
+				break;
+			case "show":
+				return $this->Show();
 				break;
 			case "disp":
 				return $this->ShowDetails();
@@ -143,16 +155,34 @@ class Fact {
 	private function getSimpleDate() {
 		
 		if (is_null($this->simpledate)) {
-			if ($this->disp) $this->simpledate = GetSubRecord(2, "2 DATE", $this->factrec);
+			if ($this->ShowDetails()) $this->simpledate = GetSubRecord(2, "2 DATE", $this->factrec);
 			else $this->simpledate = "";
 		}
 		return $this->simpledate;
 	}
 	
+	private function getDateString() {
+		
+		if (is_null($this->datestring)) {
+			if ($this->ShowDetails()) $this->datestring = GetGedcomValue("DATE", "2", $this->factrec);
+			else $this->datestring = "";
+		}
+		return $this->datestring;
+	}
+	
+	private function getTimeString() {
+		
+		if (is_null($this->timestring)) {
+			if ($this->ShowDetails()) $this->timestring = GetGedcomValue("DATE:TIME", "2", $this->factrec);
+			else $this->timestring = "";
+		}
+		return $this->timestring;
+	}
+	
 	private function getSimpleType() {
 		
 		if (is_null($this->simpletype)) {
-			if ($this->disp) $this->simpletype = GetSubRecord(2, "2 TYPE", $this->factrec);
+			if ($this->ShowDetails()) $this->simpletype = GetSubRecord(2, "2 TYPE", $this->factrec);
 			else $this->simpletype = "";
 		}
 		return $this->simpletype;
@@ -161,7 +191,7 @@ class Fact {
 	private function getSimplePlace() {
 		
 		if (is_null($this->simpleplace)) {
-			if ($this->disp) $this->simpleplace = GetSubRecord(2, "2 PLAC", $this->factrec);
+			if ($this->ShowDetails()) $this->simpleplace = GetSubRecord(2, "2 PLAC", $this->factrec);
 			else $this->simpleplace = "";
 		}
 		return $this->simpleplace;
@@ -201,22 +231,24 @@ class Fact {
 	}
 	
 	private function getFactDescription() {
+		global $ABBREVIATE_CHART_LABELS;
 		
 		if (is_null($this->descr)) {
-			if ($this->ShowDetails()) {
+//			if ($this->ShowDetails()) {
 				$fact = preg_replace("/^X_/", "_", $this->factref);
 				if (defined("GM_FACT_".$fact)) $this->descr = constant("GM_FACT_".$fact);
 				else $this->descr = $fact;
-			}
-			else $this->descr = "";
+//			}
+//			else $this->descr = "";
 		}
-		return $this->descr;
+		if ($ABBREVIATE_CHART_LABELS) return GetFirstLetter($this->descr);
+		else return $this->descr;
 	}
 	
 	private function ShowDetails() {
 		global $global_facts, $person_facts, $gm_user;
 		
-		if ($this->disp == null) {
+		if (is_null($this->disp)) {
 			$facts = array();
 			// Close relatives facts are already checked against their own xref while adding them
 			$f = substr($this->fact, 1, 6);
@@ -248,6 +280,22 @@ class Fact {
 			}
 		}
 		return $this->disp;
+	}
+	
+	private function Show() {
+		global $global_facts, $person_facts, $gm_user;
+		
+		// print "Checking ".$fact." for ".$pid. " type ".$type." show_sources: ".$SHOW_SOURCES." userlevel: ".$ulevel."<br />";
+		
+		//-- first check the global facts array
+		if (isset($global_facts[$this->fact]["show"])) {
+			if ($global_facts[$this->fact]["show"] < $gm_user->getUserAccessLevel()) return false;
+		}
+		//-- check the person facts array
+		if (isset($person_facts[$this->GetOwner()->xref][$this->fact]["show"])) {
+			if ($person_facts[$this->GetOwner()->xref][$this->fact]["show"] < $gm_user->getUserAccessLevel()) return false;
+		}
+		return true;
 	}
 
 	private function getOwner() {

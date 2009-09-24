@@ -50,9 +50,7 @@ class RepositoryController extends DetailController {
 		$this->xref = CleanInput($this->xref);
 		$this->gedcomid = $GEDCOMID;
 		
-		$reporec = FindRepoRecord($this->xref);
-		
-		$this->repo =& Repository::GetInstance($this->xref, $reporec);
+		$this->repo =& Repository::GetInstance($this->xref, "", $GEDCOMID);
 		
 		//-- perform the desired action
 		switch($this->action) {

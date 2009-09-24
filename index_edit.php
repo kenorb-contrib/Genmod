@@ -137,6 +137,7 @@ $GEDCOM_TITLE = PrintReady($GEDCOMS[$GEDCOMID]["title"]);  // needed in $gm_lang
 if ($action=="updateconfig") {
 	$block = $ublocks->$side;
 	$block = $block[$index];
+
 	if (isset($GM_BLOCKS[$block[0]]["canconfig"]) && $GM_BLOCKS[$block[0]]["canconfig"] && isset($GM_BLOCKS[$block[0]]["config"]) && is_array($GM_BLOCKS[$block[0]]["config"])) {
 		$config = $block[1];
 		foreach($GM_BLOCKS[$block[0]]["config"] as $config_name=>$config_value) {
@@ -154,6 +155,7 @@ if ($action=="updateconfig") {
 		if ($side == "main") $ublocks->main[$index][1] = $config;
 		else $ublocks->right[$index][1] = $config;
 		$ublocks->SetValues($setdefault);
+		if ($block[0] == "print_upcoming_events" || $block[0] == "print_todays_events") GedcomConfig::ResetCaches();
 	}
 	print $gm_lang["config_update_ok"]."<br />\n";?>
 	<script language="JavaScript" type="text/javascript">

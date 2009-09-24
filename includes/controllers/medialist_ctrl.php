@@ -28,7 +28,7 @@ if (stristr($_SERVER["SCRIPT_NAME"],basename(__FILE__))) {
 	require "../../intrusion.php";
 }
 
-class Media {
+class MediaListController {
 	
 	public $classname = "Media";	// Name of this class
 	
@@ -72,7 +72,7 @@ class Media {
 		$db = NewQuery($sql);
 		$this->totalmediaitems = $db->NumRows();
 		while($row = $db->FetchAssoc()) {
-			$media =& MediaItem::GetInstance($row);
+			$media = MediaItem::GetInstance($row["m_media"], $row);
 			if ($media->disp) {
 				if ($count) {
 					$this->medialist[$row["m_media"]."_".$row["m_gedfile"]] = $media;
@@ -91,7 +91,6 @@ class Media {
 		}
 		$this->mediainlist = count($this->medialist);
 		$db->FreeResult();
-		$this->RetrieveMediaLink();
 	}
 		
 	public function RetrieveFilterMedia($filter, $start=0, $max=0) {
@@ -145,7 +144,7 @@ class Media {
 		$db = NewQuery($sql);
 		$this->totalmediaitems = $db->NumRows();
 		while($row = $db->FetchAssoc()) {
-			$media =& MediaItem::GetInstance($row);
+			$media =& MediaItem::GetInstance($row["m_media"], $row);
 			if ($media->disp) {
 				$found++;
 				if ($found > $start) {
@@ -157,7 +156,6 @@ class Media {
 		}
 		$this->mediainlist = count($this->medialist);
 		$db->FreeResult();
-		$this->RetrieveMediaLink();
 	}
 
 	public function RetrieveFilterMediaList($filter) {
@@ -168,41 +166,13 @@ class Media {
 		$db = NewQuery($sql);
 		$this->totalmediaitems = $db->NumRows();
 		while($row = $db->FetchAssoc()) {
-			$media =& MediaItem::GetInstance($row);
+			$media =& MediaItem::GetInstance($row["m_media"], $row);
 			if ($media->disp) {
 				$this->medialist[$row["m_media"]."_".$row["m_gedfile"]] = $media;
 			}
 		}
 		$this->mediainlist = count($this->medialist);
 		$db->FreeResult();
-	}
-
-	
-	
-	/* Retrieves the medialinks for the items.
-	** If link privacy is on, privacy is already checked 2 levels deep	
-	** If off, the linked items are checked
-	*/
-	private function RetrieveMediaLink() {
-		global $GEDCOMID, $LINK_PRIVACY;
-		if (count($this->medialist) > 0) {
-			$sql = "SELECT * FROM ".TBLPREFIX."media_mapping WHERE mm_gedfile='".$GEDCOMID."' AND mm_media in (";
-			foreach($this->medialist as $key => $media) {
-				$sql .= "'".$media->xref."',";
-			}
-			$sql = substr($sql, 0, -1);
-			$sql .= ")";
-			$res = NewQuery($sql);
-			while($row = $res->FetchAssoc()){
-				$type = $row["mm_type"];
-				// This will hide the links if the media item can be shown (link privacy off)
-				// if link privacy is on, the item will not show at all
-				if (!$LINK_PRIVACY || (PrivacyFunctions::DisplayDetailsByID($row["mm_gid"], $type) && PrivacyFunctions::showFactDetails("OBJE", $row["mm_gid"]))) {
-					$this->medialist[stripslashes($row["mm_media"])."_".$row["mm_gedfile"]]->links[stripslashes($row["mm_gid"])] = $type;
-					$this->medialist[stripslashes($row["mm_media"])."_".$row["mm_gedfile"]]->linked = true;
-				}
-			}
-		}
 	}
 }
 ?>

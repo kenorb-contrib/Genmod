@@ -41,6 +41,7 @@ class Family extends GedcomRecord {
 	private $sortable_addname = null;		// Printable and sortable addname of the family, after applying privacy (can be blank)
 	public $label = null;					// Label set in the person class as a specific label for this family of the person
 	private $title = null;					// Printable name for the family in normal order
+	private $descriptor = null;				// Same as title
 		
 	// Family members
 	private $husb = null;					// Holder for the husband object (or new, if showing changes)
@@ -85,6 +86,13 @@ class Family extends GedcomRecord {
 	 * @param string $gedrec	the gedcom record
 	 */
 	public function __construct($id, $gedrec="", $gedcomid="") {
+		
+		if (is_array($gedrec)) {
+			// extract the construction parameters
+			$gedcomid = $gedrec["f_file"];
+			$id = $gedrec["f_id"];
+			$gedrec = $gedrec["f_gedcom"];
+		}
 		
 		parent::__construct($id, $gedrec, $gedcomid);
 		$this->exclude_facts = "";
@@ -165,6 +173,9 @@ class Family extends GedcomRecord {
 			case "title":
 				return $this->GetTitle();
 				break;
+			case "descriptor":
+				return $this->GetTitle();
+				break;
 			default:
 				return parent::__get($property);
 				break;
@@ -229,7 +240,7 @@ class Family extends GedcomRecord {
 	
 	private function GetFamilyDescriptor() {
 		
-		if (is_null($this->sortable_name)) $this->sortable_name = GetFamilyDescriptor($this->xref, false, $this->gedrec);
+		if (is_null($this->sortable_name)) $this->sortable_name = NameFunctions::GetFamilyDescriptor($this, false);
 		return $this->sortable_name;
 	}
 	
@@ -237,7 +248,7 @@ class Family extends GedcomRecord {
 		global $DISPLAY_PINYIN, $LANGUAGE;
 		
 		if (is_null($this->sortable_addname)) {
-			$this->sortable_addname = GetFamilyAddDescriptor($this->xref, false, $this->gedrec);
+			$this->sortable_addname = NameFunctions::GetFamilyAddDescriptor($this, false);
 		}
 		return $this->sortable_addname;
 	}
@@ -245,7 +256,7 @@ class Family extends GedcomRecord {
 	private function GetTitle() {
 		
 		if (is_null($this->title)) {
-			$this->title = GetFamilyDescriptor($this->xref, true, $this->gedrec);
+			$this->title = NameFunctions::GetFamilyDescriptor($this, true);
 		}
 		return $this->title;
 	}
@@ -513,10 +524,22 @@ class Family extends GedcomRecord {
 		return $this->actionlist;
 	}
 	
+	protected function ReadFamilyRecord() {
+		
+		$sql = "SELECT f_gedcom FROM ".TBLPREFIX."families WHERE f_key='".JoinKey($this->xref, $this->gedcomid)."'";
+		$res = NewQuery($sql);
+		if ($res) {
+			if ($res->NumRows() != 0) {
+				$row = $res->fetchAssoc();
+				$this->gedrec = $row["f_gedcom"];
+			}
+		}
+	}
+	
 	public function PrintListFamily($useli=true) {
 		global $gm_lang;
 		
-		if (!$this->disp) return false;
+		if (!$this->DisplayDetails()) return false;
 		
 		if ($useli) {
 			if (begRTLText($this->GetFamilyDescriptor())) print "\n\t\t\t<li class=\"rtl\" dir=\"rtl\">";

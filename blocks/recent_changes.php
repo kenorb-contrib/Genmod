@@ -87,157 +87,112 @@ function print_recent_changes($block=true, $config="", $side, $index) {
 		$lastgid="";
 		foreach($found_facts as $index=>$factarr) {
 			if ($factarr[2]=="INDI") {
-				$gid = $factarr[0];
-				$factrec = $factarr[1];
-				if (PrivacyFunctions::displayDetailsById($gid)) {
-					$indirec = FindPersonRecord($gid);
-					if ($lastgid!=$gid) {
-						$name = CheckNN(GetSortableName($gid));
-						print "<a href=\"individual.php?pid=$gid&amp;gedid=".$GEDCOMID."\"><b>";
-						if (HasChinese($name)) print PrintReady($name." (".GetSortableAddName($gid, $indirec, false).")");
-						else print PrintReady($name);
-						print "</b>";
-						print "<img id=\"box-".$gid."-".$index."-sex\" src=\"$GM_IMAGE_DIR/";
-						if (preg_match("/1 SEX M/", $indirec)>0) print $GM_IMAGES["sex"]["small"]."\" title=\"".$gm_lang["male"]."\" alt=\"".$gm_lang["male"];
-						else  if (preg_match("/1 SEX F/", $indirec)>0) print $GM_IMAGES["sexf"]["small"]."\" title=\"".$gm_lang["female"]."\" alt=\"".$gm_lang["female"];
-						else print $GM_IMAGES["sexn"]["small"]."\" title=\"".$gm_lang["unknown"]."\" alt=\"".$gm_lang["unknown"];
-						print "\" class=\"sex_image\" />";
-						if ($SHOW_ID_NUMBERS) {
-						   if ($TEXT_DIRECTION=="ltr")
-								print "&lrm;($gid)&lrm;";
-						   else print "&rlm;($gid)&rlm;";
-						}
-						print "</a><br />\n";
-						$lastgid=$gid;
-					}
-					print "<div class=\"indent" . ($TEXT_DIRECTION=="rtl"?"_rtl":"") . "\">";
-					print GM_FACT_CHAN;
-					$ct = preg_match("/\d DATE (.*)/", $factrec, $match);
-					if ($ct>0) {
-							print " - <span class=\"date\">".GetChangedDate($match[1]);
-							$tt = preg_match("/3 TIME (.*)/", $factrec, $match);
-							if ($tt>0) {
-									print " - ".$match[1];
-							}
-							print "</span>\n";
-					}
-					print "</div><br />";
+				$person = Person::GetInstance($factarr[0]);
+				$fact = New Fact($person->xref, $factarr[3], $factarr[1]);
+				if ($lastgid != $person->xref) {
+					print "<a href=\"individual.php?pid=".$person->xref."&amp;gedid=".$person->gedcomid."\"><b>";
+					print $person->sortable_name;
+					print "</b>";
+					print "<img id=\"box-".$person->xref."-".$index."-sex\" src=\"$GM_IMAGE_DIR/";
+					if ($person->sex == "M") print $GM_IMAGES["sex"]["small"]."\" title=\"".$gm_lang["male"]."\" alt=\"".$gm_lang["male"];
+					else  if ($person->sex == "F") print $GM_IMAGES["sexf"]["small"]."\" title=\"".$gm_lang["female"]."\" alt=\"".$gm_lang["female"];
+					else print $GM_IMAGES["sexn"]["small"]."\" title=\"".$gm_lang["unknown"]."\" alt=\"".$gm_lang["unknown"];
+					print "\" class=\"sex_image\" />";
+					print $person->addxref;
+					print "</a><br />\n";
+					$lastgid = $person->xref;
 				}
+				print "<div class=\"indent" . ($TEXT_DIRECTION=="rtl"?"_rtl":"") . "\">";
+				print GM_FACT_CHAN;
+				print " - <span class=\"date\">".GetChangedDate($fact->datestring);
+				if ($fact->timestring != "") {
+					print " - ".$fact->timestring;
+				}
+				print "</span>\n";
+				print "</div><br />";
 			}
 
 			if ($factarr[2]=="FAM") {
-				$gid = $factarr[0];
-				$factrec = $factarr[1];
-				if (PrivacyFunctions::displayDetailsById($gid, "FAM")) {
-					$famrec = FindFamilyRecord($gid);
-					$name = GetFamilyDescriptor($gid);
-					if ($lastgid!=$gid) {
-						print "<a href=\"family.php?famid=$gid&amp;gedid=".$GEDCOMID."\"><b>";
-						if (HasChinese($name)) print PrintReady($name." (".GetFamilyAddDescriptor($gid).")");
-						else print PrintReady($name);
-						print "</b>";
-						if ($SHOW_FAM_ID_NUMBERS) {
-						   if ($TEXT_DIRECTION=="ltr")
-								print " &lrm;($gid)&lrm;";
-						   else print " &rlm;($gid)&rlm;";
-						}
-						print "</a><br />\n";
-						$lastgid=$gid;
-					}
-					print "<div class=\"indent" . ($TEXT_DIRECTION=="rtl"?"_rtl":"") . "\">";
-					print GM_FACT_CHAN;
-					$ct = preg_match("/\d DATE (.*)/", $factrec, $match);
-					if ($ct>0) {
-							print " - <span class=\"date\">".GetChangedDate($match[1]);
-							$tt = preg_match("/3 TIME (.*)/", $factrec, $match);
-							if ($tt>0) {
-									print " - ".$match[1];
-							}
-							print "</span>\n";
-					}
-					print "</div><br />";
+				$family = Family::GetInstance($factarr[0]);
+				$fact = New Fact($family->xref, $factarr[3], $factarr[1]);
+				if ($lastgid != $family->xref) {
+					print "<a href=\"family.php?famid=".$family->xref."&amp;gedid=".$family->gedcomid."\"><b>";
+					print $family->sortable_name;
+					print "</b>";
+					print $family->addxref;
+					print "</a><br />\n";
+					$lastgid = $family->xref;
 				}
+				print "<div class=\"indent" . ($TEXT_DIRECTION=="rtl"?"_rtl":"") . "\">";
+				print GM_FACT_CHAN;
+				print " - <span class=\"date\">".GetChangedDate($fact->datestring);
+				if ($fact->timestring != "") {
+					print " - ".$fact->timestring;
+				}
+				print "</span>\n";
+				print "</div><br />";
 			}
 
 			if ($factarr[2]=="SOUR") {
 				$source =& Source::GetInstance($factarr[0]);
-				$gid = $factarr[0];
-				$factrec = $factarr[1];
-				if ($source->disp) {
-					if ($lastgid!=$gid) {
-						print "<a href=\"source.php?sid=$gid&amp;gedid=".$GEDCOMID."\"><b>".PrintReady($source->descriptor)."</b>";
-						if ($SHOW_FAM_ID_NUMBERS) print $source->addxref;
-						print "</a><br />\n";
-						$lastgid=$gid;
-					}
-					print "<div class=\"indent" . ($TEXT_DIRECTION=="rtl"?"_rtl":"") . "\">";
-					print GM_FACT_CHAN;
-					print " - <span class=\"date\">".$source->lastchanged."</span>\n";
-					print "</div><br />";
+				$fact = New Fact($source->xref, $factarr[3], $factarr[1]);
+				if ($lastgid != $source->xref) {
+					print "<a href=\"source.php?sid=".$source->xref."&amp;gedid=".$source->gedcomid."\"><b>";
+					print $source->descriptor;
+					print "</b>";
+					print $source->addxref;
+					print "</a><br />\n";
+					$lastgid = $source->xref;
 				}
+				print "<div class=\"indent" . ($TEXT_DIRECTION=="rtl"?"_rtl":"") . "\">";
+				print GM_FACT_CHAN;
+				print " - <span class=\"date\">".GetChangedDate($fact->datestring);
+				if ($fact->timestring != "") {
+					print " - ".$fact->timestring;
+				}
+				print "</span>\n";
+				print "</div><br />";
 			}
 
 			if ($factarr[2]=="REPO") {
-				$gid = $factarr[0];
-				$factrec = $factarr[1];
-				if (PrivacyFunctions::displayDetailsById($gid, "REPO")) {
-					$reporec = FindRepoRecord($gid);
-					$name = GetRepoDescriptor($gid);
-					if ($lastgid!=$gid) {
-						print "<a href=\"repo.php?rid=$gid&amp;gedid=".$GEDCOMID."\"><b>".PrintReady($name)."</b>";
-						if ($SHOW_FAM_ID_NUMBERS) {
-						   if ($TEXT_DIRECTION=="ltr")
-								print " &lrm;($gid)&lrm;";
-						   else print " &rlm;($gid)&rlm;";
-						}
-						print "</a><br />\n";
-						$lastgid=$gid;
-					}
-					print "<div class=\"indent" . ($TEXT_DIRECTION=="rtl"?"_rtl":"") . "\">";
-					print GM_FACT_CHAN;
-					$ct = preg_match("/\d DATE (.*)/", $factrec, $match);
-					if ($ct>0) {
-							print " - <span class=\"date\">".GetChangedDate($match[1]);
-							$tt = preg_match("/3 TIME (.*)/", $factrec, $match);
-							if ($tt>0) {
-									print " - ".$match[1];
-							}
-							print "</span>\n";
-					}
-					print "</div><br />";
+				$repo =& Repository::GetInstance($factarr[0]);
+				$fact = New Fact($repo->xref, $factarr[3], $factarr[1]);
+				if ($lastgid != $repo->xref) {
+					print "<a href=\"repo.php?rid=".$repo->xref."&amp;gedid=".$repo->gedcomid."\"><b>";
+					print $repo->descriptor;
+					print "</b>";
+					print $repo->addxref;
+					print "</a><br />\n";
+					$lastgid = $repo->xref;
 				}
+				print "<div class=\"indent" . ($TEXT_DIRECTION=="rtl"?"_rtl":"") . "\">";
+				print GM_FACT_CHAN;
+				print " - <span class=\"date\">".GetChangedDate($fact->datestring);
+				if ($fact->timestring != "") {
+					print " - ".$fact->timestring;
+				}
+				print "</span>\n";
+				print "</div><br />";
 			}
 			if ($factarr[2]=="OBJE") {
-				$gid = $factarr[0];
-				$factrec = $factarr[1];
-				if (PrivacyFunctions::displayDetailsById($gid, "OBJE", 1, true)) {
-					$mediarec = FindMediaRecord($gid);
-					if (isset($medialist[$gid]["title"]) && $medialist[$gid]["title"] != "") $title=$medialist[$gid]["title"];
-					else $title = $medialist[$gid]["file"];
-					$SearchTitle = preg_replace("/ /","+",$title);
-					if ($lastgid!=$gid) {
- 						print "<a href=\"medialist.php?action=filter&amp;search=yes&amp;filter=$SearchTitle&amp;gedid=".$GEDCOMID."\"><b>".PrintReady($title)."</b>";
-						if ($SHOW_FAM_ID_NUMBERS) {
-						   if ($TEXT_DIRECTION=="ltr")
-								print " &lrm;($gid)&lrm;";
-						   else print " &rlm;($gid)&rlm;";
-						}
-						print "</a><br />\n";
-						$lastgid=$gid;
-					}
-					print "<div class=\"indent" . ($TEXT_DIRECTION=="rtl"?"_rtl":"") . "\">";
-					print GM_FACT_CHAN;
-					$ct = preg_match("/\d DATE (.*)/", $factrec, $match);
-					if ($ct>0) {
-							print " - <span class=\"date\">".GetChangedDate($match[1]);
-							$tt = preg_match("/3 TIME (.*)/", $factrec, $match);
-							if ($tt>0) {
-									print " - ".$match[1];
-							}
-							print "</span>\n";
-					}
-					print "</div><br />";
+				$media =& MediaItem::GetInstance($factarr[0]);
+				$fact = New Fact($media->xref, $factarr[3], $factarr[1]);
+				if ($lastgid != $media->xref) {
+					print "<a href=\"mediadetail.php?mid=".$media->xref."&amp;gedid=".$media->gedcomid."\"><b>";
+					print $media->title;
+					print "</b>";
+					print $media->addxref;
+					print "</a><br />\n";
+					$lastgid = $media->xref;
 				}
+				print "<div class=\"indent" . ($TEXT_DIRECTION=="rtl"?"_rtl":"") . "\">";
+				print GM_FACT_CHAN;
+				print " - <span class=\"date\">".GetChangedDate($fact->datestring);
+				if ($fact->timestring != "") {
+					print " - ".$fact->timestring;
+				}
+				print "</span>\n";
+				print "</div><br />";
 			}
 		}
 

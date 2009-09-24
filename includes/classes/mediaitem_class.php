@@ -43,44 +43,41 @@ class MediaItem extends GedcomRecord {
 	public  $links = array(); // set in media class
 	public  $linked = false; // set in media class
 
-	public static function GetInstance($details, $gedrec="", $gedcomid="") {
+	public static function GetInstance($id, $gedrec="", $gedcomid="") {
 		global $GEDCOMID;
 		
-		if (is_array($details)) {
-			$xref = $details["m_media"];
-			$gedcomid = $details["m_gedfile"];
-		}
-		else $xref = $details;
 		if (empty($gedcomid)) $gedcomid = $GEDCOMID;
-		if (!isset(self::$mediaitemcache[$gedcomid][$xref])) {
-			self::$mediaitemcache[$gedcomid][$xref] = new MediaItem($details, $gedrec, $gedcomid);
+		if (!isset(self::$mediaitemcache[$gedcomid][$id])) {
+			self::$mediaitemcache[$gedcomid][$id] = new MediaItem($id, $gedrec, $gedcomid);
 		}
-		return self::$mediaitemcache[$gedcomid][$xref];
+		return self::$mediaitemcache[$gedcomid][$id];
 	}
 	
-	public function __construct($details, $gedrec="", $gedcomid="") {
+	public function __construct($id, $gedrec="", $gedcomid="") {
 		global $GEDCOMID, $MEDIA_DIRECTORY;
 		
-		if (is_array($details)) parent::__construct($details["m_media"], $details["m_gedrec"], $details["m_gedfile"]);
-		else parent::__construct($details, $gedrec, $gedcomid);
+		if (is_array($gedrec)) {
+			// Prefill some variables
+			$this->extension = $gedrec["m_ext"];
+			$file = $gedrec["m_file"];
+			$id = $gedrec["m_media"];
+			$gedcomid = $gedrec["m_gedfile"];
+			$gedrec = $gedrec["m_gedrec"];
+		}
+	
+		parent::__construct($id, $gedrec, $gedcomid);
 	
 		$mimetypedetect = new MimeTypeDetect();
 		
-		if (is_array($details)) {
-			// extension
-			$this->extension = $details["m_ext"];
-			$t = trim($details["m_titl"]);
-			if (!empty($t) && $this->disp) $this->title = $t;
-			if ($this->show_changes && $this->ThisChanged()) $this->filename = RelativePathFile(FilenameDecode(MediaFS::CheckMediaDepth(GetGedcomValue("FILE", 1, $this->GetChangedGedrec()))));
-			else $this->filename = RelativePathFile(FilenameDecode(MediaFS::CheckMediaDepth($details["m_file"])));
-		}
+		if ($this->show_changes && $this->ThisChanged()) $this->filename = RelativePathFile(FilenameDecode(MediaFS::CheckMediaDepth(GetGedcomValue("FILE", 1, $this->GetChangedGedrec()))));
 		else {
-			if ($this->show_changes && $this->ThisChanged()) $this->filename = RelativePathFile(FilenameDecode(MediaFS::CheckMediaDepth(GetGedcomValue("FILE", 1, $this->GetChangedGedrec()))));
+			if (isset($file)) $this->filename = RelativePathFile(FilenameDecode(MediaFS::CheckMediaDepth($file)));
 			else $this->filename = RelativePathFile(FilenameDecode(MediaFS::CheckMediaDepth(GetGedcomValue("FILE", 1,$this->gedrec))));
-			
 		}
+			
 		if (stristr($this->filename, "://")) $this->fileobj = new MFile($this->filename);
 		else $this->fileobj = new MFile($MEDIA_DIRECTORY.$this->filename);
+
 	}
 	
 
@@ -118,7 +115,7 @@ class MediaItem extends GedcomRecord {
 		global $gm_lang;
 		
 		if (is_null($this->title)) {
-			if ($this->disp) {
+			if ($this->DisplayDetails()) {
 				if ($this->show_changes && $this->ThisChanged()) $gedrec = $this->GetChangedGedRec();
 				else $gedrec = $this->gedrec;
 
@@ -184,8 +181,8 @@ class MediaItem extends GedcomRecord {
 		$res = NewQuery($sql);
 		while($row = $res->FetchAssoc()){
 			$person = null;
-			$person =& Person::GetInstance($row["i_id"], $row["i_gedcom"]);
-			if ($person->disp_name) {
+			$person =& Person::GetInstance($row["i_id"], $row, $row["i_file"]);
+			if ($person->DispName()) {
 				$this->indilist[$row["i_key"]] = $person;
 			}
 			else $this->indi_hide++;
@@ -209,8 +206,8 @@ class MediaItem extends GedcomRecord {
 		$res = NewQuery($sql);
 		while($row = $res->FetchAssoc()){
 			$family = null;
-			$family =& Family::GetInstance($row["f_id"], $row["f_gedcom"]);
-			if ($family->disp) {
+			$family =& Family::GetInstance($row["f_id"], $row, $row["f_file"]);
+			if ($family->DisplayDetails()) {
 				$this->famlist[$row["f_key"]] = $family;
 			}
 			else $this->fam_hide++;
@@ -234,8 +231,8 @@ class MediaItem extends GedcomRecord {
 		$res = NewQuery($sql);
 		while($row = $res->FetchAssoc()){
 			$source = null;
-			$source =& Source::GetInstance($row["s_id"], $row["s_gedcom"]);
-			if ($source->disp) $this->sourcelist[$row["s_key"]] = $source;
+			$source =& Source::GetInstance($row["s_id"], $row, $row["s_file"]);
+			if ($source->DisplayDetails()) $this->sourcelist[$row["s_key"]] = $source;
 			else $this->sour_hide++;
 		}
 		uasort($this->sourcelist, "GedcomObjSort");
@@ -259,8 +256,8 @@ class MediaItem extends GedcomRecord {
 		$res = NewQuery($sql);
 		while($row = $res->FetchAssoc()){
 			$repo = null;
-			$repo =& Repository::GetInstance($row["o_id"], $row["o_gedcom"], $this->gedcomid);
-			if ($repo->disp) $this->repolist[$row["o_key"]] = $repo;
+			$repo =& Repository::GetInstance($row["o_id"], $row, $row["o_file"], $this->gedcomid);
+			if ($repo->DisplayDetails()) $this->repolist[$row["o_key"]] = $repo;
 			else $this->repo_hide++;
 		}
 		uasort($this->repolist, "ItemSort");
@@ -280,23 +277,35 @@ class MediaItem extends GedcomRecord {
 		if (!empty($type)) $sql .= " AND mm_type='".$type."'";
 		$sql .= " AND mm_gedfile='".$GEDCOMID."'";
 		$res = NewQuery($sql);
-		while($row = $res->FetchRow()){
+		while($row = $res->FetchAssoc()){
 			if (!$applypriv) {
-				$links[] = $row[0];
+				$links[] = $row["mm_gid"];
 			}
 			else {
-				if (PrivacyFunctions::showFact("OBJE", $row[0], $type)) {
-					$links[] = $row[0];
+				if (PrivacyFunctions::showFact("OBJE", $row["mm_gid"], $type)) {
+					$links[] = $row["mm_gid"];
 				}
 			}
 		}
 		return $links;
 	}
+	
+	protected function ReadMediaRecord() {
+		
+		$sql = "SELECT m_gedrec FROM ".TBLPREFIX."media WHERE m_media='".$this->xref."' AND m_gedfile='".$this->gedcomid."'";
+		$res = NewQuery($sql);
+		if ($res) {
+			if ($res->NumRows() != 0) {
+				$row = $res->fetchAssoc();
+				$this->gedrec = $row["m_gedrec"];
+			}
+		}
+	}
 		
 	// Prints the information for media in a list view
 	public function PrintListMedia() {
 		
-		if (!$this->disp) return false;
+		if (!$this->DisplayDetails()) return false;
 		if (begRTLText($this->GetTitle())) print "\n\t\t\t<li class=\"rtl\" dir=\"rtl\">";
 		else print "\n\t\t\t<li class=\"ltr\" dir=\"ltr\">";
 		print "\n\t\t\t<a href=\"mediadetail.php?mid=$this->xref&amp;gedid=".$this->gedcomid."\" class=\"list_item\">".PrintReady($this->title);

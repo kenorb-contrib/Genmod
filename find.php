@@ -585,7 +585,7 @@ if ($action=="filter") {
 	}
 	else if ($type == "object" && isset($clicked)) {
 		print "\n\t<table class=\"list_table center $TEXT_DIRECTION\">\n\t\t";
-		$fmedialist = new Media;
+		$fmedialist = new MediaListController;
 		$fmedialist->RetrieveFilterMediaList($filter);
 		if (count($fmedialist->medialist > 0)) {
 			foreach ($fmedialist->medialist as $key => $media) {

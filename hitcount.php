@@ -36,20 +36,26 @@ if($SHOW_COUNTER) {
 	$GM_INDI_COUNTER_NAME = $GEDCOMID."gm_indi_counter";
 
 	// First check if any id is set. If not, we assume it's the index page
-	if (isset($pid) || isset($famid) || isset($sid) || isset($rid) || isset($oid)) {
+	if (isset($pid) || isset($famid) || isset($sid) || isset($rid) || isset($oid) || isset($mid)) {
 		// See if the ID exists. If not, we set the counter to 0.
-		if((isset($pid) && FindPersonRecord(strtoupper($pid)) != "") 
-		|| (isset($famid) && FindFamilyRecord(strtoupper($famid)) != "")
-		|| (isset($sid) && FindSourceRecord(strtoupper($sid)) != "")
-		|| (isset($rid) && FindRepoRecord(strtoupper($rid)) != "")
-		|| (isset($oid) && FindOtherRecord(strtoupper($oid), "", false, "NOTE") != "")
-		) {
+		$object = null;
+		switch ($_SERVER["SCRIPT_NAME"]) {
+			case "/individual.php": $object = Person::GetInstance($pid); break;
+			case "/family.php": $object = Family::GetInstance($famid); break;
+			case "/source.php": $object = Source::GetInstance($sid); break;
+			case "/repo.php": $object = Repository::GetInstance($rid); break;
+			case "/note.php": $object = Note::GetInstance($oid); break;
+			case "/mediadetail.php": $object = MediaItem::GetInstance($mid); break;
+		}
+			
+		if (is_object($object)) {
 			
 			if (isset($pid)) $cpid = $pid;
 			if (isset($famid)) $cpid = $famid;
 			if (isset($sid)) $cpid = $sid;
 			if (isset($rid)) $cpid = $rid;
 			if (isset($oid)) $cpid = $oid;
+			if (isset($mid)) $cpid = $mid;
 			
 	  		// Capitalize ID to make sure we have a correct hitcount on the individual
 	  		$cpid = strtoupper($cpid);

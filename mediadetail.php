@@ -85,6 +85,9 @@ $media_controller->CheckRawEdited();
 			print "<img src=\"".$thumbnail."\" border=\"0\" align=\"" . ($TEXT_DIRECTION== "rtl"?"right": "left") . "\" class=\"thumbnail\" alt=\"\" /></a>";
 		}
 		?>
+		<?php if($SHOW_COUNTER) {
+			print "\n<br /><br /><span style=\"margin-left: 3px;\">".$gm_lang["hit_count"]."&nbsp;".$hits."</span>\n";
+		}?>
 		</td>
 	</tr>
 </table>

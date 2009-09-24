@@ -249,5 +249,14 @@ abstract class GedcomConfig {
 		$lang = $res->FetchAssoc();
 		return $lang["gc_gedcomlang"];
 	}
+	
+	public function AnyGedcomHasAuth() {
+		
+		$sql = "SELECT count(gc_require_authentication) as number FROM ".TBLPREFIX."gedconf WHERE gc_require_authentication=1";
+		$res = NewQuery($sql);
+		if ($res->NumRows() == 0) return false;
+		$row = $res->FetchAssoc();
+		return $row["number"];
+	}
 }
 ?>

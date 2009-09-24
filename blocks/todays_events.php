@@ -85,110 +85,69 @@ function print_todays_events($block=true, $config="", $side, $index) {
 	$selindi = implode("[".$GEDCOMID."]','", $selindi);
 	$selindi .= "[".$GEDCOMID."]'";
 	$selindi = "'".$selindi;
-	GetIndiList("no", $selindi);
+	ListFunctions::GetIndiList("no", $selindi);
 	$selfam = implode("[".$GEDCOMID."]','", $selfam);
 	$selfam .= "[".$GEDCOMID."]'";
 	$selfam = "'".$selfam;
-	GetFamList("no", $selfam);
+	ListFunctions::GetFamList("no", $selfam);
 	
 	foreach($found_facts as $key=>$factarr) {
 		$datestamp = $factarr[3];
 		if ($factarr[2]=="INDI") {
+			$person =& Person::GetInstance($factarr[0], "", $GEDCOMID);
+			$fact = new Fact($factarr[0], $factarr[6], $factarr[1]);
 			$gid = $factarr[0];
 			$factrec = $factarr[1];
-			$disp = true;
-			if (($filter=="living" and IsDeadId($gid)) || !PrivacyFunctions::DisplayDetailsByID($gid, "INDI")) $disp = false;
-			if ($disp) {
-				if ($onlyBDM == "yes") $filterev = "bdm";
-				else $filterev = "all";
-				$text = GetCalendarFact($factrec, $action, $filter, $gid, $filterev);
+			if ($person->disp && $fact->disp) {
+				$text = GetCalendarFact($factrec, $action, $filter, $gid);
 				if ($text!="filter") {
-					if ($text=="") {
-						$PrivateFacts = true;
-					} 
-					else {
-						if ($lastgid!=$gid) {
-							if ($lastgid != "") print "<br />";
-							if ($NAME_REVERSE) $name = str_replace(",", "", $factarr[4]);
-							else $name = $factarr[4];
-							print "<a href=\"individual.php?pid=$gid&amp;gedid=".$GEDCOMID."\"><b>";
-							if (HasChinese($name)) print PrintReady($name." (".GetSortableAddName($gid, "", false).")");
-							else print PrintReady($name);
-							print "</b>";
-							print "<img id=\"box-".$gid."-".$key."-sex\" src=\"$GM_IMAGE_DIR/";
-							if ($factarr[5] == "M") print $GM_IMAGES["sex"]["small"]."\" title=\"".$gm_lang["male"]."\" alt=\"".$gm_lang["male"];
-							else if ($factarr[5] == "F") print $GM_IMAGES["sexf"]["small"]."\" title=\"".$gm_lang["female"]."\" alt=\"".$gm_lang["female"];
-							else print $GM_IMAGES["sexn"]["small"]."\" title=\"".$gm_lang["unknown"]."\" alt=\"".$gm_lang["unknown"];
-							print "\" class=\"sex_image\" />";
-							if ($SHOW_ID_NUMBERS) {
-								if ($TEXT_DIRECTION=="ltr") print "&lrm;($gid)&lrm;";
-								else print "&rlm;($gid)&rlm;";
-							}
-							print "</a><br />\n";
-							$lastgid=$gid;
-						}
-						print "<div class=\"indent" . ($TEXT_DIRECTION=="rtl"?"_rtl":"") . "\">";
-						print $text;
-						print "</div>";
-						$OutputDone = true;
+					if ($lastgid!=$gid) {
+						if ($lastgid != "") print "<br />";
+						if ($NAME_REVERSE) $name = str_replace(",", "", $factarr[4]);
+						else $name = $factarr[4];
+						print "<a href=\"individual.php?pid=$gid&amp;gedid=".$GEDCOMID."\"><b>".$name."</b>";
+						print "<img id=\"box-".$gid."-".$key."-sex\" src=\"".$GM_IMAGE_DIR."/";
+						if ($factarr[5] == "M") print $GM_IMAGES["sex"]["small"]."\" title=\"".$gm_lang["male"]."\" alt=\"".$gm_lang["male"];
+						else if ($factarr[5] == "F") print $GM_IMAGES["sexf"]["small"]."\" title=\"".$gm_lang["female"]."\" alt=\"".$gm_lang["female"];
+						else print $GM_IMAGES["sexn"]["small"]."\" title=\"".$gm_lang["unknown"]."\" alt=\"".$gm_lang["unknown"];
+						print "\" class=\"sex_image\" />";
+						print "</a><br />\n";
+						$lastgid=$gid;
 					}
+					print "<div class=\"indent" . ($TEXT_DIRECTION=="rtl"?"_rtl":"") . "\">";
+					print $text;
+					print "</div>";
+					$OutputDone = true;
 				}
 			}
+			else $PrivateFacts = true;
 		}
 
 		if ($factarr[2]=="FAM") {
-			$gid = $factarr[0];
-			$factrec = $factarr[1];
-			$disp = true;
-			if ($filter=="living") {
-				$parents = FindParents($gid);
-				if (IsDeadId($parents["HUSB"])) $disp = false;
-				else if (!PrivacyFunctions::displayDetailsByID($parents["HUSB"])) {
-					$disp = false;
-					$PrivateFacts = true;
-				}
-				if ($disp) {
-					if (IsDeadId($parents["WIFE"])) $disp = false;
-					else if (!PrivacyFunctions::displayDetailsByID($parents["WIFE"])) {
-						$disp = false;
-						$PrivateFacts = true;
-					}
-				}
-			}
-			else if (!PrivacyFunctions::displayDetailsByID($gid, "FAM")) {
-				$disp = false;
-				$PrivateFacts = true;
-			}
-			if ($disp) {
-				if ($onlyBDM == "yes") $filterev = "bdm";
-				else $filterev = "all";
-				$text = GetCalendarFact($factrec, $action, $filter, $gid, $filterev);
+			$family =& Family::GetInstance($factarr[0], "", $GEDCOMID);
+			$fact = new Fact($factarr[0], $factarr[6], $factarr[1]);
+			if ((!is_object($family->husb || $family->husb->disp)) && (!is_object($family->wife || $family->wife->disp)) && $fact->disp) {
+				$text = GetCalendarFact($factarr[1], $action, $filter, $factarr[0]);
 				if ($text!="filter") {
-					if ($text=="") {
-						$PrivateFacts = true;
-					} 
-					else {
-						if ($lastgid!=$gid) {
-							$name = GetFamilyDescriptor($gid);
-							if ($lastgid != "") print "<br />";
-							print "<a href=\"family.php?famid=$gid&amp;gedid=".$GEDCOMID."\"><b>";
-							if (HasChinese($name)) print PrintReady($name." (".GetFamilyAddDescriptor($gid).")");
-							else print PrintReady($name);
-							print "</b>";
-							if ($SHOW_FAM_ID_NUMBERS) {
-								if ($TEXT_DIRECTION=="ltr") print " &lrm;($gid)&lrm;";
-								else print " &rlm;($gid)&rlm;";
-							}
-							print "</a><br />\n";
-							$lastgid=$gid;
+					if ($lastgid!=$factarr[0]) {
+						if ($lastgid != "") print "<br />";
+						print "<a href=\"family.php?famid=".$family->xref."&amp;gedid=".$family->gedcomid."\"><b>";
+						print $family->sortable_name;
+						print "</b>";
+						if ($SHOW_FAM_ID_NUMBERS) {
+							if ($TEXT_DIRECTION=="ltr") print " &lrm;(".$family->xref.")&lrm;";
+							else print " &rlm;(".$family->xref.")&rlm;";
 						}
-						print "<div class=\"indent" . ($TEXT_DIRECTION=="rtl"?"_rtl":"") . "\">";
-						print $text;
-						print "</div>";
-						$OutputDone = true;
+						print "</a><br />\n";
+						$lastgid=$family->xref;
 					}
+					print "<div class=\"indent" . ($TEXT_DIRECTION=="rtl"?"_rtl":"") . "\">";
+					print $text;
+					print "</div>";
+					$OutputDone = true;
 				}
 			}
+			else $PrivateFacts = true;
 		}
 	}
 	if ($PrivateFacts) {// Facts were found but not printed for some reason

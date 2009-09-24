@@ -60,11 +60,17 @@ class Note extends GedcomRecord {
 	public function __construct($id, $gedrec="", $gedcomid="", $new=false) {
 		global $GEDCOMID;
 
+		if (is_array($gedrec)) {
+			$id = $gedrec["o_id"];
+			$gedcomid = $gedrec["o_file"];
+			$gedrec = $gedrec["o_gedcom"];
+		}
+		
 		parent::__construct($id, $gedrec, $gedcomid);
 		
 		$this->exclude_facts = "CONC,CONT";
 		
-		if ($this->disp) {
+		if ($this->DisplayDetails()) {
 			// If the record is changed, check WHAT is changed.
 			if ($this->ThisChanged() && ($this->GetNoteText() != $this->GetNoteText(true))) $this->textchanged = true;
 			
@@ -104,7 +110,7 @@ class Note extends GedcomRecord {
 	public function getTitle($l=40, $changed=false) {
 		global $gm_lang;
 
-		if (!$this->disp) {
+		if (!$this->DisplayDetails()) {
 			$this->title = $gm_lang["private"];
 			return $this->title;
 		}
@@ -140,7 +146,7 @@ class Note extends GedcomRecord {
 	 */
 	public function getNoteText($changed=false) {
 		
-		if (!$this->disp) {
+		if (!$this->DisplayDetails()) {
 			$this->newtext = $gm_lang["private"];
 			return $this->text;
 		}
@@ -172,8 +178,8 @@ class Note extends GedcomRecord {
 		$res = NewQuery($sql);
 		while($row = $res->FetchAssoc()){
 			$person = null;
-			$person =& Person::GetInstance($row["i_id"], $row["i_gedcom"]);
-			if ($person->disp_name) {
+			$person =& Person::GetInstance($row["i_id"], $row, $row["i_file"]);
+			if ($person->DispName()) {
 				$this->indilist[$row["i_key"]] = $person;
 			}
 			else $this->indi_hide++;
@@ -193,8 +199,8 @@ class Note extends GedcomRecord {
 		$res = NewQuery($sql);
 		while($row = $res->FetchAssoc()){
 			$family = null;
-			$family =& Family::GetInstance($row["f_id"], $row["f_gedcom"]);
-			if ($family->disp) {
+			$family =& Family::GetInstance($row["f_id"], $row, $row["f_file"]);
+			if ($family->DisplayDetails()) {
 				$this->famlist[$row["f_key"]] = $family;
 			}
 			else $this->fam_hide++;
@@ -210,12 +216,12 @@ class Note extends GedcomRecord {
 		$this->medialist = array();
 		$this->media_hide = 0;
 		
-		$sql = "SELECT DISTINCT m_media, m_gedrec, m_gedfile FROM ".TBLPREFIX."other_mapping, ".TBLPREFIX."media WHERE om_oid='".$this->xref."' AND om_gedfile='".$this->gedcomid."' AND om_type='OBJE' AND om_gid=m_media AND m_gedfile=om_gedfile";
+		$sql = "SELECT DISTINCT m_media, m_gedrec, m_gedfile, m_ext, m_file FROM ".TBLPREFIX."other_mapping, ".TBLPREFIX."media WHERE om_oid='".$this->xref."' AND om_gedfile='".$this->gedcomid."' AND om_type='OBJE' AND om_gid=m_media AND m_gedfile=om_gedfile";
 		$res = NewQuery($sql);
 		while($row = $res->FetchAssoc()) {
 			$mediaitem = null;
-			$mediaitem =& MediaItem::GetInstance($row["m_media"], $row["m_gedrec"], $row["m_gedfile"]);
-			if ($mediaitem->disp) $this->medialist[JoinKey($row["m_media"], $row["m_gedfile"])] = $mediaitem;
+			$mediaitem =& MediaItem::GetInstance($row["m_media"], $row, $row["m_gedfile"]);
+			if ($mediaitem->DisplayDetails()) $this->medialist[JoinKey($row["m_media"], $row["m_gedfile"])] = $mediaitem;
 			else $this->media_hide++;
 		}
 		uasort($this->medialist, "TitleObjSort");
@@ -237,8 +243,8 @@ class Note extends GedcomRecord {
 		$res = NewQuery($sql);
 		while($row = $res->FetchAssoc()){
 			$source = null;
-			$source =& Source::GetInstance($row["s_id"], $row["s_gedcom"]);
-			if ($source->disp) $this->sourcelist[$row["s_key"]] = $source;
+			$source =& Source::GetInstance($row["s_id"], $row, $row["s_file"]);
+			if ($source->DisplayDetails()) $this->sourcelist[$row["s_key"]] = $source;
 			else $this->sour_hide++;
 		}
 		uasort($this->sourcelist, "GedcomObjSort");
@@ -258,22 +264,34 @@ class Note extends GedcomRecord {
 		$this->repo_hide = 0;
 		
 		// repositories can be linked from 
-		$sql = 	"SELECT o_key, o_id, o_gedcom FROM ".TBLPREFIX."other_mapping, ".TBLPREFIX."other WHERE om_oid='".$this->xref."' AND om_gedfile='".$this->gedcomid."' AND o_type='REPO' AND o_file=om_gedfile AND o_id=om_gid";
+		$sql = 	"SELECT o_key, o_id, o_gedcom, o_file FROM ".TBLPREFIX."other_mapping, ".TBLPREFIX."other WHERE om_oid='".$this->xref."' AND om_gedfile='".$this->gedcomid."' AND o_type='REPO' AND o_file=om_gedfile AND o_id=om_gid";
 		$res = NewQuery($sql);
 		while($row = $res->FetchAssoc()){
 			$repo = null;
-			$repo =& Repository::GetInstance($row["o_id"], $row["o_gedcom"], $this->gedcomid);
-			if ($repo->disp) $this->repolist[$row["o_key"]] = $repo;
+			$repo =& Repository::GetInstance($row["o_id"], $row, $row["o_file"], $this->gedcomid);
+			if ($repo->DisplayDetails()) $this->repolist[$row["o_key"]] = $repo;
 			else $this->repo_hide++;
 		}
 		uasort($this->repolist, "ItemSort");
 		$this->repo_count=count($this->repolist);
 		return $this->repolist;
 	}
+	
+	protected function ReadNoteRecord() {
+		
+		$sql = "SELECT o_gedcom FROM ".TBLPREFIX."other WHERE o_key='".JoinKey($this->xref,	$this->gedcomid)."'";
+		$res = NewQuery($sql);
+		if ($res) {
+			if ($res->NumRows() != 0) {
+				$row = $res->fetchAssoc();
+				$this->gedrec = $row["o_gedcom"];
+			}
+		}
+	}
 		
 	public function PrintListNote($len=60, $useli=true) {
 		
-		if (!$this->disp) return false;
+		if (!$this->DisplayDetails()) return false;
 		
 		if ($useli) {
 			if (begRTLText($this->GetTitle())) print "\n\t\t\t<li class=\"rtl\" dir=\"rtl\">";

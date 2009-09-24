@@ -41,11 +41,10 @@ function print_random_media($block = true, $config="", $side, $index) {
 	$foundlist = array();
 	srand();
 	$random = 10;
-	$mediaobjs = new Media;
-	$mediaobjs->RetrieveMedia($random,0,1); 
-	$ct = count($mediaobjs);
-	if ($mediaobjs->mediainlist > 0) {
-		$value = $mediaobjs->lastitem;
+	$mediacontroller = new MediaListController;
+	$mediacontroller->RetrieveMedia($random,0,1); 
+	if ($mediacontroller->mediainlist > 0) {
+		$media = $mediacontroller->lastitem;
 		print "<div id=\"random_picture\" class=\"block\">\n";
 		print "<div class=\"blockhc ltr\">";
 		print_help_link("index_media_help", "qm", "random_picture");
@@ -57,30 +56,30 @@ function print_random_media($block = true, $config="", $side, $index) {
 		print " >";
 		$imgwidth = 300;
 		$imgheight = 300;
-		if (preg_match("'://'", $value->filename)) {
-			if (in_array(strtolower($value->extension), $MEDIATYPE)){
+		if (preg_match("'://'", $media->filename)) {
+			if (in_array(strtolower($media->extension), $MEDIATYPE)){
 			   $imgwidth = 400;
 			   $imgheight = 500;
 			} 
 		}
-		else if ((preg_match("'://'", $MEDIA_DIRECTORY)>0)||$value->fileobj->f_file_exists) {
-			   $imgwidth = $value->fileobj->f_width+50;
-			   $imgheight = $value->fileobj->f_height+50;
+		else if ((preg_match("'://'", $MEDIA_DIRECTORY)>0)||$media->fileobj->f_file_exists) {
+			   $imgwidth = $media->fileobj->f_width+50;
+			   $imgheight = $media->fileobj->f_height+50;
 		}
-		if ($USE_GREYBOX && $value->fileobj->f_is_image) {
-			print "<a href=\"".FilenameEncode($value->fileobj->f_main_file)."\" title=\"".$value->title."\" rel=\"gb_imageset[random]\">";
+		if ($USE_GREYBOX && $media->fileobj->f_is_image) {
+			print "<a href=\"".FilenameEncode($media->fileobj->f_main_file)."\" title=\"".$media->title."\" rel=\"gb_imageset[random]\">";
 		}
-		else print "<a href=\"#\" onclick=\"return openImage('".$value->fileobj->f_main_file."', '".$imgwidth."', '".$imgheight."', '".$value->fileobj->f_is_image."');\">";
+		else print "<a href=\"#\" onclick=\"return openImage('".$media->fileobj->f_main_file."', '".$imgwidth."', '".$imgheight."', '".$media->fileobj->f_is_image."');\">";
 		if ($block) {
-			print "<img src=\"".$value->fileobj->f_thumb_file."\" border=\"0\" class=\"thumbnail\" alt=\"\" ";
-			if ($value->fileobj->f_twidth > 175) print "width=\"175\" ";
+			print "<img src=\"".$media->fileobj->f_thumb_file."\" border=\"0\" class=\"thumbnail\" alt=\"\" ";
+			if ($media->fileobj->f_twidth > 175) print "width=\"175\" ";
 			print "/>";
 		}
 		else {
-			if ($value->fileobj->f_file_exists || strstr($value->filename, "://")) {
-				print "<img src=\"".$value->m_main_file."\" border=\"0\" class=\"thumbnail\" alt=\"\" ";
-				if (!stristr($value->m_main_file, "://")) {
-					if ($value->fileobj->f_width > 175) print "width=\"175\" ";
+			if ($media->fileobj->f_file_exists || strstr($media->filename, "://")) {
+				print "<img src=\"".$media->m_main_file."\" border=\"0\" class=\"thumbnail\" alt=\"\" ";
+				if (!stristr($media->m_main_file, "://")) {
+					if ($media->fileobj->f_width > 175) print "width=\"175\" ";
 				}
 				else print "width=\"175\" ";
 				print "/>";
@@ -88,31 +87,33 @@ function print_random_media($block = true, $config="", $side, $index) {
 		}
 		print "</a>\n";
 		if ($block) print "<br />";
-		if ($value->title!=$value->filename) {
-		    print "<a href=\"mediadetail.php?mid=".$value->xref."&amp;gedid=".$GEDCOMID."\">";
-		    if (strlen($value->title) > 0) print "<b>".PrintReady($value->title)."</b><br />";
+		if ($media->title!=$media->filename) {
+		    print "<a href=\"mediadetail.php?mid=".$media->xref."&amp;gedid=".$GEDCOMID."\">";
+		    if (strlen($media->title) > 0) print "<b>".PrintReady($media->title)."</b><br />";
 			print "</a>";
 		}
-		$links = $value->links;
-		if (count($links) != 0){
-			foreach($links as $key=>$id) {
-				if (($id=="INDI")&&(PrivacyFunctions::displayDetailsByID($key))) {
-					print " <a href=\"individual.php?pid=".$key."\">".$gm_lang["view_person"]." - ";
-					if (HasChinese(GetPersonName($key))) print PrintReady(GetPersonName($key)." (".GetPinYin(GetPersonName($key)).")");
-					else print PrintReady(GetPersonName($key));
-					print "</a><br />";
-				}
-				if ($id=="FAM") {
-					print " <a href=\"family.php?famid=".$key."\">".$gm_lang["view_family"]." - ";
-					if (HasChinese(GetPersonName($key))) print PrintReady(GetFamilyDescriptor($key)." (".GetPinYin(GetFamilyDescriptor($key)).")");
-					else print PrintReady(GetFamilyDescriptor($key));
-					print "</a><br />";
-				}
-				if ($id=="SOUR") print " <a href=\"source.php?sid=".$key."\">".$gm_lang["view_source"]." - ".PrintReady(GetSourceDescriptor($key))."</a><br />";
-			}
+		foreach($media->indilist as $key => $indi) {
+			print " <a href=\"individual.php?pid=".$indi->xref."&amp;gedid=".$indi->gedcomid."\">".$gm_lang["view_person"].": ";
+			print $indi->name.($indi->addname == "" ? "" : " - ".$indi->addname).$indi->addxref;
+			print "</a><br />";
+		}
+		foreach($media->famlist as $key => $family) {
+			print " <a href=\"family.php?famid=".$family->xref."&amp;gedid=".$family->gedcomid."\">".$gm_lang["view_family"].": ";
+			print $family->descriptor.$family->addxref;
+			print "</a><br />";
+		}
+		foreach($media->sourcelist as $key => $source) {
+			print " <a href=\"source.php?sid=".$source->xref."&amp;gedid=".$source->gedcomid."\">".$gm_lang["view_source"].": ";
+			print $source->descriptor.$source->addxref;
+			print "</a><br />";
+		}
+		foreach($media->repolist as $key => $repo) {
+			print " <a href=\"repo.php?rid=".$repo->xref."&amp;gedid=".$repo->gedcomid."\">".$gm_lang["view_repo"].": ";
+			print $repo->descriptor.$repo->addxref;
+			print "</a><br />";
 		}
 		print "<br /><div class=\"indent" . ($TEXT_DIRECTION=="rtl"?"_rtl":"") . "\">";
-		FactFunctions::PrintFactNotes($value->gedrec, "1");
+		FactFunctions::PrintFactNotes($media->gedrec, "1");
 		print "</div>";
 		print "</div>"; // blockcontent
 		print "</div>"; // block

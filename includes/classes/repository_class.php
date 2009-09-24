@@ -52,7 +52,16 @@ class Repository extends GedcomRecord {
 	
 	public function __construct($id, $gedrec="", $gedcomid="") {
 		
+		if (is_array($gedrec)) {
+			// preset some values
+			// extract the construction parameters
+			$gedcomid = $gedrec["o_file"];
+			$id = $gedrec["o_id"];
+			$gedrec = $gedrec["o_gedcom"];
+		}
+		
 		parent::__construct($id, $gedrec, $gedcomid);
+		
 		$this->exclude_facts = "";
 	}
 
@@ -92,7 +101,7 @@ class Repository extends GedcomRecord {
 		
 		if (is_null($this->name)) {
 			$this->name = $this->GetRepoDescriptor();
-			if ($this->disp) {
+			if ($this->DisplayDetails()) {
 				$add_descriptor = $this->GetAddRepoDescriptor();
 				if ($add_descriptor) {
 					if ($this->name) $this->name .= " - ".$add_descriptor;
@@ -178,8 +187,8 @@ class Repository extends GedcomRecord {
 		$res = NewQuery($sql);
 		while($row = $res->FetchAssoc()){
 			$source = null;
-			$source =& Source::GetInstance($row["s_id"], $row["s_gedcom"]);
-			if ($source->disp) $this->sourcelist[$row["s_key"]] = $source;
+			$source =& Source::GetInstance($row["s_id"], $row, $row["s_file"]);
+			if ($source->DisplayDetails()) $this->sourcelist[$row["s_key"]] = $source;
 			else $this->sour_hide++;
 		}
 		uasort($this->sourcelist, "GedcomObjSort");
@@ -210,10 +219,24 @@ class Repository extends GedcomRecord {
 		$this->action_closed = $search[2];
 		$this->action_count = $this->action_open + $this->action_closed;
 	}
-	
+
+	protected function ReadRepositoryRecord() {
+		
+		$sql = "SELECT o_gedcom FROM ".TBLPREFIX."other WHERE o_key='".JoinKey($this->xref,	$this->gedcomid)."'";
+		$res = NewQuery($sql);
+		if ($res) {
+			if ($res->NumRows() != 0) {
+				$row = $res->fetchAssoc();
+				$this->gedrec = $row["o_gedcom"];
+			}
+		}
+	}
+		
 	public function PrintListRepository($useli=true, $prtact=true) {
 		global $TEXT_DIRECTION;
 
+		if (!$this->DisplayDetails()) return false;
+		
 		if ($useli) {
 			if (begRTLText($this->title)) print "\n\t\t\t<li class=\"rtl\" dir=\"rtl\">";
 			else print "\n\t\t\t<li class=\"ltr\" dir=\"ltr\">";

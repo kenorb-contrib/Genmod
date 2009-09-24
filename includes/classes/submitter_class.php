@@ -37,7 +37,7 @@ class Submitter extends GedcomRecord {
 	public $datatype = "SUBM";					// Type of data collected here
 	private static $submittercache = array(); 	// Holder of the instances for this class
 	
-	private $name = null;						// Printable name of the person, after applying privacy (can be unknown of private)
+	private $name = null;						// Printable name of the person, after applying privacy (can be unknown or private)
 
 	
 	public static function GetInstance($xref, $gedrec="", $gedcomid="") {
@@ -84,5 +84,18 @@ class Submitter extends GedcomRecord {
 		}
 		return $this->name;
 	}
+	
+	protected function ReadSubmitterRecord() {
+		
+		$sql = "SELECT o_gedcom FROM ".TBLPREFIX."other WHERE o_key='".JoinKey($this->xref,	$this->gedcomid)."'";
+		$res = NewQuery($sql);
+		if ($res) {
+			if ($res->NumRows() != 0) {
+				$row = $res->fetchAssoc();
+				$this->gedrec = $row["o_gedcom"];
+			}
+		}
+	}
+	
 }
 ?>

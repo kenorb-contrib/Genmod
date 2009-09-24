@@ -153,7 +153,7 @@ abstract class ActionController {
 	}
 	
 	private function ActionPidSort($a, $b) {
-		if ($a->indidesc != $b->piddesc) return StringSort($a->piddesc, $b->piddesc);
+		if ($a->piddesc != $b->piddesc) return StringSort($a->piddesc, $b->piddesc);
 		else return StringSort($a->repodesc, $b->repodesc);
 	}
 	
