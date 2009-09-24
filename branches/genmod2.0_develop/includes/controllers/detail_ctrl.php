@@ -235,6 +235,15 @@ abstract class DetailController extends BaseController{
 				//-- new fact link
 				if ($this->view != "preview" && $this->$object_name->canedit && !$this->$object_name->isdeleted) {
 					FactFunctions::PrintAddNewFact($this->$object_name->xref, $this->$object_name->facts, strtoupper($this->tabtype));
+					if ($this->object_name == "media") {
+						print "<tr>";
+						print "<td class=\"shade2\">";
+						print_help_link("add_media_link_help", "qm");
+						print $gm_lang["add_media_link_lbl"]."</td>";
+						print "<td class=\"shade1\">";
+						print "<a href=\"javascript: ".$gm_lang["add_media_lbl"]."\" onclick=\"add_new_record('". $this->$object_name->xref."','".$this->$object_name->datatype."', 'add_media_link'); return false;\">".$gm_lang["add_media_link"]."</a>";
+						print "</td></tr>";
+					}
 				}
 				print "</table>\n\n<br />";
 				print "</div>";

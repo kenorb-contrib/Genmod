@@ -174,7 +174,10 @@ $outputmenu["Calendar"] = Array
 		</div>
 		<div class="shade1" style="float: <?php print $rdir; ?>; text-align: <?php print $ldir; ?>; margin-<?php print $rdir; ?>: 0em; width: 20em;">
 			<?php 
-			if (isset($gm_user->gedcomid[$GEDCOMID]) && !empty($gm_user->gedcomid[$GEDCOMID]) && PrivacyFunctions::DisplayDetailsByID($gm_user->gedcomid[$GEDCOMID])) print "<a href=\"individual.php?pid=".$gm_user->gedcomid[$GEDCOMID]."\">".$gm_user->firstname.' '.$gm_user->lastname."</a><br />";
+			if (isset($gm_user->gedcomid[$GEDCOMID]) && !empty($gm_user->gedcomid[$GEDCOMID])) {
+				$person =& Person::GetInstance($gm_user->gedcomid[$GEDCOMID], "", $GEDCOMID);
+				if ($person->disp_name) print "<a href=\"individual.php?pid=".$gm_user->gedcomid[$GEDCOMID]."&amp;gedid=".$GEDCOMID."\">".$gm_user->firstname.' '.$gm_user->lastname."</a><br />";
+			}
 			else echo $gm_user->firstname.' '.$gm_user->lastname.'<br />';
 			echo "<a href=\"".$HOME_SITE_URL."\">".$HOME_SITE_TEXT."</a>";
 			?>

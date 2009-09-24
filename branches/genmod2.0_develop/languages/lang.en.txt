@@ -503,6 +503,7 @@
 "view_person";"View Person"
 "view_family";"View Family"
 "view_source";"View Source"
+"view_repo";"View Repository"
 "prev";"&lt; Previous"
 "next";"Next &gt;"
 "file_not_found";"File not found."

@@ -34,6 +34,9 @@ if (strstr($_SERVER["SCRIPT_NAME"],basename(__FILE__))) {
 
 abstract class SearchFunctions {
 
+	static public $indi_total = array();
+	static public $indi_hide = array();
+	
 	//-- search through the gedcom records for individuals
 	/**
 	 * Search the database for individuals that match the query
@@ -463,9 +466,8 @@ abstract class SearchFunctions {
 		$res = NewQuery($sql);
 		if ($res && $res->NumRows() > 0) {
 	 		while ($row = $res->FetchAssoc()) {
-		 		$note =& Note::GetInstance($row["o_id"], $row["o_gedcom"], $row["o_file"]);
+		 		$note =& Note::GetInstance($row["o_id"], $row, $row["o_file"]);
 		 		$note->GetTitle(40);
-		 		$note->gedcomid = $row["o_file"];
 		 		SwitchGedcom($row["o_file"]);
 				$note_total[$note->xref."[".$GEDCOMID."]"] = 1;
 		 		if ($note->disp) $notelist[] = $note;
@@ -569,6 +571,226 @@ abstract class SearchFunctions {
 		if ($chinese) return 1;
 		else return $minwlen;
 	}
+	/**
+	 * Search the dates table for individuals that had events on the given day
+	 *
+	 * @param	int $day the day of the month to search for, leave empty to include all
+	 * @param	string $month the 3 letter abbr. of the month to search for, leave empty to include all
+	 * @param	int $year the year to search for, leave empty to include all
+	 * @param	string $fact the facts to include (use a comma seperated list to include multiple facts)
+	 * 				prepend the fact with a ! to not include that fact
+	 * @param	boolean $allgeds setting if all gedcoms should be searched, default is false
+	 * @return	array $myindilist array with all individuals that matched the query
+	 */
+	public function SearchIndisDateRange($dstart="1", $mstart="1", $ystart="", $dend="31", $mend="12", $yend="", $filter="all", $onlyBDM="no", $skipfacts="", $allgeds=false, $onlyfacts="") {
+		
+		$indilist = array();
+	//print "Dstart: ".$dstart."<br />";
+	//print "Mstart: ".$mstart." ".date("M", mktime(1,0,0,$mstart,1))."<br />";
+	//print "Dend: ".$dend."<br />";
+	//print "Mend: ".$mend." ".date("M", mktime(1,0,0,$mend,1))."<br />";
+		$sql = "SELECT i_key, i_id, i_file, i_gedcom, i_isdead, n_name, n_surname, n_letter, n_type FROM ".TBLPREFIX."dates, ".TBLPREFIX."individuals, ".TBLPREFIX."names WHERE i_key=d_key AND n_key=i_key ";
+		if ($onlyBDM == "yes") $sql .= " AND d_fact IN ('BIRT', 'DEAT')";
+		if ($filter == "living") $sql .= "AND i_isdead!='1'";
+	
+		$sql .= self::DateRangeforQuery($dstart, $mstart, $ystart, $dend, $mend, $yend, $skipfacts, $allgeds, $onlyfacts);
+	
+		$sql .= "GROUP BY i_id ORDER BY d_year, d_month, d_day DESC";
 
+		$res = NewQuery($sql);
+		$key = "";
+		while($row = $res->FetchAssoc($res->result)){
+			if ($key != $row["i_key"]) {
+				$person = null;
+				$key = $row["i_key"];
+				$person =& Person::GetInstance($row["i_id"], $row);
+				$indilist[$row["i_key"]] = $person;
+			}
+			$row = db_cleanup($row);
+			if ($person->disp_name) $indilist[$row["i_key"]]->addname = array($row["n_name"], $row["n_letter"], $row["n_surname"], $row["n_type"]);
+		}
+		$res->FreeResult();
+		return $indilist;
+	}
+	
+	/**
+	 * Search the dates table for families that had events on the given day
+	 *
+	 * @param	int $day the day of the month to search for, leave empty to include all
+	 * @param	string $month the 3 letter abbr. of the month to search for, leave empty to include all
+	 * @param	int $year the year to search for, leave empty to include all
+	 * @param	string $fact the facts to include (use a comma seperated list to include multiple facts)
+	 * 				prepend the fact with a ! to not include that fact
+	 * @param	boolean $allgeds setting if all gedcoms should be searched, default is false
+	 * @return	array $myfamlist array with all individuals that matched the query
+	 */
+	public function SearchFamsDateRange($dstart="1", $mstart="1", $ystart, $dend="31", $mend="12", $yend, $onlyBDM="no", $skipfacts="", $allgeds=false, $onlyfacts="") {
+		
+		$famlist = array();
+		$sql = "SELECT f_key, f_id, f_husb, f_wife, f_file, f_gedcom FROM ".TBLPREFIX."dates, ".TBLPREFIX."families WHERE f_key=d_key ";
+	
+		$sql .= self::DateRangeforQuery($dstart, $mstart, $ystart, $dend, $mend, $yend, $skipfacts, $allgeds, $onlyfacts);
+	
+		if ($onlyBDM == "yes") $sql .= " AND d_fact='MARR'";
+		$sql .= "GROUP BY f_id ORDER BY d_year, d_month, d_day DESC";
+	
+		$res = NewQuery($sql);
+		while($row = $res->fetchAssoc()) {
+			$fam = Family::GetInstance($row["f_id"], $row);
+			$famlist[$row["f_key"]] = $fam;
+		}
+		$res->FreeResult();
+		return $famlist;
+	}
+	
+	/**
+	 * Search the dates table for other records that had events on the given day
+	 *
+	 * @param	boolean $allgeds setting if all gedcoms should be searched, default is false
+	 * @return	array $myfamlist array with all individuals that matched the query
+	 */
+	function SearchOtherDateRange($dstart="1", $mstart="1", $ystart="", $dend="31", $mend="12", $yend="", $skipfacts="", $allgeds=false, $onlyfacts="") {
+		$repolist = array();
+		
+		$sql = "SELECT o_key, o_id, o_file, o_gedcom, d_gid FROM ".TBLPREFIX."dates, ".TBLPREFIX."other WHERE o_id=d_gid AND o_file=d_file AND o_type='REPO' ";
+		
+		$sql .= self::DateRangeforQuery($dstart, $mstart, $ystart, $dend, $mend, $yend, $skipfacts, $allgeds, $onlyfacts);
+		
+		$sql .= "GROUP BY o_id ORDER BY d_year, d_month, d_day DESC";
+	
+		$res = NewQuery($sql);
+		while($row = $res->fetchAssoc()){
+			$repo = null;
+			$repo = Repository::GetInstance($row["o_id"], $row, $row["o_file"]);
+			$repolist[$row["o_key"]] = $repo;
+		}
+		$res->FreeResult();
+		return $repolist;
+	}
+	/**
+	 * Search the dates table for sources that had events on the given day
+	 *
+	 * @param	boolean $allgeds setting if all gedcoms should be searched, default is false
+	 * @return	array $myfamlist array with all individuals that matched the query
+	 */
+	public function SearchSourcesDateRange($dstart="1", $mstart="1", $ystart="", $dend="31", $mend="12", $yend="", $skipfacts="", $allgeds=false, $onlyfacts="") {
+		
+		$sourcelist = array();
+		
+		$sql = "SELECT s_key, s_id, s_name, s_file, s_gedcom, d_gid FROM ".TBLPREFIX."dates, ".TBLPREFIX."sources WHERE s_id=d_gid AND s_file=d_file ";
+		
+		$sql .= self::DateRangeforQuery($dstart, $mstart, $ystart, $dend, $mend, $yend, $skipfacts, $allgeds, $onlyfacts);
+		
+		$sql .= "GROUP BY s_id ORDER BY d_year, d_month, d_day DESC";
+		
+		$res = NewQuery($sql);
+		while($row = $res->fetchAssoc()){
+			$source = null;
+			$source = Source::GetInstance($row["s_id"], $row, $row["s_file"]);
+			$sourcelist[$row["s_key"]] = $source;
+		}
+		$res->FreeResult();
+		return $sourcelist;
+	}
+	/**
+	 * Search the dates table for other records that had events on the given day
+	 *
+	 * @param	boolean $allgeds setting if all gedcoms should be searched, default is false
+	 * @return	array $mymedia array with all individuals that matched the query
+	 */
+	function SearchMediaDateRange($dstart="1", $mstart="1", $ystart="", $dend="31", $mend="12", $yend="", $skipfacts="", $allgeds=false, $onlyfacts="") {
+		$medialist = array();
+		
+		$sql = "SELECT m_media, m_file, m_gedfile, m_ext, m_titl, m_gedrec FROM ".TBLPREFIX."dates, ".TBLPREFIX."media WHERE m_media=d_gid AND m_gedfile=d_file ";
+		
+		$sql .= self::DateRangeforQuery($dstart, $mstart, $ystart, $dend, $mend, $yend, $skipfacts, $allgeds, $onlyfacts);
+		
+		$sql .= "GROUP BY m_media ORDER BY d_year, d_month, d_day DESC";
+	
+		$res = NewQuery($sql);
+	
+		while($row = $res->fetchAssoc()){
+			$media = null;
+			$media = MediaItem::GetInstance($row["m_media"], $row, $row["m_gedfile"]);
+			$medialist[JoinKey($row["m_media"], $row["m_gedfile"])] = $media;
+		}
+		$res->FreeResult();
+		return $medialist;
+	}
+	
+	private function DateRangeforQuery($dstart="1", $mstart="1", $ystart="", $dend="31", $mend="12", $yend="", $skipfacts="", $allgeds=false, $onlyfacts="") {
+		global $GEDCOMID;
+		
+		//-- Compute start
+		$sql = "";
+		// SQL for 1 day
+		if ($dstart == $dend && $mstart == $mend && $ystart == $yend) {
+			$sql .= " AND d_day=".$dstart." AND d_month='".date("M", mktime(1,0,0,$mstart,1))."'";
+			if (!empty($ystart) && !empty($yend)) $sql .= "' AND d_year='".$ystart."'";
+		}
+		// SQL for dates in 1 month
+		else if ($mstart == $mend && $ystart == $yend) {
+			$sql .= " AND d_day BETWEEN ".$dstart." AND ".$dend." AND d_month='".date("M", mktime(1,0,0,$mstart,1))."'";
+			if (!empty($ystart) && !empty($yend)) $sql .= " AND d_year='".$ystart."'";
+		}
+		// SQL for >=2 months
+		else {
+			$sql .= " AND d_day!='0' AND ((d_day>=".$dstart." AND d_month='".date("M", mktime(1,0,0,$mstart,1));
+			if (!empty($ystart) && !empty($yend)) $sql .= "' AND d_year='".$ystart;
+			$sql .= "')";
+			//-- intermediate months
+			if (!empty($ystart) && !empty($yend)) {
+				if ($mend < $mstart) $mend = $mend + 12*($yend-$ystart);
+				else $mend = $mend + 12*($yend-$ystart);
+			}
+			else if ($mend < $mstart) $mend += 12;
+			for($i=$mstart+1; $i<$mend;$i++) {
+				if ($i>12) {
+					$m = $i%12;
+					if (!empty($ystart) && !empty($yend)) $y = $ystart + (($i - ($i % 12)) / 12);
+				}
+				else {
+					$m = $i;
+					if (!empty($ystart) && !empty($yend)) $y = $ystart;
+				}
+				$sql .= " OR (d_month='".date("M", mktime(1,0,0,$m,1))."'";
+				if (!empty($ystart) && !empty($yend)) $sql .= " AND d_year='".$y."'";
+				$sql .= ")";
+			}
+			//-- End 
+			$sql .= " OR (d_day<=".$dend." AND d_month='".date("M", mktime(1,0,0,$mend,1));
+			if (!empty($ystart) && !empty($yend)) $sql .= "' AND d_year='".$yend;
+			$sql .= "')";
+			$sql .= ")";
+		}
+		if (!empty($skipfacts)) {
+			$skip = preg_split("/[;, ]/", $skipfacts);
+			$sql .= " AND d_fact NOT IN (";
+			$i = 0;
+			foreach ($skip as $key=>$value) {
+				if ($i != 0 ) $sql .= ", ";
+				$i++; 
+				$sql .= "'".$value."'";
+			}
+		}
+	
+		if (!empty($onlyfacts)) {
+			$only = preg_split("/[;, ]/", $onlyfacts);
+			$sql .= " AND d_fact IN (";
+			$i = 0;
+			foreach ($only as $key=>$value) {
+				if ($i != 0 ) $sql .= ", ";
+				$i++; 
+				$sql .= "'".$value."'";
+			}
+			$sql .= ")";
+		}
+		else $sql .= ")";	
+		
+		if (!$allgeds) $sql .= " AND d_file='".$GEDCOMID."' ";
+		// General part ends here
+		
+		return $sql;
+	}
 }
 ?>

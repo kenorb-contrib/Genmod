@@ -86,12 +86,7 @@ class Favorite {
 	public function GetObject() {
 		
 		if (is_null($this->object)) {
-			if ($this->type == "INDI") $this->object =& Person::GetInstance($this->gid);
-			elseif ($this->type == "FAM") $this->object =& Family::GetInstance($this->gid);
-			elseif ($this->type == "SOUR") $this->object =& Source::GetInstance($this->gid);
-			elseif ($this->type == "REPO") $this->object =& Repository::GetInstance($this->gid);
-			elseif ($this->type == "OBJE") $this->object =& MediaItem::GetInstance($this->gid);
-			elseif ($this->type == "NOTE") $this->object =& Note::GetInstance($this->gid);
+			$this->object =& ConstructObject($this->gid, $this->type, $this->file);
 		}
 	}
 

@@ -308,7 +308,7 @@ abstract class PersonFunctions {
 				// Remove double tags
 				$tagstoprint = array_flip(array_flip($tagstoprint));
 				// Get the subrecords and sort them
-				$factstoprint = array();
+/*				$factstoprint = array();
 				foreach ($tagstoprint as $key => $tag) {
 					if (PrivacyFunctions::showFact($tag, $person->xref, "INDI")) $factstoprint[] = GetSubrecord(1, "1 ".$tag, $person->gedrec);
 				}
@@ -318,6 +318,11 @@ abstract class PersonFunctions {
 					$ft = preg_match("/1\s(\w+)(.*)/", $factrec, $match);
 					print_simple_fact($factrec, $match[1], $person->xref);
 				}
+*/
+				$factobjs = $person->SelectFacts($tagstoprint);	
+				foreach($factobjs as $key => $factobj) {
+					FactFunctions::PrintSimpleFact($factobj);
+				}			
 				// NOTE: Close div inout2-$pid.$personcount.$count
 				if ($show_full) print "</div>\n";
 				
@@ -456,7 +461,7 @@ abstract class PersonFunctions {
 		if (!empty($upfamid) and ($sosa!=-1) and ($view != "preview")) {
 			print "<td style=\"vertical-align:middle;\" rowspan=\"2\">";
 			
-			PrintUrlArrow($upfamid, ($sosa==0 ? "?famid=$upfamid&amp;show_full=$show_full" : "#$upfamid"), PrintReady($gm_lang["start_at_parents"]."&nbsp;-&nbsp;".htmlspecialchars(GetFamilyDescriptor($upfamid, true, "", false, false))), 1);
+			PrintUrlArrow($upfamid, ($sosa==0 ? "?famid=$upfamid&amp;show_full=$show_full" : "#$upfamid"), PrintReady($gm_lang["start_at_parents"]."&nbsp;-&nbsp;".htmlspecialchars($family->$husb->childfamilies[$hfam]->sortable_name)), 1);
 			print "</td>\n";
 		}
 	//	if ($hfam != "" || ($sosa != 0 &&  $SHOW_EMPTY_BOXES)) {
@@ -535,7 +540,7 @@ abstract class PersonFunctions {
 		if (!empty($upfamid) and ($sosa!=-1) and ($view != "preview")) {
 			print "<td style=\"vertical-align:middle;\" rowspan=\"2\">";
 			
-			PrintUrlArrow($upfamid.$label, ($sosa==0 ? "?famid=$upfamid&amp;show_full=$show_full" : "#$upfamid"), PrintReady($gm_lang["start_at_parents"]."&nbsp;-&nbsp;".htmlspecialchars(GetFamilyDescriptor($upfamid, true, "", false, false))), 1);
+			PrintUrlArrow($upfamid.$label, ($sosa==0 ? "?famid=$upfamid&amp;show_full=$show_full" : "#$upfamid"), PrintReady($gm_lang["start_at_parents"]."&nbsp;-&nbsp;".htmlspecialchars($family->$wife->childfamilies[$wfam]->sortable_name)), 1);
 			print "</td>\n";
 		}
 	//	if ($wfam != "" || ($sosa != 0 &&  $SHOW_EMPTY_BOXES)) {

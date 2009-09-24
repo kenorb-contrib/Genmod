@@ -187,14 +187,14 @@ abstract class MediaFS {
 				if ($directory == "external_links") {
 					if (!isset($files[$row["mf_link"]]["filedata"])) $files[$row["mf_link"]]["filedata"] = New MFile($row);
 					if (!empty($row["m_media"])) {
-						$media =& MediaItem::GetInstance($row);
+						$media =& MediaItem::GetInstance($row["m_media"], $row);
 						$files[$row["mf_link"]]["objects"][] = $media;
 					}
 				}
 				else {
 					if (!isset($files[$row["mf_file"]]["filedata"])) $files[$row["mf_file"]]["filedata"] = New MFile($row);
 					if (!empty($row["m_media"])) {
-						$media =& MediaItem::GetInstance($row);
+						$media =& MediaItem::GetInstance($row["m_media"], $row);
 						$files[$row["mf_file"]]["objects"][] = $media;
 					}
 				}
@@ -238,7 +238,7 @@ abstract class MediaFS {
 //				print "f: ".$f;
 				if (in_array($f, $dirfiles)) {
 //					print "added";
-					$files[$f]["objects"][] =& MediaItem::GetInstance($row);
+					$files[$f]["objects"][] =& MediaItem::GetInstance($row["m_media"], $row);
 				}
 			}
 			foreach ($files as $filename => $objects) {

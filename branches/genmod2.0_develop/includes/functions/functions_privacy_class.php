@@ -764,10 +764,10 @@ abstract class PrivacyFunctions {
 			if ($person_facts[$pid][$fact]["show"] < $ulevel) return false;
 		}
 	
-		if ($fact=="SOUR") {
-			if ($SHOW_SOURCES >= $ulevel) return true;
-			else return false;
-	    }
+//		if ($fact=="SOUR") {
+//			if ($SHOW_SOURCES >= $ulevel) return true;
+//			else return false;
+//	    }
 	    
 	//	if ($fact!="NAME") {
 	//		$gedrec = FindGedcomRecord($pid);
@@ -775,9 +775,9 @@ abstract class PrivacyFunctions {
 	//		return $disp;
 	//	}
 	//	else {
-		if ($fact == "NAME") {
-			if (!self::displayDetailsByID($pid, $type)) return self::showLivingNameById($pid);
-		}
+//		if ($fact == "NAME") {
+//			if (!self::displayDetailsByID($pid, $type)) return self::showLivingNameById($pid);
+//		}
 		return true;
 	}
 	
@@ -1029,6 +1029,16 @@ abstract class PrivacyFunctions {
 		// also check the current setting, as it may not be in the database
 		if ($SHOW_SOURCES >= $acclevel) return true;
 		return false;
+	}
+	
+	public function UpdateIsDead($indi) {
+		
+		$isdead = 0;
+		$isdead = self::IsDead($indi->gedrec);
+		if (empty($isdead)) $isdead = 0;
+		$sql = "UPDATE ".TBLPREFIX."individuals SET i_isdead=".$isdead." WHERE i_id LIKE '".DbLayer::EscapeQuery($indi->xref)."' AND i_file='".DbLayer::EscapeQuery($indi->gedcomid)."'";
+		$res = NewQuery($sql);
+		return $isdead;
 	}
 
 }

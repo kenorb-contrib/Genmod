@@ -83,6 +83,7 @@ abstract class GedcomRecord {
 	// Informational
 	protected $disp = null;				// If privacy allows display of this object
 	protected $disp_name = null;		// Person only: if privacy allows display of the name
+	protected $disp_as_link = null;		// Sources, Media, Notes, Repo's, privacy check without link privacy
 	protected $show_changes = null;		// If changes must be shown
 	protected $canedit = null;			// If this record can be edited (facts must be checked separately)
 	protected $ischanged = null;		// If this record is changed (added, deleted, changed)
@@ -97,7 +98,7 @@ abstract class GedcomRecord {
 	 * constructor for this class
 	 */
 	protected function __construct($id, $gedrec="", $gedcomid="") {
-		global $show_changes, $GEDCOMID, $gm_user, $ALLOW_EDIT_GEDCOM;
+		global $show_changes, $GEDCOMID;
 		
 		// The class might be called with an ID or with a gedcom record.
 		// The gedcom record might be empty, in which case it's a new or non existent record.
@@ -111,13 +112,13 @@ abstract class GedcomRecord {
 			$this->type = $this->datatype;
 			// Get the gedcom record
 			switch ($this->type) {
-				case "INDI": $this->gedrec = FindPersonRecord($this->xref, $this->gedcomid); break;
-				case "FAM": $this->gedrec = FindFamilyRecord($this->xref, $this->gedcomid); break;
-				case "SOUR": $this->gedrec = FindSourceRecord($this->xref, $this->gedcomid); break;
-				case "REPO": $this->gedrec = FindOtherRecord($this->xref, $this->gedcomid); break;
-				case "OBJE": $this->gedrec = FindMediaRecord($this->xref, $this->gedcomid); break;
-				case "NOTE": $this->gedrec = FindOtherRecord($this->xref, $this->gedcomid, false, "NOTE"); break;
-				case "SUBM": $this->gedrec = FindOtherRecord($this->xref, $this->gedcomid, false, "SUBM"); break;
+				case "INDI": $this->ReadPersonRecord(); break;
+				case "FAM": $this->ReadFamilyRecord(); break;
+				case "SOUR": $this->ReadSourceRecord(); break;
+				case "REPO": $this->ReadRepositoryRecord(); break;
+				case "OBJE": $this->ReadMediaRecord(); break;
+				case "NOTE": $this->ReadNoteRecord(); break;
+				case "SUBM": $this->ReadSubmitterRecord(); break;
 			}
 			if (empty($this->gedrec)) {
 				if (!$this->show_changes) $this->isempty = true;
@@ -138,18 +139,7 @@ abstract class GedcomRecord {
 				$this->xref = trim($match[1]);
 				$this->type = trim($match[2]);
 			}
-		}
-		
-		if ($GEDCOMID != $this->gedcomid) SwitchGedcom($this->gedcomid);
-		
-		$this->disp = PrivacyFunctions::displayDetailsByID($this->xref, $this->type, 1, true);
-		$this->disp_name = $this->disp;
-		
-		if (!$this->disp && $this->datatype == "INDI") $this->disp_name = PrivacyFunctions::showLivingNameByID($this->xref, "INDI", $this->gedrec);
-		
-		if ($this->disp && $ALLOW_EDIT_GEDCOM && $gm_user->userCanEdit() && !PrivacyFunctions::FactEditRestricted($this->xref, $this->gedrec, 1)) $this->canedit = true;
-		else $this->canedit = false;
-		SwitchGedcom($GEDCOMID);
+		}	
 	}
 	
 
@@ -164,10 +154,13 @@ abstract class GedcomRecord {
 				return $this->gedcomid;
 				break;
 			case "disp":
-				return $this->disp;
+				return $this->DisplayDetails();
 				break;
 			case "disp_name":
-				return $this->disp_name;
+				return $this->DispName();
+				break;
+			case "disp_as_link":
+				return $this->DisplayDetails(false);
 				break;
 			case "isempty":
 				return $this->isempty;
@@ -176,7 +169,7 @@ abstract class GedcomRecord {
 				return $this->show_changes;
 				break;
 			case "canedit":
-				return $this->canedit;
+				return $this->CanEdit();
 				break;
 			case "ischanged":
 				return $this->ThisChanged();
@@ -200,7 +193,7 @@ abstract class GedcomRecord {
 				return $this->type;
 				break;
 			case "addxref":
-				if ($SHOW_ID_NUMBERS && $this->disp_name) {
+				if ($SHOW_ID_NUMBERS && $this->DispName()) {
 					if ($TEXT_DIRECTION=="ltr")	return " &lrm;(".$this->xref.")&lrm;";
 					else return " &rlm;(".$this->xref.")&rlm;";
 				}
@@ -324,6 +317,35 @@ abstract class GedcomRecord {
 		}
 	}
 
+	protected function DisplayDetails($links=true) {
+		if (is_null($this->disp)) {
+			$this->disp = $this->CheckAccess(1, $links);
+		}
+		return $this->disp;
+	}
+	
+	protected function DispName() {
+		
+		if (is_null($this->disp_name)) {
+			$this->disp_name = $this->DisplayDetails();
+			if (!$this->disp && $this->datatype == "INDI") {
+				$this->disp_name = $this->showLivingName();
+			}
+		}
+		return $this->disp_name;
+	}
+		
+	protected function CanEdit() {
+		global $ALLOW_EDIT_GEDCOM, $gm_user;
+		
+		if (is_null($this->canedit)) {
+			if ($this->DisplayDetails() && $ALLOW_EDIT_GEDCOM && $gm_user->userCanEdit() && !PrivacyFunctions::FactEditRestricted($this->xref, $this->gedrec, 1)) $this->canedit = true;
+			else $this->canedit = false;
+		}
+		return $this->canedit;
+	}
+	
+	
 	protected function ThisDeleted() {
 		
 		if (is_null($this->isdeleted)) {
@@ -376,12 +398,11 @@ abstract class GedcomRecord {
 	}
 	
 	protected function GetChangedGedRec() {
-		global $GEDCOMID;
 		
 		if (!$this->ThisChanged()) return "";
 		if (is_null($this->changedgedrec)) {
 			$rec = GetChangeData(false, $this->xref, true, "gedlines", "");
-			$this->changedgedrec = $rec[$GEDCOMID][$this->xref];
+			$this->changedgedrec = $rec[$this->gedcomid][$this->xref];
 		}
 		return $this->changedgedrec;
 	}			
@@ -390,12 +411,11 @@ abstract class GedcomRecord {
 	 * Parse the facts from the record
 	 */
 	protected function parseFacts($selection="") {
-		
-		if (!is_null($this->facts) && !is_array($selection)) return $this->facts;
 
+		if (!is_null($this->facts) && !is_array($selection)) return $this->facts;
 		$facts = array();
-		if (!$this->disp) return $facts;
-		
+		if (!$this->DisplayDetails()) return $facts;
+
 		// Get the subrecords/facts. Don't apply privacy here, as it will disturb
 		// the fact numbering which is needed for editing (get the right fact number)
 		$allsubs = GetAllSubrecords($this->gedrec, $this->exclude_facts, false, false, false);
@@ -405,7 +425,9 @@ abstract class GedcomRecord {
 				$ft = preg_match("/1\s(\w+)(.*)/", $subrecord, $match);
 				if ($ft>0) {
 					$fact = $match[1];
-					if (strstr($match[2], "@") && in_array($fact, array("INDI", "FAM", "SOUR", "OBJE", "NOTE", "ASSO"))) $gid = trim(str_replace("@", "", $match[2]));
+					if (strstr($match[2], "@") && in_array($fact, array("INDI", "FAM", "SOUR", "OBJE", "NOTE", "ASSO"))) {
+						$gid = trim(str_replace("@", "", $match[2]));
+					}
 					else $gid = "";
 				}
 				else {
@@ -420,9 +442,15 @@ abstract class GedcomRecord {
 					$ct = preg_match("/2 TYPE (.*)/", $subrecord, $match);
 					if ($ct>0) $typeshow = PrivacyFunctions::showFact(trim($match[1]), $this->xref, $this->type);
 				}
-				if (!empty($fact) && (!is_array($selection) || in_array($fact, $selection)) && PrivacyFunctions::showFact($fact, $this->xref, $this->type) && $typeshow && !PrivacyFunctions::FactViewRestricted($this->xref, $subrecord, 2)) {
-					if (empty($gid) || PrivacyFunctions::DisplayDetailsByID($gid, $fact, 1, true)) {
-						$facts[] = new Fact($this->xref, $fact, $subrecord, $count[$fact], "");
+				if (!empty($fact) && (!is_array($selection) || in_array($fact, $selection))&& $typeshow && !PrivacyFunctions::FactViewRestricted($this->xref, $subrecord, 2)) {
+					$factobj = new Fact($this->xref, $fact, $subrecord, $count[$fact], "");
+					$dispobj = $factobj->show;
+					if (!empty($gid) && $dispobj) {
+						$object =& ConstructObject($gid, $fact, $this->gedcomid, "");
+						$disp = $object->DisplayDetails();
+					}
+					if ($dispobj && (empty($gid) || $disp)) {
+						$facts[] = $factobj;
 						if (!is_array($selection)) {
 							if ($fact == "SOUR") $this->sourfacts_count++;
 							elseif ($fact == "NOTE") $this->notefacts_count++;
@@ -516,6 +544,7 @@ abstract class GedcomRecord {
 			}
 		}
 		if (!is_array($selection)) $this->facts = $facts;
+
 		return $facts;
 	}
 	
@@ -559,6 +588,435 @@ abstract class GedcomRecord {
 			else $this->view = false;
 		}
 		return $this->view;
+	}
+	
+	private function CheckAccess($recursive=1, $checklinks=false) {
+		global $USE_RELATIONSHIP_PRIVACY, $CHECK_MARRIAGE_RELATIONS, $MAX_RELATION_PATH_LENGTH, $GEDCOMID;
+		global $global_facts, $person_privacy, $user_privacy, $HIDE_LIVE_PEOPLE, $SHOW_DEAD_PEOPLE, $MAX_ALIVE_AGE, $PRIVACY_BY_YEAR;
+		global $PRIVACY_CHECKS, $PRIVACY_BY_RESN, $SHOW_SOURCES, $SHOW_LIVING_NAMES, $LINK_PRIVACY, $gm_user;
+		static $hit;
+	
+					
+		if ($this->isempty) return true;
+		
+		// Check the gedcom context
+		$oldgedid = $GEDCOMID;
+		if ($GEDCOMID != $this->gedcomid) SwichGedcom($this->gedcomid);
+		
+		$ulevel = $gm_user->getUserAccessLevel();
+		if (!isset($hit)) $hit = array();
+		if (isset($hit[$this->xref])) print "ERROR: getting checked twice: ".$this->xref."<br />";
+		else $hit[$this->xref] = 1;
+		
+		if (!isset($PRIVACY_CHECKS)) $PRIVACY_CHECKS = 1;
+		else $PRIVACY_CHECKS++;
+		// print "checking privacy for pid: $this->xref, type: $this->datatype<br />";
+	
+		//-- look for an Ancestral File level 1 RESN (restriction) tag. This overrules all other settings if it prevents showing data.
+		if (isset($PRIVACY_BY_RESN) && ($PRIVACY_BY_RESN==true)) {
+			if (PrivacyFunctions::FactViewRestricted($this->xref, $this->gedrec, 1)) {
+				SwitchGedcom($oldgedid);
+				return false;
+			}
+		}
+	
+		// If a user is logged on, check for user related privacy first---------------------------------------------------------------
+		if ($gm_user->username != "") {
+			// Check user privacy for all users (hide/show)
+			if (isset($user_privacy["all"][$this->xref])) {
+				if ($user_privacy["all"][$this->xref] == 1) {
+					SwitchGedcom($oldgedid);
+					return true;
+				}
+				else {
+					SwitchGedcom($oldgedid);
+					return false;
+				}
+			}
+			// Check user privacy for this user (hide/show)
+			if (isset($user_privacy[$gm_user->username][$this->xref])) {
+				if ($user_privacy[$gm_user->username][$this->xref] == 1) {
+					SwitchGedcom($oldgedid);
+					return true;
+				}
+				else {
+					SwitchGedcom($oldgedid);
+					return false;
+				}
+			}
+			// Check person privacy (access level)
+			if (isset($person_privacy[$this->xref])) {
+				if ($person_privacy[$this->xref] >= $ulevel) {
+					SwitchGedcom($oldgedid);
+					return true;
+				}
+				else {
+					SwitchGedcom($oldgedid);
+					return false;
+				}
+			}
+			
+			// Check privacy by isdead status
+			if ($this->datatype == "INDI") {
+				$isdead = $this->isdead;
+				// The person is still hidden at this point and cannot be shown, either dead or alive.
+				// Check the relation privacy. If within the range, people can be shown. 
+				if ($USE_RELATIONSHIP_PRIVACY) {
+					// If we don't know the user's gedcom ID, we cannot determine the relationship so no reason to show
+					if ($gm_user->gedcomid[$GEDCOMID] == "") {
+						SwitchGedcom($oldgedid);
+						return false;
+					}
+						
+					// If it's the user himself, we can show him
+					if ($gm_user->gedcomid[$GEDCOMID]==$this->xref) {
+						SwitchGedcom($oldgedid);
+						return true;
+					}
+					
+					// Determine if the person is within range
+					$path_length = $MAX_RELATION_PATH_LENGTH;
+					// print "get relation ".$gm_user->gedcomid[$GEDCOMID]." with ".$this->xref;
+					$relationship = GetRelationship($gm_user->gedcomid[$GEDCOMID], $this->xref, $CHECK_MARRIAGE_RELATIONS, $path_length);
+
+					// Only limit access to live people!
+					if ($relationship == false && !$this->isdead) {
+						SwitchGedcom($oldgedid);
+						return false;
+					}
+					else {
+						// A relation is found. Do not return anything, as general rules will apply in this case.
+					}
+				}
+				
+				// First check if the person is dead. If so, it can be shown, depending on the setting for dead people.
+				if ($this->isdead && $SHOW_DEAD_PEOPLE >= $ulevel) {
+					SwitchGedcom($oldgedid);
+					return true;
+				}
+				
+				// Alive people. If the user is allowed to see the person, show it.
+				if (!$this->isdead && $HIDE_LIVE_PEOPLE >= $ulevel) {
+					SwitchGedcom($oldgedid);
+					return true;
+				}
+				
+				// No options left to show the person. Return false.
+				SwitchGedcom($oldgedid);
+				return false;
+			}
+		}
+		
+		// This is the part that handles visitors. ---------------------------------------------------------------
+		// No need to check user privacy
+		//-- check the person privacy array for an exception (access level)
+		// NOTE: This checks all record types! So no need to check later with fams, sources, etc.
+		if (isset($person_privacy[$this->xref])) {
+			if ($person_privacy[$this->xref] >= $ulevel) {
+				SwitchGedcom($oldgedid);
+				return true;
+			}
+			else {
+				SwitchGedcom($oldgedid);
+				return false;
+			}
+		}
+		if ($this->datatype=="INDI") {
+	//		 && $HIDE_LIVE_PEOPLE<getUserAccessLevel($username)) 
+			//-- option to keep person living if they haven't been dead very long
+			// This option assumes a person as living, if (max_alive_age = 120):
+			// - Died within the last 95 years
+			// - Married within the last 105 years
+			// - Born within the last 120 years
+			$dead = $this->isdead;
+			if ($PRIVACY_BY_YEAR) {
+				$cyear = date("Y");
+				//-- check death record
+				$deatrec = GetSubRecord(1, "1 BIRT", $this->gedrec);
+				$ct = preg_match("/2 DATE .*(\d\d\d|\d\d\d\d).*/", $deatrec, $match);
+				if ($ct>0) {
+					$dyear = $match[1];
+					if (($cyear-$dyear) <= $MAX_ALIVE_AGE-25) $dead = true;
+				}
+				//-- check marriage records
+				foreach($this->getSpouseFamilyIds() as $indexval => $fam) {
+					$family =& Family::GetInstance($fam, "", $GEDCOMID);
+					//-- check marriage record
+					$marrrec = GetSubRecord(1, "1 MARR", $family->gedrec);
+					$ct = preg_match("/2 DATE .*(\d\d\d|\d\d\d\d).*/", $marrrec, $match);
+					if ($ct>0) {
+						$myear = $match[1];
+						if (($cyear-$myear) <= $MAX_ALIVE_AGE-15) $dead = true;
+					}
+				}
+	
+				//-- check birth record
+				$birtrec = GetSubRecord(1, "1 BIRT", $this->gedrec);
+				$ct = preg_match("/2 DATE .*(\d\d\d|\d\d\d\d).*/", $birtrec, $match);
+				if ($ct>0) {
+					$byear = $match[1];
+					if (($cyear-$byear) <= $MAX_ALIVE_AGE) $dead = true;
+				}
+			}
+			if (!$dead) {
+				// The person is alive, let's see if we can show him
+				if ($HIDE_LIVE_PEOPLE >= $ulevel) {
+					SwitchGedcom($oldgedid);
+					return true;
+				}
+				else {
+					SwitchGedcom($oldgedid);
+					return false;
+				}
+			}
+			else {
+				// The person is dead, let's see if we can show him
+	//				print "DDbyID showlivingn: ".$SHOW_LIVING_NAMES."    useracc: ".getUserAccessLevel($username)."    ".$this->xref."<br />";
+	//				if ($SHOW_LIVING_NAMES>getUserAccessLevel($username)) return true;
+	//				else return false;
+				if ($SHOW_DEAD_PEOPLE >= $ulevel) {
+					SwitchGedcom($oldgedid);
+					return true;
+				}
+				else {
+					SwitchGedcom($oldgedid);
+					return false;
+				}
+			}
+		}
+		
+		// Now check the fams, for visitors AND for other users. Previously only INDI's are handled for users, not fams and other record types.
+	    if ($this->datatype=="FAM") {
+		    $type = "AND";
+		    //-- check if we can display both parents. If not, the family will be hidden.	
+		    $ct = preg_match("/1 HUSB @(.*)@/", $this->gedrec, $match);
+			if ($ct>0) {
+				$husb =& Person::GetInstance($match[1], "", $GEDCOMID);
+				if ($type = "AND" && !$husb->DisplayDetails()) {
+					SwitchGedcom($oldgedid);
+					return false;
+				}
+			}
+		    $ct = preg_match("/1 WIFE @(.*)@/", $this->gedrec, $match);
+			if ($ct>0) {
+				$wife =& Person::GetInstance($match[1], "", $GEDCOMID);
+				if ($type == "AND" && !$wife->DisplayDetails()) {
+					SwitchGedcom($oldgedid);
+					return false;
+				}
+			}
+			if ($type == "OR" && !$husb->DisplayDetails() && !$wife->DisplayDetails()) {
+				SwitchGedcom($oldgedid);
+				return false;
+			}
+			SwitchGedcom($oldgedid);
+			return true;
+	    }
+	    
+	    // Check the sources. First check the general setting
+	    if ($this->datatype=="SOUR") {
+		    if ($SHOW_SOURCES >= $ulevel) {
+			    $disp = true;
+			    
+			    // If we can show the source, see if any links to hidden records must prevent this.
+			    // Only hide if a linked RECORD is hidden. Don't hide if a LINK is hidden
+			    if ($LINK_PRIVACY && $checklinks) {
+				    // This will prevent loops if MM points to SOUR vice versa. We only go one level deep.
+				    $recursive--;
+				    if ($recursive >=0) {
+					    $disp = $this->CheckSourceLinks();
+				    }
+				    $recursive++;
+			    }
+			    // We can show the source, and there are no links that prevent this
+				SwitchGedcom($oldgedid);
+			    if ($disp) {
+					return true;
+				}
+				// The links prevent displaying the source
+				else {
+					return false;
+				}
+			}
+			// The sources setting prevents display, so hide!
+			else {
+				SwitchGedcom($oldgedid);
+				return false;
+			}
+	    }
+	    
+	    // Check the repositories
+	    if ($this->datatype=="REPO") {
+		    // To do: see if any hidden sources exist that prevent the repository to be shown.
+			SwitchGedcom($oldgedid);
+		    if ($SHOW_SOURCES >= $ulevel) {
+			    return true;
+		    }
+			else {
+				return false;
+			}
+	    }
+	    
+	    // Check the MM objects
+	    if ($this->datatype=="OBJE") {
+		    // Check if OBJE details are hidden by global or specific facts settings
+		    if (PrivacyFunctions::ShowFactDetails("OBJE", $this->xref)) {
+			    $disp = true;
+			    // Check links to the MM record. Only hide if a linked RECORD is hidden. Don't hide if a LINK is hidden
+			    if ($LINK_PRIVACY) {
+				    $recursive--;
+				    if ($recursive >=0) {
+					    $disp = $this->CheckMediaLinks();
+			    	}
+				    $recursive++;
+			    }
+				SwitchGedcom($oldgedid);
+			    if ($disp) {
+				    return true;
+			    }
+			    else {
+				    // we cannot show it because of hidden links
+					return false;
+				}
+			}
+			// we cannot show the MM details
+			else {
+				SwitchGedcom($oldgedid);
+				return false;
+			}
+	    }
+	    // Check the Note objects
+	    if ($this->datatype=="NOTE") {
+		    // Check if NOTE details are hidden by global or specific facts settings
+		    if (PrivacyFunctions::ShowFactDetails("NOTE", $this->xref)) {
+			    $disp = true;
+			    // Check links to the note record. Only hide if a linked RECORD is hidden. Don't hide if a LINK is hidden
+			    if ($LINK_PRIVACY) {
+				    $recursive--;
+				    if ($recursive >=0) {
+					    $disp = $this->CheckNoteLinks();
+			    	}
+				    $recursive++;
+			    }
+				SwitchGedcom($oldgedid);
+			    if ($disp) {
+				    return true;
+			    }
+			    else {
+				    // we cannot show it because of hidden links
+					return false;
+				}
+			}
+			// we cannot show the Note details
+			else {
+				SwitchGedcom($oldgedid);
+				return false;
+			}
+	    }
+		SwitchGedcom($oldgedid);
+	    return true;
+	}
+	
+	private function CheckSourceLinks() {
+		
+		$sql = "SELECT DISTINCT i_id, i_isdead, i_file, i_gedcom FROM ".TBLPREFIX."source_mapping, ".TBLPREFIX."individuals WHERE sm_sid='".$this->xref."' AND sm_gedfile='".$this->gedcomid."' AND sm_type='INDI' AND sm_gid=i_id AND sm_gedfile=i_file";
+		$res = NewQuery($sql);
+		while ($row = $res->FetchAssoc()) {
+			$person = null;
+			$person = Person::GetInstance($row["i_id"], $row, $row["i_file"]);
+			if (!$person->DisplayDetails()) {
+				$res->FreeResult();
+				return false;
+			}
+		}
+		$indiarr = array();
+		$famarr = array();
+		$sql = "SELECT DISTINCT DISTINCT sm_gid, f_id, f_file, f_gedcom, f_husb, f_wife FROM ".TBLPREFIX."source_mapping, ".TBLPREFIX."families WHERE sm_sid='".$this->xref."' AND sm_gedfile='".$this->gedcomid."' AND sm_type='FAM' AND sm_gid=f_id AND sm_gedfile=f_file";
+		$res = NewQuery($sql);
+		while ($row = $res->FetchAssoc()) {
+			$family = null;
+			$family = Family::GetInstance($row["f_id"], $row, $row["f_file"]);
+			$famarr[] = $family;
+			if (!empty($row["f_husb"])) $indiarr[] = $row["f_husb"];
+			if (!empty($row["f_wife"])) $indiarr[] = $row["f_wife"];
+		}
+		
+		$indiarr = array_flip(array_flip($indiarr));
+		
+		return $this->IndiFamPrivCheck($indiarr, $famarr);
+	}
+		
+	private function CheckMediaLinks() {
+		
+		$sql = "SELECT DISTINCT mm_gid, i_id, i_isdead, i_file, i_gedcom FROM ".TBLPREFIX."media_mapping, ".TBLPREFIX."individuals WHERE mm_media='".$this->xref."' AND mm_gedfile='".$this->gedcomid."' AND mm_type='INDI' AND mm_gid=i_id AND mm_gedfile=i_file";
+		$res = NewQuery($sql);
+		while ($row = $res->FetchAssoc()) {
+			$person = null;
+			$person = Person::GetInstance($row["i_id"], $row, $row["i_file"]);
+			if (!$person->DisplayDetails()) {
+				$res->FreeResult();
+				return false;
+			}
+		}
+		
+		$indiarr = array();
+		$famarr = array();
+		$sql = "SELECT DISTINCT DISTINCT mm_gid, f_id, f_file, f_gedcom, f_husb, f_wife FROM ".TBLPREFIX."media_mapping, ".TBLPREFIX."families WHERE mm_media='".$this->xref."' AND mm_gedfile='".$this->gedcomid."' AND mm_type='FAM' AND mm_gid=f_id AND mm_gedfile=f_file";
+		$res = NewQuery($sql);
+		while ($row = $res->FetchAssoc()) {
+			$family = null;
+			$family = Family::GetInstance($row["f_id"], $row, $row["f_file"]);
+			$famarr[] = $family;
+			if (!empty($row["f_husb"])) $indiarr[] = $row["f_husb"];
+			if (!empty($row["f_wife"])) $indiarr[] = $row["f_wife"];
+		}
+		
+		$indiarr = array_flip(array_flip($indiarr));
+		return $this->IndiFamPrivCheck($indiarr, $famarr);
+	}
+		
+	private function CheckNoteLinks() {
+		
+		$sql = "SELECT DISTINCT om_gid, i_id, i_isdead, i_file, i_gedcom FROM ".TBLPREFIX."other, ".TBLPREFIX."other_mapping, ".TBLPREFIX."individuals WHERE o_id='".$this->xref."' AND o_file='".$this->gedcomid."' AND o_id = om_oid AND o_file = om_gedfile AND om_type='INDI' AND i_id=om_gid AND om_gedfile=i_file";
+		$res = NewQuery($sql);
+		while ($row = $res->FetchAssoc()) {
+			$person = null;
+			$person = Person::GetInstance($row["i_id"], $row, $row["i_file"]);
+			if (!$person->DisplayDetails()) {
+				$res->FreeResult();
+				return false;
+			}
+		}
+		
+		$indiarr = array();
+		$famarr = array();
+		$sql = "SELECT DISTINCT om_gid, f_id, f_file, f_gedcom, f_husb, f_wife FROM ".TBLPREFIX."other, ".TBLPREFIX."other_mapping, ".TBLPREFIX."families WHERE o_id='".$this->xref."' AND o_file='".$this->gedcomid."' AND o_id = om_oid AND o_file = om_gedfile AND om_type='FAM' AND f_id=om_gid AND om_gedfile=f_file";
+		$res = NewQuery($sql);
+		while ($row = $res->FetchAssoc()) {
+			$family = null;
+			$family = Family::GetInstance($row["f_id"], $row, $row["f_file"]);
+			$famarr[] = $family;
+			if (!empty($row["f_husb"])) $indiarr[] = $row["f_husb"];
+			if (!empty($row["f_wife"])) $indiarr[] = $row["f_wife"];
+		}
+		
+		$indiarr = array_flip(array_flip($indiarr));
+		return $this->IndiFamPrivCheck($indiarr, $famarr);
+	}
+	
+	private function IndiFamPrivCheck($indiarr, $famarr) {
+		
+		$sql = "SELECT DISTINCT i_id, i_isdead, i_file, i_gedcom FROM ".TBLPREFIX."individuals WHERE i_key IN ('".implode("','", $indiarr)."')";
+		$res = NewQuery($sql);
+		while ($row = $res->FetchAssoc()) {
+			$person = null;
+			$person = Person::GetInstance($row["i_id"], $row, $row["i_file"]);
+		}
+		foreach($famarr as $key => $family) {
+			if (!$family->DisplayDetails()) return false;
+		}
+		return true;
+		
 	}
 }
 ?>

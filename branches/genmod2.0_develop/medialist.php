@@ -41,7 +41,7 @@ if (!isset($search)) $search="no";
 if (!isset($start)) $start = 0;
 if (!isset($max)) $max = 20;
 if (!isset($media)) {
-	$media = new Media();
+	$mediacontroller = new MediaListController();
 }
 
 // Header for the page
@@ -65,19 +65,19 @@ print '<div class="center"><h3>'.$gm_lang["multi_title"].'</h3></div>';
 <?php  
 
 // Retrieve the media items
-if (empty($filter)) $media->RetrieveMedia(0, $start, $max);
-else $media->RetrieveFilterMedia($filter, $start, $max);
+if (empty($filter)) $mediacontroller->RetrieveMedia(0, $start, $max);
+else $mediacontroller->RetrieveFilterMedia($filter, $start, $max);
 
 // Count the number of items in the medialist
 $count = $max;
-if ($count > $media->mediainlist) $count = $media->mediainlist;
+if ($count > $mediacontroller->mediainlist) $count = $mediacontroller->mediainlist;
 
-print '<div align="center">'.$media->totalmediaitems.' '.$gm_lang["media_found"].'<br />';
+print '<div align="center">'.$mediacontroller->totalmediaitems.' '.$gm_lang["media_found"].'<br />';
 
 // Dropdown selector for number of items to show
-if ($media->totalmediaitems > 0) {
+if ($mediacontroller->totalmediaitems > 0) {
 	print '<form action="'.$SCRIPT_NAME.'" method="get" > '.$gm_lang["medialist_show"].' <select name="max" onchange="javascript:submit();">';
-	for ($i=1;($i<=20&&$i-1<ceil($media->totalmediaitems/10));$i++) {
+	for ($i=1;($i<=20&&$i-1<ceil($mediacontroller->totalmediaitems/10));$i++) {
 		print '<option value="'.($i*10).'" ';
 		if ($i*10==$max) print 'selected="selected" ';
 		print ' >'.($i*10).'</option>';
@@ -95,7 +95,7 @@ print '<table class="list_table">';
 		print '<a href="medialist.php?filter='.$filter.'&amp;search=no&amp;start='.$newstart.'&amp;max='.$max.'">'.htmlentities($gm_lang["prev"]).'</a>';
 	}
 	print '</td><td align="'.($TEXT_DIRECTION == "ltr"?"right":"left").'">';
-	if ($max <= $media->mediainlist) {
+	if ($max <= $mediacontroller->mediainlist) {
 		$newstart = $start + $max;
 		print '<a href="medialist.php?filter='.$filter.'&amp;search=no&amp;start='.$newstart.'&amp;max='.$max.'">'.htmlentities($gm_lang["next"]).'</a>';
 	}
@@ -104,7 +104,7 @@ print '<tr>';
 
 // -- print the array
 $i=0;
-foreach($media->medialist as $index => $mediaitem) {
+foreach($mediacontroller->medialist as $index => $mediaitem) {
 	print '<td class="list_value wrap width50">';
 	print '<table class="'.$TEXT_DIRECTION.'"><tr><td valign="top" class="wrap">';
 
@@ -125,28 +125,26 @@ foreach($media->medialist as $index => $mediaitem) {
 	
 	if (!$MEDIA_EXTERNAL && !$mediaitem->fileobj->f_file_exists);
 	else print '</a>';
-	if (count($mediaitem->links) != 0) {
-		$indiexists = 0;
-		$famexists = 0;
-		foreach($mediaitem->links as $id => $type) {
-			if ($type=="INDI") {
-				print '<br /><a href="individual.php?pid='.$id.'">'.$gm_lang["view_person"].' - '.PrintReady(GetPersonName($id)).'</a>';
-				$indiexists = 1;
-			}
-			if ($type=="FAM") {
-				if ($indiexists && !$famexists) print "<br />";
-				$famexists = 1;
-				print '<br /><a href="family.php?famid='.$id.'">'.$gm_lang["view_family"].' - '.PrintReady(GetFamilyDescriptor($id)).'</a>';
-			}
-			if ($type=="SOUR") {
-				if ($indiexists || $famexists) {
-					print "<br />";
-					$indiexists = 0;
-					$famexists = 0;
-				}
-				print '<br /><a href="source.php?sid='.$id.'">'.$gm_lang["view_source"].' - '.PrintReady(GetSourceDescriptor($id)).'</a>';
-			}
-		}
+	$indiexists = false;
+	$famexists = false;
+	$sourexists = false;
+	foreach($mediaitem->indilist as $key => $indi) {
+		print "<br /><a href=\"individual.php?pid=".$indi->xref."&amp;gedid=".$indi->gedcomid."\">".$gm_lang["view_person"].": ".$indi->name.($indi->addname == "" ? "" : " - ".$indi->addname).$indi->addxref."</a>";
+		$indiexists = true;
+	}
+	if ($indiexists) print "<br />";
+	foreach($mediaitem->famlist as $key => $family) {
+		print "<br /><a href=\"family.php?famid=".$family->xref."&amp;gedid=".$family->gedcomid."\">".$gm_lang["view_family"].": ".$family->descriptor.$family->addxref."</a>";
+		$famexists = true;
+	}
+	if ($famexists) print "<br />";
+	foreach($mediaitem->sourcelist as $key => $source) {
+		print "<br /><a href=\"source.php?sid=".$source->xref."&amp;gedid=".$source->gedcomid."\">".$gm_lang["view_source"].": ".$source->descriptor.$source->addxref."</a>";
+		$sourexists = true;
+	}
+	if ($sourexists) print "<br />";
+	foreach($mediaitem->repolist as $key => $repo) {
+		print "<br /><a href=\"repo.php?rid=".$repo->xref."&amp;gedid=".$repo->gedcomid."\">".$gm_lang["view_repo"].": ".$repo->descriptor.$repo->addxref."</a>";
 	}
 	if (is_null($mediaitem->filename) || $mediaitem->filename == "") print '<br /><span class="error">'.$gm_lang["file_empty"].' '.$mediaitem->filename.'</span>';
 	else if (!strstr($mediaitem->filename, "://") && !$mediaitem->fileobj->f_file_exists) print '<br /><span class="error">'.$gm_lang["file_not_found"].'<br />'.$mediaitem->filename.'</span>';
@@ -176,7 +174,7 @@ print "</tr>";
 		print '<a href="medialist.php?filter='.$filter.'&amp;search=no&amp;start='.$newstart.'&amp;max='.$max.'">'.$gm_lang["prev"].'</a>';
 	}
 	print '</td><td align="'.($TEXT_DIRECTION == "ltr"?"right":"left").'">';
-	if ($max <= $media->mediainlist) {
+	if ($max <= $mediacontroller->mediainlist) {
 		$newstart = $start + $max;
 		print '<a href="medialist.php?filter='.$filter.'&amp;search=no&amp;start='.$newstart.'&amp;max='.$max.'">'.$gm_lang["next"].'</a>';
 	}

@@ -55,7 +55,8 @@ $res = NewQuery($sql);
 
 // Check the privacy settings
 while ($row = $res->FetchRow()) {
-	if (!PrivacyFunctions::DisplayDetailsByID($row[0], "OBJE", 2, true)) {
+	$media =& MediaItem::GetInstance($row[0], "", $GEDCOMID);
+	if (!$media->disp_as_link) {
 		WriteToLog("ShowBlob-> Unauthorised access to media: ".$file, "W", "S");
 		header("HTTP/1.1 403 Forbidden");
 		exit;

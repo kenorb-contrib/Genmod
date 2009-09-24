@@ -228,7 +228,7 @@ if (($surname_sublist=="yes")&&($show_all=="yes")) {
 				$ret = check_alive($indi["gedcom"], $year, $type, $useMAA);
 				if ($ret==0) {
 					foreach($indi["names"] as $indexval => $name) {
-						SurnameCount($name[2]);
+						ListFunctions::SurnameCount($name[2]);
 						$indi_alive++;
 					}
 				}
@@ -266,12 +266,12 @@ else if (($surname_sublist=="yes")&&(empty($surname))&&($show_all=="no")) {
 						else if ($alpha == "Æ") $text = "AE";
 						else if ($alpha == "Å") $text = "AA";
 						if (isset($text)) {
-							if ((preg_match("/^$expalpha/", $name[1])>0)||(preg_match("/^$text/", $name[1])>0)) SurnameCount($name[2], $alpha);
+							if ((preg_match("/^$expalpha/", $name[1])>0)||(preg_match("/^$text/", $name[1])>0)) ListFunctions::SurnameCount($name[2], $alpha);
 						}
-						else if (preg_match("/^$expalpha/", $name[1])>0) SurnameCount($name[2], $alpha);
+						else if (preg_match("/^$expalpha/", $name[1])>0) ListFunctions::SurnameCount($name[2], $alpha);
 					}
 					else {
-						if (preg_match("/^$expalpha/", $name[1])>0) SurnameCount($name[2], $alpha);
+						if (preg_match("/^$expalpha/", $name[1])>0) ListFunctions::SurnameCount($name[2], $alpha);
 					}
 				}
 			}

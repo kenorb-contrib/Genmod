@@ -108,24 +108,25 @@ class IndividualController extends DetailController {
 		// NOTE: Can we show the gedcom record?
 		if ($gm_user->userCanViewGedlines() && $this->indi->disp) $this->canshowgedrec = true;
 		else $this->canshowgedrec = false;
-		
-		// NOTE: add_family_facts parses all facts as it calls the parseFacts function
-		$this->indi->AddFamilyFacts();
-		
-		// NOTE: Determine the number of names and sex records
-		foreach ($this->indi->globalfacts as $key => $value) {
-			if ($value->fact == "SEX") $this->SEX_COUNT++;
-			if ($value->fact == "NAME") $this->TOTAL_NAMES++;
+		if ($this->indi->disp) {
+			// NOTE: add_family_facts parses all facts as it calls the parseFacts function
+			$this->indi->AddFamilyFacts();
+			
+			// NOTE: Determine the number of names and sex records
+			foreach ($this->indi->globalfacts as $key => $value) {
+				if ($value->fact == "SEX") $this->SEX_COUNT++;
+				if ($value->fact == "NAME") $this->TOTAL_NAMES++;
+			}
+			
+			// NOTE: Get the parents and siblings labels
+			$this->indi->getParentFamily($this->xref);
+	
+			// NOTE: Get the spouses and kids
+			$this->indi->getSpouseFamily($this->xref);
+			
+			// NOTE: Get the parents other families
+			$this->indi->getParentOtherFamily($this->xref);
 		}
-		
-		// NOTE: Get the parents and siblings labels
-		$this->indi->getParentFamily($this->xref);
-
-		// NOTE: Get the spouses and kids
-		$this->indi->getSpouseFamily($this->xref);
-		
-		// NOTE: Get the parents other families
-		$this->indi->getParentOtherFamily($this->xref);
 	}
 
 	public function __get($property) {

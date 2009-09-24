@@ -855,7 +855,7 @@ function FindHighlightedObject($pid) {
 	$sql = "select m_file, m_media, mm_gedrec, m_gedrec, m_gedfile, m_ext, m_titl from ".TBLPREFIX."media, ".TBLPREFIX."media_mapping where mm_gid LIKE '".$pid."' AND m_gedfile = '".$GEDCOMID."' AND m_gedfile = mm_gedfile AND m_media = mm_media AND mm_gedrec NOT LIKE '%\_PRIM N%' AND mm_gedrec LIKE '1 OBJE%' ORDER BY mm_order";
 	$res = NewQuery($sql);
 	while ($row = $res->FetchAssoc()) {
-		$media =& Mediaitem::GetInstance($row);
+		$media =& Mediaitem::GetInstance($row["m_media"], $row);
 		if ($media->disp) $media_ids[] = $row;
 //		if (PrivacyFunctions::DisplayDetailsByID($row["m_media"], "OBJE", 1, true)) $media_ids[] = $row;
 	}
@@ -3300,4 +3300,17 @@ function ReplaceEmbedText($text) {
 	}
 	return $text;
 }	
+
+function ConstructObject($pid, $type, $gedid, $data_array="") {
+
+	if ($type == "SOUR") $object =& Source::GetInstance($pid, $data_array, $gedid);
+	elseif ($type == "REPO") $object =& Repository::GetInstance($pid, $data_array, $gedid);
+	elseif ($type == "OBJE") $object =& MediaItem::GetInstance($pid, $data_array, $gedid);
+	elseif ($type == "NOTE") $object =& Note::GetInstance($pid, $data_array, $gedid);
+	elseif ($type == "ASSO" || $type == "INDI") $object =& Person::GetInstance($pid, $data_array, $gedid);
+	elseif ($type == "FAM") $object =& Family::GetInstance($pid, $data_array, $gedid);
+	if (is_object($object)) return $object;
+	else return false;
+}
+	
 ?>

@@ -57,6 +57,14 @@ class Source extends GedcomRecord {
 	 */
 	public function __construct($id, $gedrec="", $gedcomid="") {
 
+		if (is_array($gedrec)) {
+			// preset some values
+			// extract the construction parameters
+			$gedcomid = $gedrec["s_file"];
+			$id = $gedrec["s_id"];
+			$gedrec = $gedrec["s_gedcom"];
+		}
+		
 		parent::__construct($id, $gedrec, $gedcomid);
 		$this->exclude_facts = "";
 	}
@@ -95,7 +103,7 @@ class Source extends GedcomRecord {
 		global $gm_lang;
 		
 		if (is_null($this->name)) {
-			if ($this->disp) {
+			if ($this->DisplayDetails()) {
 				$this->name = $this->GetSourceDescriptor();
 				$add_descriptor = $this->GetAddSourceDescriptor();
 				if ($add_descriptor) {
@@ -118,7 +126,7 @@ class Source extends GedcomRecord {
 		global $gm_lang;
 		
 		if (is_null($this->descriptor)) {
-			if ($this->disp) {
+			if ($this->DisplayDetails()) {
 		
 				if ($this->show_changes && $this->ThisChanged()) $gedrec = $this->GetChangedGedRec();
 				else $gedrec = $this->gedrec;
@@ -130,7 +138,7 @@ class Source extends GedcomRecord {
 						if (!PrivacyFunctions::showFact("TITL", $this->xref, "SOUR")) {
 							$this->descriptor = $gm_lang["unknown"];
 						}
-						else if(!PrivacyFunctions::showFactDetails("TITL", $this->xref, "SOUR") || PrivacyFunctions::FactViewRestricted($this->xref, $subrec, 2) || !$this->disp) {
+						else if(!PrivacyFunctions::showFactDetails("TITL", $this->xref, "SOUR") || PrivacyFunctions::FactViewRestricted($this->xref, $subrec, 2) || !$this->DisplayDetails()) {
 							$this->descriptor = $gm_lang["private"];
 						}
 						else {
@@ -144,7 +152,7 @@ class Source extends GedcomRecord {
 						if (!PrivacyFunctions::showFact("ABBR", $this->xref, "SOUR")) {
 							$this->descriptor = $gm_lang["unknown"];
 						}
-						else if (!PrivacyFunctions::showFactDetails("ABBR", $this->xref, "SOUR") || !$this->disp) {
+						else if (!PrivacyFunctions::showFactDetails("ABBR", $this->xref, "SOUR") || !$this->DisplayDetails()) {
 							$this->descriptor =  $gm_lang["private"];
 						}
 						else $this->descriptor = $smatch[1];
@@ -167,14 +175,14 @@ class Source extends GedcomRecord {
 	private function getAddSourceDescriptor() {
 	
 		if (is_null($this->adddescriptor)) {
-			if ($this->disp) {
+			if ($this->DisplayDetails()) {
 				if ($this->show_changes && $this->ThisChanged()) $gedrec = $this->GetChangedGedRec();
 				else $gedrec = $this->gedrec;
 				
 				if (!empty($gedrec)) {
 					$ct = preg_match("/\d ROMN (.*)/", $gedrec, $match);
 			 		if ($ct>0) {
-						if (!PrivacyFunctions::showFact("ROMN", $this->xref, "SOUR") || !PrivacyFunctions::showFactDetails("ROMN", $this->xref, "SOUR") || !$this->disp) {
+						if (!PrivacyFunctions::showFact("ROMN", $this->xref, "SOUR") || !PrivacyFunctions::showFactDetails("ROMN", $this->xref, "SOUR") || !$this->DisplayDetails()) {
 							$this->adddescriptor = "";
 						}
 						else $this->adddescriptor = $smatch[1];
@@ -182,7 +190,7 @@ class Source extends GedcomRecord {
 			 		}
 					$ct = preg_match("/\d _HEB (.*)/", $gedrec, $match);
 			 		if ($ct>0) {
-						if (!PrivacyFunctions::showFact("_HEB", $this->xref, "SOUR")|| !PrivacyFunctions::showFactDetails("_HEB", $this->xref, "SOUR") || !$this->disp) {
+						if (!PrivacyFunctions::showFact("_HEB", $this->xref, "SOUR")|| !PrivacyFunctions::showFactDetails("_HEB", $this->xref, "SOUR") || !$this->DisplayDetails()) {
 							$this->adddescriptor = "";
 						}
 						else $this->adddescriptor = $smatch[1];
@@ -206,8 +214,8 @@ class Source extends GedcomRecord {
 		$res = NewQuery($sql);
 		while($row = $res->FetchAssoc()){
 			$person = null;
-			$person =& Person::GetInstance($row["i_id"], $row["i_gedcom"]);
-			if ($person->disp_name) {
+			$person =& Person::GetInstance($row["i_id"], $row, $row["i_file"]);
+			if ($person->DispName()) {
 				$this->indilist[$row["i_key"]] = $person;
 			}
 			else $this->indi_hide++;
@@ -227,8 +235,8 @@ class Source extends GedcomRecord {
 		$res = NewQuery($sql);
 		while($row = $res->FetchAssoc()){
 			$family = null;
-			$family =& Family::GetInstance($row["f_id"], $row["f_gedcom"]);
-			if ($family->disp) {
+			$family =& Family::GetInstance($row["f_id"], $row, $row["f_file"]);
+			if ($family->DisplayDetails()) {
 				$this->famlist[$row["f_key"]] = $family;
 			}
 			else $this->fam_hide++;
@@ -248,8 +256,8 @@ class Source extends GedcomRecord {
 		$res = NewQuery($sql);
 		while($row = $res->FetchAssoc()){
 			$note = null;
-			$note =& Note::GetInstance($row["o_id"], $row["o_gedcom"]);
-			if ($note->disp) $this->notelist[$row["o_key"]] = $note;
+			$note =& Note::GetInstance($row["o_id"], $row, $row["o_file"]);
+			if ($note->DisplayDetails()) $this->notelist[$row["o_key"]] = $note;
 			else $this->note_hide++;
 		}
 		uasort($this->notelist, "TitleObjSort");
@@ -263,12 +271,12 @@ class Source extends GedcomRecord {
 		$this->medialist = array();
 		$this->media_hide = 0;
 		
-		$sql = "SELECT DISTINCT m_media, m_gedrec, m_gedfile FROM ".TBLPREFIX."source_mapping, ".TBLPREFIX."media WHERE sm_sid='".$this->xref."' AND sm_gedfile='".$this->gedcomid."' AND sm_type='OBJE' AND sm_gid=m_media AND m_gedfile=sm_gedfile";
+		$sql = "SELECT DISTINCT m_media, m_gedrec, m_gedfile, m_ext, m_file FROM ".TBLPREFIX."source_mapping, ".TBLPREFIX."media WHERE sm_sid='".$this->xref."' AND sm_gedfile='".$this->gedcomid."' AND sm_type='OBJE' AND sm_gid=m_media AND m_gedfile=sm_gedfile";
 		$res = NewQuery($sql);
 		while($row = $res->FetchAssoc()) {
 			$mediaitem = null;
-			$mediaitem =& MediaItem::GetInstance($row["m_media"], $row["m_gedrec"], $row["m_gedfile"]);
-			if ($mediaitem->disp) $this->medialist[JoinKey($row["m_media"], $row["m_gedfile"])] = $mediaitem;
+			$mediaitem =& MediaItem::GetInstance($row["m_media"], $row, $row["m_gedfile"]);
+			if ($mediaitem->DisplayDetails()) $this->medialist[JoinKey($row["m_media"], $row["m_gedfile"])] = $mediaitem;
 			else $this->media_hide++;
 		}
 		uasort($this->medialist, "TitleObjSort");
@@ -276,9 +284,21 @@ class Source extends GedcomRecord {
 		return $this->medialist;
 	}
 	
+	protected function ReadSourceRecord() {
+		
+		$sql = "SELECT s_gedcom FROM ".TBLPREFIX."sources WHERE s_key='".JoinKey($this->xref, $this->gedcomid)."'";
+		$res = NewQuery($sql);
+		if ($res) {
+			if ($res->NumRows() != 0) {
+				$row = $res->fetchAssoc();
+				$this->gedrec = $row["s_gedcom"];
+			}
+		}
+	}
+	
 	public function PrintListSource($useli=true) {
 		
-		if (!$this->disp) return false;
+		if (!$this->DisplayDetails()) return false;
 		
 		if ($useli) {
 			if (begRTLText($this->title)) print "\n\t\t\t<li class=\"rtl\" dir=\"rtl\">";

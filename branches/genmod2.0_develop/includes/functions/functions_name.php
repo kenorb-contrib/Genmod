@@ -553,7 +553,8 @@ function GetFamilyDescriptor($fid, $rev = false, $famrec="", $changes = false, $
 	else $parents = FindParentsInRecord($famrec);
 
 	if ($parents["HUSB"]) {
-		if (PrivacyFunctions::showLivingNameByID($parents["HUSB"]))
+		$person =& Person::GetInstance($parents["HUSB"]);
+		if ($person->disp_name)
 			$hname = GetSortableName($parents["HUSB"], "", "", false, $rev, $changes);
 		else $hname = $gm_lang["private"];
 	}
@@ -562,7 +563,9 @@ function GetFamilyDescriptor($fid, $rev = false, $famrec="", $changes = false, $
 		else $hname = "@N.N., @P.N.";
 	}
 	if ($parents["WIFE"]) {
-		if (PrivacyFunctions::showLivingNameByID($parents["WIFE"]))
+		$person = null;
+		$person =& Person::GetInstance($parents["WIFE"]);
+		if ($person->disp_name)
 			$wname = GetSortableName($parents["WIFE"], "", "", false, $rev, $changes);
 		else $wname = $gm_lang["private"];
 	}
@@ -767,7 +770,7 @@ function StripPrefix($lastname){
  * It will work if the surname is all lowercase
  * @param string $indiname	the name to extract the surname from
  */
-function ExtractSurname($indiname, $count=true) {
+function ExtractSurname($indiname) {
 	global $surnames, $alpha, $surname, $show_all, $i, $testname;
 
 	if (!isset($testname)) $testname="";
@@ -785,43 +788,9 @@ function ExtractSurname($indiname, $count=true) {
 		$nsurname = preg_replace(array("/ [jJsS][rR]\.?/", "/ I+/"), array("",""), $nsurname);
 		
 	}
-	if ($count) SurnameCount($nsurname);
 	return $nsurname;
 }
 
-/**
- * Add a surname to the surnames array for counting
- *
- * @param string $nsurname
- * @return string
- */
-function SurnameCount($nsurname, $sort_letter="") {
-	global $surnames, $alpha, $surname, $show_all, $i, $testname;
-	
-	if ($sort_letter == "") $sort_letter = GetFirstLetter($nsurname);
-	$lname = StripPrefix($nsurname);
-	if (empty($lname)) $lname = $nsurname;
-	if (($show_all=="yes") || empty($alpha) || ($alpha==$sort_letter)) {
-//		$tsurname = preg_replace(array("/ [jJsS][rR]\.?/", "/ I+/"), array("",""), $nsurname);
-		$tsurname = Str2Upper(StripPrefix(preg_replace("/([^ ]+)\*/", "$1", $nsurname)));
-		if (empty($surname) || (Str2Upper($surname)==$tsurname)) {
-			if (!isset($surnames[$tsurname])) {
-				$surnames[$tsurname] = array();
-				$surnames[$tsurname]["name"] = preg_replace("/([^ ]+)\*/", "$1", $nsurname);
-				$surnames[$tsurname]["match"] = 1;
-				$surnames[$tsurname]["fam"] = 1;
-				$surnames[$tsurname]["alpha"] = $sort_letter;
-			}
-			else {
-				$surnames[$tsurname]["match"]++;
-				if ($i==0 || $testname != $tsurname) $surnames[$tsurname]["fam"]++;
-			}
-			if ($i==0) $testname = $tsurname;
-		}
-		return $nsurname;
-	}
-	return false;
-}
 
 /**
  * Get first letter
@@ -1092,7 +1061,7 @@ function GetIndiNames($indirec, $import=false, $marr_names=true) {
 		$j = 1;
 		while(!empty($namerec)) {
 			$name = GetNameInRecord($namerec, $import);
-			$surname = ExtractSurname($name, false);
+			$surname = ExtractSurname($name);
 			if (empty($surname)) $surname = "@N.N.";
 			$lname = preg_replace("/^[a-z0-9 \.]+/", "", $surname);
 			if (empty($lname)) $lname = $surname;
@@ -1106,7 +1075,7 @@ function GetIndiNames($indirec, $import=false, $marr_names=true) {
 			//-- check for _HEB or ROMN name sub tags
 			$addname = GetAddPersonNameInRecord($namerec, true);
 			if (!empty($addname)) {
-				$surname = ExtractSurname($addname, false);
+				$surname = ExtractSurname($addname);
 				if (empty($surname)) $surname = "@N.N.";
 				$lname = preg_replace("/^[a-z0-9 \.]+/", "", $surname);
 				if (empty($lname)) $lname = $surname;
@@ -1121,7 +1090,7 @@ function GetIndiNames($indirec, $import=false, $marr_names=true) {
 				$ct = preg_match_all("/\d _MARNM (.*)/", $namerec, $match, PREG_SET_ORDER);
 				for($i=0; $i<$ct; $i++) {
 					$marriedname = trim($match[$i][1]);
-					$surname = ExtractSurname($marriedname, false);
+					$surname = ExtractSurname($marriedname);
 					if (empty($surname)) $surname = "@N.N.";
 					$lname = preg_replace("/^[a-z0-9 \.]+/", "", $surname);
 					if (empty($lname)) $lname = $surname;
