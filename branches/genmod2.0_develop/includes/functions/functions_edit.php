@@ -47,7 +47,7 @@ require_once("includes/values/edit_data.php");
  * @param		string	$change_type	The name of the change
  * @return 	boolean	true if succeed/false if failed
  */
-function ReplaceGedrec($gid, $oldrec, $newrec, $fact="", $change_id, $change_type, $gedid="") {
+function ReplaceGedrec($gid, $oldrec, $newrec, $fact="", $change_id, $change_type, $gedid="", $gid_type) {
 	global $manual_save, $gm_user, $GEDCOMID, $chcache, $can_auto_accept, $aa_attempt;
 
 	// NOTE: Check if auto accept is possible. If there are already changes present for any ID in one $change_id, changes cannot be auto accepted.
@@ -87,9 +87,9 @@ function ReplaceGedrec($gid, $oldrec, $newrec, $fact="", $change_id, $change_typ
 		}
 	}
 
-	$sql = "INSERT INTO ".TBLPREFIX."changes (ch_cid, ch_gid, ch_file, ch_type, ch_user, ch_time, ch_fact, ch_old, ch_new)";
-	$sql .= "VALUES ('".$change_id."', '".$gid."', '".$gedid."', '".$change_type."', '".$gm_user->name."', '".time()."'";
-	$sql .= ", '".$fact."', '".DbLayer::EscapeQuery($oldrec)."', '".DbLayer::EscapeQuery($newrec)."')";
+	$sql = "INSERT INTO ".TBLPREFIX."changes (ch_cid, ch_gid, ch_file, ch_type, ch_user, ch_time, ch_fact, ch_old, ch_new, ch_gid_type)";
+	$sql .= "VALUES ('".$change_id."', '".$gid."', '".$gedid."', '".$change_type."', '".$gm_user->username."', '".time()."'";
+	$sql .= ", '".$fact."', '".DbLayer::EscapeQuery($oldrec)."', '".DbLayer::EscapeQuery($newrec)."', '".$gid_type."')";
 	$res = NewQuery($sql);
 	
 	WriteToLog("ReplaceGedrec-> Replacing gedcom record $gid ->" . $gm_user->username ."<-", "I", "G", $gedid);
@@ -115,8 +115,8 @@ function AppendGedrec($newrec, $fact="", $change_id, $change_type, $gedid="") {
 	$_SESSION["last_used"][$type] = JoinKey($xref, $GEDCOMID);
 	$newrec = preg_replace("/0 @(.*)@/", "0 @$xref@", $newrec);
 	
-	$sql = "INSERT INTO ".TBLPREFIX."changes (ch_cid, ch_gid, ch_file, ch_type, ch_user, ch_time, ch_fact, ch_new)";
-	$sql .= "VALUES ('".$change_id."', '".$xref."', '".$gedid."', '".$change_type."', '".$gm_user->username."', '".time()."', '".$fact."', '".DbLayer::EscapeQuery($newrec)."')";
+	$sql = "INSERT INTO ".TBLPREFIX."changes (ch_cid, ch_gid, ch_file, ch_type, ch_user, ch_time, ch_fact, ch_new, ch_gid_type)";
+	$sql .= "VALUES ('".$change_id."', '".$xref."', '".$gedid."', '".$change_type."', '".$gm_user->username."', '".time()."', '".$fact."', '".DbLayer::EscapeQuery($newrec)."', '".$type."')";
 	$res = NewQuery($sql);
 	WriteToLog("AppendGedrec-> Appending new $type record $xref ->" . $gm_user->username ."<-", "I", "G", $gedid);
 
@@ -128,7 +128,7 @@ function AppendGedrec($newrec, $fact="", $change_id, $change_type, $gedid="") {
 //-------------------------------------------- delete_gedrec
 //-- this function will delete the gedcom record with
 //-- the given $gid
-function DeleteGedrec($gid, $change_id, $change_type) {
+function DeleteGedrec($gid, $change_id, $change_type, $gid_type) {
 	global $manual_save, $gm_user, $GEDCOMID, $chcache, $can_auto_accept, $aa_attempt;
 	$gid = strtoupper($gid);
 	
@@ -163,8 +163,8 @@ function DeleteGedrec($gid, $change_id, $change_type) {
 		else $oldrec = FindGedcomRecord($gid);
 		$ct = preg_match("/0 @.*@\s(\w+)\s/", $oldrec, $match);
 		$ch_fact = $match[1];
-		$sql = "INSERT INTO ".TBLPREFIX."changes (ch_cid, ch_gid, ch_fact, ch_old, ch_file, ch_type, ch_user, ch_time)";
-		$sql .= "VALUES ('".$change_id."', '".$gid."', '".$ch_fact."', '".DbLayer::EscapeQuery($oldrec)."', '".$GEDCOMID."', '".$change_type."', '".$gm_user->username."', '".time()."')";
+		$sql = "INSERT INTO ".TBLPREFIX."changes (ch_cid, ch_gid, ch_fact, ch_old, ch_file, ch_type, ch_user, ch_time, ch_gid_type)";
+		$sql .= "VALUES ('".$change_id."', '".$gid."', '".$ch_fact."', '".DbLayer::EscapeQuery($oldrec)."', '".$GEDCOMID."', '".$change_type."', '".$gm_user->username."', '".time()."', '".$gid_type."')";
 		$res = NewQuery($sql);
 		// Also delete the asso recs to an indi, to preserve referential integrity
 		if ($ch_fact == "INDI" || $ch_fact == "FAM") {
@@ -181,8 +181,8 @@ function DeleteGedrec($gid, $change_id, $change_type) {
 						do {
 							$asubrec = GetSubrecord(1, "1 ASSO @".$pid1."@", $arec, $i);
 							if (!empty($asubrec)) {
-								$sql = "INSERT INTO ".TBLPREFIX."changes (ch_cid, ch_gid, ch_fact, ch_old, ch_file, ch_type, ch_user, ch_time)";
-								$sql .= "VALUES ('".$change_id."', '".$pid2."', 'ASSO', '".DbLayer::EscapeQuery($asubrec)."', '".$GEDCOMID."', '".$change_type."', '".$gm_user->username."', '".time()."')";
+								$sql = "INSERT INTO ".TBLPREFIX."changes (ch_cid, ch_gid, ch_fact, ch_old, ch_file, ch_type, ch_user, ch_time, ch_gid_type)";
+								$sql .= "VALUES ('".$change_id."', '".$pid2."', 'ASSO', '".DbLayer::EscapeQuery($asubrec)."', '".$GEDCOMID."', '".$change_type."', '".$gm_user->username."', '".time()."', 'INDI')";
 							}
 							$i++;
 						} while (!empty($asubrec));
@@ -193,8 +193,8 @@ function DeleteGedrec($gid, $change_id, $change_type) {
 							if (preg_match("/\n2 ASSO @$pid1@/", $subrec, $match)) {
 								$asubrec = GetSubrecord(2, "2 ASSO @".$pid1."@", $subrec);
 								$newsubrec = preg_replace($asubrec, "", $subrec);
-								$sql = "INSERT INTO ".TBLPREFIX."changes (ch_cid, ch_gid, ch_fact, ch_old, ch_new, ch_file, ch_type, ch_user, ch_time)";
-								$sql .= "VALUES ('".$change_id."', '".$pid2."', 'ASSO', '".DbLayer::EscapeQuery($subrec)."', '".DbLayer::EscapeQuery($newsubrec)."', '".$GEDCOMID."', '".$change_type."', '".$gm_user->username."', '".time()."')";
+								$sql = "INSERT INTO ".TBLPREFIX."changes (ch_cid, ch_gid, ch_fact, ch_old, ch_new, ch_file, ch_type, ch_user, ch_time, ch_gid_type)";
+								$sql .= "VALUES ('".$change_id."', '".$pid2."', 'ASSO', '".DbLayer::EscapeQuery($subrec)."', '".DbLayer::EscapeQuery($newsubrec)."', '".$GEDCOMID."', '".$change_type."', '".$gm_user->username."', '".time()."', 'INDI')";
 							}
 						}
 					}

@@ -119,6 +119,7 @@ abstract class GedcomRecord {
 				case "OBJE": $this->ReadMediaRecord(); break;
 				case "NOTE": $this->ReadNoteRecord(); break;
 				case "SUBM": $this->ReadSubmitterRecord(); break;
+				case "HEAD": $this->ReadHeaderRecord(); break;
 			}
 			if (empty($this->gedrec)) {
 				if (!$this->show_changes) $this->isempty = true;
@@ -556,7 +557,7 @@ abstract class GedcomRecord {
 			// We must retain the order of the fact array
 			foreach ($factarr as $key => $fact) {
 				foreach ($this->facts as $key => $factobj) {
-					if (in_array($factobj->fact, $factarr)) {
+					if ($factobj->fact == $fact) {
 						$facts[] = $factobj;
 					}
 				}
@@ -573,10 +574,12 @@ abstract class GedcomRecord {
 	
 	protected function GetLastChangeDate() {
 		
-		if (!is_null($this->lastchanged)) return $this->lastchanged;
-		$this->lastchanged = GetChangedDate(GetGedcomValue("CHAN:DATE", 1, $this->gedrec));
-		$add = GetGedcomValue("CHAN:DATE:TIME", 1, $this->gedrec);
-		if ($add) $this->lastchanged .= " - ".$add;
+		if (is_null($this->lastchanged)) {
+			$this->lastchanged = GetGedcomValue("CHAN:DATE", 1, $this->gedrec, "", false);
+			$add = GetGedcomValue("CHAN:DATE:TIME", 1, $this->gedrec, "", false);
+			if ($add) $this->lastchanged .= " ".$add;
+			$this->lastchanged = strtotime($this->lastchanged);
+		}
 		return $this->lastchanged;
 	}
 	

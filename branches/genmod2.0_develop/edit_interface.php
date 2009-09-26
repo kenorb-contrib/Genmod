@@ -381,7 +381,7 @@ switch ($action) {
 				}
 				
 				// Delete the person
-				if ($success) $success = $success && DeleteGedrec($pid, $change_id, "delete_indi");
+				if ($success) $success = $success && DeleteGedrec($pid, $change_id, "delete_indi", "INDI");
 				
 				if ($success) print "<br /><br />".$gm_lang["gedrec_deleted"];
 			}
@@ -402,7 +402,7 @@ switch ($action) {
 				$success = DeleteLinks($famid, "FAM", $change_id, $change_type, $GEDCOMID);
 				
 				if ($success) {
-					$success = $success && DeleteGedrec($famid, $change_id, $change_type);
+					$success = $success && DeleteGedrec($famid, $change_id, $change_type, "FAM");
 				}
 				if ($success) print "<br /><br />".$gm_lang["gedrec_deleted"];
 			}
@@ -416,7 +416,7 @@ switch ($action) {
 			$success = false;
 			$success = DeleteLinks($pid, "SOUR", $change_id, $change_type, $GEDCOMID);
 			if ($success) {
-				$success = $success && DeleteGedrec($pid, $change_id, $change_type);
+				$success = $success && DeleteGedrec($pid, $change_id, $change_type, "SOUR");
 			}
 			if ($success) print "<br /><br />".$gm_lang["gedrec_deleted"];
 		}
@@ -430,7 +430,7 @@ switch ($action) {
 			$success = false;
 			$success = DeleteLinks($pid, "REPO", $change_id, $change_type, $GEDCOMID);
 			if ($success) {
-				$success = $success && DeleteGedrec($pid, $change_id, $change_type);
+				$success = $success && DeleteGedrec($pid, $change_id, $change_type, "REPO");
 			}
 			if ($success) print "<br /><br />".$gm_lang["gedrec_deleted"];
 		}
@@ -443,7 +443,7 @@ switch ($action) {
 			$success = false;
 			$success = DeleteLinks($pid, "NOTE", $change_id, $change_type, $GEDCOMID);
 			if ($success) {
-				$success = $success && DeleteGedrec($pid, $change_id, $change_type);
+				$success = $success && DeleteGedrec($pid, $change_id, $change_type, "NOTE");
 			}
 			if ($success) print "<br /><br />".$gm_lang["gedrec_deleted"];
 		}
@@ -461,7 +461,7 @@ switch ($action) {
 				$success = DeleteLinks($pid, "OBJE", $change_id, $change_type, $GEDCOMID);
 				
 				if ($success) {
-					$success = $success && DeleteGedrec($pid, $change_id, $change_type);
+					$success = $success && DeleteGedrec($pid, $change_id, $change_type, "OBJE");
 				}
 				if ($success) print "<br /><br />".$gm_lang["gedrec_deleted"];
 			}
@@ -475,7 +475,7 @@ switch ($action) {
 		// Before using getsubrec, we must get the privatised gedrec. Otherwise the counter is not correct.
 		$gedrecpriv = implode("\r\n", GetAllSubrecords($gedrec, "", false, false));
 		$oldrec = GetSubRecord(1, "1 $fact", $gedrecpriv, $count);
-		$success =  ReplaceGedrec($pid, $oldrec, "", $fact, $change_id, $change_type);
+		$success =  ReplaceGedrec($pid, $oldrec, "", $fact, $change_id, $change_type, "", $pid_type); 
 		if ($success) print "<br /><br />".$gm_lang["gedrec_deleted"];
 		break;
 	
@@ -485,6 +485,7 @@ switch ($action) {
 		<form name="reorder_form" method="post" action="edit_interface.php" style="display:inline;">
 			<input type="hidden" name="action" value="reorder_media_update" />
 			<input type="hidden" name="pid" value="<?php print $pid; ?>" />
+			<input type="hidden" name="pid_type" value="<?php print $pid_type; ?>" />
 			<input type="hidden" name="change_type" value="<?php print $change_type; ?>" />
 			<table class="facts_table">
 			<tr><td class="topbottombar" colspan="2">
@@ -535,11 +536,11 @@ switch ($action) {
 			$t = getsubrecord(1,"1 OBJE", $gedrec, $i);
 			$rc = preg_match("/1 OBJE @(.*)@/", $t, $match);
 			$f[$match[1]] = $t;
-			$success = $success && (ReplaceGedrec($pid, $f[$match[1]], "", "OBJE", $change_id, $change_type));
+			$success = $success && (ReplaceGedrec($pid, $f[$match[1]], "", "OBJE", $change_id, $change_type, "", $pid_type));
 		}
 		$order = array_flip($order);
 		foreach($order as $ord => $famkey) {
-			$success = $success && (ReplaceGedrec($pid, "", $f[$famkey], "OBJE", $change_id, $change_type));
+			$success = $success && (ReplaceGedrec($pid, "", $f[$famkey], "OBJE", $change_id, $change_type, "", $pid_type));
 		}
 		if ($success) print "<br /><br />".$gm_lang["update_successful"];
 		break;
@@ -621,11 +622,11 @@ switch ($action) {
 			$t = getsubrecord(1,"1 CHIL", $gedrec, $i);
 			$rc = preg_match("/1 CHIL @(.*)@/", $t, $match);
 			$f[$match[1]] = $t;
-			$success = $success && (ReplaceGedrec($pid, $f[$match[1]], "", "CHIL", $change_id, $change_type));
+			$success = $success && (ReplaceGedrec($pid, $f[$match[1]], "", "CHIL", $change_id, $change_type, "", "FAM"));
 		}
 		$order = array_flip($order);
 		foreach($order as $ord => $famkey) {
-			$success = $success && (ReplaceGedrec($pid, "", $f[$famkey], "CHIL", $change_id, $change_type));
+			$success = $success && (ReplaceGedrec($pid, "", $f[$famkey], "CHIL", $change_id, $change_type, "", "FAM"));
 		}
 		if ($success) print "<br /><br />".$gm_lang["update_successful"];
 		break;
@@ -699,11 +700,11 @@ switch ($action) {
 			$t = getsubrecord(1,"1 FAMS", $gedrec, $i);
 			$rc = preg_match("/1 FAMS @(.*)@/", $t, $match);
 			$f[$match[1]] = $t;
-			$success = $success && ReplaceGedrec($pid, $f[$match[1]], "", "FAMS", $change_id, $change_type);
+			$success = $success && ReplaceGedrec($pid, $f[$match[1]], "", "FAMS", $change_id, $change_type, "", "INDI");
 		}
 		$order = array_flip($order);
 		foreach($order as $ord => $famkey) {
-			$success = $success && ReplaceGedrec($pid, "", $f[$famkey], "FAMS", $change_id, $change_type);
+			$success = $success && ReplaceGedrec($pid, "", $f[$famkey], "FAMS", $change_id, $change_type, "", "INDI");
 		}
 		if ($success) print "<br /><br />".$gm_lang["update_successful"];
 		break;
@@ -784,7 +785,7 @@ switch ($action) {
 					else $for = "";
 					$recnew = preg_replace("/$repl/", "$for", $rec);
 				}
-				$success = $success && ReplaceGedrec($pid, $rec, $recnew, "FAMC", $change_id, $change_type);
+				$success = $success && ReplaceGedrec($pid, $rec, $recnew, "FAMC", $change_id, $change_type, "", "INDI");
 			}
 			if (GetChangeData(true, $pid, true, "", "")) {
 				$rec = GetChangeData(false, $pid, true, "gedlines", "");
@@ -796,12 +797,12 @@ switch ($action) {
 			if ($fam["famid"] != $select_prim) {
 				if ($fam["primary"] == "Y") {
 					$recnew = preg_replace("/2 _PRIMARY Y/", "", $rec);
-					$success = $success && ReplaceGedrec($pid, $rec, $recnew, "FAMC", $change_id, $change_type);
+					$success = $success && ReplaceGedrec($pid, $rec, $recnew, "FAMC", $change_id, $change_type, "", "INDI");
 				}
 			}
 			else if ($fam["primary"] != "Y") {
 				$recnew = trim($rec)."\r\n2 _PRIMARY Y";
-				$success = $success && ReplaceGedrec($pid, $rec, $recnew, "FAMC", $change_id, $change_type);
+				$success = $success && ReplaceGedrec($pid, $rec, $recnew, "FAMC", $change_id, $change_type, "", "INDI");
 			}
 		}
 		if ($success) print "<br /><br />".$gm_lang["update_successful"];
@@ -973,7 +974,7 @@ switch ($action) {
 			// Replace the father link in the fam record
 			$oldrec = GetSubRecord(1, "1 HUSB @$father->xref@", $gedrec);
 			$newrec = preg_replace("/1 HUSB @$father->xref@/", "1 HUSB @$HUSB@\r\n", $oldrec);
-			if (trim($oldrec) != trim($newrec)) ReplaceGedrec($famid, $oldrec, $newrec, "HUSB", $change_id, $change_type);
+			if (trim($oldrec) != trim($newrec)) ReplaceGedrec($famid, $oldrec, $newrec, "HUSB", $change_id, $change_type, "", "FAM");
 
 			// Remove the fam link from the old father record
 			$famids = FindSfamilyIds($father->xref, true);
@@ -981,7 +982,7 @@ switch ($action) {
 			foreach ($famids as $key => $fam) {
 				if ($fam["famid"] == $famid) {
 					$oldfath = GetSubrecord(1, "1 FAMS @$famid@", $frec, 1);
-					$success = $success && ReplaceGedrec($father->xref, $oldfath, "", "FAMS", $change_id, $change_type);
+					$success = $success && ReplaceGedrec($father->xref, $oldfath, "", "FAMS", $change_id, $change_type, "", "INDI");
 					break;
 				}
 			}
@@ -995,7 +996,7 @@ switch ($action) {
 			}
 			if (!$found) {
 				$newrec = "1 FAMS @$famid@\r\n";
-				$success = $success && ReplaceGedrec($HUSB, "", $newrec, "FAMS", $change_id, $change_type);
+				$success = $success && ReplaceGedrec($HUSB, "", $newrec, "FAMS", $change_id, $change_type, "", "INDI");
 			}
 			$updated = true;
 		}
@@ -1004,7 +1005,7 @@ switch ($action) {
 			
 			// Remove the father link from the fam
 			$oldfam = GetSubrecord(1, "1 HUSB @$father->xref", $gedrec, 1);
-			$success = $success && ReplaceGedrec($famid, $oldfam, "", "HUSB", $change_id, $change_type);
+			$success = $success && ReplaceGedrec($famid, $oldfam, "", "HUSB", $change_id, $change_type, "", "FAM");
 			$updated = true;
 			
 			// Remove the fam link from the old father record
@@ -1013,7 +1014,7 @@ switch ($action) {
 			foreach ($famids as $key => $fam) {
 				if ($fam["famid"] == $famid) {
 					$oldfath = GetSubrecord(1, "1 FAMS @$famid@", $frec, 1);
-					$success = $success && ReplaceGedrec($father->xref, $oldfath, "", "FAMS", $change_id, $change_type);
+					$success = $success && ReplaceGedrec($father->xref, $oldfath, "", "FAMS", $change_id, $change_type, "", "INDI");
 					break;
 				}
 			}
@@ -1026,7 +1027,7 @@ switch ($action) {
 			$hrec = GetSubrecord(1, "1 HUSB @$HUSB@", $gedrec, 1);
 			if (empty($hrec)) {
 				$newrec = "1 HUSB @$HUSB@\r\n";
-				$success = $success && ReplaceGedrec($famid, "", $newrec, "HUSB", $change_id, $change_type);
+				$success = $success && ReplaceGedrec($famid, "", $newrec, "HUSB", $change_id, $change_type, "", "INDI");
 			}
 			
 			// Add the fam link to the new father
@@ -1038,7 +1039,7 @@ switch ($action) {
 			}
 			if (!$found) {
 				$newrec = "1 FAMS @$famid@\r\n";
-				$success = $success && ReplaceGedrec($HUSB, "", $newrec, "FAMS", $change_id, $change_type);
+				$success = $success && ReplaceGedrec($HUSB, "", $newrec, "FAMS", $change_id, $change_type, "", "INDI");
 			}
 			$updated = true;
 		}
@@ -1049,7 +1050,7 @@ switch ($action) {
 			// Replace the mother link in the fam record
 			$oldrec = GetSubRecord(1, "1 WIFE @$mother->xref@", $gedrec);
 			$newrec = preg_replace("/1 WIFE @$father->xref@/", "1 WIFE @$HUSB@\r\n", $oldrec);
-			if (trim($oldrec) != trim($newrec)) ReplaceGedrec($famid, $oldrec, $newrec, "WIFE", $change_id, $change_type);
+			if (trim($oldrec) != trim($newrec)) ReplaceGedrec($famid, $oldrec, $newrec, "WIFE", $change_id, $change_type, "", "FAM");
 			
 			// Remove the fam link from the old mother record
 			$famids = FindSfamilyIds($mother->xref, true);
@@ -1057,7 +1058,7 @@ switch ($action) {
 			foreach ($famids as $key => $fam) {
 				if ($fam["famid"] == $famid) {
 					$oldmoth = GetSubrecord(1, "1 FAMS @$famid@", $mrec, 1);
-					$success = $success && ReplaceGedrec($mother->xref, $oldmoth, "", "FAMS", $change_id, $change_type);
+					$success = $success && ReplaceGedrec($mother->xref, $oldmoth, "", "FAMS", $change_id, $change_type, "", "INDI");
 					break;
 				}
 			}
@@ -1071,7 +1072,7 @@ switch ($action) {
 			}
 			if (!$found) {
 				$newrec = "1 FAMS @$famid@\r\n";
-				$success = $success && ReplaceGedrec($WIFE, "", $newrec, "FAMS", $change_id, $change_type);
+				$success = $success && ReplaceGedrec($WIFE, "", $newrec, "FAMS", $change_id, $change_type, "", "INDI");
 			}
 			$updated = true;
 		}
@@ -1081,7 +1082,7 @@ switch ($action) {
 			
 			// Remove the mother link from the fam
 			$oldfam = GetSubrecord(1, "1 WIFE @$mother->xref", $gedrec, 1);
-			$success = $success && ReplaceGedrec($famid, $oldfam, "", "WIFE", $change_id, $change_type);
+			$success = $success && ReplaceGedrec($famid, $oldfam, "", "WIFE", $change_id, $change_type, "", "FAM");
 			$updated = true;
 			
 			// Remove the fam link from the old mother record
@@ -1090,7 +1091,7 @@ switch ($action) {
 			foreach ($famids as $key => $fam) {
 				if ($fam["famid"] == $famid) {
 					$oldmoth = GetSubrecord(1, "1 FAMS @$famid@", $mrec, 1);
-					$success = $success && ReplaceGedrec($mother->xref, $oldmoth, "", "FAMS", $change_id, $change_type);
+					$success = $success && ReplaceGedrec($mother->xref, $oldmoth, "", "FAMS", $change_id, $change_type, "", "INDI");
 					break;
 				}
 			}
@@ -1104,7 +1105,7 @@ switch ($action) {
 			$mrec = GetSubrecord(1, "1 WIFE @$WIFE@", $gedrec, 1);
 			if (empty($mrec)) {
 				$newrec = "1 WIFE @$WIFE@\r\n";
-				$success = $success && ReplaceGedrec($famid, "", $newrec, "WIFE", $change_id, $change_type);
+				$success = $success && ReplaceGedrec($famid, "", $newrec, "WIFE", $change_id, $change_type, "", "FAM");
 			}
 			
 			// Add the fam link to the new mother
@@ -1116,7 +1117,7 @@ switch ($action) {
 			}
 			if (!$found) {
 				$newrec = "1 FAMS @$famid@\r\n";
-				$success = $success && ReplaceGedrec($WIFE, "", $newrec, "FAMS", $change_id, $change_type);
+				$success = $success && ReplaceGedrec($WIFE, "", $newrec, "FAMS", $change_id, $change_type, "", "INDI");
 			}
 			$updated = true;
 		}
@@ -1142,13 +1143,13 @@ switch ($action) {
 				// NOTE: If not, add it to the family record
 				if (preg_match("/1 CHIL @$CHIL@/", $gedrec)==0) {
 					$newrec = "1 CHIL @$CHIL@\r\n";
-					$success = $success && ReplaceGedrec($famid, "", $newrec, "CHIL", $change_id, $change_type);
+					$success = $success && ReplaceGedrec($famid, "", $newrec, "CHIL", $change_id, $change_type, "", "FAM");
 					$updated = true;
 					// NOTE: Check for a family reference in the child record
 					if (!empty($indirec) && (preg_match("/1 FAMC @$famid@/", $indirec)==0)) {
 						$newrec = "1 FAMC @$famid@\r\n";
 						if (!empty($pedi)) $newrec .= "2 PEDI ".$pedi."\r\n";
-						$success = $success && ReplaceGedrec($CHIL, "", $newrec, "FAMC", $change_id, $change_type);
+						$success = $success && ReplaceGedrec($CHIL, "", $newrec, "FAMC", $change_id, $change_type, "", "INDI");
 					}
 				}
 				// NOTE: it's already there, check for PEDI update
@@ -1158,15 +1159,15 @@ switch ($action) {
 					$pediold = GetGedcomValue("PEDI", 2, $oldprec);
 					if (empty($pediold) && (!empty($pedi))) {
 						$newrec = trim($oldfrec) . "\r\n"."2 PEDI ".$pedi; 
-						$success = $success && ReplaceGedrec($CHIL, $oldfrec, $newrec, "FAMC", $change_id, $change_type);
+						$success = $success && ReplaceGedrec($CHIL, $oldfrec, $newrec, "FAMC", $change_id, $change_type, "", "INDI");
 					}
 					else if (!empty($pediold) && !empty($pedi)) {
 						$newrec = preg_replace("/2 PEDI $pediold/", "2 PEDI $pedi", $oldfrec);
-						$success = $success && ReplaceGedrec($CHIL, $oldfrec, $newrec, "FAMC", $change_id, $change_type);
+						$success = $success && ReplaceGedrec($CHIL, $oldfrec, $newrec, "FAMC", $change_id, $change_type, "", "INDI");
 					}
 					else if (!empty($pediold) && empty($pedi)) {
 						$newrec = preg_replace("/$oldprec/", "", $oldfrec);
-						$success = $success && ReplaceGedrec($CHIL, $oldfrec, $newrec, "FAMC", $change_id, $change_type);
+						$success = $success && ReplaceGedrec($CHIL, $oldfrec, $newrec, "FAMC", $change_id, $change_type, "", "INDI");
 					}
 				}
 			}
@@ -1181,12 +1182,12 @@ switch ($action) {
 				if (!in_array($child->xref, $newchildren)) {
 					//-- remove the CHIL link from the family record
 					$oldrec = GetSubRecord(1, "1 CHIL @$child->xref@", $gedrec, 1);
-					$success = $success && ReplaceGedrec($famid, $oldrec, "", "CHIL", $change_id, $change_type);
+					$success = $success && ReplaceGedrec($famid, $oldrec, "", "CHIL", $change_id, $change_type, "", "FAM");
 					
 					//-- remove the FAMC link from the child record
 					$chgedrec = $child->changedgedrec;
 					$oldrec = GetSubrecord(1, "1 FAMC @$famid@", $chgedrec, 1);
-					$success = $success && ReplaceGedrec($child->xref, $oldrec, "" , "FAMC", $change_id, $change_type);
+					$success = $success && ReplaceGedrec($child->xref, $oldrec, "" , "FAMC", $change_id, $change_type, "", "INDI");
 				}
 			}
 		}
@@ -1196,7 +1197,7 @@ switch ($action) {
 			$rec = GetChangeData(false, $famid, true, "gedlines");
 			$newfamrec = $rec[$GEDCOMID][$famid];
 			$ct = preg_match("/1 CHIL|HUSB|WIFE/", $newfamrec, $match);
-			if ($ct == 0) $success = $success && ReplaceGedRec($famid, $newfamrec, "", "FAM", $change_id, $change_type);
+			if ($ct == 0) $success = $success && ReplaceGedRec($famid, $newfamrec, "", "FAM", $change_id, $change_type, "", "FAM");
 		}
 		
 		if ($success) print "<br /><br />".$gm_lang["update_successful"];
@@ -1229,6 +1230,7 @@ switch ($action) {
 			print "<input type=\"hidden\" name=\"fact\" value=\"".$fact."\" />\n";
 			if ($change_type != "add_media_link") print "<input type=\"hidden\" name=\"pid\" value=\"".$pid."\" />\n";
 			print "<input type=\"hidden\" name=\"change_type\" value=\"".$change_type."\" />\n";
+			print "<input type=\"hidden\" name=\"pid_type\" value=\"".$pid_type."\" />\n";
 			print "<table class=\"facts_table\">";
 			
 			if (!in_array($fact, $separatorfacts)) AddTagSeparator($fact);
@@ -1324,7 +1326,7 @@ switch ($action) {
 		$ct = preg_match("/1\s(\w+).*/", $newrec, $match);
 		if ($ct > 0) {
 			$fact = $match[1];
-			$success = ReplaceGedrec($pid, "", $newrec, $fact, $change_id, $change_type);
+			$success = ReplaceGedrec($pid, "", $newrec, $fact, $change_id, $change_type, "", $pid_type);
 		}
 		if ($success) print "<br /><br />".$gm_lang["update_successful"];
 		break;
@@ -1431,7 +1433,7 @@ switch ($action) {
 			$ct = preg_match("/1 CHIL @$xref@/", $newrec, $match);
 			if ($ct == 0) {
 				$newrec = "1 CHIL @$xref@\r\n";
-				ReplaceGedrec($famid, "", $newrec, "CHIL", $change_id, $change_type);
+				ReplaceGedrec($famid, "", $newrec, "CHIL", $change_id, $change_type, "", "FAM");
 				$success = true;
 			}
 			else print $famid." &lt -- &gt ".$xref.": ".$gm_lang["link_exists"];
@@ -1510,7 +1512,6 @@ switch ($action) {
 			$newrec .= "1 DEAT Y\r\n";
 			if ($addsource) $newrec .= "2 SOUR @XXX@\r\n";
 		}
-		
 		$newrec = HandleUpdates($newrec);
 		if ($addsource == "2") {
 			$addsourcevalue = GetSubRecord(1, "1 SOUR", $newrec);
@@ -1520,7 +1521,7 @@ switch ($action) {
 		if ($addsource) $newrec = preg_replace("/2 SOUR @XXX@\r\n/", $addsourcevalue, $newrec); 
 		// NOTE: Save the new indi record and get the new ID
 		$xref = AppendGedrec($newrec, "INDI", $change_id, $change_type);
-		
+	
 		if ($xref) print "<br /><br />".$gm_lang["update_successful"];
 		else exit;
 		
@@ -1563,20 +1564,24 @@ switch ($action) {
 			if (!empty($famrec)) {
 				$famrec = trim($famrec);
 				$newrec = "1 $famtag @$xref@\r\n";
-				ReplaceGedrec($famid, "", $newrec, $fact, $change_id, $change_type);
+				ReplaceGedrec($famid, "", $newrec, $fact, $change_id, $change_type, "", "FAM");
 			}
 		}
 		if ((!empty($famid)) && ($famid != "new")) {
 			$newrec = "";
 			// NOTE: Check if there are changes present, if not get the record otherwise the changed record
-			if (!GetChangeData(true, $xref, true)) $newrec = FindGedcomRecord($xref);
-			else $newrec = GetChangeData(false, $xref, true, "gedlines");
+			if (!GetChangeData(true, $xref, true)) {
+				$newrec = ReadGedcomRecord($xref, $GEDCOMID, "INDI");
+			}
+			else {
+				$newrec = GetChangeData(false, $xref, true, "gedlines");
+			}
 			$newrec = trim($newrec[$GEDCOMID][$xref]);
 			// NOTE: Check if the record already has a link to this family
 			$ct = preg_match("/1 FAMS @$famid@/", $newrec, $match);
 			if ($ct == 0) {
 				$newrec = "1 FAMS @$famid@\r\n";
-				ReplaceGedrec($xref, "", $newrec, "FAMS", $change_id, $change_type);
+				ReplaceGedrec($xref, "", $newrec, "FAMS", $change_id, $change_type, "", "INDI");
 			}
 			else print $famid." &lt -- &gt ".$xref.": ".$gm_lang["link_exists"];
 		}
@@ -1592,7 +1597,7 @@ switch ($action) {
 			$ct = preg_match("/1 FAMS @$famid@/", $newrec, $match);
 			if ($ct == 0) {
 				$newrec = "1 FAMS @$famid@\r\n";
-				ReplaceGedrec($pid, "", $newrec, "FAMS", $change_id, $change_type);
+				ReplaceGedrec($pid, "", $newrec, "FAMS", $change_id, $change_type, "", "INDI");
 			}
 			else print $famid." &lt --- &gt ".$pid.": ".$gm_lang["link_exists"];
 		}
@@ -1644,7 +1649,7 @@ switch ($action) {
 			// Append the famid to the childs record
 			$newrec = "1 FAMC @".$famid."@\r\n";
 			if (isset($PEDI) && $PEDI != "birth") $newrec .= "2 PEDI ".$PEDI."\r\n";
-			$success = $success && ReplaceGedrec($pid, "", $newrec, "FAMC", $change_id, $change_type);
+			$success = $success && ReplaceGedrec($pid, "", $newrec, "FAMC", $change_id, $change_type, "", "INDI");
 		}
 		else {
 			// Create the new family
@@ -1655,7 +1660,7 @@ switch ($action) {
 			
 			// Append the famid to the persons record
 			$newrec = "1 FAMS @".$famid."@\r\n";
-			$success = $success && ReplaceGedrec($pid, "", $newrec, "FAMS", $change_id, $change_type);
+			$success = $success && ReplaceGedrec($pid, "", $newrec, "FAMS", $change_id, $change_type, "", "INDI");
 		}
 				
 		if ($success) print "<br /><br />".$gm_lang["update_successful"];
@@ -1719,10 +1724,10 @@ switch ($action) {
 					if (preg_match("/1 $famtag @$pid@/", $famrec)==0) {
 						// NOTE: Notify the session of change
 						$newrec = "1 $famtag @$pid@\r\n";
-						$success = $success && ReplaceGedrec($famid, "", $newrec, $famtag, $change_id, $change_type);
+						$success = $success && ReplaceGedrec($famid, "", $newrec, $famtag, $change_id, $change_type, "", "FAM");
 						$newrec = "1 $itag @$famid@\r\n";
 						if (isset($PEDI) && $PEDI != "birth") $newrec .= "2 PEDI ".$PEDI."\r\n";
-						$success = $success && ReplaceGedrec($pid, "", $newrec, $itag, $change_id, $change_type);
+						$success = $success && ReplaceGedrec($pid, "", $newrec, $itag, $change_id, $change_type, "", "INDI");
 					}
 				}
 				//-- if it is adding a husband or wife
@@ -1741,11 +1746,11 @@ switch ($action) {
 						// NOTE: Update the individual record for the person
 						if (preg_match("/1 $itag @$famid@/", $gedrec)==0) {
 							$newrec = "1 $itag @$famid@\r\n";
-							$success = $success && ReplaceGedrec($pid, "", $newrec, $itag, $change_id, $change_type);
+							$success = $success && ReplaceGedrec($pid, "", $newrec, $itag, $change_id, $change_type, "", "INDI");
 						}
 						
 						$newrec = "1 $famtag @$pid@\r\n";
-						$success = $success && ReplaceGedrec($famid, "", $newrec, $famtag, $change_id, $change_type);
+						$success = $success && ReplaceGedrec($famid, "", $newrec, $famtag, $change_id, $change_type, "", "FAM");
 					}
 				}
 				if ($success) print "<br /><br />".$gm_lang["update_successful"];
@@ -1867,19 +1872,19 @@ switch ($action) {
 			}
 			if (!empty($famrec)) {
 				$newrec = "1 $famtag @$xref@\r\n";
-				ReplaceGedrec($famid, "", $newrec, $famtag, $change_id, $change_type);
+				ReplaceGedrec($famid, "", $newrec, $famtag, $change_id, $change_type, "", "FAM");
 			}
 		}
 		if ((!empty($famid))&&($famid != "new")) {
 				$newrec = "1 FAMS @$famid@\r\n";
-				ReplaceGedrec($xref, "", $newrec, "FAMS", $change_id, $change_type);
+				ReplaceGedrec($xref, "", $newrec, "FAMS", $change_id, $change_type, "", "INDI");
 		}
 		if (!empty($pid)) {
 			if ($gedrec) {
 				$ct = preg_match("/1 FAMC @$famid@/", $gedrec);
 				if ($ct==0) {
 					$newrec = "1 FAMC @$famid@\r\n";
-					ReplaceGedrec($pid, "", $newrec, "FAMC", $change_id, $change_type);
+					ReplaceGedrec($pid, "", $newrec, "FAMC", $change_id, $change_type, "", "INDI");
 				}
 			}
 		}
@@ -1889,12 +1894,12 @@ switch ($action) {
 			if (!empty($MARR_DATE)) $newrec .= "2 DATE ".$MARR_DATE."\r\n";
 			if (!empty($MARR_PLAC)) $newrec .= "2 PLAC ".$MARR_PLAC."\r\n";
 			if ($addsource) $newrec .= $addsourcevalue;
-			ReplaceGedrec($famid, "", $newrec, "MARR", $change_id, $change_type);
+			ReplaceGedrec($famid, "", $newrec, "MARR", $change_id, $change_type, "", "FAM");
 		}
 		else if (!empty($famid) && !empty($MARR)) {
 			$newrec = "1 MARR Y\r\n";
 			if ($addsource) $newrec .= $addsourcevalue;
-			ReplaceGedrec($famid, "", $newrec, "MARR", $change_id, $change_type);
+			ReplaceGedrec($famid, "", $newrec, "MARR", $change_id, $change_type, "", "FAM");
 		}
 		break;
 		
@@ -2113,6 +2118,7 @@ switch ($action) {
 		print "<input type=\"hidden\" name=\"fact\" value=\"$fact\" />";
 		print "<input type=\"hidden\" name=\"count\" value=\"$count\" />";
 		print "<input type=\"hidden\" name=\"change_type\" value=\"$change_type\" />";
+		print "<input type=\"hidden\" name=\"pid_type\" value=\"$pid_type\" />";
 		print "<input type=\"hidden\" name=\"pid\" value=\"$pid\" />";
 		print "<table class=\"facts_table\">";
 		$orgfact = $fact;
@@ -2345,7 +2351,7 @@ switch ($action) {
 		$rectype = GetRecType($newrec);
 		if (!$rectype) $rectype = "";
 		if (trim($oldrec) != trim($newrec)) {
-			$success = (!empty($newrec)&&(ReplaceGedrec($pid, $oldrec, $newrec, $rectype, $change_id, $change_type)));
+			$success = (!empty($newrec)&&(ReplaceGedrec($pid, $oldrec, $newrec, $rectype, $change_id, $change_type, "", $rectype)));
 			if ($success) print "<br /><br />".$gm_lang["update_successful"];
 		}
 		break;
@@ -2468,7 +2474,7 @@ switch ($action) {
 						}
 						else if (!empty($MARR)) {
 							$famrec .= "1 MARR Y\r\n";
-							ReplaceGedrec($famid, "", $famrec, "MARR", $change_id, $change_type);
+							ReplaceGedrec($famid, "", $famrec, "MARR", $change_id, $change_type, "", "FAM");
 						}
 						$famid = AppendGedrec($famrec, "FAM", $change_id, $change_type);
 					}
@@ -2476,13 +2482,13 @@ switch ($action) {
 						// NOTE: Notify the session of change
 						// NOTE: Add the new FAM ID to the spouse record
 						$newrec = "1 FAMS @$famid@\r\n";
-						ReplaceGedrec($spid, "", $newrec, "FAMS", $change_id, $change_type);
+						ReplaceGedrec($spid, "", $newrec, "FAMS", $change_id, $change_type, "", "INDI");
 					}
 					if (!empty($pid)) {
 						// NOTE: Notify the session of change
 						// NOTE: Add the new FAM ID to the active person record
 						$newrec = "1 FAMS @$famid@\r\n";
-						ReplaceGedrec($pid, "", $newrec, "FAMS", $change_id, $change_type);
+						ReplaceGedrec($pid, "", $newrec, "FAMS", $change_id, $change_type, "", "INDI");
 					}
 					if ($famtag == "HUSB") print $gm_lang["husband_added"];
 					else if ($famtag == "WIFE") print $gm_lang["wife_added"];
@@ -2534,7 +2540,7 @@ switch ($action) {
 		$chanrec = GetSubrecord(1, "1 CHAN", $oldrecord);
 		$orec = preg_replace("/$chanrec/", "", $oldrecord);
 		if (trim($newrec) != trim($orec)) {
-			$success = (ReplaceGedrec($pid, $oldrecord, $newrec, $fact, $change_id, $change_type, $gedfile));
+			$success = (ReplaceGedrec($pid, $oldrecord, $newrec, $fact, $change_id, $change_type, $gedfile, "", "SUBM"));
 			if ($success) print "<br /><br />".$gm_lang["update_successful"];
 		}
 	}
@@ -2542,7 +2548,7 @@ switch ($action) {
 		$newrec = "0 @new@ SUBM\r\n";
 		$newrec = HandleUpdates($newrec);
 		$subid = AppendGedrec($newrec, "SUBM", $change_id, $change_type, $gedfile);
-		$success = (ReplaceGedrec("HEAD", "", "1 SUBM @".$subid."@", "SUBM", $change_id, $change_type, $gedfile));
+		$success = (ReplaceGedrec("HEAD", "", "1 SUBM @".$subid."@", "SUBM", $change_id, $change_type, $gedfile, "", "HEAD"));
 		if ($success) print "<br /><br />".$gm_lang["update_successful"];
 		
 	}
@@ -2626,11 +2632,12 @@ switch ($action) {
 				}
 			}
 		}
-		if (trim(SortFactDetails($oldrec)) != trim(SortFactDetails($newrec))) $success = ReplaceGedrec($pid, $oldrec, $newrec, $fact, $change_id, $change_type, $gedfile);
+		if (trim(SortFactDetails($oldrec)) != trim(SortFactDetails($newrec))) $success = ReplaceGedrec($pid, $oldrec, $newrec, $fact, $change_id, $change_type, $gedfile, $pid_type);
 		if ($success) print "<br /><br />".$gm_lang["update_successful"];
 		break;
 	
 }
+	print "hier6";	
 
 // if there were link errors, don't auto-accept and don't auto-close.
 if (!isset($link_error)) $link_error = false;

@@ -37,7 +37,7 @@ $GM_BLOCKS["print_user_news"]["rss"]        = false;
  *
  */
 function print_user_news($block=true, $config="", $side, $index) {
-	global $gm_lang, $GM_IMAGE_DIR, $GM_IMAGES, $TEXT_DIRECTION, $command, $TIME_FORMAT, $gm_user;
+	global $gm_lang, $TEXT_DIRECTION, $command, $TIME_FORMAT, $gm_user;
 
 	$usernews = NewsController::getUserNews($gm_user->username);
 

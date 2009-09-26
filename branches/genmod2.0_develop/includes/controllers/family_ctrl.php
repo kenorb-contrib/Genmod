@@ -169,7 +169,7 @@ class FamilyController extends DetailController
 			// edit_fam / reorder_media. Only show if #media > 1
 			if ($this->family->media_count > 1) {
 				$submenu = new Menu($gm_lang['reorder_media']);
-				$submenu->addLink("reorder_media('".$this->family->xref."', 'reorder_media');");
+				$submenu->addLink("reorder_media('".$this->family->xref."', 'reorder_media', 'FAM');");
 				$menu->addSubmenu($submenu);
 			}
 			

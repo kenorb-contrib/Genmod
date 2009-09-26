@@ -998,9 +998,9 @@ function deleterepository(pid, change_type) {
 	 return false;
 }
 
-function delete_record(pid, fact, count, change_type) {
+function delete_record(pid, fact, count, change_type, pid_type) {
 	if (!count) count = 1;
-	window.open('edit_interface.php?action=delete&pid='+pid+'&change_type='+change_type+'&fact='+fact+'&count='+count+"&"+sessionname+"="+sessionid, '', 'top=50,left=50,width=600,height=500,resizable=1,scrollbars=1');
+	window.open('edit_interface.php?action=delete&pid='+pid+'&pid_type='+pid_type+'&change_type='+change_type+'&fact='+fact+'&count='+count+"&"+sessionname+"="+sessionid, '', 'top=50,left=50,width=600,height=500,resizable=1,scrollbars=1');
 	return false;
 }
 
@@ -1012,8 +1012,8 @@ function reorder_children(famid, change_type) {
 	return false;
 }
 
-function reorder_media(famid, change_type) {
-	window.open('edit_interface.php?action=reorder_media&pid='+famid+'&change_type='+change_type+"&"+sessionname+"="+sessionid, '', 'top=50,left=50,width=710,height=500,resizable=1,scrollbars=1');
+function reorder_media(famid, change_type, pid_type) {
+	window.open('edit_interface.php?action=reorder_media&pid='+famid+'&pid_type='+pid_type+'&change_type='+change_type+"&"+sessionname+"="+sessionid, '', 'top=50,left=50,width=710,height=500,resizable=1,scrollbars=1');
 	return false;
 }
 
@@ -1035,12 +1035,12 @@ function change_family_members(famid, change_type) {
 /**
  * Add
  */
-function add_record(pid, fact, change_type) {
+function add_record(pid, fact, change_type, pid_type) {
 	factfield = document.getElementById(fact);
 	if (factfield) {
 		factvalue = factfield.options[factfield.selectedIndex].value;
-		if (factvalue.substr(0, 10)=="clipboard_") window.open('edit_interface.php?action=paste&pid='+pid+'&change_type='+change_type+'&fact='+factvalue.substr(10)+"&"+sessionname+"="+sessionid, '', 'top=50,left=50,width=710,height=500,resizable=1,scrollbars=1');
-		else window.open('edit_interface.php?action=add&pid='+pid+'&change_type='+change_type+'&fact='+factvalue+"&"+sessionname+"="+sessionid, '', 'top=50,left=50,width=710,height=500,resizable=1,scrollbars=1');
+		if (factvalue.substr(0, 10)=="clipboard_") window.open('edit_interface.php?action=paste&pid='+pid+'&pid_type='+pid_type+'&change_type='+change_type+'&fact='+factvalue.substr(10)+"&"+sessionname+"="+sessionid, '', 'top=50,left=50,width=710,height=500,resizable=1,scrollbars=1');
+		else window.open('edit_interface.php?action=add&pid='+pid+'&pid_type='+pid_type+'&change_type='+change_type+'&fact='+factvalue+"&"+sessionname+"="+sessionid, '', 'top=50,left=50,width=710,height=500,resizable=1,scrollbars=1');
 	}
 	return false;
 }
@@ -1126,8 +1126,8 @@ function addnewgnote(field, change_type) {
 /**
  * Edit
  */
-function edit_record(pid, fact, count, change_type) {
-	window.open('edit_interface.php?action=edit&pid='+pid+'&fact='+fact+'&count='+count+'&change_type='+change_type+"&"+sessionname+"="+sessionid, '', 'top=50,left=50,width=900,height=650,resizable=1,scrollbars=1');
+function edit_record(pid, fact, count, change_type, pid_type) {
+	window.open('edit_interface.php?action=edit&pid='+pid+'&pid_type='+pid_type+'&fact='+fact+'&count='+count+'&change_type='+change_type+"&"+sessionname+"="+sessionid, '', 'top=50,left=50,width=900,height=650,resizable=1,scrollbars=1');
 	return false;
 }
 

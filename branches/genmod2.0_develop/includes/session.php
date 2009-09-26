@@ -770,7 +770,7 @@ else {
 	require_once($THEME_DIR."theme.php");
 }
 
-require_once($GM_BASE_DIRECTORY."hitcount.php"); //--load the hit counter
+if ($SHOW_COUNTER) $hits = CounterFunctions::GetCounter(); //--load the hit counter
 
 if ($Languages_Default) {					// If Languages not yet configured
 	$gm_lang_use["english"] = false;		//   disable English

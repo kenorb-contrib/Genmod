@@ -117,8 +117,8 @@ $controller->CheckRawEdited();
 				if (!$controller->indi->isdeleted && $factobj->style != "change_old" && $controller->indi->canedit) {
 					if ($controller->indi->sexdetails["add"]) print "<br /><a class=\"font9\" href=\"#\" onclick=\"add_new_record('".$controller->xref."', 'SEX'); return false;\">".$gm_lang["edit"]."</a>";
 					else {
-						print "<br /><a class=\"font9\" href=\"#\" onclick=\"edit_record('".$controller->xref."', 'SEX', 1, 'edit_gender'); return false;\">".$gm_lang["edit"]."</a> | ";
-						print "<a class=\"font9\" href=\"#\" onclick=\"delete_record('".$controller->xref."', 'SEX', 1, 'edit_gender'); return false;\">".$gm_lang["delete"]."</a>\n";
+						print "<br /><a class=\"font9\" href=\"#\" onclick=\"edit_record('".$controller->xref."', 'SEX', 1, 'edit_gender', 'INDI'); return false;\">".$gm_lang["edit"]."</a> | ";
+						print "<a class=\"font9\" href=\"#\" onclick=\"delete_record('".$controller->xref."', 'SEX', 1, 'edit_gender', 'INDI'); return false;\">".$gm_lang["delete"]."</a>\n";
 					}
 				}
 				print "</span>";

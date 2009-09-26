@@ -42,6 +42,7 @@ class Family extends GedcomRecord {
 	public $label = null;					// Label set in the person class as a specific label for this family of the person
 	private $title = null;					// Printable name for the family in normal order
 	private $descriptor = null;				// Same as title
+	private $adddescriptor = null;			// Printable addname, names in order firstname lastname
 		
 	// Family members
 	private $husb = null;					// Holder for the husband object (or new, if showing changes)
@@ -176,6 +177,9 @@ class Family extends GedcomRecord {
 			case "descriptor":
 				return $this->GetTitle();
 				break;
+			case "adddescriptor":
+				return $this->GetAddTitle();
+				break;
 			default:
 				return parent::__get($property);
 				break;
@@ -261,6 +265,13 @@ class Family extends GedcomRecord {
 		return $this->title;
 	}
 	
+	private function GetAddTitle() {
+		
+		if (is_null($this->adddescriptor)) {
+			$this->title = NameFunctions::GetFamilyAddDescriptor($this, true);
+		}
+		return $this->adddescriptor;
+	}
 	/**
 	 * get the husbands ID
 	 * @return string

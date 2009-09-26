@@ -35,10 +35,10 @@ $GM_BLOCKS["print_todays_events"]["rss"]		= true;
 //-- today's events block
 //-- this block prints a list of today's upcoming events of living people in your gedcom
 function print_todays_events($block=true, $config="", $side, $index) {
-	global $gm_lang, $month, $year, $day, $monthtonum, $HIDE_LIVE_PEOPLE, $SHOW_ID_NUMBERS, $command, $TEXT_DIRECTION, $SHOW_FAM_ID_NUMBERS;
-	global $GM_IMAGE_DIR, $GM_IMAGES, $DEBUG, $ASC, $IGNORE_FACTS, $IGNORE_YEAR, $LAST_QUERY, $GM_BLOCKS;
-	global $USE_RTL_FUNCTIONS, $NAME_REVERSE, $GEDCOMID;
-	global $hDay, $hMonth, $hYear, $gm_user;
+	global $gm_lang, $command, $TEXT_DIRECTION;
+	global $GM_IMAGE_DIR, $GM_IMAGES, $GM_BLOCKS;
+	global $NAME_REVERSE, $GEDCOMID;
+	global $gm_user;
 
 	$block = true;// Always restrict this block's height
 
@@ -52,7 +52,7 @@ function print_todays_events($block=true, $config="", $side, $index) {
 
 	$action = "today";
 
-	$found_facts = GetCachedEvents($action, 1, $filter, $onlyBDM, $skipfacts);
+	$found_facts = BlockFunctions::GetCachedEvents($action, 1, $filter, $onlyBDM, $skipfacts);
 
 	 //-- Start output
 	print "<div id=\"on_this_day_events\" class=\"block\">";
@@ -100,8 +100,8 @@ function print_todays_events($block=true, $config="", $side, $index) {
 			$factrec = $factarr[1];
 			if ($person->disp && $fact->disp) {
 				$text = GetCalendarFact($factrec, $action, $filter, $gid);
-				if ($text!="filter") {
-					if ($lastgid!=$gid) {
+				if ($text != "filter") {
+					if ($lastgid != $gid) {
 						if ($lastgid != "") print "<br />";
 						if ($NAME_REVERSE) $name = str_replace(",", "", $factarr[4]);
 						else $name = $factarr[4];
@@ -112,7 +112,7 @@ function print_todays_events($block=true, $config="", $side, $index) {
 						else print $GM_IMAGES["sexn"]["small"]."\" title=\"".$gm_lang["unknown"]."\" alt=\"".$gm_lang["unknown"];
 						print "\" class=\"sex_image\" />";
 						print "</a><br />\n";
-						$lastgid=$gid;
+						$lastgid = $gid;
 					}
 					print "<div class=\"indent" . ($TEXT_DIRECTION=="rtl"?"_rtl":"") . "\">";
 					print $text;
@@ -126,7 +126,7 @@ function print_todays_events($block=true, $config="", $side, $index) {
 		if ($factarr[2]=="FAM") {
 			$family =& Family::GetInstance($factarr[0], "", $GEDCOMID);
 			$fact = new Fact($factarr[0], $factarr[6], $factarr[1]);
-			if ((!is_object($family->husb || $family->husb->disp)) && (!is_object($family->wife || $family->wife->disp)) && $fact->disp) {
+			if ($family->disp && $fact->disp) {
 				$text = GetCalendarFact($factarr[1], $action, $filter, $factarr[0]);
 				if ($text!="filter") {
 					if ($lastgid!=$factarr[0]) {
@@ -134,10 +134,7 @@ function print_todays_events($block=true, $config="", $side, $index) {
 						print "<a href=\"family.php?famid=".$family->xref."&amp;gedid=".$family->gedcomid."\"><b>";
 						print $family->sortable_name;
 						print "</b>";
-						if ($SHOW_FAM_ID_NUMBERS) {
-							if ($TEXT_DIRECTION=="ltr") print " &lrm;(".$family->xref.")&lrm;";
-							else print " &rlm;(".$family->xref.")&rlm;";
-						}
+						print $family->addxref;
 						print "</a><br />\n";
 						$lastgid=$family->xref;
 					}
@@ -169,7 +166,8 @@ function print_todays_events($block=true, $config="", $side, $index) {
 }
 
 function print_todays_events_config($config) {
-	global $gm_lang, $GM_BLOCKS, $TEXT_DIRECTION;
+	global $gm_lang, $GM_BLOCKS;
+	
 	if (empty($config)) $config = $GM_BLOCKS["print_todays_events"]["config"];
 	if (!isset($config["filter"])) $config["filter"] = "all";
 	if (!isset($config["onlyBDM"])) $config["onlyBDM"] = "no";

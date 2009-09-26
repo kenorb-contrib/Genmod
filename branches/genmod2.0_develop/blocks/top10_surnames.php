@@ -46,7 +46,11 @@ function print_block_name_top10($block=true, $config="", $side, $index) {
 
 	//-- cache the result in the session so that subsequent calls do not have to
 	//-- perform the calculation all over again.
-	$surnames = GetTopSurnames($config["num"]);
+	if (!isset($_SESSION["top10_surnames"])) {
+		$surnames = BlockFunctions::GetTopSurnames($config["num"]);
+		$_SESSION["top10_surnames"] = serialize($surnames);
+	}
+	else $surnames = unserialize($_SESSION["top10_surnames"]);
 
 	if (count($surnames)>0) {
 		print "<div id=\"top10surnames\" class=\"block\">\n";

@@ -38,7 +38,9 @@ class Person extends GedcomRecord {
 	private static $personcache = array(); 	// Holder of the instances for this class
 	
 	private $name = null;					// Printable name of the person, after applying privacy (can be unknown of private)
+	private $revname = null;					// Printable name, in reversed order
 	private $addname = null;				// Printable addname of the person, after applying privacy (can be blank)
+	private $revaddname = null;				// Printable addname, in reversed order
 	private $name_array = null;				// Array of names from GetIndiNames
 	private $sortable_name = null;			// Sortable name of the person, no privacy applied
 	private $sortable_addname = null;		// Sortable addname of the person, no privacy applied
@@ -108,8 +110,14 @@ class Person extends GedcomRecord {
 			case "name":
 				return $this->getName();
 				break;
+			case "revname":
+				return $this->getRevName();
+				break;
 			case "addname":
 				return $this->getAddName();
+				break;
+			case "revaddname":
+				return $this->getRevAddName();
 				break;
 			case "name_array":
 				return $this->GetNameArray();
@@ -216,6 +224,24 @@ class Person extends GedcomRecord {
 		}
 		return $this->name;
 	}
+
+	private function getRevName() {
+		
+		if (is_null($this->revname)) {
+			$this->revname = $this->GetSortableName();
+			$this->revname = CheckNN($this->revname);
+		}
+		return $this->revname;
+	}
+	
+	private function getRevAddName() {
+		
+		if (is_null($this->revaddname)) {
+			$this->revaddname = $this->GetSortableAddName();
+			$this->revaddname = CheckNN($this->revaddname);
+		}
+		return $this->revaddname;
+	}
 	
 	private function getAddName() {
 		
@@ -243,7 +269,7 @@ class Person extends GedcomRecord {
 	private function GetSortableName() {
 		
 		if (is_null($this->sortable_name)) {
-			if ($this->show_changes && $this->ThisChanged()) $this->sortable_name = GetSortableName($this->xref, "", "", false, false, true);
+			if ($this->show_changes && $this->ThisChanged()) $this->sortable_name = NameFunctions::GetSortableName($this->xref, "", "", false, false, true);
 			else $this->sortable_name = NameFunctions::GetSortableName($this);
 		}
 		return $this->sortable_name;
@@ -261,7 +287,7 @@ class Person extends GedcomRecord {
 		
 		// NOTE: Get the array of old/new names, for display on indipage
 		if (is_null($this->changednames)) {
-			$this->changednames = GetChangeNames($this);
+			$this->changednames = PersonFunctions::GetChangeNames($this);
 		}
 		return $this->changednames;
 	}
