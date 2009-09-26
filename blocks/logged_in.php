@@ -52,7 +52,7 @@ function print_logged_in_users($block=true, $config="", $side, $index) {
 		foreach($users as $indexval => $user) {
 			if (time() - $user->sessiontime > $GM_SESSION_TIME) UserController::UserLogout($user->username);
 			else {
-				if (($gm_user->userIsAdmin()) or (($user->visibleonline) and ($gm_user->visibleonline))) $loggedusers[] = $user;
+				if (($gm_user->userIsAdmin()) || (($user->visibleonline) && ($gm_user->visibleonline))) $loggedusers[] = $user;
 				else $NumAnonymous ++;
 			}
 		}

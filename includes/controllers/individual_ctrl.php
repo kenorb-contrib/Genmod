@@ -315,7 +315,7 @@ class IndividualController extends DetailController {
 				// Reorder_media. Only show if #media > 1
 				if ($this->indi->mediafacts_count > 1) {
 					$submenu = new Menu($gm_lang['reorder_media']);
-					$submenu->addLink("reorder_media('".$this->xref."', 'reorder_media');");
+					$submenu->addLink("reorder_media('".$this->xref."', 'reorder_media', 'INDI');");
 					$menu->addSubmenu($submenu);
 				}
 				
@@ -336,7 +336,7 @@ class IndividualController extends DetailController {
 				// NOTE: Gender
 				if ($this->SEX_COUNT<2) {
 					if ($SEX_LINENUM=="new") $execute = "add_new_record('".$this->xref."', 'SEX', 'sex_edit');";
-					else $execute = "edit_record('".$this->xref."', 'SEX', 1, 'edit_gender');";
+					else $execute = "edit_record('".$this->xref."', 'SEX', 1, 'edit_gender', 'INDI');";
 					$submenu = new Menu($gm_lang["edit"]." ".$gm_lang["sex"]);
 					$submenu->addLink($execute);
 					$menu->addSubmenu($submenu);
@@ -463,7 +463,7 @@ class IndividualController extends DetailController {
 		if ($this->TOTAL_NAMES>1 && !$this->isPrintPreview() && $this->indi->canedit && $showedit) {
 			if ($this->name_count==2) print_help_link("delete_name_help", "qm", "delete_name");
 	   		print "<a href=\"#\" class=\"font9\" onclick=\"edit_name('".$this->xref."', 'NAME', '".$this->name_count."', 'edit_name'); return false;\">".$gm_lang["edit_name"]."</a> | ";
-			print "<a class=\"font9\" href=\"#\" onclick=\"delete_record('".$this->xref."', 'NAME', '".$this->name_count."', 'delete_name'); return false;\">".$gm_lang["delete_name"]."</a>\n";
+			print "<a class=\"font9\" href=\"#\" onclick=\"delete_record('".$this->xref."', 'NAME', '".$this->name_count."', 'delete_name', 'INDI'); return false;\">".$gm_lang["delete_name"]."</a>\n";
 			print "<br />\n";
 		}
 		$ct = preg_match("/\d (NOTE)|(SOUR)/", $factrec);

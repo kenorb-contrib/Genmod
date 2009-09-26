@@ -114,10 +114,10 @@ if ($action=="edituser2") {
 								$oldrec = $match[0];
 								$subrec = GetSubRecord($level, $oldrec, $indirec);
 								$newrec = preg_replace("/(\d _?EMAIL)[^\r\n]*/", "$1 ".$user->email, $subrec);
-								if ($subrec != $newrec) ReplaceGedrec($gedid, $subrec, $newrec, "EMAIL", $change_id, "edit_fact", $GEDCOMID);
+								if ($subrec != $newrec) ReplaceGedrec($gedid, $subrec, $newrec, "EMAIL", $change_id, "edit_fact", $GEDCOMID, "INDI");
 							}
 							else {
-								ReplaceGedrec($gedid, "", "1 EMAIL ".$user->email."\r\n2 RESN private", "EMAIL", $change_id, "add_fact", $GEDCOMID);
+								ReplaceGedrec($gedid, "", "1 EMAIL ".$user->email."\r\n2 RESN private", "EMAIL", $change_id, "add_fact", $GEDCOMID, "INDI");
 							}
 						}
 					}

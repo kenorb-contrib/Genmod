@@ -233,7 +233,7 @@ class NoteController extends DetailController {
 				$menu["labelpos"] = "right";
 				$menu["icon"] = "";
 				$menu["link"] = "#";
-				$menu["onclick"] = "return edit_record('$this->xref', 'NOTE', '1', 'edit_general_note');";
+				$menu["onclick"] = "return edit_record('$this->xref', 'NOTE', '1', 'edit_general_note', 'NOTE');";
 				$menu["class"] = "";
 				$menu["hoverclass"] = "";
 				$menu["flyout"] = "down";
@@ -243,7 +243,7 @@ class NoteController extends DetailController {
 				$submenu["label"] = $gm_lang["edit"];
 				$submenu["labelpos"] = "right";
 				$submenu["icon"] = "";
-				$submenu["onclick"] = "return edit_record('$this->xref', 'NOTE', '1', 'edit_general_note');";
+				$submenu["onclick"] = "return edit_record('$this->xref', 'NOTE', '1', 'edit_general_note', 'NOTE');";
 				$submenu["link"] = "#";
 				$submenu["class"] = "submenuitem";
 				$submenu["hoverclass"] = "submenuitem_hover";

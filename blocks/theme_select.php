@@ -35,33 +35,35 @@ $GM_BLOCKS["print_block_theme_select"]["rss"]       = false;
 function print_block_theme_select($style=0, $config="", $side, $index) {
 	global $ALLOW_THEME_DROPDOWN, $ALLOW_USER_THEMES, $THEME_DIR, $gm_lang, $gm_user, $themeformcount;
 	
-	print "<div id=\"theme_select\" class=\"block\">\n";
-	print "<div class=\"blockhc\">";
-	print_help_link("change_theme", "qm", "change_theme");
-	print $gm_lang["change_theme"];
-	print "</div>";
-	print "<div class=\"blockcontent center\">";
-
-	if (!isset($themeformcount)) $themeformcount = 0;
-	$themeformcount++;
-	isset($_SERVER["QUERY_STRING"]) == true?$tqstring = "?".$_SERVER["QUERY_STRING"]:$tqstring = "";
-	$frompage = $_SERVER["SCRIPT_NAME"].$tqstring;
-	$themes = GetThemeNames();
-	print "<form action=\"themechange.php\" name=\"themeform$themeformcount\" method=\"post\">";
-	print "<input type=\"hidden\" name=\"frompage\" value=\"".urlencode($frompage)."\" />";
-	print "<select name=\"mytheme\" class=\"header_select\" onchange=\"document.themeform$themeformcount.submit();\">";
-	print "<option value=\"\">".$gm_lang["change_theme"]."</option>\n";
-	foreach($themes as $indexval => $themedir) {
-			print "<option value=\"".$themedir["dir"]."\"";
-			if ($uname) {
-					if ($themedir["dir"] == $gm_user->theme) print " class=\"selected-option\"";
-			}
-			else {
-					 if ($themedir["dir"] == $THEME_DIR) print " class=\"selected-option\"";
-			}
-			print ">".$themedir["name"]."</option>\n";
+	if ($ALLOW_THEME_DROPDOWN && $ALLOW_USER_THEMES) {
+		print "<div id=\"theme_select\" class=\"block\">\n";
+		print "<div class=\"blockhc\">";
+		print_help_link("change_theme", "qm", "change_theme");
+		print $gm_lang["change_theme"];
+		print "</div>";
+		print "<div class=\"blockcontent center\">";
+	
+		if (!isset($themeformcount)) $themeformcount = 0;
+		$themeformcount++;
+		isset($_SERVER["QUERY_STRING"]) == true?$tqstring = "?".$_SERVER["QUERY_STRING"]:$tqstring = "";
+		$frompage = $_SERVER["SCRIPT_NAME"].$tqstring;
+		$themes = GetThemeNames();
+		print "<form action=\"themechange.php\" name=\"themeform$themeformcount\" method=\"post\">";
+		print "<input type=\"hidden\" name=\"frompage\" value=\"".urlencode($frompage)."\" />";
+		print "<select name=\"mytheme\" class=\"header_select\" onchange=\"document.themeform$themeformcount.submit();\">";
+		print "<option value=\"\">".$gm_lang["change_theme"]."</option>\n";
+		foreach($themes as $indexval => $themedir) {
+				print "<option value=\"".$themedir["dir"]."\"";
+				if ($gm_user->username != "") {
+						if ($themedir["dir"] == $gm_user->theme) print " class=\"selected-option\"";
+				}
+				else {
+						 if ($themedir["dir"] == $THEME_DIR) print " class=\"selected-option\"";
+				}
+				print ">".$themedir["name"]."</option>\n";
+		}
+		print "</select></form>";
+		print "</div></div>";
 	}
-	print "</select></form>";
-	print "</div></div>";
 }
 ?>

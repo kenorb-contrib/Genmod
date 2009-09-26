@@ -72,7 +72,7 @@ function print_gedcom_stats($block = true, $config="", $side, $index) {
 		print "</div>";
 		print "<div class=\"blockcontent\">";
 		print "<b><a href=\"index.php?command=gedcom\">".PrintReady($GEDCOMS[$GEDCOMID]["title"])."</a></b><br />\n";
-		$stats = GetCachedStatistics();
+		$stats = BlockFunctions::GetCachedStatistics();
 		if (isset($stats["gs_title"])) print $stats["gs_title"];
 		
 		print "<br />\n";

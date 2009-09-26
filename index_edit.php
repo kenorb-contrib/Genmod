@@ -156,6 +156,7 @@ if ($action=="updateconfig") {
 		else $ublocks->right[$index][1] = $config;
 		$ublocks->SetValues($setdefault);
 		if ($block[0] == "print_upcoming_events" || $block[0] == "print_todays_events") GedcomConfig::ResetCaches();
+		if ($block[0] == "print_block_name_top10") unset($_SESSION["top10_surnames"]);
 	}
 	print $gm_lang["config_update_ok"]."<br />\n";?>
 	<script language="JavaScript" type="text/javascript">

@@ -307,6 +307,7 @@ abstract class PersonFunctions {
 				}
 				// Remove double tags
 				$tagstoprint = array_flip(array_flip($tagstoprint));
+
 				// Get the subrecords and sort them
 /*				$factstoprint = array();
 				foreach ($tagstoprint as $key => $tag) {
@@ -733,6 +734,76 @@ abstract class PersonFunctions {
 			return $foundfact;
 		}
 		else return addslashes($retstr);
+	}
+	
+	public function GetChangeNames($person) {
+		global $changes, $gm_lang, $GEDCOMID, $show_changes, $gm_user;
+		
+		$name = array();
+		if ($show_changes && $gm_user->UserCanEditOwn($person->xref)) $onlyold = false;
+		else $onlyold = true;
+	
+		if($person->isempty) return $name;
+		
+		$newindi = false;
+		// First see if the indi exists or is new
+		$indirec = $person->gedrec;
+		$fromchange = false;
+		if (empty($indirec) && !$onlyold) {
+			$newindi = true;
+			// And see if it's a new indi
+			if ($person->isnew) {
+				$indirec = $person->changedgedrec;
+				$fromchange = true;
+			}
+		}
+		// Check if the indi is flagged for delete
+		$deleted = false;
+		if (!$onlyold && $person->isdeleted) $deleted = true;
+	
+		if (empty($indirec)) return false;
+		$result = "aa";
+		$num = 1;
+		while($result != "") {
+			$result = GetSubrecord(1, "1 NAME", $indirec, $num);
+			if (!empty($result)) {
+				if ($deleted) $resultnew = "";
+				else $resultnew = $result;
+				if ($fromchange) $name[] = array("old"=>"", "new"=>$resultnew);
+				else $name[] = array("old"=>$result, "new"=>$resultnew);
+			}
+			$num++;
+		}
+		if ($deleted) return $name;
+		
+		// we have the original names, now we get all additions and changes TODO: DELETE
+		if (!$onlyold && GetChangeData(true, $person->xref, true)) {
+			$sql = "SELECT ch_type, ch_fact, ch_old, ch_new FROM ".TBLPREFIX."changes WHERE ch_gid='".$person->xref."' AND ch_fact='NAME' AND ch_file='".$person->gedcomid."' ORDER BY ch_id";
+			$res = NewQuery($sql);
+	//		if (!$res) return false;
+		
+			// Loop through the changes and apply them to the name records
+			while ($row = $res->FetchAssoc($res->result)) {
+				if ($row["ch_type"] == "add_name") {
+					$name[] = array("old"=>"", "new"=>$row["ch_new"]);
+				}
+				if ($row["ch_type"] == "edit_name") {
+					foreach($name as $key => $namerecs) {
+						if (trim($namerecs["new"]) == trim($row["ch_old"])) {
+							$name[$key]["new"] = $row["ch_new"];
+						}
+					}
+				}
+				if ($row["ch_type"] == "delete_name") {
+					foreach($name as $key => $namerecs) {
+						if (trim($namerecs["new"]) == trim($row["ch_old"])) {
+							$name[$key]["new"] = $row["ch_new"];
+						}
+					}
+				}
+			}
+		}
+		return $name;
 	}
 }
 ?>

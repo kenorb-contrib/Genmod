@@ -192,7 +192,7 @@ if ($action!="choose") {
 					// Delete the old record2
 					$ogedid = $GEDCOMID;
 					$GEDCOMID = $ged;
-					DeleteGedrec($gid2, $change_id, $change_type);
+					DeleteGedrec($gid2, $change_id, $change_type, $type1);
 					$GEDCOMID = $ogedid;
 
 					// First add facts 2-> 1

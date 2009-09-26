@@ -78,7 +78,7 @@ function GetCommonSurnames($min) {
 	if (!CONFIGURED || !UserController::AdminUserExists() || (count($GEDCOMS)==0) || (!CheckForImport($GEDCOMID))) return $surnames;
 	//-- this line causes a bug where the common surnames list is not properly updated
 	// if ((!isset($indilist))||(!is_array($indilist))) return $surnames;
-	$surnames = GetTopSurnames(100);
+	$surnames = BlockFunctions::GetTopSurnames(100);
 	arsort($surnames);
 	$topsurns = array();
 	$i=0;

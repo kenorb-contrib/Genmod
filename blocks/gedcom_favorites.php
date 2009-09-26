@@ -52,10 +52,10 @@ function print_gedcom_favorites($block = true, $config="", $side, $index) {
 	else {
 		if ($block) $style = 1;
 		else $style = 2;
-		PrintBlockFavorites($userfavs, $side, $index, $style);
+		BlockFunctions::PrintBlockFavorites($userfavs, $side, $index, $style);
 	}
 	if ($gm_user->userGedcomAdmin()) { 
-		PrintBlockAddFavorite($command, "gedcom");
+		BlockFunctions::PrintBlockAddFavorite($command, "gedcom");
 	}
 	if ($block) print "</div>\n";
 	print "</div>"; // blockcontent

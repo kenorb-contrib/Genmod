@@ -35,10 +35,10 @@ $GM_BLOCKS["print_upcoming_events"]["rss"]			= true;
 //-- upcoming events block
 //-- this block prints a list of upcoming events of people in your gedcom
 function print_upcoming_events($block=true, $config="", $side, $index) {
-	global $gm_lang, $month, $year, $day, $monthtonum, $HIDE_LIVE_PEOPLE, $SHOW_ID_NUMBERS, $command, $TEXT_DIRECTION, $SHOW_FAM_ID_NUMBERS;
-	global $GM_IMAGE_DIR, $GM_IMAGES, $DEBUG, $ASC, $IGNORE_FACTS, $IGNORE_YEAR, $LAST_QUERY, $GM_BLOCKS;
-	global $USE_RTL_FUNCTIONS, $NAME_REVERSE, $GEDCOMID;
-	global $DAYS_TO_SHOW_LIMIT, $CIRCULAR_BASE, $gm_user;
+	global $gm_lang, $command, $TEXT_DIRECTION;
+	global $GM_IMAGE_DIR, $GM_IMAGES, $GM_BLOCKS;
+	global $NAME_REVERSE, $GEDCOMID;
+	global $DAYS_TO_SHOW_LIMIT, $gm_user;
 
 	$block = true; // Always restrict this block's height
 	if (empty($config)) $config = $GM_BLOCKS["print_upcoming_events"]["config"];
@@ -57,7 +57,7 @@ function print_upcoming_events($block=true, $config="", $side, $index) {
 
 	$action = "upcoming";
 	
-	$found_facts = GetCachedEvents($action, $daysprint, $filter, $onlyBDM, $skipfacts);
+	$found_facts = BlockFunctions::GetCachedEvents($action, $daysprint, $filter, $onlyBDM, $skipfacts);
 	
 	// Output starts here
 	print "<div id=\"upcoming_events\" class=\"block\">";
@@ -119,7 +119,7 @@ function print_upcoming_events($block=true, $config="", $side, $index) {
 						else print $GM_IMAGES["sexn"]["small"]."\" title=\"".$gm_lang["unknown"]."\" alt=\"".$gm_lang["unknown"];
 						print "\" class=\"sex_image\" />";
 						print "</a><br />\n";
-						$lastgid=$gid;
+						$lastgid = $gid;
 					}
 					print "<div class=\"indent" . ($TEXT_DIRECTION=="rtl"?"_rtl":"") . "\">";
 					print $text;
@@ -133,7 +133,7 @@ function print_upcoming_events($block=true, $config="", $side, $index) {
 		if ($factarr[2]=="FAM") {
 			$family =& Family::GetInstance($factarr[0], "", $GEDCOMID);
 			$fact = new Fact($factarr[0], $factarr[6], $factarr[1]);
-			if ((!is_object($family->husb || $family->husb->disp)) && (!is_object($family->wife || $family->wife->disp)) && $fact->disp) {
+			if ($family->disp && $fact->disp) {
 				$text = GetCalendarFact($factarr[1], $action, $filter, $factarr[0]);
 				if ($text!="filter") {
 					if ($lastgid!=$factarr[0]) {
@@ -141,12 +141,9 @@ function print_upcoming_events($block=true, $config="", $side, $index) {
 						print "<a href=\"family.php?famid=".$family->xref."&amp;gedid=".$family->gedcomid."\"><b>";
 						print $family->sortable_name;
 						print "</b>";
-						if ($SHOW_FAM_ID_NUMBERS) {
-							if ($TEXT_DIRECTION=="ltr") print " &lrm;(".$family->xref.")&lrm;";
-							else print " &rlm;(".$family->xref.")&rlm;";
-						}
+						print $family->addxref;
 						print "</a><br />\n";
-						$lastgid=$family->xref;
+						$lastgid = $family->xref;
 					}
 					print "<div class=\"indent" . ($TEXT_DIRECTION=="rtl"?"_rtl":"") . "\">";
 					print $text;
@@ -182,7 +179,8 @@ function print_upcoming_events($block=true, $config="", $side, $index) {
 }
 
 function print_upcoming_events_config($config) {
-	global $gm_lang, $GM_BLOCKS, $DAYS_TO_SHOW_LIMIT, $TEXT_DIRECTION;
+	global $gm_lang, $GM_BLOCKS, $DAYS_TO_SHOW_LIMIT;
+	
 	if (empty($config)) $config = $GM_BLOCKS["print_upcoming_events"]["config"];
 	if (!isset($DAYS_TO_SHOW_LIMIT)) $DAYS_TO_SHOW_LIMIT = 30;
 	if (!isset($config["days"])) $config["days"] = 30;

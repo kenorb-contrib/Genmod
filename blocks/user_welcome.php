@@ -34,7 +34,7 @@ $GM_BLOCKS["print_welcome_block"]["rss"]       	= false;
 
 //-- function to print the welcome block
 function print_welcome_block($block=true, $config="", $side, $index) {
-		global $gm_lang, $day, $month, $year, $GM_IMAGE_DIR, $GM_IMAGES, $user, $GEDCOMID, $TIME_FORMAT,$command, $gm_user;
+		global $gm_lang, $day, $month, $year, $GM_IMAGE_DIR, $GM_IMAGES, $GEDCOMID, $TIME_FORMAT, $gm_user;
 
 		print "<div id=\"user_welcome\" class=\"block\">\n";
 		print "<div class=\"blockhc\">";

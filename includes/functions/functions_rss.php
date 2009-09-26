@@ -94,7 +94,7 @@ function getUpcomingEvents() {
 	$daytext = "<ul>";
 	$action = "upcoming";
 
-	$found_facts = GetCachedEvents($action, $daysprint, $filter, "no", $skipfacts);
+	$found_facts = BlockFunctions::GetCachedEvents($action, $daysprint, $filter, "no", $skipfacts);
 
 	$OutputDone = false;
 	$PrivateFacts = false;
@@ -244,7 +244,7 @@ function getTodaysEvents() {
 	if (is_array($lastcachedate) && $lastcachedate["gc_last_today"] != 0) $dataArray[1] = iso8601_date($lastcachedate["gc_last_today"]);
 	else $dataArray[1] = iso8601_date(time());
 
-	$found_facts = GetCachedEvents($action, 1, $filter, "no", $skipfacts);
+	$found_facts = BlockFunctions::GetCachedEvents($action, 1, $filter, "no", $skipfacts);
 
 	$lastgid="";
 	foreach($found_facts as $index=>$factarr) {
@@ -471,7 +471,7 @@ function getTop10Surnames() {
 		$dataArray[1] = $_SESSION["top10"][$GEDCOMID]["time"];
 	}
 	else {
-		$surnames = GetTopSurnames($config["num"]);
+		$surnames = BlockFunctions::GetTopSurnames($config["num"]);
 
 		// Insert from the "Add Names" list if not already in there
 		if ($COMMON_NAMES_ADD != "") {
@@ -544,7 +544,7 @@ function getRecentChanges() {
 
 	$recentText = "";
 	
-	$found_facts = GetRecentChangeFacts($day, $month, $year, $config["days"]);
+	$found_facts = BlockFunctions::GetRecentChangeFacts($day, $month, $year, $config["days"]);
 	
 // Start output
 	if (count($found_facts)==0 and $HideEmpty=="yes") return false;

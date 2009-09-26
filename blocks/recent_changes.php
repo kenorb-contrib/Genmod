@@ -52,7 +52,7 @@ function print_recent_changes($block=true, $config="", $side, $index) {
 
 	$action = "today";
 
-	$found_facts = GetRecentChangeFacts($day, $month, $year, $config["days"]);
+	$found_facts = BlockFunctions::GetRecentChangeFacts($day, $month, $year, $config["days"]);
 
 // Start output
 	if (count($found_facts)==0 and $HideEmpty=="yes") return false;
@@ -91,7 +91,7 @@ function print_recent_changes($block=true, $config="", $side, $index) {
 				$fact = New Fact($person->xref, $factarr[3], $factarr[1]);
 				if ($lastgid != $person->xref) {
 					print "<a href=\"individual.php?pid=".$person->xref."&amp;gedid=".$person->gedcomid."\"><b>";
-					print $person->sortable_name;
+					print $person->revname;
 					print "</b>";
 					print "<img id=\"box-".$person->xref."-".$index."-sex\" src=\"$GM_IMAGE_DIR/";
 					if ($person->sex == "M") print $GM_IMAGES["sex"]["small"]."\" title=\"".$gm_lang["male"]."\" alt=\"".$gm_lang["male"];

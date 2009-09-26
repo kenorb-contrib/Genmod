@@ -33,7 +33,7 @@ $GM_BLOCKS["top10_pageviews"]["config"] 	= array("num"=>10, "count_placement"=>"
 $GM_BLOCKS["top10_pageviews"]["rss"]		= false;
 
 function top10_pageviews($block=true, $config="", $side, $index) {
-	global $gm_lang, $GEDCOMID, $GM_BLOCKS, $command, $GM_IMAGES, $GM_IMAGE_DIR, $SHOW_SOURCES, $TEXT_DIRECTION, $gm_user;
+	global $gm_lang, $GEDCOMID, $GM_BLOCKS, $command, $GM_IMAGES, $GM_IMAGE_DIR, $gm_user;
 
 	if (empty($config)) $config = $GM_BLOCKS["top10_pageviews"]["config"];
 	if (isset($config["count_placement"])) $CountSide = $config["count_placement"];
@@ -42,14 +42,7 @@ function top10_pageviews($block=true, $config="", $side, $index) {
 	//-- load the lines from the database
 	$ids = array();
 	$limit = $config["num"]+1;
-	$sql = "SELECT * from ".TBLPREFIX."counters WHERE (c_id like '%[".$GEDCOMID."]%') ORDER BY c_number DESC LIMIT ".$limit;
-	$res = NewQuery($sql);
-	while($row = $res->FetchAssoc()){
-		$p1 = strpos($row["c_id"],"[");
-		$id = substr($row["c_id"],0,$p1);
-		$ids[$id] = $row["c_number"];
-	}
-	$res->FreeResult();
+	$ids = CounterFunctions::GetCounters($limit, $GEDCOMID, false);
 
 	//-- if no results are returned then don't do anything
 	if (count($ids) == 0) {
@@ -83,118 +76,7 @@ function top10_pageviews($block=true, $config="", $side, $index) {
 	print "</div>";
 	print "<div class=\"blockcontent\">\n";
 	if ($block) print "<div class=\"small_inner_block\">\n";
-	if (count($ids)>0) {
-		if ($block) print "<table width=\"90%\">";
-		else print "<table>";
-		$i=0;
-		foreach($ids as $id=>$count) {
-			$gedrec = FindGedcomRecord($id);
-			$ct = preg_match("/0 @(.*)@ (.*)/", $gedrec, $match);
-			if ($ct>0) {
-				$type = trim($match[2]);
-				$disp = PrivacyFunctions::showLivingNameByID($id, $type);
-				if ($disp) {
-					if ($type=="INDI") {
-						print "<tr valign=\"top\">";
-						if ($CountSide=="left") {
-							print "<td dir=\"ltr\" align=\"right\">";
-							if ($TEXT_DIRECTION=="rtl") print "&nbsp;";
-							print "[".$count."]";
-							if ($TEXT_DIRECTION=="ltr") print "&nbsp;";
-							print "</td>";
-						}
-						$name = GetPersonName($id);
-						print "<td class=\"name2 wrap\" ";
-						if ($block) print "width=\"86%\"";
-						print "><a href=\"individual.php?pid=".urlencode($id)."\">";
-						if (HasChinese($name)) print PrintReady($name." (".GetSortableAddName($id, "", true).")");
-						else print PrintReady($name);
-						print "</a></td>";
-						if ($CountSide=="right") {
-							print "<td dir=\"ltr\" align=\"right\">";
-							if ($TEXT_DIRECTION=="ltr") print "&nbsp;";
-							print "[".$count."]";
-							if ($TEXT_DIRECTION=="rtl") print "&nbsp;";
-							print "</td>";
-						}
-						print "</tr>";
-						$i++;
-					}
-					if ($type=="FAM") {
-						print "<tr valign=\"top\">";
-						if ($CountSide=="left") {
-							print "<td dir=\"ltr\" align=\"right\">";
-							if ($TEXT_DIRECTION=="rtl") print "&nbsp;";
-							print "[".$count."]";
-							if ($TEXT_DIRECTION=="ltr") print "&nbsp;";
-							print "</td>";
-						}
-						print "<td class=\"name2 wrap\" ><a href=\"family.php?famid=".urlencode($id)."\">";
-						$fname = GetFamilyDescriptor($id, true);
-						if (HasChinese($fname)) print PrintReady($fname." (".GetFamilyAddDescriptor($id, true).")");
-						else print PrintReady($fname);
-						print "</a></td>";
-						if ($CountSide=="right") {
-							print "<td dir=\"ltr\" align=\"right\">";
-							if ($TEXT_DIRECTION=="ltr") print "&nbsp;";
-							print "[".$count."]";
-							if ($TEXT_DIRECTION=="rtl") print "&nbsp;";
-							print "</td>";
-						}
-						print "</tr>";
-						$i++;
-					}
-					if ($type=="REPO") {
-						if ($SHOW_SOURCES>=$gm_user->getUserAccessLevel()) {
-							print "<tr valign=\"top\">";
-							if ($CountSide=="left") {
-								print "<td dir=\"ltr\" align=\"right\">";
-								if ($TEXT_DIRECTION=="rtl") print "&nbsp;";
-								print "[".$count."]";
-								if ($TEXT_DIRECTION=="ltr") print "&nbsp;";
-								print "</td>";
-							}
-							print "<td class=\"name2 wrap\" ><a href=\"repo.php?rid=".urlencode($id)."\">".PrintReady(GetRepoDescriptor($id))."</a></td>";
-							if ($CountSide=="right") {
-								print "<td dir=\"ltr\" align=\"right\">";
-								if ($TEXT_DIRECTION=="ltr") print "&nbsp;";
-								print "[".$count."]";
-								if ($TEXT_DIRECTION=="rtl") print "&nbsp;";
-								print "</td>";
-							}
-							print "</tr>";
-							$i++;
-						}
-					}
-					if ($type=="SOUR") {
-						if ($SHOW_SOURCES>=$gm_user->getUserAccessLevel()) {
-							print "<tr valign=\"top\">";
-							if ($CountSide=="left") {
-								print "<td dir=\"ltr\" align=\"right\">";
-								if ($TEXT_DIRECTION=="rtl") print "&nbsp;";
-								print "[".$count."]";
-								if ($TEXT_DIRECTION=="ltr") print "&nbsp;";
-								print "</td>";
-							}
-							print "<td class=\"name2 wrap\" ><a href=\"source.php?sid=".urlencode($id)."\">".PrintReady(GetSourceDescriptor($id))."</a></td>";
-							if ($CountSide=="right") {
-								print "<td dir=\"ltr\" align=\"right\">";
-								if ($TEXT_DIRECTION=="ltr") print "&nbsp;";
-								print "[".$count."]";
-								if ($TEXT_DIRECTION=="rtl") print "&nbsp;";
-								print "</td>";
-							}
-							print "</tr>";
-							$i++;
-						}
-					}
-					if ($i>=$config["num"]) break;
-				}
-			}
-		}
-		print "</table>";
-	}
-	else print "<b>".$gm_lang["top10_pageviews_nohits"]."</b>\n";
+	BlockFunctions::PrintPageViews($ids, $CountSide, $config["num"], $block);
 	if ($block) print "</div>\n";
 	print "</div>";
 	print "</div>";
@@ -202,6 +84,7 @@ function top10_pageviews($block=true, $config="", $side, $index) {
 
 function top10_pageviews_config($config) {
 	global $gm_lang, $GM_BLOCKS,$TEXT_DIRECTION;
+	
 	if (empty($config)) $config = $GM_BLOCKS["top10_pageviews"]["config"];
 	?>
 	<table class="facts_table <?php print $TEXT_DIRECTION; ?>">

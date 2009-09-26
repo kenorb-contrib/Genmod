@@ -3303,6 +3303,7 @@ function ReplaceEmbedText($text) {
 
 function ConstructObject($pid, $type, $gedid, $data_array="") {
 
+	$object = null;
 	if ($type == "SOUR") $object =& Source::GetInstance($pid, $data_array, $gedid);
 	elseif ($type == "REPO") $object =& Repository::GetInstance($pid, $data_array, $gedid);
 	elseif ($type == "OBJE") $object =& MediaItem::GetInstance($pid, $data_array, $gedid);

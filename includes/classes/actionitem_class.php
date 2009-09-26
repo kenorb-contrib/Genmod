@@ -206,7 +206,7 @@ class ActionItem {
 			if (is_null($this->pid) || empty($this->pid)) $this->piddesc = "";
 			else {
 				if (!is_object($this->pid_obj)) $this->getPidObj();
-				if (is_object($this->pid_obj)) $this->piddesc = $this->pid_obj->sortable_name;
+				if (is_object($this->pid_obj)) $this->piddesc = $this->pid_obj->revname;
 				else $this->piddesc = "";
 			}
 		}
