@@ -28,7 +28,7 @@
 $DEBUG = false;
 if ($DEBUG) DebugCollector::$show = true;
  
-if (strstr($_SERVER["SCRIPT_NAME"],"session")) {
+if (stristr($_SERVER["SCRIPT_NAME"],"session")) {
 //	print "Now, why would you want to do that.  You're not hacking are you?";
 //	exit;
 $INTRUSION_DETECTED = true;

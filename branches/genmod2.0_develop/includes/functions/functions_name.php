@@ -26,7 +26,7 @@
 /**
  * security check to prevent hackers from directly accessing this file
  */
-if (strstr($_SERVER["SCRIPT_NAME"],basename(__FILE__))) {
+if (stristr($_SERVER["SCRIPT_NAME"],basename(__FILE__))) {
 	require "../../intrusion.php";
 }
 
@@ -48,7 +48,7 @@ function GetCommonSurnamesIndex($gedid) {
 			foreach($surnames as $indexval => $surname) {
 				$sns .= $surname["name"].", ";
 			}
-			$sql = "UPDATE ".TBLPREFIX."gedcoms SET g_commonsurnames='".DbLayer::EscapeQuery($sns)."' WHERE g_id='".$gedid."'";
+			$sql = "UPDATE ".TBLPREFIX."gedcoms SET g_commonsurnames='".DbLayer::EscapeQuery($sns)."' WHERE g_file='".$gedid."'";
 			$res = NewQuery($sql);
 			$GEDCOMS[$gedid]["commonsurnames"] = $sns;
 		}

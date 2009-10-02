@@ -57,7 +57,7 @@ class Repository extends GedcomRecord {
 			// extract the construction parameters
 			$gedcomid = $gedrec["o_file"];
 			$id = $gedrec["o_id"];
-			$gedrec = $gedrec["o_gedcom"];
+			$gedrec = $gedrec["o_gedrec"];
 		}
 		
 		parent::__construct($id, $gedrec, $gedcomid);
@@ -159,17 +159,17 @@ class Repository extends GedcomRecord {
 			$ct = preg_match("/\d ROMN (.*)/", $gedrec, $match);
 	 		if ($ct>0) {
 				if (!PrivacyFunctions::showFact("ROMN", $this->xref, "SOUR") || !PrivacyFunctions::showFactDetails("ROMN", $this->xref, "REPO")) return false;
-				$this->adddescriptor = $smatch[1];
+				$this->adddescriptor = $match[1];
 				return $this->adddescriptor;
 	 		}
 			$ct = preg_match("/\d _HEB (.*)/", $gedrec, $match);
 	 		if ($ct>0) {
 				if (!PrivacyFunctions::showFact("_HEB", $this->xref, "SOUR")|| !PrivacyFunctions::showFactDetails("_HEB", $this->xref, "REPO")) return false;
-				$this->adddescriptor = $smatch[1];
+				$this->adddescriptor = $match[1];
 				return $this->adddescriptor;
 	 		}
 	 	}
-		$this->adddescriptor = false;
+		$this->adddescriptor = "";
 		return $this->adddescriptor;
 	}
 	
@@ -183,7 +183,7 @@ class Repository extends GedcomRecord {
 		$this->sourcelist = array();
 		$this->sour_hide = 0;
 		
-		$sql = 	"SELECT DISTINCT s_key, s_id, s_gedcom, s_file FROM ".TBLPREFIX."other_mapping, ".TBLPREFIX."sources WHERE om_oid='".$this->xref."' AND om_gedfile='".$this->gedcomid."' AND om_type='SOUR' AND s_file=om_gedfile AND s_id=om_gid";
+		$sql = 	"SELECT DISTINCT s_key, s_id, s_gedrec, s_file FROM ".TBLPREFIX."other_mapping, ".TBLPREFIX."sources WHERE om_oid='".$this->xref."' AND om_file='".$this->gedcomid."' AND om_type='SOUR' AND s_file=om_file AND s_id=om_gid";
 		$res = NewQuery($sql);
 		while($row = $res->FetchAssoc()){
 			$source = null;
@@ -222,17 +222,20 @@ class Repository extends GedcomRecord {
 
 	protected function ReadRepositoryRecord() {
 		
-		$sql = "SELECT o_gedcom FROM ".TBLPREFIX."other WHERE o_key='".JoinKey($this->xref,	$this->gedcomid)."'";
+		$sql = "SELECT o_gedrec FROM ".TBLPREFIX."other WHERE o_key='".JoinKey($this->xref,	$this->gedcomid)."'";
 		$res = NewQuery($sql);
 		if ($res) {
 			if ($res->NumRows() != 0) {
 				$row = $res->fetchAssoc();
-				$this->gedrec = $row["o_gedcom"];
+				$this->gedrec = $row["o_gedrec"];
 			}
 		}
 	}
 		
-	public function PrintListRepository($useli=true, $prtact=true) {
+	// Type	=	1	: normal title (descriptor and adddescriptor
+	// 			2	: descriptor
+	//			3	: adddescriptor
+	public function PrintListRepository($useli=true, $type=1, $prtact=true) {
 		global $TEXT_DIRECTION;
 
 		if (!$this->DisplayDetails()) return false;
@@ -243,10 +246,13 @@ class Repository extends GedcomRecord {
 		}
 
 		print "<a href=\"repo.php?rid=".$this->xref."&amp;gedid=".$this->gedcomid."\" class=\"list_item\">";
-		print PrintReady($this->GetTitle());
+		if ($type == 1) print PrintReady($this->GetTitle());
+		else if ($type == 2) print PrintReady($this->GetRepoDescriptor());
+		else if ($type == 3) print PrintReady($this->GetAddRepoDescriptor());
 		print $this->addxref;
 		
 		if ($prtact) {
+			$this->GetLinksFromActionCount();
 			if ($this->action_closed > 0) {
 				if ($TEXT_DIRECTION=="ltr") print "<span class=\"error\"> &lrm;(".$this->action_closed.")&lrm;</span>";
 				else print "<span class=\"error\"> &rlm;(".$this->action_closed.")&rlm;</span>";

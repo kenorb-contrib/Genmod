@@ -30,7 +30,7 @@
 /**
  * security check to prevent hackers from directly accessing this file
  */
-if (strstr($_SERVER["SCRIPT_NAME"],basename(__FILE__))) {
+if (stristr($_SERVER["SCRIPT_NAME"],basename(__FILE__))) {
 	require "../../intrusion.php";
 }
 global $CALENDAR_FORMAT;

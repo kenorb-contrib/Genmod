@@ -135,7 +135,7 @@ if ($action == "import_action") {
 	// Linked only
 	if ($linked) {
 		// Read the files into the table
-		$sql = "SELECT m_file, m_gedrec FROM ".TBLPREFIX."media WHERE m_gedfile='".$GEDCOMID."'";
+		$sql = "SELECT m_mfile, m_gedrec FROM ".TBLPREFIX."media WHERE m_file='".$GEDCOMID."'";
 		$res = NewQuery($sql);
 		while ($row = $res->Fetchrow()) {
 			$filefromged = GetGedcomValue("FILE", 1, $row[1]);
@@ -172,7 +172,7 @@ if ($action == "export_action") {
 
 	// Linked only
 	if ($linked) {
-		$sql = "SELECT m_file, m_gedrec FROM ".TBLPREFIX."media WHERE m_gedfile='".$GEDCOMID."'";
+		$sql = "SELECT m_mfile, m_gedrec FROM ".TBLPREFIX."media WHERE m_file='".$GEDCOMID."'";
 		$res = NewQuery($sql);
 		while ($row = $res->Fetchrow()) {
 			$filefromged = GetGedcomValue("FILE", 1, $row[1]);

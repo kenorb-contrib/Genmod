@@ -25,7 +25,7 @@
  * @subpackage Display
  * @version $Id$
  */
-if (strstr($_SERVER["SCRIPT_NAME"],basename(__FILE__))) {
+if (stristr($_SERVER["SCRIPT_NAME"],basename(__FILE__))) {
 	require "../../intrusion.php";
 }
 abstract class LinkFunctions {

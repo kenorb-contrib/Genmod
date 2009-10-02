@@ -2,8 +2,6 @@
 /**
  * Functions used for the hitcounter
  *
- * $Id$
- *
  * Genmod: Genealogy Viewer
  * Copyright (C) 2005 - 2008 Genmod Development Team
  *
@@ -22,10 +20,11 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  * @package Genmod
  * @subpackage Tools
- * @see validategedcom.php
+ *
+ * $Id$
  */
  
-if (strstr($_SERVER["SCRIPT_NAME"],basename(__FILE__))) {
+if (stristr($_SERVER["SCRIPT_NAME"],basename(__FILE__))) {
 	require "../../intrusion.php";
 }
 

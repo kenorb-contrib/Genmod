@@ -2,8 +2,6 @@
 /**
  * Functions used in or by blocks
  *
- * $Id$
- *
  * Genmod: Genealogy Viewer
  * Copyright (C) 2005 - 2008 Genmod Development Team
  *
@@ -23,9 +21,11 @@
  * @package Genmod
  * @subpackage Tools
  * @see validategedcom.php
+ *
+ * $Id$
  */
  
-if (strstr($_SERVER["SCRIPT_NAME"],basename(__FILE__))) {
+if (stristr($_SERVER["SCRIPT_NAME"],basename(__FILE__))) {
 	require "../../intrusion.php";
 }
 
@@ -467,11 +467,11 @@ abstract class BlockFunctions {
 		// The title must be generated every time because the language may differ
 		$stats["gs_title"] = "";
 		$head = "";
-		$sql = "SELECT o_gedcom FROM ".TBLPREFIX."other WHERE o_id='HEAD' AND o_file='".$GEDCOMID."'";
+		$sql = "SELECT o_gedrec FROM ".TBLPREFIX."other WHERE o_id='HEAD' AND o_file='".$GEDCOMID."'";
 		$res = NewQuery($sql);
 		if ($res->NumRows() > 0) {
 			$row = $res->FetchAssoc();
-			$head = $row["o_gedcom"];
+			$head = $row["o_gedrec"];
 		}
 		$ct=preg_match("/1 SOUR (.*)/", $head, $match);
 		

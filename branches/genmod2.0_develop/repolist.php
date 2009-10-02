@@ -43,42 +43,43 @@
 */
 require("config.php");
 
-print_header($gm_lang["repo_list"]);
+$repolist_controller = New RepoListController();
+
+
+print_header($repolist_controller->pagetitle);
 print "<div class=\"center\">";
 print "<h3>".$gm_lang["repo_list"]."</h3>\n\t";
 
-$lrepolist = GetRepoList();               //-- array of regular repository titles 
-$addrepolist = GetRepoAddTitleList();  //-- array of additional repository titlesadd
-
-$cr = count($lrepolist);
-$ca = count($addrepolist);
-$ctot = $cr + $ca;
+$ctot = $repolist_controller->repo_total + $repolist_controller->repo_add - $repolist_controller->repo_hide;
 
 print "\n\t<table class=\"list_table $TEXT_DIRECTION center\">\n\t\t<tr><td class=\"shade2 center\"";
-if($cr>12)	print " colspan=\"2\"";
+if($ctot > 12) print " colspan=\"2\"";
 print "><img src=\"".$GM_IMAGE_DIR."/".$GM_IMAGES["repository"]["small"]."\" border=\"0\" title=\"".$gm_lang["titles_found"]."\" alt=\"".$gm_lang["titles_found"]."\" />&nbsp;&nbsp;";
 print $gm_lang["titles_found"];
 print "</td></tr><tr><td class=\"$TEXT_DIRECTION shade1 wrap\"><ul>";
 
-if ($cr>0){
+if ($ctot > 0){
 	$i=1;
 	// -- print the array
-	foreach ($lrepolist as $key => $value) {
-		print_list_repository($key, $value);
-		if ($i==ceil($cr/2) && $cr>12) print "</ul></td><td class=\"shade1 wrap\"><ul>\n";
+	foreach ($repolist_controller->repolist as $key => $repo) {
+		$repo->PrintListRepository(true, 2);
+		if ($i == ceil($ctot/2) && $ctot>12) print "</ul></td><td class=\"shade1 wrap\"><ul>\n";
 		$i++;
 	}
-	// -- print the additional array
-	foreach ($addrepolist as $key => $value) {
-		print_list_repository($key, $value);
-		if ($i==ceil($cr/2) && $cr>12) print "</ul></td><td class=\"shade1 wrap\"><ul>\n";
-		$i++;
+	
+	if ($repolist_controller->repo_add > 0) {
+		// -- print the additional array
+		foreach ($repolist_controller->addrepolist as $key => $repo) {
+			$repo->PrintListRepository(true, 3);
+			if ($i==ceil($ctot/2) && $ctot>12) print "</ul></td><td class=\"shade1 wrap\"><ul>\n";
+			$i++;
+		}
 	}
 
 	print "\n\t\t</ul></td>\n\t\t";
  
-	print "</tr><tr><td>".$gm_lang["total_repositories"]." ".count($repo_total);
-	if (count($repo_hide)>0) print "  --  ".$gm_lang["hidden"]." ".count($repo_hide);
+	print "</tr><tr><td>".$gm_lang["total_repositories"]." ".$repolist_controller->repo_total;
+	if ($repolist_controller->repo_hide > 0) print "  --  ".$gm_lang["hidden"]." ".$repolist_controller->repo_hide;
 }
 else print "<span class=\"warning\"><i>".$gm_lang["no_results"]."</span>";
 

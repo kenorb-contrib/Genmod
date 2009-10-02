@@ -26,7 +26,7 @@
  * @subpackage Privacy
  */
 
-if (strstr($_SERVER["SCRIPT_NAME"],basename(__FILE__))) {
+if (stristr($_SERVER["SCRIPT_NAME"],basename(__FILE__))) {
 	require "../../intrusion.php";
 }
 abstract class PrivacyFunctions {
@@ -137,30 +137,27 @@ abstract class PrivacyFunctions {
 			//-- check the parents for dates
 			$numfams = preg_match_all("/1\s*FAMC\s*@(.*)@/", $indirec, $fmatch, PREG_SET_ORDER);
 			for($j=0; $j<$numfams; $j++) {
-				$parents = FindParents($fmatch[$j][1]);
-				if ($parents) {
-					if (!empty($parents["HUSB"])) {
-						$prec = FindPersonRecord($parents["HUSB"]);
-						$ct = preg_match_all("/\d DATE.*\s(\d{3,4})\s/", $prec, $match, PREG_SET_ORDER);
-						for($i=0; $i<$ct; $i++) {
-							$byear = $match[$i][1];
-							// If any date is prior to than MAX_ALIVE_AGE years ago assume they are dead
-							if (($cyear-$byear) > $MAX_ALIVE_AGE+40) {
-								//print "father older than $MAX_ALIVE_AGE+40 (".$match[$i][0].") year is $byear\n";
-								return true;
-							}
+				$family = Family::GetInstance($fmatch[$j][1]);
+				$parents = $family->parents;
+				if (is_object($parents["HUSB"])) {
+					$ct = preg_match_all("/\d DATE.*\s(\d{3,4})\s/", $parents["HUSB"]->gedrec, $match, PREG_SET_ORDER);
+					for($i=0; $i<$ct; $i++) {
+						$byear = $match[$i][1];
+						// If any date is prior to than MAX_ALIVE_AGE years ago assume they are dead
+						if (($cyear-$byear) > $MAX_ALIVE_AGE+40) {
+							//print "father older than $MAX_ALIVE_AGE+40 (".$match[$i][0].") year is $byear\n";
+							return true;
 						}
 					}
-					if (!empty($parents["WIFE"])) {
-						$prec = FindPersonRecord($parents["WIFE"]);
-						$ct = preg_match_all("/\d DATE.*\s(\d{3,4})\s/", $prec, $match, PREG_SET_ORDER);
-						for($i=0; $i<$ct; $i++) {
-							$byear = $match[$i][1];
-							// If any date is prior to than MAX_ALIVE_AGE years ago assume they are dead
-							if (($cyear-$byear) > $MAX_ALIVE_AGE+40) {
-								//print "mother older than $MAX_ALIVE_AGE+40 (".$match[$i][0].") year is $byear\n";
-								return true;
-							}
+				}
+				if (is_object($parents["WIFE"])) {
+					$ct = preg_match_all("/\d DATE.*\s(\d{3,4})\s/", $parents["WIFE"]->gedrec, $match, PREG_SET_ORDER);
+					for($i=0; $i<$ct; $i++) {
+						$byear = $match[$i][1];
+						// If any date is prior to than MAX_ALIVE_AGE years ago assume they are dead
+						if (($cyear-$byear) > $MAX_ALIVE_AGE+40) {
+							//print "mother older than $MAX_ALIVE_AGE+40 (".$match[$i][0].") year is $byear\n";
+							return true;
 						}
 					}
 				}
@@ -170,12 +167,11 @@ abstract class PrivacyFunctions {
 			$numfams = preg_match_all("/1\s*FAMS\s*@(.*)@/", $indirec, $fmatch, PREG_SET_ORDER);
 			for($j=0; $j<$numfams; $j++) {
 				// Get the family record
-				$famrec = FindFamilyRecord($fmatch[$j][1]);
-	
+				$family = Family::GetInstance($fmatch[$j][1]);
 				//-- check for marriage date
-				$marrec = GetSubRecord(1, "1 MARR", $famrec);
-				if ($marrec!==false) {
-					$bt = preg_match_all("/\d DATE.*\s(\d{3,4})\s/", $marrec, $bmatch, PREG_SET_ORDER);
+				$mardate = $family->marr_date;
+				if ($mardate != "") {
+					$bt = preg_match_all("/\d DATE.*\s(\d{3,4})\s/", $mardate, $bmatch, PREG_SET_ORDER);
 					for($h=0; $h<$bt; $h++) {
 						$byear = $bmatch[$h][1];
 						// if marriage was more than MAX_ALIVE_AGE-10 years ago assume the person has died
@@ -186,31 +182,24 @@ abstract class PrivacyFunctions {
 					}
 				}
 				//-- check spouse record for dates
-				$parents = FindParentsInRecord($famrec);
-				if ($parents) {
-					if ($parents["HUSB"]!=$pid) $spid = $parents["HUSB"];
-					else $spid = $parents["WIFE"];
-					$spouserec = FindPersonRecord($spid);
-					// Check dates
-					$bt = preg_match_all("/\d DATE.*\s(\d{3,4})\s/", $spouserec, $bmatch, PREG_SET_ORDER);
-					for($h=0; $h<$bt; $h++) {
-						$byear = $bmatch[$h][1];
-						// if the spouse is > $MAX_ALIVE_AGE assume the individual is dead
-						if (($cyear-$byear) > $MAX_ALIVE_AGE) {
-							//print "spouse older than $MAX_ALIVE_AGE (".$bmatch[$h][0].") year is $byear\n";
-							return true;
-						}
+				if ($family->husb_id != $pid) $spouse = $family->husb;
+				else $spouse = $family->wife;
+				if (is_object($spouse)) $spouserec = $spouse->gedrec;
+				else $spouserec = "";
+				// Check dates
+				$bt = preg_match_all("/\d DATE.*\s(\d{3,4})\s/", $spouserec, $bmatch, PREG_SET_ORDER);
+				for($h=0; $h<$bt; $h++) {
+					$byear = $bmatch[$h][1];
+					// if the spouse is > $MAX_ALIVE_AGE assume the individual is dead
+					if (($cyear-$byear) > $MAX_ALIVE_AGE) {
+						//print "spouse older than $MAX_ALIVE_AGE (".$bmatch[$h][0].") year is $byear\n";
+						return true;
 					}
 				}
 				// Get the set of children
-				$ct = preg_match_all("/1 CHIL @(.*)@/", $famrec, $match, PREG_SET_ORDER);
-				for($i=0; $i<$ct; $i++) {
-					// Get each child's record
-					$childrec = FindPersonRecord($match[$i][1]);
-					$children[] = $childrec;
-	
+				foreach ($family->children as $key => $child) {
 					// Check each child's dates
-					$bt = preg_match_all("/\d DATE.*\s(\d{3,4})\s/", $childrec, $bmatch, PREG_SET_ORDER);
+					$bt = preg_match_all("/\d DATE.*\s(\d{3,4})\s/", $child->gedrec, $bmatch, PREG_SET_ORDER);
 					for($h=0; $h<$bt; $h++) {
 						$byear = $bmatch[$h][1];
 						// if any child was born more than MAX_ALIVE_AGE-10 years ago assume the parent has died
@@ -223,22 +212,16 @@ abstract class PrivacyFunctions {
 			}
 			//-- check grandchildren for dates
 			$gchildren = array();
-			foreach($children as $indexval => $child) {
+			foreach($family->children as $indexval => $child) {
 				// For each family in which this person is a spouse...
-				$numfams = preg_match_all("/1\s*FAMS\s*@(.*)@/", $child, $fmatch, PREG_SET_ORDER);
+				$numfams = preg_match_all("/1\s*FAMS\s*@(.*)@/", $child->gedrec, $fmatch, PREG_SET_ORDER);
 				for($j=0; $j<$numfams; $j++) {
 					// Get the family record
-					$famrec = FindFamilyRecord($fmatch[$j][1]);
-	
+					$childfam = Family::GetInstance($fmatch[$j][1]);
 					// Get the set of children
-					$ct = preg_match_all("/1 CHIL @(.*)@/", $famrec, $match, PREG_SET_ORDER);
-					for($i=0; $i<$ct; $i++) {
-						// Get each child's record
-						$childrec = FindPersonRecord($match[$i][1]);
-						$gchildren[] = $childrec;
-	
+					foreach ($childfam->children as $key2 => $grandchild) {
 						// Check each grandchild's dates
-						$bt = preg_match_all("/\d DATE.*\s(\d{3,4})\s/", $childrec, $bmatch, PREG_SET_ORDER);
+						$bt = preg_match_all("/\d DATE.*\s(\d{3,4})\s/", $grandchild->gedrec, $bmatch, PREG_SET_ORDER);
 						for($h=0; $h<$bt; $h++) {
 							$byear = $bmatch[$h][1];
 							// if any grandchild was born more than MAX_ALIVE_AGE-30 years ago assume the grandparent has died

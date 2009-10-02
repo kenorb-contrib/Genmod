@@ -62,7 +62,7 @@ class Source extends GedcomRecord {
 			// extract the construction parameters
 			$gedcomid = $gedrec["s_file"];
 			$id = $gedrec["s_id"];
-			$gedrec = $gedrec["s_gedcom"];
+			$gedrec = $gedrec["s_gedrec"];
 		}
 		
 		parent::__construct($id, $gedrec, $gedcomid);
@@ -87,6 +87,18 @@ class Source extends GedcomRecord {
 		}
 	}
 
+	public function __set($property, $value) {
+		switch ($property) {
+			case "addlink":
+				if (is_null($this->link_array)) $this->link_array = array();
+				$this->link_array[] = $value;
+				break;
+			default:
+				parent::__set($property, $value);
+				break;
+		}
+	}
+	
 	public function ObjCount() {
 		$count = 0;
 		foreach(self::$sourcecache as $ged => $source) {
@@ -173,6 +185,7 @@ class Source extends GedcomRecord {
 	 * @return string the additional title of the source
 	 */
 	private function getAddSourceDescriptor() {
+		global $gm_lang;
 	
 		if (is_null($this->adddescriptor)) {
 			if ($this->DisplayDetails()) {
@@ -185,7 +198,7 @@ class Source extends GedcomRecord {
 						if (!PrivacyFunctions::showFact("ROMN", $this->xref, "SOUR") || !PrivacyFunctions::showFactDetails("ROMN", $this->xref, "SOUR") || !$this->DisplayDetails()) {
 							$this->adddescriptor = "";
 						}
-						else $this->adddescriptor = $smatch[1];
+						else $this->adddescriptor = $match[1];
 						return $this->adddescriptor;
 			 		}
 					$ct = preg_match("/\d _HEB (.*)/", $gedrec, $match);
@@ -193,7 +206,7 @@ class Source extends GedcomRecord {
 						if (!PrivacyFunctions::showFact("_HEB", $this->xref, "SOUR")|| !PrivacyFunctions::showFactDetails("_HEB", $this->xref, "SOUR") || !$this->DisplayDetails()) {
 							$this->adddescriptor = "";
 						}
-						else $this->adddescriptor = $smatch[1];
+						else $this->adddescriptor = $match[1];
 						return $this->adddescriptor;
 			 		}
 			 	}
@@ -210,7 +223,7 @@ class Source extends GedcomRecord {
 		$this->indilist = array();
 		$this->indi_hide = 0;
 		
-		$sql = "SELECT DISTINCT i_key, i_gedcom, i_isdead, i_id, i_file  FROM ".TBLPREFIX."source_mapping, ".TBLPREFIX."individuals WHERE sm_sid='".$this->xref."' AND sm_gedfile='".$this->gedcomid."' AND sm_type='INDI' AND sm_gid=i_id AND sm_gedfile=i_file";
+		$sql = "SELECT DISTINCT i_key, i_gedrec, i_isdead, i_id, i_file  FROM ".TBLPREFIX."source_mapping, ".TBLPREFIX."individuals WHERE sm_sid='".$this->xref."' AND sm_file='".$this->gedcomid."' AND sm_type='INDI' AND sm_gid=i_id AND sm_file=i_file";
 		$res = NewQuery($sql);
 		while($row = $res->FetchAssoc()){
 			$person = null;
@@ -231,7 +244,7 @@ class Source extends GedcomRecord {
 		$this->famlist = array();
 		$this->fam_hide = 0;
 		
-		$sql = "SELECT DISTINCT f_key, f_gedcom, f_id, f_file, f_husb, f_wife  FROM ".TBLPREFIX."source_mapping, ".TBLPREFIX."families WHERE sm_sid='".$this->xref."' AND sm_gedfile='".$this->gedcomid."' AND sm_type='FAM' AND sm_gid=f_id AND sm_gedfile=f_file";
+		$sql = "SELECT DISTINCT f_key, f_gedrec, f_id, f_file, f_husb, f_wife  FROM ".TBLPREFIX."source_mapping, ".TBLPREFIX."families WHERE sm_sid='".$this->xref."' AND sm_file='".$this->gedcomid."' AND sm_type='FAM' AND sm_gid=f_id AND sm_file=f_file";
 		$res = NewQuery($sql);
 		while($row = $res->FetchAssoc()){
 			$family = null;
@@ -252,7 +265,7 @@ class Source extends GedcomRecord {
 		$this->notelist = array();
 		$this->note_hide = 0;
 		
-		$sql = "SELECT DISTINCT o_key, o_id, o_gedcom, o_file FROM ".TBLPREFIX."source_mapping, ".TBLPREFIX."other WHERE sm_sid='".$this->xref."' AND sm_gedfile='".$this->gedcomid."' AND sm_type='NOTE' AND sm_gid=o_id AND o_file=sm_gedfile";
+		$sql = "SELECT DISTINCT o_key, o_id, o_gedrec, o_file FROM ".TBLPREFIX."source_mapping, ".TBLPREFIX."other WHERE sm_sid='".$this->xref."' AND sm_file='".$this->gedcomid."' AND sm_type='NOTE' AND sm_gid=o_id AND o_file=sm_file";
 		$res = NewQuery($sql);
 		while($row = $res->FetchAssoc()){
 			$note = null;
@@ -271,12 +284,12 @@ class Source extends GedcomRecord {
 		$this->medialist = array();
 		$this->media_hide = 0;
 		
-		$sql = "SELECT DISTINCT m_media, m_gedrec, m_gedfile, m_ext, m_file FROM ".TBLPREFIX."source_mapping, ".TBLPREFIX."media WHERE sm_sid='".$this->xref."' AND sm_gedfile='".$this->gedcomid."' AND sm_type='OBJE' AND sm_gid=m_media AND m_gedfile=sm_gedfile";
+		$sql = "SELECT DISTINCT m_media, m_gedrec, m_file, m_ext, m_mfile FROM ".TBLPREFIX."source_mapping, ".TBLPREFIX."media WHERE sm_sid='".$this->xref."' AND sm_file='".$this->gedcomid."' AND sm_type='OBJE' AND sm_gid=m_media AND m_file=sm_file";
 		$res = NewQuery($sql);
 		while($row = $res->FetchAssoc()) {
 			$mediaitem = null;
-			$mediaitem =& MediaItem::GetInstance($row["m_media"], $row, $row["m_gedfile"]);
-			if ($mediaitem->DisplayDetails()) $this->medialist[JoinKey($row["m_media"], $row["m_gedfile"])] = $mediaitem;
+			$mediaitem =& MediaItem::GetInstance($row["m_media"], $row, $row["m_file"]);
+			if ($mediaitem->DisplayDetails()) $this->medialist[JoinKey($row["m_media"], $row["m_file"])] = $mediaitem;
 			else $this->media_hide++;
 		}
 		uasort($this->medialist, "TitleObjSort");
@@ -286,25 +299,30 @@ class Source extends GedcomRecord {
 	
 	protected function ReadSourceRecord() {
 		
-		$sql = "SELECT s_gedcom FROM ".TBLPREFIX."sources WHERE s_key='".JoinKey($this->xref, $this->gedcomid)."'";
+		$sql = "SELECT s_gedrec FROM ".TBLPREFIX."sources WHERE s_key='".JoinKey($this->xref, $this->gedcomid)."'";
 		$res = NewQuery($sql);
 		if ($res) {
 			if ($res->NumRows() != 0) {
 				$row = $res->fetchAssoc();
-				$this->gedrec = $row["s_gedcom"];
+				$this->gedrec = $row["s_gedrec"];
 			}
 		}
 	}
 	
-	public function PrintListSource($useli=true) {
-		
+	// Type	=	1	: normal title (descriptor and adddescriptor
+	// 			2	: descriptor
+	//			3	: adddescriptor
+	public function PrintListSource($useli=true, $type=1) {
+
 		if (!$this->DisplayDetails()) return false;
 		
 		if ($useli) {
 			if (begRTLText($this->title)) print "\n\t\t\t<li class=\"rtl\" dir=\"rtl\">";
 			else print "\n\t\t\t<li class=\"ltr\" dir=\"ltr\">";
 		}
-		print "\n\t\t\t<a href=\"source.php?sid=$this->xref&amp;gedid=".$this->gedcomid."\" class=\"list_item\">".PrintReady($this->GetTitle());
+		if ($type == 1) print "\n\t\t\t<a href=\"source.php?sid=$this->xref&amp;gedid=".$this->gedcomid."\" class=\"list_item\">".PrintReady($this->GetTitle());
+		else if ($type == 2) print "\n\t\t\t<a href=\"source.php?sid=$this->xref&amp;gedid=".$this->gedcomid."\" class=\"list_item\">".PrintReady($this->GetSourceDescriptor());
+		else if ($type == 3) print "\n\t\t\t<a href=\"source.php?sid=$this->xref&amp;gedid=".$this->gedcomid."\" class=\"list_item\">".PrintReady($this->GetAddSourceDescriptor());
 		print $this->addxref;
 		print "</a>\n";
 		if ($useli) print "</li>\n";

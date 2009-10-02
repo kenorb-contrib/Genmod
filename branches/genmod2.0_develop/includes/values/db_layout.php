@@ -45,6 +45,10 @@ if (isset($_POST["TBLPREFIX"])) define('TBLPREFIX', $_POST["TBLPREFIX"]);
 	* Auto increment fields										:	INT
 	* Username													:	VARBINARY(30) NOT NULL DEFAULT ''
 	* Fact tag													:	VARCHAR(15)
+	
+	Field naming rules:
+	* Gedcom id													: <table shortcut>_file
+	* Gedcom records											: <table shortcut>_gedrec
 */
 
 $db_original[TBLPREFIX."actions"]["row"]["a_id"]["details"] = "INT NOT NULL AUTO_INCREMENT";
@@ -143,12 +147,12 @@ $db_original[TBLPREFIX."families"]["row"]["f_file"]["details"] = "TINYINT UNSIGN
 $db_original[TBLPREFIX."families"]["row"]["f_husb"]["details"] = "VARCHAR(64) CHARACTER SET #charset# COLLATE #collate# ";
 $db_original[TBLPREFIX."families"]["row"]["f_wife"]["details"] = "VARCHAR(64) CHARACTER SET #charset# COLLATE #collate# ";
 $db_original[TBLPREFIX."families"]["row"]["f_chil"]["details"] = "TEXT CHARACTER SET #charset# COLLATE #collate# ";
-$db_original[TBLPREFIX."families"]["row"]["f_gedcom"]["details"] = "TEXT CHARACTER SET #charset# COLLATE #collate# ";
+$db_original[TBLPREFIX."families"]["row"]["f_gedrec"]["details"] = "TEXT CHARACTER SET #charset# COLLATE #collate# ";
 $db_original[TBLPREFIX."families"]["row"]["f_numchil"]["details"] = "TINYINT UNSIGNED";
 $db_original[TBLPREFIX."families"]["key"]["primary"] = "PRIMARY KEY  (`f_key`)";
 $db_original[TBLPREFIX."families"]["key"]["fam_id_file"] = "UNIQUE KEY `fam_id_file` (`f_id`, `f_file`)";
 $db_original[TBLPREFIX."families"]["key"]["fam_file"] = "KEY `fam_file` (`f_file`)";
-$db_original[TBLPREFIX."families"]["key"]["fam_gedcom"] = "FULLTEXT `fam_gedcom` (`f_gedcom`)";
+$db_original[TBLPREFIX."families"]["key"]["fam_gedrec"] = "FULLTEXT `fam_gedrec` (`f_gedrec`)";
 
 $db_original[TBLPREFIX."favorites"]["row"]["fv_id"]["details"] = "INT NOT NULL AUTO_INCREMENT";       
 $db_original[TBLPREFIX."favorites"]["row"]["fv_username"]["details"] = "VARBINARY(30) NOT NULL DEFAULT ''";
@@ -160,7 +164,7 @@ $db_original[TBLPREFIX."favorites"]["row"]["fv_title"]["details"] = "VARCHAR(255
 $db_original[TBLPREFIX."favorites"]["row"]["fv_note"]["details"] = "TEXT CHARACTER SET #charset# COLLATE #collate# ";
 $db_original[TBLPREFIX."favorites"]["key"]["primary"] = "PRIMARY KEY  (`fv_id`)";
 
-$db_original[TBLPREFIX."gedcoms"]["row"]["g_id"]["details"] = "TINYINT UNSIGNED";
+$db_original[TBLPREFIX."gedcoms"]["row"]["g_file"]["details"] = "TINYINT UNSIGNED";
 $db_original[TBLPREFIX."gedcoms"]["row"]["g_gedcom"]["details"] = "VARCHAR(64) CHARACTER SET #charset# COLLATE #collate#  NOT NULL DEFAULT ''";
 $db_original[TBLPREFIX."gedcoms"]["row"]["g_config"]["details"] = "VARCHAR(64) CHARACTER SET #charset# COLLATE #collate# ";
 $db_original[TBLPREFIX."gedcoms"]["row"]["g_privacy"]["details"] = "VARCHAR(64) CHARACTER SET #charset# COLLATE #collate# ";
@@ -169,7 +173,7 @@ $db_original[TBLPREFIX."gedcoms"]["row"]["g_path"]["details"] = "VARCHAR(255) CH
 $db_original[TBLPREFIX."gedcoms"]["row"]["g_commonsurnames"]["details"] = "TEXT CHARACTER SET #charset# COLLATE #collate# ";
 $db_original[TBLPREFIX."gedcoms"]["row"]["g_isdefault"]["details"] = "VARCHAR(1) CHARACTER SET #charset# COLLATE #collate# ";
 $db_original[TBLPREFIX."gedcoms"]["key"]["primary"] = "PRIMARY KEY  (`g_gedcom`)";
-$db_original[TBLPREFIX."gedcoms"]["key"]["g_id_id"] = "KEY `g_id_id` (`g_id`)";
+$db_original[TBLPREFIX."gedcoms"]["key"]["g_file"] = "KEY `g_file` (`g_file`)";
                                                 
 $db_original[TBLPREFIX."gedconf"]["row"]["gc_gedcomid"]["details"] = "TINYINT UNSIGNED";
 $db_original[TBLPREFIX."gedconf"]["row"]["gc_gedcom"]["details"] = "VARCHAR (64) CHARACTER SET #charset# COLLATE #collate#  NOT NULL default ''";
@@ -318,12 +322,12 @@ $db_original[TBLPREFIX."individuals"]["row"]["i_id"]["details"] = "VARCHAR(64) C
 $db_original[TBLPREFIX."individuals"]["row"]["i_file"]["details"] = "TINYINT UNSIGNED";
 $db_original[TBLPREFIX."individuals"]["row"]["i_rin"]["details"] = "VARCHAR(64) CHARACTER SET #charset# COLLATE #collate# ";
 $db_original[TBLPREFIX."individuals"]["row"]["i_isdead"]["details"] = "TINYINT(1) DEFAULT 1";
-$db_original[TBLPREFIX."individuals"]["row"]["i_gedcom"]["details"] = "TEXT CHARACTER SET #charset# COLLATE #collate# ";
+$db_original[TBLPREFIX."individuals"]["row"]["i_gedrec"]["details"] = "TEXT CHARACTER SET #charset# COLLATE #collate# ";
 $db_original[TBLPREFIX."individuals"]["row"]["i_gender"]["details"] = "CHAR(1) CHARACTER SET #charset# COLLATE #collate# ";
 $db_original[TBLPREFIX."individuals"]["key"]["primary"] = "PRIMARY KEY  (`i_key`)";
 $db_original[TBLPREFIX."individuals"]["key"]["indi_id_file"] = "UNIQUE KEY `indi_id_file` (`i_id`, `i_file`)";
 $db_original[TBLPREFIX."individuals"]["key"]["indi_file"] = "KEY `indi_file` (`i_file`)";
-$db_original[TBLPREFIX."individuals"]["key"]["indi_gedcom"] = "FULLTEXT `indi_gedcom` (`i_gedcom`)";
+$db_original[TBLPREFIX."individuals"]["key"]["indi_gedrec"] = "FULLTEXT `indi_gedrec` (`i_gedrec`)";
              
 $db_original[TBLPREFIX."language"]["row"]["lg_string"]["details"] = "VARCHAR(255) CHARACTER SET #charset# COLLATE #collate#  NOT NULL DEFAULT ''";
 $db_original[TBLPREFIX."language"]["row"]["lg_english"]["details"] = "TEXT CHARACTER SET #charset# COLLATE #collate#  NOT NULL";
@@ -456,25 +460,25 @@ $db_original[TBLPREFIX."media"]["row"]["m_id"]["details"] = "INT AUTO_INCREMENT"
 $db_original[TBLPREFIX."media"]["row"]["m_media"]["details"] = "VARCHAR(64) CHARACTER SET #charset# COLLATE #collate# ";
 $db_original[TBLPREFIX."media"]["row"]["m_ext"]["details"] = "VARCHAR(6) CHARACTER SET #charset# COLLATE #collate# ";
 $db_original[TBLPREFIX."media"]["row"]["m_titl"]["details"] = "VARCHAR(255) CHARACTER SET #charset# COLLATE #collate# ";
-$db_original[TBLPREFIX."media"]["row"]["m_file"]["details"] = "VARCHAR(255) CHARACTER SET #charset# COLLATE #collate# ";  
-$db_original[TBLPREFIX."media"]["row"]["m_gedfile"]["details"] = "TINYINT UNSIGNED";
+$db_original[TBLPREFIX."media"]["row"]["m_mfile"]["details"] = "VARCHAR(255) CHARACTER SET #charset# COLLATE #collate# ";  
+$db_original[TBLPREFIX."media"]["row"]["m_file"]["details"] = "TINYINT UNSIGNED";
 $db_original[TBLPREFIX."media"]["row"]["m_gedrec"]["details"] = "TEXT CHARACTER SET #charset# COLLATE #collate# ";
 $db_original[TBLPREFIX."media"]["key"]["primary"] = "PRIMARY KEY  (`m_id`)";
-$db_original[TBLPREFIX."media"]["key"]["m_file"] = "KEY `m_file` (`m_file`)";
-$db_original[TBLPREFIX."media"]["key"]["m_media_file"] = "UNIQUE KEY `m_media_file` (`m_media` , `m_gedfile`)";
+$db_original[TBLPREFIX."media"]["key"]["m_mfile"] = "KEY `m_mfile` (`m_mfile`)";
+$db_original[TBLPREFIX."media"]["key"]["m_media_file"] = "UNIQUE KEY `m_media_file` (`m_media` , `m_file`)";
 $db_original[TBLPREFIX."media"]["key"]["media_gedrec"] = "FULLTEXT `media_gedrec` (`m_gedrec`)";
                                        
 $db_original[TBLPREFIX."media_mapping"]["row"]["mm_id"]["details"] = "INT AUTO_INCREMENT";
 $db_original[TBLPREFIX."media_mapping"]["row"]["mm_media"]["details"] = "VARCHAR(64) CHARACTER SET #charset# COLLATE #collate#  NOT NULL DEFAULT ''";
 $db_original[TBLPREFIX."media_mapping"]["row"]["mm_gid"]["details"] = "VARCHAR(64) CHARACTER SET #charset# COLLATE #collate#  NOT NULL DEFAULT ''";
 $db_original[TBLPREFIX."media_mapping"]["row"]["mm_order"]["details"] = "TINYINT UNSIGNED NOT NULL DEFAULT '0'";
-$db_original[TBLPREFIX."media_mapping"]["row"]["mm_gedfile"]["details"] = "TINYINT UNSIGNED DEFAULT NULL";  
+$db_original[TBLPREFIX."media_mapping"]["row"]["mm_file"]["details"] = "TINYINT UNSIGNED DEFAULT NULL";  
 $db_original[TBLPREFIX."media_mapping"]["row"]["mm_gedrec"]["details"] = "TEXT CHARACTER SET #charset# COLLATE #collate# ";
 $db_original[TBLPREFIX."media_mapping"]["row"]["mm_type"]["details"] = "VARCHAR(4) CHARACTER SET #charset# COLLATE #collate#  NOT NULL DEFAULT ''";
 $db_original[TBLPREFIX."media_mapping"]["key"]["primary"] = "PRIMARY KEY  (`mm_id`)";
-$db_original[TBLPREFIX."media_mapping"]["key"]["mm_media"] = "KEY `mm_media` (`mm_media` , `mm_gedfile`)";
-$db_original[TBLPREFIX."media_mapping"]["key"]["mm_type"] = "KEY `mm_type` (`mm_media` ,  `mm_type` , `mm_gedfile` )";
-$db_original[TBLPREFIX."media_mapping"]["key"]["mm_gid"] = "KEY `mm_gid` (`mm_media` ,  `mm_gid` , `mm_gedfile` )";
+$db_original[TBLPREFIX."media_mapping"]["key"]["mm_media"] = "KEY `mm_media` (`mm_media` , `mm_file`)";
+$db_original[TBLPREFIX."media_mapping"]["key"]["mm_type"] = "KEY `mm_type` (`mm_media` ,  `mm_type` , `mm_file` )";
+$db_original[TBLPREFIX."media_mapping"]["key"]["mm_gid"] = "KEY `mm_gid` (`mm_media` ,  `mm_gid` , `mm_file` )";
 
 $db_original[TBLPREFIX."media_files"]["row"]["mf_id"]["details"] = "INT AUTO_INCREMENT";
 $db_original[TBLPREFIX."media_files"]["row"]["mf_file"]["details"] = "VARCHAR(255) CHARACTER SET #charset# COLLATE #collate#  NOT NULL DEFAULT ''";
@@ -543,21 +547,21 @@ $db_original[TBLPREFIX."other_mapping"]["row"]["om_id"]["details"] = "INT AUTO_I
 $db_original[TBLPREFIX."other_mapping"]["row"]["om_oid"]["details"] = "VARCHAR(64) CHARACTER SET #charset# COLLATE #collate#  NOT NULL DEFAULT ''";
 $db_original[TBLPREFIX."other_mapping"]["row"]["om_gid"]["details"] = "VARCHAR(64) CHARACTER SET #charset# COLLATE #collate#  NOT NULL DEFAULT ''";
 $db_original[TBLPREFIX."other_mapping"]["row"]["om_type"]["details"] = "VARCHAR(4) CHARACTER SET #charset# COLLATE #collate#  NOT NULL DEFAULT ''";
-$db_original[TBLPREFIX."other_mapping"]["row"]["om_gedfile"]["details"] = "TINYINT UNSIGNED DEFAULT NULL";  
+$db_original[TBLPREFIX."other_mapping"]["row"]["om_file"]["details"] = "TINYINT UNSIGNED DEFAULT NULL";  
 $db_original[TBLPREFIX."other_mapping"]["key"]["primary"] = "PRIMARY KEY  (`om_id`)";
-$db_original[TBLPREFIX."other_mapping"]["key"]["om_oid"] = "KEY `om_oid` (`om_oid` , `om_gedfile` )";
-$db_original[TBLPREFIX."other_mapping"]["key"]["om_gid"] = "KEY `om_gid` ( `om_gid` , `om_gedfile` )";
+$db_original[TBLPREFIX."other_mapping"]["key"]["om_oid"] = "KEY `om_oid` (`om_oid` , `om_file` )";
+$db_original[TBLPREFIX."other_mapping"]["key"]["om_gid"] = "KEY `om_gid` ( `om_gid` , `om_file` )";
 
 $db_original[TBLPREFIX."other"]["row"]["o_key"]["details"] = "VARCHAR(64) CHARACTER SET #charset# COLLATE #collate#  NOT NULL DEFAULT ''";
 $db_original[TBLPREFIX."other"]["row"]["o_id"]["details"] = "VARCHAR(64) CHARACTER SET #charset# COLLATE #collate# ";
 $db_original[TBLPREFIX."other"]["row"]["o_file"]["details"] = "TINYINT UNSIGNED";
 $db_original[TBLPREFIX."other"]["row"]["o_type"]["details"] = "VARCHAR(20) CHARACTER SET #charset# COLLATE #collate# ";
-$db_original[TBLPREFIX."other"]["row"]["o_gedcom"]["details"] = "TEXT CHARACTER SET #charset# COLLATE #collate# ";
+$db_original[TBLPREFIX."other"]["row"]["o_gedrec"]["details"] = "TEXT CHARACTER SET #charset# COLLATE #collate# ";
 $db_original[TBLPREFIX."other"]["key"]["primary"] = "PRIMARY KEY (`o_id`, `o_file`)";
 $db_original[TBLPREFIX."other"]["key"]["o_key"] = "UNIQUE KEY `o_key` (`o_key`)";
 $db_original[TBLPREFIX."other"]["key"]["other_type"] = "KEY `other_type` (`o_type`)";
 $db_original[TBLPREFIX."other"]["key"]["other_file"] = "KEY `other_file` (`o_file`)";
-$db_original[TBLPREFIX."other"]["key"]["other_gedcom"] = "FULLTEXT `other_gedcom` (`o_gedcom`)";
+$db_original[TBLPREFIX."other"]["key"]["other_gedrec"] = "FULLTEXT `other_gedrec` (`o_gedrec`)";
              
 $db_original[TBLPREFIX."pages"]["row"]["pag_id"]["details"] = "INT NOT NULL AUTO_INCREMENT";
 $db_original[TBLPREFIX."pages"]["row"]["pag_content"]["details"] = "LONGTEXT CHARACTER SET #charset# COLLATE #collate#   NOT NULL";
@@ -620,23 +624,24 @@ $db_original[TBLPREFIX."sources"]["row"]["s_key"]["details"] = "VARCHAR(64) CHAR
 $db_original[TBLPREFIX."sources"]["row"]["s_id"]["details"] = "VARCHAR(64) CHARACTER SET #charset# COLLATE #collate# ";
 $db_original[TBLPREFIX."sources"]["row"]["s_file"]["details"] = "VARCHAR(64) CHARACTER SET #charset# COLLATE #collate# ";
 $db_original[TBLPREFIX."sources"]["row"]["s_name"]["details"] = "VARCHAR(255) CHARACTER SET #charset# COLLATE #collate# ";
-$db_original[TBLPREFIX."sources"]["row"]["s_gedcom"]["details"] = "TEXT CHARACTER SET #charset# COLLATE #collate# ";
+$db_original[TBLPREFIX."sources"]["row"]["s_gedrec"]["details"] = "TEXT CHARACTER SET #charset# COLLATE #collate# ";
 $db_original[TBLPREFIX."sources"]["key"]["primary"] = "PRIMARY KEY  (`s_key`)";
 $db_original[TBLPREFIX."sources"]["key"]["sour_id_file"] = "UNIQUE KEY `sour_id_file` (`s_id`, `s_file`)";
 $db_original[TBLPREFIX."sources"]["key"]["sour_name"] = "KEY `sour_name` (`s_name`)";
 $db_original[TBLPREFIX."sources"]["key"]["sour_file"] = "KEY `sour_file` (`s_file`)";
-$db_original[TBLPREFIX."sources"]["key"]["sour_gedcom"] = "FULLTEXT `sour_gedcom` (`s_gedcom`)";
+$db_original[TBLPREFIX."sources"]["key"]["sour_gedrec"] = "FULLTEXT `sour_gedrec` (`s_gedrec`)";
 
 $db_original[TBLPREFIX."source_mapping"]["row"]["sm_id"]["details"] = "INT AUTO_INCREMENT";
+$db_original[TBLPREFIX."source_mapping"]["row"]["sm_key"]["details"] = "VARCHAR(64) CHARACTER SET #charset# COLLATE #collate# ";
 $db_original[TBLPREFIX."source_mapping"]["row"]["sm_sid"]["details"] = "VARCHAR(64) CHARACTER SET #charset# COLLATE #collate#  NOT NULL DEFAULT ''";
 $db_original[TBLPREFIX."source_mapping"]["row"]["sm_type"]["details"] = "VARCHAR(4) CHARACTER SET #charset# COLLATE #collate#  NOT NULL DEFAULT ''";
 $db_original[TBLPREFIX."source_mapping"]["row"]["sm_gid"]["details"] = "VARCHAR(64) CHARACTER SET #charset# COLLATE #collate#  NOT NULL DEFAULT ''";
-$db_original[TBLPREFIX."source_mapping"]["row"]["sm_gedfile"]["details"] = "TINYINT UNSIGNED DEFAULT NULL";  
+$db_original[TBLPREFIX."source_mapping"]["row"]["sm_file"]["details"] = "TINYINT UNSIGNED DEFAULT NULL";  
 $db_original[TBLPREFIX."source_mapping"]["row"]["sm_gedrec"]["details"] = "TEXT CHARACTER SET #charset# COLLATE #collate# ";
-$db_original[TBLPREFIX."source_mapping"]["key"]["primary"] = "PRIMARY KEY  (`sm_id`)";
-$db_original[TBLPREFIX."source_mapping"]["key"]["sm_sid"] = "KEY `sm_sid` (`sm_sid` , `sm_gedfile` )";
-$db_original[TBLPREFIX."source_mapping"]["key"]["sm_gid"] = "KEY `sm_gid` ( `sm_gid` , `sm_gedfile` )";
-$db_original[TBLPREFIX."source_mapping"]["key"]["sm_type"] = "KEY `sm_type` (`sm_sid` ,  `sm_type` , `sm_gedfile` )";
+$db_original[TBLPREFIX."source_mapping"]["key"]["primary"] = "PRIMARY KEY  (`sm_key`)";
+$db_original[TBLPREFIX."source_mapping"]["key"]["sm_sid"] = "KEY `sm_sid` (`sm_sid` , `sm_file` )";
+$db_original[TBLPREFIX."source_mapping"]["key"]["sm_gid"] = "KEY `sm_gid` ( `sm_gid` , `sm_file` )";
+$db_original[TBLPREFIX."source_mapping"]["key"]["sm_type"] = "KEY `sm_type` (`sm_sid` ,  `sm_type` , `sm_file` )";
 
 $db_original[TBLPREFIX."soundex"]["row"]["s_id"]["details"] = "INT NOT NULL AUTO_INCREMENT";
 $db_original[TBLPREFIX."soundex"]["row"]["s_gid"]["details"] = "VARCHAR(64) CHARACTER SET #charset# COLLATE #collate#  NOT NULL DEFAULT ''";;
@@ -698,7 +703,7 @@ $db_original[TBLPREFIX."users"]["key"]["primary"] = "PRIMARY KEY  (`u_username`)
 
 $db_original[TBLPREFIX."users_gedcoms"]["row"]["ug_ID"]["details"] = "INT NOT NULL AUTO_INCREMENT";
 $db_original[TBLPREFIX."users_gedcoms"]["row"]["ug_username"]["details"] = "VARBINARY(30) NOT NULL DEFAULT ''";
-$db_original[TBLPREFIX."users_gedcoms"]["row"]["ug_gedfile"]["details"] = "TINYINT UNSIGNED NOT NULL DEFAULT '0'";
+$db_original[TBLPREFIX."users_gedcoms"]["row"]["ug_file"]["details"] = "TINYINT UNSIGNED NOT NULL DEFAULT '0'";
 $db_original[TBLPREFIX."users_gedcoms"]["row"]["ug_gedcomid"]["details"] = "VARCHAR(64) CHARACTER SET #charset# COLLATE #collate# ";
 $db_original[TBLPREFIX."users_gedcoms"]["row"]["ug_rootid"]["details"] = "VARCHAR(64) CHARACTER SET #charset# COLLATE #collate# ";
 $db_original[TBLPREFIX."users_gedcoms"]["row"]["ug_canedit"]["details"] = "VARCHAR(7) CHARACTER SET #charset# COLLATE #collate# DEFAULT 'none'";
@@ -711,7 +716,7 @@ $db_original[TBLPREFIX."users_gedcoms"]["row"]["ug_hide_live_people"]["details"]
 $db_original[TBLPREFIX."users_gedcoms"]["row"]["ug_show_living_names"]["details"] = "ENUM('N','Y','') NOT NULL DEFAULT ''";
 $db_original[TBLPREFIX."users_gedcoms"]["key"]["primary"] = "PRIMARY KEY  (`ug_ID`)";
 $db_original[TBLPREFIX."users_gedcoms"]["key"]["ug_user"] = "KEY `ug_user` (`ug_username`)";
-$db_original[TBLPREFIX."users_gedcoms"]["key"]["ug_ged"] = "KEY `ug_ged` (`ug_gedcomid` ,  `ug_gedfile`)";
+$db_original[TBLPREFIX."users_gedcoms"]["key"]["ug_gedid"] = "KEY `ug_gedid` (`ug_gedcomid` ,  `ug_file`)";
 
 ksort($db_original);
 ?>

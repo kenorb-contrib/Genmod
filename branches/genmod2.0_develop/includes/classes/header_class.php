@@ -84,12 +84,12 @@ class Header extends GedcomRecord {
 	
 	protected function ReadHeaderRecord() {
 		
-		$sql = "SELECT o_gedcom FROM ".TBLPREFIX."other WHERE o_key='".JoinKey($this->xref,	$this->gedcomid)."'";
+		$sql = "SELECT o_gedrec FROM ".TBLPREFIX."other WHERE o_key='".JoinKey($this->xref,	$this->gedcomid)."'";
 		$res = NewQuery($sql);
 		if ($res) {
 			if ($res->NumRows() != 0) {
 				$row = $res->fetchAssoc();
-				$this->gedrec = $row["o_gedcom"];
+				$this->gedrec = $row["o_gedrec"];
 			}
 		}
 	}

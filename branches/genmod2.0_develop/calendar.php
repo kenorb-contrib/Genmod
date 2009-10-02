@@ -304,7 +304,7 @@ print_header($gm_lang["anniversary_calendar"]);
 print "<div style=\" text-align: center;\" id=\"calendar_page\">\n";
 
 	//-- moved here from session.php, should probably be moved somewhere else still
-	$sql = "SELECT i_id FROM ".TBLPREFIX."individuals where i_file='".$GEDCOMID."' AND i_gedcom like '%@#DHEBREW@%'";
+	$sql = "SELECT i_id FROM ".TBLPREFIX."individuals where i_file='".$GEDCOMID."' AND i_gedrec like '%@#DHEBREW@%'";
 	$res = NewQuery($sql);
 	if ($res->NumRows()>0) $HEBREWFOUND[$GEDCOMID] = true;
 	else $HEBREWFOUND[$GEDCOMID] = false;

@@ -28,7 +28,7 @@
  * @package Genmod
  * @subpackage DB
  */
-if (strstr($_SERVER["SCRIPT_NAME"],basename(__FILE__))) {
+if (stristr($_SERVER["SCRIPT_NAME"],basename(__FILE__))) {
 	require "../../intrusion.php";
 }
 
@@ -48,13 +48,13 @@ function SearchIndis($query, $allgeds=false, $ANDOR="AND") {
 	global $indilist, $GEDCOMS, $GEDCOMID;
 	
 	$myindilist = array();
-	if (!is_array($query)) $sql = "SELECT i_key, i_id, i_file, i_gedcom, i_isdead FROM ".TBLPREFIX."individuals WHERE (i_gedcom REGEXP '".DbLayer::EscapeQuery($query)."')";
+	if (!is_array($query)) $sql = "SELECT i_key, i_id, i_file, i_gedrec, i_isdead FROM ".TBLPREFIX."individuals WHERE (i_gedrec REGEXP '".DbLayer::EscapeQuery($query)."')";
 	else {
-		$sql = "SELECT i_key, i_id, i_file, i_gedcom, i_isdead FROM ".TBLPREFIX."individuals WHERE (";
+		$sql = "SELECT i_key, i_id, i_file, i_gedrec, i_isdead FROM ".TBLPREFIX."individuals WHERE (";
 		$i=0;
 		foreach($query as $indexval => $q) {
 			if ($i>0) $sql .= " $ANDOR ";
-			$sql .= "(i_gedcom REGEXP '".DbLayer::EscapeQuery($q)."')";
+			$sql .= "(i_gedrec REGEXP '".DbLayer::EscapeQuery($q)."')";
 			$i++;
 		}
 		$sql .= ")";
@@ -77,9 +77,9 @@ function SearchIndis($query, $allgeds=false, $ANDOR="AND") {
 			$row = db_cleanup($row);
 			if (count($allgeds) > 1) $key = $row["i_key"];
 			else $key = $row["i_id"];
-			$myindilist[$key]["names"] = GetIndiNames($row["i_gedcom"]);
+			$myindilist[$key]["names"] = GetIndiNames($row["i_gedrec"]);
 			$myindilist[$key]["gedfile"] = $row["i_file"];
-			$myindilist[$key]["gedcom"] = $row["i_gedcom"];
+			$myindilist[$key]["gedcom"] = $row["i_gedrec"];
 			$myindilist[$key]["isdead"] = $row["i_isdead"];
 //			if ($myindilist[$row["i_key"]]["gedfile"] == $GEDCOMID) $indilist[$row[0]] = $myindilist[$row[0]."[".$row[2]."]"];
 		}
@@ -98,7 +98,7 @@ function SearchIndis($query, $allgeds=false, $ANDOR="AND") {
 function SearchIndisFam($add2myindilist) {
 	global $indilist, $myindilist, $GEDCOMID;
 
-	$sql = "SELECT i_id, i_file, i_gedcom, i_isdead, n_name, n_type, n_surname, n_letter FROM ".TBLPREFIX."individuals, ".TBLPREFIX."names WHERE i_key=n_key AND i_file='".$GEDCOMID."'";
+	$sql = "SELECT i_id, i_file, i_gedrec, i_isdead, n_name, n_type, n_surname, n_letter FROM ".TBLPREFIX."individuals, ".TBLPREFIX."names WHERE i_key=n_key AND i_file='".$GEDCOMID."'";
 	$res = NewQuery($sql);
 	while($row = $res->fetchAssoc()){
 		if (isset($add2myindilist[$row["i_id"]])){
@@ -107,7 +107,7 @@ function SearchIndisFam($add2myindilist) {
 			if (!isset($myindilist[$row["i_id"]])) {
 				$myindilist[$row["i_id"]]["names"][] = array($row["n_name"], $row["n_letter"], $row["n_surname"], $row["n_type"]);
 				$myindilist[$row["i_id"]]["gedfile"] = $row["i_file"];
-				$myindilist[$row["i_id"]]["gedcom"] = $row["i_gedcom"].$add2my_fam;
+				$myindilist[$row["i_id"]]["gedcom"] = $row["i_gedrec"].$add2my_fam;
 				$myindilist[$row["i_id"]]["isdead"] = $row["i_isdead"];
 			}
 			else $myindilist[$row["i_id"]]["names"][] = array($row["n_name"], $row["n_letter"], $row["n_surname"], $row["n_type"]);
@@ -126,11 +126,11 @@ function SearchIndisYearRange($startyear, $endyear, $allgeds=false) {
 	global $indilist, $GEDCOMID;
 
 	$myindilist = array();
-	$sql = "SELECT i_id, i_file, i_gedcom, i_isdead, n_name, n_surname, n_letter, n_type FROM ".TBLPREFIX."individuals, ".TBLPREFIX."names WHERE i_key=n_key AND (";
+	$sql = "SELECT i_id, i_file, i_gedrec, i_isdead, n_name, n_surname, n_letter, n_type FROM ".TBLPREFIX."individuals, ".TBLPREFIX."names WHERE i_key=n_key AND (";
 	$i=$startyear;
 	while($i <= $endyear) {
 		if ($i > $startyear) $sql .= " OR ";
-		$sql .= "i_gedcom REGEXP '".DbLayer::EscapeQuery("2 DATE[^\n]* ".$i)."'";
+		$sql .= "i_gedrec REGEXP '".DbLayer::EscapeQuery("2 DATE[^\n]* ".$i)."'";
 		$i++;
 	}
 	$sql .= ")";
@@ -141,7 +141,7 @@ function SearchIndisYearRange($startyear, $endyear, $allgeds=false) {
 		if (!isset($myindilist[$row["i_id"]])) {
 			$myindilist[$row["i_id"]]["names"][] = array($row["n_name"], $row["n_letter"], $row["n_surname"], $row["n_type"]);
 			$myindilist[$row["i_id"]]["gedfile"] = $row["i_file"];
-			$myindilist[$row["i_id"]]["gedcom"] = $row["i_gedcom"];
+			$myindilist[$row["i_id"]]["gedcom"] = $row["i_gedrec"];
 			$myindilist[$row["i_id"]]["isdead"] = $row["i_isdead"];
 		}
 		else $myindilist[$row["i_id"]]["names"][] = array($row["n_name"], $row["n_letter"], $row["n_surname"], $row["n_type"]);
@@ -167,9 +167,9 @@ function SearchIndisNames($query, $allgeds=false, $gedid=0) {
 	}
 
 	$myindilist = array();
-	if (!is_array($query)) $sql = "SELECT i_id, i_file, i_gedcom, i_isdead, n_name, n_letter, n_type, n_surname FROM ".TBLPREFIX."individuals, ".TBLPREFIX."names WHERE i_key=n_key AND n_name REGEXP '".DbLayer::EscapeQuery($query)."'";
+	if (!is_array($query)) $sql = "SELECT i_id, i_file, i_gedrec, i_isdead, n_name, n_letter, n_type, n_surname FROM ".TBLPREFIX."individuals, ".TBLPREFIX."names WHERE i_key=n_key AND n_name REGEXP '".DbLayer::EscapeQuery($query)."'";
 	else {
-		$sql = "SELECT i_id, i_file, i_gedcom, i_isdead, n_name, n_letter, n_type, n_surname FROM ".TBLPREFIX."individuals, ".TBLPREFIX."names WHERE i_key=n_key AND (";
+		$sql = "SELECT i_id, i_file, i_gedrec, i_isdead, n_name, n_letter, n_type, n_surname FROM ".TBLPREFIX."individuals, ".TBLPREFIX."names WHERE i_key=n_key AND (";
 		$i=0;
 		foreach($query as $indexval => $q) {
 			if (!empty($q)) {
@@ -192,7 +192,7 @@ function SearchIndisNames($query, $allgeds=false, $gedid=0) {
 		if (!isset($myindilist[$key])) {
 			$myindilist[$key]["names"][] = array($row["n_name"], $row["n_letter"], $row["n_surname"], $row["n_type"]);
 			$myindilist[$key]["gedfile"] = $row["i_file"];
-			$myindilist[$key]["gedcom"] = $row["i_gedcom"];
+			$myindilist[$key]["gedcom"] = $row["i_gedrec"];
 			$myindilist[$key]["isdead"] = $row["i_isdead"];
 		}
 		else $myindilist[$key]["names"][] = array($row["n_name"], $row["n_letter"], $row["n_surname"], $row["n_type"]);
@@ -218,7 +218,7 @@ function SearchIndisDates($day="", $month="", $year="", $fact="", $allgeds=false
 	global $indilist, $GEDCOMID;
 	$myindilist = array();
 	
-	$sql = "SELECT i_id, i_file, i_gedcom, i_isdead, d_gid, d_fact, n_name, n_surname, n_type, n_letter FROM ".TBLPREFIX."dates, ".TBLPREFIX."individuals, ".TBLPREFIX."names WHERE i_key=d_key AND n_key=i_key ";
+	$sql = "SELECT i_id, i_file, i_gedrec, i_isdead, d_gid, d_fact, n_name, n_surname, n_type, n_letter FROM ".TBLPREFIX."dates, ".TBLPREFIX."individuals, ".TBLPREFIX."names WHERE i_key=d_key AND n_key=i_key ";
 	if (!empty($day)) $sql .= "AND d_day='".DbLayer::EscapeQuery($day)."' ";
 	if (!empty($month)) $sql .= "AND d_month='".DbLayer::EscapeQuery($month)."' ";
 	if (!empty($year)) $sql .= "AND d_year='".DbLayer::EscapeQuery($year)."' ";
@@ -251,7 +251,7 @@ function SearchIndisDates($day="", $month="", $year="", $fact="", $allgeds=false
 			if (!isset($myindilist[$key])) {
 				$myindilist[$key]["names"][] = array($row["n_name"], $row["n_letter"], $row["n_surname"], $row["n_type"]);
 				$myindilist[$key]["gedfile"] = $row["i_file"];
-				$myindilist[$key]["gedcom"] = $row["i_gedcom"];
+				$myindilist[$key]["gedcom"] = $row["i_gedrec"];
 				$myindilist[$key]["isdead"] = $row["i_isdead"];
 			}
 			else $myindilist[$key]["names"][] = array($row["n_name"], $row["n_letter"], $row["n_surname"], $row["n_type"]);
@@ -280,7 +280,7 @@ function SearchIndisDateRange($dstart="1", $mstart="1", $ystart="", $dend="31", 
 //print "Mstart: ".$mstart." ".date("M", mktime(1,0,0,$mstart,1))."<br />";
 //print "Dend: ".$dend."<br />";
 //print "Mend: ".$mend." ".date("M", mktime(1,0,0,$mend,1))."<br />";
-	$sql = "SELECT i_id, i_file, i_gedcom, i_isdead, n_name, n_surname, n_letter, n_type FROM ".TBLPREFIX."dates, ".TBLPREFIX."individuals, ".TBLPREFIX."names WHERE i_key=d_key AND n_key=i_key ";
+	$sql = "SELECT i_id, i_file, i_gedrec, i_isdead, n_name, n_surname, n_letter, n_type FROM ".TBLPREFIX."dates, ".TBLPREFIX."individuals, ".TBLPREFIX."names WHERE i_key=d_key AND n_key=i_key ";
 	if ($onlyBDM == "yes") $sql .= " AND d_fact NOT IN ('BIRT', 'DEAT')";
 	if ($filter == "alive") $sql .= "AND i_isdead!='0'";
 
@@ -296,7 +296,7 @@ function SearchIndisDateRange($dstart="1", $mstart="1", $ystart="", $dend="31", 
 		if (!isset($myindilist[$key])) {
 			$myindilist[$key]["names"][] = array($row["n_name"], $row["n_letter"], $row["n_surname"], $row["n_type"]);
 			$myindilist[$key]["gedfile"] = $row["i_file"];
-			$myindilist[$key]["gedcom"] = $row["i_gedcom"];
+			$myindilist[$key]["gedcom"] = $row["i_gedrec"];
 			$myindilist[$key]["isdead"] = $row["i_isdead"];
 		}
 		else $myindilist[$key]["names"][] = array($row["n_name"], $row["n_letter"], $row["n_surname"], $row["n_type"]);
@@ -396,7 +396,7 @@ function DateRangeforQuery($dstart="1", $mstart="1", $ystart="", $dend="31", $me
 function SearchFamsDateRange($dstart="1", $mstart="1", $ystart, $dend="31", $mend="12", $yend, $onlyBDM="no", $skipfacts="", $allgeds=false, $onlyfacts="") {
 	global $GEDCOMID, $famlist, $GEDCOMS, $GEDCOMID;
 	$myfamlist = array();
-	$sql = "SELECT f_key, f_id, f_husb, f_wife, f_file, f_gedcom FROM ".TBLPREFIX."dates, ".TBLPREFIX."families WHERE f_key=d_key ";
+	$sql = "SELECT f_key, f_id, f_husb, f_wife, f_file, f_gedrec FROM ".TBLPREFIX."dates, ".TBLPREFIX."families WHERE f_key=d_key ";
 
 	$sql .= DateRangeforQuery($dstart, $mstart, $ystart, $dend, $mend, $yend, $skipfacts, $allgeds, $onlyfacts);
 
@@ -419,7 +419,7 @@ function SearchFamsDateRange($dstart="1", $mstart="1", $ystart, $dend="31", $men
 		$myfamlist[$key]["HUSB"] = SplitKey($row["f_husb"], "id");
 		$myfamlist[$key]["WIFE"] = SplitKey($row["f_wife"], "id");
 		$myfamlist[$key]["gedfile"] = $row["f_file"];
-		$myfamlist[$key]["gedcom"] = $row["f_gedcom"];
+		$myfamlist[$key]["gedcom"] = $row["f_gedrec"];
 		$famlist[$key] = $myfamlist[$key];
 	}
 	$GEDCOMID = $gedold;
@@ -432,13 +432,13 @@ function SearchFams($query, $allgeds=false, $ANDOR="AND", $allnames=false) {
 	global $famlist, $GEDCOMS, $GEDCOMID;
 	
 	$myfamlist = array();
-	if (!is_array($query)) $sql = "SELECT f_id, f_husb, f_wife, f_file, f_gedcom FROM ".TBLPREFIX."families WHERE (f_gedcom REGEXP '".DbLayer::EscapeQuery($query)."')";
+	if (!is_array($query)) $sql = "SELECT f_id, f_husb, f_wife, f_file, f_gedrec FROM ".TBLPREFIX."families WHERE (f_gedrec REGEXP '".DbLayer::EscapeQuery($query)."')";
 	else {
-		$sql = "SELECT f_key, f_id, f_husb, f_wife, f_file, f_gedcom FROM ".TBLPREFIX."families WHERE (";
+		$sql = "SELECT f_key, f_id, f_husb, f_wife, f_file, f_gedrec FROM ".TBLPREFIX."families WHERE (";
 		$i=0;
 		foreach($query as $indexval => $q) {
 			if ($i>0) $sql .= " $ANDOR ";
-			$sql .= "(f_gedcom REGEXP '".DbLayer::EscapeQuery($q)."')";
+			$sql .= "(f_gedrec REGEXP '".DbLayer::EscapeQuery($q)."')";
 			$i++;
 		}
 		$sql .= ")";
@@ -486,7 +486,7 @@ function SearchFams($query, $allgeds=false, $ANDOR="AND", $allnames=false) {
 		else $key = $row["f_id"];
 		$myfamlist[$key]["name"] = $name;
 		$myfamlist[$key]["gedfile"] = $row["f_file"];
-		$myfamlist[$key]["gedcom"] = $row["f_gedcom"];
+		$myfamlist[$key]["gedcom"] = $row["f_gedrec"];
 		$myfamlist[$key]["HUSB"] = $husb;
 		$myfamlist[$key]["WIFE"] = $wife;
 	}
@@ -521,7 +521,7 @@ function SearchFamsNames($query, $ANDOR="AND", $allnames=false) {
 	global $famlist, $GEDCOMS, $GEDCOMID, $COMBIKEY;
 
 	$myfamlist = array();
-	$sql = "SELECT f_key, f_id, f_husb, f_wife, f_file, f_gedcom FROM ".TBLPREFIX."families WHERE (";
+	$sql = "SELECT f_key, f_id, f_husb, f_wife, f_file, f_gedrec FROM ".TBLPREFIX."families WHERE (";
 	$i=0;
 	foreach($query as $indexval => $q) {
 
@@ -564,7 +564,7 @@ function SearchFamsNames($query, $ANDOR="AND", $allnames=false) {
 		$myfamlist[$key]["gedfile"] = $row["f_file"];
 		$myfamlist[$key]["HUSB"] = $husb;
 		$myfamlist[$key]["WIFE"] = $wife;
-		$myfamlist[$key]["gedcom"] = $row["f_gedcom"];
+		$myfamlist[$key]["gedcom"] = $row["f_gedrec"];
 		$famlist[$key] = $myfamlist[$key];
 	}
 	$GEDCOMID = $gedold;
@@ -622,11 +622,11 @@ function SearchFamsYearRange($startyear, $endyear, $allgeds=false) {
 	global $famlist, $GEDCOMID;
 
 	$myfamlist = array();
-	$sql = "SELECT f_id, f_husb, f_wife, f_file, f_gedcom FROM ".TBLPREFIX."families WHERE (";
+	$sql = "SELECT f_id, f_husb, f_wife, f_file, f_gedrec FROM ".TBLPREFIX."families WHERE (";
 	$i=$startyear;
 	while($i <= $endyear) {
 		if ($i > $startyear) $sql .= " OR ";
-		$sql .= "f_gedcom REGEXP '".DbLayer::EscapeQuery("2 DATE[^\n]* ".$i)."'";
+		$sql .= "f_gedrec REGEXP '".DbLayer::EscapeQuery("2 DATE[^\n]* ".$i)."'";
 		$i++;
 	}
 	$sql .= ")";
@@ -666,7 +666,7 @@ function SearchFamsDates($day="", $month="", $year="", $fact="", $allgeds=false)
 	global $famlist, $GEDCOMS, $GEDCOMID;
 	$myfamlist = array();
 	
-	$sql = "SELECT f_id, f_husb, f_wife, f_file, f_gedcom, d_gid, d_fact FROM ".TBLPREFIX."dates, ".TBLPREFIX."families WHERE f_key=d_key ";
+	$sql = "SELECT f_id, f_husb, f_wife, f_file, f_gedrec, d_gid, d_fact FROM ".TBLPREFIX."dates, ".TBLPREFIX."families WHERE f_key=d_key ";
 	if (!empty($day)) $sql .= "AND d_day='".DbLayer::EscapeQuery($day)."' ";
 	if (!empty($month)) $sql .= "AND d_month='".DbLayer::EscapeQuery(Str2Upper($month))."' ";
 	if (!empty($year)) $sql .= "AND d_year='".DbLayer::EscapeQuery($year)."' ";
@@ -728,13 +728,13 @@ function SearchSources($query, $allgeds=false, $ANDOR="AND") {
 	global $GEDCOMID;
 	
 	$mysourcelist = array();	
-	if (!is_array($query)) $sql = "SELECT s_id, s_name, s_file, s_gedcom FROM ".TBLPREFIX."sources WHERE (s_gedcom REGEXP '".DbLayer::EscapeQuery($query)."')";
+	if (!is_array($query)) $sql = "SELECT s_id, s_name, s_file, s_gedrec FROM ".TBLPREFIX."sources WHERE (s_gedrec REGEXP '".DbLayer::EscapeQuery($query)."')";
 	else {
-		$sql = "SELECT s_id, s_name, s_file, s_gedcom FROM ".TBLPREFIX."sources WHERE (";
+		$sql = "SELECT s_id, s_name, s_file, s_gedrec FROM ".TBLPREFIX."sources WHERE (";
 		$i=0;
 		foreach($query as $indexval => $q) {
 			if ($i>0) $sql .= " $ANDOR ";
-			$sql .= "(s_gedcom REGEXP '".DbLayer::EscapeQuery($q)."')";
+			$sql .= "(s_gedrec REGEXP '".DbLayer::EscapeQuery($q)."')";
 			$i++;
 		}
 		$sql .= ")";
@@ -779,7 +779,7 @@ function SearchSourcesDates($day="", $month="", $year="", $fact="", $allgeds=fal
 	global $famlist, $GEDCOMID;
 	$mysourcelist = array();
 	
-	$sql = "SELECT s_id, s_name, s_file, s_gedcom, d_gid FROM ".TBLPREFIX."dates, ".TBLPREFIX."sources WHERE s_id=d_gid AND s_file=d_file ";
+	$sql = "SELECT s_id, s_name, s_file, s_gedrec, d_gid FROM ".TBLPREFIX."dates, ".TBLPREFIX."sources WHERE s_id=d_gid AND s_file=d_file ";
 	if (!empty($day)) $sql .= "AND d_day='".DbLayer::EscapeQuery($day)."' ";
 	if (!empty($month)) $sql .= "AND d_month='".DbLayer::EscapeQuery(Str2Upper($month))."' ";
 	if (!empty($year)) $sql .= "AND d_year='".DbLayer::EscapeQuery($year)."' ";
@@ -817,7 +817,7 @@ function SearchSourcesDateRange($dstart="1", $mstart="1", $ystart="", $dend="31"
 	global $famlist, $GEDCOMID;
 	$mysourcelist = array();
 	
-	$sql = "SELECT s_id, s_name, s_file, s_gedcom, d_gid FROM ".TBLPREFIX."dates, ".TBLPREFIX."sources WHERE s_id=d_gid AND s_file=d_file ";
+	$sql = "SELECT s_id, s_name, s_file, s_gedrec, d_gid FROM ".TBLPREFIX."dates, ".TBLPREFIX."sources WHERE s_id=d_gid AND s_file=d_file ";
 	
 	$sql .= DateRangeforQuery($dstart, $mstart, $ystart, $dend, $mend, $yend, $skipfacts, $allgeds, $onlyfacts);
 	
@@ -853,7 +853,7 @@ function SearchOtherDates($day="", $month="", $year="", $fact="", $allgeds=false
 	global $famlist, $GEDCOMID;
 	$myrepolist = array();
 	
-	$sql = "SELECT o_id, o_file, o_type, o_gedcom, d_gid FROM ".TBLPREFIX."dates, ".TBLPREFIX."other WHERE o_id=d_gid AND o_file=d_file ";
+	$sql = "SELECT o_id, o_file, o_type, o_gedrec, d_gid FROM ".TBLPREFIX."dates, ".TBLPREFIX."other WHERE o_id=d_gid AND o_file=d_file ";
 	if (!empty($day)) $sql .= "AND d_day='".DbLayer::EscapeQuery($day)."' ";
 	if (!empty($month)) $sql .= "AND d_month='".DbLayer::EscapeQuery(Str2Upper($month))."' ";
 	if (!empty($year)) $sql .= "AND d_year='".DbLayer::EscapeQuery($year)."' ";
@@ -895,7 +895,7 @@ function SearchOtherDateRange($dstart="1", $mstart="1", $ystart="", $dend="31", 
 	global $GEDCOMID;
 	$myrepolist = array();
 	
-	$sql = "SELECT o_id, o_file, o_type, o_gedcom, d_gid FROM ".TBLPREFIX."dates, ".TBLPREFIX."other WHERE o_id=d_gid AND o_file=d_file ";
+	$sql = "SELECT o_id, o_file, o_type, o_gedrec, d_gid FROM ".TBLPREFIX."dates, ".TBLPREFIX."other WHERE o_id=d_gid AND o_file=d_file ";
 	
 	$sql .= DateRangeforQuery($dstart, $mstart, $ystart, $dend, $mend, $yend, $skipfacts, $allgeds, $onlyfacts);
 	
@@ -935,7 +935,7 @@ function SearchMediaDateRange($dstart="1", $mstart="1", $ystart="", $dend="31", 
 	global $GEDCOMID;
 	$mymedia = array();
 	
-	$sql = "SELECT m_media, m_file, m_gedfile, m_ext, m_titl, m_gedrec FROM ".TBLPREFIX."dates, ".TBLPREFIX."media WHERE m_media=d_gid AND m_gedfile=d_file ";
+	$sql = "SELECT m_media, m_mfile, m_file, m_ext, m_titl, m_gedrec FROM ".TBLPREFIX."dates, ".TBLPREFIX."media WHERE m_media=d_gid AND m_file=d_file ";
 	
 	$sql .= DateRangeforQuery($dstart, $mstart, $ystart, $dend, $mend, $yend, $skipfacts, $allgeds, $onlyfacts);
 	
@@ -945,13 +945,13 @@ function SearchMediaDateRange($dstart="1", $mstart="1", $ystart="", $dend="31", 
 	$gedold = $GEDCOMID;
 
 	while($row = $res->fetchAssoc()){
-		if ($allgeds) $mid = $row["m_media"]."[".$row["m_gedfile"]."]";
+		if ($allgeds) $mid = $row["m_media"]."[".$row["m_file"]."]";
 		else $mid = $row["m_media"];
 		$mymedia[$mid]["ext"] = $row["m_ext"];
 		$mymedia[$mid]["title"] = $row["m_titl"];
-		$mymedia[$mid]["file"] = MediaFS::CheckMediaDepth($row["m_file"]);
+		$mymedia[$mid]["file"] = MediaFS::CheckMediaDepth($row["m_mfile"]);
 		$mymedia[$mid]["gedcom"] = $row["m_gedrec"];
-		$mymedia[$mid]["gedfile"] = $row["m_gedfile"];
+		$mymedia[$mid]["gedfile"] = $row["m_file"];
 	}
 	$GEDCOMID = $gedold;
 	$res->FreeResult();
