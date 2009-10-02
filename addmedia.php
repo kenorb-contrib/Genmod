@@ -83,7 +83,7 @@ if (empty($action)) $action="showmediaform";
 
 if (!isset($m_ext)) $m_ext="";
 if (!isset($m_titl)) $m_titl="";
-if (!isset($m_file)) $m_file="";
+if (!isset($m_mfile)) $m_mfile="";
 if (!isset($paste)) $paste = false;
 $can_auto_accept = true;
 if (!isset($aa_attempt)) $aa_attempt = false;

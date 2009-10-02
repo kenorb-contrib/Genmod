@@ -67,22 +67,22 @@ class MediaListController {
 		$found = 0;
 		$added = 0;
 		// sort the data on title, if absent on the filename with heading . and / stripped.
-		if ($count == 0) $sql = "SELECT *, concat(m_titl, if(substr(if(substr(m_file,1,1)='.',substr(m_file,2),m_file),1,1)='/',substr(if(substr(m_file,1,1)='.',substr(m_file,2),m_file),2),if(substr(m_file,1,1)='.',substr(m_file,2),m_file))) as k FROM ".TBLPREFIX."media WHERE m_gedfile='".$GEDCOMID."' ORDER BY k";
-		else $sql = "SELECT * FROM ".TBLPREFIX."media WHERE m_gedfile='".$GEDCOMID."' ORDER BY RAND() LIMIT ".$count;
+		if ($count == 0) $sql = "SELECT *, concat(m_titl, if(substr(if(substr(m_mfile,1,1)='.',substr(m_mfile,2),m_mfile),1,1)='/',substr(if(substr(m_mfile,1,1)='.',substr(m_mfile,2),m_mfile),2),if(substr(m_mfile,1,1)='.',substr(m_mfile,2),m_mfile))) as k FROM ".TBLPREFIX."media WHERE m_file='".$GEDCOMID."' ORDER BY k";
+		else $sql = "SELECT * FROM ".TBLPREFIX."media WHERE m_file='".$GEDCOMID."' ORDER BY RAND() LIMIT ".$count;
 		$db = NewQuery($sql);
 		$this->totalmediaitems = $db->NumRows();
 		while($row = $db->FetchAssoc()) {
 			$media = MediaItem::GetInstance($row["m_media"], $row);
 			if ($media->disp) {
 				if ($count) {
-					$this->medialist[$row["m_media"]."_".$row["m_gedfile"]] = $media;
+					$this->medialist[$row["m_media"]."_".$row["m_file"]] = $media;
 					$added++;
 					if ($added == $max) break;
 				}
 				else {	
 					$found++;
 					if ($found > $start) {
-						$this->medialist[$row["m_media"]."_".$row["m_gedfile"]] = $media;
+						$this->medialist[$row["m_media"]."_".$row["m_file"]] = $media;
 						$added++;
 					}
 					if ($max != 0 && $added == $max+1) break;
@@ -99,7 +99,7 @@ class MediaListController {
 		$added = 0;
 		$t = 1;
 		if ($t == 1) {
-		$sql = "SELECT *, concat(m_titl, if(substr(if(substr(m_file,1,1)='.',substr(m_file,2),m_file),1,1)='/',substr(if(substr(m_file,1,1)='.',substr(m_file,2),m_file),2),if(substr(m_file,1,1)='.',substr(m_file,2),m_file))) as k FROM ".TBLPREFIX."media WHERE m_gedfile='".$GEDCOMID."' AND m_media IN
+		$sql = "SELECT *, concat(m_titl, if(substr(if(substr(m_mfile,1,1)='.',substr(m_mfile,2),m_mfile),1,1)='/',substr(if(substr(m_mfile,1,1)='.',substr(m_mfile,2),m_mfile),2),if(substr(m_mfile,1,1)='.',substr(m_mfile,2),m_mfile))) as k FROM ".TBLPREFIX."media WHERE m_file='".$GEDCOMID."' AND m_media IN
 		(SELECT mm_media FROM ".TBLPREFIX."media_mapping WHERE mm_gid IN
 			(SELECT n_gid FROM ".TBLPREFIX."names WHERE n_name LIKE '%".$filter."%' AND n_file = '".$GEDCOMID."'
 			UNION
@@ -118,14 +118,14 @@ class MediaListController {
 			AND n_name LIKE '%".$filter."%'
 			UNION
 			SELECT s_id FROM ".TBLPREFIX."sources WHERE s_name LIKE '%".$filter."%' AND s_file = '".$GEDCOMID."')
-			AND mm_gedfile = '".$GEDCOMID."'
+			AND mm_file = '".$GEDCOMID."'
 		) 
 		OR
-		((m_titl LIKE '%".$filter."%' OR m_gedrec LIKE '%".$filter."%') AND m_gedfile = '".$GEDCOMID."')
+		((m_titl LIKE '%".$filter."%' OR m_gedrec LIKE '%".$filter."%') AND m_file = '".$GEDCOMID."')
 		ORDER BY k";
 		}
 		else {
-		$sql = "SELECT *, concat(m_titl, if(substr(if(substr(m_file,1,1)='.',substr(m_file,2),m_file),1,1)='/',substr(if(substr(m_file,1,1)='.',substr(m_file,2),m_file),2),if(substr(m_file,1,1)='.',substr(m_file,2),m_file))) as k FROM ".TBLPREFIX."media WHERE m_gedfile='".$GEDCOMID."' AND m_media IN
+		$sql = "SELECT *, concat(m_titl, if(substr(if(substr(m_mfile,1,1)='.',substr(m_mfile,2),m_mfile),1,1)='/',substr(if(substr(m_mfile,1,1)='.',substr(m_mfile,2),m_mfile),2),if(substr(m_mfile,1,1)='.',substr(m_mfile,2),m_mfile))) as k FROM ".TBLPREFIX."media WHERE m_file='".$GEDCOMID."' AND m_media IN
 		(SELECT mm_media FROM ".TBLPREFIX."media_mapping WHERE CONCAT(mm_gid,'[".$GEDCOMID."]') IN
 			(SELECT n_key FROM ".TBLPREFIX."names WHERE n_name LIKE '%".$filter."%' AND n_file = '".$GEDCOMID."'
 			UNION
@@ -135,10 +135,10 @@ class MediaListController {
 			WHERE n_name LIKE '%".$filter."%' AND if_role='S' AND n_file='".$GEDCOMID."'
 			UNION
 			SELECT CONCAT(s_id,'[".$GEDCOMID."]') FROM ".TBLPREFIX."sources WHERE s_name LIKE '%".$filter."%' AND s_file = '".$GEDCOMID."')
-			AND mm_gedfile = '".$GEDCOMID."'
+			AND mm_file = '".$GEDCOMID."'
 		) 
 		OR
-		((m_titl LIKE '%".$filter."%' OR m_gedrec LIKE '%".$filter."%') AND m_gedfile = '".$GEDCOMID."')
+		((m_titl LIKE '%".$filter."%' OR m_gedrec LIKE '%".$filter."%') AND m_file = '".$GEDCOMID."')
 		ORDER BY k";
 		}
 		$db = NewQuery($sql);
@@ -148,7 +148,7 @@ class MediaListController {
 			if ($media->disp) {
 				$found++;
 				if ($found > $start) {
-					$this->medialist[$row["m_media"]."_".$row["m_gedfile"]] = $media;
+					$this->medialist[$row["m_media"]."_".$row["m_file"]] = $media;
 					$added++;
 				}
 				if ($max != 0 && $added == $max+1) break;
@@ -160,15 +160,15 @@ class MediaListController {
 
 	public function RetrieveFilterMediaList($filter) {
 		global $GEDCOMID;
-		$sql = "SELECT *, concat(m_titl, if(substr(if(substr(m_file,1,1)='.',substr(m_file,2),m_file),1,1)='/',substr(if(substr(m_file,1,1)='.',substr(m_file,2),m_file),2),if(substr(m_file,1,1)='.',substr(m_file,2),m_file))) as k FROM ".TBLPREFIX."media WHERE m_gedfile='".$GEDCOMID."'";
-		if (!empty($filter)) $sql .= " AND (m_titl LIKE '%".$filter."%' OR m_file LIKE '%".$filter."%')";
+		$sql = "SELECT *, concat(m_titl, if(substr(if(substr(m_mfile,1,1)='.',substr(m_mfile,2),m_mfile),1,1)='/',substr(if(substr(m_mfile,1,1)='.',substr(m_mfile,2),m_mfile),2),if(substr(m_mfile,1,1)='.',substr(m_mfile,2),m_mfile))) as k FROM ".TBLPREFIX."media WHERE m_file='".$GEDCOMID."'";
+		if (!empty($filter)) $sql .= " AND (m_titl LIKE '%".$filter."%' OR m_mfile LIKE '%".$filter."%')";
 		$sql .= " ORDER BY k";
 		$db = NewQuery($sql);
 		$this->totalmediaitems = $db->NumRows();
 		while($row = $db->FetchAssoc()) {
 			$media =& MediaItem::GetInstance($row["m_media"], $row);
 			if ($media->disp) {
-				$this->medialist[$row["m_media"]."_".$row["m_gedfile"]] = $media;
+				$this->medialist[$row["m_media"]."_".$row["m_file"]] = $media;
 			}
 		}
 		$this->mediainlist = count($this->medialist);

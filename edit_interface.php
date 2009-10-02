@@ -2351,7 +2351,7 @@ switch ($action) {
 		$rectype = GetRecType($newrec);
 		if (!$rectype) $rectype = "";
 		if (trim($oldrec) != trim($newrec)) {
-			$success = (!empty($newrec)&&(ReplaceGedrec($pid, $oldrec, $newrec, $rectype, $change_id, $change_type, "", $rectype)));
+			$success = (!empty($newrec) && (ReplaceGedrec($pid, $oldrec, $newrec, $rectype, $change_id, $change_type, "", $rectype)));
 			if ($success) print "<br /><br />".$gm_lang["update_successful"];
 		}
 		break;

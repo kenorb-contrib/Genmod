@@ -27,7 +27,7 @@
 
 // The variables in this file are used to glue together other var's in the help_text.xx.php
 // Do NOT put any var's, that need to be translated, in this file
-if (strstr($_SERVER["SCRIPT_NAME"],"helptext_vars")) {
+if (stristr($_SERVER["SCRIPT_NAME"],basename(__FILE__))) {
 	require "intrusion.php";
 }
 

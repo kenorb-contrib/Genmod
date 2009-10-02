@@ -25,19 +25,28 @@
  * @subpackage Display
  * @version $Id$
  */
-if (strstr($_SERVER["SCRIPT_NAME"],basename(__FILE__))) {
+if (stristr($_SERVER["SCRIPT_NAME"],basename(__FILE__))) {
 	require "../../intrusion.php";
 }
 abstract class ListFunctions {
 	
-	private static $indi_total = array();
-	private static $indi_hide = array();
+	public static $indi_total = array();
+	public static $indi_hide = array();
+	public static $fam_total = array();
+	public static $fam_hide = array();
+	public static $sour_total = array();
+	public static $sour_hide = array();
+	public static $repo_total = array();
+	public static $repo_hide = array();
 	
-	public function GetIndiList($allgeds="", $selection = "") {
-		global $GEDCOMID, $COMBIKEY;
+	// $selection is a string with joined keys, quoted and comma separated
+	// $applypriv true does not add indi's where disp_name is false to the array
+	// $allgeds is either "no", or an array with gedcomid's to search in
+	public function GetIndiList($allgeds="", $selection = "", $applypriv=true) {
+		global $GEDCOMID;
 		
 		$indilist = array();
-		$sql = "SELECT i_key, i_gedcom, i_isdead, i_id, i_file, n_name, n_surname, n_letter, n_type ";
+		$sql = "SELECT i_key, i_gedrec, i_isdead, i_id, i_file, n_name, n_surname, n_letter, n_type ";
 		$sql .= "FROM ".TBLPREFIX."individuals, ".TBLPREFIX."names WHERE n_key=i_key ";
 		if ($allgeds == "no") {
 			$sql .= "AND i_file = ".$GEDCOMID." ";
@@ -63,17 +72,17 @@ abstract class ListFunctions {
 				$key = $row["i_key"];
 				$person =& Person::GetInstance($row["i_id"], $row);
 				self::$indi_total[$row["i_key"]] = 1;
-				if ($person->disp_name) {
+				if (!$applypriv || $person->disp_name) {
 					$indilist[$row["i_key"]] = $person;
 				}
 				else {
 					self::$indi_hide[$row["i_key"]] = 1;
 				}
 			}
-			$row = db_cleanup($row);
-			if ($person->disp_name) $indilist[$row["i_key"]]->addname = array($row["n_name"], $row["n_letter"], $row["n_surname"], $row["n_type"]);
+			if ($person->disp_name || !$applypriv) $indilist[$row["i_key"]]->addname = array($row["n_name"], $row["n_letter"], $row["n_surname"], $row["n_type"]);
 		}
 		$res->FreeResult();
+		// print "Indis generated: ".count($indilist)."<br />";
 		return $indilist;
 	}
 	
@@ -197,9 +206,8 @@ abstract class ListFunctions {
 	}
 	
 	//-- get the famlist from the datastore
-	function GetFamList($allgeds="no", $selection="", $renew=true, $trans=array()) {
+	public function GetFamList($allgeds="no", $selection="", $applypriv=true) {
 		global $GEDCOMID;
-		global $COMBIKEY;
 	
 		$sql = "SELECT * FROM ".TBLPREFIX."families";
 		if ($allgeds != "yes") {
@@ -212,27 +220,109 @@ abstract class ListFunctions {
 		$ct = $res->NumRows();
 		while($row = $res->FetchAssoc()){
 			$fam = null;
-			$fam = Family::GetInstance($row["f_id"], $row);
+			$fam =& Family::GetInstance($row["f_id"], $row);
 			$famlist[$row["f_key"]] = $fam;
+			self::$fam_total[$row["f_key"]] = 1;
 		}
 		$res->FreeResult();
 	
 		if (count($famlist) > 0) {
 			$select = array();
 			foreach ($famlist as $key => $fam) {
-				if ($fam->husb_id != "") $select[JoinKey($fam->husb_id, $fam->gedcomid)] = true;
-				if ($fam->wife_id != "") $select[JoinKey($fam->wife_id, $fam->gedcomid)] = true;
+				if ($fam->husb_id != "" && Person::IsInstance($fam->husb_id, $fam->gedcomid) == false) $select[] = JoinKey($fam->husb_id, $fam->gedcomid);
+				if ($fam->wife_id != "" && Person::IsInstance($fam->wife_id, $fam->gedcomid) == false) $select[] = JoinKey($fam->wife_id, $fam->gedcomid);
 			}
 			if (count($select) > 0) {
-				$selection = "";
-				foreach ($select as $id => $value) {
-					$selection .= "'".$id."', ";
-				}
-				$selection = substr($selection, 0, strlen($selection)-2);
+				array_flip(array_flip($select));
+				print "Indi's selected for fams: ".count($select)."<br />";
+				$selection = "'".implode("','", $select)."'";
 				self::GetIndilist($allgeds, $selection, false);
 			}
+			if ($applypriv) {
+				foreach($famlist as $key => $fam) {
+					if (!$fam->disp) {
+						unset($famlist[$key]);
+						self::$fam_hide[$key] = 1;
+					}
+				}
+			}
 		}
+		// print "Fams generated: ".count($famlist)."<br />";
 		return $famlist;
 	}
+	
+	public function GetSourceList($selection="", $applypriv=true) {
+		global $GEDCOMID, $LINK_PRIVACY;
+		
+		$links = array();
+		$famsel = array();
+		$indisel = array();	
+		$sourcelist = array();
+		
+		$sql = "SELECT s_id, s_gedrec, s_file, s_key, sm_sid, sm_gid, sm_type FROM ".TBLPREFIX."sources, ".TBLPREFIX."source_mapping WHERE sm_file='".$GEDCOMID."' AND sm_file=s_file AND s_key=sm_key";
+		if (!empty($selection)) $sql .= " AND s_key IN (".$selection.") ";
+		$res = NewQuery($sql);
+		$oldkey = "";
+		while($row = $res->FetchAssoc()){
+			if ($oldkey != $row["s_key"]) {
+				$oldkey = $row["s_key"];
+				$source =& Source::GetInstance($row["s_id"], $row, $row["s_file"]);
+				$sourcelist[$row["s_key"]] = $source;
+				self::$sour_total[$row["s_key"]] = 1;
+			}
+			$source->addlink = array($row["sm_gid"], $row["sm_type"], $row["s_file"]);
+			if ($LINK_PRIVACY) {
+				if ($row["sm_type"] == "INDI") $indisel[] = $row["sm_gid"];
+				else if ($row["sm_type"] == "FAM") $famsel[] = $row["sm_gid"];
+			}
+		}
+		$res->FreeResult();
+		
+		if (count($indisel) > 0) {
+			array_flip(array_flip($indisel));
+			$indiselect = "'".implode("[".$GEDCOMID."]','", $indisel)."[".$GEDCOMID."]'";
+			self::GetIndiList("no", $indiselect, false);
+		}
+		if (count($famsel) > 0) {
+			array_flip(array_flip($famsel));
+			$famselect = "'".implode ("[".$GEDCOMID."]','", $famsel)."[".$GEDCOMID."]'";
+			self::GetFamList("no", $famselect, false);
+		}
+		if ($applypriv) {
+			foreach ($sourcelist as $key => $source) {
+				if (!$source->disp) {
+					unset($sourcelist[$key]);
+					self::$sour_hide[$key] = 1;
+				}
+			}
+		}
+	
+		return $sourcelist;
+	}
+
+	//-- get the repositorylist from the datastore
+	public function GetRepoList($selection="", $applypriv=true) {
+		global $GEDCOMID;
+		
+		$repolist = array();
+	
+		$sql = "SELECT * FROM ".TBLPREFIX."other WHERE o_file='".$GEDCOMID."' AND o_type='REPO'";
+		if (!empty($filter)) $sql .= " AND o_gedrec LIKE '%".DbLayer::EscapeQuery($filter)."%'";
+		if (!empty($selection)) $sql .= "AND o_id IN (".$selection.") ";
+		$resr = NewQuery($sql);
+		$ct = $resr->NumRows();
+		while($row = $resr->FetchAssoc()){
+			$repo = null;
+			$repo = Repository::GetInstance($row["o_id"], $row, $row["o_file"]);
+			self::$repo_total[JoinKey($row["o_id"], $row["o_file"])] = 1;
+			if (!$applypriv) $repolist[JoinKey($row["o_id"], $row["o_file"])] = $repo;
+			else {
+				if ($repo->disp) $repolist[JoinKey($row["o_id"], $row["o_file"])] = $repo;
+				else self::$repo_hide[JoinKey($row["o_id"], $row["o_file"])] = 1;
+			}
+		}
+		return $repolist;
+	}
+	
 }
 ?>

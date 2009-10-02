@@ -13,9 +13,9 @@
  */
 
 //-- do not allow direct access to this file
-if (strstr($_SERVER["SCRIPT_NAME"],"reportheader.php")) {   
-	print "Why do you want to do that?";   
-	exit;   
+if (stristr($_SERVER["SCRIPT_NAME"],basename(__FILE__))) {
+	require "../intrusion.php";
+}
 } 
  
 /**

@@ -26,7 +26,7 @@
  * @version $Id$
  */
 
-if (strstr($_SERVER["SCRIPT_NAME"],basename(__FILE__))) {
+if (stristr($_SERVER["SCRIPT_NAME"],basename(__FILE__))) {
 	require "../../intrusion.php";
 }
 
@@ -669,6 +669,16 @@ function LetterSort($a, $b) {
 function SourceSort($a, $b) {
 	return StringSort($a["name"], $b["name"]);
 }
+
+//-- comparison for sourcelist sort
+function SourceDescrSort($a, $b) {
+	return StringSort($a->descriptor, $b->descriptor);
+}
+//-- comparison for sourcelist sort
+function SourceAddDescrSort($a, $b) {
+	return StringSort($a->adddescriptor, $b->adddescriptor);
+}
+
 
 /**
  * compare two fact records by date

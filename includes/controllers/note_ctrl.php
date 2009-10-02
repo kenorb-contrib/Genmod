@@ -165,7 +165,7 @@ class NoteController extends DetailController {
 		global $GEDCOMID, $note_hide;
 		
  		$sql = "SELECT * FROM ".TBLPREFIX."other WHERE o_type='NOTE' AND o_file='".$GEDCOMID."'";
- 		if (!empty($filter)) $sql .= " AND o_gedcom LIKE '%".$filter."%'";
+ 		if (!empty($filter)) $sql .= " AND o_gedrec LIKE '%".$filter."%'";
  		if (!empty($selection)) $sql .= " AND o_id IN (".$selection.")";
  		$res = NewQuery($sql);
  		while ($row = $res->FetchAssoc()) {

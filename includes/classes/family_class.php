@@ -92,7 +92,7 @@ class Family extends GedcomRecord {
 			// extract the construction parameters
 			$gedcomid = $gedrec["f_file"];
 			$id = $gedrec["f_id"];
-			$gedrec = $gedrec["f_gedcom"];
+			$gedrec = $gedrec["f_gedrec"];
 		}
 		
 		parent::__construct($id, $gedrec, $gedcomid);
@@ -537,12 +537,12 @@ class Family extends GedcomRecord {
 	
 	protected function ReadFamilyRecord() {
 		
-		$sql = "SELECT f_gedcom FROM ".TBLPREFIX."families WHERE f_key='".JoinKey($this->xref, $this->gedcomid)."'";
+		$sql = "SELECT f_gedrec FROM ".TBLPREFIX."families WHERE f_key='".JoinKey($this->xref, $this->gedcomid)."'";
 		$res = NewQuery($sql);
 		if ($res) {
 			if ($res->NumRows() != 0) {
 				$row = $res->fetchAssoc();
-				$this->gedrec = $row["f_gedcom"];
+				$this->gedrec = $row["f_gedrec"];
 			}
 		}
 	}

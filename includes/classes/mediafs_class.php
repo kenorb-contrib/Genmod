@@ -171,7 +171,7 @@ abstract class MediaFS {
 		$files = array();
 		if ($dbmode) {
 			// For DB media
-			$sql = "SELECT ".TBLPREFIX."media.*, ".TBLPREFIX."media_files.* FROM ".TBLPREFIX."media_files LEFT JOIN ".TBLPREFIX."media ON mf_file=CONCAT('".$m."', m_file) WHERE";
+			$sql = "SELECT ".TBLPREFIX."media.*, ".TBLPREFIX."media_files.* FROM ".TBLPREFIX."media_files LEFT JOIN ".TBLPREFIX."media ON mf_file=CONCAT('".$m."', m_mfile) WHERE";
 			if ($directory == "external_links") {
 				$sql .= " mf_link NOT LIKE ''";
 				// Reset the directory, as the media items have no path recorded.
@@ -221,19 +221,19 @@ abstract class MediaFS {
 				if (!$first) $sql .= " OR ";
 				else $first = false;
 				if (!empty($m)) $dir = preg_replace("~".$m."~", "", $dir); 
-				$sql .= "m_file LIKE '%".DbLayer::EscapeQuery($dir)."'";
+				$sql .= "m_mfile LIKE '%".DbLayer::EscapeQuery($dir)."'";
 			}
 			$sql .=")";
-			if (!empty($filter)) $sql .= " AND m_file LIKE '%".DbLayer::EscapeQuery($filter)."%'"; 
-			$sql .= " ORDER BY m_file";
+			if (!empty($filter)) $sql .= " AND m_mfile LIKE '%".DbLayer::EscapeQuery($filter)."%'"; 
+			$sql .= " ORDER BY m_mfile";
 //			print $sql;
 			$res = NewQuery($sql);
 			while ($row = $res->FetchAssoc()) {
 //				print "<br />";
 //				print_r($row);
 //				$mi = new MediaItem($row);
-//				$f = $m.RelativePathFile(self::CheckMediaDepth($mi->m_file));
-				if ($directory != "external_links") $f = $m.RelativePathFile(self::CheckMediaDepth($row["m_file"]));
+//				$f = $m.RelativePathFile(self::CheckMediaDepth($mi->m_mfile));
+				if ($directory != "external_links") $f = $m.RelativePathFile(self::CheckMediaDepth($row["m_mfile"]));
 				else $f = GetGedcomValue("FILE", "1", $row["m_gedrec"]);
 //				print "f: ".$f;
 				if (in_array($f, $dirfiles)) {
@@ -1185,7 +1185,7 @@ abstract class MediaFS {
 		
 		if ($MEDIA_IN_DB || (self::DirIsWritable($from, false) && self::DirIsWritable($to, false) && FileIsWriteable($from.$file))) {
 			// Retrieve the media in which this file is used
-			$sql = "SELECT m_media, m_gedrec FROM ".TBLPREFIX."media WHERE m_file LIKE '".DbLayer::EscapeQuery($mfrom.$file)."%' AND m_gedfile LIKE '".$GEDCOMID."'";
+			$sql = "SELECT m_media, m_gedrec FROM ".TBLPREFIX."media WHERE m_mfile LIKE '".DbLayer::EscapeQuery($mfrom.$file)."%' AND m_file LIKE '".$GEDCOMID."'";
 //			print $sql;
 			$res = NewQuery ($sql);
 			if ($res->NumRows() > 0) {

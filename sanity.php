@@ -318,21 +318,21 @@ if (!empty($check_oldgeds)) {
 	$gedcheck[] = array("i_file", "individuals", "geds", "sc_oldged_indis");
 	$gedcheck[] = array("if_file", "individual_family", "geds", "sc_oldged_indifamily");
 	$gedcheck[] = array("l_file", "log", "geds", "sc_oldged_log");
-	$gedcheck[] = array("m_gedfile", "media", "geds", "sc_oldged_media");
-	$gedcheck[] = array("mm_gedfile", "media_mapping", "geds", "sc_oldged_mediam");
+	$gedcheck[] = array("m_file", "media", "geds", "sc_oldged_media");
+	$gedcheck[] = array("mm_file", "media_mapping", "geds", "sc_oldged_mediam");
 	$gedcheck[] = array("n_file", "names", "geds", "sc_oldged_names");
 	$gedcheck[] = array("n_username", "news", "geds", "sc_oldged_news");
 	$gedcheck[] = array("o_file", "other", "geds", "sc_oldged_other");
-	$gedcheck[] = array("om_gedfile", "other_mapping", "geds", "sc_oldged_otherm");
+	$gedcheck[] = array("om_file", "other_mapping", "geds", "sc_oldged_otherm");
 	$gedcheck[] = array("pl_file", "placelinks", "geds", "sc_oldged_pl");
 	$gedcheck[] = array("p_file", "places", "geds", "sc_oldged_places");
 	$gedcheck[] = array("pd_file", "pdata", "geds", "sc_oldged_plot");
 	$gedcheck[] = array("p_gedcomid", "privacy", "geds", "sc_oldged_privacy");
 	$gedcheck[] = array("s_file", "sources", "geds", "sc_oldged_sources");
-	$gedcheck[] = array("sm_gedfile", "source_mapping", "geds", "sc_oldged_sourcesm");
+	$gedcheck[] = array("sm_file", "source_mapping", "geds", "sc_oldged_sourcesm");
 	$gedcheck[] = array("s_file", "soundex", "geds", "sc_oldged_soundex");
 	$gedcheck[] = array("gs_file", "statscache", "geds", "sc_oldged_stats");
-	$gedcheck[] = array("ug_gedfile", "users_gedcoms", "geds", "sc_oldged_ug");
+	$gedcheck[] = array("ug_file", "users_gedcoms", "geds", "sc_oldged_ug");
 		
 	$users = UserController::GetUsers();
 	
@@ -384,19 +384,19 @@ if (!empty($check_gedcoms)) {
 			print "<tr><td class=\"shade1 wrap\" rowspan=\"23\">".$value["title"]."</td><td class=\"shade1 wrap\">";
 			
 			// Get the partial indilist
-			$sql = "SELECT i_id, i_gedcom, i_file FROM ".TBLPREFIX."individuals WHERE i_file='".$id."'";
+			$sql = "SELECT i_id, i_gedrec, i_file FROM ".TBLPREFIX."individuals WHERE i_file='".$id."'";
 			$res = NewQuery($sql);
 			if ($res) {
 				$indilist = array();
 				while ($row = $res->FetchAssoc()) {
-					$indilist[$row["i_id"]]{"gedcom"} = $row["i_gedcom"];
+					$indilist[$row["i_id"]]{"gedcom"} = $row["i_gedrec"];
 					$indilist[$row["i_id"]]{"gedfile"} = $row["i_file"];
 				}
 			}
 			
 			// Find unlinked indi's
 			if ($check_unlinked) {
-				$sql = "SELECT * FROM `gm_individuals` WHERE i_gedcom NOT LIKE '%1 FAMS%' AND i_file='".$id."' AND i_gedcom NOT LIKE '%1 FAMC%'";
+				$sql = "SELECT * FROM `gm_individuals` WHERE i_gedrec NOT LIKE '%1 FAMS%' AND i_file='".$id."' AND i_gedrec NOT LIKE '%1 FAMC%'";
 				$res = NewQuery($sql);
 				$found = false;
 				$num = 0;
@@ -419,43 +419,43 @@ if (!empty($check_gedcoms)) {
 			print "</td></tr>";
 
 			// Get the partial indilist with asso's and alia's
-			$sql = "SELECT i_id, i_gedcom FROM ".TBLPREFIX."individuals WHERE (i_gedcom LIKE '%ASSO @%' OR i_gedcom LIKE '%ALIA @') AND i_file='".$id."'";
+			$sql = "SELECT i_id, i_gedrec FROM ".TBLPREFIX."individuals WHERE (i_gedrec LIKE '%ASSO @%' OR i_gedrec LIKE '%ALIA @') AND i_file='".$id."'";
 			$res = NewQuery($sql);
 			if ($res) {
 				$cirelalist = array();
 				while ($row = $res->FetchAssoc()) {
-					$cirelalist[$row["i_id"]]{"gedcom"} = $row["i_gedcom"];
+					$cirelalist[$row["i_id"]]{"gedcom"} = $row["i_gedrec"];
 				}
 			}
 		
 			// Get the partial famlist
-			$sql = "SELECT f_id, f_gedcom FROM ".TBLPREFIX."families WHERE f_file='".$id."'";
+			$sql = "SELECT f_id, f_gedrec FROM ".TBLPREFIX."families WHERE f_file='".$id."'";
 			$res = NewQuery($sql);
 			if ($res) {
 				$cfamlist = array();
 				while ($row = $res->FetchAssoc()) {
-					$cfamlist[$row["f_id"]]["gedcom"] = $row["f_gedcom"];
+					$cfamlist[$row["f_id"]]["gedcom"] = $row["f_gedrec"];
 				}
 			}
 		
 			// Get the partial famlist with asso's
-			$sql = "SELECT f_id, f_gedcom FROM ".TBLPREFIX."families WHERE (f_gedcom LIKE '%ASSO @%') AND f_file='".$id."'";
+			$sql = "SELECT f_id, f_gedrec FROM ".TBLPREFIX."families WHERE (f_gedrec LIKE '%ASSO @%') AND f_file='".$id."'";
 			$res = NewQuery($sql);
 			if ($res) {
 				$cfrelalist = array();
 				while ($row = $res->FetchAssoc()) {
-					$cfrelalist[$row["f_id"]]["gedcom"] = $row["f_gedcom"];
+					$cfrelalist[$row["f_id"]]["gedcom"] = $row["f_gedrec"];
 				}
 			}
 
 			// Get the partial sourcelist
-			$sql = "SELECT s_id, s_gedcom, s_file, s_name FROM ".TBLPREFIX."sources WHERE s_file='".$id."'";
+			$sql = "SELECT s_id, s_gedrec, s_file, s_name FROM ".TBLPREFIX."sources WHERE s_file='".$id."'";
 			$res = NewQuery($sql);
 			if ($res) {
 				$sourcelist = array();
 				while ($row = $res->FetchAssoc()) {
 					$csource = array();
-					$csource["gedcom"] = $row["s_gedcom"];
+					$csource["gedcom"] = $row["s_gedrec"];
 					$csource["in_use"] = false;
 					$csource["gedfile"] = $row["s_file"];
 					$csource["name"] = stripslashes($row["s_name"]);
@@ -464,41 +464,41 @@ if (!empty($check_gedcoms)) {
 			}
 
 			// Get the partial repolist
-			$sql = "SELECT o_id, o_gedcom FROM ".TBLPREFIX."other WHERE o_file='".$id."' AND o_type='REPO'";
+			$sql = "SELECT o_id, o_gedrec FROM ".TBLPREFIX."other WHERE o_file='".$id."' AND o_type='REPO'";
 			$res = NewQuery($sql);
 			if ($res) {
 				$crepolist = array();
 				while ($row = $res->FetchAssoc()) {
 					$crepo = array();
-					$crepo["gedcom"] = $row["o_gedcom"];
+					$crepo["gedcom"] = $row["o_gedrec"];
 					$crepo["in_use"] = false;
 					$crepolist[$row["o_id"]] = $crepo;
 				}
 			}
 			
 			// Get the partial level 0 notelist
-			$sql = "SELECT o_id, o_gedcom FROM ".TBLPREFIX."other WHERE o_file='".$id."' AND o_type='NOTE'";
+			$sql = "SELECT o_id, o_gedrec FROM ".TBLPREFIX."other WHERE o_file='".$id."' AND o_type='NOTE'";
 			$res = NewQuery($sql);
 			if ($res) {
 				$cnotelist = array();
 				while ($row = $res->FetchAssoc()) {
 					$cnote = array();
-					$cnote["gedcom"] = $row["o_gedcom"];
+					$cnote["gedcom"] = $row["o_gedrec"];
 					$cnote["in_use"] = false;
 					$cnotelist[$row["o_id"]] = $cnote;
 				}
 			}
 			
 			// Get the partial MMlist
-			$sql = "SELECT m_media, m_gedrec, m_file, m_titl, m_gedfile FROM ".TBLPREFIX."media WHERE m_gedfile='".$id."'";
+			$sql = "SELECT m_media, m_gedrec, m_mfile, m_titl, m_file FROM ".TBLPREFIX."media WHERE m_file='".$id."'";
 			$res = NewQuery($sql);
 			if ($res) {
 				$cmedialist = array();
 				while ($row = $res->FetchAssoc()) {
 					$cmedia = array();
 					$cmedia["gedcom"] = $row["m_gedrec"];
-					$cmedia["file"] = $row["m_file"];
-					$cmedia["gedfile"] = $row["m_gedfile"];
+					$cmedia["file"] = $row["m_mfile"];
+					$cmedia["gedfile"] = $row["m_file"];
 					$cmedia["in_use"] = false;
 					$cmedia["title"] = $row["m_titl"];
 					$cmedialist[$row["m_media"]] = $cmedia;

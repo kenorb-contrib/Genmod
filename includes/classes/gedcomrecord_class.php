@@ -46,6 +46,8 @@ abstract class GedcomRecord {
 	
 	// Arrays of records that link to this record
 	// and counters
+	protected $link_array = null;	// Array of links to this object. Format: id, type, gedcomid.
+	
 	protected $indilist = null;			// Array of person objects that link to this object
 	protected $indi_count = null;		// Count of the above
 	protected $indi_hide = null;		// Number of person objects that are omitted because privacy doesn't allow it
@@ -604,7 +606,7 @@ abstract class GedcomRecord {
 		
 		// Check the gedcom context
 		$oldgedid = $GEDCOMID;
-		if ($GEDCOMID != $this->gedcomid) SwichGedcom($this->gedcomid);
+		if ($GEDCOMID != $this->gedcomid) SwitchGedcom($this->gedcomid);
 		
 		$ulevel = $gm_user->getUserAccessLevel();
 		if (!isset($hit)) $hit = array();
@@ -850,12 +852,28 @@ abstract class GedcomRecord {
 	    
 	    // Check the repositories
 	    if ($this->datatype=="REPO") {
-		    // To do: see if any hidden sources exist that prevent the repository to be shown.
-			SwitchGedcom($oldgedid);
 		    if ($SHOW_SOURCES >= $ulevel) {
-			    return true;
+			    $disp = true;
+			    if ($LINK_PRIVACY && $checklinks) {
+				    // This will prevent loops if MM points to SOUR vice versa. We only go one level deep.
+				    $recursive--;
+				    if ($recursive >=0) {
+					    $disp = $this->CheckRepoLinks();
+				    }
+				    $recursive++;
+			    }
+			    // We can show the repo, and there are no links that prevent this
+				SwitchGedcom($oldgedid);
+			    if ($disp) {
+					return true;
+				}
+				// The links prevent displaying the source
+				else {
+					return false;
+				}
 		    }
 			else {
+				SwitchGedcom($oldgedid);
 				return false;
 			}
 	    }
@@ -922,36 +940,48 @@ abstract class GedcomRecord {
 	
 	private function CheckSourceLinks() {
 		
-		$sql = "SELECT DISTINCT i_id, i_isdead, i_file, i_gedcom FROM ".TBLPREFIX."source_mapping, ".TBLPREFIX."individuals WHERE sm_sid='".$this->xref."' AND sm_gedfile='".$this->gedcomid."' AND sm_type='INDI' AND sm_gid=i_id AND sm_gedfile=i_file";
-		$res = NewQuery($sql);
-		while ($row = $res->FetchAssoc()) {
-			$person = null;
-			$person = Person::GetInstance($row["i_id"], $row, $row["i_file"]);
-			if (!$person->DisplayDetails()) {
-				$res->FreeResult();
-				return false;
+		if (!is_array($this->link_array)) {
+			$sql = "SELECT DISTINCT i_id, i_isdead, i_file, i_gedrec FROM ".TBLPREFIX."source_mapping, ".TBLPREFIX."individuals WHERE sm_sid='".$this->xref."' AND sm_file='".$this->gedcomid."' AND sm_type='INDI' AND sm_gid=i_id AND sm_file=i_file";
+			$res = NewQuery($sql);
+			while ($row = $res->FetchAssoc()) {
+				$person = null;
+				$person = Person::GetInstance($row["i_id"], $row, $row["i_file"]);
+				if (!$person->DisplayDetails()) {
+					$res->FreeResult();
+					return false;
+				}
+			}
+			$indiarr = array();
+			$famarr = array();
+			$sql = "SELECT DISTINCT sm_gid, f_id, f_file, f_gedrec, f_husb, f_wife FROM ".TBLPREFIX."source_mapping, ".TBLPREFIX."families WHERE sm_sid='".$this->xref."' AND sm_file='".$this->gedcomid."' AND sm_type='FAM' AND sm_gid=f_id AND sm_file=f_file";
+			$res = NewQuery($sql);
+			while ($row = $res->FetchAssoc()) {
+				$family = null;
+				$family = Family::GetInstance($row["f_id"], $row, $row["f_file"]);
+				$famarr[] = $family;
+				if ($row["f_husb"] != "") $indiarr[] = $row["f_husb"];
+				if ($row["f_wife"] != "") $indiarr[] = $row["f_wife"];
+			}
+			
+			$indiarr = array_flip(array_flip($indiarr));
+			
+			return $this->IndiFamPrivCheck($indiarr, $famarr);
+		}
+		// else we presume that the linked objects are already cached somewhere
+		else {
+			foreach($this->link_array as $key => $link) {
+				$obj = null;
+				if ($link[1] == "INDI") $obj = Person::GetInstance($link[0], "", $link[2]);
+				else if ($link[1] == "FAM") $obj = Family::GetInstance($link[0], "", $link[2]);
+				if (is_object($obj) && !$obj->disp_name) return false;
 			}
 		}
-		$indiarr = array();
-		$famarr = array();
-		$sql = "SELECT DISTINCT DISTINCT sm_gid, f_id, f_file, f_gedcom, f_husb, f_wife FROM ".TBLPREFIX."source_mapping, ".TBLPREFIX."families WHERE sm_sid='".$this->xref."' AND sm_gedfile='".$this->gedcomid."' AND sm_type='FAM' AND sm_gid=f_id AND sm_gedfile=f_file";
-		$res = NewQuery($sql);
-		while ($row = $res->FetchAssoc()) {
-			$family = null;
-			$family = Family::GetInstance($row["f_id"], $row, $row["f_file"]);
-			$famarr[] = $family;
-			if (!empty($row["f_husb"])) $indiarr[] = $row["f_husb"];
-			if (!empty($row["f_wife"])) $indiarr[] = $row["f_wife"];
-		}
-		
-		$indiarr = array_flip(array_flip($indiarr));
-		
-		return $this->IndiFamPrivCheck($indiarr, $famarr);
+		return true;
 	}
 		
 	private function CheckMediaLinks() {
 		
-		$sql = "SELECT DISTINCT mm_gid, i_id, i_isdead, i_file, i_gedcom FROM ".TBLPREFIX."media_mapping, ".TBLPREFIX."individuals WHERE mm_media='".$this->xref."' AND mm_gedfile='".$this->gedcomid."' AND mm_type='INDI' AND mm_gid=i_id AND mm_gedfile=i_file";
+		$sql = "SELECT DISTINCT mm_gid, i_id, i_isdead, i_file, i_gedrec FROM ".TBLPREFIX."media_mapping, ".TBLPREFIX."individuals WHERE mm_media='".$this->xref."' AND mm_file='".$this->gedcomid."' AND mm_type='INDI' AND mm_gid=i_id AND mm_file=i_file";
 		$res = NewQuery($sql);
 		while ($row = $res->FetchAssoc()) {
 			$person = null;
@@ -964,7 +994,7 @@ abstract class GedcomRecord {
 		
 		$indiarr = array();
 		$famarr = array();
-		$sql = "SELECT DISTINCT DISTINCT mm_gid, f_id, f_file, f_gedcom, f_husb, f_wife FROM ".TBLPREFIX."media_mapping, ".TBLPREFIX."families WHERE mm_media='".$this->xref."' AND mm_gedfile='".$this->gedcomid."' AND mm_type='FAM' AND mm_gid=f_id AND mm_gedfile=f_file";
+		$sql = "SELECT DISTINCT mm_gid, f_id, f_file, f_gedrec, f_husb, f_wife FROM ".TBLPREFIX."media_mapping, ".TBLPREFIX."families WHERE mm_media='".$this->xref."' AND mm_file='".$this->gedcomid."' AND mm_type='FAM' AND mm_gid=f_id AND mm_file=f_file";
 		$res = NewQuery($sql);
 		while ($row = $res->FetchAssoc()) {
 			$family = null;
@@ -980,7 +1010,7 @@ abstract class GedcomRecord {
 		
 	private function CheckNoteLinks() {
 		
-		$sql = "SELECT DISTINCT om_gid, i_id, i_isdead, i_file, i_gedcom FROM ".TBLPREFIX."other, ".TBLPREFIX."other_mapping, ".TBLPREFIX."individuals WHERE o_id='".$this->xref."' AND o_file='".$this->gedcomid."' AND o_id = om_oid AND o_file = om_gedfile AND om_type='INDI' AND i_id=om_gid AND om_gedfile=i_file";
+		$sql = "SELECT DISTINCT om_gid, i_id, i_isdead, i_file, i_gedrec FROM ".TBLPREFIX."other, ".TBLPREFIX."other_mapping, ".TBLPREFIX."individuals WHERE o_id='".$this->xref."' AND o_file='".$this->gedcomid."' AND o_id = om_oid AND o_file = om_file AND om_type='INDI' AND i_id=om_gid AND om_file=i_file";
 		$res = NewQuery($sql);
 		while ($row = $res->FetchAssoc()) {
 			$person = null;
@@ -993,7 +1023,7 @@ abstract class GedcomRecord {
 		
 		$indiarr = array();
 		$famarr = array();
-		$sql = "SELECT DISTINCT om_gid, f_id, f_file, f_gedcom, f_husb, f_wife FROM ".TBLPREFIX."other, ".TBLPREFIX."other_mapping, ".TBLPREFIX."families WHERE o_id='".$this->xref."' AND o_file='".$this->gedcomid."' AND o_id = om_oid AND o_file = om_gedfile AND om_type='FAM' AND f_id=om_gid AND om_gedfile=f_file";
+		$sql = "SELECT DISTINCT om_gid, f_id, f_file, f_gedrec, f_husb, f_wife FROM ".TBLPREFIX."other, ".TBLPREFIX."other_mapping, ".TBLPREFIX."families WHERE o_id='".$this->xref."' AND o_file='".$this->gedcomid."' AND o_id = om_oid AND o_file = om_file AND om_type='FAM' AND f_id=om_gid AND om_file=f_file";
 		$res = NewQuery($sql);
 		while ($row = $res->FetchAssoc()) {
 			$family = null;
@@ -1006,14 +1036,31 @@ abstract class GedcomRecord {
 		$indiarr = array_flip(array_flip($indiarr));
 		return $this->IndiFamPrivCheck($indiarr, $famarr);
 	}
-	
+
+	private function CheckRepoLinks() {
+		
+		$sql = "SELECT s_id, s_file, s_gedrec FROM ".TBLPREFIX."other_mapping, ".TBLPREFIX."sources WHERE om_oid='".$this->xref."' AND om_file='".$this->gedcomid."' AND s_file=om_file AND s_id=om_gid";
+		$res = Newquery($sql);
+		while ($row = $res->FetchAssoc()) {
+			$source = null;
+			$source = Source::GetInstance($row["s_id"], $row, $row["s_file"]);
+			if (!$source->DisplayDetails(false)) {
+				$res->FreeResult();
+				return false;
+			}
+		}
+		return true;
+	}
+		
 	private function IndiFamPrivCheck($indiarr, $famarr) {
 		
-		$sql = "SELECT DISTINCT i_id, i_isdead, i_file, i_gedcom FROM ".TBLPREFIX."individuals WHERE i_key IN ('".implode("','", $indiarr)."')";
-		$res = NewQuery($sql);
-		while ($row = $res->FetchAssoc()) {
-			$person = null;
-			$person = Person::GetInstance($row["i_id"], $row, $row["i_file"]);
+		if (count($indiarr) != 0) {
+			$sql = "SELECT DISTINCT i_id, i_isdead, i_file, i_gedrec FROM ".TBLPREFIX."individuals WHERE i_key IN ('".implode("','", $indiarr)."')";
+			$res = NewQuery($sql);
+			while ($row = $res->FetchAssoc()) {
+				$person = null;
+				$person = Person::GetInstance($row["i_id"], $row, $row["i_file"]);
+			}
 		}
 		foreach($famarr as $key => $family) {
 			if (!$family->DisplayDetails()) return false;

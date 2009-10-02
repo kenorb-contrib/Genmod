@@ -176,7 +176,7 @@ class User {
 			}
 		
 			// Now get the rights
-			$ged = $user_row["ug_gedfile"];
+			$ged = $user_row["ug_file"];
 			if (isset($user_row["ug_canedit"])) $this->canedit[$ged] = $user_row["ug_canedit"];
 			if (isset($user_row["ug_privgroup"])) $this->privgroup[$ged] = $user_row["ug_privgroup"];
 			if (isset($user_row["ug_gedcomadmin"])) {

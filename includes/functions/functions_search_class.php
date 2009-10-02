@@ -28,7 +28,7 @@
  * @package Genmod
  * @subpackage DB
  */
-if (strstr($_SERVER["SCRIPT_NAME"],basename(__FILE__))) {
+if (stristr($_SERVER["SCRIPT_NAME"],basename(__FILE__))) {
 	require "../../intrusion.php";
 }
 
@@ -67,20 +67,20 @@ abstract class SearchFunctions {
 		if ($mlen < $ftminwlen || self::HasMySQLStopwords($cquery)) {
 			if (isset($cquery["includes"])) {
 				foreach ($cquery["includes"] as $index => $keyword) {
-					if (!Utf8_isascii($keyword["term"])) $addsql .= " ".$keyword["operator"]." i_gedcom REGEXP '".DbLayer::EscapeQuery($keyword["term"]).$keyword["wildcard"]."'";
-					else $addsql .= " ".$keyword["operator"]." i_gedcom REGEXP '[[:<:]]".DbLayer::EscapeQuery($keyword["term"]).$keyword["wildcard"]."[[:>:]]'";
+					if (!Utf8_isascii($keyword["term"])) $addsql .= " ".$keyword["operator"]." i_gedrec REGEXP '".DbLayer::EscapeQuery($keyword["term"]).$keyword["wildcard"]."'";
+					else $addsql .= " ".$keyword["operator"]." i_gedrec REGEXP '[[:<:]]".DbLayer::EscapeQuery($keyword["term"]).$keyword["wildcard"]."[[:>:]]'";
 				}
 			}
 			if (isset($cquery["excludes"])) {
 				foreach ($cquery["excludes"] as $index => $keyword) {
-					if (!Utf8_isascii($keyword["term"])) $addsql .= " AND i_gedcom NOT REGEXP '".DbLayer::EscapeQuery($keyword["term"]).$keyword["wildcard"]."'";
-					else $addsql .= " AND i_gedcom NOT REGEXP '[[:<:]]".DbLayer::EscapeQuery($keyword["term"]).$keyword["wildcard"]."[[:>:]]'";
+					if (!Utf8_isascii($keyword["term"])) $addsql .= " AND i_gedrec NOT REGEXP '".DbLayer::EscapeQuery($keyword["term"]).$keyword["wildcard"]."'";
+					else $addsql .= " AND i_gedrec NOT REGEXP '[[:<:]]".DbLayer::EscapeQuery($keyword["term"]).$keyword["wildcard"]."[[:>:]]'";
 				}
 			}
-			$sql = "SELECT i_key, i_id, i_file, i_gedcom, i_isdead, n_name, n_letter, n_type, n_surname FROM ".TBLPREFIX."individuals, ".TBLPREFIX."names WHERE i_key=n_key AND (".substr($addsql,4).")";
+			$sql = "SELECT i_key, i_id, i_file, i_gedrec, i_isdead, n_name, n_letter, n_type, n_surname FROM ".TBLPREFIX."individuals, ".TBLPREFIX."names WHERE i_key=n_key AND (".substr($addsql,4).")";
 		}
 		else {
-			$sql = "SELECT i_key, i_id, i_file, i_gedcom, i_isdead, n_name, n_letter, n_type, n_surname FROM ".TBLPREFIX."individuals, ".TBLPREFIX."names WHERE i_key=n_key AND (MATCH (i_gedcom) AGAINST ('".DbLayer::EscapeQuery($query)."' IN BOOLEAN MODE))";
+			$sql = "SELECT i_key, i_id, i_file, i_gedrec, i_isdead, n_name, n_letter, n_type, n_surname FROM ".TBLPREFIX."individuals, ".TBLPREFIX."names WHERE i_key=n_key AND (MATCH (i_gedrec) AGAINST ('".DbLayer::EscapeQuery($query)."' IN BOOLEAN MODE))";
 		}
 			
 		if (!$allgeds) $sql .= " AND i_file='".$GEDCOMID."'";
@@ -105,7 +105,7 @@ abstract class SearchFunctions {
 				if (!isset($myindilist[$key])) {
 					$myindilist[$key]["names"][] = array($row["n_name"], $row["n_letter"], $row["n_surname"], $row["n_type"]);
 					$myindilist[$key]["gedfile"] = $row["i_file"];
-					$myindilist[$key]["gedcom"] = $row["i_gedcom"];
+					$myindilist[$key]["gedcom"] = $row["i_gedrec"];
 					$myindilist[$key]["isdead"] = $row["i_isdead"];
 				}
 				else $myindilist[$key]["names"][] = array($row["n_name"], $row["n_letter"], $row["n_surname"], $row["n_type"]);
@@ -152,20 +152,20 @@ abstract class SearchFunctions {
 		if ($mlen < $ftminwlen || self::HasMySQLStopwords($cquery)) {
 			if (isset($cquery["includes"])) {
 				foreach ($cquery["includes"] as $index => $keyword) {
-					if (HasChinese($keyword["term"])) $addsql .= " ".$keyword["operator"]." f_gedcom REGEXP '".DbLayer::EscapeQuery($keyword["term"]).$keyword["wildcard"]."'";
-					else $addsql .= " ".$keyword["operator"]." f_gedcom REGEXP '[[:<:]]".DbLayer::EscapeQuery($keyword["term"]).$keyword["wildcard"]."[[:>:]]'";
+					if (HasChinese($keyword["term"])) $addsql .= " ".$keyword["operator"]." f_gedrec REGEXP '".DbLayer::EscapeQuery($keyword["term"]).$keyword["wildcard"]."'";
+					else $addsql .= " ".$keyword["operator"]." f_gedrec REGEXP '[[:<:]]".DbLayer::EscapeQuery($keyword["term"]).$keyword["wildcard"]."[[:>:]]'";
 				}
 			}
 			if (isset($cquery["excludes"])) {
 				foreach ($cquery["excludes"] as $index => $keyword) {
-					if (HasChinese($keyword["term"])) $addsql .= " AND f_gedcom NOT REGEXP '".DbLayer::EscapeQuery($keyword["term"]).$keyword["wildcard"]."'";
-					else $addsql .= " AND f_gedcom NOT REGEXP '[[:<:]]".DbLayer::EscapeQuery($keyword["term"]).$keyword["wildcard"]."[[:>:]]'";
+					if (HasChinese($keyword["term"])) $addsql .= " AND f_gedrec NOT REGEXP '".DbLayer::EscapeQuery($keyword["term"]).$keyword["wildcard"]."'";
+					else $addsql .= " AND f_gedrec NOT REGEXP '[[:<:]]".DbLayer::EscapeQuery($keyword["term"]).$keyword["wildcard"]."[[:>:]]'";
 				}
 			}
-			$sql = "SELECT f_key, f_id, f_husb, f_wife, f_file, f_gedcom FROM ".TBLPREFIX."families WHERE (".substr($addsql,4).")";
+			$sql = "SELECT f_key, f_id, f_husb, f_wife, f_file, f_gedrec FROM ".TBLPREFIX."families WHERE (".substr($addsql,4).")";
 		}
 		else {
-			$sql = "SELECT f_key, f_id, f_husb, f_wife, f_file, f_gedcom FROM ".TBLPREFIX."families WHERE (MATCH (f_gedcom) AGAINST ('".DbLayer::EscapeQuery($query)."' IN BOOLEAN MODE))";
+			$sql = "SELECT f_key, f_id, f_husb, f_wife, f_file, f_gedrec FROM ".TBLPREFIX."families WHERE (MATCH (f_gedrec) AGAINST ('".DbLayer::EscapeQuery($query)."' IN BOOLEAN MODE))";
 		}
 		
 		if (!$allgeds) $sql .= " AND f_file='".$GEDCOMID."'";
@@ -210,7 +210,7 @@ abstract class SearchFunctions {
 			else $key = $row["f_id"];
 			$myfamlist[$key]["name"] = $name;
 			$myfamlist[$key]["gedfile"] = $row["f_file"];
-			$myfamlist[$key]["gedcom"] = $row["f_gedcom"];
+			$myfamlist[$key]["gedcom"] = $row["f_gedrec"];
 			$myfamlist[$key]["HUSB"] = $husb;
 			$myfamlist[$key]["WIFE"] = $wife;
 			$famlist[$key] = $myfamlist[$key];
@@ -236,20 +236,20 @@ abstract class SearchFunctions {
 		if ($mlen < $ftminwlen || self::HasMySQLStopwords($cquery)) {
 			if (isset($cquery["includes"])) {
 				foreach ($cquery["includes"] as $index => $keyword) {
-					if (HasChinese($keyword["term"])) $addsql .= " ".$keyword["operator"]." s_gedcom REGEXP '".DbLayer::EscapeQuery($keyword["term"]).$keyword["wildcard"]."'";
-					else $addsql .= " ".$keyword["operator"]." s_gedcom REGEXP '[[:<:]]".DbLayer::EscapeQuery($keyword["term"]).$keyword["wildcard"]."[[:>:]]'";
+					if (HasChinese($keyword["term"])) $addsql .= " ".$keyword["operator"]." s_gedrec REGEXP '".DbLayer::EscapeQuery($keyword["term"]).$keyword["wildcard"]."'";
+					else $addsql .= " ".$keyword["operator"]." s_gedrec REGEXP '[[:<:]]".DbLayer::EscapeQuery($keyword["term"]).$keyword["wildcard"]."[[:>:]]'";
 				}
 			}
 			if (isset($cquery["excludes"])) {
 				foreach ($cquery["excludes"] as $index => $keyword) {
-					if (HasChinese($keyword["term"])) $addsql .= " AND s_gedcom NOT REGEXP '".DbLayer::EscapeQuery($keyword["term"]).$keyword["wildcard"]."'";
-					else $addsql .= " AND s_gedcom NOT REGEXP '[[:<:]]".DbLayer::EscapeQuery($keyword["term"]).$keyword["wildcard"]."[[:>:]]'";
+					if (HasChinese($keyword["term"])) $addsql .= " AND s_gedrec NOT REGEXP '".DbLayer::EscapeQuery($keyword["term"]).$keyword["wildcard"]."'";
+					else $addsql .= " AND s_gedrec NOT REGEXP '[[:<:]]".DbLayer::EscapeQuery($keyword["term"]).$keyword["wildcard"]."[[:>:]]'";
 				}
 			}
-			$sql = "SELECT s_id, s_name, s_file, s_gedcom FROM ".TBLPREFIX."sources WHERE (".substr($addsql,4).")";
+			$sql = "SELECT s_id, s_name, s_file, s_gedrec FROM ".TBLPREFIX."sources WHERE (".substr($addsql,4).")";
 		}
 		else {
-			$sql = "SELECT s_id, s_name, s_file, s_gedcom FROM ".TBLPREFIX."sources WHERE (MATCH (s_gedcom) AGAINST ('".DbLayer::EscapeQuery($query)."' IN BOOLEAN MODE))";
+			$sql = "SELECT s_id, s_name, s_file, s_gedrec FROM ".TBLPREFIX."sources WHERE (MATCH (s_gedrec) AGAINST ('".DbLayer::EscapeQuery($query)."' IN BOOLEAN MODE))";
 		}
 	
 		if (!$allgeds) $sql .= " AND s_file='".$GEDCOMID."'";
@@ -299,20 +299,20 @@ abstract class SearchFunctions {
 		if ($mlen < $ftminwlen || self::HasMySQLStopwords($cquery)) {
 			if (isset($cquery["includes"])) {
 				foreach ($cquery["includes"] as $index => $keyword) {
-					if (HasChinese($keyword["term"])) $addsql .= " ".$keyword["operator"]." o_gedcom REGEXP '".DbLayer::EscapeQuery($keyword["term"]).$keyword["wildcard"]."'";
-					else $addsql .= " ".$keyword["operator"]." o_gedcom REGEXP '[[:<:]]".DbLayer::EscapeQuery($keyword["term"]).$keyword["wildcard"]."[[:>:]]'";
+					if (HasChinese($keyword["term"])) $addsql .= " ".$keyword["operator"]." o_gedrec REGEXP '".DbLayer::EscapeQuery($keyword["term"]).$keyword["wildcard"]."'";
+					else $addsql .= " ".$keyword["operator"]." o_gedrec REGEXP '[[:<:]]".DbLayer::EscapeQuery($keyword["term"]).$keyword["wildcard"]."[[:>:]]'";
 				}
 			}
 			if (isset($cquery["excludes"])) {
 				foreach ($cquery["excludes"] as $index => $keyword) {
-					if (HasChinese($keyword["term"])) $addsql .= " AND o_gedcom NOT REGEXP '".DbLayer::EscapeQuery($keyword["term"]).$keyword["wildcard"]."'";
-					else $addsql .= " AND o_gedcom NOT REGEXP '[[:<:]]".DbLayer::EscapeQuery($keyword["term"]).$keyword["wildcard"]."[[:>:]]'";
+					if (HasChinese($keyword["term"])) $addsql .= " AND o_gedrec NOT REGEXP '".DbLayer::EscapeQuery($keyword["term"]).$keyword["wildcard"]."'";
+					else $addsql .= " AND o_gedrec NOT REGEXP '[[:<:]]".DbLayer::EscapeQuery($keyword["term"]).$keyword["wildcard"]."[[:>:]]'";
 				}
 			}
-			$sql = "SELECT o_id, o_file, o_type, o_gedcom FROM ".TBLPREFIX."other WHERE (".substr($addsql,4).")";
+			$sql = "SELECT o_id, o_file, o_type, o_gedrec FROM ".TBLPREFIX."other WHERE (".substr($addsql,4).")";
 		}
 		else {
-			$sql = "SELECT o_id, o_file, o_type, o_gedcom FROM ".TBLPREFIX."other WHERE (MATCH (o_gedcom) AGAINST ('".DbLayer::EscapeQuery($query)."' IN BOOLEAN MODE))";
+			$sql = "SELECT o_id, o_file, o_type, o_gedrec FROM ".TBLPREFIX."other WHERE (MATCH (o_gedrec) AGAINST ('".DbLayer::EscapeQuery($query)."' IN BOOLEAN MODE))";
 		}
 	
 		if (!$allgeds) $sql .= " AND o_file='".$GEDCOMID."'";
@@ -332,19 +332,19 @@ abstract class SearchFunctions {
 		if ($res) {
 			while($row = $res->fetchAssoc()){
 				$row = db_cleanup($row);
-				$tt = preg_match("/1 NAME (.*)/", $row["o_gedcom"], $match);
+				$tt = preg_match("/1 NAME (.*)/", $row["o_gedrec"], $match);
 				if ($tt == "0") $name = $row["o_id"]; else $name = $match[1];
 				if (count($allgeds) > 1) {
 					$myrepolist[$row["o_id"]."[".$row["o_file"]."]"]["id"] = $row["o_id"];
 					$myrepolist[$row["o_id"]."[".$row["o_file"]."]"]["name"] = $name;
 					$myrepolist[$row["o_id"]."[".$row["o_file"]."]"]["gedfile"] = $row["o_file"];
-					$myrepolist[$row["o_id"]."[".$row["o_file"]."]"]["gedcom"] = $row["o_gedcom"];
+					$myrepolist[$row["o_id"]."[".$row["o_file"]."]"]["gedcom"] = $row["o_gedrec"];
 				}
 				else {
 					$myrepolist[$row["o_id"]]["id"] = $row["o_id"];
 					$myrepolist[$row["o_id"]]["name"] = $name;
 					$myrepolist[$row["o_id"]]["gedfile"] = $row["o_file"];
-					$myrepolist[$row["o_id"]]["gedcom"] = $row["o_gedcom"];
+					$myrepolist[$row["o_id"]]["gedcom"] = $row["o_gedrec"];
 				}
 			}
 			$res->FreeResult();
@@ -383,12 +383,12 @@ abstract class SearchFunctions {
 			$sql = "SELECT * FROM ".TBLPREFIX."media WHERE (MATCH (m_gedrec) AGAINST ('".DbLayer::EscapeQuery($query)."' IN BOOLEAN MODE))";
 		}
 	
-		if (!$allgeds) $sql .= " AND m_gedfile='".$GEDCOMID."'";
+		if (!$allgeds) $sql .= " AND m_file='".$GEDCOMID."'";
 		
 		if ((is_array($allgeds) && count($allgeds) != 0) && count($allgeds) != count($GEDCOMS)) {
 			$sql .= " AND (";
 			for ($i=0; $i<count($allgeds); $i++) {
-				$sql .= "m_gedfile='".$allgeds[$i]."'";
+				$sql .= "m_file='".$allgeds[$i]."'";
 				if ($i < count($allgeds)-1) $sql .= " OR ";
 			}
 			$sql .= ")";
@@ -401,13 +401,13 @@ abstract class SearchFunctions {
 		if ($res) {
 	 		while ($row = $res->FetchAssoc()) {
 		 		$media = array();
-		 		SwitchGedcom($row["m_gedfile"]);
+		 		SwitchGedcom($row["m_file"]);
 				$media_total[$row["m_media"]."[".$GEDCOMID."]"] = 1;
 		 		if (PrivacyFunctions::DisplayDetailsByID($row["m_media"], "OBJE", 1, true)) {
 					$media = array();
 					$media["gedfile"] = $GEDCOMID;
 					$media["name"] = GetMediaDescriptor($row["m_media"], $row["m_gedrec"]);
-					$medialist[JoinKey($row["m_media"], $row["m_gedfile"])] = $media;
+					$medialist[JoinKey($row["m_media"], $row["m_file"])] = $media;
 	 			}
 		 		else $media_hide[$row["m_media"]."[".$GEDCOMID."]"] = 1;
 		 		SwitchGedcom();
@@ -431,20 +431,20 @@ abstract class SearchFunctions {
 		if ($mlen < $ftminwlen || self::HasMySQLStopwords($cquery)) {
 			if (isset($cquery["includes"])) {
 				foreach ($cquery["includes"] as $index => $keyword) {
-					if (HasChinese($keyword["term"])) $addsql .= " ".$keyword["operator"]." o_gedcom REGEXP '".DbLayer::EscapeQuery($keyword["term"]).$keyword["wildcard"]."'";
-					else $addsql .= " ".$keyword["operator"]." o_gedcom REGEXP '[[:<:]]".DbLayer::EscapeQuery($keyword["term"]).$keyword["wildcard"]."[[:>:]]'";
+					if (HasChinese($keyword["term"])) $addsql .= " ".$keyword["operator"]." o_gedrec REGEXP '".DbLayer::EscapeQuery($keyword["term"]).$keyword["wildcard"]."'";
+					else $addsql .= " ".$keyword["operator"]." o_gedrec REGEXP '[[:<:]]".DbLayer::EscapeQuery($keyword["term"]).$keyword["wildcard"]."[[:>:]]'";
 				}
 			}
 			if (isset($cquery["excludes"])) {
 				foreach ($cquery["excludes"] as $index => $keyword) {
-					if (HasChinese($keyword["term"])) $addsql .= " AND o_gedcom NOT REGEXP '".DbLayer::EscapeQuery($keyword["term"]).$keyword["wildcard"]."'";
-					else $addsql .= " AND o_gedcom NOT REGEXP '[[:<:]]".DbLayer::EscapeQuery($keyword["term"]).$keyword["wildcard"]."[[:>:]]'";
+					if (HasChinese($keyword["term"])) $addsql .= " AND o_gedrec NOT REGEXP '".DbLayer::EscapeQuery($keyword["term"]).$keyword["wildcard"]."'";
+					else $addsql .= " AND o_gedrec NOT REGEXP '[[:<:]]".DbLayer::EscapeQuery($keyword["term"]).$keyword["wildcard"]."[[:>:]]'";
 				}
 			}
 			$sql = "SELECT * FROM ".TBLPREFIX."other WHERE (".substr($addsql,4).")";
 		}
 		else {
-			$sql = "SELECT * FROM ".TBLPREFIX."other WHERE (MATCH (o_gedcom) AGAINST ('".DbLayer::EscapeQuery($query)."' IN BOOLEAN MODE))";
+			$sql = "SELECT * FROM ".TBLPREFIX."other WHERE (MATCH (o_gedrec) AGAINST ('".DbLayer::EscapeQuery($query)."' IN BOOLEAN MODE))";
 		}
 	
 		if (!$allgeds) $sql .= " AND o_file='".$GEDCOMID."'";
@@ -589,7 +589,7 @@ abstract class SearchFunctions {
 	//print "Mstart: ".$mstart." ".date("M", mktime(1,0,0,$mstart,1))."<br />";
 	//print "Dend: ".$dend."<br />";
 	//print "Mend: ".$mend." ".date("M", mktime(1,0,0,$mend,1))."<br />";
-		$sql = "SELECT i_key, i_id, i_file, i_gedcom, i_isdead, n_name, n_surname, n_letter, n_type FROM ".TBLPREFIX."dates, ".TBLPREFIX."individuals, ".TBLPREFIX."names WHERE i_key=d_key AND n_key=i_key ";
+		$sql = "SELECT i_key, i_id, i_file, i_gedrec, i_isdead, n_name, n_surname, n_letter, n_type FROM ".TBLPREFIX."dates, ".TBLPREFIX."individuals, ".TBLPREFIX."names WHERE i_key=d_key AND n_key=i_key ";
 		if ($onlyBDM == "yes") $sql .= " AND d_fact IN ('BIRT', 'DEAT')";
 		if ($filter == "living") $sql .= "AND i_isdead!='1'";
 	
@@ -627,7 +627,7 @@ abstract class SearchFunctions {
 	public function SearchFamsDateRange($dstart="1", $mstart="1", $ystart, $dend="31", $mend="12", $yend, $onlyBDM="no", $skipfacts="", $allgeds=false, $onlyfacts="") {
 		
 		$famlist = array();
-		$sql = "SELECT f_key, f_id, f_husb, f_wife, f_file, f_gedcom FROM ".TBLPREFIX."dates, ".TBLPREFIX."families WHERE f_key=d_key ";
+		$sql = "SELECT f_key, f_id, f_husb, f_wife, f_file, f_gedrec FROM ".TBLPREFIX."dates, ".TBLPREFIX."families WHERE f_key=d_key ";
 	
 		$sql .= self::DateRangeforQuery($dstart, $mstart, $ystart, $dend, $mend, $yend, $skipfacts, $allgeds, $onlyfacts);
 	
@@ -652,7 +652,7 @@ abstract class SearchFunctions {
 	function SearchOtherDateRange($dstart="1", $mstart="1", $ystart="", $dend="31", $mend="12", $yend="", $skipfacts="", $allgeds=false, $onlyfacts="") {
 		$repolist = array();
 		
-		$sql = "SELECT o_key, o_id, o_file, o_gedcom, d_gid FROM ".TBLPREFIX."dates, ".TBLPREFIX."other WHERE o_id=d_gid AND o_file=d_file AND o_type='REPO' ";
+		$sql = "SELECT o_key, o_id, o_file, o_gedrec, d_gid FROM ".TBLPREFIX."dates, ".TBLPREFIX."other WHERE o_id=d_gid AND o_file=d_file AND o_type='REPO' ";
 		
 		$sql .= self::DateRangeforQuery($dstart, $mstart, $ystart, $dend, $mend, $yend, $skipfacts, $allgeds, $onlyfacts);
 		
@@ -677,7 +677,7 @@ abstract class SearchFunctions {
 		
 		$sourcelist = array();
 		
-		$sql = "SELECT s_key, s_id, s_name, s_file, s_gedcom, d_gid FROM ".TBLPREFIX."dates, ".TBLPREFIX."sources WHERE s_id=d_gid AND s_file=d_file ";
+		$sql = "SELECT s_key, s_id, s_name, s_file, s_gedrec, d_gid FROM ".TBLPREFIX."dates, ".TBLPREFIX."sources WHERE s_id=d_gid AND s_file=d_file ";
 		
 		$sql .= self::DateRangeforQuery($dstart, $mstart, $ystart, $dend, $mend, $yend, $skipfacts, $allgeds, $onlyfacts);
 		
@@ -701,7 +701,7 @@ abstract class SearchFunctions {
 	function SearchMediaDateRange($dstart="1", $mstart="1", $ystart="", $dend="31", $mend="12", $yend="", $skipfacts="", $allgeds=false, $onlyfacts="") {
 		$medialist = array();
 		
-		$sql = "SELECT m_media, m_file, m_gedfile, m_ext, m_titl, m_gedrec FROM ".TBLPREFIX."dates, ".TBLPREFIX."media WHERE m_media=d_gid AND m_gedfile=d_file ";
+		$sql = "SELECT m_media, m_mfile, m_file, m_ext, m_titl, m_gedrec FROM ".TBLPREFIX."dates, ".TBLPREFIX."media WHERE m_media=d_gid AND m_file=d_file ";
 		
 		$sql .= self::DateRangeforQuery($dstart, $mstart, $ystart, $dend, $mend, $yend, $skipfacts, $allgeds, $onlyfacts);
 		
@@ -711,8 +711,8 @@ abstract class SearchFunctions {
 	
 		while($row = $res->fetchAssoc()){
 			$media = null;
-			$media = MediaItem::GetInstance($row["m_media"], $row, $row["m_gedfile"]);
-			$medialist[JoinKey($row["m_media"], $row["m_gedfile"])] = $media;
+			$media = MediaItem::GetInstance($row["m_media"], $row, $row["m_file"]);
+			$medialist[JoinKey($row["m_media"], $row["m_file"])] = $media;
 		}
 		$res->FreeResult();
 		return $medialist;

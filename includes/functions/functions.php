@@ -29,7 +29,7 @@
 /**
  * security check to prevent hackers from directly accessing this file
  */
-if (strstr($_SERVER["SCRIPT_NAME"],basename(__FILE__))) {
+if (stristr($_SERVER["SCRIPT_NAME"],basename(__FILE__))) {
 	require "../../intrusion.php";
 }
 //require_once("date_class.php");
@@ -852,7 +852,7 @@ function FindHighlightedObject($pid) {
 	$media_ids = array();
 
 	// NOTE: Find the media items for that person
-	$sql = "select m_file, m_media, mm_gedrec, m_gedrec, m_gedfile, m_ext, m_titl from ".TBLPREFIX."media, ".TBLPREFIX."media_mapping where mm_gid LIKE '".$pid."' AND m_gedfile = '".$GEDCOMID."' AND m_gedfile = mm_gedfile AND m_media = mm_media AND mm_gedrec NOT LIKE '%\_PRIM N%' AND mm_gedrec LIKE '1 OBJE%' ORDER BY mm_order";
+	$sql = "select m_mfile, m_media, mm_gedrec, m_gedrec, m_file, m_ext, m_titl from ".TBLPREFIX."media, ".TBLPREFIX."media_mapping where mm_gid LIKE '".$pid."' AND m_file = '".$GEDCOMID."' AND m_file = mm_file AND m_media = mm_media AND mm_gedrec NOT LIKE '%\_PRIM N%' AND mm_gedrec LIKE '1 OBJE%' ORDER BY mm_order";
 	$res = NewQuery($sql);
 	while ($row = $res->FetchAssoc()) {
 		$media =& Mediaitem::GetInstance($row["m_media"], $row);
@@ -867,7 +867,7 @@ function FindHighlightedObject($pid) {
 	foreach($media_ids as $key => $media) {
 		$prim = GetGedcomValue("_PRIM", 2, $media["mm_gedrec"]);
 		if ($prim == "Y") {
-			$primfile = $media["m_file"];
+			$primfile = $media["m_mfile"];
 			$thum = GetGedcomValue("_THUM", 2, $media["mm_gedrec"]);
 			if (empty($thum)) $thum = GetGedcomValue("_THUM", 1, $media["m_gedrec"]);
 			$id = $media["m_media"];
@@ -881,7 +881,7 @@ function FindHighlightedObject($pid) {
 		foreach($media_ids as $key => $media) {
 			$prim = GetGedcomValue("_PRIM", 1, $media["m_gedrec"]);
 			if ($prim == "Y") {
-				$primfile = $media["m_file"];
+				$primfile = $media["m_mfile"];
 				$thum = GetGedcomValue("_THUM", 2, $media["mm_gedrec"]);
 				if (empty($thum)) $thum = GetGedcomValue("_THUM", 1, $media["m_gedrec"]);
 				$id = $media["m_media"];
@@ -891,7 +891,7 @@ function FindHighlightedObject($pid) {
 	}
 	// If a PRIM Y is found nowhere, we just take the first link.
 	if (!isset($primfile)) {
-		$primfile = $media_ids[0]["m_file"];
+		$primfile = $media_ids[0]["m_mfile"];
 		$thum = GetGedcomValue("_THUM", 2, $media_ids[0]["mm_gedrec"]);
 		if (empty($thum)) $thum = GetGedcomValue("_THUM", 1, $media_ids[0]["m_gedrec"]);
 		$id = $media_ids[0]["m_media"];
@@ -2282,7 +2282,7 @@ function GetNewXref($type='INDI') {
 			break;
 		case "OBJE":
 			$sqlc = "select max(cast(substring(ch_gid,".(strlen($MEDIA_ID_PREFIX)+1).") as signed)) as xref from ".TBLPREFIX."changes where ch_file = '".$gedid."' AND ch_gid LIKE '".$MEDIA_ID_PREFIX."%'";
-			$sql = "select max(cast(substring(m_media,".(strlen($MEDIA_ID_PREFIX)+1).") as signed)) as xref from ".TBLPREFIX."media where m_gedfile = '".$gedid."'";
+			$sql = "select max(cast(substring(m_media,".(strlen($MEDIA_ID_PREFIX)+1).") as signed)) as xref from ".TBLPREFIX."media where m_file = '".$gedid."'";
 			break;
 		case "SOUR":
 			$sqlc = "select max(cast(substring(ch_gid,".(strlen($SOURCE_ID_PREFIX)+1).") as signed)) as xref from ".TBLPREFIX."changes where ch_file = '".$gedid."' AND ch_gid LIKE '".$SOURCE_ID_PREFIX."%'";
@@ -2509,7 +2509,7 @@ function PrintGedcom($ged, $convert, $remove, $zip, $privatize_export, $privatiz
 	if ($zip == "yes") fwrite($gedout, $head);
 	else print $head;
 
-	$sql = "SELECT i_gedcom FROM ".TBLPREFIX."individuals WHERE i_file=".$GEDCOMID." ORDER BY CAST(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(LOWER(i_id),'a',''),'b',''),'c',''),'d',''),'e',''),'f',''),'g',''),'h',''),'i',''),'j',''),'k',''),'l',''),'m',''),'n',''),'o',''),'p',''),'q',''),'r',''),'s',''),'t',''),'u',''),'v',''),'w',''),'x',''),'y',''),'z','') as unsigned)";
+	$sql = "SELECT i_gedrec FROM ".TBLPREFIX."individuals WHERE i_file=".$GEDCOMID." ORDER BY CAST(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(LOWER(i_id),'a',''),'b',''),'c',''),'d',''),'e',''),'f',''),'g',''),'h',''),'i',''),'j',''),'k',''),'l',''),'m',''),'n',''),'o',''),'p',''),'q',''),'r',''),'s',''),'t',''),'u',''),'v',''),'w',''),'x',''),'y',''),'z','') as unsigned)";
 	$res = NewQuery($sql);
 	if ($res) {
 		while($row = $res->FetchRow()){
@@ -2524,7 +2524,7 @@ function PrintGedcom($ged, $convert, $remove, $zip, $privatize_export, $privatiz
 		$res->FreeResult();
 	}
 	
-	$sql = "SELECT f_gedcom FROM ".TBLPREFIX."families WHERE f_file=".$GEDCOMID." ORDER BY cast(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(LOWER(f_id),'a',''),'b',''),'c',''),'d',''),'e',''),'f',''),'g',''),'h',''),'i',''),'j',''),'k',''),'l',''),'m',''),'n',''),'o',''),'p',''),'q',''),'r',''),'s',''),'t',''),'u',''),'v',''),'w',''),'x',''),'y',''),'z','') as unsigned)";
+	$sql = "SELECT f_gedrec FROM ".TBLPREFIX."families WHERE f_file=".$GEDCOMID." ORDER BY cast(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(LOWER(f_id),'a',''),'b',''),'c',''),'d',''),'e',''),'f',''),'g',''),'h',''),'i',''),'j',''),'k',''),'l',''),'m',''),'n',''),'o',''),'p',''),'q',''),'r',''),'s',''),'t',''),'u',''),'v',''),'w',''),'x',''),'y',''),'z','') as unsigned)";
 	$res = NewQuery($sql);
 	if ($res) {
 		while($row = $res->FetchRow()){
@@ -2539,7 +2539,7 @@ function PrintGedcom($ged, $convert, $remove, $zip, $privatize_export, $privatiz
 		$res->FreeResult();
 	}
 
-	$sql = "SELECT s_gedcom FROM ".TBLPREFIX."sources WHERE s_file=".$GEDCOMID." ORDER BY cast(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(LOWER(s_id),'a',''),'b',''),'c',''),'d',''),'e',''),'f',''),'g',''),'h',''),'i',''),'j',''),'k',''),'l',''),'m',''),'n',''),'o',''),'p',''),'q',''),'r',''),'s',''),'t',''),'u',''),'v',''),'w',''),'x',''),'y',''),'z','') as unsigned)";
+	$sql = "SELECT s_gedrec FROM ".TBLPREFIX."sources WHERE s_file=".$GEDCOMID." ORDER BY cast(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(LOWER(s_id),'a',''),'b',''),'c',''),'d',''),'e',''),'f',''),'g',''),'h',''),'i',''),'j',''),'k',''),'l',''),'m',''),'n',''),'o',''),'p',''),'q',''),'r',''),'s',''),'t',''),'u',''),'v',''),'w',''),'x',''),'y',''),'z','') as unsigned)";
 	$res = NewQuery($sql);
 	if ($res) {
 		while($row = $res->FetchRow()){
@@ -2555,7 +2555,7 @@ function PrintGedcom($ged, $convert, $remove, $zip, $privatize_export, $privatiz
 	}
 	
 	if ($embedmm != "yes") {
-		$sql = "SELECT m_gedrec FROM ".TBLPREFIX."media WHERE m_gedfile=".$GEDCOMID." ORDER BY cast(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(LOWER(m_media),'a',''),'b',''),'c',''),'d',''),'e',''),'f',''),'g',''),'h',''),'i',''),'j',''),'k',''),'l',''),'m',''),'n',''),'o',''),'p',''),'q',''),'r',''),'s',''),'t',''),'u',''),'v',''),'w',''),'x',''),'y',''),'z','') as unsigned)";
+		$sql = "SELECT m_gedrec FROM ".TBLPREFIX."media WHERE m_file=".$GEDCOMID." ORDER BY cast(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(LOWER(m_media),'a',''),'b',''),'c',''),'d',''),'e',''),'f',''),'g',''),'h',''),'i',''),'j',''),'k',''),'l',''),'m',''),'n',''),'o',''),'p',''),'q',''),'r',''),'s',''),'t',''),'u',''),'v',''),'w',''),'x',''),'y',''),'z','') as unsigned)";
 		$res = NewQuery($sql);
 		if ($res) {
 			while($row = $res->FetchRow()){
@@ -2570,7 +2570,7 @@ function PrintGedcom($ged, $convert, $remove, $zip, $privatize_export, $privatiz
 		}
 	}
 
-	$sql = "SELECT o_gedcom, o_type FROM ".TBLPREFIX."other WHERE o_file=".$GEDCOMID." ORDER BY cast(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(LOWER(o_id),'a',''),'b',''),'c',''),'d',''),'e',''),'f',''),'g',''),'h',''),'i',''),'j',''),'k',''),'l',''),'m',''),'n',''),'o',''),'p',''),'q',''),'r',''),'s',''),'t',''),'u',''),'v',''),'w',''),'x',''),'y',''),'z','') as unsigned)";
+	$sql = "SELECT o_gedrec, o_type FROM ".TBLPREFIX."other WHERE o_file=".$GEDCOMID." ORDER BY cast(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(LOWER(o_id),'a',''),'b',''),'c',''),'d',''),'e',''),'f',''),'g',''),'h',''),'i',''),'j',''),'k',''),'l',''),'m',''),'n',''),'o',''),'p',''),'q',''),'r',''),'s',''),'t',''),'u',''),'v',''),'w',''),'x',''),'y',''),'z','') as unsigned)";
 	$res = NewQuery($sql);
 	if ($res) {
 		while($row = $res->FetchRow()){

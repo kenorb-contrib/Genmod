@@ -50,7 +50,7 @@ if (!MediaFS::IsValidMedia($file)) {
 $m = RelativePathFile($MEDIA_DIRECTORY);
 if (!empty($m)) $mfile = preg_replace("~^$m~", "", $file);
 else $mfile = $file;
-$sql = "SELECT m_media FROM ".TBLPREFIX."media WHERE m_file='".$mfile."' AND m_gedfile='".$GEDCOMID."'";
+$sql = "SELECT m_media FROM ".TBLPREFIX."media WHERE m_mfile='".$mfile."' AND m_file='".$GEDCOMID."'";
 $res = NewQuery($sql);
 
 // Check the privacy settings

@@ -59,9 +59,9 @@ class MediaItem extends GedcomRecord {
 		if (is_array($gedrec)) {
 			// Prefill some variables
 			$this->extension = $gedrec["m_ext"];
-			$file = $gedrec["m_file"];
+			$file = $gedrec["m_mfile"];
 			$id = $gedrec["m_media"];
-			$gedcomid = $gedrec["m_gedfile"];
+			$gedcomid = $gedrec["m_file"];
 			$gedrec = $gedrec["m_gedrec"];
 		}
 	
@@ -177,7 +177,7 @@ class MediaItem extends GedcomRecord {
 		$this->indilist = array();
 		$this->indi_hide = 0;
 		
-		$sql = "SELECT DISTINCT i_key, i_gedcom, i_isdead, i_id, i_file  FROM ".TBLPREFIX."media_mapping, ".TBLPREFIX."individuals WHERE mm_media='".$this->xref."' AND mm_gedfile='".$this->gedcomid."' AND mm_type='INDI' AND mm_gid=i_id AND mm_gedfile=i_file";
+		$sql = "SELECT DISTINCT i_key, i_gedrec, i_isdead, i_id, i_file  FROM ".TBLPREFIX."media_mapping, ".TBLPREFIX."individuals WHERE mm_media='".$this->xref."' AND mm_file='".$this->gedcomid."' AND mm_type='INDI' AND mm_gid=i_id AND mm_file=i_file";
 		$res = NewQuery($sql);
 		while($row = $res->FetchAssoc()){
 			$person = null;
@@ -202,7 +202,7 @@ class MediaItem extends GedcomRecord {
 		$this->famlist = array();
 		$this->fam_hide = 0;
 		
-		$sql = "SELECT DISTINCT f_key, f_gedcom, f_id, f_file, f_husb, f_wife  FROM ".TBLPREFIX."media_mapping, ".TBLPREFIX."families WHERE mm_media='".$this->xref."' AND mm_gedfile='".$this->gedcomid."' AND mm_type='FAM' AND mm_gid=f_id AND mm_gedfile=f_file";
+		$sql = "SELECT DISTINCT f_key, f_gedrec, f_id, f_file, f_husb, f_wife  FROM ".TBLPREFIX."media_mapping, ".TBLPREFIX."families WHERE mm_media='".$this->xref."' AND mm_file='".$this->gedcomid."' AND mm_type='FAM' AND mm_gid=f_id AND mm_file=f_file";
 		$res = NewQuery($sql);
 		while($row = $res->FetchAssoc()){
 			$family = null;
@@ -227,7 +227,7 @@ class MediaItem extends GedcomRecord {
 		$this->sourcelist = array();
 		$this->sour_hide = 0;
 		
-		$sql = 	"SELECT DISTINCT s_key, s_id, s_gedcom, s_file FROM ".TBLPREFIX."media_mapping, ".TBLPREFIX."sources WHERE mm_media='".$this->xref."' AND mm_gedfile='".$this->gedcomid."' AND mm_type='SOUR' AND s_file=mm_gedfile AND s_id=mm_gid";
+		$sql = 	"SELECT DISTINCT s_key, s_id, s_gedrec, s_file FROM ".TBLPREFIX."media_mapping, ".TBLPREFIX."sources WHERE mm_media='".$this->xref."' AND mm_file='".$this->gedcomid."' AND mm_type='SOUR' AND s_file=mm_file AND s_id=mm_gid";
 		$res = NewQuery($sql);
 		while($row = $res->FetchAssoc()){
 			$source = null;
@@ -252,7 +252,7 @@ class MediaItem extends GedcomRecord {
 		$this->repo_hide = 0;
 		
 		// repositories can be linked from 
-		$sql = 	"SELECT o_id, o_gedcom FROM ".TBLPREFIX."media_mapping, ".TBLPREFIX."other WHERE mm_media='".$this->xref."' AND mm_gedfile='".$this->gedcomid."' AND mm_type='REPO' AND o_type='REPO' AND o_file=mm_gedfile AND o_id=mm_gid";
+		$sql = 	"SELECT o_id, o_gedrec FROM ".TBLPREFIX."media_mapping, ".TBLPREFIX."other WHERE mm_media='".$this->xref."' AND mm_file='".$this->gedcomid."' AND mm_type='REPO' AND o_type='REPO' AND o_file=mm_file AND o_id=mm_gid";
 		$res = NewQuery($sql);
 		while($row = $res->FetchAssoc()){
 			$repo = null;
@@ -275,7 +275,7 @@ class MediaItem extends GedcomRecord {
 		$links = array();	
 		$sql = "SELECT mm_gid FROM ".TBLPREFIX."media_mapping WHERE mm_media='".$pid."'";
 		if (!empty($type)) $sql .= " AND mm_type='".$type."'";
-		$sql .= " AND mm_gedfile='".$GEDCOMID."'";
+		$sql .= " AND mm_file='".$GEDCOMID."'";
 		$res = NewQuery($sql);
 		while($row = $res->FetchAssoc()){
 			if (!$applypriv) {
@@ -292,7 +292,7 @@ class MediaItem extends GedcomRecord {
 	
 	protected function ReadMediaRecord() {
 		
-		$sql = "SELECT m_gedrec FROM ".TBLPREFIX."media WHERE m_media='".$this->xref."' AND m_gedfile='".$this->gedcomid."'";
+		$sql = "SELECT m_gedrec FROM ".TBLPREFIX."media WHERE m_media='".$this->xref."' AND m_file='".$this->gedcomid."'";
 		$res = NewQuery($sql);
 		if ($res) {
 			if ($res->NumRows() != 0) {

@@ -25,7 +25,7 @@
  * @version $Id$
  */
 
-if (strstr($_SERVER["SCRIPT_NAME"],basename(__FILE__))) {
+if (stristr($_SERVER["SCRIPT_NAME"],basename(__FILE__))) {
 	require "../../intrusion.php";
 }
 
@@ -221,7 +221,7 @@ function CheckGedcom($gedrec, $chan=true, $user="", $tstamp="") {
 	if ($ct==0) {
 		$ct2 = preg_match("/0 HEAD/", $gedrec, $match2);
 		if ($ct2 == 0) {
-			print "CheckGedcom-> Invalid GEDCOM 5.5 format.\n";
+			print "CheckGedcom-> Invalid GEDCOM 5.5 format.\n".$pipo;
 			WriteToLog("CheckGedcom-> Invalid GEDCOM 5.5 format.->" . $gm_user->username ."<-", "I", "G", $GEDCOMID);
 			return false;
 		}
@@ -1643,40 +1643,40 @@ function GetLinkedGedrecs($oldgid, $mtype, $ged) {
 	
 	//-- References from sources (REPO, OBJE, NOTE)
 	if ($mtype == "REPO" || $mtype == "OBJE" || $mtype == "NOTE") {
-		$sql = "SELECT s_gedcom, s_id FROM ".TBLPREFIX."sources WHERE s_gedcom REGEXP '[1-9] [[:alnum:]]+ @".$oldgid."@' AND s_file='".$ged."'";
+		$sql = "SELECT s_gedrec, s_id FROM ".TBLPREFIX."sources WHERE s_gedrec REGEXP '[1-9] [[:alnum:]]+ @".$oldgid."@' AND s_file='".$ged."'";
 		$res = NewQuery($sql);
 		if ($res) {
 			while ($row = $res->FetchAssoc()) {
-				$records[] = $row["s_gedcom"];
+				$records[] = $row["s_gedrec"];
 			}
 		}
 	}
 	
 	//-- References from individuals (SOUR, INDI, FAM, NOTE, OBJE)
 	if ($mtype == "SOUR" || $mtype == "INDI" || $mtype == "FAM" || $mtype == "NOTE" || $mtype == "OBJE") {
-		$sql = "SELECT i_gedcom, i_id FROM ".TBLPREFIX."individuals WHERE i_gedcom REGEXP '[1-9] [[:alnum:]]+ @".$oldgid."@' AND i_file='".$ged."'";
+		$sql = "SELECT i_gedrec, i_id FROM ".TBLPREFIX."individuals WHERE i_gedrec REGEXP '[1-9] [[:alnum:]]+ @".$oldgid."@' AND i_file='".$ged."'";
 		$res = NewQuery($sql);
 		if ($res) {
 			while ($row = $res->FetchAssoc()) {
-				$records[] = $row["i_gedcom"];
+				$records[] = $row["i_gedrec"];
 			}
 		}
 	}
 
 	//-- References from families (SOUR, INDI, NOTE, OBJE)
 	if ($mtype == "SOUR" || $mtype == "INDI" || $mtype == "NOTE" || $mtype == "OBJE") {
-		$sql = "SELECT f_gedcom, f_id FROM ".TBLPREFIX."families WHERE f_gedcom REGEXP '[1-9] [[:alnum:]]+ @".$oldgid."@' AND f_file='".$ged."'";
+		$sql = "SELECT f_gedrec, f_id FROM ".TBLPREFIX."families WHERE f_gedrec REGEXP '[1-9] [[:alnum:]]+ @".$oldgid."@' AND f_file='".$ged."'";
 		$res = NewQuery($sql);
 		if ($res) {
 			while ($row = $res->FetchAssoc()) {
-				$records[] = $row["f_gedcom"];
+				$records[] = $row["f_gedrec"];
 			}
 		}
 	}
 	
 	//-- References from multimedia (SOUR, NOTE)
 	if ($mtype == "SOUR" || $mtype == "NOTE") {
-		$sql = "SELECT m_gedrec, m_media FROM ".TBLPREFIX."media WHERE m_gedrec REGEXP '[1-9] [[:alnum:]]+ @".$oldgid."@' AND m_gedfile='".$ged."'";
+		$sql = "SELECT m_gedrec, m_media FROM ".TBLPREFIX."media WHERE m_gedrec REGEXP '[1-9] [[:alnum:]]+ @".$oldgid."@' AND m_file='".$ged."'";
 		$res = NewQuery($sql);
 		if ($res) {
 			while ($row = $res->FetchAssoc()) {
@@ -1687,11 +1687,11 @@ function GetLinkedGedrecs($oldgid, $mtype, $ged) {
 
 	//-- References from notes, submitter recs (SOUR, INDI) <== links to notes and repositories
 	if ($mtype == "SOUR" || $mtype == "INDI" || $mtype == "REPO" || $mtype == "OBJE") {
-		$sql = "SELECT o_gedcom, o_id FROM ".TBLPREFIX."other WHERE o_gedcom REGEXP '[1-9] [[:alnum:]]+ @".$oldgid."@' AND o_file='".$ged."'";
+		$sql = "SELECT o_gedrec, o_id FROM ".TBLPREFIX."other WHERE o_gedrec REGEXP '[1-9] [[:alnum:]]+ @".$oldgid."@' AND o_file='".$ged."'";
 		$res = NewQuery($sql);
 		if ($res) {
 			while ($row = $res->FetchAssoc()) {
-				$records[] = $row["f_gedcom"];
+				$records[] = $row["f_gedrec"];
 			}
 		}
 	}

@@ -51,7 +51,7 @@ abstract class UserController {
 		$user = false;
 		$id = DbLayer::EscapeQuery($id);
 		$sql = "SELECT ug_username FROM ".TBLPREFIX."users_gedcoms WHERE ";
-		$sql .= "ug_gedfile='".$gedcomid."'";
+		$sql .= "ug_file='".$gedcomid."'";
 		$sql .= "AND ug_gedcomid='".$id."'";
 		$res = NewQuery($sql, false);
 		if (!$res) return false;
@@ -498,7 +498,7 @@ abstract class UserController {
 	
 	public function CheckPrivacyOverrides($gedid) {
 		
-		$sql = "SELECT count(ug_username) FROM ".TBLPREFIX."users_gedcoms WHERE (ug_relationship_privacy<>'' OR ug_hide_live_people<>'' OR ug_show_living_names<>'') AND ug_gedfile='".$gedid."'";
+		$sql = "SELECT count(ug_username) FROM ".TBLPREFIX."users_gedcoms WHERE (ug_relationship_privacy<>'' OR ug_hide_live_people<>'' OR ug_show_living_names<>'') AND ug_file='".$gedid."'";
 		$res = NewQuery($sql);
 		if ($res) {
 			$row = $res->FetchRow();

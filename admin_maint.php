@@ -62,10 +62,11 @@ switch ($action) {
 		else $message = "<span class=\"error\">".$gm_lang["isdead_not_reset"]."</span>";
 		break;
 	case "buildisdead":
-		$sql = "SELECT i_id FROM ".TBLPREFIX."individuals WHERE i_isdead=-1 AND i_file='".$GEDCOMID."'";
+		$sql = "SELECT i_id, i_gedrec, i_file, i_isdead FROM ".TBLPREFIX."individuals WHERE i_isdead=-1 AND i_file='".$GEDCOMID."'";
 		$res = NewQuery($sql);
 		while ($row = $res->FetchAssoc()) {
-			IsDeadId($row["i_id"]);
+			$person = Person::GetInstance($row["i_id"], $row);
+			$p = $person->isdead;
 		}
 		break;
 	case "dispdbsettings":

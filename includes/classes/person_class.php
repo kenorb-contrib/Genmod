@@ -81,6 +81,13 @@ class Person extends GedcomRecord {
 		return self::$personcache[$gedcomid][$xref];
 	}
 		
+	public static function IsInstance($xref, $gedcomid="") {
+		
+		if (empty($gedcomid)) $gedcomid = $GEDCOMID;
+		if (!isset(self::$personcache[$gedcomid][$xref])) return false;
+		else return true;
+	}
+		
 	/**
 	 * Constructor for person object
 	 * @param string $gedrec	the raw individual gedcom record
@@ -94,7 +101,7 @@ class Person extends GedcomRecord {
 			// extract the construction parameters
 			$gedcomid = $gedrec["i_file"];
 			$id = $gedrec["i_id"];
-			$gedrec = $gedrec["i_gedcom"];
+			$gedrec = $gedrec["i_gedrec"];
 		}
 			
 		parent::__construct($id, $gedrec, $gedcomid);
@@ -1552,12 +1559,12 @@ if ($this->tracefacts) print "AddSpouseFacts - Adding for ".$fam->$spperson->xre
 
 	protected function ReadPersonRecord() {
 		
-		$sql = "SELECT i_key, i_gedcom, i_isdead, i_file, n_name, n_surname, n_letter, n_type FROM ".TBLPREFIX."individuals, ".TBLPREFIX."names WHERE i_key='".DbLayer::EscapeQuery(JoinKey($this->xref, $this->gedcomid))."' AND i_key=n_key";
+		$sql = "SELECT i_key, i_gedrec, i_isdead, i_file, n_name, n_surname, n_letter, n_type FROM ".TBLPREFIX."individuals, ".TBLPREFIX."names WHERE i_key='".DbLayer::EscapeQuery(JoinKey($this->xref, $this->gedcomid))."' AND i_key=n_key";
 		$res = NewQuery($sql);
 		if ($res) {
 			if ($res->NumRows() != 0) {
 				$row = $res->fetchAssoc();
-				$this->gedrec = $row["i_gedcom"];
+				$this->gedrec = $row["i_gedrec"];
 				$this->name_array[] = array($row["n_name"], $row["n_letter"], $row["n_surname"], $row["n_type"]);
 				$this->isdead = $row["i_isdead"];
 				while ($row = $res->FetchAssoc()) {
@@ -1575,7 +1582,7 @@ if ($this->tracefacts) print "AddSpouseFacts - Adding for ".$fam->$spperson->xre
 		
 		// Check the gedcom context
 		$oldgedid = $GEDCOMID;
-		if ($GEDCOMID != $this->gedcomid) SwichGedcom($this->gedcomid);
+		if ($GEDCOMID != $this->gedcomid) SwitchGedcom($this->gedcomid);
 		
 		// If a pid is hidden or shown due to user privacy, the name is hidden or shown also
 		if (!empty($gm_user->username)) {

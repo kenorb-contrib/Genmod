@@ -25,7 +25,7 @@
  * @see validategedcom.php
  */
  
-if (strstr($_SERVER["SCRIPT_NAME"],basename(__FILE__))) {
+if (stristr($_SERVER["SCRIPT_NAME"],basename(__FILE__))) {
 	require "../../intrusion.php";
 }
 abstract class ImportFunctions {
@@ -433,11 +433,11 @@ abstract class ImportFunctions {
 		$res = NewQuery($sql);
 		$sql = "DELETE FROM ".TBLPREFIX."sources WHERE s_file='$FILEID'";
 		$res = NewQuery($sql);
-		$sql = "DELETE FROM ".TBLPREFIX."source_mapping WHERE sm_gedfile='$FILEID'";
+		$sql = "DELETE FROM ".TBLPREFIX."source_mapping WHERE sm_file='$FILEID'";
 		$res = NewQuery($sql);
 		$sql = "DELETE FROM ".TBLPREFIX."other WHERE o_file='$FILEID'";
 		$res = NewQuery($sql);
-		$sql = "DELETE FROM ".TBLPREFIX."other_mapping WHERE om_gedfile='$FILEID'";
+		$sql = "DELETE FROM ".TBLPREFIX."other_mapping WHERE om_file='$FILEID'";
 		$res = NewQuery($sql);
 		$sql = "DELETE FROM ".TBLPREFIX."places WHERE p_file='$FILEID'";
 		$res = NewQuery($sql);
@@ -447,9 +447,9 @@ abstract class ImportFunctions {
 		$res = NewQuery($sql);
 		$sql = "DELETE FROM ".TBLPREFIX."dates WHERE d_file='$FILEID'";
 		$res = NewQuery($sql);
-		$sql = "DELETE FROM ".TBLPREFIX."media WHERE m_gedfile='$FILEID'";
+		$sql = "DELETE FROM ".TBLPREFIX."media WHERE m_file='$FILEID'";
 		$res = NewQuery($sql);
-		$sql = "DELETE FROM ".TBLPREFIX."media_mapping WHERE mm_gedfile='$FILEID'";
+		$sql = "DELETE FROM ".TBLPREFIX."media_mapping WHERE mm_file='$FILEID'";
 		$res = NewQuery($sql);
 		$sql = "DELETE FROM ".TBLPREFIX."individual_family WHERE if_file='$FILEID'";
 		$res = NewQuery($sql);
@@ -708,7 +708,7 @@ abstract class ImportFunctions {
 			$fam["CHIL"] = $chil;
 			$fam["gedcom"] = $indirec;
 			$fam["gedfile"] = $FILEID;
-			$sql = "INSERT INTO ".TBLPREFIX."families (f_key, f_id, f_file, f_husb, f_wife, f_chil, f_gedcom, f_numchil) VALUES ('".DbLayer::EscapeQuery($gid)."[".DbLayer::EscapeQuery($fam["gedfile"])."]','".DbLayer::EscapeQuery($gid)."','".DbLayer::EscapeQuery($fam["gedfile"])."','".DbLayer::EscapeQuery(JoinKey($fam["HUSB"], $fam["gedfile"]))."','".DbLayer::EscapeQuery(JoinKey($fam["WIFE"], $FILEID))."','".DbLayer::EscapeQuery($fam["CHIL"])."','".DbLayer::EscapeQuery($fam["gedcom"])."','".DbLayer::EscapeQuery($ct)."')";
+			$sql = "INSERT INTO ".TBLPREFIX."families (f_key, f_id, f_file, f_husb, f_wife, f_chil, f_gedrec, f_numchil) VALUES ('".DbLayer::EscapeQuery($gid)."[".DbLayer::EscapeQuery($fam["gedfile"])."]','".DbLayer::EscapeQuery($gid)."','".DbLayer::EscapeQuery($fam["gedfile"])."','".DbLayer::EscapeQuery(JoinKey($fam["HUSB"], $fam["gedfile"]))."','".DbLayer::EscapeQuery(JoinKey($fam["WIFE"], $FILEID))."','".DbLayer::EscapeQuery($fam["CHIL"])."','".DbLayer::EscapeQuery($fam["gedcom"])."','".DbLayer::EscapeQuery($ct)."')";
 			$res = NewQuery($sql);
 			if ($res) $res->FreeResult();
 		}
@@ -772,7 +772,7 @@ abstract class ImportFunctions {
 	
 		// if no preference to order find the number of records and add to the end
 		if ($order=-1) {
-			$sql = "SELECT * FROM ".TBLPREFIX."media_mapping WHERE mm_gedfile='".$gedid."' AND mm_gid='".addslashes($indi)."'";
+			$sql = "SELECT * FROM ".TBLPREFIX."media_mapping WHERE mm_file='".$gedid."' AND mm_gid='".addslashes($indi)."'";
 			$res = NewQuery($sql);
 			$ct = $res->NumRows();
 			$order = $ct + 1;
@@ -976,12 +976,12 @@ abstract class ImportFunctions {
 			if ($et>0) $ext = substr(trim($ematch[1]),1);
 			if ($found) {
 				// It's the actual values for an inserted stub record. We only update the fields with the true values
-				$sql = "UPDATE ".TBLPREFIX."media SET m_ext = '".DbLayer::EscapeQuery($ext)."', m_titl = '".DbLayer::EscapeQuery($title)."', m_file = '".DbLayer::EscapeQuery($file)."', m_gedrec = '".DbLayer::EscapeQuery($indirec)."' WHERE m_media = '".$new_m_media."' AND m_gedfile='".$FILEID."'";
+				$sql = "UPDATE ".TBLPREFIX."media SET m_ext = '".DbLayer::EscapeQuery($ext)."', m_titl = '".DbLayer::EscapeQuery($title)."', m_mfile = '".DbLayer::EscapeQuery($file)."', m_gedrec = '".DbLayer::EscapeQuery($indirec)."' WHERE m_media = '".$new_m_media."' AND m_file='".$FILEID."'";
 				$res = NewQuery($sql);
 			}
 			else {
 				// It's completely new, we insert a new record
-				$sql = "INSERT INTO ".TBLPREFIX."media (m_id, m_media, m_ext, m_titl, m_file, m_gedfile, m_gedrec)";
+				$sql = "INSERT INTO ".TBLPREFIX."media (m_id, m_media, m_ext, m_titl, m_mfile, m_file, m_gedrec)";
 				$sql .= " VALUES('0', '".DbLayer::EscapeQuery($new_m_media)."', '".DbLayer::EscapeQuery($ext)."', '".DbLayer::EscapeQuery($title)."', '".DbLayer::EscapeQuery($file)."', '".$FILEID."', '".DbLayer::EscapeQuery($indirec)."')";
 				$res = NewQuery($sql);
 			}
@@ -1050,11 +1050,11 @@ abstract class ImportFunctions {
 							$objrec = preg_replace("/$rec/", "", $objrec);
 						}
 						if (!$em) {
-							$sql = "INSERT INTO ".TBLPREFIX."media (m_id, m_media, m_ext, m_titl, m_file, m_gedfile, m_gedrec)";
+							$sql = "INSERT INTO ".TBLPREFIX."media (m_id, m_media, m_ext, m_titl, m_mfile, m_file, m_gedrec)";
 							$sql .= " VALUES('0', '".DbLayer::EscapeQuery($m_media)."', '".DbLayer::EscapeQuery($ext)."', '".DbLayer::EscapeQuery($title)."', '".DbLayer::EscapeQuery($file)."', '".$FILEID."', '".DbLayer::EscapeQuery($objrec)."')";
 							$res = NewQuery($sql);
 						}
-						$sql = "INSERT INTO ".TBLPREFIX."media_mapping (mm_id, mm_media, mm_gid, mm_order, mm_gedfile, mm_gedrec, mm_type)";
+						$sql = "INSERT INTO ".TBLPREFIX."media_mapping (mm_id, mm_media, mm_gid, mm_order, mm_file, mm_gedrec, mm_type)";
 						$sql .= " VALUES ('0', '".DbLayer::EscapeQuery($m_media)."', '".DbLayer::EscapeQuery($gid)."', '".DbLayer::EscapeQuery($count)."', '".$FILEID."', '".addslashes(''.$objlevel.' OBJE @'.$m_media.'@'.$add)."', '".$rectype."')";
 						$res = NewQuery($sql);
 						$media_count++;
@@ -1095,7 +1095,7 @@ abstract class ImportFunctions {
 							if (!$update) {
 								// NOTE: We found a media reference but no media item yet, we need to create an empty
 								// NOTE: media object, so we do not have orhpaned media mapping links
-								$sql = "INSERT INTO ".TBLPREFIX."media (m_id, m_media, m_ext, m_titl, m_file, m_gedfile, m_gedrec)";
+								$sql = "INSERT INTO ".TBLPREFIX."media (m_id, m_media, m_ext, m_titl, m_mfile, m_file, m_gedrec)";
 								$sql .= " VALUES('0', '".DbLayer::EscapeQuery($new_mm_media)."', '', '', '', '".$FILEID."', '0 @".DbLayer::EscapeQuery($new_mm_media)."@ OBJE\r\n')";
 								$res = NewQuery($sql);
 								
@@ -1104,13 +1104,13 @@ abstract class ImportFunctions {
 								$gedrec = GetSubRecord($objlevel, $line, $indirec);
 								$gedrec = preg_replace("/@(.*)@/", "@$new_mm_media@", $gedrec);
 								$line = preg_replace("/@(.*)@/", "@$new_mm_media@", $line);
-								$sql = "INSERT INTO ".TBLPREFIX."media_mapping (mm_id, mm_media, mm_gid, mm_order, mm_gedfile, mm_gedrec, mm_type) ";
+								$sql = "INSERT INTO ".TBLPREFIX."media_mapping (mm_id, mm_media, mm_gid, mm_order, mm_file, mm_gedrec, mm_type) ";
 								$sql .= "VALUES ('0', '".DbLayer::EscapeQuery($new_mm_media)."', '".DbLayer::EscapeQuery($gid)."', '".DbLayer::EscapeQuery($count)."', '".$FILEID."', '".$gedrec."', '".$rectype."')";
 								$res = NewQuery($sql);
 							}
 							else {
 								// NOTE: This is an online update. Let's see if we already have a media mapping for this item
-								$sql = "SELECT mm_media FROM ".TBLPREFIX."media_mapping WHERE mm_media = '".$new_mm_media."' AND mm_gedfile = '".$FILEID."'";
+								$sql = "SELECT mm_media FROM ".TBLPREFIX."media_mapping WHERE mm_media = '".$new_mm_media."' AND mm_file = '".$FILEID."'";
 								$res = NewQuery($sql);
 								$row = $res->FetchAssoc();
 								if (count($row) == 0) {
@@ -1118,7 +1118,7 @@ abstract class ImportFunctions {
 									$gedrec = preg_replace("/@(.*)@/", "@$new_mm_media@", $gedrec); // Added
 									// NOTE: Add the mapping to the media reference
 									$line = preg_replace("/@(.*)@/", "@$new_mm_media@", $line);
-									$sql = "INSERT INTO ".TBLPREFIX."media_mapping (mm_id, mm_media, mm_gid, mm_order, mm_gedfile, mm_gedrec, mm_type) ";
+									$sql = "INSERT INTO ".TBLPREFIX."media_mapping (mm_id, mm_media, mm_gid, mm_order, mm_file, mm_gedrec, mm_type) ";
 									$sql .= "VALUES ('0', '".DbLayer::EscapeQuery($new_mm_media)."', '".DbLayer::EscapeQuery($gid)."', '".DbLayer::EscapeQuery($count)."', '".$FILEID."', '".$gedrec."', '".$rectype."')";
 									$res = NewQuery($sql);
 								}
@@ -1131,19 +1131,19 @@ abstract class ImportFunctions {
 								$gedrec = GetSubRecord($objlevel, $line, $indirec);
 								$gedrec = preg_replace("/@(.*)@/", "@$new_mm_media@", $gedrec);
 								$line = preg_replace("/@(.*)@/", "@$new_mm_media@", $line);
-								$sql = "INSERT INTO ".TBLPREFIX."media_mapping (mm_id, mm_media, mm_gid, mm_order, mm_gedfile, mm_gedrec, mm_type) ";
+								$sql = "INSERT INTO ".TBLPREFIX."media_mapping (mm_id, mm_media, mm_gid, mm_order, mm_file, mm_gedrec, mm_type) ";
 								$sql .= "VALUES ('0', '".DbLayer::EscapeQuery($new_mm_media)."', '".DbLayer::EscapeQuery($gid)."', '".DbLayer::EscapeQuery($count)."', '".$FILEID."', '".$gedrec."', '".$rectype."')";
 								$res = NewQuery($sql);
 							}
 							else {
 								// NOTE: This is an online update. Let's see if we already have a media mapping for this item
-								$sql = "SELECT mm_media FROM ".TBLPREFIX."media_mapping WHERE mm_media = '".$new_mm_media."' AND mm_gedfile = '".$FILEID."'";
+								$sql = "SELECT mm_media FROM ".TBLPREFIX."media_mapping WHERE mm_media = '".$new_mm_media."' AND mm_file = '".$FILEID."'";
 								$res = NewQuery($sql);
 								$row = $res->FetchAssoc();
 								if (count($row) == 0) {
 									// NOTE: Add the mapping to the media reference
 									$line = preg_replace("/@(.+)@/", "@$new_mm_media@", $line);
-									$sql = "INSERT INTO ".TBLPREFIX."media_mapping (mm_id, mm_media, mm_gid, mm_order, mm_gedfile, mm_gedrec, mm_type) ";
+									$sql = "INSERT INTO ".TBLPREFIX."media_mapping (mm_id, mm_media, mm_gid, mm_order, mm_file, mm_gedrec, mm_type) ";
 									$sql .= "VALUES ('0', '".DbLayer::EscapeQuery($new_mm_media)."', '".DbLayer::EscapeQuery($gid)."', '".DbLayer::EscapeQuery($count)."', '".$FILEID."', '".$line."', '".$rectype."')";
 									$res = NewQuery($sql);
 								}
@@ -1195,13 +1195,13 @@ abstract class ImportFunctions {
 						$objrec = preg_replace("/ OBJE/", " @".$m_media."@ OBJE", $objrec);
 						$objrec = preg_replace("/^(\d+) /me", "($1-$objlevel).' '", $objrec);
 						if (!$em) {
-							$sql = "INSERT INTO ".TBLPREFIX."media (m_id, m_media, m_ext, m_titl, m_file, m_gedfile, m_gedrec)";
+							$sql = "INSERT INTO ".TBLPREFIX."media (m_id, m_media, m_ext, m_titl, m_mfile, m_file, m_gedrec)";
 							$sql .= " VALUES('0', '".DbLayer::EscapeQuery($m_media)."', '".DbLayer::EscapeQuery($ext)."', '".DbLayer::EscapeQuery($title)."', '".DbLayer::EscapeQuery($file)."', '".$FILEID."', '".DbLayer::EscapeQuery($objrec)."')";
 							$res = NewQuery($sql);
 						}
 	
 						
-						$sql = "INSERT INTO ".TBLPREFIX."media_mapping (mm_id, mm_media, mm_gid, mm_order, mm_gedfile, mm_gedrec, mm_type)";
+						$sql = "INSERT INTO ".TBLPREFIX."media_mapping (mm_id, mm_media, mm_gid, mm_order, mm_file, mm_gedrec, mm_type)";
 						$sql .= " VALUES ('0', '".DbLayer::EscapeQuery($m_media)."', '".DbLayer::EscapeQuery($gid)."', '".DbLayer::EscapeQuery($count)."', '".$FILEID."', '".addslashes(''.$objlevel.' OBJE @'.$m_media.'@'.$add)."', '".$rectype."')";
 						$res = NewQuery($sql);
 						$media_count++;
@@ -1264,18 +1264,18 @@ abstract class ImportFunctions {
 								}
 	
 								if (!$em) {
-									$sql = "INSERT INTO ".TBLPREFIX."media (m_id, m_media, m_ext, m_titl, m_file, m_gedfile, m_gedrec)";
+									$sql = "INSERT INTO ".TBLPREFIX."media (m_id, m_media, m_ext, m_titl, m_mfile, m_file, m_gedrec)";
 									$sql .= " VALUES('0', '".DbLayer::EscapeQuery($m_media)."', '".DbLayer::EscapeQuery($ext)."', '".DbLayer::EscapeQuery($title)."', '".DbLayer::EscapeQuery($file)."', '".$FILEID."', '".DbLayer::EscapeQuery($objrec)."')";
 									$res = NewQuery($sql);
 								}
-								$sql = "INSERT INTO ".TBLPREFIX."media_mapping (mm_id, mm_media, mm_gid, mm_order, mm_gedfile, mm_gedrec, mm_type)";
+								$sql = "INSERT INTO ".TBLPREFIX."media_mapping (mm_id, mm_media, mm_gid, mm_order, mm_file, mm_gedrec, mm_type)";
 								$sql .= " VALUES ('0', '".DbLayer::EscapeQuery($m_media)."', '".DbLayer::EscapeQuery($gid)."', '".DbLayer::EscapeQuery($count)."', '".$FILEID."', '".addslashes(''.$objlevel.' OBJE @'.$m_media.'@'.$add)."', '".$rectype."')";
 								$res = NewQuery($sql);
 							}
 							else {
 								$oldid = preg_match("/0\s@(.*)@\sOBJE/", $objrec, $newmatch);
 								$m_media = $newmatch[1];
-								$sql = "UPDATE ".TBLPREFIX."media SET m_ext = '".DbLayer::EscapeQuery($ext)."', m_titl = '".DbLayer::EscapeQuery($title)."', m_file = '".DbLayer::EscapeQuery($file)."', m_gedrec = '".DbLayer::EscapeQuery($objrec)."' WHERE m_media = '".$m_media."'";
+								$sql = "UPDATE ".TBLPREFIX."media SET m_ext = '".DbLayer::EscapeQuery($ext)."', m_titl = '".DbLayer::EscapeQuery($title)."', m_mfile = '".DbLayer::EscapeQuery($file)."', m_gedrec = '".DbLayer::EscapeQuery($objrec)."' WHERE m_media = '".$m_media."'";
 								$res = NewQuery($sql);
 							}
 							$media_count++;
@@ -1326,7 +1326,7 @@ abstract class ImportFunctions {
 	private function AddSourceLink($sour, $gid, $gedrec, $gedid, $type) {
 		global $GEDCOMID;
 		
-		$sql = "INSERT INTO ".TBLPREFIX."source_mapping (sm_id, sm_sid, sm_type, sm_gid, sm_gedfile, sm_gedrec) VALUES ('0', '".$sour."', '".$type."', '".$gid."', '".$gedid."', '".DbLayer::EscapeQuery($gedrec)."')";
+		$sql = "INSERT INTO ".TBLPREFIX."source_mapping (sm_id, sm_sid, sm_type, sm_gid, sm_file, sm_gedrec, sm_key) VALUES ('0', '".$sour."', '".$type."', '".$gid."', '".$gedid."', '".DbLayer::EscapeQuery($gedrec)."', '".JoinKey($sour, $gedid)."')";
 		$res = NewQuery($sql);
 		if ($res) {
 			$res->FreeResult();
@@ -1338,7 +1338,7 @@ abstract class ImportFunctions {
 	private function AddOtherLink($note, $gid, $type, $gedid) {
 		global $GEDCOMID;
 		
-		$sql = "INSERT INTO ".TBLPREFIX."other_mapping (om_id, om_oid, om_gid, om_type, om_gedfile) VALUES ('0', '".$note."', '".$gid."', '".$type."', '".$gedid."')";
+		$sql = "INSERT INTO ".TBLPREFIX."other_mapping (om_id, om_oid, om_gid, om_type, om_file) VALUES ('0', '".$note."', '".$gid."', '".$type."', '".$gedid."')";
 		$res = NewQuery($sql);
 		if ($res) {
 			$res->FreeResult();

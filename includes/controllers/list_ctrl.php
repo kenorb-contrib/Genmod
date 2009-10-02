@@ -1,6 +1,6 @@
 <?php
 /**
- * Controller for the indilist Page
+ * Controller for the list Pages
  *
  * Genmod: Genealogy Viewer
  * Copyright (C) 2005 - 2008 Genmod Development Team
@@ -19,7 +19,6 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
- * Page does not validate see line number 1109 -> 15 August 2005
  *
  * @package Genmod
  * @subpackage Charts
@@ -36,12 +35,18 @@ if (stristr($_SERVER["SCRIPT_NAME"],basename(__FILE__))) {
 class ListController extends BaseController {
 	
 	public $classname = "ListController";	// Name of this class
+	protected $pagetitle = null;				// Page title to show in the browser top line
 	
 	public function __construct() {
+		
+		parent::__construct();
 	}
 
 	public function __get($property) {
 		switch($property) {
+			case "pagetitle":
+				return $this->GetPageTitle();
+				break;
 			default:
 				return parent::__get($property);
 				break;

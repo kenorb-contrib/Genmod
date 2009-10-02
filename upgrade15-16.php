@@ -72,7 +72,7 @@ else {
 	$res->FreeResult();
 	print "<b>Upgrade user data</b><br />";
 	print "Step 1: Creating new database table for user rights<br />";
-	$sql = "CREATE TABLE ".TBLPREFIX."users_gedcoms (ug_ID int(11) NOT NULL auto_increment, ug_username varbinary(30) NOT NULL default '', ug_gedfile int(11) NOT NULL default '0', ug_gedcomid varchar(255) default NULL, ug_rootid varchar(255) default NULL, ug_canedit varchar(7) default NULL, PRIMARY KEY  (ug_ID), KEY ug_user (ug_username), KEY ug_ged (ug_gedcomid,ug_gedfile)) ENGINE=MyISAM";
+	$sql = "CREATE TABLE ".TBLPREFIX."users_gedcoms (ug_ID int(11) NOT NULL auto_increment, ug_username varbinary(30) NOT NULL default '', ug_file int(11) NOT NULL default '0', ug_gedcomid varchar(255) default NULL, ug_rootid varchar(255) default NULL, ug_canedit varchar(7) default NULL, PRIMARY KEY  (ug_ID), KEY ug_user (ug_username), KEY ug_ged (ug_gedcomid,ug_gedfile)) ENGINE=MyISAM";
 	$res = NewQuery($sql);
 	if (!$res) {
 		print "There was a problem creating the table: <br />".$DBCONN->sqlerrordesc."<br />".$DBCONN->sqlquery."<br />";

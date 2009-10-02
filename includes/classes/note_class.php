@@ -63,7 +63,7 @@ class Note extends GedcomRecord {
 		if (is_array($gedrec)) {
 			$id = $gedrec["o_id"];
 			$gedcomid = $gedrec["o_file"];
-			$gedrec = $gedrec["o_gedcom"];
+			$gedrec = $gedrec["o_gedrec"];
 		}
 		
 		parent::__construct($id, $gedrec, $gedcomid);
@@ -174,7 +174,7 @@ class Note extends GedcomRecord {
 		$this->indilist = array();
 		$this->indi_hide = 0;
 		
-		$sql = "SELECT DISTINCT i_key, i_gedcom, i_isdead, i_id, i_file  FROM ".TBLPREFIX."other_mapping, ".TBLPREFIX."individuals WHERE om_oid='".$this->xref."' AND om_gedfile='".$this->gedcomid."' AND om_type='INDI' AND om_gid=i_id AND om_gedfile=i_file";
+		$sql = "SELECT DISTINCT i_key, i_gedrec, i_isdead, i_id, i_file  FROM ".TBLPREFIX."other_mapping, ".TBLPREFIX."individuals WHERE om_oid='".$this->xref."' AND om_file='".$this->gedcomid."' AND om_type='INDI' AND om_gid=i_id AND om_file=i_file";
 		$res = NewQuery($sql);
 		while($row = $res->FetchAssoc()){
 			$person = null;
@@ -195,7 +195,7 @@ class Note extends GedcomRecord {
 		$this->famlist = array();
 		$this->fam_hide = 0;
 		
-		$sql = "SELECT DISTINCT f_key, f_gedcom, f_id, f_file, f_husb, f_wife  FROM ".TBLPREFIX."other_mapping, ".TBLPREFIX."families WHERE om_oid='".$this->xref."' AND om_gedfile='".$this->gedcomid."' AND om_type='FAM' AND om_gid=f_id AND om_gedfile=f_file";
+		$sql = "SELECT DISTINCT f_key, f_gedrec, f_id, f_file, f_husb, f_wife  FROM ".TBLPREFIX."other_mapping, ".TBLPREFIX."families WHERE om_oid='".$this->xref."' AND om_file='".$this->gedcomid."' AND om_type='FAM' AND om_gid=f_id AND om_file=f_file";
 		$res = NewQuery($sql);
 		while($row = $res->FetchAssoc()){
 			$family = null;
@@ -216,12 +216,12 @@ class Note extends GedcomRecord {
 		$this->medialist = array();
 		$this->media_hide = 0;
 		
-		$sql = "SELECT DISTINCT m_media, m_gedrec, m_gedfile, m_ext, m_file FROM ".TBLPREFIX."other_mapping, ".TBLPREFIX."media WHERE om_oid='".$this->xref."' AND om_gedfile='".$this->gedcomid."' AND om_type='OBJE' AND om_gid=m_media AND m_gedfile=om_gedfile";
+		$sql = "SELECT DISTINCT m_media, m_gedrec, m_file, m_ext, m_mfile FROM ".TBLPREFIX."other_mapping, ".TBLPREFIX."media WHERE om_oid='".$this->xref."' AND om_file='".$this->gedcomid."' AND om_type='OBJE' AND om_gid=m_media AND m_file=om_file";
 		$res = NewQuery($sql);
 		while($row = $res->FetchAssoc()) {
 			$mediaitem = null;
-			$mediaitem =& MediaItem::GetInstance($row["m_media"], $row, $row["m_gedfile"]);
-			if ($mediaitem->DisplayDetails()) $this->medialist[JoinKey($row["m_media"], $row["m_gedfile"])] = $mediaitem;
+			$mediaitem =& MediaItem::GetInstance($row["m_media"], $row, $row["m_file"]);
+			if ($mediaitem->DisplayDetails()) $this->medialist[JoinKey($row["m_media"], $row["m_file"])] = $mediaitem;
 			else $this->media_hide++;
 		}
 		uasort($this->medialist, "TitleObjSort");
@@ -239,7 +239,7 @@ class Note extends GedcomRecord {
 		$this->sourcelist = array();
 		$this->sour_hide = 0;
 		
-		$sql = 	"SELECT DISTINCT s_key, s_id, s_gedcom, s_file FROM ".TBLPREFIX."other_mapping, ".TBLPREFIX."sources WHERE om_oid='".$this->xref."' AND om_gedfile='".$this->gedcomid."' AND om_type='SOUR' AND s_file=om_gedfile AND s_id=om_gid";
+		$sql = 	"SELECT DISTINCT s_key, s_id, s_gedrec, s_file FROM ".TBLPREFIX."other_mapping, ".TBLPREFIX."sources WHERE om_oid='".$this->xref."' AND om_file='".$this->gedcomid."' AND om_type='SOUR' AND s_file=om_file AND s_id=om_gid";
 		$res = NewQuery($sql);
 		while($row = $res->FetchAssoc()){
 			$source = null;
@@ -264,7 +264,7 @@ class Note extends GedcomRecord {
 		$this->repo_hide = 0;
 		
 		// repositories can be linked from 
-		$sql = 	"SELECT o_key, o_id, o_gedcom, o_file FROM ".TBLPREFIX."other_mapping, ".TBLPREFIX."other WHERE om_oid='".$this->xref."' AND om_gedfile='".$this->gedcomid."' AND o_type='REPO' AND o_file=om_gedfile AND o_id=om_gid";
+		$sql = 	"SELECT o_key, o_id, o_gedrec, o_file FROM ".TBLPREFIX."other_mapping, ".TBLPREFIX."other WHERE om_oid='".$this->xref."' AND om_file='".$this->gedcomid."' AND o_type='REPO' AND o_file=om_file AND o_id=om_gid";
 		$res = NewQuery($sql);
 		while($row = $res->FetchAssoc()){
 			$repo = null;
@@ -279,12 +279,12 @@ class Note extends GedcomRecord {
 	
 	protected function ReadNoteRecord() {
 		
-		$sql = "SELECT o_gedcom FROM ".TBLPREFIX."other WHERE o_key='".JoinKey($this->xref,	$this->gedcomid)."'";
+		$sql = "SELECT o_gedrec FROM ".TBLPREFIX."other WHERE o_key='".JoinKey($this->xref,	$this->gedcomid)."'";
 		$res = NewQuery($sql);
 		if ($res) {
 			if ($res->NumRows() != 0) {
 				$row = $res->fetchAssoc();
-				$this->gedrec = $row["o_gedcom"];
+				$this->gedrec = $row["o_gedrec"];
 			}
 		}
 	}
