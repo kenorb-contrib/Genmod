@@ -26,7 +26,12 @@
 
 // NOTE: Start the debug collector
 $DEBUG = false;
-if ($DEBUG) DebugCollector::$show = true;
+if ($DEBUG && !stristr($_SERVER["SCRIPT_NAME"],"gmrpc")) {
+	define('DEBUG', true);
+	DebugCollector::$show = true;
+	define('pipo','');
+}
+else define('DEBUG', false);
  
 if (stristr($_SERVER["SCRIPT_NAME"],"session")) {
 //	print "Now, why would you want to do that.  You're not hacking are you?";
@@ -415,8 +420,6 @@ require_once($GM_BASE_DIRECTORY."config_gedcom.php");
 if (CONFIGURED) if ($DBCONN->connected) GedcomConfig::ReadGedcomConfig($GEDCOMID);
 require_once($GM_BASE_DIRECTORY."includes/functions/functions_name.php");
 require_once($GM_BASE_DIRECTORY."includes/functions/functions_search.php");
-
-if (empty($PEDIGREE_GENERATIONS)) $PEDIGREE_GENERATIONS = $DEFAULT_PEDIGREE_GENERATIONS;
 
 // This is for choosing either normal or combined keys. It defaults to false to ensure backwards compatibility.
 // When all code is adjusted, this can be removed.

@@ -65,7 +65,7 @@ function iso8601_date($time) {
  */
 function getUpcomingEvents() {
 	global $gm_lang, $month, $year, $day, $monthtonum, $HIDE_LIVE_PEOPLE, $SHOW_ID_NUMBERS, $command, $TEXT_DIRECTION, $SHOW_FAM_ID_NUMBERS, $monthstart;
-	global $GM_IMAGE_DIR, $GM_IMAGES, $GEDCOMID, $DEBUG, $ASC, $IGNORE_FACTS, $IGNORE_YEAR, $LAST_QUERY, $GM_BLOCKS;
+	global $GM_IMAGE_DIR, $GM_IMAGES, $GEDCOMID, $ASC, $IGNORE_FACTS, $IGNORE_YEAR, $LAST_QUERY, $GM_BLOCKS;
 	global $USE_RTL_FUNCTIONS;
 	global $DAYS_TO_SHOW_LIMIT, $lastcachedate;
 	global $CIRCULAR_BASE;
@@ -229,7 +229,7 @@ function getUpcomingEvents() {
  */
 function getTodaysEvents() {
 	global $gm_lang, $month, $year, $day, $monthtonum, $HIDE_LIVE_PEOPLE, $SHOW_ID_NUMBERS, $command, $TEXT_DIRECTION, $SHOW_FAM_ID_NUMBERS;
-	global $GM_IMAGE_DIR, $GM_IMAGES, $GEDCOMID, $DEBUG, $ASC, $IGNORE_FACTS, $IGNORE_YEAR, $lastcachedate;
+	global $GM_IMAGE_DIR, $GM_IMAGES, $GEDCOMID, $ASC, $IGNORE_FACTS, $IGNORE_YEAR, $lastcachedate;
 
 	if ($command=="user") $filter = "living";
 	else $filter = "all";
@@ -528,7 +528,7 @@ function getTop10Surnames() {
  */
 function getRecentChanges() {
 	global $gm_lang, $month, $year, $day, $monthtonum, $HIDE_LIVE_PEOPLE, $SHOW_ID_NUMBERS, $command, $TEXT_DIRECTION, $SHOW_FAM_ID_NUMBERS;
-	global $GM_IMAGE_DIR, $GM_IMAGES, $GEDCOMID, $DEBUG, $ASC, $IGNORE_FACTS, $IGNORE_YEAR, $TOTAL_QUERIES, $LAST_QUERY, $GM_BLOCKS, $SHOW_SOURCES;
+	global $GM_IMAGE_DIR, $GM_IMAGES, $GEDCOMID, $ASC, $IGNORE_FACTS, $IGNORE_YEAR, $TOTAL_QUERIES, $LAST_QUERY, $GM_BLOCKS, $SHOW_SOURCES;
 	global $medialist;
 
 	if ($command=="user") $filter = "living";

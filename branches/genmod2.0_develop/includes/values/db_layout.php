@@ -576,6 +576,7 @@ $db_original[TBLPREFIX."pdata"]["key"]["pd_file"] = "KEY `pd_file` (`pd_file`)";
 
 $db_original[TBLPREFIX."placelinks"]["row"]["pl_p_id"]["details"] = "INT";
 $db_original[TBLPREFIX."placelinks"]["row"]["pl_gid"]["details"] = "VARCHAR(64) CHARACTER SET #charset# COLLATE #collate# ";
+$db_original[TBLPREFIX."placelinks"]["row"]["pl_type"]["details"] = "ENUM('INDI','FAM','REPO','SOUR','OBJE','NOTE') NOT NULL";
 $db_original[TBLPREFIX."placelinks"]["row"]["pl_file"]["details"] = "TINYINT UNSIGNED";
 $db_original[TBLPREFIX."placelinks"]["key"]["plindex_place"] = "KEY `plindex_place` (`pl_p_id`)";
 $db_original[TBLPREFIX."placelinks"]["key"]["plindex_gid"] = "KEY `plindex_gid` (`pl_gid`)";

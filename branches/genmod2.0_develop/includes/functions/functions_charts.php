@@ -28,26 +28,6 @@ if (stristr($_SERVER["SCRIPT_NAME"],basename(__FILE__))) {
 }
 
 /**
- * print a table cell with sosa number
- *
- * @param int $sosa
- * @param string $pid optional pid
- */
-function PrintSosaNumber($sosa, $pid = "") {
-	global $view, $pbwidth, $pbheight;
-	global $GM_IMAGE_DIR, $GM_IMAGES;
-
-	print "<td class=\"subheaders\" style=\"vertical-align: middle; white-space: nowrap;\">";
-	print $sosa;
-	if ($sosa != "1") {
-		print "<br />";
-		PrintUrlArrow($pid, "#$pid", "#$pid");
-		print "&nbsp;";
-	}
-	print "</td>";
-}
-
-/**
  * print family header
  *
  * @param string $famid family gedcom ID
@@ -55,20 +35,10 @@ function PrintSosaNumber($sosa, $pid = "") {
 function PrintFamilyHeader($famid, $famrec="", $changes = false) {
 	global $gm_lang;
 
-	//-- check if we can display both parents
-	if (empty($famrec)) $parents = FindParents($famid);
-	else $parents = FindParentsInRecord($famrec);
-
-	if (PrivacyFunctions::displayDetailsByID($famid, "FAM") || PrivacyFunctions::showLivingNameByID($parents["HUSB"]) || PrivacyFunctions::showLivingNameByID($parents["WIFE"])) {
-		$fam = GetFamilyDescriptor($famid, true, $famrec, $changes);
-		$addfam = GetFamilyAddDescriptor($famid, true, $famrec, $changes);
-	}
-	else {
-		$fam = $gm_lang["private"];
-		$addfam = "";
-	}
-	print "<p class=\"name_head\">".PrintReady($fam);
-	if ($addfam != $fam) print "<br />".PrintReady($addfam);
+	
+	$family =& Family::GetInstance($famid);
+	print "<p class=\"name_head\">".$family->descriptor;
+	if ($family->adddescriptor != "") print "<br />".$family->adddescriptor;
 	print "</p>\r\n";
 }
 
@@ -525,22 +495,30 @@ function CheckRootId($rootid) {
 	global $user, $GEDCOMID, $GEDCOM_ID_PREFIX, $PEDIGREE_ROOT_ID, $USE_RIN, $gm_user;
 	
 	// -- if the $rootid is not already there then find the first person in the file and make him the root
-	if (empty($rootid)) {
-		if ((!empty($gm_user->rootid[$GEDCOMID])) && (FindPersonRecord($gm_user->rootid[$GEDCOMID]))) $rootid = $gm_user->rootid[$GEDCOMID];
-		else if ((!empty($gm_user->gedcomid[$GEDCOMID])) && (FindPersonRecord($gm_user->gedcomid[$GEDCOMID]))) $rootid = $gm_user->gedcomid[$GEDCOMID];
+	if (empty($rootid) &&!empty($gm_user->rootid[$GEDCOMID])) {
+		$person =&Person::GetInstance($gm_user->rootid[$GEDCOMID], "", $GEDCOMID);
+		if (!$person->isempty) $rootid = $gm_user->rootid[$GEDCOMID];
+	}
+	if (empty($rootid) &&!empty($gm_user->gedcomid[$GEDCOMID])) {
+		$person =&Person::GetInstance($gm_user->gedcomid[$GEDCOMID], "", $GEDCOMID);
+		if (!$person->isempty) $rootid = $gm_user->gedcomid[$GEDCOMID];
+	}
 		
-		// -- allow users to overide default id in the config file.
-		if (empty($rootid)) {
-			$PEDIGREE_ROOT_ID = trim($PEDIGREE_ROOT_ID);
-			if ((!empty($PEDIGREE_ROOT_ID)) && (FindPersonRecord($PEDIGREE_ROOT_ID))) $rootid = $PEDIGREE_ROOT_ID;
-			else $rootid = FindFirstPerson();
+	// -- allow users to overide default id in the config file.
+	if (empty($rootid)) {
+		$PEDIGREE_ROOT_ID = trim($PEDIGREE_ROOT_ID);
+		if (!empty($PEDIGREE_ROOT_ID)) {
+			$person =&Person::GetInstance($PEDIGREE_ROOT_ID, "", $GEDCOMID);
+			if (!$person->isempty) $rootid = $PEDIGREE_ROOT_ID;
 		}
 	}
+	if (empty($rootid)) $rootid = FindFirstPerson();
 	
 	if ($USE_RIN) {
-		$indirec = FindPersonRecord($rootid);
-		if ($indirec == false) $rootid = FindRinId($rootid);
-	} else {
+		$person =&Person::GetInstance($rootid, "", $GEDCOMID);
+		if ($person->isempty) $rootid = FindRinId($rootid);
+	} 
+	else {
 		if (preg_match("/[A-Za-z]+/", $rootid) == 0) {
 			$GEDCOM_ID_PREFIX = trim($GEDCOM_ID_PREFIX);
 			$rootid = $GEDCOM_ID_PREFIX . $rootid;

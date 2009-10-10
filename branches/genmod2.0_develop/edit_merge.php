@@ -73,8 +73,8 @@ if ($action!="choose") {
 		$action="choose";
 	}
 	else {
-		$gedrec1 = FindGedcomRecord($gid1, get_gedcom_from_id($ged));
-		$gedrec2 = FindGedcomRecord($gid2, get_gedcom_from_id($ged));
+		$gedrec1 = FindGedcomRecord($gid1, $gedid);
+		$gedrec2 = FindGedcomRecord($gid2, $gedid);
 		$orggedrec1 = $gedrec1;
 		$oged = $GEDCOMID;
 		$GEDCOMID = $ged;
@@ -136,8 +136,8 @@ if ($action!="choose") {
 				}
 				if ($action=="merge") {
 					// before we do anything, we check for double selecting unique facts
-					$gedrec1 = FindGedcomRecord($gid1, get_gedcom_from_id($ged));
-					$gedrec2 = FindGedcomRecord($gid2, get_gedcom_from_id($ged));
+					$gedrec1 = FindGedcomRecord($gid1, $gedid);
+					$gedrec2 = FindGedcomRecord($gid2, $gedid);
 					$tt = preg_match("/0 @.+@ (\w+)/", $gedrec1, $match);
 					$mtype = $match[1];
 					$type = trim($match[1])."_FACTS_UNIQUE";
@@ -225,10 +225,10 @@ if ($action!="choose") {
 									// print "newrec1: ".$newrec1;
 									$subs1 = GetAllSubrecords($gedrec1, "CONC,CONT", false, false, false);
 									$newrec1 .= implode("\r\n", $subs1);
-									ReplaceGedrec($gid1, $gedrec1, $newrec1, "NOTE", $change_id, $change_type, $ged);
+									ReplaceGedrec($gid1, $gedrec1, $newrec1, "NOTE", $change_id, $change_type, $ged, "NOTE");
 								}
 							}
-							else ReplaceGedrec($gid1, "", $facts2[$i]["subrec"], $facts2[$i]["fact"], $change_id, $change_type, $ged);
+							else ReplaceGedrec($gid1, "", $facts2[$i]["subrec"], $facts2[$i]["fact"], $change_id, $change_type, $gedid, $type1);
 						}
 					}
 					
@@ -245,10 +245,10 @@ if ($action!="choose") {
 								$ct = preg_match("/1 (HUSB|WIFE|CHIL) @$gid2@/", $famrec, $match);
 								$role = $match[1];
 								$subrec = GetSubrecord(1, "1 $role @$gid2@", $famrec);
-								if (!in_array($i, $keep2)) ReplaceGedrec($famid, $subrec, "", $change_id, $change_type, $ged);
+								if (!in_array($i, $keep2)) ReplaceGedrec($famid, $subrec, "", $change_id, $change_type, $gedid, "FAM");
 								else {
 									$subrecnew = preg_replace("/@$gid2@/", "@$gid1@", $subrec);
-									ReplaceGedrec($famid, $subrec, $subrecnew, $role, $change_id, $change_type, $ged);
+									ReplaceGedrec($famid, $subrec, $subrecnew, $role, $change_id, $change_type, $ged, "FAM");
 								}
 							}
 							if ($facts2[$i]["fact"] == "HUSB" || $facts2[$i]["fact"] == "WIFE" || $facts2[$i]["fact"] == "CHIL") {
@@ -261,10 +261,10 @@ if ($action!="choose") {
 								else $role = "FAMS";
 								$pidrec = FindPersonRecord($pid, get_gedcom_from_id($ged));
 								$subrec = GetSubrecord(1, "1 $role @$gid2@", $pidrec);
-								if (!in_array($i, $keep2)) ReplaceGedrec($pid, $subrec, "", $role, $change_id, $change_type, $ged);
+								if (!in_array($i, $keep2)) ReplaceGedrec($pid, $subrec, "", $role, $change_id, $change_type, $gedid, "INDI");
 								else {
 									$subrecnew = preg_replace("/@$gid2@/", "@$gid1@", $subrec);
-									ReplaceGedrec($pid, $subrec, $subrecnew, $role, $change_id, $change_type, $ged);
+									ReplaceGedrec($pid, $subrec, $subrecnew, $role, $change_id, $change_type, $gedid, "INDI");
 								}
 							}
 						}
@@ -272,11 +272,11 @@ if ($action!="choose") {
 					
 					// Now remove the subrecs that are not kept in ged1
 					for($i=0; ($i<count($facts1)); $i++) {
-						if (!in_array($i, $keep1) && $facts1[$i]["fact"] != "CHAN" && $facts1[$i]["fact"] != "NOTETEXT") ReplaceGedrec($gid1, $facts1[$i]["subrec"], "", $facts1[$i]["fact"], $change_id, $change_type, $ged);
+						if (!in_array($i, $keep1) && $facts1[$i]["fact"] != "CHAN" && $facts1[$i]["fact"] != "NOTETEXT") ReplaceGedrec($gid1, $facts1[$i]["subrec"], "", $facts1[$i]["fact"], $change_id, $change_type, $gedid, $type1);
 					}
 
 					// Now update all links in other records from ged2 to ged1
-					ReplaceLinks($gid2, $gid1, $mtype, $change_id, $change_type, $ged);
+					ReplaceLinks($gid2, $gid1, $mtype, $change_id, $change_type, $gedid);
 					if (isset($change_id) && $can_auto_accept &&  $gm_user->userAutoAccept()) {
 						AcceptChange($change_id, $GEDCOMID);
 						print $gm_lang["merge_success_auto"];

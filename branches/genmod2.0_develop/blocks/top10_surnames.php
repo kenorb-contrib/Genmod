@@ -33,7 +33,7 @@ $GM_BLOCKS["print_block_name_top10"]["config"] 		= array("num"=>10, "count_place
 $GM_BLOCKS["print_block_name_top10"]["rss"]			= true;
 
 function print_block_name_top10($block=true, $config="", $side, $index) {
-	global $gm_lang, $GEDCOMID, $DEBUG, $TEXT_DIRECTION;
+	global $gm_lang, $GEDCOMID, $TEXT_DIRECTION;
 	global $COMMON_NAMES_ADD, $COMMON_NAMES_REMOVE, $COMMON_NAMES_THRESHOLD, $GM_BLOCKS, $command, $GM_IMAGES, $GM_IMAGE_DIR, $gm_user;
 
 	function top_surname_sort($a, $b) {

@@ -117,7 +117,7 @@ abstract class FactFunctions {
 					}
 				}
 				// -- find date for each fact
-				$prted = $factobj->PrintFactDate(true, true, $fact, $factobj->owner->xref);
+				$prted = $factobj->PrintFactDate(true, true, true, true);
 				
 				//-- print spouse name for marriage events
 				$ct = preg_match("/_GMS @(.*)@/", $factobj->factrec, $match);
@@ -1038,7 +1038,7 @@ abstract class FactFunctions {
 				}
 				else if ($asso->disp) {
 					print "<a href=\"family.php?famid=".$pid2."&amp;gedid=".$asso->gedcomid."\">";
-					print $asso->revname.$asso->addxref;
+					print $asso->sortable_name.$asso->addxref;
 					print "</a>\n";
 				}
 				else {
@@ -1274,13 +1274,11 @@ abstract class FactFunctions {
 		self::PrintFactMedia($subm, 1);
 	}
 	
-	public function PrintSimpleFact($factobj) {
+	public function PrintSimpleFact($factobj, $print_parents_age=false, $print_age_at_event=false) {
 		global $gm_lang;
 		
 		$emptyfacts = array("BIRT","CHR","DEAT","BURI","CREM","ADOP","BAPM","BARM","BASM","BLES","CHRA","CONF","FCOM","ORDN","NATU","EMIG","IMMI","CENS","PROB","WILL","GRAD","RETI","BAPL","CONL","ENDL","SLGC","EVEN","MARR","SLGS","MARL","ANUL","CENS","DIV","DIVF","ENGA","MARB","MARC","MARS","OBJE","CHAN","_SEPR","RESI", "DATA", "MAP");
 		
-		// RFE [ 1229233 ] "DEAT" vs "DEAT Y"
-		// The check $factrec != "1 DEAT" will not show any records that only have 1 DEAT in them
 		if ($factobj->factrec != "1 DEAT"){
 		   print "<span class=\"details_label\">".$factobj->descr."</span> ";
 		}
@@ -1289,7 +1287,7 @@ abstract class FactFunctions {
 				$ct = preg_match("/1 $fact(.*)/", $factobj->factrec, $match);
 				if ($ct>0) print PrintReady(trim($match[1]));
 			}
-			$factobj->PrintFactDate();
+			$factobj->PrintFactDate(false, false, $print_parents_age, $print_age_at_event);
 			$factobj->PrintFactPlace();
 		}
 		else print $gm_lang["private"];

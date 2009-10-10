@@ -31,11 +31,6 @@
 */
 require("config.php");
 
-/**
- * Inclusion of the chart functions
-*/
-require("includes/functions/functions_charts.php");
-
 function PointLen($string) {
 	global $cw;
 	
@@ -498,7 +493,7 @@ $OLD_PGENS = $PEDIGREE_GENERATIONS;
 
 if (!isset($rootid)) $rootid = "";
 $rootid = CleanInput($rootid);
-$rootid = CheckRootId($rootid);
+$rootid = ChartFunctions::CheckRootId($rootid);
 
 // -- size of the chart
 if (!isset($fan_width)) $fan_width = "100";
@@ -605,7 +600,7 @@ else {
 }
 print "</td></tr></table>";
 
-$treeid = AncestryArray($rootid);
+$treeid = ChartFunctions::AncestryArray($rootid, $PEDIGREE_GENERATIONS);
 print_fan_chart($treeid, 640*$fan_width/100, $fan_style*90);
 
 print_footer();

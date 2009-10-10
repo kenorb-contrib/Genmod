@@ -562,7 +562,7 @@ class Family extends GedcomRecord {
 		print $this->addxref;
 		if ($this->GetMarriageFact() != "") {
 			print " -- <i>".$gm_lang["marriage"]." ";
-			$this->marr_fact->PrintFactDate(false, false, false, $this->xref);
+			$this->marr_fact->PrintFactDate();
 			$this->marr_fact->PrintFactPlace();
 			print "</i>";
 		}

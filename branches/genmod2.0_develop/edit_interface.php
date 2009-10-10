@@ -2498,61 +2498,32 @@ switch ($action) {
 		}
 		break;
 	
-	// NOTE updatemedia done ====> obsolete
-	/* 
-	case "updatemedia":
-		$change_id = GetNewXref("CHANGE");
-		
-		// NOTE: Check for uploaded files
-		if (count($_FILES)>0) {
-			MediaFS::UploadFiles($_FILES, $folder, true);
-		}
-		
-		// NOTE: Build the new record
-		$newrec = "0 @$pid@ OBJE\r\n";
-		$newrec = HandleUpdates($newrec);
-		
-		// NOTE: Get the old record and remove the CHAN info
-		$crec = GetSubRecord(1, "1 CHAN", $oldgedrec);
-		if (!empty($crec)) {
-			$oldgedrec = str_replace($crec, "", $oldgedrec);
-		}
-		// Compare old and new record. If changed, update.
-		if (trim($newrec) != trim($oldgedrec)) {
-		
-			// NOTE: Store the change in the database
-			$success = (ReplaceGedrec($pid, $gedrec, $newrec, $fact, $change_id, $change_type));
-			if ($success) print "<br /><br />".$gm_lang["update_successful"];
-		}
-		break;
-		*/
-
 	case "update_submitter":
-	$change_id = GetNewXref("CHANGE");
-	if ($pid !== "NEW") {
-		$oldrecord = FindGedcomRecord($pid, get_gedcom_from_id($gedfile));
-		if (GetChangeData(true, $pid, true, "", "")) {
-			$rec = GetChangeData(false, $pid, true, "gedlines", "");
-			if (isset($rec[$gedfile][$pid])) $oldrecord = $rec[$gedfile][$pid];
+		$change_id = GetNewXref("CHANGE");
+		if ($pid !== "NEW") {
+			$oldrecord = FindGedcomRecord($pid, get_gedcom_from_id($gedfile));
+			if (GetChangeData(true, $pid, true, "", "")) {
+				$rec = GetChangeData(false, $pid, true, "gedlines", "");
+				if (isset($rec[$gedfile][$pid])) $oldrecord = $rec[$gedfile][$pid];
+			}
+			$newrec = "0 @".$pid."@ SUBM\r\n";
+			$newrec = HandleUpdates($newrec);
+			$chanrec = GetSubrecord(1, "1 CHAN", $oldrecord);
+			$orec = preg_replace("/$chanrec/", "", $oldrecord);
+			if (trim($newrec) != trim($orec)) {
+				$success = (ReplaceGedrec($pid, $oldrecord, $newrec, $fact, $change_id, $change_type, $gedfile, "", "SUBM"));
+				if ($success) print "<br /><br />".$gm_lang["update_successful"];
+			}
 		}
-		$newrec = "0 @".$pid."@ SUBM\r\n";
-		$newrec = HandleUpdates($newrec);
-		$chanrec = GetSubrecord(1, "1 CHAN", $oldrecord);
-		$orec = preg_replace("/$chanrec/", "", $oldrecord);
-		if (trim($newrec) != trim($orec)) {
-			$success = (ReplaceGedrec($pid, $oldrecord, $newrec, $fact, $change_id, $change_type, $gedfile, "", "SUBM"));
+		else {
+			$newrec = "0 @new@ SUBM\r\n";
+			$newrec = HandleUpdates($newrec);
+			$subid = AppendGedrec($newrec, "SUBM", $change_id, $change_type, $gedfile);
+			$success = (ReplaceGedrec("HEAD", "", "1 SUBM @".$subid."@", "SUBM", $change_id, $change_type, $gedfile, "", "HEAD"));
 			if ($success) print "<br /><br />".$gm_lang["update_successful"];
+			
 		}
-	}
-	else {
-		$newrec = "0 @new@ SUBM\r\n";
-		$newrec = HandleUpdates($newrec);
-		$subid = AppendGedrec($newrec, "SUBM", $change_id, $change_type, $gedfile);
-		$success = (ReplaceGedrec("HEAD", "", "1 SUBM @".$subid."@", "SUBM", $change_id, $change_type, $gedfile, "", "HEAD"));
-		if ($success) print "<br /><br />".$gm_lang["update_successful"];
-		
-	}
-	break;	
+		break;	
 		
 			
 	// NOTE: reconstruct the gedcom from the incoming fields and store it in the file done

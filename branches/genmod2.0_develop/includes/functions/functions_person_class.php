@@ -39,23 +39,27 @@ abstract class PersonFunctions {
 	 * @param int $style	the style to print the box in, 1 for smaller boxes, 2 for larger boxes
 	 * @param boolean $show_famlink	set to true to show the icons for the popup links and the zoomboxes
 	 * @param int $count	on some charts it is important to keep a count of how many boxes were printed
+	 * @param string $view	number of generations as parameter for links to various charts
+	 * @param string $chart_style	style of chart as parameter for links to various charts
 	 */
-	public function PrintPedigreePerson(&$person, $style=1, $show_famlink=true, $count=0, $personcount="1", $view="") {
+	public function PrintPedigreePerson(&$person, $style=1, $show_famlink=true, $count=0, $personcount="1", $view="", $num_gens=0, $chart_style=1) {
 		// Global settings
 		global $ZOOM_BOXES, $LINK_ICONS, $SCRIPT_NAME, $GEDCOMID, $SHOW_HIGHLIGHT_IMAGES, $PEDIGREE_FULL_DETAILS, $SHOW_ID_NUMBERS;
 		global $CONTACT_EMAIL, $CONTACT_METHOD, $TEXT_DIRECTION, $DEFAULT_PEDIGREE_GENERATIONS, $PEDIGREE_LAYOUT;
 		global $GM_IMAGE_DIR, $GM_IMAGES, $CHART_BOX_TAGS, $SHOW_LDS_AT_GLANCE;
-		// Theme dependent settings
-		global $bwidth, $bheight;
-		// Settings for pedigree, descendancy, ancestry etc.
-		global $show_full, $OLD_PGENS, $talloffset, $chart_style, $box_width, $generations;
 		global $gm_lang, $gm_user;
+		
+		// Theme dependent settings, must be kept global
+		global $bwidth, $bheight;
+		
+		// Settings for pedigree, descendancy, ancestry etc.
+		global $show_full, $box_width;
+		
 
 		if (is_object($person) && $person->show_changes && $gm_user->UserCanEdit()) $canshow = true;
 		else $canshow = false;
 	
-		if (!isset($OLD_PGENS)) $OLD_PGENS = $DEFAULT_PEDIGREE_GENERATIONS;
-		if (!isset($talloffset)) $talloffset = $PEDIGREE_LAYOUT;
+		if ($num_gens == 0) $num_gens = $DEFAULT_PEDIGREE_GENERATIONS;
 		if (!isset($show_full)) $show_full=$PEDIGREE_FULL_DETAILS;
 	
 		if ($TEXT_DIRECTION == "ltr") {
@@ -68,7 +72,7 @@ abstract class PersonFunctions {
 		}
 			
 		// NOTE: Start div out-rand()
-		if (!is_object($person)) {
+		if (!is_object($person) || $person->isempty) {
 			print "\n\t\t\t<div id=\"out-".rand()."\" class=\"person_boxNN\" style=\"width: ".$bwidth."px; height: ".$bheight."px; padding: 2px; overflow: hidden;\">";
 			print "<br />";
 			print "\n\t\t\t</div>";
@@ -96,17 +100,17 @@ abstract class PersonFunctions {
 					print "onmouseout=\"moveout('".$person->xref.".".$personcount.".".$count.".".$random."'); return false;\">";
 					// This div is filled by an AJAX call! Not yet as placement is a problem!
 					// NOTE: Zoom
-					print "<a href=\"pedigree.php?rootid=".$person->xref."&amp;PEDIGREE_GENERATIONS=$OLD_PGENS&amp;talloffset=$talloffset&amp;gedid=".$person->gedcomid."\"><b>".$gm_lang["index_header"]."</b></a>\n";
-					print "<br /><a href=\"descendancy.php?pid=".$person->xref."&amp;show_full=$show_full&amp;generations=$generations&amp;box_width=$box_width&amp;gedid=".$person->gedcomid."\"><b>".$gm_lang["descend_chart"]."</b></a><br />\n";
+					print "<a href=\"pedigree.php?rootid=".$person->xref."&amp;num_generations=".$num_gens."&amp;talloffset=".$chart_style."&amp;gedid=".$person->gedcomid."\"><b>".$gm_lang["index_header"]."</b></a>\n";
+					print "<br /><a href=\"descendancy.php?pid=".$person->xref."&amp;show_full=$show_full&amp;generations=".$num_gens."&amp;box_width=$box_width&amp;gedid=".$person->gedcomid."\"><b>".$gm_lang["descend_chart"]."</b></a><br />\n";
 					if ($gm_user->username != "") {
 						if (!empty($gm_user->gedcomid[$GEDCOMID])) {
 							print "<a href=\"relationship.php?pid1=".$gm_user->gedcomid[$GEDCOMID]."&amp;pid2=".$person->xref."&amp;gedid=".$person->gedcomid."\"><b>".$gm_lang["relationship_to_me"]."</b></a><br />\n";
 						}
 					}
 					// NOTE: Zoom
-					if (file_exists("ancestry.php")) print "<a href=\"ancestry.php?rootid=".$person->xref."&amp;chart_style=$chart_style&amp;PEDIGREE_GENERATIONS=$OLD_PGENS&amp;box_width=$box_width&amp;gedid=".$person->gedcomid."\"><b>".$gm_lang["ancestry_chart"]."</b></a><br />\n";
-					if (file_exists("fanchart.php") and defined("IMG_ARC_PIE") and function_exists("imagettftext"))  print "<a href=\"fanchart.php?rootid=".$person->xref."&amp;PEDIGREE_GENERATIONS=$OLD_PGENS&amp;gedid=".$person->gedcomid."\"><b>".$gm_lang["fan_chart"]."</b></a><br />\n";
-					if (file_exists("hourglass.php")) print "<a href=\"hourglass.php?pid=".$person->xref."&amp;chart_style=$chart_style&amp;PEDIGREE_GENERATIONS=$OLD_PGENS&amp;box_width=$box_width&amp;gedid=".$person->gedcomid."\"><b>".$gm_lang["hourglass_chart"]."</b></a><br />\n";
+					if (file_exists("ancestry.php")) print "<a href=\"ancestry.php?rootid=".$person->xref."&amp;chart_style=$chart_style&amp;PEDIGREE_GENERATIONS=".$num_gens."&amp;box_width=$box_width&amp;gedid=".$person->gedcomid."\"><b>".$gm_lang["ancestry_chart"]."</b></a><br />\n";
+					if (file_exists("fanchart.php") and defined("IMG_ARC_PIE") and function_exists("imagettftext"))  print "<a href=\"fanchart.php?rootid=".$person->xref."&amp;PEDIGREE_GENERATIONS=".$num_gens."&amp;gedid=".$person->gedcomid."\"><b>".$gm_lang["fan_chart"]."</b></a><br />\n";
+					if (file_exists("hourglass.php")) print "<a href=\"hourglass.php?pid=".$person->xref."&amp;chart_style=$chart_style&amp;PEDIGREE_GENERATIONS=".$num_gens."&amp;box_width=$box_width&amp;gedid=".$person->gedcomid."\"><b>".$gm_lang["hourglass_chart"]."</b></a><br />\n";
 					foreach ($person->spousefamilies as $skey => $sfam) {
 						if (is_object($sfam)) {
 							if ($person->xref == $sfam->husb_id) $spouse = "wife";
@@ -322,7 +326,7 @@ abstract class PersonFunctions {
 */
 				$factobjs = $person->SelectFacts($tagstoprint);	
 				foreach($factobjs as $key => $factobj) {
-					FactFunctions::PrintSimpleFact($factobj);
+					FactFunctions::PrintSimpleFact($factobj, true, false);
 				}			
 				// NOTE: Close div inout2-$pid.$personcount.$count
 				if ($show_full) print "</div>\n";
@@ -365,10 +369,10 @@ abstract class PersonFunctions {
 				// NOTE: Popup box icon (don't show if the person is private)
 				if ($LINK_ICONS!="disabled" && $show_famlink && !$view && ($person->disp_name)) {
 					$click_link="#";
-					if (preg_match("/pedigree.php/", $SCRIPT_NAME)>0) $click_link="pedigree.php?rootid=".$person->xref."&amp;PEDIGREE_GENERATIONS=$OLD_PGENS&amp;talloffset=$talloffset&amp;gedid=".$person->gedcomid;
-					if (preg_match("/hourglass.php/", $SCRIPT_NAME)>0) $click_link="hourglass.php?pid=".$person->xref."&amp;generations=$generations&amp;box_width=$box_width&amp;gedid=".$person->gedcomid;
-					if (preg_match("/ancestry.php/", $SCRIPT_NAME)>0) $click_link="ancestry.php?rootid=".$person->xref."&amp;chart_style=$chart_style&amp;PEDIGREE_GENERATIONS=$OLD_PGENS&amp;box_width=$box_width&amp;gedid=".$person->gedcomid;
-					if (preg_match("/descendancy.php/", $SCRIPT_NAME)>0) $click_link="descendancy.php?pid=".$person->xref."&amp;show_full=$show_full&amp;generations=$generations&amp;box_width=$box_width&amp;gedid=".$person->gedcomid;
+					if (preg_match("/pedigree.php/", $SCRIPT_NAME)>0) $click_link="pedigree.php?rootid=".$person->xref."&amp;num_generations=".$num_gens."&amp;talloffset=".$chart_style."&amp;gedid=".$person->gedcomid;
+					if (preg_match("/hourglass.php/", $SCRIPT_NAME)>0) $click_link="hourglass.php?pid=".$person->xref."&amp;generations=".$num_gens."&amp;box_width=$box_width&amp;gedid=".$person->gedcomid;
+					if (preg_match("/ancestry.php/", $SCRIPT_NAME)>0) $click_link="ancestry.php?rootid=".$person->xref."&amp;chart_style=$chart_style&amp;PEDIGREE_GENERATIONS=".$num_gens."&amp;box_width=$box_width&amp;gedid=".$person->gedcomid;
+					if (preg_match("/descendancy.php/", $SCRIPT_NAME)>0) $click_link="descendancy.php?pid=".$person->xref."&amp;show_full=$show_full&amp;generations=".$num_gens."&amp;box_width=$box_width&amp;gedid=".$person->gedcomid;
 					if ((preg_match("/family.php/", $SCRIPT_NAME)>0)&&!empty($famid)) $click_link="family.php?famid=".$sfam->xref."&amp;gedid=".$sfam->gedcomid;
 					if (preg_match("/individual.php/", $SCRIPT_NAME)>0) $click_link="individual.php?pid=".$person->xref."&amp;gedid=".$person->gedcomid;
 					print "<br /><img src=\"".$GM_IMAGE_DIR."/".$GM_IMAGES["pedigree"]["small"]."\" width=\"25\" border=\"0\" vspace=\"0\" hspace=\"0\" alt=\"".$gm_lang["person_links"]."\" title=\"".$gm_lang["person_links"]."\"";
@@ -414,10 +418,10 @@ abstract class PersonFunctions {
 		print "<span class=\"subheaders\">" . GetSosaName($sosa*2) . "</span>";
 		print "\n\t<table style=\"width: " . ($pbwidth) . "px; height: " . $pbheight . "px;\" border=\"0\"><tr>";
 		if ($parid) {
-			if ($family->husb_id == $parid) PrintSosaNumber($label);
-			else PrintSosaNumber(str_repeat("&nbsp; ", strlen($label)-1));
+			if ($family->husb_id == $parid) ChartFunctions::PrintSosaNumber($label);
+			else ChartFunctions::PrintSosaNumber(str_repeat("&nbsp; ", strlen($label)-1));
 		}
-		else if ($sosa > 0) PrintSosaNumber($sosa * 2);
+		else if ($sosa > 0) ChartFunctions::PrintSosaNumber($sosa * 2);
 	
 		$husb = "husb";
 		if ($family->husb_status == "") $style = "";
@@ -451,8 +455,8 @@ abstract class PersonFunctions {
 	//		if (is_object($fath) or ($sosa != 0 and $SHOW_EMPTY_BOXES)) {
 				// husband's father
 				print "\n\t<table style=\"width: " . ($pbwidth) . "px; height: " . $pbheight . "px;\" border=\"0\"><tr>";
-				if ($sosa > 0) PrintSosaNumber($sosa * 4);
-				if (is_object($fath) && $fath->xref == $gparid) PrintSosaNumber(trim(substr($label,0,-3),".").".");
+				if ($sosa > 0) ChartFunctions::PrintSosaNumber($sosa * 4);
+				if (is_object($fath) && $fath->xref == $gparid) ChartFunctions::PrintSosaNumber(trim(substr($label,0,-3),".").".");
 				print "\n\t<td style=\"vertical-align:middle;\">";
 				self::PrintPedigreePerson($fath, 1, true, 1, $personcount, $family->view);
 				print "</td></tr></table>";
@@ -462,15 +466,15 @@ abstract class PersonFunctions {
 		if (!empty($upfamid) and ($sosa!=-1) and ($view != "preview")) {
 			print "<td style=\"vertical-align:middle;\" rowspan=\"2\">";
 			
-			PrintUrlArrow($upfamid, ($sosa==0 ? "?famid=$upfamid&amp;show_full=$show_full" : "#$upfamid"), PrintReady($gm_lang["start_at_parents"]."&nbsp;-&nbsp;".htmlspecialchars($family->$husb->childfamilies[$hfam]->sortable_name)), 1);
+			ChartFunctions::PrintUrlArrow($upfamid, ($sosa==0 ? "?famid=$upfamid&amp;show_full=$show_full" : "#$upfamid"), PrintReady($gm_lang["start_at_parents"]."&nbsp;-&nbsp;".htmlspecialchars($family->$husb->childfamilies[$hfam]->sortable_name)), 1);
 			print "</td>\n";
 		}
 	//	if ($hfam != "" || ($sosa != 0 &&  $SHOW_EMPTY_BOXES)) {
 			// husband's mother
 			print "</tr><tr><td style=\"vertical-align:middle;\"><img src=\"".$GM_IMAGE_DIR."/".$GM_IMAGES["hline"]["other"]."\" alt=\"\" /></td><td>";
 			print "\n\t<table style=\"width: " . ($pbwidth) . "px; height: " . $pbheight . "px;\" border=\"0\"><tr>";
-			if ($sosa > 0) PrintSosaNumber($sosa * 4 + 1);
-			if (is_object($moth) && $moth->xref == $gparid) PrintSosaNumber(trim(substr($label,0,-3),".").".");
+			if ($sosa > 0) ChartFunctions::PrintSosaNumber($sosa * 4 + 1);
+			if (is_object($moth) && $moth->xref == $gparid) ChartFunctions::PrintSosaNumber(trim(substr($label,0,-3),".").".");
 			print "\n\t<td style=\"vertical-align:middle;\">";
 			self::PrintPedigreePerson($moth, 1, true, 1, $personcount, $family->view);
 			print "</td></tr></table>";
@@ -493,10 +497,10 @@ abstract class PersonFunctions {
 		print "<span class=\"subheaders\">" . GetSosaName($sosa*2+1) . "</span>";
 		print "\n\t<table style=\"width: " . ($pbwidth) . "px; height: " . $pbheight . "px;\"><tr>";
 		if ($parid) {
-			if ($family->wife->xref == $parid) PrintSosaNumber($label);
-			else PrintSosaNumber(str_repeat("&nbsp; ", strlen($label)-1));
+			if ($family->wife->xref == $parid) ChartFunctions::PrintSosaNumber($label);
+			else ChartFunctions::PrintSosaNumber(str_repeat("&nbsp; ", strlen($label)-1));
 		}
-		else if ($sosa > 0) PrintSosaNumber($sosa * 2 + 1);
+		else if ($sosa > 0) ChartFunctions::PrintSosaNumber($sosa * 2 + 1);
 		
 		$wife = "wife";
 		if ($family->wife_status == "") $style = "";
@@ -530,8 +534,8 @@ abstract class PersonFunctions {
 	//		if (is_object($fath) or ($sosa != 0 and $SHOW_EMPTY_BOXES)) {
 				// wife's father
 				print "\n\t<table style=\"width: " . ($pbwidth) . "px; height: " . $pbheight . "px;\"><tr>";
-				if ($sosa > 0) PrintSosaNumber($sosa * 4 + 2);
-				if (is_object($fath) && $fath->xref == $gparid) PrintSosaNumber(trim(substr($label,0,-3),".").".");
+				if ($sosa > 0) ChartFunctions::PrintSosaNumber($sosa * 4 + 2);
+				if (is_object($fath) && $fath->xref == $gparid) ChartFunctions::PrintSosaNumber(trim(substr($label,0,-3),".").".");
 				print "\n\t<td style=\"vertical-align:middle;\">";
 				self::PrintPedigreePerson($fath, 1, true, 1, $personcount, $family->view);
 				print "</td></tr></table>";
@@ -541,15 +545,15 @@ abstract class PersonFunctions {
 		if (!empty($upfamid) and ($sosa!=-1) and ($view != "preview")) {
 			print "<td style=\"vertical-align:middle;\" rowspan=\"2\">";
 			
-			PrintUrlArrow($upfamid.$label, ($sosa==0 ? "?famid=$upfamid&amp;show_full=$show_full" : "#$upfamid"), PrintReady($gm_lang["start_at_parents"]."&nbsp;-&nbsp;".htmlspecialchars($family->$wife->childfamilies[$wfam]->sortable_name)), 1);
+			ChartFunctions::PrintUrlArrow($upfamid.$label, ($sosa==0 ? "?famid=$upfamid&amp;show_full=$show_full" : "#$upfamid"), PrintReady($gm_lang["start_at_parents"]."&nbsp;-&nbsp;".htmlspecialchars($family->$wife->childfamilies[$wfam]->sortable_name)), 1);
 			print "</td>\n";
 		}
 	//	if ($wfam != "" || ($sosa != 0 &&  $SHOW_EMPTY_BOXES)) {
 			// wife's mother
 			print "</tr><tr><td style=\"vertical-align:middle;\"><img src=\"".$GM_IMAGE_DIR."/".$GM_IMAGES["hline"]["other"]."\" alt=\"\" /></td><td>";
 			print "\n\t<table style=\"width: " . ($pbwidth) . "px; height: " . $pbheight . "px;\" border=\"0\"><tr>";
-			if ($sosa > 0) PrintSosaNumber($sosa * 4 + 1);
-			if (is_object($moth) && $moth->xref == $gparid) PrintSosaNumber(trim(substr($label,0,-3),".").".");
+			if ($sosa > 0) ChartFunctions::PrintSosaNumber($sosa * 4 + 1);
+			if (is_object($moth) && $moth->xref == $gparid) ChartFunctions::PrintSosaNumber(trim(substr($label,0,-3),".").".");
 			print "\n\t<td style=\"vertical-align:middle;\">";
 			self::PrintPedigreePerson($moth, 1, true, 1, $personcount, $family->view);
 			print "</td></tr></table>";
@@ -584,9 +588,9 @@ abstract class PersonFunctions {
 			foreach($family->children as $indexval => $chil) {
 				print "<tr>\n";
 				if ($sosa != 0) {
-					if ($chil->xref == $childid) PrintSosaNumber($sosa, $childid);
-						else if (empty($label)) PrintSosaNumber("");
-						else PrintSosaNumber($label.($nchi++).".");
+					if ($chil->xref == $childid) ChartFunctions::PrintSosaNumber($sosa, $childid);
+						else if (empty($label)) ChartFunctions::PrintSosaNumber("");
+						else ChartFunctions::PrintSosaNumber($label.($nchi++).".");
 					}
 					$style = "";
 					if ($family->show_changes) {
@@ -692,7 +696,7 @@ abstract class PersonFunctions {
 	   }
 	   else {
 		   print "<tr>\n";
-		   PrintSosaNumber($sosa, $childid);
+		   ChartFunctions::PrintSosaNumber($sosa, $childid);
 		   print "<td style=\"vertical-align:middle;\">";
 		   print_pedigree_person($childid, 1, $show_famlink, 0, $personcount);
 		   $personcount++;
@@ -721,8 +725,8 @@ abstract class PersonFunctions {
 				if (isset($gm_lang[$factobj->fact])) $retstr .= $gm_lang[$factobj->fact];
 				else if (defined("GM_FACT_".$factobj->fact)) $retstr .= constant("GM_FACT_".$factobj->fact);
 				else $retstr .= $factobj->fact;
-				$retstr .= " ";
-				$retstr .= $factobj->PrintFactDate(false, false, false, false, false, false);
+				$retstr .= "&nbsp;";
+				$retstr .= $factobj->PrintFactDate(false, false, false, false, false);
 				$retstr .= $factobj->PrintFactPlace(false, false, false, false);
 				$retstr .= "</i>";
 				$foundfact = $factobj->fact;

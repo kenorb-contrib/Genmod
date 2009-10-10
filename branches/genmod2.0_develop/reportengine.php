@@ -31,11 +31,6 @@
 */
 require("config.php");
 
-/**
- * Inclusion of the chart functions
-*/
-require("includes/functions/functions_charts.php");
-
 @set_time_limit($TIME_LIMIT*2);
 function get_tag_values($tag) {
 	global $tags, $values;
@@ -192,7 +187,7 @@ function paste_id(value) {
 					if (isset($input["lookup"])) {
 						if ($input["lookup"]=="INDI") {
 							if (!empty($pid)) $input["default"] = CleanInput($pid);
-							else $input["default"] = CheckRootId($input["default"]);
+							else $input["default"] = ChartFunctions::CheckRootId($input["default"]);
 						}
 						if ($input["lookup"]=="FAM") {
 							if (!empty($famid)) $input["default"] = CleanInput($famid);

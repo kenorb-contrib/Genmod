@@ -40,7 +40,7 @@ if (stristr($_SERVER["SCRIPT_NAME"],basename(__FILE__))) {
  * $ERROR_LEVEL = 2 will print a full stack trace with function arguments.
  */
 $ERROR_LEVEL = 2;
-if (isset($DEBUG)) $ERROR_LEVEL = 2;
+if (DEBUG == true) $ERROR_LEVEL = 2;
 
 // ************************************************* START OF INITIALIZATION FUNCTIONS ********************************* //
 /**

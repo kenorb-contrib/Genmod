@@ -31,8 +31,6 @@
 */
 require_once 'config.php';
 
-require_once 'includes/functions/functions_charts.php';
-
 $controller = new FamilyController();
 
 print_header($controller->pagetitle);

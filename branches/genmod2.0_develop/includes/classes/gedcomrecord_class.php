@@ -791,13 +791,13 @@ abstract class GedcomRecord {
 		}
 		
 		// Now check the fams, for visitors AND for other users. Previously only INDI's are handled for users, not fams and other record types.
-	    if ($this->datatype=="FAM") {
+	    if ($this->datatype == "FAM") {
 		    $type = "AND";
 		    //-- check if we can display both parents. If not, the family will be hidden.	
 		    $ct = preg_match("/1 HUSB @(.*)@/", $this->gedrec, $match);
 			if ($ct>0) {
 				$husb =& Person::GetInstance($match[1], "", $GEDCOMID);
-				if ($type = "AND" && !$husb->DisplayDetails()) {
+				if ($type == "AND" && !$husb->DisplayDetails()) {
 					SwitchGedcom($oldgedid);
 					return false;
 				}
@@ -819,7 +819,7 @@ abstract class GedcomRecord {
 	    }
 	    
 	    // Check the sources. First check the general setting
-	    if ($this->datatype=="SOUR") {
+	    if ($this->datatype == "SOUR") {
 		    if ($SHOW_SOURCES >= $ulevel) {
 			    $disp = true;
 			    
@@ -828,7 +828,7 @@ abstract class GedcomRecord {
 			    if ($LINK_PRIVACY && $checklinks) {
 				    // This will prevent loops if MM points to SOUR vice versa. We only go one level deep.
 				    $recursive--;
-				    if ($recursive >=0) {
+				    if ($recursive >= 0) {
 					    $disp = $this->CheckSourceLinks();
 				    }
 				    $recursive++;
@@ -851,7 +851,7 @@ abstract class GedcomRecord {
 	    }
 	    
 	    // Check the repositories
-	    if ($this->datatype=="REPO") {
+	    if ($this->datatype == "REPO") {
 		    if ($SHOW_SOURCES >= $ulevel) {
 			    $disp = true;
 			    if ($LINK_PRIVACY && $checklinks) {
@@ -879,7 +879,7 @@ abstract class GedcomRecord {
 	    }
 	    
 	    // Check the MM objects
-	    if ($this->datatype=="OBJE") {
+	    if ($this->datatype == "OBJE") {
 		    // Check if OBJE details are hidden by global or specific facts settings
 		    if (PrivacyFunctions::ShowFactDetails("OBJE", $this->xref)) {
 			    $disp = true;
@@ -907,7 +907,7 @@ abstract class GedcomRecord {
 			}
 	    }
 	    // Check the Note objects
-	    if ($this->datatype=="NOTE") {
+	    if ($this->datatype == "NOTE") {
 		    // Check if NOTE details are hidden by global or specific facts settings
 		    if (PrivacyFunctions::ShowFactDetails("NOTE", $this->xref)) {
 			    $disp = true;
@@ -971,9 +971,9 @@ abstract class GedcomRecord {
 		else {
 			foreach($this->link_array as $key => $link) {
 				$obj = null;
-				if ($link[1] == "INDI") $obj = Person::GetInstance($link[0], "", $link[2]);
-				else if ($link[1] == "FAM") $obj = Family::GetInstance($link[0], "", $link[2]);
-				if (is_object($obj) && !$obj->disp_name) return false;
+				if ($link[1] == "INDI") $obj =& Person::GetInstance($link[0], "", $link[2]);
+				else if ($link[1] == "FAM") $obj =& Family::GetInstance($link[0], "", $link[2]);
+				if (is_object($obj) && !$obj->DispName()) return false;
 			}
 		}
 		return true;
@@ -985,7 +985,7 @@ abstract class GedcomRecord {
 		$res = NewQuery($sql);
 		while ($row = $res->FetchAssoc()) {
 			$person = null;
-			$person = Person::GetInstance($row["i_id"], $row, $row["i_file"]);
+			$person =& Person::GetInstance($row["i_id"], $row, $row["i_file"]);
 			if (!$person->DisplayDetails()) {
 				$res->FreeResult();
 				return false;
@@ -998,7 +998,7 @@ abstract class GedcomRecord {
 		$res = NewQuery($sql);
 		while ($row = $res->FetchAssoc()) {
 			$family = null;
-			$family = Family::GetInstance($row["f_id"], $row, $row["f_file"]);
+			$family =& Family::GetInstance($row["f_id"], $row, $row["f_file"]);
 			$famarr[] = $family;
 			if (!empty($row["f_husb"])) $indiarr[] = $row["f_husb"];
 			if (!empty($row["f_wife"])) $indiarr[] = $row["f_wife"];
@@ -1014,7 +1014,7 @@ abstract class GedcomRecord {
 		$res = NewQuery($sql);
 		while ($row = $res->FetchAssoc()) {
 			$person = null;
-			$person = Person::GetInstance($row["i_id"], $row, $row["i_file"]);
+			$person =& Person::GetInstance($row["i_id"], $row, $row["i_file"]);
 			if (!$person->DisplayDetails()) {
 				$res->FreeResult();
 				return false;
@@ -1027,7 +1027,7 @@ abstract class GedcomRecord {
 		$res = NewQuery($sql);
 		while ($row = $res->FetchAssoc()) {
 			$family = null;
-			$family = Family::GetInstance($row["f_id"], $row, $row["f_file"]);
+			$family =& Family::GetInstance($row["f_id"], $row, $row["f_file"]);
 			$famarr[] = $family;
 			if (!empty($row["f_husb"])) $indiarr[] = $row["f_husb"];
 			if (!empty($row["f_wife"])) $indiarr[] = $row["f_wife"];
@@ -1043,7 +1043,7 @@ abstract class GedcomRecord {
 		$res = Newquery($sql);
 		while ($row = $res->FetchAssoc()) {
 			$source = null;
-			$source = Source::GetInstance($row["s_id"], $row, $row["s_file"]);
+			$source =& Source::GetInstance($row["s_id"], $row, $row["s_file"]);
 			if (!$source->DisplayDetails(false)) {
 				$res->FreeResult();
 				return false;
@@ -1059,7 +1059,7 @@ abstract class GedcomRecord {
 			$res = NewQuery($sql);
 			while ($row = $res->FetchAssoc()) {
 				$person = null;
-				$person = Person::GetInstance($row["i_id"], $row, $row["i_file"]);
+				$person =& Person::GetInstance($row["i_id"], $row, $row["i_file"]);
 			}
 		}
 		foreach($famarr as $key => $family) {

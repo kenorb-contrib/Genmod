@@ -34,15 +34,12 @@
 */
 require("config.php");
 
-/**
- * Inclusion of the chart functions
-*/
-require("includes/functions/functions_charts.php");
+$pedigree_controller = new PedigreeController();
 
-$log2 = log(2);
-$show_changes = false;
+
 function adjust_subtree($index, $diff) {
-	global $offsetarray, $treeid, $PEDIGREE_GENERATIONS, $log2, $talloffset,$boxspacing, $mdiff, $SHOW_EMPTY_BOXES;
+	global $offsetarray, $treeid, $boxspacing, $mdiff, $SHOW_EMPTY_BOXES;
+	
 	$f = ($index*2)+1; //-- father index
 	$m = $f+1; //-- mother index
 
@@ -54,7 +51,8 @@ function adjust_subtree($index, $diff) {
 }
 
 function collapse_tree($index, $curgen, $diff) {
-	global $offsetarray, $treeid, $PEDIGREE_GENERATIONS, $log2, $talloffset,$boxspacing, $mdiff, $minyoffset, $SHOW_ID_NUMBERS;
+	global $offsetarray, $treeid, $boxspacing, $mdiff, $minyoffset;
+	global $pedigree_controller;
 
 	//print "$index:$curgen:$diff<br />\n";
 	$f = ($index*2)+1; //-- father index
@@ -62,28 +60,28 @@ function collapse_tree($index, $curgen, $diff) {
 	if (empty($treeid[$index])) {
 		$pgen=$curgen;
 		$genoffset=0;
-		while($pgen<=$PEDIGREE_GENERATIONS) {
-			$genoffset += pow(2, ($PEDIGREE_GENERATIONS-$pgen));
+		while($pgen <= $pedigree_controller->num_generations) {
+			$genoffset += pow(2, ($pedigree_controller->num_generations-$pgen));
 			$pgen++;
 		}
-		if ($talloffset==1) $diff+=.5*$genoffset;
+		if ($pedigree_controller->talloffset==1) $diff+=.5*$genoffset;
 		else $diff+=$genoffset;
 		if (isset($offsetarray[$index]["y"])) $offsetarray[$index]["y"]-=($boxspacing*$diff)/2;
 		return $diff;
 	}
-	if ($curgen==$PEDIGREE_GENERATIONS) {
+	if ($curgen == $pedigree_controller->num_generations) {
 		$offsetarray[$index]["y"] -= $boxspacing*$diff;
 		//print "UP $index BY $diff<br />\n";
 		return $diff;
 	}
 	$odiff=$diff;
 	$fdiff = collapse_tree($f, $curgen+1, $diff);
-	if (($curgen<($PEDIGREE_GENERATIONS-1))||($index%2==1)) $diff=$fdiff;
+	if (($curgen < ($pedigree_controller->num_generations-1)) || ($index%2 == 1)) $diff=$fdiff;
 	if (isset($offsetarray[$index]["y"])) $offsetarray[$index]["y"] -= $boxspacing*$diff;
 	//print "UP $index BY $diff<br />\n";
 	$mdiff = collapse_tree($m, $curgen+1, $diff);
 	$zdiff = $mdiff - $fdiff;
-	if (($zdiff>0)&&($curgen<$PEDIGREE_GENERATIONS-2)) {
+	if ($zdiff > 0 && $curgen < ($pedigree_controller->num_generations - 2)) {
 		$offsetarray[$index]["y"] -= $boxspacing*$zdiff/2;
 		//print "UP $index BY ".($zdiff/2)."<br />\n";
 		if ((empty($treeid[$m]))&&(!empty($treeid[$f]))) adjust_subtree($f, -1*($boxspacing*$zdiff/4));
@@ -92,60 +90,19 @@ function collapse_tree($index, $curgen, $diff) {
 	return $diff;
 }
 
-$show_famlink = true;
-if ((isset($view))&&($view=="preview")) {
-	$show_famlink = false;
-}
+print_header($pedigree_controller->pagetitle);
 
-if (!isset($show_full)) $show_full=$PEDIGREE_FULL_DETAILS;
-if ($show_full=="") $show_full = 0;
-if (!isset($talloffset)) $talloffset = $PEDIGREE_LAYOUT;
-if ($talloffset=="") $talloffset = 0;
-
-if ((!isset($PEDIGREE_GENERATIONS))||($PEDIGREE_GENERATIONS=="")) $PEDIGREE_GENERATIONS=$DEFAULT_PEDIGREE_GENERATIONS;
-
-if ($PEDIGREE_GENERATIONS > $MAX_PEDIGREE_GENERATIONS) {
-	$PEDIGREE_GENERATIONS = $MAX_PEDIGREE_GENERATIONS;
-	$max_generation = TRUE;
-}
-
-if ($PEDIGREE_GENERATIONS < 3) {
-	$PEDIGREE_GENERATIONS = 3;
-	$min_generation = TRUE;
-}
-$OLD_PGENS = $PEDIGREE_GENERATIONS;
-
-if (!isset($rootid)) $rootid="";
-$rootid = CleanInput($rootid);
-$rootid = CheckRootId($rootid);
-
-if (PrivacyFunctions::showLivingNameByID($rootid)) {
-	$name = GetPersonName($rootid);
-	$addname = GetAddPersonName($rootid);
-}
-else {
-	$name = $gm_lang["private"];
-	$addname = "";
-}
-
-// NOTE: Print html header information
-$title = $name;
-if ($SHOW_ID_NUMBERS) $title .= " - ".$rootid;
-$title .= " - ".$gm_lang["index_header"];
-print_header($title);
 print "<div id=\"content_pedigree\">";
-	if ($view=="preview") print "<h3>".str_replace("#PEDIGREE_GENERATIONS#", ConvertNumber($PEDIGREE_GENERATIONS), $gm_lang["gen_ped_chart"]).":";
+	// Print the page title
+	if ($pedigree_controller->view == "preview") print "<h3>".str_replace("#PEDIGREE_GENERATIONS#", ConvertNumber($pedigree_controller->num_generations), $gm_lang["gen_ped_chart"]).":";
 	else print "<h3>".$gm_lang["index_header"].":";
-	print "<br />".PrintReady($name);
-	if ($addname != "") print "<br />" . PrintReady($addname);
-	$rootfams = FindPrimaryFamilyId($rootid);
-	$famrela = "";
-	foreach ($rootfams as $key=>$fam) {
-		if ($fam["primary"] == "Y") {
-			$famrela = $fam["relation"];
-			break;
-		}
-	}
+	print "<br />".$pedigree_controller->root->name;
+	if ($pedigree_controller->root->addname != "") print "<br />" . $pedigree_controller->root->addname;
+	
+	// Print the family relation
+	$fam = $pedigree_controller->root->primaryfamily;
+	$family =& Family::GetInstance($fam, "", $GEDCOMID);
+	$famrela = $family->pedigreetype;
 	if (!empty($famrela)) {
 		if ($TEXT_DIRECTION == "ltr") print "&nbsp;&lrm;(".$gm_lang[$famrela."_parents"].")&lrm;";
 		else print "&nbsp;&rlm;(".$gm_lang[$famrela."_parents"].")&rlm;";
@@ -153,7 +110,7 @@ print "<div id=\"content_pedigree\">";
 	print "</h3>";
 
 	// NOTE: Print the form to change the number of displayed generations
-	if ($view!="preview") {
+	if ($pedigree_controller->view != "preview") {
 		?>
 		<script language="JavaScript" type="text/javascript">
 		<!--
@@ -164,11 +121,11 @@ print "<div id=\"content_pedigree\">";
 		//-->
 		</script>
 		<?php
-		if (isset($max_generation) == TRUE) print "<span class=\"error\">".str_replace("#PEDIGREE_GENERATIONS#", ConvertNumber($PEDIGREE_GENERATIONS), $gm_lang["max_generation"])."</span>";
-		if (isset($min_generation) == TRUE) print "<span class=\"error\">".$gm_lang["min_generation"]."</span>";
+		if ($pedigree_controller->max_generation == true) print "<span class=\"error\">".str_replace("#PEDIGREE_GENERATIONS#", ConvertNumber($pedigree_controller->num_generations), $gm_lang["max_generation"])."</span>";
+		if ($pedigree_controller->min_generation == true) print "<span class=\"error\">".$gm_lang["min_generation"]."</span>";
 		print "<form name=\"people\" method=\"get\" action=\"pedigree.php\">";
-		print "<input type=\"hidden\" name=\"show_full\" value=\"$show_full\" />";
-		print "<input type=\"hidden\" name=\"talloffset\" value=\"$talloffset\" />";
+		print "<input type=\"hidden\" name=\"show_full\" value=\"".$pedigree_controller->show_full."\" />";
+		print "<input type=\"hidden\" name=\"talloffset\" value=\"".$pedigree_controller->talloffset."\" />";
 		print "<table class=\"pedigree_table $TEXT_DIRECTION\" width=\"225\">";
 		
 		print "<tr><td colspan=\"2\" class=\"topbottombar\" style=\"text-align:center; \">";
@@ -179,7 +136,7 @@ print "<div id=\"content_pedigree\">";
 		print $gm_lang["root_person"];
 		print "</td>";
 		print "<td class=\"shade1\">";
-		print "<input class=\"pedigree_form\" type=\"text\" id=\"rootid\" name=\"rootid\" size=\"3\" value=\"$rootid\" />";
+		print "<input class=\"pedigree_form\" type=\"text\" id=\"rootid\" name=\"rootid\" size=\"3\" value=\"".$pedigree_controller->xref."\" />";
 		LinkFunctions::PrintFindIndiLink("rootid","");
 		print "</td></tr>";
 	
@@ -188,10 +145,10 @@ print "<div id=\"content_pedigree\">";
 		print $gm_lang["generations"];
 		print "</td>";
 		print "<td class=\"shade1\">";
-		print "<select name=\"PEDIGREE_GENERATIONS\">";
+		print "<select name=\"num_generations\">";
 		for ($i=3; $i<=$MAX_PEDIGREE_GENERATIONS; $i++) {
 			print "<option value=\"".$i."\"" ;
-			if ($i == $OLD_PGENS) print " selected=\"selected\" ";
+			if ($i == $pedigree_controller->num_generations) print " selected=\"selected\" ";
 			print ">".$i."</option>";
 		}
 		print "</select></td></tr>";
@@ -201,10 +158,10 @@ print "<div id=\"content_pedigree\">";
 		print $gm_lang["orientation"];
 		print "</td><td class=\"shade1\">";
 		print "<input type=\"radio\" name=\"talloffset\" value=\"0\" ";
-		if (!$talloffset) print "checked=\"checked\" ";
+		if (!$pedigree_controller->talloffset) print "checked=\"checked\" ";
 		print "onclick=\"document.people.talloffset.value='1';\" />".$gm_lang["portrait"];
 		print "<br /><input type=\"radio\" name=\"talloffset\" value=\"1\" ";
-		if ($talloffset) print "checked=\"checked\" ";
+		if ($pedigree_controller->talloffset) print "checked=\"checked\" ";
 		print "onclick=\"document.people.talloffset.value='0';\" />".$gm_lang["landscape"];
 		print "<br /></td></tr>";
 	
@@ -214,7 +171,7 @@ print "<div id=\"content_pedigree\">";
 		print "</td>";
 		print "<td class=\"shade1\">";
 		print "<input type=\"checkbox\" value=\"";
-		if ($show_full) print "1\" checked=\"checked\" onclick=\"document.people.show_full.value='0';\"";
+		if ($pedigree_controller->show_full) print "1\" checked=\"checked\" onclick=\"document.people.show_full.value='0';\"";
 		else print "0\" onclick=\"document.people.show_full.value='1';\"";
 		print " />";
 		print "</td></tr>";
@@ -227,20 +184,22 @@ print "<div id=\"content_pedigree\">";
 		print "</form>";
 	}
 	print "<div style=\"position: relative; z-index:0;\">\n";
+	
+	// Start calculating the tree
 	// NOTE: Adjustments for hide details
-	if ($show_full==false) {
+	if ($pedigree_controller->show_full == false) {
 		$bheight=30;
 		$bwidth-=40;
 		$baseyoffset+=30;
 	}
 	// NOTE: Adjustments for portrait mode
-	if ($talloffset==0) {
+	if ($pedigree_controller->talloffset == 0) {
 		$bxspacing+=12;
 		$basexoffset+=50;
 		$bwidth+=20;
 	}
 	// NOTE: Adjustments for preview
-	if ($view=="preview") {
+	if ($pedigree_controller->view=="preview") {
 		$baseyoffset-=20;
 	}
 	
@@ -249,25 +208,26 @@ print "<div id=\"content_pedigree\">";
 	$pbwidth = $bwidth+6;
 	$pbheight = $bheight+5;
 	
-	$treeid = PedigreeArray($rootid);
-	$treesize = pow(2, (int)($PEDIGREE_GENERATIONS))-1;
+	// Get the ID's in the tree
+	$treeid = ChartFunctions::PedigreeArray($pedigree_controller->xref, $pedigree_controller->num_generations);
+	$treesize = pow(2, (int)($pedigree_controller->num_generations))-1;
 	
-	if (($PEDIGREE_GENERATIONS < 5)&&($show_full==false)) {
+	if ($pedigree_controller->num_generations < 5 && $pedigree_controller->show_full == false) {
 		// Set the width of the pedigree
-		$baseyoffset+=($PEDIGREE_GENERATIONS*$pbheight/2)+20;
-		if ($view=="preview") $baseyoffset-=120;
+		$baseyoffset+=($pedigree_controller->num_generations*$pbheight/2)+20;
+		if ($pedigree_controller->view == "preview") $baseyoffset-=120;
 	}
 	
-	if ($PEDIGREE_GENERATIONS==3) {
+	if ($pedigree_controller->num_generations == 3) {
 		$baseyoffset+=$pbheight*1.6;
 	}
-	if ((isset($max_generation) == TRUE)||(isset($min_generation) == TRUE)) $baseyoffset+=20;
+	if ($pedigree_controller->max_generation == true || $pedigree_controller->min_generation == true) $baseyoffset+=20;
 	
 	// NOTE: This next section will create and position the DIV layers for the pedigree tree
 	$curgen = 1;			// -- variable to track which generation the algorithm is currently working on
 	$yoffset=0;				// -- used to offset the position of each box as it is generated
 	$xoffset=0;
-	$prevyoffset=0;		// -- used to track the y position of the previous box
+	$prevyoffset=0;			// -- used to track the y position of the previous box
 	$offsetarray = array();
 	$minyoffset = 0;
 	if ($treesize<3) $treesize=3;
@@ -279,15 +239,15 @@ print "<div id=\"content_pedigree\">";
 			$curgen++;
 		}
 		//-- box position in current generation
-		$boxpos = $i-pow(2, $PEDIGREE_GENERATIONS-$curgen);
+		$boxpos = $i-pow(2, $pedigree_controller->num_generations - $curgen);
 		//-- offset multiple for current generation
-		$genoffset = pow(2, $curgen-$talloffset);
+		$genoffset = pow(2, $curgen-$pedigree_controller->talloffset);
 		$boxspacing = $pbheight+$byspacing;
 		// -- calculate the yoffset		Position in the generation		Spacing between boxes		put child between parents
 		$yoffset = $baseyoffset+($boxpos * ($boxspacing * $genoffset))+(($boxspacing/2)*$genoffset)+($boxspacing * $genoffset);
-		if ($talloffset==0) {
+		if ($pedigree_controller->talloffset == 0) {
 			//-- compact the tree
-			if ($curgen<$PEDIGREE_GENERATIONS) {
+			if ($curgen < $pedigree_controller->num_generations) {
 				$parent = floor(($i-1)/2);
 				if ($i%2 == 0) $yoffset=$yoffset - (($boxspacing/2) * ($curgen-1));
 				else $yoffset=$yoffset + (($boxspacing/2) * ($curgen-1));
@@ -314,14 +274,14 @@ print "<div id=\"content_pedigree\">";
 			}
 		}
 		// -- calculate the xoffset
-		$xoffset = 20+$basexoffset+ (($PEDIGREE_GENERATIONS - $curgen) * (($pbwidth+$bxspacing)/(2-$talloffset)));
+		$xoffset = 20+$basexoffset+ (($pedigree_controller->num_generations - $curgen) * (($pbwidth+$bxspacing)/(2-$pedigree_controller->talloffset)));
 		$offsetarray[$i]["x"]=$xoffset;
 		$offsetarray[$i]["y"]=$yoffset;
 	}
 	
 	//-- collapse the tree if boxes are missing
 	if (!$SHOW_EMPTY_BOXES) {
-		if ($PEDIGREE_GENERATIONS>1) collapse_tree(0, 1, 0);
+		if ($pedigree_controller->num_generations > 1) collapse_tree(0, 1, 0);
 	}
 	
 	//-- calculate the smallest yoffset and adjust the tree to that offset
@@ -338,20 +298,23 @@ print "<div id=\"content_pedigree\">";
 	adjust_subtree(0, $ydiff);
 	
 	//-- if no father keep the tree off of the pedigree form
-	if (($view!="preview")&&($offsetarray[0]["y"]+$baseyoffset<300)) adjust_subtree(0, 300-($offsetarray[0]["y"]+$baseyoffset));
+	if (($pedigree_controller->view != "preview")&&($offsetarray[0]["y"]+$baseyoffset<300)) adjust_subtree(0, 300-($offsetarray[0]["y"]+$baseyoffset));
+	
 	print "<div id=\"pedigree_chart";
 	if ($TEXT_DIRECTION=="rtl") print "_rtl";
-	if ($view=="preview") {
+	if ($pedigree_controller->view == "preview") {
 		print "\" style=\"top: 1px;";
 	}
 	else print "\" style=\"z-index: 1;";
 	print "\">\n";
+	
 	//-- print the boxes
 	$curgen = 1;
 	$yoffset=0;				// -- used to offset the position of each box as it is generated
 	$xoffset=0;
 	$prevyoffset=0;		// -- used to track the y position of the previous box
 	$maxyoffset = 0;
+	
 	for($i=($treesize-1); $i>=0; $i--) {
 		// -- check to see if we have moved to the next generation
 		if ($i < floor($treesize / (pow(2, $curgen)))) {
@@ -361,7 +324,7 @@ print "<div id=\"content_pedigree\">";
 		$xoffset = $offsetarray[$i]["x"];
 		$yoffset = $offsetarray[$i]["y"];
 		// -- if we are in the middle generations then we need to draw the connecting lines
-		if (($curgen >(1+$talloffset)) && ($curgen < $PEDIGREE_GENERATIONS)) {
+		if (($curgen >(1 + $pedigree_controller->talloffset)) && ($curgen < $pedigree_controller->num_generations)) {
 			if ($i%2==1) {
 				if ($SHOW_EMPTY_BOXES || ($treeid[$i]) || ($treeid[$i+1])) {
 					$vlength = ($prevyoffset-$yoffset);
@@ -389,27 +352,25 @@ print "<div id=\"content_pedigree\">";
 			else print ".1.0\" style=\"position:absolute; left:";
 			print $xoffset."px; top:".($yoffset-2)."px; width:".$pbwidth."px; height:".$pbheight."px; z-index: 0;\">";
 			print "\n\t\t\t<table border=\"0\" cellspacing=\"0\" cellpadding=\"0\" width=\"100%\" dir=\"$TEXT_DIRECTION\">";
-			if (($curgen >(1+$talloffset)) && ($curgen < $PEDIGREE_GENERATIONS)) {
+			if (($curgen > (1 + $pedigree_controller->talloffset)) && ($curgen < $pedigree_controller->num_generations)) {
 				print "<tr><td style=\"vertical-align: middle;\">";
 				print "\n\t\t\t<img src=\"".$GM_IMAGE_DIR."/".$GM_IMAGES["hline"]["other"]."\" align=\"left\" hspace=\"0\" vspace=\"0\" alt=\"\" />";
 				print "\n\t\t\t</td><td width=\"100%\">";
 			}
 			else print "<tr><td width=\"100%\">";
-			$mfstyle = "";
-			if (!empty($treeid[$i])) {
-				$indirec = FindPersonRecord($treeid[$i]);
-				$ct = preg_match("/1 SEX F/", $indirec);
-				if ($ct>0) $mfstyle="F";
-			}
-			if (!isset($treeid[$i])) $treeid[$i] = false;
-			print_pedigree_person($treeid[$i], 1, $show_famlink, 0, 1);
 			
-			if (($curgen==1)&&(count(FindFamilyIds($treeid[$i]))>0)) {
+			if (!isset($treeid[$i])) $treeid[$i] = false;
+			$person =& Person::GetInstance($treeid[$i], "", $GEDCOMID);
+			$fams = count($person->childfamilies);
+			
+			PersonFunctions::PrintPedigreePerson($person, 1, 1, 0, 1, $pedigree_controller->view, $pedigree_controller->num_generations, $pedigree_controller->talloffset);
+			
+			if ($curgen == 1 && $fams > 0) {
 				$did = 1;
 				if ($i > ($treesize/2) + ($treesize/4)-1) $did++;
 				print "\n\t\t\t\t</td><td style=\"vertical-align: middle\">";
-				if ($view!="preview") {
-					print "<a href=\"pedigree.php?PEDIGREE_GENERATIONS=$OLD_PGENS&amp;rootid=".$treeid[$did]."&amp;show_full=$show_full&amp;talloffset=$talloffset\" ";
+				if ($pedigree_controller->view != "preview") {
+					print "<a href=\"pedigree.php?num_generations=".$pedigree_controller->num_generations."&amp;rootid=".$treeid[$did]."&amp;show_full=".$pedigree_controller->show_full."&amp;talloffset=".$pedigree_controller->talloffset."\" ";
 					if ($TEXT_DIRECTION=="rtl") {
 						print "onmouseover=\"swap_image('arrow$i',0);\" onmouseout=\"swap_image('arrow$i',0);\">";
 						print "<img id=\"arrow$i\" src=\"".$GM_IMAGE_DIR."/".$GM_IMAGES["larrow"]["other"]."\" border=\"0\" alt=\"\" />";
@@ -424,26 +385,23 @@ print "<div id=\"content_pedigree\">";
 			print "\n\t\t\t</td></tr></table>\n\t\t</div>";
 		}
 	}
-	
-	if (PrivacyFunctions::showLivingNameByID($rootid)) {
+	if ($pedigree_controller->root->disp_name) {
+		
 		// -- print left arrow for decendants so that we can move down the tree
 		$yoffset += ($pbheight / 2)-10;
-		$famids = FindSfamilyIds($rootid);
+		$famids = count($pedigree_controller->root->spousefamilies);
+		
 		//-- make sure there is more than 1 child in the family with parents
-		$cfamids = FindFamilyIds($rootid);
 		$num=0;
-		for($f=0; $f<count($cfamids); $f++) {
-			$famrec = FindFamilyRecord($cfamids[$f]["famid"]);
-			if ($famrec) {
-				$num += preg_match_all("/1\s*CHIL\s*@(.*)@/", $famrec, $smatch,PREG_SET_ORDER);
-			}
+		foreach($pedigree_controller->root->childfamilies as $key =>$family) {
+			$num += $family->children_count;
 		}
-		if ($famids||($num>1)) {
+		if ($famids > 0 || $num > 1) {
 			print "\n\t\t<div id=\"childarrow\" dir=\"";
 			if ($TEXT_DIRECTION=="rtl") print "rtl\" style=\"position:absolute; right:";
 			else print "ltr\" style=\"position:absolute; left:";
 			print $basexoffset."px; top:".$yoffset."px; width:10px; height:10px; \">";
-			if ($view!="preview") {
+			if ($pedigree_controller->view != "preview") {
 				if ($TEXT_DIRECTION=="rtl") print "<a href=\"javascript: ".$gm_lang["show"]."\" onclick=\"togglechildrenbox(); return false;\" onmouseover=\"swap_image('larrow',1);\" onmouseout=\"swap_image('larrow',1);\">";
 				else print "<a href=\"javascript: ".$gm_lang["show"]."\" onclick=\"togglechildrenbox(''); return false;\" onmouseover=\"swap_image('larrow',0);\" onmouseout=\"swap_image('larrow',0);\">";
 				if ($TEXT_DIRECTION=="rtl") print "<img id=\"larrow\" src=\"".$GM_IMAGE_DIR."/".$GM_IMAGES["rarrow"]["other"]."\" border=\"0\" alt=\"\" />";
@@ -457,70 +415,28 @@ print "<div id=\"content_pedigree\">";
 			else print "ltr\" style=\"position:absolute; left:";
 			print $xoffset."px; top:".$yoffset."px; width:".$pbwidth."px; height:".$pbheight."px; visibility: hidden;\">";
 			print "\n\t\t\t<table class=\"person_box\"><tr><td>";
-			for($f=0; $f<count($famids); $f++) {
-				$famrec = FindFamilyRecord(trim($famids[$f]["famid"]));
-				if ($famrec) {
-					$parents = FindParents($famids[$f]["famid"]);
-					if($parents) {
-						if($rootid!=$parents["HUSB"]) $spid=$parents["HUSB"];
-						else $spid=$parents["WIFE"];
-						if (!empty($spid)) {
-							print "\n\t\t\t\t<a href=\"pedigree.php?PEDIGREE_GENERATIONS=$OLD_PGENS&amp;rootid=$spid&amp;show_full=$show_full&amp;talloffset=$talloffset\"><span ";
-							if (PrivacyFunctions::showLivingNameByID($spid)) {
-								$name = GetPersonName($spid);
-								$name = rtrim($name);
-								if (hasRTLText($name))
-									print "class=\"name2\">";								
-								else print "class=\"name1\">";
-								print PrintReady($name);
-							}
-							else print $gm_lang["private"];
-							print "<br /></span></a>";
-						}
-	
-					}
-					$num = preg_match_all("/1\s*CHIL\s*@(.*)@/", $famrec, $smatch,PREG_SET_ORDER);
-					for($i=0; $i<$num; $i++) {
-						//-- add the following line to stop a bad PHP bug
-						if ($i>=$num) break;
-						$pid = $smatch[$i][1];
-						print "\n\t\t\t\t&nbsp;&nbsp;<a href=\"pedigree.php?PEDIGREE_GENERATIONS=$OLD_PGENS&amp;rootid=$pid&amp;show_full=$show_full&amp;talloffset=$talloffset\"><span ";
-						if (PrivacyFunctions::showLivingNameByID($pid)) {
-							$name = GetPersonName($pid);
-							$name = rtrim($name);
-							if (hasRTLText($name))
-								print "class=\"name2\">&lt; ";									
-							else print "class=\"name1\">&lt; ";
-							print PrintReady($name);
-						}
-						else print ">" . $gm_lang["private"];
-						print "<br /></span></a>";
-					}
+			foreach($pedigree_controller->root->spousefamilies as $key => $fam) {
+				if($pedigree_controller->xref != $fam->husb_id) $me = $fam->husb;
+				else $me = $fam->wife;
+				if (is_object($me) && !$me->isempty) {
+					print "\n\t\t\t\t<a href=\"pedigree.php?num_generations=".$pedigree_controller->num_generations."&amp;rootid=".$me->xref."&amp;show_full=".$pedigree_controller->show_full."&amp;talloffset=".$pedigree_controller->talloffset."\"><span class=\"name1\">";
+					print $me->name;
+					print "<br /></a>";
+				}
+				foreach($fam->children as $key2 => $child) {
+					print "\n\t\t\t\t&nbsp;&nbsp;<a href=\"pedigree.php?num_generations=".$pedigree_controller->num_generations."&amp;rootid=".$child->xref."&amp;show_full=".$pedigree_controller->show_full."&amp;talloffset=".$pedigree_controller->talloffset."\"><span class=\"name1\">";
+					print $child->name;
+					print "<br /></a>";
 				}
 			}
 			//-- print the siblings
-			for($f=0; $f<count($cfamids); $f++) {
-				$famrec = FindFamilyRecord($cfamids[$f]["famid"]);
-				if ($famrec) {
-					$num = preg_match_all("/1\s*CHIL\s*@(.*)@/", $famrec, $smatch,PREG_SET_ORDER);
-					if ($num>1) print "<span class=\"name1\"><br />".$gm_lang["siblings"]."<br /></span>";
-					for($i=0; $i<$num; $i++) {
-						//-- add the following line to stop a bad PHP bug
-						if ($i>=$num) break;
-						$pid = $smatch[$i][1];
-						if ($pid!=$rootid) {
-							print "\n\t\t\t\t&nbsp;&nbsp;<a href=\"pedigree.php?PEDIGREE_GENERATIONS=$OLD_PGENS&amp;rootid=$pid&amp;show_full=$show_full&amp;talloffset=$talloffset\"><span ";
-							if (PrivacyFunctions::showLivingNameByID($pid)) {
-								$name = GetPersonName($pid);
-								$name = rtrim($name);
-								if (hasRTLText($name))
-								print "class=\"name2\"> ";									 
-								else print "class=\"name1\"> ";
-								print PrintReady($name);
-							}
-							else print ">". $gm_lang["private"];
-							print "<br /></span></a>";
-						}
+			foreach ($pedigree_controller->root->childfamilies as $key => $fam) {
+				if ($fam->children_count > 1) print "<span class=\"name1\"><br />".$gm_lang["siblings"]."<br /></span>";
+				foreach ($fam->children as $key2 => $child) {
+					if ($child->xref != $pedigree_controller->xref) {
+						print "\n\t\t\t\t&nbsp;&nbsp;<a href=\"pedigree.php?num_generations=".$pedigree_controller->num_generations."&amp;rootid=".$child->xref."&amp;show_full=".$pedigree_controller->show_full."&amp;talloffset=".$pedigree_controller->talloffset."\"><span class=\"name1\">";
+						print $child->name;
+						print "<br /></span></a>";
 					}
 				}
 			}
@@ -544,7 +460,7 @@ $maxyoffset+=140;
 //-->
 </script>
 <?php
-if ($view=="preview") print "<br /><br /><br />";
+if ($pedigree_controller->view == "preview") print "<br /><br /><br />";
 print "</div>";
 print_footer();
 ?>

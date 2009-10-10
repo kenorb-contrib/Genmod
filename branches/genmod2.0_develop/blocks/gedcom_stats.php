@@ -95,21 +95,18 @@ function print_gedcom_stats($block = true, $config="", $side, $index) {
 			print "<tr><td valign=\"top\">".$gm_lang["stat_earliest_birth"]."</td><td class=\"rtl\">&nbsp;<span style=\"font-weight: bold\"><a href=\"calendar.php?action=year&amp;year=".$stats["gs_earliest_birth_year"]."\">".$stats["gs_earliest_birth_year"]."</a></span>&nbsp;</td><td valign=\"top\" class=\"ltr wrap\">";
 			$person =& Person::GetInstance($stats["gs_earliest_birth_gid"]);
 			$person->PrintListPerson(false, false);
-//			print_list_person($stats["gs_earliest_birth_gid"], array(GetPersonName($stats["gs_earliest_birth_gid"]), $GEDCOM), false, "", false);
 			print "</td></tr>\n";
 		}
 		if ($config["stat_last_birth"]=="yes" && !empty($stats["gs_latest_birth_gid"])) {
 			print "<tr><td valign=\"top\">".$gm_lang["stat_latest_birth"]."</td><td class=\"rtl\">&nbsp;<span style=\"font-weight: bold\"><a href=\"calendar.php?action=year&amp;year=".$stats["gs_latest_birth_year"]."\">".$stats["gs_latest_birth_year"]."</a></span>&nbsp;</td><td valign=\"top\" class=\"ltr wrap\">";
 			$person =& Person::GetInstance($stats["gs_latest_birth_gid"]);
 			$person->PrintListPerson(false, false);
-//			print_list_person($stats["gs_latest_birth_gid"], array(GetPersonName($stats["gs_latest_birth_gid"]), $GEDCOM), false, "", false);
 			print "</td></tr>\n";
 		}
 		if ($config["stat_long_life"]=="yes" && !empty($stats["gs_longest_live_gid"])) {
 			print "<tr><td valign=\"top\">".$gm_lang["stat_longest_life"]."</td><td class=\"rtl\">&nbsp;<span style=\"font-weight: bold\">".$stats["gs_longest_live_years"]."</span>&nbsp;</td><td valign=\"top\" class=\"ltr wrap\">";
 			$person =& Person::GetInstance($stats["gs_longest_live_gid"]);
 			$person->PrintListPerson(false, false);
-//			print_list_person($stats["gs_longest_live_gid"], array(GetPersonName($stats["gs_longest_live_gid"]), $GEDCOM), false, "", false);
 			print "</td></tr>\n";
 		}
 		if ($config["stat_avg_life"]=="yes") {

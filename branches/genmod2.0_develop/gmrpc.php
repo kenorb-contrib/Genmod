@@ -26,10 +26,6 @@
  
 require "config.php";
 
-// Switch off debug as that output is also sent!
-$olddebug = $DEBUG;
-$DEBUG = false;
-
 if (!isset($action)) $action = "";
 
 switch($action) {
@@ -244,7 +240,7 @@ switch($action) {
 						print "</span> ";
 					}
 				}
-				$factobj->PrintFactDate(false, false, $factobj->fact, $pid);
+				$factobj->PrintFactDate(false, false, true, true, true);
 				if (GetSubRecord(2, "2 DATE", $factobj->factrec) == "") {
 					// Don't display Y, N and ASSO links
 					if ($details!="Y" && $details!="N" && $factobj->fact != "ASSO") print PrintReady($details);
@@ -276,5 +272,4 @@ switch($action) {
 	break;
 }
 session_write_close();
-$DEBUG = $olddebug;
 ?>

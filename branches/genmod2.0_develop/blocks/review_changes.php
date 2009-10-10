@@ -113,23 +113,23 @@ function review_changes_block($block = true, $config="", $side, $index) {
 				foreach($changes as $gid=>$change) {
 					$type = GetRecType($change);
 					if ($type=="INDI") {
-						$person = Person::GetInstance($gid, "", $gedcomid);
+						$person =& Person::GetInstance($gid, "", $gedcomid);
 						print "<b>".$person->name."</b>".$person->addxref;
 					}
 					else if ($type=="FAM") {
-						$family = Family::GetInstance($gid, "", $gedcomid);
+						$family =& Family::GetInstance($gid, "", $gedcomid);
 						print "<b>".$family->descriptor."</b>".$family->addxref;
 					}
 					else if ($type=="SOUR") {
-						$source = Source::GetInstance($gid, "", $gedcomid);
+						$source =& Source::GetInstance($gid, "", $gedcomid);
 						print "<b>".$source->descriptor."</b>".$source->addxref;
 					}
 					else if ($type=="REPO") {
-						$repo = Repository::GetInstance($gid, "", $gedcomid);
+						$repo =& Repository::GetInstance($gid, "", $gedcomid);
 						print "<b>".$repo->descriptor."</b>".$repo->addxref;
 					}
 					else if ($type == "OBJE") {
-						$media = MediaItem::GetInstance($gid, "", $gedcomid);
+						$media =& MediaItem::GetInstance($gid, "", $gedcomid);
 						print "<b>".$media->descriptor."</b>".$media->addxref;
 					}
 					else print "<b>".constant("GM_FACT_".$type)."</b> &lrm;(".$gid.")&lrm;\n";

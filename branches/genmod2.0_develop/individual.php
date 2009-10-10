@@ -32,7 +32,6 @@
  * Inclusion of the configuration file
 */
 require("config.php");
-require_once 'includes/functions/functions_charts.php';
 
 /**
  * Inclusion of the individual controller
@@ -133,7 +132,7 @@ $controller->CheckRawEdited();
 			if ($factobj->style != "") $style = " class=\"".$factobj->style."\"";
 			else $style = "";
 			print "<span".$style.">".$factobj->descr.": ";
-			$factobj->PrintFactDate(false, false, false, $controller->indi->xref);
+			$factobj->PrintFactDate();
 			$factobj->PrintFactPlace();
 			print "</span><br />";
 		}
@@ -142,7 +141,7 @@ $controller->CheckRawEdited();
 			if ($factobj->style != "") $style = " class=\"".$factobj->style."\"";
 			else $style = "";
 			print "<span".$style.">".$factobj->descr.": ";
-			$factobj->PrintFactDate(false, false, false, $controller->indi->xref);
+			$factobj->PrintFactDate();
 			$factobj->PrintFactPlace();
 			print "</span><br style=\"line-height:30px;\" />";
 		}

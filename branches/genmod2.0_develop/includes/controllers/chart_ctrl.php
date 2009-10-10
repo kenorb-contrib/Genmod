@@ -1,6 +1,6 @@
 <?php
 /**
- * Controller for the list Pages
+ * Controller for the Chart Pages
  *
  * Genmod: Genealogy Viewer
  * Copyright (C) 2005 - 2008 Genmod Development Team
@@ -32,9 +32,9 @@ if (stristr($_SERVER["SCRIPT_NAME"],basename(__FILE__))) {
 /**
  * Main controller class for the individual page.
  */
-class ListController extends BaseController {
+class ChartController extends BaseController {
 	
-	public $classname = "ListController";	// Name of this class
+	public $classname = "ChartController";	// Name of this class
 	protected $pagetitle = null;			// Page title to show in the browser top line
 	
 	public function __construct() {

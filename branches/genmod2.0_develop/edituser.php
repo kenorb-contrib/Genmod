@@ -180,8 +180,9 @@ if ($action=="edituser2") {
 	<tr><td class="shade2 wrap"><div class="helpicon"><?php print_help_link("edituser_gedcomid_help", "qm"); print "</div><div class=\"description\">"; print $gm_lang["gedcomid"];?></div></td><td class="shade1">
 		<?php
 			if (!empty($gm_user->gedcomid[$GEDCOMID])) {
+				$person =& Person::GetInstance($gm_user->gedcomid[$GEDCOMID], "", $GEDCOMID);
 				print "<ul>";
-				print_list_person($gm_user->gedcomid[$GEDCOMID], array(GetPersonName($gm_user->gedcomid[$GEDCOMID]), $GEDCOMID));
+				$person->PrintListPerson();
 				print "</ul>";
 			}
 			else print "&nbsp;";

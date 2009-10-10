@@ -30,10 +30,7 @@
  * Inclusion of the configuration file
 */
 require("config.php");
-/**
- * Inclusion of the chart functions
-*/
-require("includes/functions/functions_charts.php");
+
 /**
  * print a child family
  *
@@ -48,7 +45,7 @@ function print_child_family($pid, $depth, $label="1.", $gpid="") {
 	$famids = FindSfamilyIds($pid);
 	foreach($famids as $famkey => $ffamid) {
 		$famid = $ffamid["famid"];
-		PrintSosaFamily($famid, "", -1, $label, $pid, $gpid, $personcount);
+		ChartFunctions::PrintSosaFamily($famid, "", -1, $label, $pid, $gpid, $personcount);
 		$personcount++;
 		$children = GetChildrenIds($famid);
 		$i=1;
@@ -89,7 +86,7 @@ function print_child_descendancy($pid, $depth) {
 			if ($parid=="") $parid=$parents["WIFE"];
 			if ($parid!="") {
 				$desc = GetFamilyDescriptor($sfamid, true);
-				PrintUrlArrow($parid.$personcount.$pid, "?pid=$parid&amp;generations=$generations&amp;chart_style=$chart_style&amp;show_full=$show_full&amp;box_width=$box_width", PrintReady($gm_lang["start_at_parents"]."&nbsp;-&nbsp;".$desc), 2);
+				ChartFunctions::PrintUrlArrow($parid.$personcount.$pid, "?pid=$parid&amp;generations=$generations&amp;chart_style=$chart_style&amp;show_full=$show_full&amp;box_width=$box_width", PrintReady($gm_lang["start_at_parents"]."&nbsp;-&nbsp;".$desc), 2);
 				$personcount++;
 			}
 		}
@@ -168,7 +165,7 @@ function print_family_descendancy($pid, $famid, $depth) {
 				if ($parid=="") $parid=$parents["WIFE"];
 				if ($parid!="") {
 					$desc = GetFamilyDescriptor($sfamid, true);
-					PrintUrlArrow($parid.$personcount.$pid, "?pid=$parid&amp;generations=$generations&amp;show_full=$show_full&amp;box_width=$box_width", PrintReady($gm_lang["start_at_parents"]."&nbsp;-&nbsp;".$desc), 2);
+					ChartFunctions::PrintUrlArrow($parid.$personcount.$pid, "?pid=$parid&amp;generations=$generations&amp;show_full=$show_full&amp;box_width=$box_width", PrintReady($gm_lang["start_at_parents"]."&nbsp;-&nbsp;".$desc), 2);
 					$personcount++;
 				}
 			}
@@ -219,7 +216,7 @@ $pbheight = $bheight+14;
 // -- root id
 if (!isset($pid)) $pid="";
 $pid = CleanInput($pid);
-$pid=CheckRootId($pid);
+$pid = ChartFunctions::CheckRootId($pid);
 if (PrivacyFunctions::showLivingNameByID($pid)) {
 	$name = GetPersonName($pid);
 	$addname = GetAddPersonName($pid);

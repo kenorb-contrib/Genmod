@@ -31,11 +31,6 @@
 */
 require("config.php");
 
-/**
- * Inclusion of the chart functions
-*/
-require_once("includes/functions/functions_charts.php");
-
 function print_descendency($pid, $count) {
 	global $show_spouse, $dgenerations, $bwidth, $bheight, $TEXT_DIRECTION, $GM_IMAGE_DIR, $GM_IMAGES, $generations, $box_width, $view, $show_full, $gm_lang, $boxcount;
 	if ($count>=$dgenerations) return 0;
@@ -335,7 +330,7 @@ function print_family_book($pid, $descent)
     $famids = FindSfamilyIds($pid);
     if (count($famids)>0 || empty($firstrun)) {
     	$firstrun = true;
-        $pid=CheckRootId($pid);
+        $pid = ChartFunctions::CheckRootId($pid);
         if (PrivacyFunctions::showLivingNameByID($pid)) $name = GetPersonName($pid);
         else $name = $gm_lang["private"];
         
@@ -388,7 +383,7 @@ if ($show_full==false) {
 
 // -- root id
 if (!isset($pid)) $pid="";
-$pid=CheckRootId($pid);
+$pid = ChartFunctions::CheckRootId($pid);
 if (PrivacyFunctions::showLivingNameByID($pid)) $name = GetPersonName($pid);
 else $name = $gm_lang["private"];
 

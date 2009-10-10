@@ -36,6 +36,7 @@ class Header extends GedcomRecord {
 	public $classname = "Header";			// Name of this class
 	public $datatype = "HEAD";				// Type of data collected here
 	private static $headercache = array(); 	// Holder of the instances for this class
+	private $placeformat = null;			// Order of place hierarchy
 	
 	
 	public static function GetInstance($xref, $gedrec="", $gedcomid="") {
@@ -66,6 +67,9 @@ class Header extends GedcomRecord {
 			case "lastchanged":
 				return $this->HeaderLastChanged();
 				break;
+			case "placeformat":
+				return $this->GetPlaceFormat();
+				break;
 			default:
 				return parent::__get($property);
 				break;
@@ -81,7 +85,15 @@ class Header extends GedcomRecord {
 		}
 		return $this->lastchanged;
 	}
-	
+
+	private function GetPlaceFormat() {
+		
+		if (is_null($this->placeformat)) {
+			$this->placeformat = GetGedcomValue("PLAC:FORM", 1, $this->gedrec, "", false);
+		}
+		return $this->placeformat;
+	}
+		
 	protected function ReadHeaderRecord() {
 		
 		$sql = "SELECT o_gedrec FROM ".TBLPREFIX."other WHERE o_key='".JoinKey($this->xref,	$this->gedcomid)."'";

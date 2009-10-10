@@ -325,11 +325,11 @@ class Fact {
 	 * @param string $factrec	gedcom fact record
 	 * @param boolean $anchor	option to print a link to calendar
 	 * @param boolean $time		option to print TIME value
+	 * @param boolean $print_age option to print age
 	 * @param string $fact		optional fact name (to print age)
 	 * @param string $pid		optional person ID (to print age)
-	 * @param string $indirec	optional individual record (to print age)
 	 */
-	public function PrintFactDate($anchor=false, $time=false, $fact=false, $pid=false, $prt=true) {
+	public function PrintFactDate($anchor=false, $time=false, $print_parents_age=false, $print_own_age=false, $prt=true) {
 		global $gm_lang;
 	
 		$prtstr = "";
@@ -347,11 +347,13 @@ class Fact {
 				$tt = preg_match("/[2-3] TIME (.*)/", $timerec, $tmatch);
 				if ($tt>0) $prtstr .= " - <span class=\"date\">".$tmatch[1]."</span>";
 			}
-			if ($fact && $pid) {
+			if ($print_parents_age) {
 				// age of parents at child birth
-				if ($fact=="BIRT") $this->GetOwner()->PrintParentsAge($match[1]);
+				if ($this->fact == "BIRT") $this->GetOwner()->PrintParentsAge($match[1]);
+			}
+			if ($print_own_age) {
 				// age at event
-				else if ($fact!="CHAN") {
+				if ($this->fact != "CHAN") {
 					// do not print age after death
 					$deatrec=GetSubRecord(1, "1 DEAT", $this->GetOwner()->gedrec);
 					if ((CompareFacts($this->factrec, $this->GetOwner()->drec)!=1)||(strstr($this->factrec, "1 DEAT"))) {
@@ -460,7 +462,7 @@ class Fact {
 					for ($level=0; $level<$SHOW_PEDIGREE_PLACES; $level++) {
 						if (!empty($levels[$level])) {
 							if ($level>0) $ptext .= ", ";
-							$ptext .= GetPinYin($levels[$level]);
+							$ptext .= GetPinYin(trim($levels[$level]));
 						}
 					}
 					$ptext .= ")";

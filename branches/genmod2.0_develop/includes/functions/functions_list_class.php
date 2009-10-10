@@ -62,7 +62,7 @@ abstract class ListFunctions {
 			$sql .= ")";
 		}
 		else if (!empty($selection)) $sql .= "AND i_key IN (".$selection.") ";
-	//	$sql .= "ORDER BY i_letter, i_surname ASC";
+		$sql .= "ORDER BY i_key, n_id ASC";
 		$res = NewQuery($sql);
 		$ct = $res->NumRows($res->result);
 		$key = "";
@@ -209,6 +209,7 @@ abstract class ListFunctions {
 	public function GetFamList($allgeds="no", $selection="", $applypriv=true) {
 		global $GEDCOMID;
 	
+		$famlist = array();
 		$sql = "SELECT * FROM ".TBLPREFIX."families";
 		if ($allgeds != "yes") {
 			if (!empty($selection)) $sql .= " WHERE f_key IN (".$selection.") ";
@@ -234,7 +235,7 @@ abstract class ListFunctions {
 			}
 			if (count($select) > 0) {
 				array_flip(array_flip($select));
-				print "Indi's selected for fams: ".count($select)."<br />";
+				//print "Indi's selected for fams: ".count($select)."<br />";
 				$selection = "'".implode("','", $select)."'";
 				self::GetIndilist($allgeds, $selection, false);
 			}
@@ -263,7 +264,7 @@ abstract class ListFunctions {
 		if (!empty($selection)) $sql .= " AND s_key IN (".$selection.") ";
 		$res = NewQuery($sql);
 		$oldkey = "";
-		while($row = $res->FetchAssoc()){
+		while ($row = $res->FetchAssoc()) {
 			if ($oldkey != $row["s_key"]) {
 				$oldkey = $row["s_key"];
 				$source =& Source::GetInstance($row["s_id"], $row, $row["s_file"]);
@@ -296,7 +297,6 @@ abstract class ListFunctions {
 				}
 			}
 		}
-	
 		return $sourcelist;
 	}
 
@@ -313,16 +313,16 @@ abstract class ListFunctions {
 		$ct = $resr->NumRows();
 		while($row = $resr->FetchAssoc()){
 			$repo = null;
+			$key = JoinKey($row["o_id"], $row["o_file"]);
 			$repo = Repository::GetInstance($row["o_id"], $row, $row["o_file"]);
-			self::$repo_total[JoinKey($row["o_id"], $row["o_file"])] = 1;
-			if (!$applypriv) $repolist[JoinKey($row["o_id"], $row["o_file"])] = $repo;
+			self::$repo_total[$key] = 1;
+			if (!$applypriv) $repolist[$key] = $repo;
 			else {
-				if ($repo->disp) $repolist[JoinKey($row["o_id"], $row["o_file"])] = $repo;
-				else self::$repo_hide[JoinKey($row["o_id"], $row["o_file"])] = 1;
+				if ($repo->disp) $repolist[$key] = $repo;
+				else self::$repo_hide[$key] = 1;
 			}
 		}
 		return $repolist;
 	}
-	
 }
 ?>

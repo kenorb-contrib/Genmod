@@ -72,7 +72,7 @@ class MediaListController {
 		$db = NewQuery($sql);
 		$this->totalmediaitems = $db->NumRows();
 		while($row = $db->FetchAssoc()) {
-			$media = MediaItem::GetInstance($row["m_media"], $row);
+			$media =& MediaItem::GetInstance($row["m_media"], $row);
 			if ($media->disp) {
 				if ($count) {
 					$this->medialist[$row["m_media"]."_".$row["m_file"]] = $media;
