@@ -81,9 +81,9 @@ abstract class NameFunctions {
 			else $wname = "@N.N., @P.N.";
 		}
 	
-		if (!empty($hname) && !empty($wname)) return CheckNN($hname,$starred)." + ".CheckNN($wname,$starred);
-		else if (!empty($hname) && empty($wname)) return CheckNN($hname,$starred);
-		else if (empty($hname) && !empty($wname)) return CheckNN($wname,$starred);
+		if (!empty($hname) && !empty($wname)) return CheckNN($hname)." + ".CheckNN($wname);
+		else if (!empty($hname) && empty($wname)) return CheckNN($hname);
+		else if (empty($hname) && !empty($wname)) return CheckNN($wname);
 	}
 		
 	/**
@@ -99,7 +99,7 @@ abstract class NameFunctions {
 	 * @param boolean $changes include unapproved changes
 	 * @return string the sortable name
 	 */
-	public function GetSortableName($person, $alpha="", $surname="", $allnames=false, $rev = false, $changes = false) {
+	public function GetSortableName(&$person, $alpha="", $surname="", $allnames=false, $rev = false, $changes = false) {
 		global $SHOW_LIVING_NAMES, $PRIV_PUBLIC, $GEDCOMID, $COMBIKEY;
 		global $indilist, $gm_lang, $GEDCOMID, $NAME_REVERSE;
 	
@@ -118,6 +118,7 @@ abstract class NameFunctions {
 		}
 	
 		$names = $person->name_array;
+		
 		if ($allnames == true) {
 			$mynames = array();
 			foreach ($names as $key => $name) {

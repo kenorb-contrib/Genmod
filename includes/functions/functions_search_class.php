@@ -636,7 +636,7 @@ abstract class SearchFunctions {
 	
 		$res = NewQuery($sql);
 		while($row = $res->fetchAssoc()) {
-			$fam = Family::GetInstance($row["f_id"], $row);
+			$fam =& Family::GetInstance($row["f_id"], $row);
 			$famlist[$row["f_key"]] = $fam;
 		}
 		$res->FreeResult();
@@ -661,7 +661,7 @@ abstract class SearchFunctions {
 		$res = NewQuery($sql);
 		while($row = $res->fetchAssoc()){
 			$repo = null;
-			$repo = Repository::GetInstance($row["o_id"], $row, $row["o_file"]);
+			$repo =& Repository::GetInstance($row["o_id"], $row, $row["o_file"]);
 			$repolist[$row["o_key"]] = $repo;
 		}
 		$res->FreeResult();
@@ -686,7 +686,7 @@ abstract class SearchFunctions {
 		$res = NewQuery($sql);
 		while($row = $res->fetchAssoc()){
 			$source = null;
-			$source = Source::GetInstance($row["s_id"], $row, $row["s_file"]);
+			$source =& Source::GetInstance($row["s_id"], $row, $row["s_file"]);
 			$sourcelist[$row["s_key"]] = $source;
 		}
 		$res->FreeResult();
@@ -711,7 +711,7 @@ abstract class SearchFunctions {
 	
 		while($row = $res->fetchAssoc()){
 			$media = null;
-			$media = MediaItem::GetInstance($row["m_media"], $row, $row["m_file"]);
+			$media =& MediaItem::GetInstance($row["m_media"], $row, $row["m_file"]);
 			$medialist[JoinKey($row["m_media"], $row["m_file"])] = $media;
 		}
 		$res->FreeResult();

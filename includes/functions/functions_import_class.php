@@ -499,8 +499,7 @@ abstract class ImportFunctions {
 		//-- if this is an import from an online update then import the places
 		// NOTE: What's the difference? Oh... in uploadgedcom it's also done. So only do it here in case of updates
 		if ($update) {
-	//		UpdatePlaces($gid, $indirec, $update);
-			self::UpdatePlaces($gid, $indirec, true);
+			self::UpdatePlaces($gid, $type, $indirec, true);
 			self::UpdateDates($gid, $indirec);
 	
 			//-- Also add the MM links to the DB
@@ -796,7 +795,7 @@ abstract class ImportFunctions {
 	 * into the places table
 	 * @param string $indirec
 	 */
-	public function UpdatePlaces($gid, $indirec, $update=false) {
+	public function UpdatePlaces($gid, $type, $indirec, $update=false) {
 		global $FILEID, $placecache;
 		
 	// NOTE: $update=false causes double places to be added. Force true
@@ -823,7 +822,7 @@ abstract class ImportFunctions {
 					$parent_id = $placecache[$key][0];
 					if (strpos($placecache[$key][1], $gid.",")===false) {
 						$placecache[$key][1] = "$gid,".$placecache[$key][1];
-						$sql = "INSERT INTO ".TBLPREFIX."placelinks VALUES($parent_id, '".DbLayer::EscapeQuery($gid)."', '".$FILEID."')";
+						$sql = "INSERT INTO ".TBLPREFIX."placelinks VALUES($parent_id, '".DbLayer::EscapeQuery($gid)."', '".$type."', '".$FILEID."')";
 						$res = NewQuery($sql);
 					}
 				}
@@ -840,7 +839,7 @@ abstract class ImportFunctions {
 							$parent_id = $row["p_id"];
 							$skip=true;
 							$placecache[$key] = array($parent_id, $gid.",");
-							$sql = "INSERT INTO ".TBLPREFIX."placelinks VALUES($parent_id, '".DbLayer::EscapeQuery($gid)."', '".$FILEID."')";
+							$sql = "INSERT INTO ".TBLPREFIX."placelinks VALUES($parent_id, '".DbLayer::EscapeQuery($gid)."', '".$type."', '".$FILEID."')";
 							$res = NewQuery($sql);
 						}
 					}
@@ -854,7 +853,7 @@ abstract class ImportFunctions {
 						$res = NewQuery($sql);
 						$parent_id = $place_id;
 						$placecache[$key] = array($parent_id, $gid.",");
-						$sql = "INSERT INTO ".TBLPREFIX."placelinks VALUES($place_id, '".DbLayer::EscapeQuery($gid)."', '".$FILEID."')";
+						$sql = "INSERT INTO ".TBLPREFIX."placelinks VALUES($place_id, '".DbLayer::EscapeQuery($gid)."', '".$type."', '".$FILEID."')";
 						$res = NewQuery($sql);
 					}
 				}

@@ -59,50 +59,35 @@ abstract class MenuBar {
 	public function GetCustomMenu() {
 		global $gm_lang, $gm_user, $DBCONN;
 		
-		if (!$DBCONN->connected) return false;
-		
-		// NOTE: Check if table exists, if not, do print the menu
-		$sql = "SHOW TABLES LIKE '".TBLPREFIX."pages'";
-		$res = NewQuery($sql);
-		if ($res) {
-			// Retrieve the current pages stored in the DB
-			$sql = "SELECT * FROM ".TBLPREFIX."pages";
-			$result = NewQuery($sql);
-			if (!$result) {
-				$message  = 'Invalid query: ' . mysql_error() . "\n";
-				$message .= 'Whole query: ' . $sql;
-				die($message);
-			}
-			else {
-				$pages = array();
-				while ($row = $result->FetchAssoc()) {
-					$page = array();
-					$page["id"] = $row["pag_id"];
-					$page["html"] = $row["pag_content"];
-					$page["title"] = $row["pag_title"];
-					$pages[$row["pag_id"]] = $page;
-				}
-			}
-				
-			//-- My Pages
-			if (count($pages) > 0) {
-				$menu = new Menu($gm_lang["my_pages"]);
-				foreach ( $pages as $key => $page) {
-					$submenu = new Menu($page["title"], "");
-					$submenu->addLink("custompage.php?action=show&id=".$page["id"]);
-					$menu->addSubmenu($submenu);
-				}
-			}
-			else $menu = "";
-			if ($gm_user->userIsAdmin()) {
-				if (!is_object($menu)) $menu = new Menu($gm_lang["my_pages"]);
-				$submenu = new Menu($gm_lang["edit_pages"], "");
-				$submenu->addLink("custompage.php?action=edit");
+		// Retrieve the current pages stored in the DB
+		$sql = "SELECT * FROM ".TBLPREFIX."pages";
+		$result = NewQuery($sql);
+		$pages = array();
+		while ($row = $result->FetchAssoc()) {
+			$page = array();
+			$page["id"] = $row["pag_id"];
+			$page["html"] = $row["pag_content"];
+			$page["title"] = $row["pag_title"];
+			$pages[$row["pag_id"]] = $page;
+		}
+			
+		//-- My Pages
+		if (count($pages) > 0) {
+			$menu = new Menu($gm_lang["my_pages"]);
+			foreach ( $pages as $key => $page) {
+				$submenu = new Menu($page["title"], "");
+				$submenu->addLink("custompage.php?action=show&id=".$page["id"]);
 				$menu->addSubmenu($submenu);
 			}
-			return $menu;
 		}
-		return null;
+		else $menu = "";
+		if ($gm_user->userIsAdmin()) {
+			if (!is_object($menu)) $menu = new Menu($gm_lang["my_pages"]);
+			$submenu = new Menu($gm_lang["edit_pages"], "");
+			$submenu->addLink("custompage.php?action=edit");
+			$menu->addSubmenu($submenu);
+		}
+		return $menu;
 	}
 
 	/**

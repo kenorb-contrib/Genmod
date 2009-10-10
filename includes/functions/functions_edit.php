@@ -213,7 +213,7 @@ function DeleteGedrec($gid, $change_id, $change_type, $gid_type) {
 //-------------------------------------------- check_gedcom
 //-- this function will check a GEDCOM record for valid gedcom format
 function CheckGedcom($gedrec, $chan=true, $user="", $tstamp="") {
-	global $gm_lang, $DEBUG, $GEDCOMID, $gm_user;
+	global $gm_lang, $GEDCOMID, $gm_user;
 
 	$gedrec = stripslashes($gedrec);
 	$ct = preg_match("/0 @(.*)@ (.*)/", $gedrec, $match);
@@ -221,7 +221,7 @@ function CheckGedcom($gedrec, $chan=true, $user="", $tstamp="") {
 	if ($ct==0) {
 		$ct2 = preg_match("/0 HEAD/", $gedrec, $match2);
 		if ($ct2 == 0) {
-			print "CheckGedcom-> Invalid GEDCOM 5.5 format.\n".$pipo;
+			print "CheckGedcom-> Invalid GEDCOM 5.5 format.\n";
 			WriteToLog("CheckGedcom-> Invalid GEDCOM 5.5 format.->" . $gm_user->username ."<-", "I", "G", $GEDCOMID);
 			return false;
 		}
@@ -1586,9 +1586,9 @@ function ShowMediaForm($pid, $action="newentry", $change_type="add_media") {
 	if (isset($element_id)) print "\n<script type=\"text/javascript\">\n<!--\ndocument.getElementById(\"".$element_id."\").focus();\n//-->\n</script>";
 }
 
-function ReplaceLinks($oldgid, $newgid, $mtype, $change_id, $change_type, $ged) {
+function ReplaceLinks($oldgid, $newgid, $mtype, $change_id, $change_type, $gedid) {
 
-	$records = GetLinkedGedRecs($oldgid, $mtype, $ged);
+	$records = GetLinkedGedRecs($oldgid, $mtype, $gedid);
 		
 	foreach ($records as $key1=>$record) {	
 		$tt = preg_match("/0 @(.+)@ (.+)/", $record, $match);
@@ -1600,18 +1600,18 @@ function ReplaceLinks($oldgid, $newgid, $mtype, $change_id, $change_type, $ged) 
 				$tag = substr($sub, 2, 4);
 				if ($tag != "CHIL" && $tag != "HUSB" && $tag != "WIFE" && $tag != "FAMC" && $tag != "FAMS") {
 					$newsub = preg_replace("/(\d) (\w+) @$oldgid@/", "$1 $2 @$newgid@", $sub);
-					ReplaceGedrec($gid, $sub, $newsub, $tag, $change_id, $change_type, $ged);
+					ReplaceGedrec($gid, $sub, $newsub, $tag, $change_id, $change_type, $gedid, $type);
 				}
 			}
 		}
 	}
 }
 
-function DeleteLinks($oldgid, $mtype, $change_id, $change_type, $ged) {
+function DeleteLinks($oldgid, $mtype, $change_id, $change_type, $gedid) {
 	global $GEDCOMID;
 
 	// We miss the links on new records, which are only in the _changes table
-	$records = GetLinkedGedRecs($oldgid, $mtype, $ged);
+	$records = GetLinkedGedRecs($oldgid, $mtype, $gedid);
 	$success = true;
 	foreach ($records as $key1=>$record) {	
 		$tt = preg_match("/0 @(.+)@ (.+)/", $record, $match);
@@ -1628,14 +1628,14 @@ function DeleteLinks($oldgid, $mtype, $change_id, $change_type, $ged) {
 			if (preg_match("/(\d) (\w+) @$oldgid@/", $sub, $match2)) {
 				$subdel = GetSubRecord($match2[1], $match2[1]." ".$match2[2]." @".$oldgid."@", $sub);
 				$subnew = preg_replace("/$subdel/", "", $sub);
-				$success = $success && ReplaceGedrec($gid, $sub, $subnew, $fact, $change_id, $change_type);
+				$success = $success && ReplaceGedrec($gid, $sub, $subnew, $fact, $change_id, $change_type, $gedid, $type);
 			}
 		}
 	}
 	return $success;
 }
 
-function GetLinkedGedrecs($oldgid, $mtype, $ged) {
+function GetLinkedGedrecs($oldgid, $mtype, $gedid) {
 	
 	$records = array();
 	
@@ -1643,7 +1643,7 @@ function GetLinkedGedrecs($oldgid, $mtype, $ged) {
 	
 	//-- References from sources (REPO, OBJE, NOTE)
 	if ($mtype == "REPO" || $mtype == "OBJE" || $mtype == "NOTE") {
-		$sql = "SELECT s_gedrec, s_id FROM ".TBLPREFIX."sources WHERE s_gedrec REGEXP '[1-9] [[:alnum:]]+ @".$oldgid."@' AND s_file='".$ged."'";
+		$sql = "SELECT s_gedrec, s_id FROM ".TBLPREFIX."sources WHERE s_gedrec REGEXP '[1-9] [[:alnum:]]+ @".$oldgid."@' AND s_file='".$gedid."'";
 		$res = NewQuery($sql);
 		if ($res) {
 			while ($row = $res->FetchAssoc()) {
@@ -1654,7 +1654,7 @@ function GetLinkedGedrecs($oldgid, $mtype, $ged) {
 	
 	//-- References from individuals (SOUR, INDI, FAM, NOTE, OBJE)
 	if ($mtype == "SOUR" || $mtype == "INDI" || $mtype == "FAM" || $mtype == "NOTE" || $mtype == "OBJE") {
-		$sql = "SELECT i_gedrec, i_id FROM ".TBLPREFIX."individuals WHERE i_gedrec REGEXP '[1-9] [[:alnum:]]+ @".$oldgid."@' AND i_file='".$ged."'";
+		$sql = "SELECT i_gedrec, i_id FROM ".TBLPREFIX."individuals WHERE i_gedrec REGEXP '[1-9] [[:alnum:]]+ @".$oldgid."@' AND i_file='".$gedid."'";
 		$res = NewQuery($sql);
 		if ($res) {
 			while ($row = $res->FetchAssoc()) {
@@ -1665,7 +1665,7 @@ function GetLinkedGedrecs($oldgid, $mtype, $ged) {
 
 	//-- References from families (SOUR, INDI, NOTE, OBJE)
 	if ($mtype == "SOUR" || $mtype == "INDI" || $mtype == "NOTE" || $mtype == "OBJE") {
-		$sql = "SELECT f_gedrec, f_id FROM ".TBLPREFIX."families WHERE f_gedrec REGEXP '[1-9] [[:alnum:]]+ @".$oldgid."@' AND f_file='".$ged."'";
+		$sql = "SELECT f_gedrec, f_id FROM ".TBLPREFIX."families WHERE f_gedrec REGEXP '[1-9] [[:alnum:]]+ @".$oldgid."@' AND f_file='".$gedid."'";
 		$res = NewQuery($sql);
 		if ($res) {
 			while ($row = $res->FetchAssoc()) {
@@ -1676,7 +1676,7 @@ function GetLinkedGedrecs($oldgid, $mtype, $ged) {
 	
 	//-- References from multimedia (SOUR, NOTE)
 	if ($mtype == "SOUR" || $mtype == "NOTE") {
-		$sql = "SELECT m_gedrec, m_media FROM ".TBLPREFIX."media WHERE m_gedrec REGEXP '[1-9] [[:alnum:]]+ @".$oldgid."@' AND m_file='".$ged."'";
+		$sql = "SELECT m_gedrec, m_media FROM ".TBLPREFIX."media WHERE m_gedrec REGEXP '[1-9] [[:alnum:]]+ @".$oldgid."@' AND m_file='".$gedid."'";
 		$res = NewQuery($sql);
 		if ($res) {
 			while ($row = $res->FetchAssoc()) {
@@ -1687,7 +1687,7 @@ function GetLinkedGedrecs($oldgid, $mtype, $ged) {
 
 	//-- References from notes, submitter recs (SOUR, INDI) <== links to notes and repositories
 	if ($mtype == "SOUR" || $mtype == "INDI" || $mtype == "REPO" || $mtype == "OBJE") {
-		$sql = "SELECT o_gedrec, o_id FROM ".TBLPREFIX."other WHERE o_gedrec REGEXP '[1-9] [[:alnum:]]+ @".$oldgid."@' AND o_file='".$ged."'";
+		$sql = "SELECT o_gedrec, o_id FROM ".TBLPREFIX."other WHERE o_gedrec REGEXP '[1-9] [[:alnum:]]+ @".$oldgid."@' AND o_file='".$gedid."'";
 		$res = NewQuery($sql);
 		if ($res) {
 			while ($row = $res->FetchAssoc()) {
@@ -1699,18 +1699,18 @@ function GetLinkedGedrecs($oldgid, $mtype, $ged) {
 	return $records;
 }
 
-function DeleteFamIfEmpty($famid, $change_id, $change_type, $ged="") {
+function DeleteFamIfEmpty($famid, $change_id, $change_type, $gedid="") {
 	global $GEDCOMID;
 	
-	if (empty($ged)) $ged = $GEDCOMID;
-	$famrec = FindFamilyRecord($famid, get_gedcom_from_id($ged));
+	if (empty($gedid)) $gedid = $GEDCOMID;
+	$famrec = FindFamilyRecord($famid, $gedid);
 	if (GetChangeData(true, $famid, true)) {
 		$rec = GetChangeData(false, $famid, true, "gedlines");
 		$famrec = $rec[$GEDCOMID][$famid];
 	}
 	$ct = preg_match("/1 CHIL|HUSB|WIFE/", $famrec);
 //	print $famrec."<br />".$ct."<br />";
-	if ($ct == 0) return ReplaceGedRec($famid, $famrec, "", "FAM", $change_id, $change_type, $ged);
+	if ($ct == 0) return ReplaceGedRec($famid, $famrec, "", "FAM", $change_id, $change_type, $gedid, "FAM");
 	else return true;
 }
 

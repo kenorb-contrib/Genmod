@@ -753,7 +753,7 @@ function GetSortableAddName($pid, $record="", $rev = false, $changes = false) {
  * @return string	The updated name
  */
 function StripPrefix($lastname){
-//	if (is_object($lastname)) print $pipo;
+
 	$name = preg_replace(array("/ [jJsS][rR]\.?,/", "/ I+,/", "/^[a-z. ]*/"), array(",",",",""), $lastname);
 	$name = trim($name);
 	return $name;

@@ -692,7 +692,7 @@ function SourceAddDescrSort($a, $b) {
  * @return int -1 if $a should be sorted first, 0 if they are the same, 1 if $b should be sorted first
  */
 function CompareFacts($a, $b) {
-	global $gm_lang, $ASC, $IGNORE_YEAR, $IGNORE_FACTS, $DEBUG, $USE_RTL_FUNCTIONS, $CIRCULAR_BASE;
+	global $gm_lang, $ASC, $IGNORE_YEAR, $IGNORE_FACTS, $USE_RTL_FUNCTIONS, $CIRCULAR_BASE;
 	if (!isset($ASC)) $ASC = 0;
 	if (!isset($IGNORE_YEAR)) $IGNORE_YEAR = 0;
 	if (!isset($IGNORE_FACTS)) $IGNORE_FACTS = 0;
@@ -711,7 +711,6 @@ function CompareFacts($a, $b) {
 	else $arec = $a;
 	if (is_array($b)) $brec = $b[1];
 	else $brec = $b;
-	if ($DEBUG) print "\n<br />".substr($arec,0,6)."==".substr($brec,0,6)." ";
 	
 	if (!$IGNORE_FACTS) {
 		$ft = preg_match("/1\s(\w+)(.*)/", $arec, $match);
@@ -822,7 +821,6 @@ function CompareFacts($a, $b) {
 	if ($USE_RTL_FUNCTIONS && isset($bdate[0]["ext"]) && strstr($bdate[0]["ext"], "#DHEBREW")!==false) $bdate = JewishGedcomDateToGregorian($bdate);
 	}
 
-	if ($DEBUG) print $adate[0]["year"]."==".$bdate[0]["year"]." ";
 	if ($adate[0]["year"]==$bdate[0]["year"] || $IGNORE_YEAR) {
 		// Check month
 		$montha = $adate[0]["mon"];
@@ -870,7 +868,6 @@ function CompareFacts($a, $b) {
 			return ($montha < $monthb) ? $bef : $aft;
 		}
 	}
-	if ($DEBUG) print (($adate[0]["year"] < $bdate[0]["year"]) ? $bef : $aft)." ";
 	return ($adate[0]["year"] < $bdate[0]["year"]) ? $bef : $aft;
 }
 

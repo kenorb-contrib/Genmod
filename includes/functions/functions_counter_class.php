@@ -47,27 +47,27 @@ abstract class CounterFunctions {
 				$object = null;
 				switch ($_SERVER["SCRIPT_NAME"]) {
 					case "/individual.php": 
-						$object = Person::GetInstance($pid);
+						$object =& Person::GetInstance($pid);
 						$type = "INDI";
 						break;
 					case "/family.php":
-						$object = Family::GetInstance($famid);
+						$object =& Family::GetInstance($famid);
 						$type = "FAM";
 						break;
 					case "/source.php": 
-						$object = Source::GetInstance($sid); 
+						$object =& Source::GetInstance($sid); 
 						$type = "SOUR";
 						break;
 					case "/repo.php": 
-						$object = Repository::GetInstance($rid); 
+						$object =& Repository::GetInstance($rid); 
 						$type = "REPO";
 						break;
 					case "/note.php": 
-						$object = Note::GetInstance($oid); 
+						$object =& Note::GetInstance($oid); 
 						$type = "NOTE";
 						break;
 					case "/mediadetail.php": 
-						$object = MediaItem::GetInstance($mid); 
+						$object =& MediaItem::GetInstance($mid); 
 						$type = "OBJE";
 						break;
 				}

@@ -32,7 +32,7 @@
  * Inclusion of the timeline controller
 */
 require("config.php");
-require("includes/functions/functions_charts.php");
+
 $controller = new TimelineController();
 
 $title = "";

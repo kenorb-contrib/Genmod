@@ -99,7 +99,10 @@ function CheckForImport($gedid) {
 function FindFamilyRecord($famid, $gedfile="", $renew = false) {
 	global $COMBIKEY;
 	global $GEDCOMID, $famlist, $COMBIKEY;
-//print "Old function called: FindFamilyRecord for ".$famid."<br />".$pipo;
+	
+	
+	if (DEBUG) print "Old function called: FindFamilyRecord for ".$famid."<br />".pipo;
+	
 	if (empty($famid)) return false;
 	if (empty($gedfile)) $gedfile = $GEDCOMID;
 	
@@ -141,7 +144,9 @@ function FindPersonRecord($pid, $gedfile="", $renew = false, $nocache = false) {
 	global $COMBIKEY;
 	global $GEDCOMID;
 	global $indilist;
-//print "Old function called: FindPersonRecord for ".$pid."<br />".$pipo;
+	
+	if (DEBUG) print "Old function called: FindPersonRecord for ".$pid."<br />".pipo;
+	
 	if (empty($pid)) return false;
 	if (empty($gedfile)) $gedfile = $GEDCOMID;
 	if (empty($gedfile)) return "";
@@ -187,7 +192,7 @@ function FindGedcomRecord($pid, $gedfile = "", $renew = false, $nocache = false)
 	global $GEDCOMID, $indilist, $famlist, $sourcelist, $otherlist, $repolist, $medialist;
 	global $GEDCOM_ID_PREFIX, $FAM_ID_PREFIX, $SOURCE_ID_PREFIX, $MEDIA_ID_PREFIX, $NOTE_ID_PREFIX;
 	
-// print "hit on findgecomrecord for: ".$pid."<br />".$pipo;
+ 	if (DEBUG) print "hit on findgecomrecord for: ".$pid."<br />".pipo;
 	if (empty($pid)) return false;
 	if (empty($gedfile)) $gedfile = $GEDCOMID;
 	if (!$renew) {
@@ -278,7 +283,8 @@ function FindGedcomRecord($pid, $gedfile = "", $renew = false, $nocache = false)
 function FindOtherRecord($oid, $gedfile="", $renew = false, $type="") {
 	global $gm_lang;
 	global $GEDCOMID, $otherlist;
-//print "Old function called: FindOtherRecord for ".$oid."<br />".$pipo;
+	
+	if (DEBUG) print "Old function called: FindOtherRecord for ".$oid."<br />".pipo;
 
 	if ($oid=="") return false;
 	if (empty($gedfile)) $gedfile = $GEDCOMID;
@@ -312,7 +318,8 @@ function FindOtherRecord($oid, $gedfile="", $renew = false, $type="") {
 function FindSourceRecord($sid, $gedfile="", $renew = false) {
 	global $gm_lang;
 	global $GEDCOMID, $sourcelist;
-//print "Old function called: FindSourceRecord for ".$sid."<br />".$pipo;
+	
+	if (DEBUG) print "Old function called: FindSourceRecord for ".$sid."<br />".pipo;
 
 	if ($sid=="") return false;
 	if (empty($gedfile)) $gedfile = $GEDCOMID;
@@ -367,7 +374,8 @@ function CheckExists($pid, $type="") {
  */
 function FindRepoRecord($rid, $gedfile="") {
 	global $GEDCOMID, $repolist;
-//print "Old function called: FindRepoRecord for ".$rid."<br />".$pipo;
+	
+	if (DEBUG) print "Old function called: FindRepoRecord for ".$rid."<br />".pipo;
 
 	if ($rid=="") return false;
 	if (empty($gedfile)) $gedfile = $GEDCOMID;
@@ -396,7 +404,8 @@ function FindRepoRecord($rid, $gedfile="") {
  */
 function FindMediaRecord($rid, $gedfile='', $renew = false) {
 	global $medialist, $GEDCOMID;
-//print "Old function called: FindMediaRecord for ".$rid."<br />".$pipo;
+	
+	if (DEBUG) print "Old function called: FindMediaRecord for ".$rid."<br />".pipo;
 	
 	if ($rid=="") return false;
 	if (empty($gedfile)) $gedfile = $GEDCOMID;
@@ -432,7 +441,7 @@ function FindFirstPerson() {
 	$res = NewQuery($sql);
 	$row = $res->FetchAssoc();
 	$res->FreeResult();
-	return $row["i_id"];
+	return $row["i_file"];
 }
 
 function FindSubmitter($gedid) {
@@ -1026,101 +1035,31 @@ function GetOtherList() {
 	$res->FreeResult();
 	return $otherlist;
 }
-
-/**
- * get place parent ID
- * @param array $parent
- * @param int $level
- * @return int
- */
-function GetPlaceParentId($parent, $level) {
-	global $GEDCOMID;
-
-	$parent_id=0;
-	for($i=0; $i<$level; $i++) {
-		$escparent=preg_replace("/\?/","\\\\\\?", DbLayer::EscapeQuery($parent[$i]));
-		$psql = "SELECT p_id FROM ".TBLPREFIX."places WHERE p_level=".$i." AND p_parent_id=$parent_id AND p_place LIKE '".$escparent."' AND p_file='".$GEDCOMID."' ORDER BY p_place";
-		$res = NewQuery($psql);
-		$row = $res->fetchRow();
-		$res->FreeResult();
-		if (empty($row[0])) break;
-		$parent_id = $row[0];
-	}
-	return $parent_id;
-}
-
-/**
- * Find all of the places in the hierarchy
- *
- * The $parent array holds the parent hierarchy of the places
- * we want to get.  The level holds the level in the hierarchy that
- * we are at.
- *
- * @package Genmod
- * @subpackage Places
- */
-function GetPlaceList() {
-	global $numfound, $j, $level, $parent, $found;
-	global $placelist, $positions, $GEDCOMID;
-
-	// --- find all of the place in the file
-	if ($level==0) $sql = "SELECT p_place FROM ".TBLPREFIX."places WHERE p_level=0 AND p_file='".$GEDCOMID."' ORDER BY p_place";
-	else {
-		$parent_id = GetPlaceParentId($parent, $level);
-		$sql = "SELECT p_place FROM ".TBLPREFIX."places WHERE p_level=$level AND p_parent_id=$parent_id AND p_file='".$GEDCOMID."' ORDER BY p_place";
-	}
-	$res = NewQuery($sql);
-	while ($row = $res->fetchRow()) {
-		$placelist[] = $row[0];
-		$numfound++;
-	}
-	$res->FreeResult();
-}
-
-/**
- * get all of the place connections
- * @param array $parent
- * @param int $level
- * @return array
- */
-function GetPlacePositions($parent, $level) {
-	global $positions, $GEDCOMID;
-
-	$p_id = GetPlaceParentId($parent, $level);
-	$sql = "SELECT DISTINCT pl_gid FROM ".TBLPREFIX."placelinks WHERE pl_p_id=$p_id AND pl_file='".$GEDCOMID."'";
-	$res = NewQuery($sql);
-	while ($row = $res->fetchRow()) {
-		$positions[] = $row[0];
-	}
-	return $positions;
-}
-
-//-- find all of the places
-function FindPlaceList($place) {
-	global $placelist, $indilist, $famlist, $sourcelist, $otherlist, $GEDCOMID;
-	
-	$sql = "SELECT p_id, p_place, p_parent_id  FROM ".TBLPREFIX."places WHERE p_file='".$GEDCOMID."' ORDER BY p_parent_id, p_id";
-	$res = NewQuery($sql);
-	while($row = $res->fetchRow()) {
-		if ($row[2]==0) $placelist[$row[0]] = $row[1];
-		else {
-			$placelist[$row[0]] = $placelist[$row[2]].", ".$row[1];
-		}
-	}
-	if (!empty($place)) {
-		$found = array();
-		foreach($placelist as $indexval => $pplace) {
-			if (preg_match("/$place/i", $pplace)>0) {
-				$upperplace = Str2Upper($pplace);
-				if (!isset($found[$upperplace])) {
-					$found[$upperplace] = $pplace;
-				}
+	//-- find all of the places
+	function FindPlaceList($place) {
+		global $placelist, $GEDCOMID;
+		
+		$sql = "SELECT p_id, p_place, p_parent_id  FROM ".TBLPREFIX."places WHERE p_file='".$GEDCOMID."' ORDER BY p_parent_id, p_id";
+		$res = NewQuery($sql);
+		while($row = $res->fetchRow()) {
+			if ($row[2]==0) $placelist[$row[0]] = $row[1];
+			else {
+				$placelist[$row[0]] = $placelist[$row[2]].", ".$row[1];
 			}
 		}
-		$placelist = array_values($found);
+		if (!empty($place)) {
+			$found = array();
+			foreach($placelist as $indexval => $pplace) {
+				if (preg_match("/$place/i", $pplace)>0) {
+					$upperplace = Str2Upper($pplace);
+					if (!isset($found[$upperplace])) {
+						$found[$upperplace] = $pplace;
+					}
+				}
+			}
+			$placelist = array_values($found);
+		}
 	}
-}
-
 
 //-- get the first character in the list
 function GetFamAlpha($allgeds="no") {
@@ -1609,7 +1548,7 @@ function AcceptChange($cid, $gedfile, $all=false) {
 				$sql = "select ch_cid from ".TBLPREFIX."changes where ch_gid = '".$details["gid"]."' AND ch_file = '".$details["file"]."'";
 				$res = NewQuery($sql);
 				while ($row = $res->FetchAssoc()) {
-					RejectChange($row["ch_cid"], $details["gedfile"]);
+					RejectChange($row["ch_cid"], $details["file"]);
 				}
 				
 			}
@@ -2877,7 +2816,7 @@ function GetLastChangeDate($type, $pid, $gedid, $head=false) {
 	if ($object->lastchanged != "") return $object->lastchanged;
 	
 	// if not found, take the header record of the gedcom
-	if ($head) $object = Header::GetInstance("HEAD", "", $gedid); 
+	if ($head) $object =& Header::GetInstance("HEAD", "", $gedid); 
 	// WriteToLog("Retrieved date and time from HEAD record", "I", "S");
 	return $object->lastchanged;
 }

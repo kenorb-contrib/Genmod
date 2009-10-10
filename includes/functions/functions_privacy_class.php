@@ -133,11 +133,11 @@ abstract class PrivacyFunctions {
 		}
 	
 		// If we found no dates then check the dates of close relatives.
-		if($CHECK_CHILD_DATES ) {
+		if($CHECK_CHILD_DATES) {
 			//-- check the parents for dates
 			$numfams = preg_match_all("/1\s*FAMC\s*@(.*)@/", $indirec, $fmatch, PREG_SET_ORDER);
 			for($j=0; $j<$numfams; $j++) {
-				$family = Family::GetInstance($fmatch[$j][1]);
+				$family =& Family::GetInstance($fmatch[$j][1]);
 				$parents = $family->parents;
 				if (is_object($parents["HUSB"])) {
 					$ct = preg_match_all("/\d DATE.*\s(\d{3,4})\s/", $parents["HUSB"]->gedrec, $match, PREG_SET_ORDER);
@@ -167,7 +167,7 @@ abstract class PrivacyFunctions {
 			$numfams = preg_match_all("/1\s*FAMS\s*@(.*)@/", $indirec, $fmatch, PREG_SET_ORDER);
 			for($j=0; $j<$numfams; $j++) {
 				// Get the family record
-				$family = Family::GetInstance($fmatch[$j][1]);
+				$family =& Family::GetInstance($fmatch[$j][1]);
 				//-- check for marriage date
 				$mardate = $family->marr_date;
 				if ($mardate != "") {
@@ -217,7 +217,7 @@ abstract class PrivacyFunctions {
 				$numfams = preg_match_all("/1\s*FAMS\s*@(.*)@/", $child->gedrec, $fmatch, PREG_SET_ORDER);
 				for($j=0; $j<$numfams; $j++) {
 					// Get the family record
-					$childfam = Family::GetInstance($fmatch[$j][1]);
+					$childfam =& Family::GetInstance($fmatch[$j][1]);
 					// Get the set of children
 					foreach ($childfam->children as $key2 => $grandchild) {
 						// Check each grandchild's dates

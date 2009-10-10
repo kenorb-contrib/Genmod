@@ -202,10 +202,10 @@ if ($action=="createuser") {
 											$oldrec = $match[0];
 											$newrec = preg_replace("/(\d _?EMAIL)[^\r\n]*/", "$1 ".$user->email, $subrec);
 										}
-										if ($subrec != $newrec) ReplaceGedrec($gedid, $subrec, $newrec, "EMAIL", $change_id, "edit_fact", $GEDCOMID);
+										if ($subrec != $newrec) ReplaceGedrec($gedid, $subrec, $newrec, "EMAIL", $change_id, "edit_fact", $GEDCOMID, "INDI");
 									}
 								}
-								if (!$found) ReplaceGedrec($gedid, "", "1 EMAIL ".$user->email."\r\n2 RESN privacy\r\n2 SOUR ".$sourstring."\r\n", "EMAIL", $change_id, "add_fact", $GEDCOMID);
+								if (!$found) ReplaceGedrec($gedid, "", "1 EMAIL ".$user->email."\r\n2 RESN privacy\r\n2 SOUR ".$sourstring."\r\n", "EMAIL", $change_id, "add_fact", $GEDCOMID, "INDI");
 							}
 						}
 					}
@@ -348,10 +348,10 @@ if ($action=="edituser2") {
 										$oldrec = $match[0];
 										$newrec = preg_replace("/(\d _?EMAIL)[^\r\n]*/", "$1 ".$newuser->email, $subrec);
 									}
-									if ($subrec != $newrec) ReplaceGedrec($gedid, $subrec, $newrec, "EMAIL", $change_id, "edit_fact", $GEDCOMID);
+									if ($subrec != $newrec) ReplaceGedrec($gedid, $subrec, $newrec, "EMAIL", $change_id, "edit_fact", $GEDCOMID, "INDI");
 								}
 							}
-							if (!$found) ReplaceGedrec($gedid, "", "1 EMAIL ".$newuser->email."\r\n2 RESN privacy\r\n2 SOUR ".$sourstring."\r\n", "EMAIL", $change_id, "add_fact", $GEDCOMID);
+							if (!$found) ReplaceGedrec($gedid, "", "1 EMAIL ".$newuser->email."\r\n2 RESN privacy\r\n2 SOUR ".$sourstring."\r\n", "EMAIL", $change_id, "add_fact", $GEDCOMID, "INDI");
 						}
 					}
 				}
@@ -1646,10 +1646,10 @@ if ($action == "massupdate2") {
 									$oldrec = $match[0];
 									$subrec = GetSubRecord($level, $oldrec, $indirec);
 									$newrec = preg_replace("/(\d _?EMAIL)[^\r\n]*/", "$1 ".$newuser->email, $subrec);
-									if ($subrec != $newrec) ReplaceGedrec($gedid, $subrec, $newrec, "EMAIL", $change_id, "edit_fact", $GEDCOMID);
+									if ($subrec != $newrec) ReplaceGedrec($gedid, $subrec, $newrec, "EMAIL", $change_id, "edit_fact", $GEDCOMID, "INDI");
 								}
 								else {
-									ReplaceGedrec($gedid, "", "1 EMAIL ".$newuser->email."\r\n2 RESN privacy2 SOUR Genmod user administration\r\n", "EMAIL", $change_id, "add_fact", $GEDCOMID);
+									ReplaceGedrec($gedid, "", "1 EMAIL ".$newuser->email."\r\n2 RESN privacy2 SOUR Genmod user administration\r\n", "EMAIL", $change_id, "add_fact", $GEDCOMID, "INDI");
 								}
 							}
 						}

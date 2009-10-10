@@ -35,11 +35,6 @@
 require("config.php");
 
 /**
- * Inclusion of the chart functions
-*/
-require("includes/functions/functions_charts.php");
-
-/**
  * print a child ascendancy
  *
  * @param string $pid individual Gedcom Id
@@ -60,7 +55,7 @@ function print_child_ascendancy($pid, $sosa, $depth) {
 	print_pedigree_person($pid, 1, $view!="preview");
 	print "</td>";
 	print "<td style=\"vertical-align:middle;\">";
-	if ($sosa>1) PrintUrlArrow($pid, "?rootid=$pid&amp;PEDIGREE_GENERATIONS=$OLD_PGENS&amp;show_full=$show_full&amp;box_width=$box_width&amp;chart_style=$chart_style", $gm_lang["ancestry_chart"], 3);
+	if ($sosa>1) ChartFunctions::PrintUrlArrow($pid, "?rootid=$pid&amp;PEDIGREE_GENERATIONS=$OLD_PGENS&amp;show_full=$show_full&amp;box_width=$box_width&amp;chart_style=$chart_style", $gm_lang["ancestry_chart"], 3);
 	print "</td>";
 	print "<td class=\"details1\" style=\"vertical-align:middle;\">&nbsp;<span class=\"person_box". (($sosa==1) ? "NN" : (($sosa%2) ? "F" : "")) . "\">&nbsp;$sosa&nbsp;</span>&nbsp;";
 	print "</td><td class=\"details1\" style=\"vertical-align:middle;\">";
@@ -125,7 +120,7 @@ $OLD_PGENS = $PEDIGREE_GENERATIONS;
 
 if (!isset($rootid)) $rootid = "";
 $rootid = CleanInput($rootid);
-$rootid = CheckRootId($rootid);
+$rootid = ChartFunctions::CheckRootId($rootid);
 
 // -- size of the boxes
 if (!isset($box_width)) $box_width = "100";
@@ -281,16 +276,16 @@ if ($chart_style) {
 	<br />
 END;
 	// process the tree
-	$treeid = PedigreeArray($rootid);
+	$treeid = ChartFunctions::PedigreeArray($rootid, $PEDIGREE_GENERATIONS);
 	$treesize = pow(2, (int)($PEDIGREE_GENERATIONS))-1;
 	for ($i = 0; $i < $treesize; $i++) {
 		$pid = $treeid[$i];
 		if ($pid) {
 			$famids = FindFamilyIds($pid);
 			$parents = @FindParents($famids[0]["famid"]);
-			if ($parents) PrintSosaFamily($famids[0]["famid"], $pid, $i + 1);
+			if ($parents) ChartFunctions::PrintSosaFamily($famids[0]["famid"], $pid, $i + 1);
 			// show empty family only if it is the first and only one
-			else if ($i == 0) PrintSosaFamily("", $pid, $i + 1);
+			else if ($i == 0) ChartFunctions::PrintSosaFamily("", $pid, $i + 1);
 		}
 	}
 }

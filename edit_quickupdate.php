@@ -196,7 +196,7 @@ if ($action=="update") {
 						//-- delete the fact
 						if ($REMS[$j]==1) { 
 //							$famupdate = true;
-							if (ReplaceGedrec($match[1], $oldfac, "", $fact, $change_id, $change_type)) $famupdate = true;
+							if (ReplaceGedrec($match[1], $oldfac, "", $fact, $change_id, $change_type, "", "FAM")) $famupdate = true;
 							$famrec = substr($famrec, 0, $pos1) . "\r\n". substr($famrec, $pos2);
 //							print "sfamupdate_del [".$factrec."]{".$oldfac."}";
 						}
@@ -242,7 +242,7 @@ if ($action=="update") {
 							if (trim($factrec) != trim($oldfac)) {
 //Print "<br />This record will be updated";								
 //								$famupdate = true;
-								if (ReplaceGedrec($match[1], $oldfac, $factrec, $fact, $change_id, $change_type)) $famupdate = true;
+								if (ReplaceGedrec($match[1], $oldfac, $factrec, $fact, $change_id, $change_type, "", "FAM")) $famupdate = true;
 
 								$famrec = substr($famrec, 0, $pos1) . trim($factrec)."\r\n" . substr($famrec, $pos2);
 //			print "sfamupdate3 [".$factrec."]{".$oldfac."}";
@@ -251,7 +251,7 @@ if ($action=="update") {
 					}
 				}
 				else if (!empty($factrec)) {
-					if (ReplaceGedrec($match[1], "", $factrec, $fact, $change_id, $change_type)) $famupdate = true;
+					if (ReplaceGedrec($match[1], "", $factrec, $fact, $change_id, $change_type, "", "FAM")) $famupdate = true;
 					$famrec .= "\r\n".$factrec;
 //					$famupdate = true;
 //						print "sfamupdate2";
@@ -331,7 +331,7 @@ if ($action=="update") {
 	if ($namerec != $oldnamerec) {
 		if (empty($oldnamerec)) $type = "add_name";
 		else $type = "edit_name";
-		if (ReplaceGedrec($pid, $oldnamerec, $namerec, "NAME", $change_id, $type)) $updated = true;
+		if (ReplaceGedrec($pid, $oldnamerec, $namerec, "NAME", $change_id, $type, "", "INDI")) $updated = true;
 	}
 	
 	//-- update the person's gender

@@ -58,6 +58,7 @@ class Person extends GedcomRecord {
 	
 	public $sexdetails = array();	 		// Set by individual controller
 	public $label = array();				// Set for relatives relation
+	private $names_read = null;				// Set to indicate that this object has read it's names. None can be added.
 	
 	private $childfamilies = null;  		// container for array of family objects where this person is child
 	private $primaryfamily = null;			// The xref of the parent family that is set as primary for this person
@@ -193,7 +194,7 @@ class Person extends GedcomRecord {
 				$this->isdead = $value;
 				break;
 			case "addname":
-				$this->name_array[] = $value;
+				if ($this->names_read != true) $this->name_array[] = $value;
 				break;
 			default:
 				parent::__set($property, $value);
@@ -264,7 +265,7 @@ class Person extends GedcomRecord {
 	}
 
 	private function getNameArray() {
-		
+
 		if (is_null($this->name_array)) {
 			if ($this->show_changes && $this->ThisChanged()) $gedrec = $this->GetChangedGedRec();
 			else $gedrec = $this->gedrec;
@@ -276,7 +277,7 @@ class Person extends GedcomRecord {
 	private function GetSortableName() {
 		
 		if (is_null($this->sortable_name)) {
-			if ($this->show_changes && $this->ThisChanged()) $this->sortable_name = NameFunctions::GetSortableName($this->xref, "", "", false, false, true);
+			if ($this->show_changes && $this->ThisChanged()) $this->sortable_name = NameFunctions::GetSortableName($this, "", "", false, false, true);
 			else $this->sortable_name = NameFunctions::GetSortableName($this);
 		}
 		return $this->sortable_name;
@@ -1265,7 +1266,7 @@ if ($this->tracefacts) print "AddSpouseFacts - Adding for ".$fam->$spperson->xre
 			$fams = $this->getChildFamilyIds();
 			$this->childfamilies = array();
 			foreach($fams as $key=>$ffamid) {
-				$famid = $ffamid["famid"];
+			$famid = $ffamid["famid"];
 				if (!empty($famid)) {
 					$family =& Family::GetInstance($famid);
 					if ($family->DisplayDetails()) {
@@ -1287,10 +1288,10 @@ if ($this->tracefacts) print "AddSpouseFacts - Adding for ".$fam->$spperson->xre
 			if (is_null($this->childfamilies)) $this->GetChildFamilies();
      		$priority = array();
 			foreach ($this->childfamilies as $id => $family) {
-				if (!isset($priority["first"])) $priority["first"]=$id;
+				if (!isset($priority["first"])) $priority["first"] = $id;
 				$priority["last"]=$id;
 				if ($family->showprimary) {
-					if (!isset($priority["primary"])) $priority["primary"]=$id;
+					if (!isset($priority["primary"])) $priority["primary"] = $id;
 				}
 				$relation = $family->pedigreetype;
 				switch ($relation) {
@@ -1516,8 +1517,7 @@ if ($this->tracefacts) print "AddSpouseFacts - Adding for ".$fam->$spperson->xre
 			if (begRTLText($this->GetSortableName())) print "<li class=\"rtl\" dir=\"rtl\">";
 			else print "<li class=\"ltr\" dir=\"ltr\">";
 		}
-		
-		if (HasChinese($this->name_array[0][0])) $addname = " (".$this->GetSortableAddName().")";
+		if (HasChinese($this->name_array[0][0])) $addname = "&nbsp;(".$this->GetSortableAddName().")";
 		else $addname = "";
 		print "<a href=\"individual.php?pid=".$this->xref."&amp;gedid=".$this->gedcomid."\" class=\"list_item\"><b>";
 		print CheckNN($this->GetSortableName()).$addname."</b>".$this->addxref;
@@ -1559,7 +1559,7 @@ if ($this->tracefacts) print "AddSpouseFacts - Adding for ".$fam->$spperson->xre
 
 	protected function ReadPersonRecord() {
 		
-		$sql = "SELECT i_key, i_gedrec, i_isdead, i_file, n_name, n_surname, n_letter, n_type FROM ".TBLPREFIX."individuals, ".TBLPREFIX."names WHERE i_key='".DbLayer::EscapeQuery(JoinKey($this->xref, $this->gedcomid))."' AND i_key=n_key";
+		$sql = "SELECT i_key, i_gedrec, i_isdead, i_file, n_name, n_surname, n_letter, n_type FROM ".TBLPREFIX."individuals, ".TBLPREFIX."names WHERE i_key='".DbLayer::EscapeQuery(JoinKey($this->xref, $this->gedcomid))."' AND i_key=n_key ORDER BY n_id";
 		$res = NewQuery($sql);
 		if ($res) {
 			if ($res->NumRows() != 0) {
@@ -1572,6 +1572,7 @@ if ($this->tracefacts) print "AddSpouseFacts - Adding for ".$fam->$spperson->xre
 				}
 			}
 		}
+		$this->names_read = true;
 	}
 	
 	protected function showLivingName() {

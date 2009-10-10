@@ -40,6 +40,7 @@ if (stristr($_SERVER["SCRIPT_NAME"],basename(__FILE__))) {
  */
 abstract class BaseController {
 	public $classname = "BaseController";	// Name of this class
+	protected $action = "";					// Requested action to perform
 	protected $view = "";					// View mode of the page (preview or blank)
 	protected $xref = null;					// Xref of the record that is loaded by the child controller
 	protected $gedcomid = null;				// Active gedcomid while loading the child controller
@@ -53,7 +54,7 @@ abstract class BaseController {
 		global $show_changes, $gm_user, $GEDCOMID;
 		
 		if (isset($_REQUEST["view"])) $this->view = $_REQUEST["view"];
-		if (!empty($_REQUEST["action"])) $this->action = $_REQUEST["action"];
+		if (isset($_REQUEST["action"])) $this->action = $_REQUEST["action"];
 		
 		$this->show_changes = $show_changes;
 		
@@ -67,6 +68,9 @@ abstract class BaseController {
 		switch($property) {
 			case "view":
 				return $this->view;
+				break;
+			case "action":
+				return $this->action;
 				break;
 			case "xref":
 				return $this->xref;

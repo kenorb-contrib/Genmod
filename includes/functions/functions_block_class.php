@@ -68,7 +68,7 @@ abstract class BlockFunctions {
 	
 	public function GetCachedEvents($action, $daysprint, $filter, $onlyBDM="no", $skipfacts) {
 		global $gm_lang, $month, $year, $day, $monthtonum, $monthstart;
-		global $GEDCOMID, $DEBUG, $ASC, $IGNORE_FACTS, $IGNORE_YEAR;
+		global $GEDCOMID, $ASC, $IGNORE_FACTS, $IGNORE_YEAR;
 		global $USE_RTL_FUNCTIONS, $DAYS_TO_SHOW_LIMIT;
 		global $CIRCULAR_BASE;
 		

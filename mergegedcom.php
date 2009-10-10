@@ -992,7 +992,8 @@ print "<form enctype=\"multipart/form-data\" method=\"post\" name=\"configform\"
 						//-- import anything that is not a blob
 						if (preg_match("/\n1 BLOB/", $indirec)==0) {
 							$gid = ImportFunctions::ImportRecord($indirec);
-							$place_count += ImportFunctions::UpdatePlaces($gid, $indirec);
+							$type = GetRecType($indirec);
+							$place_count += ImportFunctions::UpdatePlaces($gid, $type, $indirec);
 							$date_count += ImportFunctions::UpdateDates($gid, $indirec);
 						}
 						else WriteToLog("MergeGedcom -> Import skipped a aecord with a BLOB tag: ".$indirec, "E", "G", get_gedcomid_from_file($FILE));

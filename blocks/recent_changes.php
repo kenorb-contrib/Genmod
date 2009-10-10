@@ -39,7 +39,7 @@ $GM_BLOCKS["print_recent_changes"]["rss"]       = true;
 **/
 function print_recent_changes($block=true, $config="", $side, $index) {
 	global $gm_lang, $month, $year, $day, $monthtonum, $HIDE_LIVE_PEOPLE, $SHOW_ID_NUMBERS, $command, $TEXT_DIRECTION, $SHOW_FAM_ID_NUMBERS;
-	global $GM_IMAGE_DIR, $GM_IMAGES, $GEDCOMID, $DEBUG, $ASC, $IGNORE_FACTS, $IGNORE_YEAR, $TOTAL_QUERIES, $LAST_QUERY, $GM_BLOCKS, $SHOW_SOURCES;
+	global $GM_IMAGE_DIR, $GM_IMAGES, $GEDCOMID, $ASC, $IGNORE_FACTS, $IGNORE_YEAR, $TOTAL_QUERIES, $LAST_QUERY, $GM_BLOCKS, $SHOW_SOURCES;
 	global $medialist, $gm_user;
 
 	$block = true;			// Always restrict this block's height
@@ -87,7 +87,7 @@ function print_recent_changes($block=true, $config="", $side, $index) {
 		$lastgid="";
 		foreach($found_facts as $index=>$factarr) {
 			if ($factarr[2]=="INDI") {
-				$person = Person::GetInstance($factarr[0]);
+				$person =& Person::GetInstance($factarr[0]);
 				$fact = New Fact($person->xref, $factarr[3], $factarr[1]);
 				if ($lastgid != $person->xref) {
 					print "<a href=\"individual.php?pid=".$person->xref."&amp;gedid=".$person->gedcomid."\"><b>";
@@ -113,7 +113,7 @@ function print_recent_changes($block=true, $config="", $side, $index) {
 			}
 
 			if ($factarr[2]=="FAM") {
-				$family = Family::GetInstance($factarr[0]);
+				$family =& Family::GetInstance($factarr[0]);
 				$fact = New Fact($family->xref, $factarr[3], $factarr[1]);
 				if ($lastgid != $family->xref) {
 					print "<a href=\"family.php?famid=".$family->xref."&amp;gedid=".$family->gedcomid."\"><b>";

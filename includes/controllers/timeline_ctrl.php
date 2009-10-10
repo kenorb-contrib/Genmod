@@ -69,7 +69,7 @@ class TimelineControllerRoot extends BaseController {
 		if (!isset($_REQUEST['pids'])){
 			$this->pids=array();
 			if (!empty($newpid)) $this->pids[] = $newpid;
-			else $this->pids[] = CheckRootId("");
+			else $this->pids[] = ChartFunctions::CheckRootId("");
 		}
 		else {
 			$this->pids = $_REQUEST['pids'];

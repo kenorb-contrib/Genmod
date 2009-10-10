@@ -24,21 +24,21 @@
  * @version $Id$
  */
 
-$theme_name = "Clear";		//-- the name of this theme
+$theme_name = "Clear";								//-- the name of this theme
 
-$stylesheet = $THEME_DIR."style.css";	//-- CSS level 2 stylesheet to use
-$rtl_stylesheet = $THEME_DIR."style_rtl.css";           //-- CSS level 2 stylesheet to use
-$mail_stylesheet = $THEME_DIR."style_mail.css";           //-- CSS level 2 stylesheet to use
-$print_stylesheet = $THEME_DIR."print.css";	//-- CSS level 2 print stylesheet to use
-$toplinks = $THEME_DIR."toplinks.html";	//-- File to display the icons and links to different sections
-$menubar = $THEME_DIR."menubar.php";	//-- File to display the top menu
-$headerfile = $THEME_DIR."header.html";	//-- Header information for the site
-$footerfile = $THEME_DIR."footer.html";	//-- Footer information for the site
+$stylesheet = $THEME_DIR."style.css";				//-- CSS level 2 stylesheet to use
+$rtl_stylesheet = $THEME_DIR."style_rtl.css";       //-- CSS level 2 stylesheet to use
+$mail_stylesheet = $THEME_DIR."style_mail.css";     //-- CSS level 2 stylesheet to use
+$print_stylesheet = $THEME_DIR."print.css";			//-- CSS level 2 print stylesheet to use
+$toplinks = $THEME_DIR."toplinks.html";				//-- File to display the icons and links to different sections
+$menubar = $THEME_DIR."menubar.php";				//-- File to display the top menu
+$headerfile = $THEME_DIR."header.html";				//-- Header information for the site
+$footerfile = $THEME_DIR."footer.html";				//-- Footer information for the site
 $print_footerfile = $THEME_DIR."print_footer.html";	//-- Print Preview Footer information for the site
 $print_headerfile = $THEME_DIR."print_header.html";	//-- Print Preview Header information for the site
 
-$GM_USE_HELPIMG = true;		// set to true to use image for help questionmark, set to false to use $gm_lang["qm"]
-$GM_IMAGE_DIR = "images";		//-- directory to look for images
+$GM_USE_HELPIMG = true;								// set to true to use image for help questionmark, set to false to use $gm_lang["qm"]
+$GM_IMAGE_DIR = "images";							//-- directory to look for images
 
 //-- variables for image names
 //- GM main icons
@@ -178,7 +178,7 @@ $bxspacing = 4;		// -- horizontal spacing between boxes on the pedigree chart
 $byspacing = 4;		// -- vertical spacing between boxes on the pedigree chart
 
 // -- global variables for the descendancy chart
-$Dbaseyoffset = 0;	// -- position the entire descendancy tree relative to the top of the page
+$Dbaseyoffset = 0;		// -- position the entire descendancy tree relative to the top of the page
 $Dbasexoffset = 0;		// -- position the entire descendancy tree relative to the left of the page
 $Dbxspacing = 0;		// -- horizontal spacing between boxes
 $Dbyspacing = 1;		// -- vertical spacing between boxes
