@@ -1592,7 +1592,7 @@ if ($action=="general") {
 	    		}
   		  	}
 			print "\n\t<table class=\"list_table $TEXT_DIRECTION\">\n\t\t<tr><td class=\"shade2 center\"";
-			$note_count = count($controller->notelist);
+			$note_count = count($note_controller->notelist);
 			if($note_count > 12) print " colspan=\"2\"";
 			print "><img src=\"".$GM_IMAGE_DIR."/".$GM_IMAGES["note"]["other"]."\" border=\"0\" alt=\"".$gm_lang["notes"]."\" />&nbsp;&nbsp;";
 			print $gm_lang["notes"];
