@@ -35,7 +35,7 @@ require("config.php");
 */
 $source_controller = new SourceController();
 
-print_header($source_controller->pagetitle);
+PrintHeader($source_controller->pagetitle);
 
 $source_controller->CheckNoResult($gm_lang["source_not_found"]);
 
@@ -51,7 +51,7 @@ $source_controller->CheckRawEdited();
 	<tr>
 		<td>
 		<span class="name_head"><?php print PrintReady($source_controller->source->title.$source_controller->source->addxref);?></span><br />
-		<?php if($SHOW_COUNTER) print "\n<br /><br /><span style=\"margin-left: 3px;\">".$gm_lang["hit_count"]."&nbsp;".$hits."</span>\n"; ?>
+		<?php if(GedcomConfig::$SHOW_COUNTER) print "\n<br /><br /><span style=\"margin-left: 3px;\">".$gm_lang["hit_count"]."&nbsp;".$hits."</span>\n"; ?>
 		</td>
 	</tr>
 	<tr>
@@ -61,5 +61,5 @@ $source_controller->CheckRawEdited();
 // Print the tab doors
 $source_controller->PrintTabs();
 
-print_footer();
+PrintFooter();
 ?>

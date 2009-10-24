@@ -38,10 +38,10 @@ $GM_BLOCKS["review_changes_block"]["rss"]       = false;
  * Prints a block allowing the user review all changes pending approval
  */
 function review_changes_block($block = true, $config="", $side, $index) {
-	global $gm_lang, $GEDCOMID, $GEDCOMS, $command, $SCRIPT_NAME, $QUERY_STRING, $GM_IMAGE_DIR, $GM_IMAGES;
-	global $gm_changes, $LAST_CHANGE_EMAIL, $ALLOW_EDIT_GEDCOM, $TEXT_DIRECTION, $SHOW_SOURCES, $TIME_FORMAT, $GM_BLOCKS, $gm_user;
+	global $gm_lang, $GEDCOMID, $GEDCOMS, $command, $SCRIPT_NAME, $QUERY_STRING, $GM_IMAGES;
+	global $gm_changes, $TEXT_DIRECTION, $SHOW_SOURCES, $TIME_FORMAT, $GM_BLOCKS, $gm_user;
 
-	if (!$ALLOW_EDIT_GEDCOM) return;
+	if (!GedcomConfig::$ALLOW_EDIT_GEDCOM) return;
 
 	if (empty($config)) $config = $GM_BLOCKS["review_changes_block"]["config"];
 
@@ -89,7 +89,7 @@ function review_changes_block($block = true, $config="", $side, $index) {
 				if ($command=="gedcom") $name = preg_replace("/'/", "\'", get_gedcom_from_id($GEDCOMID));
 				else $name = $gm_user->username;
 				print "<a href=\"javascript: ".$gm_lang["config_block"]."\" onclick=\"window.open('index_edit.php?name=$name&amp;command=$command&amp;action=configure&amp;side=$side&amp;index=$index', '', 'top=50,left=50,width=500,height=250,scrollbars=1,resizable=1'); return false;\">";
-				print "<img class=\"adminicon\" src=\"$GM_IMAGE_DIR/".$GM_IMAGES["admin"]["small"]."\" width=\"15\" height=\"15\" border=\"0\" alt=\"".$gm_lang["config_block"]."\" /></a>\n";
+				print "<img class=\"adminicon\" src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["admin"]["small"]."\" width=\"15\" height=\"15\" border=\"0\" alt=\"".$gm_lang["config_block"]."\" /></a>\n";
 			}
 		}
 		print $gm_lang["review_changes"];
@@ -97,15 +97,15 @@ function review_changes_block($block = true, $config="", $side, $index) {
 		print "<div class=\"blockcontent\">";
 		if ($gm_user->userCanAccept()) print "<a href=\"#\" onclick=\"window.open('edit_changes.php','','width=600,height=600,resizable=1,scrollbars=1'); return false;\">".$gm_lang["accept_changes"]."</a><br />\n";
 		if ($block) print "<div class=\"small_inner_block, $TEXT_DIRECTION\">\n";
-		if ($config["sendmail"]=="yes" && $LAST_CHANGE_EMAIL != 0) {
-			$day = date("j", $LAST_CHANGE_EMAIL);
-			$mon = date("M", $LAST_CHANGE_EMAIL);
-			$year = date("Y", $LAST_CHANGE_EMAIL);
-			print $gm_lang["last_email_sent"].GetChangedDate("$day $mon $year")." - ".date($TIME_FORMAT, $LAST_CHANGE_EMAIL)."<br />\n";
-			$day = date("j", $LAST_CHANGE_EMAIL+(60*60*24*$config["days"]));
-			$mon = date("M", $LAST_CHANGE_EMAIL+(60*60*24*$config["days"]));
-			$year = date("Y", $LAST_CHANGE_EMAIL+(60*60*24*$config["days"]));
-			print $gm_lang["next_email_sent"].GetChangedDate("$day $mon $year")." - ".date($TIME_FORMAT, $LAST_CHANGE_EMAIL+(60*60*24*$config["days"]))."<br /><br />\n";
+		if ($config["sendmail"]=="yes" && GedcomConfig::$LAST_CHANGE_EMAIL != 0) {
+			$day = date("j", GedcomConfig::$LAST_CHANGE_EMAIL);
+			$mon = date("M", GedcomConfig::$LAST_CHANGE_EMAIL);
+			$year = date("Y", GedcomConfig::$LAST_CHANGE_EMAIL);
+			print $gm_lang["last_email_sent"].GetChangedDate("$day $mon $year")." - ".date($TIME_FORMAT, GedcomConfig::$LAST_CHANGE_EMAIL)."<br />\n";
+			$day = date("j", GedcomConfig::$LAST_CHANGE_EMAIL+(60*60*24*$config["days"]));
+			$mon = date("M", GedcomConfig::$LAST_CHANGE_EMAIL+(60*60*24*$config["days"]));
+			$year = date("Y", GedcomConfig::$LAST_CHANGE_EMAIL+(60*60*24*$config["days"]));
+			print $gm_lang["next_email_sent"].GetChangedDate("$day $mon $year")." - ".date($TIME_FORMAT, GedcomConfig::$LAST_CHANGE_EMAIL+(60*60*24*$config["days"]))."<br /><br />\n";
 		}
 		$gm_changes = GetChangeData(false, "", true, "gedlines");
 		foreach($gm_changes as $gedcomid=>$changes) {

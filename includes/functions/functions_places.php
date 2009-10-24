@@ -43,7 +43,7 @@ if (stristr($_SERVER["SCRIPT_NAME"],basename(__FILE__))) {
  * @param string $element_id	id of PLAC input element in the form
  */
 function print_place_subfields($element_id) {
-	global $gm_lang, $GM_IMAGE_DIR, $GM_IMAGES, $lang_short_cut, $LANGUAGE;
+	global $gm_lang, $GM_IMAGES, $lang_short_cut, $LANGUAGE;
 	global $countries;
 
 	if ($element_id=="DEAT_PLAC") return; // known bug - waiting for a patch
@@ -237,7 +237,7 @@ function print_place_subfields($element_id) {
 	closedir($handle);
 
 	$cols=40;
-	print "&nbsp;<a href=\"javascript: ".$gm_lang["show_details"]."\" onclick=\"expand_layer('".$element_id."_div'); toggleplace('".$element_id."'); return false;\"><img id=\"".$element_id."_div_img\" src=\"".$GM_IMAGE_DIR."/".$GM_IMAGES["plus"]["other"]."\" border=\"0\" width=\"11\" height=\"11\" alt=\"\" title=\"\" />&nbsp;</a>";
+	print "&nbsp;<a href=\"javascript: ".$gm_lang["show_details"]."\" onclick=\"expand_layer('".$element_id."_div'); toggleplace('".$element_id."'); return false;\"><img id=\"".$element_id."_div_img\" src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["plus"]["other"]."\" border=\"0\" width=\"11\" height=\"11\" alt=\"\" title=\"\" />&nbsp;</a>";
 	print "<br /><div id=\"".$element_id."_div\" style=\"display: none; border-width:thin; border-style:none; padding:0px\">\n";
 	// subtags creation : _0 _1 _2 etc...
 	$icountry=-1;
@@ -287,7 +287,7 @@ function print_place_subfields($element_id) {
 		else {
 			if ($icountry<$i and $i<=$icity) {
 				$text = $gm_lang["autocomplete"];
-				if (isset($GM_IMAGES["autocomplete"]["button"])) $Link = "<img id=\"".$subtagid."_auto\" name=\"".$subtagname."_auto\" src=\"".$GM_IMAGE_DIR."/".$GM_IMAGES["autocomplete"]["button"]."\" alt=\"".$text."\" title=\"".$text."\" />";
+				if (isset($GM_IMAGES["autocomplete"]["button"])) $Link = "<img id=\"".$subtagid."_auto\" name=\"".$subtagname."_auto\" src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["autocomplete"]["button"]."\" alt=\"".$text."\" title=\"".$text."\" />";
 				else $Link = $text;
 				print "&nbsp;".$Link."&nbsp;";
 			}

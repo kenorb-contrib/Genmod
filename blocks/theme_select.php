@@ -33,9 +33,9 @@ $GM_BLOCKS["print_block_theme_select"]["canconfig"]	= false;
 $GM_BLOCKS["print_block_theme_select"]["rss"]       = false;
 
 function print_block_theme_select($style=0, $config="", $side, $index) {
-	global $ALLOW_THEME_DROPDOWN, $ALLOW_USER_THEMES, $THEME_DIR, $gm_lang, $gm_user, $themeformcount;
+	global $ALLOW_USER_THEMES, $gm_lang, $gm_user, $themeformcount;
 	
-	if ($ALLOW_THEME_DROPDOWN && $ALLOW_USER_THEMES) {
+	if (GedcomConfig::$ALLOW_THEME_DROPDOWN && $ALLOW_USER_THEMES) {
 		print "<div id=\"theme_select\" class=\"block\">\n";
 		print "<div class=\"blockhc\">";
 		print_help_link("change_theme", "qm", "change_theme");
@@ -58,7 +58,7 @@ function print_block_theme_select($style=0, $config="", $side, $index) {
 						if ($themedir["dir"] == $gm_user->theme) print " class=\"selected-option\"";
 				}
 				else {
-						 if ($themedir["dir"] == $THEME_DIR) print " class=\"selected-option\"";
+						 if ($themedir["dir"] == GedcomConfig::$THEME_DIR) print " class=\"selected-option\"";
 				}
 				print ">".$themedir["name"]."</option>\n";
 		}

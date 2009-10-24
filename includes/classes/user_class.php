@@ -278,11 +278,11 @@ class User {
 	* @return boolean true if user can edit false if they cannot
 	*/
 	public function userCanEdit($gedid="") {
-		global $ALLOW_EDIT_GEDCOM, $GEDCOMID;
+		global $GEDCOMID;
 
 		if (empty($gedid)) $gedid = $GEDCOMID;
 
-		if (!$ALLOW_EDIT_GEDCOM) return false;
+		if (!GedcomConfig::$ALLOW_EDIT_GEDCOM) return false;
 		if ($this->username == "empty" || $this->username == "") return false;
 		
 		// Site admins can edit all
@@ -304,11 +304,11 @@ class User {
 	* @return boolean true if user can accept false if user cannot accept
 	*/ 
 	public function userCanAccept($gedid="") {
-		global $ALLOW_EDIT_GEDCOM, $GEDCOMID;
+		global $GEDCOMID;
 
 		if (empty($gedid)) $gedid = $GEDCOMID;
 
-		if (!$ALLOW_EDIT_GEDCOM) return false;
+		if (!GedcomConfig::$ALLOW_EDIT_GEDCOM) return false;
 		if ($this->username == "") return false;
 		
 		// Site admins can accept all
@@ -342,19 +342,19 @@ class User {
 	* @return 		boolean					Return true or false as a result
 	*/ 
 	public function userCanViewGedlines($gedid="") {
-		global $GEDCOMID, $SHOW_GEDCOM_RECORD;
+		global $GEDCOMID;
 		
 		if ($this->username == "empty" || $this->username == "") return false;
 
 		if (empty($gedid)) $gedid = $GEDCOMID;
 		
-		if ($SHOW_GEDCOM_RECORD == -1) return false;
-		if ($SHOW_GEDCOM_RECORD == 0) return true;
-		if ($SHOW_GEDCOM_RECORD == 1 && $this->UserPrivAccess($gedid)) return true;
-		if ($SHOW_GEDCOM_RECORD == 2 && $this->UserCanEdit($gedid)) return true;
-		if ($SHOW_GEDCOM_RECORD == 3 && $this->UserCanAccept($gedid)) return true;
-		if ($SHOW_GEDCOM_RECORD == 4 && $this->UserGedcomAdmin($gedid)) return true;
-		if ($SHOW_GEDCOM_RECORD == 5 && $this->UserIsAdmin()) return true;
+		if (GedcomConfig::$SHOW_GEDCOM_RECORD == -1) return false;
+		if (GedcomConfig::$SHOW_GEDCOM_RECORD == 0) return true;
+		if (GedcomConfig::$SHOW_GEDCOM_RECORD == 1 && $this->UserPrivAccess($gedid)) return true;
+		if (GedcomConfig::$SHOW_GEDCOM_RECORD == 2 && $this->UserCanEdit($gedid)) return true;
+		if (GedcomConfig::$SHOW_GEDCOM_RECORD == 3 && $this->UserCanAccept($gedid)) return true;
+		if (GedcomConfig::$SHOW_GEDCOM_RECORD == 4 && $this->UserGedcomAdmin($gedid)) return true;
+		if (GedcomConfig::$SHOW_GEDCOM_RECORD == 5 && $this->UserIsAdmin()) return true;
 		return false;
 	}
 
@@ -366,31 +366,31 @@ class User {
 	* @return 		boolean					Return true or false as a result
 	*/ 
 	public function userCanEditGedlines($username="", $gedid="") {
-		global $GEDCOMID, $ALLOW_EDIT_GEDCOM, $EDIT_GEDCOM_RECORD;
+		global $GEDCOMID;
 		
 		if (empty($gedid)) $gedid = $GEDCOMID;
 		$can = false;
 		SwitchGedcom($gedid);
-		if ($ALLOW_EDIT_GEDCOM) {
+		if (GedcomConfig::$ALLOW_EDIT_GEDCOM) {
 			if ($this->username == "empty" || $this->username == "") $can = false;
 			// Note: options 0 and 1 are not configurable in the settings.
-			elseif ($EDIT_GEDCOM_RECORD == -1) $can = false;
-			elseif ($EDIT_GEDCOM_RECORD == 0) $can = true;
-			elseif ($EDIT_GEDCOM_RECORD == 1 && $this->UserPrivAccess($GEDCOMID)) $can = true;
-			elseif ($EDIT_GEDCOM_RECORD == 2 && $this->UserCanEdit($GEDCOMID)) $can = true;
-			elseif ($EDIT_GEDCOM_RECORD == 3 && $this->UserCanAccept($GEDCOMID)) $can = true;
-			elseif ($EDIT_GEDCOM_RECORD == 4 && $this->UserGedcomAdmin($GEDCOMID)) $can = true;
-			elseif ($EDIT_GEDCOM_RECORD == 5 && $this->UserIsAdmin()) $can = true;
+			elseif (GedcomConfig::$EDIT_GEDCOM_RECORD == -1) $can = false;
+			elseif (GedcomConfig::$EDIT_GEDCOM_RECORD == 0) $can = true;
+			elseif (GedcomConfig::$EDIT_GEDCOM_RECORD == 1 && $this->UserPrivAccess($GEDCOMID)) $can = true;
+			elseif (GedcomConfig::$EDIT_GEDCOM_RECORD == 2 && $this->UserCanEdit($GEDCOMID)) $can = true;
+			elseif (GedcomConfig::$EDIT_GEDCOM_RECORD == 3 && $this->UserCanAccept($GEDCOMID)) $can = true;
+			elseif (GedcomConfig::$EDIT_GEDCOM_RECORD == 4 && $this->UserGedcomAdmin($GEDCOMID)) $can = true;
+			elseif (GedcomConfig::$EDIT_GEDCOM_RECORD == 5 && $this->UserIsAdmin()) $can = true;
 		}
 		SwitchGedcom();
 		return $can;
 	}
 	
 	public function UserCanEditOwn($pid) {
-		global $GEDCOMID, $USE_QUICK_UPDATE;
+		global $GEDCOMID;
 	
 		if ($this->UserCanEdit()) return true;
-		if (!$USE_QUICK_UPDATE) return false;
+		if (!GedcomConfig::$USE_QUICK_UPDATE) return false;
 		if (empty($pid)) return false;
 
 		if (!empty($this->gedcomid[$GEDCOMID])) {

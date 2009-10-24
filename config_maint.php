@@ -42,7 +42,7 @@ if (!$gm_user->userIsAdmin()) {
 	exit;
 }
 
-print_header($gm_lang["config_maint"]);
+PrintHeader($gm_lang["config_maint"]);
 
 ?>
 <!-- Setup the left box -->
@@ -107,5 +107,5 @@ print_header($gm_lang["config_maint"]);
 	</form>
 </div>
 <?php
-print_footer();
+PrintFooter();
 ?>

@@ -40,7 +40,7 @@ if (!isset($action)) $action = "";
 if (!isset($url)) $url = "index.php";
 switch ($action) {
 	case "pwlost" :
-  		print_header("Genmod - " . $gm_lang["lost_pw_reset"]);	?>
+  		PrintHeader("Genmod - " . $gm_lang["lost_pw_reset"]);	?>
   		<script language="JavaScript" type="text/javascript">
 		<!--
 		function checkform(frm)
@@ -79,7 +79,7 @@ switch ($action) {
 	case "requestpw" :
 		$QUERY_STRING = "";
 		if (!isset($user_name)) $user_name = "";
-		print_header("Genmod - " . $gm_lang["lost_pw_reset"]);
+		PrintHeader("Genmod - " . $gm_lang["lost_pw_reset"]);
 		print "<div class=\"center\">";
 		$newuser =& User::GetInstance($user_name);
 		if ($newuser->is_empty) {
@@ -218,7 +218,7 @@ switch ($action) {
 		else $user_email_false = false;
 		if ($user_email_false && !$user_name_false) $message .= $gm_lang["invalid_email"];
 		
-		if ($ENABLE_MULTI_LANGUAGE) {
+		if (GedcomConfig::$ENABLE_MULTI_LANGUAGE) {
 			if (isset($user_language)&& strlen($user_language)==0) $user_language_false = true;
 			else if (!isset($user_language)) $user_language_false = true;
 			else $user_language_false = false;
@@ -237,7 +237,7 @@ switch ($action) {
 		
 		if ($user_name_false == false && $user_password01_false == false && $user_password02_false == false && $user_firstname_false == false && $user_lastname_false == false && $user_email_false == false && $user_language_false == false && $user_comments_false == false && $password_mismatch == false && $user_password_length == false && $user_first_last_false == false) $action = "registernew";
 		else {
-			print_header("Genmod - " . $gm_lang["requestaccount"]);
+			PrintHeader("Genmod - " . $gm_lang["requestaccount"]);
 			// Empty user array in case any details might be left
 			// and faulty users are requested and created
 			$user = array();
@@ -310,14 +310,14 @@ switch ($action) {
 				<input type="hidden" name="time" value="" />
 				<table class="center facts_table width20">
 				<?php $i = 1;?>
-				<tr><td class="topbottombar" colspan="2"><?php print_help_link("register_info_0".$WELCOME_TEXT_AUTH_MODE."", "qm", "requestaccount"); print $gm_lang["requestaccount"];?><?php if (strlen($message) > 0) print "<br /><span class=\"warning\">".$message."</span>"; ?></td></tr>
+				<tr><td class="topbottombar" colspan="2"><?php print_help_link("register_info_0".GedcomConfig::$WELCOME_TEXT_AUTH_MODE."", "qm", "requestaccount"); print $gm_lang["requestaccount"];?><?php if (strlen($message) > 0) print "<br /><span class=\"warning\">".$message."</span>"; ?></td></tr>
 				<tr><td class="shade2 nowrap ltr"><?php print_help_link("username_help", "qm", "username"); print $gm_lang["username"];?></td><td class="shade1 ltr"><input type="text" name="user_name" value="<?php if (!$user_name_false) print $user_name;?>" tabindex="<?php print $i;?>" onchange="sndReq('errus', 'checkuser', 'username', this.value);" /> * <span id="errus"></span></td></tr>
 				<tr><td class="shade2 nowrap ltr"><?php print_help_link("edituser_password_help", "qm", "password"); print $gm_lang["password"];?></td><td class="shade1 ltr"><input type="password" name="user_password01" value="" tabindex="<?php print $i++;?>" /> *</td></tr>
 				<tr><td class="shade2 nowrap ltr"><?php print_help_link("edituser_conf_password_help", "qm", "confirm");print $gm_lang["confirm"];?></td><td class="shade1 ltr"><input type="password" name="user_password02" value="" tabindex="<?php print $i++;?>" /> *</td></tr>
 				<tr><td class="shade2 nowrap ltr"><?php print_help_link("new_user_firstname_help", "qm", "firstname");print $gm_lang["firstname"];?></td><td class="shade1 ltr"><input type="text" name="user_firstname" value="<?php if (!$user_firstname_false) print $user_firstname;?>" tabindex="<?php print $i++;?>" /> *</td></tr>
 				<tr><td class="shade2 nowrap ltr"><?php print_help_link("new_user_lastname_help", "qm", "lastname");print $gm_lang["lastname"];?></td><td class="shade1 ltr"><input type="text" name="user_lastname" value="<?php if (!$user_lastname_false) print $user_lastname;?>" tabindex="<?php print $i++;?>" /> *</td></tr>
 				<?php
-				if ($ENABLE_MULTI_LANGUAGE) {
+				if (GedcomConfig::$ENABLE_MULTI_LANGUAGE) {
 					print "<tr><td class=\"shade2 ltr\">";
 					print_help_link("edituser_change_lang_help", "qm", "change_lang");
 					print $gm_lang["change_lang"];
@@ -336,7 +336,7 @@ switch ($action) {
 				}
 				?>
 				<tr><td class="shade2 nowrap ltr"><?php print_help_link("edituser_email_help", "qm", "emailadress");print $gm_lang["emailadress"];?></td><td class="shade1 ltr"><input type="text" size="30" name="user_email" value="<?php if (!$user_email_false) print $user_email;?>" tabindex="<?php print $i++;?>" onchange="sndReq('errem', 'checkemail', 'email', this.value);" /> * <span id="errem"></span></td></tr>
-				<?php if ($REQUIRE_AUTHENTICATION && $SHOW_LIVING_NAMES>=$PRIV_PUBLIC) { ?>
+				<?php if (GedcomConfig::$REQUIRE_AUTHENTICATION && $SHOW_LIVING_NAMES>=$PRIV_PUBLIC) { ?>
 				<tr><td class="shade2 nowrap ltr"><?php print_help_link("register_gedcomid_help", "qm", "gedcomid");print $gm_lang["gedcomid"];?></td><td class="shade1 ltr" valign="top" ><input type="text" size="10" name="user_gedcomid" id="user_gedcomid" value="" tabindex="<?php print $i++;?>" /><?php LinkFunctions::PrintFindIndiLink("user_gedcomid",""); ?></td></tr>
 				<?php } ?>
 				<tr><td class="shade2 nowrap ltr"><?php print_help_link("register_comments_help", "qm", "comments");print $gm_lang["comments"];?></td><td class="shade1 ltr" valign="top" ><textarea cols="50" rows="5" name="user_comments" tabindex="<?php print $i++;?>"><?php if (!$user_comments_false) print $user_comments;?></textarea> *</td></tr>
@@ -356,7 +356,7 @@ switch ($action) {
 	case "registernew" :
 		$QUERY_STRING = "";
 		if (isset($user_name)) {
-			print_header("Genmod - " . $gm_lang["registernew"]);
+			PrintHeader("Genmod - " . $gm_lang["registernew"]);
 			print "<div class=\"center\">";
 			$user_created_ok = false;
 				
@@ -436,7 +436,7 @@ switch ($action) {
 				GmMail($user_email, str_replace("#SERVER_NAME#", SERVER_URL, $gm_lang["mail01_subject"]), $mail_body, "", "", "", "", "", true);
 				
 				// switch language to webmaster settings
-				$admuser =& User::GetInstance($WEBMASTER_EMAIL);
+				$admuser =& User::GetInstance(GedcomConfig::$WEBMASTER_EMAIL);
 				$LANGUAGE = $admuser->language;
 				if (isset($gm_language[$LANGUAGE])) LoadEnglish(false, false, true);	//-- load language file
 				$TEXT_DIRECTION = $TEXT_DIRECTION_array[$LANGUAGE];
@@ -461,14 +461,14 @@ switch ($action) {
 				}
 				/* 2 lines below seem obsolete */
 				$message = new Message();
-				$message->to = $WEBMASTER_EMAIL;
+				$message->to = GedcomConfig::$WEBMASTER_EMAIL;
 				$message->from = $user_name;
 				$message->from_email = $user_email;
 				$message->from_name = $user_firstname.' '.$user_lastname;
 				$message->subject = str_replace("#SERVER_NAME#", SERVER_URL, str_replace("#user_email#", $user_email, $gm_lang["mail02_subject"]));
 				$message->body = $mail_body;
 				$message->created = $time;
-				$message->method = $SUPPORT_METHOD;
+				$message->method = GedcomConfig::$SUPPORT_METHOD;
 				$message->no_from = true;
 				/* Store a message for the admin in the database and send out the email */
 				$message->AddMessage();
@@ -503,7 +503,7 @@ switch ($action) {
 	case "userverify" :
 		if (!isset($user_name)) $user_name = "";
 		if (!isset($user_hashcode)) $user_hashcode = "";
-		print_header("Genmod - " . $gm_lang["user_verify"]);
+		PrintHeader("Genmod - " . $gm_lang["user_verify"]);
 		print "<div class=\"center\">";
 		?><form name="verifyform" method="post" action="" onsubmit="t = new Date(); document.verifyform.time.value=t.toUTCString();">
 		<input type="hidden" name="action" value="verify_hash" />
@@ -527,7 +527,7 @@ switch ($action) {
 	case "verify_hash" :
   		$QUERY_STRING = "";
 		WriteToLog("LoginRegister-> User attempted to verify hashcode: ".$user_name, "I", "S");
-		print_header("Genmod - " . $gm_lang["user_verify"]);# <-- better verification of authentication code
+		PrintHeader("Genmod - " . $gm_lang["user_verify"]);# <-- better verification of authentication code
 		print "<div class=\"center\">";
 		print "<table class=\"center facts_table ltr\">";
 		print "<tr><td class=\"topbottombar\">".$gm_lang["user_verify"]."</td></tr>";
@@ -547,7 +547,7 @@ switch ($action) {
 				if (!$REQUIRE_ADMIN_AUTH_REGISTRATION) $newuser->verified_by_admin = "Y";
 				UserController::AddUser($newuser, "verified");
 				// switch language to webmaster settings
-				$admuser =& User::GetInstance($WEBMASTER_EMAIL);
+				$admuser =& User::GetInstance(GedcomConfig::$WEBMASTER_EMAIL);
 				$oldlanguage = $LANGUAGE;
 				$LANGUAGE = $admuser->language;
 				if (isset($gm_language[$LANGUAGE])) LoadEnglish(false, false, true);
@@ -568,12 +568,12 @@ switch ($action) {
 				$host = preg_replace("/^www\./i", "", $_SERVER["SERVER_NAME"]);
 				$headers = "From: Genmod-noreply@".$host;
 				$message = new Message();
-				$message->to = $WEBMASTER_EMAIL;
+				$message->to = GedcomConfig::$WEBMASTER_EMAIL;
 				$message->from = "Genmod-noreply@".$host;
 				$message->subject = str_replace("#SERVER_NAME#", SERVER_URL, $gm_lang["mail03_subject"]);
 				$message->body = $mail_body;
 				$message->created = $time;
-				$message->method = $SUPPORT_METHOD;
+				$message->method = GedcomConfig::$SUPPORT_METHOD;
 				$message->no_from = true;
 				$message->AddMessage(true);
 				
@@ -613,5 +613,5 @@ switch ($action) {
 		break;
 }
 
-print_footer();
+PrintFooter();
 ?>

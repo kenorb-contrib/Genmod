@@ -115,16 +115,16 @@ class EditLang {
 	function AddHeader(&$genmod, &$gm_lang) {
 		switch ($genmod['action']){
 			case "edit": 
-				print_header($gm_lang["edit_lang_utility"]);
+				PrintHeader($gm_lang["edit_lang_utility"]);
 				break;
 			case "export": 
-				print_header($gm_lang["export_lang_utility"]);
+				PrintHeader($gm_lang["export_lang_utility"]);
 				break;
 			case "compare": 
-				print_header($gm_lang["compare_lang_utility"]); 
+				PrintHeader($gm_lang["compare_lang_utility"]); 
 				break;
 			default: 
-				print_header($gm_lang["edit_langdiff"]); 
+				PrintHeader($gm_lang["edit_langdiff"]); 
 				break;
 		}
 		
@@ -146,7 +146,7 @@ class EditLang {
 	function AddFooter() {
 		if ($this->message != "") echo "<div class=\"shade2 center\">".$this->message."</div>";
 		if ($this->output != "") echo "<div class=\"shade1 ltr\">".$this->output."</div>";
-		print_footer();
+		PrintFooter();
 	}
 	
 	function GetPageValues(&$genmod) {

@@ -46,7 +46,7 @@ class IndividualController extends DetailController {
 	private $indi_userlink = "";				// Link to user details, or username of the person showed
 	
 	public function __construct() {
-		global $GEDCOM_DEFAULT_TAB, $gm_lang, $GM_IMAGE_DIR, $GM_IMAGES, $nonfacts, $nonfamfacts;
+		global $gm_lang, $GM_IMAGES, $nonfacts, $nonfamfacts;
 		global $GEDCOMID, $gm_user;
 		
 		parent::__construct();
@@ -69,7 +69,7 @@ class IndividualController extends DetailController {
 		$this->xref = CleanInput($this->xref);
 
 		// NOTE: Determine which tab should be shown global value
-		$this->default_tab = $GEDCOM_DEFAULT_TAB;
+		$this->default_tab = GedcomConfig::$GEDCOM_DEFAULT_TAB;
 		
 		// NOTE: Get the user details
 		if (!empty($gm_user->username)) {
@@ -82,7 +82,7 @@ class IndividualController extends DetailController {
 			$this->indi_userlink = "";
 			if ($indi_username) {
 				if ($gm_user->UserIsAdmin()) $this->indi_userlink = "<a href=\"useradmin.php?action=edituser&username=".$indi_username."\">";
-				$this->indi_userlink .= "<img src=\"".$GM_IMAGE_DIR."/".$GM_IMAGES["indis"]["small"]."\" border=\"0\" alt=\"".PrintReady($gm_lang["gm_username"]." ".$indi_username)."\" />";
+				$this->indi_userlink .= "<img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["indis"]["small"]."\" border=\"0\" alt=\"".PrintReady($gm_lang["gm_username"]." ".$indi_username)."\" />";
 				if ($gm_user->UserIsAdmin()) $this->indi_userlink .= "</a>";
 			}
 		}
@@ -154,13 +154,13 @@ class IndividualController extends DetailController {
 	
 	
 	protected function GetPageTitle() {
-		global $gm_lang, $SHOW_ID_NUMBERS;
+		global $gm_lang;
 
 		if (is_null($this->pagetitle)) {
 			if ($this->indi->disp) $this->pagetitle = $this->indi->name;
 			else $this->pagetitle = $gm_lang["private"];
 			
-			if ($SHOW_ID_NUMBERS) $this->pagetitle .= " - ".$this->indi->xref;
+			if (GedcomConfig::$SHOW_ID_NUMBERS) $this->pagetitle .= " - ".$this->indi->xref;
 			$this->pagetitle .= " - ".$gm_lang["indi_info"];
 		}
 		return $this->pagetitle;
@@ -173,15 +173,14 @@ class IndividualController extends DetailController {
 	 * @return boolean
 	 */
 	private function canShowHighlightedObject() {
-		global $SHOW_HIGHLIGHT_IMAGES, $USE_THUMBS_MAIN;
 
 		if (is_null($this->canshowhighlightedobj)) {
-			if ($this->indi->disp && $SHOW_HIGHLIGHT_IMAGES && PrivacyFunctions::showFact("OBJE", $this->xref, "OBJE")) {
+			if ($this->indi->disp && GedcomConfig::$SHOW_HIGHLIGHT_IMAGES && PrivacyFunctions::showFact("OBJE", $this->xref, "OBJE")) {
 				$firstmediarec = $this->indi->highlightedimage;
 				if ($firstmediarec) {
 					// new from here
 					$media =& MediaItem::GetInstance($firstmediarec["id"]);
-					if ($USE_THUMBS_MAIN && $firstmediarec["use_thum"] != "Y") $filename = $media->fileobj->f_thumb_file;
+					if (GedcomConfig::$USE_THUMBS_MAIN && $firstmediarec["use_thum"] != "Y") $filename = $media->fileobj->f_thumb_file;
 					else $filename = $media->fileobj->f_main_file;
 					if ($media->fileobj->f_height != 0 && $media->fileobj->f_height < 150) $height = $media->fileobj->f_height;
 					else $height = 150;
@@ -203,13 +202,13 @@ class IndividualController extends DetailController {
 	 */
 	public function &getEditMenu() {
 		global $gm_user;
-		global $SEX_LINENUM, $gm_lang, $USE_QUICK_UPDATE;
+		global $SEX_LINENUM, $gm_lang;
 		
 		//-- main edit menu
 		$menu = new Menu($gm_lang["edit"]);
 		if (!$this->indi->isdeleted) {
 			// NOTE: Quickedit sub menu
-			if ($USE_QUICK_UPDATE) {
+			if (GedcomConfig::$USE_QUICK_UPDATE) {
 				$submenu = new Menu($gm_lang["quick_update_title"]);
 				$submenu->addLink("quickEdit('".$this->xref."', '', 'edit_quickupdate');");
 				$menu->addSubmenu($submenu);
@@ -429,7 +428,7 @@ class IndividualController extends DetailController {
 				$name = trim($nmatch[1]);
 				if (HasChinese($name, true)) $add = "";
 				else $add = " ";
-				if ($NAME_REVERSE || HasChinese($name, true)) $name = ReverseName($name);
+				if ($NAME_REVERSE || HasChinese($name, true)) $name = NameFunctions::ReverseName($name);
 				$name = preg_replace("'/,'", ",", $name);
 	   			$name = preg_replace("'/'", $add, $name);
 				// handle PAF extra NPFX [ 961860 ]
@@ -452,7 +451,7 @@ class IndividualController extends DetailController {
 				print ":</span><span class=\"field\"> ";
 				if (isset($nmatch[$i][2])) {
 			  		$name = trim($nmatch[$i][2]);
-					if ($NAME_REVERSE || HasChinese($name, true)) $name = ReverseName($name);
+					if ($NAME_REVERSE || HasChinese($name, true)) $name = NameFunctions::ReverseName($name);
 			  		$name = preg_replace("'/,'", ",", $name);
 					$name = preg_replace("'/'", " ", $name);
 					print PrintReady(CheckNN($name));
@@ -487,7 +486,7 @@ class IndividualController extends DetailController {
 	 * @param int $linenum		the line number from the original INDI gedcom record where this sex record started, used for editing
 	 */
 	public function GenderRecord($factrec, $linenum) {
-		global $gm_lang, $GM_IMAGE_DIR, $GM_IMAGES;
+		global $gm_lang, $GM_IMAGES;
 		
 		if ((!PrivacyFunctions::showFact("SEX", $this->xref))||(!PrivacyFunctions::showFactDetails("SEX", $this->xref))) return false;
 		
@@ -499,15 +498,15 @@ class IndividualController extends DetailController {
 		switch ($sex) {
 			case "M":
 				$this->indi->sexdetails["gender"] = $gm_lang["male"];
-				$this->indi->sexdetails["image"] = $GM_IMAGE_DIR."/".$GM_IMAGES["sex"]["small"];
+				$this->indi->sexdetails["image"] = GM_IMAGE_DIR."/".$GM_IMAGES["sex"]["small"];
 				break;
 			case "F":
 				$this->indi->sexdetails["gender"] = $gm_lang["female"];
-				$this->indi->sexdetails["image"] = $GM_IMAGE_DIR."/".$GM_IMAGES["sexf"]["small"];
+				$this->indi->sexdetails["image"] = GM_IMAGE_DIR."/".$GM_IMAGES["sexf"]["small"];
 				break;
 			case "U":
 				$this->indi->sexdetails["gender"] = $gm_lang["unknown"];
-				$this->indi->sexdetails["image"] = $GM_IMAGE_DIR."/".$GM_IMAGES["sexn"]["small"];
+				$this->indi->sexdetails["image"] = GM_IMAGE_DIR."/".$GM_IMAGES["sexn"]["small"];
 				break;
 		}
 		if ($this->SEX_COUNT>1) {
@@ -579,7 +578,6 @@ class IndividualController extends DetailController {
 	}
 	
 	protected function PrintToggleJS2() {
-		global $EXPAND_RELATIVES_EVENTS;
 		?>
 		<script language="JavaScript" type="text/javascript">
 		<!--
@@ -588,7 +586,7 @@ class IndividualController extends DetailController {
 		var ebn = document.getElementsByName('row_rela0');
 //		if (ebn.length==0) document.getElementById('row_top').style.display="none";
 		if (ebn == null) document.getElementById('row_top').style.display="none";
-		<?php if (!$EXPAND_RELATIVES_EVENTS) print "togglerow('row_rela');"?>
+		<?php if (!GedcomConfig::$EXPAND_RELATIVES_EVENTS) print "togglerow('row_rela');"?>
 		//-->
 		</script>
 		<?php

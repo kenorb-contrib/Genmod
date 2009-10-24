@@ -91,7 +91,7 @@ foreach ($assokeys as $indexval => $key) {
 }
 natsort($assorela);
 
-print_simple_header("Edit Interface ".GM_VERSION);
+PrintSimpleHeader("Edit Interface ".GM_VERSION);
 
 // Debug info
 //print "Action: ".$action."<br />Pid: ".$pid;
@@ -242,7 +242,7 @@ else if (!empty($famid)) {
 else {
 	if (($action!="addchild")&&($action!="addchildaction")&&($action!="submitter")) {
 		print "<span class=\"error\">The \$pid variable was empty.	Unable to perform $action.</span>";
-		print_simple_footer();
+		PrintSimpleFooter();
 		exit;
 		// exit added, what's the following line for?
 		$disp = true;
@@ -275,18 +275,18 @@ if ($action == "edit" || $action == "editraw") {
 	}
 }
 // TODO edit submitter from other than $GEDCOM
-if ((!$gm_user->userCanEdit())||(!$disp)||(!$ALLOW_EDIT_GEDCOM) || (!$gm_user->userCanEditGedlines() && $action == "editraw")) {
+if ((!$gm_user->userCanEdit())||(!$disp)||(!GedcomConfig::$ALLOW_EDIT_GEDCOM) || (!$gm_user->userCanEditGedlines() && $action == "editraw")) {
 	print $gm_lang["access_denied"];
 	//-- display messages as to why the editing access was denied
 	if (!$gm_user->userCanEdit()) print "<br />".$gm_lang["user_cannot_edit"];
-	else if (!$ALLOW_EDIT_GEDCOM) print "<br />".$gm_lang["gedcom_editing_disabled"];
+	else if (!GedcomConfig::$ALLOW_EDIT_GEDCOM) print "<br />".$gm_lang["gedcom_editing_disabled"];
 	else if (!$disp) {
 		print "<br />".$gm_lang["privacy_prevented_editing"];
 		if (!empty($pid)) print "<br />".$gm_lang["privacy_not_granted"]." pid $pid.";
 		else if (!empty($famid)) print "<br />".$gm_lang["privacy_not_granted"]." famid $famid.";
 	}
 	print "<br /><br /><div class=\"center\"><a href=\"javascript: ".$gm_lang["close_window"]."\" onclick=\"window.close();\">".$gm_lang["close_window"]."</a></div>\n";
-	print_simple_footer();
+	PrintSimpleFooter();
 	exit;
 }
 
@@ -1964,7 +1964,7 @@ switch ($action) {
 		$xref = AppendGedrec($newged, "SOUR", $change_id, $change_type);
 		if ($xref) {
 			print "<br /><br />\n".$gm_lang["new_source_created"]."<br /><br />";
-			if ($EDIT_AUTOCLOSE) print "\n<script type=\"text/javascript\">\n<!--\nopenerpasteid('$xref');\n//-->\n</script>";
+			if (GedcomConfig::$EDIT_AUTOCLOSE) print "\n<script type=\"text/javascript\">\n<!--\nopenerpasteid('$xref');\n//-->\n</script>";
 			else print "<a href=\"javascript:// SOUR $xref\" onclick=\"openerpasteid('$xref'); return false;\">".$gm_lang["paste_id_into_field"]." <b>$xref</b></a>\n";
 		}
 		break;
@@ -2058,7 +2058,7 @@ switch ($action) {
 		$xref = AppendGedrec($newged, "REPO", $change_id, $change_type);
 		if ($xref) {
 			print "<br /><br />\n".$gm_lang["new_repo_created"]."<br /><br />";
-			if ($EDIT_AUTOCLOSE) print "\n<script type=\"text/javascript\">\n<!--\nopenerpasteid('$xref');\n//-->\n</script>";
+			if (GedcomConfig::$EDIT_AUTOCLOSE) print "\n<script type=\"text/javascript\">\n<!--\nopenerpasteid('$xref');\n//-->\n</script>";
 			else print "<a href=\"javascript:// REPO $xref\" onclick=\"openerpasteid('$xref'); return false;\">".$gm_lang["paste_rid_into_field"]." <b>$xref</b></a>\n";
 		}
 		break;
@@ -2101,7 +2101,7 @@ switch ($action) {
 			$xref = AppendGedrec($newged, "NOTE", $change_id, $change_type);
 			if ($xref) {
 				print "<br /><br />\n".$gm_lang["new_gnote_created"]."<br /><br />";
-				if ($EDIT_AUTOCLOSE) print "\n<script type=\"text/javascript\">\n<!--\nopenerpasteid('$xref');\n//-->\n</script>";
+				if (GedcomConfig::$EDIT_AUTOCLOSE) print "\n<script type=\"text/javascript\">\n<!--\nopenerpasteid('$xref');\n//-->\n</script>";
 				else print "<a href=\"javascript:// NOTE $xref\" onclick=\"openerpasteid('$xref'); return false;\">".$gm_lang["paste_noteid_into_field"]." <b>$xref</b></a>\n";
 			}
 		}
@@ -2183,7 +2183,7 @@ switch ($action) {
 				while(($i+1<count($gedlines))&&(preg_match("/".($level+1)." (CON[CT])\s?(.*)/", $gedlines[$i+1], $cmatch)>0)) {
 					$iscont=true;
 					if ($cmatch[1] == "CONT") $text.="\r\n";
-					else if ($WORD_WRAPPED_NOTES) $text .= " ";
+					else if (GedcomConfig::$WORD_WRAPPED_NOTES) $text .= " ";
 					$text .= $cmatch[2];
 					$i++;
 				}
@@ -2322,7 +2322,7 @@ switch ($action) {
 			print "<br />".$gm_lang["privacy_prevented_editing"];
 			if (!empty($pid)) print "<br />".$gm_lang["privacy_not_granted"]." pid $pid.";
 			if (!empty($famid)) print "<br />".$gm_lang["privacy_not_granted"]." famid $famid.";
-			print_simple_footer();
+			PrintSimpleFooter();
 			exit;
 		}
 		else {
@@ -2596,7 +2596,7 @@ switch ($action) {
 			else {
 				$newmfile = $result["filename"];
 				if (!empty($newmfile)) {
-					$m = RelativePathFile($MEDIA_DIRECTORY);
+					$m = RelativePathFile(GedcomConfig::$MEDIA_DIRECTORY);
 					if (!empty($m)) $newmfile = preg_replace("~$m~", "", $newmfile);
 					if (!empty($oldrec)) $old = GetGedcomValue("FILE", 1, $oldrec);
 					if (isset($old) && !empty($old)) $newrec = preg_replace("~".addslashes($old)."~", $newmfile, $newrec);
@@ -2618,11 +2618,11 @@ if (isset($change_id) && $can_auto_accept && !$link_error && (($gm_user->UserCan
 }
 
 // autoclose window when update successful
-if ($success && !$link_error && $EDIT_AUTOCLOSE) {
+if ($success && !$link_error && GedcomConfig::$EDIT_AUTOCLOSE) {
 	session_write_close();
 	print "\n<script type=\"text/javascript\">\n<!--\nedit_close();\n//-->\n</script>";
 }
 
 print "<div class=\"center\"><a href=\"javascript:// ".$gm_lang["close_window"]."\" onclick=\"edit_close();\">".$gm_lang["close_window"]."</a></div><br />\n";
-print_simple_footer();
+PrintSimpleFooter();
 ?>

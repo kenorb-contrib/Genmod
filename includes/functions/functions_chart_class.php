@@ -57,20 +57,22 @@ abstract class ChartFunctions {
 	 * @param string $parid optional parent ID (descendancy booklet)
 	 * @param string $gparid optional gd-parent ID (descendancy booklet)
 	 */
-	public function PrintSosaFamily($famid, $childid, $sosa, $label="", $parid="", $gparid="", $personcount="1") {
+	public function PrintSosaFamily(&$family, $childid, $sosa, $label="", $parid="", $gparid="", $view="") {
 		global $gm_lang, $pbwidth, $pbheight, $view;
 	
 		if ($view != "preview") print "<hr />";
 		print "\r\n\r\n<p style='page-break-before:always' />\r\n";
-		print "<a name=\"$famid\"></a>\r\n";
-		$fam =& Family::GetInstance($famid);
-		PersonFunctions::PrintFamilyParents($fam, $sosa, $label, $parid, $gparid, $personcount);
-		$personcount++;
+		print "<a name=\"".$family->xref."\"></a>\r\n";
+		
+		print "<p class=\"name_head\">".$family->descriptor;
+		if ($family->adddescriptor != "") print "<br />".$family->adddescriptor;
+		print "</p>\r\n";
+		
+		PersonFunctions::PrintFamilyParents($family, $sosa, $label, $parid, $gparid, $view);
 		print "\n\t<br />\n";
 		print "<table width=\"95%\"><tr><td valign=\"top\" style=\"width: " . ($pbwidth) . "px;\">\n";
-		PersonFunctions::PrintFamilyChildren($fam, $childid, $sosa, $label, $personcount);
+		PersonFunctions::PrintFamilyChildren($family, $childid, $sosa, $label, $view);
 		print "</td><td valign=\"top\">";
-	//	if ($sosa == 0) PrintFamilyFacts($famid, $sosa);
 		print "</td></tr></table>\n";
 		print "<br />";
 	}
@@ -82,7 +84,7 @@ abstract class ChartFunctions {
 	 * @return string $rootid validated root ID
 	 */
 	public function CheckRootId($rootid) {
-		global $user, $GEDCOMID, $GEDCOM_ID_PREFIX, $PEDIGREE_ROOT_ID, $USE_RIN, $gm_user;
+		global $GEDCOMID, $gm_user;
 		
 		// -- if the $rootid is not already there then find the first person in the file and make him the root
 		if (empty($rootid) &&!empty($gm_user->rootid[$GEDCOMID])) {
@@ -96,22 +98,22 @@ abstract class ChartFunctions {
 			
 		// -- allow users to overide default id in the config file.
 		if (empty($rootid)) {
-			$PEDIGREE_ROOT_ID = trim($PEDIGREE_ROOT_ID);
-			if (!empty($PEDIGREE_ROOT_ID)) {
-				$person =&Person::GetInstance($PEDIGREE_ROOT_ID, "", $GEDCOMID);
-				if (!$person->isempty) $rootid = $PEDIGREE_ROOT_ID;
+			GedcomConfig::$PEDIGREE_ROOT_ID = trim(GedcomConfig::$PEDIGREE_ROOT_ID);
+			if (!empty(GedcomConfig::$PEDIGREE_ROOT_ID)) {
+				$person =&Person::GetInstance(GedcomConfig::$PEDIGREE_ROOT_ID, "", $GEDCOMID);
+				if (!$person->isempty) $rootid = GedcomConfig::$PEDIGREE_ROOT_ID;
 			}
 		}
 		if (empty($rootid)) $rootid = FindFirstPerson();
 		
-		if ($USE_RIN) {
+		if (GedcomConfig::$USE_RIN) {
 			$person =&Person::GetInstance($rootid, "", $GEDCOMID);
 			if ($person->isempty) $rootid = FindRinId($rootid);
 		} 
 		else {
 			if (preg_match("/[A-Za-z]+/", $rootid) == 0) {
-				$GEDCOM_ID_PREFIX = trim($GEDCOM_ID_PREFIX);
-				$rootid = $GEDCOM_ID_PREFIX . $rootid;
+				GedcomConfig::$GEDCOM_ID_PREFIX = trim(GedcomConfig::$GEDCOM_ID_PREFIX);
+				$rootid = GedcomConfig::$GEDCOM_ID_PREFIX . $rootid;
 			}
 		}
 	
@@ -129,7 +131,6 @@ abstract class ChartFunctions {
 	 * @return array $treeid
 	 */
 	public function AncestryArray($rootid, $num_gens) {
-		global $SHOW_EMPTY_BOXES;
 		
 		// -- maximum size of the id array
 		$treesize = pow(2, ($num_gens + 1));
@@ -181,7 +182,6 @@ abstract class ChartFunctions {
 	 * @return array $treeid
 	 */
 	public function PedigreeArray($rootid, $num_gens) {
-		global $SHOW_EMPTY_BOXES;
 		
 		// -- maximum size of the id array is 2^$PEDIGREE_GENERATIONS - 1
 		$treesize = pow(2, (int)($num_gens))-1;
@@ -221,8 +221,6 @@ abstract class ChartFunctions {
 									break;
 								}
 							}
-							//$parents = FindParents($famids[$j]);
-	//						$j++;
 						}
 					}
 	
@@ -242,30 +240,13 @@ abstract class ChartFunctions {
 			}
 		}
 		// -- detect the highest generation that actually has a person in it and use it for the pedigree generations
-		if (!$SHOW_EMPTY_BOXES) {
+		if (!GedcomConfig::$SHOW_EMPTY_BOXES) {
 			for($i = ($treesize-1); empty($treeid[$i]); $i--);
 			$num_gens = ceil(log($i + 2) / log(2));
 			if ($num_gens < 2) $num_gens = 2;
 		}
 	
 		return $treeid;
-	}
-	
-	/**
-	 * find all children from a family
-	 *
-	 * @todo get the kids out of the database
-	 * @param string $famid family ID
-	 * @return array array of child ID
-	 */
-	public function GetChildrenIds($famid) {
-		$children = array();
-		$famrec = FindFamilyRecord($famid);
-		$ct = preg_match_all("/1\s*CHIL\s*@(.*)@/", $famrec, $match, PREG_SET_ORDER);
-		for($i = 0; $i < $ct; $i++) {
-			$children[] = $match[$i][1];
-		}
-		return $children;
 	}
 	
 	/**
@@ -278,7 +259,7 @@ abstract class ChartFunctions {
 	 */
 	public function PrintUrlArrow($id, $url, $label, $dir=2) {
 		global $gm_lang, $view;
-		global $GM_IMAGE_DIR, $GM_IMAGES;
+		global $GM_IMAGES;
 		global $TEXT_DIRECTION;
 	
 		if ($id=="" or $url=="") return;
@@ -293,7 +274,7 @@ abstract class ChartFunctions {
 		$array_style=array("larrow", "rarrow", "uarrow", "darrow");
 		$astyle=$array_style[$adir];
 	
-		print "<a href=\"$url\" onmouseover=\"swap_image('".$astyle.$id."',$adir); window.status ='" . $label . "'; return true; \" onmouseout=\"swap_image('".$astyle.$id."',$adir); window.status=''; return true; \"><img id=\"".$astyle.$id."\" src=\"".$GM_IMAGE_DIR."/".$GM_IMAGES[$astyle]["other"]."\" hspace=\"0\" vspace=\"0\" border=\"0\" alt=\"".$label."\" title=\"".$label."\" /></a>";
+		print "<a href=\"$url\" onmouseover=\"swap_image('".$astyle.$id."',$adir); window.status ='" . $label . "'; return true; \" onmouseout=\"swap_image('".$astyle.$id."',$adir); window.status=''; return true; \"><img id=\"".$astyle.$id."\" src=\"".GM_IMAGE_DIR."/".$GM_IMAGES[$astyle]["other"]."\" hspace=\"0\" vspace=\"0\" border=\"0\" alt=\"".$label."\" title=\"".$label."\" /></a>";
 	}
 	
 	
@@ -302,12 +283,10 @@ abstract class ChartFunctions {
 	 *
 	 * @param string $famid family ID
 	 */
-	public function PrintCousins($famid, $personcount="1") {
+	public function PrintCousins($family) {
 		global $show_full, $bheight, $bwidth;
-		global $GM_IMAGE_DIR, $GM_IMAGES;
-	
-		$fchildren = GetChildrenIds($famid);
-		$kids = count($fchildren);
+		global $GM_IMAGES;
+
 		$save_show_full = $show_full;
 		if ($save_show_full) {
 			$bheight/=4;
@@ -315,17 +294,15 @@ abstract class ChartFunctions {
 		}
 		$show_full = false;
 		print "<td style=\"vertical-align:middle\" height=\"100%\">";
-		if ($kids) {
+		if ($family->children_count > 0) {
 			print "<table cellspacing=\"0\" cellpadding=\"0\" border=\"0\" ><tr valign=\"middle\">";
-			if ($kids>1) print "<td rowspan=\"".$kids."\" style=\"vertical-align:middle;\" align=\"right\"><img width=\"3px\" height=\"". (($bheight+5) * ($kids-1)) ."px\" src=\"".$GM_IMAGE_DIR."/".$GM_IMAGES["vline"]["other"]."\" alt=\"\" /></td>";
-			$ctkids = count($fchildren);
+			if ($family->children_count > 1) print "<td rowspan=\"".$family->children_count."\" style=\"vertical-align:middle;\" align=\"right\"><img width=\"3px\" height=\"". (($bheight+5) * ($family->children_count-1)) ."px\" src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["vline"]["other"]."\" alt=\"\" /></td>";
 			$i = 1;
-			foreach ($fchildren as $indexval => $fchil) {
-				print "<td style=\"vertical-align:middle;\"><img width=\"7px\" height=\"3px\" src=\"".$GM_IMAGE_DIR."/".$GM_IMAGES["hline"]["other"]."\" alt=\"\" /></td><td style=\"vertical-align:middle;\">";
-				print_pedigree_person($fchil, 1 , false, 0, $personcount);
-				$personcount++;
+			foreach ($family->children as $indexval => $chil) {
+				print "<td style=\"vertical-align:middle;\"><img width=\"7px\" height=\"3px\" src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["hline"]["other"]."\" alt=\"\" /></td><td style=\"vertical-align:middle;\">";
+				PersonFunctions::PrintPedigreePerson($chil, 1, false, 0);
 				print "</td></tr>";
-				if ($i < $ctkids) {
+				if ($i < $family->children_count) {
 					print "<tr>";
 					$i++;
 				}

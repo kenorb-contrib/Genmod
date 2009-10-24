@@ -38,7 +38,7 @@ if (!MediaFS::IsValidMedia($filename)) {
 	exit;
 }
 
-print_simple_header($gm_lang["imageview"]);
+PrintSimpleHeader($gm_lang["imageview"]);
 ?>
 <script language="JavaScript" type="text/javascript">
 <!--
@@ -227,6 +227,6 @@ else {
 }
 print "</form>\n";
 print "<div style=\"position: relative bottom; \">\n";
-print_simple_footer();
+PrintSimpleFooter();
 print "</div>\n";
 ?>

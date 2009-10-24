@@ -653,7 +653,6 @@ abstract class PrivacyFunctions {
 	 * connected with the individual are also hidden such that arriving at this record results in a dead
 	 * end.
 	 *
-	 * @author	yalnifj
 	 * @param		string 	$pid 	the GEDCOM XRef ID for the entity to check privacy settings for
 	 * @return	boolean 	return true to show the person's name, return false to keep it private
 	 */
@@ -722,7 +721,6 @@ abstract class PrivacyFunctions {
 	 * has sufficient privileges to access the GEDCOM resource.  It first checks the $global_facts array
 	 * for admin override settings for the fact.
 	 *
-	 * @author	yalnifj
 	 * @param	string $fact the GEDCOM fact tag to check the privacy settings
 	 * @param	string $pid the GEDCOM XRef ID for the entity to check privacy settings
 	 * @return	boolean return true to show the fact, return false to keep it private
@@ -771,7 +769,6 @@ abstract class PrivacyFunctions {
 	 * has sufficient privileges to access the GEDCOM resource.  It first checks the $global_facts array
 	 * for admin override settings for the fact.
 	 *
-	 * @author	yalnifj
 	 * @param	string $fact the GEDCOM fact tag to check the privacy settings
 	 * @param	string $pid the GEDCOM XRef ID for the entity to check privacy settings
 	 * @return	boolean return true to show the fact details, return false to keep it private

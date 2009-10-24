@@ -112,27 +112,27 @@ function split_align_text($data, $maxlen) {
  */
 function print_fan_chart($treeid, $fanw=640, $fandeg=270) {
 	global $PEDIGREE_GENERATIONS, $fan_width, $fan_style, $cw, $fontsize;
-	global $name, $gm_lang, $SHOW_ID_NUMBERS, $view, $TEXT_DIRECTION;
-	global $stylesheet, $print_stylesheet, $gm_user;
-	global $GM_IMAGE_DIR, $GM_IMAGES, $LINK_ICONS, $GEDCOMID;
+	global $name, $gm_lang, $view, $TEXT_DIRECTION;
+	global $gm_user;
+	global $GM_IMAGES, $GEDCOMID;
 
 	// check for GD 2.x library
 	if (!defined("IMG_ARC_PIE")) {
 		print "<span class=\"error\">".$gm_lang["gd_library"]."</span>";
-		print " <a href=\"" . $gm_lang["gd_helplink"] . "\"><img src=\"".$GM_IMAGE_DIR."/".$GM_IMAGES["help"]["small"]."\" class=\"icon\" alt=\"\" /></a><br /><br />";
+		print " <a href=\"" . $gm_lang["gd_helplink"] . "\"><img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["help"]["small"]."\" class=\"icon\" alt=\"\" /></a><br /><br />";
 		return false;
 	}
 	if (!function_exists("ImageTtfBbox")) {
 		print "<span class=\"error\">".$gm_lang["gd_freetype"]."</span>";
-		print " <a href=\"" . $gm_lang["gd_helplink"] . "\"><img src=\"".$GM_IMAGE_DIR."/".$GM_IMAGES["help"]["small"]."\" class=\"icon\" alt=\"\" /></a><br /><br />";
+		print " <a href=\"" . $gm_lang["gd_helplink"] . "\"><img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["help"]["small"]."\" class=\"icon\" alt=\"\" /></a><br /><br />";
 		return false;
 	}
 
 	// parse CSS file
 	include("includes/cssparser.inc.php");
 	$css = new cssparser(false);
-    if ($view=="preview") $css->Parse($print_stylesheet);
-    else $css->Parse($stylesheet);
+    if ($view=="preview") $css->Parse(GM_PRINT_STYLESHEET);
+    else $css->Parse(GM_STYLESHEET);
 
     // check for fontfile
 	$fontfile = $css->Get(".fan_chart","font-family");
@@ -349,7 +349,7 @@ print " ".strlen($altname)." ".$wmax." ".$name." ";
 				/**
 				// add action url
 				$url = "javascript:// " . PrintReady(strip_tags($name));
-				if ($SHOW_ID_NUMBERS) $url .= " (".$pid.")";
+				if (GedcomConfig::$SHOW_ID_NUMBERS) $url .= " (".$pid.")";
 				$imagemap .= "\" href=\"$url\" ";
 				$url = "?rootid=$pid&amp;PEDIGREE_GENERATIONS=$PEDIGREE_GENERATIONS&amp;fan_width=$fan_width&amp;fan_style=$fan_style";
 				if (!empty($view)) $url .= "&amp;view=$view";
@@ -365,7 +365,7 @@ print " ".strlen($altname)." ".$wmax." ".$name." ";
 				if (!empty($addname)) print "<br />" . PrintReady($addname);
 				print "</a>\n";
 				print "<br /><a href=\"pedigree.php?rootid=$pid\" >".$gm_lang["index_header"]."</a>\n";
-				print "<br /><a href=\"descendancy.php?pid=$pid\" >".$gm_lang["descend_chart"]."</a>\n";
+				print "<br /><a href=\"descendancy.php?rootid=$pid\" >".$gm_lang["descend_chart"]."</a>\n";
 				if ($reltome)  print "<br /><a href=\"relationship.php?pid1=".$tuser->gedcomid[$GEDCOMID]."&amp;pid2=".$pid."&amp;ged=$GEDCOMID\" onmouseover=\"clear_family_box_timeout('".$pid.".".$count."');\" onmouseout=\"family_box_timeout('".$pid.".".$count."');\">".$gm_lang["relationship_to_me"]."</a>\n";
 				print "<br /><a href=\"ancestry.php?rootid=$pid\" onmouseover=\"clear_family_box_timeout('".$pid.".".$count."');\" onmouseout=\"family_box_timeout('".$pid.".".$count."');\">".$gm_lang["ancestry_chart"]."</a>\n";
 				print "<br /><a href=\"fanchart.php?rootid=$pid&amp;PEDIGREE_GENERATIONS=$PEDIGREE_GENERATIONS&amp;fan_width=$fan_width&amp;fan_style=$fan_style\" onmouseover=\"clear_family_box_timeout('".$pid.".".$count."');\" onmouseout=\"family_box_timeout('".$pid.".".$count."');\">".$gm_lang["fan_chart"]."</a>\n";
@@ -478,10 +478,10 @@ print " ".strlen($altname)." ".$wmax." ".$name." ";
 // -- args
 if (!isset($fan_style)) $fan_style = 0;
 if ($fan_style==0) $fan_style = 3;
-if ((!isset($PEDIGREE_GENERATIONS)) || ($PEDIGREE_GENERATIONS == "")) $PEDIGREE_GENERATIONS = $DEFAULT_PEDIGREE_GENERATIONS;
+if ((!isset($PEDIGREE_GENERATIONS)) || ($PEDIGREE_GENERATIONS == "")) $PEDIGREE_GENERATIONS = GedcomConfig::$DEFAULT_PEDIGREE_GENERATIONS;
 
-if ($PEDIGREE_GENERATIONS > $MAX_PEDIGREE_GENERATIONS) {
-	$PEDIGREE_GENERATIONS = $MAX_PEDIGREE_GENERATIONS;
+if ($PEDIGREE_GENERATIONS > GedcomConfig::$MAX_PEDIGREE_GENERATIONS) {
+	$PEDIGREE_GENERATIONS = GedcomConfig::$MAX_PEDIGREE_GENERATIONS;
 	$max_generation = true;
 }
 
@@ -510,9 +510,9 @@ else {
 }
 // -- print html header information
 $title = PrintReady($name);
-if ($SHOW_ID_NUMBERS) $title .= " - ".$rootid;
+if (GedcomConfig::$SHOW_ID_NUMBERS) $title .= " - ".$rootid;
 $title .= " - ".$gm_lang["fan_chart"];
-print_header($title);
+PrintHeader($title);
 if (strlen($name)<30) $cellwidth="420";
 else $cellwidth=(strlen($name)*14);
 print "\n\t<table class=\"list_table $TEXT_DIRECTION\"><tr><td width=\"${cellwidth}\" valign=\"top\">\n\t\t";
@@ -575,7 +575,7 @@ if ($view != "preview") {
 	print "<td class=\"shade1\">";
 //	print "<input type=\"text\" name=\"PEDIGREE_GENERATIONS\" size=\"3\" value=\"$OLD_PGENS\" /> ";
 	print "<select name=\"PEDIGREE_GENERATIONS\">";
-	for ($i=2; $i<=$MAX_PEDIGREE_GENERATIONS; $i++) {
+	for ($i=2; $i<=GedcomConfig::$MAX_PEDIGREE_GENERATIONS; $i++) {
 	print "<option value=\"".$i."\"";
 	if ($i == $OLD_PGENS) print " selected=\"selected\" ";
 		print ">".$i."</option>";
@@ -603,5 +603,5 @@ print "</td></tr></table>";
 $treeid = ChartFunctions::AncestryArray($rootid, $PEDIGREE_GENERATIONS);
 print_fan_chart($treeid, 640*$fan_width/100, $fan_style*90);
 
-print_footer();
+PrintFooter();
 ?>

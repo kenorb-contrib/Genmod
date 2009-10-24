@@ -33,14 +33,13 @@
 if (stristr($_SERVER["SCRIPT_NAME"],basename(__FILE__))) {
 	require "../../intrusion.php";
 }
-global $CALENDAR_FORMAT;
-if ($CALENDAR_FORMAT=="hijri" || $CALENDAR_FORMAT=="arabic") {
+if (GedcomConfig::$CALENDAR_FORMAT=="hijri" || GedcomConfig::$CALENDAR_FORMAT=="arabic") {
 	require_once("includes/functions/functions_date_hijri.php");
 }
 
 // Removed Hebrew check because one can have Hebrew disabled but the Gedcom can contain
 // Hebrew dates.
-// if ((stristr($CALENDAR_FORMAT, "hebrew")!==false) || (stristr($CALENDAR_FORMAT, "jewish")!==false) || $USE_RTL_FUNCTIONS) {
+// if ((stristr(GedcomConfig::$CALENDAR_FORMAT, "hebrew")!==false) || (stristr(GedcomConfig::$CALENDAR_FORMAT, "jewish")!==false) || GedcomConfig::$USE_RTL_FUNCTIONS) {
 	require_once("includes/functions/functions_date_hebrew.php");
 // }
 
@@ -56,7 +55,7 @@ if ($CALENDAR_FORMAT=="hijri" || $CALENDAR_FORMAT=="arabic") {
  * @return string the new converted date
  */
 function ConvertDate($dstr_beg, $dstr_end, $day, $month, $year) {
-	global $gm_lang, $DATE_FORMAT, $LANGUAGE, $CALENDAR_FORMAT, $monthtonum, $TEXT_DIRECTION;
+	global $gm_lang, $DATE_FORMAT, $LANGUAGE, $monthtonum, $TEXT_DIRECTION;
 	$altDay=30;
 
 	$month = trim($month);
@@ -79,7 +78,7 @@ function ConvertDate($dstr_beg, $dstr_end, $day, $month, $year) {
 		}
 		$skipday = true;
 	}
-	if ($CALENDAR_FORMAT=="jewish" && $LANGUAGE != "hebrew" && !empty($year) && ! (preg_match("/^\d+$/", $year)==0)) {
+	if (GedcomConfig::$CALENDAR_FORMAT=="jewish" && $LANGUAGE != "hebrew" && !empty($year) && ! (preg_match("/^\d+$/", $year)==0)) {
 		$month = $monthtonum[$month];
 		$jd = gregoriantojd($month, $day, $year);
 		$hebrewDate = jdtojewish($jd);
@@ -112,7 +111,7 @@ function ConvertDate($dstr_beg, $dstr_end, $day, $month, $year) {
 		$newdate = preg_replace("/Y/", $hebrewYear, $newdate);
 		$datestr = $dstr_beg . $newdate . $dstr_end;
 	}
-	else if ($CALENDAR_FORMAT=="jewish_and_gregorian" && $LANGUAGE != "hebrew" && !empty($year) && ! (preg_match("/^\d+$/", $year)==0)) {
+	else if (GedcomConfig::$CALENDAR_FORMAT=="jewish_and_gregorian" && $LANGUAGE != "hebrew" && !empty($year) && ! (preg_match("/^\d+$/", $year)==0)) {
 		$monthnum = $monthtonum[$month];
 		$jd = gregoriantojd($monthnum, $day, $year);
 		$hebrewDate = jdtojewish($jd);
@@ -158,7 +157,7 @@ function ConvertDate($dstr_beg, $dstr_end, $day, $month, $year) {
 		$gdate = trim($gdate);
 		$datestr = $dstr_beg . $newdate . " ($gdate)" . $dstr_end;
 	}
-	else if (($CALENDAR_FORMAT=="hebrew" || ($CALENDAR_FORMAT=="jewish" && $LANGUAGE == "hebrew")) && !empty($year) && ! (preg_match("/^\d+$/", $year)==0)) {
+	else if ((GedcomConfig::$CALENDAR_FORMAT=="hebrew" || (GedcomConfig::$CALENDAR_FORMAT=="jewish" && $LANGUAGE == "hebrew")) && !empty($year) && ! (preg_match("/^\d+$/", $year)==0)) {
 
 		$month = $monthtonum[$month];
 		$jd = gregoriantojd($month, $day, $year);
@@ -174,7 +173,7 @@ function ConvertDate($dstr_beg, $dstr_end, $day, $month, $year) {
 		$newdate = GetFullHebrewJewishDates($hebrewYear, $hebrewMonth, $hebrewDay, $altHebrewYear, $altHebrewMonth);
 		$datestr = $dstr_beg . $newdate . $dstr_end;
 	}
-	else if (($CALENDAR_FORMAT=="hebrew_and_gregorian" || ($CALENDAR_FORMAT=="jewish_and_gregorian" && $LANGUAGE == "hebrew")) && !empty($year) && ! (preg_match("/^\d+$/", $year)==0)) {
+	else if ((GedcomConfig::$CALENDAR_FORMAT=="hebrew_and_gregorian" || (GedcomConfig::$CALENDAR_FORMAT=="jewish_and_gregorian" && $LANGUAGE == "hebrew")) && !empty($year) && ! (preg_match("/^\d+$/", $year)==0)) {
 		$monthnum = $monthtonum[$month];
 		//if (preg_match("/^\d+$/", $year)==0) $year = date("Y");
 		$jd = gregoriantojd($monthnum, $day, $year);
@@ -199,7 +198,7 @@ function ConvertDate($dstr_beg, $dstr_end, $day, $month, $year) {
 		$gdate = trim($gdate);
 		$datestr = $dstr_beg  . " ". $newdate . " ($gdate) ". $dstr_end;
 	}
-	else if ($CALENDAR_FORMAT=="julian") {
+	else if (GedcomConfig::$CALENDAR_FORMAT=="julian") {
 		$monthnum = $monthtonum[$month];
 		$jd = gregoriantojd($monthnum, $day, $year);
 		$jDate = jdtojulian($jd);
@@ -212,7 +211,7 @@ function ConvertDate($dstr_beg, $dstr_end, $day, $month, $year) {
 		$newdate = preg_replace("/Y/", $jYear, $newdate);
 		$datestr = $dstr_beg . $newdate . $dstr_end;
 	}
-	else if ($CALENDAR_FORMAT=="hijri") {
+	else if (GedcomConfig::$CALENDAR_FORMAT=="hijri") {
 		$monthnum = $monthtonum[$month];
 		$hDate = GetHijri($day, $monthnum, $year);
 		list ($hMonthName, $hDay, $hYear) = split ('/', $hDate);
@@ -227,7 +226,7 @@ function ConvertDate($dstr_beg, $dstr_end, $day, $month, $year) {
 	  	}
 		$datestr .= $dstr_end;
 	}
-	else if ($CALENDAR_FORMAT=="arabic") {
+	else if (GedcomConfig::$CALENDAR_FORMAT=="arabic") {
 		$monthnum = $monthtonum[$month];
 		$aDate = GetArabic($day, $monthnum, $year);
 		list ($aMonthName, $aDay, $aYear) = split ('/', $aDate);
@@ -242,7 +241,7 @@ function ConvertDate($dstr_beg, $dstr_end, $day, $month, $year) {
 	  	}
 		$datestr .= $dstr_end;
 	}
-	else if ($CALENDAR_FORMAT=="french") {
+	else if (GedcomConfig::$CALENDAR_FORMAT=="french") {
 		$monthnum = $monthtonum[$month];
 		$jd = gregoriantojd($monthnum, $day, $year);
 		$frenchDate = jdtofrench($jd);
@@ -510,8 +509,7 @@ function GetTurkishDate($datestr) {
  * @return string the new date string
  */
 function GetChangedDate($datestr) {
-	global $gm_lang, $DATE_FORMAT, $LANGUAGE, $CALENDAR_FORMAT, $monthtonum, $dHebrew;
-	global $USE_RTL_FUNCTIONS; //--- required??
+	global $gm_lang, $DATE_FORMAT, $LANGUAGE, $monthtonum, $dHebrew;
 	global $CalYear;   //-- Hebrew calendar year
 
 	$checked_dates = array();
@@ -670,8 +668,8 @@ function GetChangedDate($datestr) {
 	//-- this will make sure years get converted for non romanic alphabets such as hebrew
 	$ct = preg_match_all("/.?(\d\d\d\d)/", $datestr, $match, PREG_SET_ORDER);
 
-	if ((stristr($CALENDAR_FORMAT, "hebrew")!==false) || (stristr($CALENDAR_FORMAT, "jewish")!==false) || ($dHebrew)) { // check if contain hebrew dates then heared also with hebrew date!!!!
-//	if ((stristr($CALENDAR_FORMAT, "hebrew")!==false) || (stristr($CALENDAR_FORMAT, "jewish")!==false) || $dHebrew || $USE_RTL_FUNCTIONS) {
+	if ((stristr(GedcomConfig::$CALENDAR_FORMAT, "hebrew")!==false) || (stristr(GedcomConfig::$CALENDAR_FORMAT, "jewish")!==false) || ($dHebrew)) { // check if contain hebrew dates then heared also with hebrew date!!!!
+//	if ((stristr(GedcomConfig::$CALENDAR_FORMAT, "hebrew")!==false) || (stristr(GedcomConfig::$CALENDAR_FORMAT, "jewish")!==false) || $dHebrew || GedcomConfig::$USE_RTL_FUNCTIONS) {
 
 		$checked_dates_str = implode(",", $checked_dates);
 		for($i=0; $i<$ct; $i++) {
@@ -693,7 +691,7 @@ function GetChangedDate($datestr) {
 			}
 		}
 	}
-	else if ($CALENDAR_FORMAT=="hijri") {
+	else if (GedcomConfig::$CALENDAR_FORMAT=="hijri") {
 		$checked_dates_str = implode(",", $checked_dates);
 		for($i=0; $i<$ct; $i++) {
 			$match[$i][0] = trim($match[$i][0]);
@@ -740,10 +738,10 @@ function GetChangedDate($datestr) {
  * @return string a converted date with anchor html tags around it <a href="">date</a>
  */
 function GetDateUrl($datestr){
-	global $monthtonum, $USE_RTL_FUNCTIONS;
+	global $monthtonum;
 	global $CalYear;   //-- Hebrew calendar year
 	
-    if (!stristr($datestr, "#DHEBREW") || $USE_RTL_FUNCTIONS) {
+    if (!stristr($datestr, "#DHEBREW") || GedcomConfig::$USE_RTL_FUNCTIONS) {
 
 //		Commented out 2 lines as I don't know why they are here
 //		$datestrip = preg_replace("/[a-zA-Z]/", "", $datestr);
@@ -760,7 +758,7 @@ function GetDateUrl($datestr){
 			// Checks if date is bet(ween)..and or from..to
 				$cb = preg_match_all("/ (\d\d\d\d|\d\d\d)/", trim($datestr), $match_bet, PREG_SET_ORDER);
 
-                    if (stristr($datestr, "#DHEBREW") && $USE_RTL_FUNCTIONS) {
+                    if (stristr($datestr, "#DHEBREW") && GedcomConfig::$USE_RTL_FUNCTIONS) {
 
                     	$cm = preg_match_all("/([a-zA-Z]{2,4})?\s?([a-zA-Z]{7})?\s?(\d{1,2}\s)?([a-zA-Z]{3})?\s?(\d{3,4})?/", trim($datestr), $match_bet, PREG_SET_ORDER);
 						$dateheb = array();
@@ -932,7 +930,7 @@ function GetDateUrl($datestr){
 						$tmplink = "\">";
 					}
 
-					if (stristr($datestr, "#DHEBREW") && $USE_RTL_FUNCTIONS) {
+					if (stristr($datestr, "#DHEBREW") && GedcomConfig::$USE_RTL_FUNCTIONS) {
 						    $dateheb = array();
 						    if ($day!="")      			$date[0]["day"]   = $day;
 						    else if ($tmpdatelink=="calendar") $date[0]["day"]   = '30';
@@ -994,7 +992,8 @@ function GetDateUrl($datestr){
  * @return string the age in a string
  */
 function GetAge($indirec, $datestr, $style=1) {
-	global $gm_lang,$monthtonum, $USE_RTL_FUNCTIONS;
+	global $gm_lang,$monthtonum;
+	
 	$estimates = array("abt","aft","bef","est","cir");
 	$realbirthdt="";
 	$bdatestr = "";
@@ -1014,7 +1013,7 @@ function GetAge($indirec, $datestr, $style=1) {
 				if ($hct>0) {
 					$dct = preg_match("/2 DATE (.+)/", $birthrec, $match);
 					$hebrew_birthdate = ParseDate(trim($match[1]));
-					if ($USE_RTL_FUNCTIONS && $index==1) $birthdate = JewishGedcomDateToGregorian($hebrew_birthdate);
+					if (GedcomConfig::$USE_RTL_FUNCTIONS && $index==1) $birthdate = JewishGedcomDateToGregorian($hebrew_birthdate);
 				}
 				else {
 					$dct = preg_match("/2 DATE (.+)/", $birthrec, $match);
@@ -1029,7 +1028,7 @@ function GetAge($indirec, $datestr, $style=1) {
 	$convert_hebrew = false;
 	//-- check if it is a hebrew date
 	$hct = preg_match("/@#DHEBREW@/", $datestr, $match);
-	if ($USE_RTL_FUNCTIONS && $hct>0) {
+	if (GedcomConfig::$USE_RTL_FUNCTIONS && $hct>0) {
 		if (isset($hebrew_birthdate)) $birthdate = $hebrew_birthdate;
 		else $convert_hebrew = true;
 	}

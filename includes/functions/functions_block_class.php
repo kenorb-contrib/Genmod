@@ -38,12 +38,12 @@ abstract class BlockFunctions {
 	 * @return array
 	 */
 	public function GetTopSurnames($num) {
-		global $COMMON_NAMES_REMOVE, $GEDCOMID;
+		global $GEDCOMID;
 	
 		//-- Exclude the common surnames to be removed
 		$delnames = array();
-		if ($COMMON_NAMES_REMOVE != "") {
-			$delnames = preg_split("/[,;] /", $COMMON_NAMES_REMOVE);
+		if (GedcomConfig::$COMMON_NAMES_REMOVE != "") {
+			$delnames = preg_split("/[,;] /", GedcomConfig::$COMMON_NAMES_REMOVE);
 		}
 		$delstrn = "";
 		foreach($delnames as $key => $delname) {
@@ -69,7 +69,6 @@ abstract class BlockFunctions {
 	public function GetCachedEvents($action, $daysprint, $filter, $onlyBDM="no", $skipfacts) {
 		global $gm_lang, $month, $year, $day, $monthtonum, $monthstart;
 		global $GEDCOMID, $ASC, $IGNORE_FACTS, $IGNORE_YEAR;
-		global $USE_RTL_FUNCTIONS, $DAYS_TO_SHOW_LIMIT;
 		global $CIRCULAR_BASE;
 		
 		$found_facts = array();
@@ -101,9 +100,9 @@ abstract class BlockFunctions {
 			// Substract 1 to make # of days correct: including start date
 			$dstart = date("j", $monthstart);
 			if ($action == "upcoming") {
-				$monthend = $monthstart + (60*60*24*($DAYS_TO_SHOW_LIMIT-1));
-				$dend = date("j", $monthstart+(60*60*24*($DAYS_TO_SHOW_LIMIT-1)));
-				$mend = date("n", $monthstart+(60*60*24*($DAYS_TO_SHOW_LIMIT-1)));
+				$monthend = $monthstart + (60*60*24*(GedcomConfig::$DAYS_TO_SHOW_LIMIT-1));
+				$dend = date("j", $monthstart+(60*60*24*(GedcomConfig::$DAYS_TO_SHOW_LIMIT-1)));
+				$mend = date("n", $monthstart+(60*60*24*(GedcomConfig::$DAYS_TO_SHOW_LIMIT-1)));
 			}
 			else {
 				$monthend = $monthstart;
@@ -121,7 +120,7 @@ abstract class BlockFunctions {
 						$date = 0; //--- MA @@@
 						$hct = preg_match("/2 DATE.*(@#DHEBREW@)/", $factrec, $match);
 						if ($hct>0) {
-							if ($USE_RTL_FUNCTIONS) {
+							if (GedcomConfig::$USE_RTL_FUNCTIONS) {
 								$dct = preg_match("/2 DATE (.+)/", $factrec, $match);
 								if ($dct>0) {
 									$hebrew_date = ParseDate(trim($match[1]));
@@ -371,7 +370,7 @@ abstract class BlockFunctions {
 	}
 	
 	public function PrintBlockFavorites(&$userfavs, $side, $index, $style) {
-		global $command, $gm_user, $gm_lang;
+		global $command, $gm_user, $gm_lang, $view;
 		
 		foreach($userfavs as $key=>$favorite) {
 			if (isset($favorite->id)) $key=$favorite->id;
@@ -391,7 +390,7 @@ abstract class BlockFunctions {
 					if ($favorite->object->sex == "F") print "F\">\n";
 					elseif ($favorite->object->sex == "U") print "NN\">\n";
 					else print "\">\n";
-					PersonFunctions::PrintPedigreePerson($favorite->object, $style, 1, $key);
+					PersonFunctions::PrintPedigreePerson($favorite->object, $style, 1, $key, 1, $view);
 				}
 				else {
 					print "\"><ul>\n";
@@ -416,7 +415,7 @@ abstract class BlockFunctions {
 	}
 	
 	public function PrintBlockAddFavorite($command, $type) {
-		global $GM_IMAGE_DIR, $GM_IMAGES, $gm_lang, $GEDCOMID;
+		global $GM_IMAGES, $gm_lang, $GEDCOMID;
 		
 		?>
 			<script language="JavaScript" type="text/javascript">
@@ -430,7 +429,7 @@ abstract class BlockFunctions {
 			<br />
 		<?php
 		print_help_link("index_add_favorites_help", "qm", "add_favorite");
-		print "<b><a href=\"javascript: ".$gm_lang["add_favorite"]." \" onclick=\"expand_layer('add_".$type."_fav'); return false;\"><img id=\"add_ged_fav_img\" src=\"".$GM_IMAGE_DIR."/".$GM_IMAGES["plus"]["other"]."\" border=\"0\" alt=\"".$gm_lang["add_favorite"]."\" />&nbsp;".$gm_lang["add_favorite"]."</a></b>";
+		print "<b><a href=\"javascript: ".$gm_lang["add_favorite"]." \" onclick=\"expand_layer('add_".$type."_fav'); return false;\"><img id=\"add_ged_fav_img\" src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["plus"]["other"]."\" border=\"0\" alt=\"".$gm_lang["add_favorite"]."\" />&nbsp;".$gm_lang["add_favorite"]."</a></b>";
 		print "<br /><div id=\"add_".$type."_fav\" style=\"display: none;\">\n";
 		print "<form name=\"addfavform\" method=\"get\" action=\"index.php\">\n";
 		print "<input type=\"hidden\" name=\"action\" value=\"addfav\" />\n";

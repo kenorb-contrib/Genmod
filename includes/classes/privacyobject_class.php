@@ -84,8 +84,8 @@ class PrivacyObject {
 		
 		// Initialize some values, which cannot be done with var, as in PHP4 it only accepts constants
 		$this->GEDCOMID = $gedcomid;
-		$this->global_facts["SSN"]["show"] = $this->PRIV_NONE;
-		$this->global_facts["SSN"]["details"] = $this->PRIV_NONE;
+		$this->global_facts["SSN"]["show"] = "PRIV_NONE";
+		$this->global_facts["SSN"]["details"] = "PRIV_NONE";
 		$this->GetPrivacy($gedcomid, $user_override);
 	}
 	

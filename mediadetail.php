@@ -35,7 +35,7 @@ require("config.php");
 */
 $media_controller = new mediaController();
 
-print_header($media_controller->pagetitle);
+PrintHeader($media_controller->pagetitle);
 
 $media_controller->CheckNoResult($gm_lang["media_not_found"]);
 
@@ -71,21 +71,21 @@ $media_controller->CheckRawEdited();
 				$imgheight = 400;
 			}
 		}
-		else if ((preg_match("'://'", $MEDIA_DIRECTORY)>0)||($media_controller->media->fileobj->f_file_exists)) {
+		else if ((preg_match("'://'", GedcomConfig::$MEDIA_DIRECTORY)>0)||($media_controller->media->fileobj->f_file_exists)) {
 			if ($media_controller->media->fileobj->f_width > 0 && $media_controller->media->fileobj->f_height > 0) {
 				$imgwidth = $media_controller->media->fileobj->f_width+50;
 				$imgheight = $media_controller->media->fileobj->f_height + 50;
 			}
 		}
-		if (preg_match("'://'", $thumbnail)||(preg_match("'://'", $MEDIA_DIRECTORY)>0)||($media_controller->media->fileobj->f_file_exists)) {
-			if ($USE_GREYBOX && $media_controller->media->fileobj->f_is_image) print "<a href=\"".FilenameEncode($filename)."\" title=\"".PrintReady($media_controller->media->title)."\" rel=\"gb_imageset[]\">";
+		if (preg_match("'://'", $thumbnail)||(preg_match("'://'", GedcomConfig::$MEDIA_DIRECTORY)>0)||($media_controller->media->fileobj->f_file_exists)) {
+			if (USE_GREYBOX && $media_controller->media->fileobj->f_is_image) print "<a href=\"".FilenameEncode($filename)."\" title=\"".PrintReady($media_controller->media->title)."\" rel=\"gb_imageset[]\">";
 			else {
 				print "<a href=\"#\" onclick=\"return openImage('".$filename."',".$imgwidth.", ".$imgheight.", ".$media_controller->media->fileobj->f_is_image.");\">";
 			}
 			print "<img src=\"".$thumbnail."\" border=\"0\" align=\"" . ($TEXT_DIRECTION== "rtl"?"right": "left") . "\" class=\"thumbnail\" alt=\"\" /></a>";
 		}
 		?>
-		<?php if($SHOW_COUNTER) {
+		<?php if(GedcomConfig::$SHOW_COUNTER) {
 			print "\n<br /><br /><span style=\"margin-left: 3px;\">".$gm_lang["hit_count"]."&nbsp;".$hits."</span>\n";
 		}?>
 		</td>
@@ -94,5 +94,5 @@ $media_controller->CheckRawEdited();
 <?php	
 $media_controller->PrintTabs();
 
-print_footer(); 
+PrintFooter(); 
 ?>

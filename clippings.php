@@ -33,7 +33,7 @@
 require("config.php");
 
 if (!isset($ENABLE_CLIPPINGS_CART)) $ENABLE_CLIPPINGS_CART = $PRIV_HIDE;
-if ($ENABLE_CLIPPINGS_CART===true) $ENABLE_CLIPPING_CART=$PRIV_PUBLIC;
+if ($ENABLE_CLIPPINGS_CART===true) $ENABLE_CLIPPING_CART = $PRIV_PUBLIC;
 if ($ENABLE_CLIPPINGS_CART < $gm_user->getUserAccessLevel())
 {
   header("Location: index.php");
@@ -48,7 +48,7 @@ if (!isset($type)) $type = "";
 $id = CleanInput($id);
 
 // -- print html header information
-print_header($gm_lang["clip_cart"]);
+PrintHeader($gm_lang["clip_cart"]);
 print "\r\n\t<h3>".$gm_lang["clippings_cart"]."</h3>";
 
 
@@ -76,7 +76,7 @@ function id_in_cart($id) {
 }
 
 function add_clipping($clipping) {
-	global $cart, $gm_lang, $SHOW_SOURCES, $GEDCOMID;
+	global $cart, $gm_lang, $GEDCOMID;
 	
 	if (($clipping['id']==false)||($clipping['id']=="")) return false;
 
@@ -412,7 +412,7 @@ else if($action=='download') {
 	$mediacount=0;
 	$ct = count($cart[$GEDCOMID]);
 	$filetext = "0 HEAD\r\n1 SOUR Genmod\r\n2 NAME Genmod Online Genealogy\r\n2 VERS ".GM_VERSION." ".GM_VERSION_RELEASE."\r\n1 DEST DISKETTE\r\n1 DATE ".date("j M Y")."\r\n2 TIME ".date("h:i:s")."\r\n";
-	$filetext .= "1 GEDC\r\n2 VERS 5.5\r\n2 FORM LINEAGE-LINKED\r\n1 CHAR $CHARACTER_SET\r\n";
+	$filetext .= "1 GEDC\r\n2 VERS 5.5\r\n2 FORM LINEAGE-LINKED\r\n1 CHAR ".GedcomConfig::$CHARACTER_SET."\r\n";
 	$head = FindGedcomRecord("HEAD");
 	$placeform = trim(GetSubRecord(1, "1 PLAC", $head));
 	if (!empty($placeform)) $filetext .= $placeform."\r\n";
@@ -519,13 +519,13 @@ else if($action=='download') {
 		else $filetext .= trim($record)."\r\n";
 	}
 	$filetext .= "0 @SGM1@ SOUR\r\n";
-	$tuser =& User::GetInstance($CONTACT_EMAIL);
+	$tuser =& User::GetInstance(GedcomConfig::$CONTACT_EMAIL);
 	if ($tuser) {
 		$filetext .= "1 AUTH ".$tuser->firstname." ".$tuser->lastname."\r\n";
 	}
-	$filetext .= "1 TITL ".$HOME_SITE_TEXT."\r\n";
-	$filetext .= "1 ABBR ".$HOME_SITE_TEXT."\r\n";
-	$filetext .= "1 PUBL ".$HOME_SITE_URL."\r\n";
+	$filetext .= "1 TITL ".GedcomConfig::$HOME_SITE_TEXT."\r\n";
+	$filetext .= "1 ABBR ".GedcomConfig::$HOME_SITE_TEXT."\r\n";
+	$filetext .= "1 PUBL ".GedcomConfig::$HOME_SITE_URL."\r\n";
 	$filetext .= "0 TRLR\r\n";
 	//-- make sure the gedcom doesn't have any empty lines
 	$filetext = preg_replace("/(\r?\n)+/", "\r\n", $filetext);
@@ -538,7 +538,7 @@ else if($action=='download') {
 		// -- create zipped media file====> is a todo
 		print "<li>".$gm_lang["media_files"]."</li><ul>";
 		for($m=0; $m<$mediacount; $m++) {
-			print "<li><a href=\"".$MEDIA_DIRECTORY."$media[$m]\">".substr($media[$m], strrpos($media[$m], "/"))."</a></li>";
+			print "<li><a href=\"".GedcomConfig::$MEDIA_DIRECTORY."$media[$m]\">".substr($media[$m], strrpos($media[$m], "/"))."</a></li>";
 		}
 		print "</ul>";
 	}
@@ -558,12 +558,12 @@ else {
 	for($i=0; $i<$ct; $i++) {
 		print "\r\n\t\t<tr>\r\n\t\t<td class=\"list_value\">";
 		$clipping = $cart[$GEDCOMID][$i];
-		if($clipping['type']=='indi') print "<img src=\"".$GM_IMAGE_DIR."/".$GM_IMAGES["indis"]["small"]."\" border=\"0\" alt=\"".$gm_lang["individual"]."\" />";
-		else if($clipping['type']=='fam') print "<img src=\"".$GM_IMAGE_DIR."/".$GM_IMAGES["sfamily"]["small"]."\" border=\"0\" alt=\"".$gm_lang["family"]."\" />";
-		else if($clipping['type']=='sour') print "<img src=\"".$GM_IMAGE_DIR."/".$GM_IMAGES["source"]["small"]."\" border=\"0\" alt=\"".$gm_lang["source"]."\" />";
-		else if($clipping['type']=='repo') print "<img src=\"".$GM_IMAGE_DIR."/".$GM_IMAGES["repository"]["small"]."\" border=\"0\" alt=\"".$gm_lang["repo"]."\" />";
-		else if($clipping['type']=='obje') print "<img src=\"".$GM_IMAGE_DIR."/".$GM_IMAGES["media"]["small"]."\" border=\"0\" alt=\"".$gm_lang["media"]."\" />";
-		else if($clipping['type']=='note') print "<img src=\"".$GM_IMAGE_DIR."/".$GM_IMAGES["note"]["other"]."\" border=\"0\" alt=\"".$gm_lang["note"]."\" />";
+		if($clipping['type']=='indi') print "<img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["indis"]["small"]."\" border=\"0\" alt=\"".$gm_lang["individual"]."\" />";
+		else if($clipping['type']=='fam') print "<img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["sfamily"]["small"]."\" border=\"0\" alt=\"".$gm_lang["family"]."\" />";
+		else if($clipping['type']=='sour') print "<img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["source"]["small"]."\" border=\"0\" alt=\"".$gm_lang["source"]."\" />";
+		else if($clipping['type']=='repo') print "<img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["repository"]["small"]."\" border=\"0\" alt=\"".$gm_lang["repo"]."\" />";
+		else if($clipping['type']=='obje') print "<img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["media"]["small"]."\" border=\"0\" alt=\"".$gm_lang["media"]."\" />";
+		else if($clipping['type']=='note') print "<img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["note"]["other"]."\" border=\"0\" alt=\"".$gm_lang["note"]."\" />";
 		print "</td><td class=\"list_value\">".$clipping['id']."</td><td class=\"list_value\">";
 
 		$id_ok = true;
@@ -645,5 +645,5 @@ else {
 	print_help_link("empty_cart_help", "qm");
 }
 if (isset($_SESSION["cart"])) $_SESSION["cart"]=$cart;
-print_footer();
+PrintFooter();
 ?>

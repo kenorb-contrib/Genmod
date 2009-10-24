@@ -49,7 +49,7 @@ if (isset($cleanup) && $cleanup == "yes") unset($_SESSION[$GEDCOMID."statisticsp
 global $nrfam, $famgeg, $nrpers, $persgeg,$key2ind,$nrman,$nrvrouw;
 global $match1,$match2;
 
-print_header($gm_lang["statistics"]);
+PrintHeader($gm_lang["statistics"]);
 //-- You should install JpGraph routines on your computer. I implemented them in genmod/modules/jpgraph
 //-- Please check this with any availability test
 
@@ -204,6 +204,6 @@ print "</form>";
 //$_SESSION["plottype"]=$plottype;
 
 print "<br />";
-print_footer();
+PrintFooter();
 
 ?>

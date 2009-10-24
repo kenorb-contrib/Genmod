@@ -32,7 +32,7 @@ require("config.php");
 if (!isset($pid)) $pid = "";
 if (!isset($changed)) $changed = false;
 $pid = CleanInput($pid);
-print_simple_header($pid);
+PrintSimpleHeader($pid);
 
 if ((!$gm_user->userCanViewGedlines()) && (!$gm_user->UserCanAccept())) {
 	print "<span class=\"error\">".$gm_lang["ged_noshow"]."</span>\n";
@@ -41,7 +41,7 @@ if ((!$gm_user->userCanViewGedlines()) && (!$gm_user->UserCanAccept())) {
 }
 
 if ((FindPersonRecord($pid))&&(!PrivacyFunctions::displayDetailsByID($pid))) {
-	PrintFunctions::PrintPrivacyError($CONTACT_EMAIL);
+	PrintFunctions::PrintPrivacyError(GedcomConfig::$CONTACT_EMAIL);
 	print "</body></html>";
 	exit;
 }

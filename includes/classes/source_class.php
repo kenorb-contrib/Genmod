@@ -222,17 +222,25 @@ class Source extends GedcomRecord {
 		if (!is_null($this->indilist)) return $this->indilist;
 		$this->indilist = array();
 		$this->indi_hide = 0;
+		$key = "";
 		
-		$sql = "SELECT DISTINCT i_key, i_gedrec, i_isdead, i_id, i_file  FROM ".TBLPREFIX."source_mapping, ".TBLPREFIX."individuals WHERE sm_sid='".$this->xref."' AND sm_file='".$this->gedcomid."' AND sm_type='INDI' AND sm_gid=i_id AND sm_file=i_file";
+		$sql = "SELECT DISTINCT n_id, i_key, i_gedrec, i_isdead, i_id, i_file, n_name, n_surname, n_letter, n_type  FROM ".TBLPREFIX."source_mapping, ".TBLPREFIX."individuals, ".TBLPREFIX."names WHERE sm_sid='".$this->xref."' AND sm_file='".$this->gedcomid."' AND sm_type='INDI' AND sm_gid=i_id AND sm_file=i_file AND i_key=n_key ORDER BY i_key, n_id";
 		$res = NewQuery($sql);
 		while($row = $res->FetchAssoc()){
-			$person = null;
-			$person =& Person::GetInstance($row["i_id"], $row, $row["i_file"]);
-			if ($person->DispName()) {
-				$this->indilist[$row["i_key"]] = $person;
+			if ($key != $row["i_key"]) {
+				if ($key != "") $person->names_read = true;
+				$key = $row["i_key"];
+				$person = null;
+				$person =& Person::GetInstance($row["i_id"], $row, $row["i_file"]);
+				if ($person->DispName()) {
+					$this->indilist[$row["i_key"]] = $person;
+				}
+				else $this->indi_hide++;
 			}
-			else $this->indi_hide++;
+			if ($person->DispName()) $person->addname = array($row["n_name"], $row["n_letter"], $row["n_surname"], $row["n_type"]);
 		}
+		if ($key != "") $person->names_read = true;
+		
 		uasort($this->indilist, "ItemObjSort");
 		$this->indi_count=count($this->indilist);
 		return $this->indilist;

@@ -99,8 +99,8 @@ else {
 	}
 }
 
-if ($type=="full") print_header($gm_lang["login_head"]);
-else print_simple_header($gm_lang["login_head"]);
+if ($type=="full") PrintHeader($gm_lang["login_head"]);
+else PrintSimpleHeader($gm_lang["login_head"]);
 print "<div class=\"center\">\n";
 
 if ($_SESSION["cookie_login"]) {
@@ -108,11 +108,11 @@ if ($_SESSION["cookie_login"]) {
 	print_text("cookie_login_help");
 	print "</div><br /><br />\n";
 }
-if ($REQUIRE_AUTHENTICATION) {
+if (GedcomConfig::$REQUIRE_AUTHENTICATION) {
 	print "<table class=\"center width60 ".$TEXT_DIRECTION."\"><tr><td class=\"wrap\">";
 	if (empty($help_message) || !isset($help_message)) {
 		if (!empty($GEDCOMID)) SwitchGedcom($GEDCOMID);
-		switch ($WELCOME_TEXT_AUTH_MODE){
+		switch (GedcomConfig::$WELCOME_TEXT_AUTH_MODE){
 			case "1":
 				$help_message = "welcome_text_auth_mode_1";
 				print_text($help_message,0,0,false);
@@ -126,11 +126,11 @@ if ($REQUIRE_AUTHENTICATION) {
 				 print_text($help_message,0,0,false);
 				 break;
 			case "4":
-				 if ($WELCOME_TEXT_CUST_HEAD == "true"){
+				 if (GedcomConfig::$WELCOME_TEXT_CUST_HEAD == "true"){
 					 $help_message = "welcome_text_cust_head";
 					 print_text($help_message,0,0,false);
 				 }
-				 print $WELCOME_TEXT_AUTH_MODE_4;
+				 print GedcomConfig::$WELCOME_TEXT_AUTH_MODE_4;
 				 break;
 		}
 	}
@@ -174,8 +174,8 @@ else {
 		  <tr>
 		    <td colspan="2">
 		    <?php
-		        if ($SHOW_CONTEXT_HELP) {
-		          if ($REQUIRE_AUTHENTICATION) {
+		        if (GedcomConfig::$SHOW_CONTEXT_HELP) {
+		          if (GedcomConfig::$REQUIRE_AUTHENTICATION) {
 		            print_help_link("login_buttons_aut_help", "qm", "login");
 		          }
 		          else {
@@ -209,6 +209,6 @@ print "</div><br /><br />";
 //-->
 </script>
 <?php
-if ($type=="full") print_footer();
-else print_simple_footer();
+if ($type=="full") PrintFooter();
+else PrintSimpleFooter();
 ?>

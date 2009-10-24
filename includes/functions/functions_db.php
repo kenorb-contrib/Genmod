@@ -188,9 +188,8 @@ function FindPersonRecord($pid, $gedfile="", $renew = false, $nocache = false) {
  * @return string the raw gedcom record is returned
  */
 function FindGedcomRecord($pid, $gedfile = "", $renew = false, $nocache = false) {
-	global $gm_lang, $MEDIA_ID_PREFIX;
+	global $gm_lang;
 	global $GEDCOMID, $indilist, $famlist, $sourcelist, $otherlist, $repolist, $medialist;
-	global $GEDCOM_ID_PREFIX, $FAM_ID_PREFIX, $SOURCE_ID_PREFIX, $MEDIA_ID_PREFIX, $NOTE_ID_PREFIX;
 	
  	if (DEBUG) print "hit on findgecomrecord for: ".$pid."<br />".pipo;
 	if (empty($pid)) return false;
@@ -229,27 +228,27 @@ function FindGedcomRecord($pid, $gedfile = "", $renew = false, $nocache = false)
 
 	// To minimize queries, we first start to guess what record type we must retrieve
 	$tried = "";
-	if (substr($pid,0,strlen($GEDCOM_ID_PREFIX)) == $GEDCOM_ID_PREFIX) {
+	if (substr($pid,0,strlen(GedcomConfig::$GEDCOM_ID_PREFIX)) == GedcomConfig::$GEDCOM_ID_PREFIX) {
 		$gedrec = FindPersonRecord($pid, $gedfile, $renew, $nocache);
 		$tried = "indi";
 	}
 	else {
-		if (substr($pid,0,strlen($FAM_ID_PREFIX)) == $FAM_ID_PREFIX) {
+		if (substr($pid,0,strlen(GedcomConfig::$FAM_ID_PREFIX)) == GedcomConfig::$FAM_ID_PREFIX) {
 			$gedrec = FindFamilyRecord($pid, $gedfile, $renew);
 			$tried = "fam";
 		}
 		else {
-			if (substr($pid,0,strlen($SOURCE_ID_PREFIX)) == $SOURCE_ID_PREFIX) {
+			if (substr($pid,0,strlen(GedcomConfig::$SOURCE_ID_PREFIX)) == GedcomConfig::$SOURCE_ID_PREFIX) {
 				$gedrec = FindSourceRecord($pid, $gedfile, $renew);
 				$tried = "sour";
 			}
 			else {
-				if (substr($pid,0,strlen($MEDIA_ID_PREFIX)) == $MEDIA_ID_PREFIX) {
+				if (substr($pid,0,strlen(GedcomConfig::$MEDIA_ID_PREFIX)) == GedcomConfig::$MEDIA_ID_PREFIX) {
 					$gedrec = FindMediaRecord($pid, $gedfile, $renew);
 					$tried = "media";
 				}
 				else {
-					if (substr($pid,0,strlen($NOTE_ID_PREFIX)) == $NOTE_ID_PREFIX) {
+					if (substr($pid,0,strlen(GedcomConfig::$NOTE_ID_PREFIX)) == GedcomConfig::$NOTE_ID_PREFIX) {
 						$gedrec = FindOtherRecord($pid, $gedfile, $renew);
 						$tried = "note";
 					}
@@ -475,7 +474,7 @@ function FindSubmitter($gedid) {
  * @return int	1 if the person is dead, 0 if living
  */
 function UpdateIsDead($gid, $indi) {
-	global $USE_RIN, $indilist;
+	global $indilist;
 	$isdead = 0;
 	$isdead = PrivacyFunctions::IsDead($indi["gedcom"]);
 	if (empty($isdead)) $isdead = 0;
@@ -559,7 +558,7 @@ function ResetIsDeadLinked($pid, $type="INDI") {
  * @param string $letter	the letter for this name
  */
 function AddNewName($gid, $newname, $letter, $surname, $indirec) {
-	global $USE_RIN, $indilist, $FILE, $GEDCOMID;
+	global $indilist, $FILE, $GEDCOMID;
 
 	$indilist[$gid]["names"][] = array($newname, $letter, $surname, 'C');
 	$indilist[$gid]["gedcom"] = $indirec;
@@ -589,12 +588,11 @@ function AddNewName($gid, $newname, $letter, $surname, $indirec) {
 * If check for existing media is disabled, return false.
 */
 function CheckDoubleMedia($file, $title, $gedid) {
-	global $MERGE_DOUBLE_MEDIA;
 	
-	if ($MERGE_DOUBLE_MEDIA == 0) return false;
+	if (GedcomConfig::$MERGE_DOUBLE_MEDIA == 0) return false;
 	
 	$sql = "SELECT m_media FROM ".TBLPREFIX."media WHERE m_file='".$gedid."' AND m_mfile LIKE '".DbLayer::EscapeQuery($file)."'";
-	if ($MERGE_DOUBLE_MEDIA == "2") $sql .= " AND m_titl LIKE '".DbLayer::EscapeQuery($title)."'";
+	if (GedcomConfig::$MERGE_DOUBLE_MEDIA == "2") $sql .= " AND m_titl LIKE '".DbLayer::EscapeQuery($title)."'";
 	$res = NewQuery($sql);
 	if ($res->NumRows() == 0) return false;
 	else {
@@ -984,11 +982,11 @@ function GetFamList($allgeds="no", $selection="", $renew=true, $trans=array()) {
 					// First check the husband. If both have the same selected letter/name, 
 					// only the name with the husband first will appear
 					if (JoinKey($fam["HUSB"], $GEDCOMID) == $trans[$key]["id"]) {
-						$hname = SortableNameFromName($trans[$key]["name"]);
+						$hname = NameFunctions::SortableNameFromName($trans[$key]["name"]);
 						$wname = GetSortableName($fam["WIFE"]);
 					}
 					else {
-						$hname = SortableNameFromName($trans[$key]["name"]);
+						$hname = NameFunctions::SortableNameFromName($trans[$key]["name"]);
 						$wname = GetSortableName($fam["HUSB"]);
 					}
 				}
@@ -1063,7 +1061,7 @@ function GetOtherList() {
 
 //-- get the first character in the list
 function GetFamAlpha($allgeds="no") {
-	global $CHARACTER_SET, $LANGUAGE, $famalpha, $GEDCOMID;
+	global $LANGUAGE, $famalpha, $GEDCOMID;
 
 	$famalpha = array();
 
@@ -1111,7 +1109,7 @@ function GetFamAlpha($allgeds="no") {
  * @return array	$indilist array
  */
 function GetAlphaIndis($letter, $allgeds="no") {
-	global $LANGUAGE, $indilist, $surname, $SHOW_MARRIED_NAMES;
+	global $LANGUAGE, $indilist, $surname;
 	global $GEDCOMID, $COMBIKEY;
 
 	$tindilist = array();
@@ -1153,7 +1151,7 @@ function GetAlphaIndis($letter, $allgeds="no") {
 	// NOTE: Add some optimization if the surname is set to speed up the lists
 	if (!empty($surname)) $sql .= "AND n_surname LIKE '%".DbLayer::EscapeQuery($surname)."%' ";
 	// NOTE: Do not retrieve married names if the user does not want to see them
-	if (!$SHOW_MARRIED_NAMES) $sql .= "AND n_type NOT LIKE 'C' ";
+	if (!GedcomConfig::$SHOW_MARRIED_NAMES) $sql .= "AND n_type NOT LIKE 'C' ";
 	// NOTE: Make the selection on the currently active gedcom
 	if ($allgeds != "yes") $sql .= "AND n_file = '".$GEDCOMID."' ";
 	if ($allgeds != "yes") $sql .= "AND i_file = '".$GEDCOMID."'";
@@ -1166,7 +1164,7 @@ function GetAlphaIndis($letter, $allgeds="no") {
 			else $key = $row["i_id"];
 			if (!isset($indilist[$key])) {
 				$indi = array();
-				if ($row["n_type"] != "C" || ($row["n_type"] == "C" && $SHOW_MARRIED_NAMES)) $indi["names"][] = array($row["n_name"], $row["n_letter"], $row["n_surname"], $row["n_type"]);
+				if ($row["n_type"] != "C" || ($row["n_type"] == "C" && GedcomConfig::$SHOW_MARRIED_NAMES)) $indi["names"][] = array($row["n_name"], $row["n_letter"], $row["n_surname"], $row["n_type"]);
 				$indi["isdead"] = $row["i_isdead"];
 				$indi["gedcom"] = $row["i_gedrec"];
 				$indi["gedfile"] = $row["n_file"];
@@ -1175,7 +1173,7 @@ function GetAlphaIndis($letter, $allgeds="no") {
 				$indilist[$key] = $indi;
 			}
 			else {
-				if ($row["n_type"] != "C" || ($row["n_type"] == "C" && $SHOW_MARRIED_NAMES)) $indilist[$key]["names"][] = array($row["n_name"], $row["n_letter"], $row["n_surname"], $row["n_type"]);
+				if ($row["n_type"] != "C" || ($row["n_type"] == "C" && GedcomConfig::$SHOW_MARRIED_NAMES)) $indilist[$key]["names"][] = array($row["n_name"], $row["n_letter"], $row["n_surname"], $row["n_type"]);
 
 			}
 		}
@@ -1192,33 +1190,33 @@ function GetAlphaIndis($letter, $allgeds="no") {
  * @return array	$indilist array
  */
 function GetSurnameIndis($surname, $allgeds="no") {
-	global $LANGUAGE, $indilist, $SHOW_MARRIED_NAMES, $GEDCOMID, $COMBIKEY, $SHOW_NICK, $NICK_DELIM;
+	global $LANGUAGE, $indilist, $GEDCOMID, $COMBIKEY;
 
 	$tindilist = array();
 	$sql = "SELECT i_key, i_id, i_file, i_isdead, i_gedrec, n_letter, n_name, n_surname, n_type FROM ".TBLPREFIX."individuals, ".TBLPREFIX."names WHERE i_key=n_key AND n_surname LIKE '".DbLayer::EscapeQuery($surname)."' ";
-	if (!$SHOW_MARRIED_NAMES) $sql .= "AND n_type!='C' ";
+	if (!GedcomConfig::$SHOW_MARRIED_NAMES) $sql .= "AND n_type!='C' ";
 	if ($allgeds == "no") $sql .= "AND i_file='".$GEDCOMID."'";
 	$sql .= " ORDER BY n_surname";
 	$res = NewQuery($sql);
 	while($row = $res->FetchAssoc()){
 		$row = db_cleanup($row);
-		if ($SHOW_NICK) {
+		if (GedcomConfig::$SHOW_NICK) {
 			$n = GetNicks($row["i_gedrec"]);
 			if (count($n) > 0) {
 				$ct = preg_match("~(.*)/(.*)/(.*)~", $row["n_name"], $match);
-				if ($ct>0) $row["n_name"] = $match[1].substr($NICK_DELIM, 0, 1).$n[0].substr($NICK_DELIM, 1, 1)."/".$match[2]."/".$match[3];
+				if ($ct>0) $row["n_name"] = $match[1].substr(GedcomConfig::$NICK_DELIM, 0, 1).$n[0].substr(GedcomConfig::$NICK_DELIM, 1, 1)."/".$match[2]."/".$match[3];
 //				$ct = preg_match("~(.*)/(.*)/(.*)~", $row["i_name"], $match);
-//				$row["i_name"] = $match[1].substr($NICK_DELIM, 0, 1).$n[0].substr($NICK_DELIM, 1, 1)."/".$match[2]."/".$match[3];
+//				$row["i_name"] = $match[1].substr(GedcomConfig::$NICK_DELIM, 0, 1).$n[0].substr(GedcomConfig::$NICK_DELIM, 1, 1)."/".$match[2]."/".$match[3];
 			}
 		}
 		if (!$COMBIKEY) $key = $row["i_id"];
 		else $key = $row["i_key"];
 		if (isset($indilist[$key])) {
-			if ($row["n_type"] != "C" || ($row["n_type"] == "C" && $SHOW_MARRIED_NAMES)) $indilist[$key]["names"][] = array($row["n_name"], $row["n_letter"], $row["n_surname"], $row["n_type"]);
+			if ($row["n_type"] != "C" || ($row["n_type"] == "C" && GedcomConfig::$SHOW_MARRIED_NAMES)) $indilist[$key]["names"][] = array($row["n_name"], $row["n_letter"], $row["n_surname"], $row["n_type"]);
 		}
 		else {
 			$indi = array();
-			if ($row["n_type"] != "C" || ($row["n_type"] == "C" && $SHOW_MARRIED_NAMES)) $indi["names"][] = array($row["n_name"], $row["n_letter"], $row["n_surname"], $row["n_type"]);
+			if ($row["n_type"] != "C" || ($row["n_type"] == "C" && GedcomConfig::$SHOW_MARRIED_NAMES)) $indi["names"][] = array($row["n_name"], $row["n_letter"], $row["n_surname"], $row["n_type"]);
 			$indi["isdead"] = $row["i_isdead"];
 			$indi["gedcom"] = $row["i_gedrec"];
 			$indi["gedfile"] = $row["i_file"];
@@ -1231,10 +1229,10 @@ function GetSurnameIndis($surname, $allgeds="no") {
 }
 
 function GetAlphaFamSurnames($letter, $allgeds="no") {
-	global $GEDCOMID, $famlist, $indilist, $gm_lang, $LANGUAGE, $SHOW_MARRIED_NAMES, $COMBIKEY;
+	global $GEDCOMID, $famlist, $indilist, $gm_lang, $LANGUAGE, $COMBIKEY;
 
-	$temp = $SHOW_MARRIED_NAMES;
-	$SHOW_MARRIED_NAMES = false;
+	$temp = GedcomConfig::$SHOW_MARRIED_NAMES;
+	GedcomConfig::$SHOW_MARRIED_NAMES = false;
 	$search_letter = "";
 	
 	// NOTE: Determine what letter to search for depending on the active language
@@ -1274,6 +1272,7 @@ function GetAlphaFamSurnames($letter, $allgeds="no") {
 	while($row = $res->FetchAssoc()) {
 		$namelist[] = array("name"=>$row["n_surname"], "count"=>$row["fams"]);		
 	}
+	GedcomConfig::$SHOW_MARRIED_NAMES = $temp;
 	return $namelist;
 }
 
@@ -1286,7 +1285,7 @@ function GetAlphaFamSurnames($letter, $allgeds="no") {
  * @see GetAlphaIndis()
  */
 function GetAlphaFams($letter, $allgeds="no") {
-	global $GEDCOMID, $famlist, $indilist, $gm_lang, $LANGUAGE, $SHOW_MARRIED_NAMES, $COMBIKEY;
+	global $GEDCOMID, $famlist, $indilist, $gm_lang, $LANGUAGE, $COMBIKEY;
 	
 	$search_letter = "";
 	
@@ -1320,8 +1319,8 @@ function GetAlphaFams($letter, $allgeds="no") {
 	// This table is to determine which of the indis for a family has the desired letter.
 	// Later, when building the famlist, it is used to place that person first in the familydescriptor
 	$trans = array();
-	$temp = $SHOW_MARRIED_NAMES;
-	$SHOW_MARRIED_NAMES = false;
+	$temp = GedcomConfig::$SHOW_MARRIED_NAMES;
+	GedcomConfig::$SHOW_MARRIED_NAMES = false;
 	
 	$sql = "SELECT DISTINCT if_fkey, if_pkey, n_name FROM ".TBLPREFIX."names, ".TBLPREFIX."individual_family WHERE n_key=if_pkey AND if_role='S' ";
 	$sql .= "AND n_type NOT LIKE 'C' ";
@@ -1336,7 +1335,7 @@ function GetAlphaFams($letter, $allgeds="no") {
 	}
 	$select = "'".implode("', '", $select)."'";
 	$f = GetFamlist($allgeds, $select, false, $trans);
-	$SHOW_MARRRIED_NAMES = $temp;
+	GedcomConfig::$SHOW_MARRIED_NAMES = $temp;
 	return $f;
 }
 
@@ -1348,12 +1347,12 @@ function GetAlphaFams($letter, $allgeds="no") {
  * @return array	$indilist array
  */
 function GetSurnameFams($surname, $allgeds="no") {
-	global $GEDCOMID, $famlist, $indilist, $gm_lang, $SHOW_MARRIED_NAMES, $COMBIKEY;
+	global $GEDCOMID, $famlist, $indilist, $gm_lang, $COMBIKEY;
 	
 	$trans = array();
 	$select = array();
-	$temp = $SHOW_MARRIED_NAMES;
-	$SHOW_MARRIED_NAMES = false;
+	$temp = GedcomConfig::$SHOW_MARRIED_NAMES;
+	GedcomConfig::$SHOW_MARRIED_NAMES = false;
 
 	$sql = "SELECT DISTINCT if_fkey, if_pkey, n_name FROM ".TBLPREFIX."names, ".TBLPREFIX."individual_family WHERE n_key=if_pkey AND if_role='S' AND n_surname='".DbLayer::EscapeQuery($surname)."'";
 	if ($allgeds != "yes") $sql .= " AND n_file = '".$GEDCOMID."' ";
@@ -1378,7 +1377,7 @@ function GetSurnameFams($surname, $allgeds="no") {
 	$select = "'".implode("', '", $select)."'";
 	if ($select != "''") $f = GetFamlist($allgeds, $select, false, $trans);
 	else $f = array();
-	$SHOW_MARRIED_NAMES = $temp;
+	GedcomConfig::$SHOW_MARRIED_NAMES = $temp;
 	return $f;
 }
 
@@ -1499,7 +1498,6 @@ function GetListSize($list) {
  */
 function AcceptChange($cid, $gedfile, $all=false) {
 	global $GEDCOMID, $FILE, $gm_user, $chcache;
-	global $MEDIA_ID_PREFIX, $FAM_ID_PREFIX, $GEDCOM_ID_PREFIX, $SOURCE_ID_PREFIX, $REPO_ID_PREFIX, $NOTE_ID_PREFIX;
 	
 	$cidchanges = array();
 	if ($all) $sql = "SELECT ch_id, ch_cid, ch_gid, ch_file, ch_old, ch_new, ch_type, ch_user, ch_time FROM ".TBLPREFIX."changes WHERE ch_file = '".$gedfile."' ORDER BY ch_id ASC";
@@ -1631,7 +1629,7 @@ function RejectChange($cid, $gedfile, $all=false) {
  * @param string $indirec
  */
 function UpdateRecord($indirec, $delete=false) {
-	global $GEDCOMID, $PEDIGREE_ROOT_ID;
+	global $GEDCOMID;
 
 	$tt = preg_match("/0 @(.+)@ (.+)/", $indirec, $match);
 	if ($tt>0) {
@@ -1754,8 +1752,8 @@ function UpdateRecord($indirec, $delete=false) {
 		if ($type == "INDI") {
 			// Clear users
 			UserController::ClearUserGedcomIDs($gid, $GEDCOMID);
-			if ($PEDIGREE_ROOT_ID == $gid) {
-				$PEDIGREE_ROOT_ID = "";
+			if (GedcomConfig::$PEDIGREE_ROOT_ID == $gid) {
+				GedcomConfig::$PEDIGREE_ROOT_ID = "";
 				GedcomConfig::SetPedigreeRootId("", $GEDCOMID);
 			}
 		}
@@ -2116,7 +2114,7 @@ function HasChangedMedia($gedrec) {
  * @author	Genmod Development Team
  */
 function StoreGedcoms() {
-	global $GEDCOMS, $gm_lang, $DEFAULT_GEDCOM, $COMMON_NAMES_THRESHOLD, $GEDCOMID;
+	global $GEDCOMS, $gm_lang, $DEFAULT_GEDCOM, $GEDCOMID;
 
 	if (!CONFIGURED) return false;
 	uasort($GEDCOMS, "GedcomSort");
@@ -2132,9 +2130,6 @@ function StoreGedcoms() {
 	foreach($GEDCOMS as $indexval => $GED) {
 //		print "<br /><br />Processing gedcom ".$indexval;
 //		print_r($GED);
-		$GED["config"] = str_replace(INDEX_DIRECTORY, "\${INDEX_DIRECTORY}", $GED["config"]);
-		if (isset($GED["privacy"])) $GED["privacy"] = str_replace(INDEX_DIRECTORY, "\${INDEX_DIRECTORY}", $GED["privacy"]);
-		else $GED["privacy"] = "privacy.php";
 		$GED["path"] = str_replace(INDEX_DIRECTORY, "\${INDEX_DIRECTORY}", $GED["path"]);
 		$GED["title"] = stripslashes($GED["title"]);
 		$GED["title"] = preg_replace("/\"/", "\\\"", $GED["title"]);
@@ -2147,7 +2142,7 @@ function StoreGedcoms() {
 		if (empty($GED["commonsurnames"])) {
 			if ($GED["gedcom"] == get_gedcom_from_id($GEDCOMID)) {
 				$GED["commonsurnames"] = "";
-				$surnames = GetCommonSurnames($COMMON_NAMES_THRESHOLD);
+				$surnames = GetCommonSurnames(GedcomConfig::$COMMON_NAMES_THRESHOLD);
 				foreach($surnames as $indexval => $surname) {
 					$GED["commonsurnames"] .= $surname["name"].", ";
 				}
@@ -2156,7 +2151,7 @@ function StoreGedcoms() {
 		}
 		if ($GED["gedcom"] == $DEFAULT_GEDCOM) $is_default = "Y";
 		else $is_default = "N";
-		$sql = "INSERT INTO ".TBLPREFIX."gedcoms VALUES('".DbLayer::EscapeQuery($GED["gedcom"])."','".DbLayer::EscapeQuery($GED["config"])."','".DbLayer::EscapeQuery($GED["privacy"])."','".DbLayer::EscapeQuery($GED["title"])."','".DbLayer::EscapeQuery($GED["path"])."','".DbLayer::EscapeQuery($GED["id"])."','".DbLayer::EscapeQuery($GED["commonsurnames"])."','".DbLayer::EscapeQuery($is_default)."')";
+		$sql = "INSERT INTO ".TBLPREFIX."gedcoms VALUES('".DbLayer::EscapeQuery($GED["gedcom"])."','".DbLayer::EscapeQuery($GED["title"])."','".DbLayer::EscapeQuery($GED["path"])."','".DbLayer::EscapeQuery($GED["id"])."','".DbLayer::EscapeQuery($GED["commonsurnames"])."','".DbLayer::EscapeQuery($is_default)."')";
 		$res = NewQuery($sql);
 	}
 }
@@ -2185,8 +2180,6 @@ function ReadGedcoms() {
 			while($row = $res->FetchAssoc()){
 				$g = array();
 				$g["gedcom"] = $row["g_gedcom"];
-				$g["config"] = str_replace("\${INDEX_DIRECTORY}", INDEX_DIRECTORY, $row["g_config"]);
-				$g["privacy"] = str_replace("\${INDEX_DIRECTORY}", INDEX_DIRECTORY, $row["g_privacy"]);
 				$g["title"] = $row["g_title"];
 				$g["path"] = str_replace("\${INDEX_DIRECTORY}", INDEX_DIRECTORY, $row["g_path"]);
 				$g["id"] = $row["g_file"];

@@ -31,60 +31,43 @@ require("config.php");
 
 $placelist_controller = new PlacelistController();
 
-print_header($placelist_controller->pagetitle);
+PrintHeader($placelist_controller->pagetitle);
 
 print "\n\t<div class=\"center\" >";
-print "<h3>".$placelist_controller->pagetitle."</h3>\n\t";
-
-if (!isset($parent)) $parent=array();
-else {
-	if (!is_array($parent)) $parent = array();
-	else $parent = array_values($parent);
-}
-// Remove slashes
-foreach ($parent as $p => $child){
-	$parent[$p] = stripslashes($child);
-}
-
-if (!isset($level)) {
-	$level=0;
-}
-
-if ($level>count($parent)) $level = count($parent);
-if ($level<count($parent)) $level = 0;
+print "<h3>".$placelist_controller->title."</h3>\n\t";
 
 //-- hierarchical display
 if ($placelist_controller->display == "hierarchy") {
 	// -- array of names
-	$placelist = $placelist_controller->GetPlaceList($parent, $level);
+	$placelist = $placelist_controller->GetPlaceList($placelist_controller->parent, $placelist_controller->level);
 	$numfound = count($placelist);
 	
 	//-- create a query string for passing to search page
-	$tempparent = array_reverse($parent);
+	$tempparent = array_reverse($placelist_controller->parent);
 	if (count($tempparent)>0) $squery = "&query=".urlencode($tempparent[0]);
 	else $squery="";
-	for($i=1; $i<$level; $i++) {
+	for($i=1; $i<$placelist_controller->level; $i++) {
 		$squery.=", ".urlencode($tempparent[$i]);
 	}
 
 	// -- print the breadcrumb hierarchy
 	$numls=0;
-	if ($level>0) {
+	if ($placelist_controller->level > 0) {
 		//-- link to search results
-		if ((($level>1)||($parent[0]!=""))&&($numfound>0)) {
+		if (($placelist_controller->level > 1 || $placelist_controller->parent[0] != "") && $numfound > 0) {
 			print $numfound."  ".$gm_lang["connections"].": ";
 		}
 		//-- breadcrumb
-		$numls = count($parent)-1;
+		$numls = count($placelist_controller->parent)-1;
 		$num_place="";
 		//-- place and page text orientation is opposite -> top level added at the beginning of the place text
 		print "<a href=\"placelist.php?level=0&amp;select=".$placelist_controller->select."\">";
-		if ($numls>=0 && (($TEXT_DIRECTION=="ltr" && hasRtLText($parent[$numls])) || ($TEXT_DIRECTION=="rtl" && !hasRtLText($parent[$numls])))) print $gm_lang["top_level"].", ";
+		if ($numls>=0 && (($TEXT_DIRECTION=="ltr" && hasRtLText($placelist_controller->parent[$numls])) || ($TEXT_DIRECTION=="rtl" && !hasRtLText($placelist_controller->parent[$numls])))) print $gm_lang["top_level"].", ";
 		print "</a>";
 	    for($i=$numls; $i>=0; $i--) {
 			print "<a href=\"placelist.php?level=".($i+1)."&amp;";
 			for ($j=0; $j<=$i; $j++) {
-				$levels = preg_split ("/,/", trim($parent[$j]));
+				$levels = preg_split ("/,/", trim($placelist_controller->parent[$j]));
 				// Routine for replacing ampersands
 				foreach($levels as $pindex=>$ppart) {
 					$ppart = urlencode($ppart);
@@ -93,28 +76,28 @@ if ($placelist_controller->display == "hierarchy") {
 				}
 			}
  			print "&amp;select=".$placelist_controller->select."\">";
- 			if (trim($parent[$i])=="") print $gm_lang["unknown"];
+ 			if (trim($placelist_controller->parent[$i])=="") print $gm_lang["unknown"];
 			else {
-				print PrintReady($parent[$i]);
-				if (HasChinese($parent[$i])) print " (".printReady(GetPinYin($parent[$i])).")";
+				print PrintReady($placelist_controller->parent[$i]);
+				if (HasChinese($placelist_controller->parent[$i])) print " (".printReady(GetPinYin($placelist_controller->parent[$i])).")";
 			}
 			print "</a>";
  			if ($i>0) print ", ";
- 			else if (($TEXT_DIRECTION=="rtl" && hasRtLText($parent[$i])) || ($TEXT_DIRECTION=="ltr" &&  !hasRtLText($parent[$i])))  print ", ";
-			if (empty($num_place)) $num_place=$parent[$i];
+ 			else if (($TEXT_DIRECTION=="rtl" && hasRtLText($placelist_controller->parent[$i])) || ($TEXT_DIRECTION=="ltr" &&  !hasRtLText($placelist_controller->parent[$i])))  print ", ";
+			if (empty($num_place)) $num_place=$placelist_controller->parent[$i];
 		}
 	}
 	print "<a href=\"placelist.php?level=0&amp;select=".$placelist_controller->select."\">";
 	//-- place and page text orientation is the same -> top level added at the end of the place text
-	if ($level==0 || ($numls>=0 && (($TEXT_DIRECTION=="rtl" && hasRtLText($parent[$numls])) || ($TEXT_DIRECTION=="ltr" && !hasRtLText($parent[$numls]))))) print $gm_lang["top_level"];
+	if ($placelist_controller->level == 0 || ($numls>=0 && (($TEXT_DIRECTION=="rtl" && hasRtLText($placelist_controller->parent[$numls])) || ($TEXT_DIRECTION=="ltr" && !hasRtLText($placelist_controller->parent[$numls]))))) print $gm_lang["top_level"];
 	print "</a>";
 
 	print_help_link("ppp_levels_help", "qm");
 
 	// show clickable map if found
 	print "\n\t<br /><br />\n\t<table class=\"width90 center\"><tr><td class=\"center\">";
-	if ($level>=1 and $level<=3) {
-		$country = $parent[0];
+	if ($placelist_controller->level >= 1 && $placelist_controller->level <= 3) {
+		$country = $placelist_controller->parent[0];
 		if ($country == "\xD7\x99\xD7\xA9\xD7\xA8\xD7\x90\xD7\x9C") $country = "ISR"; // Israel hebrew name
 		$country = strtoupper($country);
 		if (strlen($country)!=3) {
@@ -122,7 +105,7 @@ if ($placelist_controller->display == "hierarchy") {
 			require($GM_BASE_DIRECTORY."languages/countries.en.php");
 			// changed $LANGUAGE to $deflang (the language set for the current gedcom)	// eikland
 			// changed to $GEDCOMLANG sjouke
-			if (file_exists($GM_BASE_DIRECTORY."languages/countries.".$lang_short_cut[$GEDCOMLANG].".php")) require($GM_BASE_DIRECTORY."languages/countries.".$lang_short_cut[$GEDCOMLANG].".php");
+			if (file_exists($GM_BASE_DIRECTORY."languages/countries.".$lang_short_cut[GedcomConfig::$GEDCOMLANG].".php")) require($GM_BASE_DIRECTORY."languages/countries.".$lang_short_cut[GedcomConfig::$GEDCOMLANG].".php");
 			foreach ($countries as $countrycode => $countryname) {
 				if (strtoupper($countryname) == $country) {
 					$country = $countrycode;
@@ -132,23 +115,25 @@ if ($placelist_controller->display == "hierarchy") {
 			if (strlen($country)!=3) $country=substr($country,0,3);
 		}
 		$mapname = $country;
-		$areaname = $parent[0];
+		$areaname = $placelist_controller->parent[0];
 		$imgfile = "places/".$country."/".$mapname.".gif";
 		$mapfile = "places/".$country."/".$country.".".$lang_short_cut[$LANGUAGE].".htm";
 		if (!file_exists($mapfile)) $mapfile = "places/".$country."/".$country.".htm";
 
-		if ($level>1) {
-			$state = SmartUtf8Decode($parent[1]);
+		if ($placelist_controller->level > 1) {
+			$state = SmartUtf8Decode($placelist_controller->parent[1]);
 			$mapname .= "_".$state;
-			if ($level>2) {
-				$county = SmartUtf8Decode($parent[2]);
+			if ($placelist_controller->level > 2) {
+				$county = SmartUtf8Decode($placelist_controller->parent[2]);
 				$mapname .= "_".$county;
-				$parent[2] = str_replace("'","\'",$parent[2]);
-				$areaname = $parent[2];
+//				$placelist_controller->parent[2] = str_replace("'","\'",$placelist_controller->parent[2]);
+//				$areaname = $placelist_controller->parent[2];
+				$areaname = str_replace("'","\'",$placelist_controller->parent[2]);
 			}
 			else {
-				$parent[1] = str_replace("'","\'",$parent[1]);
-				$areaname = $parent[1];
+//				$placelist_controller->parent[1] = str_replace("'","\'",$placelist_controller->parent[1]);
+//				$areaname = $placelist_controller->parent[1];
+				$areaname = str_replace("'","\'",$placelist_controller->parent[1]);			
 			}
 			$mapname = strtr($mapname,"���������������������������������������������������������������������' ","SOZsozYYuAAAAAAACEEEEIIIIDNOOOOOOUUUUYsaaaaaaaceeeeiiiionoooooouuuuyy--");
 			$imgfile = "places/".$country."/".$mapname.".gif";
@@ -173,46 +158,46 @@ if ($placelist_controller->display == "hierarchy") {
 				if (txt=='') return;
 				// search full text [California (CA)]
 				var search = txt;
-				if (places_accept.in_array(search)) return(location.href = 'placelist.php?level=2<?php print "&parent[0]=".$parent[0]."&parent[1]="?>'+search);
+				if (places_accept.in_array(search)) return(location.href = 'placelist.php?level=2<?php print "&parent[0]=".$placelist_controller->parent[0]."&parent[1]="?>'+search);
 				// search without optional code [California]
 				txt = txt.replace(/(\/)/,' ('); // case: finnish/swedish ==> finnish (swedish
 				p=txt.indexOf(' (');
 				if (p>1) search=txt.substring(0,p);
 				else return;
-				if (places_accept.in_array(search)) return(location.href = 'placelist.php?level=2<?php print "&parent[0]=".$parent[0]."&parent[1]="?>'+search);
+				if (places_accept.in_array(search)) return(location.href = 'placelist.php?level=2<?php print "&parent[0]=".$placelist_controller->parent[0]."&parent[1]="?>'+search);
 				// search with code only [CA]
 				search=txt.substring(p+2);
 				p=search.indexOf(')');
 				if (p>1) search=search.substring(0,p);
-				if (places_accept.in_array(search)) return(location.href = 'placelist.php?level=2<?php print "&parent[0]=".$parent[0]."&parent[1]="?>'+search);
+				if (places_accept.in_array(search)) return(location.href = 'placelist.php?level=2<?php print "&parent[0]=".$placelist_controller->parent[0]."&parent[1]="?>'+search);
 			}
 			function setPlaceCounty(txt) {
 				if (txt=='') return;
 				var search = txt;
-				if (places_accept.in_array(search)) return(location.href = 'placelist.php?level=3<?php print "&parent[0]=".$parent[0]."&parent[1]=".@$parent[1]."&parent[2]="?>'+search);
+				if (places_accept.in_array(search)) return(location.href = 'placelist.php?level=3<?php print "&parent[0]=".$placelist_controller->parent[0]."&parent[1]=".@$placelist_controller->parent[1]."&parent[2]="?>'+search);
 				txt = txt.replace(/(\/)/,' (');
 				p=txt.indexOf(' (');
 				if (p>1) search=txt.substring(0,p);
 				else return;
-				if (places_accept.in_array(search)) return(location.href = 'placelist.php?level=3<?php print "&parent[0]=".$parent[0]."&parent[1]=".@$parent[1]."&parent[2]="?>'+search);
+				if (places_accept.in_array(search)) return(location.href = 'placelist.php?level=3<?php print "&parent[0]=".$placelist_controller->parent[0]."&parent[1]=".@$placelist_controller->parent[1]."&parent[2]="?>'+search);
 				search=txt.substring(p+2);
 				p=search.indexOf(')');
 				if (p>1) search=search.substring(0,p);
-				if (places_accept.in_array(search)) return(location.href = 'placelist.php?level=3<?php print "&parent[0]=".$parent[0]."&parent[1]=".@$parent[1]."&parent[2]="?>'+search);
+				if (places_accept.in_array(search)) return(location.href = 'placelist.php?level=3<?php print "&parent[0]=".$placelist_controller->parent[0]."&parent[1]=".@$placelist_controller->parent[1]."&parent[2]="?>'+search);
 			}
 			function setPlaceCity(txt) {
 				if (txt=='') return;
 				var search = txt;
-				if (places_accept.in_array(search)) return(location.href = 'placelist.php?level=4<?php print "&parent[0]=".$parent[0]."&parent[1]=".@$parent[1]."&parent[2]=".@$parent[2]."&parent[3]="?>'+search);
+				if (places_accept.in_array(search)) return(location.href = 'placelist.php?level=4<?php print "&parent[0]=".$placelist_controller->parent[0]."&parent[1]=".@$placelist_controller->parent[1]."&parent[2]=".@$placelist_controller->parent[2]."&parent[3]="?>'+search);
 				txt = txt.replace(/(\/)/,' (');
 				p=txt.indexOf(' (');
 				if (p>1) search=txt.substring(0,p);
 				else return;
-				if (places_accept.in_array(search)) return(location.href = 'placelist.php?level=4<?php print "&parent[0]=".$parent[0]."&parent[1]=".@$parent[1]."&parent[2]=".@$parent[2]."&parent[3]="?>'+search);
+				if (places_accept.in_array(search)) return(location.href = 'placelist.php?level=4<?php print "&parent[0]=".$placelist_controller->parent[0]."&parent[1]=".@$placelist_controller->parent[1]."&parent[2]=".@$placelist_controller->parent[2]."&parent[3]="?>'+search);
 				search=txt.substring(p+2);
 				p=search.indexOf(')');
 				if (p>1) search=search.substring(0,p);
-				if (places_accept.in_array(search)) return(location.href = 'placelist.php?level=4<?php print "&parent[0]=".$parent[0]."&parent[1]=".@$parent[1]."&parent[2]=".@$parent[2]."&parent[3]="?>'+search);
+				if (places_accept.in_array(search)) return(location.href = 'placelist.php?level=4<?php print "&parent[0]=".$placelist_controller->parent[0]."&parent[1]=".@$placelist_controller->parent[1]."&parent[2]=".@$placelist_controller->parent[2]."&parent[3]="?>'+search);
 			}
 			//-->
 			</script>
@@ -223,8 +208,8 @@ if ($placelist_controller->display == "hierarchy") {
 
 	//-- create a string to hold the variable links
 	$linklevels="";
-	for($j=0; $j<$level; $j++) {
-		$linklevels .= "&amp;parent[$j]=".urlencode($parent[$j]);
+	for($j=0; $j<$placelist_controller->level; $j++) {
+		$linklevels .= "&amp;parent[$j]=".urlencode($placelist_controller->parent[$j]);
 	}
 	$i=0;
 	$ct1=count($placelist);
@@ -238,8 +223,8 @@ if ($placelist_controller->display == "hierarchy") {
 			if ($ct1 > 20) print "colspan=\"3\"";
 			else if ($ct1 > 4) print "colspan=\"2\"";
 			print ">&nbsp;";
-			print "<img src=\"".$GM_IMAGE_DIR."/".$GM_IMAGES["place"]["small"]."\" border=\"0\" title=\"".$gm_lang["search_place"]."\" alt=\"".$gm_lang["search_place"]."\" />&nbsp;&nbsp;";
-			if ($level>0) {
+			print "<img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["place"]["small"]."\" border=\"0\" title=\"".$gm_lang["search_place"]."\" alt=\"".$gm_lang["search_place"]."\" />&nbsp;&nbsp;";
+			if ($placelist_controller->level > 0) {
 				print " ".$gm_lang["place_list_aft"]." ";
 				print PrintReady($num_place);
 			}
@@ -254,8 +239,8 @@ if ($placelist_controller->display == "hierarchy") {
 		if (begRTLText($value))
 			 print "<li class=\"rtl\" dir=\"rtl\"";
 		else print "<li class=\"ltr\" dir=\"ltr\"";
-		print " type=\"square\">\n<a href=\"placelist.php?action=".$placelist_controller->action."&amp;level=".($level+1).$linklevels;
-		print "&amp;parent[$level]=".urlencode($value)."&amp;select=".$placelist_controller->select."\" class=\"shade1\">";
+		print " type=\"square\">\n<a href=\"placelist.php?action=".$placelist_controller->action."&amp;level=".($placelist_controller->level + 1).$linklevels;
+		print "&amp;parent[$placelist_controller->level]=".urlencode($value)."&amp;select=".$placelist_controller->select."\" class=\"shade1\">";
 
 		if (trim($value)=="") print $gm_lang["unknown"];
 		else {
@@ -274,7 +259,7 @@ if ($placelist_controller->display == "hierarchy") {
 	}
 	if ($i>0){
 		print "\n\t\t</ul></td></tr>";
-		if ($placelist_controller->action != "show" && $level > 0) {
+		if ($placelist_controller->action != "show" && $placelist_controller->level > 0) {
 			print "<tr>\n\t\t<td class=\"shade2 center\" ";
 			if ($ct1 > 20) print "colspan=\"3\"";
 			else if ($ct1 > 4) print "colspan=\"2\"";
@@ -285,8 +270,8 @@ if ($placelist_controller->display == "hierarchy") {
 			if ($ct1 > 20) print "colspan=\"3\"";
 			else if ($ct1 > 4) print "colspan=\"2\"";
 			print " style=\"text-align: center;\">";
-			print "<a href=\"placelist.php?select=".$placelist_controller->select."&amp;action=show&amp;level=$level";
-			foreach($parent as $key=>$value) {
+			print "<a href=\"placelist.php?select=".$placelist_controller->select."&amp;action=show&amp;level=".$placelist_controller->level;
+			foreach($placelist_controller->parent as $key=>$value) {
 				print "&amp;parent[$key]=".urlencode(trim($value));
 			}
 			print "\"><span class=\"formField\">";
@@ -304,10 +289,10 @@ if ($placelist_controller->display == "hierarchy") {
 
 }
 
-if ($level > 0) {
+if ($placelist_controller->level > 0) {
 	if ($placelist_controller->action == "show") {
 		// -- array of names
-		$positions = $placelist_controller->GetPlacePositions($parent, $level, $placelist_controller->select);
+		$positions = $placelist_controller->GetPlacePositions($placelist_controller->parent, $placelist_controller->level, $placelist_controller->select);
 
 		print "\n\t<br /><br /><table class=\"list_table $TEXT_DIRECTION center\">\n\t\t<tr>";
 		$ci = count($placelist_controller->indi_total);
@@ -319,10 +304,10 @@ if ($level > 0) {
 		print "<form action=\"placelist.php\" name=\"selectplace\" method=\"get\">";
 		print "<input type=\"hidden\" name=\"action\" value=\"".$placelist_controller->action."\">";
 		print "<input type=\"hidden\" name=\"display\" value=\"".$placelist_controller->display."\">";
-		print "<input type=\"hidden\" name=\"level\" value=\"".$level."\">";
+		print "<input type=\"hidden\" name=\"level\" value=\"".$placelist_controller->level."\">";
 		$j = 0;
-		while (isset($parent[$j])) {
-			print "<input type=\"hidden\" name=\"parent[]\" value=\"".$parent[$j]."\">";
+		while (isset($placelist_controller->parent[$j])) {
+			print "<input type=\"hidden\" name=\"parent[]\" value=\"".$placelist_controller->parent[$j]."\">";
 			$j++;
 		}
 		print $gm_lang["pl_show_event"].":&nbsp";
@@ -331,9 +316,9 @@ if ($level > 0) {
 		print "</select>";
 		print "</form>";
 		print "</td></tr><tr>";
-		if ($ci>0) print "<td class=\"shade2 center\"><img src=\"".$GM_IMAGE_DIR."/".$GM_IMAGES["indis"]["small"]."\" border=\"0\" alt=\"\" /> ".$gm_lang["individuals"]."</td>";
-		if ($cs>0) print "<td class=\"shade2 center\"><img src=\"".$GM_IMAGE_DIR."/".$GM_IMAGES["source"]["small"]."\" border=\"0\" alt=\"\" /> ".$gm_lang["sources"]."</td>";
-		if ($cf>0) print "<td class=\"shade2 center\"><img src=\"".$GM_IMAGE_DIR."/".$GM_IMAGES["sfamily"]["small"]."\" border=\"0\" alt=\"\" /> ".$gm_lang["families"]."</td>";
+		if ($ci>0) print "<td class=\"shade2 center\"><img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["indis"]["small"]."\" border=\"0\" alt=\"\" /> ".$gm_lang["individuals"]."</td>";
+		if ($cs>0) print "<td class=\"shade2 center\"><img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["source"]["small"]."\" border=\"0\" alt=\"\" /> ".$gm_lang["sources"]."</td>";
+		if ($cf>0) print "<td class=\"shade2 center\"><img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["sfamily"]["small"]."\" border=\"0\" alt=\"\" /> ".$gm_lang["families"]."</td>";
 		print "</tr><tr>";
 		if ($ci>0) {
 			print "\n\t\t<td class=\"shade1 wrap\">";
@@ -413,7 +398,7 @@ if ($placelist_controller->display=="list") {
 		print ">\n\t\t<tr>\n\t\t<td class=\"list_label\" ";
 		$ct = count($placelist);
 		print " colspan=\"".($ct>20?"3":"2")."\">&nbsp;";
-		print "<img src=\"".$GM_IMAGE_DIR."/".$GM_IMAGES["place"]["small"]."\" border=\"0\" title=\"".$gm_lang["search_place"]."\" alt=\"".$gm_lang["search_place"]."\" />&nbsp;&nbsp;";
+		print "<img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["place"]["small"]."\" border=\"0\" title=\"".$gm_lang["search_place"]."\" alt=\"".$gm_lang["search_place"]."\" />&nbsp;&nbsp;";
 		print $gm_lang["place_list2"];
 		print "&nbsp;";
 		print_help_link("ppp_placelist_help2", "qm");
@@ -436,7 +421,7 @@ if ($placelist_controller->display=="list") {
 			if (begRTLText($revplace))
 			     print "<li class=\"rtl\" dir=\"rtl\"";
 		    else print "<li class=\"ltr\" dir=\"ltr\"";
-			print "type=\"square\"><a href=\"placelist.php?action=show&amp;display=hierarchy&amp;level=$level$linklevels&amp;select=".$placelist_controller->select."\">";
+			print "type=\"square\"><a href=\"placelist.php?action=show&amp;display=hierarchy&amp;level=".$level.$linklevels."&amp;select=".$placelist_controller->select."\">";
 			print PrintReady($revplace)."</a></li>\n";
 			$i++;
 			if ($ct > 20){
@@ -471,6 +456,5 @@ else {
 }
 
 print "<br /><br /></div>";
-print_footer();
-
+PrintFooter();
 ?>

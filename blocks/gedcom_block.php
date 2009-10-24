@@ -34,7 +34,7 @@ $GM_BLOCKS["print_gedcom_block"]["rss"]			= false;
 
 //-- function to print the gedcom block
 function print_gedcom_block($block = true, $config="", $side, $index) {
-	global $hits,$gm_lang, $day, $month, $year, $GEDCOMID, $GEDCOMS, $ALLOW_CHANGE_GEDCOM, $TIME_FORMAT,$SHOW_COUNTER, $command,$THEME_DIR,$TEXT_DIRECTION, $gm_user;
+	global $hits,$gm_lang, $day, $month, $year, $GEDCOMID, $GEDCOMS, $TIME_FORMAT, $command,$TEXT_DIRECTION, $gm_user;
 
 
 	print "<div id=\"gedcom_welcome\" class=\"block\" >\n";
@@ -43,7 +43,7 @@ function print_gedcom_block($block = true, $config="", $side, $index) {
 	print "</div>";
 	print "<div class=\"blockcontent center\">";
 	print "<br />".GetChangedDate("$day $month $year")." - ".date($TIME_FORMAT, time()-$_SESSION["timediff"])."<br />\n";
-	if($SHOW_COUNTER)
+	if(GedcomConfig::$SHOW_COUNTER)
 			print $gm_lang["hit_count"]."  ".$hits."<br />\n";
 	print "\n<br />";
 	print "<a href=\"javascript: ".$gm_lang["add_site_to_favs"]."\" onclick='window.external.AddFavorite(location.href, document.title); return false;'>".$gm_lang["add_site_to_favs"]."</a><br />";

@@ -213,7 +213,6 @@ if (isset($CONFIG_PARMS)) {
 }
 //-- if not configured then redirect to the configuration script
 if (!defined("CONFIGURED") || CONFIGURED == false) {
-	print defined(CONFIGURED);
 	if (file_exists("install/install.php")) {
 	header("Location: install/install.php");
 	exit;
@@ -383,6 +382,7 @@ CheckLockout();
 // -- Read the GEDCOMS array
 $GEDCOMS = array();
 $DEFAULT_GEDCOMID = "";
+if (!isset($GEDCOMID)) $GEDCOMID = "";
 if (CONFIGURED) if ($DBCONN->connected) ReadGedcoms();
 else $GEDCOMS = array();
 
@@ -406,7 +406,6 @@ else {
 	settype($_REQUEST["gedid"], "integer");
 	$GEDCOMID = $_REQUEST["gedid"];
 }
-//if (!empty($GEDCOMID)) $GEDCOM = $GEDCOMS[$GEDCOMID]["gedcom"];
 
 $_SESSION["GEDCOMID"] = $GEDCOMID;
 
@@ -416,7 +415,6 @@ $FAMLIST_RETRIEVED = false;
 // NOTE: This is to suppress the closing div tag in the footer
 $without_close = true;
 
-require_once($GM_BASE_DIRECTORY."config_gedcom.php");
 if (CONFIGURED) if ($DBCONN->connected) GedcomConfig::ReadGedcomConfig($GEDCOMID);
 require_once($GM_BASE_DIRECTORY."includes/functions/functions_name.php");
 require_once($GM_BASE_DIRECTORY."includes/functions/functions_search.php");
@@ -424,9 +422,6 @@ require_once($GM_BASE_DIRECTORY."includes/functions/functions_search.php");
 // This is for choosing either normal or combined keys. It defaults to false to ensure backwards compatibility.
 // When all code is adjusted, this can be removed.
 $COMBIKEY = false;
-
-//-- load the pinyin translations
-if ($DISPLAY_PINYIN) require_once($GM_BASE_DIRECTORY."includes/values/pinyin.php");
 
 //-- load file for language settings
 require_once($GM_BASE_DIRECTORY . "includes/values/lang_settings_std.php");
@@ -511,11 +506,11 @@ asort($gm_language);
  *    rule 3. 
  */
 if ($spider) {
-	$ENABLE_MULTI_LANGUAGE = false;
+	GedcomConfig::$ENABLE_MULTI_LANGUAGE = false;
 }
 if ((!empty($logout))&&($logout==1)) unset($_SESSION["CLANGUAGE"]);		// user is about to log out
 else {
-	if (($ENABLE_MULTI_LANGUAGE)&&(empty($_SESSION["CLANGUAGE"]))) {
+	if ((GedcomConfig::$ENABLE_MULTI_LANGUAGE)&&(empty($_SESSION["CLANGUAGE"]))) {
 		// If visitor language is forced, set it
 		if ($VISITOR_LANG != "Genmod" && isset($gm_lang_use[$VISITOR_LANG])) {
 			$LANGUAGE = $VISITOR_LANG;
@@ -566,13 +561,12 @@ if (!empty($CLANGUAGE) && !$spider) {
    $LANGUAGE = $CLANGUAGE;
 }
 
-// If we still don't know the language, set it to the gedcom language. If all else fails, pick english.
+// If we still don't know the language, set it to the gedcom language. If no gedcom is known, it will default to default gedcom settings.
 if (!isset($LANGUAGE)) {
-	if (isset(GedcomConfig::$GEDCONF[$GEDCOMID])) $LANGUAGE = GedcomConfig::$GEDCONF[$GEDCOMID]["GEDCOMLANG"];
-	else $LANGUAGE="english";
+	$LANGUAGE = GedcomConfig::$GEDCOMLANG;
 }
 
-if ($ENABLE_MULTI_LANGUAGE) {
+if (GedcomConfig::$ENABLE_MULTI_LANGUAGE) {
 	if ((isset($changelanguage))&&($changelanguage=="yes")) {
 		if (!empty($NEWLANGUAGE) && isset($gm_language[$NEWLANGUAGE])) {
 			$LANGUAGE=$NEWLANGUAGE;
@@ -660,12 +654,12 @@ $monthtonum["aav"] = 12;
 $monthtonum["ell"] = 13;
 
 if (!isset($show_context_help)) $show_context_help = "";
-if (!isset($_SESSION["show_context_help"])) $_SESSION["show_context_help"] = $SHOW_CONTEXT_HELP;
+if (!isset($_SESSION["show_context_help"])) $_SESSION["show_context_help"] = GedcomConfig::$SHOW_CONTEXT_HELP;
 if (!isset($_SESSION["gm_user"])) $_SESSION["gm_user"] = "";
 if (!isset($_SESSION["cookie_login"])) $_SESSION["cookie_login"] = false;
-if (isset($SHOW_CONTEXT_HELP) && $show_context_help==='yes') $_SESSION["show_context_help"] = true;
-if (isset($SHOW_CONTEXT_HELP) && $show_context_help==='no') $_SESSION["show_context_help"] = false;
-if (!isset($USE_THUMBS_MAIN)) $USE_THUMBS_MAIN = false;
+//if (isset(GedcomConfig::$SHOW_CONTEXT_HELP) && $show_context_help==='yes') $_SESSION["show_context_help"] = true;
+//if (isset(GedcomConfig::$SHOW_CONTEXT_HELP) && $show_context_help==='no') $_SESSION["show_context_help"] = false;
+//if (!isset(GedcomConfig::$USE_THUMBS_MAIN)) GedcomConfig::$USE_THUMBS_MAIN = false;
 
 if ((strstr($SCRIPT_NAME, "editconfig.php")===false) &&(strstr($SCRIPT_NAME, "editconfig_help.php")===false)) {
 	if ((!$DBCONN->connected)||(!UserController::AdminUserExists())) {
@@ -704,8 +698,8 @@ if ((strstr($SCRIPT_NAME, "editconfig.php")===false) &&(strstr($SCRIPT_NAME, "ed
 		UserController::UserLogout($gm_username);
 		$Action = "";
 		$gm_user =& User::GetInstance($gm_username);
-		if ($REQUIRE_AUTHENTICATION) {
-			header("Location: ".$HOME_SITE_URL);
+		if (GedcomConfig::$REQUIRE_AUTHENTICATION) {
+			header("Location: ".GedcomConfig::$HOME_SITE_URL);
 			exit;
 		}
 		else {
@@ -717,7 +711,7 @@ if ((strstr($SCRIPT_NAME, "editconfig.php")===false) &&(strstr($SCRIPT_NAME, "ed
 		}
 	}
 	
-	if ($REQUIRE_AUTHENTICATION) {
+	if (GedcomConfig::$REQUIRE_AUTHENTICATION) {
 		if (empty($gm_username)) {
 			if ((strstr($SCRIPT_NAME, "login.php")===false)
 				&&(strstr($SCRIPT_NAME, "login_register.php")===false)
@@ -755,25 +749,25 @@ if ((!empty($gm_username))&&(!isset($logout))) {
 	$usertheme = $gm_user->theme;
 	if ((!empty($_POST["user_theme"]))&&(!empty($_POST["oldusername"]))&&($_POST["oldusername"]==$gm_username)) $usertheme = $_POST["user_theme"];
 	if ((!empty($usertheme)) && (file_exists($usertheme."theme.php")))  {
-		$THEME_DIR = $usertheme;
+		GedcomConfig::$THEME_DIR = $usertheme;
 	}
 }
 
 if (isset($_SESSION["theme_dir"])) {
-	$THEME_DIR = $_SESSION["theme_dir"];
+	GedcomConfig::$THEME_DIR = $_SESSION["theme_dir"];
 	if (!empty($gm_username)) {
 		if ($gm_user->editaccount) unset($_SESSION["theme_dir"]);
 	}
 }
 
-if (empty($THEME_DIR)) $THEME_DIR="standard/";
-if (file_exists($GM_BASE_DIRECTORY.$THEME_DIR."theme.php")) require_once($GM_BASE_DIRECTORY.$THEME_DIR."theme.php");
+if (empty(GedcomConfig::$THEME_DIR)) GedcomConfig::$THEME_DIR="standard/";
+if (file_exists($GM_BASE_DIRECTORY.GedcomConfig::$THEME_DIR."theme.php")) require_once($GM_BASE_DIRECTORY.GedcomConfig::$THEME_DIR."theme.php");
 else {
-	$THEME_DIR = $GM_BASE_DIRECTORY."themes/standard/";
-	require_once($THEME_DIR."theme.php");
+	GedcomConfig::$THEME_DIR = $GM_BASE_DIRECTORY."themes/standard/";
+	require_once(GedcomConfig::$THEME_DIR."theme.php");
 }
 
-if ($SHOW_COUNTER) $hits = CounterFunctions::GetCounter(); //--load the hit counter
+if (GedcomConfig::$SHOW_COUNTER) $hits = CounterFunctions::GetCounter(); //--load the hit counter
 
 if ($Languages_Default) {					// If Languages not yet configured
 	$gm_lang_use["english"] = false;		//   disable English
@@ -798,8 +792,7 @@ if ((time() - $_SESSION["check_login"]) > 900) {
 }
 
 // Check for the presence of Greybox
-if (is_dir("modules/greybox/")) $USE_GREYBOX = true;
-else $USE_GREYBOX = false;
+define('USE_GREYBOX', is_dir("modules/greybox/"));
 
 // Define the function to autoload the classes
 function __autoload($classname) {

@@ -76,7 +76,7 @@ if (!isset($bakfile)) $bakfile = "";
 if (!isset($cleanup_needed)) $cleanup_needed = false;
 if (!isset($ok)) $ok = false;
 if (!isset($startimport)) $startimport = false;
-if (!isset($timelimit)) $timelimit = $TIME_LIMIT;
+if (!isset($timelimit)) $timelimit = GedcomConfig::$TIME_LIMIT;
 if (!isset($importtime)) $importtime = 0;
 if (!isset($no_upload)) $no_upload = false;
 if (!isset($override)) $override = false;
@@ -242,7 +242,7 @@ if (isset($UPFILE) && !empty($UPFILE["name"])) {
 }
 
 // NOTE: Change header depending on action
-print_header($gm_lang["merge_gedcom"]);
+PrintHeader($gm_lang["merge_gedcom"]);
 print "<div id=\"import_content\">";
 // NOTE: Print form header
 print "<form enctype=\"multipart/form-data\" method=\"post\" name=\"configform\" action=\"mergegedcom.php\">";
@@ -252,7 +252,7 @@ print "<form enctype=\"multipart/form-data\" method=\"post\" name=\"configform\"
 		print "<div class=\"topbottombar $TEXT_DIRECTION\">";
 			print "<a href=\"javascript: ";
 			print $gm_lang["merge_what"];
-			print "\" onclick=\"expand_layer('add-form');return false\"><img id=\"add-form_img\" src=\"".$GM_IMAGE_DIR."/";
+			print "\" onclick=\"expand_layer('add-form');return false\"><img id=\"add-form_img\" src=\"".GM_IMAGE_DIR."/";
 			if ($startimport != "true") print $GM_IMAGES["minus"]["other"];
 			else print $GM_IMAGES["plus"]["other"];
 			print "\" border=\"0\" width=\"11\" height=\"11\" alt=\"\" /></a>";
@@ -295,7 +295,7 @@ print "<form enctype=\"multipart/form-data\" method=\"post\" name=\"configform\"
 	// NOTE: Upload GEDCOM form
 		if (!isset($GEDFILENAME)) {
 			print "<div class=\"topbottombar $TEXT_DIRECTION\">";
-			print "<a href=\"javascript: ".$gm_lang["merge_what_upload"]."\" onclick=\"expand_layer('upload_gedcom'); return false;\"><img id=\"upload_gedcom_img\" src=\"".$GM_IMAGE_DIR."/";
+			print "<a href=\"javascript: ".$gm_lang["merge_what_upload"]."\" onclick=\"expand_layer('upload_gedcom'); return false;\"><img id=\"upload_gedcom_img\" src=\"".GM_IMAGE_DIR."/";
 			if ($startimport != "true") print $GM_IMAGES["minus"]["other"];
 			else print $GM_IMAGES["plus"]["other"];
 			print "\" border=\"0\" width=\"11\" height=\"11\" alt=\"\" /></a>";
@@ -337,7 +337,7 @@ print "<form enctype=\"multipart/form-data\" method=\"post\" name=\"configform\"
 		print "</div>";
 		}
 			print "<div class=\"topbottombar $TEXT_DIRECTION\">";
-			print "<a href=\"javascript: ".$gm_lang["merge_with"]."\" onclick=\"expand_layer('merge_gedcom'); return false;\"><img id=\"merge_gedcom_img\" src=\"".$GM_IMAGE_DIR."/";
+			print "<a href=\"javascript: ".$gm_lang["merge_with"]."\" onclick=\"expand_layer('merge_gedcom'); return false;\"><img id=\"merge_gedcom_img\" src=\"".GM_IMAGE_DIR."/";
 			if ($startimport != "true") print $GM_IMAGES["minus"]["other"];
 			else print $GM_IMAGES["plus"]["other"];
 			print "\" border=\"0\" width=\"11\" height=\"11\" alt=\"\" /></a>";
@@ -381,7 +381,7 @@ print "<form enctype=\"multipart/form-data\" method=\"post\" name=\"configform\"
 		if ($bakfile != "") {
 			// NOTE: If GEDCOM exists show warning
 			print "<div class=\"topbottombar $TEXT_DIRECTION\" style=\"margin-top: 5px;\">";
-				print "<a href=\"javascript: ".$gm_lang["verify_gedcom"]."\" onclick=\"expand_layer('verify_gedcom');return false\"><img id=\"verify_gedcom_img\" src=\"".$GM_IMAGE_DIR."/";
+				print "<a href=\"javascript: ".$gm_lang["verify_gedcom"]."\" onclick=\"expand_layer('verify_gedcom');return false\"><img id=\"verify_gedcom_img\" src=\"".GM_IMAGE_DIR."/";
 				if ($startimport != "true") print $GM_IMAGES["minus"]["other"];
 				else print $GM_IMAGES["plus"]["other"];
 				print "\" border=\"0\" width=\"11\" height=\"11\" alt=\"\" /></a>";
@@ -426,7 +426,7 @@ print "<form enctype=\"multipart/form-data\" method=\"post\" name=\"configform\"
 	}
 	if ($verify == "validate_form") {
 		print "<div class=\"topbottombar $TEXT_DIRECTION\">";
-			print "<a href=\"javascript: ".$gm_lang["validate_gedcom"]."\" onclick=\"expand_layer('validate_gedcom');return false\"><img id=\"validate_gedcom_img\" src=\"".$GM_IMAGE_DIR."/";
+			print "<a href=\"javascript: ".$gm_lang["validate_gedcom"]."\" onclick=\"expand_layer('validate_gedcom');return false\"><img id=\"validate_gedcom_img\" src=\"".GM_IMAGE_DIR."/";
 			if ($startimport != "true") print $GM_IMAGES["minus"]["other"];
 			else print $GM_IMAGES["plus"]["other"];
 			print "\" border=\"0\" width=\"11\" height=\"11\" alt=\"\" /></a>";
@@ -458,17 +458,17 @@ print "<form enctype=\"multipart/form-data\" method=\"post\" name=\"configform\"
 						//-- read the gedcom and test it in 8KB chunks
 						SwitchGedcom($merge_ged);
 						$lastindi = GetNewXref("INDI");
-						$lastindi = substr($lastindi,(strlen($GEDCOM_ID_PREFIX)));
+						$lastindi = substr($lastindi,(strlen(GedcomConfig::$GEDCOM_ID_PREFIX)));
 						$lastfam = GetNewXref("FAM");
-						$lastfam = substr($lastfam,(strlen($FAM_ID_PREFIX)));
+						$lastfam = substr($lastfam,(strlen(GedcomConfig::$FAM_ID_PREFIX)));
 						$lastobje = GetNewXref("OBJE");
-						$lastobje = substr($lastobje,(strlen($MEDIA_ID_PREFIX)));
+						$lastobje = substr($lastobje,(strlen(GedcomConfig::$MEDIA_ID_PREFIX)));
 						$lastsour = GetNewXref("SOUR");
-						$lastsour = substr($lastsour,(strlen($SOURCE_ID_PREFIX)));
+						$lastsour = substr($lastsour,(strlen(GedcomConfig::$SOURCE_ID_PREFIX)));
 						$lastrepo = GetNewXref("REPO");
-						$lastrepo = substr($lastrepo,(strlen($REPO_ID_PREFIX)));
+						$lastrepo = substr($lastrepo,(strlen(GedcomConfig::$REPO_ID_PREFIX)));
 						$lastnote = GetNewXref("NOTE");
-						$lastnote = substr($lastnote,(strlen($NOTE_ID_PREFIX)));
+						$lastnote = substr($lastnote,(strlen(GedcomConfig::$NOTE_ID_PREFIX)));
 						$inditab = array();
 						$famtab = array();
 						$objetab = array();
@@ -513,27 +513,27 @@ print "<form enctype=\"multipart/form-data\" method=\"post\" name=\"configform\"
 									// print "Handling ".$match[1][$i]." at ".$pos1."<br />";
 									switch ($match[2][$i]) {
 										case "INDI": 
-											$inditab[$match[1][$i]] = $GEDCOM_ID_PREFIX.$lastindi;
+											$inditab[$match[1][$i]] = GedcomConfig::$GEDCOM_ID_PREFIX.$lastindi;
 											$lastindi++;
 											break;
 										case "FAM":
-											$famtab[$match[1][$i]] = $FAM_ID_PREFIX.$lastfam;
+											$famtab[$match[1][$i]] = GedcomConfig::$FAM_ID_PREFIX.$lastfam;
 											$lastfam++;
 											break;
 										case "OBJE":
-											$objetab[$match[1][$i]] = $MEDIA_ID_PREFIX.$lastobje;
+											$objetab[$match[1][$i]] = GedcomConfig::$MEDIA_ID_PREFIX.$lastobje;
 											$lastobje++;
 											break;
 										case "SOUR":
-											$sourtab[$match[1][$i]] = $SOURCE_ID_PREFIX.$lastsour;
+											$sourtab[$match[1][$i]] = GedcomConfig::$SOURCE_ID_PREFIX.$lastsour;
 											$lastsour++;
 											break;
 										case "REPO":
-											$repotab[$match[1][$i]] = $REPO_ID_PREFIX.$lastrepo;
+											$repotab[$match[1][$i]] = GedcomConfig::$REPO_ID_PREFIX.$lastrepo;
 											$lastrepo++;
 											break;
 										case "NOTE":
-											$notetab[$match[1][$i]] = $NOTE_ID_PREFIX.$lastnote;
+											$notetab[$match[1][$i]] = GedcomConfig::$NOTE_ID_PREFIX.$lastnote;
 											$lastnote++;
 											break;
 										default:
@@ -666,7 +666,7 @@ print "<form enctype=\"multipart/form-data\" method=\"post\" name=\"configform\"
 	if ($import == true) {
 		// NOTE: Additional import options
 		print "<div class=\"topbottombar $TEXT_DIRECTION\">";
-			print "<a href=\"javascript: ".$gm_lang["import_options"]."\" onclick=\"expand_layer('import_options');return false\"><img id=\"import_options_img\" src=\"".$GM_IMAGE_DIR."/";
+			print "<a href=\"javascript: ".$gm_lang["import_options"]."\" onclick=\"expand_layer('import_options');return false\"><img id=\"import_options_img\" src=\"".GM_IMAGE_DIR."/";
 			if ($startimport != "true") print $GM_IMAGES["minus"]["other"];
 			else print $GM_IMAGES["plus"]["other"];
 			print "\" border=\"0\" width=\"11\" height=\"11\" alt=\"\" /></a>";
@@ -835,7 +835,7 @@ print "<form enctype=\"multipart/form-data\" method=\"post\" name=\"configform\"
 		//-- end of setup_progress_bar function
 		
 		if (!isset($stage)) $stage = 0;
-		$temp = $THEME_DIR;
+		$temp = GedcomConfig::$THEME_DIR;
 		$GEDCOM_FILE = $GEDFILENAME;
 		$FILEID = $merge_ged;
 		$FILE = get_gedcom_from_id($FILEID);
@@ -843,9 +843,9 @@ print "<form enctype=\"multipart/form-data\" method=\"post\" name=\"configform\"
 		SwitchGedcom($FILEID);
 		if ($LANGUAGE <> $_SESSION["CLANGUAGE"]) $LANGUAGE = $_SESSION["CLANGUAGE"];
 		GedcomConfig::ResetCaches(get_id_from_gedcom($merge_ged));
-		$temp2 = $THEME_DIR;
-		$THEME_DIR = $temp;
-		$THEME_DIR = $temp2;
+		$temp2 = GedcomConfig::$THEME_DIR;
+		GedcomConfig::$THEME_DIR = $temp;
+		GedcomConfig::$THEME_DIR = $temp2;
 		
 		if (isset($GEDCOM_FILE)) {
 			if ((!strstr($GEDCOM_FILE, "://"))&&(!file_exists($GEDCOM_FILE))) {
@@ -1081,7 +1081,7 @@ print "<form enctype=\"multipart/form-data\" method=\"post\" name=\"configform\"
 								DMSoundex("", "closecache");
 								//-- We write the session data and close it. Fix for intermittend logoff.
 								session_write_close();
-								print_footer();
+								PrintFooter();
 								exit;
 							}
 						}
@@ -1205,7 +1205,7 @@ print "<form enctype=\"multipart/form-data\" method=\"post\" name=\"configform\"
 								<input type="submit" name="continue" value="<?php print $gm_lang["del_proceed"]; ?>" />
 							</div>
 							<?php
-							print_footer();
+							PrintFooter();
 							exit;
 						}
 					}
@@ -1265,7 +1265,7 @@ print "<form enctype=\"multipart/form-data\" method=\"post\" name=\"configform\"
 			unset($_SESSION["listtype"]);
 			unset($_SESSION["exectime_start"]);
 			unset($_SESSION["i"]);
-			if (!ini_get('safe_mode')) @set_time_limit($TIME_LIMIT);
+			if (!ini_get('safe_mode')) @set_time_limit(GedcomConfig::$TIME_LIMIT);
 			@unlink(INDEX_DIRECTORY."transtab.txt");
 		}
 	}
@@ -1280,5 +1280,5 @@ print "<form enctype=\"multipart/form-data\" method=\"post\" name=\"configform\"
 	?>
 </form>
 <?php
-print_footer();
+PrintFooter();
 ?>

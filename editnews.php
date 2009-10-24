@@ -38,15 +38,15 @@ if($useFCK){
 
 $username = $gm_username;
 if (empty($username)) {
-	print_simple_header("");
+	PrintSimpleHeader("");
 	print $gm_lang["access_denied"];
-	print_simple_footer();
+	PrintSimpleFooter();
 	exit;
 }
 
 if (!isset($action)) $action="compose";
 
-print_simple_header($gm_lang["edit_news"]);
+PrintSimpleHeader($gm_lang["edit_news"]);
 
 if (empty($uname)) $uname = get_gedcom_from_id($GEDCOMID);
 
@@ -135,5 +135,5 @@ else if ($action=="delete") {
 }
 print "<center><br /><br /><a href=\"#\" onclick=\"if (window.opener.refreshpage) window.opener.refreshpage(); window.close();\">".$gm_lang["close_window"]."</a><br /></center>";
 
-print_simple_footer();
+PrintSimpleFooter();
 ?>

@@ -231,7 +231,6 @@ class Fact {
 	}
 	
 	private function getFactDescription() {
-		global $ABBREVIATE_CHART_LABELS;
 		
 		if (is_null($this->descr)) {
 //			if ($this->ShowDetails()) {
@@ -241,7 +240,7 @@ class Fact {
 //			}
 //			else $this->descr = "";
 		}
-		if ($ABBREVIATE_CHART_LABELS) return GetFirstLetter($this->descr);
+		if (GedcomConfig::$ABBREVIATE_CHART_LABELS) return GetFirstLetter($this->descr);
 		else return $this->descr;
 	}
 	
@@ -420,7 +419,7 @@ class Fact {
 	 * @param boolean $lds		option to print LDS TEMPle and STATus
 	 */
 	public function PrintFactPlace($anchor=false, $sub=false, $lds=false, $prt=true) {
-		global $SHOW_PEDIGREE_PLACES, $TEMPLE_CODES, $gm_lang;
+		global $TEMPLE_CODES, $gm_lang;
 	
 		$printed = false;
 		$out = false;
@@ -451,7 +450,7 @@ class Fact {
 			}
 			else {
 				$prtstr .= " -- ";
-				for ($level=0; $level<$SHOW_PEDIGREE_PLACES; $level++) {
+				for ($level=0; $level < GedcomConfig::$SHOW_PEDIGREE_PLACES; $level++) {
 					if (!empty($levels[$level])) {
 						if ($level>0) $prtstr .= ", ";
 						$prtstr .= PrintReady($levels[$level]);
@@ -459,7 +458,7 @@ class Fact {
 				}
 				if (HasChinese($match[1])) {
 					$ptext = "(";
-					for ($level=0; $level<$SHOW_PEDIGREE_PLACES; $level++) {
+					for ($level=0; $level < GedcomConfig::$SHOW_PEDIGREE_PLACES; $level++) {
 						if (!empty($levels[$level])) {
 							if ($level>0) $ptext .= ", ";
 							$ptext .= GetPinYin(trim($levels[$level]));

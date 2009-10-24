@@ -61,15 +61,14 @@ class SendMail {
 	}
 	// NOTE: Basic mailheader
 	private function MailHeader($from_name, $from_mail, $replyto, $admincopy) {
-		global $WEBMASTER_EMAIL, $BCC_WEBMASTER;
 		
 		$this->header .= "MIME-Version: 1.0\n";
 		$this->header .= "X-Mailer: Genmod\n";
 		// Add extra headers and separate them by \r\n
 		$this->header = "From: ".$from_name." <".$from_mail.">\r\n";
 		$this->header .= "Reply-To: ".$replyto."\r\n";
-		if ($admincopy && $BCC_WEBMASTER) {
-			$adm =& User::GetInstance($WEBMASTER_EMAIL);
+		if ($admincopy && GedcomConfig::$BCC_WEBMASTER) {
+			$adm =& User::GetInstance(GedcomConfig::$WEBMASTER_EMAIL);
 			if (!empty($adm->email)) $this->header .= "Bcc: ".$adm->email."\r\n";
 		}
 	}

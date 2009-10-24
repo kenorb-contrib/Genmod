@@ -29,11 +29,11 @@
 $GM_BLOCKS["print_html_block"]["name"]        = $gm_lang["html_block_name"];
 $GM_BLOCKS["print_html_block"]["descr"]       = "html_block_descr";
 $GM_BLOCKS["print_html_block"]["canconfig"]   = true;
-$GM_BLOCKS["print_html_block"]["config"]      = array("html"=>$gm_lang["html_block_sample_part1"]." <img src=\"".$GM_IMAGE_DIR."/".$GM_IMAGES["admin"]["small"]."\" alt=\"".$gm_lang["config_block"]."\" /> ".$gm_lang["html_block_sample_part2"], "only_show_logged_in"=>"no");
+$GM_BLOCKS["print_html_block"]["config"]      = array("html"=>$gm_lang["html_block_sample_part1"]." <img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["admin"]["small"]."\" alt=\"".$gm_lang["config_block"]."\" /> ".$gm_lang["html_block_sample_part2"], "only_show_logged_in"=>"no");
 $GM_BLOCKS["print_html_block"]["rss"]			= false;
 
 function print_html_block($block=true, $config="", $side, $index) {
-	global $gm_lang, $GM_IMAGE_DIR, $TEXT_DIRECTION, $GM_IMAGES, $HTML_BLOCK_COUNT, $GM_BLOCKS, $command, $GEDCOMID, $gm_user;
+	global $gm_lang, $TEXT_DIRECTION, $GM_IMAGES, $HTML_BLOCK_COUNT, $GM_BLOCKS, $command, $GEDCOMID, $gm_user;
 
 	if (empty($config)) $config = $GM_BLOCKS["print_html_block"]["config"];
 	if ($config["only_show_logged_in"] != "no" && $gm_user->username == "") return;
@@ -53,7 +53,7 @@ function print_html_block($block=true, $config="", $side, $index) {
 			if ($command=="gedcom") $name = preg_replace("/'/", "\'", get_gedcom_from_id($GEDCOMID));
 			else $name = $username;
 			print "<br /><a href=\"javascript: ".$gm_lang["config_block"]."\" onclick=\"window.open('index_edit.php?name=$name&amp;command=$command&amp;action=configure&amp;side=$side&amp;index=$index', '', 'top=50,left=50,width=750,height=550,scrollbars=1,resizable=1'); return false;\">";
-			print "<img class=\"adminicon\" src=\"$GM_IMAGE_DIR/".$GM_IMAGES["admin"]["small"]."\" width=\"15\" height=\"15\" border=\"0\" alt=\"".$gm_lang["config_block"]."\" /></a>\n";
+			print "<img class=\"adminicon\" src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["admin"]["small"]."\" width=\"15\" height=\"15\" border=\"0\" alt=\"".$gm_lang["config_block"]."\" /></a>\n";
 		}
 	}
 	print "</div>"; // blockcontent

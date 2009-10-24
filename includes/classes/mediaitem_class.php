@@ -54,7 +54,7 @@ class MediaItem extends GedcomRecord {
 	}
 	
 	public function __construct($id, $gedrec="", $gedcomid="") {
-		global $GEDCOMID, $MEDIA_DIRECTORY;
+		global $GEDCOMID;
 		
 		if (is_array($gedrec)) {
 			// Prefill some variables
@@ -76,7 +76,7 @@ class MediaItem extends GedcomRecord {
 		}
 			
 		if (stristr($this->filename, "://")) $this->fileobj = new MFile($this->filename);
-		else $this->fileobj = new MFile($MEDIA_DIRECTORY.$this->filename);
+		else $this->fileobj = new MFile(GedcomConfig::$MEDIA_DIRECTORY.$this->filename);
 
 	}
 	
@@ -176,17 +176,25 @@ class MediaItem extends GedcomRecord {
 		if (!is_null($this->indilist)) return $this->indilist;
 		$this->indilist = array();
 		$this->indi_hide = 0;
+		$key = "";
 		
-		$sql = "SELECT DISTINCT i_key, i_gedrec, i_isdead, i_id, i_file  FROM ".TBLPREFIX."media_mapping, ".TBLPREFIX."individuals WHERE mm_media='".$this->xref."' AND mm_file='".$this->gedcomid."' AND mm_type='INDI' AND mm_gid=i_id AND mm_file=i_file";
+		$sql = "SELECT DISTINCT n_id, i_key, i_gedrec, i_isdead, i_id, i_file, n_name, n_surname, n_letter, n_type  FROM ".TBLPREFIX."media_mapping, ".TBLPREFIX."individuals, ".TBLPREFIX."names WHERE mm_media='".$this->xref."' AND mm_file='".$this->gedcomid."' AND mm_type='INDI' AND mm_gid=i_id AND mm_file=i_file AND i_key=n_key ORDER BY i_key, n_id";
 		$res = NewQuery($sql);
 		while($row = $res->FetchAssoc()){
-			$person = null;
-			$person =& Person::GetInstance($row["i_id"], $row, $row["i_file"]);
-			if ($person->DispName()) {
-				$this->indilist[$row["i_key"]] = $person;
+			if ($key != $row["i_key"]) {
+				if ($key != "") $person->names_read = true;
+				$key = $row["i_key"];
+				$person = null;
+				$person =& Person::GetInstance($row["i_id"], $row, $row["i_file"]);
+				if ($person->DispName()) {
+					$this->indilist[$row["i_key"]] = $person;
+				}
+				else $this->indi_hide++;
 			}
-			else $this->indi_hide++;
+			if ($person->DispName()) $person->addname = array($row["n_name"], $row["n_letter"], $row["n_surname"], $row["n_type"]);
 		}
+		if ($key != "") $person->names_read = true;
+		
 		uasort($this->indilist, "ItemObjSort");
 		$this->indi_count=count($this->indilist);
 		return $this->indilist;

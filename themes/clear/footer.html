@@ -1,14 +1,15 @@
 <!-- linkbreaks added to give space between footer and content -->
 <br /><br />
 <?php
-global $CONFIGURED, $CONFIG_PARMS, $spider, $Users, $MEDIA_IN_DB;
+global $CONFIGURED, $CONFIG_PARMS, $spider, $gm_user, $MEDIA_IN_DB;
 if (!isset($without_close)) print "</div> <!-- closing div id=\"content\" -->\n";
 print "<div id=\"footer\" class=\"$TEXT_DIRECTION\">";
-	print_contact_links();
+	PrintContactLinks();
 	print "<div class=\"center\" style=\"width:99%;\">";
-	if ($SHOW_STATS) print_execution_stats();
+	if (GedcomConfig::$SHOW_STATS) PrintExecutionStats();
+//	print "Objects: P: ".Person::objcount()." F: ".Family::objcount()." M: ".MediaItem::objcount()." S: ".Source::objcount()." R: ".Repository::objcount()." N: ".Note::Objcount()." U: ".User::objcount()."<br />";
 	if($CONFIGURED) {
-		if (GetChangeData(true, "", true) && ($Users->userCanAccept($Users->GetUserName()))) {
+		if (GetChangeData(true, "", true) && ($gm_user->userCanAccept())) {
 			print "<br />".$gm_lang["changes_exist"]." <a href=\"#\" onclick=\"window.open('edit_changes.php','','width=800,height=600,resizable=1,scrollbars=1'); return false;\">".
 			$gm_lang["accept_changes"]."</a>\n";
 		}

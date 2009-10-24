@@ -41,7 +41,7 @@ else if (!isset($adminedit)) $adminedit = false;
 $message = "";
 
 // -- print html header information
-print_header($gm_lang["faq_page"]);
+PrintHeader($gm_lang["faq_page"]);
 
 if ($canconfig && $adminedit) {?>
 	<!-- Setup the left box -->
@@ -339,11 +339,11 @@ if ($canconfig && $adminedit) {?>
 								if ($canconfig && $adminedit) { ?>
 									<div class="choice_left">
 										<?php print_help_link("moveup_faq_item_help","qm","moveup_faq_item");?>
-										<a href="faq.php?action=commit&amp;type=moveup&amp;id=<?php print $id; ?>&amp;pidh=<?php print $data["header"]["pid"]; ?>&amp;pidb=<?php print $data["body"]["pid"];?>"><img src="<?php print $GM_IMAGE_DIR."/".$GM_IMAGES["uarrow"]["other"];?>" alt="" /></a>
+										<a href="faq.php?action=commit&amp;type=moveup&amp;id=<?php print $id; ?>&amp;pidh=<?php print $data["header"]["pid"]; ?>&amp;pidb=<?php print $data["body"]["pid"];?>"><img src="<?php print GM_IMAGE_DIR."/".$GM_IMAGES["uarrow"]["other"];?>" alt="" /></a>
 									</div>
 									<div class="choice_middle">
 										<?php print_help_link("movedown_faq_item_help","qm","movedown_faq_item"); ?>
-										<a href="faq.php?action=commit&amp;type=movedown&amp;id=<?php print $id; ?>&amp;pidh=<?php print $data["header"]["pid"]; ?>&amp;pidb=<?php print $data["body"]["pid"];?>"><img src="<?php print $GM_IMAGE_DIR."/".$GM_IMAGES["darrow"]["other"];?>" alt="" /></a>
+										<a href="faq.php?action=commit&amp;type=movedown&amp;id=<?php print $id; ?>&amp;pidh=<?php print $data["header"]["pid"]; ?>&amp;pidb=<?php print $data["body"]["pid"];?>"><img src="<?php print GM_IMAGE_DIR."/".$GM_IMAGES["darrow"]["other"];?>" alt="" /></a>
 									</div>
 									<div class="choice_middle">					
 										<?php print_help_link("edit_faq_item_help","qm","edit_faq_item"); ?>
@@ -383,5 +383,5 @@ if ($canconfig && $adminedit) {?>
 </div>
 
 <?php
-print_footer();
+PrintFooter();
 ?>

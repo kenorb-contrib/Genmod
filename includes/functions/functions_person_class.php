@@ -44,9 +44,9 @@ abstract class PersonFunctions {
 	 */
 	public function PrintPedigreePerson(&$person, $style=1, $show_famlink=true, $count=0, $personcount="1", $view="", $num_gens=0, $chart_style=1) {
 		// Global settings
-		global $ZOOM_BOXES, $LINK_ICONS, $SCRIPT_NAME, $GEDCOMID, $SHOW_HIGHLIGHT_IMAGES, $PEDIGREE_FULL_DETAILS, $SHOW_ID_NUMBERS;
-		global $CONTACT_EMAIL, $CONTACT_METHOD, $TEXT_DIRECTION, $DEFAULT_PEDIGREE_GENERATIONS, $PEDIGREE_LAYOUT;
-		global $GM_IMAGE_DIR, $GM_IMAGES, $CHART_BOX_TAGS, $SHOW_LDS_AT_GLANCE;
+		global $SCRIPT_NAME, $GEDCOMID;
+		global $TEXT_DIRECTION;
+		global $GM_IMAGES;
 		global $gm_lang, $gm_user;
 		
 		// Theme dependent settings, must be kept global
@@ -55,12 +55,16 @@ abstract class PersonFunctions {
 		// Settings for pedigree, descendancy, ancestry etc.
 		global $show_full, $box_width;
 		
+		static $personcount;
+		if(!isset($personcount)) $personcount = 0;
+		
+		$personcount++;
 
 		if (is_object($person) && $person->show_changes && $gm_user->UserCanEdit()) $canshow = true;
 		else $canshow = false;
 	
-		if ($num_gens == 0) $num_gens = $DEFAULT_PEDIGREE_GENERATIONS;
-		if (!isset($show_full)) $show_full=$PEDIGREE_FULL_DETAILS;
+		if ($num_gens == 0) $num_gens = GedcomConfig::$DEFAULT_PEDIGREE_GENERATIONS;
+		if (!isset($show_full)) $show_full = GedcomConfig::$PEDIGREE_FULL_DETAILS;
 	
 		if ($TEXT_DIRECTION == "ltr") {
 			$ldir = "left";
@@ -91,7 +95,7 @@ abstract class PersonFunctions {
 		if ($person->disp_name) {
 			if ($show_famlink && $view == "") {
 				// NOTE: Go ahead if we can show the popup box for the links to other pages and family members
-				if ($LINK_ICONS!="disabled") {
+				if (GedcomConfig::$LINK_ICONS!="disabled") {
 					// NOTE: draw a popup box for the links to other pages and family members
 					// NOTE: Start div I.$pid.$personcount.$count.links
 					// NOTE: ie_popup_width is needed to set the width of the popup box in IE for the gedcom favorites
@@ -101,14 +105,14 @@ abstract class PersonFunctions {
 					// This div is filled by an AJAX call! Not yet as placement is a problem!
 					// NOTE: Zoom
 					print "<a href=\"pedigree.php?rootid=".$person->xref."&amp;num_generations=".$num_gens."&amp;talloffset=".$chart_style."&amp;gedid=".$person->gedcomid."\"><b>".$gm_lang["index_header"]."</b></a>\n";
-					print "<br /><a href=\"descendancy.php?pid=".$person->xref."&amp;show_full=$show_full&amp;generations=".$num_gens."&amp;box_width=$box_width&amp;gedid=".$person->gedcomid."\"><b>".$gm_lang["descend_chart"]."</b></a><br />\n";
+					print "<br /><a href=\"descendancy.php?rootid=".$person->xref."&amp;show_full=$show_full&amp;num_generations=".$num_gens."&amp;box_width=$box_width&amp;gedid=".$person->gedcomid."\"><b>".$gm_lang["descend_chart"]."</b></a><br />\n";
 					if ($gm_user->username != "") {
 						if (!empty($gm_user->gedcomid[$GEDCOMID])) {
 							print "<a href=\"relationship.php?pid1=".$gm_user->gedcomid[$GEDCOMID]."&amp;pid2=".$person->xref."&amp;gedid=".$person->gedcomid."\"><b>".$gm_lang["relationship_to_me"]."</b></a><br />\n";
 						}
 					}
 					// NOTE: Zoom
-					if (file_exists("ancestry.php")) print "<a href=\"ancestry.php?rootid=".$person->xref."&amp;chart_style=$chart_style&amp;PEDIGREE_GENERATIONS=".$num_gens."&amp;box_width=$box_width&amp;gedid=".$person->gedcomid."\"><b>".$gm_lang["ancestry_chart"]."</b></a><br />\n";
+					if (file_exists("ancestry.php")) print "<a href=\"ancestry.php?rootid=".$person->xref."&amp;chart_style=$chart_style&amp;num_generations=".$num_gens."&amp;box_width=$box_width&amp;gedid=".$person->gedcomid."\"><b>".$gm_lang["ancestry_chart"]."</b></a><br />\n";
 					if (file_exists("fanchart.php") and defined("IMG_ARC_PIE") and function_exists("imagettftext"))  print "<a href=\"fanchart.php?rootid=".$person->xref."&amp;PEDIGREE_GENERATIONS=".$num_gens."&amp;gedid=".$person->gedcomid."\"><b>".$gm_lang["fan_chart"]."</b></a><br />\n";
 					if (file_exists("hourglass.php")) print "<a href=\"hourglass.php?pid=".$person->xref."&amp;chart_style=$chart_style&amp;PEDIGREE_GENERATIONS=".$num_gens."&amp;box_width=$box_width&amp;gedid=".$person->gedcomid."\"><b>".$gm_lang["hourglass_chart"]."</b></a><br />\n";
 					foreach ($person->spousefamilies as $skey => $sfam) {
@@ -147,14 +151,14 @@ abstract class PersonFunctions {
 					
 		// NOTE: If box zooming is allowed and no person details are shown
 		// NOTE: determine what mouse behavior to add
-		if ($ZOOM_BOXES != "disabled" && !$show_full && $person->disp_name) {
-			if ($ZOOM_BOXES == "mouseover") print " onmouseover=\"expandbox('".$person->xref.".".$personcount.".".$count."', $style, '".$random."'); return false;\" onmouseout=\"restorebox('".$person->xref.".".$personcount.".".$count."', $style, '".$random."'); return false;\"";
-			elseif ($ZOOM_BOXES == "mousedown") print " onmousedown=\"expandbox('".$person->xref.".".$personcount.".".$count."', $style, '".$random."');\" onmouseup=\"restorebox('".$person->xref.".".$personcount.".".$count."', $style, '".$random."');\"";
-			elseif ($ZOOM_BOXES == "click") print " onclick=\"expandbox('".$person->xref.".".$personcount.".".$count."', $style, '".$random."');\"";
+		if (GedcomConfig::$ZOOM_BOXES != "disabled" && !$show_full && $person->disp_name) {
+			if (GedcomConfig::$ZOOM_BOXES == "mouseover") print " onmouseover=\"expandbox('".$person->xref.".".$personcount.".".$count."', $style, '".$random."'); return false;\" onmouseout=\"restorebox('".$person->xref.".".$personcount.".".$count."', $style, '".$random."'); return false;\"";
+			elseif (GedcomConfig::$ZOOM_BOXES == "mousedown") print " onmousedown=\"expandbox('".$person->xref.".".$personcount.".".$count."', $style, '".$random."');\" onmouseup=\"restorebox('".$person->xref.".".$personcount.".".$count."', ".$style.", '".$random."');\"";
+			elseif (GedcomConfig::$ZOOM_BOXES == "click") print " onclick=\"expandbox('".$person->xref.".".$personcount.".".$count."', '".$style."', '".$random."');\"";
 		}
-		print ">";
+		print ">\n";
 		// NOTE: Show the persons primary picture if possible, but only in large boxes ($show_full)
-		if ($SHOW_HIGHLIGHT_IMAGES && $person->disp && PrivacyFunctions::showFact("OBJE", $person->xref, "INDI") && $show_full) {
+		if (GedcomConfig::$SHOW_HIGHLIGHT_IMAGES && $person->disp && PrivacyFunctions::showFact("OBJE", $person->xref, "INDI") && $show_full) {
 			$object = $person->highlightedimage;
 			// NOTE: Print the pedigree tumbnail
 			if (!empty($object["thumb"])) {
@@ -186,12 +190,12 @@ abstract class PersonFunctions {
 					else print "class=\"name$style\">";
 					print PrintReady($person->name);
 					// NOTE: IMG ID
-					print "<img id=\"box-".$person->xref.".".$personcount.".".$count.".".$random."-sex\" src=\"$GM_IMAGE_DIR/";
+					print "<img id=\"box-".$person->xref.".".$personcount.".".$count.".".$random."-sex\" src=\"".GM_IMAGE_DIR."/";
 					if ($isF=="") print $GM_IMAGES["sex"]["small"]."\" title=\"".$gm_lang["male"]."\" alt=\"".$gm_lang["male"];
 					else  if ($isF=="F")print $GM_IMAGES["sexf"]["small"]."\" title=\"".$gm_lang["female"]."\" alt=\"".$gm_lang["female"];
 					else  print $GM_IMAGES["sexn"]["small"]."\" title=\"".$gm_lang["unknown"]."\" alt=\"".$gm_lang["unknown"];
 					print "\" class=\"sex_image\" />";
-					if ($SHOW_ID_NUMBERS) {
+					if (GedcomConfig::$SHOW_ID_NUMBERS) {
 						print "</span><span class=\"details$style\">";
 						print $person->addxref;
 						// NOTE: Close span namedef-$personcount.$pid.$count
@@ -208,11 +212,11 @@ abstract class PersonFunctions {
 					print "</a>";
 				}
 				else {
-					$user =& User::GetInstance($CONTACT_EMAIL);
+					$user =& User::GetInstance(GedcomConfig::$CONTACT_EMAIL);
 					print "<a href=\"javascript: ".$gm_lang["private"]."\" onclick=\"if (confirm('".preg_replace("'<br />'", " ", $gm_lang["privacy_error"])."\\n\\n".str_replace("#user[fullname]#", $user->firstname." ".$user->lastname, $gm_lang["clicking_ok"])."')) ";
-					if ($CONTACT_METHOD!="none") {
-						if ($CONTACT_METHOD=="mailto") print "window.location = 'mailto:".$user->email."'; ";
-						else print "message('$CONTACT_EMAIL', '$CONTACT_METHOD'); ";
+					if (GedcomConfig::$CONTACT_METHOD!="none") {
+						if (GedcomConfig::$CONTACT_METHOD=="mailto") print "window.location = 'mailto:".$user->email."'; ";
+						else print "message('".GedcomConfig::$CONTACT_EMAIL."', '".GedcomConfig::$CONTACT_METHOD."'); ";
 					}
 					// NOTE: Start span namedef-$pid.$personcount.$count
 					// NOTE: Close span namedef-$pid.$personcount.$count
@@ -235,9 +239,9 @@ abstract class PersonFunctions {
 				// Added this else to show zoomboxes even if details are hidden. Privacy should handle the contents
 				print "<a href=\"individual.php?pid=".$person->xref."&amp;gedid=".$person->gedcomid."\"";
 				if (!$show_full) {
-					//not needed or wanted for mouseover //if ($ZOOM_BOXES=="mouseover") print " onmouseover=\"event.cancelBubble = true;\"";
-					if ($ZOOM_BOXES=="mousedown") print "onmousedown=\"event.cancelBubble = true;\"";
-					if ($ZOOM_BOXES=="click") print "onclick=\"event.cancelBubble = true;\"";
+					//not needed or wanted for mouseover //if (GedcomConfig::$ZOOM_BOXES=="mouseover") print " onmouseover=\"event.cancelBubble = true;\"";
+					if (GedcomConfig::$ZOOM_BOXES=="mousedown") print " onmousedown=\"event.cancelBubble = true;\"";
+					if (GedcomConfig::$ZOOM_BOXES=="click") print " onclick=\"event.cancelBubble = true;\"";
 				}
 				// NOTE: Start span namedef-$pid.$personcount.$count
 				if (hasRTLText($person->name) && $style=="1") print "><span id=\"namedef-".$person->xref.".".$personcount.".".$count.".".$random."\" class=\"name2";
@@ -254,18 +258,18 @@ abstract class PersonFunctions {
 				print "</span>";
 				print "<span class=\"name$style\">";
 				// NOTE: IMG ID
-				print "<img id=\"box-".$person->xref.".".$personcount.".".$count.".".$random."-sex\" src=\"$GM_IMAGE_DIR/";
+				print "<img id=\"box-".$person->xref.".".$personcount.".".$count.".".$random."-sex\" src=\"".GM_IMAGE_DIR."/";
 				if ($isF=="") print $GM_IMAGES["sex"]["small"]."\" title=\"".$gm_lang["male"]."\" alt=\"".$gm_lang["male"];
 				else  if ($isF=="F")print $GM_IMAGES["sexf"]["small"]."\" title=\"".$gm_lang["female"]."\" alt=\"".$gm_lang["female"];
 				else  print $GM_IMAGES["sexn"]["small"]."\" title=\"".$gm_lang["unknown"]."\" alt=\"".$gm_lang["unknown"];
 				print "\" class=\"sex_image\" />";
 				print "</span>\r\n";
-				if ($SHOW_ID_NUMBERS) {
+				if (GedcomConfig::$SHOW_ID_NUMBERS) {
 					print "<span class=\"details$style\">";
 					print $person->addxref;
 					print "</span>";
 				}
-				if ($SHOW_LDS_AT_GLANCE) print "<span class=\"details$style\">".GetLdsGlance($person->gedrec)."</span>";
+				if (GedcomConfig::$SHOW_LDS_AT_GLANCE) print "<span class=\"details$style\">".GetLdsGlance($person->gedrec)."</span>";
 				if ($person->addname != "") {
 					print "<br />";
 					if (hasRTLText($person->addname) && $style=="1")
@@ -285,8 +289,8 @@ abstract class PersonFunctions {
 				//-- section to display tags in the boxes
 				// First get the optional tags and check if they exist
 				$tagstoprint = array();
-				if (!empty($CHART_BOX_TAGS)) {
-					$opt_tags = preg_split("/[, ]+/", $CHART_BOX_TAGS);
+				if (!empty(GedcomConfig::$CHART_BOX_TAGS)) {
+					$opt_tags = preg_split("/[, ]+/", GedcomConfig::$CHART_BOX_TAGS);
 					foreach ($opt_tags as $key => $tag) {
 						if (strpos($person->gedrec, "\n1 ".$tag)) {
 							$tagstoprint[] = $tag;
@@ -313,17 +317,6 @@ abstract class PersonFunctions {
 				$tagstoprint = array_flip(array_flip($tagstoprint));
 
 				// Get the subrecords and sort them
-/*				$factstoprint = array();
-				foreach ($tagstoprint as $key => $tag) {
-					if (PrivacyFunctions::showFact($tag, $person->xref, "INDI")) $factstoprint[] = GetSubrecord(1, "1 ".$tag, $person->gedrec);
-				}
-				SortFacts($factstoprint, "INDI");
-				// Print the facts
-				foreach($factstoprint as $key => $factrec) {
-					$ft = preg_match("/1\s(\w+)(.*)/", $factrec, $match);
-					print_simple_fact($factrec, $match[1], $person->xref);
-				}
-*/
 				$factobjs = $person->SelectFacts($tagstoprint);	
 				foreach($factobjs as $key => $factobj) {
 					FactFunctions::PrintSimpleFact($factobj, true, false);
@@ -348,7 +341,7 @@ abstract class PersonFunctions {
 					
 			// NOTE: links and zoom icons
 			// NOTE: Start div icons-$personcount.$pid.$count
-			print "<div id=\"icons-".$person->xref.".".$personcount.".".$count."\"  class=\"width10\" style=\"float:";
+			print "<div id=\"icons-".$person->xref.".".$personcount.".".$count.".".$random."\"  class=\"width10\" style=\"float:";
 			if ($TEXT_DIRECTION == "rtl") print "left"; else print "right";
 			print "; text-align: ";
 			if ($TEXT_DIRECTION == "rtl") print "left"; else print "right";
@@ -359,25 +352,25 @@ abstract class PersonFunctions {
 				// NOTE: If box zooming is allowed and person details are shown
 				// NOTE: determine what mouse behavior to add
 				// NOTE: Zoom icon
-				if ($ZOOM_BOXES != "disabled" && $show_full && !$view && ($person->disp_name)) {
+				if (GedcomConfig::$ZOOM_BOXES != "disabled" && $show_full && !$view && ($person->disp_name)) {
 					print "<a href=\"javascript: ".$gm_lang["zoom_box"]."\"";
-					if ($ZOOM_BOXES=="mouseover") print " onmouseover=\"expandbox('".$person->xref.".".$personcount.".".$count."', $style, '".$random."'); if(document.getElementById('inout-".$person->xref.".".$personcount.".".$count.".".$random."').innerHTML=='') sndReq('inout-".$person->xref.".".$personcount.".".$count.".".$random."', 'getzoomfacts', 'pid', '".$person->xref."', 'gedcomid', '".$person->gedcomid."', 'canshow', '".$canshow."', 'view', '".$view."');\" onmouseout=\"restorebox('".$person->xref.".".$personcount.".".$count."', $style, '".$random."');\" onclick=\"return false;\"";
-					if ($ZOOM_BOXES=="mousedown") print " onmousedown=\"expandbox('".$person->xref.".".$personcount.".".$count."', $style, '".$random."'); if(document.getElementById('inout-".$person->xref.".".$personcount.".".$count.".".$random."').innerHTML=='') sndReq('inout-".$person->xref.".".$personcount.".".$count.".".$random."', 'getzoomfacts', 'pid', '".$person->xref."', 'gedcomid', '".$person->gedcomid."', 'canshow', '".$canshow."', 'view', '".$view."');\" onmouseup=\"restorebox('".$person->xref.".".$personcount.".".$count."', $style, '".$random."');\" onclick=\"return false;\"";
-					if ($ZOOM_BOXES=="click") print " onclick=\"expandbox('".$person->xref.".".$personcount.".".$count."', $style, '".$random."'); if(document.getElementById('inout-".$person->xref.".".$personcount.".".$count.".".$random."').innerHTML=='') sndReq('inout-".$person->xref.".".$personcount.".".$count.".".$random."', 'getzoomfacts', 'pid', '".$person->xref."', 'gedcomid', '".$person->gedcomid."', 'canshow', '".$canshow."', 'view', '".$view."'); return false;\"";
-					print "><img id=\"iconz-".$person->xref.".".$personcount.".".$count."\" src=\"".$GM_IMAGE_DIR."/".$GM_IMAGES["zoomin"]["other"]."\" width=\"25\" height=\"25\" border=\"0\" alt=\"".$gm_lang["zoom_box"]."\" title=\"".$gm_lang["zoom_box"]."\" /></a>";
+					if (GedcomConfig::$ZOOM_BOXES=="mouseover") print " onmouseover=\"expandbox('".$person->xref.".".$personcount.".".$count."', $style, '".$random."'); if(document.getElementById('inout-".$person->xref.".".$personcount.".".$count.".".$random."').innerHTML=='') sndReq('inout-".$person->xref.".".$personcount.".".$count.".".$random."', 'getzoomfacts', 'pid', '".$person->xref."', 'gedcomid', '".$person->gedcomid."', 'canshow', '".$canshow."', 'view', '".$view."');\" onmouseout=\"restorebox('".$person->xref.".".$personcount.".".$count."', $style, '".$random."');\" onclick=\"return false;\"";
+					if (GedcomConfig::$ZOOM_BOXES=="mousedown") print " onmousedown=\"expandbox('".$person->xref.".".$personcount.".".$count."', $style, '".$random."'); if(document.getElementById('inout-".$person->xref.".".$personcount.".".$count.".".$random."').innerHTML=='') sndReq('inout-".$person->xref.".".$personcount.".".$count.".".$random."', 'getzoomfacts', 'pid', '".$person->xref."', 'gedcomid', '".$person->gedcomid."', 'canshow', '".$canshow."', 'view', '".$view."');\" onmouseup=\"restorebox('".$person->xref.".".$personcount.".".$count."', $style, '".$random."');\" onclick=\"return false;\"";
+					if (GedcomConfig::$ZOOM_BOXES=="click") print " onclick=\"expandbox('".$person->xref.".".$personcount.".".$count."', $style, '".$random."'); if(document.getElementById('inout-".$person->xref.".".$personcount.".".$count.".".$random."').innerHTML=='') sndReq('inout-".$person->xref.".".$personcount.".".$count.".".$random."', 'getzoomfacts', 'pid', '".$person->xref."', 'gedcomid', '".$person->gedcomid."', 'canshow', '".$canshow."', 'view', '".$view."'); return false;\"";
+					print "><img id=\"iconz-".$person->xref.".".$personcount.".".$count."\" src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["zoomin"]["other"]."\" width=\"25\" height=\"25\" border=\"0\" alt=\"".$gm_lang["zoom_box"]."\" title=\"".$gm_lang["zoom_box"]."\" /></a>";
 				}
 				// NOTE: Popup box icon (don't show if the person is private)
-				if ($LINK_ICONS!="disabled" && $show_famlink && !$view && ($person->disp_name)) {
+				if (GedcomConfig::$LINK_ICONS!="disabled" && $show_famlink && !$view && ($person->disp_name)) {
 					$click_link="#";
 					if (preg_match("/pedigree.php/", $SCRIPT_NAME)>0) $click_link="pedigree.php?rootid=".$person->xref."&amp;num_generations=".$num_gens."&amp;talloffset=".$chart_style."&amp;gedid=".$person->gedcomid;
 					if (preg_match("/hourglass.php/", $SCRIPT_NAME)>0) $click_link="hourglass.php?pid=".$person->xref."&amp;generations=".$num_gens."&amp;box_width=$box_width&amp;gedid=".$person->gedcomid;
-					if (preg_match("/ancestry.php/", $SCRIPT_NAME)>0) $click_link="ancestry.php?rootid=".$person->xref."&amp;chart_style=$chart_style&amp;PEDIGREE_GENERATIONS=".$num_gens."&amp;box_width=$box_width&amp;gedid=".$person->gedcomid;
-					if (preg_match("/descendancy.php/", $SCRIPT_NAME)>0) $click_link="descendancy.php?pid=".$person->xref."&amp;show_full=$show_full&amp;generations=".$num_gens."&amp;box_width=$box_width&amp;gedid=".$person->gedcomid;
+					if (preg_match("/ancestry.php/", $SCRIPT_NAME)>0) $click_link="ancestry.php?rootid=".$person->xref."&amp;chart_style=$chart_style&amp;num_generations=".$num_gens."&amp;box_width=$box_width&amp;gedid=".$person->gedcomid;
+					if (preg_match("/descendancy.php/", $SCRIPT_NAME)>0) $click_link="descendancy.php?rootid=".$person->xref."&amp;show_full=$show_full&amp;num_generations=".$num_gens."&amp;box_width=$box_width&amp;gedid=".$person->gedcomid;
 					if ((preg_match("/family.php/", $SCRIPT_NAME)>0)&&!empty($famid)) $click_link="family.php?famid=".$sfam->xref."&amp;gedid=".$sfam->gedcomid;
 					if (preg_match("/individual.php/", $SCRIPT_NAME)>0) $click_link="individual.php?pid=".$person->xref."&amp;gedid=".$person->gedcomid;
-					print "<br /><img src=\"".$GM_IMAGE_DIR."/".$GM_IMAGES["pedigree"]["small"]."\" width=\"25\" border=\"0\" vspace=\"0\" hspace=\"0\" alt=\"".$gm_lang["person_links"]."\" title=\"".$gm_lang["person_links"]."\"";
-					if ($LINK_ICONS=="mouseover") print " onmouseover";
-					if ($LINK_ICONS=="click") print " onclick";
+					print "<br /><img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["pedigree"]["small"]."\" width=\"25\" border=\"0\" vspace=\"0\" hspace=\"0\" alt=\"".$gm_lang["person_links"]."\" title=\"".$gm_lang["person_links"]."\"";
+					if (GedcomConfig::$LINK_ICONS=="mouseover") print " onmouseover";
+					if (GedcomConfig::$LINK_ICONS=="click") print " onclick";
 					print "=\"";
 	 //				print "if(document.getElementById('I".$pid.".".$personcount.".".$count.".".$random."links').innerHTML=='') sndReq('I".$pid.".".$personcount.".".$count.".".$random."links', 'getindilinks', 'pid', '".$pid."', 'OLD_PGENS', '".$OLD_PGENS."', 'talloffset', '".$talloffset."', 'generations', '".$generations."', 'canshow', '".$canshow."', 'show_full', '".$show_full."', 'box_width', '".$box_width."', 'chart_style', '".$chart_style."'); ";
 					print "showbox(this, '".$person->xref.".".$personcount.".".$count.".".$random."', '";
@@ -389,7 +382,7 @@ abstract class PersonFunctions {
 					// NOTE: Keep it here in case we might need it
 					print "onmouseout=\"moveout('".$person->xref.".".$personcount.".".$count.".".$random."');";
 					print " return false;\"";
-					if (($click_link=="#")&&($LINK_ICONS!="click")) print " onclick=\"return false;\"";
+					if (($click_link=="#")&&(GedcomConfig::$LINK_ICONS!="click")) print " onclick=\"return false;\"";
 					print " />";
 				}
 			// NOTE: Close div icons-$personcount.$pid.$count
@@ -407,13 +400,12 @@ abstract class PersonFunctions {
 	 * @param string $parid optional parent ID (descendancy booklet)
 	 * @param string $gparid optional gd-parent ID (descendancy booklet)
 	 */
-	public function PrintFamilyParents(&$family, $sosa = 0, $label="", $parid="", $gparid="", $personcount="1") {
-		global $gm_lang, $view, $show_full;
-		global $TEXT_DIRECTION, $SHOW_EMPTY_BOXES;
+	public function PrintFamilyParents(&$family, $sosa = 0, $label="", $parid="", $gparid="", $view="") {
+		global $gm_lang, $show_full;
+		global $TEXT_DIRECTION;
 		global $pbwidth, $pbheight;
-		global $GM_IMAGE_DIR, $GM_IMAGES;
-	
-		
+		global $GM_IMAGES;
+
 		print "<table cellspacing=\"0\" cellpadding=\"0\" border=\"0\"><tr><td rowspan=\"2\" style=\"vertical-align:middle;\">";
 		print "<span class=\"subheaders\">" . GetSosaName($sosa*2) . "</span>";
 		print "\n\t<table style=\"width: " . ($pbwidth) . "px; height: " . $pbheight . "px;\" border=\"0\"><tr>";
@@ -433,7 +425,7 @@ abstract class PersonFunctions {
 		print "\n\t<td style=\"vertical-align:middle;\"".$style.">";
 		// Fix for overloading error of array object
 		$husband = $family->$husb;
-		self::PrintPedigreePerson($husband, 1, true, 1, $personcount, $family->view);
+		self::PrintPedigreePerson($husband, 1, true, 1, $family->view);
 		print "</td></tr></table>";
 		print "</td>\n";
 		
@@ -449,16 +441,16 @@ abstract class PersonFunctions {
 			}
 		}
 		$upfamid = $hfam;
-		if ($hfam != "" || ($sosa != 0 && $SHOW_EMPTY_BOXES)) {
-			print "<td rowspan=\"2\" style=\"vertical-align:middle;\"><img src=\"".$GM_IMAGE_DIR."/".$GM_IMAGES["hline"]["other"]."\" alt=\"\" /></td><td rowspan=\"2\" style=\"vertical-align:middle;\"><img src=\"".$GM_IMAGE_DIR."/".$GM_IMAGES["vline"]["other"]."\" width=\"3\" height=\"" . ($pbheight) . "\" alt=\"\" /></td>";
-			print "<td style=\"vertical-align:middle;\"><img src=\"".$GM_IMAGE_DIR."/".$GM_IMAGES["hline"]["other"]."\" alt=\"\" /></td><td>";
-	//		if (is_object($fath) or ($sosa != 0 and $SHOW_EMPTY_BOXES)) {
+		if ($hfam != "" || ($sosa != 0 && GedcomConfig::$SHOW_EMPTY_BOXES)) {
+			print "<td rowspan=\"2\" style=\"vertical-align:middle;\"><img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["hline"]["other"]."\" alt=\"\" /></td><td rowspan=\"2\" style=\"vertical-align:middle;\"><img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["vline"]["other"]."\" width=\"3\" height=\"" . ($pbheight) . "\" alt=\"\" /></td>";
+			print "<td style=\"vertical-align:middle;\"><img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["hline"]["other"]."\" alt=\"\" /></td><td>";
+	//		if (is_object($fath) or ($sosa != 0 and GedcomConfig::$SHOW_EMPTY_BOXES)) {
 				// husband's father
 				print "\n\t<table style=\"width: " . ($pbwidth) . "px; height: " . $pbheight . "px;\" border=\"0\"><tr>";
 				if ($sosa > 0) ChartFunctions::PrintSosaNumber($sosa * 4);
 				if (is_object($fath) && $fath->xref == $gparid) ChartFunctions::PrintSosaNumber(trim(substr($label,0,-3),".").".");
 				print "\n\t<td style=\"vertical-align:middle;\">";
-				self::PrintPedigreePerson($fath, 1, true, 1, $personcount, $family->view);
+				self::PrintPedigreePerson($fath, 1, true, 1, $family->view);
 				print "</td></tr></table>";
 	//		}
 			print "</td>";
@@ -466,17 +458,17 @@ abstract class PersonFunctions {
 		if (!empty($upfamid) and ($sosa!=-1) and ($view != "preview")) {
 			print "<td style=\"vertical-align:middle;\" rowspan=\"2\">";
 			
-			ChartFunctions::PrintUrlArrow($upfamid, ($sosa==0 ? "?famid=$upfamid&amp;show_full=$show_full" : "#$upfamid"), PrintReady($gm_lang["start_at_parents"]."&nbsp;-&nbsp;".htmlspecialchars($family->$husb->childfamilies[$hfam]->sortable_name)), 1);
+			ChartFunctions::PrintUrlArrow($upfamid, ($sosa==0 ? "?famid=".$upfamid."&amp;show_full=".$show_full : "#".$upfamid), PrintReady($gm_lang["start_at_parents"]."&nbsp;-&nbsp;".htmlspecialchars($family->$husb->childfamilies[$hfam]->sortable_name)), 1);
 			print "</td>\n";
 		}
-	//	if ($hfam != "" || ($sosa != 0 &&  $SHOW_EMPTY_BOXES)) {
+	//	if ($hfam != "" || ($sosa != 0 &&  GedcomConfig::$SHOW_EMPTY_BOXES)) {
 			// husband's mother
-			print "</tr><tr><td style=\"vertical-align:middle;\"><img src=\"".$GM_IMAGE_DIR."/".$GM_IMAGES["hline"]["other"]."\" alt=\"\" /></td><td>";
+			print "</tr><tr><td style=\"vertical-align:middle;\"><img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["hline"]["other"]."\" alt=\"\" /></td><td>";
 			print "\n\t<table style=\"width: " . ($pbwidth) . "px; height: " . $pbheight . "px;\" border=\"0\"><tr>";
 			if ($sosa > 0) ChartFunctions::PrintSosaNumber($sosa * 4 + 1);
 			if (is_object($moth) && $moth->xref == $gparid) ChartFunctions::PrintSosaNumber(trim(substr($label,0,-3),".").".");
 			print "\n\t<td style=\"vertical-align:middle;\">";
-			self::PrintPedigreePerson($moth, 1, true, 1, $personcount, $family->view);
+			self::PrintPedigreePerson($moth, 1, true, 1, $family->view);
 			print "</td></tr></table>";
 			print "</td>\n";
 		}
@@ -484,8 +476,8 @@ abstract class PersonFunctions {
 		if ($sosa!=0) {
 			print "<a href=\"family.php?famid=".$family->xref."\" class=\"details1\">";
 			print $family->addxref;
-	//		else print str_repeat("&nbsp;", 10);
-			if (PrivacyFunctions::showFact("MARR", $family->xref) && $family->disp) print_simple_fact($family->gedrec, "MARR", $family->wife->xref); else print $gm_lang["private"];
+			if ($family->addxref != "") print "&nbsp;&nbsp;";
+			FactFunctions::PrintSimpleFact($family->marr_fact, false, false); 
 			print "</a>";
 		}
 		else print "<br />\n";
@@ -512,7 +504,7 @@ abstract class PersonFunctions {
 		print "\n\t<td style=\"vertical-align:middle;\"".$style.">";
 		// Fix for overloading error of array object
 		$wwife = $family->$wife;
-		self::PrintPedigreePerson($wwife, 1, true, 1, $personcount, $family->view);
+		self::PrintPedigreePerson($wwife, 1, true, 1, $family->view);
 		print "</td></tr></table>";
 		print "</td>\n";
 		
@@ -528,16 +520,16 @@ abstract class PersonFunctions {
 			}
 		}
 		$upfamid = $wfam;
-		if ($wfam != "" || ($sosa != 0 && $SHOW_EMPTY_BOXES)) {
-			print "<td rowspan=\"2\" style=\"vertical-align:middle;\"><img src=\"".$GM_IMAGE_DIR."/".$GM_IMAGES["hline"]["other"]."\" alt=\"\" /></td><td rowspan=\"2\" style=\"vertical-align:middle;\"><img src=\"".$GM_IMAGE_DIR."/".$GM_IMAGES["vline"]["other"]."\" width=\"3\" height=\"" . ($pbheight) . "\" alt=\"\" /></td>";
-			print "<td style=\"vertical-align:middle;\"><img src=\"".$GM_IMAGE_DIR."/".$GM_IMAGES["hline"]["other"]."\" alt=\"\" /></td><td>";
-	//		if (is_object($fath) or ($sosa != 0 and $SHOW_EMPTY_BOXES)) {
+		if ($wfam != "" || ($sosa != 0 && GedcomConfig::$SHOW_EMPTY_BOXES)) {
+			print "<td rowspan=\"2\" style=\"vertical-align:middle;\"><img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["hline"]["other"]."\" alt=\"\" /></td><td rowspan=\"2\" style=\"vertical-align:middle;\"><img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["vline"]["other"]."\" width=\"3\" height=\"" . ($pbheight) . "\" alt=\"\" /></td>";
+			print "<td style=\"vertical-align:middle;\"><img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["hline"]["other"]."\" alt=\"\" /></td><td>";
+	//		if (is_object($fath) or ($sosa != 0 and GedcomConfig::$SHOW_EMPTY_BOXES)) {
 				// wife's father
 				print "\n\t<table style=\"width: " . ($pbwidth) . "px; height: " . $pbheight . "px;\"><tr>";
 				if ($sosa > 0) ChartFunctions::PrintSosaNumber($sosa * 4 + 2);
 				if (is_object($fath) && $fath->xref == $gparid) ChartFunctions::PrintSosaNumber(trim(substr($label,0,-3),".").".");
 				print "\n\t<td style=\"vertical-align:middle;\">";
-				self::PrintPedigreePerson($fath, 1, true, 1, $personcount, $family->view);
+				self::PrintPedigreePerson($fath, 1, true, 1, $family->view);
 				print "</td></tr></table>";
 	//		}
 			print "</td>\n";
@@ -548,14 +540,14 @@ abstract class PersonFunctions {
 			ChartFunctions::PrintUrlArrow($upfamid.$label, ($sosa==0 ? "?famid=$upfamid&amp;show_full=$show_full" : "#$upfamid"), PrintReady($gm_lang["start_at_parents"]."&nbsp;-&nbsp;".htmlspecialchars($family->$wife->childfamilies[$wfam]->sortable_name)), 1);
 			print "</td>\n";
 		}
-	//	if ($wfam != "" || ($sosa != 0 &&  $SHOW_EMPTY_BOXES)) {
+	//	if ($wfam != "" || ($sosa != 0 &&  GedcomConfig::$SHOW_EMPTY_BOXES)) {
 			// wife's mother
-			print "</tr><tr><td style=\"vertical-align:middle;\"><img src=\"".$GM_IMAGE_DIR."/".$GM_IMAGES["hline"]["other"]."\" alt=\"\" /></td><td>";
+			print "</tr><tr><td style=\"vertical-align:middle;\"><img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["hline"]["other"]."\" alt=\"\" /></td><td>";
 			print "\n\t<table style=\"width: " . ($pbwidth) . "px; height: " . $pbheight . "px;\" border=\"0\"><tr>";
 			if ($sosa > 0) ChartFunctions::PrintSosaNumber($sosa * 4 + 1);
 			if (is_object($moth) && $moth->xref == $gparid) ChartFunctions::PrintSosaNumber(trim(substr($label,0,-3),".").".");
 			print "\n\t<td style=\"vertical-align:middle;\">";
-			self::PrintPedigreePerson($moth, 1, true, 1, $personcount, $family->view);
+			self::PrintPedigreePerson($moth, 1, true, 1, $family->view);
 			print "</td></tr></table>";
 			print "</td>\n";
 		}
@@ -570,9 +562,9 @@ abstract class PersonFunctions {
 	 * @param int $sosa optional child sosa number
 	 * @param string $label optional indi label (descendancy booklet)
 	 */
-	public function PrintFamilyChildren($family, $childid = "", $sosa = 0, $label="", $personcount="1") {
-		global $gm_lang, $pbwidth, $pbheight, $view, $show_famlink, $show_cousins;
-		global $GM_IMAGE_DIR, $GM_IMAGES, $show_changes, $SHOW_ID_NUMBERS, $TEXT_DIRECTION, $gm_user;
+	public function PrintFamilyChildren($family, $childid = "", $sosa = 0, $label="", $view="") {
+		global $gm_lang, $pbwidth, $pbheight, $show_famlink, $show_cousins;
+		global $GM_IMAGES, $show_changes, $TEXT_DIRECTION, $gm_user;
 	
 		if ($show_changes && $gm_user->UserCanEdit()) $canshow = true;
 		else $canshow = false;
@@ -600,109 +592,75 @@ abstract class PersonFunctions {
 					
 					print "<td ".$style."style=\"vertical-align:middle;\" >";
 					print GetPediName($chil->famc[$family->xref]["relation"], $chil->sex);
-					self::PrintPedigreePerson($chil, 1, true, 1, $personcount, $chil->view);
-					$personcount++;
+					self::PrintPedigreePerson($chil, 1, true, 1, $chil->view);
 					print "</td>";
-	/*				if ($sosa != 0) {
+					// Don't print the children's spouses and children if private
+					if ($sosa != 0 && $chil->disp_name) {
+						
 						// loop for all families where current child is a spouse
-						$famids = FindSfamilyIds($chil, true);
-						$maxfam = count($famids)-1;
-						for ($f=0; $f<=$maxfam; $f++) {
-							$famid = $famids[$f]["famid"];
-							if (!$famid) continue;
-							$parents = FindParents($famid);
-							if (!$parents) continue;
-							if ($parents["HUSB"] == $chil) $spouse = $parents["WIFE"];
-							else $spouse =  $parents["HUSB"];
+						$f = 0;
+						foreach($chil->fams as $key => $cfamid) {
+							$cfam =& Family::GetInstance($cfamid);
+							$f++;
+							if ($cfam->husb_id == "" && $cfam->wife_id == "") continue;
+							if ($cfam->husb_id == $chil->xref) $spouse = $cfam->wife;
+							else $spouse =  $cfam->husb;
+							
 							// multiple marriages
-							if ($f>0) {
+							if ($f > 1) {
 								print "</tr>\n<tr><td>&nbsp;</td>";
 								print "<td style=\"vertical-align:middle;\"";
 								if ($TEXT_DIRECTION == "rtl") print " align=\"left\">";
 								else print " align=\"right\">";
-								if ($f==$maxfam) print "<img height=\"50%\"";
+								if ($f == count($chil->spousefamilies)) print "<img height=\"50%\"";
 								else print "<img height=\"100%\"";
-								print " width=\"3\" src=\"".$GM_IMAGE_DIR."/".$GM_IMAGES["vline"]["other"]."\" alt=\"\" />";
+								print " width=\"3\" src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["vline"]["other"]."\" alt=\"\" />";
 								print "</td>";
 							}
 							print "<td class=\"details1\" style=\"vertical-align:middle;\" align=\"center\">";
-	 						$divrec = "";
-							if (PrivacyFunctions::showFact("MARR", $famid) && PrivacyFunctions::DisplayDetailsByID($chil) && DisplayDetailsByID($spouse)) {
-								// marriage date
-								$famrec = FindFamilyRecord($famid);
-								$ct = preg_match("/2 DATE.*(\d\d\d\d)/", GetSubRecord(1, "1 MARR", $famrec), $match);
-								if ($ct>0) print "<span class=\"date\">".trim($match[1])."</span>";
-								// divorce date
-								$divrec = GetSubRecord(1, "1 DIV", $famrec);
-								$ct = preg_match("/2 DATE.*(\d\d\d\d)/", $divrec, $match);
-								if ($ct>0) print "-<span class=\"date\">".trim($match[1])."</span>";
-							}
-							print "<br /><img width=\"100%\" height=\"3\" src=\"".$GM_IMAGE_DIR."/".$GM_IMAGES["hline"]["other"]."\" alt=\"\" />";
+							
+							// marriage date. We only print this if the family can be shown
+							if ($cfam->disp && $cfam->marr_date != "") print "<span class=\"date\">".$cfam->marr_fact->datestring."</span>";
+							
+							// divorce date. We only print this if the family can be shown
+							print "<br /><img width=\"100%\" height=\"3\" src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["hline"]["other"]."\" alt=\"\" />";
+							if ($cfam->disp && $cfam->div_date != "") print "-<br /><span class=\"date\">".$cfam->div_fact->datestring."</span>";
+							
 							// family link
-							if ($famid) {
-								print "<br />";
-								print "<a class=\"details1\" href=\"family.php?famid=$famid\">";
-								if ($SHOW_FAM_ID_NUMBERS) print "&lrm;&nbsp;($famid)&nbsp;&lrm;";
-								print "</a>";
-							}
+							print "<br />";
+							print "<a class=\"details1\" href=\"family.php?famid=".$cfam->xref."\">";
+							print $cfam->addxref;
+							print "</a>";
 							print "</td>\n";
+							
 							// spouse information
 							print "<td style=\"vertical-align: middle;";
-							if (!empty($divrec) and ($view != "preview")) print " filter:alpha(opacity=40);-moz-opacity:0.4\">";
+							if ($cfam->div_date != "" && $view != "preview") print " filter:alpha(opacity=40);-moz-opacity:0.4\">";
 							else print "\">";
-							print_pedigree_person($spouse, 1, $show_famlink, 9, $personcount);
-							$personcount++;
+							PersonFunctions::PrintPedigreePerson($spouse, 1, $show_famlink, 9);
 							print "</td>\n";
 							// cousins
 							if ($show_cousins) {
-								PrintCousins($famid, $personcount);
-								$personcount++;
+								ChartFunctions::PrintCousins($cfam);
 							}
 						}
 					}
-	*/				print "</tr>\n";
+					print "</tr>\n";
 			}
-	/*		foreach($newchildren as $indexval => $chil) {
-				print "<tr >";
-				print "<td valign=\"top\" class=\"facts_valueblue\" style=\"vertical-align:middle; width: " . ($pbwidth) . "px; height: " . $pbheight . "px;\">\n";
-				if ($canshow && GetChangeData(true, $chil, true, "", "")) {
-					$rec = GetChangeData(false, $chil, true, "gedlines", "");
-					$indirec = $rec[$GEDCOMID][$chil];
-				}
-				else $indirec = FindPersonRecord($chil);
-				$pedirec = GetSubRecord(1, "1 FAMC @".$famid."@", $indirec);
-				$pedi = GetGedcomValue("PEDI", 2, $pedirec);
-				print GetPediName($pedi, GetGender($indirec));
-				print_pedigree_person($chil, 1, $show_famlink, 0, $personcount, $indirec);
-				$personcount++;
-				print "</td></tr>\n";
-			}
-			foreach($oldchildren as $indexval => $chil) {
-				print "<tr >";
-				print "<td style=\"vertical-align:middle;\" class=\"facts_valuered\" style=\"width: " . ($pbwidth) . "px; height: " . $pbheight . "px;\">\n";
-				$indirec = FindPersonRecord($chil);
-				$pedirec = GetSubRecord(1, "1 FAMC @".$famid."@", $indirec);
-				$pedi = GetGedcomValue("PEDI", 2, $pedirec);
-				print GetPediName($pedi, GetGender($indirec));
-				print_pedigree_person($chil, 1, $show_famlink, 0, $personcount);
-				$personcount++;
-				print "</td></tr>\n";
-			}
-	*/		// message 'no children' except for sosa
 	   }
 	   else if ($sosa<1) {
 				print "<tr><td></td>";
 				print "<td valign=\"top\"><span class=\"label\">" . $gm_lang["no_children"] . "</span></td></tr>";
 	   }
 	   else {
-		   print "<tr>\n";
-		   ChartFunctions::PrintSosaNumber($sosa, $childid);
-		   print "<td style=\"vertical-align:middle;\">";
-		   print_pedigree_person($childid, 1, $show_famlink, 0, $personcount);
-		   $personcount++;
-		   print "</td></tr>\n";
-	   }
-	   print "</table><br />";
+		   	print "<tr>\n";
+		   	ChartFunctions::PrintSosaNumber($sosa, $childid);
+		   	print "<td style=\"vertical-align:middle;\">";
+		   	$child = Person::GetInstance($childid);
+		   	PersonFunctions::PrintPedigreePerson($child, 1, $show_famlink, 0);
+		   	print "</td></tr>\n";
+	   	}
+		print "</table><br />";
 	}
 	
 	/**

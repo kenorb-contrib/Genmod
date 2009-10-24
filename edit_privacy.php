@@ -120,7 +120,7 @@ function write_hide_show($checkVar) {
  * @param string $outputVar	error message style
  */
 function search_ID_details($checkVar, $outputVar) {
-	global $GEDCOMS, $GEDCOM;
+	global $GEDCOMS;
 	global $gm_lang;
 
 	$indirec = FindGedcomRecord($checkVar);
@@ -189,7 +189,7 @@ function PrintFactChoice() {
 
 
 if (empty($action)) $action="";
-print_header($gm_lang["privacy_header"]);
+PrintHeader($gm_lang["privacy_header"]);
 ?>
 <table class="facts_table <?php print $TEXT_DIRECTION ?>">
 	<tr>
@@ -354,7 +354,7 @@ if ($action=="update") {
     	<tr>
     		<td class="topbottombar <?php print $TEXT_DIRECTION;?>">
 		<?php
-    		print "<a href=\"javascript: ".$gm_lang["general_privacy"]."\" onclick=\"expand_layer('general-privacy-options');return false\"><img id=\"general-privacy-options_img\" src=\"".$GM_IMAGE_DIR."/".$GM_IMAGES["minus"]["other"]."\" border=\"0\" width=\"11\" height=\"11\" alt=\"\" /></a> ";
+    		print "<a href=\"javascript: ".$gm_lang["general_privacy"]."\" onclick=\"expand_layer('general-privacy-options');return false\"><img id=\"general-privacy-options_img\" src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["minus"]["other"]."\" border=\"0\" width=\"11\" height=\"11\" alt=\"\" /></a> ";
 		print_help_link("general_privacy_help", "qm", "general_privacy");
     		?>
         	<a href="javascript: <?php print $gm_lang["general_privacy"]; ?>" onclick="expand_layer('general-privacy-options');return false"><b><?php print $gm_lang["general_privacy"]; ?></b></a>
@@ -410,7 +410,7 @@ if ($action=="update") {
     	<tr>
     		<td class="topbottombar <?php print $TEXT_DIRECTION;?>">
 		<?php
-    		print "<a href=\"javascript: ".$gm_lang["age_privacy"]."\" onclick=\"expand_layer('age-privacy-options');return false\"><img id=\"age-privacy-options_img\" src=\"".$GM_IMAGE_DIR."/".$GM_IMAGES["plus"]["other"]."\" border=\"0\" width=\"11\" height=\"11\" alt=\"\" /></a> ";
+    		print "<a href=\"javascript: ".$gm_lang["age_privacy"]."\" onclick=\"expand_layer('age-privacy-options');return false\"><img id=\"age-privacy-options_img\" src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["plus"]["other"]."\" border=\"0\" width=\"11\" height=\"11\" alt=\"\" /></a> ";
 		print_help_link("age_privacy_help", "qm", "age_privacy");
     		?>
         	<a href="javascript: <?php print $gm_lang["age_privacy"]; ?>" onclick="expand_layer('age-privacy-options');return false"><b><?php print $gm_lang["age_privacy"]; ?></b></a>
@@ -506,7 +506,7 @@ if ($action=="update") {
      	<tr>
      		<td class="topbottombar <?php print $TEXT_DIRECTION;?>">
      		<?php
-		print "<a href=\"javascript: ".$gm_lang["person_privacy"]."\" onclick=\"expand_layer('person-privacy-options');return false\"><img id=\"person-privacy-options_img\" src=\"".$GM_IMAGE_DIR."/".$GM_IMAGES["plus"]["other"]."\" border=\"0\" width=\"11\" height=\"11\" alt=\"\" /></a> ";?><?php print_help_link("person_privacy_help", "qm", "person_privacy");?>
+		print "<a href=\"javascript: ".$gm_lang["person_privacy"]."\" onclick=\"expand_layer('person-privacy-options');return false\"><img id=\"person-privacy-options_img\" src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["plus"]["other"]."\" border=\"0\" width=\"11\" height=\"11\" alt=\"\" /></a> ";?><?php print_help_link("person_privacy_help", "qm", "person_privacy");?>
         	<a href="javascript: <?php print $gm_lang["person_privacy"]; ?>" onclick="expand_layer('person-privacy-options');return false"><b><?php print $gm_lang["person_privacy"]; ?></b></a>
         	</td>
 		</tr>
@@ -586,7 +586,7 @@ if ($action=="update") {
 		<tr>
 			<td class="topbottombar <?php print $TEXT_DIRECTION;?>">
      		<?php
-    		print "<a href=\"javascript: ".$gm_lang["user_privacy"]."\" onclick=\"expand_layer('user-privacy-options');return false\"><img id=\"user-privacy-options_img\" src=\"".$GM_IMAGE_DIR."/".$GM_IMAGES["plus"]["other"]."\" border=\"0\" width=\"11\" height=\"11\" alt=\"\" /></a> ";?><?php print_help_link("user_privacy_help", "qm", "user_privacy");?>
+    		print "<a href=\"javascript: ".$gm_lang["user_privacy"]."\" onclick=\"expand_layer('user-privacy-options');return false\"><img id=\"user-privacy-options_img\" src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["plus"]["other"]."\" border=\"0\" width=\"11\" height=\"11\" alt=\"\" /></a> ";?><?php print_help_link("user_privacy_help", "qm", "user_privacy");?>
 		<a href="javascript: <?php print $gm_lang["user_privacy"]; ?>" onclick="expand_layer('user-privacy-options');return false"><b><?php print $gm_lang["user_privacy"]; ?></b></a>
         	</td>
 		</tr>
@@ -685,7 +685,7 @@ if ($action=="update") {
     ?>
 	<table class="facts_table"><tr><td class="topbottombar <?php print $TEXT_DIRECTION;?>">
      <?php
-    print "<a href=\"javascript: ".$gm_lang["global_facts"]."\" onclick=\"expand_layer('global-facts-options');return false\"><img id=\"global-facts-options_img\" src=\"".$GM_IMAGE_DIR."/".$GM_IMAGES["plus"]["other"]."\" border=\"0\" width=\"11\" height=\"11\" alt=\"\" /></a> ";?>
+    print "<a href=\"javascript: ".$gm_lang["global_facts"]."\" onclick=\"expand_layer('global-facts-options');return false\"><img id=\"global-facts-options_img\" src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["plus"]["other"]."\" border=\"0\" width=\"11\" height=\"11\" alt=\"\" /></a> ";?>
     	   <?php print_help_link("global_facts_help", "qm", "global_facts");?>
 	   <a href="javascript: <?php print $gm_lang["global_facts"]; ?>" onclick="expand_layer('global-facts-options');return false"><b><?php print $gm_lang["global_facts"]; ?></b></a></td>
       </tr>
@@ -772,7 +772,7 @@ if ($action=="update") {
     ?>
 	<table class="facts_table"><tr><td class="topbottombar <?php print $TEXT_DIRECTION;?>">
      <?php
-    print "<a href=\"javascript: ".$gm_lang["person_facts"]."\" onclick=\"expand_layer('person-facts-options');return false\"><img id=\"person-facts-options_img\" src=\"".$GM_IMAGE_DIR."/".$GM_IMAGES["plus"]["other"]."\" border=\"0\" width=\"11\" height=\"11\" alt=\"\" /></a> ";?>
+    print "<a href=\"javascript: ".$gm_lang["person_facts"]."\" onclick=\"expand_layer('person-facts-options');return false\"><img id=\"person-facts-options_img\" src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["plus"]["other"]."\" border=\"0\" width=\"11\" height=\"11\" alt=\"\" /></a> ";?>
     	   <?php print_help_link("person_facts_help", "qm", "person_facts");?>
 	   <a href="javascript: <?php print $gm_lang["person_facts"]; ?>" onclick="expand_layer('person-facts-options');return false"><b><?php print $gm_lang["person_facts"]; ?></b></a></td>
       </tr>
@@ -881,6 +881,6 @@ if ($action=="update") {
 	</table>
     </form>
 <?php
-print_footer();
+PrintFooter();
 
 ?>

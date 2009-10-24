@@ -91,13 +91,12 @@ class Favorite {
 	}
 
 	private function GetTitle() {
-		global $SHOW_ID_NUMBERS;
 		
 		if (is_null($this->title) || $this->title == "") {
 			SwitchGedcom($this->file);
 			$this->GetObject();
 			$this->title = $this->object->title;
-			if ($SHOW_ID_NUMBERS) $this->title .= " (".$this->object->xref.")";
+			if (GedcomConfig::$SHOW_ID_NUMBERS) $this->title .= " (".$this->object->xref.")";
 			SwitchGedcom();
 		}
 		return $this->title;

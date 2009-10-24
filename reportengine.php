@@ -31,7 +31,7 @@
 */
 require("config.php");
 
-@set_time_limit($TIME_LIMIT*2);
+@set_time_limit(GedcomConfig::$TIME_LIMIT*2);
 function get_tag_values($tag) {
 	global $tags, $values;
 
@@ -91,7 +91,7 @@ if (!empty($report)) {
 //-- choose a report to run
 if ($action=="choose") {
 	$reports = GetReportList(true);
-	print_header($gm_lang["choose_report"]);
+	PrintHeader($gm_lang["choose_report"]);
 
 	print "<br /><br />\n";
 	print "<form name=\"choosereport\" method=\"get\" action=\"reportengine.php\">\n";
@@ -111,12 +111,12 @@ if ($action=="choose") {
 	print "</form>\n";
 	print "<br /><br />\n";
 
-	print_footer();
+	PrintFooter();
 }
 
 //-- setup report to run
 else if ($action=="setup") {
-	print_header($gm_lang["enter_report_values"]);
+	PrintHeader($gm_lang["enter_report_values"]);
 	//-- make sure the report exists
 	if (!file_exists($report)) {
 		print "<span class=\"error\">The specified report cannot be found</span>\n";
@@ -246,7 +246,7 @@ function paste_id(value) {
 						if ($input["lookup"]=="REPO") LinkFunctions::PrintFindRepositoryLink($input["name"]);
 						if ($input["lookup"]=="DATE") {
 							$text = $gm_lang["select_date"];
-							if (isset($GM_IMAGES["calendar"]["button"])) $Link = "<img src=\"".$GM_IMAGE_DIR."/".$GM_IMAGES["calendar"]["button"]."\" name=\"a_".$input["name"]."\" id=\"a_".$input["name"]."\" alt=\"".$text."\" title=\"".$text."\" border=\"0\" align=\"middle\" />";
+							if (isset($GM_IMAGES["calendar"]["button"])) $Link = "<img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["calendar"]["button"]."\" name=\"a_".$input["name"]."\" id=\"a_".$input["name"]."\" alt=\"".$text."\" title=\"".$text."\" border=\"0\" align=\"middle\" />";
 							else $Link = $text;
 
 							?>
@@ -280,7 +280,7 @@ function paste_id(value) {
 		print "</form>\n";
 		print "<br /><br />\n";
 	}
-	print_footer();
+	PrintFooter();
 }
 //-- run the report
 else if ($action=="run") {

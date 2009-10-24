@@ -468,8 +468,8 @@ abstract class ImportFunctions {
 	 */
 	public function ImportRecord($indirec, $update=false) {
 		global $gid, $type, $indilist,$famlist,$sourcelist,$otherlist, $prepared_statement;
-		global $GEDCOM_FILE, $FILEID, $gm_lang, $USE_RIN, $gdfp, $placecache, $GEDCOMID;
-		global $ALPHABET_upper, $ALPHABET_lower, $place_id, $WORD_WRAPPED_NOTES, $media_count;
+		global $GEDCOM_FILE, $FILEID, $gm_lang, $gdfp, $placecache, $GEDCOMID;
+		global $ALPHABET_upper, $ALPHABET_lower, $place_id, $media_count;
 		
 		if ($update) $FILEID = $GEDCOMID;
 		if (strlen(trim($indirec)) ==  0) return false;
@@ -655,7 +655,7 @@ abstract class ImportFunctions {
 			$s = GetGedcomValue("SEX", 1, $indirec, '', false);
 			if (empty($s)) $indi["sex"] = "U";
 			else $indi["sex"] = $s;
-			if ($USE_RIN) {
+			if (GedcomConfig::$USE_RIN) {
 				$ct = preg_match("/1 RIN (.*)/", $indirec, $match);
 				if ($ct>0) $rin = trim($match[1]);
 				else $rin = $gid;
@@ -724,7 +724,7 @@ abstract class ImportFunctions {
 				$ct = preg_match_all("/2 CON[C|T] (.*)/", $subindi[1], $match, PREG_SET_ORDER);
 				for($i=0; $i<$ct; $i++) {
 					$name = trim($name);
-					if ($WORD_WRAPPED_NOTES) $name .= " ".$match[$i][1];
+					if (GedcomConfig::$WORD_WRAPPED_NOTES) $name .= " ".$match[$i][1];
 					else $name .= $match[$i][1];
 				}
 			}
@@ -912,7 +912,7 @@ abstract class ImportFunctions {
 	 * @return string	an updated record
 	 */
 	private function UpdateMedia($gid, $indirec, $update=false) {
-		global $FILEID, $MEDIA_ID_PREFIX, $media_count, $found_ids;
+		global $FILEID, $media_count, $found_ids;
 		global $zero_level_media;
 		
 		if (!isset($media_count)) $media_count = 0;

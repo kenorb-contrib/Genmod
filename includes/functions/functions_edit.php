@@ -268,8 +268,8 @@ function CheckGedcom($gedrec, $chan=true, $user="", $tstamp="") {
  * @param string $famtag		how the new person is added to the family
  */
 function PrintIndiForm($nextaction, $famid, $linenum="", $namerec="", $famtag="CHIL") {
-	global $gm_lang, $pid, $GM_IMAGE_DIR, $GM_IMAGES, $monthtonum, $WORD_WRAPPED_NOTES;
-	global $NPFX_accept, $SPFX_accept, $NSFX_accept, $FILE_FORM_accept, $USE_RTL_FUNCTIONS, $change_type;
+	global $gm_lang, $pid, $GM_IMAGES, $monthtonum;
+	global $NPFX_accept, $SPFX_accept, $NSFX_accept, $FILE_FORM_accept, $change_type;
 	global $GEDCOMID, $gm_user;
 
 	init_calendar_popup();
@@ -355,7 +355,7 @@ function PrintIndiForm($nextaction, $famid, $linenum="", $namerec="", $famtag="C
 	AddSimpleTag("0 NSFX ".@$nmatch[1]);
 	// 2 _HEB
 	$nt = preg_match("/\d _HEB (.*)/", $namerec, $nmatch);
-	if ($nt>0 || $USE_RTL_FUNCTIONS) {
+	if ($nt>0 || GedcomConfig::$USE_RTL_FUNCTIONS) {
 		AddSimpleTag("0 _HEB ".@$nmatch[1]);
 	}
 	// 2 ROMN
@@ -441,7 +441,7 @@ function PrintIndiForm($nextaction, $famid, $linenum="", $namerec="", $famtag="C
 					while(($i+1<count($gedlines))&&(preg_match("/".($level+1)." (CON[CT])\s?(.*)/", $gedlines[$i+1], $cmatch)>0)) {
 						$iscont=true;
 						if ($cmatch[1]=="CONT") $text.="\r\n";
-						if ($WORD_WRAPPED_NOTES) $text .= " ";
+						if (GedcomConfig::$WORD_WRAPPED_NOTES) $text .= " ";
 						$text .= $cmatch[2];
 						$i++;
 					}
@@ -600,11 +600,11 @@ function PrintIndiForm($nextaction, $famid, $linenum="", $namerec="", $famtag="C
  * @see init_calendar_popup()
  */
 function PrintCalendarPopup($id) {
-	global $gm_lang, $GM_IMAGE_DIR, $GM_IMAGES;
+	global $gm_lang, $GM_IMAGES;
 
 	// calendar button
 	$text = $gm_lang["select_date"];
-	if (isset($GM_IMAGES["calendar"]["button"])) $Link = "<img src=\"".$GM_IMAGE_DIR."/".$GM_IMAGES["calendar"]["button"]."\" name=\"img".$id."\" id=\"img".$id."\" alt=\"".$text."\" title=\"".$text."\" border=\"0\" align=\"middle\" />";
+	if (isset($GM_IMAGES["calendar"]["button"])) $Link = "<img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["calendar"]["button"]."\" name=\"img".$id."\" id=\"img".$id."\" alt=\"".$text."\" title=\"".$text."\" border=\"0\" align=\"middle\" />";
 	else $Link = $text;
 	print "<a href=\"javascript: ".$text."\" onclick=\"cal_toggleDate('caldiv".$id."', '".$id."'); return false;\">";
 	print $Link;
@@ -640,7 +640,7 @@ function AddTagSeparator($fact="") {
  * @param string $upperlevel	optional upper level tag (eg BIRT)
  */
 function AddSimpleTag($tag, $upperlevel="", $tab="1") {
-	global $gm_lang, $GM_IMAGE_DIR, $GM_IMAGES, $MEDIA_DIRECTORY, $TEMPLE_CODES, $STATUS_CODES, $REPO_ID_PREFIX, $SPLIT_PLACES;
+	global $gm_lang, $GM_IMAGES, $TEMPLE_CODES, $STATUS_CODES;
 	global $assorela, $tags, $emptyfacts, $TEXT_DIRECTION, $confighelpfile, $GM_BASE_DIRECTORY, $GEDCOMID;
 	global $NPFX_accept, $SPFX_accept, $NSFX_accept, $FILE_FORM_accept, $upload_count, $separatorfacts, $canhavey_facts;
 	static $tabkey;
@@ -681,7 +681,7 @@ function AddSimpleTag($tag, $upperlevel="", $tab="1") {
 	else if (in_array($fact, $subnamefacts)) $cols=25;
 	else if (in_array($fact, $largetextfacts)) { $rows=10; $cols=70; }
 	else if ($fact=="ADDR") $rows=5;
-	else if ($fact=="REPO") $cols = strlen($REPO_ID_PREFIX) + 4;
+	else if ($fact=="REPO") $cols = strlen(GedcomConfig::$REPO_ID_PREFIX) + 4;
 
 	// label
 	if (in_array($fact, $separatorfacts) && $level <= 2) AddTagSeparator($fact, $islink);
@@ -879,7 +879,7 @@ function AddSimpleTag($tag, $upperlevel="", $tab="1") {
 			LinkFunctions::PrintSpecialCharLink($element_id);
 			LinkFunctions::PrintFindPlaceLink($element_id);
 			print "</div>\n";
-			if ($SPLIT_PLACES) {
+			if (GedcomConfig::$SPLIT_PLACES) {
 				if (!function_exists("print_place_subfields")) require("includes/functions/functions_places.php");
 				print_place_subfields($element_id);
 			}
@@ -1018,7 +1018,7 @@ function AddSimpleTag($tag, $upperlevel="", $tab="1") {
 	// pastable values
 	if ($fact=="NPFX") {
 		$text = $gm_lang["autocomplete"];
-		if (isset($GM_IMAGES["autocomplete"]["button"])) $Link = "<img id=\"".$element_id."_spec\" name=\"".$element_id."_spec\" src=\"".$GM_IMAGE_DIR."/".$GM_IMAGES["autocomplete"]["button"]."\"  alt=\"".$text."\"  title=\"".$text."\" border=\"0\" align=\"middle\" />";
+		if (isset($GM_IMAGES["autocomplete"]["button"])) $Link = "<img id=\"".$element_id."_spec\" name=\"".$element_id."_spec\" src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["autocomplete"]["button"]."\"  alt=\"".$text."\"  title=\"".$text."\" border=\"0\" align=\"middle\" />";
 		else $Link = $text;
 		print "&nbsp;".$Link;
 	}
@@ -1028,8 +1028,8 @@ function AddSimpleTag($tag, $upperlevel="", $tab="1") {
 
 	// split NAME
 	if ($fact=="NAME") {
-		print "&nbsp;<a href=\"javascript: ".$gm_lang["show_details"]."\" onclick=\"togglename(); return false;\"><img id=\"".$element_id."_plus\" src=\"".$GM_IMAGE_DIR."/".$GM_IMAGES["plus"]["other"]."\" border=\"0\" width=\"11\" height=\"11\" alt=\"\" title=\"\" /></a>\n";
-		print "<a href=\"javascript: ".$gm_lang["show_details"]."\" onclick=\"togglename(); return false;\"><img style=\"display:none;\" id=\"".$element_id."_minus\" src=\"".$GM_IMAGE_DIR."/".$GM_IMAGES["minus"]["other"]."\" border=\"0\" width=\"11\" height=\"11\" alt=\"\" title=\"\" /></a>\n";
+		print "&nbsp;<a href=\"javascript: ".$gm_lang["show_details"]."\" onclick=\"togglename(); return false;\"><img id=\"".$element_id."_plus\" src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["plus"]["other"]."\" border=\"0\" width=\"11\" height=\"11\" alt=\"\" title=\"\" /></a>\n";
+		print "<a href=\"javascript: ".$gm_lang["show_details"]."\" onclick=\"togglename(); return false;\"><img style=\"display:none;\" id=\"".$element_id."_minus\" src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["minus"]["other"]."\" border=\"0\" width=\"11\" height=\"11\" alt=\"\" title=\"\" /></a>\n";
 	}
 	
 	if (!in_array($fact, $emptyfacts) || in_array($fact, $canhavey_facts)) print "</td>";
@@ -1044,12 +1044,11 @@ function AddSimpleTag($tag, $upperlevel="", $tab="1") {
  * @param string $tag		Gedcom tag name
  */
 function PrintAddLayer($tag, $level=2, $addfact=false) {
-	global $gm_lang, $GM_IMAGE_DIR, $GM_IMAGES, $TEXT_DIRECTION;
-	global $MEDIA_DIRECTORY;
+	global $gm_lang, $GM_IMAGES, $TEXT_DIRECTION;
 
 	if ($tag=="SOUR") {
 		//-- Add new source to fact
-		print "<a href=\"#\" onclick=\"expand_layer('newsource'); if(document.getElementById('newsource').style.display == 'block') document.getElementById(addsourcefocus).focus(); return false;\"><img id=\"newsource_img\" src=\"".$GM_IMAGE_DIR."/".$GM_IMAGES["plus"]["other"]."\" border=\"0\" width=\"11\" height=\"11\" alt=\"\" title=\"\" /> ".$gm_lang["add_source"]."</a>";
+		print "<a href=\"#\" onclick=\"expand_layer('newsource'); if(document.getElementById('newsource').style.display == 'block') document.getElementById(addsourcefocus).focus(); return false;\"><img id=\"newsource_img\" src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["plus"]["other"]."\" border=\"0\" width=\"11\" height=\"11\" alt=\"\" title=\"\" /> ".$gm_lang["add_source"]."</a>";
 		print_help_link("edit_add_SOUR_help", "qm");
 		print "<br />";
 		print "<div id=\"newsource\" style=\"display: none;\">\n";
@@ -1081,7 +1080,7 @@ function PrintAddLayer($tag, $level=2, $addfact=false) {
 	}
 	if ($tag=="ASSO") {
 		//-- Add a new ASSOciate
-		print "<a href=\"#\" onclick=\"expand_layer('newasso'); if(document.getElementById('newasso').style.display == 'block') document.getElementById(addassofocus).focus(); return false;\"><img id=\"newasso_img\" src=\"".$GM_IMAGE_DIR."/".$GM_IMAGES["plus"]["other"]."\" border=\"0\" width=\"11\" height=\"11\" alt=\"\" title=\"\" /> ".$gm_lang["add_asso"]."</a>";
+		print "<a href=\"#\" onclick=\"expand_layer('newasso'); if(document.getElementById('newasso').style.display == 'block') document.getElementById(addassofocus).focus(); return false;\"><img id=\"newasso_img\" src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["plus"]["other"]."\" border=\"0\" width=\"11\" height=\"11\" alt=\"\" title=\"\" /> ".$gm_lang["add_asso"]."</a>";
 		print_help_link("edit_add_ASSO_help", "qm");
 		print "<br />";
 		print "<div id=\"newasso\" style=\"display: none;\">\n";
@@ -1103,7 +1102,7 @@ function PrintAddLayer($tag, $level=2, $addfact=false) {
 	}
 	if ($tag=="NOTE") {
 		//-- Add new note to fact
-		print "<a href=\"#\" onclick=\"expand_layer('newnote'); if(document.getElementById('newnote').style.display == 'block') document.getElementById(addnotefocus).focus(); return false;\"><img id=\"newnote_img\" src=\"".$GM_IMAGE_DIR."/".$GM_IMAGES["plus"]["other"]."\" border=\"0\" width=\"11\" height=\"11\" alt=\"\" title=\"\" /> ".$gm_lang["add_note"]."</a>";
+		print "<a href=\"#\" onclick=\"expand_layer('newnote'); if(document.getElementById('newnote').style.display == 'block') document.getElementById(addnotefocus).focus(); return false;\"><img id=\"newnote_img\" src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["plus"]["other"]."\" border=\"0\" width=\"11\" height=\"11\" alt=\"\" title=\"\" /> ".$gm_lang["add_note"]."</a>";
 		print_help_link("edit_add_NOTE_help", "qm");
 		print "<br />\n";
 		print "<div id=\"newnote\" style=\"display: none;\">\n";
@@ -1121,7 +1120,7 @@ function PrintAddLayer($tag, $level=2, $addfact=false) {
 	}
 	if ($tag=="GNOTE") {
 		//-- Add new general note to fact
-		print "<a href=\"#\" onclick=\"expand_layer('newgnote'); if(document.getElementById('newgnote').style.display == 'block') document.getElementById(addgnotefocus).focus(); return false;\"><img id=\"newnote_img\" src=\"".$GM_IMAGE_DIR."/".$GM_IMAGES["plus"]["other"]."\" border=\"0\" width=\"11\" height=\"11\" alt=\"\" title=\"\" /> ".$gm_lang["add_gnote"]."</a>";
+		print "<a href=\"#\" onclick=\"expand_layer('newgnote'); if(document.getElementById('newgnote').style.display == 'block') document.getElementById(addgnotefocus).focus(); return false;\"><img id=\"newnote_img\" src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["plus"]["other"]."\" border=\"0\" width=\"11\" height=\"11\" alt=\"\" title=\"\" /> ".$gm_lang["add_gnote"]."</a>";
 		print_help_link("edit_add_NOTE_help", "qm");
 		print "<br />";
 		print "<div id=\"newgnote\" style=\"display: none;\">\n";
@@ -1139,7 +1138,7 @@ function PrintAddLayer($tag, $level=2, $addfact=false) {
 	}
 	if ($tag=="OBJE") {
 		//-- Add new obje to fact
-		print "<a href=\"#\" onclick=\"expand_layer('newobje'); if(document.getElementById('newobje').style.display == 'block') document.getElementById(addobjefocus).focus(); return false;\"><img id=\"newobje_img\" src=\"".$GM_IMAGE_DIR."/".$GM_IMAGES["plus"]["other"]."\" border=\"0\" width=\"11\" height=\"11\" alt=\"\" title=\"\" /> ".$gm_lang["add_obje"]."</a>";
+		print "<a href=\"#\" onclick=\"expand_layer('newobje'); if(document.getElementById('newobje').style.display == 'block') document.getElementById(addobjefocus).focus(); return false;\"><img id=\"newobje_img\" src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["plus"]["other"]."\" border=\"0\" width=\"11\" height=\"11\" alt=\"\" title=\"\" /> ".$gm_lang["add_obje"]."</a>";
 		print_help_link("add_media_help", "qm");
 		print "<br />";
 		print "<div id=\"newobje\" style=\"display: none;\">\n";
@@ -1344,9 +1343,9 @@ function CheckInputDate($datestr) {
 }
 
 function PrintQuickResn($name, $default="") {
-	global $SHOW_QUICK_RESN, $align, $gm_lang, $tabkey;
+	global $align, $gm_lang, $tabkey;
 	
-	if ($SHOW_QUICK_RESN) {
+	if (GedcomConfig::$SHOW_QUICK_RESN) {
 		print "<tr><td class=\"shade2\">";
 		print_help_link("RESN_help", "qm");
 		print GM_FACT_RESN; 
@@ -1422,7 +1421,7 @@ function SubmitterRecord($level, $gedrec) {
 		while(($i+1<count($gedlines))&&(preg_match("/".($level+2)." (CON[CT])\s?(.*)/", $gedlines[$i+1], $cmatch)>0)) {
 			$iscont=true;
 			if ($cmatch[1]=="CONT") $text.="\n";
-			else if ($WORD_WRAPPED_NOTES) $text .= " ";
+			else if (GedcomConfig::$WORD_WRAPPED_NOTES) $text .= " ";
 			$text .= $cmatch[2];
 			$i++;
 		}
@@ -1446,11 +1445,11 @@ function SubmitterRecord($level, $gedrec) {
 	}
 }
 function ShowMediaForm($pid, $action="newentry", $change_type="add_media") {
-	global $GEDCOMID, $gm_lang, $TEXT_DIRECTION, $MEDIA_ID_PREFIX, $WORD_WRAPPED_NOTES, $MEDIA_DIRECTORY;
-	global $MEDIA_FACTS_ADD, $MEDIA_FACTS_UNIQUE, $gm_user;
+	global $GEDCOMID, $gm_lang, $TEXT_DIRECTION;
+	global $gm_user;
 	
-	$facts_add = explode(",", $MEDIA_FACTS_ADD);
-	$facts_unique = explode(",", $MEDIA_FACTS_UNIQUE);
+	$facts_add = explode(",", GedcomConfig::$MEDIA_FACTS_ADD);
+	$facts_unique = explode(",", GedcomConfig::$MEDIA_FACTS_UNIQUE);
 	
 	// NOTE: add a table and form to easily add new values to the table
 	print "<form method=\"post\" name=\"newmedia\" action=\"addmedia.php\" enctype=\"multipart/form-data\">\n";
@@ -1523,7 +1522,7 @@ function ShowMediaForm($pid, $action="newentry", $change_type="add_media") {
 					// strip the newline from the text as CONC should not start on a new line
 					$notetext = preg_replace("/[\r|\n]+$/", "", $notetext);
 					if ($tag == "CONT") $notetext.="\n";
-					else if ($WORD_WRAPPED_NOTES) $notetext .= " ";
+					else if (GedcomConfig::$WORD_WRAPPED_NOTES) $notetext .= " ";
 					$notetext .= $value;
 				}
 				else AddSimpleTag("$level $tag $value");
@@ -1552,7 +1551,7 @@ function ShowMediaForm($pid, $action="newentry", $change_type="add_media") {
 			// Box for user to choose to upload file from local computer
 			print "<tr><td class=\"shade2\">".$gm_lang["upload_file"]."</td><td class=\"shade1\"><input type=\"file\" name=\"picture\" size=\"60\"></td></tr>";
 			// Box for user to choose the folder to store the image
-			$dirlist = MediaFS::GetMediaDirList($MEDIA_DIRECTORY, true, 1, true, false);
+			$dirlist = MediaFS::GetMediaDirList(GedcomConfig::$MEDIA_DIRECTORY, true, 1, true, false);
 			print "<tr><td class=\"shade2\">".$gm_lang["upload_to_folder"]."</td><td class=\"shade1\">";
 	//		<input type=\"text\" name=\"folder\" size=\"60\">
 			print "<select name=\"folder\">";
@@ -1767,7 +1766,7 @@ function SortFactDetails($gedrec) {
 }
 
 function AddMissingTags($tags) {
-	global $templefacts, $nondatefacts, $nonplacfacts, $gm_lang, $MEDIA_DIRECTORY, $focus;
+	global $templefacts, $nondatefacts, $nonplacfacts, $gm_lang, $focus;
 
 	// Now add some missing tags :
 	if (in_array($tags[0], $templefacts)) {
@@ -1831,7 +1830,7 @@ function AddMissingTags($tags) {
 		// Box for user to choose to upload file from local computer
 		print "<tr><td class=\"shade2\">".$gm_lang["upload_file"]."</td><td class=\"shade1\"><input type=\"file\" name=\"picture\" size=\"60\"></td></tr>";
 		// Box for user to choose the folder to store the image
-		$dirlist = MediaFS::GetMediaDirList($MEDIA_DIRECTORY, true, 1, true, false);
+		$dirlist = MediaFS::GetMediaDirList(GedcomConfig::$MEDIA_DIRECTORY, true, 1, true, false);
 		print "<tr><td class=\"shade2\">".$gm_lang["upload_to_folder"]."</td><td class=\"shade1\">";
 		print "<select name=\"folder\">";
 		foreach($dirlist as $key => $dir) {

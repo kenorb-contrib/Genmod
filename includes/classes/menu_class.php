@@ -100,14 +100,13 @@ class Menu {
 		global
 			$menucount,
 			$TEXT_DIRECTION,
-			$GM_IMAGE_DIR,
 			$GM_IMAGES
 		;
 		if (!isset($menucount)) $menucount = 0;
 		else $menucount++;
 		if ($this->seperator) {
 			$output = "<div id=\"menu{$menucount}\" class=\"seperator\";\">"
-				."<img src=\"{$GM_IMAGE_DIR}/{$GM_IMAGES['hline']['other']}\" height=\"3\" alt=\"\" />"
+				."<img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES['hline']['other']."\" height=\"3\" alt=\"\" />"
 				."</div>\n";
 			return $output;
 		}

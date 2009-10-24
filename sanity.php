@@ -40,7 +40,7 @@ if (!$gm_user->userGedcomAdmin()) {
 	else header("Location: ".LOGIN_URL."?url=sanity.php");
 	exit;
 }
-print_header("Genmod ".$gm_lang["sc_sanity_check_short"]);
+PrintHeader("Genmod ".$gm_lang["sc_sanity_check_short"]);
 
 // init vars
 if (!isset($check_components)) $check_components = "";
@@ -58,9 +58,9 @@ if (!isset($check_gedtags)) $check_gedtags = "";
 if (!isset($check_unlinked)) $check_unlinked = "";
 if (!isset($check_cits)) $check_sits = "";
 if (!isset($action)) $action = "";
-$info_icon = "<img src=\"".$GM_IMAGE_DIR."/".$GM_IMAGES["log"]["information"]."\" alt=\"".$gm_lang["information"]."\" />&nbsp;";
-$warn_icon = "<img src=\"".$GM_IMAGE_DIR."/".$GM_IMAGES["log"]["warning"]."\" alt=\"".$gm_lang["warning"]."\" />&nbsp;";
-$error_icon = "<img src=\"".$GM_IMAGE_DIR."/".$GM_IMAGES["log"]["error"]."\" alt=\"".$gm_lang["error"]."\" />&nbsp;";
+$info_icon = "<img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["log"]["information"]."\" alt=\"".$gm_lang["information"]."\" />&nbsp;";
+$warn_icon = "<img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["log"]["warning"]."\" alt=\"".$gm_lang["warning"]."\" />&nbsp;";
+$error_icon = "<img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["log"]["error"]."\" alt=\"".$gm_lang["error"]."\" />&nbsp;";
 ?>
 <!-- Setup the left box -->
 <div id="admin_genmod_left">
@@ -100,7 +100,7 @@ if (empty($action)) {
 	</table></form><br /><br />
 	</div>
 	<?php
-	print_footer();
+	PrintFooter();
 	exit;
 }
 
@@ -1298,10 +1298,10 @@ if (!empty($check_gedcoms)) {
 			if (!$MEDIA_IN_DB) {
 				
 				// Build the directorylist
-				$dirs = GetDirList(array($MEDIA_DIRECTORY));
+				$dirs = GetDirList(array(GedcomConfig::$MEDIA_DIRECTORY));
 				
 				// exclude the GM trees
-				$tpath = array($MEDIA_DIRECTORY."/thumbs", "/thumbs/", "./fonts/", "./hooks/", "./images/", "./includes", "./languages/", "./modules/", "./pgvnuke/", "./places/", "./reports/", "./ufpdf/", "./themes/", "./blocks/", "./install/", INDEX_DIRECTORY);
+				$tpath = array(GedcomConfig::$MEDIA_DIRECTORY."/thumbs", "/thumbs/", "./fonts/", "./hooks/", "./images/", "./includes", "./languages/", "./modules/", "./pgvnuke/", "./places/", "./reports/", "./ufpdf/", "./themes/", "./blocks/", "./install/", INDEX_DIRECTORY);
 				$tpath = str_replace("//", "/", $tpath);
 				foreach($dirs as $key => $dir) {
 					if ($dir == "./") unset ($dirs[$key]);
@@ -1352,7 +1352,7 @@ if (!empty($check_gedcoms)) {
 						$file = trim($file);
 						if (substr($file,0,7) != "http://") {
 							if (substr($file,0,2) != "./") $file = "./".$file;
-							$file = RelativePathFile($MEDIA_DIRECTORY.MediaFS::CheckMediaDepth($file));
+							$file = RelativePathFile(GedcomConfig::$MEDIA_DIRECTORY.MediaFS::CheckMediaDepth($file));
 						}
 						$num++;
 						if (isset($flist[$file])) {
@@ -1725,5 +1725,5 @@ if (!empty($check_filesys)) {
 }
 print "</table><br />";
 print "</div>";
-print_footer();
+PrintFooter();
 ?>

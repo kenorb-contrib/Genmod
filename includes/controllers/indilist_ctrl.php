@@ -49,8 +49,8 @@ class IndilistController extends ListController {
 	public function __construct() {
 		global $ALLOW_CHANGE_GEDCOM, $gm_user;
 		
-		global $GEDCOM_DEFAULT_TAB, $USE_RIN, $gm_lang, $GM_IMAGE_DIR, $GM_IMAGES, $nonfacts, $nonfamfacts;
-		global $ENABLE_CLIPPINGS_CART, $show_changes, $gm_user, $SHOW_ID_NUMBERS;
+		global $gm_lang, $GM_IMAGES, $nonfacts, $nonfamfacts;
+		global $ENABLE_CLIPPINGS_CART, $show_changes, $gm_user;
 		
 		parent::__construct();
 		
@@ -89,13 +89,13 @@ class IndilistController extends ListController {
 	
 	
 	protected function GetPageTitle() {
-		global $gm_lang, $SHOW_ID_NUMBERS;
+		global $gm_lang;
 
 		if (is_null($this->pagetitle)) {
 			if ($this->indi->disp) $this->pagetitle = $this->indi->name;
 			else $this->pagetitle = $gm_lang["private"];
 			
-			if ($SHOW_ID_NUMBERS) $this->pagetitle .= " - ".$this->indi->xref;
+			if (GedcomConfig::$SHOW_ID_NUMBERS) $this->pagetitle .= " - ".$this->indi->xref;
 			$this->pagetitle .= " - ".$gm_lang["indi_info"];
 		}
 		return $this->pagetitle;

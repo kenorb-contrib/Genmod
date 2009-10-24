@@ -44,7 +44,7 @@ if ($action == "loadlanguage" && isset($language)) {
 	StoreLanguage($language);
 }
 
-print_header($gm_lang["administration"]);
+PrintHeader($gm_lang["administration"]);
 ?>
 <script type="text/javascript">
 <!--
@@ -192,7 +192,7 @@ if (file_exists(INDEX_DIRECTORY."emergency_syslog.txt")) {
 	</div>
 	<div class="admin_item_box">
 		<div class="admin_item_left"><div class="helpicon"><?php print_help_link("help_media.php", "qm", "manage_media"); ?></div><div class="description"><a href="media.php"><?php print $gm_lang["manage_media"];?></a></div></div>
-		<div class="admin_item_right"><?php if ($ALLOW_EDIT_GEDCOM) { ?>
+		<div class="admin_item_right"><?php if (GedcomConfig::$ALLOW_EDIT_GEDCOM) { ?>
 			<div class="helpicon"><?php print_help_link("edit_add_unlinked_person_help", "qm"); ?></div><div class="description"><a href="javascript: <?php print $gm_lang["add_unlinked_person"]; ?>" onclick="addnewchild('','add_unlinked_person'); return false;"><?php print $gm_lang["add_unlinked_person"]; ?></a></div>
 			<?php }
 			else print "&nbsp;"; ?>
@@ -231,5 +231,5 @@ if (file_exists(INDEX_DIRECTORY."emergency_syslog.txt")) {
 	<?php } ?>
 </div>
 <?php
-print_footer();
+PrintFooter();
 ?>

@@ -47,7 +47,7 @@ if (!MediaFS::IsValidMedia($file)) {
 }
 
 // We always do a privacy check
-$m = RelativePathFile($MEDIA_DIRECTORY);
+$m = RelativePathFile(GedcomConfig::$MEDIA_DIRECTORY);
 if (!empty($m)) $mfile = preg_replace("~^$m~", "", $file);
 else $mfile = $file;
 $sql = "SELECT m_media FROM ".TBLPREFIX."media WHERE m_mfile='".$mfile."' AND m_file='".$GEDCOMID."'";

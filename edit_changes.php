@@ -42,7 +42,7 @@ if (!$gm_user->userCanAccept()) {
 
 if (empty($action)) $action="";
 
-print_simple_header($gm_lang["review_changes"]);
+PrintSimpleHeader($gm_lang["review_changes"]);
 ?>
 <script language="JavaScript" type="text/javascript">
 <!--
@@ -472,5 +472,5 @@ else {
 }
 print "<br /><br />\n</center></div>\n";
 print "<center><a href=\"#\" onclick=\"window.opener.reload(); window.close();\">".$gm_lang["close_window"]."</a><br /></center>\n";
-print_simple_footer();
+PrintSimpleFooter();
 ?>

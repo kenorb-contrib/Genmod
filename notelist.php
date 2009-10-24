@@ -33,7 +33,7 @@ require("config.php");
 */
 $note_controller = new NoteController();
 
-print_header($gm_lang["note_list"]);
+PrintHeader($gm_lang["note_list"]);
 print "<div class=\"center\">";
 print "<h3>".$gm_lang["note_list"]."</h3>\n\t";
 
@@ -45,7 +45,7 @@ $note_hide = $note_total - $note_count;
 
 print "\n\t<table class=\"list_table $TEXT_DIRECTION center\">\n\t\t<tr><td class=\"shade2 center\"";
 if($note_count > 12) print " colspan=\"2\"";
-print "><img src=\"".$GM_IMAGE_DIR."/".$GM_IMAGES["note"]["other"]."\" border=\"0\" title=\"".$gm_lang["notes"]."\" alt=\"".$gm_lang["notes"]."\" />&nbsp;&nbsp;";
+print "><img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["note"]["other"]."\" border=\"0\" title=\"".$gm_lang["notes"]."\" alt=\"".$gm_lang["notes"]."\" />&nbsp;&nbsp;";
 print $gm_lang["titles_found"];
 print "</td></tr><tr><td class=\"$TEXT_DIRECTION shade1 wrap\"><ul>";
 $i=1;
@@ -68,5 +68,5 @@ print "</td>\n\t\t</tr>\n\t</table>";
 print_help_link("notelist_listbox_help", "qm");
 print "</div>";
 print "<br /><br />";
-print_footer();
+PrintFooter();
 ?>

@@ -38,7 +38,7 @@ require("config.php");
 */
 $controller = new IndividualController();
 
-print_header($controller->pagetitle);
+PrintHeader($controller->pagetitle);
 
 $controller->CheckNoResult($gm_lang["person_not_found"]);
 
@@ -145,13 +145,13 @@ $controller->CheckRawEdited();
 			$factobj->PrintFactPlace();
 			print "</span><br style=\"line-height:30px;\" />";
 		}
-		if ($SHOW_LDS_AT_GLANCE) print "<br /><b>".GetLdsGlance($controller->indi->gedrec)."</b>";
+		if (GedcomConfig::$SHOW_LDS_AT_GLANCE) print "<br /><b>".GetLdsGlance($controller->indi->gedrec)."</b>";
 		?>
 		</div>
 		<?php 
 	}
 	// Print indi counter only if displaying a non-private person
-	if($SHOW_COUNTER) print "\n<br /><br /><div style=\"margin-left: 3px; width: 100%;\">".$gm_lang["hit_count"]."&nbsp;".$hits."</div>\n";
+	if(GedcomConfig::$SHOW_COUNTER) print "\n<br /><br /><div style=\"margin-left: 3px; width: 100%;\">".$gm_lang["hit_count"]."&nbsp;".$hits."</div>\n";
 	
 print "</div><br />";
 
@@ -160,7 +160,7 @@ if (!$controller->view) {
 ?>
 	<div class="accesskeys">
 		<a class="accesskeys" href="<?php print "pedigree.php?rootid=$pid";?>" title="<?php print $gm_lang["pedigree_chart"] ?>" tabindex="-1" accesskey="<?php print $gm_lang["accesskey_individual_pedigree"]; ?>"><?php print $gm_lang["pedigree_chart"] ?></a>
-		<a class="accesskeys" href="<?php print "descendancy.php?pid=$pid";?>" title="<?php print $gm_lang["descend_chart"] ?>" tabindex="-1" accesskey="<?php print $gm_lang["accesskey_individual_descendancy"]; ?>"><?php print $gm_lang["descend_chart"] ?></a>
+		<a class="accesskeys" href="<?php print "descendancy.php?rootid=$pid";?>" title="<?php print $gm_lang["descend_chart"] ?>" tabindex="-1" accesskey="<?php print $gm_lang["accesskey_individual_descendancy"]; ?>"><?php print $gm_lang["descend_chart"] ?></a>
 		<a class="accesskeys" href="<?php print "timeline.php?pids[]=$pid";?>" title="<?php print $gm_lang["timeline_chart"] ?>" tabindex="-1" accesskey="<?php print $gm_lang["accesskey_individual_timeline"]; ?>"><?php print $gm_lang["timeline_chart"] ?></a>
 		<?php
 		if (!empty($controller->user)&&!empty($controller->user->gedcomid[$GEDCOMID])) {
@@ -196,5 +196,5 @@ if (!$controller->view) {
 // Print the tab doors
 $controller->PrintTabs();
 
-print_footer();
+PrintFooter();
 ?>

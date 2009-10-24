@@ -47,7 +47,7 @@ if (!isset($NEW_LANGS)) $NEW_LANGS = array();
 $message = "";
 $i = 1;
 
-print_header($gm_lang["configure_head"]);
+PrintHeader($gm_lang["configure_head"]);
 ?>
 <!-- Setup the left box -->
 <div id="admin_genmod_left">
@@ -765,5 +765,5 @@ print_header($gm_lang["configure_head"]);
 	</script>
 </div>
 <?php
-print_footer();
+PrintFooter();
 ?>

@@ -87,7 +87,7 @@ switch ($action) {
 		break;
 }
 
-print_header($gm_lang["administration_maintenance"]);
+PrintHeader($gm_lang["administration_maintenance"]);
 $err_write = FileIsWriteable("config.php");
 
 $users = UserController::GetUsers();
@@ -139,5 +139,5 @@ foreach($users as $indexval => $user) {
 	?>
 </div>
 <?php
-print_footer();
+PrintFooter();
 ?>

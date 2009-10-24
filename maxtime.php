@@ -28,7 +28,7 @@
  * Inclusion of the configuration file
 */
 require("config.php");
-print_header($gm_lang["max_time"]);
+PrintHeader($gm_lang["max_time"]);
 if(!$gm_user->UserIsAdmin()) exit;
 if (!isset($maxtime)) $maxtime = 0;
 
@@ -70,5 +70,5 @@ else {
 	print $gm_lang["maxtime_lower"];
 }
 
-print_footer();
+PrintFooter();
 ?>

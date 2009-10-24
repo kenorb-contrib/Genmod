@@ -36,7 +36,7 @@ require("config.php");
 $controller = new TimelineController();
 
 $title = "";
-if ($SHOW_ID_NUMBERS) {
+if (GedcomConfig::$SHOW_ID_NUMBERS) {
 	foreach($controller->people as $p=>$indi) {
 		if (!empty($title)) $title .= '/';
 		$title .= $indi->xref;
@@ -44,7 +44,7 @@ if ($SHOW_ID_NUMBERS) {
 	if (!empty ($title)) $title .= " - ";
 }
 $title .= $gm_lang["timeline_title"];
-print_header($title);
+PrintHeader($title);
 ?>
 <script language="JavaScript" type="text/javascript">
 <!--
@@ -189,11 +189,11 @@ function MM(e) {
 			// check if we are above the starting point and switch the background image
 			if (newy < boxmean) {
 				if (textDirection=='ltr') {
-					dbox.style.backgroundImage = "url('<?php print $GM_IMAGE_DIR."/".$GM_IMAGES["dline"]["other"]; ?>')";
+					dbox.style.backgroundImage = "url('<?php print GM_IMAGE_DIR."/".$GM_IMAGES["dline"]["other"]; ?>')";
 					dbox.style.backgroundPosition = "0% 100%";
 				}
 				else {
-					dbox.style.backgroundImage = "url('<?php print $GM_IMAGE_DIR."/".$GM_IMAGES["dline2"]["other"]; ?>')";
+					dbox.style.backgroundImage = "url('<?php print GM_IMAGE_DIR."/".$GM_IMAGES["dline2"]["other"]; ?>')";
 					dbox.style.backgroundPosition = "0% 0%";
 				}
 				dy = (-1)*dy;
@@ -202,11 +202,11 @@ function MM(e) {
 			}
 			else {
 				if (textDirection=='ltr') {
-					dbox.style.backgroundImage = "url('<?php print $GM_IMAGE_DIR."/".$GM_IMAGES["dline2"]["other"]; ?>')";
+					dbox.style.backgroundImage = "url('<?php print GM_IMAGE_DIR."/".$GM_IMAGES["dline2"]["other"]; ?>')";
 					dbox.style.backgroundPosition = "0% 0%";
 				}
 				else {
-					dbox.style.backgroundImage = "url('<?php print $GM_IMAGE_DIR."/".$GM_IMAGES["dline"]["other"]; ?>')";
+					dbox.style.backgroundImage = "url('<?php print GM_IMAGE_DIR."/".$GM_IMAGES["dline"]["other"]; ?>')";
 					dbox.style.backgroundPosition = "0% 100%";
 				}
 
@@ -276,19 +276,19 @@ $controller->checkPrivacy();
 		if ((!is_null($indi))&&($indi->disp)) {
 			switch($sex) {
 			case "M":
-				$seximage = $GM_IMAGE_DIR."/".$GM_IMAGES["sex"]["small"];
+				$seximage = GM_IMAGE_DIR."/".$GM_IMAGES["sex"]["small"];
 				?>
 				<img src="<?php print $seximage; ?>" title="<?php print $gm_lang["male"]; ?>" alt="<?php print $gm_lang["male"]; ?>" vspace="0" hspace="0" class="sex_image" border="0" />
 				<?php
 				break;
 			case "F":
-				$seximage = $GM_IMAGE_DIR."/".$GM_IMAGES["sexf"]["small"];
+				$seximage = GM_IMAGE_DIR."/".$GM_IMAGES["sexf"]["small"];
 				?>
 				<img src="<?php print $seximage; ?>" title="<?php print $gm_lang["female"]; ?>" alt="<?php print $gm_lang["female"]; ?>" vspace="0" hspace="0" class="sex_image" border="0" />
 				<?php
 				break;
 			default:
-				$seximage = $GM_IMAGE_DIR."/".$GM_IMAGES["sexn"]["small"];
+				$seximage = GM_IMAGE_DIR."/".$GM_IMAGES["sexn"]["small"];
 				?>
 				<img src="<?php print $seximage; ?>" title="<?php print $gm_lang["sex"]." ".$gm_lang["unknown"]; ?>" alt="<?php print $gm_lang["sex"]." ".$gm_lang["unknown"]; ?>" vspace="0" hspace="0" class="sex_image" border="0" />
 				<?php
@@ -317,7 +317,7 @@ $controller->checkPrivacy();
 		<?php
 		}
 		else {
-			PrintFunctions::PrintPrivacyError($CONTACT_EMAIL);
+			PrintFunctions::PrintPrivacyError(GedcomConfig::$CONTACT_EMAIL);
 			?>
 			<input type="hidden" name="pids[<?php print $p; ?>]" value="<?php print $pid; ?>" />
 			<?php if (!$controller->isPrintPreview()) {
@@ -361,7 +361,7 @@ if (count($controller->people)>0) {
 <div id="timeline_chart">
 	<!-- print the timeline line image -->
 	<div id="line" style="position:absolute; <?php print $TEXT_DIRECTION =="ltr"?"left: ".($basexoffset+20):"right: ".($basexoffset+20); ?>px; top: <?php print $baseyoffset; ?>px; ">
-		<img src="<?php print $GM_IMAGE_DIR."/".$GM_IMAGES["vline"]["other"]; ?>" width="3" height="<?php print ($baseyoffset+(($controller->topyear-$controller->baseyear)*$controller->scale)); ?>" alt="" />
+		<img src="<?php print GM_IMAGE_DIR."/".$GM_IMAGES["vline"]["other"]; ?>" width="3" height="<?php print ($baseyoffset+(($controller->topyear-$controller->baseyear)*$controller->scale)); ?>" alt="" />
 	</div>
 	<!-- print divs for the grid -->
 	<div id="scale<?php print $controller->baseyear; ?>" style="font-family: Arial; position:absolute; <?php print ($TEXT_DIRECTION =="ltr"?"left: $basexoffset":"right: $basexoffset"); ?>px; top: <?php print ($baseyoffset-5); ?>px; font-size: 7pt; text-align: <?php print ($TEXT_DIRECTION =="ltr"?"left":"right"); ?>;">
@@ -396,7 +396,7 @@ if (count($controller->people)>0) {
 			<table cellspacing="0" cellpadding="0">
 				<tr>
 					<td>
-						<img src="<?php print $GM_IMAGE_DIR."/".$GM_IMAGES["hline"]["other"]; ?>" name="ageline<?php print $p; ?>" id="ageline<?php print $p; ?>" align="left" hspace="0" vspace="0" width="25" height="3" alt="" />
+						<img src="<?php print GM_IMAGE_DIR."/".$GM_IMAGES["hline"]["other"]; ?>" name="ageline<?php print $p; ?>" id="ageline<?php print $p; ?>" align="left" hspace="0" vspace="0" width="25" height="3" alt="" />
 					</td>
 					<td valign="top">
 						<?php 
@@ -453,5 +453,5 @@ if (count($controller->people)>0) {
 //-->
 </script>
 <?php
-print_footer();
+PrintFooter();
 ?>

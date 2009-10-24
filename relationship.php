@@ -33,7 +33,7 @@ require("config.php");
 
 $show_changes = false;
 
-if (!isset($show_full)) $show_full=$PEDIGREE_FULL_DETAILS;
+if (!isset($show_full)) $show_full = GedcomConfig::$PEDIGREE_FULL_DETAILS;
 if (!isset($path_to_find)){
 	$path_to_find = 0;
 	$pretty = 1;
@@ -75,7 +75,7 @@ $pid1 = CleanInput($pid1);
 $pid2 = CleanInput($pid2);
 
 $title = "";
-if ($SHOW_ID_NUMBERS && (($pid1 != "") || ($pid2 != ""))) {
+if (GedcomConfig::$SHOW_ID_NUMBERS && (($pid1 != "") || ($pid2 != ""))) {
 	if ($pid1 != "") $title .= strtoupper($pid1);
 	if ($pid2 != "") $title .= "/".strtoupper($pid2);
 	$title .= " - ";
@@ -83,9 +83,9 @@ if ($SHOW_ID_NUMBERS && (($pid1 != "") || ($pid2 != ""))) {
 $title_string .= $gm_lang["relationship_chart"];
 $title .= $title_string;
 // -- print html header information
-print_header($title);
+PrintHeader($title);
 if (!empty($pid1)) {
-	if (preg_match("/[A-Za-z]+/", $pid1)==0) $pid1 = $GEDCOM_ID_PREFIX.$pid1;
+	if (preg_match("/[A-Za-z]+/", $pid1)==0) $pid1 = GedcomConfig::$GEDCOM_ID_PREFIX.$pid1;
 	//-- check if the id is valid
 	$indirec = FindPersonRecord($pid1);
 	if (empty($indirec)) $pid1 = "";
@@ -97,7 +97,7 @@ if (!empty($pid1)) {
 	}
 }
 if (!empty($pid2)) {
-	if (preg_match("/[A-Za-z]+/", $pid2)==0) $pid2 = $GEDCOM_ID_PREFIX.$pid2;
+	if (preg_match("/[A-Za-z]+/", $pid2)==0) $pid2 = GedcomConfig::$GEDCOM_ID_PREFIX.$pid2;
 	//-- check if the id is valid
 	$indirec = FindPersonRecord($pid2);
 	if (empty($indirec)) $pid2 = "";
@@ -301,7 +301,7 @@ print "</div>\n";
 
 $maxyoffset = $Dbaseyoffset;
 if ((!empty($pid1))&&(!empty($pid2))) {
-	if (!$disp) PrintFunctions::PrintPrivacyError($CONTACT_EMAIL);
+	if (!$disp) PrintFunctions::PrintPrivacyError(GedcomConfig::$CONTACT_EMAIL);
 	else {
 		if (isset($_SESSION["relationships"][$path_to_find])) $node = $_SESSION["relationships"][$path_to_find];
 		else $node = GetRelationship($pid1, $pid2, $followspouse, 0, true, $path_to_find);
@@ -355,7 +355,7 @@ if ((!empty($pid1))&&(!empty($pid2))) {
 				$indirec = FindPersonRecord($pid);
 				if (preg_match("/1 SEX F/", $indirec, $smatch)>0) $mfstyle="F";
 				if (preg_match("/1 SEX M/", $indirec, $smatch)>0) $mfstyle="";
-				$arrow_img = $GM_IMAGE_DIR."/".$GM_IMAGES["darrow"]["other"];
+				$arrow_img = GM_IMAGE_DIR."/".$GM_IMAGES["darrow"]["other"];
 				if (($node["relations"][$index]=="father")||($node["relations"][$index]=="mother")) {
 					$line = $GM_IMAGES["vline"]["other"];
 					$liney += $Dbheight;
@@ -364,7 +364,7 @@ if ((!empty($pid1))&&(!empty($pid2))) {
 					$lw = 3;
 					if ($pretty) {
                        if ($asc==0) $asc=1;
-                       if ($asc==-1) $arrow_img = $GM_IMAGE_DIR."/".$GM_IMAGES["uarrow"]["other"];
+                       if ($asc==-1) $arrow_img = GM_IMAGE_DIR."/".$GM_IMAGES["uarrow"]["other"];
 					   $lh=$ys;
                        $linex=$xoffset+$Dbwidth/2;
                        // put the box up or down ?
@@ -379,11 +379,11 @@ if ((!empty($pid1))&&(!empty($pid2))) {
                           if ($asc==-1) $liney=$yoffset+$Dbheight; else $liney=$yoffset-$lh;
                           $joinx = $xoffset-$xs;
                           $joiny = $liney-2-($asc-1)/2*$lh;
-                          print "<div id=\"joina$index\" style=\"position:absolute; ".($TEXT_DIRECTION=="ltr"?"left":"right").":".($joinx+$Dbxspacing)."px; top:".($joiny+$Dbyspacing)."px; z-index:".(count($node["path"])-$index)."; \" align=\"center\"><img src=\"".$GM_IMAGE_DIR."/".$GM_IMAGES["hline"]["other"]."\" align=\"left\" width=\"".$joinw."\" height=\"".$joinh."\" alt=\"\" /></div>\n";
+                          print "<div id=\"joina$index\" style=\"position:absolute; ".($TEXT_DIRECTION=="ltr"?"left":"right").":".($joinx+$Dbxspacing)."px; top:".($joiny+$Dbyspacing)."px; z-index:".(count($node["path"])-$index)."; \" align=\"center\"><img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["hline"]["other"]."\" align=\"left\" width=\"".$joinw."\" height=\"".$joinh."\" alt=\"\" /></div>\n";
                           $joinw = $xs/2+2;
                           $joinx = $joinx+$xs/2;
                           $joiny = $joiny+$asc*$lh;
-                          print "<div id=\"joinb$index\" style=\"position:absolute; ".($TEXT_DIRECTION=="ltr"?"left":"right").":".($joinx+$Dbxspacing)."px; top:".($joiny+$Dbyspacing)."px; z-index:".(count($node["path"])-$index)."; \" align=\"center\"><img src=\"".$GM_IMAGE_DIR."/".$GM_IMAGES["hline"]["other"]."\" align=\"left\" width=\"".$joinw."\" height=\"".$joinh."\" alt=\"\" /></div>\n";
+                          print "<div id=\"joinb$index\" style=\"position:absolute; ".($TEXT_DIRECTION=="ltr"?"left":"right").":".($joinx+$Dbxspacing)."px; top:".($joiny+$Dbyspacing)."px; z-index:".(count($node["path"])-$index)."; \" align=\"center\"><img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["hline"]["other"]."\" align=\"left\" width=\"".$joinw."\" height=\"".$joinh."\" alt=\"\" /></div>\n";
                        }
                        $previous2=$previous;;
                        $previous="parent";
@@ -391,7 +391,7 @@ if ((!empty($pid1))&&(!empty($pid2))) {
 					else $yoffset += $Dbheight+$Dbyspacing+50;
 			    }
 				if ($node["relations"][$index]=="sibling") {
-					$arrow_img = $GM_IMAGE_DIR."/".$GM_IMAGES["rarrow"]["other"];
+					$arrow_img = GM_IMAGE_DIR."/".$GM_IMAGES["rarrow"]["other"];
 					if ($mfstyle=="F") $node["relations"][$index]="sister";
 					if ($mfstyle=="") $node["relations"][$index]="brother";
 					$xoffset += $Dbwidth+$Dbxspacing+70;
@@ -409,7 +409,7 @@ if ((!empty($pid1))&&(!empty($pid2))) {
 					}
 				}
 				if ($node["relations"][$index]=="spouse") {
-					$arrow_img = $GM_IMAGE_DIR."/".$GM_IMAGES["rarrow"]["other"];
+					$arrow_img = GM_IMAGE_DIR."/".$GM_IMAGES["rarrow"]["other"];
 					if ($mfstyle=="F") $node["relations"][$index]="wife";
 					if ($mfstyle=="") $node["relations"][$index]="husband";
 					$xoffset += $Dbwidth+$Dbxspacing+70;
@@ -436,7 +436,7 @@ if ((!empty($pid1))&&(!empty($pid2))) {
 					$lw = 3;
 					if ($pretty) {
 				       if ($asc==0) $asc=-1;
-                       if ($asc==1) $arrow_img = $GM_IMAGE_DIR."/".$GM_IMAGES["uarrow"]["other"];
+                       if ($asc==1) $arrow_img = GM_IMAGE_DIR."/".$GM_IMAGES["uarrow"]["other"];
 					   $lh=$ys;
                        $linex = $xoffset+$Dbwidth/2;
                        // put the box up or down ?
@@ -451,11 +451,11 @@ if ((!empty($pid1))&&(!empty($pid2))) {
                           if ($asc==1) $liney=$yoffset+$Dbheight; else $liney=$yoffset-($lh+$Dbyspacing);
                           $joinx = $xoffset-$xs;
                           $joiny = $liney-2+($asc+1)/2*$lh;
-                          print "<div id=\"joina$index\" style=\"position:absolute; ".($TEXT_DIRECTION=="ltr"?"left":"right").":".($joinx+$Dbxspacing)."px; top:".($joiny+$Dbyspacing)."px; z-index:".(count($node["path"])-$index)."; \" align=\"center\"><img src=\"".$GM_IMAGE_DIR."/".$GM_IMAGES["hline"]["other"]."\" align=\"left\" width=\"".$joinw."\" height=\"".$joinh."\" alt=\"\" /></div>\n";
+                          print "<div id=\"joina$index\" style=\"position:absolute; ".($TEXT_DIRECTION=="ltr"?"left":"right").":".($joinx+$Dbxspacing)."px; top:".($joiny+$Dbyspacing)."px; z-index:".(count($node["path"])-$index)."; \" align=\"center\"><img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["hline"]["other"]."\" align=\"left\" width=\"".$joinw."\" height=\"".$joinh."\" alt=\"\" /></div>\n";
                           $joinw = $xs/2+2;
                           $joinx = $joinx+$xs/2;
                           $joiny = $joiny-$asc*$lh;
-                          print "<div id=\"joinb$index\" style=\"position:absolute; ".($TEXT_DIRECTION=="ltr"?"left":"right").":".($joinx+$Dbxspacing)."px; top:".($joiny+$Dbyspacing)."px; z-index:".(count($node["path"])-$index)."; \" align=\"center\"><img src=\"".$GM_IMAGE_DIR."/".$GM_IMAGES["hline"]["other"]."\" align=\"left\" width=\"".$joinw."\" height=\"".$joinh."\" alt=\"\" /></div>\n";
+                          print "<div id=\"joinb$index\" style=\"position:absolute; ".($TEXT_DIRECTION=="ltr"?"left":"right").":".($joinx+$Dbxspacing)."px; top:".($joiny+$Dbyspacing)."px; z-index:".(count($node["path"])-$index)."; \" align=\"center\"><img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["hline"]["other"]."\" align=\"left\" width=\"".$joinw."\" height=\"".$joinh."\" alt=\"\" /></div>\n";
                        }
                        $previous2=$previous;;
                        $previous="child";
@@ -468,13 +468,13 @@ if ((!empty($pid1))&&(!empty($pid2))) {
 				if ($index>0) {
 					if ($TEXT_DIRECTION=="rtl" && $line!=$GM_IMAGES["hline"]["other"]) {
 						print "<div id=\"line$index\" dir=\"ltr\" style=\"background:none; position:absolute; right:".($plinex+$Dbxspacing)."px; top:".($liney+$Dbyspacing)."px; width:".($lw+$lh*2)."px; z-index:".(count($node["path"])-$index)."; \" align=\"right\">";
-						print "<img src=\"$GM_IMAGE_DIR/$line\" align=\"right\" width=\"$lw\" height=\"$lh\" alt=\"\" />\n";
+						print "<img src=\"".GM_IMAGE_DIR."/$line\" align=\"right\" width=\"$lw\" height=\"$lh\" alt=\"\" />\n";
 						print "<br />";
 						print $gm_lang[$node["relations"][$index]]."\n";
 						print "<img src=\"$arrow_img\" border=\"0\" align=\"middle\" alt=\"\" />\n";
 					}
 					else {
-						print "<div id=\"line$index\" style=\"background:none;  position:absolute; ".($TEXT_DIRECTION=="ltr"?"left":"right").":".($plinex+$Dbxspacing)."px; top:".($liney+$Dbyspacing)."px; width:".($lw+$lh*2)."px; z-index:".(count($node["path"])-$index)."; \" align=\"".($lh==3?"center":"left")."\"><img src=\"$GM_IMAGE_DIR/$line\" align=\"left\" width=\"$lw\" height=\"$lh\" alt=\"\" />\n";
+						print "<div id=\"line$index\" style=\"background:none;  position:absolute; ".($TEXT_DIRECTION=="ltr"?"left":"right").":".($plinex+$Dbxspacing)."px; top:".($liney+$Dbyspacing)."px; width:".($lw+$lh*2)."px; z-index:".(count($node["path"])-$index)."; \" align=\"".($lh==3?"center":"left")."\"><img src=\"".GM_IMAGE_DIR."/$line\" align=\"left\" width=\"$lw\" height=\"$lh\" alt=\"\" />\n";
 						print "<br />";
 						print "<img src=\"$arrow_img\" border=\"0\" align=\"middle\" alt=\"\" />\n";
 						if ($lh == 3) print "<br />"; // note: $lh==3 means horiz arrow
@@ -504,6 +504,5 @@ $maxyoffset += 100;
 //-->
 </script>
 <?php
-print_footer();
-
+PrintFooter();
 ?>

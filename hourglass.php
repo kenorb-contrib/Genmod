@@ -34,7 +34,7 @@
 require("config.php");
 
 function print_descendency($pid, $count) {
-	global $show_spouse, $dgenerations, $bwidth, $bheight, $TEXT_DIRECTION, $GM_IMAGE_DIR, $GM_IMAGES, $generations, $box_width, $view, $show_full, $gm_lang, $boxcount;
+	global $show_spouse, $dgenerations, $bwidth, $bheight, $TEXT_DIRECTION, $GM_IMAGES, $generations, $box_width, $view, $show_full, $gm_lang, $boxcount;
 	if ($count>=$dgenerations) return 0;
 	print "<table cellspacing=\"0\" cellpadding=\"0\" border=\"0\" style=\"vertical-align:middle;\">\n";
 	print "<tr>";
@@ -65,18 +65,18 @@ function print_descendency($pid, $count) {
 				print "</td>\n";
 				$twidth = 7;
 				if ($ct==1) $twidth+=3;
-				print "<td rowspan=\"$rowspan\" style=\"vertical-align:middle;\"><img src=\"".$GM_IMAGE_DIR."/".$GM_IMAGES["hline"]["other"]."\" width=\"$twidth\" height=\"3\" alt=\"\" /></td>\n";
+				print "<td rowspan=\"$rowspan\" style=\"vertical-align:middle;\"><img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["hline"]["other"]."\" width=\"$twidth\" height=\"3\" alt=\"\" /></td>\n";
 				if ($ct>1) {
 					if ($i==0) {
-						print "<td style=\"vertical-align:middle;\" height=\"50%\"><img src=\"".$GM_IMAGE_DIR."/".$GM_IMAGES["spacer"]["other"]."\" width=\"3\" alt=\"\" /></td></tr>\n";
-						print "<tr><td height=\"50%\" style=\"vertical-align:middle; background: url('".$GM_IMAGE_DIR."/".$GM_IMAGES["vline"]["other"]."');\"><img src=\"".$GM_IMAGE_DIR."/".$GM_IMAGES["spacer"]["other"]."\" width=\"3\" alt=\"\" /></td>\n";
+						print "<td style=\"vertical-align:middle;\" height=\"50%\"><img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["spacer"]["other"]."\" width=\"3\" alt=\"\" /></td></tr>\n";
+						print "<tr><td height=\"50%\" style=\"vertical-align:middle; background: url('".GM_IMAGE_DIR."/".$GM_IMAGES["vline"]["other"]."');\"><img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["spacer"]["other"]."\" width=\"3\" alt=\"\" /></td>\n";
 					}
 					else if ($i==$ct-1) {
-						print "<td height=\"50%\" style=\"vertical-align:middle; background: url('".$GM_IMAGE_DIR."/".$GM_IMAGES["vline"]["other"]."');\"><img src=\"".$GM_IMAGE_DIR."/".$GM_IMAGES["spacer"]["other"]."\" width=\"3\" alt=\"\" /></td></tr>\n";
-						print "<tr><td height=\"50%\" style=\"vertical-align:middle;\"><img src=\"".$GM_IMAGE_DIR."/".$GM_IMAGES["spacer"]["other"]."\" width=\"3\" alt=\"\" /></td>\n";
+						print "<td height=\"50%\" style=\"vertical-align:middle; background: url('".GM_IMAGE_DIR."/".$GM_IMAGES["vline"]["other"]."');\"><img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["spacer"]["other"]."\" width=\"3\" alt=\"\" /></td></tr>\n";
+						print "<tr><td height=\"50%\" style=\"vertical-align:middle;\"><img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["spacer"]["other"]."\" width=\"3\" alt=\"\" /></td>\n";
 					}
 					else {
-						print "<td style=\"vertical-align:middle; background: url('".$GM_IMAGE_DIR."/".$GM_IMAGES["vline"]["other"]."');\"><img src=\"".$GM_IMAGE_DIR."/".$GM_IMAGES["spacer"]["other"]."\" width=\"3\" alt=\"\" /></td>\n";
+						print "<td style=\"vertical-align:middle; background: url('".GM_IMAGE_DIR."/".$GM_IMAGES["vline"]["other"]."');\"><img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["spacer"]["other"]."\" width=\"3\" alt=\"\" /></td>\n";
 					}
 				}
 				print "</tr>\n";
@@ -150,7 +150,7 @@ function print_descendency($pid, $count) {
 				print "width:10px; height:10px; \">";
 				if ($view!="preview") {
 					print "<a href=\"javascript: ".$gm_lang["show"]."\" onclick=\"togglechildrenbox($boxcount); return false;\" onmouseover=\"swap_image('larrow$boxcount',3);\" onmouseout=\"swap_image('larrow$boxcount',3);\">";
-					print "<img id=\"larrow$boxcount\" src=\"".$GM_IMAGE_DIR."/".$GM_IMAGES["darrow"]["other"]."\" border=\"0\" alt=\"\" />";
+					print "<img id=\"larrow$boxcount\" src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["darrow"]["other"]."\" border=\"0\" alt=\"\" />";
 					print "</a>";
 				}
 				print "\n\t\t<div id=\"childbox$boxcount\" dir=\"";
@@ -287,7 +287,7 @@ function max_descendency_generations($pid, $depth) {
 }
 
 function print_person_pedigree($pid, $count) {
-	global $generations, $SHOW_EMPTY_BOXES, $GM_IMAGE_DIR, $GM_IMAGES, $bheight, $boxcount;
+	global $generations, $GM_IMAGES, $bheight, $boxcount;
 	if ($count>=$generations) return;
 	$famids = FindFamilyIds($pid);
 	foreach($famids as $indexval => $ffamid) {
@@ -296,8 +296,8 @@ function print_person_pedigree($pid, $count) {
 		$parents = FindParents($famid);
 		$height="100%";
 		print "<tr>";
-		if ($count<$generations-1) print "<td style=\"vertical-align:middle;\" height=\"50%\"><img src=\"".$GM_IMAGE_DIR."/".$GM_IMAGES["spacer"]["other"]."\" width=\"3\" alt=\"\" /></td>\n";
-		if ($count<$generations-1) print "<td style=\"vertical-align:middle;\" rowspan=\"2\"><img src=\"".$GM_IMAGE_DIR."/".$GM_IMAGES["hline"]["other"]."\" width=\"7\" height=\"3\" alt=\"\" /></td>\n";
+		if ($count<$generations-1) print "<td style=\"vertical-align:middle;\" height=\"50%\"><img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["spacer"]["other"]."\" width=\"3\" alt=\"\" /></td>\n";
+		if ($count<$generations-1) print "<td style=\"vertical-align:middle;\" rowspan=\"2\"><img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["hline"]["other"]."\" width=\"7\" height=\"3\" alt=\"\" /></td>\n";
 		print "<td style=\"vertical-align:middle;\" rowspan=\"2\">\n";
 		print_pedigree_person($parents["HUSB"], 1, true, $boxcount);
 		$boxcount++;
@@ -306,10 +306,10 @@ function print_person_pedigree($pid, $count) {
 		print_person_pedigree($parents["HUSB"], $count+1);
 		print "</td>\n";
 		print "</tr>\n<tr>\n<td style=\"vertical-align:middle;";
-		if ($count<$generations-1) print " background: url('".$GM_IMAGE_DIR."/".$GM_IMAGES["vline"]["other"]."');";
-		print "\" height=\"50%\"><img src=\"".$GM_IMAGE_DIR."/".$GM_IMAGES["spacer"]["other"]."\" width=\"3\" alt=\"\" /></td></tr>\n<tr>\n";
-		if ($count<$generations-1) print "<td height=\"50%\" style=\"vertical-align:middle; background: url('".$GM_IMAGE_DIR."/".$GM_IMAGES["vline"]["other"]."');\"><img src=\"".$GM_IMAGE_DIR."/".$GM_IMAGES["spacer"]["other"]."\" width=\"3\" alt=\"\" /></td>";
-		if ($count<$generations-1) print "<td style=\"vertical-align:middle;\" rowspan=\"2\"><img src=\"".$GM_IMAGE_DIR."/".$GM_IMAGES["hline"]["other"]."\" width=\"7\" height=\"3\" alt=\"\" /></td>\n";
+		if ($count<$generations-1) print " background: url('".GM_IMAGE_DIR."/".$GM_IMAGES["vline"]["other"]."');";
+		print "\" height=\"50%\"><img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["spacer"]["other"]."\" width=\"3\" alt=\"\" /></td></tr>\n<tr>\n";
+		if ($count<$generations-1) print "<td height=\"50%\" style=\"vertical-align:middle; background: url('".GM_IMAGE_DIR."/".$GM_IMAGES["vline"]["other"]."');\"><img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["spacer"]["other"]."\" width=\"3\" alt=\"\" /></td>";
+		if ($count<$generations-1) print "<td style=\"vertical-align:middle;\" rowspan=\"2\"><img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["hline"]["other"]."\" width=\"7\" height=\"3\" alt=\"\" /></td>\n";
 		print "<td style=\"vertical-align:middle;\" rowspan=\"2\">\n";
 		print_pedigree_person($parents["WIFE"], 1, true, $boxcount);
 		$boxcount++;
@@ -318,17 +318,17 @@ function print_person_pedigree($pid, $count) {
 		print_person_pedigree($parents["WIFE"], $count+1);
 		print "</td>\n";
 		print "</tr>\n";
-		if ($count<$generations-1) print "<tr>\n<td style=\"vertical-align:middle;\" height=\"50%\"><img src=\"".$GM_IMAGE_DIR."/".$GM_IMAGES["spacer"]["other"]."\" width=\"3\" alt=\"\" /></td></tr>\n";
+		if ($count<$generations-1) print "<tr>\n<td style=\"vertical-align:middle;\" height=\"50%\"><img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["spacer"]["other"]."\" width=\"3\" alt=\"\" /></td></tr>\n";
 		print "</table>\n";
 	}
 }
 
 // -- args
 $boxcount = 0;
-if (!isset($show_full)) $show_full=$PEDIGREE_FULL_DETAILS;
+if (!isset($show_full)) $show_full = GedcomConfig::$PEDIGREE_FULL_DETAILS;
 if (!isset($show_spouse)) $show_spouse=0;
 if (empty($generations)) $generations = 3;
-if ($generations > $MAX_DESCENDANCY_GENERATIONS) $generations = $MAX_DESCENDANCY_GENERATIONS;
+if ($generations > GedcomConfig::$MAX_DESCENDANCY_GENERATIONS) $generations = GedcomConfig::$MAX_DESCENDANCY_GENERATIONS;
 if (!isset($view)) $view="";
 
 // -- size of the boxes
@@ -355,9 +355,9 @@ else {
 
 // -- print html header information
 $title = PrintReady($name);
-if ($SHOW_ID_NUMBERS) $title .= " - ".$pid;
+if (GedcomConfig::$SHOW_ID_NUMBERS) $title .= " - ".$pid;
 $title .= " - ".$gm_lang["hourglass_chart"];
-print_header($title);
+PrintHeader($title);
 // NOTE: Start table header
 print "\n\t<table width=\"100%\" class=\"list_table $TEXT_DIRECTION\"><tr><td valign=\"top\">\n\t\t";
 if ($view!="preview") print "\n\t<h3>".$gm_lang["hourglass_chart"].":<br />".PrintReady($name);
@@ -414,7 +414,7 @@ if ($view!="preview") {
 	print "<td class=\"shade1\">";
 //	print <input type=\"text\" size=\"3\" name=\"generations\" value=\"$generations\" />";
 	print "<select name=\"generations\">";
-	for ($i=2; $i<=$MAX_DESCENDANCY_GENERATIONS; $i++) {
+	for ($i=2; $i<=GedcomConfig::$MAX_DESCENDANCY_GENERATIONS; $i++) {
 	print "<option value=\"".$i."\"";
 	if ($i == $generations) print " selected=\"selected\" ";
 		print ">".$i."</option>";
@@ -457,5 +457,5 @@ print_person_pedigree($pid, 0);
 print "</td>\n";
 print "</tr></table>\n";
 print "<br /><br />\n";
-print_footer();
+PrintFooter();
 ?>

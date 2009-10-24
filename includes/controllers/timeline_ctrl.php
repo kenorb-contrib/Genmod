@@ -154,19 +154,18 @@ class TimelineControllerRoot extends BaseController {
 	 * check the privacy of the incoming people to make sure they can be shown
 	 */
 	function checkPrivacy() {
-		global $CONTACT_EMAIL;
 		
 		$printed = false;
 		for($i=0; $i<count($this->people); $i++) {
 			if (!$this->people[$i]->disp) {
 				if ($this->people[$i]->disp_name) {
 					print "&nbsp;<a href=\"individual.php?pid=".$this->people[$i]->xref."\">".PrintReady($this->people[$i]->getName())."</a>";
-					PrintFunctions::PrintPrivacyError($CONTACT_EMAIL);
+					PrintFunctions::PrintPrivacyError(GedcomConfig::$CONTACT_EMAIL);
 					print "<br />";
 					$printed = true;
 				}
 				else if (!$printed) {
-					PrintFunctions::PrintPrivacyError($CONTACT_EMAIL);
+					PrintFunctions::PrintPrivacyError(GedcomConfig::$CONTACT_EMAIL);
 					print "<br />";
 				}
 			}
@@ -175,7 +174,7 @@ class TimelineControllerRoot extends BaseController {
 	
 	function print_time_fact($factitem) {
 		global $basexoffset, $baseyoffset, $factcount, $TEXT_DIRECTION;
-		global $gm_lang, $GM_IMAGE_DIR, $GM_IMAGES, $SHOW_PEDIGREE_PLACES, $placements;
+		global $gm_lang, $GM_IMAGES, $placements;
 		global $familyfacts, $GEDCOMID;
 	
 		$factrec = $factitem[1];
@@ -231,7 +230,7 @@ class TimelineControllerRoot extends BaseController {
 				if (($date[0]["year"]!=0)&&(stristr($date[0]["ext"], "hebrew")===false)) {
 					print "\n\t\t<div id=\"fact$factcount\" style=\"position:absolute; ".($TEXT_DIRECTION =="ltr"?"left: ".($xoffset):"right: ".($xoffset))."px; top:".($yoffset)."px; font-size: 8pt; height: ".($this->bheight)."px; \" onmousedown=\"factMD(this, '".$factcount."', ".($yoffset-$tyoffset).");\">\n";
 					print "<table cellspacing=\"0\" cellpadding=\"0\" border=\"0\" style=\"cursor: hand;\"><tr><td>\n";
-					print "<img src=\"".$GM_IMAGE_DIR."/".$GM_IMAGES["hline"]["other"]."\" name=\"boxline$factcount\" id=\"boxline$factcount\" height=\"3\" align=\"left\" hspace=\"0\" width=\"10\" vspace=\"0\" alt=\"\" />\n";
+					print "<img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["hline"]["other"]."\" name=\"boxline$factcount\" id=\"boxline$factcount\" height=\"3\" align=\"left\" hspace=\"0\" width=\"10\" vspace=\"0\" alt=\"\" />\n";
 					$col = $factitem["p"] % 6;
 					print "</td><td valign=\"top\" class=\"person".$col."\">\n";
 					if (count($this->pids) > 6)print GetPersonName($factitem["pid"])." - ";
@@ -241,12 +240,12 @@ class TimelineControllerRoot extends BaseController {
 					print "--";
 					print "<span class=\"date\">".GetChangedDate($datestr)."</span> ";
 					if (!empty($desc)) print $desc." ";
-					if ($SHOW_PEDIGREE_PLACES>0) {
+					if (GedcomConfig::$SHOW_PEDIGREE_PLACES > 0) {
 						$pct = preg_match("/2 PLAC (.*)/", $factrec, $match);
 						if ($pct>0) {
 							print " - ";
 							$plevels = preg_split("/,/", $match[1]);
-							for($plevel=0; $plevel<$SHOW_PEDIGREE_PLACES; $plevel++) {
+							for($plevel=0; $plevel < GedcomConfig::$SHOW_PEDIGREE_PLACES; $plevel++) {
 								if (!empty($plevels[$plevel])) {
 									if ($plevel>0) print ", ";
 									print PrintReady($plevels[$plevel]);
@@ -296,7 +295,7 @@ class TimelineControllerRoot extends BaseController {
 					}
 					//-- print the diagnal line
 					print "\n\t\t<div id=\"dbox$factcount\" style=\"position:absolute; ".($TEXT_DIRECTION =="ltr"?"left: ".($basexoffset+20):"right: ".($basexoffset+20))."px; top:".($dyoffset)."px; font-size: 8pt; height: ".(abs($tyoffset))."px; width: ".(abs($tyoffset))."px;";
-					print " background-image: url('".$GM_IMAGE_DIR."/".$GM_IMAGES[$img]["other"]."');";
+					print " background-image: url('".GM_IMAGE_DIR."/".$GM_IMAGES[$img]["other"]."');";
 					print " background-position: 0% $ypos; \" >\n";
 					print "</div>\n";
 				}

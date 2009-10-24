@@ -50,7 +50,7 @@ $GM_BLOCKS["print_gedcom_stats"]["rss"]			= true;
 //-- function to print the gedcom statistics block
 
 function print_gedcom_stats($block = true, $config="", $side, $index) {
-		global $GM_BLOCKS, $gm_lang, $GEDCOMID, $GEDCOMS, $ALLOW_CHANGE_GEDCOM, $command, $COMMON_NAMES_THRESHOLD, $GM_IMAGE_DIR, $GM_IMAGES;
+		global $GM_BLOCKS, $gm_lang, $GEDCOMID, $GEDCOMS, $ALLOW_CHANGE_GEDCOM, $command, $GM_IMAGES;
 		global $top10_block_present, $monthtonum, $gm_user;		// Set in index.php
 
 		if (empty($config)) $config = $GM_BLOCKS["print_gedcom_stats"]["config"];
@@ -65,7 +65,7 @@ function print_gedcom_stats($block = true, $config="", $side, $index) {
 				if ($command=="gedcom") $name = $GEDCOMID;
 				else $name = $username;
 				print "<a href=\"javascript: ".$gm_lang["config_block"]."\" onclick=\"window.open('index_edit.php?name=$name&amp;command=$command&amp;action=configure&amp;side=$side&amp;index=$index', '', 'top=50,left=50,width=600,height=350,scrollbars=1,resizable=1'); return false;\">";
-				print "<img class=\"adminicon\" src=\"$GM_IMAGE_DIR/".$GM_IMAGES["admin"]["small"]."\" width=\"15\" height=\"15\" border=\"0\" alt=\"".$gm_lang["config_block"]."\" /></a>\n";
+				print "<img class=\"adminicon\" src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["admin"]["small"]."\" width=\"15\" height=\"15\" border=\"0\" alt=\"".$gm_lang["config_block"]."\" /></a>\n";
 			}
 		}
 		print $gm_lang["gedcom_stats"];
@@ -124,7 +124,6 @@ function print_gedcom_stats($block = true, $config="", $side, $index) {
 				print "<tr><td valign=\"top\">".$gm_lang["stat_most_children"]."</td><td class=\"rtl\">&nbsp;<span style=\"font-weight: bold\">".$stats["gs_most_children_nr"]."</span>&nbsp;</td><td valign=\"top\" class=\"ltr wrap\">";
 				$family =& Family::GetInstance($stats["gs_most_children_gid"]);
 				$family->PrintListFamily(false);
-//				print_list_family($stats["gs_most_children_gid"], array(GetFamilyDescriptor($stats["gs_most_children_gid"]), $GEDCOM), false, "", false);
 				print "</td></tr>\n";
 			}
 		}

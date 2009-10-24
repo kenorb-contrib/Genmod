@@ -35,22 +35,196 @@ if (stristr($_SERVER["SCRIPT_NAME"],basename(__FILE__))) {
 class ChartController extends BaseController {
 	
 	public $classname = "ChartController";	// Name of this class
-	protected $pagetitle = null;			// Page title to show in the browser top line
+	protected $root = null;					// Holder for the root person object
+	protected $show_full = null;			// Display details in chart boxes
+	protected $show_details = null;			// Display details in chart boxes (input variable)
+	protected $show_cousins = null;
+	protected $box_width = null;
+	protected $chart_style = null;
+	protected $min_generation = null;		// Generate an error that a minimum number of generations must be displayed
+	protected $max_generation = null;		// Generate an error that no more than a maximum number of generations can be displayed
+	protected $num_generations = null;		// Number of generations to display
 	
 	public function __construct() {
 		
 		parent::__construct();
+		
+		if (isset($_REQUEST["rootid"])) $this->xref = $_REQUEST["rootid"];
+		$this->xref = ChartFunctions::CheckRootId(CleanInput($this->xref));
+		
+		if (isset($_REQUEST["show_details"])) {
+			$this->show_details = $_REQUEST["show_details"];
+			$this->show_full = ($this->show_details == 1 ? 1 : 0);
+		}
+		else {
+			$this->show_details = (GedcomConfig::$PEDIGREE_FULL_DETAILS == 1 ? 1 : -1);
+			$this->show_full = GedcomConfig::$PEDIGREE_FULL_DETAILS;
+		}
+		
+		global $show_full;
+		$show_full = $this->show_full;
+		
+		if (!isset($_REQUEST["chart_style"])) $this->chart_style = 0;
+		else $this->chart_style = ($_REQUEST["chart_style"] == "" ? 0 : $_REQUEST["chart_style"]);
+		
+		if (!isset($_REQUEST["show_cousins"])) $this->show_cousins = 0;
+		else $this->show_cousins = $_REQUEST["show_cousins"];
+		if ($this->show_cousins == "") $this->show_cousins = 0;
+		
+		global $show_cousins;
+		$show_cousins = $this->show_cousins;
+
 	}
 
 	public function __get($property) {
 		switch($property) {
-			case "pagetitle":
-				return $this->GetPageTitle();
+			case "root":
+				return $this->GetRootObject();
+				break;
+			case "show_full":
+				return $this->show_full;
+				break;
+			case "box_width":
+				return $this->box_width;
+				break;
+			case "chart_style":
+				return $this->chart_style;
+				break;
+			case "show_cousins":
+				return $this->show_cousins;
+				break;
+			case "show_details":
+				return $this->show_details;
+				break;
+			case "min_generation":
+				return $this->min_generation;
+				break;
+			case "max_generation":
+				return $this->max_generation;
+				break;
+			case "num_generations":
+				return $this->num_generations;
 				break;
 			default:
 				return parent::__get($property);
 				break;
 		}
+	}
+	
+	protected function GetRootObject() {
+		
+		if (is_null($this->root)) {
+			$this->root =& Person::GetInstance($this->xref, "", $this->gedcomid);
+		}
+		return $this->root;
+	}
+	
+	public function PrintInputRootId() {
+		global $gm_lang;
+		
+		print "<tr><td class=\"shade2\">";
+		print_help_link("rootid_help", "qm");
+		print $gm_lang["root_person"]."&nbsp;</td>";
+		print "<td class=\"shade1 vmiddle\">";
+		print "<input class=\"pedigree_form\" type=\"text\" name=\"rootid\" id=\"rootid\" size=\"3\" value=\"".$this->xref."\" />";
+		LinkFunctions::PrintFindIndiLink("rootid","");
+		print "</td></tr>";
+	}
+	
+	public function PrintInputBoxWidth() {
+		global $gm_lang;
+		
+		print "<tr><td class=\"shade2\">";
+		print_help_link("box_width_help", "qm");
+		print $gm_lang["box_width"] . "&nbsp;</td>";
+		print "<td class=\"shade1 vmiddle\"><input type=\"text\" size=\"3\" name=\"box_width\" value=\"".$this->box_width."\" /> <b>%</b>";
+		print "</td></tr>";
+	}
+
+	public function PrintInputHeader() {
+		global $gm_lang;
+		
+		print "<tr><td colspan=\"2\" class=\"topbottombar\" style=\"text-align:center; \">";
+		print $gm_lang["options"]."</td></tr>";
+	}
+	
+	public function PrintInputGenerations($gens, $help) {	
+		global $gm_lang;
+		
+		print "<tr><td class=\"shade2\">";
+		print_help_link($help, "qm");
+		print $gm_lang["generations"] . "&nbsp;</td>";
+	
+		print "<td class=\"shade1 vmiddle\">";
+		print "<select name=\"num_generations\">";
+		for ($i=2; $i <= $gens; $i++) {
+			print "<option value=\"".$i."\"" ;
+			if ($i == $this->num_generations) print " selected=\"selected\"";
+			print ">".$i."</option>";
+		}
+		print "</select>";
+		print "</td></tr>";
+	}
+	
+	public function PrintInputSubmit() {
+		global $gm_lang;
+				
+		print "<tr><td class=\"center\" colspan=\"2\">";
+		print "\n\t\t<input type=\"submit\" value=\"".$gm_lang["view"]."\" />";
+		print "</td></tr>";
+	}
+	
+	public function PrintInputShowCousins() {
+		global $gm_lang;
+		
+		print "<tr><td class=\"shade2\">";
+		print "<input type=\"hidden\" name=\"show_cousins\" value=\"".$this->show_cousins."\" />";
+		print_help_link("show_cousins_help", "qm");
+		print $gm_lang["show_cousins"]."</td>";
+		print "<td class=\"shade1 vmiddle\"><input ";
+		if ($this->chart_style == "0") print "disabled=\"disabled\" ";
+		print "id=\"cousins\" type=\"checkbox\" value=\"";
+		if ($this->show_cousins) print "1\" checked=\"checked\" onclick=\"document.people.show_cousins.value='0';\"";
+		else print "0\" onclick=\"document.people.show_cousins.value='1';\"";
+		print " />";
+		print "</td></tr>";
+	}
+	
+	public function PrintInputChartStyle() {
+		global $gm_lang;
+				
+		print "<tr><td class=\"shade2\">";
+		print_help_link("chart_style_help", "qm");
+		print $gm_lang["displ_layout_conf"];
+		print "</td>";
+		print "<td class=\"shade1 vmiddle\">";
+		print "<input type=\"radio\" name=\"chart_style\" value=\"0\" ";
+		if ($this->chart_style == "0") print "checked=\"checked\" ";
+		print "onclick=\"toggleStatus('cousins');";
+		if ($this->chart_style != "1") print " document.people.chart_style.value='1';";
+		print "\" />".$gm_lang["chart_list"];
+		print "<br /><input type=\"radio\" name=\"chart_style\" value=\"1\" ";
+		if ($this->chart_style == "1") print "checked=\"checked\" ";
+		print "onclick=\"toggleStatus('cousins');";
+		if ($this->chart_style != "1") print " document.people.chart_style.value='0';";
+		print "\" />".$gm_lang["chart_booklet"];
+		print "</td></tr>";
+	}
+	
+	public function PrintInputShowFull() {
+		global $gm_lang;
+		
+		print "<tr><td class=\"shade2\">";
+		print "<input type=\"hidden\" name=\"show_details\" value=\"".$this->show_details."\" />";
+		print_help_link("show_full_help", "qm");
+		print $gm_lang["show_details"];
+		print "</td>";
+		print "<td class=\"shade1 vmiddle\">";
+		print "<input type=\"checkbox\" value=\"";
+		if ($this->show_full) print "1\" checked=\"checked\" onclick=\"document.people.show_details.value='-1';\"";
+		else print "-1\" onclick=\"document.people.show_details.value='1';\"";
+		print " />";
+		print "</td></tr>";
 	}
 }
 ?>

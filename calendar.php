@@ -37,7 +37,7 @@ if (empty($day)) $day = adodb_date("j");
 if (empty($month)) $month = adodb_date("M");
 if (empty($year)) $year = adodb_date("Y");
 
-if ($USE_RTL_FUNCTIONS) {
+if (GedcomConfig::$USE_RTL_FUNCTIONS) {
 	//-------> Today's Hebrew Day with Gedcom Month 
 	
 	$datearray = array();
@@ -244,7 +244,7 @@ if (!isset($query)) {
 	}
 }
 
-If (!isset($datearray[4]["year"]) && $USE_RTL_FUNCTIONS) {
+If (!isset($datearray[4]["year"]) && GedcomConfig::$USE_RTL_FUNCTIONS) {
 	if ($action!="year") {
 		 $year1 = $year;
 		 $year2 = $year;
@@ -300,7 +300,7 @@ If (!isset($datearray[4]["year"]) && $USE_RTL_FUNCTIONS) {
 		}
 	}
 }
-print_header($gm_lang["anniversary_calendar"]);
+PrintHeader($gm_lang["anniversary_calendar"]);
 print "<div style=\" text-align: center;\" id=\"calendar_page\">\n";
 
 	//-- moved here from session.php, should probably be moved somewhere else still
@@ -319,15 +319,15 @@ if ($action=="today") {
 	print $gm_lang["on_this_day"]."</h3></td></tr>\n";
 	print "<tr><td class=\"topbottombar\">";
 	//-- the year is needed for alternate calendars
- 	if ($CALENDAR_FORMAT!="gregorian") print GetChangedDate("$day $month $year");
+ 	if (GedcomConfig::$CALENDAR_FORMAT!="gregorian") print GetChangedDate("$day $month $year");
 	else print GetChangedDate("$day $month");
-	if ($CALENDAR_FORMAT=="gregorian" && $USE_RTL_FUNCTIONS && $HEBREWFOUND[$GEDCOMID] == true) print " / ".GetChangedDate("@#DHEBREW@ $hDay $hMonth $CalYear"); 
+	if (GedcomConfig::$CALENDAR_FORMAT=="gregorian" && GedcomConfig::$USE_RTL_FUNCTIONS && $HEBREWFOUND[$GEDCOMID] == true) print " / ".GetChangedDate("@#DHEBREW@ $hDay $hMonth $CalYear"); 
 }
 else if ($action=="calendar") {
 	print $gm_lang["in_this_month"]."</h3></td></tr>\n";
 	print "<tr><td class=\"topbottombar\">";
 	print GetChangedDate(" $month $year ");
-	if ($CALENDAR_FORMAT=="gregorian" && $USE_RTL_FUNCTIONS && $HEBREWFOUND[$GEDCOMID] == true) {
+	if (GedcomConfig::$CALENDAR_FORMAT=="gregorian" && GedcomConfig::$USE_RTL_FUNCTIONS && $HEBREWFOUND[$GEDCOMID] == true) {
 		$hdd = $date[1]["day"];
 		$hmm = $date[1]["month"];
 		$hyy = $date[1]["year"];
@@ -344,7 +344,7 @@ else if ($action=="year") {
 	print $gm_lang["in_this_year"]."</h3></td></tr>\n";
 	print "<tr><td class=\"topbottombar\">";
 	print GetChangedDate(" $year_text ");
-	if ($CALENDAR_FORMAT=="gregorian" && $USE_RTL_FUNCTIONS && $HEBREWFOUND[$GEDCOMID] == true) {
+	if (GedcomConfig::$CALENDAR_FORMAT=="gregorian" && GedcomConfig::$USE_RTL_FUNCTIONS && $HEBREWFOUND[$GEDCOMID] == true) {
 		$hdd = $date[3]["day"];
 		$hmm = $date[3]["month"];
 		$hstartyear = $date[3]["year"];
@@ -381,11 +381,11 @@ if ($view!="preview") {
 	$Yy = adodb_date("Y");
 //	print "<a href=\"calendar.php?filterev=$filterev&amp;filterof=$filterof&amp;filtersx=$filtersx\"><b>".GetChangedDate("$Dd $Mm $Yy")."</b></a> | ";
 	//-- for alternate calendars the year is needed
-  	if ($CALENDAR_FORMAT!="gregorian" || ($USE_RTL_FUNCTIONS && $HEBREWFOUND[$GEDCOMID] == true)) $datestr = "$Dd $Mm $Yy";
+  	if (GedcomConfig::$CALENDAR_FORMAT!="gregorian" || (GedcomConfig::$USE_RTL_FUNCTIONS && $HEBREWFOUND[$GEDCOMID] == true)) $datestr = "$Dd $Mm $Yy";
 // 	if ($CALENDAR_FORMAT!="gregorian") $datestr = "$Dd $Mm $Yy"; // MA @@@
 	else $datestr = "$Dd $Mm";
 	print "<a href=\"calendar.php?filterev=$filterev&amp;filterof=$filterof&amp;filtersx=$filtersx&amp;year=$year\"><b>".GetChangedDate($datestr);
-	if ($USE_RTL_FUNCTIONS && $HEBREWFOUND[$GEDCOMID] == true) {
+	if (GedcomConfig::$USE_RTL_FUNCTIONS && $HEBREWFOUND[$GEDCOMID] == true) {
 		$hdatestr = "@#DHEBREW@ $currhDay $currhMon $currhYear";
 		print " / ".GetChangedDate($hdatestr);
 	}
@@ -468,35 +468,35 @@ if ($view!="preview") {
 		print $gm_lang["sex"].":&nbsp;</td>\n";
 		print "<td class=\"shade1 vmiddle\">";
 		if ($filtersx==""){
-			print " <img src=\"".$GM_IMAGE_DIR."/".$GM_IMAGES["sex"]["small"]."\" title=\"".$gm_lang["all"]."\" alt=\"".$gm_lang["all"]."\" width=\"15\" height=\"15\" border=\"0\" align=\"middle\" />";
-			print "<img src=\"".$GM_IMAGE_DIR."/".$GM_IMAGES["sexf"]["small"]."\" title=\"".$gm_lang["all"]."\" alt=\"".$gm_lang["all"]."\" width=\"15\" height=\"15\" border=\"0\" align=\"middle\" />";
+			print " <img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["sex"]["small"]."\" title=\"".$gm_lang["all"]."\" alt=\"".$gm_lang["all"]."\" width=\"15\" height=\"15\" border=\"0\" align=\"middle\" />";
+			print "<img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["sexf"]["small"]."\" title=\"".$gm_lang["all"]."\" alt=\"".$gm_lang["all"]."\" width=\"15\" height=\"15\" border=\"0\" align=\"middle\" />";
 			print " | ";
 		}
 		else {
 			$fs="";
 			print " <a href=\"calendar.php?day=$dd&amp;month=$month&amp;year=$year&&amp;filterev=$filterev&amp;filterof=$filterof&amp;filtersx=$fs&amp;action=$action\">";
-			print "<img src=\"".$GM_IMAGE_DIR."/".$GM_IMAGES["sex"]["small"]."\" title=\"".$gm_lang["all"]."\" alt=\"".$gm_lang["all"]."\" width=\"9\" height=\"9\" border=\"0\" align=\"middle\" />";
-			print "<img src=\"".$GM_IMAGE_DIR."/".$GM_IMAGES["sexf"]["small"]."\" title=\"".$gm_lang["all"]."\" alt=\"".$gm_lang["all"]."\" width=\"9\" height=\"9\" border=\"0\" align=\"middle\" />";
+			print "<img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["sex"]["small"]."\" title=\"".$gm_lang["all"]."\" alt=\"".$gm_lang["all"]."\" width=\"9\" height=\"9\" border=\"0\" align=\"middle\" />";
+			print "<img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["sexf"]["small"]."\" title=\"".$gm_lang["all"]."\" alt=\"".$gm_lang["all"]."\" width=\"9\" height=\"9\" border=\"0\" align=\"middle\" />";
 			print "</a>"." | ";
 		}
 		if ($filtersx=="M"){
-			print "<img src=\"".$GM_IMAGE_DIR."/".$GM_IMAGES["sex"]["small"]."\" title=\"".$gm_lang["male"]."\" alt=\"".$gm_lang["male"]."\" width=\"15\" height=\"15\" border=\"0\" align=\"middle\" />";
+			print "<img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["sex"]["small"]."\" title=\"".$gm_lang["male"]."\" alt=\"".$gm_lang["male"]."\" width=\"15\" height=\"15\" border=\"0\" align=\"middle\" />";
 			print " | ";
 		}
 		else {
 			$fs="M";
 			print "<a href=\"calendar.php?day=$dd&amp;month=$month&amp;year=$year&amp;filterev=$filterev&amp;filterof=$filterof&amp;filtersx=$fs&amp;action=$action\">";
-			print "<img src=\"".$GM_IMAGE_DIR."/".$GM_IMAGES["sex"]["small"]."\" title=\"".$gm_lang["male"]."\" alt=\"".$gm_lang["male"]."\" width=\"9\" height=\"9\" border=\"0\" align=\"middle\" />";
+			print "<img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["sex"]["small"]."\" title=\"".$gm_lang["male"]."\" alt=\"".$gm_lang["male"]."\" width=\"9\" height=\"9\" border=\"0\" align=\"middle\" />";
 			print "</a>"." | ";
 		}
 		if ($filtersx=="F"){
-			print "<img src=\"".$GM_IMAGE_DIR."/".$GM_IMAGES["sexf"]["small"]."\" title=\"".$gm_lang["female"]."\" alt=\"".$gm_lang["female"]."\" width=\"15\" height=\"15\" border=\"0\" align=\"middle\" />";
+			print "<img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["sexf"]["small"]."\" title=\"".$gm_lang["female"]."\" alt=\"".$gm_lang["female"]."\" width=\"15\" height=\"15\" border=\"0\" align=\"middle\" />";
 			print " | ";
 		}
 		else {
 			$fs="F";
 			print "<a href=\"calendar.php?day=$dd&amp;month=$month&amp;year=$year&amp;filterev=$filterev&amp;filterof=$filterof&amp;filtersx=$fs&amp;action=$action\">";
-			print "<img src=\"".$GM_IMAGE_DIR."/".$GM_IMAGES["sexf"]["small"]."\" title=\"".$gm_lang["female"]."\" alt=\"".$gm_lang["female"]."\" width=\"9\" height=\"9\" border=\"0\" align=\"middle\" />";
+			print "<img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["sexf"]["small"]."\" title=\"".$gm_lang["female"]."\" alt=\"".$gm_lang["female"]."\" width=\"9\" height=\"9\" border=\"0\" align=\"middle\" />";
 			print "</a>"." | ";
 		}
 		
@@ -550,7 +550,7 @@ if (($action=="today") || ($action=="year")) {
 			$myindilist = SearchIndisYearRange($startyear,$endyear);
 			$myfamlist = SearchFamsYearRange($startyear,$endyear);
 		}
-		if ($USE_RTL_FUNCTIONS && isset($hstartyear) && isset($hendyear)) {
+		if (GedcomConfig::$USE_RTL_FUNCTIONS && isset($hstartyear) && isset($hendyear)) {
 			
 			$myindilist1 = SearchIndisYearRange($hstartyear,$hendyear);
 			$myindilist = GmArrayMerge($myindilist, $myindilist1);
@@ -560,7 +560,7 @@ if (($action=="today") || ($action=="year")) {
 		}
 	}
 	if ($endyear==0) {
-		if ($USE_RTL_FUNCTIONS) {
+		if (GedcomConfig::$USE_RTL_FUNCTIONS) {
 			$myindilist1 = SearchIndis($query);
 			$myindilist = GmArrayMerge($myindilist, $myindilist1);
 		
@@ -572,7 +572,7 @@ if (($action=="today") || ($action=="year")) {
 			$myfamlist = SearchFams($query);
         }
 
-		if ($USE_RTL_FUNCTIONS && isset($queryhb) && $action!="year") {
+		if (GedcomConfig::$USE_RTL_FUNCTIONS && isset($queryhb) && $action!="year") {
 			$myindilist1 = SearchIndis($queryhb);
 			$myindilist = GmArrayMerge($myindilist, $myindilist1);
 			
@@ -617,7 +617,7 @@ if (($action=="today") || ($action=="year")) {
 				if ($i==$lct||($line{0}=="1")) {
 					if (!empty($factrec)) {
 						$t1 = preg_match("/2 DATE.*DHEBREW.* (\d\d\d\d)/i", $factrec, $m1);
-						if ($USE_RTL_FUNCTIONS && $action=="year" && isset($hendyear) && $hendyear>0 && $t1>0) {
+						if (GedcomConfig::$USE_RTL_FUNCTIONS && $action=="year" && isset($hendyear) && $hendyear>0 && $t1>0) {
 							$j = $hstartyear;   //-- why MA @@@ ??
 								if ($m1[1]==$hstartyear || $m1[1]==$hendyear) {
 									// verify if the date falls within the first or the last range gregorian year @@@@ !!!!
@@ -679,7 +679,7 @@ if (($action=="today") || ($action=="year")) {
 									}
 								}
 							}
-							if ($ct < 1 && $USE_RTL_FUNCTIONS && isset($preghbquery)) $ct = preg_match("/$preghbquery/i", $factrec, $match);
+							if ($ct < 1 && GedcomConfig::$USE_RTL_FUNCTIONS && isset($preghbquery)) $ct = preg_match("/$preghbquery/i", $factrec, $match);
 							if ($action=="year"){
 								if ($ct==0){
 									$cb = preg_match("/2 DATE[^\n]*(bet)/i", $factrec, $m1);
@@ -725,7 +725,7 @@ if (($action=="today") || ($action=="year")) {
 				$n = CheckNN(GetSortableName($gid));
 				if (HasChinese($n)) $text_indi .= PrintReady($n." (".GetPinYin($n).")")."</b>";
 				else $text_indi .= PrintReady($n)."</b>";
-				$text_indi .= "<img id=\"box-$gid.$lct-sex\" src=\"$GM_IMAGE_DIR/";
+				$text_indi .= "<img id=\"box-$gid.$lct-sex\" src=\"".GM_IMAGE_DIR."/";
 				if (preg_match("/1 SEX M/", $indi["gedcom"])>0){
 					$count_male++;
 					$text_indi .= $GM_IMAGES["sex"]["small"]."\" title=\"".$gm_lang["male"]."\" alt=\"".$gm_lang["male"];
@@ -739,7 +739,7 @@ if (($action=="today") || ($action=="year")) {
 					$text_indi .= $GM_IMAGES["sexn"]["small"]."\" title=\"".$gm_lang["unknown"]."\" alt=\"".$gm_lang["unknown"];
 				}
 				$text_indi .= "\" class=\"sex_image\" />";
-				if ($SHOW_ID_NUMBERS) {
+				if (GedcomConfig::$SHOW_ID_NUMBERS) {
 					if ($TEXT_DIRECTION=="ltr") $text_indi .= "&lrm;($gid)&lrm;";
 					else $text_indi .= "&rlm;($gid)&rlm;";
 				}
@@ -784,7 +784,7 @@ if (($action=="today") || ($action=="year")) {
 					if ($i==$lct||($line{0}=="1")) {
 						if (!empty($factrec)) {
 							$t1 = preg_match("/2 DATE.*DHEBREW.* (\d\d\d\d)/i", $factrec, $m1);
-							if ($USE_RTL_FUNCTIONS && $action=="year" && isset($hendyear) && $hendyear>0 && $t1>0) {
+							if (GedcomConfig::$USE_RTL_FUNCTIONS && $action=="year" && isset($hendyear) && $hendyear>0 && $t1>0) {
 								$j = $hstartyear;   //----- why??? MA @@@@
 								if ($m1[1]==$hstartyear || $m1[1]==$hendyear) {
 								// verify if the date falls within the first or the last range gregorian year @@@@ !!!!
@@ -847,8 +847,7 @@ if (($action=="today") || ($action=="year")) {
 										}
 									}
 								}
-    							if ($ct < 1 && $USE_RTL_FUNCTIONS && isset($preghbquery)) $ct = preg_match("/$preghbquery/i", $factrec, $match);
-//								if ($ct < 1 && $USE_RTL_FUNCTIONS) $ct = preg_match("/$preghbquery/i", $factrec, $match);
+    							if ($ct < 1 && GedcomConfig::$USE_RTL_FUNCTIONS && isset($preghbquery)) $ct = preg_match("/$preghbquery/i", $factrec, $match);
 								if ($action=="year"){
 									if ($ct==0){
 										$cb = preg_match("/2 DATE[^\n]*(bet)/i", $factrec, $m1);
@@ -905,10 +904,10 @@ if (($action=="today") || ($action=="year")) {
 	if (!empty($text_indi) || !empty($text_fam) || $count_private_indi>0 || $count_private_fam>0) {
 		print "\n\t\t<table class=\"center $TEXT_DIRECTION\">\n\t\t<tr>";
 		if (!empty($text_indi) || ($count_private_indi>0)) {
-			print "<td class=\"shade2 center\"><img src=\"".$GM_IMAGE_DIR."/".$GM_IMAGES["indis"]["small"]."\" border=\"0\" title=\"".$gm_lang["individuals"]."\" alt=\"".$gm_lang["individuals"]."\" /> ".$gm_lang["individuals"]."</td>";
+			print "<td class=\"shade2 center\"><img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["indis"]["small"]."\" border=\"0\" title=\"".$gm_lang["individuals"]."\" alt=\"".$gm_lang["individuals"]."\" /> ".$gm_lang["individuals"]."</td>";
 		}
 		if (!empty($text_fam) || ($count_private_fam)) {
-			print "<td class=\"shade2 center\"><img src=\"".$GM_IMAGE_DIR."/".$GM_IMAGES["sfamily"]["small"]."\" border=\"0\" title=\"".$gm_lang["families"]."\" alt=\"".$gm_lang["families"]."\" /> ".$gm_lang["families"]."</td>";
+			print "<td class=\"shade2 center\"><img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["sfamily"]["small"]."\" border=\"0\" title=\"".$gm_lang["families"]."\" alt=\"".$gm_lang["families"]."\" /> ".$gm_lang["families"]."</td>";
 		}
 		print "</tr><tr>\n\t\t";
 		if (!empty($text_indi) || ($count_private_indi)) {
@@ -941,19 +940,19 @@ if (($action=="today") || ($action=="year")) {
 			if (($count_male+$count_female+$count_unknown+$count_private_indi)>0)
 			print $gm_lang["total_indis"]." ".($count_male+$count_female+$count_unknown+$count_private_indi)."<br />&nbsp;&nbsp;";
 			if ($count_male>0){
-				print "<img src=\"".$GM_IMAGE_DIR."/".$GM_IMAGES["sex"]["small"]."\" ";
+				print "<img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["sex"]["small"]."\" ";
 				print "title=\"".$gm_lang["male"]."\" alt=\"".$gm_lang["male"]."\" class=\"sex_image\" />&nbsp;";
 				print $count_male;
 			}
 			if (($count_male>0)&&($count_female>0)) print "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
 			if ($count_female>0) {
-				print "<img src=\"".$GM_IMAGE_DIR."/".$GM_IMAGES["sexf"]["small"]."\" ";
+				print "<img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["sexf"]["small"]."\" ";
 				print "title=\"".$gm_lang["female"]."\" alt=\"".$gm_lang["female"]."\" class=\"sex_image\"  />&nbsp;";
 				print $count_female;
 			}
 			if ($count_unknown>0) {
 				print "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
-				print "<img src=\"".$GM_IMAGE_DIR."/".$GM_IMAGES["sexn"]["small"]."\" ";
+				print "<img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["sexn"]["small"]."\" ";
 				print "title=\"".$gm_lang["unknown"]."\" alt=\"".$gm_lang["unknown"]."\" class=\"sex_image\" />&nbsp;";
 				print $count_unknown;
 			}
@@ -978,7 +977,7 @@ if (($action=="today") || ($action=="year")) {
 	if ($view=="preview") print "<tr><td>";
 }
 else if ($action=="calendar") {
-	if($CALENDAR_FORMAT=="jewish" || $CALENDAR_FORMAT=="hebrew" || $CALENDAR_FORMAT=="hijri") { //since calendar is based on gregorian it doesn't make sense to not display the gregorian caption
+	if(GedcomConfig::$CALENDAR_FORMAT=="jewish" || GedcomConfig::$CALENDAR_FORMAT=="hebrew" || GedcomConfig::$CALENDAR_FORMAT=="hijri") { //since calendar is based on gregorian it doesn't make sense to not display the gregorian caption
 		print "<span class=\"subheaders\">".$gm_lang[strtolower($month)]." $year</span> &#160; \n";
 	}
 	if (empty($WEEK_START)) $WEEK_START="0";                //-- if the starting day for a week was not defined in the language file, then make it Sunday
@@ -1028,7 +1027,7 @@ else if ($action=="calendar") {
 	$myindilist = SearchIndisDates("", $mmon, "", $fact);
 	$myfamlist = SearchFamsDates("", $mmon, "", $fact);
 
-	if ($USE_RTL_FUNCTIONS) {
+	if (GedcomConfig::$USE_RTL_FUNCTIONS) {
 		$datearray[0]["day"]   = 01;
  		$datearray[0]["mon"]   = $monthtonum[Str2Lower($month)];	
  		$datearray[0]["year"]  = $year;
@@ -1119,7 +1118,7 @@ else if ($action=="calendar") {
 
 					// Include here Hebrew dates that do not convert to a Gregorian date (same into blocks) - like 31 NSN 5724
 					
-					if ($USE_RTL_FUNCTIONS) {
+					if (GedcomConfig::$USE_RTL_FUNCTIONS) {
 						    $preghbquery1 = "";
 						    $preghbquery2 = "";
 						    $preghbquery3 = "";
@@ -1149,29 +1148,29 @@ else if ($action=="calendar") {
 					if(($year == adodb_date("Y")) && (strtolower($month) == strtolower(adodb_date("M"))) && ($mday == adodb_date("j"))) //current day
 						$currentDay = true;
 					print "<span class=\"cal_day". ($currentDay?" current_day":"") ."\">".$mday."</span>";
-					if ($CALENDAR_FORMAT=="hebrew_and_gregorian" || $CALENDAR_FORMAT=="hebrew" ||
-						(($CALENDAR_FORMAT=="jewish_and_gregorian" || $CALENDAR_FORMAT=="jewish" || ($USE_RTL_FUNCTIONS &&  $HEBREWFOUND[$GEDCOMID] == true)) && $LANGUAGE == "hebrew")) {
+					if (GedcomConfig::$CALENDAR_FORMAT=="hebrew_and_gregorian" || GedcomConfig::$CALENDAR_FORMAT=="hebrew" ||
+						((GedcomConfig::$CALENDAR_FORMAT=="jewish_and_gregorian" || GedcomConfig::$CALENDAR_FORMAT=="jewish" || (GedcomConfig::$USE_RTL_FUNCTIONS &&  $HEBREWFOUND[$GEDCOMID] == true)) && $LANGUAGE == "hebrew")) {
 						$monthTemp = $monthtonum[strtolower($month)];
 						$jd = gregoriantojd($monthTemp, $mday, $year);
 						$hebrewDate = jdtojewish($jd);
-						// if ($USE_RTL_FUNCTIONS &&  $HEBREWFOUND[$GEDCOMID] == true) {
+						// if (GedcomConfig::$USE_RTL_FUNCTIONS &&  $HEBREWFOUND[$GEDCOMID] == true) {
 							list ($hebrewMonth, $hebrewDay, $hebrewYear) = split ('/', $hebrewDate);
 							print "<span class=\"rtl_cal_day". ($currentDay?" current_day":"") ."\">";
 							print GetHebrewJewishDay($hebrewDay) . " " .GetHebrewJewishMonth($hebrewMonth, $hebrewYear) . "</span>";
 						// }
 					}
-					else if($CALENDAR_FORMAT=="jewish_and_gregorian" || $CALENDAR_FORMAT=="jewish" || ($USE_RTL_FUNCTIONS && $HEBREWFOUND[$GEDCOMID] == true)) {
-						// else if($CALENDAR_FORMAT=="jewish_and_gregorian" || $CALENDAR_FORMAT=="jewish" || $USE_RTL_FUNCTIONS) {
+					else if(GedcomConfig::$CALENDAR_FORMAT=="jewish_and_gregorian" || GedcomConfig::$CALENDAR_FORMAT=="jewish" || ($USE_RTL_FUNCTIONS && $HEBREWFOUND[$GEDCOMID] == true)) {
+						// else if(GedcomConfig::$CALENDAR_FORMAT=="jewish_and_gregorian" || GedcomConfig::$CALENDAR_FORMAT=="jewish" || GedcomConfig::$USE_RTL_FUNCTIONS) {
 						$monthTemp = $monthtonum[strtolower($month)];
 						$jd = gregoriantojd($monthTemp, $mday, $year);
 						$hebrewDate = jdtojewish($jd);
-						// if ($USE_RTL_FUNCTIONS &&  $HEBREWFOUND[$GEDCOMID] == true) {
+						// if (GedcomConfig::$USE_RTL_FUNCTIONS &&  $HEBREWFOUND[$GEDCOMID] == true) {
 							list ($hebrewMonth, $hebrewDay, $hebrewYear) = split ('/', $hebrewDate);
 							print "<span class=\"rtl_cal_day". ($currentDay?" current_day":"") ."\">";
 							print $hebrewDay . " " . GetJewishMonthName($hebrewMonth, $hebrewYear) . "</span>";
 						// }
 					}
-					else if($CALENDAR_FORMAT=="hijri") {
+					else if(GedcomConfig::$CALENDAR_FORMAT=="hijri") {
 						$monthTemp = $monthtonum[strtolower($month)];
 						$hDate = GetHijri($mday, $monthTemp, $year);
 						list ($hMonthName, $hDay, $hYear) = split ('/', $hDate);
@@ -1185,7 +1184,7 @@ else if ($action=="calendar") {
 					else if (!$leap && $mmon == "feb" && $mday == '28') $pregquery = "2 DATE[^\n]*2[8|9] $mmon";
 					else $pregquery = "2 DATE[^\n]*$mday $mmon";
 				
-					if ($USE_RTL_FUNCTIONS) {
+					if (GedcomConfig::$USE_RTL_FUNCTIONS) {
 						    $preghbquery1 = "";
 						    $preghbquery2 = "";
 						    $preghbquery3 = "";
@@ -1253,7 +1252,7 @@ else if ($action=="calendar") {
 					if (!empty($filtersx)) $sx = preg_match("/1 SEX $filtersx/i", $indi["gedcom"]);
 					if ((($filterof!="living")||(IsDeadId($gid)!=1))&& $sx>0) {
 						
-						if (preg_match("/$pregquery/i", $indi["gedcom"])>0 || ($USE_RTL_FUNCTIONS && (preg_match("/$preghbquery/i", $indi["gedcom"])>0 || ($preghbquery1!="" && preg_match("/$preghbquery1/i", $indi["gedcom"])>0) || ($preghbquery2!="" && preg_match("/$preghbquery2/i", $indi["gedcom"])>0) || ($preghbquery3!="" && preg_match("/$preghbquery3/i", $indi["gedcom"])>0)))) {
+						if (preg_match("/$pregquery/i", $indi["gedcom"])>0 || (GedcomConfig::$USE_RTL_FUNCTIONS && (preg_match("/$preghbquery/i", $indi["gedcom"])>0 || ($preghbquery1!="" && preg_match("/$preghbquery1/i", $indi["gedcom"])>0) || ($preghbquery2!="" && preg_match("/$preghbquery2/i", $indi["gedcom"])>0) || ($preghbquery3!="" && preg_match("/$preghbquery3/i", $indi["gedcom"])>0)))) {
 							$filterout=false;
 							$indilines = split("\n", $indi["gedcom"]);
 							$factrec = "";
@@ -1266,10 +1265,10 @@ else if ($action=="calendar") {
 								if ($i==$lct||($line{0}=="1")) {
 									if (!empty($factrec)) {
 										$ct = preg_match("/$pregquery/i", $factrec, $match);
-										if ($ct < 1 && $USE_RTL_FUNCTIONS) $ct = preg_match("/$preghbquery/i", $factrec, $match);
-										if ($ct < 1 && $USE_RTL_FUNCTIONS && $preghbquery1!="") $ct = preg_match("/$preghbquery1/i", $factrec, $match);
-										if ($ct < 1 && $USE_RTL_FUNCTIONS && $preghbquery2!="") $ct = preg_match("/$preghbquery2/i", $factrec, $match);
-										if ($ct < 1 && $USE_RTL_FUNCTIONS && $preghbquery3!="") $ct = preg_match("/$preghbquery3/i", $factrec, $match);
+										if ($ct < 1 && GedcomConfig::$USE_RTL_FUNCTIONS) $ct = preg_match("/$preghbquery/i", $factrec, $match);
+										if ($ct < 1 && GedcomConfig::$USE_RTL_FUNCTIONS && $preghbquery1!="") $ct = preg_match("/$preghbquery1/i", $factrec, $match);
+										if ($ct < 1 && GedcomConfig::$USE_RTL_FUNCTIONS && $preghbquery2!="") $ct = preg_match("/$preghbquery2/i", $factrec, $match);
+										if ($ct < 1 && GedcomConfig::$USE_RTL_FUNCTIONS && $preghbquery3!="") $ct = preg_match("/$preghbquery3/i", $factrec, $match);
 										if ($ct>0) {
 											$text_temp .= GetCalendarFact($factrec, $action, $filterof, $gid, $filterev);
 										}
@@ -1285,7 +1284,7 @@ else if ($action=="calendar") {
 								$n = CheckNN(GetSortableName($gid));
 								if (HasChinese($n)) $text_day .= PrintReady($n." (".GetPinYin($n).")")."</b>";
 								else $text_day .= $n."</b>";
-								if ($SHOW_ID_NUMBERS) {
+								if (GedcomConfig::$SHOW_ID_NUMBERS) {
 						      	    if ($TEXT_DIRECTION=="ltr") $text_day .= " &lrm;($gid)&lrm;";
 							        else $text_day .= " &rlm;($gid)&rlm;";
 						        }
@@ -1311,7 +1310,7 @@ else if ($action=="calendar") {
 							if (IsDeadId($parents["HUSB"]) || IsDeadId($parents["WIFE"])) $display=false;
 						}
 						if ($display) {
-			    			if (preg_match("/$pregquery/i", $fam["gedcom"])>0 || ($USE_RTL_FUNCTIONS && (preg_match("/$preghbquery/i", $fam["gedcom"])>0 || ($preghbquery1!="" && preg_match("/$preghbquery1/i", $fam["gedcom"])>0) || ($preghbquery2!="" && preg_match("/$preghbquery2/i", $fam["gedcom"])>0) || ($preghbquery3!="" && preg_match("/$preghbquery3/i", $fam["gedcom"])>0)))) {
+			    			if (preg_match("/$pregquery/i", $fam["gedcom"])>0 || (GedcomConfig::$USE_RTL_FUNCTIONS && (preg_match("/$preghbquery/i", $fam["gedcom"])>0 || ($preghbquery1!="" && preg_match("/$preghbquery1/i", $fam["gedcom"])>0) || ($preghbquery2!="" && preg_match("/$preghbquery2/i", $fam["gedcom"])>0) || ($preghbquery3!="" && preg_match("/$preghbquery3/i", $fam["gedcom"])>0)))) {
 								
 								$filterout=false;
 								$name = StripPrefix($fam["name"]);
@@ -1329,10 +1328,10 @@ else if ($action=="calendar") {
 										
 									if (!empty($factrec)) {
 										$ct = preg_match("/$pregquery/i", $factrec, $match);
-										if ($ct < 1 && $USE_RTL_FUNCTIONS) $ct = preg_match("/$preghbquery/i", $factrec, $match);
-										if ($ct < 1 && $USE_RTL_FUNCTIONS && $preghbquery1!="") $ct = preg_match("/$preghbquery1/i", $factrec, $match);
-										if ($ct < 1 && $USE_RTL_FUNCTIONS && $preghbquery2!="") $ct = preg_match("/$preghbquery2/i", $factrec, $match);
-										if ($ct < 1 && $USE_RTL_FUNCTIONS && $preghbquery3!="") $ct = preg_match("/$preghbquery3/i", $factrec, $match);
+										if ($ct < 1 && GedcomConfig::$USE_RTL_FUNCTIONS) $ct = preg_match("/$preghbquery/i", $factrec, $match);
+										if ($ct < 1 && GedcomConfig::$USE_RTL_FUNCTIONS && $preghbquery1!="") $ct = preg_match("/$preghbquery1/i", $factrec, $match);
+										if ($ct < 1 && GedcomConfig::$USE_RTL_FUNCTIONS && $preghbquery2!="") $ct = preg_match("/$preghbquery2/i", $factrec, $match);
+										if ($ct < 1 && GedcomConfig::$USE_RTL_FUNCTIONS && $preghbquery3!="") $ct = preg_match("/$preghbquery3/i", $factrec, $match);
 										if ($ct>0) {
 											$text_temp .= GetCalendarFact($factrec, $action, $filterof, $gid, $filterev);
 										}
@@ -1429,5 +1428,5 @@ if ($view=="preview"){
 }
 print "</table>\n";
 print "</div><br />\n";
-print_footer();
+PrintFooter();
 ?>

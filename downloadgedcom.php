@@ -81,11 +81,11 @@ class DownloadGedcom {
 	}
 	
 	function AddHeader($gm_lang) {
-		print_header($gm_lang["download_gedcom"]);
+		PrintHeader($gm_lang["download_gedcom"]);
 	}
 	
 	function AddFooter() {
-		print_footer();
+		PrintFooter();
 	}
 	
 	function ShowForm(&$genmod, &$gm_lang) {

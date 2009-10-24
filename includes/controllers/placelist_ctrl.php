@@ -35,14 +35,16 @@ if (stristr($_SERVER["SCRIPT_NAME"],basename(__FILE__))) {
 class PlaceListController extends ListController {
 	
 	public $classname = "PlaceListController";	// Name of this class
-	private $display = null;
-	private $select = null;
-	private $indi_total = array();
-	private $indi_hide = array();
-	private $sour_total = array();
-	private $sour_hide = array();
-	private $fam_hide = array();
-	private $fam_total = array();
+	private $display = null;					// Either list (all strings of locations) or hierarchy
+	private $select = null;						// Fact filter for a location. Default "all"
+	private $parent = null;						// Array of parent locations for the current display
+	private $level = null;						// Current level of display
+	private $indi_total = array();				// Indi's found
+	private $indi_hide = array();				// Indi's hidden
+	private $sour_total = array();				// Sources found
+	private $sour_hide = array();				// Sources hidden
+	private $fam_hide = array();				// Families found
+	private $fam_total = array();				// Families hidden
 	
 	public function __construct() {
 		
@@ -55,6 +57,22 @@ class PlaceListController extends ListController {
 		if (isset($_REQUEST["select"])) $this->select = $_REQUEST["select"];
 		if (is_null($this->select)) $this->select = "all";
 		
+		if (!isset($_REQUEST["parent"])) $this->parent = array();
+		else {
+			if (!is_array($_REQUEST["parent"])) $this->parent = array();
+			else $this->parent = array_values($_REQUEST["parent"]);
+		}
+		// Remove slashes
+		foreach ($this->parent as $p => $child){
+			$this->parent[$p] = stripslashes($child);
+		}
+
+		if (!isset($_REQUEST["level"])) $this->level = 0;
+		else $this->level = $_REQUEST["level"];
+
+		if ($this->level>count($this->parent)) $this->level = count($this->parent);
+		if ($this->level<count($this->parent)) $this->level = 0;
+
 	}
 
 	public function __get($property) {
@@ -64,6 +82,12 @@ class PlaceListController extends ListController {
 				break;
 			case "display":
 				return $this->display;
+				break;
+			case "parent":
+				return $this->parent;
+				break;
+			case "level":
+				return $this->level;
 				break;
 			case "indi_total":
 				return $this->indi_total;
@@ -97,6 +121,15 @@ class PlaceListController extends ListController {
 			else $this->pagetitle = $gm_lang["place_list2"];
 		}
 		return $this->pagetitle;
+	}
+	
+	protected function GetTitle() {
+		global $gm_lang;
+		
+		if (is_null($this->title)) {
+			$this->title = $this->GetPageTitle();
+		}
+		return $this->title;
 	}
 		
 	/**

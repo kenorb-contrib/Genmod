@@ -71,12 +71,12 @@ class MediaController extends DetailController {
 	 * @return string
 	 */
 	protected function getPageTitle() {
-		global $gm_lang, $SHOW_ID_NUMBERS;
+		global $gm_lang;
 
 		if (is_null($this->pagetitle)) {
 			$this->pagetitle = "";
 			$this->pagetitle .= $this->media->title." - ";
-			if ($SHOW_ID_NUMBERS) $this->pagetitle .= $this->media->xref." - ";
+			if (GedcomConfig::$SHOW_ID_NUMBERS) $this->pagetitle .= $this->media->xref." - ";
 			$this->pagetitle .= $gm_lang["media_info"];
 		}
 		return $this->pagetitle;

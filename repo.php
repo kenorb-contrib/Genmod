@@ -34,7 +34,7 @@ require("config.php");
 */
 $repository_controller = new RepositoryController();
 
-print_header($repository_controller->pagetitle);
+PrintHeader($repository_controller->pagetitle);
 
 $repository_controller->CheckNoResult($gm_lang["repo_not_found"]);
 
@@ -50,7 +50,7 @@ $repository_controller->CheckRawEdited();
 	<tr>
 		<td>
 		<span class="name_head"><?php print PrintReady($repository_controller->repo->title.$repository_controller->repo->addxref);?></span><br />
-		<?php if($SHOW_COUNTER) {
+		<?php if(GedcomConfig::$SHOW_COUNTER) {
 			print "\n<br /><br /><span style=\"margin-left: 3px;\">".$gm_lang["hit_count"]."&nbsp;".$hits."</span>\n";
 		}?>
 		</td>
@@ -61,5 +61,5 @@ $repository_controller->CheckRawEdited();
 // Print the tab doors
 $repository_controller->PrintTabs();
 
-print_footer();
+PrintFooter();
 ?>

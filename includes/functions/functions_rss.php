@@ -64,10 +64,9 @@ function iso8601_date($time) {
  * @TODO does not pick up the upcoming events block config and always shows 30 days of data.
  */
 function getUpcomingEvents() {
-	global $gm_lang, $month, $year, $day, $monthtonum, $HIDE_LIVE_PEOPLE, $SHOW_ID_NUMBERS, $command, $TEXT_DIRECTION, $SHOW_FAM_ID_NUMBERS, $monthstart;
-	global $GM_IMAGE_DIR, $GM_IMAGES, $GEDCOMID, $ASC, $IGNORE_FACTS, $IGNORE_YEAR, $LAST_QUERY, $GM_BLOCKS;
-	global $USE_RTL_FUNCTIONS;
-	global $DAYS_TO_SHOW_LIMIT, $lastcachedate;
+	global $gm_lang, $month, $year, $day, $monthtonum, $HIDE_LIVE_PEOPLE, $command, $TEXT_DIRECTION, $monthstart;
+	global $GM_IMAGES, $GEDCOMID, $ASC, $IGNORE_FACTS, $IGNORE_YEAR, $LAST_QUERY, $GM_BLOCKS;
+	global $lastcachedate;
 	global $CIRCULAR_BASE;
 
 	$dataArray[0] = $gm_lang["upcoming_events"];
@@ -78,7 +77,7 @@ function getUpcomingEvents() {
 	else $dataArray[1] = iso8601_date(time());
 
 	if (empty($config)) $config = $GM_BLOCKS["print_upcoming_events"]["config"];
-	if (!isset($DAYS_TO_SHOW_LIMIT)) $DAYS_TO_SHOW_LIMIT = 30;
+//	if (!isset(GedcomConfig::$DAYS_TO_SHOW_LIMIT)) GedcomConfig::$DAYS_TO_SHOW_LIMIT = 30;
 	if (isset($config["days"])) $daysprint = $config["days"];
 	else $daysprint = 30;
 	if (isset($config["filter"])) $filter = $config["filter"];  // "living" or "all"
@@ -87,7 +86,7 @@ function getUpcomingEvents() {
 	else $onlyBDM = "no";
 
 	if ($daysprint < 1) $daysprint = 1;
-	if ($daysprint > $DAYS_TO_SHOW_LIMIT) $daysprint = $DAYS_TO_SHOW_LIMIT;  // valid: 1 to limit
+	if ($daysprint > GedcomConfig::$DAYS_TO_SHOW_LIMIT) $daysprint = GedcomConfig::$DAYS_TO_SHOW_LIMIT;  // valid: 1 to limit
 
 	$skipfacts = "CHAN,BAPL,SLGC,SLGS,ENDL";	// These are always excluded
 
@@ -125,7 +124,7 @@ function getUpcomingEvents() {
 							if ($lastgid!=$gid) {
 								$name = CheckNN(GetSortableName($gid));
 								$daytext .= "<li><a href=\"".SERVER_URL ."individual.php?pid=$gid&amp;gedid=".$GEDCOMID."\"><b>".PrintReady($name)."</b>";
-								if ($SHOW_ID_NUMBERS) {
+								if (GedcomConfig::$SHOW_ID_NUMBERS) {
 									if ($TEXT_DIRECTION=="ltr"){
 										$daytext .=  " &lrm;($gid)&lrm; ";
 									} else {
@@ -179,7 +178,7 @@ function getUpcomingEvents() {
 						} else {
 							if ($lastgid!=$gid) {
 								$daytext .=  "<li><a href=\"".SERVER_URL ."family.php?famid=$gid&amp;gedid=".$GEDCOMID."\"><b>".PrintReady($name)."</b>";
-								if ($SHOW_FAM_ID_NUMBERS) {
+								if (GedcomConfig::$SHOW_FAM_ID_NUMBERS) {
 									if ($TEXT_DIRECTION=="ltr")
 										$daytext .=  " &lrm;($gid)&lrm; ";
 									else $daytext .=  " &rlm;($gid)&rlm; ";
@@ -228,8 +227,8 @@ function getUpcomingEvents() {
  * @TODO does not display the privacy message displayed by the upcoming events feed.
  */
 function getTodaysEvents() {
-	global $gm_lang, $month, $year, $day, $monthtonum, $HIDE_LIVE_PEOPLE, $SHOW_ID_NUMBERS, $command, $TEXT_DIRECTION, $SHOW_FAM_ID_NUMBERS;
-	global $GM_IMAGE_DIR, $GM_IMAGES, $GEDCOMID, $ASC, $IGNORE_FACTS, $IGNORE_YEAR, $lastcachedate;
+	global $gm_lang, $month, $year, $day, $monthtonum, $HIDE_LIVE_PEOPLE, $command, $TEXT_DIRECTION;
+	global $GM_IMAGES, $GEDCOMID, $ASC, $IGNORE_FACTS, $IGNORE_YEAR, $lastcachedate;
 
 	if ($command=="user") $filter = "living";
 	else $filter = "all";
@@ -258,7 +257,7 @@ function getTodaysEvents() {
 					if ($lastgid!=$gid) {
 						$name = CheckNN(GetSortableName($gid));
 						$daytext .= "<li><a href=\"".SERVER_URL ."individual.php?pid=$gid&amp;gedid=".$GEDCOMID."\"><b>".PrintReady($name)."</b>";
-						if ($SHOW_ID_NUMBERS) {
+						if (GedcomConfig::$SHOW_ID_NUMBERS) {
 							if ($TEXT_DIRECTION=="ltr")	$daytext .= " &lrm;($gid)&lrm;";
 							else $daytext .= " &rlm;($gid)&rlm;";
 						}
@@ -280,7 +279,7 @@ function getTodaysEvents() {
 				if ($text!="filter") {
 					if ($lastgid!=$gid) {
 						$daytext .= "<li><a href=\"".SERVER_URL ."family.php?famid=$gid&amp;gedid=".$GEDCOMID."\"><b>".PrintReady($name)."</b>";
-						if ($SHOW_FAM_ID_NUMBERS) {
+						if (GedcomConfig::$SHOW_FAM_ID_NUMBERS) {
 						   if ($TEXT_DIRECTION=="ltr")
 								$daytext .=  " &lrm;($gid)&lrm;";
 						   else $daytext .=  " &rlm;($gid)&rlm;";
@@ -312,7 +311,7 @@ function getTodaysEvents() {
  */
 function getGedcomStats() {
 	global $gm_lang, $day, $month, $year, $GEDCOMID, $GEDCOMS, $GEDCOMID, $ALLOW_CHANGE_GEDCOM;
-	global $command, $COMMON_NAMES_THRESHOLD, $RTLOrd;
+	global $command, $RTLOrd;
 	global $GEDCOMID, $lastcachedate;
 
 	$data = "";
@@ -406,7 +405,7 @@ function getGedcomStats() {
  * @TODO prepend relative URL's in news items with SERVER_URL
  */
 function getGedcomNews() {
-	global $gm_lang, $GM_IMAGE_DIR, $GM_IMAGES, $TEXT_DIRECTION, $GEDCOMID, $command, $TIME_FORMAT, $lastcachedate;
+	global $gm_lang, $GM_IMAGES, $TEXT_DIRECTION, $GEDCOMID, $command, $TIME_FORMAT, $lastcachedate;
 
 	$usernews = NewsController::getUserNews($GEDCOMID);
 
@@ -445,7 +444,7 @@ function getGedcomNews() {
  */
 function getTop10Surnames() {
 	global $gm_lang, $GEDCOMID;
-	global $COMMON_NAMES_ADD, $COMMON_NAMES_REMOVE, $COMMON_NAMES_THRESHOLD, $GM_BLOCKS, $command, $GM_IMAGES, $GM_IMAGE_DIR;
+	global $GM_BLOCKS, $command, $GM_IMAGES;
 
 	$data = "";
 	$dataArray = array();
@@ -474,23 +473,23 @@ function getTop10Surnames() {
 		$surnames = BlockFunctions::GetTopSurnames($config["num"]);
 
 		// Insert from the "Add Names" list if not already in there
-		if ($COMMON_NAMES_ADD != "") {
-			$addnames = preg_split("/[,;] /", $COMMON_NAMES_ADD);
-			if (count($addnames)==0) $addnames[] = $COMMON_NAMES_ADD;
+		if (GedcomConfig::$COMMON_NAMES_ADD != "") {
+			$addnames = preg_split("/[,;] /", GedcomConfig::$COMMON_NAMES_ADD);
+			if (count($addnames)==0) $addnames[] = GedcomConfig::$COMMON_NAMES_ADD;
 			foreach($addnames as $indexval => $name) {
 				//$surname = Str2Upper($name);
 				$surname = $name;
 				if (!isset($surnames[$surname])) {
 					$surnames[$surname]["name"] = $name;
-					$surnames[$surname]["match"] = $COMMON_NAMES_THRESHOLD;
+					$surnames[$surname]["match"] = GedcomConfig::$COMMON_NAMES_THRESHOLD;
 				}
 			}
 		}
 
 		// Remove names found in the "Remove Names" list
-		if ($COMMON_NAMES_REMOVE != "") {
-			$delnames = preg_split("/[,;] /", $COMMON_NAMES_REMOVE);
-			if (count($delnames)==0) $delnames[] = $COMMON_NAMES_REMOVE;
+		if (GedcomConfig::$COMMON_NAMES_REMOVE != "") {
+			$delnames = preg_split("/[,;] /", GedcomConfig::$COMMON_NAMES_REMOVE);
+			if (count($delnames)==0) $delnames[] = GedcomConfig::$COMMON_NAMES_REMOVE;
 			foreach($delnames as $indexval => $name) {
 				//$surname = Str2Upper($name);
 				$surname = $name;
@@ -527,8 +526,8 @@ function getTop10Surnames() {
  * @todo Find out why TOTAL_QUERIES is here???
  */
 function getRecentChanges() {
-	global $gm_lang, $month, $year, $day, $monthtonum, $HIDE_LIVE_PEOPLE, $SHOW_ID_NUMBERS, $command, $TEXT_DIRECTION, $SHOW_FAM_ID_NUMBERS;
-	global $GM_IMAGE_DIR, $GM_IMAGES, $GEDCOMID, $ASC, $IGNORE_FACTS, $IGNORE_YEAR, $TOTAL_QUERIES, $LAST_QUERY, $GM_BLOCKS, $SHOW_SOURCES;
+	global $gm_lang, $month, $year, $day, $monthtonum, $HIDE_LIVE_PEOPLE, $command, $TEXT_DIRECTION;
+	global $GM_IMAGES, $GEDCOMID, $ASC, $IGNORE_FACTS, $IGNORE_YEAR, $TOTAL_QUERIES, $LAST_QUERY, $GM_BLOCKS, $SHOW_SOURCES;
 	global $medialist;
 
 	if ($command=="user") $filter = "living";
@@ -583,7 +582,7 @@ function getRecentChanges() {
 					if ($lastgid!=$gid) {
 						$name = CheckNN(GetSortableName($gid));
 						$recentText .= "<a href=\"".SERVER_URL ."individual.php?pid=$gid&amp;gedid=".$GEDCOMID."\"><b>".PrintReady($name)."</b>";
-						if ($SHOW_ID_NUMBERS) {
+						if (GedcomConfig::$SHOW_ID_NUMBERS) {
 							if ($TEXT_DIRECTION=="ltr")
 								$recentText .= " &lrm;($gid)&lrm; ";
 							else $recentText .= " &rlm;($gid)&rlm; ";
@@ -612,7 +611,7 @@ function getRecentChanges() {
 					$name = GetFamilyDescriptor($gid);
 					if ($lastgid!=$gid) {
 						$recentText .= "<a href=\"".SERVER_URL ."family.php?famid=$gid&amp;gedid=".$GEDCOMID."\"><b>".PrintReady($name)."</b>";
-						if ($SHOW_FAM_ID_NUMBERS) {
+						if (GedcomConfig::$SHOW_FAM_ID_NUMBERS) {
 							if ($TEXT_DIRECTION=="ltr")
 								$recentText .= " &lrm;($gid)&lrm; ";
 							else $recentText .= " &rlm;($gid)&rlm; ";
@@ -641,7 +640,7 @@ function getRecentChanges() {
 					$name = GetSourceDescriptor($gid);
 					if ($lastgid!=$gid) {
 						$recentText .= "<a href=\"".SERVER_URL ."source.php?sid=$gid&amp;gedid=".$GEDCOMID."\"><b>".PrintReady($name)."</b>";
-						if ($SHOW_FAM_ID_NUMBERS) {
+						if (GedcomConfig::$SHOW_FAM_ID_NUMBERS) {
 							if ($TEXT_DIRECTION=="ltr")
 								$recentText .= " &lrm;($gid)&lrm; ";
 							else $recentText .= " &rlm;($gid)&rlm; ";
@@ -670,7 +669,7 @@ function getRecentChanges() {
 					$name = GetRepoDescriptor($gid);
 					if ($lastgid!=$gid) {
 						$recentText .= "<a href=\"".SERVER_URL ."repo.php?rid=$gid&amp;gedid=".$GEDCOMID."\"><b>".PrintReady($name)."</b>";
-						if ($SHOW_FAM_ID_NUMBERS) {
+						if (GedcomConfig::$SHOW_FAM_ID_NUMBERS) {
 							if ($TEXT_DIRECTION=="ltr")
 								$recentText .= " &lrm;($gid)&lrm; ";
 							else $recentText .= " &rlm;($gid)&rlm; ";
@@ -700,7 +699,7 @@ function getRecentChanges() {
 					$SearchTitle = preg_replace("/ /","+",$title);
 					if ($lastgid!=$gid) {
  						$recentText .= "<a href=\"".SERVER_URL ."medialist.php?action=filter&amp;search=yes&amp;filter=$SearchTitle&amp;gedid=".$GEDCOMID."\"><b>".PrintReady($title)."</b>";
-						if ($SHOW_FAM_ID_NUMBERS) {
+						if (GedcomConfig::$SHOW_FAM_ID_NUMBERS) {
 							if ($TEXT_DIRECTION=="ltr")
 								$recentText .= " &lrm;($gid)&lrm; ";
 							else $recentText .= " &rlm;($gid)&rlm; ";

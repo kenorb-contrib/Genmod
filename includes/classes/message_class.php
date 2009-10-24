@@ -159,7 +159,7 @@ class Message {
 	}
 	
 	public function AddMessage($admincopy=false) {
-		global $gm_lang, $LANGUAGE, $GM_STORE_MESSAGES, $GM_SIMPLE_MAIL, $WEBMASTER_EMAIL;
+		global $gm_lang, $LANGUAGE, $GM_STORE_MESSAGES, $GM_SIMPLE_MAIL;
 		global $TEXT_DIRECTION, $TEXT_DIRECTION_array, $DATE_FORMAT, $DATE_FORMAT_array, $TIME_FORMAT, $TIME_FORMAT_array, $WEEK_START, $WEEK_START_array, $NAME_REVERSE, $NAME_REVERSE_array;
 
 		// We cannot send already stored messages
@@ -307,7 +307,7 @@ class Message {
 		if ($this->method != "messaging") {
 			if (is_null($this->no_from)) {
 				if (stristr($from, "Genmod-noreply@")){
-					$admuser =& User::GetInstance($WEBMASTER_EMAIL);
+					$admuser =& User::GetInstance(GedcomConfig::$WEBMASTER_EMAIL);
 					$from = $admuser->email;
 				}
 				if (!empty($from)) {

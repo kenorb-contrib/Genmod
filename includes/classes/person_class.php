@@ -173,6 +173,9 @@ class Person extends GedcomRecord {
 			case "spousefamilies":
 				return $this->GetSpouseFamilies();
 				break;
+			case "fams":
+				return $this->GetSpouseFamilyIds();
+				break;
 			case "famc":
 				return $this->GetChildFamilyIds();
 				break;
@@ -194,7 +197,12 @@ class Person extends GedcomRecord {
 				$this->isdead = $value;
 				break;
 			case "addname":
-				if ($this->names_read != true) $this->name_array[] = $value;
+				if ($this->names_read != true) {
+					$this->name_array[] = $value;
+				}
+				break;
+			case "names_read":
+				if ($this->names_read != true) $this->names_read = $value;
 				break;
 			default:
 				parent::__set($property, $value);
@@ -461,9 +469,8 @@ if ($this->tracefacts) print "AddFamilyFacts - Adding for ".$fam->xref.": ".$fac
 	 * @return records added to indifacts array
 	 */
 	private function AddParentsFacts($person, $sosa=1) {
-		global $SHOW_RELATIVES_EVENTS;
 		
-		if (!$SHOW_RELATIVES_EVENTS) return;
+		if (!GedcomConfig::$SHOW_RELATIVES_EVENTS) return;
 		if ($sosa > $this->sosamax) return;
 		if (!is_object($person)) return;
 		$person->GetChildFamilies();
@@ -472,7 +479,7 @@ if ($this->tracefacts) print "AddFamilyFacts - Adding for ".$fam->xref.": ".$fac
 				if ($fam->husb_id != "") {
 					// add father death
 					if ($sosa==1) $fact="_DEAT_FATH"; else $fact="_DEAT_GPAR";
-					if (strstr($SHOW_RELATIVES_EVENTS, $fact) && PrivacyFunctions::showFact("DEAT", $fam->husb->xref, "INDI") && PrivacyFunctions::showFactDetails("DEAT", $fam->husb->xref)) {
+					if (strstr(GedcomConfig::$SHOW_RELATIVES_EVENTS, $fact) && PrivacyFunctions::showFact("DEAT", $fam->husb->xref, "INDI") && PrivacyFunctions::showFactDetails("DEAT", $fam->husb->xref)) {
 						if (CompareFacts($this->GetBirthDate(), $fam->husb->GetDeathDate())<0 && CompareFacts($fam->husb->GetDeathDate(), $this->GetDeathDate())<0) {
 							$factrec = "1 ".$fact;
 							$factrec .= "\n".trim($fam->husb->GetDeathDate());
@@ -489,7 +496,7 @@ if ($this->tracefacts) print "AddFamilyFacts - Adding for ".$fam->xref.": ".$fac
 				if ($fam->wife_id != "") {
 					// add mother death
 					if ($sosa==1) $fact="_DEAT_MOTH"; else $fact="_DEAT_GPAR";
-					if (strstr($SHOW_RELATIVES_EVENTS, $fact) && PrivacyFunctions::showFact("DEAT", $fam->wife->xref, "INDI") && PrivacyFunctions::showFactDetails("DEAT", $fam->wife->xref)) {
+					if (strstr(GedcomConfig::$SHOW_RELATIVES_EVENTS, $fact) && PrivacyFunctions::showFact("DEAT", $fam->wife->xref, "INDI") && PrivacyFunctions::showFactDetails("DEAT", $fam->wife->xref)) {
 						if (CompareFacts($this->GetBirthDate(), $fam->wife->GetDeathDate())<0 && CompareFacts($fam->wife->GetDeathDate(), $this->GetDeathDate())<0) {
 							$factrec = "1 ".$fact;
 							$factrec .= "\n".trim($fam->wife->GetDeathDate());
@@ -515,7 +522,7 @@ if ($this->tracefacts) print "AddFamilyFacts - Adding for ".$fam->xref.": ".$fac
 						$fact="_MARR_MOTH";
 						$rela="mother";
 					}
-					if (strstr($SHOW_RELATIVES_EVENTS, $fact) && is_object($parent) && PrivacyFunctions::showFact("MARR", $fam->xref, "FAM") && PrivacyFunctions::showFactDetails("MARR", $fam->xref)) {
+					if (strstr(GedcomConfig::$SHOW_RELATIVES_EVENTS, $fact) && is_object($parent) && PrivacyFunctions::showFact("MARR", $fam->xref, "FAM") && PrivacyFunctions::showFactDetails("MARR", $fam->xref)) {
 						$parent->GetSpouseFamilies();
 						foreach ($parent->spousefamilies as $indexval => $psfam) {
 							if ($psfam->xref == $fam->xref and $rela=="mother") continue; // show current family marriage only for father
@@ -558,9 +565,9 @@ if ($this->tracefacts) print "AddParentsFacts sosa ".$sosa."- Adding for ".$fam-
 	 * @return records added to indifacts array
 	 */
 	private function AddChildrenFacts($fam, $option="", $except="") {
-		global $SHOW_RELATIVES_EVENTS, $gm_lang;
+		global $gm_lang;
 
-		if (!$SHOW_RELATIVES_EVENTS) return;
+		if (!GedcomConfig::$SHOW_RELATIVES_EVENTS) return;
 		if (!$fam->DisplayDetails()) return;
 		
 		foreach($fam->children as $key => $child) {
@@ -609,7 +616,7 @@ if ($this->tracefacts) print "AddParentsFacts sosa ".$sosa."- Adding for ".$fam-
 				if ($option=="1") $fact = "_BIRT_SIBL";
 				if ($option=="2") $fact = "_BIRT_FSIB";
 				if ($option=="3") $fact = "_BIRT_MSIB";
-				if (strstr($SHOW_RELATIVES_EVENTS, $fact) && PrivacyFunctions::showFact("BIRT", $child->xref, "INDI") && PrivacyFunctions::showFactDetails("BIRT", $child->xref)) {
+				if (strstr(GedcomConfig::$SHOW_RELATIVES_EVENTS, $fact) && PrivacyFunctions::showFact("BIRT", $child->xref, "INDI") && PrivacyFunctions::showFactDetails("BIRT", $child->xref)) {
 					if (CompareFacts($this->GetBirthDate(), $child->GetBirthDate()) < 0 && CompareFacts($child->GetBirthDate(), $this->GetDeathDate()) < 0) {
 						$factrec = "1 ".$fact;
 						$factrec .= "\n".trim($child->bdate);
@@ -628,7 +635,7 @@ if ($this->tracefacts) print "AddChildrenFacts (".$option.") - Adding for ".$chi
 				if ($option=="1") $fact = "_DEAT_SIBL";
 				if ($option=="2") $fact = "_DEAT_FSIB";
 				if ($option=="3") $fact = "_DEAT_MSIB";
-				if (strstr($SHOW_RELATIVES_EVENTS, $fact) && PrivacyFunctions::showFact("DEAT", $child->xref, "INDI") && PrivacyFunctions::showFactDetails("DEAT", $child->xref)) {
+				if (strstr(GedcomConfig::$SHOW_RELATIVES_EVENTS, $fact) && PrivacyFunctions::showFact("DEAT", $child->xref, "INDI") && PrivacyFunctions::showFactDetails("DEAT", $child->xref)) {
 					if (CompareFacts($this->GetBirthDate(), $child->GetDeathDate())<0 && CompareFacts($child->GetDeathDate(), $this->GetDeathDate()) < 0) {
 						$factrec = "1 ".$fact;
 						$factrec .= "\n".trim($child->ddate);
@@ -647,7 +654,7 @@ if ($this->tracefacts) print "AddChildrenFacts (".$option.") - Adding for ".$chi
 				if ($option=="2") $fact = "_MARR_FSIB";
 				if ($option=="3") $fact = "_MARR_MSIB";
 				
-				if (strstr($SHOW_RELATIVES_EVENTS, $fact)) {
+				if (strstr(GedcomConfig::$SHOW_RELATIVES_EVENTS, $fact)) {
 					$child->GetSpouseFamilies();
 					foreach($child->spousefamilies as $key => $childfam) {
 						if ($childfam->disp && PrivacyFunctions::showFact("MARR", $childfam->xref, "FAM") && PrivacyFunctions::showFactDetails("MARR", $childfam->xref)) {
@@ -710,13 +717,12 @@ if ($this->tracefacts) print "AddChildrenFacts (".$option.") - Adding for ".$chi
 	 * @return records added to indifacts array
 	 */
 	private function AddSpouseFacts($fam, $spperson) {
-		global $SHOW_RELATIVES_EVENTS;
 
 		// do not show if divorced
 		if (strstr($fam->gedrec, "1 DIV")) return;
 		// add spouse death
 		$fact = "_DEAT_SPOU";
-		if (strstr($SHOW_RELATIVES_EVENTS, $fact) && PrivacyFunctions::showFact("DEAT", $fam->$spperson->xref, "INDI") && PrivacyFunctions::showFactDetails("DEAT", $fam->$spperson->xref)) {
+		if (strstr(GedcomConfig::$SHOW_RELATIVES_EVENTS, $fact) && PrivacyFunctions::showFact("DEAT", $fam->$spperson->xref, "INDI") && PrivacyFunctions::showFactDetails("DEAT", $fam->$spperson->xref)) {
 			if (CompareFacts($this->GetBirthDate(), $fam->$spperson->GetDeathDate())<0 and CompareFacts($fam->$spperson->GetDeathDate(), $this->GetDeathDate())<0) {
 				$factrec = "1 ".$fact;
 				$factrec .= "\n".trim($fam->$spperson->ddate);
@@ -758,9 +764,8 @@ if ($this->tracefacts) print "AddSpouseFacts - Adding for ".$fam->$spperson->xre
 	 */
 	private function AddHistoricalFacts() {
 		global $GM_BASE_DIRECTORY, $LANGUAGE, $lang_short_cut;
-		global $SHOW_RELATIVES_EVENTS;
 		
-		if (!$SHOW_RELATIVES_EVENTS) return;
+		if (!GedcomConfig::$SHOW_RELATIVES_EVENTS) return;
 		if (empty($this->bdate)) return;
 		
 		$histo=array();
@@ -1374,7 +1379,7 @@ if ($this->tracefacts) print "AddSpouseFacts - Adding for ".$fam->$spperson->xre
 	 * @return string the age in a string
 	 */
 	public function GetAge($datestr, $style=1) {
-		global $gm_lang, $monthtonum, $USE_RTL_FUNCTIONS;
+		global $gm_lang, $monthtonum;
 		
 		$estimates = array("abt","aft","bef","est","cir");
 		$realbirthdt="";
@@ -1388,7 +1393,7 @@ if ($this->tracefacts) print "AddSpouseFacts - Adding for ".$fam->$spperson->xre
 		if ($hct>0) {
 			$dct = preg_match("/2 DATE (.+)/", $birthrec, $match);
 			$hebrew_birthdate = ParseDate(trim($match[1]));
-			if ($USE_RTL_FUNCTIONS && $index==1) $birthdate = JewishGedcomDateToGregorian($hebrew_birthdate);
+			if (GedcomConfig::$USE_RTL_FUNCTIONS && $index==1) $birthdate = JewishGedcomDateToGregorian($hebrew_birthdate);
 		}
 		else {
 			$dct = preg_match("/2 DATE (.+)/", $birthrec, $match);
@@ -1398,7 +1403,7 @@ if ($this->tracefacts) print "AddSpouseFacts - Adding for ".$fam->$spperson->xre
 		$convert_hebrew = false;
 		//-- check if it is a hebrew date
 		$hct = preg_match("/@#DHEBREW@/", $datestr, $match);
-		if ($USE_RTL_FUNCTIONS && $hct>0) {
+		if (GedcomConfig::$USE_RTL_FUNCTIONS && $hct>0) {
 			if (isset($hebrew_birthdate)) $birthdate = $hebrew_birthdate;
 			else $convert_hebrew = true;
 		}
@@ -1535,9 +1540,9 @@ if ($this->tracefacts) print "AddSpouseFacts - Adding for ".$fam->$spperson->xre
 	 * @param string $bdate	child birthdate
 	 */
 	public function PrintParentsAge($date) {
-		global $gm_lang, $SHOW_PARENTS_AGE, $GM_IMAGE_DIR, $GM_IMAGES;
+		global $gm_lang, $GM_IMAGES;
 		
-		if ($SHOW_PARENTS_AGE) {
+		if (GedcomConfig::$SHOW_PARENTS_AGE) {
 			$childfam =& Family::GetInstance($this->GetPrimaryChildFamily());
 			if (is_object($childfam)) {
 				$father_text = "";
@@ -1545,12 +1550,12 @@ if ($this->tracefacts) print "AddSpouseFacts - Adding for ".$fam->$spperson->xre
 				// father
 				if (is_object($childfam->husb)) {
 					$age = ConvertNumber($childfam->husb->GetAge($date, false));
-					if (10<$age && $age<80) $father_text = "<img src=\"$GM_IMAGE_DIR/" . $GM_IMAGES["sex"]["small"] . "\" title=\"" . $gm_lang["father"] . "\" alt=\"" . $gm_lang["father"] . "\" class=\"sex_image\" />".$age;
+					if (10<$age && $age<80) $father_text = "<img src=\"".GM_IMAGE_DIR."/" . $GM_IMAGES["sex"]["small"] . "\" title=\"" . $gm_lang["father"] . "\" alt=\"" . $gm_lang["father"] . "\" class=\"sex_image\" />".$age;
 				}
 				// mother
 				if (is_object($childfam->wife)) {
 					$age = ConvertNumber($childfam->wife->GetAge($date, false));
-					if (10<$age && $age<80) $mother_text = "<img src=\"$GM_IMAGE_DIR/" . $GM_IMAGES["sexf"]["small"] . "\" title=\"" . $gm_lang["mother"] . "\" alt=\"" . $gm_lang["mother"] . "\" class=\"sex_image\" />".$age;
+					if (10<$age && $age<80) $mother_text = "<img src=\"".GM_IMAGE_DIR."/" . $GM_IMAGES["sexf"]["small"] . "\" title=\"" . $gm_lang["mother"] . "\" alt=\"" . $gm_lang["mother"] . "\" class=\"sex_image\" />".$age;
 				}
 				if ((!empty($father_text)) || (!empty($mother_text))) print "<span class=\"age\">".$father_text.$mother_text."</span>";
 			}

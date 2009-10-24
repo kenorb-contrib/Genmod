@@ -42,7 +42,7 @@ require("includes/functions/functions_rss.php");
 */
 require("config.php");
 if (empty($rssStyle)){
-	$rssStyle=$RSS_FORMAT;
+	$rssStyle = GedcomConfig::$RSS_FORMAT;
 }
 if (empty($rssStyle) || ($rssStyle != "HTML" && $rssStyle != "JS" && $rssStyle != "MBOX")) {
 	header("Content-Type: application/xml; charset=utf-8");
@@ -52,7 +52,7 @@ if (empty($rssStyle) || ($rssStyle != "HTML" && $rssStyle != "JS" && $rssStyle !
 
 if (!isset($_SERVER['QUERY_STRING'])) $_SERVER['QUERY_STRING'] = "lang=".$LANGUAGE;
 
-$user =& User::GetInstance($CONTACT_EMAIL);
+$user =& User::GetInstance(GedcomConfig::$CONTACT_EMAIL);
 $author =$user->firstname." ".$user->lastname;
 
 $rss = new UniversalFeedCreator();

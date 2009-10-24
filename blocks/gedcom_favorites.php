@@ -33,7 +33,7 @@ $GM_BLOCKS["print_gedcom_favorites"]["rss"]				= false;
 
 //-- print gedcom favorites
 function print_gedcom_favorites($block = true, $config="", $side, $index) {
-	global $gm_lang, $GM_IMAGE_DIR, $GM_IMAGES, $command, $sourcelist, $TEXT_DIRECTION, $GEDCOMID;
+	global $gm_lang, $GM_IMAGES, $command, $sourcelist, $TEXT_DIRECTION, $GEDCOMID;
 	global $gm_user;
 	
 	$userfavs = FavoritesController::getGedcomFavorites($GEDCOMID);

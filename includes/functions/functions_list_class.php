@@ -68,6 +68,7 @@ abstract class ListFunctions {
 		$key = "";
 		while($row = $res->FetchAssoc($res->result)){
 			if ($key != $row["i_key"]) {
+				if ($key != "") $person->names_read = true;
 				$person = null;
 				$key = $row["i_key"];
 				$person =& Person::GetInstance($row["i_id"], $row);
@@ -81,6 +82,7 @@ abstract class ListFunctions {
 			}
 			if ($person->disp_name || !$applypriv) $indilist[$row["i_key"]]->addname = array($row["n_name"], $row["n_letter"], $row["n_surname"], $row["n_type"]);
 		}
+		if ($key != "") $person->names_read = true;
 		$res->FreeResult();
 		// print "Indis generated: ".count($indilist)."<br />";
 		return $indilist;
@@ -98,7 +100,7 @@ abstract class ListFunctions {
 	 * @param		string		$page		The page the links should point to
 	 */
 	public function PrintSurnameList($surnames, $page, $allgeds="no", $resturl="") {
-		global $TEXT_DIRECTION, $gm_lang, $SHOW_MARRIED_NAMES;
+		global $TEXT_DIRECTION, $gm_lang;
 		global $surname_sublist, $indilist;
 		
 		if (stristr($page, "aliveinyear")) {
@@ -157,7 +159,7 @@ abstract class ListFunctions {
 		print "</td>\n";
 		if ($count>1 || count(self::$indi_hide)>0) {
 			print "</tr><tr><td colspan=\"$col\" class=\"center\">&nbsp;";
-			if ($SHOW_MARRIED_NAMES && $count>1) print $gm_lang["total_names"]." ".$count_indi."<br />";
+			if (GedcomConfig::$SHOW_MARRIED_NAMES && $count>1) print $gm_lang["total_names"]." ".$count_indi."<br />";
 			if (isset($indi_total) && $count>1) print $gm_lang["total_indis"]." ".$indi_total."&nbsp;";
 			if ($count>1 && count(self::$indi_hide)>0) print "--&nbsp;";
 			if (count(self::$indi_hide)>0) print $gm_lang["hidden"]." ".count(self::$indi_hide);

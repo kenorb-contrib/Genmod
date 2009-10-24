@@ -32,17 +32,17 @@
 */
 require("config.php");
 
-global $gm_lang, $GM_USE_HELPIMG, $GM_IMAGES, $GM_IMAGE_DIR, $TEXT_DIRECTION;
+global $gm_lang, $GM_IMAGES, $TEXT_DIRECTION;
 global $GEDCOM_TITLE;
 
 
 //-- make sure that they have user status before they can use this page
 //-- otherwise have them login again
 if (empty($gm_user->username) || empty($name)) {
-	print_simple_header("");
+	PrintSimpleHeader("");
 	print $gm_lang["access_denied"];
 	print "<div class=\"center\"><a href=\"javascript:// ".$gm_lang["close_window"]."\" onclick=\"self.close();\">".$gm_lang["close_window"]."</a></div>\n";
-	print_simple_footer();
+	PrintSimpleFooter();
 	exit;
 }
 if (!$gm_user->userIsAdmin()) $setdefault=false;
@@ -57,15 +57,15 @@ if (!isset($index)) $index=1;
 
 // Define all the icons we're going to use
 $IconHelp = $gm_lang["qm"];
-if ($GM_USE_HELPIMG) {
-	$IconHelp = "<img src=\"".$GM_IMAGE_DIR."/".$GM_IMAGES["help"]["small"]."\" class=\"icon\" width=\"15\" height=\"15\" alt=\"\" />";
+if (GM_USE_HELPIMG) {
+	$IconHelp = "<img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["help"]["small"]."\" class=\"icon\" width=\"15\" height=\"15\" alt=\"\" />";
 }
-$IconUarrow = "<img src=\"".$GM_IMAGE_DIR."/".$GM_IMAGES["uarrow"]["other"]."\" width=\"20\" height=\"20\" alt=\"\" />";
-$IconDarrow = "<img src=\"".$GM_IMAGE_DIR."/".$GM_IMAGES["darrow"]["other"]."\" width=\"20\" height=\"20\" alt=\"\" />";
-$IconRarrow = "<img src=\"".$GM_IMAGE_DIR."/".$GM_IMAGES["rarrow"]["other"]."\" width=\"20\" height=\"20\" alt=\"\" />";
-$IconLarrow = "<img src=\"".$GM_IMAGE_DIR."/".$GM_IMAGES["larrow"]["other"]."\" width=\"20\" height=\"20\" alt=\"\" />";
-$IconRDarrow = "<img src=\"".$GM_IMAGE_DIR."/".$GM_IMAGES["rdarrow"]["other"]."\" width=\"20\" height=\"20\" alt=\"\" />";
-$IconLDarrow = "<img src=\"".$GM_IMAGE_DIR."/".$GM_IMAGES["ldarrow"]["other"]."\" width=\"20\" height=\"20\" alt=\"\" />";
+$IconUarrow = "<img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["uarrow"]["other"]."\" width=\"20\" height=\"20\" alt=\"\" />";
+$IconDarrow = "<img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["darrow"]["other"]."\" width=\"20\" height=\"20\" alt=\"\" />";
+$IconRarrow = "<img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["rarrow"]["other"]."\" width=\"20\" height=\"20\" alt=\"\" />";
+$IconLarrow = "<img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["larrow"]["other"]."\" width=\"20\" height=\"20\" alt=\"\" />";
+$IconRDarrow = "<img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["rdarrow"]["other"]."\" width=\"20\" height=\"20\" alt=\"\" />";
+$IconLDarrow = "<img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["ldarrow"]["other"]."\" width=\"20\" height=\"20\" alt=\"\" />";
 
 /**
  * Block definition array
@@ -129,8 +129,8 @@ $SortedBlocks = array_flip($SortedBlocks);
 if ($command=="user") $ublocks = new Blocks("user", $gm_user->username, $action);
 else $ublocks = new Blocks("gedcom", "", $action);
 
-if ($command=="user") print_simple_header($gm_lang["mygedview"]);
-else print_simple_header($GEDCOMS[$GEDCOMID]["title"]);
+if ($command=="user") PrintSimpleHeader($gm_lang["mygedview"]);
+else PrintSimpleHeader($GEDCOMS[$GEDCOMID]["title"]);
 
 $GEDCOM_TITLE = PrintReady($GEDCOMS[$GEDCOMID]["title"]);  // needed in $gm_lang["rss_descr"]
 
@@ -234,7 +234,7 @@ if ($action == "storefav") {
 	else {
 		print "<span class=\"error\">".$gm_lang["favorite_not_stored"]."</span>";
 		print "<div class=\"center\"><a href=\"javascript:// ".$gm_lang["close_window"]."\" onclick=\"self.close();\">".$gm_lang["close_window"]."</a></div>\n";
-		print_footer();
+		PrintFooter();
 		exit;
 	}
 }
