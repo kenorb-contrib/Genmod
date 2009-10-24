@@ -63,8 +63,9 @@ abstract class NameFunctions {
 		global $gm_lang;
 		
 		if (is_object($family->husb)) {
-			if ($family->husb->disp_name)
+			if ($family->husb->disp_name) {
 				$hname = self::GetSortableAddName($family->husb, $rev, $changes);
+			}
 			else $hname = $gm_lang["private"];
 		}
 		else {
@@ -72,18 +73,19 @@ abstract class NameFunctions {
 			else $hname = "@N.N., @P.N.";
 		}
 		if (is_object($family->wife)) {
-			if ($family->wife->disp_name)
+			if ($family->wife->disp_name) {
 				$wname = self::GetSortableAddName($family->wife, $rev, $changes);
+			}
 			else $wname = $gm_lang["private"];
 		}
 		else {
 			if ($rev) $wname = "@P.N. @N.N.";
 			else $wname = "@N.N., @P.N.";
 		}
-	
+
 		if (!empty($hname) && !empty($wname)) return CheckNN($hname)." + ".CheckNN($wname);
-		else if (!empty($hname) && empty($wname)) return CheckNN($hname);
-		else if (empty($hname) && !empty($wname)) return CheckNN($wname);
+		else if (!empty($hname) && empty($wname)) return CheckNN($hname)." + ".CheckNN(self::GetSortableName($family->wife, "", "", false, $rev, $changes));
+		else if (empty($hname) && !empty($wname)) return CheckNN(self::GetSortableName($family->husb, "", "", false, $rev, $changes))." + ".CheckNN($wname);
 	}
 		
 	/**
@@ -118,33 +120,33 @@ abstract class NameFunctions {
 		}
 	
 		$names = $person->name_array;
-		
+	
 		if ($allnames == true) {
 			$mynames = array();
 			foreach ($names as $key => $name) {
-				if ($NAME_REVERSE) $mynames[] = SortableNameFromName(ReverseName($name[0]), $rev);
-				else $mynames[] = SortableNameFromName($name[0], $rev);
+				if ($NAME_REVERSE) $mynames[] = self::SortableNameFromName(self::ReverseName($name[0]), $rev);
+				else $mynames[] = self::SortableNameFromName($name[0], $rev);
 			}
 			return $mynames;
 		}
 		foreach($names as $indexval => $name) {
 			if ($surname!="" && $name[2]==$surname) {
-				if ($NAME_REVERSE) return SortableNameFromName(ReverseName($name[0]), $rev);
-				else return SortableNameFromName($name[0], $rev);
+				if ($NAME_REVERSE) return self::SortableNameFromName(self::ReverseName($name[0]), $rev);
+				else return self::SortableNameFromName($name[0], $rev);
 			}
 			else if ($alpha!="" && $name[1]==$alpha) {
-				if ($NAME_REVERSE) return SortableNameFromName(ReverseName($name[0]), $rev);
-				else return SortableNameFromName($name[0], $rev);
+				if ($NAME_REVERSE) return self::SortableNameFromName(self::ReverseName($name[0]), $rev);
+				else return self::SortableNameFromName($name[0], $rev);
 			}
 		}
-		if ($NAME_REVERSE) return SortableNameFromName(ReverseName($names[0][0]), $rev);
-		else return SortableNameFromName($names[0][0], $rev);
+		if ($NAME_REVERSE) return self::SortableNameFromName(self::ReverseName($names[0][0]), $rev);
+		else return self::SortableNameFromName($names[0][0], $rev);
 	}
 	
 	// -- find and return a given individual's second name in sort format: familyname, firstname
 	public function GetSortableAddName($person, $rev = false, $changes = false) {
 		global $NAME_REVERSE;
-		global $NAME_FROM_GEDCOM, $GEDCOMID;
+		global $GEDCOMID;
 	
 		//-- get the name from the indexes
 		if ($changes) $record = $person->changedgedrec;
@@ -155,7 +157,7 @@ abstract class NameFunctions {
 		// Check for ROMN name
 		$romn = preg_match("/(2 ROMN (.*)|2 _HEB (.*))/", $name_record, $romn_match);
 		if ($romn == 0) {
-			$orgname = GetNameInRecord($name_record);
+			$orgname = self::GetNameInRecord($name_record);
 			if (HasChinese($orgname)){
 				$romn_match[0] = GetPinYin($orgname);
 				$romn = 1;
@@ -183,6 +185,159 @@ abstract class NameFunctions {
 	
 	//	else $name = GetSortableName($pid, "", "", false, $rev, $changes);
 	
+		return $name;
+	}
+	/**
+	 * Get the name from the raw gedcom record
+	 *
+	 * @param string $indirec the raw gedcom record to get the name from
+	 */
+	public function GetNameInRecord($indirec, $import=false) {
+		
+		$name = "";
+		$nt = preg_match("/1 NAME (.*)/", $indirec, $ntmatch);
+		if ($nt>0) {
+			$name = trim($ntmatch[1]);
+			$name = preg_replace(array("/__+/", "/\.\.+/", "/^\?+/"), array("", "", ""), $name);
+	
+			//-- check for a surname
+			$ct = preg_match("~/(.*)/~", $name, $match);
+			if ($ct > 0) {
+				$surname = trim($match[1]);
+				$surname = preg_replace(array("/__+/", "/\.\.+/", "/^\?+/"), array("", "", ""), $surname);
+				if (empty($surname)) $name = preg_replace("~/(.*)/~", "/@N.N./", $name);
+			}
+			else {
+				//-- check for the surname SURN tag
+				$ct = preg_match("/2 SURN (.*)/", $indirec, $match);
+				if ($ct>0) {
+					$pt = preg_match("/2 SPFX (.*)/", $indirec, $pmatch);
+					if ($pt>0) $name .=" ".trim($pmatch[1]);
+					$surname = trim($match[1]);
+					$surname = preg_replace(array("/__+/", "/\.\.+/", "/^\?+/"), array("", "", ""), $surname);
+					if (empty($surname)) $name .= " /@N.N./";
+					else $name .= " /".$surname."/";
+				}
+				else $name .= " /@N.N./";
+			}
+			
+			$givens = preg_replace("~/.*/~", "", $name);
+			if (empty($givens)) $name = "@P.N. ".$name;
+		}
+		else {
+			/*-- this is all extraneous to the 1 NAME tag and according to the gedcom spec
+			-- the 1 NAME tag should take preference
+			*/
+			$name = "";
+			//-- check for the given names
+			$gt = preg_match("/2 GIVN (.*)/", $indirec, $gmatch);
+			if ($gt>0) $name .= trim($gmatch[1]);
+			else $name .= "@P.N.";
+	
+			//-- check for the surname
+			$ct = preg_match("/2 SURN (.*)/", $indirec, $match);
+			if ($ct>0) {
+				$pt = preg_match("/2 SPFX (.*)/", $indirec, $pmatch);
+				if ($pt>0) $name .=" ".trim($pmatch[1]);
+				$surname = trim($match[1]);
+				if (empty($surname)) $name .= " /@N.N./";
+				else $name .= " /".$surname."/";
+			}
+			if (empty($name)) $name = "@P.N. /@N.N./";
+	
+			$st = preg_match("/2 NSFX (.*)/", $indirec, $smatch);
+			if ($st>0) $name.=" ".trim($smatch[1]);
+			$pt = preg_match("/2 SPFX (.*)/", $indirec, $pmatch);
+			if ($pt>0) $name =strtolower(trim($pmatch[1]))." ".$name;
+		}
+		// handle PAF extra NPFX [ 961860 ]
+		$ct = preg_match("/2 NPFX (.*)/", $indirec, $match);
+		if ($ct>0) {
+			$npfx = trim($match[1]);
+			if (strpos($name, $npfx)===false) $name = $npfx." ".$name;
+		}
+		// Insert the nickname if the option is set
+		if (GedcomConfig::$SHOW_NICK && !$import) {
+			$n = GetNicks($indirec);
+			if (count($n) > 0) {
+				$ct = preg_match("~(.*)/(.*)/(.*)~", $name, $match);
+				$name = $match[1].substr(GedcomConfig::$NICK_DELIM, 0, 1).$n[0].substr(GedcomConfig::$NICK_DELIM, 1, 1)."/".$match[2]."/".$match[3];
+			}
+		}
+		return $name;
+	}
+	
+	/**
+	 * Get the sortable name from the gedcom name
+	 *
+	 * @param string $name 	the name from the 1 NAME gedcom line including the /
+	 * @return string 	The new name in the form Surname, Given Names
+	 */
+	public function SortableNameFromName($name, $rev = false) {
+		global $NAME_REVERSE;
+	
+		// NOTE: Remove any unwanted characters from the name
+		if (preg_match("/^\.(\.*)$|^\?(\?*)$|^_(_*)$|^,(,*)$/", $name)) $name = preg_replace(array("/,/","/\./","/_/","/\?/"), array("","","",""), $name);
+	
+		$ct = preg_match("~(.*)/(.*)/(.*)~", $name, $match);
+		if ($ct>0) {
+			$surname = trim($match[2]);
+			if (empty($surname)) $surname = "@N.N.";
+			$givenname = trim($match[1]);
+			$othername = trim($match[3]);
+			if (HasChinese($name, true)) $add = "";
+			else $add = " ";
+			if (empty($givenname)&&!empty($othername)) {
+				$givenname = $othername;
+				$othername = "";
+			}
+			if ($rev) {
+				if (empty($givenname)) $givenname = "@P.N.";
+				if ($NAME_REVERSE || HasChinese($name, true)) $name = $surname.$add.$givenname;
+				else $name = $givenname.$add.$surname;
+				if (!empty($othername)) $name .= $add.$othername;
+			}
+			else {
+				if (empty($givenname)) $givenname = "@P.N.";
+				$name = $surname;
+				if (!empty($othername)) $name .= $add.$othername;
+				if ($NAME_REVERSE || HasChinese($name, true)) $name .= $add.$givenname;
+				else $name .= ", ".$givenname;
+			}
+		}
+		if (!empty($name)) return $name;
+		else {
+			if ($rev) return "@P.N. @N.N.";
+			else return "@N.N., @P.N.";
+		}
+	}
+	
+	/**
+	 * reverse a name
+	 * this function will reverse a name for languages that
+	 * prefer last name first such as hungarian and chinese
+	 * @param string $name	the name to reverse, must be gedcom encoded as if from the 1 NAME line
+	 * @return string		the reversed name
+	 */
+	public function ReverseName($name) {
+		$ct = preg_match("~(.*)/(.*)/(.*)~", $name, $match);
+		if ($ct>0) {
+			if (HasChinese($name, true)) $add = "";
+			else $add = " ";
+			$surname = trim($match[2]);
+			if (empty($surname)) $surname = "@N.N.";
+			$givenname = trim($match[1]);
+			$othername = trim($match[3]);
+			if (empty($givenname)&&!empty($othername)) {
+				$givenname = $othername;
+				$othername = "";
+			}
+			if (empty($givenname)) $givenname = "@P.N.";
+			$name = $surname;
+			$name .= $add.$givenname;
+			if (!empty($othername)) $name .= $add.$othername;
+		}
+		
 		return $name;
 	}
 	

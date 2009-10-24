@@ -35,7 +35,6 @@ if (stristr($_SERVER["SCRIPT_NAME"],basename(__FILE__))) {
 class ListController extends BaseController {
 	
 	public $classname = "ListController";	// Name of this class
-	protected $pagetitle = null;			// Page title to show in the browser top line
 	
 	public function __construct() {
 		
@@ -44,9 +43,6 @@ class ListController extends BaseController {
 
 	public function __get($property) {
 		switch($property) {
-			case "pagetitle":
-				return $this->GetPageTitle();
-				break;
 			default:
 				return parent::__get($property);
 				break;

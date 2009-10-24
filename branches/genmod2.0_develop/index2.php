@@ -43,14 +43,14 @@ else $genmod['task'] = '';
 
 // Check if we have a gedcom to work with
 $genmod['gedcomid'] = $GEDCOMID;
-$genmod['gedcomname'] = get_gedcom_from_id($GEDCOM);
+$genmod['gedcomname'] = get_gedcom_from_id($GEDCOMID);
 
 // Get some general settings
 $genmod['index_directory'] = INDEX_DIRECTORY;
 $genmod['text_direction'] = $TEXT_DIRECTION;
 $genmod['version'] = GM_VERSION;
 $genmod['version_release'] = GM_VERSION_RELEASE;
-$genmod['character_set'] = $CHARACTER_SET;
+$genmod['character_set'] = GedcomConfig::$CHARACTER_SET;
 $genmod['gedcoms'] = $GEDCOMS;
 $genmod['language'] = $LANGUAGE;
 $genmod['gm_base_directory'] = $GM_BASE_DIRECTORY;
@@ -61,7 +61,7 @@ $genmod['gm_lang'] = $gm_lang;
 $genmod['tblprefix'] = TBLPREFIX;
 $genmod['factarray'] = $factarray;
 $genmod['gm_images'] = $GM_IMAGES;
-$genmod['gm_image_dir'] = $GM_IMAGE_DIR;
+$genmod['gm_image_dir'] = GM_IMAGE_DIR;
 
 // Start collecting output
 ob_start();

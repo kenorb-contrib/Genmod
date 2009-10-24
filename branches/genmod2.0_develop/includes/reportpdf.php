@@ -1599,9 +1599,8 @@ function GMRTextEHandler() {
 
 function GMRGetPersonNameSHandler($attrs) {
 	global $currentElement, $vars, $gedrec, $gedrecStack, $gm_lang;
-	global $SHOW_ID_NUMBERS, $NICK_DELIM, $SHOW_NICK;
-
-	$showIndID = $SHOW_ID_NUMBERS; // false, 0, "0", NOT "false"
+.
+	$showIndID = GedcomConfig::$SHOW_ID_NUMBERS; // false, 0, "0", NOT "false"
 	if (isset($vars["showIndID"]["id"])) $showIndID = $vars["showIndID"]["id"];
 	if ($showIndID) { // can override showing
 		if (isset($attrs["hideID"])) {
@@ -1654,7 +1653,7 @@ function GMRGetPersonNameSHandler($attrs) {
 					//$name = preg_replace("/\(.*\) ?/", "", $name);
 					// remove nickname if exists
 					// BEWARE this is reversed engineering. Could cause problems depending on what the admin set as delimiters.
-					if ($SHOW_NICK) $name = preg_replace("/".substr($NICK_DELIM, 0, 1).".*".substr($NICK_DELIM, 1, 1)." ?/", "", $name);
+					if (GedcomConfig::$SHOW_NICK) $name = preg_replace("/".substr(GedcomConfig::$NICK_DELIM, 0, 1).".*".substr(GedcomConfig::$NICK_DELIM, 1, 1)." ?/", "", $name);
 				}
 				if (strlen($name)>$attrs["truncate"]) {
 					$name = AbbreviateName($name, $attrs["truncate"]);
@@ -1668,7 +1667,7 @@ function GMRGetPersonNameSHandler($attrs) {
 
 function GMRGedcomValueSHandler($attrs) {
 	global $currentElement, $vars, $gedrec, $gedrecStack, $fact, $desc, $type;
-	global $SHOW_PEDIGREE_PLACES, $gm_lang, $debug;
+	global $gm_lang, $debug;
 
 	$id = "";
 	$gt = preg_match("/0 @(.+)@/", $gedrec, $gmatch);
@@ -2175,8 +2174,7 @@ function GMRSetVarSHandler($attrs) {
 }
 
 function GMRifSHandler($attrs) {
-	global $vars, $gedrec, $processIfs, $fact, $desc, $generation, $POSTAL_CODE;
-	global $SHOW_ID_NUMBERS, $SHOW_FAM_ID_NUMBERS;
+	global $vars, $gedrec, $processIfs, $fact, $desc, $generation;
 
 	$debug = false;
 	if ($processIfs>0) {
@@ -2184,7 +2182,7 @@ function GMRifSHandler($attrs) {
 		return;
 	}
 	if ($debug) print "Init fact: ".$fact." desc: ".$desc."<br />";
-	$vars['POSTAL_CODE']['id'] = $POSTAL_CODE;
+	$vars['POSTAL_CODE']['id'] = GedcomConfig::$POSTAL_CODE;
 	$conditions = preg_split("/\s[OR|or]\s/",$attrs["condition"]);
 	$final_condition = "";
 	$count = 1;
@@ -2211,10 +2209,10 @@ function GMRifSHandler($attrs) {
 				$value = "'$generation'";
 				break;
 			case "SHOW_ID_NUMBERS":
-				$value = "'$SHOW_ID_NUMBERS'";
+				$value = "'".GedcomConfig::$SHOW_ID_NUMBERS."'";
 				break;
 	                case "SHOW_FAM_ID_NUMBERS":
-	                        $value = "'$SHOW_FAM_ID_NUMBERS'";
+	                        $value = "'".GedcomConfig::$SHOW_FAM_ID_NUMBERS."'";
 				break;
 			default:
 				$temp = preg_split("/\s+/", trim($gedrec));
@@ -2332,7 +2330,7 @@ function GMRHighlightedImageSHandler($attrs) {
 }
 
 function GMRImageSHandler($attrs) {
-	global $gedrec, $gmreport, $MEDIA_DIRECTORY;
+	global $gedrec, $gmreport;
 
 	$id = "";
 	$gt = preg_match("/0 @(.+)@/", $gedrec, $gmatch);
@@ -2358,7 +2356,7 @@ function GMRImageSHandler($attrs) {
 			$fullpath = ExtractFullpath($orec);
 			$filename = "";
 			$filename = ExtractFilename($fullpath);
-			$filename = $MEDIA_DIRECTORY.$filename;
+			$filename = GedcomConfig::$MEDIA_DIRECTORY.$filename;
 			$filename = trim($filename);
 			if (!empty($filename)) {
 				if (preg_match("/(jpg)|(jpeg)|(png)$/i", $filename)>0) {

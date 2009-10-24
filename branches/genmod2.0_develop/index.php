@@ -73,7 +73,7 @@ else $time = time();
 $day = date("j", $time);
 $month = date("M", $time);
 $year = date("Y", $time);
-if ($USE_RTL_FUNCTIONS) {
+if (GedcomConfig::$USE_RTL_FUNCTIONS) {
 	//-------> Today's Hebrew Day with Gedcom Month
 	$datearray = array();
  	$datearray[0]["day"]   = $day;
@@ -177,10 +177,10 @@ else $ublocks = new Blocks("gedcom", "", $action);
 
 if ($command=="user") {
 	$helpindex = "index_myged_help";
-	print_header($gm_lang["mygedview"]);
+	PrintHeader($gm_lang["mygedview"]);
 }
 else {
-	print_header("");
+	PrintHeader("");
 }
 ?>
 <script language="JavaScript" type="text/javascript">
@@ -252,5 +252,5 @@ if (($command=="gedcom") and (!$ublocks->gedcom_block_present)) {
 	}
 }
 
-print_footer();
+PrintFooter();
 ?>

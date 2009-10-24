@@ -35,7 +35,7 @@ abstract class MediaFS {
 	public static $fdetails = array();
 	
 	public function GetMediaDirList($directory="", $all=true, $level=1, $checkwrite=true, $incthumbdir=false, $dbmode="unset") {
-		global $MEDIA_DIRECTORY_LEVELS, $MEDIA_DIRECTORY, $MEDIA_IN_DB;
+		global $MEDIA_IN_DB;
 		
 		if ($dbmode == "unset") $dbmode = $MEDIA_IN_DB;
 // print "Dir in dirlist: ".$directory."<br />";
@@ -60,7 +60,7 @@ abstract class MediaFS {
 				$base = "";
 				foreach ($folders as $level => $foldername) {
 //					print $foldername."<br />";
-					if ($level <= $MEDIA_DIRECTORY_LEVELS && !empty($foldername)) {
+					if ($level <= GedcomConfig::$MEDIA_DIRECTORY_LEVELS && !empty($foldername)) {
 						$base = $base.$foldername."/";
 						if (($all || $level == $thislevel) && !in_array($base, $dirs)) $dirs[] = $base;
 					}
@@ -68,11 +68,11 @@ abstract class MediaFS {
 			}
 		}
 		else {
-			if (empty($directory)) $directory = $MEDIA_DIRECTORY;
+			if (empty($directory)) $directory = GedcomConfig::$MEDIA_DIRECTORY;
 			//print "Getting : ".$directory."<br />";
 			$canwrite = true;
 			$exclude_dirs = array(INDEX_DIRECTORY, "./languages/", "./fonts/", "./hooks/", "./images/", "./includes", "./languages/", "./modules/", "./places/", "./reports/", "./ufpdf/", "./themes/", "./blocks/", "./install/", "./includes/", "./pgvnuke/");
-			if ($level <= $MEDIA_DIRECTORY_LEVELS) {
+			if ($level <= GedcomConfig::$MEDIA_DIRECTORY_LEVELS) {
 				$d = @dir($directory);
 				if (is_object($d)) {
 					while (false !== ($entry = $d->read())) {
@@ -96,7 +96,7 @@ abstract class MediaFS {
 	}
 
 	public function GetFileList($directory, $filter="", $dbmode=false) {
-		global $MEDIATYPE, $MEDIA_DIRECTORY;
+		global $MEDIATYPE;
 		
 		$dirfiles = array();
 		if (!$dbmode) {
@@ -141,7 +141,7 @@ abstract class MediaFS {
 		}
 		else {
 			$directory = RelativePathFile($directory);
-			$m = RelativePathFile($MEDIA_DIRECTORY);
+			$m = RelativePathFile(GedcomConfig::$MEDIA_DIRECTORY);
 			if ($directory == "external_links") {
 				$sql = "SELECT mf_link FROM ".TBLPREFIX."media_files WHERE";
 				$sql .= " mf_link NOT LIKE ''";
@@ -162,11 +162,11 @@ abstract class MediaFS {
 		
 		
 	public function GetMediaFilelist($directory, $filter="", $dbmode="unset") {
-		global $MEDIA_IN_DB, $MEDIA_DIRECTORY, $MEDIATYPE, $AUTO_GENERATE_THUMBS;
+		global $MEDIA_IN_DB, $MEDIATYPE;
  //print "Dir in filelist: ".$directory."<br />";
  		if ($dbmode == "unset") $dbmode = $MEDIA_IN_DB;
 		$directory = RelativePathFile($directory);
-		if ($directory != "external_links") $m = RelativePathFile($MEDIA_DIRECTORY);
+		if ($directory != "external_links") $m = RelativePathFile(GedcomConfig::$MEDIA_DIRECTORY);
 		else $m = "";
 		$files = array();
 		if ($dbmode) {
@@ -257,7 +257,7 @@ abstract class MediaFS {
 	}
 	
 	public function PrintViewLink($file, $thumb=false, $paste=false) {
-		global $MEDIA_IN_DB, $USE_GREYBOX, $TEXT_DIRECTION, $gm_lang, $MEDIA_DIRECTORY, $AUTO_GENERATE_THUMBS;
+		global $MEDIA_IN_DB, $TEXT_DIRECTION, $gm_lang;
 
 		$fileobj = $file["filedata"];
 //		print_r($fileobj);
@@ -283,7 +283,7 @@ abstract class MediaFS {
 			print "\n\t\t\t<td class=\"list_value wrap $TEXT_DIRECTION\">";
 			$twidth = 50;
 			$theight = 50;
-			if ($USE_GREYBOX && $fileobj->f_is_image) {
+			if (USE_GREYBOX && $fileobj->f_is_image) {
 				print "<a href=\"".FilenameEncode($realfile)."\" title=\"".$fileobj->f_main_file."\" rel=\"gb_imageset[]\">";
 			}
 			else {
@@ -299,7 +299,7 @@ abstract class MediaFS {
 		print $gm_lang["filename"]."&nbsp;";
 		if (!$paste) print $fileobj->f_file."<br />";
 		else {
-			$m = RelativePathFile($MEDIA_DIRECTORY);
+			$m = RelativePathFile(GedcomConfig::$MEDIA_DIRECTORY);
 			if (!empty($m)) $plink = preg_replace("~$m~", "", $fileobj->f_pastelink);
 			else $plink = $fileobj->f_pastelink;
 			print "<a href=\"#\" onclick=\"pasteid('".preg_replace("/'/", "\'", FilenameEncode($plink))."');\">".basename($fileobj->f_file)."</a><br />";
@@ -330,8 +330,8 @@ abstract class MediaFS {
 	 * @return 	string the location of the thumbnail
 	 */
 	public function ThumbnailFile($filename, $dbmode="unset", $placeholder=true) {
-		global $MEDIA_DIRECTORY, $GM_IMAGE_DIR, $GM_IMAGES, $AUTO_GENERATE_THUMBS, $MEDIA_DIRECTORY_LEVELS;
-		global $MEDIA_EXTERNAL, $MEDIA_IN_DB;
+		global $GM_IMAGES;
+		global $MEDIA_IN_DB;
 
 		if ($dbmode == "unset") $dbmode = $MEDIA_IN_DB;
 		if (strlen($filename) == 0) return false;
@@ -344,16 +344,16 @@ abstract class MediaFS {
 		if (isset($parts["extension"])) $thumb_extension = $parts["extension"];
 		else $thumb_extension = "";
 		// We can skip this part for media in DB
-		if (!$dbmode && $AUTO_GENERATE_THUMBS) {	
-//			if ((stristr($filename, "://") && !$MEDIA_EXTERNAL) || !stristr($filename, "://")) {
+		if (!$dbmode && GedcomConfig::$AUTO_GENERATE_THUMBS) {	
+//			if ((stristr($filename, "://") && !GedcomConfig::$MEDIA_EXTERNAL) || !stristr($filename, "://")) {
 				// in case of a link we set the thumb dir to the media directory
-				if (stristr($filename, "://")) $dirname = RelativePathFile($MEDIA_DIRECTORY);
+				if (stristr($filename, "://")) $dirname = RelativePathFile(GedcomConfig::$MEDIA_DIRECTORY);
 				// NOTE: Construct dirname according to media levels to keep
-				if (!is_dir($dirname."thumbs/urls/") && $dirname == RelativePathFile($MEDIA_DIRECTORY)) {
+				if (!is_dir($dirname."thumbs/urls/") && $dirname == RelativePathFile(GedcomConfig::$MEDIA_DIRECTORY)) {
 					self::CreateDir("thumbs", $dirname); 
 					self::CreateDir("urls", $dirname."thumbs/"); 
 				}
-				if ($MEDIA_DIRECTORY_LEVELS == 0) $dirname = RelativePathFile($MEDIA_DIRECTORY);
+				if (GedcomConfig::$MEDIA_DIRECTORY_LEVELS == 0) $dirname = RelativePathFile(GedcomConfig::$MEDIA_DIRECTORY);
 				if (!is_dir($dirname."thumbs/")&& !stristr($dirname, "thumbs")) {
 //					print "dirname: ".$dirname."<br />";
 					self::CreateDir("thumbs", $dirname); 
@@ -411,13 +411,13 @@ abstract class MediaFS {
 			}
 			else {
 				$file_basename = self::NormalizeLink($filename);
-				if (file_exists(FilenameDecode($MEDIA_DIRECTORY."thumbs/urls/".$file_basename))) {
-					return $MEDIA_DIRECTORY."thumbs/urls/".$file_basename;
+				if (file_exists(FilenameDecode(GedcomConfig::$MEDIA_DIRECTORY."thumbs/urls/".$file_basename))) {
+					return GedcomConfig::$MEDIA_DIRECTORY."thumbs/urls/".$file_basename;
 				}
 				else {
-					if ($AUTO_GENERATE_THUMBS && is_dir($MEDIA_DIRECTORY."thumbs/urls/")) {
-						if (self::GenerateThumbnail($filename, $MEDIA_DIRECTORY."thumbs/urls/".$file_basename)) {
-							return $MEDIA_DIRECTORY."thumbs/urls/".$file_basename;
+					if (GedcomConfig::$AUTO_GENERATE_THUMBS && is_dir(GedcomConfig::$MEDIA_DIRECTORY."thumbs/urls/")) {
+						if (self::GenerateThumbnail($filename, GedcomConfig::$MEDIA_DIRECTORY."thumbs/urls/".$file_basename)) {
+							return GedcomConfig::$MEDIA_DIRECTORY."thumbs/urls/".$file_basename;
 						}
 						else WriteToLog("MediaFS->ThumbnailFile: Cannot generate thumbnail from ".$filename.".", "E", "S");
 					}
@@ -436,7 +436,7 @@ abstract class MediaFS {
 					return $dirname."thumbs/".$file_basename;
 				}
 				else {
-					if ($AUTO_GENERATE_THUMBS && is_dir($dirname."thumbs/")) {				
+					if (GedcomConfig::$AUTO_GENERATE_THUMBS && is_dir($dirname."thumbs/")) {				
 						if (self::GenerateThumbnail($dirname.$file_basename, $dirname."thumbs/".$file_basename)) {
 							return $dirname."thumbs/".$file_basename;
 						}
@@ -448,16 +448,16 @@ abstract class MediaFS {
 		if ($placeholder) {
 			switch ($thumb_extension) {
 				case "pdf":
-					return $GM_IMAGE_DIR."/".$GM_IMAGES["media"]["pdf"];
+					return GM_IMAGE_DIR."/".$GM_IMAGES["media"]["pdf"];
 					break;
 				case "doc":
-					return $GM_IMAGE_DIR."/".$GM_IMAGES["media"]["doc"];
+					return GM_IMAGE_DIR."/".$GM_IMAGES["media"]["doc"];
 					break;
 				case "ged":
-					return $GM_IMAGE_DIR."/".$GM_IMAGES["media"]["ged"];
+					return GM_IMAGE_DIR."/".$GM_IMAGES["media"]["ged"];
 					break;
 				default :
-					return $GM_IMAGE_DIR."/".$GM_IMAGES["media"]["large"];
+					return GM_IMAGE_DIR."/".$GM_IMAGES["media"]["large"];
 			}
 		}
 		else return "";
@@ -476,10 +476,9 @@ abstract class MediaFS {
 	 * @return 	string	A filename validated for the media depth
 	 */
 	public function CheckMediaDepth($filename) {
-		global $MEDIA_DIRECTORY, $MEDIA_DIRECTORY_LEVELS, $MEDIA_EXTERNAL;
 	
 		// NOTE: If the media depth is 0, no need to check it
-		if (empty($filename) || ($MEDIA_EXTERNAL && stristr($filename, "://"))) return $filename;
+		if (empty($filename) || (GedcomConfig::$MEDIA_EXTERNAL && stristr($filename, "://"))) return $filename;
 		
 		// remove heading driveletters
 		$filename = preg_replace("/^\w:/", "", $filename);
@@ -494,9 +493,9 @@ abstract class MediaFS {
 		$level = 0;
 		$path = "";
 		$count_dir_levels = count($dir_levels);
-		if ($MEDIA_DIRECTORY_LEVELS == 0 || empty($dirname)) return $file_basename;
-		else if ($MEDIA_DIRECTORY_LEVELS < $count_dir_levels) {
-			for ($ct_level = ($MEDIA_DIRECTORY_LEVELS-1); $ct_level >= 0; $ct_level--) {
+		if (GedcomConfig::$MEDIA_DIRECTORY_LEVELS == 0 || empty($dirname)) return $file_basename;
+		else if (GedcomConfig::$MEDIA_DIRECTORY_LEVELS < $count_dir_levels) {
+			for ($ct_level = (GedcomConfig::$MEDIA_DIRECTORY_LEVELS-1); $ct_level >= 0; $ct_level--) {
 				if (strlen(trim($dir_levels[$ct_level])) != 0) {
 					$path .= $dir_levels[$ct_level]."/";
 				}
@@ -517,7 +516,7 @@ abstract class MediaFS {
 	 * @return	boolean	true|false
 	 */
 	public function GenerateThumbnail($filename, $thumbnail, $ignoremediadir=false, $ext="") {
-		global $MEDIA_DIRECTORY, $THUMBNAIL_WIDTH, $AUTO_GENERATE_THUMBS, $MEDIA_IN_DB;
+		global $MEDIA_IN_DB;
 //						print "Generating thumb for: ".$filename."<br />";
 
 //		print "filename: ".$filename."<br />";
@@ -525,15 +524,15 @@ abstract class MediaFS {
 		$parts = pathinfo($thumbnail);
 		$dirname = RelativePathFile($parts["dirname"]."/");
 //		print "dirname: ".$dirname;
-		if (!$AUTO_GENERATE_THUMBS) return false;
+		if (!GedcomConfig::$AUTO_GENERATE_THUMBS) return false;
 		if (!$MEDIA_IN_DB && file_exists($thumbnail)) return false;
 		
 		if (!$ignoremediadir && !self::DirIsWritable($dirname, false)) return false;
 	
-		if (!$ignoremediadir && strstr($filename, "://") && !is_dir($MEDIA_DIRECTORY."thumbs/urls")) {
-			self::CreateDir($MEDIA_DIRECTORY, "thumbs");
-			self::CreateDir($MEDIA_DIRECTORY."thums/", "urls");
-			WriteToLog("MediaFS->GenerateThumbnail: Folder ".$MEDIA_DIRECTORY."thumbs/urls/ created.", "I", "S");
+		if (!$ignoremediadir && strstr($filename, "://") && !is_dir(GedcomConfig::$MEDIA_DIRECTORY."thumbs/urls")) {
+			self::CreateDir(GedcomConfig::$MEDIA_DIRECTORY, "thumbs");
+			self::CreateDir(GedcomConfig::$MEDIA_DIRECTORY."thums/", "urls");
+			WriteToLog("MediaFS->GenerateThumbnail: Folder ".GedcomConfig::$MEDIA_DIRECTORY."thumbs/urls/ created.", "I", "S");
 		}
 		if (!strstr($filename, "://")) {
 			if (!file_exists($filename)) {
@@ -555,7 +554,7 @@ abstract class MediaFS {
 			}
 		}
 		else {
-			if (!$ignoremediadir && !self::DirIsWritable($MEDIA_DIRECTORY."thumbs/urls", false)) return false;
+			if (!$ignoremediadir && !self::DirIsWritable(GedcomConfig::$MEDIA_DIRECTORY."thumbs/urls", false)) return false;
 			$filename = preg_replace("/ /", "%20", $filename);
 			if ($fp = @fopen($filename, "rb")) {
 				if ($fp===false) return false;
@@ -578,7 +577,7 @@ abstract class MediaFS {
 			}
 			else return false;
 		}
-		$width = $THUMBNAIL_WIDTH;
+		$width = GedcomConfig::$THUMBNAIL_WIDTH;
 		$height = round($imgsize[1] * ($width/$imgsize[0]));
 		$ct = preg_match("/\.([^\.]+)$/", $filename, $match);
 		if ($ct>0) {
@@ -641,7 +640,7 @@ abstract class MediaFS {
 	
 	
 	public function UploadFiles($files, $path, $overwrite=false) {
-		global $MEDIA_DIRECTORY, $MEDIA_IN_DB, $gm_lang, $MEDIATYPE, $AUTO_GENERATE_THUMBS, $error;
+		global $MEDIA_IN_DB, $gm_lang, $MEDIATYPE, $error;
 		
 		$error = "";
 		$result = array("filename"=>"", "error"=>"", "errno"=>"0");
@@ -694,7 +693,7 @@ abstract class MediaFS {
 									
 									// Try to create a thumb
 									$thumb = INDEX_DIRECTORY.basename($upload["name"]);
-									$AUTO_GENERATE_THUMBS = true;
+									GedcomConfig::$AUTO_GENERATE_THUMBS = true;
 									$hasthumb = self::GenerateThumbNail($upload["tmp_name"], $thumb, true, $ext);
 							
 									// and get the details
@@ -932,7 +931,7 @@ abstract class MediaFS {
 	}
 
 	public function CreateFile($filename, $delete=false, $dbmode=false, $delonimport=false, $exportthum="no") {
-		global $MEDIA_IN_DB, $gm_lang, $MEDIA_DIRECTORY;
+		global $MEDIA_IN_DB, $gm_lang;
 
 		// File system to DB
 		if ($dbmode) {
@@ -942,7 +941,7 @@ abstract class MediaFS {
 				return false;
 			}
 			
-//			$realfile = RelativePathFile($MEDIA_DIRECTORY.self::CheckMediaDepth($filename));
+//			$realfile = RelativePathFile(GedcomConfig::$MEDIA_DIRECTORY.self::CheckMediaDepth($filename));
 //			self::$fdetails["file"] = $realfile;
 			self::$fdetails["file"] = $filename;
 			if (!self::GetFileDetails($filename, false)) {
@@ -999,7 +998,7 @@ abstract class MediaFS {
 				$realfile = self::NormalizeLink($filename);
 			}
 			else {
-//				$realfile = RelativePathFile($MEDIA_DIRECTORY.self::CheckMediaDepth($filename));
+//				$realfile = RelativePathFile(GedcomConfig::$MEDIA_DIRECTORY.self::CheckMediaDepth($filename));
 				$realfile = $filename;
 			}
 //			print $realfile."<br />";
@@ -1009,7 +1008,7 @@ abstract class MediaFS {
 				return false;
 			}
 			// Create the directory in file mode
-			if (empty(self::$fdetails["path"])) self::$fdetails["path"] = $MEDIA_DIRECTORY;
+			if (empty(self::$fdetails["path"])) self::$fdetails["path"] = GedcomConfig::$MEDIA_DIRECTORY;
 			// 1. main directory
 			if (!self::CreateDir(self::$fdetails["path"], "", false)) {
 				WriteToLog("MediaFS->CreateFile: Cannot create folder ".self::$fdetails["path"], "W", "S");
@@ -1033,8 +1032,8 @@ abstract class MediaFS {
 				WriteToLog("MediaFS->CreateFile: Folder not writable: ".self::$fdetails["path"]."thumbs", "W", "S");
 				return false;
 			}
-			if ($islink && $exportthum != "no" && !self::DirIsWritable($MEDIA_DIRECTORY."thumbs/urls", false)) {
-				WriteToLog("MediaFS->CreateFile: Folder not writable: ".$MEDIA_DIRECTORY."thumbs/urls", "W", "S");
+			if ($islink && $exportthum != "no" && !self::DirIsWritable(GedcomConfig::$MEDIA_DIRECTORY."thumbs/urls", false)) {
+				WriteToLog("MediaFS->CreateFile: Folder not writable: ".GedcomConfig::$MEDIA_DIRECTORY."thumbs/urls", "W", "S");
 				return false;
 			}
 			
@@ -1054,7 +1053,7 @@ abstract class MediaFS {
 				$sql = "SELECT mtf_data FROM ".TBLPREFIX."media_thumbfiles WHERE mtf_file='".$realfile."' ORDER BY mtf_id ASC";
 				$res = NewQuery($sql);
 				if ($res && $res->NumRows() > 0) {
-					if ($islink) $fp = @fopen($MEDIA_DIRECTORY."thumbs/urls/".self::$fdetails["file"], "wb");
+					if ($islink) $fp = @fopen(GedcomConfig::$MEDIA_DIRECTORY."thumbs/urls/".self::$fdetails["file"], "wb");
 					else $fp = @fopen(self::$fdetails["path"]."thumbs/".self::$fdetails["fname"], "wb");
 					while ($row = $res->FetchRow()) {
 						fwrite($fp, $row[0]);
@@ -1148,7 +1147,7 @@ abstract class MediaFS {
 	}
 	
 	public function MoveFile($file, $from, $to) {
-		global $MEDIA_IN_DB, $GEDCOMID, $MEDIA_DIRECTORY;
+		global $MEDIA_IN_DB, $GEDCOMID;
 		static $change_id;
 		require_once("includes/functions/functions_edit.php");
 		
@@ -1157,7 +1156,7 @@ abstract class MediaFS {
 		// 1. for the physical file, including the media directory path
 		// 2. for the path stored with the media item, excluding the media directory path
 		// The incoming parameters are 1., so we must calculate 2.
-		$m = RelativePathFile($MEDIA_DIRECTORY);
+		$m = RelativePathFile(GedcomConfig::$MEDIA_DIRECTORY);
 		if (!empty($m)) {
 			$mfrom = preg_replace("~$m~", "", $from);
 			$mto = preg_replace("~$m~", "", $to);
@@ -1232,7 +1231,7 @@ abstract class MediaFS {
 	}
 	
 	public function DeleteFile($file, $folder, $fromdb="unset") {
-		global $MEDIA_IN_DB, $MEDIA_DIRECTORY;
+		global $MEDIA_IN_DB;
 	
 		if ($fromdb == "unset") $fromdb = $MEDIA_IN_DB;
 		if ($fromdb) {
@@ -1246,7 +1245,7 @@ abstract class MediaFS {
 			return true;
 		}
 		else {
-			if ($folder == "external_links") $folder = $MEDIA_DIRECTORY."/thumbs/urls/";
+			if ($folder == "external_links") $folder = GedcomConfig::$MEDIA_DIRECTORY."/thumbs/urls/";
 			$success = @unlink($folder.$file);
 			@unlink($folder."thumbs/".$file);
 			return $success;

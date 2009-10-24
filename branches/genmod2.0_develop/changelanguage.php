@@ -42,12 +42,12 @@ if (!isset($action) or $action=="") $action="editold";
 switch ($action) {
 	case "addnew" :
 		$helpindex = "add_new_language_help";
-		print_header($gm_lang["add_new_language"]); 
+		PrintHeader($gm_lang["add_new_language"]); 
 		break;
 
 	case "editold" :
 	default :
-		print_header($gm_lang["edit_lang_utility"]);
+		PrintHeader($gm_lang["edit_lang_utility"]);
 }
 ?>
 <script language="JavaScript" type="text/javascript">
@@ -260,5 +260,5 @@ $maxlines = max($active, $inactive);
 	
 print "</div>";
 
-print_footer();
+PrintFooter();
 ?>

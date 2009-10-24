@@ -33,7 +33,7 @@ require "config.php";
  * Inclusion of the help text variables
 */
 require ("helptext_vars.php");
-print_simple_header($gm_lang["help_config"]);
+PrintSimpleHeader($gm_lang["help_config"]);
 print '<span class="helpheader">';
 print $gm_lang["help_config"];
 print '</span><br /><br /><span class="helptext">';
@@ -56,5 +56,5 @@ print "</b></a><br />";
 print "<a href=\"#\" onclick=\"window.close();\"><b>";
 print $gm_lang["close_window"];
 print "</b></a>";
-print_simple_footer();
+PrintSimpleFooter();
 ?>

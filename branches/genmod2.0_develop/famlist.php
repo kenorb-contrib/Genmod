@@ -56,7 +56,7 @@ if (!isset($allgeds) || $allgeds != "yes" || !$ALLOW_CHANGE_GEDCOM) $allgeds = "
 if ($allgeds == "yes" && empty($gm_user->username)) {
 	foreach($GEDCOMS as $key => $ged) {
 		SwitchGedcom($key);
-		if ($REQUIRE_AUTHENTICATION) $allgeds = "no";
+		if (GedcomConfig::$REQUIRE_AUTHENTICATION) $allgeds = "no";
 	}
 	SwitchGedcom();
 }
@@ -73,7 +73,7 @@ if (isset($surname)) {
 	$addheader = "(".CheckNN($surname).")";
 }
 
-print_header($gm_lang["family_list"]." ".$addheader);
+PrintHeader($gm_lang["family_list"]." ".$addheader);
 print "<div class =\"center\">";
 print "\n\t<h3>";
 print_help_link("name_list_help", "qm", "name_list");
@@ -108,14 +108,14 @@ uasort($famalpha, "stringsort");
 
 if (isset($alpha) && !isset($famalpha["$alpha"])) unset($alpha);
 
-$TableTitle = "<img src=\"".$GM_IMAGE_DIR."/".$GM_IMAGES["sfamily"]["small"]."\" border=\"0\" title=\"".$gm_lang["families"]."\" alt=\"".$gm_lang["families"]."\" />&nbsp;&nbsp;";
+$TableTitle = "<img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["sfamily"]["small"]."\" border=\"0\" title=\"".$gm_lang["families"]."\" alt=\"".$gm_lang["families"]."\" />&nbsp;&nbsp;";
 
 if (count($famalpha) > 0) {
 	print_help_link("alpha_help", "qm", "alpha_index");
 	foreach($famalpha as $letter=>$list) {
 		if (empty($alpha)) {
 			if (!empty($surname)) {
-				if ($USE_RTL_FUNCTIONS && isRTLText($surname)) $alpha = substr(StripPrefix($surname),0,2);
+				if (GedcomConfig::$USE_RTL_FUNCTIONS && isRTLText($surname)) $alpha = substr(StripPrefix($surname),0,2);
 				else $alpha = substr(StripPrefix($surname),0,1);
 			}
 		}
@@ -151,7 +151,7 @@ if (count($famalpha) > 0) {
 		*/
 		$pass = FALSE;
 	}
-	if ($LISTS_ALL) {
+	if (GedcomConfig::$LISTS_ALL) {
 		print " | \n";
 		if ($show_all=="yes") {
 			print "<a href=\"famlist.php?show_all=yes&amp;surname_sublist=".$surname_sublist;
@@ -229,5 +229,5 @@ if ($alpha != "@") {
 	}
 }
 print "</div>";
-print_footer();
+PrintFooter();
 ?>

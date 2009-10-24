@@ -46,15 +46,16 @@ if (!$gm_user->userGedcomAdmin()) {
 	else header("Location: ".LOGIN_URL."?url=editgedcoms.php");
 	exit;
 }
-print_header($gm_lang["gedcom_adm_head"]);
+PrintHeader($gm_lang["gedcom_adm_head"]);
 print "<center>\n";
 if ($action=="delete") {
 	if (isset($GEDCOMS[$delged])) {
-		PrivacyController::DeletePrivacy($GEDCOMS[$delged]);
+		PrivacyController::DeletePrivacy($delged);
 		DeleteGedcom($delged);
 		unset($GEDCOMS[$delged]);
 		StoreGedcoms();
-		GedcomConfig::DeleteGedcomConfig($GEDCOMS[$delged]);
+		GedcomConfig::DeleteGedcomConfig($delged);
+		if (isset($_SESSION["GEDCOMID"]) && $_SESSION["GEDCOMID"] == $delged) $_SESSION["GEDCOMID"] = $DEFAULT_GEDCOMID;
 		print "<br />".str_replace("#GED#", $delged, $gm_lang["gedcom_deleted"])."<br />\n";
 	}
 	else print "<br /><span class=\"error\">".$gm_lang["gedcom_not_exist"]."</span>";
@@ -246,6 +247,6 @@ if ($action == "deletecount") {
 	print "</center>";
 print "</div>";
 
-print_footer();
+PrintFooter();
 
 ?>

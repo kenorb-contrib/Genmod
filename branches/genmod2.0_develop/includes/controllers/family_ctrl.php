@@ -48,11 +48,8 @@ class FamilyController extends DetailController
 			$famlist,
 			$GEDCOMID,
 			$gm_lang,
-			$CONTACT_EMAIL,
 			$ENABLE_CLIPPINGS_CART,
-			$SHOW_ID_NUMBERS,
-			$nonfacts,
-			$GEDCOM_DEFAULT_TAB
+			$nonfacts
 		;
 		
 		parent::__construct();
@@ -83,7 +80,7 @@ class FamilyController extends DetailController
 	}
 	
 	protected function GetPageTitle() {
-		global $SHOW_ID_NUMBERS, $gm_lang;
+		global $gm_lang;
 		
 		if (is_null($this->pagetitle)) {
 			
@@ -94,10 +91,21 @@ class FamilyController extends DetailController
 			else $wname = CheckNN("@P.N. @N.N.");
 			
 			$this->pagetitle = $hname." + ".$wname;
-			if ($SHOW_ID_NUMBERS) $this->pagetitle .= " - ".$this->family->xref;
+			if (GedcomConfig::$SHOW_ID_NUMBERS) $this->pagetitle .= " - ".$this->family->xref;
 			$this->pagetitle .= " - ".$gm_lang['family_info'];
 		}
 		return $this->pagetitle;
+	}
+	
+	protected function GetTitle() {
+		global $gm_lang;
+		
+		if (is_null($this->title)) {
+			$this->title = $this->family->descriptor;
+			$add = $this->family->adddescriptor;
+			if ($add != "") $this->title .= "<br />".$add;
+		}
+		return $this->title;
 	}
 	
 	public function getChildrenUrlTimeline($start=0) {
@@ -239,12 +247,12 @@ class FamilyController extends DetailController
 	}
 	
 	public function PrintFamilyGroupHeader() {
-		global $gm_lang, $SHOW_COUNTER, $hits;
+		global $gm_lang, $hits;
 		
 		print "\n\t<br /><span class=\"subheaders\">" . $gm_lang["family_group_info"];
 		print $this->family->addxref;
 		print "</span>";
-		if($SHOW_COUNTER) {
+		if(GedcomConfig::$SHOW_COUNTER) {
 			// Print indi counter only if displaying a non-private person
 			print "\n<span style=\"margin-left: 3px; vertical-align:bottom;\">".$gm_lang["hit_count"]."&nbsp;".$hits."</span>\n";
 		}

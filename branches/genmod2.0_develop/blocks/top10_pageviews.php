@@ -33,7 +33,7 @@ $GM_BLOCKS["top10_pageviews"]["config"] 	= array("num"=>10, "count_placement"=>"
 $GM_BLOCKS["top10_pageviews"]["rss"]		= false;
 
 function top10_pageviews($block=true, $config="", $side, $index) {
-	global $gm_lang, $GEDCOMID, $GM_BLOCKS, $command, $GM_IMAGES, $GM_IMAGE_DIR, $gm_user;
+	global $gm_lang, $GEDCOMID, $GM_BLOCKS, $command, $GM_IMAGES, $gm_user;
 
 	if (empty($config)) $config = $GM_BLOCKS["top10_pageviews"]["config"];
 	if (isset($config["count_placement"])) $CountSide = $config["count_placement"];
@@ -69,7 +69,7 @@ function top10_pageviews($block=true, $config="", $side, $index) {
 			if ($command=="gedcom") $name = preg_replace("/'/", "\'", get_gedcom_from_id($GEDCOMID));
 			else $name = $gm_user->username;
 			print "<a href=\"javascript: ".$gm_lang["config_block"]."\" onclick=\"window.open('index_edit.php?name=$name&amp;command=$command&amp;action=configure&amp;side=$side&amp;index=$index', '', 'top=50,left=50,width=500,height=250,scrollbars=1,resizable=1'); return false;\">";
-			print "<img class=\"adminicon\" src=\"$GM_IMAGE_DIR/".$GM_IMAGES["admin"]["small"]."\" width=\"15\" height=\"15\" border=\"0\" alt=\"".$gm_lang["config_block"]."\" /></a>\n";
+			print "<img class=\"adminicon\" src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["admin"]["small"]."\" width=\"15\" height=\"15\" border=\"0\" alt=\"".$gm_lang["config_block"]."\" /></a>\n";
 		}
 	}
 	print "<b>".$gm_lang["top10_pageviews"]."</b>";

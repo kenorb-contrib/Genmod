@@ -26,19 +26,17 @@
 
 $theme_name = "Clear";								//-- the name of this theme
 
-$stylesheet = $THEME_DIR."style.css";				//-- CSS level 2 stylesheet to use
-$rtl_stylesheet = $THEME_DIR."style_rtl.css";       //-- CSS level 2 stylesheet to use
-$mail_stylesheet = $THEME_DIR."style_mail.css";     //-- CSS level 2 stylesheet to use
-$print_stylesheet = $THEME_DIR."print.css";			//-- CSS level 2 print stylesheet to use
-$toplinks = $THEME_DIR."toplinks.html";				//-- File to display the icons and links to different sections
-$menubar = $THEME_DIR."menubar.php";				//-- File to display the top menu
-$headerfile = $THEME_DIR."header.html";				//-- Header information for the site
-$footerfile = $THEME_DIR."footer.html";				//-- Footer information for the site
-$print_footerfile = $THEME_DIR."print_footer.html";	//-- Print Preview Footer information for the site
-$print_headerfile = $THEME_DIR."print_header.html";	//-- Print Preview Header information for the site
+define('GM_STYLESHEET', GedcomConfig::$THEME_DIR."style.css");					//-- CSS level 2 stylesheet to use
+define('GM_RTL_STYLESHEET', GedcomConfig::$THEME_DIR."style_rtl.css");      	//-- CSS level 2 stylesheet to use
+define('GM_MAIL_STYLESHEET', GedcomConfig::$THEME_DIR."style_mail.css");    	//-- CSS level 2 stylesheet to use
+define('GM_PRINT_STYLESHEET', GedcomConfig::$THEME_DIR."print.css");			//-- CSS level 2 print stylesheet to use
+define('GM_MENUBAR', GedcomConfig::$THEME_DIR."menubar.php");					//-- File to display the top menu
+define('GM_FOOTERFILE', GedcomConfig::$THEME_DIR."footer.html");				//-- Footer information for the site
+define('GM_PRINT_FOOTERFILE', GedcomConfig::$THEME_DIR."print_footer.html");	//-- Print Preview Footer information for the site
+define('GM_PRINT_HEADERFILE', GedcomConfig::$THEME_DIR."print_header.html");	//-- Print Preview Header information for the site
 
-$GM_USE_HELPIMG = true;								// set to true to use image for help questionmark, set to false to use $gm_lang["qm"]
-$GM_IMAGE_DIR = "images";							//-- directory to look for images
+define('GM_USE_HELPIMG', true);						// set to true to use image for help questionmark, set to false to use $gm_lang["qm"]
+define('GM_IMAGE_DIR', 'images');					//-- directory to look for images
 
 //-- variables for image names
 //- GM main icons
@@ -187,10 +185,8 @@ $Dbheight = 80;			// -- height of DIV layer boxes
 $Dindent = 15;			// -- width to indent descendancy boxes
 $Darrowwidth = 15;		// -- additional width to include for the up arrows
 
-$CHARTS_CLOSE_HTML = true;		//-- should the charts, pedigree, descendacy, etc clost the HTML on the page
-
 // Arrow symbol or icon for up-page links on Help pages
-$ImgSrc = $GM_IMAGE_DIR."/uarrow3.gif";
+$ImgSrc = GM_IMAGE_DIR."/uarrow3.gif";
 $UpArrow = "<b>^&nbsp;&nbsp;</b>";
 if (file_exists($ImgSrc)) $UpArrow = "<img src=\"$ImgSrc\" class=\"icon\" border=\"0\" alt=\"\" />";
 $gm_lang["UpArrow"] = $UpArrow;	// help_text.xx.php requires this _untranslatable_ term!

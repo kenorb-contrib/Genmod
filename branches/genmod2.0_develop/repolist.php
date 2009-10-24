@@ -46,7 +46,7 @@ require("config.php");
 $repolist_controller = New RepoListController();
 
 
-print_header($repolist_controller->pagetitle);
+PrintHeader($repolist_controller->pagetitle);
 print "<div class=\"center\">";
 print "<h3>".$gm_lang["repo_list"]."</h3>\n\t";
 
@@ -54,7 +54,7 @@ $ctot = $repolist_controller->repo_total + $repolist_controller->repo_add - $rep
 
 print "\n\t<table class=\"list_table $TEXT_DIRECTION center\">\n\t\t<tr><td class=\"shade2 center\"";
 if($ctot > 12) print " colspan=\"2\"";
-print "><img src=\"".$GM_IMAGE_DIR."/".$GM_IMAGES["repository"]["small"]."\" border=\"0\" title=\"".$gm_lang["titles_found"]."\" alt=\"".$gm_lang["titles_found"]."\" />&nbsp;&nbsp;";
+print "><img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["repository"]["small"]."\" border=\"0\" title=\"".$gm_lang["titles_found"]."\" alt=\"".$gm_lang["titles_found"]."\" />&nbsp;&nbsp;";
 print $gm_lang["titles_found"];
 print "</td></tr><tr><td class=\"$TEXT_DIRECTION shade1 wrap\"><ul>";
 
@@ -88,5 +88,5 @@ print "</td>\n\t\t</tr>\n\t</table>";
 print_help_link("repolist_listbox_help", "qm");
 print "</div>";
 print "<br /><br />";
-print_footer();
+PrintFooter();
 ?>

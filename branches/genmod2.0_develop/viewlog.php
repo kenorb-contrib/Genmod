@@ -37,7 +37,7 @@ if($type == "All") $type = "";
 if (!isset($gedid)) $gedid = $GEDCOMID;
 if (!isset($cleanup)) $cleanup = "";
 if (!isset($action)) $action = "";
-if ($action != "download") print_simple_header("Print logfile");
+if ($action != "download") PrintSimpleHeader("Print logfile");
 
 //-- make sure that they have admin status before they can use this page
 $auth = false;
@@ -52,7 +52,7 @@ if ($auth) {
 				if ($cat == "S") $expname = "syslog.csv";
 				if ($cat == "G") $expname = "gedlog.csv";
 				if ($cat == "F") $expname = "searchlog.csv";
-				header("Content-Type: text/plain; charset=$CHARACTER_SET");
+				header("Content-Type: text/plain; charset=".GedcomConfig::$CHARACTER_SET);
 				header("Content-Disposition: attachment; filename=$expname");
 				print '"Type","Date/time","User",';
 				if ($cat != "S") print '"Gedcom",';
@@ -136,13 +136,13 @@ if ($auth) {
 		print " />".$gm_lang["all"]."&nbsp;";
 		print "<input type=\"radio\" name=\"type\" value=\"I\" onclick=\"document.location='viewlog.php?type=I&amp;cat=$cat&amp;max=$max&amp;gedid=$gedid'\"";
 		if ($type == "I") print " checked=\"checked\"";
-		print " /><img src=\"".$GM_IMAGE_DIR."/".$GM_IMAGES["log"]["information"]."\" alt=\"".$gm_lang["information"]."\" />&nbsp;";
+		print " /><img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["log"]["information"]."\" alt=\"".$gm_lang["information"]."\" />&nbsp;";
 		print "<input type=\"radio\" name=\"type\" value=\"W\" onclick=\"document.location='viewlog.php?type=W&amp;cat=$cat&amp;max=$max&amp;gedid=$gedid'\"";
 		if ($type == "W") print " checked=\"checked\"";
-		print " /><img src=\"".$GM_IMAGE_DIR."/".$GM_IMAGES["log"]["warning"]."\" alt=\"".$gm_lang["warning"]."\" />&nbsp;";
+		print " /><img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["log"]["warning"]."\" alt=\"".$gm_lang["warning"]."\" />&nbsp;";
 		print "<input type=\"radio\" name=\"type\" value=\"E\" onclick=\"document.location='viewlog.php?type=E&amp;cat=$cat&amp;max=$max&amp;gedid=$gedid'\"";
 		if ($type == "E") print " checked=\"checked\"";
-		print " /><img src=\"".$GM_IMAGE_DIR."/".$GM_IMAGES["log"]["error"]."\" alt=\"".$gm_lang["error"]."\" />&nbsp;";
+		print " /><img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["log"]["error"]."\" alt=\"".$gm_lang["error"]."\" />&nbsp;";
 	print "</div>";
 	
 	print "<div id=\"viewlog_admin\">";
@@ -199,9 +199,9 @@ if ($auth) {
 		foreach ($loglines as $key => $logline) {
 			print "<tr class=\"admin_item_box shade1\">";
 			print "<td>";
-			if ($logline["type"] == "I") print "<img src=\"".$GM_IMAGE_DIR."/".$GM_IMAGES["log"]["information"]."\" alt=\"".$gm_lang["information"]."\" />";
-			if ($logline["type"] == "W") print "<img src=\"".$GM_IMAGE_DIR."/".$GM_IMAGES["log"]["warning"]."\" alt=\"".$gm_lang["warning"]."\" />";
-			if ($logline["type"] == "E") print "<img src=\"".$GM_IMAGE_DIR."/".$GM_IMAGES["log"]["error"]."\" alt=\"".$gm_lang["error"]."\" />";
+			if ($logline["type"] == "I") print "<img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["log"]["information"]."\" alt=\"".$gm_lang["information"]."\" />";
+			if ($logline["type"] == "W") print "<img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["log"]["warning"]."\" alt=\"".$gm_lang["warning"]."\" />";
+			if ($logline["type"] == "E") print "<img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["log"]["error"]."\" alt=\"".$gm_lang["error"]."\" />";
 			print "</td>";
 			print "<td>".date("d.m.Y H:i:s", $logline["time"])."</td>";
 			print "<td>".$logline["ip"]."</td>";
@@ -219,9 +219,9 @@ if ($auth) {
 		foreach ($loglines as $key => $logline) {
 			print "<tr class=\"admin_item_box shade1\">";
 			print "<td>";
-			if ($logline["type"] == "I") print "<img src=\"".$GM_IMAGE_DIR."/".$GM_IMAGES["log"]["information"]."\" alt=\"".$gm_lang["information"]."\" />";
-			if ($logline["type"] == "W") print "<img src=\"".$GM_IMAGE_DIR."/".$GM_IMAGES["log"]["warning"]."\" alt=\"".$gm_lang["warning"]."\" />";
-			if ($logline["type"] == "E") print "<img src=\"".$GM_IMAGE_DIR."/".$GM_IMAGES["log"]["error"]."\" alt=\"".$gm_lang["error"]."\" />";
+			if ($logline["type"] == "I") print "<img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["log"]["information"]."\" alt=\"".$gm_lang["information"]."\" />";
+			if ($logline["type"] == "W") print "<img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["log"]["warning"]."\" alt=\"".$gm_lang["warning"]."\" />";
+			if ($logline["type"] == "E") print "<img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["log"]["error"]."\" alt=\"".$gm_lang["error"]."\" />";
 			print "</td>";
 			print "<td>".date("d.m.Y H:i:s", $logline["time"])."</td>";
 			print "<td>".$logline["ip"]."</td>";
@@ -249,5 +249,5 @@ else {
 	print "<input type=\"submit\" value=\"".$gm_lang["back"]."\" onclick='self.close();' /><br /><br />";
 }
 
-print_simple_footer();
+PrintSimpleFooter();
 ?>

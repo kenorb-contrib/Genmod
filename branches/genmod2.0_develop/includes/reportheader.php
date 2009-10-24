@@ -144,7 +144,6 @@ function GMRDescriptionEHandler() {
 
 function GMRInputSHandler($attrs) {
 	global $input, $text, $DEFAULT_PAGE_SIZE;
-	global $SHOW_ID_NUMBERS, $SHOW_FAM_ID_NUMBERS;
 	
 	$text ="";
 	$input = array();
@@ -160,13 +159,13 @@ function GMRInputSHandler($attrs) {
 	if (isset($attrs["default"])) {
 		switch ($attrs["default"]) {
 		case "DEFAULT_PAGE_SIZE":
-			$input["default"]=$DEFAULT_PAGE_SIZE;
+			$input["default"] = $DEFAULT_PAGE_SIZE;
 			break;
 		case "SHOW_ID_NUMBERS":
-			$input["default"]=$SHOW_ID_NUMBERS;
+			$input["default"] = GedcomConfig::$SHOW_ID_NUMBERS;
 			break;
 		case "SHOW_FAM_ID_NUMBERS":
-			$input["default"]=$SHOW_FAM_ID_NUMBERS;
+			$input["default"] = GedcomConfig::$SHOW_FAM_ID_NUMBERS;
 			break;
 		case "NOW":
 			$input["default"] = date("d M Y");

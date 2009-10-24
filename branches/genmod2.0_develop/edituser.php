@@ -54,7 +54,7 @@ if (!$gm_user->editaccount) {
 	header("Location: index.php?command=user");
 	exit;
 }
-print_header("Genmod ".$gm_lang["user_admin"]);
+PrintHeader("Genmod ".$gm_lang["user_admin"]);
 print "<div class=\"center\">\n";
 
 //-- section to update a user by first deleting them
@@ -194,7 +194,7 @@ if ($action=="edituser2") {
 	<tr><td class="shade2 wrap"><div class="helpicon"><?php print_help_link("edituser_password_help", "qm"); print "</div><div class=\"description\">"; print $gm_lang["password"];?></div></td><td class="shade1"><input type="password" name="pass1" tabindex="<?php $tab++; print $tab; ?>" /><br /><?php print $gm_lang["leave_blank"];?></td></tr>
 	<tr><td class="shade2 wrap"><div class="helpicon"><?php print_help_link("edituser_conf_password_help", "qm"); print "</div><div class=\"description\">"; print $gm_lang["confirm"];?></div></td><td class="shade1"><input type="password" name="pass2" tabindex="<?php $tab++; print $tab; ?>" /></td></tr>
 	<tr><td class="shade2 wrap"><div class="helpicon"><?php print_help_link("edituser_change_lang_help", "qm"); print "</div><div class=\"description\">"; print $gm_lang["change_lang"];?></div></td><td class="shade1" valign="top"><?php
-	if ($ENABLE_MULTI_LANGUAGE) {
+	if (GedcomConfig::$ENABLE_MULTI_LANGUAGE) {
 		$tab++;
 		print "<select name=\"user_language\" tabindex=\"".$tab."\" style=\"{ font-size: 9pt; }\">";
 		foreach ($gm_language as $key => $value) {
@@ -260,5 +260,5 @@ if ($action=="edituser2") {
 </form><br />
 </div>
 <?php
-print_footer();
+PrintFooter();
 ?>

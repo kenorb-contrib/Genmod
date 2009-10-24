@@ -34,7 +34,7 @@ $GM_BLOCKS["print_user_messages"]["rss"]		= false;
 
 //-- print user messages
 function print_user_messages($block=true, $config="", $side, $index) {
-		global $gm_lang, $GM_IMAGE_DIR, $TEXT_DIRECTION, $TIME_FORMAT, $GM_STORE_MESSAGES, $GM_IMAGES, $gm_user;
+		global $gm_lang, $TEXT_DIRECTION, $TIME_FORMAT, $GM_STORE_MESSAGES, $GM_IMAGES, $gm_user;
 
 		$usermessages = MessageController::getUserMessages($gm_user->username);
 
@@ -65,7 +65,7 @@ function print_user_messages($block=true, $config="", $side, $index) {
 				print "<td class=\"wrap shade1\"".$separatortd."><input type=\"checkbox\" name=\"message_id[]\" value=\"$key\" /></td>\n";
 				$showmsg=preg_replace("/(\w)\/(\w)/","\$1/<span style=\"font-size:1px;\"> </span>\$2",PrintReady($message->subject));
 				$showmsg=preg_replace("/@/","@<span style=\"font-size:1px;\"> </span>",$showmsg);
-				print "<td class=\"wrap\"".$separatortd."><a href=\"#\" onclick=\"expand_layer('message$key'); return false;\"><b>".$showmsg."</b> <img id=\"message${key}_img\" src=\"".$GM_IMAGE_DIR."/".$GM_IMAGES["plus"]["other"]."\" border=\"0\" alt=\"\" title=\"\" /></a></td>\n";
+				print "<td class=\"wrap\"".$separatortd."><a href=\"#\" onclick=\"expand_layer('message$key'); return false;\"><b>".$showmsg."</b> <img id=\"message${key}_img\" src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["plus"]["other"]."\" border=\"0\" alt=\"\" title=\"\" /></a></td>\n";
 				if (!is_null($message->created) && $message->created != "") $time = strtotime($message->created);
 				else $time = time();
 				$day = date("j", $time);

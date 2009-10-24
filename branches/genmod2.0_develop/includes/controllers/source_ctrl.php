@@ -71,13 +71,13 @@ class SourceController extends DetailController {
 	 * @return string
 	 */
 	protected function getPageTitle() {
-		global $gm_lang, $SHOW_ID_NUMBERS;
+		global $gm_lang;
 
 		if (is_null($this->pagetitle)) {
 			$this->pagetitle = "";
 			if ($this->source->title) {
 				$this->pagetitle .= $this->source->title." - ";
-				if ($SHOW_ID_NUMBERS) $this->pagetitle .= $this->source->xref." - ";
+				if (GedcomConfig::$SHOW_ID_NUMBERS) $this->pagetitle .= $this->source->xref." - ";
 			}
 			$this->pagetitle .= $gm_lang["source_info"];
 		}

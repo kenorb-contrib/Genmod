@@ -33,7 +33,7 @@ require_once 'config.php';
 
 $controller = new FamilyController();
 
-print_header($controller->pagetitle);
+PrintHeader($controller->pagetitle);
 
 $controller->CheckNoResult($gm_lang["family_not_found"]);
 
@@ -48,7 +48,7 @@ $controller->CheckRawEdited();
 	<tr>
 		<td>
 		<?php
-		print "<p class=\"name_head\">".PrintReady($controller->family->title);
+		print "<p class=\"name_head\">".PrintReady($controller->title);
 		print "</p>\r\n";
 
 		print PersonFunctions::PrintFamilyParents($controller->family);
@@ -89,4 +89,4 @@ $controller->CheckRawEdited();
 	</tr>
 </table>
 <br />
-<?php print_footer();?>
+<?php PrintFooter();?>

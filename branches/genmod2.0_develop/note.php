@@ -35,7 +35,7 @@ require("config.php");
 */
 $note_controller = new NoteController();
 
-print_header($note_controller->pagetitle);
+PrintHeader($note_controller->pagetitle);
 
 $note_controller->CheckNoResult($gm_lang["note_not_found"]);
 
@@ -51,7 +51,7 @@ $note_controller->CheckRawEdited();
 	<tr>
 		<td>
 		<span class="name_head"><?php print PrintReady($note_controller->note->GetTitle(40, $note_controller->note->show_changes).$note_controller->note->addxref); ?></span><br />
-		<?php if($SHOW_COUNTER) print "\n<br /><br /><span style=\"margin-left: 3px;\">".$gm_lang["hit_count"]."&nbsp;".$hits."</span>\n"; ?><br />
+		<?php if(GedcomConfig::$SHOW_COUNTER) print "\n<br /><br /><span style=\"margin-left: 3px;\">".$gm_lang["hit_count"]."&nbsp;".$hits."</span>\n"; ?><br />
 		</td>
 	</tr>
 </table>
@@ -61,5 +61,5 @@ $note_controller->CheckRawEdited();
 // Print the tabs
 $note_controller->PrintTabs();
 
-print_footer();
+PrintFooter();
 ?>

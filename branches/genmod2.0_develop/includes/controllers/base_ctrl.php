@@ -46,6 +46,8 @@ abstract class BaseController {
 	protected $gedcomid = null;				// Active gedcomid while loading the child controller
 	protected $show_changes = null;			// Wether of not changes to the records will be displayed
 	protected $uname = null;				// Name of the currently signed on user 
+	protected $pagetitle = null;			// Title to show in the browser top bar
+	protected $title = null;				// Title to show at the top of the page
 	
 	/**
 	 * constructor for this class
@@ -83,6 +85,12 @@ abstract class BaseController {
 				break;
 			case "uname":
 				return $this->uname;
+				break;
+			case "pagetitle":
+				return $this->GetPageTitle();
+				break;
+			case "title":
+				return $this->GetTitle();
 				break;
 			default:
 				print "<span class=\"error\">Invalid property ".$property." for __get in ".get_class($this)." class</span><br />";

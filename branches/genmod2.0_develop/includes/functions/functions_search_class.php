@@ -595,20 +595,21 @@ abstract class SearchFunctions {
 	
 		$sql .= self::DateRangeforQuery($dstart, $mstart, $ystart, $dend, $mend, $yend, $skipfacts, $allgeds, $onlyfacts);
 	
-		$sql .= "GROUP BY i_id ORDER BY d_year, d_month, d_day DESC";
+		$sql .= "GROUP BY n_id ORDER BY n_id, d_year, d_month, d_day DESC";
 
 		$res = NewQuery($sql);
 		$key = "";
 		while($row = $res->FetchAssoc($res->result)){
 			if ($key != $row["i_key"]) {
+				if ($key != "") $person->names_read = true;
 				$person = null;
 				$key = $row["i_key"];
 				$person =& Person::GetInstance($row["i_id"], $row);
 				$indilist[$row["i_key"]] = $person;
 			}
-			$row = db_cleanup($row);
 			if ($person->disp_name) $indilist[$row["i_key"]]->addname = array($row["n_name"], $row["n_letter"], $row["n_surname"], $row["n_type"]);
 		}
+		if ($key != "") $person->names_read = true;
 		$res->FreeResult();
 		return $indilist;
 	}
@@ -792,5 +793,119 @@ abstract class SearchFunctions {
 		
 		return $sql;
 	}
+	
+	public function SearchAddAssos() {
+		global $assolist, $indi_printed, $fam_printed, $printindiname, $printfamname, $famlist;
+	
+		// Step 1: Pull the relations to the printed results from the assolist
+		$toadd = array();
+		foreach ($assolist as $p1key => $assos) {
+			// Get the person who might be a relation
+			// Check if we can show him/her
+			SwitchGedcom(SplitKey($p1key, "gedid"));
+			foreach ($assos as $key => $asso) {
+				$p2key = $asso["pid2"];
+				// Design choice: we add to->from and from->to
+				// Check if he/she  and the persons/fams he/she is related to, actually exist
+				// Also respect name privacy for all related individuals. If one is hidden, it prevents the relation to be displayed
+				// p1key can be either indi or fam, p2key can only be indi.
+				if (array_key_exists($p2key, $indi_printed) || array_key_exists($p1key, $indi_printed) || array_key_exists($p1key, $fam_printed)) {
+					// p2key is always an indi, so check this first
+					$disp = true;
+					if (!PrivacyFunctions::showLivingNameByID(SplitKey($p2key, "id"))) $disp = false;
+					else {
+						if (!empty($asso["fact"]) &&!PrivacyFunctions::showFact($asso["fact"], SplitKey($p2key, "id"))) $disp = false;
+						else {
+							// assotype is the type of p1key
+							if ($asso["type"] == "indi") {
+								if (!PrivacyFunctions::showLivingNameByID(SplitKey($p1key, "id"))) $disp = false;
+							}
+							else {
+								$parents = FindParentsInRecord($asso["gedcom"]);
+								if (!PrivacyFunctions::showLivingNameByID($parents["HUSB"]) || !PrivacyFunctions::showLivingNameByID($parents["WIFE"])) $disp = false;
+							}
+						}
+					}
+					if ($disp && !empty($asso["resn"])) {
+						if (!empty($asso["fact"])) {
+							$rec = "1 ".$fact."\r\n2 ASSO @".SplitKey($p1key, "id")."@\r\n2 RESN ".$asso["resn"]."\r\n";
+							$disp = PrivacyFunctions::FactViewRestricted(SplitKey($p2key, "id"), $rec, 2);
+						}
+						else {
+							$rec = "1 ASSO @".SplitKey($p1key, "id")."@\r\n2 RESN ".$asso["resn"]."\r\n";
+							$disp = PrivacyFunctions::FactViewRestricted(SplitKey($p2key, "id"), $rec, 2);
+						}
+					}
+					// save his relation to existing search results
+					if ($disp) {
+						$toadd[$p1key][] = array($p2key, "indi", $asso["fact"], $asso["role"]);
+						$toadd[$p2key][] = array($p1key, $asso["type"], $asso["fact"], $asso["role"]);
+					}
+				}
+			}
+		}
+	
+		// Step 2: Add the relations who are not printed themselves
+		foreach ($toadd as $add => $links) {
+			$arec = FindGedcomRecord(SplitKey($add, "id"));
+			$type = GetRecType($arec);
+			if ($type == "INDI") {
+				if (!array_key_exists($add, $indi_printed)) {
+					$indi_printed[$add] = "1";
+					$names = GetIndiNames($arec);
+					foreach ($names as $nkey => $namearray) {
+						$printindiname[] = array(NameFunctions::SortableNameFromName($namearray[0]), SplitKey($add, "id"), SplitKey($add, "gedid"), "");
+					}
+				}
+			}
+			else {
+				if (!array_key_exists($add, $fam_printed)) {
+					$fam_printed[$add] = "1";
+					$fam = $famlist[$add];
+					$hname = GetSortableName($fam["HUSB"], "", "", true);
+					$wname = GetSortableName($fam["WIFE"], "", "", true);
+					if (empty($hname)) $hname = "@N.N.";
+					if (empty($wname)) $wname = "@N.N.";
+					$name = array();
+					foreach ($hname as $hkey => $hn) {
+						foreach ($wname as $wkey => $wn) {
+							$name[] = $hn." + ".$wn;
+							$name[] = $wn." + ".$hn;
+						}
+					}
+					foreach ($name as $namekey => $famname) {
+						$famsplit = preg_split("/(\s\+\s)/", trim($famname));
+						// Both names have to have the same direction and combination of chinese/not chinese
+						if (hasRTLText($famsplit[0]) == hasRTLText($famsplit[1]) && HasChinese($famsplit[0], true) == HasChinese($famsplit[1], true)) {
+							$printfamname[]=array(CheckNN($famname), SplitKey($add, "id"), $fam["gedfile"],"");
+						}
+					}
+				}
+			}
+		}
+	
+		// Step 3: now cycle through the indi search results to add a relation link
+		foreach ($printindiname as $pkey => $printindi) {
+			$pikey = JoinKey($printindi[1], get_id_from_gedcom($printindi[2]));
+			if (isset($toadd[$pikey])) {
+				foreach ($toadd[$pikey] as $rkey => $asso) {
+					SwitchGedcom($printindi[2]);
+					$printindiname[$pkey][3][] = $asso;
+				}
+			}
+		}
+		// Step 4: now cycle through the fam search results to add a relation link
+		foreach ($printfamname as $pkey => $printfam) {
+			$pikey = JoinKey($printfam[1], get_id_from_gedcom($printfam[2]));
+			if (isset($toadd[$pikey])) {
+				foreach ($toadd[$pikey] as $rkey => $asso) {
+					SwitchGedcom($printfam[2]);
+					$printfamname[$pkey][3][] = $asso;
+				}
+			}
+		}
+		SwitchGedcom();
+	}
+
 }
 ?>

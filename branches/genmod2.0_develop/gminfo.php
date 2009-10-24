@@ -41,7 +41,7 @@ if (!isset($action)) $action = "";
 
 if ($action == "phpinfo") {
 	$helpindex = "phpinfo_help";
-	print_header($gm_lang["phpinfo"]);
+	PrintHeader($gm_lang["phpinfo"]);
 	 ?>
 	<div class="center">
 		<?php
@@ -85,7 +85,7 @@ if ($action == "phpinfo") {
 }
 
 if ($action=="confighelp") {
-	print_header($gm_lang["help_config"]);
+	PrintHeader($gm_lang["help_config"]);
 	print "<h3 class=\"center\">".Str2Upper($gm_lang["help_config"])."</h3><br />";
 	$language_array = array();
 	$language_array = LoadLanguage($LANGUAGE,true, true);
@@ -100,5 +100,5 @@ if ($action=="confighelp") {
     	print "</ol>";
 }
 
-print_footer();
+PrintFooter();
 ?>

@@ -31,11 +31,11 @@ if (stristr($_SERVER["SCRIPT_NAME"],basename(__FILE__))) {
 abstract class CounterFunctions {
 
 	public function GetCounter() {
-		global $SHOW_COUNTER, $GEDCOMID, $GM_IMAGES, $GM_IMAGE_DIR, $gm_lang, $bot;
+		global $GEDCOMID, $GM_IMAGES, $gm_lang, $bot;
 		global $pid, $famid, $sid, $rid, $mid, $oid;
 		
 		//only do counter stuff if counters are enabled
-		if($SHOW_COUNTER) {
+		if(GedcomConfig::$SHOW_COUNTER) {
 		
 			$GM_COUNTER_NAME     = $GEDCOMID."gm_counter";
 			$GM_INDI_COUNTER_NAME = $GEDCOMID."gm_indi_counter";
@@ -111,7 +111,7 @@ abstract class CounterFunctions {
 		
 			//replace the numbers with their images
 			for($i=0;$i<10;$i++)
-		    $hits = str_replace("$i","<img src=\"".$GM_IMAGE_DIR."/".$GM_IMAGES[$i]["digit"]."\" alt=\"".$gm_lang["hit_count"]."\" />","$hits");
+		    $hits = str_replace("$i","<img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES[$i]["digit"]."\" alt=\"".$gm_lang["hit_count"]."\" />","$hits");
 			$hits = '<span dir="ltr">'.$hits.'</span>';
 			return $hits;
 		}

@@ -147,7 +147,7 @@ abstract class GedcomRecord {
 	
 
 	public function __get($property) {
-		global $TEXT_DIRECTION, $SHOW_ID_NUMBERS;
+		global $TEXT_DIRECTION;
 	
 		switch ($property) {
 			case "gedrec":
@@ -196,7 +196,7 @@ abstract class GedcomRecord {
 				return $this->type;
 				break;
 			case "addxref":
-				if ($SHOW_ID_NUMBERS && $this->DispName()) {
+				if (GedcomConfig::$SHOW_ID_NUMBERS && $this->DispName()) {
 					if ($TEXT_DIRECTION=="ltr")	return " &lrm;(".$this->xref.")&lrm;";
 					else return " &rlm;(".$this->xref.")&rlm;";
 				}
@@ -339,10 +339,10 @@ abstract class GedcomRecord {
 	}
 		
 	protected function CanEdit() {
-		global $ALLOW_EDIT_GEDCOM, $gm_user;
+		global $gm_user;
 		
 		if (is_null($this->canedit)) {
-			if ($this->DisplayDetails() && $ALLOW_EDIT_GEDCOM && $gm_user->userCanEdit() && !PrivacyFunctions::FactEditRestricted($this->xref, $this->gedrec, 1)) $this->canedit = true;
+			if ($this->DisplayDetails() && GedcomConfig::$ALLOW_EDIT_GEDCOM && $gm_user->userCanEdit() && !PrivacyFunctions::FactEditRestricted($this->xref, $this->gedrec, 1)) $this->canedit = true;
 			else $this->canedit = false;
 		}
 		return $this->canedit;
@@ -794,23 +794,23 @@ abstract class GedcomRecord {
 	    if ($this->datatype == "FAM") {
 		    $type = "AND";
 		    //-- check if we can display both parents. If not, the family will be hidden.	
-		    $ct = preg_match("/1 HUSB @(.*)@/", $this->gedrec, $match);
-			if ($ct>0) {
+		    $ct1 = preg_match("/1 HUSB @(.*)@/", $this->gedrec, $match);
+			if ($ct1 > 0) {
 				$husb =& Person::GetInstance($match[1], "", $GEDCOMID);
 				if ($type == "AND" && !$husb->DisplayDetails()) {
 					SwitchGedcom($oldgedid);
 					return false;
 				}
 			}
-		    $ct = preg_match("/1 WIFE @(.*)@/", $this->gedrec, $match);
-			if ($ct>0) {
+		    $ct2 = preg_match("/1 WIFE @(.*)@/", $this->gedrec, $match);
+			if ($ct2 > 0) {
 				$wife =& Person::GetInstance($match[1], "", $GEDCOMID);
 				if ($type == "AND" && !$wife->DisplayDetails()) {
 					SwitchGedcom($oldgedid);
 					return false;
 				}
 			}
-			if ($type == "OR" && !$husb->DisplayDetails() && !$wife->DisplayDetails()) {
+			if ($type == "OR" && ($ct1 && !$husb->DisplayDetails()) && ($ct2 && !$wife->DisplayDetails())) {
 				SwitchGedcom($oldgedid);
 				return false;
 			}
@@ -941,16 +941,30 @@ abstract class GedcomRecord {
 	private function CheckSourceLinks() {
 		
 		if (!is_array($this->link_array)) {
-			$sql = "SELECT DISTINCT i_id, i_isdead, i_file, i_gedrec FROM ".TBLPREFIX."source_mapping, ".TBLPREFIX."individuals WHERE sm_sid='".$this->xref."' AND sm_file='".$this->gedcomid."' AND sm_type='INDI' AND sm_gid=i_id AND sm_file=i_file";
+			$sql = "SELECT DISTINCT n_id, i_id, i_key, i_isdead, i_file, i_gedrec, n_name, n_surname, n_letter, n_type FROM ".TBLPREFIX."source_mapping, ".TBLPREFIX."individuals, ".TBLPREFIX."names WHERE sm_sid='".$this->xref."' AND sm_file='".$this->gedcomid."' AND sm_type='INDI' AND sm_gid=i_id AND sm_file=i_file AND i_key=n_key ORDER BY n_id";
 			$res = NewQuery($sql);
+			$key = "";
+			$ok = true;
 			while ($row = $res->FetchAssoc()) {
-				$person = null;
-				$person = Person::GetInstance($row["i_id"], $row, $row["i_file"]);
-				if (!$person->DisplayDetails()) {
-					$res->FreeResult();
-					return false;
+				if ($key != $row["i_key"]) {
+					if ($key != "") $person->names_read = true;
+					if (!$ok) {
+						$res->FreeResult();
+						return false;
+					}
+					$person = null;
+					$key = $row["i_key"];
+					$person = Person::GetInstance($row["i_id"], $row, $row["i_file"]);
+					if (!$person->DisplayDetails()) {
+						$ok = false;
+						// Don't return here, first add all names to the person
+					}
 				}
+				if ($person->disp_name) $person->addname = array($row["n_name"], $row["n_letter"], $row["n_surname"], $row["n_type"]);
 			}
+			if ($key != "") $person->names_read = true;
+			if (!$ok) return false;
+			
 			$indiarr = array();
 			$famarr = array();
 			$sql = "SELECT DISTINCT sm_gid, f_id, f_file, f_gedrec, f_husb, f_wife FROM ".TBLPREFIX."source_mapping, ".TBLPREFIX."families WHERE sm_sid='".$this->xref."' AND sm_file='".$this->gedcomid."' AND sm_type='FAM' AND sm_gid=f_id AND sm_file=f_file";
@@ -981,16 +995,29 @@ abstract class GedcomRecord {
 		
 	private function CheckMediaLinks() {
 		
-		$sql = "SELECT DISTINCT mm_gid, i_id, i_isdead, i_file, i_gedrec FROM ".TBLPREFIX."media_mapping, ".TBLPREFIX."individuals WHERE mm_media='".$this->xref."' AND mm_file='".$this->gedcomid."' AND mm_type='INDI' AND mm_gid=i_id AND mm_file=i_file";
+		$sql = "SELECT DISTINCT n_id, i_id, i_key, i_isdead, i_file, i_gedrec, n_name, n_surname, n_letter, n_type FROM ".TBLPREFIX."media_mapping, ".TBLPREFIX."individuals, ".TBLPREFIX."names WHERE mm_media='".$this->xref."' AND mm_file='".$this->gedcomid."' AND mm_type='INDI' AND mm_gid=i_id AND mm_file=i_file and i_key=n_key";
 		$res = NewQuery($sql);
+		$key = "";
+		$ok = true;
 		while ($row = $res->FetchAssoc()) {
-			$person = null;
-			$person =& Person::GetInstance($row["i_id"], $row, $row["i_file"]);
-			if (!$person->DisplayDetails()) {
-				$res->FreeResult();
-				return false;
+			if ($key != $row["i_key"]) {
+				if ($key != "") $person->names_read = true;
+				if (!$ok) {
+					$res->FreeResult();
+					return false;
+				}
+				$key = $row["i_key"];
+				$person = null;
+				$person =& Person::GetInstance($row["i_id"], $row, $row["i_file"]);
+				if (!$person->DisplayDetails()) {
+					$ok = false;
+					// Don't return here, first add all names to the person
+				}
 			}
+			if ($person->disp_name) $person->addname = array($row["n_name"], $row["n_letter"], $row["n_surname"], $row["n_type"]);
 		}
+		if ($key != "") $person->names_read = true;
+		if (!$ok) return false;
 		
 		$indiarr = array();
 		$famarr = array();
@@ -1010,16 +1037,29 @@ abstract class GedcomRecord {
 		
 	private function CheckNoteLinks() {
 		
-		$sql = "SELECT DISTINCT om_gid, i_id, i_isdead, i_file, i_gedrec FROM ".TBLPREFIX."other, ".TBLPREFIX."other_mapping, ".TBLPREFIX."individuals WHERE o_id='".$this->xref."' AND o_file='".$this->gedcomid."' AND o_id = om_oid AND o_file = om_file AND om_type='INDI' AND i_id=om_gid AND om_file=i_file";
+		$sql = "SELECT DISTINCT n_id, i_id, i_key, i_isdead, i_file, i_gedrec, n_name, n_surname, n_letter, n_type FROM ".TBLPREFIX."other, ".TBLPREFIX."other_mapping, ".TBLPREFIX."individuals, ".TBLPREFIX."names WHERE o_id='".$this->xref."' AND o_file='".$this->gedcomid."' AND o_id = om_oid AND o_file = om_file AND om_type='INDI' AND i_id=om_gid AND om_file=i_file AND i_key=n_key";
 		$res = NewQuery($sql);
+		$key = "";
+		$ok = true;
 		while ($row = $res->FetchAssoc()) {
-			$person = null;
-			$person =& Person::GetInstance($row["i_id"], $row, $row["i_file"]);
-			if (!$person->DisplayDetails()) {
-				$res->FreeResult();
-				return false;
+			if ($key != $row["i_key"]) {
+				if ($key != "") $person->names_read = true;
+				if (!$ok) {
+					$res->FreeResult();
+					return false;
+				}
+				$key = $row["i_key"];
+				$person = null;
+				$person =& Person::GetInstance($row["i_id"], $row, $row["i_file"]);
+				if (!$person->DisplayDetails()) {
+					$ok = false;
+					// Don't return here, first add all names to the person
+				}
 			}
+			if ($person->disp_name) $person->addname = array($row["n_name"], $row["n_letter"], $row["n_surname"], $row["n_type"]);
 		}
+		if ($key != "") $person->names_read = true;
+		if (!$ok) return false;
 		
 		$indiarr = array();
 		$famarr = array();
@@ -1055,12 +1095,19 @@ abstract class GedcomRecord {
 	private function IndiFamPrivCheck($indiarr, $famarr) {
 		
 		if (count($indiarr) != 0) {
-			$sql = "SELECT DISTINCT i_id, i_isdead, i_file, i_gedrec FROM ".TBLPREFIX."individuals WHERE i_key IN ('".implode("','", $indiarr)."')";
+			$key = "";
+			$sql = "SELECT DISTINCT n_id, i_key, i_id, i_isdead, i_file, i_gedrec, n_name, n_surname, n_letter, n_type FROM ".TBLPREFIX."individuals, ".TBLPREFIX."names WHERE n_key=i_key AND i_key IN ('".implode("','", $indiarr)."') ORDER BY i_key, n_id";
 			$res = NewQuery($sql);
 			while ($row = $res->FetchAssoc()) {
-				$person = null;
-				$person =& Person::GetInstance($row["i_id"], $row, $row["i_file"]);
+				if ($key != $row["i_key"]) {
+					if ($key != "") $person->names_read = true;
+					$key = $row["i_key"];
+					$person = null;
+					$person =& Person::GetInstance($row["i_id"], $row, $row["i_file"]);
+				}
+				if ($person->disp_name) $person->addname = array($row["n_name"], $row["n_letter"], $row["n_surname"], $row["n_type"]);
 			}
+			if ($key != "") $person->names_read = true;
 		}
 		foreach($famarr as $key => $family) {
 			if (!$family->DisplayDetails()) return false;

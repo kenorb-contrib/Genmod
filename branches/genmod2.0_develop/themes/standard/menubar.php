@@ -30,7 +30,7 @@ if (strstr($_SERVER["PHP_SELF"],"menubar.php")) {
 	print "Why do you want to do that?";
 	exit;
 }
-global $gm_lang, $controller, $note_controller, $source_controller, $repository_controller, $media_controller, $rid;
+global $gm_lang, $controller, $note_controller, $source_controller, $repository_controller, $media_controller;
 $filemenu = MenuBar::GetFileMenu();
 $editmenu = MenuBar::GetEditMenu();
 $viewmenu = MenuBar::GetViewMenu();
@@ -52,6 +52,7 @@ $listmenu = MenuBar::GetListMenu();
 $helpmenu = MenuBar::GetHelperMenu();
 $favoritesmenu = MenuBar::GetFavoritesMenu();
 $custommenu = MenuBar::GetCustomMenu();
+
 function CreateMenu($menuobject, $level=0, $sub=false) {
 	global $outputmenu;
 	if (!$sub) $outputmenu = array();
@@ -86,32 +87,6 @@ if (is_object($notemenu)) $showmenu[$gm_lang["this_note"]] = CreateMenu($notemen
 if (is_object($repomenu)) $showmenu[$gm_lang["this_repository"]] = CreateMenu($repomenu);
 if (is_object($helpmenu)) $showmenu[$gm_lang["helpmenu"]] = CreateMenu($helpmenu);
 if (is_object($custommenu)) $showmenu[$gm_lang["my_pages"]] = CreateMenu($custommenu);
-/**
-$outputmenu["Calendar"] = Array
-        (
-            0 => Array
-                (
-                    "label" => "Day",
-                    "link" => "calendar.php"
-                ),
-
-            1 => Array
-                (
-                    "label" => "Month",
-                    "link" => "calendar.php?action=calendar"
-                ),
-
-            2 => Array
-                (
-				 "Jaar" => Array
-				 (
-					"label" => "Year",
-					"link" => "calendar.php?action=year"
-				 )
-                )
-
-        );
-	   **/
 ?>
 <div id="header" class="<?php echo $TEXT_DIRECTION; ?>">
 	<script type="text/javascript" src="transmenu.js"></script>
@@ -144,7 +119,7 @@ $outputmenu["Calendar"] = Array
 	//-->
 	</script>
 	<?php
-	global $gm_lang, $GEDCOMS, $HOME_SITE_URL, $HOME_SITE_TEXT,$GM_IMAGE_DIR, $GM_IMAGES, $gm_user;
+	global $gm_lang, $GEDCOMS, $GM_IMAGES, $gm_user;
 	if ($TEXT_DIRECTION == "ltr") {
 		$rdir = "right";
 		$ldir = "left";
@@ -157,7 +132,7 @@ $outputmenu["Calendar"] = Array
 	<?php if (isset($GEDCOMS[$GEDCOMID])) { ?>
 		<div style="width: 1em; height: 1em;">
 		<a href="index.php?command=gedcom">
-		<img src="<?php print $GM_IMAGE_DIR."/".$GM_IMAGES['gedcom']['small']; ?>" alt="<?php print $GEDCOMS[$GEDCOMID]['title']; ?>" />
+		<img src="<?php print GM_IMAGE_DIR."/".$GM_IMAGES['gedcom']['small']; ?>" alt="<?php print $GEDCOMS[$GEDCOMID]['title']; ?>" />
 		</a>
 		</div>
 	<?php } 
@@ -179,7 +154,7 @@ $outputmenu["Calendar"] = Array
 				if ($person->disp_name) print "<a href=\"individual.php?pid=".$gm_user->gedcomid[$GEDCOMID]."&amp;gedid=".$GEDCOMID."\">".$gm_user->firstname.' '.$gm_user->lastname."</a><br />";
 			}
 			else echo $gm_user->firstname.' '.$gm_user->lastname.'<br />';
-			echo "<a href=\"".$HOME_SITE_URL."\">".$HOME_SITE_TEXT."</a>";
+			echo "<a href=\"".GedcomConfig::$HOME_SITE_URL."\">".GedcomConfig::$HOME_SITE_TEXT."</a>";
 			?>
 		</div>
 	</div>

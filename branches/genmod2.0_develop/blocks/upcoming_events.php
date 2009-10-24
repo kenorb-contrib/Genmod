@@ -36,13 +36,13 @@ $GM_BLOCKS["print_upcoming_events"]["rss"]			= true;
 //-- this block prints a list of upcoming events of people in your gedcom
 function print_upcoming_events($block=true, $config="", $side, $index) {
 	global $gm_lang, $command, $TEXT_DIRECTION;
-	global $GM_IMAGE_DIR, $GM_IMAGES, $GM_BLOCKS;
+	global $GM_IMAGES, $GM_BLOCKS;
 	global $NAME_REVERSE, $GEDCOMID;
-	global $DAYS_TO_SHOW_LIMIT, $gm_user;
+	global $gm_user;
 
 	$block = true; // Always restrict this block's height
 	if (empty($config)) $config = $GM_BLOCKS["print_upcoming_events"]["config"];
-	if (!isset($DAYS_TO_SHOW_LIMIT)) $DAYS_TO_SHOW_LIMIT = 15;
+//	if (!isset(GedcomConfig::$DAYS_TO_SHOW_LIMIT)) GedcomConfig::$DAYS_TO_SHOW_LIMIT = 15;
 	if (isset($config["days"])) $daysprint = $config["days"];
 	else $daysprint = 30;
 	if (isset($config["filter"])) $filter = $config["filter"]; // "living" or "all"
@@ -51,7 +51,7 @@ function print_upcoming_events($block=true, $config="", $side, $index) {
 	else $onlyBDM = "no";
 
 	if ($daysprint < 1) $daysprint = 1;
-	if ($daysprint > $DAYS_TO_SHOW_LIMIT) $daysprint = $DAYS_TO_SHOW_LIMIT; // valid: 1 to limit
+	if ($daysprint > GedcomConfig::$DAYS_TO_SHOW_LIMIT) $daysprint = GedcomConfig::$DAYS_TO_SHOW_LIMIT; // valid: 1 to limit
 
 	$skipfacts = "CHAN,BAPL,SLGC,SLGS,ENDL";	// These are always excluded
 
@@ -68,7 +68,7 @@ function print_upcoming_events($block=true, $config="", $side, $index) {
 			if ($command=="gedcom") $name = preg_replace("/'/", "\'", get_gedcom_from_id($GEDCOMID));
 			else $name = $gm_user->username;
 			print "<a href=\"javascript: ".$gm_lang["config_block"]."\" onclick=\"window.open('index_edit.php?name=$name&amp;command=$command&amp;action=configure&amp;side=$side&amp;index=$index', '', 'top=50,left=50,width=500,height=250,scrollbars=1,resizable=1'); return false;\">";
-			print "<img class=\"adminicon\" src=\"$GM_IMAGE_DIR/".$GM_IMAGES["admin"]["small"]."\" width=\"15\" height=\"15\" border=\"0\" alt=\"".$gm_lang["config_block"]."\" /></a>\n";
+			print "<img class=\"adminicon\" src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["admin"]["small"]."\" width=\"15\" height=\"15\" border=\"0\" alt=\"".$gm_lang["config_block"]."\" /></a>\n";
 		}
 	}
 	print $gm_lang["upcoming_events"];
@@ -113,7 +113,7 @@ function print_upcoming_events($block=true, $config="", $side, $index) {
 						if ($NAME_REVERSE) $name = str_replace(",", "", $factarr[4]);
 						else $name = $factarr[4];
 						print "<a href=\"individual.php?pid=$gid&amp;gedid=".$GEDCOMID."\"><b>".$name."</b>";
-						print "<img id=\"box-".$gid."-".$key."-sex\" src=\"".$GM_IMAGE_DIR."/";
+						print "<img id=\"box-".$gid."-".$key."-sex\" src=\"".GM_IMAGE_DIR."/";
 						if ($factarr[5] == "M") print $GM_IMAGES["sex"]["small"]."\" title=\"".$gm_lang["male"]."\" alt=\"".$gm_lang["male"];
 						else if ($factarr[5] == "F") print $GM_IMAGES["sexf"]["small"]."\" title=\"".$gm_lang["female"]."\" alt=\"".$gm_lang["female"];
 						else print $GM_IMAGES["sexn"]["small"]."\" title=\"".$gm_lang["unknown"]."\" alt=\"".$gm_lang["unknown"];
@@ -179,16 +179,16 @@ function print_upcoming_events($block=true, $config="", $side, $index) {
 }
 
 function print_upcoming_events_config($config) {
-	global $gm_lang, $GM_BLOCKS, $DAYS_TO_SHOW_LIMIT;
+	global $gm_lang, $GM_BLOCKS;
 	
 	if (empty($config)) $config = $GM_BLOCKS["print_upcoming_events"]["config"];
-	if (!isset($DAYS_TO_SHOW_LIMIT)) $DAYS_TO_SHOW_LIMIT = 30;
+//	if (!isset(GedcomConfig::$DAYS_TO_SHOW_LIMIT)) GedcomConfig::$DAYS_TO_SHOW_LIMIT = 30;
 	if (!isset($config["days"])) $config["days"] = 30;
 	if (!isset($config["filter"])) $config["filter"] = "all";
 	if (!isset($config["onlyBDM"])) $config["onlyBDM"] = "no";
 
 	if ($config["days"] < 1) $config["days"] = 1;
-	if ($config["days"] > $DAYS_TO_SHOW_LIMIT) $config["days"] = $DAYS_TO_SHOW_LIMIT; // valid: 1 to limit
+	if ($config["days"] > GedcomConfig::$DAYS_TO_SHOW_LIMIT) $config["days"] = GedcomConfig::$DAYS_TO_SHOW_LIMIT; // valid: 1 to limit
 
 	print "<tr><td class=\"shade2 width20\">";
 	print_help_link("days_to_show_help", "qm");

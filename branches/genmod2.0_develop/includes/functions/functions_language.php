@@ -676,7 +676,7 @@ function DeactivateLanguage($lang) {
  ** else return true or false
  */
 function LanguageInUse($lang="") {
-	global $GEDCOMS, $GEDCOMLANG;
+	global $GEDCOMS;
 	static $configuredlanguages, $inuse;
 	
 	if (!isset($configuredlanguages)) {
@@ -686,8 +686,8 @@ function LanguageInUse($lang="") {
 		// Read GEDCOMS configuration and collect language data
 		foreach ($GEDCOMS as $key => $value) {
 			SwitchGedcom($value["gedcom"]);
-			if (!isset($configuredlanguages["gedcom"][$GEDCOMLANG][$value["gedcom"]])) $configuredlanguages["gedcom"][$GEDCOMLANG][$value["gedcom"]] = TRUE;
-			$inuse[$GEDCOMLANG] = true;
+			if (!isset($configuredlanguages["gedcom"][GedcomConfig::$GEDCOMLANG][$value["gedcom"]])) $configuredlanguages["gedcom"][GedcomConfig::$GEDCOMLANG][$value["gedcom"]] = TRUE;
+			$inuse[GedcomConfig::$GEDCOMLANG] = true;
 		}
 		// Restore the current settings
 		SwitchGedcom();

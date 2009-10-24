@@ -72,13 +72,13 @@ class RepositoryController extends DetailController {
 	 * @return string
 	 */
 	protected function getPageTitle() {
-		global $gm_lang, $SHOW_ID_NUMBERS;
+		global $gm_lang;
 
 		if (is_null($this->pagetitle)) {
 			$this->pagetitle = "";
 			if ($this->repo->title) {
 				$this->pagetitle .= $this->repo->title." - ";
-				if ($SHOW_ID_NUMBERS) $this->pagetitle .= $this->repo->xref." - ";
+				if (GedcomConfig::$SHOW_ID_NUMBERS) $this->pagetitle .= $this->repo->xref." - ";
 			}
 			$this->pagetitle .= $gm_lang["repo_info"];
 		}

@@ -64,9 +64,9 @@ $ANN = "\x28\xd8\xba\xd9\x8a\xd8\xb1\x20\xd9\x85\xd8\xb9\xd8\xb1\xd9\x88\xd9\x81
  * @todo other rtl languages
  */
 function ltr_string($name) {
-	global $USE_RTL_FUNCTIONS, $RTLOrd;
+	global $RTLOrd;
 	
-	if(!$USE_RTL_FUNCTIONS) {
+	if(!GedcomConfig::$USE_RTL_FUNCTIONS) {
 		return $name;
 	} 
 	else {
@@ -136,9 +136,9 @@ function unhtmlentities ($string)  {
  * @todo add other RTL langauges
  */
 function bidi_text($text) {
-	global $USE_RTL_FUNCTIONS, $RTLOrd;
+	global $RTLOrd;
 	
-	if($USE_RTL_FUNCTIONS) {
+	if(GedcomConfig::$USE_RTL_FUNCTIONS) {
 		return $text;
 	} 
 	else {
@@ -248,10 +248,10 @@ function bidi_text($text) {
  * @param string $text to verify
  */
 function oneRTLText($text) {
-	global $USE_RTL_FUNCTIONS, $RTLOrd;
+	global $RTLOrd;
 	
 	//--- What if gedcom in ANSI?
-	if(!$USE_RTL_FUNCTIONS) return false;
+	if(!GedcomConfig::$USE_RTL_FUNCTIONS) return false;
 	else return (strlen($text)==2 && in_array(ord($text),$RTLOrd));
 }
 
@@ -262,9 +262,9 @@ function oneRTLText($text) {
  * @param string $text to verify
  */
 function begRTLText($text) { 
-	global $USE_RTL_FUNCTIONS, $RTLOrd;
+	global $RTLOrd;
 	
-	if(!$USE_RTL_FUNCTIONS) return false;
+	if(!GedcomConfig::$USE_RTL_FUNCTIONS) return false;
 	else return (in_array(ord(substr(trim($text),0,2)),$RTLOrd) || in_array(ord(substr(trim($text),1,2)),$RTLOrd));
 }
 
@@ -275,9 +275,9 @@ function begRTLText($text) {
  * @param string $text to verify
  */
 function endRTLText($text) { 
-	global $USE_RTL_FUNCTIONS, $RTLOrd;
+	global $RTLOrd;
 	
-	if(!$USE_RTL_FUNCTIONS) return false;
+	if(!GedcomConfig::$USE_RTL_FUNCTIONS) return false;
 	else return (in_array(ord(substr(trim($text),strlen(trim($text))-2,2)),$RTLOrd) || in_array(ord(substr(trim($text),strlen(trim($text))-3,2)),$RTLOrd));
 }
 

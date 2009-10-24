@@ -100,7 +100,7 @@ if (!isset($useMAA)) $useMAA = 0;
 if (isset($alpha)) $alpha = stripslashes($alpha);
 if (isset($surname)) $surname = stripslashes($surname);
 
-print_header($gm_lang["alive_in_year"]);
+PrintHeader($gm_lang["alive_in_year"]);
 print "<div class =\"center\">";
 print "\n\t<h3>";
 print_help_link("alive_in_year_help", "qm");
@@ -357,5 +357,5 @@ if ($alpha != "@") {
 	else print "<a href=\"aliveinyear.php?year=$year&amp;alpha=".urlencode($alpha)."&amp;surname_sublist=yes&amp;show_all=$show_all&amp;type=$type&amp;useMAA=$useMAA&amp;year=$year\">".$gm_lang["show_surnames"]."</a>";
 }
 print "</div>\n";
-print_footer();
+PrintFooter();
 ?>

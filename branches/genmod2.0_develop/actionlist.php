@@ -43,11 +43,11 @@
 */
 require("config.php");
 
-print_header($gm_lang["actionlist"]);
+PrintHeader($gm_lang["actionlist"]);
 
 if (!$gm_user->ShowActionLog()) {
 	print "<span class=\"error\">".$gm_lang["access_denied"]."</span>";
-	print_footer();
+	PrintFooter();
 	exit;
 }
 
@@ -135,5 +135,5 @@ else {
 	print "</table></div>";
 }
 print "</div>";
-print_footer();
+PrintFooter();
 ?>

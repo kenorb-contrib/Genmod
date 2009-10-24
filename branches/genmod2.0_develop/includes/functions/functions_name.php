@@ -38,11 +38,11 @@ if (stristr($_SERVER["SCRIPT_NAME"],basename(__FILE__))) {
  * @param int $min the number of times a surname must occur before it is added to the array
  */
 function GetCommonSurnamesIndex($gedid) {
-	global $GEDCOMS, $COMMON_NAMES_THRESHOLD;
+	global $GEDCOMS;
 
 	if (empty($GEDCOMS[$gedid]["commonsurnames"])) {
 		SwitchGedcom($gedid);
-		$surnames = GetCommonSurnames($COMMON_NAMES_THRESHOLD);
+		$surnames = GetCommonSurnames(GedcomConfig::$COMMON_NAMES_THRESHOLD);
 		if (count($surnames) != 0) {
 			$sns = "";
 			foreach($surnames as $indexval => $surname) {
@@ -72,7 +72,7 @@ function GetCommonSurnamesIndex($gedid) {
  * @param int $min the number of times a surname must occur before it is added to the array
  */
 function GetCommonSurnames($min) {
-	global $GEDCOMID, $indilist, $GEDCOMS, $COMMON_NAMES_ADD, $COMMON_NAMES_REMOVE, $gm_lang, $HNN, $ANN;
+	global $GEDCOMID, $indilist, $GEDCOMS, $gm_lang, $HNN, $ANN;
 
 	$surnames = array();
 	if (!CONFIGURED || !UserController::AdminUserExists() || (count($GEDCOMS)==0) || (!CheckForImport($GEDCOMID))) return $surnames;
@@ -88,23 +88,23 @@ function GetCommonSurnames($min) {
 				&& stristr($surname["name"], "@N.N")===false
 				&& stristr($surname["name"], $HNN)===false
 				&& stristr($surname["name"], $ANN.",")===false
-				&& stristr($COMMON_NAMES_REMOVE, $surname["name"])===false ) {
+				&& stristr(GedcomConfig::$COMMON_NAMES_REMOVE, $surname["name"])===false ) {
 			if ($surname["match"]>=$min) {
 				$topsurns[Str2Upper($surname["name"])] = $surname;
 			}
 			$i++;
 		}
 	}
-	$addnames = preg_split("/[,;] /", $COMMON_NAMES_ADD);
-	if ((count($addnames)==0) && (!empty($COMMON_NAMES_ADD))) $addnames[] = $COMMON_NAMES_ADD;
+	$addnames = preg_split("/[,;] /", GedcomConfig::$COMMON_NAMES_ADD);
+	if ((count($addnames)==0) && (!empty(GedcomConfig::$COMMON_NAMES_ADD))) $addnames[] = GedcomConfig::$COMMON_NAMES_ADD;
 	foreach($addnames as $indexval => $name) {
 		if (!empty($name)) {
 			$topsurns[$name]["name"] = $name;
 			$topsurns[$name]["match"] = $min;
 		}
 	}
-	$delnames = preg_split("/[,;] /", $COMMON_NAMES_REMOVE);
-	if ((count($delnames)==0) && (!empty($COMMON_NAMES_REMOVE))) $delnames[] = $COMMON_NAMES_REMOVE;
+	$delnames = preg_split("/[,;] /", GedcomConfig::$COMMON_NAMES_REMOVE);
+	if ((count($delnames)==0) && (!empty(GedcomConfig::$COMMON_NAMES_REMOVE))) $delnames[] = GedcomConfig::$COMMON_NAMES_REMOVE;
 	foreach($delnames as $indexval => $name) {
 		if (!empty($name)) {
 			unset($topsurns[$name]);
@@ -115,86 +115,6 @@ function GetCommonSurnames($min) {
 	return $topsurns;
 }
 
-/**
- * Get the name from the raw gedcom record
- *
- * @param string $indirec the raw gedcom record to get the name from
- */
-function GetNameInRecord($indirec, $import=false) {
-	global $SHOW_NICK, $NICK_DELIM;
-	$name = "";
-
-	$nt = preg_match("/1 NAME (.*)/", $indirec, $ntmatch);
-	if ($nt>0) {
-		$name = trim($ntmatch[1]);
-		$name = preg_replace(array("/__+/", "/\.\.+/", "/^\?+/"), array("", "", ""), $name);
-
-		//-- check for a surname
-		$ct = preg_match("~/(.*)/~", $name, $match);
-		if ($ct > 0) {
-			$surname = trim($match[1]);
-			$surname = preg_replace(array("/__+/", "/\.\.+/", "/^\?+/"), array("", "", ""), $surname);
-			if (empty($surname)) $name = preg_replace("~/(.*)/~", "/@N.N./", $name);
-		}
-		else {
-			//-- check for the surname SURN tag
-			$ct = preg_match("/2 SURN (.*)/", $indirec, $match);
-			if ($ct>0) {
-				$pt = preg_match("/2 SPFX (.*)/", $indirec, $pmatch);
-				if ($pt>0) $name .=" ".trim($pmatch[1]);
-				$surname = trim($match[1]);
-				$surname = preg_replace(array("/__+/", "/\.\.+/", "/^\?+/"), array("", "", ""), $surname);
-				if (empty($surname)) $name .= " /@N.N./";
-				else $name .= " /".$surname."/";
-			}
-			else $name .= " /@N.N./";
-		}
-		
-		$givens = preg_replace("~/.*/~", "", $name);
-		if (empty($givens)) $name = "@P.N. ".$name;
-	}
-	else {
-		/*-- this is all extraneous to the 1 NAME tag and according to the gedcom spec
-		-- the 1 NAME tag should take preference
-		*/
-		$name = "";
-		//-- check for the given names
-		$gt = preg_match("/2 GIVN (.*)/", $indirec, $gmatch);
-		if ($gt>0) $name .= trim($gmatch[1]);
-		else $name .= "@P.N.";
-
-		//-- check for the surname
-		$ct = preg_match("/2 SURN (.*)/", $indirec, $match);
-		if ($ct>0) {
-			$pt = preg_match("/2 SPFX (.*)/", $indirec, $pmatch);
-			if ($pt>0) $name .=" ".trim($pmatch[1]);
-			$surname = trim($match[1]);
-			if (empty($surname)) $name .= " /@N.N./";
-			else $name .= " /".$surname."/";
-		}
-		if (empty($name)) $name = "@P.N. /@N.N./";
-
-		$st = preg_match("/2 NSFX (.*)/", $indirec, $smatch);
-		if ($st>0) $name.=" ".trim($smatch[1]);
-		$pt = preg_match("/2 SPFX (.*)/", $indirec, $pmatch);
-		if ($pt>0) $name =strtolower(trim($pmatch[1]))." ".$name;
-	}
-	// handle PAF extra NPFX [ 961860 ]
-	$ct = preg_match("/2 NPFX (.*)/", $indirec, $match);
-	if ($ct>0) {
-		$npfx = trim($match[1]);
-		if (strpos($name, $npfx)===false) $name = $npfx." ".$name;
-	}
-	// Insert the nickname if the option is set
-	if ($SHOW_NICK && !$import) {
-		$n = GetNicks($indirec);
-		if (count($n) > 0) {
-			$ct = preg_match("~(.*)/(.*)/(.*)~", $name, $match);
-			$name = $match[1].substr($NICK_DELIM, 0, 1).$n[0].substr($NICK_DELIM, 1, 1)."/".$match[2]."/".$match[3];
-		}
-	}
-	return $name;
-}
 
 /**
  * get the person's name as surname, given names
@@ -267,69 +187,25 @@ function GetSortableName($pid, $alpha="", $surname="", $allnames=false, $rev = f
 	if ($allnames == true) {
 		$mynames = array();
 		foreach ($names as $key => $name) {
-			if ($NAME_REVERSE) $mynames[] = SortableNameFromName(ReverseName($name[0]), $rev);
-			else $mynames[] = SortableNameFromName($name[0], $rev);
+			if ($NAME_REVERSE) $mynames[] = NameFunctions::SortableNameFromName(NameFunctions::ReverseName($name[0]), $rev);
+			else $mynames[] = NameFunctions::SortableNameFromName($name[0], $rev);
 		}
 		return $mynames;
 	}
 	foreach($names as $indexval => $name) {
 		if ($surname!="" && $name[2]==$surname) {
-			if ($NAME_REVERSE) return SortableNameFromName(ReverseName($name[0]), $rev);
-			else return SortableNameFromName($name[0], $rev);
+			if ($NAME_REVERSE) return NameFunctions::SortableNameFromName(NameFunctions::ReverseName($name[0]), $rev);
+			else return NameFunctions::SortableNameFromName($name[0], $rev);
 		}
 		else if ($alpha!="" && $name[1]==$alpha) {
-			if ($NAME_REVERSE) return SortableNameFromName(ReverseName($name[0]), $rev);
-			else return SortableNameFromName($name[0], $rev);
+			if ($NAME_REVERSE) return NameFunctions::SortableNameFromName(NameFunctions::ReverseName($name[0]), $rev);
+			else return NameFunctions::SortableNameFromName($name[0], $rev);
 		}
 	}
-	if ($NAME_REVERSE) return SortableNameFromName(ReverseName($names[0][0]), $rev);
-	else return SortableNameFromName($names[0][0], $rev);
+	if ($NAME_REVERSE) return NameFunctions::SortableNameFromName(NameFunctions::ReverseName($names[0][0]), $rev);
+	else return NameFunctions::SortableNameFromName($names[0][0], $rev);
 }
 
-/**
- * Get the sortable name from the gedcom name
- *
- * @param string $name 	the name from the 1 NAME gedcom line including the /
- * @return string 	The new name in the form Surname, Given Names
- */
-function SortableNameFromName($name, $rev = false) {
-	global $NAME_REVERSE;
-
-	// NOTE: Remove any unwanted characters from the name
-	if (preg_match("/^\.(\.*)$|^\?(\?*)$|^_(_*)$|^,(,*)$/", $name)) $name = preg_replace(array("/,/","/\./","/_/","/\?/"), array("","","",""), $name);
-
-	$ct = preg_match("~(.*)/(.*)/(.*)~", $name, $match);
-	if ($ct>0) {
-		$surname = trim($match[2]);
-		if (empty($surname)) $surname = "@N.N.";
-		$givenname = trim($match[1]);
-		$othername = trim($match[3]);
-		if (HasChinese($name, true)) $add = "";
-		else $add = " ";
-		if (empty($givenname)&&!empty($othername)) {
-			$givenname = $othername;
-			$othername = "";
-		}
-		if ($rev) {
-			if (empty($givenname)) $givenname = "@P.N.";
-			if ($NAME_REVERSE || HasChinese($name, true)) $name = $surname.$add.$givenname;
-			else $name = $givenname.$add.$surname;
-			if (!empty($othername)) $name .= $add.$othername;
-		}
-		else {
-			if (empty($givenname)) $givenname = "@P.N.";
-			$name = $surname;
-			if (!empty($othername)) $name .= $add.$othername;
-			if ($NAME_REVERSE || HasChinese($name, true)) $name .= $add.$givenname;
-			else $name .= ", ".$givenname;
-		}
-	}
-	if (!empty($name)) return $name;
-	else {
-		if ($rev) return "@P.N. @N.N.";
-		else return "@N.N., @P.N.";
-	}
-}
 
 /**
  * get the name for a person
@@ -342,7 +218,6 @@ function SortableNameFromName($name, $rev = false) {
  */
 function GetPersonName($pid, $indirec="", $starred=true) {
 	global $NAME_REVERSE, $COMBIKEY;
-	global $NAME_FROM_GEDCOM;
 	global $indilist, $GEDCOMID;
 
 	if ($COMBIKEY) $key = JoinKey($pid, $GEDCOMID);
@@ -350,9 +225,9 @@ function GetPersonName($pid, $indirec="", $starred=true) {
 	
 	$name = "";
 	//-- get the name from the gedcom record
-	if ($NAME_FROM_GEDCOM) {
+	if (GedcomConfig::$NAME_FROM_GEDCOM) {
 		if ($indirec == "") $indirec = FindPersonRecord($pid);
-		$name = GetNameInRecord($indirec);
+		$name = NameFunctions::GetNameInRecord($indirec);
 	}
 	else {
 		if ($indirec == "") {
@@ -385,39 +260,11 @@ function GetPersonName($pid, $indirec="", $starred=true) {
 			$name = $names[0][0];
 		}
 	}
-	if ($NAME_REVERSE ||HasChinese($name, true)) $name = ReverseName($name);
+	if ($NAME_REVERSE ||HasChinese($name, true)) $name = NameFunctions::ReverseName($name);
 	$name = CheckNN($name, $starred);
 	return $name;
 }
 
-/**
- * reverse a name
- * this function will reverse a name for languages that
- * prefer last name first such as hungarian and chinese
- * @param string $name	the name to reverse, must be gedcom encoded as if from the 1 NAME line
- * @return string		the reversed name
- */
-function ReverseName($name) {
-	$ct = preg_match("~(.*)/(.*)/(.*)~", $name, $match);
-	if ($ct>0) {
-		if (HasChinese($name, true)) $add = "";
-		else $add = " ";
-		$surname = trim($match[2]);
-		if (empty($surname)) $surname = "@N.N.";
-		$givenname = trim($match[1]);
-		$othername = trim($match[3]);
-		if (empty($givenname)&&!empty($othername)) {
-			$givenname = $othername;
-			$othername = "";
-		}
-		if (empty($givenname)) $givenname = "@P.N.";
-		$name = $surname;
-		$name .= $add.$givenname;
-		if (!empty($othername)) $name .= $add.$othername;
-	}
-	
-	return $name;
-}
 //toberemoved
 /**
  * get the descriptive title of the source
@@ -426,7 +273,6 @@ function ReverseName($name) {
  * @return string the title of the source
  */
 function GetSourceDescriptor($sid, $gedrec="") {
-	global $WORD_WRAPPED_NOTES;
 	global $GEDCOMID, $sourcelist, $show_changes, $gm_lang;
 
 	if ($sid=="") return false;
@@ -461,7 +307,6 @@ function GetSourceDescriptor($sid, $gedrec="") {
  * @return string the title of the repository
  */
 function GetRepoDescriptor($rid) {
-	global $WORD_WRAPPED_NOTES;
 	global $GEDCOMID, $repo_id_list, $show_changes, $gm_lang;
 
 	if ($rid=="") return false;
@@ -488,7 +333,6 @@ function GetRepoDescriptor($rid) {
  * @return string the additional title of the source
  */
 function GetAddSourceDescriptor($sid) {
-	global $WORD_WRAPPED_NOTES;
 	global $GEDCOMID, $sourcelist, $show_changes;
 	$title = "";
 	if ($sid=="") return false;
@@ -520,7 +364,6 @@ function GetAddSourceDescriptor($sid) {
  * @return string the additional title of the repository
  */
 function GetAddRepoDescriptor($rid) {
-	global $WORD_WRAPPED_NOTES;
 	global $GEDCOMID, $repolist, $show_changes;
 	$title = "";
 	if ($rid=="") return false;
@@ -642,7 +485,6 @@ function GetMediaDescriptor($mid, $gedrec="") {
 
 // -- find and return a given individual's second name in format: firstname lastname
 function GetAddPersonName($pid, $record="", $import=false) {
-	global $NAME_FROM_GEDCOM;
 
 	//-- get the name from the indexes
 	if (empty($record)) $record = FindPersonRecord($pid);
@@ -653,7 +495,6 @@ function GetAddPersonName($pid, $record="", $import=false) {
 
 function GetAddPersonNameInRecord($name_record, $keep_slash=false, $import=false) {
 	global $NAME_REVERSE;
-	global $NAME_FROM_GEDCOM;
 
 	// Check for ROMN name
 	$romn = preg_match("/(2 ROMN (.*)|2 _HEB (.*))/", $name_record, $romn_match);
@@ -672,7 +513,7 @@ function GetAddPersonNameInRecord($name_record, $keep_slash=false, $import=false
 	}
 	// If not found, and chinese, generate the PinYin equivalent of the name
 	else {
-		$orgname = GetNameInRecord($name_record);
+		$orgname = NameFunctions::GetNameInRecord($name_record);
 		if (HasChinese($orgname, $import)){
 			$name = GetPinYin($orgname, $import);
 			if ($keep_slash) return trim($name);
@@ -689,14 +530,14 @@ function GetAddPersonNameInRecord($name_record, $keep_slash=false, $import=false
 		}
 		else $name = "";
 	}
-	if ($NAME_REVERSE) $name = ReverseName($name);
+	if ($NAME_REVERSE) $name = NameFunctions::ReverseName($name);
 	return $name;
 }
 
 // -- find and return a given individual's second name in sort format: familyname, firstname
 function GetSortableAddName($pid, $record="", $rev = false, $changes = false) {
 	global $NAME_REVERSE;
-	global $NAME_FROM_GEDCOM, $GEDCOMID;
+	global $GEDCOMID;
 
 	//-- get the name from the indexes
 	if (empty($record)) $record = FindPersonRecord($pid);
@@ -712,7 +553,7 @@ function GetSortableAddName($pid, $record="", $rev = false, $changes = false) {
 	// Check for ROMN name
 	$romn = preg_match("/(2 ROMN (.*)|2 _HEB (.*))/", $name_record, $romn_match);
 	if ($romn == 0) {
-		$orgname = GetNameInRecord($name_record);
+		$orgname = NameFunctions::GetNameInRecord($name_record);
 		if (HasChinese($orgname)){
 			$romn_match[0] = GetPinYin($orgname);
 			$romn = 1;
@@ -802,7 +643,7 @@ function ExtractSurname($indiname) {
  * @return string 	the first letter UTF-8 encoded
  */
 function GetFirstLetter($text, $import=false) {
-	global $LANGUAGE, $CHARACTER_SET;
+	global $LANGUAGE;
 
 	$text=trim(Str2Upper($text));
 	if ($import == true) {
@@ -847,7 +688,7 @@ function GetFirstLetter($text, $import=false) {
  * @return string
  */
 function CheckNN($names, $starred=true) {
-	global $gm_lang, $HNN, $ANN, $UNDERLINE_NAME_QUOTES;
+	global $gm_lang, $HNN, $ANN;
 
 	$fullname = "";
 	$NN = $gm_lang["NN"];
@@ -863,7 +704,7 @@ function CheckNN($names, $starred=true) {
 		else $names = preg_replace(array("~ /~","~/,~","~/~"), array(" ", ",", " "), $names);
 		$names = preg_replace(array("/@N.N.?/","/@P.N.?/"), array($NN,$PN), trim($names));
 
-		if ($UNDERLINE_NAME_QUOTES) {
+		if (GedcomConfig::$UNDERLINE_NAME_QUOTES) {
 			if ($starred) $names = preg_replace("/\"(.+)\"/", "<span class=\"starredname\">$1</span>", $names);
 			else $names = preg_replace("/\"(.+)\"/", "$1", $names);
 		}
@@ -884,7 +725,7 @@ function CheckNN($names, $starred=true) {
 			}
 			
 			for($i=0; $i<count($names); $i++) {
-				if ($UNDERLINE_NAME_QUOTES) {
+				if (GedcomConfig::$UNDERLINE_NAME_QUOTES) {
 					if ($starred) $names[$i] = preg_replace("/\"(.+)\"/", "<span class=\"starredname\">$1</span>", $names[$i]);
 					else $names[$i] = preg_replace("/\"(.+)\"/", "$1", $names[$i]);
 				}
@@ -1060,7 +901,7 @@ function GetIndiNames($indirec, $import=false, $marr_names=true) {
 	else {
 		$j = 1;
 		while(!empty($namerec)) {
-			$name = GetNameInRecord($namerec, $import);
+			$name = NameFunctions::GetNameInRecord($namerec, $import);
 			$surname = ExtractSurname($name);
 			if (empty($surname)) $surname = "@N.N.";
 			$lname = preg_replace("/^[a-z0-9 \.]+/", "", $surname);
@@ -1386,9 +1227,9 @@ function GetSoundexStrings($namearray, $import=false, $indirec="") {
 // CJK = 3 bytes, 228 <= ord <= 233
 // Hebrew = 2 bytes, 214 <= ord <= 215
 function HasChinese($name, $import = false) {
-	global $DISPLAY_PINYIN, $LANGUAGE;
+	global $LANGUAGE;
 	
-	if ((!$DISPLAY_PINYIN || $LANGUAGE == "chinese") && !$import) return false;
+	if ((!GedcomConfig::$DISPLAY_PINYIN || $LANGUAGE == "chinese") && !$import) return false;
 	$l = strlen($name);
 	if ($l <3) return false;
 	$max = $l - 3;
@@ -1527,118 +1368,6 @@ function AbbreviateName($name, $length) {
 	return $name;
 }
 
-function SearchAddAssos() {
-	global $assolist, $indi_printed, $fam_printed, $printindiname, $printfamname, $famlist;
-
-	// Step 1: Pull the relations to the printed results from the assolist
-	$toadd = array();
-	foreach ($assolist as $p1key => $assos) {
-		// Get the person who might be a relation
-		// Check if we can show him/her
-		SwitchGedcom(SplitKey($p1key, "gedid"));
-		foreach ($assos as $key => $asso) {
-			$p2key = $asso["pid2"];
-			// Design choice: we add to->from and from->to
-			// Check if he/she  and the persons/fams he/she is related to, actually exist
-			// Also respect name privacy for all related individuals. If one is hidden, it prevents the relation to be displayed
-			// p1key can be either indi or fam, p2key can only be indi.
-			if (array_key_exists($p2key, $indi_printed) || array_key_exists($p1key, $indi_printed) || array_key_exists($p1key, $fam_printed)) {
-				// p2key is always an indi, so check this first
-				$disp = true;
-				if (!PrivacyFunctions::showLivingNameByID(SplitKey($p2key, "id"))) $disp = false;
-				else {
-					if (!empty($asso["fact"]) &&!PrivacyFunctions::showFact($asso["fact"], SplitKey($p2key, "id"))) $disp = false;
-					else {
-						// assotype is the type of p1key
-						if ($asso["type"] == "indi") {
-							if (!PrivacyFunctions::showLivingNameByID(SplitKey($p1key, "id"))) $disp = false;
-						}
-						else {
-							$parents = FindParentsInRecord($asso["gedcom"]);
-							if (!PrivacyFunctions::showLivingNameByID($parents["HUSB"]) || !PrivacyFunctions::showLivingNameByID($parents["WIFE"])) $disp = false;
-						}
-					}
-				}
-				if ($disp && !empty($asso["resn"])) {
-					if (!empty($asso["fact"])) {
-						$rec = "1 ".$fact."\r\n2 ASSO @".SplitKey($p1key, "id")."@\r\n2 RESN ".$asso["resn"]."\r\n";
-						$disp = PrivacyFunctions::FactViewRestricted(SplitKey($p2key, "id"), $rec, 2);
-					}
-					else {
-						$rec = "1 ASSO @".SplitKey($p1key, "id")."@\r\n2 RESN ".$asso["resn"]."\r\n";
-						$disp = PrivacyFunctions::FactViewRestricted(SplitKey($p2key, "id"), $rec, 2);
-					}
-				}
-				// save his relation to existing search results
-				if ($disp) {
-					$toadd[$p1key][] = array($p2key, "indi", $asso["fact"], $asso["role"]);
-					$toadd[$p2key][] = array($p1key, $asso["type"], $asso["fact"], $asso["role"]);
-				}
-			}
-		}
-	}
-
-	// Step 2: Add the relations who are not printed themselves
-	foreach ($toadd as $add => $links) {
-		$arec = FindGedcomRecord(SplitKey($add, "id"));
-		$type = GetRecType($arec);
-		if ($type == "INDI") {
-			if (!array_key_exists($add, $indi_printed)) {
-				$indi_printed[$add] = "1";
-				$names = GetIndiNames($arec);
-				foreach ($names as $nkey => $namearray) {
-					$printindiname[] = array(SortableNameFromName($namearray[0]), SplitKey($add, "id"), SplitKey($add, "gedid"), "");
-				}
-			}
-		}
-		else {
-			if (!array_key_exists($add, $fam_printed)) {
-				$fam_printed[$add] = "1";
-				$fam = $famlist[$add];
-				$hname = GetSortableName($fam["HUSB"], "", "", true);
-				$wname = GetSortableName($fam["WIFE"], "", "", true);
-				if (empty($hname)) $hname = "@N.N.";
-				if (empty($wname)) $wname = "@N.N.";
-				$name = array();
-				foreach ($hname as $hkey => $hn) {
-					foreach ($wname as $wkey => $wn) {
-						$name[] = $hn." + ".$wn;
-						$name[] = $wn." + ".$hn;
-					}
-				}
-				foreach ($name as $namekey => $famname) {
-					$famsplit = preg_split("/(\s\+\s)/", trim($famname));
-					// Both names have to have the same direction and combination of chinese/not chinese
-					if (hasRTLText($famsplit[0]) == hasRTLText($famsplit[1]) && HasChinese($famsplit[0], true) == HasChinese($famsplit[1], true)) {
-						$printfamname[]=array(CheckNN($famname), SplitKey($add, "id"), $fam["gedfile"],"");
-					}
-				}
-			}
-		}
-	}
-
-	// Step 3: now cycle through the indi search results to add a relation link
-	foreach ($printindiname as $pkey => $printindi) {
-		$pikey = JoinKey($printindi[1], get_id_from_gedcom($printindi[2]));
-		if (isset($toadd[$pikey])) {
-			foreach ($toadd[$pikey] as $rkey => $asso) {
-				SwitchGedcom($printindi[2]);
-				$printindiname[$pkey][3][] = $asso;
-			}
-		}
-	}
-	// Step 4: now cycle through the fam search results to add a relation link
-	foreach ($printfamname as $pkey => $printfam) {
-		$pikey = JoinKey($printfam[1], get_id_from_gedcom($printfam[2]));
-		if (isset($toadd[$pikey])) {
-			foreach ($toadd[$pikey] as $rkey => $asso) {
-				SwitchGedcom($printfam[2]);
-				$printfamname[$pkey][3][] = $asso;
-			}
-		}
-	}
-	SwitchGedcom();
-}
 
 /**
  * builds and returns sosa relationship name in the active language

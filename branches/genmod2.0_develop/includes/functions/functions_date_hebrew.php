@@ -36,11 +36,11 @@ if (stristr($_SERVER["SCRIPT_NAME"],basename(__FILE__))) {
 
 //-- Hebrew date (escape value @#DHEBREW@) month (Jewish) or full date (Hebrew pages) translation  (meliza)  
 function ConvertHdate($dstr_beg, $dstr_end, $day, $month, $year) {
-	global $LANGUAGE, $CALENDAR_FORMAT, $monthtonum; 
+	global $LANGUAGE, $monthtonum; 
 	
 	if ($month != "") $month = $monthtonum[$month];
 	
-	if ($LANGUAGE != "hebrew" && ($CALENDAR_FORMAT == "gregorian" || $CALENDAR_FORMAT == "jewish" || $CALENDAR_FORMAT == "jewish_and_gregorian")) {
+	if ($LANGUAGE != "hebrew" && (GedcomConfig::$CALENDAR_FORMAT == "gregorian" || GedcomConfig::$CALENDAR_FORMAT == "jewish" || GedcomConfig::$CALENDAR_FORMAT == "jewish_and_gregorian")) {
 		if ($month != "") $hebrewMonthName = GetJewishMonthName($month, $year);
 		else $hebrewMonthName = "";
 		$datestr = $dstr_beg . $day . " " . $hebrewMonthName . " " . $year . " " . $dstr_end;
@@ -56,7 +56,7 @@ function ConvertHdate($dstr_beg, $dstr_end, $day, $month, $year) {
 //-- functions to take a Jewish date and display it in Hebrew.
 //-- provided by: KosherJava
 function GetFullHebrewJewishDates($year, $month="", $day="", $altYear="", $altMonth="") {
-	global $DISPLAY_JEWISH_GERESHAYIM, $TEXT_DIRECTION;
+	global $TEXT_DIRECTION;
 	$USE_FULL_PARTIAL_JEWISH_DATES = true;
 	$sb = "<span lang=\"he-IL\" dir=\"rtl\">";
 	if($day != "") {
@@ -98,14 +98,14 @@ function GetFullHebrewJewishDates($year, $month="", $day="", $altYear="", $altMo
 	if($TEXT_DIRECTION == "ltr") { //only do this for ltr languages
 		$sb.= "&lrm;"; //add entity to return to left to right direction
 	}
-	if($DISPLAY_JEWISH_GERESHAYIM == false) {
+	if(GedcomConfig::$DISPLAY_JEWISH_GERESHAYIM == false) {
 		$sb = preg_replace(array("/\"/", "/'/"), array("",""), $sb);
 	}
 	return $sb;
 }
 
 function GetHebrewJewishDates($year, $month="", $day="", $altYear="", $altMonth="") {
-	global $DISPLAY_JEWISH_GERESHAYIM, $TEXT_DIRECTION;
+	global $TEXT_DIRECTION;
 	$sb = "<span lang=\"he-IL\" dir=\"rtl\">";
 	if($day != "") {
 		$sb .= GetHebrewJewishDay($day);
@@ -128,14 +128,13 @@ function GetHebrewJewishDates($year, $month="", $day="", $altYear="", $altMonth=
 		$sb.= "&lrm;"; //add entity to return to left to right direction
 	}
 
-	if($DISPLAY_JEWISH_GERESHAYIM == false) {
+	if(GedcomConfig::$DISPLAY_JEWISH_GERESHAYIM == false) {
 			$sb = preg_replace(array("/\"/", "/'/"), array("",""), $sb);
 	}
 	return $sb;
 }
 
 function GetHebrewJewishYear($year) {
-	global $DISPLAY_JEWISH_THOUSANDS;
 
 	$jAlafim = "אלפים";                       //word ALAFIM in Hebrew for display on years evenly divisable by 1000
 	$jHundreds = array("", "ק", "ר", "ש", "ת", "תק", "תר","תש", "תת", "תתק");
@@ -154,7 +153,7 @@ function GetHebrewJewishYear($year) {
 		$sb .= "'";
 		$sb .= " ";
 		$sb .= $jAlafim;                                         //add # of thousands plus word thousand (overide alafim boolean)
-	} else if($DISPLAY_JEWISH_THOUSANDS) {                       // if alafim boolean display thousands
+	} else if(GedcomConfig::$DISPLAY_JEWISH_THOUSANDS) {                       // if alafim boolean display thousands
 		$sb .= $jOnes[$thousands];
 		$sb .= "'";                                              //append thousands quote
 		$sb .= " ";
@@ -269,11 +268,11 @@ function IsSingleDigitJewishYear($year) {
 }
 
 function GetJewishMonthName($month, $year) {
-	global $JEWISH_ASHKENAZ_PRONUNCIATION;
+	
 	$ashkenazMonths = array("Tishrei", "Cheshvan", "Kislev", "Teves", "Shevat", "Adar I", "Adar II", "Nisan", "Iyar", "Sivan", "Tamuz", "Av", "Elul", "Adar");
 	$sefardMonths = array("Tishrei", "Heshvan", "Kislev", "Tevet", "Shevat", "Adar I", "Adar II", "Nisan", "Iyar", "Sivan", "Tamuz", "Av", "Elul", "Adar");
 	$monthNames = $ashkenazMonths;
-	if($JEWISH_ASHKENAZ_PRONUNCIATION != true) {
+	if(GedcomConfig::$JEWISH_ASHKENAZ_PRONUNCIATION != true) {
 		$monthNames = $sefardMonths;
 	}
 	if($month == 6) { // if Adar check for leap year

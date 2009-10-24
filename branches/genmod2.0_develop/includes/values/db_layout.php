@@ -166,8 +166,6 @@ $db_original[TBLPREFIX."favorites"]["key"]["primary"] = "PRIMARY KEY  (`fv_id`)"
 
 $db_original[TBLPREFIX."gedcoms"]["row"]["g_file"]["details"] = "TINYINT UNSIGNED";
 $db_original[TBLPREFIX."gedcoms"]["row"]["g_gedcom"]["details"] = "VARCHAR(64) CHARACTER SET #charset# COLLATE #collate#  NOT NULL DEFAULT ''";
-$db_original[TBLPREFIX."gedcoms"]["row"]["g_config"]["details"] = "VARCHAR(64) CHARACTER SET #charset# COLLATE #collate# ";
-$db_original[TBLPREFIX."gedcoms"]["row"]["g_privacy"]["details"] = "VARCHAR(64) CHARACTER SET #charset# COLLATE #collate# ";
 $db_original[TBLPREFIX."gedcoms"]["row"]["g_title"]["details"] = "VARCHAR(50) CHARACTER SET #charset# COLLATE #collate# ";
 $db_original[TBLPREFIX."gedcoms"]["row"]["g_path"]["details"] = "VARCHAR(255) CHARACTER SET #charset# COLLATE #collate# ";
 $db_original[TBLPREFIX."gedcoms"]["row"]["g_commonsurnames"]["details"] = "TEXT CHARACTER SET #charset# COLLATE #collate# ";

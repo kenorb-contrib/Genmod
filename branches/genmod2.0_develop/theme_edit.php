@@ -43,7 +43,7 @@ if (empty($uname)) {
 $user =& User::GetInstance($uname);
 
 // -- print html header information
-print_header("Theme editor");
+PrintHeader("Theme editor");
 
 ?>
 <form name="editform" method="post";">
@@ -66,7 +66,7 @@ print_header("Theme editor");
 <input type="submit" value="Change stylesheet" />
 </form>
 <?php
-if (strlen($choose_theme) == 0) $choose_theme = $THEME_DIR;
+if (strlen($choose_theme) == 0) $choose_theme = GedcomConfig::$THEME_DIR;
 $output = file($choose_theme."/style.css");
 $start = FALSE;
 $empty = TRUE;
@@ -174,6 +174,6 @@ foreach ($tags as $l => $tag){
 	print "<tr><td><br /></td><td><br /></td><td><br /></td></tr>\r\n";
 }
 print "</table>";
-print_footer();
+PrintFooter();
 print "\n\t</div>\n</body>\n</html>";
 ?>

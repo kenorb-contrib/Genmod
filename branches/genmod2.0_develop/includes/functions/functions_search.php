@@ -205,7 +205,6 @@ function SearchIndisNames($query, $allgeds=false, $gedid=0) {
 /**
  * Search the dates table for individuals that had events on the given day
  *
- * @author	yalnifj
  * @param	int $day the day of the month to search for, leave empty to include all
  * @param	string $month the 3 letter abbr. of the month to search for, leave empty to include all
  * @param	int $year the year to search for, leave empty to include all
@@ -384,7 +383,6 @@ function DateRangeforQuery($dstart="1", $mstart="1", $ystart="", $dend="31", $me
 /**
  * Search the dates table for families that had events on the given day
  *
- * @author	yalnifj
  * @param	int $day the day of the month to search for, leave empty to include all
  * @param	string $month the 3 letter abbr. of the month to search for, leave empty to include all
  * @param	int $year the year to search for, leave empty to include all
@@ -494,27 +492,6 @@ function SearchFams($query, $allgeds=false, $ANDOR="AND", $allnames=false) {
 	$res->FreeResult();
 	return $myfamlist;
 }
-
-// Get the minimum and maximum Full Text Search term lengths
-function GetFTWordLengths() {
-	global $ftminwlen, $ftmaxwlen;
-	
-	if (!isset($ftminwlen)) {
-		$sql = "SHOW VARIABLES LIKE '%ft_min_word_len%'";
-		$res = NewQuery($sql);
-		$row = $res->FetchRow();
-		$ftminwlen = $row[1];
-		$res->FreeResult();
-	}
-	if (!isset($ftmaxwlen)) {
-		$sql = "SHOW VARIABLES LIKE '%ft_max_word_len%'";
-		$res = NewQuery($sql);
-		$row = $res->FetchRow();
-		$maxwlen = $row[1];
-		$res->FreeResult();
-	}
-}	
-
 
 //-- search through the gedcom records for families
 function SearchFamsNames($query, $ANDOR="AND", $allnames=false) {
@@ -653,7 +630,6 @@ function SearchFamsYearRange($startyear, $endyear, $allgeds=false) {
 /**
  * Search the dates table for families that had events on the given day
  *
- * @author	yalnifj
  * @param	int $day the day of the month to search for, leave empty to include all
  * @param	string $month the 3 letter abbr. of the month to search for, leave empty to include all
  * @param	int $year the year to search for, leave empty to include all
@@ -806,156 +782,4 @@ function SearchSourcesDates($day="", $month="", $year="", $fact="", $allgeds=fal
 	$res->FreeResult();
 	return $mysourcelist;
 }
-
-/**
- * Search the dates table for sources that had events on the given day
- *
- * @param	boolean $allgeds setting if all gedcoms should be searched, default is false
- * @return	array $myfamlist array with all individuals that matched the query
- */
-function SearchSourcesDateRange($dstart="1", $mstart="1", $ystart="", $dend="31", $mend="12", $yend="", $skipfacts="", $allgeds=false, $onlyfacts="") {
-	global $famlist, $GEDCOMID;
-	$mysourcelist = array();
-	
-	$sql = "SELECT s_id, s_name, s_file, s_gedrec, d_gid FROM ".TBLPREFIX."dates, ".TBLPREFIX."sources WHERE s_id=d_gid AND s_file=d_file ";
-	
-	$sql .= DateRangeforQuery($dstart, $mstart, $ystart, $dend, $mend, $yend, $skipfacts, $allgeds, $onlyfacts);
-	
-	$sql .= "GROUP BY s_id ORDER BY d_year, d_month, d_day DESC";
-	
-	$res = NewQuery($sql);
-	$gedold = $GEDCOMID;
-	while($row = $res->fetchRow()){
-		$row = db_cleanup($row);
-		if ($allgeds) {
-			$mysourcelist[$row[0]."[".$row[2]."]"]["name"] = $row[1];
-			$mysourcelist[$row[0]."[".$row[2]."]"]["gedfile"] = $row[2];
-			$mysourcelist[$row[0]."[".$row[2]."]"]["gedcom"] = $row[3];
-		}
-		else {
-			$mysourcelist[$row[0]]["name"] = $row[1];
-			$mysourcelist[$row[0]]["gedfile"] = $row[2];
-			$mysourcelist[$row[0]]["gedcom"] = $row[3];
-		}
-	}
-	$GEDCOMID = $gedold;
-	$res->FreeResult();
-	return $mysourcelist;
-}
-
-/**
- * Search the dates table for other records that had events on the given day
- *
- * @param	boolean $allgeds setting if all gedcoms should be searched, default is false
- * @return	array $myfamlist array with all individuals that matched the query
- */
-function SearchOtherDates($day="", $month="", $year="", $fact="", $allgeds=false) {
-	global $famlist, $GEDCOMID;
-	$myrepolist = array();
-	
-	$sql = "SELECT o_id, o_file, o_type, o_gedrec, d_gid FROM ".TBLPREFIX."dates, ".TBLPREFIX."other WHERE o_id=d_gid AND o_file=d_file ";
-	if (!empty($day)) $sql .= "AND d_day='".DbLayer::EscapeQuery($day)."' ";
-	if (!empty($month)) $sql .= "AND d_month='".DbLayer::EscapeQuery(Str2Upper($month))."' ";
-	if (!empty($year)) $sql .= "AND d_year='".DbLayer::EscapeQuery($year)."' ";
-	if (!empty($fact)) $sql .= "AND d_fact='".DbLayer::EscapeQuery(Str2Upper($fact))."' ";
-	if (!$allgeds) $sql .= "AND d_file='".$GEDCOMID."' ";
-	$sql .= "GROUP BY o_id ORDER BY d_year, d_month, d_day DESC";
-	
-	$res = NewQuery($sql);
-	$gedold = $GEDCOMID;
-	while($row = $res->fetchRow()){
-		$row = db_cleanup($row);
-		$tt = preg_match("/1 NAME (.*)/", $row[2], $match);
-		if ($tt == "0") $name = $row[0]; else $name = $match[1];
-		if ($allgeds) {
-			$myrepolist[$row[0]."[".$row[1]."]"]["name"] = $name;
-			$myrepolist[$row[0]."[".$row[1]."]"]["gedfile"] = $row[1];
-			$myrepolist[$row[0]."[".$row[1]."]"]["type"] = $row[2];
-			$myrepolist[$row[0]."[".$row[1]."]"]["gedcom"] = $row[3];
-		}
-		else {
-			$myrepolist[$row[0]]["name"] = $name;
-			$myrepolist[$row[0]]["gedfile"] = $row[1];
-			$myrepolist[$row[0]]["type"] = $row[2];
-			$myrepolist[$row[0]]["gedcom"] = $row[3];
-		}
-	}
-	$GEDCOMID = $gedold;
-	$res->FreeResult();
-	return $myrepolist;
-}
-
-/**
- * Search the dates table for other records that had events on the given day
- *
- * @param	boolean $allgeds setting if all gedcoms should be searched, default is false
- * @return	array $myfamlist array with all individuals that matched the query
- */
-function SearchOtherDateRange($dstart="1", $mstart="1", $ystart="", $dend="31", $mend="12", $yend="", $skipfacts="", $allgeds=false, $onlyfacts="") {
-	global $GEDCOMID;
-	$myrepolist = array();
-	
-	$sql = "SELECT o_id, o_file, o_type, o_gedrec, d_gid FROM ".TBLPREFIX."dates, ".TBLPREFIX."other WHERE o_id=d_gid AND o_file=d_file ";
-	
-	$sql .= DateRangeforQuery($dstart, $mstart, $ystart, $dend, $mend, $yend, $skipfacts, $allgeds, $onlyfacts);
-	
-	$sql .= "GROUP BY o_id ORDER BY d_year, d_month, d_day DESC";
-
-	$res = NewQuery($sql);
-	$gedold = $GEDCOMID;
-	while($row = $res->fetchRow()){
-		$row = db_cleanup($row);
-		$tt = preg_match("/1 NAME (.*)/", $row[2], $match);
-		if ($tt == "0") $name = $row[0]; else $name = $match[1];
-		if ($allgeds) {
-			$myrepolist[$row[0]."[".$row[1]."]"]["name"] = $name;
-			$myrepolist[$row[0]."[".$row[1]."]"]["gedfile"] = $row[1];
-			$myrepolist[$row[0]."[".$row[1]."]"]["type"] = $row[2];
-			$myrepolist[$row[0]."[".$row[1]."]"]["gedcom"] = $row[3];
-		}
-		else {
-			$myrepolist[$row[0]]["name"] = $name;
-			$myrepolist[$row[0]]["gedfile"] = $row[1];
-			$myrepolist[$row[0]]["type"] = $row[2];
-			$myrepolist[$row[0]]["gedcom"] = $row[3];
-		}
-	}
-	$GEDCOMID = $gedold;
-	$res->FreeResult();
-	return $myrepolist;
-}
-
-/**
- * Search the dates table for other records that had events on the given day
- *
- * @param	boolean $allgeds setting if all gedcoms should be searched, default is false
- * @return	array $mymedia array with all individuals that matched the query
- */
-function SearchMediaDateRange($dstart="1", $mstart="1", $ystart="", $dend="31", $mend="12", $yend="", $skipfacts="", $allgeds=false, $onlyfacts="") {
-	global $GEDCOMID;
-	$mymedia = array();
-	
-	$sql = "SELECT m_media, m_mfile, m_file, m_ext, m_titl, m_gedrec FROM ".TBLPREFIX."dates, ".TBLPREFIX."media WHERE m_media=d_gid AND m_file=d_file ";
-	
-	$sql .= DateRangeforQuery($dstart, $mstart, $ystart, $dend, $mend, $yend, $skipfacts, $allgeds, $onlyfacts);
-	
-	$sql .= "GROUP BY m_media ORDER BY d_year, d_month, d_day DESC";
-
-	$res = NewQuery($sql);
-	$gedold = $GEDCOMID;
-
-	while($row = $res->fetchAssoc()){
-		if ($allgeds) $mid = $row["m_media"]."[".$row["m_file"]."]";
-		else $mid = $row["m_media"];
-		$mymedia[$mid]["ext"] = $row["m_ext"];
-		$mymedia[$mid]["title"] = $row["m_titl"];
-		$mymedia[$mid]["file"] = MediaFS::CheckMediaDepth($row["m_mfile"]);
-		$mymedia[$mid]["gedcom"] = $row["m_gedrec"];
-		$mymedia[$mid]["gedfile"] = $row["m_file"];
-	}
-	$GEDCOMID = $gedold;
-	$res->FreeResult();
-	return $mymedia;
-}
-
 ?>

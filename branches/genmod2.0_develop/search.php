@@ -180,7 +180,7 @@ if (($ALLOW_CHANGE_GEDCOM) && (count($GEDCOMS) > 1)) {
 		// BUT we must NOT search in a gedcom with authentication required and a user not logged in!
 		$str = "sg".$key;
 		SwitchGedcom($key);
-		if ($REQUIRE_AUTHENTICATION && $gm_user->username == "") unset($$str);
+		if (GedcomConfig::$REQUIRE_AUTHENTICATION && $gm_user->username == "") unset($$str);
 		if (isset($$str)) $sgeds[] = $key;
 	}
 	SwitchGedcom();
@@ -572,7 +572,7 @@ if ($action=="soundex") {
 			if ($save === true) {
 				if ($nameprt == "all") {
 					foreach($value["names"] as $indexval => $namearray) {
-						$printindiname[] = array(SortableNameFromName($namearray[0]), $ikey, $value["gedfile"],"");
+						$printindiname[] = array(NameFunctions::SortableNameFromName($namearray[0]), $ikey, $value["gedfile"],"");
 					}
 					$indi_printed[JoinKey($ikey, $value["gedfile"])] = "1";
 				}
@@ -621,7 +621,7 @@ if ($action=="soundex") {
 							}
 						}
 						if ($print) {
-							$printindiname[] = array(SortableNameFromName($namearray[0]), $ikey, $value["gedfile"],"");
+							$printindiname[] = array(NameFunctions::SortableNameFromName($namearray[0]), $ikey, $value["gedfile"],"");
 							$indi_printed[JoinKey($ikey, $value["gedfile"])] = "1";
 						}
 					}
@@ -648,7 +648,7 @@ if ($action=="soundex") {
 		}
 		// Now we have the final list of indi's to be printed.
 		// We may add the assos at this point.
-		if ($showasso == "on") SearchAddAssos();
+		if ($showasso == "on") SearchFunctions::SearchAddAssos();
 		//-- if only 1 item is returned, automatically forward to that item
 		if (count($printindiname)==1) {
 			$GEDCOMID = $printindiname[0][2];
@@ -665,7 +665,7 @@ if ($action=="soundex") {
 	}
 }
 
-print_header($gm_lang["search"]);
+PrintHeader($gm_lang["search"]);
 ?>
 <script language="JavaScript" type="text/javascript">
 <!--
@@ -722,7 +722,7 @@ else {
 			echo '<input type="checkbox" onclick="CheckAllGed(this)" />'.$gm_lang['select_deselect_all'].'<br>';
 			foreach ($GEDCOMS as $key=>$ged) {
 				SwitchGedcom($key);
-				if ($gm_user->username != "" || !$REQUIRE_AUTHENTICATION) {
+				if ($gm_user->username != "" || !GedcomConfig::$REQUIRE_AUTHENTICATION) {
 					$str = "sg".$key;
 					print "<input type=\"checkbox\" ";
 					if (($key == $GEDCOMID) && ($action == "")) print "checked=\"checked\" ";
@@ -999,7 +999,7 @@ if ($action=="general") {
 				if ($found == true && $nodisplay == false) {
 					// print all names from the indi found
 			    	foreach($value["names"] as $indexval => $namearray) {
-						$printindiname[] = array(SortableNameFromName($namearray[0]), $key, $value["gedfile"], "");
+						$printindiname[] = array(NameFunctions::SortableNameFromName($namearray[0]), $key, $value["gedfile"], "");
 					}
 					$indi_printed[JoinKey($key, $GEDCOMID)] = "1";
 				}
@@ -1158,7 +1158,7 @@ if ($action=="general") {
 	
 		// Add the assos to the indi and famlist
 	  	if ($showasso == "on") {
-		  	SearchAddAssos();
+		  	SearchFunctions::SearchAddAssos();
 		}
 		SwitchGedcom();
 
@@ -1220,7 +1220,7 @@ if ($action=="general") {
 			print "\n\t<table class=\"list_table $TEXT_DIRECTION\">\n\t\t<tr><td class=\"shade2 center\"";
 			$indi_count = count($printindiname);
 			if($indi_count > 12) print " colspan=\"2\"";
-			print "><img src=\"".$GM_IMAGE_DIR."/".$GM_IMAGES["indis"]["small"]."\" border=\"0\" title=\"".$gm_lang["people"]."\" alt=\"".$gm_lang["individuals"]."\" />&nbsp;&nbsp;";
+			print "><img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["indis"]["small"]."\" border=\"0\" title=\"".$gm_lang["people"]."\" alt=\"".$gm_lang["individuals"]."\" />&nbsp;&nbsp;";
 			print $gm_lang["individuals"];
 			print "</td></tr><tr><td class=\"$TEXT_DIRECTION shade1 wrap\"><ul>";
 			$i=1;
@@ -1259,7 +1259,7 @@ if ($action=="general") {
 			print "\n\t<table class=\"list_table $TEXT_DIRECTION\">\n\t\t<tr><td class=\"shade2 center\"";
 			$fam_count = count($printfamname);
 			if($fam_count > 12) print " colspan=\"2\"";
-			print "><img src=\"".$GM_IMAGE_DIR."/".$GM_IMAGES["sfamily"]["small"]."\" border=\"0\" alt=\"".$gm_lang["families"]."\" />&nbsp;&nbsp;";
+			print "><img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["sfamily"]["small"]."\" border=\"0\" alt=\"".$gm_lang["families"]."\" />&nbsp;&nbsp;";
 			print $gm_lang["families"];
 			print "</td></tr><tr><td class=\"$TEXT_DIRECTION shade1 wrap\"><ul>";
 			$i=1;
@@ -1304,7 +1304,7 @@ if ($action=="general") {
 			print "\n\t<table class=\"list_table $TEXT_DIRECTION\">\n\t\t<tr><td class=\"shade2 center\"";
 			$sour_count = count($ssourcelist);
 			if($sour_count > 12) print " colspan=\"2\"";
-			print "><img src=\"".$GM_IMAGE_DIR."/".$GM_IMAGES["source"]["small"]."\" border=\"0\" alt=\"".$gm_lang["sources"]."\" />&nbsp;&nbsp;";
+			print "><img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["source"]["small"]."\" border=\"0\" alt=\"".$gm_lang["sources"]."\" />&nbsp;&nbsp;";
 			print $gm_lang["sources"];
 			print "</td></tr><tr><td class=\"$TEXT_DIRECTION shade1 wrap\"><ul>";
 			$i=1;
@@ -1400,7 +1400,7 @@ if ($action=="general") {
 			print "\n\t<table class=\"list_table $TEXT_DIRECTION\">\n\t\t<tr><td class=\"shade2 center\"";
 			$repo_count = count($srepolist);
 			if($repo_count > 12) print " colspan=\"2\"";
-			print "><img src=\"".$GM_IMAGE_DIR."/".$GM_IMAGES["repository"]["small"]."\" border=\"0\" alt=\"".$gm_lang["search_repos"]."\" />&nbsp;&nbsp;";
+			print "><img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["repository"]["small"]."\" border=\"0\" alt=\"".$gm_lang["search_repos"]."\" />&nbsp;&nbsp;";
 			print $gm_lang["search_repos"];
 			print "</td></tr><tr><td class=\"$TEXT_DIRECTION shade1 wrap\"><ul>";
 			$i=1;
@@ -1484,7 +1484,7 @@ if ($action=="general") {
 			print "\n\t<table class=\"list_table  $TEXT_DIRECTION\">\n\t\t<tr><td class=\"shade2 center\"";
 			$media_count = count($media_total) - count($media_hide);
 			if($media_count>12)	print " colspan=\"2\"";
-			print "><img src=\"".$GM_IMAGE_DIR."/".$GM_IMAGES["media"]["small"]."\" border=\"0\" title=\"".$gm_lang["media"]."\" alt=\"".$gm_lang["media"]."\" />&nbsp;&nbsp;";
+			print "><img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["media"]["small"]."\" border=\"0\" title=\"".$gm_lang["media"]."\" alt=\"".$gm_lang["media"]."\" />&nbsp;&nbsp;";
 			print $gm_lang["media"];
 			print "</td></tr><tr><td class=\"$TEXT_DIRECTION shade1 wrap\"><ul>";
 			$i=1;
@@ -1525,7 +1525,7 @@ if ($action=="general") {
 			print "\n\t<table class=\"list_table $TEXT_DIRECTION\">\n\t\t<tr><td class=\"shade2 center\"";
 			$note_count = count($snotelist);
 			if($note_count > 12) print " colspan=\"2\"";
-			print "><img src=\"".$GM_IMAGE_DIR."/".$GM_IMAGES["note"]["other"]."\" border=\"0\" alt=\"".$gm_lang["notes"]."\" />&nbsp;&nbsp;";
+			print "><img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["note"]["other"]."\" border=\"0\" alt=\"".$gm_lang["notes"]."\" />&nbsp;&nbsp;";
 			print $gm_lang["notes"];
 			print "</td></tr><tr><td class=\"$TEXT_DIRECTION shade1 wrap\"><ul>";
 			$i=1;
@@ -1628,10 +1628,10 @@ if ($action=="soundex") {
 			$extrafams = false;
 			if (count($printfamname)>0) $extrafams = true;
 			if ($extrafams) {
-				print "<td class=\"topbottombar\"><img src=\"".$GM_IMAGE_DIR."/".$GM_IMAGES["indis"]["small"]."\" border=\"0\" alt=\"\" /> ".$gm_lang["people"]."</td>";
-				print "<td class=\"topbottombar\"><img src=\"".$GM_IMAGE_DIR."/".$GM_IMAGES["sfamily"]["small"]."\" border=\"0\" alt=\"\" /> ".$gm_lang["families"]."</td>";
+				print "<td class=\"topbottombar\"><img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["indis"]["small"]."\" border=\"0\" alt=\"\" /> ".$gm_lang["people"]."</td>";
+				print "<td class=\"topbottombar\"><img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["sfamily"]["small"]."\" border=\"0\" alt=\"\" /> ".$gm_lang["families"]."</td>";
 			}
-			else print "<td colspan=\"2\" class=\"topbottombar\"><img src=\"".$GM_IMAGE_DIR."/".$GM_IMAGES["indis"]["small"]."\" border=\"0\" alt=\"\" /> ".$gm_lang["people"]."</td>";
+			else print "<td colspan=\"2\" class=\"topbottombar\"><img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["indis"]["small"]."\" border=\"0\" alt=\"\" /> ".$gm_lang["people"]."</td>";
 			print "</tr><tr>\n\t\t<td class=\"shade1 wrap\"><ul>";
 
 			foreach ($printindiname as $key => $pvalue) {
@@ -1703,5 +1703,5 @@ if ($action == "general") {
 	}
 }
 
-print_footer();
+PrintFooter();
 ?>

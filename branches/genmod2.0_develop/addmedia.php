@@ -39,12 +39,12 @@ require("config.php");
 */
 require("includes/functions/functions_edit.php");
 
-print_simple_header($gm_lang["add_media_tool"]);
+PrintSimpleHeader($gm_lang["add_media_tool"]);
 
 //-- only allow users with edit privileges to access script.
 if (!$gm_user->userGedcomAdmin()) {
 	print $gm_lang["access_denied"];
-	print_simple_footer();
+	PrintSimpleFooter();
 	exit;
 }
 
@@ -108,7 +108,7 @@ if ($action=="newentry") {
 		$filename = $result["filename"];
 		// Based on the gedcom settings, we first check if double media is allowed and exists
 		if (isset($filename) && !empty($filename) && $filename != "1") {
-			$m = RelativePathFile($MEDIA_DIRECTORY);
+			$m = RelativePathFile(GedcomConfig::$MEDIA_DIRECTORY);
 			if (!empty($m)) $filename = preg_replace("~$m~", "", $filename);
 		}
 
@@ -147,15 +147,15 @@ if ($action=="newentry") {
 			print "<br /><br /><span class=\"error\">".$gm_lang["no_double_media"]."</span>";
 		}
 		if ($paste) {
-			if ($EDIT_AUTOCLOSE) print "\n<script type=\"text/javascript\">\n<!--\nopenerpasteid('$xref');\n//-->\n</script>";
+			if (GedcomConfig::$EDIT_AUTOCLOSE) print "\n<script type=\"text/javascript\">\n<!--\nopenerpasteid('$xref');\n//-->\n</script>";
 			else print "<br /><br /><a href=\"javascript:// OBJE $xref\" onclick=\"openerpasteid('$xref'); return false;\">".$gm_lang["paste_mm_id_into_field"]." <b>$xref</b></a>\n";
 		}
-		if ($EDIT_AUTOCLOSE) print "\n<script type=\"text/javascript\">\n<!--\nwindow.close();\n//-->\n</script>";
+		if (GedcomConfig::$EDIT_AUTOCLOSE) print "\n<script type=\"text/javascript\">\n<!--\nwindow.close();\n//-->\n</script>";
 	}
 }
 
 print "<br />";
 print "<div class=\"center\"><a href=\"#\" onclick=\"if (window.opener.showchanges) window.opener.showchanges(); window.close();\">".$gm_lang["close_window"]."</a></div>\n";
 print "<br />";
-print_simple_footer();
+PrintSimpleFooter();
 ?>

@@ -34,9 +34,8 @@ $GM_BLOCKS["print_random_media"]["rss"]     = false;
 
 //-- function to display a random picture from the gedcom
 function print_random_media($block = true, $config="", $side, $index) {
-	global $gm_lang, $TEXT_DIRECTION, $GM_IMAGE_DIR, $GM_IMAGES;
-	global $MEDIA_DIRECTORY;
-	global $MEDIATYPE, $USE_GREYBOX;
+	global $gm_lang, $TEXT_DIRECTION, $GM_IMAGES;
+	global $MEDIATYPE;
 	
 	srand();
 	$random = 10;
@@ -61,11 +60,11 @@ function print_random_media($block = true, $config="", $side, $index) {
 			   $imgheight = 500;
 			} 
 		}
-		else if ((preg_match("'://'", $MEDIA_DIRECTORY)>0)||$media->fileobj->f_file_exists) {
+		else if ((preg_match("'://'", GedcomConfig::$MEDIA_DIRECTORY)>0)||$media->fileobj->f_file_exists) {
 			   $imgwidth = $media->fileobj->f_width+50;
 			   $imgheight = $media->fileobj->f_height+50;
 		}
-		if ($USE_GREYBOX && $media->fileobj->f_is_image) {
+		if (USE_GREYBOX && $media->fileobj->f_is_image) {
 			print "<a href=\"".FilenameEncode($media->fileobj->f_main_file)."\" title=\"".$media->title."\" rel=\"gb_imageset[random]\">";
 		}
 		else print "<a href=\"#\" onclick=\"return openImage('".$media->fileobj->f_main_file."', '".$imgwidth."', '".$imgheight."', '".$media->fileobj->f_is_image."');\">";

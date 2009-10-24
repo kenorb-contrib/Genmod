@@ -138,22 +138,6 @@ function FileIsWriteable($file) {
 	return($err_write);
 }
 
-// This functions checks if an existing directory is physically writeable
-// The standard PHP function only checks for the R/O attribute and doesn't
-// detect authorisation by ACL.
-function DirIsWritable($dir) {
-	
-	if (substr($dir,-1) !="/") $dir .="/";
-	$err_write = false;
-	$handle = @fopen($dir."foo.txt","w+");
-	if	($handle) {
-		$i = fclose($handle);
-		$err_write = true;
-		@unlink($dir."foo.txt");
-	}
-	return($err_write);
-}
-
 /**
  * GM Error Handling function
  *
@@ -401,7 +385,7 @@ function GetAllSubrecords($gedrec, $ignore="", $families=true, $sort=true, $Appl
  * @return string
  */
 function GetGedcomValue($tag, $level, $gedrec, $truncate='', $convert=true) {
-	global $SHOW_PEDIGREE_PLACES, $gm_lang;
+	global $gm_lang;
 
 	$tags = preg_split("/:/", $tag);
 
@@ -468,10 +452,10 @@ function GetGedcomValue($tag, $level, $gedrec, $truncate='', $convert=true) {
 		}
 		//-- if it is a place value then apply the pedigree place limit
 		else if ($convert && $t=="PLAC") {
-			if ($SHOW_PEDIGREE_PLACES>0) {
+			if (GedcomConfig::$SHOW_PEDIGREE_PLACES>0) {
 				$plevels = preg_split("/,/", $value);
 				$value = "";
-				for($plevel=0; $plevel<$SHOW_PEDIGREE_PLACES; $plevel++) {
+				for($plevel=0; $plevel < GedcomConfig::$SHOW_PEDIGREE_PLACES; $plevel++) {
 					if (!empty($plevels[$plevel])) {
 						if ($plevel>0) $value .= ", ";
 						$value .= trim($plevels[$plevel]);
@@ -530,12 +514,12 @@ function GetGedcomValue($tag, $level, $gedrec, $truncate='', $convert=true) {
  * @return string a string with all CONT or CONC lines merged
  */
 function GetCont($nlevel, $nrec) {
-	global $WORD_WRAPPED_NOTES;
+	
 	$text = "";
 	$tt = preg_match_all("/$nlevel CON[CT](.*)(\r\n|\r|\n)*/", $nrec, $cmatch, PREG_SET_ORDER);
 	for($i=0; $i<$tt; $i++) {
 		if (strstr($cmatch[$i][0], "CONT")) $text.="<br />\n";
-		else if ($WORD_WRAPPED_NOTES) $text.=" ";
+		else if (GedcomConfig::$WORD_WRAPPED_NOTES) $text.=" ";
 		$conctxt = $cmatch[$i][1];
 		if (!empty($conctxt)) {
 			if ($conctxt{0}==" ") $conctxt = substr($conctxt, 1);
@@ -548,7 +532,6 @@ function GetCont($nlevel, $nrec) {
 }
 
 function MakeCont($newged, $newline) {
-	global $WORD_WRAPPED_NOTES;
 	
 	$newged = rtrim($newged)." ";
 	$clevel = substr($newged, 0, 1) + 1;
@@ -844,7 +827,7 @@ function CleanupTagsY($irec) {
  * @return array an object array with indexes "thumb" and "file" for thumbnail and filename
  */
 function FindHighlightedObject($pid) {
-	global $MEDIA_DIRECTORY, $GM_IMAGE_DIR, $GM_IMAGES, $MEDIA_EXTERNAL;
+	global $GM_IMAGES;
 	global $GEDCOMID;
 	
 	if (!PrivacyFunctions::showFactDetails("OBJE", $pid)) return false;
@@ -899,7 +882,7 @@ function FindHighlightedObject($pid) {
 		 
 	$object["use_thum"] = $thum;
 	$object["file"] = MediaFS::CheckMediaDepth($primfile);
-	$object["thumb"] = MediaFS::ThumbnailFile($MEDIA_DIRECTORY.RelativePathFile($object["file"]));
+	$object["thumb"] = MediaFS::ThumbnailFile(GedcomConfig::$MEDIA_DIRECTORY.RelativePathFile($object["file"]));
 	$object["id"] = $id;
 	return $object;
 }
@@ -921,7 +904,7 @@ function FindHighlightedObject($pid) {
  * @param int $path_to_find which path in the relationship to find, 0 is the shortest path, 1 is the next shortest path, etc
  */
 function GetRelationship($pid1, $pid2, $followspouse=true, $maxlength=0, $ignore_cache=false, $path_to_find=0) {
-	global $TIME_LIMIT, $start_time, $gm_lang, $NODE_CACHE_LENGTH, $USE_RELATIONSHIP_PRIVACY, $GEDCOMID, $gm_username, $show_changes;
+	global $start_time, $gm_lang, $NODE_CACHE_LENGTH, $USE_RELATIONSHIP_PRIVACY, $GEDCOMID, $gm_username, $show_changes;
 
 	$pid1 = strtoupper($pid1);
 	$pid2 = strtoupper($pid2);
@@ -1047,7 +1030,7 @@ function GetRelationship($pid1, $pid2, $followspouse=true, $maxlength=0, $ignore
 		$count++;
 		$end_time = GetMicrotime();
 		$exectime = $end_time - $start_time;
-		if (($TIME_LIMIT>1)&&($exectime > $TIME_LIMIT-1)) {
+		if (GedcomConfig::$TIME_LIMIT > 1 && $exectime > GedcomConfig::$TIME_LIMIT - 1) {
 			print "<span class=\"error\">".$gm_lang["timeout_error"]."</span>\n";
 			return false;
 		}
@@ -1058,7 +1041,7 @@ function GetRelationship($pid1, $pid2, $followspouse=true, $maxlength=0, $ignore
 			}
 			if (headers_sent()) {
 				print "\n<!-- Relationship $pid1-$pid2 NOT FOUND | Visited ".count($visited)." nodes | Required $count iterations.<br />\n";
-				print_execution_stats();
+				PrintExecutionStats();
 				print "-->\n";
 			}
 			PrivacyFunctions::$NODE_CACHE["$pid1-$pid2"] = "NOT FOUND";
@@ -1323,7 +1306,7 @@ function GetRelationship($pid1, $pid2, $followspouse=true, $maxlength=0, $ignore
 	} //-- end while loop
 	if (headers_sent()) {
 		print "\n<!-- Relationship $pid1-$pid2 | Visited ".count($visited)." nodes | Required $count iterations.<br />\n";
-		print_execution_stats();
+		PrintExecutionStats();
 		print "-->\n";
 	}
 	return $resnode;
@@ -1370,8 +1353,8 @@ function GetThemeNames() {
  * @return string a html text string that can be printed
  */
 function GetCalendarFact($factrec, $action, $filterof, $pid, $filterev="all") {
-	global $gm_lang, $year, $month, $day, $TEMPLE_CODES, $CALENDAR_FORMAT, $monthtonum, $TEXT_DIRECTION, $SHOW_PEDIGREE_PLACES, $caltype;
-	global $CalYear, $currhYear, $USE_RTL_FUNCTIONS;
+	global $gm_lang, $year, $month, $day, $TEMPLE_CODES, $monthtonum, $TEXT_DIRECTION, $caltype;
+	global $CalYear, $currhYear;
 	
 	$Upcoming = false;
 	if ($action == "upcoming") {
@@ -1415,7 +1398,7 @@ function GetCalendarFact($factrec, $action, $filterof, $pid, $filterev="all") {
 	}
 
 	$hct = preg_match("/2 DATE.*(@#DHEBREW@)/", $factrec, $match);
-	if ($hct>0 && $USE_RTL_FUNCTIONS)
+	if ($hct>0 && GedcomConfig::$USE_RTL_FUNCTIONS)
 		if ($action == "today") $yearnow = $currhYear;
 		else $yearnow = $CalYear;
 
@@ -1455,7 +1438,7 @@ function GetCalendarFact($factrec, $action, $filterof, $pid, $filterev="all") {
 			if ($yt>0) {
 
 				$hct = preg_match("/2 DATE.*(@#DHEBREW@)/", $match[1], $hmatch);
-	            if ($hct>0 && $USE_RTL_FUNCTIONS && $action=='today')
+	            if ($hct>0 && GedcomConfig::$USE_RTL_FUNCTIONS && $action=='today')
 
 // should perhaps use the month of the fact to find if should use $currhYear or $currhYear+1 or $currhYear-1 to calculate age
 // use $currhMonth and the fact month for this
@@ -1491,13 +1474,13 @@ function GetCalendarFact($factrec, $action, $filterof, $pid, $filterev="all") {
 			}
 			if (($action=='today')||($action=='year')) {
 				// -- find place for each fact
-				if ($SHOW_PEDIGREE_PLACES>0) {
+				if (GedcomConfig::$SHOW_PEDIGREE_PLACES > 0) {
 					$ct = preg_match("/2 PLAC (.*)/", $factrec, $match);
 					if ($ct>0) {
 						$text .=($action=='today'?"<br />":" ");
 						$plevels = preg_split("/,/", $match[1]);
 						$plactext = "";
-						for($plevel=0; $plevel<$SHOW_PEDIGREE_PLACES; $plevel++) {
+						for($plevel=0; $plevel < GedcomConfig::$SHOW_PEDIGREE_PLACES; $plevel++) {
 							if (!empty($plevels[$plevel])) {
 								if ($plevel>0) $plactext .=", ";
 								$plactext .= PrintReady($plevels[$plevel]);
@@ -1565,7 +1548,6 @@ function ConvertNumber($num) {
  * @param		string	$mailformat	The type of mail to send. Multipart is for rich e-mails and text for plain e-mails
  */
 function GmMail($mailto, $subject, $message, $from_name='', $from_mail='', $replyto='', $filenames='', $path='', $admincopy=false){
-	global $HOME_SITE_TEXT,$mail_stylesheet;
 	
 /*	print "mailto: ".$mailto."<br />";
 	print "subject: ".$subject."<br />";
@@ -1585,12 +1567,12 @@ function GmMail($mailto, $subject, $message, $from_name='', $from_mail='', $repl
 	if (empty($replyto)) $replyto = $from_mail;
 	
 	// NOTE: Set the home site name as from mail
-	if (empty($from_name)) $from_name = $HOME_SITE_TEXT;
+	if (empty($from_name)) $from_name = GedcomConfig::$HOME_SITE_TEXT;
 	
 	// NOTE: Check if we send HTML or plain text
 	$html=true;
 	
-	$styles = file_get_contents($mail_stylesheet);
+	$styles = file_get_contents(GM_MAIL_STYLESHEET);
 	
 	if ($html) {
 		$html_header = "<html>\r\n";
@@ -2264,8 +2246,8 @@ function CheckSessionIP() {
  */
 
 function GetNewXref($type='INDI') {
-	global $SOURCE_ID_PREFIX, $REPO_ID_PREFIX, $changes;
-	global $MEDIA_ID_PREFIX, $FAM_ID_PREFIX, $GEDCOM_ID_PREFIX, $FILE, $GEDCOMID, $NOTE_ID_PREFIX;
+	global $changes;
+	global $FILE, $GEDCOMID;
 	
 	
 	if (isset($FILE) && !is_array($FILE)) $gedid = get_id_from_gedcom($FILE);
@@ -2273,28 +2255,28 @@ function GetNewXref($type='INDI') {
 
 	switch ($type) {
 		case "INDI":
-			$sqlc = "select max(cast(substring(ch_gid,".(strlen($GEDCOM_ID_PREFIX)+1).") as signed)) as xref from ".TBLPREFIX."changes where ch_file = '".$gedid."' AND ch_gid LIKE '".$GEDCOM_ID_PREFIX."%'";
-			$sql = "select max(cast(substring(i_rin,".(strlen($GEDCOM_ID_PREFIX)+1).") as signed)) as xref from ".TBLPREFIX."individuals where i_file = '".$gedid."'";
+			$sqlc = "select max(cast(substring(ch_gid,".(strlen(GedcomConfig::$GEDCOM_ID_PREFIX)+1).") as signed)) as xref from ".TBLPREFIX."changes where ch_file = '".$gedid."' AND ch_gid LIKE '".GedcomConfig::$GEDCOM_ID_PREFIX."%'";
+			$sql = "select max(cast(substring(i_rin,".(strlen(GedcomConfig::$GEDCOM_ID_PREFIX)+1).") as signed)) as xref from ".TBLPREFIX."individuals where i_file = '".$gedid."'";
 			break;
 		case "FAM":
-			$sqlc = "select max(cast(substring(ch_gid,".(strlen($FAM_ID_PREFIX)+1).") as signed)) as xref from ".TBLPREFIX."changes where ch_file = '".$gedid."' AND ch_gid LIKE '".$FAM_ID_PREFIX."%'";
-			$sql = "select max(cast(substring(f_id,".(strlen($FAM_ID_PREFIX)+1).") as signed)) as xref from ".TBLPREFIX."families where f_file = '".$gedid."'";
+			$sqlc = "select max(cast(substring(ch_gid,".(strlen(GedcomConfig::$FAM_ID_PREFIX)+1).") as signed)) as xref from ".TBLPREFIX."changes where ch_file = '".$gedid."' AND ch_gid LIKE '".GedcomConfig::$FAM_ID_PREFIX."%'";
+			$sql = "select max(cast(substring(f_id,".(strlen(GedcomConfig::$FAM_ID_PREFIX)+1).") as signed)) as xref from ".TBLPREFIX."families where f_file = '".$gedid."'";
 			break;
 		case "OBJE":
-			$sqlc = "select max(cast(substring(ch_gid,".(strlen($MEDIA_ID_PREFIX)+1).") as signed)) as xref from ".TBLPREFIX."changes where ch_file = '".$gedid."' AND ch_gid LIKE '".$MEDIA_ID_PREFIX."%'";
-			$sql = "select max(cast(substring(m_media,".(strlen($MEDIA_ID_PREFIX)+1).") as signed)) as xref from ".TBLPREFIX."media where m_file = '".$gedid."'";
+			$sqlc = "select max(cast(substring(ch_gid,".(strlen(GedcomConfig::$MEDIA_ID_PREFIX)+1).") as signed)) as xref from ".TBLPREFIX."changes where ch_file = '".$gedid."' AND ch_gid LIKE '".GedcomConfig::$MEDIA_ID_PREFIX."%'";
+			$sql = "select max(cast(substring(m_media,".(strlen(GedcomConfig::$MEDIA_ID_PREFIX)+1).") as signed)) as xref from ".TBLPREFIX."media where m_file = '".$gedid."'";
 			break;
 		case "SOUR":
-			$sqlc = "select max(cast(substring(ch_gid,".(strlen($SOURCE_ID_PREFIX)+1).") as signed)) as xref from ".TBLPREFIX."changes where ch_file = '".$gedid."' AND ch_gid LIKE '".$SOURCE_ID_PREFIX."%'";
-			$sql = "select max(cast(substring(s_id,".(strlen($SOURCE_ID_PREFIX)+1).") as signed)) as xref from ".TBLPREFIX."sources where s_file = '".$gedid."'";
+			$sqlc = "select max(cast(substring(ch_gid,".(strlen(GedcomConfig::$SOURCE_ID_PREFIX)+1).") as signed)) as xref from ".TBLPREFIX."changes where ch_file = '".$gedid."' AND ch_gid LIKE '".GedcomConfig::$SOURCE_ID_PREFIX."%'";
+			$sql = "select max(cast(substring(s_id,".(strlen(GedcomConfig::$SOURCE_ID_PREFIX)+1).") as signed)) as xref from ".TBLPREFIX."sources where s_file = '".$gedid."'";
 			break;
 		case "REPO":
-			$sqlc = "select max(cast(substring(ch_gid,".(strlen($REPO_ID_PREFIX)+1).") as signed)) as xref from ".TBLPREFIX."changes where ch_file = '".$gedid."' AND ch_gid LIKE '".$REPO_ID_PREFIX."%'";
-			$sql = "select max(cast(substring(o_id,".(strlen($REPO_ID_PREFIX)+1).") as signed)) as xref from ".TBLPREFIX."other where o_file = '".$gedid."' and o_type = 'REPO'";
+			$sqlc = "select max(cast(substring(ch_gid,".(strlen(GedcomConfig::REPO_ID_PREFIX)+1).") as signed)) as xref from ".TBLPREFIX."changes where ch_file = '".$gedid."' AND ch_gid LIKE '".GedcomConfig::$REPO_ID_PREFIX."%'";
+			$sql = "select max(cast(substring(o_id,".(strlen(GedcomConfig::REPO_ID_PREFIX)+1).") as signed)) as xref from ".TBLPREFIX."other where o_file = '".$gedid."' and o_type = 'REPO'";
 			break;
 		case "NOTE":
-			$sqlc = "select max(cast(substring(ch_gid,".(strlen($NOTE_ID_PREFIX)+1).") as signed)) as xref from ".TBLPREFIX."changes where ch_file = '".$gedid."' AND ch_gid LIKE '".$NOTE_ID_PREFIX."%'";
-			$sql = "select max(cast(substring(o_id,".(strlen($NOTE_ID_PREFIX)+1).") as signed)) as xref from ".TBLPREFIX."other where o_file = '".$gedid."' and o_type = 'NOTE'";
+			$sqlc = "select max(cast(substring(ch_gid,".(strlen(GedcomConfig::$NOTE_ID_PREFIX)+1).") as signed)) as xref from ".TBLPREFIX."changes where ch_file = '".$gedid."' AND ch_gid LIKE '".GedcomConfig::$NOTE_ID_PREFIX."%'";
+			$sql = "select max(cast(substring(o_id,".(strlen(GedcomConfig::$NOTE_ID_PREFIX)+1).") as signed)) as xref from ".TBLPREFIX."other where o_file = '".$gedid."' and o_type = 'NOTE'";
 			break;
 		case "CHANGE":
 			$sql = "select max(ch_cid) as xref from ".TBLPREFIX."changes where ch_file = '".$gedid."'";
@@ -2318,12 +2300,12 @@ function GetNewXref($type='INDI') {
 	$num++;
 	
 	// NOTE: Determine prefix needed
-	if ($type == "INDI") $prefix = $GEDCOM_ID_PREFIX;
-	else if ($type == "FAM") $prefix = $FAM_ID_PREFIX;
-	else if ($type == "OBJE") $prefix = $MEDIA_ID_PREFIX;
-	else if ($type == "SOUR") $prefix = $SOURCE_ID_PREFIX;
-	else if ($type == "REPO") $prefix = $REPO_ID_PREFIX;
-	else if ($type == "NOTE") $prefix = $NOTE_ID_PREFIX;
+	if ($type == "INDI") $prefix = GedcomConfig::$GEDCOM_ID_PREFIX;
+	else if ($type == "FAM") $prefix = GedcomConfig::$FAM_ID_PREFIX;
+	else if ($type == "OBJE") $prefix = GedcomConfig::$MEDIA_ID_PREFIX;
+	else if ($type == "SOUR") $prefix = GedcomConfig::$SOURCE_ID_PREFIX;
+	else if ($type == "REPO") $prefix = GedcomConfig::$REPO_ID_PREFIX;
+	else if ($type == "NOTE") $prefix = GedcomConfig::$NOTE_ID_PREFIX;
 	else if ($type == "CHANGE") return $num;
 
 	return $prefix.$num;;
@@ -2341,25 +2323,24 @@ function GetNewXref($type='INDI') {
  */
 
 function IdType($id) {
-	global $SOURCE_ID_PREFIX, $REPO_ID_PREFIX, $MEDIA_ID_PREFIX, $FAM_ID_PREFIX, $GEDCOM_ID_PREFIX, $NOTE_ID_PREFIX;
 	
 	// NOTE: Set length for the ID's
-	$indi_length = strlen($GEDCOM_ID_PREFIX);
-	$fam_length = strlen($FAM_ID_PREFIX);
-	$source_length = strlen($SOURCE_ID_PREFIX);
-	$repo_length = strlen($REPO_ID_PREFIX);
-	$media_length = strlen($MEDIA_ID_PREFIX);
-	$note_length = strlen($NOTE_ID_PREFIX);
+	$indi_length = strlen(GedcomConfig::$GEDCOM_ID_PREFIX);
+	$fam_length = strlen(GedcomConfig::$FAM_ID_PREFIX);
+	$source_length = strlen(GedcomConfig::$SOURCE_ID_PREFIX);
+	$repo_length = strlen(GedcomConfig::$REPO_ID_PREFIX);
+	$media_length = strlen(GedcomConfig::$MEDIA_ID_PREFIX);
+	$note_length = strlen(GedcomConfig::$NOTE_ID_PREFIX);
 	$submitter_length = 3;
 	
 	// NOTE: Check for individual ID
-	if (substr($id, 0, $indi_length) == $GEDCOM_ID_PREFIX) return "INDI";
+	if (substr($id, 0, $indi_length) == GedcomConfig::$GEDCOM_ID_PREFIX) return "INDI";
 	else if (substr($id, 0, $submitter_length) == "SUB") return "SUBM";
-	else if (substr($id, 0, $fam_length) == $FAM_ID_PREFIX) return "FAM";
-	else if (substr($id, 0, $source_length) == $SOURCE_ID_PREFIX) return "SOUR";
-	else if (substr($id, 0, $repo_length) == $REPO_ID_PREFIX) return "REPO";
-	else if (substr($id, 0, $media_length) == $MEDIA_ID_PREFIX) return "OBJE";
-	else if (substr($id, 0, $note_length) == $NOTE_ID_PREFIX) return "NOTE";
+	else if (substr($id, 0, $fam_length) == GedcomConfig::$FAM_ID_PREFIX) return "FAM";
+	else if (substr($id, 0, $source_length) == GedcomConfig::$SOURCE_ID_PREFIX) return "SOUR";
+	else if (substr($id, 0, $repo_length) == GedcomConfig::$REPO_ID_PREFIX) return "REPO";
+	else if (substr($id, 0, $media_length) == GedcomConfig::$MEDIA_ID_PREFIX) return "OBJE";
+	else if (substr($id, 0, $note_length) == GedcomConfig::$NOTE_ID_PREFIX) return "NOTE";
 	else return "";
 }
 
@@ -2448,7 +2429,7 @@ function GetGMNewsItems() {
 
 
 function PrintGedcom($ged, $convert, $remove, $zip, $privatize_export, $privatize_export_level, $gedname, $embedmm) {
-	GLOBAL $GEDCOMID, $gm_lang, $CHARACTER_SET, $GM_BASE_DIRECTORY, $gm_username, $gm_user;
+	GLOBAL $GEDCOMID, $gm_lang, $GM_BASE_DIRECTORY, $gm_username, $gm_user;
 	if ($zip == "yes") {
 		$gedout = fopen($gedname, "w");
 	}
@@ -2498,7 +2479,7 @@ function PrintGedcom($ged, $convert, $remove, $zip, $privatize_export, $privatiz
 	}
 	else {
 		$head = "0 HEAD\r\n1 SOUR Genmod\r\n2 NAME Genmod Online Genealogy\r\n2 VERS ".GM_VERSION." ".GM_VERSION_RELEASE."\r\n1 DEST DISKETTE\r\n1 DATE ".date("j M Y")."\r\n2 TIME ".date("h:i:s")."\r\n";
-		$head .= "1 GEDC\r\n2 VERS 5.5\r\n2 FORM LINEAGE-LINKED\r\n1 CHAR $CHARACTER_SET\r\n1 PLAC\r\n2 FORM ".$gm_lang["default_form"]."\r\n";
+		$head .= "1 GEDC\r\n2 VERS 5.5\r\n2 FORM LINEAGE-LINKED\r\n1 CHAR ".GedcomConfig::$CHARACTER_SET."\r\n1 PLAC\r\n2 FORM ".$gm_lang["default_form"]."\r\n";
 	}
 	if ($convert=="yes") {
 		$head = preg_replace("/UTF-8/", "ANSI", $head);
@@ -2607,43 +2588,6 @@ function PrintGedcom($ged, $convert, $remove, $zip, $privatize_export, $privatiz
 	}
 }
 
-
-/*
-function GetDescArray($pid, $ngen) {
-	global $descarray, $pointtofath;
-	$pointtofath[$pid]= "root";
-	$pointtofathnew = array();
-	$numrows = 0;
-	for ($i=1;$i<=$ngen;$i++) {
-//		print "Round ".$i;
-//		pb();
-		foreach ($pointtofath as $child => $hisfather) {
-			if (in_array($child, $pointtofath)===false) {
-				print "Get child ".$child;
-//				pb();
-				$fams = FindSFamilyIDs($child);
-				foreach ($fams as $key1 => $famid) {
-//					print "Get fam ".$famid;
-//					pb();
-					$children = GetChildrenIDs($famid["famid"]);
-//					print_r($children);
-//					pb();
-					foreach($children as $key => $childsub) {
-						$pointtofathnew[$childsub] = $child;
-					}
-					if ($numkidsgen > $numkids) $numkids = $numkidsgen;
-				}
-			}
-//			else print "skipped ".$child;
-		}
-		$pointtofath = GMarrayMerge($pointtofath, $pointtofathnew);
-	}
-//	print_r ($pointtofath);
-	return $numkids;
-}
-*/			
-
-
 function GetGender($indirec) {
 	
 	$st = preg_match("/1 SEX (.*)/", $indirec, $smatch);
@@ -2682,11 +2626,10 @@ function ExtractFullpath($mediarec) {
  * @return string a relative path that can be appended to the <var>$MEDIA_DIRECTORY</var> to reference the item
  */
 function ExtractFilename($fullpath) {
-	global $MEDIA_DIRECTORY_LEVELS, $MEDIA_DIRECTORY;
 
 	$filename="";
 	$regexp = "'[/\\\]'";
-	$srch = "/".addcslashes($MEDIA_DIRECTORY,'/.')."/";
+	$srch = "/".addcslashes(GedcomConfig::$MEDIA_DIRECTORY,'/.')."/";
 	$repl = "";
 	if (!strstr($fullpath, "://")) $nomedia = stripcslashes(preg_replace($srch, $repl, $fullpath));
 	else $nomedia = $fullpath;
@@ -2694,7 +2637,7 @@ function ExtractFilename($fullpath) {
 	if ($ct>0) {
 		$subelements = preg_split($regexp, $nomedia);
 		$subelements = array_reverse($subelements);
-		$max = $MEDIA_DIRECTORY_LEVELS;
+		$max = GedcomConfig::$MEDIA_DIRECTORY_LEVELS;
 		if ($max>=count($subelements)) $max=count($subelements)-1;
 		for($s=$max; $s>=0; $s--) {
 			if ($s!=$max) $filename = $filename."/".$subelements[$s];

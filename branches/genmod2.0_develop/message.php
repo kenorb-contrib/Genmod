@@ -31,7 +31,7 @@ require("config.php");
 
 if (!isset($action)) $action="compose";
 
-print_simple_header($gm_lang["Genmod_message"]);
+PrintSimpleHeader($gm_lang["Genmod_message"]);
 
 if (!isset($subject)) $subject = "";
 if (!isset($url)) $url = "";
@@ -43,12 +43,12 @@ if (!isset($from_email)) $from_email="";
 
 if (empty($to)) {
 	print "<span class=\"error\">".$gm_lang["no_to_user"]."</span><br />";
-	print_simple_footer();
+	PrintSimpleFooter();
 	exit;
 }
 if ($to=="all" && !$gm_user->userIsAdmin()) {
 	print "<span class=\"error\">".$gm_lang["no_to_user"]."</span><br />";
-	print_simple_footer();
+	PrintSimpleFooter();
 	exit;
 }
 
@@ -200,5 +200,5 @@ else if ($action=="delete") {
 }
 print "<center><br /><br /><a href=\"#\" onclick=\"if (window.opener.refreshpage) window.opener.refreshpage(); window.close();\">".$gm_lang["close_window"]."</a><br /></center>";
 
-print_simple_footer();
+PrintSimpleFooter();
 ?>

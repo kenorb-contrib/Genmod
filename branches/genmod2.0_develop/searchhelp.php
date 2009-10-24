@@ -57,7 +57,7 @@ class SearchHelp {
 	}
 	
 	function AddHeader(&$gm_lang) {
-		print_simple_header($gm_lang["hs_title"]);
+		PrintSimpleHeader($gm_lang["hs_title"]);
 	}
 	
 	function AddFooter() {
@@ -68,7 +68,7 @@ class SearchHelp {
 		//-->
 		</script>
 		<?php
-		print_simple_footer();
+		PrintSimpleFooter();
 	}
 	
 	function GetPageValues(&$genmod) {

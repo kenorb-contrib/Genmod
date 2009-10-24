@@ -36,29 +36,29 @@ if ($_SESSION["cookie_login"]) {
 }
 
 //-- @TODO make list a configurable list
-$addfacts = preg_split("/[,; ]/", $QUICK_ADD_FACTS);
+$addfacts = preg_split("/[,; ]/", GedcomConfig::$QUICK_ADD_FACTS);
 usort($addfacts, "factsort");
 
-$reqdfacts = preg_split("/[,; ]/", $QUICK_REQUIRED_FACTS);
+$reqdfacts = preg_split("/[,; ]/", GedcomConfig::$QUICK_REQUIRED_FACTS);
 
 //-- @TODO make list a configurable list
-$famaddfacts = preg_split("/[,; ]/", $QUICK_ADD_FAMFACTS);
+$famaddfacts = preg_split("/[,; ]/", GedcomConfig::$QUICK_ADD_FAMFACTS);
 usort($famaddfacts, "factsort");
-$famreqdfacts = preg_split("/[,; ]/", $QUICK_REQUIRED_FAMFACTS);
+$famreqdfacts = preg_split("/[,; ]/", GedcomConfig::$QUICK_REQUIRED_FAMFACTS);
 
 $align="right";
 if ($TEXT_DIRECTION=="rtl") $align="left";
 
-print_simple_header($gm_lang["quick_update_title"]);
+PrintSimpleHeader($gm_lang["quick_update_title"]);
 
 //print "<pre>";
 //print_r($_POST);
 //print "</pre>";
 
 //-- only allow logged in users to access this page
-if ((!$ALLOW_EDIT_GEDCOM)||(!$USE_QUICK_UPDATE)||(empty($gm_user->username))) {
+if ((!GedcomConfig::$ALLOW_EDIT_GEDCOM)||(!GedcomConfig::$USE_QUICK_UPDATE)||(empty($gm_user->username))) {
 	print $gm_lang["access_denied"];
-	print_simple_footer();
+	PrintSimpleFooter();
 	exit;
 }
 
@@ -74,7 +74,7 @@ $pid = CleanInput($pid);
 //-- only allow editors or users who are editing their own individual or their immediate relatives
 if (!$gm_user->userCanEditOwn($pid)) {
 	print $gm_lang["access_denied"];
-	print_simple_footer();
+	PrintSimpleFooter();
 	exit;
 }
 
@@ -95,22 +95,22 @@ if ($ct>0) {
 	}
 	else {
 		print $gm_lang["access_denied"];
-		print_simple_footer();
+		PrintSimpleFooter();
 		exit;
 	}
 }
 
-if ((!$disp)||(!$ALLOW_EDIT_GEDCOM)) {
+if ((!$disp)||(!GedcomConfig::$ALLOW_EDIT_GEDCOM)) {
 
 	print $gm_lang["access_denied"];
 	//-- display messages as to why the editing access was denied
 	if (!$gm_user->userCanEdit()) print "<br />".$gm_lang["user_cannot_edit"];
-	if (!$ALLOW_EDIT_GEDCOM) print "<br />".$gm_lang["gedcom_editing_disabled"];
+	if (!GedcomConfig::$ALLOW_EDIT_GEDCOM) print "<br />".$gm_lang["gedcom_editing_disabled"];
 	if (!$disp) {
 		print "<br />".$gm_lang["privacy_prevented_editing"];
 		if (!empty($pid)) print "<br />".$gm_lang["privacy_not_granted"]." pid $pid.";
 	}
-	print_simple_footer();
+	PrintSimpleFooter();
 	exit;
 }
 
@@ -310,7 +310,7 @@ if ($action=="update") {
 		}
 	}
 	//-- rtl name update
-	if ($USE_RTL_FUNCTIONS) {
+	if (GedcomConfig::$USE_RTL_FUNCTIONS) {
 		if (!empty($HSURN) || !empty($HGIVN)) {
 			if (preg_match("/2 _HEB/", $namerec)>0) {
 				if (!empty($HGIVN)) {
@@ -379,12 +379,12 @@ if ($action=="update") {
 	//-- check for photo update
 	if (!empty($_FILES["FILE"]['tmp_name'])) {
 		$upload_errors = array($gm_lang["file_success"], $gm_lang["file_too_big"], $gm_lang["file_too_big"],$gm_lang["file_partial"], $gm_lang["file_missing"]);
-		if (!move_uploaded_file($_FILES['FILE']['tmp_name'], $MEDIA_DIRECTORY.basename($_FILES['FILE']['name']))) {
+		if (!move_uploaded_file($_FILES['FILE']['tmp_name'], GedcomConfig::$MEDIA_DIRECTORY.basename($_FILES['FILE']['name']))) {
 			$error .= "<br />".$gm_lang["upload_error"]."<br />".$upload_errors[$_FILES['FILE']['error']];
 		}
 		else {
-			$filename = $MEDIA_DIRECTORY.basename($_FILES['FILE']['name']);
-			$thumbnail = $MEDIA_DIRECTORY."thumbs/".basename($_FILES['FILE']['name']);
+			$filename = GedcomConfig::$MEDIA_DIRECTORY.basename($_FILES['FILE']['name']);
+			$thumbnail = GedcomConfig::$MEDIA_DIRECTORY."thumbs/".basename($_FILES['FILE']['name']);
 			generate_thumbnail($filename, $thumbnail);
 
 			$factrec = "1 OBJE\r\n";
@@ -1222,11 +1222,11 @@ if ($action=="update") {
 
 	if ($closewin) {
 		// autoclose window when update successful
-		if ($EDIT_AUTOCLOSE) print "\n<script type=\"text/javascript\">\n<!--\nif (window.opener.showchanges) window.opener.showchanges(); window.close();\n//-->\n</script>";
+		if (GedcomConfig::$EDIT_AUTOCLOSE) print "\n<script type=\"text/javascript\">\n<!--\nif (window.opener.showchanges) window.opener.showchanges(); window.close();\n//-->\n</script>";
 		
 		print "<center><br /><br /><br />";
 		print "<a href=\"#\" onclick=\"if (window.opener.showchanges) window.opener.showchanges(); window.close();\">".$gm_lang["close_window"]."</a><br /></center>\n";
-		print_simple_footer();
+		PrintSimpleFooter();
 		exit;
 	}
 }
@@ -1302,7 +1302,7 @@ if ($action=="choosepid") {
 		$HSURN = "";
 		$RGIVN = "";
 		$RSURN = "";
-		if ($USE_RTL_FUNCTIONS) {
+		if (GedcomConfig::$USE_RTL_FUNCTIONS) {
 			$hname = GetGedcomValue("_HEB", 2, $subrec, '', false);
 			if (!empty($hname)) {
 				$ct = preg_match("~(.*)/(.*)/(.*)~", $hname, $matches);
@@ -1338,7 +1338,7 @@ if ($action=="choosepid") {
 			$ADR2 = GetGedcomValue("ADR2", 2, $subrec);
 			if (!empty($ADR2)) $ADDR .= "\r\n". $ADR2;
 			$cityspace = "\r\n";
-			if (!$POSTAL_CODE) {
+			if (!GedcomConfig::$POSTAL_CODE) {
 				$POST = GetGedcomValue("POST", 2, $subrec);
 				if (!empty($POST)) $ADDR .= "\r\n". $POST;
 				else $ADDR .= "\r\n";
@@ -1349,7 +1349,7 @@ if ($action=="choosepid") {
 			else $ADDR .= $cityspace;
 			$STAE = GetGedcomValue("STAE", 2, $subrec);
 			if (!empty($STAE)) $ADDR .= ", ". $STAE;
-			if ($POSTAL_CODE) {
+			if (GedcomConfig::$POSTAL_CODE) {
 				$POST = GetGedcomValue("POST", 2, $subrec);
 				if (!empty($POST)) $ADDR .= "  ". $POST;
 			}
@@ -1423,7 +1423,7 @@ if ($action=="choosepid") {
 	$tabkey = 1;
 	$name = PrintReady(GetPersonName($pid, $namerec));
 	print "<b>".$name;
-	if ($SHOW_ID_NUMBERS) print "&nbsp;&nbsp;(".$pid.")";
+	if (GedcomConfig::$SHOW_ID_NUMBERS) print "&nbsp;&nbsp;(".$pid.")";
 	print "</b><br />";
 ?>
 <script language="JavaScript" type="text/javascript">
@@ -1519,18 +1519,18 @@ function checkform(frm) {
 		?>
 		</tr>
 		<tr>
-		  <td id="pagetab0bottom" class="tab_active_bottom"><img src="<?php print $GM_IMAGE_DIR."/".$GM_IMAGES["spacer"]["other"]; ?>" width="1" height="1" alt="" /></td>
+		  <td id="pagetab0bottom" class="tab_active_bottom"><img src="<?php print GM_IMAGE_DIR."/".$GM_IMAGES["spacer"]["other"]; ?>" width="1" height="1" alt="" /></td>
 		  <?php
 		for($i=1; $i<=count($sfams); $i++) {
-			print "<td id=\"pagetab{$i}bottom\" class=\"tab_inactive_bottom\"><img src=\"$GM_IMAGE_DIR/".$GM_IMAGES["spacer"]["other"]."\" width=\"1\" height=\"1\" alt=\"\"/></td>\n";
+			print "<td id=\"pagetab{$i}bottom\" class=\"tab_inactive_bottom\"><img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["spacer"]["other"]."\" width=\"1\" height=\"1\" alt=\"\"/></td>\n";
 		}
 		for($j=1; $j<=count($cfams); $j++) {
-			print "<td id=\"pagetab{$i}bottom\" class=\"tab_inactive_bottom\"><img src=\"$GM_IMAGE_DIR/".$GM_IMAGES["spacer"]["other"]."\" width=\"1\" height=\"1\" alt=\"\" /></td>\n";
+			print "<td id=\"pagetab{$i}bottom\" class=\"tab_inactive_bottom\"><img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["spacer"]["other"]."\" width=\"1\" height=\"1\" alt=\"\" /></td>\n";
 			$i++;
 		}
 		?>
-			<td id="pagetab<?php echo $i; ?>bottom" class="tab_inactive_bottom"><img src="<?php print $GM_IMAGE_DIR."/".$GM_IMAGES["spacer"]["other"]; ?>" width="1" height="1" alt="" /></td>
-			<td class="tab_inactive_bottom_right" style="width:10%;"><img src="<?php print $GM_IMAGE_DIR."/".$GM_IMAGES["spacer"]["other"]; ?>" width="1" height="1" alt="" /></td>
+			<td id="pagetab<?php echo $i; ?>bottom" class="tab_inactive_bottom"><img src="<?php print GM_IMAGE_DIR."/".$GM_IMAGES["spacer"]["other"]; ?>" width="1" height="1" alt="" /></td>
+			<td class="tab_inactive_bottom_right" style="width:10%;"><img src="<?php print GM_IMAGE_DIR."/".$GM_IMAGES["spacer"]["other"]; ?>" width="1" height="1" alt="" /></td>
    </tr>
 </table>
 <div id="tab0">
@@ -1542,7 +1542,7 @@ function checkform(frm) {
 <tr><td class="descriptionbox"><?php print_help_link("edit_surname_help", "qm"); print $factarray["SURN"];?></td>
 <td class="optionbox" colspan="3"><input size="50" type="text" tabindex="<?php print $tabkey; ?>" name="SURN" value="<?php print PrintReady(htmlspecialchars($SURN)); ?>" /></td></tr>
 <?php $tabkey++; ?>
-<?php if ($USE_RTL_FUNCTIONS) { ?>
+<?php if (GedcomConfig::$USE_RTL_FUNCTIONS) { ?>
 <tr><td class="descriptionbox"><?php print_help_link("edit_given_name_help", "qm"); print $gm_lang["hebrew_givn"];?></td>
 <td class="optionbox" colspan="3"><input size="50" type="text" tabindex="<?php print $tabkey; ?>" name="HGIVN" value="<?php print PrintReady(htmlspecialchars($HGIVN)); ?>" /></td></tr>
 <?php $tabkey++; ?>
@@ -1640,7 +1640,7 @@ foreach($indifacts as $f=>$fact) {
 		<td class="optionbox center">
 			<input type="hidden" name="REMS[<?php echo $f; ?>]" id="REM<?php echo $f; ?>" value="0" />
 			<a href="javascript: <?php print $gm_lang["delete"]; ?>" onclick="document.quickupdate.closewin.value='0'; document.quickupdate.REM<?php echo $f; ?>.value='1'; document.quickupdate.submit(); return false;">
-				<img src="<?php print $GM_IMAGE_DIR."/".$GM_IMAGES["remove"]["other"]; ?>" border="0" alt="<?php print $gm_lang["delete"]; ?>" />
+				<img src="<?php print GM_IMAGE_DIR."/".$GM_IMAGES["remove"]["other"]; ?>" border="0" alt="<?php print $gm_lang["delete"]; ?>" />
 			</a>
 		</td>
 	</tr>
@@ -1649,7 +1649,7 @@ foreach($indifacts as $f=>$fact) {
 		<td class="optionbox">&nbsp;</td>
 	</tr>
 	<?php }
-	if ($SHOW_QUICK_RESN) {
+	if (GedcomConfig::$SHOW_QUICK_RESN) {
 		PrintQuickResn("RESNS[]", $resn);
 	}
 }
@@ -1713,7 +1713,7 @@ if (count($addfacts)>0) { ?>
 <?php }
 
 // NOTE: Add photo
-if (MediaFS::DirIsWritable($MEDIA_DIRECTORY)) { ?>
+if (MediaFS::DirIsWritable(GedcomConfig::$MEDIA_DIRECTORY)) { ?>
 <tr><td>&nbsp;</td></tr>
 <tr><td class="topbottombar" colspan="4"><b><?php print_help_link("quick_update_photo_help", "qm"); print $gm_lang["update_photo"]; ?></b></td></tr>
 <tr>
@@ -1808,7 +1808,7 @@ for($i=1; $i<=count($sfams); $i++) {
 <table class="<?php print $TEXT_DIRECTION; ?> width80">
 <tr><td class="topbottombar" colspan="4">
 <?php
-	$famreqdfacts = preg_split("/[,; ]/", $QUICK_REQUIRED_FAMFACTS);
+	$famreqdfacts = preg_split("/[,; ]/", GedcomConfig::$QUICK_REQUIRED_FAMFACTS);
 	$famid = $sfams[$i-1]["famid"];
 	$famrec = FindFamilyRecord($famid);
 	if (GetChangeData(true, $famid, true)) {
@@ -1831,7 +1831,7 @@ for($i=1; $i<=count($sfams); $i++) {
 		if (PrivacyFunctions::displayDetailsById($spid) && PrivacyFunctions::showLivingNameById($spid)) {
 			print "<a href=\"#\" onclick=\"return quickEdit('".$spid."');\">";
 			$name = PrintReady(GetPersonName($spid, $parrec));
-			if ($SHOW_ID_NUMBERS) $name .= " (".$spid.")";
+			if (GedcomConfig::$SHOW_ID_NUMBERS) $name .= " (".$spid.")";
 			$name .= " [".$gm_lang["edit"]."]";
 			print $name."</a>\n";
 		}
@@ -1886,7 +1886,7 @@ for($i=1; $i<=count($sfams); $i++) {
 	<td class="optionbox" colspan="3"><input size="50" type="text" tabindex="<?php print $tabkey; ?>" name="SSURN<?php echo $i; ?>" /></td>
 	<?php $tabkey++; ?>
 </tr>
-<?php if ($USE_RTL_FUNCTIONS) { ?>
+<?php if (GedcomConfig::$USE_RTL_FUNCTIONS) { ?>
 <tr>
 	<td class="descriptionbox"><?php print_help_link("edit_given_name_help", "qm"); print $gm_lang["hebrew_givn"];?></td>
 	<td class="optionbox" colspan="3"><input size="50" type="text" tabindex="<?php print $tabkey; ?>" name="HSGIVN<?php echo $i; ?>" /></td>
@@ -1925,7 +1925,7 @@ for($i=1; $i<=count($sfams); $i++) {
 	</tr>
 	<?php $tabkey++; ?>
 	<td class="descriptionbox"><?php print_help_link("edit_PLAC_help", "qm"); print $factarray["PLAC"];?></td>
-	<td class="optionbox" colspan="3"><input size="30" type="text" tabindex="<?php print $tabkey; ?>" name="BPLAC<?php echo $i; ?>" id="bplace<?php echo $i; ?>" /><img src="<?php print $GM_IMAGE_DIR."/".$GM_IMAGES["spacer"]["other"];?>" name="banchor1x" id="banchor1x" alt="" />
+	<td class="optionbox" colspan="3"><input size="30" type="text" tabindex="<?php print $tabkey; ?>" name="BPLAC<?php echo $i; ?>" id="bplace<?php echo $i; ?>" /><img src="<?php print GM_IMAGE_DIR."/".$GM_IMAGES["spacer"]["other"];?>" name="banchor1x" id="banchor1x" alt="" />
 	<?php LinkFunctions::PrintFindPlaceLink("place$f"); ?>
 	<?php $tabkey++; ?>
 	</td>
@@ -1980,12 +1980,12 @@ foreach($famfacts as $f=>$fact) {
 					<input type="hidden" name="F<?php echo $i; ?>REMS[<?php echo $f; ?>]" id="F<?php echo $i; ?>REM<?php echo $f; ?>" value="0" />
 					<?php if (!$fact[2]) { ?>
 					<a href="javascript: <?php print $gm_lang["delete"]; ?>" onclick="document.quickupdate.closewin.value='0'; document.quickupdate.F<?php echo $i; ?>REM<?php echo $f; ?>.value='1'; document.quickupdate.submit(); return false;">
-						<img src="<?php print $GM_IMAGE_DIR."/".$GM_IMAGES["remove"]["other"]; ?>" border="0" alt="<?php print $gm_lang["delete"]; ?>" />
+						<img src="<?php print GM_IMAGE_DIR."/".$GM_IMAGES["remove"]["other"]; ?>" border="0" alt="<?php print $gm_lang["delete"]; ?>" />
 					</a>
 					<?php } ?>
 				</td>
 			</tr>
-			<?php if ($SHOW_QUICK_RESN) {
+			<?php if (GedcomConfig::$SHOW_QUICK_RESN) {
 				PrintQuickResn("F".$i."RESNS[]", $resn);
 			} ?>
 	<?php
@@ -2052,11 +2052,11 @@ $chil = FindChildrenInRecord($famrec);
 					print "<tr><td class=\"optionbox\">";
 					$name = GetPersonName($child, $childrec);
 					$disp = PrivacyFunctions::displayDetailsById($child);
-					if ($SHOW_ID_NUMBERS) $name .= " (".$child.")";
+					if (GedcomConfig::$SHOW_ID_NUMBERS) $name .= " (".$child.")";
 					else $childrec = FindPersonRecord($child);
 					if ($disp || PrivacyFunctions::showLivingNameById($child)) {
 						$isF = GetGedcomValue("SEX", 1, $childrec, "", false);
-						$name .= "<img id=\"box-F.$i.$child-sex\" src=\"$GM_IMAGE_DIR/";
+						$name .= "<img id=\"box-F.$i.$child-sex\" src=\"".GM_IMAGE_DIR."/";
 						if ($isF=="M") $name .= $GM_IMAGES["sex"]["small"]."\" title=\"".$gm_lang["male"]."\" alt=\"".$gm_lang["male"];
 						else  if ($isF=="F") $name .= $GM_IMAGES["sexf"]["small"]."\" title=\"".$gm_lang["female"]."\" alt=\"".$gm_lang["female"];
 						else  $name .= $GM_IMAGES["sexn"]["small"]."\" title=\"".$gm_lang["unknown"]."\" alt=\"".$gm_lang["unknown"];
@@ -2088,7 +2088,7 @@ $chil = FindChildrenInRecord($famrec);
 					?>
 					<td class="optionbox center" colspan="3">
 						<a href="javascript: <?php print $gm_lang["remove_child"]; ?>" onclick="if (confirm('<?php print $gm_lang["confirm_remove"]; ?>')) { document.quickupdate.closewin.value='0'; document.quickupdate.F<?php echo $i; ?>CDEL.value='<?php echo $child; ?>'; document.quickupdate.submit(); } return false;">
-							<img src="<?php print $GM_IMAGE_DIR."/".$GM_IMAGES["remove"]["other"]; ?>" border="0" alt="<?php print $gm_lang["remove_child"]; ?>" />
+							<img src="<?php print GM_IMAGE_DIR."/".$GM_IMAGES["remove"]["other"]; ?>" border="0" alt="<?php print $gm_lang["remove_child"]; ?>" />
 						</a>
 					</td>
 					<?php
@@ -2117,7 +2117,7 @@ if (empty($child_surname)) $child_surname = "";
 	<td class="optionbox" colspan="3"><input size="50" type="text" tabindex="<?php print $tabkey; ?>" name="C<?php echo $i; ?>SURN" value="<?php if (!empty($child_surname)) print $child_surname; ?>" /></td>
 	<?php $tabkey++; ?>
 </tr>
-<?php if ($USE_RTL_FUNCTIONS) { ?>
+<?php if (GedcomConfig::$USE_RTL_FUNCTIONS) { ?>
 <tr>
 	<td class="descriptionbox"><?php print_help_link("edit_given_name_help", "qm"); print $gm_lang["hebrew_givn"];?></td>
 	<td class="optionbox" colspan="3"><input size="50" type="text" tabindex="<?php print $tabkey; ?>" name="HC<?php echo $i; ?>GIVN" /></td>
@@ -2158,7 +2158,7 @@ if (empty($child_surname)) $child_surname = "";
 	</tr>
 	<tr>
 	<td class="descriptionbox"><?php print_help_link("edit_PLAC_help", "qm"); print $factarray["PLAC"];?></td>
-	<td class="optionbox" colspan="3"><input size="30" type="text" tabindex="<?php print $tabkey; ?>" name="C<?php echo $i; ?>PLAC" id="c<?php echo $i; ?>place" /><img src="<?php print $GM_IMAGE_DIR."/".$GM_IMAGES["spacer"]["other"];?>" name="canchor1x" id="canchor1x" alt="" />
+	<td class="optionbox" colspan="3"><input size="30" type="text" tabindex="<?php print $tabkey; ?>" name="C<?php echo $i; ?>PLAC" id="c<?php echo $i; ?>place" /><img src="<?php print GM_IMAGE_DIR."/".$GM_IMAGES["spacer"]["other"];?>" name="canchor1x" id="canchor1x" alt="" />
 	<?php LinkFunctions::PrintFindPlaceLink("c".$i."place"); ?>
 	</td>
 	<?php $tabkey++; ?>
@@ -2187,7 +2187,7 @@ if (empty($child_surname)) $child_surname = "";
 	<td class="optionbox" colspan="3"><input size="50" type="text" tabindex="<?php print $tabkey; ?>" name="SSURN" /></td>
 	<?php $tabkey++; ?>
 </tr>
-<?php if ($USE_RTL_FUNCTIONS) { ?>
+<?php if (GedcomConfig::$USE_RTL_FUNCTIONS) { ?>
 <tr>
 	<td class="descriptionbox"><?php print_help_link("edit_given_name_help", "qm"); print $gm_lang["hebrew_givn"];?></td>
 	<td class="optionbox" colspan="3"><input size="50" type="text" tabindex="<?php print $tabkey; ?>" name="HSGIVN" /></td>
@@ -2229,7 +2229,7 @@ if (empty($child_surname)) $child_surname = "";
 	<?php $tabkey++; ?>
 	<tr>
 	<td class="descriptionbox"><?php print_help_link("edit_PLAC_help", "qm"); print $factarray["PLAC"];?></td>
-	<td class="optionbox" colspan="3"><input size="30" type="text" tabindex="<?php print $tabkey; ?>" name="BPLAC" id="bplace" /><img src="<?php print $GM_IMAGE_DIR."/".$GM_IMAGES["spacer"]["other"];?>" name="banchor1x" id="banchor1x" alt="" />
+	<td class="optionbox" colspan="3"><input size="30" type="text" tabindex="<?php print $tabkey; ?>" name="BPLAC" id="bplace" /><img src="<?php print GM_IMAGE_DIR."/".$GM_IMAGES["spacer"]["other"];?>" name="banchor1x" id="banchor1x" alt="" />
 	<?php LinkFunctions::PrintFindPlaceLink("bplace"); ?>
 	<?php $tabkey++; ?>
 	</td>
@@ -2250,7 +2250,7 @@ if (empty($child_surname)) $child_surname = "";
 	<?php $tabkey++; ?>
 	<tr>
 	<td class="descriptionbox"><?php print_help_link("edit_PLAC_help", "qm"); print $factarray["PLAC"];?></td>
-	<td class="optionbox" colspan="3"><input size="30" type="text" tabindex="<?php print $tabkey; ?>" name="MPLAC" id="mplace" /><img src="<?php print $GM_IMAGE_DIR."/".$GM_IMAGES["spacer"]["other"];?>" name="manchor1x" id="manchor1x" alt="" />
+	<td class="optionbox" colspan="3"><input size="30" type="text" tabindex="<?php print $tabkey; ?>" name="MPLAC" id="mplace" /><img src="<?php print GM_IMAGE_DIR."/".$GM_IMAGES["spacer"]["other"];?>" name="manchor1x" id="manchor1x" alt="" />
 	<?php LinkFunctions::PrintFindPlaceLink("mplace"); ?>
 	<?php $tabkey++; ?>
 	</td>
@@ -2272,7 +2272,7 @@ if (empty($child_surname)) $child_surname = "";
 	<td class="optionbox" colspan="3"><input size="50" type="text" tabindex="<?php print $tabkey; ?>" name="CSURN" value="<?php if (!empty($child_surname)) print $child_surname; ?>" /></td>
 	<?php $tabkey++; ?>
 </tr>
-<?php if ($USE_RTL_FUNCTIONS) { ?>
+<?php if (GedcomConfig::$USE_RTL_FUNCTIONS) { ?>
 <tr>
 	<td class="descriptionbox"><?php print_help_link("edit_given_name_help", "qm"); print $gm_lang["hebrew_givn"];?></td>
 	<td class="optionbox" colspan="3"><input size="50" type="text" tabindex="<?php print $tabkey; ?>" name="HCGIVN" /></td>
@@ -2313,7 +2313,7 @@ if (empty($child_surname)) $child_surname = "";
 	<?php $tabkey++; ?>
 	<tr>
 	<td class="descriptionbox"><?php print_help_link("edit_PLAC_help", "qm"); print $factarray["PLAC"];?></td>
-	<td class="optionbox" colspan="3"><input size="30" type="text" tabindex="<?php print $tabkey; ?>" name="CPLAC" id="cplace" /><img src="<?php print $GM_IMAGE_DIR."/".$GM_IMAGES["spacer"]["other"];?>" name="canchor2x" id="canchor2x" alt="" />
+	<td class="optionbox" colspan="3"><input size="30" type="text" tabindex="<?php print $tabkey; ?>" name="CPLAC" id="cplace" /><img src="<?php print GM_IMAGE_DIR."/".$GM_IMAGES["spacer"]["other"];?>" name="canchor2x" id="canchor2x" alt="" />
 	<?php LinkFunctions::PrintFindPlaceLink("cplace"); ?>
 	</td>
 	<?php $tabkey++; ?>
@@ -2329,7 +2329,7 @@ for($j=1; $j<=count($cfams); $j++) {
 <div id="tab<?php echo $i; ?>" style="display: none;">
 <table class="<?php print $TEXT_DIRECTION; ?> width80">
 <?php
-	$famreqdfacts = preg_split("/[,; ]/", $QUICK_REQUIRED_FAMFACTS);
+	$famreqdfacts = preg_split("/[,; ]/", GedcomConfig::$QUICK_REQUIRED_FAMFACTS);
 	$famid = $cfams[$j-1]["famid"];
 	// NOTE $famid can be empty to generate empty tab
 	if (!empty($famid) && GetChangeData(true, $famid, true)) {
@@ -2392,7 +2392,7 @@ for($j=1; $j<=count($cfams); $j++) {
 			print $label." ";
 			print "<a href=\"#\" onclick=\"return quickEdit('".$parents["HUSB"]."');\">";
 			$name = GetPersonName($parents["HUSB"], $fatherrec);
-			if ($SHOW_ID_NUMBERS) $name .= " (".$parents["HUSB"].")";
+			if (GedcomConfig::$SHOW_ID_NUMBERS) $name .= " (".$parents["HUSB"].")";
 			$name .= " [".$gm_lang["edit"]."]";
 			print PrintReady($name)."</a>\n";
 		}
@@ -2416,7 +2416,7 @@ for($j=1; $j<=count($cfams); $j++) {
 	<td class="optionbox" colspan="3"><input size="50" type="text" tabindex="<?php print $tabkey; ?>" name="FSURN<?php echo $i; ?>" /></td>
 	<?php $tabkey++; ?>
 	</tr>
-	<?php if ($USE_RTL_FUNCTIONS) { ?>
+	<?php if (GedcomConfig::$USE_RTL_FUNCTIONS) { ?>
 	<tr>
 	<td class="descriptionbox"><?php print_help_link("edit_given_name_help", "qm"); print $gm_lang["hebrew_givn"];?></td>
 	<td class="optionbox" colspan="3"><input size="50" type="text" tabindex="<?php print $tabkey; ?>" name="HFGIVN<?php echo $i; ?>" /></td>
@@ -2458,7 +2458,7 @@ for($j=1; $j<=count($cfams); $j++) {
 	<?php $tabkey++; ?>
 	<tr>
 	<td class="descriptionbox"><?php print_help_link("edit_PLAC_help", "qm"); print $factarray["PLAC"];?></td>
-	<td class="optionbox" colspan="3"><input size="30" type="text" tabindex="<?php print $tabkey; ?>" name="FBPLAC<?php echo $i; ?>" id="Fbplace<?php echo $i; ?>" /><img src="<?php print $GM_IMAGE_DIR."/".$GM_IMAGES["spacer"]["other"];?>" name="banchor1x" id="banchor1x" alt="" />
+	<td class="optionbox" colspan="3"><input size="30" type="text" tabindex="<?php print $tabkey; ?>" name="FBPLAC<?php echo $i; ?>" id="Fbplace<?php echo $i; ?>" /><img src="<?php print GM_IMAGE_DIR."/".$GM_IMAGES["spacer"]["other"];?>" name="banchor1x" id="banchor1x" alt="" />
 	<?php LinkFunctions::PrintFindPlaceLink("Fbplace$i"); ?>
 	<?php $tabkey++; ?>
 	</td>
@@ -2473,7 +2473,7 @@ for($j=1; $j<=count($cfams); $j++) {
 	<?php $tabkey++; ?>
 	<tr>
 	<td class="descriptionbox"><?php print_help_link("edit_PLAC_help", "qm"); print $factarray["PLAC"];?></td>
-	<td class="optionbox" colspan="3"><input size="30" type="text" tabindex="<?php print $tabkey; ?>" name="FDPLAC<?php echo $i; ?>" id="Fdplace<?php echo $i; ?>" /><img src="<?php print $GM_IMAGE_DIR."/".$GM_IMAGES["spacer"]["other"];?>" name="danchor1x" id="danchor1x" alt="" />
+	<td class="optionbox" colspan="3"><input size="30" type="text" tabindex="<?php print $tabkey; ?>" name="FDPLAC<?php echo $i; ?>" id="Fdplace<?php echo $i; ?>" /><img src="<?php print GM_IMAGE_DIR."/".$GM_IMAGES["spacer"]["other"];?>" name="danchor1x" id="danchor1x" alt="" />
 	<?php LinkFunctions::PrintFindPlaceLink("Fdplace$i"); ?>
 	<?php $tabkey++; ?>
 	</td>
@@ -2500,7 +2500,7 @@ for($j=1; $j<=count($cfams); $j++) {
 			print $label." ";
 			print "<a href=\"#\" onclick=\"return quickEdit('".$parents["WIFE"]."');\">";
 			$name = GetPersonName($parents["WIFE"], $motherrec);
-			if ($SHOW_ID_NUMBERS) $name .= " (".$parents["WIFE"].")";
+			if (GedcomConfig::$SHOW_ID_NUMBERS) $name .= " (".$parents["WIFE"].")";
 			$name .= " [".$gm_lang["edit"]."]";
 			print PrintReady($name)."</a>\n";
 		}
@@ -2524,7 +2524,7 @@ for($j=1; $j<=count($cfams); $j++) {
 	<td class="optionbox" colspan="3"><input size="50" type="text" tabindex="<?php print $tabkey; ?>" name="MSURN<?php echo $i; ?>" /></td>
 	<?php $tabkey++; ?>
 </tr>
-<?php if ($USE_RTL_FUNCTIONS) { ?>
+<?php if (GedcomConfig::$USE_RTL_FUNCTIONS) { ?>
 <tr>
 	<td class="descriptionbox"><?php print_help_link("edit_given_name_help", "qm"); print $gm_lang["hebrew_givn"];?></td>
 	<td class="optionbox" colspan="3"><input size="50" type="text" tabindex="<?php print $tabkey; ?>" name="HMGIVN<?php echo $i; ?>" /></td>
@@ -2566,7 +2566,7 @@ for($j=1; $j<=count($cfams); $j++) {
 	<?php $tabkey++; ?>
 	<tr>
 	<td class="descriptionbox"><?php print_help_link("edit_PLAC_help", "qm"); print $factarray["PLAC"];?></td>
-	<td class="optionbox" colspan="3"><input size="30" type="text" tabindex="<?php print $tabkey; ?>" name="MBPLAC<?php echo $i; ?>" id="Mbplace<?php echo $i; ?>" /><img src="<?php print $GM_IMAGE_DIR."/".$GM_IMAGES["spacer"]["other"];?>" name="banchor1x" id="banchor1x" alt="" />
+	<td class="optionbox" colspan="3"><input size="30" type="text" tabindex="<?php print $tabkey; ?>" name="MBPLAC<?php echo $i; ?>" id="Mbplace<?php echo $i; ?>" /><img src="<?php print GM_IMAGE_DIR."/".$GM_IMAGES["spacer"]["other"];?>" name="banchor1x" id="banchor1x" alt="" />
 	<?php LinkFunctions::PrintFindPlaceLink("Mbplace$i"); ?>
 	<?php $tabkey++; ?>
 	</td>
@@ -2581,7 +2581,7 @@ for($j=1; $j<=count($cfams); $j++) {
 	<?php $tabkey++; ?>
 	<tr>
 	<td class="descriptionbox"><?php print_help_link("edit_PLAC_help", "qm"); print $factarray["PLAC"];?></td>
-	<td class="optionbox" colspan="3"><input size="30" type="text" tabindex="<?php print $tabkey; ?>" name="MDPLAC<?php echo $i; ?>" id="Mdplace<?php echo $i; ?>" /><img src="<?php print $GM_IMAGE_DIR."/".$GM_IMAGES["spacer"]["other"];?>" name="danchor1x" id="danchor1x" alt="" />
+	<td class="optionbox" colspan="3"><input size="30" type="text" tabindex="<?php print $tabkey; ?>" name="MDPLAC<?php echo $i; ?>" id="Mdplace<?php echo $i; ?>" /><img src="<?php print GM_IMAGE_DIR."/".$GM_IMAGES["spacer"]["other"];?>" name="danchor1x" id="danchor1x" alt="" />
 	<?php LinkFunctions::PrintFindPlaceLink("Mdplace$i"); ?>
 	<?php $tabkey++; ?>
 	</td>
@@ -2635,12 +2635,12 @@ foreach($famfacts as $f=>$fact) {
 					<input type="hidden" name="F<?php echo $i; ?>REMS[<?php echo $f; ?>]" id="F<?php echo $i; ?>REM<?php echo $f; ?>" value="0" />
 					<?php if (!$fact[2]) { ?>
 					<a href="javascript: <?php print $gm_lang["delete"]; ?>" onclick="if (confirm('<?php print $gm_lang["confirm_remove"]; ?>')) { document.quickupdate.closewin.value='0'; document.quickupdate.F<?php echo $i; ?>REM<?php echo $f; ?>.value='1'; document.quickupdate.submit(); } return false;">
-						<img src="<?php print $GM_IMAGE_DIR."/".$GM_IMAGES["remove"]["other"]; ?>" border="0" alt="<?php print $gm_lang["delete"]; ?>" />
+						<img src="<?php print GM_IMAGE_DIR."/".$GM_IMAGES["remove"]["other"]; ?>" border="0" alt="<?php print $gm_lang["delete"]; ?>" />
 					</a>
 					<?php } ?>
 				</td>
 			</tr>
-			<?php if ($SHOW_QUICK_RESN) {
+			<?php if (GedcomConfig::$SHOW_QUICK_RESN) {
 				PrintQuickResn("F".$i."RESNS[]", $resn);
 			} ?>
 	<?php
@@ -2712,10 +2712,10 @@ $chil = FindChildrenInRecord($famrec);
 					}
 					$name = GetPersonName($child, $childrec);
 					$disp = PrivacyFunctions::displayDetailsById($child);
-					if ($SHOW_ID_NUMBERS) $name .= " (".$child.")";
+					if (GedcomConfig::$SHOW_ID_NUMBERS) $name .= " (".$child.")";
 					if ($disp || PrivacyFunctions::showLivingNameById($child)) {
 						$isF = GetGedcomValue("SEX", 1, $childrec, "", false);
-						$name .= "<img id=\"box-F.$i.$child-sex\" src=\"$GM_IMAGE_DIR/";
+						$name .= "<img id=\"box-F.$i.$child-sex\" src=\"".GM_IMAGE_DIR."/";
 						if ($isF=="M") $name .= $GM_IMAGES["sex"]["small"]."\" title=\"".$gm_lang["male"]."\" alt=\"".$gm_lang["male"];
 						else  if ($isF=="F") $name .= $GM_IMAGES["sexf"]["small"]."\" title=\"".$gm_lang["female"]."\" alt=\"".$gm_lang["female"];
 						else  $name .= $GM_IMAGES["sexn"]["small"]."\" title=\"".$gm_lang["unknown"]."\" alt=\"".$gm_lang["unknown"];
@@ -2747,7 +2747,7 @@ $chil = FindChildrenInRecord($famrec);
 
 					?><td class="optionbox center" colspan="1"><?php if ($pid != $child) {?>
 						<a href="javascript: <?php print $gm_lang["remove_child"]; ?>" onclick="document.quickupdate.closewin.value='0'; document.quickupdate.F<?php echo $i; ?>CDEL.value='<?php echo $child; ?>'; document.quickupdate.submit(); return false;">
-							<img src="<?php print $GM_IMAGE_DIR."/".$GM_IMAGES["remove"]["other"]; ?>" border="0" alt="<?php print $gm_lang["remove_child"]; ?>" />
+							<img src="<?php print GM_IMAGE_DIR."/".$GM_IMAGES["remove"]["other"]; ?>" border="0" alt="<?php print $gm_lang["remove_child"]; ?>" />
 						</a><?php }?>
 					</td>
 					<?php
@@ -2775,7 +2775,7 @@ $chil = FindChildrenInRecord($famrec);
 	<td class="optionbox" colspan="3"><input size="50" type="text" tabindex="<?php print $tabkey; ?>" name="C<?php echo $i; ?>SURN" value="<?php //if (!empty($child_surname)) print $child_surname; ?>" /></td>
 	<?php $tabkey++; ?>
 </tr>
-<?php if ($USE_RTL_FUNCTIONS) { ?>
+<?php if (GedcomConfig::$USE_RTL_FUNCTIONS) { ?>
 <tr>
 	<td class="descriptionbox"><?php print_help_link("edit_given_name_help", "qm"); print $gm_lang["hebrew_givn"];?></td>
 	<td class="optionbox" colspan="3"><input size="50" type="text" tabindex="<?php print $tabkey; ?>" name="HC<?php echo $i; ?>GIVN" /></td>
@@ -2812,7 +2812,7 @@ $chil = FindChildrenInRecord($famrec);
 	<?php $tabkey++; ?>
 	<tr>
 	<td class="descriptionbox"><?php print_help_link("edit_PLAC_help", "qm"); print $factarray["PLAC"];?></td>
-	<td class="optionbox" colspan="3"><input size="30" type="text" tabindex="<?php print $tabkey; ?>" name="C<?php echo $i; ?>PLAC" id="C<?php echo $i; ?>place" /><img src="<?php print $GM_IMAGE_DIR."/".$GM_IMAGES["spacer"]["other"];?>" name="canchor3x" id="canchor3x" alt="" />
+	<td class="optionbox" colspan="3"><input size="30" type="text" tabindex="<?php print $tabkey; ?>" name="C<?php echo $i; ?>PLAC" id="C<?php echo $i; ?>place" /><img src="<?php print GM_IMAGE_DIR."/".$GM_IMAGES["spacer"]["other"];?>" name="canchor3x" id="canchor3x" alt="" />
 	<?php LinkFunctions::PrintFindPlaceLink("c".$i."place"); ?>
 	</td>
 	<?php $tabkey++; ?>
@@ -2828,5 +2828,5 @@ $chil = FindChildrenInRecord($famrec);
 </form>
 <?php
 }
-print_simple_footer();
+PrintSimpleFooter();
 ?>

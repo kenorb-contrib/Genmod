@@ -40,7 +40,7 @@ if (!isset($callback)) $callback="paste_id";
 if (!isset($create)) $create="";
 if (!isset($media)) $media="";
 if (!isset($embed)) $embed=false;
-if (!isset($directory)) $directory = $MEDIA_DIRECTORY;
+if (!isset($directory)) $directory = GedcomConfig::$MEDIA_DIRECTORY;
 $badmedia = array(".","..","CVS","thumbs","index.php","MediaInfo.txt");
 $showthumb= isset($showthumb);
 if ($embed) check_media_db();
@@ -49,18 +49,18 @@ if ($showthumb) {$thumbget = "&amp;showthumb=true";}
 
 //-- force the thumbnail directory to have the same layout as the media directory
 //-- Dots and slashes should be escaped for the preg_replace
-$srch = "/".addcslashes($MEDIA_DIRECTORY,'/.')."/";
-$repl = addcslashes($MEDIA_DIRECTORY."thumbs/",'/.');
+$srch = "/".addcslashes(GedcomConfig::$MEDIA_DIRECTORY,'/.')."/";
+$repl = addcslashes(GedcomConfig::$MEDIA_DIRECTORY."thumbs/",'/.');
 $thumbdir = stripcslashes(preg_replace($srch, $repl, $directory));
 if (!isset($level)) $level=0;
 
 //-- prevent script from accessing an area outside of the media directory
 //-- and keep level consistency
-if (($level < 0) || ($level > $MEDIA_DIRECTORY_LEVELS)){
-	$directory = $MEDIA_DIRECTORY;
+if (($level < 0) || ($level > GedcomConfig::$MEDIA_DIRECTORY_LEVELS)){
+	$directory = GedcomConfig::$MEDIA_DIRECTORY;
 	$level = 0;
-} elseif (preg_match("'^".RelativePathFile($MEDIA_DIRECTORY)."'", $directory)==0){
-	$directory = $MEDIA_DIRECTORY;
+} elseif (preg_match("'^".RelativePathFile(GedcomConfig::$MEDIA_DIRECTORY)."'", $directory)==0){
+	$directory = GedcomConfig::$MEDIA_DIRECTORY;
 	$level = 0;
 }
 // End variables for find media
@@ -78,37 +78,37 @@ require("includes/values/specialchars.php");
 
 switch ($type) {
 	case "indi" :
-		print_simple_header($gm_lang["find_individual"]);
+		PrintSimpleHeader($gm_lang["find_individual"]);
 		break;
 	case "fam" :
-		print_simple_header($gm_lang["find_fam_list"]);
+		PrintSimpleHeader($gm_lang["find_fam_list"]);
 		break;
 	case "media" :
-		print_simple_header($gm_lang["find_media"]);
+		PrintSimpleHeader($gm_lang["find_media"]);
 		$action="filter";
 		break;
 	case "object" :
-		print_simple_header($gm_lang["find_media"]);
+		PrintSimpleHeader($gm_lang["find_media"]);
 		$action="filter";
 		break;
 	case "place" :
-		print_simple_header($gm_lang["find_place"]);
+		PrintSimpleHeader($gm_lang["find_place"]);
 		$action="filter";		
 		break;
 	case "repo" :
-		print_simple_header($gm_lang["repo_list"]);
+		PrintSimpleHeader($gm_lang["repo_list"]);
 		$action="filter";		
 		break;
 	case "source" :
-		print_simple_header($gm_lang["find_source"]);
+		PrintSimpleHeader($gm_lang["find_source"]);
 		$action="filter";
 		break;
 	case "note" :
-		print_simple_header($gm_lang["find_note"]);
+		PrintSimpleHeader($gm_lang["find_note"]);
 		$action="filter";
 		break;
 	case "specialchar" :
-		print_simple_header($gm_lang["find_specialchar"]);
+		PrintSimpleHeader($gm_lang["find_specialchar"]);
 		$action="filter";		
 		break;
 }
@@ -510,7 +510,7 @@ if ($action=="filter") {
 		print "<div align=\"center\">";
 		print "\n\t<table class=\"tabs_table center $TEXT_DIRECTION width80\">\n\t\t";
 		$directory = RelativePathFile($directory);
-		$mdir = RelativePathFile($MEDIA_DIRECTORY);
+		$mdir = RelativePathFile(GedcomConfig::$MEDIA_DIRECTORY);
 		
 		// Show link to previous folder		
 		if ($level>0) {
@@ -543,10 +543,10 @@ if ($action=="filter") {
 			// If we view the external links, add a link to the main directory
 			if ($external_links == "1") {
 				print "<tr><td class=\"list_value wrap $TEXT_DIRECTION\" colspan=\"4\" width=\"45%\">";
-				print "<a href=\"find.php?directory=".$MEDIA_DIRECTORY."&thumbdir=".$MEDIA_DIRECTORY.$thumbget."&level=0&amp;type=media&amp;filter=".$filter."\">".$mdir."</a>";
+				print "<a href=\"find.php?directory=".GedcomConfig::$MEDIA_DIRECTORY."&thumbdir=".GedcomConfig::$MEDIA_DIRECTORY.$thumbget."&level=0&amp;type=media&amp;filter=".$filter."\">".$mdir."</a>";
 				print "</td></tr>";
 			}
-			if ($level < $MEDIA_DIRECTORY_LEVELS) {
+			if ($level < GedcomConfig::$MEDIA_DIRECTORY_LEVELS) {
 				foreach ($dirs as $indexval => $dir) {
 					if ($dir != $directory) {
 						print "<tr><td class=\"list_value wrap $TEXT_DIRECTION\" colspan=\"4\" width=\"45%\">";
@@ -591,7 +591,7 @@ if ($action=="filter") {
 			foreach ($fmedialist->medialist as $key => $media) {
 				print "\n\t\t<tr><td class=\"shade1 wrap $TEXT_DIRECTION\">";
 				if (!empty($media->fileobj->f_thumb_file)) {
-					if ($USE_GREYBOX && $media->fileobj->f_is_image) print "<a href=\"".FilenameEncode($media->fileobj->f_file)."\" title=\"".$media->title."\" rel=\"gb_imageset[]\">";
+					if (USE_GREYBOX && $media->fileobj->f_is_image) print "<a href=\"".FilenameEncode($media->fileobj->f_file)."\" title=\"".$media->title."\" rel=\"gb_imageset[]\">";
 					else print "<a href=\"#\" onclick=\"return openImage('".$media->fileobj->f_main_file."','".($media->fileobj->f_width+50)."','".($media->fileobj->f_height+50)."', '".$media->fileobj->f_is_image."');\">";
 					print "<img src=\"".FilenameEncode($media->fileobj->f_thumb_file)."\" border=\"0\" width=\"50\" align=\"left\" ></a>\n";
 				}
@@ -772,5 +772,5 @@ if ($type != "specialchar") {?>
 //-->
 </script>
 <?php }
-print_simple_footer();
+PrintSimpleFooter();
 ?>

@@ -38,7 +38,7 @@ $GM_BLOCKS["print_gedcom_news"]["rss"]			= true;
  * @todo Add an allowed HTML translation
  */
 function print_gedcom_news($block = true, $config="", $side, $index) {
-	global $gm_lang, $GM_IMAGE_DIR, $GM_IMAGES, $TEXT_DIRECTION, $GEDCOMID, $command, $TIME_FORMAT, $gm_user;
+	global $gm_lang, $GM_IMAGES, $TEXT_DIRECTION, $GEDCOMID, $command, $TIME_FORMAT, $gm_user;
 
 	$usernews = NewsController::getUserNews($GEDCOMID);
 	print "<div id=\"gedcom_news\" class=\"block\">\n";

@@ -139,12 +139,12 @@ class CustomPage {
 	}
 	
 	function AddHeader($title) {
-		print_header($title);
+		PrintHeader($title);
 	}
 	
 	function AddFooter() {
 		if (!empty($this->message)) echo $this->message;
-		print_footer();
+		PrintFooter();
 	}
 	
 	function ShowForm(&$genmod) {

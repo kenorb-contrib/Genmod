@@ -53,7 +53,7 @@ if (!$gm_user->userIsAdmin()) {
 	else header("Location: ".LOGIN_URL."?url=useradmin.php?".GetQueryString(true));
 	exit;
 }
-print_header("Genmod ".$gm_lang["user_admin"]);
+PrintHeader("Genmod ".$gm_lang["user_admin"]);
 
 // Javascript for edit form
 ?>
@@ -603,7 +603,7 @@ if ($action=="edituser" || $action == "createform") { ?>
 				</div>
 			</div>
 			<?php if ($action == "createform") $user =& User::GetInstance($gm_user->username);
-			if ($ENABLE_MULTI_LANGUAGE) { ?>
+			if (GedcomConfig::$ENABLE_MULTI_LANGUAGE) { ?>
 				<div class="admin_item_box">
 					<div class="width30 choice_left">
 						<div class="helpicon">
@@ -1804,7 +1804,7 @@ if (($action == "listusers") || ($action == "edituser2") || ($action == "deleteu
 					<?php
 					$k = 1;
 					for ($i=1, $max=count($users)+1; $i<=$max; $i++) print "expand_layer('user-geds".$i."'); ";
-					print " return false;\"><img id=\"user-geds".$k."_img\" src=\"".$GM_IMAGE_DIR."/";
+					print " return false;\"><img id=\"user-geds".$k."_img\" src=\"".GM_IMAGE_DIR."/";
 					if ($showprivs == false) print $GM_IMAGES["plus"]["other"];
 					else print $GM_IMAGES["minus"]["other"]; ?>
 					" width="11" height="11" alt="" /></a>
@@ -1853,7 +1853,7 @@ if (($action == "listusers") || ($action == "edituser2") || ($action == "deleteu
 							else print "\">".$username;
 						}
 						else print "\">".$username;
-						if (!empty($user->comment)) print "<br /><img class=\"adminicon\" title=\"".PrintReady(stripslashes($user->comment))."\" width=\"20\" height=\"20\" align=\"top\" alt=\"".PrintReady(stripslashes($user->comment))."\"  src=\"".$GM_IMAGE_DIR."/".$GM_IMAGES["note"]["other"]."\" />";?>
+						if (!empty($user->comment)) print "<br /><img class=\"adminicon\" title=\"".PrintReady(stripslashes($user->comment))."\" width=\"20\" height=\"20\" align=\"top\" alt=\"".PrintReady(stripslashes($user->comment))."\"  src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["note"]["other"]."\" />";?>
 					</div>
 					<div class="choice_middle width_fullname">
 						<?php
@@ -1875,7 +1875,7 @@ if (($action == "listusers") || ($action == "edituser2") || ($action == "deleteu
 					</div>
 					<div class="choice_middle width_priviliges">
 						<?php
-						print "<a href=\"javascript: ".$gm_lang["privileges"]."\" onclick=\"expand_layer('user-geds".$k."'); return false;\"><img id=\"user-geds".$k."_img\" src=\"".$GM_IMAGE_DIR."/";
+						print "<a href=\"javascript: ".$gm_lang["privileges"]."\" onclick=\"expand_layer('user-geds".$k."'); return false;\"><img id=\"user-geds".$k."_img\" src=\"".GM_IMAGE_DIR."/";
 						if ($showprivs == false) print $GM_IMAGES["plus"]["other"];
 						else print $GM_IMAGES["minus"]["other"];
 						print "\" width=\"11\" height=\"11\" alt=\"\" />";
@@ -2430,5 +2430,5 @@ if ($action == "cleanup_messages") {
 	</div>
 	<?php
 }
-print_footer();
+PrintFooter();
 ?>

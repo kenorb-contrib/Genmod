@@ -32,7 +32,7 @@ require("config.php");
 $sourcelist_controller = New SourceListController();
 
 
-print_header($sourcelist_controller->pagetitle);
+PrintHeader($sourcelist_controller->pagetitle);
 print "<div class=\"center\">";
 print "<h3>".$gm_lang["source_list"]."</h3>\n\t";
 
@@ -40,7 +40,7 @@ $ctot = $sourcelist_controller->sour_total + $sourcelist_controller->sour_add - 
 
 print "\n\t<table class=\"list_table $TEXT_DIRECTION center\">\n\t\t<tr><td class=\"shade2 center\"";
 if ($ctot > 12)	print " colspan=\"2\"";
-print "><img src=\"".$GM_IMAGE_DIR."/".$GM_IMAGES["source"]["small"]."\" border=\"0\" title=\"".$gm_lang["sources"]."\" alt=\"".$gm_lang["sources"]."\" />&nbsp;&nbsp;";
+print "><img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["source"]["small"]."\" border=\"0\" title=\"".$gm_lang["sources"]."\" alt=\"".$gm_lang["sources"]."\" />&nbsp;&nbsp;";
 print $gm_lang["titles_found"];
 print "</td></tr><tr><td class=\"$TEXT_DIRECTION shade1 wrap\"><ul>";
 $i=1;
@@ -74,5 +74,5 @@ print "</td>\n\t\t</tr>\n\t</table>";
 print_help_link("sourcelist_listbox_help", "qm");
 print "</div>";
 print "<br /><br />";
-print_footer();
+PrintFooter();
 ?>

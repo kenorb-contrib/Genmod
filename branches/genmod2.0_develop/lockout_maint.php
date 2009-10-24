@@ -42,7 +42,7 @@ if (!$gm_user->userIsAdmin()) {
 	exit;
 }
 
-print_header($gm_lang["lockout_maint"]);
+PrintHeader($gm_lang["lockout_maint"]);
 
 //if ($action == "update") {
 //	print "<pre>";
@@ -161,5 +161,5 @@ print_header($gm_lang["lockout_maint"]);
 	</form>
 </div>
 <?php
-print_footer();
+PrintFooter();
 ?>

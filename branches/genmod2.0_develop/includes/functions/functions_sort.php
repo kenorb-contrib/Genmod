@@ -438,7 +438,7 @@ function FactSort($a, $b) {
  * @return int negative numbers sort $a first, positive sort $b first
  */
 function StringSort($aname, $bname) {
-	global $LANGUAGE, $alphabet, $CHARACTER_SET;
+	global $LANGUAGE, $alphabet;
 
 	$alphabet = GetAlphabet();
 
@@ -525,7 +525,7 @@ function StringSort($aname, $bname) {
 			$aletter = substr($aname, $i, 1);
 			$bletter = substr($bname, $i, 1);
 		}
-		if ($CHARACTER_SET=="UTF-8") {
+		if (GedcomConfig::$CHARACTER_SET=="UTF-8") {
 			$ord = ord($aletter);
 			if ($ord==92 || $ord==195 || $ord==196 || $ord==197 || $ord==206 || $ord==207 || $ord==208 || $ord==209 || $ord==214 || $ord==215 || $ord==216 || $ord==217 || $ord==218 || $ord==219){
 				$aletter = stripslashes(substr($aname, $i, 2));
@@ -596,13 +596,13 @@ function StringSort($aname, $bname) {
  * @return int negative numbers sort $a first, positive sort $b first
  */
 function FirstnameSort($a, $b) {
-	if (isset($a["name"])) $aname = SortableNameFromName($a["name"]);
-	else if (isset($a["names"])) $aname = SortableNameFromName($a["names"][0][0]);
-	else if (is_array($a)) $aname = SortableNameFromName($a[0]);
+	if (isset($a["name"])) $aname = NameFunctions::SortableNameFromName($a["name"]);
+	else if (isset($a["names"])) $aname = NameFunctions::SortableNameFromName($a["names"][0][0]);
+	else if (is_array($a)) $aname = NameFunctions::SortableNameFromName($a[0]);
 	else $aname=$a;
-	if (isset($b["name"])) $bname = SortableNameFromName($b["name"]);
-	else if (isset($b["names"])) $bname = SortableNameFromName($b["names"][0][0]);
-	else if (is_array($b)) $bname = SortableNameFromName($b[0]);
+	if (isset($b["name"])) $bname = NameFunctions::SortableNameFromName($b["name"]);
+	else if (isset($b["names"])) $bname = NameFunctions::SortableNameFromName($b["names"][0][0]);
+	else if (is_array($b)) $bname = NameFunctions::SortableNameFromName($b[0]);
 	else $bname=$b;
 	$aname = StripPrefix($aname);
 	$bname = StripPrefix($bname);
@@ -627,13 +627,13 @@ function FirstnameSort($a, $b) {
  */
 function ItemSort($a, $b) {
 
-	if (isset($a["name"])) $aname = SortableNameFromName($a["name"]);
-	else if (isset($a["names"])) $aname = SortableNameFromName($a["names"][0][0]);
-	else if (is_array($a)) $aname = SortableNameFromName($a[0]);
+	if (isset($a["name"])) $aname = NameFunctions::SortableNameFromName($a["name"]);
+	else if (isset($a["names"])) $aname = NameFunctions::SortableNameFromName($a["names"][0][0]);
+	else if (is_array($a)) $aname = NameFunctions::SortableNameFromName($a[0]);
 	else $aname = $a;
-	if (isset($b["name"])) $bname = SortableNameFromName($b["name"]);
-	else if (isset($b["names"])) $bname = SortableNameFromName($b["names"][0][0]);
-	else if (is_array($b)) $bname = SortableNameFromName($b[0]);
+	if (isset($b["name"])) $bname = NameFunctions::SortableNameFromName($b["name"]);
+	else if (isset($b["names"])) $bname = NameFunctions::SortableNameFromName($b["names"][0][0]);
+	else if (is_array($b)) $bname = NameFunctions::SortableNameFromName($b[0]);
 	else $bname = $b;
 
 	$aname = preg_replace("/([^ ]+)\*/", "$1", StripPrefix($aname));
@@ -692,7 +692,7 @@ function SourceAddDescrSort($a, $b) {
  * @return int -1 if $a should be sorted first, 0 if they are the same, 1 if $b should be sorted first
  */
 function CompareFacts($a, $b) {
-	global $gm_lang, $ASC, $IGNORE_YEAR, $IGNORE_FACTS, $USE_RTL_FUNCTIONS, $CIRCULAR_BASE;
+	global $gm_lang, $ASC, $IGNORE_YEAR, $IGNORE_FACTS, $CIRCULAR_BASE;
 	if (!isset($ASC)) $ASC = 0;
 	if (!isset($IGNORE_YEAR)) $IGNORE_YEAR = 0;
 	if (!isset($IGNORE_FACTS)) $IGNORE_FACTS = 0;
@@ -812,13 +812,13 @@ function CompareFacts($a, $b) {
 	}
 	if ($IGNORE_YEAR) {
 	// Calculate Current year Gregorian date for Hebrew date
-	   if ($USE_RTL_FUNCTIONS && isset($adate[0]["ext"]) && strstr($adate[0]["ext"], "#DHEBREW")!==false) $adate = JewishGedcomDateToCurrentGregorian($adate);
-		if ($USE_RTL_FUNCTIONS && isset($bdate[0]["ext"]) && strstr($bdate[0]["ext"], "#DHEBREW")!==false) $bdate = JewishGedcomDateToCurrentGregorian($bdate);
+	   if (GedcomConfig::$USE_RTL_FUNCTIONS && isset($adate[0]["ext"]) && strstr($adate[0]["ext"], "#DHEBREW")!==false) $adate = JewishGedcomDateToCurrentGregorian($adate);
+		if (GedcomConfig::$USE_RTL_FUNCTIONS && isset($bdate[0]["ext"]) && strstr($bdate[0]["ext"], "#DHEBREW")!==false) $bdate = JewishGedcomDateToCurrentGregorian($bdate);
 	}
 	else {
 	// Calculate Original year Gregorian date for Hebrew date
-	if ($USE_RTL_FUNCTIONS && isset($adate[0]["ext"]) && strstr($adate[0]["ext"], "#DHEBREW")!==false) $adate = JewishGedcomDateToGregorian($adate);
-	if ($USE_RTL_FUNCTIONS && isset($bdate[0]["ext"]) && strstr($bdate[0]["ext"], "#DHEBREW")!==false) $bdate = JewishGedcomDateToGregorian($bdate);
+	if (GedcomConfig::$USE_RTL_FUNCTIONS && isset($adate[0]["ext"]) && strstr($adate[0]["ext"], "#DHEBREW")!==false) $adate = JewishGedcomDateToGregorian($adate);
+	if (GedcomConfig::$USE_RTL_FUNCTIONS && isset($bdate[0]["ext"]) && strstr($bdate[0]["ext"], "#DHEBREW")!==false) $bdate = JewishGedcomDateToGregorian($bdate);
 	}
 
 	if ($adate[0]["year"]==$bdate[0]["year"] || $IGNORE_YEAR) {
@@ -933,16 +933,16 @@ function ItemObjSort($a, $b) {
 	
 	if (is_object($a)) {
 		if (!is_null($a->sortable_name)) $aname = $a->sortable_name;
-		else if (!is_null($a->name_array)) $aname = SortableNameFromName($a->name_array[0][0]);
+		else if (!is_null($a->name_array)) $aname = NameFunctions::SortableNameFromName($a->name_array[0][0]);
 	}
-	else if (is_array($a)) $aname = SortableNameFromName($a[0]);
+	else if (is_array($a)) $aname = NameFunctions::SortableNameFromName($a[0]);
 	else if (is_string($a)) $aname = $a;
 
 	if (is_object($b)) {
 		if (!is_null($b->sortable_name)) $bname = $b->sortable_name;
-		else if (!is_null($b->name_array)) $bname = SortableNameFromName($b->name_array[0][0]);
+		else if (!is_null($b->name_array)) $bname = NameFunctions::SortableNameFromName($b->name_array[0][0]);
 	}
-	else if (is_array($b)) $bname = SortableNameFromName($b[0]);
+	else if (is_array($b)) $bname = NameFunctions::SortableNameFromName($b[0]);
 	else if (is_string($b)) $aname = $b;
 
 	$aname = preg_replace("/([^ ]+)\*/", "$1", StripPrefix($aname));

@@ -41,7 +41,7 @@ if (stristr($_SERVER["SCRIPT_NAME"],basename(__FILE__))) {
  */
 function print_list_person($key, $value, $findid=false, $asso="", $useli=true, $fact="") {
 	global $gm_lang, $SCRIPT_NAME, $pass, $indi_private, $indi_hide, $indi_total, $NAME_REVERSE;
-	global $GEDCOMID, $SHOW_ID_NUMBERS, $TEXT_DIRECTION, $SHOW_PEDIGREE_PLACES, $GM_IMAGE_DIR, $GM_IMAGES, $SHOW_DEATH_LISTS;
+	global $GEDCOMID, $TEXT_DIRECTION, $GM_IMAGES, $SHOW_DEATH_LISTS;
 	
 	$key = splitkey($key, "id");
 	SwitchGedcom($value[1]);
@@ -78,7 +78,7 @@ function print_list_person($key, $value, $findid=false, $asso="", $useli=true, $
 			print PrintReady($value[0]);
 			print "</b>";
 		}
-		if ($SHOW_ID_NUMBERS){
+		if (GedcomConfig::$SHOW_ID_NUMBERS){
 		   if ($TEXT_DIRECTION=="ltr") print " <span dir=\"ltr\">($key)</span>";
   		   else print " <span dir=\"rtl\">($key)</span>";
 		}
@@ -127,7 +127,7 @@ function print_list_person($key, $value, $findid=false, $asso="", $useli=true, $
 				if ($TEXT_DIRECTION=="ltr") print " <span dir=\"ltr\">";
 				else print " <span dir=\"rtl\">";
 				print "(".$gm_lang["associate_with"]." ";
-				if ($SHOW_ID_NUMBERS) print $key;
+				if (GedcomConfig::$SHOW_ID_NUMBERS) print $key;
 				print ": ".$name;
 				if (!empty($avalue[2]) || !empty($avalue[3])) {
 					print " - ";
@@ -153,8 +153,8 @@ function print_list_person($key, $value, $findid=false, $asso="", $useli=true, $
 //-- print information about a family for a list view
 // param fact is for sanitycheck to print the fact and open a new page in a new window.
 function print_list_family($key, $value, $findid=false, $asso="", $useli=true, $fact="") {
-	global $gm_lang, $pass, $fam_private, $fam_hide, $fam_total, $SHOW_ID_NUMBERS, $SHOW_FAM_ID_NUMBERS;
-	global $GEDCOMID, $HIDE_LIVE_PEOPLE, $SHOW_PEDIGREE_PLACES;
+	global $gm_lang, $pass, $fam_private, $fam_hide, $fam_total;
+	global $GEDCOMID, $HIDE_LIVE_PEOPLE;
 	global $TEXT_DIRECTION, $COMBIKEY;
 
 	SwitchGedcom($value[1]);
@@ -199,7 +199,7 @@ function print_list_family($key, $value, $findid=false, $asso="", $useli=true, $
 			print PrintReady($value[0]);
 			print "</b>";
 		}
-		if ($SHOW_FAM_ID_NUMBERS) {
+		if (GedcomConfig::$SHOW_FAM_ID_NUMBERS) {
 			if ($TEXT_DIRECTION=="ltr")	print " <span dir=\"ltr\">($kid)</span>";
   			else print " <span dir=\"rtl\">($kid)</span>";
 			}
@@ -247,7 +247,7 @@ function print_list_family($key, $value, $findid=false, $asso="", $useli=true, $
 				if ($TEXT_DIRECTION=="ltr") print " <span dir=\"ltr\">";
 				else print " <span dir=\"rtl\">";
 				print "(".$gm_lang["associate_with"]." ";
-				if ($SHOW_ID_NUMBERS) print $key;
+				if (GedcomConfig::$SHOW_ID_NUMBERS) print $key;
 				print ": ".$name;
 				if(!empty($avalue[2]) || !empty($avalue[3])) {
 					print " - ";
@@ -271,7 +271,7 @@ function print_list_family($key, $value, $findid=false, $asso="", $useli=true, $
 
 // Prints the information for a source in a list view
 function print_list_source($key, $value) {
-	global $GEDCOMID, $source_total, $source_hide, $SHOW_SOURCES, $SHOW_ID_NUMBERS, $TEXT_DIRECTION;
+	global $GEDCOMID, $source_total, $source_hide, $SHOW_SOURCES, $TEXT_DIRECTION;
 	
 	SwitchGedcom($value["gedfile"]);
 	if (!isset($source_total)) $source_total=array();
@@ -281,7 +281,7 @@ function print_list_source($key, $value) {
 		if (begRTLText($value["name"])) print "\n\t\t\t<li class=\"rtl\" dir=\"rtl\">";
 		else print "\n\t\t\t<li class=\"ltr\" dir=\"ltr\">";
 		print "\n\t\t\t<a href=\"source.php?sid=$key&amp;gedid=".$value["gedfile"]."\" class=\"list_item\">".PrintReady($value["name"]);
-		if ($SHOW_ID_NUMBERS) {
+		if (GedcomConfig::$SHOW_ID_NUMBERS) {
 		if ($TEXT_DIRECTION=="ltr") print " &lrm;($key)&lrm;";
 		else print " &rlm;($key)&rlm;";
 	}
@@ -295,7 +295,7 @@ function print_list_source($key, $value) {
 }
 // Prints the information for media in a list view
 function print_list_media($key, $value, $skippriv=false) {
-	global $GEDCOMID, $media_total, $media_hide, $SHOW_ID_NUMBERS, $TEXT_DIRECTION;
+	global $GEDCOMID, $media_total, $media_hide, $TEXT_DIRECTION;
 
 	SwitchGedcom($value["gedfile"]);
 	if (!isset($media_total)) $media_total=array();
@@ -304,7 +304,7 @@ function print_list_media($key, $value, $skippriv=false) {
 		if (begRTLText($value["name"])) print "\n\t\t\t<li class=\"rtl\" dir=\"rtl\">";
 		else print "\n\t\t\t<li class=\"ltr\" dir=\"ltr\">";
 		print "\n\t\t\t<a href=\"mediadetail.php?mid=$key&amp;gedid=".$value["gedfile"]."\" class=\"list_item\">".PrintReady($value["name"]);
-		if ($SHOW_ID_NUMBERS) {
+		if (GedcomConfig::$SHOW_ID_NUMBERS) {
 			if ($TEXT_DIRECTION=="ltr") print " &lrm;($key)&lrm;";
 			else print " &rlm;($key)&rlm;";
 		}
@@ -317,7 +317,7 @@ function print_list_media($key, $value, $skippriv=false) {
 
 // Prints the information for a repository in a list view
 function print_list_repository($key, $value) {
-	global $GEDCOMID, $repo_total, $repo_hide, $SHOW_ID_NUMBERS, $TEXT_DIRECTION;
+	global $GEDCOMID, $repo_total, $repo_hide, $TEXT_DIRECTION;
 
 	SwitchGedcom($value["gedfile"]);
 	if (!isset($repo_total)) $repo_total=array();
@@ -329,7 +329,7 @@ function print_list_repository($key, $value) {
 
 		print "<a href=\"repo.php?rid=".$value["id"]."&amp;gedid=".$GEDCOMID."\" class=\"list_item\">";
 		print PrintReady($key);
-		if ($SHOW_ID_NUMBERS) {
+		if (GedcomConfig::$SHOW_ID_NUMBERS) {
 			if ($TEXT_DIRECTION=="ltr") print " &lrm;(".$value["id"].")&lrm;";
 			else print " &rlm;(".$value["id"].")&rlm;";
 		}
@@ -402,19 +402,21 @@ function InitListCounters($action = "reset") {
  * @param int $count	on some charts it is important to keep a count of how many boxes were printed
  */
 function print_pedigree_person($pid, $style=1, $show_famlink=true, $count=0, $personcount="1", $indirec="") {
-	global $HIDE_LIVE_PEOPLE, $SHOW_LIVING_NAMES, $PRIV_PUBLIC, $ZOOM_BOXES, $LINK_ICONS, $view, $SCRIPT_NAME, $GEDCOMID;
-	global $gm_lang, $SHOW_HIGHLIGHT_IMAGES, $bwidth, $bheight, $show_full, $PEDIGREE_FULL_DETAILS, $SHOW_ID_NUMBERS, $SHOW_PEDIGREE_PLACES, $view;
-	global $CONTACT_EMAIL, $CONTACT_METHOD, $TEXT_DIRECTION, $DEFAULT_PEDIGREE_GENERATIONS, $OLD_PGENS, $talloffset, $PEDIGREE_LAYOUT, $MEDIA_DIRECTORY;
-	global $GM_IMAGE_DIR, $GM_IMAGES, $ABBREVIATE_CHART_LABELS;
+	global $HIDE_LIVE_PEOPLE, $SHOW_LIVING_NAMES, $PRIV_PUBLIC, $view, $SCRIPT_NAME, $GEDCOMID;
+	global $gm_lang, $bwidth, $bheight, $show_full, $view;
+	global $TEXT_DIRECTION, $OLD_PGENS, $talloffset;
+	global $GM_IMAGES;
 	global $chart_style, $box_width, $generations, $show_changes, $gm_user;
-	global $CHART_BOX_TAGS, $SHOW_LDS_AT_GLANCE;
 
+	static $personcount;
+	if (!isset($personcount)) $personcount = 1;
+	
 	if ($show_changes && $gm_user->UserCanEdit()) $canshow = true;
 	else $canshow = false;
 
-	if (!isset($OLD_PGENS)) $OLD_PGENS = $DEFAULT_PEDIGREE_GENERATIONS;
-	if (!isset($talloffset)) $talloffset = $PEDIGREE_LAYOUT;
-	if (!isset($show_full)) $show_full=$PEDIGREE_FULL_DETAILS;
+	if (!isset($OLD_PGENS)) $OLD_PGENS = GedcomConfig::$DEFAULT_PEDIGREE_GENERATIONS;
+	if (!isset($talloffset)) $talloffset = GedcomConfig::$PEDIGREE_LAYOUT;
+	if (!isset($show_full)) $show_full = GedcomConfig::$PEDIGREE_FULL_DETAILS;
 
 	if ($TEXT_DIRECTION == "ltr") {
 		$ldir = "left";
@@ -456,7 +458,7 @@ function print_pedigree_person($pid, $style=1, $show_famlink=true, $count=0, $pe
 	if ($disp || $dispname) {
 		if ($show_famlink) {
 			// NOTE: Go ahead if we can show the popup box for the links to other pages and family members
-			if ($LINK_ICONS!="disabled") {
+			if (GedcomConfig::$LINK_ICONS!="disabled") {
 				// NOTE: draw a popup box for the links to other pages and family members
 				// NOTE: Start div I.$pid.$personcount.$count.links
 				// NOTE: ie_popup_width is needed to set the width of the popup box in IE for the gedcom favorites
@@ -466,7 +468,7 @@ function print_pedigree_person($pid, $style=1, $show_famlink=true, $count=0, $pe
 				// This div is filled by an AJAX call! Not yet as placement is a problem!
 				// NOTE: Zoom
 				print "<a href=\"pedigree.php?rootid=$pid&amp;PEDIGREE_GENERATIONS=$OLD_PGENS&amp;talloffset=$talloffset&amp;gedid=$GEDCOMID\"><b>".$gm_lang["index_header"]."</b></a>\n";
-				print "<br /><a href=\"descendancy.php?pid=$pid&amp;show_full=$show_full&amp;generations=$generations&amp;box_width=$box_width&amp;gedid=$GEDCOMID\"><b>".$gm_lang["descend_chart"]."</b></a><br />\n";
+				print "<br /><a href=\"descendancy.php?pid=$rootid&amp;show_full=$show_full&amp;generations=$generations&amp;box_width=$box_width&amp;gedid=$GEDCOMID\"><b>".$gm_lang["descend_chart"]."</b></a><br />\n";
 				if ($gm_user->username != "") {
 					if (!empty($gm_user->gedcomid[$GEDCOMID])) {
 						print "<a href=\"relationship.php?pid1=".$gm_user->gedcomid[$GEDCOMID]."&amp;pid2=".$pid."&amp;gedid=$GEDCOMID\"><b>".$gm_lang["relationship_to_me"]."</b></a><br />\n";
@@ -533,15 +535,15 @@ function print_pedigree_person($pid, $style=1, $show_famlink=true, $count=0, $pe
 				
 	// NOTE: If box zooming is allowed and no person details are shown
 	// NOTE: determine what mouse behavior to add
-	if ($ZOOM_BOXES != "disabled" && !$show_full && ($disp || $dispname)) {
-		if ($ZOOM_BOXES=="mouseover") print " onmouseover=\"expandbox('".$pid.".".$personcount.".".$count."', $style, '".$random."'); return false;\" onmouseout=\"restorebox('".$pid.".".$personcount.".".$count."', $style, '".$random."'); return false;\"";
-		if ($ZOOM_BOXES=="mousedown") print " onmousedown=\"expandbox('".$pid.".".$personcount.".".$count."', $style, '".$random."');\" onmouseup=\"restorebox('".$pid.".".$personcount.".".$count."', $style, '".$random."');\"";
-		if (($ZOOM_BOXES=="click")&&($view!="preview")) print " onclick=\"expandbox('".$pid.".".$personcount.".".$count."', $style, '".$random."');\"";
+	if (GedcomConfig::$ZOOM_BOXES != "disabled" && !$show_full && ($disp || $dispname)) {
+		if (GedcomConfig::$ZOOM_BOXES=="mouseover") print " onmouseover=\"expandbox('".$pid.".".$personcount.".".$count."', $style, '".$random."'); return false;\" onmouseout=\"restorebox('".$pid.".".$personcount.".".$count."', $style, '".$random."'); return false;\"";
+		if (GedcomConfig::$ZOOM_BOXES=="mousedown") print " onmousedown=\"expandbox('".$pid.".".$personcount.".".$count."', $style, '".$random."');\" onmouseup=\"restorebox('".$pid.".".$personcount.".".$count."', $style, '".$random."');\"";
+		if ((GedcomConfig::$ZOOM_BOXES=="click")&&($view!="preview")) print " onclick=\"expandbox('".$pid.".".$personcount.".".$count."', $style, '".$random."');\"";
 	}
 	print ">";
 	
 	// NOTE: Show the persons primary picture if possible, but only in large boxes ($show_full)
-	if ($SHOW_HIGHLIGHT_IMAGES && $disp && PrivacyFunctions::showFact("OBJE", $pid, "INDI") && $show_full) {
+	if (GedcomConfig::$SHOW_HIGHLIGHT_IMAGES && $disp && PrivacyFunctions::showFact("OBJE", $pid, "INDI") && $show_full) {
 		$object = FindHighlightedObject($pid);
 		// NOTE: Print the pedigree tumbnail
 		if (!empty($object["thumb"])) {
@@ -577,12 +579,12 @@ function print_pedigree_person($pid, $style=1, $show_famlink=true, $count=0, $pe
 				else print "class=\"name$style\">";
 				print PrintReady($name);
 				// NOTE: IMG ID
-				print "<img id=\"box-$pid.$personcount.$count.$random-sex\" src=\"$GM_IMAGE_DIR/";
+				print "<img id=\"box-$pid.$personcount.$count.$random-sex\" src=\"".GM_IMAGE_DIR."/";
 				if ($isF=="") print $GM_IMAGES["sex"]["small"]."\" title=\"".$gm_lang["male"]."\" alt=\"".$gm_lang["male"];
 				else  if ($isF=="F")print $GM_IMAGES["sexf"]["small"]."\" title=\"".$gm_lang["female"]."\" alt=\"".$gm_lang["female"];
 				else  print $GM_IMAGES["sexn"]["small"]."\" title=\"".$gm_lang["unknown"]."\" alt=\"".$gm_lang["unknown"];
 				print "\" class=\"sex_image\" />";
-				if ($SHOW_ID_NUMBERS) {
+				if (GedcomConfig::$SHOW_ID_NUMBERS) {
 					print "</span><span class=\"details$style\">";
 					if ($TEXT_DIRECTION=="ltr") print "&lrm;($pid)&lrm;";
 					else print "&rlm;($pid)&rlm;";
@@ -600,11 +602,11 @@ function print_pedigree_person($pid, $style=1, $show_famlink=true, $count=0, $pe
 				print "</a>";
 			}
 			else {
-				$user =& User::GetInstance($CONTACT_EMAIL);
+				$user =& User::GetInstance(GedcomConfig::$CONTACT_EMAIL);
 				print "<a href=\"javascript: ".$gm_lang["private"]."\" onclick=\"if (confirm('".preg_replace("'<br />'", " ", $gm_lang["privacy_error"])."\\n\\n".str_replace("#user[fullname]#", $user->firstname." ".$user->lastname, $gm_lang["clicking_ok"])."')) ";
-				if ($CONTACT_METHOD!="none") {
-					if ($CONTACT_METHOD=="mailto") print "window.location = 'mailto:".$user->email."'; ";
-					else print "message('$CONTACT_EMAIL', '$CONTACT_METHOD'); ";
+				if (GedcomConfig::$CONTACT_METHOD != "none") {
+					if (GedcomConfig::$CONTACT_METHOD=="mailto") print "window.location = 'mailto:".$user->email."'; ";
+					else print "message('".GedcomConfig::$CONTACT_EMAIL."', '".GedcomConfig::$CONTACT_METHOD."'); ";
 				}
 				// NOTE: Start span namedef-$pid.$personcount.$count
 				// NOTE: Close span namedef-$pid.$personcount.$count
@@ -628,8 +630,8 @@ function print_pedigree_person($pid, $style=1, $show_famlink=true, $count=0, $pe
 			print "<a href=\"individual.php?pid=$pid&amp;gedid=$GEDCOMID\"";
 			if (!$show_full) {
 				//not needed or wanted for mouseover //if ($ZOOM_BOXES=="mouseover") print " onmouseover=\"event.cancelBubble = true;\"";
-				if ($ZOOM_BOXES=="mousedown") print "onmousedown=\"event.cancelBubble = true;\"";
-				if ($ZOOM_BOXES=="click") print "onclick=\"event.cancelBubble = true;\"";
+				if (GedcomConfig::$ZOOM_BOXES=="mousedown") print "onmousedown=\"event.cancelBubble = true;\"";
+				if (GedcomConfig::$ZOOM_BOXES=="click") print "onclick=\"event.cancelBubble = true;\"";
 			}
 			// NOTE: Start span namedef-$pid.$personcount.$count
 			if (hasRTLText($name) && $style=="1") print "><span id=\"namedef-$pid.$personcount.$count.$random\" class=\"name2";
@@ -646,17 +648,17 @@ function print_pedigree_person($pid, $style=1, $show_famlink=true, $count=0, $pe
 			print "</span>";
 			print "<span class=\"name$style\">";
 			// NOTE: IMG ID
-			print "<img id=\"box-$pid.$personcount.$count.$random-sex\" src=\"$GM_IMAGE_DIR/";
+			print "<img id=\"box-$pid.$personcount.$count.$random-sex\" src=\"".GM_IMAGE_DIR."/";
 			if ($isF=="") print $GM_IMAGES["sex"]["small"]."\" title=\"".$gm_lang["male"]."\" alt=\"".$gm_lang["male"];
 			else  if ($isF=="F")print $GM_IMAGES["sexf"]["small"]."\" title=\"".$gm_lang["female"]."\" alt=\"".$gm_lang["female"];
 			else  print $GM_IMAGES["sexn"]["small"]."\" title=\"".$gm_lang["unknown"]."\" alt=\"".$gm_lang["unknown"];
 			print "\" class=\"sex_image\" />";
 			print "</span>\r\n";
-			if ($SHOW_ID_NUMBERS) {
+			if (GedcomConfig::$SHOW_ID_NUMBERS) {
 				if ($TEXT_DIRECTION=="ltr") print "<span class=\"details$style\">&lrm;($pid)&lrm; </span>";
 				else print "<span class=\"details$style\">&rlm;($pid)&rlm; </span>";
 			}
-			if ($SHOW_LDS_AT_GLANCE) print "<span class=\"details$style\">".GetLdsGlance($indirec)."</span>";
+			if (GedcomConfig::$SHOW_LDS_AT_GLANCE) print "<span class=\"details$style\">".GetLdsGlance($indirec)."</span>";
 			if (strlen($addname) > 0) {
 				print "<br />";
 				if (hasRTLText($addname) && $style=="1")
@@ -676,8 +678,8 @@ function print_pedigree_person($pid, $style=1, $show_famlink=true, $count=0, $pe
 			//-- section to display tags in the boxes
 			// First get the optional tags and check if they exist
 			$tagstoprint = array();
-			if (!empty($CHART_BOX_TAGS)) {
-				$opt_tags = preg_split("/[, ]+/", $CHART_BOX_TAGS);
+			if (!empty(GedcomConfig::$CHART_BOX_TAGS)) {
+				$opt_tags = preg_split("/[, ]+/", GedcomConfig::$CHART_BOX_TAGS);
 				foreach ($opt_tags as $key => $tag) {
 					if (strpos($indirec, "\n1 ".$tag)) {
 						$tagstoprint[] = $tag;
@@ -744,25 +746,25 @@ function print_pedigree_person($pid, $style=1, $show_famlink=true, $count=0, $pe
 			// NOTE: If box zooming is allowed and person details are shown
 			// NOTE: determine what mouse behavior to add
 			// NOTE: Zoom icon
-			if ($ZOOM_BOXES != "disabled" && $show_full && !$view == "preview" && ($disp || $dispname)) {
+			if (GedcomConfig::$ZOOM_BOXES != "disabled" && $show_full && !$view == "preview" && ($disp || $dispname)) {
 				print "<a href=\"javascript: ".$gm_lang["zoom_box"]."\"";
-				if ($ZOOM_BOXES=="mouseover") print " onmouseover=\"expandbox('".$pid.".".$personcount.".".$count."', $style, '".$random."'); if(document.getElementById('inout-$pid.$personcount.$count.$random').innerHTML=='') sndReq('inout-$pid.$personcount.$count.$random', 'getzoomfacts', 'pid', '".$pid."', 'gedcomid', '".$GEDCOMID."', 'canshow', '".$canshow."', 'view', '".$view."');\" onmouseout=\"restorebox('".$pid.".".$personcount.".".$count."', $style, '".$random."');\" onclick=\"return false;\"";
-				if ($ZOOM_BOXES=="mousedown") print " onmousedown=\"expandbox('".$pid.".".$personcount.".".$count."', $style, '".$random."'); if(document.getElementById('inout-$pid.$personcount.$count.$random').innerHTML=='') sndReq('inout-$pid.$personcount.$count.$random', 'getzoomfacts', 'pid', '".$pid."', 'gedcomid', '".$GEDCOMID."', 'canshow', '".$canshow."', 'view', '".$view."');\" onmouseup=\"restorebox('".$pid.".".$personcount.".".$count."', $style, '".$random."');\" onclick=\"return false;\"";
-				if ($ZOOM_BOXES=="click") print " onclick=\"expandbox('".$pid.".".$personcount.".".$count."', $style, '".$random."'); if(document.getElementById('inout-$pid.$personcount.$count.$random').innerHTML=='') sndReq('inout-$pid.$personcount.$count.$random', 'getzoomfacts', 'pid', '".$pid."', 'gedcomid', '".$GEDCOMID."', 'canshow', '".$canshow."', 'view', '".$view."'); return false;\"";
-				print "><img id=\"iconz-$pid.$personcount.$count\" src=\"".$GM_IMAGE_DIR."/".$GM_IMAGES["zoomin"]["other"]."\" width=\"25\" height=\"25\" border=\"0\" alt=\"".$gm_lang["zoom_box"]."\" title=\"".$gm_lang["zoom_box"]."\" /></a>";
+				if (GedcomConfig::$ZOOM_BOXES=="mouseover") print " onmouseover=\"expandbox('".$pid.".".$personcount.".".$count."', $style, '".$random."'); if(document.getElementById('inout-$pid.$personcount.$count.$random').innerHTML=='') sndReq('inout-$pid.$personcount.$count.$random', 'getzoomfacts', 'pid', '".$pid."', 'gedcomid', '".$GEDCOMID."', 'canshow', '".$canshow."', 'view', '".$view."');\" onmouseout=\"restorebox('".$pid.".".$personcount.".".$count."', $style, '".$random."');\" onclick=\"return false;\"";
+				if (GedcomConfig::$ZOOM_BOXES=="mousedown") print " onmousedown=\"expandbox('".$pid.".".$personcount.".".$count."', $style, '".$random."'); if(document.getElementById('inout-$pid.$personcount.$count.$random').innerHTML=='') sndReq('inout-$pid.$personcount.$count.$random', 'getzoomfacts', 'pid', '".$pid."', 'gedcomid', '".$GEDCOMID."', 'canshow', '".$canshow."', 'view', '".$view."');\" onmouseup=\"restorebox('".$pid.".".$personcount.".".$count."', $style, '".$random."');\" onclick=\"return false;\"";
+				if (GedcomConfig::$ZOOM_BOXES=="click") print " onclick=\"expandbox('".$pid.".".$personcount.".".$count."', $style, '".$random."'); if(document.getElementById('inout-$pid.$personcount.$count.$random').innerHTML=='') sndReq('inout-$pid.$personcount.$count.$random', 'getzoomfacts', 'pid', '".$pid."', 'gedcomid', '".$GEDCOMID."', 'canshow', '".$canshow."', 'view', '".$view."'); return false;\"";
+				print "><img id=\"iconz-$pid.$personcount.$count\" src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["zoomin"]["other"]."\" width=\"25\" height=\"25\" border=\"0\" alt=\"".$gm_lang["zoom_box"]."\" title=\"".$gm_lang["zoom_box"]."\" /></a>";
 			}
 			// NOTE: Popup box icon (don't show if the person is private)
-			if ($LINK_ICONS!="disabled" && $show_famlink && ($disp || $dispname)) {
+			if (GedcomConfig::$LINK_ICONS!="disabled" && $show_famlink && ($disp || $dispname)) {
 				$click_link="#";
 				if (preg_match("/pedigree.php/", $SCRIPT_NAME)>0) $click_link="pedigree.php?rootid=$pid&amp;PEDIGREE_GENERATIONS=$OLD_PGENS&amp;talloffset=$talloffset&amp;gedid=$GEDCOMID";
 				if (preg_match("/hourglass.php/", $SCRIPT_NAME)>0) $click_link="hourglass.php?pid=$pid&amp;generations=$generations&amp;box_width=$box_width&amp;gedid=$GEDCOMID";
 				if (preg_match("/ancestry.php/", $SCRIPT_NAME)>0) $click_link="ancestry.php?rootid=$pid&amp;chart_style=$chart_style&amp;PEDIGREE_GENERATIONS=$OLD_PGENS&amp;box_width=$box_width&amp;gedid=$GEDCOMID";
-				if (preg_match("/descendancy.php/", $SCRIPT_NAME)>0) $click_link="descendancy.php?pid=$pid&amp;show_full=$show_full&amp;generations=$generations&amp;box_width=$box_width&amp;gedid=$GEDCOMID";
+				if (preg_match("/descendancy.php/", $SCRIPT_NAME)>0) $click_link="descendancy.php?rootid=$pid&amp;show_full=$show_full&amp;generations=$generations&amp;box_width=$box_width&amp;gedid=$GEDCOMID";
 				if ((preg_match("/family.php/", $SCRIPT_NAME)>0)&&!empty($famid)) $click_link="family.php?famid=$famid&amp;gedid=$GEDCOMID";
 				if (preg_match("/individual.php/", $SCRIPT_NAME)>0) $click_link="individual.php?pid=$pid&amp;gedid=$GEDCOMID";
-				print "<br /><img src=\"".$GM_IMAGE_DIR."/".$GM_IMAGES["pedigree"]["small"]."\" width=\"25\" border=\"0\" vspace=\"0\" hspace=\"0\" alt=\"".$gm_lang["person_links"]."\" title=\"".$gm_lang["person_links"]."\"";
-				if ($LINK_ICONS=="mouseover") print " onmouseover";
-				if ($LINK_ICONS=="click") print " onclick";
+				print "<br /><img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["pedigree"]["small"]."\" width=\"25\" border=\"0\" vspace=\"0\" hspace=\"0\" alt=\"".$gm_lang["person_links"]."\" title=\"".$gm_lang["person_links"]."\"";
+				if (GedcomConfig::$LINK_ICONS=="mouseover") print " onmouseover";
+				if (GedcomConfig::$LINK_ICONS=="click") print " onclick";
 				print "=\"";
  //				print "if(document.getElementById('I".$pid.".".$personcount.".".$count.".".$random."links').innerHTML=='') sndReq('I".$pid.".".$personcount.".".$count.".".$random."links', 'getindilinks', 'pid', '".$pid."', 'OLD_PGENS', '".$OLD_PGENS."', 'talloffset', '".$talloffset."', 'generations', '".$generations."', 'canshow', '".$canshow."', 'show_full', '".$show_full."', 'box_width', '".$box_width."', 'chart_style', '".$chart_style."'); ";
 				print "showbox(this, '".$pid.".".$personcount.".".$count.".".$random."', '";
@@ -774,7 +776,7 @@ function print_pedigree_person($pid, $style=1, $show_famlink=true, $count=0, $pe
 				// NOTE: Keep it here in case we might need it
 				print "onmouseout=\"moveout('".$pid.".".$personcount.".".$count.".".$random."');";
 				print " return false;\"";
-				if (($click_link=="#")&&($LINK_ICONS!="click")) print " onclick=\"return false;\"";
+				if (($click_link=="#")&&(GedcomConfig::$LINK_ICONS!="click")) print " onclick=\"return false;\"";
 				print " />";
 			}
 		// NOTE: Close div icons-$personcount.$pid.$count
@@ -796,16 +798,13 @@ function print_pedigree_person($pid, $style=1, $show_famlink=true, $count=0, $pe
  * @param string $head
  * @param boolean $use_alternate_styles
  */
-function print_header($title, $head="",$use_alternate_styles=true) {
+function PrintHeader($title, $head="",$use_alternate_styles=true) {
 	global $gm_lang, $bwidth;
-	global $HOME_SITE_URL, $HOME_SITE_TEXT;
 	global $BROWSERTYPE, $indilist, $INDILIST_RETRIEVED;
-	global $view, $cart, $menubar, $USE_GREYBOX;
-	global $CHARACTER_SET, $GM_IMAGE_DIR, $GEDCOMS, $CONTACT_EMAIL, $COMMON_NAMES_THRESHOLD;
+	global $view, $cart;
+	global $GEDCOMS;
 	global $SCRIPT_NAME, $QUERY_STRING, $action, $query, $changelanguage,$theme_name;
-	global $FAVICON, $stylesheet, $print_stylesheet, $rtl_stylesheet, $headerfile, $toplinks, $THEME_DIR, $print_headerfile;
-	global $GM_IMAGES, $TEXT_DIRECTION, $ONLOADFUNCTION,$REQUIRE_AUTHENTICATION, $SHOW_SOURCES;
-	global $META_AUTHOR, $META_PUBLISHER, $META_COPYRIGHT, $META_DESCRIPTION, $META_PAGE_TOPIC, $META_AUDIENCE, $META_PAGE_TYPE, $META_ROBOTS, $META_REVISIT, $META_KEYWORDS, $META_TITLE, $META_SURNAME_KEYWORDS;
+	global $GM_IMAGES, $TEXT_DIRECTION, $ONLOADFUNCTION, $SHOW_SOURCES;
 	// globals for the bot 304 mechanism
 	global $bot, $_SERVER, $GEDCOMID, $pid, $famid, $rid, $sid;
 
@@ -872,30 +871,30 @@ function print_header($title, $head="",$use_alternate_styles=true) {
 	}
 	
 	// Continue normal processing	
-	header("Content-Type: text/html; charset=$CHARACTER_SET");
+	header("Content-Type: text/html; charset=".GedcomConfig::$CHARACTER_SET);
 	header("Cache-Control: no-cache, must-revalidate, post-check=0, pre-check=0");
 
 		
 	print "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">\n";
 	print "<html xmlns=\"http://www.w3.org/1999/xhtml\">\n\t<head>\n\t\t";
-	print "<meta http-equiv=\"Content-Type\" content=\"text/html; charset=$CHARACTER_SET\" />\n\t\t";
-	if( $FAVICON ) {
-	   print "<link rel=\"shortcut icon\" href=\"$FAVICON\" type=\"image/x-icon\"></link>\n\t\t";
+	print "<meta http-equiv=\"Content-Type\" content=\"text/html; charset=".GedcomConfig::$CHARACTER_SET."\" />\n\t\t";
+	if( GedcomConfig::$FAVICON ) {
+	   print "<link rel=\"shortcut icon\" href=\"".GedcomConfig::$FAVICON."\" type=\"image/x-icon\"></link>\n\t\t";
 	}
-	if (!isset($META_TITLE)) $META_TITLE = "";
+//	if (!isset(GedcomConfig::$META_TITLE)) GedcomConfig::$META_TITLE = "";
 	if (isset($GEDCOMS[$GEDCOMID]["title"])) $title = $GEDCOMS[$GEDCOMID]["title"]." :: ".$title;
-	print "<title>".PrintReady(strip_tags($title)." - ".$META_TITLE." - Genmod", TRUE)."</title>\n\t";
-	 if (!$REQUIRE_AUTHENTICATION){
+	print "<title>".PrintReady(strip_tags($title)." - ".GedcomConfig::$META_TITLE." - Genmod", TRUE)."</title>\n\t";
+	 if (!GedcomConfig::$REQUIRE_AUTHENTICATION){
 		print "<link href=\"" . SERVER_URL .  "rss.php\" rel=\"alternate\" type=\"application/rss+xml\" title=\"RSS\"></link>\n\t";
 	 }
-	 print "<link rel=\"stylesheet\" href=\"$stylesheet\" type=\"text/css\" media=\"all\"></link>\n\t";
-	 if ((!empty($rtl_stylesheet))&&($TEXT_DIRECTION=="rtl")) print "<link rel=\"stylesheet\" href=\"$rtl_stylesheet\" type=\"text/css\" media=\"all\"></link>\n\t";
+	 print "<link rel=\"stylesheet\" href=\"".GM_STYLESHEET."\" type=\"text/css\" media=\"all\"></link>\n\t";
+	 if ((!empty($rtl_stylesheet))&&($TEXT_DIRECTION=="rtl")) print "<link rel=\"stylesheet\" href=\"".GM_RTL_STYLESHEET."\" type=\"text/css\" media=\"all\"></link>\n\t";
 	 if ($use_alternate_styles) {
 		if ($BROWSERTYPE != "other") {
-			print "<link rel=\"stylesheet\" href=\"".$THEME_DIR.$BROWSERTYPE.".css\" type=\"text/css\" media=\"all\"></link>\n\t";
+			print "<link rel=\"stylesheet\" href=\"".GedcomConfig::$THEME_DIR.$BROWSERTYPE.".css\" type=\"text/css\" media=\"all\"></link>\n\t";
 		}
 	 }
-	 print "<link rel=\"stylesheet\" href=\"$print_stylesheet\" type=\"text/css\" media=\"print\"></link>\n\t";
+	 print "<link rel=\"stylesheet\" href=\"".GM_PRINT_STYLESHEET."\" type=\"text/css\" media=\"print\"></link>\n\t";
 	 if ($BROWSERTYPE == "msie") print "<style type=\"text/css\">\nFORM { margin-top: 0px; margin-bottom: 0px; }\n</style>\n";
 	 print "<!-- Genmod v".GM_VERSION." -->\n";
 	 if (isset($changelanguage)) {
@@ -910,40 +909,40 @@ function print_header($title, $head="",$use_alternate_styles=true) {
 	 }
 	 else $query_string = $QUERY_STRING;
 	 if ($view!="preview") {
-		 $old_META_AUTHOR = $META_AUTHOR;
-		 $old_META_PUBLISHER = $META_PUBLISHER;
-		 $old_META_COPYRIGHT = $META_COPYRIGHT;
-		 $old_META_DESCRIPTION = $META_DESCRIPTION;
-		 $old_META_PAGE_TOPIC = $META_PAGE_TOPIC;
-		  $cuser =& User::GetInstance($CONTACT_EMAIL);
+		 $old_META_AUTHOR = GedcomConfig::$META_AUTHOR;
+		 $old_META_PUBLISHER = GedcomConfig::$META_PUBLISHER;
+		 $old_META_COPYRIGHT = GedcomConfig::$META_COPYRIGHT;
+		 $old_META_DESCRIPTION = GedcomConfig::$META_DESCRIPTION;
+		 $old_META_PAGE_TOPIC = GedcomConfig::$META_PAGE_TOPIC;
+		  $cuser =& User::GetInstance(GedcomConfig::$CONTACT_EMAIL);
 		  if (!empty($cuser->username)) {
-			  if (empty($META_AUTHOR)) $META_AUTHOR = $cuser->firstname." ".$cuser->lastname;
-			  if (empty($META_PUBLISHER)) $META_PUBLISHER = $cuser->firstname." ".$cuser->lastname;
-			  if (empty($META_COPYRIGHT)) $META_COPYRIGHT = $cuser->firstname." ".$cuser->lastname;
+			  if (empty(GedcomConfig::$META_AUTHOR)) GedcomConfig::$META_AUTHOR = $cuser->firstname." ".$cuser->lastname;
+			  if (empty(GedcomConfig::$META_PUBLISHER)) GedcomConfig::$META_PUBLISHER = $cuser->firstname." ".$cuser->lastname;
+			  if (empty(GedcomConfig::$META_COPYRIGHT)) GedcomConfig::$META_COPYRIGHT = $cuser->firstname." ".$cuser->lastname;
 		  }
-		  if (!empty($META_AUTHOR)) print "<meta name=\"author\" content=\"".$META_AUTHOR."\" />\n";
-		  if (!empty($META_PUBLISHER)) print "<meta name=\"publisher\" content=\"".$META_PUBLISHER."\" />\n";
-		  if (!empty($META_COPYRIGHT)) print "<meta name=\"copyright\" content=\"".$META_COPYRIGHT."\" />\n";
-		  print "<meta name=\"keywords\" content=\"".$META_KEYWORDS;
+		  if (!empty(GedcomConfig::$META_AUTHOR)) print "<meta name=\"author\" content=\"".GedcomConfig::$META_AUTHOR."\" />\n";
+		  if (!empty(GedcomConfig::$META_PUBLISHER)) print "<meta name=\"publisher\" content=\"".GedcomConfig::$META_PUBLISHER."\" />\n";
+		  if (!empty(GedcomConfig::$META_COPYRIGHT)) print "<meta name=\"copyright\" content=\"".GedcomConfig::$META_COPYRIGHT."\" />\n";
+		  print "<meta name=\"keywords\" content=\"".GedcomConfig::$META_KEYWORDS;
 		  $surnames = GetCommonSurnamesIndex($GEDCOMID);
 		  foreach($surnames as $surname=>$count) if (!empty($surname)) print ", $surname";
 		  print "\" />\n";
-		  if ((empty($META_PAGE_TOPIC))&&(!empty($GEDCOMS[$GEDCOMID]["title"]))) $META_PAGE_TOPIC = $GEDCOMS[$GEDCOMID]["title"];
+		  if ((empty(GedcomConfig::$META_PAGE_TOPIC))&&(!empty($GEDCOMS[$GEDCOMID]["title"]))) GedcomConfig::$META_PAGE_TOPIC = $GEDCOMS[$GEDCOMID]["title"];
 		//LERMAN - make meta description unique, like the title
-		  if (empty($META_DESCRIPTION)) $META_DESCRIPTION = PrintReady(strip_tags($title)." - ".$META_TITLE." - Genmod", TRUE);
+		  if (empty(GedcomConfig::$META_DESCRIPTION)) GedcomConfig::$META_DESCRIPTION = PrintReady(strip_tags($title)." - ".GedcomConfig::$META_TITLE." - Genmod", TRUE);
 		  //if ((empty($META_DESCRIPTION))&&(!empty($GEDCOMS[$GEDCOMID]["title"]))) $META_DESCRIPTION = $GEDCOMS[$GEDCOMID]["title"];
-		  if (!empty($META_DESCRIPTION)) print "<meta name=\"description\" content=\"".preg_replace("/\"/", "", $META_DESCRIPTION)."\" />\n";
-		  if (!empty($META_PAGE_TOPIC)) print "<meta name=\"page-topic\" content=\"".preg_replace("/\"/", "", $META_PAGE_TOPIC)."\" />\n";
-	 	  if (!empty($META_AUDIENCE)) print "<meta name=\"audience\" content=\"$META_AUDIENCE\" />\n";
-	 	  if (!empty($META_PAGE_TYPE)) print "<meta name=\"page-type\" content=\"$META_PAGE_TYPE\" />\n";
-	 	  if (!empty($META_ROBOTS)) print "<meta name=\"robots\" content=\"$META_ROBOTS\" />\n";
-	 	  if (!empty($META_REVISIT)) print "<meta name=\"revisit-after\" content=\"$META_REVISIT\" />\n";
+		  if (!empty(GedcomConfig::$META_DESCRIPTION)) print "<meta name=\"description\" content=\"".preg_replace("/\"/", "", GedcomConfig::$META_DESCRIPTION)."\" />\n";
+		  if (!empty(GedcomConfig::$META_PAGE_TOPIC)) print "<meta name=\"page-topic\" content=\"".preg_replace("/\"/", "", GedcomConfig::$META_PAGE_TOPIC)."\" />\n";
+	 	  if (!empty(GedcomConfig::$META_AUDIENCE)) print "<meta name=\"audience\" content=\"".GedcomConfig::$META_AUDIENCE."\" />\n";
+	 	  if (!empty(GedcomConfig::$META_PAGE_TYPE)) print "<meta name=\"page-type\" content=\"".GedcomConfig::$META_PAGE_TYPE."\" />\n";
+	 	  if (!empty(GedcomConfig::$META_ROBOTS)) print "<meta name=\"robots\" content=\"".GedcomConfig::$META_ROBOTS."\" />\n";
+	 	  if (!empty(GedcomConfig::$META_REVISIT)) print "<meta name=\"revisit-after\" content=\"".GedcomConfig::$META_REVISIT."\" />\n";
 		  print "<meta name=\"generator\" content=\"Genmod v".GM_VERSION." - http://www.genmod.net\" />\n";
-		 $META_AUTHOR = $old_META_AUTHOR;
-		 $META_PUBLISHER = $old_META_PUBLISHER;
-		 $META_COPYRIGHT = $old_META_COPYRIGHT;
-		 $META_DESCRIPTION = $old_META_DESCRIPTION;
-		 $META_PAGE_TOPIC = $old_META_PAGE_TOPIC;
+		 GedcomConfig::$META_AUTHOR = $old_META_AUTHOR;
+		 GedcomConfig::$META_PUBLISHER = $old_META_PUBLISHER;
+		 GedcomConfig::$META_COPYRIGHT = $old_META_COPYRIGHT;
+		 GedcomConfig::$META_DESCRIPTION = $old_META_DESCRIPTION;
+		 GedcomConfig::$META_PAGE_TOPIC = $old_META_PAGE_TOPIC;
 	}
 	else {
 ?>
@@ -980,23 +979,23 @@ function showBack() {
 	 <?php print "sessionname = \"".session_name()."\";\n"; ?>
 	 plusminus = new Array();
 	 plusminus[0] = new Image();
-	 plusminus[0].src = "<?php print $GM_IMAGE_DIR."/".$GM_IMAGES["plus"]["other"]; ?>";
+	 plusminus[0].src = "<?php print GM_IMAGE_DIR."/".$GM_IMAGES["plus"]["other"]; ?>";
 	 plusminus[1] = new Image();
-	 plusminus[1].src = "<?php print $GM_IMAGE_DIR."/".$GM_IMAGES["minus"]["other"]; ?>";
+	 plusminus[1].src = "<?php print GM_IMAGE_DIR."/".$GM_IMAGES["minus"]["other"]; ?>";
 	 zoominout = new Array();
 	 zoominout[0] = new Image();
-	 zoominout[0].src = "<?php print $GM_IMAGE_DIR."/".$GM_IMAGES["zoomin"]["other"]; ?>";
+	 zoominout[0].src = "<?php print GM_IMAGE_DIR."/".$GM_IMAGES["zoomin"]["other"]; ?>";
 	 zoominout[1] = new Image();
-	 zoominout[1].src = "<?php print $GM_IMAGE_DIR."/".$GM_IMAGES["zoomout"]["other"]; ?>";
+	 zoominout[1].src = "<?php print GM_IMAGE_DIR."/".$GM_IMAGES["zoomout"]["other"]; ?>";
 	 arrows = new Array();
 	 arrows[0] = new Image();
-	 arrows[0].src = "<?php print $GM_IMAGE_DIR."/".$GM_IMAGES["larrow2"]["other"]; ?>";
+	 arrows[0].src = "<?php print GM_IMAGE_DIR."/".$GM_IMAGES["larrow2"]["other"]; ?>";
 	 arrows[1] = new Image();
-	 arrows[1].src = "<?php print $GM_IMAGE_DIR."/".$GM_IMAGES["rarrow2"]["other"]; ?>";
+	 arrows[1].src = "<?php print GM_IMAGE_DIR."/".$GM_IMAGES["rarrow2"]["other"]; ?>";
 	 arrows[2] = new Image();
-	 arrows[2].src = "<?php print $GM_IMAGE_DIR."/".$GM_IMAGES["uarrow2"]["other"]; ?>";
+	 arrows[2].src = "<?php print GM_IMAGE_DIR."/".$GM_IMAGES["uarrow2"]["other"]; ?>";
 	 arrows[3] = new Image();
-	 arrows[3].src = "<?php print $GM_IMAGE_DIR."/".$GM_IMAGES["darrow2"]["other"]; ?>";
+	 arrows[3].src = "<?php print GM_IMAGE_DIR."/".$GM_IMAGES["darrow2"]["other"]; ?>";
 
 function message(username, method, url, subject) {
 	 if ((!url)||(url=="")) url='<?php print urlencode(basename($SCRIPT_NAME)."?".$QUERY_STRING); ?>';
@@ -1009,7 +1008,7 @@ var whichhelp = 'help_<?php print basename($SCRIPT_NAME)."&amp;action=".$action;
 </script>
 <script src="genmod.js" language="JavaScript" type="text/javascript"></script>
 <script src="gmrpc.js" language="JavaScript" type="text/javascript"></script>
-<?php if ($USE_GREYBOX) { ?>
+<?php if (USE_GREYBOX) { ?>
 <script type="text/javascript">
 <!--
     var GB_ROOT_DIR = "<?php print SERVER_URL."modules/greybox/";?>";
@@ -1037,12 +1036,12 @@ var whichhelp = 'help_<?php print basename($SCRIPT_NAME)."&amp;action=".$action;
 	 print "<!-- begin header section -->\n";
 	 include("includes/values/include_top.php");
 	 
-	 if ($view!="preview") include($menubar);
-	 else include($print_headerfile);
+	 if ($view!="preview") include(GM_MENUBAR);
+	 else include(GM_PRINT_HEADERFILE);
 	 print "<!-- end header section -->\n";
 	 print "<!-- begin content section -->\n";
 	
-	 if ($USE_GREYBOX) { ?>
+	 if (USE_GREYBOX) { ?>
 		<script type="text/javascript" src="modules/greybox/AJS.js"></script>
 		<script type="text/javascript" src="modules/greybox/AJS_fx.js"></script>
 		<script type="text/javascript" src="modules/greybox/gb_scripts.js"></script>
@@ -1063,60 +1062,56 @@ var whichhelp = 'help_<?php print basename($SCRIPT_NAME)."&amp;action=".$action;
  * @param string $head
  * @param boolean $use_alternate_styles
  */
-function print_simple_header($title) {
+function PrintSimpleHeader($title) {
 	 global $gm_lang;
-	 global $HOME_SITE_URL, $USE_GREYBOX;
-	 global $HOME_SITE_TEXT;
-	 global $view, $rtl_stylesheet;
-	 global $CHARACTER_SET, $GM_IMAGE_DIR;
+	 global $view;
 	 global $SCRIPT_NAME, $QUERY_STRING, $action, $query, $changelanguage;
-	 global $FAVICON, $stylesheet, $headerfile, $toplinks, $THEME_DIR, $print_headerfile, $SCRIPT_NAME;
-	 global $TEXT_DIRECTION, $GEDCOMS, $GEDCOMID, $CONTACT_EMAIL, $COMMON_NAMES_THRESHOLD,$GM_IMAGES;
-	 global $META_AUTHOR, $META_PUBLISHER, $META_COPYRIGHT, $META_DESCRIPTION, $META_PAGE_TOPIC, $META_AUDIENCE, $META_PAGE_TYPE, $META_ROBOTS, $META_REVISIT, $META_KEYWORDS, $META_TITLE;
-	 header("Content-Type: text/html; charset=$CHARACTER_SET");
+	 global $SCRIPT_NAME;
+	 global $TEXT_DIRECTION, $GEDCOMS, $GEDCOMID,$GM_IMAGES;
+	 
+	 header("Content-Type: text/html; charset=".GedcomConfig::$CHARACTER_SET);
 	 print "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">\n";
 	 print "<html xmlns=\"http://www.w3.org/1999/xhtml\">\n\t<head>\n\t\t";
-	 print "<meta http-equiv=\"Content-Type\" content=\"text/html; charset=$CHARACTER_SET\" />\n\t\t";
-	if( $FAVICON ) {
-	   print "<link rel=\"shortcut icon\" href=\"$FAVICON\" type=\"image/x-icon\"></link>\n\t\t";
+	 print "<meta http-equiv=\"Content-Type\" content=\"text/html; charset=".GedcomConfig::$CHARACTER_SET."\" />\n\t\t";
+	if( GedcomConfig::$FAVICON ) {
+	   print "<link rel=\"shortcut icon\" href=\"".GedcomConfig::$FAVICON."\" type=\"image/x-icon\"></link>\n\t\t";
 	}
-	if (!isset($META_TITLE)) $META_TITLE = "";
-	print "<title>".PrintReady(strip_tags($title))." - ".$META_TITLE." - Genmod</title>\n\t<link rel=\"stylesheet\" href=\"$stylesheet\" type=\"text/css\"></link>\n\t";
-	if ((!empty($rtl_stylesheet))&&($TEXT_DIRECTION=="rtl")) print "<link rel=\"stylesheet\" href=\"$rtl_stylesheet\" type=\"text/css\" media=\"all\"></link>\n\t";
-	$old_META_AUTHOR = $META_AUTHOR;
-	$old_META_PUBLISHER = $META_PUBLISHER;
-	$old_META_COPYRIGHT = $META_COPYRIGHT;
-	$old_META_DESCRIPTION = $META_DESCRIPTION;
-	$old_META_PAGE_TOPIC = $META_PAGE_TOPIC;
-	$cuser =& User::GetInstance($CONTACT_EMAIL);
+//	if (!isset(GedcomConfig::$META_TITLE)) GedcomConfig::$META_TITLE = "";
+	print "<title>".PrintReady(strip_tags($title))." - ".GedcomConfig::$META_TITLE." - Genmod</title>\n\t<link rel=\"stylesheet\" href=\"".GM_STYLESHEET."\" type=\"text/css\"></link>\n\t";
+	if ((!empty($rtl_stylesheet))&&($TEXT_DIRECTION=="rtl")) print "<link rel=\"stylesheet\" href=\"".GM_RTL_STYLESHEET."\" type=\"text/css\" media=\"all\"></link>\n\t";
+	$old_META_AUTHOR = GedcomConfig::$META_AUTHOR;
+	$old_META_PUBLISHER = GedcomConfig::$META_PUBLISHER;
+	$old_META_COPYRIGHT = GedcomConfig::$META_COPYRIGHT;
+	$old_META_DESCRIPTION = GedcomConfig::$META_DESCRIPTION;
+	$old_META_PAGE_TOPIC = GedcomConfig::$META_PAGE_TOPIC;
+	$cuser =& User::GetInstance(GedcomConfig::$CONTACT_EMAIL);
 	if (!empty($cuser->username)) {
-		if (empty($META_AUTHOR)) $META_AUTHOR = $cuser->firstname." ".$cuser->lastname;
-		if (empty($META_PUBLISHER)) $META_PUBLISHER = $cuser->firstname." ".$cuser->lastname;
-		if (empty($META_COPYRIGHT)) $META_COPYRIGHT = $cuser->firstname." ".$cuser->lastname;
+		if (empty(GedcomConfig::$META_AUTHOR)) GedcomConfig::$META_AUTHOR = $cuser->firstname." ".$cuser->lastname;
+		if (empty(GedcomConfig::$META_PUBLISHER)) GedcomConfig::$META_PUBLISHER = $cuser->firstname." ".$cuser->lastname;
+		if (empty(GedcomConfig::$META_COPYRIGHT)) GedcomConfig::$META_COPYRIGHT = $cuser->firstname." ".$cuser->lastname;
 	}
-	if (!empty($META_AUTHOR)) print "<meta name=\"author\" content=\"".$META_AUTHOR."\" />\n";
-	if (!empty($META_PUBLISHER)) print "<meta name=\"publisher\" content=\"".$META_PUBLISHER."\" />\n";
-	if (!empty($META_COPYRIGHT)) print "<meta name=\"copyright\" content=\"".$META_COPYRIGHT."\" />\n";
-	print "<meta name=\"keywords\" content=\"".$META_KEYWORDS;
+	if (!empty(GedcomConfig::$META_AUTHOR)) print "<meta name=\"author\" content=\"".GedcomConfig::$META_AUTHOR."\" />\n";
+	if (!empty(GedcomConfig::$META_PUBLISHER)) print "<meta name=\"publisher\" content=\"".GedcomConfig::$META_PUBLISHER."\" />\n";
+	if (!empty(GedcomConfig::$META_COPYRIGHT)) print "<meta name=\"copyright\" content=\"".GedcomConfig::$META_COPYRIGHT."\" />\n";
+	print "<meta name=\"keywords\" content=\"".GedcomConfig::$META_KEYWORDS;
 	$surnames = GetCommonSurnamesIndex($GEDCOMID);
 	foreach($surnames as $surname=>$count) print ", $surname";
 	print "\" />\n";
-	if ((empty($META_PAGE_TOPIC))&&(!empty($GEDCOMS[$GEDCOMID]["title"]))) $META_PAGE_TOPIC = $GEDCOMS[$GEDCOMID]["title"];
+	if ((empty(GedcomConfig::$META_PAGE_TOPIC))&&(!empty($GEDCOMS[$GEDCOMID]["title"]))) GedcomConfig::$META_PAGE_TOPIC = $GEDCOMS[$GEDCOMID]["title"];
 	//LERMAN - make meta description unique, like the title
-	if (empty($META_DESCRIPTION)) $META_DESCRIPTION = PrintReady(strip_tags($title)." - ".$META_TITLE." - Genmod", TRUE);
-	//if ((empty($META_DESCRIPTION))&&(!empty($GEDCOMS[$GEDCOMID]["title"]))) $META_DESCRIPTION = $GEDCOMS[$GEDCOMID]["title"];
-	if (!empty($META_DESCRIPTION)) print "<meta name=\"description\" content=\"".preg_replace("/\"/", "", $META_DESCRIPTION)."\" />\n";
-	if (!empty($META_PAGE_TOPIC)) print "<meta name=\"page-topic\" content=\"".preg_replace("/\"/", "", $META_PAGE_TOPIC)."\" />\n";
-	if (!empty($META_AUDIENCE)) print "<meta name=\"audience\" content=\"$META_AUDIENCE\" />\n";
-	if (!empty($META_PAGE_TYPE)) print "<meta name=\"page-type\" content=\"$META_PAGE_TYPE\" />\n";
-	if (!empty($META_ROBOTS)) print "<meta name=\"robots\" content=\"$META_ROBOTS\" />\n";
-	if (!empty($META_REVISIT)) print "<meta name=\"revisit-after\" content=\"$META_REVISIT\" />\n";
+	if (empty(GedcomConfig::$META_DESCRIPTION)) GedcomConfig::$META_DESCRIPTION = PrintReady(strip_tags($title)." - ".GedcomConfig::$META_TITLE." - Genmod", TRUE);
+	if (!empty(GedcomConfig::$META_DESCRIPTION)) print "<meta name=\"description\" content=\"".preg_replace("/\"/", "", GedcomConfig::$META_DESCRIPTION)."\" />\n";
+	if (!empty(GedcomConfig::$META_PAGE_TOPIC)) print "<meta name=\"page-topic\" content=\"".preg_replace("/\"/", "", GedcomConfig::$META_PAGE_TOPIC)."\" />\n";
+	if (!empty(GedcomConfig::$META_AUDIENCE)) print "<meta name=\"audience\" content=\"".GedcomConfig::$META_AUDIENCE."\" />\n";
+	if (!empty(GedcomConfig::$META_PAGE_TYPE)) print "<meta name=\"page-type\" content=\"".GedcomConfig::$META_PAGE_TYPE."\" />\n";
+	if (!empty(GedcomConfig::$META_ROBOTS)) print "<meta name=\"robots\" content=\"".GedcomConfig::$META_ROBOTS."\" />\n";
+	if (!empty(GedcomConfig::$META_REVISIT)) print "<meta name=\"revisit-after\" content=\"".GedcomConfig::$META_REVISIT."\" />\n";
 	print "<meta name=\"generator\" content=\"Genmod v".GM_VERSION." - http://www.Genmod.net\" />\n";
-	$META_AUTHOR = $old_META_AUTHOR;
-	$META_PUBLISHER = $old_META_PUBLISHER;
-	$META_COPYRIGHT = $old_META_COPYRIGHT;
-	$META_DESCRIPTION = $old_META_DESCRIPTION;
-	$META_PAGE_TOPIC = $old_META_PAGE_TOPIC;
+	GedcomConfig::$META_AUTHOR = $old_META_AUTHOR;
+	GedcomConfig::$META_PUBLISHER = $old_META_PUBLISHER;
+	GedcomConfig::$META_COPYRIGHT = $old_META_COPYRIGHT;
+	GedcomConfig::$META_DESCRIPTION = $old_META_DESCRIPTION;
+	GedcomConfig::$META_PAGE_TOPIC = $old_META_PAGE_TOPIC;
 	?>
 	<style type="text/css">
 	<!--
@@ -1132,14 +1127,14 @@ function print_simple_header($title) {
 	 <?php print "sessionname = \"".session_name()."\";\n"; ?>
 	 plusminus = new Array();
 	 plusminus[0] = new Image();
-	 plusminus[0].src = "<?php print $GM_IMAGE_DIR."/".$GM_IMAGES["plus"]["other"]; ?>";
+	 plusminus[0].src = "<?php print GM_IMAGE_DIR."/".$GM_IMAGES["plus"]["other"]; ?>";
 	 plusminus[1] = new Image();
-	 plusminus[1].src = "<?php print $GM_IMAGE_DIR."/".$GM_IMAGES["minus"]["other"]; ?>";
+	 plusminus[1].src = "<?php print GM_IMAGE_DIR."/".$GM_IMAGES["minus"]["other"]; ?>";
 	 zoominout = new Array();
 	 zoominout[0] = new Image();
-	 zoominout[0].src = "<?php print $GM_IMAGE_DIR."/".$GM_IMAGES["zoomin"]["other"]; ?>";
+	 zoominout[0].src = "<?php print GM_IMAGE_DIR."/".$GM_IMAGES["zoomin"]["other"]; ?>";
 	 zoominout[1] = new Image();
-	 zoominout[1].src = "<?php print $GM_IMAGE_DIR."/".$GM_IMAGES["zoomout"]["other"]; ?>";
+	 zoominout[1].src = "<?php print GM_IMAGE_DIR."/".$GM_IMAGES["zoomout"]["other"]; ?>";
 
 	var helpWin;
 	function helpPopup(which) {
@@ -1157,7 +1152,7 @@ function print_simple_header($title) {
 	</script>
 	<script src="genmod.js" language="JavaScript" type="text/javascript"></script>
 	<script src="gmrpc.js" language="JavaScript" type="text/javascript"></script>
-	<?php if ($USE_GREYBOX) { ?>
+	<?php if (USE_GREYBOX) { ?>
 		<script type="text/javascript">
 		<!--
 	    	var GB_ROOT_DIR = "<?php print SERVER_URL."modules/greybox/";?>";
@@ -1167,27 +1162,28 @@ function print_simple_header($title) {
 	<?php }
 	print "</head>\n\t<body style=\"margin: 5px;\"";
 	print " onload=\"loadHandler();\">\n\t";
-	 if ($USE_GREYBOX) { ?>
+	 if (USE_GREYBOX) { ?>
 		<script type="text/javascript" src="modules/greybox/AJS.js"></script>
 		<script type="text/javascript" src="modules/greybox/AJS_fx.js"></script>
 		<script type="text/javascript" src="modules/greybox/gb_scripts.js"></script>
 	 <?php
  	}
 }
+
 // -- print the html to close the page
-function print_footer() {
+function PrintFooter() {
 	global $without_close, $gm_lang, $view, $buildindex;
-	global $SHOW_STATS, $SCRIPT_NAME, $QUERY_STRING, $footerfile, $print_footerfile, $ALLOW_CHANGE_GEDCOM, $printlink;
-	global $GM_IMAGE_DIR, $theme_name, $GM_IMAGES, $TEXT_DIRECTION, $footer_count;
+	global $SCRIPT_NAME, $QUERY_STRING, $ALLOW_CHANGE_GEDCOM, $printlink;
+	global $theme_name, $GM_IMAGES, $TEXT_DIRECTION, $footer_count;
 	
 	if (!isset($footer_count)) $footer_count = 1;
 	else $footer_count++;
 	
 	print "<!-- begin footer -->\n";
 	$QUERY_STRING = preg_replace("/&/", "&", $QUERY_STRING);
-	if ($view != "preview") include($footerfile);
+	if ($view != "preview") include(GM_FOOTERFILE);
 	else {
-		include($print_footerfile);
+		include(GM_PRINT_FOOTERFILE);
 		print "\n\t<div class=\"center width95\"><br />";
 		$backlink = $SCRIPT_NAME."?".GetQueryString();
 		if (!$printlink) {
@@ -1208,9 +1204,9 @@ function print_footer() {
 
 }
 // -- print the html to close the page
-function print_simple_footer() {
+function PrintSimpleFooter() {
 	global $gm_lang, $start_time, $buildindex;
-	global $SHOW_STATS, $CONFIG_PARMS;
+	global $CONFIG_PARMS;
 	global $SCRIPT_NAME, $QUERY_STRING;
 	
 	if (empty($SCRIPT_NAME)) {
@@ -1218,12 +1214,12 @@ function print_simple_footer() {
 		$QUERY_STRING = $_SERVER["QUERY_STRING"];
 	}
 	print "\n\t<br /><br /><div class=\"center\" style=\"width: 99%;\">";
-	print_contact_links();
+	PrintContactLinks();
 	print "<br />Running <a href=\"http://www.genmod.net/\" target=\"_blank\">Genmod";
 	if (count($CONFIG_PARMS) >1) print " Enterprise";
 	print MediaFS::GetStorageType();
 	print "</a> Version ".GM_VERSION." ".GM_VERSION_RELEASE;
-	if ($SHOW_STATS) print_execution_stats();
+	if (GedcomConfig::$SHOW_STATS) PrintExecutionStats();
 	print "</div>";
 	if (DebugCollector::$show) DebugCollector::PrintDebug();
 	print "\n\t</body>\n</html>";
@@ -1269,7 +1265,7 @@ if( !function_exists('memory_get_usage') ) {
  *
  * @author	Genmod Development Team
  */
-function print_execution_stats() {
+function PrintExecutionStats() {
 	global $start_time, $gm_lang, $TOTAL_QUERIES, $PRIVACY_CHECKS, $QUERY_EXECTIME;
 	$end_time = GetMicrotime();
 	$exectime = $end_time - $start_time;
@@ -1297,57 +1293,58 @@ function print_execution_stats() {
  * this function will print appropriate links based on the preferred contact methods for the genealogy
  * contact user and the technical support contact user
  */
-function print_contact_links($style=0) {
-	global $WEBMASTER_EMAIL, $SUPPORT_METHOD, $CONTACT_EMAIL, $CONTACT_METHOD, $gm_lang, $gm_user;
-	if ($SUPPORT_METHOD=="none" && $CONTACT_METHOD=="none") return array();
-	if ($SUPPORT_METHOD=="none") $WEBMASTER_EMAIL = $CONTACT_EMAIL;
-	if ($CONTACT_METHOD=="none") $CONTACT_EMAIL = $WEBMASTER_EMAIL;
+function PrintContactLinks($style=0) {
+	global $gm_lang, $gm_user;
+	
+	if (GedcomConfig::$SUPPORT_METHOD=="none" && GedcomConfig::$CONTACT_METHOD=="none") return array();
+	if (GedcomConfig::$SUPPORT_METHOD=="none") GedcomConfig::$WEBMASTER_EMAIL = GedcomConfig::$CONTACT_EMAIL;
+	if (GedcomConfig::$CONTACT_METHOD=="none") GedcomConfig::$CONTACT_EMAIL = GedcomConfig::$WEBMASTER_EMAIL;
 	switch($style) {
 		case 0:
 			print "<div class=\"contact_links\">\n";
 			//--only display one message if the contact users are the same
-			if ($CONTACT_EMAIL == $WEBMASTER_EMAIL) {
-				$user =& User::GetInstance($WEBMASTER_EMAIL);
-				if (!$user->is_empty && $SUPPORT_METHOD!="mailto") {
-					print $gm_lang["for_all_contact"]." <a href=\"#\" accesskey=\"". $gm_lang["accesskey_contact"] ."\" onclick=\"message('$WEBMASTER_EMAIL', '$SUPPORT_METHOD'); return false;\">".$user->firstname." ".$user->lastname."</a><br />\n";
+			if (GedcomConfig::$CONTACT_EMAIL == GedcomConfig::$WEBMASTER_EMAIL) {
+				$user =& User::GetInstance(GedcomConfig::$WEBMASTER_EMAIL);
+				if (!$user->is_empty && GedcomConfig::$SUPPORT_METHOD != "mailto") {
+					print $gm_lang["for_all_contact"]." <a href=\"#\" accesskey=\"". $gm_lang["accesskey_contact"] ."\" onclick=\"message('".GedcomConfig::$WEBMASTER_EMAIL."', '".GedcomConfig::$SUPPORT_METHOD."'); return false;\">".$user->firstname." ".$user->lastname."</a><br />\n";
 				}
 				else {
 					print $gm_lang["for_support"]." <a href=\"mailto:";
 					if (!empty($gm_user->username)) print $user->email."\" accesskey=\"". $gm_lang["accesskey_contact"] ."\">".$gm_user->firstname." ".$gm_user->lastname."</a><br />\n";
-					else print $WEBMASTER_EMAIL."\">".$WEBMASTER_EMAIL."</a><br />\n";
+					else print GedcomConfig::$WEBMASTER_EMAIL."\">".GedcomConfig::$WEBMASTER_EMAIL."</a><br />\n";
 				}
 			}
 			//-- display two messages if the contact users are different
 			else {
-				  $user =& User::GetInstance($CONTACT_EMAIL);
-				  if (!$user->is_empty && $CONTACT_METHOD!="mailto") {
-					  print $gm_lang["for_contact"]." <a href=\"#\" accesskey=\"". $gm_lang["accesskey_contact"] ."\" onclick=\"message('$CONTACT_EMAIL', '$CONTACT_METHOD'); return false;\">".$gm_user->firstname." ".$gm_user->lastname."</a><br /><br />\n";
+				  $user =& User::GetInstance(GedcomConfig::$CONTACT_EMAIL);
+				  if (!$user->is_empty && GedcomConfig::$CONTACT_METHOD!="mailto") {
+					  print $gm_lang["for_contact"]." <a href=\"#\" accesskey=\"". $gm_lang["accesskey_contact"] ."\" onclick=\"message('".GedcomConfig::$CONTACT_EMAIL."', '".GedcomConfig::$CONTACT_METHOD."'); return false;\">".$gm_user->firstname." ".$gm_user->lastname."</a><br /><br />\n";
 				  }
 				  else {
 					   print $gm_lang["for_contact"]." <a href=\"mailto:";
 					   if (!empty($gm_user->username)) print $user->email."\" accesskey=\"". $gm_lang["accesskey_contact"] ."\">".$gm_user->firstname." ".$gm_user->lastname."</a><br />\n";
-					   else print $CONTACT_EMAIL."\">".$CONTACT_EMAIL."</a><br />\n";
+					   else print GedcomConfig::$CONTACT_EMAIL."\">".GedcomConfig::$CONTACT_EMAIL."</a><br />\n";
 				  }
-				  $user =& User::GetInstance($WEBMASTER_EMAIL);
-				  if (($user)&&($SUPPORT_METHOD!="mailto")) {
-					  print $gm_lang["for_support"]." <a href=\"#\" onclick=\"message('$WEBMASTER_EMAIL', '$SUPPORT_METHOD'); return false;\">".$gm_user->firstname." ".$gm_user->lastname."</a><br />\n";
+				  $user =& User::GetInstance(GedcomConfig::$WEBMASTER_EMAIL);
+				  if ($user && GedcomConfig::$SUPPORT_METHOD != "mailto") {
+					  print $gm_lang["for_support"]." <a href=\"#\" onclick=\"message('".GedcomConfig::$WEBMASTER_EMAIL."', '".GedcomConfig::$SUPPORT_METHOD."'); return false;\">".$gm_user->firstname." ".$gm_user->lastname."</a><br />\n";
 				  }
 				  else {
 					   print $gm_lang["for_support"]." <a href=\"mailto:";
 					   if (!empty($gm_user->username)) print $gm_user->email."\">".$gm_user->firstname." ".$gm_user->lastname."</a><br />\n";
-					   else print $WEBMASTER_EMAIL."\">".$WEBMASTER_EMAIL."</a><br />\n";
+					   else print GedcomConfig::$WEBMASTER_EMAIL."\">".GedcomConfig::$WEBMASTER_EMAIL."</a><br />\n";
 				  }
 			}
 			print "</div>\n";
 			break;
 		case 1:
 			$menuitems = array();
-			if ($CONTACT_EMAIL == $WEBMASTER_EMAIL) {
-				$user =& User::GetInstance($WEBMASTER_EMAIL);
+			if (GedcomConfig::$CONTACT_EMAIL == GedcomConfig::$WEBMASTER_EMAIL) {
+				$user =& User::GetInstance(GedcomConfig::$WEBMASTER_EMAIL);
 				$submenu = array();
-				if (!$user->is_empty && $SUPPORT_METHOD!="mailto") {
+				if (!$user->is_empty && GedcomConfig::$SUPPORT_METHOD != "mailto") {
 					$submenu["label"] = $gm_lang["support_contact"]." ".$gm_user->firstname." ".$gm_user->lastname;
-					$submenu["link"] = "message('$WEBMASTER_EMAIL', '$SUPPORT_METHOD');";
+					$submenu["link"] = "message('".GedcomConfig::$WEBMASTER_EMAIL."', '".GedcomConfig::$SUPPORT_METHOD."');";
 				}
 				else {
 					$submenu["label"] = $gm_lang["support_contact"]." ";
@@ -1357,8 +1354,8 @@ function print_contact_links($style=0) {
 						$submenu["label"] .= $gm_user->firstname." ".$gm_user->lastname;
 					}
 					else {
-						$submenu["link"] .= $WEBMASTER_EMAIL;
-						$submenu["label"] .= $WEBMASTER_EMAIL;
+						$submenu["link"] .= GedcomConfig::$WEBMASTER_EMAIL;
+						$submenu["label"] .= GedcomConfig::$WEBMASTER_EMAIL;
 					}
 				}
 	            $submenu["label"] = $gm_lang["support_contact"];
@@ -1368,11 +1365,11 @@ function print_contact_links($style=0) {
 	            $menuitems[] = $submenu;
 			}
 			else {
-				$user =& User::GetInstance($CONTACT_EMAIL);
+				$user =& User::GetInstance(GedcomConfig::$CONTACT_EMAIL);
 				$submenu = array();
-				if (!$user->is_empty && $CONTACT_METHOD!="mailto") {
+				if (!$user->is_empty && GedcomConfig::$CONTACT_METHOD!="mailto") {
 					$submenu["label"] = $gm_lang["genealogy_contact"]." ".$gm_user->firstname." ".$gm_user->lastname;
-					$submenu["link"] = "message('$CONTACT_EMAIL', '$CONTACT_METHOD');";
+					$submenu["link"] = "message('".GedcomConfig::$CONTACT_EMAIL."', '".GedcomConfig::$CONTACT_METHOD."');";
 				}
 				else {
 					$submenu["label"] = $gm_lang["genealogy_contact"]." ";
@@ -1382,8 +1379,8 @@ function print_contact_links($style=0) {
 						$submenu["label"] .= $gm_user->firstname." ".$gm_user->lastname;
 					}
 					else {
-						$submenu["link"] .= $CONTACT_EMAIL;
-						$submenu["label"] .= $CONTACT_EMAIL;
+						$submenu["link"] .= GedcomConfig::$CONTACT_EMAIL;
+						$submenu["label"] .= GedcomConfig::$CONTACT_EMAIL;
 					}
 				}
 	            $submenu["labelpos"] = "right";
@@ -1391,9 +1388,9 @@ function print_contact_links($style=0) {
 	            $submenu["hoverclass"] = "submenuitem_hover";
 	            $menuitems[] = $submenu;
 	            $submenu = array();
-				if (($user)&&($SUPPORT_METHOD!="mailto")) {
+				if ($user && GedcomConfig::$SUPPORT_METHOD != "mailto") {
 					$submenu["label"] = $gm_lang["support_contact"]." ".$gm_user->firstname." ".$gm_user->lastname;
-					$submenu["link"] = "message('$WEBMASTER_EMAIL', '$SUPPORT_METHOD');";
+					$submenu["link"] = "message('".GedcomConfig::$WEBMASTER_EMAIL."', '".GedcomConfig::$SUPPORT_METHOD."');";
 				}
 				else {
 					$submenu["label"] = $gm_lang["support_contact"]." ";
@@ -1403,8 +1400,8 @@ function print_contact_links($style=0) {
 						$submenu["label"] .= $gm_user->firstname." ".$gm_user->lastname;
 					}
 					else {
-						$submenu["link"] .= $WEBMASTER_EMAIL;
-						$submenu["label"] .= $WEBMASTER_EMAIL;
+						$submenu["link"] .= GedcomConfig::$WEBMASTER_EMAIL;
+						$submenu["label"] .= GedcomConfig::$WEBMASTER_EMAIL;
 					}
 				}
 	            $submenu["labelpos"] = "right";
@@ -1426,7 +1423,7 @@ function print_contact_links($style=0) {
  * @param string $pid the id of the individual to print, required to check privacy
  */
 function print_simple_fact($indirec, $fact, $pid) {
-	global $gm_lang, $ABBREVIATE_CHART_LABELS;
+	global $gm_lang;
 	
 	$emptyfacts = array("BIRT","CHR","DEAT","BURI","CREM","ADOP","BAPM","BARM","BASM","BLES","CHRA","CONF","FCOM","ORDN","NATU","EMIG","IMMI","CENS","PROB","WILL","GRAD","RETI","BAPL","CONL","ENDL","SLGC","EVEN","MARR","SLGS","MARL","ANUL","CENS","DIV","DIVF","ENGA","MARB","MARC","MARS","OBJE","CHAN","_SEPR","RESI", "DATA", "MAP");
 	$factrec = GetSubRecord(1, "1 $fact", $indirec);
@@ -1434,7 +1431,7 @@ function print_simple_fact($indirec, $fact, $pid) {
 	$label = "";
 	if (isset($gm_lang[$fact])) $label = $gm_lang[$fact];
 	else if (defined("GM_FACT_".$fact)) $label = constant("GM_FACT_".$fact);
-	if ($ABBREVIATE_CHART_LABELS) $label = GetFirstLetter($label);
+	if (GedcomConfig::$ABBREVIATE_CHART_LABELS) $label = GetFirstLetter($label);
 	// RFE [ 1229233 ] "DEAT" vs "DEAT Y"
 	// The check $factrec != "1 DEAT" will not show any records that only have 1 DEAT in them
 	if (trim($factrec) != "1 DEAT"){
@@ -1468,9 +1465,9 @@ function print_simple_fact($indirec, $fact, $pid) {
  * @param boolean $output	return the text instead of printing it
  */
 function print_help_link($help, $helpText, $show_desc="", $use_print_text=false, $return=false) {
-	global $SHOW_CONTEXT_HELP, $gm_lang,$view, $GM_USE_HELPIMG, $GM_IMAGES, $GM_IMAGE_DIR, $gm_user;
+	global $gm_lang,$view, $GM_IMAGES, $gm_user;
 	
-	if ($GM_USE_HELPIMG) $sentense = "<img src=\"".$GM_IMAGE_DIR."/".$GM_IMAGES["help"]["small"]."\" class=\"icon\" width=\"15\" height=\"15\" alt=\"\" />";
+	if (GM_USE_HELPIMG) $sentense = "<img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["help"]["small"]."\" class=\"icon\" width=\"15\" height=\"15\" alt=\"\" />";
 	else $sentense = $gm_lang[$helpText];
 	$output = "";
 	if (($view!="preview")&&($_SESSION["show_context_help"])){
@@ -1524,9 +1521,9 @@ function print_help_link($help, $helpText, $show_desc="", $use_print_text=false,
  * @param int $noprint		The switch if the text needs to be printed or returned
  */
 function print_text($help, $level=0, $noprint=0){
-	 global $gm_lang, $COMMON_NAMES_THRESHOLD;
+	 global $gm_lang;
 	 global $GEDCOM_TITLE, $LANGUAGE;
-	 global $GUESS_URL, $UpArrow, $DAYS_TO_SHOW_LIMIT, $MEDIA_DIRECTORY;
+	 global $GUESS_URL, $UpArrow;
 	 global $repeat, $thumbnail, $xref, $pid, $LANGUAGE;
 	
 	 if (!isset($_SESSION["DEBUG_LANG"])) $DEBUG_LANG = "no";
@@ -1660,7 +1657,7 @@ function print_help_index($help){
  * @author Genmod Development Team
  * @param array $menu the menuitems array to print
  */
-function print_menu($menu, $parentmenu="") {
+function PrintFactMenu($menu, $parentmenu="") {
 	$conv = array(
 		'label'=>'label',
 		'labelpos'=>'labelpos',
@@ -1946,8 +1943,9 @@ function PrintReady($text, $InHeaders=false) {
  * @param string $bdate	child birthdate
  */
 function print_parents_age($pid, $bdate) {
-	global $gm_lang, $SHOW_PARENTS_AGE, $GM_IMAGE_DIR, $GM_IMAGES;
-	if ($SHOW_PARENTS_AGE) {
+	global $gm_lang, $GM_IMAGES;
+	
+	if (GedcomConfig::$SHOW_PARENTS_AGE) {
 		$famids = FindFamilyIds($pid);
 		// dont show age of parents if more than one family (ADOPtion)
 		if (count($famids)==1) {
@@ -1958,13 +1956,13 @@ function print_parents_age($pid, $bdate) {
 			$spouse = $parents["HUSB"];
 			if ($spouse && PrivacyFunctions::showFact("BIRT", $spouse)) {
 				$age = ConvertNumber(GetAge(FindPersonRecord($spouse), $bdate, false));
-				if (10<$age && $age<80) $father_text = "<img src=\"$GM_IMAGE_DIR/" . $GM_IMAGES["sex"]["small"] . "\" title=\"" . $gm_lang["father"] . "\" alt=\"" . $gm_lang["father"] . "\" class=\"sex_image\" />$age";
+				if (10<$age && $age<80) $father_text = "<img src=\"".GM_IMAGE_DIR."/" . $GM_IMAGES["sex"]["small"] . "\" title=\"" . $gm_lang["father"] . "\" alt=\"" . $gm_lang["father"] . "\" class=\"sex_image\" />$age";
 			}
 			// mother
 			$spouse = $parents["WIFE"];
 			if ($spouse && PrivacyFunctions::showFact("BIRT", $spouse)) {
 				$age = ConvertNumber(GetAge(FindPersonRecord($spouse), $bdate, false));
-				if (10<$age && $age<80) $mother_text = "<img src=\"$GM_IMAGE_DIR/" . $GM_IMAGES["sexf"]["small"] . "\" title=\"" . $gm_lang["mother"] . "\" alt=\"" . $gm_lang["mother"] . "\" class=\"sex_image\" />$age";
+				if (10<$age && $age<80) $mother_text = "<img src=\"".GM_IMAGE_DIR."/" . $GM_IMAGES["sexf"]["small"] . "\" title=\"" . $gm_lang["mother"] . "\" alt=\"" . $gm_lang["mother"] . "\" class=\"sex_image\" />$age";
 			}
 			if ((!empty($father_text)) || (!empty($mother_text))) print "<span class=\"age\">".$father_text.$mother_text."</span>";
 		}
@@ -2062,7 +2060,7 @@ function print_fact_date($factrec, $anchor=false, $time=false, $fact=false, $pid
  * @param boolean $lds		option to print LDS TEMPle and STATus
  */
 function print_fact_place($factrec, $anchor=false, $sub=false, $lds=false, $prt=true) {
-	global $SHOW_PEDIGREE_PLACES, $TEMPLE_CODES, $gm_lang;
+	global $TEMPLE_CODES, $gm_lang;
 
 	$printed = false;
 	$out = false;
@@ -2093,7 +2091,7 @@ function print_fact_place($factrec, $anchor=false, $sub=false, $lds=false, $prt=
 		}
 		else {
 			$prtstr .= " -- ";
-			for ($level=0; $level<$SHOW_PEDIGREE_PLACES; $level++) {
+			for ($level=0; $level < GedcomConfig::$SHOW_PEDIGREE_PLACES; $level++) {
 				if (!empty($levels[$level])) {
 					if ($level>0) $prtstr .= ", ";
 					$prtstr .= PrintReady($levels[$level]);
@@ -2101,7 +2099,7 @@ function print_fact_place($factrec, $anchor=false, $sub=false, $lds=false, $prt=
 			}
 			if (HasChinese($match[1])) {
 				$ptext = "(";
-				for ($level=0; $level<$SHOW_PEDIGREE_PLACES; $level++) {
+				for ($level=0; $level < GedcomConfig::$SHOW_PEDIGREE_PLACES; $level++) {
 					if (!empty($levels[$level])) {
 						if ($level>0) $ptext .= ", ";
 						$ptext .= GetPinYin($levels[$level]);
@@ -2266,13 +2264,13 @@ function init_calendar_popup() {
  * @param		boolean	$find		Set to yes to print links for the find pages
  */
 function PrintPersonList($personlist, $print_all=true, $find=false, $allgeds = "no") {
-	global $TEXT_DIRECTION, $gm_lang, $SHOW_MARRIED_NAMES, $LISTS_ALL;
+	global $TEXT_DIRECTION, $gm_lang;
 	global $indi_private, $indi_hide, $surname, $show_all_firstnames, $alpha, $falpha;
-	global $surname_sublist, $show_all, $GEDCOMID, $ALPHA_INDEX_LISTS, $indilist, $year;
+	global $surname_sublist, $show_all, $GEDCOMID, $indilist, $year;
 
 	print "<table class=\"center ".$TEXT_DIRECTION."\"><tr>";
 	// NOTE: The list is really long so divide it up again by the first letter of the first name
-	if ($ALPHA_INDEX_LISTS && count($personlist) > $ALPHA_INDEX_LISTS && $print_all == true && $find == false) {
+	if (GedcomConfig::$ALPHA_INDEX_LISTS && count($personlist) > GedcomConfig::$ALPHA_INDEX_LISTS && $print_all == true && $find == false) {
 		$firstalpha = array();
 		foreach($personlist as $gid=>$indi) {
 			$indi = $indilist[$gid];
@@ -2333,7 +2331,7 @@ function PrintPersonList($personlist, $print_all=true, $find=false, $allgeds = "
 			}
 			$pass = false;
 		}
-		if ($LISTS_ALL) {
+		if (GedcomConfig::$LISTS_ALL) {
 			print " | \n";
 			if (strstr($_SERVER["SCRIPT_NAME"],"indilist.php")) print "<a href=\"indilist.php?";
 			if (strstr($_SERVER["SCRIPT_NAME"],"aliveinyear.php")) print "<a href=\"aliveinyear.php?year=$year&amp;";
@@ -2372,7 +2370,7 @@ function PrintPersonList($personlist, $print_all=true, $find=false, $allgeds = "
 				foreach($indi["names"] as $indexval => $namearray) {
 					// NOTE: Only include married names if chosen to show so
 					// NOTE: Do not include calculated names. Identified by C.
-					if ($SHOW_MARRIED_NAMES || $namearray[3]!='C') {
+					if (GedcomConfig::$SHOW_MARRIED_NAMES || $namearray[3]!='C') {
 						if ($allgeds == "yes") $names[] = array($namearray[0], $namearray[1], $namearray[2], $namearray[3], splitkey($gid, "id"), splitkey($gid, "gedid"));
 						else $names[] = array($namearray[0], $namearray[1], $namearray[2], $namearray[3], $gid, $GEDCOMID);
 					}
@@ -2386,8 +2384,8 @@ function PrintPersonList($personlist, $print_all=true, $find=false, $allgeds = "
 		$i=0;
 		print "<td class=\"shade1 list_value indilist $TEXT_DIRECTION\">\n";
 		foreach($names as $indexval => $namearray) {
-			$name = CheckNN(SortableNameFromName($namearray[0]));
-			if (HasChinese($name)) $name .= " (".CheckNN(SortableNameFromName(GetPinYin($namearray[0]))).")";
+			$name = CheckNN(NameFunctions::SortableNameFromName($namearray[0]));
+			if (HasChinese($name)) $name .= " (".CheckNN(NameFunctions::SortableNameFromName(GetPinYin($namearray[0]))).")";
 			print_list_person($namearray[4], array($name, $namearray[5]), $find);
 			$i++;
 			if ($i==ceil($count/2) && $count>8) print "</td><td class=\"shade1 list_value indilist $TEXT_DIRECTION\">\n";			
@@ -2395,7 +2393,7 @@ function PrintPersonList($personlist, $print_all=true, $find=false, $allgeds = "
 		print "</td>\n";
 		if ($count>1) {
 			print "</tr><tr><td colspan=\"2\" class=\"center\">";
-			if ($SHOW_MARRIED_NAMES) print $gm_lang["total_names"]." ".$count."<br />\n";
+			if (GedcomConfig::$SHOW_MARRIED_NAMES) print $gm_lang["total_names"]." ".$count."<br />\n";
 			print $gm_lang["total_indis"]." ".$total_indis;
 			if (count($indi_private)>0) print "  (".$gm_lang["private"]." ".count($indi_private).")";
 			if (count($indi_hide)>0) print "  --  ".$gm_lang["hidden"]." ".count($indi_hide);
@@ -2418,7 +2416,7 @@ function PrintPersonList($personlist, $print_all=true, $find=false, $allgeds = "
  * @param		string		$page		The page the links should point to
  */
 function PrintSurnameList($surnames, $page, $allgeds="no", $resturl="") {
-	global $TEXT_DIRECTION, $gm_lang, $SHOW_MARRIED_NAMES;
+	global $TEXT_DIRECTION, $gm_lang;
 	global $surname_sublist, $indilist, $indi_hide, $indi_total;
 	
 	if (stristr($page, "aliveinyear")) {
@@ -2477,7 +2475,7 @@ function PrintSurnameList($surnames, $page, $allgeds="no", $resturl="") {
 	print "</td>\n";
 	if ($count>1 || count($indi_hide)>0) {
 		print "</tr><tr><td colspan=\"$col\" class=\"center\">&nbsp;";
-		if ($SHOW_MARRIED_NAMES && $count>1) print $gm_lang["total_names"]." ".$count_indi."<br />";
+		if (GedcomConfig::$SHOW_MARRIED_NAMES && $count>1) print $gm_lang["total_names"]." ".$count_indi."<br />";
 		if (isset($indi_total) && $count>1) print $gm_lang["total_indis"]." ".$indi_total."&nbsp;";
 		if ($count>1 && count($indi_hide)>0) print "--&nbsp;";
 		if (count($indi_hide)>0) print $gm_lang["hidden"]." ".count($indi_hide);
@@ -2505,7 +2503,7 @@ function PrintSurnameList($surnames, $page, $allgeds="no", $resturl="") {
  * @param		boolean	$find		Set to yes to print links for the find pages
  */
 function PrintFamilyList($familylist, $print_all=true, $find=false, $allgeds="no") {
-	global $TEXT_DIRECTION, $gm_lang, $SHOW_MARRIED_NAMES, $COMBIKEY, $ALPHA_INDEX_LISTS, $LISTS_ALL;
+	global $TEXT_DIRECTION, $gm_lang, $COMBIKEY;
 	global $surname_sublist, $show_all, $famlist, $fam_hide, $alpha, $falpha;
 	global $firstname_alpha, $fam_private, $show_all_firstnames, $surname;
 	
@@ -2513,7 +2511,7 @@ function PrintFamilyList($familylist, $print_all=true, $find=false, $allgeds="no
 	
 	print "<table class=\"center ".$TEXT_DIRECTION."\"><tr>";
 	// NOTE: The list is really long so divide it up again by the first letter of the first name
-	if ($ALPHA_INDEX_LISTS && $count > $ALPHA_INDEX_LISTS && $print_all == true) {
+	if (GedcomConfig::$ALPHA_INDEX_LISTS && $count > GedcomConfig::$ALPHA_INDEX_LISTS && $print_all == true) {
 		$firstalpha = array();
 		foreach($familylist as $gid=>$fam) {
 			$fam = $famlist[$gid];
@@ -2574,10 +2572,10 @@ function PrintFamilyList($familylist, $print_all=true, $find=false, $allgeds="no
 				if ($allgeds == "yes") print "&amp;allgeds=yes";
 				print "\">".PrintReady($gm_lang["NN"])."</a>";
 			}
-			if ($LISTS_ALL) print " | \n";
+			if (GedcomConfig::$LISTS_ALL) print " | \n";
 			$pass = FALSE;
 		}
-		if ($LISTS_ALL) {
+		if (GedcomConfig::$LISTS_ALL) {
 			print "<a href=\"famlist.php?";
 			// NOTE: only include the alpha letter when not showing the ALL list
 			if ($show_all == "no") print "alpha=".urlencode($alpha)."&amp;";
@@ -2663,45 +2661,13 @@ function PrintFilterEvent($filterev) {
 	if ($filterev == "all") print " selected=\"selected\"";
 	print ">".$gm_lang["all"]."</option>\n";		
 	
-	print "<option value=\"BIRT\"";
-	if ($filterev == "BIRT") print " selected=\"selected\"";
-	print ">".GM_FACT_BIRT."</option>\n";
-	print "<option value=\"CHR\"";
-	if ($filterev == "CHR") print " selected=\"selected\"";
-	print ">".GM_FACT_CHR."</option>\n";
-	print "<option value=\"CHRA\"";
-	if ($filterev == "CHRA") print " selected=\"selected\"";
-	print ">".GM_FACT_CHRA."</option>\n";
-	print "<option value=\"BAPM\"";
-	if ($filterev == "BAPM") print " selected=\"selected\"";
-	print ">".GM_FACT_BAPM."</option>\n";
-	print "<option value=\"_COML\"";
-	if ($filterev == "_COML") print " selected=\"selected\"";
-	print ">".GM_FACT__COML."</option>\n";
-	print "<option value=\"MARR\"";
-	if ($filterev == "MARR") print " selected=\"selected\"";
-	print ">".GM_FACT_MARR."</option>\n";
-//	print "<option value=\"_SEPR\"";
-//	if ($filterev == "_SEPR") print " selected=\"selected\"";
-//	print ">".$factarray["_SEPR"]."</option>\n";
-	print "<option value=\"DIV\"";
-	if ($filterev == "DIV") print " selected=\"selected\"";
-	print ">".GM_FACT_DIV."</option>\n";
-	print "<option value=\"DEAT\"";
-	if ($filterev == "DEAT") print " selected=\"selected\"";
-	print ">".GM_FACT_DEAT."</option>\n";
-	print "<option value=\"BURI\"";
-	if ($filterev == "BURI") print " selected=\"selected\"";
-	print ">".GM_FACT_BURI."</option>\n";
-	print "<option value=\"IMMI\"";
-	if ($filterev == "IMMI") print " selected=\"selected\"";
-	print ">".GM_FACT_IMMI."</option>\n";
-	print "<option value=\"EMIG\"";
-	if ($filterev == "EMIG") print " selected=\"selected\"";
-	print ">".GM_FACT_EMIG."</option>\n";
-	print "<option value=\"EVEN\"";
-	if ($filterev == "EVEN") print " selected=\"selected\"";
-	print ">".$gm_lang["custom_event"]."</option>\n";
-	print "</select>\n";
+	$events = array("BIRT", "CHR", "CHRA", "BAPM", "_COML", "MARR", "DIV", "DEAT", "BURI", "IMMI", "EMIG", "EVEN");
+	
+	foreach($events as $nothing => $event) {
+		print "<option value=\"".$event."\"";
+		if ($filterev == $event) print " selected=\"selected\"";
+		if ($filterev == "EVEN") print ">".$gm_lang["custom_event"]."</option>\n";
+		else print ">".constant("GM_FACT_".$event)."</option>\n";
+	}
 }
 ?>

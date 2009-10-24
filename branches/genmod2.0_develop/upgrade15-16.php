@@ -40,12 +40,12 @@ if (!userIsAdmin($gm_username)) {
 	exit;
 }
 
-print_header("Upgrade script to DB after 1.5 Final");
+PrintHeader("Upgrade script to DB after 1.5 Final");
 
 if (file_exists("includes/values/db_layout.php") || file_exists("values/db_layout.php")) {
 	print "Remove the file db_layout.php from your Genmod root directory<br />and from the includes/values directory first.<br />Afterwards, restart this script.<br /><br />";
 	print "This will prevent automatic rollback to the old situation if<br />anyone logs in after the upgrade and before installing the new version of the software.<br />";
-	print_footer();
+	PrintFooter();
 	exit;
 }
 
@@ -183,5 +183,5 @@ if ($update1 || $update2 || $update3 || $update4 || $update5) {
 }
 else print "<br />Database was already upgraded. No action was taken.";
 print "<br /><br />End of upgrade script.";
-print_footer();
+PrintFooter();
 ?>

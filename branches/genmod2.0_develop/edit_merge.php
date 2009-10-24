@@ -47,7 +47,7 @@ if (empty($skip2)) $skip2=array();
 $errorstring = "";
 $error = 0;
 
-print_header($gm_lang["merge_records"]);
+PrintHeader($gm_lang["merge_records"]);
 
 // We can auto accept the merge
 $can_auto_accept = true;
@@ -55,7 +55,7 @@ $can_auto_accept = true;
 //-- make sure they have accept access privileges
 if (!$gm_user->userCanAccept()) {
 	print "<span class=\"error\">".$gm_lang["access_denied"]."</span>";
-	print_footer();
+	PrintFooter();
 	exit;
 }
 ?>	<!-- Setup the left box -->
@@ -446,5 +446,5 @@ if ($action=="choose") {
 	<?php
 }
 
-print_footer();
+PrintFooter();
 ?>

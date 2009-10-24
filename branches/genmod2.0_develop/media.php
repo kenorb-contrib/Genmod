@@ -36,7 +36,7 @@ if (!$gm_user->userGedcomAdmin()) {
 	else header("Location: ".LOGIN_URL."?url=media.php&amp;".GetQueryString(true));
 	exit;
 }
-if (!isset($directory)) $directory = $MEDIA_DIRECTORY;
+if (!isset($directory)) $directory = GedcomConfig::$MEDIA_DIRECTORY;
 else $directory = urldecode($directory);
 if (!isset($action)) $action = "";
 if (!isset($filter)) $filter = "";
@@ -49,16 +49,16 @@ if (!isset($disp1)) $disp1 = "block";
 if (!isset($disp2)) $disp2 = "none";
 if ($disp1 == "block") $disp2 = "none";
 
-$AUTO_GENERATE_THUMBS = $autothumbs;
+GedcomConfig::$AUTO_GENERATE_THUMBS = $autothumbs;
 
-print_header($gm_lang["manage_media"]." - ".$GEDCOMS[$GEDCOMID]['title']);
+PrintHeader($gm_lang["manage_media"]." - ".$GEDCOMS[$GEDCOMID]['title']);
 
 if ($action == "delete") {
 	MediaFS::DeleteFile(basename($file), RelativePathFile($directory));
 }
 if ($disp1 == "block") {
-	$dirs = MediaFS::GetMediaDirList($MEDIA_DIRECTORY, true, 1, false, true);
-//	if (!in_array($MEDIA_DIRECTORY, $dirs)) $dirs[] = $MEDIA_DIRECTORY;
+	$dirs = MediaFS::GetMediaDirList(GedcomConfig::$MEDIA_DIRECTORY, true, 1, false, true);
+//	if (!in_array(GedcomConfig::$MEDIA_DIRECTORY, $dirs)) $dirs[] = GedcomConfig::$MEDIA_DIRECTORY;
 	sort($dirs);
 	$files = MediaFS::GetMediaFileList($directory, $filter);
 	ksort($files);
@@ -118,8 +118,8 @@ if ($action == "directory_action") {
 			else $error = $gm_lang["dirdel_fail"];
 		}
 	}
-	$dirs = MediaFS::GetMediaDirList($MEDIA_DIRECTORY, true, 1, false, true);
-//	if (!in_array($MEDIA_DIRECTORY, $dirs)) $dirs[] = $MEDIA_DIRECTORY;
+	$dirs = MediaFS::GetMediaDirList(GedcomConfig::$MEDIA_DIRECTORY, true, 1, false, true);
+//	if (!in_array(GedcomConfig::$MEDIA_DIRECTORY, $dirs)) $dirs[] = GedcomConfig::$MEDIA_DIRECTORY;
 	sort($dirs);
 }
 
@@ -140,14 +140,14 @@ if ($action == "import_action") {
 		while ($row = $res->Fetchrow()) {
 			$filefromged = GetGedcomValue("FILE", 1, $row[1]);
 			if (stristr($filefromged, "://")) $file = $filefromged;
-			else $file = $MEDIA_DIRECTORY.$row[0];
+			else $file = GedcomConfig::$MEDIA_DIRECTORY.$row[0];
 			// dbmode is always true for import
 			if (MediaFS::CreateFile($file, $delexist, true, $delold)) $count++;
 			else $error = $gm_lang["m_imp_err"]."<br />";
 		}
 	}
 	else {
-		$dirs = MediaFS::GetMediaDirList($MEDIA_DIRECTORY, true, 1, false, false, false);
+		$dirs = MediaFS::GetMediaDirList(GedcomConfig::$MEDIA_DIRECTORY, true, 1, false, false, false);
 		foreach ($dirs as $pipo => $dir) {
 			$files = MediaFS::GetFileList($dir, "", false);
 			foreach ($files as $dikkedeur => $file) {
@@ -177,13 +177,13 @@ if ($action == "export_action") {
 		while ($row = $res->Fetchrow()) {
 			$filefromged = GetGedcomValue("FILE", 1, $row[1]);
 			if (stristr($filefromged, "://")) $file = $filefromged;
-			else $file = $MEDIA_DIRECTORY.$row[0];
+			else $file = GedcomConfig::$MEDIA_DIRECTORY.$row[0];
 			if (MediaFS::CreateFile($file, $delexist, false, $delold, $genthumbs)) $count++;
 			else $error = $gm_lang["m_imp_err"]."<br />";
 		}
 	}
 	else {
-		$dirs = MediaFS::GetMediaDirList($MEDIA_DIRECTORY, true, 1, false, false, true); 
+		$dirs = MediaFS::GetMediaDirList(GedcomConfig::$MEDIA_DIRECTORY, true, 1, false, false, true); 
 		$dirs[] = "external_links";
 		foreach ($dirs as $pipo => $dir) {
 			$files = MediaFS::GetFileList($dir, "", true);
@@ -342,7 +342,7 @@ if ($disp1 == "block") {
 				if (MediaFS::DirIsWritable($dir)) {
 					$d = RelativePathFile($dir);
 					$l = preg_split("/\//", $d);
-					if (count($l)-1 <= $MEDIA_DIRECTORY_LEVELS) print "<option value=\"".urlencode($dir)."\">".$dir."</option>";
+					if (count($l)-1 <= GedcomConfig::$MEDIA_DIRECTORY_LEVELS) print "<option value=\"".urlencode($dir)."\">".$dir."</option>";
 				}
 			}
 			print "</select>";
@@ -353,7 +353,7 @@ if ($disp1 == "block") {
 			$sel .= "<select name=\"del_dir\">";
 			// To fix: only dirs with no subdirs
 			foreach($dirs as $key => $dir) {
-				if (MediaFS::DirIsWritable($dir) && MediaFS::DeleteDir($dir, $MEDIA_IN_DB, true) && $dir != RelativePathFile($MEDIA_DIRECTORY)) {
+				if (MediaFS::DirIsWritable($dir) && MediaFS::DeleteDir($dir, $MEDIA_IN_DB, true) && $dir != RelativePathFile(GedcomConfig::$MEDIA_DIRECTORY)) {
 					$sel .= "<option value=\"".urlencode($dir)."\">".$dir."</option>";
 					$csel++;
 				}
@@ -403,7 +403,7 @@ if ($disp1 == "block") {
 				// print filename
 				print "<td style=\"border-bottom:1px solid #493424;\" class=\"wrap\">";
 				if (!$MEDIA_IN_DB) $canwrite = FileIsWriteable($filename);
-				if ($USE_GREYBOX && $fileobj->f_is_image) print "<a href=\"".FilenameEncode($fileobj->f_main_file)."\" title=\"".$fileobj->f_file."\" rel=\"gb_imageset[]\">";
+				if (USE_GREYBOX && $fileobj->f_is_image) print "<a href=\"".FilenameEncode($fileobj->f_main_file)."\" title=\"".$fileobj->f_file."\" rel=\"gb_imageset[]\">";
 				else print "<a href=\"#\" onclick=\"return openImage('".$fileobj->f_main_file."','".$fileobj->f_width."','".$fileobj->f_height."','".$fileobj->f_is_image."');\">";
 //				print $fileobj->f_thumb_file."<br />";
 				if ($thumbs) print "<img src=\"".$fileobj->f_thumb_file."\" border=\"0\" align=\"left\" class=\"thumbnail\" alt=\"\" width=\"100\" height=\"100\" />";
@@ -431,7 +431,7 @@ if ($disp1 == "block") {
 						print "\n\t<a href=\"mediadetail.php?mid=".$media->xref."&amp;gedid=".$media->gedcomid."\" target=\"_blank\">".$media->title."</a><br />";
 					}
 					print "</div>";
-					print "<img src=\"".$GM_IMAGE_DIR."/".$GM_IMAGES["link"]["other"]."\" border=\"0\" alt=\"".$gm_lang["click_mm_links"]."\" style=\"vertical-align:middle;\" onclick=\"showbox(this, '".$filename."', 'relatives'); return false;\" onmouseout=\"moveout('".$filename."');return false;\" />";
+					print "<img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["link"]["other"]."\" border=\"0\" alt=\"".$gm_lang["click_mm_links"]."\" style=\"vertical-align:middle;\" onclick=\"showbox(this, '".$filename."', 'relatives'); return false;\" onmouseout=\"moveout('".$filename."');return false;\" />";
 				}
 				else print "&nbsp;";
 				print "</td>";
@@ -443,7 +443,7 @@ if ($disp1 == "block") {
 					print "<a href=\"media.php?action=delete&amp;file=".urlencode(MediaFS::NormalizeLink($filename))."&amp;directory=".$directory."&amp;thumbs=".$thumbs."&amp;filter=".$filter."\" onclick=\"return confirm('".$gm_lang["del_mm_file1"];
 					if (isset($file["objects"])) print $gm_lang["del_mm_file2"];
 					print "');\">";
-					print "<img src=\"".$GM_IMAGE_DIR."/".$GM_IMAGES["delete"]["other"]."\" border=\"0\" alt=\"".$gm_lang["delete_file"]."\" style=\"vertical-align:middle;\"/></a>";
+					print "<img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["delete"]["other"]."\" border=\"0\" alt=\"".$gm_lang["delete_file"]."\" style=\"vertical-align:middle;\"/></a>";
 				}
 				else print "&nbsp;";
 				print "</td>";
@@ -461,7 +461,7 @@ if ($disp1 == "block") {
 					print "\" target=\"_blank\">";
 				}
 				else print "<a href=\"downloadbackup.php?fname=".urlencode($filename)."\" target=\"_blank\">";
-				print "<img src=\"".$GM_IMAGE_DIR."/".$GM_IMAGES["download"]["other"]."\" border=\"0\" alt=\"".$gm_lang["download_now"]."\" style=\"vertical-align:middle;\"/>";
+				print "<img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["download"]["other"]."\" border=\"0\" alt=\"".$gm_lang["download_now"]."\" style=\"vertical-align:middle;\"/>";
 				print "</a></td>";
 				
 				// Details
@@ -479,7 +479,7 @@ if ($disp1 == "block") {
 					print "</span>";
 					print "</div>";
 				
-					print "<img src=\"".$GM_IMAGE_DIR."/".$GM_IMAGES["search"]["small"]."\" height=\"15\" width=\"15\" border=\"0\" alt=\"".$gm_lang["click_details"]."\" style=\"vertical-align:middle;\" onclick=\"showbox(this, '".$filename."D"."', 'relatives'); return false;\" onmouseout=\"moveout('".$filename."D"."');return false;\" />";
+					print "<img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["search"]["small"]."\" height=\"15\" width=\"15\" border=\"0\" alt=\"".$gm_lang["click_details"]."\" style=\"vertical-align:middle;\" onclick=\"showbox(this, '".$filename."D"."', 'relatives'); return false;\" onmouseout=\"moveout('".$filename."D"."');return false;\" />";
 				print "</td>";
 				
 				$i++;
@@ -566,8 +566,8 @@ if ($disp2 == "block") {
 					// Box for user to choose to upload thumb from local computer
 //					print "<input type=\"file\" name=\"thumbnail\" size=\"30\" />&nbsp;&nbsp;&nbsp;".$gm_lang["upl_thumb"]."<br /><br />";
 					// Box for user to choose the folder to store the image
-					$dirlist = MediaFS::GetMediaDirList($MEDIA_DIRECTORY, true, 1, true, false, $MEDIA_IN_DB);
-//					if (!in_array($MEDIA_DIRECTORY, $dirlist)) $dirlist[] = $MEDIA_DIRECTORY;
+					$dirlist = MediaFS::GetMediaDirList(GedcomConfig::$MEDIA_DIRECTORY, true, 1, true, false, $MEDIA_IN_DB);
+//					if (!in_array(GedcomConfig::$MEDIA_DIRECTORY, $dirlist)) $dirlist[] = GedcomConfig::$MEDIA_DIRECTORY;
 					sort($dirlist);
 					print "<select name=\"folder\">";
 					foreach($dirlist as $key => $dir) {
@@ -608,5 +608,5 @@ if ($disp2 == "block") {
 	print "</div>";
 }
 print "</form>";
-print_footer();
+PrintFooter();
 ?>

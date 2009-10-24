@@ -51,7 +51,7 @@ else$protectActive = false;
 $d_LangName = "lang_name_" . $ln;
 $sentHeader = false;    // Indicates whether HTML headers have been sent
 if ($action !="save" and $action != "toggleActive") {
-	print_simple_header($gm_lang["config_lang_utility"]);
+	PrintSimpleHeader($gm_lang["config_lang_utility"]);
 	$sentHeader = true;
 	print "<div id=\"content_editlang\">";
 }
@@ -475,7 +475,7 @@ if ($action == "save") {
 	
 	if ($error != "") {
 		if (!$sentHeader) {
-			print_simple_header($gm_lang["config_lang_utility"]);
+			PrintSimpleHeader($gm_lang["config_lang_utility"]);
 			$sentHeader = true;
 			print "<div class=\"center\"><center>";
 		}
@@ -494,7 +494,7 @@ if ($action == "save") {
 }
 if ($sentHeader) {
 	print "</div>";
-	print_simple_footer();
+	PrintSimpleFooter();
 }
 else if ($action == "toggleActive") {
 	header("Location: changelanguage.php");

@@ -30,7 +30,7 @@
 */
 require("config.php");
 
-print_header($gm_lang["unlink_list"]);
+PrintHeader($gm_lang["unlink_list"]);
 print "<div class=\"center\"><h3>".$gm_lang["unlink_list"]."</h3></div>\n";
 
 $indis = GetUnlinked();
@@ -43,6 +43,6 @@ if (count($indis) == 0) {
 }
 else PrintPersonList($indis);
 print "</div>";
-print_footer();
+PrintFooter();
 
 ?>

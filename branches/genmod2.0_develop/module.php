@@ -81,7 +81,7 @@ switch ($modinfo['Module']['type']) {
 
 function mod_print_header($title, $head='', $use_alternate_styles=true) {
 	ob_start();
-	print_header($title, $head, $use_alternate_styles);
+	PrintHeader($title, $head, $use_alternate_styles);
 	$out = ob_get_contents();
 	ob_end_clean();
 	return $out;
@@ -89,7 +89,7 @@ function mod_print_header($title, $head='', $use_alternate_styles=true) {
 
 function mod_print_simple_header($title) {
 	ob_start();
-	print_simple_header($title);
+	PrintSimpleHeader($title);
 	$out = ob_get_contents();
 	ob_end_clean();
 	return $out;
@@ -97,7 +97,7 @@ function mod_print_simple_header($title) {
 
 function mod_print_footer() {
 	ob_start();
-	print_footer();
+	PrintFooter();
 	$out = ob_get_contents();
 	ob_end_clean();
 	return $out;
@@ -105,7 +105,7 @@ function mod_print_footer() {
 
 function mod_print_simple_footer() {
 	ob_start();
-	print_simple_footer();
+	PrintSimpleFooter();
 	$out = ob_get_contents();
 	ob_end_clean();
 	return $out;

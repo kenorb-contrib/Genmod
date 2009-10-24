@@ -286,7 +286,7 @@ class ActionItem {
 				$submenu["hoverclass"] = "submenuitem_hover";
 				$menu["items"][] = $submenu;
 				print "<div style=\"width:25px;\" class=\"center\" id=\"menu_".$this->id."\">";
-				print_menu($menu);
+				PrintFactMenu($menu);
 				print "</div>";
 			}
 			print "</td>";

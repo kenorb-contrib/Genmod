@@ -65,6 +65,8 @@ class Family extends GedcomRecord {
 	private $marr_date = null;				// Marriage date (after showfact, showfactdetails and factviewrestricted)
 	private $marr_type = null;				// Marriage type (after showfact, showfactdetails and factviewrestricted)
 	private $marr_plac = null;				// Marriage place (after showfact, showfactdetails and factviewrestricted)
+	private $div_fact = null;				// Fact object of divorce record (after showfact, showfactdetails and factviewrestricted)
+	private $div_date = null;				// Divorce date (after showfact, showfactdetails and factviewrestricted)
 	
 	// Relations from the FAMC link
 	public $showprimary = null;				// Show this family as primary from the childs perspective (set in person class)
@@ -165,6 +167,12 @@ class Family extends GedcomRecord {
 			case "marr_plac":
 				return $this->getMarriagePlace();
 				break;
+			case "div_fact":
+				return $this->getDivorceFact();
+				break;
+			case "div_date":
+				return $this->getDivorceDate();
+				break;
 			case "media_count":
 				return $this->GetNumberOfMedia();
 				break;
@@ -249,7 +257,6 @@ class Family extends GedcomRecord {
 	}
 	
 	private function GetFamilyAddDescriptor() {
-		global $DISPLAY_PINYIN, $LANGUAGE;
 		
 		if (is_null($this->sortable_addname)) {
 			$this->sortable_addname = NameFunctions::GetFamilyAddDescriptor($this, false);
@@ -261,6 +268,8 @@ class Family extends GedcomRecord {
 		
 		if (is_null($this->title)) {
 			$this->title = NameFunctions::GetFamilyDescriptor($this, true);
+//			$add = NameFunctions::GetFamilyAddDescriptor($this, true);
+//			if ($add != "") $this->title .= "<br />".$add;
 		}
 		return $this->title;
 	}
@@ -268,7 +277,7 @@ class Family extends GedcomRecord {
 	private function GetAddTitle() {
 		
 		if (is_null($this->adddescriptor)) {
-			$this->title = NameFunctions::GetFamilyAddDescriptor($this, true);
+			$this->adddescriptor = NameFunctions::GetFamilyAddDescriptor($this, true);
 		}
 		return $this->adddescriptor;
 	}
@@ -458,7 +467,33 @@ class Family extends GedcomRecord {
 		if(is_null($this->children_count)) $this->GetChildren();
 		return $this->children_count;
 	}
-	  
+
+	private function GetDivorceFact() {
+		
+		if (is_null($this->div_fact)) {
+			$this->GetDivorceDate();
+		}
+		return $this->div_fact;
+	}
+	
+	private function GetDivorceDate() {
+	
+		if (is_null($this->div_date)) {	
+			if ($this->show_changes && $this->ThisChanged()) $gedrec = $this->GetChangedGedRec();
+			else $gedrec = $this->gedrec;
+
+			$subrecord = GetSubRecord(1, "1 DIV", $this->gedrec);
+			if (!empty($subrecord) && PrivacyFunctions::showFact("DIV", $this->xref, "FAM") && !PrivacyFunctions::FactViewRestricted($this->xref, $subrecord, 2)) {
+				$this->div_fact = new Fact($this->xref, "DIV", $subrecord);
+				$this->div_date = $this->div_fact->simpledate;
+			}
+			else {
+				$this->div_date = "";
+			}
+		}
+		return $this->div_date;
+	}
+		  
 	/**
 	 * parse marriage record
 	 */

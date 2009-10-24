@@ -40,7 +40,7 @@ if (isset($surname)) {
 	$addheader = "(".CheckNN($surname).")";
 }
 
-print_header($gm_lang["individual_list"]." ".$addheader);
+PrintHeader($gm_lang["individual_list"]." ".$addheader);
 print "<div class =\"center\">";
 print "\n\t<h3>";
 print_help_link("name_list_help", "qm", "name_list");
@@ -105,7 +105,7 @@ if (count($indialpha) > 0) {
 		*/
 		$pass = FALSE;
 	}
-	if ($LISTS_ALL) {
+	if (GedcomConfig::$LISTS_ALL) {
 		print " | \n";
 		if ($indilist_controller->show_all == "yes") {
 			print "<a href=\"indilist.php?show_all=yes&amp;surname_sublist=".$indilist_controller->surname_sublist;
@@ -221,5 +221,5 @@ if ($indilist_controller->alpha != "@") {
 	}
 }
 print "</div>\n";
-print_footer();
+PrintFooter();
 ?>

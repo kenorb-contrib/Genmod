@@ -44,16 +44,16 @@ if (!isset($action)) $action = "backup";
 if (!isset($step)) $step = "1";
 
 if ($action == "backup") {
-	if ($MEDIA_IN_DB && (2 * MediaFS::GetTotalMediaSize() >= disk_free_space(INDEX_DIRECTORY) || !MediaFS::DirIsWritable($MEDIA_DIRECTORY, false))) $nomedia = true;
+	if ($MEDIA_IN_DB && (2 * MediaFS::GetTotalMediaSize() >= disk_free_space(INDEX_DIRECTORY) || !MediaFS::DirIsWritable(GedcomConfig::$MEDIA_DIRECTORY, false))) $nomedia = true;
 	else $nomedia = false;
 }
 
 switch ($action) {
 	case "backup" :
-		print_header($gm_lang["um_backup"]);
+		PrintHeader($gm_lang["um_backup"]);
 		break;
 	case "restore" :
-		print_header($gm_lang["um_restore"]);
+		PrintHeader($gm_lang["um_restore"]);
 		break;
 }
 ?>
@@ -140,14 +140,14 @@ switch ($action) {
 				
 				$flist = GetMediaFiles();
 				foreach ($flist as $key => $mfile) {
-					MediaFS::CreateFile(RelativePathFile($MEDIA_DIRECTORY.MediaFS::CheckMediaDepth($mfile)));
+					MediaFS::CreateFile(RelativePathFile(GedcomConfig::$MEDIA_DIRECTORY.MediaFS::CheckMediaDepth($mfile)));
 				}
 				print "<div class=\"shade2\"><br />".$gm_lang["um_mediaexp"]."<br /></div>";
 				print "<div class=\"admin_item_box center\">";
 				print "<input type=\"submit\" name=\"submit\" value=\"".$gm_lang["um_proceed_bu"]."\" />";
 				print "</div>";
 				print "</form>";
-				print_footer();
+				PrintFooter();
 				exit;
 			}
 			else $step = 3;
@@ -203,7 +203,7 @@ switch ($action) {
 				if (isset($_POST["um_media"])) {
 					$mlist = GetMediaFiles($GEDCOMID);
 					foreach ($mlist as $key => $mfile) {
-						$file = RelativePathFile($MEDIA_DIRECTORY.MediaFS::CheckMediaDepth($mfile));
+						$file = RelativePathFile(GedcomConfig::$MEDIA_DIRECTORY.MediaFS::CheckMediaDepth($mfile));
 						if (file_exists($file)) $flist[] = $file;
 					}
 				}
@@ -456,7 +456,7 @@ switch ($action) {
 			<?php
 		}
 	}
-	@set_time_limit($TIME_LIMIT);
+	@set_time_limit(GedcomConfig::$TIME_LIMIT);
 	?>
 </div>
 <?php
@@ -476,5 +476,5 @@ function GetMediaFiles($gedid="") {
 	}
 	return array_flip(array_flip($mlist));
 }
-print_footer();
+PrintFooter();
 ?>

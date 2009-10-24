@@ -34,10 +34,9 @@ abstract class MenuBar {
 	 * @return Text         the sub-menu text
 	 */
 	private function GetSubmenuText($textIn, $selected=false) {
-		global $GM_IMAGE_DIR;
 		
-		$checkImage = $GM_IMAGE_DIR."/checked.gif";
-		$noImage = $GM_IMAGE_DIR."/pix1.gif";
+		$checkImage = GM_IMAGE_DIR."/checked.gif";
+		$noImage = GM_IMAGE_DIR."/pix1.gif";
 		$displayImage = (file_exists($checkImage) && file_exists($noImage));
 		//$displayImage=false;
 		if ($selected==true) {
@@ -191,14 +190,14 @@ abstract class MenuBar {
 	
 	public function GetViewMenu() {
 		global $gm_lang, $SCRIPT_NAME, $gm_language, $language_settings;
-		global $LANGUAGE, $ENABLE_MULTI_LANGUAGE;
-		global $ALLOW_THEME_DROPDOWN, $ALLOW_USER_THEMES, $gm_user, $THEME_DIR;
+		global $LANGUAGE;
+		global $ALLOW_USER_THEMES, $gm_user;
 		
 		//-- main edit menu item
 		$menu = new Menu($gm_lang["menu_view"]);
 		
 		// Language selector
-		if ($ENABLE_MULTI_LANGUAGE) {
+		if (GedcomConfig::$ENABLE_MULTI_LANGUAGE) {
 			// Change language
 			$submenu = new Menu($gm_lang["inc_languages"]);
 			$menu->addSubmenu($submenu);
@@ -214,7 +213,7 @@ abstract class MenuBar {
 		}
 
 		// Theme selector
-		if ($ALLOW_THEME_DROPDOWN && $ALLOW_USER_THEMES) {
+		if (GedcomConfig::$ALLOW_THEME_DROPDOWN && $ALLOW_USER_THEMES) {
 			// Change theme
 			$submenu = new Menu($gm_lang["inc_themes"]);
 			$menu->addSubmenu($submenu);
@@ -234,7 +233,7 @@ abstract class MenuBar {
 			// NOTE: add themes
 			$themes = GetThemeNames();
 			foreach ($themes as $indexval => $themedir) {
-				$submenu = new Menu(self::GetSubmenuText($themedir["name"], (($themedir["dir"] == $gm_user->theme)||(empty($gm_user->theme)&&($themedir["dir"]==$THEME_DIR)))), false);
+				$submenu = new Menu(self::GetSubmenuText($themedir["name"], (($themedir["dir"] == $gm_user->theme)||(empty($gm_user->theme)&&($themedir["dir"] == GedcomConfig::$THEME_DIR)))), false);
 //LERMAN - for some reason "...&amp;mytheme=..." does not work for Firefox 1.5.0.4 on Linux, but does work on IE. Changing it to "...&mytheme=..." works in both places
 				$submenu->addLink("themechange.php?frompage=".urlencode($frompage)."&mytheme=".$themedir["dir"]);
 				$menu->submenus[count($menu->submenus)-1]->submenus[]=$submenu;
@@ -264,7 +263,7 @@ abstract class MenuBar {
 	}
 	
 	public function GetFavoritesMenu() {
-		global $gm_lang, $gm_user, $REQUIRE_AUTHENTICATION;
+		global $gm_lang, $gm_user;
 		global $GEDCOMID;
 		
 		// NOTE: Favorites
@@ -276,7 +275,7 @@ abstract class MenuBar {
 			$userfavs = FavoritesController::getUserFavorites($gm_user->username);
 		}
 		else {
-			if ($REQUIRE_AUTHENTICATION) return false;
+			if (GedcomConfig::$REQUIRE_AUTHENTICATION) return false;
 			$userfavs = array();
 		}
 		
@@ -541,7 +540,7 @@ abstract class MenuBar {
 	 */
 	public function GetHelperMenu() {
 		global $gm_lang, $spider;
-		global $SHOW_CONTEXT_HELP, $SCRIPT_NAME, $QUERY_STRING, $helpindex, $action;
+		global $SCRIPT_NAME, $QUERY_STRING, $helpindex, $action;
 		
 		//-- main help menu item
 		$menu = new Menu($gm_lang["help_page"]);
@@ -571,7 +570,7 @@ abstract class MenuBar {
 		
 		//-- add contact links to help menu
 		$menu->addSeperator();
-		$menuitems = print_contact_links(1);
+		$menuitems = PrintContactLinks(1);
 		foreach($menuitems as $menuitem) {
 			$submenu = new Menu($menuitem["label"]);
 			$submenu->addLink($menuitem["link"]);

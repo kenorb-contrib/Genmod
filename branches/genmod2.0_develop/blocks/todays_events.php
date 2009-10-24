@@ -36,7 +36,7 @@ $GM_BLOCKS["print_todays_events"]["rss"]		= true;
 //-- this block prints a list of today's upcoming events of living people in your gedcom
 function print_todays_events($block=true, $config="", $side, $index) {
 	global $gm_lang, $command, $TEXT_DIRECTION;
-	global $GM_IMAGE_DIR, $GM_IMAGES, $GM_BLOCKS;
+	global $GM_IMAGES, $GM_BLOCKS;
 	global $NAME_REVERSE, $GEDCOMID;
 	global $gm_user;
 
@@ -63,7 +63,7 @@ function print_todays_events($block=true, $config="", $side, $index) {
 			if ($command=="gedcom") $name = preg_replace("/'/", "\'", get_gedcom_from_id($GEDCOMID));
 			else $name = $gm_user->username;
 			print "<a href=\"javascript: ".$gm_lang["config_block"]."\" onclick=\"window.open('index_edit.php?name=$name&amp;command=$command&amp;action=configure&amp;side=$side&amp;index=$index', '', 'top=50,left=50,width=500,height=250,scrollbars=1,resizable=1'); return false;\">";
-			print "<img class=\"adminicon\" src=\"$GM_IMAGE_DIR/".$GM_IMAGES["admin"]["small"]."\" width=\"15\" height=\"15\" border=\"0\" alt=\"".$gm_lang["config_block"]."\" /></a>\n";
+			print "<img class=\"adminicon\" src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["admin"]["small"]."\" width=\"15\" height=\"15\" border=\"0\" alt=\"".$gm_lang["config_block"]."\" /></a>\n";
 		}
 	}
 	print $gm_lang["on_this_day"];
@@ -106,7 +106,7 @@ function print_todays_events($block=true, $config="", $side, $index) {
 						if ($NAME_REVERSE) $name = str_replace(",", "", $factarr[4]);
 						else $name = $factarr[4];
 						print "<a href=\"individual.php?pid=$gid&amp;gedid=".$GEDCOMID."\"><b>".$name."</b>";
-						print "<img id=\"box-".$gid."-".$key."-sex\" src=\"".$GM_IMAGE_DIR."/";
+						print "<img id=\"box-".$gid."-".$key."-sex\" src=\"".GM_IMAGE_DIR."/";
 						if ($factarr[5] == "M") print $GM_IMAGES["sex"]["small"]."\" title=\"".$gm_lang["male"]."\" alt=\"".$gm_lang["male"];
 						else if ($factarr[5] == "F") print $GM_IMAGES["sexf"]["small"]."\" title=\"".$gm_lang["female"]."\" alt=\"".$gm_lang["female"];
 						else print $GM_IMAGES["sexn"]["small"]."\" title=\"".$gm_lang["unknown"]."\" alt=\"".$gm_lang["unknown"];

@@ -38,7 +38,7 @@ if (!isset($help)) $help = "";
  * Inclusion of the help text variables
 */
 require ("helptext_vars.php");
-print_simple_header($gm_lang["help_header"]);
+PrintSimpleHeader($gm_lang["help_header"]);
 print "<a name=\"top\"></a><span class=\"helpheader\">".$gm_lang["help_header"]."</span><br /><br />\n<div class=\"left\">\n";
 $actione = "";
 
@@ -75,5 +75,5 @@ print "<a href=\"#top\" title=\"".$gm_lang["move_up"]."\">$UpArrow</a><br />";
 print "<a href=\"help_text.php?help=help_contents_help\"><b>".$gm_lang["help_contents"]."</b></a><br />";
 print "<a href=\"#\" onclick=\"window.close();\"><b>".$gm_lang["close_window"]."</b></a>";
 print "</div>";
-print_simple_footer();
+PrintSimpleFooter();
 ?>

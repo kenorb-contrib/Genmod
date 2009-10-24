@@ -51,7 +51,7 @@ if (!isset($lang_filename_orig)) $lang_filename_orig = "";
 if (!isset($anchor)) $anchor = "";
 if (!isset($realtime)) $realtime = false;
 
-print_simple_header($gm_lang["editlang"]);
+PrintSimpleHeader($gm_lang["editlang"]);
 
 print "<script language=\"JavaScript\" type=\"text/javascript\">";
 print "<!--\nself.focus();\n//-->";
@@ -200,6 +200,6 @@ if ($action == "save") {
 	print "</center></div>";
 }
 
-print_simple_footer();
+PrintSimpleFooter();
 
 ?>

@@ -109,7 +109,7 @@ switch($action) {
 			if ($family->isempty) {
 				print "<span class=\"error\">".$gm_lang["fam_id_no_exists"]."</span>";
 			}
-			else if ($family->disp) print $family->title.$family->addxref;
+			else if ($family->disp) print $family->descriptor.$family->addxref;
 			else print "";
 		}
 	break;
