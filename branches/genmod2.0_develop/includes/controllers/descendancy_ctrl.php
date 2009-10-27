@@ -51,14 +51,6 @@ class DescendancyController extends ChartController {
 			$this->num_generations = 2;
 		}
 		
-		if (!isset($_REQUEST["box_width"]) || $_REQUEST["box_width"] == "") $this->box_width = "100";
-		else $this->box_width = $_REQUEST["box_width"];
-		$this->box_width = max($this->box_width, 50);
-		$this->box_width = min($this->box_width, 300);
-		
-		global $box_width;
-		$box_width = $this->box_width;
-		
 		if (isset($_REQUEST["rootid"])) $this->xref = $_REQUEST["rootid"];
 		$this->xref = ChartFunctions::CheckRootId(CleanInput($this->xref));
 	}
