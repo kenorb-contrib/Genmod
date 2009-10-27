@@ -15,7 +15,6 @@
 //-- do not allow direct access to this file
 if (stristr($_SERVER["SCRIPT_NAME"],basename(__FILE__))) {
 	require "../intrusion.php";
-}
 } 
  
 /**

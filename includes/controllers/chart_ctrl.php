@@ -74,6 +74,13 @@ class ChartController extends BaseController {
 		global $show_cousins;
 		$show_cousins = $this->show_cousins;
 
+		if (!isset($_REQUEST["box_width"]) || $_REQUEST["box_width"] == "") $this->box_width = "100";
+		else $this->box_width = $_REQUEST["box_width"];
+		$this->box_width = max($this->box_width, 50);
+		$this->box_width = min($this->box_width, 300);
+		
+		global $box_width;
+		$box_width = $this->box_width;
 	}
 
 	public function __get($property) {

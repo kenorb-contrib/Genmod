@@ -50,14 +50,6 @@ class AncestryController extends ChartController {
 			$this->num_generations = 2;
 			$this->min_generation = true;
 		}
-		
-		if (!isset($_REQUEST["box_width"]) || $_REQUEST["box_width"] == "") $this->box_width = "100";
-		else $this->box_width = $_REQUEST["box_width"];
-		$this->box_width = max($this->box_width, 50);
-		$this->box_width = min($this->box_width, 300);
-		
-		global $box_width;
-		$box_width = $this->box_width;
 	}
 
 	public function __get($property) {

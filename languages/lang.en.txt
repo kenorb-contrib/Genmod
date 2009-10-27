@@ -2581,3 +2581,4 @@
 "associate_with";"Associate with"
 "embedvar_not_found";"<b>embedded variable not found</b>"
 "embedvar_not_allowed";"<b>embedded variable not allowed</b>"
+"descent_steps";"Descent steps"

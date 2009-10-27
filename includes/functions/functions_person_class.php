@@ -42,7 +42,7 @@ abstract class PersonFunctions {
 	 * @param string $view	number of generations as parameter for links to various charts
 	 * @param string $chart_style	style of chart as parameter for links to various charts
 	 */
-	public function PrintPedigreePerson(&$person, $style=1, $show_famlink=true, $count=0, $personcount="1", $view="", $num_gens=0, $chart_style=1) {
+	public function PrintPedigreePerson($person, $style=1, $show_famlink=true, $count=0, $personcount="1", $view="", $num_gens=0, $chart_style=1) {
 		// Global settings
 		global $SCRIPT_NAME, $GEDCOMID;
 		global $TEXT_DIRECTION;
