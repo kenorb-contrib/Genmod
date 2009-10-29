@@ -36,13 +36,13 @@ if (empty($action)) $action="";
 
 //-- make sure that they have gedcom admin status before they can use this page
 //-- otherwise have them login again
-if (!$Users->userIsAdmin($gm_username)) {
-	if (empty($LOGIN_URL)) header("Location: login.php?url=config_maint.php");
-	else header("Location: ".$LOGIN_URL."?url=config_maint.php");
+if (!$gm_user->userIsAdmin()) {
+	if (LOGIN_URL == "") header("Location: login.php?url=config_maint.php");
+	else header("Location: ".LOGIN_URL."?url=config_maint.php");
 	exit;
 }
 
-print_header($gm_lang["config_maint"]);
+PrintHeader($gm_lang["config_maint"]);
 
 ?>
 <!-- Setup the left box -->
@@ -54,14 +54,13 @@ print_header($gm_lang["config_maint"]);
 <div id="content">
 	<?php
 	if ($action == "update" && isset($delconf)) {
-		if (FileIsWriteable("config.php")) {
-			foreach ($delconf as $key => $value) {
-				print "deleting".$value;
-				unset ($CONFIG_PARMS[trim($value)]);
+		foreach ($delconf as $key => $value) {
+			if (!$SystemConfig->DeleteConfig($value)) {
+				$message = "<span class=\"error\">".$gm_lang["gm_config_write_error"]."</span>";
+				break;
 			}
-			StoreConfig();
+			else unset($CONFIG_PARMS[$value]);
 		}
-		else $message = "<span class=\"error\">".$gm_lang["gm_config_write_error"]."</span>";
 	}
 	?>
 	<form method="post" name="configform" action="config_maint.php">
@@ -84,19 +83,21 @@ print_header($gm_lang["config_maint"]);
 		</div>
 		<?php
 			foreach ($CONFIG_PARMS as $site => $parms) {
+				if (isset($parms["SITE_ALIAS"])) $aliases = explode(",", $parms["SITE_ALIAS"]);
+				else $aliases = array();
 				?>
 				<div class="admin_item_box">
-				<div class="width10 choice_left"><input type="checkbox" name="delconf[]" value="<?php print $site."\"";
-				if ($site == $SERVER_URL) print " disabled=\"disabled\"";
-				?>/>
+				<div class="width10 choice_left"><input type="checkbox" name="delconf[]" value="
+				<?php 
+					print $site."\"";
+					if ($site == SERVER_URL || in_array(SERVER_URL, $aliases)) print " disabled=\"disabled\""; 
+				?>
+				/>
 				</div>
 				<div class="width30 choice_right"><?php print $site; ?></div>
 				<div class="width30 choice_right"><?php 
-				if (isset($parms["SITE_ALIAS"])) {
-					$aliases = explode(",", $parms["SITE_ALIAS"]);
-					foreach ($aliases as $key => $alias) {
-						print $alias."<br />";
-					}
+				foreach ($aliases as $key => $alias) {
+					print $alias."<br />";
 				}
 				?></div>
 				</div>
@@ -108,5 +109,5 @@ print_header($gm_lang["config_maint"]);
 	</form>
 </div>
 <?php
-print_footer();
+PrintFooter();
 ?>
