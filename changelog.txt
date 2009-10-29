@@ -8,6 +8,7 @@
 	# $Id: changelog.txt,v 1.510 2009/05/29 07:43:05 sjouke Exp $
 =====================================================================
 Version 1.7-patch
+- Fixed config maint allows deletion of current site config (sjouke)
 - Fixed error in general search, notes (sjouke)
 - Fixed marriages don't display in hourglass and family book (sjouke)
 - Fixed double privacy checking for link privacy, minor impact (sjouke)
