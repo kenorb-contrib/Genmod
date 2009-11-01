@@ -656,7 +656,7 @@ abstract class PersonFunctions {
 		   	print "<tr>\n";
 		   	ChartFunctions::PrintSosaNumber($sosa, $childid);
 		   	print "<td style=\"vertical-align:middle;\">";
-		   	$child = Person::GetInstance($childid);
+		   	$child =& Person::GetInstance($childid);
 		   	PersonFunctions::PrintPedigreePerson($child, 1, $show_famlink, 0);
 		   	print "</td></tr>\n";
 	   	}

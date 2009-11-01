@@ -228,15 +228,25 @@ class Family extends GedcomRecord {
 			$gedrec = $this->gedrec;
 			$num = preg_match_all("/1\s*CHIL\s*@(.*)@/", $gedrec, $smatch, PREG_SET_ORDER);
 			if (is_null($this->children_count)) $this->children_count = $num;
+			$children = array();
+			$notobj = 0;
 			for($i=0; $i<$num; $i++) {
 				//-- get the childs ids
 				$chil = trim($smatch[$i][1]);
-				if (!isset($this->children[$chil])) {
-					$this->children[$chil] =& Person::GetInstance($chil);
-					if ($changed) $this->child_status[$chil] = "deleted";
-					else $this->child_status[$chil] = "";
+				$children[] = $chil;
+				if (!person::IsInstance($chil)) $notobj++;
+			}
+			// If more than one kids don't have an object yet, get them all in one.
+			if ($notobj > 1) {
+				ListFunctions::GetIndiList(false, "'".implode("[".$this->gedcomid."]','", $children)."[".$this->gedcomid."]'", false);
+			}
+			foreach ($children as $key => $child) {	
+				if (!isset($this->children[$child])) {
+					$this->children[$child] =& Person::GetInstance($child);
+					if ($changed) $this->child_status[$child] = "deleted";
+					else $this->child_status[$child] = "";
 				}
-				else $this->child_status[$chil] = "";
+				else $this->child_status[$child] = "";
 			}
 		}
 		return $this->children;

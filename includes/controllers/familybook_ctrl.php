@@ -291,7 +291,7 @@ class FamilyBookController extends ChartController {
 						if($person->xref != $sfamily->husb_id) $spouse = $sfamily->husb;
 						else $spouse = $sfamily->wife;
 						if (is_object($spouse)) {
-							print "\n\t\t\t\t<a href=\"familybook.php?rootid=".$spouse->xref."&amp;show_spouse=".$this->show_spouse."&amp;show_details=".$this->show_details."&amp;num_generations=".$this->num_generations."&amp;box_width=".$this->box_width."\"><span ";
+							print "\n\t\t\t\t<a href=\"familybook.php?rootid=".$spouse->xref."&amp;show_spouse=".$this->show_spouse."&amp;show_details=".$this->show_details."&amp;num_generations=".$this->num_generations."&amp;box_width=".$this->box_width."&amp;num_descent=".$this->num_descent."\"><span ";
 							if ($spouse->disp_name) {
 								if (hasRTLText($spouse->name))
 								     print "class=\"name2\">";
@@ -302,7 +302,7 @@ class FamilyBookController extends ChartController {
 							print "<br /></span></a>";
 						}
 						foreach($sfamily->children as $ckey => $child) {
-							print "\n\t\t\t\t&nbsp;&nbsp;<a href=\"familybook.php?rootid=".$child->xref."&amp;show_spouse=".$this->show_spouse."&amp;show_details=".$this->show_details."&amp;num_generations=".$this->num_generations."&amp;box_width=".$this->box_width."\"><span ";
+							print "\n\t\t\t\t&nbsp;&nbsp;<a href=\"familybook.php?rootid=".$child->xref."&amp;show_spouse=".$this->show_spouse."&amp;show_details=".$this->show_details."&amp;num_generations=".$this->num_generations."&amp;box_width=".$this->box_width."&amp;num_descent=".$this->num_descent."\"><span ";
 							if ($child->disp_name) {
 								if (hasRTLText($child->name))
 								     print "class=\"name2\">&lt; ";
@@ -318,7 +318,7 @@ class FamilyBookController extends ChartController {
 						if($cfamily->husb_id != "" || $cfamily->wife_id != "") {
 							print "<span class=\"name1\"><br />".$gm_lang["parents"]."<br /></span>";
 							if ($cfamily->husb_id != "") {
-								print "\n\t\t\t\t&nbsp;&nbsp;<a href=\"familybook.php?rootid=".$cfamily->husb_id."&amp;show_spouse=".$this->show_spouse."&amp;show_details=".$this->show_details."&amp;num_generations=".$this->num_generations."&amp;box_width=".$this->box_width."\"><span ";
+								print "\n\t\t\t\t&nbsp;&nbsp;<a href=\"familybook.php?rootid=".$cfamily->husb_id."&amp;show_spouse=".$this->show_spouse."&amp;show_details=".$this->show_details."&amp;num_generations=".$this->num_generations."&amp;box_width=".$this->box_width."&amp;num_descent=".$this->num_descent."\"><span ";
 								if ($cfamily->husb->disp_name) {
 									if (hasRTLText($cfamily->husb->name))
 									     print "class=\"name2\">";
@@ -329,7 +329,7 @@ class FamilyBookController extends ChartController {
 								print "<br /></span></a>";
 							}
 							if ($cfamily->wife_id != "") {
-								print "\n\t\t\t\t&nbsp;&nbsp;<a href=\"familybook.php?rootid=".$cfamily->wife_id."&amp;show_spouse=".$this->show_spouse."&amp;show_details=".$this->show_details."&amp;num_generations=".$this->num_generations."&amp;box_width=".$this->box_width."\"><span ";
+								print "\n\t\t\t\t&nbsp;&nbsp;<a href=\"familybook.php?rootid=".$cfamily->wife_id."&amp;show_spouse=".$this->show_spouse."&amp;show_details=".$this->show_details."&amp;num_generations=".$this->num_generations."&amp;box_width=".$this->box_width."&amp;num_descent=".$this->num_descent."\"><span ";
 								if ($cfamily->wife->disp_name) {
 									if (hasRTLText($cfamily->wife->name))
 									     print "class=\"name2\">";
@@ -344,7 +344,7 @@ class FamilyBookController extends ChartController {
 							print "<span class=\"name1\"><br />".$gm_lang["siblings"]."<br /></span>";
 							foreach($cfamily->children as $key2 => $child) {
 								if ($child->xref != $person->xref) {
-									print "\n\t\t\t\t&nbsp;&nbsp;<a href=\"familybook.php?rootid=".$child->xref."&amp;show_spouse=".$this->show_spouse."&amp;show_details=".$this->show_details."&amp;num_generations=".$this->num_generations."&amp;box_width=".$this->box_width."\"><span ";
+									print "\n\t\t\t\t&nbsp;&nbsp;<a href=\"familybook.php?rootid=".$child->xref."&amp;show_spouse=".$this->show_spouse."&amp;show_details=".$this->show_details."&amp;num_generations=".$this->num_generations."&amp;box_width=".$this->box_width."&amp;num_descent=".$this->num_descent."\"><span ";
 									if ($child->disp_name) {
 										if (hasRTLText($child->name))
 										print "class=\"name2\"> ";

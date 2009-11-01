@@ -138,21 +138,25 @@ class ChartController extends BaseController {
 		print "</td></tr>";
 	}
 	
-	public function PrintInputBoxWidth() {
+	public function PrintInputBoxWidth($tr=true) {
 		global $gm_lang;
 		
-		print "<tr><td class=\"shade2\">";
+		if ($tr) print "<tr>";
+		print "<td class=\"shade2\">";
 		print_help_link("box_width_help", "qm");
 		print $gm_lang["box_width"] . "&nbsp;</td>";
 		print "<td class=\"shade1 vmiddle\"><input type=\"text\" size=\"3\" name=\"box_width\" value=\"".$this->box_width."\" /> <b>%</b>";
-		print "</td></tr>";
+		print "</td>";
+		if ($tr) print "</tr>";
 	}
 
-	public function PrintInputHeader() {
+	public function PrintInputHeader($tr=true) {
 		global $gm_lang;
 		
-		print "<tr><td colspan=\"2\" class=\"topbottombar\" style=\"text-align:center; \">";
-		print $gm_lang["options"]."</td></tr>";
+		if ($tr) print "<tr>";
+		print "<td colspan=\"2\" class=\"topbottombar\" style=\"text-align:center; \">";
+		print $gm_lang["options"]."</td>";
+		if ($tr) print "</tr>";
 	}
 	
 	public function PrintInputGenerations($gens, $help) {	
@@ -173,12 +177,14 @@ class ChartController extends BaseController {
 		print "</td></tr>";
 	}
 	
-	public function PrintInputSubmit() {
+	public function PrintInputSubmit($tr=true) {
 		global $gm_lang;
-				
-		print "<tr><td class=\"center\" colspan=\"2\">";
+		
+		if ($tr) print "<tr>";
+		print "<td class=\"center\" colspan=\"2\">";
 		print "\n\t\t<input type=\"submit\" value=\"".$gm_lang["view"]."\" />";
-		print "</td></tr>";
+		print "</td>";
+		if ($tr) print "</tr>";
 	}
 	
 	public function PrintInputShowCousins() {
@@ -218,10 +224,11 @@ class ChartController extends BaseController {
 		print "</td></tr>";
 	}
 	
-	public function PrintInputShowFull() {
+	public function PrintInputShowFull($tr=true) {
 		global $gm_lang;
 		
-		print "<tr><td class=\"shade2\">";
+		if ($tr) print "<tr>";
+		print "<td class=\"shade2\">";
 		print "<input type=\"hidden\" name=\"show_details\" value=\"".$this->show_details."\" />";
 		print_help_link("show_full_help", "qm");
 		print $gm_lang["show_details"];
@@ -231,7 +238,8 @@ class ChartController extends BaseController {
 		if ($this->show_full) print "1\" checked=\"checked\" onclick=\"document.people.show_details.value='-1';\"";
 		else print "-1\" onclick=\"document.people.show_details.value='1';\"";
 		print " />";
-		print "</td></tr>";
+		print "</td>";
+		if ($tr) print "</tr>";
 	}
 }
 ?>
