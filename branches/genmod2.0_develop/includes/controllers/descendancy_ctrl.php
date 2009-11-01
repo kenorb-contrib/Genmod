@@ -90,7 +90,7 @@ class DescendancyController extends ChartController {
 		if ($depth == $this->num_generations) print "<img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["spacer"]["other"]."\" height=\"2\" width=\"$Dindent\" border=\"0\" alt=\"\" /></td><td style=\"vertical-align:middle;\">\n";
 		else print "<img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["hline"]["other"]."\" height=\"2\" width=\"$Dindent\" border=\"0\" alt=\"\" /></td><td style=\"vertical-align:middle;\">\n";
 		
-		$child = Person::GetInstance($pid);
+		$child =& Person::GetInstance($pid);
 		PersonFunctions::PrintPedigreePerson($child, 1, true, '', $this->view);
 		print "</td>";
 	
@@ -206,7 +206,7 @@ class DescendancyController extends ChartController {
 	public function PrintChildFamily($pid, $depth, $label="1.", $gpid="") {
 	
 		if ($depth<1) return;
-		$person = Person::GetInstance($pid);
+		$person =& Person::GetInstance($pid);
 		
 		foreach($person->spousefamilies as $key => $fam) {
 			ChartFunctions::PrintSosaFamily($fam, "", -1, $label, $pid, $gpid, $this->view);

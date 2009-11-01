@@ -903,102 +903,46 @@ function FindHighlightedObject($pid) {
  * @param bool $ignore_cache enable or disable the relationship cache
  * @param int $path_to_find which path in the relationship to find, 0 is the shortest path, 1 is the next shortest path, etc
  */
-function GetRelationship($pid1, $pid2, $followspouse=true, $maxlength=0, $ignore_cache=false, $path_to_find=0) {
+function GetRelationship(&$pid1, &$pid2, $followspouse=true, $maxlength=0, $ignore_cache=false, $path_to_find=0) {
 	global $start_time, $gm_lang, $NODE_CACHE_LENGTH, $USE_RELATIONSHIP_PRIVACY, $GEDCOMID, $gm_username, $show_changes;
 
-	$pid1 = strtoupper($pid1);
-	$pid2 = strtoupper($pid2);
-	$indirec = FindPersonRecord($pid2);
-	if ($show_changes) {
-		if (GetChangeData(true, $pid2, true)) {
-			$rec = GetChangeData(false, $pid2, true, "gedlines");
-			$indirec = $rec[$GEDCOMID][$pid2];
-		}
-	}
 	//-- check the cache
 	if ($USE_RELATIONSHIP_PRIVACY && !$ignore_cache) {
-		if(isset(PrivacyFunctions::$NODE_CACHE["$pid1-$pid2"])) {
-			if (PrivacyFunctions::$NODE_CACHE["$pid1-$pid2"]=="NOT FOUND") return false;
-			if (($maxlength==0)||(count(PrivacyFunctions::$NODE_CACHE["$pid1-$pid2"]["path"])-1<=$maxlength)) return PrivacyFunctions::$NODE_CACHE["$pid1-$pid2"];
+		if(isset(PrivacyFunctions::$NODE_CACHE[$pid1->xref."-".$pid2->xref])) {
+			if (PrivacyFunctions::$NODE_CACHE[$pid1->xref."-".$pid2->xref] == "NOT FOUND") return false;
+			if ($maxlength==0 || count(PrivacyFunctions::$NODE_CACHE[$pid1->xref."-".$pid2->xref]["path"])-1<=$maxlength) return PrivacyFunctions::$NODE_CACHE[$pid1->xref."-".$pid2->xref];
 			else return false;
 		}
-		//-- check the cache for person 2's children
-		$famids = array();
-		$ct = preg_match_all("/1\sFAMS\s@(.*)@/", $indirec, $match, PREG_SET_ORDER);
-		for($i=0; $i<$ct; $i++) {
-			$famids[$i]=$match[$i][1];
-		}
-		foreach($famids as $indexval => $fam) {
-			$famrec = FindFamilyRecord($fam);
-			$ct = preg_match_all("/1 CHIL @(.*)@/", $famrec, $match, PREG_SET_ORDER);
-			for($i=0; $i<$ct; $i++) {
-				$child = $match[$i][1];
-				if (!empty($child)){
-					if(isset(PrivacyFunctions::$NODE_CACHE["$pid1-$child"])) {
-						if (($maxlength==0)||(count(PrivacyFunctions::$NODE_CACHE["$pid1-$child"]["path"])+1<=$maxlength)) {
-							$node1 = PrivacyFunctions::$NODE_CACHE["$pid1-$child"];
-							if ($node1!="NOT FOUND") {
-								$node1["path"][] = $pid2;
-								$node1["pid"] = $pid2;
-								$ct = preg_match("/1 SEX F/", $indirec, $match);
-								if ($ct>0) $node1["relations"][] = "mother";
-								else $node1["relations"][] = "father";
-							}
-							PrivacyFunctions::$NODE_CACHE["$pid1-$pid2"] = $node1;
-							if ($node1=="NOT FOUND") return false;
-							return $node1;
+		foreach($pid2->spousefamilies as $indexval => $fam) {
+			foreach($fam->children as $key => $child) {
+				if(isset(PrivacyFunctions::$NODE_CACHE[$pid1->xref."-".$child->xref])) {
+					if ($maxlength == 0 || count(PrivacyFunctions::$NODE_CACHE[$pid1->xref."-".$child->xref]["path"])+1 <= $maxlength) {
+						$node1 = PrivacyFunctions::$NODE_CACHE[$pid1->xref."-".$child->xref];
+						if ($node1 != "NOT FOUND") {
+							$node1["path"][] = $pid2->xref;
+							$node1["pid"][] = $pid2->xref;
+							if ($pid2->sex == "F") $node1["relations"][] = "mother";
+							else $node1["relations"][] = "father";
 						}
-						else return false;
+						PrivacyFunctions::$NODE_CACHE[$pid1->xref."-".$pid2->xref] = $node1;
+						if ($node1=="NOT FOUND") return false;
+						return $node1;
 					}
+					else return false;
 				}
 			}
 		}
 
-		if ((!empty($NODE_CACHE_LENGTH))&&($maxlength>0)) {
-			if ($NODE_CACHE_LENGTH>=$maxlength) return false;
+		if (!empty($NODE_CACHE_LENGTH) && $maxlength > 0) {
+			if ($NODE_CACHE_LENGTH >= $maxlength) return false;
 		}
 	}
 	//-- end cache checking
 
-	//-- get the birth year of p2 for calculating heuristics
-	$birthrec = GetSubRecord(1, "1 BIRT", $indirec);
-	$byear2 = -1;
-	if ($birthrec!==false) {
-		$dct = preg_match("/2 DATE .*(\d\d\d\d)/", $birthrec, $match);
-		if ($dct>0) $byear2 = $match[1];
-	}
-	if ($byear2==-1) {
-		$numfams = preg_match_all("/1\s*FAMS\s*@(.*)@/", $indirec, $fmatch, PREG_SET_ORDER);
-		for($j=0; $j<$numfams; $j++) {
-			// Get the family record
-			$famrec = FindFamilyRecord($fmatch[$j][1]);
-			if ($show_changes) {
-				if (GetChangeData(true, $fmatch[$j][1], true)) {
-					$rec = GetChangeData(false, $fmatch[$j][1], true, "gedlines");
-					$famrec = $rec[$GEDCOMID][$fmatch[$j][1]];
-				}
-			}
-
-			// Get the set of children
-			$ct = preg_match_all("/1 CHIL @(.*)@/", $famrec, $cmatch, PREG_SET_ORDER);
-			for($i=0; $i<$ct; $i++) {
-				// Get each child's record
-				$childrec = FindPersonRecord($cmatch[$i][1]);
-				if ($show_changes) {
-					if (GetChangeData(true, $cmatch[$i][1], true)) {
-						$rec = GetChangeData(false, $cmatch[$i][1], true, "gedlines");
-						$childrec = $rec[$GEDCOMID][$cmatch[$i][1]];
-					}
-				}
-				$birthrec = GetSubRecord(1, "1 BIRT", $childrec);
-				if ($birthrec!==false) {
-					$dct = preg_match("/2 DATE .*(\d\d\d\d)/", $birthrec, $bmatch);
-					if ($dct>0) $byear2 = $bmatch[1]-25;
-				}
-			}
-		}
-	}
-	//-- end of approximating birth year
+	
+	$years = EstimateBD($pid2, "narrow");
+	if (isset($years["birth"]["year"])) $byear2 = $years["birth"]["year"];
+	else $byear2 = -1;
 
 	//-- current path nodes
 	$p1nodes = array();
@@ -1008,17 +952,20 @@ function GetRelationship($pid1, $pid2, $followspouse=true, $maxlength=0, $ignore
 	//-- set up first node for person1
 	$node1 = array();
 	$node1["path"] = array();
-	$node1["path"][] = $pid1;
+	$node1["path"][] = $pid1->xref;
 	$node1["length"] = 0;
-	$node1["pid"] = $pid1;
+	$node1["pid"] = $pid1->xref;
 	$node1["relations"] = array();
 	$node1["relations"][] = "self";
+	$years = EstimateBD($pid1, "narrow");
+	if (isset($years["birth"]["year"])) $byear1 = $years["birth"]["year"];
+	else $byear1 = -1;
+	$node1["byear"] = $byear1;
 	$p1nodes[] = $node1;
-
-	$visited[$pid1] = true;
+	$visited[$pid1->xref] = true;
 
 	$found = false;
-	$count=0;
+	$count = 0;
 	while(!$found) {
 		//-- the following 2 lines ensure that the user can abort a long relationship calculation
 		//-- refer to http://www.php.net/manual/en/features.connection-handling.php for more
@@ -1034,17 +981,17 @@ function GetRelationship($pid1, $pid2, $followspouse=true, $maxlength=0, $ignore
 			print "<span class=\"error\">".$gm_lang["timeout_error"]."</span>\n";
 			return false;
 		}
-		if (count($p1nodes)==0) {
-			if ($maxlength!=0) {
+		if (count($p1nodes) == 0) {
+			if ($maxlength != 0) {
 				if (!isset($NODE_CACHE_LENGTH)) $NODE_CACHE_LENGTH = $maxlength;
 				else if ($NODE_CACHE_LENGTH<$maxlength) $NODE_CACHE_LENGTH = $maxlength;
 			}
 			if (headers_sent()) {
-				print "\n<!-- Relationship $pid1-$pid2 NOT FOUND | Visited ".count($visited)." nodes | Required $count iterations.<br />\n";
+				print "\n<!-- Relationship ".$pid1->xref."-".$pid2->xref." NOT FOUND | Visited ".count($visited)." nodes | Required $count iterations.<br />\n";
 				PrintExecutionStats();
 				print "-->\n";
 			}
-			PrivacyFunctions::$NODE_CACHE["$pid1-$pid2"] = "NOT FOUND";
+			PrivacyFunctions::$NODE_CACHE[$pid1->xref."-".$pid2->xref] = "NOT FOUND";
 			return false;
 		}
 		//-- search the node list for the shortest path length
@@ -1056,12 +1003,13 @@ function GetRelationship($pid1, $pid2, $followspouse=true, $maxlength=0, $ignore
 				if ($node1["length"] > $node["length"]) $shortest = $index;
 			}
 		}
-		if ($shortest==-1) return false;
+		if ($shortest == -1) return false;
 		$node = $p1nodes[$shortest];
-		if (($maxlength==0)||(count($node["path"])<=$maxlength)) {
-			if ($node["pid"]==$pid2) {
+		if ($maxlength == 0 || count($node["path"]) <= $maxlength) {
+			if ($node["pid"] == $pid2->xref) {
 			}
 			else {
+//print "node: ".$node["pid"]." pid2: ".$pid2->xref."<br />";
 				//-- hueristic values
 				$fatherh = 1;
 				$motherh = 1;
@@ -1070,21 +1018,11 @@ function GetRelationship($pid1, $pid2, $followspouse=true, $maxlength=0, $ignore
 				$childh = 3;
 
 				//-- generate heuristic values based of the birthdates of the current node and p2
-				$indirec = FindPersonRecord($node["pid"]);
-				if ($show_changes) {
-					if (GetChangeData(true, $node["pid"], true)) {
-						$rec = GetChangeData(false, $node["pid"], true, "gedlines");
-						$indirec = $rec[$GEDCOMID][$node["pid"]];
-					}
-				}
-				$byear1 = -1;
-				$birthrec = GetSubRecord(1, "1 BIRT", $indirec);
-				if ($birthrec!==false) {
-					$dct = preg_match("/2 DATE .*(\d\d\d\d)/", $birthrec, $match);
-					if ($dct>0) $byear1 = $match[1];
-				}
-				if (($byear1!=-1)&&($byear2!=-1)) {
-					$yeardiff = $byear1-$byear2;
+				if (isset($node["byear"])) $byear1 = $node["byear"];
+				else $byear1 = -1;
+				
+				if ($byear1 != -1 && $byear2 != -1) {
+					$yeardiff = $byear1 - $byear2;
 					if ($yeardiff < -140) {
 						$fatherh = 20;
 						$motherh = 20;
@@ -1113,21 +1051,21 @@ function GetRelationship($pid1, $pid2, $followspouse=true, $maxlength=0, $ignore
 						$spouseh = 3;
 						$childh = 1;
 					}
-					else if ($yeardiff<20) {
+					else if ($yeardiff < 20) {
 						$fatherh = 3;
 						$motherh = 3;
 						$siblingh = 1;
 						$spouseh = 1;
 						$childh = 5;
 					}
-					else if ($yeardiff<60) {
+					else if ($yeardiff < 60) {
 						$fatherh = 1;
 						$motherh = 1;
 						$siblingh = 5;
 						$spouseh = 2;
 						$childh = 10;
 					}
-					else if ($yeardiff<100) {
+					else if ($yeardiff < 100) {
 						$fatherh = 1;
 						$motherh = 1;
 						$siblingh = 10;
@@ -1142,160 +1080,61 @@ function GetRelationship($pid1, $pid2, $followspouse=true, $maxlength=0, $ignore
 						$childh = 20;
 					}
 				}
-				//-- check all parents and siblings of this node
-				$famids = array();
-				$ct = preg_match_all("/1\sFAMC\s@(.*)@/", $indirec, $match, PREG_SET_ORDER);
-				for($i=0; $i<$ct; $i++) {
-					if (!isset($visited[$match[$i][1]])) $famids[$i]=$match[$i][1];
-				}
-				foreach($famids as $indexval => $fam) {
-					$visited[$fam] = true;
-					$famrec = FindFamilyRecord($fam);
-					if ($show_changes) {
-						if (GetChangeData(true, $fam, true)) {
-							$rec = GetChangeData(false, $fam, true, "gedlines");
-							$famrec = $rec[$GEDCOMID][$fam];
-						}
-					}
-					$parents = FindParentsInRecord($famrec);
-					if ((!empty($parents["HUSB"]))&&(!isset($visited[$parents["HUSB"]]))) {
-						$node1 = $node;
-						$node1["length"]+=$fatherh;
-						$node1["path"][] = $parents["HUSB"];
-						$node1["pid"] = $parents["HUSB"];
-						$node1["relations"][] = "father";
-						$p1nodes[] = $node1;
-						if ($node1["pid"]==$pid2) {
-							if ($path_to_find>0) $path_to_find--;
+				// Get the ID's in the surrounding families. Also save the parents ID's for getting the grandparents
+				$sql = "SELECT n.if_pkey as d_pid, n.if_role as d_role, i.i_gender as d_gender, d.d_year as d_bdate, m.if_role as n_role, n.if_fkey as d_fam FROM ".TBLPREFIX."individual_family as m LEFT JOIN ".TBLPREFIX."individual_family as n ON n.if_fkey=m.if_fkey LEFT JOIN ".TBLPREFIX."individuals AS i ON i.i_key=n.if_pkey LEFT JOIN ".TBLPREFIX."dates AS d ON (n.if_pkey=d.d_key AND (d.d_fact IS NULL OR d.d_fact='BIRT')) WHERE m.if_pkey='".DbLayer::EscapeQuery(JoinKey($node["pid"], $GEDCOMID))."' AND n.if_pkey<>m.if_pkey ORDER BY n_role, d_role";
+				$res = NewQuery($sql);
+				while ($row = $res->FetchAssoc()) {
+					$dpid = SplitKey($row["d_pid"], "id");
+					$dfam = SplitKey($row["d_fam"], "id");
+					if (!isset($visited[$dpid])) {
+						$nrole = $row["n_role"];
+						$drole = $row["d_role"];
+						if ($followspouse || ($drole != "S" || $nrole != "S")) {
+							$ddate = $row["d_bdate"];
+							$dgender = $row["d_gender"];
+							if ($nrole == "C") {
+								if ($drole == "C") {
+									$rela = ($dgender == "M" ? "brother" : ($dgender == "F" ? "sister" : ""));
+									$length = $siblingh;
+								}
+								else {
+									if ($dgender == "M") {
+										$rela = "father";
+										$length = $fatherh;
+									}
+									else {
+										$rela = "mother";
+										$length = $motherh;
+									}
+								}
+							}
 							else {
-								$found=true;
-								$resnode = $node1;
-							}
-						}
-						else $visited[$parents["HUSB"]] = true;
-						if ($USE_RELATIONSHIP_PRIVACY) {
-							PrivacyFunctions::$NODE_CACHE["$pid1-".$node1["pid"]] = $node1;
-						}
-					}
-					if ((!empty($parents["WIFE"]))&&(!isset($visited[$parents["WIFE"]]))) {
-						$node1 = $node;
-						$node1["length"]+=$motherh;
-						$node1["path"][] = $parents["WIFE"];
-						$node1["pid"] = $parents["WIFE"];
-						$node1["relations"][] = "mother";
-						$p1nodes[] = $node1;
-						if ($node1["pid"]==$pid2) {
-							if ($path_to_find>0) $path_to_find--;
-							else {
-								$found=true;
-								$resnode = $node1;
-							}
-						}
-						else $visited[$parents["WIFE"]] = true;
-						if ($USE_RELATIONSHIP_PRIVACY) {
-							PrivacyFunctions::$NODE_CACHE["$pid1-".$node1["pid"]] = $node1;
-						}
-					}
-					$ct = preg_match_all("/1 CHIL @(.*)@/", $famrec, $match, PREG_SET_ORDER);
-					for($i=0; $i<$ct; $i++) {
-						$child = $match[$i][1];
-						if ((!empty($child))&&(!isset($visited[$child]))) {
-							$node1 = $node;
-							$node1["length"]+=$siblingh;
-							$node1["path"][] = $child;
-							$node1["pid"] = $child;
-							$node1["relations"][] = "sibling";
-							$p1nodes[] = $node1;
-							if ($node1["pid"]==$pid2) {
-								if ($path_to_find>0) $path_to_find--;
+								if ($drole == "S") {
+									$rela = $rela = ($dgender == "M" ? "husband" : "wife");
+									$length = $spouseh;
+								}
 								else {
-									$found=true;
+									$rela = ($dgender == "M" ? "son" : ($dgender == "F" ? "daughter" : ""));
+									$length = $childh;
+								}
+							}
+							$node1 = $node;
+							$node1["length"] += $length;
+							$node1["byear"] = $ddate;
+							$node1["path"][] = $dpid;
+							$node1["pid"] = $dpid;
+							$node1["relations"][] = $rela;
+							$p1nodes[] = $node1;
+							if ($node1["pid"] == $pid2->xref) {
+								if ($path_to_find > 0) $path_to_find--;
+								else {
+									$found = true;
 									$resnode = $node1;
 								}
 							}
-							else $visited[$child] = true;
+							else $visited[$dpid] = true;
 							if ($USE_RELATIONSHIP_PRIVACY) {
-								PrivacyFunctions::$NODE_CACHE["$pid1-".$node1["pid"]] = $node1;
-							}
-						}
-					}
-				}
-				//-- check all spouses and children of this node
-				$famids = array();
-				$ct = preg_match_all("/1\sFAMS\s@(.*)@/", $indirec, $match, PREG_SET_ORDER);
-				for($i=0; $i<$ct; $i++) {
-					$famids[$i]=$match[$i][1];
-				}
-				foreach($famids as $indexval => $fam) {
-					$visited[$fam] = true;
-					$famrec = FindFamilyRecord($fam);
-					if ($show_changes) {
-						if (GetChangeData(true, $fam, true)) {
-							$rec = GetChangeData(false, $fam, true, "gedlines");
-							$famrec = $rec[$GEDCOMID][$fam];
-						}
-					}
-					if ($followspouse) {
-						$parents = FindParentsInRecord($famrec);
-						if ((!empty($parents["HUSB"]))&&(!isset($visited[$parents["HUSB"]]))) {
-							$node1 = $node;
-							$node1["length"]+=$spouseh;
-							$node1["path"][] = $parents["HUSB"];
-							$node1["pid"] = $parents["HUSB"];
-							$node1["relations"][] = "spouse";
-							$p1nodes[] = $node1;
-							if ($node1["pid"]==$pid2) {
-								if ($path_to_find>0) $path_to_find--;
-								else {
-									$found=true;
-									$resnode = $node1;
-								}
-							}
-							else $visited[$parents["HUSB"]] = true;
-							if ($USE_RELATIONSHIP_PRIVACY) {
-								PrivacyFunctions::$NODE_CACHE["$pid1-".$node1["pid"]] = $node1;
-							}
-						}
-						if ((!empty($parents["WIFE"]))&&(!isset($visited[$parents["WIFE"]]))) {
-							$node1 = $node;
-							$node1["length"]+=$spouseh;
-							$node1["path"][] = $parents["WIFE"];
-							$node1["pid"] = $parents["WIFE"];
-							$node1["relations"][] = "spouse";
-							$p1nodes[] = $node1;
-							if ($node1["pid"]==$pid2) {
-								if ($path_to_find>0) $path_to_find--;
-								else {
-									$found=true;
-									$resnode = $node1;
-								}
-							}
-							else $visited[$parents["WIFE"]] = true;
-							if ($USE_RELATIONSHIP_PRIVACY) {
-								PrivacyFunctions::$NODE_CACHE["$pid1-".$node1["pid"]] = $node1;
-							}
-						}
-					}
-					$ct = preg_match_all("/1 CHIL @(.*)@/", $famrec, $match, PREG_SET_ORDER);
-					for($i=0; $i<$ct; $i++) {
-						$child = $match[$i][1];
-						if ((!empty($child))&&(!isset($visited[$child]))) {
-							$node1 = $node;
-							$node1["length"]+=$childh;
-							$node1["path"][] = $child;
-							$node1["pid"] = $child;
-							$node1["relations"][] = "child";
-							$p1nodes[] = $node1;
-							if ($node1["pid"]==$pid2) {
-								if ($path_to_find>0) $path_to_find--;
-								else {
-									$found=true;
-									$resnode = $node1;
-								}
-							}
-							else $visited[$child] = true;
-							if ($USE_RELATIONSHIP_PRIVACY) {
-								PrivacyFunctions::$NODE_CACHE["$pid1-".$node1["pid"]] = $node1;
+								PrivacyFunctions::$NODE_CACHE[$pid1->xref."-".$node1["pid"]] = $node1;
 							}
 						}
 					}
@@ -1305,7 +1144,7 @@ function GetRelationship($pid1, $pid2, $followspouse=true, $maxlength=0, $ignore
 		unset($p1nodes[$shortest]);
 	} //-- end while loop
 	if (headers_sent()) {
-		print "\n<!-- Relationship $pid1-$pid2 | Visited ".count($visited)." nodes | Required $count iterations.<br />\n";
+		print "\n<!-- Relationship ".$pid1->xref."-".$pid2->xref." | Visited ".count($visited)." nodes | Required $count iterations.<br />\n";
 		PrintExecutionStats();
 		print "-->\n";
 	}
@@ -2790,7 +2629,7 @@ function CheckLockout() {
  * @return array with 2 year values, pid and type (as 
  * requested or "true" is found a true year)
  */
-function EstimateBD($indirec, $type) {
+function EstimateBD(&$person, $type) {
 	global $CHECK_CHILD_DATES, $MAX_ALIVE_AGE, $HIDE_LIVE_PEOPLE;
 	global $PRIVACY_BY_YEAR, $gm_lang, $COMBIKEY;
 	global $GEDCOMID;
@@ -2798,29 +2637,24 @@ function EstimateBD($indirec, $type) {
 	// Init values
 	$dates = array();
 		
-	$ct = preg_match("/0 @(.*)@ INDI/", $indirec, $match);
-	if ($ct>0) {
-		$pid = trim($match[1]);
-	}
-	else return false;
-	$dates["pid"] = $pid;
+	if (!is_object($person) || $person->isempty) return false;
+	
+	$dates["pid"] = $person->xref;
 	
 	$cyear = date("Y");
 	
 	// -- check for a death record
-	$deathrec = GetSubRecord(1, "1 DEAT", $indirec);
-	if (!empty($deathrec)) {
-		if (preg_match("/1 DEAT Y/", $deathrec)>0) $deathyear = $cyear;
+	if ($person->drec != "") {
+		if (preg_match("/1 DEAT Y/", $person->drec)>0) $deathyear = $cyear;
 		else {
-			$ct = preg_match("/\d DATE.*\s(\d{3,4})\s/", $deathrec, $match);
+			$ct = preg_match("/\d DATE.*\s(\d{3,4})\s/", $person->drec, $match);
 			if ($ct>0) $truedeathyear = $match[1];
 		}
 	}
 
 	//-- check for birth record
-	$birthrec = GetSubRecord(1, "1 BIRT", $indirec);
-	if (!empty($birthrec)) {
-		$ct = preg_match("/\d DATE.*\s(\d{3,4})\s/", $birthrec, $match);
+	if ($person->brec != "") {
+		$ct = preg_match("/\d DATE.*\s(\d{3,4})\s/", $person->brec, $match);
 		if ($ct>0) $truebirthyear = $match[1];
 	}
 
@@ -2851,9 +2685,8 @@ function EstimateBD($indirec, $type) {
 	// Check the fact dates
 	$ffactyear = 9999;
 	$lfactyear = 0;
-	$subrecs = GetAllSubRecords($indirec, "CHAN", true, true, false);
-	foreach ($subrecs as $key => $rec) {
-		$ct = preg_match_all("/\d DATE.*\s(\d{3,4})\s/", $rec, $match, PREG_SET_ORDER);
+	foreach ($person->facts as $key => $fact) {
+		$ct = preg_match_all("/\d DATE.*\s(\d{3,4})\s/", $fact->factrec, $match, PREG_SET_ORDER);
 //		print_r($match);
 		for($i=0; $i<$ct; $i++) {
 			if (strstr($match[$i][0], "@#DHEBREW@")===false) {
@@ -2866,64 +2699,42 @@ function EstimateBD($indirec, $type) {
 
 	// If we found no dates then check the dates of close relatives.
 	if($CHECK_CHILD_DATES ) {
-		//-- check the parents for dates
-		$numfams = preg_match_all("/1\s*FAMC\s*@(.*)@/", $indirec, $fmatch, PREG_SET_ORDER);
-		for($j=0; $j<$numfams; $j++) {
-			$parents = FindParents($fmatch[$j][1]);
-			if ($parents) {
-				if (!empty($parents["HUSB"])) {
-					$prec = FindPersonRecord($parents["HUSB"]);
-					// For now only search the birth record
-					$brec = GetSubRecord(1, "1 BIRT", $prec);
-					$ct = preg_match_all("/\d DATE.*\s(\d{3,4})\s/", $brec, $match, PREG_SET_ORDER);
-					// loop for later if also facts are scanned
-					for($i=0; $i<$ct; $i++) {
-						$fbyear = $match[$i][1];
-					}
-					$drec = GetSubRecord(1, "1 DEAT", $prec);
-					if (!empty($drec)) {
-						if (preg_match("/1 DEAT Y/", $drec)>0) $fddate = $cyear;
-						else {
-							$ct = preg_match("/\d DATE.*\s(\d{3,4})\s/", $drec, $match);
-							if ($ct>0) $fdyear = $match[1];
-						}
-					}
+		foreach($person->childfamilies as $key => $family) {
+			if ($family->husb_id != "") {
+				$ct = preg_match_all("/\d DATE.*\s(\d{3,4})\s/", $family->husb->brec, $match, PREG_SET_ORDER);
+				// loop for later if also facts are scanned
+				for($i=0; $i<$ct; $i++) {
+					$fbyear = $match[$i][1];
 				}
-				if (!empty($parents["WIFE"])) {
-					$prec = FindPersonRecord($parents["WIFE"]);
-					// For now only search the birth record
-					$brec = GetSubRecord(1, "1 BIRT", $prec);
-					$ct = preg_match_all("/\d DATE.*\s(\d{3,4})\s/", $brec, $match, PREG_SET_ORDER);
-					// loop for later if also facts are scanned
-					for($i=0; $i<$ct; $i++) {
-						$mbyear = $match[$i][1];
-					}
-					$drec = GetSubRecord(1, "1 DEAT", $prec);
-					if (!empty($drec)) {
-						if (preg_match("/1 DEAT Y/", $drec)>0) $mddate = $cyear;
-						else {
-							$ct = preg_match("/\d DATE.*\s(\d{3,4})\s/", $drec, $match);
-							if ($ct>0) $mdyear = $match[1];
-						}
-					}
+				if (preg_match("/1 DEAT Y/", $family->husb->drec)>0) $fddate = $cyear;
+				else {
+					$ct = preg_match("/\d DATE.*\s(\d{3,4})\s/", $family->husb->drec, $match);
+					if ($ct>0) $fdyear = $match[1];
+				}
+			}
+			if ($family->wife_id != "") {
+				$ct = preg_match_all("/\d DATE.*\s(\d{3,4})\s/", $family->wife->brec, $match, PREG_SET_ORDER);
+				// loop for later if also facts are scanned
+				for($i=0; $i<$ct; $i++) {
+					$mbyear = $match[$i][1];
+				}
+				if (preg_match("/1 DEAT Y/", $family->wife->drec)>0) $mddate = $cyear;
+				else {
+					$ct = preg_match("/\d DATE.*\s(\d{3,4})\s/", $family->wife->drec, $match);
+					if ($ct>0) $mdyear = $match[1];
 				}
 			}
 		}
 		$children = array();
 		// For each family in which this person is a spouse...
-		$numfams = preg_match_all("/1\s*FAMS\s*@(.*)@/", $indirec, $fmatch, PREG_SET_ORDER);
 		$fmarryear = 9999;
 		$lmarryear = 0;
 		$fcbyear = 9999;
 		$lcbyear = 0;
-		for($j=0; $j<$numfams; $j++) {
-			// Get the family record
-			$famrec = FindFamilyRecord($fmatch[$j][1]);
-
+		foreach ($person->spousefamilies as $key => $family) {
 			//-- check for marriage date
-			$marrec = GetSubRecord(1, "1 MARR", $famrec);
-			if ($marrec!==false) {
-				$bt = preg_match_all("/\d DATE.*\s(\d{3,4})\s/", $marrec, $bmatch, PREG_SET_ORDER);
+			if (is_object($family->marr_fact)) {
+				$bt = preg_match_all("/\d DATE.*\s(\d{3,4})\s/", $family->marr_fact->simpledate, $bmatch, PREG_SET_ORDER);
 				for($h=0; $h<$bt; $h++) {
 					$byear = $bmatch[$h][1];
 					if ($fmarryear > $byear) $fmarryear = $byear;
@@ -2932,9 +2743,8 @@ function EstimateBD($indirec, $type) {
 			}
 			
 			//-- check for divorce date
-			$marrec = GetSubRecord(1, "1 DIV", $famrec);
-			if ($marrec!==false) {
-				$bt = preg_match_all("/\d DATE.*\s(\d{3,4})\s/", $marrec, $bmatch, PREG_SET_ORDER);
+			if (is_object($family->div_fact)) {
+				$bt = preg_match_all("/\d DATE.*\s(\d{3,4})\s/", $family->div_fact->simpledate, $bmatch, PREG_SET_ORDER);
 				for($h=0; $h<$bt; $h++) {
 					$byear = $bmatch[$h][1];
 					if ($fmarryear > $byear) $fmarryear = $byear;
@@ -2960,15 +2770,12 @@ function EstimateBD($indirec, $type) {
 //				}
 //			}
 			// Get the set of children
-			$ct = preg_match_all("/1 CHIL @(.*)@/", $famrec, $match, PREG_SET_ORDER);
-			for($i=0; $i<$ct; $i++) {
-				// Get each child's record
-				$childrec = FindPersonRecord($match[$i][1]);
-				$children[] = $childrec;
+			foreach ($family->children as $key2 => $child) {
+				// Get each child's object and keep it. This will gather all children from all spousefamilies
+				$children[] = $child;
 
 				// Check each child's dates (for now only birth)
-				$brec = GetSubRecord(1, "1 BIRT", $childrec);
-				$bt = preg_match_all("/\d DATE.*\s(\d{3,4})\s/", $brec, $bmatch, PREG_SET_ORDER);
+				$bt = preg_match_all("/\d DATE.*\s(\d{3,4})\s/", $child->brec, $bmatch, PREG_SET_ORDER);
 				for($h=0; $h<$bt; $h++) {
 					$byear = $bmatch[$h][1];
 					if ($fcbyear > $byear) $fcbyear = $byear;
@@ -2978,22 +2785,13 @@ function EstimateBD($indirec, $type) {
 		}
 		//-- check grandchildren for dates
 		$fgcbyear = 9999;
-		foreach($children as $indexval => $child) {
+		foreach($children as $key => $child) {
 			// For each family in which this person is a spouse...
-			$numfams = preg_match_all("/1\s*FAMS\s*@(.*)@/", $child, $fmatch, PREG_SET_ORDER);
-			for($j=0; $j<$numfams; $j++) {
-				// Get the family record
-				$famrec = FindFamilyRecord($fmatch[$j][1]);
-
+			foreach ($child->spousefamilies as $key2 => $family) {
 				// Get the set of children
-				$ct = preg_match_all("/1 CHIL @(.*)@/", $famrec, $match, PREG_SET_ORDER);
-				for($i=0; $i<$ct; $i++) {
-					// Get each child's record
-					$childrec = FindPersonRecord($match[$i][1]);
-
+				foreach ($family->children as $key3 => $fchild) {
 					// Check each grandchild's dates
-					$brec = GetSubRecord(1, "1 BIRT", $childrec);
-					$bt = preg_match_all("/\d DATE.*\s(\d{3,4})\s/", $brec, $bmatch, PREG_SET_ORDER);
+					$bt = preg_match_all("/\d DATE.*\s(\d{3,4})\s/", $fchild->brec, $bmatch, PREG_SET_ORDER);
 					for($h=0; $h<$bt; $h++) {
 						$byear = $bmatch[$h][1];
 						if ($fgcbyear > $byear) $fgcbyear = $byear;

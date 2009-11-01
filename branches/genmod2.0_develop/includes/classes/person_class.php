@@ -83,6 +83,7 @@ class Person extends GedcomRecord {
 	}
 		
 	public static function IsInstance($xref, $gedcomid="") {
+		global $GEDCOMID;
 		
 		if (empty($gedcomid)) $gedcomid = $GEDCOMID;
 		if (!isset(self::$personcache[$gedcomid][$xref])) return false;
@@ -1659,7 +1660,8 @@ if ($this->tracefacts) print "AddSpouseFacts - Adding for ".$fam->$spperson->xre
 			}
 			
 			// Determine if the person is within range
-			$relationship = GetRelationship($gm_user->gedcomid[$this->gedcomid], $this->xref, $CHECK_MARRIAGE_RELATIONS, $MAX_RELATION_PATH_LENGTH);
+			$user_indi =& Person::GetInstance($gm_user->gedcomid[$this->gedcomid]);
+			$relationship = GetRelationship($user_indi, $this, $CHECK_MARRIAGE_RELATIONS, $MAX_RELATION_PATH_LENGTH);
 			// If we have a relation in range, we can display the name
 			// if not in range, we can display the name of dead people
 			if ($relationship != false) {

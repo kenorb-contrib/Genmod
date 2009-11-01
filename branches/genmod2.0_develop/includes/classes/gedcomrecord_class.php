@@ -110,7 +110,7 @@ abstract class GedcomRecord {
 		else $this->gedcomid = $gedcomid;
 	
 		if ($this->gedrec == "") {
-			$this->xref = $id;
+			$this->xref = strtoupper($id);
 			$this->type = $this->datatype;
 			// Get the gedcom record
 			switch ($this->type) {
@@ -610,7 +610,8 @@ abstract class GedcomRecord {
 		
 		$ulevel = $gm_user->getUserAccessLevel();
 		if (!isset($hit)) $hit = array();
-		if (isset($hit[$this->xref])) print "ERROR: getting checked twice: ".$this->xref."<br />";
+
+		if (DEBUG && isset($hit[$this->xref])) print "ERROR: getting checked twice: ".$this->xref."<br />";
 		else $hit[$this->xref] = 1;
 		
 		if (!isset($PRIVACY_CHECKS)) $PRIVACY_CHECKS = 1;
@@ -682,7 +683,8 @@ abstract class GedcomRecord {
 					// Determine if the person is within range
 					$path_length = $MAX_RELATION_PATH_LENGTH;
 					// print "get relation ".$gm_user->gedcomid[$GEDCOMID]." with ".$this->xref;
-					$relationship = GetRelationship($gm_user->gedcomid[$GEDCOMID], $this->xref, $CHECK_MARRIAGE_RELATIONS, $path_length);
+					$user_indi =& Person::GetInstance($gm_user->gedcomid[$GEDCOMID]);
+					$relationship = GetRelationship($user_indi, $this, $CHECK_MARRIAGE_RELATIONS, $path_length);
 
 					// Only limit access to live people!
 					if ($relationship == false && !$this->isdead) {

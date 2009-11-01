@@ -468,7 +468,7 @@ function print_pedigree_person($pid, $style=1, $show_famlink=true, $count=0, $pe
 				// This div is filled by an AJAX call! Not yet as placement is a problem!
 				// NOTE: Zoom
 				print "<a href=\"pedigree.php?rootid=$pid&amp;PEDIGREE_GENERATIONS=$OLD_PGENS&amp;talloffset=$talloffset&amp;gedid=$GEDCOMID\"><b>".$gm_lang["index_header"]."</b></a>\n";
-				print "<br /><a href=\"descendancy.php?pid=$rootid&amp;show_full=$show_full&amp;generations=$generations&amp;box_width=$box_width&amp;gedid=$GEDCOMID\"><b>".$gm_lang["descend_chart"]."</b></a><br />\n";
+				print "<br /><a href=\"descendancy.php?pid=$pid&amp;show_full=$show_full&amp;generations=$generations&amp;box_width=$box_width&amp;gedid=$GEDCOMID\"><b>".$gm_lang["descend_chart"]."</b></a><br />\n";
 				if ($gm_user->username != "") {
 					if (!empty($gm_user->gedcomid[$GEDCOMID])) {
 						print "<a href=\"relationship.php?pid1=".$gm_user->gedcomid[$GEDCOMID]."&amp;pid2=".$pid."&amp;gedid=$GEDCOMID\"><b>".$gm_lang["relationship_to_me"]."</b></a><br />\n";
