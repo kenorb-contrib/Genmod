@@ -250,7 +250,7 @@ if ($relationship_controller->view != "preview") {
 
 	print "</tr>";
 	// Sixth row
-	print "</tr>";
+	print "<tr>";
 	
 	if (!$relationship_controller->person1->isempty && !$relationship_controller->person2->isempty && $disp){
 		if ($disp && !$check_node) print "<td class=\"wrap vmiddle center\" colspan=\"2\"><span class=\"error\">".(isset($_SESSION["relationships"])?$gm_lang["no_link_found"]:"")."</span></td>";
@@ -261,11 +261,10 @@ if ($relationship_controller->view != "preview") {
 	if ($pass == false) print "<td colspan=\"2\" class=\"center wrap\">&nbsp;</td>";
 
 	// Empty space
-	print "<td></td>";
+	print "<td>&nbsp;</td>";
 
 	// View button
 	$relationship_controller->PrintInputSubmit(false);
-	print "</td>";
 	
 	print "</tr>";
 
