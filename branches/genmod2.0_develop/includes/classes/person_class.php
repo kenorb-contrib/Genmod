@@ -1635,7 +1635,7 @@ if ($this->tracefacts) print "AddSpouseFacts - Adding for ".$fam->$spperson->xre
 		}
 		
 		// Now split dead and alive people
-		// If dead, we follow DisplayDetailsByID
+		// If dead, we follow DisplayDetails
 		// If alive, we check if the general rule allows displaying the name. If not, return false.
 		if ($this->isdead) {
 			SwitchGedcom($oldgedid);

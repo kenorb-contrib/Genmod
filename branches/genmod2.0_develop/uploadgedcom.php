@@ -185,7 +185,7 @@ else if ($check == "cancel_upload") {
 if ($cleanup_needed == "cleanup_needed" && $continue == $gm_lang["del_proceed"]) {
 	
 	$filechanged=false;
-	if (FileIsWriteable($GEDCOMS[$gedid]["path"]) && (file_exists($GEDCOMS[$gedid]["path"]))) {
+	if (AdminFunctions::FileIsWriteable($GEDCOMS[$gedid]["path"]) && (file_exists($GEDCOMS[$gedid]["path"]))) {
 		$l_headcleanup = false;
 		$l_macfilecleanup = false;
 		$l_lineendingscleanup = false;
@@ -498,7 +498,7 @@ print "<form enctype=\"multipart/form-data\" method=\"post\" name=\"configform\"
 						else {
 							$cleanup_needed = true;
 							print "<input type=\"hidden\" name=\"cleanup_needed\" value=\"cleanup_needed\">";
-							if (!FileIsWriteable($GEDCOMS[$gedid]["path"]) && (file_exists($GEDCOMS[$gedid]["path"]))) {
+							if (!AdminFunctions::FileIsWriteable($GEDCOMS[$gedid]["path"]) && (file_exists($GEDCOMS[$gedid]["path"]))) {
 								print "<span class=\"error\">".str_replace("#GEDCOM#", $GEDCOM, $gm_lang["error_header_write"])."</span>\n";
 							}
 							// NOTE: Check for head cleanu
@@ -754,11 +754,6 @@ print "<form enctype=\"multipart/form-data\" method=\"post\" name=\"configform\"
 			flush();
 			@ob_flush();
 			// ------------------------------------------------------ Begin importing data
-			// -- array of names
-//			if (!isset($indilist)) $indilist = array();
-//			if (!isset($famlist)) $famlist = array();
-//			$sourcelist = array();
-//			$otherlist = array();
 			$i=0;
 		
 			$fpged = fopen($GEDCOM_FILE, "rb");
@@ -787,6 +782,7 @@ print "<form enctype=\"multipart/form-data\" method=\"post\" name=\"configform\"
 			}
 			else $_SESSION["resumed"] = 0;
 			if (!isset($lastgid)) {
+				ImportFunctions::LockTables();
 				DMSoundex("", "opencache");
 				$end = false;
 				$pos1 = 0;
@@ -873,6 +869,8 @@ print "<form enctype=\"multipart/form-data\" method=\"post\" name=\"configform\"
 						$newtime = time();
 						$exectime = $newtime - $oldtime;
 						if (($timelimit != 0) && ($timelimit - $exectime) < 10) {
+							$sql = "UNLOCK TABLES";
+							$res = NewQuery($sql);
 							$importtime = $importtime + $exectime;
 							$fcontents = substr($fcontents, $pos2);
 							//-- store the resume information in the session
@@ -947,6 +945,8 @@ print "<form enctype=\"multipart/form-data\" method=\"post\" name=\"configform\"
 				@ob_flush();
 			}
 			
+			$sql = "UNLOCK TABLES";
+			$res = NewQuery($sql);
 			if ($marr_names == "yes") {
 				$GEDCOM = $FILE;
 				$flist = GetFemalesWithFAMS();

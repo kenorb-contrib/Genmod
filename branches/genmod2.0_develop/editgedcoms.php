@@ -150,7 +150,7 @@ if ($action == "deletecount") {
 				print "</tr>";
 				
 				// Row 2: Column headings
-				print "<tr class=\"shade2\">";
+				print "<tr class=\"shade2 center\">";
 				print "<td>".$gm_lang["id"]."</td>";
 				print "<td>".$gm_lang["ged_gedcom"]."</td>";
 				print "<td>".$gm_lang["edit"]."</td>";
@@ -159,7 +159,7 @@ if ($action == "deletecount") {
 				print "</tr>";
 				
 				// Row 3: Files
-				print "<tr class=\"subbar\">";
+				print "<tr class=\"subbar center\">";
 				print "<td>".$gedarray["id"]."</td>";
 				print "<td>";
 				if (file_exists($gedarray["path"])) {
@@ -167,7 +167,7 @@ if ($action == "deletecount") {
 					else print $gedarray["path"]." &rlm;(";
 					printf("%.2fKb", (filesize($gedarray["path"])/1024));
 					print ")";
-					$url = CheckGedcomDownloadable($gedarray["path"]);
+					$url = AdminFunctions::CheckGedcomDownloadable($gedarray["path"]);
 					if ($url!==false) {
 						print "<br />\n";
 						print "<span class=\"error\">".$gm_lang["gedcom_downloadable"]." :</span>";
@@ -184,7 +184,7 @@ if ($action == "deletecount") {
 				// Row 3: Options
 				if (CheckForImport($gedc)) $imported = true;
 				else $imported = false;
-				print "<tr>";
+				print "<tr class=\"center\">";
 				print "<td>&nbsp;</td>";
 				print "<td>";
 				if (file_exists($gedarray["path"])) {
@@ -204,7 +204,7 @@ if ($action == "deletecount") {
 				print "</tr>";
 				
 				// Row 4: Options
-				print "<tr>";
+				print "<tr class=\"center\">";
 				print "<td>&nbsp;</td>";
 				print "<td>";
 				if ($imported) print "<a href=\"downloadgedcom.php?gedid=$gedc\">".$gm_lang["ged_download"]."</a>";
@@ -220,7 +220,7 @@ if ($action == "deletecount") {
 				print "</tr>";
 				
 				// Row 5: Options
-				print "<tr>";
+				print "<tr class=\"center\">";
 				print "<td>&nbsp;</td>";
 				print "<td>";
 				print "<a href=\"editconfig_gedcom.php?source=reupload_form&amp;gedid=$gedc\">".$gm_lang["ged_reupload"]."</a>";

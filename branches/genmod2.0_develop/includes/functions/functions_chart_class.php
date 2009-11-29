@@ -39,7 +39,11 @@ abstract class ChartFunctions {
 		print $sosa;
 		if ($sosa != "1") {
 			print "<br />";
-			self::PrintUrlArrow($pid, "#$pid", "#$pid");
+			$url = GetQueryString();
+			$srch = "rootid=".$_REQUEST["rootid"];
+			$repl = "rootid=".$pid;
+			$url = "?".str_replace($srch, $repl, $url);
+			self::PrintUrlArrow($pid, $url, "#$pid");
 			print "&nbsp;";
 		}
 		print "</td>";

@@ -278,6 +278,7 @@ function PrintIndiForm($nextaction, $famid, $linenum="", $namerec="", $famtag="C
 	print "<input type=\"hidden\" name=\"famid\" value=\"".$famid."\" />\n";
 	print "<input type=\"hidden\" name=\"pid\" value=\"".$pid."\" />\n";
 	print "<input type=\"hidden\" name=\"change_type\" value=\"".$change_type."\" />\n";
+	print "<input type=\"hidden\" name=\"pid_type\" value=\"INDI\" />\n";
 	print "<input type=\"hidden\" name=\"famtag\" value=\"".$famtag."\" />\n";
 	print "<table class=\"facts_table\">";
 	

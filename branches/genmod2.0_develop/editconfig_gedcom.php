@@ -66,7 +66,7 @@ print "gedcompath is ".$GEDCOMPATH."<br />";
 print " gedfilename set to: ".$GEDFILENAME."<br />";
 	// NOTE: Check if it is a zipfile
 	if ($path == "") if (strstr(strtolower(trim($GEDFILENAME)), ".zip")==".zip") {
-		if ($source == "add_form") $GEDFILENAME = GetGedFromZip($GEDCOMPATH);
+		if ($source == "add_form") $GEDFILENAME = AdminFunctions::GetGedFromZip($GEDCOMPATH);
 	}
 	// NOTE: Check if there is an extension
 	if (strtolower(substr(trim($GEDFILENAME), -4)) != ".ged" && strtolower(substr(trim($GEDFILENAME), -4)) != ".zip") $GEDFILENAME .= ".ged";
@@ -98,7 +98,7 @@ print " gedfilename set to: ".$GEDFILENAME."<br />";
 				unlink($path.$GEDFILENAME);
 			move_uploaded_file($_FILES['GEDCOMPATH']['tmp_name'], $path.$GEDFILENAME);
 		}
-		if (strstr(strtolower(trim($GEDFILENAME)), ".zip")==".zip") $GEDFILENAME = GetGedFromZip($path.$GEDFILENAME);
+		if (strstr(strtolower(trim($GEDFILENAME)), ".zip")==".zip") $GEDFILENAME = AdminFunctions::GetGedFromZip($path.$GEDFILENAME);
 	}
 	$ged = $GEDFILENAME;
 	$gedid = get_id_from_gedcom($ged);

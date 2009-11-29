@@ -372,7 +372,6 @@ abstract class PersonFunctions {
 					if (GedcomConfig::$LINK_ICONS=="mouseover") print " onmouseover";
 					if (GedcomConfig::$LINK_ICONS=="click") print " onclick";
 					print "=\"";
-	 //				print "if(document.getElementById('I".$pid.".".$personcount.".".$count.".".$random."links').innerHTML=='') sndReq('I".$pid.".".$personcount.".".$count.".".$random."links', 'getindilinks', 'pid', '".$pid."', 'OLD_PGENS', '".$OLD_PGENS."', 'talloffset', '".$talloffset."', 'generations', '".$generations."', 'canshow', '".$canshow."', 'show_full', '".$show_full."', 'box_width', '".$box_width."', 'chart_style', '".$chart_style."'); ";
 					print "showbox(this, '".$person->xref.".".$personcount.".".$count.".".$random."', '";
 					if ($style==1) print "box".$person->xref;
 					else print "relatives";

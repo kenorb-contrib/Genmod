@@ -402,7 +402,7 @@ if ($disp1 == "block") {
 				
 				// print filename
 				print "<td style=\"border-bottom:1px solid #493424;\" class=\"wrap\">";
-				if (!$MEDIA_IN_DB) $canwrite = FileIsWriteable($filename);
+				if (!$MEDIA_IN_DB) $canwrite = AdminFunctions::FileIsWriteable($filename);
 				if (USE_GREYBOX && $fileobj->f_is_image) print "<a href=\"".FilenameEncode($fileobj->f_main_file)."\" title=\"".$fileobj->f_file."\" rel=\"gb_imageset[]\">";
 				else print "<a href=\"#\" onclick=\"return openImage('".$fileobj->f_main_file."','".$fileobj->f_width."','".$fileobj->f_height."','".$fileobj->f_is_image."');\">";
 //				print $fileobj->f_thumb_file."<br />";

@@ -178,39 +178,7 @@ if ($action=="createuser") {
 			if ($au) {
 				$message .= $gm_lang["user_created"];
 				//-- update Gedcom record with new email address
-				if ($user->sync_gedcom=="Y" && !empty($user->email)) {
-					$oldged = $GEDCOMID;
-					foreach($user->gedcomid as $gedcid => $gedid) {
-						if (!empty($gedid) && isset($GEDCOMS[$gedcid])) {
-							$GEDCOMID = $gedcid;
-							$indirec = FindPersonRecord($gedid);
-							$rec = GetChangeData(false, $gedid, true, "gedlines", "");
-							if (isset($rec[$GEDCOMID][$gedid])) $indirec = $rec[$GEDCOMID][$gedid];
-							if (!empty($indirec)) {
-								$subrecords = GetAllSubrecords($indirec, "", false, false, false);
-								$found = false;
-								$sourstring = GetLangVarString("sync_mailsource", $GEDCOMID, "gedcomid");
-								foreach ($subrecords as $key =>$subrec) {
-									$change_id = GetNewXref("CHANGE");
-									if (preg_match("/(\d) (_?EMAIL .+)/", $subrec, $match)>0) {
-										$found = true;
-										$level = $match[1];
-										if ($level == 1) {
-											$newrec = "1 EMAIL ".$user->email."\r\n2 RESN privacy\r\n2 SOUR ".$sourstring."\r\n";
-										}
-										else {
-											$oldrec = $match[0];
-											$newrec = preg_replace("/(\d _?EMAIL)[^\r\n]*/", "$1 ".$user->email, $subrec);
-										}
-										if ($subrec != $newrec) ReplaceGedrec($gedid, $subrec, $newrec, "EMAIL", $change_id, "edit_fact", $GEDCOMID, "INDI");
-									}
-								}
-								if (!$found) ReplaceGedrec($gedid, "", "1 EMAIL ".$user->email."\r\n2 RESN privacy\r\n2 SOUR ".$sourstring."\r\n", "EMAIL", $change_id, "add_fact", $GEDCOMID, "INDI");
-							}
-						}
-					}
-					$GEDCOMID = $oldged;
-				}
+				AdminFunctions::UpdateUserIndiEmail($user);
 			}
 			else {
 				$message .= "<span class=\"error\">".$gm_lang["user_create_error"]."<br /></span>";
@@ -324,39 +292,7 @@ if ($action=="edituser2") {
 			UserController::AddUser($newuser, "changed");
 			
 			//-- update Gedcom record with new email address
-			if ($newuser->sync_gedcom=="Y" && $sync_data_changed && !empty($newuser->email)) {
-				$oldged = $GEDCOMID;
-				foreach($newuser->gedcomid as $gedcid => $gedid) {
-					if (!empty($gedid) && isset($GEDCOMS[$gedcid])) {
-						$GEDCOMID = $gedcid;
-						$indirec = FindPersonRecord($gedid);
-						$rec = GetChangeData(false, $gedid, true, "gedlines", "");
-						if (isset($rec[$GEDCOMID][$gedid])) $indirec = $rec[$GEDCOMID][$gedid];
-						if (!empty($indirec)) {
-							$subrecords = GetAllSubrecords($indirec, "", false, false, false);
-							$found = false;
-							$sourstring = GetLangVarString("sync_mailsource", $GEDCOMID, "gedcomid");
-							foreach ($subrecords as $key =>$subrec) {
-								$change_id = GetNewXref("CHANGE");
-								if (preg_match("/(\d) (_?EMAIL .+)/", $subrec, $match)>0) {
-									$found = true;
-									$level = $match[1];
-									if ($level == 1) {
-										$newrec = "1 EMAIL ".$newuser->email."\r\n2 RESN privacy\r\n2 SOUR ".$sourstring."\r\n";
-									}
-									else {
-										$oldrec = $match[0];
-										$newrec = preg_replace("/(\d _?EMAIL)[^\r\n]*/", "$1 ".$newuser->email, $subrec);
-									}
-									if ($subrec != $newrec) ReplaceGedrec($gedid, $subrec, $newrec, "EMAIL", $change_id, "edit_fact", $GEDCOMID, "INDI");
-								}
-							}
-							if (!$found) ReplaceGedrec($gedid, "", "1 EMAIL ".$newuser->email."\r\n2 RESN privacy\r\n2 SOUR ".$sourstring."\r\n", "EMAIL", $change_id, "add_fact", $GEDCOMID, "INDI");
-						}
-					}
-				}
-				$GEDCOMID = $oldged;
-			}
+			if ($sync_data_changed) AdminFunctions::UpdateUserIndiEmail($newuser);
 			
 			//-- if the user was just verified by the admin, then send the user a message
 			if (($olduser->verified_by_admin!=$newuser->verified_by_admin)&&(!empty($newuser->verified_by_admin))) {
@@ -1631,31 +1567,7 @@ if ($action == "massupdate2") {
 		if (isset($change_sync_gedcom)) {
 			if (isset($new_sync_gedcom)) {
 				$newuser->sync_gedcom = "Y";
-				if (!empty($newuser->email)) {
-					$oldged = $GEDCOMID;
-					foreach($newuser->gedcomid as $gedc=>$gedid) {
-						if (!empty($gedid) && isset($GEDCOMS[$gedc])) {
-							$GEDCOMID = $gedc;
-							$indirec = FindPersonRecord($gedid);
-							$rec = GetChangeData(false, $gedid, true, "gedlines", "");
-							if (isset($rec[$GEDCOMID][$gedid])) $indirec = $rec[$GEDCOMID][$gedid];
-							if (!empty($indirec)) {
-								$change_id = GetNewXref("CHANGE");
-								if (preg_match("/(\d) (_?EMAIL .+)/", $indirec, $match)>0) {
-									$level = $match[1];
-									$oldrec = $match[0];
-									$subrec = GetSubRecord($level, $oldrec, $indirec);
-									$newrec = preg_replace("/(\d _?EMAIL)[^\r\n]*/", "$1 ".$newuser->email, $subrec);
-									if ($subrec != $newrec) ReplaceGedrec($gedid, $subrec, $newrec, "EMAIL", $change_id, "edit_fact", $GEDCOMID, "INDI");
-								}
-								else {
-									ReplaceGedrec($gedid, "", "1 EMAIL ".$newuser->email."\r\n2 RESN privacy2 SOUR Genmod user administration\r\n", "EMAIL", $change_id, "add_fact", $GEDCOMID, "INDI");
-								}
-							}
-						}
-					}
-					$GEDCOMID = $oldged;
-				}
+				AdminFunctions::UpdateUserIndiEmail($newuser);
 			}
 			else $newuser->sync_gedcom = "N";
 		}

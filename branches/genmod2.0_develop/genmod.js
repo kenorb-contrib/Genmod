@@ -604,7 +604,7 @@ function hide_submenu(elementid) {
  */
 function timeout_submenu(elementid) {
 	if (menutimeouts[elementid] == null) {
-		tout = setTimeout("hide_submenu('"+elementid+"')", 500);
+		tout = setTimeout("hide_submenu('"+elementid+"')", 1000);
 		menutimeouts[elementid] = tout;
 	}
 }

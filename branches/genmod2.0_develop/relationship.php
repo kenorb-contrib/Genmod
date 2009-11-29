@@ -69,8 +69,8 @@ print "<div style=\"position: relative; z-index: 1; width:98%;\">\n";
 print "<table class=\"list_table $TEXT_DIRECTION\" style=\"width:100%;\"><tr><td valign=\"top\">";
 $title_string = $gm_lang["relationship_chart"];
 if ($relationship_controller->pid1 != "" && $relationship_controller->pid2 != "") {
-	$title_string .= ":<br />".$relationship_controller->person1->name;
-	$title_string .= " ".$gm_lang["and"]." ".$relationship_controller->person2->name;
+	$title_string .= ":<br /><br />".$relationship_controller->person1->name;
+	$title_string .= "<br />".$gm_lang["and"]." ".$relationship_controller->person2->name;
 }
 print "\n\t<h3>".PrintReady($title_string)."</h3>";
 print "</td><td>";
@@ -328,7 +328,7 @@ if (!$relationship_controller->person1->isempty && !$relationship_controller->pe
 		if ($TEXT_DIRECTION=="rtl") print "_rtl";
 		print "\">\n";
 		foreach($node["path"] as $index=>$pid) {
-		    print "\r\n\r\n<!-- Node ".$index." -->\r\n";
+		    print "\r\n\r\n<!-- Node ".$index." ".$node["relations"][$index]." ".$pid." -->\r\n";
 			$linex = $xoffset;
 			$liney = $yoffset;
 			$arrow_img = GM_IMAGE_DIR."/".$GM_IMAGES["darrow"]["other"];
@@ -368,7 +368,7 @@ if (!$relationship_controller->person1->isempty && !$relationship_controller->pe
                 }
 				else $yoffset += $Dbheight + $Dbyspacing + 50;
 		    }
-			if ($node["relations"][$index]=="brother" || $node["relations"][$index]=="sister") {
+			if ($node["relations"][$index] == "brother" || $node["relations"][$index] == "sister" || $node["relations"][$index] == "sibling") {
 				$arrow_img = GM_IMAGE_DIR."/".$GM_IMAGES["rarrow"]["other"];
 				$xoffset += $Dbwidth + $Dbxspacing + 70;
 				$line = $GM_IMAGES["hline"]["other"];
@@ -384,7 +384,7 @@ if (!$relationship_controller->person1->isempty && !$relationship_controller->pe
 				   $previous = "";
 				}
 			}
-			if ($node["relations"][$index]=="husband" || $node["relations"][$index]=="wife") {
+			if ($node["relations"][$index] == "husband" || $node["relations"][$index] == "wife") {
 				$arrow_img = GM_IMAGE_DIR."/".$GM_IMAGES["rarrow"]["other"];
 				$xoffset += $Dbwidth + $Dbxspacing + 70;
 				$line = $GM_IMAGES["hline"]["other"];
@@ -400,7 +400,7 @@ if (!$relationship_controller->person1->isempty && !$relationship_controller->pe
 				   $previous = "";
 				}
 			}
-			if ($node["relations"][$index] == "son" || $node["relations"][$index] == "daughter") {
+			if ($node["relations"][$index] == "son" || $node["relations"][$index] == "daughter" || $node["relations"][$index] == "child") {
 				$line = $GM_IMAGES["vline"]["other"];
 				$liney += $Dbheight;
 				$linex += $Dbwidth / 2;

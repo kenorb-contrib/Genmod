@@ -117,7 +117,7 @@ if ($cleanup_needed == "cleanup_needed" && $continue == $gm_lang["del_proceed"])
 	
 	$filechanged=false;
 	$inpfile = $GEDFILENAME;
-	if (FileIsWriteable($inpfile) && (file_exists($inpfile))) {
+	if (AdminFunctions::FileIsWriteable($inpfile) && (file_exists($inpfile))) {
 		$l_headcleanup = false;
 		$l_macfilecleanup = false;
 		$l_lineendingscleanup = false;
@@ -204,7 +204,7 @@ if (isset($UPFILE) && !empty($UPFILE["name"])) {
 
 	// NOTE: Check if it is a zipfile
 	if ($path == "") if (strstr(strtolower(trim($GEDFILENAME)), ".zip")==".zip") {
-		$GEDFILENAME = GetGedFromZip($UPFILE);
+		$GEDFILENAME = AdminFunctions::GetGedFromZip($UPFILE);
 	}
 	// NOTE: Check if there is an extension
 	if (strtolower(substr(trim($GEDFILENAME), -4)) != ".ged" && strtolower(substr(trim($GEDFILENAME), -4)) != ".zip") $GEDFILENAME .= ".ged";
@@ -236,7 +236,7 @@ if (isset($UPFILE) && !empty($UPFILE["name"])) {
 				unlink($path.$GEDFILENAME);
 			move_uploaded_file($_FILES['UPFILE']['tmp_name'], $path.$GEDFILENAME);
 		}
-		if (strstr(strtolower(trim($GEDFILENAME)), ".zip")==".zip") $GEDFILENAME = GetGedFromZip($path.$GEDFILENAME);
+		if (strstr(strtolower(trim($GEDFILENAME)), ".zip")==".zip") $GEDFILENAME = AdminFunctions::GetGedFromZip($path.$GEDFILENAME);
 	}
 //	$ged = $GEDFILENAME;
 }
@@ -575,7 +575,7 @@ print "<form enctype=\"multipart/form-data\" method=\"post\" name=\"configform\"
 						else {
 							$cleanup_needed = true;
 							print "<input type=\"hidden\" name=\"cleanup_needed\" value=\"cleanup_needed\">";
-							if (!FileIsWriteable($GEDFILENAME) && (file_exists($GEDFILENAME))) {
+							if (!AdminFunctions::FileIsWriteable($GEDFILENAME) && (file_exists($GEDFILENAME))) {
 								print "<span class=\"error\">".str_replace("#GEDCOM#", get_gedcom_from_id($GEDCOMID), $gm_lang["error_header_write"])."</span>\n";
 							}
 							// NOTE: Check for head cleanu

@@ -555,7 +555,7 @@ if (!empty($check_gedcoms)) {
 					$facts = GetAllSubrecords($gedlines["gedcom"], "", false, true, false);
 					foreach($facts as $keyf => $fact) {
 						// Tags
-						if (!empty($check_tags)) {
+						if (!empty($check_gedtags)) {
 							$subs = split("\n", $fact);
 							foreach($subs as $keyf2 => $sub) {
 								preg_match("/(\d)\s(\w+)[\s.+\r\n|\r\n]/", $sub, $tags);
@@ -570,7 +570,6 @@ if (!empty($check_gedcoms)) {
 								$type = $match[1];
 								$numnc++;
 								if (stristr($fact, "2 SOUR") == 0 && !in_array($type, $non_cits_facts)) {
-//									print "found: ".$type."<br />";
 									$no_cits[$key."[".$GEDCOMID."]"] = array($key, $GEDCOMID, "INDI", $type);
 								}
 							}
@@ -734,7 +733,6 @@ if (!empty($check_gedcoms)) {
 								$ft = preg_match("/^1\s(\w+)/", $fact, $match);
 								$type = $match[1];
 								if (stristr($fact, "2 SOUR") == 0 && !in_array($type, $non_cits_facts)) {
-//									print "found: ".$type."<br />";
 									$no_cits[$key."[".$GEDCOMID."]"] = array($key, $GEDCOMID, "FAM", $gedlines["gedcom"], $type);
 									$numnc++;
 									$inames = true;
@@ -772,8 +770,8 @@ if (!empty($check_gedcoms)) {
 								print $error_icon.$gm_lang["sc_inv_rref_sour"];
 							}
 							print "<br />".$gm_lang["repo"]." ".$rid."<br />";
-							$srec = FindSourceRecord($key, $GEDCOMID);
-							print_list_source($key, $sourcelist[$key]);
+							$source =& Source::GetInstance($key, $sourcelist[$key]["gedcom"], $GEDCOMID);
+							$source->PrintListSource();
 						}
 					}
 				}
@@ -821,8 +819,10 @@ if (!empty($check_gedcoms)) {
 						print $warn_icon.$gm_lang["sc_noref_sour_repo"];
 					}
 					print "<br />";
-					$srec = FindSourceRecord($key, $GEDCOMID);
-					print_list_source($key, $sourcelist[$key]);
+					$source =& Source::GetInstance($key, $sourcelist[$key]["gedcom"], $GEDCOMID);
+					$source->PrintListSource();
+//					$srec = FindSourceRecord($key, $GEDCOMID);
+//					print_list_source($key, $sourcelist[$key]);
 				}
 			}
 			if (!$error) print $info_icon.$gm_lang["sc_ok_sour_repo_ref"]." ";
@@ -842,8 +842,8 @@ if (!empty($check_gedcoms)) {
 						print $warn_icon.$gm_lang["sc_unu_sref"];
 					}
 					print "<br />";
-					$srec = FindSourceRecord($sid, $GEDCOMID);
-					print_list_source($sid, $sourcelist[$sid]);
+					$source =& Source::GetInstance($sid, $sourcelist[$sid]["gedcom"], $GEDCOMID);
+					$source->PrintListSource();
 				}
 			}
 			if (!$error) print $info_icon.$gm_lang["sc_ok_all_sref"]." ";
@@ -863,14 +863,8 @@ if (!empty($check_gedcoms)) {
 						print $warn_icon.$gm_lang["sc_unu_rref"];
 					}
 					print "<br />";
-					$repo = array();
-					$tt = preg_match("/1 NAME (.*)/", $value["gedcom"], $match);
-					if ($tt == "0") $name = $rid; else $name = $match[1];
-					$repo["id"] = $rid;
-					$repo["gedfile"] = $id;
-					$repo["type"] = "REPO";
-					$repo["gedcom"] = $value["gedcom"];
-					print_list_repository($name, $repo);
+					$repo = Repository::GetInstance($rid, $value["gedcom"], $GEDCOMID);
+					$repo->PrintListRepository(true, 1, false);
 				}
 				$s = preg_match_all("/\n\d NOTE @(.+)@/", $value["gedcom"], $match);
 				// if more use $match[1] as array
@@ -892,13 +886,13 @@ if (!empty($check_gedcoms)) {
 						foreach($subs as $keyf2 => $sub) {
 							preg_match("/(\d)\s(\w+)[\s.+\r\n|\r\n]/", $sub, $tags);
 							$numcf++;
-							if (isset($tags[2]) && !defined("GM_FACT_".$tags[2]) && !in_array($tags[2],$rightfacts)) $wrongfacts[$tags[2]][] = array($key, $GEDCOMID, "REPO", $value["gedcom"]);
+							if (isset($tags[2]) && !defined("GM_FACT_".$tags[2]) && !in_array($tags[2],$rightfacts)) $wrongfacts[$tags[2]][] = array($rid, $GEDCOMID, "REPO", $value["gedcom"]);
 						}
 					}
 				}
 			}
 			if (!$error) print $info_icon.$gm_lang["sc_ok_all_rref"]." ";
-			print $gm_lang["sc_numrecs_checked"]." ".$num;
+			print "<br />".$gm_lang["sc_numrecs_checked"]." ".$num;
 			print "</td></tr>";
 	
 			// Print the non-existent facts
@@ -913,18 +907,12 @@ if (!empty($check_gedcoms)) {
 							if ($wfact[2] == "INDI") print_list_person($wfact[0], array(GetPersonName($wfact[0]), $wfact[1]));
 							else if ($wfact[2] == "FAM") print_list_family($wfact[0], array(GetFamilyDescriptor($wfact[0], false, $wfact[3]), $wfact[1]));
 							else if ($wfact[2] == "SOUR") {
-								$srec = FindSourceRecord($wfact[0], $wfact[1]);
-								print_list_source($wfact[0], $sourcelist[$wfact[0]]);
+								$source =& Source::GetInstance($wfact[0], $sourcelist[$wfact[0]]["gedcom"], $wfact[1]);
+								$source->PrintListSource();
 							}
 							else if ($wfact[2] == "REPO") {
-								$repo = array();
-								$tt = preg_match("/1 NAME (.*)/", $wfact[3], $match);
-								if ($tt == "0") $name = $key; else $name = $match[1];
-								$repo["id"] = $key;
-								$repo["gedfile"] = $wfact[1];
-								$repo["type"] = "REPO";
-								$repo["gedcom"] = $wfact[3];
-								print_list_repository($name, $repo);
+								$repo = Repository::GetInstance($key, $wfact[3], $wfact[1]);
+								$repo->PrintListRepository(true, 1, false);
 							}
 							else if ($wfact[2] == "MEDIA") {
 			    				print "<a href=\"mediadetail.php?mid=".$wfact[0]."&amp;gedid=".$GEDCOMID."\">";
@@ -1228,8 +1216,8 @@ if (!empty($check_gedcoms)) {
 								print $error_icon.$gm_lang["sc_inv_mref_sour"];
 							}
 							print "<br />".$gm_lang["sc_media"]." ".$mid."<br />";
-							$srec = FindSourceRecord($key, $GEDCOMID);
-							print_list_source($key, $sourcelist[$sid]);
+							$source =& Source::GetInstance($key, $sourcelist[$key]["gedcom"], $GEDCOMID);
+							$source->PrintListSource();
 						}
 					}
 				}
@@ -1257,12 +1245,8 @@ if (!empty($check_gedcoms)) {
 								print $error_icon.$gm_lang["sc_inv_mref_repo"];
 							}
 							print "<br />".$gm_lang["sc_media"]." ".$mid."<br />";
-							$tt = preg_match("/1 NAME (.*)/", $repo["gedcom"], $rmatch);
-							if ($tt == "0") $name = $key; else $name = $rmatch[1];
-							$repo["id"] = $rid;
-							$repo["gedfile"] = $id;
-							$repo["type"] = "REPO";
-							print_list_repository($name, $repo);
+							$repo = Repository::GetInstance($key, $repo["gedcom"], $GEDCOMID);
+							$repo->PrintListRepository(true, 1, false);
 						}
 					}
 				}
@@ -1298,7 +1282,7 @@ if (!empty($check_gedcoms)) {
 			if (!$MEDIA_IN_DB) {
 				
 				// Build the directorylist
-				$dirs = GetDirList(array(GedcomConfig::$MEDIA_DIRECTORY));
+				$dirs = AdminFunctions::GetDirList(array(GedcomConfig::$MEDIA_DIRECTORY));
 				
 				// exclude the GM trees
 				$tpath = array(GedcomConfig::$MEDIA_DIRECTORY."/thumbs", "/thumbs/", "./fonts/", "./hooks/", "./images/", "./includes", "./languages/", "./modules/", "./pgvnuke/", "./places/", "./reports/", "./ufpdf/", "./themes/", "./blocks/", "./install/", INDEX_DIRECTORY);
@@ -1414,26 +1398,24 @@ if (!empty($check_gedcoms)) {
 					}
 					if ($type == "SOUR") {
 						foreach ($keys as $key => $nothing) {
-							print_list_source($key, $sourcelist[$key]);
+							$source =& Source::GetInstance($key, $sourcelist[$key]["gedcom"], $GEDCOMID);
+							$source->PrintListSource();
 						}
 					}
 					if ($type == "REPO") {
 						foreach ($keys as $key => $nothing) {
-							$crepolist[$key]["id"] = $key;
-							$crepolist[$key]["gedfile"] = $GEDCOMID;
-							$tt = preg_match("/1 NAME (.*)/", $crepolist[$key]["gedcom"], $match);
-							if ($tt == "0") $name = $key; else $name = $match[1];
-							print_list_repository($name, $crepolist[$key]);
+							$repo = Repository::GetInstance($key, $crepolist[$key]["gedcom"], $GEDCOMID);
+							$repo->PrintListRepository(true, 1, false);
 						}
 					}
 					if ($type == "OBJE") {
 						foreach ($keys as $key => $nothing) {
-							if (empty($cmedialist[$key]["title"])) $cmedialist[$key]["name"] = $cmedialist[$key]["file"];
-							else $cmedialist[$key]["name"] = $cmedialist[$key]["title"];
-							print_list_media($key, $cmedialist[$key]);
+							$media = MediaItem::GetInstance($key, $cmedialist[$key]["gedcom"], $cmedialist[$key]["gedfile"]);
+							$media->PrintListMedia();
 						}
 					}
 				}
+				print "<br />";
 			}
 			print $gm_lang["sc_numrecs_checked"]." ".$numcn;
 			print "</td></tr>";	
@@ -1485,7 +1467,7 @@ if (!empty($check_filesys)) {
 			while (false !== ($entry = $d->read())) {
 				if(!is_dir($entry) && $entry != ".") {
 					$num++;
-					if (FileIsWriteable($d->path."/".$entry)) {
+					if (AdminFunctions::FileIsWriteable($d->path."/".$entry)) {
 						if (!$errors2) {
 							print $error_icon.$gm_lang["sc_fs_filesrw"]."<br />";
 							$errors2 = true;
@@ -1517,7 +1499,7 @@ if (!empty($check_filesys)) {
 				// As of PHP5 also .. is returned and now excluded here.
 				if(!is_dir($entry) && $entry != "." && $entry != "..") {
 					$num++;
-					if (!FileIsWriteable($d->path."/".$entry)) {
+					if (!AdminFunctions::FileIsWriteable($d->path."/".$entry)) {
 						if (!$errors2) {
 							print $error_icon.$gm_lang["sc_fs_filesro"]."<br />";
 							$errors2 = true;
@@ -1546,7 +1528,7 @@ if (!empty($check_filesys)) {
 			while (false !== ($entry = $d->read())) {
 				$num++;
 				if(!is_dir($entry) && $entry != ".") {
-					if (FileIsWriteable($d->path."/".$entry)) $write2 = true;
+					if (AdminFunctions::FileIsWriteable($d->path."/".$entry)) $write2 = true;
 					$num++;
 				}
 			}
@@ -1683,7 +1665,7 @@ if (!empty($check_filesys)) {
 		
 		// All other files and dirs
 		print "<tr><td class=\"shade1 wrap\">".$gm_lang["sc_fs_other"]."</td><td class=\"shade1 wrap\">";
-		$dirs = GetDirList(array("./blocks/", "./fonts/", "./hooks/", "./images/", "./includes/", "./modules/", "./places/", "./reports/", "./themes/", "./ufpdf/"));
+		$dirs = AdminFunctions::GetDirList(array("./blocks/", "./fonts/", "./hooks/", "./images/", "./includes/", "./modules/", "./places/", "./reports/", "./themes/", "./ufpdf/"));
 		$errors1 = false;
 		foreach ($dirs as $key=>$dir) {
 			if (MediaFS::DirIsWritable($dir, false)) {
@@ -1707,7 +1689,7 @@ if (!empty($check_filesys)) {
 				while (false !== ($entry = $d->read())) {
 					if(!is_dir($entry) && $entry != ".") {
 						$num++;
-						if (FileIsWriteable($d->path."/".$entry)) {
+						if (AdminFunctions::FileIsWriteable($d->path."/".$entry)) {
 							if (!$errors2) {
 								print $error_icon.$gm_lang["sc_fs_filesrw"]."<br />";
 								$errors2 = true;

@@ -97,33 +97,9 @@ if ($action=="edituser2") {
 			if (isset($new_default_tab)) $newuser->default_tab = $new_default_tab;
 			UserController::AddUser($newuser, "changed");
 			$gm_user = CloneObj($newuser);
-			
+
 			//-- update Gedcom record with new email address
-			if ($gm_user->sync_gedcom == "Y" && $sync_data_changed && !empty($user->email)) {
-				$oldged = $GEDCOMID;
-				foreach($gm_user->gedcomid as $gedcid=>$gedid) {
-					if (!empty($gedid) && isset($GEDCOMS[$gedcid])) {
-						$GEDCOMID = $gedcid;
-						$indirec = FindPersonRecord($gedid);
-						$rec = GetChangeData(false, $gedid, true, "gedlines", "");
-						if (isset($rec[$GEDCOMID][$gedid])) $indirec = $rec[$GEDCOMID][$gedid];
-						if (!empty($indirec)) {
-							$change_id = GetNewXref("CHANGE");
-							if (preg_match("/(\d) (_?EMAIL .+)/", $indirec, $match)>0) {
-								$level = $match[1];
-								$oldrec = $match[0];
-								$subrec = GetSubRecord($level, $oldrec, $indirec);
-								$newrec = preg_replace("/(\d _?EMAIL)[^\r\n]*/", "$1 ".$user->email, $subrec);
-								if ($subrec != $newrec) ReplaceGedrec($gedid, $subrec, $newrec, "EMAIL", $change_id, "edit_fact", $GEDCOMID, "INDI");
-							}
-							else {
-								ReplaceGedrec($gedid, "", "1 EMAIL ".$user->email."\r\n2 RESN private", "EMAIL", $change_id, "add_fact", $GEDCOMID, "INDI");
-							}
-						}
-					}
-				}
-				$GEDCOMID = $oldged;
-			}
+			if ($sync_data_changed) AdminFunctions::UpdateUserIndiEmail($newuser);
 		}
 		else {
 			print "<span class=\"error\">".$gm_lang["invalid_username"]."</span><br />";

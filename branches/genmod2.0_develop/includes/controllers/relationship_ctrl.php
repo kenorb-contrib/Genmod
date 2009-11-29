@@ -60,7 +60,7 @@ class RelationshipController extends ChartController {
 		if (!isset($_REQUEST["asc"]) || $_REQUEST["asc"] == "") $this->asc = 1;
 		else $this->asc = $_REQUEST["asc"];
 		
-		if (!isset($_REQUEST["followspouse"]) || $_REQUEST["followspouse"] == "") $this->pretty = 0;
+		if (!isset($_REQUEST["followspouse"]) || $_REQUEST["followspouse"] == "") $this->followspouse = 0;
 		else $this->followspouse = $_REQUEST["followspouse"];
 		
 		if (!isset($_REQUEST["path_to_find"]) || $_REQUEST["path_to_find"] == "") {

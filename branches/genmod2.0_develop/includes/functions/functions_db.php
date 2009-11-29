@@ -109,7 +109,7 @@ function FindFamilyRecord($famid, $gedfile="", $renew = false) {
 	if ($COMBIKEY) $key = JoinKey($famid, $gedfile);
 	else $key = $famid;
 
-	if (!$renew && isset($famlist[$key]["gedcom"])&&($famlist[$key]["gedfile"] == $gedfile)) return $famlist[$key]["gedcom"];
+	if (!$renew && isset($famlist[$key]["gedfile"])&&($famlist[$key]["gedfile"] == $gedfile)) return $famlist[$key]["gedcom"];
 
 	$sql = "SELECT f_gedrec, f_file, f_husb, f_wife FROM ".TBLPREFIX."families WHERE f_key='".DbLayer::EscapeQuery(JoinKey($famid, $gedfile))."'";
 
@@ -153,8 +153,8 @@ function FindPersonRecord($pid, $gedfile="", $renew = false, $nocache = false) {
 	
 	// print $pid." ".$gedfileid."<br />";
 	//-- first check the indilist cache
-	if (!$renew && isset($indilist[$pid]["gedcom"]) && $indilist[$pid]["gedfile"]==$gedfile) return $indilist[$pid]["gedcom"];
-	if (!$renew && isset($indilist[JoinKey($pid, $gedfile)]["gedcom"])) return $indilist[JoinKey($pid, $gedfile)]["gedcom"];
+	if (!$renew && isset($indilist[$pid]["gedfile"]) && $indilist[$pid]["gedfile"]==$gedfile) return $indilist[$pid]["gedcom"];
+	if (!$renew && isset($indilist[JoinKey($pid, $gedfile)]["gedfile"])) return $indilist[JoinKey($pid, $gedfile)]["gedcom"];
 
 	$sql = "SELECT i_key, i_gedrec, i_isdead, i_file FROM ".TBLPREFIX."individuals WHERE i_key='".DbLayer::EscapeQuery(JoinKey($pid, $gedfile))."'";
 	$res = NewQuery($sql);
@@ -1953,8 +1953,8 @@ function ReadLog($cat, $max="20", $type="", $gedid="", $last=false, $count=false
 
 function NewLogRecs($cat, $gedid="") {
 	
-	$sql = "SELECT count('i_type') FROM ".TBLPREFIX."log WHERE l_category='".$cat."' AND l_type='E' AND l_new='1'";
-	if (!empty($ged)) $sql .= " AND l_file='".$gedid."'";
+	$sql = "SELECT count('l_type') FROM ".TBLPREFIX."log WHERE l_category='".$cat."' AND l_type='E' AND l_new='1'";
+	if (!empty($gedid)) $sql .= " AND l_file='".$gedid."'";
 	$res = NewQuery($sql);
 	if ($res) {
 		$number = $res->FetchRow();
@@ -1966,7 +1966,7 @@ function NewLogRecs($cat, $gedid="") {
 function HaveReadNewLogrecs($cat, $gedid="") {
 	
 	$sql = "UPDATE ".TBLPREFIX."log SET l_new='0' WHERE l_category='".$cat."' AND l_type='E' AND l_new='1'";
-	if (!empty($ged)) $sql .= " AND l_file='".$gedid."'";
+	if (!empty($gedid)) $sql .= " AND l_file='".$gedid."'";
 	$res = NewQuery($sql);
 }
 
@@ -1975,7 +1975,7 @@ function ImportEmergencyLog() {
 
 	// If we cannot read/delete the file, don't process it.
 	$filename = INDEX_DIRECTORY."emergency_syslog.txt";
-	if (!FileIsWriteable($filename)) return $gm_lang["emergency_log_noprocess"];
+	if (!AdminFunctions::FileIsWriteable($filename)) return $gm_lang["emergency_log_noprocess"];
 	
 	// Read the contents
 	$handle = fopen($filename, "r");
@@ -2487,8 +2487,6 @@ require_once("includes/functions/functions_edit.php"); // for checkgedcom
 					$gedlines[$gedname][$chgid] = trim($gedrecord);
 				}
 			}
-//			print_r($gedlines);
-//			print "<br /><br />";
 			$chcache[$sql] = $gedlines;
 			return $gedlines;
 		}

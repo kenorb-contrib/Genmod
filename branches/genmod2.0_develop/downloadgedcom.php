@@ -55,7 +55,7 @@ class DownloadGedcom {
 							header("Content-Type: text/plain; charset=".$genmod['character_set']);
 							if (file_exists($genmod['gedcoms'][$this->ged]["path"])) header("Content-Disposition: attachment; filename=$this->ged; size=".filesize($genmod['gedcoms'][$this->ged]["path"]));
 							else header("Content-Disposition: attachment; filename=$this->ged");
-							PrintGedcom($this->ged, $this->convert, $this->remove, $this->zip, $this->privatize_export, $this->privatize_export_level, "", $this->embedmm);
+							AdminFunctions::PrintGedcom($this->ged, $this->convert, $this->remove, $this->zip, $this->privatize_export, $this->privatize_export_level, "", $this->embedmm);
 							exit;
 							break;
 					}
@@ -169,7 +169,7 @@ class DownloadGedcom {
 		$this->zipfile = $genmod['index_directory'].$this->zipname;
 		$this->gedname = $genmod['index_directory']."DL_".$this->ged;
 		if (file_exists($this->gedname)) unlink($this->gedname);
-		PrintGedcom($this->ged, $this->convert, $this->remove, $this->zip, $this->privatize_export, $this->privatize_export_level, $this->gedname, $this->embedmm);
+		AdminFunctions::PrintGedcom($this->ged, $this->convert, $this->remove, $this->zip, $this->privatize_export, $this->privatize_export_level, $this->gedname, $this->embedmm);
 		$this->comment = "Created by Genmod ".$genmod["version"]." ".$genmod["version_release"]." on ".adodb_date("r").".";
 		$archive = new PclZip($this->zipfile);
 		$v_list = $archive->create($this->gedname, PCLZIP_OPT_COMMENT, $this->comment);

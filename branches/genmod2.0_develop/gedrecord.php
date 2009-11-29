@@ -39,17 +39,16 @@ if ((!$gm_user->userCanViewGedlines()) && (!$gm_user->UserCanAccept())) {
 	print "</body></html>";
 	exit;
 }
-
-if ((FindPersonRecord($pid))&&(!PrivacyFunctions::displayDetailsByID($pid))) {
+$person = Person::GetInstance($pid);
+if (!$person->isempty && !$person->disp) {
 	PrintFunctions::PrintPrivacyError(GedcomConfig::$CONTACT_EMAIL);
 	print "</body></html>";
 	exit;
 }
 if ($changed) {
-	$getrec = GetChangeData(false, $pid, true);
-	$newrec = $getrec[$GEDCOMID][$pid];
+	$newrec = $person->changedgedrec;
 	$newrec = PrivacyFunctions::PrivatizeGedcom($newrec);
-	$oldrec = FindGedcomRecord($pid);
+	$oldrec = $person->gedrec;
 	$oldrec = PrivacyFunctions::PrivatizeGedcom($oldrec);
 	print "<table class=\"facts_table\">\r\n";
 	print "<tr class=\"topbottombar\"><td>".$gm_lang["old_record"]."</td><td>".$gm_lang["new_record"]."</td></tr>\r\n";
@@ -57,8 +56,7 @@ if ($changed) {
 	print "<tr class=\"topbottombar\"><td colspan=\"2\">&nbsp;</td></tr></table>\r\n";
 }
 else {
-	$indirec = FindGedcomRecord($pid);
-	$indirec = PrivacyFunctions::PrivatizeGedcom($indirec);
+	$indirec = PrivacyFunctions::PrivatizeGedcom($person->gedrec);
 	print nl2br($indirec);
 	print "<br />";
 }

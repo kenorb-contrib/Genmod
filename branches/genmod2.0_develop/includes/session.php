@@ -292,7 +292,6 @@ if (!defined('SERVER_URL')) {
 
 //--load common functions
 require_once($GM_BASE_DIRECTORY."includes/functions/functions.php");
-require_once($GM_BASE_DIRECTORY."includes/functions/functions_admin.php");
 require_once($GM_BASE_DIRECTORY."includes/functions/functions_language.php");
 //-- load db specific functions
 require_once($GM_BASE_DIRECTORY."includes/functions/functions_db.php");

@@ -162,7 +162,6 @@ abstract class PrivacyFunctions {
 					}
 				}
 			}
-			$children = array();
 			// For each family in which this person is a spouse...
 			$numfams = preg_match_all("/1\s*FAMS\s*@(.*)@/", $indirec, $fmatch, PREG_SET_ORDER);
 			for($j=0; $j<$numfams; $j++) {
@@ -211,29 +210,33 @@ abstract class PrivacyFunctions {
 				}
 			}
 			//-- check grandchildren for dates
-			$gchildren = array();
-			foreach($family->children as $indexval => $child) {
-				// For each family in which this person is a spouse...
-				$numfams = preg_match_all("/1\s*FAMS\s*@(.*)@/", $child->gedrec, $fmatch, PREG_SET_ORDER);
-				for($j=0; $j<$numfams; $j++) {
-					// Get the family record
-					$childfam =& Family::GetInstance($fmatch[$j][1]);
-					// Get the set of children
-					foreach ($childfam->children as $key2 => $grandchild) {
-						// Check each grandchild's dates
-						$bt = preg_match_all("/\d DATE.*\s(\d{3,4})\s/", $grandchild->gedrec, $bmatch, PREG_SET_ORDER);
-						for($h=0; $h<$bt; $h++) {
-							$byear = $bmatch[$h][1];
-							// if any grandchild was born more than MAX_ALIVE_AGE-30 years ago assume the grandparent has died
-							if (($cyear-$byear) > ($MAX_ALIVE_AGE-30)) {
-								//print "grandchild older than $MAX_ALIVE_AGE-30 (".$bmatch[$h][0].") year is $byear\n";
-								return true;
+			$numfams = preg_match_all("/1\s*FAMS\s*@(.*)@/", $indirec, $fmatch, PREG_SET_ORDER);
+			for($j=0; $j<$numfams; $j++) {
+				// Get the family record
+				$family =& Family::GetInstance($fmatch[$j][1]);
+				foreach($family->children as $indexval => $child) {
+					// For each family in which this person is a spouse...
+					$numfams = preg_match_all("/1\s*FAMS\s*@(.*)@/", $child->gedrec, $fmatch, PREG_SET_ORDER);
+					for($j=0; $j<$numfams; $j++) {
+						// Get the family record
+						$childfam =& Family::GetInstance($fmatch[$j][1]);
+						// Get the set of children
+						foreach ($childfam->children as $key2 => $grandchild) {
+							// Check each grandchild's dates
+							$bt = preg_match_all("/\d DATE.*\s(\d{3,4})\s/", $grandchild->gedrec, $bmatch, PREG_SET_ORDER);
+							for($h=0; $h<$bt; $h++) {
+								$byear = $bmatch[$h][1];
+								// if any grandchild was born more than MAX_ALIVE_AGE-30 years ago assume the grandparent has died
+								if (($cyear-$byear) > ($MAX_ALIVE_AGE-30)) {
+									//print "grandchild older than $MAX_ALIVE_AGE-30 (".$bmatch[$h][0].") year is $byear\n";
+									return true;
+								}
 							}
 						}
 					}
 				}
 			}
-	/*			//-- check greatgrandchildren for dates
+/*			//-- check greatgrandchildren for dates
 			$ggchildren = array();
 			foreach($gchildren as $indexval => $gchild) {
 				// For each family in which this person is a spouse...
@@ -813,25 +816,26 @@ abstract class PrivacyFunctions {
 		if ($gt > 0) {
 			$gid = trim($gmatch[1]);
 			$type = trim($gmatch[2]);
-			$disp = self::displayDetailsByID($gid, $type, 1, true);
-	//		if ($type == "SOUR") print "<br />"."[$gm_user->username $gid $type $disp]";
+			$object = ConstructObject($gid, $type, "", $gedrec);
+			$allsubs = GetAllSubrecords($gedrec, "", false, false, false);
 			//-- check if the whole record is private
-			if (!$disp) {
+			if (!$object->disp) {
 				//-- check if name should be private
-				if (($type=="INDI")&&(!self::showLivingNameById($gid))) {
-					$newrec = "0 @".$gid."@ INDI\r\n";
-					$newrec .= "1 NAME " . $gm_lang["private"] . " /" . $gm_lang["private"] . "/" . "\r\n";
-					$newrec .= "2 SURN " . $gm_lang["private"] . "\r\n";
-					$newrec .= "2 GIVN " . $gm_lang["private"] . "\r\n";
+				if ($type == "INDI") {
+					if (!$object->disp_name) {
+						$newrec = "0 @".$gid."@ INDI\r\n";
+						$newrec .= "1 NAME " . $gm_lang["private"] . " /" . $gm_lang["private"] . "/" . "\r\n";
+						$newrec .= "2 SURN " . $gm_lang["private"] . "\r\n";
+						$newrec .= "2 GIVN " . $gm_lang["private"] . "\r\n";
+					}
 				}
-				else if ($type=="SOUR") {
-	//				print "hidden";
+				else if ($type == "SOUR") {
 					$newrec = "0 @".$gid."@ SOUR\r\n";
 					$newrec .= "1 TITL ".$gm_lang["private"]."\r\n";
 				}
 				else {
 					$newrec = "0 @".$gid."@ $type\r\n";
-					if ($type=="INDI") {
+					if ($type == "INDI") {
 						$chil = GetSubRecord(1, "1 NAME", $gedrec);
 						if (!empty($chil)) $newrec .= trim($chil)."\r\n";
 						$chil = GetSubRecord(1, "1 FAMC", $gedrec);
@@ -849,13 +853,13 @@ abstract class PrivacyFunctions {
 							$chil = GetSubRecord(1, "1 FAMS", $gedrec, $i);
 						}
 					}
-					else if ($type=="SOUR") {
+					else if ($type == "SOUR") {
 						$chil = GetSubRecord(1, "1 ABBR", $gedrec);
 						if (!empty($chil)) $newrec .= trim($chil)."\r\n";
 						$chil = GetSubRecord(1, "1 TITL", $gedrec);
 						if (!empty($chil)) $newrec .= trim($chil)."\r\n";
 					}
-					else if ($type=="FAM") {
+					else if ($type == "FAM") {
 						$chil = GetSubRecord(1, "1 HUSB", $gedrec);
 						if (!empty($chil)) $newrec .= trim($chil)."\r\n";
 						$chil = GetSubRecord(1, "1 WIFE", $gedrec);
@@ -870,27 +874,13 @@ abstract class PrivacyFunctions {
 					}
 				}
 				$newrec .= "1 NOTE ".trim($gm_lang["person_private"])."\r\n";
-				//print $newrec;
 				return $newrec;
 			}
 			else {
 				$newrec = "0 @".$gid."@ $type\r\n";
-				//-- check all of the sub facts for access
-				$subs = GetAllSubrecords($gedrec, "", false, false, false);
-				foreach($subs as $indexval => $sub) {
-					$ft = preg_match("/1\s(\w+)(.*)/", $sub, $match);
-					$fact = $match[1];
-					if (self::FactViewRestricted($gid, $sub)==false && self::ShowFact($fact, $gid) && self::ShowFactDetails($fact, $gid)) {
-						// Also remove private links from this record
-						$cl = preg_match_all("/[1-9]\s(.+)\s@(.+)@/", $sub, $match);
-						for ($i=0; $i<$cl;$i++) {
-							if (!self::DisplayDetailsByID($match[2][$i], $match[1][$i], 1, true)) {
-								$r = $match[0][$i]."[\r\n]*";
-								$sub = preg_replace("/$r/", "", $sub);
-							}
-						}
-						$newrec .= $sub;
-					}
+				//-- check all of the sub facts for access. As ->facts also contains changed factrecs, compare them with the original indirec.
+				foreach($object->facts as $indexval => $fact) {
+					if ($fact->disp && in_array($fact->factrec."\r\n", $allsubs)) $newrec .= $fact->factrec."\r\n";
 				}
 				return $newrec;
 			}

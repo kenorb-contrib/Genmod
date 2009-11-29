@@ -192,7 +192,7 @@ switch ($action) {
 						$ged = $gedcom["gedcom"];
 						if (file_exists(INDEX_DIRECTORY."export_".$ged)) unlink(INDEX_DIRECTORY."export_".$ged);
 						$gedname = INDEX_DIRECTORY."export_".$ged;
-						PrintGedcom($ged, "no", "no", "yes", "no", "", $gedname, "");
+						AdminFunctions::PrintGedcom($ged, "no", "no", "yes", "no", "", $gedname, "");
 						$flist[] = $gedname;
 					}
 					$fn = ExportTable("changes");
