@@ -441,8 +441,8 @@ function InstallStoreConfig() {
 	
 	//-- Store the config file
 	if (file_exists("../config.php")) {
-		if (file_exists("../config.old") && FileIsWriteable("../config.old")) unlink("../config.old");
-		if (FileIsWriteable("../config.old")) copy("../config.php", "../config.old");
+		if (file_exists("../config.old") && AdminFunctions::FileIsWriteable("../config.old")) unlink("../config.old");
+		if (AdminFunctions::FileIsWriteable("../config.old")) copy("../config.php", "../config.old");
 	}
 	$fp = @fopen("../config.php", "wb");
 	if (!$fp) {

@@ -1182,7 +1182,7 @@ abstract class MediaFS {
 		$cnt = $res->FetchRow();
 		if ($cnt[0] > 0) return false;
 		
-		if ($MEDIA_IN_DB || (self::DirIsWritable($from, false) && self::DirIsWritable($to, false) && FileIsWriteable($from.$file))) {
+		if ($MEDIA_IN_DB || (self::DirIsWritable($from, false) && self::DirIsWritable($to, false) && AdminFunctions::FileIsWriteable($from.$file))) {
 			// Retrieve the media in which this file is used
 			$sql = "SELECT m_media, m_gedrec FROM ".TBLPREFIX."media WHERE m_mfile LIKE '".DbLayer::EscapeQuery($mfrom.$file)."%' AND m_file LIKE '".$GEDCOMID."'";
 //			print $sql;

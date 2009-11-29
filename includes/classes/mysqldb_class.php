@@ -84,6 +84,7 @@ abstract class MysqlDb {
 		if (!$res && !$noreport) {
 			$this->HandleError($sql);
 			WriteToLog("Query-> Error occured: ".mysql_error()."<br />Query: ".htmlentities($sql),"E","S");
+//			print "Query-> Error occured: ".mysql_error()."<br />Query: ".htmlentities($sql);
 		}
 		// Increase the querytime
 		$QUERY_EXECTIME = $QUERY_EXECTIME + $timee - $times;

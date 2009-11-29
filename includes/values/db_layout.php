@@ -118,6 +118,7 @@ $db_original[TBLPREFIX."dates"]["row"]["d_gid"]["details"] = "VARCHAR(64) CHARAC
 $db_original[TBLPREFIX."dates"]["row"]["d_key"]["details"] = "VARCHAR(64) CHARACTER SET #charset# COLLATE #collate# ";
 $db_original[TBLPREFIX."dates"]["row"]["d_file"]["details"] = "TINYINT UNSIGNED";
 $db_original[TBLPREFIX."dates"]["row"]["d_type"]["details"] = "VARCHAR(13) CHARACTER SET #charset# COLLATE #collate# ";
+$db_original[TBLPREFIX."dates"]["row"]["d_ext"]["details"] = "VARCHAR(32) CHARACTER SET #charset# COLLATE #collate# ";
 $db_original[TBLPREFIX."dates"]["key"]["date_day"] = "KEY `date_day` (`d_day`)";
 $db_original[TBLPREFIX."dates"]["key"]["date_month"] = "KEY `date_month` (`d_month`)";
 $db_original[TBLPREFIX."dates"]["key"]["date_year"] = "KEY `date_year` (`d_year`)";

@@ -125,19 +125,6 @@ function IsDeadId($pid) {
 	return PrivacyFunctions::IsDead(FindPersonRecord($pid));
 }
 
-// This functions checks if an existing file is physically writeable
-// The standard PHP function only checks for the R/O attribute and doesn't
-// detect authorisation by ACL.
-function FileIsWriteable($file) {
-	$err_write = false;
-	$handle = @fopen($file,"r+");
-	if	($handle)	{
-		$i = fclose($handle);
-		$err_write = true;
-	}
-	return($err_write);
-}
-
 /**
  * GM Error Handling function
  *
@@ -1084,6 +1071,7 @@ function GetRelationship(&$pid1, &$pid2, $followspouse=true, $maxlength=0, $igno
 				$sql = "SELECT n.if_pkey as d_pid, n.if_role as d_role, i.i_gender as d_gender, d.d_year as d_bdate, m.if_role as n_role, n.if_fkey as d_fam FROM ".TBLPREFIX."individual_family as m LEFT JOIN ".TBLPREFIX."individual_family as n ON n.if_fkey=m.if_fkey LEFT JOIN ".TBLPREFIX."individuals AS i ON i.i_key=n.if_pkey LEFT JOIN ".TBLPREFIX."dates AS d ON (n.if_pkey=d.d_key AND (d.d_fact IS NULL OR d.d_fact='BIRT')) WHERE m.if_pkey='".DbLayer::EscapeQuery(JoinKey($node["pid"], $GEDCOMID))."' AND n.if_pkey<>m.if_pkey ORDER BY n_role, d_role";
 				$res = NewQuery($sql);
 				while ($row = $res->FetchAssoc()) {
+					$rela = "";
 					$dpid = SplitKey($row["d_pid"], "id");
 					$dfam = SplitKey($row["d_fam"], "id");
 					if (!isset($visited[$dpid])) {
@@ -1094,7 +1082,7 @@ function GetRelationship(&$pid1, &$pid2, $followspouse=true, $maxlength=0, $igno
 							$dgender = $row["d_gender"];
 							if ($nrole == "C") {
 								if ($drole == "C") {
-									$rela = ($dgender == "M" ? "brother" : ($dgender == "F" ? "sister" : ""));
+									$rela = ($dgender == "M" ? "brother" : ($dgender == "F" ? "sister" : "sibling"));
 									$length = $siblingh;
 								}
 								else {
@@ -1114,7 +1102,7 @@ function GetRelationship(&$pid1, &$pid2, $followspouse=true, $maxlength=0, $igno
 									$length = $spouseh;
 								}
 								else {
-									$rela = ($dgender == "M" ? "son" : ($dgender == "F" ? "daughter" : ""));
+									$rela = ($dgender == "M" ? "son" : ($dgender == "F" ? "daughter" : "child"));
 									$length = $childh;
 								}
 							}
@@ -1621,25 +1609,6 @@ function GetLdsGlance($indirec) {
 }
 
 /**
- * Check for facts that may exist only once for a certain record type.
- * If the fact already exists in the second array, delete it from the first one.
- */
- function CheckFactUnique($uniquefacts, $recfacts, $type) {
-
-	 foreach($recfacts as $indexval => $fact) {
-
-//		$ft = preg_match("/1 (\w+)(.*)/", $fact[1], $match);
-//		if ($ft>0) {
-		if ($fact->fact != "") {
-//			$fact = trim($match[1]);
-			$key = array_search($fact->fact, $uniquefacts);
-			if ($key !== false) unset($uniquefacts[$key]);
-		}
-	 }
-	 return $uniquefacts;
- }
-
-/**
  * remove any custom GM tags from the given gedcom record
  * custom tags include _GMU and _THUM
  * @param string $gedrec	the raw gedcom record
@@ -1659,21 +1628,6 @@ function RemoveCustomTags($gedrec, $remove="no") {
 	return $gedrec;
 }
 
-function EmbedMM($gedrec) {
-
-	$ct = preg_match_all("/\n(\d) OBJE @(.+)@/", $gedrec, $match);
-	for ($i=1;$i<=$ct;$i++) {
-		$mmid = $match[2][$i-1];
-		$level = $match[1][$i-1];
-		$mediarec = FindMediaRecord($mmid);
-		$oldlevel = $mediarec[0];
-		$mediarec = preg_replace("/\n(\d) /e", "'\n'.SumNums($1, $level).' '", $mediarec);
-		$mediarec = preg_replace("/0 @.+@ OBJE\s*\r\n/", "", $mediarec);
-		$mediarec = $level." OBJE\r\n".$mediarec."\r\n";
-		$gedrec = preg_replace("/$level OBJE @$mmid@\s*/", $mediarec, $gedrec);
-	}
-	return $gedrec;
-}
 
 function EmbedNote($gedrec) {
 
@@ -1692,48 +1646,6 @@ function EmbedNote($gedrec) {
 
 function SumNums($val1, $val2) {
 	return $val1 + $val2;
-}
-
-/**
- * find the name of the first GEDCOM file in a zipfile
- * @param string $zipfile	the path and filename
- * @param boolean $extract  true = extract and return filename, false = return filename
- * @return string		the path and filename of the gedcom file
- */
-function GetGedFromZip($zipfile, $extract=true) {
-
-	require_once "includes/pclzip.lib.php";
-	$zip = new PclZip($zipfile);
-
-	// if it's not a valid zip, just return the filename
-	if (($list = $zip->listContent()) == 0) {
-		return $zipfile;
-	}
-
-	// Determine the extract directory
-	$slpos = strrpos($zipfile, "/");
-	if (!$slpos) $slpos = strrpos($zipfile,"\\");
-	if ($slpos) $path = substr($zipfile, 0, $slpos+1);
-	else $path = INDEX_DIRECTORY;
-	// Scan the files and return the first .ged found
-	foreach($list as $key=>$listitem) {
-		if (($listitem["status"]="ok") && (strstr(strtolower($listitem["filename"]), ".")==".ged")) {
-			$filename = basename($listitem["filename"]);
-			if ($extract == false) return $filename;
-
-			// if the gedcom exists, save the old one. NOT to bak as it will be overwritten on import
-			if (file_exists($path.$filename)) {
-				if (file_exists($path.$filename.".old")) unlink($path.$filename.".old");
-				copy($path.$filename, $path.$filename.".old");
-				unlink($path.$filename);
-			}
-			if ($zip->extract(PCLZIP_OPT_REMOVE_ALL_PATH, PCLZIP_OPT_PATH, $path, PCLZIP_OPT_BY_NAME, $listitem["filename"]) == 0) {
-				print "ERROR cannot extract ZIP";
-			}
-			return $filename;
-		}
-	}
-	return $zipfile;
 }
 
 /**
@@ -1841,8 +1753,9 @@ function SplitKey($key, $type) {
 }
 
 function JoinKey($key, $gedid) {
+	if (empty($key)) return "";
 	if (strpos($key, "[") === false) return $key."[".$gedid."]";
-	else print "Joining an already combined key: ".$key;
+	else print "Trying to join already joined key: ".$key."<br />";
 }
 
 /**
@@ -2266,177 +2179,6 @@ function GetGMNewsItems() {
 	return $gmnews;
 }
 
-
-function PrintGedcom($ged, $convert, $remove, $zip, $privatize_export, $privatize_export_level, $gedname, $embedmm) {
-	GLOBAL $GEDCOMID, $gm_lang, $GM_BASE_DIRECTORY, $gm_username, $gm_user;
-	if ($zip == "yes") {
-		$gedout = fopen($gedname, "w");
-	}
-
-	if ($privatize_export == "yes") {
-		UserController::CreateExportUser($privatize_export_level);
-		if (isset($_SESSION)) {
-			$_SESSION["org_user"] = $_SESSION["gm_user"];
-			$_SESSION["gm_user"] = "export";
-		}
-		if (isset($HTTP_SESSION_VARS)) {
-			$HTTP_SESSION_VARS["org_user"] = $HTTP_SESSION_VARS["gm_user"];
-			$HTTP_SESSION_VARS["gm_user"] = "export";
-		}
-		$gm_username = UserController::GetUserName();
-		$gm_user =& User::GetInstance($gm_username); 
-	}
-
-	SwitchGedcom($ged);
-	$head = FindGedcomRecord("HEAD");
-	if (!empty($head)) {
-		$pos1 = strpos($head, "1 SOUR");
-		if ($pos1!==false) {
-			$pos2 = strpos($head, "\n1", $pos1+1);
-			if ($pos2===false) $pos2 = strlen($head);
-			$newhead = substr($head, 0, $pos1);
-			$newhead .= substr($head, $pos2+1);
-			$head = $newhead;
-		}
-		$pos1 = strpos($head, "1 DATE ");
-		if ($pos1!=false) {
-			$pos2 = strpos($head, "\n1", $pos1+1);
-			if ($pos2===false) {
-				$head = substr($head, 0, $pos1);
-			}
-			else {
-				$head = substr($head, 0, $pos1).substr($head, $pos2+1);
-			}
-		}
-		$head = trim($head);
-		$head .= "\r\n1 SOUR Genmod\r\n2 NAME Genmod Online Genealogy\r\n2 VERS ".GM_VERSION." ".GM_VERSION_RELEASE."\r\n";
-		$head .= "1 DATE ".date("j M Y")."\r\n";
-		$head .= "2 TIME ".date("h:i:s")."\r\n";
-		if (strstr($head, "1 PLAC")===false) {
-			$head .= "1 PLAC\r\n2 FORM ".$gm_lang["default_form"]."\r\n";
-		}
-	}
-	else {
-		$head = "0 HEAD\r\n1 SOUR Genmod\r\n2 NAME Genmod Online Genealogy\r\n2 VERS ".GM_VERSION." ".GM_VERSION_RELEASE."\r\n1 DEST DISKETTE\r\n1 DATE ".date("j M Y")."\r\n2 TIME ".date("h:i:s")."\r\n";
-		$head .= "1 GEDC\r\n2 VERS 5.5\r\n2 FORM LINEAGE-LINKED\r\n1 CHAR ".GedcomConfig::$CHARACTER_SET."\r\n1 PLAC\r\n2 FORM ".$gm_lang["default_form"]."\r\n";
-	}
-	if ($convert=="yes") {
-		$head = preg_replace("/UTF-8/", "ANSI", $head);
-		$head = utf8_decode($head);
-	}
-	$head = RemoveCustomTags($head, $remove);
-	$head = preg_replace(array("/(\r\n)+/", "/\r+/", "/\n+/"), array("\r\n", "\r", "\n"), $head);
-	if ($zip == "yes") fwrite($gedout, $head);
-	else print $head;
-
-	$sql = "SELECT i_gedrec FROM ".TBLPREFIX."individuals WHERE i_file=".$GEDCOMID." ORDER BY CAST(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(LOWER(i_id),'a',''),'b',''),'c',''),'d',''),'e',''),'f',''),'g',''),'h',''),'i',''),'j',''),'k',''),'l',''),'m',''),'n',''),'o',''),'p',''),'q',''),'r',''),'s',''),'t',''),'u',''),'v',''),'w',''),'x',''),'y',''),'z','') as unsigned)";
-	$res = NewQuery($sql);
-	if ($res) {
-		while($row = $res->FetchRow()){
-			$rec = trim($row[0])."\r\n";
-			if ($embedmm=="yes") $rec = EmbedMM($rec);
-			$rec = RemoveCustomTags($rec, $remove);
-			if ($privatize_export == "yes") $rec = PrivacyFunctions::PrivatizeGedcom($rec);
-			if ($convert=="yes") $rec = utf8_decode($rec);
-			if ($zip == "yes") fwrite($gedout, $rec);
-			else print $rec;
-		}
-		$res->FreeResult();
-	}
-	
-	$sql = "SELECT f_gedrec FROM ".TBLPREFIX."families WHERE f_file=".$GEDCOMID." ORDER BY cast(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(LOWER(f_id),'a',''),'b',''),'c',''),'d',''),'e',''),'f',''),'g',''),'h',''),'i',''),'j',''),'k',''),'l',''),'m',''),'n',''),'o',''),'p',''),'q',''),'r',''),'s',''),'t',''),'u',''),'v',''),'w',''),'x',''),'y',''),'z','') as unsigned)";
-	$res = NewQuery($sql);
-	if ($res) {
-		while($row = $res->FetchRow()){
-			$rec = trim($row[0])."\r\n";
-			if ($embedmm=="yes") $rec = EmbedMM($rec);
-			$rec = RemoveCustomTags($rec, $remove);
-			if ($privatize_export == "yes") $rec = PrivacyFunctions::PrivatizeGedcom($rec);
-			if ($convert=="yes") $rec = utf8_decode($rec);
-			if ($zip == "yes") fwrite($gedout, $rec);
-			else print $rec;
-		}
-		$res->FreeResult();
-	}
-
-	$sql = "SELECT s_gedrec FROM ".TBLPREFIX."sources WHERE s_file=".$GEDCOMID." ORDER BY cast(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(LOWER(s_id),'a',''),'b',''),'c',''),'d',''),'e',''),'f',''),'g',''),'h',''),'i',''),'j',''),'k',''),'l',''),'m',''),'n',''),'o',''),'p',''),'q',''),'r',''),'s',''),'t',''),'u',''),'v',''),'w',''),'x',''),'y',''),'z','') as unsigned)";
-	$res = NewQuery($sql);
-	if ($res) {
-		while($row = $res->FetchRow()){
-			$rec = trim($row[0])."\r\n";
-			if ($embedmm=="yes") $rec = EmbedMM($rec);
-			$rec = RemoveCustomTags($rec, $remove);
-			if ($privatize_export == "yes") $rec = PrivacyFunctions::PrivatizeGedcom($rec);
-			if ($convert=="yes") $rec = utf8_decode($rec);
-			if ($zip == "yes") fwrite($gedout, $rec);
-			else print $rec;
-		}
-		$res->FreeResult();
-	}
-	
-	if ($embedmm != "yes") {
-		$sql = "SELECT m_gedrec FROM ".TBLPREFIX."media WHERE m_file=".$GEDCOMID." ORDER BY cast(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(LOWER(m_media),'a',''),'b',''),'c',''),'d',''),'e',''),'f',''),'g',''),'h',''),'i',''),'j',''),'k',''),'l',''),'m',''),'n',''),'o',''),'p',''),'q',''),'r',''),'s',''),'t',''),'u',''),'v',''),'w',''),'x',''),'y',''),'z','') as unsigned)";
-		$res = NewQuery($sql);
-		if ($res) {
-			while($row = $res->FetchRow()){
-				$rec = trim($row[0])."\r\n";
-				$rec = RemoveCustomTags($rec, $remove);
-				if ($privatize_export == "yes") $rec = PrivacyFunctions::PrivatizeGedcom($rec);
-				if ($convert=="yes") $rec = utf8_decode($rec);
-				if ($zip == "yes") fwrite($gedout, $rec);
-				else print $rec;
-			}
-			$res->FreeResult();
-		}
-	}
-
-	$sql = "SELECT o_gedrec, o_type FROM ".TBLPREFIX."other WHERE o_file=".$GEDCOMID." ORDER BY cast(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(LOWER(o_id),'a',''),'b',''),'c',''),'d',''),'e',''),'f',''),'g',''),'h',''),'i',''),'j',''),'k',''),'l',''),'m',''),'n',''),'o',''),'p',''),'q',''),'r',''),'s',''),'t',''),'u',''),'v',''),'w',''),'x',''),'y',''),'z','') as unsigned)";
-	$res = NewQuery($sql);
-	if ($res) {
-		while($row = $res->FetchRow()){
-			$rec = trim($row[0])."\r\n";
-			$key = $row[1];
-			if (($key!="HEAD")&&($key!="TRLR")) {
-				$rec = RemoveCustomTags($rec, $remove);
-				if ($privatize_export == "yes") $rec = PrivacyFunctions::PrivatizeGedcom($rec);
-				if ($convert=="yes") $rec = utf8_decode($rec);
-				if ($zip == "yes") fwrite($gedout, $rec);
-				else print $rec;
-			}
-		}
-		$res->FreeResult();
-	}
-
-	if ($zip == "yes") fwrite($gedout, "0 TRLR\r\n");
-	else print "0 TRLR\r\n";
-	
-	if ($privatize_export == "yes") {
-		if (isset($_SESSION)) {
-			$_SESSION["gm_user"] = $_SESSION["org_user"];
-		}
-		if (isset($HTTP_SESSION_VARS)) {
-			$HTTP_SESSION_VARS["gm_user"] = $HTTP_SESSION_VARS["org_user"];
-		}
-		UserController::DeleteUser("export");
-		$gm_username = UserController::GetUserName();
-		$gm_user =& User::GetInstance($gm_username); 
-	}
-	SwitchGedcom();
-	if ($zip == "yes") {
-		fclose($gedout);
-	}
-}
-
-function GetGender($indirec) {
-	
-	$st = preg_match("/1 SEX (.*)/", $indirec, $smatch);
-	if ($st>0) {
-		$smatch[1] = trim($smatch[1]);
-		if (empty($smatch[1])) return "U";
-		else return trim($smatch[1]);
-	}
-}
-
 function ArrayCopy (&$array, &$copy, $depth=0) {
 
 	if(!is_array($copy)) $copy = array();
@@ -2664,7 +2406,6 @@ function EstimateBD(&$person, $type) {
 		$dates["birth"]["type"] = "true";
 		$dates["death"]["year"] = $truedeathyear;
 		$dates["death"]["type"] = "true";
-//		print_r($dates);
 		return $dates;
 	}
 	
@@ -2687,7 +2428,6 @@ function EstimateBD(&$person, $type) {
 	$lfactyear = 0;
 	foreach ($person->facts as $key => $fact) {
 		$ct = preg_match_all("/\d DATE.*\s(\d{3,4})\s/", $fact->factrec, $match, PREG_SET_ORDER);
-//		print_r($match);
 		for($i=0; $i<$ct; $i++) {
 			if (strstr($match[$i][0], "@#DHEBREW@")===false) {
 				$byear = $match[$i][1];
@@ -2936,13 +2676,6 @@ function CloneObj($obj) {
 	if (version_compare(phpversion(), '5.0') < 0)  $cloneobj = $obj;
 	else $cloneobj = clone($obj);
 	return $cloneobj;
-}
-
-// The next function is only for sorting the non-object medialist
-function OldMediaSort($a, $b) {
-	$aname = Str2Upper($a["TITL"]);
-	$bname = Str2Upper($b["TITL"]);
-	return StringSort($aname, $bname);
 }
 
 function CheckEmailAddress($address) {

@@ -1362,7 +1362,9 @@ if ($action=="general") {
 					}
 				}
 				if ($found == true) {
-					print_list_source($key, $value);
+					$source =& Source::GetInstance($key, $value["gedcom"], $GEDCOMID);
+					$source->PrintListSource();
+//					print_list_source($key, $value);
 					$sour_printed[$key."[".$GEDCOMID."]"] = "1";
 					if ($i==ceil($sour_count/2) && $sour_count>12) print "</ul></td><td class=\"shade1 wrap\"><ul>\n";
 					$i++;
@@ -1458,7 +1460,8 @@ if ($action=="general") {
 					}
 				}
 				if ($found == true) {
-					print_list_repository($value["name"], $value);
+					$repo = Repository::GetInstance($key, $value["gedcom"], $value["gedfile"]);
+					$repo->PrintListRepository(true, 1, false);
 					$repo_printed[$key."[".$GEDCOMID."]"] = "1";
 					if ($i==ceil($repo_count/2) && $repo_count>12) print "</ul></td><td class=\"shade1 wrap\"><ul>\n";
 					$i++;
@@ -1491,7 +1494,8 @@ if ($action=="general") {
 			foreach ($smedialist as $key => $value) {
 				$ged = SplitKey($key, "gedid");
 				$id = SplitKey($key, "id");
-				print_list_media($id, $value, true);
+				$media =& MediaItem::GetInstance($id, "", $value["gedfile"]);
+				$media->PrintListMedia();
 				if ($i==ceil($media_count/2) && $media_count>12) print "</ul></td><td class=\"shade1 wrap\"><ul>\n";
 				$i++;
 			}

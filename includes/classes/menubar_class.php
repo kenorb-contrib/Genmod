@@ -306,7 +306,7 @@ abstract class MenuBar {
 	 * @return Menu		the menu item
 	 */
 	public function GetChartsMenu($rootid='',$myid='') {
-		global $gm_lang, $gm_user;
+		global $gm_lang, $gm_user, $GEDCOMID;
 		
 		//-- main charts menu item
 		$link = "pedigree.php";
@@ -375,12 +375,12 @@ abstract class MenuBar {
 		}
 		//-- relationship submenu
 		if (file_exists("relationship.php")) {
-			if ($rootid and empty($myid)) {
+			if ($rootid && empty($myid)) {
 				if ($gm_user->username != "") {
-					$myid = @$gm_user->gedcomid[$GEDCOMID];
+					$myid = $gm_user->gedcomid[$GEDCOMID];
 				}
 			}
-			if (($myid and $myid!=$rootid) or empty($rootid)) {
+			if ((!empty($myid) && $myid != $rootid) || empty($rootid)) {
 				$link = "relationship.php";
 				if ($rootid) {
 					$link .= "?pid1=".$myid."&pid2=".$rootid;

@@ -31,7 +31,6 @@
  * Inclusion of the configuration file
 */
 require("config.php");
-require_once($GM_BASE_DIRECTORY."includes/functions/functions_plot.php");
 
 
 //--	========= start of main program =========
@@ -42,12 +41,9 @@ $famgeg1 = array();
 $persgeg1= array();
 $key2ind= array();
 $match1= array();
-$match2= array();
+//$match2= array();
 
 if (isset($cleanup) && $cleanup == "yes") unset($_SESSION[$GEDCOMID."statisticsplot"]);
-
-global $nrfam, $famgeg, $nrpers, $persgeg,$key2ind,$nrman,$nrvrouw;
-global $match1,$match2;
 
 PrintHeader($gm_lang["statistics"]);
 //-- You should install JpGraph routines on your computer. I implemented them in genmod/modules/jpgraph
@@ -60,9 +56,9 @@ $mypath= ini_get("include_path");
 //--	ini_set("include_path", $mypath);
 
 
-CheckPlotExtensions();
+PlotFunctions::CheckPlotExtensions();
 
-GetPlotData();
+PlotFunctions::GetPlotData();
 
 print "\n\t<center><h2>".$gm_lang["statistiek_list"]."</h2>\n\t";
 print "</center>";

@@ -55,7 +55,7 @@ function reload() {
 </script>
 <?php
 
-$err_write = FileIsWriteable("config.php");
+$err_write = AdminFunctions::FileIsWriteable("config.php");
 $users = UserController::GetUsers();
 
 $verify_msg = false;		// Users to be verified by admin

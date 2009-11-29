@@ -385,10 +385,10 @@ abstract class ImportFunctions {
 		<?php
 		// NOTE: Print the progress bar for the GEDCOM file
 		print "<div>";
-			print "<div id=\"progress_header\" class=\"progress_box\" style=\"float: left;\">\n";
+			print "<div id=\"progress_header\" class=\"progress_box center\" style=\"float: left;\">\n";
 				print "<b>".$gm_lang["import_progress"]."</b>";
-				print "<div class=\"inner_progress_bar\">\n";
-					print "<div id=\"progress_div\" class=\"progress_bar\">";
+				print "<div class=\"inner_progress_bar center\">\n";
+					print "<div id=\"progress_div\" class=\"progress_bar center\">";
 					if (isset($_SESSION["TOTAL_BYTES"])) {
 						print "\n<script type=\"text/javascript\"><!--\nupdate_progress(".$_SESSION["TOTAL_BYTES"].",".$_SESSION["exectime_start"].");\n//-->\n</script>\n";
 					}
@@ -405,11 +405,11 @@ abstract class ImportFunctions {
 			print "</div>";
 			
 			// NOTE: Print the progress bar for the time
-			print "<div id=\"progress_header\" class=\"progress_box\">\n";
+			print "<div id=\"progress_header\" class=\"progress_box center\">\n";
 				if ($timelimit == 0) print "<b>".$gm_lang["time_limit"]." ".$gm_lang["none"]."</b>";
 				else print "<b>".$gm_lang["time_limit"]." ".$timelimit." ".$gm_lang["sec"]."</b>";
-				print "<div class=\"inner_progress_bar\">\n";
-					print "<div id=\"time_div\" class=\"progress_bar\">1%</div>\n";
+				print "<div class=\"inner_progress_bar center\">\n";
+					print "<div id=\"time_div\" class=\"progress_bar center\">1%</div>\n";
 				print "</div>\n";
 			print "</div>\n";
 		print "</div>";
@@ -896,10 +896,10 @@ abstract class ImportFunctions {
 				if (isset($date[0]["ext"])) {
 					preg_match("/@#D(.*)@/", $date[0]["ext"], $extract_type);
 					$date_types = array("@#DGREGORIAN@","@#DJULIAN@","@#DHEBREW@","@#DFRENCH R@", "@#DROMAN@", "@#DUNKNOWN@");
-					if (isset($extract_type[0]) && in_array($extract_type[0], $date_types)) $sql .= "'".$extract_type[0]."')";
-					else $sql .= "NULL)";
+					if (isset($extract_type[0]) && in_array($extract_type[0], $date_types)) $sql .= "'".$extract_type[0]."','')";
+					else $sql .= "NULL, '".$date[0]["ext"]."')";
 				}
-				else $sql .= "NULL)";
+				else $sql .= "NULL, '')";
 				$res = NewQuery($sql);
 				$count++;
 			}
@@ -1346,5 +1346,29 @@ abstract class ImportFunctions {
 		else return false;
 	}
 
+	public function LockTables() {
+		
+		$sql = "LOCK TABLES ".
+		TBLPREFIX."actions WRITE, ".
+		TBLPREFIX."asso WRITE, ".
+		TBLPREFIX."individuals WRITE, ".
+		TBLPREFIX."individual_family WRITE, ".
+		TBLPREFIX."families WRITE, ".
+		TBLPREFIX."sources WRITE, ".
+		TBLPREFIX."source_mapping WRITE, ".
+		TBLPREFIX."other WRITE, ".
+		TBLPREFIX."other_mapping WRITE, ".
+		TBLPREFIX."places WRITE, ".
+		TBLPREFIX."placelinks WRITE, ".
+		TBLPREFIX."names WRITE, ".
+		TBLPREFIX."dates WRITE, ".
+		TBLPREFIX."media WRITE, ".
+		TBLPREFIX."media_mapping WRITE, ".
+		TBLPREFIX."soundex WRITE, ".
+		TBLPREFIX."log WRITE, ".
+		TBLPREFIX."changes WRITE";
+		$res = NewQuery($sql);
+		
+	}
 }
 ?>

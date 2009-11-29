@@ -1058,12 +1058,12 @@ abstract class FactFunctions {
 	public function PrintAddNewFact($id, $usedfacts, $type) {
 		global $gm_lang;
 	
-		if ($type == "SOUR") $addfacts = array_merge(CheckFactUnique(preg_split("/[, ;:]+/", GedcomConfig::$SOUR_FACTS_UNIQUE, -1, PREG_SPLIT_NO_EMPTY), $usedfacts, "SOUR"), preg_split("/[, ;:]+/", GedcomConfig::$SOUR_FACTS_ADD, -1, PREG_SPLIT_NO_EMPTY));
-		else if ($type == "REPO") $addfacts = array_merge(CheckFactUnique(preg_split("/[, ;:]+/", GedcomConfig::$REPO_FACTS_UNIQUE, -1, PREG_SPLIT_NO_EMPTY), $usedfacts, "REPO"), preg_split("/[, ;:]+/", GedcomConfig::$REPO_FACTS_ADD, -1, PREG_SPLIT_NO_EMPTY));
-		else if ($type == "INDI") $addfacts = array_merge(CheckFactUnique(preg_split("/[, ;:]+/", GedcomConfig::$INDI_FACTS_UNIQUE, -1, PREG_SPLIT_NO_EMPTY), $usedfacts, "INDI"), preg_split("/[, ;:]+/", GedcomConfig::$INDI_FACTS_ADD, -1, PREG_SPLIT_NO_EMPTY));
-		else if($type == "FAM") $addfacts = array_merge(CheckFactUnique(preg_split("/[, ;:]+/", GedcomConfig::$FAM_FACTS_UNIQUE, -1, PREG_SPLIT_NO_EMPTY), $usedfacts, "FAM"), preg_split("/[, ;:]+/", GedcomConfig::$FAM_FACTS_ADD, -1, PREG_SPLIT_NO_EMPTY));
-		else if($type == "OBJE") $addfacts = array_merge(CheckFactUnique(preg_split("/[, ;:]+/", GedcomConfig::$MEDIA_FACTS_UNIQUE, -1, PREG_SPLIT_NO_EMPTY), $usedfacts, "OBJE"), preg_split("/[, ;:]+/", GedcomConfig::$MEDIA_FACTS_ADD, -1, PREG_SPLIT_NO_EMPTY));
-		else if($type == "NOTE") $addfacts = array_merge(CheckFactUnique(preg_split("/[, ;:]+/", GedcomConfig::$NOTE_FACTS_UNIQUE, -1, PREG_SPLIT_NO_EMPTY), $usedfacts, "NOTE"), preg_split("/[, ;:]+/", GedcomConfig::$NOTE_FACTS_ADD, -1, PREG_SPLIT_NO_EMPTY));
+		if ($type == "SOUR") $addfacts = array_merge(self::CheckFactUnique(preg_split("/[, ;:]+/", GedcomConfig::$SOUR_FACTS_UNIQUE, -1, PREG_SPLIT_NO_EMPTY), $usedfacts, "SOUR"), preg_split("/[, ;:]+/", GedcomConfig::$SOUR_FACTS_ADD, -1, PREG_SPLIT_NO_EMPTY));
+		else if ($type == "REPO") $addfacts = array_merge(self::CheckFactUnique(preg_split("/[, ;:]+/", GedcomConfig::$REPO_FACTS_UNIQUE, -1, PREG_SPLIT_NO_EMPTY), $usedfacts, "REPO"), preg_split("/[, ;:]+/", GedcomConfig::$REPO_FACTS_ADD, -1, PREG_SPLIT_NO_EMPTY));
+		else if ($type == "INDI") $addfacts = array_merge(self::CheckFactUnique(preg_split("/[, ;:]+/", GedcomConfig::$INDI_FACTS_UNIQUE, -1, PREG_SPLIT_NO_EMPTY), $usedfacts, "INDI"), preg_split("/[, ;:]+/", GedcomConfig::$INDI_FACTS_ADD, -1, PREG_SPLIT_NO_EMPTY));
+		else if($type == "FAM") $addfacts = array_merge(self::CheckFactUnique(preg_split("/[, ;:]+/", GedcomConfig::$FAM_FACTS_UNIQUE, -1, PREG_SPLIT_NO_EMPTY), $usedfacts, "FAM"), preg_split("/[, ;:]+/", GedcomConfig::$FAM_FACTS_ADD, -1, PREG_SPLIT_NO_EMPTY));
+		else if($type == "OBJE") $addfacts = array_merge(self::CheckFactUnique(preg_split("/[, ;:]+/", GedcomConfig::$MEDIA_FACTS_UNIQUE, -1, PREG_SPLIT_NO_EMPTY), $usedfacts, "OBJE"), preg_split("/[, ;:]+/", GedcomConfig::$MEDIA_FACTS_ADD, -1, PREG_SPLIT_NO_EMPTY));
+		else if($type == "NOTE") $addfacts = array_merge(self::CheckFactUnique(preg_split("/[, ;:]+/", GedcomConfig::$NOTE_FACTS_UNIQUE, -1, PREG_SPLIT_NO_EMPTY), $usedfacts, "NOTE"), preg_split("/[, ;:]+/", GedcomConfig::$NOTE_FACTS_ADD, -1, PREG_SPLIT_NO_EMPTY));
 		else return;
 		if (count($addfacts) == 0) return;
 	
@@ -1284,5 +1284,23 @@ abstract class FactFunctions {
 		else print $gm_lang["private"];
 		print "<br />\n";
 	}
+	
+	/**
+	 * Check for facts that may exist only once for a certain record type.
+	 * If the fact already exists in the second array, delete it from the first one.
+	 */
+	 private function CheckFactUnique($uniquefacts, $recfacts, $type) {
+	
+		foreach($recfacts as $indexval => $fact) {
+	
+			if ($fact->fact != "") {
+				$key = array_search($fact->fact, $uniquefacts);
+				if ($key !== false) unset($uniquefacts[$key]);
+			}
+		}
+		return $uniquefacts;
+	}
+
+
 }
 ?>
