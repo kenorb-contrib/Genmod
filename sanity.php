@@ -31,7 +31,6 @@
  */
 require "config.php";
 global $TEXT_DIRECTION;
-include "includes/functions/functions_edit.php";
 
 //-- make sure that they have gedcom admin status before they can use this page
 //-- otherwise have them login again

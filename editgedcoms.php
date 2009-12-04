@@ -53,7 +53,7 @@ if ($action=="delete") {
 		PrivacyController::DeletePrivacy($delged);
 		DeleteGedcom($delged);
 		unset($GEDCOMS[$delged]);
-		StoreGedcoms();
+		AdminFunctions::StoreGedcoms();
 		GedcomConfig::DeleteGedcomConfig($delged);
 		if (isset($_SESSION["GEDCOMID"]) && $_SESSION["GEDCOMID"] == $delged) $_SESSION["GEDCOMID"] = $DEFAULT_GEDCOMID;
 		print "<br />".str_replace("#GED#", $delged, $gm_lang["gedcom_deleted"])."<br />\n";
@@ -63,7 +63,7 @@ if ($action=="delete") {
 
 if (($action=="setdefault") && isset($default_ged)) {
 	$DEFAULT_GEDCOM = urldecode($_POST["default_ged"]);
-	StoreGedcoms();
+	AdminFunctions::StoreGedcoms();
 }
 
 if ($action == "deletecount") {
@@ -136,7 +136,7 @@ if ($action == "deletecount") {
 				if ($GedCount!=0) {
 					print "<tr>";
 					print "<td colspan=\"5\">";
-					print "<br /><hr class=\"gedcom_table\" /><br />";
+					print "<br /><hr class=\"gedcom_table\" />";
 					print "</td>";
 					print "</tr>";
 				}
@@ -144,7 +144,7 @@ if ($action == "deletecount") {
 	
 				// Row 1: Title
 				print "<tr>";
-				print "<td colspan=\"5\" class=\"topbottombar width20\">";
+				print "<td colspan=\"5\" class=\"topbottombar\">";
 				if ($DEFAULT_GEDCOMID==$gedc) print "<span class=\"label\">".PrintReady($gedarray["title"])."</span></td>";
 				else print PrintReady($gedarray["title"])."</td>";
 				print "</tr>";
@@ -176,14 +176,11 @@ if ($action == "deletecount") {
 				}
 				else print "<span class=\"error\">".$gm_lang["file_not_found"]."</span>";
 				print "</td>";
-				print "<td>&nbsp;</td>";
-				print "<td>&nbsp;</td>";
-				print "<td>&nbsp;</td>";
+				print "<td  colspan=\"3\">&nbsp;</td>";
 				print "</tr>";
 				
 				// Row 3: Options
-				if (CheckForImport($gedc)) $imported = true;
-				else $imported = false;
+				$imported = CheckForImport($gedc);
 				print "<tr class=\"center\">";
 				print "<td>&nbsp;</td>";
 				print "<td>";
@@ -197,7 +194,7 @@ if ($action == "deletecount") {
 				print "</td>";
 				print "<td><a href=\"editconfig_gedcom.php?gedid=".$gedc."\">".$gm_lang["ged_config"]."</a></td>";
 				print "<td><a href=\"javascript: ".$gm_lang["view_searchlog"]."\" onclick=\"window.open('viewlog.php?cat=F&amp;gedid=".$gedarray["id"]."', '', 'top=50,left=10,width=700,height=600,scrollbars=1,resizable=1'); return false;\">";
-				if (NewLogRecs("F", $gedc)) print "<span class=\"error\">".$gm_lang["view_searchlog"]."</span>";
+				if (AdminFunctions::NewLogRecs("F", $gedc)) print "<span class=\"error\">".$gm_lang["view_searchlog"]."</span>";
 				else print $gm_lang["view_searchlog"];
 				print "</a></td>";
 				print "<td><a href=\"editgedcoms.php?action=delete&amp;delged=".$gedc."\" onclick=\"return confirm('".$gm_lang["confirm_gedcom_delete"]." ".preg_replace("/'/", "\'", $gedc)."?');\">".$gm_lang["ged_gedcom"]."</a></td>";
@@ -213,7 +210,7 @@ if ($action == "deletecount") {
 				print "<td><a href=\"edit_privacy.php?action=edit&amp;gedid=".$gedc."\">".$gm_lang["ged_privacy"]."</a></td>";
 	
 			  print "<td><a href=\"javascript: ".$gm_lang["view_gedlog"]."\" onclick=\"window.open('viewlog.php?cat=G&amp;gedid=".$gedarray["id"]."', '', 'top=50,left=10,width=700,height=600,scrollbars=1,resizable=1'); ChangeClass('gedlog".$GedCount."', ''); return false; \">";
-			  if (NewLogRecs("G", $gedc)) print "<span id=\"gedlog".$GedCount."\" class=\"error\">".$gm_lang["view_gedlog"]."</span>";
+			  if (AdminFunctions::NewLogRecs("G", $gedc)) print "<span id=\"gedlog".$GedCount."\" class=\"error\">".$gm_lang["view_gedlog"]."</span>";
 			  else print "<span id=\"gedlog".$GedCount."\">".$gm_lang["view_gedlog"]."</span>";
 				print "</a></td>";
 				print "<td><a href=\"editgedcoms.php?action=deletecount&amp;delged=".$gedc."\" onclick=\"return confirm('".$gm_lang["confirm_count_delete"]." ".preg_replace("/'/", "\'", $gedc)."?');\">".$gm_lang["counters"]."</a></td>";
@@ -226,8 +223,7 @@ if ($action == "deletecount") {
 				print "<a href=\"editconfig_gedcom.php?source=reupload_form&amp;gedid=$gedc\">".$gm_lang["ged_reupload"]."</a>";
 				print "</td>";
 				print "<td><a href=\"javascript: ".$gm_lang["submitter_record"]."\" onclick=\"window.open('edit_interface.php?action=submitter&amp;gedfile=".$gedc."','','width=800,height=600,resizable=1,scrollbars=1'); return false;\">".$gm_lang["submitter_record"]."</a></td>";
-				print "<td>&nbsp;</td>";
-				print "<td>&nbsp;</td>";
+				print "<td colspan=\"2\">&nbsp;</td>";
 				print "</tr>";
 				
 				// print "<td valign=\"top\">";		// Column 6  (Create .SLK spreadsheet)

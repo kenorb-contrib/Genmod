@@ -36,10 +36,10 @@
 // 4. DB structure
 // 5. Admin user
 
-define(GM_VERSION, "2.0");
-define(GM_VERSION_RELEASE, "Beta 1");
-$min_php_version = "4.3";
-$min_mysql_version = "4.1";
+define('GM_VERSION', "2.0");
+define('GM_VERSION_RELEASE', "Beta 1");
+$min_php_version = "5.2";
+$min_mysql_version = "5.1";
 $stylesheet = "install_style.css";
 $TEXT_DIRECTION = "ltr";
 $MEDIA_DIRECTORY = "../media/";
@@ -182,11 +182,11 @@ if ($step == 1) {
 	// Check if the media directory is not a .
 	// If so, do not try to create it since it does exist
 	// Check first if the $MEDIA_DIRECTORY exists
-	if (!is_dir(GedcomConfig::$MEDIA_DIRECTORY)) {
-		if (mkdir(GedcomConfig::$MEDIA_DIRECTORY)) {
-			if (!file_exists($MEDIA_DIRECTORY."index.php")) {
+	if (!is_dir("../".GedcomConfig::$MEDIA_DIRECTORY)) {
+		if (mkdir("../".GedcomConfig::$MEDIA_DIRECTORY)) {
+			if (!file_exists("../".$MEDIA_DIRECTORY."index.php")) {
 				$inddata = html_entity_decode("<?php\nheader(\"Location: ../medialist.php\");\nexit;\n?>");
-				$fp = @fopen(GedcomConfig::$MEDIA_DIRECTORY."index.php","w+");
+				$fp = @fopen("../".GedcomConfig::$MEDIA_DIRECTORY."index.php","w+");
 				if (!$fp) print "<span class=\"error\">".$gm_lang["security_no_create"].GedcomConfig::$MEDIA_DIRECTORY."</span>";
 				else {
 					// Write the index.php for the media folder
@@ -207,15 +207,15 @@ if ($step == 1) {
 	}
 	else {
 		print "<img src=\"images/nok.png\" alt=\"Media structure NOK\"/> ";
-		print "<span class=\"error\">The media folder structure has been checked and not found OK. The media folder could not be created.</span>";
+		print "<span class=\"error\">The media folder structure has been checked and not found OK. The media folder could not be created.</span><br />";
 	}
 	// Check if the thumbs folder exists
-	if (!is_dir(GedcomConfig::$MEDIA_DIRECTORY."thumbs")) {
-		if (mkdir(GedcomConfig::$MEDIA_DIRECTORY."thumbs")) {
-			if (!file_exists(GedcomConfig::$MEDIA_DIRECTORY."thumbs/index.php")) {
-				$inddata = file_get_contents(GedcomConfig::$MEDIA_DIRECTORY."index.php");
+	if (!is_dir("../".GedcomConfig::$MEDIA_DIRECTORY."thumbs")) {
+		if (mkdir("../".GedcomConfig::$MEDIA_DIRECTORY."thumbs")) {
+			if (!file_exists("../".GedcomConfig::$MEDIA_DIRECTORY."thumbs/index.php")) {
+				$inddata = file_get_contents("../".GedcomConfig::$MEDIA_DIRECTORY."index.php");
 				$inddatathumb = str_replace(": ../",": ../../",$inddata);
-				$fpthumb = @fopen(GedcomConfig::$MEDIA_DIRECTORY."thumbs/index.php","w+");
+				$fpthumb = @fopen("../".GedcomConfig::$MEDIA_DIRECTORY."thumbs/index.php","w+");
 				if (!$fpthumb) print "<div class=\"error\">".$gm_lang["security_no_create"].GedcomConfig::$MEDIA_DIRECTORY."thumbs</div>";
 				else {
 					// Write the index.php for the thumbs media folder
@@ -906,4 +906,13 @@ if ($step == 7) {
 if (isset($link) && $link) mysql_close($link);
 print "\n\t</div></body>\n</html>";
 @session_write_close();
+// Define the function to autoload the classes
+function __autoload($classname) {
+	global $GM_BASE_DIRECTORY;
+	
+	if (stristr($classname, "controller")) require_once($GM_BASE_DIRECTORY.strtolower("../includes/controllers/".str_ireplace("controller", "", $classname)."_ctrl.php"));
+	else if (stristr($classname, "functions")) require_once($GM_BASE_DIRECTORY.strtolower("../includes/functions/functions_".str_ireplace("functions", "", $classname)."_class.php"));
+	else require_once($GM_BASE_DIRECTORY.strtolower("../includes/classes/".$classname."_class.php"));
+}
+
 ?>

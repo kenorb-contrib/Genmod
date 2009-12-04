@@ -29,11 +29,6 @@
 */
 require("config.php");
 
-/**
- * Inclusion of the editing functions
-*/
-require("includes/functions/functions_edit.php");
-
 /** * Inclusion of the country names
 */
 require($GM_BASE_DIRECTORY."languages/countries.en.php");
@@ -346,7 +341,7 @@ switch ($action) {
 		print "<input type=\"hidden\" name=\"fact\" value=\"SUBM\" />\n";
 		print "<input type=\"hidden\" name=\"change_type\" value=\"submitter_record\" />\n";
 		print "<table class=\"facts_table\">";
-		SubmitterRecord(0, $record);
+		EditFunctions::SubmitterRecord(0, $record);
 		print "</table>";
 		if ($gm_user->UserCanAccept() && !$gm_user->userAutoAccept()) print "<br /><input name=\"aa_attempt\" type=\"checkbox\" value=\"1\" />".$gm_lang["attempt_auto_acc"]."<br />\n";
 		print "<br /><input type=\"submit\" value=\"".$gm_lang["save"]."\" /><br />\n";
@@ -373,15 +368,15 @@ switch ($action) {
 				$fams = Array_Merge(FindSFamilyIDs($pid, true), FindFamilyIDs($pid, "", true));
 				
 				// Delete all links to this person
-				$success = DeleteLinks($pid, "INDI", $change_id, $change_type, $GEDCOMID);
+				$success = EditFunctions::DeleteLinks($pid, "INDI", $change_id, $change_type, $GEDCOMID);
 				
 				// Remove resulting empty fams
 				foreach($fams as $key=>$fam) {
-					if ($success) $success = $success && DeleteFamIfEmpty($fam["famid"], $change_id, $change_type, $GEDCOMID);
+					if ($success) $success = $success && EditFunctions::DeleteFamIfEmpty($fam["famid"], $change_id, $change_type, $GEDCOMID);
 				}
 				
 				// Delete the person
-				if ($success) $success = $success && DeleteGedrec($pid, $change_id, "delete_indi", "INDI");
+				if ($success) $success = $success && EditFunctions::DeleteGedrec($pid, $change_id, "delete_indi", "INDI");
 				
 				if ($success) print "<br /><br />".$gm_lang["gedrec_deleted"];
 			}
@@ -399,10 +394,10 @@ switch ($action) {
 		else {
 			if (!empty($gedrec)) {
 				$success = false;
-				$success = DeleteLinks($famid, "FAM", $change_id, $change_type, $GEDCOMID);
+				$success = EditFunctions::DeleteLinks($famid, "FAM", $change_id, $change_type, $GEDCOMID);
 				
 				if ($success) {
-					$success = $success && DeleteGedrec($famid, $change_id, $change_type, "FAM");
+					$success = $success && EditFunctions::DeleteGedrec($famid, $change_id, $change_type, "FAM");
 				}
 				if ($success) print "<br /><br />".$gm_lang["gedrec_deleted"];
 			}
@@ -414,9 +409,9 @@ switch ($action) {
 		
 		if (!empty($gedrec)) {
 			$success = false;
-			$success = DeleteLinks($pid, "SOUR", $change_id, $change_type, $GEDCOMID);
+			$success = EditFunctions::DeleteLinks($pid, "SOUR", $change_id, $change_type, $GEDCOMID);
 			if ($success) {
-				$success = $success && DeleteGedrec($pid, $change_id, $change_type, "SOUR");
+				$success = $success && EditFunctions::DeleteGedrec($pid, $change_id, $change_type, "SOUR");
 			}
 			if ($success) print "<br /><br />".$gm_lang["gedrec_deleted"];
 		}
@@ -428,9 +423,9 @@ switch ($action) {
 		
 		if (!empty($gedrec)) {
 			$success = false;
-			$success = DeleteLinks($pid, "REPO", $change_id, $change_type, $GEDCOMID);
+			$success = EditFunctions::DeleteLinks($pid, "REPO", $change_id, $change_type, $GEDCOMID);
 			if ($success) {
-				$success = $success && DeleteGedrec($pid, $change_id, $change_type, "REPO");
+				$success = $success && EditFunctions::DeleteGedrec($pid, $change_id, $change_type, "REPO");
 			}
 			if ($success) print "<br /><br />".$gm_lang["gedrec_deleted"];
 		}
@@ -441,9 +436,9 @@ switch ($action) {
 		
 		if (!empty($gedrec)) {
 			$success = false;
-			$success = DeleteLinks($pid, "NOTE", $change_id, $change_type, $GEDCOMID);
+			$success = EditFunctions::DeleteLinks($pid, "NOTE", $change_id, $change_type, $GEDCOMID);
 			if ($success) {
-				$success = $success && DeleteGedrec($pid, $change_id, $change_type, "NOTE");
+				$success = $success && EditFunctions::DeleteGedrec($pid, $change_id, $change_type, "NOTE");
 			}
 			if ($success) print "<br /><br />".$gm_lang["gedrec_deleted"];
 		}
@@ -458,10 +453,10 @@ switch ($action) {
 		else {
 			if (!empty($gedrec)) {
 				$success = false;
-				$success = DeleteLinks($pid, "OBJE", $change_id, $change_type, $GEDCOMID);
+				$success = EditFunctions::DeleteLinks($pid, "OBJE", $change_id, $change_type, $GEDCOMID);
 				
 				if ($success) {
-					$success = $success && DeleteGedrec($pid, $change_id, $change_type, "OBJE");
+					$success = $success && EditFunctions::DeleteGedrec($pid, $change_id, $change_type, "OBJE");
 				}
 				if ($success) print "<br /><br />".$gm_lang["gedrec_deleted"];
 			}
@@ -475,7 +470,7 @@ switch ($action) {
 		// Before using getsubrec, we must get the privatised gedrec. Otherwise the counter is not correct.
 		$gedrecpriv = implode("\r\n", GetAllSubrecords($gedrec, "", false, false));
 		$oldrec = GetSubRecord(1, "1 $fact", $gedrecpriv, $count);
-		$success =  ReplaceGedrec($pid, $oldrec, "", $fact, $change_id, $change_type, "", $pid_type); 
+		$success =  EditFunctions::ReplaceGedrec($pid, $oldrec, "", $fact, $change_id, $change_type, "", $pid_type); 
 		if ($success) print "<br /><br />".$gm_lang["gedrec_deleted"];
 		break;
 	
@@ -536,11 +531,11 @@ switch ($action) {
 			$t = getsubrecord(1,"1 OBJE", $gedrec, $i);
 			$rc = preg_match("/1 OBJE @(.*)@/", $t, $match);
 			$f[$match[1]] = $t;
-			$success = $success && (ReplaceGedrec($pid, $f[$match[1]], "", "OBJE", $change_id, $change_type, "", $pid_type));
+			$success = $success && (EditFunctions::ReplaceGedrec($pid, $f[$match[1]], "", "OBJE", $change_id, $change_type, "", $pid_type));
 		}
 		$order = array_flip($order);
 		foreach($order as $ord => $famkey) {
-			$success = $success && (ReplaceGedrec($pid, "", $f[$famkey], "OBJE", $change_id, $change_type, "", $pid_type));
+			$success = $success && (EditFunctions::ReplaceGedrec($pid, "", $f[$famkey], "OBJE", $change_id, $change_type, "", $pid_type));
 		}
 		if ($success) print "<br /><br />".$gm_lang["update_successful"];
 		break;
@@ -622,11 +617,11 @@ switch ($action) {
 			$t = getsubrecord(1,"1 CHIL", $gedrec, $i);
 			$rc = preg_match("/1 CHIL @(.*)@/", $t, $match);
 			$f[$match[1]] = $t;
-			$success = $success && (ReplaceGedrec($pid, $f[$match[1]], "", "CHIL", $change_id, $change_type, "", "FAM"));
+			$success = $success && (EditFunctions::ReplaceGedrec($pid, $f[$match[1]], "", "CHIL", $change_id, $change_type, "", "FAM"));
 		}
 		$order = array_flip($order);
 		foreach($order as $ord => $famkey) {
-			$success = $success && (ReplaceGedrec($pid, "", $f[$famkey], "CHIL", $change_id, $change_type, "", "FAM"));
+			$success = $success && (EditFunctions::ReplaceGedrec($pid, "", $f[$famkey], "CHIL", $change_id, $change_type, "", "FAM"));
 		}
 		if ($success) print "<br /><br />".$gm_lang["update_successful"];
 		break;
@@ -700,11 +695,11 @@ switch ($action) {
 			$t = getsubrecord(1,"1 FAMS", $gedrec, $i);
 			$rc = preg_match("/1 FAMS @(.*)@/", $t, $match);
 			$f[$match[1]] = $t;
-			$success = $success && ReplaceGedrec($pid, $f[$match[1]], "", "FAMS", $change_id, $change_type, "", "INDI");
+			$success = $success && EditFunctions::ReplaceGedrec($pid, $f[$match[1]], "", "FAMS", $change_id, $change_type, "", "INDI");
 		}
 		$order = array_flip($order);
 		foreach($order as $ord => $famkey) {
-			$success = $success && ReplaceGedrec($pid, "", $f[$famkey], "FAMS", $change_id, $change_type, "", "INDI");
+			$success = $success && EditFunctions::ReplaceGedrec($pid, "", $f[$famkey], "FAMS", $change_id, $change_type, "", "INDI");
 		}
 		if ($success) print "<br /><br />".$gm_lang["update_successful"];
 		break;
@@ -732,7 +727,7 @@ switch ($action) {
 					}
 					else $famrec = FindFamilyRecord($fam["famid"]);
 					print "<tr>\n<td class=\"shade2\">\n";
-					PrintPedi("pedi_".$fam["famid"], $fam["relation"]);
+					EditFunctions::PrintPedi("pedi_".$fam["famid"], $fam["relation"]);
 					print "</td><td class=\"shade1\">";
 					print PrintReady(GetFamilyDescriptor($fam["famid"], false, $famrec, true));
 					print "<br />";
@@ -785,7 +780,7 @@ switch ($action) {
 					else $for = "";
 					$recnew = preg_replace("/$repl/", "$for", $rec);
 				}
-				$success = $success && ReplaceGedrec($pid, $rec, $recnew, "FAMC", $change_id, $change_type, "", "INDI");
+				$success = $success && EditFunctions::ReplaceGedrec($pid, $rec, $recnew, "FAMC", $change_id, $change_type, "", "INDI");
 			}
 			if (GetChangeData(true, $pid, true, "", "")) {
 				$rec = GetChangeData(false, $pid, true, "gedlines", "");
@@ -797,12 +792,12 @@ switch ($action) {
 			if ($fam["famid"] != $select_prim) {
 				if ($fam["primary"] == "Y") {
 					$recnew = preg_replace("/2 _PRIMARY Y/", "", $rec);
-					$success = $success && ReplaceGedrec($pid, $rec, $recnew, "FAMC", $change_id, $change_type, "", "INDI");
+					$success = $success && EditFunctions::ReplaceGedrec($pid, $rec, $recnew, "FAMC", $change_id, $change_type, "", "INDI");
 				}
 			}
 			else if ($fam["primary"] != "Y") {
 				$recnew = trim($rec)."\r\n2 _PRIMARY Y";
-				$success = $success && ReplaceGedrec($pid, $rec, $recnew, "FAMC", $change_id, $change_type, "", "INDI");
+				$success = $success && EditFunctions::ReplaceGedrec($pid, $rec, $recnew, "FAMC", $change_id, $change_type, "", "INDI");
 			}
 		}
 		if ($success) print "<br /><br />".$gm_lang["update_successful"];
@@ -924,7 +919,7 @@ switch ($action) {
 				<tr>
 					<td class="shade2 <?php print $TEXT_DIRECTION; ?>"><b><?php print $child->getLabel(); ?></b><input type="hidden" name="CHIL<?php print $i; ?>" value="<?php print $child->xref;?>" /></td>
 					<td id="CHILName<?php print $i; ?>" class="shade1"><?php print PrintReady($child->name); ?><br /><?php print_first_major_fact($child->xref, $child->gedrec); ?></td>
-					<td id="CHILPedi<?php print $i; ?>" class="shade1"><?php PrintPedi("CHILPedisel".$i, $pedi); ?></td>
+					<td id="CHILPedi<?php print $i; ?>" class="shade1"><?php EditFunctions::PrintPedi("CHILPedisel".$i, $pedi); ?></td>
 					<td class="shade1 <?php print $TEXT_DIRECTION; ?>">
 						<a href="#" id="childrem<?php print $i; ?>" style="display:block;" onclick="document.changefamform.CHIL<?php print $i; ?>.value=''; document.getElementById('CHILName<?php print $i; ?>').innerHTML=''; this.style.display='none'; return false;"><?php print $gm_lang["remove"]; ?></a>
 						<a href="#" onclick="nameElement = document.getElementById('CHILName<?php print $i; ?>'); remElement = document.getElementById('childrem<?php print $i; ?>'); return findIndi(document.changefamform.CHIL<?php print $i; ?>);"><?php print $gm_lang["change"]; ?></a><br />
@@ -939,7 +934,7 @@ switch ($action) {
 				<tr>
 					<td class="shade2 <?php print $TEXT_DIRECTION; ?>"><b><?php print $gm_lang["add_child"]; ?></b><input type="hidden" name="CHIL<?php print $i; ?>" value="" /></td>
 					<td id="CHILName<?php print $i; ?>" class="shade1">
-					<td id="CHILPedi<?php print $i; ?>" class="shade1"><div id="CHILHide<?php print $i; ?>" style="display: none;"><?php PrintPedi("CHILPedisel".$i, $pedi); ?></div></td>
+					<td id="CHILPedi<?php print $i; ?>" class="shade1"><div id="CHILHide<?php print $i; ?>" style="display: none;"><?php EditFunctions::PrintPedi("CHILPedisel".$i, $pedi); ?></div></td>
 					<td class="shade1 <?php print $TEXT_DIRECTION; ?>">
 						<a href="#" id="childrem<?php print $i; ?>" style="display: none;" onclick="document.changefamform.CHIL<?php print $i; ?>.value=''; document.getElementById('CHILName<?php print $i; ?>').innerHTML=''; this.style.display='none'; return false;"><?php print $gm_lang["remove"]; ?></a>
 						<a href="#" onclick="pediElement = document.getElementById('CHILHide<?php print $i; ?>'); nameElement = document.getElementById('CHILName<?php print $i; ?>'); remElement = document.getElementById('childrem<?php print $i; ?>'); return findIndi(document.changefamform.CHIL<?php print $i; ?>);"><?php print $gm_lang["change"]; ?></a><br />
@@ -974,7 +969,7 @@ switch ($action) {
 			// Replace the father link in the fam record
 			$oldrec = GetSubRecord(1, "1 HUSB @$father->xref@", $gedrec);
 			$newrec = preg_replace("/1 HUSB @$father->xref@/", "1 HUSB @$HUSB@\r\n", $oldrec);
-			if (trim($oldrec) != trim($newrec)) ReplaceGedrec($famid, $oldrec, $newrec, "HUSB", $change_id, $change_type, "", "FAM");
+			if (trim($oldrec) != trim($newrec)) EditFunctions::ReplaceGedrec($famid, $oldrec, $newrec, "HUSB", $change_id, $change_type, "", "FAM");
 
 			// Remove the fam link from the old father record
 			$famids = FindSfamilyIds($father->xref, true);
@@ -982,7 +977,7 @@ switch ($action) {
 			foreach ($famids as $key => $fam) {
 				if ($fam["famid"] == $famid) {
 					$oldfath = GetSubrecord(1, "1 FAMS @$famid@", $frec, 1);
-					$success = $success && ReplaceGedrec($father->xref, $oldfath, "", "FAMS", $change_id, $change_type, "", "INDI");
+					$success = $success && EditFunctions::ReplaceGedrec($father->xref, $oldfath, "", "FAMS", $change_id, $change_type, "", "INDI");
 					break;
 				}
 			}
@@ -996,7 +991,7 @@ switch ($action) {
 			}
 			if (!$found) {
 				$newrec = "1 FAMS @$famid@\r\n";
-				$success = $success && ReplaceGedrec($HUSB, "", $newrec, "FAMS", $change_id, $change_type, "", "INDI");
+				$success = $success && EditFunctions::ReplaceGedrec($HUSB, "", $newrec, "FAMS", $change_id, $change_type, "", "INDI");
 			}
 			$updated = true;
 		}
@@ -1005,7 +1000,7 @@ switch ($action) {
 			
 			// Remove the father link from the fam
 			$oldfam = GetSubrecord(1, "1 HUSB @$father->xref", $gedrec, 1);
-			$success = $success && ReplaceGedrec($famid, $oldfam, "", "HUSB", $change_id, $change_type, "", "FAM");
+			$success = $success && EditFunctions::ReplaceGedrec($famid, $oldfam, "", "HUSB", $change_id, $change_type, "", "FAM");
 			$updated = true;
 			
 			// Remove the fam link from the old father record
@@ -1014,7 +1009,7 @@ switch ($action) {
 			foreach ($famids as $key => $fam) {
 				if ($fam["famid"] == $famid) {
 					$oldfath = GetSubrecord(1, "1 FAMS @$famid@", $frec, 1);
-					$success = $success && ReplaceGedrec($father->xref, $oldfath, "", "FAMS", $change_id, $change_type, "", "INDI");
+					$success = $success && EditFunctions::ReplaceGedrec($father->xref, $oldfath, "", "FAMS", $change_id, $change_type, "", "INDI");
 					break;
 				}
 			}
@@ -1027,7 +1022,7 @@ switch ($action) {
 			$hrec = GetSubrecord(1, "1 HUSB @$HUSB@", $gedrec, 1);
 			if (empty($hrec)) {
 				$newrec = "1 HUSB @$HUSB@\r\n";
-				$success = $success && ReplaceGedrec($famid, "", $newrec, "HUSB", $change_id, $change_type, "", "INDI");
+				$success = $success && EditFunctions::ReplaceGedrec($famid, "", $newrec, "HUSB", $change_id, $change_type, "", "INDI");
 			}
 			
 			// Add the fam link to the new father
@@ -1039,7 +1034,7 @@ switch ($action) {
 			}
 			if (!$found) {
 				$newrec = "1 FAMS @$famid@\r\n";
-				$success = $success && ReplaceGedrec($HUSB, "", $newrec, "FAMS", $change_id, $change_type, "", "INDI");
+				$success = $success && EditFunctions::ReplaceGedrec($HUSB, "", $newrec, "FAMS", $change_id, $change_type, "", "INDI");
 			}
 			$updated = true;
 		}
@@ -1050,7 +1045,7 @@ switch ($action) {
 			// Replace the mother link in the fam record
 			$oldrec = GetSubRecord(1, "1 WIFE @$mother->xref@", $gedrec);
 			$newrec = preg_replace("/1 WIFE @$father->xref@/", "1 WIFE @$HUSB@\r\n", $oldrec);
-			if (trim($oldrec) != trim($newrec)) ReplaceGedrec($famid, $oldrec, $newrec, "WIFE", $change_id, $change_type, "", "FAM");
+			if (trim($oldrec) != trim($newrec)) EditFunctions::ReplaceGedrec($famid, $oldrec, $newrec, "WIFE", $change_id, $change_type, "", "FAM");
 			
 			// Remove the fam link from the old mother record
 			$famids = FindSfamilyIds($mother->xref, true);
@@ -1058,7 +1053,7 @@ switch ($action) {
 			foreach ($famids as $key => $fam) {
 				if ($fam["famid"] == $famid) {
 					$oldmoth = GetSubrecord(1, "1 FAMS @$famid@", $mrec, 1);
-					$success = $success && ReplaceGedrec($mother->xref, $oldmoth, "", "FAMS", $change_id, $change_type, "", "INDI");
+					$success = $success && EditFunctions::ReplaceGedrec($mother->xref, $oldmoth, "", "FAMS", $change_id, $change_type, "", "INDI");
 					break;
 				}
 			}
@@ -1072,7 +1067,7 @@ switch ($action) {
 			}
 			if (!$found) {
 				$newrec = "1 FAMS @$famid@\r\n";
-				$success = $success && ReplaceGedrec($WIFE, "", $newrec, "FAMS", $change_id, $change_type, "", "INDI");
+				$success = $success && EditFunctions::ReplaceGedrec($WIFE, "", $newrec, "FAMS", $change_id, $change_type, "", "INDI");
 			}
 			$updated = true;
 		}
@@ -1082,7 +1077,7 @@ switch ($action) {
 			
 			// Remove the mother link from the fam
 			$oldfam = GetSubrecord(1, "1 WIFE @$mother->xref", $gedrec, 1);
-			$success = $success && ReplaceGedrec($famid, $oldfam, "", "WIFE", $change_id, $change_type, "", "FAM");
+			$success = $success && EditFunctions::ReplaceGedrec($famid, $oldfam, "", "WIFE", $change_id, $change_type, "", "FAM");
 			$updated = true;
 			
 			// Remove the fam link from the old mother record
@@ -1091,7 +1086,7 @@ switch ($action) {
 			foreach ($famids as $key => $fam) {
 				if ($fam["famid"] == $famid) {
 					$oldmoth = GetSubrecord(1, "1 FAMS @$famid@", $mrec, 1);
-					$success = $success && ReplaceGedrec($mother->xref, $oldmoth, "", "FAMS", $change_id, $change_type, "", "INDI");
+					$success = $success && EditFunctions::ReplaceGedrec($mother->xref, $oldmoth, "", "FAMS", $change_id, $change_type, "", "INDI");
 					break;
 				}
 			}
@@ -1105,7 +1100,7 @@ switch ($action) {
 			$mrec = GetSubrecord(1, "1 WIFE @$WIFE@", $gedrec, 1);
 			if (empty($mrec)) {
 				$newrec = "1 WIFE @$WIFE@\r\n";
-				$success = $success && ReplaceGedrec($famid, "", $newrec, "WIFE", $change_id, $change_type, "", "FAM");
+				$success = $success && EditFunctions::ReplaceGedrec($famid, "", $newrec, "WIFE", $change_id, $change_type, "", "FAM");
 			}
 			
 			// Add the fam link to the new mother
@@ -1117,7 +1112,7 @@ switch ($action) {
 			}
 			if (!$found) {
 				$newrec = "1 FAMS @$famid@\r\n";
-				$success = $success && ReplaceGedrec($WIFE, "", $newrec, "FAMS", $change_id, $change_type, "", "INDI");
+				$success = $success && EditFunctions::ReplaceGedrec($WIFE, "", $newrec, "FAMS", $change_id, $change_type, "", "INDI");
 			}
 			$updated = true;
 		}
@@ -1143,13 +1138,13 @@ switch ($action) {
 				// NOTE: If not, add it to the family record
 				if (preg_match("/1 CHIL @$CHIL@/", $gedrec)==0) {
 					$newrec = "1 CHIL @$CHIL@\r\n";
-					$success = $success && ReplaceGedrec($famid, "", $newrec, "CHIL", $change_id, $change_type, "", "FAM");
+					$success = $success && EditFunctions::ReplaceGedrec($famid, "", $newrec, "CHIL", $change_id, $change_type, "", "FAM");
 					$updated = true;
 					// NOTE: Check for a family reference in the child record
 					if (!empty($indirec) && (preg_match("/1 FAMC @$famid@/", $indirec)==0)) {
 						$newrec = "1 FAMC @$famid@\r\n";
 						if (!empty($pedi)) $newrec .= "2 PEDI ".$pedi."\r\n";
-						$success = $success && ReplaceGedrec($CHIL, "", $newrec, "FAMC", $change_id, $change_type, "", "INDI");
+						$success = $success && EditFunctions::ReplaceGedrec($CHIL, "", $newrec, "FAMC", $change_id, $change_type, "", "INDI");
 					}
 				}
 				// NOTE: it's already there, check for PEDI update
@@ -1159,15 +1154,15 @@ switch ($action) {
 					$pediold = GetGedcomValue("PEDI", 2, $oldprec);
 					if (empty($pediold) && (!empty($pedi))) {
 						$newrec = trim($oldfrec) . "\r\n"."2 PEDI ".$pedi; 
-						$success = $success && ReplaceGedrec($CHIL, $oldfrec, $newrec, "FAMC", $change_id, $change_type, "", "INDI");
+						$success = $success && EditFunctions::ReplaceGedrec($CHIL, $oldfrec, $newrec, "FAMC", $change_id, $change_type, "", "INDI");
 					}
 					else if (!empty($pediold) && !empty($pedi)) {
 						$newrec = preg_replace("/2 PEDI $pediold/", "2 PEDI $pedi", $oldfrec);
-						$success = $success && ReplaceGedrec($CHIL, $oldfrec, $newrec, "FAMC", $change_id, $change_type, "", "INDI");
+						$success = $success && EditFunctions::ReplaceGedrec($CHIL, $oldfrec, $newrec, "FAMC", $change_id, $change_type, "", "INDI");
 					}
 					else if (!empty($pediold) && empty($pedi)) {
 						$newrec = preg_replace("/$oldprec/", "", $oldfrec);
-						$success = $success && ReplaceGedrec($CHIL, $oldfrec, $newrec, "FAMC", $change_id, $change_type, "", "INDI");
+						$success = $success && EditFunctions::ReplaceGedrec($CHIL, $oldfrec, $newrec, "FAMC", $change_id, $change_type, "", "INDI");
 					}
 				}
 			}
@@ -1182,12 +1177,12 @@ switch ($action) {
 				if (!in_array($child->xref, $newchildren)) {
 					//-- remove the CHIL link from the family record
 					$oldrec = GetSubRecord(1, "1 CHIL @$child->xref@", $gedrec, 1);
-					$success = $success && ReplaceGedrec($famid, $oldrec, "", "CHIL", $change_id, $change_type, "", "FAM");
+					$success = $success && EditFunctions::ReplaceGedrec($famid, $oldrec, "", "CHIL", $change_id, $change_type, "", "FAM");
 					
 					//-- remove the FAMC link from the child record
 					$chgedrec = $child->changedgedrec;
 					$oldrec = GetSubrecord(1, "1 FAMC @$famid@", $chgedrec, 1);
-					$success = $success && ReplaceGedrec($child->xref, $oldrec, "" , "FAMC", $change_id, $change_type, "", "INDI");
+					$success = $success && EditFunctions::ReplaceGedrec($child->xref, $oldrec, "" , "FAMC", $change_id, $change_type, "", "INDI");
 				}
 			}
 		}
@@ -1197,7 +1192,7 @@ switch ($action) {
 			$rec = GetChangeData(false, $famid, true, "gedlines");
 			$newfamrec = $rec[$GEDCOMID][$famid];
 			$ct = preg_match("/1 CHIL|HUSB|WIFE/", $newfamrec, $match);
-			if ($ct == 0) $success = $success && ReplaceGedRec($famid, $newfamrec, "", "FAM", $change_id, $change_type, "", "FAM");
+			if ($ct == 0) $success = $success && EditFunctions::ReplaceGedRec($famid, $newfamrec, "", "FAM", $change_id, $change_type, "", "FAM");
 		}
 		
 		if ($success) print "<br /><br />".$gm_lang["update_successful"];
@@ -1219,7 +1214,7 @@ switch ($action) {
 //		}
 		
 		if ($fact=="OBJE" && $change_type == "create_media") {
-			ShowMediaForm($pid);
+			EditFunctions::ShowMediaForm($pid);
 		}
 		else {
 			$tags=array();
@@ -1233,9 +1228,9 @@ switch ($action) {
 			print "<input type=\"hidden\" name=\"pid_type\" value=\"".$pid_type."\" />\n";
 			print "<table class=\"facts_table\">";
 			
-			if (!in_array($fact, $separatorfacts)) AddTagSeparator($fact);
+			if (!in_array($fact, $separatorfacts)) EditFunctions::AddTagSeparator($fact);
 			if ($change_type == "add_media_link") {
-				AddTagSeparator($fact);
+				EditFunctions::AddTagSeparator($fact);
 				print "<tr><td class=\"shade2 $TEXT_DIRECTION\">";
 				print_help_link("find_add_mmlink", "qm", "find_add_mmlink");
 				print $gm_lang["find_add_mmlink"]."</td>";
@@ -1252,52 +1247,52 @@ switch ($action) {
 		 	}
 			if ($fact=="GNOTE") {
 //				$fact = "NOTE";
-				$focus = AddSimpleTag("1 NOTE @");
+				$focus = EditFunctions::AddSimpleTag("1 NOTE @");
 			}
-			else if ($fact=="SOUR") $focus = AddSimpleTag("1 SOUR @");
-			else if ($fact=="ASSO") $focus = AddSimpleTag("1 ASSO @");
+			else if ($fact=="SOUR") $focus = EditFunctions::AddSimpleTag("1 SOUR @");
+			else if ($fact=="ASSO") $focus = EditFunctions::AddSimpleTag("1 ASSO @");
 			else if ($fact=="OBJE") {
-				if ($change_type != "add_media_link") $focus = AddSimpleTag("1 OBJE @");
+				if ($change_type != "add_media_link") $focus = EditFunctions::AddSimpleTag("1 OBJE @");
 				// 3 _PRIM
-				AddSimpleTag("2 _PRIM", "", "2");
+				EditFunctions::AddSimpleTag("2 _PRIM", "", "2");
 				// 3 _THUM
-				AddSimpleTag("2 _THUM");
+				EditFunctions::AddSimpleTag("2 _THUM");
 			}
 			else {
-				if (!in_array($fact, $emptyfacts)) $focus = AddSimpleTag("1 ".$fact);
-				else AddSimpleTag("1 ".$fact);
+				if (!in_array($fact, $emptyfacts)) $focus = EditFunctions::AddSimpleTag("1 ".$fact);
+				else EditFunctions::AddSimpleTag("1 ".$fact);
 			}
 			
-			AddMissingTags(array($fact));
+			EditFunctions::AddMissingTags(array($fact));
 		
 			if ($fact=="SOUR") {
 				// 1 SOUR
 				// 2 PAGE
-				AddSimpleTag("2 PAGE");
+				EditFunctions::AddSimpleTag("2 PAGE");
 				// 2 DATA
-				AddSimpleTag("2 DATA");
+				EditFunctions::AddSimpleTag("2 DATA");
 				// 3 DATE
 				// 3 TEXT
-				AddSimpleTag("3 DATE");
-				AddSimpleTag("3 TEXT");
+				EditFunctions::AddSimpleTag("3 DATE");
+				EditFunctions::AddSimpleTag("3 TEXT");
 			}
 			if ($fact=="ASSO") {
 				// 2 RELA
-				AddSimpleTag("2 RELA");
+				EditFunctions::AddSimpleTag("2 RELA");
 			}
 			if ($fact!="OBJE" && $rectype != "NOTE" && $rectype != "OBJE" && $fact!="RESN") {
 				// 2 RESN
-				AddSimpleTag("2 RESN");
+				EditFunctions::AddSimpleTag("2 RESN");
 			}
 
 			if ($rectype != "OBJE" && $rectype != "NOTE" && $fact!="RESN") {
 				print "<tr><td colspan=\"2\">";
-				if ($fact != "ASSO" && $fact != "OBJE" && $fact != "REPO" &&  $fact!="SOUR" && $fact != "NOTE" && $fact != "GNOTE") PrintAddLayer("ASSO");
-				if ($fact != "SOUR" && $fact != "OBJE" && $fact != "REPO" && $fact != "GNOTE") PrintAddLayer("SOUR");
-				if ($fact != "OBJE" && $fact != "REPO" && $fact != "NOTE" && $fact != "GNOTE") PrintAddLayer("OBJE");
+				if ($fact != "ASSO" && $fact != "OBJE" && $fact != "REPO" &&  $fact!="SOUR" && $fact != "NOTE" && $fact != "GNOTE") EditFunctions::PrintAddLayer("ASSO");
+				if ($fact != "SOUR" && $fact != "OBJE" && $fact != "REPO" && $fact != "GNOTE") EditFunctions::PrintAddLayer("SOUR");
+				if ($fact != "OBJE" && $fact != "REPO" && $fact != "NOTE" && $fact != "GNOTE") EditFunctions::PrintAddLayer("OBJE");
 				if ($fact != "NOTE" && $fact != "OBJE" && $fact != "GNOTE") {
-					PrintAddLayer("NOTE");
-					PrintAddLayer("GNOTE");
+					EditFunctions::PrintAddLayer("NOTE");
+					EditFunctions::PrintAddLayer("GNOTE");
 				}
 				print"</td></tr>";
 			}
@@ -1326,14 +1321,14 @@ switch ($action) {
 		$ct = preg_match("/1\s(\w+).*/", $newrec, $match);
 		if ($ct > 0) {
 			$fact = $match[1];
-			$success = ReplaceGedrec($pid, "", $newrec, $fact, $change_id, $change_type, "", $pid_type);
+			$success = EditFunctions::ReplaceGedrec($pid, "", $newrec, $fact, $change_id, $change_type, "", $pid_type);
 		}
 		if ($success) print "<br /><br />".$gm_lang["update_successful"];
 		break;
 		
 	// NOTE: addchild done
 	case "addchild":
-		PrintIndiForm("addchildaction", $famid);
+		EditFunctions::PrintIndiForm("addchildaction", $famid);
 		break;
 		
 	// NOTE: addchildaction done
@@ -1362,7 +1357,7 @@ switch ($action) {
 		if ((!empty($BIRT_DATE))||(!empty($BIRT_PLAC))) {
 			$gedrec .= "1 BIRT\r\n";
 			if (!empty($BIRT_DATE)) {
-				$BIRT_DATE = CheckInputDate($BIRT_DATE);
+				$BIRT_DATE = EditFunctions::CheckInputDate($BIRT_DATE);
 				$gedrec .= "2 DATE $BIRT_DATE\r\n";
 				if (!empty($BIRT_TIME)) $gedrec .= "3 TIME $BIRT_TIME\r\n";
 			}
@@ -1377,7 +1372,7 @@ switch ($action) {
 		if ((!empty($CHR_DATE))||(!empty($CHR_PLAC))) {
 			$gedrec .= "1 CHR\r\n";
 			if (!empty($CHR_DATE)) {
-				$CHR_DATE = CheckInputDate($CHR_DATE);
+				$CHR_DATE = EditFunctions::CheckInputDate($CHR_DATE);
 				$gedrec .= "2 DATE $CHR_DATE\r\n";
 				if (!empty($CHR_TIME)) $gedrec .= "3 TIME $CHR_TIME\r\n";
 			}
@@ -1392,7 +1387,7 @@ switch ($action) {
 		if ((!empty($DEAT_DATE))||(!empty($DEAT_PLAC))) {
 			$gedrec .= "1 DEAT\r\n";
 			if (!empty($DEAT_DATE)) {
-				$DEAT_DATE = CheckInputDate($DEAT_DATE);
+				$DEAT_DATE = EditFunctions::CheckInputDate($DEAT_DATE);
 				$gedrec .= "2 DATE $DEAT_DATE\r\n";
 				if (!empty($DEAT_TIME)) $gedrec .= "3 TIME $DEAT_TIME\r\n";
 			}
@@ -1408,7 +1403,7 @@ switch ($action) {
 			$gedrec .= "1 FAMC @$famid@\r\n";
 			if(!empty($PEDI) && $PEDI != "birth") $gedrec .= "2 PEDI ".$PEDI;
 		}
-		$gedrec = HandleUpdates($gedrec);
+		$gedrec = EditFunctions::HandleUpdates($gedrec);
 		if ($addsource == "2") {
 			$addsourcevalue = GetSubRecord(1, "1 SOUR", $gedrec);
 			$addsourcevalue = substr(preg_replace("/\n(\d) /e", "'\n'.SumNums($1, 1).' '", $addsourcevalue),1);
@@ -1417,7 +1412,7 @@ switch ($action) {
 		if ($addsource) $gedrec = preg_replace("/2 SOUR @XXX@\r\n/", $addsourcevalue, $gedrec); 
 		
 		// NOTE: New record is appended to the database
-		$xref = AppendGedrec($gedrec, "INDI", $change_id, $change_type);
+		$xref = EditFunctions::AppendGedrec($gedrec, "INDI", $change_id, $change_type);
 		
 		if ($xref && !empty($famid)) {
 			print "<br /><br />".$gm_lang["update_successful"];
@@ -1433,7 +1428,7 @@ switch ($action) {
 			$ct = preg_match("/1 CHIL @$xref@/", $newrec, $match);
 			if ($ct == 0) {
 				$newrec = "1 CHIL @$xref@\r\n";
-				ReplaceGedrec($famid, "", $newrec, "CHIL", $change_id, $change_type, "", "FAM");
+				EditFunctions::ReplaceGedrec($famid, "", $newrec, "CHIL", $change_id, $change_type, "", "FAM");
 				$success = true;
 			}
 			else print $famid." &lt -- &gt ".$xref.": ".$gm_lang["link_exists"];
@@ -1442,7 +1437,7 @@ switch ($action) {
 	
 	// NOTE: addspouse done
 	case "addspouse":
-		PrintIndiForm("addspouseaction", $famid, "", "", $famtag);
+		EditFunctions::PrintIndiForm("addspouseaction", $famid, "", "", $famtag);
 		break;
 		
 	// NOTE: addspouseaction done
@@ -1471,7 +1466,7 @@ switch ($action) {
 		if ((!empty($BIRT_DATE))||(!empty($BIRT_PLAC))) {
 			$newrec .= "1 BIRT\r\n";
 			if (!empty($BIRT_DATE)) {
-				$BIRT_DATE = CheckInputDate($BIRT_DATE);
+				$BIRT_DATE = EditFunctions::CheckInputDate($BIRT_DATE);
 				$newrec .= "2 DATE $BIRT_DATE\r\n";
 				if (!empty($BIRT_TIME)) $newrec .= "3 TIME $BIRT_TIME\r\n";
 			}
@@ -1486,7 +1481,7 @@ switch ($action) {
 		if ((!empty($CHR_DATE))||(!empty($CHR_PLAC))) {
 			$gedrec .= "1 CHR\r\n";
 			if (!empty($CHR_DATE)) {
-				$CHR_DATE = CheckInputDate($CHR_DATE);
+				$CHR_DATE = EditFunctions::CheckInputDate($CHR_DATE);
 				$gedrec .= "2 DATE $CHR_DATE\r\n";
 				if (!empty($CHR_TIME)) $gedrec .= "3 TIME $CHR_TIME\r\n";
 			}
@@ -1501,7 +1496,7 @@ switch ($action) {
 		if ((!empty($DEAT_DATE))||(!empty($DEAT_PLAC))) {
 			$newrec .= "1 DEAT\r\n";
 			if (!empty($DEAT_DATE)) {
-				$DEAT_DATE = CheckInputDate($DEAT_DATE);
+				$DEAT_DATE = EditFunctions::CheckInputDate($DEAT_DATE);
 				$newrec .= "2 DATE $DEAT_DATE\r\n";
 				if (!empty($DEAT_TIME)) $newrec .= "3 TIME $DEAT_TIME\r\n";
 			}
@@ -1512,7 +1507,7 @@ switch ($action) {
 			$newrec .= "1 DEAT Y\r\n";
 			if ($addsource) $newrec .= "2 SOUR @XXX@\r\n";
 		}
-		$newrec = HandleUpdates($newrec);
+		$newrec = EditFunctions::HandleUpdates($newrec);
 		if ($addsource == "2") {
 			$addsourcevalue = GetSubRecord(1, "1 SOUR", $newrec);
 			$addsourcevalue = substr(preg_replace("/\n(\d) /e", "'\n'.SumNums($1, 1).' '", $addsourcevalue),1);
@@ -1520,7 +1515,7 @@ switch ($action) {
 		}
 		if ($addsource) $newrec = preg_replace("/2 SOUR @XXX@\r\n/", $addsourcevalue, $newrec); 
 		// NOTE: Save the new indi record and get the new ID
-		$xref = AppendGedrec($newrec, "INDI", $change_id, $change_type);
+		$xref = EditFunctions::AppendGedrec($newrec, "INDI", $change_id, $change_type);
 	
 		if ($xref) print "<br /><br />".$gm_lang["update_successful"];
 		else exit;
@@ -1541,7 +1536,7 @@ switch ($action) {
 			if ((!empty($MARR_DATE))||(!empty($MARR_PLAC))) {
 				$famrec .= "1 MARR\r\n";
 				if (!empty($MARR_DATE)) {
-					$MARR_DATE = CheckInputDate($MARR_DATE);
+					$MARR_DATE = EditFunctions::CheckInputDate($MARR_DATE);
 					$famrec .= "2 DATE $MARR_DATE\r\n";
 				}
 				if (!empty($MARR_PLAC)) $famrec .= "2 PLAC $MARR_PLAC\r\n";
@@ -1551,7 +1546,7 @@ switch ($action) {
 				$famrec .= "1 MARR Y\r\n";
 				if ($addsource) $famrec .= $addsourcevalue;
 			}
-			$famid = AppendGedrec($famrec, "FAM", $change_id, $change_type);
+			$famid = EditFunctions::AppendGedrec($famrec, "FAM", $change_id, $change_type);
 		}
 		else if (!empty($famid)) {
 			$famrec = "";
@@ -1564,7 +1559,7 @@ switch ($action) {
 			if (!empty($famrec)) {
 				$famrec = trim($famrec);
 				$newrec = "1 $famtag @$xref@\r\n";
-				ReplaceGedrec($famid, "", $newrec, $fact, $change_id, $change_type, "", "FAM");
+				EditFunctions::ReplaceGedrec($famid, "", $newrec, $fact, $change_id, $change_type, "", "FAM");
 			}
 		}
 		if ((!empty($famid)) && ($famid != "new")) {
@@ -1581,7 +1576,7 @@ switch ($action) {
 			$ct = preg_match("/1 FAMS @$famid@/", $newrec, $match);
 			if ($ct == 0) {
 				$newrec = "1 FAMS @$famid@\r\n";
-				ReplaceGedrec($xref, "", $newrec, "FAMS", $change_id, $change_type, "", "INDI");
+				EditFunctions::ReplaceGedrec($xref, "", $newrec, "FAMS", $change_id, $change_type, "", "INDI");
 			}
 			else print $famid." &lt -- &gt ".$xref.": ".$gm_lang["link_exists"];
 		}
@@ -1597,7 +1592,7 @@ switch ($action) {
 			$ct = preg_match("/1 FAMS @$famid@/", $newrec, $match);
 			if ($ct == 0) {
 				$newrec = "1 FAMS @$famid@\r\n";
-				ReplaceGedrec($pid, "", $newrec, "FAMS", $change_id, $change_type, "", "INDI");
+				EditFunctions::ReplaceGedrec($pid, "", $newrec, "FAMS", $change_id, $change_type, "", "INDI");
 			}
 			else print $famid." &lt --- &gt ".$pid.": ".$gm_lang["link_exists"];
 		}
@@ -1611,7 +1606,7 @@ switch ($action) {
 		print "<input type=\"hidden\" name=\"change_type\" value=\"".$change_type."\" />\n";
 		print "<table class=\"facts_table\">";
 		print "<tr>";
-		AddTagSeparator($change_type);
+		EditFunctions::AddTagSeparator($change_type);
 		print "</tr>";
 		if ($famtag == "CHIL"){
 			$ids = FindFamilyIDs($pid, "", true);
@@ -1624,7 +1619,7 @@ switch ($action) {
 			}
 			print "<tr><td class=\"shade2\">".GM_FACT_PEDI."</td>";
 			print "<td class=\"shade1\">";
-			PrintPedi("PEDI", "", $showbio);
+			EditFunctions::PrintPedi("PEDI", "", $showbio);
 			print "</td></tr>";
 		}
 		if ($gm_user->UserCanAccept() && !$gm_user->userAutoAccept()) print "<tr><td class=\"shade1\" colspan=\"2\"><input name=\"aa_attempt\" type=\"checkbox\" value=\"1\" />".$gm_lang["attempt_auto_acc"]."</td></tr>";
@@ -1643,24 +1638,24 @@ switch ($action) {
 		if ($famtag == "CHIL") {
 			// Create the new family
 			$newrec = "0 @REF@ FAM\r\n1 CHIL @".$pid."@\r\n";
-			$famid = AppendGedrec($newrec, "FAM", $change_id, $change_type);
+			$famid = EditFunctions::AppendGedrec($newrec, "FAM", $change_id, $change_type);
 			if (!empty($famid)) $success = true;
 			
 			// Append the famid to the childs record
 			$newrec = "1 FAMC @".$famid."@\r\n";
 			if (isset($PEDI) && $PEDI != "birth") $newrec .= "2 PEDI ".$PEDI."\r\n";
-			$success = $success && ReplaceGedrec($pid, "", $newrec, "FAMC", $change_id, $change_type, "", "INDI");
+			$success = $success && EditFunctions::ReplaceGedrec($pid, "", $newrec, "FAMC", $change_id, $change_type, "", "INDI");
 		}
 		else {
 			// Create the new family
 			if ($famtag == "HUSB") $newrec = "0 @REF@ FAM\r\n1 HUSB @".$pid."@\r\n";
 			else $newrec = "0 @REF@ FAM\r\n1 WIFE @".$pid."@\r\n";
-			$famid = AppendGedrec($newrec, "FAM", $change_id, $change_type);
+			$famid = EditFunctions::AppendGedrec($newrec, "FAM", $change_id, $change_type);
 			if (!empty($famid)) $success = true;
 			
 			// Append the famid to the persons record
 			$newrec = "1 FAMS @".$famid."@\r\n";
-			$success = $success && ReplaceGedrec($pid, "", $newrec, "FAMS", $change_id, $change_type, "", "INDI");
+			$success = $success && EditFunctions::ReplaceGedrec($pid, "", $newrec, "FAMS", $change_id, $change_type, "", "INDI");
 		}
 				
 		if ($success) print "<br /><br />".$gm_lang["update_successful"];
@@ -1676,7 +1671,7 @@ switch ($action) {
 		print "<input type=\"hidden\" name=\"famtag\" value=\"".$famtag."\" />\n";
 		print "<table class=\"facts_table\">";
 		print "<tr>";
-		AddTagSeparator("link_as_child");
+		EditFunctions::AddTagSeparator("link_as_child");
 		print "<td class=\"shade2\">".$gm_lang["family"]."</td>";
 		print "<td class=\"shade1\"><input type=\"text\" id=\"famid\" name=\"famid\" size=\"8\" onblur=\"sndReq('famlink', 'getfamilydescriptor', 'famid', this.value, '', '');\"/> ";
 		LinkFunctions::PrintFindFamilyLink("famid");
@@ -1685,7 +1680,7 @@ switch ($action) {
 		if ($famtag == "CHIL") {
 			print "<tr><td class=\"shade2\">".GM_FACT_PEDI."</td>";
 			print "<td class=\"shade1\">";
-			PrintPedi("PEDI");
+			EditFunctions::PrintPedi("PEDI");
 			print "</td></tr>";
 		}
 		if ($gm_user->UserCanAccept() && !$gm_user->userAutoAccept()) print "<tr><td class=\"shade1\" colspan=\"2\"><input name=\"aa_attempt\" type=\"checkbox\" value=\"1\" />".$gm_lang["attempt_auto_acc"]."</td></tr>";
@@ -1724,10 +1719,10 @@ switch ($action) {
 					if (preg_match("/1 $famtag @$pid@/", $famrec)==0) {
 						// NOTE: Notify the session of change
 						$newrec = "1 $famtag @$pid@\r\n";
-						$success = $success && ReplaceGedrec($famid, "", $newrec, $famtag, $change_id, $change_type, "", "FAM");
+						$success = $success && EditFunctions::ReplaceGedrec($famid, "", $newrec, $famtag, $change_id, $change_type, "", "FAM");
 						$newrec = "1 $itag @$famid@\r\n";
 						if (isset($PEDI) && $PEDI != "birth") $newrec .= "2 PEDI ".$PEDI."\r\n";
-						$success = $success && ReplaceGedrec($pid, "", $newrec, $itag, $change_id, $change_type, "", "INDI");
+						$success = $success && EditFunctions::ReplaceGedrec($pid, "", $newrec, $itag, $change_id, $change_type, "", "INDI");
 					}
 				}
 				//-- if it is adding a husband or wife
@@ -1746,11 +1741,11 @@ switch ($action) {
 						// NOTE: Update the individual record for the person
 						if (preg_match("/1 $itag @$famid@/", $gedrec)==0) {
 							$newrec = "1 $itag @$famid@\r\n";
-							$success = $success && ReplaceGedrec($pid, "", $newrec, $itag, $change_id, $change_type, "", "INDI");
+							$success = $success && EditFunctions::ReplaceGedrec($pid, "", $newrec, $itag, $change_id, $change_type, "", "INDI");
 						}
 						
 						$newrec = "1 $famtag @$pid@\r\n";
-						$success = $success && ReplaceGedrec($famid, "", $newrec, $famtag, $change_id, $change_type, "", "FAM");
+						$success = $success && EditFunctions::ReplaceGedrec($famid, "", $newrec, $famtag, $change_id, $change_type, "", "FAM");
 					}
 				}
 				if ($success) print "<br /><br />".$gm_lang["update_successful"];
@@ -1762,12 +1757,12 @@ switch ($action) {
 		
 	// NOTE: addname done
 	case "addname":
-		PrintIndiForm("update", "", "new", "NEW");
+		EditFunctions::PrintIndiForm("update", "", "new", "NEW");
 		break;
 	// NOTE: addnewparent done
 	
 	case "addnewparent":
-		PrintIndiForm("addnewparentaction", $famid, "", "", $famtag);
+		EditFunctions::PrintIndiForm("addnewparentaction", $famid, "", "", $famtag);
 		break;
 		
 	// NOTE: addnewparentaction done
@@ -1796,7 +1791,7 @@ switch ($action) {
 		if ((!empty($BIRT_DATE))||(!empty($BIRT_PLAC))) {
 			$newrec .= "1 BIRT\r\n";
 			if (!empty($BIRT_DATE)) {
-				$BIRT_DATE = CheckInputDate($BIRT_DATE);
+				$BIRT_DATE = EditFunctions::CheckInputDate($BIRT_DATE);
 				$newrec .= "2 DATE $BIRT_DATE\r\n";
 				if (!empty($BIRT_TIME)) $newrec .= "3 TIME $BIRT_TIME\r\n";
 			}
@@ -1811,7 +1806,7 @@ switch ($action) {
 		if ((!empty($CHR_DATE))||(!empty($CHR_PLAC))) {
 			$gedrec .= "1 CHR\r\n";
 			if (!empty($CHR_DATE)) {
-				$CHR_DATE = CheckInputDate($CHR_DATE);
+				$CHR_DATE = EditFunctions::CheckInputDate($CHR_DATE);
 				$gedrec .= "2 DATE $CHR_DATE\r\n";
 				if (!empty($CHR_TIME)) $gedrec .= "3 TIME $CHR_TIME\r\n";
 			}
@@ -1826,7 +1821,7 @@ switch ($action) {
 		if ((!empty($DEAT_DATE))||(!empty($DEAT_PLAC))) {
 			$newrec .= "1 DEAT\r\n";
 			if (!empty($DEAT_DATE)) {
-				$DEAT_DATE = CheckInputDate($DEAT_DATE);
+				$DEAT_DATE = EditFunctions::CheckInputDate($DEAT_DATE);
 				$newrec .= "2 DATE $DEAT_DATE\r\n";
 				if (!empty($DEAT_TIME)) $newrec .= "3 TIME $DEAT_TIME\r\n";
 			}
@@ -1838,7 +1833,7 @@ switch ($action) {
 			if ($addsource) $newrec .= "2 SOUR @XXX@\r\n";
 		}
 		
-		$newrec = HandleUpdates($newrec);
+		$newrec = EditFunctions::HandleUpdates($newrec);
 		if ($addsource == "2") {
 			$addsourcevalue = GetSubRecord(1, "1 SOUR", $newrec);
 			$addsourcevalue = substr(preg_replace("/\n(\d) /e", "'\n'.SumNums($1, 1).' '", $addsourcevalue),1);
@@ -1847,7 +1842,7 @@ switch ($action) {
 		if ($addsource) $newrec = preg_replace("/2 SOUR @XXX@\r\n/", $addsourcevalue, $newrec); 
 		
 		// NOTE: Save the new indi record and get the new ID
-		$xref = AppendGedrec($newrec, "INDI", $change_id, $change_type);
+		$xref = EditFunctions::AppendGedrec($newrec, "INDI", $change_id, $change_type);
 		if ($xref) print "<br /><br />".$gm_lang["update_successful"];
 		else exit;
 		$success = true;
@@ -1861,7 +1856,7 @@ switch ($action) {
 				$famrec .= "1 WIFE @$xref@\r\n";
 				$famrec .= "1 CHIL @$pid@\r\n";
 			}
-			$famid = AppendGedrec($famrec, "FAM", $change_id, $change_type);
+			$famid = EditFunctions::AppendGedrec($famrec, "FAM", $change_id, $change_type);
 		}
 		else if (!empty($famid)) {
 			$famrec = "";
@@ -1872,19 +1867,19 @@ switch ($action) {
 			}
 			if (!empty($famrec)) {
 				$newrec = "1 $famtag @$xref@\r\n";
-				ReplaceGedrec($famid, "", $newrec, $famtag, $change_id, $change_type, "", "FAM");
+				EditFunctions::ReplaceGedrec($famid, "", $newrec, $famtag, $change_id, $change_type, "", "FAM");
 			}
 		}
 		if ((!empty($famid))&&($famid != "new")) {
 				$newrec = "1 FAMS @$famid@\r\n";
-				ReplaceGedrec($xref, "", $newrec, "FAMS", $change_id, $change_type, "", "INDI");
+				EditFunctions::ReplaceGedrec($xref, "", $newrec, "FAMS", $change_id, $change_type, "", "INDI");
 		}
 		if (!empty($pid)) {
 			if ($gedrec) {
 				$ct = preg_match("/1 FAMC @$famid@/", $gedrec);
 				if ($ct==0) {
 					$newrec = "1 FAMC @$famid@\r\n";
-					ReplaceGedrec($pid, "", $newrec, "FAMC", $change_id, $change_type, "", "INDI");
+					EditFunctions::ReplaceGedrec($pid, "", $newrec, "FAMC", $change_id, $change_type, "", "INDI");
 				}
 			}
 		}
@@ -1894,12 +1889,12 @@ switch ($action) {
 			if (!empty($MARR_DATE)) $newrec .= "2 DATE ".$MARR_DATE."\r\n";
 			if (!empty($MARR_PLAC)) $newrec .= "2 PLAC ".$MARR_PLAC."\r\n";
 			if ($addsource) $newrec .= $addsourcevalue;
-			ReplaceGedrec($famid, "", $newrec, "MARR", $change_id, $change_type, "", "FAM");
+			EditFunctions::ReplaceGedrec($famid, "", $newrec, "MARR", $change_id, $change_type, "", "FAM");
 		}
 		else if (!empty($famid) && !empty($MARR)) {
 			$newrec = "1 MARR Y\r\n";
 			if ($addsource) $newrec .= $addsourcevalue;
-			ReplaceGedrec($famid, "", $newrec, "MARR", $change_id, $change_type, "", "FAM");
+			EditFunctions::ReplaceGedrec($famid, "", $newrec, "MARR", $change_id, $change_type, "", "FAM");
 		}
 		break;
 		
@@ -1915,9 +1910,9 @@ switch ($action) {
 		<input type="hidden" name="change_type" value="<?php print $change_type; ?>" />
 		<table class="facts_table"><?php
 		
-		AddTagSeparator("create_source");
+		EditFunctions::AddTagSeparator("create_source");
 		// 1 TITL
-		$element_id = AddSimpleTag("1 TITL");
+		$element_id = EditFunctions::AddSimpleTag("1 TITL");
 		?>
 		<script type="text/javascript">
 		<!--
@@ -1933,22 +1928,22 @@ switch ($action) {
 		</script>
 		<?php
 		// 1 ABBR
-		AddSimpleTag("1 ABBR");
+		EditFunctions::AddSimpleTag("1 ABBR");
 		// 1 AUTH
-		AddSimpleTag("1 AUTH");
+		EditFunctions::AddSimpleTag("1 AUTH");
 		// 1 PUBL
-		AddSimpleTag("1 PUBL");
+		EditFunctions::AddSimpleTag("1 PUBL");
 		// 1 TEXT
-		AddSimpleTag("1 TEXT");
+		EditFunctions::AddSimpleTag("1 TEXT");
 		// 1 REPO
-		AddSimpleTag("1 REPO @");
+		EditFunctions::AddSimpleTag("1 REPO @");
 		print "</table>";
 		
 		// 1 OBJE
-		PrintAddLayer("OBJE", 1);
+		EditFunctions::PrintAddLayer("OBJE", 1);
 		// 1 NOTE
-		PrintAddLayer("NOTE", 1);
-		PrintAddLayer("GNOTE", 1);
+		EditFunctions::PrintAddLayer("NOTE", 1);
+		EditFunctions::PrintAddLayer("GNOTE", 1);
 		if ($gm_user->UserCanAccept() && !$gm_user->userAutoAccept()) print "<br /><input name=\"aa_attempt\" type=\"checkbox\" value=\"1\" />".$gm_lang["attempt_auto_acc"]."<br />";
 		print "<br /><input class=\"center\" type=\"submit\" value=\"".$gm_lang["create_source"]."\" /><br />";
 		print "</form>";
@@ -1960,8 +1955,8 @@ switch ($action) {
 		$change_id = GetNewXref("CHANGE");
 		
 		$newged = "0 @XREF@ SOUR\r\n";
-		$newged = HandleUpdates($newged);
-		$xref = AppendGedrec($newged, "SOUR", $change_id, $change_type);
+		$newged = EditFunctions::HandleUpdates($newged);
+		$xref = EditFunctions::AppendGedrec($newged, "SOUR", $change_id, $change_type);
 		if ($xref) {
 			print "<br /><br />\n".$gm_lang["new_source_created"]."<br /><br />";
 			if (GedcomConfig::$EDIT_AUTOCLOSE) print "\n<script type=\"text/javascript\">\n<!--\nopenerpasteid('$xref');\n//-->\n</script>";
@@ -1992,7 +1987,7 @@ switch ($action) {
 			<input type="hidden" name="pid" value="newrepo" />
 			<input type="hidden" name="change_type" value="<?php print $change_type; ?>" />
 			<table class="facts_table">
-				<?php AddTagSeparator("create_repository"); ?>
+				<?php EditFunctions::AddTagSeparator("create_repository"); ?>
 				<tr><td class="shade2"><?php print GM_FACT_NAME; ?></td>
 				<td class="shade1"><input tabindex="<?php print $tabkey; ?>" type="text" name="NAME" id="NAME" value="" size="40" maxlength="255" /> <?php LinkFunctions::PrintSpecialCharLink("NAME"); ?></td></tr>
 				<?php $tabkey++; ?>
@@ -2055,7 +2050,7 @@ switch ($action) {
 				$newged .= trim($newlines[$k])."\r\n";
 			}
 		}
-		$xref = AppendGedrec($newged, "REPO", $change_id, $change_type);
+		$xref = EditFunctions::AppendGedrec($newged, "REPO", $change_id, $change_type);
 		if ($xref) {
 			print "<br /><br />\n".$gm_lang["new_repo_created"]."<br /><br />";
 			if (GedcomConfig::$EDIT_AUTOCLOSE) print "\n<script type=\"text/javascript\">\n<!--\nopenerpasteid('$xref');\n//-->\n</script>";
@@ -2075,12 +2070,12 @@ switch ($action) {
 		<input type="hidden" name="change_type" value="<?php print $change_type; ?>" />
 		<table class="facts_table"><?php
 		
-//		AddTagSeparator("create_gnote");
+//		EditFunctions::AddTagSeparator("create_gnote");
 
-		$element_id = AddSimpleTag("0 NOTE");
-		AddSimpleTag("1 RESN");
+		$element_id = EditFunctions::AddSimpleTag("0 NOTE");
+		EditFunctions::AddSimpleTag("1 RESN");
 		print "</table>";
-		print PrintAddLayer("SOUR", 1);
+		print EditFunctions::PrintAddLayer("SOUR", 1);
 		if ($gm_user->UserCanAccept() && !$gm_user->userAutoAccept($gm_urname)) print "<br /><input name=\"aa_attempt\" type=\"checkbox\" value=\"1\" />".$gm_lang["attempt_auto_acc"]."<br />";
 		print "<br /><input class=\"center\" type=\"submit\" value=\"".$gm_lang["create_general_note"]."\" /><br />";
 		print "</form>";
@@ -2097,8 +2092,8 @@ switch ($action) {
 			$change_id = GetNewXref("CHANGE");
 			$newged = "0 @XREF@ NOTE";
 			$newged = MakeCont($newged, $NOTE);
-			$newged = HandleUpdates($newged);
-			$xref = AppendGedrec($newged, "NOTE", $change_id, $change_type);
+			$newged = EditFunctions::HandleUpdates($newged);
+			$xref = EditFunctions::AppendGedrec($newged, "NOTE", $change_id, $change_type);
 			if ($xref) {
 				print "<br /><br />\n".$gm_lang["new_gnote_created"]."<br /><br />";
 				if (GedcomConfig::$EDIT_AUTOCLOSE) print "\n<script type=\"text/javascript\">\n<!--\nopenerpasteid('$xref');\n//-->\n</script>";
@@ -2127,15 +2122,15 @@ switch ($action) {
 //			$oldrec = GetSubRecord(1, "1 $fact", $gedrec, $count);
 //			print $oldrec;
 			
-//			AddSimpleTag(
-			// ShowMediaForm($pid, 'updatemedia', 'edit_media');
+//			EditFunctions::AddSimpleTag(
+			// EditFunctions::ShowMediaForm($pid, 'updatemedia', 'edit_media');
 //		}
 //		else {
 			// Get the record type
 			$ct = preg_match("/0\s@\w+@\s(\w+)/", $gedrec, $match);
 			if ($ct>0) $rectype = $match[1];
 			else $rectype = "";
-			$oldrec = SortFactDetails($oldrec);
+			$oldrec = EditFunctions::SortFactDetails($oldrec);
 			$gedlines = split("\r\n", trim($oldrec));	// -- find the number of lines in the record
 			$fields = preg_split("/\s/", $gedlines[0]);
 			// glevel is always 1
@@ -2162,12 +2157,12 @@ switch ($action) {
 			// linenum is always 1
 			// $i = $linenum;
 			
-			// if ($change_type == "edit_gender") AddSimpleTag(GetSubRecord(1, "1 SEX", $gedrec));
+			// if ($change_type == "edit_gender") EditFunctions::AddSimpleTag(GetSubRecord(1, "1 SEX", $gedrec));
 			$i = 0;
 			$insour = false;
 			$inobj = false;
 			$addfactsdone = false;
-			if (!in_array($fact, $separatorfacts)) AddTagSeparator($fact);
+			if (!in_array($fact, $separatorfacts)) EditFunctions::AddTagSeparator($fact);
 			// Loop on existing tags :
 			do {
 				$text = "";
@@ -2191,29 +2186,29 @@ switch ($action) {
 				$text = rtrim($text);
 				$tags[]=$fact;
 				if (($fact == "SOUR" || $fact == "OBJE" || $fact == "RESN" || $fact == "ASSO") && !$insour && !$inobj && !$addfactsdone) {
-					AddMissingTags($tags);
+					EditFunctions::AddMissingTags($tags);
 					$addfactsdone = true;
 				}
 				// Finished adding missing tags
 				// Print the next fact
-				AddSimpleTag($level." ".$fact." ".$text);
+				EditFunctions::AddSimpleTag($level." ".$fact." ".$text);
 //				print "adding tag ".$level." ".$fact." ".nl2br($text)."<br />";
 				if ($fact=="DATE" && $orgfact != "SOUR" && !strpos(@$gedlines[$i+1], " TIME")) {
-					AddSimpleTag(($level+1)." TIME");
+					EditFunctions::AddSimpleTag(($level+1)." TIME");
 					$tags[] = "TIME";
 				}
 				if ($fact=="MARR" && !strpos(@$gedlines[$i+1], " TYPE")) {
-					AddSimpleTag(($level+1)." TYPE");
+					EditFunctions::AddSimpleTag(($level+1)." TYPE");
 					$tags[] = "TYPE";
 				}
 				
 				if ($fact=="ASSO") {
 					if (!strpos(@$gedlines[$i+1], " RELA")) {
-						AddSimpleTag(($level+1)." RELA");
+						EditFunctions::AddSimpleTag(($level+1)." RELA");
 						$tags[] = "RELA";
 					}
 					if (!strpos(@$gedlines[$i+2], " NOTE")) {
-						AddSimpleTag(($level+1)." NOTE");
+						EditFunctions::AddSimpleTag(($level+1)." NOTE");
 						$tags[] = "NOTE";
 					}
 				}
@@ -2235,8 +2230,8 @@ switch ($action) {
 							$line++;
 						}
 						// we have the DATA subtags, now add the missing ones
-						if (!array_key_exists("DATE", $arrdata)) AddSimpleTag($datalevel." DATE");
-						if (!array_key_exists("TEXT", $arrdata)) AddSimpleTag($datalevel." TEXT");
+						if (!array_key_exists("DATE", $arrdata)) EditFunctions::AddSimpleTag($datalevel." DATE");
+						if (!array_key_exists("TEXT", $arrdata)) EditFunctions::AddSimpleTag($datalevel." TEXT");
 					}
 					// Wait until we are eof or end of source, then we can insert the remaining level+n tags
 					if (!isset($gedlines[$i+1]) || substr($gedlines[$i+1],0,1) <= $insourlevel) {
@@ -2248,15 +2243,15 @@ switch ($action) {
 						// 3 TEXT
 						$l1 = $insourlevel+1;
 						$l2 = $insourlevel+2;
-						if (!in_array("PAGE", $insourfacts)) AddSimpleTag($l1." PAGE");
+						if (!in_array("PAGE", $insourfacts)) EditFunctions::AddSimpleTag($l1." PAGE");
 						if (!in_array("DATA", $insourfacts)) {
-							AddSimpleTag($l1." DATA");
-							AddSimpleTag($l2." DATE");
-							AddSimpleTag($l2." TEXT");
+							EditFunctions::AddSimpleTag($l1." DATA");
+							EditFunctions::AddSimpleTag($l2." DATE");
+							EditFunctions::AddSimpleTag($l2." TEXT");
 						}
 //						else {
-//							if (!in_array("DATE", $insourfacts)) AddSimpleTag($l2." DATE");
-//							if (!in_array("TEXT", $insourfacts)) AddSimpleTag($l2." TEXT");
+//							if (!in_array("DATE", $insourfacts)) EditFunctions::AddSimpleTag($l2." DATE");
+//							if (!in_array("TEXT", $insourfacts)) EditFunctions::AddSimpleTag($l2." TEXT");
 //						}
 						$insourfacts = array();
 					}
@@ -2269,20 +2264,20 @@ switch ($action) {
 					// Wait until we are eof or end of object
 					if (!isset($gedlines[$i+1]) || substr($gedlines[$i+1],0,1) <= $inobjlevel) {
 						$inobj = false;			
-//						ShowMediaForm($pid);
+//						EditFunctions::ShowMediaForm($pid);
 						// 1 OBJE
 						if (!$factlink) {
 							// 2 FORM
-							if (!in_array("FORM", $tags)) AddSimpleTag(($inobjlevel+1)." FORM");
+							if (!in_array("FORM", $tags)) EditFunctions::AddSimpleTag(($inobjlevel+1)." FORM");
 							// 2 FILE
-							if (!in_array("FILE", $tags)) AddSimpleTag(($inobjlevel+1)." FILE");
+							if (!in_array("FILE", $tags)) EditFunctions::AddSimpleTag(($inobjlevel+1)." FILE");
 							// 2 TITL
-							if (!in_array("TITL", $tags)) AddSimpleTag(($inobjlevel+1)." TITL");
+							if (!in_array("TITL", $tags)) EditFunctions::AddSimpleTag(($inobjlevel+1)." TITL");
 						}
 						// 2 _PRIM
-						if (!in_array("_PRIM", $tags)) AddSimpleTag(($inobjlevel+1)." _PRIM");
+						if (!in_array("_PRIM", $tags)) EditFunctions::AddSimpleTag(($inobjlevel+1)." _PRIM");
 						// 2 _THUM
-						if (!in_array("_THUM", $tags)) AddSimpleTag(($inobjlevel+1)." _THUM");
+						if (!in_array("_THUM", $tags)) EditFunctions::AddSimpleTag(($inobjlevel+1)." _THUM");
 					}
 				}
 				$i++;
@@ -2296,18 +2291,18 @@ switch ($action) {
 					}
 					else $levellink = false;
 				}
-				if ($i == count($gedlines) && !$addfactsdone) AddMissingTags($tags);
+				if ($i == count($gedlines) && !$addfactsdone) EditFunctions::AddMissingTags($tags);
 			} while ($i<count($gedlines));
 			// 2 RESN
-			if (!in_array("RESN", $tags)&& $rectype != "OBJE") AddSimpleTag("2 RESN");
+			if (!in_array("RESN", $tags)&& $rectype != "OBJE") EditFunctions::AddSimpleTag("2 RESN");
 			print "</table>";
 			if ($orgfact != "SEX" && $orgfact != "RESN" && $rectype != "OBJE" && $rectype != "NOTE") {
-				if ($orgfact!="ASSO"  && $orgfact!="REPO" && $orgfact!="OBJE" && $orgfact!="SOUR" && $orgfact!="NOTE") PrintAddLayer("ASSO");
-				if ($orgfact!="SOUR"  && $orgfact!="REPO" && $orgfact!="OBJE" && !($orgfact == "NOTE" && $levellink)) PrintAddLayer("SOUR");
-				if ($orgfact!="OBJE"  && $orgfact!="REPO" && $orgfact!="NOTE") PrintAddLayer("OBJE");
+				if ($orgfact!="ASSO"  && $orgfact!="REPO" && $orgfact!="OBJE" && $orgfact!="SOUR" && $orgfact!="NOTE") EditFunctions::PrintAddLayer("ASSO");
+				if ($orgfact!="SOUR"  && $orgfact!="REPO" && $orgfact!="OBJE" && !($orgfact == "NOTE" && $levellink)) EditFunctions::PrintAddLayer("SOUR");
+				if ($orgfact!="OBJE"  && $orgfact!="REPO" && $orgfact!="NOTE") EditFunctions::PrintAddLayer("OBJE");
 				if ($orgfact!="NOTE") {
-					PrintAddLayer("NOTE");
-					PrintAddLayer("GNOTE");
+					EditFunctions::PrintAddLayer("NOTE");
+					EditFunctions::PrintAddLayer("GNOTE");
 				}
 			}
 			if ($gm_user->UserCanAccept() && !$gm_user->userAutoAccept()) print "<br /><input name=\"aa_attempt\" type=\"checkbox\" value=\"1\" />".$gm_lang["attempt_auto_acc"]."<br />\n";
@@ -2351,7 +2346,7 @@ switch ($action) {
 		$rectype = GetRecType($newrec);
 		if (!$rectype) $rectype = "";
 		if (trim($oldrec) != trim($newrec)) {
-			$success = (!empty($newrec) && (ReplaceGedrec($pid, $oldrec, $newrec, $rectype, $change_id, $change_type, "", $rectype)));
+			$success = (!empty($newrec) && (EditFunctions::ReplaceGedrec($pid, $oldrec, $newrec, $rectype, $change_id, $change_type, "", $rectype)));
 			if ($success) print "<br /><br />".$gm_lang["update_successful"];
 		}
 		break;
@@ -2363,7 +2358,7 @@ switch ($action) {
 			$namerecnew = GetSubRecord(1, "1 NAME", $rec[$GEDCOMID][$pid], $count);
 		}
 		else $namerecnew = GetSubRecord(1, "1 NAME", $gedrec, $count);
-		PrintIndiForm("update", "", "", $namerecnew);
+		EditFunctions::PrintIndiForm("update", "", "", $namerecnew);
 		break;
 		
 	
@@ -2397,7 +2392,7 @@ switch ($action) {
 		print "<input type=\"hidden\" name=\"famid\" value=\"new\" />\n";
 		print "<input type=\"hidden\" name=\"famtag\" value=\"".$famtag."\" />\n";
 		print "<table class=\"facts_table\">";
-		AddTagSeparator($famtag);
+		EditFunctions::AddTagSeparator($famtag);
 		print "<tr><td class=\"shade2\">";
 		if ($famtag=="WIFE") print $gm_lang["wife"];
 		else print $gm_lang["husband"];
@@ -2406,11 +2401,11 @@ switch ($action) {
 		LinkFunctions::PrintFindIndiLink("spouseid", "");
 		print "&nbsp;<span id=\"spouselink\"></span>";
 		print "\n</td></tr>";
-		AddTagSeparator("MARR");
-		AddSimpleTag("0 MARR");
-		AddSimpleTag("0 TYPE", "MARR");
-		AddSimpleTag("0 DATE", "MARR");
-		AddSimpleTag("0 PLAC", "MARR");
+		EditFunctions::AddTagSeparator("MARR");
+		EditFunctions::AddSimpleTag("0 MARR");
+		EditFunctions::AddSimpleTag("0 TYPE", "MARR");
+		EditFunctions::AddSimpleTag("0 DATE", "MARR");
+		EditFunctions::AddSimpleTag("0 PLAC", "MARR");
 		if ($gm_user->UserCanAccept() && !$gm_user->userAutoAccept()) print "<tr><td class=\"shade1\" colspan=\"2\"><input name=\"aa_attempt\" type=\"checkbox\" value=\"1\" />".$gm_lang["attempt_auto_acc"]."</td></tr>";
 		print "<tr><td class=\"topbottombar\" colspan=\"2\">";
 		print "<input type=\"submit\" id=\"submit\" value=\"".$gm_lang["set_link"]."\" />\n";
@@ -2467,28 +2462,28 @@ switch ($action) {
 						if ((!empty($MARR_DATE))||(!empty($MARR_PLAC))) {
 							$famrec .= "1 MARR\r\n";
 							if (!empty($MARR_DATE)) {
-								$MARR_DATE = CheckInputDate($MARR_DATE);
+								$MARR_DATE = EditFunctions::CheckInputDate($MARR_DATE);
 								$famrec .= "2 DATE $MARR_DATE\r\n";
 							}
 							if (!empty($MARR_PLAC)) $famrec .= "2 PLAC $MARR_PLAC\r\n";
 						}
 						else if (!empty($MARR)) {
 							$famrec .= "1 MARR Y\r\n";
-							ReplaceGedrec($famid, "", $famrec, "MARR", $change_id, $change_type, "", "FAM");
+							EditFunctions::ReplaceGedrec($famid, "", $famrec, "MARR", $change_id, $change_type, "", "FAM");
 						}
-						$famid = AppendGedrec($famrec, "FAM", $change_id, $change_type);
+						$famid = EditFunctions::AppendGedrec($famrec, "FAM", $change_id, $change_type);
 					}
 					if ((!empty($famid)) && ($famid != "new")) {
 						// NOTE: Notify the session of change
 						// NOTE: Add the new FAM ID to the spouse record
 						$newrec = "1 FAMS @$famid@\r\n";
-						ReplaceGedrec($spid, "", $newrec, "FAMS", $change_id, $change_type, "", "INDI");
+						EditFunctions::ReplaceGedrec($spid, "", $newrec, "FAMS", $change_id, $change_type, "", "INDI");
 					}
 					if (!empty($pid)) {
 						// NOTE: Notify the session of change
 						// NOTE: Add the new FAM ID to the active person record
 						$newrec = "1 FAMS @$famid@\r\n";
-						ReplaceGedrec($pid, "", $newrec, "FAMS", $change_id, $change_type, "", "INDI");
+						EditFunctions::ReplaceGedrec($pid, "", $newrec, "FAMS", $change_id, $change_type, "", "INDI");
 					}
 					if ($famtag == "HUSB") print $gm_lang["husband_added"];
 					else if ($famtag == "WIFE") print $gm_lang["wife_added"];
@@ -2507,19 +2502,19 @@ switch ($action) {
 				if (isset($rec[$gedfile][$pid])) $oldrecord = $rec[$gedfile][$pid];
 			}
 			$newrec = "0 @".$pid."@ SUBM\r\n";
-			$newrec = HandleUpdates($newrec);
+			$newrec = EditFunctions::HandleUpdates($newrec);
 			$chanrec = GetSubrecord(1, "1 CHAN", $oldrecord);
 			$orec = preg_replace("/$chanrec/", "", $oldrecord);
 			if (trim($newrec) != trim($orec)) {
-				$success = (ReplaceGedrec($pid, $oldrecord, $newrec, $fact, $change_id, $change_type, $gedfile, "", "SUBM"));
+				$success = (EditFunctions::ReplaceGedrec($pid, $oldrecord, $newrec, $fact, $change_id, $change_type, $gedfile, "", "SUBM"));
 				if ($success) print "<br /><br />".$gm_lang["update_successful"];
 			}
 		}
 		else {
 			$newrec = "0 @new@ SUBM\r\n";
-			$newrec = HandleUpdates($newrec);
-			$subid = AppendGedrec($newrec, "SUBM", $change_id, $change_type, $gedfile);
-			$success = (ReplaceGedrec("HEAD", "", "1 SUBM @".$subid."@", "SUBM", $change_id, $change_type, $gedfile, "", "HEAD"));
+			$newrec = EditFunctions::HandleUpdates($newrec);
+			$subid = EditFunctions::AppendGedrec($newrec, "SUBM", $change_id, $change_type, $gedfile);
+			$success = (EditFunctions::ReplaceGedrec("HEAD", "", "1 SUBM @".$subid."@", "SUBM", $change_id, $change_type, $gedfile, "", "HEAD"));
 			if ($success) print "<br /><br />".$gm_lang["update_successful"];
 			
 		}
@@ -2563,7 +2558,7 @@ switch ($action) {
 			else if (!isset($newrec) && $fact != "SUBM") $newrec = "";
 			else if ($fact == "SUBM") $newrec = "0 @SUB1@ SUBM\r\n";
 		}
-		$newrec = HandleUpdates($newrec);
+		$newrec = EditFunctions::HandleUpdates($newrec);
 		if (!isset($count)) $count = 1;
 		if (!isset($change_type)) $change_type = "unknown";
 
@@ -2603,12 +2598,11 @@ switch ($action) {
 				}
 			}
 		}
-		if (trim(SortFactDetails($oldrec)) != trim(SortFactDetails($newrec))) $success = ReplaceGedrec($pid, $oldrec, $newrec, $fact, $change_id, $change_type, $gedfile, $pid_type);
+		if (trim(EditFunctions::SortFactDetails($oldrec)) != trim(EditFunctions::SortFactDetails($newrec))) $success = EditFunctions::ReplaceGedrec($pid, $oldrec, $newrec, $fact, $change_id, $change_type, $gedfile, $pid_type);
 		if ($success) print "<br /><br />".$gm_lang["update_successful"];
 		break;
 	
 }
-	print "hier6";	
 
 // if there were link errors, don't auto-accept and don't auto-close.
 if (!isset($link_error)) $link_error = false;

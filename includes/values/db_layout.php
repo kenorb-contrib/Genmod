@@ -638,8 +638,8 @@ $db_original[TBLPREFIX."source_mapping"]["row"]["sm_type"]["details"] = "VARCHAR
 $db_original[TBLPREFIX."source_mapping"]["row"]["sm_gid"]["details"] = "VARCHAR(64) CHARACTER SET #charset# COLLATE #collate#  NOT NULL DEFAULT ''";
 $db_original[TBLPREFIX."source_mapping"]["row"]["sm_file"]["details"] = "TINYINT UNSIGNED DEFAULT NULL";  
 $db_original[TBLPREFIX."source_mapping"]["row"]["sm_gedrec"]["details"] = "TEXT CHARACTER SET #charset# COLLATE #collate# ";
-$db_original[TBLPREFIX."source_mapping"]["key"]["primary"] = "PRIMARY KEY  (`sm_key`)";
-$db_original[TBLPREFIX."source_mapping"]["key"]["sm_sid"] = "KEY `sm_sid` (`sm_sid` , `sm_file` )";
+$db_original[TBLPREFIX."source_mapping"]["key"]["primary"] = "PRIMARY KEY  (`sm_id`)";
+$db_original[TBLPREFIX."source_mapping"]["key"]["sm_key"] = "KEY `sm_key` (`sm_key` , `sm_file` )";
 $db_original[TBLPREFIX."source_mapping"]["key"]["sm_gid"] = "KEY `sm_gid` ( `sm_gid` , `sm_file` )";
 $db_original[TBLPREFIX."source_mapping"]["key"]["sm_type"] = "KEY `sm_type` (`sm_sid` ,  `sm_type` , `sm_file` )";
 

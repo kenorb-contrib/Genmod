@@ -2582,3 +2582,4 @@
 "embedvar_not_found";"<b>embedded variable not found</b>"
 "embedvar_not_allowed";"<b>embedded variable not allowed</b>"
 "descent_steps";"Descent steps"
+"gedcom_exists";"A GEDCOM-file with this name is already in the database"

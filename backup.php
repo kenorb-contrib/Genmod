@@ -161,14 +161,14 @@ switch ($action) {
 					$flist[] = "includes/values/include_top.php";
 					$flist[] = "includes/values/include_bottom.php";
 					$tables = array("lockout");
-					$fn = ExportTable($tables, "yes", "config");
+					$fn = AdminFunctions::ExportTable($tables, "yes", "config");
 					if (!empty($fn)) $flist = array_merge($fn, $flist);
 				}
 				
 				// Backup MyPages
 				if (isset($_POST["um_mypages"])) {
 					$tables = array("pages");
-					$fn = ExportTable($tables, "yes", "mypages");
+					$fn = AdminFunctions::ExportTable($tables, "yes", "mypages");
 					if (!empty($fn)) $flist = array_merge($fn, $flist);
 				}
 				
@@ -182,7 +182,7 @@ switch ($action) {
 						}
 					}
 					$d->close();
-					$fn = ExportTable("lang_settings");
+					$fn = AdminFunctions::ExportTable("lang_settings");
 					if (!empty($fn)) $flist = array_merge($fn, $flist);
 				}
 				
@@ -195,7 +195,7 @@ switch ($action) {
 						AdminFunctions::PrintGedcom($ged, "no", "no", "yes", "no", "", $gedname, "");
 						$flist[] = $gedname;
 					}
-					$fn = ExportTable("changes");
+					$fn = AdminFunctions::ExportTable("changes");
 					if (!empty($fn)) $flist = array_merge($fn, $flist);
 				}
 				
@@ -211,7 +211,7 @@ switch ($action) {
 				// Backup gedcom settings
 				if (isset($_POST["um_gedsets"])) {
 					$tables = array("gedcoms", "gedconf", "privacy");
-					$fn = ExportTable($tables, "yes", "gedcomsettings");
+					$fn = AdminFunctions::ExportTable($tables, "yes", "gedcomsettings");
 					if (!empty($fn)) $flist = array_merge($fn, $flist);
 				}
 			
@@ -219,24 +219,24 @@ switch ($action) {
 				if (isset($_POST["um_logs"])) {
 			
 					// Gedcom counters
-					$fn = ExportTable("counters");
+					$fn = AdminFunctions::ExportTable("counters");
 					if (!empty($fn)) $flist = array_merge($fn, $flist);
 			
 					// Gedcom searchlogs, changelogs and systemlogs
-					$fn = ExportTable("log");
+					$fn = AdminFunctions::ExportTable("log");
 					if (!empty($fn)) $flist = array_merge($fn, $flist);
 				}
 				
 				// Backup user information
 				if (isset($_POST["um_usinfo"])) {
 					$tables = array("users", "users_gedcoms", "news", "messages", "blocks", "favorites");
-					$fn = ExportTable($tables, "yes", "users");
+					$fn = AdminFunctions::ExportTable($tables, "yes", "users");
 					if (!empty($fn)) $flist = array_merge($fn, $flist);
 				}
 				
 				// Backup Actions
 				if (isset($_POST["um_actions"])) {
-					$fn = ExportTable("actions");
+					$fn = AdminFunctions::ExportTable("actions");
 					if (!empty($fn)) $flist = array_merge($fn, $flist);
 				}
 				
@@ -365,7 +365,7 @@ switch ($action) {
 			$error = false;
 			// Restore logfiles. Do this first, so we can write the restore results to the logfile.
 			if (isset($_POST["um_logs"])) {
-				$result = ImportTable("export_log.sql");
+				$result = AdminFunctions::ImportTable("export_log.sql");
 				if (empty($result)) WriteToLog("Restore-> Restore of logfiles and counters successful", "I", "S");
 				else {
 					WriteToLog("Restore-> Restore of logfiles and counters failed with error: ".$result, "E", "S");
@@ -375,7 +375,7 @@ switch ($action) {
 			
 			// Restore lockout table
 			if (isset($_POST["um_config"])) {
-				$result = ImportTable("export_config.sql");
+				$result = AdminFunctions::ImportTable("export_config.sql");
 				if (empty($result)) WriteToLog("Restore-> Restore of lockout table successful", "I", "S");
 				else {
 					WriteToLog("Restore-> Restore of lockout table failed with error: ".$result, "E", "S");
@@ -385,7 +385,7 @@ switch ($action) {
 			
 			// Restore language settings 
 			if (isset($_POST["um_lang"])) {
-				$result = ImportTable("export_lang_settings.sql");
+				$result = AdminFunctions::ImportTable("export_lang_settings.sql");
 				if (empty($result)) WriteToLog("Restore-> Restore of language settings successful", "I", "S");
 				else {
 					WriteToLog("Restore-> Restore of language settings failed with error: ".$result, "E", "S");
@@ -395,7 +395,7 @@ switch ($action) {
 			
 			// Restore changes
 			if (isset($_POST["um_changes"])) {
-				$result = ImportTable("export_changes.sql");
+				$result = AdminFunctions::ImportTable("export_changes.sql");
 				if (empty($result)) WriteToLog("Restore-> Restore of changes successful", "I", "S");
 				else {
 					WriteToLog("Restore-> Restore of changes failed with error: ".$result, "E", "S");
@@ -405,7 +405,7 @@ switch ($action) {
 			
 			// Restore gedcom settings
 			if (isset($_POST["um_gedsets"])) {
-				$result = ImportTable("export_gedcomsettings.sql");
+				$result = AdminFunctions::ImportTable("export_gedcomsettings.sql");
 				if (empty($result)) WriteToLog("Restore-> Restore of gedcom settings successful", "I", "S");
 				else {
 					WriteToLog("Restore-> Restore of gedcom settings failed with error: ".$result, "E", "S");
@@ -415,7 +415,7 @@ switch ($action) {
 			
 			// Restore usersettings
 			if (isset($_POST["um_usinfo"])) {
-				$result = ImportTable("export_users.sql");
+				$result = AdminFunctions::ImportTable("export_users.sql");
 				if (empty($result)) WriteToLog("Restore-> Restore of usersettings successful", "I", "S");
 				else {
 					WriteToLog("Restore-> Restore of usersettings failed with error: ".$result, "E", "S");
@@ -425,7 +425,7 @@ switch ($action) {
 			
 			// Restore MyPages
 			if (isset($_POST["um_mypages"])) {
-				$result = ImportTable("export_mypages.sql");
+				$result = AdminFunctions::ImportTable("export_mypages.sql");
 				if (empty($result)) WriteToLog("Restore-> Restore of MyPages successful", "I", "S");
 				else {
 					WriteToLog("Restore-> Restore of MyPages failed with error: ".$result, "E", "S");
@@ -435,7 +435,7 @@ switch ($action) {
 
 			// Restore Actions
 			if (isset($_POST["um_actions"])) {
-				$result = ImportTable("export_actions.sql");
+				$result = AdminFunctions::ImportTable("export_actions.sql");
 				if (empty($result)) WriteToLog("Restore-> Restore of ToDo's successful", "I", "S");
 				else {
 					WriteToLog("Restore-> Restore of ToDo's failed with error: ".$result, "E", "S");

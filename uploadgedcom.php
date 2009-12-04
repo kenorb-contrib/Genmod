@@ -36,8 +36,16 @@
  // TODO: Progress bars don't show until </table> or </div>
  // TODO: Upload ZIP support alternative path and name
  
- // NOTE: $GEDFILENAME = The filename of the uploaded GEDCOM
- // NOTE: $action = Which form we should present
+ // Incoming Variables:
+ // $GEDFILENAME = The filename of the uploaded GEDCOM
+ 
+ // $action = Which form we should present
+ // Possible values:
+ // add_form: add new gedcom already on server
+ // upload form: add new gedcom from upload
+ // add_new_form: add new gedcom from scratch
+ // reupload_form: re-upload and import an existing gedcom
+
  // NOTE: $check = Which check to be performed
  // NOTE: $timelimit = The time limit for the import process
  // NOTE: $cleanup = If set to yes, the GEDCOM contains invalid tags
@@ -169,7 +177,7 @@ else if ($check == "add_new") {
 else if ($check == "cancel_upload") {
 	if ($exists) {
 		unset($GEDCOMS[get_id_from_gedcom($GEDFILENAME)]);
-		StoreGedcoms();
+		AdminFunctions::StoreGedcoms();
 		if ($action == "add_new_form") @unlink(INDEX_DIRECTORY.$GEDFILENAME);
 	}
 	// NOTE: Cleanup everything no longer needed
@@ -471,6 +479,7 @@ print "<form enctype=\"multipart/form-data\" method=\"post\" name=\"configform\"
 						$l_placecleanup = false;
 						$l_datecleanup=false;
 						$l_isansi = false;
+						print_r($GEDCOMS);
 						$fp = fopen($GEDCOMS[$gedid]["path"], "r");
 						if (!$fp) {
 							print "error opening file ".$GEDCOMS[$gedid]["path"];
@@ -959,7 +968,6 @@ print "<form enctype=\"multipart/form-data\" method=\"post\" name=\"configform\"
 				$exectime = $newtime - $oldtime;
 				$exectime_start = $exectime;
 				if (!isset($names_added)) $names_added = 0;
-				include_once("includes/functions/functions_edit.php"); // for checkgedcom
 				$manual_save = true;
 				DMSoundex("", "opencache");
 				if (!isset($lastgid)) $skip = false;
@@ -991,7 +999,7 @@ print "<form enctype=\"multipart/form-data\" method=\"post\" name=\"configform\"
 													$pos1 = strpos($indi["gedcom"], "\n1", $pos1+1);
 													if ($pos1!==false) $indi["gedcom"] = substr($indi["gedcom"], 0, $pos1)."\n2 _MARNM $newname\r\n".substr($indi["gedcom"], $pos1+1);
 													else $indi["gedcom"]= trim($indi["gedcom"])."\r\n2 _MARNM $newname\r\n";
-													$indi["gedcom"] = CheckGedcom($indi["gedcom"], false);
+													$indi["gedcom"] = EditFunctions::CheckGedcom($indi["gedcom"], false);
 													AddNewName($gid, $newname, $letter, $surname, $indi["gedcom"]);
 													$names_added++;
 												}

@@ -122,6 +122,7 @@ if ($spider) {
 	}
 }
 
+date_default_timezone_set(date_default_timezone_get());
 @ini_set('arg_separator.output', '&amp;');
 @ini_set('error_reporting', 0);
 @ini_set('display_errors', '1');

@@ -32,7 +32,6 @@
 require "config.php";
 
 global $TEXT_DIRECTION;
-include "includes/functions/functions_edit.php";
 
 // Remove slashes
 if (isset($ufirstname)) $ufirstname = stripslashes($ufirstname);
@@ -347,7 +346,6 @@ if ($action=="edituser2") {
 }
 //-- print the form to edit a user
 // NOTE: WORKING
-require_once("./includes/functions/functions_edit.php");
 init_calendar_popup();
 if ($action=="edituser" || $action == "createform") { ?>
 	<!-- Setup the left box -->
@@ -685,7 +683,7 @@ if ($action=="edituser" || $action == "createform") { ?>
 						</div>
 					</div>
 					<div class="choice_right">
-						<input type="text" name="new_comment_exp" id="new_comment_exp" tabindex="<?php $tab++; print $tab; ?>" value="<?php if ($action == "edituser") print $user->comment_exp; ?>" />&nbsp;&nbsp;<?php PrintCalendarPopup("new_comment_exp"); ?>
+						<input type="text" name="new_comment_exp" id="new_comment_exp" tabindex="<?php $tab++; print $tab; ?>" value="<?php if ($action == "edituser") print $user->comment_exp; ?>" />&nbsp;&nbsp;<?php EditFunctions::PrintCalendarPopup("new_comment_exp"); ?>
 					</div>
 				</div>
 			<?php } ?>

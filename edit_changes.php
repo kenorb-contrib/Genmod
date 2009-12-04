@@ -29,11 +29,6 @@
 */
 require "config.php";
 
-/**
- * Inclusion of the editing functions
-*/
-require "includes/functions/functions_edit.php";
-
 if (!$gm_user->userCanAccept()) {
 	if (LOGIN_URL == "") header("Location: login.php?url=edit_changes.php");
 	else header("Location: ".LOGIN_URL."?url=edit_changes.php");

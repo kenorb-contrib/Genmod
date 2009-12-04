@@ -27,7 +27,6 @@
  */
 
 require("config.php");
-require("includes/functions/functions_edit.php");
 
 if ($_SESSION["cookie_login"]) {
 	if (LOGIN_URL == "") header("Location: login.php?type=simple&url=edit_interface.php");
@@ -152,7 +151,7 @@ if ($action=="update") {
 //				print $fact;
 				if (!isset($repeat_tags[$fact])) $repeat_tags[$fact] = 1;
 				else $repeat_tags[$fact]++;
-				$DATES[$j] = CheckInputDate($DATES[$j]);
+				$DATES[$j] = EditFunctions::CheckInputDate($DATES[$j]);
 				if (!isset($REMS[$j])) $REMS[$j] = 0;
 				if ($REMS[$j]==1) {
 					$DATES[$j]="";
@@ -196,7 +195,7 @@ if ($action=="update") {
 						//-- delete the fact
 						if ($REMS[$j]==1) { 
 //							$famupdate = true;
-							if (ReplaceGedrec($match[1], $oldfac, "", $fact, $change_id, $change_type, "", "FAM")) $famupdate = true;
+							if (EditFunctions::ReplaceGedrec($match[1], $oldfac, "", $fact, $change_id, $change_type, "", "FAM")) $famupdate = true;
 							$famrec = substr($famrec, 0, $pos1) . "\r\n". substr($famrec, $pos2);
 //							print "sfamupdate_del [".$factrec."]{".$oldfac."}";
 						}
@@ -242,7 +241,7 @@ if ($action=="update") {
 							if (trim($factrec) != trim($oldfac)) {
 //Print "<br />This record will be updated";								
 //								$famupdate = true;
-								if (ReplaceGedrec($match[1], $oldfac, $factrec, $fact, $change_id, $change_type, "", "FAM")) $famupdate = true;
+								if (EditFunctions::ReplaceGedrec($match[1], $oldfac, $factrec, $fact, $change_id, $change_type, "", "FAM")) $famupdate = true;
 
 								$famrec = substr($famrec, 0, $pos1) . trim($factrec)."\r\n" . substr($famrec, $pos2);
 //			print "sfamupdate3 [".$factrec."]{".$oldfac."}";
@@ -251,7 +250,7 @@ if ($action=="update") {
 					}
 				}
 				else if (!empty($factrec)) {
-					if (ReplaceGedrec($match[1], "", $factrec, $fact, $change_id, $change_type, "", "FAM")) $famupdate = true;
+					if (EditFunctions::ReplaceGedrec($match[1], "", $factrec, $fact, $change_id, $change_type, "", "FAM")) $famupdate = true;
 					$famrec .= "\r\n".$factrec;
 //					$famupdate = true;
 //						print "sfamupdate2";
@@ -331,7 +330,7 @@ if ($action=="update") {
 	if ($namerec != $oldnamerec) {
 		if (empty($oldnamerec)) $type = "add_name";
 		else $type = "edit_name";
-		if (ReplaceGedrec($pid, $oldnamerec, $namerec, "NAME", $change_id, $type, "", "INDI")) $updated = true;
+		if (EditFunctions::ReplaceGedrec($pid, $oldnamerec, $namerec, "NAME", $change_id, $type, "", "INDI")) $updated = true;
 	}
 	
 	//-- update the person's gender
@@ -349,7 +348,7 @@ if ($action=="update") {
 		if (trim($sexrec) != trim($oldsexrec)) {
 		if (empty($oldsexrec)) $type = "add_gender";
 		else $type = "edit_gender";
-			if (ReplaceGedrec($pid, $oldsexrec, $sexrec, "SEX", $change_id, $type)) $updated = true;
+			if (EditFunctions::ReplaceGedrec($pid, $oldsexrec, $sexrec, "SEX", $change_id, $type)) $updated = true;
 		}
 	}
 
@@ -364,7 +363,7 @@ if ($action=="update") {
 		if (!in_array($newfact, $typefacts)) $factrec = "1 $newfact\r\n";
 		else $factrec = "1 EVEN\r\n2 TYPE $newfact\r\n";
 		if (!empty($DATE)) {
-			$DATE = CheckInputDate($DATE);
+			$DATE = EditFunctions::CheckInputDate($DATE);
 			$factrec .= "2 DATE $DATE\r\n";
 		}
 		if (!empty($PLAC)) $factrec .= "2 PLAC $PLAC\r\n";
@@ -373,7 +372,7 @@ if ($action=="update") {
 		//-- make sure that there is at least a Y
 		if (preg_match("/\n2 \w*/", $factrec)==0) $factrec = "1 $newfact Y\r\n";
 		$gedrec .= "\r\n".$factrec;
-		$updated = ReplaceGedrec($pid, "", $factrec, $newfact, $change_id, $change_type);
+		$updated = EditFunctions::ReplaceGedrec($pid, "", $factrec, $newfact, $change_id, $change_type);
 	}
 
 	//-- check for photo update
@@ -432,10 +431,10 @@ if ($action=="update") {
 		foreach ($oldsubs as $key => $sub) {
 			if (!preg_match("/(1|2) (ADDR|_NAME|ADR1|ADR2|CITY|STAE|POST|CTRY|CONT)/", $sub)) $factrec = $factrec . $sub ."\r\n";
 		}
-		if (trim($oldfact) != trim($factrec)) $updated = ReplaceGedrec($pid, $oldfact, $factrec, "ADDR", $change_id, $change_type);
+		if (trim($oldfact) != trim($factrec)) $updated = EditFunctions::ReplaceGedrec($pid, $oldfact, $factrec, "ADDR", $change_id, $change_type);
 	}
 	else if (!empty($factrec)) {
-		$updated = ReplaceGedrec($pid, "", $factrec, "ADDR", $change_id, $change_type);
+		$updated = EditFunctions::ReplaceGedrec($pid, "", $factrec, "ADDR", $change_id, $change_type);
 	}
 
 	$factrec = "";
@@ -445,10 +444,10 @@ if ($action=="update") {
 		$pos2 = strpos($oldfact, "\n2 ", 0);
 		if ($pos2===false) $pos2 = strlen($oldfact)-1;
 		$factrec = $factrec. substr($oldfact, $pos2+1);
-		if (trim($oldfact) != trim($factrec)) $updated = ReplaceGedrec($pid, $oldfact, $factrec, "PHON", $change_id, $change_type);
+		if (trim($oldfact) != trim($factrec)) $updated = EditFunctions::ReplaceGedrec($pid, $oldfact, $factrec, "PHON", $change_id, $change_type);
 	}
 	else if (!empty($factrec)) {
-		$updated = ReplaceGedrec($pid, "", $factrec, "PHON", $change_id, $change_type);
+		$updated = EditFunctions::ReplaceGedrec($pid, "", $factrec, "PHON", $change_id, $change_type);
 	}
 
 	$factrec = "";
@@ -458,10 +457,10 @@ if ($action=="update") {
 		$pos2 = strpos($oldfact, "\n2 ", 0);
 		if ($pos2===false) $pos2 = strlen($oldfact)-1;
 		$factrec = $factrec . substr($oldfact, $pos2+1);
-		if (trim($oldfact) != trim($factrec)) $updated = ReplaceGedrec($pid, $oldfact, $factrec, "FAX", $change_id, $change_type);
+		if (trim($oldfact) != trim($factrec)) $updated = EditFunctions::ReplaceGedrec($pid, $oldfact, $factrec, "FAX", $change_id, $change_type);
 	}
 	else if (!empty($factrec)) {
-		$updated = ReplaceGedrec($pid, "", $factrec, "FAX", $change_id, $change_type);
+		$updated = EditFunctions::ReplaceGedrec($pid, "", $factrec, "FAX", $change_id, $change_type);
 	}
 
 	$factrec = "";
@@ -471,10 +470,10 @@ if ($action=="update") {
 		$pos2 = strpos($oldfact, "\n2 ", 0);
 		if ($pos2===false) $pos2 = strlen($oldfact)-1;
 		$factrec = $factrec . substr($oldfact, $pos2+1);
-		if (trim($oldfact) != trim($factrec)) $updated = ReplaceGedrec($pid, $oldfact, $factrec, "EMAIL", $change_id, $change_type);
+		if (trim($oldfact) != trim($factrec)) $updated = EditFunctions::ReplaceGedrec($pid, $oldfact, $factrec, "EMAIL", $change_id, $change_type);
 	}
 	else if (!empty($factrec)) {
-		$updated = ReplaceGedrec($pid, "", $factrec, "EMAIL", $change_id, $change_type);
+		$updated = EditFunctions::ReplaceGedrec($pid, "", $factrec, "EMAIL", $change_id, $change_type);
 	}
 	
 	//-- spouse family tabs
@@ -522,11 +521,11 @@ if ($action=="update") {
 			if (!empty($$rsgivn) || !empty($$rssurn)) {
 				$spouserec .= "2 ROMN ".$$rsgivn." /".$$rssurn."/\r\n";
 			}
-			$SPID[$i] = AppendGedrec($spouserec, "INDI", $change_id, $change_type);
+			$SPID[$i] = EditFunctions::AppendGedrec($spouserec, "INDI", $change_id, $change_type);
 			$ssex = "SSEX$i";
 			if (!empty($$ssex)) {
 				$spouserec .= "1 SEX ".$$ssex."\r\n";
-				ReplaceGedrec($SPID[$i], "", "1 SEX ".$$ssex, "SEX", $change_id, $change_type);
+				EditFunctions::ReplaceGedrec($SPID[$i], "", "1 SEX ".$$ssex, "SEX", $change_id, $change_type);
 			}
 			$bdate = "BDATE$i";
 			$bplac = "BPLAC$i";
@@ -534,19 +533,19 @@ if ($action=="update") {
 				$brec = "1 BIRT\r\n";
 				if (!empty($$bdate)) {
 					$bdate = $$bdate;
-					$bdate = CheckInputDate($bdate);
+					$bdate = EditFunctions::CheckInputDate($bdate);
 					$brec .= "2 DATE $bdate\r\n";
 				}
 				if (!empty($$bplac)) $brec .= "2 PLAC ".$$bplac."\r\n";
 				$bresn = "BRESN$i";
 				if (!empty($$bresn)) $brec .= "2 RESN ".$$bresn."\r\n";
 				$spouserec .= $brec;
-				ReplaceGedrec($SPID[$i], "", $brec, "BIRT", $change_id, $change_type);
+				EditFunctions::ReplaceGedrec($SPID[$i], "", $brec, "BIRT", $change_id, $change_type);
 			}
 			$spouserec .= "\r\n1 FAMS @$famid@\r\n";
-			ReplaceGedrec($SPID[$i], "", "1 FAMS @$famid@", "FAMS", $change_id, $change_type);
+			EditFunctions::ReplaceGedrec($SPID[$i], "", "1 FAMS @$famid@", "FAMS", $change_id, $change_type);
 //			$SPID[$i] = append_gedrec($spouserec);
-//			$SPID[$i] = AppendGedrec($spouserec, "INDI", $change_id, $change_type);
+//			$SPID[$i] = EditFunctions::AppendGedrec($spouserec, "INDI", $change_id, $change_type);
 			$change["INDI"] = true;
 		}
 		
@@ -562,14 +561,14 @@ if ($action=="update") {
 //				else $oldgedrec = FindGedcomRecord($oldpid);
 //				$oldfam = GetSubRecord(1, "1 FAMS", $oldgedrec);
 //				print "Oldfam: ".$oldfam;
-				$updated = ReplaceGedrec($spid, "1 FAMS @$famid@", "", "FAMS", $change_id, $change_type);
-				$updated = ReplaceGedrec($SPID[$i], "", "1 FAMS @$famid@", "FAMS", $change_id, $change_type);
+				$updated = EditFunctions::ReplaceGedrec($spid, "1 FAMS @$famid@", "", "FAMS", $change_id, $change_type);
+				$updated = EditFunctions::ReplaceGedrec($SPID[$i], "", "1 FAMS @$famid@", "FAMS", $change_id, $change_type);
 				$famrec = preg_replace("/1 $tag @.*@/", "1 $tag @$SPID[$i]@", $famrec);
-				$updated = ReplaceGedrec($famid, "1 $tag @$spid@", "1 $tag @$SPID[$i]@", "FAM", $change_id, $change_type);
+				$updated = EditFunctions::ReplaceGedrec($famid, "1 $tag @$spid@", "1 $tag @$SPID[$i]@", "FAM", $change_id, $change_type);
 			}
 			else {
 				$famrec .= "\r\n1 $tag @$SPID[$i]@";
-				$famupdate = ReplaceGedrec($famid, "", "1 $tag @$SPID[$i]@", "FAM", $change_id, $change_type);
+				$famupdate = EditFunctions::ReplaceGedrec($famid, "", "1 $tag @$SPID[$i]@", "FAM", $change_id, $change_type);
 			}
 //			print "sfamupdate1";
 		}
@@ -595,7 +594,7 @@ if ($action=="update") {
 			if (!empty($$var)) $FDATE = $$var;
 			else $FDATE = "";
 			if (!empty($FDATE)) {
-				$FDATE = CheckInputDate($FDATE);
+				$FDATE = EditFunctions::CheckInputDate($FDATE);
 				$factrec .= "2 DATE $FDATE\r\n";
 			}
 			$var = "F".$i."PLAC";
@@ -613,7 +612,7 @@ if ($action=="update") {
 			//-- make sure that there is at least a Y
 			if (preg_match("/\n2 \w*/", $factrec)==0) $factrec = "1 $newfact Y\r\n";
 			$famrec .= "\r\n".$factrec;
-			$famupdate = ReplaceGedrec($famid, "", $factrec, $newfact, $change_id, $change_type);
+			$famupdate = EditFunctions::ReplaceGedrec($famid, "", $factrec, $newfact, $change_id, $change_type);
 //			print "sfamupdate4";
 		}
 		
@@ -621,7 +620,7 @@ if ($action=="update") {
 			$famupdate = true;
 //			print "sfamupdate5";
 			$famrec .= "\r\n1 CHIL @".$CHIL[$i]."@";
-			$famupdate = ReplaceGedrec($famid, "", "1 CHIL @".$CHIL[$i]."@", "CHIL", $change_id, $change_type);
+			$famupdate = EditFunctions::ReplaceGedrec($famid, "", "1 CHIL @".$CHIL[$i]."@", "CHIL", $change_id, $change_type);
 			if (GetChangeData(true, $CHIL[$i], true)) {
 					$rec = GetChangeData(false, $CHIL[$i], true, "gedlines");
 					$childrec = $rec[$GEDCOMID][$CHIL[$i]];
@@ -629,7 +628,7 @@ if ($action=="update") {
 			else $childrec = FindGedcomRecord($CHIL[$i]);
 			if (preg_match("/1 FAMC @$famid@/", $childrec)==0) {
 				$childrec .= "\r\n1 FAMC @$famid@";
-				$famupdate = ReplaceGedrec($CHIL[$i], "", "1 FAMC @$famid@", "FAMC", $change_id, $change_type);
+				$famupdate = EditFunctions::ReplaceGedrec($CHIL[$i], "", "1 FAMC @$famid@", "FAMC", $change_id, $change_type);
 			}
 		}
 		
@@ -638,7 +637,7 @@ if ($action=="update") {
 		else $fcdel = "";
 		if (!empty($fcdel)) {
 			$famrec = preg_replace("/1 CHIL @$fcdel@/", "", $famrec);
-			$famupdate = ReplaceGedrec($famid, "1 CHIL @$fcdel@", "", "CHIL", $change_id, $change_type);
+			$famupdate = EditFunctions::ReplaceGedrec($famid, "1 CHIL @$fcdel@", "", "CHIL", $change_id, $change_type);
 //			print "sfamupdate6";
 		}
 		
@@ -667,13 +666,13 @@ if ($action=="update") {
 			if (!empty($$rsgivn) || !empty($$rssurn)) {
 				$childrec .= "2 ROMN ".$$rsgivn." /".$$rssurn."/\r\n";
 			}
-			$cxref = AppendGedrec($childrec, "INDI", $change_id, $change_type);
+			$cxref = EditFunctions::AppendGedrec($childrec, "INDI", $change_id, $change_type);
 			$var = "C".$i."SEX";
 			$csex = "";
 			if (!empty($$var)) $csex = $$var;
 			if (!empty($csex)) {
 				$childrec .= "1 SEX $csex\r\n";
-				ReplaceGedrec($cxref, "", "1 SEX $csex", "SEX", $change_id, $change_type);
+				EditFunctions::ReplaceGedrec($cxref, "", "1 SEX $csex", "SEX", $change_id, $change_type);
 			}
 			$var = "C".$i."DATE";
 			$cdate = "";
@@ -683,21 +682,21 @@ if ($action=="update") {
 			if (!empty($$var)) $cplac = $$var;
 			if (!empty($cdate)||!empty($cplac)) {
 				$brec = "1 BIRT\r\n";
-				$cdate = CheckInputDate($cdate);
+				$cdate = EditFunctions::CheckInputDate($cdate);
 				if (!empty($cdate)) $brec .= "2 DATE $cdate\r\n";
 				if (!empty($cplac)) $brec .= "2 PLAC $cplac\r\n";
 				$var = "C".$i."RESN";
 				$cresn = "";
 				if (!empty($$var)) $cresn = $$var;
 				if (!empty($cresn)) $brec .= "2 RESN $cresn\r\n";
-				$famupdate = ReplaceGedrec($cxref, "", $brec, "BIRT", $change_id, $change_type);
+				$famupdate = EditFunctions::ReplaceGedrec($cxref, "", $brec, "BIRT", $change_id, $change_type);
 				$childrec .= $brec;
 			}
-//			$cxref = AppendGedrec($childrec, "INDI", $change_id, $change_type);
+//			$cxref = EditFunctions::AppendGedrec($childrec, "INDI", $change_id, $change_type);
 			$childrec .= "1 FAMC @$famid@\r\n";
-			$famupdate = ReplaceGedrec($cxref, "", "1 FAMC @$famid@", "FAMC", $change_id, $change_type);
+			$famupdate = EditFunctions::ReplaceGedrec($cxref, "", "1 FAMC @$famid@", "FAMC", $change_id, $change_type);
 			$famrec .= "\r\n1 CHIL @$cxref@";
-			$famupdate = ReplaceGedrec($famid, "", "1 CHIL @$cxref@", "CHIL", $change_id, $change_type);
+			$famupdate = EditFunctions::ReplaceGedrec($famid, "", "1 CHIL @$cxref@", "CHIL", $change_id, $change_type);
 //			print "sfamupdate7";
 		}
 		
@@ -711,10 +710,10 @@ if ($action=="update") {
 		$spouserec .= "1 NAME $SGIVN /$SSURN/\r\n";
 		if (!empty($SGIVN)) $spouserec .= "2 GIVN $SGIVN\r\n";
 		if (!empty($SSURN)) $spouserec .= "2 SURN $SSURN\r\n";
-		$xref = AppendGedrec($spouserec, "INDI", $change_id, $change_type);
+		$xref = EditFunctions::AppendGedrec($spouserec, "INDI", $change_id, $change_type);
 		if (!empty($SSEX)) {
 			$spouserec .= "1 SEX $SSEX\r\n";
-			ReplaceGedrec($xref, "", "1 SEX $SSEX", "SEX", $change_id, $change_type);
+			EditFunctions::ReplaceGedrec($xref, "", "1 SEX $SSEX", "SEX", $change_id, $change_type);
 		}
 		if (!empty($BDATE)||!empty($BPLAC)) {
 			$brec = "1 BIRT\r\n";
@@ -722,25 +721,25 @@ if ($action=="update") {
 			if (!empty($BPLAC)) $brec .= "2 PLAC $BPLAC\r\n";
 			if (!empty($BRESN)) $brec .= "2 RESN $BRESN\r\n";
 			$spouserec .= $brec;
-			ReplaceGedrec($xref, "", $brec, "BIRT", $change_id, $change_type);
+			EditFunctions::ReplaceGedrec($xref, "", $brec, "BIRT", $change_id, $change_type);
 		}
 
 		//-- next add the new family record
 		$famrec = "0 @REF@ FAM\r\n";
 		if ($SSEX=="M") $famrec .= "1 HUSB @$xref@\r\n1 WIFE @$pid@\r\n";
 		else $famrec .= "1 HUSB @$pid@\r\n1 WIFE @$xref@\r\n";
-		$newfamid = AppendGedrec($famrec, "FAM", $change_id, $change_type);
+		$newfamid = EditFunctions::AppendGedrec($famrec, "FAM", $change_id, $change_type);
 
 		//-- add the new family id to the new spouse record
 		$rec = GetChangeData(false, $xref, true, "gedlines");
 		$spouserec = $rec[$GEDCOMID][$xref];
 //		$spouserec = find_record_in_file($xref);
 		$spouserec .= "\r\n1 FAMS @$newfamid@\r\n";
-		ReplaceGedrec($xref, "", "1 FAMS @$newfamid@", "FAMS", $change_id, $change_type);
+		EditFunctions::ReplaceGedrec($xref, "", "1 FAMS @$newfamid@", "FAMS", $change_id, $change_type);
 		
 		//-- last add the new family id to the persons record
 		$gedrec .= "\r\n1 FAMS @$newfamid@\r\n";
-		$updated = ReplaceGedrec($pid, "", "1 FAMS @$newfamid@", "FAMS", $change_id, $change_type);
+		$updated = EditFunctions::ReplaceGedrec($pid, "", "1 FAMS @$newfamid@", "FAMS", $change_id, $change_type);
 
 	}
 	if (!empty($MDATE)||!empty($MPLAC)) {
@@ -748,17 +747,17 @@ if ($action=="update") {
 			$famrec = "0 @REF@ FAM\r\n";
 			if (preg_match("/1 SEX M/", $gedrec)>0) $famrec .= "1 HUSB @$pid@\r\n";
 			else $famrec .= "1 WIFE @$pid@";
-			$newfamid = AppendGedrec($famrec, "FAM", $change_id, $change_type);
+			$newfamid = EditFunctions::AppendGedrec($famrec, "FAM", $change_id, $change_type);
 			$gedrec .= "\r\n1 FAMS @$newfamid@";
-			$updated = ReplaceGedrec($pid, "", "1 FAMS @$newfamid@", "FAMS", $change_id, $change_type);
+			$updated = EditFunctions::ReplaceGedrec($pid, "", "1 FAMS @$newfamid@", "FAMS", $change_id, $change_type);
 		}
 		$factrec = "1 MARR\r\n";
-		$MDATE = CheckInputDate($MDATE);
+		$MDATE = EditFunctions::CheckInputDate($MDATE);
 		if (!empty($MDATE)) $factrec .= "2 DATE $MDATE\r\n";
 		if (!empty($MPLAC)) $factrec .= "2 PLAC $MPLAC\r\n";
 		if (!empty($MRESN)) $factrec .= "2 RESN $MRESN\r\n";
 		$famrec .= "\r\n".$factrec;
-		$updated = ReplaceGedrec($newfamid, "", $factrec, "MARR", $change_id, $change_type);
+		$updated = EditFunctions::ReplaceGedrec($newfamid, "", $factrec, "MARR", $change_id, $change_type);
 	}
 
 	//--add new child, name, birth
@@ -771,18 +770,18 @@ if ($action=="update") {
 		if (!empty($HCGIVN) || !empty($HCSURN)) {
 			$childrec .= "2 _HEB $HCGIVN /$HCSURN/\r\n";
 		}
-		$cxref = AppendGedrec($childrec, "INDI", $change_id, $change_type);
+		$cxref = EditFunctions::AppendGedrec($childrec, "INDI", $change_id, $change_type);
 		if (!empty($CSEX)) {
 			$childrec .= "1 SEX $CSEX\r\n";
-			ReplaceGedrec($cxref, "", "1 SEX $CSEX", "SEX", $change_id, $change_type);
+			EditFunctions::ReplaceGedrec($cxref, "", "1 SEX $CSEX", "SEX", $change_id, $change_type);
 		}
 		if (!empty($CDATE)||!empty($CPLAC)) {
 			$brec = "1 BIRT\r\n";
-			$CDATE = CheckInputDate($CDATE);
+			$CDATE = EditFunctions::CheckInputDate($CDATE);
 			if (!empty($CDATE)) $brec .= "2 DATE $CDATE\r\n";
 			if (!empty($CPLAC)) $brec .= "2 PLAC $CPLAC\r\n";
 			if (!empty($CRESN)) $brec .= "2 RESN $CRESN\r\n";
-			$famupdate = ReplaceGedrec($cxref, "", $brec, "BIRT", $change_id, $change_type);
+			$famupdate = EditFunctions::ReplaceGedrec($cxref, "", $brec, "BIRT", $change_id, $change_type);
 			$childrec .= $brec;
 		}
 
@@ -793,22 +792,22 @@ if ($action=="update") {
 			if (preg_match("/1 SEX M/", $gedrec)>0) $famrec .= "1 HUSB @$pid@\r\n";
 			else $famrec .= "1 WIFE @$pid@\r\n";
 			$famrec .= "1 CHIL @$cxref@\r\n";
-			$newfamid = AppendGedrec($famrec, "FAM", $change_id, $change_type);
+			$newfamid = EditFunctions::AppendGedrec($famrec, "FAM", $change_id, $change_type);
 			
 			//-- add the new family to the new child
 			$rec = GetChangeData(false, $cxref, true, "gedlines");
 			$childrec = $rec[$GEDCOMID][$cxref];
 //			$childrec = find_record_in_file($cxref);
 			$childrec .= "\r\n1 FAMC @$newfamid@\r\n";
-			ReplaceGedrec($cxref, "", "1 FAMC @$newfamid@", "FAMC", $change_id, $change_type);
+			EditFunctions::ReplaceGedrec($cxref, "", "1 FAMC @$newfamid@", "FAMC", $change_id, $change_type);
 			
 			//-- add the new family to the original person
 			$gedrec .= "\r\n1 FAMS @$newfamid@";
-			$updated = ReplaceGedrec($pid, "", "1 FAMS @$newfamid@", "FAMS", $change_id, $change_type);
+			$updated = EditFunctions::ReplaceGedrec($pid, "", "1 FAMS @$newfamid@", "FAMS", $change_id, $change_type);
 		}
 		else {
 			$famrec .= "\r\n1 CHIL @$cxref@\r\n";
-			$updated = ReplaceGedrec($newfamid, "", "1 CHIL @$cxref@", "CHIL", $change_id, $change_type);
+			$updated = EditFunctions::ReplaceGedrec($newfamid, "", "1 CHIL @$cxref@", "CHIL", $change_id, $change_type);
 			
 			//-- add the family to the new child
 			$rec = GetChangeData(false, $cxref, true, "gedlines");
@@ -816,7 +815,7 @@ if ($action=="update") {
 //			$childrec = find_record_in_file($cxref);
 			$childrec .= "\r\n1 FAMC @$newfamid@\r\n";
 //			replace_gedrec($cxref, $childrec);
-			ReplaceGedrec($cxref, "", "1 FAMC @$newfamid@", "FAMC", $change_id, $change_type);
+			EditFunctions::ReplaceGedrec($cxref, "", "1 FAMC @$newfamid@", "FAMC", $change_id, $change_type);
 		}
 		print $gm_lang["update_successful"]."<br />\n";;
 	}
@@ -867,11 +866,11 @@ if ($action=="update") {
 				if (!empty($$rsgivn) || !empty($$rssurn)) {
 					$spouserec .= "2 ROMN ".$$rsgivn." /".$$rssurn."/\r\n";
 				}
-				$FATHER[$i] = AppendGedrec($spouserec, "INDI", $change_id, $change_type);
+				$FATHER[$i] = EditFunctions::AppendGedrec($spouserec, "INDI", $change_id, $change_type);
 				$ssex = "FSEX$i";
 				if (!empty($$ssex)) {
 					$spouserec .= "1 SEX ".$$ssex."\r\n";
-					ReplaceGedrec($FATHER[$i], "", "1 SEX ".$$ssex, "SEX", $change_id, $change_type);
+					EditFunctions::ReplaceGedrec($FATHER[$i], "", "1 SEX ".$$ssex, "SEX", $change_id, $change_type);
 				}
 				$bdate = "FBDATE$i";
 				$bplac = "FBPLAC$i";
@@ -879,12 +878,12 @@ if ($action=="update") {
 					$brec = "1 BIRT\r\n";
 					if (!empty($$bdate)) $bdate = $$bdate;
 					else $bdate = "";
-					$bdate = CheckInputDate($bdate);
+					$bdate = EditFunctions::CheckInputDate($bdate);
 					if (!empty($bdate)) $brec .= "2 DATE $bdate\r\n";
 					if (!empty($$bplac)) $brec .= "2 PLAC ".$$bplac."\r\n";
 					$bresn = "FBRESN$i";
 					if (!empty($$bresn)) $brec .= "2 RESN ".$$bresn."\r\n";
-					ReplaceGedrec($FATHER[$i], "", $brec, "BIRT", $change_id, $change_type);
+					EditFunctions::ReplaceGedrec($FATHER[$i], "", $brec, "BIRT", $change_id, $change_type);
 					$spouserec .= $brec;
 				}
 				$bdate = "FDDATE$i";
@@ -893,31 +892,31 @@ if ($action=="update") {
 					$drec = "1 DEAT\r\n";
 					if (!empty($$bdate)) $bdate = $$bdate;
 					else $bdate = "";
-					$bdate = CheckInputDate($bdate);
+					$bdate = EditFunctions::CheckInputDate($bdate);
 					if (!empty($bdate)) $drec .= "2 DATE $bdate\r\n";
 					if (!empty($$bplac)) $drec .= "2 PLAC ".$$bplac."\r\n";
 					$bresn = "FDRESN$i";
 					if (!empty($$bresn)) $drec .= "2 RESN ".$$bresn."\r\n";
-					ReplaceGedrec($FATHER[$i], "", $drec, "DEAT", $change_id, $change_type);
+					EditFunctions::ReplaceGedrec($FATHER[$i], "", $drec, "DEAT", $change_id, $change_type);
 					$spouserec .= $drec;
 				}
 				if (empty($famid)) {
 					//print "HERE 1";
-					$famid = AppendGedrec($famrec, "FAM", $change_id, $change_type);
+					$famid = EditFunctions::AppendGedrec($famrec, "FAM", $change_id, $change_type);
 					//print "<pre>$famrec</pre>";
 					$gedrec .= "\r\n1 FAMC @$famid@\r\n";
-					$updated = ReplaceGedrec($pid, "", "1 FAMC @$famid@", "FAMC", $change_id, $change_type);
+					$updated = EditFunctions::ReplaceGedrec($pid, "", "1 FAMC @$famid@", "FAMC", $change_id, $change_type);
 				}
 				$spouserec .= "\r\n1 FAMS @$famid@\r\n";
-				ReplaceGedrec($FATHER[$i], "", "1 FAMS @$famid@", "FAMS", $change_id, $change_type);
+				EditFunctions::ReplaceGedrec($FATHER[$i], "", "1 FAMS @$famid@", "FAMS", $change_id, $change_type);
 			}
 		}
 		else {
 			if (empty($famid)) {
 				//print "HERE 2";
-				$famid = AppendGedrec($famrec, "FAM", $change_id, $change_type);
+				$famid = EditFunctions::AppendGedrec($famrec, "FAM", $change_id, $change_type);
 				$gedrec .= "\r\n1 FAMC @$famid@\r\n";
-				$updated = ReplaceGedrec($pid, "", "1 FAMC @$famid@", "FAMC", $change_id, $change_type);
+				$updated = EditFunctions::ReplaceGedrec($pid, "", "1 FAMC @$famid@", "FAMC", $change_id, $change_type);
 			}
 			if (empty($oldfamrec)) {
 				if (GetChangeData(true, $FATHER[$i], true)) {
@@ -927,7 +926,7 @@ if ($action=="update") {
 				else $spouserec = FindGedcomRecord($FATHER[$i]);
 //				$spouserec = find_record_in_file($FATHER[$i]);
 				$spouserec .= "\r\n1 FAMS @$famid@";
-				ReplaceGedrec($FATHER[$i], "", "1 FAMS @$famid@", "FAMS", $change_id, $change_type);
+				EditFunctions::ReplaceGedrec($FATHER[$i], "", "1 FAMS @$famid@", "FAMS", $change_id, $change_type);
 			}
 		}
 		
@@ -936,14 +935,14 @@ if ($action=="update") {
 //			if (strstr($famrec, "1 HUSB")!==false) $famrec = preg_replace("/1 HUSB @.*@/", "1 HUSB @$FATHER[$i]@", $famrec);
 			if (preg_match("/1 HUSB @.*@/", $famrec, $match) != 0) {
 				$famrec = preg_replace("/1 HUSB @.*@/", "1 HUSB @$FATHER[$i]@", $famrec);
-				$famupdate = ReplaceGedrec($famid, "1 HUSB @".$parents['HUSB']."@", "1 HUSB @".$FATHER[$i]."@", "FAM", $change_id, $change_type);
-				ReplaceGedrec($parents["HUSB"], "1 FAMS @$famid@", "", "FAMS", $change_id, $change_type);
+				$famupdate = EditFunctions::ReplaceGedrec($famid, "1 HUSB @".$parents['HUSB']."@", "1 HUSB @".$FATHER[$i]."@", "FAM", $change_id, $change_type);
+				EditFunctions::ReplaceGedrec($parents["HUSB"], "1 FAMS @$famid@", "", "FAMS", $change_id, $change_type);
 			}
 			else {
 				$famrec .= "\r\n1 HUSB @$FATHER[$i]@";
-				$famupdate = ReplaceGedrec($famid, "", "1 HUSB @$FATHER[$i]@", "FAM", $change_id, $change_type);
+				$famupdate = EditFunctions::ReplaceGedrec($famid, "", "1 HUSB @$FATHER[$i]@", "FAM", $change_id, $change_type);
 			}
-			if (!empty($oldfamrec)) ReplaceGedrec($FATHER[$i], "", "1 FAMS @$famid@", "FAMS", $change_id, $change_type);
+			if (!empty($oldfamrec)) EditFunctions::ReplaceGedrec($FATHER[$i], "", "1 FAMS @$famid@", "FAMS", $change_id, $change_type);
 //			print "famupdate1";
 		}
 		
@@ -968,11 +967,11 @@ if ($action=="update") {
 				if (!empty($$rsgivn) || !empty($$rssurn)) {
 					$spouserec .= "2 ROMN ".$$rsgivn." /".$$rssurn."/\r\n";
 				}
-				$MOTHER[$i] = AppendGedrec($spouserec, "INDI", $change_id, $change_type);
+				$MOTHER[$i] = EditFunctions::AppendGedrec($spouserec, "INDI", $change_id, $change_type);
 				$ssex = "MSEX$i";
 				if (!empty($$ssex)) {
 					$spouserec .= "1 SEX ".$$ssex."\r\n";
-					ReplaceGedrec($MOTHER[$i], "", "1 SEX ".$$ssex, "SEX", $change_id, $change_type);
+					EditFunctions::ReplaceGedrec($MOTHER[$i], "", "1 SEX ".$$ssex, "SEX", $change_id, $change_type);
 				}
 				$bdate = "MBDATE$i";
 				$bplac = "MBPLAC$i";
@@ -980,12 +979,12 @@ if ($action=="update") {
 					$brec = "1 BIRT\r\n";
 					if (!empty($$bdate)) $bdate = $$bdate;
 					else $bdate = "";
-					$bdate = CheckInputDate($bdate);
+					$bdate = EditFunctions::CheckInputDate($bdate);
 					if (!empty($bdate)) $brec .= "2 DATE $bdate\r\n";
 					if (!empty($$bplac)) $brec .= "2 PLAC ".$$bplac."\r\n";
 					$bresn = "MBRESN$i";
 					if (!empty($$bresn)) $brec .= "2 RESN ".$$bresn."\r\n";
-					ReplaceGedrec($MOTHER[$i], "", $brec, "BIRT", $change_id, $change_type);
+					EditFunctions::ReplaceGedrec($MOTHER[$i], "", $brec, "BIRT", $change_id, $change_type);
 					$spouserec .= $brec;
 				}
 				$bdate = "MDDATE$i";
@@ -994,30 +993,30 @@ if ($action=="update") {
 					$drec = "1 DEAT\r\n";
 					if (!empty($$bdate)) $bdate = $$bdate;
 					else $bdate = "";
-					$bdate = CheckInputDate($bdate);
+					$bdate = EditFunctions::CheckInputDate($bdate);
 					if (!empty($bdate)) $drec .= "2 DATE $bdate\r\n";
 					if (!empty($$bplac)) $drec .= "2 PLAC ".$$bplac."\r\n";
 					$bresn = "MDRESN$i";
 					if (!empty($$bresn)) $drec .= "2 RESN ".$$bresn."\r\n";
-					ReplaceGedrec($MOTHER[$i], "", $drec, "DEAT", $change_id, $change_type);
+					EditFunctions::ReplaceGedrec($MOTHER[$i], "", $drec, "DEAT", $change_id, $change_type);
 					$spouserec .= $drec;
 				}
 				if (empty($famid)) {
 					//print "HERE 3";
-					$famid = AppendGedrec($famrec, "FAM", $change_id, $change_type);
+					$famid = EditFunctions::AppendGedrec($famrec, "FAM", $change_id, $change_type);
 					$gedrec .= "\r\n1 FAMC @$famid@\r\n";
-					$updated = ReplaceGedrec($pid, "", "1 FAMC @$famid@", "FAMC", $change_id, $change_type);
+					$updated = EditFunctions::ReplaceGedrec($pid, "", "1 FAMC @$famid@", "FAMC", $change_id, $change_type);
 				}
 				$spouserec .= "\r\n1 FAMS @$famid@\r\n";
-				ReplaceGedrec($MOTHER[$i], "", "1 FAMS @$famid@", "FAMS", $change_id, $change_type);
+				EditFunctions::ReplaceGedrec($MOTHER[$i], "", "1 FAMS @$famid@", "FAMS", $change_id, $change_type);
 			}
 		}
 		else {
 			if (empty($famid)) {
 // 				print "HERE 4";
-				$famid = AppendGedrec($famrec, "FAM", $change_id, $change_type);
+				$famid = EditFunctions::AppendGedrec($famrec, "FAM", $change_id, $change_type);
 				$gedrec .= "\r\n1 FAMC @$famid@\r\n";
-				$updated = ReplaceGedrec($pid, "", "1 FAMC @$famid@", "FAMC", $change_id, $change_type);
+				$updated = EditFunctions::ReplaceGedrec($pid, "", "1 FAMC @$famid@", "FAMC", $change_id, $change_type);
 			}
 			if (empty($oldfamrec)) {
 				if (GetChangeData(true, $MOTHER[$i], true)) {
@@ -1027,21 +1026,21 @@ if ($action=="update") {
 				else $spouse = FindGedcomRecord($MOTHER[$i]);
 //				$spouserec = find_record_in_file($MOTHER[$i]);
 				$spouserec .= "\r\n1 FAMS @$famid@";
-				ReplaceGedrec($MOTHER[$i], "", "1 FAMS @$famid@", "FAMS", $change_id, $change_type);
+				EditFunctions::ReplaceGedrec($MOTHER[$i], "", "1 FAMS @$famid@", "FAMS", $change_id, $change_type);
 			}
 		}
 		if (!empty($MOTHER[$i]) && $parents['WIFE']!=$MOTHER[$i]) {
 //			if (strstr($famrec, "1 WIFE")!==false) $famrec = preg_replace("/1 WIFE @.*@/", "1 WIFE @$MOTHER[$i]@", $famrec);
 			if (preg_match("/1 WIFE @.*@/", $famrec, $match) != 0) {
 				$famrec = preg_replace("/1 WIFE @.*@/", "1 WIFE @$MOTHER[$i]@", $famrec);
-				$famupdate = ReplaceGedrec($famid, "1 WIFE @".$parents['WIFE']."@", "1 WIFE @".$MOTHER[$i]."@", "FAM", $change_id, $change_type);
-				ReplaceGedrec($parents["WIFE"], "1 FAMS @$famid@", "", "FAMS", $change_id, $change_type);
+				$famupdate = EditFunctions::ReplaceGedrec($famid, "1 WIFE @".$parents['WIFE']."@", "1 WIFE @".$MOTHER[$i]."@", "FAM", $change_id, $change_type);
+				EditFunctions::ReplaceGedrec($parents["WIFE"], "1 FAMS @$famid@", "", "FAMS", $change_id, $change_type);
 			}
 			else {
 				$famrec .= "\r\n1 WIFE @$MOTHER[$i]@";
-				$famupdate = ReplaceGedrec($famid, "", "1 WIFE @$MOTHER[$i]@", "FAM", $change_id, $change_type);
+				$famupdate = EditFunctions::ReplaceGedrec($famid, "", "1 WIFE @$MOTHER[$i]@", "FAM", $change_id, $change_type);
 			}
-			if (!empty($oldfamrec)) ReplaceGedrec($MOTHER[$i], "", "1 FAMS @$famid@", "FAMS", $change_id, $change_type);
+			if (!empty($oldfamrec)) EditFunctions::ReplaceGedrec($MOTHER[$i], "", "1 FAMS @$famid@", "FAMS", $change_id, $change_type);
 //			print "famupdate2";
 		}
 		
@@ -1062,16 +1061,16 @@ if ($action=="update") {
 		if (!empty($newfact)) {
 			if (empty($famid)) {
 				//print "HERE 6";
-				$famid = AppendGedrec($famrec, "FAM", $change_id, $change_type);
+				$famid = EditFunctions::AppendGedrec($famrec, "FAM", $change_id, $change_type);
 				$gedrec .= "\r\n1 FAMC @$famid@\r\n";
-				$updated = ReplaceGedrec($pid, "", "1 FAMC @$famid@", "FAMC", $change_id, $change_type);
+				$updated = EditFunctions::ReplaceGedrec($pid, "", "1 FAMC @$famid@", "FAMC", $change_id, $change_type);
 			}
 			if (!in_array($newfact, $typefacts)) $factrec = "1 $newfact\r\n";
 			else $factrec = "1 EVEN\r\n2 TYPE $newfact\r\n";
 			$var = "F".$i."DATE";
 			if (!empty($$var)) $FDATE = $$var;
 			else $FDATE = "";
-			$FDATE = CheckInputDate($FDATE);
+			$FDATE = EditFunctions::CheckInputDate($FDATE);
 			if (!empty($FDATE)) $factrec .= "2 DATE $FDATE\r\n";
 			$var = "F".$i."PLAC";
 			if (!empty($$var)) $FPLAC = $$var;
@@ -1088,15 +1087,15 @@ if ($action=="update") {
 			//-- make sure that there is at least a Y
 			if (preg_match("/\n2 \w*/", $factrec)==0) $factrec = "1 $newfact Y\r\n";
 			$famrec .= "\r\n".$factrec;
-			$famupdate = ReplaceGedrec($famid, "", $factrec, $newfact, $change_id, $change_type);
+			$famupdate = EditFunctions::ReplaceGedrec($famid, "", $factrec, $newfact, $change_id, $change_type);
 //			print "famupdate5";
 		}
 		if (!empty($CHIL[$i])) {
 			if (empty($famid)) {
 				//print "HERE 7";
-				$famid = AppendGedrec($famrec, "FAM", $change_id, $change_type);
+				$famid = EditFunctions::AppendGedrec($famrec, "FAM", $change_id, $change_type);
 				$gedrec .= "\r\n1 FAMC @$famid@\r\n";
-				$updated = ReplaceGedrec($pid, "", "1 FAMC @$famid@", "FAMC", $change_id, $change_type);
+				$updated = EditFunctions::ReplaceGedrec($pid, "", "1 FAMC @$famid@", "FAMC", $change_id, $change_type);
 			}
 			$famrec .= "\r\n1 CHIL @".$CHIL[$i]."@";
 			if (GetChangeData(true, $CHIL[$i], true)) {
@@ -1107,9 +1106,9 @@ if ($action=="update") {
 //			$childrec = find_record_in_file($CHIL[$i]);
 			if (preg_match("/1 FAMC @$famid@/", $childrec)==0) {
 				$childrec = "\r\n1 FAMC @$famid@";
-				ReplaceGedrec($CHIL[$i], "", "1 FAMC @$famid@", "FAMC", $change_id, $change_type);
+				EditFunctions::ReplaceGedrec($CHIL[$i], "", "1 FAMC @$famid@", "FAMC", $change_id, $change_type);
 			}
-			$famupdate = ReplaceGedrec($famid, "", "1 CHIL @".$CHIL[$i]."@", "CHIL", $change_id, $change_type);
+			$famupdate = EditFunctions::ReplaceGedrec($famid, "", "1 CHIL @".$CHIL[$i]."@", "CHIL", $change_id, $change_type);
 //			print "famupdate6";
 		}
 
@@ -1125,7 +1124,7 @@ if ($action=="update") {
 				if (empty($$var)) $pedifamrec = preg_replace("/$pedirec/", "", $pedifamrec);
 				else if(empty($pedirec)) $pedifamrec .= "\r\n2 PEDI ".$$var;
 				else $pedifamrec = preg_replace("/2 PEDI.*/", "2 PEDI ".$$var, $pedifamrec);
-				$famupdate = ReplaceGedrec($pid, $oldpedifamrec, $pedifamrec, "FAMC", $change_id, $change_type);
+				$famupdate = EditFunctions::ReplaceGedrec($pid, $oldpedifamrec, $pedifamrec, "FAMC", $change_id, $change_type);
 			}
 		}
 			
@@ -1135,8 +1134,8 @@ if ($action=="update") {
 		else $fcdel = "";
 		if (!empty($fcdel)) {
 			$famrec = preg_replace("/1 CHIL @$fcdel@/", "", $famrec);
-			$famupdate = ReplaceGedrec($famid, "1 CHIL @".$fcdel."@", "", "CHIL", $change_id, $change_type);
-			ReplaceGedrec($fcdel, "1 CHIL @".$famid."@", "", "FAMC", $change_id, $change_type);
+			$famupdate = EditFunctions::ReplaceGedrec($famid, "1 CHIL @".$fcdel."@", "", "CHIL", $change_id, $change_type);
+			EditFunctions::ReplaceGedrec($fcdel, "1 CHIL @".$famid."@", "", "FAMC", $change_id, $change_type);
 //			print "famupdate7";
 		}
 		
@@ -1146,9 +1145,9 @@ if ($action=="update") {
 		if (!empty($$cgivn) || !empty($$csurn)) {
 			if (empty($famid)) {
 				//print "HERE 8";
-				$famid = AppendGedrec($famrec, "FAM", $change_id, $change_type);
+				$famid = EditFunctions::AppendGedrec($famrec, "FAM", $change_id, $change_type);
 				$gedrec .= "\r\n1 FAMC @$famid@\r\n";
-				$updated = ReplaceGedrec($pid, "", "1 FAMC @$famid@", "FAMC", $change_id, $change_type);
+				$updated = EditFunctions::ReplaceGedrec($pid, "", "1 FAMC @$famid@", "FAMC", $change_id, $change_type);
 			}
 			//-- first add the new child
 			$childrec = "0 @REF@ INDI\r\n";
@@ -1165,13 +1164,13 @@ if ($action=="update") {
 			if (!empty($$rsgivn) || !empty($$rssurn)) {
 				$childrec .= "2 ROMN ".$$rsgivn." /".$$rssurn."/\r\n";
 			}
-			$cxref = AppendGedrec($childrec, "INDI", $change_id, $change_type);
+			$cxref = EditFunctions::AppendGedrec($childrec, "INDI", $change_id, $change_type);
 			$var = "C".$i."SEX";
 			if (!empty($$var)) $csex = $$var;
 			else $csex = "";
 			if (!empty($csex)) {
 				$childrec .= "1 SEX $csex\r\n";
-				ReplaceGedrec($cxref, "", "1 SEX $csex", "SEX", $change_id, $change_type);
+				EditFunctions::ReplaceGedrec($cxref, "", "1 SEX $csex", "SEX", $change_id, $change_type);
 			}
 			$var = "C".$i."DATE";
 			if (!empty($$var)) $cdate = $$var;
@@ -1181,22 +1180,22 @@ if ($action=="update") {
 			else $cplac = "";
 			if (!empty($cdate)||!empty($cplac)) {
 				$brec = "1 BIRT\r\n";
-				$cdate = CheckInputDate($cdate);
+				$cdate = EditFunctions::CheckInputDate($cdate);
 				if (!empty($cdate)) $brec .= "2 DATE $cdate\r\n";
 				if (!empty($cplac)) $brec .= "2 PLAC $cplac\r\n";
 				$var = "C".$i."RESN";
 				if (!empty($$var)) $cresn = $$var;
 				else $cresn = "";
 				if (!empty($cresn)) $brec .= "2 RESN $cresn\r\n";
-				$famupdate = ReplaceGedrec($cxref, "", $brec, "BIRT", $change_id, $change_type);
+				$famupdate = EditFunctions::ReplaceGedrec($cxref, "", $brec, "BIRT", $change_id, $change_type);
 				$childrec .= $brec;
 			}
 			$childrec .= "1 FAMC @$famid@\r\n";
-			ReplaceGedrec($cxref, "", "1 FAMC @$famid@", "FAMC", $change_id, $change_type);
+			EditFunctions::ReplaceGedrec($cxref, "", "1 FAMC @$famid@", "FAMC", $change_id, $change_type);
 //			$cxref = append_gedrec($childrec);
-//			$cxref = AppendGedrec($childrec, "INDI", $change_id, $change_type);
+//			$cxref = EditFunctions::AppendGedrec($childrec, "INDI", $change_id, $change_type);
 			$famrec .= "\r\n1 CHIL @$cxref@";
-			$famupdate = ReplaceGedrec($famid, "", "1 CHIL @$cxref@", "CHIL", $change_id, $change_type);
+			$famupdate = EditFunctions::ReplaceGedrec($famid, "", "1 CHIL @$cxref@", "CHIL", $change_id, $change_type);
 //			print "famupdate8";
 		}
 //		if ($famupdate &&($oldfamrec!=$famrec)) {
@@ -1611,7 +1610,7 @@ foreach($indifacts as $f=>$fact) {
 		if (!in_array($fact_tag, $nondatefacts)) { ?>
 			<td class="optionbox">
 				<input type="hidden" name="DESCS[]" value="<?php print htmlspecialchars($desc); ?>" />
-				<input type="text" tabindex="<?php print $tabkey; $tabkey++;?>" size="15" name="DATES[]" id="DATE<?php echo $f; ?>" onblur="valid_date(this);" value="<?php echo htmlspecialchars($date); ?>" />&nbsp;<?php PrintCalendarPopup("DATE$f");?>
+				<input type="text" tabindex="<?php print $tabkey; $tabkey++;?>" size="15" name="DATES[]" id="DATE<?php echo $f; ?>" onblur="valid_date(this);" value="<?php echo htmlspecialchars($date); ?>" />&nbsp;<?php EditFunctions::PrintCalendarPopup("DATE$f");?>
 			</td>
 		<?php }
 		if (empty($temp) && (!in_array($fact_tag, $nonplacfacts))) { ?>
@@ -1650,7 +1649,7 @@ foreach($indifacts as $f=>$fact) {
 	</tr>
 	<?php }
 	if (GedcomConfig::$SHOW_QUICK_RESN) {
-		PrintQuickResn("RESNS[]", $resn);
+		EditFunctions::PrintQuickResn("RESNS[]", $resn);
 	}
 }
 
@@ -1702,14 +1701,14 @@ if (count($addfacts)>0) { ?>
 			<?php print $gm_lang["description"]; ?><input type="text" size="35" name="DESC" />
 		</div>
 	</td>
-	<td class="optionbox"><input type="text" tabindex="<?php print $tabkey; ?>" size="15" name="DATE" id="DATE" onblur="valid_date(this);" />&nbsp;<?php PrintCalendarPopup("DATE");?></td>
+	<td class="optionbox"><input type="text" tabindex="<?php print $tabkey; ?>" size="15" name="DATE" id="DATE" onblur="valid_date(this);" />&nbsp;<?php EditFunctions::PrintCalendarPopup("DATE");?></td>
 	<?php $tabkey++; ?>
 	<td class="optionbox"><input type="text" tabindex="<?php print $tabkey; ?>" name="PLAC" id="place" />
 	<?php LinkFunctions::PrintFindPlaceLink("place"); ?>
 	</td>
 	<td class="optionbox">&nbsp;</td></tr>
 	<?php $tabkey++; ?>
-	<?php PrintQuickResn("RESN"); ?>
+	<?php EditFunctions::PrintQuickResn("RESN"); ?>
 <?php }
 
 // NOTE: Add photo
@@ -1921,7 +1920,7 @@ for($i=1; $i<=count($sfams); $i++) {
 </tr>
 <tr>
 	<td class="descriptionbox"><?php print_help_link("def_gedcom_date_help", "qm"); print $factarray["BIRT"]; ?><?php print $factarray["DATE"];?></td>
-	<td class="optionbox" colspan="3"><input type="text" tabindex="<?php print $tabkey; ?>" size="15" name="BDATE<?php echo $i; ?>" id="BDATE<?php echo $i; ?>" onblur="valid_date(this);" /><?php PrintCalendarPopup("BDATE$i");?></td>
+	<td class="optionbox" colspan="3"><input type="text" tabindex="<?php print $tabkey; ?>" size="15" name="BDATE<?php echo $i; ?>" id="BDATE<?php echo $i; ?>" onblur="valid_date(this);" /><?php EditFunctions::PrintCalendarPopup("BDATE$i");?></td>
 	</tr>
 	<?php $tabkey++; ?>
 	<td class="descriptionbox"><?php print_help_link("edit_PLAC_help", "qm"); print $factarray["PLAC"];?></td>
@@ -1930,7 +1929,7 @@ for($i=1; $i<=count($sfams); $i++) {
 	<?php $tabkey++; ?>
 	</td>
 </tr>
-<?php PrintQuickResn("BRESN".$i); 
+<?php EditFunctions::PrintQuickResn("BRESN".$i); 
 }
 //NOTE: Update fact
 ?>
@@ -1958,7 +1957,7 @@ foreach($famfacts as $f=>$fact) {
 				?>
 					<input type="hidden" name="F<?php echo $i; ?>TAGS[]" value="<?php echo $fact_tag; ?>" />
 				</td>
-				<td class="optionbox"><input type="text" tabindex="<?php print $tabkey; $tabkey++;?>" size="15" name="F<?php echo $i; ?>DATES[]" id="F<?php echo $i; ?>DATE<?php echo $f; ?>" onblur="valid_date(this);" value="<?php echo htmlspecialchars($date); ?>" /><?php PrintCalendarPopup("F{$i}DATE{$f}");?></td>
+				<td class="optionbox"><input type="text" tabindex="<?php print $tabkey; $tabkey++;?>" size="15" name="F<?php echo $i; ?>DATES[]" id="F<?php echo $i; ?>DATE<?php echo $f; ?>" onblur="valid_date(this);" value="<?php echo htmlspecialchars($date); ?>" /><?php EditFunctions::PrintCalendarPopup("F{$i}DATE{$f}");?></td>
 				<?php if (empty($temp) && (!in_array($fact_tag, $nonplacfacts))) { ?>
 					<td class="optionbox"><input type="text" size="30" tabindex="<?php print $tabkey; $tabkey++; ?>" name="F<?php echo $i; ?>PLACS[]" id="F<?php echo $i; ?>place<?php echo $f; ?>" value="<?php print PrintReady(htmlspecialchars($plac)); ?>" />
                                         <?php LinkFunctions::PrintFindPlaceLink("F".$i."place$f"); ?>
@@ -1986,7 +1985,7 @@ foreach($famfacts as $f=>$fact) {
 				</td>
 			</tr>
 			<?php if (GedcomConfig::$SHOW_QUICK_RESN) {
-				PrintQuickResn("F".$i."RESNS[]", $resn);
+				EditFunctions::PrintQuickResn("F".$i."RESNS[]", $resn);
 			} ?>
 	<?php
 }
@@ -2018,7 +2017,7 @@ if (count($famaddfacts)>0) { ?>
 	?>
 		</select>
 	</td>
-	<td class="optionbox"><input type="text" tabindex="<?php print $tabkey; ?>" size="15" name="F<?php echo $i; ?>DATE" id="F<?php echo $i; ?>DATE" onblur="valid_date(this);" /><?php PrintCalendarPopup("F".$i."DATE");?></td>
+	<td class="optionbox"><input type="text" tabindex="<?php print $tabkey; ?>" size="15" name="F<?php echo $i; ?>DATE" id="F<?php echo $i; ?>DATE" onblur="valid_date(this);" /><?php EditFunctions::PrintCalendarPopup("F".$i."DATE");?></td>
 	<?php $tabkey++; ?>
 	<td class="optionbox"><input type="text" tabindex="<?php print $tabkey; ?>" name="F<?php echo $i; ?>PLAC" id="F<?php echo $i; ?>place" />
 	<?php LinkFunctions::PrintFindPlaceLink("F".$i."place"); ?>
@@ -2026,7 +2025,7 @@ if (count($famaddfacts)>0) { ?>
 	<?php $tabkey++; ?>
 	<td class="optionbox">&nbsp;</td>
 	</tr>
-	<?php PrintQuickResn("F".$i."RESN"); ?>
+	<?php EditFunctions::PrintQuickResn("F".$i."RESN"); ?>
 <?php }
 // NOTE: Children
 $chil = FindChildrenInRecord($famrec);
@@ -2081,7 +2080,7 @@ $chil = FindChildrenInRecord($famrec);
 					$pedirec = GetGedcomValue("PEDI", 2, $pedirec);
 					
 					print "<td class=\"optionbox\">";
-					if ($pid == $child) PrintPedi("F".$i."CPEDI".$i, $pedirec);
+					if ($pid == $child) EditFunctions::PrintPedi("F".$i."CPEDI".$i, $pedirec);
 					else if (!empty($pedirec)) print $gm_lang[$pedirec];
 					else print $gm_lang["biological"];
 					print "</td>";
@@ -2153,7 +2152,7 @@ if (empty($child_surname)) $child_surname = "";
 	<td class="descriptionbox"><?php print_help_link("def_gedcom_date_help", "qm"); print $factarray["BIRT"]; ?>
 		<?php print $factarray["DATE"];?>
 	</td>
-	<td class="optionbox" colspan="3"><input type="text" tabindex="<?php print $tabkey; ?>" size="15" name="C<?php echo $i; ?>DATE" id="C<?php echo $i; ?>DATE" onblur="valid_date(this);" /><?php PrintCalendarPopup("C{$i}DATE");?></td>
+	<td class="optionbox" colspan="3"><input type="text" tabindex="<?php print $tabkey; ?>" size="15" name="C<?php echo $i; ?>DATE" id="C<?php echo $i; ?>DATE" onblur="valid_date(this);" /><?php EditFunctions::PrintCalendarPopup("C{$i}DATE");?></td>
 	<?php $tabkey++; ?>
 	</tr>
 	<tr>
@@ -2163,7 +2162,7 @@ if (empty($child_surname)) $child_surname = "";
 	</td>
 	<?php $tabkey++; ?>
 </tr>
-<?php PrintQuickResn("C".$i."RESN"); ?>
+<?php EditFunctions::PrintQuickResn("C".$i."RESN"); ?>
 <tr><td colspan="4"><br /></td></tr>
 </table>
 </div>
@@ -2224,7 +2223,7 @@ if (empty($child_surname)) $child_surname = "";
 	<td class="descriptionbox"><?php print_help_link("def_gedcom_date_help", "qm"); print $factarray["BIRT"]; ?>
 		<?php print $factarray["DATE"];?>
 	</td>
-	<td class="optionbox" colspan="3"><input type="text" tabindex="<?php print $tabkey; ?>" size="15" name="BDATE" id="BDATE" onblur="valid_date(this);" /><?php PrintCalendarPopup("BDATE");?></td>
+	<td class="optionbox" colspan="3"><input type="text" tabindex="<?php print $tabkey; ?>" size="15" name="BDATE" id="BDATE" onblur="valid_date(this);" /><?php EditFunctions::PrintCalendarPopup("BDATE");?></td>
 	</tr>
 	<?php $tabkey++; ?>
 	<tr>
@@ -2234,7 +2233,7 @@ if (empty($child_surname)) $child_surname = "";
 	<?php $tabkey++; ?>
 	</td>
 </tr>
-<?php PrintQuickResn("BRESN"); 
+<?php EditFunctions::PrintQuickResn("BRESN"); 
 
 // NOTE: Marriage
 ?>
@@ -2245,7 +2244,7 @@ if (empty($child_surname)) $child_surname = "";
 <tr><td class="descriptionbox">
 		<?php print_help_link("def_gedcom_date_help", "qm"); print $factarray["DATE"];?>
 	</td>
-	<td class="optionbox" colspan="3"><input type="text" tabindex="<?php print $tabkey; ?>" size="15" name="MDATE" id="MDATE" onblur="valid_date(this);" /><?php PrintCalendarPopup("MDATE");?></td>
+	<td class="optionbox" colspan="3"><input type="text" tabindex="<?php print $tabkey; ?>" size="15" name="MDATE" id="MDATE" onblur="valid_date(this);" /><?php EditFunctions::PrintCalendarPopup("MDATE");?></td>
 	</tr>
 	<?php $tabkey++; ?>
 	<tr>
@@ -2255,7 +2254,7 @@ if (empty($child_surname)) $child_surname = "";
 	<?php $tabkey++; ?>
 	</td>
 </tr>
-<?php PrintQuickResn("MRESN");
+<?php EditFunctions::PrintQuickResn("MRESN");
 
 // NOTE: New child
 if (empty($child_surname)) $child_surname = "";
@@ -2308,7 +2307,7 @@ if (empty($child_surname)) $child_surname = "";
 	<td class="descriptionbox"><?php print_help_link("def_gedcom_date_help", "qm"); print $factarray["BIRT"]; ?>
 		<?php print $factarray["DATE"];?>
 	</td>
-	<td class="optionbox" colspan="3"><input type="text" tabindex="<?php print $tabkey; ?>" size="15" name="CDATE" id="CDATE" onblur="valid_date(this);" /><?php PrintCalendarPopup("CDATE");?></td>
+	<td class="optionbox" colspan="3"><input type="text" tabindex="<?php print $tabkey; ?>" size="15" name="CDATE" id="CDATE" onblur="valid_date(this);" /><?php EditFunctions::PrintCalendarPopup("CDATE");?></td>
 	</tr>
 	<?php $tabkey++; ?>
 	<tr>
@@ -2318,7 +2317,7 @@ if (empty($child_surname)) $child_surname = "";
 	</td>
 	<?php $tabkey++; ?>
 </tr>
-<?php PrintQuickResn("CRESN"); ?>
+<?php EditFunctions::PrintQuickResn("CRESN"); ?>
 </table>
 </div>
 
@@ -2453,7 +2452,7 @@ for($j=1; $j<=count($cfams); $j++) {
 	<td class="descriptionbox"><?php print_help_link("def_gedcom_date_help", "qm"); print $factarray["BIRT"]; ?>
 		<?php print $factarray["DATE"];?>
 	</td>
-	<td class="optionbox" colspan="3"><input type="text" tabindex="<?php print $tabkey; ?>" size="15" name="FBDATE<?php echo $i; ?>" id="FBDATE<?php echo $i; ?>" onblur="valid_date(this);" /><?php PrintCalendarPopup("FBDATE$i");?></td>
+	<td class="optionbox" colspan="3"><input type="text" tabindex="<?php print $tabkey; ?>" size="15" name="FBDATE<?php echo $i; ?>" id="FBDATE<?php echo $i; ?>" onblur="valid_date(this);" /><?php EditFunctions::PrintCalendarPopup("FBDATE$i");?></td>
 	</tr>
 	<?php $tabkey++; ?>
 	<tr>
@@ -2463,12 +2462,12 @@ for($j=1; $j<=count($cfams); $j++) {
 	<?php $tabkey++; ?>
 	</td>
 	</tr>
-	<?php PrintQuickResn("FBRESN$i"); ?>
+	<?php EditFunctions::PrintQuickResn("FBRESN$i"); ?>
 	<tr>
 	<td class="descriptionbox"><?php print_help_link("def_gedcom_date_help", "qm"); print $factarray["DEAT"]; ?>
 		<?php print $factarray["DATE"];?>
 	</td>
-	<td class="optionbox" colspan="3"><input type="text" tabindex="<?php print $tabkey; ?>" size="15" name="FDDATE<?php echo $i; ?>" id="FDDATE<?php echo $i; ?>" onblur="valid_date(this);" /><?php PrintCalendarPopup("FDDATE$i");?></td>
+	<td class="optionbox" colspan="3"><input type="text" tabindex="<?php print $tabkey; ?>" size="15" name="FDDATE<?php echo $i; ?>" id="FDDATE<?php echo $i; ?>" onblur="valid_date(this);" /><?php EditFunctions::PrintCalendarPopup("FDDATE$i");?></td>
 	</tr>
 	<?php $tabkey++; ?>
 	<tr>
@@ -2478,7 +2477,7 @@ for($j=1; $j<=count($cfams); $j++) {
 	<?php $tabkey++; ?>
 	</td>
 	</tr>
-	<?php PrintQuickResn("FDRESN$i"); 
+	<?php EditFunctions::PrintQuickResn("FDRESN$i"); 
 }
 ?>
 <?php
@@ -2561,7 +2560,7 @@ for($j=1; $j<=count($cfams); $j++) {
 	<td class="descriptionbox"><?php print_help_link("def_gedcom_date_help", "qm"); print $factarray["BIRT"]; ?>
 		<?php print $factarray["DATE"];?>
 	</td>
-	<td class="optionbox" colspan="3"><input type="text" tabindex="<?php print $tabkey; ?>" size="15" name="MBDATE<?php echo $i; ?>" id="MBDATE<?php echo $i; ?>" onblur="valid_date(this);" /><?php PrintCalendarPopup("MBDATE$i");?></td>
+	<td class="optionbox" colspan="3"><input type="text" tabindex="<?php print $tabkey; ?>" size="15" name="MBDATE<?php echo $i; ?>" id="MBDATE<?php echo $i; ?>" onblur="valid_date(this);" /><?php EditFunctions::PrintCalendarPopup("MBDATE$i");?></td>
 	</tr>
 	<?php $tabkey++; ?>
 	<tr>
@@ -2571,12 +2570,12 @@ for($j=1; $j<=count($cfams); $j++) {
 	<?php $tabkey++; ?>
 	</td>
 </tr>
-<?php PrintQuickResn("MBRESN$i"); ?>
+<?php EditFunctions::PrintQuickResn("MBRESN$i"); ?>
 <tr>
 	<td class="descriptionbox"><?php print_help_link("def_gedcom_date_help", "qm"); print $factarray["DEAT"]; ?>
 		<?php print $factarray["DATE"];?>
 	</td>
-	<td class="optionbox" colspan="3"><input type="text" tabindex="<?php print $tabkey; ?>" size="15" name="MDDATE<?php echo $i; ?>" id="MDDATE<?php echo $i; ?>" onblur="valid_date(this);" /><?php PrintCalendarPopup("MDDATE$i");?></td>
+	<td class="optionbox" colspan="3"><input type="text" tabindex="<?php print $tabkey; ?>" size="15" name="MDDATE<?php echo $i; ?>" id="MDDATE<?php echo $i; ?>" onblur="valid_date(this);" /><?php EditFunctions::PrintCalendarPopup("MDDATE$i");?></td>
 	</tr>
 	<?php $tabkey++; ?>
 	<tr>
@@ -2586,7 +2585,7 @@ for($j=1; $j<=count($cfams); $j++) {
 	<?php $tabkey++; ?>
 	</td>
 </tr>
-<?php PrintQuickResn("MDRESN$i"); 
+<?php EditFunctions::PrintQuickResn("MDRESN$i"); 
 }
 // NOTE: Update fact 
 ?>
@@ -2613,7 +2612,7 @@ foreach($famfacts as $f=>$fact) {
 				?>
 					<input type="hidden" name="F<?php echo $i; ?>TAGS[]" value="<?php echo $fact_tag; ?>" />
 				</td>
-				<td class="optionbox"><input type="text" tabindex="<?php print $tabkey; $tabkey++;?>" size="15" name="F<?php echo $i; ?>DATES[]" id="F<?php echo $i; ?>DATE<?php echo $f; ?>" onblur="valid_date(this);" value="<?php echo htmlspecialchars($date); ?>" /><?php PrintCalendarPopup("F{$i}DATE$f");?></td>
+				<td class="optionbox"><input type="text" tabindex="<?php print $tabkey; $tabkey++;?>" size="15" name="F<?php echo $i; ?>DATES[]" id="F<?php echo $i; ?>DATE<?php echo $f; ?>" onblur="valid_date(this);" value="<?php echo htmlspecialchars($date); ?>" /><?php EditFunctions::PrintCalendarPopup("F{$i}DATE$f");?></td>
 				<?php if (empty($temp) && (!in_array($fact_tag, $nonplacfacts))) { ?>
 					<td class="optionbox"><input size="30" type="text" tabindex="<?php print $tabkey; $tabkey++; ?>" name="F<?php echo $i; ?>PLACS[]" id="F<?php echo $i; ?>place<?php echo $f; ?>" value="<?php print PrintReady(htmlspecialchars($plac)); ?>" />
 					<?php LinkFunctions::PrintFindPlaceLink("F".$i."place$f"); ?>
@@ -2641,7 +2640,7 @@ foreach($famfacts as $f=>$fact) {
 				</td>
 			</tr>
 			<?php if (GedcomConfig::$SHOW_QUICK_RESN) {
-				PrintQuickResn("F".$i."RESNS[]", $resn);
+				EditFunctions::PrintQuickResn("F".$i."RESNS[]", $resn);
 			} ?>
 	<?php
 }
@@ -2677,7 +2676,7 @@ foreach($famfacts as $f=>$fact) {
 		?>
 			</select>
 		</td>
-		<td class="optionbox"><input type="text" tabindex="<?php print $tabkey; ?>" size="15" name="F<?php echo $i; ?>DATE" id="F<?php echo $i; ?>DATE" onblur="valid_date(this);" /><?php PrintCalendarPopup("F".$i."DATE");?></td>
+		<td class="optionbox"><input type="text" tabindex="<?php print $tabkey; ?>" size="15" name="F<?php echo $i; ?>DATE" id="F<?php echo $i; ?>DATE" onblur="valid_date(this);" /><?php EditFunctions::PrintCalendarPopup("F".$i."DATE");?></td>
 		<?php $tabkey++; ?>
 		<td class="optionbox"><input size="30" type="text" tabindex="<?php print $tabkey; ?>" name="F<?php echo $i; ?>PLAC" id="F<?php echo $i; ?>place" />
 		<?php LinkFunctions::PrintFindPlaceLink("F".$i."place"); ?>
@@ -2685,7 +2684,7 @@ foreach($famfacts as $f=>$fact) {
 		<?php $tabkey++; ?>
 		<td class="optionbox">&nbsp;</td>
 	</tr>
-	<?php PrintQuickResn("F".$i."RESN"); ?>
+	<?php EditFunctions::PrintQuickResn("F".$i."RESN"); ?>
 <?php }
 // NOTE: Children
 //$chil = FindChildrenInRecord($famrec, $pid);
@@ -2740,7 +2739,7 @@ $chil = FindChildrenInRecord($famrec);
 					print "<td class=\"optionbox\">";
 					$pedirec = GetSubRecord(1, "FAMC @$famid@", $childrec);
 					$pedirec = GetGedcomValue("PEDI", 2, $pedirec);
-					if ($pid == $child) PrintPedi("F".$i."CPEDI", $pedirec);
+					if ($pid == $child) EditFunctions::PrintPedi("F".$i."CPEDI", $pedirec);
 					else if (!empty($pedirec)) print $gm_lang[$pedirec];
 					else print $gm_lang["biological"];
 					print "</td>";
@@ -2807,7 +2806,7 @@ $chil = FindChildrenInRecord($famrec);
 	<td class="descriptionbox"><?php print_help_link("def_gedcom_date_help", "qm"); print $factarray["BIRT"]; ?>
 		<?php print $factarray["DATE"];?>
 	</td>
-	<td class="optionbox" colspan="3"><input type="text" tabindex="<?php print $tabkey; ?>" size="15" name="C<?php echo $i; ?>DATE" id="C<?php echo $i; ?>DATE" onblur="valid_date(this);" /><?php PrintCalendarPopup("C{$i}DATE");?></td>
+	<td class="optionbox" colspan="3"><input type="text" tabindex="<?php print $tabkey; ?>" size="15" name="C<?php echo $i; ?>DATE" id="C<?php echo $i; ?>DATE" onblur="valid_date(this);" /><?php EditFunctions::PrintCalendarPopup("C{$i}DATE");?></td>
 	</tr>
 	<?php $tabkey++; ?>
 	<tr>
@@ -2817,7 +2816,7 @@ $chil = FindChildrenInRecord($famrec);
 	</td>
 	<?php $tabkey++; ?>
 </tr>
-<?php PrintQuickResn("C".$i."RESN"); ?>
+<?php EditFunctions::PrintQuickResn("C".$i."RESN"); ?>
 </table>
 </div>
 	<?php

@@ -31,11 +31,6 @@
 */
 require "config.php";
 
-/**
- * Inclusion of the editing functions
-*/
-include "includes/functions/functions_edit.php";
-
 if (!isset($action)) $action="";
 if (isset($firstname)) $firstname = stripslashes($firstname);
 if (isset($lastname)) $lastname = stripslashes($lastname);

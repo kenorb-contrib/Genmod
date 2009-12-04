@@ -32,24 +32,148 @@
 */
 require "config.php";
 
-if (empty($action)) $action="";
-if (empty($source)) $source="";		// Set when loaded from uploadgedcom.php
 if (!$gm_user->userGedcomAdmin()) {
 	header("Location: editgedcoms.php");
 	exit;
 }
 
-if (!isset($_POST)) $_POST = $HTTP_POST_VARS;
+// Incoming variables:
+//
+// $source: Set when loaded from uploadgedcom.php
+// 		add_form: 		add new gedcom already on server
+// 		upload form: 	add new gedcom from upload
+// 		add_new_form: 	add new gedcom from scratch
+// 		reupload_form: 	re-upload and import an existing gedcom
+// 		<no value>: 	edit existing settings
+if (!isset($source)) $source="";		
 
-// Remove slashes
-if (isset($_POST["NEW_COMMON_NAMES_ADD"])) $_POST["NEW_COMMON_NAMES_ADD"] = stripslashes($_POST["NEW_COMMON_NAMES_ADD"]);
-if (isset($_POST["NEW_COMMON_NAMES_REMOVE"])) $_POST["NEW_COMMON_NAMES_REMOVE"] = stripslashes($_POST["NEW_COMMON_NAMES_REMOVE"]);
-if (empty($oldgedid)) $oldgedid = "";
-else $gedid = $oldgedid;
-if (!isset($path)) $path = "";
+// $GEDCOMPATH: Set from input field for upload. Path and filename. Sets $_FILES['GEDCOMPATH']
+//
+// $GEDFILENAME: Name of the gedcom file.
 if (!isset($GEDFILENAME)) $GEDFILENAME = "";
 
+// $gedid: ID of the gedcom being edited
+if (!isset($gedid)) $gedid = false;
+
+// $oldgedid: ID of the gedcom sent with filled in form
+if (empty($oldgedid)) $oldgedid = "";
+else $gedid = $oldgedid;
+
+// $action: either nothing (edit/add) or "update" for processing the form
+if (!isset($action)) $action="";
+
+if (!isset($_POST)) $_POST = $HTTP_POST_VARS;
+$error_msg = "";
+
+// Initial
+if (empty($action)) {
+	
+	switch($source){
+		
+		// Add a gedcom with the file already on the server
+		case("add_form"):
+			$GEDCOMPATH = "";
+			$gedcom_title = "";
+			break;
+			
+		// Add a new gedcom with upload
+		case("upload_form"):
+			$GEDCOMPATH = "";
+			$gedcom_title = "";
+			break;
+			
+		// Add a new gedcom from scratch
+		case("add_new_form"):
+			$GEDCOMPATH = "";
+			$gedcom_title = "";
+			break;
+			
+		// Re-upload a gedcom file for an existing gedcom
+		case("reupload_form"):
+			SwitchGedcom($gedid);
+			$GEDCOMPATH = $GEDCOMS[$gedid]["path"];
+			$path = AdminFunctions::CalculateGedcomPath($GEDCOMPATH);
+			$GEDFILENAME = $GEDCOMS[$gedid]["gedcom"];
+			$gedcom_title = $GEDCOMS[$gedid]["title"];
+			$oldgedid = $GEDCOMS[$gedid]["id"];
+			break;
+			
+		// No source, so it must be an edit of an existing gedcom setting
+		default:
+			SwitchGedcom($gedid);
+			$GEDCOMPATH = $GEDCOMS[$gedid]["path"];
+			$path = AdminFunctions::CalculateGedcomPath($GEDCOMPATH);
+			$GEDFILENAME = $GEDCOMS[$gedid]["gedcom"];
+			$gedcom_title = $GEDCOMS[$gedid]["title"];
+			$oldgedid = $GEDCOMS[$gedid]["id"];
+			break;
+	}
+}
+else {
+	switch($source){
+		
+		// Add a gedcom with the file already on the server
+		case("add_form"):
+			$path = AdminFunctions::CalculateGedcomPath($GEDCOMPATH);
+			$GEDFILENAME = basename($GEDCOMPATH);
+			if (!file_exists($path.$GEDFILENAME)) $action = "";
+			if (get_id_from_gedcom($GEDFILENAME)) {
+				$error_msg = $gm_lang["gedcom_exists"];
+				$action = "";
+			}
+			break;
+			
+		// Add a new gedcom with upload
+		case("upload_form"):
+			$path = INDEX_DIRECTORY;
+			$GEDFILENAME = basename($GEDCOMPATH['name']);
+			if (!AdminFunctions::CheckUploadedGedcom($GEDFILENAME)) {
+				$action = "";
+				$error_msg = $gm_lang["upload_error"];
+				break;
+			} 
+			$GEDFILENAME = AdminFunctions::MoveUploadedGedcom($GEDFILENAME, $path);
+			break;
+			
+		// Add a new gedcom from scratch
+		case("add_new_form"):
+			$path = AdminFunctions::CalculateGedcomPath($GEDCOMPATH);
+			$GEDFILENAME = basename($GEDCOMPATH);
+			if (get_id_from_gedcom($GEDFILENAME)) {
+				$error_msg = $gm_lang["gedcom_exists"];
+				$action = "";
+			}
+			break;
+			
+		// Re-upload a gedcom file for an existing gedcom
+		case("reupload_form"):
+			SwitchGedcom($gedid);
+			$GEDCOMPATH = $GEDCOMS[$gedid]["path"];
+			$path = AdminFunctions::CalculateGedcomPath($GEDCOMPATH);
+			$GEDFILENAME = $GEDCOMS[$gedid]["gedcom"];
+			if (!AdminFunctions::CheckUploadedGedcom($GEDFILENAME)) {
+				$action = "";
+				$error_msg = $gm_lang["upload_error"];
+				break;
+			}
+			$GEDFILENAME = AdminFunctions::MoveUploadedGedcom($GEDFILENAME, $path);
+			break;
+			
+		// No source, so it must be an edit of an existing gedcom setting
+		default:
+			SwitchGedcom($gedid);
+			$GEDCOMPATH = $GEDCOMS[$gedid]["path"];
+			// recalculate the path
+			$path = AdminFunctions::CalculateGedcomPath($GEDCOMPATH);
+			$GEDFILENAME = $GEDCOMS[$gedid]["gedcom"];
+			break;
+	}
+}
+	
+/*
+// Process (re-)upload or add
 if (isset($GEDCOMPATH)) {
+	
 	// NOTE: Check if we are uploading a file and retrieve the filename
 	if (isset($_FILES['GEDCOMPATH'])) {
 		if (filesize($_FILES['GEDCOMPATH']['tmp_name'])!= 0) $GEDCOMPATH = $_FILES['GEDCOMPATH']['name'];
@@ -57,35 +181,28 @@ if (isset($GEDCOMPATH)) {
 	else {
 		// TODO: We cannot upload the file. Too big or something else.
 	}
-	
 
 	// NOTE: Extract the GEDCOM filename
-	if (!empty($path)) $GEDFILENAME = basename($path);
-	else $GEDFILENAME = basename($GEDCOMPATH);
-print "gedcompath is ".$GEDCOMPATH."<br />";
-print " gedfilename set to: ".$GEDFILENAME."<br />";
-	// NOTE: Check if it is a zipfile
-	if ($path == "") if (strstr(strtolower(trim($GEDFILENAME)), ".zip")==".zip") {
+	$GEDFILENAME = basename($GEDCOMPATH);
+	
+	// NOTE: Check if it is a zipfile, only extract it if it's not an upload (already there)
+	if (strstr(strtolower(trim($GEDFILENAME)), ".zip")==".zip") {
+		// Get the filename of the gedcom file. It is extracted in the folder of $GEDCOMPATH (if empty: INDEX_DIRECTORY)
 		if ($source == "add_form") $GEDFILENAME = AdminFunctions::GetGedFromZip($GEDCOMPATH);
 	}
-	// NOTE: Check if there is an extension
+	
+	// Now GEDFILENAME either has it's name extracted from the ZIP, or from the entry in GEDCOMPATH
+	// Check if there is an extension, if not: add it.
 	if (strtolower(substr(trim($GEDFILENAME), -4)) != ".ged" && strtolower(substr(trim($GEDFILENAME), -4)) != ".zip") $GEDFILENAME .= ".ged";
-	// NOTE: Check if the input contains a valid path otherwise check if there is one in the GEDCOMPATH
-	if (!is_dir($path)) {
-		if (!empty($path)) $parts = preg_split("/[\/\\\]/", $path);
-		else $parts = preg_split("/[\/\\\]/", $GEDCOMPATH);
-		$path = "";
-		$ctparts = count($parts)-1;
-		if (count($parts) == 1) $path = INDEX_DIRECTORY;
-		else {
-			foreach ($parts as $key => $pathpart) {
-				if ($key < $ctparts) $path .= $pathpart."/";
-			}
-		}
-	}
+	
+	// NOTE: Check if there is a path in GEDCOMPATH (only the case if the file already is on the server)
+	$path = AdminFunctions::CalculateGedcomPath($GEDCOMPATH);
+	// At this point, $path represents the path to the gedcom file. 
+	
+	// If a file is uploaded, place it in the previously determinated $path folder
 	$ctupload = count($_FILES);
 	if ($ctupload > 0) {
-		// NOTE: When uploading a file check if it doesn't exist yet
+		// NOTE: When uploading a file check if it doesn't exist yet, either in $GEDCOMS or on disk
 		if (!isset($GEDCOMS[get_id_from_gedcom($GEDFILENAME)]) || !file_exists($path.$GEDFILENAME)) {
 			if (move_uploaded_file($_FILES['GEDCOMPATH']['tmp_name'], $path.$GEDFILENAME)) {
 				WriteToLog("EditConfigGedcom-> Gedcom ".$path.$GEDFILENAME." uploaded", "I", "S");
@@ -98,47 +215,43 @@ print " gedfilename set to: ".$GEDFILENAME."<br />";
 				unlink($path.$GEDFILENAME);
 			move_uploaded_file($_FILES['GEDCOMPATH']['tmp_name'], $path.$GEDFILENAME);
 		}
-		if (strstr(strtolower(trim($GEDFILENAME)), ".zip")==".zip") $GEDFILENAME = AdminFunctions::GetGedFromZip($path.$GEDFILENAME);
+		// A bit odd to have this extracted here, but if it works... 
+		// Get the gedcom name from the ZIP 
+		if (strstr(strtolower(trim($GEDFILENAME)), ".zip") == ".zip") $GEDFILENAME = AdminFunctions::GetGedFromZip($path.$GEDFILENAME);
 	}
+	
 	$ged = $GEDFILENAME;
 	$gedid = get_id_from_gedcom($ged);
 }
-if (isset($gedid)) {
+// $gedid is false when it doesn't exist yet in the system. 
+if ($gedid) {
 	if (isset($GEDCOMS[$gedid])) {
 		$GEDCOMPATH = $GEDCOMS[$gedid]["path"];
-		$path = "";
-		$parts = preg_split("/[\/\\\]/", $GEDCOMPATH);
-		$ctparts = count($parts)-1;
-		if (count($parts) == 1) $path = INDEX_DIRECTORY;
-		else {
-			foreach ($parts as $key => $pathpart) {
-				if ($key < $ctparts) $path .= $pathpart."/";
-			}
-		}
+		// recalculate the path
+		$path = AdminFunctions::CalculateGedcomPath($GEDCOMPATH);
 		$GEDFILENAME = $GEDCOMS[$gedid]["gedcom"];
 		if (!isset($gedcom_title)) $gedcom_title = $GEDCOMS[$gedid]["title"];
-		$gedcom_id = $GEDCOMS[$gedid]["id"];
+		$gedid = $GEDCOMS[$gedid]["id"];
 		$FILE = $GEDFILENAME;
 		$oldgedid = $gedid;
 	}
 	else {
-		if (empty($_POST["GEDCOMPATH"])) {
+		if (!isset($_POST["GEDCOMPATH"])) {
 			$GEDCOMPATH = "";
 			$gedcom_title = "";
 		}
-		$gedcom_id = "";
 	}
 }
+// We have to fill in the form with new values, so some must exist (empty)
 else {
 	$GEDCOMPATH = "";
 	$gedcom_title = "";
-	$gedcom_id = "";
-	$path = "";
-	$GEDFILENAME = "";
 }
+*/
 $USERLANG = $LANGUAGE;
 $temp = GedcomConfig::$THEME_DIR;
 
+// If it's a new gedcom, read the default settings (auto calculate and set the new GEDCOMID)
 if (!isset($gedid) || !isset($GEDCOMS[$gedid])) {
 	GedcomConfig::ReadGedcomConfig(0);
 	$gedid = $GEDCOMID;
@@ -147,13 +260,11 @@ else SwitchGedcom($gedid);
 
 if (is_null(GedcomConfig::$GEDCOMLANG)) GedcomConfig::$GEDCOMLANG = $LANGUAGE;
 $LANGUAGE = $USERLANG;
-$error_msg = "";
 
-// Not used anywhere! if (!file_exists($path.$GEDFILENAME) && $source != "add_new_form") $action="add";
 if ($action=="update") {
 	$errors = false;
 	if (!isset($_POST)) $_POST = $HTTP_POST_VARS;
-	$FILE=$GEDFILENAME;
+	$FILE = $GEDFILENAME;
 	$newgedcom=false;
 
 	$gedarray = array();
@@ -162,8 +273,11 @@ if ($action=="update") {
 	else if (!empty($_POST["gedcom_title"])) $gedarray["title"] = $_POST["gedcom_title"];
 	else $gedarray["title"] = str_replace("#GEDCOMFILE#", $GEDFILENAME, $gm_lang["new_gedcom_title"]);
 	$gedarray["path"] = $path.$GEDFILENAME;
-	$gedarray["id"] = $gedcom_id;
+	$gedarray["id"] = $gedid;
 
+	// Remove slashes
+	if (isset($_POST["NEW_COMMON_NAMES_ADD"])) $_POST["NEW_COMMON_NAMES_ADD"] = stripslashes($_POST["NEW_COMMON_NAMES_ADD"]);
+	if (isset($_POST["NEW_COMMON_NAMES_REMOVE"])) $_POST["NEW_COMMON_NAMES_REMOVE"] = stripslashes($_POST["NEW_COMMON_NAMES_REMOVE"]);
 	// Check that add/remove common surnames are separated by [,;] blank
 	$_POST["NEW_COMMON_NAMES_REMOVE"] = preg_replace("/[,;]\b/", ", ", $_POST["NEW_COMMON_NAMES_REMOVE"]);
 	$_POST["NEW_COMMON_NAMES_ADD"] = preg_replace("/[,;]\b/", ", ", $_POST["NEW_COMMON_NAMES_ADD"]);
@@ -171,14 +285,8 @@ if ($action=="update") {
 	GedcomConfig::$COMMON_NAMES_ADD = $_POST["NEW_COMMON_NAMES_ADD"];
 	GedcomConfig::$COMMON_NAMES_REMOVE = $_POST["NEW_COMMON_NAMES_REMOVE"];
 	$gedarray["commonsurnames"] = "";
-//	print "array: <pre>";
-//	print_r($GEDCOMS);
-//	print "</pre>";
 	$GEDCOMS[$gedid] = $gedarray;
-//	print "array: <pre>";
-//	print_r($GEDCOMS);
-//	print "</pre>";
-	StoreGedcoms();
+	AdminFunctions::StoreGedcoms();
 
 	ReadGedcoms();
 	$boolarray = array();
@@ -324,7 +432,7 @@ if ($action=="update") {
 	$newconf["zoom_boxes"] = $_POST["NEW_ZOOM_BOXES"];
 	$newconf["display_pinyin"] = $boolarray[$_POST["NEW_DISPLAY_PINYIN"]];
 	if (file_exists($NTHEME_DIR)) {
-	$newconf["theme_dir"] = $_POST["NTHEME_DIR"];
+		$newconf["theme_dir"] = $_POST["NTHEME_DIR"];
 	}
 	else {
 		$errors = true;
@@ -366,8 +474,8 @@ if ($action=="update") {
 		else if ($source == "add_form") $check = "add";
 		else if ($source == "add_new_form") $check = "add_new";
 		if (!isset($bakfile)) $bakfile = "";
-//		print "source: ".$source." check: ".$check." gedfilename: ".$GEDFILENAME." path: ".$path. " bakfile: ".$bakfile;
-//		exit;
+		//print "source: ".$source." check: ".$check." gedfilename: ".$GEDFILENAME." path: ".$path. " bakfile: ".$bakfile;
+		//exit;
 		if ($source !== "") header("Location: uploadgedcom.php?action=$source&check=$check&step=2&GEDFILENAME=$GEDFILENAME&path=$path&verify=verify_gedcom&bakfile=$bakfile");
 		else {
 			header("Location: editgedcoms.php");
@@ -474,14 +582,14 @@ print "&nbsp;<a href=\"javascript: ".$gm_lang["gedcom_conf"]."\" onclick=\"expan
 			<input type="text" name="GEDCOMPATH" value="<?php print preg_replace('/\\*/', '\\', $GEDCOMPATH);?>" size="40" dir ="ltr" tabindex="<?php $i++; print $i?>" <?php if (empty($source)) print " disabled=\"disabled\"";?>/>
 			<?php
 		}
-			if ($GEDCOMPATH != "" || $GEDFILENAME != "") {
-				if (!file_exists($path.$GEDFILENAME) && !empty($GEDCOMPATH)) {
-					if (strtolower(substr(trim($path.$GEDFILENAME), -4)) != ".ged") $GEDFILENAME .= ".ged";
-				}
-				if ((!strstr($GEDCOMPATH, "://")) &&(!file_exists($path.$GEDFILENAME))) {
-					print "<br /><span class=\"error\">".str_replace("#GEDCOM#", $GEDCOMPATH, $gm_lang["error_header"])."</span>\n";
-				}
+		if ($GEDCOMPATH != "" || $GEDFILENAME != "") {
+			if (!file_exists($path.$GEDFILENAME) && !empty($GEDCOMPATH)) {
+				if (strtolower(substr(trim($path.$GEDFILENAME), -4)) != ".ged") $GEDFILENAME .= ".ged";
 			}
+			if (!strstr($GEDCOMPATH, "://") && !file_exists($path.$GEDFILENAME)) {
+				print "<br /><span class=\"error\">".str_replace("#GEDCOM#", $GEDCOMPATH, $gm_lang["error_header"])."</span>\n";
+			}
+		}
 		?>
 		</td>
 	</tr>
