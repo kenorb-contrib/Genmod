@@ -81,7 +81,7 @@ if (count($explangs) > 0) $export_msg = true;
 
 if (file_exists(INDEX_DIRECTORY."emergency_syslog.txt")) {
 	$emergency_msg = true;
-	$emergency_text = ImportEmergencyLog();
+	$emergency_text = AdminFunctions::ImportEmergencyLog();
 }
 ?>
 <!-- Setup the left box -->
@@ -223,7 +223,7 @@ if (file_exists(INDEX_DIRECTORY."emergency_syslog.txt")) {
 			<div class="admin_item_left"><div class="helpicon"><?php print_help_link("admin_maint_help", "qm", "maintenance"); ?></div><div class="description"><a href="admin_maint.php"><?php print $gm_lang["maintenance"]; ?></a></div></div>
 			<div class="admin_item_right"><div class="helpicon"><?php print_help_link("help_viewlog.php", "qm", "view_syslog"); ?></div><div class="description"><a href="javascript: <?php print $gm_lang["view_syslog"];?>" onclick="window.open('viewlog.php?cat=S&amp;max=20', '', 'top=50,left=10,width=1000,height=600,scrollbars=1,resizable=1'); ChangeClass('syslog', 'shade1'); return false;">
 			<?php
-			if (NewLogRecs("S")) print "<span id=\"syslog\" class=\"error\">".$gm_lang["view_syslog"]."</span>";
+			if (AdminFunctions::NewLogRecs("S")) print "<span id=\"syslog\" class=\"error\">".$gm_lang["view_syslog"]."</span>";
 			else print "<span id=\"syslog\">".$gm_lang["view_syslog"]."</span>";
 			?>
 			</a></div></div>

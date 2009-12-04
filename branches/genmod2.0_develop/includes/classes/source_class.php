@@ -224,7 +224,7 @@ class Source extends GedcomRecord {
 		$this->indi_hide = 0;
 		$key = "";
 		
-		$sql = "SELECT DISTINCT n_id, i_key, i_gedrec, i_isdead, i_id, i_file, n_name, n_surname, n_letter, n_type  FROM ".TBLPREFIX."source_mapping, ".TBLPREFIX."individuals, ".TBLPREFIX."names WHERE sm_sid='".$this->xref."' AND sm_file='".$this->gedcomid."' AND sm_type='INDI' AND sm_gid=i_id AND sm_file=i_file AND i_key=n_key ORDER BY i_key, n_id";
+		$sql = "SELECT DISTINCT n_id, i_key, i_gedrec, i_isdead, i_id, i_file, n_name, n_surname, n_letter, n_type  FROM ".TBLPREFIX."source_mapping, ".TBLPREFIX."individuals, ".TBLPREFIX."names WHERE sm_key='".$this->key."' AND sm_file='".$this->gedcomid."' AND sm_type='INDI' AND sm_gid=i_id AND sm_file=i_file AND i_key=n_key ORDER BY i_key, n_id";
 		$res = NewQuery($sql);
 		while($row = $res->FetchAssoc()){
 			if ($key != $row["i_key"]) {
@@ -252,7 +252,7 @@ class Source extends GedcomRecord {
 		$this->famlist = array();
 		$this->fam_hide = 0;
 		
-		$sql = "SELECT DISTINCT f_key, f_gedrec, f_id, f_file, f_husb, f_wife  FROM ".TBLPREFIX."source_mapping, ".TBLPREFIX."families WHERE sm_sid='".$this->xref."' AND sm_file='".$this->gedcomid."' AND sm_type='FAM' AND sm_gid=f_id AND sm_file=f_file";
+		$sql = "SELECT DISTINCT f_key, f_gedrec, f_id, f_file, f_husb, f_wife  FROM ".TBLPREFIX."source_mapping, ".TBLPREFIX."families WHERE sm_key='".$this->key."' AND sm_file='".$this->gedcomid."' AND sm_type='FAM' AND sm_gid=f_id AND sm_file=f_file";
 		$res = NewQuery($sql);
 		while($row = $res->FetchAssoc()){
 			$family = null;
@@ -273,7 +273,7 @@ class Source extends GedcomRecord {
 		$this->notelist = array();
 		$this->note_hide = 0;
 		
-		$sql = "SELECT DISTINCT o_key, o_id, o_gedrec, o_file FROM ".TBLPREFIX."source_mapping, ".TBLPREFIX."other WHERE sm_sid='".$this->xref."' AND sm_file='".$this->gedcomid."' AND sm_type='NOTE' AND sm_gid=o_id AND o_file=sm_file";
+		$sql = "SELECT DISTINCT o_key, o_id, o_gedrec, o_file FROM ".TBLPREFIX."source_mapping, ".TBLPREFIX."other WHERE sm_key='".$this->key."' AND sm_file='".$this->gedcomid."' AND sm_type='NOTE' AND sm_gid=o_id AND o_file=sm_file";
 		$res = NewQuery($sql);
 		while($row = $res->FetchAssoc()){
 			$note = null;
@@ -292,7 +292,7 @@ class Source extends GedcomRecord {
 		$this->medialist = array();
 		$this->media_hide = 0;
 		
-		$sql = "SELECT DISTINCT m_media, m_gedrec, m_file, m_ext, m_mfile FROM ".TBLPREFIX."source_mapping, ".TBLPREFIX."media WHERE sm_sid='".$this->xref."' AND sm_file='".$this->gedcomid."' AND sm_type='OBJE' AND sm_gid=m_media AND m_file=sm_file";
+		$sql = "SELECT DISTINCT m_media, m_gedrec, m_file, m_ext, m_mfile FROM ".TBLPREFIX."source_mapping, ".TBLPREFIX."media WHERE sm_key='".$this->key."' AND sm_file='".$this->gedcomid."' AND sm_type='OBJE' AND sm_gid=m_media AND m_file=sm_file";
 		$res = NewQuery($sql);
 		while($row = $res->FetchAssoc()) {
 			$mediaitem = null;

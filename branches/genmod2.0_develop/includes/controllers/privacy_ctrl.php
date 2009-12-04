@@ -56,7 +56,6 @@ abstract class PrivacyController {
 	public function DeletePrivacy($gedcomid) {
 		global $DBCONN;
 
-		if (!isset($gedcomid)) return false;
 		if (!$DBCONN->connected) return false;
 		
 		$priv =& PrivacyObject::GetInstance($gedcomid);
@@ -67,7 +66,7 @@ abstract class PrivacyController {
 
 		$sql = "DELETE FROM ".TBLPREFIX."privacy WHERE p_gedcomid='".$gedcomid."'";
 		$res = NewQuery($sql);
-		$ct = $res->NumRows($res->result);
+		$ct = $res->NumRows();
 		if ($ct == "0") return false;
 		$res->FreeResult();
 		return true;

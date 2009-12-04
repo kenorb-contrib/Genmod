@@ -112,6 +112,7 @@ abstract class BlockFunctions {
 			$indilist = SearchFunctions::SearchIndisDateRange($dstart, $mstart, "", $dend, $mend, "", $filter, "no", $skipfacts);
 			// Search database for raw Family data if no cache was found
 			$famlist = SearchFunctions::SearchFamsDateRange($dstart, $mstart, "", $dend, $mend, "", "no", $skipfacts);
+
 			// Apply filter criteria and perform other transformations on the raw data
 			foreach($indilist as $gid=>$indi) {
 				foreach($indi->facts as $key => $factobj) {
@@ -130,7 +131,10 @@ abstract class BlockFunctions {
 						}
 						else {
 							$dct = preg_match("/2 DATE (.+)/", $factrec, $match);
-							if ($dct>0) $date = ParseDate(trim($match[1]));
+							if ($dct>0) {
+								$date = ParseDate(trim($match[1]));
+								//print $gid." ".$factobj->fact." ".$match[1]."<br />";
+							}
 						}
 						if (!empty($date[0]["mon"]) && !empty($date[0]["day"])) {
 							if ($date[0]["mon"]< $mstart) $y = $year+1;

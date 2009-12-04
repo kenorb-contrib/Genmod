@@ -28,18 +28,38 @@
 if (stristr($_SERVER["SCRIPT_NAME"],basename(__FILE__))) {
 	require "../../intrusion.php";
 }
-
+global $NPFX_accept;
 $NPFX_accept = array("Adm", "Amb", "Brig", "Can", "Capt", "Chan", "Chapln", "Cmdr", "Col", "Cpl", "Cpt", "Dr", "Gen", "Gov", "Hon", "Lady", "Lt", "Mr", "Mrs", "Ms", "Msgr", "Pfc", "Pres", "Prof", "Pvt", "Rep", "Rev", "Sen", "Sgt", "Sir", "Sr", "Sra", "Srta", "Ven");
+
+global $SPFX_accept;
 $SPFX_accept = array("al", "da", "de", "den", "dem", "der", "di", "du", "el", "la", "van", "von");
+
+global $NSFX_accept;
 $NSFX_accept = array("Jr", "Sr", "I", "II", "III", "IV", "MD", "PhD");
+
+global $FILE_FORM_accept;
 $FILE_FORM_accept = array("avi", "bmp", "gif", "jpeg", "mp3", "ole", "pcx", "tiff", "wav");
+
 // Removed EVEN from empty facts
+global $emptyfacts;
 $emptyfacts = array("BIRT","CHR","DEAT","BURI","CREM","ADOP","BAPM","BARM","BASM","BLES","CHRA","CONF","FCOM","ORDN","NATU","EMIG","IMMI","CENS","PROB","WILL","GRAD","RETI","BAPL","CONL","ENDL","SLGC","MARR","MARR_CIVIL","MARR_RELIGIOUS","MARR_PARTNERS","MARR_UNKNOWN","SLGS","MARL","ANUL","CENS","DIV","DIVF","ENGA","MARB","MARC","MARS","CHAN","_SEPR","RESI", "DATA", "MAP");
 //$separatorfacts = array("BIRT","CHR","DEAT","BURI","CREM","ADOP","BAPM","BARM","BASM","BLES","CHRA","CONF","FCOM","ORDN","NATU","EMIG","IMMI","CENS","PROB","WILL","GRAD","RETI","BAPL","CONL","ENDL","SLGC","EVEN","MARR","SLGS","MARL","ANUL","CENS","DIV","DIVF","ENGA","MARB","MARC","MARS","CHAN","_SEPR","RESI","MAP","SOUR","REPO","OBJE","SEX","NAME","ASSO","NOTE","EMAIL","TITL");
+
+global $separatorfacts;
 $separatorfacts = array("SOUR","REPO","OBJE","ASSO","NOTE","RESN","GNOTE");
+
+global $templefacts;
 $templefacts = array("SLGC","SLGS","BAPL","ENDL","CONL");
+
+global $nonplacfacts;
 $nonplacfacts = array("SLGC","SLGS","ENDL","ASSO","RESN");
+
+global $nondatefacts;
 $nondatefacts = array("ABBR","ADDR","ASSO","AFN","AUTH","EMAIL","FAX","NAME","NOTE","GNOTE","OBJE","PHON","PUBL","REPO","SEX","SOUR","TEXT","TITL","WWW","_EMAIL","EMAIL","REFN","NCHI","RIN","FILE","FORM","_PRIM","_SSHOW","_TYPE","_SCBK","RESN");
+
+global $typefacts;
 $typefacts = array();	//-- special facts that go on 2 TYPE lines
+
+global $canhavey_facts;
 $canhavey_facts = array("MARR","DIV","BIRT","DEAT","CHR","BURI","CREM"); 
 ?>

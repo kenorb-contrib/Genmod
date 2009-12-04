@@ -40,6 +40,7 @@ abstract class GedcomRecord {
 	protected $gedcomid = null;			// Gedcom id in which this object exists
 	protected $changedgedrec = null;	// The gedcom record after changes would be applied
 	protected $xref = null;				// ID of the object
+	protected $key = null;				// ID joined with the gedcomid
 	protected $type = null;				// Type of the object: INDI, FAM, SOUR, REPO, NOTE or OBJE
 	protected $facts = null;			// Array of fact objects for this object
 	protected $lastchanged = null;		// Date and time from the CHAN fact
@@ -142,7 +143,8 @@ abstract class GedcomRecord {
 				$this->xref = trim($match[1]);
 				$this->type = trim($match[2]);
 			}
-		}	
+		}
+		$this->key = JoinKey($this->xref, $this->gedcomid);
 	}
 	
 
@@ -943,7 +945,7 @@ abstract class GedcomRecord {
 	private function CheckSourceLinks() {
 		
 		if (!is_array($this->link_array)) {
-			$sql = "SELECT DISTINCT n_id, i_id, i_key, i_isdead, i_file, i_gedrec, n_name, n_surname, n_letter, n_type FROM ".TBLPREFIX."source_mapping, ".TBLPREFIX."individuals, ".TBLPREFIX."names WHERE sm_sid='".$this->xref."' AND sm_file='".$this->gedcomid."' AND sm_type='INDI' AND sm_gid=i_id AND sm_file=i_file AND i_key=n_key ORDER BY n_id";
+			$sql = "SELECT DISTINCT n_id, i_id, i_key, i_isdead, i_file, i_gedrec, n_name, n_surname, n_letter, n_type FROM ".TBLPREFIX."source_mapping, ".TBLPREFIX."individuals, ".TBLPREFIX."names WHERE sm_key='".$this->key."' AND sm_file='".$this->gedcomid."' AND sm_type='INDI' AND sm_gid=i_id AND sm_file=i_file AND i_key=n_key ORDER BY n_id";
 			$res = NewQuery($sql);
 			$key = "";
 			$ok = true;
@@ -969,7 +971,7 @@ abstract class GedcomRecord {
 			
 			$indiarr = array();
 			$famarr = array();
-			$sql = "SELECT DISTINCT sm_gid, f_id, f_file, f_gedrec, f_husb, f_wife FROM ".TBLPREFIX."source_mapping, ".TBLPREFIX."families WHERE sm_sid='".$this->xref."' AND sm_file='".$this->gedcomid."' AND sm_type='FAM' AND sm_gid=f_id AND sm_file=f_file";
+			$sql = "SELECT DISTINCT sm_gid, f_id, f_file, f_gedrec, f_husb, f_wife FROM ".TBLPREFIX."source_mapping, ".TBLPREFIX."families WHERE sm_key='".$this->key."' AND sm_file='".$this->gedcomid."' AND sm_type='FAM' AND sm_gid=f_id AND sm_file=f_file";
 			$res = NewQuery($sql);
 			while ($row = $res->FetchAssoc()) {
 				$family = null;

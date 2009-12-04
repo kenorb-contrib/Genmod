@@ -291,7 +291,7 @@ abstract class AdminFunctions {
 		else $path = INDEX_DIRECTORY;
 		// Scan the files and return the first .ged found
 		foreach($list as $key=>$listitem) {
-			if (($listitem["status"]="ok") && (strstr(strtolower($listitem["filename"]), ".")==".ged")) {
+			if (($listitem["status"] == "ok") && (strstr(strtolower($listitem["filename"]), ".") == ".ged")) {
 				$filename = basename($listitem["filename"]);
 				if ($extract == false) return $filename;
 	
@@ -338,15 +338,305 @@ abstract class AdminFunctions {
 									$oldrec = $match[0];
 									$newrec = preg_replace("/(\d _?EMAIL)[^\r\n]*/", "$1 ".$user->email, $subrec);
 								}
-								if ($subrec != $newrec) ReplaceGedrec($gedid, $subrec, $newrec, "EMAIL", $change_id, "edit_fact", $GEDCOMID, "INDI");
+								if ($subrec != $newrec) EditFunctions::ReplaceGedrec($gedid, $subrec, $newrec, "EMAIL", $change_id, "edit_fact", $GEDCOMID, "INDI");
 							}
 						}
-						if (!$found) ReplaceGedrec($gedid, "", "1 EMAIL ".$user->email."\r\n2 RESN privacy\r\n2 SOUR ".$sourstring."\r\n", "EMAIL", $change_id, "add_fact", $GEDCOMID, "INDI");
+						if (!$found) EditFunctions::ReplaceGedrec($gedid, "", "1 EMAIL ".$user->email."\r\n2 RESN privacy\r\n2 SOUR ".$sourstring."\r\n", "EMAIL", $change_id, "add_fact", $GEDCOMID, "INDI");
 					}
 				}
 			}
 			$GEDCOMID = $oldged;
 		}
+	}
+
+	/**
+	 * Read the Log records from the database for display
+	 *
+	 * The function reads the records that are logged for
+	 * either the Syetem Log, the Gedcom Log or the Search
+	 * Log. It returns the records in an array for further 
+	 * processing in the log viewer.
+	 *
+	 * @author	Genmod Development Team
+	 * @param		string	$cat	Category of log records:
+	 *								S = System Log
+	 *								G = Gedcom Log
+	 *								F = Search Log
+	 * @param		integer	$max	Maximum number of records to be returned
+	 * @param		string	$type	Type of record:
+	 *								I = Information
+	 *								W = Warning
+	 *								E = Error
+	 * @param		string	$gedid	Used with Gedcom Log and Search Log
+	 *								Gedcomid the Log record applies to
+	 * @param		boolean $last	If true, return oldest log entries
+	 * @param		boolean $count	If true, return the number of logrecords matching criteria
+	 * @return 		array			Array with log records
+	 */
+	public function ReadLog($cat, $max="20", $type="", $gedid="", $last=false, $count=false) {
+	
+		if (!$count) {
+			$sql = "SELECT * FROM ".TBLPREFIX."log WHERE l_category='".$cat."'";
+			if (!empty($type)) $sql .= " AND l_type='".$type."'";
+			if (!empty($gedid) && $cat != "S") $sql .= " AND l_file='".$gedid."'";
+			if ($last == false) $sql .= " ORDER BY l_num DESC";
+			else $sql .= " ORDER BY l_num ASC";
+			if ($max != "0") $sql .= " LIMIT ".$max;
+			$res = NewQuery($sql);
+			$loglines = array();
+			if ($res) {
+				while($log_row = $res->FetchAssoc($res->result)){
+					$logline = array();
+					$logline["type"] = $log_row["l_type"];
+					$logline["category"] = $log_row["l_category"];
+					$logline["time"] = $log_row["l_timestamp"];
+					$logline["ip"] = $log_row["l_ip"];
+					$logline["user"] = $log_row["l_user"];
+					$logline["text"] = $log_row["l_text"];
+					$logline["gedcomid"] = $log_row["l_file"];
+					$loglines[] = $logline;
+				}
+			}
+			$res->FreeResult();
+			return $loglines;
+		}
+		else {
+			$sql = "SELECT COUNT(l_type) FROM ".TBLPREFIX."log WHERE l_category='".$cat."'";
+			if (!empty($type)) $sql .= " AND l_type='".$type."'";
+			if (!empty($gedid) && $cat != "S") $sql .= " AND l_file='".$gedid."'";
+			$res = NewQuery($sql);
+			if ($res) {
+				$number = $res->FetchRow();
+				return $number[0];
+			}
+		}
+	}
+	
+	public function NewLogRecs($cat, $gedid="") {
+		
+		$sql = "SELECT count('l_type') FROM ".TBLPREFIX."log WHERE l_category='".$cat."' AND l_type='E' AND l_new='1'";
+		if (!empty($gedid)) $sql .= " AND l_file='".$gedid."'";
+		$res = NewQuery($sql);
+		if ($res) {
+			$number = $res->FetchRow();
+			return $number[0];
+		}
+		return false;
+	}
+	
+	public function HaveReadNewLogrecs($cat, $gedid="") {
+		
+		$sql = "UPDATE ".TBLPREFIX."log SET l_new='0' WHERE l_category='".$cat."' AND l_type='E' AND l_new='1'";
+		if (!empty($gedid) && $cat != "S") $sql .= " AND l_file='".$gedid."'";
+		$res = NewQuery($sql);
+	}
+	
+	public function ImportEmergencyLog() {
+		global $gm_lang;
+	
+		// If we cannot read/delete the file, don't process it.
+		$filename = INDEX_DIRECTORY."emergency_syslog.txt";
+		if (!AdminFunctions::FileIsWriteable($filename)) return $gm_lang["emergency_log_noprocess"];
+		
+		// Read the contents
+		$handle = fopen($filename, "r");
+		$contents = fread($handle, filesize($filename));
+		fclose($handle);
+		$lines = split("\r\n", $contents);
+		
+		//Process the queries
+		foreach($lines as $key=>$line) {
+			if (strlen($line) > 6 && substr($line, 0, 6) == "INSERT") $res = NewQuery($line);
+		}
+	
+		//Delete the file
+		unlink($filename);
+		
+		return $gm_lang["emergency_log_exists"];
+	}
+
+	/** Import table(s) from a file
+	 *
+	 * This function imports dumps of MySQL tables into the database.
+	 * If an error is encountered, execution stops and the error is returned.
+	 * Be extremely careful changing this function, as it deals with query lines
+	 * spread over multiple lines in the input file.
+	 *
+	 * @author	Genmod Development Team
+	 * @param		string		$fn		Name of the file to be imported
+	 * @return		string		$error	Either the empty string, or the MySQL error message
+	 *
+	**/
+	public function ImportTable($fn) {
+		
+		if (file_exists(INDEX_DIRECTORY.$fn)) $sqlines = file(INDEX_DIRECTORY.$fn);
+		else return false;
+	
+		$sqline = "";
+		foreach($sqlines as $key=>$sql) {
+			$sqline .= $sql;
+			if ((substr(ltrim($sqline), 0, 6) == "INSERT" && substr(rtrim($sqline), -2) == "')") || substr(ltrim($sqline), 0, 6) == "DELETE") {
+				$res = NewQuery($sqline);
+				$error = mysql_error();
+				if (!empty($error)) return $error;
+				$sqline = "";
+			}
+		}
+		return "";
+	}
+
+	
+	/** Export a table and write the result to file
+	 *
+	 * This function makes dumps of MySQL tables into a file.
+	 * It can also join several dumps into one file to keep them together.
+	 * The filename will default to the last read table name.
+	 * As Genmod uses linebreaks in the database fields, the SQL files
+	 * CANNOT be imported by DB-management tools.
+	 *
+	 * @author	Genmod Development Team
+	 * @param		string/array	$table		String or array with table names to be exported.
+	 * @param		string			$join	String yes/no to dump multiple tables in one file or create multiple files.
+	 * @param		string			$newname	Only valid if one file or multiple joined files: filename to use for output.
+	 * @return	array			$fn		Array with names of created files
+	 *
+	**/
+	public function ExportTable($table, $join="no", $newname="") {
+	
+		$tables = array();
+		$fn = array();
+		if (!is_array($table)) $tables[] = $table;
+		else $tables = $table;
+		$outstr = "";
+		foreach($tables as $tabkey=>$tabname) {
+			$sql = "SHOW COLUMNS FROM ".TBLPREFIX.$tabname;
+			$res1 = NewQuery($sql);
+			$fstring = " (";
+			while ($fieldrow = $res1->FetchAssoc()) $fstring .= $fieldrow["Field"].",";
+			$fstring = substr($fstring, 0, -1);
+			$fstring .= ") ";
+			$outstr .= "DELETE FROM ".TBLPREFIX.$tabname."\r\n";
+			$sql = "SELECT * FROM ".TBLPREFIX.$tabname;
+			$res = NewQuery($sql);
+			$ct = $res->NumRows($res->result);
+			if ($ct != "0") {
+				while ($row = $res->FetchAssoc($res->result)) {
+					$line = "INSERT INTO ".TBLPREFIX.$tabname.$fstring."VALUES (";
+					$i = 0;
+					foreach ($row as $key=>$value) {
+						if ($i != "0") $line .= ", ";
+						$i++;
+						$line .= "'".mysql_real_escape_string($value)."'";
+					}
+					$line .= ")\r\n";
+					$outstr .= $line;
+				}
+			}
+			if (($tabkey == count($tables)-1 && $join == "yes") || $join == "no") {
+				if (!empty($newname) && ($join == "yes" || count($tables) == "1")) $tabname = $newname;
+				if (file_exists(INDEX_DIRECTORY."export_".$tabname.".sql")) unlink(INDEX_DIRECTORY."export_".$tabname.".sql");
+	
+				$fp = fopen(INDEX_DIRECTORY."export_".$tabname.".sql", "w");
+				if ($fp) {
+					fwrite($fp, $outstr);
+					fclose($fp);
+					$fn[] = INDEX_DIRECTORY."export_".$tabname.".sql";
+				}
+				else return "";
+			}
+		}
+		return $fn;
+	}
+
+	public function CalculateGedcomPath($inpath) {
+		
+		$path = "";
+		$parts = preg_split("/[\/\\\]/", $inpath);
+		$ctparts = count($parts)-1;
+		if (count($parts) == 1) $path = INDEX_DIRECTORY;
+		else {
+			foreach ($parts as $key => $pathpart) {
+				if ($key < $ctparts) $path .= $pathpart."/";
+			}
+		}
+		return $path;
+	}
+	
+	/**
+	 * Store the GEDCOMS array in the database
+	 *
+	 * The function takes the GEDCOMS array and stores all
+	 * content in the database, including DEFAULT_GEDCOM.
+	 *
+	 * @author	Genmod Development Team
+	 */
+	public function StoreGedcoms() {
+		global $GEDCOMS, $gm_lang, $DEFAULT_GEDCOM, $GEDCOMID;
+	
+		if (!CONFIGURED) return false;
+		uasort($GEDCOMS, "GedcomSort");
+		$maxid = 0;
+		foreach ($GEDCOMS as $name => $details) {
+			if (isset($details["id"]) && $details["id"] > $maxid) $maxid = $details["id"];
+		}
+		// -- For now, we update the gedcoms table by rewriting it
+		$sql = "DELETE FROM ".TBLPREFIX."gedcoms";
+		$res = NewQuery($sql);
+		
+		$maxid++;
+		foreach($GEDCOMS as $indexval => $GED) {
+			//print "<br /><br />Processing gedcom ".$indexval;
+			//print_r($GED);
+			$GED["path"] = str_replace(INDEX_DIRECTORY, "[INDEX_DIRECTORY]/", $GED["path"]);
+			$GED["title"] = stripslashes($GED["title"]);
+			$GED["title"] = preg_replace("/\"/", "\\\"", $GED["title"]);
+			// TODO: Commonsurnames from an old gedcom are used
+			// TODO: Default GEDCOM is changed to last uploaded GEDCOM
+	
+			// NOTE: Set the GEDCOM ID
+			if (!isset($GED["id"]) || (empty($GED["id"]))) $GED["id"] = $maxid;
+	
+			if (empty($GED["commonsurnames"])) {
+				if ($GED["gedcom"] == get_gedcom_from_id($GEDCOMID)) {
+					$GED["commonsurnames"] = "";
+					$surnames = GetCommonSurnames(GedcomConfig::$COMMON_NAMES_THRESHOLD);
+					foreach($surnames as $indexval => $surname) {
+						$GED["commonsurnames"] .= $surname["name"].", ";
+					}
+				}
+				else $GED["commonsurnames"]="";
+			}
+			if ($GED["gedcom"] == $DEFAULT_GEDCOM) $is_default = "Y";
+			else $is_default = "N";
+			$sql = "INSERT INTO ".TBLPREFIX."gedcoms VALUES('".DbLayer::EscapeQuery($GED["id"])."','".DbLayer::EscapeQuery($GED["gedcom"])."','".DbLayer::EscapeQuery($GED["title"])."','".DbLayer::EscapeQuery($GED["path"])."','".DbLayer::EscapeQuery($GED["commonsurnames"])."','".DbLayer::EscapeQuery($is_default)."')";
+			$res = NewQuery($sql);
+		}
+	}
+	
+	public function CheckUploadedGedcom($filename) {
+		
+		if (!isset($_FILES['GEDCOMPATH']) || filesize($_FILES['GEDCOMPATH']['tmp_name'])== 0 || (strstr(strtolower(trim($_FILES['GEDCOMPATH']['name'])), ".zip") == ".zip" && AdminFunctions::GetGedFromZip($_FILES['GEDCOMPATH']['tmp_name'], false) != $filename) || (strstr(strtolower(trim($_FILES['GEDCOMPATH']['name'])), ".ged") == ".ged" && $_FILES['GEDCOMPATH']['name'] != $filename)) {
+			unlink($_FILES['GEDCOMPATH']['tmp_name']);
+			return false;
+		}
+		return true;
+	}
+	
+	public function MoveUploadedGedcom($file, $path) {
+		
+		if (file_exists($path.$_FILES['GEDCOMPATH']['name'])) {
+			if (file_exists($path.$_FILES['GEDCOMPATH']['name'].".old")) unlink($path.$_FILES['GEDCOMPATH']['name'].".old");
+			copy($path.$_FILES['GEDCOMPATH']['name'], $path.$_FILES['GEDCOMPATH']['name'].".old");
+			unlink($path.$_FILES['GEDCOMPATH']['name']);
+		}
+		if (move_uploaded_file($_FILES['GEDCOMPATH']['tmp_name'], $path.$_FILES['GEDCOMPATH']['name'])) {
+				WriteToLog("EditConfigGedcom-> Gedcom ".$path.$_FILES['GEDCOMPATH']['name']." uploaded", "I", "S");
+		}
+		// Get the gedcom name from the ZIP 
+		if (strstr(strtolower(trim($_FILES['GEDCOMPATH']['name'])), ".zip") == ".zip") {
+			return AdminFunctions::GetGedFromZip($path.$_FILES['GEDCOMPATH']['name']);
+		}
+		else return $file;
 	}
 }
 ?>

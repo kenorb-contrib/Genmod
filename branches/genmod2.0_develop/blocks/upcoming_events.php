@@ -56,7 +56,6 @@ function print_upcoming_events($block=true, $config="", $side, $index) {
 	$skipfacts = "CHAN,BAPL,SLGC,SLGS,ENDL";	// These are always excluded
 
 	$action = "upcoming";
-	
 	$found_facts = BlockFunctions::GetCachedEvents($action, $daysprint, $filter, $onlyBDM, $skipfacts);
 	
 	// Output starts here

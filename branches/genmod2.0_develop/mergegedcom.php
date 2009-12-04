@@ -1115,7 +1115,6 @@ print "<form enctype=\"multipart/form-data\" method=\"post\" name=\"configform\"
 				$exectime = $newtime - $oldtime;
 				$exectime_start = $exectime;
 				if (!isset($names_added)) $names_added = 0;
-				include_once("includes/functions/functions_edit.php"); // for checkgedcom
 				$manual_save = true;
 				DMSoundex("", "opencache");
 				if (!isset($lastgid)) $skip = false;
@@ -1147,7 +1146,7 @@ print "<form enctype=\"multipart/form-data\" method=\"post\" name=\"configform\"
 													$pos1 = strpos($indi["gedcom"], "\n1", $pos1+1);
 													if ($pos1!==false) $indi["gedcom"] = substr($indi["gedcom"], 0, $pos1)."\n2 _MARNM $newname\r\n".substr($indi["gedcom"], $pos1+1);
 													else $indi["gedcom"]= trim($indi["gedcom"])."\r\n2 _MARNM $newname\r\n";
-													$indi["gedcom"] = CheckGedcom($indi["gedcom"], false);
+													$indi["gedcom"] = EditFunctions::CheckGedcom($indi["gedcom"], false);
 													AddNewName($gid, $newname, $letter, $surname, $indi["gedcom"]);
 													$names_added++;
 												}

@@ -1149,7 +1149,6 @@ abstract class MediaFS {
 	public function MoveFile($file, $from, $to) {
 		global $MEDIA_IN_DB, $GEDCOMID;
 		static $change_id;
-		require_once("includes/functions/functions_edit.php");
 		
 		$file = basename($file);
 		// We must have 2 paths: 

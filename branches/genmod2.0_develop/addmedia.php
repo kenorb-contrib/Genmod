@@ -34,11 +34,6 @@
 */
 require("config.php");
 
-/**
- * Inclusion of the edit functions
-*/
-require("includes/functions/functions_edit.php");
-
 PrintSimpleHeader($gm_lang["add_media_tool"]);
 
 //-- only allow users with edit privileges to access script.
@@ -133,8 +128,8 @@ if ($action=="newentry") {
 			$media_id = GetNewXref("OBJE");
 			$newged = "0 @".$media_id."@ OBJE\r\n";
 			
-			$newged = HandleUpdates($newged);
-			$xref = AppendGedrec($newged, "OBJE", $change_id, $change_type);
+			$newged = EditFunctions::HandleUpdates($newged);
+			$xref = EditFunctions::AppendGedrec($newged, "OBJE", $change_id, $change_type);
 		
 			if ($can_auto_accept && (($gm_user->UserCanAccept() && $aa_attempt) || $gm_user->userAutoAccept())) {
 				AcceptChange($change_id, $GEDCOMID);

@@ -168,8 +168,7 @@ switch($action) {
 	break;
 			
 	case "getchangeddate":
-		require('includes/functions/functions_edit.php');
-		print GetChangedDate(CheckInputDate($date));
+		print GetChangedDate(EditFunctions::CheckInputDate($date));
 	break;
 	
 	case "action_edit":

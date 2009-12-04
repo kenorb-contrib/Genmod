@@ -47,7 +47,7 @@ if ((($cat == "G") || ($cat == "F"))  && ($gm_user->userGedcomAdmin($gedid))) $a
 if ($auth) {
 	if (!empty($action)) {
 		if ($action == "download") {
-			$loglines = ReadLog($cat, "0", "", $gedid);
+			$loglines = AdminFunctions::ReadLog($cat, "0", "", $gedid);
 			if (count($loglines) > 1) {
 				if ($cat == "S") $expname = "syslog.csv";
 				if ($cat == "G") $expname = "gedlog.csv";
@@ -90,10 +90,10 @@ if ($auth) {
 		}
 	}
 	// Set the notifications to off
-	HaveReadNewLogrecs($cat, $gedid);
+	AdminFunctions::HaveReadNewLogrecs($cat, $gedid);
 	
 	// Retrieve number of loglines
-	$logcount = ReadLog($cat, $max, $type, $gedid, false, true);
+	$logcount = AdminFunctions::ReadLog($cat, $max, $type, $gedid, false, true);
 	
 	// Start form
 	print "<form action=\"viewlog.php\" method=\"get\">";
@@ -152,7 +152,7 @@ if ($auth) {
 
 	// -- Print the administration options line
 	// -- Calculate the number of months that can be deleted
-	$loglines = ReadLog($cat, "1", $type, $gedid, true);
+	$loglines = AdminFunctions::ReadLog($cat, "1", $type, $gedid, true);
 	// if no loglines are present, do not display the cleanup option
 	if (count($loglines) > 0) {
 		$logline = $loglines[0];
@@ -188,7 +188,7 @@ if ($auth) {
 	print "<br clear=\"all\" />";
 	
 	// Perform the query
-	$loglines = ReadLog($cat, $max, $type, $gedid);
+	$loglines = AdminFunctions::ReadLog($cat, $max, $type, $gedid);
 	
 	// Print the loglines
 //	print "<div id=\"logdetails\">";

@@ -74,7 +74,7 @@ if ($familybook_controller->view != "preview") {
 	$familybook_controller->PrintInputRootId();
 
 	// NOTE: generations
-	$familybook_controller->PrintInputGenerations(GedcomConfig::$MAX_DESCENDANCY_GENERATIONS, "desc_generations_help");
+	$familybook_controller->PrintInputGenerations(GedcomConfig::$MAX_PEDIGREE_GENERATIONS, "desc_generations_help");
 	
 	// NOTE: Descent steps
 	$familybook_controller->PrintInputDescentSteps();
