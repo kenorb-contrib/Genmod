@@ -604,7 +604,7 @@ function FindParentsInRecord($famrec) {
  * siblings but do want to include them as well
  * @return array
  */
-function FindChildren($famid, $me='') {
+/*function FindChildren($famid, $me='') {
 	global $gm_lang, $gm_username, $gm_user;
 
 	$famrec = FindFamilyRecord($famid);
@@ -617,7 +617,7 @@ function FindChildren($famid, $me='') {
 	}
 	return FindChildrenInRecord($famrec);
 }
-
+*/
 /**
  * find the children in a family record
  *

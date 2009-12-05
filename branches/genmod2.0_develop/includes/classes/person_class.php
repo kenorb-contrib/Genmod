@@ -419,7 +419,7 @@ class Person extends GedcomRecord {
 	 */
 	public function AddFamilyFacts($continue=true) {
 		global $nonfacts, $nonfamfacts;
-		
+	
 		if (!$this->DisplayDetails()) return;
 		if (is_null($this->facts)) $this->ParseFacts();
 		$this->GetSpouseFamilies();
@@ -435,8 +435,8 @@ class Person extends GedcomRecord {
 					if (!isset($count_facts[$factobj->fact])) $count_facts[$factobj->fact] = 1;
 					else $count_facts[$factobj->fact]++;
 					// -- handle special source fact case
-					if (($factobj->fact!="SOUR") && ($factobj->fact!="OBJE") && ($factobj->fact!="NOTE") && ($factobj->fact!="CHAN") && ($factobj->fact!="_UID") && ($factobj->fact!="RIN")) {
-						if ((!in_array($factobj->fact, $nonfacts))&&(!in_array($factobj->fact, $nonfamfacts))) {
+					if ($factobj->fact != "SOUR" && $factobj->fact != "OBJE" && $factobj->fact != "NOTE" && $factobj->fact != "CHAN" && $factobj->fact != "_UID" && $factobj->fact!="RIN") {
+						if (!in_array($factobj->fact, $nonfacts) && !in_array($factobj->fact, $nonfamfacts)) {
 							$subrecord = trim($factobj->factrec)."\r\n";
 							if (is_object($fam->$spperson)) $subrecord.="1 _GMS @".$fam->$spperson->xref."@\r\n";
 							$subrecord.="1 _GMFS @".$fam->xref."@\r\n";

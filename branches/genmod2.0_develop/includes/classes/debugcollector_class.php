@@ -52,7 +52,7 @@ abstract class DebugCollector {
 		if (!self::$show) return false;
 		else {
 			static $i = 0; $i++;
-			echo "\n<div id=\"array_tree_$i\" class=\"array_tree\">\n";
+			echo "\n<div id=\"array_tree_$i\" class=\"array_tree row\">\n";
 			if (count($arr) == 0) {
 				echo 'No data to show.';
 			}
