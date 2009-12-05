@@ -35,16 +35,8 @@ require("config.php");
 
 $controller = new TimelineController();
 
-$title = "";
-if (GedcomConfig::$SHOW_ID_NUMBERS) {
-	foreach($controller->people as $p=>$indi) {
-		if (!empty($title)) $title .= '/';
-		$title .= $indi->xref;
-	}
-	if (!empty ($title)) $title .= " - ";
-}
-$title .= $gm_lang["timeline_title"];
-PrintHeader($title);
+PrintHeader($controller->pagetitle);
+
 ?>
 <script language="JavaScript" type="text/javascript">
 <!--
@@ -298,14 +290,14 @@ $controller->checkPrivacy();
  			<a href="individual.php?pid=<?php print $pid; ?>">&nbsp;<?php print PrintReady($indi->name); ?><br />
  			<?php $addname = $indi->addname; if (strlen($addname) > 0) print PrintReady($addname); ?> 
 			</a>
-			<input type="hidden" name="pids[<?php print $p; ?>]" value="<?php print $pid; ?>" />
+			<input type="hidden" name="pids<?php print $p; ?>" value="<?php print $pid; ?>" />
 			<?php if (!$controller->isPrintPreview()) {
 				print "<br />";
 				print_help_link("remove_person_help", "qm");
 				?>
 				<a href="timeline.php?<?php print $controller->pidlinks; ?>&amp;scale=<?php print $controller->scale; ?>&amp;remove=<?php print $pid;?>" >
 				<span class="details1"><?php print $gm_lang["remove_person"]; ?></span></a>
-			<?php if (!empty($indi->brec)) { ?>
+			<?php if ($indi->brec != "") { ?>
 				<span class="details1"><br />
 				<?php print_help_link("show_age_marker_help", "qm"); ?>
 				<?php print $gm_lang["show_age"]; ?>
@@ -378,11 +370,10 @@ if (count($controller->people)>0) {
 	print "\n\t\t<div id=\"scale{$controller->topyear}\" style=\"font-family: Arial; position:absolute; ".($TEXT_DIRECTION =="ltr"?"left: $basexoffset":"right: $basexoffset")."px; top:".floor($baseyoffset+(($controller->topyear-$controller->baseyear)*$controller->scale))."px; font-size: 7pt; text-align:".($TEXT_DIRECTION =="ltr"?"left":"right").";\">\n";
 	print $controller->topyear."--";
 	print "</div>";
-//	usort($controller->indifacts, "CompareFacts");
-	SortFacts($controller->indifacts);
+//	SortFacts($controller->indifacts);
 	$factcount=0;
 	foreach($controller->indifacts as $indexval => $fact) {
-		$controller->print_time_fact($fact);
+		$controller->PrintTimeFact($fact);
 		$factcount++;
 	}
 

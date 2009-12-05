@@ -31,55 +31,51 @@ if (stristr($_SERVER["SCRIPT_NAME"],basename(__FILE__))) {
 /**
  * Main controller class for the timeline page.
  */
-class TimelineControllerRoot extends BaseController {
-	var $classname = "TimelineControllerRoot";
-	var $bheight = 30;
-	var $placements = array();
-	var $familyfacts = array();
-	var $indifacts = array();						// array to store the fact records in for sorting and displaying
-	var $birthyears=array();
-	var $birthmonths=array();
-	var $birthdays=array();
-	var $baseyear=0;
-	var $topyear=0;
-	var $pids = array();
-	var $people = array();
-	var $pidlinks = "";
-	var $scale = 2;
-	var $show_changes = false;
-	// GEDCOM elements that will be found but should not be displayed
-	var $nonfacts = "FAMS,FAMC,MAY,BLOB,OBJE,SEX,NAME,SOUR,NOTE,BAPL,ENDL,SLGC,SLGS,_TODO,CHAN,HUSB,WIFE,CHIL";
+class TimelineController extends BaseController {
+	
+	public $classname = "TimelineController";
+	public $bheight = 30;
+	public $placements = array();
+	public $familyfacts = array();
+	public $indifacts = array();						// array to store the fact records in for sorting and displaying
+	public $birthyears=array();
+	public $birthmonths=array();
+	public $birthdays=array();
+	public $baseyear=0;
+	public $topyear=0;
+	public $pids = array();
+	public $people = array();
+	public $pidlinks = "";
+	public $scale = 2;
 	
 	/**
 	 * constructor
 	 */
 	public function __construct() {
+		global $nonfamfacts, $nonfacts;
+		
 		parent::__construct();
+		
+		// GEDCOM elements that will be found but should not be displayed
+		$nonfamfacts = array("_UID", "RESN", "CHAN");
+		$nonfacts = array("FAMS", "FAMC", "MAY", "BLOB", "OBJE", "SEX", "NAME", "SOUR", "NOTE", "BAPL", "ENDL", "SLGC", "SLGS", "_TODO", "HUSB", "WIFE", "CHIL", "CHAN");
 		
 		$this->baseyear = date("Y");
 		// NOTE: New pid
 		if (isset($_REQUEST['newpid'])) {
 			$newpid = CleanInput($_REQUEST['newpid']);
-			$indirec = FindPersonRecord($newpid);
-			if (empty($indirec)) {
-				if (stristr($newpid, "I")===false) $newpid = "I".$newpid;
-			}
 		}
 		// NOTE: pids array
-		if (!isset($_REQUEST['pids'])){
-			$this->pids=array();
-			if (!empty($newpid)) $this->pids[] = $newpid;
-			else $this->pids[] = ChartFunctions::CheckRootId("");
+		$i = 0;
+		while(isset($_REQUEST["pids".$i])) {
+			$this->pids[] = $_REQUEST["pids".$i];
+			$i++;
 		}
-		else {
-			$this->pids = $_REQUEST['pids'];
-			if (!empty($newpid)) $this->pids[] = $newpid;
-		}
-		if (!is_array($this->pids)) $this->pids = array();
-		else {
-			//-- make sure that arrays are indexed by numbers
-			$this->pids = array_values($this->pids);
-		}
+		if (!empty($newpid)) $this->pids[] = $newpid;
+		if (count($this->pids) == 0) $this->pids[] = ChartFunctions::CheckRootId("");
+		
+		//-- make sure that arrays are indexed by numbers
+		$this->pids = array_values($this->pids);
 		$remove = "";
 		if (!empty($_REQUEST['remove'])) $remove = $_REQUEST['remove'];
 		//-- cleanup user input
@@ -92,7 +88,7 @@ class TimelineControllerRoot extends BaseController {
 		}
 		
 		$this->pidlinks = "";
-		foreach($this->people as $p=>$indi) {
+		foreach($this->people as $p => $indi) {
 			if (!is_null($indi) && $indi->disp) {
 				//-- setup string of valid pids for links
 				$this->pidlinks .= "pids[]=".$indi->xref."&amp;";
@@ -108,29 +104,24 @@ class TimelineControllerRoot extends BaseController {
 					}
 				}
 				// find all the fact information
-				$facts = GetAllSubrecords($indi->gedrec, $this->nonfacts, true, false);
-				foreach($facts as $indexval => $factrec) {
-					//-- get the fact type
-					$ct = preg_match("/1 (\w+)(.*)/", $factrec, $match);
-					if ($ct > 0) {
-						$fact = trim($match[1]);
-						$desc = trim($match[2]);
+				$indi->AddFamilyFacts(false);
+				foreach($indi->facts as $indexval => $factobj) {
+					// We must be able to display the full fact (timeline is about dates)
+					if (!in_array($factobj->fact, $nonfacts) && $factobj->show && $factobj->disp) {
 						//-- check for a date
-						$ct = preg_match("/2 DATE (.*)/", $factrec, $match);
-						if ($ct>0) {
-							$datestr = trim($match[1]);
-							$date = ParseDate($datestr);
+						if ($factobj->datestring != "") {
+							$date = ParseDate($factobj->datestring);
 							//-- do not print hebrew dates
 							if ((stristr($date[0]["ext"], "hebrew")===false)&&($date[0]["year"]!=0)) {
 								if ($date[0]["year"]<$this->baseyear) $this->baseyear=$date[0]["year"];
 								if ($date[0]["year"]>$this->topyear) $this->topyear=$date[0]["year"];
-								if (!IsDeadId($indi->xref)) {
+								if (!$indi->isdead) {
 									if ($this->topyear < date("Y")) $this->topyear = date("Y");
 								}
 								$tfact = array();
 								$tfact["p"] = $p;
 								$tfact["pid"] = $indi->xref;
-								$tfact[1] = $factrec;
+								$tfact[1] = $factobj;
 								$this->indifacts[] = $tfact;
 							}
 						}
@@ -150,16 +141,33 @@ class TimelineControllerRoot extends BaseController {
 		$this->topyear += 5;
 	}
 	
+	protected function GetPageTitle() {
+		global $gm_lang;
+		
+		if (is_null($this->pagetitle)) {
+			$this->pagetitle = "";
+			if (GedcomConfig::$SHOW_ID_NUMBERS) {
+				foreach($this->people as $p=>$indi) {
+					if ($this->pagetitle != "") $this->pagetitle .= '/';
+					$this->pagetitle .= $indi->xref;
+				}
+				if ($this->pagetitle != "") $this->pagetitle .= " - ";
+			}
+			$this->pagetitle .= $gm_lang["timeline_title"];
+		}
+		return $this->pagetitle;
+	}
+	
 	/**
 	 * check the privacy of the incoming people to make sure they can be shown
 	 */
-	function checkPrivacy() {
+	public function checkPrivacy() {
 		
 		$printed = false;
 		for($i=0; $i<count($this->people); $i++) {
 			if (!$this->people[$i]->disp) {
 				if ($this->people[$i]->disp_name) {
-					print "&nbsp;<a href=\"individual.php?pid=".$this->people[$i]->xref."\">".PrintReady($this->people[$i]->getName())."</a>";
+					print "&nbsp;<a href=\"individual.php?pid=".$this->people[$i]->xref."\">".PrintReady($this->people[$i]->name)."</a>";
 					PrintFunctions::PrintPrivacyError(GedcomConfig::$CONTACT_EMAIL);
 					print "<br />";
 					$printed = true;
@@ -172,147 +180,108 @@ class TimelineControllerRoot extends BaseController {
 		}
 	}
 	
-	function print_time_fact($factitem) {
+	public function PrintTimeFact($factitem) {
 		global $basexoffset, $baseyoffset, $factcount, $TEXT_DIRECTION;
-		global $gm_lang, $GM_IMAGES, $placements;
-		global $familyfacts, $GEDCOMID;
+		global $GM_IMAGES;
 	
-		$factrec = $factitem[1];
-		$ct = preg_match("/1 (\w+)(.*)/", $factrec, $match);
-		if ($ct > 0) {
-			$fact = trim($match[1]);
-			$desc = trim($match[2]);
-			if ($fact=="EVEN" || $fact=="FACT") {
-				$ct = preg_match("/2 TYPE (.*)/", $factrec, $match);
-				if ($ct>0) $fact = trim($match[1]);
-			}
-			$ct = preg_match("/2 DATE (.*)/", $factrec, $match);
-			if ($ct>0) {
-				//-- check if this is a family fact
-				$ct = preg_match("/1 _GMFS @(.*)@/", $factrec, $fmatch);
-				if ($ct>0) {
-					$famid = trim($fmatch[1]);
-					//-- if we already showed this family fact then don't print it
-					if (isset($familyfacts[$famid.$fact])&&($familyfacts[$famid.$fact]!=$factitem["p"])) return;
-					$familyfacts[$famid.$fact] = $factitem["p"];
-				}
-				$datestr = trim($match[1]);
-				$date = ParseDate($datestr);
-				$year = $date[0]["year"];
-	
-				$month = $date[0]["mon"];
-				$day = $date[0]["day"];
-				$xoffset = $basexoffset+20;
-				$yoffset = $baseyoffset+(($year-$this->baseyear) * $this->scale)-($this->scale);
-				$yoffset = $yoffset + (($month / 12) * $this->scale);
-				$yoffset = $yoffset + (($day / 30) * ($this->scale/12));
-				$yoffset = floor($yoffset);
-				$place = round($yoffset / $this->bheight);
-				$i=1;
-				$j=0;
-				$tyoffset = 0;
-				while(isset($placements[$place])) {
-					if ($i==$j) {
-						$tyoffset = $this->bheight * $i;
-						$i++;
-					}
-					else {
-						$tyoffset = -1 * $this->bheight * $j;
-						$j++;
-					}
-	
-					$place = round(($yoffset+$tyoffset) / ($this->bheight));
-				}
-				$yoffset += $tyoffset;
-				$xoffset += abs($tyoffset);
-				$placements[$place] = $yoffset;
-				//-- do not print hebrew dates
-				if (($date[0]["year"]!=0)&&(stristr($date[0]["ext"], "hebrew")===false)) {
-					print "\n\t\t<div id=\"fact$factcount\" style=\"position:absolute; ".($TEXT_DIRECTION =="ltr"?"left: ".($xoffset):"right: ".($xoffset))."px; top:".($yoffset)."px; font-size: 8pt; height: ".($this->bheight)."px; \" onmousedown=\"factMD(this, '".$factcount."', ".($yoffset-$tyoffset).");\">\n";
-					print "<table cellspacing=\"0\" cellpadding=\"0\" border=\"0\" style=\"cursor: hand;\"><tr><td>\n";
-					print "<img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["hline"]["other"]."\" name=\"boxline$factcount\" id=\"boxline$factcount\" height=\"3\" align=\"left\" hspace=\"0\" width=\"10\" vspace=\"0\" alt=\"\" />\n";
-					$col = $factitem["p"] % 6;
-					print "</td><td valign=\"top\" class=\"person".$col."\">\n";
-					if (count($this->pids) > 6)print GetPersonName($factitem["pid"])." - ";
-					if (defined("GM_FACT_".$fact)) print constant("GM_FACT_".$fact);
-					else if (isset($gm_lang[$fact])) print $gm_lang[$fact];
-					else print $fact;
-					print "--";
-					print "<span class=\"date\">".GetChangedDate($datestr)."</span> ";
-					if (!empty($desc)) print $desc." ";
-					if (GedcomConfig::$SHOW_PEDIGREE_PLACES > 0) {
-						$pct = preg_match("/2 PLAC (.*)/", $factrec, $match);
-						if ($pct>0) {
-							print " - ";
-							$plevels = preg_split("/,/", $match[1]);
-							for($plevel=0; $plevel < GedcomConfig::$SHOW_PEDIGREE_PLACES; $plevel++) {
-								if (!empty($plevels[$plevel])) {
-									if ($plevel>0) print ", ";
-									print PrintReady($plevels[$plevel]);
-								}
-							}
-						}
-					}
-					$age = GetAge(FindPersonRecord($factitem["pid"]), $datestr);
-					if (!empty($age)) print $age;
-					//-- print spouse name for marriage events
-					$ct = preg_match("/1 _GMS @(.*)@/", $factrec, $match);
-					if ($ct>0) {
-						$spouse=$match[1];
-						if ($spouse!=="") {
-							for($p=0; $p<count($this->pids); $p++) {
-								if ($this->pids[$p]==$spouse) break;
-							}
-							if ($p==count($this->pids)) $p = $factitem["p"];
-							$col = $p % 6;
-							print " <span class=\"person$col\"> <a href=\"individual.php?pid=$spouse&amp;gedid=$GEDCOMID\">";
-							if (PrivacyFunctions::displayDetailsByID($spouse)||PrivacyFunctions::showLivingNameByID($spouse)) print GetPersonName($spouse);
-							else print $gm_lang["private"];
-							print "</a> </span>";
-						}
-					}
-					print "</td></tr></table>\n";
-					print "</div>";
-					if ($TEXT_DIRECTION=='ltr') {
-						$img = "dline2";
-						$ypos = "0%";
-					}
-					else {
-						$img = "dline";
-						$ypos = "100%";
-					}
-					$dyoffset = ($yoffset-$tyoffset)+$this->bheight/3;
-					if ($tyoffset<0) {
-						$dyoffset = $yoffset+$this->bheight/3;
-						if ($TEXT_DIRECTION=='ltr') {
-							$img = "dline";
-							$ypos = "100%";
-						}
-						else {
-							$img = "dline2";
-							$ypos = "0%";
-						}
-					}
-					//-- print the diagnal line
-					print "\n\t\t<div id=\"dbox$factcount\" style=\"position:absolute; ".($TEXT_DIRECTION =="ltr"?"left: ".($basexoffset+20):"right: ".($basexoffset+20))."px; top:".($dyoffset)."px; font-size: 8pt; height: ".(abs($tyoffset))."px; width: ".(abs($tyoffset))."px;";
-					print " background-image: url('".GM_IMAGE_DIR."/".$GM_IMAGES[$img]["other"]."');";
-					print " background-position: 0% $ypos; \" >\n";
-					print "</div>\n";
-				}
-			}
+		$factobj = $factitem[1];
+		//-- check if this is a family fact
+		$ct = preg_match("/1 _GMFS @(.*)@/", $factobj->factrec, $fmatch);
+		if ($ct>0) {
+			$famid = trim($fmatch[1]);
+			//-- if we already showed this family fact then don't print it
+			if (isset($this->familyfacts[$famid.$factobj->fact]) && $this->familyfacts[$famid.$factobj->fact] != $factitem["p"]) return;
+			$this->familyfacts[$famid.$factobj->fact] = $factitem["p"];
 		}
-	}
-}
-// -- end of class
-//-- load a user extended class if one exists
-if (file_exists('includes/controllers/timeline_ctrl_user.php'))
-{
-	include_once 'includes/controllers/timeline_ctrl_user.php';
-}
-else
-{
-	class TimelineController extends TimelineControllerRoot
-	{
+		$date = ParseDate($factobj->datestring);
+		$year = $date[0]["year"];
+	
+		$month = $date[0]["mon"];
+		$day = $date[0]["day"];
+		$xoffset = $basexoffset+20;
+		$yoffset = $baseyoffset+(($year-$this->baseyear) * $this->scale)-($this->scale);
+		$yoffset = $yoffset + (($month / 12) * $this->scale);
+		$yoffset = $yoffset + (($day / 30) * ($this->scale/12));
+		$yoffset = floor($yoffset);
+		$place = round($yoffset / $this->bheight);
+		$i=1;
+		$j=0;
+		$tyoffset = 0;
+		while(isset($this->placements[$place])) {
+			if ($i==$j) {
+				$tyoffset = $this->bheight * $i;
+				$i++;
+			}
+			else {
+				$tyoffset = -1 * $this->bheight * $j;
+				$j++;
+			}
+			$place = round(($yoffset+$tyoffset) / ($this->bheight));
+		}
+		$yoffset += $tyoffset;
+		$xoffset += abs($tyoffset);
+		$this->placements[$place] = $yoffset;
+		//-- do not print hebrew dates
+		if (($date[0]["year"]!=0)&&(stristr($date[0]["ext"], "hebrew")===false)) {
+			$thisperson =& $factobj->owner;
+			print "\n\t\t<div id=\"fact$factcount\" style=\"position:absolute; ".($TEXT_DIRECTION =="ltr"?"left: ".($xoffset):"right: ".($xoffset))."px; top:".($yoffset)."px; font-size: 8pt; height: ".($this->bheight)."px; \" onmousedown=\"factMD(this, '".$factcount."', ".($yoffset-$tyoffset).");\">\n";
+			print "<table cellspacing=\"0\" cellpadding=\"0\" border=\"0\" style=\"cursor: hand;\"><tr><td>\n";
+			print "<img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["hline"]["other"]."\" name=\"boxline$factcount\" id=\"boxline$factcount\" height=\"3\" align=\"left\" hspace=\"0\" width=\"10\" vspace=\"0\" alt=\"\" />\n";
+			$col = $factitem["p"] % 6;
+			print "</td><td valign=\"top\" class=\"person".$col."\">\n";
+			if (count($this->pids) > 6)	print $thisperson->name." - ";
+			print $factobj->descr;
+			print "--";
+			print "<span class=\"date\">".GetChangedDate($factobj->datestring)."</span> ";
+			if (GedcomConfig::$SHOW_PEDIGREE_PLACES > 0) {
+				$factobj->PrintFactPlace(false, false, false, true);
+			}
+			$age = $thisperson->GetAge($factobj->datestring);
+			if (!empty($age)) print $age;
+			//-- print spouse name for marriage events
+			$ct = preg_match("/1 _GMS @(.*)@/", $factobj->factrec, $match);
+			if ($ct > 0) {
+				$spouse = $match[1];
+				if ($spouse != "") {
+					for($p = 0; $p < count($this->pids); $p++) {
+						if ($this->pids[$p] == $spouse) break;
+					}
+					if ($p == count($this->pids)) $p = $factitem["p"];
+					$col = $p % 6;
+					$spouse =& Person::GetInstance($spouse);
+					print " <span class=\"person".$col."\"> <a href=\"individual.php?pid=".$spouse->xref."&amp;gedid=".$spouse->gedcomid."\">";
+					print $spouse->name;
+					print "</a> </span>";
+				}
+			}
+			print "</td></tr></table>\n";
+			print "</div>";
+			if ($TEXT_DIRECTION=='ltr') {
+				$img = "dline2";
+				$ypos = "0%";
+			}
+			else {
+				$img = "dline";
+				$ypos = "100%";
+			}
+			$dyoffset = ($yoffset-$tyoffset)+$this->bheight/3;
+			if ($tyoffset<0) {
+				$dyoffset = $yoffset+$this->bheight/3;
+				if ($TEXT_DIRECTION=='ltr') {
+					$img = "dline";
+					$ypos = "100%";
+				}
+				else {
+					$img = "dline2";
+					$ypos = "0%";
+				}
+			}
+			//-- print the diagnal line
+			print "\n\t\t<div id=\"dbox$factcount\" style=\"position:absolute; ".($TEXT_DIRECTION =="ltr"?"left: ".($basexoffset+20):"right: ".($basexoffset+20))."px; top:".($dyoffset)."px; font-size: 8pt; height: ".(abs($tyoffset))."px; width: ".(abs($tyoffset))."px;";
+			print " background-image: url('".GM_IMAGE_DIR."/".$GM_IMAGES[$img]["other"]."');";
+			print " background-position: 0% $ypos; \" >\n";
+			print "</div>\n";
+		}
 	}
 }
 ?>

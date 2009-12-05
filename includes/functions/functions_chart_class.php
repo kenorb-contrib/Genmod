@@ -185,10 +185,12 @@ abstract class ChartFunctions {
 	 * @param string $rootid
 	 * @return array $treeid
 	 */
-	public function PedigreeArray($rootid, $num_gens) {
+	public function PedigreeArray($rootid, $num_gens, $gens_split=-1) {
 		
 		// -- maximum size of the id array is 2^$PEDIGREE_GENERATIONS - 1
 		$treesize = pow(2, (int)($num_gens))-1;
+		if ($gens_split == -1) $gens_split = $treesize;
+		else $gens_split = pow(2, (int)($gens_split))-1;
 	
 		$treeid = array();
 		$treeid[0] = $rootid;
@@ -198,7 +200,6 @@ abstract class ChartFunctions {
 				print " ";
 				$person =& Person::GetInstance($treeid[$i]);
 				$famids = $person->childfamilies;
-				// $famids = FindFamilyIds($treeid[$i]);
 				if (count($famids) > 0) {
 					$parents = false;
 					$wife = null;
@@ -206,7 +207,7 @@ abstract class ChartFunctions {
 					// First see if there is a primary family
 					foreach($famids as $famid=>$family) {
 						if (is_object($family) && $family->showprimary) {
-							$wife = $family->wife;
+							if ($i < $gens_split) $wife = $family->wife;
 							$husb = $family->husb;
 							if (is_object($wife) || is_object($husb)) {
 								$parents = true;
@@ -218,7 +219,7 @@ abstract class ChartFunctions {
 					if (!$parents) {
 						foreach($famids as $famid=>$family) {
 							if (is_object($family)) {
-								$wife = $family->wife;
+								if ($i < $gens_split)$wife = $family->wife;
 								$husb = $family->husb;
 								if (is_object($wife) || is_object($husb)) {
 									$parents = true;
@@ -249,7 +250,7 @@ abstract class ChartFunctions {
 			$num_gens = ceil(log($i + 2) / log(2));
 			if ($num_gens < 2) $num_gens = 2;
 		}
-	
+		//print_r($treeid);
 		return $treeid;
 	}
 	

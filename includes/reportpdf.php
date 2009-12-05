@@ -30,7 +30,7 @@
 if (stristr($_SERVER["SCRIPT_NAME"],basename(__FILE__))) {
 	require "../intrusion.php";
 }
-}
+
 
 define('FPDF_FONTPATH','fonts/');
 
@@ -1599,7 +1599,7 @@ function GMRTextEHandler() {
 
 function GMRGetPersonNameSHandler($attrs) {
 	global $currentElement, $vars, $gedrec, $gedrecStack, $gm_lang;
-.
+
 	$showIndID = GedcomConfig::$SHOW_ID_NUMBERS; // false, 0, "0", NOT "false"
 	if (isset($vars["showIndID"]["id"])) $showIndID = $vars["showIndID"]["id"];
 	if ($showIndID) { // can override showing
