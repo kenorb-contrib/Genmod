@@ -479,7 +479,7 @@ print "<form enctype=\"multipart/form-data\" method=\"post\" name=\"configform\"
 						$l_placecleanup = false;
 						$l_datecleanup=false;
 						$l_isansi = false;
-						/print_r($GEDCOMS);
+						//print_r($GEDCOMS);
 						$fp = fopen($GEDCOMS[$gedid]["path"], "r");
 						if (!$fp) {
 							print "error opening file ".$GEDCOMS[$gedid]["path"];

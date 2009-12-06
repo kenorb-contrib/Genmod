@@ -191,7 +191,7 @@ class FamilyController extends DetailController
 			// edit_fam / edit_raw
 			if ($gm_user->userCanEditGedlines()) {
 				$submenu = new Menu($gm_lang['edit_raw']);
-				$submenu->addLink("edit_raw('".$this->family->xref."', 'edit_raw');");
+				$submenu->addLink("edit_raw('".$this->family->xref."', 'edit_raw', 'FAM');");
 				$menu->addSubmenu($submenu);
 			}
 		}

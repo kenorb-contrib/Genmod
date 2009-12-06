@@ -83,9 +83,10 @@ abstract class AdminFunctions {
 	// The standard PHP function only checks for the R/O attribute and doesn't
 	// detect authorisation by ACL.
 	public function FileIsWriteable($file) {
+
 		$err_write = false;
 		$handle = @fopen($file,"r+");
-		if	($handle)	{
+		if ($handle) {
 			$i = fclose($handle);
 			$err_write = true;
 		}

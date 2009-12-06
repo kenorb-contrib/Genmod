@@ -151,7 +151,7 @@ $controller->CheckRawEdited();
 		<?php 
 	}
 	// Print indi counter only if displaying a non-private person
-	if(GedcomConfig::$SHOW_COUNTER) print "\n<br /><br /><div style=\"margin-left: 3px; width: 100%;\">".$gm_lang["hit_count"]."&nbsp;".$hits."</div>\n";
+	if(GedcomConfig::$SHOW_COUNTER) print "\n<br /><br /><div style=\"margin-left: 3px; width: 100%; clear:both;\">".$gm_lang["hit_count"]."&nbsp;".$hits."</div>\n";
 	
 print "</div><br />";
 

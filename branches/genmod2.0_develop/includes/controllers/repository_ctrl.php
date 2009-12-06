@@ -99,7 +99,7 @@ class RepositoryController extends DetailController {
 			// edit repo / edit_raw
 			if ($gm_user->userCanEditGedlines()) {
 				$submenu = new Menu($gm_lang['edit_raw']);
-				$submenu->addLink("edit_raw('".$this->repo->xref."', 'edit_raw');");
+				$submenu->addLink("edit_raw('".$this->repo->xref."', 'edit_raw', 'REPO');");
 				$menu->addSubmenu($submenu);
 			}
 

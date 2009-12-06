@@ -77,6 +77,9 @@ class Repository extends GedcomRecord {
 			case "title":
 				return $this->GetTitle();
 				break;
+			case "name":
+				return $this->GetTitle();
+				break;
 			default:
 				return parent::__get($property);
 				break;

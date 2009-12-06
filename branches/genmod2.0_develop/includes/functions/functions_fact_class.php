@@ -918,7 +918,7 @@ abstract class FactFunctions {
 			$menu["labelpos"] = "right";
 			$menu["icon"] = "";
 			$menu["link"] = "#";
-			$menu["onclick"] = "return edit_record('".$factobj->owner->xref."', '".$factobj->fact."', '".$factobj->count."', '".$edit_actions[0]."', '".$factobj->owner->datatype."');";
+			$menu["onclick"] = "return edit_record('".$factobj->owner->xref."', '".$factobj->fact."', '".$factobj->count."', '".$edit_actions[0]."', '".$factobj->owner_type."');";
 			$menu["class"] = "";
 			$menu["hoverclass"] = "";
 			$menu["flyout"] = "down";
@@ -928,7 +928,7 @@ abstract class FactFunctions {
 			$submenu["label"] = $gm_lang["edit"];
 			$submenu["labelpos"] = "right";
 			$submenu["icon"] = "";
-			$submenu["onclick"] = "return edit_record('".$factobj->owner->xref."', '".$factobj->fact."', '".$factobj->count."', '".$edit_actions[1]."', '".$factobj->owner->datatype."');";
+			$submenu["onclick"] = "return edit_record('".$factobj->owner->xref."', '".$factobj->fact."', '".$factobj->count."', '".$edit_actions[1]."', '".$factobj->owner_type."');";
 			$submenu["link"] = "#";
 			$submenu["class"] = "submenuitem";
 			$submenu["hoverclass"] = "submenuitem_hover";
@@ -938,7 +938,7 @@ abstract class FactFunctions {
 				$submenu["label"] = $gm_lang["copy"];
 				$submenu["labelpos"] = "right";
 				$submenu["icon"] = "";
-				$submenu["onclick"] = "return copy_record('".$factobj->owner->xref."', '".$factobj->fact."', '".$factobj->count."', '".$edit_actions[2]."', '".$factobj->owner->datatype."');";
+				$submenu["onclick"] = "return copy_record('".$factobj->owner->xref."', '".$factobj->fact."', '".$factobj->count."', '".$edit_actions[2]."', '".$factobj->owner_type."');";
 				$submenu["link"] = "#";
 				$submenu["class"] = "submenuitem";
 				$submenu["hoverclass"] = "submenuitem_hover";
@@ -949,7 +949,7 @@ abstract class FactFunctions {
 			$submenu["labelpos"] = "right";
 			$submenu["icon"] = "";
 //			$submenu["onclick"] = "return delete_record('".$factobj->owner->xref."', '".$factobj->fact."', '$count', '".$edit_actions[3]."');";
-			$submenu["onclick"] = "if (confirm('".$gm_lang["check_delete"]."')) return delete_record('".$factobj->owner->xref."', '".$factobj->fact."', '".$factobj->count."', '".$edit_actions[3]."', '".$factobj->owner->datatype."'); else return false;";
+			$submenu["onclick"] = "if (confirm('".$gm_lang["check_delete"]."')) return delete_record('".$factobj->owner->xref."', '".$factobj->fact."', '".$factobj->count."', '".$edit_actions[3]."', '".$factobj->owner_type."'); else return false;";
 			$submenu["link"] = "#";
 			$submenu["class"] = "submenuitem";
 			$submenu["hoverclass"] = "submenuitem_hover";

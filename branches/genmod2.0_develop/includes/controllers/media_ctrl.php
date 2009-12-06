@@ -96,7 +96,7 @@ class MediaController extends DetailController {
 			// edit media / edit_raw
 			if ($gm_user->userCanEditGedlines()) {
 				$submenu = new Menu($gm_lang['edit_raw']);
-				$submenu->addLink("edit_raw('".$this->media->xref."', 'edit_raw');");
+				$submenu->addLink("edit_raw('".$this->media->xref."', 'edit_raw', 'OBJE');");
 				$menu->addSubmenu($submenu);
 			}
 
