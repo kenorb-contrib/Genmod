@@ -88,7 +88,7 @@ function print_recent_changes($block=true, $config="", $side, $index) {
 		foreach($found_facts as $index=>$factarr) {
 			if ($factarr[2]=="INDI") {
 				$person =& Person::GetInstance($factarr[0]);
-				$fact = New Fact($person->xref, $factarr[3], $factarr[1]);
+				$fact = New Fact($person->xref, "INDI", $factarr[3], $factarr[1]);
 				if ($lastgid != $person->xref) {
 					print "<a href=\"individual.php?pid=".$person->xref."&amp;gedid=".$person->gedcomid."\"><b>";
 					print $person->revname;
@@ -114,7 +114,7 @@ function print_recent_changes($block=true, $config="", $side, $index) {
 
 			if ($factarr[2]=="FAM") {
 				$family =& Family::GetInstance($factarr[0]);
-				$fact = New Fact($family->xref, $factarr[3], $factarr[1]);
+				$fact = New Fact($family->xref, "FAM", $factarr[3], $factarr[1]);
 				if ($lastgid != $family->xref) {
 					print "<a href=\"family.php?famid=".$family->xref."&amp;gedid=".$family->gedcomid."\"><b>";
 					print $family->sortable_name;
@@ -135,7 +135,7 @@ function print_recent_changes($block=true, $config="", $side, $index) {
 
 			if ($factarr[2]=="SOUR") {
 				$source =& Source::GetInstance($factarr[0]);
-				$fact = New Fact($source->xref, $factarr[3], $factarr[1]);
+				$fact = New Fact($source->xref, "SOUR", $factarr[3], $factarr[1]);
 				if ($lastgid != $source->xref) {
 					print "<a href=\"source.php?sid=".$source->xref."&amp;gedid=".$source->gedcomid."\"><b>";
 					print $source->descriptor;
@@ -156,7 +156,7 @@ function print_recent_changes($block=true, $config="", $side, $index) {
 
 			if ($factarr[2]=="REPO") {
 				$repo =& Repository::GetInstance($factarr[0]);
-				$fact = New Fact($repo->xref, $factarr[3], $factarr[1]);
+				$fact = New Fact($repo->xref, "REPO", $factarr[3], $factarr[1]);
 				if ($lastgid != $repo->xref) {
 					print "<a href=\"repo.php?rid=".$repo->xref."&amp;gedid=".$repo->gedcomid."\"><b>";
 					print $repo->descriptor;
@@ -176,7 +176,7 @@ function print_recent_changes($block=true, $config="", $side, $index) {
 			}
 			if ($factarr[2]=="OBJE") {
 				$media =& MediaItem::GetInstance($factarr[0]);
-				$fact = New Fact($media->xref, $factarr[3], $factarr[1]);
+				$fact = New Fact($media->xref, "OBJE", $factarr[3], $factarr[1]);
 				if ($lastgid != $media->xref) {
 					print "<a href=\"mediadetail.php?mid=".$media->xref."&amp;gedid=".$media->gedcomid."\"><b>";
 					print $media->title;

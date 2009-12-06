@@ -101,7 +101,7 @@ function print_upcoming_events($block=true, $config="", $side, $index) {
 		$datestamp = $factarr[3];
 		if ($factarr[2]=="INDI") {
 			$person =& Person::GetInstance($factarr[0], "", $GEDCOMID);
-			$fact = new Fact($factarr[0], $factarr[6], $factarr[1]);
+			$fact = new Fact($factarr[0], $factarr[2], $factarr[6], $factarr[1]);
 			$gid = $factarr[0];
 			$factrec = $factarr[1];
 			if ($person->disp && $fact->disp) {
@@ -131,7 +131,7 @@ function print_upcoming_events($block=true, $config="", $side, $index) {
 
 		if ($factarr[2]=="FAM") {
 			$family =& Family::GetInstance($factarr[0], "", $GEDCOMID);
-			$fact = new Fact($factarr[0], $factarr[6], $factarr[1]);
+			$fact = new Fact($factarr[0], $factarr[2], $factarr[6], $factarr[1]);
 			if ($family->disp && $fact->disp) {
 				$text = GetCalendarFact($factarr[1], $action, $filter, $factarr[0]);
 				if ($text!="filter") {
