@@ -350,7 +350,7 @@ class IndividualController extends DetailController {
 				// NOTE: Raw editing
 				if ($gm_user->userCanEditGedlines()) {
 					$submenu = new Menu($gm_lang["edit_raw"]);
-					$submenu->addLink("edit_raw('".$this->xref."', 'edit_raw');");
+					$submenu->addLink("edit_raw('".$this->xref."', 'edit_raw', 'INDI');");
 					$menu->addSubmenu($submenu);
 				}
 			

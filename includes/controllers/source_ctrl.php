@@ -97,7 +97,7 @@ class SourceController extends DetailController {
 			// edit source / edit_raw
 			if ($gm_user->userCanEditGedlines()) {
 				$submenu = new Menu($gm_lang['edit_raw']);
-				$submenu->addLink("edit_raw('".$this->source->xref."', 'edit_raw');");
+				$submenu->addLink("edit_raw('".$this->source->xref."', 'edit_raw', 'SOUR');");
 				$menu->addSubmenu($submenu);
 			}
 

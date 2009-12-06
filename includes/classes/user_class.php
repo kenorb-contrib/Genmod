@@ -117,8 +117,7 @@ class User {
 		if (!is_array($userfields)) {
 			if (!$DBCONN->connected) return false;
 			$username = DbLayer::EscapeQuery($username);
-			$sql = "SELECT * FROM ".TBLPREFIX."users_gedcoms ug RIGHT JOIN ".TBLPREFIX."users u ON BINARY u.u_username = BINARY ug.ug_username WHERE BINARY u_username='".$username."'";
-//			$sql = "SELECT * FROM ".TBLPREFIX."users ";
+			$sql = "SELECT * FROM ".TBLPREFIX."users u LEFT JOIN ".TBLPREFIX."users_gedcoms ug ON BINARY u.u_username = BINARY ug.ug_username WHERE BINARY u.u_username='".$username."'";
 			$res = NewQuery($sql);
 			if ($res===false) return false;
 			if ($res->NumRows()==0) return false;
@@ -143,7 +142,7 @@ class User {
 	}
 
 	private function FillUser($username, $user_data) {
-		global $userobjects;
+		global $userobjects, $MAX_RELATION_PATH_LENGTH, $GEDCOMS;
 		
 		foreach ($user_data as $key => $user_row) {
 			if (empty($this->username) && !empty($username)) {
@@ -176,20 +175,35 @@ class User {
 			}
 		
 			// Now get the rights
-			$ged = $user_row["ug_file"];
-			if (isset($user_row["ug_canedit"])) $this->canedit[$ged] = $user_row["ug_canedit"];
-			if (isset($user_row["ug_privgroup"])) $this->privgroup[$ged] = $user_row["ug_privgroup"];
-			if (isset($user_row["ug_gedcomadmin"])) {
-				if ($user_row["ug_gedcomadmin"] == "Y") $this->gedcomadmin[$ged] = true;
-				else $this->gedcomadmin[$ged] = false;
+			if (!is_null($user_row["ug_file"])) {
+				$ged = $user_row["ug_file"];
+				
+				if (isset($user_row["ug_canedit"])) $this->canedit[$ged] = $user_row["ug_canedit"];
+				if (isset($user_row["ug_privgroup"])) $this->privgroup[$ged] = $user_row["ug_privgroup"];
+				if (isset($user_row["ug_gedcomadmin"])) {
+					if ($user_row["ug_gedcomadmin"] == "Y") $this->gedcomadmin[$ged] = true;
+					else $this->gedcomadmin[$ged] = false;
+				}
+				if (isset($user_row["ug_relationship_privacy"])) $this->relationship_privacy[$ged] = $user_row["ug_relationship_privacy"];
+				if (isset($user_row["ug_max_relation_path"])) $this->max_relation_path[$ged] = $user_row["ug_max_relation_path"];
+				if (isset($user_row["ug_check_marriage_relations"])) $this->check_marriage_relations[$ged] = $user_row["ug_check_marriage_relations"];
+				if (isset($user_row["ug_hide_live_people"])) $this->hide_live_people[$ged] = $user_row["ug_hide_live_people"];
+				if (isset($user_row["ug_show_living_names"])) $this->show_living_names[$ged] = $user_row["ug_show_living_names"];
+				if (isset($user_row["ug_gedcomid"])) $this->gedcomid[$ged] = $user_row["ug_gedcomid"];
+				if (isset($user_row["ug_rootid"])) $this->rootid[$ged] = $user_row["ug_rootid"];
 			}
-			if (isset($user_row["ug_relationship_privacy"])) $this->relationship_privacy[$ged] = $user_row["ug_relationship_privacy"];
-			if (isset($user_row["ug_max_relation_path"])) $this->max_relation_path[$ged] = $user_row["ug_max_relation_path"];
-			if (isset($user_row["ug_check_marriage_relations"])) $this->check_marriage_relations[$ged] = $user_row["ug_check_marriage_relations"];
-			if (isset($user_row["ug_hide_live_people"])) $this->hide_live_people[$ged] = $user_row["ug_hide_live_people"];
-			if (isset($user_row["ug_show_living_names"])) $this->show_living_names[$ged] = $user_row["ug_show_living_names"];
-			if (isset($user_row["ug_gedcomid"])) $this->gedcomid[$ged] = $user_row["ug_gedcomid"];
-			if (isset($user_row["ug_rootid"])) $this->rootid[$ged] = $user_row["ug_rootid"];
+		}
+		foreach ($GEDCOMS as $ged => $settings) {
+			if (!isset($this->gedcomid[$ged])) $this->gedcomid[$ged] = "";
+			if (!isset($this->rootid[$ged])) $this->rootid[$ged] = "";
+			if (!isset($this->canedit[$ged])) $this->canedit[$ged] = "none";
+			if (!isset($this->gedcomadmin[$ged])) $this->gedcomadmin[$ged] = false;
+			if (!isset($this->privgroup[$ged])) $this->privgroup[$ged] = "access";
+			if (!isset($this->relationship_privacy[$ged])) $this->relationship_privacy[$ged] = "";
+			if (!isset($this->max_relation_path[$ged])) $this->max_relation_path[$ged] = $MAX_RELATION_PATH_LENGTH;
+			if (!isset($this->check_marriage_relations[$ged])) $this->check_marriage_relations[$ged] = "";
+			if (!isset($this->hide_live_people[$ged])) $this->hide_live_people[$ged] = "";
+			if (!isset($this->show_living_names[$ged])) $this->show_living_names[$ged] = "";
 		}
 	}
 	

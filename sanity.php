@@ -405,9 +405,10 @@ if (!empty($check_gedcoms)) {
 						if (!$found) {
 							$found = true;
 							print $warn_icon.$gm_lang["sc_ged_unlink"];
+							print "<br />";
 						}
-						print "<br />";
-						print_list_person($row["i_id"], array(GetPersonName($row["i_id"]), $GEDCOMID));
+						$person =& Person::GetInstance($row["i_id"], $row, $GEDCOMID);
+						$person->PrintListPerson();
 					}
 					if ($found) print "<br />";
 				}
@@ -513,7 +514,7 @@ if (!empty($check_gedcoms)) {
 			$numcf = 0; // check for invalid tags
 			$numcn = 0; // check for note references
 			$rightfacts = array("CONT", "CONC");
-			$non_cits_facts = array("CHAN", "NOTE", "SOUR", "FAMS", "FAMC", "_UID", "OBJE", "NAME", "SEX", "CHIL", "HUSB", "WIFE");
+			$non_cits_facts = array("CHAN", "NOTE", "SOUR", "FAMS", "FAMC", "_UID", "OBJE", "NAME", "SEX", "CHIL", "HUSB", "WIFE", "ASSO");
 			
 			// Check for reference to non existing sources for indi's
 			print "<tr><td class=\"shade1 wrap\">";
@@ -533,7 +534,8 @@ if (!empty($check_gedcoms)) {
 								print $error_icon.$gm_lang["sc_inv_sref"];
 							}
 							print "<br />".$gm_lang["source"]." ".$sid."<br />";
-							print_list_person($key, array(GetPersonName($key), $GEDCOMID));
+							$person =& Person::GetInstance($key, $gedlines["gedcom"], $GEDCOMID);
+							$person->PrintListPerson();
 						}
 					}
 				}
@@ -569,7 +571,7 @@ if (!empty($check_gedcoms)) {
 								$type = $match[1];
 								$numnc++;
 								if (stristr($fact, "2 SOUR") == 0 && !in_array($type, $non_cits_facts)) {
-									$no_cits[$key."[".$GEDCOMID."]"] = array($key, $GEDCOMID, "INDI", $type);
+									$no_cits[$key."[".$GEDCOMID."]"] = array($key, $GEDCOMID, "INDI", $type, $gedlines["gedcom"]);
 								}
 							}
 						}
@@ -598,7 +600,8 @@ if (!empty($check_gedcoms)) {
 								print $error_icon.$gm_lang["sc_inv_aref"];
 							}
 							print "<br />".$gm_lang["asso_alia"].": ".$pid."<br />";
-							print_list_person($key, array(GetPersonName($key), $GEDCOMID));
+							$person =& Person::GetInstance($key, $gedlines["gedcom"], $GEDCOMID);
+							$person->PrintListPerson();
 						}
 					}
 				}
@@ -616,7 +619,8 @@ if (!empty($check_gedcoms)) {
 								print $error_icon.$gm_lang["sc_inv_aref"];
 							}
 							print "<br />".$gm_lang["asso_alia"].": ".$pid."<br />";
-							print_list_family($key, array(GetFamilyDescriptor($key), $GEDCOMID));
+							$family =& Family::GetInstance($key, $gedlines["gedcom"], $GEDCOMID);
+							$family->PrintListFamily();
 						}
 					}
 				}
@@ -668,7 +672,7 @@ if (!empty($check_gedcoms)) {
 						foreach($subs as $keyf2 => $sub) {
 							preg_match("/(\d)\s(\w+)[\s.+\r\n|\r\n]/", $sub, $tags);
 							$numcf++;
-							if (isset($tags[2]) && !defined("GM_FACT_".$tags[2]) && !in_array($tags[2],$rightfacts)) $wrongfacts[$tags[2]][] = array($key, $GEDCOMID, "MEDIA", $gedlines["file"], $gedlines["title"]);
+							if (isset($tags[2]) && !defined("GM_FACT_".$tags[2]) && !in_array($tags[2],$rightfacts)) $wrongfacts[$tags[2]][] = array($key, $GEDCOMID, "MEDIA", $gedlines["gedcom"]);
 						}
 					}
 				}
@@ -696,7 +700,8 @@ if (!empty($check_gedcoms)) {
 								print $error_icon.$gm_lang["sc_inv_sref_fam"];
 							}
 							print "<br />".$gm_lang["source"]." ".$sid."<br />";
-							print_list_family($key, array(GetFamilyDescriptor($key), $GEDCOMID));
+							$family =& Family::GetInstance($key, $gedlines["gedcom"], $GEDCOMID);
+							$family->PrintListFamily();
 						}
 					}
 				}
@@ -732,7 +737,7 @@ if (!empty($check_gedcoms)) {
 								$ft = preg_match("/^1\s(\w+)/", $fact, $match);
 								$type = $match[1];
 								if (stristr($fact, "2 SOUR") == 0 && !in_array($type, $non_cits_facts)) {
-									$no_cits[$key."[".$GEDCOMID."]"] = array($key, $GEDCOMID, "FAM", $gedlines["gedcom"], $type);
+									$no_cits[$key."[".$GEDCOMID."]"] = array($key, $GEDCOMID, "FAM", $type, $gedlines["gedcom"]);
 									$numnc++;
 									$inames = true;
 								}
@@ -820,8 +825,6 @@ if (!empty($check_gedcoms)) {
 					print "<br />";
 					$source =& Source::GetInstance($key, $sourcelist[$key]["gedcom"], $GEDCOMID);
 					$source->PrintListSource();
-//					$srec = FindSourceRecord($key, $GEDCOMID);
-//					print_list_source($key, $sourcelist[$key]);
 				}
 			}
 			if (!$error) print $info_icon.$gm_lang["sc_ok_sour_repo_ref"]." ";
@@ -862,7 +865,7 @@ if (!empty($check_gedcoms)) {
 						print $warn_icon.$gm_lang["sc_unu_rref"];
 					}
 					print "<br />";
-					$repo = Repository::GetInstance($rid, $value["gedcom"], $GEDCOMID);
+					$repo =& Repository::GetInstance($rid, $value["gedcom"], $GEDCOMID);
 					$repo->PrintListRepository(true, 1, false);
 				}
 				$s = preg_match_all("/\n\d NOTE @(.+)@/", $value["gedcom"], $match);
@@ -903,21 +906,25 @@ if (!empty($check_gedcoms)) {
 					foreach ($wrongfacts as $fact => $records) {
 						print $gm_lang["sc_facttag"]." ".$fact."<br />";
 						foreach ($records as $key => $wfact) {
-							if ($wfact[2] == "INDI") print_list_person($wfact[0], array(GetPersonName($wfact[0]), $wfact[1]));
-							else if ($wfact[2] == "FAM") print_list_family($wfact[0], array(GetFamilyDescriptor($wfact[0], false, $wfact[3]), $wfact[1]));
+							if ($wfact[2] == "INDI") {
+								$person =& Person::GetInstance($wfact[0], "", $wfact[1]);
+								$person->PrintListPerson();
+							}
+							else if ($wfact[2] == "FAM") {
+								$family =& Family::GetInstance($wfact[0], $wfact[3], $wfact[1]);
+								$family->PrintListFamily();
+							}
 							else if ($wfact[2] == "SOUR") {
 								$source =& Source::GetInstance($wfact[0], $sourcelist[$wfact[0]]["gedcom"], $wfact[1]);
 								$source->PrintListSource();
 							}
 							else if ($wfact[2] == "REPO") {
-								$repo = Repository::GetInstance($key, $wfact[3], $wfact[1]);
+								$repo =& Repository::GetInstance($key, $wfact[3], $wfact[1]);
 								$repo->PrintListRepository(true, 1, false);
 							}
 							else if ($wfact[2] == "MEDIA") {
-			    				print "<a href=\"mediadetail.php?mid=".$wfact[0]."&amp;gedid=".$GEDCOMID."\">";
-				    			if (!empty($wfact[4])) print $wfact[4];
-				    			else print $wfact[3];
-				    			print "</a><br />";
+								$media =& MediaItem::GetInstance($wfact[0], $wfact[3], $wfact[1]);
+								$media->PrintListMedia();
 							}
 						}
 						print "<br />";
@@ -935,9 +942,17 @@ if (!empty($check_gedcoms)) {
 				else {
 					print $warn_icon.$gm_lang["sc_hasno_cits"]."<br />";
 					foreach ($no_cits as $key => $rec) {
-						if ($rec[2] == "INDI") print_list_person($rec[0], array(GetPersonName($rec[0]), ""), false, "", true, $rec[3]);
-						else if ($rec[2] == "FAM") print_list_family($rec[0], array(GetFamilyDescriptor($rec[0], false, $rec[3]), $rec[1]), false, "", true, $rec[4]);
-						else print_r($rec);
+						if ($rec[2] == "INDI") {
+							$person =& Person::GetInstance($rec[0], $rec[4], $rec[1]);
+							$person->PrintListPerson(true, false, $rec[3]);
+						}
+						else if ($rec[2] == "FAM") {
+							$family =& Family::GetInstance($rec[0], $rec[4], $rec[1]);
+							$family->PrintListFamily(true, $rec[3]);
+						}
+						else {
+							print_r($rec);
+						}
 					}
 					print "<br />";
  				}			
@@ -983,7 +998,8 @@ if (!empty($check_gedcoms)) {
 									print $warn_icon.$gm_lang["sc_order_fam"]."<br />";
 								}
 								if (!$printed) {
-									print_list_family($key, array(GetFamilyDescriptor($key), $GEDCOMID));
+									$family =& Family::GetInstance($key, $fam["gedcom"], $GEDCOMID);
+									$family->PrintListFamily();
 									$printed = true;
 								}
 							}
@@ -1025,7 +1041,8 @@ if (!empty($check_gedcoms)) {
 						$error = true;
 						print $error_icon.$gm_lang["sc_empty_fam"]."<br />";
 					}
-					print_list_family($key, array(GetFamilyDescriptor($key), $GEDCOMID));
+					$family =& Family::GetInstance($key, $cfam["gedcom"], $GEDCOMID);
+					$family->PrintListFamily();
 				}
 			}
 			if (!$error) print $info_icon.$gm_lang["sc_ok_empty_fam"]." ";
@@ -1159,7 +1176,8 @@ if (!empty($check_gedcoms)) {
 								print $error_icon.$gm_lang["sc_inv_mref"];
 							}
 							print "<br />".$gm_lang["sc_media"]." ".$mid."<br />";
-							print_list_person($key, array(GetPersonName($key), $GEDCOMID));
+							$person =& Person::GetInstance($key, $gedlines["gedcom"], $GEDCOMID);
+							$person->PrintListPerson();
 						}
 					}
 				}
@@ -1187,7 +1205,8 @@ if (!empty($check_gedcoms)) {
 								print $error_icon.$gm_lang["sc_inv_mref_fam"];
 							}
 							print "<br />".$gm_lang["sc_media"]." ".$mid."<br />";
-							print_list_family($key, array(GetFamilyDescriptor($key), $GEDCOMID));
+							$family =& Family::GetInstance($key, $gedlines["gedcom"], $GEDCOMID);
+							$family->PrintListFamily();
 						}
 					}
 				}
@@ -1244,7 +1263,7 @@ if (!empty($check_gedcoms)) {
 								print $error_icon.$gm_lang["sc_inv_mref_repo"];
 							}
 							print "<br />".$gm_lang["sc_media"]." ".$mid."<br />";
-							$repo = Repository::GetInstance($key, $repo["gedcom"], $GEDCOMID);
+							$repo =& Repository::GetInstance($key, $repo["gedcom"], $GEDCOMID);
 							$repo->PrintListRepository(true, 1, false);
 						}
 					}
@@ -1387,12 +1406,14 @@ if (!empty($check_gedcoms)) {
 				foreach ($inv_noteref as $type => $keys) {
 					if ($type == "INDI") {
 						foreach ($keys as $key => $nothing) {
-							print_list_person($key, array(GetPersonName($key), $GEDCOMID));
+							$person =& Person::GetInstance($key, $indilist[$key]["gedcom"], $GEDCOMID);
+							$person->PrintListPerson();
 						}
 					}
 					if ($type == "FAM") {
 						foreach ($keys as $key => $nothing) {
-							print_list_family($key, array(GetFamilyDescriptor($key), $GEDCOMID));
+							$family =& Family::GetInstance($key, $cfamlist[$key]["gedcom"], $GEDCOMID);
+							$family->PrintListFamily();
 						}
 					}
 					if ($type == "SOUR") {
@@ -1403,13 +1424,13 @@ if (!empty($check_gedcoms)) {
 					}
 					if ($type == "REPO") {
 						foreach ($keys as $key => $nothing) {
-							$repo = Repository::GetInstance($key, $crepolist[$key]["gedcom"], $GEDCOMID);
+							$repo =& Repository::GetInstance($key, $crepolist[$key]["gedcom"], $GEDCOMID);
 							$repo->PrintListRepository(true, 1, false);
 						}
 					}
 					if ($type == "OBJE") {
 						foreach ($keys as $key => $nothing) {
-							$media = MediaItem::GetInstance($key, $cmedialist[$key]["gedcom"], $cmedialist[$key]["gedfile"]);
+							$media =& MediaItem::GetInstance($key, $cmedialist[$key]["gedcom"], $cmedialist[$key]["gedfile"]);
 							$media->PrintListMedia();
 						}
 					}
@@ -1432,7 +1453,7 @@ if (!empty($check_gedcoms)) {
 					}
 					print "<br />";
 					$note =& Note::GetInstance($oid);
-					print "<a href=\"note.php?oid=".$oid."&amp;gedid=".$GEDCOMID."\">".$note->GetTitle(40, true)." (".$oid.")</a>";
+					$note->PrintListNote(40);
 				}
 			}
 			if (!$error) print $info_icon.$gm_lang["sc_ok_all_nref"]." ";
@@ -1452,7 +1473,7 @@ if (!empty($check_filesys)) {
 	
 		// Root dir
 		print "<tr><td class=\"shade1 wrap\">".$gm_lang["sc_fs_main"]."</td><td class=\"shade1 wrap\">";
-		$dir = "/"; // From PHP5 dir will not read ./ as the current dir. The dot is removed here.
+		$dir = "includes/.."; // From PHP5 dir will not read ./ as the current dir. A workaround is to name a subdirectory and point back to the parent.
 		$errors1 = false;
 		if (MediaFS::DirIsWritable($dir, false)) {
 			print $error_icon.$gm_lang["sc_fs_main_error"]."<br />";
@@ -1466,12 +1487,12 @@ if (!empty($check_filesys)) {
 			while (false !== ($entry = $d->read())) {
 				if(!is_dir($entry) && $entry != ".") {
 					$num++;
-					if (AdminFunctions::FileIsWriteable($d->path."/".$entry)) {
+					if (AdminFunctions::FileIsWriteable(basename($d->path."/".$entry))) {
 						if (!$errors2) {
 							print $error_icon.$gm_lang["sc_fs_filesrw"]."<br />";
 							$errors2 = true;
 						}
-						print $dir.$entry."<br />";
+						print basename($d->path."/".$entry)."<br />";
 					}
 				}
 			}

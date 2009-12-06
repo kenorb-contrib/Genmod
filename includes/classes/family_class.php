@@ -41,6 +41,7 @@ class Family extends GedcomRecord {
 	private $sortable_addname = null;		// Printable and sortable addname of the family, after applying privacy (can be blank)
 	public $label = null;					// Label set in the person class as a specific label for this family of the person
 	private $title = null;					// Printable name for the family in normal order
+	private $name = null;
 	private $descriptor = null;				// Same as title
 	private $adddescriptor = null;			// Printable addname, names in order firstname lastname
 		
@@ -178,6 +179,9 @@ class Family extends GedcomRecord {
 				break;
 			case "label":
 				return $this->label;
+				break;
+			case "name":
+				return $this->GetTitle();
 				break;
 			case "title":
 				return $this->GetTitle();
@@ -494,7 +498,7 @@ class Family extends GedcomRecord {
 
 			$subrecord = GetSubRecord(1, "1 DIV", $this->gedrec);
 			if (!empty($subrecord) && PrivacyFunctions::showFact("DIV", $this->xref, "FAM") && !PrivacyFunctions::FactViewRestricted($this->xref, $subrecord, 2)) {
-				$this->div_fact = new Fact($this->xref, "DIV", $subrecord);
+				$this->div_fact = new Fact($this->xref, $this->datatype, "DIV", $subrecord);
 				$this->div_date = $this->div_fact->simpledate;
 			}
 			else {
@@ -514,7 +518,7 @@ class Family extends GedcomRecord {
 
 		$subrecord = GetSubRecord(1, "1 MARR", $this->gedrec);
 		if (!empty($subrecord) && PrivacyFunctions::showFact("MARR", $this->xref, "FAM") && !PrivacyFunctions::FactViewRestricted($this->xref, $subrecord, 2)) {
-			$this->marr_fact = new Fact($this->xref, "MARR", $subrecord);
+			$this->marr_fact = new Fact($this->xref, $this->datatype, "MARR", $subrecord);
 			$this->marr_date = $this->marr_fact->simpledate;
 			$this->marr_type = $this->marr_fact->simpletype;
 			$this->marr_plac = $this->marr_fact->simpleplace;
@@ -592,7 +596,7 @@ class Family extends GedcomRecord {
 		}
 	}
 	
-	public function PrintListFamily($useli=true) {
+	public function PrintListFamily($useli=true, $fact="") {
 		global $gm_lang;
 		
 		if (!$this->DisplayDetails()) return false;
@@ -610,6 +614,12 @@ class Family extends GedcomRecord {
 			$this->marr_fact->PrintFactDate();
 			$this->marr_fact->PrintFactPlace();
 			print "</i>";
+		}
+		if (!empty($fact)) {
+			print " <i>(";
+			if (defined("GM_FACT_".$fact)) print constant("GM_FACT_".$fact);
+			else print $fact;
+			print ")</i>";
 		}
 		print "</a>\n";
 		if ($useli) print "</li>\n";

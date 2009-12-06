@@ -441,7 +441,7 @@ class Person extends GedcomRecord {
 							if (is_object($fam->$spperson)) $subrecord.="1 _GMS @".$fam->$spperson->xref."@\r\n";
 							$subrecord.="1 _GMFS @".$fam->xref."@\r\n";
 if ($this->tracefacts) print "AddFamilyFacts - Adding for ".$fam->xref.": ".$factobj->fact." ".$subrecord."<br />";
-							$this->facts[] = new fact($this->xref, $factobj->fact, $subrecord, $count_facts[$factobj->fact], $factobj->style);
+							$this->facts[] = new fact($this->xref, $this->datatype, $factobj->fact, $subrecord, $count_facts[$factobj->fact], $factobj->style);
 						}
 					}
 				}
@@ -487,7 +487,7 @@ if ($this->tracefacts) print "AddFamilyFacts - Adding for ".$fam->xref.": ".$fac
 							$factrec .= "\n2 ASSO @".$fam->husb->xref."@";
 							$factrec .= "\n3 RELA ".(GetSosaName($sosa*2));
 	if ($this->tracefacts) print "AddParentsFacts sosa ".$sosa."- Adding for ".$fam->xref.": ".$fact." ".$factrec."<br />";
-							$this->facts[] = new Fact($this->xref, "X$fact", $factrec, 0, "");
+							$this->facts[] = new Fact($this->xref, $this->datatype, "X$fact", $factrec, 0, "");
 						}
 					}
 					if ($sosa==1) $this->AddStepSiblingsFacts($fam->husb, $fam->xref); // stepsiblings with father
@@ -505,7 +505,7 @@ if ($this->tracefacts) print "AddFamilyFacts - Adding for ".$fam->xref.": ".$fac
 							$factrec .= "\n3 RELA ".(GetSosaName($sosa*2+1));
 	if ($this->tracefacts) print "AddParentsFacts sosa ".$sosa."- Adding for ".$fam->xref.": ".$fact." ".$factrec."<br />";
 	//print $this->GetBirthDate()."  ".$fam->wife->GetDeathDate()."  ".$fam->wife->GetDeathDate()."  ".$this->GetDeathDate()."<br />";
-							$this->facts[] = new Fact($this->xref, "X$fact", $factrec, 0, "");
+							$this->facts[] = new Fact($this->xref, $this->datatype, "X$fact", $factrec, 0, "");
 						}
 					}
 					if ($sosa==1) $this->AddStepSiblingsFacts($fam->wife, $fam->xref); // stepsiblings with mother
@@ -544,7 +544,7 @@ if ($this->tracefacts) print "AddFamilyFacts - Adding for ".$fam->xref.": ".$fac
 								$factrec .= "\n2 ASSO @".$psfam->xref."@";
 								$factrec .= "\n3 RELA family";
 if ($this->tracefacts) print "AddParentsFacts sosa ".$sosa."- Adding for ".$fam->xref.": ".$fact." ".$factrec."<br />";
-								$this->facts[] = new Fact($this->xref, "X$fact", $factrec, 0, "");
+								$this->facts[] = new Fact($this->xref, $this->datatype, "X$fact", $factrec, 0, "");
 							}
 						}
 					}
@@ -625,7 +625,7 @@ if ($this->tracefacts) print "AddParentsFacts sosa ".$sosa."- Adding for ".$fam-
 						$factrec .= "\n3 RELA ".$rela;
 if ($this->tracefacts) print "AddChildrenFacts (".$option.") - Adding for ".$child->xref.": ".$fact." ".$factrec."<br />";
 
-						$this->facts[] = new Fact($this->xref, "X$fact", $factrec, 0, "");
+						$this->facts[] = new Fact($this->xref, $this->datatype, "X$fact", $factrec, 0, "");
 					}
 				}
 				// add child death
@@ -643,7 +643,7 @@ if ($this->tracefacts) print "AddChildrenFacts (".$option.") - Adding for ".$chi
 						$factrec .= "\n2 ASSO @".$child->xref."@";
 						$factrec .= "\n3 RELA ".$rela;
 if ($this->tracefacts) print "AddChildrenFacts (".$option.") - Adding for ".$child->xref.": ".$fact." ".$factrec."<br />";
-						$this->facts[] = new Fact($this->xref, "X$fact", $factrec, 0, "");
+						$this->facts[] = new Fact($this->xref, $this->datatype, "X$fact", $factrec, 0, "");
 					}
 				}
 				// add child marriage
@@ -683,7 +683,7 @@ if ($this->tracefacts) print "AddChildrenFacts (".$option.") - Adding for ".$chi
 								$arec = GetSubRecord(2, "2 ASSO @".$child->xref."@", $childfam->marr_fact->factrec);
 								if ($arec) $factrec .= "\n".$arec;
 if ($this->tracefacts) print "AddChildrenFacts (".$option.") - Adding for ".$child->xref.": ".$fact." ".$factrec."<br />";
-								$this->facts[] = new Fact($this->xref, "X$fact", $factrec, 0, "");
+								$this->facts[] = new Fact($this->xref, $this->datatype, "X$fact", $factrec, 0, "");
 							}
 						}
 					}
@@ -730,7 +730,7 @@ if ($this->tracefacts) print "AddChildrenFacts (".$option.") - Adding for ".$chi
 				$factrec .= "\n2 ASSO @".$fam->$spperson->xref."@";
 				$factrec .= "\n3 RELA spouse";
 if ($this->tracefacts) print "AddSpouseFacts - Adding for ".$fam->$spperson->xref.": ".$fact." ".$factrec."<br />";
-				$this->facts[] = new Fact($this->xref, "X$fact", $factrec, 0, "");
+				$this->facts[] = new Fact($this->xref, $this->datatype, "X$fact", $factrec, 0, "");
 			}
 		}
 	}
@@ -778,7 +778,7 @@ if ($this->tracefacts) print "AddSpouseFacts - Adding for ".$fam->$spperson->xre
 			else $count++;
 			$sdate = GetSubRecord(2, "2 DATE", $hrec);
 			if (CompareFacts($this->bdate, $sdate)<0 && CompareFactsDate($sdate, $this->ddate)<0) {
-				$this->facts[] = new Fact($this->xref, "EVEN", $hrec, $count, "");
+				$this->facts[] = new Fact($this->xref, $this->datatype, "EVEN", $hrec, $count, "");
 			}
 		}
 	}
@@ -832,7 +832,7 @@ if ($this->tracefacts) print "AddSpouseFacts - Adding for ".$fam->$spperson->xre
 										else $factrec .= "\n2 ASSO @".$rid."@\n3 RELA ".$label;
 										//$factrec .= "\n3 NOTE ".$rela;
 										$factrec .= "\n2 ASSO @".$pid."@\n3 RELA ".$rela;
-										$this->facts[] = new Fact($this->xref, "X_$fact", $factrec, 0, "");
+										$this->facts[] = new Fact($this->xref, $this->datatype, "X_$fact", $factrec, 0, "");
 									}
 								}
 							}
@@ -1515,7 +1515,7 @@ if ($this->tracefacts) print "AddSpouseFacts - Adding for ".$fam->$spperson->xre
 		$this->action_count = $this->action_open + $this->action_closed;
 	}
 
-	public function PrintListPerson($useli=true, $break=false) {
+	public function PrintListPerson($useli=true, $break=false, $fact="") {
 		
 		if (!$this->DisplayDetails()) return false;
 		
@@ -1528,6 +1528,12 @@ if ($this->tracefacts) print "AddSpouseFacts - Adding for ".$fam->$spperson->xre
 		print "<a href=\"individual.php?pid=".$this->xref."&amp;gedid=".$this->gedcomid."\" class=\"list_item\"><b>";
 		print CheckNN($this->GetSortableName()).$addname."</b>".$this->addxref;
 		PersonFunctions::PrintFirstMajorFact($this, true, $break);
+		if (!empty($fact)) {
+			print " <i>(";
+			if (defined("GM_FACT_".$fact)) print constant("GM_FACT_".$fact);
+			else print $fact;
+			print ")</i>";
+		}
 		print "</a>\n";
 		if ($useli) print "</li>";
 		

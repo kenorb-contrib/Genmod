@@ -1131,8 +1131,8 @@ function edit_record(pid, fact, count, change_type, pid_type) {
 	return false;
 }
 
-function edit_raw(pid, change_type) {
-	window.open('edit_interface.php?action=editraw&pid='+pid+'&change_type='+change_type+"&"+sessionname+"="+sessionid, '', 'top=50,left=50,width=710,height=550,resizable=1,scrollbars=1');
+function edit_raw(pid, change_type, pid_type) {
+	window.open('edit_interface.php?action=editraw&pid='+pid+'&pid_type='+pid_type+'&change_type='+change_type+"&"+sessionname+"="+sessionid, '', 'top=50,left=50,width=710,height=550,resizable=1,scrollbars=1');
 	return false;
 }
 

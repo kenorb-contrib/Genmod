@@ -130,49 +130,36 @@ if (!empty($pid)) {
 	$pid = CleanInput($pid);
 	if ((strtolower($pid) != "newsour") && (strtolower($pid) != "newrepo")&& (strtolower($pid) != "newgnote")) {
 		// NOTE: Do not take the changed record here since non-approved changes should not yet appear
-		$gedrec = FindGedcomRecord($pid);
-		$rec = GetChangeData(false, $pid, true, "gedlines");
-//		print_r($rec);
-		if (isset($rec[$GEDCOMID][$pid])) $gedrec = $rec[$GEDCOMID][$pid];
-//		print $gedrec;
-		$type = GetRecType($gedrec);
-		if ($type) {
+		$object = ConstructObject($pid, $pid_type, $GEDCOMID);
+		if ($object->ischanged) $gedrec = $object->changedgedrec;
+		else $gedrec = $object->gedrec;
+		if (!$object->isempty) {
+			$disp = $object->disp;
 			//-- if the record is for an INDI then check for display privileges for that indi
-			if ($type=="INDI") {
-				$disp = PrivacyFunctions::displayDetailsById($pid);
+			if ($pid_type == "INDI" || $pid_type == "FAM") {
 				//-- if disp is true, also check for resn access
-				if ($disp == true){
-					// First check level 1 RESN
-					if (PrivacyFunctions::FactViewRestricted($pid, $gedrec, 1)) $factdisp = false;
-					if (PrivacyFunctions::FactEditRestricted($pid, $gedrec, 1)) $factedit = false;
-					// Then check level 2 RESN
-					$subs = GetAllSubrecords($gedrec, "", false, false);
-					foreach($subs as $indexval => $sub) {
-						if (PrivacyFunctions::FactViewRestricted($pid, $sub)==true) $factdisp = false;
-						if (PrivacyFunctions::FactEditRestricted($pid, $sub)==true) $factedit = false;
+				if ($object->hiddenfacts) $factdisp = false;
+				if (!$object->canedit) $factedit = false;
+				if ($factdisp || $factedit)	{
+					foreach ($object->facts as $key => $factobj) {
+						if ($factobj->fact != "CHAN") {
+							if (!$factobj->disp) $factdisp = false;
+							if (!$factobj->canedit) $factedit = false;
+						}
 					}
 				}
 			}
 			//-- for FAM check for display privileges on both parents
-			else if ($type=="FAM") {
-				// First check level 1 RESN
-				if (PrivacyFunctions::FactViewRestricted($pid, $gedrec, 1)) $factdisp = false;
-				if (PrivacyFunctions::FactEditRestricted($pid, $gedrec, 1)) $factedit = false;
-				// Then check level 2 RESN
-				$subs = GetAllSubrecords($gedrec, "", false, false);
-				foreach($subs as $indexval => $sub) {
-					if (PrivacyFunctions::FactViewRestricted($pid, $sub)==true) $factdisp = false;
-					if (PrivacyFunctions::FactEditRestricted($pid, $sub)==true) $factedit = false;
-				}
+			if ($pid_type == "FAM") {
+				$disp = true;
 				//-- check if we can display both parents
-				$parents = FindParentsInRecord($gedrec);
-				$disp = PrivacyFunctions::displayDetailsById($parents["HUSB"]);
+				if (is_object($object->wife) && !$object->wife->disp) $disp = false;
 				if ($disp) {
-					$disp = PrivacyFunctions::displayDetailsById($parents["WIFE"]);
+					if (is_object($object->husb) && !$object->husb->disp) $disp = false;
 				}
 			}
 			else {
-				$disp=true;
+				$disp = true;
 			}
 		}
 		else {
@@ -186,51 +173,39 @@ if (!empty($pid)) {
 else if (!empty($famid)) {
 	$famid = CleanInput($famid);
 	if ($famid != "new") {
-		
-		// TODO: if the fam record has been changed, get the record from the changes table DONE
-		if (GetChangeData(true, $famid, true, "", "")) {
-			$rec = GetChangeData(false, $famid, true, "gedlines", "");
-			$gedrec = $rec[$GEDCOMID][$famid];
-		}
-		else $gedrec = FindGedcomRecord($famid);
-		
-		$ct = preg_match("/0 @$famid@ (.*)/", $gedrec, $match);
-		if ($ct>0) {
-			$type = trim($match[1]);
+		$object = ConstructObject($pid, $pid_type, $GEDCOMID);
+		if ($object->ischanged) $gedrec = $object->changedgedrec;
+		else $gedrec = $object->gedrec;
+		if (!$object->isempty) {
+			$disp = $object->disp;
 			//-- if the record is for an INDI then check for display privileges for that indi
-			if ($type=="INDI") {
-				$disp = PrivacyFunctions::displayDetailsById($famid);
+			if ($pid_type == "INDI" || $pid_type == "FAM") {
 				//-- if disp is true, also check for resn access
-				if ($disp == true){
-					if (PrivacyFunctions::FactViewRestricted($famid, $gedrec, 1)) $factdisp = false;
-					if (PrivacyFunctions::FactEditRestricted($famid, $gedrec, 1)) $factedit = false;
-					$subs = GetAllSubrecords($gedrec, "", false, false);
-					foreach($subs as $indexval => $sub) {
-						if (PrivacyFunctions::FactViewRestricted($famid, $sub)==true) $factdisp = false;
-						if (PrivacyFunctions::FactEditRestricted($famid, $sub)==true) $factedit = false;
+				if ($object->hiddenfacts) $factdisp = false;
+				if (!$object->canedit) $factedit = false;
+				if ($factdisp || $factedit)	{
+					foreach ($object->facts as $key => $factobj) {
+						if ($factobj->fact != "CHAN") {
+							if (!$factobj->disp) $factdisp = false;
+							if (!$factobj->canedit) $factedit = false;
+						}
 					}
 				}
 			}
 			//-- for FAM check for display privileges on both parents
-			else if ($type=="FAM") {
-				//-- check if there are restrictions on the facts
-				if (PrivacyFunctions::FactViewRestricted($famid, $gedrec, 1)) $factdisp = false;
-				if (PrivacyFunctions::FactEditRestricted($famid, $gedrec, 1)) $factedit = false;
-				$subs = GetAllSubrecords($gedrec, "", false, false);
-				foreach($subs as $indexval => $sub) {
-					if (PrivacyFunctions::FactViewRestricted($famid, $sub)==true) $factdisp = false;
-					if (PrivacyFunctions::FactEditRestricted($famid, $sub)==true) $factedit = false;
-				}
+			if ($pid_type=="FAM") {
 				//-- check if we can display both parents
-				$parents = FindParentsInRecord($gedrec);
-				$disp = PrivacyFunctions::displayDetailsById($parents["HUSB"]);
+				if (is_object($object->wife) && !$object->wife->disp) $disp = false;
 				if ($disp) {
-					$disp = PrivacyFunctions::displayDetailsById($parents["WIFE"]);
+					if (is_object($object->husb) && !$object->husb->disp) $disp = false;
 				}
 			}
 			else {
 				$disp=true;
 			}
+		}
+		else {
+			$disp = true;
 		}
 	}
 }
@@ -261,16 +236,14 @@ if ($action == "edit" || $action == "editraw") {
 		}
 		else $oldrec = GetSubRecord(1, "1 $fact", $gedrec, $count);
 	}
-	else $oldrec = $gedrec;
-	// Check links from the fact to hidden sources, media, etc.
-	$cl = preg_match_all("/[1-9]\s(.+)\s@(.+)@/", $oldrec, $match);
-	for ($i=0; $i<$cl;$i++) {
-		$disp = $disp && PrivacyFunctions::DisplayDetailsByID($match[2][$i], $match[1][$i], 1, true);
-		// print "2: ".$match[2][$i]." 1: ".$match[1][$i]." disp: ".$disp."<br />";
+	else {
+		if ($object->hiddenfacts) $disp = false;
+		$oldrec = $gedrec;
 	}
+	// Check links from the fact to hidden sources, media, etc. is not needed: done in hiddenfacts
 }
 // TODO edit submitter from other than $GEDCOM
-if ((!$gm_user->userCanEdit())||(!$disp)||(!GedcomConfig::$ALLOW_EDIT_GEDCOM) || (!$gm_user->userCanEditGedlines() && $action == "editraw")) {
+if (!$gm_user->userCanEdit() || !$disp || !GedcomConfig::$ALLOW_EDIT_GEDCOM || (!$gm_user->userCanEditGedlines() && $action == "editraw")) {
 	print $gm_lang["access_denied"];
 	//-- display messages as to why the editing access was denied
 	if (!$gm_user->userCanEdit()) print "<br />".$gm_lang["user_cannot_edit"];
@@ -285,16 +258,11 @@ if ((!$gm_user->userCanEdit())||(!$disp)||(!GedcomConfig::$ALLOW_EDIT_GEDCOM) ||
 	exit;
 }
 
-if (!isset($type)) $type="";
-if ($type=="INDI") {
-	print "<b>".PrintReady(GetPersonName($pid, $gedrec))."</b><br />";
+if (!isset($pid_type)) $pid_type="";
+if ($pid_type == "INDI" || $pid_type == "FAM" || $pid_type == "SOUR" || $pid_type == "REPO") {
+	print "<b>".$object->name."</b><br />";
 }
-else if ($type=="FAM") {
-	print "<b>".PrintReady(GetPersonName($parents["HUSB"]))." + ".PrintReady(GetPersonName($parents["WIFE"]))."</b><br />";
-}
-else if ($type=="SOUR") {
-	print "<b>".PrintReady(GetSourceDescriptor($pid))."</b><br />";
-}
+
 if (strstr($action,"addchild")) {
 	if (empty($famid)) {
 		print_help_link("edit_add_unlinked_person_help", "qm");
@@ -311,11 +279,11 @@ else if (strstr($action,"addspouse")) {
 }
 else if (strstr($action,"addnewparent")) {
 	print_help_link("edit_add_parent_help", "qm");
-	if ($famtag=="WIFE") print "<b>".$gm_lang["add_mother"]."</b><br />\n";
+	if ($famtag == "WIFE") print "<b>".$gm_lang["add_mother"]."</b><br />\n";
 	else print "<b>".$gm_lang["add_father"]."</b><br />\n";
 }
 else {
-	if (defined("GM_FACT_".$type)) print "<b>".constant("GM_FACT_".$type)."</b><br />";
+	if (defined("GM_FACT_".$pid_type)) print "<b>".constant("GM_FACT_".$pid_type)."</b><br />";
 }
 
 switch ($action) {
@@ -2110,14 +2078,13 @@ switch ($action) {
 
 		print "<form name=\"editform\" method=\"post\" action=\"edit_interface.php\" enctype=\"multipart/form-data\" style=\"display:inline;\">";
 		print "<input type=\"hidden\" name=\"action\" value=\"update\" />";
-		print "<input type=\"hidden\" name=\"fact\" value=\"$fact\" />";
-		print "<input type=\"hidden\" name=\"count\" value=\"$count\" />";
-		print "<input type=\"hidden\" name=\"change_type\" value=\"$change_type\" />";
-		print "<input type=\"hidden\" name=\"pid_type\" value=\"$pid_type\" />";
-		print "<input type=\"hidden\" name=\"pid\" value=\"$pid\" />";
+		print "<input type=\"hidden\" name=\"fact\" value=\"".$fact."\" />";
+		print "<input type=\"hidden\" name=\"count\" value=\"".$count."\" />";
+		print "<input type=\"hidden\" name=\"change_type\" value=\"".$change_type."\" />";
+		print "<input type=\"hidden\" name=\"pid_type\" value=\"".$pid_type."\" />";
+		print "<input type=\"hidden\" name=\"pid\" value=\"".$pid."\" />";
 		print "<table class=\"facts_table\">";
 		$orgfact = $fact;
-//		print $gedrec;
 //		if ($fact == "OBJE" && $change_type == "edit_media_link") {
 //			$oldrec = GetSubRecord(1, "1 $fact", $gedrec, $count);
 //			print $oldrec;
@@ -2327,9 +2294,10 @@ switch ($action) {
 			print "<b>".$gm_lang["edit_raw"]."</b>";
 			print "<form method=\"post\" action=\"edit_interface.php\" style=\"display:inline;\">\n";
 			print "<input type=\"hidden\" name=\"action\" value=\"updateraw\" />\n";
-			print "<input type=\"hidden\" name=\"pid\" value=\"$pid\" />\n";
+			print "<input type=\"hidden\" name=\"pid\" value=\"".$pid."\" />\n";
+			print "<input type=\"hidden\" name=\"pid_type\" value=\"".$pid_type."\" />\n";
 			print "<input type=\"hidden\" name=\"oldrec\" value=\"".urlencode($oldrec)."\" />\n";
-			print "<input type=\"hidden\" name=\"change_type\" value=\"$change_type\" />\n";
+			print "<input type=\"hidden\" name=\"change_type\" value=\"".$change_type."\" />\n";
 			LinkFunctions::PrintSpecialCharLink("newgedrec");
 			print "<textarea name=\"newgedrec\" id=\"newgedrec\" rows=\"20\" cols=\"82\" dir=\"ltr\">".$gedrec."</textarea>\n<br />";
 			if ($gm_user->UserCanAccept() && !$gm_user->userAutoAccept()) print "<br /><input name=\"aa_attempt\" type=\"checkbox\" value=\"1\" />".$gm_lang["attempt_auto_acc"]."<br />\n";

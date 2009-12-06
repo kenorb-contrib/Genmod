@@ -95,6 +95,7 @@ abstract class GedcomRecord {
 	protected $isempty = null;			// If this record exists
 	protected $israwedited = null;		// If this record is changed using raw editing
 	protected $exclude_facts = "";		// Facts that should be excluded while parsing the facts
+	protected $hiddenfacts = null;		// False or true that 1 or more facts are hidden
 	protected $view = null;				// If preview mode is on
 	
 	/**
@@ -305,6 +306,10 @@ abstract class GedcomRecord {
 				if (is_null($this->facts)) $this->ParseFacts();
 				return $this->mediafacts_count;
 				break;
+			case "hiddenfacts":
+				if (is_null($this->facts)) $this->ParseFacts();
+				return $this->hiddenfacts;
+				break;
 			case "view":
 				return $this->IsPreview();
 				break;
@@ -419,7 +424,10 @@ abstract class GedcomRecord {
 
 		if (!is_null($this->facts) && !is_array($selection)) return $this->facts;
 		$facts = array();
-		if (!$this->DisplayDetails()) return $facts;
+		if (!$this->DisplayDetails()) {
+			$this->hiddenfacts = true;
+			return $facts;
+		}
 
 		// Get the subrecords/facts. Don't apply privacy here, as it will disturb
 		// the fact numbering which is needed for editing (get the right fact number)
@@ -427,6 +435,7 @@ abstract class GedcomRecord {
 
 		if (is_array($allsubs)) {
 			foreach ($allsubs as $key => $subrecord) {
+				$added = false;
 				$ft = preg_match("/1\s(\w+)(.*)/", $subrecord, $match);
 				if ($ft>0) {
 					$fact = $match[1];
@@ -448,7 +457,7 @@ abstract class GedcomRecord {
 					if ($ct>0) $typeshow = PrivacyFunctions::showFact(trim($match[1]), $this->xref, $this->type);
 				}
 				if (!empty($fact) && (!is_array($selection) || in_array($fact, $selection))&& $typeshow && !PrivacyFunctions::FactViewRestricted($this->xref, $subrecord, 2)) {
-					$factobj = new Fact($this->xref, $fact, $subrecord, $count[$fact], "");
+					$factobj = new Fact($this->xref, $this->datatype, $fact, $subrecord, $count[$fact], "");
 					$dispobj = $factobj->show;
 					if (!empty($gid) && $dispobj) {
 						$object =& ConstructObject($gid, $fact, $this->gedcomid, "");
@@ -456,6 +465,7 @@ abstract class GedcomRecord {
 					}
 					if ($dispobj && (empty($gid) || $disp)) {
 						$facts[] = $factobj;
+						$added = true;
 						if (!is_array($selection)) {
 							if ($fact == "SOUR") $this->sourfacts_count++;
 							elseif ($fact == "NOTE") $this->notefacts_count++;
@@ -463,6 +473,7 @@ abstract class GedcomRecord {
 						}
 					}
 				}
+				if (!$added) $this->hiddenfacts = true;
 			}
 		}
 		// if we don't show changes, don't parse the facts
@@ -485,8 +496,12 @@ abstract class GedcomRecord {
 				if (!isset($count[$fact])) $count[$fact] = 1;
 				else $count[$fact]++;
 				if (!empty($fact) && !in_array($fact, array($this->exclude_facts)) && PrivacyFunctions::showFact($fact, $this->xref, $this->type) && !PrivacyFunctions::FactViewRestricted($this->xref, $newrec, 2)) {
-					if (!is_array($selection) || in_array($fact, $selection)) $facts[] = new Fact($this->xref, $fact, $newrec, $count[$fact], "change_new");
+					if (!is_array($selection) || in_array($fact, $selection)) {
+						$added = true;
+						$facts[] = new Fact($this->xref, $this->datatype, $fact, $newrec, $count[$fact], "change_new");
+					}
 				}
+				if (!$added) $this->hiddenfacts = true;
 			}
 			// After sorting, add the changed facts at the appropriate places
 			SortFactObjs($facts, $this->type);
@@ -511,7 +526,7 @@ abstract class GedcomRecord {
 							$newfacts[] = $factobj;
 							// an empty record indicates deletion, so only add the new record if not empty
 							if (!empty($cfact)) {
-								$newfact = new Fact($this->xref, $factobj->fact, $cfact, $factobj->count, "change_new");
+								$newfact = new Fact($this->xref, $this->datatype, $factobj->fact, $cfact, $factobj->count, "change_new");
 								// add the new fact
 								$newfacts[] = $newfact;
 							}

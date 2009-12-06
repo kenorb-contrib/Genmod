@@ -52,6 +52,7 @@ class Fact {
 	
 	// Other attributes
 	private $owner = null;			// Xref of the owner of this fact
+	private $owner_type = null;		// Datatype of the owner
 	private $disp = null;			// Result of ShowFactDetails
 	private $show = null;			// Result of ShowFact
 	private $canedit = null;		// If privacy (resn) or the owner prevents editing
@@ -59,11 +60,12 @@ class Fact {
 	private $style = null;			// Style to print this fact with
 	private $descr = null;			// Fact description
 		
-	public function __construct($parent, $fact, $factrec, $count=1, $style = "") {
+	public function __construct($parent, $parent_type, $fact, $factrec, $count=1, $style = "") {
 		
 		$this->fact = trim($fact);
 		$this->factrec = $factrec;
 		$this->owner = $parent;
+		$this->owner_type = $parent_type;
 		$this->count = $count;
 		$this->style = $style;
 		$ct = preg_match("/2 TYPE (.*)/", $this->factrec, $match);
@@ -112,6 +114,9 @@ class Fact {
 //				break;
 			case "owner":
 				return $this->getOwner();
+				break;
+			case "owner_type":
+				return $this->owner_type;
 				break;
 			case "show":
 				return $this->Show();
@@ -300,7 +305,7 @@ class Fact {
 	private function getOwner() {
 		
 		if ($this->owner != "") {
-			if (!is_object($this->owner)) return Person::GetInstance($this->owner);
+			if (!is_object($this->owner)) return ConstructObject($this->owner, $this->owner_type, "");
 			else return $this->owner;
 		}
 	}
@@ -346,11 +351,11 @@ class Fact {
 				$tt = preg_match("/[2-3] TIME (.*)/", $timerec, $tmatch);
 				if ($tt>0) $prtstr .= " - <span class=\"date\">".$tmatch[1]."</span>";
 			}
-			if ($print_parents_age) {
+			if ($print_parents_age && $this->owner_type == "INDI") {
 				// age of parents at child birth
 				if ($this->fact == "BIRT") $this->GetOwner()->PrintParentsAge($match[1]);
 			}
-			if ($print_own_age) {
+			if ($print_own_age && $this->owner_type == "INDI") {
 				// age at event
 				if ($this->fact != "CHAN") {
 					// do not print age after death

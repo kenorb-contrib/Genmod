@@ -103,7 +103,7 @@ class NoteController extends DetailController {
 			// edit note / edit_raw
 			if ($gm_user->userCanEditGedlines()) {
 				$submenu = new Menu($gm_lang['edit_raw']);
-				$submenu->addLink("edit_raw('".$this->xref."', 'edit_raw');");
+				$submenu->addLink("edit_raw('".$this->xref."', 'edit_raw', 'NOTE');");
 				$menu->addSubmenu($submenu);
 			}
 
