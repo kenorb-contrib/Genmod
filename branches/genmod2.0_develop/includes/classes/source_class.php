@@ -323,7 +323,7 @@ class Source extends GedcomRecord {
 	// Type	=	1	: normal title (descriptor and adddescriptor
 	// 			2	: descriptor
 	//			3	: adddescriptor
-	public function PrintListSource($useli=true, $type=1) {
+	public function PrintListSource($useli=true, $type=1, $fact="") {
 
 		if (!$this->DisplayDetails()) return false;
 		
@@ -335,6 +335,12 @@ class Source extends GedcomRecord {
 		else if ($type == 2) print "\n\t\t\t<a href=\"source.php?sid=$this->xref&amp;gedid=".$this->gedcomid."\" class=\"list_item\">".PrintReady($this->GetSourceDescriptor());
 		else if ($type == 3) print "\n\t\t\t<a href=\"source.php?sid=$this->xref&amp;gedid=".$this->gedcomid."\" class=\"list_item\">".PrintReady($this->GetAddSourceDescriptor());
 		print $this->addxref;
+		if (!empty($fact)) {
+			print " <i>(";
+			if (defined("GM_FACT_".$fact)) print constant("GM_FACT_".$fact);
+			else print $fact;
+			print ")</i>";
+		}
 		print "</a>\n";
 		if ($useli) print "</li>\n";
 	}

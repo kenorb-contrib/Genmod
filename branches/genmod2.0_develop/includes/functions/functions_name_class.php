@@ -37,7 +37,7 @@ abstract class NameFunctions {
 
 		if (is_object($family->husb)) {
 			if ($family->husb->disp_name)
-				$hname = self::GetSortableName($family->husb, "", "", false, $rev, $changes);
+				$hname = self::GetSortableName($family->husb, false, $rev);
 			else $hname = $gm_lang["private"];
 		}
 		else {
@@ -46,7 +46,7 @@ abstract class NameFunctions {
 		}
 		if (is_object($family->wife)) {
 			if ($family->wife->disp_name)
-				$wname = self::GetSortableName($family->wife, "", "", false, $rev, $changes);
+				$wname = self::GetSortableName($family->wife, false, $rev);
 			else $wname = $gm_lang["private"];
 		}
 		else {
@@ -84,8 +84,8 @@ abstract class NameFunctions {
 		}
 
 		if (!empty($hname) && !empty($wname)) return CheckNN($hname)." + ".CheckNN($wname);
-		else if (!empty($hname) && empty($wname)) return CheckNN($hname)." + ".CheckNN(self::GetSortableName($family->wife, "", "", false, $rev, $changes));
-		else if (empty($hname) && !empty($wname)) return CheckNN(self::GetSortableName($family->husb, "", "", false, $rev, $changes))." + ".CheckNN($wname);
+		else if (!empty($hname) && empty($wname)) return CheckNN($hname)." + ".CheckNN(self::GetSortableName($family->wife, false, $rev));
+		else if (empty($hname) && !empty($wname)) return CheckNN(self::GetSortableName($family->husb, false, $rev))." + ".CheckNN($wname);
 	}
 		
 	/**
@@ -101,7 +101,7 @@ abstract class NameFunctions {
 	 * @param boolean $changes include unapproved changes
 	 * @return string the sortable name
 	 */
-	public function GetSortableName(&$person, $alpha="", $surname="", $allnames=false, $rev = false, $changes = false) {
+	public function GetSortableName(&$person, $allnames=false, $rev = false, $count=0) {
 		global $SHOW_LIVING_NAMES, $PRIV_PUBLIC, $GEDCOMID, $COMBIKEY;
 		global $indilist, $gm_lang, $GEDCOMID, $NAME_REVERSE;
 	
@@ -119,9 +119,9 @@ abstract class NameFunctions {
 			}
 		}
 	
-		$names = $person->name_array;
 	
 		if ($allnames == true) {
+			$names = $person->name_array;
 			$mynames = array();
 			foreach ($names as $key => $name) {
 				if ($NAME_REVERSE) $mynames[] = self::SortableNameFromName(self::ReverseName($name[0]), $rev);
@@ -129,29 +129,20 @@ abstract class NameFunctions {
 			}
 			return $mynames;
 		}
-		foreach($names as $indexval => $name) {
-			if ($surname!="" && $name[2]==$surname) {
-				if ($NAME_REVERSE) return self::SortableNameFromName(self::ReverseName($name[0]), $rev);
-				else return self::SortableNameFromName($name[0], $rev);
-			}
-			else if ($alpha!="" && $name[1]==$alpha) {
-				if ($NAME_REVERSE) return self::SortableNameFromName(self::ReverseName($name[0]), $rev);
-				else return self::SortableNameFromName($name[0], $rev);
-			}
-		}
-		if ($NAME_REVERSE) return self::SortableNameFromName(self::ReverseName($names[0][0]), $rev);
-		else return self::SortableNameFromName($names[0][0], $rev);
+		$name = $person->name_array[$count];
+		if ($NAME_REVERSE) return self::SortableNameFromName(self::ReverseName($name[0]), $rev);
+		else return self::SortableNameFromName($name[0], $rev);
 	}
 	
 	// -- find and return a given individual's second name in sort format: familyname, firstname
-	public function GetSortableAddName($person, $rev = false, $changes = false) {
+	public function GetSortableAddName($person, $rev = false, $changes = false, $count=0) {
 		global $NAME_REVERSE;
 		global $GEDCOMID;
 	
 		//-- get the name from the indexes
 		if ($changes) $record = $person->changedgedrec;
 		else $record = $person->gedrec;
-		$name_record = GetSubRecord(1, "1 NAME", $record);
+		$name_record = GetSubRecord(1, "1 NAME", $record, ($count+1));
 		$name = "";
 	
 		// Check for ROMN name
@@ -258,7 +249,7 @@ abstract class NameFunctions {
 		}
 		// Insert the nickname if the option is set
 		if (GedcomConfig::$SHOW_NICK && !$import) {
-			$n = GetNicks($indirec);
+			$n = self::GetNicks($indirec);
 			if (count($n) > 0) {
 				$ct = preg_match("~(.*)/(.*)/(.*)~", $name, $match);
 				$name = $match[1].substr(GedcomConfig::$NICK_DELIM, 0, 1).$n[0].substr(GedcomConfig::$NICK_DELIM, 1, 1)."/".$match[2]."/".$match[3];
@@ -275,7 +266,7 @@ abstract class NameFunctions {
 	 */
 	public function SortableNameFromName($name, $rev = false) {
 		global $NAME_REVERSE;
-	
+
 		// NOTE: Remove any unwanted characters from the name
 		if (preg_match("/^\.(\.*)$|^\?(\?*)$|^_(_*)$|^,(,*)$/", $name)) $name = preg_replace(array("/,/","/\./","/_/","/\?/"), array("","","",""), $name);
 	
@@ -339,6 +330,19 @@ abstract class NameFunctions {
 		}
 		
 		return $name;
+	}
+	
+	public function GetNicks($namerec) {
+		
+		$nicks = array();
+		if (!empty($namerec)) {
+			$i = 1;
+			while($n = GetSubrecord(2, "2 NICK", $namerec, $i)) {
+				$nicks[] = GetGedcomValue("NICK", 2, $n);
+				$i++;
+			}
+		}
+		return $nicks;
 	}
 	
 }

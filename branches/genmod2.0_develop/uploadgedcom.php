@@ -41,10 +41,10 @@
  
  // $action = Which form we should present
  // Possible values:
- // add_form: add new gedcom already on server
- // upload form: add new gedcom from upload
- // add_new_form: add new gedcom from scratch
- // reupload_form: re-upload and import an existing gedcom
+ // 	add_form		: add new gedcom already on server
+ // 	upload form		: add new gedcom from upload
+ // 	add_new_form	: add new gedcom from scratch
+ // 	reupload_form	: re-upload and import an existing gedcom
 
  // NOTE: $check = Which check to be performed
  // NOTE: $timelimit = The time limit for the import process

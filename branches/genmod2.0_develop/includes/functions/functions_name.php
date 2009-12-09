@@ -513,7 +513,7 @@ function GetAddPersonNameInRecord($name_record, $keep_slash=false, $import=false
 	}
 	// If not found, and chinese, generate the PinYin equivalent of the name
 	else {
-		$orgname = NameFunctions::GetNameInRecord($name_record);
+		$orgname = NameFunctions::GetNameInRecord($name_record, $import);
 		if (HasChinese($orgname, $import)){
 			$name = GetPinYin($orgname, $import);
 			if ($keep_slash) return trim($name);
@@ -645,7 +645,8 @@ function ExtractSurname($indiname) {
 function GetFirstLetter($text, $import=false) {
 	global $LANGUAGE;
 
-	$text=trim(Str2Upper($text));
+	$text = trim(Str2Upper($text));
+
 	if ($import == true) {
 		$hungarianex = array("CS", "DZ" ,"GY", "LY", "NY", "SZ", "TY", "ZS", "DZS");
 		$danishex = array("OE", "AE", "AA");
@@ -669,13 +670,16 @@ function GetFirstLetter($text, $import=false) {
 		}
 		$letter = substr($text, 0, 1);
 	}
-	else $letter = substr($text, 0, 1);
-
+	
+	if (MB_FUNCTIONS) {
+		if (isset($letter) && mb_detect_encoding(mb_substr($text, 0, 1)) == "ASCII") return $letter;
+		else return mb_substr($text, 0, 1);
+	}
 	//-- if the letter is an other character then A-Z or a-z
 	//-- define values of characters to look for
 	$ord_value2 = array(92, 195, 196, 197, 206, 207, 208, 209, 214, 215, 216, 217, 218, 219);
 	$ord_value3 = array(228, 229, 230, 231, 232, 233);
-	$ord = ord(substr($letter, 0, 1));
+	$ord = ord(substr($text, 0, 1));
 	if (in_array($ord, $ord_value2)) $letter = stripslashes(substr($text, 0, 2));
 	else if (in_array($ord, $ord_value3)) $letter = stripslashes(substr($text, 0, 3));
 
@@ -785,7 +789,8 @@ function Str2Lower($value) {
 	}
 
 	$value_lower = "";
-	$len = strlen($value);
+	if (MB_FUNCTIONS) $len = mb_strlen($value);
+	else $len = strlen($value);
 
 	//-- loop through all of the letters in the value and find their position in the
 	//-- upper case alphabet.  Then use that position to get the correct letter from the
@@ -793,22 +798,32 @@ function Str2Lower($value) {
 	$ord_value2 = array(92, 195, 196, 197, 206, 207, 208, 209, 214, 215, 216, 217, 218, 219);
 	$ord_value3 = array(228, 229, 230, 232, 233);
 	for($i=0; $i<$len; $i++) {
-		$letter = substr($value, $i, 1);
-		$ord = ord($letter);
-		if (in_array($ord, $ord_value2)) {
-			$i++;
-			$letter .= substr($value, $i, 1);
+		if (!MB_FUNCTIONS) {
+			$letter = substr($value, $i, 1);
+			$ord = ord($letter);
+			if (in_array($ord, $ord_value2)) {
+				$i++;
+				$letter .= substr($value, $i, 1);
+			}
+			else if (in_array($ord, $ord_value3)) {
+				$i++;
+				$letter .= substr($value, $i, 2);
+				$i++;
+			}
+			$pos = strpos($all_ALPHABET_upper, $letter);
+			if ($pos!==false) {
+				$letter = substr($all_ALPHABET_lower, $pos, strlen($letter));
+			}
+			$value_lower .= $letter;
 		}
-		else if (in_array($ord, $ord_value3)) {
-			$i++;
-			$letter .= substr($value, $i, 2);
-			$i++;
+		else {
+			$letter = mb_substr($value, $i, 1);
+			$pos = mb_strpos($all_ALPHABET_upper, $letter);
+			if ($pos!==false) {
+				$letter = mb_substr($all_ALPHABET_lower, $pos, 1);
+			}
+			$value_lower .= $letter;
 		}
-		$pos = strpos($all_ALPHABET_upper, $letter);
-		if ($pos!==false) {
-			$letter = substr($all_ALPHABET_lower, $pos, strlen($letter));
-		}
-		$value_lower .= $letter;
 	}
 	return $value_lower;
 }
@@ -843,7 +858,8 @@ function Str2Upper($value) {
 	}
 
 	$value_upper = "";
-	$len = strlen($value);
+	if (MB_FUNCTIONS) $len = mb_strlen($value);
+	else $len = strlen($value);
 
 	//-- loop through all of the letters in the value and find their position in the
 	//-- lower case alphabet.  Then use that position to get the correct letter from the
@@ -851,22 +867,32 @@ function Str2Upper($value) {
 	$ord_value2 = array(92, 195, 196, 197, 206, 207, 208, 209, 214, 215, 216, 217, 218, 219);
 	$ord_value3 = array(228, 229, 230, 232, 233);
 	for($i=0; $i<$len; $i++) {
-		$letter = substr($value, $i, 1);
-		$ord = ord($letter);
-		if (in_array($ord, $ord_value2)) {
-			$i++;
-			$letter .= substr($value, $i, 1);
+		if (!MB_FUNCTIONS) {
+			$letter = substr($value, $i, 1);
+			$ord = ord($letter);
+			if (in_array($ord, $ord_value2)) {
+				$i++;
+				$letter .= substr($value, $i, 1);
+			}
+			else if (in_array($ord, $ord_value3)) {
+				$i++;
+				$letter .= substr($value, $i, 2);
+				$i++;
+			}
+			$pos = strpos($all_ALPHABET_lower, $letter);
+			if ($pos!==false) {
+				$letter = substr($all_ALPHABET_upper, $pos, strlen($letter));
+			}
+			$value_upper .= $letter;
 		}
-		else if (in_array($ord, $ord_value3)) {
-			$i++;
-			$letter .= substr($value, $i, 2);
-			$i++;
+		else {
+			$letter = mb_substr($value, $i, 1);
+			$pos = mb_strpos($all_ALPHABET_lower, $letter);
+			if ($pos!==false) {
+				$letter = mb_substr($all_ALPHABET_upper, $pos, 1);
+			}
+			$value_upper .= $letter;
 		}
-		$pos = strpos($all_ALPHABET_lower, $letter);
-		if ($pos!==false) {
-			$letter = substr($all_ALPHABET_upper, $pos, strlen($letter));
-		}
-		$value_upper .= $letter;
 	}
 	return $value_upper;
 }
@@ -914,7 +940,7 @@ function GetIndiNames($indirec, $import=false, $marr_names=true) {
 			else $names[] = array($name, $letter, $surname, "A");
 
 			//-- check for _HEB or ROMN name sub tags
-			$addname = GetAddPersonNameInRecord($namerec, true);
+			$addname = GetAddPersonNameInRecord($namerec, true, $import);
 			if (!empty($addname)) {
 				$surname = ExtractSurname($addname);
 				if (empty($surname)) $surname = "@N.N.";
@@ -1206,7 +1232,7 @@ function GetSoundexStrings($namearray, $import=false, $indirec="") {
 			}
 		}
 		// Now also add the nicks. Only if the indirec is added, we will get any result.
-		$nicks = GetNicks($indirec);
+		$nicks = NameFunctions::GetNicks($indirec);
 		foreach ($nicks as $key => $nick) {
 			$sval = soundex($nick);
 			if ($sval != "0000") {
@@ -1323,18 +1349,6 @@ Function GetPediName($pedi, $gender="") {
 	return "";
 }
 
-function GetNicks($namerec) {
-	
-	$nicks = array();
-	if (!empty($namerec)) {
-		$i = 1;
-		while($n = GetSubrecord(2, "2 NICK", $namerec, $i)) {
-			$nicks[] = GetGedcomValue("NICK", 2, $n);
-			$i++;
-		}
-	}
-	return $nicks;
-}
 
 function AbbreviateName($name, $length) {
 	
