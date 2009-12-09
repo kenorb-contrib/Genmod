@@ -134,6 +134,13 @@ define("GM_VERSION_RELEASE", "Beta 1");
 define("GM_REQUIRED_PRIVACY_VERSION", "3.3");
 define("GM_REQUIRED_CONFIG_VERSION", "3.1");
 
+// NOTE: Check for multibyte functions
+if (defined("MB_CASE_TITLE")) {
+	define("MB_FUNCTIONS", true);
+	mb_internal_encoding("UTF-8");
+}
+else define("MB_FUNCTIONS", false);
+
 set_magic_quotes_runtime(0);
 
 if (!empty($_SERVER["SCRIPT_NAME"])) $SCRIPT_NAME=$_SERVER["SCRIPT_NAME"];

@@ -132,7 +132,7 @@ class Person extends GedcomRecord {
 				return $this->GetNameArray();
 				break;
 			case "sortable_name":
-				return $this->getSortableName();
+				return $this->getSortableName(0);
 				break;
 			case "sortable_addname":
 				return $this->getSortableAddName();
@@ -283,21 +283,21 @@ class Person extends GedcomRecord {
 		return $this->name_array;
 	}
 
-	private function GetSortableName() {
+	private function GetSortableName($namenum=0) {
 		
-		if (is_null($this->sortable_name)) {
-			if ($this->show_changes && $this->ThisChanged()) $this->sortable_name = NameFunctions::GetSortableName($this, "", "", false, false, true);
-			else $this->sortable_name = NameFunctions::GetSortableName($this);
+		if (is_null($this->sortable_name) || !isset($this->sortable_name[$namenum])) {
+			if ($this->show_changes && $this->ThisChanged()) $this->sortable_name[$namenum] = NameFunctions::GetSortableName($this, false, false, $namenum);
+			else $this->sortable_name[$namenum] = NameFunctions::GetSortableName($this, false, false, $namenum);
 		}
-		return $this->sortable_name;
+		return $this->sortable_name[$namenum];
 	}
-	private function GetSortableAddName() {
+	private function GetSortableAddName($namenum=0) {
 		
-		if (is_null($this->sortable_addname)) {
-			if ($this->show_changes && $this->ThisChanged()) $this->sortable_addname = NameFunctions::GetSortableAddName($this, false, true);
-			else $this->sortable_addname = NameFunctions::GetSortableAddName($this, false, false);
+		if (is_null($this->sortable_addname) || !isset($this->sortable_addname[$namenum])) {
+			if ($this->show_changes && $this->ThisChanged()) $this->sortable_addname[$namenum] = NameFunctions::GetSortableAddName($this, false, true, $namenum);
+			else $this->sortable_addname[$namenum] = NameFunctions::GetSortableAddName($this, false, false, $namenum);
 		}
-		return $this->sortable_addname;
+		return $this->sortable_addname[$namenum];
 	}
 
 	private function GetChangedNames() {
@@ -1515,18 +1515,18 @@ if ($this->tracefacts) print "AddSpouseFacts - Adding for ".$fam->$spperson->xre
 		$this->action_count = $this->action_open + $this->action_closed;
 	}
 
-	public function PrintListPerson($useli=true, $break=false, $fact="") {
+	public function PrintListPerson($useli=true, $break=false, $fact="", $namenum=0) {
 		
-		if (!$this->DisplayDetails()) return false;
+		if (!$this->ShowLivingName()) return false;
 		
 		if ($useli) {
-			if (begRTLText($this->GetSortableName())) print "<li class=\"rtl\" dir=\"rtl\">";
+			if (begRTLText($this->GetSortableName($namenum))) print "<li class=\"rtl\" dir=\"rtl\">";
 			else print "<li class=\"ltr\" dir=\"ltr\">";
 		}
-		if (HasChinese($this->name_array[0][0])) $addname = "&nbsp;(".$this->GetSortableAddName().")";
+		if (HasChinese($this->name_array[$namenum][0])) $addname = "&nbsp;(".$this->GetSortableAddName($namenum).")";
 		else $addname = "";
 		print "<a href=\"individual.php?pid=".$this->xref."&amp;gedid=".$this->gedcomid."\" class=\"list_item\"><b>";
-		print CheckNN($this->GetSortableName()).$addname."</b>".$this->addxref;
+		print CheckNN($this->GetSortableName($namenum)).$addname."</b>".$this->addxref;
 		PersonFunctions::PrintFirstMajorFact($this, true, $break);
 		if (!empty($fact)) {
 			print " <i>(";
@@ -1536,7 +1536,7 @@ if ($this->tracefacts) print "AddSpouseFacts - Adding for ".$fam->$spperson->xre
 		}
 		print "</a>\n";
 		if ($useli) print "</li>";
-		
+		return true;
 
 	}
 	
@@ -1591,7 +1591,7 @@ if ($this->tracefacts) print "AddSpouseFacts - Adding for ".$fam->$spperson->xre
 		global $SHOW_LIVING_NAMES, $person_privacy, $user_privacy, $gm_user, $USE_RELATIONSHIP_PRIVACY, $CHECK_MARRIAGE_RELATIONS, $GEDCOMID, $MAX_RELATION_PATH_LENGTH;
 		
 		// If we can show the details, we can also show the name
-		if ($this->disp) return true;
+		if ($this->DisplayDetails()) return true;
 		
 		// Check the gedcom context
 		$oldgedid = $GEDCOMID;

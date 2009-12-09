@@ -192,6 +192,9 @@ abstract class GedcomRecord {
 			case "changedgedrec":
 				return $this->GetChangedGedRec();
 				break;
+			case "key":
+				return $this->key;
+				break;
 			case "xref":
 				return $this->xref;
 				break;

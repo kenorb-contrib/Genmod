@@ -878,23 +878,7 @@ function GetAssoList($type = "all", $id="") {
 			$asso["role"] = $row["as_rela"];
 			// Get the family names
 			$GEDCOMID = $row["f_file"];
-/*			
-			$husb = Person::GetInstance(SplitKey($row["f_husb"], "id"), "", $row["f_file"]);
-			$wife = Person::GetInstance(SplitKey($row["f_wife"], "id"), "", $row["f_file"]);
-			$hname = NameFunctions::GetSortableName($husb, "", "", true);
-			$wname = NameFunctions::GetSortableName($wife, "", "", true);
-			print $pipo;
-			if (empty($hname)) $hname = "@N.N.";
-			if (empty($wname)) $wname = "@N.N.";
-			$name = array();
-			foreach ($hname as $hkey => $hn) {
-				foreach ($wname as $wkey => $wn) {
-					$name[] = $hn." + ".$wn;
-					$name[] = $wn." + ".$hn;
-				}
-			}
-			$asso["name"] = $name;
-*/			$assolist[$row["f_key"]][] = $asso;
+			$assolist[$row["f_key"]][] = $asso;
 		}
 		$res->FreeResult();
 	}
@@ -1127,19 +1111,19 @@ function GetAlphaIndis($letter, $allgeds="no") {
 			else if ($letter == "S") $text = "SZ";
 			else if ($letter == "T") $text = "TY";
 			else if ($letter == "Z") $text = "ZS";
-			if (isset($text)) $search_letter = "(i_letter = '".DbLayer::EscapeQuery($letter)."' AND i_letter != '".DbLayer::EscapeQuery($text)."') ";
-			else $search_letter = "i_letter LIKE '".DbLayer::EscapeQuery($letter)."' ";
+			if (isset($text)) $search_letter = "(n_letter = '".DbLayer::EscapeQuery($letter)."' AND n_letter != '".DbLayer::EscapeQuery($text)."') ";
+			else $search_letter = "n_letter LIKE '".DbLayer::EscapeQuery($letter)."' ";
 		}
 	}
 	else if ($LANGUAGE == "danish" || $LANGUAGE == "norwegian") {
 		if ($letter == "Ø") $text = "OE";
 		else if ($letter == "Æ") $text = "AE";
 		else if ($letter == "Å") $text = "AA";
-		if (isset($text)) $search_letter = "(i_letter = '".DbLayer::EscapeQuery($letter)."' OR i_letter = '".DbLayer::EscapeQuery($text)."') ";
+		if (isset($text)) $search_letter = "(n_letter = '".DbLayer::EscapeQuery($letter)."' OR n_letter = '".DbLayer::EscapeQuery($text)."') ";
 		else if ($letter=="A") $search_letter = "i_letter LIKE '".DbLayer::EscapeQuery($letter)."' ";
-		else $search_letter = "i_letter LIKE '".DbLayer::EscapeQuery($letter)."' ";
+		else $search_letter = "n_letter LIKE '".DbLayer::EscapeQuery($letter)."' ";
 	}
-	else $search_letter = "i_letter LIKE '".DbLayer::EscapeQuery($letter)."' ";
+	else $search_letter = "n_letter LIKE '".DbLayer::EscapeQuery($letter)."' ";
 	
 	// NOTE: Select the records from the individual table
 	$sql = "";
@@ -1147,7 +1131,7 @@ function GetAlphaIndis($letter, $allgeds="no") {
 	$sql .= "SELECT i_key, i_id, i_isdead, n_letter, i_gedrec, n_file, n_type, n_name, n_surname, n_letter ";
 	$sql .= "FROM ".TBLPREFIX."names, ".TBLPREFIX."individuals ";
 	$sql .= "WHERE n_key = i_key ";
-	$sql .= "AND ".str_replace("i_letter", "n_letter", $search_letter);
+	$sql .= "AND ".$search_letter;
 	// NOTE: Add some optimization if the surname is set to speed up the lists
 	if (!empty($surname)) $sql .= "AND n_surname LIKE '%".DbLayer::EscapeQuery($surname)."%' ";
 	// NOTE: Do not retrieve married names if the user does not want to see them
@@ -1201,7 +1185,7 @@ function GetSurnameIndis($surname, $allgeds="no") {
 	while($row = $res->FetchAssoc()){
 		$row = db_cleanup($row);
 		if (GedcomConfig::$SHOW_NICK) {
-			$n = GetNicks($row["i_gedrec"]);
+			$n = NameFunctions::GetNicks($row["i_gedrec"]);
 			if (count($n) > 0) {
 				$ct = preg_match("~(.*)/(.*)/(.*)~", $row["n_name"], $match);
 				if ($ct>0) $row["n_name"] = $match[1].substr(GedcomConfig::$NICK_DELIM, 0, 1).$n[0].substr(GedcomConfig::$NICK_DELIM, 1, 1)."/".$match[2]."/".$match[3];

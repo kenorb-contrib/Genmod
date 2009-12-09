@@ -217,6 +217,12 @@ if (!empty($check_settings)) {
 							$res = NewQuery("DELETE FROM ".TBLPREFIX."testsanity WHERE s_text='testdata2'", true);
 							if (!$res) print $error_icon.$gm_lang["sc_no_rights"];
 							else {
+								$res = NewQuery("LOCK TABLES ".TBLPREFIX."testsanity WRITE", true);
+								if (!$res) {
+									print $gm_lang["sc_no_lock_rights"];
+									$error = true;
+								}
+								else $res = NewQuery("UNLOCK TABLES", true);
 								$res = NewQuery("DROP TABLE ".TBLPREFIX."testsanity", true);
 								if (!$res) print $gm_lang["sc_no_rights"];
 								else print $info_icon.$gm_lang["sc_ok"];
@@ -405,15 +411,14 @@ if (!empty($check_gedcoms)) {
 						if (!$found) {
 							$found = true;
 							print $warn_icon.$gm_lang["sc_ged_unlink"];
-							print "<br />";
+							print "<br /><ul>";
 						}
 						$person =& Person::GetInstance($row["i_id"], $row, $GEDCOMID);
 						$person->PrintListPerson();
 					}
-					if ($found) print "<br />";
 				}
 				if (!$found) print $info_icon.$gm_lang["sc_ged_nounlink"];
-				else print $gm_lang["sc_numrecs_found"]." ".$num;
+				else print "</ul>".$gm_lang["sc_numrecs_found"]." ".$num;
 			}
 			else print $info_icon.$gm_lang["sc_ged_unlinked_noselect"];
 			print "</td></tr>";
@@ -531,11 +536,10 @@ if (!empty($check_gedcoms)) {
 						else {
 							if (!$error) {
 								$error = true;
-								print $error_icon.$gm_lang["sc_inv_sref"];
+								print $error_icon.$gm_lang["sc_inv_sref"]."<ul>";
 							}
-							print "<br />".$gm_lang["source"]." ".$sid."<br />";
 							$person =& Person::GetInstance($key, $gedlines["gedcom"], $GEDCOMID);
-							$person->PrintListPerson();
+							$person->PrintListPerson(true, false, $gm_lang["source"].": ".$sid);
 						}
 					}
 				}
@@ -579,7 +583,7 @@ if (!empty($check_gedcoms)) {
 				}
 			}
 			if (!$error) print $info_icon.$gm_lang["sc_ok_sref"]." ";
-			else print "<br />";
+			else print "</ul>";
 			print $gm_lang["sc_numrecs_checked"]." ".$num;
 			print "</td></tr>";
 					
@@ -597,11 +601,10 @@ if (!empty($check_gedcoms)) {
 						if (!isset($indilist[$pid])) {
 							if (!$error) {
 								$error = true;
-								print $error_icon.$gm_lang["sc_inv_aref"];
+								print $error_icon.$gm_lang["sc_inv_aref"]."<ul>";
 							}
-							print "<br />".$gm_lang["asso_alia"].": ".$pid."<br />";
 							$person =& Person::GetInstance($key, $gedlines["gedcom"], $GEDCOMID);
-							$person->PrintListPerson();
+							$person->PrintListPerson(true, false, $gm_lang["asso_alia"].": ".$pid);
 						}
 					}
 				}
@@ -616,17 +619,16 @@ if (!empty($check_gedcoms)) {
 						if (!isset($indilist[$pid])) {
 							if (!$error) {
 								$error = true;
-								print $error_icon.$gm_lang["sc_inv_aref"];
+								print $error_icon.$gm_lang["sc_inv_aref"]."<ul>";
 							}
-							print "<br />".$gm_lang["asso_alia"].": ".$pid."<br />";
 							$family =& Family::GetInstance($key, $gedlines["gedcom"], $GEDCOMID);
-							$family->PrintListFamily();
+							$family->PrintListFamily(true, $gm_lang["asso_alia"].": ".$pid);
 						}
 					}
 				}
 			}
 			if (!$error) print $info_icon.$gm_lang["sc_ok_aref"]." ";
-			else print "<br />";
+			else print "</ul>";
 			print $gm_lang["sc_numrecs_checked"]." ".$num;
 			print "</td></tr>";
 
@@ -697,11 +699,10 @@ if (!empty($check_gedcoms)) {
 						else {
 							if (!$error) {
 								$error = true;
-								print $error_icon.$gm_lang["sc_inv_sref_fam"];
+								print $error_icon.$gm_lang["sc_inv_sref_fam"]."<ul>";
 							}
-							print "<br />".$gm_lang["source"]." ".$sid."<br />";
 							$family =& Family::GetInstance($key, $gedlines["gedcom"], $GEDCOMID);
-							$family->PrintListFamily();
+							$family->PrintListFamily(true, $gm_lang["source"]." ".$sid);
 						}
 					}
 				}
@@ -752,7 +753,7 @@ if (!empty($check_gedcoms)) {
 				}
 			}
 			if (!$error) print $info_icon.$gm_lang["sc_ok_sref_fam"]." ";
-			else print "<br />";
+			else print "</ul>";
 			print $gm_lang["sc_numrecs_checked"]." ".$num;
 			print "</td></tr>";
 		
@@ -771,11 +772,10 @@ if (!empty($check_gedcoms)) {
 						else {
 							if (!$error) {
 								$error = true;
-								print $error_icon.$gm_lang["sc_inv_rref_sour"];
+								print $error_icon.$gm_lang["sc_inv_rref_sour"]."<ul>";
 							}
-							print "<br />".$gm_lang["repo"]." ".$rid."<br />";
 							$source =& Source::GetInstance($key, $sourcelist[$key]["gedcom"], $GEDCOMID);
-							$source->PrintListSource();
+							$source->PrintListSource(true, 1, $gm_lang["repo"]." ".$rid);
 						}
 					}
 				}
@@ -805,7 +805,7 @@ if (!empty($check_gedcoms)) {
 				}
 			}
 			if (!$error) print $info_icon.$gm_lang["sc_ok_rref_sour"]." ";
-			else print "<br />";
+			else print "</ul>";
 			print $gm_lang["sc_numrecs_checked"]." ".$num;
 			print" </td></tr>";
 		
@@ -821,14 +821,14 @@ if (!empty($check_gedcoms)) {
 					if (!$error) {
 						$error = true;
 						print $warn_icon.$gm_lang["sc_noref_sour_repo"];
+						print "<ul>";
 					}
-					print "<br />";
 					$source =& Source::GetInstance($key, $sourcelist[$key]["gedcom"], $GEDCOMID);
 					$source->PrintListSource();
 				}
 			}
 			if (!$error) print $info_icon.$gm_lang["sc_ok_sour_repo_ref"]." ";
-			else print "<br />";
+			else print "</ul>";
 			print $gm_lang["sc_numrecs_checked"]." ".$num;
 			print" </td></tr>";
 		
@@ -842,14 +842,14 @@ if (!empty($check_gedcoms)) {
 					if (!$error) {
 						$error = true;
 						print $warn_icon.$gm_lang["sc_unu_sref"];
+						print "<ul>";
 					}
-					print "<br />";
 					$source =& Source::GetInstance($sid, $sourcelist[$sid]["gedcom"], $GEDCOMID);
 					$source->PrintListSource();
 				}
 			}
 			if (!$error) print $info_icon.$gm_lang["sc_ok_all_sref"]." ";
-			else print "<br />";
+			else print "</ul>";
 			print $gm_lang["sc_numrecs_checked"]." ".$num;
 			print "</td></tr>";
 
@@ -862,9 +862,8 @@ if (!empty($check_gedcoms)) {
 				if (!$value["in_use"]) {
 					if (!$error) {
 						$error = true;
-						print $warn_icon.$gm_lang["sc_unu_rref"];
+						print $warn_icon.$gm_lang["sc_unu_rref"]."<ul>";
 					}
-					print "<br />";
 					$repo =& Repository::GetInstance($rid, $value["gedcom"], $GEDCOMID);
 					$repo->PrintListRepository(true, 1, false);
 				}
@@ -894,7 +893,7 @@ if (!empty($check_gedcoms)) {
 				}
 			}
 			if (!$error) print $info_icon.$gm_lang["sc_ok_all_rref"]." ";
-			print "<br />".$gm_lang["sc_numrecs_checked"]." ".$num;
+			print "</ul>".$gm_lang["sc_numrecs_checked"]." ".$num;
 			print "</td></tr>";
 	
 			// Print the non-existent facts
@@ -904,7 +903,7 @@ if (!empty($check_gedcoms)) {
 				else {
 					print $error_icon.$gm_lang["sc_haswrongfacts"]."<br />";
 					foreach ($wrongfacts as $fact => $records) {
-						print $gm_lang["sc_facttag"]." ".$fact."<br />";
+						print $gm_lang["sc_facttag"]." ".$fact."<ul>";
 						foreach ($records as $key => $wfact) {
 							if ($wfact[2] == "INDI") {
 								$person =& Person::GetInstance($wfact[0], "", $wfact[1]);
@@ -927,7 +926,7 @@ if (!empty($check_gedcoms)) {
 								$media->PrintListMedia();
 							}
 						}
-						print "<br />";
+						print "</ul>";
 					}
  				}			
 				print $gm_lang["sc_numrecs_checked"]." ".$numcf;
@@ -940,7 +939,7 @@ if (!empty($check_gedcoms)) {
 			if (!empty($check_cits)) {
 				if (count($no_cits) == 0) print $info_icon.$gm_lang["sc_cits_ok"]." ";
 				else {
-					print $warn_icon.$gm_lang["sc_hasno_cits"]."<br />";
+					print $warn_icon.$gm_lang["sc_hasno_cits"]."<ul>";
 					foreach ($no_cits as $key => $rec) {
 						if ($rec[2] == "INDI") {
 							$person =& Person::GetInstance($rec[0], $rec[4], $rec[1]);
@@ -954,7 +953,7 @@ if (!empty($check_gedcoms)) {
 							print_r($rec);
 						}
 					}
-					print "<br />";
+					print "</ul>";
  				}			
 				print $gm_lang["sc_numrecs_checked"]." ".$numnc;
 			}
@@ -995,7 +994,7 @@ if (!empty($check_gedcoms)) {
 							if (CompareFactsdate($oldrec, $rec) > 0) {
 								if (!$error) {
 									$error = true;
-									print $warn_icon.$gm_lang["sc_order_fam"]."<br />";
+									print $warn_icon.$gm_lang["sc_order_fam"]."<ul>";
 								}
 								if (!$printed) {
 									$family =& Family::GetInstance($key, $fam["gedcom"], $GEDCOMID);
@@ -1027,7 +1026,7 @@ if (!empty($check_gedcoms)) {
 				}
 			}
 			if (!$error) print $info_icon.$gm_lang["sc_ok_order_fam"]." ";
-			else print "<br />";
+			else print "</ul>";
 			print "</td></tr>";
 
 			// Check for empty fams with no reference to any indi
@@ -1039,14 +1038,14 @@ if (!empty($check_gedcoms)) {
 				if (!isset($cfam["CHIL"]) && !isset($cfam["WIFE"]) && !isset($cfam["HUSB"])) {
 					if (!$error) {
 						$error = true;
-						print $error_icon.$gm_lang["sc_empty_fam"]."<br />";
+						print $error_icon.$gm_lang["sc_empty_fam"]."<ul>";
 					}
 					$family =& Family::GetInstance($key, $cfam["gedcom"], $GEDCOMID);
 					$family->PrintListFamily();
 				}
 			}
 			if (!$error) print $info_icon.$gm_lang["sc_ok_empty_fam"]." ";
-			else print "<br />";
+			else print "</ul>";
 			print $gm_lang["sc_numrecs_checked"]." ".$num;
 			print "</td></tr>";
 			
@@ -1173,17 +1172,16 @@ if (!empty($check_gedcoms)) {
 						else {
 							if (!$error) {
 								$error = true;
-								print $error_icon.$gm_lang["sc_inv_mref"];
+								print $error_icon.$gm_lang["sc_inv_mref"]."<ul>";
 							}
-							print "<br />".$gm_lang["sc_media"]." ".$mid."<br />";
 							$person =& Person::GetInstance($key, $gedlines["gedcom"], $GEDCOMID);
-							$person->PrintListPerson();
+							$person->PrintListPerson(true, false, $gm_lang["sc_media"]." ".$mid);
 						}
 					}
 				}
 			}
 			if (!$error) print $info_icon.$gm_lang["sc_ok_mref"]." ";
-			else print "<br />";
+			else print "</ul>";
 			print $gm_lang["sc_numrecs_checked"]." ".$num;
 			print "</td></tr>";
 			
@@ -1202,17 +1200,16 @@ if (!empty($check_gedcoms)) {
 						else {
 							if (!$error) {
 								$error = true;
-								print $error_icon.$gm_lang["sc_inv_mref_fam"];
+								print $error_icon.$gm_lang["sc_inv_mref_fam"]."<ul>";
 							}
-							print "<br />".$gm_lang["sc_media"]." ".$mid."<br />";
 							$family =& Family::GetInstance($key, $gedlines["gedcom"], $GEDCOMID);
-							$family->PrintListFamily();
+							$family->PrintListFamily(true, $gm_lang["sc_media"]." ".$mid);
 						}
 					}
 				}
 			}
 			if (!$error) print $info_icon.$gm_lang["sc_ok_mref_fam"]." ";
-			else print "<br />";
+			else print "</ul>";
 			print $gm_lang["sc_numrecs_checked"]." ".$num;
 			print "</td></tr>";
 			
@@ -1231,17 +1228,16 @@ if (!empty($check_gedcoms)) {
 						else {
 							if (!$error) {
 								$error = true;
-								print $error_icon.$gm_lang["sc_inv_mref_sour"];
+								print $error_icon.$gm_lang["sc_inv_mref_sour"]."<ul>";
 							}
-							print "<br />".$gm_lang["sc_media"]." ".$mid."<br />";
 							$source =& Source::GetInstance($key, $sourcelist[$key]["gedcom"], $GEDCOMID);
-							$source->PrintListSource();
+							$source->PrintListSource(true, 1, $gm_lang["sc_media"]." ".$mid);
 						}
 					}
 				}
 			}
 			if (!$error) print $info_icon.$gm_lang["sc_ok_mref_sour"]." ";
-			else print "<br />";
+			else print "</ul>";
 			print $gm_lang["sc_numrecs_checked"]." ".$num;
 			print "</td></tr>";
 
@@ -1260,17 +1256,16 @@ if (!empty($check_gedcoms)) {
 						else {
 							if (!$error) {
 								$error = true;
-								print $error_icon.$gm_lang["sc_inv_mref_repo"];
+								print $error_icon.$gm_lang["sc_inv_mref_repo"]."<ul>";
 							}
-							print "<br />".$gm_lang["sc_media"]." ".$mid."<br />";
 							$repo =& Repository::GetInstance($key, $repo["gedcom"], $GEDCOMID);
-							$repo->PrintListRepository(true, 1, false);
+							$repo->PrintListRepository(true, 1, false, $gm_lang["sc_media"]." ".$mid);
 						}
 					}
 				}
 			}
 			if (!$error) print $info_icon.$gm_lang["sc_ok_mref_repo"]." ";
-			else print "<br />";
+			else print "</ul>";
 			print $gm_lang["sc_numrecs_checked"]." ".$num;
 			print "</td></tr>";
 			
@@ -1283,14 +1278,14 @@ if (!empty($check_gedcoms)) {
 				if (!$value["in_use"]) {
 					if (!$error) {
 						$error = true;
-						print $warn_icon.$gm_lang["sc_unu_mref"];
+						print $warn_icon.$gm_lang["sc_unu_mref"]."<ul>";
 					}
-					print "<br />";
-					print $gm_lang["sc_media"]." ".$mid."<br />";
+					$media =& MediaItem::GetInstance($key, $cmedialist[$mid]["gedcom"], $cmedialist[$mid]["gedfile"]);
+					$media->PrintListMedia();
 				}
 			}
 			if (!$error) print $info_icon.$gm_lang["sc_ok_all_mref"]." ";
-			else print "<br />";
+			else print "</ul>";
 			print $gm_lang["sc_numrecs_checked"]." ".$num;
 			print "</td></tr>";
 
@@ -1363,16 +1358,16 @@ if (!empty($check_gedcoms)) {
 						else {
 							if (!$error) {
 								$error = true;
-								print $error_icon.$gm_lang["sc_inv_mref_file"];
+								print $error_icon.$gm_lang["sc_inv_mref_file"]."<ul>";
 							}
-							print "<br />".$gm_lang["sc_media"]." ".$mid."<br />";
-							print $gm_lang["sc_file"]." ".$file."<br />";
+							$media =& MediaItem::GetInstance($key, $cmedialist[$mid]["gedcom"], $cmedialist[$mid]["gedfile"]);
+							$media->PrintListMedia(true, $gm_lang["sc_file"]." ".$file);
 						}
 					}
 				}
 			}
 			if (!$error) print $info_icon.$gm_lang["sc_ok_all_file"]." ";
-			else print "<br />";
+			else print "</ul>";
 			print $gm_lang["sc_numrecs_checked"]." ".$num;
 			print "</td></tr>";
 			
@@ -1385,13 +1380,13 @@ if (!empty($check_gedcoms)) {
 				if (!$ref) {
 					if (!$error) {
 						$error = true;
-						print $warn_icon.$gm_lang["sc_unu_file"];
+						print $warn_icon.$gm_lang["sc_unu_file"]."<ul>";
 					}
-					print "<br />".$gm_lang["sc_file"]." ".$file;
+					print "<li>".$gm_lang["sc_file"]." ".$file."</li>";
 				}
 			}
 			if (!$error) print $info_icon.$gm_lang["sc_ok_use_file"]." ";
-			else print "<br />";
+			else print "</ul>";
 			print $gm_lang["sc_numrecs_checked"]." ".$num;
 			print "</td></tr>";
 			
@@ -1402,7 +1397,7 @@ if (!empty($check_gedcoms)) {
 				print $info_icon.$gm_lang["sc_ok_noteref"]." ";
 			}
 			else {
-				print $error_icon.$gm_lang["sc_inv_noteref"]."<br />";
+				print $error_icon.$gm_lang["sc_inv_noteref"]."<ul>";
 				foreach ($inv_noteref as $type => $keys) {
 					if ($type == "INDI") {
 						foreach ($keys as $key => $nothing) {
@@ -1435,7 +1430,7 @@ if (!empty($check_gedcoms)) {
 						}
 					}
 				}
-				print "<br />";
+				print "</ul>";
 			}
 			print $gm_lang["sc_numrecs_checked"]." ".$numcn;
 			print "</td></tr>";	
@@ -1449,15 +1444,14 @@ if (!empty($check_gedcoms)) {
 				if (!$value["in_use"]) {
 					if (!$error) {
 						$error = true;
-						print $warn_icon.$gm_lang["sc_unu_nref"];
+						print $warn_icon.$gm_lang["sc_unu_nref"]."<ul>";
 					}
-					print "<br />";
 					$note =& Note::GetInstance($oid);
 					$note->PrintListNote(40);
 				}
 			}
 			if (!$error) print $info_icon.$gm_lang["sc_ok_all_nref"]." ";
-			else print "<br />";
+			else print "</ul>";
 			print $gm_lang["sc_numrecs_checked"]." ".$num;
 			print "</td></tr>";
 		}

@@ -311,15 +311,23 @@ class MediaItem extends GedcomRecord {
 	}
 		
 	// Prints the information for media in a list view
-	public function PrintListMedia() {
+	public function PrintListMedia($useli=true, $fact="") {
 		
 		if (!$this->DisplayDetails()) return false;
-		if (begRTLText($this->GetTitle())) print "\n\t\t\t<li class=\"rtl\" dir=\"rtl\">";
-		else print "\n\t\t\t<li class=\"ltr\" dir=\"ltr\">";
+		if ($useli) {
+			if (begRTLText($this->GetTitle())) print "\n\t\t\t<li class=\"rtl\" dir=\"rtl\">";
+			else print "\n\t\t\t<li class=\"ltr\" dir=\"ltr\">";
+		}
 		print "\n\t\t\t<a href=\"mediadetail.php?mid=$this->xref&amp;gedid=".$this->gedcomid."\" class=\"list_item\">".PrintReady($this->title);
 		print $this->addxref;
+		if (!empty($fact)) {
+			print " <i>(";
+			if (defined("GM_FACT_".$fact)) print constant("GM_FACT_".$fact);
+			else print $fact;
+			print ")</i>";
+		}
 		print "</a>\n";
-		print "</li>\n";
+		if ($useli) print "</li>\n";
 	}
 	
 	

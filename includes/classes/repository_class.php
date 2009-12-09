@@ -238,7 +238,7 @@ class Repository extends GedcomRecord {
 	// Type	=	1	: normal title (descriptor and adddescriptor
 	// 			2	: descriptor
 	//			3	: adddescriptor
-	public function PrintListRepository($useli=true, $type=1, $prtact=true) {
+	public function PrintListRepository($useli=true, $type=1, $prtact=true, $fact="") {
 		global $TEXT_DIRECTION;
 
 		if (!$this->DisplayDetails()) return false;
@@ -265,6 +265,12 @@ class Repository extends GedcomRecord {
 				else print "<span class=\"okay\"> &rlm;(".$this->action_open.")&rlm;</span>";
 			}
 		}			
+		if (!empty($fact)) {
+			print " <i>(";
+			if (defined("GM_FACT_".$fact)) print constant("GM_FACT_".$fact);
+			else print $fact;
+			print ")</i>";
+		}
 		print "</a>\n";
 		if ($useli) print "</li>\n";
 	}
