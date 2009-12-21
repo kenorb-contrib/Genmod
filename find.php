@@ -78,37 +78,37 @@ require("includes/values/specialchars.php");
 
 switch ($type) {
 	case "indi" :
-		PrintSimpleHeader($gm_lang["find_individual"]);
+		PrintSimpleHeader(GM_LANG_find_individual);
 		break;
 	case "fam" :
-		PrintSimpleHeader($gm_lang["find_fam_list"]);
+		PrintSimpleHeader(GM_LANG_find_fam_list);
 		break;
 	case "media" :
-		PrintSimpleHeader($gm_lang["find_media"]);
+		PrintSimpleHeader(GM_LANG_find_media);
 		$action="filter";
 		break;
 	case "object" :
-		PrintSimpleHeader($gm_lang["find_media"]);
+		PrintSimpleHeader(GM_LANG_find_media);
 		$action="filter";
 		break;
 	case "place" :
-		PrintSimpleHeader($gm_lang["find_place"]);
+		PrintSimpleHeader(GM_LANG_find_place);
 		$action="filter";		
 		break;
 	case "repo" :
-		PrintSimpleHeader($gm_lang["repo_list"]);
+		PrintSimpleHeader(GM_LANG_repo_list);
 		$action="filter";		
 		break;
 	case "source" :
-		PrintSimpleHeader($gm_lang["find_source"]);
+		PrintSimpleHeader(GM_LANG_find_source);
 		$action="filter";
 		break;
 	case "note" :
-		PrintSimpleHeader($gm_lang["find_note"]);
+		PrintSimpleHeader(GM_LANG_find_note);
 		$action="filter";
 		break;
 	case "specialchar" :
-		PrintSimpleHeader($gm_lang["find_specialchar"]);
+		PrintSimpleHeader(GM_LANG_find_specialchar);
 		$action="filter";		
 		break;
 }
@@ -137,7 +137,7 @@ switch ($type) {
 		if (document.forms[0].subclick) button = document.forms[0].subclick.value;
 		else button = "";
 		if (frm.filter.value.length<2&button!="all") {
-			alert("<?php print $gm_lang["search_more_chars"]?>");
+			alert("<?php print GM_LANG_search_more_chars?>");
 			frm.filter.focus();
 			return false;
 		}
@@ -176,31 +176,31 @@ print "<div class=\"topbottombar width60\">";
 
 switch ($type) {
 	case "indi" :
-		print $gm_lang["find_individual"];
+		print GM_LANG_find_individual;
 		break;
 	case "fam" :
-		print $gm_lang["find_fam_list"];
+		print GM_LANG_find_fam_list;
 		break;
 	case "media" :
-		print $gm_lang["find_media"];
+		print GM_LANG_find_media;
 		break;
 	case "object" :
-		print $gm_lang["find_media"];
+		print GM_LANG_find_media;
 		break;
 	case "place" :
-		print $gm_lang["find_place"];
+		print GM_LANG_find_place;
 		break;
 	case "repo" :
-		print $gm_lang["repo_list"];
+		print GM_LANG_repo_list;
 		break;
 	case "source" :
-		print $gm_lang["find_source"];
+		print GM_LANG_find_source;
 		break;
 	case "note" :
-		print $gm_lang["find_note"];
+		print GM_LANG_find_note;
 		break;
 	case "specialchar" :
-		print $gm_lang["find_specialchar"];
+		print GM_LANG_find_specialchar;
 		break;
 }
 print "</div>";
@@ -214,12 +214,12 @@ if ($type == "indi") {
 	print "<input type=\"hidden\" name=\"type\" value=\"indi\" />";
 	print "<input type=\"hidden\" name=\"gedid\" value=\"".$gedid."\" />";
 	print "<label class=\"width10\" style=\"padding: 5px;\">";
-	print $gm_lang["name_contains"]."</label> <input type=\"text\" name=\"filter\" value=\"";
+	print GM_LANG_name_contains."</label> <input type=\"text\" name=\"filter\" value=\"";
 	if (isset($filter)) print stripslashes($filter);
 	print "\" />";
 	print "</div>";
 	print "<div class=\"width60 center\" style=\"padding: 5px;\">";
-	print "<input type=\"submit\"  value=\"".$gm_lang["filter"]."\" /><br />";
+	print "<input type=\"submit\"  value=\"".GM_LANG_filter."\" /><br />";
 	print "</form></div>";
 }		
 
@@ -232,12 +232,12 @@ else if ($type == "fam") {
 	print "<input type=\"hidden\" name=\"callback\" value=\"$callback\" />";
 	print "<table class=\"list_table $TEXT_DIRECTION\" width=\"30%\" border=\"0\">";
 	print "<tr><td class=\"list_label\" width=\"10%\" style=\"padding: 5px;\">";
-	print $gm_lang["name_contains"]." <input type=\"text\" name=\"filter\" value=\"";
+	print GM_LANG_name_contains." <input type=\"text\" name=\"filter\" value=\"";
 	if (isset($filter)) print stripslashes($filter);
 	print "\" />";
 	print "</td></tr>";
 	print "<tr><td class=\"list_label\" width=\"10%\" style=\"padding: 5px;\">";
-	print "<input type=\"submit\"  value=\"".$gm_lang["filter"]."\" /><br />";
+	print "<input type=\"submit\"  value=\"".GM_LANG_filter."\" /><br />";
 	print "</td></tr></table>";
 	print "</form></div>";
 }
@@ -257,7 +257,7 @@ else if ($type == "media") {
 	print "<input type=\"hidden\" name=\"subclick\">"; // This is for passing the name of which submit button was clicked		
 	print "<table class=\"list_table $TEXT_DIRECTION\" width=\"30%\" border=\"0\">";
 	print "<tr><td class=\"list_label\" width=\"10%\" style=\"padding: 5px;\">";
-	print $gm_lang["media_contains"]." <input type=\"text\" name=\"filter\" value=\"";
+	print GM_LANG_media_contains." <input type=\"text\" name=\"filter\" value=\"";
 	if (isset($filter)) print $filter;
 	print "\" />";
 	print_help_link("simple_filter_help","qm");
@@ -265,12 +265,12 @@ else if ($type == "media") {
 	print "<tr><td class=\"list_label\" width=\"10%\" style=\"padding: 5px;\">";
 	print "<input type=\"checkbox\" name=\"showthumb\" value=\"true\"";
 	if( $showthumb) print "checked=\"checked\"";
-	print "onclick=\"javascript: this.form.submit();\" />".$gm_lang["show_thumbnail"];
+	print "onclick=\"javascript: this.form.submit();\" />".GM_LANG_show_thumbnail;
 	print_help_link("show_thumb_help","qm");
 	print "</td></tr>";
 	print "<tr><td class=\"list_label\" width=\"10%\" style=\"padding: 5px;\">";
-	print "<input type=\"submit\"  name=\"search\" value=\"".$gm_lang["filter"]."\" onclick=\"this.form.subclick.value=this.name\" />&nbsp;";
-	print "<input type=\"submit\"  name=\"all\" value=\"".$gm_lang["display_all"]."\" onclick=\"this.form.subclick.value=this.name\" />";
+	print "<input type=\"submit\"  name=\"search\" value=\"".GM_LANG_filter."\" onclick=\"this.form.subclick.value=this.name\" />&nbsp;";
+	print "<input type=\"submit\"  name=\"all\" value=\"".GM_LANG_display_all."\" onclick=\"this.form.subclick.value=this.name\" />";
 	print "</td></tr></table>";
 	print "</form></div>";
 }
@@ -286,13 +286,13 @@ else if ($type == "object") {
 	print "<table class=\"list_table $TEXT_DIRECTION width30\">";
 	print "<tr><td class=\"list_label width10\" style=\"padding: 5px;\">";
 	print_help_link("simple_filter_help","qm");
-	print $gm_lang["media_contains"]." <input type=\"text\" name=\"filter\" value=\"";
+	print GM_LANG_media_contains." <input type=\"text\" name=\"filter\" value=\"";
 	if (isset($filter)) print stripslashes($filter);
 	print "\" />";
 	print "</td></tr>";
 	print "<tr><td class=\"list_label width10\" style=\"padding: 5px;\">";
-	print "<input type=\"submit\"  name=\"search\" value=\"".$gm_lang["filter"]."\" onclick=\"this.form.subclick.value=this.name\" />&nbsp;";
-	print "<input type=\"submit\"  name=\"all\" value=\"".$gm_lang["display_all"]."\" onclick=\"this.form.subclick.value=this.name\" />";
+	print "<input type=\"submit\"  name=\"search\" value=\"".GM_LANG_filter."\" onclick=\"this.form.subclick.value=this.name\" />&nbsp;";
+	print "<input type=\"submit\"  name=\"all\" value=\"".GM_LANG_display_all."\" onclick=\"this.form.subclick.value=this.name\" />";
 	print "</td></tr></table>";
 	print "</form></div>";
 }
@@ -307,13 +307,13 @@ else if ($type == "place") {
 	print "<input type=\"hidden\" name=\"subclick\">"; // This is for passing the name of which submit button was clicked				
 	print "<table class=\"list_table $TEXT_DIRECTION\" width=\"30%\" border=\"0\">";
 	print "<tr><td class=\"list_label\" width=\"10%\" style=\"padding: 5px;\">";
-	print $gm_lang["place_contains"]." <input type=\"text\" name=\"filter\" value=\"";
+	print GM_LANG_place_contains." <input type=\"text\" name=\"filter\" value=\"";
 	if (isset($filter)) print stripslashes($filter);
 	print "\" />";
 	print "</td></tr>";
 	print "<tr><td class=\"list_label\" width=\"10%\" style=\"padding: 5px;\">";
-	print "<input type=\"submit\"  name=\"search\" value=\"".$gm_lang["filter"]."\" onclick=\"this.form.subclick.value=this.name\" />&nbsp;";
-	print "<input type=\"submit\"  name=\"all\" value=\"".$gm_lang["display_all"]."\" onclick=\"this.form.subclick.value=this.name\" />";
+	print "<input type=\"submit\"  name=\"search\" value=\"".GM_LANG_filter."\" onclick=\"this.form.subclick.value=this.name\" />&nbsp;";
+	print "<input type=\"submit\"  name=\"all\" value=\"".GM_LANG_display_all."\" onclick=\"this.form.subclick.value=this.name\" />";
 	print "</td></tr></table>";
 	print "</form></div>";
 }
@@ -328,13 +328,13 @@ else if ($type == "repo" && $SHOW_SOURCES >= $gm_user->getUserAccessLevel()) {
 	print "<input type=\"hidden\" name=\"subclick\">"; // This is for passing the name of which submit button was clicked				
 	print "<table class=\"list_table $TEXT_DIRECTION\" width=\"30%\" border=\"0\">";
 	print "<tr><td class=\"list_label\" width=\"10%\" style=\"padding: 5px;\">";
-	print $gm_lang["repo_contains"]." <input type=\"text\" name=\"filter\" value=\"";
+	print GM_LANG_repo_contains." <input type=\"text\" name=\"filter\" value=\"";
 	if (isset($filter)) print stripslashes($filter);
 	print "\" />";
 	print "</td></tr>";
 	print "<tr><td class=\"list_label\" width=\"10%\" style=\"padding: 5px;\">";
-	print "<input type=\"submit\"  name=\"search\" value=\"".$gm_lang["filter"]."\" onclick=\"this.form.subclick.value=this.name\" />&nbsp;";
-	print "<input type=\"submit\"  name=\"all\" value=\"".$gm_lang["display_all"]."\" onclick=\"this.form.subclick.value=this.name\" />";
+	print "<input type=\"submit\"  name=\"search\" value=\"".GM_LANG_filter."\" onclick=\"this.form.subclick.value=this.name\" />&nbsp;";
+	print "<input type=\"submit\"  name=\"all\" value=\"".GM_LANG_display_all."\" onclick=\"this.form.subclick.value=this.name\" />";
 	print "</td></tr></table>";
 	print "</form></div>";
 }
@@ -350,13 +350,13 @@ else if ($type == "note") {
 	print "<input type=\"hidden\" name=\"subclick\">"; // This is for passing the name of which submit button was clicked				
 	print "<table class=\"list_table $TEXT_DIRECTION\" width=\"30%\" border=\"0\">";
 	print "<tr><td class=\"list_label\" width=\"10%\" style=\"padding: 5px;\">";
-	print $gm_lang["note_contains"]." <input type=\"text\" name=\"filter\" value=\"";
+	print GM_LANG_note_contains." <input type=\"text\" name=\"filter\" value=\"";
 	if (isset($filter)) print stripslashes($filter);
 	print "\" />";
 	print "</td></tr>";
 	print "<tr><td class=\"list_label\" width=\"10%\" style=\"padding: 5px;\">";
-	print "<input type=\"submit\"  name=\"search\" value=\"".$gm_lang["filter"]."\" onclick=\"this.form.subclick.value=this.name\" />&nbsp;";
-	print "<input type=\"submit\"  name=\"all\" value=\"".$gm_lang["display_all"]."\" onclick=\"this.form.subclick.value=this.name\" />";
+	print "<input type=\"submit\"  name=\"search\" value=\"".GM_LANG_filter."\" onclick=\"this.form.subclick.value=this.name\" />&nbsp;";
+	print "<input type=\"submit\"  name=\"all\" value=\"".GM_LANG_display_all."\" onclick=\"this.form.subclick.value=this.name\" />";
 	print "</td></tr></table>";
 	print "</form></div>";
 }
@@ -372,13 +372,13 @@ else if ($type == "source" && $SHOW_SOURCES >= $gm_user->getUserAccessLevel()) {
 	print "<input type=\"hidden\" name=\"subclick\">"; // This is for passing the name of which submit button was clicked
 	print "<table class=\"list_table $TEXT_DIRECTION\" width=\"30%\" border=\"0\">";
 	print "<tr><td class=\"list_label\" width=\"10%\" style=\"padding: 5px;\">";
-	print $gm_lang["source_contains"]." <input type=\"text\" name=\"filter\" value=\"";
+	print GM_LANG_source_contains." <input type=\"text\" name=\"filter\" value=\"";
 	if (isset($filter)) print stripslashes($filter);
 	print "\" />";
 	print "</td></tr>";
 	print "<tr><td class=\"list_label\" width=\"10%\" style=\"padding: 5px;\">";
-	print "<input type=\"submit\"  name=\"search\" value=\"".$gm_lang["filter"]."\" onclick=\"this.form.subclick.value=this.name\" />&nbsp;";
-	print "<input type=\"submit\"  name=\"all\" value=\"".$gm_lang["display_all"]."\" onclick=\"this.form.subclick.value=this.name\" />";
+	print "<input type=\"submit\"  name=\"search\" value=\"".GM_LANG_filter."\" onclick=\"this.form.subclick.value=this.name\" />&nbsp;";
+	print "<input type=\"submit\"  name=\"all\" value=\"".GM_LANG_display_all."\" onclick=\"this.form.subclick.value=this.name\" />";
 	print "</td></tr></table>";
 	print "</form></div>";
 }
@@ -394,21 +394,21 @@ else if ($type == "specialchar") {
 	print "<table class=\"list_table $TEXT_DIRECTION\" width=\"30%\" border=\"0\">";
 	print "<tr><td class=\"list_label\" width=\"10%\" style=\"padding: 5px;\">";
 	print "<select id=\"language_filter\" name=\"language_filter\" onchange=\"submit();\">";
-	print "\n\t<option value=\"\">".$gm_lang["change_lang"]."</option>";
+	print "\n\t<option value=\"\">".GM_LANG_change_lang."</option>";
 	$language_options = "";
 	foreach($specialchar_languages as $key=>$value) {
 		$language_options.= "\n\t<option value=\"$key\">$value</option>";
 	}
 	$language_options = str_replace("\"$language_filter\"","\"$language_filter\" selected",$language_options);
 	print $language_options;
-	print "</select><br /><a href=\"#\" onclick=\"setMagnify()\">".$gm_lang["magnify"]."</a>";
+	print "</select><br /><a href=\"#\" onclick=\"setMagnify()\">".GM_LANG_magnify."</a>";
 	print "</td></tr></table>";
 	print "</form></div>";
 }
 // end column for find options
 print "<br />";
 print "<div class=\"center\">";
-print "<a href=\"#\" onclick=\"if (window.opener.showchanges) window.opener.showchanges(); window.close();\">".$gm_lang["close_window"]."</a><br />\n";
+print "<a href=\"#\" onclick=\"if (window.opener.showchanges) window.opener.showchanges(); window.close();\">".GM_LANG_close_window."</a><br />\n";
 print "</div>";
 
 if ($action=="filter") {
@@ -422,7 +422,7 @@ if ($action=="filter") {
 		}
 		else {
 			print "<div class=\"center width60\">";
-			print $gm_lang["no_results"];
+			print GM_LANG_no_results;
 			print "</div>";
 		}
 	}
@@ -486,15 +486,15 @@ if ($action=="filter") {
 			print "\n\t\t</ul></td>";
 			SwitchGedcom();
 			print "</tr>\n";
-			print "<tr><td class=\"list_label\">".$gm_lang["total_fams"]." ".$ctf;
-			if (count($fam_private)>0) print "  (".$gm_lang["private"]." ".count($fam_private).")";
-			if (count($fam_hide)>0) print "  --  ".$gm_lang["hidden"]." ".count($fam_hide);
+			print "<tr><td class=\"list_label\">".GM_LANG_total_fams." ".$ctf;
+			if (count($fam_private)>0) print "  (".GM_LANG_private." ".count($fam_private).")";
+			if (count($fam_hide)>0) print "  --  ".GM_LANG_hidden." ".count($fam_hide);
 			if (count($fam_private)>0 || count($fam_hide)>0) print_help_link("privacy_error_help", "qm");
 			print "</tr></td>";
 		}
 		else {
 			print "<td class=\"list_value_wrap\">";
-			print $gm_lang["no_results"];
+			print GM_LANG_no_results;
 			print "</td></tr>";
 		}
 		print "</table>";
@@ -524,8 +524,8 @@ if ($action=="filter") {
 		}
 
 		// Tell the user where he is
-		print "<tr><td class=\"list_value wrap $TEXT_DIRECTION\" colspan=\"4\">".$gm_lang["current_dir"];
-		if ($external_links == "1") print $gm_lang["external_media"];
+		print "<tr><td class=\"list_value wrap $TEXT_DIRECTION\" colspan=\"4\">".GM_LANG_current_dir;
+		if ($external_links == "1") print GM_LANG_external_media;
 		else print $directory;
 		print "</td></tr>";
 
@@ -538,7 +538,7 @@ if ($action=="filter") {
 				print $uplink."</td></tr>";
 			}
 			print "<tr><td class=\"shade2 $TEXT_DIRECTION\" colspan=\"4\">";
-			print "<a href=\"find.php?directory=&amp;external_links=1&amp;type=media".$thumbget."&amp;level=0\">".$gm_lang["external_media"]."</a>";
+			print "<a href=\"find.php?directory=&amp;external_links=1&amp;type=media".$thumbget."&amp;level=0\">".GM_LANG_external_media."</a>";
 			print "</td></tr>";
 			// If we view the external links, add a link to the main directory
 			if ($external_links == "1") {
@@ -578,7 +578,7 @@ if ($action=="filter") {
 		}
 		else {
 			print "<tr><td class=\"list_value_wrap\">";
-			print $gm_lang["no_results"];
+			print GM_LANG_no_results;
 			print "</td></tr>";
 		}
 		print "</table></table></div>";
@@ -601,7 +601,7 @@ if ($action=="filter") {
 		}
 		else {
 			print "<tr><td class=\"list_value_wrap\">";
-			print $gm_lang["no_results"];
+			print GM_LANG_no_results;
 			print "</td></tr>";
 		}
 		print "</table>";
@@ -628,12 +628,12 @@ if ($action=="filter") {
 				print "<li><a href=\"#\" onclick=\"pasteid('".preg_replace(array("/'/",'/"/'), array("\'",'&quot;'), $placetext)."');\">".PrintReady($revplace)."</a></li>\n";
 			}
 			print "\n\t\t</ul></td></tr>";
-			print "<tr><td class=\"list_label\">".$gm_lang["total_places"]." ".$ctplace;
+			print "<tr><td class=\"list_label\">".GM_LANG_total_places." ".$ctplace;
 			print "</td></tr>";
 		}
 		else {
 			print "<tr><td class=\"list_value_wrap $TEXT_DIRECTION\"><ul>";
-			print $gm_lang["no_results"];
+			print GM_LANG_no_results;
 			print "</td></tr>";
 		}
 		print "</table>";
@@ -654,12 +654,12 @@ if ($action=="filter") {
 		    	else $ctrepo--;
 			}
 			print "</ul></td></tr>";
-			print "<tr><td class=\"list_label\">".$gm_lang["repos_found"]." ".$ctrepo;
+			print "<tr><td class=\"list_label\">".GM_LANG_repos_found." ".$ctrepo;
 			print "</td></tr>";
 		}
 		else {
 			print "<tr><td class=\"list_value_wrap\">";
-			print $gm_lang["no_results"];
+			print GM_LANG_no_results;
 			print "</td></tr>";
 		}
 		print "</table>";
@@ -689,11 +689,11 @@ if ($action=="filter") {
 			}
 			print "</ul></td></tr>";
 			SwitchGedcom();
-			if ($cts > 0) print "<tr><td class=\"list_label\">".$gm_lang["total_sources"]." ".$cts."</td></tr>";
+			if ($cts > 0) print "<tr><td class=\"list_label\">".GM_LANG_total_sources." ".$cts."</td></tr>";
 		}
 		else {
 			print "<tr><td class=\"list_value_wrap\">";
-			print $gm_lang["no_results"];
+			print GM_LANG_no_results;
 			print "</td></tr>";
 		}
 		print "</table>";
@@ -719,11 +719,11 @@ if ($action=="filter") {
 			}
 			print "</ul></td></tr>";
 			SwitchGedcom();
-			if ($ctn > 0) print "<tr><td class=\"list_label\">".$gm_lang["total_notes"]." ".$ctn."</td></tr>";
+			if ($ctn > 0) print "<tr><td class=\"list_label\">".GM_LANG_total_notes." ".$ctn."</td></tr>";
 		}
 		else {
 			print "<tr><td class=\"list_value_wrap\">";
-			print $gm_lang["no_results"];
+			print GM_LANG_no_results;
 			print "</td></tr>";
 		}
 		print "</table>";

@@ -37,7 +37,7 @@ if (!$gm_user->userCanAccept()) {
 
 if (empty($action)) $action="";
 
-PrintSimpleHeader($gm_lang["review_changes"]);
+PrintSimpleHeader(GM_LANG_review_changes);
 ?>
 <script language="JavaScript" type="text/javascript">
 <!--
@@ -45,7 +45,7 @@ PrintSimpleHeader($gm_lang["review_changes"]);
 		var recwin = window.open("gedrecord.php?changed=1&pid="+xref, "", "top=50,left=50,width=800,height=400,scrollbars=1,scrollable=1,resizable=1");
 	}
 	function showchanges() {
-	   window.location = '<?php print $SCRIPT_NAME; ?>';
+	   window.location = '<?php print SCRIPT_NAME; ?>';
    }
 
 	function show_diff(diffurl) {
@@ -58,14 +58,14 @@ PrintSimpleHeader($gm_lang["review_changes"]);
 print "<div id=\"content_popup\" class=\"center\">\n";
 print "<span class=\"subheaders\">";
 print_help_link("accept_gedcom", "qm", "review_changes");
-print $gm_lang["review_changes"];
+print GM_LANG_review_changes;
 print "</span><br /><br />\n";
 
 // NOTE: User wants to reject the change
 if ($action=="reject") {
 	if (RejectChange($cid, $gedfile)) {
 		print "<br /><br /><b>";
-		print $gm_lang["reject_successful"];
+		print GM_LANG_reject_successful;
 		print "</b><br /><br />";
 	}
 }
@@ -73,7 +73,7 @@ if ($action=="reject") {
 if ($action=="rejectall") {
 	if (RejectChange("", $gedfile, true)) {
 		print "<br /><br /><b>";
-		print $gm_lang["reject_successful"];
+		print GM_LANG_reject_successful;
 		print "</b><br /><br />";
 	}
 }
@@ -81,7 +81,7 @@ if ($action=="rejectall") {
 if ($action=="accept") {
 	if (AcceptChange($cid, $gedfile)) {
 		print "<br /><br /><b>";
-		print $gm_lang["accept_successful"];
+		print GM_LANG_accept_successful;
 		print "</b><br /><br />";
 	}
 }
@@ -89,14 +89,14 @@ if ($action=="accept") {
 if ($action=="acceptall") {
 	if (AcceptChange("", $gedfile, true)) {
 		print "<br /><br /><b>";
-		print $gm_lang["accept_successful"];
+		print GM_LANG_accept_successful;
 		print "</b><br /><br />";
 	}
 }
 
 if (GetChangeData(true, "", true)==0) {
 	print "<br /><br /><b>";
-	print $gm_lang["no_changes"];
+	print GM_LANG_no_changes;
 	print "</b>";
 }
 else {
@@ -363,16 +363,16 @@ else {
 	// Now, at last, we can start printing!
 	print "<table class=\"shade1\">";
 	foreach ($changegroup as $groupid => $changes) {
-		print "<tr class=\"topbottombar shade2 $TEXT_DIRECTION\"><td colspan=\"2\">".$gm_lang["change_type"].": ";
-		if (isset($gm_lang[$changegroup[$groupid][0]["type"]])) print $gm_lang[$changegroup[$groupid][0]["type"]];
+		print "<tr class=\"topbottombar shade2 $TEXT_DIRECTION\"><td colspan=\"2\">".GM_LANG_change_type.": ";
+		if (defined("GM_LANG_".$changegroup[$groupid][0]["type"])) print constant("GM_LANG_".$changegroup[$groupid][0]["type"]);
 		else print $changegroup[$groupid][0]["type"];
 		if (defined("GM_FACT_".$changegroup[$groupid][0]["fact"])) print ": ".constant("GM_FACT_".$changegroup[$groupid][0]["fact"]);
 		print "</td><td>";
-		if ($changegroup[$groupid]["canaccept"]) print "<a href=\"edit_changes.php?action=accept&amp;cid=$groupid&amp;gedfile=".$changegroup[$groupid][0]["file"]."\">".$gm_lang["accept"]."</a>";
+		if ($changegroup[$groupid]["canaccept"]) print "<a href=\"edit_changes.php?action=accept&amp;cid=$groupid&amp;gedfile=".$changegroup[$groupid][0]["file"]."\">".GM_LANG_accept."</a>";
 		if ($changegroup[$groupid]["canaccept"] && $changegroup[$groupid]["canreject"]) print " | ";
-		if ($changegroup[$groupid]["canreject"]) print "<a href=\"edit_changes.php?action=reject&amp;cid=$groupid&amp;gedfile=".$changegroup[$groupid][0]["file"]."\">".$gm_lang["reject"]."</a>";
+		if ($changegroup[$groupid]["canreject"]) print "<a href=\"edit_changes.php?action=reject&amp;cid=$groupid&amp;gedfile=".$changegroup[$groupid][0]["file"]."\">".GM_LANG_reject."</a>";
 		print "</td></tr>";
-		print "<tr><td>".$gm_lang["name"]."</td><td>".$gm_lang["username"]."</td><td>".$gm_lang["date"]."</td></tr><tr>";
+		print "<tr><td>".GM_LANG_name."</td><td>".GM_LANG_username."</td><td>".GM_LANG_date."</td></tr><tr>";
 		foreach ($changes as $key => $change) {
 			// $change also contains the canaccept and canreject values. Only process if it's an array
 			if (is_array($change)) {
@@ -416,17 +416,17 @@ else {
 						$changegids["repo"][$change["gid"]] = $printname;
 						break;
 					case "OBJE":
-						$printname = "<b>".$gm_lang["media"]."</b> &lrm;(".$change["gid"].")&lrm;<br />\n";;
+						$printname = "<b>".GM_LANG_media."</b> &lrm;(".$change["gid"].")&lrm;<br />\n";;
 						print $printname;
 						$changegids["media"][$change["gid"]] = $printname;
 						break;
 					case "SUBM":
-						$printname = "<b>".$gm_lang["submitter_record"]."</b> &lrm;(".$change["gid"].")&lrm;<br />\n";;
+						$printname = "<b>".GM_LANG_submitter_record."</b> &lrm;(".$change["gid"].")&lrm;<br />\n";;
 						print $printname;
 						$changegids["subm"][$change["gid"]] = $printname;
 						break;
 					case "NOTE":
-						$printname = "<b>".$gm_lang["note"]."</b> &lrm;(".$change["gid"].")&lrm;<br />\n";;
+						$printname = "<b>".GM_LANG_note."</b> &lrm;(".$change["gid"].")&lrm;<br />\n";;
 						print $printname;
 						$changegids["note"][$change["gid"]] = $printname;
 						break;
@@ -448,9 +448,9 @@ else {
 	print "<br /><br /><table class=\"list_table center\">\r\n";
 	print "<tr><td class=\"topbottombar\" colspan=\"2\">";
 	print_help_link("view_gedcom_help", "qm", "view_gedcom");
-	print $gm_lang["view_gedcom"]."</td></tr>";
+	print GM_LANG_view_gedcom."</td></tr>";
 	foreach ($changegids as $type => $gids) {
-		print "<tr><td class=\"shade2\">".$gm_lang[$type]."</td></tr>";
+		print "<tr><td class=\"shade2\">".constant("GM_LANG_".$type)."</td></tr>";
 		foreach ($gids as $gid => $name) {
 			print "<tr><td class=\"shade1 $TEXT_DIRECTION\"><a href=\"javascript:show_gedcom_record('".$gid."');\">".$name."</a></td></tr>";
 		}
@@ -459,13 +459,13 @@ else {
 	//-- accept and reject all
 	print "<br /><br /><table class=\"list_table center\">";
 	print "<tr><td class=\"shade2\">";
-	print "<a href=\"edit_changes.php?action=acceptall&amp;gedfile=".$GEDCOMID."\" onclick=\"return confirm('".$gm_lang["accept_all_confirm"]."');\">".$gm_lang["accept_all"]."</a>\n";
+	print "<a href=\"edit_changes.php?action=acceptall&amp;gedfile=".$GEDCOMID."\" onclick=\"return confirm('".GM_LANG_accept_all_confirm."');\">".GM_LANG_accept_all."</a>\n";
 	print "</td>";
 	print "<td class=\"shade2\">";
-	print "<a href=\"edit_changes.php?action=rejectall&amp;gedfile=".$GEDCOMID."\" onclick=\"return confirm('".$gm_lang["reject_all_confirm"]."');\">".$gm_lang["reject_all"]."</a>\n";
+	print "<a href=\"edit_changes.php?action=rejectall&amp;gedfile=".$GEDCOMID."\" onclick=\"return confirm('".GM_LANG_reject_all_confirm."');\">".GM_LANG_reject_all."</a>\n";
 	print "</td></tr></table>";
 }
 print "<br /><br />\n</center></div>\n";
-print "<center><a href=\"#\" onclick=\"window.opener.reload(); window.close();\">".$gm_lang["close_window"]."</a><br /></center>\n";
+print "<center><a href=\"#\" onclick=\"window.opener.reload(); window.close();\">".GM_LANG_close_window."</a><br /></center>\n";
 PrintSimpleFooter();
 ?>

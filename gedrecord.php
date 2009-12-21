@@ -35,7 +35,7 @@ $pid = CleanInput($pid);
 PrintSimpleHeader($pid);
 
 if ((!$gm_user->userCanViewGedlines()) && (!$gm_user->UserCanAccept())) {
-	print "<span class=\"error\">".$gm_lang["ged_noshow"]."</span>\n";
+	print "<span class=\"error\">".GM_LANG_ged_noshow."</span>\n";
 	print "</body></html>";
 	exit;
 }
@@ -51,7 +51,7 @@ if ($changed) {
 	$oldrec = $person->gedrec;
 	$oldrec = PrivacyFunctions::PrivatizeGedcom($oldrec);
 	print "<table class=\"facts_table\">\r\n";
-	print "<tr class=\"topbottombar\"><td>".$gm_lang["old_record"]."</td><td>".$gm_lang["new_record"]."</td></tr>\r\n";
+	print "<tr class=\"topbottombar\"><td>".GM_LANG_old_record."</td><td>".GM_LANG_new_record."</td></tr>\r\n";
 	print "<tr class=\"shade1 wrap\"><td>".nl2br($oldrec)."</td><td>".nl2br($newrec)."</td></tr>\r\n";
 	print "<tr class=\"topbottombar\"><td colspan=\"2\">&nbsp;</td></tr></table>\r\n";
 }
@@ -60,7 +60,7 @@ else {
 	print nl2br($indirec);
 	print "<br />";
 }
-print "<div class=\"center\"><a href=\"#\" onclick=\"window.close();\">".$gm_lang["close_window"]."</a></div>\n";
+print "<div class=\"center\"><a href=\"#\" onclick=\"window.close();\">".GM_LANG_close_window."</a></div>\n";
 print "</body></html>";
 
 ?>

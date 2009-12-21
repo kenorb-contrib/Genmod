@@ -39,32 +39,32 @@ if($useFCK){
 $username = $gm_username;
 if (empty($username)) {
 	PrintSimpleHeader("");
-	print $gm_lang["access_denied"];
+	print GM_LANG_access_denied;
 	PrintSimpleFooter();
 	exit;
 }
 
 if (!isset($action)) $action="compose";
 
-PrintSimpleHeader($gm_lang["edit_news"]);
+PrintSimpleHeader(GM_LANG_edit_news);
 
 if (empty($uname)) $uname = get_gedcom_from_id($GEDCOMID);
 
 if ($action=="compose") {
-	print '<span class="subheaders">'.$gm_lang["edit_news"].'</span>';
+	print '<span class="subheaders">'.GM_LANG_edit_news.'</span>';
 	?>
 	<script language="JavaScript" type="text/javascript">
 	<!--
 		function checkForm(frm) {
 			if (frm.title.value=="") {
-				alert('<?php print $gm_lang["enter_title"]; ?>');
+				alert('<?php print GM_LANG_enter_title; ?>');
 				document.messageform.title.focus();
 				return false;
 			}
 			<?php if (! $useFCK) { //will be empty for FCK. FIXME, use FCK API to check for content.
 			?>
 			if (frm.text.value=="") {
-				alert('<?php print $gm_lang["enter_text"]; ?>');
+				alert('<?php print GM_LANG_enter_text; ?>');
 				document.messageform.text.focus();
 				return false;
 			}
@@ -92,8 +92,8 @@ if ($action=="compose") {
 	print "<input type=\"hidden\" name=\"news_id\" value=\"".$news->id."\" />\n";
 	print "<input type=\"hidden\" name=\"date\" value=\"".$news->date."\" />\n";
 	print "<table>\n";
-	print "<tr><td align=\"right\">".$gm_lang["title"]."</td><td><input type=\"text\" name=\"title\" size=\"50\" value=\"".$news->title."\" /><br /></td></tr>\n";
-	print "<tr><td valign=\"top\" align=\"right\">".$gm_lang["article_text"]."<br /></td>";
+	print "<tr><td align=\"right\">".GM_LANG_title."</td><td><input type=\"text\" name=\"title\" size=\"50\" value=\"".$news->title."\" /><br /></td></tr>\n";
+	print "<tr><td valign=\"top\" align=\"right\">".GM_LANG_article_text."<br /></td>";
 	print "<td>";
 	if ($useFCK) { // use FCKeditor module
 		$trans = get_html_translation_table(HTML_SPECIALCHARS);
@@ -113,7 +113,7 @@ if ($action=="compose") {
 		print "<textarea name=\"text\" cols=\"80\" rows=\"10\">".$news->text."</textarea>";
 	}
 	print "<br /></td></tr>\n";
-	print "<tr><td></td><td><input type=\"submit\"  value=\"".$gm_lang["save"]."\" /></td></tr>\n";
+	print "<tr><td></td><td><input type=\"submit\"  value=\"".GM_LANG_save."\" /></td></tr>\n";
 	print "</table>\n";
 	print "</form>\n";
 }
@@ -127,13 +127,13 @@ else if ($action=="save") {
 	$news->title = $title;
 	$news->text = $text;
 	if ($news->addNews()) {
-		print $gm_lang["news_saved"];
+		print GM_LANG_news_saved;
 	}
 }
 else if ($action=="delete") {
-	if (NewsController::DeleteNews($news_id)) print $gm_lang["news_deleted"];
+	if (NewsController::DeleteNews($news_id)) print GM_LANG_news_deleted;
 }
-print "<center><br /><br /><a href=\"#\" onclick=\"if (window.opener.refreshpage) window.opener.refreshpage(); window.close();\">".$gm_lang["close_window"]."</a><br /></center>";
+print "<center><br /><br /><a href=\"#\" onclick=\"if (window.opener.refreshpage) window.opener.refreshpage(); window.close();\">".GM_LANG_close_window."</a><br /></center>";
 
 PrintSimpleFooter();
 ?>

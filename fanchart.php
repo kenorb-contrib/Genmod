@@ -112,19 +112,19 @@ function split_align_text($data, $maxlen) {
  */
 function print_fan_chart($treeid, $fanw=640, $fandeg=270) {
 	global $PEDIGREE_GENERATIONS, $fan_width, $fan_style, $cw, $fontsize;
-	global $name, $gm_lang, $view, $TEXT_DIRECTION;
+	global $name, $view, $TEXT_DIRECTION;
 	global $gm_user;
 	global $GM_IMAGES, $GEDCOMID;
 
 	// check for GD 2.x library
 	if (!defined("IMG_ARC_PIE")) {
-		print "<span class=\"error\">".$gm_lang["gd_library"]."</span>";
-		print " <a href=\"" . $gm_lang["gd_helplink"] . "\"><img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["help"]["small"]."\" class=\"icon\" alt=\"\" /></a><br /><br />";
+		print "<span class=\"error\">".GM_LANG_gd_library."</span>";
+		print " <a href=\"" . GM_LANG_gd_helplink . "\"><img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["help"]["small"]."\" class=\"icon\" alt=\"\" /></a><br /><br />";
 		return false;
 	}
 	if (!function_exists("ImageTtfBbox")) {
-		print "<span class=\"error\">".$gm_lang["gd_freetype"]."</span>";
-		print " <a href=\"" . $gm_lang["gd_helplink"] . "\"><img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["help"]["small"]."\" class=\"icon\" alt=\"\" /></a><br /><br />";
+		print "<span class=\"error\">".GM_LANG_gd_freetype."</span>";
+		print " <a href=\"" . GM_LANG_gd_helplink . "\"><img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["help"]["small"]."\" class=\"icon\" alt=\"\" /></a><br /><br />";
 		return false;
 	}
 
@@ -144,13 +144,13 @@ function print_fan_chart($treeid, $fanw=640, $fandeg=270) {
 	print "\r\ngetcwd()\t=\t". getcwd();
 	print "\r\n-->";
 	if (!file_exists($fontfile)) {
-		if (!empty($fontfile)) print "<span class=\"error\">".$gm_lang["fontfile_error"]." : $fontfile</span>";
+		if (!empty($fontfile)) print "<span class=\"error\">".GM_LANG_fontfile_error." : $fontfile</span>";
 		$fontfile="./fonts/LucidaSansRegular.ttf";
 	}
 	print "\r\n<!-- trace start\r\n font-family\t=\t$fontfile\r\n-->";
 	if ($fontfile{0}!='/') $fontfile = dirname(__FILE__) . "/" . $fontfile;
 	if (!file_exists($fontfile)) {
-		print "<span class=\"error\">".$gm_lang["fontfile_error"]." : $fontfile</span>";
+		print "<span class=\"error\">".GM_LANG_fontfile_error." : $fontfile</span>";
 		return false;
 	}
 	if (intval($fontsize)<2) $fontsize = 7;
@@ -249,7 +249,7 @@ require_once("fonts/".$ff[0].".php");
 				$maxpix = sin(deg2rad($deg2-$deg1))*$rx/2;
 				print "strlen kan: ".$maxpix." ";
 				if (!PrivacyFunctions::showLivingNameByID($pid)) {
-					$name = $gm_lang["private"];
+					$name = GM_LANG_private;
 					$addname = "";
 				}
 				else {
@@ -364,12 +364,12 @@ print " ".strlen($altname)." ".$wmax." ".$name." ";
 				print "<a href=\"individual.php?pid=$pid\" class=\"name1\">" . PrintReady($name);
 				if (!empty($addname)) print "<br />" . PrintReady($addname);
 				print "</a>\n";
-				print "<br /><a href=\"pedigree.php?rootid=$pid\" >".$gm_lang["index_header"]."</a>\n";
-				print "<br /><a href=\"descendancy.php?rootid=$pid\" >".$gm_lang["descend_chart"]."</a>\n";
-				if ($reltome)  print "<br /><a href=\"relationship.php?pid1=".$tuser->gedcomid[$GEDCOMID]."&amp;pid2=".$pid."&amp;ged=$GEDCOMID\" onmouseover=\"clear_family_box_timeout('".$pid.".".$count."');\" onmouseout=\"family_box_timeout('".$pid.".".$count."');\">".$gm_lang["relationship_to_me"]."</a>\n";
-				print "<br /><a href=\"ancestry.php?rootid=$pid\" onmouseover=\"clear_family_box_timeout('".$pid.".".$count."');\" onmouseout=\"family_box_timeout('".$pid.".".$count."');\">".$gm_lang["ancestry_chart"]."</a>\n";
-				print "<br /><a href=\"fanchart.php?rootid=$pid&amp;PEDIGREE_GENERATIONS=$PEDIGREE_GENERATIONS&amp;fan_width=$fan_width&amp;fan_style=$fan_style\" onmouseover=\"clear_family_box_timeout('".$pid.".".$count."');\" onmouseout=\"family_box_timeout('".$pid.".".$count."');\">".$gm_lang["fan_chart"]."</a>\n";
-				print "<br /><a href=\"hourglass.php?pid=$pid\" onmouseover=\"clear_family_box_timeout('".$pid.".".$count."');\" onmouseout=\"family_box_timeout('".$pid.".".$count."');\">".$gm_lang["hourglass_chart"]."</a>\n";
+				print "<br /><a href=\"pedigree.php?rootid=$pid\" >".GM_LANG_index_header."</a>\n";
+				print "<br /><a href=\"descendancy.php?rootid=$pid\" >".GM_LANG_descend_chart."</a>\n";
+				if ($reltome)  print "<br /><a href=\"relationship.php?pid1=".$tuser->gedcomid[$GEDCOMID]."&amp;pid2=".$pid."&amp;ged=$GEDCOMID\" onmouseover=\"clear_family_box_timeout('".$pid.".".$count."');\" onmouseout=\"family_box_timeout('".$pid.".".$count."');\">".GM_LANG_relationship_to_me."</a>\n";
+				print "<br /><a href=\"ancestry.php?rootid=$pid\" onmouseover=\"clear_family_box_timeout('".$pid.".".$count."');\" onmouseout=\"family_box_timeout('".$pid.".".$count."');\">".GM_LANG_ancestry_chart."</a>\n";
+				print "<br /><a href=\"fanchart.php?rootid=$pid&amp;PEDIGREE_GENERATIONS=$PEDIGREE_GENERATIONS&amp;fan_width=$fan_width&amp;fan_style=$fan_style\" onmouseover=\"clear_family_box_timeout('".$pid.".".$count."');\" onmouseout=\"family_box_timeout('".$pid.".".$count."');\">".GM_LANG_fan_chart."</a>\n";
+				print "<br /><a href=\"hourglass.php?pid=$pid\" onmouseover=\"clear_family_box_timeout('".$pid.".".$count."');\" onmouseout=\"family_box_timeout('".$pid.".".$count."');\">".GM_LANG_hourglass_chart."</a>\n";
 				**/
 				if ($sosa>=1) {
 					$famids = FindSfamilyIds($pid);
@@ -394,7 +394,7 @@ print " ".strlen($altname)." ".$wmax." ".$name." ";
 										// TODO: Fix links
 										//print "\n<br /><a href=\"$linkurl\" class=\"name1\">";
 										//if (displayDetailsById($spid) || showLivingNameById($spid)) print PrintReady(rtrim(GetPersonName($spid)));
-										//else print $gm_lang["private"];
+										//else print GM_LANG_private;
 										//print "</a>";
 //									}
 								}
@@ -405,7 +405,7 @@ print " ".strlen($altname)." ".$wmax." ".$name." ";
 									// TODO: Fix links
 									// print "\n<br />&nbsp;&nbsp;<a href=\"$linkurl\" class=\"name1\">&lt; ";
 									//if (displayDetailsById($cpid) || showLivingNameById($cpid)) print PrintReady(rtrim(GetPersonName($cpid)));
-									//else print $gm_lang["private"];
+									//else print GM_LANG_private;
 									//print "</a>";
 //								}
 							}
@@ -415,7 +415,7 @@ print " ".strlen($altname)." ".$wmax." ".$name." ";
 							$famrec = FindFamilyRecord($cfamids[$f]["famid"]);
 							if ($famrec) {
 								$num = preg_match_all("/1\s*CHIL\s*@(.*)@/", $famrec, $smatch,PREG_SET_ORDER);
-								if ($num>1) print "\n<br /><span class=\"name1\">".$gm_lang["siblings"]."</span>";
+								if ($num>1) print "\n<br /><span class=\"name1\">".GM_LANG_siblings."</span>";
 								for($i=0; $i<$num; $i++) {
 									$cpid = $smatch[$i][1];
 									if ($cpid!=$pid) {
@@ -423,7 +423,7 @@ print " ".strlen($altname)." ".$wmax." ".$name." ";
 										// TODO: Fix links
 										//print "\n<br />&nbsp;&nbsp;<a href=\"$linkurl\" class=\"name1\"> ";
 										//if (displayDetailsById($cpid) || showLivingNameById($cpid)) print PrintReady(rtrim(GetPersonName($cpid)));
-										//else print $gm_lang["private"];
+										//else print GM_LANG_private;
 										//print "</a>";
 									}
 								}
@@ -468,7 +468,7 @@ print " ".strlen($altname)." ".$wmax." ".$name." ";
 	// note: arg "image_name=" is to avoid image miscaching
 	$image_name="V".time();
 	unset($_SESSION[$image_name]);          // statisticsplot.php uses this to hold a file name to send to browser
-	$image_title=preg_replace("~<.*>~", "", $name) . " " . $gm_lang["fan_chart"];
+	$image_title=preg_replace("~<.*>~", "", $name) . " " . GM_LANG_fan_chart;
 	echo "\r\n<p align=\"center\" >";
 	echo "<img src=\"imageflush.php?image_type=png&amp;image_name=$image_name\" width=\"$fanw\" height=\"$fanh\" border=\"0\" alt=\"$image_title\" title=\"$image_title\" usemap=\"#fanmap\" />";
 	echo "\r\n</p>\r\n";
@@ -505,19 +505,19 @@ if (PrivacyFunctions::showLivingNameByID($rootid)) {
 	$addname = GetAddPersonName($rootid);
 }
 else {
-	$name = $gm_lang["private"];
+	$name = GM_LANG_private;
 	$addname = "";
 }
 // -- print html header information
 $title = PrintReady($name);
 if (GedcomConfig::$SHOW_ID_NUMBERS) $title .= " - ".$rootid;
-$title .= " - ".$gm_lang["fan_chart"];
+$title .= " - ".GM_LANG_fan_chart;
 PrintHeader($title);
 if (strlen($name)<30) $cellwidth="420";
 else $cellwidth=(strlen($name)*14);
 print "\n\t<table class=\"list_table $TEXT_DIRECTION\"><tr><td width=\"${cellwidth}\" valign=\"top\">\n\t\t";
-if ($view == "preview") print "<h3>" . str_replace("#PEDIGREE_GENERATIONS#", ConvertNumber($PEDIGREE_GENERATIONS), $gm_lang["gen_fan_chart"]) . ":";
-else print "<h3>" . $gm_lang["fan_chart"] . ":";
+if ($view == "preview") print "<h3>" . str_replace("#PEDIGREE_GENERATIONS#", ConvertNumber($PEDIGREE_GENERATIONS), GM_LANG_gen_fan_chart) . ":";
+else print "<h3>" . GM_LANG_fan_chart . ":";
 print "<br />".PrintReady($name);
 if ($addname != "") print "<br />" . PrintReady($addname);
 print "</h3>";
@@ -534,15 +534,15 @@ if ($view != "preview") {
 	//-->
 	</script>
 	<?php
-	if (isset($max_generation) == true) print "<span class=\"error\">" . str_replace("#PEDIGREE_GENERATIONS#", ConvertNumber($PEDIGREE_GENERATIONS), $gm_lang["max_generation"]) . "</span>";
-	if (isset($min_generation) == true) print "<span class=\"error\">" . $gm_lang["min_generation"] . "</span>";
+	if (isset($max_generation) == true) print "<span class=\"error\">" . str_replace("#PEDIGREE_GENERATIONS#", ConvertNumber($PEDIGREE_GENERATIONS), GM_LANG_max_generation) . "</span>";
+	if (isset($min_generation) == true) print "<span class=\"error\">" . GM_LANG_min_generation . "</span>";
 	print "\n\t</td><td><form name=\"people\" method=\"get\" action=\"?\">";
 	print "\n\t\t<table class=\"list_table $TEXT_DIRECTION\">\n\t\t<tr>";
 	
 	// NOTE: rootid
 	print "<td class=\"shade2\">";
 	print_help_link("rootid_help", "qm");
-	print $gm_lang["root_person"]."</td>";
+	print GM_LANG_root_person."</td>";
 	print "<td class=\"shade1\">";
 	print "<input class=\"pedigree_form\" type=\"text\" name=\"rootid\" id=\"rootid\" size=\"3\" value=\"$rootid\" />";
     LinkFunctions::PrintFindIndiLink("rootid","");
@@ -551,7 +551,7 @@ if ($view != "preview") {
 	// NOTE: fan style
 	print "<td rowspan=\"3\" class=\"shade2\">";
 	print_help_link("fan_style_help", "qm");
-	print $gm_lang["fan_chart"]."</td>";
+	print GM_LANG_fan_chart."</td>";
 	print "<td rowspan=\"3\" class=\"shade1\">";
 	print "<input type=\"radio\" name=\"fan_style\" value=\"2\"";
 	if ($fan_style==2) print " checked=\"checked\"";
@@ -565,13 +565,13 @@ if ($view != "preview") {
 	
 	// NOTE: submit
 	print "</td><td rowspan=\"3\" class=\"center vmiddle\">";
-	print "<input type=\"submit\"  value=\"" . $gm_lang["view"] . "\" />";
+	print "<input type=\"submit\"  value=\"" . GM_LANG_view . "\" />";
 	print "</td></tr>\n";
 	
 	// NOTE: generations
 	print "<tr><td class=\"shade2\">";
 	print_help_link("PEDIGREE_GENERATIONS_help", "qm");	
-	print $gm_lang["generations"]."</td>";
+	print GM_LANG_generations."</td>";
 	print "<td class=\"shade1\">";
 //	print "<input type=\"text\" name=\"PEDIGREE_GENERATIONS\" size=\"3\" value=\"$OLD_PGENS\" /> ";
 	print "<select name=\"PEDIGREE_GENERATIONS\">";
@@ -586,7 +586,7 @@ if ($view != "preview") {
 	// NOTE: fan width
 	print "<td class=\"shade2\">";
 	print_help_link("fan_width_help", "qm");
-	print $gm_lang["fan_width"]."</td>";
+	print GM_LANG_fan_width."</td>";
 	print "<td class=\"shade1\">";
 	print "<input type=\"text\" size=\"3\" name=\"fan_width\" value=\"$fan_width\" /> <b>%</b> ";
 	print "</td>";
@@ -595,7 +595,7 @@ if ($view != "preview") {
 } 
 else {
 	print "<script language='JavaScript' type='text/javascript'><!--\n";
-	print "if (IE) document.write('<span class=\"warning\">".str_replace("'", "\'", $gm_lang["fanchart_IE"])."</span>');";
+	print "if (IE) document.write('<span class=\"warning\">".str_replace("'", "\'", GM_LANG_fanchart_IE)."</span>');";
 	print "//--></script>";
 }
 print "</td></tr></table>";

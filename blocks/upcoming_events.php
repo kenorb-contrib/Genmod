@@ -26,7 +26,7 @@
  * $Id$
  */
 
-$GM_BLOCKS["print_upcoming_events"]["name"] 		= $gm_lang["upcoming_events_block"];
+$GM_BLOCKS["print_upcoming_events"]["name"] 		= GM_LANG_upcoming_events_block;
 $GM_BLOCKS["print_upcoming_events"]["descr"] 		= "upcoming_events_descr";
 $GM_BLOCKS["print_upcoming_events"]["canconfig"] 	= true;
 $GM_BLOCKS["print_upcoming_events"]["config"] 		= array("days"=>15, "filter"=>"all", "onlyBDM"=>"no");
@@ -35,7 +35,7 @@ $GM_BLOCKS["print_upcoming_events"]["rss"]			= true;
 //-- upcoming events block
 //-- this block prints a list of upcoming events of people in your gedcom
 function print_upcoming_events($block=true, $config="", $side, $index) {
-	global $gm_lang, $command, $TEXT_DIRECTION;
+	global $command, $TEXT_DIRECTION;
 	global $GM_IMAGES, $GM_BLOCKS;
 	global $NAME_REVERSE, $GEDCOMID;
 	global $gm_user;
@@ -66,11 +66,11 @@ function print_upcoming_events($block=true, $config="", $side, $index) {
 		if ((($command=="gedcom")&&($gm_user->userGedcomAdmin())) || (($command=="user")&&($gm_user->username != ""))) {
 			if ($command=="gedcom") $name = preg_replace("/'/", "\'", get_gedcom_from_id($GEDCOMID));
 			else $name = $gm_user->username;
-			print "<a href=\"javascript: ".$gm_lang["config_block"]."\" onclick=\"window.open('index_edit.php?name=$name&amp;command=$command&amp;action=configure&amp;side=$side&amp;index=$index', '', 'top=50,left=50,width=500,height=250,scrollbars=1,resizable=1'); return false;\">";
-			print "<img class=\"adminicon\" src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["admin"]["small"]."\" width=\"15\" height=\"15\" border=\"0\" alt=\"".$gm_lang["config_block"]."\" /></a>\n";
+			print "<a href=\"javascript: ".GM_LANG_config_block."\" onclick=\"window.open('index_edit.php?name=$name&amp;command=$command&amp;action=configure&amp;side=$side&amp;index=$index', '', 'top=50,left=50,width=500,height=250,scrollbars=1,resizable=1'); return false;\">";
+			print "<img class=\"adminicon\" src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["admin"]["small"]."\" width=\"15\" height=\"15\" border=\"0\" alt=\"".GM_LANG_config_block."\" /></a>\n";
 		}
 	}
-	print $gm_lang["upcoming_events"];
+	print GM_LANG_upcoming_events;
 	print "</div>";
 	print "<div class=\"blockcontent\" >";
 	if ($block) print "<div class=\"small_inner_block\">\n";
@@ -105,7 +105,7 @@ function print_upcoming_events($block=true, $config="", $side, $index) {
 			$gid = $factarr[0];
 			$factrec = $factarr[1];
 			if ($person->disp && $fact->disp) {
-				$text = GetCalendarFact($factrec, $action, $filter, $gid);
+				$text = FactFunctions::GetCalendarFact($fact, $action, $filter);
 				if ($text!="filter") {
 					if ($lastgid!=$gid) {
 						if ($lastgid != "") print "<br />";
@@ -113,9 +113,9 @@ function print_upcoming_events($block=true, $config="", $side, $index) {
 						else $name = $factarr[4];
 						print "<a href=\"individual.php?pid=$gid&amp;gedid=".$GEDCOMID."\"><b>".$name."</b>";
 						print "<img id=\"box-".$gid."-".$key."-sex\" src=\"".GM_IMAGE_DIR."/";
-						if ($factarr[5] == "M") print $GM_IMAGES["sex"]["small"]."\" title=\"".$gm_lang["male"]."\" alt=\"".$gm_lang["male"];
-						else if ($factarr[5] == "F") print $GM_IMAGES["sexf"]["small"]."\" title=\"".$gm_lang["female"]."\" alt=\"".$gm_lang["female"];
-						else print $GM_IMAGES["sexn"]["small"]."\" title=\"".$gm_lang["unknown"]."\" alt=\"".$gm_lang["unknown"];
+						if ($factarr[5] == "M") print $GM_IMAGES["sex"]["small"]."\" title=\"".GM_LANG_male."\" alt=\"".GM_LANG_male;
+						else if ($factarr[5] == "F") print $GM_IMAGES["sexf"]["small"]."\" title=\"".GM_LANG_female."\" alt=\"".GM_LANG_female;
+						else print $GM_IMAGES["sexn"]["small"]."\" title=\"".GM_LANG_unknown."\" alt=\"".GM_LANG_unknown;
 						print "\" class=\"sex_image\" />";
 						print "</a><br />\n";
 						$lastgid = $gid;
@@ -133,7 +133,7 @@ function print_upcoming_events($block=true, $config="", $side, $index) {
 			$family =& Family::GetInstance($factarr[0], "", $GEDCOMID);
 			$fact = new Fact($factarr[0], $factarr[2], $factarr[6], $factarr[1]);
 			if ($family->disp && $fact->disp) {
-				$text = GetCalendarFact($factarr[1], $action, $filter, $factarr[0]);
+				$text = FactFunctions::GetCalendarFact($fact, $action, $filter);
 				if ($text!="filter") {
 					if ($lastgid!=$factarr[0]) {
 						if ($lastgid != "") print "<br />";
@@ -155,7 +155,8 @@ function print_upcoming_events($block=true, $config="", $side, $index) {
 	}
 	
 	if ($PrivateFacts) { // Facts were found but not printed for some reason
-		$gm_lang["global_num1"] = $daysprint;
+		// 4 is upcoming
+		define("GM_LANG_global_num4",$daysprint);
 		$Advisory = "no_events_privacy";
 		if ($OutputDone) $Advisory = "more_events_privacy";
 		if ($daysprint==1) $Advisory .= "1";
@@ -164,7 +165,7 @@ function print_upcoming_events($block=true, $config="", $side, $index) {
 		print "</b><br />";
 	} 
 	else if (!$OutputDone) { // No Facts were found
-		$gm_lang["global_num1"] = $daysprint;
+		define("GM_LANG_global_num4", $daysprint);
 		$Advisory = "no_events_" . $config["filter"];
 		if ($daysprint==1) $Advisory .= "1";
 		print "<b>";
@@ -178,7 +179,7 @@ function print_upcoming_events($block=true, $config="", $side, $index) {
 }
 
 function print_upcoming_events_config($config) {
-	global $gm_lang, $GM_BLOCKS;
+	global $GM_BLOCKS;
 	
 	if (empty($config)) $config = $GM_BLOCKS["print_upcoming_events"]["config"];
 //	if (!isset(GedcomConfig::$DAYS_TO_SHOW_LIMIT)) GedcomConfig::$DAYS_TO_SHOW_LIMIT = 30;
@@ -191,28 +192,28 @@ function print_upcoming_events_config($config) {
 
 	print "<tr><td class=\"shade2 width20\">";
 	print_help_link("days_to_show_help", "qm");
-	print $gm_lang["days_to_show"]."</td>";?>
+	print GM_LANG_days_to_show."</td>";?>
 	<td class="shade1">
 		<input type="text" name="days" size="2" value="<?php print $config["days"]; ?>" />
 	</td></tr>
 
 	<?php
- 	print "<tr><td class=\"shade2 width20\">".$gm_lang["living_or_all"]."</td>";?>
+ 	print "<tr><td class=\"shade2 width20\">".GM_LANG_living_or_all."</td>";?>
 	<td class="shade1">
 	<select name="filter">
-		<option value="all"<?php if ($config["filter"]=="all") print " selected=\"selected\"";?>><?php print $gm_lang["no"]; ?></option>
-		<option value="living"<?php if ($config["filter"]=="living") print " selected=\"selected\"";?>><?php print $gm_lang["yes"]; ?></option>
+		<option value="all"<?php if ($config["filter"]=="all") print " selected=\"selected\"";?>><?php print GM_LANG_no; ?></option>
+		<option value="living"<?php if ($config["filter"]=="living") print " selected=\"selected\"";?>><?php print GM_LANG_yes; ?></option>
 	</select>
 	</td></tr>
 
 	<?php
  	print "<tr><td class=\"shade2 width20\">";
 	print_help_link("basic_or_all_help", "qm");
-	print $gm_lang["basic_or_all"]."</td>";?>
+	print GM_LANG_basic_or_all."</td>";?>
 	<td class="shade1">
 	<select name="onlyBDM">
- 	<option value="no"<?php if ($config["onlyBDM"]=="no") print " selected=\"selected\"";?>><?php print $gm_lang["no"]; ?></option>
- 	<option value="yes"<?php if ($config["onlyBDM"]=="yes") print " selected=\"selected\"";?>><?php print $gm_lang["yes"]; ?></option>
+ 	<option value="no"<?php if ($config["onlyBDM"]=="no") print " selected=\"selected\"";?>><?php print GM_LANG_no; ?></option>
+ 	<option value="yes"<?php if ($config["onlyBDM"]=="yes") print " selected=\"selected\"";?>><?php print GM_LANG_yes; ?></option>
  	</select>
 	</td></tr>
  <?php

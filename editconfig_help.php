@@ -33,9 +33,9 @@ require "config.php";
  * Inclusion of the help text variables
 */
 require ("helptext_vars.php");
-PrintSimpleHeader($gm_lang["help_config"]);
+PrintSimpleHeader(GM_LANG_help_config);
 print '<span class="helpheader">';
-print $gm_lang["help_config"];
+print GM_LANG_help_config;
 print '</span><br /><br /><span class="helptext">';
 if ($help == "help_contents_help") {
 		if ($gm_user->userIsAdmin()) {
@@ -51,10 +51,10 @@ else {
 }
 print "</span><br /><br />";
 print "<a href=\"help_text.php?help=help_contents_help\"><b>";
-print $gm_lang["help_contents"];
+print GM_LANG_help_contents;
 print "</b></a><br />";
 print "<a href=\"#\" onclick=\"window.close();\"><b>";
-print $gm_lang["close_window"];
+print GM_LANG_close_window;
 print "</b></a>";
 PrintSimpleFooter();
 ?>

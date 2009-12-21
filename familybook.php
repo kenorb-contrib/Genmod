@@ -40,7 +40,7 @@ if ($familybook_controller->show_full == false) {
 // -- print html header information
 print "<div id=\"content_pedigree\">";
 
-print "\n\t<h3>".$gm_lang["familybook_chart"].":";
+print "\n\t<h3>".GM_LANG_familybook_chart.":";
 print "<br />".PrintReady($familybook_controller->root->name);
 if ($familybook_controller->root->addname != "") print "<br />" . PrintReady($familybook_controller->root->addname);
 print "</h3>";

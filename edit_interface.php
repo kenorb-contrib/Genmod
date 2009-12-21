@@ -81,7 +81,7 @@ $assokeys = array(
 );
 $assorela = array();
 foreach ($assokeys as $indexval => $key) {
-  if (isset($gm_lang["$key"])) $assorela["$key"] = $gm_lang["$key"];
+  if (defined("GM_LANG_".$key)) $assorela["$key"] = constant("GM_LANG_".$key);
   else $assorela["$key"] = "? $key";
 }
 natsort($assorela);
@@ -244,16 +244,16 @@ if ($action == "edit" || $action == "editraw") {
 }
 // TODO edit submitter from other than $GEDCOM
 if (!$gm_user->userCanEdit() || !$disp || !GedcomConfig::$ALLOW_EDIT_GEDCOM || (!$gm_user->userCanEditGedlines() && $action == "editraw")) {
-	print $gm_lang["access_denied"];
+	print GM_LANG_access_denied;
 	//-- display messages as to why the editing access was denied
-	if (!$gm_user->userCanEdit()) print "<br />".$gm_lang["user_cannot_edit"];
-	else if (!GedcomConfig::$ALLOW_EDIT_GEDCOM) print "<br />".$gm_lang["gedcom_editing_disabled"];
+	if (!$gm_user->userCanEdit()) print "<br />".GM_LANG_user_cannot_edit;
+	else if (!GedcomConfig::$ALLOW_EDIT_GEDCOM) print "<br />".GM_LANG_gedcom_editing_disabled;
 	else if (!$disp) {
-		print "<br />".$gm_lang["privacy_prevented_editing"];
-		if (!empty($pid)) print "<br />".$gm_lang["privacy_not_granted"]." pid $pid.";
-		else if (!empty($famid)) print "<br />".$gm_lang["privacy_not_granted"]." famid $famid.";
+		print "<br />".GM_LANG_privacy_prevented_editing;
+		if (!empty($pid)) print "<br />".GM_LANG_privacy_not_granted." pid $pid.";
+		else if (!empty($famid)) print "<br />".GM_LANG_privacy_not_granted." famid $famid.";
 	}
-	print "<br /><br /><div class=\"center\"><a href=\"javascript: ".$gm_lang["close_window"]."\" onclick=\"window.close();\">".$gm_lang["close_window"]."</a></div>\n";
+	print "<br /><br /><div class=\"center\"><a href=\"javascript: ".GM_LANG_close_window."\" onclick=\"window.close();\">".GM_LANG_close_window."</a></div>\n";
 	PrintSimpleFooter();
 	exit;
 }
@@ -266,21 +266,21 @@ if ($pid_type == "INDI" || $pid_type == "FAM" || $pid_type == "SOUR" || $pid_typ
 if (strstr($action,"addchild")) {
 	if (empty($famid)) {
 		print_help_link("edit_add_unlinked_person_help", "qm");
-		print "<b>".$gm_lang["add_unlinked_person"]."</b><br />\n";
+		print "<b>".GM_LANG_add_unlinked_person."</b><br />\n";
 	}
 	else {
 		print_help_link("edit_add_child_help", "qm");
-		print "<b>".$gm_lang["add_child"]."</b><br />\n";
+		print "<b>".GM_LANG_add_child."</b><br />\n";
 	}
 }
 else if (strstr($action,"addspouse")) {
 	print_help_link("edit_add_spouse_help", "qm");
-	print "<b>".$gm_lang["add_".strtolower($famtag)]."</b><br />\n";
+	print "<b>".GM_LANG_add_".strtolower($famtag)]."</b><br />\n";
 }
 else if (strstr($action,"addnewparent")) {
 	print_help_link("edit_add_parent_help", "qm");
-	if ($famtag == "WIFE") print "<b>".$gm_lang["add_mother"]."</b><br />\n";
-	else print "<b>".$gm_lang["add_father"]."</b><br />\n";
+	if ($famtag == "WIFE") print "<b>".GM_LANG_add_mother."</b><br />\n";
+	else print "<b>".GM_LANG_add_father."</b><br />\n";
 }
 else {
 	if (defined("GM_FACT_".$pid_type)) print "<b>".constant("GM_FACT_".$pid_type)."</b><br />";
@@ -311,8 +311,8 @@ switch ($action) {
 		print "<table class=\"facts_table\">";
 		EditFunctions::SubmitterRecord(0, $record);
 		print "</table>";
-		if ($gm_user->UserCanAccept() && !$gm_user->userAutoAccept()) print "<br /><input name=\"aa_attempt\" type=\"checkbox\" value=\"1\" />".$gm_lang["attempt_auto_acc"]."<br />\n";
-		print "<br /><input type=\"submit\" value=\"".$gm_lang["save"]."\" /><br />\n";
+		if ($gm_user->UserCanAccept() && !$gm_user->userAutoAccept()) print "<br /><input name=\"aa_attempt\" type=\"checkbox\" value=\"1\" />".GM_LANG_attempt_auto_acc."<br />\n";
+		print "<br /><input type=\"submit\" value=\"".GM_LANG_save."\" /><br />\n";
 		print "</form>\n";
 		$disp = true;
 		break;
@@ -322,9 +322,9 @@ switch ($action) {
 		$change_id = GetNewXref("CHANGE");
 		
 		if (!$factedit) {
-			print "<br />".$gm_lang["privacy_prevented_editing"];
-			if (!empty($pid)) print "<br />".$gm_lang["privacy_not_granted"]." pid $pid.";
-			if (!empty($famid)) print "<br />".$gm_lang["privacy_not_granted"]." famid $famid.";
+			print "<br />".GM_LANG_privacy_prevented_editing;
+			if (!empty($pid)) print "<br />".GM_LANG_privacy_not_granted." pid $pid.";
+			if (!empty($famid)) print "<br />".GM_LANG_privacy_not_granted." famid $famid.";
 		}
 		else {
 			// TODO: Notify user if record has already been deleted
@@ -346,7 +346,7 @@ switch ($action) {
 				// Delete the person
 				if ($success) $success = $success && EditFunctions::DeleteGedrec($pid, $change_id, "delete_indi", "INDI");
 				
-				if ($success) print "<br /><br />".$gm_lang["gedrec_deleted"];
+				if ($success) print "<br /><br />".GM_LANG_gedrec_deleted;
 			}
 		}
 		break;
@@ -355,9 +355,9 @@ switch ($action) {
 		$change_id = GetNewXref("CHANGE");
 		
 		if (!$factedit) {
-			print "<br />".$gm_lang["privacy_prevented_editing"];
-			if (!empty($pid)) print "<br />".$gm_lang["privacy_not_granted"]." pid $pid.";
-			if (!empty($famid)) print "<br />".$gm_lang["privacy_not_granted"]." famid $famid.";
+			print "<br />".GM_LANG_privacy_prevented_editing;
+			if (!empty($pid)) print "<br />".GM_LANG_privacy_not_granted." pid $pid.";
+			if (!empty($famid)) print "<br />".GM_LANG_privacy_not_granted." famid $famid.";
 		}
 		else {
 			if (!empty($gedrec)) {
@@ -367,7 +367,7 @@ switch ($action) {
 				if ($success) {
 					$success = $success && EditFunctions::DeleteGedrec($famid, $change_id, $change_type, "FAM");
 				}
-				if ($success) print "<br /><br />".$gm_lang["gedrec_deleted"];
+				if ($success) print "<br /><br />".GM_LANG_gedrec_deleted;
 			}
 		}
 		break;
@@ -381,7 +381,7 @@ switch ($action) {
 			if ($success) {
 				$success = $success && EditFunctions::DeleteGedrec($pid, $change_id, $change_type, "SOUR");
 			}
-			if ($success) print "<br /><br />".$gm_lang["gedrec_deleted"];
+			if ($success) print "<br /><br />".GM_LANG_gedrec_deleted;
 		}
 		break;
 		
@@ -395,7 +395,7 @@ switch ($action) {
 			if ($success) {
 				$success = $success && EditFunctions::DeleteGedrec($pid, $change_id, $change_type, "REPO");
 			}
-			if ($success) print "<br /><br />".$gm_lang["gedrec_deleted"];
+			if ($success) print "<br /><br />".GM_LANG_gedrec_deleted;
 		}
 		break;
 		
@@ -408,15 +408,15 @@ switch ($action) {
 			if ($success) {
 				$success = $success && EditFunctions::DeleteGedrec($pid, $change_id, $change_type, "NOTE");
 			}
-			if ($success) print "<br /><br />".$gm_lang["gedrec_deleted"];
+			if ($success) print "<br /><br />".GM_LANG_gedrec_deleted;
 		}
 		break;
 		
 	case "deletemedia":
 		$change_id = GetNewXref("CHANGE");
 		if (!$factedit) {
-			print "<br />".$gm_lang["privacy_prevented_editing"];
-			if (!empty($pid)) print "<br />".$gm_lang["privacy_not_granted"]." pid $pid.";
+			print "<br />".GM_LANG_privacy_prevented_editing;
+			if (!empty($pid)) print "<br />".GM_LANG_privacy_not_granted." pid $pid.";
 		}
 		else {
 			if (!empty($gedrec)) {
@@ -426,7 +426,7 @@ switch ($action) {
 				if ($success) {
 					$success = $success && EditFunctions::DeleteGedrec($pid, $change_id, $change_type, "OBJE");
 				}
-				if ($success) print "<br /><br />".$gm_lang["gedrec_deleted"];
+				if ($success) print "<br /><br />".GM_LANG_gedrec_deleted;
 			}
 		}
 		break;
@@ -439,7 +439,7 @@ switch ($action) {
 		$gedrecpriv = implode("\r\n", GetAllSubrecords($gedrec, "", false, false));
 		$oldrec = GetSubRecord(1, "1 $fact", $gedrecpriv, $count);
 		$success =  EditFunctions::ReplaceGedrec($pid, $oldrec, "", $fact, $change_id, $change_type, "", $pid_type); 
-		if ($success) print "<br /><br />".$gm_lang["gedrec_deleted"];
+		if ($success) print "<br /><br />".GM_LANG_gedrec_deleted;
 		break;
 	
 	// NOTE: Reorder media
@@ -453,7 +453,7 @@ switch ($action) {
 			<table class="facts_table">
 			<tr><td class="topbottombar" colspan="2">
 			<?php print_help_link("reorder_media_help", "qm", "reorder_media"); ?>
-			<?php print $gm_lang["reorder_media"]; ?>
+			<?php print GM_LANG_reorder_media; ?>
 			</td></tr>
 			<?php
 				if (GetChangeData(true, $pid, true, "", "")) {
@@ -480,7 +480,7 @@ switch ($action) {
 				}
 			?>
 			<tr><td class="topbottombar" colspan="2">
-			<input type="submit" value="<?php print $gm_lang["save"]; ?>" />&nbsp;
+			<input type="submit" value="<?php print GM_LANG_save; ?>" />&nbsp;
 			</td</tr>
 			</table>
 		</form>
@@ -505,7 +505,7 @@ switch ($action) {
 		foreach($order as $ord => $famkey) {
 			$success = $success && (EditFunctions::ReplaceGedrec($pid, "", $f[$famkey], "OBJE", $change_id, $change_type, "", $pid_type));
 		}
-		if ($success) print "<br /><br />".$gm_lang["update_successful"];
+		if ($success) print "<br /><br />".GM_LANG_update_successful;
 		break;
 		
 	
@@ -521,7 +521,7 @@ switch ($action) {
 			<table class="facts_table">
 			<tr><td class="topbottombar" colspan="2">
 			<?php print_help_link("reorder_children_help", "qm", "reorder_children"); ?>
-			<?php print $gm_lang["reorder_children"]; ?>
+			<?php print GM_LANG_reorder_children; ?>
 			</td></tr>
 			<?php
 				$children = array();
@@ -565,8 +565,8 @@ switch ($action) {
 				}
 			?>
 			<tr><td class="topbottombar" colspan="2">
-			<input type="submit" value="<?php print $gm_lang["save"]; ?>" />&nbsp;
-			<input type="button" value="<?php print $gm_lang["sort_by_birth"]; ?>" onclick="document.reorder_form.action.value='reorder_children'; document.reorder_form.submit();" />
+			<input type="submit" value="<?php print GM_LANG_save; ?>" />&nbsp;
+			<input type="button" value="<?php print GM_LANG_sort_by_birth; ?>" onclick="document.reorder_form.action.value='reorder_children'; document.reorder_form.submit();" />
 			</td</tr>
 			</table>
 		</form>
@@ -591,7 +591,7 @@ switch ($action) {
 		foreach($order as $ord => $famkey) {
 			$success = $success && (EditFunctions::ReplaceGedrec($pid, "", $f[$famkey], "CHIL", $change_id, $change_type, "", "FAM"));
 		}
-		if ($success) print "<br /><br />".$gm_lang["update_successful"];
+		if ($success) print "<br /><br />".GM_LANG_update_successful;
 		break;
 		
 	// NOTE: reorder_fams 5/8/2007 ok
@@ -605,10 +605,10 @@ switch ($action) {
 			<table class="facts_table">
 			<tr><td class="topbottombar <?php print $TEXT_DIRECTION; ?>" colspan="2">
 			<?php print_help_link("reorder_families_help", "qm", "reorder_families"); ?>
-			<?php print $gm_lang["reorder_families"]; ?>
+			<?php print GM_LANG_reorder_families; ?>
 			</td></tr>
 			<?php
-			print "<tr class=\"shade2\"><td>".$gm_lang["order"]."</td><td>".$gm_lang["family"]."</td></tr>";
+			print "<tr class=\"shade2\"><td>".GM_LANG_order."</td><td>".GM_LANG_family."</td></tr>";
 				$fams = array();
 				$ct = preg_match_all("/1 FAMS @(.+)@/", $gedrec, $match, PREG_SET_ORDER);
 				for($i=0; $i<$ct; $i++) {
@@ -644,8 +644,8 @@ switch ($action) {
 				}
 			?>
 			<tr><td class="topbottombar" colspan = "2">
-			<input type="submit" value="<?php print $gm_lang["save"]; ?>" />
-			<input type="button" value="<?php print $gm_lang["sort_by_marriage"]; ?>" onclick="document.reorder_form.action.value='reorder_fams'; document.reorder_form.submit();" />
+			<input type="submit" value="<?php print GM_LANG_save; ?>" />
+			<input type="button" value="<?php print GM_LANG_sort_by_marriage; ?>" onclick="document.reorder_form.action.value='reorder_fams'; document.reorder_form.submit();" />
 			</td></tr>
 			</table>
 		</form>
@@ -669,7 +669,7 @@ switch ($action) {
 		foreach($order as $ord => $famkey) {
 			$success = $success && EditFunctions::ReplaceGedrec($pid, "", $f[$famkey], "FAMS", $change_id, $change_type, "", "INDI");
 		}
-		if ($success) print "<br /><br />".$gm_lang["update_successful"];
+		if ($success) print "<br /><br />".GM_LANG_update_successful;
 		break;
 		
 	// NOTE relation_fams ok 5/8/2007	
@@ -682,10 +682,10 @@ switch ($action) {
 			<table class="facts_table">
 				<tr><td class="topbottombar <?php print $TEXT_DIRECTION; ?>" colspan="3">
 				<?php print_help_link("relation_families_help", "qm", "relation_families"); ?>
-				<?php print $gm_lang["relation_families"]; ?>
+				<?php print GM_LANG_relation_families; ?>
 				</td></tr>
 				<?php
-				print "<tr class=\"shade2\"><td>".GM_FACT_PEDI."</td><td>".$gm_lang["family"]."</td><td>".$gm_lang["primary"]."</tr>";
+				print "<tr class=\"shade2\"><td>".GM_FACT_PEDI."</td><td>".GM_LANG_family."</td><td>".GM_LANG_primary."</tr>";
 				$famids = FindFamilyIds($pid, "", true);
 				$hasprimary = false;
 				foreach($famids as $famid=>$fam) {
@@ -709,13 +709,13 @@ switch ($action) {
 					print "></td></tr>\n";
 					$i++;
 				}
-				print "<tr class=\"shade2\"><td>&nbsp;</td><td>".$gm_lang["no_primary"]."</td><td>";
+				print "<tr class=\"shade2\"><td>&nbsp;</td><td>".GM_LANG_no_primary."</td><td>";
 				print "<input type=\"radio\" name=\"select_prim\" value=\"noprim\" ";
 				if (!$hasprimary) print "checked=\"checked\" ";
 				print "></td></tr>\n";
 			?>
 			<tr><td class="topbottombar" colspan = "3">
-			<input type="submit" value="<?php print $gm_lang["save"]; ?>" />
+			<input type="submit" value="<?php print GM_LANG_save; ?>" />
 			</td></tr>
 			</table>
 		</form>
@@ -768,7 +768,7 @@ switch ($action) {
 				$success = $success && EditFunctions::ReplaceGedrec($pid, $rec, $recnew, "FAMC", $change_id, $change_type, "", "INDI");
 			}
 		}
-		if ($success) print "<br /><br />".$gm_lang["update_successful"];
+		if ($success) print "<br /><br />".GM_LANG_update_successful;
 		break;
 		
 	// NOTE: changefamily 9/8/2007 ok
@@ -783,32 +783,32 @@ switch ($action) {
 		$children = $family->children;
 		if (count($children)>0) {
 			if (is_object($father)) {
-				if ($father->sex=="F") $father->setLabel($gm_lang["mother"]);
-				else $father->setLabel($gm_lang["father"]);
+				if ($father->sex=="F") $father->setLabel(GM_LANG_mother);
+				else $father->setLabel(GM_LANG_father);
 			}
 			if (is_object($mother)) {
-				if ($mother->sex=="M") $mother->setLabel($gm_lang["father"]);
-				else $mother->setLabel($gm_lang["mother"]);
+				if ($mother->sex=="M") $mother->setLabel(GM_LANG_father);
+				else $mother->setLabel(GM_LANG_mother);
 			}
 //			for($i=0; $i<count($children); $i++) {
 			foreach ($children as $i => $child) {
 				if (is_object($children[$i])) {
-					if ($children[$i]->sex=="M") $children[$i]->setLabel($gm_lang["son"]);
-					else if ($children[$i]->sex=="F") $children[$i]->setLabel($gm_lang["daughter"]);
-					else $children[$i]->setLabel($gm_lang["child"]);
+					if ($children[$i]->sex=="M") $children[$i]->setLabel(GM_LANG_son);
+					else if ($children[$i]->sex=="F") $children[$i]->setLabel(GM_LANG_daughter);
+					else $children[$i]->setLabel(GM_LANG_child);
 				}
 			}
 		}
 		else {
 			if (is_object($father)) {
-				if ($father->sex=="F") $father->setLabel($gm_lang["wife"]);
-				else if ($father->sex=="M") $father->setLabel($gm_lang["husband"]);
-				else $father->setLabel($gm_lang["spouse"]);
+				if ($father->sex=="F") $father->setLabel(GM_LANG_wife);
+				else if ($father->sex=="M") $father->setLabel(GM_LANG_husband);
+				else $father->setLabel(GM_LANG_spouse);
 			}
 			if (is_object($mother)) {
-				if ($mother->sex=="F") $mother->setLabel($gm_lang["wife"]);
-				else if ($mother->sex=="M") $mother->setLabel($gm_lang["husband"]);
-				else $father->setLabel($gm_lang["spouse"]);
+				if ($mother->sex=="F") $mother->setLabel(GM_LANG_wife);
+				else if ($mother->sex=="M") $mother->setLabel(GM_LANG_husband);
+				else $father->setLabel(GM_LANG_spouse);
 			}
 		}
 		?>
@@ -834,7 +834,7 @@ switch ($action) {
 			<input type="hidden" name="famid" value="<?php print $famid;?>" />
 			<input type="hidden" name="change_type" value="<?php print $change_type;?>" />
 			<table class="width50 <?php print $TEXT_DIRECTION; ?>">
-				<tr><td colspan="4" class="topbottombar"><?php print_help_link("change_family_instr","qm","change_family_instr"); ?><?php print $gm_lang["change_family_members"]; ?></td></tr>
+				<tr><td colspan="4" class="topbottombar"><?php print_help_link("change_family_instr","qm","change_family_instr"); ?><?php print GM_LANG_change_family_members; ?></td></tr>
 				<tr>
 				<?php
 				if (is_object($father)) {
@@ -845,14 +845,14 @@ switch ($action) {
 				}
 				else {
 				?>
-					<td class="shade2 <?php print $TEXT_DIRECTION; ?>"><b><?php print $gm_lang["father"]; ?></b><input type="hidden" name="HUSB" value="" /></td>
+					<td class="shade2 <?php print $TEXT_DIRECTION; ?>"><b><?php print GM_LANG_father; ?></b><input type="hidden" name="HUSB" value="" /></td>
 					<td id="HUSBName" class="shade1 <?php print $TEXT_DIRECTION; ?>"></td><td class="shade1">&nbsp;</td>
 				<?php
 				}
 				?>
 					<td class="shade1 <?php print $TEXT_DIRECTION; ?>">
-						<a href="#" id="husbrem" style="display: <?php print !is_object($father) ? 'none':'block'; ?>;" onclick="document.changefamform.HUSB.value=''; document.getElementById('HUSBName').innerHTML=''; this.style.display='none'; return false;"><?php print $gm_lang["remove"]; ?></a>
-						<a href="#" onclick="nameElement = document.getElementById('HUSBName'); remElement = document.getElementById('husbrem'); return findIndi(document.changefamform.HUSB);"><?php print $gm_lang["change"]; ?></a><br />
+						<a href="#" id="husbrem" style="display: <?php print !is_object($father) ? 'none':'block'; ?>;" onclick="document.changefamform.HUSB.value=''; document.getElementById('HUSBName').innerHTML=''; this.style.display='none'; return false;"><?php print GM_LANG_remove; ?></a>
+						<a href="#" onclick="nameElement = document.getElementById('HUSBName'); remElement = document.getElementById('husbrem'); return findIndi(document.changefamform.HUSB);"><?php print GM_LANG_change; ?></a><br />
 					</td>
 				</tr>
 				<tr>
@@ -865,14 +865,14 @@ switch ($action) {
 				}
 				else {
 				?>
-					<td class="shade2 <?php print $TEXT_DIRECTION; ?>"><b><?php print $gm_lang["mother"]; ?></b><input type="hidden" name="WIFE" value="" /></td>
+					<td class="shade2 <?php print $TEXT_DIRECTION; ?>"><b><?php print GM_LANG_mother; ?></b><input type="hidden" name="WIFE" value="" /></td>
 					<td id="WIFEName" class="shade1 <?php print $TEXT_DIRECTION; ?>"></td><td class="shade1">&nbsp;</td>
 				<?php
 				}
 				?>
 					<td class="shade1 <?php print $TEXT_DIRECTION; ?>">
-						<a href="#" id="wiferem" style="display: <?php print !is_object($mother) ? 'none':'block'; ?>;" onclick="document.changefamform.WIFE.value=''; document.getElementById('WIFEName').innerHTML=''; this.style.display='none'; return false;"><?php print $gm_lang["remove"]; ?></a>
-						<a href="#" onclick="nameElement = document.getElementById('WIFEName'); remElement = document.getElementById('wiferem'); return findIndi(document.changefamform.WIFE);"><?php print $gm_lang["change"]; ?></a><br />
+						<a href="#" id="wiferem" style="display: <?php print !is_object($mother) ? 'none':'block'; ?>;" onclick="document.changefamform.WIFE.value=''; document.getElementById('WIFEName').innerHTML=''; this.style.display='none'; return false;"><?php print GM_LANG_remove; ?></a>
+						<a href="#" onclick="nameElement = document.getElementById('WIFEName'); remElement = document.getElementById('wiferem'); return findIndi(document.changefamform.WIFE);"><?php print GM_LANG_change; ?></a><br />
 					</td>
 				</tr>
 				<?php
@@ -889,8 +889,8 @@ switch ($action) {
 					<td id="CHILName<?php print $i; ?>" class="shade1"><?php print PrintReady($child->name); ?><br /><?php print_first_major_fact($child->xref, $child->gedrec); ?></td>
 					<td id="CHILPedi<?php print $i; ?>" class="shade1"><?php EditFunctions::PrintPedi("CHILPedisel".$i, $pedi); ?></td>
 					<td class="shade1 <?php print $TEXT_DIRECTION; ?>">
-						<a href="#" id="childrem<?php print $i; ?>" style="display:block;" onclick="document.changefamform.CHIL<?php print $i; ?>.value=''; document.getElementById('CHILName<?php print $i; ?>').innerHTML=''; this.style.display='none'; return false;"><?php print $gm_lang["remove"]; ?></a>
-						<a href="#" onclick="nameElement = document.getElementById('CHILName<?php print $i; ?>'); remElement = document.getElementById('childrem<?php print $i; ?>'); return findIndi(document.changefamform.CHIL<?php print $i; ?>);"><?php print $gm_lang["change"]; ?></a><br />
+						<a href="#" id="childrem<?php print $i; ?>" style="display:block;" onclick="document.changefamform.CHIL<?php print $i; ?>.value=''; document.getElementById('CHILName<?php print $i; ?>').innerHTML=''; this.style.display='none'; return false;"><?php print GM_LANG_remove; ?></a>
+						<a href="#" onclick="nameElement = document.getElementById('CHILName<?php print $i; ?>'); remElement = document.getElementById('childrem<?php print $i; ?>'); return findIndi(document.changefamform.CHIL<?php print $i; ?>);"><?php print GM_LANG_change; ?></a><br />
 					</td>
 				</tr>
 					<?php
@@ -900,17 +900,17 @@ switch ($action) {
 				$pedi = "";
 					?>
 				<tr>
-					<td class="shade2 <?php print $TEXT_DIRECTION; ?>"><b><?php print $gm_lang["add_child"]; ?></b><input type="hidden" name="CHIL<?php print $i; ?>" value="" /></td>
+					<td class="shade2 <?php print $TEXT_DIRECTION; ?>"><b><?php print GM_LANG_add_child; ?></b><input type="hidden" name="CHIL<?php print $i; ?>" value="" /></td>
 					<td id="CHILName<?php print $i; ?>" class="shade1">
 					<td id="CHILPedi<?php print $i; ?>" class="shade1"><div id="CHILHide<?php print $i; ?>" style="display: none;"><?php EditFunctions::PrintPedi("CHILPedisel".$i, $pedi); ?></div></td>
 					<td class="shade1 <?php print $TEXT_DIRECTION; ?>">
-						<a href="#" id="childrem<?php print $i; ?>" style="display: none;" onclick="document.changefamform.CHIL<?php print $i; ?>.value=''; document.getElementById('CHILName<?php print $i; ?>').innerHTML=''; this.style.display='none'; return false;"><?php print $gm_lang["remove"]; ?></a>
-						<a href="#" onclick="pediElement = document.getElementById('CHILHide<?php print $i; ?>'); nameElement = document.getElementById('CHILName<?php print $i; ?>'); remElement = document.getElementById('childrem<?php print $i; ?>'); return findIndi(document.changefamform.CHIL<?php print $i; ?>);"><?php print $gm_lang["change"]; ?></a><br />
+						<a href="#" id="childrem<?php print $i; ?>" style="display: none;" onclick="document.changefamform.CHIL<?php print $i; ?>.value=''; document.getElementById('CHILName<?php print $i; ?>').innerHTML=''; this.style.display='none'; return false;"><?php print GM_LANG_remove; ?></a>
+						<a href="#" onclick="pediElement = document.getElementById('CHILHide<?php print $i; ?>'); nameElement = document.getElementById('CHILName<?php print $i; ?>'); remElement = document.getElementById('childrem<?php print $i; ?>'); return findIndi(document.changefamform.CHIL<?php print $i; ?>);"><?php print GM_LANG_change; ?></a><br />
 					</td>
 				</tr>
 			<tr>
 				<td class="topbottombar" colspan="4">
-					<input type="submit" value="<?php print $gm_lang["save"]; ?>" />&nbsp;<input type="button" value="<?php print $gm_lang["cancel"]; ?>" onclick="window.close();" />
+					<input type="submit" value="<?php print GM_LANG_save; ?>" />&nbsp;<input type="button" value="<?php print GM_LANG_cancel; ?>" onclick="window.close();" />
 				</td>
 			</tr>
 			</table>
@@ -1163,7 +1163,7 @@ switch ($action) {
 			if ($ct == 0) $success = $success && EditFunctions::ReplaceGedRec($famid, $newfamrec, "", "FAM", $change_id, $change_type, "", "FAM");
 		}
 		
-		if ($success) print "<br /><br />".$gm_lang["update_successful"];
+		if ($success) print "<br /><br />".GM_LANG_update_successful;
 		break;
 	
 	// NOTE: Add
@@ -1201,7 +1201,7 @@ switch ($action) {
 				EditFunctions::AddTagSeparator($fact);
 				print "<tr><td class=\"shade2 $TEXT_DIRECTION\">";
 				print_help_link("find_add_mmlink", "qm", "find_add_mmlink");
-				print $gm_lang["find_add_mmlink"]."</td>";
+				print GM_LANG_find_add_mmlink."</td>";
 				print "<td class=\"shade1 $TEXT_DIRECTION\">";
                 print "<input type=\"text\" name=\"pid\" size=\"4\" tabindex=\"1\"/>";
 				print "<input type=\"hidden\" name=\"glevels[]\" value=\"1\" />\n";
@@ -1264,9 +1264,9 @@ switch ($action) {
 				}
 				print"</td></tr>";
 			}
-			if ($gm_user->UserCanAccept() && !$gm_user->userAutoAccept()) print "<tr><td class=\"shade1\" colspan=\"2\"><input name=\"aa_attempt\" type=\"checkbox\" value=\"1\" />".$gm_lang["attempt_auto_acc"]."</td></tr>";
+			if ($gm_user->UserCanAccept() && !$gm_user->userAutoAccept()) print "<tr><td class=\"shade1\" colspan=\"2\"><input name=\"aa_attempt\" type=\"checkbox\" value=\"1\" />".GM_LANG_attempt_auto_acc."</td></tr>";
 			print "<tr><td class=\"topbottombar\" colspan=\"2\">";
-			print "<input type=\"submit\" value=\"".$gm_lang["add"]."\" /></td></tr>\n";
+			print "<input type=\"submit\" value=\"".GM_LANG_add."\" /></td></tr>\n";
 			print "</table>";
 			print "</form>\n";
 			if (isset($focus)) {
@@ -1291,7 +1291,7 @@ switch ($action) {
 			$fact = $match[1];
 			$success = EditFunctions::ReplaceGedrec($pid, "", $newrec, $fact, $change_id, $change_type, "", $pid_type);
 		}
-		if ($success) print "<br /><br />".$gm_lang["update_successful"];
+		if ($success) print "<br /><br />".GM_LANG_update_successful;
 		break;
 		
 	// NOTE: addchild done
@@ -1383,7 +1383,7 @@ switch ($action) {
 		$xref = EditFunctions::AppendGedrec($gedrec, "INDI", $change_id, $change_type);
 		
 		if ($xref && !empty($famid)) {
-			print "<br /><br />".$gm_lang["update_successful"];
+			print "<br /><br />".GM_LANG_update_successful;
 			$newrec = "";
 			// NOTE: Check if there are changes present, if not get the record otherwise the changed record
 			if (!GetChangeData(true, $famid, true)) $newrec = FindGedcomRecord($famid);
@@ -1399,7 +1399,7 @@ switch ($action) {
 				EditFunctions::ReplaceGedrec($famid, "", $newrec, "CHIL", $change_id, $change_type, "", "FAM");
 				$success = true;
 			}
-			else print $famid." &lt -- &gt ".$xref.": ".$gm_lang["link_exists"];
+			else print $famid." &lt -- &gt ".$xref.": ".GM_LANG_link_exists;
 		}
 		break;
 	
@@ -1485,7 +1485,7 @@ switch ($action) {
 		// NOTE: Save the new indi record and get the new ID
 		$xref = EditFunctions::AppendGedrec($newrec, "INDI", $change_id, $change_type);
 	
-		if ($xref) print "<br /><br />".$gm_lang["update_successful"];
+		if ($xref) print "<br /><br />".GM_LANG_update_successful;
 		else exit;
 		
 		$success = true;
@@ -1546,7 +1546,7 @@ switch ($action) {
 				$newrec = "1 FAMS @$famid@\r\n";
 				EditFunctions::ReplaceGedrec($xref, "", $newrec, "FAMS", $change_id, $change_type, "", "INDI");
 			}
-			else print $famid." &lt -- &gt ".$xref.": ".$gm_lang["link_exists"];
+			else print $famid." &lt -- &gt ".$xref.": ".GM_LANG_link_exists;
 		}
 		if (!empty($pid)) {
 			$newrec = "";
@@ -1562,7 +1562,7 @@ switch ($action) {
 				$newrec = "1 FAMS @$famid@\r\n";
 				EditFunctions::ReplaceGedrec($pid, "", $newrec, "FAMS", $change_id, $change_type, "", "INDI");
 			}
-			else print $famid." &lt --- &gt ".$pid.": ".$gm_lang["link_exists"];
+			else print $famid." &lt --- &gt ".$pid.": ".GM_LANG_link_exists;
 		}
 		break;
 	
@@ -1590,9 +1590,9 @@ switch ($action) {
 			EditFunctions::PrintPedi("PEDI", "", $showbio);
 			print "</td></tr>";
 		}
-		if ($gm_user->UserCanAccept() && !$gm_user->userAutoAccept()) print "<tr><td class=\"shade1\" colspan=\"2\"><input name=\"aa_attempt\" type=\"checkbox\" value=\"1\" />".$gm_lang["attempt_auto_acc"]."</td></tr>";
+		if ($gm_user->UserCanAccept() && !$gm_user->userAutoAccept()) print "<tr><td class=\"shade1\" colspan=\"2\"><input name=\"aa_attempt\" type=\"checkbox\" value=\"1\" />".GM_LANG_attempt_auto_acc."</td></tr>";
 		print "\n<tr><td class=\"topbottombar\" colspan=\"2\">";
-		print "<input type=\"submit\" value=\"".$gm_lang["add"]."\" />\n";
+		print "<input type=\"submit\" value=\"".GM_LANG_add."\" />\n";
 		print "\n</td></tr>";
 		print "</table>\n";
 		print "</form>\n";
@@ -1626,7 +1626,7 @@ switch ($action) {
 			$success = $success && EditFunctions::ReplaceGedrec($pid, "", $newrec, "FAMS", $change_id, $change_type, "", "INDI");
 		}
 				
-		if ($success) print "<br /><br />".$gm_lang["update_successful"];
+		if ($success) print "<br /><br />".GM_LANG_update_successful;
 		break;			
 
 		
@@ -1640,7 +1640,7 @@ switch ($action) {
 		print "<table class=\"facts_table\">";
 		print "<tr>";
 		EditFunctions::AddTagSeparator("link_as_child");
-		print "<td class=\"shade2\">".$gm_lang["family"]."</td>";
+		print "<td class=\"shade2\">".GM_LANG_family."</td>";
 		print "<td class=\"shade1\"><input type=\"text\" id=\"famid\" name=\"famid\" size=\"8\" onblur=\"sndReq('famlink', 'getfamilydescriptor', 'famid', this.value, '', '');\"/> ";
 		LinkFunctions::PrintFindFamilyLink("famid");
 		print "&nbsp;<span id=\"famlink\"></span>";
@@ -1651,9 +1651,9 @@ switch ($action) {
 			EditFunctions::PrintPedi("PEDI");
 			print "</td></tr>";
 		}
-		if ($gm_user->UserCanAccept() && !$gm_user->userAutoAccept()) print "<tr><td class=\"shade1\" colspan=\"2\"><input name=\"aa_attempt\" type=\"checkbox\" value=\"1\" />".$gm_lang["attempt_auto_acc"]."</td></tr>";
+		if ($gm_user->UserCanAccept() && !$gm_user->userAutoAccept()) print "<tr><td class=\"shade1\" colspan=\"2\"><input name=\"aa_attempt\" type=\"checkbox\" value=\"1\" />".GM_LANG_attempt_auto_acc."</td></tr>";
 		print "\n<tr><td class=\"topbottombar\" colspan=\"2\">";
-		print "<input type=\"submit\" id=\"submit\" value=\"".$gm_lang["set_link"]."\" />\n";
+		print "<input type=\"submit\" id=\"submit\" value=\"".GM_LANG_set_link."\" />\n";
 		print "\n</td></tr>";
 		print "</table>\n";
 		print "</form>\n";
@@ -1699,8 +1699,8 @@ switch ($action) {
 					$ct = preg_match("/1 $famtag @(.*)@/", $famrec, $match);
 					if ($ct>0) {
 						$spid = trim($match[1]);
-						if ($famtag == "HUSB") print $gm_lang["husb_present"];
-						else if ($famtag == "WIFE") print $gm_lang["wife_present"];
+						if ($famtag == "HUSB") print GM_LANG_husb_present;
+						else if ($famtag == "WIFE") print GM_LANG_wife_present;
 						print "<br />";
 						print constant("GM_FACT_".$famtag).": ".PrintReady(GetPersonName($spid));
 						$success = false;
@@ -1716,9 +1716,9 @@ switch ($action) {
 						$success = $success && EditFunctions::ReplaceGedrec($famid, "", $newrec, $famtag, $change_id, $change_type, "", "FAM");
 					}
 				}
-				if ($success) print "<br /><br />".$gm_lang["update_successful"];
+				if ($success) print "<br /><br />".GM_LANG_update_successful;
 			}
-			else print "<span class=\"error\">".$gm_lang["family_not_found"].": ".$famid."</span>";
+			else print "<span class=\"error\">".GM_LANG_family_not_found.": ".$famid."</span>";
 		}
 		break;	
 		
@@ -1811,7 +1811,7 @@ switch ($action) {
 		
 		// NOTE: Save the new indi record and get the new ID
 		$xref = EditFunctions::AppendGedrec($newrec, "INDI", $change_id, $change_type);
-		if ($xref) print "<br /><br />".$gm_lang["update_successful"];
+		if ($xref) print "<br /><br />".GM_LANG_update_successful;
 		else exit;
 		$success = true;
 		if ($famid=="new") {
@@ -1869,7 +1869,7 @@ switch ($action) {
 	// NOTE: add new source
 	case "addnewsource":
 		?>
-		<b><?php print $gm_lang["create_source"];
+		<b><?php print GM_LANG_create_source;
 		$tabkey = 1;
 		 ?></b>
 		<form method="post" action="edit_interface.php" onSubmit="return check_ansform(this);" style="display:inline;">
@@ -1886,7 +1886,7 @@ switch ($action) {
 		<!--
 			function check_ansform(frm) {
 				if (document.getElementById("<?php print $element_id?>").value=="") {
-					alert('<?php print $gm_lang["must_provide"].GM_FACT_TITL; ?>');
+					alert('<?php print GM_LANG_must_provide.GM_FACT_TITL; ?>');
 					document.getElementById("<?php print $element_id?>").focus();
 					return false;
 				}
@@ -1912,8 +1912,8 @@ switch ($action) {
 		// 1 NOTE
 		EditFunctions::PrintAddLayer("NOTE", 1);
 		EditFunctions::PrintAddLayer("GNOTE", 1);
-		if ($gm_user->UserCanAccept() && !$gm_user->userAutoAccept()) print "<br /><input name=\"aa_attempt\" type=\"checkbox\" value=\"1\" />".$gm_lang["attempt_auto_acc"]."<br />";
-		print "<br /><input class=\"center\" type=\"submit\" value=\"".$gm_lang["create_source"]."\" /><br />";
+		if ($gm_user->UserCanAccept() && !$gm_user->userAutoAccept()) print "<br /><input name=\"aa_attempt\" type=\"checkbox\" value=\"1\" />".GM_LANG_attempt_auto_acc."<br />";
+		print "<br /><input class=\"center\" type=\"submit\" value=\"".GM_LANG_create_source."\" /><br />";
 		print "</form>";
 		print "\n<script type=\"text/javascript\">\n<!--\ndocument.getElementById(\"".$element_id."\").focus();\n//-->\n</script>";
 		break;
@@ -1926,9 +1926,9 @@ switch ($action) {
 		$newged = EditFunctions::HandleUpdates($newged);
 		$xref = EditFunctions::AppendGedrec($newged, "SOUR", $change_id, $change_type);
 		if ($xref) {
-			print "<br /><br />\n".$gm_lang["new_source_created"]."<br /><br />";
+			print "<br /><br />\n".GM_LANG_new_source_created."<br /><br />";
 			if (GedcomConfig::$EDIT_AUTOCLOSE) print "\n<script type=\"text/javascript\">\n<!--\nopenerpasteid('$xref');\n//-->\n</script>";
-			else print "<a href=\"javascript:// SOUR $xref\" onclick=\"openerpasteid('$xref'); return false;\">".$gm_lang["paste_id_into_field"]." <b>$xref</b></a>\n";
+			else print "<a href=\"javascript:// SOUR $xref\" onclick=\"openerpasteid('$xref'); return false;\">".GM_LANG_paste_id_into_field." <b>$xref</b></a>\n";
 		}
 		break;
 		
@@ -1939,7 +1939,7 @@ switch ($action) {
 		<!--
 			function check_form(frm) {
 				if (frm.NAME.value=="") {
-					alert('<?php print $gm_lang["must_provide"]." ".GM_FACT_NAME; ?>');
+					alert('<?php print GM_LANG_must_provide." ".GM_FACT_NAME; ?>');
 					frm.NAME.focus();
 					return false;
 				}
@@ -1947,7 +1947,7 @@ switch ($action) {
 			}
 		//-->
 		</script>
-		<b><?php print $gm_lang["create_repository"];
+		<b><?php print GM_LANG_create_repository;
 		$tabkey = 1;
 		?></b>
 		<form method="post" action="edit_interface.php" onSubmit="return check_form(this);" style="display:inline;">
@@ -1974,10 +1974,10 @@ switch ($action) {
 				<tr><td class="shade2"><?php print GM_FACT_WWW; ?></td>
 				<td class="shade1"><input tabindex="<?php print $tabkey; ?>" type="text" name="WWW" id="WWW" value="" size="40" maxlength="255" /> </td></tr>
 				<?php if ($gm_user->UserCanAccept() && !$gm_user->userAutoAccept()) {?>
-					<tr><td class="shade1" colspan="2"><input name="aa_attempt" type="checkbox" value="1" /><?php print $gm_lang["attempt_auto_acc"]?></td></tr>
+					<tr><td class="shade1" colspan="2"><input name="aa_attempt" type="checkbox" value="1" /><?php print GM_LANG_attempt_auto_acc?></td></tr>
 				<?php } ?>
 			<tr><td class="topbottombar" colspan="2">
-			<input type="submit" value="<?php print $gm_lang["create_repository"]; ?>" />
+			<input type="submit" value="<?php print GM_LANG_create_repository; ?>" />
 			</td></tr>
 			</table>
 		</form>
@@ -2020,16 +2020,16 @@ switch ($action) {
 		}
 		$xref = EditFunctions::AppendGedrec($newged, "REPO", $change_id, $change_type);
 		if ($xref) {
-			print "<br /><br />\n".$gm_lang["new_repo_created"]."<br /><br />";
+			print "<br /><br />\n".GM_LANG_new_repo_created."<br /><br />";
 			if (GedcomConfig::$EDIT_AUTOCLOSE) print "\n<script type=\"text/javascript\">\n<!--\nopenerpasteid('$xref');\n//-->\n</script>";
-			else print "<a href=\"javascript:// REPO $xref\" onclick=\"openerpasteid('$xref'); return false;\">".$gm_lang["paste_rid_into_field"]." <b>$xref</b></a>\n";
+			else print "<a href=\"javascript:// REPO $xref\" onclick=\"openerpasteid('$xref'); return false;\">".GM_LANG_paste_rid_into_field." <b>$xref</b></a>\n";
 		}
 		break;
 		
 	// NOTE: add new general note
 	case "addnewgnote":
 		?>
-		<b><?php print $gm_lang["create_general_note"];
+		<b><?php print GM_LANG_create_general_note;
 		$tabkey = 1;
 		 ?></b>
 		<form method="post" action="edit_interface.php" "style="display:inline;">
@@ -2044,8 +2044,8 @@ switch ($action) {
 		EditFunctions::AddSimpleTag("1 RESN");
 		print "</table>";
 		print EditFunctions::PrintAddLayer("SOUR", 1);
-		if ($gm_user->UserCanAccept() && !$gm_user->userAutoAccept($gm_urname)) print "<br /><input name=\"aa_attempt\" type=\"checkbox\" value=\"1\" />".$gm_lang["attempt_auto_acc"]."<br />";
-		print "<br /><input class=\"center\" type=\"submit\" value=\"".$gm_lang["create_general_note"]."\" /><br />";
+		if ($gm_user->UserCanAccept() && !$gm_user->userAutoAccept($gm_urname)) print "<br /><input name=\"aa_attempt\" type=\"checkbox\" value=\"1\" />".GM_LANG_attempt_auto_acc."<br />";
+		print "<br /><input class=\"center\" type=\"submit\" value=\"".GM_LANG_create_general_note."\" /><br />";
 		print "</form>";
 		print "\n<script type=\"text/javascript\">\n<!--\ndocument.getElementById(\"".$element_id."\").focus();\n//-->\n</script>";
 		break;
@@ -2054,7 +2054,7 @@ switch ($action) {
 	case "addgnoteaction":
 
 		if (empty($NOTE)) {
-			print "<span class=\"error\">".$gm_lang["no_empty_notes"]."</span>";
+			print "<span class=\"error\">".GM_LANG_no_empty_notes."</span>";
 		}
 		else {
 			$change_id = GetNewXref("CHANGE");
@@ -2063,9 +2063,9 @@ switch ($action) {
 			$newged = EditFunctions::HandleUpdates($newged);
 			$xref = EditFunctions::AppendGedrec($newged, "NOTE", $change_id, $change_type);
 			if ($xref) {
-				print "<br /><br />\n".$gm_lang["new_gnote_created"]."<br /><br />";
+				print "<br /><br />\n".GM_LANG_new_gnote_created."<br /><br />";
 				if (GedcomConfig::$EDIT_AUTOCLOSE) print "\n<script type=\"text/javascript\">\n<!--\nopenerpasteid('$xref');\n//-->\n</script>";
-				else print "<a href=\"javascript:// NOTE $xref\" onclick=\"openerpasteid('$xref'); return false;\">".$gm_lang["paste_noteid_into_field"]." <b>$xref</b></a>\n";
+				else print "<a href=\"javascript:// NOTE $xref\" onclick=\"openerpasteid('$xref'); return false;\">".GM_LANG_paste_noteid_into_field." <b>$xref</b></a>\n";
 			}
 		}
 		break;
@@ -2272,8 +2272,8 @@ switch ($action) {
 					EditFunctions::PrintAddLayer("GNOTE");
 				}
 			}
-			if ($gm_user->UserCanAccept() && !$gm_user->userAutoAccept()) print "<br /><input name=\"aa_attempt\" type=\"checkbox\" value=\"1\" />".$gm_lang["attempt_auto_acc"]."<br />\n";
-			print "<br /><input type=\"submit\" value=\"".$gm_lang["save"]."\" /><br />\n";
+			if ($gm_user->UserCanAccept() && !$gm_user->userAutoAccept()) print "<br /><input name=\"aa_attempt\" type=\"checkbox\" value=\"1\" />".GM_LANG_attempt_auto_acc."<br />\n";
+			print "<br /><input type=\"submit\" value=\"".GM_LANG_save."\" /><br />\n";
 			print "</form>\n";
 //		}
 		break;
@@ -2281,9 +2281,9 @@ switch ($action) {
 	// NOTE: editraw done
 	case "editraw":
 		if (!$factedit) {
-			print "<br />".$gm_lang["privacy_prevented_editing"];
-			if (!empty($pid)) print "<br />".$gm_lang["privacy_not_granted"]." pid $pid.";
-			if (!empty($famid)) print "<br />".$gm_lang["privacy_not_granted"]." famid $famid.";
+			print "<br />".GM_LANG_privacy_prevented_editing;
+			if (!empty($pid)) print "<br />".GM_LANG_privacy_not_granted." pid $pid.";
+			if (!empty($famid)) print "<br />".GM_LANG_privacy_not_granted." famid $famid.";
 			PrintSimpleFooter();
 			exit;
 		}
@@ -2291,7 +2291,7 @@ switch ($action) {
 			print "<br />";
 			$gedrec = preg_replace(array("/(\r\n)+/", "/\r+/", "/\n+/"), array("\r\n", "\r", "\n"), $gedrec);
 			print_help_link("edit_edit_raw_help", "qm");
-			print "<b>".$gm_lang["edit_raw"]."</b>";
+			print "<b>".GM_LANG_edit_raw."</b>";
 			print "<form method=\"post\" action=\"edit_interface.php\" style=\"display:inline;\">\n";
 			print "<input type=\"hidden\" name=\"action\" value=\"updateraw\" />\n";
 			print "<input type=\"hidden\" name=\"pid\" value=\"".$pid."\" />\n";
@@ -2300,8 +2300,8 @@ switch ($action) {
 			print "<input type=\"hidden\" name=\"change_type\" value=\"".$change_type."\" />\n";
 			LinkFunctions::PrintSpecialCharLink("newgedrec");
 			print "<textarea name=\"newgedrec\" id=\"newgedrec\" rows=\"20\" cols=\"82\" dir=\"ltr\">".$gedrec."</textarea>\n<br />";
-			if ($gm_user->UserCanAccept() && !$gm_user->userAutoAccept()) print "<br /><input name=\"aa_attempt\" type=\"checkbox\" value=\"1\" />".$gm_lang["attempt_auto_acc"]."<br />\n";
-			print "<input type=\"submit\" value=\"".$gm_lang["save"]."\" /><br />\n";
+			if ($gm_user->UserCanAccept() && !$gm_user->userAutoAccept()) print "<br /><input name=\"aa_attempt\" type=\"checkbox\" value=\"1\" />".GM_LANG_attempt_auto_acc."<br />\n";
+			print "<input type=\"submit\" value=\"".GM_LANG_save."\" /><br />\n";
 			print "</form>\n";
 		}
 		break;
@@ -2315,7 +2315,7 @@ switch ($action) {
 		if (!$rectype) $rectype = "";
 		if (trim($oldrec) != trim($newrec)) {
 			$success = (!empty($newrec) && (EditFunctions::ReplaceGedrec($pid, $oldrec, $newrec, $rectype, $change_id, $change_type, "", $rectype)));
-			if ($success) print "<br /><br />".$gm_lang["update_successful"];
+			if ($success) print "<br /><br />".GM_LANG_update_successful;
 		}
 		break;
 	
@@ -2344,7 +2344,7 @@ switch ($action) {
 			}
 			if (count($_SESSION["clipboard"])>4) array_shift($_SESSION["clipboard"]);
 			$_SESSION["clipboard"][] = array("type"=>$type, "factrec"=>$factrec, "fact"=>$fact);
-			print "<b>".$gm_lang["record_copied"]."</b>\n";
+			print "<b>".GM_LANG_record_copied."</b>\n";
 		}
 		break;
 	
@@ -2362,8 +2362,8 @@ switch ($action) {
 		print "<table class=\"facts_table\">";
 		EditFunctions::AddTagSeparator($famtag);
 		print "<tr><td class=\"shade2\">";
-		if ($famtag=="WIFE") print $gm_lang["wife"];
-		else print $gm_lang["husband"];
+		if ($famtag=="WIFE") print GM_LANG_wife;
+		else print GM_LANG_husband;
 		print "</td>";
 		print "<td class=\"shade1\"><input id=\"spouseid\" type=\"text\" name=\"spid\" size=\"8\"  onblur=\"sndReq('spouselink', 'getpersonname', 'pid', this.value, '', '');\"/> ";
 		LinkFunctions::PrintFindIndiLink("spouseid", "");
@@ -2374,9 +2374,9 @@ switch ($action) {
 		EditFunctions::AddSimpleTag("0 TYPE", "MARR");
 		EditFunctions::AddSimpleTag("0 DATE", "MARR");
 		EditFunctions::AddSimpleTag("0 PLAC", "MARR");
-		if ($gm_user->UserCanAccept() && !$gm_user->userAutoAccept()) print "<tr><td class=\"shade1\" colspan=\"2\"><input name=\"aa_attempt\" type=\"checkbox\" value=\"1\" />".$gm_lang["attempt_auto_acc"]."</td></tr>";
+		if ($gm_user->UserCanAccept() && !$gm_user->userAutoAccept()) print "<tr><td class=\"shade1\" colspan=\"2\"><input name=\"aa_attempt\" type=\"checkbox\" value=\"1\" />".GM_LANG_attempt_auto_acc."</td></tr>";
 		print "<tr><td class=\"topbottombar\" colspan=\"2\">";
-		print "<input type=\"submit\" id=\"submit\" value=\"".$gm_lang["set_link"]."\" />\n";
+		print "<input type=\"submit\" id=\"submit\" value=\"".GM_LANG_set_link."\" />\n";
 		print "</td></tr>";
 		print "</table>\n";
 		print "</form>\n";
@@ -2399,9 +2399,9 @@ switch ($action) {
 			while($row = $res->FetchAssoc($res->result)) {
 				if (!empty($row["f_id"])) {
 					$exist = true;
-					print $gm_lang["family_exists"];
+					print GM_LANG_family_exists;
 					print "<br />";
-					print $gm_lang["family"].": ".$row["f_id"];
+					print GM_LANG_family.": ".$row["f_id"];
 				}
 			}
 			if (!$exist) {
@@ -2453,10 +2453,10 @@ switch ($action) {
 						$newrec = "1 FAMS @$famid@\r\n";
 						EditFunctions::ReplaceGedrec($pid, "", $newrec, "FAMS", $change_id, $change_type, "", "INDI");
 					}
-					if ($famtag == "HUSB") print $gm_lang["husband_added"];
-					else if ($famtag == "WIFE") print $gm_lang["wife_added"];
+					if ($famtag == "HUSB") print GM_LANG_husband_added;
+					else if ($famtag == "WIFE") print GM_LANG_wife_added;
 				}
-				else print "<br /><span class=\"error\">".$gm_lang["person_not_found"].": ".$spid."</span>";
+				else print "<br /><span class=\"error\">".GM_LANG_person_not_found.": ".$spid."</span>";
 			}
 		}
 		break;
@@ -2475,7 +2475,7 @@ switch ($action) {
 			$orec = preg_replace("/$chanrec/", "", $oldrecord);
 			if (trim($newrec) != trim($orec)) {
 				$success = (EditFunctions::ReplaceGedrec($pid, $oldrecord, $newrec, $fact, $change_id, $change_type, $gedfile, "", "SUBM"));
-				if ($success) print "<br /><br />".$gm_lang["update_successful"];
+				if ($success) print "<br /><br />".GM_LANG_update_successful;
 			}
 		}
 		else {
@@ -2483,7 +2483,7 @@ switch ($action) {
 			$newrec = EditFunctions::HandleUpdates($newrec);
 			$subid = EditFunctions::AppendGedrec($newrec, "SUBM", $change_id, $change_type, $gedfile);
 			$success = (EditFunctions::ReplaceGedrec("HEAD", "", "1 SUBM @".$subid."@", "SUBM", $change_id, $change_type, $gedfile, "", "HEAD"));
-			if ($success) print "<br /><br />".$gm_lang["update_successful"];
+			if ($success) print "<br /><br />".GM_LANG_update_successful;
 			
 		}
 		break;	
@@ -2554,7 +2554,7 @@ switch ($action) {
 		if (count($_FILES)>0) {
 			$result = MediaFS::UploadFiles($_FILES, $folder, true);
 			if ($result["errno"] != 0) {
-				print "<span class=\"error\">".$gm_lang["upload_error"]."<br />".$result["error"]."</span><br />";
+				print "<span class=\"error\">".GM_LANG_upload_error."<br />".$result["error"]."</span><br />";
 			}
 			else {
 				$newmfile = $result["filename"];
@@ -2567,7 +2567,7 @@ switch ($action) {
 			}
 		}
 		if (trim(EditFunctions::SortFactDetails($oldrec)) != trim(EditFunctions::SortFactDetails($newrec))) $success = EditFunctions::ReplaceGedrec($pid, $oldrec, $newrec, $fact, $change_id, $change_type, $gedfile, $pid_type);
-		if ($success) print "<br /><br />".$gm_lang["update_successful"];
+		if ($success) print "<br /><br />".GM_LANG_update_successful;
 		break;
 	
 }
@@ -2585,6 +2585,6 @@ if ($success && !$link_error && GedcomConfig::$EDIT_AUTOCLOSE) {
 	print "\n<script type=\"text/javascript\">\n<!--\nedit_close();\n//-->\n</script>";
 }
 
-print "<div class=\"center\"><a href=\"javascript:// ".$gm_lang["close_window"]."\" onclick=\"edit_close();\">".$gm_lang["close_window"]."</a></div><br />\n";
+print "<div class=\"center\"><a href=\"javascript:// ".GM_LANG_close_window."\" onclick=\"edit_close();\">".GM_LANG_close_window."</a></div><br />\n";
 PrintSimpleFooter();
 ?>

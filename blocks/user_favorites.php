@@ -26,7 +26,7 @@
  * $Id$
  */
 
-$GM_BLOCKS["print_user_favorites"]["name"]      = $gm_lang["user_favorites_block"];
+$GM_BLOCKS["print_user_favorites"]["name"]      = GM_LANG_user_favorites_block;
 $GM_BLOCKS["print_user_favorites"]["descr"]     = "user_favorites_descr";
 $GM_BLOCKS["print_user_favorites"]["type"]      = "user";
 $GM_BLOCKS["print_user_favorites"]["canconfig"] = true;
@@ -34,7 +34,7 @@ $GM_BLOCKS["print_user_favorites"]["rss"]		= false;
 
 //-- print user favorites
 function print_user_favorites($block=true, $config="", $side, $index) {
-	global $gm_lang, $GM_IMAGES, $command, $gm_user;
+	global $GM_IMAGES, $command, $gm_user;
 
 		$userfavs = FavoritesController::getUserFavorites($gm_user->username);
 		if (!is_array($userfavs)) $userfavs = array();
@@ -42,7 +42,7 @@ function print_user_favorites($block=true, $config="", $side, $index) {
 		print "<div id=\"user_favorites\" class=\"block\">\n"; // block
 		print "<div class=\"blockhc\">";
 		print_help_link("mygedview_favorites_help", "qm", "my_favorites");
-		print $gm_lang["my_favorites"]." &lrm;(".count($userfavs).")&lrm;";
+		print GM_LANG_my_favorites." &lrm;(".count($userfavs).")&lrm;";
 		print "</div>";
 		print "<div class=\"blockcontent\">";
 		if ($block) print "<div class=\"small_inner_block\">\n";
@@ -63,7 +63,7 @@ function print_user_favorites($block=true, $config="", $side, $index) {
 }
 
 function print_user_favorites_config($favid="") {
-	global $gm_user, $gm_lang;
+	global $gm_user;
 	
 	if ($favid == "" && isset($_GET["favid"])) $favid = $_GET["favid"];
 	
@@ -80,14 +80,14 @@ function print_user_favorites_config($favid="") {
 	print "<input type=\"hidden\" name=\"type\" value=\"".$fav->type."\" />\n";
 	print "<input type=\"hidden\" name=\"file\" value=\"".$fav->file."\" />\n";
 	if ($fav->type == "URL") {
-		print "<label for=\"favurl\">".$gm_lang["url"]."</label>";
+		print "<label for=\"favurl\">".GM_LANG_url."</label>";
 		print "<input type=\"text\" id=\"favurl\" name=\"favurl\" size=\"40\" value=\"".$fav->url."\">";
 		print "<br />";
-		print "<label for=\"title\">".$gm_lang["title"]."</label>";
+		print "<label for=\"title\">".GM_LANG_title."</label>";
 		print "<input type=\"text\" id=\"title\" name=\"favtitle\" size=\"40\" value=\"".$fav->title."\">";
 		print "<br />";
 	}
-	print "<label for=\"favnote\">".$gm_lang["add_fav_enter_note"]."</label>";
+	print "<label for=\"favnote\">".GM_LANG_add_fav_enter_note."</label>";
 	print "<textarea id=\"favnote\" name=\"favnote\" rows=\"6\" cols=\"40\">".$fav->note."</textarea>";
 }
 ?>

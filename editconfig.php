@@ -47,11 +47,11 @@ if (!isset($NEW_LANGS)) $NEW_LANGS = array();
 $message = "";
 $i = 1;
 
-PrintHeader($gm_lang["configure_head"]);
+PrintHeader(GM_LANG_configure_head);
 ?>
 <!-- Setup the left box -->
 <div id="admin_genmod_left">
-	<div class="admin_link"><a href="admin.php"><?php print $gm_lang["admin"];?></a></div>
+	<div class="admin_link"><a href="admin.php"><?php print GM_LANG_admin;?></a></div>
 </div>
 
 <div id="content">
@@ -153,7 +153,7 @@ PrintHeader($gm_lang["configure_head"]);
 			
 			
 			if (!$SystemConfig->StoreConfig($CONFIG)) {
-				$message .= "<span class=\"error\">".$gm_lang["gm_config_write_error"]."</span>";
+				$message .= "<span class=\"error\">".GM_LANG_gm_config_write_error."</span>";
 				$error_cnf = true;
 			}
 			
@@ -187,7 +187,7 @@ PrintHeader($gm_lang["configure_head"]);
 				}
 			}
 			if (!$error_cnf) {
-				$message .= $gm_lang["system_configuration_updated"];
+				$message .= GM_LANG_system_configuration_updated;
 			}
 		}
 		foreach($_POST as $key=>$value) {
@@ -208,9 +208,9 @@ PrintHeader($gm_lang["configure_head"]);
 		<div class="admin_topbottombar">
 			<h3>
 				<?php print_help_link("configure_genmod_help", "qm", "configure");?>
-				<?php print $gm_lang["configure"]; ?>
+				<?php print GM_LANG_configure; ?>
 			</h3>
-			<?php print $gm_lang["site_config"].": ".$CONFIG_SITE; ?>
+			<?php print GM_LANG_site_config.": ".$CONFIG_SITE; ?>
 		</div>
 		<?php
 		if ($message != "") {
@@ -223,7 +223,7 @@ PrintHeader($gm_lang["configure_head"]);
 					<?php print_help_link("DBHOST_help", "qm", "DBHOST");?>
 				</div>
 				<div class="description">
-					<?php print $gm_lang["DBHOST"]; ?>
+					<?php print GM_LANG_DBHOST; ?>
 				</div>
 			</div>
 			<div class="choice_right">
@@ -236,7 +236,7 @@ PrintHeader($gm_lang["configure_head"]);
 					<?php print_help_link("DBUSER_help", "qm", "DBUSER");?>
 				</div>
 				<div class="description">
-					<?php  print $gm_lang["DBUSER"]; ?>
+					<?php  print GM_LANG_DBUSER; ?>
 				</div>
 			</div>
 			<div class="choice_right">
@@ -249,7 +249,7 @@ PrintHeader($gm_lang["configure_head"]);
 					<?php print_help_link("DBPASS_help", "qm", "DBPASS");?>
 				</div>
 				<div class="description">
-					<?php print $gm_lang["DBPASS"]; ?>
+					<?php print GM_LANG_DBPASS; ?>
 				</div>
 			</div>
 			<div class="choice_right">
@@ -262,7 +262,7 @@ PrintHeader($gm_lang["configure_head"]);
 					<?php print_help_link("DBNAME_help", "qm", "DBNAME");?>
 				</div>
 				<div class="description">
-					<?php print $gm_lang["DBNAME"]; ?>
+					<?php print GM_LANG_DBNAME; ?>
 				</div>
 			</div>
 			<div class="choice_right">
@@ -275,13 +275,13 @@ PrintHeader($gm_lang["configure_head"]);
 					<?php print_help_link("DBPERSIST_help", "qm", "DBPERSIST");?>
 				</div>
 				<div class="description">
-					<?php print $gm_lang["DBPERSIST"]; ?>
+					<?php print GM_LANG_DBPERSIST; ?>
 				</div>
 			</div>
 			<div class="choice_right">
 				<select name="NEW_DBPERSIST" tabindex="<?php $i++; print $i?>">
-					<option value="yes" <?php if (DBPERSIST) print "selected=\"selected\""; ?>><?php print $gm_lang["yes"];?></option>
-					<option value="no" <?php if (!DBPERSIST) print "selected=\"selected\""; ?>><?php print $gm_lang["no"];?></option>
+					<option value="yes" <?php if (DBPERSIST) print "selected=\"selected\""; ?>><?php print GM_LANG_yes;?></option>
+					<option value="no" <?php if (!DBPERSIST) print "selected=\"selected\""; ?>><?php print GM_LANG_no;?></option>
 				</select>
 			</div>
 		</div>
@@ -291,14 +291,14 @@ PrintHeader($gm_lang["configure_head"]);
 					<?php print_help_link("TBLPREFIX_help", "qm", "TBLPREFIX");?>
 				</div>
 				<div class="description">
-					<?php print $gm_lang["TBLPREFIX"]; ?>
+					<?php print GM_LANG_TBLPREFIX; ?>
 				</div>
 			</div>
 			<div class="choice_right">
 				<input type="text" name="NEW_TBLPREFIX" value="<?php print TBLPREFIX?>" size="40" tabindex="<?php $i++; print $i?>" />
-				<?php if ($error_db) print "<div class=\"error\">".$gm_lang["duplicatedb"]."</div>"; ?>
-				<?php if ($error_db2) print "<div class=\"error\">".$gm_lang["bad_host_user_pass"]."</div>"; ?>
-				<?php if ($error_db3) print "<div class=\"error\">".$gm_lang["bad_database_name"]."</div>"; ?>
+				<?php if ($error_db) print "<div class=\"error\">".GM_LANG_duplicatedb."</div>"; ?>
+				<?php if ($error_db2) print "<div class=\"error\">".GM_LANG_bad_host_user_pass."</div>"; ?>
+				<?php if ($error_db3) print "<div class=\"error\">".GM_LANG_bad_database_name."</div>"; ?>
 			</div>
 		</div>
 		<div class="admin_item_box">
@@ -307,13 +307,13 @@ PrintHeader($gm_lang["configure_head"]);
 					<?php print_help_link("ALLOW_CHANGE_GEDCOM_help", "qm", "ALLOW_CHANGE_GEDCOM");?>
 				</div>
 				<div class="description">
-					<?php print $gm_lang["ALLOW_CHANGE_GEDCOM"]; ?>
+					<?php print GM_LANG_ALLOW_CHANGE_GEDCOM; ?>
 				</div>
 			</div>
 			<div class="choice_right">
 				<select name="NEW_ALLOW_CHANGE_GEDCOM" tabindex="<?php $i++; print $i?>">
-					<option value="yes" <?php if ($ALLOW_CHANGE_GEDCOM) print "selected=\"selected\""; ?>><?php print $gm_lang["yes"];?></option>
-					<option value="no" <?php if (!$ALLOW_CHANGE_GEDCOM) print "selected=\"selected\""; ?>><?php print $gm_lang["no"];?></option>
+					<option value="yes" <?php if ($ALLOW_CHANGE_GEDCOM) print "selected=\"selected\""; ?>><?php print GM_LANG_yes;?></option>
+					<option value="no" <?php if (!$ALLOW_CHANGE_GEDCOM) print "selected=\"selected\""; ?>><?php print GM_LANG_no;?></option>
 				</select>
 			</div>
 		</div>
@@ -323,12 +323,12 @@ PrintHeader($gm_lang["configure_head"]);
 					<?php print_help_link("INDEX_DIRECTORY_help", "qm", "INDEX_DIRECTORY");?>
 				</div>
 				<div class="description">
-					<?php print $gm_lang["INDEX_DIRECTORY"]; ?>
+					<?php print GM_LANG_INDEX_DIRECTORY; ?>
 				</div>
 			</div>
 			<div class="choice_right">
 				<input type="text" size="40" name="NEW_INDEX_DIRECTORY" value="<?php print INDEX_DIRECTORY?>" dir="ltr" tabindex="<?php $i++; print $i?>" />
-				<?php if ($error_indexdir) print "<div class=\"error\">".$gm_lang["duplicateindexdir"]."</div>"; ?>
+				<?php if ($error_indexdir) print "<div class=\"error\">".GM_LANG_duplicateindexdir."</div>"; ?>
 			</div>
 		</div>
 		<div class="admin_item_box">
@@ -337,13 +337,13 @@ PrintHeader($gm_lang["configure_head"]);
 					<?php print_help_link("MEDIA_IN_DB_help", "qm", "MEDIA_IN_DB");?>
 				</div>
 				<div class="description">
-					<?php print $gm_lang["MEDIA_IN_DB"]; ?>
+					<?php print GM_LANG_MEDIA_IN_DB; ?>
 				</div>
 			</div>
 			<div class="choice_right">
 				<select name="NEW_MEDIA_IN_DB" tabindex="<?php $i++; print $i?>">
-					<option value="yes" <?php if ($MEDIA_IN_DB) print "selected=\"selected\""; ?>><?php print $gm_lang["yes"];?></option>
-					<option value="no" <?php if (!$MEDIA_IN_DB) print "selected=\"selected\""; ?>><?php print $gm_lang["no"];?></option>
+					<option value="yes" <?php if ($MEDIA_IN_DB) print "selected=\"selected\""; ?>><?php print GM_LANG_yes;?></option>
+					<option value="no" <?php if (!$MEDIA_IN_DB) print "selected=\"selected\""; ?>><?php print GM_LANG_no;?></option>
 				</select>
 			</div>
 		</div>
@@ -353,13 +353,13 @@ PrintHeader($gm_lang["configure_head"]);
 					<?php print_help_link("GM_STORE_MESSAGES_help", "qm", "GM_STORE_MESSAGES");?>
 				</div>
 				<div class="description">
-					<?php print $gm_lang["GM_STORE_MESSAGES"]; ?>
+					<?php print GM_LANG_GM_STORE_MESSAGES; ?>
 				</div>
 			</div>
 			<div class="choice_right">
 				<select name="NEW_GM_STORE_MESSAGES" tabindex="<?php $i++; print $i?>">
-					<option value="yes" <?php if ($GM_STORE_MESSAGES) print "selected=\"selected\""; ?>><?php print $gm_lang["yes"];?></option>
-					<option value="no" <?php if (!$GM_STORE_MESSAGES) print "selected=\"selected\""; ?>><?php print $gm_lang["no"];?></option>
+					<option value="yes" <?php if ($GM_STORE_MESSAGES) print "selected=\"selected\""; ?>><?php print GM_LANG_yes;?></option>
+					<option value="no" <?php if (!$GM_STORE_MESSAGES) print "selected=\"selected\""; ?>><?php print GM_LANG_no;?></option>
 				</select>
 			</div>
 		</div>
@@ -369,13 +369,13 @@ PrintHeader($gm_lang["configure_head"]);
 					<?php print_help_link("USE_REGISTRATION_MODULE_help", "qm", "USE_REGISTRATION_MODULE");?>
 				</div>
 				<div class="description">
-					<?php print $gm_lang["USE_REGISTRATION_MODULE"]; ?>
+					<?php print GM_LANG_USE_REGISTRATION_MODULE; ?>
 				</div>
 			</div>
 			<div class="choice_right">
 				<select name="NEW_USE_REGISTRATION_MODULE" tabindex="<?php $i++; print $i?>">
-					<option value="yes" <?php if ($USE_REGISTRATION_MODULE) print "selected=\"selected\""; ?>><?php print $gm_lang["yes"];?></option>
-					<option value="no" <?php if (!$USE_REGISTRATION_MODULE) print "selected=\"selected\""; ?>><?php print $gm_lang["no"];?></option>
+					<option value="yes" <?php if ($USE_REGISTRATION_MODULE) print "selected=\"selected\""; ?>><?php print GM_LANG_yes;?></option>
+					<option value="no" <?php if (!$USE_REGISTRATION_MODULE) print "selected=\"selected\""; ?>><?php print GM_LANG_no;?></option>
 				</select>
 			</div>
 		</div>
@@ -385,13 +385,13 @@ PrintHeader($gm_lang["configure_head"]);
 					<?php print_help_link("REQUIRE_ADMIN_AUTH_REGISTRATION_help", "qm", "REQUIRE_ADMIN_AUTH_REGISTRATION");?>
 				</div>
 				<div class="description">
-					<?php print $gm_lang["REQUIRE_ADMIN_AUTH_REGISTRATION"]; ?>
+					<?php print GM_LANG_REQUIRE_ADMIN_AUTH_REGISTRATION; ?>
 				</div>
 			</div>
 			<div class="choice_right">
 				<select name="NEW_REQUIRE_ADMIN_AUTH_REGISTRATION" tabindex="<?php $i++; print $i?>">
-					<option value="yes" <?php if ($REQUIRE_ADMIN_AUTH_REGISTRATION) print "selected=\"selected\""; ?>><?php print $gm_lang["yes"];?></option>
-					<option value="no" <?php if (!$REQUIRE_ADMIN_AUTH_REGISTRATION) print "selected=\"selected\""; ?>><?php print $gm_lang["no"];?></option>
+					<option value="yes" <?php if ($REQUIRE_ADMIN_AUTH_REGISTRATION) print "selected=\"selected\""; ?>><?php print GM_LANG_yes;?></option>
+					<option value="no" <?php if (!$REQUIRE_ADMIN_AUTH_REGISTRATION) print "selected=\"selected\""; ?>><?php print GM_LANG_no;?></option>
 				</select>
 			</div>
 		</div>
@@ -401,13 +401,13 @@ PrintHeader($gm_lang["configure_head"]);
 					<?php print_help_link("GM_SIMPLE_MAIL_help", "qm", "GM_SIMPLE_MAIL");?>
 				</div>
 				<div class="description">
-					<?php print $gm_lang["GM_SIMPLE_MAIL"]; ?>
+					<?php print GM_LANG_GM_SIMPLE_MAIL; ?>
 				</div>
 			</div>
 			<div class="choice_right">
 				<select name="NEW_GM_SIMPLE_MAIL" tabindex="<?php $i++; print $i?>">
-					<option value="yes" <?php if ($GM_SIMPLE_MAIL) print "selected=\"selected\""; ?>><?php print $gm_lang["yes"];?></option>
-					<option value="no" <?php if (!$GM_SIMPLE_MAIL) print "selected=\"selected\""; ?>><?php print $gm_lang["no"];?></option>
+					<option value="yes" <?php if ($GM_SIMPLE_MAIL) print "selected=\"selected\""; ?>><?php print GM_LANG_yes;?></option>
+					<option value="no" <?php if (!$GM_SIMPLE_MAIL) print "selected=\"selected\""; ?>><?php print GM_LANG_no;?></option>
 				</select>
 			</div>
 		</div>
@@ -417,13 +417,13 @@ PrintHeader($gm_lang["configure_head"]);
 					<?php print_help_link("ALLOW_USER_THEMES_help", "qm", "ALLOW_USER_THEMES");?>
 				</div>
 				<div class="description">
-					<?php print $gm_lang["ALLOW_USER_THEMES"]; ?>
+					<?php print GM_LANG_ALLOW_USER_THEMES; ?>
 				</div>
 			</div>
 			<div class="choice_right">
 				<select name="NEW_ALLOW_USER_THEMES" tabindex="<?php $i++; print $i?>">
-					<option value="yes" <?php if ($ALLOW_USER_THEMES) print "selected=\"selected\""; ?>><?php print $gm_lang["yes"];?></option>
-					<option value="no" <?php if (!$ALLOW_USER_THEMES) print "selected=\"selected\""; ?>><?php print $gm_lang["no"];?></option>
+					<option value="yes" <?php if ($ALLOW_USER_THEMES) print "selected=\"selected\""; ?>><?php print GM_LANG_yes;?></option>
+					<option value="no" <?php if (!$ALLOW_USER_THEMES) print "selected=\"selected\""; ?>><?php print GM_LANG_no;?></option>
 				</select>
 			</div>
 		</div>
@@ -433,13 +433,13 @@ PrintHeader($gm_lang["configure_head"]);
 					<?php print_help_link("NEWS_TYPE_help", "qm", "NEWS_TYPE");?>
 				</div>
 				<div class="description">
-					<?php print $gm_lang["NEWS_TYPE"]; ?>
+					<?php print GM_LANG_NEWS_TYPE; ?>
 				</div>
 			</div>
 			<div class="choice_right">
 				<select name="NEW_NEWS_TYPE" tabindex="<?php $i++; print $i?>">
-					<option value="Normal" <?php if ($NEWS_TYPE == "Normal") print "selected=\"selected\""; ?>><?php print $gm_lang["normal"];?></option>
-					<option value="Urgent" <?php if ($NEWS_TYPE == "Urgent") print "selected=\"selected\""; ?>><?php print $gm_lang["urgent"];?></option>
+					<option value="Normal" <?php if ($NEWS_TYPE == "Normal") print "selected=\"selected\""; ?>><?php print GM_LANG_normal;?></option>
+					<option value="Urgent" <?php if ($NEWS_TYPE == "Urgent") print "selected=\"selected\""; ?>><?php print GM_LANG_urgent;?></option>
 				</select>
 			</div>
 		</div>
@@ -449,13 +449,13 @@ PrintHeader($gm_lang["configure_head"]);
 					<?php print_help_link("ALLOW_REMEMBER_ME_help", "qm", "ALLOW_REMEMBER_ME");?>
 				</div>
 				<div class="description">
-					<?php print $gm_lang["ALLOW_REMEMBER_ME"]; ?>
+					<?php print GM_LANG_ALLOW_REMEMBER_ME; ?>
 				</div>
 			</div>
 			<div class="choice_right">
 				<select name="NEW_ALLOW_REMEMBER_ME" tabindex="<?php $i++; print $i?>">
-					<option value="yes" <?php if ($ALLOW_REMEMBER_ME) print "selected=\"selected\""; ?>><?php print $gm_lang["yes"];?></option>
-					<option value="no" <?php if (!$ALLOW_REMEMBER_ME) print "selected=\"selected\""; ?>><?php print $gm_lang["no"];?></option>
+					<option value="yes" <?php if ($ALLOW_REMEMBER_ME) print "selected=\"selected\""; ?>><?php print GM_LANG_yes;?></option>
+					<option value="no" <?php if (!$ALLOW_REMEMBER_ME) print "selected=\"selected\""; ?>><?php print GM_LANG_no;?></option>
 				</select>
 			</div>
 		</div>
@@ -465,7 +465,7 @@ PrintHeader($gm_lang["configure_head"]);
 					<?php print_help_link("LANG_SELECTION_help", "qm", "LANG_SELECTION");?>
 				</div>
 				<div class="description">
-					<?php print $gm_lang["LANG_SELECTION"]; ?>
+					<?php print GM_LANG_LANG_SELECTION; ?>
 				</div>
 			</div>
 			<div class="choice_right width65">
@@ -473,8 +473,8 @@ PrintHeader($gm_lang["configure_head"]);
 				// NOTE: Build a sorted list of language names in the currently active language
 				foreach ($language_settings as $key => $value){
 					$d_LangName = "lang_name_".$key;
-					$SortedLangs[$key] = $gm_lang[$d_LangName];
-					if ($value["gm_lang_use"]) $ActiveLangs[$key] = $gm_lang[$d_LangName];
+					$SortedLangs[$key] = constant("GM_LANG_".$d_LangName);
+					if ($value["gm_lang_use"]) $ActiveLangs[$key] = constant("GM_LANG_".$d_LangName);
 				}
 				asort($SortedLangs);
 				
@@ -537,18 +537,18 @@ PrintHeader($gm_lang["configure_head"]);
 					<?php print_help_link("VISITOR_LANG_help", "qm", "VISITOR_LANG");?>
 				</div>
 				<div class="description">
-					<?php print $gm_lang["VISITOR_LANG"]; ?>
+					<?php print GM_LANG_VISITOR_LANG; ?>
 				</div>
 			</div>
 			<div class="choice_right">
 				<select name="NEW_VISITOR_LANG" tabindex="<?php $i++; print $i?>">
-					<option value="Genmod" <?php if ($VISITOR_LANG == "Genmod") print "selected=\"selected\""; ?>><?php print $gm_lang["genmod_lang"];?></option>
+					<option value="Genmod" <?php if ($VISITOR_LANG == "Genmod") print "selected=\"selected\""; ?>><?php print GM_LANG_genmod_lang;?></option>
 					<?php
 					foreach ($gm_language as $key=>$value) {
 						if ($language_settings[$key]["gm_lang_use"]) {
 							print "<option value=\"".$key."\"";
 							if ($VISITOR_LANG == $key) print " selected=\"selected\"";
-							print ">".$gm_lang[$key]."</option>";
+							print ">".constant("GM_LANG_lang_name_".$key)."</option>";
 						}
 					} ?>
 				</select>
@@ -560,17 +560,17 @@ PrintHeader($gm_lang["configure_head"]);
 					<?php print_help_link("SERVER_URL_help", "qm", "SERVER_URL");?>
 				</div>
 				<div class="description">
-					<?php print $gm_lang["SERVER_URL"]; ?>
+					<?php print GM_LANG_SERVER_URL; ?>
 				</div>
 			</div>
 			<div class="choice_right width65">
 				<input type="text" name="NEW_SERVER_URL" value="<?php print $SERVER_URL?>" dir="ltr" tabindex="<?php $i++; print $i?>" size="40" 
 				<?php if (isset($CONFIG["SERVER_URL"]) && isset($CONFIG_PARMS[$CONFIG["SERVER_URL"]])) print "disabled=\"disabled\""; ?> />
 				<?php
-				if ($error_url) print "<div class=\"error\">".$gm_lang["emptyserverurl"]."</div>";
+				if ($error_url) print "<div class=\"error\">".GM_LANG_emptyserverurl."</div>";
 				$GUESS_URL = ("http://".$_SERVER["SERVER_NAME"]);
 				if ($_SERVER["SERVER_PORT"] != 80) $GUESS_URL .= ":".$_SERVER["SERVER_PORT"];
-				$GUESS_URL .= dirname($SCRIPT_NAME)."/";
+				$GUESS_URL .= dirname(SCRIPT_NAME)."/";
 				$GUESS_URL = stripslashes($GUESS_URL);
 				print "<div>".print_text("server_url_note",0,1)."</div>"; ?>
 			</div>
@@ -581,12 +581,12 @@ PrintHeader($gm_lang["configure_head"]);
 					<?php print_help_link("LOGIN_URL_help", "qm", "LOGIN_URL");?>
 				</div>
 				<div class="description">
-					<?php print $gm_lang["LOGIN_URL"]; ?>
+					<?php print GM_LANG_LOGIN_URL; ?>
 				</div>
 			</div>
 			<div class="choice_right">
 				<input type="text" name="NEW_LOGIN_URL" value="<?php print LOGIN_URL?>" dir="ltr" tabindex="<?php $i++; print $i?>" size="40" />
-				<?php if ($error_ali_login) print "<div class=\"error\">".$gm_lang["aliaslogin"]."</div>"; ?>
+				<?php if ($error_ali_login) print "<div class=\"error\">".GM_LANG_aliaslogin."</div>"; ?>
 			</div>
 		</div>
 		<div class="admin_item_box">
@@ -595,12 +595,12 @@ PrintHeader($gm_lang["configure_head"]);
 					<?php print_help_link("SITE_ALIAS_help", "qm", "LOGIN_URL");?>
 				</div>
 				<div class="description">
-					<?php print $gm_lang["SITE_ALIAS"]; ?>
+					<?php print GM_LANG_SITE_ALIAS; ?>
 				</div>
 			</div>
 			<div class="choice_right">
 				<input type="text" name="NEW_SITE_ALIAS" value="<?php print $SITE_ALIAS?>" dir="ltr" tabindex="<?php $i++; print $i?>" size="40" />
-				<?php if ($error_ali) print "<div class=\"error\">".$gm_lang["invalidalias"]."</div>"; ?>
+				<?php if ($error_ali) print "<div class=\"error\">".GM_LANG_invalidalias."</div>"; ?>
 			</div>
 		</div>
 		<div class="admin_item_box">
@@ -609,7 +609,7 @@ PrintHeader($gm_lang["configure_head"]);
 					<?php print_help_link("PROXY_ADDRESS_help", "qm", "PROXY_ADDRESS");?>
 				</div>
 				<div class="description">
-					<?php print $gm_lang["PROXY_ADDRESS"]; ?>
+					<?php print GM_LANG_PROXY_ADDRESS; ?>
 				</div>
 			</div>
 			<div class="choice_right">
@@ -622,7 +622,7 @@ PrintHeader($gm_lang["configure_head"]);
 					<?php print_help_link("PROXY_PORT_help", "qm", "PROXY_PORT");?>
 				</div>
 				<div class="description">
-					<?php print $gm_lang["PROXY_PORT"]; ?>
+					<?php print GM_LANG_PROXY_PORT; ?>
 				</div>
 			</div>
 			<div class="choice_right">
@@ -635,7 +635,7 @@ PrintHeader($gm_lang["configure_head"]);
 					<?php print_help_link("GM_SESSION_SAVE_PATH_help", "qm", "GM_SESSION_SAVE_PATH");?>
 				</div>
 				<div class="description">
-					<?php print $gm_lang["GM_SESSION_SAVE_PATH"]; ?>
+					<?php print GM_LANG_GM_SESSION_SAVE_PATH; ?>
 				</div>
 			</div>
 			<div class="choice_right">
@@ -648,7 +648,7 @@ PrintHeader($gm_lang["configure_head"]);
 					<?php print_help_link("GM_SESSION_TIME_help", "qm", "GM_SESSION_TIME");?>
 				</div>
 				<div class="description">
-					<?php print $gm_lang["GM_SESSION_TIME"]; ?>
+					<?php print GM_LANG_GM_SESSION_TIME; ?>
 				</div>
 			</div>
 			<div class="choice_right">
@@ -661,25 +661,25 @@ PrintHeader($gm_lang["configure_head"]);
 					<?php print_help_link("MAX_VIEW_RATE_help", "qm", "MAX_VIEW_RATE");?>
 				</div>
 				<div class="description">
-					<?php print $gm_lang["MAX_VIEW_RATE"]; ?>
+					<?php print GM_LANG_MAX_VIEW_RATE; ?>
 				</div>
 			</div>
 			<div class="choice_right">
 				<input type="text" name="NEW_MAX_VIEWS" value="<?php print $MAX_VIEWS;?>" tabindex="<?php $i++; print $i?>" size="5" />
 				<?php
-					if ($TEXT_DIRECTION == "ltr") print $gm_lang["page_views"];
-					else print $gm_lang["seconds"];
+					if ($TEXT_DIRECTION == "ltr") print GM_LANG_page_views;
+					else print GM_LANG_seconds;
 				?>
 				<input type="text" name="NEW_MAX_VIEW_TIME" value="<?php print $MAX_VIEW_TIME?>" tabindex="<?php $i++; print $i?>" size="5" />
 				<?php 
-					if ($TEXT_DIRECTION == "ltr") print $gm_lang["seconds"];
-					else print $gm_lang["page_views"];
+					if ($TEXT_DIRECTION == "ltr") print GM_LANG_seconds;
+					else print GM_LANG_page_views;
 				?>
 				<br />
 				<select name="NEW_MAX_VIEW_LOGLEVEL" tabindex="<?php $i++; print $i?>">
-					<option value="0" <?php if ($MAX_VIEW_LOGLEVEL == "0") print "selected=\"selected\""; ?>><?php print $gm_lang["loglevel_0"];?></option>
-					<option value="1" <?php if ($MAX_VIEW_LOGLEVEL == "1") print "selected=\"selected\""; ?>><?php print $gm_lang["loglevel_1"];?></option>
-					<option value="2" <?php if ($MAX_VIEW_LOGLEVEL == "2") print "selected=\"selected\""; ?>><?php print $gm_lang["loglevel_2"];?></option>
+					<option value="0" <?php if ($MAX_VIEW_LOGLEVEL == "0") print "selected=\"selected\""; ?>><?php print GM_LANG_loglevel_0;?></option>
+					<option value="1" <?php if ($MAX_VIEW_LOGLEVEL == "1") print "selected=\"selected\""; ?>><?php print GM_LANG_loglevel_1;?></option>
+					<option value="2" <?php if ($MAX_VIEW_LOGLEVEL == "2") print "selected=\"selected\""; ?>><?php print GM_LANG_loglevel_2;?></option>
 				</select>
 				
 			</div>
@@ -690,7 +690,7 @@ PrintHeader($gm_lang["configure_head"]);
 					<?php print_help_link("EXCLUDE_HOSTS_help", "qm", "LOCKOUT_TIME");?>
 				</div>
 				<div class="description">
-					<?php print $gm_lang["EXCLUDE_HOSTS"]; ?>
+					<?php print GM_LANG_EXCLUDE_HOSTS; ?>
 				</div>
 			</div>
 			<div class="choice_right">
@@ -703,7 +703,7 @@ PrintHeader($gm_lang["configure_head"]);
 					<?php print_help_link("LOCKOUT_TIME_help", "qm", "LOCKOUT_TIME");?>
 				</div>
 				<div class="description">
-					<?php print $gm_lang["LOCKOUT_TIME"]; ?>
+					<?php print GM_LANG_LOCKOUT_TIME; ?>
 				</div>
 			</div>
 			<div class="choice_right">
@@ -716,7 +716,7 @@ PrintHeader($gm_lang["configure_head"]);
 					<?php print_help_link("GM_MEMORY_LIMIT_help", "qm", "GM_MEMORY_LIMIT");?>
 				</div>
 				<div class="description">
-					<?php print $gm_lang["GM_MEMORY_LIMIT"]; ?>
+					<?php print GM_LANG_GM_MEMORY_LIMIT; ?>
 				</div>
 			</div>
 			<div class="choice_right">
@@ -729,7 +729,7 @@ PrintHeader($gm_lang["configure_head"]);
 					<?php print_help_link("DEFAULT_PAGE_SIZE_help", "qm", "DEFAULT_PAGE_SIZE");?>
 				</div>
 				<div class="description">
-					<?php print $gm_lang["DEFAULT_PAGE_SIZE"]; ?>
+					<?php print GM_LANG_DEFAULT_PAGE_SIZE; ?>
 				</div>
 			</div>
 			<div class="choice_right">
@@ -741,14 +741,14 @@ PrintHeader($gm_lang["configure_head"]);
 				<?php foreach ($sizes as $key => $size) {
 						print "<option value=\"".$size."\" ";
 						if ($DEFAULT_PAGE_SIZE == $size) print "selected=\"selected\"";
-						print ">".$gm_lang["p_".$size];
+						print ">".constant("GM_LANG_p_".$size);
 						print "</option>";
 					} ?>
 				</select>
 			</div>
 		</div>
 		<div class="admin_item_box center">
-			<input type="submit" value="<?php print $gm_lang["save"];?>" />
+			<input type="submit" value="<?php print GM_LANG_save;?>" />
 		</div>
 	</form>
 	<?php if (!CONFIGURED) { ?>
