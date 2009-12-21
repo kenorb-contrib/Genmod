@@ -101,7 +101,7 @@ function GMReportSHandler($attrs) {
 }
 
 function GMRvarSHandler($attrs) {
-	global $text, $vars, $gm_lang, $fact, $desc, $type, $generation;
+	global $text, $vars, $fact, $desc, $type, $generation;
 
 	$var = $attrs["var"];
 	if (!empty($var)) {

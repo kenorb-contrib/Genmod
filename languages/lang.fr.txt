@@ -815,7 +815,7 @@
 "login_descr";"Le bloc «Login» permet de se connecter en saisissant son identificateur et son mot de passe."
 "login_head";"Identification Genmod"
 "login_user";"1 utilisateur connecté"
-"login_users";"#gm_lang[global_num1]# utilisateurs connectés"
+"login_users";"#gm_lang[global_num2]# utilisateurs connectés"
 "logout";"Déconnexion"
 "lost_password";"Mot de passe perdu ?"
 "lost_pw_reset";"Demande de mot de passe perdu"

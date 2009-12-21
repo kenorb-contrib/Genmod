@@ -92,7 +92,7 @@ class GMReport {
 	var $processing;
 
 	function setup($pw, $ph, $pageSize, $o, $m, $showGenText=true) {
-		global $gm_lang, $vars, $pageSizes;
+		global $vars, $pageSizes;
 
 		// Determine the page dimensions
 		$this->pageFormat = strtoupper($pageSize);
@@ -139,7 +139,7 @@ class GMReport {
 		$this->processing = "H";
 		if ($showGenText) {
 			$element = new GMRCell(0,10, "C", "");
-			$element->addText("$gm_lang[generated_by] Genmod ".GM_VERSION);
+			$element->addText(GM_LANG_generated_by." Genmod ".GM_VERSION);
 			$element->setUrl("http://www.genmod.net/");
 			$this->pdf->addFooter($element);
 		}
@@ -1598,7 +1598,7 @@ function GMRTextEHandler() {
 }
 
 function GMRGetPersonNameSHandler($attrs) {
-	global $currentElement, $vars, $gedrec, $gedrecStack, $gm_lang;
+	global $currentElement, $vars, $gedrec, $gedrecStack;
 
 	$showIndID = GedcomConfig::$SHOW_ID_NUMBERS; // false, 0, "0", NOT "false"
 	if (isset($vars["showIndID"]["id"])) $showIndID = $vars["showIndID"]["id"];
@@ -1638,11 +1638,11 @@ function GMRGetPersonNameSHandler($attrs) {
 	}
 	if (!empty($id)) {
 		if (!PrivacyFunctions::displayDetailsById($id) && !PrivacyFunctions::showLivingNameByID($id)) {
-			$name=$gm_lang["private"];
+			$name = GM_LANG_private;
 		} else {
 			$name = trim(GetPersonName($id));
 			//LERMAN-- added individuals in pending list does not have Gedcom record yet
-			if ($name == $gm_lang["PN"]." ".$gm_lang["NN"]) $name = trim(GetPersonName($id,$gedrec));
+			if ($name == GM_LANG_PN." ".GM_LANG_NN) $name = trim(GetPersonName($id,$gedrec));
 			$addname = trim(GetAddPersonName($id, "", true));
 			if (!empty($addname)) $name .= " ".$addname;
 			// This is a workaround to display the PinYin name instead of the name in Chinese characters, as Chinese characters are not printed properly.
@@ -1667,7 +1667,7 @@ function GMRGetPersonNameSHandler($attrs) {
 
 function GMRGedcomValueSHandler($attrs) {
 	global $currentElement, $vars, $gedrec, $gedrecStack, $fact, $desc, $type;
-	global $gm_lang, $debug;
+	global $debug;
 
 	$id = "";
 	$gt = preg_match("/0 @(.+)@/", $gedrec, $gmatch);
@@ -1681,7 +1681,7 @@ function GMRGedcomValueSHandler($attrs) {
 	if (!empty($tag)) {
 		if ($tag=="@desc") {
 			if (PrivacyFunctions::showFact($fact, $id) && PrivacyFunctions::showFactDetails($fact,$id)) $value = $desc;
-			else $value = $gm_lang["private"];
+			else $value = GM_LANG_private;
 			$value = trim($value);
 			if (HasChinese($value, true)) $currentElement->addText(GetPinYin($value, true));
 			else $currentElement->addText($value);
@@ -1905,7 +1905,7 @@ function GMRRepeatTagEHandler() {
 }
 
 function GMRvarSHandler($attrs) {
-	global $currentElement, $vars, $gedrec, $gedrecStack, $gm_lang, $fact, $desc, $type;
+	global $currentElement, $vars, $gedrec, $gedrecStack, $fact, $desc, $type;
 //print_r($attrs);
 //print "<br />";
 	$var = $attrs["var"];
@@ -2091,7 +2091,7 @@ function NumToRoman($num, $lower) {
 }
 
 function GMRSetVarSHandler($attrs) {
-	global $vars, $gedrec, $gedrecStack, $gm_lang, $fact, $desc, $type, $generation;
+	global $vars, $gedrec, $gedrecStack, $fact, $desc, $type, $generation;
 
 	$name = $attrs["name"];
 	$value = $attrs["value"];
@@ -2119,8 +2119,8 @@ function GMRSetVarSHandler($attrs) {
 		if ($gt > 0) $value = preg_replace("/@/", "", trim($gmatch[1]));
 	}
 
-	if ((substr($value, 0, 9) == "\$gm_lang[")) {
-		$var = preg_replace(array("/\[/","/\]/"), array("['","']"), $value);
+	if ((substr($value, 0, 9) == "\GM_LANG_)) {
+		$var = preg_replace(array("/\[/","/\]/"), array("GM_LANG_",""), $value);
 		eval("\$value = $var;");
 	}
 	if (substr($value, 0, 11) == "\$factarray[") {
@@ -2417,7 +2417,7 @@ function GMRLineSHandler($attrs) {
 
 function GMRListSHandler($attrs) {
 	global $gmreport, $gedrec, $repeats, $repeatBytes, $list, $repeatsStack, $processRepeats, $parser, $vars, $sortby;
-	global $status, $gm_lang;
+	global $status;
 
 	$processRepeats++;
 	if ($processRepeats>1) return;
@@ -2526,7 +2526,7 @@ function GMRListSHandler($attrs) {
 						$gedline = FindRepoRecord($action->repo);
 						$gedline .= "\r\n1 _TODO\r\n";
 						$gedline .= "2 INDI @".$action->pid."@\r\n";
-						$gedline .= "2 _STAT ".$gm_lang["action".$action->status]."\r\n";
+						$gedline .= "2 _STAT ".GM_LANG_action.$action->status]."\r\n";
 						$noteline = MakeCont("2 NOTE", $action->text);
 						$gedline .= $noteline;
 						$oldrepo = $action->repo;
@@ -2534,7 +2534,7 @@ function GMRListSHandler($attrs) {
 					else {
 						$gedline .= "1 _TODO\r\n";
 						$gedline .= "2 INDI @".$action->pid."@\r\n";
-						$gedline .= "2 _STAT ".$gm_lang["action".$action->status]."\r\n";
+						$gedline .= "2 _STAT ".GM_LANG_action.$action->status]."\r\n";
 						$noteline = MakeCont("2 NOTE", $action->text);
 						$gedline .= $noteline;
 					}

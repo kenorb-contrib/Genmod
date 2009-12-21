@@ -28,7 +28,7 @@
  * Inclusion of the configuration file
 */
 require("config.php");
-PrintHeader($gm_lang["max_time"]);
+PrintHeader(GM_LANG_max_time);
 if(!$gm_user->UserIsAdmin()) exit;
 if (!isset($maxtime)) $maxtime = 0;
 
@@ -38,12 +38,12 @@ if(function_exists('apache_setenv')) {
 	@apache_setenv('no-gzip', '1');
 }
 
-print $gm_lang["maxtime_explain"];
+print GM_LANG_maxtime_explain;
 print "<br /><br />";
 
 if ($maxtime == 0) {
 	print "<form name=\"maxtimeset\" method=\"post\" action=\"maxtime.php\">";
-	print $gm_lang["maxtime_explain2"];
+	print GM_LANG_maxtime_explain2;
 	print "&nbsp;&nbsp;&nbsp;<select id=\"maxtime\" name=\"maxtime\">";
 		for ($i=1; $i<=10; $i++) {
 			$s = $i * 60;
@@ -51,13 +51,13 @@ if ($maxtime == 0) {
 			print ">".$i."</option>";
 		}
 	print "</select>&nbsp;&nbsp;&nbsp;";
-	print "<input type=\"submit\" name=\"action\" value=\"".$gm_lang["go"]."\" />";
+	print "<input type=\"submit\" name=\"action\" value=\"".GM_LANG_go."\" />";
 	print "</form>";
 }
 else {
 	@set_time_limit(0);
 	$secs = 0;
-	print $gm_lang["maxtime_now"]."&nbsp;<div id=\"max_progress\"></div>";
+	print GM_LANG_maxtime_now."&nbsp;<div id=\"max_progress\"></div>";
 	while($secs < $maxtime) {
 		$secs++;
 //	print "Maximum execution time is at least ".$secs." seconds<br />";
@@ -67,7 +67,7 @@ else {
 		$SystemConfig->SetConfigDBValue('max_execution_time', $secs);
 		sleep(1);
 	}
-	print $gm_lang["maxtime_lower"];
+	print GM_LANG_maxtime_lower;
 }
 
 PrintFooter();

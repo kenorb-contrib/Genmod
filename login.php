@@ -73,7 +73,7 @@ if ($action=="login") {
 		header("Location: $url");
 		exit;
 	}
-	else $message = $gm_lang["no_login"];
+	else $message = GM_LANG_no_login;
 }
 else {
 	// Check the DB layout
@@ -99,8 +99,8 @@ else {
 	}
 }
 
-if ($type=="full") PrintHeader($gm_lang["login_head"]);
-else PrintSimpleHeader($gm_lang["login_head"]);
+if ($type=="full") PrintHeader(GM_LANG_login_head);
+else PrintSimpleHeader(GM_LANG_login_head);
 print "<div class=\"center\">\n";
 
 if ($_SESSION["cookie_login"]) {
@@ -156,18 +156,18 @@ else {
 		<span class="error"><b><?php print $message?></b></span>
 		<!--table-->
 		<table class="center facts_table width40">
-		  <tr><td class="topbottombar" colspan="2"><?php print $gm_lang["login"]?></td></tr>
+		  <tr><td class="topbottombar" colspan="2"><?php print GM_LANG_login?></td></tr>
 		  <tr>
-		    <td class="shade2 width40 <?php print $TEXT_DIRECTION; ?>"><?php print_help_link("username_help", "qm", "username"); print $gm_lang["username"]?></td>
+		    <td class="shade2 width40 <?php print $TEXT_DIRECTION; ?>"><?php print_help_link("username_help", "qm", "username"); print GM_LANG_username?></td>
 		    <td class="shade1 <?php print $TEXT_DIRECTION; ?>"><input type="text" tabindex="<?php $i++; print $i?>" name="username" value="<?php print $username?>" size="20" /></td>
 		  </tr>
 		  <tr>
-		    <td class="shade2 <?php print $TEXT_DIRECTION; ?>"><?php print_help_link("password_help", "qm", "password"); print $gm_lang["password"]?></td>
+		    <td class="shade2 <?php print $TEXT_DIRECTION; ?>"><?php print_help_link("password_help", "qm", "password"); print GM_LANG_password?></td>
 		    <td class="shade1 <?php print $TEXT_DIRECTION; ?>"><input type="password" tabindex="<?php $i++; print $i?>" name="password" size="20" /></td>
 		  </tr>
 		  <?php if ($ALLOW_REMEMBER_ME) { ?>
 		  <tr>
-		  	<td class="shade2 <?php print $TEXT_DIRECTION; ?>"><?php print_help_link("remember_me_help", "qm", "remember_me"); print $gm_lang["remember_me"]?></td>
+		  	<td class="shade2 <?php print $TEXT_DIRECTION; ?>"><?php print_help_link("remember_me_help", "qm", "remember_me"); print GM_LANG_remember_me?></td>
 		    <td class="shade1 <?php print $TEXT_DIRECTION; ?> "><input type="checkbox" tabindex="<?php $i++; print $i?>" name="remember" value="yes" <?php if (!empty($_COOKIE["gm_rem"])) print "checked=\"checked\""; ?> /></td>
 		  </tr>
 		  <?php } ?>
@@ -183,21 +183,21 @@ else {
 		          }
 		        }
 		    ?>
-		      <input type="submit" tabindex="<?php $i++; print $i?>" value="<?php print $gm_lang["login"]; ?>" />&nbsp;
+		      <input type="submit" tabindex="<?php $i++; print $i?>" value="<?php print GM_LANG_login; ?>" />&nbsp;
 		    </td>
 		  </tr>
 		</table>
 </form><br /><br />
 <?php
 $sessname = session_name();
-if (!isset($_COOKIE[$sessname]) && !isset($_COOKIE["gm_rem"])) print "<span class=\"error\">".$gm_lang["cookie_message"]."</span><br /><br />";
+if (!isset($_COOKIE[$sessname]) && !isset($_COOKIE["gm_rem"])) print "<span class=\"error\">".GM_LANG_cookie_message."</span><br /><br />";
 if ($USE_REGISTRATION_MODULE) {?>
 	<table class="center facts_table width40">
-	<tr><td class="topbottombar" colspan="2"><?php print $gm_lang["account_information"];?></td></tr>
-	<tr><td class="shade2 width40 <?php print $TEXT_DIRECTION; ?>"><?php print_help_link("new_user_help", "qm", "requestaccount"); print $gm_lang["no_account_yet"];?></td>
-	<td class="shade1 <?php print $TEXT_DIRECTION; ?>"><a href="login_register.php?action=register"><?php print $gm_lang["requestaccount"];?></a></td></tr>
-	<tr><td class="shade2 <?php print $TEXT_DIRECTION; ?>"><?php print_help_link("new_password_help", "qm", "lost_password"); print $gm_lang["lost_password"];?></td>
-	<td class="shade1 <?php print $TEXT_DIRECTION; ?>"><a href="login_register.php?action=pwlost"><?php print $gm_lang["requestpassword"];?></a></td></tr>
+	<tr><td class="topbottombar" colspan="2"><?php print GM_LANG_account_information;?></td></tr>
+	<tr><td class="shade2 width40 <?php print $TEXT_DIRECTION; ?>"><?php print_help_link("new_user_help", "qm", "requestaccount"); print GM_LANG_no_account_yet;?></td>
+	<td class="shade1 <?php print $TEXT_DIRECTION; ?>"><a href="login_register.php?action=register"><?php print GM_LANG_requestaccount;?></a></td></tr>
+	<tr><td class="shade2 <?php print $TEXT_DIRECTION; ?>"><?php print_help_link("new_password_help", "qm", "lost_password"); print GM_LANG_lost_password;?></td>
+	<td class="shade1 <?php print $TEXT_DIRECTION; ?>"><a href="login_register.php?action=pwlost"><?php print GM_LANG_requestpassword;?></a></td></tr>
 	</table>
 <?php
 }

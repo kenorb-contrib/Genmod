@@ -64,12 +64,12 @@ function iso8601_date($time) {
  * @TODO does not pick up the upcoming events block config and always shows 30 days of data.
  */
 function getUpcomingEvents() {
-	global $gm_lang, $month, $year, $day, $monthtonum, $HIDE_LIVE_PEOPLE, $command, $TEXT_DIRECTION, $monthstart;
+	global $month, $year, $day, $monthtonum, $HIDE_LIVE_PEOPLE, $command, $TEXT_DIRECTION, $monthstart;
 	global $GM_IMAGES, $GEDCOMID, $ASC, $IGNORE_FACTS, $IGNORE_YEAR, $LAST_QUERY, $GM_BLOCKS;
 	global $lastcachedate;
 	global $CIRCULAR_BASE;
 
-	$dataArray[0] = $gm_lang["upcoming_events"];
+	$dataArray[0] = GM_LANG_upcoming_events;
 	if (!isset($lastcachedate)) $lastcachedate = GedcomConfig::GetAllLastCacheDates();
 
 	if (!isset($lastcachedate)) $lastcachedate = GedcomConfig::GetAllLastCacheDates();
@@ -198,13 +198,13 @@ function getUpcomingEvents() {
 	$daytext .= "</ul>";
 
 	if ($PrivateFacts) {    // Facts were found but not printed for some reason
-			$gm_lang["global_num1"] = $daysprint;
+			define("GM_LANG_global_num4", $daysprint);
 			$Advisory = "no_events_privacy";
 			if ($OutputDone) $Advisory = "more_events_privacy";
 			if ($daysprint==1) $Advisory .= "1";
 			$daytext .= print_text($Advisory, 0, 1);
 		} else if (!$OutputDone) {    // No Facts were found
-			$gm_lang["global_num1"] = $daysprint;
+			define("GM_LANG_global_num4", $daysprint);
 			$Advisory = "no_events_" . $config["filter"];
 			if ($daysprint==1) $Advisory .= "1";
 			$daytext .= print_text($Advisory, 0, 1);
@@ -227,7 +227,7 @@ function getUpcomingEvents() {
  * @TODO does not display the privacy message displayed by the upcoming events feed.
  */
 function getTodaysEvents() {
-	global $gm_lang, $month, $year, $day, $monthtonum, $HIDE_LIVE_PEOPLE, $command, $TEXT_DIRECTION;
+	global $month, $year, $day, $monthtonum, $HIDE_LIVE_PEOPLE, $command, $TEXT_DIRECTION;
 	global $GM_IMAGES, $GEDCOMID, $ASC, $IGNORE_FACTS, $IGNORE_YEAR, $lastcachedate;
 
 	if ($command=="user") $filter = "living";
@@ -238,7 +238,7 @@ function getTodaysEvents() {
 	$dataArray = array();
 	$daytext = "<ul>";
 	$action = "today";
-	$dataArray[0] = $gm_lang["on_this_day"];
+	$dataArray[0] = GM_LANG_on_this_day;
 	if (!isset($lastcachedate)) $lastcachedate = GedcomConfig::GetAllLastCacheDates();
 	if (is_array($lastcachedate) && $lastcachedate["gc_last_today"] != 0) $dataArray[1] = iso8601_date($lastcachedate["gc_last_today"]);
 	else $dataArray[1] = iso8601_date(time());
@@ -310,17 +310,18 @@ function getTodaysEvents() {
  * @TODO does not pick up the GEDCOM stats block config and always shows most common names.
  */
 function getGedcomStats() {
-	global $gm_lang, $day, $month, $year, $GEDCOMID, $GEDCOMS, $GEDCOMID, $ALLOW_CHANGE_GEDCOM;
+	global $day, $month, $year, $GEDCOMID, $GEDCOMS, $GEDCOMID, $ALLOW_CHANGE_GEDCOM;
 	global $command, $RTLOrd;
 	global $GEDCOMID, $lastcachedate;
 
 	$data = "";
-	$dataArray[0] = $gm_lang["gedcom_stats"] . " - " . $GEDCOMS[$GEDCOMID]["title"];
+	$dataArray[0] = GM_LANG_gedcom_stats . " - " . $GEDCOMS[$GEDCOMID]["title"];
 	if (!isset($lastcachedate)) $lastcachedate = GedcomConfig::GetAllLastCacheDates();
 	if (is_array($lastcachedate) && $lastcachedate["gc_last_stats"] != 0) $dataArray[1] = iso8601_date($lastcachedate["gc_last_stats"]);
 	else $dataArray[1] = iso8601_date(time());
 
-	$head = FindGedcomRecord("HEAD");
+	$header =& Header::GetInstance("HEAD");
+	$head = $header->gedrec;
 	$ct=preg_match("/1 SOUR (.*)/", $head, $match);
 	if ($ct>0) {
 		$softrec = GetSubRecord(1, "1 SOUR", $head);
@@ -328,7 +329,7 @@ function getGedcomStats() {
 		if ($tt>0) $title = trim($tmatch[1]);
 		else $title = trim($match[1]);
 		if (!empty($title)) {
-			$text = strip_tags(str_replace("#SOFTWARE#", $title, $gm_lang["gedcom_created_using"]));
+			$text = strip_tags(str_replace("#SOFTWARE#", $title, GM_LANG_gedcom_created_using));
 			$tt = preg_match("/2 VERS (.*)/", $softrec, $tmatch);
 			if ($tt>0) $version = trim($tmatch[1]);
 			else $version="";
@@ -344,21 +345,21 @@ function getGedcomStats() {
 		else $time = "";	
 
 		if (empty($title)) {
-			$text = str_replace("#DATE#", GetChangedDate($date), $gm_lang["gedcom_created_on"]);
+			$text = str_replace("#DATE#", GetChangedDate($date), GM_LANG_gedcom_created_on);
 			$text = str_replace("#TIME#", $time, $text);
 		}
 		else {
-			$text = str_replace("#DATE#", GetChangedDate($date), $gm_lang["gedcom_created_on2"]);
+			$text = str_replace("#DATE#", GetChangedDate($date), GM_LANG_gedcom_created_on2);
 			$text = str_replace("#TIME#", $time, $text);
 		}
 		$data .= $text;
 	}
 
 	$data .= " <br />\n";
-	$data .= GetListSize("indilist"). " - " .$gm_lang["stat_individuals"]."<br />";
-	$data .= GetListSize("famlist"). " - ".$gm_lang["stat_families"]."<br />";
-	$data .= GetListSize("sourcelist")." - ".$gm_lang["stat_sources"]."<br /> ";
-	$data .= GetListSize("otherlist")." - ".$gm_lang["stat_other"]."<br />";
+	$data .= GetListSize("indilist"). " - " .GM_LANG_stat_individuals."<br />";
+	$data .= GetListSize("famlist"). " - ".GM_LANG_stat_families."<br />";
+	$data .= GetListSize("sourcelist")." - ".GM_LANG_stat_sources."<br /> ";
+	$data .= GetListSize("otherlist")." - ".GM_LANG_stat_other."<br />";
 
 
 
@@ -366,19 +367,19 @@ function getGedcomStats() {
 	$sql = "select min(d_year) as lowyear from ".TBLPREFIX."dates where d_file = '".$GEDCOMID."' and d_fact = 'BIRT' and d_year != '0' and d_type is null";
 	$res = NewQuery($sql);
 	$row = $res->FetchAssoc();
-	$data .= $gm_lang["stat_earliest_birth"]." - ".$row["lowyear"]."<br />\n";
+	$data .= GM_LANG_stat_earliest_birth." - ".$row["lowyear"]."<br />\n";
 
 	// NOTE: Get the latest birth year
 	$sql = "select max(d_year) as highyear from ".TBLPREFIX."dates where d_file = '".$GEDCOMID."' and d_fact = 'BIRT' and d_type is null";
 	$res = NewQuery($sql);
 	$row = $res->FetchAssoc();
-	$data .= $gm_lang["stat_latest_birth"]." - " .$row["highyear"]."<br />\n";
+	$data .= GM_LANG_stat_latest_birth." - " .$row["highyear"]."<br />\n";
 
 
 
 	$surnames = GetCommonSurnamesIndex($GEDCOMID);
 	if (count($surnames)>0) {
-		$data .="<b>" . $gm_lang["common_surnames"]."</b><br />";
+		$data .="<b>" . GM_LANG_common_surnames."</b><br />";
 		$i=0;
 		foreach($surnames as $indexval => $surname) {
 			if ($i>0) $data .= ", ";
@@ -405,7 +406,7 @@ function getGedcomStats() {
  * @TODO prepend relative URL's in news items with SERVER_URL
  */
 function getGedcomNews() {
-	global $gm_lang, $GM_IMAGES, $TEXT_DIRECTION, $GEDCOMID, $command, $TIME_FORMAT, $lastcachedate;
+	global $GM_IMAGES, $TEXT_DIRECTION, $GEDCOMID, $command, $TIME_FORMAT, $lastcachedate;
 
 	$usernews = NewsController::getUserNews($GEDCOMID);
 
@@ -443,7 +444,7 @@ function getGedcomNews() {
  * @TODO Possibly turn list into a <ul> list
  */
 function getTop10Surnames() {
-	global $gm_lang, $GEDCOMID;
+	global $GEDCOMID;
 	global $GM_BLOCKS, $command, $GM_IMAGES;
 
 	$data = "";
@@ -458,7 +459,7 @@ function getTop10Surnames() {
 
 	if (empty($config)) $config = $GM_BLOCKS["print_block_name_top10"]["config"];
 
-	$dataArray[0] = str_replace("10", $config["num"], $gm_lang["block_top10_title"]);
+	$dataArray[0] = str_replace("10", $config["num"], GM_LANG_block_top10_title);
 	if (!isset($lastcachedate)) $lastcachedate = GedcomConfig::GetAllLastCacheDates();
 	if (is_array($lastcachedate) && $lastcachedate["gc_last_stats"] != 0) $dataArray[1] = iso8601_date($lastcachedate["gc_last_stats"]);
 	else $dataArray[1] = iso8601_date(time());
@@ -526,7 +527,7 @@ function getTop10Surnames() {
  * @todo Find out why TOTAL_QUERIES is here???
  */
 function getRecentChanges() {
-	global $gm_lang, $month, $year, $day, $monthtonum, $HIDE_LIVE_PEOPLE, $command, $TEXT_DIRECTION;
+	global $month, $year, $day, $monthtonum, $HIDE_LIVE_PEOPLE, $command, $TEXT_DIRECTION;
 	global $GM_IMAGES, $GEDCOMID, $ASC, $IGNORE_FACTS, $IGNORE_YEAR, $TOTAL_QUERIES, $LAST_QUERY, $GM_BLOCKS, $SHOW_SOURCES;
 	global $medialist;
 
@@ -538,7 +539,7 @@ function getRecentChanges() {
 	if (isset($config["hide_empty"])) $HideEmpty = $config["hide_empty"];
 	else $HideEmpty = "no";
 
-	$dataArray[0] = $gm_lang["recent_changes"];
+	$dataArray[0] = GM_LANG_recent_changes;
 	$dataArray[1] = time();//FIXED: get overwritten later, if any found.
 
 	$recentText = "";
@@ -550,7 +551,7 @@ function getRecentChanges() {
 
 
 //		Print block content
-	$gm_lang["global_num1"] = $config["days"];		// Make this visible
+	define("GM_LANG_global_num3", $config["days"]);		// Make this visible
 	if (count($found_facts)==0) {
 		$recentText .= print_text("recent_changes_none", 0, 1);
 	} else {

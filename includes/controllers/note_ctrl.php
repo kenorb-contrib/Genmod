@@ -78,13 +78,12 @@ class NoteController extends DetailController {
 	 * @return string
 	 */
 	protected function getPageTitle() {
-		global $gm_lang;
 
 		if (is_null($this->pagetitle)) {
 			$this->pagetitle = "";
 			$this->pagetitle .= $this->note->getTitle()." - ";
 			if (GedcomConfig::$SHOW_ID_NUMBERS) $this->pagetitle .= $this->note->xref." - ";
-			$this->pagetitle .= $gm_lang["note_info"];
+			$this->pagetitle .= GM_LANG_note_info;
 		}
 		return $this->pagetitle;
 	}
@@ -94,22 +93,22 @@ class NoteController extends DetailController {
 	 * @return Menu
 	 */
 	public function &getEditMenu() {
-		global $gm_lang, $gm_user, $show_changes;
+		global $gm_user, $show_changes;
 		
 		// edit note menu
-		$menu = new Menu($gm_lang['edit_note']);
+		$menu = new Menu(GM_LANG_edit_note);
 
 		if (!$this->note->isdeleted) {
 			// edit note / edit_raw
 			if ($gm_user->userCanEditGedlines()) {
-				$submenu = new Menu($gm_lang['edit_raw']);
+				$submenu = new Menu(GM_LANG_edit_raw);
 				$submenu->addLink("edit_raw('".$this->xref."', 'edit_raw', 'NOTE');");
 				$menu->addSubmenu($submenu);
 			}
 
 			// edit note / delete_note
-			$submenu = new Menu($gm_lang['delete_note']);
-			$submenu->addLink("if (confirm('".$gm_lang["confirm_delete_note"]."'))  deletegnote('".$this->xref."', 'delete_note'); ");
+			$submenu = new Menu(GM_LANG_delete_note);
+			$submenu->addLink("if (confirm('".GM_LANG_confirm_delete_note."'))  deletegnote('".$this->xref."', 'delete_note'); ");
 			$menu->addSubmenu($submenu);
 
 		}
@@ -120,8 +119,8 @@ class NoteController extends DetailController {
 			$menu->addSubmenu($submenu);
 
 			// edit_note / show/hide changes
-			if (!$show_changes) $submenu = new Menu($gm_lang['show_changes']);
-			else $submenu = new Menu($gm_lang['hide_changes']);
+			if (!$show_changes) $submenu = new Menu(GM_LANG_show_changes);
+			else $submenu = new Menu(GM_LANG_hide_changes);
 			$submenu->addLink('showchanges();');
 			$menu->addSubmenu($submenu);
 		}
@@ -133,28 +132,28 @@ class NoteController extends DetailController {
 	 * @return Menu
 	 */
 	public function &getOtherMenu() {
-		global $GEDCOMID, $gm_lang;
+		global $GEDCOMID;
 		global $ENABLE_CLIPPINGS_CART, $gm_user;
 		
 		// other menu
-		$menu = new Menu($gm_lang['other']);
+		$menu = new Menu(GM_LANG_other);
 		if ($gm_user->userCanViewGedlines()) {
 				// other / view_gedcom
 				if ($this->show_changes) $execute = "show_gedcom_record('new');";
 				else $execute = "show_gedcom_record();";
-				$submenu = new Menu($gm_lang['view_gedcom']);
+				$submenu = new Menu(GM_LANG_view_gedcom);
 				$submenu->addLink($execute);
 				$menu->addSubmenu($submenu);
 		}
 		if ($ENABLE_CLIPPINGS_CART >= $gm_user->getUserAccessLevel()) {
 				// other / add_to_cart
-				$submenu = new Menu($gm_lang['add_to_cart']);
+				$submenu = new Menu(GM_LANG_add_to_cart);
 				$submenu->addLink('clippings.php?action=add&id='.$this->xref.'&type=note');
 				$menu->addSubmenu($submenu);
 		}
 		if ($this->note->disp && !empty($this->uname)) {
 				// other / add_to_my_favorites
-				$submenu = new Menu($gm_lang['add_to_my_favorites']);
+				$submenu = new Menu(GM_LANG_add_to_my_favorites);
 				$submenu->addLink('note.php?action=addfav&oid='.$this->xref.'&gedid='.$GEDCOMID);
 				$menu->addSubmenu($submenu);
 		}
@@ -199,7 +198,6 @@ class NoteController extends DetailController {
 	 * @param string $pid		The gedcom XREF id for the level 0 record that this note is a part of
 	 */
 	protected function PrintGeneralNote($styleadd="", $mayedit=true) {
-		global $gm_lang;
 		global $view, $show_changes;
 		global $GM_IMAGES;
 
@@ -207,7 +205,7 @@ class NoteController extends DetailController {
 
 		if (($this->note->textchanged || $this->note->isdeleted) && $this->note->show_changes && !($this->view == "preview")) {
 			$styleadd = "change_old";
-			print "\n\t\t<tr><td class=\"shade2 $styleadd center\" style=\"vertical-align: middle;\"><img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["note"]["other"]."\" width=\"50\" height=\"50\" alt=\"\" /><br />".$gm_lang["note"].":";
+			print "\n\t\t<tr><td class=\"shade2 $styleadd center\" style=\"vertical-align: middle;\"><img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["note"]["other"]."\" width=\"50\" height=\"50\" alt=\"\" /><br />".GM_LANG_note.":";
 			print " </td>\n<td class=\"shade1 $styleadd wrap\">";
 			if (PrivacyFunctions::showFactDetails("NOTE", $this->note->xref)) {
 				print PrintReady($this->note->text)."<br />\n";
@@ -217,7 +215,7 @@ class NoteController extends DetailController {
 				// -- Find RESN tag
 				if (isset($resn_value)) {
 					print_help_link("RESN_help", "qm");
-					print $gm_lang[$resn_value]."\n";
+					print constant("GM_LANG_".$resn_value)."\n";
 				}
 				print "<br />\n";
 			}
@@ -225,10 +223,10 @@ class NoteController extends DetailController {
 		}
 		if (($this->note->textchanged || $this->note->isnew) && !$this->note->isdeleted && $this->show_changes && !($this->view == "preview")) $styleadd = "change_new";
 		if (!$this->note->isdeleted || !$this->show_changes) {
-			print "\n\t\t<tr><td class=\"shade2 $styleadd center\" style=\"vertical-align: middle;\"><img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["note"]["other"]."\" width=\"50\" height=\"50\" alt=\"\" /><br />".$gm_lang["note"].":";
+			print "\n\t\t<tr><td class=\"shade2 $styleadd center\" style=\"vertical-align: middle;\"><img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["note"]["other"]."\" width=\"50\" height=\"50\" alt=\"\" /><br />".GM_LANG_note.":";
 			if ($this->note->canedit && ($styleadd!="change_old")&&($view!="preview")&& $mayedit) {
 				$menu = array();
-				$menu["label"] = $gm_lang["edit"];
+				$menu["label"] = GM_LANG_edit;
 				$menu["labelpos"] = "right";
 				$menu["icon"] = "";
 				$menu["link"] = "#";
@@ -239,7 +237,7 @@ class NoteController extends DetailController {
 				$menu["submenuclass"] = "submenu";
 				$menu["items"] = array();
 				$submenu = array();
-				$submenu["label"] = $gm_lang["edit"];
+				$submenu["label"] = GM_LANG_edit;
 				$submenu["labelpos"] = "right";
 				$submenu["icon"] = "";
 				$submenu["onclick"] = "return edit_record('$this->xref', 'NOTE', '1', 'edit_general_note', 'NOTE');";
@@ -248,7 +246,7 @@ class NoteController extends DetailController {
 				$submenu["hoverclass"] = "submenuitem_hover";
 				$menu["items"][] = $submenu;
 				$submenu = array();
-				$submenu["label"] = $gm_lang["copy"];
+				$submenu["label"] = GM_LANG_copy;
 				$submenu["labelpos"] = "right";
 				$submenu["icon"] = "";
 				$submenu["onclick"] = "return copy_record('$this->xref', 'NOTE', '1', 'copy_general_note');";
@@ -271,7 +269,7 @@ class NoteController extends DetailController {
 				// -- Find RESN tag
 				if (isset($resn_value)) {
 					print_help_link("RESN_help", "qm");
-					print $gm_lang[$resn_value]."\n";
+					print constant("GM_LANG_".$resn_value)."\n";
 				}
 				print "<br />\n";
 			}

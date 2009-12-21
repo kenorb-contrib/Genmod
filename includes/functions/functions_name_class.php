@@ -33,12 +33,11 @@ if (stristr($_SERVER["SCRIPT_NAME"],basename(__FILE__))) {
 abstract class NameFunctions {
 	
 	public function GetFamilyDescriptor(&$family, $rev = false, $changes = false, $starred=true) {
-		global $gm_lang;
 
 		if (is_object($family->husb)) {
 			if ($family->husb->disp_name)
 				$hname = self::GetSortableName($family->husb, false, $rev);
-			else $hname = $gm_lang["private"];
+			else $hname = GM_LANG_private;
 		}
 		else {
 			if ($rev) $hname = "@P.N. @N.N.";
@@ -47,7 +46,7 @@ abstract class NameFunctions {
 		if (is_object($family->wife)) {
 			if ($family->wife->disp_name)
 				$wname = self::GetSortableName($family->wife, false, $rev);
-			else $wname = $gm_lang["private"];
+			else $wname = GM_LANG_private;
 		}
 		else {
 			if ($rev) $wname = "@P.N. @N.N.";
@@ -60,13 +59,12 @@ abstract class NameFunctions {
 	}
 	
 	public function GetFamilyAddDescriptor($family, $rev = false, $changes = false) {
-		global $gm_lang;
 		
 		if (is_object($family->husb)) {
 			if ($family->husb->disp_name) {
 				$hname = self::GetSortableAddName($family->husb, $rev, $changes);
 			}
-			else $hname = $gm_lang["private"];
+			else $hname = GM_LANG_private;
 		}
 		else {
 			if ($rev) $hname = "@P.N. @N.N.";
@@ -76,7 +74,7 @@ abstract class NameFunctions {
 			if ($family->wife->disp_name) {
 				$wname = self::GetSortableAddName($family->wife, $rev, $changes);
 			}
-			else $wname = $gm_lang["private"];
+			else $wname = GM_LANG_private;
 		}
 		else {
 			if ($rev) $wname = "@P.N. @N.N.";
@@ -103,7 +101,7 @@ abstract class NameFunctions {
 	 */
 	public function GetSortableName(&$person, $allnames=false, $rev = false, $count=0) {
 		global $SHOW_LIVING_NAMES, $PRIV_PUBLIC, $GEDCOMID, $COMBIKEY;
-		global $indilist, $gm_lang, $GEDCOMID, $NAME_REVERSE;
+		global $indilist, $GEDCOMID, $NAME_REVERSE;
 	
 		$mynames = array();
 	

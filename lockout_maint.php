@@ -42,7 +42,7 @@ if (!$gm_user->userIsAdmin()) {
 	exit;
 }
 
-PrintHeader($gm_lang["lockout_maint"]);
+PrintHeader(GM_LANG_lockout_maint);
 
 //if ($action == "update") {
 //	print "<pre>";
@@ -53,8 +53,8 @@ PrintHeader($gm_lang["lockout_maint"]);
 ?>
 <!-- Setup the left box -->
 <div id="admin_genmod_left">
-	<div class="admin_link"><a href="admin.php"><?php print $gm_lang["admin"];?></a></div>
-	<div class="admin_link"><a href="admin_maint.php"><?php print $gm_lang["administration_maintenance"];?></a></div>
+	<div class="admin_link"><a href="admin.php"><?php print GM_LANG_admin;?></a></div>
+	<div class="admin_link"><a href="admin_maint.php"><?php print GM_LANG_administration_maintenance;?></a></div>
 </div>
 
 <div id="content">
@@ -98,7 +98,7 @@ PrintHeader($gm_lang["lockout_maint"]);
 		<div class="admin_topbottombar">
 			<h3>
 				<?php print_help_link("lockout_maint_help", "qm", "lockout_maint");?>
-				<?php print $gm_lang["lockout_maint"]; ?>
+				<?php print GM_LANG_lockout_maint; ?>
 			</h3>
 		</div>
 		<?php
@@ -106,15 +106,15 @@ PrintHeader($gm_lang["lockout_maint"]);
 		$res = NewQuery($sql);
 		if ($res && $res->NumRows() > 0) {
 			?><div class="admin_item_box shade2">
-				<div class="width10 choice_left"><?php print $gm_lang["select"]; ?></div>
-				<div class="width15 choice_middle"><?php print $gm_lang["ip_address"]; ?></div>
-				<div class="width20 choice_middle"><?php print $gm_lang["username"]; ?></div>
-				<div class="width20 choice_middle"><?php print $gm_lang["lockout_at"]; ?></div>
-				<div class="width20 choice_right"><?php print $gm_lang["release_at"]; ?></div>
+				<div class="width10 choice_left"><?php print GM_LANG_select; ?></div>
+				<div class="width15 choice_middle"><?php print GM_LANG_ip_address; ?></div>
+				<div class="width20 choice_middle"><?php print GM_LANG_username; ?></div>
+				<div class="width20 choice_middle"><?php print GM_LANG_lockout_at; ?></div>
+				<div class="width20 choice_right"><?php print GM_LANG_release_at; ?></div>
 			</div><?php
 			while ($row = $res->FetchRow()) {
 				$locktime = GetChangedDate(date("d", $row[1])." ".date("M", $row[1])." ".date("Y", $row[1]))." - ".date($TIME_FORMAT, $row[1]);
-				if($row[2] == "0") $releasetime = $gm_lang["until_unlocked"];
+				if($row[2] == "0") $releasetime = GM_LANG_until_unlocked;
 				else {
 					$releasetime = GetChangedDate(date("d", $row[2])." ".date("M", $row[2])." ".date("Y", $row[2]))." - ".date($TIME_FORMAT, $row[2]);
 				}
@@ -131,32 +131,32 @@ PrintHeader($gm_lang["lockout_maint"]);
 				</div>
 			<?php } ?>
 			<div class="admin_item_box center shade2">
-				<input type="submit" value="<?php print $gm_lang["delete_selected"];?>" />
+				<input type="submit" value="<?php print GM_LANG_delete_selected;?>" />
 			</div>
 		<?php } 
 		else { ?>
 			<div class="admin_item_box center">
-			<?php print $gm_lang["no_lockouts"]; ?>
+			<?php print GM_LANG_no_lockouts; ?>
 			</div>
 		<?php } ?>
 	</form><br />
 	<form method="post" name="lockoutaddform" action="lockout_maint.php">
 		<input type="hidden" name="action" value="add" />
 		<div class="admin_item_box shade2 center">
-			<div class="width100 choice_middle"><?php print $gm_lang["add_lockout"]; ?></div>
+			<div class="width100 choice_middle"><?php print GM_LANG_add_lockout; ?></div>
 		</div>
 		<div class="admin_item_box">
-			<div class="width30 choice_left"><?php print $gm_lang["ip_address"]; ?></div>
+			<div class="width30 choice_left"><?php print GM_LANG_ip_address; ?></div>
 			<div class="width30 choice_middle"><input type="text" name="add_ip" value="<?php if (isset($add_ip)) print $add_ip;?>" size="15" maxlength="15" /></div>
-			<?php if ($error1) {?><div class="width30 choice_right"><span class="error"><?php print $gm_lang["invalid_ip"]; ?></span></div><?php } ?>
+			<?php if ($error1) {?><div class="width30 choice_right"><span class="error"><?php print GM_LANG_invalid_ip; ?></span></div><?php } ?>
 		</div>
 		<div class="admin_item_box">
-			<div class="width30 choice_left"><?php print $gm_lang["username"]; ?></div>
+			<div class="width30 choice_left"><?php print GM_LANG_username; ?></div>
 			<div class="width30 choice_middle"><input type="text" name="add_user" value="<?php if (isset($add_user)) print $add_user;?>" size="25" /></div>
-			<?php if ($error2) {?><div class="width30 choice_right"><span class="error"><?php print $gm_lang["invalid_user"]; ?></span></div><?php } ?>
+			<?php if ($error2) {?><div class="width30 choice_right"><span class="error"><?php print GM_LANG_invalid_user; ?></span></div><?php } ?>
 		</div>
 			<div class="admin_item_box center shade2">
-				<input type="submit" value="<?php print $gm_lang["lockout_submit"];?>" />
+				<input type="submit" value="<?php print GM_LANG_lockout_submit;?>" />
 			</div>
 	</form>
 </div>

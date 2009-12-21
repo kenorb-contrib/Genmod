@@ -120,11 +120,11 @@ if ($step > 2) {
 	if ($link = @mysql_connect($DBHOST, $DBUSER, $DBPASS)) mysql_select_db($DBNAME);
 	else {
 		$step = 2;
-		$error = $gm_lang["error"].": ". mysql_error();
+		$error = GM_LANG_error.": ". mysql_error();
 	}
 	if (!$upgrade && in_array(INDEX_DIRECTORY, $index_inuse)) {
 		$step = 2;
-		$error .= "<br />".$gm_lang["error"].": Index directory already in use by another site.";
+		$error .= "<br />".GM_LANG_error.": Index directory already in use by another site.";
 	}
 }
 
@@ -133,11 +133,11 @@ print "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"http:/
 print "<html xmlns=\"http://www.w3.org/1999/xhtml\">\n\t<head>\n\t\t";
 print "<meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF8\" />\n\t\t";
 print "<link rel=\"stylesheet\" href=\"".$stylesheet."\" type=\"text/css\" media=\"all\"></link>\n\t";
-print "<title>Genmod ".GM_VERSION." ".GM_VERSION_RELEASE." ".$gm_lang["install"]."</title>";
+print "<title>Genmod ".GM_VERSION." ".GM_VERSION_RELEASE." ".GM_LANG_install."</title>";
 print "</head>\n\t<body>";
 print "<div id=\"header\" class=\"".$TEXT_DIRECTION."\">";
 print "<img src=\"images/header.gif\" alt=\"\"/>";
-print "<span style=\"font-size: 26px; color: #DE0029; padding-left: 2em;\">".$gm_lang["setup_genmod"]."</span>";
+print "<span style=\"font-size: 26px; color: #DE0029; padding-left: 2em;\">".GM_LANG_setup_genmod."</span>";
 print "</div>";
 print "<div id=\"body\" class=\"".$TEXT_DIRECTION."\" style=\"padding: 5em;\">";
 InstallShowProgress();
@@ -150,9 +150,9 @@ print "<br />";
 $ssp = session_save_path();
 if (0) {
 	if (!is_writable($ssp)) {
-		print "<span class=\"error\">".$gm_lang["session_cannot_start"]."</span>";
+		print "<span class=\"error\">".GM_LANG_session_cannot_start."</span>";
 		print "<br />";
-		print $gm_lang["session_path"].$ssp;
+		print GM_LANG_session_path.$ssp;
 		// NOTE: Delete session information since it cannot be written
 		@session_destroy();
 		print "<br />";
@@ -164,7 +164,7 @@ if (0) {
 	}
 }
 if ($step == 1) {
-	print $gm_lang["step1"];
+	print GM_LANG_step1;
 	print "<br /><br />";
 	
 	if (phpversion() < $min_php_version) {
@@ -187,7 +187,7 @@ if ($step == 1) {
 			if (!file_exists("../".$MEDIA_DIRECTORY."index.php")) {
 				$inddata = html_entity_decode("<?php\nheader(\"Location: ../medialist.php\");\nexit;\n?>");
 				$fp = @fopen("../".GedcomConfig::$MEDIA_DIRECTORY."index.php","w+");
-				if (!$fp) print "<span class=\"error\">".$gm_lang["security_no_create"].GedcomConfig::$MEDIA_DIRECTORY."</span>";
+				if (!$fp) print "<span class=\"error\">".GM_LANG_security_no_create.GedcomConfig::$MEDIA_DIRECTORY."</span>";
 				else {
 					// Write the index.php for the media folder
 					fputs($fp,$inddata);
@@ -216,7 +216,7 @@ if ($step == 1) {
 				$inddata = file_get_contents("../".GedcomConfig::$MEDIA_DIRECTORY."index.php");
 				$inddatathumb = str_replace(": ../",": ../../",$inddata);
 				$fpthumb = @fopen("../".GedcomConfig::$MEDIA_DIRECTORY."thumbs/index.php","w+");
-				if (!$fpthumb) print "<div class=\"error\">".$gm_lang["security_no_create"].GedcomConfig::$MEDIA_DIRECTORY."thumbs</div>";
+				if (!$fpthumb) print "<div class=\"error\">".GM_LANG_security_no_create.GedcomConfig::$MEDIA_DIRECTORY."thumbs</div>";
 				else {
 					// Write the index.php for the thumbs media folder
 					fputs($fpthumb,$inddatathumb);
@@ -243,7 +243,7 @@ if ($step == 1) {
 		print "<form method=\"post\" name=\"next\" action=\"".$_SERVER["SCRIPT_NAME"]."\">";
 		print "<input type=\"hidden\" name=\"step\" value=\"2\">";
 		print "<br />";
-		print "<input type=\"submit\"  value=\"".$gm_lang["next"]."\">";
+		print "<input type=\"submit\"  value=\"".GM_LANG_next."\">";
 		print "</form>";
 		$setup_php = true;
 		$media = true;
@@ -260,50 +260,50 @@ if ($step == 1) {
 
 // NOTE: Have the user enter database details
 if ($step == 2) {
-	print $gm_lang["step2"];
+	print GM_LANG_step2;
 	print "<br /><br />";
 	
 	if (!empty($error)) print "<span class=\"error\">".$error."</span><br /><br />";
 	print "<form method=\"post\" action=\"".$_SERVER["SCRIPT_NAME"]."\" name=\"loginform\">\n";
 	print "<input type=\"hidden\" name=\"step\" value=\"3\"/>";
 	print "<label class=\"label_form\">Database details</label><br style=\"clear: left;\"/>";
-	print "<label class=\"label_form\" for=\"DBHOST\">".$gm_lang["DBHOST"]."</label>";
+	print "<label class=\"label_form\" for=\"DBHOST\">".GM_LANG_DBHOST."</label>";
 	print "<input class=\"input_form\" type=\"text\" id=\"DBHOST\" name=\"DBHOST\" value=\"";
 	if ($upgrade) print $newconfigparms[$LOCATION]["DBHOST"];
 	else print "localhost";
 	if (!isset($DBUSER)) $DBUSER = "";
 	if (!isset($DBPASS)) $DBPASS = "";
 	print "\" /><br style=\"clear: left;\"/>";
-	print "<label class=\"label_form\" for=\"DBUSER\">".$gm_lang["DBUSER"]."</label>";
+	print "<label class=\"label_form\" for=\"DBUSER\">".GM_LANG_DBUSER."</label>";
 	print "<input class=\"input_form\" type=\"text\" id=\"DBUSER\" name=\"DBUSER\" value=\"".$DBUSER."\"/><br style=\"clear: left;\"/>";
-	print "<label class=\"label_form\" for=\"DBPASS\">".$gm_lang["DBPASS"]."</label>";
+	print "<label class=\"label_form\" for=\"DBPASS\">".GM_LANG_DBPASS."</label>";
 	print "<input class=\"input_form\" type=\"password\" id=\"DBPASS\" name=\"DBPASS\" value=\"".$DBPASS."\" /><br style=\"clear: left;\"/>";
-	print "<label class=\"label_form\" for=\"DBNAME\">".$gm_lang["DBNAME"]."</label>";
+	print "<label class=\"label_form\" for=\"DBNAME\">".GM_LANG_DBNAME."</label>";
 	print "<input class=\"input_form\" type=\"text\" id=\"DBNAME\" name=\"DBNAME\" value=\"";
 	if (isset($DBNAME)) print $DBNAME;
 	else if ($upgrade) print $newconfigparms[$LOCATION]["DBNAME"];
 	else print "genmod";
 	print "\" /><br style=\"clear: left;\"/>";
-	print "<label class=\"label_form\" for=\"TBLPREFIX\">".$gm_lang["TBLPREFIX"]."</label>";
+	print "<label class=\"label_form\" for=\"TBLPREFIX\">".GM_LANG_TBLPREFIX."</label>";
 	print "<input class=\"input_form\" type=\"text\" id=\"TBLPREFIX\" name=\"TBLPREFIX\" value=\"";
 	if (isset($TBLPREFIX)) print $TBLPREFIX;
 	else if ($upgrade) print $newconfigparms[$LOCATION]["TBLPREFIX"];
 	else print "gm_";
 	print "\" /><br style=\"clear: left;\"/>";
-	print "<label class=\"label_form\" for=\"INDEX_DIRECTORY\">".$gm_lang["INDEX_DIRECTORY"]."</label>";
+	print "<label class=\"label_form\" for=\"INDEX_DIRECTORY\">".GM_LANG_INDEX_DIRECTORY."</label>";
 	print "<input class=\"input_form\" type=\"text\" id=\"INDEX_DIRECTORY\" name=\"INDEX_DIRECTORY\" value=\"";
 	if (isset($INDEX_DIRECTORY)) print $INDEX_DIRECTORY;
 	else if ($upgrade) print $newconfigparms[$LOCATION]["INDEX_DIRECTORY"];
 	else print GuessIndexDirectory($index_inuse);
 	print "\" /><br style=\"clear: left;\"/>";
 	print "<label class=\"label_form\" for=\"submit\" />&nbsp;</label>";
-	print "<input class=\"input_form\" type=\"submit\"  id=\"submit\" name=\"submit\" value=\"".$gm_lang["next"]."\"/><br style=\"clear: left;\"/>";
+	print "<input class=\"input_form\" type=\"submit\"  id=\"submit\" name=\"submit\" value=\"".GM_LANG_next."\"/><br style=\"clear: left;\"/>";
 	print "</form>";
 
 }
 // NOTE: Verify database structure
 if ($step == 3) {
-	print $gm_lang["step3"];
+	print GM_LANG_step3;
 	print "<br /><br />";
 	if (substr(trim(mysql_get_server_info()), 0, strlen($min_mysql_version)) < $min_mysql_version) {
 		print "<img src=\"images/nok.png\" alt=\"MySQL version too low\"/> ";
@@ -332,7 +332,7 @@ if ($step == 3) {
 	if ($setup_mysql) {
 		$db_ok = InstallCheckDBLayout();
 		if (!$db_ok && !is_array($deleterows)) {
-			print $gm_lang["create_database_first"];
+			print GM_LANG_create_database_first;
 			InstallRestartButton();
 		}
 		else {
@@ -365,7 +365,7 @@ if ($step == 3) {
 				print "<form method=\"post\" name=\"next\" action=\"".$_SERVER["SCRIPT_NAME"]."\">";
 				print "<input type=\"hidden\" name=\"step\" value=\"4\">";
 				print "<br />";
-				print "<input type=\"submit\"  value=\"".$gm_lang["next"]."\">";
+				print "<input type=\"submit\"  value=\"".GM_LANG_next."\">";
 				print "</form>";
 			}
 			else if (!$db_ok) {
@@ -386,7 +386,7 @@ if ($step == 3) {
 	}
 }
 if ($step == 4) {
-	print $gm_lang["step4"];
+	print GM_LANG_step4;
 	print "<br /><br />";
 	
 	// NOTE: Request user details
@@ -425,13 +425,13 @@ if ($step == 4) {
 		unset($_SESSION["action"]);
 		if ($au) {
 			print "<img src=\"images/ok.png\" alt=\"Create administrator account OK\" /> ";
-			print $gm_lang["user_created"];
+			print GM_LANG_user_created;
 			print "<br />";
 			$_SESSION["gm_user"]=$username;
 		}
 		else {
 			print "<img src=\"images/nok.png\" alt=\"Create administrator account NOK\" /> ";
-			print $gm_lang["user_create_error"];
+			print GM_LANG_user_create_error;
 			print "<br />";
 		}
 	}
@@ -446,7 +446,7 @@ if ($step == 4) {
 		print "<form method=\"post\" name=\"next\" action=\"".$_SERVER["SCRIPT_NAME"]."\">";
 		print "<input type=\"hidden\" name=\"step\" value=\"5\">";
 		print "<br />";
-		print "<input type=\"submit\"  value=\"".$gm_lang["next"]."\">";
+		print "<input type=\"submit\"  value=\"".GM_LANG_next."\">";
 		print "</form>";
 		// session_destroy();
 	}
@@ -459,32 +459,32 @@ if ($step == 4) {
 		<!--
 			function checkform(frm) {
 				if (frm.username.value=="") {
-					alert("<?php print $gm_lang["enter_username"]; ?>");
+					alert("<?php print GM_LANG_enter_username; ?>");
 					frm.username.focus();
 					return false;
 				}
 				if (frm.firstname.value=="") {
-					alert("<?php print $gm_lang["enter_fullname"]; ?>");
+					alert("<?php print GM_LANG_enter_fullname; ?>");
 					frm.firstname.focus();
 					return false;
 				}
 				if (frm.lastname.value=="") {
-					alert("<?php print $gm_lang["enter_fullname"]; ?>");
+					alert("<?php print GM_LANG_enter_fullname; ?>");
 					frm.lastname.focus();
 					return false;
 				}
 				if (frm.pass1.value=="") {
-					alert("<?php print $gm_lang["enter_password"]; ?>");
+					alert("<?php print GM_LANG_enter_password; ?>");
 					frm.pass1.focus();
 					return false;
 				}
 				if (frm.pass2.value=="") {
-					alert("<?php print $gm_lang["confirm_password"]; ?>");
+					alert("<?php print GM_LANG_confirm_password; ?>");
 					frm.pass2.focus();
 					return false;
 				}
 				if (frm.pass1.value != frm.pass2.value) {
-					alert("<?php print $gm_lang["password_mismatch"]; ?>");
+					alert("<?php print GM_LANG_password_mismatch; ?>");
 					frm.pass1.focus();
 					return false;
 				}
@@ -496,19 +496,19 @@ if ($step == 4) {
 		<form method="post" action="<?php print $_SERVER["SCRIPT_NAME"];?>" onsubmit="return checkform(this);">
 			<input type="hidden" name="action" value="createadminuser" />
 			<input type="hidden" name="step" value="4" />
-			<label class="label_form"><?php print $gm_lang["username"];?></label>
+			<label class="label_form"><?php print GM_LANG_username;?></label>
 			<input class="input_form" type="text" name="username" /><br style="clear: left;" />
-			<label class="label_form"><?php print $gm_lang["firstname"];?></label>
+			<label class="label_form"><?php print GM_LANG_firstname;?></label>
 			<input class="input_form" type="text" name="firstname" /><br style="clear: left;" />
-			<label class="label_form"><?php print $gm_lang["lastname"];?></label>
+			<label class="label_form"><?php print GM_LANG_lastname;?></label>
 			<input class="input_form" type="text" name="lastname" /><br style="clear: left;" />
-			<label class="label_form"><?php print $gm_lang["password"];?></label>
+			<label class="label_form"><?php print GM_LANG_password;?></label>
 			<input class="input_form" type="password" name="pass1" /><br style="clear: left;" />
-			<label class="label_form"><?php print $gm_lang["confirm"];?></label>
+			<label class="label_form"><?php print GM_LANG_confirm;?></label>
 			<input class="input_form" type="password" name="pass2" /><br style="clear: left;" />
-			<label class="label_form"><?php print $gm_lang["emailadress"];?></label>
+			<label class="label_form"><?php print GM_LANG_emailadress;?></label>
 			<input class="input_form" type="text" name="emailadress" size="45" /><br style="clear: left;" />
-			<input class="input_form" type="submit" value="<?php print $gm_lang["create_user"]; ?>" />
+			<input class="input_form" type="submit" value="<?php print GM_LANG_create_user; ?>" />
 		</form>
 		<?php
 		
@@ -516,7 +516,7 @@ if ($step == 4) {
 }
 
 if ($step == 5) {
-	print $gm_lang["step5"];
+	print GM_LANG_step5;
 	print "<br /><br />";
 	
 	// NOTE: Load the language settings file
@@ -536,7 +536,7 @@ if ($step == 5) {
 	// NOTE: Also build a list of active languages so we can compare which have been turned off
 	foreach ($language_settings as $key => $value){
 		$d_LangName = "lang_name_".$key;
-		$SortedLangs[$key] = $gm_lang[$d_LangName];
+		$SortedLangs[$key] = constant("GM_LANG_".$d_LangName);
 		// If the language is in the DB settings, take that value for on/off
 		if (isset($currentlangs[$key])) {
 			if ($currentlangs[$key] == 1) $_SESSION["ActiveLangs"][] = $key;
@@ -595,12 +595,12 @@ if ($step == 5) {
 	print "<input type=\"hidden\" name=\"step\" value=\"6\">";
 	print "<input type=\"hidden\" name=\"language\" value=\"chosen\">";
 	print "<br />";
-	print "<input type=\"submit\"  value=\"".$gm_lang["next"]."\">";
+	print "<input type=\"submit\"  value=\"".GM_LANG_next."\">";
 	print "</form>";
 }
 
 if ($step ==  6) {
-	print $gm_lang["step6"];
+	print GM_LANG_step6;
 	print "<br /><br />";
 	include("install_lang_settings.php");
 	
@@ -700,7 +700,7 @@ if ($step ==  6) {
 				if ($type == "lang") print "Language ";
 				else if ($type == "help") print "Help ";
 				else if ($type == "facts") print "Facts ";
-				print $gm_lang["lang_name_english"]." imported succesfully.";
+				print GM_LANG_lang_name_english." imported succesfully.";
 				print "<br />";
 			}
 			else {
@@ -709,7 +709,7 @@ if ($step ==  6) {
 				if ($type == "lang") print "Language ";
 				else if ($type == "help") print "Help ";
 				else if ($type == "facts") print "Facts ";
-				print $gm_lang["lang_name_english"]." imported failed.";
+				print GM_LANG_lang_name_english." imported failed.";
 				print "<br />";
 			}
 		}
@@ -730,7 +730,7 @@ if ($step ==  6) {
 				if ($type == "lang") print "Language ";
 				else if ($type == "help") print "Help ";
 				else if ($type == "facts") print "Facts ";
-				print $gm_lang["lang_name_".$NEW_LANGS[0]]." imported succesfully.";
+				print constant("GM_LANG_lang_name_".$NEW_LANGS[0])." imported succesfully.";
 				print "<br />";
 			}
 			else {
@@ -738,7 +738,7 @@ if ($step ==  6) {
 				if ($type == "lang") print "Language ";
 				else if ($type == "help") print "Help ";
 				else if ($type == "facts") print "Facts ";
-				print $gm_lang["lang_name_".$NEW_LANGS[0]]." imported failed.";
+				print constant("GM_LANG_lang_name_".$NEW_LANGS[0])." imported failed.";
 				print "<br />";
 			}
 		}
@@ -755,12 +755,12 @@ if ($step ==  6) {
 	print "\">";
 	print "<input type=\"hidden\" name=\"english_done\" value=\"".$english_done."\">";
 	print "<br />";
-	print "<input type=\"submit\"  value=\"".$gm_lang["next"]."\">";
+	print "<input type=\"submit\"  value=\"".GM_LANG_next."\">";
 	print "</form>";
 }
 
 if ($step == 7) {
-	print $gm_lang["step7"];
+	print GM_LANG_step7;
 	print "<br /><br />";
 	
 	// NOTE: Write the configuration file

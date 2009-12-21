@@ -141,6 +141,15 @@ $db_original[TBLPREFIX."eventcache"]["row"]["ge_gender"]["details"] = "VARCHAR(2
 $db_original[TBLPREFIX."eventcache"]["key"]["ge_file_key"] = "KEY `ge_file_key` (`ge_file`)";
 $db_original[TBLPREFIX."eventcache"]["key"]["ge_order_key"] = "KEY `ge_order_key` (`ge_order`)";
 $db_original[TBLPREFIX."eventcache"]["key"]["ge_cache_key"] = "KEY `ge_cache_key` (`ge_cache`)";
+
+$db_original[TBLPREFIX."faqs"]["row"]["fa_id"]["details"] = "INT NOT NULL AUTO_INCREMENT";
+$db_original[TBLPREFIX."faqs"]["row"]["fa_order"]["details"] = "TINYINT UNSIGNED";
+$db_original[TBLPREFIX."faqs"]["row"]["fa_header"]["details"] = "VARCHAR(255) CHARACTER SET #charset# COLLATE #collate# ";
+$db_original[TBLPREFIX."faqs"]["row"]["fa_body"]["details"] = "TEXT CHARACTER SET #charset# COLLATE #collate# ";
+$db_original[TBLPREFIX."faqs"]["row"]["fa_file"]["details"] = "TINYINT UNSIGNED";
+$db_original[TBLPREFIX."faqs"]["key"]["primary"] = "PRIMARY KEY  (`fa_id`)";
+$db_original[TBLPREFIX."faqs"]["key"]["fa_file"] = "KEY `fa_file` (`fa_file`)";
+
              
 $db_original[TBLPREFIX."families"]["row"]["f_key"]["details"] = "VARCHAR(64) CHARACTER SET #charset# COLLATE #collate# ";
 $db_original[TBLPREFIX."families"]["row"]["f_id"]["details"] = "VARCHAR(64) CHARACTER SET #charset# COLLATE #collate# ";

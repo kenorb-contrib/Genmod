@@ -40,7 +40,7 @@ if (stristr($_SERVER["SCRIPT_NAME"],basename(__FILE__))) {
  * @param array $value is an array of the form array($name, $GEDCOM)
  */
 function print_list_person($key, $value, $findid=false, $asso="", $useli=true, $fact="") {
-	global $gm_lang, $SCRIPT_NAME, $pass, $indi_private, $indi_hide, $indi_total, $NAME_REVERSE;
+	global $pass, $indi_private, $indi_hide, $indi_total, $NAME_REVERSE;
 	global $GEDCOMID, $TEXT_DIRECTION, $GM_IMAGES, $SHOW_DEATH_LISTS;
 	
 	$key = splitkey($key, "id");
@@ -84,7 +84,7 @@ function print_list_person($key, $value, $findid=false, $asso="", $useli=true, $
 		}
 
 		if (!$disp) {
-			print " -- <i>".$gm_lang["private"]."</i>";
+			print " -- <i>".GM_LANG_private."</i>";
 			$indi_private[$key."[".$GEDCOMID."]"] = 1;
 		}
 		else {
@@ -126,14 +126,14 @@ function print_list_person($key, $value, $findid=false, $asso="", $useli=true, $
 				}
 				if ($TEXT_DIRECTION=="ltr") print " <span dir=\"ltr\">";
 				else print " <span dir=\"rtl\">";
-				print "(".$gm_lang["associate_with"]." ";
+				print "(".GM_LANG_associate_with." ";
 				if (GedcomConfig::$SHOW_ID_NUMBERS) print $key;
 				print ": ".$name;
 				if (!empty($avalue[2]) || !empty($avalue[3])) {
 					print " - ";
 					if (!empty($avalue[2])) print constant("GM_FACT_".$avalue[2]);
 					if(!empty($avalue[2]) && !empty($avalue[3])) print " : ";
-					if (isset($gm_lang[$avalue[3]])) print $gm_lang[$avalue[3]];
+					if (defined("GM_LANG_".$avalue[3])) print constant("GM_LANG_".$avalue[3]);
 					else print $avalue[3];
 				}
 				print ")</span></a>";
@@ -153,7 +153,7 @@ function print_list_person($key, $value, $findid=false, $asso="", $useli=true, $
 //-- print information about a family for a list view
 // param fact is for sanitycheck to print the fact and open a new page in a new window.
 function print_list_family($key, $value, $findid=false, $asso="", $useli=true, $fact="") {
-	global $gm_lang, $pass, $fam_private, $fam_hide, $fam_total;
+	global $pass, $fam_private, $fam_hide, $fam_total;
 	global $GEDCOMID, $HIDE_LIVE_PEOPLE;
 	global $TEXT_DIRECTION, $COMBIKEY;
 
@@ -204,7 +204,7 @@ function print_list_family($key, $value, $findid=false, $asso="", $useli=true, $
   			else print " <span dir=\"rtl\">($kid)</span>";
 			}
 		if (!$display) {
-			print " -- <i>".$gm_lang["private"]."</i>";
+			print " -- <i>".GM_LANG_private."</i>";
 			$fam_private[$key."[".$GEDCOMID."]"] = 1;
 		}
 		else {
@@ -212,7 +212,7 @@ function print_list_family($key, $value, $findid=false, $asso="", $useli=true, $
 			if ($bpos1) {
 				$birthrec = GetSubRecord(1, "1 MARR", $famrec);
 				if (!PrivacyFunctions::FactViewRestricted($key, $birthrec) && PrivacyFunctions::showFact("MARR", $kid)) {
-					print " -- <i>".$gm_lang["marriage"]." ";
+					print " -- <i>".GM_LANG_marriage." ";
 					$bt = preg_match("/1 \w+/", $birthrec, $match);
 					if ($bt>0) {
 						 $bpos2 = strpos($birthrec, $match[0]);
@@ -246,14 +246,14 @@ function print_list_family($key, $value, $findid=false, $asso="", $useli=true, $
 				}
 				if ($TEXT_DIRECTION=="ltr") print " <span dir=\"ltr\">";
 				else print " <span dir=\"rtl\">";
-				print "(".$gm_lang["associate_with"]." ";
+				print "(".GM_LANG_associate_with." ";
 				if (GedcomConfig::$SHOW_ID_NUMBERS) print $key;
 				print ": ".$name;
 				if(!empty($avalue[2]) || !empty($avalue[3])) {
 					print " - ";
 					if (!empty($avalue[2])) print constant("GM_FACT_".$avalue[2]);
 					if(!empty($avalue[2]) && !empty($avalue[3])) print " : ";
-					if (isset($gm_lang[$avalue[3]])) print $gm_lang[$avalue[3]];
+					if (defined("GM_LANG_".$avalue[3])) print constant("GM_LANG_".$avalue[3]);
 					else print $avalue[3];
 				}
 				print ")</span></a>";
@@ -325,11 +325,11 @@ function InitListCounters($action = "reset") {
  * @param boolean $use_alternate_styles
  */
 function PrintHeader($title, $head="",$use_alternate_styles=true) {
-	global $gm_lang, $bwidth;
+	global $bwidth;
 	global $BROWSERTYPE, $indilist, $INDILIST_RETRIEVED;
-	global $view, $cart;
+	global $view;
 	global $GEDCOMS;
-	global $SCRIPT_NAME, $QUERY_STRING, $action, $query, $changelanguage,$theme_name;
+	global $QUERY_STRING, $action, $query, $changelanguage,$theme_name;
 	global $GM_IMAGES, $TEXT_DIRECTION, $ONLOADFUNCTION, $SHOW_SOURCES;
 	// globals for the bot 304 mechanism
 	global $bot, $_SERVER, $GEDCOMID, $pid, $famid, $rid, $sid;
@@ -362,7 +362,7 @@ function PrintHeader($title, $head="",$use_alternate_styles=true) {
 		// Tells the requestor that you.ve recognized the conditional GET
 		header("X-Requested-If-Modified-Since: ".$ifModifiedSinceDate, TRUE);
 		
-		switch (basename($SCRIPT_NAME)) {
+		switch (basename(SCRIPT_NAME)) {
 		case "individual.php":
 			$lastchange = GetLastChangeDate("INDI", $pid, $GEDCOMID, true);
 			break;
@@ -499,7 +499,7 @@ function showBack() {
 	 <?php print "textDirection = \"$TEXT_DIRECTION\";\n"; ?>
 	 <?php print "browserType = \"$BROWSERTYPE\";\n"; ?>
 	 <?php print "themeName = \"".strtolower($theme_name)."\";\n"; ?>
-	 <?php print "SCRIPT_NAME = \"$SCRIPT_NAME\";\n"; ?>
+	 <?php print "SCRIPT_NAME = \"".SCRIPT_NAME."\";\n"; ?>
 	 /* keep the session id when opening new windows */
 	 <?php print "sessionid = \"".session_id()."\";\n"; ?>
 	 <?php print "sessionname = \"".session_name()."\";\n"; ?>
@@ -524,12 +524,12 @@ function showBack() {
 	 arrows[3].src = "<?php print GM_IMAGE_DIR."/".$GM_IMAGES["darrow2"]["other"]; ?>";
 
 function message(username, method, url, subject) {
-	 if ((!url)||(url=="")) url='<?php print urlencode(basename($SCRIPT_NAME)."?".$QUERY_STRING); ?>';
+	 if ((!url)||(url=="")) url='<?php print urlencode(basename(SCRIPT_NAME)."?".$QUERY_STRING); ?>';
 	 if ((!subject)||(subject=="")) subject= '';
 	 window.open('message.php?to='+username+'&method='+method+'&url='+url+'&subject='+subject+"&"+sessionname+"="+sessionid, '', 'top=50,left=50,width=600,height=500,resizable=1,scrollbars=1');
 	 return false;
 }
-var whichhelp = 'help_<?php print basename($SCRIPT_NAME)."&amp;action=".$action; ?>';
+var whichhelp = 'help_<?php print basename(SCRIPT_NAME)."&amp;action=".$action; ?>';
 //-->
 </script>
 <script src="genmod.js" language="JavaScript" type="text/javascript"></script>
@@ -589,10 +589,8 @@ var whichhelp = 'help_<?php print basename($SCRIPT_NAME)."&amp;action=".$action;
  * @param boolean $use_alternate_styles
  */
 function PrintSimpleHeader($title) {
-	 global $gm_lang;
 	 global $view;
-	 global $SCRIPT_NAME, $QUERY_STRING, $action, $query, $changelanguage;
-	 global $SCRIPT_NAME;
+	 global $QUERY_STRING, $action, $query, $changelanguage;
 	 global $TEXT_DIRECTION, $GEDCOMS, $GEDCOMID,$GM_IMAGES;
 	 
 	 header("Content-Type: text/html; charset=".GedcomConfig::$CHARACTER_SET);
@@ -669,7 +667,7 @@ function PrintSimpleHeader($title) {
 		return false;
 	}
 	function message(username, method, url, subject) {
-		if ((!url)||(url=="")) url='<?php print urlencode(basename($SCRIPT_NAME)."?".$QUERY_STRING); ?>';
+		if ((!url)||(url=="")) url='<?php print urlencode(basename(SCRIPT_NAME)."?".$QUERY_STRING); ?>';
 		if ((!subject)||(subject=="")) subject= '';
 		window.open('message.php?to='+username+'&method='+method+'&url='+url+'&subject='+subject+"&"+sessionname+"="+sessionid, '', 'top=50,left=50,width=600,height=500,resizable=1,scrollbars=1');
 		return false;
@@ -698,8 +696,8 @@ function PrintSimpleHeader($title) {
 
 // -- print the html to close the page
 function PrintFooter() {
-	global $without_close, $gm_lang, $view, $buildindex;
-	global $SCRIPT_NAME, $QUERY_STRING, $ALLOW_CHANGE_GEDCOM, $printlink;
+	global $without_close, $view, $buildindex;
+	global $QUERY_STRING, $ALLOW_CHANGE_GEDCOM, $printlink;
 	global $theme_name, $GM_IMAGES, $TEXT_DIRECTION, $footer_count;
 	
 	if (!isset($footer_count)) $footer_count = 1;
@@ -711,13 +709,13 @@ function PrintFooter() {
 	else {
 		include(GM_PRINT_FOOTERFILE);
 		print "\n\t<div class=\"center width95\"><br />";
-		$backlink = $SCRIPT_NAME."?".GetQueryString();
+		$backlink = SCRIPT_NAME."?".GetQueryString();
 		if (!$printlink) {
-			print "\n\t<br /><a id=\"printlink\" href=\"#\" onclick=\"print(); return false;\">".$gm_lang["print"]."</a><br />";
-			print "\n\t <a id=\"printlinktwo\"	  href=\"#\" onclick=\"window.location='".$backlink."'; return false;\">".$gm_lang["cancel_preview"]."</a><br />";
+			print "\n\t<br /><a id=\"printlink\" href=\"#\" onclick=\"print(); return false;\">".GM_LANG_print."</a><br />";
+			print "\n\t <a id=\"printlinktwo\"	  href=\"#\" onclick=\"window.location='".$backlink."'; return false;\">".GM_LANG_cancel_preview."</a><br />";
 		}
 		$printlink = true;
-		print "\n\t<a id=\"backlink\" style=\"display: none;\" href=\"#\" onclick=\"window.location='".$backlink."'; return false;\">".$gm_lang["cancel_preview"]."</a><br />";
+		print "\n\t<a id=\"backlink\" style=\"display: none;\" href=\"#\" onclick=\"window.location='".$backlink."'; return false;\">".GM_LANG_cancel_preview."</a><br />";
 		print "</div>";
 	}
 	// print "<!-- close container -->\n";
@@ -731,14 +729,14 @@ function PrintFooter() {
 }
 // -- print the html to close the page
 function PrintSimpleFooter() {
-	global $gm_lang, $start_time, $buildindex;
+	global $start_time, $buildindex;
 	global $CONFIG_PARMS;
-	global $SCRIPT_NAME, $QUERY_STRING;
+	global $QUERY_STRING;
 	
-	if (empty($SCRIPT_NAME)) {
-		$SCRIPT_NAME = $_SERVER["SCRIPT_NAME"];
-		$QUERY_STRING = $_SERVER["QUERY_STRING"];
-	}
+//	if (empty(SCRIPT_NAME)) {
+//		$SCRIPT_NAME = $_SERVER["SCRIPT_NAME"];
+//		$QUERY_STRING = $_SERVER["QUERY_STRING"];
+//	}
 	print "\n\t<br /><br /><div class=\"center\" style=\"width: 99%;\">";
 	PrintContactLinks();
 	print "<br />Running <a href=\"http://www.genmod.net/\" target=\"_blank\">Genmod";
@@ -792,20 +790,20 @@ if( !function_exists('memory_get_usage') ) {
  * @author	Genmod Development Team
  */
 function PrintExecutionStats() {
-	global $start_time, $gm_lang, $TOTAL_QUERIES, $PRIVACY_CHECKS, $QUERY_EXECTIME;
+	global $start_time, $TOTAL_QUERIES, $PRIVACY_CHECKS, $QUERY_EXECTIME;
 	$end_time = GetMicrotime();
 	$exectime = $end_time - $start_time;
-	print "<br /><br />".$gm_lang["exec_time"];
-	printf(" %.3f ".$gm_lang["sec"], $exectime);
-	print "  ".$gm_lang["total_queries"]." $TOTAL_QUERIES.";
-	print " ".$gm_lang["query_exec_time"];
-	printf(" %.3f ".$gm_lang["sec"], $QUERY_EXECTIME);
+	print "<br /><br />".GM_LANG_exec_time;
+	printf(" %.3f ".GM_LANG_sec, $exectime);
+	print "  ".GM_LANG_total_queries." $TOTAL_QUERIES.";
+	print " ".GM_LANG_query_exec_time;
+	printf(" %.3f ".GM_LANG_sec, $QUERY_EXECTIME);
 	if (!$PRIVACY_CHECKS) $PRIVACY_CHECKS=0;
-	print " ".$gm_lang["total_privacy_checks"]." $PRIVACY_CHECKS.";
+	print " ".GM_LANG_total_privacy_checks." $PRIVACY_CHECKS.";
 	if (function_exists("memory_get_usage")) {
 		$mu = memory_get_usage(true);
 		if ($mu) {
-			print " ".$gm_lang["total_memory_usage"]." ";
+			print " ".GM_LANG_total_memory_usage." ";
 			print GetFileSize($mu);
 			print ".";
 		}
@@ -820,7 +818,7 @@ function PrintExecutionStats() {
  * contact user and the technical support contact user
  */
 function PrintContactLinks($style=0) {
-	global $gm_lang, $gm_user;
+	global $gm_user;
 	
 	if (GedcomConfig::$SUPPORT_METHOD=="none" && GedcomConfig::$CONTACT_METHOD=="none") return array();
 	if (GedcomConfig::$SUPPORT_METHOD=="none") GedcomConfig::$WEBMASTER_EMAIL = GedcomConfig::$CONTACT_EMAIL;
@@ -832,11 +830,11 @@ function PrintContactLinks($style=0) {
 			if (GedcomConfig::$CONTACT_EMAIL == GedcomConfig::$WEBMASTER_EMAIL) {
 				$user =& User::GetInstance(GedcomConfig::$WEBMASTER_EMAIL);
 				if (!$user->is_empty && GedcomConfig::$SUPPORT_METHOD != "mailto") {
-					print $gm_lang["for_all_contact"]." <a href=\"#\" accesskey=\"". $gm_lang["accesskey_contact"] ."\" onclick=\"message('".GedcomConfig::$WEBMASTER_EMAIL."', '".GedcomConfig::$SUPPORT_METHOD."'); return false;\">".$user->firstname." ".$user->lastname."</a><br />\n";
+					print GM_LANG_for_all_contact." <a href=\"#\" accesskey=\"". GM_LANG_accesskey_contact ."\" onclick=\"message('".GedcomConfig::$WEBMASTER_EMAIL."', '".GedcomConfig::$SUPPORT_METHOD."'); return false;\">".$user->firstname." ".$user->lastname."</a><br />\n";
 				}
 				else {
-					print $gm_lang["for_support"]." <a href=\"mailto:";
-					if (!empty($gm_user->username)) print $user->email."\" accesskey=\"". $gm_lang["accesskey_contact"] ."\">".$gm_user->firstname." ".$gm_user->lastname."</a><br />\n";
+					print GM_LANG_for_support." <a href=\"mailto:";
+					if (!empty($gm_user->username)) print $user->email."\" accesskey=\"". GM_LANG_accesskey_contact ."\">".$gm_user->firstname." ".$gm_user->lastname."</a><br />\n";
 					else print GedcomConfig::$WEBMASTER_EMAIL."\">".GedcomConfig::$WEBMASTER_EMAIL."</a><br />\n";
 				}
 			}
@@ -844,19 +842,19 @@ function PrintContactLinks($style=0) {
 			else {
 				  $user =& User::GetInstance(GedcomConfig::$CONTACT_EMAIL);
 				  if (!$user->is_empty && GedcomConfig::$CONTACT_METHOD!="mailto") {
-					  print $gm_lang["for_contact"]." <a href=\"#\" accesskey=\"". $gm_lang["accesskey_contact"] ."\" onclick=\"message('".GedcomConfig::$CONTACT_EMAIL."', '".GedcomConfig::$CONTACT_METHOD."'); return false;\">".$gm_user->firstname." ".$gm_user->lastname."</a><br /><br />\n";
+					  print GM_LANG_for_contact." <a href=\"#\" accesskey=\"". GM_LANG_accesskey_contact ."\" onclick=\"message('".GedcomConfig::$CONTACT_EMAIL."', '".GedcomConfig::$CONTACT_METHOD."'); return false;\">".$gm_user->firstname." ".$gm_user->lastname."</a><br /><br />\n";
 				  }
 				  else {
-					   print $gm_lang["for_contact"]." <a href=\"mailto:";
-					   if (!empty($gm_user->username)) print $user->email."\" accesskey=\"". $gm_lang["accesskey_contact"] ."\">".$gm_user->firstname." ".$gm_user->lastname."</a><br />\n";
+					   print GM_LANG_for_contact." <a href=\"mailto:";
+					   if (!empty($gm_user->username)) print $user->email."\" accesskey=\"". GM_LANG_accesskey_contact ."\">".$gm_user->firstname." ".$gm_user->lastname."</a><br />\n";
 					   else print GedcomConfig::$CONTACT_EMAIL."\">".GedcomConfig::$CONTACT_EMAIL."</a><br />\n";
 				  }
 				  $user =& User::GetInstance(GedcomConfig::$WEBMASTER_EMAIL);
 				  if ($user && GedcomConfig::$SUPPORT_METHOD != "mailto") {
-					  print $gm_lang["for_support"]." <a href=\"#\" onclick=\"message('".GedcomConfig::$WEBMASTER_EMAIL."', '".GedcomConfig::$SUPPORT_METHOD."'); return false;\">".$gm_user->firstname." ".$gm_user->lastname."</a><br />\n";
+					  print GM_LANG_for_support." <a href=\"#\" onclick=\"message('".GedcomConfig::$WEBMASTER_EMAIL."', '".GedcomConfig::$SUPPORT_METHOD."'); return false;\">".$gm_user->firstname." ".$gm_user->lastname."</a><br />\n";
 				  }
 				  else {
-					   print $gm_lang["for_support"]." <a href=\"mailto:";
+					   print GM_LANG_for_support." <a href=\"mailto:";
 					   if (!empty($gm_user->username)) print $gm_user->email."\">".$gm_user->firstname." ".$gm_user->lastname."</a><br />\n";
 					   else print GedcomConfig::$WEBMASTER_EMAIL."\">".GedcomConfig::$WEBMASTER_EMAIL."</a><br />\n";
 				  }
@@ -869,11 +867,11 @@ function PrintContactLinks($style=0) {
 				$user =& User::GetInstance(GedcomConfig::$WEBMASTER_EMAIL);
 				$submenu = array();
 				if (!$user->is_empty && GedcomConfig::$SUPPORT_METHOD != "mailto") {
-					$submenu["label"] = $gm_lang["support_contact"]." ".$gm_user->firstname." ".$gm_user->lastname;
+					$submenu["label"] = GM_LANG_support_contact." ".$gm_user->firstname." ".$gm_user->lastname;
 					$submenu["link"] = "message('".GedcomConfig::$WEBMASTER_EMAIL."', '".GedcomConfig::$SUPPORT_METHOD."');";
 				}
 				else {
-					$submenu["label"] = $gm_lang["support_contact"]." ";
+					$submenu["label"] = GM_LANG_support_contact." ";
 					$submenu["link"] = "mailto:";
 					if (!empty($gm_user->username)) {
 						$submenu["link"] .= $gm_user->email;
@@ -884,7 +882,7 @@ function PrintContactLinks($style=0) {
 						$submenu["label"] .= GedcomConfig::$WEBMASTER_EMAIL;
 					}
 				}
-	            $submenu["label"] = $gm_lang["support_contact"];
+	            $submenu["label"] = GM_LANG_support_contact;
 	            $submenu["labelpos"] = "right";
 	            $submenu["class"] = "submenuitem";
 	            $submenu["hoverclass"] = "submenuitem_hover";
@@ -894,11 +892,11 @@ function PrintContactLinks($style=0) {
 				$user =& User::GetInstance(GedcomConfig::$CONTACT_EMAIL);
 				$submenu = array();
 				if (!$user->is_empty && GedcomConfig::$CONTACT_METHOD!="mailto") {
-					$submenu["label"] = $gm_lang["genealogy_contact"]." ".$gm_user->firstname." ".$gm_user->lastname;
+					$submenu["label"] = GM_LANG_genealogy_contact." ".$gm_user->firstname." ".$gm_user->lastname;
 					$submenu["link"] = "message('".GedcomConfig::$CONTACT_EMAIL."', '".GedcomConfig::$CONTACT_METHOD."');";
 				}
 				else {
-					$submenu["label"] = $gm_lang["genealogy_contact"]." ";
+					$submenu["label"] = GM_LANG_genealogy_contact." ";
 					$submenu["link"] = "mailto:";
 					if (!empty($gm_user->username)) {
 						$submenu["link"] .= $gm_user->email;
@@ -915,11 +913,11 @@ function PrintContactLinks($style=0) {
 	            $menuitems[] = $submenu;
 	            $submenu = array();
 				if ($user && GedcomConfig::$SUPPORT_METHOD != "mailto") {
-					$submenu["label"] = $gm_lang["support_contact"]." ".$gm_user->firstname." ".$gm_user->lastname;
+					$submenu["label"] = GM_LANG_support_contact." ".$gm_user->firstname." ".$gm_user->lastname;
 					$submenu["link"] = "message('".GedcomConfig::$WEBMASTER_EMAIL."', '".GedcomConfig::$SUPPORT_METHOD."');";
 				}
 				else {
-					$submenu["label"] = $gm_lang["support_contact"]." ";
+					$submenu["label"] = GM_LANG_support_contact." ";
 					$submenu["link"] = "mailto:";
 					if (!empty($gm_user->username)) {
 						$submenu["link"] .= $gm_user->email;
@@ -949,13 +947,12 @@ function PrintContactLinks($style=0) {
  * @param string $pid the id of the individual to print, required to check privacy
  */
 function print_simple_fact($indirec, $fact, $pid) {
-	global $gm_lang;
 	
 	$emptyfacts = array("BIRT","CHR","DEAT","BURI","CREM","ADOP","BAPM","BARM","BASM","BLES","CHRA","CONF","FCOM","ORDN","NATU","EMIG","IMMI","CENS","PROB","WILL","GRAD","RETI","BAPL","CONL","ENDL","SLGC","EVEN","MARR","SLGS","MARL","ANUL","CENS","DIV","DIVF","ENGA","MARB","MARC","MARS","OBJE","CHAN","_SEPR","RESI", "DATA", "MAP");
 	$factrec = GetSubRecord(1, "1 $fact", $indirec);
 	if ((empty($factrec))||(PrivacyFunctions::FactViewRestricted($pid, $factrec))) return;
 	$label = "";
-	if (isset($gm_lang[$fact])) $label = $gm_lang[$fact];
+	if (defined("GM_LANG_".$fact)) $label = constant("GM_LANG_".$fact);
 	else if (defined("GM_FACT_".$fact)) $label = constant("GM_FACT_".$fact);
 	if (GedcomConfig::$ABBREVIATE_CHART_LABELS) $label = GetFirstLetter($label);
 	// RFE [ 1229233 ] "DEAT" vs "DEAT Y"
@@ -973,12 +970,12 @@ function print_simple_fact($indirec, $fact, $pid) {
 		// It is not proper GEDCOM form to use a N(o) value with an event tag to infer that it did not happen.
 		/*-- handled by print_fact_date()
 		 * if (GetSubRecord(2, "2 DATE", $factrec)=="") {
-			if (strtoupper(trim(substr($factrec,6,2)))=="Y") print $gm_lang["yes"];
+			if (strtoupper(trim(substr($factrec,6,2)))=="Y") print GM_LANG_yes;
 		}*/
 		print_fact_date($factrec, false, false, $fact, $pid, $indirec);
 		print_fact_place($factrec);
 	}
-	else print $gm_lang["private"];
+	else print GM_LANG_private;
 	print "<br />\n";
 }
 
@@ -991,10 +988,10 @@ function print_simple_fact($indirec, $fact, $pid) {
  * @param boolean $output	return the text instead of printing it
  */
 function print_help_link($help, $helpText, $show_desc="", $use_print_text=false, $return=false) {
-	global $gm_lang,$view, $GM_IMAGES, $gm_user;
+	global $view, $GM_IMAGES, $gm_user;
 	
 	if (GM_USE_HELPIMG) $sentense = "<img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["help"]["small"]."\" class=\"icon\" width=\"15\" height=\"15\" alt=\"\" />";
-	else $sentense = $gm_lang[$helpText];
+	else $sentense = constant("GM_LANG_".$helpText);
 	$output = "";
 	if (($view!="preview")&&($_SESSION["show_context_help"])){
 		if ($helpText=="qm_ah"){
@@ -1002,8 +999,8 @@ function print_help_link($help, $helpText, $show_desc="", $use_print_text=false,
 				 $output .= " <a class=\"error help\" tabindex=\"0\" href=\"javascript:";
 				 if ($show_desc == "") $output .= $help;
 				 else if ($use_print_text) $output .= print_text($show_desc, 0, 1);
-				 else if (stristr($gm_lang[$show_desc], "\"")) $output .= preg_replace('/\"/','\'',$gm_lang[$show_desc]);
-				 else  $output .= strip_tags($gm_lang[$show_desc]);
+				 else if (stristr(constant("GM_LANG_".$show_desc), "\"")) $output .= preg_replace('/\"/','\'', constant("GM_LANG_".$show_desc));
+				 else  $output .= strip_tags(constant("GM_LANG_".$show_desc));
 				 $output .= "\" onclick=\"helpPopup('$help'); return false;\">".$sentense."</a> \n";
 			}
 		}
@@ -1011,8 +1008,8 @@ function print_help_link($help, $helpText, $show_desc="", $use_print_text=false,
 			$output .= " <a class=\"help\" tabindex=\"0\" href=\"javascript: ";
 			if ($show_desc == "") $output .= $help;
 			else if ($use_print_text) $output .= print_text($show_desc, 0, 1);
-			else if (stristr($gm_lang[$show_desc], "\"")) $output .= preg_replace('/\"/','\'',$gm_lang[$show_desc]);
-			else  $output .= strip_tags($gm_lang[$show_desc]);
+			else if (stristr(constant("GM_LANG_".$show_desc), "\"")) $output .= preg_replace('/\"/','\'',constant("GM_LANG_".$show_desc));
+			else  $output .= strip_tags(constant("GM_LANG_".$show_desc));
 			$output .= "\" onclick=\"helpPopup('$help'); return false;\">".$sentense."</a> \n";
 		}
 	}
@@ -1029,9 +1026,9 @@ function print_help_link($help, $helpText, $show_desc="", $use_print_text=false,
  *		of which only the 1st is mandatory
  * The first parameter is the variable that needs to be processed.  At nesting level zero,
  *		this is the name of a $gm_lang array entry.  "whatever" refers to
- *		$gm_lang["whatever"].  At nesting levels greater than zero, this is the name of
+ *		GM_LANG_whatever.  At nesting levels greater than zero, this is the name of
  *		any global variable, but *without* the $ in front.  For example, VERSION or
- *		gm_lang["whatever"] or factarray["rowname"].
+ *		gm_lang["whatever or factarray["rowname"].
  * The second parameter is $level for the nested vars in a sentence.  This indicates
  *		that the function has been called recursively.
  * The third parameter $noprint is for returning the text instead of printing it
@@ -1047,7 +1044,6 @@ function print_help_link($help, $helpText, $show_desc="", $use_print_text=false,
  * @param int $noprint		The switch if the text needs to be printed or returned
  */
 function print_text($help, $level=0, $noprint=0){
-	 global $gm_lang;
 	 global $GEDCOM_TITLE, $LANGUAGE;
 	 global $GUESS_URL, $UpArrow;
 	 global $repeat, $thumbnail, $xref, $pid, $LANGUAGE;
@@ -1067,20 +1063,21 @@ function print_text($help, $level=0, $noprint=0){
 		 // check fact constant
 		 else if (defined("GM_FACT_".$help)) $sentence = constant("GM_FACT_".$help);
 		 // check langvar
-		 else !isset($gm_lang[$help]) ? $sentence = GetString($help, $LANGUAGE) : $sentence = $gm_lang[$help];
+		 else if (defined("GM_LANG_".$help)) $sentence = constant("GM_LANG_".$help);
+		 else (!defined("GM_LANG_".$help) ? $sentence = GetString($help, $LANGUAGE) : $sentence = constant("GM_LANG_".$help));
 	 }
 	 if (empty($sentence)) {
 		  if ($noprint == 2) {
 			  $sentence = $help;
 	  	  }
 	  	  else {
-			  if (!isset($gm_lang[$help])) $sentence = GetString($help, $LANGUAGE);
-			  else $sentence = $gm_lang[$help];
+			  if (!defined("GM_LANG_".$help)) $sentence = GetString($help, $LANGUAGE);
+			  else $sentence = constant("GM_LANG_".$help);
 		  }
 		
 		  if (empty($sentence)) {
 			  if ($DEBUG_LANG == "yes") print "[LANG_DEBUG] Variable not present: ".$help."<br /><br />";
-			  $sentence = $gm_lang["help_not_exist"];
+			  $sentence = GM_LANG_help_not_exist;
 		  }
 	 }
 	 $mod_sentence = "";
@@ -1096,7 +1093,7 @@ function print_text($help, $level=0, $noprint=0){
 		  if ($DEBUG_LANG == "yes") print "[LANG_DEBUG] Embedded variable: ".$match[$i][1]."<br /><br />";
 		  $value = print_text($newreplace, $level+1);
 		  if (!empty($value)) $sentence = str_replace($match[$i][0], $value, $sentence);
-		  else if ($noprint==0) $sentence = str_replace($match[$i][0], $match[$i][1].": ".$gm_lang["var_not_exist"], $sentence);
+		  else if ($noprint==0) $sentence = str_replace($match[$i][0], $match[$i][1].": ".GM_LANG_var_not_exist, $sentence);
 	 }
 	 // ------ Replace paired ~  by tag_start and tag_end (those vars contain CSS classes)
 	 while (stristr($sentence, "~") == TRUE){
@@ -1114,9 +1111,8 @@ function print_text($help, $level=0, $noprint=0){
 	 print $sentence;
 }
 function print_help_index($help){
-	 global $gm_lang;
 
-	 $sentence = $gm_lang[$help];
+	 $sentence = constant("GM_LANG_".$help);
 	 $mod_sentence = "";
 	 $replace = "";
 	 $replace_text = "";
@@ -1133,12 +1129,12 @@ function print_help_index($help){
 		$pos2 = strpos($mod_sentence, "#");
 		$replace = substr($sentence, ($pos1+1), ($pos2-$pos1-1));
 		$sub = preg_replace(array("/gm_lang\\[/","/\]/"), array("",""), $replace);
-		if (isset($gm_lang[$sub])) {
-			$items = preg_split("/,/", $gm_lang[$sub]);
+		if (defined("GM_LANG_".$sub)) {
+			$items = preg_split("/,/", constant("GM_LANG_".$sub));
 			$var = print_text($items[1],0,1);
 		}
 		$sub = preg_replace(array("/factarray\\[/","/\]/"), array("",""), $replace);
-		print "sub: ".$sub."<br />";
+//		print "sub: ".$sub."<br />";
 		if (defined("GM_FACT_".$sub)) {
 			$items = preg_split("/,/", constant("GM_FACT_".$sub));
 			$var = constant("GM_FACT_".$items[1]);
@@ -1469,7 +1465,7 @@ function PrintReady($text, $InHeaders=false) {
  * @param string $bdate	child birthdate
  */
 function print_parents_age($pid, $bdate) {
-	global $gm_lang, $GM_IMAGES;
+	global $GM_IMAGES;
 	
 	if (GedcomConfig::$SHOW_PARENTS_AGE) {
 		$famids = FindFamilyIds($pid);
@@ -1482,13 +1478,13 @@ function print_parents_age($pid, $bdate) {
 			$spouse = $parents["HUSB"];
 			if ($spouse && PrivacyFunctions::showFact("BIRT", $spouse)) {
 				$age = ConvertNumber(GetAge(FindPersonRecord($spouse), $bdate, false));
-				if (10<$age && $age<80) $father_text = "<img src=\"".GM_IMAGE_DIR."/" . $GM_IMAGES["sex"]["small"] . "\" title=\"" . $gm_lang["father"] . "\" alt=\"" . $gm_lang["father"] . "\" class=\"sex_image\" />$age";
+				if (10<$age && $age<80) $father_text = "<img src=\"".GM_IMAGE_DIR."/" . $GM_IMAGES["sex"]["small"] . "\" title=\"" . GM_LANG_father . "\" alt=\"" . GM_LANG_father . "\" class=\"sex_image\" />$age";
 			}
 			// mother
 			$spouse = $parents["WIFE"];
 			if ($spouse && PrivacyFunctions::showFact("BIRT", $spouse)) {
 				$age = ConvertNumber(GetAge(FindPersonRecord($spouse), $bdate, false));
-				if (10<$age && $age<80) $mother_text = "<img src=\"".GM_IMAGE_DIR."/" . $GM_IMAGES["sexf"]["small"] . "\" title=\"" . $gm_lang["mother"] . "\" alt=\"" . $gm_lang["mother"] . "\" class=\"sex_image\" />$age";
+				if (10<$age && $age<80) $mother_text = "<img src=\"".GM_IMAGE_DIR."/" . $GM_IMAGES["sexf"]["small"] . "\" title=\"" . GM_LANG_mother . "\" alt=\"" . GM_LANG_mother . "\" class=\"sex_image\" />$age";
 			}
 			if ((!empty($father_text)) || (!empty($mother_text))) print "<span class=\"age\">".$father_text.$mother_text."</span>";
 		}
@@ -1505,7 +1501,6 @@ function print_parents_age($pid, $bdate) {
  * @param string $indirec	optional individual record (to print age)
  */
 function print_fact_date($factrec, $anchor=false, $time=false, $fact=false, $pid=false, $indirec=false, $prt=true) {
-	global $gm_lang;
 
 	$prtstr = "";
 	$ct = preg_match("/2 DATE (.+)/", $factrec, $match);
@@ -1539,7 +1534,7 @@ function print_fact_date($factrec, $anchor=false, $time=false, $fact=false, $pid
 		// 1 DEAT Y with no DATE => print YES
 		// 1 DEAT N is not allowed
 		// It is not proper GEDCOM form to use a N(o) value with an event tag to infer that it did not happen.
-		if (preg_match("/^1\s(BIRT|DEAT|MARR|DIV|CHR|CREM|BURI)\sY/", $factrec) && !preg_match("/\n2\s(DATE|PLAC)/", $factrec)) $prtstr .= $gm_lang["yes"]."&nbsp;";
+		if (preg_match("/^1\s(BIRT|DEAT|MARR|DIV|CHR|CREM|BURI)\sY/", $factrec) && !preg_match("/\n2\s(DATE|PLAC)/", $factrec)) $prtstr .= GM_LANG_yes."&nbsp;";
 	}
 	// gedcom indi age
 	$ages=array();
@@ -1561,8 +1556,8 @@ function print_fact_date($factrec, $anchor=false, $time=false, $fact=false, $pid
 	foreach ($ages as $indexval=>$agerec) {
 		if (!empty($agerec)) {
 			$prtstr .= "<span class=\"label\">";
-			if ($indexval==1) $prtstr .= $gm_lang["husband"];
-			else if ($indexval==2) $prtstr .= $gm_lang["wife"];
+			if ($indexval==1) $prtstr .= GM_LANG_husband;
+			else if ($indexval==2) $prtstr .= GM_LANG_wife;
 			else $prtstr .= GM_FACT_AGE;
 			$prtstr .= "</span>: ";
 			$age = GetAgeAtEvent(substr($agerec,5));
@@ -1586,7 +1581,7 @@ function print_fact_date($factrec, $anchor=false, $time=false, $fact=false, $pid
  * @param boolean $lds		option to print LDS TEMPle and STATus
  */
 function print_fact_place($factrec, $anchor=false, $sub=false, $lds=false, $prt=true) {
-	global $TEMPLE_CODES, $gm_lang;
+	global $TEMPLE_CODES;
 
 	$printed = false;
 	$out = false;
@@ -1691,15 +1686,15 @@ function print_fact_place($factrec, $anchor=false, $sub=false, $lds=false, $prt=
 		if ($ct>0) {
 			$tcode = trim($match[1]);
 			if (array_key_exists($tcode, $TEMPLE_CODES)) {
-				$prtstr .= "<br />".$gm_lang["temple"].": ".$TEMPLE_CODES[$tcode];
+				$prtstr .= "<br />".GM_LANG_temple.": ".$TEMPLE_CODES[$tcode];
 			}
 			else {
-				$prtstr .= "<br />".$gm_lang["temple_code"].$tcode;
+				$prtstr .= "<br />".GM_LANG_temple_code.$tcode;
 			}
 		}
 		$ct = preg_match("/2 STAT (.*)/", $factrec, $match);
 		if ($ct>0) {
-			$prtstr .= "<br />".$gm_lang["status"].": ";
+			$prtstr .= "<br />".GM_LANG_status.": ";
 			$prtstr .= trim($match[1]);
 		}
 	}
@@ -1715,7 +1710,7 @@ function print_fact_place($factrec, $anchor=false, $sub=false, $lds=false, $prt=
  * @param string $key	indi pid
  */
 function print_first_major_fact($key, $indirec="", $prt=true, $break=false) {
-	global $gm_lang, $GM_BASE_DIRECTORY, $factsfile, $LANGUAGE;
+	global $GM_BASE_DIRECTORY, $factsfile, $LANGUAGE;
 	
 	$majorfacts = array("BIRT", "CHR", "BAPM", "DEAT", "BURI", "BAPL", "ADOP");
 	if (empty($indirec)) $indirec = FindPersonRecord($key);
@@ -1726,7 +1721,7 @@ function print_first_major_fact($key, $indirec="", $prt=true, $break=false) {
 			if ($break) $retstr .= "<br />";
 			else $retstr .= " -- ";
 			$retstr .= "<i>";
-			if (isset($gm_lang[$fact])) $retstr .= $gm_lang[$fact];
+			if (defined("GM_LANG_".$fact)) $retstr .= constant("GM_LANG_".$fact);
 			else if (defined("GM_FACT_".$fact)) $retstr .= constant("GM_FACT_".$fact);
 			else $retstr .= $fact;
 			$retstr .= " ";
@@ -1750,24 +1745,24 @@ function print_first_major_fact($key, $indirec="", $prt=true, $break=false) {
  * @param none
  */
 function init_calendar_popup() {
-	global $monthtonum, $gm_lang, $WEEK_START;
+	global $monthtonum, $WEEK_START;
 
 	print "<script language=\"JavaScript\" type='text/javascript'>\n<!--\n";
 	// month names
 	print "cal_setMonthNames(";
 	foreach($monthtonum as $mon=>$num) {
-		if (isset($gm_lang[$mon])) {
+		if (defined("GM_LANG_".$mon)) {
 			if ($num>1) print ",";
-			print "\"".$gm_lang[$mon]."\"";
+			print "\"".constant("GM_LANG_".$mon)."\"";
 		}
 	}
 	print ");\n";
 	// day headers
 	print "cal_setDayHeaders(";
 	foreach(array('sunday_1st','monday_1st','tuesday_1st','wednesday_1st','thursday_1st','friday_1st','saturday_1st') as $indexval => $day) {
-		if (isset($gm_lang[$day])) {
+		if (defined("GM_LANG_".$day)) {
 			if ($day!=="sunday_1st") print ",";
-			print "\"".$gm_lang[$day]."\"";
+			print "\"".constant("GM_LANG_".$day)."\"";
 		}
 	}
 	print ");\n";
@@ -1789,7 +1784,7 @@ function init_calendar_popup() {
  * @param		string		$page		The page the links should point to
  */
 function PrintSurnameList($surnames, $page, $allgeds="no", $resturl="") {
-	global $TEXT_DIRECTION, $gm_lang;
+	global $TEXT_DIRECTION;
 	global $surname_sublist, $indilist, $indi_hide, $indi_total;
 	
 	if (stristr($page, "aliveinyear")) {
@@ -1824,7 +1819,7 @@ function PrintSurnameList($surnames, $page, $allgeds="no", $resturl="") {
 		else if (substr($namecount["name"], 0, 4) == "@N.N") {
 			print "<div class =\"ltr\" dir=\"ltr\">&nbsp;<a href=\"".$page."?alpha=".$namecount["alpha"]."&amp;surname_sublist=$surname_sublist&amp;surname=@N.N.".$resturl;
  			if ($allgeds == "yes") print "&amp;allgeds=yes";
-			print "\">&nbsp;".$gm_lang["NN"] . "&lrm; - [".($namecount["match"])."]&lrm;&nbsp;";
+			print "\">&nbsp;".GM_LANG_NN . "&lrm; - [".($namecount["match"])."]&lrm;&nbsp;";
 		}
 		else {
 			print "<div class =\"ltr\" dir=\"ltr\">&nbsp;<a href=\"".$page."?alpha=".urlencode($namecount["alpha"])."&amp;surname_sublist=$surname_sublist&amp;surname=".urlencode($namecount["name"]).$resturl;
@@ -1848,16 +1843,16 @@ function PrintSurnameList($surnames, $page, $allgeds="no", $resturl="") {
 	print "</td>\n";
 	if ($count>1 || count($indi_hide)>0) {
 		print "</tr><tr><td colspan=\"$col\" class=\"center\">&nbsp;";
-		if (GedcomConfig::$SHOW_MARRIED_NAMES && $count>1) print $gm_lang["total_names"]." ".$count_indi."<br />";
-		if (isset($indi_total) && $count>1) print $gm_lang["total_indis"]." ".$indi_total."&nbsp;";
+		if (GedcomConfig::$SHOW_MARRIED_NAMES && $count>1) print GM_LANG_total_names." ".$count_indi."<br />";
+		if (isset($indi_total) && $count>1) print GM_LANG_total_indis." ".$indi_total."&nbsp;";
 		if ($count>1 && count($indi_hide)>0) print "--&nbsp;";
-		if (count($indi_hide)>0) print $gm_lang["hidden"]." ".count($indi_hide);
+		if (count($indi_hide)>0) print GM_LANG_hidden." ".count($indi_hide);
 		if ($count>1 && $aiy) {
-			print "<br />".$gm_lang["unborn"]."&nbsp;".$indi_unborn;
-			print "&nbsp;--&nbsp;".$gm_lang["alive"]."&nbsp;".$indi_alive;
-			print "&nbsp;--&nbsp;".$gm_lang["dead"]."&nbsp;".$indi_dead;
+			print "<br />".GM_LANG_unborn."&nbsp;".$indi_unborn;
+			print "&nbsp;--&nbsp;".GM_LANG_alive."&nbsp;".$indi_alive;
+			print "&nbsp;--&nbsp;".GM_LANG_dead."&nbsp;".$indi_dead;
 		}
-		if ($count>1) print "<br />".$gm_lang["surnames"]." ".$count;
+		if ($count>1) print "<br />".GM_LANG_surnames." ".$count;
 		print "</td>\n";
 	}
 	print "</tr></table>";
@@ -1876,7 +1871,7 @@ function PrintSurnameList($surnames, $page, $allgeds="no", $resturl="") {
  * @param		boolean	$find		Set to yes to print links for the find pages
  */
 function PrintFamilyList($familylist, $print_all=true, $find=false, $allgeds="no") {
-	global $TEXT_DIRECTION, $gm_lang, $COMBIKEY;
+	global $TEXT_DIRECTION, $COMBIKEY;
 	global $surname_sublist, $show_all, $famlist, $fam_hide, $alpha, $falpha;
 	global $firstname_alpha, $fam_private, $show_all_firstnames, $surname;
 	
@@ -1908,7 +1903,7 @@ function PrintFamilyList($familylist, $print_all=true, $find=false, $allgeds="no
 		// NOTE: Sort the family array
 		uasort($firstalpha, "LetterSort");
 		print "<td class=\"shade1 list_value wrap center\" colspan=\"2\">\n";
-		print $gm_lang["first_letter_fname"]."<br />\n";
+		print GM_LANG_first_letter_fname."<br />\n";
 		foreach($firstalpha as $letter=>$list) {
 			$pass = false;
 			if ($letter != "@") {
@@ -1938,12 +1933,12 @@ function PrintFamilyList($familylist, $print_all=true, $find=false, $allgeds="no
 			if (isset($falpha) && $falpha == "@") {
 				print "<a href=\"famlist.php?alpha=".urlencode($alpha)."&amp;surname=".urlencode($surname)."&amp;falpha=@&amp;surname_sublist=yes";
 				if ($allgeds == "yes") print "&amp;allgeds=yes";
-				print "\"><span class=\"warning\">".PrintReady($gm_lang["NN"])."</span></a>";
+				print "\"><span class=\"warning\">".PrintReady(GM_LANG_NN)."</span></a>";
 			}
 			else {
 				print "<a href=\"famlist.php?alpha=".urlencode($alpha)."&amp;surname=".urlencode($surname)."&amp;falpha=@&amp;surname_sublist=yes";
 				if ($allgeds == "yes") print "&amp;allgeds=yes";
-				print "\">".PrintReady($gm_lang["NN"])."</a>";
+				print "\">".PrintReady(GM_LANG_NN)."</a>";
 			}
 			if (GedcomConfig::$LISTS_ALL) print " | \n";
 			$pass = FALSE;
@@ -1955,8 +1950,8 @@ function PrintFamilyList($familylist, $print_all=true, $find=false, $allgeds="no
 			// NOTE: Include the surname if surnames are to be listed
 			if ($allgeds == "yes") print "allgeds=yes&amp;";
 			if ($surname_sublist == "yes" && isset($surname)) print "surname=".urlencode($surname)."&amp;";
-			if ($show_all_firstnames=="yes") print "show_all_firstnames=no&amp;show_all=$show_all&amp;surname_sublist=$surname_sublist\"><span class=\"warning\">".$gm_lang["all"]."</span>\n";
-			else print "show_all_firstnames=yes&amp;show_all=$show_all&amp;surname_sublist=$surname_sublist\">".$gm_lang["all"]."</a>\n";
+			if ($show_all_firstnames=="yes") print "show_all_firstnames=no&amp;show_all=$show_all&amp;surname_sublist=$surname_sublist\"><span class=\"warning\">".GM_LANG_all."</span>\n";
+			else print "show_all_firstnames=yes&amp;show_all=$show_all&amp;surname_sublist=$surname_sublist\">".GM_LANG_all."</a>\n";
 		}
 		print "</td></tr><tr>\n";
 		if (isset($fstartalpha)) $falpha = $fstartalpha;
@@ -1997,10 +1992,10 @@ function PrintFamilyList($familylist, $print_all=true, $find=false, $allgeds="no
 		$newcol=ceil($count/$col);
 		if ($count>1 || count($fam_hide)>0) {
 			print "</tr><tr><td colspan=\"$col\" align=\"center\">&nbsp;";
-			if ($count>1) print $gm_lang["total_fams"]." ".count($famlist)."&nbsp;";
+			if ($count>1) print GM_LANG_total_fams." ".count($famlist)."&nbsp;";
 			if ($count>1 && count($fam_hide)>0) print "--&nbsp;";
-			if (count($fam_hide)>0) print $gm_lang["hidden"]." ".count($fam_hide);
-//			if ($count>1) print "<br />".$gm_lang["surnames"]." ".$count;
+			if (count($fam_hide)>0) print GM_LANG_hidden." ".count($fam_hide);
+//			if ($count>1) print "<br />".GM_LANG_surnames." ".$count;
 			print "</td>\n";
 		}
 	}
@@ -2028,18 +2023,18 @@ function ExpandUrl($text) {
 }
 
 function PrintFilterEvent($filterev) {
-	global $gm_lang;
 	
 	print "<option value=\"all\"";
 	if ($filterev == "all") print " selected=\"selected\"";
-	print ">".$gm_lang["all"]."</option>\n";		
+	print ">".GM_LANG_all."</option>\n";		
 	
+	// If this array is changed, also change the selection for the search facts in calendar.php!
 	$events = array("BIRT", "CHR", "CHRA", "BAPM", "_COML", "MARR", "DIV", "DEAT", "BURI", "IMMI", "EMIG", "EVEN");
 	
 	foreach($events as $nothing => $event) {
 		print "<option value=\"".$event."\"";
 		if ($filterev == $event) print " selected=\"selected\"";
-		if ($filterev == "EVEN") print ">".$gm_lang["custom_event"]."</option>\n";
+		if ($filterev == "EVEN") print ">".GM_LANG_custom_event."</option>\n";
 		else print ">".constant("GM_FACT_".$event)."</option>\n";
 	}
 }

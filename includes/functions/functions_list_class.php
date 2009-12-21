@@ -100,7 +100,7 @@ abstract class ListFunctions {
 	 * @param		string		$page		The page the links should point to
 	 */
 	public function PrintSurnameList($surnames, $page, $allgeds="no", $resturl="") {
-		global $TEXT_DIRECTION, $gm_lang;
+		global $TEXT_DIRECTION;
 		global $surname_sublist, $indilist;
 		
 		if (stristr($page, "aliveinyear")) {
@@ -135,7 +135,7 @@ abstract class ListFunctions {
 			else if (substr($namecount["name"], 0, 4) == "@N.N") {
 				print "<div class =\"ltr\" dir=\"ltr\">&nbsp;<a href=\"".$page."?alpha=".$namecount["alpha"]."&amp;surname_sublist=$surname_sublist&amp;surname=@N.N.".$resturl;
 	 			if ($allgeds == "yes") print "&amp;allgeds=yes";
-				print "\">&nbsp;".$gm_lang["NN"] . "&lrm; - [".($namecount["match"])."]&lrm;&nbsp;";
+				print "\">&nbsp;".GM_LANG_NN . "&lrm; - [".($namecount["match"])."]&lrm;&nbsp;";
 			}
 			else {
 				print "<div class =\"ltr\" dir=\"ltr\">&nbsp;<a href=\"".$page."?alpha=".urlencode($namecount["alpha"])."&amp;surname_sublist=$surname_sublist&amp;surname=".urlencode($namecount["name"]).$resturl;
@@ -159,16 +159,16 @@ abstract class ListFunctions {
 		print "</td>\n";
 		if ($count>1 || count(self::$indi_hide)>0) {
 			print "</tr><tr><td colspan=\"$col\" class=\"center\">&nbsp;";
-			if (GedcomConfig::$SHOW_MARRIED_NAMES && $count>1) print $gm_lang["total_names"]." ".$count_indi."<br />";
-			if (isset($indi_total) && $count>1) print $gm_lang["total_indis"]." ".$indi_total."&nbsp;";
+			if (GedcomConfig::$SHOW_MARRIED_NAMES && $count>1) print GM_LANG_total_names." ".$count_indi."<br />";
+			if (isset($indi_total) && $count>1) print GM_LANG_total_indis." ".$indi_total."&nbsp;";
 			if ($count>1 && count(self::$indi_hide)>0) print "--&nbsp;";
-			if (count(self::$indi_hide)>0) print $gm_lang["hidden"]." ".count(self::$indi_hide);
+			if (count(self::$indi_hide)>0) print GM_LANG_hidden." ".count(self::$indi_hide);
 			if ($count>1 && $aiy) {
-				print "<br />".$gm_lang["unborn"]."&nbsp;".$indi_unborn;
-				print "&nbsp;--&nbsp;".$gm_lang["alive"]."&nbsp;".$indi_alive;
-				print "&nbsp;--&nbsp;".$gm_lang["dead"]."&nbsp;".$indi_dead;
+				print "<br />".GM_LANG_unborn."&nbsp;".$indi_unborn;
+				print "&nbsp;--&nbsp;".GM_LANG_alive."&nbsp;".$indi_alive;
+				print "&nbsp;--&nbsp;".GM_LANG_dead."&nbsp;".$indi_dead;
 			}
-			if ($count>1) print "<br />".$gm_lang["surnames"]." ".$count;
+			if ($count>1) print "<br />".GM_LANG_surnames." ".$count;
 			print "</td>\n";
 		}
 		print "</tr></table>";

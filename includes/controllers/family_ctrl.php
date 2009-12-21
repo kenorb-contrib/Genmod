@@ -47,7 +47,6 @@ class FamilyController extends DetailController
 			$bheight,
 			$famlist,
 			$GEDCOMID,
-			$gm_lang,
 			$ENABLE_CLIPPINGS_CART,
 			$nonfacts
 		;
@@ -80,7 +79,6 @@ class FamilyController extends DetailController
 	}
 	
 	protected function GetPageTitle() {
-		global $gm_lang;
 		
 		if (is_null($this->pagetitle)) {
 			
@@ -92,13 +90,12 @@ class FamilyController extends DetailController
 			
 			$this->pagetitle = $hname." + ".$wname;
 			if (GedcomConfig::$SHOW_ID_NUMBERS) $this->pagetitle .= " - ".$this->family->xref;
-			$this->pagetitle .= " - ".$gm_lang['family_info'];
+			$this->pagetitle .= " - ".GM_LANG_family_info;
 		}
 		return $this->pagetitle;
 	}
 	
 	protected function GetTitle() {
-		global $gm_lang;
 		
 		if (is_null($this->title)) {
 			$this->title = $this->family->descriptor;
@@ -123,24 +120,23 @@ class FamilyController extends DetailController
 	 * @return Menu
 	 */
 	public function &getChartsMenu() {
-		global $gm_lang;
 		
 		// charts menu
-		$menu = new Menu($gm_lang['charts']);
+		$menu = new Menu(GM_LANG_charts);
 		$menu->addLink('timeline.php?pids[0]='.$this->family->husb_id.'&pids[1]='.$this->family->wife_id);
 		
 		// charts / parents_timeline
-		$submenu = new Menu($gm_lang['parents_timeline']);
+		$submenu = new Menu(GM_LANG_parents_timeline);
 		$submenu->addLink('timeline.php?pids[0]='.$this->family->husb_id.'&pids[1]='.$this->family->wife_id);
 		$menu->addSubmenu($submenu);
 		
 		// charts / children_timeline
-		$submenu = new Menu($gm_lang['children_timeline']);
+		$submenu = new Menu(GM_LANG_children_timeline);
 		$submenu->addLink('timeline.php?'.$this->getChildrenUrlTimeline());
 		$menu->addSubmenu($submenu);
 		
 		// charts / family_timeline
-		$submenu = new Menu($gm_lang['family_timeline']);
+		$submenu = new Menu(GM_LANG_family_timeline);
 		$submenu->addLink('timeline.php?pids[0]='.$this->family->husb_id.'&pids[1]='.$this->family->wife_id.'&'.$this->getChildrenUrlTimeline(2));
 		$menu->addSubmenu($submenu);
 		
@@ -151,46 +147,46 @@ class FamilyController extends DetailController
 	 * get the family page edit menu
 	 */
 	public function &getEditMenu() {
-		global $gm_lang, $gm_user;
+		global $gm_user;
 		
 		// edit_fam menu
-		$menu = new Menu($gm_lang['edit_fam']);
+		$menu = new Menu(GM_LANG_edit_fam);
 		if (!$this->family->isdeleted && $this->family->canedit) {
 
 			// edit_fam / members
-			$submenu = new Menu($gm_lang['change_family_members']);
+			$submenu = new Menu(GM_LANG_change_family_members);
 			$submenu->addLink("change_family_members('".$this->family->xref."', 'change_family_members');");
 			$menu->addSubmenu($submenu);
 
 			// edit_fam / add child
-			$submenu = new Menu($gm_lang['add_child_to_family']);
+			$submenu = new Menu(GM_LANG_add_child_to_family);
 			$submenu->addLink("addnewchild('".$this->family->xref."', 'add_child_to_family');");
 			$menu->addSubmenu($submenu);
 
 			// edit_fam / reorder_children. Only show if #kids > 1
 			if ($this->family->children_count > 1) {
-				$submenu = new Menu($gm_lang['reorder_children']);
+				$submenu = new Menu(GM_LANG_reorder_children);
 				$submenu->addLink("reorder_children('".$this->family->xref."', 'reorder_children');");
 				$menu->addSubmenu($submenu);
 			}
 			
 			// edit_fam / reorder_media. Only show if #media > 1
 			if ($this->family->media_count > 1) {
-				$submenu = new Menu($gm_lang['reorder_media']);
+				$submenu = new Menu(GM_LANG_reorder_media);
 				$submenu->addLink("reorder_media('".$this->family->xref."', 'reorder_media', 'FAM');");
 				$menu->addSubmenu($submenu);
 			}
 			
 			// edit_fam / delete_family. Don't show if unapproved fam.
 			if (!$this->family->isnew && !$this->family->isdeleted) {
-				$submenu = new Menu($gm_lang['delete_family']);
-				$submenu->addLink("if (confirm('".$gm_lang["delete_family_confirm"]."')) delete_family('".$this->family->xref."', 'delete_family');");
+				$submenu = new Menu(GM_LANG_delete_family);
+				$submenu->addLink("if (confirm('".GM_LANG_delete_family_confirm."')) delete_family('".$this->family->xref."', 'delete_family');");
 				$menu->addSubmenu($submenu);
 			}
 
 			// edit_fam / edit_raw
 			if ($gm_user->userCanEditGedlines()) {
-				$submenu = new Menu($gm_lang['edit_raw']);
+				$submenu = new Menu(GM_LANG_edit_raw);
 				$submenu->addLink("edit_raw('".$this->family->xref."', 'edit_raw', 'FAM');");
 				$menu->addSubmenu($submenu);
 			}
@@ -205,8 +201,8 @@ class FamilyController extends DetailController
 			}
 
 			// edit_fam / show/hide changes
-				if (!$this->show_changes) $submenu = new Menu($gm_lang['show_changes']);
-				else $submenu = new Menu($gm_lang['hide_changes']);
+				if (!$this->show_changes) $submenu = new Menu(GM_LANG_show_changes);
+				else $submenu = new Menu(GM_LANG_hide_changes);
 				$submenu->addLink('showchanges();');
 				$menu->addSubmenu($submenu);
 		}
@@ -218,28 +214,27 @@ class FamilyController extends DetailController
 	 * @return Menu
 	 */
 	public function &getOtherMenu() {
-		global $gm_lang;
 		global $ENABLE_CLIPPINGS_CART, $gm_user;
 		
 		// other menu
-		$menu = new Menu($gm_lang['other']);
+		$menu = new Menu(GM_LANG_other);
 		if ($gm_user->userCanViewGedlines()) {
 				// other / view_gedcom
 				if ($this->show_changes) $execute = "show_gedcom_record('new');";
 				else $execute = "show_gedcom_record();";
-				$submenu = new Menu($gm_lang['view_gedcom']);
+				$submenu = new Menu(GM_LANG_view_gedcom);
 				$submenu->addLink($execute);
 				$menu->addSubmenu($submenu);
 		}
 		if ($ENABLE_CLIPPINGS_CART >= $gm_user->getUserAccessLevel()) {
 				// other / add_to_cart
-				$submenu = new Menu($gm_lang['add_to_cart']);
+				$submenu = new Menu(GM_LANG_add_to_cart);
 				$submenu->addLink('clippings.php?action=add&id='.$this->family->xref.'&type=fam');
 				$menu->addSubmenu($submenu);
 		}
 		if ($this->family->disp && $this->uname != "") {
 				// other / add_to_my_favorites
-				$submenu = new Menu($gm_lang['add_to_my_favorites']);
+				$submenu = new Menu(GM_LANG_add_to_my_favorites);
 				$submenu->addLink('family.php?action=addfav&famid='.$this->family->xref.'&gedid='.$this->family->gedcomid);
 				$menu->addSubmenu($submenu);
 		}
@@ -247,14 +242,14 @@ class FamilyController extends DetailController
 	}
 	
 	public function PrintFamilyGroupHeader() {
-		global $gm_lang, $hits;
+		global $hits;
 		
-		print "\n\t<br /><span class=\"subheaders\">" . $gm_lang["family_group_info"];
+		print "\n\t<br /><span class=\"subheaders\">" . GM_LANG_family_group_info;
 		print $this->family->addxref;
 		print "</span>";
 		if(GedcomConfig::$SHOW_COUNTER) {
 			// Print indi counter only if displaying a non-private person
-			print "\n<span style=\"margin-left: 3px; vertical-align:bottom;\">".$gm_lang["hit_count"]."&nbsp;".$hits."</span>\n";
+			print "\n<span style=\"margin-left: 3px; vertical-align:bottom;\">".GM_LANG_hit_count."&nbsp;".$hits."</span>\n";
 		}
 	}
 }
