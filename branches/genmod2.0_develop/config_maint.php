@@ -42,13 +42,13 @@ if (!$gm_user->userIsAdmin()) {
 	exit;
 }
 
-PrintHeader($gm_lang["config_maint"]);
+PrintHeader(GM_LANG_config_maint);
 
 ?>
 <!-- Setup the left box -->
 <div id="admin_genmod_left">
-	<div class="admin_link"><a href="admin.php"><?php print $gm_lang["admin"];?></a></div>
-	<div class="admin_link"><a href="admin_maint.php"><?php print $gm_lang["administration_maintenance"];?></a></div>
+	<div class="admin_link"><a href="admin.php"><?php print GM_LANG_admin;?></a></div>
+	<div class="admin_link"><a href="admin_maint.php"><?php print GM_LANG_administration_maintenance;?></a></div>
 </div>
 
 <div id="content">
@@ -56,7 +56,7 @@ PrintHeader($gm_lang["config_maint"]);
 	if ($action == "update" && isset($delconf)) {
 		foreach ($delconf as $key => $value) {
 			if (!$SystemConfig->DeleteConfig($value)) {
-				$message = "<span class=\"error\">".$gm_lang["gm_config_write_error"]."</span>";
+				$message = "<span class=\"error\">".GM_LANG_gm_config_write_error."</span>";
 				break;
 			}
 			else unset($CONFIG_PARMS[$value]);
@@ -68,7 +68,7 @@ PrintHeader($gm_lang["config_maint"]);
 		<div class="admin_topbottombar">
 			<h3>
 				<?php print_help_link("config_maint_help", "qm", "config_maint");?>
-				<?php print $gm_lang["config_maint"]; ?>
+				<?php print GM_LANG_config_maint; ?>
 			</h3>
 		</div>
 		<?php
@@ -77,9 +77,9 @@ PrintHeader($gm_lang["config_maint"]);
 		}
 		?>
 		<div class="admin_item_box shade2">
-			<div class="width10 choice_left"><?php print $gm_lang["select"]; ?></div>
-			<div class="width30 choice_right"><?php print $gm_lang["site_name"]; ?></div>
-			<div class="width30 choice_right"><?php print $gm_lang["SITE_ALIAS"]; ?></div>
+			<div class="width10 choice_left"><?php print GM_LANG_select; ?></div>
+			<div class="width30 choice_right"><?php print GM_LANG_site_name; ?></div>
+			<div class="width30 choice_right"><?php print GM_LANG_SITE_ALIAS; ?></div>
 		</div>
 		<?php
 			foreach ($CONFIG_PARMS as $site => $parms) {
@@ -104,7 +104,7 @@ PrintHeader($gm_lang["config_maint"]);
 			<?php } ?>
 			<div class="admin_item_box center shade2">
 				<br />
-				<input type="submit" value="<?php print $gm_lang["delete_sel_configs"];?>" />
+				<input type="submit" value="<?php print GM_LANG_delete_sel_configs;?>" />
 			</div>
 	</form>
 </div>

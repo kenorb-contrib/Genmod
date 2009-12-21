@@ -49,7 +49,7 @@ $show_full = $descendancy_controller->show_full;
 // -- print html header information
 print "<div id=\"content_pedigree\">";
 
-print "\n\t<h3>".$gm_lang["descend_chart"].":";
+print "\n\t<h3>".GM_LANG_descend_chart.":";
 print "<br />".PrintReady($descendancy_controller->root->name);
 if ($descendancy_controller->root->addname != "") print "<br />" . PrintReady($descendancy_controller->root->addname);
 print "</h3>";

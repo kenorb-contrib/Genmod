@@ -59,19 +59,19 @@ switch($action) {
 		$types = array("INDI", "FAM", "SOUR", "REPO", "OBJE", "NOTE");
 		$desc = array("individual", "family", "source", "repo", "media_object", "note");
 		foreach($types as $k=>$type) {
-			print $gm_lang["next_free"]." ".$gm_lang[$desc[$k]].": ".GetNewXref($type)."<br />";
+			print GM_LANG_next_free." ".constant("GM_LANG_".$desc[$k]).": ".GetNewXref($type)."<br />";
 		}
 	break;
 	
 	case "checkuser":
 		$u =& User::GetInstance($username);
-		if (!$u->is_empty) print "<span class=\"error\">".$gm_lang["duplicate_username"]."</span>";
+		if (!$u->is_empty) print "<span class=\"error\">".GM_LANG_duplicate_username."</span>";
 		else print "";
 	break;
 	
 	case "checkemail":
 		if (empty($email) || CheckEmailAddress($email)) print "";
-		else print "<span class=\"error\">".$gm_lang["invalid_email"]."</span>";
+		else print "<span class=\"error\">".GM_LANG_invalid_email."</span>";
 	break;
 
 	case "getpersonname":
@@ -81,7 +81,7 @@ switch($action) {
 		else {
 			$person =& Person::GetInstance($pid);
 			if ($person->isempty) {
-				print "<span class=\"error\">".$gm_lang["indi_id_no_exists"]."</span>";
+				print "<span class=\"error\">".GM_LANG_indi_id_no_exists."</span>";
 			}
 			else if ($person->disp_name) print $person->name.$person->addxref;
 			else print "";
@@ -107,7 +107,7 @@ switch($action) {
 		else {
 			$family =& Family::GetInstance($famid);
 			if ($family->isempty) {
-				print "<span class=\"error\">".$gm_lang["fam_id_no_exists"]."</span>";
+				print "<span class=\"error\">".GM_LANG_fam_id_no_exists."</span>";
 			}
 			else if ($family->disp) print $family->descriptor.$family->addxref;
 			else print "";
@@ -120,7 +120,7 @@ switch($action) {
 		else {
 			$source =& Source::GetInstance($sid);
 			if ($source->isempty) {
-				print "<span class=\"error\">".$gm_lang["source_id_no_exists"]."</span>";
+				print "<span class=\"error\">".GM_LANG_source_id_no_exists."</span>";
 			}
 			else if ($source->disp) print $source->descriptor.$source->addxref;
 			else print "";
@@ -133,7 +133,7 @@ switch($action) {
 		else {
 			$repo =& Repository::GetInstance($rid);
 			if ($repo->isempty) {
-				print "<span class=\"error\">".$gm_lang["repo_id_no_exists"]."</span>";
+				print "<span class=\"error\">".GM_LANG_repo_id_no_exists."</span>";
 			}
 			else if ($repo->disp) print $repo->title.$repo->addxref;
 			else print "";
@@ -146,7 +146,7 @@ switch($action) {
 		else {
 			$media =& MediaItem::GetInstance($mid);
 			if ($media->isempty) {
-				print "<span class=\"error\">".$gm_lang["media_id_no_exists"]."</span>";
+				print "<span class=\"error\">".GM_LANG_media_id_no_exists."</span>";
 			}
 			else if ($media->disp) print $media->title.$media->addxref;
 			else print "";
@@ -160,7 +160,7 @@ switch($action) {
 			$note =& Note::GetInstance($oid);
 			// Note is deleted or doesn't exist
 			if ($note->isempty) {
-				print "<span class=\"error\">".$gm_lang["note_id_no_exists"]."</span>";
+				print "<span class=\"error\">".GM_LANG_note_id_no_exists."</span>";
 			}
 			else if ($note->disp) print $note->GetTitle(40, true).$note->addxref;
 			else print "";
@@ -258,7 +258,7 @@ switch($action) {
 						print "</a>";
 					}
 					if ($spouse != "" && !$factobj->owner->view) print " - ";
-					if (!$factobj->owner->view) print "<a href=\"family.php?famid=".$famid."&amp;gedid=".$GEDCOMID."\">[".$gm_lang["view_family"]."]</a>\n";
+					if (!$factobj->owner->view) print "<a href=\"family.php?famid=".$famid."&amp;gedid=".$GEDCOMID."\">[".GM_LANG_view_family."]</a>\n";
 				}
 				$factobj->PrintFactPlace(true, true);
 				$prted = FactFunctions::PrintAssoRelaRecord($factobj, $pid, true);

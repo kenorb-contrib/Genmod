@@ -42,12 +42,12 @@ if (!isset($action) or $action=="") $action="editold";
 switch ($action) {
 	case "addnew" :
 		$helpindex = "add_new_language_help";
-		PrintHeader($gm_lang["add_new_language"]); 
+		PrintHeader(GM_LANG_add_new_language); 
 		break;
 
 	case "editold" :
 	default :
-		PrintHeader($gm_lang["edit_lang_utility"]);
+		PrintHeader(GM_LANG_edit_lang_utility);
 }
 ?>
 <script language="JavaScript" type="text/javascript">
@@ -66,7 +66,7 @@ $configuredlanguages = LanguageInUse();
 // Sort the Language table into localized language name order
 foreach ($gm_language as $key => $value){
 	$d_LangName = "lang_name_".$key;
-	$Sorted_Langs[$key] = $gm_lang[$d_LangName];
+	$Sorted_Langs[$key] = constant("GM_LANG_".$d_LangName);
 }
 asort($Sorted_Langs);
 
@@ -88,8 +88,8 @@ $maxlines = max($active, $inactive);
 ?>
 <!-- Setup the left box -->
 <div id="admin_genmod_left">
-	<div class="admin_link"><a href="admin.php"><?php print $gm_lang["admin"];?></a></div>
-	<div class="admin_link"><a href="editlang.php"><?php print $gm_lang["translator_tools"];?></a></div>
+	<div class="admin_link"><a href="admin.php"><?php print GM_LANG_admin;?></a></div>
+	<div class="admin_link"><a href="editlang.php"><?php print GM_LANG_translator_tools;?></a></div>
 </div>
 
 <div id="content">
@@ -100,7 +100,7 @@ $maxlines = max($active, $inactive);
 			<input type="hidden" name="action" value="new_lang" />
 			<input type="hidden" name="execute" value="true" />
 			<div class="admin_topbottombar">
-				<?php print $gm_lang["add_new_language"]; ?>
+				<?php print GM_LANG_add_new_language; ?>
 			</div>
 			<div class="admin_item_box">
 				<div class="width25 choice_left">
@@ -131,7 +131,7 @@ $maxlines = max($active, $inactive);
 					</div>
 				</div>
 				<div class="width25 center choice_right">
-					<input type="submit" value="<?php print $gm_lang["add_new_lang_button"];?>" />
+					<input type="submit" value="<?php print GM_LANG_add_new_lang_button;?>" />
 				</div>
 			</div>
 			</form>
@@ -139,19 +139,19 @@ $maxlines = max($active, $inactive);
 			$USERLANG = $LANGUAGE;
 			break;
 		default : ?>
-			<form name="lang_config_form" method="get" action="<?php print $SCRIPT_NAME;?>">
+			<form name="lang_config_form" method="get" action="<?php print SCRIPT_NAME;?>">
 				<input type="hidden" name="action" value="config_lang" />
 				<div class="admin_topbottombar">
 					<?php print_help_link("config_lang_utility_help", "qm", "config_lang_utility");?>
-					<?php print $gm_lang["config_lang_utility"]; ?>
+					<?php print GM_LANG_config_lang_utility; ?>
 				</div>
 				<div class="admin_item_box">
-					<div class="width25 choice_left"><?php print $gm_lang["lang_language"]; ?></div>
-					<div class="width10 choice_middle"><?php print $gm_lang["active"]; ?></div>
-					<div class="width10 choice_middle"><?php print $gm_lang["edit_settings"]; ?></div>
-					<div class="width25 choice_middle"><?php print $gm_lang["lang_language"]; ?></div>
-					<div class="width10 choice_middle"><?php print $gm_lang["active"]; ?></div>
-					<div class="width10 choice_right"><?php print $gm_lang["edit_settings"]; ?></div>
+					<div class="width25 choice_left"><?php print GM_LANG_lang_language; ?></div>
+					<div class="width10 choice_middle"><?php print GM_LANG_active; ?></div>
+					<div class="width10 choice_middle"><?php print GM_LANG_edit_settings; ?></div>
+					<div class="width25 choice_middle"><?php print GM_LANG_lang_language; ?></div>
+					<div class="width10 choice_middle"><?php print GM_LANG_active; ?></div>
+					<div class="width10 choice_right"><?php print GM_LANG_edit_settings; ?></div>
 				</div>
 				<?php
 				// Print the Language table in sorted name order
@@ -172,7 +172,7 @@ $maxlines = max($active, $inactive);
 						else { 
 							$d_LangName = "lang_name_" . $value; ?>
 							<div class="width25 choice_left">
-								<?php print $gm_lang[$d_LangName]; ?>
+								<?php print constant("GM_LANG_".$d_LangName) ?>
 							</div>
 							<div class="width10 choice_middle">
 								<input
@@ -182,7 +182,7 @@ $maxlines = max($active, $inactive);
 								?>
 							</div>
 							<div class="width10 choice_middle">
-								<a href="javascript: "<?php print $value;?>" onclick="window.open('editlang_edit_settings.php?action=editold&ln=<?php print $value;?>', '', 'top=50,left=10,width=1000,height=600,scrollbars=1,resizable=1'); return false;""><?php print $gm_lang["lang_edit"];?></a>
+								<a href="javascript: "<?php print $value;?>" onclick="window.open('editlang_edit_settings.php?action=editold&ln=<?php print $value;?>', '', 'top=50,left=10,width=1000,height=600,scrollbars=1,resizable=1'); return false;""><?php print GM_LANG_lang_edit;?></a>
 							</div>
 							<?php
 						}
@@ -199,13 +199,13 @@ $maxlines = max($active, $inactive);
 						else { 
 							$d_LangName = "lang_name_" . $value; ?>
 							<div class="width25 choice_left">
-								<?php print $gm_lang[$d_LangName]; ?>
+								<?php print constant("GM_LANG_".$d_LangName); ?>
 							</div>
 							<div class="width10 choice_middle">
 								<input type="checkbox" value="<?php print $value; ?>" onclick="enabledisablelanguage('<?php print $value; ?>');" /> 
 							</div>
 							<div class="width10 choice_right">
-								<a href="javascript: "<?php print $value;?>" onclick="window.open('editlang_edit_settings.php?action=editold&ln=<?php print $value;?>', '', 'top=50,left=10,width=1000,height=600,scrollbars=1,resizable=1'); return false;""><?php print $gm_lang["lang_edit"];?></a>
+								<a href="javascript: "<?php print $value;?>" onclick="window.open('editlang_edit_settings.php?action=editold&ln=<?php print $value;?>', '', 'top=50,left=10,width=1000,height=600,scrollbars=1,resizable=1'); return false;""><?php print GM_LANG_lang_edit;?></a>
 							</div>
 							<?php
 						}
@@ -218,11 +218,11 @@ $maxlines = max($active, $inactive);
 			$USERLANG = $LANGUAGE;
 			?>
 			<div class="admin_topbottombar">
-				<?php print $gm_lang["configured_languages"]; ?>
+				<?php print GM_LANG_configured_languages; ?>
 			</div>
 			<div class="admin_item_box">
 				<div class="width20 choice_left">
-					<?php print $gm_lang["current_gedcoms"];?>
+					<?php print GM_LANG_current_gedcoms;?>
 				</div>
 				<?php
 				foreach ($configuredlanguages["gedcom"] as $key => $value) {
@@ -234,19 +234,19 @@ $maxlines = max($active, $inactive);
 					print "<br /></div>";
 					print "<div class=\"choice_right\">";
 						// Print language name and flag
-						print "<img src=\"".$language_settings[$key]["flagsfile"]."\" class=\"brightflag\" alt=\"".$gm_lang["lang_name_".$key]."\" title=\"".$gm_lang["lang_name_".$key]."\" />&nbsp;".$gm_lang["lang_name_".$key]."<br />";
+						print "<img src=\"".$language_settings[$key]["flagsfile"]."\" class=\"brightflag\" alt=\"".constant("GM_LANG_lang_name_".$key)."\" title=\"".constant("GM_LANG_lang_name_".$key)."\" />&nbsp;".constant("GM_LANG_lang_name_".$key)."<br />";
 					print "</div>";
 					print "</div><div class=\"admin_item_box\"><div class=\"width20 choice_left\">&nbsp;</div>";
 				}
 				?>
 			</div>
 			<div class="admin_item_box">
-				<div class="width20 choice_left"><?php print $gm_lang["users_langs"];?></div>
+				<div class="width20 choice_left"><?php print GM_LANG_users_langs;?></div>
 				<?php
 				foreach ($configuredlanguages["users"] as $key => $value) {
 					print "<div class=\"width20 choice_middle\"><a href=\"useradmin.php?action=listusers&amp;filter=language&amp;usrlang=".$key."\">".count($value)."</a></div>";
 					print "<div class=\"choice_right\">";
-					print "<img src=\"".$language_settings[$key]["flagsfile"]."\" class=\"brightflag\" alt=\"".$gm_lang["lang_name_".$key]."\" title=\"".$gm_lang["lang_name_".$key]."\" />&nbsp;".$gm_lang["lang_name_".$key]."<br /></div>";
+					print "<img src=\"".$language_settings[$key]["flagsfile"]."\" class=\"brightflag\" alt=\"".constant("GM_LANG_lang_name_".$key)."\" title=\"".constant("GM_LANG_lang_name_".$key)."\" />&nbsp;".constant("GM_LANG_lang_name_".$key)."<br /></div>";
 					print "</div><div class=\"admin_item_box\"><div class=\"width20 choice_left\">&nbsp;</div>";
 				}
 				?>

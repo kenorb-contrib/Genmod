@@ -51,7 +51,7 @@ if (!isset($lang_filename_orig)) $lang_filename_orig = "";
 if (!isset($anchor)) $anchor = "";
 if (!isset($realtime)) $realtime = false;
 
-PrintSimpleHeader($gm_lang["editlang"]);
+PrintSimpleHeader(GM_LANG_editlang);
 
 print "<script language=\"JavaScript\" type=\"text/javascript\">";
 print "<!--\nself.focus();\n//-->";
@@ -154,7 +154,7 @@ if ($action == "save") {
 	if ($Write_Ok) print "<td class=\"facts_label03\" style=\"color: #0000FF; font-weight: bold; \">".print_text("original_message",0,1);
 	else {
 		print "<td class=\"warning\" >";
-		print str_replace("#lang_filename#", $lang_filename, $gm_lang["lang_file_write_error"]) . "<br /><br />";
+		print str_replace("#lang_filename#", $lang_filename, GM_LANG_lang_file_write_error) . "<br /><br />";
 	}
 	print "</td>";
 	print "</tr>";
@@ -190,8 +190,8 @@ if ($action == "save") {
 	print "<tr>";
 	print "<td class=\"facts_value\" style=\"text-align:center; \" >";
 	srand((double)microtime()*1000000);
-	if (!$realtime) print "<input type=\"submit\" value=\"" . $gm_lang["close_window"] . "\"" . " onclick=\"window.opener.showchanges('&dv=".rand()."#".$anchor."'); self.close();\" />";
-	else print "<input type=\"submit\" value=\"" . $gm_lang["close_window"] . "\"" . " onclick=\"self.close();\" />";
+	if (!$realtime) print "<input type=\"submit\" value=\"" . GM_LANG_close_window . "\"" . " onclick=\"window.opener.showchanges('&dv=".rand()."#".$anchor."'); self.close();\" />";
+	else print "<input type=\"submit\" value=\"" . GM_LANG_close_window . "\"" . " onclick=\"self.close();\" />";
 	print "</td>";
 	print "</tr>";
 	print "</table>";

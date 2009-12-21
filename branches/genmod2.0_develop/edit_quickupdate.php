@@ -48,7 +48,7 @@ $famreqdfacts = preg_split("/[,; ]/", GedcomConfig::$QUICK_REQUIRED_FAMFACTS);
 $align="right";
 if ($TEXT_DIRECTION=="rtl") $align="left";
 
-PrintSimpleHeader($gm_lang["quick_update_title"]);
+PrintSimpleHeader(GM_LANG_quick_update_title);
 
 //print "<pre>";
 //print_r($_POST);
@@ -56,7 +56,7 @@ PrintSimpleHeader($gm_lang["quick_update_title"]);
 
 //-- only allow logged in users to access this page
 if ((!GedcomConfig::$ALLOW_EDIT_GEDCOM)||(!GedcomConfig::$USE_QUICK_UPDATE)||(empty($gm_user->username))) {
-	print $gm_lang["access_denied"];
+	print GM_LANG_access_denied;
 	PrintSimpleFooter();
 	exit;
 }
@@ -72,7 +72,7 @@ $pid = CleanInput($pid);
 
 //-- only allow editors or users who are editing their own individual or their immediate relatives
 if (!$gm_user->userCanEditOwn($pid)) {
-	print $gm_lang["access_denied"];
+	print GM_LANG_access_denied;
 	PrintSimpleFooter();
 	exit;
 }
@@ -93,7 +93,7 @@ if ($ct>0) {
 		$disp = PrivacyFunctions::displayDetailsById($pid);
 	}
 	else {
-		print $gm_lang["access_denied"];
+		print GM_LANG_access_denied;
 		PrintSimpleFooter();
 		exit;
 	}
@@ -101,13 +101,13 @@ if ($ct>0) {
 
 if ((!$disp)||(!GedcomConfig::$ALLOW_EDIT_GEDCOM)) {
 
-	print $gm_lang["access_denied"];
+	print GM_LANG_access_denied;
 	//-- display messages as to why the editing access was denied
-	if (!$gm_user->userCanEdit()) print "<br />".$gm_lang["user_cannot_edit"];
-	if (!GedcomConfig::$ALLOW_EDIT_GEDCOM) print "<br />".$gm_lang["gedcom_editing_disabled"];
+	if (!$gm_user->userCanEdit()) print "<br />".GM_LANG_user_cannot_edit;
+	if (!GedcomConfig::$ALLOW_EDIT_GEDCOM) print "<br />".GM_LANG_gedcom_editing_disabled;
 	if (!$disp) {
-		print "<br />".$gm_lang["privacy_prevented_editing"];
-		if (!empty($pid)) print "<br />".$gm_lang["privacy_not_granted"]." pid $pid.";
+		print "<br />".GM_LANG_privacy_prevented_editing;
+		if (!empty($pid)) print "<br />".GM_LANG_privacy_not_granted." pid $pid.";
 	}
 	PrintSimpleFooter();
 	exit;
@@ -121,7 +121,7 @@ $gedrec = PrivacyFunctions::PrivatizeGedcom($gedrec);
 //-- put the updates into the gedcom record
 if ($action=="update") {
 	function check_updated_facts($i, &$famrec, $TAGS, $prefix){
-		global $typefacts, $pid, $gm_lang, $change_type, $change_id, $can_auto_accept;
+		global $typefacts, $pid, $change_type, $change_id, $can_auto_accept;
 		$famrec = trim($famrec);
 		$ct = preg_match("/0 @(.+)@/", $famrec, $match);
 //		print "famrec: ".$famrec;
@@ -189,7 +189,7 @@ if ($action=="update") {
 					$oldfac = trim(substr($famrec, $pos1, $pos2-$pos1));
 					$noupdfact = PrivacyFunctions::FactEditRestricted($pid, $oldfac);
 					if ($noupdfact) {
-						print "<br />".$gm_lang["update_fact_restricted"]." ".$factarray[$fact]."<br /><br />";
+						print "<br />".GM_LANG_update_fact_restricted." ".$factarray[$fact]."<br /><br />";
 					}
 					else {
 						//-- delete the fact
@@ -260,7 +260,7 @@ if ($action=="update") {
 		return $famupdate;
 	}
 	
-	print "<h3>".$gm_lang["quick_update_title"]."</h3>\n";
+	print "<h3>".GM_LANG_quick_update_title."</h3>\n";
 	print "<b>".PrintReady(GetPersonName($pid, $gedrec))."</b><br /><br />";
 	
 	WriteToLog("EditQuickUpdate-> Quick update attempted for $pid by >".$gm_user->username."<", "I", "G", $GEDCOMID);
@@ -377,9 +377,9 @@ if ($action=="update") {
 
 	//-- check for photo update
 	if (!empty($_FILES["FILE"]['tmp_name'])) {
-		$upload_errors = array($gm_lang["file_success"], $gm_lang["file_too_big"], $gm_lang["file_too_big"],$gm_lang["file_partial"], $gm_lang["file_missing"]);
+		$upload_errors = array(GM_LANG_file_success, GM_LANG_file_too_big, GM_LANG_file_too_big,GM_LANG_file_partial, GM_LANG_file_missing);
 		if (!move_uploaded_file($_FILES['FILE']['tmp_name'], GedcomConfig::$MEDIA_DIRECTORY.basename($_FILES['FILE']['name']))) {
-			$error .= "<br />".$gm_lang["upload_error"]."<br />".$upload_errors[$_FILES['FILE']['error']];
+			$error .= "<br />".GM_LANG_upload_error."<br />".$upload_errors[$_FILES['FILE']['error']];
 		}
 		else {
 			$filename = GedcomConfig::$MEDIA_DIRECTORY.basename($_FILES['FILE']['name']);
@@ -817,7 +817,7 @@ if ($action=="update") {
 //			replace_gedrec($cxref, $childrec);
 			EditFunctions::ReplaceGedrec($cxref, "", "1 FAMC @$newfamid@", "FAMC", $change_id, $change_type);
 		}
-		print $gm_lang["update_successful"]."<br />\n";;
+		print GM_LANG_update_successful."<br />\n";;
 	}
 //	if (!empty($newfamid)) {
 //		$famrec = preg_replace("/0 @(.*)@/", "0 @".$newfamid."@", $famrec);
@@ -1207,7 +1207,7 @@ if ($action=="update") {
 	}
 
 	if ($updated && empty($error)) {
-		print $gm_lang["update_successful"]."<br />";
+		print GM_LANG_update_successful."<br />";
 //		AddToChangeLog("Quick update for $pid by >".getUserName()."<");
 		//print "<pre>$gedrec</pre>";
 //		if ($oldgedrec!=$gedrec) replace_gedrec($pid, $gedrec);
@@ -1224,14 +1224,14 @@ if ($action=="update") {
 		if (GedcomConfig::$EDIT_AUTOCLOSE) print "\n<script type=\"text/javascript\">\n<!--\nif (window.opener.showchanges) window.opener.showchanges(); window.close();\n//-->\n</script>";
 		
 		print "<center><br /><br /><br />";
-		print "<a href=\"#\" onclick=\"if (window.opener.showchanges) window.opener.showchanges(); window.close();\">".$gm_lang["close_window"]."</a><br /></center>\n";
+		print "<a href=\"#\" onclick=\"if (window.opener.showchanges) window.opener.showchanges(); window.close();\">".GM_LANG_close_window."</a><br /></center>\n";
 		PrintSimpleFooter();
 		exit;
 	}
 }
 
-if ($action!="update") print "<h3>".$gm_lang["quick_update_title"]."</h3>\n";
-print $gm_lang["quick_update_instructions"]."<br /><br />";
+if ($action!="update") print "<h3>".GM_LANG_quick_update_title."</h3>\n";
+print GM_LANG_quick_update_instructions."<br /><br />";
 
 init_calendar_popup();
 ?>
@@ -1258,13 +1258,13 @@ if ($action=="choosepid") {
 	<input type="hidden" name="action" value="" />
 	<table>
 	<tr>
-		<td><?php print $gm_lang["enter_pid"]; ?></td>
+		<td><?php print GM_LANG_enter_pid; ?></td>
 		<td><input type="text" size="6" name="pid" id="pid" />
 		<?php LinkFunctions::PrintFindIndiLink("pid","");?>
                 </td>
 	</tr>
 	</table>
-	<input type="submit" value="<?php print $gm_lang["continue"]; ?>" />
+	<input type="submit" value="<?php print GM_LANG_continue; ?>" />
 	</form>
 		<?php
 	}
@@ -1452,7 +1452,7 @@ function checkform(frm) {
 			((frm.EMAIL.value.indexOf("@")==-1) || 
 			(frm.EMAIL.value.indexOf("<")!=-1) ||
 			(frm.EMAIL.value.indexOf(">")!=-1))) {
-			alert("<?php print $gm_lang["enter_email"]; ?>");
+			alert("<?php print GM_LANG_enter_email; ?>");
 			frm.EMAIL.focus();
 			return false;
 		} 
@@ -1465,10 +1465,10 @@ function checkform(frm) {
 <input type="hidden" name="action" value="update" />
 <input type="hidden" name="change_type" value="quick_update" />
 <input type="hidden" name="closewin" value="1" />
-<br /><input type="submit" value="<?php print $gm_lang["save"]; ?>" /><br /><br />
+<br /><input type="submit" value="<?php print GM_LANG_save; ?>" /><br /><br />
 <table class="tabs_table">
    <tr>
-		<td id="pagetab0" class="tab_cell_active"><a href="javascript: <?php print $gm_lang["personal_facts"];?>" onclick="switch_tab(0); return false;"><?php print $gm_lang["personal_facts"]?></a></td>
+		<td id="pagetab0" class="tab_cell_active"><a href="javascript: <?php print GM_LANG_personal_facts;?>" onclick="switch_tab(0); return false;"><?php print GM_LANG_personal_facts?></a></td>
 		<?php
 		for($i=1; $i<=count($sfams); $i++) {
 			$famid = $sfams[$i-1]["famid"];
@@ -1489,29 +1489,29 @@ function checkform(frm) {
 				$parrec = $rec[$GEDCOMID][$spid];
 			}
 						
-			print "<td id=\"pagetab$i\" class=\"tab_cell_inactive\" onclick=\"switch_tab($i); return false;\"><a href=\"javascript: ".$gm_lang["family_with"]."&nbsp;";
+			print "<td id=\"pagetab$i\" class=\"tab_cell_inactive\" onclick=\"switch_tab($i); return false;\"><a href=\"javascript: ".GM_LANG_family_with."&nbsp;";
 			if (!empty($spid)) {
 				if (PrivacyFunctions::displayDetailsById($spid) && PrivacyFunctions::showLivingNameById($spid)) {
 					print PrintReady(str_replace(array("<span class=\"starredname\">", "</span>"), "", GetPersonName($spid, $parrec)));
-					print "\" onclick=\"switch_tab($i); return false;\">".$gm_lang["family_with"]." ";
+					print "\" onclick=\"switch_tab($i); return false;\">".GM_LANG_family_with." ";
 					print PrintReady(GetPersonName($spid, $parrec));
 				}
 				else {
-					print $gm_lang["private"];
-					print "\" onclick=\"switch_tab($i); return false;\">".$gm_lang["family_with"]." ";
-					print $gm_lang["private"];
+					print GM_LANG_private;
+					print "\" onclick=\"switch_tab($i); return false;\">".GM_LANG_family_with." ";
+					print GM_LANG_private;
 				}
 			}
-			else print "\" onclick=\"switch_tab($i); return false;\">".$gm_lang["family_with"]." ".$gm_lang["unknown"];
+			else print "\" onclick=\"switch_tab($i); return false;\">".GM_LANG_family_with." ".GM_LANG_unknown;
 			print "</a></td>\n";
 		}
 		?>
-		<td id="pagetab<?php echo $i; ?>" class="tab_cell_inactive" onclick="switch_tab(<?php echo $i; ?>); return false;"><a href="javascript: <?php print $gm_lang["add_new_wife"];?>" onclick="switch_tab(<?php echo $i; ?>); return false;">
-		<?php if (preg_match("/1 SEX M/", $gedrec)>0) print $gm_lang["add_new_wife"]; else print $gm_lang["add_new_husb"]; ?></a></td>
+		<td id="pagetab<?php echo $i; ?>" class="tab_cell_inactive" onclick="switch_tab(<?php echo $i; ?>); return false;"><a href="javascript: <?php print GM_LANG_add_new_wife;?>" onclick="switch_tab(<?php echo $i; ?>); return false;">
+		<?php if (preg_match("/1 SEX M/", $gedrec)>0) print GM_LANG_add_new_wife; else print GM_LANG_add_new_husb; ?></a></td>
 		<?php
 		$i++;
 		for($j=1; $j<=count($cfams); $j++) {
-			print "<td id=\"pagetab$i\" class=\"tab_cell_inactive\" onclick=\"switch_tab($i); return false;\"><a href=\"#\" onclick=\"switch_tab($i); return false;\">".$gm_lang["as_child"];
+			print "<td id=\"pagetab$i\" class=\"tab_cell_inactive\" onclick=\"switch_tab($i); return false;\"><a href=\"#\" onclick=\"switch_tab($i); return false;\">".GM_LANG_as_child;
 			print "</a></td>\n";
 			$i++;
 		}
@@ -1534,7 +1534,7 @@ function checkform(frm) {
 </table>
 <div id="tab0">
 <table class="<?php print $TEXT_DIRECTION; ?> width80">
-<tr><td class="topbottombar" colspan="4"><?php print_help_link("quick_update_name_help", "qm"); ?><?php print $gm_lang["update_name"]; ?></td></tr>
+<tr><td class="topbottombar" colspan="4"><?php print_help_link("quick_update_name_help", "qm"); ?><?php print GM_LANG_update_name; ?></td></tr>
 <tr><td class="descriptionbox"><?php print_help_link("edit_given_name_help", "qm"); print $factarray["GIVN"];?></td>
 <td class="optionbox" colspan="3"><input size="50" type="text" tabindex="<?php print $tabkey; ?>" name="GIVN" value="<?php print PrintReady(htmlspecialchars($GIVN)); ?>" /></td></tr>
 <?php $tabkey++; ?>
@@ -1542,29 +1542,29 @@ function checkform(frm) {
 <td class="optionbox" colspan="3"><input size="50" type="text" tabindex="<?php print $tabkey; ?>" name="SURN" value="<?php print PrintReady(htmlspecialchars($SURN)); ?>" /></td></tr>
 <?php $tabkey++; ?>
 <?php if (GedcomConfig::$USE_RTL_FUNCTIONS) { ?>
-<tr><td class="descriptionbox"><?php print_help_link("edit_given_name_help", "qm"); print $gm_lang["hebrew_givn"];?></td>
+<tr><td class="descriptionbox"><?php print_help_link("edit_given_name_help", "qm"); print GM_LANG_hebrew_givn;?></td>
 <td class="optionbox" colspan="3"><input size="50" type="text" tabindex="<?php print $tabkey; ?>" name="HGIVN" value="<?php print PrintReady(htmlspecialchars($HGIVN)); ?>" /></td></tr>
 <?php $tabkey++; ?>
-<tr><td class="descriptionbox"><?php print_help_link("edit_surname_help", "qm"); print $gm_lang["hebrew_surn"];?></td>
+<tr><td class="descriptionbox"><?php print_help_link("edit_surname_help", "qm"); print GM_LANG_hebrew_surn;?></td>
 <td class="optionbox" colspan="3"><input size="50" type="text" tabindex="<?php print $tabkey; ?>" name="HSURN" value="<?php print PrintReady(htmlspecialchars($HSURN)); ?>" /></td></tr>
 <?php $tabkey++; ?>
 </tr>
-<tr><td class="descriptionbox"><?php print_help_link("edit_given_name_help", "qm"); print $gm_lang["roman_givn"];?></td>
+<tr><td class="descriptionbox"><?php print_help_link("edit_given_name_help", "qm"); print GM_LANG_roman_givn;?></td>
 <td class="optionbox" colspan="3"><input size="50" type="text" tabindex="<?php print $tabkey; ?>" name="RGIVN" value="<?php print PrintReady(htmlspecialchars($RGIVN)); ?>" /></td></tr>
 <?php $tabkey++; ?>
-<tr><td class="descriptionbox"><?php print_help_link("edit_surname_help", "qm"); print $gm_lang["roman_surn"];?></td>
+<tr><td class="descriptionbox"><?php print_help_link("edit_surname_help", "qm"); print GM_LANG_roman_surn;?></td>
 <td class="optionbox" colspan="3"><input size="50" type="text" tabindex="<?php print $tabkey; ?>" name="RSURN" value="<?php print PrintReady(htmlspecialchars($RSURN)); ?>" /></td></tr>
 <?php $tabkey++; ?>
 </tr>
 <?php } ?>
 
 <tr>
-	<td class="descriptionbox"><?php print_help_link("edit_sex_help", "qm"); print $gm_lang["sex"];?></td>
+	<td class="descriptionbox"><?php print_help_link("edit_sex_help", "qm"); print GM_LANG_sex;?></td>
 	<td class="optionbox" colspan="3">
 		<select name="SEX" tabindex="<?php print $tabkey; ?>">
-			<option value="M"<?php if ($SEX=="M") print " selected=\"selected\""; ?>><?php print $gm_lang["male"]; ?></option>
-			<option value="F"<?php if ($SEX=="F") print " selected=\"selected\""; ?>><?php print $gm_lang["female"]; ?></option>
-			<option value="U"<?php if ($SEX=="U") print " selected=\"selected\""; ?>><?php print $gm_lang["unknown"]; ?></option>
+			<option value="M"<?php if ($SEX=="M") print " selected=\"selected\""; ?>><?php print GM_LANG_male; ?></option>
+			<option value="F"<?php if ($SEX=="F") print " selected=\"selected\""; ?>><?php print GM_LANG_female; ?></option>
+			<option value="U"<?php if ($SEX=="U") print " selected=\"selected\""; ?>><?php print GM_LANG_unknown; ?></option>
 		</select>
 	<?php $tabkey++; ?>
 	</td>
@@ -1573,12 +1573,12 @@ function checkform(frm) {
 // NOTE: Update fact
 ?>
 <tr><td>&nbsp;</td></tr>
-<tr><td class="topbottombar" colspan="4"><?php print_help_link("quick_update_fact_help", "qm"); print $gm_lang["update_fact"]; ?></td></tr>
+<tr><td class="topbottombar" colspan="4"><?php print_help_link("quick_update_fact_help", "qm"); print GM_LANG_update_fact; ?></td></tr>
 <tr>
 	<td class="descriptionbox">&nbsp;</td>
 	<td class="descriptionbox"><?php print $factarray["DATE"]; ?></td>
 	<td class="descriptionbox"><?php print $factarray["PLAC"]; ?></td>
-	<td class="descriptionbox"><?php print $gm_lang["delete"]; ?></td>
+	<td class="descriptionbox"><?php print GM_LANG_delete; ?></td>
 </tr>
 <?php
 foreach($indifacts as $f=>$fact) {
@@ -1593,7 +1593,7 @@ foreach($indifacts as $f=>$fact) {
 <tr>
 	<td class="descriptionbox">
 		<?php if (isset($factarray[$fact_tag])) print $factarray[$fact_tag]; 
-		else if (isset($gm_lang[$fact_tag])) print $gm_lang[$fact_tag]; 
+		else if (defined("GM_LANG_".$fact_tag)) print constant("GM_LANG_".$fact_tag); 
 		else print $fact_tag;
 		?>		
 		<input type="hidden" name="TAGS[]" value="<?php echo $fact_tag; ?>" />
@@ -1623,7 +1623,7 @@ foreach($indifacts as $f=>$fact) {
 		}
 		else {
 			print "<td class=\"optionbox\"><select tabindex=\"".$tabkey."\" name=\"TEMPS[]\" >\n";
-			print "<option value=''>".$gm_lang["no_temple"]."</option>\n";
+			print "<option value=''>".GM_LANG_no_temple."</option>\n";
 			foreach($TEMPLE_CODES as $code=>$temple) {
 				print "<option value=\"$code\"";
 				if ($code==$temp) print " selected=\"selected\"";
@@ -1638,8 +1638,8 @@ foreach($indifacts as $f=>$fact) {
 	if (!$fact[2]) { ?>
 		<td class="optionbox center">
 			<input type="hidden" name="REMS[<?php echo $f; ?>]" id="REM<?php echo $f; ?>" value="0" />
-			<a href="javascript: <?php print $gm_lang["delete"]; ?>" onclick="document.quickupdate.closewin.value='0'; document.quickupdate.REM<?php echo $f; ?>.value='1'; document.quickupdate.submit(); return false;">
-				<img src="<?php print GM_IMAGE_DIR."/".$GM_IMAGES["remove"]["other"]; ?>" border="0" alt="<?php print $gm_lang["delete"]; ?>" />
+			<a href="javascript: <?php print GM_LANG_delete; ?>" onclick="document.quickupdate.closewin.value='0'; document.quickupdate.REM<?php echo $f; ?>.value='1'; document.quickupdate.submit(); return false;">
+				<img src="<?php print GM_IMAGE_DIR."/".$GM_IMAGES["remove"]["other"]; ?>" border="0" alt="<?php print GM_LANG_delete; ?>" />
 			</a>
 		</td>
 	</tr>
@@ -1656,7 +1656,7 @@ foreach($indifacts as $f=>$fact) {
 // NOTE: Add fact
 if (count($addfacts)>0) { ?>
 <tr><td>&nbsp;</td></tr>
-<tr><td class="topbottombar" colspan="4"><?php print_help_link("quick_update_fact_help", "qm"); print $gm_lang["add_fact"]; ?></td></tr>
+<tr><td class="topbottombar" colspan="4"><?php print_help_link("quick_update_fact_help", "qm"); print GM_LANG_add_fact; ?></td></tr>
 <tr>
 	<td class="descriptionbox">&nbsp;</td>
 	<td class="descriptionbox"><?php print_help_link("def_gedcom_date_help", "qm"); print $factarray["DATE"]; ?></td>
@@ -1682,7 +1682,7 @@ if (count($addfacts)>0) { ?>
 	//-->
 	</script>
 	<select name="newfact" tabindex="<?php print $tabkey; ?>" onchange="checkDesc(this);">
-		<option value=""><?php print $gm_lang["select_fact"]; ?></option>
+		<option value=""><?php print GM_LANG_select_fact; ?></option>
 	<?php $tabkey++; ?>
 	<?php
 	foreach($addfacts as $indexval => $fact) {
@@ -1698,7 +1698,7 @@ if (count($addfacts)>0) { ?>
 	?>
 		</select>
 		<div id="descFact" style="display:none;"><br />
-			<?php print $gm_lang["description"]; ?><input type="text" size="35" name="DESC" />
+			<?php print GM_LANG_description; ?><input type="text" size="35" name="DESC" />
 		</div>
 	</td>
 	<td class="optionbox"><input type="text" tabindex="<?php print $tabkey; ?>" size="15" name="DATE" id="DATE" onblur="valid_date(this);" />&nbsp;<?php EditFunctions::PrintCalendarPopup("DATE");?></td>
@@ -1714,7 +1714,7 @@ if (count($addfacts)>0) { ?>
 // NOTE: Add photo
 if (MediaFS::DirIsWritable(GedcomConfig::$MEDIA_DIRECTORY)) { ?>
 <tr><td>&nbsp;</td></tr>
-<tr><td class="topbottombar" colspan="4"><b><?php print_help_link("quick_update_photo_help", "qm"); print $gm_lang["update_photo"]; ?></b></td></tr>
+<tr><td class="topbottombar" colspan="4"><b><?php print_help_link("quick_update_photo_help", "qm"); print GM_LANG_update_photo; ?></b></td></tr>
 <tr>
 	<td class="descriptionbox">
 		<?php print $factarray["TITL"]; ?>
@@ -1737,7 +1737,7 @@ if (MediaFS::DirIsWritable(GedcomConfig::$MEDIA_DIRECTORY)) { ?>
 <tr>
 	<td class="descriptionbox">&nbsp;</td>
 	<td class="optionbox" colspan="3">
-		<input type="checkbox" tabindex="<?php print $tabkey; ?>" name="replace" value="yes" /> <?php print $gm_lang["photo_replace"]; ?>
+		<input type="checkbox" tabindex="<?php print $tabkey; ?>" name="replace" value="yes" /> <?php print GM_LANG_photo_replace; ?>
 	</td>
 	<?php $tabkey++; ?>
 </tr>
@@ -1748,7 +1748,7 @@ if (MediaFS::DirIsWritable(GedcomConfig::$MEDIA_DIRECTORY)) { ?>
 if (!IsDeadId($pid) || !empty($ADDR) || !empty($PHON) || !empty($FAX) || !empty($EMAIL)) { //-- don't show address for dead people 
 	 ?>
 <tr><td>&nbsp;</td></tr> 
-<tr><td class="topbottombar" colspan="4"><?php print_help_link("quick_update_address_help", "qm"); print $gm_lang["update_address"]; ?></td></tr>
+<tr><td class="topbottombar" colspan="4"><?php print_help_link("quick_update_address_help", "qm"); print GM_LANG_update_address; ?></td></tr>
 <tr>
 	<td class="descriptionbox">
 		<?php print $factarray["ADDR"]; ?>
@@ -1814,7 +1814,7 @@ for($i=1; $i<=count($sfams); $i++) {
 		$rec = GetChangeData(false, $famid, true, "gedlines");
 		$famrec = $rec[$GEDCOMID][$famid];
 	}
-	print $gm_lang["family_with"]." ";
+	print GM_LANG_family_with." ";
 	$parents = FindParentsInRecord($famrec);
 	$spid = "";
 	if($parents) {
@@ -1831,12 +1831,12 @@ for($i=1; $i<=count($sfams); $i++) {
 			print "<a href=\"#\" onclick=\"return quickEdit('".$spid."');\">";
 			$name = PrintReady(GetPersonName($spid, $parrec));
 			if (GedcomConfig::$SHOW_ID_NUMBERS) $name .= " (".$spid.")";
-			$name .= " [".$gm_lang["edit"]."]";
+			$name .= " [".GM_LANG_edit."]";
 			print $name."</a>\n";
 		}
-		else print $gm_lang["private"];
+		else print GM_LANG_private;
 	}
-	else print $gm_lang["unknown"];
+	else print GM_LANG_unknown;
 	$subrecords = GetAllSubrecords($famrec, "HUSB,WIFE,CHIL", false, false, false);
 	$famfacts = array();
 	foreach($subrecords as $ind=>$subrec) {
@@ -1867,14 +1867,14 @@ for($i=1; $i<=count($sfams); $i++) {
 ?>
 </td></tr>
 <tr>
-	<td class="descriptionbox"><?php print $gm_lang["enter_pid"]; ?></td>
+	<td class="descriptionbox"><?php print GM_LANG_enter_pid; ?></td>
 	<td class="optionbox" colspan="3"><input type="text" size="10" name="SPID[<?php echo $i; ?>]" id="SPID<?php echo $i; ?>" value="<?php echo $spid; ?>" />
 		<?php LinkFunctions::PrintFindindiLink("SPID$i","");?>
      </td>
 	</tr>
 <?php if (empty($spid)) { ?>
 <tr><td>&nbsp;</td></tr>
-<tr><td class="topbottombar" colspan="4"><?php print_help_link("quick_update_spouse_help", "qm"); if (preg_match("/1 SEX M/", $gedrec)>0) print $gm_lang["add_new_wife"]; else print $gm_lang["add_new_husb"];?></td></tr>
+<tr><td class="topbottombar" colspan="4"><?php print_help_link("quick_update_spouse_help", "qm"); if (preg_match("/1 SEX M/", $gedrec)>0) print GM_LANG_add_new_wife; else print GM_LANG_add_new_husb;?></td></tr>
 <tr>
 	<td class="descriptionbox"><?php print_help_link("edit_given_name_help", "qm"); print $factarray["GIVN"];?></td>
 	<td class="optionbox" colspan="3"><input size="50" type="text" tabindex="<?php print $tabkey; ?>" name="SGIVN<?php echo $i; ?>" /></td>
@@ -1887,33 +1887,33 @@ for($i=1; $i<=count($sfams); $i++) {
 </tr>
 <?php if (GedcomConfig::$USE_RTL_FUNCTIONS) { ?>
 <tr>
-	<td class="descriptionbox"><?php print_help_link("edit_given_name_help", "qm"); print $gm_lang["hebrew_givn"];?></td>
+	<td class="descriptionbox"><?php print_help_link("edit_given_name_help", "qm"); print GM_LANG_hebrew_givn;?></td>
 	<td class="optionbox" colspan="3"><input size="50" type="text" tabindex="<?php print $tabkey; ?>" name="HSGIVN<?php echo $i; ?>" /></td>
 	</tr>
 	<?php $tabkey++; ?>
 	<tr>
-	<td class="descriptionbox"><?php print_help_link("edit_surname_help", "qm"); print $gm_lang["hebrew_surn"];?></td>
+	<td class="descriptionbox"><?php print_help_link("edit_surname_help", "qm"); print GM_LANG_hebrew_surn;?></td>
 	<td class="optionbox" colspan="3"><input size="50" type="text" tabindex="<?php print $tabkey; ?>" name="HSSURN<?php echo $i; ?>" /></td>
 	<?php $tabkey++; ?>
 </tr>
 <tr>
-	<td class="descriptionbox"><?php print_help_link("edit_given_name_help", "qm"); print $gm_lang["roman_givn"];?></td>
+	<td class="descriptionbox"><?php print_help_link("edit_given_name_help", "qm"); print GM_LANG_roman_givn;?></td>
 	<td class="optionbox" colspan="3"><input size="50" type="text" tabindex="<?php print $tabkey; ?>" name="RSGIVN<?php echo $i; ?>" /></td>
 	</tr>
 	<?php $tabkey++; ?>
 	<tr>
-	<td class="descriptionbox"><?php print_help_link("edit_surname_help", "qm"); print $gm_lang["roman_surn"];?></td>
+	<td class="descriptionbox"><?php print_help_link("edit_surname_help", "qm"); print GM_LANG_roman_surn;?></td>
 	<td class="optionbox" colspan="3"><input size="50" type="text" tabindex="<?php print $tabkey; ?>" name="RSSURN<?php echo $i; ?>" /></td>
 	<?php $tabkey++; ?>
 </tr>
 <?php } ?>
 <tr>
-	<td class="descriptionbox"><?php print_help_link("edit_sex_help", "qm"); print $gm_lang["sex"];?></td>
+	<td class="descriptionbox"><?php print_help_link("edit_sex_help", "qm"); print GM_LANG_sex;?></td>
 	<td class="optionbox" colspan="3">
 		<select name="SSEX<?php echo $i; ?>" tabindex="<?php print $tabkey; ?>">
-			<option value="M"<?php if (preg_match("/1 SEX F/", $gedrec)>0) print " selected=\"selected\""; ?>><?php print $gm_lang["male"]; ?></option>
-			<option value="F"<?php if (preg_match("/1 SEX M/", $gedrec)>0) print " selected=\"selected\""; ?>><?php print $gm_lang["female"]; ?></option>
-			<option value="U"<?php if (preg_match("/1 SEX U/", $gedrec)>0) print " selected=\"selected\""; ?>><?php print $gm_lang["unknown"]; ?></option>
+			<option value="M"<?php if (preg_match("/1 SEX F/", $gedrec)>0) print " selected=\"selected\""; ?>><?php print GM_LANG_male; ?></option>
+			<option value="F"<?php if (preg_match("/1 SEX M/", $gedrec)>0) print " selected=\"selected\""; ?>><?php print GM_LANG_female; ?></option>
+			<option value="U"<?php if (preg_match("/1 SEX U/", $gedrec)>0) print " selected=\"selected\""; ?>><?php print GM_LANG_unknown; ?></option>
 		</select>
 	<?php $tabkey++; ?>
 	</td>
@@ -1934,12 +1934,12 @@ for($i=1; $i<=count($sfams); $i++) {
 //NOTE: Update fact
 ?>
 <tr><td>&nbsp;</td></tr>
-<tr><td class="topbottombar" colspan="4"><?php print_help_link("quick_update_fact_help", "qm"); print $gm_lang["update_fact"]; ?></td></tr>
+<tr><td class="topbottombar" colspan="4"><?php print_help_link("quick_update_fact_help", "qm"); print GM_LANG_update_fact; ?></td></tr>
 <tr>
 	<td class="descriptionbox">&nbsp;</td>
 	<td class="descriptionbox"><?php print $factarray["DATE"]; ?></td>
 	<td class="descriptionbox"><?php print $factarray["PLAC"]; ?></td>
-	<td class="descriptionbox"><?php print $gm_lang["delete"]; ?></td>
+	<td class="descriptionbox"><?php print GM_LANG_delete; ?></td>
 	</tr>
 <?php
 foreach($famfacts as $f=>$fact) {
@@ -1952,7 +1952,7 @@ foreach($famfacts as $f=>$fact) {
 			<tr>
 				<td class="descriptionbox">
 				<?php if (isset($factarray[$fact_tag])) print $factarray[$fact_tag]; 
-					else if (isset($gm_lang[$fact_tag])) print $gm_lang[$fact_tag]; 
+					else if (defined("GM_LANG_".$fact_tag)) print constant("GM_LANG_".$fact_tag); 
 					else print $fact_tag;
 				?>
 					<input type="hidden" name="F<?php echo $i; ?>TAGS[]" value="<?php echo $fact_tag; ?>" />
@@ -1965,7 +1965,7 @@ foreach($famfacts as $f=>$fact) {
 				<?php }
 				else {
 					print "<td class=\"optionbox\"><select tabindex=\"".$tabkey."\" name=\"F".$i."TEMPS[]\" >\n";
-					print "<option value=''>".$gm_lang["no_temple"]."</option>\n";
+					print "<option value=''>".GM_LANG_no_temple."</option>\n";
 					foreach($TEMPLE_CODES as $code=>$temple) {
 						print "<option value=\"$code\"";
 						if ($code==$temp) print " selected=\"selected\"";
@@ -1978,8 +1978,8 @@ foreach($famfacts as $f=>$fact) {
 				<td class="optionbox center">
 					<input type="hidden" name="F<?php echo $i; ?>REMS[<?php echo $f; ?>]" id="F<?php echo $i; ?>REM<?php echo $f; ?>" value="0" />
 					<?php if (!$fact[2]) { ?>
-					<a href="javascript: <?php print $gm_lang["delete"]; ?>" onclick="document.quickupdate.closewin.value='0'; document.quickupdate.F<?php echo $i; ?>REM<?php echo $f; ?>.value='1'; document.quickupdate.submit(); return false;">
-						<img src="<?php print GM_IMAGE_DIR."/".$GM_IMAGES["remove"]["other"]; ?>" border="0" alt="<?php print $gm_lang["delete"]; ?>" />
+					<a href="javascript: <?php print GM_LANG_delete; ?>" onclick="document.quickupdate.closewin.value='0'; document.quickupdate.F<?php echo $i; ?>REM<?php echo $f; ?>.value='1'; document.quickupdate.submit(); return false;">
+						<img src="<?php print GM_IMAGE_DIR."/".$GM_IMAGES["remove"]["other"]; ?>" border="0" alt="<?php print GM_LANG_delete; ?>" />
 					</a>
 					<?php } ?>
 				</td>
@@ -1992,7 +1992,7 @@ foreach($famfacts as $f=>$fact) {
 // Note: add fact
 if (count($famaddfacts)>0) { ?>
 	<tr><td>&nbsp;</td></tr>
-	<tr><td class="topbottombar" colspan="4"><?php print_help_link("quick_update_fact_help", "qm"); print $gm_lang["add_fact"]; ?></td></tr>
+	<tr><td class="topbottombar" colspan="4"><?php print_help_link("quick_update_fact_help", "qm"); print GM_LANG_add_fact; ?></td></tr>
 	<tr>
 	<td class="descriptionbox">&nbsp;</td>
 	<td class="descriptionbox"><?php print_help_link("def_gedcom_date_help", "qm"); print $factarray["DATE"]; ?></td>
@@ -2001,7 +2001,7 @@ if (count($famaddfacts)>0) { ?>
 	</tr>
 	<tr>
 	<td class="optionbox"><select name="F<?php echo $i; ?>newfact" tabindex="<?php print $tabkey; ?>">
-		<option value=""><?php print $gm_lang["select_fact"]; ?></option>
+		<option value=""><?php print GM_LANG_select_fact; ?></option>
 	<?php $tabkey++; ?>
 	<?php
 	foreach($famaddfacts as $indexval => $fact) {
@@ -2032,14 +2032,14 @@ $chil = FindChildrenInRecord($famrec);
 	?>
 	<tr><td>&nbsp;</td></tr>
 	<tr>
-		<td class="topbottombar" colspan="4"><?php print $gm_lang["children"]; ?></td>
+		<td class="topbottombar" colspan="4"><?php print GM_LANG_children; ?></td>
 	</tr>
 	<tr>
 			<input type="hidden" name="F<?php echo $i; ?>CDEL" value="" />
-					<td class="descriptionbox"><?php print $gm_lang["name"]; ?></td>
+					<td class="descriptionbox"><?php print GM_LANG_name; ?></td>
 					<td class="descriptionbox"><?php print $factarray["BIRT"]; ?></td>
 					<td class="descriptionbox"><?php print $factarray["PEDI"]; ?></td>
-					<td class="descriptionbox"><?php print $gm_lang["remove"]; ?></td>
+					<td class="descriptionbox"><?php print GM_LANG_remove; ?></td>
 	</tr>
 			<?php
 				foreach($chil as $c=>$child) {
@@ -2056,14 +2056,14 @@ $chil = FindChildrenInRecord($famrec);
 					if ($disp || PrivacyFunctions::showLivingNameById($child)) {
 						$isF = GetGedcomValue("SEX", 1, $childrec, "", false);
 						$name .= "<img id=\"box-F.$i.$child-sex\" src=\"".GM_IMAGE_DIR."/";
-						if ($isF=="M") $name .= $GM_IMAGES["sex"]["small"]."\" title=\"".$gm_lang["male"]."\" alt=\"".$gm_lang["male"];
-						else  if ($isF=="F") $name .= $GM_IMAGES["sexf"]["small"]."\" title=\"".$gm_lang["female"]."\" alt=\"".$gm_lang["female"];
-						else  $name .= $GM_IMAGES["sexn"]["small"]."\" title=\"".$gm_lang["unknown"]."\" alt=\"".$gm_lang["unknown"];
+						if ($isF=="M") $name .= $GM_IMAGES["sex"]["small"]."\" title=\"".GM_LANG_male."\" alt=\"".GM_LANG_male;
+						else  if ($isF=="F") $name .= $GM_IMAGES["sexf"]["small"]."\" title=\"".GM_LANG_female."\" alt=\"".GM_LANG_female;
+						else  $name .= $GM_IMAGES["sexn"]["small"]."\" title=\"".GM_LANG_unknown."\" alt=\"".GM_LANG_unknown;
 						$name .= "\" class=\"sex_image\" />";
-						$name.= "<a href=\"#\" onclick=\"return quickEdit('".$child."');\">&nbsp;"."[".$gm_lang["edit"]."]</a>";
+						$name.= "<a href=\"#\" onclick=\"return quickEdit('".$child."');\">&nbsp;"."[".GM_LANG_edit."]</a>";
 						print PrintReady($name);
 					}
-					else print $gm_lang["private"];
+					else print GM_LANG_private;
 					print "</td>\n<td class=\"optionbox\">";
 					if ($disp) {
 						$birtrec = GetSubRecord(1, "BIRT", $childrec);
@@ -2081,13 +2081,13 @@ $chil = FindChildrenInRecord($famrec);
 					
 					print "<td class=\"optionbox\">";
 					if ($pid == $child) EditFunctions::PrintPedi("F".$i."CPEDI".$i, $pedirec);
-					else if (!empty($pedirec)) print $gm_lang[$pedirec];
-					else print $gm_lang["biological"];
+					else if (!empty($pedirec)) print constant("GM_LANG_".$pedirec);
+					else print GM_LANG_biological;
 					print "</td>";
 					?>
 					<td class="optionbox center" colspan="3">
-						<a href="javascript: <?php print $gm_lang["remove_child"]; ?>" onclick="if (confirm('<?php print $gm_lang["confirm_remove"]; ?>')) { document.quickupdate.closewin.value='0'; document.quickupdate.F<?php echo $i; ?>CDEL.value='<?php echo $child; ?>'; document.quickupdate.submit(); } return false;">
-							<img src="<?php print GM_IMAGE_DIR."/".$GM_IMAGES["remove"]["other"]; ?>" border="0" alt="<?php print $gm_lang["remove_child"]; ?>" />
+						<a href="javascript: <?php print GM_LANG_remove_child; ?>" onclick="if (confirm('<?php print GM_LANG_confirm_remove; ?>')) { document.quickupdate.closewin.value='0'; document.quickupdate.F<?php echo $i; ?>CDEL.value='<?php echo $child; ?>'; document.quickupdate.submit(); } return false;">
+							<img src="<?php print GM_IMAGE_DIR."/".$GM_IMAGES["remove"]["other"]; ?>" border="0" alt="<?php print GM_LANG_remove_child; ?>" />
 						</a>
 					</td>
 					<?php
@@ -2095,7 +2095,7 @@ $chil = FindChildrenInRecord($famrec);
 				}
 			?>
 			<tr>
-				<td class="descriptionbox"><?php print $gm_lang["add_new_chil"]; ?></td>
+				<td class="descriptionbox"><?php print GM_LANG_add_new_chil; ?></td>
 				<td class="optionbox" colspan="3"><input type="text" size="10" name="CHIL[]" id="CHIL<?php echo $i; ?>" />
                                 <?php LinkFunctions::PrintFindindiLink("CHIL$i","");?>
                                 </td>
@@ -2105,7 +2105,7 @@ $chil = FindChildrenInRecord($famrec);
 if (empty($child_surname)) $child_surname = "";
 ?>
 <tr><td>&nbsp;</td></tr>
-<tr><td class="topbottombar" colspan="4"><b><?php print_help_link("quick_update_child_help", "qm"); print $gm_lang["add_new_chil"]; ?></b></td></tr>
+<tr><td class="topbottombar" colspan="4"><b><?php print_help_link("quick_update_child_help", "qm"); print GM_LANG_add_new_chil; ?></b></td></tr>
 <tr>
 	<td class="descriptionbox"><?php print_help_link("edit_given_name_help", "qm"); print $factarray["GIVN"];?></td>
 	<td class="optionbox" colspan="3"><input size="50" type="text" tabindex="<?php print $tabkey; ?>" name="C<?php echo $i; ?>GIVN" /></td>
@@ -2118,33 +2118,33 @@ if (empty($child_surname)) $child_surname = "";
 </tr>
 <?php if (GedcomConfig::$USE_RTL_FUNCTIONS) { ?>
 <tr>
-	<td class="descriptionbox"><?php print_help_link("edit_given_name_help", "qm"); print $gm_lang["hebrew_givn"];?></td>
+	<td class="descriptionbox"><?php print_help_link("edit_given_name_help", "qm"); print GM_LANG_hebrew_givn;?></td>
 	<td class="optionbox" colspan="3"><input size="50" type="text" tabindex="<?php print $tabkey; ?>" name="HC<?php echo $i; ?>GIVN" /></td>
 </tr>
 	<?php $tabkey++; ?>
 <tr>
-	<td class="descriptionbox"><?php print_help_link("edit_surname_help", "qm"); print $gm_lang["hebrew_surn"];?></td>
+	<td class="descriptionbox"><?php print_help_link("edit_surname_help", "qm"); print GM_LANG_hebrew_surn;?></td>
 	<td class="optionbox" colspan="3"><input size="50" type="text" tabindex="<?php print $tabkey; ?>" name="HC<?php echo $i; ?>SURN" /></td>
 	<?php $tabkey++; ?>
 </tr>
 <tr>
-	<td class="descriptionbox"><?php print_help_link("edit_given_name_help", "qm"); print $gm_lang["roman_givn"];?></td>
+	<td class="descriptionbox"><?php print_help_link("edit_given_name_help", "qm"); print GM_LANG_roman_givn;?></td>
 	<td class="optionbox" colspan="3"><input size="50" type="text" tabindex="<?php print $tabkey; ?>" name="RC<?php echo $i; ?>GIVN" /></td>
 </tr>
 	<?php $tabkey++; ?>
 <tr>
-	<td class="descriptionbox"><?php print_help_link("edit_surname_help", "qm"); print $gm_lang["roman_surn"];?></td>
+	<td class="descriptionbox"><?php print_help_link("edit_surname_help", "qm"); print GM_LANG_roman_surn;?></td>
 	<td class="optionbox" colspan="3"><input size="50" type="text" tabindex="<?php print $tabkey; ?>" name="RC<?php echo $i; ?>SURN" /></td>
 	<?php $tabkey++; ?>
 </tr>
 <?php } ?>
 <tr>
-	<td class="descriptionbox"><?php print_help_link("edit_sex_help", "qm"); print $gm_lang["sex"];?></td>
+	<td class="descriptionbox"><?php print_help_link("edit_sex_help", "qm"); print GM_LANG_sex;?></td>
 	<td class="optionbox" colspan="3">
 		<select name="C<?php echo $i; ?>SEX" tabindex="<?php print $tabkey; ?>">
-			<option value="M"><?php print $gm_lang["male"]; ?></option>
-			<option value="F"><?php print $gm_lang["female"]; ?></option>
-			<option value="U"><?php print $gm_lang["unknown"]; ?></option>
+			<option value="M"><?php print GM_LANG_male; ?></option>
+			<option value="F"><?php print GM_LANG_female; ?></option>
+			<option value="U"><?php print GM_LANG_unknown; ?></option>
 		</select>
 	</td></tr>
 	<?php $tabkey++; ?>
@@ -2176,7 +2176,7 @@ if (empty($child_surname)) $child_surname = "";
 <?php
 // NOTE: New wife
 ?>
-<tr><td class="topbottombar" colspan="4"><?php print_help_link("quick_update_spouse_help", "qm"); if (preg_match("/1 SEX M/", $gedrec)>0) print $gm_lang["add_new_wife"]; else print $gm_lang["add_new_husb"]; ?></td></tr>
+<tr><td class="topbottombar" colspan="4"><?php print_help_link("quick_update_spouse_help", "qm"); if (preg_match("/1 SEX M/", $gedrec)>0) print GM_LANG_add_new_wife; else print GM_LANG_add_new_husb; ?></td></tr>
 <tr>
 	<td class="descriptionbox"><?php print_help_link("edit_given_name_help", "qm"); print $factarray["GIVN"];?></td>
 	<td class="optionbox" colspan="3"><input size="50" type="text" tabindex="<?php print $tabkey; ?>" name="SGIVN" /></td></tr>
@@ -2188,33 +2188,33 @@ if (empty($child_surname)) $child_surname = "";
 </tr>
 <?php if (GedcomConfig::$USE_RTL_FUNCTIONS) { ?>
 <tr>
-	<td class="descriptionbox"><?php print_help_link("edit_given_name_help", "qm"); print $gm_lang["hebrew_givn"];?></td>
+	<td class="descriptionbox"><?php print_help_link("edit_given_name_help", "qm"); print GM_LANG_hebrew_givn;?></td>
 	<td class="optionbox" colspan="3"><input size="50" type="text" tabindex="<?php print $tabkey; ?>" name="HSGIVN" /></td>
 	<?php $tabkey++; ?>
 </tr>
 <tr>
-	<td class="descriptionbox"><?php print_help_link("edit_surname_help", "qm"); print $gm_lang["hebrew_surn"];?></td>
+	<td class="descriptionbox"><?php print_help_link("edit_surname_help", "qm"); print GM_LANG_hebrew_surn;?></td>
 	<td class="optionbox" colspan="3"><input size="50" type="text" tabindex="<?php print $tabkey; ?>" name="HSSURN" /></td>
 	<?php $tabkey++; ?>
 </tr>
 <tr>
-	<td class="descriptionbox"><?php print_help_link("edit_given_name_help", "qm"); print $gm_lang["roman_givn"];?></td>
+	<td class="descriptionbox"><?php print_help_link("edit_given_name_help", "qm"); print GM_LANG_roman_givn;?></td>
 	<td class="optionbox" colspan="3"><input size="50" type="text" tabindex="<?php print $tabkey; ?>" name="RSGIVN" /></td>
 	<?php $tabkey++; ?>
 </tr>
 <tr>
-	<td class="descriptionbox"><?php print_help_link("edit_surname_help", "qm"); print $gm_lang["roman_surn"];?></td>
+	<td class="descriptionbox"><?php print_help_link("edit_surname_help", "qm"); print GM_LANG_roman_surn;?></td>
 	<td class="optionbox" colspan="3"><input size="50" type="text" tabindex="<?php print $tabkey; ?>" name="RSSURN" /></td>
 	<?php $tabkey++; ?>
 </tr>
 <?php } ?>
 <tr>
-	<td class="descriptionbox"><?php print_help_link("edit_sex_help", "qm"); print $gm_lang["sex"];?></td>
+	<td class="descriptionbox"><?php print_help_link("edit_sex_help", "qm"); print GM_LANG_sex;?></td>
 	<td class="optionbox" colspan="3">
 		<select name="SSEX" tabindex="<?php print $tabkey; ?>">
-			<option value="M"<?php if (preg_match("/1 SEX F/", $gedrec)>0) print " selected=\"selected\""; ?>><?php print $gm_lang["male"]; ?></option>
-			<option value="F"<?php if (preg_match("/1 SEX M/", $gedrec)>0) print " selected=\"selected\""; ?>><?php print $gm_lang["female"]; ?></option>
-			<option value="U"<?php if (preg_match("/1 SEX U/", $gedrec)>0) print " selected=\"selected\""; ?>><?php print $gm_lang["unknown"]; ?></option>
+			<option value="M"<?php if (preg_match("/1 SEX F/", $gedrec)>0) print " selected=\"selected\""; ?>><?php print GM_LANG_male; ?></option>
+			<option value="F"<?php if (preg_match("/1 SEX M/", $gedrec)>0) print " selected=\"selected\""; ?>><?php print GM_LANG_female; ?></option>
+			<option value="U"<?php if (preg_match("/1 SEX U/", $gedrec)>0) print " selected=\"selected\""; ?>><?php print GM_LANG_unknown; ?></option>
 		</select>
 	<?php $tabkey++; ?>
 	</td>
@@ -2260,7 +2260,7 @@ if (empty($child_surname)) $child_surname = "";
 if (empty($child_surname)) $child_surname = "";
 ?>
 <tr><td>&nbsp;</td></tr>
-<tr><td class="topbottombar" colspan="4"><b><?php print_help_link("quick_update_child_help", "qm"); print $gm_lang["add_new_chil"]; ?></b></td></tr>
+<tr><td class="topbottombar" colspan="4"><b><?php print_help_link("quick_update_child_help", "qm"); print GM_LANG_add_new_chil; ?></b></td></tr>
 <tr>
 	<td class="descriptionbox"><?php print_help_link("edit_given_name_help", "qm"); print $factarray["GIVN"];?></td>
 	<td class="optionbox" colspan="3"><input size="50" type="text" tabindex="<?php print $tabkey; ?>" name="CGIVN" /></td>
@@ -2273,33 +2273,33 @@ if (empty($child_surname)) $child_surname = "";
 </tr>
 <?php if (GedcomConfig::$USE_RTL_FUNCTIONS) { ?>
 <tr>
-	<td class="descriptionbox"><?php print_help_link("edit_given_name_help", "qm"); print $gm_lang["hebrew_givn"];?></td>
+	<td class="descriptionbox"><?php print_help_link("edit_given_name_help", "qm"); print GM_LANG_hebrew_givn;?></td>
 	<td class="optionbox" colspan="3"><input size="50" type="text" tabindex="<?php print $tabkey; ?>" name="HCGIVN" /></td>
 	</tr>
 	<?php $tabkey++; ?>
 	<tr>
-	<td class="descriptionbox"><?php print_help_link("edit_surname_help", "qm"); print $gm_lang["hebrew_surn"];?></td>
+	<td class="descriptionbox"><?php print_help_link("edit_surname_help", "qm"); print GM_LANG_hebrew_surn;?></td>
 	<td class="optionbox" colspan="3"><input size="50" type="text" tabindex="<?php print $tabkey; ?>" name="HCSURN" /></td>
 	<?php $tabkey++; ?>
 </tr>
 <tr>
-	<td class="descriptionbox"><?php print_help_link("edit_given_name_help", "qm"); print $gm_lang["roman_givn"];?></td>
+	<td class="descriptionbox"><?php print_help_link("edit_given_name_help", "qm"); print GM_LANG_roman_givn;?></td>
 	<td class="optionbox" colspan="3"><input size="50" type="text" tabindex="<?php print $tabkey; ?>" name="RCGIVN" /></td>
 	</tr>
 	<?php $tabkey++; ?>
 	<tr>
-	<td class="descriptionbox"><?php print_help_link("edit_surname_help", "qm"); print $gm_lang["roman_surn"];?></td>
+	<td class="descriptionbox"><?php print_help_link("edit_surname_help", "qm"); print GM_LANG_roman_surn;?></td>
 	<td class="optionbox" colspan="3"><input size="50" type="text" tabindex="<?php print $tabkey; ?>" name="RCSURN" /></td>
 	<?php $tabkey++; ?>
 </tr>
 <?php } ?>
 <tr>
-	<td class="descriptionbox"><?php print_help_link("edit_sex_help", "qm"); print $gm_lang["sex"];?></td>
+	<td class="descriptionbox"><?php print_help_link("edit_sex_help", "qm"); print GM_LANG_sex;?></td>
 	<td class="optionbox" colspan="3">
 		<select name="CSEX" tabindex="<?php print $tabkey; ?>">
-			<option value="M"><?php print $gm_lang["male"]; ?></option>
-			<option value="F"><?php print $gm_lang["female"]; ?></option>
-			<option value="U"><?php print $gm_lang["unknown"]; ?></option>
+			<option value="M"><?php print GM_LANG_male; ?></option>
+			<option value="F"><?php print GM_LANG_female; ?></option>
+			<option value="U"><?php print GM_LANG_unknown; ?></option>
 		</select>
 	</td></tr>
 	<?php $tabkey++; ?>
@@ -2375,7 +2375,7 @@ for($j=1; $j<=count($cfams); $j++) {
 ?>
 	<tr><td class="topbottombar" colspan="4">
 	<?php
-	$label = $gm_lang["father"];
+	$label = GM_LANG_father;
 	if (!empty($parents["HUSB"])) {
 		if (PrivacyFunctions::displayDetailsById($parents["HUSB"]) && PrivacyFunctions::showLivingNameById($parents["HUSB"])) {
 			$fatherrec = FindPersonRecord($parents["HUSB"]);
@@ -2387,24 +2387,24 @@ for($j=1; $j<=count($cfams); $j++) {
 			$child_surname = "";
 			$ct = preg_match("~1 NAME.*/(.*)/~", $fatherrec, $match);
 			if ($ct>0) $child_surname = $match[1];
-			if ($fsex=="F") $label = $gm_lang["mother"];
+			if ($fsex=="F") $label = GM_LANG_mother;
 			print $label." ";
 			print "<a href=\"#\" onclick=\"return quickEdit('".$parents["HUSB"]."');\">";
 			$name = GetPersonName($parents["HUSB"], $fatherrec);
 			if (GedcomConfig::$SHOW_ID_NUMBERS) $name .= " (".$parents["HUSB"].")";
-			$name .= " [".$gm_lang["edit"]."]";
+			$name .= " [".GM_LANG_edit."]";
 			print PrintReady($name)."</a>\n";
 		}
-		else print $label." ".$gm_lang["private"];
+		else print $label." ".GM_LANG_private;
 	}
-	else print $label." ".$gm_lang["unknown"];
+	else print $label." ".GM_LANG_unknown;
 	print "</td></tr>";
-	print "<tr><td class=\"descriptionbox\">".$gm_lang["enter_pid"]."<td  class=\"optionbox\" colspan=\"3\"><input type=\"text\" size=\"10\" name=\"FATHER[$i]\" id=\"FATHER$i\" value=\"".$parents['HUSB']."\" />";
+	print "<tr><td class=\"descriptionbox\">".GM_LANG_enter_pid."<td  class=\"optionbox\" colspan=\"3\"><input type=\"text\" size=\"10\" name=\"FATHER[$i]\" id=\"FATHER$i\" value=\"".$parents['HUSB']."\" />";
 	LinkFunctions::PrintFindIndiLink("FATHER$i","");
 	print "</td></tr>";
 ?>
 <?php if (empty($parents["HUSB"])) { ?>
-	<tr><td class="topbottombar" colspan="4"><?php print_help_link("quick_update_spouse_help", "qm"); print $gm_lang["add_father"]; ?></td></tr>
+	<tr><td class="topbottombar" colspan="4"><?php print_help_link("quick_update_spouse_help", "qm"); print GM_LANG_add_father; ?></td></tr>
 	<tr>
 	<td class="descriptionbox"><?php print_help_link("edit_given_name_help", "qm"); print $factarray["GIVN"];?></td>
 	<td class="optionbox" colspan="3"><input size="50" type="text" tabindex="<?php print $tabkey; ?>" name="FGIVN<?php echo $i; ?>" /></td>
@@ -2417,33 +2417,33 @@ for($j=1; $j<=count($cfams); $j++) {
 	</tr>
 	<?php if (GedcomConfig::$USE_RTL_FUNCTIONS) { ?>
 	<tr>
-	<td class="descriptionbox"><?php print_help_link("edit_given_name_help", "qm"); print $gm_lang["hebrew_givn"];?></td>
+	<td class="descriptionbox"><?php print_help_link("edit_given_name_help", "qm"); print GM_LANG_hebrew_givn;?></td>
 	<td class="optionbox" colspan="3"><input size="50" type="text" tabindex="<?php print $tabkey; ?>" name="HFGIVN<?php echo $i; ?>" /></td>
 	</tr>
 	<?php $tabkey++; ?>
 	<tr>
-	<td class="descriptionbox"><?php print_help_link("edit_surname_help", "qm"); print $gm_lang["hebrew_surn"];?></td>
+	<td class="descriptionbox"><?php print_help_link("edit_surname_help", "qm"); print GM_LANG_hebrew_surn;?></td>
 	<td class="optionbox" colspan="3"><input size="50" type="text" tabindex="<?php print $tabkey; ?>" name="HFSURN<?php echo $i; ?>" /></td>
 	<?php $tabkey++; ?>
 	</tr>
 	<tr>
-	<td class="descriptionbox"><?php print_help_link("edit_given_name_help", "qm"); print $gm_lang["roman_givn"];?></td>
+	<td class="descriptionbox"><?php print_help_link("edit_given_name_help", "qm"); print GM_LANG_roman_givn;?></td>
 	<td class="optionbox" colspan="3"><input size="50" type="text" tabindex="<?php print $tabkey; ?>" name="RFGIVN<?php echo $i; ?>" /></td>
 	</tr>
 	<?php $tabkey++; ?>
 	<tr>
-	<td class="descriptionbox"><?php print_help_link("edit_surname_help", "qm"); print $gm_lang["roman_surn"];?></td>
+	<td class="descriptionbox"><?php print_help_link("edit_surname_help", "qm"); print GM_LANG_roman_surn;?></td>
 	<td class="optionbox" colspan="3"><input size="50" type="text" tabindex="<?php print $tabkey; ?>" name="RFSURN<?php echo $i; ?>" /></td>
 	<?php $tabkey++; ?>
 	</tr>
 	<?php } ?>
 	<tr>
-	<td class="descriptionbox"><?php print_help_link("edit_sex_help", "qm"); print $gm_lang["sex"];?></td>
+	<td class="descriptionbox"><?php print_help_link("edit_sex_help", "qm"); print GM_LANG_sex;?></td>
 	<td class="optionbox" colspan="3">
 		<select name="FSEX<?php echo $i; ?>" tabindex="<?php print $tabkey; ?>">
-			<option value="M" selected="selected"><?php print $gm_lang["male"]; ?></option>
-			<option value="F"><?php print $gm_lang["female"]; ?></option>
-			<option value="U"><?php print $gm_lang["unknown"]; ?></option>
+			<option value="M" selected="selected"><?php print GM_LANG_male; ?></option>
+			<option value="F"><?php print GM_LANG_female; ?></option>
+			<option value="U"><?php print GM_LANG_unknown; ?></option>
 		</select>
 	<?php $tabkey++; ?>
 	</td>
@@ -2486,7 +2486,7 @@ for($j=1; $j<=count($cfams); $j++) {
 <tr><td>&nbsp;</td></tr>
 <tr><td class="topbottombar" colspan="4">
 <?php
-	$label = $gm_lang["mother"];
+	$label = GM_LANG_mother;
 	if (!empty($parents["WIFE"])) {
 		if (PrivacyFunctions::displayDetailsById($parents["WIFE"]) && PrivacyFunctions::showLivingNameById($parents["WIFE"])) {
 			$motherrec = FindPersonRecord($parents["WIFE"]);
@@ -2495,24 +2495,24 @@ for($j=1; $j<=count($cfams); $j++) {
 				$motherrec = $rec[$GEDCOMID][$parents["WIFE"]];
 			}
 			$msex = GetGedcomValue("SEX", 1, $motherrec, '', false);
-			if ($msex=="M") $label = $gm_lang["father"];
+			if ($msex=="M") $label = GM_LANG_father;
 			print $label." ";
 			print "<a href=\"#\" onclick=\"return quickEdit('".$parents["WIFE"]."');\">";
 			$name = GetPersonName($parents["WIFE"], $motherrec);
 			if (GedcomConfig::$SHOW_ID_NUMBERS) $name .= " (".$parents["WIFE"].")";
-			$name .= " [".$gm_lang["edit"]."]";
+			$name .= " [".GM_LANG_edit."]";
 			print PrintReady($name)."</a>\n";
 		}
-		else print $label." ".$gm_lang["private"];
+		else print $label." ".GM_LANG_private;
 	}
-	else print $label." ".$gm_lang["unknown"];
+	else print $label." ".GM_LANG_unknown;
 	print "</td></tr>\n";
-	print "<tr><td  class=\"descriptionbox\">".$gm_lang["enter_pid"]."<td  class=\"optionbox\" colspan=\"3\"><input type=\"text\" size=\"10\" name=\"MOTHER[$i]\" id=\"MOTHER$i\" value=\"".$parents['WIFE']."\" />";
+	print "<tr><td  class=\"descriptionbox\">".GM_LANG_enter_pid."<td  class=\"optionbox\" colspan=\"3\"><input type=\"text\" size=\"10\" name=\"MOTHER[$i]\" id=\"MOTHER$i\" value=\"".$parents['WIFE']."\" />";
 	LinkFunctions::PrintFindIndiLink("MOTHER$i","");
 	?>
 </td></tr>
 <?php if (empty($parents["WIFE"])) { ?>
-<tr><td class="topbottombar" colspan="4"><?php print_help_link("quick_update_spouse_help", "qm"); print $gm_lang["add_mother"]; ?></td></tr>
+<tr><td class="topbottombar" colspan="4"><?php print_help_link("quick_update_spouse_help", "qm"); print GM_LANG_add_mother; ?></td></tr>
 <tr>
 	<td class="descriptionbox"><?php print_help_link("edit_given_name_help", "qm"); print $factarray["GIVN"];?></td>
 	<td class="optionbox" colspan="3"><input size="50" type="text" tabindex="<?php print $tabkey; ?>" name="MGIVN<?php echo $i; ?>" /></td>
@@ -2525,33 +2525,33 @@ for($j=1; $j<=count($cfams); $j++) {
 </tr>
 <?php if (GedcomConfig::$USE_RTL_FUNCTIONS) { ?>
 <tr>
-	<td class="descriptionbox"><?php print_help_link("edit_given_name_help", "qm"); print $gm_lang["hebrew_givn"];?></td>
+	<td class="descriptionbox"><?php print_help_link("edit_given_name_help", "qm"); print GM_LANG_hebrew_givn;?></td>
 	<td class="optionbox" colspan="3"><input size="50" type="text" tabindex="<?php print $tabkey; ?>" name="HMGIVN<?php echo $i; ?>" /></td>
 	</tr>
 	<?php $tabkey++; ?>
 	</tr>
-	<td class="descriptionbox"><?php print_help_link("edit_surname_help", "qm"); print $gm_lang["hebrew_surn"];?></td>
+	<td class="descriptionbox"><?php print_help_link("edit_surname_help", "qm"); print GM_LANG_hebrew_surn;?></td>
 	<td class="optionbox" colspan="3"><input size="50" type="text" tabindex="<?php print $tabkey; ?>" name="HMSURN<?php echo $i; ?>" /></td>
 	<?php $tabkey++; ?>
 </tr>
 <tr>
-	<td class="descriptionbox"><?php print_help_link("edit_given_name_help", "qm"); print $gm_lang["roman_givn"];?></td>
+	<td class="descriptionbox"><?php print_help_link("edit_given_name_help", "qm"); print GM_LANG_roman_givn;?></td>
 	<td class="optionbox" colspan="3"><input size="50" type="text" tabindex="<?php print $tabkey; ?>" name="RMGIVN<?php echo $i; ?>" /></td>
 	</tr>
 	<?php $tabkey++; ?>
 	</tr>
-	<td class="descriptionbox"><?php print_help_link("edit_surname_help", "qm"); print $gm_lang["roman_surn"];?></td>
+	<td class="descriptionbox"><?php print_help_link("edit_surname_help", "qm"); print GM_LANG_roman_surn;?></td>
 	<td class="optionbox" colspan="3"><input size="50" type="text" tabindex="<?php print $tabkey; ?>" name="RMSURN<?php echo $i; ?>" /></td>
 	<?php $tabkey++; ?>
 </tr>
 <?php } ?>
 <tr>
-	<td class="descriptionbox"><?php print_help_link("edit_sex_help", "qm"); print $gm_lang["sex"];?></td>
+	<td class="descriptionbox"><?php print_help_link("edit_sex_help", "qm"); print GM_LANG_sex;?></td>
 	<td class="optionbox" colspan="3">
 		<select name="MSEX<?php echo $i; ?>" tabindex="<?php print $tabkey; ?>">
-			<option value="M"><?php print $gm_lang["male"]; ?></option>
-			<option value="F" selected="selected"><?php print $gm_lang["female"]; ?></option>
-			<option value="U"><?php print $gm_lang["unknown"]; ?></option>
+			<option value="M"><?php print GM_LANG_male; ?></option>
+			<option value="F" selected="selected"><?php print GM_LANG_female; ?></option>
+			<option value="U"><?php print GM_LANG_unknown; ?></option>
 		</select>
 	<?php $tabkey++; ?>
 	</td>
@@ -2590,12 +2590,12 @@ for($j=1; $j<=count($cfams); $j++) {
 // NOTE: Update fact 
 ?>
 <tr><td>&nbsp;</td></tr>
-<tr><td class="topbottombar" colspan="4"><?php print_help_link("quick_update_fact_help", "qm"); print $gm_lang["update_fact"]; ?></td></tr>
+<tr><td class="topbottombar" colspan="4"><?php print_help_link("quick_update_fact_help", "qm"); print GM_LANG_update_fact; ?></td></tr>
 <tr>
 	<td class="descriptionbox">&nbsp;</td>
 	<td class="descriptionbox"><?php print $factarray["DATE"]; ?></td>
 	<td class="descriptionbox"><?php print $factarray["PLAC"]; ?></td>
-	<td class="descriptionbox"><?php print $gm_lang["delete"]; ?></td>
+	<td class="descriptionbox"><?php print GM_LANG_delete; ?></td>
 <?php
 foreach($famfacts as $f=>$fact) {
 	$fact_tag = $fact[0];
@@ -2607,7 +2607,7 @@ foreach($famfacts as $f=>$fact) {
 			<tr>
 				<td class="descriptionbox">
 				<?php if (isset($factarray[$fact_tag])) print $factarray[$fact_tag]; 
-					else if (isset($gm_lang[$fact_tag])) print $gm_lang[$fact_tag]; 
+					else if (defined("GM_LANG_".$fact_tag)) print constant("GM_LANG_".$fact_tag); 
 					else print $fact_tag;
 				?>
 					<input type="hidden" name="F<?php echo $i; ?>TAGS[]" value="<?php echo $fact_tag; ?>" />
@@ -2620,7 +2620,7 @@ foreach($famfacts as $f=>$fact) {
 				<?php }
 				else {
 					print "<td class=\"optionbox\"><select tabindex=\"".$tabkey."\" name=\"F".$i."TEMPS[]\" >\n";
-					print "<option value=''>".$gm_lang["no_temple"]."</option>\n";
+					print "<option value=''>".GM_LANG_no_temple."</option>\n";
 					foreach($TEMPLE_CODES as $code=>$temple) {
 						print "<option value=\"$code\"";
 						if ($code==$temp) print " selected=\"selected\"";
@@ -2633,8 +2633,8 @@ foreach($famfacts as $f=>$fact) {
 				<td class="optionbox center">
 					<input type="hidden" name="F<?php echo $i; ?>REMS[<?php echo $f; ?>]" id="F<?php echo $i; ?>REM<?php echo $f; ?>" value="0" />
 					<?php if (!$fact[2]) { ?>
-					<a href="javascript: <?php print $gm_lang["delete"]; ?>" onclick="if (confirm('<?php print $gm_lang["confirm_remove"]; ?>')) { document.quickupdate.closewin.value='0'; document.quickupdate.F<?php echo $i; ?>REM<?php echo $f; ?>.value='1'; document.quickupdate.submit(); } return false;">
-						<img src="<?php print GM_IMAGE_DIR."/".$GM_IMAGES["remove"]["other"]; ?>" border="0" alt="<?php print $gm_lang["delete"]; ?>" />
+					<a href="javascript: <?php print GM_LANG_delete; ?>" onclick="if (confirm('<?php print GM_LANG_confirm_remove; ?>')) { document.quickupdate.closewin.value='0'; document.quickupdate.F<?php echo $i; ?>REM<?php echo $f; ?>.value='1'; document.quickupdate.submit(); } return false;">
+						<img src="<?php print GM_IMAGE_DIR."/".$GM_IMAGES["remove"]["other"]; ?>" border="0" alt="<?php print GM_LANG_delete; ?>" />
 					</a>
 					<?php } ?>
 				</td>
@@ -2651,7 +2651,7 @@ foreach($famfacts as $f=>$fact) {
 ?>
 <?php if (count($famaddfacts)>0) { ?>
 	<tr><td>&nbsp;</td></tr>
-	<tr><td class="topbottombar" colspan="4"><?php print_help_link("quick_update_fact_help", "qm"); print $gm_lang["add_fact"]; ?></td></tr>
+	<tr><td class="topbottombar" colspan="4"><?php print_help_link("quick_update_fact_help", "qm"); print GM_LANG_add_fact; ?></td></tr>
 	<tr>
 		<td class="descriptionbox">&nbsp;</td>
 		<td class="descriptionbox"><?php print_help_link("def_gedcom_date_help", "qm"); print $factarray["DATE"]; ?></td>
@@ -2660,7 +2660,7 @@ foreach($famfacts as $f=>$fact) {
 		</tr>
 	<tr>
 		<td class="optionbox"><select name="F<?php echo $i; ?>newfact" tabindex="<?php print $tabkey; ?>">
-			<option value=""><?php print $gm_lang["select_fact"]; ?></option>
+			<option value=""><?php print GM_LANG_select_fact; ?></option>
 		<?php $tabkey++; ?>
 		<?php
 		foreach($famaddfacts as $indexval => $fact) {
@@ -2692,14 +2692,14 @@ $chil = FindChildrenInRecord($famrec);
 	?>
 	<tr><td>&nbsp;</td></tr>
 	<tr>
-		<td class="topbottombar" colspan="4"><?php print $gm_lang["children"]; ?></td>
+		<td class="topbottombar" colspan="4"><?php print GM_LANG_children; ?></td>
 	</tr>
 	<tr>
 		<input type="hidden" name="F<?php echo $i; ?>CDEL" value="" />
-					<td class="descriptionbox"><?php print $gm_lang["name"]; ?></td>
+					<td class="descriptionbox"><?php print GM_LANG_name; ?></td>
 					<td class="descriptionbox"><?php print $factarray["BIRT"]; ?></td>
 					<td class="descriptionbox"><?php print $factarray["PEDI"]; ?></td>
-					<td class="descriptionbox"><?php print $gm_lang["remove"]; ?></td>
+					<td class="descriptionbox"><?php print GM_LANG_remove; ?></td>
 				</tr>
 			<?php
 				foreach($chil as $c=>$child) {
@@ -2715,14 +2715,14 @@ $chil = FindChildrenInRecord($famrec);
 					if ($disp || PrivacyFunctions::showLivingNameById($child)) {
 						$isF = GetGedcomValue("SEX", 1, $childrec, "", false);
 						$name .= "<img id=\"box-F.$i.$child-sex\" src=\"".GM_IMAGE_DIR."/";
-						if ($isF=="M") $name .= $GM_IMAGES["sex"]["small"]."\" title=\"".$gm_lang["male"]."\" alt=\"".$gm_lang["male"];
-						else  if ($isF=="F") $name .= $GM_IMAGES["sexf"]["small"]."\" title=\"".$gm_lang["female"]."\" alt=\"".$gm_lang["female"];
-						else  $name .= $GM_IMAGES["sexn"]["small"]."\" title=\"".$gm_lang["unknown"]."\" alt=\"".$gm_lang["unknown"];
+						if ($isF=="M") $name .= $GM_IMAGES["sex"]["small"]."\" title=\"".GM_LANG_male."\" alt=\"".GM_LANG_male;
+						else  if ($isF=="F") $name .= $GM_IMAGES["sexf"]["small"]."\" title=\"".GM_LANG_female."\" alt=\"".GM_LANG_female;
+						else  $name .= $GM_IMAGES["sexn"]["small"]."\" title=\"".GM_LANG_unknown."\" alt=\"".GM_LANG_unknown;
 						$name .= "\" class=\"sex_image\" />";
-						if ($pid != $child) $name.= "<a href=\"#\" onclick=\"return quickEdit('".$child."');\">&nbsp;"."[".$gm_lang["edit"]."]</a>";
+						if ($pid != $child) $name.= "<a href=\"#\" onclick=\"return quickEdit('".$child."');\">&nbsp;"."[".GM_LANG_edit."]</a>";
 						print PrintReady($name);
 					}
-					else print $gm_lang["private"];
+					else print GM_LANG_private;
 					print "</td>\n<td class=\"optionbox\">";
 					if ($disp) {
 						$birtrec = GetSubRecord(1, "BIRT", $childrec);
@@ -2740,13 +2740,13 @@ $chil = FindChildrenInRecord($famrec);
 					$pedirec = GetSubRecord(1, "FAMC @$famid@", $childrec);
 					$pedirec = GetGedcomValue("PEDI", 2, $pedirec);
 					if ($pid == $child) EditFunctions::PrintPedi("F".$i."CPEDI", $pedirec);
-					else if (!empty($pedirec)) print $gm_lang[$pedirec];
-					else print $gm_lang["biological"];
+					else if (!empty($pedirec)) print constant("GM_LANG_".$pedirec);
+					else print GM_LANG_biological;
 					print "</td>";
 
 					?><td class="optionbox center" colspan="1"><?php if ($pid != $child) {?>
-						<a href="javascript: <?php print $gm_lang["remove_child"]; ?>" onclick="document.quickupdate.closewin.value='0'; document.quickupdate.F<?php echo $i; ?>CDEL.value='<?php echo $child; ?>'; document.quickupdate.submit(); return false;">
-							<img src="<?php print GM_IMAGE_DIR."/".$GM_IMAGES["remove"]["other"]; ?>" border="0" alt="<?php print $gm_lang["remove_child"]; ?>" />
+						<a href="javascript: <?php print GM_LANG_remove_child; ?>" onclick="document.quickupdate.closewin.value='0'; document.quickupdate.F<?php echo $i; ?>CDEL.value='<?php echo $child; ?>'; document.quickupdate.submit(); return false;">
+							<img src="<?php print GM_IMAGE_DIR."/".$GM_IMAGES["remove"]["other"]; ?>" border="0" alt="<?php print GM_LANG_remove_child; ?>" />
 						</a><?php }?>
 					</td>
 					<?php
@@ -2754,7 +2754,7 @@ $chil = FindChildrenInRecord($famrec);
 				}
 			?>
 			<tr>
-				<td class="descriptionbox"><?php print $gm_lang["add_child_to_family"]; ?></td>
+				<td class="descriptionbox"><?php print GM_LANG_add_child_to_family; ?></td>
 				<td class="optionbox" colspan="3"><input type="text" size="10" name="CHIL[<?php echo $i; ?>]" id="CHIL<?php echo $i; ?>" />
                                 <?php LinkFunctions::PrintFindIndiLink("CHIL$i","");?>
                                 </td>
@@ -2763,7 +2763,7 @@ $chil = FindChildrenInRecord($famrec);
 // NOTE: Add a child
 ?>
 <tr><td>&nbsp;</td></tr>
-<tr><td class="topbottombar" colspan="4"><?php print_help_link("quick_update_child_help", "qm"); print $gm_lang["add_child_to_family"]; ?></td></tr>
+<tr><td class="topbottombar" colspan="4"><?php print_help_link("quick_update_child_help", "qm"); print GM_LANG_add_child_to_family; ?></td></tr>
 <tr>
 	<td class="descriptionbox"><?php print_help_link("edit_given_name_help", "qm"); print $factarray["GIVN"];?></td>
 	<td class="optionbox" colspan="3"><input size="50" type="text" tabindex="<?php print $tabkey; ?>" name="C<?php echo $i; ?>GIVN" /></td>
@@ -2776,29 +2776,29 @@ $chil = FindChildrenInRecord($famrec);
 </tr>
 <?php if (GedcomConfig::$USE_RTL_FUNCTIONS) { ?>
 <tr>
-	<td class="descriptionbox"><?php print_help_link("edit_given_name_help", "qm"); print $gm_lang["hebrew_givn"];?></td>
+	<td class="descriptionbox"><?php print_help_link("edit_given_name_help", "qm"); print GM_LANG_hebrew_givn;?></td>
 	<td class="optionbox" colspan="3"><input size="50" type="text" tabindex="<?php print $tabkey; ?>" name="HC<?php echo $i; ?>GIVN" /></td>
 	<?php $tabkey++; ?>
-	<td class="descriptionbox"><?php print_help_link("edit_surname_help", "qm"); print $gm_lang["hebrew_surn"];?></td>
+	<td class="descriptionbox"><?php print_help_link("edit_surname_help", "qm"); print GM_LANG_hebrew_surn;?></td>
 	<td class="optionbox" colspan="3"><input size="50" type="text" tabindex="<?php print $tabkey; ?>" name="HC<?php echo $i; ?>SURN" /></td>
 	<?php $tabkey++; ?>
 </tr>
 <tr>
-	<td class="descriptionbox"><?php print_help_link("edit_given_name_help", "qm"); print $gm_lang["roman_givn"];?></td>
+	<td class="descriptionbox"><?php print_help_link("edit_given_name_help", "qm"); print GM_LANG_roman_givn;?></td>
 	<td class="optionbox" colspan="3"><input size="50" type="text" tabindex="<?php print $tabkey; ?>" name="RC<?php echo $i; ?>GIVN" /></td>
 	<?php $tabkey++; ?>
-	<td class="descriptionbox"><?php print_help_link("edit_surname_help", "qm"); print $gm_lang["roman_surn"];?></td>
+	<td class="descriptionbox"><?php print_help_link("edit_surname_help", "qm"); print GM_LANG_roman_surn;?></td>
 	<td class="optionbox" colspan="3"><input size="50" type="text" tabindex="<?php print $tabkey; ?>" name="RC<?php echo $i; ?>SURN" /></td>
 	<?php $tabkey++; ?>
 </tr>
 <?php } ?>
 <tr>
-	<td class="descriptionbox"><?php print_help_link("edit_sex_help", "qm"); print $gm_lang["sex"];?></td>
+	<td class="descriptionbox"><?php print_help_link("edit_sex_help", "qm"); print GM_LANG_sex;?></td>
 	<td class="optionbox" colspan="3">
 		<select name="C<?php echo $i; ?>SEX" tabindex="<?php print $tabkey; ?>">
-			<option value="M"><?php print $gm_lang["male"]; ?></option>
-			<option value="F"><?php print $gm_lang["female"]; ?></option>
-			<option value="U"><?php print $gm_lang["unknown"]; ?></option>
+			<option value="M"><?php print GM_LANG_male; ?></option>
+			<option value="F"><?php print GM_LANG_female; ?></option>
+			<option value="U"><?php print GM_LANG_unknown; ?></option>
 		</select>
 	</td></tr>
 	<?php $tabkey++; ?>
@@ -2823,7 +2823,7 @@ $chil = FindChildrenInRecord($famrec);
 	$i++;
 }
 ?>
-<input type="submit" value="<?php print $gm_lang["save"]; ?>" />
+<input type="submit" value="<?php print GM_LANG_save; ?>" />
 </form>
 <?php
 }

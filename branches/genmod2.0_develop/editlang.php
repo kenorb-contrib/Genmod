@@ -41,14 +41,14 @@ class EditLang {
 	var $lang_shortcut = '';
 	
 	
-	function EditLang(&$genmod, &$gm_lang, &$gm_username) {
+	function EditLang(&$genmod, &$gm_username) {
 //		$this->CheckUrl();
 		if (!$this->CheckAccess($gm_username)) return false;
 		else {
 			$this->GetPageValues($genmod);
-			$this->SortLanguageTable($genmod, $gm_lang);
-			$this->AddHeader($genmod, $gm_lang);
-			$this->ShowMenu($genmod, $gm_lang);
+			$this->SortLanguageTable($genmod);
+			$this->AddHeader($genmod);
+			$this->ShowMenu($genmod);
 			echo '<div id="content">';
 			// Inclusion of the language editing functions
 			require $genmod['gm_base_directory'] . "includes/functions/functions_editlang.php";
@@ -59,37 +59,37 @@ class EditLang {
 						else $_SESSION["DEBUG_LANG"] = "no";
 						$this->debug_lang = $_SESSION["DEBUG_LANG"];
 					}
-					$this->DebugHelptext($gm_lang);
+					$this->DebugHelptext();
 					break;
 				case 'edit':
-					$this->EditLanguage($genmod, $gm_lang);
+					$this->EditLanguage($genmod);
 					break;
 				case 'export':
-					$this->ExportLanguage($genmod, $gm_lang);
+					$this->ExportLanguage($genmod);
 					break;
 				case 'compare':
-					$this->CompareLanguage($genmod, $gm_lang);
+					$this->CompareLanguage($genmod);
 					break;
 				default:
 					?>
 					<div class="admin_topbottombar">
 					<?php
-					print "<h3>".$gm_lang["edit_langdiff"]."</h3>";
+					print "<h3>".GM_LANG_edit_langdiff."</h3>";
 					?>
 					</div>
 					<div class="admin_item_box">
-						<div class="admin_item_left"><div class="helpicon"><?php print_help_link("help_changelanguage.php", "qm", "enable_disable_lang"); ?></div><div class="description"><a href="changelanguage.php"><?php print $gm_lang["enable_disable_lang"];?></a>
+						<div class="admin_item_left"><div class="helpicon"><?php print_help_link("help_changelanguage.php", "qm", "enable_disable_lang"); ?></div><div class="description"><a href="changelanguage.php"><?php print GM_LANG_enable_disable_lang;?></a>
 						</div></div>
-						<div class="admin_item_right"><div class="helpicon"><?php print_help_link("edit_lang_utility_help", "qm", "edit_lang_utility"); ?></div><div class="description"><a href="editlang.php?action=edit"><?php print $gm_lang["edit_lang_utility"];?></a></div></div>
-						<div class="admin_item_left"><div class="helpicon"><?php print_help_link("export_lang_utility_help", "qm", "export_lang_utility"); ?></div><div class="description"><a href="editlang.php?action=export"><?php print $gm_lang["export_lang_utility"];?></a></div></div>
-						<div class="admin_item_right"><div class="helpicon"><?php print_help_link("translation_forum_desc", "qm", "translation_forum"); ?></div><div class="description"><a href="http://www.genmod.net/forum/viewforum.php?f=4" target="_blank" ><?php print $gm_lang["translation_forum"];?></a></div></div>
-						<div class="admin_item_left"><div class="helpicon"><?php print_help_link("compare_lang_utility_help", "qm", "compare_lang_utility"); ?></div><div class="description"><a href="editlang.php?action=compare"><?php print $gm_lang["compare_lang_utility"];?></a></div></div>
-						<div class="admin_item_right"><div class="helpicon"><?php print_help_link("lang_debug_help", "qm", "lang_debug"); ?></div><div class="description"><a href="editlang.php?action=debug"><?php print $gm_lang["lang_debug"];?></a></div></div>
-						<div class="admin_item_left"><div class="helpicon"><?php print_help_link("bom_check_help", "qm", "bom_check"); ?></div><div class="description"><a href="editlang.php?action=bom"><?php print $gm_lang["bom_check"];?></a></div></div>
+						<div class="admin_item_right"><div class="helpicon"><?php print_help_link("edit_lang_utility_help", "qm", "edit_lang_utility"); ?></div><div class="description"><a href="editlang.php?action=edit"><?php print GM_LANG_edit_lang_utility;?></a></div></div>
+						<div class="admin_item_left"><div class="helpicon"><?php print_help_link("export_lang_utility_help", "qm", "export_lang_utility"); ?></div><div class="description"><a href="editlang.php?action=export"><?php print GM_LANG_export_lang_utility;?></a></div></div>
+						<div class="admin_item_right"><div class="helpicon"><?php print_help_link("translation_forum_desc", "qm", "translation_forum"); ?></div><div class="description"><a href="http://www.genmod.net/forum/viewforum.php?f=4" target="_blank" ><?php print GM_LANG_translation_forum;?></a></div></div>
+						<div class="admin_item_left"><div class="helpicon"><?php print_help_link("compare_lang_utility_help", "qm", "compare_lang_utility"); ?></div><div class="description"><a href="editlang.php?action=compare"><?php print GM_LANG_compare_lang_utility;?></a></div></div>
+						<div class="admin_item_right"><div class="helpicon"><?php print_help_link("lang_debug_help", "qm", "lang_debug"); ?></div><div class="description"><a href="editlang.php?action=debug"><?php print GM_LANG_lang_debug;?></a></div></div>
+						<div class="admin_item_left"><div class="helpicon"><?php print_help_link("bom_check_help", "qm", "bom_check"); ?></div><div class="description"><a href="editlang.php?action=bom"><?php print GM_LANG_bom_check;?></a></div></div>
 					</div>
 					<?php
 					if ($genmod['action'] == "bom") {
-						echo "<div class=\"shade2 center\">".$gm_lang["bom_check"]."</div>";
+						echo "<div class=\"shade2 center\">".GM_LANG_bom_check."</div>";
 						echo "<div class=\"shade1 ltr\">".CheckBom()."</div>";
 					}
 					break;
@@ -112,19 +112,19 @@ class EditLang {
 		else return true;
 	}
 	
-	function AddHeader(&$genmod, &$gm_lang) {
+	function AddHeader(&$genmod) {
 		switch ($genmod['action']){
 			case "edit": 
-				PrintHeader($gm_lang["edit_lang_utility"]);
+				PrintHeader(GM_LANG_edit_lang_utility);
 				break;
 			case "export": 
-				PrintHeader($gm_lang["export_lang_utility"]);
+				PrintHeader(GM_LANG_export_lang_utility);
 				break;
 			case "compare": 
-				PrintHeader($gm_lang["compare_lang_utility"]); 
+				PrintHeader(GM_LANG_compare_lang_utility); 
 				break;
 			default: 
-				PrintHeader($gm_lang["edit_langdiff"]); 
+				PrintHeader(GM_LANG_edit_langdiff); 
 				break;
 		}
 		
@@ -162,38 +162,38 @@ class EditLang {
 		if (strpos($this->query_string,"&dv=")) $this->query_string = substr($this->query_string,0,strpos($this->query_string,"&dv="));
 	}
 	
-	function SortLanguageTable(&$genmod, &$gm_lang) { 
+	function SortLanguageTable(&$genmod) { 
 		// Sort the Language table into localized language name order
 		// NB we can only work on the active languages, inactive ones are not in the DB!
 		foreach ($genmod['gm_language'] as $key => $value){
 			if ($genmod['language_settings'][$key]["gm_lang_use"]) {
 				$d_LangName = "lang_name_".$key;
-				$this->sorted_langs[$key] = $gm_lang[$d_LangName];
+				$this->sorted_langs[$key] = constant("GM_LANG_".$d_LangName);
 			}
 		}
 		asort($this->sorted_langs);
 	}
 	
-	function ShowMenu(&$genmod, &$gm_lang) {
+	function ShowMenu(&$genmod) {
 		?>
 		<!-- Setup the left box -->
 		<div id="admin_genmod_left">
-			<div class="admin_link"><a href="admin.php"><?php print $gm_lang["admin"];?></a></div>
+			<div class="admin_link"><a href="admin.php"><?php print GM_LANG_admin;?></a></div>
 			<?php
-			if ($genmod['action'] != "") print "<div class=\"admin_link\"><a href=\"editlang.php\">".$gm_lang["translator_tools"]."</a></div>";
+			if ($genmod['action'] != "") print "<div class=\"admin_link\"><a href=\"editlang.php\">".GM_LANG_translator_tools."</a></div>";
 			?>
 		</div>
 		<?php
 	}
 	
-	function EditLanguage(&$genmod, &$gm_lang) {
+	function EditLanguage(&$genmod) {
 		?>
 		<form name="choose_form" method="get" action="<?php print $_SERVER['SCRIPT_NAME']; ?>">
 			<input type="hidden" name="page" value="editlang" />
 			<input type="hidden" name="action" value="edit" />
 			<input type="hidden" name="execute" value="true" />
 			<div class="admin_topbottombar">
-				<?php print $gm_lang["edit_lang_utility"]; ?>
+				<?php print GM_LANG_edit_lang_utility; ?>
 			</div>
 			<div class="admin_item_box">
 				<div class="width30 choice_left">
@@ -202,12 +202,12 @@ class EditLang {
 					</div>
 					<div class="description">
 						<?php
-						print $gm_lang["language_to_edit"]."<br />";
+						print GM_LANG_language_to_edit."<br />";
 						print "<select name=\"language2\">";
 						foreach ($this->sorted_langs as $key => $value){
 							print "\n\t\t\t<option value=\"$key\"";
 							if ($key == $this->language2) print " selected=\"selected\"";
-							print ">".$gm_lang["lang_name_".$key]."</option>";
+							print ">".constant("GM_LANG_lang_name_".$key)."</option>";
 						}
 						?>
 						</select>
@@ -219,19 +219,19 @@ class EditLang {
 					</div>
 					<div class="description">
 						<?php
-						print $gm_lang["file_to_edit"]."<br />";
+						print GM_LANG_file_to_edit."<br />";
 						print "<select name=\"file_type\">";
 						print "\n\t\t\t<option value=\"lang\"";
 						if ($this->file_type == "lang") print " selected=\"selected\"";
-						print ">".$gm_lang["comparing_main"]."</option>";
+						print ">".GM_LANG_comparing_main."</option>";
 						
 						print "\n\t\t\t<option value=\"help_text\"";
 						if ($this->file_type == "help_text") print " selected=\"selected\"";
-						print ">" . $gm_lang["comparing_helptext"] . "</option>";
+						print ">" . GM_LANG_comparing_helptext . "</option>";
 						
 						print "\n\t\t\t<option value=\"facts\"";
 						if ($this->file_type == "facts") print " selected=\"selected\"";
-						print ">" . $gm_lang["comparing_facts"] . "</option>";
+						print ">" . GM_LANG_comparing_facts . "</option>";
 						?>
 						</select>
 					</div>
@@ -242,21 +242,21 @@ class EditLang {
 					</div>
 					<div class="description">
 						<?php
-						print $gm_lang["hide_translated"]."<br />";
+						print GM_LANG_hide_translated."<br />";
 						print "<select name=\"hide_translated\">";
 						print "<option";
 						if (!$this->hide_translated) print " selected=\"selected\"";
 						print " value=\"";
 						print "0";
 						print "\">";
-						print $gm_lang["no"];
+						print GM_LANG_no;
 						print "</option>";
 						print "<option";
 						if ($this->hide_translated) print " selected=\"selected\"";
 						print " value=\"";
 						print "1";
 						print "\">";
-						print $gm_lang["yes"];
+						print GM_LANG_yes;
 						print "</option>";
 						?>
 						</select>
@@ -265,20 +265,20 @@ class EditLang {
 			</div>
 			<div class="admin_item_box">
 				<div class="center">
-					<input  type="submit" value="<?php print $gm_lang["edit"];?>" />
+					<input  type="submit" value="<?php print GM_LANG_edit;?>" />
 				</div>
 			</div>
 		</form>
 		<?php
 		if ($this->execute) {
 			?>
-			<div class="topbottombar subheaders"><?php print $gm_lang["listing"];?>: "
+			<div class="topbottombar subheaders"><?php print GM_LANG_listing;?>: "
 			<?php
 			switch ($this->file_type) {
 				case "lang":
-					print $gm_lang["lang_name_english"] . "\" ";
-					print $gm_lang["and"] . " \"";
-					print $gm_lang["lang_name_".$this->language2];
+					print constant("GM_LANG_lang_name_english") . "\" ";
+					print GM_LANG_and . " \"";
+					print constant("GM_LANG_lang_name_".$this->language2);
 					// read the english lang.en.php file into array
 					$english_language_array = array();
 					$english_language_array = LoadEnglish(true,false,false);
@@ -287,9 +287,9 @@ class EditLang {
 					$new_language_array = LoadLanguage($this->language2, true);
 					break;
 				case "help_text":
-					print $gm_lang["lang_name_english"] . "\" ";
-					print $gm_lang["and"] . " \"";
-					print $gm_lang["lang_name_".$this->language2];
+					print constant("GM_LANG_lang_name_english") . "\" ";
+					print GM_LANG_and . " \"";
+					print constant("GM_LANG_lang_name_".$this->language2);
 					// read the english lang.en.php file into array
 					$english_language_array = array();
 					$english_language_array = LoadEnglish(true, true);
@@ -298,9 +298,9 @@ class EditLang {
 					$new_language_array = LoadLanguage($this->language2, true, true);
 					break;
 				case "facts":
-					print $gm_lang["lang_name_english"] . "\" ";
-					print $gm_lang["and"] . " \"";
-					print $gm_lang["lang_name_".$this->language2];
+					print constant("GM_LANG_lang_name_english") . "\" ";
+					print GM_LANG_and . " \"";
+					print constant("GM_LANG_lang_name_".$this->language2);
 					// read the english lang.en.php file into array
 					$english_language_array = array();
 					$english_language_array = LoadEnglishFacts(true);
@@ -310,7 +310,7 @@ class EditLang {
 					break;					
 			}
 			print "\"<br />\n";
-			print $gm_lang["contents"] . ":</div>";
+			print GM_LANG_contents . ":</div>";
 			$lastfound = (-1);
 			$counter = 0;
 			$colorid = 1;
@@ -325,7 +325,7 @@ class EditLang {
 				
 				$val = stripslashes(mask_all($value));
 				if ($val == "") {
-					$dummy_output .= "<strong style=\"color: #FF0000\">" . str_replace("#LANGUAGE_FILE#", $genmod['gm_language'][$this->language1], $gm_lang["message_empty_warning"]) . "</strong>";
+					$dummy_output .= "<strong style=\"color: #FF0000\">" . str_replace("#LANGUAGE_FILE#", $genmod['gm_language'][$this->language1], GM_LANG_message_empty_warning) . "</strong>";
 				}
 				else $dummy_output .= "<i>" . $val . "</i>";
 				$dummy_output .= '</div>';
@@ -342,7 +342,7 @@ class EditLang {
 					$dum = stripslashes(mask_all($dDummy));
 					$dummy_output .= $dum;
 					if ($dum == "") {
-						$dummy_output .= "<strong style=\"color: #FF0000\">" . str_replace("#LANGUAGE_FILE#", $genmod['gm_language'][$this->language2], $gm_lang["message_empty_warning"]) . "</strong>";
+						$dummy_output .= "<strong style=\"color: #FF0000\">" . str_replace("#LANGUAGE_FILE#", $genmod['gm_language'][$this->language2], GM_LANG_message_empty_warning) . "</strong>";
 					}
 					$dummy_output .= "</a>";
 					$lastfound = $new_counter;
@@ -375,14 +375,14 @@ class EditLang {
 		}
 	}
 	
-	function DebugHelptext(&$gm_lang) {
+	function DebugHelptext() {
 		?>
 		<form name="debug_form" method="post" action="editlang.php">
 		<input type="hidden" name="page" value="editlang" />
 		<input type="hidden" name="action" value="debug" />
 		<input type="hidden" name="execute" value="true" />
 		<div class="admin_topbottombar">
-			<?php print $gm_lang["lang_debug"]; ?>
+			<?php print GM_LANG_lang_debug; ?>
 		</div>
 		<div class="admin_item_box">
 			<div class="choice_left">
@@ -393,24 +393,24 @@ class EditLang {
 				}
 				?>
 				/>
-				<?php print $gm_lang["lang_debug_use"]?>&nbsp;&nbsp;
+				<?php print GM_LANG_lang_debug_use?>&nbsp;&nbsp;
 			</div>
 			<div class="choice_middle">
-				<input  type="submit" value="<?php print $gm_lang["save"];?>" />
+				<input  type="submit" value="<?php print GM_LANG_save;?>" />
 			</div>
 		</div>
 		</form>
 		<?php
 	}
 	
-	function ExportLanguage(&$genmod, &$gm_lang) {
+	function ExportLanguage(&$genmod) {
 		?>
 		<form name="export_form" method="get" action="editlang.php">
 		<input type="hidden" name="page" value="editlang" />
 		<input type="hidden" name="action" value="export" />
 		<input type="hidden" name="execute" value="true" />
 		<div class="admin_topbottombar">
-			<?php print $gm_lang["export_lang_utility"]; ?>
+			<?php print GM_LANG_export_lang_utility; ?>
 		</div>
 		<div class="admin_item_box">
 			<div class="width25 choice_left">
@@ -418,7 +418,7 @@ class EditLang {
 					<?php print_help_link("language_to_export_help", "qm", "language_to_export"); ?>
 				</div>
 				<div class="description">
-					<?php print $gm_lang["language_to_export"]; ?>
+					<?php print GM_LANG_language_to_export; ?>
 					<br />
 					<select name="language2">
 					<?php
@@ -426,7 +426,7 @@ class EditLang {
 						if ($genmod['language_settings'][$key]["gm_lang_use"]) {
 							print "\n\t\t\t<option value=\"$key\"";
 							if ($key == $this->language2) print " selected=\"selected\"";
-							print ">".$gm_lang["lang_name_".$key]."</option>";
+							print ">".constant("GM_LANG_lang_name_".$key)."</option>";
 						}
 					}
 					?>
@@ -434,7 +434,7 @@ class EditLang {
 				</div>
 			</div>
 			<div class="width25 center choice_right">
-				<input  type="submit" value="<?php print $gm_lang["export"];?>" />
+				<input  type="submit" value="<?php print GM_LANG_export;?>" />
 			</div>
 		</div>
 		</form>
@@ -442,7 +442,7 @@ class EditLang {
 		<?php
 		if ($this->execute) {
 			print "<div class=\"shade2 center\">";
-				print $gm_lang["export_results"];
+				print GM_LANG_export_results;
 			print "</div>";
 			print "<div class=\"shade1 ltr\">";
 				$data = "";
@@ -456,44 +456,44 @@ class EditLang {
 				}
 				if (!empty($data)) {
 					if (!$handle = fopen("languages/lang.".$this->lang_shortcut.".txt", "w")) {
-						print str_replace("#lang_filename#", "languages/lang.".$this->lang_shortcut.".txt", $gm_lang["no_open"])."<br />";
+						print str_replace("#lang_filename#", "languages/lang.".$this->lang_shortcut.".txt", GM_LANG_no_open)."<br />";
 						$storeerror = true;
 						WriteToLog("EditLang-> Can't open file languages/lang.".$this->lang_shortcut.".txt", "E", "S");
 					}
 					else {
 						if (fwrite($handle, $data)) {
-							WriteToLog("EditLang-> ".$gm_lang["editlang_lang_export_success"], "I", "S");
-							print $gm_lang["editlang_lang_export_success"]."<br />";
+							WriteToLog("EditLang-> ".GM_LANG_editlang_lang_export_success, "I", "S");
+							print GM_LANG_editlang_lang_export_success."<br />";
 						}
 						else {
 							$storeerror = true;
-							WriteToLog("EditLang-> ".$gm_lang["editlang_lang_export_no_success"], "E", "S");
-							print "<span class=\"error\">".$gm_lang["editlang_lang_export_no_success"]."</span><br />";
+							WriteToLog("EditLang-> ".GM_LANG_editlang_lang_export_no_success, "E", "S");
+							print "<span class=\"error\">".GM_LANG_editlang_lang_export_no_success."</span><br />";
 						}
 						fclose($handle);            
 					}
 				}
-				else print "<span class=\"error\">".$gm_lang["lang_not_stored"]."</span><br />";
+				else print "<span class=\"error\">".GM_LANG_lang_not_stored."</span><br />";
 				if (!empty($data_help)) {
 					if (!$handle_help = fopen("languages/help_text.".$this->lang_shortcut.".txt", "w")) {
-						print str_replace("#lang_filename#", "languages/help_text.".$this->lang_shortcut.".txt", $gm_lang["no_open"])."<br />";
+						print str_replace("#lang_filename#", "languages/help_text.".$this->lang_shortcut.".txt", GM_LANG_no_open)."<br />";
 						$storeerror = true;
 						WriteToLog("EditLang-> Can't open file languages/help_text.".$this->lang_shortcut.".txt", "E", "S");
 					}
 					else {
 						if (fwrite($handle_help, $data_help)) {
-							WriteToLog("EditLang-> ".$gm_lang["editlang_help_export_success"], "I", "S");
-							print $gm_lang["editlang_help_export_success"]."<br />";
+							WriteToLog("EditLang-> ".GM_LANG_editlang_help_export_success, "I", "S");
+							print GM_LANG_editlang_help_export_success."<br />";
 						}
 						else {
 							$storeerror = true;
-							WriteToLog("EditLang-> ".$gm_lang["editlang_help_no_export_success"], "E", "S");
-							print "<span class=\"error\">".$gm_lang["editlang_help_no_export_success"]."</span><br />";
+							WriteToLog("EditLang-> ".GM_LANG_editlang_help_no_export_success, "E", "S");
+							print "<span class=\"error\">".GM_LANG_editlang_help_no_export_success."</span><br />";
 						}
 						fclose($handle_help);
 					}
 				}
-				else print "<span class=\"error\">".$gm_lang["lang_help_not_stored"]."</span><br />";
+				else print "<span class=\"error\">".GM_LANG_lang_help_not_stored."</span><br />";
 				
 				$data = "";
 				$storefacts = LoadFacts($this->language2);
@@ -503,24 +503,24 @@ class EditLang {
 				}
 				if (!empty($data)) {
 					if (!$handle = fopen("languages/facts.".$this->lang_shortcut.".txt", "w")) {
-						print str_replace("#lang_filename#", "languages/facts.".$this->lang_shortcut.".txt", $gm_lang["no_open"])."<br />";
+						print str_replace("#lang_filename#", "languages/facts.".$this->lang_shortcut.".txt", GM_LANG_no_open)."<br />";
 						$storeerror = true;
 						WriteToLog("EditLang-> Can't open file languages/facts.".$this->lang_shortcut.".txt", "E", "S");
 					}
 					else {
 						if (fwrite($handle, $data)) {
-							WriteToLog("EditLang-> ".$gm_lang["editlang_facts_export_success"], "I", "S");
-							print $gm_lang["editlang_facts_export_success"]."<br />";
+							WriteToLog("EditLang-> ".GM_LANG_editlang_facts_export_success, "I", "S");
+							print GM_LANG_editlang_facts_export_success."<br />";
 						}
 						else {
 							$storeerror = true;
-							WriteToLog("EditLang-> ".$gm_lang["editlang_facts_export_no_success"], "E", "S");
-							print "<span class=\"error\">".$gm_lang["editlang_facts_export_no_success"]."</span><br />";
+							WriteToLog("EditLang-> ".GM_LANG_editlang_facts_export_no_success, "E", "S");
+							print "<span class=\"error\">".GM_LANG_editlang_facts_export_no_success."</span><br />";
 						}
 						fclose($handle);            
 					}
 				}
-				else print "<span class=\"error\">".$gm_lang["lang_facts_not_stored"]."</span><br />";
+				else print "<span class=\"error\">".GM_LANG_lang_facts_not_stored."</span><br />";
 				if (!$storeerror) {
 					$sql = "UPDATE ".TBLPREFIX."lang_settings SET ls_translated = '0', ls_md5_lang = '".md5_file("languages/lang.".$genmod['language_settings'][$this->language2]["lang_short_cut"].".txt")."', ls_md5_help = '".md5_file("languages/help_text.".$genmod['language_settings'][$this->language2]["lang_short_cut"].".txt")."', ls_md5_facts = '".md5_file("languages/facts.".$genmod['language_settings'][$this->language2]["lang_short_cut"].".txt")."' WHERE ls_gm_langname='".$this->language2."'";
 					$res = NewQuery($sql);
@@ -529,13 +529,13 @@ class EditLang {
 		}
 	}
 	
-	function CompareLanguage(&$genmod, &$gm_lang) { ?>
+	function CompareLanguage(&$genmod) { ?>
 		<form name="langdiff_form" method="get" action="editlang.php">
 		<input type="hidden" name="page" value="editlang" />
 		<input type="hidden" name="action" value="compare" />
 		<input type="hidden" name="execute" value="true" />
 		<div class="admin_topbottombar">
-			<?php print $gm_lang["compare_lang_utility"]; ?>
+			<?php print GM_LANG_compare_lang_utility; ?>
 		</div>
 		<div class="admin_item_box">
 			<div class="width25 choice_left">
@@ -544,13 +544,13 @@ class EditLang {
 				</div>
 				<div class="description">
 					<?php
-					print $gm_lang["new_language"]."<br />";
+					print GM_LANG_new_language."<br />";
 					print "<select name=\"language1\">";
 					foreach ($this->sorted_langs as $key => $value) {
 						if ($genmod['language_settings'][$key]["gm_lang_use"]) {
 							print "\n\t\t\t<option value=\"$key\"";
 							if ($key == $this->language1) print " selected=\"selected\"";
-							print ">".$gm_lang["lang_name_".$key]."</option>";
+							print ">".constant("GM_LANG_lang_name_".$key)."</option>";
 						}
 					}
 					?>
@@ -563,13 +563,13 @@ class EditLang {
 				</div>
 				<div class="description">
 					<?php
-					print $gm_lang["old_language"]."<br />";
+					print GM_LANG_old_language."<br />";
 					print "<select name=\"language2\">";
 					foreach ($this->sorted_langs as $key => $value) {
 						if ($genmod['language_settings'][$key]["gm_lang_use"]) {
 							print "\n\t\t\t<option value=\"$key\"";
 							if ($key == $this->language2) print " selected=\"selected\"";
-							print ">".$gm_lang["lang_name_".$key]."</option>";
+							print ">".constant("GM_LANG_lang_name_".$key)."</option>";
 						}
 					}
 					?>
@@ -577,7 +577,7 @@ class EditLang {
 				</div>
 			</div>
 			<div class="width25 center choice_right">
-				<input  type="submit" value="<?php print $gm_lang["compare"]; ?>" />
+				<input  type="submit" value="<?php print GM_LANG_compare; ?>" />
 			</div>
 		</div>
 		</form>
@@ -585,21 +585,21 @@ class EditLang {
 		if ($this->execute) {
 			?>
 			<div class="topbottombar subheaders">
-				<?php echo $gm_lang["comparing_main"];?>
+				<?php echo GM_LANG_comparing_main;?>
 			</div>
 			<?php
 			$this->ShowLanguageCompare($genmod, LoadLanguage($this->language1, true), LoadLanguage($this->language2, true))
 			?>
 			<img src="<?php print $genmod['gm_image_dir']."/".$genmod['gm_images']["hline"]["other"];?>" width="100%" height="6" alt="" /><br />
 			<div class="topbottombar subheaders">
-				<?php print $gm_lang["comparing_facts"];?>
+				<?php print GM_LANG_comparing_facts;?>
 			</div>
 			<?php
 			$this->ShowLanguageCompare($genmod, LoadFacts($this->language1), LoadFacts($this->language2), true);
 				?>
 			<img src="<?php print $genmod['gm_image_dir']."/".$genmod['gm_images']["hline"]["other"];?>" width="100%" height="6" alt="" /><br />
 			<div class="topbottombar subheaders">
-				<?php print $gm_lang["comparing_helptext"];?>
+				<?php print GM_LANG_comparing_helptext;?>
 			</div>
 			<?php
 			$this->langhelp = LoadEnglish(true, true, true);
@@ -609,7 +609,7 @@ class EditLang {
 	}
 	
 	function ShowLanguageCompare(&$genmod, $lang1, $lang2, $facts = false, $help = false) {
-		echo '<span class="subheaders">'.$genmod['gm_lang']["additions"].':</span>';
+		echo '<span class="subheaders">'.GM_LANG_additions.':</span>';
 		$count=0;
 		$colorid = 1;
 		foreach($lang1 as $key=>$value) {
@@ -628,15 +628,15 @@ class EditLang {
 			}
 			echo '</div>';
 		}
-		if ($count==0) echo '<div class="shade1">'.$genmod['gm_lang']["no_additions"].'</div>';
-		echo '<span class="subheaders">'.$genmod['gm_lang']["subtractions"].':</span>';
+		if ($count==0) echo '<div class="shade1">'.GM_LANG_no_additions.'</div>';
+		echo '<span class="subheaders">'.GM_LANG_subtractions.':</span>';
 		$count = 0;
 		$colorid = 1;
 		foreach($lang2 as $key=>$value) {
 			echo '<div class="language_item_box'.$colorid.'">';
 			if (!array_key_exists($key, $lang1)) {
 				echo '<div class="original_language">';
-				if (!$facts && !$help) echo $genmod['gm_lang'][$key];
+				if (!$facts && !$help) echo constant("GM_LANG_".$key);
 				else if ($facts) echo $genmod['factarray'][$key];
 				else if ($help) echo $this->langhelp[$key];
 				echo '</div>';
@@ -647,12 +647,12 @@ class EditLang {
 			}
 			echo '</div>';
 		}
-		if ($count==0) echo '<div class="shade1">'.$genmod['gm_lang']["no_subtractions"].'</div>';
+		if ($count==0) echo '<div class="shade1">'.GM_LANG_no_subtractions.'</div>';
 	}
 }
 require "config.php";
 require "includes/setgenmod.php";
-$editlang = new EditLang($genmod, $gm_lang, $gm_username);
+$editlang = new EditLang($genmod, $gm_username);
 
 // NOTE: make sure that they have admin status before they can use this page
 // NOTE: otherwise have them login again

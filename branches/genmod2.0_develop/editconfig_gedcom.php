@@ -118,7 +118,7 @@ else {
 			$GEDFILENAME = basename($GEDCOMPATH);
 			if (!file_exists($path.$GEDFILENAME)) $action = "";
 			if (get_id_from_gedcom($GEDFILENAME)) {
-				$error_msg = $gm_lang["gedcom_exists"];
+				$error_msg = GM_LANG_gedcom_exists;
 				$action = "";
 			}
 			break;
@@ -129,7 +129,7 @@ else {
 			$GEDFILENAME = basename($GEDCOMPATH['name']);
 			if (!AdminFunctions::CheckUploadedGedcom($GEDFILENAME)) {
 				$action = "";
-				$error_msg = $gm_lang["upload_error"];
+				$error_msg = GM_LANG_upload_error;
 				break;
 			} 
 			$GEDFILENAME = AdminFunctions::MoveUploadedGedcom($GEDFILENAME, $path);
@@ -140,7 +140,7 @@ else {
 			$path = AdminFunctions::CalculateGedcomPath($GEDCOMPATH);
 			$GEDFILENAME = basename($GEDCOMPATH);
 			if (get_id_from_gedcom($GEDFILENAME)) {
-				$error_msg = $gm_lang["gedcom_exists"];
+				$error_msg = GM_LANG_gedcom_exists;
 				$action = "";
 			}
 			break;
@@ -153,7 +153,7 @@ else {
 			$GEDFILENAME = $GEDCOMS[$gedid]["gedcom"];
 			if (!AdminFunctions::CheckUploadedGedcom($GEDFILENAME)) {
 				$action = "";
-				$error_msg = $gm_lang["upload_error"];
+				$error_msg = GM_LANG_upload_error;
 				break;
 			}
 			$GEDFILENAME = AdminFunctions::MoveUploadedGedcom($GEDFILENAME, $path);
@@ -271,7 +271,7 @@ if ($action=="update") {
 	$gedarray["gedcom"] = $FILE;
 	if (!empty($gedcom_title)) $gedarray["title"] = $gedcom_title;
 	else if (!empty($_POST["gedcom_title"])) $gedarray["title"] = $_POST["gedcom_title"];
-	else $gedarray["title"] = str_replace("#GEDCOMFILE#", $GEDFILENAME, $gm_lang["new_gedcom_title"]);
+	else $gedarray["title"] = str_replace("#GEDCOMFILE#", $GEDFILENAME, GM_LANG_new_gedcom_title);
 	$gedarray["path"] = $path.$GEDFILENAME;
 	$gedarray["id"] = $gedid;
 
@@ -487,7 +487,7 @@ if ($action=="update") {
 //-- output starts here
 $temp2 = GedcomConfig::$THEME_DIR;
 GedcomConfig::$THEME_DIR = $temp;
-PrintHeader($gm_lang["gedconf_head"]);
+PrintHeader(GM_LANG_gedconf_head);
 GedcomConfig::$THEME_DIR = $temp2;
 if (!isset($NTHEME_DIR)) $NTHEME_DIR = GedcomConfig::$THEME_DIR;
 if (!isset($themeselect)) $themeselect="";
@@ -532,14 +532,14 @@ if (!isset($themeselect)) $themeselect="";
 <table class="facts_table <?php print $TEXT_DIRECTION ?>">
   <tr>
     <td colspan="2" class="shade3 facts_label center"><?php
-    	print "<h3>".$gm_lang["gedconf_head"]." - ";
+    	print "<h3>".GM_LANG_gedconf_head." - ";
 		if (isset($gedid) && isset($GEDCOMS[$gedid])) print $GEDCOMS[$gedid]["title"];
-		else if ($source == "add_form") print $gm_lang["add_gedcom"];
-		else if ($source == "upload_form" || $source == "reupload_form") print $gm_lang["upload_gedcom"];
-		else if ($source == "add_new_form") print $gm_lang["add_new_gedcom"];
+		else if ($source == "add_form") print GM_LANG_add_gedcom;
+		else if ($source == "upload_form" || $source == "reupload_form") print GM_LANG_upload_gedcom;
+		else if ($source == "add_new_form") print GM_LANG_add_new_gedcom;
 		print "</h3>";
 		print "<a href=\"editgedcoms.php\"><b>";
-		print $gm_lang["lang_back_manage_gedcoms"];
+		print GM_LANG_lang_back_manage_gedcoms;
 		print "</b></a><br /><br />";
     	?>
     </td>
@@ -558,8 +558,8 @@ if (!isset($themeselect)) $themeselect="";
 
 <table class="facts_table"><tr><td class="topbottombar <?php print $TEXT_DIRECTION;?>">
 <?php
-print "<a href=\"javascript: ".$gm_lang["gedcom_conf"]."\" onclick=\"expand_layer('file-options'); return false;\"><img id=\"file-options_img\" src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["minus"]["other"]."\" border=\"0\" width=\"11\" height=\"11\" alt=\"\" /></a>";
-print "&nbsp;<a href=\"javascript: ".$gm_lang["gedcom_conf"]."\" onclick=\"expand_layer('file-options'); return false;\">".$gm_lang["gedcom_conf"]."</a>";
+print "<a href=\"javascript: ".GM_LANG_gedcom_conf."\" onclick=\"expand_layer('file-options'); return false;\"><img id=\"file-options_img\" src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["minus"]["other"]."\" border=\"0\" width=\"11\" height=\"11\" alt=\"\" /></a>";
+print "&nbsp;<a href=\"javascript: ".GM_LANG_gedcom_conf."\" onclick=\"expand_layer('file-options'); return false;\">".GM_LANG_gedcom_conf."</a>";
 ?></td></tr></table>
 <div id="file-options" style="display: block">
 <table class="facts_table">
@@ -568,15 +568,15 @@ print "&nbsp;<a href=\"javascript: ".$gm_lang["gedcom_conf"]."\" onclick=\"expan
 		<?php
 		if ($source == "upload_form" || $source == "reupload_form") {
 			print "<div class=\"helpicon\">";
-			print_help_link("upload_path_help", "qm", "upload_path"); print "</div><div class=\"description\">"; print $gm_lang["upload_path"];
+			print_help_link("upload_path_help", "qm", "upload_path"); print "</div><div class=\"description\">"; print GM_LANG_upload_path;
 			print "</div></td><td class=\"shade1\">";
 			print "<input name=\"GEDCOMPATH\" type=\"file\" size=\"60\" />";
 			if (!$filesize = ini_get('upload_max_filesize')) $filesize = "2M";
-			print " ( ".$gm_lang["max_upload_size"]." $filesize )";
+			print " ( ".GM_LANG_max_upload_size." $filesize )";
 		}
 		else {
 			print "<div class=\"helpicon\">";
-			print_help_link("gedcom_path_help", "qm", "gedcom_path"); print "</div><div class=\"description\">"; print $gm_lang["gedcom_path"];
+			print_help_link("gedcom_path_help", "qm", "gedcom_path"); print "</div><div class=\"description\">"; print GM_LANG_gedcom_path;
 			print "</div></td><td class=\"shade1\">";
 				?>
 			<input type="text" name="GEDCOMPATH" value="<?php print preg_replace('/\\*/', '\\', $GEDCOMPATH);?>" size="40" dir ="ltr" tabindex="<?php $i++; print $i?>" <?php if (empty($source)) print " disabled=\"disabled\"";?>/>
@@ -587,7 +587,7 @@ print "&nbsp;<a href=\"javascript: ".$gm_lang["gedcom_conf"]."\" onclick=\"expan
 				if (strtolower(substr(trim($path.$GEDFILENAME), -4)) != ".ged") $GEDFILENAME .= ".ged";
 			}
 			if (!strstr($GEDCOMPATH, "://") && !file_exists($path.$GEDFILENAME)) {
-				print "<br /><span class=\"error\">".str_replace("#GEDCOM#", $GEDCOMPATH, $gm_lang["error_header"])."</span>\n";
+				print "<br /><span class=\"error\">".str_replace("#GEDCOM#", $GEDCOMPATH, GM_LANG_error_header)."</span>\n";
 			}
 		}
 		?>
@@ -599,7 +599,7 @@ print "&nbsp;<a href=\"javascript: ".$gm_lang["gedcom_conf"]."\" onclick=\"expan
 	</tr>
 	<tr>
 		<td class="shade2 wrap">
-		<div class="helpicon"><?php print_help_link("LANGUAGE_help", "qm", "LANGUAGE"); print "</div><div class=\"description\">";print $gm_lang["LANGUAGE"];?></div></td>
+		<div class="helpicon"><?php print_help_link("LANGUAGE_help", "qm", "LANGUAGE"); print "</div><div class=\"description\">";print GM_LANG_LANGUAGE;?></div></td>
 		<td class="shade1"><input type="hidden" name="changelanguage" value="yes" />
 		<select name="NEW_GEDCOMLANG" dir="ltr" tabindex="<?php $i++; print $i?>" >
 		<?php
@@ -607,7 +607,7 @@ print "&nbsp;<a href=\"javascript: ".$gm_lang["gedcom_conf"]."\" onclick=\"expan
 				if ($language_settings[$key]["gm_lang_use"]) {
 					print "\n\t\t\t<option value=\"$key\"";
 					if (GedcomConfig::$GEDCOMLANG == $key) print " selected=\"selected\"";
-					print ">".$gm_lang[$key]."</option>";
+					print ">".constant("GM_LANG_lang_name_".$key)."</option>";
 				}
 			}
 			print "</select>";
@@ -616,21 +616,21 @@ print "&nbsp;<a href=\"javascript: ".$gm_lang["gedcom_conf"]."\" onclick=\"expan
 	</tr>
 	<tr>
 		<td class="shade2 wrap width20">
-		<div class="helpicon"><?php print_help_link("DISPLAY_PINYIN_help", "qm", "DISPLAY_PINYIN"); print "</div><div class=\"description\">"; print $gm_lang["DISPLAY_PINYIN"];?></div></td>
+		<div class="helpicon"><?php print_help_link("DISPLAY_PINYIN_help", "qm", "DISPLAY_PINYIN"); print "</div><div class=\"description\">"; print GM_LANG_DISPLAY_PINYIN;?></div></td>
 		<td class="shade1"><select name="NEW_DISPLAY_PINYIN" tabindex="<?php $i++; print $i?>">
-				<option value="yes" <?php if (GedcomConfig::$DISPLAY_PINYIN) print "selected=\"selected\""; ?>><?php print $gm_lang["yes"];?></option>
-				<option value="no" <?php if (!GedcomConfig::$DISPLAY_PINYIN) print "selected=\"selected\""; ?>><?php print $gm_lang["no"];?></option>
+				<option value="yes" <?php if (GedcomConfig::$DISPLAY_PINYIN) print "selected=\"selected\""; ?>><?php print GM_LANG_yes;?></option>
+				<option value="no" <?php if (!GedcomConfig::$DISPLAY_PINYIN) print "selected=\"selected\""; ?>><?php print GM_LANG_no;?></option>
 			</select>
 		</td>
 	</tr>
 	<tr>
 		<td class="shade2 wrap width20">
-		<div class="helpicon"><?php print_help_link("CHARACTER_SET_help", "qm", "CHARACTER_SET"); print "</div><div class=\"description\">"; print $gm_lang["CHARACTER_SET"];?></div></td>
+		<div class="helpicon"><?php print_help_link("CHARACTER_SET_help", "qm", "CHARACTER_SET"); print "</div><div class=\"description\">"; print GM_LANG_CHARACTER_SET;?></div></td>
 		<td class="shade1"><input type="text" name="NEW_CHARACTER_SET" dir="ltr" value="<?php print GedcomConfig::$CHARACTER_SET;?>" tabindex="<?php $i++; print $i?>" /></td>
 	</tr>
 	<tr>
 		<td class="shade2 wrap">
-		<div class="helpicon"><?php print_help_link("PEDIGREE_ROOT_ID_help", "qm", "PEDIGREE_ROOT_ID"); print "</div><div class=\"description\">"; print $gm_lang["PEDIGREE_ROOT_ID"];?></div></td>
+		<div class="helpicon"><?php print_help_link("PEDIGREE_ROOT_ID_help", "qm", "PEDIGREE_ROOT_ID"); print "</div><div class=\"description\">"; print GM_LANG_PEDIGREE_ROOT_ID;?></div></td>
 
 		<?php
 		$indirec = "";
@@ -691,7 +691,7 @@ print "&nbsp;<a href=\"javascript: ".$gm_lang["gedcom_conf"]."\" onclick=\"expan
 			    }
 			    else {
 					print "<span class=\"error\">";
-					print $gm_lang["unable_to_find_indi"];
+					print GM_LANG_unable_to_find_indi;
 					print "</span>";
 				}
 				LinkFunctions::PrintFindIndiLink("NEW_PEDIGREE_ROOT_ID","");
@@ -701,17 +701,17 @@ print "&nbsp;<a href=\"javascript: ".$gm_lang["gedcom_conf"]."\" onclick=\"expan
 	</tr>
 	<tr>
 		<td class="shade2 wrap">
-		<div class="helpicon"><?php print_help_link("CALENDAR_FORMAT_help", "qm", "CALENDAR_FORMAT"); print "</div><div class=\"description\">"; print $gm_lang["CALENDAR_FORMAT"];?></div></td>
+		<div class="helpicon"><?php print_help_link("CALENDAR_FORMAT_help", "qm", "CALENDAR_FORMAT"); print "</div><div class=\"description\">"; print GM_LANG_CALENDAR_FORMAT;?></div></td>
 		<td class="shade1"><select name="NEW_CALENDAR_FORMAT" tabindex="<?php $i++; print $i?>"  onchange="show_jewish(this, 'hebrew-cal');">
-				<option value="gregorian" <?php if (GedcomConfig::$CALENDAR_FORMAT=='gregorian') print "selected=\"selected\""; ?>><?php print $gm_lang["gregorian"];?></option>
-				<option value="julian" <?php if (GedcomConfig::$CALENDAR_FORMAT=='julian') print "selected=\"selected\""; ?>><?php print $gm_lang["julian"];?></option>
-				<option value="french" <?php if (GedcomConfig::$CALENDAR_FORMAT=='french') print "selected=\"selected\""; ?>><?php print $gm_lang["config_french"];?></option>
-				<option value="jewish" <?php if (GedcomConfig::$CALENDAR_FORMAT=='jewish') print "selected=\"selected\""; ?>><?php print $gm_lang["jewish"];?></option>
-				<option value="jewish_and_gregorian" <?php if (GedcomConfig::$CALENDAR_FORMAT=='jewish_and_gregorian') print "selected=\"selected\""; ?>><?php print $gm_lang["jewish_and_gregorian"];?></option>
-				<option value="hebrew" <?php if (GedcomConfig::$CALENDAR_FORMAT=='hebrew') print "selected=\"selected\""; ?>><?php print $gm_lang["config_hebrew"];?></option>
-				<option value="hebrew_and_gregorian" <?php if (GedcomConfig::$CALENDAR_FORMAT=='hebrew_and_gregorian') print "selected=\"selected\""; ?>><?php print $gm_lang["hebrew_and_gregorian"];?></option>
-				<option value="arabic" <?php if (GedcomConfig::$CALENDAR_FORMAT=='arabic') print "selected=\"selected\""; ?>><?php print $gm_lang["arabic_cal"];?></option>
-				<option value="hijri" <?php if (GedcomConfig::$CALENDAR_FORMAT=='hijri') print "selected=\"selected\""; ?>><?php print $gm_lang["hijri"];?></option>
+				<option value="gregorian" <?php if (GedcomConfig::$CALENDAR_FORMAT=='gregorian') print "selected=\"selected\""; ?>><?php print GM_LANG_gregorian;?></option>
+				<option value="julian" <?php if (GedcomConfig::$CALENDAR_FORMAT=='julian') print "selected=\"selected\""; ?>><?php print GM_LANG_julian;?></option>
+				<option value="french" <?php if (GedcomConfig::$CALENDAR_FORMAT=='french') print "selected=\"selected\""; ?>><?php print GM_LANG_config_french;?></option>
+				<option value="jewish" <?php if (GedcomConfig::$CALENDAR_FORMAT=='jewish') print "selected=\"selected\""; ?>><?php print GM_LANG_jewish;?></option>
+				<option value="jewish_and_gregorian" <?php if (GedcomConfig::$CALENDAR_FORMAT=='jewish_and_gregorian') print "selected=\"selected\""; ?>><?php print GM_LANG_jewish_and_gregorian;?></option>
+				<option value="hebrew" <?php if (GedcomConfig::$CALENDAR_FORMAT=='hebrew') print "selected=\"selected\""; ?>><?php print GM_LANG_config_hebrew;?></option>
+				<option value="hebrew_and_gregorian" <?php if (GedcomConfig::$CALENDAR_FORMAT=='hebrew_and_gregorian') print "selected=\"selected\""; ?>><?php print GM_LANG_hebrew_and_gregorian;?></option>
+				<option value="arabic" <?php if (GedcomConfig::$CALENDAR_FORMAT=='arabic') print "selected=\"selected\""; ?>><?php print GM_LANG_arabic_cal;?></option>
+				<option value="hijri" <?php if (GedcomConfig::$CALENDAR_FORMAT=='hijri') print "selected=\"selected\""; ?>><?php print GM_LANG_hijri;?></option>
 			</select>
 		</td>
 	</tr>
@@ -720,28 +720,28 @@ print "&nbsp;<a href=\"javascript: ".$gm_lang["gedcom_conf"]."\" onclick=\"expan
 	<table class="facts_table">
 	<tr>
 		<td class="shade2 wrap width20">
-		<div class="helpicon"><?php print_help_link("DISPLAY_JEWISH_THOUSANDS_help", "qm", "DISPLAY_JEWISH_THOUSANDS"); print "</div><div class=\"description\">"; print $gm_lang["DISPLAY_JEWISH_THOUSANDS"];?></div></td>
+		<div class="helpicon"><?php print_help_link("DISPLAY_JEWISH_THOUSANDS_help", "qm", "DISPLAY_JEWISH_THOUSANDS"); print "</div><div class=\"description\">"; print GM_LANG_DISPLAY_JEWISH_THOUSANDS;?></div></td>
 		<td class="shade1"><select name="NEW_DISPLAY_JEWISH_THOUSANDS">
-				<option value="yes" <?php if (GedcomConfig::$DISPLAY_JEWISH_THOUSANDS) print "selected=\"selected\""; ?>><?php print $gm_lang["yes"];?></option>
-				<option value="no" <?php if (!GedcomConfig::$DISPLAY_JEWISH_THOUSANDS) print "selected=\"selected\""; ?>><?php print $gm_lang["no"];?></option>
+				<option value="yes" <?php if (GedcomConfig::$DISPLAY_JEWISH_THOUSANDS) print "selected=\"selected\""; ?>><?php print GM_LANG_yes;?></option>
+				<option value="no" <?php if (!GedcomConfig::$DISPLAY_JEWISH_THOUSANDS) print "selected=\"selected\""; ?>><?php print GM_LANG_no;?></option>
 			</select>
 		</td>
 	</tr>
 	<tr>
 		<td class="shade2 wrap">
-		<div class="helpicon"><?php print_help_link("DISPLAY_JEWISH_GERESHAYIM_help", "qm", "DISPLAY_JEWISH_GERESHAYIM"); print "</div><div class=\"description\">"; print $gm_lang["DISPLAY_JEWISH_GERESHAYIM"];?></div></td>
+		<div class="helpicon"><?php print_help_link("DISPLAY_JEWISH_GERESHAYIM_help", "qm", "DISPLAY_JEWISH_GERESHAYIM"); print "</div><div class=\"description\">"; print GM_LANG_DISPLAY_JEWISH_GERESHAYIM;?></div></td>
 		<td class="shade1"><select name="NEW_DISPLAY_JEWISH_GERESHAYIM">
-				<option value="yes" <?php if (GedcomConfig::$DISPLAY_JEWISH_GERESHAYIM) print "selected=\"selected\""; ?>><?php print $gm_lang["yes"];?></option>
-				<option value="no" <?php if (!GedcomConfig::$DISPLAY_JEWISH_GERESHAYIM) print "selected=\"selected\""; ?>><?php print $gm_lang["no"];?></option>
+				<option value="yes" <?php if (GedcomConfig::$DISPLAY_JEWISH_GERESHAYIM) print "selected=\"selected\""; ?>><?php print GM_LANG_yes;?></option>
+				<option value="no" <?php if (!GedcomConfig::$DISPLAY_JEWISH_GERESHAYIM) print "selected=\"selected\""; ?>><?php print GM_LANG_no;?></option>
 			</select>
 		</td>
 	</tr>
 	<tr>
 		<td class="shade2 wrap">
-		<div class="helpicon"><?php print_help_link("JEWISH_ASHKENAZ_PRONUNCIATION_help", "qm", "JEWISH_ASHKENAZ_PRONUNCIATION"); print "</div><div class=\"description\">"; print $gm_lang["JEWISH_ASHKENAZ_PRONUNCIATION"];?></div></td>
+		<div class="helpicon"><?php print_help_link("JEWISH_ASHKENAZ_PRONUNCIATION_help", "qm", "JEWISH_ASHKENAZ_PRONUNCIATION"); print "</div><div class=\"description\">"; print GM_LANG_JEWISH_ASHKENAZ_PRONUNCIATION;?></div></td>
 		<td class="shade1"><select name="NEW_JEWISH_ASHKENAZ_PRONUNCIATION">
-				<option value="yes" <?php if (GedcomConfig::$JEWISH_ASHKENAZ_PRONUNCIATION) print "selected=\"selected\""; ?>><?php print $gm_lang["yes"];?></option>
-				<option value="no" <?php if (!GedcomConfig::$JEWISH_ASHKENAZ_PRONUNCIATION) print "selected=\"selected\""; ?>><?php print $gm_lang["no"];?></option>
+				<option value="yes" <?php if (GedcomConfig::$JEWISH_ASHKENAZ_PRONUNCIATION) print "selected=\"selected\""; ?>><?php print GM_LANG_yes;?></option>
+				<option value="no" <?php if (!GedcomConfig::$JEWISH_ASHKENAZ_PRONUNCIATION) print "selected=\"selected\""; ?>><?php print GM_LANG_no;?></option>
 			</select>
 		</td>
 	</tr>
@@ -750,60 +750,60 @@ print "&nbsp;<a href=\"javascript: ".$gm_lang["gedcom_conf"]."\" onclick=\"expan
 	<table class="facts_table">
 	<tr>
 		<td class="shade2 wrap width20">
-		<div class="helpicon"><?php print_help_link("USE_RTL_FUNCTIONS_help", "qm", "USE_RTL_FUNCTIONS"); print "</div><div class=\"description\">"; print $gm_lang["USE_RTL_FUNCTIONS"];?></div></td>
+		<div class="helpicon"><?php print_help_link("USE_RTL_FUNCTIONS_help", "qm", "USE_RTL_FUNCTIONS"); print "</div><div class=\"description\">"; print GM_LANG_USE_RTL_FUNCTIONS;?></div></td>
 		<td class="shade1"><select name="NEW_USE_RTL_FUNCTIONS" tabindex="<?php $i++; print $i?>">
-				<option value="yes" <?php if (GedcomConfig::$USE_RTL_FUNCTIONS) print "selected=\"selected\""; ?>><?php print $gm_lang["yes"];?></option>
-				<option value="no" <?php if (!GedcomConfig::$USE_RTL_FUNCTIONS) print "selected=\"selected\""; ?>><?php print $gm_lang["no"];?></option>
+				<option value="yes" <?php if (GedcomConfig::$USE_RTL_FUNCTIONS) print "selected=\"selected\""; ?>><?php print GM_LANG_yes;?></option>
+				<option value="no" <?php if (!GedcomConfig::$USE_RTL_FUNCTIONS) print "selected=\"selected\""; ?>><?php print GM_LANG_no;?></option>
 			</select>
 		</td>
 	</tr>
 	<tr>
 		<td class="shade2 wrap">
-		<div class="helpicon"><?php print_help_link("USE_RIN_help", "qm", "USE_RIN"); print "</div><div class=\"description\">"; print $gm_lang["USE_RIN"];?></div></td>
+		<div class="helpicon"><?php print_help_link("USE_RIN_help", "qm", "USE_RIN"); print "</div><div class=\"description\">"; print GM_LANG_USE_RIN;?></div></td>
 		<td class="shade1"><select name="NEW_USE_RIN" tabindex="<?php $i++; print $i?>">
-				<option value="yes" <?php if (GedcomConfig::$USE_RIN) print "selected=\"selected\""; ?>><?php print $gm_lang["yes"];?></option>
-				<option value="no" <?php if (!GedcomConfig::$USE_RIN) print "selected=\"selected\""; ?>><?php print $gm_lang["no"];?></option>
+				<option value="yes" <?php if (GedcomConfig::$USE_RIN) print "selected=\"selected\""; ?>><?php print GM_LANG_yes;?></option>
+				<option value="no" <?php if (!GedcomConfig::$USE_RIN) print "selected=\"selected\""; ?>><?php print GM_LANG_no;?></option>
 			</select>
 		</td>
 	</tr>
 	<tr>
 		<td class="shade2 wrap">
-		<div class="helpicon"><?php print_help_link("GEDCOM_ID_PREFIX_help", "qm", "GEDCOM_ID_PREFIX"); print "</div><div class=\"description\">"; print $gm_lang["GEDCOM_ID_PREFIX"];?></div></td>
+		<div class="helpicon"><?php print_help_link("GEDCOM_ID_PREFIX_help", "qm", "GEDCOM_ID_PREFIX"); print "</div><div class=\"description\">"; print GM_LANG_GEDCOM_ID_PREFIX;?></div></td>
 		<td class="shade1"><input type="text" name="NEW_GEDCOM_ID_PREFIX" dir="ltr" value="<?php print GedcomConfig::$GEDCOM_ID_PREFIX?>" size="5" tabindex="<?php $i++; print $i?>" />
 		</td>
 	</tr>
 	<tr>
 		<td class="shade2 wrap">
-		<div class="helpicon"><?php print_help_link("FAM_ID_PREFIX_help", "qm", "FAM_ID_PREFIX"); print "</div><div class=\"description\">"; print $gm_lang["FAM_ID_PREFIX"];?></div></td>
+		<div class="helpicon"><?php print_help_link("FAM_ID_PREFIX_help", "qm", "FAM_ID_PREFIX"); print "</div><div class=\"description\">"; print GM_LANG_FAM_ID_PREFIX;?></div></td>
 		<td class="shade1"><input type="text" name="NEW_FAM_ID_PREFIX" dir="ltr" value="<?php print GedcomConfig::$FAM_ID_PREFIX?>" size="5" tabindex="<?php $i++; print $i?>" />
 		</td>
 	</tr>
 	<tr>
-		<td class="shade2 wrap"><div class="helpicon"><?php print_help_link("SOURCE_ID_PREFIX_help", "qm", "SOURCE_ID_PREFIX"); print "</div><div class=\"description\">"; print $gm_lang["SOURCE_ID_PREFIX"];?></div></td>
+		<td class="shade2 wrap"><div class="helpicon"><?php print_help_link("SOURCE_ID_PREFIX_help", "qm", "SOURCE_ID_PREFIX"); print "</div><div class=\"description\">"; print GM_LANG_SOURCE_ID_PREFIX;?></div></td>
 		<td class="shade1"><input type="text" name="NEW_SOURCE_ID_PREFIX" dir="ltr" value="<?php print GedcomConfig::$SOURCE_ID_PREFIX?>" size="5" tabindex="<?php $i++; print $i?>" />
 		</td>
 	</tr>
 	<tr>
-		<td class="shade2 wrap"><div class="helpicon"><?php print_help_link("REPO_ID_PREFIX_help", "qm", "REPO_ID_PREFIX"); print "</div><div class=\"description\">"; print $gm_lang["REPO_ID_PREFIX"];?></div></td>
+		<td class="shade2 wrap"><div class="helpicon"><?php print_help_link("REPO_ID_PREFIX_help", "qm", "REPO_ID_PREFIX"); print "</div><div class=\"description\">"; print GM_LANG_REPO_ID_PREFIX;?></div></td>
 		<td class="shade1"><input type="text" name="NEW_REPO_ID_PREFIX" dir="ltr" value="<?php print GedcomConfig::$REPO_ID_PREFIX?>" size="5" tabindex="<?php $i++; print $i?>" />
 		</td>
 	</tr>
 	<tr>
-		<td class="shade2 wrap"><div class="helpicon"><?php print_help_link("MEDIA_ID_PREFIX_help", "qm", "MEDIA_ID_PREFIX"); print "</div><div class=\"description\">";print $gm_lang["MEDIA_ID_PREFIX"];?></div></td>
+		<td class="shade2 wrap"><div class="helpicon"><?php print_help_link("MEDIA_ID_PREFIX_help", "qm", "MEDIA_ID_PREFIX"); print "</div><div class=\"description\">";print GM_LANG_MEDIA_ID_PREFIX;?></div></td>
 		<td class="shade1"><input type="text" name="NEW_MEDIA_ID_PREFIX" dir="ltr" value="<?php print GedcomConfig::$MEDIA_ID_PREFIX?>" size="5" tabindex="<?php $i++; print $i?>" />
 		</td>
 	</tr>
 	<tr>
-		<td class="shade2 wrap"><div class="helpicon"><?php print_help_link("NOTE_ID_PREFIX_help", "qm", "NOTE_ID_PREFIX"); print "</div><div class=\"description\">";print $gm_lang["NOTE_ID_PREFIX"];?></div></td>
+		<td class="shade2 wrap"><div class="helpicon"><?php print_help_link("NOTE_ID_PREFIX_help", "qm", "NOTE_ID_PREFIX"); print "</div><div class=\"description\">";print GM_LANG_NOTE_ID_PREFIX;?></div></td>
 		<td class="shade1"><input type="text" name="NEW_NOTE_ID_PREFIX" dir="ltr" value="<?php print GedcomConfig::$NOTE_ID_PREFIX?>" size="5" tabindex="<?php $i++; print $i?>" />
 		</td>
 	</tr>
 	<tr>
-		<td class="shade2 wrap"><div class="helpicon"><?php print_help_link("time_limit_help", "qm", "PHP_TIME_LIMIT"); print "</div><div class=\"description\">"; print $gm_lang["PHP_TIME_LIMIT"];?></div></td>
+		<td class="shade2 wrap"><div class="helpicon"><?php print_help_link("time_limit_help", "qm", "PHP_TIME_LIMIT"); print "</div><div class=\"description\">"; print GM_LANG_PHP_TIME_LIMIT;?></div></td>
 		<td class="shade1"><input type="text" name="NEW_TIME_LIMIT" value="<?php print GedcomConfig::$TIME_LIMIT?>" size="5" tabindex="<?php $i++; print $i?>"/><br />
-		<?php if ($SystemConfig->max_execution_time == 0) print $gm_lang["maxtime_not_set"];
-		else print $gm_lang["maxtime_is"]."&nbsp;".$SystemConfig->max_execution_time;
-		print "<br />".$gm_lang["maxtime_measure"];
+		<?php if ($SystemConfig->max_execution_time == 0) print GM_LANG_maxtime_not_set;
+		else print GM_LANG_maxtime_is."&nbsp;".$SystemConfig->max_execution_time;
+		print "<br />".GM_LANG_maxtime_measure;
 		?></td>
 	</tr>
 </table>
@@ -811,65 +811,65 @@ print "&nbsp;<a href=\"javascript: ".$gm_lang["gedcom_conf"]."\" onclick=\"expan
 
 <table class="facts_table"><tr><td class="topbottombar <?php print $TEXT_DIRECTION;?>">
 <?php
-print "<a href=\"javascript: ".$gm_lang["media_conf"]."\" onclick=\"expand_layer('config-media');return false;\"><img id=\"config-media_img\" src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["plus"]["other"]."\" border=\"0\" width=\"11\" height=\"11\" alt=\"\" /></a>";
-print "&nbsp;<a href=\"javascript: ".$gm_lang["media_conf"]."\" onclick=\"expand_layer('config-media');return false;\">".$gm_lang["media_conf"]."</a>";
+print "<a href=\"javascript: ".GM_LANG_media_conf."\" onclick=\"expand_layer('config-media');return false;\"><img id=\"config-media_img\" src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["plus"]["other"]."\" border=\"0\" width=\"11\" height=\"11\" alt=\"\" /></a>";
+print "&nbsp;<a href=\"javascript: ".GM_LANG_media_conf."\" onclick=\"expand_layer('config-media');return false;\">".GM_LANG_media_conf."</a>";
 ?></td></tr></table>
 <div id="config-media" style="display: none">
 <table class="facts_table">
 	<tr>
-		<td class="shade2 wrap width20"><div class="helpicon"><?php print_help_link("MEDIA_EXTERNAL_help", "qm", "MEDIA_EXTERNAL"); print "</div><div class=\"description\">"; print $gm_lang["MEDIA_EXTERNAL"];?></div></td>
+		<td class="shade2 wrap width20"><div class="helpicon"><?php print_help_link("MEDIA_EXTERNAL_help", "qm", "MEDIA_EXTERNAL"); print "</div><div class=\"description\">"; print GM_LANG_MEDIA_EXTERNAL;?></div></td>
 		<td class="shade1"><select name="NEW_MEDIA_EXTERNAL" tabindex="<?php $i++; print $i?>">
-				<option value="yes" <?php if (GedcomConfig::$MEDIA_EXTERNAL) print "selected=\"selected\""; ?>><?php print $gm_lang["yes"];?></option>
-				<option value="no" <?php if (!GedcomConfig::$MEDIA_EXTERNAL) print "selected=\"selected\""; ?>><?php print $gm_lang["no"];?></option>
+				<option value="yes" <?php if (GedcomConfig::$MEDIA_EXTERNAL) print "selected=\"selected\""; ?>><?php print GM_LANG_yes;?></option>
+				<option value="no" <?php if (!GedcomConfig::$MEDIA_EXTERNAL) print "selected=\"selected\""; ?>><?php print GM_LANG_no;?></option>
 			</select>
 		</td>
 	</tr>
 	<tr>
-		<td class="shade2 wrap"><div class="helpicon"><?php print_help_link("MEDIA_DIRECTORY_help", "qm", "MEDIA_DIRECTORY"); print "</div><div class=\"description\">"; print $gm_lang["MEDIA_DIRECTORY"];?></div></td>
+		<td class="shade2 wrap"><div class="helpicon"><?php print_help_link("MEDIA_DIRECTORY_help", "qm", "MEDIA_DIRECTORY"); print "</div><div class=\"description\">"; print GM_LANG_MEDIA_DIRECTORY;?></div></td>
 		<td class="shade1"><input type="text" size="50" name="NEW_MEDIA_DIRECTORY" value="<?php print GedcomConfig::$MEDIA_DIRECTORY?>" dir="ltr" tabindex="<?php $i++; print $i?>" />
 		<?php
-		if(preg_match("/.*[a-zA-Z]{1}:.*/",GedcomConfig::$MEDIA_DIRECTORY)>0) print "<span class=\"error\">".$gm_lang["media_drive_letter"]."</span>\n";
+		if(preg_match("/.*[a-zA-Z]{1}:.*/",GedcomConfig::$MEDIA_DIRECTORY)>0) print "<span class=\"error\">".GM_LANG_media_drive_letter."</span>\n";
 		?>
 		</td>
 	</tr>
 	<tr>
-		<td class="shade2 wrap"><div class="helpicon"><?php print_help_link("MEDIA_DIRECTORY_LEVELS_help", "qm", "MEDIA_DIRECTORY_LEVELS"); print "</div><div class=\"description\">"; print $gm_lang["MEDIA_DIRECTORY_LEVELS"];?></div></td>
+		<td class="shade2 wrap"><div class="helpicon"><?php print_help_link("MEDIA_DIRECTORY_LEVELS_help", "qm", "MEDIA_DIRECTORY_LEVELS"); print "</div><div class=\"description\">"; print GM_LANG_MEDIA_DIRECTORY_LEVELS;?></div></td>
 		<td class="shade1"><input type="text" name="NEW_MEDIA_DIRECTORY_LEVELS" value="<?php print GedcomConfig::$MEDIA_DIRECTORY_LEVELS?>" size="5" tabindex="<?php $i++; print $i?>" /></td>
 	</tr>
 	<tr>
-		<td class="shade2 wrap"><div class="helpicon"><?php print_help_link("THUMBNAIL_WIDTH_help", "qm", "THUMBNAIL_WIDTH"); print "</div><div class=\"description\">"; print $gm_lang["THUMBNAIL_WIDTH"];?></div></td>
+		<td class="shade2 wrap"><div class="helpicon"><?php print_help_link("THUMBNAIL_WIDTH_help", "qm", "THUMBNAIL_WIDTH"); print "</div><div class=\"description\">"; print GM_LANG_THUMBNAIL_WIDTH;?></div></td>
 		<td class="shade1"><input type="text" name="NEW_THUMBNAIL_WIDTH" value="<?php print GedcomConfig::$THUMBNAIL_WIDTH?>" size="5" tabindex="<?php $i++; print $i?>" /></td>
 	</tr>
 	<tr>
-		<td class="shade2 wrap"><div class="helpicon"><?php print_help_link("AUTO_GENERATE_THUMBS_help", "qm", "AUTO_GENERATE_THUMBS"); print "</div><div class=\"description\">"; print $gm_lang["AUTO_GENERATE_THUMBS"];?></div></td>
+		<td class="shade2 wrap"><div class="helpicon"><?php print_help_link("AUTO_GENERATE_THUMBS_help", "qm", "AUTO_GENERATE_THUMBS"); print "</div><div class=\"description\">"; print GM_LANG_AUTO_GENERATE_THUMBS;?></div></td>
 		<td class="shade1"><select name="NEW_AUTO_GENERATE_THUMBS" tabindex="<?php $i++; print $i?>">
-				<option value="yes" <?php if (GedcomConfig::$AUTO_GENERATE_THUMBS) print "selected=\"selected\""; ?>><?php print $gm_lang["yes"];?></option>
-				<option value="no" <?php if (!GedcomConfig::$AUTO_GENERATE_THUMBS) print "selected=\"selected\""; ?>><?php print $gm_lang["no"];?></option>
+				<option value="yes" <?php if (GedcomConfig::$AUTO_GENERATE_THUMBS) print "selected=\"selected\""; ?>><?php print GM_LANG_yes;?></option>
+				<option value="no" <?php if (!GedcomConfig::$AUTO_GENERATE_THUMBS) print "selected=\"selected\""; ?>><?php print GM_LANG_no;?></option>
 			</select>
 		</td>
 	</tr>
 	<tr>
-		<td class="shade2 wrap"><div class="helpicon"><?php print_help_link("SHOW_HIGHLIGHT_IMAGES_help", "qm", "SHOW_HIGHLIGHT_IMAGES"); print "</div><div class=\"description\">"; print $gm_lang["SHOW_HIGHLIGHT_IMAGES"];?></div></td>
+		<td class="shade2 wrap"><div class="helpicon"><?php print_help_link("SHOW_HIGHLIGHT_IMAGES_help", "qm", "SHOW_HIGHLIGHT_IMAGES"); print "</div><div class=\"description\">"; print GM_LANG_SHOW_HIGHLIGHT_IMAGES;?></div></td>
 		<td class="shade1"><select name="NEW_SHOW_HIGHLIGHT_IMAGES" tabindex="<?php $i++; print $i?>">
-				<option value="yes" <?php if (GedcomConfig::$SHOW_HIGHLIGHT_IMAGES) print "selected=\"selected\""; ?>><?php print $gm_lang["yes"];?></option>
-				<option value="no" <?php if (!GedcomConfig::$SHOW_HIGHLIGHT_IMAGES) print "selected=\"selected\""; ?>><?php print $gm_lang["no"];?></option>
+				<option value="yes" <?php if (GedcomConfig::$SHOW_HIGHLIGHT_IMAGES) print "selected=\"selected\""; ?>><?php print GM_LANG_yes;?></option>
+				<option value="no" <?php if (!GedcomConfig::$SHOW_HIGHLIGHT_IMAGES) print "selected=\"selected\""; ?>><?php print GM_LANG_no;?></option>
 			</select>
 		</td>
 	</tr>
 	<tr>
-		<td class="shade2 wrap"><div class="helpicon"><?php print_help_link("USE_THUMBS_MAIN_help", "qm", "USE_THUMBS_MAIN"); print "</div><div class=\"description\">"; print $gm_lang["USE_THUMBS_MAIN"];?></div></td>
+		<td class="shade2 wrap"><div class="helpicon"><?php print_help_link("USE_THUMBS_MAIN_help", "qm", "USE_THUMBS_MAIN"); print "</div><div class=\"description\">"; print GM_LANG_USE_THUMBS_MAIN;?></div></td>
 		<td class="shade1"><select name="NEW_USE_THUMBS_MAIN" tabindex="<?php $i++; print $i?>">
-				<option value="yes" <?php if (GedcomConfig::$USE_THUMBS_MAIN) print "selected=\"selected\""; ?>><?php print $gm_lang["yes"];?></option>
-				<option value="no" <?php if (!GedcomConfig::$USE_THUMBS_MAIN) print "selected=\"selected\""; ?>><?php print $gm_lang["no"];?></option>
+				<option value="yes" <?php if (GedcomConfig::$USE_THUMBS_MAIN) print "selected=\"selected\""; ?>><?php print GM_LANG_yes;?></option>
+				<option value="no" <?php if (!GedcomConfig::$USE_THUMBS_MAIN) print "selected=\"selected\""; ?>><?php print GM_LANG_no;?></option>
 			</select>
 		</td>
 	</tr>
 	<tr>
-		<td class="shade2 wrap"><div class="helpicon"><?php print_help_link("MERGE_DOUBLE_MEDIA_help", "qm", "MERGE_DOUBLE_MEDIA"); print "</div><div class=\"description\">"; print $gm_lang["MERGE_DOUBLE_MEDIA"];?></div></td>
+		<td class="shade2 wrap"><div class="helpicon"><?php print_help_link("MERGE_DOUBLE_MEDIA_help", "qm", "MERGE_DOUBLE_MEDIA"); print "</div><div class=\"description\">"; print GM_LANG_MERGE_DOUBLE_MEDIA;?></div></td>
 		<td class="shade1"><select name="NEW_MERGE_DOUBLE_MEDIA" tabindex="<?php $i++; print $i?>">
-				<option value="0" <?php if (GedcomConfig::$MERGE_DOUBLE_MEDIA == "0") print "selected=\"selected\""; ?>><?php print $gm_lang["merge_dm_0"];?></option>
-				<option value="1" <?php if (GedcomConfig::$MERGE_DOUBLE_MEDIA == "1" || empty($MERGE_DOUBLE_MEDIA)) print "selected=\"selected\""; ?>><?php print $gm_lang["merge_dm_1"];?></option>
-				<option value="2" <?php if (GedcomConfig::$MERGE_DOUBLE_MEDIA == "2") print "selected=\"selected\""; ?>><?php print $gm_lang["merge_dm_2"];?></option>
+				<option value="0" <?php if (GedcomConfig::$MERGE_DOUBLE_MEDIA == "0") print "selected=\"selected\""; ?>><?php print GM_LANG_merge_dm_0;?></option>
+				<option value="1" <?php if (GedcomConfig::$MERGE_DOUBLE_MEDIA == "1" || empty($MERGE_DOUBLE_MEDIA)) print "selected=\"selected\""; ?>><?php print GM_LANG_merge_dm_1;?></option>
+				<option value="2" <?php if (GedcomConfig::$MERGE_DOUBLE_MEDIA == "2") print "selected=\"selected\""; ?>><?php print GM_LANG_merge_dm_2;?></option>
 			</select>
 		</td>
 	</tr>
@@ -878,39 +878,39 @@ print "&nbsp;<a href=\"javascript: ".$gm_lang["media_conf"]."\" onclick=\"expand
 
 <table class="facts_table"><tr><td class="topbottombar <?php print $TEXT_DIRECTION;?>">
 <?php
-print "<a href=\"javascript: ".$gm_lang["accpriv_conf"]."\" onclick=\"expand_layer('access-options');return false;\"><img id=\"access-options_img\" src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["plus"]["other"]."\" border=\"0\" width=\"11\" height=\"11\" alt=\"\" /></a>";
-print "&nbsp;<a href=\"javascript: ".$gm_lang["accpriv_conf"]."\" onclick=\"expand_layer('access-options');return false;\">".$gm_lang["accpriv_conf"]."</a>";
+print "<a href=\"javascript: ".GM_LANG_accpriv_conf."\" onclick=\"expand_layer('access-options');return false;\"><img id=\"access-options_img\" src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["plus"]["other"]."\" border=\"0\" width=\"11\" height=\"11\" alt=\"\" /></a>";
+print "&nbsp;<a href=\"javascript: ".GM_LANG_accpriv_conf."\" onclick=\"expand_layer('access-options');return false;\">".GM_LANG_accpriv_conf."</a>";
 ?></td></tr></table>
 <div id="access-options" style="display: none">
 <table class="facts_table">
 	<tr>
-		<td class="shade2 wrap width20"><div class="helpicon"><?php print_help_link("REQUIRE_AUTHENTICATION_help", "qm", "REQUIRE_AUTHENTICATION"); print "</div><div class=\"description\">"; print $gm_lang["REQUIRE_AUTHENTICATION"];?></div></td>
+		<td class="shade2 wrap width20"><div class="helpicon"><?php print_help_link("REQUIRE_AUTHENTICATION_help", "qm", "REQUIRE_AUTHENTICATION"); print "</div><div class=\"description\">"; print GM_LANG_REQUIRE_AUTHENTICATION;?></div></td>
 		<td class="shade1"><select name="NEW_REQUIRE_AUTHENTICATION" tabindex="<?php $i++; print $i?>">
-				<option value="yes" <?php if (GedcomConfig::$REQUIRE_AUTHENTICATION) print "selected=\"selected\""; ?>><?php print $gm_lang["yes"];?></option>
-				<option value="no" <?php if (!GedcomConfig::$REQUIRE_AUTHENTICATION) print "selected=\"selected\""; ?>><?php print $gm_lang["no"];?></option>
+				<option value="yes" <?php if (GedcomConfig::$REQUIRE_AUTHENTICATION) print "selected=\"selected\""; ?>><?php print GM_LANG_yes;?></option>
+				<option value="no" <?php if (!GedcomConfig::$REQUIRE_AUTHENTICATION) print "selected=\"selected\""; ?>><?php print GM_LANG_no;?></option>
 			</select>
 		</td>
 	</tr>
 	<tr>
-		<td class="shade2 wrap"><div class="helpicon"><?php print_help_link("WELCOME_TEXT_AUTH_MODE_help", "qm", "WELCOME_TEXT_AUTH_MODE"); print "</div><div class=\"description\">"; print $gm_lang["WELCOME_TEXT_AUTH_MODE"];?></div></td>
+		<td class="shade2 wrap"><div class="helpicon"><?php print_help_link("WELCOME_TEXT_AUTH_MODE_help", "qm", "WELCOME_TEXT_AUTH_MODE"); print "</div><div class=\"description\">"; print GM_LANG_WELCOME_TEXT_AUTH_MODE;?></div></td>
 		<td class="shade1"><select name="NEW_WELCOME_TEXT_AUTH_MODE" tabindex="<?php $i++; print $i?>">
-				<option value="1" <?php if (GedcomConfig::$WELCOME_TEXT_AUTH_MODE=='1') print "selected=\"selected\""; ?>><?php print $gm_lang["WELCOME_TEXT_AUTH_MODE_OPT1"];?></option>
-				<option value="2" <?php if (GedcomConfig::$WELCOME_TEXT_AUTH_MODE=='2') print "selected=\"selected\""; ?>><?php print $gm_lang["WELCOME_TEXT_AUTH_MODE_OPT2"];?></option>
-				<option value="3" <?php if (GedcomConfig::$WELCOME_TEXT_AUTH_MODE=='3') print "selected=\"selected\""; ?>><?php print $gm_lang["WELCOME_TEXT_AUTH_MODE_OPT3"];?></option>
-				<option value="4" <?php if (GedcomConfig::$WELCOME_TEXT_AUTH_MODE=='4') print "selected=\"selected\""; ?>><?php print $gm_lang["WELCOME_TEXT_AUTH_MODE_OPT4"];?></option>
+				<option value="1" <?php if (GedcomConfig::$WELCOME_TEXT_AUTH_MODE=='1') print "selected=\"selected\""; ?>><?php print GM_LANG_WELCOME_TEXT_AUTH_MODE_OPT1;?></option>
+				<option value="2" <?php if (GedcomConfig::$WELCOME_TEXT_AUTH_MODE=='2') print "selected=\"selected\""; ?>><?php print GM_LANG_WELCOME_TEXT_AUTH_MODE_OPT2;?></option>
+				<option value="3" <?php if (GedcomConfig::$WELCOME_TEXT_AUTH_MODE=='3') print "selected=\"selected\""; ?>><?php print GM_LANG_WELCOME_TEXT_AUTH_MODE_OPT3;?></option>
+				<option value="4" <?php if (GedcomConfig::$WELCOME_TEXT_AUTH_MODE=='4') print "selected=\"selected\""; ?>><?php print GM_LANG_WELCOME_TEXT_AUTH_MODE_OPT4;?></option>
 			</select>
 		</td>
 	</tr>
 	<tr>
-		<td class="shade2 wrap"><div class="helpicon"><?php print_help_link("WELCOME_TEXT_AUTH_MODE_CUST_HEAD_help", "qm", "WELCOME_TEXT_AUTH_MODE_CUST_HEAD"); print "</div><div class=\"description\">"; print $gm_lang["WELCOME_TEXT_AUTH_MODE_CUST_HEAD"];?></div></td>
+		<td class="shade2 wrap"><div class="helpicon"><?php print_help_link("WELCOME_TEXT_AUTH_MODE_CUST_HEAD_help", "qm", "WELCOME_TEXT_AUTH_MODE_CUST_HEAD"); print "</div><div class=\"description\">"; print GM_LANG_WELCOME_TEXT_AUTH_MODE_CUST_HEAD;?></div></td>
 		<td class="shade1"><select name="NEW_WELCOME_TEXT_CUST_HEAD" tabindex="<?php $i++; print $i?>" >
-				<option value="yes" <?php if (GedcomConfig::$WELCOME_TEXT_CUST_HEAD) print "selected=\"selected\""; ?>><?php print $gm_lang["yes"];?></option>
-				<option value="no" <?php if (!GedcomConfig::$WELCOME_TEXT_CUST_HEAD) print "selected=\"selected\""; ?>><?php print $gm_lang["no"];?></option>
+				<option value="yes" <?php if (GedcomConfig::$WELCOME_TEXT_CUST_HEAD) print "selected=\"selected\""; ?>><?php print GM_LANG_yes;?></option>
+				<option value="no" <?php if (!GedcomConfig::$WELCOME_TEXT_CUST_HEAD) print "selected=\"selected\""; ?>><?php print GM_LANG_no;?></option>
 			</select>
 		</td>
 	</tr>
 	<tr>
-		<td class="shade2 wrap"><div class="helpicon"><?php print_help_link("WELCOME_TEXT_AUTH_MODE_CUST_help", "qm", "WELCOME_TEXT_AUTH_MODE_CUST"); print "</div><div class=\"description\">"; print $gm_lang["WELCOME_TEXT_AUTH_MODE_CUST"];?></div></td>
+		<td class="shade2 wrap"><div class="helpicon"><?php print_help_link("WELCOME_TEXT_AUTH_MODE_CUST_help", "qm", "WELCOME_TEXT_AUTH_MODE_CUST"); print "</div><div class=\"description\">"; print GM_LANG_WELCOME_TEXT_AUTH_MODE_CUST;?></div></td>
 		<td class="shade1"><textarea name="NEW_WELCOME_TEXT_AUTH_MODE_4" rows="5" cols="60" dir="ltr" tabindex="<?php $i++; print $i?>"><?php print  GedcomConfig::$WELCOME_TEXT_AUTH_MODE_4 ?></textarea>
 		</td>
 	</tr>
@@ -919,100 +919,100 @@ print "&nbsp;<a href=\"javascript: ".$gm_lang["accpriv_conf"]."\" onclick=\"expa
 
 <table class="facts_table"><tr><td class="topbottombar <?php print $TEXT_DIRECTION;?>">
 <?php
-print "<a href=\"javascript: ".$gm_lang["displ_conf"]."\" onclick=\"expand_layer('layout-options');return false;\"><img id=\"layout-options_img\" src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["plus"]["other"]."\" border=\"0\" width=\"11\" height=\"11\" alt=\"\" /></a>";
-print "&nbsp;<a href=\"javascript: ".$gm_lang["displ_conf"]."\" onclick=\"expand_layer('layout-options');return false;\">".$gm_lang["displ_conf"]."</a>";
+print "<a href=\"javascript: ".GM_LANG_displ_conf."\" onclick=\"expand_layer('layout-options');return false;\"><img id=\"layout-options_img\" src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["plus"]["other"]."\" border=\"0\" width=\"11\" height=\"11\" alt=\"\" /></a>";
+print "&nbsp;<a href=\"javascript: ".GM_LANG_displ_conf."\" onclick=\"expand_layer('layout-options');return false;\">".GM_LANG_displ_conf."</a>";
 ?></td></tr></table>
 <div id="layout-options" style="display: none">
 
 <table class="facts_table"><tr><td class="subbar">
 <?php
-print "<a href=\"javascript: ".$gm_lang["displ_names_conf"]."\" onclick=\"expand_layer('layout-options2');return false;\"><img id=\"layout-options2_img\" src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["plus"]["other"]."\" border=\"0\" width=\"11\" height=\"11\" alt=\"\" /></a>";
-print "&nbsp;<a href=\"javascript: ".$gm_lang["displ_names_conf"]."\" onclick=\"expand_layer('layout-options2');return false;\">".$gm_lang["displ_names_conf"]."</a>";
+print "<a href=\"javascript: ".GM_LANG_displ_names_conf."\" onclick=\"expand_layer('layout-options2');return false;\"><img id=\"layout-options2_img\" src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["plus"]["other"]."\" border=\"0\" width=\"11\" height=\"11\" alt=\"\" /></a>";
+print "&nbsp;<a href=\"javascript: ".GM_LANG_displ_names_conf."\" onclick=\"expand_layer('layout-options2');return false;\">".GM_LANG_displ_names_conf."</a>";
 ?></td></tr></table>
 <div id="layout-options2" style="display: none">
 <table class="facts_table">
 	<tr>
-		<td class="shade2 wrap width20"><div class="helpicon"><?php print_help_link("PEDIGREE_FULL_DETAILS_help", "qm", "PEDIGREE_FULL_DETAILS"); print "</div><div class=\"description\">"; print $gm_lang["PEDIGREE_FULL_DETAILS"];?></div></td>
+		<td class="shade2 wrap width20"><div class="helpicon"><?php print_help_link("PEDIGREE_FULL_DETAILS_help", "qm", "PEDIGREE_FULL_DETAILS"); print "</div><div class=\"description\">"; print GM_LANG_PEDIGREE_FULL_DETAILS;?></div></td>
 		<td class="shade1"><select name="NEW_PEDIGREE_FULL_DETAILS" tabindex="<?php $i++; print $i?>">
-				<option value="yes" <?php if (GedcomConfig::$PEDIGREE_FULL_DETAILS) print "selected=\"selected\""; ?>><?php print $gm_lang["yes"];?></option>
-				<option value="no" <?php if (!GedcomConfig::$PEDIGREE_FULL_DETAILS) print "selected=\"selected\""; ?>><?php print $gm_lang["no"];?></option>
+				<option value="yes" <?php if (GedcomConfig::$PEDIGREE_FULL_DETAILS) print "selected=\"selected\""; ?>><?php print GM_LANG_yes;?></option>
+				<option value="no" <?php if (!GedcomConfig::$PEDIGREE_FULL_DETAILS) print "selected=\"selected\""; ?>><?php print GM_LANG_no;?></option>
 			</select>
 		</td>
 	</tr>
 	<tr>
-		<td class="shade2 wrap"><div class="helpicon"><?php print_help_link("ABBREVIATE_CHART_LABELS_help", "qm", "ABBREVIATE_CHART_LABELS"); print "</div><div class=\"description\">"; print $gm_lang["ABBREVIATE_CHART_LABELS"];?></div></td>
+		<td class="shade2 wrap"><div class="helpicon"><?php print_help_link("ABBREVIATE_CHART_LABELS_help", "qm", "ABBREVIATE_CHART_LABELS"); print "</div><div class=\"description\">"; print GM_LANG_ABBREVIATE_CHART_LABELS;?></div></td>
 		<td class="shade1"><select name="NEW_ABBREVIATE_CHART_LABELS" tabindex="<?php $i++; print $i?>">
-				<option value="yes" <?php if (GedcomConfig::$ABBREVIATE_CHART_LABELS) print "selected=\"selected\""; ?>><?php print $gm_lang["yes"];?></option>
-				<option value="no" <?php if (!GedcomConfig::$ABBREVIATE_CHART_LABELS) print "selected=\"selected\""; ?>><?php print $gm_lang["no"];?></option>
+				<option value="yes" <?php if (GedcomConfig::$ABBREVIATE_CHART_LABELS) print "selected=\"selected\""; ?>><?php print GM_LANG_yes;?></option>
+				<option value="no" <?php if (!GedcomConfig::$ABBREVIATE_CHART_LABELS) print "selected=\"selected\""; ?>><?php print GM_LANG_no;?></option>
 			</select>
 		</td>
 	</tr>
 	<tr>
-		<td class="shade2 wrap"><div class="helpicon"><?php print_help_link("SHOW_PARENTS_AGE_help", "qm", "SHOW_PARENTS_AGE"); print "</div><div class=\"description\">"; print $gm_lang["SHOW_PARENTS_AGE"];?></div></td>
+		<td class="shade2 wrap"><div class="helpicon"><?php print_help_link("SHOW_PARENTS_AGE_help", "qm", "SHOW_PARENTS_AGE"); print "</div><div class=\"description\">"; print GM_LANG_SHOW_PARENTS_AGE;?></div></td>
 		<td class="shade1"><select name="NEW_SHOW_PARENTS_AGE" tabindex="<?php $i++; print $i?>">
-				<option value="yes" <?php if (GedcomConfig::$SHOW_PARENTS_AGE) print "selected=\"selected\""; ?>><?php print $gm_lang["yes"];?></option>
-				<option value="no" <?php if (!GedcomConfig::$SHOW_PARENTS_AGE) print "selected=\"selected\""; ?>><?php print $gm_lang["no"];?></option>
+				<option value="yes" <?php if (GedcomConfig::$SHOW_PARENTS_AGE) print "selected=\"selected\""; ?>><?php print GM_LANG_yes;?></option>
+				<option value="no" <?php if (!GedcomConfig::$SHOW_PARENTS_AGE) print "selected=\"selected\""; ?>><?php print GM_LANG_no;?></option>
 			</select>
 		</td>
 	</tr>
 	<tr>
-		<td class="shade2 wrap"><div class="helpicon"><?php print_help_link("SHOW_LDS_AT_GLANCE_help", "qm", "SHOW_LDS_AT_GLANCE"); print "</div><div class=\"description\">"; print $gm_lang["SHOW_LDS_AT_GLANCE"];?></div></td>
+		<td class="shade2 wrap"><div class="helpicon"><?php print_help_link("SHOW_LDS_AT_GLANCE_help", "qm", "SHOW_LDS_AT_GLANCE"); print "</div><div class=\"description\">"; print GM_LANG_SHOW_LDS_AT_GLANCE;?></div></td>
 		<td class="shade1"><select name="NEW_SHOW_LDS_AT_GLANCE" tabindex="<?php $i++; print $i?>">
-				<option value="yes" <?php if (GedcomConfig::$SHOW_LDS_AT_GLANCE) print "selected=\"selected\""; ?>><?php print $gm_lang["yes"];?></option>
-				<option value="no" <?php if (!GedcomConfig::$SHOW_LDS_AT_GLANCE) print "selected=\"selected\""; ?>><?php print $gm_lang["no"];?></option>
+				<option value="yes" <?php if (GedcomConfig::$SHOW_LDS_AT_GLANCE) print "selected=\"selected\""; ?>><?php print GM_LANG_yes;?></option>
+				<option value="no" <?php if (!GedcomConfig::$SHOW_LDS_AT_GLANCE) print "selected=\"selected\""; ?>><?php print GM_LANG_no;?></option>
 			</select>
 		</td>
 	</tr>
 	<tr>
-		<td class="shade2 wrap"><div class="helpicon"><?php print_help_link("SHOW_NICK_help", "qm", "SHOW_NICK"); print "</div><div class=\"description\">"; print $gm_lang["SHOW_NICK"];?></div></td>
+		<td class="shade2 wrap"><div class="helpicon"><?php print_help_link("SHOW_NICK_help", "qm", "SHOW_NICK"); print "</div><div class=\"description\">"; print GM_LANG_SHOW_NICK;?></div></td>
 		<td class="shade1"><select name="NEW_SHOW_NICK" tabindex="<?php $i++; print $i?>">
-				<option value="yes" <?php if (GedcomConfig::$SHOW_NICK) print "selected=\"selected\""; ?>><?php print $gm_lang["yes"];?></option>
-				<option value="no" <?php if (!GedcomConfig::$SHOW_NICK) print "selected=\"selected\""; ?>><?php print $gm_lang["no"];?></option>
+				<option value="yes" <?php if (GedcomConfig::$SHOW_NICK) print "selected=\"selected\""; ?>><?php print GM_LANG_yes;?></option>
+				<option value="no" <?php if (!GedcomConfig::$SHOW_NICK) print "selected=\"selected\""; ?>><?php print GM_LANG_no;?></option>
 			</select>
 		</td>
 	</tr>
 	<tr>
-		<td class="shade2 wrap"><div class="helpicon"><?php print_help_link("NICK_DELIM_help", "qm", "NICK_DELIM"); print "</div><div class=\"description\">"; print $gm_lang["NICK_DELIM"];?></div></td>
+		<td class="shade2 wrap"><div class="helpicon"><?php print_help_link("NICK_DELIM_help", "qm", "NICK_DELIM"); print "</div><div class=\"description\">"; print GM_LANG_NICK_DELIM;?></div></td>
 		<td class="shade1">
 			<input type="text" size="1" maxlength="1" name="NEW_NICK_DELIM0" value="<?php if (empty(GedcomConfig::$NICK_DELIM)) print "("; else print htmlentities(substr(GedcomConfig::$NICK_DELIM, 0, 1), ENT_QUOTES);?>" dir="ltr" tabindex="<?php $i++; print $i?>" />
 			<input type="text" size="1" maxlength="1" name="NEW_NICK_DELIM1" value="<?php if (empty(GedcomConfig::$NICK_DELIM)) print ")"; else print htmlentities(substr(GedcomConfig::$NICK_DELIM, 1, 1), ENT_QUOTES);?>" dir="ltr" tabindex="<?php $i++; print $i?>" />
 		</td>
 	</tr>
 	<tr>
-		<td class="shade2 wrap"><div class="helpicon"><?php print_help_link("CHART_BOX_TAGS_help", "qm", "CHART_BOX_TAGS"); print "</div><div class=\"description\">"; print $gm_lang["CHART_BOX_TAGS"];?></div></td>
+		<td class="shade2 wrap"><div class="helpicon"><?php print_help_link("CHART_BOX_TAGS_help", "qm", "CHART_BOX_TAGS"); print "</div><div class=\"description\">"; print GM_LANG_CHART_BOX_TAGS;?></div></td>
 		<td class="shade1">
 			<input type="text" size="50" name="NEW_CHART_BOX_TAGS" value="<?php print GedcomConfig::$CHART_BOX_TAGS?>" dir="ltr" tabindex="<?php $i++; print $i?>" />
 		</td>
 	</tr>
 	<tr>
-		<td class="shade2 wrap"><div class="helpicon"><?php print_help_link("SHOW_MARRIED_NAMES_help", "qm", "SHOW_MARRIED_NAMES"); print "</div><div class=\"description\">"; print $gm_lang["SHOW_MARRIED_NAMES"];?></div></td>
+		<td class="shade2 wrap"><div class="helpicon"><?php print_help_link("SHOW_MARRIED_NAMES_help", "qm", "SHOW_MARRIED_NAMES"); print "</div><div class=\"description\">"; print GM_LANG_SHOW_MARRIED_NAMES;?></div></td>
 		<td class="shade1"><select name="NEW_SHOW_MARRIED_NAMES" tabindex="<?php $i++; print $i?>">
-				<option value="yes" <?php if (GedcomConfig::$SHOW_MARRIED_NAMES) print "selected=\"selected\""; ?>><?php print $gm_lang["yes"];?></option>
-				<option value="no" <?php if (!GedcomConfig::$SHOW_MARRIED_NAMES) print "selected=\"selected\""; ?>><?php print $gm_lang["no"];?></option>
+				<option value="yes" <?php if (GedcomConfig::$SHOW_MARRIED_NAMES) print "selected=\"selected\""; ?>><?php print GM_LANG_yes;?></option>
+				<option value="no" <?php if (!GedcomConfig::$SHOW_MARRIED_NAMES) print "selected=\"selected\""; ?>><?php print GM_LANG_no;?></option>
 			</select>
 		</td>
 	</tr>
 	<tr>
-		<td class="shade2 wrap"><div class="helpicon"><?php print_help_link("UNDERLINE_NAME_QUOTES_help", "qm", "UNDERLINE_NAME_QUOTES"); print "</div><div class=\"description\">"; print $gm_lang["UNDERLINE_NAME_QUOTES"];?></div></td>
+		<td class="shade2 wrap"><div class="helpicon"><?php print_help_link("UNDERLINE_NAME_QUOTES_help", "qm", "UNDERLINE_NAME_QUOTES"); print "</div><div class=\"description\">"; print GM_LANG_UNDERLINE_NAME_QUOTES;?></div></td>
 		<td class="shade1"><select name="NEW_UNDERLINE_NAME_QUOTES" tabindex="<?php $i++; print $i?>">
-				<option value="yes" <?php if (GedcomConfig::$UNDERLINE_NAME_QUOTES) print "selected=\"selected\""; ?>><?php print $gm_lang["yes"];?></option>
-				<option value="no" <?php if (!GedcomConfig::$UNDERLINE_NAME_QUOTES) print "selected=\"selected\""; ?>><?php print $gm_lang["no"];?></option>
+				<option value="yes" <?php if (GedcomConfig::$UNDERLINE_NAME_QUOTES) print "selected=\"selected\""; ?>><?php print GM_LANG_yes;?></option>
+				<option value="no" <?php if (!GedcomConfig::$UNDERLINE_NAME_QUOTES) print "selected=\"selected\""; ?>><?php print GM_LANG_no;?></option>
 			</select>
 		</td>
 	</tr>
 	<tr>
-		<td class="shade2 wrap"><div class="helpicon"><?php print_help_link("SHOW_ID_NUMBERS_help", "qm", "SHOW_ID_NUMBERS"); print "</div><div class=\"description\">"; print $gm_lang["SHOW_ID_NUMBERS"];?></div></td>
+		<td class="shade2 wrap"><div class="helpicon"><?php print_help_link("SHOW_ID_NUMBERS_help", "qm", "SHOW_ID_NUMBERS"); print "</div><div class=\"description\">"; print GM_LANG_SHOW_ID_NUMBERS;?></div></td>
 		<td class="shade1"><select name="NEW_SHOW_ID_NUMBERS" tabindex="<?php $i++; print $i?>">
-				<option value="yes" <?php if (GedcomConfig::$SHOW_ID_NUMBERS) print "selected=\"selected\""; ?>><?php print $gm_lang["yes"];?></option>
-				<option value="no" <?php if (!GedcomConfig::$SHOW_ID_NUMBERS) print "selected=\"selected\""; ?>><?php print $gm_lang["no"];?></option>
+				<option value="yes" <?php if (GedcomConfig::$SHOW_ID_NUMBERS) print "selected=\"selected\""; ?>><?php print GM_LANG_yes;?></option>
+				<option value="no" <?php if (!GedcomConfig::$SHOW_ID_NUMBERS) print "selected=\"selected\""; ?>><?php print GM_LANG_no;?></option>
 			</select>
 		</td>
 	</tr>
 	<tr>
-		<td class="shade2 wrap"><div class="helpicon"><?php print_help_link("SHOW_FAM_ID_NUMBERS_help", "qm", "SHOW_FAM_ID_NUMBERS"); print "</div><div class=\"description\">"; print $gm_lang["SHOW_FAM_ID_NUMBERS"];?></div></td>
+		<td class="shade2 wrap"><div class="helpicon"><?php print_help_link("SHOW_FAM_ID_NUMBERS_help", "qm", "SHOW_FAM_ID_NUMBERS"); print "</div><div class=\"description\">"; print GM_LANG_SHOW_FAM_ID_NUMBERS;?></div></td>
         <td class="shade1"><select name="NEW_SHOW_FAM_ID_NUMBERS" tabindex="<?php $i++; print $i?>">
-			<option value="yes" <?php if (GedcomConfig::$SHOW_FAM_ID_NUMBERS) print "selected=\"selected\""; ?>><?php print $gm_lang["yes"];?></option>
-            <option value="no" <?php if (!GedcomConfig::$SHOW_FAM_ID_NUMBERS) print "selected=\"selected\""; ?>><?php print $gm_lang["no"];?></option>
+			<option value="yes" <?php if (GedcomConfig::$SHOW_FAM_ID_NUMBERS) print "selected=\"selected\""; ?>><?php print GM_LANG_yes;?></option>
+            <option value="no" <?php if (!GedcomConfig::$SHOW_FAM_ID_NUMBERS) print "selected=\"selected\""; ?>><?php print GM_LANG_no;?></option>
             </select>
         </td>
     </tr>
@@ -1021,23 +1021,23 @@ print "&nbsp;<a href=\"javascript: ".$gm_lang["displ_names_conf"]."\" onclick=\"
 
 <table class="facts_table"><tr><td class="subbar">
 <?php
-print "<a href=\"javascript: ".$gm_lang["displ_comsurn_conf"]."\" onclick=\"expand_layer('layout-options3');return false;\"><img id=\"layout-options3_img\" src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["plus"]["other"]."\" border=\"0\" width=\"11\" height=\"11\" alt=\"\" /></a>";
-print "&nbsp;<a href=\"javascript: ".$gm_lang["displ_comsurn_conf"]."\" onclick=\"expand_layer('layout-options3');return false;\">".$gm_lang["displ_comsurn_conf"]."</a>";
+print "<a href=\"javascript: ".GM_LANG_displ_comsurn_conf."\" onclick=\"expand_layer('layout-options3');return false;\"><img id=\"layout-options3_img\" src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["plus"]["other"]."\" border=\"0\" width=\"11\" height=\"11\" alt=\"\" /></a>";
+print "&nbsp;<a href=\"javascript: ".GM_LANG_displ_comsurn_conf."\" onclick=\"expand_layer('layout-options3');return false;\">".GM_LANG_displ_comsurn_conf."</a>";
 ?></td></tr></table>
 <div id="layout-options3" style="display: none">
 <table class="facts_table">
 	<tr>
-		<td class="shade2 wrap width20"><div class="helpicon"><?php print_help_link("COMMON_NAMES_THRESHOLD_help", "qm", "COMMON_NAMES_THRESHOLD"); print "</div><div class=\"description\">"; print $gm_lang["COMMON_NAMES_THRESHOLD"];?></div></td>
+		<td class="shade2 wrap width20"><div class="helpicon"><?php print_help_link("COMMON_NAMES_THRESHOLD_help", "qm", "COMMON_NAMES_THRESHOLD"); print "</div><div class=\"description\">"; print GM_LANG_COMMON_NAMES_THRESHOLD;?></div></td>
 		<td class="shade1"><input type="text" name="NEW_COMMON_NAMES_THRESHOLD" value="<?php print GedcomConfig::$COMMON_NAMES_THRESHOLD?>" size="5" tabindex="<?php $i++; print $i?>" /></td>
 	</tr>
 
 	<tr>
-		<td class="shade2 wrap"><div class="helpicon"><?php print_help_link("COMMON_NAMES_ADD_help", "qm", "COMMON_NAMES_ADD"); print "</div><div class=\"description\">"; print $gm_lang["COMMON_NAMES_ADD"];?></div></td>
+		<td class="shade2 wrap"><div class="helpicon"><?php print_help_link("COMMON_NAMES_ADD_help", "qm", "COMMON_NAMES_ADD"); print "</div><div class=\"description\">"; print GM_LANG_COMMON_NAMES_ADD;?></div></td>
 		<td class="shade1"><input type="text" name="NEW_COMMON_NAMES_ADD" dir="ltr" value="<?php print GedcomConfig::$COMMON_NAMES_ADD?>" size="50" tabindex="<?php $i++; print $i?>" /></td>
 	</tr>
 
 	<tr>
-		<td class="shade2 wrap"><div class="helpicon"><?php print_help_link("COMMON_NAMES_REMOVE_help", "qm", "COMMON_NAMES_REMOVE"); print "</div><div class=\"description\">"; print $gm_lang["COMMON_NAMES_REMOVE"];?></div></td>
+		<td class="shade2 wrap"><div class="helpicon"><?php print_help_link("COMMON_NAMES_REMOVE_help", "qm", "COMMON_NAMES_REMOVE"); print "</div><div class=\"description\">"; print GM_LANG_COMMON_NAMES_REMOVE;?></div></td>
 		<td class="shade1"><input type="text" name="NEW_COMMON_NAMES_REMOVE" dir="ltr" value="<?php print GedcomConfig::$COMMON_NAMES_REMOVE?>" size="50" tabindex="<?php $i++; print $i?>" /></td>
 	</tr>
 </table>
@@ -1047,68 +1047,68 @@ print "&nbsp;<a href=\"javascript: ".$gm_lang["displ_comsurn_conf"]."\" onclick=
 ?>
 <table class="facts_table"><tr><td class="subbar <?php print $TEXT_DIRECTION;?>">
 <?php
-print "<a href=\"javascript: ".$gm_lang["displ_layout_conf"]."\" onclick=\"expand_layer('layout-options4');return false;\"><img id=\"layout-options4_img\" src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["plus"]["other"]."\" border=\"0\" width=\"11\" height=\"11\" alt=\"\" /></a>";
-print "&nbsp;<a href=\"javascript: ".$gm_lang["displ_layout_conf"]."\" onclick=\"expand_layer('layout-options4');return false;\">".$gm_lang["displ_layout_conf"]."</a>";
+print "<a href=\"javascript: ".GM_LANG_displ_layout_conf."\" onclick=\"expand_layer('layout-options4');return false;\"><img id=\"layout-options4_img\" src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["plus"]["other"]."\" border=\"0\" width=\"11\" height=\"11\" alt=\"\" /></a>";
+print "&nbsp;<a href=\"javascript: ".GM_LANG_displ_layout_conf."\" onclick=\"expand_layer('layout-options4');return false;\">".GM_LANG_displ_layout_conf."</a>";
 ?></td></tr></table>
 <div id="layout-options4" style="display: none">
 <table class="facts_table">
 	<tr>
-		<td class="shade2 wrap width20"><div class="helpicon"><?php print_help_link("DEFAULT_PEDIGREE_GENERATIONS_help", "qm", "DEFAULT_PEDIGREE_GENERATIONS"); print "</div><div class=\"description\">"; print $gm_lang["DEFAULT_PEDIGREE_GENERATIONS"];?></div></td>
+		<td class="shade2 wrap width20"><div class="helpicon"><?php print_help_link("DEFAULT_PEDIGREE_GENERATIONS_help", "qm", "DEFAULT_PEDIGREE_GENERATIONS"); print "</div><div class=\"description\">"; print GM_LANG_DEFAULT_PEDIGREE_GENERATIONS;?></div></td>
 		<td class="shade1"><input type="text" name="NEW_DEFAULT_PEDIGREE_GENERATIONS" value="<?php print GedcomConfig::$DEFAULT_PEDIGREE_GENERATIONS?>" size="5" tabindex="<?php $i++; print $i?>" /></td>
 	</tr>
 	<tr>
-		<td class="shade2 wrap"><div class="helpicon"><?php print_help_link("MAX_PEDIGREE_GENERATIONS_help", "qm", "MAX_PEDIGREE_GENERATIONS"); print "</div><div class=\"description\">"; print $gm_lang["MAX_PEDIGREE_GENERATIONS"];?></div></td>
+		<td class="shade2 wrap"><div class="helpicon"><?php print_help_link("MAX_PEDIGREE_GENERATIONS_help", "qm", "MAX_PEDIGREE_GENERATIONS"); print "</div><div class=\"description\">"; print GM_LANG_MAX_PEDIGREE_GENERATIONS;?></div></td>
 		<td class="shade1"><input type="text" name="NEW_MAX_PEDIGREE_GENERATIONS" value="<?php print GedcomConfig::$MAX_PEDIGREE_GENERATIONS?>" size="5" tabindex="<?php $i++; print $i?>" /></td>
 	</tr>
 	<tr>
-		<td class="shade2 wrap"><div class="helpicon"><?php print_help_link("MAX_DESCENDANCY_GENERATIONS_help", "qm", "MAX_DESCENDANCY_GENERATIONS"); print "</div><div class=\"description\">"; print $gm_lang["MAX_DESCENDANCY_GENERATIONS"];?></div></td>
+		<td class="shade2 wrap"><div class="helpicon"><?php print_help_link("MAX_DESCENDANCY_GENERATIONS_help", "qm", "MAX_DESCENDANCY_GENERATIONS"); print "</div><div class=\"description\">"; print GM_LANG_MAX_DESCENDANCY_GENERATIONS;?></div></td>
 		<td class="shade1"><input type="text" name="NEW_MAX_DESCENDANCY_GENERATIONS" value="<?php print GedcomConfig::$MAX_DESCENDANCY_GENERATIONS?>" size="5" tabindex="<?php $i++; print $i?>" /></td>
 	</tr>
 	<tr>
-		<td class="shade2 wrap"><div class="helpicon"><?php print_help_link("PEDIGREE_LAYOUT_help", "qm", "PEDIGREE_LAYOUT"); print "</div><div class=\"description\">"; print $gm_lang["PEDIGREE_LAYOUT"];?></div></td>
+		<td class="shade2 wrap"><div class="helpicon"><?php print_help_link("PEDIGREE_LAYOUT_help", "qm", "PEDIGREE_LAYOUT"); print "</div><div class=\"description\">"; print GM_LANG_PEDIGREE_LAYOUT;?></div></td>
 		<td class="shade1"><select name="NEW_PEDIGREE_LAYOUT" tabindex="<?php $i++; print $i?>">
-				<option value="yes" <?php if (GedcomConfig::$PEDIGREE_LAYOUT) print "selected=\"selected\""; ?>><?php print $gm_lang["landscape"];?></option>
-				<option value="no" <?php if (!GedcomConfig::$PEDIGREE_LAYOUT) print "selected=\"selected\""; ?>><?php print $gm_lang["portrait"];?></option>
+				<option value="yes" <?php if (GedcomConfig::$PEDIGREE_LAYOUT) print "selected=\"selected\""; ?>><?php print GM_LANG_landscape;?></option>
+				<option value="no" <?php if (!GedcomConfig::$PEDIGREE_LAYOUT) print "selected=\"selected\""; ?>><?php print GM_LANG_portrait;?></option>
 			</select>
 		</td>
 	</tr>
 	<tr>
-		<td class="shade2 wrap"><div class="helpicon"><?php print_help_link("SHOW_PEDIGREE_PLACES_help", "qm", "SHOW_PEDIGREE_PLACES"); print "</div><div class=\"description\">"; print $gm_lang["SHOW_PEDIGREE_PLACES"];?></div></td>
+		<td class="shade2 wrap"><div class="helpicon"><?php print_help_link("SHOW_PEDIGREE_PLACES_help", "qm", "SHOW_PEDIGREE_PLACES"); print "</div><div class=\"description\">"; print GM_LANG_SHOW_PEDIGREE_PLACES;?></div></td>
 		<td class="shade1"><input type="text" size="5" name="NEW_SHOW_PEDIGREE_PLACES" value="<?php print GedcomConfig::$SHOW_PEDIGREE_PLACES; ?>" tabindex="<?php $i++; print $i?>" /></td>
 	</tr>
 	<tr>
-		<td class="shade2 wrap"><div class="helpicon"><?php print_help_link("ZOOM_BOXES_help", "qm", "ZOOM_BOXES"); print "</div><div class=\"description\">"; print $gm_lang["ZOOM_BOXES"];?></div></td>
+		<td class="shade2 wrap"><div class="helpicon"><?php print_help_link("ZOOM_BOXES_help", "qm", "ZOOM_BOXES"); print "</div><div class=\"description\">"; print GM_LANG_ZOOM_BOXES;?></div></td>
 		<td class="shade1"><select name="NEW_ZOOM_BOXES" tabindex="<?php $i++; print $i?>">
-				<option value="disabled" <?php if (GedcomConfig::$ZOOM_BOXES=='disabled') print "selected=\"selected\""; ?>><?php print $gm_lang["disabled"];?></option>
-				<option value="mouseover" <?php if (GedcomConfig::$ZOOM_BOXES=='mouseover') print "selected=\"selected\""; ?>><?php print $gm_lang["mouseover"];?></option>
-				<option value="mousedown" <?php if (GedcomConfig::$ZOOM_BOXES=='mousedown') print "selected=\"selected\""; ?>><?php print $gm_lang["mousedown"];?></option>
-				<option value="click" <?php if (GedcomConfig::$ZOOM_BOXES=='click') print "selected=\"selected\""; ?>><?php print $gm_lang["click"];?></option>
+				<option value="disabled" <?php if (GedcomConfig::$ZOOM_BOXES=='disabled') print "selected=\"selected\""; ?>><?php print GM_LANG_disabled;?></option>
+				<option value="mouseover" <?php if (GedcomConfig::$ZOOM_BOXES=='mouseover') print "selected=\"selected\""; ?>><?php print GM_LANG_mouseover;?></option>
+				<option value="mousedown" <?php if (GedcomConfig::$ZOOM_BOXES=='mousedown') print "selected=\"selected\""; ?>><?php print GM_LANG_mousedown;?></option>
+				<option value="click" <?php if (GedcomConfig::$ZOOM_BOXES=='click') print "selected=\"selected\""; ?>><?php print GM_LANG_click;?></option>
 			</select>
 		</td>
 	</tr>
 	<tr>
-		<td class="shade2 wrap"><div class="helpicon"><?php print_help_link("LINK_ICONS_help", "qm", "LINK_ICONS"); print "</div><div class=\"description\">"; print $gm_lang["LINK_ICONS"];?></div></td>
+		<td class="shade2 wrap"><div class="helpicon"><?php print_help_link("LINK_ICONS_help", "qm", "LINK_ICONS"); print "</div><div class=\"description\">"; print GM_LANG_LINK_ICONS;?></div></td>
 		<td class="shade1"><select name="NEW_LINK_ICONS" tabindex="<?php $i++; print $i?>">
-				<option value="disabled" <?php if (GedcomConfig::$LINK_ICONS=='disabled') print "selected=\"selected\""; ?>><?php print $gm_lang["disabled"];?></option>
-				<option value="mouseover" <?php if (GedcomConfig::$LINK_ICONS=='mouseover') print "selected=\"selected\""; ?>><?php print $gm_lang["mouseover"];?></option>
-				<option value="click" <?php if (GedcomConfig::$LINK_ICONS=='click') print "selected=\"selected\""; ?>><?php print $gm_lang["click"];?></option>
+				<option value="disabled" <?php if (GedcomConfig::$LINK_ICONS=='disabled') print "selected=\"selected\""; ?>><?php print GM_LANG_disabled;?></option>
+				<option value="mouseover" <?php if (GedcomConfig::$LINK_ICONS=='mouseover') print "selected=\"selected\""; ?>><?php print GM_LANG_mouseover;?></option>
+				<option value="click" <?php if (GedcomConfig::$LINK_ICONS=='click') print "selected=\"selected\""; ?>><?php print GM_LANG_click;?></option>
 			</select>
 		</td>
 	</tr>
 	<tr>
-		<td class="shade2 wrap"><div class="helpicon"><?php print_help_link("GEDCOM_DEFAULT_TAB_help", "qm", "GEDCOM_DEFAULT_TAB"); print "</div><div class=\"description\">"; print $gm_lang["GEDCOM_DEFAULT_TAB"];?></div></td>
+		<td class="shade2 wrap"><div class="helpicon"><?php print_help_link("GEDCOM_DEFAULT_TAB_help", "qm", "GEDCOM_DEFAULT_TAB"); print "</div><div class=\"description\">"; print GM_LANG_GEDCOM_DEFAULT_TAB;?></div></td>
 		<td class="shade1"><select name="NEW_GEDCOM_DEFAULT_TAB" tabindex="<?php $i++; print $i?>">
-				<option value="0" <?php if (GedcomConfig::$GEDCOM_DEFAULT_TAB==0) print "selected=\"selected\""; ?>><?php print $gm_lang["personal_facts"];?></option>
-				<option value="1" <?php if (GedcomConfig::$GEDCOM_DEFAULT_TAB==1) print "selected=\"selected\""; ?>><?php print $gm_lang["notes"];?></option>
-				<option value="2" <?php if (GedcomConfig::$GEDCOM_DEFAULT_TAB==2) print "selected=\"selected\""; ?>><?php print $gm_lang["ssourcess"];?></option>
-				<option value="3" <?php if (GedcomConfig::$GEDCOM_DEFAULT_TAB==3) print "selected=\"selected\""; ?>><?php print $gm_lang["media"];?></option>
-				<option value="4" <?php if (GedcomConfig::$GEDCOM_DEFAULT_TAB==4) print "selected=\"selected\""; ?>><?php print $gm_lang["relatives"];?></option>
-				<option value="6" <?php if (GedcomConfig::$GEDCOM_DEFAULT_TAB==6) print "selected=\"selected\""; ?>><?php print $gm_lang["all"];?></option>
+				<option value="0" <?php if (GedcomConfig::$GEDCOM_DEFAULT_TAB==0) print "selected=\"selected\""; ?>><?php print GM_LANG_personal_facts;?></option>
+				<option value="1" <?php if (GedcomConfig::$GEDCOM_DEFAULT_TAB==1) print "selected=\"selected\""; ?>><?php print GM_LANG_notes;?></option>
+				<option value="2" <?php if (GedcomConfig::$GEDCOM_DEFAULT_TAB==2) print "selected=\"selected\""; ?>><?php print GM_LANG_ssourcess;?></option>
+				<option value="3" <?php if (GedcomConfig::$GEDCOM_DEFAULT_TAB==3) print "selected=\"selected\""; ?>><?php print GM_LANG_media;?></option>
+				<option value="4" <?php if (GedcomConfig::$GEDCOM_DEFAULT_TAB==4) print "selected=\"selected\""; ?>><?php print GM_LANG_relatives;?></option>
+				<option value="6" <?php if (GedcomConfig::$GEDCOM_DEFAULT_TAB==6) print "selected=\"selected\""; ?>><?php print GM_LANG_all;?></option>
 			</select>
 		</td>
 	</tr>
 	<tr>
-		<td class="shade2 wrap"><div class="helpicon"><?php print_help_link("SHOW_RELATIVES_EVENTS_help", "qm", "SHOW_RELATIVES_EVENTS"); print "</div><div class=\"description\">"; print $gm_lang["SHOW_RELATIVES_EVENTS"];?></div></td>
+		<td class="shade2 wrap"><div class="helpicon"><?php print_help_link("SHOW_RELATIVES_EVENTS_help", "qm", "SHOW_RELATIVES_EVENTS"); print "</div><div class=\"description\">"; print GM_LANG_SHOW_RELATIVES_EVENTS;?></div></td>
 		<td class="shade1">
 			<input type="hidden" name="NEW_SHOW_RELATIVES_EVENTS" value="<?php echo GedcomConfig::$SHOW_RELATIVES_EVENTS?>" />
 <?php
@@ -1141,11 +1141,11 @@ print "</table>";
 		</td>
 	</tr>
 	<tr>
-		<td class="shade2 wrap"><div class="helpicon"><?php print_help_link("EXPAND_RELATIVES_EVENTS_help", "qm", "EXPAND_RELATIVES_EVENTS"); print "</div><div class=\"description\">"; print $gm_lang["EXPAND_RELATIVES_EVENTS"];?></div></td>
+		<td class="shade2 wrap"><div class="helpicon"><?php print_help_link("EXPAND_RELATIVES_EVENTS_help", "qm", "EXPAND_RELATIVES_EVENTS"); print "</div><div class=\"description\">"; print GM_LANG_EXPAND_RELATIVES_EVENTS;?></div></td>
 		<td class="shade1">
 			<select name="NEW_EXPAND_RELATIVES_EVENTS" tabindex="<?php $i++; print $i?>">
-				<option value="yes" <?php if (GedcomConfig::$EXPAND_RELATIVES_EVENTS) print "selected=\"selected\""; ?>><?php print $gm_lang["yes"];?></option>
-				<option value="no" <?php if (!GedcomConfig::$EXPAND_RELATIVES_EVENTS) print "selected=\"selected\""; ?>><?php print $gm_lang["no"];?></option>
+				<option value="yes" <?php if (GedcomConfig::$EXPAND_RELATIVES_EVENTS) print "selected=\"selected\""; ?>><?php print GM_LANG_yes;?></option>
+				<option value="no" <?php if (!GedcomConfig::$EXPAND_RELATIVES_EVENTS) print "selected=\"selected\""; ?>><?php print GM_LANG_no;?></option>
 			</select>
 		</td>
 	</tr>
@@ -1153,34 +1153,34 @@ print "</table>";
 		</td>
 	</tr>
 	<tr>
-		<td class="shade2 wrap"><div class="helpicon"><?php print_help_link("INDI_EXT_FAM_FACTS_help", "qm", "INDI_EXT_FAM_FACTS"); print "</div><div class=\"description\">"; print $gm_lang["INDI_EXT_FAM_FACTS"];?></div></td>
+		<td class="shade2 wrap"><div class="helpicon"><?php print_help_link("INDI_EXT_FAM_FACTS_help", "qm", "INDI_EXT_FAM_FACTS"); print "</div><div class=\"description\">"; print GM_LANG_INDI_EXT_FAM_FACTS;?></div></td>
 		<td class="shade1">
 			<select name="NEW_INDI_EXT_FAM_FACTS" tabindex="<?php $i++; print $i?>">
-				<option value="yes" <?php if (GedcomConfig::$INDI_EXT_FAM_FACTS) print "selected=\"selected\""; ?>><?php print $gm_lang["yes"];?></option>
-				<option value="no" <?php if (!GedcomConfig::$INDI_EXT_FAM_FACTS) print "selected=\"selected\""; ?>><?php print $gm_lang["no"];?></option>
+				<option value="yes" <?php if (GedcomConfig::$INDI_EXT_FAM_FACTS) print "selected=\"selected\""; ?>><?php print GM_LANG_yes;?></option>
+				<option value="no" <?php if (!GedcomConfig::$INDI_EXT_FAM_FACTS) print "selected=\"selected\""; ?>><?php print GM_LANG_no;?></option>
 			</select>
 		</td>
 	</tr>
 	<tr>
-		<td class="shade2 wrap"><div class="helpicon"><?php print_help_link("POSTAL_CODE_help", "qm", "POSTAL_CODE"); print "</div><div class=\"description\">"; print $gm_lang["POSTAL_CODE"];?></div></td>
+		<td class="shade2 wrap"><div class="helpicon"><?php print_help_link("POSTAL_CODE_help", "qm", "POSTAL_CODE"); print "</div><div class=\"description\">"; print GM_LANG_POSTAL_CODE;?></div></td>
 		<td class="shade1"><select name="NEW_POSTAL_CODE" tabindex="<?php $i++; print $i?>">
-				<option value="yes" <?php if (GedcomConfig::$POSTAL_CODE) print "selected=\"selected\""; ?>><?php print ucfirst($gm_lang["after"]);?></option>
-				<option value="no" <?php if (!GedcomConfig::$POSTAL_CODE) print "selected=\"selected\""; ?>><?php print ucfirst($gm_lang["before"]);?></option>
+				<option value="yes" <?php if (GedcomConfig::$POSTAL_CODE) print "selected=\"selected\""; ?>><?php print ucfirst(GM_LANG_after);?></option>
+				<option value="no" <?php if (!GedcomConfig::$POSTAL_CODE) print "selected=\"selected\""; ?>><?php print ucfirst(GM_LANG_before);?></option>
 			</select>
 		</td>
 	</tr>
 	<tr>
-		<td class="shade2 wrap"><div class="helpicon"><?php print_help_link("ALPHA_INDEX_LISTS_help", "qm", "ALPHA_INDEX_LISTS"); print "</div><div class=\"description\">"; print $gm_lang["ALPHA_INDEX_LISTS"];?></div></td>
+		<td class="shade2 wrap"><div class="helpicon"><?php print_help_link("ALPHA_INDEX_LISTS_help", "qm", "ALPHA_INDEX_LISTS"); print "</div><div class=\"description\">"; print GM_LANG_ALPHA_INDEX_LISTS;?></div></td>
 		<td class="shade1"><input name="NEW_ALPHA_INDEX_LISTS" tabindex="<?php $i++; print $i?>" type="text" size="5" maxlength="4" value="<?php print GedcomConfig::$ALPHA_INDEX_LISTS; ?>" />
 			</select>
 		</td>
 	</tr>
 	<tr>
-		<td class="shade2 wrap"><div class="helpicon"><?php print_help_link("LISTS_ALL_help", "qm", "LISTS_ALL"); print "</div><div class=\"description\">"; print $gm_lang["LISTS_ALL"];?></div></td>
+		<td class="shade2 wrap"><div class="helpicon"><?php print_help_link("LISTS_ALL_help", "qm", "LISTS_ALL"); print "</div><div class=\"description\">"; print GM_LANG_LISTS_ALL;?></div></td>
 			<td class="shade1">			
 				<select name="NEW_LISTS_ALL" tabindex="<?php $i++; print $i?>">
-					<option value="yes" <?php if (GedcomConfig::$LISTS_ALL) print "selected=\"selected\""; ?>><?php print $gm_lang["yes"];?></option>
-					<option value="no" <?php if (!GedcomConfig::$LISTS_ALL) print "selected=\"selected\""; ?>><?php print $gm_lang["no"];?></option>
+					<option value="yes" <?php if (GedcomConfig::$LISTS_ALL) print "selected=\"selected\""; ?>><?php print GM_LANG_yes;?></option>
+					<option value="no" <?php if (!GedcomConfig::$LISTS_ALL) print "selected=\"selected\""; ?>><?php print GM_LANG_no;?></option>
 				</select>
 			</select>
 		</td>
@@ -1191,70 +1191,70 @@ print "</table>";
 
 <table class="facts_table"><tr><td class="subbar <?php print $TEXT_DIRECTION;?>">
 <?php
-print "<a href=\"javascript: ".$gm_lang["displ_hide_conf"]."\" onclick=\"expand_layer('layout-options5');return false;\"><img id=\"layout-options5_img\" src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["plus"]["other"]."\" border=\"0\" width=\"11\" height=\"11\" alt=\"\" /></a>";
-print "&nbsp;<a href=\"javascript: ".$gm_lang["displ_hide_conf"]."\" onclick=\"expand_layer('layout-options5');return false;\">".$gm_lang["displ_hide_conf"]."</a>";
+print "<a href=\"javascript: ".GM_LANG_displ_hide_conf."\" onclick=\"expand_layer('layout-options5');return false;\"><img id=\"layout-options5_img\" src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["plus"]["other"]."\" border=\"0\" width=\"11\" height=\"11\" alt=\"\" /></a>";
+print "&nbsp;<a href=\"javascript: ".GM_LANG_displ_hide_conf."\" onclick=\"expand_layer('layout-options5');return false;\">".GM_LANG_displ_hide_conf."</a>";
 ?></td></tr></table>
 <div id="layout-options5" style="display: none">
 <table class="facts_table">
 	<tr>
-		<td class="shade2 wrap width20"><div class="helpicon"><?php print_help_link("DAYS_TO_SHOW_LIMIT_help", "qm", "DAYS_TO_SHOW_LIMIT"); print "</div><div class=\"description\">"; print $gm_lang["DAYS_TO_SHOW_LIMIT"];?></div></td>
+		<td class="shade2 wrap width20"><div class="helpicon"><?php print_help_link("DAYS_TO_SHOW_LIMIT_help", "qm", "DAYS_TO_SHOW_LIMIT"); print "</div><div class=\"description\">"; print GM_LANG_DAYS_TO_SHOW_LIMIT;?></div></td>
 		<td class="shade1"><input type="text" name="NEW_DAYS_TO_SHOW_LIMIT" value="<?php print GedcomConfig::$DAYS_TO_SHOW_LIMIT?>" size="2" tabindex="<?php $i++; print $i?>" /></td>
 	</tr>
 
 	<tr>
-		<td class="shade2 wrap"><div class="helpicon"><?php print_help_link("SHOW_EMPTY_BOXES_help", "qm", "SHOW_EMPTY_BOXES"); print "</div><div class=\"description\">"; print $gm_lang["SHOW_EMPTY_BOXES"];?></div></td>
+		<td class="shade2 wrap"><div class="helpicon"><?php print_help_link("SHOW_EMPTY_BOXES_help", "qm", "SHOW_EMPTY_BOXES"); print "</div><div class=\"description\">"; print GM_LANG_SHOW_EMPTY_BOXES;?></div></td>
 		<td class="shade1"><select name="NEW_SHOW_EMPTY_BOXES" tabindex="<?php $i++; print $i?>">
-				<option value="yes" <?php if (GedcomConfig::$SHOW_EMPTY_BOXES) print "selected=\"selected\""; ?>><?php print $gm_lang["yes"];?></option>
-				<option value="no" <?php if (!GedcomConfig::$SHOW_EMPTY_BOXES) print "selected=\"selected\""; ?>><?php print $gm_lang["no"];?></option>
+				<option value="yes" <?php if (GedcomConfig::$SHOW_EMPTY_BOXES) print "selected=\"selected\""; ?>><?php print GM_LANG_yes;?></option>
+				<option value="no" <?php if (!GedcomConfig::$SHOW_EMPTY_BOXES) print "selected=\"selected\""; ?>><?php print GM_LANG_no;?></option>
 			</select>
 		</td>
 	</tr>
 	<tr>
-		<td class="shade2 wrap"><div class="helpicon"><?php print_help_link("SHOW_GEDCOM_RECORD_help", "qm", "SHOW_GEDCOM_RECORD"); print "</div><div class=\"description\">"; print $gm_lang["SHOW_GEDCOM_RECORD"];?></div></td>
+		<td class="shade2 wrap"><div class="helpicon"><?php print_help_link("SHOW_GEDCOM_RECORD_help", "qm", "SHOW_GEDCOM_RECORD"); print "</div><div class=\"description\">"; print GM_LANG_SHOW_GEDCOM_RECORD;?></div></td>
 		<td class="shade1"><select name="NEW_SHOW_GEDCOM_RECORD" tabindex="<?php $i++; print $i?>">
-				<option value="-1" <?php if (GedcomConfig::$SHOW_GEDCOM_RECORD == "-1") print "selected=\"selected\""; ?>><?php print $gm_lang["show_gedrec_-1"];?></option>
-				<option value="0" <?php if (GedcomConfig::$SHOW_GEDCOM_RECORD == "0") print "selected=\"selected\""; ?>><?php print $gm_lang["show_gedrec_0"];?></option>
-				<option value="1" <?php if (GedcomConfig::$SHOW_GEDCOM_RECORD == "1") print "selected=\"selected\""; ?>><?php print $gm_lang["show_gedrec_1"];?></option>
-				<option value="2" <?php if (GedcomConfig::$SHOW_GEDCOM_RECORD == "2") print "selected=\"selected\""; ?>><?php print $gm_lang["show_gedrec_2"];?></option>
-				<option value="3" <?php if (GedcomConfig::$SHOW_GEDCOM_RECORD == "3") print "selected=\"selected\""; ?>><?php print $gm_lang["show_gedrec_3"];?></option>
-				<option value="4" <?php if (GedcomConfig::$SHOW_GEDCOM_RECORD == "4") print "selected=\"selected\""; ?>><?php print $gm_lang["show_gedrec_4"];?></option>
-				<option value="5" <?php if (GedcomConfig::$SHOW_GEDCOM_RECORD == "5") print "selected=\"selected\""; ?>><?php print $gm_lang["show_gedrec_5"];?></option>
+				<option value="-1" <?php if (GedcomConfig::$SHOW_GEDCOM_RECORD == "-1") print "selected=\"selected\""; ?>><?php print constant("GM_LANG_show_gedrec_-1");?></option>
+				<option value="0" <?php if (GedcomConfig::$SHOW_GEDCOM_RECORD == "0") print "selected=\"selected\""; ?>><?php print GM_LANG_show_gedrec_0;?></option>
+				<option value="1" <?php if (GedcomConfig::$SHOW_GEDCOM_RECORD == "1") print "selected=\"selected\""; ?>><?php print GM_LANG_show_gedrec_1;?></option>
+				<option value="2" <?php if (GedcomConfig::$SHOW_GEDCOM_RECORD == "2") print "selected=\"selected\""; ?>><?php print GM_LANG_show_gedrec_2;?></option>
+				<option value="3" <?php if (GedcomConfig::$SHOW_GEDCOM_RECORD == "3") print "selected=\"selected\""; ?>><?php print GM_LANG_show_gedrec_3;?></option>
+				<option value="4" <?php if (GedcomConfig::$SHOW_GEDCOM_RECORD == "4") print "selected=\"selected\""; ?>><?php print GM_LANG_show_gedrec_4;?></option>
+				<option value="5" <?php if (GedcomConfig::$SHOW_GEDCOM_RECORD == "5") print "selected=\"selected\""; ?>><?php print GM_LANG_show_gedrec_5;?></option>
 			</select>
 		</td>
 	</tr>
 	<tr>
-		<td class="shade2 wrap"><div class="helpicon"><?php print_help_link("HIDE_GEDCOM_ERRORS_help", "qm", "HIDE_GEDCOM_ERRORS"); print "</div><div class=\"description\">"; print $gm_lang["HIDE_GEDCOM_ERRORS"];?></div></td>
+		<td class="shade2 wrap"><div class="helpicon"><?php print_help_link("HIDE_GEDCOM_ERRORS_help", "qm", "HIDE_GEDCOM_ERRORS"); print "</div><div class=\"description\">"; print GM_LANG_HIDE_GEDCOM_ERRORS;?></div></td>
 		<td class="shade1"><select name="NEW_HIDE_GEDCOM_ERRORS" tabindex="<?php $i++; print $i?>">
-				<option value="yes" <?php if (GedcomConfig::$HIDE_GEDCOM_ERRORS) print "selected=\"selected\""; ?>><?php print $gm_lang["yes"];?></option>
-				<option value="no" <?php if (!GedcomConfig::$HIDE_GEDCOM_ERRORS) print "selected=\"selected\""; ?>><?php print $gm_lang["no"];?></option>
+				<option value="yes" <?php if (GedcomConfig::$HIDE_GEDCOM_ERRORS) print "selected=\"selected\""; ?>><?php print GM_LANG_yes;?></option>
+				<option value="no" <?php if (!GedcomConfig::$HIDE_GEDCOM_ERRORS) print "selected=\"selected\""; ?>><?php print GM_LANG_no;?></option>
 			</select>
 		</td>
 	</tr>
 	<tr>
-		<td class="shade2 wrap"><div class="helpicon"><?php print_help_link("WORD_WRAPPED_NOTES_help", "qm", "WORD_WRAPPED_NOTES"); print "</div><div class=\"description\">"; print $gm_lang["WORD_WRAPPED_NOTES"];?></div></td>
+		<td class="shade2 wrap"><div class="helpicon"><?php print_help_link("WORD_WRAPPED_NOTES_help", "qm", "WORD_WRAPPED_NOTES"); print "</div><div class=\"description\">"; print GM_LANG_WORD_WRAPPED_NOTES;?></div></td>
 		<td class="shade1"><select name="NEW_WORD_WRAPPED_NOTES" tabindex="<?php $i++; print $i?>">
-				<option value="yes" <?php if (GedcomConfig::$WORD_WRAPPED_NOTES) print "selected=\"selected\""; ?>><?php print $gm_lang["yes"];?></option>
-				<option value="no" <?php if (!GedcomConfig::$WORD_WRAPPED_NOTES) print "selected=\"selected\""; ?>><?php print $gm_lang["no"];?></option>
+				<option value="yes" <?php if (GedcomConfig::$WORD_WRAPPED_NOTES) print "selected=\"selected\""; ?>><?php print GM_LANG_yes;?></option>
+				<option value="no" <?php if (!GedcomConfig::$WORD_WRAPPED_NOTES) print "selected=\"selected\""; ?>><?php print GM_LANG_no;?></option>
 			</select>
 		</td>
 	</tr>
 	<tr>
-		<td class="shade2 wrap"><div class="helpicon"><?php print_help_link("FAVICON_help", "qm", "FAVICON"); print "</div><div class=\"description\">"; print $gm_lang["FAVICON"];?></div></td>
+		<td class="shade2 wrap"><div class="helpicon"><?php print_help_link("FAVICON_help", "qm", "FAVICON"); print "</div><div class=\"description\">"; print GM_LANG_FAVICON;?></div></td>
 		<td class="shade1"><input type="text" name="NEW_FAVICON" value="<?php print GedcomConfig::$FAVICON?>" size="40" dir="ltr" tabindex="<?php $i++; print $i?>" /></td>
 	</tr>
 	<tr>
-		<td class="shade2 wrap"><div class="helpicon"><?php print_help_link("SHOW_COUNTER_help", "qm", "SHOW_COUNTER"); print "</div><div class=\"description\">"; print $gm_lang["SHOW_COUNTER"];?></div></td>
+		<td class="shade2 wrap"><div class="helpicon"><?php print_help_link("SHOW_COUNTER_help", "qm", "SHOW_COUNTER"); print "</div><div class=\"description\">"; print GM_LANG_SHOW_COUNTER;?></div></td>
 		<td class="shade1"><select name="NEW_SHOW_COUNTER" tabindex="<?php $i++; print $i?>">
-				<option value="yes" <?php if (GedcomConfig::$SHOW_COUNTER) print "selected=\"selected\""; ?>><?php print $gm_lang["yes"];?></option>
-				<option value="no" <?php if (!GedcomConfig::$SHOW_COUNTER) print "selected=\"selected\""; ?>><?php print $gm_lang["no"];?></option>
+				<option value="yes" <?php if (GedcomConfig::$SHOW_COUNTER) print "selected=\"selected\""; ?>><?php print GM_LANG_yes;?></option>
+				<option value="no" <?php if (!GedcomConfig::$SHOW_COUNTER) print "selected=\"selected\""; ?>><?php print GM_LANG_no;?></option>
 			</select>
 		</td>
 	</tr>
 	<tr>
-		<td class="shade2 wrap"><div class="helpicon"><?php print_help_link("SHOW_STATS_help", "qm", "SHOW_STATS"); print "</div><div class=\"description\">"; print $gm_lang["SHOW_STATS"];?></div></td>
+		<td class="shade2 wrap"><div class="helpicon"><?php print_help_link("SHOW_STATS_help", "qm", "SHOW_STATS"); print "</div><div class=\"description\">"; print GM_LANG_SHOW_STATS;?></div></td>
 		<td class="shade1"><select name="NEW_SHOW_STATS" tabindex="<?php $i++; print $i?>">
-				<option value="yes" <?php if (GedcomConfig::$SHOW_STATS) print "selected=\"selected\""; ?>><?php print $gm_lang["yes"];?></option>
-				<option value="no" <?php if (!GedcomConfig::$SHOW_STATS) print "selected=\"selected\""; ?>><?php print $gm_lang["no"];?></option>
+				<option value="yes" <?php if (GedcomConfig::$SHOW_STATS) print "selected=\"selected\""; ?>><?php print GM_LANG_yes;?></option>
+				<option value="no" <?php if (!GedcomConfig::$SHOW_STATS) print "selected=\"selected\""; ?>><?php print GM_LANG_no;?></option>
 			</select>
 		</td>
 	</tr>
@@ -1267,148 +1267,148 @@ print "&nbsp;<a href=\"javascript: ".$gm_lang["displ_hide_conf"]."\" onclick=\"e
 ?>
 <table class="facts_table"><tr><td class="topbottombar <?php print $TEXT_DIRECTION;?>">
 <?php
-print "<a href=\"javascript: ".$gm_lang["editopt_conf"]."\" onclick=\"expand_layer('edit-options');return false;\"><img id=\"edit-options_img\" src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["plus"]["other"]."\" border=\"0\" width=\"11\" height=\"11\" alt=\"\" /></a>";
-print "&nbsp;<a href=\"javascript: ".$gm_lang["editopt_conf"]."\" onclick=\"expand_layer('edit-options');return false;\">".$gm_lang["editopt_conf"]."</a>";
+print "<a href=\"javascript: ".GM_LANG_editopt_conf."\" onclick=\"expand_layer('edit-options');return false;\"><img id=\"edit-options_img\" src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["plus"]["other"]."\" border=\"0\" width=\"11\" height=\"11\" alt=\"\" /></a>";
+print "&nbsp;<a href=\"javascript: ".GM_LANG_editopt_conf."\" onclick=\"expand_layer('edit-options');return false;\">".GM_LANG_editopt_conf."</a>";
 ?></td></tr></table>
 <div id="edit-options" style="display: none">
 <table class="facts_table">
 	<tr>
-		<td class="shade2 wrap width20"><div class="helpicon"><?php print_help_link("ALLOW_EDIT_GEDCOM_help", "qm", "ALLOW_EDIT_GEDCOM"); print "</div><div class=\"description\">"; print $gm_lang["ALLOW_EDIT_GEDCOM"];?></div></td>
+		<td class="shade2 wrap width20"><div class="helpicon"><?php print_help_link("ALLOW_EDIT_GEDCOM_help", "qm", "ALLOW_EDIT_GEDCOM"); print "</div><div class=\"description\">"; print GM_LANG_ALLOW_EDIT_GEDCOM;?></div></td>
 		<td class="shade1"><select name="NEW_ALLOW_EDIT_GEDCOM" tabindex="<?php $i++; print $i?>">
-				<option value="yes" <?php if (GedcomConfig::$ALLOW_EDIT_GEDCOM) print "selected=\"selected\""; ?>><?php print $gm_lang["yes"];?></option>
-				<option value="no" <?php if (!GedcomConfig::$ALLOW_EDIT_GEDCOM) print "selected=\"selected\""; ?>><?php print $gm_lang["no"];?></option>
+				<option value="yes" <?php if (GedcomConfig::$ALLOW_EDIT_GEDCOM) print "selected=\"selected\""; ?>><?php print GM_LANG_yes;?></option>
+				<option value="no" <?php if (!GedcomConfig::$ALLOW_EDIT_GEDCOM) print "selected=\"selected\""; ?>><?php print GM_LANG_no;?></option>
 			</select>
 		</td>
 	</tr>
 	<tr>
-		<td class="shade2 wrap"><div class="helpicon"><?php print_help_link("EDIT_GEDCOM_RECORD_help", "qm", "EDIT_GEDCOM_RECORD"); print "</div><div class=\"description\">"; print $gm_lang["EDIT_GEDCOM_RECORD"];?></div></td>
+		<td class="shade2 wrap"><div class="helpicon"><?php print_help_link("EDIT_GEDCOM_RECORD_help", "qm", "EDIT_GEDCOM_RECORD"); print "</div><div class=\"description\">"; print GM_LANG_EDIT_GEDCOM_RECORD;?></div></td>
 		<td class="shade1"><select name="NEW_EDIT_GEDCOM_RECORD" tabindex="<?php $i++; print $i?>">
-				<option value="-1" <?php if (GedcomConfig::$EDIT_GEDCOM_RECORD == "-1") print "selected=\"selected\""; ?>><?php print $gm_lang["show_gedrec_-1"];?></option>
-				<option value="2" <?php if (GedcomConfig::$EDIT_GEDCOM_RECORD == "2") print "selected=\"selected\""; ?>><?php print $gm_lang["show_gedrec_2"];?></option>
-				<option value="3" <?php if (GedcomConfig::$EDIT_GEDCOM_RECORD == "3") print "selected=\"selected\""; ?>><?php print $gm_lang["show_gedrec_3"];?></option>
-				<option value="4" <?php if (GedcomConfig::$EDIT_GEDCOM_RECORD == "4") print "selected=\"selected\""; ?>><?php print $gm_lang["show_gedrec_4"];?></option>
-				<option value="5" <?php if (GedcomConfig::$EDIT_GEDCOM_RECORD == "5") print "selected=\"selected\""; ?>><?php print $gm_lang["show_gedrec_5"];?></option>
+				<option value="-1" <?php if (GedcomConfig::$EDIT_GEDCOM_RECORD == "-1") print "selected=\"selected\""; ?>><?php print constant("GM_LANG_show_gedrec_-1");?></option>
+				<option value="2" <?php if (GedcomConfig::$EDIT_GEDCOM_RECORD == "2") print "selected=\"selected\""; ?>><?php print GM_LANG_show_gedrec_2;?></option>
+				<option value="3" <?php if (GedcomConfig::$EDIT_GEDCOM_RECORD == "3") print "selected=\"selected\""; ?>><?php print GM_LANG_show_gedrec_3;?></option>
+				<option value="4" <?php if (GedcomConfig::$EDIT_GEDCOM_RECORD == "4") print "selected=\"selected\""; ?>><?php print GM_LANG_show_gedrec_4;?></option>
+				<option value="5" <?php if (GedcomConfig::$EDIT_GEDCOM_RECORD == "5") print "selected=\"selected\""; ?>><?php print GM_LANG_show_gedrec_5;?></option>
 			</select>
 		</td>
 	</tr>
 	<tr>
-		<td class="shade2 wrap"><div class="helpicon"><?php print_help_link("INDI_FACTS_ADD_help", "qm", "INDI_FACTS_ADD"); print "</div><div class=\"description\">"; print $gm_lang["INDI_FACTS_ADD"];?></div></td>
+		<td class="shade2 wrap"><div class="helpicon"><?php print_help_link("INDI_FACTS_ADD_help", "qm", "INDI_FACTS_ADD"); print "</div><div class=\"description\">"; print GM_LANG_INDI_FACTS_ADD;?></div></td>
 		<td class="shade1"><input type="text" name="NEW_INDI_FACTS_ADD" value="<?php print GedcomConfig::$INDI_FACTS_ADD; ?>" size="80" dir="ltr" tabindex="<?php $i++; print $i?>" /></td>
 	</tr>
 	<tr>
-		<td class="shade2 wrap"><div class="helpicon"><?php print_help_link("INDI_FACTS_UNIQUE_help", "qm", "INDI_FACTS_UNIQUE"); print "</div><div class=\"description\">"; print $gm_lang["INDI_FACTS_UNIQUE"];?></div></td>
+		<td class="shade2 wrap"><div class="helpicon"><?php print_help_link("INDI_FACTS_UNIQUE_help", "qm", "INDI_FACTS_UNIQUE"); print "</div><div class=\"description\">"; print GM_LANG_INDI_FACTS_UNIQUE;?></div></td>
 		<td class="shade1"><input type="text" name="NEW_INDI_FACTS_UNIQUE" value="<?php print GedcomConfig::$INDI_FACTS_UNIQUE; ?>" size="80" dir="ltr" tabindex="<?php $i++; print $i?>" /></td>
 	</tr>
 	<tr>
-		<td class="shade2 wrap"><div class="helpicon"><?php print_help_link("INDI_QUICK_ADDFACTS_help", "qm", "INDI_QUICK_ADDFACTS"); print "</div><div class=\"description\">"; print $gm_lang["INDI_QUICK_ADDFACTS"];?></div></td>
+		<td class="shade2 wrap"><div class="helpicon"><?php print_help_link("INDI_QUICK_ADDFACTS_help", "qm", "INDI_QUICK_ADDFACTS"); print "</div><div class=\"description\">"; print GM_LANG_INDI_QUICK_ADDFACTS;?></div></td>
 		<td class="shade1"><input type="text" name="NEW_INDI_QUICK_ADDFACTS" value="<?php print GedcomConfig::$INDI_QUICK_ADDFACTS; ?>" size="80" dir="ltr" tabindex="<?php $i++; print $i?>" /></td>
 	</tr>
 	<tr>
-		<td class="shade2 wrap"><div class="helpicon"><?php print_help_link("FAM_FACTS_ADD_help", "qm", "FAM_FACTS_ADD"); print "</div><div class=\"description\">"; print $gm_lang["FAM_FACTS_ADD"];?></div></td>
+		<td class="shade2 wrap"><div class="helpicon"><?php print_help_link("FAM_FACTS_ADD_help", "qm", "FAM_FACTS_ADD"); print "</div><div class=\"description\">"; print GM_LANG_FAM_FACTS_ADD;?></div></td>
 		<td class="shade1"><input type="text" name="NEW_FAM_FACTS_ADD" value="<?php print GedcomConfig::$FAM_FACTS_ADD; ?>" size="80" dir="ltr" tabindex="<?php $i++; print $i?>" /></td>
 	</tr>
 	<tr>
-		<td class="shade2 wrap"><div class="helpicon"><?php print_help_link("FAM_FACTS_UNIQUE_help", "qm", "FAM_FACTS_UNIQUE"); print "</div><div class=\"description\">"; print $gm_lang["FAM_FACTS_UNIQUE"];?></div></td>
+		<td class="shade2 wrap"><div class="helpicon"><?php print_help_link("FAM_FACTS_UNIQUE_help", "qm", "FAM_FACTS_UNIQUE"); print "</div><div class=\"description\">"; print GM_LANG_FAM_FACTS_UNIQUE;?></div></td>
 		<td class="shade1"><input type="text" name="NEW_FAM_FACTS_UNIQUE" value="<?php print GedcomConfig::$FAM_FACTS_UNIQUE; ?>" size="80" dir="ltr" tabindex="<?php $i++; print $i?>" /></td>
 	</tr>
 	<tr>
-		<td class="shade2 wrap"><div class="helpicon"><?php print_help_link("FAM_QUICK_ADDFACTS_help", "qm", "FAM_QUICK_ADDFACTS"); print "</div><div class=\"description\">"; print $gm_lang["FAM_QUICK_ADDFACTS"];?></div></td>
+		<td class="shade2 wrap"><div class="helpicon"><?php print_help_link("FAM_QUICK_ADDFACTS_help", "qm", "FAM_QUICK_ADDFACTS"); print "</div><div class=\"description\">"; print GM_LANG_FAM_QUICK_ADDFACTS;?></div></td>
 		<td class="shade1"><input type="text" name="NEW_FAM_QUICK_ADDFACTS" value="<?php print GedcomConfig::$FAM_QUICK_ADDFACTS; ?>" size="80" dir="ltr" tabindex="<?php $i++; print $i?>" /></td>
 	</tr>
 	<tr>
-		<td class="shade2 wrap"><div class="helpicon"><?php print_help_link("SOUR_FACTS_ADD_help", "qm", "SOUR_FACTS_ADD"); print "</div><div class=\"description\">"; print $gm_lang["SOUR_FACTS_ADD"];?></div></td>
+		<td class="shade2 wrap"><div class="helpicon"><?php print_help_link("SOUR_FACTS_ADD_help", "qm", "SOUR_FACTS_ADD"); print "</div><div class=\"description\">"; print GM_LANG_SOUR_FACTS_ADD;?></div></td>
 		<td class="shade1"><input type="text" name="NEW_SOUR_FACTS_ADD" value="<?php print GedcomConfig::$SOUR_FACTS_ADD; ?>" size="80" dir="ltr" tabindex="<?php $i++; print $i?>" /></td>
 	</tr>
 	<tr>
-		<td class="shade2 wrap"><div class="helpicon"><?php print_help_link("SOUR_FACTS_UNIQUE_help", "qm", "SOUR_FACTS_UNIQUE"); print "</div><div class=\"description\">"; print $gm_lang["SOUR_FACTS_UNIQUE"];?></div></td>
+		<td class="shade2 wrap"><div class="helpicon"><?php print_help_link("SOUR_FACTS_UNIQUE_help", "qm", "SOUR_FACTS_UNIQUE"); print "</div><div class=\"description\">"; print GM_LANG_SOUR_FACTS_UNIQUE;?></div></td>
 		<td class="shade1"><input type="text" name="NEW_SOUR_FACTS_UNIQUE" value="<?php print GedcomConfig::$SOUR_FACTS_UNIQUE; ?>" size="80" dir="ltr" tabindex="<?php $i++; print $i?>" /></td>
 	</tr>
 	<tr>
-		<td class="shade2 wrap"><div class="helpicon"><?php print_help_link("SOUR_QUICK_ADDFACTS_help", "qm", "SOUR_QUICK_ADDFACTS"); print "</div><div class=\"description\">"; print $gm_lang["SOUR_QUICK_ADDFACTS"];?></div></td>
+		<td class="shade2 wrap"><div class="helpicon"><?php print_help_link("SOUR_QUICK_ADDFACTS_help", "qm", "SOUR_QUICK_ADDFACTS"); print "</div><div class=\"description\">"; print GM_LANG_SOUR_QUICK_ADDFACTS;?></div></td>
 		<td class="shade1"><input type="text" name="NEW_SOUR_QUICK_ADDFACTS" value="<?php print GedcomConfig::$SOUR_QUICK_ADDFACTS; ?>" size="80" dir="ltr" tabindex="<?php $i++; print $i?>" /></td>
 	</tr>
 	<tr>
-		<td class="shade2 wrap"><div class="helpicon"><?php print_help_link("REPO_FACTS_ADD_help", "qm", "REPO_FACTS_ADD"); print "</div><div class=\"description\">"; print $gm_lang["REPO_FACTS_ADD"];?></div></td>
+		<td class="shade2 wrap"><div class="helpicon"><?php print_help_link("REPO_FACTS_ADD_help", "qm", "REPO_FACTS_ADD"); print "</div><div class=\"description\">"; print GM_LANG_REPO_FACTS_ADD;?></div></td>
 		<td class="shade1"><input type="text" name="NEW_REPO_FACTS_ADD" value="<?php print GedcomConfig::$REPO_FACTS_ADD; ?>" size="80" dir="ltr" tabindex="<?php $i++; print $i?>" /></td>
 	</tr>
 	<tr>
-		<td class="shade2 wrap"><div class="helpicon"><?php print_help_link("REPO_FACTS_UNIQUE_help", "qm", "REPO_FACTS_UNIQUE"); print "</div><div class=\"description\">"; print $gm_lang["REPO_FACTS_UNIQUE"];?></div></td>
+		<td class="shade2 wrap"><div class="helpicon"><?php print_help_link("REPO_FACTS_UNIQUE_help", "qm", "REPO_FACTS_UNIQUE"); print "</div><div class=\"description\">"; print GM_LANG_REPO_FACTS_UNIQUE;?></div></td>
 		<td class="shade1"><input type="text" name="NEW_REPO_FACTS_UNIQUE" value="<?php print GedcomConfig::$REPO_FACTS_UNIQUE; ?>" size="80" dir="ltr" tabindex="<?php $i++; print $i?>" /></td>
 	</tr>
 	<tr>
-		<td class="shade2 wrap"><div class="helpicon"><?php print_help_link("REPO_QUICK_ADDFACTS_help", "qm", "REPO_QUICK_ADDFACTS"); print "</div><div class=\"description\">"; print $gm_lang["REPO_QUICK_ADDFACTS"];?></div></td>
+		<td class="shade2 wrap"><div class="helpicon"><?php print_help_link("REPO_QUICK_ADDFACTS_help", "qm", "REPO_QUICK_ADDFACTS"); print "</div><div class=\"description\">"; print GM_LANG_REPO_QUICK_ADDFACTS;?></div></td>
 		<td class="shade1"><input type="text" name="NEW_REPO_QUICK_ADDFACTS" value="<?php print GedcomConfig::$REPO_QUICK_ADDFACTS; ?>" size="80" dir="ltr" tabindex="<?php $i++; print $i?>" /></td>
 	</tr>
 	<tr>
-		<td class="shade2 wrap"><div class="helpicon"><?php print_help_link("MEDIA_FACTS_ADD_help", "qm", "MEDIA_FACTS_ADD"); print "</div><div class=\"description\">"; print $gm_lang["MEDIA_FACTS_ADD"];?></div></td>
+		<td class="shade2 wrap"><div class="helpicon"><?php print_help_link("MEDIA_FACTS_ADD_help", "qm", "MEDIA_FACTS_ADD"); print "</div><div class=\"description\">"; print GM_LANG_MEDIA_FACTS_ADD;?></div></td>
 		<td class="shade1"><input type="text" name="NEW_MEDIA_FACTS_ADD" value="<?php print GedcomConfig::$MEDIA_FACTS_ADD; ?>" size="80" dir="ltr" tabindex="<?php $i++; print $i?>" /></td>
 	</tr>
 	<tr>
-		<td class="shade2 wrap"><div class="helpicon"><?php print_help_link("MEDIA_FACTS_UNIQUE_help", "qm", "MEDIA_FACTS_UNIQUE"); print "</div><div class=\"description\">"; print $gm_lang["MEDIA_FACTS_UNIQUE"];?></div></td>
+		<td class="shade2 wrap"><div class="helpicon"><?php print_help_link("MEDIA_FACTS_UNIQUE_help", "qm", "MEDIA_FACTS_UNIQUE"); print "</div><div class=\"description\">"; print GM_LANG_MEDIA_FACTS_UNIQUE;?></div></td>
 		<td class="shade1"><input type="text" name="NEW_MEDIA_FACTS_UNIQUE" value="<?php print GedcomConfig::$MEDIA_FACTS_UNIQUE; ?>" size="80" dir="ltr" tabindex="<?php $i++; print $i?>" /></td>
 	</tr>
 	<tr>
-		<td class="shade2 wrap"><div class="helpicon"><?php print_help_link("MEDIA_QUICK_ADDFACTS_help", "qm", "MEDIA_QUICK_ADDFACTS"); print "</div><div class=\"description\">"; print $gm_lang["MEDIA_QUICK_ADDFACTS"];?></div></td>
+		<td class="shade2 wrap"><div class="helpicon"><?php print_help_link("MEDIA_QUICK_ADDFACTS_help", "qm", "MEDIA_QUICK_ADDFACTS"); print "</div><div class=\"description\">"; print GM_LANG_MEDIA_QUICK_ADDFACTS;?></div></td>
 		<td class="shade1"><input type="text" name="NEW_MEDIA_QUICK_ADDFACTS" value="<?php print GedcomConfig::$MEDIA_QUICK_ADDFACTS; ?>" size="80" dir="ltr" tabindex="<?php $i++; print $i?>" /></td>
 	</tr>
 	<tr>
-		<td class="shade2 wrap"><div class="helpicon"><?php print_help_link("NOTE_FACTS_ADD_help", "qm", "NOTE_FACTS_ADD"); print "</div><div class=\"description\">"; print $gm_lang["NOTE_FACTS_ADD"];?></div></td>
+		<td class="shade2 wrap"><div class="helpicon"><?php print_help_link("NOTE_FACTS_ADD_help", "qm", "NOTE_FACTS_ADD"); print "</div><div class=\"description\">"; print GM_LANG_NOTE_FACTS_ADD;?></div></td>
 		<td class="shade1"><input type="text" name="NEW_NOTE_FACTS_ADD" value="<?php print GedcomConfig::$NOTE_FACTS_ADD; ?>" size="80" dir="ltr" tabindex="<?php $i++; print $i?>" /></td>
 	</tr>
 	<tr>
-		<td class="shade2 wrap"><div class="helpicon"><?php print_help_link("NOTE_FACTS_UNIQUE_help", "qm", "NOTE_FACTS_UNIQUE"); print "</div><div class=\"description\">"; print $gm_lang["NOTE_FACTS_UNIQUE"];?></div></td>
+		<td class="shade2 wrap"><div class="helpicon"><?php print_help_link("NOTE_FACTS_UNIQUE_help", "qm", "NOTE_FACTS_UNIQUE"); print "</div><div class=\"description\">"; print GM_LANG_NOTE_FACTS_UNIQUE;?></div></td>
 		<td class="shade1"><input type="text" name="NEW_NOTE_FACTS_UNIQUE" value="<?php print GedcomConfig::$NOTE_FACTS_UNIQUE; ?>" size="80" dir="ltr" tabindex="<?php $i++; print $i?>" /></td>
 	</tr>
 	<tr>
-		<td class="shade2 wrap"><div class="helpicon"><?php print_help_link("NOTE_QUICK_ADDFACTS_help", "qm", "NOTE_QUICK_ADDFACTS"); print "</div><div class=\"description\">"; print $gm_lang["NOTE_QUICK_ADDFACTS"];?></div></td>
+		<td class="shade2 wrap"><div class="helpicon"><?php print_help_link("NOTE_QUICK_ADDFACTS_help", "qm", "NOTE_QUICK_ADDFACTS"); print "</div><div class=\"description\">"; print GM_LANG_NOTE_QUICK_ADDFACTS;?></div></td>
 		<td class="shade1"><input type="text" name="NEW_NOTE_QUICK_ADDFACTS" value="<?php print GedcomConfig::$NOTE_QUICK_ADDFACTS; ?>" size="80" dir="ltr" tabindex="<?php $i++; print $i?>" /></td>
 	</tr>
 	<tr>
-		<td class="shade2 wrap"><div class="helpicon"><?php print_help_link("EDIT_AUTOCLOSE_help", "qm", "EDIT_AUTOCLOSE"); print "</div><div class=\"description\">"; print $gm_lang["EDIT_AUTOCLOSE"];?></div></td>
+		<td class="shade2 wrap"><div class="helpicon"><?php print_help_link("EDIT_AUTOCLOSE_help", "qm", "EDIT_AUTOCLOSE"); print "</div><div class=\"description\">"; print GM_LANG_EDIT_AUTOCLOSE;?></div></td>
 		<td class="shade1"><select name="NEW_EDIT_AUTOCLOSE" tabindex="<?php $i++; print $i?>">
-				<option value="yes" <?php if (GedcomConfig::$EDIT_AUTOCLOSE) print "selected=\"selected\""; ?>><?php print $gm_lang["yes"];?></option>
-				<option value="no" <?php if (!GedcomConfig::$EDIT_AUTOCLOSE) print "selected=\"selected\""; ?>><?php print $gm_lang["no"];?></option>
+				<option value="yes" <?php if (GedcomConfig::$EDIT_AUTOCLOSE) print "selected=\"selected\""; ?>><?php print GM_LANG_yes;?></option>
+				<option value="no" <?php if (!GedcomConfig::$EDIT_AUTOCLOSE) print "selected=\"selected\""; ?>><?php print GM_LANG_no;?></option>
 			</select>
 		</td>
 	</tr>
 	<tr>
-		<td class="shade2 wrap"><div class="helpicon"><?php print_help_link("SPLIT_PLACES_help", "qm", "SPLIT_PLACES"); print "</div><div class=\"description\">"; print $gm_lang["SPLIT_PLACES"];?></div></td>
+		<td class="shade2 wrap"><div class="helpicon"><?php print_help_link("SPLIT_PLACES_help", "qm", "SPLIT_PLACES"); print "</div><div class=\"description\">"; print GM_LANG_SPLIT_PLACES;?></div></td>
 		<td class="shade1"><select name="NEW_SPLIT_PLACES" tabindex="<?php $i++; print $i?>">
-				<option value="yes" <?php if (GedcomConfig::$SPLIT_PLACES) print "selected=\"selected\""; ?>><?php print $gm_lang["yes"];?></option>
-				<option value="no" <?php if (!GedcomConfig::$SPLIT_PLACES) print "selected=\"selected\""; ?>><?php print $gm_lang["no"];?></option>
+				<option value="yes" <?php if (GedcomConfig::$SPLIT_PLACES) print "selected=\"selected\""; ?>><?php print GM_LANG_yes;?></option>
+				<option value="no" <?php if (!GedcomConfig::$SPLIT_PLACES) print "selected=\"selected\""; ?>><?php print GM_LANG_no;?></option>
 			</select>
 		</td>
 	</tr>
 	<tr>
 		<td class="shade2 wrap"><div class="helpicon"><?php print_help_link("USE_QUICK_UPDATE_help", "qm", "USE_QUICK_UPDATE", true); print "</div><div class=\"description\">"; print print_text("USE_QUICK_UPDATE",0,0,false);?></div></td>
 		<td class="shade1"><select name="NEW_USE_QUICK_UPDATE" tabindex="<?php $i++; print $i?>">
-				<option value="yes" <?php if (GedcomConfig::$USE_QUICK_UPDATE) print "selected=\"selected\""; ?>><?php print $gm_lang["yes"];?></option>
-				<option value="no" <?php if (!GedcomConfig::$USE_QUICK_UPDATE) print "selected=\"selected\""; ?>><?php print $gm_lang["no"];?></option>
+				<option value="yes" <?php if (GedcomConfig::$USE_QUICK_UPDATE) print "selected=\"selected\""; ?>><?php print GM_LANG_yes;?></option>
+				<option value="no" <?php if (!GedcomConfig::$USE_QUICK_UPDATE) print "selected=\"selected\""; ?>><?php print GM_LANG_no;?></option>
 			</select>
 		</td>
 	</tr>
 	<tr>
 		<td class="shade2 wrap"><div class="helpicon"><?php print_help_link("SHOW_QUICK_RESN_help", "qm", "SHOW_QUICK_RESN", true); print "</div><div class=\"description\">"; print print_text("SHOW_QUICK_RESN",0,0,false);?></div></td>
 		<td class="shade1"><select name="NEW_SHOW_QUICK_RESN" tabindex="<?php $i++; print $i?>">
-				<option value="yes" <?php if (GedcomConfig::$SHOW_QUICK_RESN) print "selected=\"selected\""; ?>><?php print $gm_lang["yes"];?></option>
-				<option value="no" <?php if (!GedcomConfig::$SHOW_QUICK_RESN) print "selected=\"selected\""; ?>><?php print $gm_lang["no"];?></option>
+				<option value="yes" <?php if (GedcomConfig::$SHOW_QUICK_RESN) print "selected=\"selected\""; ?>><?php print GM_LANG_yes;?></option>
+				<option value="no" <?php if (!GedcomConfig::$SHOW_QUICK_RESN) print "selected=\"selected\""; ?>><?php print GM_LANG_no;?></option>
 			</select>
 		</td>
 	</tr>
 	<tr>
-		<td class="shade2 wrap"><div class="helpicon"><?php print_help_link("QUICK_ADD_FACTS_help", "qm", "QUICK_ADD_FACTS"); print "</div><div class=\"description\">"; print $gm_lang["QUICK_ADD_FACTS"];?></div></td>
+		<td class="shade2 wrap"><div class="helpicon"><?php print_help_link("QUICK_ADD_FACTS_help", "qm", "QUICK_ADD_FACTS"); print "</div><div class=\"description\">"; print GM_LANG_QUICK_ADD_FACTS;?></div></td>
 		<td class="shade1"><input type="text" name="NEW_QUICK_ADD_FACTS" value="<?php print GedcomConfig::$QUICK_ADD_FACTS?>" size="80" dir="ltr" tabindex="<?php $i++; print $i?>" /></td>
 	</tr>
 	<tr>
-		<td class="shade2 wrap"><div class="helpicon"><?php print_help_link("QUICK_REQUIRED_FACTS_help", "qm", "QUICK_REQUIRED_FACTS"); print "</div><div class=\"description\">"; print $gm_lang["QUICK_REQUIRED_FACTS"];?></div></td>
+		<td class="shade2 wrap"><div class="helpicon"><?php print_help_link("QUICK_REQUIRED_FACTS_help", "qm", "QUICK_REQUIRED_FACTS"); print "</div><div class=\"description\">"; print GM_LANG_QUICK_REQUIRED_FACTS;?></div></td>
 		<td class="shade1"><input type="text" name="NEW_QUICK_REQUIRED_FACTS" value="<?php print GedcomConfig::$QUICK_REQUIRED_FACTS?>" size="80" dir="ltr" tabindex="<?php $i++; print $i?>" /></td>
 	</tr>
 	<tr>
-		<td class="shade2 wrap"><div class="helpicon"><?php print_help_link("QUICK_ADD_FAMFACTS_help", "qm", "QUICK_ADD_FAMFACTS"); print "</div><div class=\"description\">"; print $gm_lang["QUICK_ADD_FAMFACTS"];?></div></td>
+		<td class="shade2 wrap"><div class="helpicon"><?php print_help_link("QUICK_ADD_FAMFACTS_help", "qm", "QUICK_ADD_FAMFACTS"); print "</div><div class=\"description\">"; print GM_LANG_QUICK_ADD_FAMFACTS;?></div></td>
 		<td class="shade1"><input type="text" name="NEW_QUICK_ADD_FAMFACTS" value="<?php print GedcomConfig::$QUICK_ADD_FAMFACTS?>" size="80" dir="ltr" tabindex="<?php $i++; print $i?>" /></td>
 	</tr>
 	<tr>
-		<td class="shade2 wrap"><div class="helpicon"><?php print_help_link("QUICK_REQUIRED_FAMFACTS_help", "qm", "QUICK_REQUIRED_FAMFACTS"); print "</div><div class=\"description\">"; print $gm_lang["QUICK_REQUIRED_FAMFACTS"];?></div></td>
+		<td class="shade2 wrap"><div class="helpicon"><?php print_help_link("QUICK_REQUIRED_FAMFACTS_help", "qm", "QUICK_REQUIRED_FAMFACTS"); print "</div><div class=\"description\">"; print GM_LANG_QUICK_REQUIRED_FAMFACTS;?></div></td>
 		<td class="shade1"><input type="text" name="NEW_QUICK_REQUIRED_FAMFACTS" value="<?php print GedcomConfig::$QUICK_REQUIRED_FAMFACTS?>" size="40" dir="ltr" tabindex="<?php $i++; print $i?>" /></td>
 	</tr>
 </table>
@@ -1419,29 +1419,29 @@ print "&nbsp;<a href=\"javascript: ".$gm_lang["editopt_conf"]."\" onclick=\"expa
 ?>
 <table class="facts_table"><tr><td class="topbottombar <?php print $TEXT_DIRECTION;?>">
 <?php
-print "<a href=\"javascript: ".$gm_lang["useropt_conf"]."\" onclick=\"expand_layer('user-options');return false;\"><img id=\"user-options_img\" src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["plus"]["other"]."\" border=\"0\" width=\"11\" height=\"11\" alt=\"\" /></a>";
-print "&nbsp;<a href=\"javascript: ".$gm_lang["useropt_conf"]."\" onclick=\"expand_layer('user-options');return false;\">".$gm_lang["useropt_conf"]."</a>";
+print "<a href=\"javascript: ".GM_LANG_useropt_conf."\" onclick=\"expand_layer('user-options');return false;\"><img id=\"user-options_img\" src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["plus"]["other"]."\" border=\"0\" width=\"11\" height=\"11\" alt=\"\" /></a>";
+print "&nbsp;<a href=\"javascript: ".GM_LANG_useropt_conf."\" onclick=\"expand_layer('user-options');return false;\">".GM_LANG_useropt_conf."</a>";
 ?></td></tr></table>
 <div id="user-options" style="display: none">
 <table class="facts_table">
 	<tr>
-		<td class="shade2 wrap width20"><div class="helpicon"><?php print_help_link("ENABLE_MULTI_LANGUAGE_help", "qm", "ENABLE_MULTI_LANGUAGE"); print "</div><div class=\"description\">"; print $gm_lang["ENABLE_MULTI_LANGUAGE"];?></div></td>
+		<td class="shade2 wrap width20"><div class="helpicon"><?php print_help_link("ENABLE_MULTI_LANGUAGE_help", "qm", "ENABLE_MULTI_LANGUAGE"); print "</div><div class=\"description\">"; print GM_LANG_ENABLE_MULTI_LANGUAGE;?></div></td>
 		<td class="shade1"><select name="NEW_ENABLE_MULTI_LANGUAGE" tabindex="<?php $i++; print $i?>" >
-				<option value="yes" <?php if (GedcomConfig::$ENABLE_MULTI_LANGUAGE) print "selected=\"selected\""; ?>><?php print $gm_lang["yes"];?></option>
-				<option value="no" <?php if (!GedcomConfig::$ENABLE_MULTI_LANGUAGE) print "selected=\"selected\""; ?>><?php print $gm_lang["no"];?></option>
+				<option value="yes" <?php if (GedcomConfig::$ENABLE_MULTI_LANGUAGE) print "selected=\"selected\""; ?>><?php print GM_LANG_yes;?></option>
+				<option value="no" <?php if (!GedcomConfig::$ENABLE_MULTI_LANGUAGE) print "selected=\"selected\""; ?>><?php print GM_LANG_no;?></option>
 			</select>
 		</td>
 	</tr>
 	<tr>
-		<td class="shade2 wrap"><div class="helpicon"><?php print_help_link("show_context_help_help", "qm", "show_contexthelp"); print "</div><div class=\"description\">"; print $gm_lang["show_contexthelp"];?></div></td>
+		<td class="shade2 wrap"><div class="helpicon"><?php print_help_link("show_context_help_help", "qm", "show_contexthelp"); print "</div><div class=\"description\">"; print GM_LANG_show_contexthelp;?></div></td>
 		<td class="shade1"><select name="NEW_SHOW_CONTEXT_HELP" tabindex="<?php $i++; print $i?>">
-				<option value="yes" <?php if (GedcomConfig::$SHOW_CONTEXT_HELP) print "selected=\"selected\""; ?>><?php print $gm_lang["yes"];?></option>
-				<option value="no" <?php if (!GedcomConfig::$SHOW_CONTEXT_HELP) print "selected=\"selected\""; ?>><?php print $gm_lang["no"];?></option>
+				<option value="yes" <?php if (GedcomConfig::$SHOW_CONTEXT_HELP) print "selected=\"selected\""; ?>><?php print GM_LANG_yes;?></option>
+				<option value="no" <?php if (!GedcomConfig::$SHOW_CONTEXT_HELP) print "selected=\"selected\""; ?>><?php print GM_LANG_no;?></option>
 			</select>
 		</td>
 	</tr>
 	<tr>
-		<td class="shade2 wrap"><div class="helpicon"><?php print_help_link("THEME_DIR_help", "qm", "THEME_DIR"); print "</div><div class=\"description\">"; print $gm_lang["THEME_DIR"];?></div></td>
+		<td class="shade2 wrap"><div class="helpicon"><?php print_help_link("THEME_DIR_help", "qm", "THEME_DIR"); print "</div><div class=\"description\">"; print GM_LANG_THEME_DIR;?></div></td>
 		<td class="shade1">
 			<select name="themeselect" dir="ltr" tabindex="<?php $i++; print $i?>"  onchange="document.configform.NTHEME_DIR.value=document.configform.themeselect.options[document.configform.themeselect.selectedIndex].value;">
 				<?php
@@ -1452,13 +1452,13 @@ print "&nbsp;<a href=\"javascript: ".$gm_lang["useropt_conf"]."\" onclick=\"expa
 						print ">".$themedir["name"]."</option>\n";
 					}
 				?>
-				<option value="themes/" <?php if($themeselect=="themes//") print "selected=\"selected\""; ?>><?php print $gm_lang["other_theme"]; ?></option>
+				<option value="themes/" <?php if($themeselect=="themes//") print "selected=\"selected\""; ?>><?php print GM_LANG_other_theme; ?></option>
 			</select>
 			<input type="text" name="NTHEME_DIR" value="<?php print $NTHEME_DIR?>" size="40" dir="ltr" tabindex="<?php $i++; print $i?>" />
 	<?php
 	if (!file_exists($NTHEME_DIR)) {
 		print "<span class=\"error\">$NTHEME_DIR ";
-		print $gm_lang["does_not_exist"];
+		print GM_LANG_does_not_exist;
 		print "</span>\n";
 		$NTHEME_DIR = GedcomConfig::$THEME_DIR;
 	}
@@ -1466,10 +1466,10 @@ print "&nbsp;<a href=\"javascript: ".$gm_lang["useropt_conf"]."\" onclick=\"expa
 		</td>
 	</tr>
 	<tr>
-		<td class="shade2 wrap"><div class="helpicon"><?php print_help_link("ALLOW_THEME_DROPDOWN_help", "qm", "ALLOW_THEME_DROPDOWN"); print "</div><div class=\"description\">"; print $gm_lang["ALLOW_THEME_DROPDOWN"];?></div></td>
+		<td class="shade2 wrap"><div class="helpicon"><?php print_help_link("ALLOW_THEME_DROPDOWN_help", "qm", "ALLOW_THEME_DROPDOWN"); print "</div><div class=\"description\">"; print GM_LANG_ALLOW_THEME_DROPDOWN;?></div></td>
 		<td class="shade1"><select name="NEW_ALLOW_THEME_DROPDOWN" tabindex="<?php $i++; print $i?>">
-				<option value="yes" <?php if (GedcomConfig::$ALLOW_THEME_DROPDOWN) print "selected=\"selected\""; ?>><?php print $gm_lang["yes"];?></option>
-				<option value="no" <?php if (!GedcomConfig::$ALLOW_THEME_DROPDOWN) print "selected=\"selected\""; ?>><?php print $gm_lang["no"];?></option>
+				<option value="yes" <?php if (GedcomConfig::$ALLOW_THEME_DROPDOWN) print "selected=\"selected\""; ?>><?php print GM_LANG_yes;?></option>
+				<option value="no" <?php if (!GedcomConfig::$ALLOW_THEME_DROPDOWN) print "selected=\"selected\""; ?>><?php print GM_LANG_no;?></option>
 			</select>
 		</td>
 	</tr>
@@ -1480,13 +1480,13 @@ print "&nbsp;<a href=\"javascript: ".$gm_lang["useropt_conf"]."\" onclick=\"expa
 
 <table class="facts_table"><tr><td class="topbottombar <?php print $TEXT_DIRECTION;?>">
 <?php
-print "<a href=\"javascript: ".$gm_lang["contact_conf"]."\" onclick=\"expand_layer('contact-options');return false;\"><img id=\"contact-options_img\" src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["plus"]["other"]."\" border=\"0\" width=\"11\" height=\"11\" alt=\"\" /></a>";
-print "&nbsp;<a href=\"javascript: ".$gm_lang["contact_conf"]."\" onclick=\"expand_layer('contact-options');return false;\">".$gm_lang["contact_conf"]."</a>";
+print "<a href=\"javascript: ".GM_LANG_contact_conf."\" onclick=\"expand_layer('contact-options');return false;\"><img id=\"contact-options_img\" src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["plus"]["other"]."\" border=\"0\" width=\"11\" height=\"11\" alt=\"\" /></a>";
+print "&nbsp;<a href=\"javascript: ".GM_LANG_contact_conf."\" onclick=\"expand_layer('contact-options');return false;\">".GM_LANG_contact_conf."</a>";
 ?></td></tr></table>
 <div id="contact-options" style="display: none">
 <table class="facts_table">
 	<tr>
-		<td class="shade2 wrap width20"><div class="helpicon"><?php print_help_link("CONTACT_EMAIL_help", "qm", "CONTACT_EMAIL"); print "</div><div class=\"description\">"; print $gm_lang["CONTACT_EMAIL"];?></div></td>
+		<td class="shade2 wrap width20"><div class="helpicon"><?php print_help_link("CONTACT_EMAIL_help", "qm", "CONTACT_EMAIL"); print "</div><div class=\"description\">"; print GM_LANG_CONTACT_EMAIL;?></div></td>
 		<td class="shade1"><select name="NEW_CONTACT_EMAIL" tabindex="<?php $i++; print $i?>">
 		<?php
 			if (GedcomConfig::$CONTACT_EMAIL=="you@yourdomain.com") GedcomConfig::$CONTACT_EMAIL = $gm_user->username;
@@ -1503,21 +1503,21 @@ print "&nbsp;<a href=\"javascript: ".$gm_lang["contact_conf"]."\" onclick=\"expa
 		</td>
 	</tr>
 	<tr>
-		<td class="shade2 wrap"><div class="helpicon"><?php print_help_link("CONTACT_METHOD_help", "qm", "CONTACT_METHOD"); print "</div><div class=\"description\">"; print $gm_lang["CONTACT_METHOD"];?></div></td>
+		<td class="shade2 wrap"><div class="helpicon"><?php print_help_link("CONTACT_METHOD_help", "qm", "CONTACT_METHOD"); print "</div><div class=\"description\">"; print GM_LANG_CONTACT_METHOD;?></div></td>
 		<td class="shade1"><select name="NEW_CONTACT_METHOD" tabindex="<?php $i++; print $i?>">
 		<?php if ($GM_STORE_MESSAGES) { ?>
-				<option value="messaging" <?php if (GedcomConfig::$CONTACT_METHOD=='messaging') print "selected=\"selected\""; ?>><?php print $gm_lang["messaging"];?></option>
-				<option value="messaging2" <?php if (GedcomConfig::$CONTACT_METHOD=='messaging2') print "selected=\"selected\""; ?>><?php print $gm_lang["messaging2"];?></option>
+				<option value="messaging" <?php if (GedcomConfig::$CONTACT_METHOD=='messaging') print "selected=\"selected\""; ?>><?php print GM_LANG_messaging;?></option>
+				<option value="messaging2" <?php if (GedcomConfig::$CONTACT_METHOD=='messaging2') print "selected=\"selected\""; ?>><?php print GM_LANG_messaging2;?></option>
 		<?php } else { ?>
-				<option value="messaging3" <?php if (GedcomConfig::$CONTACT_METHOD=='messaging3') print "selected=\"selected\""; ?>><?php print $gm_lang["messaging3"];?></option>
+				<option value="messaging3" <?php if (GedcomConfig::$CONTACT_METHOD=='messaging3') print "selected=\"selected\""; ?>><?php print GM_LANG_messaging3;?></option>
 		<?php } ?>
-				<option value="mailto" <?php if (GedcomConfig::$CONTACT_METHOD=='mailto') print "selected=\"selected\""; ?>><?php print $gm_lang["mailto"];?></option>
-				<option value="none" <?php if (GedcomConfig::$CONTACT_METHOD=='none') print "selected=\"selected\""; ?>><?php print $gm_lang["no_messaging"];?></option>
+				<option value="mailto" <?php if (GedcomConfig::$CONTACT_METHOD=='mailto') print "selected=\"selected\""; ?>><?php print GM_LANG_mailto;?></option>
+				<option value="none" <?php if (GedcomConfig::$CONTACT_METHOD=='none') print "selected=\"selected\""; ?>><?php print GM_LANG_no_messaging;?></option>
 			</select>
 		</td>
 	</tr>
 	<tr>
-		<td class="shade2 wrap"><div class="helpicon"><?php print_help_link("WEBMASTER_EMAIL_help", "qm", "WEBMASTER_EMAIL"); print "</div><div class=\"description\">"; print $gm_lang["WEBMASTER_EMAIL"];?></div></td>
+		<td class="shade2 wrap"><div class="helpicon"><?php print_help_link("WEBMASTER_EMAIL_help", "qm", "WEBMASTER_EMAIL"); print "</div><div class=\"description\">"; print GM_LANG_WEBMASTER_EMAIL;?></div></td>
 		<td class="shade1"><select name="NEW_WEBMASTER_EMAIL" tabindex="<?php $i++; print $i?>">
 		<?php
 			$users = UserController::GetUsers("lastname", "asc", "firstname");
@@ -1534,24 +1534,24 @@ print "&nbsp;<a href=\"javascript: ".$gm_lang["contact_conf"]."\" onclick=\"expa
 		</td>
 	</tr>
 	<tr>
-		<td class="shade2 wrap"><div class="helpicon"><?php print_help_link("SUPPORT_METHOD_help", "qm", "SUPPORT_METHOD"); print "</div><div class=\"description\">"; print $gm_lang["SUPPORT_METHOD"];?></div></td>
+		<td class="shade2 wrap"><div class="helpicon"><?php print_help_link("SUPPORT_METHOD_help", "qm", "SUPPORT_METHOD"); print "</div><div class=\"description\">"; print GM_LANG_SUPPORT_METHOD;?></div></td>
 		<td class="shade1"><select name="NEW_SUPPORT_METHOD" tabindex="<?php $i++; print $i?>">
 		<?php if ($GM_STORE_MESSAGES) { ?>
-				<option value="messaging" <?php if (GedcomConfig::$SUPPORT_METHOD=='messaging') print "selected=\"selected\""; ?>><?php print $gm_lang["messaging"];?></option>
-				<option value="messaging2" <?php if (GedcomConfig::$SUPPORT_METHOD=='messaging2') print "selected=\"selected\""; ?>><?php print $gm_lang["messaging2"];?></option>
+				<option value="messaging" <?php if (GedcomConfig::$SUPPORT_METHOD=='messaging') print "selected=\"selected\""; ?>><?php print GM_LANG_messaging;?></option>
+				<option value="messaging2" <?php if (GedcomConfig::$SUPPORT_METHOD=='messaging2') print "selected=\"selected\""; ?>><?php print GM_LANG_messaging2;?></option>
 		<?php } else { ?>
-				<option value="messaging3" <?php if (GedcomConfig::$SUPPORT_METHOD=='messaging3') print "selected=\"selected\""; ?>><?php print $gm_lang["messaging3"];?></option>
+				<option value="messaging3" <?php if (GedcomConfig::$SUPPORT_METHOD=='messaging3') print "selected=\"selected\""; ?>><?php print GM_LANG_messaging3;?></option>
 		<?php } ?>
-				<option value="mailto" <?php if (GedcomConfig::$SUPPORT_METHOD=='mailto') print "selected=\"selected\""; ?>><?php print $gm_lang["mailto"];?></option>
-				<option value="none" <?php if (GedcomConfig::$SUPPORT_METHOD=='none') print "selected=\"selected\""; ?>><?php print $gm_lang["no_messaging"];?></option>
+				<option value="mailto" <?php if (GedcomConfig::$SUPPORT_METHOD=='mailto') print "selected=\"selected\""; ?>><?php print GM_LANG_mailto;?></option>
+				<option value="none" <?php if (GedcomConfig::$SUPPORT_METHOD=='none') print "selected=\"selected\""; ?>><?php print GM_LANG_no_messaging;?></option>
 			</select>
 		</td>
 	</tr>
 	<tr>
-		<td class="shade2 wrap"><div class="helpicon"><?php print_help_link("BCC_WEBMASTER_help", "qm", "BCC_WEBMASTER"); print "</div><div class=\"description\">"; print $gm_lang["BCC_WEBMASTER"];?></div></td>
+		<td class="shade2 wrap"><div class="helpicon"><?php print_help_link("BCC_WEBMASTER_help", "qm", "BCC_WEBMASTER"); print "</div><div class=\"description\">"; print GM_LANG_BCC_WEBMASTER;?></div></td>
 		<td class="shade1"><select name="NEW_BCC_WEBMASTER" tabindex="<?php $i++; print $i?>">
-				<option value="yes" <?php if (GedcomConfig::$BCC_WEBMASTER) print "selected=\"selected\""; ?>><?php print $gm_lang["yes"];?></option>
-				<option value="no" <?php if (!GedcomConfig::$BCC_WEBMASTER) print "selected=\"selected\""; ?>><?php print $gm_lang["no"];?></option>
+				<option value="yes" <?php if (GedcomConfig::$BCC_WEBMASTER) print "selected=\"selected\""; ?>><?php print GM_LANG_yes;?></option>
+				<option value="no" <?php if (!GedcomConfig::$BCC_WEBMASTER) print "selected=\"selected\""; ?>><?php print GM_LANG_no;?></option>
 			</select>
 		</td>
 	</tr>
@@ -1559,83 +1559,83 @@ print "&nbsp;<a href=\"javascript: ".$gm_lang["contact_conf"]."\" onclick=\"expa
 </div>
 <table class="facts_table"><tr><td class="topbottombar <?php print $TEXT_DIRECTION;?>">
 <?php
-print "<a href=\"javascript: ".$gm_lang["meta_conf"]."\" onclick=\"expand_layer('config-meta');return false;\"><img id=\"config-meta_img\" src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["plus"]["other"]."\" border=\"0\" width=\"11\" height=\"11\" alt=\"\" /></a>";
-print "&nbsp;<a href=\"javascript: ".$gm_lang["meta_conf"]."\" onclick=\"expand_layer('config-meta');return false;\">".$gm_lang["meta_conf"]."</a>";
+print "<a href=\"javascript: ".GM_LANG_meta_conf."\" onclick=\"expand_layer('config-meta');return false;\"><img id=\"config-meta_img\" src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["plus"]["other"]."\" border=\"0\" width=\"11\" height=\"11\" alt=\"\" /></a>";
+print "&nbsp;<a href=\"javascript: ".GM_LANG_meta_conf."\" onclick=\"expand_layer('config-meta');return false;\">".GM_LANG_meta_conf."</a>";
 ?></td></tr></table>
 <div id="config-meta" style="display: none">
 <table class="facts_table">
 	<tr>
-		<td class="shade2 wrap width20"><div class="helpicon"><?php print_help_link("HOME_SITE_URL_help", "qm", "HOME_SITE_URL"); print "</div><div class=\"description\">"; print $gm_lang["HOME_SITE_URL"];?></div></td>
+		<td class="shade2 wrap width20"><div class="helpicon"><?php print_help_link("HOME_SITE_URL_help", "qm", "HOME_SITE_URL"); print "</div><div class=\"description\">"; print GM_LANG_HOME_SITE_URL;?></div></td>
 		<td class="shade1"><input type="text" name="NEW_HOME_SITE_URL" value="<?php print GedcomConfig::$HOME_SITE_URL?>" size="50" dir="ltr" tabindex="<?php $i++; print $i?>" /></td>
 	</tr>
 	<tr>
-		<td class="shade2 wrap"><div class="helpicon"><?php print_help_link("HOME_SITE_TEXT_help", "qm", "HOME_SITE_TEXT"); print "</div><div class=\"description\">"; print $gm_lang["HOME_SITE_TEXT"];?></div></td>
+		<td class="shade2 wrap"><div class="helpicon"><?php print_help_link("HOME_SITE_TEXT_help", "qm", "HOME_SITE_TEXT"); print "</div><div class=\"description\">"; print GM_LANG_HOME_SITE_TEXT;?></div></td>
 		<td class="shade1"><input type="text" dir="ltr" name="NEW_HOME_SITE_TEXT" value="<?php print htmlspecialchars(GedcomConfig::$HOME_SITE_TEXT);?>" size="50" tabindex="<?php $i++; print $i?>" /></td>
 	</tr>
 	<tr>
-		<td class="shade2 wrap"><div class="helpicon"><?php print_help_link("META_AUTHOR_help", "qm", "META_AUTHOR"); print "</div><div class=\"description\">"; print $gm_lang["META_AUTHOR"];?></div></td>
+		<td class="shade2 wrap"><div class="helpicon"><?php print_help_link("META_AUTHOR_help", "qm", "META_AUTHOR"); print "</div><div class=\"description\">"; print GM_LANG_META_AUTHOR;?></div></td>
 		<td class="shade1"><input type="text" dir="ltr" name="NEW_META_AUTHOR" value="<?php print GedcomConfig::$META_AUTHOR?>" tabindex="<?php $i++; print $i?>" /><br />
 		<?php print print_text("META_AUTHOR_descr",0,0,false); ?></td>
 	</tr>
 	<tr>
-		<td class="shade2 wrap"><div class="helpicon"><?php print_help_link("META_PUBLISHER_help", "qm", "META_PUBLISHER"); print "</div><div class=\"description\">"; print $gm_lang["META_PUBLISHER"];?></div></td>
+		<td class="shade2 wrap"><div class="helpicon"><?php print_help_link("META_PUBLISHER_help", "qm", "META_PUBLISHER"); print "</div><div class=\"description\">"; print GM_LANG_META_PUBLISHER;?></div></td>
 		<td class="shade1"><input type="text" dir="ltr" name="NEW_META_PUBLISHER" value="<?php print GedcomConfig::$META_PUBLISHER?>" tabindex="<?php $i++; print $i?>" /><br />
 		<?php print print_text("META_PUBLISHER_descr",0,0,false); ?></td>
 	</tr>
 	<tr>
-		<td class="shade2 wrap"><div class="helpicon"><?php print_help_link("META_COPYRIGHT_help", "qm", "META_COPYRIGHT"); print "</div><div class=\"description\">"; print $gm_lang["META_COPYRIGHT"];?></div></td>
+		<td class="shade2 wrap"><div class="helpicon"><?php print_help_link("META_COPYRIGHT_help", "qm", "META_COPYRIGHT"); print "</div><div class=\"description\">"; print GM_LANG_META_COPYRIGHT;?></div></td>
 		<td class="shade1"><input type="text" dir="ltr" name="NEW_META_COPYRIGHT" value="<?php print GedcomConfig::$META_COPYRIGHT?>" tabindex="<?php $i++; print $i?>" /><br />
 		<?php print print_text("META_COPYRIGHT_descr",0,0,false); ?></td>
 	</tr>
 	<tr>
-		<td class="shade2 wrap"><div class="helpicon"><?php print_help_link("META_DESCRIPTION_help", "qm", "META_DESCRIPTION"); print "</div><div class=\"description\">"; print $gm_lang["META_DESCRIPTION"];?></div></td>
+		<td class="shade2 wrap"><div class="helpicon"><?php print_help_link("META_DESCRIPTION_help", "qm", "META_DESCRIPTION"); print "</div><div class=\"description\">"; print GM_LANG_META_DESCRIPTION;?></div></td>
 		<td class="shade1"><input type="text" dir="ltr" name="NEW_META_DESCRIPTION" value="<?php print GedcomConfig::$META_DESCRIPTION?>" tabindex="<?php $i++; print $i?>" /><br />
-		<?php print $gm_lang["META_DESCRIPTION_descr"]; ?></td>
+		<?php print GM_LANG_META_DESCRIPTION_descr; ?></td>
 	</tr>
 	<tr>
-		<td class="shade2 wrap"><div class="helpicon"><?php print_help_link("META_PAGE_TOPIC_help", "qm", "META_PAGE_TOPIC"); print "</div><div class=\"description\">"; print $gm_lang["META_PAGE_TOPIC"];?></div></td>
+		<td class="shade2 wrap"><div class="helpicon"><?php print_help_link("META_PAGE_TOPIC_help", "qm", "META_PAGE_TOPIC"); print "</div><div class=\"description\">"; print GM_LANG_META_PAGE_TOPIC;?></div></td>
 		<td class="shade1"><input type="text" dir="ltr" name="NEW_META_PAGE_TOPIC" value="<?php print GedcomConfig::$META_PAGE_TOPIC?>" tabindex="<?php $i++; print $i?>" /><br />
-		<?php print $gm_lang["META_PAGE_TOPIC_descr"]; ?></td>
+		<?php print GM_LANG_META_PAGE_TOPIC_descr; ?></td>
 	</tr>
 	<tr>
-		<td class="shade2 wrap"><div class="helpicon"><?php print_help_link("META_AUDIENCE_help", "qm", "META_AUDIENCE"); print "</div><div class=\"description\">"; print $gm_lang["META_AUDIENCE"];?></div></td>
+		<td class="shade2 wrap"><div class="helpicon"><?php print_help_link("META_AUDIENCE_help", "qm", "META_AUDIENCE"); print "</div><div class=\"description\">"; print GM_LANG_META_AUDIENCE;?></div></td>
 		<td class="shade1"><input type="text" dir="ltr" name="NEW_META_AUDIENCE" value="<?php print GedcomConfig::$META_AUDIENCE?>" tabindex="<?php $i++; print $i?>" /><br />
 		</td>
 	</tr>
 	<tr>
-		<td class="shade2 wrap"><div class="helpicon"><?php print_help_link("META_PAGE_TYPE_help", "qm", "META_PAGE_TYPE"); print "</div><div class=\"description\">"; print $gm_lang["META_PAGE_TYPE"];?></div></td>
+		<td class="shade2 wrap"><div class="helpicon"><?php print_help_link("META_PAGE_TYPE_help", "qm", "META_PAGE_TYPE"); print "</div><div class=\"description\">"; print GM_LANG_META_PAGE_TYPE;?></div></td>
 		<td class="shade1"><input type="text" dir="ltr" name="NEW_META_PAGE_TYPE" value="<?php print GedcomConfig::$META_PAGE_TYPE?>" tabindex="<?php $i++; print $i?>" /><br />
 		</td>
 	</tr>
 	<tr>
-		<td class="shade2 wrap"><div class="helpicon"><?php print_help_link("META_ROBOTS_help", "qm", "META_ROBOTS"); print "</div><div class=\"description\">"; print $gm_lang["META_ROBOTS"];?></div></td>
+		<td class="shade2 wrap"><div class="helpicon"><?php print_help_link("META_ROBOTS_help", "qm", "META_ROBOTS"); print "</div><div class=\"description\">"; print GM_LANG_META_ROBOTS;?></div></td>
 		<td class="shade1"><input type="text" dir="ltr" name="NEW_META_ROBOTS" value="<?php print GedcomConfig::$META_ROBOTS?>" tabindex="<?php $i++; print $i?>" /><br />
 		</td>
 	</tr>
 	<tr>
-		<td class="shade2 wrap"><div class="helpicon"><?php print_help_link("META_REVISIT_help", "qm", "META_REVISIT"); print "</div><div class=\"description\">"; print $gm_lang["META_REVISIT"];?></div></td>
+		<td class="shade2 wrap"><div class="helpicon"><?php print_help_link("META_REVISIT_help", "qm", "META_REVISIT"); print "</div><div class=\"description\">"; print GM_LANG_META_REVISIT;?></div></td>
 		<td class="shade1"><input type="text" dir="ltr" name="NEW_META_REVISIT" value="<?php print GedcomConfig::$META_REVISIT?>" tabindex="<?php $i++; print $i?>" /><br />
 		</td>
 	</tr>
 	<tr>
-		<td class="shade2 wrap"><div class="helpicon"><?php print_help_link("META_KEYWORDS_help", "qm", "META_KEYWORDS"); print "</div><div class=\"description\">"; print $gm_lang["META_KEYWORDS"];?></div></td>
+		<td class="shade2 wrap"><div class="helpicon"><?php print_help_link("META_KEYWORDS_help", "qm", "META_KEYWORDS"); print "</div><div class=\"description\">"; print GM_LANG_META_KEYWORDS;?></div></td>
 		<td class="shade1"><input type="text" dir="ltr" name="NEW_META_KEYWORDS" value="<?php print GedcomConfig::$META_KEYWORDS?>" tabindex="<?php $i++; print $i?>" size="75" /><br />
 		</td>
 	</tr>
 	<tr>
-		<td class="shade2 wrap"><div class="helpicon"><?php print_help_link("META_SURNAME_KEYWORDS_help", "qm", "META_SURNAME_KEYWORDS"); print "</div><div class=\"description\">"; print $gm_lang["META_SURNAME_KEYWORDS"];?></div></td>
+		<td class="shade2 wrap"><div class="helpicon"><?php print_help_link("META_SURNAME_KEYWORDS_help", "qm", "META_SURNAME_KEYWORDS"); print "</div><div class=\"description\">"; print GM_LANG_META_SURNAME_KEYWORDS;?></div></td>
 		<td class="shade1"><select name="NEW_META_SURNAME_KEYWORDS" tabindex="<?php $i++; print $i?>">
-				<option value="yes" <?php if (GedcomConfig::$META_SURNAME_KEYWORDS) print "selected=\"selected\""; ?>><?php print $gm_lang["yes"];?></option>
-				<option value="no" <?php if (!GedcomConfig::$META_SURNAME_KEYWORDS) print "selected=\"selected\""; ?>><?php print $gm_lang["no"];?></option>
+				<option value="yes" <?php if (GedcomConfig::$META_SURNAME_KEYWORDS) print "selected=\"selected\""; ?>><?php print GM_LANG_yes;?></option>
+				<option value="no" <?php if (!GedcomConfig::$META_SURNAME_KEYWORDS) print "selected=\"selected\""; ?>><?php print GM_LANG_no;?></option>
 			</select>
 		</td>
 	</tr>
 	<tr>
-		<td class="shade2 wrap"><div class="helpicon"><?php print_help_link("META_TITLE_help", "qm", "META_TITLE"); print "</div><div class=\"description\">"; print $gm_lang["META_TITLE"];?></div></td>
+		<td class="shade2 wrap"><div class="helpicon"><?php print_help_link("META_TITLE_help", "qm", "META_TITLE"); print "</div><div class=\"description\">"; print GM_LANG_META_TITLE;?></div></td>
 		<td class="shade1"><input type="text" dir="ltr" name="NEW_META_TITLE" value="<?php print GedcomConfig::$META_TITLE?>" tabindex="<?php $i++; print $i?>" size="75" /></td>
 	</tr>
 	<tr>
-		<td class="shade2 wrap"><div class="helpicon"><?php print_help_link("RSS_FORMAT_help", "qm", "RSS_FORMAT"); print "</div><div class=\"description\">"; print $gm_lang["RSS_FORMAT"];?></div></td>
+		<td class="shade2 wrap"><div class="helpicon"><?php print_help_link("RSS_FORMAT_help", "qm", "RSS_FORMAT"); print "</div><div class=\"description\">"; print GM_LANG_RSS_FORMAT;?></div></td>
 		<td class="shade1"><select name="NEW_RSS_FORMAT" dir="ltr" tabindex="<?php $i++; print $i?>">
 				<option value="RSS0.91" <?php if (GedcomConfig::$RSS_FORMAT=="RSS0.91") print "selected=\"selected\""; ?>>RSS 0.91</option>
 				<option value="RSS1.0" <?php if (GedcomConfig::$RSS_FORMAT=="RSS1.0") print "selected=\"selected\""; ?>>RSS 1.0</option>
@@ -1649,9 +1649,9 @@ print "&nbsp;<a href=\"javascript: ".$gm_lang["meta_conf"]."\" onclick=\"expand_
 </div>
 <table class="facts_table" border="0">
 <tr><td class="center">
-<input type="submit" tabindex="<?php $i++; print $i?>" value="<?php print $gm_lang["save_config"]?>" onclick="closeHelp();" />
+<input type="submit" tabindex="<?php $i++; print $i?>" value="<?php print GM_LANG_save_config?>" onclick="closeHelp();" />
 &nbsp;&nbsp;
-<input type="reset" tabindex="<?php $i++; print $i?>" value="<?php print $gm_lang["reset"]?>" /><br />
+<input type="reset" tabindex="<?php $i++; print $i?>" value="<?php print GM_LANG_reset?>" /><br />
 </td></tr>
 </table>
 </form>

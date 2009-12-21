@@ -57,19 +57,19 @@ if (!isset($MAX_ALIVE_AGE)) $MAX_ALIVE_AGE = 120;
  */
 function write_access_option($checkVar) {
   global $PRIV_HIDE, $PRIV_PUBLIC, $PRIV_USER, $PRIV_NONE;
-  global $gm_lang;
+  
   print "<option value=\"PRIV_PUBLIC\"";
   if ($checkVar==$PRIV_PUBLIC) print " selected=\"selected\"";
-  print ">".$gm_lang["PRIV_PUBLIC"]."</option>\n";
+  print ">".GM_LANG_PRIV_PUBLIC."</option>\n";
   print "<option value=\"PRIV_USER\"";
   if ($checkVar==$PRIV_USER) print " selected=\"selected\"";
-  print ">".$gm_lang["PRIV_USER"]."</option>\n";
+  print ">".GM_LANG_PRIV_USER."</option>\n";
   print "<option value=\"PRIV_NONE\"";
   if ($checkVar==$PRIV_NONE) print " selected=\"selected\"";
-  print ">".$gm_lang["PRIV_NONE"]."</option>\n";
+  print ">".GM_LANG_PRIV_NONE."</option>\n";
   print "<option value=\"PRIV_HIDE\"";
   if ($checkVar==$PRIV_HIDE) print " selected=\"selected\"";
-  print ">".$gm_lang["PRIV_HIDE"]."</option>\n";
+  print ">".GM_LANG_PRIV_HIDE."</option>\n";
 }
 
 /**
@@ -78,18 +78,17 @@ function write_access_option($checkVar) {
  * @param string $checkVar
  */
 function write_yes_no($checkVar) {
-  global $gm_lang;
 
   print "<option";
   if ($checkVar == false) print " selected=\"selected\"";
   print " value=\"no\">";
-  print $gm_lang["no"];
+  print GM_LANG_no;
   print "</option>\n";
 
   print "<option";
   if ($checkVar == true) print " selected=\"selected\"";
   print " value=\"yes\">";
-  print $gm_lang["yes"];
+  print GM_LANG_yes;
   print "</option>";
 }
 
@@ -99,18 +98,17 @@ function write_yes_no($checkVar) {
  * @param string $checkVar
  */
 function write_hide_show($checkVar) {
-  global $gm_lang;
 
   print "<option";
   if ($checkVar == 0) print " selected=\"selected\"";
   print " value=\"0\">";
-  print $gm_lang["hide"];
+  print GM_LANG_hide;
   print "</option>\n";
 
   print "<option";
   if ($checkVar == 1) print " selected=\"selected\"";
   print " value=\"1\">";
-  print $gm_lang["show"];
+  print GM_LANG_show;
   print "</option>";
 }
 /**
@@ -121,7 +119,6 @@ function write_hide_show($checkVar) {
  */
 function search_ID_details($checkVar, $outputVar) {
 	global $GEDCOMS;
-	global $gm_lang;
 
 	$indirec = FindGedcomRecord($checkVar);
     
@@ -157,11 +154,11 @@ function search_ID_details($checkVar, $outputVar) {
 	else {
 		print "<span class=\"error\">";
 		if ($outputVar == 1) {
-			print $gm_lang["unable_to_find_privacy_indi"];
+			print GM_LANG_unable_to_find_privacy_indi;
 			print "<br />[" . $checkVar . "]";
 		}
 		if ($outputVar == 2) {
-			print $gm_lang["unable_to_find_privacy_indi"];
+			print GM_LANG_unable_to_find_privacy_indi;
 		}
 		print "</span><br /><br />";
 	}
@@ -189,19 +186,19 @@ function PrintFactChoice() {
 
 
 if (empty($action)) $action="";
-PrintHeader($gm_lang["privacy_header"]);
+PrintHeader(GM_LANG_privacy_header);
 ?>
 <table class="facts_table <?php print $TEXT_DIRECTION ?>">
 	<tr>
 		<td colspan="2" class="admin_topbottombar"><?php
-			print "<h3>".$gm_lang["edit_privacy_title"]." - ".$GEDCOMS[$gedid]["title"]. "</h3>";
+			print "<h3>".GM_LANG_edit_privacy_title." - ".$GEDCOMS[$gedid]["title"]. "</h3>";
 			if (UserController::CheckPrivacyOverrides($gedid)) {
-				print "<span class=\"error\">".$gm_lang["user_overr_exists"];
-				if ($gm_user->UserIsAdmin()) print "<a href=\"useradmin.php?action=listusers&amp;filter=privoverride&amp;gedid=$gedid\"> ".$gm_lang["user_overr_show"]."</a>";
+				print "<span class=\"error\">".GM_LANG_user_overr_exists;
+				if ($gm_user->UserIsAdmin()) print "<a href=\"useradmin.php?action=listusers&amp;filter=privoverride&amp;gedid=$gedid\"> ".GM_LANG_user_overr_show."</a>";
 				print "</span><br />";
 			}
 			print "<br /><a href=\"editgedcoms.php\"><b>";
-			print $gm_lang["lang_back_manage_gedcoms"];
+			print GM_LANG_lang_back_manage_gedcoms;
 			print "</b></a><br />";?>
 		</td>
 	</tr>
@@ -216,7 +213,7 @@ if ($action=="update") {
 	$boolarray[true]="1";
 	print "<table class=\"facts_table $TEXT_DIRECTION\">";
 	print "<tr><td class=\"shade2\">";
-	print $gm_lang["performing_update"];
+	print GM_LANG_performing_update;
 	print "<br />";
 	$settings = PrivacyController::GetPrivacyObject($GEDCOMID);
 	$settings->GEDCOM = get_gedcom_from_id($GEDCOMID);
@@ -226,7 +223,7 @@ if ($action=="update") {
 	$settings->PRIV_HIDE = $PRIV_HIDE;
 	$settings->PRIV_PUBLIC = $PRIV_PUBLIC;
 	$settings->PRIVACY_VERSION = $PRIVACY_VERSION;
-	print $gm_lang["config_file_read"];
+	print GM_LANG_config_file_read;
 	print "</td></tr></table>\n";
 	$settings->SHOW_DEAD_PEOPLE = $_POST["v_SHOW_DEAD_PEOPLE"];
 	$settings->HIDE_LIVE_PEOPLE = $_POST["v_HIDE_LIVE_PEOPLE"];
@@ -354,10 +351,10 @@ if ($action=="update") {
     	<tr>
     		<td class="topbottombar <?php print $TEXT_DIRECTION;?>">
 		<?php
-    		print "<a href=\"javascript: ".$gm_lang["general_privacy"]."\" onclick=\"expand_layer('general-privacy-options');return false\"><img id=\"general-privacy-options_img\" src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["minus"]["other"]."\" border=\"0\" width=\"11\" height=\"11\" alt=\"\" /></a> ";
+    		print "<a href=\"javascript: ".GM_LANG_general_privacy."\" onclick=\"expand_layer('general-privacy-options');return false\"><img id=\"general-privacy-options_img\" src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["minus"]["other"]."\" border=\"0\" width=\"11\" height=\"11\" alt=\"\" /></a> ";
 		print_help_link("general_privacy_help", "qm", "general_privacy");
     		?>
-        	<a href="javascript: <?php print $gm_lang["general_privacy"]; ?>" onclick="expand_layer('general-privacy-options');return false"><b><?php print $gm_lang["general_privacy"]; ?></b></a>
+        	<a href="javascript: <?php print GM_LANG_general_privacy; ?>" onclick="expand_layer('general-privacy-options');return false"><b><?php print GM_LANG_general_privacy; ?></b></a>
         	</td>
 	</tr>
 	</table>
@@ -367,35 +364,35 @@ if ($action=="update") {
     <div id="general-privacy-options" style="display: block">
     <table class="facts_table">
       <tr>
-        <td class="shade2 wrap width40"><?php print_help_link("PRIVACY_BY_RESN_help", "qm", "PRIVACY_BY_RESN"); print $gm_lang["PRIVACY_BY_RESN"]; ?>
+        <td class="shade2 wrap width40"><?php print_help_link("PRIVACY_BY_RESN_help", "qm", "PRIVACY_BY_RESN"); print GM_LANG_PRIVACY_BY_RESN; ?>
         </td>
         <td class="shade1 width60">
           <select size="1" name="v_PRIVACY_BY_RESN"><?php write_yes_no($PRIVACY_BY_RESN); ?></select>
         </td>
       </tr>
       <tr>
-        <td class="shade2 wrap"><?php print_help_link("SHOW_SOURCES_help", "qm", "SHOW_SOURCES"); print $gm_lang["SHOW_SOURCES"]; ?>
+        <td class="shade2 wrap"><?php print_help_link("SHOW_SOURCES_help", "qm", "SHOW_SOURCES"); print GM_LANG_SHOW_SOURCES; ?>
         </td>
         <td class="shade1">
           <select size="1" name="v_SHOW_SOURCES"><?php write_access_option($SHOW_SOURCES); ?></select>
         </td>
       </tr>
       <tr>
-        <td class="shade2 wrap"><?php print_help_link("LINK_PRIVACY_help", "qm", "LINK_PRIVACY"); print $gm_lang["LINK_PRIVACY"]; ?>
+        <td class="shade2 wrap"><?php print_help_link("LINK_PRIVACY_help", "qm", "LINK_PRIVACY"); print GM_LANG_LINK_PRIVACY; ?>
         </td>
         <td class="shade1">
           <select size="1" name="v_LINK_PRIVACY"><?php write_yes_no($LINK_PRIVACY); ?></select>
         </td>
       </tr>
       <tr>
-        <td class="shade2 wrap"><?php print_help_link("ENABLE_CLIPPINGS_CART_help", "qm", "ENABLE_CLIPPINGS_CART"); print $gm_lang["ENABLE_CLIPPINGS_CART"]; ?>
+        <td class="shade2 wrap"><?php print_help_link("ENABLE_CLIPPINGS_CART_help", "qm", "ENABLE_CLIPPINGS_CART"); print GM_LANG_ENABLE_CLIPPINGS_CART; ?>
         </td>
         <td class="shade1">
           <select size="1" name="v_ENABLE_CLIPPINGS_CART"><?php write_access_option($ENABLE_CLIPPINGS_CART); ?></select>
         </td>
       </tr>
       <tr>
-        <td class="shade2 wrap"><?php print_help_link("SHOW_RESEARCH_LOG_help", "qm", "SHOW_RESEARCH_LOG"); print $gm_lang["SHOW_RESEARCH_LOG"]; ?>
+        <td class="shade2 wrap"><?php print_help_link("SHOW_RESEARCH_LOG_help", "qm", "SHOW_RESEARCH_LOG"); print GM_LANG_SHOW_RESEARCH_LOG; ?>
         </td>
         <td class="shade1">
           <select size="1" name="v_SHOW_ACTION_LIST"><?php write_access_option($SHOW_ACTION_LIST); ?></select>
@@ -410,10 +407,10 @@ if ($action=="update") {
     	<tr>
     		<td class="topbottombar <?php print $TEXT_DIRECTION;?>">
 		<?php
-    		print "<a href=\"javascript: ".$gm_lang["age_privacy"]."\" onclick=\"expand_layer('age-privacy-options');return false\"><img id=\"age-privacy-options_img\" src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["plus"]["other"]."\" border=\"0\" width=\"11\" height=\"11\" alt=\"\" /></a> ";
+    		print "<a href=\"javascript: ".GM_LANG_age_privacy."\" onclick=\"expand_layer('age-privacy-options');return false\"><img id=\"age-privacy-options_img\" src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["plus"]["other"]."\" border=\"0\" width=\"11\" height=\"11\" alt=\"\" /></a> ";
 		print_help_link("age_privacy_help", "qm", "age_privacy");
     		?>
-        	<a href="javascript: <?php print $gm_lang["age_privacy"]; ?>" onclick="expand_layer('age-privacy-options');return false"><b><?php print $gm_lang["age_privacy"]; ?></b></a>
+        	<a href="javascript: <?php print GM_LANG_age_privacy; ?>" onclick="expand_layer('age-privacy-options');return false"><b><?php print GM_LANG_age_privacy; ?></b></a>
         	</td>
 	</tr>
 	</table>
@@ -422,27 +419,27 @@ if ($action=="update") {
     <div id="age-privacy-options" style="display: none">
     <table class="facts_table">
 	<tr>
-		<td class="shade2 wrap width40 <?php print $TEXT_DIRECTION;?>"><?php print_help_link("HIDE_LIVE_PEOPLE_help", "qm", "HIDE_LIVE_PEOPLE"); print $gm_lang["HIDE_LIVE_PEOPLE"];?></td>
+		<td class="shade2 wrap width40 <?php print $TEXT_DIRECTION;?>"><?php print_help_link("HIDE_LIVE_PEOPLE_help", "qm", "HIDE_LIVE_PEOPLE"); print GM_LANG_HIDE_LIVE_PEOPLE;?></td>
 		<td class="shade1 width60">
 			<select size="1" name="v_HIDE_LIVE_PEOPLE"><?php write_access_option($HIDE_LIVE_PEOPLE); ?></select>
 		</td>
 	</tr>
       <tr>
-        <td class="shade2 wrap width40 <?php print $TEXT_DIRECTION;?>"><?php print_help_link("SHOW_DEAD_PEOPLE_help", "qm", "SHOW_DEAD_PEOPLE"); print $gm_lang["SHOW_DEAD_PEOPLE"]; ?>
+        <td class="shade2 wrap width40 <?php print $TEXT_DIRECTION;?>"><?php print_help_link("SHOW_DEAD_PEOPLE_help", "qm", "SHOW_DEAD_PEOPLE"); print GM_LANG_SHOW_DEAD_PEOPLE; ?>
         </td>
         <td class="shade1 width60">
           <select size="1" name="v_SHOW_DEAD_PEOPLE"><?php write_access_option($SHOW_DEAD_PEOPLE); ?></select>
         </td>
       </tr>
       <tr>
-        <td class="shade2 wrap"><?php print_help_link("SHOW_LIVING_NAMES_help", "qm", "SHOW_LIVING_NAMES"); print $gm_lang["SHOW_LIVING_NAMES"]; ?>
+        <td class="shade2 wrap"><?php print_help_link("SHOW_LIVING_NAMES_help", "qm", "SHOW_LIVING_NAMES"); print GM_LANG_SHOW_LIVING_NAMES; ?>
         </td>
         <td class="shade1">
           <select size="1" name="v_SHOW_LIVING_NAMES"><?php write_access_option($SHOW_LIVING_NAMES); ?></select>
         </td>
       </tr>
       <tr>
-        <td class="shade2 wrap"><?php print_help_link("PRIVACY_BY_YEAR_help", "qm", "PRIVACY_BY_YEAR"); print $gm_lang["PRIVACY_BY_YEAR"]; ?>
+        <td class="shade2 wrap"><?php print_help_link("PRIVACY_BY_YEAR_help", "qm", "PRIVACY_BY_YEAR"); print GM_LANG_PRIVACY_BY_YEAR; ?>
         </td>
         <td class="shade1">
           <select size="1" name="v_PRIVACY_BY_YEAR"><?php write_yes_no($PRIVACY_BY_YEAR); ?></select>
@@ -450,7 +447,7 @@ if ($action=="update") {
       </tr>
       
       <tr>
-        <td class="shade2 wrap"><?php print_help_link("USE_RELATIONSHIP_PRIVACY_help", "qm", "USE_RELATIONSHIP_PRIVACY"); print $gm_lang["USE_RELATIONSHIP_PRIVACY"]; ?>
+        <td class="shade2 wrap"><?php print_help_link("USE_RELATIONSHIP_PRIVACY_help", "qm", "USE_RELATIONSHIP_PRIVACY"); print GM_LANG_USE_RELATIONSHIP_PRIVACY; ?>
         </td>
         <td class="shade1">
           <select size="1" name="v_USE_RELATIONSHIP_PRIVACY"><?php write_yes_no($USE_RELATIONSHIP_PRIVACY); ?></select>
@@ -458,7 +455,7 @@ if ($action=="update") {
       </tr>
 
       <tr>
-        <td class="shade2 wrap"><?php print_help_link("MAX_RELATION_PATH_LENGTH_help", "qm", "MAX_RELATION_PATH_LENGTH"); print $gm_lang["MAX_RELATION_PATH_LENGTH"]; ?>
+        <td class="shade2 wrap"><?php print_help_link("MAX_RELATION_PATH_LENGTH_help", "qm", "MAX_RELATION_PATH_LENGTH"); print GM_LANG_MAX_RELATION_PATH_LENGTH; ?>
         </td>
         <td class="shade1">
           <select size="1" name="v_MAX_RELATION_PATH_LENGTH"><?php
@@ -474,23 +471,23 @@ if ($action=="update") {
       </tr>
 
       <tr>
-        <td class="shade2 wrap"><?php print_help_link("CHECK_MARRIAGE_RELATIONS_help", "qm", "CHECK_MARRIAGE_RELATIONS"); print $gm_lang["CHECK_MARRIAGE_RELATIONS"]; ?>
+        <td class="shade2 wrap"><?php print_help_link("CHECK_MARRIAGE_RELATIONS_help", "qm", "CHECK_MARRIAGE_RELATIONS"); print GM_LANG_CHECK_MARRIAGE_RELATIONS; ?>
         </td>
         <td class="shade1">
           <select size="1" name="v_CHECK_MARRIAGE_RELATIONS"><?php write_yes_no($CHECK_MARRIAGE_RELATIONS); ?></select>
         </td>
       </tr>
 	<tr>
-		<td class="shade2 wrap"><?php print_help_link("CHECK_CHILD_DATES_help", "qm", "CHECK_CHILD_DATES"); print $gm_lang["CHECK_CHILD_DATES"];?></td>
+		<td class="shade2 wrap"><?php print_help_link("CHECK_CHILD_DATES_help", "qm", "CHECK_CHILD_DATES"); print GM_LANG_CHECK_CHILD_DATES;?></td>
 		<td class="shade1"><select name="v_CHECK_CHILD_DATES">
-				<option value="yes" <?php if ($CHECK_CHILD_DATES) print "selected=\"selected\""; ?>><?php print $gm_lang["yes"];?></option>
-				<option value="no" <?php if (!$CHECK_CHILD_DATES) print "selected=\"selected\""; ?>><?php print $gm_lang["no"];?></option>
+				<option value="yes" <?php if ($CHECK_CHILD_DATES) print "selected=\"selected\""; ?>><?php print GM_LANG_yes;?></option>
+				<option value="no" <?php if (!$CHECK_CHILD_DATES) print "selected=\"selected\""; ?>><?php print GM_LANG_no;?></option>
 			</select>
 		</td>
 	</tr>
       
 	  <tr>
-		<td class="shade2 wrap"><?php print_help_link("MAX_ALIVE_AGE_help", "qm", "MAX_ALIVE_AGE"); print $gm_lang["MAX_ALIVE_AGE"]?>
+		<td class="shade2 wrap"><?php print_help_link("MAX_ALIVE_AGE_help", "qm", "MAX_ALIVE_AGE"); print GM_LANG_MAX_ALIVE_AGE?>
 		</td>
 		<td class="shade1"><input type="text" name="v_MAX_ALIVE_AGE" value="<?php print $MAX_ALIVE_AGE?>" size="5"/>
 		</td>
@@ -506,8 +503,8 @@ if ($action=="update") {
      	<tr>
      		<td class="topbottombar <?php print $TEXT_DIRECTION;?>">
      		<?php
-		print "<a href=\"javascript: ".$gm_lang["person_privacy"]."\" onclick=\"expand_layer('person-privacy-options');return false\"><img id=\"person-privacy-options_img\" src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["plus"]["other"]."\" border=\"0\" width=\"11\" height=\"11\" alt=\"\" /></a> ";?><?php print_help_link("person_privacy_help", "qm", "person_privacy");?>
-        	<a href="javascript: <?php print $gm_lang["person_privacy"]; ?>" onclick="expand_layer('person-privacy-options');return false"><b><?php print $gm_lang["person_privacy"]; ?></b></a>
+		print "<a href=\"javascript: ".GM_LANG_person_privacy."\" onclick=\"expand_layer('person-privacy-options');return false\"><img id=\"person-privacy-options_img\" src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["plus"]["other"]."\" border=\"0\" width=\"11\" height=\"11\" alt=\"\" /></a> ";?><?php print_help_link("person_privacy_help", "qm", "person_privacy");?>
+        	<a href="javascript: <?php print GM_LANG_person_privacy; ?>" onclick="expand_layer('person-privacy-options');return false"><b><?php print GM_LANG_person_privacy; ?></b></a>
         	</td>
 		</tr>
 	</table>
@@ -517,13 +514,13 @@ if ($action=="update") {
     <div id="person-privacy-options" style="display: none">
     	<table class="facts_table">
         	<tr>
-            	<td class="topbottombar" colspan="2"><b><?php print $gm_lang["add_new_pp_setting"]; ?></b>
+            	<td class="topbottombar" colspan="2"><b><?php print GM_LANG_add_new_pp_setting; ?></b>
             	</td>
             </tr>
             
             <tr>
-              <td class="shade2 width40"><?php print $gm_lang["id"]; ?></td>
-              <td class="shade2 width60"><?php print $gm_lang["accessible_by"]; ?></td>
+              <td class="shade2 width40"><?php print GM_LANG_id; ?></td>
+              <td class="shade2 width60"><?php print GM_LANG_accessible_by; ?></td>
             </tr>
             
             <tr>
@@ -548,15 +545,15 @@ if ($action=="update") {
           ?>
           <table class="facts_table">
             <tr>
-              <td class="topbottombar" colspan="4"><?php print $gm_lang["edit_exist_person_privacy_settings"]; ?>
+              <td class="topbottombar" colspan="4"><?php print GM_LANG_edit_exist_person_privacy_settings; ?>
               </td>
             </tr>
             
             <tr>
-              <td class="shade2 width5"><?php print $gm_lang["delete"]; ?></td>
-              <td class="shade2 width5"><?php print $gm_lang["id"]; ?></td>
-              <td class="shade2 width30"><?php print $gm_lang["full_name"]; ?></td>
-              <td class="shade2 width60"><?php print $gm_lang["accessible_by"]; ?></td>
+              <td class="shade2 width5"><?php print GM_LANG_delete; ?></td>
+              <td class="shade2 width5"><?php print GM_LANG_id; ?></td>
+              <td class="shade2 width30"><?php print GM_LANG_full_name; ?></td>
+              <td class="shade2 width60"><?php print GM_LANG_accessible_by; ?></td>
             </tr>
             <?php
             foreach($person_privacy as $key=>$value) {
@@ -586,8 +583,8 @@ if ($action=="update") {
 		<tr>
 			<td class="topbottombar <?php print $TEXT_DIRECTION;?>">
      		<?php
-    		print "<a href=\"javascript: ".$gm_lang["user_privacy"]."\" onclick=\"expand_layer('user-privacy-options');return false\"><img id=\"user-privacy-options_img\" src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["plus"]["other"]."\" border=\"0\" width=\"11\" height=\"11\" alt=\"\" /></a> ";?><?php print_help_link("user_privacy_help", "qm", "user_privacy");?>
-		<a href="javascript: <?php print $gm_lang["user_privacy"]; ?>" onclick="expand_layer('user-privacy-options');return false"><b><?php print $gm_lang["user_privacy"]; ?></b></a>
+    		print "<a href=\"javascript: ".GM_LANG_user_privacy."\" onclick=\"expand_layer('user-privacy-options');return false\"><img id=\"user-privacy-options_img\" src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["plus"]["other"]."\" border=\"0\" width=\"11\" height=\"11\" alt=\"\" /></a> ";?><?php print_help_link("user_privacy_help", "qm", "user_privacy");?>
+		<a href="javascript: <?php print GM_LANG_user_privacy; ?>" onclick="expand_layer('user-privacy-options');return false"><b><?php print GM_LANG_user_privacy; ?></b></a>
         	</td>
 		</tr>
 	</table>
@@ -597,14 +594,14 @@ if ($action=="update") {
     <div id="user-privacy-options" style="display: none">
           <table class="facts_table">
             <tr>
-              <td class="topbottombar" colspan="3"><b><?php print $gm_lang["add_new_up_setting"]; ?></b>
+              <td class="topbottombar" colspan="3"><b><?php print GM_LANG_add_new_up_setting; ?></b>
               </td>
             </tr>
             
             <tr>
-              <td class="shade2 width25"><?php print $gm_lang["user_name"]; ?></td>
-              <td class="shade2 width15"><?php print $gm_lang["id"]; ?></td>
-              <td class="shade2 width60"><?php print $gm_lang["show_question"]; ?></td>
+              <td class="shade2 width25"><?php print GM_LANG_user_name; ?></td>
+              <td class="shade2 width15"><?php print GM_LANG_id; ?></td>
+              <td class="shade2 width60"><?php print GM_LANG_show_question; ?></td>
             </tr>
             
             <tr class="<?php print $TEXT_DIRECTION; ?>">
@@ -621,7 +618,7 @@ if ($action=="update") {
                   print $user->firstname." ".$user->lastname;
                   print "</option>";
                 }
-                print "<option value=\"all\">".$gm_lang["all_users"]."</option>";
+                print "<option value=\"all\">".GM_LANG_all_users."</option>";
                 ?>
                 </select>
               </td>
@@ -645,15 +642,15 @@ if ($action=="update") {
           ?>
           <table class="facts_table">
             <tr>
-              <td class="topbottombar" colspan="5"><?php print $gm_lang["edit_exist_user_privacy_settings"]; ?>
+              <td class="topbottombar" colspan="5"><?php print GM_LANG_edit_exist_user_privacy_settings; ?>
               </td>
             </tr>
 			<tr>
-				<td class="shade2 width5"><?php print $gm_lang["delete"]; ?></td>
-				<td class="shade2 width20"><?php print $gm_lang["user_name"]; ?></td>
-				<td class="shade2 width15"><?php print $gm_lang["id"]; ?></td>
-				<td class="shade2 width10"><?php print $gm_lang["show_question"]; ?></td>
-				<td class="shade2 width50"><?php print $gm_lang["full_name"]; ?></td>
+				<td class="shade2 width5"><?php print GM_LANG_delete; ?></td>
+				<td class="shade2 width20"><?php print GM_LANG_user_name; ?></td>
+				<td class="shade2 width15"><?php print GM_LANG_id; ?></td>
+				<td class="shade2 width10"><?php print GM_LANG_show_question; ?></td>
+				<td class="shade2 width50"><?php print GM_LANG_full_name; ?></td>
 			</tr>
            <?php
             foreach($user_privacy as $key=>$value) {
@@ -663,7 +660,7 @@ if ($action=="update") {
               <td class="shade1">
               <input type="checkbox" name="v_user_privacy_del[<?php print $key; ?>][<?php print $id; ?>]" value="1" />
               </td>
-              <td class="shade1"><?php if ($key == "all") print $gm_lang["all_users"]; else print $key; ?></td>
+              <td class="shade1"><?php if ($key == "all") print GM_LANG_all_users; else print $key; ?></td>
 	      <td class="shade1"><?php print $id; ?></td>
               <td class="shade1">
                 <select size="1" name="v_user_privacy[<?php print $key; ?>][<?php print $id; ?>]"><?php write_hide_show($setting); ?></select>
@@ -685,9 +682,9 @@ if ($action=="update") {
     ?>
 	<table class="facts_table"><tr><td class="topbottombar <?php print $TEXT_DIRECTION;?>">
      <?php
-    print "<a href=\"javascript: ".$gm_lang["global_facts"]."\" onclick=\"expand_layer('global-facts-options');return false\"><img id=\"global-facts-options_img\" src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["plus"]["other"]."\" border=\"0\" width=\"11\" height=\"11\" alt=\"\" /></a> ";?>
+    print "<a href=\"javascript: ".GM_LANG_global_facts."\" onclick=\"expand_layer('global-facts-options');return false\"><img id=\"global-facts-options_img\" src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["plus"]["other"]."\" border=\"0\" width=\"11\" height=\"11\" alt=\"\" /></a> ";?>
     	   <?php print_help_link("global_facts_help", "qm", "global_facts");?>
-	   <a href="javascript: <?php print $gm_lang["global_facts"]; ?>" onclick="expand_layer('global-facts-options');return false"><b><?php print $gm_lang["global_facts"]; ?></b></a></td>
+	   <a href="javascript: <?php print GM_LANG_global_facts; ?>" onclick="expand_layer('global-facts-options');return false"><b><?php print GM_LANG_global_facts; ?></b></a></td>
       </tr>
     </table>
     
@@ -696,26 +693,26 @@ if ($action=="update") {
     <div id="global-facts-options" style="display: none">
           <table class="facts_table">
             <tr>
-              <td class="topbottombar" colspan="3"><b><?php print $gm_lang["add_new_gf_setting"]; ?></b></td>
+              <td class="topbottombar" colspan="3"><b><?php print GM_LANG_add_new_gf_setting; ?></b></td>
             </tr>
             <tr>
-              <td class="shade2 width40"><?php print $gm_lang["name_of_fact"]; ?></td>
-              <td class="shade2 width30"><?php print $gm_lang["choice"]; ?></td>
-              <td class="shade2 width30"><?php print $gm_lang["accessible_by"]; ?></td>
+              <td class="shade2 width40"><?php print GM_LANG_name_of_fact; ?></td>
+              <td class="shade2 width30"><?php print GM_LANG_choice; ?></td>
+              <td class="shade2 width30"><?php print GM_LANG_accessible_by; ?></td>
             </tr>
             <tr class="<?php print $TEXT_DIRECTION; ?>">
               <td class="shade1">
                 <select size="1" name="v_new_global_facts_abbr">
                 <?php
-                print "<option value=\"\">".$gm_lang["choice"]."</option>";
+                print "<option value=\"\">".GM_LANG_choice."</option>";
 					PrintFactChoice()
                 ?>
                 </select>
               </td>
               <td class="shade1">
                 <select size="1" name="v_new_global_facts_choice">
-                  <option value="details"><?php print $gm_lang["fact_details"]; ?></option>
-                  <option value="show"><?php print $gm_lang["fact_show"]; ?></option>
+                  <option value="details"><?php print GM_LANG_fact_details; ?></option>
+                  <option value="show"><?php print GM_LANG_fact_show; ?></option>
                 </select>
               </td>
               <td class="shade1">
@@ -728,13 +725,13 @@ if ($action=="update") {
           ?>
           <table class="facts_table">
             <tr>
-              <td class="topbottombar" colspan="4"><b><?php print $gm_lang["edit_exist_global_facts_settings"]; ?></b></td>
+              <td class="topbottombar" colspan="4"><b><?php print GM_LANG_edit_exist_global_facts_settings; ?></b></td>
             </tr>
             <tr>
-              <td class="shade2 width5"><?php print $gm_lang["delete"]; ?></td>
-              <td class="shade2 width35"><?php print $gm_lang["name_of_fact"]; ?></td>
-              <td class="shade2 width30"><?php print $gm_lang["choice"]; ?></td>
-              <td class="shade2 width30"><?php print $gm_lang["accessible_by"]; ?></td>
+              <td class="shade2 width5"><?php print GM_LANG_delete; ?></td>
+              <td class="shade2 width35"><?php print GM_LANG_name_of_fact; ?></td>
+              <td class="shade2 width30"><?php print GM_LANG_choice; ?></td>
+              <td class="shade2 width30"><?php print GM_LANG_accessible_by; ?></td>
             </tr>
             <?php
             foreach($global_facts as $tag=>$value) {
@@ -750,8 +747,8 @@ if ($action=="update") {
                 ?>
               </td>
               <td class="shade1"><?php
-              if ($key == "show") print $gm_lang["fact_show"];
-              if ($key == "details") print $gm_lang["fact_details"];
+              if ($key == "show") print GM_LANG_fact_show;
+              if ($key == "details") print GM_LANG_fact_details;
               ?></td>
               <td class="shade1">
                 <select size="1" name="v_global_facts[<?php print $tag; ?>][<?php print $key; ?>]"><?php write_access_option($setting); ?></select>
@@ -772,9 +769,9 @@ if ($action=="update") {
     ?>
 	<table class="facts_table"><tr><td class="topbottombar <?php print $TEXT_DIRECTION;?>">
      <?php
-    print "<a href=\"javascript: ".$gm_lang["person_facts"]."\" onclick=\"expand_layer('person-facts-options');return false\"><img id=\"person-facts-options_img\" src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["plus"]["other"]."\" border=\"0\" width=\"11\" height=\"11\" alt=\"\" /></a> ";?>
+    print "<a href=\"javascript: ".GM_LANG_person_facts."\" onclick=\"expand_layer('person-facts-options');return false\"><img id=\"person-facts-options_img\" src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["plus"]["other"]."\" border=\"0\" width=\"11\" height=\"11\" alt=\"\" /></a> ";?>
     	   <?php print_help_link("person_facts_help", "qm", "person_facts");?>
-	   <a href="javascript: <?php print $gm_lang["person_facts"]; ?>" onclick="expand_layer('person-facts-options');return false"><b><?php print $gm_lang["person_facts"]; ?></b></a></td>
+	   <a href="javascript: <?php print GM_LANG_person_facts; ?>" onclick="expand_layer('person-facts-options');return false"><b><?php print GM_LANG_person_facts; ?></b></a></td>
       </tr>
     </table>
     
@@ -785,13 +782,13 @@ if ($action=="update") {
             <?php //--Start--add person_facts for individuals----------------------------------------------- 
             ?>
             <tr>
-              <td class="topbottombar" colspan="4"><b><?php print $gm_lang["add_new_pf_setting_indi"]; ?></b></td>
+              <td class="topbottombar" colspan="4"><b><?php print GM_LANG_add_new_pf_setting_indi; ?></b></td>
             </tr>
             <tr>
-              <td class="shade2 width10"><?php print $gm_lang["id"]; ?></td>
-              <td class="shade2 width30"><?php print $gm_lang["name_of_fact"]; ?></td>
-              <td class="shade2 width30"><?php print $gm_lang["choice"]; ?></td>
-              <td class="shade2 width30"><?php print $gm_lang["accessible_by"]; ?></td>
+              <td class="shade2 width10"><?php print GM_LANG_id; ?></td>
+              <td class="shade2 width30"><?php print GM_LANG_name_of_fact; ?></td>
+              <td class="shade2 width30"><?php print GM_LANG_choice; ?></td>
+              <td class="shade2 width30"><?php print GM_LANG_accessible_by; ?></td>
             </tr>
             <tr class="<?php print $TEXT_DIRECTION; ?>">
               <td class="shade1">
@@ -813,8 +810,8 @@ if ($action=="update") {
               </td>
               <td class="shade1">
                 <select size="1" name="v_new_person_facts_choice">
-                  <option value="details"><?php print $gm_lang["fact_details"]; ?></option>
-                  <option value="show"><?php print $gm_lang["fact_show"]; ?></option>
+                  <option value="details"><?php print GM_LANG_fact_details; ?></option>
+                  <option value="show"><?php print GM_LANG_fact_show; ?></option>
                 </select>
               </td>
               <td class="shade1">
@@ -829,15 +826,15 @@ if ($action=="update") {
       ?>
       <table class="facts_table">
         <tr>
-          <td class="topbottombar" colspan="6"><b><?php print $gm_lang["edit_exist_person_facts_settings"]; ?></b></td>
+          <td class="topbottombar" colspan="6"><b><?php print GM_LANG_edit_exist_person_facts_settings; ?></b></td>
         </tr>
         <tr>
-          <td class="shade2"><?php print $gm_lang["delete"]; ?></td>
-          <td class="shade2"><?php print $gm_lang["id"]; ?></td>
-		<td class="shade2"><?php print $gm_lang["full_name"]; ?></td>
-          <td class="shade2"><?php print $gm_lang["name_of_fact"]; ?></td>
-          <td class="shade2"><?php print $gm_lang["choice"]; ?></td>
-          <td class="shade2"><?php print $gm_lang["accessible_by"]; ?></td>
+          <td class="shade2"><?php print GM_LANG_delete; ?></td>
+          <td class="shade2"><?php print GM_LANG_id; ?></td>
+		<td class="shade2"><?php print GM_LANG_full_name; ?></td>
+          <td class="shade2"><?php print GM_LANG_name_of_fact; ?></td>
+          <td class="shade2"><?php print GM_LANG_choice; ?></td>
+          <td class="shade2"><?php print GM_LANG_accessible_by; ?></td>
         </tr> 
         <?php
         foreach($person_facts as $id=>$value) {
@@ -856,8 +853,8 @@ if ($action=="update") {
             print $tag. " - ".constant("GM_FACT_".$tag);
           ?></td>
           <td class="shade1"><?php
-          if ($key == "show") print $gm_lang["fact_show"];
-          if ($key == "details") print $gm_lang["fact_details"];
+          if ($key == "show") print GM_LANG_fact_show;
+          if ($key == "details") print GM_LANG_fact_details;
           ?></td>
           <td class="shade1">
             <select size="1" name="v_person_facts[<?php print $id; ?>][<?php print $tag; ?>][<?php print $key; ?>]"><?php write_access_option($setting); ?></select>
@@ -874,9 +871,9 @@ if ($action=="update") {
     </div>
     <table class="facts_table" border="0">
 	<tr><td class="topbottombar">
-	<input type="submit" value="<?php print $gm_lang["save_config"]?>" onclick="closeHelp();" />
+	<input type="submit" value="<?php print GM_LANG_save_config?>" onclick="closeHelp();" />
 	&nbsp;&nbsp;
-	<input type="reset" value="<?php print $gm_lang["reset"]?>" /><br />
+	<input type="reset" value="<?php print GM_LANG_reset?>" /><br />
 	</td></tr>
 	</table>
     </form>

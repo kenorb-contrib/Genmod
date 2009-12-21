@@ -26,7 +26,7 @@
  * @subpackage Blocks
  */
 
-$GM_BLOCKS["print_user_news"]["name"]       = $gm_lang["user_news_block"];
+$GM_BLOCKS["print_user_news"]["name"]       = GM_LANG_user_news_block;
 $GM_BLOCKS["print_user_news"]["descr"]      = "user_news_descr";
 $GM_BLOCKS["print_user_news"]["type"]       = "user";
 $GM_BLOCKS["print_user_news"]["canconfig"]	= false;
@@ -37,18 +37,18 @@ $GM_BLOCKS["print_user_news"]["rss"]        = false;
  *
  */
 function print_user_news($block=true, $config="", $side, $index) {
-	global $gm_lang, $TEXT_DIRECTION, $command, $TIME_FORMAT, $gm_user;
+	global $TEXT_DIRECTION, $command, $TIME_FORMAT, $gm_user;
 
 	$usernews = NewsController::getUserNews($gm_user->username);
 
 	print "<div id=\"user_news\" class=\"block\">\n";
 	print "<div class=\"blockhc\">";
 	print_help_link("mygedview_myjournal_help", "qm", "my_journal");
-	print $gm_lang["my_journal"];
+	print GM_LANG_my_journal;
 	print "</div>";
 	print "<div class=\"blockcontent\">";
 	if ($block) print "<div class=\"small_inner_block, $TEXT_DIRECTION\">\n";
-	if (count($usernews)==0) print $gm_lang["no_journal"];
+	if (count($usernews)==0) print GM_LANG_no_journal;
 	foreach($usernews as $key => $news) {
 		$day = date("j", $news->date);
 		$mon = date("M", $news->date);
@@ -65,12 +65,12 @@ function print_user_news($block=true, $config="", $side, $index) {
 		$news->text = strtr($news->text, $trans);
 		$news->text = nl2br($news->text);
 		print PrintReady($news->text)."<br /><br />\n";
-		print "<a href=\"#\" onclick=\"editnews('".$news->id."'); return false;\">".$gm_lang["edit"]."</a> | ";
-		print "<a href=\"index.php?action=deletenews&amp;news_id=".$news->id."&amp;command=$command\" onclick=\"return confirm('".$gm_lang["confirm_journal_delete"]."');\">".$gm_lang["delete"]."</a><br />";
+		print "<a href=\"#\" onclick=\"editnews('".$news->id."'); return false;\">".GM_LANG_edit."</a> | ";
+		print "<a href=\"index.php?action=deletenews&amp;news_id=".$news->id."&amp;command=$command\" onclick=\"return confirm('".GM_LANG_confirm_journal_delete."');\">".GM_LANG_delete."</a><br />";
 		print "</div><br />\n";
 	}
 	if ($block) print "</div>\n";
-	if ($gm_user->username != "") print "<br /><a href=\"#\" onclick=\"addnews('".$gm_user->username."'); return false;\">".$gm_lang["add_journal"]."</a>\n";
+	if ($gm_user->username != "") print "<br /><a href=\"#\" onclick=\"addnews('".$gm_user->username."'); return false;\">".GM_LANG_add_journal."</a>\n";
 	print "</div>\n";
 	print "</div>";
 }

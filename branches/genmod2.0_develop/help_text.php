@@ -38,8 +38,8 @@ if (!isset($help)) $help = "";
  * Inclusion of the help text variables
 */
 require ("helptext_vars.php");
-PrintSimpleHeader($gm_lang["help_header"]);
-print "<a name=\"top\"></a><span class=\"helpheader\">".$gm_lang["help_header"]."</span><br /><br />\n<div class=\"left\">\n";
+PrintSimpleHeader(GM_LANG_help_header);
+print "<a name=\"top\"></a><span class=\"helpheader\">".GM_LANG_help_header."</span><br /><br />\n<div class=\"left\">\n";
 $actione = "";
 
 if (isset($action)) $actione = $action;
@@ -59,21 +59,21 @@ else {
 	if ($gm_user->UserIsAdmin()) {
 		$stat = GetLangvarStatus($help, $LANGUAGE, $type="help");
 		// Already translated, edit it
-		if ($stat == 0) print "<br /><a href=\"#\" onclick=\"window.name='help'; window.open('editlang_edit.php?ls01=$help&amp;ls02=$help&amp;language2=$LANGUAGE&amp;file_type=help_text&amp;realtime=true', '', 'top=50,left=50,width=700,height=400,scrollbars=1,resizable=1');\">".$gm_lang["thishelp_edit_trans"]."</a><br />";
+		if ($stat == 0) print "<br /><a href=\"#\" onclick=\"window.name='help'; window.open('editlang_edit.php?ls01=$help&amp;ls02=$help&amp;language2=$LANGUAGE&amp;file_type=help_text&amp;realtime=true', '', 'top=50,left=50,width=700,height=400,scrollbars=1,resizable=1');\">".GM_LANG_thishelp_edit_trans."</a><br />";
 		// Add translation in the current language
-		if ($stat == 1) print "<br /><a href=\"#\" onclick=\"window.name='help'; window.open('editlang_edit.php?ls01=$help&amp;ls02=-1&amp;language2=$LANGUAGE&amp;file_type=help_text&amp;realtime=true', '', 'top=50,left=50,width=700,height=400,scrollbars=1,resizable=1');\">".$gm_lang["thishelp_add_trans"]."</a><br />";
+		if ($stat == 1) print "<br /><a href=\"#\" onclick=\"window.name='help'; window.open('editlang_edit.php?ls01=$help&amp;ls02=-1&amp;language2=$LANGUAGE&amp;file_type=help_text&amp;realtime=true', '', 'top=50,left=50,width=700,height=400,scrollbars=1,resizable=1');\">".GM_LANG_thishelp_add_trans."</a><br />";
 		// Add English helptext, only if the var is truly not found (may be in helptext_vars)
-		if ($stat == 2 && stristr($gm_lang['help_not_exist'], $text)) {
-			print "<br /><a href=\"#\" onclick=\"window.name='help'; window.open('editlang_edit.php?ls01=$help&amp;ls02=-1&amp;language2=english&amp;file_type=help_text&amp;realtime=true', '', 'top=50,left=50,width=700,height=400,scrollbars=1,resizable=1');\">".$gm_lang["thishelp_add_text"]."</a><br />";
+		if ($stat == 2 && stristr(GM_LANG_help_not_exist, $text)) {
+			print "<br /><a href=\"#\" onclick=\"window.name='help'; window.open('editlang_edit.php?ls01=$help&amp;ls02=-1&amp;language2=english&amp;file_type=help_text&amp;realtime=true', '', 'top=50,left=50,width=700,height=400,scrollbars=1,resizable=1');\">".GM_LANG_thishelp_add_text."</a><br />";
 		}
 	}
 }
 
 print "\n</div>\n";
 print "<div class=\"left\">";
-print "<a href=\"#top\" title=\"".$gm_lang["move_up"]."\">$UpArrow</a><br />";
-print "<a href=\"help_text.php?help=help_contents_help\"><b>".$gm_lang["help_contents"]."</b></a><br />";
-print "<a href=\"#\" onclick=\"window.close();\"><b>".$gm_lang["close_window"]."</b></a>";
+print "<a href=\"#top\" title=\"".GM_LANG_move_up."\">$UpArrow</a><br />";
+print "<a href=\"help_text.php?help=help_contents_help\"><b>".GM_LANG_help_contents."</b></a><br />";
+print "<a href=\"#\" onclick=\"window.close();\"><b>".GM_LANG_close_window."</b></a>";
 print "</div>";
 PrintSimpleFooter();
 ?>

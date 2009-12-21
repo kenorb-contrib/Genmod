@@ -51,7 +51,7 @@ else$protectActive = false;
 $d_LangName = "lang_name_" . $ln;
 $sentHeader = false;    // Indicates whether HTML headers have been sent
 if ($action !="save" and $action != "toggleActive") {
-	PrintSimpleHeader($gm_lang["config_lang_utility"]);
+	PrintSimpleHeader(GM_LANG_config_lang_utility);
 	$sentHeader = true;
 	print "<div id=\"content_editlang\">";
 }
@@ -63,7 +63,8 @@ if ($action == "new_lang") {
 	$d_LangName      = "lang_name_" . $ln;
 	$languages[$ln]     = $ln;
 	$gm_lang_use[$ln]    = true;
-	$gm_lang[$ln]    = $lng_codes[$new_shortcut][0];
+	define("GM_LANG_".$ln, $lng_codes[$new_shortcut][0]);
+//	$gm_lang[$ln]    = $lng_codes[$new_shortcut][0];
 	$lang_short_cut[$ln]    = $new_shortcut;
 	$lang_langcode[$ln]    = $new_shortcut . ";";
 	if (array_key_exists($new_shortcut, $lng_synonyms)) $lang_langcode[$ln] .= $lng_synonyms[$new_shortcut];
@@ -88,7 +89,8 @@ if ($action == "new_lang") {
 	$ALPHABET_lower[$ln]    = "abcdefghijklmnopqrstuvwxyz";
 	$MON_SHORT[$ln]			= "";
 	
-	$gm_lang[$d_LangName]  = $lng_codes[$new_shortcut][0];
+//	$gm_lang[$d_LangName]  = $lng_codes[$new_shortcut][0];
+	define("GM_LANG_".$d_LangName,$lng_codes[$new_shortcut][0]);
 }
 else if(!isset($v_flagsfile) && isset($flagsfile[$ln])) $v_flagsfile=$flagsfile[$ln];
 else if(!isset($v_flagsfile)) $v_flagsfile = "";
@@ -112,12 +114,12 @@ if ($action != "save" && $action != "toggleActive") { ?>
 	<div class="admin_topbottombar">
 		<h3>
 		<?php
-		if ($action == "new_lang") print $gm_lang["add_new_language"];
-		else print $gm_lang["config_lang_utility"];
+		if ($action == "new_lang") print GM_LANG_add_new_language;
+		else print GM_LANG_config_lang_utility;
 		?>
 		</h3>
 	</div>
-	<div class="admin_topbottombar"><?php print $gm_lang[$d_LangName]; ?></div>
+	<div class="admin_topbottombar"><?php print constant("GM_LANG_".$d_LangName); ?></div>
 	<form name="Form1" method="post" action="editlang_edit_settings.php">
 		<input type="hidden" name="action" value="save" />
 		<input type="hidden" name="ln" value="<?php print $ln;?>" />
@@ -126,9 +128,9 @@ if ($action != "save" && $action != "toggleActive") { ?>
 		else print "<input type=\"hidden\" name=\"new_old\" value=\"old\" />";
 		?>
 		<div class="admin_item_box center shade3">
-			<input type="submit" value="<?php print $gm_lang["lang_save"];?>" />
+			<input type="submit" value="<?php print GM_LANG_lang_save;?>" />
 			&nbsp;&nbsp;
-			<input type="submit" value="<?php print $gm_lang["cancel"];?>" onclick="CloseWindow();" />
+			<input type="submit" value="<?php print GM_LANG_cancel;?>" onclick="CloseWindow();" />
 		</div>
 		<?php
 		if ($action != "new_lang") {
@@ -138,7 +140,7 @@ if ($action != "save" && $action != "toggleActive") { ?>
 			<div class="admin_item_box">
 				<div class="change_language_item_left">
 					<div class="helpicon"><?php print_help_link("active_help", "qm"); ?></div>
-					<div class="description"><?php print $gm_lang["active"];?></div>
+					<div class="description"><?php print GM_LANG_active;?></div>
 				</div>
 				<div class="change_language_item_right">
 					<?php
@@ -157,9 +159,9 @@ if ($action != "save" && $action != "toggleActive") { ?>
 		?>
 		<div class="admin_item_box">
 			<div class="change_language_item_left">
-				<?php if (!isset($v_original_lang_name)) $v_original_lang_name = $gm_lang[$ln];?>
+				<?php if (!isset($v_original_lang_name)) $v_original_lang_name = constant("GM_LANG_".$ln);?>
 				<div class="helpicon"><?php print_help_link("original_lang_name_help", "qm"); ?></div>
-				<div class="description"><?php print str_replace("#D_LANGNAME#", $gm_lang[$d_LangName], $gm_lang["original_lang_name"]);?></div>
+				<div class="description"><?php print str_replace("#D_LANGNAME#", constant("GM_LANG_".$d_LangName), GM_LANG_original_lang_name);?></div>
 			</div>
 			<div class="change_language_item_right">
 				<input type="text" name="v_original_lang_name" size="30" value="<?php print $v_original_lang_name;?>" />
@@ -169,7 +171,7 @@ if ($action != "save" && $action != "toggleActive") { ?>
 			<div class="change_language_item_left">
 				<?php if (!isset($v_lang_shortcut)) $v_lang_shortcut = $lang_short_cut[$ln];?>
 				<div class="helpicon"><?php print_help_link("lang_shortcut_help", "qm"); ?></div>
-				<div class="description"><?php print $gm_lang["lang_shortcut"];?></div>
+				<div class="description"><?php print GM_LANG_lang_shortcut;?></div>
 			</div>
 			<div class="change_language_item_right">
 				<input type="text" name="v_lang_shortcut" size="2" value="<?php print $v_lang_shortcut;?>" onchange="document.Form1.action.value=''; submit();" />
@@ -179,7 +181,7 @@ if ($action != "save" && $action != "toggleActive") { ?>
 			<div class="change_language_item_left">
 				<?php if (!isset($v_lang_langcode)) $v_lang_langcode = $lang_langcode[$ln];?>
 				<div class="helpicon"><?php print_help_link("lang_langcode_help", "qm"); ?></div>
-				<div class="description"><?php print $gm_lang["lang_langcode"];?></div>
+				<div class="description"><?php print GM_LANG_lang_langcode;?></div>
 			</div>
 			<div class="change_language_item_right">
 				<input type="text" name="v_lang_langcode" size="40" value="<?php print $v_lang_langcode;?>" />
@@ -189,7 +191,7 @@ if ($action != "save" && $action != "toggleActive") { ?>
 			<div class="change_language_item_left">
 				<?php if (!isset($v_flagsfile)) $v_flagsfile = $flagsfile[$ln];?>
 				<div class="helpicon"><?php print_help_link("flagsfile_help", "qm"); ?></div>
-				<div class="description"><?php print $gm_lang["flagsfile"];?></div>
+				<div class="description"><?php print GM_LANG_flagsfile;?></div>
 			</div>
 			<div class="change_language_item_right">
 				<?php
@@ -250,7 +252,7 @@ if ($action != "save" && $action != "toggleActive") { ?>
 			<div class="change_language_item_left">
 				<?php if (!isset($v_date_format)) $v_date_format = $DATE_FORMAT_array[$ln];?>
 				<div class="helpicon"><?php print_help_link("date_format_help", "qm", "date_format"); ?></div>
-				<div class="description"><?php print $gm_lang["date_format"];?></div>
+				<div class="description"><?php print GM_LANG_date_format;?></div>
 			</div>
 			<div class="change_language_item_right">
 				<input type="text" name="v_date_format" size="30" value="<?php print $v_date_format;?>" />
@@ -260,7 +262,7 @@ if ($action != "save" && $action != "toggleActive") { ?>
 			<div class="change_language_item_left">
 				<?php if (!isset($v_time_format)) $v_time_format = $TIME_FORMAT_array[$ln];?>
 				<div class="helpicon"><?php print_help_link("time_format_help", "qm", "time_format"); ?></div>
-				<div class="description"><?php print $gm_lang["time_format"];?></div>
+				<div class="description"><?php print GM_LANG_time_format;?></div>
 			</div>
 			<div class="change_language_item_right">
 				<input type="text" name="v_time_format" size="30" value="<?php print $v_time_format;?>" />
@@ -270,12 +272,12 @@ if ($action != "save" && $action != "toggleActive") { ?>
 			<div class="change_language_item_left">
 				<?php if (!isset($v_week_start)) $v_week_start = $WEEK_START_array[$ln];?>
 				<div class="helpicon"><?php print_help_link("week_start_help", "qm","week_start"); ?></div>
-				<div class="description"><?php print $gm_lang["week_start"];?></div>
+				<div class="description"><?php print GM_LANG_week_start;?></div>
 			</div>
 			<div class="change_language_item_right">
 				<select size="1" name="v_week_start">
 				<?php
-				$dayArray = array($gm_lang["sunday"],$gm_lang["monday"],$gm_lang["tuesday"],$gm_lang["wednesday"],$gm_lang["thursday"],$gm_lang["friday"],$gm_lang["saturday"]);
+				$dayArray = array(GM_LANG_sunday,GM_LANG_monday,GM_LANG_tuesday,GM_LANG_wednesday,GM_LANG_thursday,GM_LANG_friday,GM_LANG_saturday);
 				for ($x = 0; $x <= 6; $x++)  {
 					print "<option";
 					if ($v_week_start == $x) print " selected=\"selected\"";
@@ -293,19 +295,19 @@ if ($action != "save" && $action != "toggleActive") { ?>
 			<div class="change_language_item_left">
 				<?php if (!isset($v_text_direction)) $v_text_direction = $TEXT_DIRECTION_array[$ln];?>
 				<div class="helpicon"><?php print_help_link("text_direction_help", "qm", "text_direction"); ?></div>
-				<div class="description"><?php print $gm_lang["text_direction"];?></div>
+				<div class="description"><?php print GM_LANG_text_direction;?></div>
 			</div>
 			<div class="change_language_item_right">
 				<select size="1" name="v_text_direction">
 				<option
 				<?php if ($v_text_direction == "ltr") print " selected=\"selected\""; ?>
 				value="0">
-				<?php print $gm_lang["ltr"];?>
+				<?php print GM_LANG_ltr;?>
 				</option>
 				<option
 				<?php if ($v_text_direction == "rtl") print " selected=\"selected\""; ?>
 				value="1">
-				<?php print $gm_lang["rtl"];?>
+				<?php print GM_LANG_rtl;?>
 				</option>
 				</select>
 			</div>
@@ -314,19 +316,19 @@ if ($action != "save" && $action != "toggleActive") { ?>
 			<div class="change_language_item_left">
 				<?php if (!isset($v_name_reverse)) $v_name_reverse = $NAME_REVERSE_array[$ln];?>
 				<div class="helpicon"><?php print_help_link("name_reverse_help", "qm", "name_reverse"); ?></div>
-				<div class="description"><?php print $gm_lang["name_reverse"];?></div>
+				<div class="description"><?php print GM_LANG_name_reverse;?></div>
 			</div>
 			<div class="change_language_item_right">
 				<select size="1" name="v_name_reverse">
 				<option
 				<?php if (!$v_name_reverse) print " selected=\"selected\""; ?>
 				value="0">
-				<?php print $gm_lang["no"];?>
+				<?php print GM_LANG_no;?>
 				</option>
 				<option
 				<?php if ($v_name_reverse) print " selected=\"selected\"";?>
 				value="1">
-				<?php print $gm_lang["yes"];?>
+				<?php print GM_LANG_yes;?>
 				</option>
 				</select>
 			</div>
@@ -335,7 +337,7 @@ if ($action != "save" && $action != "toggleActive") { ?>
 			<div class="change_language_item_left">
 				<?php if (!isset($v_alphabet_upper)) $v_alphabet_upper = $ALPHABET_upper[$ln];?>
 				<div class="helpicon"><?php print_help_link("alphabet_upper_help", "qm", "alphabet_upper"); ?></div>
-				<div class="description"><?php print $gm_lang["alphabet_upper"];?></div>
+				<div class="description"><?php print GM_LANG_alphabet_upper;?></div>
 			</div>
 			<div class="change_language_item_right">
 				<input type="text" name="v_alphabet_upper" size="50" value="<?php print $v_alphabet_upper;?>" />
@@ -345,7 +347,7 @@ if ($action != "save" && $action != "toggleActive") { ?>
 			<div class="change_language_item_left">
 				<?php if (!isset($v_alphabet_lower)) $v_alphabet_lower = $ALPHABET_lower[$ln];?>
 				<div class="helpicon"><?php print_help_link("alphabet_lower_help", "qm", "alphabet_lower"); ?></div>
-				<div class="description"><?php print $gm_lang["alphabet_lower"];?></div>
+				<div class="description"><?php print GM_LANG_alphabet_lower;?></div>
 			</div>
 			<div class="change_language_item_right">
 				<input type="text" name="v_alphabet_lower" size="50" value="<?php print $v_alphabet_lower;?>" />
@@ -355,7 +357,7 @@ if ($action != "save" && $action != "toggleActive") { ?>
 			<div class="change_language_item_left">
 				<?php if (!isset($v_mon_short)) $v_mon_short = $MON_SHORT_array[$ln];?>
 				<div class="helpicon"><?php print_help_link("mon_short_help", "qm", "mon_short"); ?></div>
-				<div class="description"><?php print $gm_lang["mon_short"];?></div>
+				<div class="description"><?php print GM_LANG_mon_short;?></div>
 			</div>
 			<div class="change_language_item_right">
 				<input type="text" name="v_mon_short" size="50" value="<?php print $v_mon_short;?>" />
@@ -371,20 +373,20 @@ if ($action != "save" && $action != "toggleActive") { ?>
 			<div class="admin_item_box">
 				<div class="change_language_item_left">
 					<div class="helpicon"><?php print_help_link("lang_filenames_help", "qm", "lang_filenames"); ?></div>
-					<div class="description"><?php print $gm_lang["lang_filenames"];?></div>
+					<div class="description"><?php print GM_LANG_lang_filenames;?></div>
 				</div>
 				<div class="change_language_item_right">
 					<?php
 						print $v_factsfile;
-						if (!file_exists($v_factsfile)) print "&nbsp;&nbsp;<span class=\"error\">" . $gm_lang["file_does_not_exist"] . "</span>";
+						if (!file_exists($v_factsfile)) print "&nbsp;&nbsp;<span class=\"error\">" . GM_LANG_file_does_not_exist . "</span>";
 						print "<br />";
 						
 						print $v_helpfile;
-						if (!file_exists($v_helpfile)) print "&nbsp;&nbsp;<span class=\"error\">" . $gm_lang["file_does_not_exist"] . "</span>";
+						if (!file_exists($v_helpfile)) print "&nbsp;&nbsp;<span class=\"error\">" . GM_LANG_file_does_not_exist . "</span>";
 						print "<br />";
 						
 						print $v_lang_filename;
-						if (!file_exists($v_lang_filename)) print "&nbsp;&nbsp;<span class=\"error\">" . $gm_lang["file_does_not_exist"] . "</span>";
+						if (!file_exists($v_lang_filename)) print "&nbsp;&nbsp;<span class=\"error\">" . GM_LANG_file_does_not_exist . "</span>";
 					?>
 				</div>
 			</div>
@@ -392,9 +394,9 @@ if ($action != "save" && $action != "toggleActive") { ?>
 		}
 		?>
 		<div class="admin_item_box center shade3">
-			<input type="submit" value="<?php print $gm_lang["lang_save"];?>" />
+			<input type="submit" value="<?php print GM_LANG_lang_save;?>" />
 			&nbsp;&nbsp;
-			<input type="submit" value="<?php print $gm_lang["cancel"];?>" onclick="CloseWindow();" />
+			<input type="submit" value="<?php print GM_LANG_cancel;?>" onclick="CloseWindow();" />
 		</div>
 	</form>
 	<?php
@@ -420,8 +422,10 @@ if ($action == "save") {
 	if ($_POST["new_old"] == "new") {
 		$lang = array();
 		$d_LangName      = "lang_name_".$ln;
-		$gm_lang[$d_LangName]  = $v_original_lang_name;
-		$gm_lang[$ln]    = $ln;
+//		$gm_lang[$d_LangName]  = $v_original_lang_name;
+		define("GM_LANG_".$d_LangName, $v_original_lang_name);
+//		$gm_lang[$ln]    = $ln;
+		define("GM_LANG_".$ln, $ln);
 		$gm_language[$ln]    = "languages/lang.".$v_lang_shortcut.".txt";
 		$confighelpfile[$ln]  = "";
 		$helptextfile[$ln]    = "languages/help_text.".$v_lang_shortcut.".txt";
@@ -431,7 +435,7 @@ if ($action == "save") {
 	}
 	
 	$flagsfile[$ln]    = $v_flagsfile;
-	$gm_lang[$ln]  = $_POST["v_original_lang_name"];
+	define("GM_LANG_".$ln, $_POST["v_original_lang_name"]);
 	if ($gm_lang_use[$ln] == "1" && $_POST["v_lang_use"] == false) RemoveLanguage($ln);
 	if ($gm_lang_use[$ln] == "0" && $_POST["v_lang_use"] == true) StoreLanguage($ln);
 	$gm_lang_use[$ln]  = $_POST["v_lang_use"];
@@ -453,7 +457,7 @@ if ($action == "save") {
 	$newvars["gm_langname"] 	= $languages[$ln];
 	if ($gm_lang_use[$ln] == true) $newvars["gm_lang_use"] = "1";
 	else $newvars["gm_lang_use"] = "0";
-	$newvars["gm_lang"] 		= $gm_lang[$ln];
+	$newvars["gm_lang"] 		= constant("GM_LANG_".$ln);
 	$newvars["lang_short_cut"] 	= $lang_short_cut[$ln];
 	$newvars["langcode"] 		= $lang_langcode[$ln];
 	$newvars["gm_language"] 	= $gm_language[$ln];
@@ -475,17 +479,17 @@ if ($action == "save") {
 	
 	if ($error != "") {
 		if (!$sentHeader) {
-			PrintSimpleHeader($gm_lang["config_lang_utility"]);
+			PrintSimpleHeader(GM_LANG_config_lang_utility);
 			$sentHeader = true;
 			print "<div class=\"center\"><center>";
 		}
-	    print "<span class=\"error\">" . $gm_lang[$error] . "</span><br /><br />";
-	    print "<form name=\"Form2\" method=\"post\" action=\"" .$SCRIPT_NAME. "\">";
+	    print "<span class=\"error\">" . constant("GM_LANG_".$error) . "</span><br /><br />";
+	    print "<form name=\"Form2\" method=\"post\" action=\"" .SCRIPT_NAME. "\">";
 	    print "<table class=\"facts_table\">";
 	    print "<tr>";
 	    print "<td class=\"facts_value\" style=\"text-align:center; \" >";
 	    srand((double)microtime()*1000000);
-	    print "<input type=\"submit\" value=\"" . $gm_lang["close_window"] . "\"" . " onclick=\"window.opener.showchanges(); self.close();\" />";
+	    print "<input type=\"submit\" value=\"" . GM_LANG_close_window . "\"" . " onclick=\"window.opener.showchanges(); self.close();\" />";
 	    print "</td>";
 	    print "</tr>";
 	    print "</table>";

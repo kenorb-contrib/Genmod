@@ -41,20 +41,20 @@ if (empty($skip2)) $skip2=array();
 $errorstring = "";
 $error = 0;
 
-PrintHeader($gm_lang["merge_records"]);
+PrintHeader(GM_LANG_merge_records);
 
 // We can auto accept the merge
 $can_auto_accept = true;
 
 //-- make sure they have accept access privileges
 if (!$gm_user->userCanAccept()) {
-	print "<span class=\"error\">".$gm_lang["access_denied"]."</span>";
+	print "<span class=\"error\">".GM_LANG_access_denied."</span>";
 	PrintFooter();
 	exit;
 }
 ?>	<!-- Setup the left box -->
 	<div id="admin_genmod_left">
-		<div class="admin_link"><a href="admin.php"><?php print $gm_lang["admin"];?></a></div>
+		<div class="admin_link"><a href="admin.php"><?php print GM_LANG_admin;?></a></div>
 	</div>
 	
 	<!-- Setup the right box -->
@@ -181,7 +181,7 @@ if ($action!="choose") {
 					$change_id = GetNewXref("CHANGE");
 					$change_type = "MERGE";
 					print "<div id=\"content\">";
-					print "<div class=\"admin_topbottombar\"><h3>".$gm_lang["merge_step3"]."</h3><br />\n";
+					print "<div class=\"admin_topbottombar\"><h3>".GM_LANG_merge_step3."</h3><br />\n";
 					print "Performing Record Merge<br /></div>\n";
 					// Delete the old record2
 					$ogedid = $GEDCOMID;
@@ -273,20 +273,20 @@ if ($action!="choose") {
 					EditFunctions::ReplaceLinks($gid2, $gid1, $mtype, $change_id, $change_type, $gedid);
 					if (isset($change_id) && $can_auto_accept &&  $gm_user->userAutoAccept()) {
 						AcceptChange($change_id, $GEDCOMID);
-						print $gm_lang["merge_success_auto"];
+						print GM_LANG_merge_success_auto;
 					}
-					else print $gm_lang["merge_success"];
+					else print GM_LANG_merge_success;
 					
 					print "<br />\n";
-					print "<div class=\"topbottombar\"><a href=\"edit_merge.php?action=choose\">".$gm_lang["merge_more"]."</a><br /></div>\n";
+					print "<div class=\"topbottombar\"><a href=\"edit_merge.php?action=choose\">".GM_LANG_merge_more."</a><br /></div>\n";
 					print "</div>\n";
 				}
 				if ($action=="select") {
 					print "<div id=\"content\">";
-					print "<div class=\"admin_topbottombar\"><h3>".$gm_lang["merge_step2"]."</h3>";
-					if (!empty($errorstring)) print "<span class=\"error\">".$gm_lang["merge_notunique"]."&nbsp;".$errorstring."</span><br />";
+					print "<div class=\"admin_topbottombar\"><h3>".GM_LANG_merge_step2."</h3>";
+					if (!empty($errorstring)) print "<span class=\"error\">".GM_LANG_merge_notunique."&nbsp;".$errorstring."</span><br />";
 					print "</div><form method=\"post\" action=\"edit_merge.php\">\n";
-					print "<div class=\"center\">".$gm_lang["merge_facts_same"]."<br /><br /></div>\n";
+					print "<div class=\"center\">".GM_LANG_merge_facts_same."<br /><br /></div>\n";
 					print "<input type=\"hidden\" name=\"gid1\" value=\"$gid1\">\n";
 					print "<input type=\"hidden\" name=\"gid2\" value=\"$gid2\">\n";
 					print "<input type=\"hidden\" name=\"ged\" value=\"$ged\">\n";
@@ -309,12 +309,12 @@ if ($action!="choose") {
 						}
 					}
 					if ($equal_count==0) {
-						print "<tr><td>".$gm_lang["no_matches_found"]."</td></tr>\n";
+						print "<tr><td>".GM_LANG_no_matches_found."</td></tr>\n";
 					}
 					print "</table><br />\n";
-					print "<div class=\"center\">".$gm_lang["unmatching_facts"]."<br /></div>\n";
+					print "<div class=\"center\">".GM_LANG_unmatching_facts."<br /></div>\n";
 					print "<table class=\"list_table wrap\" style=\"width:100%;\">\n";
-					print "<tr><td class=\"list_label\">".$gm_lang["record"]." $gid1</td><td class=\"list_label\">".$gm_lang["record"]." $gid2</td></tr>\n";
+					print "<tr><td class=\"list_label\">".GM_LANG_record." $gid1</td><td class=\"list_label\">".GM_LANG_record." $gid2</td></tr>\n";
 					print "<tr><td valign=\"top\" class=\"list_value\">\n";
 					print "<table border=\"1\">\n";
 					foreach($facts1 as $i=>$fact1) {
@@ -335,7 +335,7 @@ if ($action!="choose") {
 					print "</table>\n";
 					print "</td></tr>\n";
 					print "</table>\n";
-					print "<div class=\"center\"><input type=\"submit\"  value=\"".$gm_lang["merge_records"]."\"></div>\n";
+					print "<div class=\"center\"><input type=\"submit\"  value=\"".GM_LANG_merge_records."\"></div>\n";
 					print "</form></div>\n";
 				}
 			}
@@ -346,7 +346,7 @@ if ($action!="choose") {
 <script language="JavaScript" type="text/javascript">
 <!--
 	function reload() {
-		window.location='<?php print $SCRIPT_NAME; ?>';
+		window.location='<?php print SCRIPT_NAME; ?>';
 	}
 //-->
 </script>
@@ -385,16 +385,16 @@ if ($action=="choose") {
 	
 	<?php
 	print "<div id=\"content\">";
-		print "<div class=\"admin_topbottombar\"><h3>".$gm_lang["merge_step1"]."</h3><br />";
-			if ($error == "1") print "<span class=\"error\">".$gm_lang["same_ids"]."</span><br />";
-			if ($error == "2") print "<span class=\"error\">".$gm_lang["merge_haschanges"]."</span><br />";
-			if ($error == "3") print "<span class=\"error\">".$gm_lang["unable_to_find_record"]."</span><br />";
-			if ($error == "4") print "<span class=\"error\">".$gm_lang["merge_same"]."</span><br />";
-			print $gm_lang["select_gedcom_records"]."</div>";
+		print "<div class=\"admin_topbottombar\"><h3>".GM_LANG_merge_step1."</h3><br />";
+			if ($error == "1") print "<span class=\"error\">".GM_LANG_same_ids."</span><br />";
+			if ($error == "2") print "<span class=\"error\">".GM_LANG_merge_haschanges."</span><br />";
+			if ($error == "3") print "<span class=\"error\">".GM_LANG_unable_to_find_record."</span><br />";
+			if ($error == "4") print "<span class=\"error\">".GM_LANG_merge_same."</span><br />";
+			print GM_LANG_select_gedcom_records."</div>";
 			print "<form method=\"post\" name=\"merge\" action=\"edit_merge.php\">";
 			print "<input type=\"hidden\" name=\"action\" value=\"select\" />";
 			print "<table style=\"width:100%\">";
-				print "<tr><td class=\"shade1\">".$gm_lang["choose_gedcom"]."<br /></td>";
+				print "<tr><td class=\"shade1\">".GM_LANG_choose_gedcom."<br /></td>";
 				print "<td class=\"shade1\"><select name=\"ged\">\n";
 				if (!isset($ged) || empty($ged)) $ged = $GEDCOMID;
 				foreach($GEDCOMS as $gedc=>$gedarray) {
@@ -408,26 +408,26 @@ if ($action=="choose") {
 				print "</select>\n<br />";
 				print "</td></tr>";
 
-				print "<tr><td class=\"shade1\">".$gm_lang["merge_to"]."<br /></td>";
+				print "<tr><td class=\"shade1\">".GM_LANG_merge_to."<br /></td>";
 				print "<td class=\"shade1\"><input type=\"text\" name=\"gid1\" value=\"$gid1\" size=\"10\" tabindex=\"1\" /> ";
-				print "<a href=\"javascript:iopen_find(document.merge.gid1, document.merge.ged);\"> ".$gm_lang["find_individual"]."</a> |";
-				print " <a href=\"javascript:fopen_find(document.merge.gid1, document.merge.ged);\"> ".$gm_lang["find_familyid"]."</a> |";
-				print " <a href=\"javascript:sopen_find(document.merge.gid1, document.merge.ged);\"> ".$gm_lang["find_sourceid"]."</a> |";
-				print " <a href=\"javascript:nopen_find(document.merge.gid1, document.merge.ged);\"> ".$gm_lang["find_noteid"]."</a>";
+				print "<a href=\"javascript:iopen_find(document.merge.gid1, document.merge.ged);\"> ".GM_LANG_find_individual."</a> |";
+				print " <a href=\"javascript:fopen_find(document.merge.gid1, document.merge.ged);\"> ".GM_LANG_find_familyid."</a> |";
+				print " <a href=\"javascript:sopen_find(document.merge.gid1, document.merge.ged);\"> ".GM_LANG_find_sourceid."</a> |";
+				print " <a href=\"javascript:nopen_find(document.merge.gid1, document.merge.ged);\"> ".GM_LANG_find_noteid."</a>";
 				print_help_link("rootid_help", "qm");
 				print "</td></tr>";
 
-				print "<tr><td class=\"shade1\">".$gm_lang["merge_from"]."<br /></td>";
+				print "<tr><td class=\"shade1\">".GM_LANG_merge_from."<br /></td>";
 				print "<td class=\"shade1\"><input type=\"text\" name=\"gid2\" value=\"$gid2\" size=\"10\" tabindex=\"2\" /> ";
-				print "<a href=\"javascript:iopen_find(document.merge.gid2, document.merge.ged);\"> ".$gm_lang["find_individual"]."</a> |";
-				print " <a href=\"javascript:fopen_find(document.merge.gid2, document.merge.ged);\"> ".$gm_lang["find_familyid"]."</a> |";
-				print " <a href=\"javascript:sopen_find(document.merge.gid2, document.merge.ged);\"> ".$gm_lang["find_sourceid"]."</a> |";
-				print " <a href=\"javascript:nopen_find(document.merge.gid2, document.merge.ged);\"> ".$gm_lang["find_noteid"]."</a>";
+				print "<a href=\"javascript:iopen_find(document.merge.gid2, document.merge.ged);\"> ".GM_LANG_find_individual."</a> |";
+				print " <a href=\"javascript:fopen_find(document.merge.gid2, document.merge.ged);\"> ".GM_LANG_find_familyid."</a> |";
+				print " <a href=\"javascript:sopen_find(document.merge.gid2, document.merge.ged);\"> ".GM_LANG_find_sourceid."</a> |";
+				print " <a href=\"javascript:nopen_find(document.merge.gid2, document.merge.ged);\"> ".GM_LANG_find_noteid."</a>";
 				print_help_link("rootid_help", "qm");
 				print "</td></tr>";
 
 			print "</table>";
-			print "<div class=\"center\"><input type=\"submit\"  value=\"".$gm_lang["merge_records"]."\" /><br /></div>\n";
+			print "<div class=\"center\"><input type=\"submit\"  value=\"".GM_LANG_merge_records."\" /><br /></div>\n";
 			print "</form>\n";
 		print "</div>";
 	print "</div>";

@@ -11,7 +11,7 @@
  * The alphabet bar shows all the available letters users can click. The bar is built
  * up from the lastnames' first letter. Added to this bar is the symbol @, which is
  * shown as a translated version of the variable <var>gm_lang["NN"]</var>, and a
- * translated version of the word ALL by means of variable <var>$gm_lang["all"]</var>.
+ * translated version of the word ALL by means of variable <var>GM_LANG_all"]</var>.
  *
  * The details can be shown in two ways, with surnames or without surnames. By default
  * the user first sees a list of surnames of the chosen letter and by clicking on a
@@ -73,11 +73,11 @@ if (isset($surname)) {
 	$addheader = "(".CheckNN($surname).")";
 }
 
-PrintHeader($gm_lang["family_list"]." ".$addheader);
+PrintHeader(GM_LANG_family_list." ".$addheader);
 print "<div class =\"center\">";
 print "\n\t<h3>";
 print_help_link("name_list_help", "qm", "name_list");
-print $gm_lang["family_list"]."</h3>";
+print GM_LANG_family_list."</h3>";
 
 /**
  * Check for the @ symbol
@@ -108,7 +108,7 @@ uasort($famalpha, "stringsort");
 
 if (isset($alpha) && !isset($famalpha["$alpha"])) unset($alpha);
 
-$TableTitle = "<img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["sfamily"]["small"]."\" border=\"0\" title=\"".$gm_lang["families"]."\" alt=\"".$gm_lang["families"]."\" />&nbsp;&nbsp;";
+$TableTitle = "<img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["sfamily"]["small"]."\" border=\"0\" title=\"".GM_LANG_families."\" alt=\"".GM_LANG_families."\" />&nbsp;&nbsp;";
 
 if (count($famalpha) > 0) {
 	print_help_link("alpha_help", "qm", "alpha_index");
@@ -139,12 +139,12 @@ if (count($famalpha) > 0) {
 		if (isset($alpha) && $alpha == "@") {
 			print "<a href=\"famlist.php?alpha=@&amp;surname_sublist=".$surname_sublist."&amp;surname=@N.N.";
 			if ($allgeds == "yes") print "&amp;allgeds=yes";
-			print "\"><span class=\"warning\">".PrintReady($gm_lang["NN"])."</span></a>";
+			print "\"><span class=\"warning\">".PrintReady(GM_LANG_NN)."</span></a>";
 		}
 		else {
 			print "<a href=\"famlist.php?alpha=@&amp;surname_sublist=yes&amp;surname=@N.N.";
 			if ($allgeds == "yes") print "&amp;allgeds=yes";
-			print "\">".PrintReady($gm_lang["NN"])."</a>";
+			print "\">".PrintReady(GM_LANG_NN)."</a>";
 		}
 		/**
 		 * @ignore
@@ -156,12 +156,12 @@ if (count($famalpha) > 0) {
 		if ($show_all=="yes") {
 			print "<a href=\"famlist.php?show_all=yes&amp;surname_sublist=".$surname_sublist;
 			if ($allgeds == "yes") print "&amp;allgeds=yes";
-			print "\"><span class=\"warning\">".$gm_lang["all"]."</span></a>\n";
+			print "\"><span class=\"warning\">".GM_LANG_all."</span></a>\n";
 		}
 		else {
 			print "<a href=\"famlist.php?show_all=yes&amp;surname_sublist=".$surname_sublist;
 			if ($allgeds == "yes") print "&amp;allgeds=yes";
-			print "\">".$gm_lang["all"]."</a>\n";
+			print "\">".GM_LANG_all."</a>\n";
 		}
 	}
 	if (isset($startalpha)) $alpha = $startalpha;
@@ -181,7 +181,7 @@ if ($surname_sublist=="yes" && empty($surname)) {
 			$indi_total += $nsurname["count"];
 		}
 		uasort($surnames, "ItemSort");
-		print "<div class=\"topbar\">".$gm_lang["surnames"]."</div>\n";
+		print "<div class=\"topbar\">".GM_LANG_surnames."</div>\n";
 		PrintSurnameList($surnames, $_SERVER["SCRIPT_NAME"], $allgeds);
 	}
 }
@@ -201,14 +201,14 @@ else {
 	// NOTE: Skip surname is yes and ALL is chosen
 	if (($surname_sublist=="no")&&($show_all=="yes")) {
 		$tfamlist = GetFamList($allgeds);
-		print "<div class=\"topbar\">".$gm_lang["families"]."</div>\n";
+		print "<div class=\"topbar\">".GM_LANG_families."</div>\n";
 		PrintFamilyList($tfamlist, true, false, $allgeds);
 	}
 	else {
 		// NOTE: If user wishes to skip surname do not print the surname
 		print "<div class=\"topbar\">";
-		if ($surname_sublist == "no") print $gm_lang["surnames"];
-		else	print PrintReady(str_replace("#surname#", CheckNN($surname), $gm_lang["fams_with_surname"]));
+		if ($surname_sublist == "no") print GM_LANG_surnames;
+		else	print PrintReady(str_replace("#surname#", CheckNN($surname), GM_LANG_fams_with_surname));
 		print "</div>\n";
 		PrintFamilyList($tfamlist, true, false, $allgeds);
 	}
@@ -220,12 +220,12 @@ if ($alpha != "@") {
 	if ($surname_sublist=="yes") {
 		print "<br /><a href=\"famlist.php?alpha=$alpha&amp;surname_sublist=no&amp;show_all=".$show_all;
 		if ($allgeds == "yes") print "&amp;allgeds=yes";
-		print "\">".$gm_lang["skip_surnames"]."</a>";
+		print "\">".GM_LANG_skip_surnames."</a>";
 	}
 	else {
 		print "<br /><a href=\"famlist.php?alpha=$alpha&amp;surname_sublist=yes&amp;show_all=".$show_all;
 		if ($allgeds == "yes") print "&amp;allgeds=yes";
-		print "\">".$gm_lang["show_surnames"]."</a>";
+		print "\">".GM_LANG_show_surnames."</a>";
 	}
 }
 print "</div>";
