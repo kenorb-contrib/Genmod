@@ -26,20 +26,20 @@
  * @version $Id$
  */
 
-$GM_BLOCKS["print_block_theme_select"]["name"]      = $gm_lang["theme_select_block"];
+$GM_BLOCKS["print_block_theme_select"]["name"]      = GM_LANG_theme_select_block;
 $GM_BLOCKS["print_block_theme_select"]["descr"]     = "theme_select_descr";
 $GM_BLOCKS["print_block_theme_select"]["type"]      = "gedcom";
 $GM_BLOCKS["print_block_theme_select"]["canconfig"]	= false;
 $GM_BLOCKS["print_block_theme_select"]["rss"]       = false;
 
 function print_block_theme_select($style=0, $config="", $side, $index) {
-	global $ALLOW_USER_THEMES, $gm_lang, $gm_user, $themeformcount;
+	global $ALLOW_USER_THEMES, $gm_user, $themeformcount;
 	
 	if (GedcomConfig::$ALLOW_THEME_DROPDOWN && $ALLOW_USER_THEMES) {
 		print "<div id=\"theme_select\" class=\"block\">\n";
 		print "<div class=\"blockhc\">";
 		print_help_link("change_theme", "qm", "change_theme");
-		print $gm_lang["change_theme"];
+		print GM_LANG_change_theme;
 		print "</div>";
 		print "<div class=\"blockcontent center\">";
 	
@@ -51,7 +51,7 @@ function print_block_theme_select($style=0, $config="", $side, $index) {
 		print "<form action=\"themechange.php\" name=\"themeform$themeformcount\" method=\"post\">";
 		print "<input type=\"hidden\" name=\"frompage\" value=\"".urlencode($frompage)."\" />";
 		print "<select name=\"mytheme\" class=\"header_select\" onchange=\"document.themeform$themeformcount.submit();\">";
-		print "<option value=\"\">".$gm_lang["change_theme"]."</option>\n";
+		print "<option value=\"\">".GM_LANG_change_theme."</option>\n";
 		foreach($themes as $indexval => $themedir) {
 				print "<option value=\"".$themedir["dir"]."\"";
 				if ($gm_user->username != "") {

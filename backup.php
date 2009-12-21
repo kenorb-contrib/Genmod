@@ -50,25 +50,25 @@ if ($action == "backup") {
 
 switch ($action) {
 	case "backup" :
-		PrintHeader($gm_lang["um_backup"]);
+		PrintHeader(GM_LANG_um_backup);
 		break;
 	case "restore" :
-		PrintHeader($gm_lang["um_restore"]);
+		PrintHeader(GM_LANG_um_restore);
 		break;
 }
 ?>
 <!-- Setup the left box -->
 <div id="admin_genmod_left">
-	<div class="admin_link"><a href="admin.php"><?php print $gm_lang["admin"];?></a></div>
+	<div class="admin_link"><a href="admin.php"><?php print GM_LANG_admin;?></a></div>
 </div>
 <div id="content">
 	<?php
 	// Backup part
 	if ($action == "backup") { ?>
 		<div class="admin_topbottombar">
-			<h3> <?php print_help_link("um_bu_explain","qm","um_backup"); print $gm_lang["um_backup"];?></h3>
+			<h3> <?php print_help_link("um_bu_explain","qm","um_backup"); print GM_LANG_um_backup;?></h3>
 		</div>
-		<form action="<?php print $SCRIPT_NAME; ?>" method="post">
+		<form action="<?php print SCRIPT_NAME; ?>" method="post">
 			<input type="hidden" name="action" value="backup" />
 		<?php
 		// If first time, let the user choose the options
@@ -76,47 +76,47 @@ switch ($action) {
 			?>
 			<input type="hidden" name="step" value="2" />
 			<?php if ($nomedia) { 
-				print "<div class=\"shade2\"><br />".$gm_lang["um_nomedia"]."<br /><br /></div>";
+				print "<div class=\"shade2\"><br />".GM_LANG_um_nomedia."<br /><br /></div>";
 			}
 			?>	
 			<div class="admin_item_box">
-				<div class="width50 choice_left"><?php print $gm_lang["um_bu_config"]; ?></div>
+				<div class="width50 choice_left"><?php print GM_LANG_um_bu_config; ?></div>
 				<div class="width10 choice_right"><input type="checkbox" name="um_config" value="yes" checked="checked" /></div>
 			</div>
 			<div class="admin_item_box">
-				<div class="width50 choice_left"><?php print $gm_lang["um_bu_lang"]; ?></div>
+				<div class="width50 choice_left"><?php print GM_LANG_um_bu_lang; ?></div>
 				<div class="width10 choice_right"><input type="checkbox" name="um_lang" value="yes" checked="checked" /></div>
 			</div>
 			<div class="admin_item_box">
-				<div class="width50 choice_left"><?php print $gm_lang["um_bu_gedcoms"]; ?></div>
+				<div class="width50 choice_left"><?php print GM_LANG_um_bu_gedcoms; ?></div>
 				<div class="width10 choice_right"><input type="checkbox" name="um_gedcoms" value="yes" checked="checked" /></div>
 			</div>
 			<div class="admin_item_box">
-				<div class="width50 choice_left"><?php print $gm_lang["um_bu_media"]; ?></div>
+				<div class="width50 choice_left"><?php print GM_LANG_um_bu_media; ?></div>
 				<div class="width10 choice_right"><input type="checkbox" name="um_media" value="yes" <?php if ($nomedia) { ?> disabled="disabled" <?php } else { ?> checked="checked" <?php } ?>  /></div>
 			</div>
 			<div class="admin_item_box">
-				<div class="width50 choice_left"><?php print $gm_lang["um_bu_gedsets"]; ?></div>
+				<div class="width50 choice_left"><?php print GM_LANG_um_bu_gedsets; ?></div>
 				<div class="width10 choice_right"><input type="checkbox" name="um_gedsets" value="yes" checked="checked" /></div>
 			</div>
 			<div class="admin_item_box">
-				<div class="width50 choice_left"><?php print $gm_lang["um_bu_logs"]; ?></div>
+				<div class="width50 choice_left"><?php print GM_LANG_um_bu_logs; ?></div>
 				<div class="width10 choice_right"><input type="checkbox" name="um_logs" value="yes" checked="checked" /></div>
 			</div>
 			<div class="admin_item_box">
-				<div class="width50 choice_left"><?php print $gm_lang["um_bu_usinfo"]; ?></div>
+				<div class="width50 choice_left"><?php print GM_LANG_um_bu_usinfo; ?></div>
 				<div class="width10 choice_right"><input type="checkbox" name="um_usinfo" value="yes" checked="checked" /></div>
 			</div>
 			<div class="admin_item_box">
-				<div class="width50 choice_left"><?php print $gm_lang["um_bu_mypages"]; ?></div>
+				<div class="width50 choice_left"><?php print GM_LANG_um_bu_mypages; ?></div>
 				<div class="width10 choice_right"><input type="checkbox" name="um_mypages" value="yes" checked="checked" /></div>
 			</div>
 			<div class="admin_item_box">
-				<div class="width50 choice_left"><?php print $gm_lang["um_bu_actions"]; ?></div>
+				<div class="width50 choice_left"><?php print GM_LANG_um_bu_actions; ?></div>
 				<div class="width10 choice_right"><input type="checkbox" name="um_actions" value="yes" checked="checked" /></div>
 			</div>
 			<div class="admin_item_box center"><br />
-				<input type="submit" name="submit" value="<?php print $gm_lang["um_mk_bu"]; ?>" />
+				<input type="submit" name="submit" value="<?php print GM_LANG_um_mk_bu; ?>" />
 			</div>
 		</form>
 		<?php
@@ -142,9 +142,9 @@ switch ($action) {
 				foreach ($flist as $key => $mfile) {
 					MediaFS::CreateFile(RelativePathFile(GedcomConfig::$MEDIA_DIRECTORY.MediaFS::CheckMediaDepth($mfile)));
 				}
-				print "<div class=\"shade2\"><br />".$gm_lang["um_mediaexp"]."<br /></div>";
+				print "<div class=\"shade2\"><br />".GM_LANG_um_mediaexp."<br /></div>";
 				print "<div class=\"admin_item_box center\">";
-				print "<input type=\"submit\" name=\"submit\" value=\"".$gm_lang["um_proceed_bu"]."\" />";
+				print "<input type=\"submit\" name=\"submit\" value=\"".GM_LANG_um_proceed_bu."\" />";
 				print "</div>";
 				print "</form>";
 				PrintFooter();
@@ -229,7 +229,7 @@ switch ($action) {
 				
 				// Backup user information
 				if (isset($_POST["um_usinfo"])) {
-					$tables = array("users", "users_gedcoms", "news", "messages", "blocks", "favorites");
+					$tables = array("users", "users_gedcoms", "news", "messages", "blocks", "favorites", "faqs");
 					$fn = AdminFunctions::ExportTable($tables, "yes", "users");
 					if (!empty($fn)) $flist = array_merge($fn, $flist);
 				}
@@ -243,7 +243,7 @@ switch ($action) {
 				// Make the zip
 				?>
 				<div class="shade2 center">
-					<?php print $gm_lang["um_results"]; ?>
+					<?php print GM_LANG_um_results; ?>
 				</div>
 				<?php
 				if (count($flist) > 0) {
@@ -256,10 +256,10 @@ switch ($action) {
 					print "<div class=\"shade1\"><br />";
 					if ($v_list == 0) print "Error : ".$archive->errorInfo(true)."</div>";
 					else {
-						print $gm_lang["um_zip_succ"]."</div>";
+						print GM_LANG_um_zip_succ."</div>";
 						$url = SERVER_URL;
 						if (substr($url,-1,1)!="/") $url .= "/";
-						print "<div class=\"shade1\"><a href=".$url."downloadbackup.php?fname=".urlencode($fname)." target=_blank>".$gm_lang["um_zip_dl"]." ".$fname."</a>  (";
+						print "<div class=\"shade1\"><a href=".$url."downloadbackup.php?fname=".urlencode($fname)." target=_blank>".GM_LANG_um_zip_dl." ".$fname."</a>  (";
 						printf("%.0f Kb", (filesize($fname)/1024));
 						print")<br /></div>";
 					}
@@ -269,7 +269,7 @@ switch ($action) {
 						if (substr($fn, strlen(INDEX_DIRECTORY), 7) == "export_") unlink($fn);
 					}
 				}
-				else print "<div class=\"shade2\"><br />".$gm_lang["um_nofiles"]."<br /></div>";
+				else print "<div class=\"shade2\"><br />".GM_LANG_um_nofiles."<br /></div>";
 			}
 			
 			@set_time_limit($time_limit);
@@ -278,7 +278,7 @@ switch ($action) {
 	
 	if ($action == "restore") { ?>
 		<div class="admin_topbottombar">
-			<h3><?php print $gm_lang["um_restore"]; ?></h3>
+			<h3><?php print GM_LANG_um_restore; ?></h3>
 		</div>
 		<?php
 		// If first time, let the user choose the options
@@ -294,65 +294,65 @@ switch ($action) {
 			else $nofiles = false;
 			?>
 			
-			<form action="<?php print $SCRIPT_NAME; ?>" method="post">
+			<form action="<?php print SCRIPT_NAME; ?>" method="post">
 				<input type="hidden" name="action" value="restore" />
 				<?php 
 				if(in_array("export_config.sql", $files)) { ?>
 					<div class="admin_item_box">
-						<div class="width50 choice_left"><?php print $gm_lang["um_res_config"]; ?></div>
+						<div class="width50 choice_left"><?php print GM_LANG_um_res_config; ?></div>
 						<div class="width10 choice_right"><input type="checkbox" name="um_config" value="yes" /></div>
 					</div>
 				<?php }
 				if(in_array("export_lang_settings.sql", $files)) { ?>
 					<div class="admin_item_box">
-						<div class="width50 choice_left"><?php print $gm_lang["um_res_lang"]; ?></div>
+						<div class="width50 choice_left"><?php print GM_LANG_um_res_lang; ?></div>
 						<div class="width10 choice_right"><input type="checkbox" name="um_lang" value="yes" /></div>
 					</div>
 				<?php }
 				if(in_array("export_changes.sql", $files)) { ?>
 					<div class="admin_item_box">
-						<div class="width50 choice_left"><?php print $gm_lang["um_res_changes"]; ?></div>
+						<div class="width50 choice_left"><?php print GM_LANG_um_res_changes; ?></div>
 						<div class="width10 choice_right"><input type="checkbox" name="um_changes" value="yes" /></div>
 					</div>
 				<?php }
 				if(in_array("export_gedcomsettings.sql", $files)) { ?>
 					<div class="admin_item_box">
-						<div class="width50 choice_left"><?php print $gm_lang["um_res_gedsets"]; ?></div>
+						<div class="width50 choice_left"><?php print GM_LANG_um_res_gedsets; ?></div>
 						<div class="width10 choice_right"><input type="checkbox" name="um_gedsets" value="yes" /></div>
 					</div>
 				<?php }
 				if(in_array("export_log.sql", $files)) { ?>
 					<div class="admin_item_box">
-						<div class="width50 choice_left"><?php print $gm_lang["um_res_logs"]; ?></div>
+						<div class="width50 choice_left"><?php print GM_LANG_um_res_logs; ?></div>
 						<div class="width10 choice_right"><input type="checkbox" name="um_logs" value="yes" /></div>
 					</div>
 				<?php }
 				if(in_array("export_users.sql", $files)) { ?>
 					<div class="admin_item_box">
-						<div class="width50 choice_left"><?php print $gm_lang["um_res_usinfo"]; ?></div>
+						<div class="width50 choice_left"><?php print GM_LANG_um_res_usinfo; ?></div>
 						<div class="width10 choice_right"><input type="checkbox" name="um_usinfo" value="yes" /></div>
 					</div>
 				<?php }
 				if(in_array("export_mypages.sql", $files)) { ?>
 					<div class="admin_item_box">
-						<div class="width50 choice_left"><?php print $gm_lang["um_res_mypages"]; ?></div>
+						<div class="width50 choice_left"><?php print GM_LANG_um_res_mypages; ?></div>
 						<div class="width10 choice_right"><input type="checkbox" name="um_mypages" value="yes" /></div>
 					</div>
 				<?php }
 				if(in_array("export_actions.sql", $files)) { ?>
 					<div class="admin_item_box">
-						<div class="width50 choice_left"><?php print $gm_lang["um_res_actions"]; ?></div>
+						<div class="width50 choice_left"><?php print GM_LANG_um_res_actions; ?></div>
 						<div class="width10 choice_right"><input type="checkbox" name="um_actions" value="yes" /></div>
 					</div>
 				<?php }
 				if ($nofiles) { ?>
 					<div class="admin_item_box">
-						<?php print $gm_lang["um_res_nofiles"]; ?>
+						<?php print GM_LANG_um_res_nofiles; ?>
 					</div>
 				<?php }
 				else { ?>
 					<div class="admin_item_box center"><br />
-						<input type="submit" name="submit" value="<?php print $gm_lang["um_mk_res"]; ?>" />
+						<input type="submit" name="submit" value="<?php print GM_LANG_um_mk_res; ?>" />
 					</div>
 				<?php } ?>
 			</form>
@@ -446,11 +446,11 @@ switch ($action) {
 			// Print the result report
 			?>
 			<div class="shade2 center">
-				<?php print $gm_lang["um_results"]; ?>
+				<?php print GM_LANG_um_results; ?>
 			</div>
 			<div class="shade1">
-				<?php if ($error) print "<a href=\"javascript: ".$gm_lang["view_syslog"]."\" onclick=\"window.open('viewlog.php?cat=S&amp;max=20&amp;type=E', '', 'top=50,left=10,width=700,height=600,scrollbars=1,resizable=1'); return false;\">".$gm_lang["um_res_errors"]."</a>";
-				else print $gm_lang["um_res_success"];
+				<?php if ($error) print "<a href=\"javascript: ".GM_LANG_view_syslog."\" onclick=\"window.open('viewlog.php?cat=S&amp;max=20&amp;type=E', '', 'top=50,left=10,width=700,height=600,scrollbars=1,resizable=1'); return false;\">".GM_LANG_um_res_errors."</a>";
+				else print GM_LANG_um_res_success;
 				?>
 			</div>
 			<?php

@@ -26,7 +26,7 @@
  * @version $Id$
  */
 
-$GM_BLOCKS["print_logged_in_users"]["name"]        	= $gm_lang["logged_in_users_block"];
+$GM_BLOCKS["print_logged_in_users"]["name"]        	= GM_LANG_logged_in_users_block;
 $GM_BLOCKS["print_logged_in_users"]["descr"]        = "logged_in_users_descr";
 $GM_BLOCKS["print_logged_in_users"]["canconfig"]	= false;
 $GM_BLOCKS["print_logged_in_users"]["rss"]     		= false;
@@ -42,7 +42,7 @@ $GM_BLOCKS["print_logged_in_users"]["rss"]     		= false;
  * prints a list of other users who are logged in
  */
 function print_logged_in_users($block=true, $config="", $side, $index) {
-		global $gm_lang, $GM_SESSION_TIME, $TEXT_DIRECTION, $NAME_REVERSE, $gm_user;
+		global $GM_SESSION_TIME, $TEXT_DIRECTION, $NAME_REVERSE, $gm_user;
 		
 		$block = true;			// Always restrict this block's height
 		
@@ -60,25 +60,27 @@ function print_logged_in_users($block=true, $config="", $side, $index) {
 		print "<div id=\"logged_in_users\" class=\"block\">\n";
 		print "<div class=\"blockhc\">";
 		print_help_link("index_loggedin_help", "qm", "users_logged_in");
-		print $gm_lang["users_logged_in"];
+		print GM_LANG_users_logged_in;
 		print "</div>";
 		print "<div class=\"blockcontent\">";
 		if ($block) print "<div class=\"small_inner_block\">\n";
 		$LoginUsers = count($loggedusers);
 		if (($LoginUsers == 0) and ($NumAnonymous == 0)) {
-			print "<b>".$gm_lang["no_login_users"]."</b>";
+			print "<b>".GM_LANG_no_login_users."</b>";
 		}
 		$Advisory = "anon_user";
 		if ($NumAnonymous > 1) $Advisory .= "s";
 		
 		if ($NumAnonymous > 0) {
-			$gm_lang["global_num1"] = $NumAnonymous;	// Make it visible
+			// Anonymous = 1
+			define("GM_LANG_global_num1", $NumAnonymous);	// Make it visible
 			print "<b>".print_text($Advisory,0,1)."</b>";
 		}
 		$Advisory = "login_user";
 		if ($LoginUsers > 1) $Advisory .= "s";
 		if ($LoginUsers > 0) {
-			$gm_lang["global_num1"] = $LoginUsers;		// Make it visible
+			// Logged_in = 2
+			define("GM_LANG_global_num2", $LoginUsers);		// Make it visible
 			print "<b>".print_text($Advisory,0,1)."</b>";
 		}
 		if (count($loggedusers) > 0) print "<table width=\"90%\">";
@@ -88,7 +90,7 @@ function print_logged_in_users($block=true, $config="", $side, $index) {
 			else print PrintReady($user->firstname." ".$user->lastname);
 			print " - ".$user->username;
 			if (($gm_user->username != $user->username) and ($user->contactmethod != "none")) {
-				print "<br /><a href=\"#\" onclick=\"return message('".$user->username."');\">".$gm_lang["message"]."</a>";
+				print "<br /><a href=\"#\" onclick=\"return message('".$user->username."');\">".GM_LANG_message."</a>";
 			}
 			print "</td></tr>";
 		}

@@ -42,24 +42,24 @@ $output = "";
 switch ($action) {
 	case "loadenglish" :
 		if (StoreEnglish()) {
-               WriteToLog("AdminMaint-> ".$gm_lang["all_loaded"]);
-               $message = $gm_lang["all_loaded"];
+               WriteToLog("AdminMaint-> ".GM_LANG_all_loaded);
+               $message = GM_LANG_all_loaded;
           }
           else {
                LoadEnglish();
                LoadEnglishFacts();
-               WriteToLog("AdminMaint-> ".$gm_lang["all_not_loaded"], "E", "S");
-               $message = "<span class=\"error\">".$gm_lang["all_not_loaded"]."</span>";
+               WriteToLog("AdminMaint-> ".GM_LANG_all_not_loaded, "E", "S");
+               $message = "<span class=\"error\">".GM_LANG_all_not_loaded."</span>";
 		}
 		break;
 	case "reports": 
 		$files = GetReportList(true);
-		if ($files) $message = $gm_lang["report_titles_generated"];
-		else $message = "<span class=\"error\">".$gm_lang["report_titles_not_generated"]."</span>";
+		if ($files) $message = GM_LANG_report_titles_generated;
+		else $message = "<span class=\"error\">".GM_LANG_report_titles_not_generated."</span>";
 		break;
 	case "resetisdead": 
-		if (ResetIsDead()) $message = $gm_lang["isdead_reset"];
-		else $message = "<span class=\"error\">".$gm_lang["isdead_not_reset"]."</span>";
+		if (ResetIsDead()) $message = GM_LANG_isdead_reset;
+		else $message = "<span class=\"error\">".GM_LANG_isdead_not_reset."</span>";
 		break;
 	case "buildisdead":
 		$sql = "SELECT i_id, i_gedrec, i_file, i_isdead FROM ".TBLPREFIX."individuals WHERE i_isdead=-1 AND i_file='".$GEDCOMID."'";
@@ -71,23 +71,23 @@ switch ($action) {
 		break;
 	case "dispdbsettings":
 		$url = "http://".$_SERVER["SERVER_NAME"]."/";
-		$message = $gm_lang["disp_db_settings"];
-		$output = $gm_lang["DBHOST"].": ".DBHOST."<br />";
-		$output .= $gm_lang["DBUSER"].": ".DBUSER."<br />";
-		$output .= $gm_lang["DBNAME"].": ".DBNAME."<br />";
-		$output .= $gm_lang["TBLPREFIX"].": ".TBLPREFIX."<br />";
-		$output .= $gm_lang["DBPERSIST"].": ".DBPERSIST;
+		$message = GM_LANG_disp_db_settings;
+		$output = GM_LANG_DBHOST.": ".DBHOST."<br />";
+		$output .= GM_LANG_DBUSER.": ".DBUSER."<br />";
+		$output .= GM_LANG_DBNAME.": ".DBNAME."<br />";
+		$output .= GM_LANG_TBLPREFIX.": ".TBLPREFIX."<br />";
+		$output .= GM_LANG_DBPERSIST.": ".DBPERSIST;
 		break;
 	case "resetcaches":
 		GedcomConfig::ResetCaches();
-		$message = $gm_lang["reset_caches_ok"];
+		$message = GM_LANG_reset_caches_ok;
 		break;
 	default:
 		$message = "";
 		break;
 }
 
-PrintHeader($gm_lang["administration_maintenance"]);
+PrintHeader(GM_LANG_administration_maintenance);
 $err_write = AdminFunctions::FileIsWriteable("config.php");
 
 $users = UserController::GetUsers();
@@ -105,7 +105,7 @@ foreach($users as $indexval => $user) {
 ?>
 <!-- Setup the left box -->
 <div id="admin_genmod_left">
-	<div class="admin_link"><a href="admin.php"><?php print $gm_lang["admin"];?></a></div>
+	<div class="admin_link"><a href="admin.php"><?php print GM_LANG_admin;?></a></div>
 </div>
 	
 <!-- Setup the right box -->
@@ -115,19 +115,19 @@ foreach($users as $indexval => $user) {
 <!-- Setup the middle box -->
 <div id="content">
 	<div class="admin_topbottombar">
-		<?php print "<h3>".$gm_lang["administration_maintenance"]."</h3>"; ?>
+		<?php print "<h3>".GM_LANG_administration_maintenance."</h3>"; ?>
 	</div>
 	<div class="admin_item_box">
-		<div class="admin_item_left"><div class="helpicon"><?php print_help_link("help_sanity.php", "qm", "sc_sanity_check"); ?></div><div class="description"><a href="sanity.php"><?php print $gm_lang["sc_sanity_check"];?></a></div></div>
-		<div class="admin_item_right"><div class="helpicon"><?php print_help_link("restart_setup_help", "qm", "restart_setup"); ?></div><div class="description"><a href="install/install.php"><?php print $gm_lang["restart_setup"];?></a></div></div>
-		<div class="admin_item_left"><div class="helpicon"><?php print_help_link("load_english_help", "qm", "load_english"); ?></div><div class="description"><a href="admin_maint.php?action=loadenglish"><?php print $gm_lang["load_all_langs"];?></a></div></div>
-		<div class="admin_item_right"><div class="helpicon"><?php print_help_link("reset_isdead_help", "qm", "reset_isdead"); ?></div><div class="description"><a href="admin_maint.php?action=resetisdead"><?php print $gm_lang["reset_isdead"];?></a></div></div>
-		<div class="admin_item_left"><div class="helpicon"><?php print_help_link("generate_report_title_help", "qm", "generate_report_title"); ?></div><div class="description"><a href="admin_maint.php?action=reports"><?php print $gm_lang["generate_report_title"];?></a></div></div>
-		<div class="admin_item_right"><div class="helpicon"><?php print_help_link("build_isdead", "qm", "build_isdead"); ?></div><div class="description"><a href="admin_maint.php?action=buildisdead"><?php print $gm_lang["build_isdead"];?></a></div></div>
-		<div class="admin_item_left"><div class="helpicon"><?php print_help_link("reset_caches_help", "qm", "reset_caches"); ?></div><div class="description"><a href="admin_maint.php?action=resetcaches"><?php print $gm_lang["reset_caches"];?></a></div></div>
-		<div class="admin_item_right"><div class="helpicon"><?php print_help_link("disp_db_settings_help", "qm", "disp_db_settings"); ?></div><div class="description"><a href="admin_maint.php?action=dispdbsettings"><?php print $gm_lang["disp_db_settings"];?></a></div></div>
-		<div class="admin_item_left"><div class="helpicon"><?php print_help_link("config_maint_help", "qm", "config_maint"); ?></div><div class="description"><a href="config_maint.php"><?php print $gm_lang["config_maint"];?></a></div></div>
-		<div class="admin_item_right"><div class="helpicon"><?php print_help_link("lockout_maint_help", "qm", "lockout_maint"); ?></div><div class="description"><a href="lockout_maint.php"><?php print $gm_lang["lockout_maint"];?></a></div></div>
+		<div class="admin_item_left"><div class="helpicon"><?php print_help_link("help_sanity.php", "qm", "sc_sanity_check"); ?></div><div class="description"><a href="sanity.php"><?php print GM_LANG_sc_sanity_check;?></a></div></div>
+		<div class="admin_item_right"><div class="helpicon"><?php print_help_link("restart_setup_help", "qm", "restart_setup"); ?></div><div class="description"><a href="install/install.php"><?php print GM_LANG_restart_setup;?></a></div></div>
+		<div class="admin_item_left"><div class="helpicon"><?php print_help_link("load_english_help", "qm", "load_english"); ?></div><div class="description"><a href="admin_maint.php?action=loadenglish"><?php print GM_LANG_load_all_langs;?></a></div></div>
+		<div class="admin_item_right"><div class="helpicon"><?php print_help_link("reset_isdead_help", "qm", "reset_isdead"); ?></div><div class="description"><a href="admin_maint.php?action=resetisdead"><?php print GM_LANG_reset_isdead;?></a></div></div>
+		<div class="admin_item_left"><div class="helpicon"><?php print_help_link("generate_report_title_help", "qm", "generate_report_title"); ?></div><div class="description"><a href="admin_maint.php?action=reports"><?php print GM_LANG_generate_report_title;?></a></div></div>
+		<div class="admin_item_right"><div class="helpicon"><?php print_help_link("build_isdead", "qm", "build_isdead"); ?></div><div class="description"><a href="admin_maint.php?action=buildisdead"><?php print GM_LANG_build_isdead;?></a></div></div>
+		<div class="admin_item_left"><div class="helpicon"><?php print_help_link("reset_caches_help", "qm", "reset_caches"); ?></div><div class="description"><a href="admin_maint.php?action=resetcaches"><?php print GM_LANG_reset_caches;?></a></div></div>
+		<div class="admin_item_right"><div class="helpicon"><?php print_help_link("disp_db_settings_help", "qm", "disp_db_settings"); ?></div><div class="description"><a href="admin_maint.php?action=dispdbsettings"><?php print GM_LANG_disp_db_settings;?></a></div></div>
+		<div class="admin_item_left"><div class="helpicon"><?php print_help_link("config_maint_help", "qm", "config_maint"); ?></div><div class="description"><a href="config_maint.php"><?php print GM_LANG_config_maint;?></a></div></div>
+		<div class="admin_item_right"><div class="helpicon"><?php print_help_link("lockout_maint_help", "qm", "lockout_maint"); ?></div><div class="description"><a href="lockout_maint.php"><?php print GM_LANG_lockout_maint;?></a></div></div>
 	</div>
 	<?php
 	if ($message != "") {

@@ -26,7 +26,7 @@
  * @subpackage Blocks
  */
 
-$GM_BLOCKS["print_gedcom_news"]["name"]        	= $gm_lang["gedcom_news_block"];
+$GM_BLOCKS["print_gedcom_news"]["name"]        	= GM_LANG_gedcom_news_block;
 $GM_BLOCKS["print_gedcom_news"]["descr"]        = "gedcom_news_descr";
 $GM_BLOCKS["print_gedcom_news"]["type"]        	= "gedcom";
 $GM_BLOCKS["print_gedcom_news"]["canconfig"]   	= false;
@@ -38,20 +38,20 @@ $GM_BLOCKS["print_gedcom_news"]["rss"]			= true;
  * @todo Add an allowed HTML translation
  */
 function print_gedcom_news($block = true, $config="", $side, $index) {
-	global $gm_lang, $GM_IMAGES, $TEXT_DIRECTION, $GEDCOMID, $command, $TIME_FORMAT, $gm_user;
+	global $GM_IMAGES, $TEXT_DIRECTION, $GEDCOMID, $command, $TIME_FORMAT, $gm_user;
 
 	$usernews = NewsController::getUserNews($GEDCOMID);
 	print "<div id=\"gedcom_news\" class=\"block\">\n";
 	print "<div class=\"blockhc\">";
 	if ($gm_user->userGedcomAdmin()) print_help_link("index_gedcom_news_ahelp", "qm_ah");
 	else print_help_link("index_gedcom_news_help", "qm", "gedcom_news");
-	print $gm_lang["gedcom_news"];
+	print GM_LANG_gedcom_news;
 	print "</div>";
 	print "<div class=\"blockcontent\">";
 
 	if ($block) print "<div class=\"small_inner_block, $TEXT_DIRECTION\">\n";
 	if (count($usernews)==0) {
-		print $gm_lang["no_news"];
+		print GM_LANG_no_news;
 		print "<br />";
 	}
 	foreach($usernews as $key => $news) {
@@ -70,13 +70,13 @@ function print_gedcom_news($block = true, $config="", $side, $index) {
 		print PrintReady($news->text)."<br />\n";
 		if ($gm_user->userGedcomAdmin()) {
 			print "<hr size=\"1\" />";
-			print "<a href=\"#\" onclick=\"editnews('".$news->id."'); return false;\">".$gm_lang["edit"]."</a> | ";
-			print "<a href=\"index.php?action=deletenews&amp;news_id=".$news->id."&amp;command=$command\" onclick=\"return confirm('".$gm_lang["confirm_news_delete"]."');\">".$gm_lang["delete"]."</a><br />";
+			print "<a href=\"#\" onclick=\"editnews('".$news->id."'); return false;\">".GM_LANG_edit."</a> | ";
+			print "<a href=\"index.php?action=deletenews&amp;news_id=".$news->id."&amp;command=$command\" onclick=\"return confirm('".GM_LANG_confirm_news_delete."');\">".GM_LANG_delete."</a><br />";
 		}
 		print "</div>\n";
 	}
 	if ($block) print "</div>\n";
-	if ($gm_user->userGedcomAdmin()) print "<a href=\"#\" onclick=\"addnews('".$GEDCOMID."'); return false;\">".$gm_lang["add_news"]."</a>\n";
+	if ($gm_user->userGedcomAdmin()) print "<a href=\"#\" onclick=\"addnews('".$GEDCOMID."'); return false;\">".GM_LANG_add_news."</a>\n";
 	print "</div>\n";
 	print "</div>";
 }

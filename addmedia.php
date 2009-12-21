@@ -34,11 +34,11 @@
 */
 require("config.php");
 
-PrintSimpleHeader($gm_lang["add_media_tool"]);
+PrintSimpleHeader(GM_LANG_add_media_tool);
 
 //-- only allow users with edit privileges to access script.
 if (!$gm_user->userGedcomAdmin()) {
-	print $gm_lang["access_denied"];
+	print GM_LANG_access_denied;
 	PrintSimpleFooter();
 	exit;
 }
@@ -97,7 +97,7 @@ if ($action=="newentry") {
 	$result = MediaFS::UploadFiles($_FILES, $folder);
 	
 	if ($result["errno"] != 0) {
-		print "<span class=\"error\">".$gm_lang["upload_error"]."<br />".$result["error"]."</span><br />";
+		print "<span class=\"error\">".GM_LANG_upload_error."<br />".$result["error"]."</span><br />";
 	}
 	else {
 		$filename = $result["filename"];
@@ -135,22 +135,22 @@ if ($action=="newentry") {
 				AcceptChange($change_id, $GEDCOMID);
 			}
 			
-			print $gm_lang["update_successful"];
+			print GM_LANG_update_successful;
 		}
 		else {
 			$xref = $dm;
-			print "<br /><br /><span class=\"error\">".$gm_lang["no_double_media"]."</span>";
+			print "<br /><br /><span class=\"error\">".GM_LANG_no_double_media."</span>";
 		}
 		if ($paste) {
 			if (GedcomConfig::$EDIT_AUTOCLOSE) print "\n<script type=\"text/javascript\">\n<!--\nopenerpasteid('$xref');\n//-->\n</script>";
-			else print "<br /><br /><a href=\"javascript:// OBJE $xref\" onclick=\"openerpasteid('$xref'); return false;\">".$gm_lang["paste_mm_id_into_field"]." <b>$xref</b></a>\n";
+			else print "<br /><br /><a href=\"javascript:// OBJE $xref\" onclick=\"openerpasteid('$xref'); return false;\">".GM_LANG_paste_mm_id_into_field." <b>$xref</b></a>\n";
 		}
 		if (GedcomConfig::$EDIT_AUTOCLOSE) print "\n<script type=\"text/javascript\">\n<!--\nwindow.close();\n//-->\n</script>";
 	}
 }
 
 print "<br />";
-print "<div class=\"center\"><a href=\"#\" onclick=\"if (window.opener.showchanges) window.opener.showchanges(); window.close();\">".$gm_lang["close_window"]."</a></div>\n";
+print "<div class=\"center\"><a href=\"#\" onclick=\"if (window.opener.showchanges) window.opener.showchanges(); window.close();\">".GM_LANG_close_window."</a></div>\n";
 print "<br />";
 PrintSimpleFooter();
 ?>

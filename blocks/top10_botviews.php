@@ -26,14 +26,14 @@
  * @subpackage Blocks
  */
 
-$GM_BLOCKS["top10_botviews"]["name"]        = $gm_lang["top10_botviews"];
+$GM_BLOCKS["top10_botviews"]["name"]        = GM_LANG_top10_botviews;
 $GM_BLOCKS["top10_botviews"]["descr"]       = "top10_pageviews_descr";
 $GM_BLOCKS["top10_botviews"]["canconfig"]	= true;
 $GM_BLOCKS["top10_botviews"]["config"] 		= array("num"=>10, "count_placement"=>"left");
 $GM_BLOCKS["top10_botviews"]["rss"]       	= false;
 
 function top10_botviews($block=true, $config="", $side, $index) {
-	global $gm_lang, $GEDCOMID, $GM_BLOCKS, $command, $GM_IMAGES, $gm_user;
+	global $GEDCOMID, $GM_BLOCKS, $command, $GM_IMAGES, $gm_user;
 
 	// This block is only for admins
 	if (!$gm_user->userGedcomAdmin()) return;
@@ -53,10 +53,10 @@ function top10_botviews($block=true, $config="", $side, $index) {
 			print "<div id=\"top10\" class=\"block\">\n";
 			print "<div class=\"blockhc\">";
 			print_help_link("index_top10_pageviews_help", "qm");
-			print $gm_lang["top10_botviews"];
+			print GM_LANG_top10_botviews;
 			print "</div>";
 			print "<div class=\"blockcontent\">\n";
-			print "<span class=\"error\">\n".$gm_lang["top10_pageviews_msg"]."</span>\n";
+			print "<span class=\"error\">\n".GM_LANG_top10_pageviews_msg."</span>\n";
 			print "</div>";
 			print "</div>\n";
 		}
@@ -71,11 +71,11 @@ function top10_botviews($block=true, $config="", $side, $index) {
 		if ((($command=="gedcom")&&($gm_user->userGedcomAdmin())) || (($command=="user")&&($gm_user->username != ""))) {
 			if ($command=="gedcom") $name = preg_replace("/'/", "\'", get_gedcom_from_id($GEDCOMID));
 			else $name = $gm_user->username;
-			print "<a href=\"javascript: ".$gm_lang["config_block"]."\" onclick=\"window.open('index_edit.php?name=$name&amp;command=$command&amp;action=configure&amp;side=$side&amp;index=$index', '', 'top=50,left=50,width=500,height=250,scrollbars=1,resizable=1'); return false;\">";
-			print "<img class=\"adminicon\" src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["admin"]["small"]."\" width=\"15\" height=\"15\" border=\"0\" alt=\"".$gm_lang["config_block"]."\" /></a>\n";
+			print "<a href=\"javascript: ".GM_LANG_config_block."\" onclick=\"window.open('index_edit.php?name=$name&amp;command=$command&amp;action=configure&amp;side=$side&amp;index=$index', '', 'top=50,left=50,width=500,height=250,scrollbars=1,resizable=1'); return false;\">";
+			print "<img class=\"adminicon\" src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["admin"]["small"]."\" width=\"15\" height=\"15\" border=\"0\" alt=\"".GM_LANG_config_block."\" /></a>\n";
 		}
 	}
-	print "<b>".$gm_lang["top10_botviews"]."</b>";
+	print "<b>".GM_LANG_top10_botviews."</b>";
 	print "</div>";
 	print "<div class=\"blockcontent\">\n";
 	if ($block) print "<div class=\"small_inner_block\">\n";
@@ -86,15 +86,15 @@ function top10_botviews($block=true, $config="", $side, $index) {
 }
 
 function top10_botviews_config($config) {
-	global $gm_lang, $GM_BLOCKS, $TEXT_DIRECTION;
+	global $GM_BLOCKS, $TEXT_DIRECTION;
 	
 	if (empty($config)) $config = $GM_BLOCKS["top10_botviews"]["config"];
 	?>
 	<table class="facts_table <?php print $TEXT_DIRECTION; ?>">
-	<tr><td class="shade2"><?php print $gm_lang["num_to_show"]; ?></td><td class="shade1"><input type="text" name="num" size="2" value="<?php print $config["num"]; ?>" /></td></tr>
-	<tr><td class="shade2"><?php print $gm_lang["before_or_after"];?></td><td class="shade1"><select name="count_placement">
-		<option value="left"<?php if ($config["count_placement"]=="left") print " selected=\"selected\"";?>><?php print $gm_lang["before"]; ?></option>
-		<option value="right"<?php if ($config["count_placement"]=="right") print " selected=\"selected\"";?>><?php print $gm_lang["after"]; ?></option>
+	<tr><td class="shade2"><?php print GM_LANG_num_to_show; ?></td><td class="shade1"><input type="text" name="num" size="2" value="<?php print $config["num"]; ?>" /></td></tr>
+	<tr><td class="shade2"><?php print GM_LANG_before_or_after;?></td><td class="shade1"><select name="count_placement">
+		<option value="left"<?php if ($config["count_placement"]=="left") print " selected=\"selected\"";?>><?php print GM_LANG_before; ?></option>
+		<option value="right"<?php if ($config["count_placement"]=="right") print " selected=\"selected\"";?>><?php print GM_LANG_after; ?></option>
 	</select>
 	</td></tr>
 	<?php
