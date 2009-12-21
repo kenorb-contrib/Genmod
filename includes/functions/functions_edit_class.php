@@ -215,7 +215,7 @@ abstract class EditFunctions {
 	//-------------------------------------------- check_gedcom
 	//-- this function will check a GEDCOM record for valid gedcom format
 	public function CheckGedcom($gedrec, $chan=true, $user="", $tstamp="") {
-		global $gm_lang, $GEDCOMID, $gm_user;
+		global $GEDCOMID, $gm_user;
 	
 		$gedrec = stripslashes($gedrec);
 		$ct = preg_match("/0 @(.*)@ (.*)/", $gedrec, $match);
@@ -270,7 +270,7 @@ abstract class EditFunctions {
 	 * @param string $famtag		how the new person is added to the family
 	 */
 	public function PrintIndiForm($nextaction, $famid, $linenum="", $namerec="", $famtag="CHIL") {
-		global $gm_lang, $pid, $GM_IMAGES, $monthtonum;
+		global $pid, $GM_IMAGES, $monthtonum;
 		global $NPFX_accept, $SPFX_accept, $NSFX_accept, $FILE_FORM_accept, $change_type;
 		global $GEDCOMID, $gm_user;
 	
@@ -418,9 +418,9 @@ abstract class EditFunctions {
 			self::PrintAddLayer("OBJE", 1);
 			self::PrintAddLayer("NOTE", 1);
 			self::PrintAddLayer("GNOTE", 1);
-	//		print "<input type=\"checkbox\" name=\"addsource\" />".$gm_lang["add_source_to_fact"]."<br />\n";
-			if ($gm_user->UserCanAccept() && !$gm_user->userAutoAccept()) print "<br /><input name=\"aa_attempt\" type=\"checkbox\" value=\"1\" />".$gm_lang["attempt_auto_acc"]."<br /><br />\n";
-			print "<input type=\"submit\" value=\"".$gm_lang["save"]."\" /><br />\n";
+	//		print "<input type=\"checkbox\" name=\"addsource\" />".GM_LANG_add_source_to_fact"]."<br />\n";
+			if ($gm_user->UserCanAccept() && !$gm_user->userAutoAccept()) print "<br /><input name=\"aa_attempt\" type=\"checkbox\" value=\"1\" />".GM_LANG_attempt_auto_acc."<br /><br />\n";
+			print "<input type=\"submit\" value=\"".GM_LANG_save."\" /><br />\n";
 		}
 		else {
 			if ($namerec!="NEW") {
@@ -466,12 +466,12 @@ abstract class EditFunctions {
 			self::PrintAddLayer("SOUR");
 			self::PrintAddLayer("NOTE");
 			self::PrintAddLayer("GNOTE");
-	//		print "<input type=\"submit\" value=\"".$gm_lang["save"]."\" /><br />\n";
-			if ($gm_user->UserCanAccept() && !$gm_user->userAutoAccept()) print "<br /><input name=\"aa_attempt\" type=\"checkbox\" value=\"1\" />".$gm_lang["attempt_auto_acc"]."<br /><br />\n";
-			print "<input type=\"button\" value=\"".$gm_lang["save"]."\" onclick=\"document.addchildform.submit(); return false;\"/><br />\n";
+	//		print "<input type=\"submit\" value=\"".GM_LANG_save."\" /><br />\n";
+			if ($gm_user->UserCanAccept() && !$gm_user->userAutoAccept()) print "<br /><input name=\"aa_attempt\" type=\"checkbox\" value=\"1\" />".GM_LANG_attempt_auto_acc."<br /><br />\n";
+			print "<input type=\"button\" value=\"".GM_LANG_save."\" onclick=\"document.addchildform.submit(); return false;\"/><br />\n";
 		}
 		print "</form>\n";
-		if ($nextaction != "update") print "<br /><div id=\"show_ids\"><a href=\"javascript: ".$gm_lang["show_next_id"]."\" onclick=\"sndReq('show_ids', 'getnextids'); return false;\">".$gm_lang["show_next_id"]."</a></div>";
+		if ($nextaction != "update") print "<br /><div id=\"show_ids\"><a href=\"javascript: ".GM_LANG_show_next_id."\" onclick=\"sndReq('show_ids', 'getnextids'); return false;\">".GM_LANG_show_next_id."</a></div>";
 		?>
 		<script type="text/javascript" src="autocomplete.js"></script>
 		<script type="text/javascript">
@@ -570,12 +570,12 @@ abstract class EditFunctions {
 		function checkform() {
 			frm = document.addchildform;
 			/* if (frm.GIVN.value=="") {
-				alert('<?php print $gm_lang["must_provide"]; print $gm_lang["given_name"]; ?>');
+				alert('<?php print GM_LANG_must_provide; print GM_LANG_given_name; ?>');
 				frm.GIVN.focus();
 				return false;
 			}
 			if (frm.SURN.value=="") {
-				alert('<?php print $gm_lang["must_provide"]; print $gm_lang["surname"]; ?>');
+				alert('<?php print GM_LANG_must_provide; print GM_LANG_surname; ?>');
 				frm.SURN.focus();
 				return false;
 			}*/
@@ -583,7 +583,7 @@ abstract class EditFunctions {
 			fname=fname.replace(/ /g,'');
 			fname=fname.replace(/\//g,'');
 			if (fname=="") {
-				alert('<?php print $gm_lang["must_provide"]; print " ".GM_FACT_NAME; ?>');
+				alert('<?php print GM_LANG_must_provide; print " ".GM_FACT_NAME; ?>');
 				frm.NAME.focus();
 				return false;
 			}
@@ -603,10 +603,10 @@ abstract class EditFunctions {
 	 * @see init_calendar_popup()
 	 */
 	public function PrintCalendarPopup($id) {
-		global $gm_lang, $GM_IMAGES;
+		global $GM_IMAGES;
 	
 		// calendar button
-		$text = $gm_lang["select_date"];
+		$text = GM_LANG_select_date;
 		if (isset($GM_IMAGES["calendar"]["button"])) $Link = "<img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["calendar"]["button"]."\" name=\"img".$id."\" id=\"img".$id."\" alt=\"".$text."\" title=\"".$text."\" border=\"0\" align=\"middle\" />";
 		else $Link = $text;
 		print "<a href=\"javascript: ".$text."\" onclick=\"cal_toggleDate('caldiv".$id."', '".$id."'); return false;\">";
@@ -616,11 +616,10 @@ abstract class EditFunctions {
 	}
 	
 	public function AddTagSeparator($fact="") {
-		global $gm_lang;
 		
 		print "<tr><td colspan=\"2\" class=\"shade3 center\">";
 		if(!empty($fact)) {
-			if (isset($gm_lang[$fact])) print $gm_lang[$fact];
+			if (defined("GM_LANG_".$fact)) print constant("GM_LANG_".$fact);
 			else if (defined("GM_FACT_".$fact)) print constant("GM_FACT_".$fact);
 			else print $fact;
 		}
@@ -643,7 +642,7 @@ abstract class EditFunctions {
 	 * @param string $upperlevel	optional upper level tag (eg BIRT)
 	 */
 	public function AddSimpleTag($tag, $upperlevel="", $tab="1") {
-		global $gm_lang, $GM_IMAGES, $TEMPLE_CODES, $STATUS_CODES;
+		global $GM_IMAGES, $TEMPLE_CODES, $STATUS_CODES;
 		global $assorela, $tags, $emptyfacts, $TEXT_DIRECTION, $confighelpfile, $GM_BASE_DIRECTORY, $GEDCOMID;
 		global $NPFX_accept, $SPFX_accept, $NSFX_accept, $FILE_FORM_accept, $upload_count, $separatorfacts, $canhavey_facts;
 		static $tabkey;
@@ -698,7 +697,7 @@ abstract class EditFunctions {
 			if ($fact=="DATE") print_help_link("def_gedcom_date_help", "qm", "date");
 			else if ($fact=="RESN") print_help_link($fact."_help", "qm");
 			else print_help_link("edit_".$fact."_help", "qm");
-			if (isset($gm_lang[$fact])) print $gm_lang[$fact];
+			if (defined("GM_LANG_".$fact)) print constant("GM_LANG_".$fact);
 			else if (defined("GM_FACT_".$fact)) print constant("GM_FACT_".$fact);
 			else print $fact;
 			print "\n";
@@ -729,13 +728,13 @@ abstract class EditFunctions {
 				$tabkey++;
 				if ($value=="Y") print " checked=\"checked\"";
 				print " onClick=\"if (this.checked) ".$element_id.".value='Y'; else ".$element_id.".value=''; \" />";
-				print $gm_lang["yes"];
+				print GM_LANG_yes;
 			}
 		}
 		// Added
 		else if ($fact=="TEMP") {
 			print "<select tabindex=\"".$tabkey."\" name=\"".$element_name."\" >\n";
-			print "<option value=''>".$gm_lang["no_temple"]."</option>\n";
+			print "<option value=''>".GM_LANG_no_temple."</option>\n";
 			foreach($TEMPLE_CODES as $code=>$temple) {
 				print "<option value=\"$code\"";
 				if ($code==$value) print " selected=\"selected\"";
@@ -771,7 +770,7 @@ abstract class EditFunctions {
 				if ($resn_val=="none") $resnv=""; else $resnv=$resn_val;
 				print "<td><input tabindex=\"".$tabkey."\" type=\"radio\" id=\"".$element_id."\" name=\"".$element_name."\" value=\"".$resnv."\"";
 				if ($value==$resnv) print " checked=\"checked\"";
-				print " /><small>".$gm_lang[$resn_val]."</small>";
+				print " /><small>".constant("GM_LANG_".$resn_val)."</small>";
 				print "</td>\n";
 			}
 			print "</tr></table>\n";
@@ -781,58 +780,58 @@ abstract class EditFunctions {
 			print "<option value=\"\"></option>\n";
 			print "<option value=\"Y\"";
 			if ($value=="Y") print " selected=\"selected\"";
-			print ">".$gm_lang["yes"]."</option>\n";
+			print ">".GM_LANG_yes."</option>\n";
 			print "<option value=\"N\"";
 			if ($value=="N") print " selected=\"selected\"";
-			print ">".$gm_lang["no"]."</option>\n";
+			print ">".GM_LANG_no."</option>\n";
 			print "</select>\n";
 		}
 		else if ($fact=="SEX") {
 			print "<select tabindex=\"".$tabkey."\" id=\"".$element_id."\" name=\"".$element_name."\">\n<option value=\"M\"";
 			if ($value=="M") print " selected=\"selected\"";
-			print ">".$gm_lang["male"]."</option>\n<option value=\"F\"";
+			print ">".GM_LANG_male."</option>\n<option value=\"F\"";
 			if ($value=="F") print " selected=\"selected\"";
-			print ">".$gm_lang["female"]."</option>\n<option value=\"U\"";
+			print ">".GM_LANG_female."</option>\n<option value=\"U\"";
 			if ($value=="U" || empty($value)) print " selected=\"selected\"";
-			print ">".$gm_lang["unknown"]."</option>\n</select>\n";
+			print ">".GM_LANG_unknown."</option>\n</select>\n";
 		}
 		else if ($fact=="PEDI") {
 			print "<select tabindex=\"".$tabkey."\" id=\"".$element_id."\" name=\"".$element_name."\">\n";
 			
 			print "<option value=\"birth\"";
 			if ($value=="birth") print " selected=\"selected\"";
-			print ">".$gm_lang["biological"]."</option>\n";
+			print ">".GM_LANG_biological."</option>\n";
 			
 			print "<option value=\"adopted\"";
 			if ($value=="adopted") print " selected=\"selected\"";
-			print ">".$gm_lang["adopted"]."</option>\n";
+			print ">".GM_LANG_adopted."</option>\n";
 	
 			print "<option value=\"foster\"";
 			if ($value=="foster") print " selected=\"selected\"";
-			print ">".$gm_lang["foster"]."</option>\n";
+			print ">".GM_LANG_foster."</option>\n";
 			
 			print "<option value=\"sealing\"";
 			if ($value=="sealing") print " selected=\"selected\"";
-			print ">".$gm_lang["sealing"]."</option>\n";
+			print ">".GM_LANG_sealing."</option>\n";
 			
 			print "</select>\n";
 		}
 		else if ($fact == "TYPE" && $level == '3') {?>
 			<select name="text[]">
-			<option selected="selected" value=""> <?php print $gm_lang["choose"]; ?> </option>
-			<option <?php if ($value == $gm_lang["type_audio"]) print "selected=\"selected\""; ?>> <?php print $gm_lang["type_audio"]; ?> </option>
-			<option <?php if ($value == $gm_lang["type_book"]) print "selected=\"selected\""; ?>> <?php print $gm_lang["type_book"]; ?> </option>
-			<option <?php if ($value == $gm_lang["type_card"]) print "selected=\"selected\""; ?>> <?php print $gm_lang["type_card"]; ?> </option>
-			<option <?php if ($value == $gm_lang["type_electronic"]) print "selected=\"selected\""; ?>> <?php print $gm_lang["type_electronic"]; ?> </option>
-			<option <?php if ($value == $gm_lang["type_fiche"]) print "selected=\"selected\""; ?>> <?php print $gm_lang["type_fiche"]; ?> </option>
-			<option <?php if ($value == $gm_lang["type_film"]) print "selected=\"selected\""; ?>> <?php print $gm_lang["type_film"]; ?> </option>
-			<option <?php if ($value == $gm_lang["type_magazine"]) print "selected=\"selected\""; ?>> <?php print $gm_lang["type_magazine"]; ?> </option>
-			<option <?php if ($value == $gm_lang["type_manuscript"]) print "selected=\"selected\""; ?>> <?php print $gm_lang["type_manuscript"]; ?> </option>
-			<option <?php if ($value == $gm_lang["type_map"]) print "selected=\"selected\""; ?>> <?php print $gm_lang["type_map"]; ?> </option>
-			<option <?php if ($value == $gm_lang["type_newspaper"]) print "selected=\"selected\""; ?>> <?php print $gm_lang["type_newspaper"]; ?> </option>
-			<option <?php if ($value == $gm_lang["type_photo"]) print "selected=\"selected\""; ?>> <?php print $gm_lang["type_photo"]; ?> </option>
-			<option <?php if ($value == $gm_lang["type_tombstone"]) print "selected=\"selected\""; ?>> <?php print $gm_lang["type_tombstone"]; ?> </option>
-			<option <?php if ($value == $gm_lang["type_video"]) print "selected=\"selected\""; ?>> <?php print $gm_lang["type_video"]; ?> </option>
+			<option selected="selected" value=""> <?php print GM_LANG_choose; ?> </option>
+			<option <?php if ($value == GM_LANG_type_audio) print "selected=\"selected\""; ?>> <?php print GM_LANG_type_audio; ?> </option>
+			<option <?php if ($value == GM_LANG_type_book) print "selected=\"selected\""; ?>> <?php print GM_LANG_type_book; ?> </option>
+			<option <?php if ($value == GM_LANG_type_card) print "selected=\"selected\""; ?>> <?php print GM_LANG_type_card; ?> </option>
+			<option <?php if ($value == GM_LANG_type_electronic) print "selected=\"selected\""; ?>> <?php print GM_LANG_type_electronic; ?> </option>
+			<option <?php if ($value == GM_LANG_type_fiche) print "selected=\"selected\""; ?>> <?php print GM_LANG_type_fiche; ?> </option>
+			<option <?php if ($value == GM_LANG_type_film) print "selected=\"selected\""; ?>> <?php print GM_LANG_type_film; ?> </option>
+			<option <?php if ($value == GM_LANG_type_magazine) print "selected=\"selected\""; ?>> <?php print GM_LANG_type_magazine; ?> </option>
+			<option <?php if ($value == GM_LANG_type_manuscript) print "selected=\"selected\""; ?>> <?php print GM_LANG_type_manuscript; ?> </option>
+			<option <?php if ($value == GM_LANG_type_map) print "selected=\"selected\""; ?>> <?php print GM_LANG_type_map; ?> </option>
+			<option <?php if ($value == GM_LANG_type_newspaper) print "selected=\"selected\""; ?>> <?php print GM_LANG_type_newspaper; ?> </option>
+			<option <?php if ($value == GM_LANG_type_photo) print "selected=\"selected\""; ?>> <?php print GM_LANG_type_photo; ?> </option>
+			<option <?php if ($value == GM_LANG_type_tombstone) print "selected=\"selected\""; ?>> <?php print GM_LANG_type_tombstone; ?> </option>
+			<option <?php if ($value == GM_LANG_type_video) print "selected=\"selected\""; ?>> <?php print GM_LANG_type_video; ?> </option>
 			</select>
 			<?php
 		}
@@ -942,7 +941,7 @@ abstract class EditFunctions {
 					$gedid = SplitKey($_SESSION["last_used"]["REPO"], "gedid");
 					if ($gedid == $GEDCOMID) {
 						$id = SplitKey($_SESSION["last_used"]["REPO"], "id");
-						if (CheckExists($id, "REPO")) print "<a href=\"javascript\" onclick=\"document.getElementById('".$element_id."').value='".$id."'; sndReq('".$element_id."_repo', 'getrepodescriptor', 'rid', '".$id."', '', ''); return false;\">".$gm_lang["click_for"]." ".GetRepoDescriptor($id)."</a>";
+						if (CheckExists($id, "REPO")) print "<a href=\"javascript\" onclick=\"document.getElementById('".$element_id."').value='".$id."'; sndReq('".$element_id."_repo', 'getrepodescriptor', 'rid', '".$id."', '', ''); return false;\">".GM_LANG_click_for." ".GetRepoDescriptor($id)."</a>";
 					}
 				}
 			}
@@ -973,7 +972,7 @@ abstract class EditFunctions {
 					if ($gedid == $GEDCOMID) {
 						$id = SplitKey($_SESSION["last_used"]["NOTE"], "id");
 						if (CheckExists($id, "NOTE")) {
-							print "<a href=\"javascript\" onclick=\"document.getElementById('".$element_id."').value='".$id."'; sndReq('".$element_id."_gnote', 'getnotedescriptor', 'oid', '".$id."', '', ''); return false;\">".$gm_lang["click_for"]." ";
+							print "<a href=\"javascript\" onclick=\"document.getElementById('".$element_id."').value='".$id."'; sndReq('".$element_id."_gnote', 'getnotedescriptor', 'oid', '".$id."', '', ''); return false;\">".GM_LANG_click_for." ";
 							print "<span id=\"".$element_id."_gnote2\"></span></a>";
 							?>
 							<script>
@@ -996,7 +995,7 @@ abstract class EditFunctions {
 					$gedid = SplitKey($_SESSION["last_used"]["SOUR"], "gedid");
 					if ($gedid == $GEDCOMID) {
 						$id = SplitKey($_SESSION["last_used"]["SOUR"], "id");
-						if (CheckExists($id, "SOUR")) print "<a href=\"javascript\" onclick=\"document.getElementById('".$element_id."').value='".$id."'; sndReq('".$element_id."_src', 'getsourcedescriptor', 'sid', '".$id."', '', ''); return false;\">".$gm_lang["click_for"]." ".GetSourceDescriptor($id)."</a>";
+						if (CheckExists($id, "SOUR")) print "<a href=\"javascript\" onclick=\"document.getElementById('".$element_id."').value='".$id."'; sndReq('".$element_id."_src', 'getsourcedescriptor', 'sid', '".$id."', '', ''); return false;\">".GM_LANG_click_for." ".GetSourceDescriptor($id)."</a>";
 					}
 				}
 			}
@@ -1011,7 +1010,7 @@ abstract class EditFunctions {
 					$gedid = SplitKey($_SESSION["last_used"]["OBJE"], "gedid");
 					if ($gedid == $GEDCOMID) {
 						$id = SplitKey($_SESSION["last_used"]["OBJE"], "id");
-						if (CheckExists($id, "OBJE")) print "<a href=\"javascript\" onclick=\"document.getElementById('".$element_id."').value='".$id."'; sndReq('".$element_id."_obj', 'getmediadescriptor', 'mid', '".$id."', '', ''); return false;\">".$gm_lang["click_for"]." ".GetMediaDescriptor($id)."</a>";
+						if (CheckExists($id, "OBJE")) print "<a href=\"javascript\" onclick=\"document.getElementById('".$element_id."').value='".$id."'; sndReq('".$element_id."_obj', 'getmediadescriptor', 'mid', '".$id."', '', ''); return false;\">".GM_LANG_click_for." ".GetMediaDescriptor($id)."</a>";
 					}
 				}
 			}
@@ -1020,7 +1019,7 @@ abstract class EditFunctions {
 		
 		// pastable values
 		if ($fact=="NPFX") {
-			$text = $gm_lang["autocomplete"];
+			$text = GM_LANG_autocomplete"];
 			if (isset($GM_IMAGES["autocomplete"]["button"])) $Link = "<img id=\"".$element_id."_spec\" name=\"".$element_id."_spec\" src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["autocomplete"]["button"]."\"  alt=\"".$text."\"  title=\"".$text."\" border=\"0\" align=\"middle\" />";
 			else $Link = $text;
 			print "&nbsp;".$Link;
@@ -1031,8 +1030,8 @@ abstract class EditFunctions {
 	
 		// split NAME
 		if ($fact=="NAME") {
-			print "&nbsp;<a href=\"javascript: ".$gm_lang["show_details"]."\" onclick=\"togglename(); return false;\"><img id=\"".$element_id."_plus\" src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["plus"]["other"]."\" border=\"0\" width=\"11\" height=\"11\" alt=\"\" title=\"\" /></a>\n";
-			print "<a href=\"javascript: ".$gm_lang["show_details"]."\" onclick=\"togglename(); return false;\"><img style=\"display:none;\" id=\"".$element_id."_minus\" src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["minus"]["other"]."\" border=\"0\" width=\"11\" height=\"11\" alt=\"\" title=\"\" /></a>\n";
+			print "&nbsp;<a href=\"javascript: ".GM_LANG_show_details."\" onclick=\"togglename(); return false;\"><img id=\"".$element_id."_plus\" src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["plus"]["other"]."\" border=\"0\" width=\"11\" height=\"11\" alt=\"\" title=\"\" /></a>\n";
+			print "<a href=\"javascript: ".GM_LANG_show_details."\" onclick=\"togglename(); return false;\"><img style=\"display:none;\" id=\"".$element_id."_minus\" src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["minus"]["other"]."\" border=\"0\" width=\"11\" height=\"11\" alt=\"\" title=\"\" /></a>\n";
 		}
 		
 		if (!in_array($fact, $emptyfacts) || in_array($fact, $canhavey_facts)) print "</td>";
@@ -1047,11 +1046,11 @@ abstract class EditFunctions {
 	 * @param string $tag		Gedcom tag name
 	 */
 	public function PrintAddLayer($tag, $level=2, $addfact=false) {
-		global $gm_lang, $GM_IMAGES, $TEXT_DIRECTION;
+		global $GM_IMAGES, $TEXT_DIRECTION;
 	
 		if ($tag=="SOUR") {
 			//-- Add new source to fact
-			print "<a href=\"#\" onclick=\"expand_layer('newsource'); if(document.getElementById('newsource').style.display == 'block') document.getElementById(addsourcefocus).focus(); return false;\"><img id=\"newsource_img\" src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["plus"]["other"]."\" border=\"0\" width=\"11\" height=\"11\" alt=\"\" title=\"\" /> ".$gm_lang["add_source"]."</a>";
+			print "<a href=\"#\" onclick=\"expand_layer('newsource'); if(document.getElementById('newsource').style.display == 'block') document.getElementById(addsourcefocus).focus(); return false;\"><img id=\"newsource_img\" src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["plus"]["other"]."\" border=\"0\" width=\"11\" height=\"11\" alt=\"\" title=\"\" /> ".GM_LANG_add_source."</a>";
 			print_help_link("edit_add_SOUR_help", "qm");
 			print "<br />";
 			print "<div id=\"newsource\" style=\"display: none;\">\n";
@@ -1074,16 +1073,16 @@ abstract class EditFunctions {
 			// 4 TEXT
 			self::AddSimpleTag(($level+2)." TEXT");
 			if ($addfact) {
-				print "<tr><td colspan=\"2\" class=\"shade2 $TEXT_DIRECTION\"><input type=\"radio\" name=\"addsource\" value=\"0\" />".$gm_lang["add_source_citation_to_person"]."<br />\n";
-				print "<input type=\"radio\" name=\"addsource\" value=\"1\" />".$gm_lang["add_source_reference_to_fact"]."<br />\n";
-				print "<input type=\"radio\" name=\"addsource\" value=\"2\" checked=\"checked\" />".$gm_lang["add_source_citation_to_fact"]."<br />\n";
+				print "<tr><td colspan=\"2\" class=\"shade2 $TEXT_DIRECTION\"><input type=\"radio\" name=\"addsource\" value=\"0\" />".GM_LANG_add_source_citation_to_person."<br />\n";
+				print "<input type=\"radio\" name=\"addsource\" value=\"1\" />".GM_LANG_add_source_reference_to_fact."<br />\n";
+				print "<input type=\"radio\" name=\"addsource\" value=\"2\" checked=\"checked\" />".GM_LANG_add_source_citation_to_fact."<br />\n";
 				print "</td></tr>";
 			}
 			print "</table></div>";
 		}
 		if ($tag=="ASSO") {
 			//-- Add a new ASSOciate
-			print "<a href=\"#\" onclick=\"expand_layer('newasso'); if(document.getElementById('newasso').style.display == 'block') document.getElementById(addassofocus).focus(); return false;\"><img id=\"newasso_img\" src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["plus"]["other"]."\" border=\"0\" width=\"11\" height=\"11\" alt=\"\" title=\"\" /> ".$gm_lang["add_asso"]."</a>";
+			print "<a href=\"#\" onclick=\"expand_layer('newasso'); if(document.getElementById('newasso').style.display == 'block') document.getElementById(addassofocus).focus(); return false;\"><img id=\"newasso_img\" src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["plus"]["other"]."\" border=\"0\" width=\"11\" height=\"11\" alt=\"\" title=\"\" /> ".GM_LANG_add_asso."</a>";
 			print_help_link("edit_add_ASSO_help", "qm");
 			print "<br />";
 			print "<div id=\"newasso\" style=\"display: none;\">\n";
@@ -1105,7 +1104,7 @@ abstract class EditFunctions {
 		}
 		if ($tag=="NOTE") {
 			//-- Add new note to fact
-			print "<a href=\"#\" onclick=\"expand_layer('newnote'); if(document.getElementById('newnote').style.display == 'block') document.getElementById(addnotefocus).focus(); return false;\"><img id=\"newnote_img\" src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["plus"]["other"]."\" border=\"0\" width=\"11\" height=\"11\" alt=\"\" title=\"\" /> ".$gm_lang["add_note"]."</a>";
+			print "<a href=\"#\" onclick=\"expand_layer('newnote'); if(document.getElementById('newnote').style.display == 'block') document.getElementById(addnotefocus).focus(); return false;\"><img id=\"newnote_img\" src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["plus"]["other"]."\" border=\"0\" width=\"11\" height=\"11\" alt=\"\" title=\"\" /> ".GM_LANG_add_note."</a>";
 			print_help_link("edit_add_NOTE_help", "qm");
 			print "<br />\n";
 			print "<div id=\"newnote\" style=\"display: none;\">\n";
@@ -1123,7 +1122,7 @@ abstract class EditFunctions {
 		}
 		if ($tag=="GNOTE") {
 			//-- Add new general note to fact
-			print "<a href=\"#\" onclick=\"expand_layer('newgnote'); if(document.getElementById('newgnote').style.display == 'block') document.getElementById(addgnotefocus).focus(); return false;\"><img id=\"newnote_img\" src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["plus"]["other"]."\" border=\"0\" width=\"11\" height=\"11\" alt=\"\" title=\"\" /> ".$gm_lang["add_gnote"]."</a>";
+			print "<a href=\"#\" onclick=\"expand_layer('newgnote'); if(document.getElementById('newgnote').style.display == 'block') document.getElementById(addgnotefocus).focus(); return false;\"><img id=\"newnote_img\" src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["plus"]["other"]."\" border=\"0\" width=\"11\" height=\"11\" alt=\"\" title=\"\" /> ".GM_LANG_add_gnote."</a>";
 			print_help_link("edit_add_NOTE_help", "qm");
 			print "<br />";
 			print "<div id=\"newgnote\" style=\"display: none;\">\n";
@@ -1141,7 +1140,7 @@ abstract class EditFunctions {
 		}
 		if ($tag=="OBJE") {
 			//-- Add new obje to fact
-			print "<a href=\"#\" onclick=\"expand_layer('newobje'); if(document.getElementById('newobje').style.display == 'block') document.getElementById(addobjefocus).focus(); return false;\"><img id=\"newobje_img\" src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["plus"]["other"]."\" border=\"0\" width=\"11\" height=\"11\" alt=\"\" title=\"\" /> ".$gm_lang["add_obje"]."</a>";
+			print "<a href=\"#\" onclick=\"expand_layer('newobje'); if(document.getElementById('newobje').style.display == 'block') document.getElementById(addobjefocus).focus(); return false;\"><img id=\"newobje_img\" src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["plus"]["other"]."\" border=\"0\" width=\"11\" height=\"11\" alt=\"\" title=\"\" /> ".GM_LANG_add_obje."</a>";
 			print_help_link("add_media_help", "qm");
 			print "<br />";
 			print "<div id=\"newobje\" style=\"display: none;\">\n";
@@ -1179,7 +1178,7 @@ abstract class EditFunctions {
 	 * @return string	The updated gedcom record
 	 */
 	public function HandleUpdates($newged) {
-		global $glevels, $islink, $tag, $uploaded_files, $text, $NOTE, $change_id, $change_type, $success, $can_auto_accept, $gm_lang, $link_error;
+		global $glevels, $islink, $tag, $uploaded_files, $text, $NOTE, $change_id, $change_type, $success, $can_auto_accept, $link_error;
 		
 		$link_error = false;
 	//	print_r($_POST);
@@ -1238,7 +1237,7 @@ abstract class EditFunctions {
 							else $passlink = false;
 						}
 						if (!$passlink) {
-							print "<span class=\"error\">".$gm_lang["link_not_added"].": ".$text[$j]."</span><br />";
+							print "<span class=\"error\">".GM_LANG_link_not_added.": ".$text[$j]."</span><br />";
 							$link_error = true;
 						}
 						else {
@@ -1346,7 +1345,7 @@ abstract class EditFunctions {
 	}
 	
 	public function PrintQuickResn($name, $default="") {
-		global $align, $gm_lang, $tabkey;
+		global $align, $tabkey;
 		
 		if (GedcomConfig::$SHOW_QUICK_RESN) {
 			print "<tr><td class=\"shade2\">";
@@ -1357,11 +1356,11 @@ abstract class EditFunctions {
 			print "<select name=\"$name\" tabindex=\"".$tabkey."\" ><option value=\"\"></option><option value=\"confidential\"";
 			if ($default == "confidential") print "selected=\"selected\"";
 			$tabkey++;
-			print ">".$gm_lang["confidential"]."</option><option value=\"locked\"";
+			print ">".GM_LANG_confidential."</option><option value=\"locked\"";
 			if ($default == "locked") print "selected=\"selected\"";
-			print ">".$gm_lang["locked"]."</option><option value=\"privacy\"";
+			print ">".GM_LANG_locked."</option><option value=\"privacy\"";
 			if ($default == "privacy") print "selected=\"selected\"";
-			print ">".$gm_lang["privacy"]."</option>";
+			print ">".GM_LANG_privacy."</option>";
 			print "</select>\n";
 			print "</td>\n";
 			print "</tr>\n";
@@ -1369,27 +1368,27 @@ abstract class EditFunctions {
 	}
 	
 	public function PrintPedi($name, $value="", $showbio=true) {
-		global $align, $gm_lang, $tabkey;
+		global $align, $tabkey;
 	
 		print "<select tabindex=\"".$tabkey."\" id=\"".$name."\" name=\"".$name."\">\n";
 			
 		if ($showbio) {
 			print "<option value=\"birth\"";
 			if ($value=="birth" || $value=="") print " selected=\"selected\"";
-			print ">".$gm_lang["biological"]."</option>\n";
+			print ">".GM_LANG_biological."</option>\n";
 		}
 			
 		print "<option value=\"adopted\"";
 		if ($value=="adopted") print " selected=\"selected\"";
-		print ">".$gm_lang["adopted"]."</option>\n";
+		print ">".GM_LANG_adopted."</option>\n";
 	
 		print "<option value=\"foster\"";
 		if ($value=="foster") print " selected=\"selected\"";
-		print ">".$gm_lang["foster"]."</option>\n";
+		print ">".GM_LANG_foster."</option>\n";
 			
 		print "<option value=\"sealing\"";
 		if ($value=="sealing") print " selected=\"selected\"";
-		print ">".$gm_lang["sealing"]."</option>\n";
+		print ">".GM_LANG_sealing."</option>\n";
 			
 		print "</select>\n";
 	}
@@ -1450,7 +1449,7 @@ abstract class EditFunctions {
 	}
 	
 	public function ShowMediaForm($pid, $action="newentry", $change_type="add_media") {
-		global $GEDCOMID, $gm_lang, $TEXT_DIRECTION;
+		global $GEDCOMID, $TEXT_DIRECTION;
 		global $gm_user;
 		
 		$facts_add = explode(",", GedcomConfig::$MEDIA_FACTS_ADD);
@@ -1464,9 +1463,9 @@ abstract class EditFunctions {
 		print "<input type=\"hidden\" name=\"gedid\" value=\"$GEDCOMID\" />\n";
 		if (isset($pid)) print "<input type=\"hidden\" name=\"pid\" value=\"$pid\" />\n";
 		print "<table class=\"facts_table center $TEXT_DIRECTION\">\n";
-		print "<tr><td class=\"topbottombar\" colspan=\"2\">".$gm_lang["add_media"]."</td></tr>";
+		print "<tr><td class=\"topbottombar\" colspan=\"2\">".GM_LANG_add_media."</td></tr>";
 		if ($pid == "") {
-			print "<tr><td class=\"shade2\">".$gm_lang["add_fav_enter_id"]."</td>";
+			print "<tr><td class=\"shade2\">".GM_LANG_add_fav_enter_id."</td>";
 			print "<td class=\"shade1\"><input type=\"text\" name=\"gid\" id=\"gid\" size=\"3\" value=\"\" />";
 			LinkFunctions::PrintFindIndiLink("gid","");
 			LinkFunctions::PrintFindFamilyLink("gid");
@@ -1494,7 +1493,7 @@ abstract class EditFunctions {
 			if( filename.match( /^[a-zA-Z]:[\w- \\\\]+\..*$/ ) ) 
 				return true;
 			else
-				alert( "<?php print $gm_lang["invalid_file"]; ?>" ) ;
+				alert( "<?php print GM_LANG_invalid_file; ?>" ) ;
 				return false;
 		}
 		//-->
@@ -1535,7 +1534,7 @@ abstract class EditFunctions {
 						// Box for user to choose to upload file from local computer
 						print "<tr><td class=\"shade2\">&nbsp;</td><td class=\"shade1\"><input type=\"file\" name=\"picture\" size=\"60\"></td></tr>";
 						// Box for user to choose the folder to store the image
-						print "<tr><td class=\"shade2\">".$gm_lang["folder"]."</td><td class=\"shade1\"><input type=\"text\" name=\"folder\" size=\"60\"></td></tr>";
+						print "<tr><td class=\"shade2\">".GM_LANG_folder."</td><td class=\"shade1\"><input type=\"text\" name=\"folder\" size=\"60\"></td></tr>";
 					}
 				}
 			}
@@ -1554,10 +1553,10 @@ abstract class EditFunctions {
 			if (in_array("FILE", $facts_add) || in_array("FILE", $facts_unique)) {
 				$element_id = self::AddSimpleTag("1 FILE");
 				// Box for user to choose to upload file from local computer
-				print "<tr><td class=\"shade2\">".$gm_lang["upload_file"]."</td><td class=\"shade1\"><input type=\"file\" name=\"picture\" size=\"60\"></td></tr>";
+				print "<tr><td class=\"shade2\">".GM_LANG_upload_file."</td><td class=\"shade1\"><input type=\"file\" name=\"picture\" size=\"60\"></td></tr>";
 				// Box for user to choose the folder to store the image
 				$dirlist = MediaFS::GetMediaDirList(GedcomConfig::$MEDIA_DIRECTORY, true, 1, true, false);
-				print "<tr><td class=\"shade2\">".$gm_lang["upload_to_folder"]."</td><td class=\"shade1\">";
+				print "<tr><td class=\"shade2\">".GM_LANG_upload_to_folder."</td><td class=\"shade1\">";
 		//		<input type=\"text\" name=\"folder\" size=\"60\">
 				print "<select name=\"folder\">";
 				foreach($dirlist as $key => $dir) {
@@ -1583,8 +1582,8 @@ abstract class EditFunctions {
 			}
 		}
 			
-		if ($gm_user->UserCanAccept() && !$gm_user->userAutoAccept()) print "<tr><td class=\"shade1\" colspan=\"2\"><input name=\"aa_attempt\" type=\"checkbox\" value=\"1\" />".$gm_lang["attempt_auto_acc"]."</td></tr>";
-		print "<tr><td class=\"topbottombar\" colspan=\"2\"><input type=\"submit\" onclick=\"return check(document.newmedia.picture.value);\" value=\"".$gm_lang["add_media_button"]."\" /></td></tr>\n";
+		if ($gm_user->UserCanAccept() && !$gm_user->userAutoAccept()) print "<tr><td class=\"shade1\" colspan=\"2\"><input name=\"aa_attempt\" type=\"checkbox\" value=\"1\" />".GM_LANG_attempt_auto_acc."</td></tr>";
+		print "<tr><td class=\"topbottombar\" colspan=\"2\"><input type=\"submit\" onclick=\"return check(document.newmedia.picture.value);\" value=\"".GM_LANG_add_media_button."\" /></td></tr>\n";
 		print "</table>\n";
 		print "</form>\n";
 		if (isset($element_id)) print "\n<script type=\"text/javascript\">\n<!--\ndocument.getElementById(\"".$element_id."\").focus();\n//-->\n</script>";
@@ -1771,7 +1770,7 @@ abstract class EditFunctions {
 	}
 	
 	public function AddMissingTags($tags) {
-		global $templefacts, $nondatefacts, $nonplacfacts, $gm_lang, $focus;
+		global $templefacts, $nondatefacts, $nonplacfacts, $focus;
 	
 		// Now add some missing tags :
 		if (in_array($tags[0], $templefacts)) {
@@ -1833,10 +1832,10 @@ abstract class EditFunctions {
 		if ($tags[0]=="FILE") {
 			// 1 FILE
 			// Box for user to choose to upload file from local computer
-			print "<tr><td class=\"shade2\">".$gm_lang["upload_file"]."</td><td class=\"shade1\"><input type=\"file\" name=\"picture\" size=\"60\"></td></tr>";
+			print "<tr><td class=\"shade2\">".GM_LANG_upload_file."</td><td class=\"shade1\"><input type=\"file\" name=\"picture\" size=\"60\"></td></tr>";
 			// Box for user to choose the folder to store the image
 			$dirlist = MediaFS::GetMediaDirList(GedcomConfig::$MEDIA_DIRECTORY, true, 1, true, false);
-			print "<tr><td class=\"shade2\">".$gm_lang["upload_to_folder"]."</td><td class=\"shade1\">";
+			print "<tr><td class=\"shade2\">".GM_LANG_upload_to_folder."</td><td class=\"shade1\">";
 			print "<select name=\"folder\">";
 			foreach($dirlist as $key => $dir) {
 				print "<option value=\"".$dir."\">".$dir."</option>";

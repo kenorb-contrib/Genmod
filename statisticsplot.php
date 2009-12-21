@@ -107,8 +107,8 @@ unset($savedInput);
 
 //--	print " sort, x_as:" . $x_as . ", y_as:". $y_as . ", x_as:". $z_as . ", xas_gr_leef:" . $xas_grenzen_leeftijden . ", xas_gr_maan:" . $xas_grenzen_maanden . ", xas_gr_aant:" . $xas_grenzen_aantallen . ", zas_gr_peri:" . $zas_grenzen_periode . "<BR>";
 
-PrintHeader($gm_lang["statistiek_list"]);
-print "\n\t<center><h2>".$gm_lang["statistiek_list"]."</h2>\n\t";
+PrintHeader(GM_LANG_statistiek_list);
+print "\n\t<center><h2>".GM_LANG_statistiek_list."</h2>\n\t";
 print "</center>";
 
 //--print ("aantal namen, families, male and female=".$nrpers . ":" . $nrfam . ":" $nrman . ":" $nrvrouw . "<BR>");
@@ -143,7 +143,7 @@ PlotFunctions::SetParams(21,"FAM", false, false, "stat_21_nok", "stplnumbers",$y
 
 // Back button
 print "<form method=\"post\" name=\"form\" action=\"statisticsplot.php\">";
-print "<center><input type=\"button\" value=\"".$gm_lang["back"]."\" onclick=\"location.href='statistics.php';\" />";
+print "<center><input type=\"button\" value=\"".GM_LANG_back."\" onclick=\"location.href='statistics.php';\" />";
 print "</center></form>";
 
 PrintFooter();

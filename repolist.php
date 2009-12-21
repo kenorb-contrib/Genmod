@@ -7,7 +7,7 @@
  * The alphabet bar shows all the available letters users can click. The bar is built
  * up from the lastnames first letter. Added to this bar is the symbol @, which is
  * shown as a translated version of the variable <var>gm_lang["NN"]</var>, and a
- * translated version of the word ALL by means of variable <var>$gm_lang["all"]</var>.
+ * translated version of the word ALL by means of variable <var>GM_LANG_all</var>.
  *
  * The details can be shown in two ways, with surnames or without surnames. By default
  * the user first sees a list of surnames of the chosen letter and by clicking on a
@@ -48,14 +48,14 @@ $repolist_controller = New RepoListController();
 
 PrintHeader($repolist_controller->pagetitle);
 print "<div class=\"center\">";
-print "<h3>".$gm_lang["repo_list"]."</h3>\n\t";
+print "<h3>".GM_LANG_repo_list."</h3>\n\t";
 
 $ctot = $repolist_controller->repo_total + $repolist_controller->repo_add - $repolist_controller->repo_hide;
 
 print "\n\t<table class=\"list_table $TEXT_DIRECTION center\">\n\t\t<tr><td class=\"shade2 center\"";
 if($ctot > 12) print " colspan=\"2\"";
-print "><img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["repository"]["small"]."\" border=\"0\" title=\"".$gm_lang["titles_found"]."\" alt=\"".$gm_lang["titles_found"]."\" />&nbsp;&nbsp;";
-print $gm_lang["titles_found"];
+print "><img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["repository"]["small"]."\" border=\"0\" title=\"".GM_LANG_titles_found."\" alt=\"".GM_LANG_titles_found."\" />&nbsp;&nbsp;";
+print GM_LANG_titles_found;
 print "</td></tr><tr><td class=\"$TEXT_DIRECTION shade1 wrap\"><ul>";
 
 if ($ctot > 0){
@@ -78,10 +78,10 @@ if ($ctot > 0){
 
 	print "\n\t\t</ul></td>\n\t\t";
  
-	print "</tr><tr><td>".$gm_lang["total_repositories"]." ".$repolist_controller->repo_total;
-	if ($repolist_controller->repo_hide > 0) print "  --  ".$gm_lang["hidden"]." ".$repolist_controller->repo_hide;
+	print "</tr><tr><td>".GM_LANG_total_repositories." ".$repolist_controller->repo_total;
+	if ($repolist_controller->repo_hide > 0) print "  --  ".GM_LANG_hidden." ".$repolist_controller->repo_hide;
 }
-else print "<span class=\"warning\"><i>".$gm_lang["no_results"]."</span>";
+else print "<span class=\"warning\"><i>".GM_LANG_no_results."</span>";
 
 print "</td>\n\t\t</tr>\n\t</table>";
 

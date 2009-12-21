@@ -30,7 +30,7 @@ if (strstr($_SERVER["PHP_SELF"],"menubar.php")) {
 	print "Why do you want to do that?";
 	exit;
 }
-global $gm_lang, $controller, $note_controller, $source_controller, $repository_controller, $media_controller;
+global $controller, $note_controller, $source_controller, $repository_controller, $media_controller;
 $filemenu = MenuBar::GetFileMenu();
 $editmenu = MenuBar::GetEditMenu();
 $viewmenu = MenuBar::GetViewMenu();
@@ -72,21 +72,21 @@ function CreateMenu($menuobject, $level=0, $sub=false) {
 	return $outputmenu;
 }
 
-if (is_object($filemenu)) $showmenu[$gm_lang["menu_file"]] = CreateMenu($filemenu);
-if (is_object($editmenu)) $showmenu[$gm_lang["menu_edit"]] = CreateMenu($editmenu);
-if (is_object($viewmenu)) $showmenu[$gm_lang["menu_view"]] = CreateMenu($viewmenu);
-if (is_object($chartmenu)) $showmenu[$gm_lang["menu_charts"]] = CreateMenu($chartmenu);
-if (is_object($listmenu)) $showmenu[$gm_lang["menu_lists"]] = CreateMenu($listmenu);
-if (is_object($reportmenu)) $showmenu[$gm_lang["menu_reports"]] = CreateMenu($reportmenu);
-if (is_object($favoritesmenu)) $showmenu[$gm_lang["menu_favorites"]] = CreateMenu($favoritesmenu);
-if (is_object($personmenu)) $showmenu[$gm_lang["this_individual"]] = CreateMenu($personmenu);
-if (is_object($familymenu)) $showmenu[$gm_lang["this_family"]] = CreateMenu($familymenu);
-if (is_object($sourcemenu)) $showmenu[$gm_lang["this_source"]] = CreateMenu($sourcemenu);
-if (is_object($mediamenu)) $showmenu[$gm_lang["this_media"]] = CreateMenu($mediamenu);
-if (is_object($notemenu)) $showmenu[$gm_lang["this_note"]] = CreateMenu($notemenu);
-if (is_object($repomenu)) $showmenu[$gm_lang["this_repository"]] = CreateMenu($repomenu);
-if (is_object($helpmenu)) $showmenu[$gm_lang["helpmenu"]] = CreateMenu($helpmenu);
-if (is_object($custommenu)) $showmenu[$gm_lang["my_pages"]] = CreateMenu($custommenu);
+if (is_object($filemenu)) $showmenu[GM_LANG_menu_file] = CreateMenu($filemenu);
+if (is_object($editmenu)) $showmenu[GM_LANG_menu_edit] = CreateMenu($editmenu);
+if (is_object($viewmenu)) $showmenu[GM_LANG_menu_view] = CreateMenu($viewmenu);
+if (is_object($chartmenu)) $showmenu[GM_LANG_menu_charts] = CreateMenu($chartmenu);
+if (is_object($listmenu)) $showmenu[GM_LANG_menu_lists] = CreateMenu($listmenu);
+if (is_object($reportmenu)) $showmenu[GM_LANG_menu_reports] = CreateMenu($reportmenu);
+if (is_object($favoritesmenu)) $showmenu[GM_LANG_menu_favorites] = CreateMenu($favoritesmenu);
+if (is_object($personmenu)) $showmenu[GM_LANG_this_individual] = CreateMenu($personmenu);
+if (is_object($familymenu)) $showmenu[GM_LANG_this_family] = CreateMenu($familymenu);
+if (is_object($sourcemenu)) $showmenu[GM_LANG_this_source] = CreateMenu($sourcemenu);
+if (is_object($mediamenu)) $showmenu[GM_LANG_this_media] = CreateMenu($mediamenu);
+if (is_object($notemenu)) $showmenu[GM_LANG_this_note] = CreateMenu($notemenu);
+if (is_object($repomenu)) $showmenu[GM_LANG_this_repository] = CreateMenu($repomenu);
+if (is_object($helpmenu)) $showmenu[GM_LANG_helpmenu] = CreateMenu($helpmenu);
+if (is_object($custommenu)) $showmenu[GM_LANG_my_pages] = CreateMenu($custommenu);
 ?>
 <div id="header" class="<?php echo $TEXT_DIRECTION; ?>">
 	<script type="text/javascript" src="transmenu.js"></script>
@@ -119,7 +119,7 @@ if (is_object($custommenu)) $showmenu[$gm_lang["my_pages"]] = CreateMenu($custom
 	//-->
 	</script>
 	<?php
-	global $gm_lang, $GEDCOMS, $GM_IMAGES, $gm_user;
+	global $GEDCOMS, $GM_IMAGES, $gm_user;
 	if ($TEXT_DIRECTION == "ltr") {
 		$rdir = "right";
 		$ldir = "left";
@@ -163,8 +163,8 @@ if (is_object($custommenu)) $showmenu[$gm_lang["my_pages"]] = CreateMenu($custom
 		<form action="search.php" method="get" name="searchformtop">
 			<input type="hidden" name="action" value="general" />
 			<input type="hidden" name="topsearch" value="yes" />
-			<input class="search" type="text" name="query" accesskey="<?php print $gm_lang["accesskey_search"]?>" size="25" onfocus="document.searchformtop.query.size=55;" onblur="document.searchformtop.query.size=25;" />
-			<input type="submit" value="<?php print $gm_lang['search']?>" />
+			<input class="search" type="text" name="query" accesskey="<?php print GM_LANG_accesskey_search?>" size="25" onfocus="document.searchformtop.query.size=55;" onblur="document.searchformtop.query.size=25;" />
+			<input type="submit" value="<?php print GM_LANG_search;?>" />
 		</form>
 	</div>
 	<br clear="all" />

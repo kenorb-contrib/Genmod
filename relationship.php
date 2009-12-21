@@ -67,10 +67,10 @@ function paste_id(value) {
 <?php
 print "<div style=\"position: relative; z-index: 1; width:98%;\">\n";
 print "<table class=\"list_table $TEXT_DIRECTION\" style=\"width:100%;\"><tr><td valign=\"top\">";
-$title_string = $gm_lang["relationship_chart"];
+$title_string = GM_LANG_relationship_chart;
 if ($relationship_controller->pid1 != "" && $relationship_controller->pid2 != "") {
 	$title_string .= ":<br /><br />".$relationship_controller->person1->name;
-	$title_string .= "<br />".$gm_lang["and"]." ".$relationship_controller->person2->name;
+	$title_string .= "<br />".GM_LANG_and." ".$relationship_controller->person2->name;
 }
 print "\n\t<h3>".PrintReady($title_string)."</h3>";
 print "</td><td>";
@@ -91,7 +91,7 @@ if ($relationship_controller->view != "preview") {
 	
 	// Relationship header
 	print "<td colspan=\"2\" class=\"topbottombar center\">";
-	print $gm_lang["relationship_chart"]."</td>";
+	print GM_LANG_relationship_chart."</td>";
 
 	// Empty space
 	print "<td>&nbsp;</td>";
@@ -106,7 +106,7 @@ if ($relationship_controller->view != "preview") {
 	// Person 1
 	print "<td class=\"shade2\">";
 	print_help_link("relationship_id_help", "qm");
-	print $gm_lang["person1"]."</td>";
+	print GM_LANG_person1."</td>";
 	print "<td class=\"shade1 vmiddle\">";
 	print "<input tabindex=\"1\" class=\"pedigree_form\" type=\"text\" name=\"pid1\" id=\"pid1\" size=\"3\" value=\"".$relationship_controller->pid1."\" />";
 	LinkFunctions::PrintFindIndiLink("pid1","");
@@ -125,7 +125,7 @@ if ($relationship_controller->view != "preview") {
 	// Person 2
 	print "<td class=\"shade2\">";
 	print_help_link("relationship_id_help", "qm");
-	print $gm_lang["person2"]."</td>\n";
+	print GM_LANG_person2."</td>\n";
 	print "<td class=\"shade1 vmiddle\">";
 	print "<input tabindex=\"2\" class=\"pedigree_form\" type=\"text\" name=\"pid2\" id=\"pid2\" size=\"3\" value=\"".$relationship_controller->pid2."\" />";
         LinkFunctions::PrintFindIndiLink("pid2","");
@@ -144,7 +144,7 @@ if ($relationship_controller->view != "preview") {
 	// Check relationships by marriage
 	print "<td class=\"shade2\">";
 	print_help_link("follow_spouse_help", "qm");
-	print $gm_lang["follow_spouse"];
+	print GM_LANG_follow_spouse;
 	print "</td>";
 	print "<td class=\"shade1\">";
 	print "<input tabindex=\"4\" type=\"checkbox\" name=\"followspouse\" value=\"1\"";
@@ -157,7 +157,7 @@ if ($relationship_controller->view != "preview") {
 	// Show oldest top
 	print "<td class=\"shade2\">";
 	print_help_link("oldest_top_help", "qm");
-	print $gm_lang["oldest_top"];
+	print GM_LANG_oldest_top;
 	print "</td><td class=\"shade1\">";
 	print "<input tabindex=\"5\" type=\"checkbox\" id=\"oldtop\" name=\"asc\" value=\"-1\" ";
 	if ($relationship_controller->asc == -1) print " checked=\"checked\"";
@@ -196,7 +196,7 @@ if ($relationship_controller->view != "preview") {
 				$check_node = false;
 				break;
 			}
-			if ($i == 0) print $gm_lang["show_path"].": </td><td class=\"list_value\" style=\"padding: 3px;\">";
+			if ($i == 0) print GM_LANG_show_path.": </td><td class=\"list_value\" style=\"padding: 3px;\">";
 			if ($i > 0) print " | ";
 			if ($i == $relationship_controller->path_to_find){
 				print "<span class=\"error\" style=\"valign: middle\">".($i+1)."</span>";
@@ -215,7 +215,7 @@ if ($relationship_controller->view != "preview") {
 			if (!$relationship_controller->person1->disp_name) $disp = false;
 			else if (!$relationship_controller->person2->disp_name) $disp = false;
 			if ($disp) {
-				print $gm_lang["show_path"].": </td>";
+				print GM_LANG_show_path.": </td>";
 				print "\n\t\t<td class=\"shade1\">";
 				print " <span class=\"error vmmiddle\">";
 				if (isset($_SESSION["relationships"][$relationship_controller->path_to_find])) $check_node = $_SESSION["relationships"][$relationship_controller->path_to_find];
@@ -228,7 +228,7 @@ if ($relationship_controller->view != "preview") {
 						$_SESSION["relationships"][$relationship_controller->path_to_find] = $check_node;
 //					}
 				}
-				print ($check_node ? "1" : "&nbsp;".$gm_lang["no_results"])."</span></td>";
+				print ($check_node ? "1" : "&nbsp;".GM_LANG_no_results)."</span></td>";
 				$prt = true;
 			}
 		}
@@ -241,7 +241,7 @@ if ($relationship_controller->view != "preview") {
 	// Line up generations
 	print "<td class=\"shade2\">";
 	print_help_link("line_up_generations_help", "qm");
-	print $gm_lang["line_up_generations"]."</td>";
+	print GM_LANG_line_up_generations."</td>";
 	print "<td class=\"shade1\">";
 	print "<input tabindex=\"6\" type=\"checkbox\" name=\"pretty\" value=\"2\"";
 	if ($relationship_controller->pretty) print " checked=\"checked\"";
@@ -253,8 +253,8 @@ if ($relationship_controller->view != "preview") {
 	print "<tr>";
 	
 	if (!$relationship_controller->person1->isempty && !$relationship_controller->person2->isempty && $disp){
-		if ($disp && !$check_node) print "<td class=\"wrap vmiddle center\" colspan=\"2\"><span class=\"error\">".(isset($_SESSION["relationships"])?$gm_lang["no_link_found"]:"")."</span></td>";
-		else print "<td class=\"vmiddle center\" colspan=\"2\"><input type=\"submit\" value=\"".$gm_lang["next_path"]."\" onclick=\"document.people.path_to_find.value='".($relationship_controller->path_to_find + 1)."';\" /></td>\n";
+		if ($disp && !$check_node) print "<td class=\"wrap vmiddle center\" colspan=\"2\"><span class=\"error\">".(isset($_SESSION["relationships"])?GM_LANG_no_link_found : "")."</span></td>";
+		else print "<td class=\"vmiddle center\" colspan=\"2\"><input type=\"submit\" value=\"".GM_LANG_next_path."\" onclick=\"document.people.path_to_find.value='".($relationship_controller->path_to_find + 1)."';\" /></td>\n";
 		$pass = true;
 	}
 
@@ -444,7 +444,7 @@ if (!$relationship_controller->person1->isempty && !$relationship_controller->pe
 					print "<div id=\"line".$index."\" dir=\"ltr\" style=\"background:none; position:absolute; right:".($plinex + $Dbxspacing)."px; top:".($liney + $Dbyspacing)."px; width:".($lw + $lh * 2)."px; z-index:".(count($node["path"]) - $index)."; \" align=\"right\">";
 					print "<img src=\"".GM_IMAGE_DIR."/".$line."\" align=\"right\" width=\"".$lw."\" height=\"".$lh."\" alt=\"\" />\n";
 					print "<br />";
-					print $gm_lang[$node["relations"][$index]]."\n";
+					print constant("GM_LANG_".$node["relations"][$index])."\n";
 					print "<img src=\"".$arrow_img."\" border=\"0\" align=\"middle\" alt=\"\" />\n";
 				}
 				else {
@@ -452,7 +452,7 @@ if (!$relationship_controller->person1->isempty && !$relationship_controller->pe
 					print "<br />";
 					print "<img src=\"".$arrow_img."\" border=\"0\" align=\"middle\" alt=\"\" />\n";
 					if ($lh == 3) print "<br />"; // note: $lh==3 means horiz arrow
-					print $gm_lang[$node["relations"][$index]]."\n";
+					print constant("GM_LANG_".$node["relations"][$index])."\n";
 				}
 				print "</div>\n";
 			}

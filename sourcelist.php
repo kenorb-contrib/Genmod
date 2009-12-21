@@ -34,14 +34,14 @@ $sourcelist_controller = New SourceListController();
 
 PrintHeader($sourcelist_controller->pagetitle);
 print "<div class=\"center\">";
-print "<h3>".$gm_lang["source_list"]."</h3>\n\t";
+print "<h3>".GM_LANG_source_list."</h3>\n\t";
 
 $ctot = $sourcelist_controller->sour_total + $sourcelist_controller->sour_add - $sourcelist_controller->sour_hide;
 
 print "\n\t<table class=\"list_table $TEXT_DIRECTION center\">\n\t\t<tr><td class=\"shade2 center\"";
 if ($ctot > 12)	print " colspan=\"2\"";
-print "><img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["source"]["small"]."\" border=\"0\" title=\"".$gm_lang["sources"]."\" alt=\"".$gm_lang["sources"]."\" />&nbsp;&nbsp;";
-print $gm_lang["titles_found"];
+print "><img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["source"]["small"]."\" border=\"0\" title=\"".GM_LANG_sources."\" alt=\"".GM_LANG_sources."\" />&nbsp;&nbsp;";
+print GM_LANG_titles_found;
 print "</td></tr><tr><td class=\"$TEXT_DIRECTION shade1 wrap\"><ul>";
 $i=1;
 if ($ctot > 0) {
@@ -63,11 +63,11 @@ if ($ctot > 0) {
 
 	print "\n\t\t</ul></td>\n\t\t";
  
-	print "</tr><tr><td>".$gm_lang["total_sources"]." ".$sourcelist_controller->sour_total;
-	if ($sourcelist_controller->sour_total > 0) print "&nbsp;&nbsp;(".$gm_lang["titles_found"]."&nbsp;".$sourcelist_controller->sour_total.")";
-	if ($sourcelist_controller->sour_hide > 0) print "  --  ".$gm_lang["hidden"]." ".$sourcelist_controller->sour_hide;
+	print "</tr><tr><td>".GM_LANG_total_sources." ".$sourcelist_controller->sour_total;
+	if ($sourcelist_controller->sour_total > 0) print "&nbsp;&nbsp;(".GM_LANG_titles_found."&nbsp;".$sourcelist_controller->sour_total.")";
+	if ($sourcelist_controller->sour_hide > 0) print "  --  ".GM_LANG_hidden." ".$sourcelist_controller->sour_hide;
 }
-else print "<span class=\"warning\"><i>".$gm_lang["no_results"]."</span>";
+else print "<span class=\"warning\"><i>".GM_LANG_no_results."</span>";
 
 print "</td>\n\t\t</tr>\n\t</table>";
 

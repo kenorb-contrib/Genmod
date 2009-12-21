@@ -52,7 +52,7 @@ if (!$gm_user->userIsAdmin()) {
 	else header("Location: ".LOGIN_URL."?url=useradmin.php?".GetQueryString(true));
 	exit;
 }
-PrintHeader("Genmod ".$gm_lang["user_admin"]);
+PrintHeader("Genmod ".GM_LANG_user_admin);
 
 // Javascript for edit form
 ?>
@@ -60,29 +60,29 @@ PrintHeader("Genmod ".$gm_lang["user_admin"]);
 <!--
 	function checkform(frm) {
 		if (frm.uusername.value=="") {
-			alert("<?php print $gm_lang["enter_username"]; ?>");
+			alert("<?php print GM_LANG_enter_username; ?>");
 			frm.uusername.focus();
 			return false;
 		}
 		if (frm.ufirstname.value=="") {
-			alert("<?php print $gm_lang["enter_fullname"]; ?>");
+			alert("<?php print GM_LANG_enter_fullname; ?>");
 			frm.ufirstname.focus();
 			return false;
 		}
 		if (frm.ulastname.value=="") {
-			alert("<?php print $gm_lang["enter_fullname"]; ?>");
+			alert("<?php print GM_LANG_enter_fullname; ?>");
 			frm.ulastname.focus();
 			return false;
 		}
 	    if ((frm.pass1.value!="")&&(frm.pass1.value.length < 6)) {
-	      alert("<?php print $gm_lang["passwordlength"]; ?>");
+	      alert("<?php print GM_LANG_passwordlength; ?>");
 	      frm.pass1.value = "";
 	      frm.pass2.value = "";
 	      frm.pass1.focus();
 	      return false;
 	    }
 		if ((frm.emailadress.value!="")&&(frm.emailadress.value.indexOf("@")==-1)) {
-			alert("<?php print $gm_lang["enter_email"]; ?>");
+			alert("<?php print GM_LANG_enter_email; ?>");
 			frm.emailadress.focus();
 			return false;
 		} 
@@ -112,7 +112,7 @@ if ($action=="createuser") {
 	if ($pass == TRUE){
 		$uuser =& User::GetInstance($uusername);
 		if (!$uuser->is_empty) {
-			print "<span class=\"error\">".$gm_lang["duplicate_username"]."</span><br />";
+			print "<span class=\"error\">".GM_LANG_duplicate_username."</span><br />";
 		}
 		else if ($pass1==$pass2) {
 			$user = new User();
@@ -175,30 +175,30 @@ if ($action=="createuser") {
 			$au = UserController::AddUser($user, "added");
 			
 			if ($au) {
-				$message .= $gm_lang["user_created"];
+				$message .= GM_LANG_user_created;
 				//-- update Gedcom record with new email address
 				AdminFunctions::UpdateUserIndiEmail($user);
 			}
 			else {
-				$message .= "<span class=\"error\">".$gm_lang["user_create_error"]."<br /></span>";
+				$message .= "<span class=\"error\">".GM_LANG_user_create_error."<br /></span>";
 			}
 		}
 		else {
-			$message .= "<span class=\"error\">".$gm_lang["password_mismatch"]."</span><br />";
+			$message .= "<span class=\"error\">".GM_LANG_password_mismatch."</span><br />";
 		}
 	}
 	else {
-		$message .= "<span class=\"error\">".$gm_lang["invalid_username"]."</span><br />";
+		$message .= "<span class=\"error\">".GM_LANG_invalid_username."</span><br />";
 	}
 	$action = "";
 }
 //-- section to delete a user
 if ($action=="deleteuser") {
 	if (UserController::DeleteUser($username, "deleted")) {
-		$message .= $gm_lang["delete_user_ok"];
+		$message .= GM_LANG_delete_user_ok;
 		NewsController::DeleteUserNews($username);
 	}
-	else $message .= "<span class=\"error\">".$gm_lang["delete_user_nok"]."</span>";
+	else $message .= "<span class=\"error\">".GM_LANG_delete_user_nok."</span>";
 }
 //-- section to update a user by first deleting them
 //-- and then adding them again
@@ -217,7 +217,7 @@ if ($action=="edituser2") {
 	if ($pass == TRUE){
 		$u =& User::GetInstance($uusername);
 		if ($uusername!=$oldusername && !$u->is_empty) {
-			print "<span class=\"error\">".$gm_lang["duplicate_username"]."</span><br />";
+			print "<span class=\"error\">".GM_LANG_duplicate_username."</span><br />";
 			$action="edituser";
 			$username = $oldusername;
 		}
@@ -312,12 +312,12 @@ if ($action=="edituser2") {
 				$message->from_name = $newuser->firstname.' '.$newuser->lastname;
 				$message->from = "genmod-noreply@".$host;
 				if (substr(SERVER_URL, -1) == "/"){
-					$message->subject = str_replace("#SERVER_NAME#", substr(SERVER_URL,0, (strlen(SERVER_URL)-1)), $gm_lang["admin_approved"]);
-					$message->body = str_replace("#SERVER_NAME#", SERVER_URL, $gm_lang["admin_approved"])." ".$gm_lang["you_may_login"]."\r\n\r\n"."<a href=\"".substr(SERVER_URL,0, (strlen(SERVER_URL)-1))."/index.php?command=user\">".substr(SERVER_URL,0, (strlen(SERVER_URL)-1))."/index.php?command=user</a>\r\n";
+					$message->subject = str_replace("#SERVER_NAME#", substr(SERVER_URL,0, (strlen(SERVER_URL)-1)), GM_LANG_admin_approved);
+					$message->body = str_replace("#SERVER_NAME#", SERVER_URL, GM_LANG_admin_approved)." ".GM_LANG_you_may_login."\r\n\r\n"."<a href=\"".substr(SERVER_URL,0, (strlen(SERVER_URL)-1))."/index.php?command=user\">".substr(SERVER_URL,0, (strlen(SERVER_URL)-1))."/index.php?command=user</a>\r\n";
 				}
 				else {
-					$message->subject = str_replace("#SERVER_NAME#", SERVER_URL, $gm_lang["admin_approved"]);
-					$message->body = str_replace("#SERVER_NAME#", SERVER_URL, $gm_lang["admin_approved"])." ".$gm_lang["you_may_login"]."\r\n\r\n"."<a href=\"".SERVER_URL."/index.php?command=user\">".SERVER_URL."/index.php?command=user</a>\r\n";
+					$message->subject = str_replace("#SERVER_NAME#", SERVER_URL, GM_LANG_admin_approved);
+					$message->body = str_replace("#SERVER_NAME#", SERVER_URL, GM_LANG_admin_approved)." ".GM_LANG_you_may_login."\r\n\r\n"."<a href=\"".SERVER_URL."/index.php?command=user\">".SERVER_URL."/index.php?command=user</a>\r\n";
 				}
 				$message->created = "";
 				$message->method = "messaging2";
@@ -334,14 +334,14 @@ if ($action=="edituser2") {
 			}
 		}
 		else {
-			print "<span class=\"error\">".$gm_lang["password_mismatch"]."</span><br />";
+			print "<span class=\"error\">".GM_LANG_password_mismatch."</span><br />";
 			$action="edituser";
 			$username = $oldusername;
 		}
 		$message = "";
 	}
 	else {
-		print "<span class=\"error\">".$gm_lang["invalid_username"]."</span><br />";
+		print "<span class=\"error\">".GM_LANG_invalid_username."</span><br />";
 	}
 }
 //-- print the form to edit a user
@@ -350,9 +350,9 @@ init_calendar_popup();
 if ($action=="edituser" || $action == "createform") { ?>
 	<!-- Setup the left box -->
 	<div id="admin_genmod_left">
-		<div class="admin_link"><a href="admin.php"><?php print $gm_lang["admin"];?></a></div>
-		<div class="admin_link"><a href="useradmin.php"><?php print $gm_lang["user_admin"];?></a></div>
-		<div class="admin_link"><a href="useradmin.php?action=listusers&amp;sort=<?php print $sort;?>&amp;filter=<?php print $filter;?>&amp;usrlang=<?php print $usrlang;?>&amp;gedid=<?php print $gedid;?>&amp;namefilter=<?php print $namefilter;?>"><?php print $gm_lang["current_users"];?></a></div>
+		<div class="admin_link"><a href="admin.php"><?php print GM_LANG_admin;?></a></div>
+		<div class="admin_link"><a href="useradmin.php"><?php print GM_LANG_user_admin;?></a></div>
+		<div class="admin_link"><a href="useradmin.php?action=listusers&amp;sort=<?php print $sort;?>&amp;filter=<?php print $filter;?>&amp;usrlang=<?php print $usrlang;?>&amp;gedid=<?php print $gedid;?>&amp;namefilter=<?php print $namefilter;?>"><?php print GM_LANG_current_users;?></a></div>
 	</div>
 	<div id="content">
 		<?php
@@ -372,7 +372,7 @@ if ($action=="edituser" || $action == "createform") { ?>
 				<?php } 
 				break;
 			case "createform": ?>
-				<form name="newform" method="post" action="<?php print $SCRIPT_NAME;?>" onsubmit="return checkform(this);">
+				<form name="newform" method="post" action="<?php print SCRIPT_NAME;?>" onsubmit="return checkform(this);">
 				<input type="hidden" name="action" value="createuser" />
 				<input type="hidden" name="reg_timestamp" value="<?php print date("U");?>" />
 				<input type="hidden" name="reg_hashcode" value="" />
@@ -383,10 +383,10 @@ if ($action=="edituser" || $action == "createform") { ?>
 			<h3>
 			<?php switch ($action) {
 				case "edituser":
-					print $gm_lang["update_user"];
+					print GM_LANG_update_user;
 					break;
 				case "createform":
-					print $gm_lang["add_user"];
+					print GM_LANG_add_user;
 					break;
 			} ?>
 			</h3>
@@ -399,7 +399,7 @@ if ($action=="edituser" || $action == "createform") { ?>
 						<?php print_help_link("useradmin_username_help", "qm","username");?>
 					</div>
 					<div class="description">
-						<?php print $gm_lang["username"]; ?>
+						<?php print GM_LANG_username; ?>
 					</div>
 				</div>
 				<div class="choice_right">
@@ -412,7 +412,7 @@ if ($action=="edituser" || $action == "createform") { ?>
 						<?php print_help_link("useradmin_firstname_help", "qm", "firstname");?>
 					</div>
 					<div class="description">
-						<?php print $gm_lang["firstname"]; ?>
+						<?php print GM_LANG_firstname; ?>
 					</div>
 				</div>
 				<div class="choice_right">
@@ -425,7 +425,7 @@ if ($action=="edituser" || $action == "createform") { ?>
 						<?php print_help_link("useradmin_lastname_help", "qm","lastname");?>
 					</div>
 					<div class="description">
-						<?php print $gm_lang["lastname"]; ?>
+						<?php print GM_LANG_lastname; ?>
 					</div>
 				</div>
 				<div class="choice_right">
@@ -438,11 +438,11 @@ if ($action=="edituser" || $action == "createform") { ?>
 						<?php print_help_link("useradmin_password_help", "qm","password");?>
 					</div>
 					<div class="description">
-						<?php print $gm_lang["password"]; ?>
+						<?php print GM_LANG_password; ?>
 					</div>
 				</div>
 				<div class="choice_right">
-					<input type="password" name="pass1" tabindex="<?php $tab++; print $tab; ?>" /><br /><?php if ($action == "edituser") { print $gm_lang["leave_blank"]; } ?>
+					<input type="password" name="pass1" tabindex="<?php $tab++; print $tab; ?>" /><br /><?php if ($action == "edituser") { print GM_LANG_leave_blank; } ?>
 				</div>
 			</div>
 			<div class="admin_item_box">
@@ -451,7 +451,7 @@ if ($action=="edituser" || $action == "createform") { ?>
 						<?php print_help_link("useradmin_conf_password_help", "qm","confirm");?>
 					</div>
 					<div class="description">
-						<?php print $gm_lang["confirm"]; ?>
+						<?php print GM_LANG_confirm; ?>
 					</div>
 				</div>
 				<div class="choice_right">
@@ -464,7 +464,7 @@ if ($action=="edituser" || $action == "createform") { ?>
 						<?php print_help_link("useradmin_sync_gedcom_help", "qm", "sync_gedcom");?>
 					</div>
 					<div class="description">
-						<?php print $gm_lang["sync_gedcom"]; ?>
+						<?php print GM_LANG_sync_gedcom; ?>
 					</div>
 				</div>
 				<div class="choice_right">
@@ -477,7 +477,7 @@ if ($action=="edituser" || $action == "createform") { ?>
 						<?php print_help_link("useradmin_can_admin_help", "qm", "can_admin");?>
 					</div>
 					<div class="description">
-						<?php print $gm_lang["can_admin"]; ?>
+						<?php print GM_LANG_can_admin; ?>
 					</div>
 				</div>
 				<div class="choice_right">
@@ -490,7 +490,7 @@ if ($action=="edituser" || $action == "createform") { ?>
 						<?php print_help_link("useradmin_auto_accept_help", "qm", "user_auto_accept");?>
 					</div>
 					<div class="description">
-						<?php print $gm_lang["user_auto_accept"]; ?>
+						<?php print GM_LANG_user_auto_accept; ?>
 					</div>
 				</div>
 				<div class="choice_right">
@@ -503,7 +503,7 @@ if ($action=="edituser" || $action == "createform") { ?>
 						<?php print_help_link("useradmin_email_help", "qm", "emailadress");?>
 					</div>
 					<div class="description">
-						<?php print $gm_lang["emailadress"]; ?>
+						<?php print GM_LANG_emailadress; ?>
 					</div>
 				</div>
 				<div class="choice_right">
@@ -516,7 +516,7 @@ if ($action=="edituser" || $action == "createform") { ?>
 						<?php print_help_link("useradmin_verified_help", "qm", "verified");?>
 					</div>
 					<div class="description">
-						<?php print $gm_lang["verified"]; ?>
+						<?php print GM_LANG_verified; ?>
 					</div>
 				</div>
 				<div class="choice_right">
@@ -529,7 +529,7 @@ if ($action=="edituser" || $action == "createform") { ?>
 						<?php print_help_link("useradmin_verbyadmin_help", "qm", "verified_by_admin");?>
 					</div>
 					<div class="description">
-						<?php print $gm_lang["verified_by_admin"]; ?>
+						<?php print GM_LANG_verified_by_admin; ?>
 					</div>
 				</div>
 				<div class="choice_right">
@@ -544,7 +544,7 @@ if ($action=="edituser" || $action == "createform") { ?>
 							<?php print_help_link("edituser_change_lang_help", "qm", "change_lang");?>
 						</div>
 						<div class="description">
-							<?php print $gm_lang["change_lang"]; ?>
+							<?php print GM_LANG_change_lang; ?>
 						</div>
 					</div>
 					<div class="choice_right">
@@ -556,7 +556,7 @@ if ($action=="edituser" || $action == "createform") { ?>
 							if ($language_settings[$key]["gm_lang_use"]) {
 								print "\n\t\t\t<option value=\"$key\"";
 								if ($key == $user->language) print " selected=\"selected\"";
-								print ">" . $gm_lang[$key] . "</option>";
+								print ">" . constant("GM_LANG_lang_name_".$key) . "</option>";
 							}
 						}
 						print "</select>\n\t\t";
@@ -571,12 +571,12 @@ if ($action=="edituser" || $action == "createform") { ?>
 							<?php print_help_link("useradmin_user_theme_help", "qm", "user_theme");?>
 						</div>
 						<div class="description">
-							<?php print $gm_lang["user_theme"]; ?>
+							<?php print GM_LANG_user_theme; ?>
 						</div>
 					</div>
 					<div class="choice_right">
 						<select name="user_theme" tabindex="<?php $tab++; print $tab; ?>" dir="ltr">
-							<option value=""><?php print $gm_lang["site_default"]; ?></option>
+							<option value=""><?php print GM_LANG_site_default; ?></option>
 							<?php
 							$themes = GetThemeNames();
 							foreach($themes as $indexval => $themedir) {
@@ -595,20 +595,20 @@ if ($action=="edituser" || $action == "createform") { ?>
 						<?php print_help_link("useradmin_user_contact_help", "qm", "user_contact_method");?>
 					</div>
 					<div class="description">
-						<?php print $gm_lang["user_contact_method"]; ?>
+						<?php print GM_LANG_user_contact_method; ?>
 					</div>
 				</div>
 				<div class="choice_right">
 					<select name="new_contact_method" tabindex="<?php $tab++; print $tab; ?>">
 						<?php if ($GM_STORE_MESSAGES) { ?>
-							<option value="messaging" <?php if ($action == "edituser") if ($user->contactmethod=='messaging') print "selected=\"selected\""; ?>><?php print $gm_lang["messaging"];?></option>
-							<option value="messaging2" <?php if ($action == "edituser") { if ($user->contactmethod=='messaging2') print "selected=\"selected\""; } else print "selected=\"selected\"";?>><?php print $gm_lang["messaging2"];?></option>
+							<option value="messaging" <?php if ($action == "edituser") if ($user->contactmethod=='messaging') print "selected=\"selected\""; ?>><?php print GM_LANG_messaging;?></option>
+							<option value="messaging2" <?php if ($action == "edituser") { if ($user->contactmethod=='messaging2') print "selected=\"selected\""; } else print "selected=\"selected\"";?>><?php print GM_LANG_messaging2;?></option>
 						<?php } 
 						else { ?>
-							<option value="messaging3" <?php if ($action == "edituser") { if ($user->contactmethod=='messaging3') print "selected=\"selected\""; } else print "selected=\"selected\"";?>><?php print $gm_lang["messaging3"];?></option>
+							<option value="messaging3" <?php if ($action == "edituser") { if ($user->contactmethod=='messaging3') print "selected=\"selected\""; } else print "selected=\"selected\"";?>><?php print GM_LANG_messaging3;?></option>
 						<?php } ?>
-						<option value="mailto" <?php if ($action == "edituser") if ($user->contactmethod=='mailto') print "selected=\"selected\""; ?>><?php print $gm_lang["mailto"];?></option>
-						<option value="none" <?php if ($action == "edituser") if ($user->contactmethod=='none') print "selected=\"selected\""; ?>><?php print $gm_lang["no_messaging"];?></option>
+						<option value="mailto" <?php if ($action == "edituser") if ($user->contactmethod=='mailto') print "selected=\"selected\""; ?>><?php print GM_LANG_mailto;?></option>
+						<option value="none" <?php if ($action == "edituser") if ($user->contactmethod=='none') print "selected=\"selected\""; ?>><?php print GM_LANG_no_messaging;?></option>
 					</select>
 				</div>
 			</div>
@@ -618,7 +618,7 @@ if ($action=="edituser" || $action == "createform") { ?>
 						<?php print_help_link("useradmin_visibleonline_help", "qm", "visibleonline");?>
 					</div>
 					<div class="description">
-						<?php print $gm_lang["visibleonline"]; ?>
+						<?php print GM_LANG_visibleonline; ?>
 					</div>
 				</div>
 				<div class="choice_right">
@@ -631,7 +631,7 @@ if ($action=="edituser" || $action == "createform") { ?>
 						<?php print_help_link("useradmin_editaccount_help", "qm", "editaccount");?>
 					</div>
 					<div class="description">
-						<?php print $gm_lang["editaccount"]; ?>
+						<?php print GM_LANG_editaccount; ?>
 					</div>
 				</div>
 				<div class="choice_right">
@@ -644,18 +644,18 @@ if ($action=="edituser" || $action == "createform") { ?>
 						<?php print_help_link("useradmin_user_default_tab_help", "qm", "user_default_tab");?>
 					</div>
 					<div class="description">
-						<?php print $gm_lang["user_default_tab"]; ?>
+						<?php print GM_LANG_user_default_tab; ?>
 					</div>
 				</div>
 				<div class="choice_right">
 					<select name="new_default_tab" tabindex="<?php $tab++; print $tab; ?>">
-						<option value="9" <?php if ($action == "edituser") if (@$user->default_tab==9) print "selected=\"selected\""; ?>><?php print $gm_lang["site_default"]; ?></option>
-						<option value="0" <?php if ($action == "edituser") if (@$user->default_tab==0) print "selected=\"selected\""; ?>><?php print $gm_lang["personal_facts"];?></option>
-						<option value="1" <?php if ($action == "edituser") if (@$user->default_tab==1) print "selected=\"selected\""; ?>><?php print $gm_lang["notes"];?></option>
-						<option value="2" <?php if ($action == "edituser") if (@$user->default_tab==2) print "selected=\"selected\""; ?>><?php print $gm_lang["ssourcess"];?></option>
-						<option value="3" <?php if ($action == "edituser") if (@$user->default_tab==3) print "selected=\"selected\""; ?>><?php print $gm_lang["media"];?></option>
-						<option value="4" <?php if ($action == "edituser") if (@$user->default_tab==4) print "selected=\"selected\""; ?>><?php print $gm_lang["relatives"];?></option>
-						<option value="6" <?php if ($action == "edituser") if (@$user->default_tab==6) print "selected=\"selected\""; ?>><?php print $gm_lang["all"];?></option>
+						<option value="9" <?php if ($action == "edituser") if (@$user->default_tab==9) print "selected=\"selected\""; ?>><?php print GM_LANG_site_default; ?></option>
+						<option value="0" <?php if ($action == "edituser") if (@$user->default_tab==0) print "selected=\"selected\""; ?>><?php print GM_LANG_personal_facts;?></option>
+						<option value="1" <?php if ($action == "edituser") if (@$user->default_tab==1) print "selected=\"selected\""; ?>><?php print GM_LANG_notes;?></option>
+						<option value="2" <?php if ($action == "edituser") if (@$user->default_tab==2) print "selected=\"selected\""; ?>><?php print GM_LANG_ssourcess;?></option>
+						<option value="3" <?php if ($action == "edituser") if (@$user->default_tab==3) print "selected=\"selected\""; ?>><?php print GM_LANG_media;?></option>
+						<option value="4" <?php if ($action == "edituser") if (@$user->default_tab==4) print "selected=\"selected\""; ?>><?php print GM_LANG_relatives;?></option>
+						<option value="6" <?php if ($action == "edituser") if (@$user->default_tab==6) print "selected=\"selected\""; ?>><?php print GM_LANG_all;?></option>
 					</select>
 				</div>
 			</div>
@@ -666,7 +666,7 @@ if ($action=="edituser" || $action == "createform") { ?>
 							<?php print_help_link("useradmin_comment_help", "qm", "comment");?>
 						</div>
 						<div class="description">
-							<?php print $gm_lang["comment"]; ?>
+							<?php print GM_LANG_comment; ?>
 						</div>
 					</div>
 					<div class="choice_right">
@@ -679,7 +679,7 @@ if ($action=="edituser" || $action == "createform") { ?>
 							<?php print_help_link("useradmin_comment_exp_help", "qm", "comment_exp");?>
 						</div>
 						<div class="description">
-							<?php print $gm_lang["comment_exp"]; ?>
+							<?php print GM_LANG_comment_exp; ?>
 						</div>
 					</div>
 					<div class="choice_right">
@@ -700,7 +700,7 @@ if ($action=="edituser" || $action == "createform") { ?>
 						<?php print_help_link("useradmin_gedcomid_help", "qm","gedcomid");?>
 					</div>
 					<div class="description">
-						<?php print $gm_lang["gedcomid"]; ?>
+						<?php print GM_LANG_gedcomid; ?>
 					</div>
 				</div>
 				<div class="width65 choice_right">
@@ -735,7 +735,7 @@ if ($action=="edituser" || $action == "createform") { ?>
 						<?php print_help_link("useradmin_rootid_help", "qm", "rootid");?>
 					</div>
 					<div class="description">
-						<?php print $gm_lang["rootid"]; ?>
+						<?php print GM_LANG_rootid; ?>
 					</div>
 				</div>
 				<div class="width65 choice_right">
@@ -771,7 +771,7 @@ if ($action=="edituser" || $action == "createform") { ?>
 						<?php print_help_link("useradmin_gedcom_admin_help", "qm", "gedadmin");?>
 					</div>
 					<div class="description">
-						<?php print $gm_lang["gedadmin"]; ?>
+						<?php print GM_LANG_gedadmin; ?>
 					</div>
 				</div>
 				<div class="choice_right">
@@ -784,7 +784,7 @@ if ($action=="edituser" || $action == "createform") { ?>
 						<?php print_help_link("useradmin_privgroup_help", "qm","accpriv_conf");?>
 					</div>
 					<div class="description">
-						<?php print $gm_lang["accpriv_conf"]; ?>
+						<?php print GM_LANG_accpriv_conf; ?>
 					</div>
 				</div>
 				<div class="width65 choice_right">
@@ -800,16 +800,16 @@ if ($action=="edituser" || $action == "createform") { ?>
 								print ">\n";
 								print "<option value=\"none\"";
 								if ($action == "edituser") if ($user->privgroup[$gedcomid]=="none") print " selected=\"selected\"";
-								print ">".$gm_lang["visitor"]."</option>\n";
+								print ">".GM_LANG_visitor."</option>\n";
 								print "<option value=\"access\"";
 								if ($action == "edituser") if ($user->privgroup[$gedcomid]=="access") print " selected=\"selected\"";
-								print ">".$gm_lang["user"]."</option>\n";
+								print ">".GM_LANG_user."</option>\n";
 								print "<option value=\"admin\"";
 								if ($action == "edituser") if ($user->privgroup[$gedcomid]=="admin" || $user->canadmin) print " selected=\"selected\"";
-								print ">".$gm_lang["administrator"]."</option>\n";
+								print ">".GM_LANG_administrator."</option>\n";
 //								print "<option value=\"admin\"";
 //								if ($action == "edituser") if ($user->canedit[$file]=="admin") print " selected=\"selected\"";
-//								print ">".$gm_lang["admin_gedcom"]."</option>\n";
+//								print ">".GM_LANG_admin_gedcom."</option>\n";
 								print "</select>\n";
 								?>
 							</div>
@@ -822,14 +822,14 @@ if ($action=="edituser" || $action == "createform") { ?>
 						<?php print_help_link("useradmin_relation_priv_help", "qm", "user_relationship_priv");?>
 					</div>
 					<div class="description">
-						<?php print $gm_lang["user_relationship_priv"]; ?>
+						<?php print GM_LANG_user_relationship_priv; ?>
 					</div>
 				</div>
 				<div class="choice_right">
 					<select name="new_relationship_privacy_<?php print $gedcomid; ?>"<?php if ($user->canadmin && $action == "edituser") print " disabled=\"disabled\""; ?> tabindex="<?php $tab++; print $tab; ?>" >
-						<option value=""<?php if ($action == "edituser") if (isset($user->relationship_privacy[$gedcomid]) && $user->relationship_privacy[$gedcomid]=="") print " selected=\"selected\"";?>><?php print $gm_lang["default"]; ?></option>
-						<option value="Y"<?php if ($action == "edituser") if (isset($user->relationship_privacy[$gedcomid]) && $user->relationship_privacy[$gedcomid]=="Y") print " selected=\"selected\"";?>><?php print $gm_lang["yes"]; ?></option>
-						<option value="N"<?php if ($action == "edituser") if (isset($user->relationship_privacy[$gedcomid]) && $user->relationship_privacy[$gedcomid]=="N") print " selected=\"selected\"";?>><?php print $gm_lang["no"]; ?></option>
+						<option value=""<?php if ($action == "edituser") if (isset($user->relationship_privacy[$gedcomid]) && $user->relationship_privacy[$gedcomid]=="") print " selected=\"selected\"";?>><?php print GM_LANG_default; ?></option>
+						<option value="Y"<?php if ($action == "edituser") if (isset($user->relationship_privacy[$gedcomid]) && $user->relationship_privacy[$gedcomid]=="Y") print " selected=\"selected\"";?>><?php print GM_LANG_yes; ?></option>
+						<option value="N"<?php if ($action == "edituser") if (isset($user->relationship_privacy[$gedcomid]) && $user->relationship_privacy[$gedcomid]=="N") print " selected=\"selected\"";?>><?php print GM_LANG_no; ?></option>
 						</select>
 				</div>
 			</div>
@@ -839,7 +839,7 @@ if ($action=="edituser" || $action == "createform") { ?>
 						<?php print_help_link("useradmin_path_length_help", "qm", "user_path_length");?>
 					</div>
 					<div class="description">
-						<?php print $gm_lang["user_path_length"]; ?>
+						<?php print GM_LANG_user_path_length; ?>
 					</div>
 				</div>
 				<div class="choice_right">
@@ -861,14 +861,14 @@ if ($action=="edituser" || $action == "createform") { ?>
 						<?php print_help_link("useradmin_marr_priv_help", "qm", "user_path_marr");?>
 					</div>
 					<div class="description">
-						<?php print $gm_lang["user_path_marr"]; ?>
+						<?php print GM_LANG_user_path_marr; ?>
 					</div>
 				</div>
 				<div class="choice_right">
 					<select name="new_check_marriage_relations_<?php print $gedcomid; ?>"<?php if ($user->canadmin && $action == "edituser") print " disabled=\"disabled\""; ?> tabindex="<?php $tab++; print $tab; ?>" >
-						<option value=""<?php if ($action == "edituser") if (isset($user->check_marriage_relations[$gedcomid]) && $user->check_marriage_relations[$gedcomid]=="") print " selected=\"selected\"";?>><?php print $gm_lang["default"]; ?></option>
-						<option value="Y"<?php if ($action == "edituser") if (isset($user->check_marriage_relations[$gedcomid]) && $user->check_marriage_relations[$gedcomid]=="Y") print " selected=\"selected\"";?>><?php print $gm_lang["yes"]; ?></option>
-						<option value="N"<?php if ($action == "edituser") if (isset($user->check_marriage_relations[$gedcomid]) && $user->check_marriage_relations[$gedcomid]=="N") print " selected=\"selected\"";?>><?php print $gm_lang["no"]; ?></option>
+						<option value=""<?php if ($action == "edituser") if (isset($user->check_marriage_relations[$gedcomid]) && $user->check_marriage_relations[$gedcomid]=="") print " selected=\"selected\"";?>><?php print GM_LANG_default; ?></option>
+						<option value="Y"<?php if ($action == "edituser") if (isset($user->check_marriage_relations[$gedcomid]) && $user->check_marriage_relations[$gedcomid]=="Y") print " selected=\"selected\"";?>><?php print GM_LANG_yes; ?></option>
+						<option value="N"<?php if ($action == "edituser") if (isset($user->check_marriage_relations[$gedcomid]) && $user->check_marriage_relations[$gedcomid]=="N") print " selected=\"selected\"";?>><?php print GM_LANG_no; ?></option>
 						</select>
 				</div>
 			</div>
@@ -878,14 +878,14 @@ if ($action=="edituser" || $action == "createform") { ?>
 						<?php print_help_link("useradmin_hide_live_people_help", "qm", "HIDE_LIVE_PEOPLE");?>
 					</div>
 					<div class="description">
-						<?php print $gm_lang["HIDE_LIVE_PEOPLE"]; ?>
+						<?php print GM_LANG_HIDE_LIVE_PEOPLE; ?>
 					</div>
 				</div>
 				<div class="choice_right">
 					<select name="new_hide_live_people_<?php print $gedcomid; ?>"<?php if ($user->canadmin && $action == "edituser") print " disabled=\"disabled\""; ?> tabindex="<?php $tab++; print $tab; ?>" >
-						<option value=""<?php if ($action == "edituser") if (isset($user->hide_live_people[$gedcomid]) && $user->hide_live_people[$gedcomid]=="") print " selected=\"selected\"";?>><?php print $gm_lang["default"]; ?></option>
-						<option value="Y"<?php if ($action == "edituser") if (isset($user->hide_live_people[$gedcomid]) && $user->hide_live_people[$gedcomid]=="Y") print " selected=\"selected\"";?>><?php print $gm_lang["yes"]; ?></option>
-						<option value="N"<?php if ($action == "edituser") if (isset($user->hide_live_people[$gedcomid]) && $user->hide_live_people[$gedcomid]=="N") print " selected=\"selected\"";?>><?php print $gm_lang["no"]; ?></option>
+						<option value=""<?php if ($action == "edituser") if (isset($user->hide_live_people[$gedcomid]) && $user->hide_live_people[$gedcomid]=="") print " selected=\"selected\"";?>><?php print GM_LANG_default; ?></option>
+						<option value="Y"<?php if ($action == "edituser") if (isset($user->hide_live_people[$gedcomid]) && $user->hide_live_people[$gedcomid]=="Y") print " selected=\"selected\"";?>><?php print GM_LANG_yes; ?></option>
+						<option value="N"<?php if ($action == "edituser") if (isset($user->hide_live_people[$gedcomid]) && $user->hide_live_people[$gedcomid]=="N") print " selected=\"selected\"";?>><?php print GM_LANG_no; ?></option>
 						</select>
 				</div>
 			</div>
@@ -895,14 +895,14 @@ if ($action=="edituser" || $action == "createform") { ?>
 						<?php print_help_link("useradmin_show_living_names_help", "qm", "SHOW_LIVING_NAMES");?>
 					</div>
 					<div class="description">
-						<?php print $gm_lang["SHOW_LIVING_NAMES"]; ?>
+						<?php print GM_LANG_SHOW_LIVING_NAMES; ?>
 					</div>
 				</div>
 				<div class="choice_right">
 					<select name="new_show_living_names_<?php print $gedcomid; ?>"<?php if ($user->canadmin && $action == "edituser") print " disabled=\"disabled\""; ?> tabindex="<?php $tab++; print $tab; ?>" >
-						<option value=""<?php if ($action == "edituser") if (isset($user->show_living_names[$gedcomid]) && $user->show_living_names[$gedcomid]=="") print " selected=\"selected\"";?>><?php print $gm_lang["default"]; ?></option>
-						<option value="Y"<?php if ($action == "edituser") if (isset($user->show_living_names[$gedcomid]) && $user->show_living_names[$gedcomid]=="Y") print " selected=\"selected\"";?>><?php print $gm_lang["yes"]; ?></option>
-						<option value="N"<?php if ($action == "edituser") if (isset($user->show_living_names[$gedcomid]) && $user->show_living_names[$gedcomid]=="N") print " selected=\"selected\"";?>><?php print $gm_lang["no"]; ?></option>
+						<option value=""<?php if ($action == "edituser") if (isset($user->show_living_names[$gedcomid]) && $user->show_living_names[$gedcomid]=="") print " selected=\"selected\"";?>><?php print GM_LANG_default; ?></option>
+						<option value="Y"<?php if ($action == "edituser") if (isset($user->show_living_names[$gedcomid]) && $user->show_living_names[$gedcomid]=="Y") print " selected=\"selected\"";?>><?php print GM_LANG_yes; ?></option>
+						<option value="N"<?php if ($action == "edituser") if (isset($user->show_living_names[$gedcomid]) && $user->show_living_names[$gedcomid]=="N") print " selected=\"selected\"";?>><?php print GM_LANG_no; ?></option>
 						</select>
 				</div>
 			</div>
@@ -912,7 +912,7 @@ if ($action=="edituser" || $action == "createform") { ?>
 						<?php print_help_link("useradmin_can_edit_help", "qm","edit_rights");?>
 					</div>
 					<div class="description">
-						<?php print $gm_lang["edit_rights"]; ?>
+						<?php print GM_LANG_edit_rights; ?>
 					</div>
 				</div>
 				<div class="width65 choice_right">
@@ -931,16 +931,16 @@ if ($action=="edituser" || $action == "createform") { ?>
 								print ">\n";
 								print "<option value=\"none\"";
 								if ($action == "edituser") if ($user->canedit[$gedcomid]=="none") print " selected=\"selected\"";
-								print ">".$gm_lang["none"]."</option>\n";
+								print ">".GM_LANG_none."</option>\n";
 								print "<option value=\"edit\"";
 								if ($action == "edituser") if ($user->canedit[$gedcomid]=="edit") print " selected=\"selected\"";
-								print ">".$gm_lang["edit"]."</option>\n";
+								print ">".GM_LANG_edit."</option>\n";
 								print "<option value=\"accept\"";
 								if ($action == "edituser") if ($user->canedit[$gedcomid]=="accept") print " selected=\"selected\"";
-								print ">".$gm_lang["accept"]."</option>\n";
+								print ">".GM_LANG_accept."</option>\n";
 //								print "<option value=\"admin\"";
 //								if ($action == "edituser") if ($user->canedit[$file]=="admin") print " selected=\"selected\"";
-//								print ">".$gm_lang["admin_gedcom"]."</option>\n";
+//								print ">".GM_LANG_admin_gedcom."</option>\n";
 								print "</select>\n";
 								?>
 							</div>
@@ -950,12 +950,12 @@ if ($action=="edituser" || $action == "createform") { ?>
 			<?php } // end of loop through gedcoms
 			?>
 			<div class="admin_item_box center">
-				<input type="submit" tabindex="<?php $tab++; print $tab; ?>" value="<?php print $gm_lang["update_user"]; ?>" />
+				<input type="submit" tabindex="<?php $tab++; print $tab; ?>" value="<?php print GM_LANG_update_user; ?>" />
 			</div>
 		</form>
 		<?php }
 		else {
-			print "<div class=\"shade2 center\"><span class=\"error\">".$gm_lang["user_not_exist"]."</span></div>";
+			print "<div class=\"shade2 center\"><span class=\"error\">".GM_LANG_user_not_exist."</span></div>";
 		}
 		?>
 	</div>
@@ -973,13 +973,13 @@ if ($action == "massupdate") {
 	?>
 	<!-- Setup the left box -->
 	<div id="admin_genmod_left">
-		<div class="admin_link"><a href="admin.php"><?php print $gm_lang["admin"];?></a></div>
-		<div class="admin_link"><a href="useradmin.php"><?php print $gm_lang["user_admin"];?></a></div>
-		<div class="admin_link"><a href="useradmin.php?action=listusers&amp;sort=<?php print $sort;?>&amp;filter=<?php print $filter;?>&amp;usrlang=<?php print $usrlang;?>&amp;gedid=<?php print $gedid;?>&amp;namefilter=<?php print $namefilter;?>"><?php print $gm_lang["current_users"];?></a></div>
+		<div class="admin_link"><a href="admin.php"><?php print GM_LANG_admin;?></a></div>
+		<div class="admin_link"><a href="useradmin.php"><?php print GM_LANG_user_admin;?></a></div>
+		<div class="admin_link"><a href="useradmin.php?action=listusers&amp;sort=<?php print $sort;?>&amp;filter=<?php print $filter;?>&amp;usrlang=<?php print $usrlang;?>&amp;gedid=<?php print $gedid;?>&amp;namefilter=<?php print $namefilter;?>"><?php print GM_LANG_current_users;?></a></div>
 	</div>
 	<!-- Setup the right box -->
 	<div id="admin_genmod_right">
-		<div class="admin_topbottombar"><?php print $gm_lang["mu_users"]; ?></div>
+		<div class="admin_topbottombar"><?php print GM_LANG_mu_users; ?></div>
 		<!-- Start print the form -->
 		<?php if (count($userlist) > 0) { ?> 
 			<form name="massupdate" method="post" action="useradmin.php">
@@ -1007,22 +1007,22 @@ if ($action == "massupdate") {
 	<div id="content">
 	<?php $tab = 0; ?>
 		<div class="admin_topbottombar">
-			<?php print "<h3>".$gm_lang["mass_update"]."</h3>"; ?>
+			<?php print "<h3>".GM_LANG_mass_update."</h3>"; ?>
 		</div>
 		<?php if (count($userlist) == 0) { ?>
-			<div class="shade2 center"><?php print $gm_lang["no_users_selected"]; ?></div>
+			<div class="shade2 center"><?php print GM_LANG_no_users_selected; ?></div>
 		<?php }
 		else { ?>
 			<div class="mass_heading_outer">
 				<div class="width30 mass_heading_style">
-					<?php print $gm_lang["mu_descr"]; ?>
+					<?php print GM_LANG_mu_descr; ?>
 				</div>
 				<div class="width65 choice_right">
 					<div class="width10 mass_heading_style" style="border-left: 0.1em solid #DE0036; border-right: 0.1em solid #DE0036; margin-left: 0.1em; margin-right: 0.1em;">
-						<?php print $gm_lang["select"]; ?>
+						<?php print GM_LANG_select; ?>
 					</div>
 					<div class="width80 mass_heading_style">
-						<?php print $gm_lang["mu_new_value"]; ?>
+						<?php print GM_LANG_mu_new_value; ?>
 					</div>
 				</div>
 			</div>
@@ -1033,7 +1033,7 @@ if ($action == "massupdate") {
 						<?php print_help_link("useradmin_sync_gedcom_help", "qm","sync_gedcom");?>
 					</div>
 					<div class="description">
-						<?php print $gm_lang["sync_gedcom"]; ?>
+						<?php print GM_LANG_sync_gedcom; ?>
 					</div>
 				</div>
 				<div class="width65 choice_right">
@@ -1055,7 +1055,7 @@ if ($action == "massupdate") {
 						<?php print_help_link("useradmin_auto_accept_help", "qm", "user_auto_accept");?>
 					</div>
 					<div class="description">
-						<?php print $gm_lang["user_auto_accept"]; ?>
+						<?php print GM_LANG_user_auto_accept; ?>
 					</div>
 				</div>
 				<div class="width65 choice_right">
@@ -1079,7 +1079,7 @@ if ($action == "massupdate") {
 							<?php print_help_link("useradmin_user_theme_help", "qm", "user_theme");?>
 						</div>
 						<div class="description">
-							<?php print $gm_lang["user_theme"]; ?>
+							<?php print GM_LANG_user_theme; ?>
 						</div>
 					</div>
 					<div class="width65 choice_right">
@@ -1089,7 +1089,7 @@ if ($action == "massupdate") {
 							</div>
 							<div class="width80 choice_right">
 								<select name="new_user_theme" tabindex="<?php print $tab;?>">
-								<option value="" selected="selected"><?php print $gm_lang["site_default"];?></option>
+								<option value="" selected="selected"><?php print GM_LANG_site_default;?></option>
 								<?php
 								$themes = GetThemeNames();
 								foreach($themes as $indexval => $themedir) {
@@ -1110,7 +1110,7 @@ if ($action == "massupdate") {
 						<?php print_help_link("useradmin_user_contact_help", "qm", "user_contact_method");?>
 					</div>
 					<div class="description">
-						<?php print $gm_lang["user_contact_method"]; ?>
+						<?php print GM_LANG_user_contact_method; ?>
 					</div>
 				</div>
 				<div class="width65 choice_right">
@@ -1121,14 +1121,14 @@ if ($action == "massupdate") {
 						<div class="width80 choice_right">
 							<select name="new_contact_method" tabindex="<?php print $tab;?>">
 							<?php if ($GM_STORE_MESSAGES) { ?>
-								<option value="messaging"><?php print $gm_lang["messaging"];?></option>
-								<option value="messaging2" selected="selected"><?php print $gm_lang["messaging2"];?></option>
+								<option value="messaging"><?php print GM_LANG_messaging;?></option>
+								<option value="messaging2" selected="selected"><?php print GM_LANG_messaging2;?></option>
 							<?php }
 							else { ?>
-								<option value="messaging3" selected="selected"><?php print $gm_lang["messaging3"];?></option>
+								<option value="messaging3" selected="selected"><?php print GM_LANG_messaging3;?></option>
 							<?php } ?>
-							<option value="mailto"><?php print $gm_lang["mailto"];?></option>
-							<option value="none"><?php print $gm_lang["no_messaging"];?></option>
+							<option value="mailto"><?php print GM_LANG_mailto;?></option>
+							<option value="none"><?php print GM_LANG_no_messaging;?></option>
 							</select>
 						</div>
 						<?php $tab++;?>
@@ -1142,7 +1142,7 @@ if ($action == "massupdate") {
 						<?php print_help_link("useradmin_visibleonline_help", "qm", "visibleonline");?>
 					</div>
 					<div class="description">
-						<?php print $gm_lang["visibleonline"]; ?>
+						<?php print GM_LANG_visibleonline; ?>
 					</div>
 				</div>
 				<div class="width65 choice_right">
@@ -1164,7 +1164,7 @@ if ($action == "massupdate") {
 						<?php print_help_link("useradmin_editaccount_help", "qm", "editaccount");?>
 					</div>
 					<div class="description">
-						<?php print $gm_lang["editaccount"]; ?>
+						<?php print GM_LANG_editaccount; ?>
 					</div>
 				</div>
 				<div class="width65 choice_right">
@@ -1186,7 +1186,7 @@ if ($action == "massupdate") {
 						<?php print_help_link("useradmin_user_default_tab_help", "qm", "user_default_tab");?>
 					</div>
 					<div class="description">
-						<?php print $gm_lang["user_default_tab"]; ?>
+						<?php print GM_LANG_user_default_tab; ?>
 					</div>
 				</div>
 				<div class="width65 choice_right">
@@ -1196,13 +1196,13 @@ if ($action == "massupdate") {
 						</div>
 						<div class="width80 choice_right">
 							<select name="new_default_tab" tabindex="<?php print $tab;?>">
-								<option value="9"><?php print $gm_lang["site_default"]; ?></option>
-								<option value="0"><?php print $gm_lang["personal_facts"];?></option>
-								<option value="1"><?php print $gm_lang["notes"];?></option>
-								<option value="2"><?php print $gm_lang["ssourcess"];?></option>
-								<option value="3"><?php print $gm_lang["media"];?></option>
-								<option value="4"><?php print $gm_lang["relatives"];?></option>
-								<option value="6"><?php print $gm_lang["all"];?></option>
+								<option value="9"><?php print GM_LANG_site_default; ?></option>
+								<option value="0"><?php print GM_LANG_personal_facts;?></option>
+								<option value="1"><?php print GM_LANG_notes;?></option>
+								<option value="2"><?php print GM_LANG_ssourcess;?></option>
+								<option value="3"><?php print GM_LANG_media;?></option>
+								<option value="4"><?php print GM_LANG_relatives;?></option>
+								<option value="6"><?php print GM_LANG_all;?></option>
 							</select>
 						</div>
 						<?php $tab++;?>
@@ -1220,7 +1220,7 @@ if ($action == "massupdate") {
 							<?php print_help_link("useradmin_rootid_help", "qm","rootid");?>
 						</div>
 						<div class="description">
-							<?php print $gm_lang["rootid"]; ?>
+							<?php print GM_LANG_rootid; ?>
 						</div>
 					</div>
 					<div class="width65 choice_right">
@@ -1246,7 +1246,7 @@ if ($action == "massupdate") {
 							<?php print_help_link("useradmin_gedcom_admin_help", "qm", "gedadmin");?>
 						</div>
 						<div class="description">
-							<?php print $gm_lang["gedadmin"]; ?>
+							<?php print GM_LANG_gedadmin; ?>
 						</div>
 					</div>
 					<div class="width65 choice_right">
@@ -1269,7 +1269,7 @@ if ($action == "massupdate") {
 							<?php print_help_link("useradmin_can_edit_help", "qm","can_edit");?>
 						</div>
 						<div class="description">
-							<?php print $gm_lang["accpriv_conf"]; ?>
+							<?php print GM_LANG_accpriv_conf; ?>
 						</div>
 					</div>
 					<div class="width65 choice_right">
@@ -1282,9 +1282,9 @@ if ($action == "massupdate") {
 								<?php if (!isset($user->privgroup[$gedcomid])) $user->privgroup[$gedcomid]="none";
 								$tab++;
 								print "<select name=\"new_privgroup_$gedcomid\" tabindex=\"".$tab."\">\n";
-								print "<option value=\"none\" >".$gm_lang["visitor"]."</option>\n";
-								print "<option value=\"access\" selected=\"selected\">".$gm_lang["user"]."</option>\n";
-								print "<option value=\"admin\" >".$gm_lang["administrator"]."</option>\n";
+								print "<option value=\"none\" >".GM_LANG_visitor."</option>\n";
+								print "<option value=\"access\" selected=\"selected\">".GM_LANG_user."</option>\n";
+								print "<option value=\"admin\" >".GM_LANG_administrator."</option>\n";
 								print "</select>\n";
 								?>
 							</div>
@@ -1299,7 +1299,7 @@ if ($action == "massupdate") {
 							<?php print_help_link("useradmin_relation_priv_help", "qm", "user_relationship_priv");?>
 						</div>
 						<div class="description">
-							<?php print $gm_lang["user_relationship_priv"]; ?>
+							<?php print GM_LANG_user_relationship_priv; ?>
 						</div>
 					</div>
 					<div class="width65 choice_right">
@@ -1309,9 +1309,9 @@ if ($action == "massupdate") {
 							</div>
 							<div class="width80 choice_right">
 								<select name="new_relationship_privacy_<?php print $gedcomid; ?>" tabindex="<?php $tab++; print $tab; ?>" >
-									<option value=""><?php print $gm_lang["default"]; ?></option>
-									<option value="Y"><?php print $gm_lang["yes"]; ?></option>
-									<option value="N"><?php print $gm_lang["no"]; ?></option>
+									<option value=""><?php print GM_LANG_default; ?></option>
+									<option value="Y"><?php print GM_LANG_yes; ?></option>
+									<option value="N"><?php print GM_LANG_no; ?></option>
 								</select>
 							</div>
 							<?php $tab++;?>
@@ -1326,7 +1326,7 @@ if ($action == "massupdate") {
 							<?php print_help_link("useradmin_path_length_help", "qm", "user_path_length");?>
 						</div>
 						<div class="description">
-							<?php print $gm_lang["user_path_length"]; ?>
+							<?php print GM_LANG_user_path_length; ?>
 						</div>
 					</div>
 					<div class="width65 choice_right">
@@ -1353,7 +1353,7 @@ if ($action == "massupdate") {
 							<?php print_help_link("useradmin_marr_priv_help", "qm", "user_path_marr");?>
 						</div>
 						<div class="description">
-							<?php print $gm_lang["user_path_marr"]; ?>
+							<?php print GM_LANG_user_path_marr; ?>
 						</div>
 					</div>
 					<div class="width65 choice_right">
@@ -1363,9 +1363,9 @@ if ($action == "massupdate") {
 							</div>
 							<div class="width80 choice_right">
 								<select name="new_check_marriage_relations_<?php print $gedcomid; ?>" tabindex="<?php $tab++; print $tab; ?>" >
-									<option value=""><?php print $gm_lang["default"]; ?></option>
-									<option value="Y"><?php print $gm_lang["yes"]; ?></option>
-									<option value="N"><?php print $gm_lang["no"]; ?></option>
+									<option value=""><?php print GM_LANG_default; ?></option>
+									<option value="Y"><?php print GM_LANG_yes; ?></option>
+									<option value="N"><?php print GM_LANG_no; ?></option>
 								</select>
 							</div>
 							<?php $tab++;?>
@@ -1380,7 +1380,7 @@ if ($action == "massupdate") {
 							<?php print_help_link("useradmin_hide_live_people_help", "qm", "HIDE_LIVE_PEOPLE");?>
 						</div>
 						<div class="description">
-							<?php print $gm_lang["HIDE_LIVE_PEOPLE"]; ?>
+							<?php print GM_LANG_HIDE_LIVE_PEOPLE; ?>
 						</div>
 					</div>
 					<div class="width65 choice_right">
@@ -1390,9 +1390,9 @@ if ($action == "massupdate") {
 							</div>
 							<div class="width80 choice_right">
 								<select name="new_hide_live_people_<?php print $gedcomid; ?>" tabindex="<?php $tab++; print $tab; ?>" >
-									<option value=""><?php print $gm_lang["default"]; ?></option>
-									<option value="Y"><?php print $gm_lang["yes"]; ?></option>
-									<option value="N"><?php print $gm_lang["no"]; ?></option>
+									<option value=""><?php print GM_LANG_default; ?></option>
+									<option value="Y"><?php print GM_LANG_yes; ?></option>
+									<option value="N"><?php print GM_LANG_no; ?></option>
 								</select>
 							</div>
 							<?php $tab++;?>
@@ -1407,7 +1407,7 @@ if ($action == "massupdate") {
 							<?php print_help_link("useradmin_show_living_names_help", "qm", "SHOW_LIVING_NAMES");?>
 						</div>
 						<div class="description">
-							<?php print $gm_lang["SHOW_LIVING_NAMES"]; ?>
+							<?php print GM_LANG_SHOW_LIVING_NAMES; ?>
 						</div>
 					</div>
 					<div class="width65 choice_right">
@@ -1417,9 +1417,9 @@ if ($action == "massupdate") {
 							</div>
 							<div class="width80 choice_right">
 								<select name="new_show_living_names_<?php print $gedcomid; ?>" tabindex="<?php $tab++; print $tab; ?>" >
-									<option value=""><?php print $gm_lang["default"]; ?></option>
-									<option value="Y"><?php print $gm_lang["yes"]; ?></option>
-									<option value="N"><?php print $gm_lang["no"]; ?></option>
+									<option value=""><?php print GM_LANG_default; ?></option>
+									<option value="Y"><?php print GM_LANG_yes; ?></option>
+									<option value="N"><?php print GM_LANG_no; ?></option>
 								</select>
 							</div>
 							<?php $tab++;?>
@@ -1434,7 +1434,7 @@ if ($action == "massupdate") {
 							<?php print_help_link("useradmin_can_edit_help", "qm","can_edit");?>
 						</div>
 						<div class="description">
-							<?php print $gm_lang["edit_rights"]; ?>
+							<?php print GM_LANG_edit_rights; ?>
 						</div>
 					</div>
 					<div class="width65 choice_right">
@@ -1448,9 +1448,9 @@ if ($action == "massupdate") {
 								$tab++;
 								print "<select name=\"new_canedit_$gedcomid\" tabindex=\"".$tab."\"";
 								print ">\n";
-								print "<option value=\"none\" >".$gm_lang["none"]."</option>\n";
-								print "<option value=\"edit\" >".$gm_lang["edit"]."</option>\n";
-								print "<option value=\"accept\" >".$gm_lang["accept"]."</option>\n";
+								print "<option value=\"none\" >".GM_LANG_none."</option>\n";
+								print "<option value=\"edit\" >".GM_LANG_edit."</option>\n";
+								print "<option value=\"accept\" >".GM_LANG_accept."</option>\n";
 								print "</select>\n";
 								?>
 							</div>
@@ -1463,7 +1463,7 @@ if ($action == "massupdate") {
 			<!-- End Gedcom related settings -->
 			
 			<div class="admin_item_box center">
-					<input type="submit" tabindex="<?php print $tab;?>" value="<?php print $gm_lang["mass_update"]; ?>" />
+					<input type="submit" tabindex="<?php print $tab;?>" value="<?php print GM_LANG_mass_update; ?>" />
 			</div>
 			</form>
 		<?php } ?>
@@ -1575,8 +1575,8 @@ if ($action == "massupdate2") {
 		}
 		else $update = false;
 	}
-	if ($update) $message .= $gm_lang["update_users_selected_ok"];
-	else $message .= $gm_lang["update_users_selected_nok"];
+	if ($update) $message .= GM_LANG_update_users_selected_ok;
+	else $message .= GM_LANG_update_users_selected_nok;
 	$action = "listusers";
 }
 
@@ -1668,49 +1668,49 @@ if (($action == "listusers") || ($action == "edituser2") || ($action == "deleteu
 			<input type="hidden" name="usrlang" value="<?php print $usrlang; ?>" />
 			<input type="hidden" name="gedid" value="<?php print $gedid; ?>" />
 		<div id="admin_genmod_left">
-			<div class="admin_link"><a href="admin.php"><?php print $gm_lang["admin"];?></a></div>
-			<div class="admin_link"><a href="useradmin.php"><?php print $gm_lang["user_admin"];?></a></div>
+			<div class="admin_link"><a href="admin.php"><?php print GM_LANG_admin;?></a></div>
+			<div class="admin_link"><a href="useradmin.php"><?php print GM_LANG_user_admin;?></a></div>
 		</div>
 		<div id="userlisting">
 			<div class="admin_topbottombar">
-				<?php print "<h3>".$gm_lang["current_users"]."</h3>"; ?>
+				<?php print "<h3>".GM_LANG_current_users."</h3>"; ?>
 			</div>
 			<div class="admin_link">
-				<a href="javascript: <?php print $gm_lang["do_massupdate"]; ?>" onclick="document.userlist.action.value='massupdate'; document.userlist.submit();return false;">
-				<?php  if ($view != "preview") print $gm_lang["do_massupdate"]; else print "&nbsp;"; ?>
+				<a href="javascript: <?php print GM_LANG_do_massupdate; ?>" onclick="document.userlist.action.value='massupdate'; document.userlist.submit();return false;">
+				<?php  if ($view != "preview") print GM_LANG_do_massupdate; else print "&nbsp;"; ?>
 				</a>
 			</div>
 			<?php if ($message != "") {
 				print "<div class=\"shade2 center message_bottom\">".$message."</div>";
 			}?>
 			<div class="admin_topbottombar ltr">
-				<?php print $gm_lang["usernamefilter"];?>
+				<?php print GM_LANG_usernamefilter;?>
 				<input type="text" name="namefilter" value="<?php print $namefilter;?>" />
-				<input type="submit" name="refreshlist" value="<?php print $gm_lang["refresh"]; ?>" />
+				<input type="submit" name="refreshlist" value="<?php print GM_LANG_refresh; ?>" />
 			</div>
 			<div class="admin_item_box shade2">
 				<?php if ($view != "preview") { ?>
 				<div class="choice_left width_select">
-					<a href="javascript: <?php print $gm_lang["select"];?> " onclick="
+					<a href="javascript: <?php print GM_LANG_select;?> " onclick="
 					<?php 
 					foreach($users as $username=>$user) {
  						print "document.userlist.select".preg_replace(array("/\./","/-/","/ /"), array("_","_","_"), $username).".checked=document.userlist.select".preg_replace(array("/\./","/-/","/ /"), array("_","_","_"), $username).".checked?false:true; ";
 						}
 					?>return false;">
-					<?php print $gm_lang["select"];?></a></div>
-				<div class="choice_middle width_deledit"><?php print $gm_lang["delete"]."<br />".$gm_lang["edit"];?></div>
+					<?php print GM_LANG_select;?></a></div>
+				<div class="choice_middle width_deledit"><?php print GM_LANG_delete."<br />".GM_LANG_edit;?></div>
 				<?php } ?>
 				<?php if ($view != "preview") { ?> <div class="choice_left width_username"> <?php } else { ?> <div class="choice_middle width_username"> <?php } ?> 
-					<?php print "<a href=\"useradmin.php?action=listusers&amp;sort=sortuname&amp;namefilter=".$namefilter."&amp;filter=".$filter."&amp;usrlang=".$usrlang."&amp;gedid=".$gedid."\">"; ?><?php print $gm_lang["username"]; ?></a>
+					<?php print "<a href=\"useradmin.php?action=listusers&amp;sort=sortuname&amp;namefilter=".$namefilter."&amp;filter=".$filter."&amp;usrlang=".$usrlang."&amp;gedid=".$gedid."\">"; ?><?php print GM_LANG_username; ?></a>
 				</div>
 				<div class="choice_middle width_fullname">
-					<?php print "<a href=\"useradmin.php?action=listusers&amp;sort=sortlname&amp;namefilter=".$namefilter."&amp;filter=".$filter."&amp;usrlang=".$usrlang."&amp;gedid=".$gedid."\">"; ?><?php print $gm_lang["full_name"]; ?></a>
+					<?php print "<a href=\"useradmin.php?action=listusers&amp;sort=sortlname&amp;namefilter=".$namefilter."&amp;filter=".$filter."&amp;usrlang=".$usrlang."&amp;gedid=".$gedid."\">"; ?><?php print GM_LANG_full_name; ?></a>
 				</div>
 				<div class="choice_middle width_languages">
-					<?php print $gm_lang["inc_languages"]; ?>
+					<?php print GM_LANG_inc_languages; ?>
 				</div>
 				<div class="choice_middle width_priviliges">
-					<a href="javascript: <?php print $gm_lang["privileges"];?>" onclick="
+					<a href="javascript: <?php print GM_LANG_privileges;?>" onclick="
 					<?php
 					$k = 1;
 					for ($i=1, $max=count($users)+1; $i<=$max; $i++) print "expand_layer('user-geds".$i."'); ";
@@ -1718,7 +1718,7 @@ if (($action == "listusers") || ($action == "edituser2") || ($action == "deleteu
 					if ($showprivs == false) print $GM_IMAGES["plus"]["other"];
 					else print $GM_IMAGES["minus"]["other"]; ?>
 					" width="11" height="11" alt="" /></a>
-					<?php print $gm_lang["privileges"]; ?>
+					<?php print GM_LANG_privileges; ?>
 					<div id="user-geds<?php print $k;?>" style="display:
 					<?php
 					if ($showprivs == false) { ?> none"> <?php }
@@ -1726,16 +1726,16 @@ if (($action == "listusers") || ($action == "edituser2") || ($action == "deleteu
 					</div>
 				</div>
 				<div class="choice_middle width_registered">
-					<?php print "<a href=\"useradmin.php?action=listusers&amp;sort=sortreg&amp;namefilter=".$namefilter."&amp;filter=".$filter."&amp;usrlang=".$usrlang."&amp;gedid=".$gedid."\">"; ?><?php print $gm_lang["date_registered"]; ?></a>
+					<?php print "<a href=\"useradmin.php?action=listusers&amp;sort=sortreg&amp;namefilter=".$namefilter."&amp;filter=".$filter."&amp;usrlang=".$usrlang."&amp;gedid=".$gedid."\">"; ?><?php print GM_LANG_date_registered; ?></a>
 				</div>
 				<div class="choice_middle width_last_logged_in">
-					<?php print "<a href=\"useradmin.php?action=listusers&amp;sort=sortllgn&amp;namefilter=".$namefilter."&amp;filter=".$filter."&amp;usrlang=".$usrlang."&amp;gedid=".$gedid."\">"; ?><?php print $gm_lang["last_login"]; ?></a>
+					<?php print "<a href=\"useradmin.php?action=listusers&amp;sort=sortllgn&amp;namefilter=".$namefilter."&amp;filter=".$filter."&amp;usrlang=".$usrlang."&amp;gedid=".$gedid."\">"; ?><?php print GM_LANG_last_login; ?></a>
 				</div>
 				<div class="choice_middle user_verified">
-					<?php print "<a href=\"useradmin.php?action=listusers&amp;sort=sortver&amp;namefilter=".$namefilter."&amp;filter=".$filter."&amp;usrlang=".$usrlang."&amp;gedid=".$gedid."\">"; ?><?php print $gm_lang["verified"]; ?></a>
+					<?php print "<a href=\"useradmin.php?action=listusers&amp;sort=sortver&amp;namefilter=".$namefilter."&amp;filter=".$filter."&amp;usrlang=".$usrlang."&amp;gedid=".$gedid."\">"; ?><?php print GM_LANG_verified; ?></a>
 				</div>
 				<div class="choice_right admin_approved">
-					<?php print "<a href=\"useradmin.php?action=listusers&amp;sort=sortveradm&amp;namefilter=".$namefilter."&amp;filter=".$filter."&amp;usrlang=".$usrlang."&amp;gedid=".$gedid."\">"; ?><?php print $gm_lang["verified_by_admin"]; ?></a>
+					<?php print "<a href=\"useradmin.php?action=listusers&amp;sort=sortveradm&amp;namefilter=".$namefilter."&amp;filter=".$filter."&amp;usrlang=".$usrlang."&amp;gedid=".$gedid."\">"; ?><?php print GM_LANG_verified_by_admin; ?></a>
 				</div>
 			</div>
 			<?php
@@ -1750,11 +1750,11 @@ if (($action == "listusers") || ($action == "edituser2") || ($action == "deleteu
 						</div>
 						<div class="choice_middle width_deledit">
 							<?php if ($user->username != $gm_user->username) {
-								if ($TEXT_DIRECTION=="ltr") print "<a href=\"useradmin.php?action=deleteuser&amp;username=".urlencode($username)."&amp;sort=".$sort."&amp;filter=".$filter."&amp;usrlang=".$usrlang."&amp;gedid=".$gedid."&amp;namefilter=".$namefilter."\" onclick=\"return confirm('".$gm_lang["confirm_user_delete"]." $username?');\">".$gm_lang["delete"]."</a><br />\n";
-								else if (begRTLText($username)) print "<a href=\"useradmin.php?action=deleteuser&amp;username=".urlencode($username)."&amp;sort=".$sort."&amp;filter=".$filter."&amp;usrlang=".$usrlang."&amp;gedid=".$gedid."&amp;namefilter=".$namefilter."\" onclick=\"return confirm('?".$gm_lang["confirm_user_delete"]." $username');\">".$gm_lang["delete"]."</a><br />\n";
-								else print "<a href=\"useradmin.php?action=deleteuser&amp;username=".urlencode($username)."&amp;sort=".$sort."&amp;filter=".$filter."&amp;usrlang=".$usrlang."&amp;gedid=".$gedid."&amp;namefilter=".$namefilter."\" onclick=\"return confirm('?$username ".$gm_lang["confirm_user_delete"]." ');\">".$gm_lang["delete"]."</a><br />\n";
+								if ($TEXT_DIRECTION=="ltr") print "<a href=\"useradmin.php?action=deleteuser&amp;username=".urlencode($username)."&amp;sort=".$sort."&amp;filter=".$filter."&amp;usrlang=".$usrlang."&amp;gedid=".$gedid."&amp;namefilter=".$namefilter."\" onclick=\"return confirm('".GM_LANG_confirm_user_delete." $username?');\">".GM_LANG_delete."</a><br />\n";
+								else if (begRTLText($username)) print "<a href=\"useradmin.php?action=deleteuser&amp;username=".urlencode($username)."&amp;sort=".$sort."&amp;filter=".$filter."&amp;usrlang=".$usrlang."&amp;gedid=".$gedid."&amp;namefilter=".$namefilter."\" onclick=\"return confirm('?".GM_LANG_confirm_user_delete." $username');\">".GM_LANG_delete."</a><br />\n";
+								else print "<a href=\"useradmin.php?action=deleteuser&amp;username=".urlencode($username)."&amp;sort=".$sort."&amp;filter=".$filter."&amp;usrlang=".$usrlang."&amp;gedid=".$gedid."&amp;namefilter=".$namefilter."\" onclick=\"return confirm('?$username ".GM_LANG_confirm_user_delete." ');\">".GM_LANG_delete."</a><br />\n";
 							}
-							print "<a href=\"useradmin.php?action=edituser&amp;username=".urlencode($username)."&amp;sort=".$sort."&amp;filter=".$filter."&amp;usrlang=".$usrlang."&amp;gedid=".$gedid."&amp;namefilter=".$namefilter."\">".$gm_lang["edit"]."</a>\n";?>
+							print "<a href=\"useradmin.php?action=edituser&amp;username=".urlencode($username)."&amp;sort=".$sort."&amp;filter=".$filter."&amp;usrlang=".$usrlang."&amp;gedid=".$gedid."&amp;namefilter=".$namefilter."\">".GM_LANG_edit."</a>\n";?>
 						</div>
 					<?php }
 					if ($view != "preview") { ?> <div class="choice_left width_username <?php } else { ?> <div class="choice_middle width_username <?php }
@@ -1780,12 +1780,12 @@ if (($action == "listusers") || ($action == "edituser2") || ($action == "deleteu
 						?>
 					</div>
 					<div class="choice_middle width_languages">
-						<?php print $gm_lang["lang_name_".$user->language];?><br />
-						<img src="<?php print $language_settings[$user->language]["flagsfile"];?>" class="brightflag" alt="<?php print $gm_lang["lang_name_".$user->language];?>" title="<?php print $gm_lang["lang_name_".$user->language];?>" />
+						<?php print GM_LANG_lang_name_".$user->language];?><br />
+						<img src="<?php print $language_settings[$user->language]["flagsfile"];?>" class="brightflag" alt="<?php print GM_LANG_lang_name_".$user->language];?>" title="<?php print GM_LANG_lang_name_".$user->language];?>" />
 					</div>
 					<div class="choice_middle width_priviliges">
 						<?php
-						print "<a href=\"javascript: ".$gm_lang["privileges"]."\" onclick=\"expand_layer('user-geds".$k."'); return false;\"><img id=\"user-geds".$k."_img\" src=\"".GM_IMAGE_DIR."/";
+						print "<a href=\"javascript: ".GM_LANG_privileges."\" onclick=\"expand_layer('user-geds".$k."'); return false;\"><img id=\"user-geds".$k."_img\" src=\"".GM_IMAGE_DIR."/";
 						if ($showprivs == false) print $GM_IMAGES["plus"]["other"];
 						else print $GM_IMAGES["minus"]["other"];
 						print "\" width=\"11\" height=\"11\" alt=\"\" />";
@@ -1794,7 +1794,7 @@ if (($action == "listusers") || ($action == "edituser2") || ($action == "deleteu
 						if ($showprivs == false) print "none;\">";
 						else print "block;\">";
 							print "<ul>";
-							if ($user->canadmin) print "<li class=\"warning\">".$gm_lang["can_admin"]."</li>\n";
+							if ($user->canadmin) print "<li class=\"warning\">".GM_LANG_can_admin."</li>\n";
 							uksort($GEDCOMS, "strnatcasecmp");
 							reset($GEDCOMS);
 							foreach($GEDCOMS as $gedid=>$gedcom) {
@@ -1806,7 +1806,7 @@ if (($action == "listusers") || ($action == "edituser2") || ($action == "deleteu
 								else $uged = "";
 								if ($vval=="accept") print "<li class=\"warning\">"; 
 								else print "<li>";
-								print $gm_lang[$vval]." ";
+								print constant("GM_LANG_".$vval)." ";
 								if ($uged != "") print "<a href=\"individual.php?pid=".$uged."&amp;gedid=".$gedid."\">".$gedcom["gedcom"]."</a></li>\n";
 								else print $gedcom["gedcom"]."</li>\n";
 							}
@@ -1824,7 +1824,7 @@ if (($action == "listusers") || ($action == "edituser2") || ($action == "deleteu
 					<div class="choice_middle width_last_logged_in">
 						<?php
 						if ($user->reg_timestamp > $user->sessiontime) {
-							print $gm_lang["never"];
+							print GM_LANG_never;
 						}
 						else {
 							print GetChangedDate(date("d", $user->sessiontime)." ".date("M", $user->sessiontime)." ".date("Y", $user->sessiontime))."<br />".date($TIME_FORMAT, $user->sessiontime);
@@ -1833,14 +1833,14 @@ if (($action == "listusers") || ($action == "edituser2") || ($action == "deleteu
 					</div>
 					<div class="choice_middle user_verified">
 						<?php
-						if ($user->verified=="Y") print $gm_lang["yes"];
-						else print $gm_lang["no"];
+						if ($user->verified=="Y") print GM_LANG_yes;
+						else print GM_LANG_no;
 						?>
 					</div>
 					<div class="choice_right admin_approved">
 						<?php
-						if ($user->verified_by_admin=="Y") print $gm_lang["yes"];
-						else print $gm_lang["no"];
+						if ($user->verified_by_admin=="Y") print GM_LANG_yes;
+						else print GM_LANG_no;
 						?>
 					</div>
 				</div>
@@ -1856,21 +1856,21 @@ if ($action == "cleanup") {
 	?>
 	<!-- Setup the left box -->
 	<div id="admin_genmod_left">
-		<div class="admin_link"><a href="admin.php"><?php print $gm_lang["admin"];?></a></div>
-		<div class="admin_link"><a href="useradmin.php"><?php print $gm_lang["user_admin"];?></a></div>
+		<div class="admin_link"><a href="admin.php"><?php print GM_LANG_admin;?></a></div>
+		<div class="admin_link"><a href="useradmin.php"><?php print GM_LANG_user_admin;?></a></div>
 	</div>
 	<div id="content">
 		<form name="cleanupform" method="post" action="">
 			<input type="hidden" name="action" value="cleanup2" />
 			<div class="admin_topbottombar">
-				<?php print "<h3>".$gm_lang["cleanup_users"]."</h3>"; ?>
+				<?php print "<h3>".GM_LANG_cleanup_users."</h3>"; ?>
 			</div>
 			<div class="admin_item_box">
 				<div class="choice_left">
 					<?php
 					// Check for idle users
 					if (!isset($month)) $month = 1;
-					print $gm_lang["usr_idle"];?>
+					print GM_LANG_usr_idle;?>
 				</div>
 				<div class="choice_middle">
 					<select onchange="document.location=options[selectedIndex].value;">
@@ -1885,13 +1885,13 @@ if ($action == "cleanup") {
 			</div>
 			<div class="admin_item_box shade2">
 				<div class="width30 choice_left">
-					<?php print $gm_lang["username"];?>
+					<?php print GM_LANG_username;?>
 				</div>
 				<div class="choice_left width60 shade2">
-					<?php print $gm_lang["message"];?>
+					<?php print GM_LANG_message;?>
 				</div>
 				<div class="choice_right shade2">
-					<?php print $gm_lang["select"];?>
+					<?php print GM_LANG_select;?>
 				</div><br />
 			</div>
 			<?php
@@ -1905,7 +1905,7 @@ if ($action == "cleanup") {
 					?>
 					<div class="admin_item_box">
 						<div class="width30 choice_left wrap">
-							<?php print $user->username." - ".$user->firstname." ".$user->lastname."</div><div class=\"width60 choice_left wrap\">".$gm_lang["usr_idle_toolong"];
+							<?php print $user->username." - ".$user->firstname." ".$user->lastname."</div><div class=\"width60 choice_left wrap\">".GM_LANG_usr_idle_toolong;
 							print GetChangedDate(date("d", $datelogin)." ".date("M", $datelogin)." ".date("Y", $datelogin));?>
 						</div>
 						<div class="choice_right">
@@ -1923,7 +1923,7 @@ if ($action == "cleanup") {
 				?>
 				<div class="admin_item_box">
 					<div class="width30 choice_left wrap">
-						<?php print $user->username." - ".$user->firstname." ".$user->lastname."</div><div class=\"width60 choice_left wrap\">".$gm_lang["del_unveru"];?>
+						<?php print $user->username." - ".$user->firstname." ".$user->lastname."</div><div class=\"width60 choice_left wrap\">".GM_LANG_del_unveru;?>
 					</div>
 					<div class="choice_right">
 						<input type="checkbox" checked="checked" name="<?php print "del_".preg_replace(array("/\./","/-/","/ /"), array("_","_","_"), $user->username); ?>" value="yes" />
@@ -1940,7 +1940,7 @@ if ($action == "cleanup") {
 				?>
 				<div class="admin_item_box">
 					<div class="width30 choice_left wrap">
-						<?php print $user->username." - ".$user->firstname." ".$user->lastname."</div><div class=\"width60 choice_left wrap\">".$gm_lang["del_unvera"]; ?>
+						<?php print $user->username." - ".$user->firstname." ".$user->lastname."</div><div class=\"width60 choice_left wrap\">".GM_LANG_del_unvera; ?>
 					</div>
 					<div class="choice_right">
 						<input type="checkbox" name="<?php print "del_".preg_replace(array("/\./","/-/","/ /"), array("_","_","_"), $user->username); ?>" value="yes" />
@@ -1968,7 +1968,7 @@ if ($action == "cleanup") {
 			foreach($gedrights as $key=>$gedcomid) { ?>
 				<div class="admin_item_box">
 					<div class="width30 choice_left wrap">
-						<?php print $GEDCOMS[$gedcomid]["title"]."</div><div class=\"width60 choice_left wrap\">".$gm_lang["del_gedrights"];?>
+						<?php print $GEDCOMS[$gedcomid]["title"]."</div><div class=\"width60 choice_left wrap\">".GM_LANG_del_gedrights;?>
 					</div>
 					<div class="choice_right">
 						<input type="checkbox" checked="checked" name="<?php print "delg_".$gedcomid; ?>" value="yes" />
@@ -1979,11 +1979,11 @@ if ($action == "cleanup") {
 			}
 			// NOTE: Nothing found to clean up
 			if ($ucnt == 0) {
-				print "<div class=\"shade2 center\"><span class=\"error\">".$gm_lang["usr_no_cleanup"]."</span></div>";
+				print "<div class=\"shade2 center\"><span class=\"error\">".GM_LANG_usr_no_cleanup."</span></div>";
 			}
 			else { ?>
 				<div class="admin_item_box center">
-					<input type="submit" value="<?php print $gm_lang["del_proceed"]; ?>" />
+					<input type="submit" value="<?php print GM_LANG_del_proceed; ?>" />
 				</div>
 			<?php } ?>
 		</form>
@@ -1995,21 +1995,21 @@ if ($action == "cleanup2") {
 	foreach($users as $key=>$user) {
 		$var = "del_".preg_replace(array("/\./","/-/","/ /"), array("_","_","_"), $user->username);
 		if (isset($$var)) {
-			if (UserController::DeleteUser($key)) $message .= $gm_lang["usr_deleted"].$user->username."<br />";
+			if (UserController::DeleteUser($key)) $message .= GM_LANG_usr_deleted.$user->username."<br />";
 		}
 		else {
 			foreach($user->canedit as $gedid=>$data) {
 				$var = "delg_".$gedid;
 				if (isset($$var)) {
 					unset($user->canedit[$gedid]);
-					$message .= $gedid.":&nbsp;&nbsp;".$gm_lang["usr_unset_rights"].$user->username."<br />";
+					$message .= $gedid.":&nbsp;&nbsp;".GM_LANG_usr_unset_rights.$user->username."<br />";
 					if (isset($user->rootid[$gedid])) {
 						unset($user->rootid[$gedid]);
-						$message .= $gedid.":&nbsp;&nbsp;".$gm_lang["usr_unset_rootid"].$user->username."<br />";
+						$message .= $gedid.":&nbsp;&nbsp;".GM_LANG_usr_unset_rootid.$user->username."<br />";
 					}
 					if (isset($user->gedcomid[$gedid])) {
 						unset($user->gedcomid[$gedid]);
-						$message .= $gedid.":&nbsp;&nbsp;".$gm_lang["usr_unset_gedcomid"].$user->username."<br />";
+						$message .= $gedid.":&nbsp;&nbsp;".GM_LANG_usr_unset_gedcomid.$user->username."<br />";
 					}
 					UserController::DeleteUser($key, "changed");
 					UserController::AddUser($user, "changed");
@@ -2026,29 +2026,29 @@ if ($action == "") {
 	?>
 	<!-- Setup the left box -->
 	<div id="admin_genmod_left">
-		<div class="admin_link"><a href="admin.php"><?php print $gm_lang["admin"];?></a></div>
+		<div class="admin_link"><a href="admin.php"><?php print GM_LANG_admin;?></a></div>
 	</div>
 	<div id="content">
 		<div class="admin_topbottombar">
-			<?php print "<h3>".$gm_lang["user_admin"]."</h3>"; ?>
+			<?php print "<h3>".GM_LANG_user_admin."</h3>"; ?>
 		</div>
 		<div class="admin_item_box">
 			<div class="admin_item_left">
-				<a href="useradmin.php?action=listusers"><?php print $gm_lang["current_users"];?></a><br />
-				<a href="useradmin.php?action=cleanup"><?php print $gm_lang["cleanup_users"];?></a><br />
-				<a href="useradmin.php?action=cleanup_messages"><?php print $gm_lang["cleanup_messages"];?></a><br />
-				<a href="useradmin.php?action=createform"><?php print $gm_lang["add_user"];?></a><br />
+				<a href="useradmin.php?action=listusers"><?php print GM_LANG_current_users;?></a><br />
+				<a href="useradmin.php?action=cleanup"><?php print GM_LANG_cleanup_users;?></a><br />
+				<a href="useradmin.php?action=cleanup_messages"><?php print GM_LANG_cleanup_messages;?></a><br />
+				<a href="useradmin.php?action=createform"><?php print GM_LANG_add_user;?></a><br />
 			</div>
 			<div class="admin_item_right">
-				<a href="javascript: <?php print $gm_lang["message_to_all"]; ?>" onclick="message('all', 'messaging2', '', ''); return false;"><?php print $gm_lang["message_to_all"]; ?></a><br />
-				<a href="javascript: <?php print $gm_lang["broadcast_never_logged_in"]; ?>" onclick="message('never_logged', 'messaging2', '', ''); return false;"><?php print $gm_lang["broadcast_never_logged_in"]; ?></a><br />
-				<a href="javascript: <?php print $gm_lang["broadcast_not_logged_6mo"]; ?>" onclick="message('last_6mo', 'messaging2', '', ''); return false;"><?php print $gm_lang["broadcast_not_logged_6mo"]; ?></a><br />
+				<a href="javascript: <?php print GM_LANG_message_to_all; ?>" onclick="message('all', 'messaging2', '', ''); return false;"><?php print GM_LANG_message_to_all; ?></a><br />
+				<a href="javascript: <?php print GM_LANG_broadcast_never_logged_in; ?>" onclick="message('never_logged', 'messaging2', '', ''); return false;"><?php print GM_LANG_broadcast_never_logged_in; ?></a><br />
+				<a href="javascript: <?php print GM_LANG_broadcast_not_logged_6mo; ?>" onclick="message('last_6mo', 'messaging2', '', ''); return false;"><?php print GM_LANG_broadcast_not_logged_6mo; ?></a><br />
 			</div>
 		</div>
 		<?php if ($message != "") {
 			print "<div class=\"shade2 center\">".$message."</div>";
 		}?>
-		<div class="admin_topbottombar"><?php print $gm_lang["admin_info"]; ?></div>
+		<div class="admin_topbottombar"><?php print GM_LANG_admin_info; ?></div>
 		<?php
 		$users = UserController::GetUsers();
 		$totusers = 0;			// Total number of users
@@ -2082,16 +2082,16 @@ if ($action == "") {
 					}
 				}
 			}
-			if (isset($userlang[$gm_lang["lang_name_".$user->language]])) $userlang[$gm_lang["lang_name_".$user->language]]["number"]++;
+			if (isset($userlang[GM_LANG_lang_name_".$user->language]])) $userlang[GM_LANG_lang_name_".$user->language]]["number"]++;
 			else {
-				$userlang[$gm_lang["lang_name_".$user->language]]["langname"] = $user->language;
-				$userlang[$gm_lang["lang_name_".$user->language]]["number"] = 1;
+				$userlang[GM_LANG_lang_name_".$user->language]]["langname"] = $user->language;
+				$userlang[GM_LANG_lang_name_".$user->language]]["number"] = 1;
 			}
 		}
 		?>
 		<div class="admin_item_box">
 			<div class="width30 choice_left">
-				<?php print $gm_lang["users_total"];?>
+				<?php print GM_LANG_users_total;?>
 			</div>
 			<div class="choice_right">
 				<?php print $totusers; ?>
@@ -2100,8 +2100,8 @@ if ($action == "") {
 		<div class="admin_item_box">
 			<div class="width30 choice_left">
 				<?php 
-				if ($adminusers == 0) print $gm_lang["users_admin"];
-				else print "<a href=\"useradmin.php?action=listusers&amp;filter=adminusers\">".$gm_lang["users_admin"]."</a>";
+				if ($adminusers == 0) print GM_LANG_users_admin;
+				else print "<a href=\"useradmin.php?action=listusers&amp;filter=adminusers\">".GM_LANG_users_admin."</a>";
 				?>
 			</div>
 			<div class="choice_right">
@@ -2113,7 +2113,7 @@ if ($action == "") {
 		?>
 		<div class="admin_item_box">
 			<div class="width30 choice_left">
-				<?php print $gm_lang["users_gedadmin"];?>
+				<?php print GM_LANG_users_gedadmin;?>
 			</div>
 		<?php
 		asort($gedadmin);
@@ -2148,8 +2148,8 @@ if ($action == "") {
 		<div class="admin_item_box">
 			<div class="width30 choice_left">
 				<?php 
-				if ($warnusers == 0) print $gm_lang["warn_users"];
-				else print "<a href=\"useradmin.php?action=listusers&amp;filter=warnings\">".$gm_lang["warn_users"]."</a>";
+				if ($warnusers == 0) print GM_LANG_warn_users;
+				else print "<a href=\"useradmin.php?action=listusers&amp;filter=warnings\">".GM_LANG_warn_users."</a>";
 				?>
 			</div>
 			<div class="choice_right">
@@ -2159,8 +2159,8 @@ if ($action == "") {
 		<div class="admin_item_box">
 			<div class="width30 choice_left">
 				<?php 
-				if ($applusers == 0) print $gm_lang["users_unver"];
-				else print "<a href=\"useradmin.php?action=listusers&amp;filter=usunver\">".$gm_lang["users_unver"]."</a>";
+				if ($applusers == 0) print GM_LANG_users_unver;
+				else print "<a href=\"useradmin.php?action=listusers&amp;filter=usunver\">".GM_LANG_users_unver."</a>";
 				?>
 			</div>
 			<div class="choice_right">
@@ -2173,8 +2173,8 @@ if ($action == "") {
 		<div class="admin_item_box">
 			<div class="width30 choice_left">
 				<?php 
-				if ($nverusers == 0) print $gm_lang["users_unver_admin"];
-				else print "<a href=\"useradmin.php?action=listusers&amp;filter=admunver\">".$gm_lang["users_unver_admin"]."</a>";
+				if ($nverusers == 0) print GM_LANG_users_unver_admin;
+				else print "<a href=\"useradmin.php?action=listusers&amp;filter=admunver\">".GM_LANG_users_unver_admin."</a>";
 				?>
 			</div>
 			<div class="choice_right">
@@ -2186,7 +2186,7 @@ if ($action == "") {
 		?>
 		<div class="admin_item_box">
 			<div class="width30 choice_left">
-				<?php print $gm_lang["users_langs"]; ?>
+				<?php print GM_LANG_users_langs; ?>
 			</div>
 			<?php asort($userlang);
 			$pass = 1;
@@ -2242,33 +2242,33 @@ if ($action == "cleanup_messages") {
 	?>
 	<!-- Setup the left box -->
 	<div id="admin_genmod_left">
-		<div class="admin_link"><a href="admin.php"><?php print $gm_lang["admin"];?></a></div>
-		<div class="admin_link"><a href="useradmin.php"><?php print $gm_lang["user_admin"];?></a></div>
+		<div class="admin_link"><a href="admin.php"><?php print GM_LANG_admin;?></a></div>
+		<div class="admin_link"><a href="useradmin.php"><?php print GM_LANG_user_admin;?></a></div>
 	</div>
 	<div id="content">
 		<form name="cleanmessageform" method="post" action="">
 			<input type="hidden" name="action" value="cleanup_messages2" />
 			<div class="admin_topbottombar">
-				<?php print "<h3>".$gm_lang["cleanup_messages"]."</h3>"; ?>
+				<?php print "<h3>".GM_LANG_cleanup_messages."</h3>"; ?>
 			</div>
 			<div class="admin_item_box shade2">
 				<div class="choice_left" style="width:28%">
-					<?php print $gm_lang["username"];?>
+					<?php print GM_LANG_username;?>
 				</div>
 				<div class="choice_left width10 center">
-					<?php print $gm_lang["number"];?>
+					<?php print GM_LANG_number;?>
 				</div>
 				<div class="choice_left width10 center">
-					<?php print $gm_lang["select"];?>
+					<?php print GM_LANG_select;?>
 				</div>
 				<div class="choice_left" style="width:28%">
-					<?php print $gm_lang["username"];?>
+					<?php print GM_LANG_username;?>
 				</div>
 				<div class="choice_left width10 center">
-					<?php print $gm_lang["number"];?>
+					<?php print GM_LANG_number;?>
 				</div>
 				<div class="choice_right width10 center">
-					<?php print $gm_lang["select"];?>
+					<?php print GM_LANG_select;?>
 				</div><br />
 			</div>
 			<?php
@@ -2305,13 +2305,13 @@ if ($action == "cleanup_messages") {
 			}
 			if ($count%2) print "</div>";
 			print "<div class=\"admin_item_box shade1\"></div>";
-			print "<div class=\"center shade2\"><br /><input type=\"submit\" value=\"".$gm_lang["del_mail"]."\" onclick=\"document.cleanmessageform.action.value='cleanup_messbox'; return confirm('".$gm_lang["confirm_sure"]."');\" /></div>";
+			print "<div class=\"center shade2\"><br /><input type=\"submit\" value=\"".GM_LANG_del_mail."\" onclick=\"document.cleanmessageform.action.value='cleanup_messbox'; return confirm('".GM_LANG_confirm_sure."');\" /></div>";
 			
 			// Print the month cleanup
 			print "<div class=\"admin_item_box shade1\"></div>";
 			print "<div class=\"admin_item_box shade2 center\"><br />";
 			$sum = array_sum($mons);
-			print $gm_lang["total_messages"]."&nbsp;&nbsp;&nbsp;".$sum."<br />";
+			print GM_LANG_total_messages."&nbsp;&nbsp;&nbsp;".$sum."<br />";
 			$maxmon = end(array_keys($mons));
 			// Convert the totals to cumulative percentage
 			ksort($mons);	
@@ -2324,17 +2324,17 @@ if ($action == "cleanup_messages") {
 				$mons[$mon] = $perc;
 //				print $mon." ".$mons[$mon];
 			}
-			print "<label for=\"cleanup\">".$gm_lang["cleanup_older"]."&nbsp;&nbsp;&nbsp;</label>";
+			print "<label for=\"cleanup\">".GM_LANG_cleanup_older."&nbsp;&nbsp;&nbsp;</label>";
 			print "<select id=\"cleanup\" name=\"cleanup\">";
 			for ($i=0; $i<=$maxmon; $i++) {
 				if (isset($mons[$i])) {
 					print "<option value=\"".$i."\"";
 					if ($i == $maxmon) print "selected=\"selected\" ";
-					print ">".$i."&nbsp;".$gm_lang["months"]." (".$mons[$i]."%)</option>";
+					print ">".$i."&nbsp;".GM_LANG_months." (".$mons[$i]."%)</option>";
 				}
 			}
 			print "</select>";
-			print "<input type=\"submit\" value=\"".$gm_lang["delete"]."\" onclick=\"document.cleanmessageform.action.value='cleanup_messold'; return confirm('".$gm_lang["confirm_sure"]."');\" /></div>";
+			print "<input type=\"submit\" value=\"".GM_LANG_delete."\" onclick=\"document.cleanmessageform.action.value='cleanup_messold'; return confirm('".GM_LANG_confirm_sure."');\" /></div>";
 			?>
 		</form>
 	</div>

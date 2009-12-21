@@ -41,8 +41,8 @@ PrintHeader($pedigree_controller->pagetitle);
 print "<div id=\"content_pedigree\">";
 
 	// Print the page title
-	if ($pedigree_controller->view == "preview") print "<h3>".str_replace("#PEDIGREE_GENERATIONS#", ConvertNumber($pedigree_controller->num_generations), $gm_lang["gen_ped_chart"]).":";
-	else print "<h3>".$gm_lang["index_header"].":";
+	if ($pedigree_controller->view == "preview") print "<h3>".str_replace("#PEDIGREE_GENERATIONS#", ConvertNumber($pedigree_controller->num_generations), GM_LANG_gen_ped_chart).":";
+	else print "<h3>".GM_LANG_index_header.":";
 	print "<br />".$pedigree_controller->root->name;
 	if ($pedigree_controller->root->addname != "") print "<br />" . $pedigree_controller->root->addname;
 	
@@ -51,8 +51,8 @@ print "<div id=\"content_pedigree\">";
 	$family =& Family::GetInstance($fam, "", $GEDCOMID);
 	$famrela = $family->pedigreetype;
 	if (!empty($famrela)) {
-		if ($TEXT_DIRECTION == "ltr") print "&nbsp;&lrm;(".$gm_lang[$famrela."_parents"].")&lrm;";
-		else print "&nbsp;&rlm;(".$gm_lang[$famrela."_parents"].")&rlm;";
+		if ($TEXT_DIRECTION == "ltr") print "&nbsp;&lrm;(".constant("GM_LANG_".$famrela."_parents").")&lrm;";
+		else print "&nbsp;&rlm;(".constant("GM_LANG_".$famrela."_parents").")&rlm;";
 	}
 	print "</h3>";
 
@@ -68,8 +68,8 @@ print "<div id=\"content_pedigree\">";
 		//-->
 		</script>
 		<?php
-		if ($pedigree_controller->max_generation == true) print "<span class=\"error\">".str_replace("#PEDIGREE_GENERATIONS#", ConvertNumber($pedigree_controller->num_generations), $gm_lang["max_generation"])."</span>";
-		if ($pedigree_controller->min_generation == true) print "<span class=\"error\">".$gm_lang["min_generation"]."</span>";
+		if ($pedigree_controller->max_generation == true) print "<span class=\"error\">".str_replace("#PEDIGREE_GENERATIONS#", ConvertNumber($pedigree_controller->num_generations), GM_LANG_max_generation)."</span>";
+		if ($pedigree_controller->min_generation == true) print "<span class=\"error\">".GM_LANG_min_generation."</span>";
 		print "<form name=\"people\" method=\"get\" action=\"pedigree.php\">";
 		print "<table class=\"pedigree_table $TEXT_DIRECTION\" width=\"225\">";
 		
@@ -85,14 +85,14 @@ print "<div id=\"content_pedigree\">";
 		// Orientation
 		print "<tr><td class=\"shade2 wrap\">";
 		print_help_link("talloffset_help", "qm");
-		print $gm_lang["orientation"];
+		print GM_LANG_orientation;
 		print "</td><td class=\"shade1\">";
 		print "<input type=\"radio\" name=\"talloffset\" value=\"0\" ";
 		if (!$pedigree_controller->talloffset) print "checked=\"checked\" ";
-		print "onclick=\"document.people.talloffset.value='1';\" />".$gm_lang["portrait"];
+		print "onclick=\"document.people.talloffset.value='1';\" />".GM_LANG_portrait;
 		print "<br /><input type=\"radio\" name=\"talloffset\" value=\"1\" ";
 		if ($pedigree_controller->talloffset) print "checked=\"checked\" ";
-		print "onclick=\"document.people.talloffset.value='0';\" />".$gm_lang["landscape"];
+		print "onclick=\"document.people.talloffset.value='0';\" />".GM_LANG_landscape;
 		print "<br /></td></tr>";
 	
 		// Show details
@@ -323,8 +323,8 @@ print "<div id=\"content_pedigree\">";
 			else print "ltr\" style=\"position:absolute; left:";
 			print $basexoffset."px; top:".$yoffset."px; width:10px; height:10px; \">";
 			if ($pedigree_controller->view != "preview") {
-				if ($TEXT_DIRECTION=="rtl") print "<a href=\"javascript: ".$gm_lang["show"]."\" onclick=\"togglechildrenbox(); return false;\" onmouseover=\"swap_image('larrow',1);\" onmouseout=\"swap_image('larrow',1);\">";
-				else print "<a href=\"javascript: ".$gm_lang["show"]."\" onclick=\"togglechildrenbox(''); return false;\" onmouseover=\"swap_image('larrow',0);\" onmouseout=\"swap_image('larrow',0);\">";
+				if ($TEXT_DIRECTION=="rtl") print "<a href=\"javascript: ".GM_LANG_show."\" onclick=\"togglechildrenbox(); return false;\" onmouseover=\"swap_image('larrow',1);\" onmouseout=\"swap_image('larrow',1);\">";
+				else print "<a href=\"javascript: ".GM_LANG_show."\" onclick=\"togglechildrenbox(''); return false;\" onmouseover=\"swap_image('larrow',0);\" onmouseout=\"swap_image('larrow',0);\">";
 				if ($TEXT_DIRECTION=="rtl") print "<img id=\"larrow\" src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["rarrow"]["other"]."\" border=\"0\" alt=\"\" />";
 				else print "<img id=\"larrow\" src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["larrow"]["other"]."\" border=\"0\" alt=\"\" />";
 				print "</a>";
@@ -352,7 +352,7 @@ print "<div id=\"content_pedigree\">";
 			}
 			//-- print the siblings
 			foreach ($pedigree_controller->root->childfamilies as $key => $fam) {
-				if ($fam->children_count > 1) print "<span class=\"name1\"><br />".$gm_lang["siblings"]."<br /></span>";
+				if ($fam->children_count > 1) print "<span class=\"name1\"><br />".GM_LANG_siblings."<br /></span>";
 				foreach ($fam->children as $key2 => $child) {
 					if ($child->xref != $pedigree_controller->xref) {
 						print "\n\t\t\t\t&nbsp;&nbsp;<a href=\"pedigree.php?num_generations=".$pedigree_controller->num_generations."&amp;rootid=".$child->xref."&amp;show_details=".$pedigree_controller->show_details."&amp;talloffset=".$pedigree_controller->talloffset."\"><span class=\"name1\">";

@@ -55,14 +55,14 @@ if ($placelist_controller->display == "hierarchy") {
 	if ($placelist_controller->level > 0) {
 		//-- link to search results
 		if (($placelist_controller->level > 1 || $placelist_controller->parent[0] != "") && $numfound > 0) {
-			print $numfound."  ".$gm_lang["connections"].": ";
+			print $numfound."  ".GM_LANG_connections.": ";
 		}
 		//-- breadcrumb
 		$numls = count($placelist_controller->parent)-1;
 		$num_place="";
 		//-- place and page text orientation is opposite -> top level added at the beginning of the place text
 		print "<a href=\"placelist.php?level=0&amp;select=".$placelist_controller->select."\">";
-		if ($numls>=0 && (($TEXT_DIRECTION=="ltr" && hasRtLText($placelist_controller->parent[$numls])) || ($TEXT_DIRECTION=="rtl" && !hasRtLText($placelist_controller->parent[$numls])))) print $gm_lang["top_level"].", ";
+		if ($numls>=0 && (($TEXT_DIRECTION=="ltr" && hasRtLText($placelist_controller->parent[$numls])) || ($TEXT_DIRECTION=="rtl" && !hasRtLText($placelist_controller->parent[$numls])))) print GM_LANG_top_level.", ";
 		print "</a>";
 	    for($i=$numls; $i>=0; $i--) {
 			print "<a href=\"placelist.php?level=".($i+1)."&amp;";
@@ -76,7 +76,7 @@ if ($placelist_controller->display == "hierarchy") {
 				}
 			}
  			print "&amp;select=".$placelist_controller->select."\">";
- 			if (trim($placelist_controller->parent[$i])=="") print $gm_lang["unknown"];
+ 			if (trim($placelist_controller->parent[$i])=="") print GM_LANG_unknown;
 			else {
 				print PrintReady($placelist_controller->parent[$i]);
 				if (HasChinese($placelist_controller->parent[$i])) print " (".printReady(GetPinYin($placelist_controller->parent[$i])).")";
@@ -89,7 +89,7 @@ if ($placelist_controller->display == "hierarchy") {
 	}
 	print "<a href=\"placelist.php?level=0&amp;select=".$placelist_controller->select."\">";
 	//-- place and page text orientation is the same -> top level added at the end of the place text
-	if ($placelist_controller->level == 0 || ($numls>=0 && (($TEXT_DIRECTION=="rtl" && hasRtLText($placelist_controller->parent[$numls])) || ($TEXT_DIRECTION=="ltr" && !hasRtLText($placelist_controller->parent[$numls]))))) print $gm_lang["top_level"];
+	if ($placelist_controller->level == 0 || ($numls>=0 && (($TEXT_DIRECTION=="rtl" && hasRtLText($placelist_controller->parent[$numls])) || ($TEXT_DIRECTION=="ltr" && !hasRtLText($placelist_controller->parent[$numls]))))) print GM_LANG_top_level;
 	print "</a>";
 
 	print_help_link("ppp_levels_help", "qm");
@@ -223,12 +223,12 @@ if ($placelist_controller->display == "hierarchy") {
 			if ($ct1 > 20) print "colspan=\"3\"";
 			else if ($ct1 > 4) print "colspan=\"2\"";
 			print ">&nbsp;";
-			print "<img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["place"]["small"]."\" border=\"0\" title=\"".$gm_lang["search_place"]."\" alt=\"".$gm_lang["search_place"]."\" />&nbsp;&nbsp;";
+			print "<img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["place"]["small"]."\" border=\"0\" title=\"".GM_LANG_search_place."\" alt=\"".GM_LANG_search_place."\" />&nbsp;&nbsp;";
 			if ($placelist_controller->level > 0) {
-				print " ".$gm_lang["place_list_aft"]." ";
+				print " ".GM_LANG_place_list_aft." ";
 				print PrintReady($num_place);
 			}
-			else print $gm_lang["place_list"];
+			else print GM_LANG_place_list;
 
 			print "&nbsp;";
 			print_help_link("ppp_placelist_help", "qm");
@@ -242,7 +242,7 @@ if ($placelist_controller->display == "hierarchy") {
 		print " type=\"square\">\n<a href=\"placelist.php?action=".$placelist_controller->action."&amp;level=".($placelist_controller->level + 1).$linklevels;
 		print "&amp;parent[$placelist_controller->level]=".urlencode($value)."&amp;select=".$placelist_controller->select."\" class=\"shade1\">";
 
-		if (trim($value)=="") print $gm_lang["unknown"];
+		if (trim($value)=="") print GM_LANG_unknown;
 		else {
 			print PrintReady($value);
 			if (HasChinese($value)) {
@@ -264,7 +264,7 @@ if ($placelist_controller->display == "hierarchy") {
 			if ($ct1 > 20) print "colspan=\"3\"";
 			else if ($ct1 > 4) print "colspan=\"2\"";
 			print ">\n\t";
-			print $gm_lang["view_records_in_place"];
+			print GM_LANG_view_records_in_place;
 			print_help_link("ppp_view_records_help", "qm");
 			print "</td></tr><tr><td class=\"shade1\" ";
 			if ($ct1 > 20) print "colspan=\"3\"";
@@ -275,7 +275,7 @@ if ($placelist_controller->display == "hierarchy") {
 				print "&amp;parent[$key]=".urlencode(trim($value));
 			}
 			print "\"><span class=\"formField\">";
-			if (trim($value)=="") print $gm_lang["unknown"];
+			if (trim($value)=="") print GM_LANG_unknown;
 			else {
 				print PrintReady($value);
 				if (HasChinese($value)) print " (".printReady(GetPinYin($value)).")";
@@ -310,15 +310,15 @@ if ($placelist_controller->level > 0) {
 			print "<input type=\"hidden\" name=\"parent[]\" value=\"".$placelist_controller->parent[$j]."\">";
 			$j++;
 		}
-		print $gm_lang["pl_show_event"].":&nbsp";
+		print GM_LANG_pl_show_event.":&nbsp";
 		print "<select name=\"select\" onchange=\"document.selectplace.submit(); return false;\" />";
 		PrintFilterEvent($placelist_controller->select);
 		print "</select>";
 		print "</form>";
 		print "</td></tr><tr>";
-		if ($ci>0) print "<td class=\"shade2 center\"><img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["indis"]["small"]."\" border=\"0\" alt=\"\" /> ".$gm_lang["individuals"]."</td>";
-		if ($cs>0) print "<td class=\"shade2 center\"><img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["source"]["small"]."\" border=\"0\" alt=\"\" /> ".$gm_lang["sources"]."</td>";
-		if ($cf>0) print "<td class=\"shade2 center\"><img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["sfamily"]["small"]."\" border=\"0\" alt=\"\" /> ".$gm_lang["families"]."</td>";
+		if ($ci>0) print "<td class=\"shade2 center\"><img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["indis"]["small"]."\" border=\"0\" alt=\"\" /> ".GM_LANG_individuals."</td>";
+		if ($cs>0) print "<td class=\"shade2 center\"><img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["source"]["small"]."\" border=\"0\" alt=\"\" /> ".GM_LANG_sources."</td>";
+		if ($cf>0) print "<td class=\"shade2 center\"><img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["sfamily"]["small"]."\" border=\"0\" alt=\"\" /> ".GM_LANG_families."</td>";
 		print "</tr><tr>";
 		if ($ci>0) {
 			print "\n\t\t<td class=\"shade1 wrap\">";
@@ -349,30 +349,30 @@ if ($placelist_controller->level > 0) {
 		print "\n\t\t</tr><tr>";
 		if ($ci>0) {
 			print "<td>";
-			print $gm_lang["total_indis"]." ".$ci;
+			print GM_LANG_total_indis." ".$ci;
 			if (count($placelist_controller->indi_hide) > 0) {
 				print "&nbsp;--&nbsp;";
-				print $gm_lang["hidden"]." ".count($placelist_controller->indi_hide);
+				print GM_LANG_hidden." ".count($placelist_controller->indi_hide);
 				print_help_link("privacy_error_help", "qm");
 			}
 			print "</td>\n";
 		}
 		if ($cs>0) {
 			print "<td>";
-			print $gm_lang["total_sources"]." ".$cs;
+			print GM_LANG_total_sources." ".$cs;
 			if (count($placelist_controller->sour_hide) > 0) {
 				print "&nbsp;--&nbsp;";
-				print $gm_lang["hidden"]." ".count($placelist_controller->sour_hide);
+				print GM_LANG_hidden." ".count($placelist_controller->sour_hide);
 				print_help_link("privacy_error_help", "qm");
 			}
 			print "</td>\n";
 		}
 		if ($cf>0) {
 			print "<td>";
-			print $gm_lang["total_fams"]." ".$cf;
+			print GM_LANG_total_fams." ".$cf;
 			if (count($placelist_controller->fam_hide) > 0) {
 				print "&nbsp;--&nbsp;";
-				print $gm_lang["hidden"]." ".count($placelist_controller->fam_hide);
+				print GM_LANG_hidden." ".count($placelist_controller->fam_hide);
 				print_help_link("privacy_error_help", "qm");
 			}
 			print "</td>\n";
@@ -390,7 +390,7 @@ if ($placelist_controller->display=="list") {
 	FindPlaceList("");
 	uasort($placelist, "stringsort");
 	if (count($placelist)==0) {
-		print "<b>".$gm_lang["no_results"]."</b><br />";
+		print "<b>".GM_LANG_no_results."</b><br />";
 	}
 	else {
 		print "\n\t<table class=\"list_table $TEXT_DIRECTION\"";
@@ -398,8 +398,8 @@ if ($placelist_controller->display=="list") {
 		print ">\n\t\t<tr>\n\t\t<td class=\"list_label\" ";
 		$ct = count($placelist);
 		print " colspan=\"".($ct>20?"3":"2")."\">&nbsp;";
-		print "<img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["place"]["small"]."\" border=\"0\" title=\"".$gm_lang["search_place"]."\" alt=\"".$gm_lang["search_place"]."\" />&nbsp;&nbsp;";
-		print $gm_lang["place_list2"];
+		print "<img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["place"]["small"]."\" border=\"0\" title=\"".GM_LANG_search_place."\" alt=\"".GM_LANG_search_place."\" />&nbsp;&nbsp;";
+		print GM_LANG_place_list2;
 		print "&nbsp;";
 		print_help_link("ppp_placelist_help2", "qm");
 		print "</td></tr><tr><td class=\"shade1 wrap\"><ul>\n\t\t\t";
@@ -414,7 +414,7 @@ if ($placelist_controller->display=="list") {
 				$linklevels .= "&amp;parent[$level]=".urlencode($place);
 				$level++;
 				if ($level>1) $revplace .= ", ";
-				if ($place=="") $revplace .= $gm_lang["unknown"];
+				if ($place=="") $revplace .= GM_LANG_unknown;
 				else $revplace .= $place;
 			}
 //			print "<li";
@@ -433,7 +433,7 @@ if ($placelist_controller->display=="list") {
 		print "\n\t\t</ul></td></tr>\n\t\t";
 		if ($i>1) {
 			print "<tr><td>";
-			if ($i>0) print $gm_lang["total_unic_places"]." ".$i;
+			if ($i>0) print GM_LANG_total_unic_places." ".$i;
 			print "</td></tr>\n";
 		}
 		print "\n\t\t</table>";
@@ -441,17 +441,17 @@ if ($placelist_controller->display=="list") {
 }
 
 print "<br /><a href=\"placelist.php?select=ALL&amp;display=";
-if ($placelist_controller->display == "list") print "hierarchy\">".$gm_lang["show_place_hierarchy"];
-else print "list\">".$gm_lang["show_place_list"];
+if ($placelist_controller->display == "list") print "hierarchy\">".GM_LANG_show_place_hierarchy;
+else print "list\">".GM_LANG_show_place_list;
 print "</a><br /><br />\n";
 
 $head = Header::GetInstance("HEAD", "", $GEDCOMID);
 if ($head->placeformat != "") {
-	print  $gm_lang["form"].$head->placeformat;
+	print  GM_LANG_form.$head->placeformat;
 	print_help_link("ppp_match_one_help", "qm");
 }
 else {
-	print $gm_lang["form"].$gm_lang["default_form"]."  ".$gm_lang["default_form_info"];
+	print GM_LANG_form.GM_LANG_default_form."  ".GM_LANG_default_form_info;
 	print_help_link("ppp_default_form_help", "qm");
 }
 

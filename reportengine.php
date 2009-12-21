@@ -91,22 +91,22 @@ if (!empty($report)) {
 //-- choose a report to run
 if ($action=="choose") {
 	$reports = GetReportList(true);
-	PrintHeader($gm_lang["choose_report"]);
+	PrintHeader(GM_LANG_choose_report);
 
 	print "<br /><br />\n";
 	print "<form name=\"choosereport\" method=\"get\" action=\"reportengine.php\">\n";
 	print "<input type=\"hidden\" name=\"action\" value=\"setup\" />\n";
 	print "<input type=\"hidden\" name=\"output\" value=\"$output\" />\n";
 	print "<table class=\"facts_table center $TEXT_DIRECTION\">";
-	print "<tr><td class=\"topbottombar\" colspan=\"2\">".$gm_lang["choose_report"]."</td></tr>";
-	print "<tr><td class=\"shade2 wrap width20 vmiddle\">".$gm_lang["select_report"]."</td>";
+	print "<tr><td class=\"topbottombar\" colspan=\"2\">".GM_LANG_choose_report."</td></tr>";
+	print "<tr><td class=\"shade2 wrap width20 vmiddle\">".GM_LANG_select_report."</td>";
 	print "<td class=\"shade1\">";
 	print "<select name=\"report\">\n";
 	foreach($reports as $file=>$report) {
 		print "<option value=\"".$report["file"]."\">".$report["title"][$LANGUAGE]."</option>\n";
 	}
 	print "</select></td></tr>\n";
-	print "<tr><td class=\"topbottombar\" colspan=\"2\"><input type=\"submit\" value=\"".$gm_lang["click_here"]."\" /></td></tr>";
+	print "<tr><td class=\"topbottombar\" colspan=\"2\"><input type=\"submit\" value=\"".GM_LANG_click_here."\" /></td></tr>";
 	print "</table>";
 	print "</form>\n";
 	print "<br /><br />\n";
@@ -116,7 +116,7 @@ if ($action=="choose") {
 
 //-- setup report to run
 else if ($action=="setup") {
-	PrintHeader($gm_lang["enter_report_values"]);
+	PrintHeader(GM_LANG_enter_report_values);
 	//-- make sure the report exists
 	if (!file_exists($report)) {
 		print "<span class=\"error\">The specified report cannot be found</span>\n";
@@ -171,8 +171,8 @@ function paste_id(value) {
 		print "</select><br />\n";
 		*/
 		print "<table class=\"facts_table width50 center $TEXT_DIRECTION\">";
-		print "<tr><td class=\"topbottombar\" colspan=\"2\">".$gm_lang["enter_report_values"]."</td></tr>";
-		print "<tr><td class=\"shade2 width30 wrap\">".$gm_lang["selected_report"]."</td><td class=\"shade1\">".$report_array["title"]."</td></tr>\n";
+		print "<tr><td class=\"topbottombar\" colspan=\"2\">".GM_LANG_enter_report_values."</td></tr>";
+		print "<tr><td class=\"shade2 width30 wrap\">".GM_LANG_selected_report."</td><td class=\"shade1\">".$report_array["title"]."</td></tr>\n";
 		
 		$firstrun = 0;
 		if (!isset($report_array["inputs"])) $report_array["inputs"] = array();
@@ -230,8 +230,8 @@ function paste_id(value) {
 								print " SELECTED=selected";
 							}
 							print ">";
-							if (isset($gm_lang[$option])) print $gm_lang[$option];
-							else if (isset($gm_lang["p_".$option])) print $gm_lang["p_".$option];
+							if (defined("GM_LANG_".$option)) print constant("GM_LANG_".$option);
+							else if (defined("GM_LANG_p_".$option])) print constant("GM_LANG_p_".$option);
 							else if (defined("GM_FACT_".$option)) print constant("GM_FACT_".$option);
 							else print $option;
 							print "</option>\n";
@@ -245,7 +245,7 @@ function paste_id(value) {
 						if ($input["lookup"]=="PLAC") LinkFunctions::PrintFindPlaceLink($input["name"]);
 						if ($input["lookup"]=="REPO") LinkFunctions::PrintFindRepositoryLink($input["name"]);
 						if ($input["lookup"]=="DATE") {
-							$text = $gm_lang["select_date"];
+							$text = GM_LANG_select_date;
 							if (isset($GM_IMAGES["calendar"]["button"])) $Link = "<img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["calendar"]["button"]."\" name=\"a_".$input["name"]."\" id=\"a_".$input["name"]."\" alt=\"".$text."\" title=\"".$text."\" border=\"0\" align=\"middle\" />";
 							else $Link = $text;
 
@@ -275,7 +275,7 @@ function paste_id(value) {
 		</td></tr>
 		<?php */
 
-		print "<tr><td class=\"topbottombar\" colspan=\"2\"><input type=\"submit\" value=\"".$gm_lang["download_report"]."\" onclick=\"document.setupreport.elements['download'].value='1';\"/></td></tr>\n";
+		print "<tr><td class=\"topbottombar\" colspan=\"2\"><input type=\"submit\" value=\"".GM_LANG_download_report."\" onclick=\"document.setupreport.elements['download'].value='1';\"/></td></tr>\n";
 		print "</table>\n";
 		print "</form>\n";
 		print "<br /><br />\n";

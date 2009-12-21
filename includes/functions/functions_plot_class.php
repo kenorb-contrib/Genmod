@@ -346,7 +346,6 @@ abstract class PlotFunctions {
 	}
 	
 	public function CheckPlotExtensions() {
-		global $gm_lang;
 		
 		$GDcheck = 1;
 		$JPcheck = 1;
@@ -358,8 +357,8 @@ abstract class PlotFunctions {
 		if (!file_exists("modules/jpgraph/jpgraph.php") || !file_exists("modules/jpgraph/jpgraph_line.php") ||!file_exists("modules/jpgraph/jpgraph_bar.php")) $JPcheck= 0;
 		
 		if (($GDcheck == 0) or ($JPcheck == 0))	{
-			if ($GDcheck == 0) print $gm_lang["stplGDno"] . "<br />";
-			if ($JPcheck == 0) print $gm_lang["stpljpgraphno"] . "<br />";
+			if ($GDcheck == 0) print GM_LANG_stplGDno . "<br />";
+			if ($JPcheck == 0) print GM_LANG_stpljpgraphno . "<br />";
 			exit;
 		}
 	}
@@ -576,7 +575,6 @@ abstract class PlotFunctions {
 	private function FillYData($z,$x,$val) {
 		global $x_as,$y_as, $z_as, $nrfam, $famgeg, $nrpers, $persgeg, $key2ind, $n1;
 		global $legend, $xdata, $ydata, $xmax, $xgrenzen, $zmax, $zgrenzen, $xgiven,$zgiven, $percentage, $man_vrouw;
-		global $gm_lang;
 		
 		//--	calculate index $i out of given z value
 		//--	calculate index $j out of given x value
@@ -610,7 +608,7 @@ abstract class PlotFunctions {
 	private function MyPlot($mytitle,$n,$xdata,$xtitle,$ydata,$ytitle,$legend) {
 		global $x_as,$y_as, $z_as, $nrfam, $famgeg, $nrpers, $persgeg, $key2ind, $n1;
 		global $legend, $xdata, $ydata, $xmax, $xgrenzen, $zmax, $zgrenzen, $xgiven,$zgiven, $percentage;
-		global $gm_lang, $colors;
+		global $colors;
 		global $showShadow, $valuePos, $graphSize, $value_angle, $screenRes, $windowRes;
 	
 		$b= array();
@@ -703,7 +701,6 @@ abstract class PlotFunctions {
 	private function CalcAxis($xas_grenzen) {
 		global $x_as,$y_as, $z_as, $nrfam, $famgeg, $nrpers, $persgeg, $key2ind, $n1;
 		global $legend, $xdata, $ydata, $xmax, $xgrenzen, $zmax, $zgrenzen, $xgiven,$zgiven, $percentage, $man_vrouw;
-		global $gm_lang;
 	
 		//calculate xdata and zdata elements out of given POST values
 		$hulpar= array();
@@ -733,7 +730,7 @@ abstract class PlotFunctions {
 	private function CalcLegend($grenzen_zas) {
 		global $x_as,$y_as, $z_as, $nrfam, $famgeg, $nrpers, $persgeg, $key2ind, $n1;
 		global $legend, $xdata, $ydata, $xmax, $xgrenzen, $zmax, $zgrenzen, $xgiven,$zgiven, $percentage, $man_vrouw;
-		global $gm_lang, $colors;
+		global $colors;
 	
 		// calculate the legend values
 		$hulpar= array();
@@ -764,7 +761,7 @@ abstract class PlotFunctions {
 	public function SetParams($current, $indfam, $xg,  $zg, $titstr,  $xt, $yt, $gx, $gz, $myfunc) {
 		global $x_as,$y_as, $z_as, $nrfam, $famgeg, $nrpers, $persgeg, $key2ind, $n1;
 		global $legend, $xdata, $ydata, $xmax, $xgrenzen, $zmax, $zgrenzen, $xgiven,$zgiven, $percentage, $man_vrouw;
-		global $gm_lang, $MON_SHORT;
+		global $MON_SHORT;
 	
 		$monthdata= array();
 		$monthdata= explode(",",$MON_SHORT);
@@ -776,8 +773,8 @@ abstract class PlotFunctions {
 		if ($x_as == $current) {
 			$xgiven= $xg; 
 			$zgiven= $zg;
-			$title= $gm_lang["$titstr"];
-			$xtitle= $gm_lang["$xt"]; 
+			$title = constant("GM_LANG_".$titstr);
+			$xtitle= constant("GM_LANG_".$xt); 
 			$grenzen_xas= $gx; 
 			$grenzen_zas= $gz;
 			if ($xg == true) {
@@ -791,11 +788,11 @@ abstract class PlotFunctions {
 			switch ($y_as) {
 			default: //case 201:
 				$percentage= false; 
-				$ytitle= $gm_lang["stplnum"];
+				$ytitle= GM_LANG_stplnum;
 				break;
 			case 202:
 				$percentage= true;  
-				$ytitle= $gm_lang["stplperc"];
+				$ytitle= GM_LANG_stplperc;
 				break;
 			}
 		
@@ -810,13 +807,13 @@ abstract class PlotFunctions {
 			case 301:
 				$man_vrouw= true; 
 				$zgiven= true;
-				$legend[0]= $gm_lang["male"]; 
-				$legend[1]= $gm_lang["female"]; 
+				$legend[0]= GM_LANG_male; 
+				$legend[1]= GM_LANG_female; 
 				$zmax=2; 
-				$xtitle= $xtitle . $gm_lang["stplmf"];
+				$xtitle= $xtitle . GM_LANG_stplmf;
 				break;
 			default: //case 302:
-				$xtitle= $xtitle . $gm_lang["stplipot"];
+				$xtitle= $xtitle . GM_LANG_stplipot;
 				break;
 			}
 		
@@ -834,7 +831,7 @@ abstract class PlotFunctions {
 				//--print "main:" . $i . "<br>";
 				self::$myfunc($i);
 			}
-			$hstr= utf8_decode($title) . "\n" . utf8_decode($gm_lang["stplnumof"]) . " N=" . $n1 . " (max= " . $nrmax. ").";
+			$hstr= utf8_decode($title) . "\n" . utf8_decode(GM_LANG_stplnumof) . " N=" . $n1 . " (max= " . $nrmax. ").";
 			self::MyPlot($hstr,$zmax,$xdata,utf8_decode($xtitle),$ydata,utf8_decode($ytitle),$legend);
 		}
 	}
