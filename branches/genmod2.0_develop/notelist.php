@@ -33,9 +33,9 @@ require("config.php");
 */
 $note_controller = new NoteController();
 
-PrintHeader($gm_lang["note_list"]);
+PrintHeader(GM_LANG_note_list);
 print "<div class=\"center\">";
-print "<h3>".$gm_lang["note_list"]."</h3>\n\t";
+print "<h3>".GM_LANG_note_list."</h3>\n\t";
 
 $note_controller->GetNoteList();
 
@@ -45,8 +45,8 @@ $note_hide = $note_total - $note_count;
 
 print "\n\t<table class=\"list_table $TEXT_DIRECTION center\">\n\t\t<tr><td class=\"shade2 center\"";
 if($note_count > 12) print " colspan=\"2\"";
-print "><img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["note"]["other"]."\" border=\"0\" title=\"".$gm_lang["notes"]."\" alt=\"".$gm_lang["notes"]."\" />&nbsp;&nbsp;";
-print $gm_lang["titles_found"];
+print "><img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["note"]["other"]."\" border=\"0\" title=\"".GM_LANG_notes."\" alt=\"".GM_LANG_notes."\" />&nbsp;&nbsp;";
+print GM_LANG_titles_found;
 print "</td></tr><tr><td class=\"$TEXT_DIRECTION shade1 wrap\"><ul>";
 $i=1;
 if ($note_count > 0){
@@ -58,10 +58,10 @@ if ($note_count > 0){
 	}
 	print "\n\t\t</ul></td>\n\t\t";
  
-	print "</tr><tr><td>".$gm_lang["total_notes"]." ".$note_total;
-	if ($note_hide > 0) print "<br />".$gm_lang["hidden"]." ".$note_hide;
+	print "</tr><tr><td>".GM_LANG_total_notes." ".$note_total;
+	if ($note_hide > 0) print "<br />".GM_LANG_hidden." ".$note_hide;
 }
-else print "<span class=\"warning\"><i>".$gm_lang["no_results"]."</span>";
+else print "<span class=\"warning\"><i>".GM_LANG_no_results."</span>";
 
 print "</td>\n\t\t</tr>\n\t</table>";
 

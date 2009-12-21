@@ -35,7 +35,7 @@ define('GM_FOOTERFILE', GedcomConfig::$THEME_DIR."footer.html");				//-- Footer 
 define('GM_PRINT_FOOTERFILE', GedcomConfig::$THEME_DIR."print_footer.html");	//-- Print Preview Footer information for the site
 define('GM_PRINT_HEADERFILE', GedcomConfig::$THEME_DIR."print_header.html");	//-- Print Preview Header information for the site
 
-define('GM_USE_HELPIMG', true);			// set to true to use image for help questionmark, set to false to use $gm_lang["qm"]
+define('GM_USE_HELPIMG', true);			// set to true to use image for help questionmark, set to false to use gm_lang["qm"]
 define('GM_IMAGE_DIR', 'images');		//-- directory to look for images
 
 //-- variables for image names
@@ -189,6 +189,6 @@ $Darrowwidth = 15;		// -- additional width to include for the up arrows
 $ImgSrc = GM_IMAGE_DIR."/uarrow3.gif";
 $UpArrow = "<b>^&nbsp;&nbsp;</b>";
 if (file_exists($ImgSrc)) $UpArrow = "<img src=\"$ImgSrc\" class=\"icon\" border=\"0\" alt=\"\" />";
-$gm_lang["UpArrow"] = $UpArrow;	// help_text.xx.php requires this _untranslatable_ term!
+define("GM_LANG_UpArrow", $UpArrow);	// help_text.xx.php requires this _untranslatable_ term!
 
 ?>

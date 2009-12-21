@@ -57,7 +57,7 @@ $author =$user->firstname." ".$user->lastname;
 
 $rss = new UniversalFeedCreator();
 $rss->title = $GEDCOMS[$GEDCOMID]["title"];
-$rss->description = str_replace("#GEDCOM_TITLE#", $GEDCOMS[$GEDCOMID]["title"], $gm_lang["rss_descr"]);
+$rss->description = str_replace("#GEDCOM_TITLE#", $GEDCOMS[$GEDCOMID]["title"], GM_LANG_rss_descr);
 
 //optional
 $rss->descriptionTruncSize = 500;
@@ -70,10 +70,10 @@ $syndURL = preg_replace("/&/", "&amp;", $syndURL);
 $rss->syndicationURL = $syndURL;
 
 $image = new FeedImage();
-$image->title = $gm_lang["rss_logo_descr"];
+$image->title = GM_LANG_rss_logo_descr;
 $image->url = SERVER_URL."images/gedcom.gif";
 $image->link = "http://www.Genmod.net";
-$image->description = $gm_lang["rss_logo_descr"];
+$image->description = GM_LANG_rss_logo_descr;
 
 //optional
 $image->descriptionTruncSize = 500;

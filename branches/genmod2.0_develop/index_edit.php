@@ -32,7 +32,7 @@
 */
 require("config.php");
 
-global $gm_lang, $GM_IMAGES, $TEXT_DIRECTION;
+global $GM_IMAGES, $TEXT_DIRECTION;
 global $GEDCOM_TITLE;
 
 
@@ -40,8 +40,8 @@ global $GEDCOM_TITLE;
 //-- otherwise have them login again
 if (empty($gm_user->username) || empty($name)) {
 	PrintSimpleHeader("");
-	print $gm_lang["access_denied"];
-	print "<div class=\"center\"><a href=\"javascript:// ".$gm_lang["close_window"]."\" onclick=\"self.close();\">".$gm_lang["close_window"]."</a></div>\n";
+	print GM_LANG_access_denied;
+	print "<div class=\"center\"><a href=\"javascript:// ".GM_LANG_close_window."\" onclick=\"self.close();\">".GM_LANG_close_window."</a></div>\n";
 	PrintSimpleFooter();
 	exit;
 }
@@ -56,7 +56,7 @@ if (!isset($side)) $side="main";
 if (!isset($index)) $index=1;
 
 // Define all the icons we're going to use
-$IconHelp = $gm_lang["qm"];
+$IconHelp = GM_LANG_qm;
 if (GM_USE_HELPIMG) {
 	$IconHelp = "<img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["help"]["small"]."\" class=\"icon\" width=\"15\" height=\"15\" alt=\"\" />";
 }
@@ -75,7 +75,7 @@ $IconLDarrow = "<img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["ldarrow"]["other"]."\"
  * their names and the function to call them
  * "name" is the name of the block in the lists
  * "descr" is the name of a gm_lang var to describe this block.  Eg: if the block is
- * described by $gm_lang["my_block_text"], put "my_block_text" here.
+ * described by GM_LANG_my_block_text"], put "my_block_text" here.
  * "type" the options are "user" or "gedcom" or undefined
  * - The type determines which lists the block is available in.
  * - Leaving the type undefined allows it to be on both the user and gedcom portal
@@ -113,15 +113,15 @@ asort($SortedBlocks);
 reset($SortedBlocks);
 
 // Build sorted table of block summary descriptions
-global $gm_lang;
-$gm_lang["block_summary_table"] = "";
+
+GM_LANG_block_summary_table = "";
 $SortedBlocks = array_flip($SortedBlocks);
 foreach($SortedBlocks as $key => $b) {
 	$temp = $GM_BLOCKS[$b]["descr"];
-	$gm_lang["block_summary_table"] .= "<tr valign='top'>";
-	$gm_lang["block_summary_table"] .= "<td>".$GM_BLOCKS[$b]["name"]."</td>";
-	$gm_lang["block_summary_table"] .= "<td>#gm_lang[$temp]#</td>";
-	$gm_lang["block_summary_table"] .= "</tr>";
+	GM_LANG_block_summary_table .= "<tr valign='top'>";
+	GM_LANG_block_summary_table .= "<td>".$GM_BLOCKS[$b]["name"]."</td>";
+	GM_LANG_block_summary_table .= "<td>#gm_lang[$temp]#</td>";
+	GM_LANG_block_summary_table .= "</tr>";
 }
 $SortedBlocks = array_flip($SortedBlocks);
 
@@ -129,10 +129,10 @@ $SortedBlocks = array_flip($SortedBlocks);
 if ($command=="user") $ublocks = new Blocks("user", $gm_user->username, $action);
 else $ublocks = new Blocks("gedcom", "", $action);
 
-if ($command=="user") PrintSimpleHeader($gm_lang["mygedview"]);
+if ($command=="user") PrintSimpleHeader(GM_LANG_mygedview);
 else PrintSimpleHeader($GEDCOMS[$GEDCOMID]["title"]);
 
-$GEDCOM_TITLE = PrintReady($GEDCOMS[$GEDCOMID]["title"]);  // needed in $gm_lang["rss_descr"]
+$GEDCOM_TITLE = PrintReady($GEDCOMS[$GEDCOMID]["title"]);  // needed in GM_LANG_rss_descr
 
 if ($action=="updateconfig") {
 	$block = $ublocks->$side;
@@ -158,7 +158,7 @@ if ($action=="updateconfig") {
 		if ($block[0] == "print_upcoming_events" || $block[0] == "print_todays_events") GedcomConfig::ResetCaches();
 		if ($block[0] == "print_block_name_top10") unset($_SESSION["top10_surnames"]);
 	}
-	print $gm_lang["config_update_ok"]."<br />\n";?>
+	print GM_LANG_config_update_ok."<br />\n";?>
 	<script language="JavaScript" type="text/javascript">
 	<!--
 	opener.location.reload();
@@ -232,8 +232,8 @@ if ($action == "storefav") {
 		<?php
 	}
 	else {
-		print "<span class=\"error\">".$gm_lang["favorite_not_stored"]."</span>";
-		print "<div class=\"center\"><a href=\"javascript:// ".$gm_lang["close_window"]."\" onclick=\"self.close();\">".$gm_lang["close_window"]."</a></div>\n";
+		print "<span class=\"error\">".GM_LANG_favorite_not_stored."</span>";
+		print "<div class=\"center\"><a href=\"javascript:// ".GM_LANG_close_window."\" onclick=\"self.close();\">".GM_LANG_close_window."</a></div>\n";
 		PrintFooter();
 		exit;
 	}
@@ -245,7 +245,7 @@ if ($action=="configure" && isset($block[$index])) {
 	$block = $block[$index];
 	print "<table class=\"facts_table ".$TEXT_DIRECTION."\">";
 	print "<tr><td class=\"facts_label\">";
-	print "<h3>".$gm_lang["config_block"]."</h3>";
+	print "<h3>".GM_LANG_config_block."</h3>";
 	print "</td></tr>";
 	print "<tr><td class=\"topbottombar\">";
 	print "<b>".$GM_BLOCKS[$block[0]]["name"]."</b>";
@@ -253,7 +253,7 @@ if ($action=="configure" && isset($block[$index])) {
 	print "</table>";
 	
 	/**
-	print "<label class=\"label_form\" for=\"username\">".$gm_lang["username"]."</label>";
+	print "<label class=\"label_form\" for=\"username\">".GM_LANG_username"]."</label>";
 	print "<input class=\"input_form\" type=\"text\" id=\"username\" name=\"username\" /><br style=\"clear: left;\"/>";
 	*/
 	print "\n<form name=\"block\" method=\"post\" action=\"index_edit.php\">\n";
@@ -268,17 +268,17 @@ if ($action=="configure" && isset($block[$index])) {
 		eval($block[0]."_config(\$block[1]);");
 		print "<tr><td colspan=\"2\" class=\"center\">";
 		print_help_link("click_here_help", "qm", "click_here");
-		print "<input type=\"button\" value=\"".$gm_lang["click_here"]."\" onclick=\"document.block.submit();\" />";
-		print "&nbsp&nbsp;<input type =\"button\" value=\"".$gm_lang["cancel"]."\" onclick=\"window.close();\" />";
+		print "<input type=\"button\" value=\"".GM_LANG_click_here."\" onclick=\"document.block.submit();\" />";
+		print "&nbsp&nbsp;<input type =\"button\" value=\"".GM_LANG_cancel."\" onclick=\"window.close();\" />";
 		print "</td></tr>";
 	}
 	else {
 		print "<tr><td colspan=\"2\" class=\"shade1\">";
-		print $gm_lang["block_not_configure"];
+		print GM_LANG_block_not_configure;
 		print "</td></tr>";
 		print "<tr><td colspan=\"2\" class=\"center\">";
 		print_help_link("click_here_help", "qm");
-		print "<input type=\"button\" value=\"".$gm_lang["click_here"]."\" onclick=\"parentrefresh();\" />";
+		print "<input type=\"button\" value=\"".GM_LANG_click_here."\" onclick=\"parentrefresh();\" />";
 		print "</td></tr>";
 	}
 	print "</table>";
@@ -423,24 +423,24 @@ else {
 		// NOTE: Print the header
 		print "<div class=\"topbottombar\">";
 			print_help_link("portal_config_intructions", "qm");
-			if ($command=="user") print "<b>".Str2Upper($gm_lang["customize_page"])."</b>";
-			else print "<b>".Str2Upper($gm_lang["customize_gedcom_page"])."</b>";
+			if ($command=="user") print "<b>".Str2Upper(GM_LANG_customize_page)."</b>";
+			else print "<b>".Str2Upper(GM_LANG_customize_gedcom_page)."</b>";
 		print "</div>";
 
 		// NOTE: Print the container
 		print "<div id=\"index_edit_container\">";
 			// NOTE: Print the arrows for moving the left block items up and down
 			print "<div id=\"index_edit_left_arrow\">";
-				print "<a tabindex=\"-1\" onclick=\"move_up_block('main_select');\" title=\"".$gm_lang["move_up"]."\">".$IconUarrow."</a>";
+				print "<a tabindex=\"-1\" onclick=\"move_up_block('main_select');\" title=\"".GM_LANG_move_up."\">".$IconUarrow."</a>";
 				print "<br />";
-				print "<a tabindex=\"-1\" onclick=\"move_down_block('main_select');\" title=\"".$gm_lang["move_down"]."\">".$IconDarrow."</a>";
+				print "<a tabindex=\"-1\" onclick=\"move_down_block('main_select');\" title=\"".GM_LANG_move_down."\">".$IconDarrow."</a>";
 				print "<br /><br />";
 				print_help_link("block_move_up_help", "qm");
 			print "</div>";
 			
 			// NOTE: Print the blocks currently in the left frame
 			print "<div id=\"index_edit_left\">";
-				print "<b>".$gm_lang["main_section"]."</b>";
+				print "<b>".GM_LANG_main_section."</b>";
 				print "<select multiple=\"multiple\" id=\"main_select\" name=\"main[]\" size=\"10\" onchange=\"show_description('main_select');\">\n";
 				foreach($ublocks->main as $indexval => $block) {
 					if (function_exists($block[0])) {
@@ -452,27 +452,27 @@ else {
 			
 			// NOTE: Print the arrows for moving items left and right
 			print "<div id=\"index_edit_left_right_arrow\">";
-				print "<a tabindex=\"-1\" onclick=\"move_left_right_block('main_select', 'right_select');\" title=\"".$gm_lang["move_right"]."\">".$IconRDarrow."</a>";
+				print "<a tabindex=\"-1\" onclick=\"move_left_right_block('main_select', 'right_select');\" title=\"".GM_LANG_move_right."\">".$IconRDarrow."</a>";
 				print "<br />";
-				print "<a tabindex=\"-1\" onclick=\"move_left_right_block('main_select', 'available_select');\" title=\"".$gm_lang["remove"]."\">".$IconRarrow."</a>";
+				print "<a tabindex=\"-1\" onclick=\"move_left_right_block('main_select', 'available_select');\" title=\"".GM_LANG_remove."\">".$IconRarrow."</a>";
 				print "<br />";
-				print "<a tabindex=\"-1\" onclick=\"move_left_right_block('available_select', 'main_select');\" title=\"".$gm_lang["add"]."\">".$IconLarrow."</a>";
+				print "<a tabindex=\"-1\" onclick=\"move_left_right_block('available_select', 'main_select');\" title=\"".GM_LANG_add."\">".$IconLarrow."</a>";
 				print "<br /><br />";
 				print_help_link("block_move_right_help", "qm");
 			print "</div>";
 			
 			// NOTE: Print the arrows for moving the right block items up and down
 			print "<div id=\"index_edit_right_arrow\">";
-				print "<a tabindex=\"-1\" onclick=\"move_up_block('right_select');\" title=\"".$gm_lang["move_up"]."\">".$IconUarrow."</a>";
+				print "<a tabindex=\"-1\" onclick=\"move_up_block('right_select');\" title=\"".GM_LANG_move_up."\">".$IconUarrow."</a>";
 				print "<br />";
-				print "<a tabindex=\"-1\" onclick=\"move_down_block('right_select');\" title=\"".$gm_lang["move_down"]."\">".$IconDarrow."</a>";
+				print "<a tabindex=\"-1\" onclick=\"move_down_block('right_select');\" title=\"".GM_LANG_move_down."\">".$IconDarrow."</a>";
 				print "<br /><br />";
 				print_help_link("block_move_up_help", "qm");
 			print "</div>";
 			
 			// NOTE: Print the blocks currently in the right frame
 			print "<div id=\"index_edit_right\">";
-				print "<b>".$gm_lang["right_section"]."</b>";
+				print "<b>".GM_LANG_right_section."</b>";
 				print "<select multiple=\"multiple\" id=\"right_select\" name=\"right[]\" size=\"10\" onchange=\"show_description('right_select');\">\n";
 				foreach($ublocks->right as $indexval => $block) {
 					if (function_exists($block[0])) {
@@ -484,11 +484,11 @@ else {
 			
 			// NOTE: Print the arrows for moving items left and right
 			print "<div id=\"index_edit_right_left_arrow\">";
-				print "<a tabindex=\"-1\" onclick=\"move_left_right_block('right_select', 'main_select');\" title=\"".$gm_lang["move_left"]."\">".$IconLDarrow."</a>";
+				print "<a tabindex=\"-1\" onclick=\"move_left_right_block('right_select', 'main_select');\" title=\"".GM_LANG_move_left."\">".$IconLDarrow."</a>";
 				print "<br />";
-				print "<a tabindex=\"-1\" onclick=\"move_left_right_block('right_select', 'available_select');\" title=\"".$gm_lang["remove"]."\">".$IconLarrow."</a>";
+				print "<a tabindex=\"-1\" onclick=\"move_left_right_block('right_select', 'available_select');\" title=\"".GM_LANG_remove."\">".$IconLarrow."</a>";
 				print "<br />";
-				print "<a tabindex=\"-1\" onclick=\"move_left_right_block('available_select', 'right_select');\" title=\"".$gm_lang["add"]."\">".$IconRarrow."</a>";
+				print "<a tabindex=\"-1\" onclick=\"move_left_right_block('available_select', 'right_select');\" title=\"".GM_LANG_add."\">".$IconRarrow."</a>";
 				print "<br /><br />";
 				print_help_link("block_move_right_help", "qm");
 			print "</div>";
@@ -496,7 +496,7 @@ else {
 			// NOTE: Print the blocks currently available
 			print "<div id=\"index_edit_content\">";
 				print " <a href=\"#\" class=\"help\" tabindex=\"0\" onclick=\"expand_layer('help',true); expand_layer('configure', false);\">".$IconHelp."</a> \n";
-				print "<b>".$gm_lang["available_blocks"]."</b><br />";
+				print "<b>".GM_LANG_available_blocks."</b><br />";
 				print "<select id=\"available_select\" name=\"available[]\" size=\"10\" onchange=\"show_description('available_select');\">\n";
 				foreach($SortedBlocks as $key => $value) {
 					if (!isset($GM_BLOCKS[$key]["type"])) $GM_BLOCKS[$key]["type"]=$command;
@@ -507,13 +507,13 @@ else {
 						
 			// NOTE: Print the box for showing the advice
 			print "<div id=\"index_edit_advice\" class=\"wrap $TEXT_DIRECTION\">";
-				print $gm_lang["index_edit_advice"];
+				print GM_LANG_index_edit_advice;
 			print "</div>";
 			
 			// NOTE: Print the submit buttons
 			print "<div>";
 				if (($gm_user->userIsAdmin())&&($command=='user')) {
-					print $gm_lang["use_blocks_for_default"]."<input type=\"checkbox\" name=\"setdefault\" value=\"1\" /><br />\n";
+					print GM_LANG_use_blocks_for_default."<input type=\"checkbox\" name=\"setdefault\" value=\"1\" /><br />\n";
 				}
 				
 				if ($command=='user') {
@@ -522,12 +522,12 @@ else {
 				else {
 					print_help_link("block_default_index", "qm");
 				}
-				print "<input type=\"button\" value=\"".$gm_lang["reset_default_blocks"]."\" onclick=\"window.location='index_edit.php?command=$command&amp;action=reset&amp;name=".preg_replace("/'/", "\'", $name)."';\" />\n";
+				print "<input type=\"button\" value=\"".GM_LANG_reset_default_blocks."\" onclick=\"window.location='index_edit.php?command=$command&amp;action=reset&amp;name=".preg_replace("/'/", "\'", $name)."';\" />\n";
 				print "&nbsp;&nbsp;";
 				print_help_link("click_here_help", "qm");
-				print "<input type=\"button\" value=\"".$gm_lang["click_here"]."\" onclick=\"select_options(); document.config_setup.submit();\" />\n";
+				print "<input type=\"button\" value=\"".GM_LANG_click_here."\" onclick=\"select_options(); document.config_setup.submit();\" />\n";
 				print "&nbsp;&nbsp;";
-				print "<input type =\"button\" value=\"".$gm_lang["cancel"]."\" onclick=\"window.close();\" />";
+				print "<input type =\"button\" value=\"".GM_LANG_cancel."\" onclick=\"window.close();\" />";
 			print "</div>";
 		print "</div>";
 		print "</form>\n";
@@ -536,7 +536,7 @@ else {
 	// NOTE: Hidden help text for column items
 	print "\n\t<div id=\"help\" class=\"tab_page\" style=\"position: absolute; display: none; top: auto; left: auto; z-index: 2; \">\n\t";
 
-	print "<br /><center><input type=\"button\" value=\"".$gm_lang["click_here"]."\" onclick=\"expand_layer('configure', true); expand_layer('help', false);\" /></center><br /><br />\n";
+	print "<br /><center><input type=\"button\" value=\"".GM_LANG_click_here."\" onclick=\"expand_layer('configure', true); expand_layer('help', false);\" /></center><br /><br />\n";
 	print_text("block_summaries");
 
 	// end of 2nd tab

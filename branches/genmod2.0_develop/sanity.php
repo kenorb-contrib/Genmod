@@ -39,7 +39,7 @@ if (!$gm_user->userGedcomAdmin()) {
 	else header("Location: ".LOGIN_URL."?url=sanity.php");
 	exit;
 }
-PrintHeader("Genmod ".$gm_lang["sc_sanity_check_short"]);
+PrintHeader("Genmod ".GM_LANG_sc_sanity_check_short);
 
 // init vars
 if (!isset($check_components)) $check_components = "";
@@ -57,44 +57,44 @@ if (!isset($check_gedtags)) $check_gedtags = "";
 if (!isset($check_unlinked)) $check_unlinked = "";
 if (!isset($check_cits)) $check_sits = "";
 if (!isset($action)) $action = "";
-$info_icon = "<img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["log"]["information"]."\" alt=\"".$gm_lang["information"]."\" />&nbsp;";
-$warn_icon = "<img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["log"]["warning"]."\" alt=\"".$gm_lang["warning"]."\" />&nbsp;";
-$error_icon = "<img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["log"]["error"]."\" alt=\"".$gm_lang["error"]."\" />&nbsp;";
+$info_icon = "<img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["log"]["information"]."\" alt=\"".GM_LANG_information."\" />&nbsp;";
+$warn_icon = "<img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["log"]["warning"]."\" alt=\"".GM_LANG_warning."\" />&nbsp;";
+$error_icon = "<img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["log"]["error"]."\" alt=\"".GM_LANG_error."\" />&nbsp;";
 ?>
 <!-- Setup the left box -->
 <div id="admin_genmod_left">
-	<div class="admin_link"><a href="admin.php"><?php print $gm_lang["admin"];?></a></div>
-	<div class="admin_link"><a href="admin_maint.php"><?php print $gm_lang["administration_maintenance"];?></a></div>
-	<?php if (!empty($action)) { ?><div class="admin_link"><a href="sanity.php"><?php print $gm_lang["sc_sanity_check"];?></a></div><?php } ?>
+	<div class="admin_link"><a href="admin.php"><?php print GM_LANG_admin;?></a></div>
+	<div class="admin_link"><a href="admin_maint.php"><?php print GM_LANG_administration_maintenance;?></a></div>
+	<?php if (!empty($action)) { ?><div class="admin_link"><a href="sanity.php"><?php print GM_LANG_sc_sanity_check;?></a></div><?php } ?>
 </div>
 <div id="content">
 	<div class="admin_topbottombar">
-		<h3><?php print $gm_lang["sc_sanity_check"];?></h3>
+		<h3><?php print GM_LANG_sc_sanity_check;?></h3>
 	</div>
 <?php
 // Display the options menu
 if (empty($action)) {
 	?>
 
-	<form action="<?php print $SCRIPT_NAME; ?>" method="post">
+	<form action="<?php print SCRIPT_NAME; ?>" method="post">
 	<input type="hidden" name="action" value="checksanity" />
 	<table class="width100">
-		<tr><td colspan="2" class="topbottombar"><?php print $gm_lang["options"]; ?></td></tr>
-		<tr><td class="shade2"><?php print $gm_lang["sc_check_components"]; ?></td><td class="shade1"><input type="checkbox" name="check_components" value="yes" /></td></tr>
-		<tr><td class="shade2"><?php print $gm_lang["sc_check_sys_settings"]; ?></td><td class="shade1"><input type="checkbox" name="check_settings" value="yes" /></td></tr>
-		<tr><td class="shade2"><?php print $gm_lang["sc_check_oldgeds"]; ?></td><td class="shade1"><input type="checkbox" name="check_oldgeds" value="yes" /></td></tr>
+		<tr><td colspan="2" class="topbottombar"><?php print GM_LANG_options; ?></td></tr>
+		<tr><td class="shade2"><?php print GM_LANG_sc_check_components; ?></td><td class="shade1"><input type="checkbox" name="check_components" value="yes" /></td></tr>
+		<tr><td class="shade2"><?php print GM_LANG_sc_check_sys_settings; ?></td><td class="shade1"><input type="checkbox" name="check_settings" value="yes" /></td></tr>
+		<tr><td class="shade2"><?php print GM_LANG_sc_check_oldgeds; ?></td><td class="shade1"><input type="checkbox" name="check_oldgeds" value="yes" /></td></tr>
 		<?php if (count($GEDCOMS) > 0) { ?>
-		<tr><td class="shade2"><?php print $gm_lang["sc_ged_sets"]; ?></td><td class="shade1"><?php
+		<tr><td class="shade2"><?php print GM_LANG_sc_ged_sets; ?></td><td class="shade1"><?php
 		foreach($GEDCOMS as $ged => $value) {
 			print "<span style=\"vertical-align: 25%\"><input type=\"checkbox\" name=\"check_gedcoms".$value["id"]."\" value=\"yes\" />&nbsp;".$value["title"]."</span><br />";
 		}
-		print "<span style=\"vertical-align: 25%\">".$gm_lang["options"]."</span><br />";
-		print "<span style=\"vertical-align: 25%\"><input type=\"checkbox\" name=\"check_gedtags\" value=\"yes\" />&nbsp;".$gm_lang["sc_check_gedtags"]."</span><br />";
-		print "<span style=\"vertical-align: 25%\"><input type=\"checkbox\" name=\"check_cits\" value=\"yes\" />&nbsp;".$gm_lang["sc_cits"]."</span><br />";
-		print "<span style=\"vertical-align: 25%\"><input type=\"checkbox\" name=\"check_unlinked\" value=\"yes\" />&nbsp;".$gm_lang["sc_ged_displ_unlinked"]."</span><br />";
+		print "<span style=\"vertical-align: 25%\">".GM_LANG_options."</span><br />";
+		print "<span style=\"vertical-align: 25%\"><input type=\"checkbox\" name=\"check_gedtags\" value=\"yes\" />&nbsp;".GM_LANG_sc_check_gedtags."</span><br />";
+		print "<span style=\"vertical-align: 25%\"><input type=\"checkbox\" name=\"check_cits\" value=\"yes\" />&nbsp;".GM_LANG_sc_cits."</span><br />";
+		print "<span style=\"vertical-align: 25%\"><input type=\"checkbox\" name=\"check_unlinked\" value=\"yes\" />&nbsp;".GM_LANG_sc_ged_displ_unlinked."</span><br />";
 		?></td></tr><?php } ?>
-		<tr><td class="shade2"><?php print $gm_lang["sc_fs_security"]; ?></td><td class="shade1"><input type="checkbox" name="check_filesys" value="yes" /></td></tr>
-		<tr><td style="padding: 5px" colspan="2" class="center"><span style="vertical-align: 25%"><button type="submit" name="submit"><?php print $gm_lang["sc_start"]; ?></button>
+		<tr><td class="shade2"><?php print GM_LANG_sc_fs_security; ?></td><td class="shade1"><input type="checkbox" name="check_filesys" value="yes" /></td></tr>
+		<tr><td style="padding: 5px" colspan="2" class="center"><span style="vertical-align: 25%"><button type="submit" name="submit"><?php print GM_LANG_sc_start; ?></button>
 		</span></td></tr>
 	</table></form><br /><br />
 	</div>
@@ -133,39 +133,39 @@ $boolean["0"] = "0";
 print "<table class=\"width100\">";
 if (!empty($check_components)) {
 	//-- Platform components
-	print "<tr><td colspan=\"2\" class=\"topbottombar\">".$gm_lang["sc_check_components"]."</td></tr>";
-	print "<tr><td class=\"shade2 center\">".$gm_lang["sc_check"]."</td><td class=\"shade2 center\">".$gm_lang["sc_result"]."</td></tr>";
+	print "<tr><td colspan=\"2\" class=\"topbottombar\">".GM_LANG_sc_check_components."</td></tr>";
+	print "<tr><td class=\"shade2 center\">".GM_LANG_sc_check."</td><td class=\"shade2 center\">".GM_LANG_sc_result."</td></tr>";
 
 		// Check versions
 		// PHP
-		print "<tr><td class=\"shade1\">".$gm_lang["sc_php"]."</td><td class=\"shade1 wrap\">";
-		if (phpversion()< $min_php_version) print $error_icon.$gm_lang["sc_php_low"]."<br />".$gm_lang["sc_ver_req"]." ".$min_php_version;
-		else print $info_icon.$gm_lang["sc_ok"];
-		print "<br />".$gm_lang["sc_ver_found"]." ".phpversion()."</td></tr>";
+		print "<tr><td class=\"shade1\">".GM_LANG_sc_php."</td><td class=\"shade1 wrap\">";
+		if (phpversion()< $min_php_version) print $error_icon.GM_LANG_sc_php_low."<br />".GM_LANG_sc_ver_req." ".$min_php_version;
+		else print $info_icon.GM_LANG_sc_ok;
+		print "<br />".GM_LANG_sc_ver_found." ".phpversion()."</td></tr>";
 		// Presence of GD
-		print "<tr><td class=\"shade1\">".$gm_lang["sc_gd"]."</td><td class=\"shade1\">";
-		if (!defined("IMG_ARC_PIE")) print $warn_icon.$gm_lang["sc_gd_missing"];
+		print "<tr><td class=\"shade1\">".GM_LANG_sc_gd."</td><td class=\"shade1\">";
+		if (!defined("IMG_ARC_PIE")) print $warn_icon.GM_LANG_sc_gd_missing;
 		else {
-			print $info_icon.$gm_lang["sc_ok"]."<br />".$gm_lang["sc_ver_found"]." ";
+			print $info_icon.GM_LANG_sc_ok."<br />".GM_LANG_sc_ver_found." ";
 			$gd_data = gd_info();
 			print $gd_data["GD Version"];
 		}
 		print "</td></tr>";
 
 		// MySQL
-		print "<tr><td class=\"shade1\">".$gm_lang["sc_mysql"]."</td><td class=\"shade1 wrap\">";
-		if (substr(mysql_get_server_info(), 0, strlen($min_mysql_version)) < $min_mysql_version) print $error_icon.$gm_lang["sc_mysql_low"]."<br />".$gm_lang["sc_ver_req"]." ".$min_mysql_version;
-		else print $info_icon.$gm_lang["sc_ok"];
-		print "<br />".$gm_lang["sc_ver_found"]." ".mysql_get_server_info()."</td></tr>";
+		print "<tr><td class=\"shade1\">".GM_LANG_sc_mysql."</td><td class=\"shade1 wrap\">";
+		if (substr(mysql_get_server_info(), 0, strlen($min_mysql_version)) < $min_mysql_version) print $error_icon.GM_LANG_sc_mysql_low."<br />".GM_LANG_sc_ver_req." ".$min_mysql_version;
+		else print $info_icon.GM_LANG_sc_ok;
+		print "<br />".GM_LANG_sc_ver_found." ".mysql_get_server_info()."</td></tr>";
 }
 
 if (!empty($check_settings)) {
 	//-- PHP and MySQL settings
-	print "<tr><td colspan=\"2\" class=\"topbottombar\">".$gm_lang["sc_check_sys_settings"]."</td></tr>";
-	print "<tr><td class=\"shade2 center\">".$gm_lang["sc_check"]."</td><td class=\"shade2 center\">".$gm_lang["sc_result"]."</td></tr>";
+	print "<tr><td colspan=\"2\" class=\"topbottombar\">".GM_LANG_sc_check_sys_settings."</td></tr>";
+	print "<tr><td class=\"shade2 center\">".GM_LANG_sc_check."</td><td class=\"shade2 center\">".GM_LANG_sc_result."</td></tr>";
 	
 		// PHP ini settings
-		print "<tr><td class=\"shade1\">".$gm_lang["sc_php_ini"]."</td><td class=\"shade1 wrap\">";
+		print "<tr><td class=\"shade1\">".GM_LANG_sc_php_ini."</td><td class=\"shade1 wrap\">";
 		$error_printed = false;
 		foreach($php_ini_settings as $setting => $value) {
 			$equal = false;
@@ -181,51 +181,51 @@ if (!empty($check_settings)) {
 			}
 			if ($equal != true) {
 				if (!$error_printed) {
-					print $warn_icon.$gm_lang["sc_ini_faults"];
+					print $warn_icon.GM_LANG_sc_ini_faults;
 					$error_printed = true;
 				}
-				print "<br /><br />".$gm_lang["sc_ini_name"]." ".$setting."<br />";
-				print $gm_lang["sc_value_req"]." ".$value."<br />";
-				print $gm_lang["sc_value_found"]." ".$inival;
-				if (empty($inival)) print $gm_lang["sc_not_set"];
+				print "<br /><br />".GM_LANG_sc_ini_name." ".$setting."<br />";
+				print GM_LANG_sc_value_req." ".$value."<br />";
+				print GM_LANG_sc_value_found." ".$inival;
+				if (empty($inival)) print GM_LANG_sc_not_set;
 			}
 		}
 				
-		if ($error_printed == false) print $info_icon.$gm_lang["sc_ok"];
+		if ($error_printed == false) print $info_icon.GM_LANG_sc_ok;
 		print "</td></tr>";
 		
 		// MySQL connect user rights
-		print "<tr><td class=\"shade1\">".$gm_lang["sc_mysql_user"]."</td><td class=\"shade1 wrap\">";
+		print "<tr><td class=\"shade1\">".GM_LANG_sc_mysql_user."</td><td class=\"shade1 wrap\">";
 		$res = NewQuery("DROP TABLE ".TBLPREFIX."testsanity", true);
 		$res = NewQuery("CREATE TABLE ".TBLPREFIX."testsanity (s_text VARCHAR(255))", true);
-		if (!$res) print $error_icon.$gm_lang["sc_no_rights"];
+		if (!$res) print $error_icon.GM_LANG_sc_no_rights;
 		else {
 			$res = NewQuery("ALTER TABLE ".TBLPREFIX."testsanity CHANGE s_text s_text VARCHAR(200)", true);
-			if (!$res) print $error_icon.$gm_lang["sc_no_rights"];
+			if (!$res) print $error_icon.GM_LANG_sc_no_rights;
 			else {
 				$res = NewQuery("INSERT INTO ".TBLPREFIX."testsanity VALUES ('testdata1')", true);
 				$res = NewQuery("INSERT INTO ".TBLPREFIX."testsanity VALUES ('testdata2')", true);
-				if (!$res) print $error_icon.$gm_lang["sc_no_rights"];
+				if (!$res) print $error_icon.GM_LANG_sc_no_rights;
 				else {
 					$res = NewQuery("UPDATE ".TBLPREFIX."testsanity SET s_text='newtestdata' WHERE s_text='testdata1'", true);
-					if (!$res) print $error_icon.$gm_lang["sc_no_rights"];
+					if (!$res) print $error_icon.GM_LANG_sc_no_rights;
 					else {
 						$res = NewQuery("SELECT * FROM ".TBLPREFIX."testsanity", true);
-						if (!$res) print $error_icon.$gm_lang["sc_no_rights"];
+						if (!$res) print $error_icon.GM_LANG_sc_no_rights;
 						else {
 							$res->FreeResult();
 							$res = NewQuery("DELETE FROM ".TBLPREFIX."testsanity WHERE s_text='testdata2'", true);
-							if (!$res) print $error_icon.$gm_lang["sc_no_rights"];
+							if (!$res) print $error_icon.GM_LANG_sc_no_rights;
 							else {
 								$res = NewQuery("LOCK TABLES ".TBLPREFIX."testsanity WRITE", true);
 								if (!$res) {
-									print $gm_lang["sc_no_lock_rights"];
+									print GM_LANG_sc_no_lock_rights;
 									$error = true;
 								}
 								else $res = NewQuery("UNLOCK TABLES", true);
 								$res = NewQuery("DROP TABLE ".TBLPREFIX."testsanity", true);
-								if (!$res) print $gm_lang["sc_no_rights"];
-								else print $info_icon.$gm_lang["sc_ok"];
+								if (!$res) print GM_LANG_sc_no_rights;
+								else print $info_icon.GM_LANG_sc_ok;
 							}
 						}
 					}
@@ -235,12 +235,12 @@ if (!empty($check_settings)) {
 		print "</td></tr>";
 
 		// Obsolete MySQL user rights
-		print "<tr><td class=\"shade1\">".$gm_lang["sc_mysql_user_obs"]."</td><td class=\"shade1 wrap\">";
+		print "<tr><td class=\"shade1\">".GM_LANG_sc_mysql_user_obs."</td><td class=\"shade1 wrap\">";
 		$errors = false;
 		$res = NewQuery("SELECT * FROM MYSQL.USER", true);
 		if ($res) {
 			$res->FreeResult();
-			print $gm_lang["sc_mysql_users"]."<br />";
+			print GM_LANG_sc_mysql_users."<br />";
 			$errors = true;
 		}
 		$res = NewQuery("SHOW DATABASES", true);
@@ -249,7 +249,7 @@ if (!empty($check_settings)) {
 				// For MySQL 5 there is always usage access to INFORMATION_SCHEMA.
 				while ($row = $res->FetchRow()) {
 					if ($row[0] != "information_schema" && $row[0] != DBNAME) {
-						print $warn_icon.$gm_lang["sc_mysql_databases"]." ".DBNAME."."."<br />";
+						print $warn_icon.GM_LANG_sc_mysql_databases." ".DBNAME."."."<br />";
 						$errors = true;
 						break;
 					}
@@ -259,31 +259,31 @@ if (!empty($check_settings)) {
 		}
 		$res = NewQuery("CREATE DATABASE testsanity", true);
 		if ($res) {
-			print $gm_lang["sc_mysql_dbcreate"]."<br />";
+			print GM_LANG_sc_mysql_dbcreate."<br />";
 			$errors = true;
 		}
 		$res = NewQuery("DROP DATABASE testsanity", true);
 		if ($res) {
-			print $gm_lang["sc_mysql_dbdrop"]."<br />";
+			print GM_LANG_sc_mysql_dbdrop."<br />";
 			$errors = true;
 		}
-		if (!$errors) print $info_icon.$gm_lang["sc_ok"];			
+		if (!$errors) print $info_icon.GM_LANG_sc_ok;			
 		print "</td></tr>";
 		
 		// MySQL table optimization
-		print "<tr><td class=\"shade1\">".$gm_lang["sc_opt_tables"]."</td><td class=\"shade1 wrap\">";
+		print "<tr><td class=\"shade1\">".GM_LANG_sc_opt_tables."</td><td class=\"shade1 wrap\">";
 		$errors = false;
 		$res = NewQuery("SHOW TABLES", true);
-		if (!$res) print $warn_icon.$gm_lang["sc_opt_cannot"];
+		if (!$res) print $warn_icon.GM_LANG_sc_opt_cannot;
 		else {
 			while ($row = $res->FetchRow()) {
 				NewQuery("OPTIMIZE TABLE ".$row[0], true);
 				if (!$res) {
-					print $warn_icon.$gm_lang["sc_opt_cannot"]." ".$row[0];
+					print $warn_icon.GM_LANG_sc_opt_cannot." ".$row[0];
 					$errors = true;
 				}
 			}
-			print $info_icon.$gm_lang["sc_opt_tables_done"];
+			print $info_icon.GM_LANG_sc_opt_tables_done;
 		}
 		print "</td></tr>";
 }
@@ -291,9 +291,9 @@ if (!empty($check_settings)) {
 if (!empty($check_oldgeds)) {
 	
 	//-- Old gedcom id's: the gedcoms table is leading here
-	print "<tr><td colspan=\"2\" class=\"topbottombar\">".$gm_lang["sc_check_oldgeds"]."</td></tr>";
-	print "<tr><td class=\"shade2 center\">".$gm_lang["sc_check"]."</td><td class=\"shade2 center\">".$gm_lang["sc_result"]."</td></tr>";
-	print "<tr><td class=\"shade1\">".$gm_lang["sc_check_invgeds"]."</td><td class=\"shade1 wrap\">";
+	print "<tr><td colspan=\"2\" class=\"topbottombar\">".GM_LANG_sc_check_oldgeds."</td></tr>";
+	print "<tr><td class=\"shade2 center\">".GM_LANG_sc_check."</td><td class=\"shade2 center\">".GM_LANG_sc_result."</td></tr>";
+	print "<tr><td class=\"shade1\">".GM_LANG_sc_check_invgeds."</td><td class=\"shade1 wrap\">";
 	$geds = array();
 	$ageds = array();
 	$gednames = array();
@@ -313,7 +313,7 @@ if (!empty($check_oldgeds)) {
 	// 4 - Language variable name of the message that this table contains records of non-existent gedcoms
 	$gedcheck = array();
 	$gedcheck[] = array("a_file", "actions", "geds", "sc_oldged_actions");
-	$gedcheck[] = array("b_username", "blocks", "geds", "sc_oldged_blocks");
+	$gedcheck[] = array("b_file", "blocks", "geds", "sc_oldged_blocks");
 	$gedcheck[] = array("ch_file", "changes", "geds", "sc_oldged_changes");
 	$gedcheck[] = array("d_file", "dates", "geds", "sc_oldged_dates");
 	$gedcheck[] = array("ge_file", "eventcache", "geds", "sc_oldged_cache");
@@ -347,36 +347,36 @@ if (!empty($check_oldgeds)) {
 				$sql = "DELETE FROM ".TBLPREFIX.$check[1]." WHERE ".$check[0]."='".$clean."'";
 				$res = NewQuery($sql);
 			}
-			else print $error_icon.$error_icon.$gm_lang["sc_oldgedclean_error"]."<br />";
+			else print $error_icon.$error_icon.GM_LANG_sc_oldgedclean_error."<br />";
 		}
 		$sql = "SELECT DISTINCT ".$check[0]." FROM ".TBLPREFIX.$check[1];
 		if (count($GEDCOMS)>0) $sql .= " WHERE ".$check[0]." NOT IN (".$$check[2].")";
 		if ($check[1] == "log") {
 			if (count($GEDCOMS)>0) $sql .= " AND l_category<>'S'";
 			else $sql .= " WHERE l_category<>'S'";
-		} 
+		}
 		$res = NewQuery($sql);
 		if ($res) {
 			if ($res->Numrows() > 0) {
 				while ($row = $res->FetchRow()) {
 					if (!(($check[1] == "blocks" || $check[1] == "news") && ($row[0] == "defaultuser" || array_key_exists($row[0], $users)))) {
 						$errors = true;
-						print $gm_lang[$check[3]]." ".$row[0]."  <a href=sanity.php?action=checksanity&check_oldgeds=yes&cleanged=$check[1]&clean=$row[0]>".$gm_lang["cleanup"]."</a><br />";
+						print constant("GM_LANG_".$check[3])." ".$row[0]."  <a href=sanity.php?action=checksanity&check_oldgeds=yes&cleanged=$check[1]&clean=$row[0]>".GM_LANG_cleanup."</a><br />";
 					}
 				}
 				if ($errors) print "<br />";
 			}
 		}
 	}
-	if (!$errors) print $info_icon.$gm_lang["sc_oldged_ok"];
+	if (!$errors) print $info_icon.GM_LANG_sc_oldged_ok;
 	print "</td></tr>";
 }
 		
 if (!empty($check_gedcoms)) {
 
 	//-- GEDCOM settings
-	print "<tr><td colspan=\"2\" class=\"topbottombar\">".$gm_lang["sc_ged_sets"]."</td></tr>";
-	print "<tr><td class=\"shade2 center\">".$gm_lang["sc_check"]."</td><td class=\"shade2 center\">".$gm_lang["sc_result"]."</td></tr>";
+	print "<tr><td colspan=\"2\" class=\"topbottombar\">".GM_LANG_sc_ged_sets."</td></tr>";
+	print "<tr><td class=\"shade2 center\">".GM_LANG_sc_check."</td><td class=\"shade2 center\">".GM_LANG_sc_result."</td></tr>";
 	foreach ($GEDCOMS as $ged=>$value) {
 		$var = "check_gedcoms".$value["id"];
 		if (isset($$var)) {
@@ -410,17 +410,17 @@ if (!empty($check_gedcoms)) {
 						$num++;
 						if (!$found) {
 							$found = true;
-							print $warn_icon.$gm_lang["sc_ged_unlink"];
+							print $warn_icon.GM_LANG_sc_ged_unlink;
 							print "<br /><ul>";
 						}
 						$person =& Person::GetInstance($row["i_id"], $row, $GEDCOMID);
 						$person->PrintListPerson();
 					}
 				}
-				if (!$found) print $info_icon.$gm_lang["sc_ged_nounlink"];
-				else print "</ul>".$gm_lang["sc_numrecs_found"]." ".$num;
+				if (!$found) print $info_icon.GM_LANG_sc_ged_nounlink;
+				else print "</ul>".GM_LANG_sc_numrecs_found." ".$num;
 			}
-			else print $info_icon.$gm_lang["sc_ged_unlinked_noselect"];
+			else print $info_icon.GM_LANG_sc_ged_unlinked_noselect;
 			print "</td></tr>";
 
 			// Get the partial indilist with asso's and alia's
@@ -536,10 +536,10 @@ if (!empty($check_gedcoms)) {
 						else {
 							if (!$error) {
 								$error = true;
-								print $error_icon.$gm_lang["sc_inv_sref"]."<ul>";
+								print $error_icon.GM_LANG_sc_inv_sref."<ul>";
 							}
 							$person =& Person::GetInstance($key, $gedlines["gedcom"], $GEDCOMID);
-							$person->PrintListPerson(true, false, $gm_lang["source"].": ".$sid);
+							$person->PrintListPerson(true, false, GM_LANG_source.": ".$sid);
 						}
 					}
 				}
@@ -582,9 +582,9 @@ if (!empty($check_gedcoms)) {
 					}
 				}
 			}
-			if (!$error) print $info_icon.$gm_lang["sc_ok_sref"]." ";
+			if (!$error) print $info_icon.GM_LANG_sc_ok_sref." ";
 			else print "</ul>";
-			print $gm_lang["sc_numrecs_checked"]." ".$num;
+			print GM_LANG_sc_numrecs_checked." ".$num;
 			print "</td></tr>";
 					
 			// Check for ASSO/ALIA's that point to non existing indi's
@@ -601,10 +601,10 @@ if (!empty($check_gedcoms)) {
 						if (!isset($indilist[$pid])) {
 							if (!$error) {
 								$error = true;
-								print $error_icon.$gm_lang["sc_inv_aref"]."<ul>";
+								print $error_icon.GM_LANG_sc_inv_aref."<ul>";
 							}
 							$person =& Person::GetInstance($key, $gedlines["gedcom"], $GEDCOMID);
-							$person->PrintListPerson(true, false, $gm_lang["asso_alia"].": ".$pid);
+							$person->PrintListPerson(true, false, GM_LANG_asso_alia.": ".$pid);
 						}
 					}
 				}
@@ -619,17 +619,17 @@ if (!empty($check_gedcoms)) {
 						if (!isset($indilist[$pid])) {
 							if (!$error) {
 								$error = true;
-								print $error_icon.$gm_lang["sc_inv_aref"]."<ul>";
+								print $error_icon.GM_LANG_sc_inv_aref."<ul>";
 							}
 							$family =& Family::GetInstance($key, $gedlines["gedcom"], $GEDCOMID);
-							$family->PrintListFamily(true, $gm_lang["asso_alia"].": ".$pid);
+							$family->PrintListFamily(true, GM_LANG_asso_alia.": ".$pid);
 						}
 					}
 				}
 			}
-			if (!$error) print $info_icon.$gm_lang["sc_ok_aref"]." ";
+			if (!$error) print $info_icon.GM_LANG_sc_ok_aref." ";
 			else print "</ul>";
-			print $gm_lang["sc_numrecs_checked"]." ".$num;
+			print GM_LANG_sc_numrecs_checked." ".$num;
 			print "</td></tr>";
 
 			// Check for reference to non existing sources for media
@@ -647,10 +647,10 @@ if (!empty($check_gedcoms)) {
 						else {
 							if (!$error) {
 								$error = true;
-								print $error_icon.$gm_lang["sc_inv_sref_media"];
+								print $error_icon.GM_LANG_sc_inv_sref_media;
 							}
-							print "<br />".$gm_lang["source"]." ".$sid."<br />";
-							print $gm_lang["sc_media"]." ".$key."<br />";
+							print "<br />".GM_LANG_source." ".$sid."<br />";
+							print GM_LANG_sc_media." ".$key."<br />";
 						}
 					}
 				}
@@ -679,9 +679,9 @@ if (!empty($check_gedcoms)) {
 					}
 				}
 			}
-			if (!$error) print $info_icon.$gm_lang["sc_ok_sref_media"]." ";
+			if (!$error) print $info_icon.GM_LANG_sc_ok_sref_media." ";
 			else print "<br />";
-			print $gm_lang["sc_numrecs_checked"]." ".$num;
+			print GM_LANG_sc_numrecs_checked." ".$num;
 			print "</td></tr>";
 			
 			// Check for reference to non existing sources for fams
@@ -699,10 +699,10 @@ if (!empty($check_gedcoms)) {
 						else {
 							if (!$error) {
 								$error = true;
-								print $error_icon.$gm_lang["sc_inv_sref_fam"]."<ul>";
+								print $error_icon.GM_LANG_sc_inv_sref_fam."<ul>";
 							}
 							$family =& Family::GetInstance($key, $gedlines["gedcom"], $GEDCOMID);
-							$family->PrintListFamily(true, $gm_lang["source"]." ".$sid);
+							$family->PrintListFamily(true, GM_LANG_source." ".$sid);
 						}
 					}
 				}
@@ -752,9 +752,9 @@ if (!empty($check_gedcoms)) {
 					}
 				}
 			}
-			if (!$error) print $info_icon.$gm_lang["sc_ok_sref_fam"]." ";
+			if (!$error) print $info_icon.GM_LANG_sc_ok_sref_fam." ";
 			else print "</ul>";
-			print $gm_lang["sc_numrecs_checked"]." ".$num;
+			print GM_LANG_sc_numrecs_checked." ".$num;
 			print "</td></tr>";
 		
 			// Check for reference to non existing repo for sources
@@ -772,10 +772,10 @@ if (!empty($check_gedcoms)) {
 						else {
 							if (!$error) {
 								$error = true;
-								print $error_icon.$gm_lang["sc_inv_rref_sour"]."<ul>";
+								print $error_icon.GM_LANG_sc_inv_rref_sour."<ul>";
 							}
 							$source =& Source::GetInstance($key, $sourcelist[$key]["gedcom"], $GEDCOMID);
-							$source->PrintListSource(true, 1, $gm_lang["repo"]." ".$rid);
+							$source->PrintListSource(true, 1, GM_LANG_repo." ".$rid);
 						}
 					}
 				}
@@ -804,9 +804,9 @@ if (!empty($check_gedcoms)) {
 					}
 				}
 			}
-			if (!$error) print $info_icon.$gm_lang["sc_ok_rref_sour"]." ";
+			if (!$error) print $info_icon.GM_LANG_sc_ok_rref_sour." ";
 			else print "</ul>";
-			print $gm_lang["sc_numrecs_checked"]." ".$num;
+			print GM_LANG_sc_numrecs_checked." ".$num;
 			print" </td></tr>";
 		
 			// Check for sources with no reference to a repository
@@ -820,16 +820,16 @@ if (!empty($check_gedcoms)) {
 				if ($s == 0) {
 					if (!$error) {
 						$error = true;
-						print $warn_icon.$gm_lang["sc_noref_sour_repo"];
+						print $warn_icon.GM_LANG_sc_noref_sour_repo;
 						print "<ul>";
 					}
 					$source =& Source::GetInstance($key, $sourcelist[$key]["gedcom"], $GEDCOMID);
 					$source->PrintListSource();
 				}
 			}
-			if (!$error) print $info_icon.$gm_lang["sc_ok_sour_repo_ref"]." ";
+			if (!$error) print $info_icon.GM_LANG_sc_ok_sour_repo_ref." ";
 			else print "</ul>";
-			print $gm_lang["sc_numrecs_checked"]." ".$num;
+			print GM_LANG_sc_numrecs_checked." ".$num;
 			print" </td></tr>";
 		
 			// Check for unreferenced sources
@@ -841,16 +841,16 @@ if (!empty($check_gedcoms)) {
 				if (!$value["in_use"]) {
 					if (!$error) {
 						$error = true;
-						print $warn_icon.$gm_lang["sc_unu_sref"];
+						print $warn_icon.GM_LANG_sc_unu_sref;
 						print "<ul>";
 					}
 					$source =& Source::GetInstance($sid, $sourcelist[$sid]["gedcom"], $GEDCOMID);
 					$source->PrintListSource();
 				}
 			}
-			if (!$error) print $info_icon.$gm_lang["sc_ok_all_sref"]." ";
+			if (!$error) print $info_icon.GM_LANG_sc_ok_all_sref." ";
 			else print "</ul>";
-			print $gm_lang["sc_numrecs_checked"]." ".$num;
+			print GM_LANG_sc_numrecs_checked." ".$num;
 			print "</td></tr>";
 
 			// Check for unreferenced repositories
@@ -862,7 +862,7 @@ if (!empty($check_gedcoms)) {
 				if (!$value["in_use"]) {
 					if (!$error) {
 						$error = true;
-						print $warn_icon.$gm_lang["sc_unu_rref"]."<ul>";
+						print $warn_icon.GM_LANG_sc_unu_rref."<ul>";
 					}
 					$repo =& Repository::GetInstance($rid, $value["gedcom"], $GEDCOMID);
 					$repo->PrintListRepository(true, 1, false);
@@ -892,18 +892,18 @@ if (!empty($check_gedcoms)) {
 					}
 				}
 			}
-			if (!$error) print $info_icon.$gm_lang["sc_ok_all_rref"]." ";
-			print "</ul>".$gm_lang["sc_numrecs_checked"]." ".$num;
+			if (!$error) print $info_icon.GM_LANG_sc_ok_all_rref." ";
+			print "</ul>".GM_LANG_sc_numrecs_checked." ".$num;
 			print "</td></tr>";
 	
 			// Print the non-existent facts
 			print "<tr><td class=\"shade1 wrap\">";
 			if (!empty($check_gedtags)) {
-				if (count($wrongfacts) == 0) print $info_icon.$gm_lang["sc_nowrongfacts"]." ";
+				if (count($wrongfacts) == 0) print $info_icon.GM_LANG_sc_nowrongfacts." ";
 				else {
-					print $error_icon.$gm_lang["sc_haswrongfacts"]."<br />";
+					print $error_icon.GM_LANG_sc_haswrongfacts."<br />";
 					foreach ($wrongfacts as $fact => $records) {
-						print $gm_lang["sc_facttag"]." ".$fact."<ul>";
+						print GM_LANG_sc_facttag." ".$fact."<ul>";
 						foreach ($records as $key => $wfact) {
 							if ($wfact[2] == "INDI") {
 								$person =& Person::GetInstance($wfact[0], "", $wfact[1]);
@@ -929,17 +929,17 @@ if (!empty($check_gedcoms)) {
 						print "</ul>";
 					}
  				}			
-				print $gm_lang["sc_numrecs_checked"]." ".$numcf;
+				print GM_LANG_sc_numrecs_checked." ".$numcf;
 			}
-			else print $info_icon.$gm_lang["sc_nocheck_gedtags"];
+			else print $info_icon.GM_LANG_sc_nocheck_gedtags;
  			print "</td></tr>";
 			
 			// Print the records with no source citations
 			print "<tr><td class=\"shade1 wrap\">";
 			if (!empty($check_cits)) {
-				if (count($no_cits) == 0) print $info_icon.$gm_lang["sc_cits_ok"]." ";
+				if (count($no_cits) == 0) print $info_icon.GM_LANG_sc_cits_ok." ";
 				else {
-					print $warn_icon.$gm_lang["sc_hasno_cits"]."<ul>";
+					print $warn_icon.GM_LANG_sc_hasno_cits."<ul>";
 					foreach ($no_cits as $key => $rec) {
 						if ($rec[2] == "INDI") {
 							$person =& Person::GetInstance($rec[0], $rec[4], $rec[1]);
@@ -955,9 +955,9 @@ if (!empty($check_gedcoms)) {
 					}
 					print "</ul>";
  				}			
-				print $gm_lang["sc_numrecs_checked"]." ".$numnc;
+				print GM_LANG_sc_numrecs_checked." ".$numnc;
 			}
-			else print $info_icon.$gm_lang["sc_nocits"];
+			else print $info_icon.GM_LANG_sc_nocits;
  			print "</td></tr>";
 			
 
@@ -994,7 +994,7 @@ if (!empty($check_gedcoms)) {
 							if (CompareFactsdate($oldrec, $rec) > 0) {
 								if (!$error) {
 									$error = true;
-									print $warn_icon.$gm_lang["sc_order_fam"]."<ul>";
+									print $warn_icon.GM_LANG_sc_order_fam."<ul>";
 								}
 								if (!$printed) {
 									$family =& Family::GetInstance($key, $fam["gedcom"], $GEDCOMID);
@@ -1025,7 +1025,7 @@ if (!empty($check_gedcoms)) {
 					}
 				}
 			}
-			if (!$error) print $info_icon.$gm_lang["sc_ok_order_fam"]." ";
+			if (!$error) print $info_icon.GM_LANG_sc_ok_order_fam." ";
 			else print "</ul>";
 			print "</td></tr>";
 
@@ -1038,15 +1038,15 @@ if (!empty($check_gedcoms)) {
 				if (!isset($cfam["CHIL"]) && !isset($cfam["WIFE"]) && !isset($cfam["HUSB"])) {
 					if (!$error) {
 						$error = true;
-						print $error_icon.$gm_lang["sc_empty_fam"]."<ul>";
+						print $error_icon.GM_LANG_sc_empty_fam."<ul>";
 					}
 					$family =& Family::GetInstance($key, $cfam["gedcom"], $GEDCOMID);
 					$family->PrintListFamily();
 				}
 			}
-			if (!$error) print $info_icon.$gm_lang["sc_ok_empty_fam"]." ";
+			if (!$error) print $info_icon.GM_LANG_sc_ok_empty_fam." ";
 			else print "</ul>";
-			print $gm_lang["sc_numrecs_checked"]." ".$num;
+			print GM_LANG_sc_numrecs_checked." ".$num;
 			print "</td></tr>";
 			
 			// Check the indi's for references to fams. If pair of references found, unset them.
@@ -1067,11 +1067,11 @@ if (!empty($check_gedcoms)) {
 								unset($indilist[$key][$role][$pointer]);
 							}
 							else {
-								if (!$error) print $error_icon.$gm_lang["sc_inv_pointer"]."<br />";
+								if (!$error) print $error_icon.GM_LANG_sc_inv_pointer."<br />";
 								if (isset($cfamlist[$pointer])) {
-									print "<br />".$gm_lang["sc_no_backward_fam"]."<br />".$gm_lang["sc_indi"]." <a href=\"individual.php?gedid=".$GEDCOMID."&amp;pid=".$key."\" target=\"_BLANK\">".$key."</a><br />".$gm_lang["sc_fam"]." <a href=\"family.php?gedid=".$GEDCOMID."&amp;famid=".$pointer."\" target=\"_BLANK\">".$pointer."</a><br />".$gm_lang["sc_role"]." ".$role."<br />";
+									print "<br />".GM_LANG_sc_no_backward_fam."<br />".GM_LANG_sc_indi." <a href=\"individual.php?gedid=".$GEDCOMID."&amp;pid=".$key."\" target=\"_BLANK\">".$key."</a><br />".GM_LANG_sc_fam." <a href=\"family.php?gedid=".$GEDCOMID."&amp;famid=".$pointer."\" target=\"_BLANK\">".$pointer."</a><br />".GM_LANG_sc_role." ".$role."<br />";
 								}
-								else print "<br />".$gm_lang["sc_no_fam"]."<br />".$gm_lang["sc_indi"]." <a href=\"individual.php?gedid=".$GEDCOMID."&amp;pid=".$key."\" target=\"_BLANK\">".$key."</a><br />".$gm_lang["sc_fam"]." ".$pointer."<br />".$gm_lang["sc_role"]." ".$role."<br />";
+								else print "<br />".GM_LANG_sc_no_fam."<br />".GM_LANG_sc_indi." <a href=\"individual.php?gedid=".$GEDCOMID."&amp;pid=".$key."\" target=\"_BLANK\">".$key."</a><br />".GM_LANG_sc_fam." ".$pointer."<br />".GM_LANG_sc_role." ".$role."<br />";
 								$error = true;
 							}
 						}
@@ -1084,11 +1084,11 @@ if (!empty($check_gedcoms)) {
 								unset($indilist[$key][$role][$pointer]);
 							}
 							else {
-								if (!$error) print $error_icon.$gm_lang["sc_inv_pointer"]."<br />";
+								if (!$error) print $error_icon.GM_LANG_sc_inv_pointer."<br />";
 								if (isset($cfamlist[$pointer])) {
-									print "<br />".$gm_lang["sc_no_backward_fam"]."<br />".$gm_lang["sc_indi"]." <a href=\"individual.php?gedid=".$GEDCOMID."&amp;pid=".$key."\" target=\"_BLANK\">".$key."</a><br />".$gm_lang["sc_fam"]." <a href=\"family.php?gedid=".$GEDCOMID."&amp;famid=".$pointer."\" target=\"_BLANK\">".$pointer."</a><br />".$gm_lang["sc_role"]." ".$role."<br />";
+									print "<br />".GM_LANG_sc_no_backward_fam."<br />".GM_LANG_sc_indi." <a href=\"individual.php?gedid=".$GEDCOMID."&amp;pid=".$key."\" target=\"_BLANK\">".$key."</a><br />".GM_LANG_sc_fam." <a href=\"family.php?gedid=".$GEDCOMID."&amp;famid=".$pointer."\" target=\"_BLANK\">".$pointer."</a><br />".GM_LANG_sc_role." ".$role."<br />";
 								}
-								else print "<br />".$gm_lang["sc_no_fam"]."<br />".$gm_lang["sc_indi"]." <a href=\"individual.php?gedid=".$GEDCOMID."&pid=".$key."\" target=\"_BLANK\">".$key."</a><br />".$gm_lang["sc_fam"]." ".$pointer."<br />".$gm_lang["sc_role"]." ".$role."<br />";
+								else print "<br />".GM_LANG_sc_no_fam."<br />".GM_LANG_sc_indi." <a href=\"individual.php?gedid=".$GEDCOMID."&pid=".$key."\" target=\"_BLANK\">".$key."</a><br />".GM_LANG_sc_fam." ".$pointer."<br />".GM_LANG_sc_role." ".$role."<br />";
 								$error = true;
 							}
 						}
@@ -1107,11 +1107,11 @@ if (!empty($check_gedcoms)) {
 								unset($cfamlist[$key][$role][$pointer]);
 							}
 							else {
-								if (!$error) print $error_icon.$gm_lang["sc_inv_pointer"]."<br />";
+								if (!$error) print $error_icon.GM_LANG_sc_inv_pointer."<br />";
 								if (isset($indilist[$pointer])) {
-									print "<br />".$gm_lang["sc_no_backward_indi"]."<br />".$gm_lang["sc_indi"]." <a href=\"individual.php?gedid=".$GEDCOMID."&amp;pid=".$pointer."\" target=\"_BLANK\">".$pointer."</a><br />".$gm_lang["sc_fam"]." <a href=\"family.php?gedid=".$GEDCOMID."&amp;famid=".$key."\" target=\"_BLANK\">".$key."</a><br />".$gm_lang["sc_role"]." ".$role."<br />";
+									print "<br />".GM_LANG_sc_no_backward_indi."<br />".GM_LANG_sc_indi." <a href=\"individual.php?gedid=".$GEDCOMID."&amp;pid=".$pointer."\" target=\"_BLANK\">".$pointer."</a><br />".GM_LANG_sc_fam." <a href=\"family.php?gedid=".$GEDCOMID."&amp;famid=".$key."\" target=\"_BLANK\">".$key."</a><br />".GM_LANG_sc_role." ".$role."<br />";
 								}
-								else print "<br />".$gm_lang["sc_no_indi"]."<br />".$gm_lang["sc_indi"]." ".$pointer."<br />".$gm_lang["sc_fam"]." <a href=\"family.php?gedid=".$GEDCOMID."&amp;famid=".$key."\" target=\"_BLANK\">".$key."</a><br />".$gm_lang["sc_role"]." ".$role."<br />";
+								else print "<br />".GM_LANG_sc_no_indi."<br />".GM_LANG_sc_indi." ".$pointer."<br />".GM_LANG_sc_fam." <a href=\"family.php?gedid=".$GEDCOMID."&amp;famid=".$key."\" target=\"_BLANK\">".$key."</a><br />".GM_LANG_sc_role." ".$role."<br />";
 								$error = true;
 							}
 						}
@@ -1124,11 +1124,11 @@ if (!empty($check_gedcoms)) {
 								unset($cfamlist[$key][$role][$pointer]);
 							}
 							else {
-								if (!$error) print $error_icon.$gm_lang["sc_inv_pointer"]."<br />";
+								if (!$error) print $error_icon.GM_LANG_sc_inv_pointer."<br />";
 								if (isset($indilist[$pointer])) {
-									print "<br />".$gm_lang["sc_no_backward_indi"]."<br />".$gm_lang["sc_indi"]." <a href=\"individual.php?gedid=".$GEDCOMID."&amp;pid=".$pointer."\" target=\"_BLANK\">".$pointer."</a><br />".$gm_lang["sc_fam"]." <a href=\"family.php?gedid=".$GEDCOMID."&amp;famid=".$key."\" target=\"_BLANK\">".$key."</a><br />".$gm_lang["sc_role"]." ".$role."<br />";
+									print "<br />".GM_LANG_sc_no_backward_indi."<br />".GM_LANG_sc_indi." <a href=\"individual.php?gedid=".$GEDCOMID."&amp;pid=".$pointer."\" target=\"_BLANK\">".$pointer."</a><br />".GM_LANG_sc_fam." <a href=\"family.php?gedid=".$GEDCOMID."&amp;famid=".$key."\" target=\"_BLANK\">".$key."</a><br />".GM_LANG_sc_role." ".$role."<br />";
 								}
-								else print "<br />".$gm_lang["sc_no_indi"]."<br />".$gm_lang["sc_indi"]." ".$pointer."<br />".$gm_lang["sc_fam"]." <a href=\"family.php?gedid=".$GEDCOMID."&amp;famid=".$key."\" target=\"_BLANK\">".$key."</a><br />".$gm_lang["sc_role"]." ".$role."<br />";
+								else print "<br />".GM_LANG_sc_no_indi."<br />".GM_LANG_sc_indi." ".$pointer."<br />".GM_LANG_sc_fam." <a href=\"family.php?gedid=".$GEDCOMID."&amp;famid=".$key."\" target=\"_BLANK\">".$key."</a><br />".GM_LANG_sc_role." ".$role."<br />";
 								$error = true;
 							}
 						}
@@ -1141,20 +1141,20 @@ if (!empty($check_gedcoms)) {
 								unset($cfamlist[$key][$role][$pointer]);
 							}
 							else {
-								if (!$error) print $error_icon.$gm_lang["sc_inv_pointer"]."<br />";
+								if (!$error) print $error_icon.GM_LANG_sc_inv_pointer."<br />";
 								if (isset($indilist[$pointer])) {
-									print "<br />".$gm_lang["sc_no_backward_indi"]."<br />".$gm_lang["sc_indi"]." <a href=\"individual.php?gedid=".$GEDCOMID."&amp;pid=".$pointer."\" target=\"_BLANK\">".$pointer."</a><br />".$gm_lang["sc_fam"]." <a href=\"family.php?gedid=".$GEDCOMID."&amp;famid=".$key."\" target=\"_BLANK\">".$key."</a><br />".$gm_lang["sc_role"]." ".$role."<br />";
+									print "<br />".GM_LANG_sc_no_backward_indi."<br />".GM_LANG_sc_indi." <a href=\"individual.php?gedid=".$GEDCOMID."&amp;pid=".$pointer."\" target=\"_BLANK\">".$pointer."</a><br />".GM_LANG_sc_fam." <a href=\"family.php?gedid=".$GEDCOMID."&amp;famid=".$key."\" target=\"_BLANK\">".$key."</a><br />".GM_LANG_sc_role." ".$role."<br />";
 								}
-								else print "<br />".$gm_lang["sc_no_indi"]."<br />".$gm_lang["sc_indi"]." ".$pointer."<br />".$gm_lang["sc_fam"]." <a href=\"family.php?gedid=".$GEDCOMID."&amp;famid=".$key."\" target=\"_BLANK\">".$key."</a><br />".$gm_lang["sc_role"]." ".$role."<br />";
+								else print "<br />".GM_LANG_sc_no_indi."<br />".GM_LANG_sc_indi." ".$pointer."<br />".GM_LANG_sc_fam." <a href=\"family.php?gedid=".$GEDCOMID."&amp;famid=".$key."\" target=\"_BLANK\">".$key."</a><br />".GM_LANG_sc_role." ".$role."<br />";
 								$error = true;
 							}
 						}
 					}
 				}
 			}
-			if (!$error) print $info_icon.$gm_lang["sc_no_inv_point"]." ";
+			if (!$error) print $info_icon.GM_LANG_sc_no_inv_point." ";
 			else print "<br />";
-			print $gm_lang["sc_numpoint_checked"]." ".$num;
+			print GM_LANG_sc_numpoint_checked." ".$num;
 			print "</td></tr>";
 			
 			// Check for reference to non existing 0 MM records from individuals
@@ -1172,17 +1172,17 @@ if (!empty($check_gedcoms)) {
 						else {
 							if (!$error) {
 								$error = true;
-								print $error_icon.$gm_lang["sc_inv_mref"]."<ul>";
+								print $error_icon.GM_LANG_sc_inv_mref."<ul>";
 							}
 							$person =& Person::GetInstance($key, $gedlines["gedcom"], $GEDCOMID);
-							$person->PrintListPerson(true, false, $gm_lang["sc_media"]." ".$mid);
+							$person->PrintListPerson(true, false, GM_LANG_sc_media." ".$mid);
 						}
 					}
 				}
 			}
-			if (!$error) print $info_icon.$gm_lang["sc_ok_mref"]." ";
+			if (!$error) print $info_icon.GM_LANG_sc_ok_mref." ";
 			else print "</ul>";
-			print $gm_lang["sc_numrecs_checked"]." ".$num;
+			print GM_LANG_sc_numrecs_checked." ".$num;
 			print "</td></tr>";
 			
 			// Check for reference to non existing 0 MM records from fams
@@ -1200,17 +1200,17 @@ if (!empty($check_gedcoms)) {
 						else {
 							if (!$error) {
 								$error = true;
-								print $error_icon.$gm_lang["sc_inv_mref_fam"]."<ul>";
+								print $error_icon.GM_LANG_sc_inv_mref_fam."<ul>";
 							}
 							$family =& Family::GetInstance($key, $gedlines["gedcom"], $GEDCOMID);
-							$family->PrintListFamily(true, $gm_lang["sc_media"]." ".$mid);
+							$family->PrintListFamily(true, GM_LANG_sc_media." ".$mid);
 						}
 					}
 				}
 			}
-			if (!$error) print $info_icon.$gm_lang["sc_ok_mref_fam"]." ";
+			if (!$error) print $info_icon.GM_LANG_sc_ok_mref_fam." ";
 			else print "</ul>";
-			print $gm_lang["sc_numrecs_checked"]." ".$num;
+			print GM_LANG_sc_numrecs_checked." ".$num;
 			print "</td></tr>";
 			
 			// Check for reference to non existing 0 MM records from sources
@@ -1228,17 +1228,17 @@ if (!empty($check_gedcoms)) {
 						else {
 							if (!$error) {
 								$error = true;
-								print $error_icon.$gm_lang["sc_inv_mref_sour"]."<ul>";
+								print $error_icon.GM_LANG_sc_inv_mref_sour."<ul>";
 							}
 							$source =& Source::GetInstance($key, $sourcelist[$key]["gedcom"], $GEDCOMID);
-							$source->PrintListSource(true, 1, $gm_lang["sc_media"]." ".$mid);
+							$source->PrintListSource(true, 1, GM_LANG_sc_media." ".$mid);
 						}
 					}
 				}
 			}
-			if (!$error) print $info_icon.$gm_lang["sc_ok_mref_sour"]." ";
+			if (!$error) print $info_icon.GM_LANG_sc_ok_mref_sour." ";
 			else print "</ul>";
-			print $gm_lang["sc_numrecs_checked"]." ".$num;
+			print GM_LANG_sc_numrecs_checked." ".$num;
 			print "</td></tr>";
 
 			// Check for reference to non existing 0 MM records from repositories
@@ -1256,17 +1256,17 @@ if (!empty($check_gedcoms)) {
 						else {
 							if (!$error) {
 								$error = true;
-								print $error_icon.$gm_lang["sc_inv_mref_repo"]."<ul>";
+								print $error_icon.GM_LANG_sc_inv_mref_repo."<ul>";
 							}
 							$repo =& Repository::GetInstance($key, $repo["gedcom"], $GEDCOMID);
-							$repo->PrintListRepository(true, 1, false, $gm_lang["sc_media"]." ".$mid);
+							$repo->PrintListRepository(true, 1, false, GM_LANG_sc_media." ".$mid);
 						}
 					}
 				}
 			}
-			if (!$error) print $info_icon.$gm_lang["sc_ok_mref_repo"]." ";
+			if (!$error) print $info_icon.GM_LANG_sc_ok_mref_repo." ";
 			else print "</ul>";
-			print $gm_lang["sc_numrecs_checked"]." ".$num;
+			print GM_LANG_sc_numrecs_checked." ".$num;
 			print "</td></tr>";
 			
 			// Check for unreferenced mediaitems
@@ -1278,15 +1278,15 @@ if (!empty($check_gedcoms)) {
 				if (!$value["in_use"]) {
 					if (!$error) {
 						$error = true;
-						print $warn_icon.$gm_lang["sc_unu_mref"]."<ul>";
+						print $warn_icon.GM_LANG_sc_unu_mref."<ul>";
 					}
 					$media =& MediaItem::GetInstance($key, $cmedialist[$mid]["gedcom"], $cmedialist[$mid]["gedfile"]);
 					$media->PrintListMedia();
 				}
 			}
-			if (!$error) print $info_icon.$gm_lang["sc_ok_all_mref"]." ";
+			if (!$error) print $info_icon.GM_LANG_sc_ok_all_mref." ";
 			else print "</ul>";
-			print $gm_lang["sc_numrecs_checked"]." ".$num;
+			print GM_LANG_sc_numrecs_checked." ".$num;
 			print "</td></tr>";
 
 			
@@ -1311,7 +1311,7 @@ if (!empty($check_gedcoms)) {
 				foreach($dirs as $key => $dir) {
 					$d = @dir($dir);
 					if (!is_object($d)) {
-						print $error_icon.$gm_lang["sc_dir_noaccess"]." ".$dir;
+						print $error_icon.GM_LANG_sc_dir_noaccess." ".$dir;
 						$errors1 = true;
 					}
 					else {
@@ -1358,17 +1358,17 @@ if (!empty($check_gedcoms)) {
 						else {
 							if (!$error) {
 								$error = true;
-								print $error_icon.$gm_lang["sc_inv_mref_file"]."<ul>";
+								print $error_icon.GM_LANG_sc_inv_mref_file."<ul>";
 							}
 							$media =& MediaItem::GetInstance($key, $cmedialist[$mid]["gedcom"], $cmedialist[$mid]["gedfile"]);
-							$media->PrintListMedia(true, $gm_lang["sc_file"]." ".$file);
+							$media->PrintListMedia(true, GM_LANG_sc_file." ".$file);
 						}
 					}
 				}
 			}
-			if (!$error) print $info_icon.$gm_lang["sc_ok_all_file"]." ";
+			if (!$error) print $info_icon.GM_LANG_sc_ok_all_file." ";
 			else print "</ul>";
-			print $gm_lang["sc_numrecs_checked"]." ".$num;
+			print GM_LANG_sc_numrecs_checked." ".$num;
 			print "</td></tr>";
 			
 			// Check if all files are referenced to
@@ -1380,24 +1380,24 @@ if (!empty($check_gedcoms)) {
 				if (!$ref) {
 					if (!$error) {
 						$error = true;
-						print $warn_icon.$gm_lang["sc_unu_file"]."<ul>";
+						print $warn_icon.GM_LANG_sc_unu_file."<ul>";
 					}
-					print "<li>".$gm_lang["sc_file"]." ".$file."</li>";
+					print "<li>".GM_LANG_sc_file." ".$file."</li>";
 				}
 			}
-			if (!$error) print $info_icon.$gm_lang["sc_ok_use_file"]." ";
+			if (!$error) print $info_icon.GM_LANG_sc_ok_use_file." ";
 			else print "</ul>";
-			print $gm_lang["sc_numrecs_checked"]." ".$num;
+			print GM_LANG_sc_numrecs_checked." ".$num;
 			print "</td></tr>";
 			
 			// NOTE results
 			// Check on references to non existing notes
 			print "<tr><td class=\"shade1 wrap\">";
 			if (count($inv_noteref) == 0) {
-				print $info_icon.$gm_lang["sc_ok_noteref"]." ";
+				print $info_icon.GM_LANG_sc_ok_noteref." ";
 			}
 			else {
-				print $error_icon.$gm_lang["sc_inv_noteref"]."<ul>";
+				print $error_icon.GM_LANG_sc_inv_noteref."<ul>";
 				foreach ($inv_noteref as $type => $keys) {
 					if ($type == "INDI") {
 						foreach ($keys as $key => $nothing) {
@@ -1432,7 +1432,7 @@ if (!empty($check_gedcoms)) {
 				}
 				print "</ul>";
 			}
-			print $gm_lang["sc_numrecs_checked"]." ".$numcn;
+			print GM_LANG_sc_numrecs_checked." ".$numcn;
 			print "</td></tr>";	
 			
 			// Check for unreferenced general notes
@@ -1444,15 +1444,15 @@ if (!empty($check_gedcoms)) {
 				if (!$value["in_use"]) {
 					if (!$error) {
 						$error = true;
-						print $warn_icon.$gm_lang["sc_unu_nref"]."<ul>";
+						print $warn_icon.GM_LANG_sc_unu_nref."<ul>";
 					}
 					$note =& Note::GetInstance($oid);
 					$note->PrintListNote(40);
 				}
 			}
-			if (!$error) print $info_icon.$gm_lang["sc_ok_all_nref"]." ";
+			if (!$error) print $info_icon.GM_LANG_sc_ok_all_nref." ";
 			else print "</ul>";
-			print $gm_lang["sc_numrecs_checked"]." ".$num;
+			print GM_LANG_sc_numrecs_checked." ".$num;
 			print "</td></tr>";
 		}
 	}
@@ -1462,19 +1462,19 @@ if (!empty($check_gedcoms)) {
 if (!empty($check_filesys)) {
 		
 	//-- File system security
-	print "<tr><td colspan=\"2\" class=\"topbottombar\">".$gm_lang["sc_fs_security"]."</td></tr>";
-	print "<tr><td class=\"shade2 center\">".$gm_lang["sc_check"]."</td><td class=\"shade2 center\">".$gm_lang["sc_result"]."</td></tr>";
+	print "<tr><td colspan=\"2\" class=\"topbottombar\">".GM_LANG_sc_fs_security."</td></tr>";
+	print "<tr><td class=\"shade2 center\">".GM_LANG_sc_check."</td><td class=\"shade2 center\">".GM_LANG_sc_result."</td></tr>";
 	
 		// Root dir
-		print "<tr><td class=\"shade1 wrap\">".$gm_lang["sc_fs_main"]."</td><td class=\"shade1 wrap\">";
+		print "<tr><td class=\"shade1 wrap\">".GM_LANG_sc_fs_main."</td><td class=\"shade1 wrap\">";
 		$dir = "includes/.."; // From PHP5 dir will not read ./ as the current dir. A workaround is to name a subdirectory and point back to the parent.
 		$errors1 = false;
 		if (MediaFS::DirIsWritable($dir, false)) {
-			print $error_icon.$gm_lang["sc_fs_main_error"]."<br />";
+			print $error_icon.GM_LANG_sc_fs_main_error."<br />";
 			$errors1 = true;
 		}
 		$d = dir($dir);
-		if (!is_object($d)) print $error_icon.$gm_lang["sc_dir_noaccess"]." ".$dir;
+		if (!is_object($d)) print $error_icon.GM_LANG_sc_dir_noaccess." ".$dir;
 		else {
 			$errors2 = false;
 			$num = 0;
@@ -1483,7 +1483,7 @@ if (!empty($check_filesys)) {
 					$num++;
 					if (AdminFunctions::FileIsWriteable(basename($d->path."/".$entry))) {
 						if (!$errors2) {
-							print $error_icon.$gm_lang["sc_fs_filesrw"]."<br />";
+							print $error_icon.GM_LANG_sc_fs_filesrw."<br />";
 							$errors2 = true;
 						}
 						print basename($d->path."/".$entry)."<br />";
@@ -1491,21 +1491,21 @@ if (!empty($check_filesys)) {
 				}
 			}
 			$d->close();
-			print $gm_lang["sc_numchecked"]." ".$num."<br />";
-			if (!$errors1 && !$errors2) print $info_icon.$gm_lang["sc_ok"];
+			print GM_LANG_sc_numchecked." ".$num."<br />";
+			if (!$errors1 && !$errors2) print $info_icon.GM_LANG_sc_ok;
 		}
 		print "</td></tr>";
 		
 		// Index dir
-		print "<tr><td class=\"shade1 wrap\">".$gm_lang["sc_fs_index"]."</td><td class=\"shade1 wrap\">";
+		print "<tr><td class=\"shade1 wrap\">".GM_LANG_sc_fs_index."</td><td class=\"shade1 wrap\">";
 		$dir = INDEX_DIRECTORY;
 		$errors1 = false;
 		if (!MediaFS::DirIsWritable($dir, false)) {
-			print $error_icon.$gm_lang["sc_fs_index_error"]."<br />";
+			print $error_icon.GM_LANG_sc_fs_index_error."<br />";
 			$errors1 = true;
 		}
 		$d = @dir($dir);
-		if (!is_object($d)) print $error_icon.$gm_lang["sc_dir_noaccess"]." ".$dir;
+		if (!is_object($d)) print $error_icon.GM_LANG_sc_dir_noaccess." ".$dir;
 		else {
 			$errors2 = false;
 			$num = 0;
@@ -1515,7 +1515,7 @@ if (!empty($check_filesys)) {
 					$num++;
 					if (!AdminFunctions::FileIsWriteable($d->path."/".$entry)) {
 						if (!$errors2) {
-							print $error_icon.$gm_lang["sc_fs_filesro"]."<br />";
+							print $error_icon.GM_LANG_sc_fs_filesro."<br />";
 							$errors2 = true;
 						}
 						print $dir.$entry."<br />";
@@ -1523,19 +1523,19 @@ if (!empty($check_filesys)) {
 				}
 			}
 			$d->close();
-			print $gm_lang["sc_numchecked"]." ".$num."<br />";
-			if (!$errors1 && !$errors2) print $info_icon.$gm_lang["sc_ok"];
+			print GM_LANG_sc_numchecked." ".$num."<br />";
+			if (!$errors1 && !$errors2) print $info_icon.GM_LANG_sc_ok;
 		}
 		print "</td></tr>";
 		
 		// Languages directory
-		print "<tr><td class=\"shade1 wrap\">".$gm_lang["sc_fs_languages"]."</td><td class=\"shade1 wrap\">";
+		print "<tr><td class=\"shade1 wrap\">".GM_LANG_sc_fs_languages."</td><td class=\"shade1 wrap\">";
 		$dir = "./languages/";
 		$write1 = false;
 		$num = 0;
 		if (MediaFS::DirIsWritable($dir, false)) $write1 = true;
 		$d = @dir($dir);
-		if (!is_object($d)) print $warn_icon.$gm_lang["sc_dir_noaccess"]." ".$dir;
+		if (!is_object($d)) print $warn_icon.GM_LANG_sc_dir_noaccess." ".$dir;
 		else {
 			$write2 = false;
 			$num = 0;
@@ -1547,16 +1547,16 @@ if (!empty($check_filesys)) {
 				}
 			}
 			$d->close();
-			print $gm_lang["sc_numchecked"]." ".$num."<br />";
-			if (!$write1 && !$write2) print $warn_icon.$gm_lang["sc_fs_languages_ro"];
-			else print $warn_icon.$gm_lang["sc_fs_languages_rw"];
+			print GM_LANG_sc_numchecked." ".$num."<br />";
+			if (!$write1 && !$write2) print $warn_icon.GM_LANG_sc_fs_languages_ro;
+			else print $warn_icon.GM_LANG_sc_fs_languages_rw;
 		}
 		print "</td></tr>";
 		
 		// Media directories
 		// Check only if media is stored in the physical file system
 		if (!$MEDIA_IN_DB) {
-			print "<tr><td class=\"shade1 wrap\">".$gm_lang["sc_fs_media"]."</td><td class=\"shade1 wrap\">";
+			print "<tr><td class=\"shade1 wrap\">".GM_LANG_sc_fs_media."</td><td class=\"shade1 wrap\">";
 			$res = NewQuery("SELECT gc_media_directory, gc_gedcomid FROM ".TBLPREFIX."gedconf");
 			if ($res) {
 				$dirs = array();
@@ -1568,9 +1568,9 @@ if (!empty($check_filesys)) {
 					if (!$first) {
 						print "<br />";
 					}
-					print $gm_lang["sc_gedname"].$GEDCOMS[$value]["title"]."<br />";
-					if (!MediaFS::DirIsWritable($dir, false)) print $warn_icon.$gm_lang["sc_fs_media_ro"]." ".$dir;
-					else print $warn_icon.$gm_lang["sc_fs_media_rw"]." ".$dir;
+					print GM_LANG_sc_gedname.$GEDCOMS[$value]["title"]."<br />";
+					if (!MediaFS::DirIsWritable($dir, false)) print $warn_icon.GM_LANG_sc_fs_media_ro." ".$dir;
+					else print $warn_icon.GM_LANG_sc_fs_media_rw." ".$dir;
 					print "<br />";
 					$first = false;
 				}
@@ -1579,7 +1579,7 @@ if (!empty($check_filesys)) {
 		}
 		else {
 			// If media is in DB, do a VFS sanity check instead
-			print "<tr><td class=\"shade1 wrap\">".$gm_lang["sc_fs_media"]."</td><td class=\"shade1 wrap\">";
+			print "<tr><td class=\"shade1 wrap\">".GM_LANG_sc_fs_media."</td><td class=\"shade1 wrap\">";
 			
 			// Get the arrays of filedir, filedata and thumbdata
 			$vferror = false;
@@ -1629,7 +1629,7 @@ if (!empty($check_filesys)) {
 					if ($row["mf_size"] != 0) {
 						$i = array_search($row["mf_file"], $filedata);
 						if (!$i) {
-							print $gm_lang["sc_vfr_nodata"]." ".$row["mf_file"]."<br />";
+							print GM_LANG_sc_vfr_nodata." ".$row["mf_file"]."<br />";
 							$vferror = true;
 						}
 						else {
@@ -1640,7 +1640,7 @@ if (!empty($check_filesys)) {
 					if ($row["mf_tsize"] != 0) {
 						$i = array_search($row["mf_file"], $thumbdata);
 						if (!$i) {
-							print $gm_lang["sc_vfr_nothumb"]." ".$row["mf_file"]."<br />";
+							print GM_LANG_sc_vfr_nothumb." ".$row["mf_file"]."<br />";
 							$vferror = true;
 						}
 						else {
@@ -1649,7 +1649,7 @@ if (!empty($check_filesys)) {
 						}
 					}
 					if (empty($row["mf_link"]) && !in_array($row["mf_path"], $dirdata) && !in_array($row["mf_path"], $dirprinted)) {
-						print $gm_lang["sc_vfr_nodir"]." ".$row["mf_path"]."<br />";
+						print GM_LANG_sc_vfr_nodir." ".$row["mf_path"]."<br />";
 						$dirprinted[] = $row["mf_path"];
 						$vferror = true;
 					}
@@ -1657,35 +1657,35 @@ if (!empty($check_filesys)) {
 				}
 				// We are left with the orphaned data
 				foreach($filedata as $pipo => $name) {
-					print $gm_lang["sc_vfr_ordata"]." ".$name."<br />";
+					print GM_LANG_sc_vfr_ordata." ".$name."<br />";
 					$vferror = true;
 				}
 				foreach($thumbdata as $pipo => $name) {
-					print $gm_lang["sc_vfr_orthum"]." ".$name."<br />";
+					print GM_LANG_sc_vfr_orthum." ".$name."<br />";
 					$vferror = true;
 				}
 			}
-			print $gm_lang["sc_numchecked"]." ".$num."<br />";
-			print $gm_lang["sc_fdatasize"]." ";
+			print GM_LANG_sc_numchecked." ".$num."<br />";
+			print GM_LANG_sc_fdatasize." ";
 			printf("%.1f Mb", ($fsize/1024)/1024);
-			print "<br />".$gm_lang["sc_fthumbsize"]." ";
+			print "<br />".GM_LANG_sc_fthumbsize." ";
 			printf("%.1f Mb", ($tsize/1024)/1024);
 			print "<br />";
-			if (!$vferror) print $info_icon.$gm_lang["sc_vfs_sane"]."<br />";
+			if (!$vferror) print $info_icon.GM_LANG_sc_vfs_sane."<br />";
 
 			print "</td></tr>";
 		}
 			
 		
 		// All other files and dirs
-		print "<tr><td class=\"shade1 wrap\">".$gm_lang["sc_fs_other"]."</td><td class=\"shade1 wrap\">";
+		print "<tr><td class=\"shade1 wrap\">".GM_LANG_sc_fs_other."</td><td class=\"shade1 wrap\">";
 		$dirs = AdminFunctions::GetDirList(array("./blocks/", "./fonts/", "./hooks/", "./images/", "./includes/", "./modules/", "./places/", "./reports/", "./themes/", "./ufpdf/"));
 		$errors1 = false;
 		foreach ($dirs as $key=>$dir) {
 			if (MediaFS::DirIsWritable($dir, false)) {
 				if (!$errors1) {
 					$errors1 = true;
-					print $error_icon.$gm_lang["sc_fs_dirrw"]."<br />";
+					print $error_icon.GM_LANG_sc_fs_dirrw."<br />";
 				}
 				print $dir."<br />";
 			}
@@ -1696,7 +1696,7 @@ if (!empty($check_filesys)) {
 		foreach ($dirs as $key=>$dir) {
 			$d = @dir($dir);
 			if (!is_object($d)) {
-				print $error_icon.$gm_lang["sc_dir_noaccess"]." ".$dir."<br />";
+				print $error_icon.GM_LANG_sc_dir_noaccess." ".$dir."<br />";
 				$errors1 = true;
 			}
 			else {
@@ -1705,7 +1705,7 @@ if (!empty($check_filesys)) {
 						$num++;
 						if (AdminFunctions::FileIsWriteable($d->path."/".$entry)) {
 							if (!$errors2) {
-								print $error_icon.$gm_lang["sc_fs_filesrw"]."<br />";
+								print $error_icon.GM_LANG_sc_fs_filesrw."<br />";
 								$errors2 = true;
 							}
 						print $d->path.$entry."<br />";
@@ -1715,8 +1715,8 @@ if (!empty($check_filesys)) {
 			$d->close();
 			}
 		}
-		print $gm_lang["sc_numchecked"]." ".$num."<br />";
-		if (!$errors1 && !$errors2) print $info_icon.$gm_lang["sc_ok"];
+		print GM_LANG_sc_numchecked." ".$num."<br />";
+		if (!$errors1 && !$errors2) print $info_icon.GM_LANG_sc_ok;
 		print "</td></tr>";
 }
 print "</table><br />";

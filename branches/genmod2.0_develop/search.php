@@ -57,7 +57,7 @@ if ($action == "quickstart") {
 // Remove slashes
 if (isset($query)) {
 	// Reset the "Search" text from the page header
-	if ($query == $gm_lang["search"]) {
+	if ($query == GM_LANG_search) {
 		unset($query);
 		$action = "";
 		unset($topsearch);
@@ -665,7 +665,7 @@ if ($action=="soundex") {
 	}
 }
 
-PrintHeader($gm_lang["search"]);
+PrintHeader(GM_LANG_search);
 ?>
 <script language="JavaScript" type="text/javascript">
 <!--
@@ -677,7 +677,7 @@ PrintHeader($gm_lang["search"]);
 				if (frm.lastname.value!="") message=false;
 				if (frm.place.value!="") message=false;
 				if (message) {
-					alert("<?php print $gm_lang["invalid_search_input"]?>");
+					alert("<?php print GM_LANG_invalid_search_input?>");
 					frm.firstname.focus();
 					return false;
 				}
@@ -685,7 +685,7 @@ PrintHeader($gm_lang["search"]);
 		}
 		if (frm.action[0].checked) {
 			if (frm.query.value.length<1) {
-					alert("<?php print $gm_lang["search_more_chars"]?>");
+					alert("<?php print GM_LANG_search_more_chars?>");
 					frm.query.focus();
 					return false;
 			}
@@ -697,7 +697,7 @@ PrintHeader($gm_lang["search"]);
 <?php
 	// print "<div id=\"search_content\">";
 		print "<div id=\"search_header\">";
-		print $gm_lang["search_gedcom"];
+		print GM_LANG_search_gedcom;
 		print "</div>";
 
 if ($view == "preview") {
@@ -709,17 +709,17 @@ else {
 		// start of new searchform
 		print "<div class=\"topbottombar\">";
 		print_help_link("search_options_help", "qm","search_options");
-		print $gm_lang["search_options"];
+		print GM_LANG_search_options;
 		print "</div>";
-		print "<form method=\"post\" onsubmit=\""?>return checknames(this);<?php print " \" action=\"$SCRIPT_NAME\">";
+		print "<form method=\"post\" onsubmit=\""?>return checknames(this);<?php print " \" action=\"".$SCRIPT_NAME."\">";
 		print "<table class=\"width100 center $TEXT_DIRECTION\">";
 		
 		// If more than one GEDCOM, switching is allowed AND DB mode is set, let the user select
 		if ((count($GEDCOMS) > 1) && ($ALLOW_CHANGE_GEDCOM)) {
 			print "<tr><td class=\"shade2\" style=\"padding: 5px;\">";
-			print $gm_lang["search_geds"];
+			print GM_LANG_search_geds;
 			print "</td><td class=\"shade1\" style=\"padding: 5px;\">";
-			echo '<input type="checkbox" onclick="CheckAllGed(this)" />'.$gm_lang['select_deselect_all'].'<br>';
+			echo '<input type="checkbox" onclick="CheckAllGed(this)" />'.GM_LANG_select_deselect_all.'<br>';
 			foreach ($GEDCOMS as $key=>$ged) {
 				SwitchGedcom($key);
 				if ($gm_user->username != "" || !GedcomConfig::$REQUIRE_AUTHENTICATION) {
@@ -738,22 +738,22 @@ else {
 		
 		// Show associated persons/fams?
 		print "<tr><td class=\"shade2\" style=\"padding: 5px;\">";
-		print $gm_lang["search_asso_label"];
+		print GM_LANG_search_asso_label;
 		print "</td><td class=\"shade1\" style=\"padding: 5px;\">";
 		print "<input type=\"checkbox\" name=\"showasso\" value=\"on\" ";
 		if ($showasso == "on") print "checked=\"checked\" ";
-		print "/>".$gm_lang["search_asso_text"];
+		print "/>".GM_LANG_search_asso_text;
 		print "</td></tr>";
 		
 		// switch between general and soundex
-		print "<tr><td class=\"shade2\" style=\"padding: 5px;\">".$gm_lang["search_type"];
+		print "<tr><td class=\"shade2\" style=\"padding: 5px;\">".GM_LANG_search_type;
 		print "</td><td class=\"shade1\" style=\"padding: 5px;\">";
 		print "<input type=\"radio\" name=\"action\" value=\"general\" ";
 		if ($action == "general") print "checked=\"checked\" ";
-		print "onclick=\"expand_layer('gsearch'); expand_layer('ssearch');\" />".$gm_lang["search_general"];
+		print "onclick=\"expand_layer('gsearch'); expand_layer('ssearch');\" />".GM_LANG_search_general;
 		print "<br /><input type=\"radio\" name=\"action\" value=\"soundex\" ";
 		if (($action == "soundex") || ($action == "")) print "checked=\"checked\" ";
-		print "onclick=\"expand_layer('gsearch'); expand_layer('ssearch');\" />".$gm_lang["search_soundex"];
+		print "onclick=\"expand_layer('gsearch'); expand_layer('ssearch');\" />".GM_LANG_search_soundex;
 		print "</td></tr>";
 		print "</table>";
 	print "</div>";
@@ -764,50 +764,50 @@ else {
 		else print "block\">";
 		print "<div class=\"topbottombar\">";
 		print_help_link("search_enter_terms_help", "qm", "search_general");
-		print $gm_lang["search_general"];
+		print GM_LANG_search_general;
 		print "</div>";
 		
 		// search terms
 		print "<table class=\"width100 center $TEXT_DIRECTION\">";
 		print "<tr><td class=\"shade2\" style=\"padding: 5px;\">";
-		print $gm_lang["enter_terms"];
+		print GM_LANG_enter_terms;
 		print "</td><td class=\"shade1\" style=\"padding: 5px;\"><input tabindex=\"1\" type=\"text\" name=\"query\" value=\"";
 		if ($action=="general" && isset($myquery)) print htmlspecialchars($myquery);
 		else print "";
 		print "\" />";
 		print "</td><td class=\"shade3\" style=\"vertical-align: middle; padding: 5px;\" rowspan=\"3\">";
-		print "<input tabindex=\"2\" type=\"submit\" value=\"".$gm_lang["search"]."\" /></tr>";
+		print "<input tabindex=\"2\" type=\"submit\" value=\"".GM_LANG_search."\" /></tr>";
 		// Choice where to search
-		print "<tr><td class=\"shade2\" style=\"padding: 5px;\">".$gm_lang["search_inrecs"];
+		print "<tr><td class=\"shade2\" style=\"padding: 5px;\">".GM_LANG_search_inrecs;
 		print "</td><td class=\"shade1\" style=\"padding: 5px;\">";
 		print "<input type=\"checkbox\"";
 		if ((isset($srindi)) || ($action == "")) print " checked=\"checked\"";
-		print " value=\"yes\" name=\"srindi\" />".$gm_lang["search_indis"]."<br />";
+		print " value=\"yes\" name=\"srindi\" />".GM_LANG_search_indis."<br />";
 		print "<input type=\"checkbox\"";
 		if (isset($srfams)) print " checked=\"checked\"";
-		print " value=\"yes\" name=\"srfams\" />".$gm_lang["search_fams"]."<br />";
+		print " value=\"yes\" name=\"srfams\" />".GM_LANG_search_fams."<br />";
 		if (PrivacyFunctions::ShowSourceFromAnyGed()) {
 			print "<input type=\"checkbox\"";
 			if (isset($srsour)) print " checked=\"checked\"";
-			print " value=\"yes\" name=\"srsour\" />".$gm_lang["search_sources"]."<br />";
+			print " value=\"yes\" name=\"srsour\" />".GM_LANG_search_sources."<br />";
 			print "<input type=\"checkbox\"";
 			if (isset($srrepo)) print " checked=\"checked\"";
-			print " value=\"yes\" name=\"srrepo\" />".$gm_lang["search_repos"]."<br />";
+			print " value=\"yes\" name=\"srrepo\" />".GM_LANG_search_repos."<br />";
 		}
 		print "<input type=\"checkbox\"";
 		if (isset($srmedia)) print " checked=\"checked\"";
-		print " value=\"yes\" name=\"srmedia\" />".$gm_lang["search_media"]."<br />";
+		print " value=\"yes\" name=\"srmedia\" />".GM_LANG_search_media."<br />";
 		print "<input type=\"checkbox\"";
 		if (isset($srnote)) print " checked=\"checked\"";
-		print " value=\"yes\" name=\"srnote\" />".$gm_lang["search_notes"]."<br />";
+		print " value=\"yes\" name=\"srnote\" />".GM_LANG_search_notes."<br />";
 		print "</td>";
 		print "</tr>";
-		print "<tr><td class=\"shade2\" style=\"padding: 5px;\">".$gm_lang["search_tagfilter"]."</td>";
+		print "<tr><td class=\"shade2\" style=\"padding: 5px;\">".GM_LANG_search_tagfilter."</td>";
 		print "<td class=\"shade1\" style=\"padding: 5px;\"><input type=\"radio\" name=\"tagfilter\" value=\"on\" ";
 		if (($tagfilter == "on") || ($tagfilter == "")) print "checked=\"checked\" ";
-		print ">".$gm_lang["search_tagfon"]."<br /><input type=\"radio\" name=\"tagfilter\" value=\"off\" ";
+		print ">".GM_LANG_search_tagfon."<br /><input type=\"radio\" name=\"tagfilter\" value=\"off\" ";
 		if ($tagfilter == "off") print "checked=\"checked\"";
-		print " />".$gm_lang["search_tagfoff"];
+		print " />".GM_LANG_search_tagfoff;
 		print "</td></tr>";
 
 		print "</table>";
@@ -819,64 +819,64 @@ else {
 		else print "none\">";
 		print "<div class=\"topbottombar\">";
 		print_help_link("soundex_search_help", "qm");
-		print $gm_lang["soundex_search"];
+		print GM_LANG_soundex_search;
 		print "</div>";
 		
 		print "<table class=\"width100 center $TEXT_DIRECTION\">";
 		
 		print "<tr><td class=\"shade2\">";
-		print $gm_lang["lastname_search"];
+		print GM_LANG_lastname_search;
 		print "</td><td class=\"shade1\"><input tabindex=\"3\" type=\"text\" name=\"lastname\" value=\"";
 		if ($action=="soundex") print $mylastname;
 		print "\" /></td>";
 
 		print "<td class=\"shade3\" style=\"vertical-align: middle; text-align: center; padding: 5px;\"  rowspan=\"4\">";
 		print "<input tabindex=\"7\" type=\"submit\" value=\"";
-		print $gm_lang["search"];
+		print GM_LANG_search;
 		print "\" /></td></tr>";
 
 		print "<tr><td class=\"shade2\">";
-		print $gm_lang["firstname_search"];
+		print GM_LANG_firstname_search;
 		print "</td><td class=\"shade1\">";
 		print "<input tabindex=\"4\" type=\"text\" name=\"firstname\" value=\"";
 		if ($action=="soundex") print $myfirstname;
 		print "\" /></td></tr>";
 		print "<tr><td class=\"shade2\">";
-		print $gm_lang["search_place"];
+		print GM_LANG_search_place;
 		print "</td><td class=\"shade1\"><input tabindex=\"5\" type=\"text\" name=\"place\" value=\"";
 		if ($action=="soundex") print $myplace;
 		print "\" /></td></tr>";
 		print "<tr><td class=\"shade2\">";
-		print $gm_lang["search_year"];
+		print GM_LANG_search_year;
 		print "</td><td class=\"shade1\"><input tabindex=\"6\" type=\"text\" name=\"year\" value=\"";
 		if ($action=="soundex") print $myyear;
 		print "\" /></td>";
 		print "</tr>";
 		print "<tr><td class=\"shade2\" >";
-		print $gm_lang["search_soundextype"];
+		print GM_LANG_search_soundextype;
 		print "<td class=\"shade1\" colspan=\"2\" ><input type=\"radio\" name=\"soundex\" value=\"Russell\" ";
 		if (($soundex == "Russell") || ($soundex == "")) print "checked=\"checked\" ";
-		print " />".$gm_lang["search_russell"]."<br /><input type=\"radio\" name=\"soundex\" value=\"DaitchM\" ";
+		print " />".GM_LANG_search_russell."<br /><input type=\"radio\" name=\"soundex\" value=\"DaitchM\" ";
 		if ($soundex == "DaitchM") print "checked=\"checked\" ";
-		print " />".$gm_lang["search_DM"];
+		print " />".GM_LANG_search_DM;
 		print "</td>";
 		print "</td></tr>";
 		print "<tr><td class=\"shade2\">";
-		print $gm_lang["search_prtnames"];
+		print GM_LANG_search_prtnames;
 		print "</td><td class=\"shade1\" colspan=\"2\" ><input type=\"radio\" name=\"nameprt\" value=\"hit\" ";
 		if (($nameprt == "hit")) print "checked=\"checked\" ";
-		print ">".$gm_lang["search_prthit"]."<br /><input type=\"radio\" name=\"nameprt\" value=\"all\" ";
+		print ">".GM_LANG_search_prthit."<br /><input type=\"radio\" name=\"nameprt\" value=\"all\" ";
 		if ($nameprt == "all" || ($nameprt == "")) print "checked=\"checked\" ";;
-		print " />".$gm_lang["search_prtall"];
+		print " />".GM_LANG_search_prtall;
 		print "</td>";
 		print "</td></tr>";
 		print "<tr><td class=\"shade2\">";
-		print $gm_lang["search_sorton"];
+		print GM_LANG_search_sorton;
 		print "</td><td class=\"shade1\" colspan=\"2\" ><input type=\"radio\" name=\"sorton\" value=\"last\" ";
 		if (($sorton == "last") || ($sorton == "")) print "checked=\"checked\" ";
-		print ">".$gm_lang["lastname_search"]."<br /><input type=\"radio\" name=\"sorton\" value=\"first\" ";
+		print ">".GM_LANG_lastname_search."<br /><input type=\"radio\" name=\"sorton\" value=\"first\" ";
 		if ($sorton == "first") print "checked=\"checked\" ";;
-		print " />".$gm_lang["firstname_search"];
+		print " />".GM_LANG_firstname_search;
 		print "</td>";
 		print "</td></tr>";
 		print "</table>";
@@ -1202,13 +1202,13 @@ if ($action=="general") {
 		<div id="result" class="width100" style="display: inline-block;"><br /><br />
 		<div class="door">
 		<dl>
-		<dd id="door1"><a href="javascript:;" onclick="tabswitch(1)" ><?php print $gm_lang["search_indis"]." (".count($sindilist).")";?></a></dd>
-		<dd id="door2"><a href="javascript:;" onclick="tabswitch(2)" ><?php print $gm_lang["search_fams"]." (".count($sfamlist).")";?></a></dd>
-		<dd id="door3"><a href="javascript:;" onclick="tabswitch(3)" ><?php print $gm_lang["search_sources"]." (".count($ssourcelist).")";?></a></dd>
-		<dd id="door4"><a href="javascript:;" onclick="tabswitch(4)" ><?php print $gm_lang["search_repos"]." (".count($srepolist).")";?></a></dd>
-		<dd id="door5"><a href="javascript:;" onclick="tabswitch(5)" ><?php print $gm_lang["search_media"]." (".count($media_total).")";?></a></dd>
-		<dd id="door6"><a href="javascript:;" onclick="tabswitch(6)" ><?php print $gm_lang["search_notes"]." (".count($note_total).")";?></a></dd>
-		<dd id="door0"><a href="javascript:;" onclick="tabswitch(0)" ><?php print $gm_lang["all"]?></a></dd>
+		<dd id="door1"><a href="javascript:;" onclick="tabswitch(1)" ><?php print GM_LANG_search_indis." (".count($sindilist).")";?></a></dd>
+		<dd id="door2"><a href="javascript:;" onclick="tabswitch(2)" ><?php print GM_LANG_search_fams." (".count($sfamlist).")";?></a></dd>
+		<dd id="door3"><a href="javascript:;" onclick="tabswitch(3)" ><?php print GM_LANG_search_sources." (".count($ssourcelist).")";?></a></dd>
+		<dd id="door4"><a href="javascript:;" onclick="tabswitch(4)" ><?php print GM_LANG_search_repos." (".count($srepolist).")";?></a></dd>
+		<dd id="door5"><a href="javascript:;" onclick="tabswitch(5)" ><?php print GM_LANG_search_media." (".count($media_total).")";?></a></dd>
+		<dd id="door6"><a href="javascript:;" onclick="tabswitch(6)" ><?php print GM_LANG_search_notes." (".count($note_total).")";?></a></dd>
+		<dd id="door0"><a href="javascript:;" onclick="tabswitch(0)" ><?php print GM_LANG_all?></a></dd>
 		</dl>
 		</div><br /><br />
 	
@@ -1220,8 +1220,8 @@ if ($action=="general") {
 			print "\n\t<table class=\"list_table $TEXT_DIRECTION\">\n\t\t<tr><td class=\"shade2 center\"";
 			$indi_count = count($printindiname);
 			if($indi_count > 12) print " colspan=\"2\"";
-			print "><img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["indis"]["small"]."\" border=\"0\" title=\"".$gm_lang["people"]."\" alt=\"".$gm_lang["individuals"]."\" />&nbsp;&nbsp;";
-			print $gm_lang["individuals"];
+			print "><img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["indis"]["small"]."\" border=\"0\" title=\"".GM_LANG_people."\" alt=\"".GM_LANG_individuals."\" />&nbsp;&nbsp;";
+			print GM_LANG_individuals;
 			print "</td></tr><tr><td class=\"$TEXT_DIRECTION shade1 wrap\"><ul>";
 			$i=1;
 			uasort($printindiname, "ItemSort");
@@ -1236,9 +1236,9 @@ if ($action=="general") {
 			}
 			print "\n\t\t</ul>&nbsp;</td></tr>";
 			if ((count($sindilist)>0) && (isset($srindi))) {
-				print "<tr><td>".$gm_lang["total_indis"]." ".$cti;
-				if (count($indi_private)>0) print "  (".$gm_lang["private"]." ".count($indi_private).")";
-				if (count($indi_hide)>0) print "  --  ".$gm_lang["hidden"]." ".count($indi_hide);
+				print "<tr><td>".GM_LANG_total_indis." ".$cti;
+				if (count($indi_private)>0) print "  (".GM_LANG_private." ".count($indi_private).")";
+				if (count($indi_hide)>0) print "  --  ".GM_LANG_hidden." ".count($indi_hide);
 				if (count($indi_private)>0 || count($indi_hide)>0) print_help_link("privacy_error_help", "qm");
 				print "</td></tr>";
 			}
@@ -1259,8 +1259,8 @@ if ($action=="general") {
 			print "\n\t<table class=\"list_table $TEXT_DIRECTION\">\n\t\t<tr><td class=\"shade2 center\"";
 			$fam_count = count($printfamname);
 			if($fam_count > 12) print " colspan=\"2\"";
-			print "><img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["sfamily"]["small"]."\" border=\"0\" alt=\"".$gm_lang["families"]."\" />&nbsp;&nbsp;";
-			print $gm_lang["families"];
+			print "><img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["sfamily"]["small"]."\" border=\"0\" alt=\"".GM_LANG_families."\" />&nbsp;&nbsp;";
+			print GM_LANG_families;
 			print "</td></tr><tr><td class=\"$TEXT_DIRECTION shade1 wrap\"><ul>";
 			$i=1;
 			foreach($printfamname as $pkey => $pvalue) {
@@ -1275,9 +1275,9 @@ if ($action=="general") {
 			}
 			print "\n\t\t</ul>&nbsp;</td></tr>";
 			if ((count($sfamlist)>0) || (count($printfamname)>0)) {
-				print "<tr><td>".$gm_lang["total_fams"]." ".$ctf;
-				if (count($fam_private)>0) print "  (".$gm_lang["private"]." ".count($fam_private).")";
-				if (count($fam_hide)>0) print "  --  ".$gm_lang["hidden"]." ".count($fam_hide);
+				print "<tr><td>".GM_LANG_total_fams." ".$ctf;
+				if (count($fam_private)>0) print "  (".GM_LANG_private." ".count($fam_private).")";
+				if (count($fam_hide)>0) print "  --  ".GM_LANG_hidden." ".count($fam_hide);
 				if (count($fam_private)>0 || count($fam_hide)>0) print_help_link("privacy_error_help", "qm");
 				print "</td></tr>";
 			}
@@ -1304,8 +1304,8 @@ if ($action=="general") {
 			print "\n\t<table class=\"list_table $TEXT_DIRECTION\">\n\t\t<tr><td class=\"shade2 center\"";
 			$sour_count = count($ssourcelist);
 			if($sour_count > 12) print " colspan=\"2\"";
-			print "><img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["source"]["small"]."\" border=\"0\" alt=\"".$gm_lang["sources"]."\" />&nbsp;&nbsp;";
-			print $gm_lang["sources"];
+			print "><img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["source"]["small"]."\" border=\"0\" alt=\"".GM_LANG_sources."\" />&nbsp;&nbsp;";
+			print GM_LANG_sources;
 			print "</td></tr><tr><td class=\"$TEXT_DIRECTION shade1 wrap\"><ul>";
 			$i=1;
 			foreach ($ssourcelist as $key => $value) {
@@ -1375,8 +1375,8 @@ if ($action=="general") {
 			SwitchGedcom();
 			if (count($source_total)>0) {
 			// if ($cts > 0) {
-				print "<tr><td>".$gm_lang["total_sources"]." ".$cts;
-				if (count($source_hide)>0) print "  --  ".$gm_lang["hidden"]." ".count($source_hide);
+				print "<tr><td>".GM_LANG_total_sources." ".$cts;
+				if (count($source_hide)>0) print "  --  ".GM_LANG_hidden." ".count($source_hide);
 				print "</td></tr>";
 			}
 			print "</table>";
@@ -1402,8 +1402,8 @@ if ($action=="general") {
 			print "\n\t<table class=\"list_table $TEXT_DIRECTION\">\n\t\t<tr><td class=\"shade2 center\"";
 			$repo_count = count($srepolist);
 			if($repo_count > 12) print " colspan=\"2\"";
-			print "><img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["repository"]["small"]."\" border=\"0\" alt=\"".$gm_lang["search_repos"]."\" />&nbsp;&nbsp;";
-			print $gm_lang["search_repos"];
+			print "><img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["repository"]["small"]."\" border=\"0\" alt=\"".GM_LANG_search_repos."\" />&nbsp;&nbsp;";
+			print GM_LANG_search_repos;
 			print "</td></tr><tr><td class=\"$TEXT_DIRECTION shade1 wrap\"><ul>";
 			$i=1;
 			foreach ($srepolist as $key => $value) {
@@ -1472,8 +1472,8 @@ if ($action=="general") {
 			SwitchGedcom();
 			if (count($repo_total)>0) {
 			// if ($cts > 0) {
-				print "<tr><td>".$gm_lang["total_repositories"]." ".count($repo_total);
-				if (count($repo_hide)>0) print "  --  ".$gm_lang["hidden"]." ".count($repo_hide);
+				print "<tr><td>".GM_LANG_total_repositories." ".count($repo_total);
+				if (count($repo_hide)>0) print "  --  ".GM_LANG_hidden." ".count($repo_hide);
 				print "</td></tr>";
 			}
 			print "</table>";
@@ -1487,8 +1487,8 @@ if ($action=="general") {
 			print "\n\t<table class=\"list_table  $TEXT_DIRECTION\">\n\t\t<tr><td class=\"shade2 center\"";
 			$media_count = count($media_total) - count($media_hide);
 			if($media_count>12)	print " colspan=\"2\"";
-			print "><img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["media"]["small"]."\" border=\"0\" title=\"".$gm_lang["media"]."\" alt=\"".$gm_lang["media"]."\" />&nbsp;&nbsp;";
-			print $gm_lang["media"];
+			print "><img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["media"]["small"]."\" border=\"0\" title=\"".GM_LANG_media."\" alt=\"".GM_LANG_media."\" />&nbsp;&nbsp;";
+			print GM_LANG_media;
 			print "</td></tr><tr><td class=\"$TEXT_DIRECTION shade1 wrap\"><ul>";
 			$i=1;
 			foreach ($smedialist as $key => $value) {
@@ -1504,8 +1504,8 @@ if ($action=="general") {
 			print "</tr>";
 			if (count($media_total) > 0) { 
 				print "<tr><td>";
-				print $gm_lang["total_media"]." ".count($media_total);
-				if (count($media_hide)>0) print "&nbsp;--&nbsp;".$gm_lang["hidden"]." ".count($media_hide);
+				print GM_LANG_total_media." ".count($media_total);
+				if (count($media_hide)>0) print "&nbsp;--&nbsp;".GM_LANG_hidden." ".count($media_hide);
 				print "</td></tr>";
 			}
 			print "</table><br />";
@@ -1529,8 +1529,8 @@ if ($action=="general") {
 			print "\n\t<table class=\"list_table $TEXT_DIRECTION\">\n\t\t<tr><td class=\"shade2 center\"";
 			$note_count = count($snotelist);
 			if($note_count > 12) print " colspan=\"2\"";
-			print "><img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["note"]["other"]."\" border=\"0\" alt=\"".$gm_lang["notes"]."\" />&nbsp;&nbsp;";
-			print $gm_lang["notes"];
+			print "><img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["note"]["other"]."\" border=\"0\" alt=\"".GM_LANG_notes."\" />&nbsp;&nbsp;";
+			print GM_LANG_notes;
 			print "</td></tr><tr><td class=\"$TEXT_DIRECTION shade1 wrap\"><ul>";
 			$i=1;
 			foreach ($snotelist as $key => $note) {
@@ -1603,8 +1603,8 @@ if ($action=="general") {
 			SwitchGedcom();
 			if (count($note_total)>0) {
 			// if ($cts > 0) {
-				print "<tr><td>".$gm_lang["total_notes"]." ".count($note_total);
-				if (count($note_hide)>0) print "  --  ".$gm_lang["hidden"]." ".count($note_hide);
+				print "<tr><td>".GM_LANG_total_notes." ".count($note_total);
+				if (count($note_hide)>0) print "  --  ".GM_LANG_hidden." ".count($note_hide);
 				print "</td></tr>";
 			}
 			print "</table>";
@@ -1615,7 +1615,7 @@ if ($action=="general") {
 print "</div>"; // End result div
 		
 	}
-//	else if (isset($query)) print "<br /><div class=\"warning width80\" style=\" text-align: center;\"><i>".$gm_lang["no_results"]."</i><br /></div>\n\t\t";
+//	else if (isset($query)) print "<br /><div class=\"warning width80\" style=\" text-align: center;\"><i>".GM_LANG_no_results."</i><br /></div>\n\t\t";
 }
 
 // ----- section to search and display results for a Soundex last name search
@@ -1632,10 +1632,10 @@ if ($action=="soundex") {
 			$extrafams = false;
 			if (count($printfamname)>0) $extrafams = true;
 			if ($extrafams) {
-				print "<td class=\"topbottombar\"><img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["indis"]["small"]."\" border=\"0\" alt=\"\" /> ".$gm_lang["people"]."</td>";
-				print "<td class=\"topbottombar\"><img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["sfamily"]["small"]."\" border=\"0\" alt=\"\" /> ".$gm_lang["families"]."</td>";
+				print "<td class=\"topbottombar\"><img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["indis"]["small"]."\" border=\"0\" alt=\"\" /> ".GM_LANG_people."</td>";
+				print "<td class=\"topbottombar\"><img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["sfamily"]["small"]."\" border=\"0\" alt=\"\" /> ".GM_LANG_families."</td>";
 			}
-			else print "<td colspan=\"2\" class=\"topbottombar\"><img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["indis"]["small"]."\" border=\"0\" alt=\"\" /> ".$gm_lang["people"]."</td>";
+			else print "<td colspan=\"2\" class=\"topbottombar\"><img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["indis"]["small"]."\" border=\"0\" alt=\"\" /> ".GM_LANG_people."</td>";
 			print "</tr><tr>\n\t\t<td class=\"shade1 wrap\"><ul>";
 
 			foreach ($printindiname as $key => $pvalue) {
@@ -1667,15 +1667,15 @@ if ($action=="soundex") {
 				print "<tr><td ";
 				if ((!$extrafams) && ($ct > 9)) print "colspan=\"2\">";
 				else print ">";
-				print $gm_lang["total_indis"]." ".count($indi_total);
-				if (count($indi_private)>0) print "  (".$gm_lang["private"]." ".count($indi_private).")";
-				if (count($indi_hide)>0) print "  --  ".$gm_lang["hidden"]." ".count($indi_hide);
+				print GM_LANG_total_indis." ".count($indi_total);
+				if (count($indi_private)>0) print "  (".GM_LANG_private." ".count($indi_private).")";
+				if (count($indi_hide)>0) print "  --  ".GM_LANG_hidden." ".count($indi_hide);
 				if (count($indi_private)>0 || count($indi_hide)>0) print_help_link("privacy_error_help", "qm");
 				print "</td>";
 				if ($extrafams) {
-					print "<td>".$gm_lang["total_fams"]." ".count($fam_total);
-					if (count($fam_private)>0) print "  (".$gm_lang["private"]." ".count($fam_private).")";
-					if (count($fam_hide)>0) print "  --  ".$gm_lang["hidden"]." ".count($fam_hide);
+					print "<td>".GM_LANG_total_fams." ".count($fam_total);
+					if (count($fam_private)>0) print "  (".GM_LANG_private." ".count($fam_private).")";
+					if (count($fam_hide)>0) print "  --  ".GM_LANG_hidden." ".count($fam_hide);
 					if (count($fam_private)>0 || count($fam_hide)>0) print_help_link("privacy_error_help", "qm");
 					print "</td>";
 				}
@@ -1683,9 +1683,9 @@ if ($action=="soundex") {
 			}
 			print "</table></div>";
 		}
-		else if (!isset($topsearch)) print "<br /><br /><div class=\"warning width100\" style=\" text-align: center;\"><i>".$gm_lang["no_results"]."</i></div>\n\t\t";
+		else if (!isset($topsearch)) print "<br /><br /><div class=\"warning width100\" style=\" text-align: center;\"><i>".GM_LANG_no_results."</i></div>\n\t\t";
 	}
-	else if (!isset($topsearch)) print "<br /><br /><div class=\"warning width100\" style=\" text-align: center;\"><i>".$gm_lang["no_results"]."</i><br /></div>\n\t\t";
+	else if (!isset($topsearch)) print "<br /><br /><div class=\"warning width100\" style=\" text-align: center;\"><i>".GM_LANG_no_results."</i><br /></div>\n\t\t";
 }
 print "<br />";
 if ($action == "general") {
@@ -1696,7 +1696,7 @@ if ($action == "general") {
 	else if(isset($media_total) && count($media_total) > 0) $tab = 5;
 	else if(isset($note_total) && count($note_total) > 0) $tab = 6;
 	else {
-		print "<br /><div class=\"warning\" style=\" text-align: center;\"><i>".$gm_lang["no_results"]."</i><br /></div>";
+		print "<br /><div class=\"warning\" style=\" text-align: center;\"><i>".GM_LANG_no_results."</i><br /></div>";
 		print "<div id=\"no_tab0\"></div>";
 		$tab = "0";
 	}

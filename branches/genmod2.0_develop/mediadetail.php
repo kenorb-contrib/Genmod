@@ -37,7 +37,7 @@ $media_controller = new mediaController();
 
 PrintHeader($media_controller->pagetitle);
 
-$media_controller->CheckNoResult($gm_lang["media_not_found"]);
+$media_controller->CheckNoResult(GM_LANG_media_not_found);
 
 $media_controller->CheckPrivate();
 
@@ -86,7 +86,7 @@ $media_controller->CheckRawEdited();
 		}
 		?>
 		<?php if(GedcomConfig::$SHOW_COUNTER) {
-			print "\n<br /><br /><span style=\"margin-left: 3px;\">".$gm_lang["hit_count"]."&nbsp;".$hits."</span>\n";
+			print "\n<br /><br /><span style=\"margin-left: 3px;\">".GM_LANG_hit_count."&nbsp;".$hits."</span>\n";
 		}?>
 		</td>
 	</tr>

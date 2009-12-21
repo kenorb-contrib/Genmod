@@ -143,8 +143,8 @@ else define("MB_FUNCTIONS", false);
 
 set_magic_quotes_runtime(0);
 
-if (!empty($_SERVER["SCRIPT_NAME"])) $SCRIPT_NAME=$_SERVER["SCRIPT_NAME"];
-else if (!empty($_SERVER["PHP_SELF"])) $SCRIPT_NAME=$_SERVER["PHP_SELF"];
+if (!empty($_SERVER["SCRIPT_NAME"])) define("SCRIPT_NAME", $_SERVER["SCRIPT_NAME"]);
+else if (!empty($_SERVER["PHP_SELF"])) define("SCRIPT_NAME", $_SERVER["PHP_SELF"]);
 if (!empty($_SERVER["QUERY_STRING"])) $QUERY_STRING = $_SERVER["QUERY_STRING"];
 else $QUERY_STRING="";
 $QUERY_STRING = preg_replace(array("/&/","/</"), array("&amp;","&lt;"), $QUERY_STRING);
@@ -157,7 +157,7 @@ if ($bot && preg_match("/(&amp;)?(show_changes=|show_full=)/", $QUERY_STRING)) {
 	$QUERY_STRING = preg_replace("/(&amp;)?show_full=(0|1)/", "", $QUERY_STRING);
 	$QUERY_STRING = preg_replace("/^&amp;/", "", $QUERY_STRING);
 	header("HTTP/1.1 301 Moved Permanently");
-	header("Location: ".basename($SCRIPT_NAME)."?".$QUERY_STRING);
+	header("Location: ".basename(SCRIPT_NAME)."?".$QUERY_STRING);
 	exit;
 }
 	
@@ -282,7 +282,7 @@ foreach($CONFIG_VARS as $indexval => $VAR) {
 //			include("db_layer.php");
 			$DBCONN = New DbLayer();
 			WriteToLog("Session-> Config variable override detected. Possible hacking attempt. Script terminated.", "W", "S");
-			HandleIntrusion("Session-> Config variable override detected. Possible hacking attempt. Script terminated.\n");
+			SystemFunctions::HandleIntrusion("Session-> Config variable override detected. Possible hacking attempt. Script terminated.\n");
 		}
 		exit;
 	}
@@ -293,7 +293,7 @@ if (empty($CONFIG_VERSION)) $CONFIG_VERSION = "2.65";
 if (!defined('SERVER_URL')) {
 	$SERVER_URL = "http://".$_SERVER["SERVER_NAME"];
 	if ($_SERVER["SERVER_PORT"] != 80) $SERVER_URL .= ":".$SERVER["SERVER_PORT"];
-	$SERVER_URL .= dirname($SCRIPT_NAME)."/";
+	$SERVER_URL .= dirname(SCRIPT_NAME)."/";
 	$SERVER_URL = stripslashes($SERVER_URL);
 	define('SERVER_URL', $SERVER_URL);
 }
@@ -341,12 +341,12 @@ if (phpversion() > '4.2.2') {
 	//-- prevent sql and code injection
 	foreach($_REQUEST as $key=>$value) {
 		if (!is_array($value)) {
-			if (preg_match("/((DELETE)|(INSERT)|(UPDATE)|(ALTER)|(CREATE)|( TABLE)|(DROP))\s[A-Za-z0-9 ]{0,200}(\s(FROM)|(INTO)|(TABLE)\s)/i", $value, $imatch) > 0 && $SCRIPT_NAME != "/editlang_edit.php") {
+			if (preg_match("/((DELETE)|(INSERT)|(UPDATE)|(ALTER)|(CREATE)|( TABLE)|(DROP))\s[A-Za-z0-9 ]{0,200}(\s(FROM)|(INTO)|(TABLE)\s)/i", $value, $imatch) > 0 && SCRIPT_NAME != "/editlang_edit.php") {
 				// NOTE: Setup the database connection, needed for logging
 //				include("db_layer.php");
 				$DBCONN = New DbLayer();
 				WriteToLog("Session-> Possible SQL injection detected: $key=>$value. <b>$imatch[0]</b> Script terminated.", "W", "S");
-				HandleIntrusion("Session-> Possible SQL injection detected: $key=>$value.  <b>$imatch[0]</b> Script terminated.");
+				SystemFunctions::HandleIntrusion("Session-> Possible SQL injection detected: $key=>$value.  <b>$imatch[0]</b> Script terminated.");
 				exit;
 			}
 			//-- don't let any html in
@@ -360,7 +360,7 @@ if (phpversion() > '4.2.2') {
 //						include("db_layer.php");
 						$DBCONN = New DbLayer();
 						WriteToLog("Session-> Possible SQL injection detected: $key=>$val <b>$imatch[0]</b>.  Script terminated.", "W", "S");
-						HandleIntrusion("Session-> Possible SQL injection detected: $key=>$val <b>$imatch[0]</b>.  Script terminated.");
+						SystemFunctions::HandleIntrusion("Session-> Possible SQL injection detected: $key=>$val <b>$imatch[0]</b>.  Script terminated.");
 						exit;
 					}
 					//-- don't let any html in
@@ -383,8 +383,8 @@ if (empty($GM_MEMORY_LIMIT)) $GM_MEMORY_LIMIT = "32M";
 @ini_set('memory_limit', $GM_MEMORY_LIMIT);
 
 // If this is an intrusion attempt, first handle it. This can update the lockout time. THEN check if locked. 
-if (isset($INTRUSION_DETECTED) && $INTRUSION_DETECTED) HandleIntrusion();
-CheckLockout();
+if (isset($INTRUSION_DETECTED) && $INTRUSION_DETECTED) SystemFunctions::HandleIntrusion();
+SystemFunctions::CheckLockout();
 
 // -- Read the GEDCOMS array
 $GEDCOMS = array();
@@ -449,7 +449,7 @@ if (count($ConfiguredSettings) > 0) {
  */
 $languages 				= array();
 $gm_lang_use 			= array();
-$gm_lang 				= array();
+//$gm_lang 				= array();
 $lang_short_cut 		= array();
 $lang_langcode 			= array();
 $gm_language 			= array();
@@ -472,7 +472,7 @@ $MON_SHORT_array		= array();
 foreach ($language_settings as $key => $value) {
 	$languages[$key] 			= $value["gm_langname"];
 	$gm_lang_use[$key]			= $value["gm_lang_use"];
-	$gm_lang[$key]				= $value["gm_lang"];
+	define("GM_LANG_".$key, $value["gm_lang"]);
 	$lang_short_cut[$key]		= $value["lang_short_cut"];
 	$lang_langcode[$key]		= $value["langcode"];
 	$gm_language[$key]			= $value["gm_language"];
@@ -489,7 +489,7 @@ foreach ($language_settings as $key => $value) {
 	$NAME_REVERSE_array[$key]	= $value["NAME_REVERSE"];
 	$MON_SHORT_array[$key]		= $value["MON_SHORT"];
 	
-	$gm_lang["lang_name_$key"]	= $value["gm_lang"];
+//	define("GM_LANG_lang_name_".$key, $value["gm_lang"]);
 	
 	$dDummy = $value["langcode"];
 	$ct = strpos($dDummy, ";");
@@ -613,17 +613,17 @@ LoadEnglish(false, false, true);
 LoadEnglishFacts(false, true);
 
 // Check for page views exceeding the limit
-CheckPageViews();
+SystemFunctions::CheckPageViews();
 
 // Check for the IP address where the request comes from
-CheckSessionIP();
+SystemFunctions::CheckSessionIP();
 
 require_once($GM_BASE_DIRECTORY . "includes/values/templecodes.php");		//-- load in the LDS temple code translations
 
 //-- load the privacy settings
 PrivacyController::ReadPrivacy($GEDCOMID);
 
-if (!isset($SCRIPT_NAME)) $SCRIPT_NAME=$_SERVER["SCRIPT_NAME"];
+if (!defined("SCRIPT_NAME")) define("SCRIPT_NAME", $_SERVER["SCRIPT_NAME"]);
 
 if (empty($TEXT_DIRECTION)) $TEXT_DIRECTION="ltr";
 $TEXT_DIRECTION = $TEXT_DIRECTION_array[$LANGUAGE];
@@ -668,31 +668,31 @@ if (!isset($_SESSION["cookie_login"])) $_SESSION["cookie_login"] = false;
 //if (isset(GedcomConfig::$SHOW_CONTEXT_HELP) && $show_context_help==='no') $_SESSION["show_context_help"] = false;
 //if (!isset(GedcomConfig::$USE_THUMBS_MAIN)) GedcomConfig::$USE_THUMBS_MAIN = false;
 
-if ((strstr($SCRIPT_NAME, "editconfig.php")===false) &&(strstr($SCRIPT_NAME, "editconfig_help.php")===false)) {
+if ((strstr(SCRIPT_NAME, "editconfig.php")===false) &&(strstr(SCRIPT_NAME, "editconfig_help.php")===false)) {
 	if ((!$DBCONN->connected)||(!UserController::AdminUserExists())) {
 		header("Location: editconfig.php");
 		exit;
 	}
-	if ((strstr($SCRIPT_NAME, "editconfig_gedcom.php")===false)
-	&&(strstr($SCRIPT_NAME, "addmedia.php")===false)
-	&&(strstr($SCRIPT_NAME, "addnewgedcom.php")===false)
-	&&(strstr($SCRIPT_NAME, "admin.php")===false)
-	&&(strstr($SCRIPT_NAME, "admin_maint.php")===false)
-	&&(strstr($SCRIPT_NAME, "backup.php")===false)
-	&&(strstr($SCRIPT_NAME, "config_download.php")===false)
-	&&(strstr($SCRIPT_NAME, "config_maint.php")===false)
-	&&(strstr($SCRIPT_NAME, "edit_privacy.php")===false)
-	&&(strstr($SCRIPT_NAME, "editconfig_help.php")===false)
-	&&(strstr($SCRIPT_NAME, "editgedcoms.php")===false)
-	&&(strstr($SCRIPT_NAME, "help_text.php")===false)
-	&&(strstr($SCRIPT_NAME, "importgedcom.php")===false)
-	&&(strstr($SCRIPT_NAME, "lockout_maint.php")===false)
-	&&(strstr($SCRIPT_NAME, "login.php")===false)
-	&&(strstr($SCRIPT_NAME, "sanity.php")===false)
-	&&(strstr($SCRIPT_NAME, "uploadgedcom.php")===false)
-	&&(strstr($SCRIPT_NAME, "useradmin.php")===false)
-	&&(strstr($SCRIPT_NAME, "validategedcom.php")===false)
-	&&(strstr($SCRIPT_NAME, "viewlog.php")===false)) {
+	if ((strstr(SCRIPT_NAME, "editconfig_gedcom.php")===false)
+	&&(strstr(SCRIPT_NAME, "addmedia.php")===false)
+	&&(strstr(SCRIPT_NAME, "addnewgedcom.php")===false)
+	&&(strstr(SCRIPT_NAME, "admin.php")===false)
+	&&(strstr(SCRIPT_NAME, "admin_maint.php")===false)
+	&&(strstr(SCRIPT_NAME, "backup.php")===false)
+	&&(strstr(SCRIPT_NAME, "config_download.php")===false)
+	&&(strstr(SCRIPT_NAME, "config_maint.php")===false)
+	&&(strstr(SCRIPT_NAME, "edit_privacy.php")===false)
+	&&(strstr(SCRIPT_NAME, "editconfig_help.php")===false)
+	&&(strstr(SCRIPT_NAME, "editgedcoms.php")===false)
+	&&(strstr(SCRIPT_NAME, "help_text.php")===false)
+	&&(strstr(SCRIPT_NAME, "importgedcom.php")===false)
+	&&(strstr(SCRIPT_NAME, "lockout_maint.php")===false)
+	&&(strstr(SCRIPT_NAME, "login.php")===false)
+	&&(strstr(SCRIPT_NAME, "sanity.php")===false)
+	&&(strstr(SCRIPT_NAME, "uploadgedcom.php")===false)
+	&&(strstr(SCRIPT_NAME, "useradmin.php")===false)
+	&&(strstr(SCRIPT_NAME, "validategedcom.php")===false)
+	&&(strstr(SCRIPT_NAME, "viewlog.php")===false)) {
 		if (((count($GEDCOMS)==0)||(!CheckForImport($GEDCOMID)))&&empty($logout)) {
 			header("Location: editgedcoms.php");
 			exit;
@@ -720,10 +720,10 @@ if ((strstr($SCRIPT_NAME, "editconfig.php")===false) &&(strstr($SCRIPT_NAME, "ed
 	
 	if (GedcomConfig::$REQUIRE_AUTHENTICATION) {
 		if (empty($gm_username)) {
-			if ((strstr($SCRIPT_NAME, "login.php")===false)
-				&&(strstr($SCRIPT_NAME, "login_register.php")===false)
-				&&(strstr($SCRIPT_NAME, "help_text.php")===false)
-				&&(strstr($SCRIPT_NAME, "message.php")===false)) {
+			if ((strstr(SCRIPT_NAME, "login.php")===false)
+				&&(strstr(SCRIPT_NAME, "login_register.php")===false)
+				&&(strstr(SCRIPT_NAME, "help_text.php")===false)
+				&&(strstr(SCRIPT_NAME, "message.php")===false)) {
 				$url = basename($_SERVER["SCRIPT_NAME"])."?".$QUERY_STRING;
 				if (stristr($url, "index.php")!==false) {
 					if (stristr($url, "command=")===false) {
@@ -740,10 +740,6 @@ if ((strstr($SCRIPT_NAME, "editconfig.php")===false) &&(strstr($SCRIPT_NAME, "ed
 		}
 	}
 
-	// -- setup session information for tree clippings cart features
-	if (!isset($_SESSION['cart'])) $_SESSION['cart'] = array();
-	$cart = $_SESSION['cart'];
-	
 	$_SESSION['CLANGUAGE'] = $LANGUAGE;
 	if (!isset($_SESSION["timediff"])) {
 		$_SESSION["timediff"] = 0;

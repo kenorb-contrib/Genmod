@@ -142,8 +142,8 @@ function MM(e) {
 			}
 			yearform = document.getElementById('yearform'+personnum);
 			ageform = document.getElementById('ageform'+personnum);
-			yearform.innerHTML = year+"      "+month+" <?php print GetFirstLetter($gm_lang["month"]);?>   "+day+" <?php print GetFirstLetter($gm_lang["day"]);?>";
-			ageform.innerHTML = (ba*yage)+" <?php print GetFirstLetter($gm_lang["year"]);?>   "+(ba*mage)+" <?php print GetFirstLetter($gm_lang["month"]);?>   "+(ba*dage)+" <?php print GetFirstLetter($gm_lang["day"]);?>";
+			yearform.innerHTML = year+"      "+month+" <?php print GetFirstLetter(GM_LANG_month);?>   "+day+" <?php print GetFirstLetter(GM_LANG_day);?>";
+			ageform.innerHTML = (ba*yage)+" <?php print GetFirstLetter(GM_LANG_year);?>   "+(ba*mage)+" <?php print GetFirstLetter(GM_LANG_month);?>   "+(ba*dage)+" <?php print GetFirstLetter(GM_LANG_day);?>";
 			var line = document.getElementById('ageline'+personnum);
 			temp = newx-oldx;
 			if (textDirection=='rtl') temp = temp * -1;
@@ -243,7 +243,7 @@ document.onmousemove = MM;
 document.onmouseup = MU;
 //-->
 </script>
-<h3><?php print $gm_lang["timeline_chart"]; ?></h3>
+<h3><?php print GM_LANG_timeline_chart; ?></h3>
 <form name="people" action="timeline.php">
 <?php
 $controller->checkPrivacy();
@@ -270,19 +270,19 @@ $controller->checkPrivacy();
 			case "M":
 				$seximage = GM_IMAGE_DIR."/".$GM_IMAGES["sex"]["small"];
 				?>
-				<img src="<?php print $seximage; ?>" title="<?php print $gm_lang["male"]; ?>" alt="<?php print $gm_lang["male"]; ?>" vspace="0" hspace="0" class="sex_image" border="0" />
+				<img src="<?php print $seximage; ?>" title="<?php print GM_LANG_male; ?>" alt="<?php print GM_LANG_male; ?>" vspace="0" hspace="0" class="sex_image" border="0" />
 				<?php
 				break;
 			case "F":
 				$seximage = GM_IMAGE_DIR."/".$GM_IMAGES["sexf"]["small"];
 				?>
-				<img src="<?php print $seximage; ?>" title="<?php print $gm_lang["female"]; ?>" alt="<?php print $gm_lang["female"]; ?>" vspace="0" hspace="0" class="sex_image" border="0" />
+				<img src="<?php print $seximage; ?>" title="<?php print GM_LANG_female; ?>" alt="<?php print GM_LANG_female; ?>" vspace="0" hspace="0" class="sex_image" border="0" />
 				<?php
 				break;
 			default:
 				$seximage = GM_IMAGE_DIR."/".$GM_IMAGES["sexn"]["small"];
 				?>
-				<img src="<?php print $seximage; ?>" title="<?php print $gm_lang["sex"]." ".$gm_lang["unknown"]; ?>" alt="<?php print $gm_lang["sex"]." ".$gm_lang["unknown"]; ?>" vspace="0" hspace="0" class="sex_image" border="0" />
+				<img src="<?php print $seximage; ?>" title="<?php print GM_LANG_sex." ".GM_LANG_unknown; ?>" alt="<?php print GM_LANG_sex." ".GM_LANG_unknown; ?>" vspace="0" hspace="0" class="sex_image" border="0" />
 				<?php
 				break;
 			}
@@ -296,11 +296,11 @@ $controller->checkPrivacy();
 				print_help_link("remove_person_help", "qm");
 				?>
 				<a href="timeline.php?<?php print $controller->pidlinks; ?>&amp;scale=<?php print $controller->scale; ?>&amp;remove=<?php print $pid;?>" >
-				<span class="details1"><?php print $gm_lang["remove_person"]; ?></span></a>
+				<span class="details1"><?php print GM_LANG_remove_person; ?></span></a>
 			<?php if ($indi->brec != "") { ?>
 				<span class="details1"><br />
 				<?php print_help_link("show_age_marker_help", "qm"); ?>
-				<?php print $gm_lang["show_age"]; ?>
+				<?php print GM_LANG_show_age; ?>
 				<input type="checkbox" name="agebar<?php print $p; ?>" value="ON" onclick="showhide('agebox<?php print $p; ?>', this);" />
 				</span>
 			<?php }
@@ -317,7 +317,7 @@ $controller->checkPrivacy();
 				print_help_link("remove_person_help", "qm");
 				?>
 				<a href="timeline.php?<?php print $controller->pidlinks; ?>&amp;scale=<?php print $controller->scale; ?>&amp;remove=<?php print $pid;?>" >
-				<span class="details1"><?php print $gm_lang["remove_person"]; ?></span></a>
+				<span class="details1"><?php print GM_LANG_remove_person; ?></span></a>
 			<?php } ?>
 			<br />
 		<?php } ?>
@@ -328,19 +328,19 @@ $controller->checkPrivacy();
 		?>
 		<td class="person<?php print $col; ?>" style="padding: 5px" valign="top">
 			<?php print_help_link("add_person_help", "qm"); ?>
-			<?php print $gm_lang["add_another"];?>&nbsp;
+			<?php print GM_LANG_add_another;?>&nbsp;
 			<input class="pedigree_form" type="text" size="5" id="newpid" name="newpid" />&nbsp;
 			<?php LinkFunctions::PrintFindIndiLink("newpid","");?>
 			<br />
 			<br />
-			<div style="text-align: center"><input type="submit" value="<?php print $gm_lang["show"]; ?>" /></div>
+			<div style="text-align: center"><input type="submit" value="<?php print GM_LANG_show; ?>" /></div>
 		</td>
 	<?php }
 	if ((count($controller->people)>0)&&(!$controller->isPrintPreview())) {
 		?>
 		<td class="list_value" style="padding: 5px">
-			<a href="<?php print $SCRIPT_NAME."?".$controller->pidlinks."scale=".($controller->scale+2); ?>"><?php print $gm_lang["zoom_in"]; ?></a><br />
-			<a href="<?php print $SCRIPT_NAME."?".$controller->pidlinks."scale=".($controller->scale-2); ?>"><?php print $gm_lang["zoom_out"]; ?></a>
+			<a href="<?php print SCRIPT_NAME."?".$controller->pidlinks."scale=".($controller->scale+2); ?>"><?php print GM_LANG_zoom_in; ?></a><br />
+			<a href="<?php print SCRIPT_NAME."?".$controller->pidlinks."scale=".($controller->scale-2); ?>"><?php print GM_LANG_zoom_out; ?></a>
 		</td>
 	<?php } ?>
 	</tr>
@@ -349,7 +349,7 @@ $controller->checkPrivacy();
 <?php
 if (count($controller->people)>0) {
 	?>
-	<?php if ($controller->isPrintPreview()) print "\n\t".$gm_lang['timeline_instructions']."<br /><br />"; ?>
+	<?php if ($controller->isPrintPreview()) print "\n\t".GM_LANG_timeline_instructions."<br /><br />"; ?>
 <div id="timeline_chart">
 	<!-- print the timeline line image -->
 	<div id="line" style="position:absolute; <?php print $TEXT_DIRECTION =="ltr"?"left: ".($basexoffset+20):"right: ".($basexoffset+20); ?>px; top: <?php print $baseyoffset; ?>px; ">
@@ -397,12 +397,12 @@ if (count($controller->people)>0) {
 						?>
 						<table class="person<?php print $col; ?>" style="cursor: hand;">
 							<tr>
-								<td valign="top" width="120"><?php print $gm_lang["year"]; ?>  
+								<td valign="top" width="120"><?php print GM_LANG_year; ?>  
 									<span id="yearform<?php print $p; ?>" class="field">
 									<?php print $tyear; ?>
 									</span>
 								</td>
-								<td valign="top" width="130">(<?php print $gm_lang["age"];?>  
+								<td valign="top" width="130">(<?php print GM_LANG_age;?>  
 									<span id="ageform<?php print $p; ?>" class="field"><?php print $tage; ?></span>) 
 								</td>
 							</tr>

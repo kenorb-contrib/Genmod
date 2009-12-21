@@ -31,7 +31,7 @@ require("config.php");
 
 if (!isset($action)) $action="compose";
 
-PrintSimpleHeader($gm_lang["Genmod_message"]);
+PrintSimpleHeader(GM_LANG_Genmod_message);
 
 if (!isset($subject)) $subject = "";
 if (!isset($url)) $url = "";
@@ -42,12 +42,12 @@ if (!isset($from_name)) $from_name="";
 if (!isset($from_email)) $from_email="";
 
 if (empty($to)) {
-	print "<span class=\"error\">".$gm_lang["no_to_user"]."</span><br />";
+	print "<span class=\"error\">".GM_LANG_no_to_user."</span><br />";
 	PrintSimpleFooter();
 	exit;
 }
 if ($to=="all" && !$gm_user->userIsAdmin()) {
-	print "<span class=\"error\">".$gm_lang["no_to_user"]."</span><br />";
+	print "<span class=\"error\">".GM_LANG_no_to_user."</span><br />";
 	PrintSimpleFooter();
 	exit;
 }
@@ -59,7 +59,7 @@ if (($action=="send")&&(isset($_SESSION["good_to_send"]))&&($_SESSION["good_to_s
 	$tuser =& User::GetInstance($from);
 	if ($tuser->is_empty) {
 		if (!CheckEmailAddress($from)) {
-			print "<center><br /><span class=\"error\">".$gm_lang["invalid_email"]."</span>\n";
+			print "<center><br /><span class=\"error\">".GM_LANG_invalid_email."</span>\n";
 			print "<br /><br /></center>";
 			$action="compose";
 	    }
@@ -118,7 +118,7 @@ if (($action=="send")&&(isset($_SESSION["good_to_send"]))&&($_SESSION["good_to_s
 			$message->url = $url;
 			if ($i>0) $message->no_from = true;
 			if ($message->AddMessage()) {
-				print $gm_lang["message_sent"]." - ";
+				print GM_LANG_message_sent." - ";
 				$touser =& User::GetInstance($to);
 				if ($touser->username != $from) print $touser->firstname."&nbsp;".$touser->lastname."<br />";
 				else print $to;
@@ -129,14 +129,14 @@ if (($action=="send")&&(isset($_SESSION["good_to_send"]))&&($_SESSION["good_to_s
 }
 
 if ($action=="compose") {
-	print '<span class="subheaders">'.$gm_lang["message"].'</span>';
+	print '<span class="subheaders">'.GM_LANG_message.'</span>';
 	$_SESSION["good_to_send"] = true;
 	?>
 	<!--
 	<script language="JavaScript" type="text/javascript">
 		function validateEmail(email) {
 			if (email.value.search("(.*)@(.*)")==-1) {
-				alert('<?php print $gm_lang["invalid_email"]; ?>');
+				alert('<?php print GM_LANG_invalid_email; ?>');
 				email.focus();
 				return false;
 			}
@@ -144,12 +144,12 @@ if ($action=="compose") {
 		}
 		function checkForm(frm) {
 			if (frm.subject.value=="") {
-				alert('<?php print $gm_lang["enter_subject"]; ?>');
+				alert('<?php print GM_LANG_enter_subject; ?>');
 				document.messageform.subject.focus();
 				return false;
 			}
 			if (frm.body.value=="") {
-				alert('<?php print $gm_lang["enter_body"]; ?>');
+				alert('<?php print GM_LANG_enter_body; ?>');
 				document.messageform.body.focus();
 				return false;
 			}
@@ -160,7 +160,7 @@ if ($action=="compose") {
 	<?php
 	$username = $gm_user->username;
 	if (empty($username)) {
-		print "<br /><br />".$gm_lang["message_instructions"];
+		print "<br /><br />".GM_LANG_message_instructions;
 	}
 	print "<br /><form name=\"messageform\" method=\"post\" action=\"message.php\" onsubmit=\"t = new Date(); document.messageform.time.value=t.toUTCString(); ";
 	if (empty($username)) print "return validateEmail(document.messageform.from_email);";
@@ -170,15 +170,15 @@ if ($action=="compose") {
 	$touser =& User::GetInstance($to);
 	$lang_temp = "lang_name_".$touser->language;
 	if (!empty($touser->username)) {
-		print "<tr><td></td><td>".str_replace("#TO_USER#", "<b>".$touser->firstname." ".$touser->lastname."</b>", $gm_lang["sending_to"])."<br />";
-		print str_replace("#USERLANG#", "<b>".$gm_lang[$lang_temp]."</b>", $gm_lang["preferred_lang"])."</td></tr>\n";
+		print "<tr><td></td><td>".str_replace("#TO_USER#", "<b>".$touser->firstname." ".$touser->lastname."</b>", GM_LANG_sending_to)."<br />";
+		print str_replace("#USERLANG#", "<b>".constant("GM_LANG_".$lang_temp)."</b>", GM_LANG_preferred_lang)."</td></tr>\n";
 	}
 
 	if (empty($username)){
-		print "<tr><td valign=\"top\" width=\"15%\" align=\"right\">".$gm_lang["message_from_name"]."</td>";
-		print "<td><input type=\"text\" name=\"from_name\" size=\"40\" value=\"$from_name\" /></td></tr><tr><td valign=\"top\" align=\"right\">".$gm_lang["message_from"]."</td><td class=\"wrap\"><input type=\"text\" name=\"from_email\" size=\"40\" value=\"$from_email\" onchange=\"sndReq('mailerr', 'checkemail', 'email', this.value);\" /> <span id=\"mailerr\"></span><br />".$gm_lang["provide_email"]."<br /><br /></td></tr>\n";
+		print "<tr><td valign=\"top\" width=\"15%\" align=\"right\">".GM_LANG_message_from_name."</td>";
+		print "<td><input type=\"text\" name=\"from_name\" size=\"40\" value=\"$from_name\" /></td></tr><tr><td valign=\"top\" align=\"right\">".GM_LANG_message_from."</td><td class=\"wrap\"><input type=\"text\" name=\"from_email\" size=\"40\" value=\"$from_email\" onchange=\"sndReq('mailerr', 'checkemail', 'email', this.value);\" /> <span id=\"mailerr\"></span><br />".GM_LANG_provide_email."<br /><br /></td></tr>\n";
 	}
-	print "<tr><td align=\"right\">".$gm_lang["message_subject"]."</td>";
+	print "<tr><td align=\"right\">".GM_LANG_message_subject."</td>";
 	print "<td>";
 	if (!empty($username)){
 		print "<input type=\"hidden\" name=\"from\" value=\"$username\"/>\n";
@@ -189,16 +189,16 @@ if ($action=="compose") {
 	print "<input type=\"hidden\" name=\"method\" value=\"$method\" />\n";
 	print "<input type=\"hidden\" name=\"url\" value=\"$url\" />\n";
 	print "<input type=\"text\" name=\"subject\" size=\"50\" value=\"".stripslashes($subject)."\" /><br /></td></tr>\n";
-	print "<tr><td valign=\"top\" align=\"right\">".$gm_lang["message_body"]."<br /></td><td><textarea name=\"body\" cols=\"50\" rows=\"7\">$body</textarea><br /></td></tr>\n";
-	print "<tr><td></td><td><input type=\"submit\" value=\"".$gm_lang["send"]."\" /></td></tr>\n";
+	print "<tr><td valign=\"top\" align=\"right\">".GM_LANG_message_body."<br /></td><td><textarea name=\"body\" cols=\"50\" rows=\"7\">$body</textarea><br /></td></tr>\n";
+	print "<tr><td></td><td><input type=\"submit\" value=\"".GM_LANG_send."\" /></td></tr>\n";
 	print "</table>\n";
 	print "</form>\n";
 	if ($method=="messaging2") print_text("messaging2_help");
 }
 else if ($action=="delete") {
-	if (MessageController::deleteMessage($id)) print $gm_lang["message_deleted"];
+	if (MessageController::deleteMessage($id)) print GM_LANG_message_deleted;
 }
-print "<center><br /><br /><a href=\"#\" onclick=\"if (window.opener.refreshpage) window.opener.refreshpage(); window.close();\">".$gm_lang["close_window"]."</a><br /></center>";
+print "<center><br /><br /><a href=\"#\" onclick=\"if (window.opener.refreshpage) window.opener.refreshpage(); window.close();\">".GM_LANG_close_window."</a><br /></center>";
 
 PrintSimpleFooter();
 ?>

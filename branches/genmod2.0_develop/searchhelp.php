@@ -57,7 +57,7 @@ class SearchHelp {
 	}
 	
 	function AddHeader(&$gm_lang) {
-		PrintSimpleHeader($gm_lang["hs_title"]);
+		PrintSimpleHeader(GM_LANG_hs_title);
 	}
 	
 	function AddFooter() {
@@ -91,34 +91,34 @@ class SearchHelp {
 		<form name="entersearch" action="<?php echo $_SERVER['SCRIPT_NAME']; ?>" method="post" >
 			<input name="action" type="hidden" value="search" />
 			<input type="hidden" name="page" value="<?php echo $genmod['page'];?>" />
-			<div class="topbottombar"><?php print_help_link("hs_title_help", "qm", "hs_title"); echo $gm_lang["hs_title"]; ?></div>
+			<div class="topbottombar"><?php print_help_link("hs_title_help", "qm", "hs_title"); echo GM_LANG_hs_title; ?></div>
 			<!-- // Enter the keyword(s) -->
 			<div id="searchhelp_text">
-				<label for="searchtext"><?php print_help_link("hs_keyword_advice", "qm", "hs_keyword"); echo $gm_lang["hs_keyword"]; ?></label>
+				<label for="searchtext"><?php print_help_link("hs_keyword_advice", "qm", "hs_keyword"); echo GM_LANG_hs_keyword; ?></label>
 				<input type="text" id="searchtext" name="searchtext" dir="ltr" size="60" value="<?php echo $this->searchtext; ?>" />
 			</div>
 			<!-- // How to search -->
 			<div id="searchhelp_how">
-				<label for="searchhow"><?php print_help_link("hs_searchhow_advice", "qm", "hs_searchhow"); echo $gm_lang["hs_searchhow"]; ?></label>
+				<label for="searchhow"><?php print_help_link("hs_searchhow_advice", "qm", "hs_searchhow"); echo GM_LANG_hs_searchhow; ?></label>
 				<input type="radio" id="searchhow" name="searchhow" dir="ltr" value="any"
 				<?php
 				if ($this->searchhow == "any") echo " checked=\"checked\"";
-				echo " />".$gm_lang["hs_searchany"];
+				echo " />".GM_LANG_hs_searchany;
 				?>
 				<input type="radio" name="searchhow" dir="ltr" value="all"
 				<?php
 				if ($this->searchhow == "all") echo " checked=\"checked\"";
-				echo " />".$gm_lang["hs_searchall"];
+				echo " />".GM_LANG_hs_searchall;
 				?>
 				<input type="radio" name="searchhow" dir="ltr" value="sentence"
 				<?php
 				if ($this->searchhow == "sentence") echo " checked=\"checked\"";
-				echo " />".$gm_lang["hs_searchsentence"];
+				echo " />".GM_LANG_hs_searchsentence;
 				?>
 			</div>
 			<div class="topbottombar">
-				<input type="submit" name="entertext" value="<?php echo $gm_lang["hs_search"];?>" />
-				<input type="button" value="<?php echo $gm_lang["hs_close"]; ?>" onclick='self.close();' />
+				<input type="submit" name="entertext" value="<?php echo GM_LANG_hs_search;?>" />
+				<input type="button" value="<?php echo GM_LANG_hs_close; ?>" onclick='self.close();' />
 			</div>
 		</form>
 		<?php
@@ -129,10 +129,10 @@ class SearchHelp {
 		if (UserIsAdmin($gm_username)) {
 			echo "<td class=\"shade1\"><input type=\"checkbox\" name=\"searchuser\" dir=\"ltr\" value=\"yes\"";
 			if ($this->searchuser == "yes") echo " checked=\"checked\"";
-			echo " />".$gm_lang["hs_searchuser"]."<br />";
+			echo " />".GM_LANG_hs_searchuser."<br />";
 			echo "<input type=\"checkbox\" name=\"searchconfig\" dir=\"ltr\" value=\"yes\"";
 			if ($this->searchconfig == "yes") echo " checked=\"checked\"";
-			echo " />".$gm_lang["hs_searchconfig"]."</td></tr><tr>";
+			echo " />".GM_LANG_hs_searchconfig."</td></tr><tr>";
 		}
 		*/
 	}
@@ -187,7 +187,7 @@ class SearchHelp {
 		// Print total results, if a search has been performed
 		if (!empty($this->searchtext)) {
 			echo $this->searchresults;
-			echo '<div id="searchhelp_result" class="topbottombar">'.$gm_lang["hs_results"].' '.$this->found.'</div>';
+			echo '<div id="searchhelp_result" class="topbottombar">'.GM_LANG_hs_results.' '.$this->found.'</div>';
 		}
 	}
 }
