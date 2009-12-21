@@ -27,7 +27,7 @@
  * @todo add a time configuration option
  */
 
-$GM_BLOCKS["review_changes_block"]["name"]      = $gm_lang["review_changes_block"];
+$GM_BLOCKS["review_changes_block"]["name"]      = GM_LANG_review_changes_block;
 $GM_BLOCKS["review_changes_block"]["descr"]     = "review_changes_descr";
 $GM_BLOCKS["review_changes_block"]["canconfig"]	= true;
 $GM_BLOCKS["review_changes_block"]["config"] 	= array("days"=>1, "sendmail"=>"yes");
@@ -38,7 +38,7 @@ $GM_BLOCKS["review_changes_block"]["rss"]       = false;
  * Prints a block allowing the user review all changes pending approval
  */
 function review_changes_block($block = true, $config="", $side, $index) {
-	global $gm_lang, $GEDCOMID, $GEDCOMS, $command, $SCRIPT_NAME, $QUERY_STRING, $GM_IMAGES;
+	global $GEDCOMID, $GEDCOMS, $command, $QUERY_STRING, $GM_IMAGES;
 	global $gm_changes, $TEXT_DIRECTION, $SHOW_SOURCES, $TIME_FORMAT, $GM_BLOCKS, $gm_user;
 
 	if (!GedcomConfig::$ALLOW_EDIT_GEDCOM) return;
@@ -67,10 +67,10 @@ function review_changes_block($block = true, $config="", $side, $index) {
 								$message->to = $username;
 								$host = preg_replace("/^www\./i", "", $_SERVER["SERVER_NAME"]);
 								$message->from = "Genmod-noreply@".$host;
-								$message->subject = $gm_lang["review_changes_subject"];
-								$message->body = $gm_lang["review_changes_body"];
+								$message->subject = GM_LANG_review_changes_subject;
+								$message->body = GM_LANG_review_changes_body;
 								$message->method = $user->contactmethod;
-								$message->url = basename($SCRIPT_NAME)."?".$QUERY_STRING;
+								$message->url = basename(SCRIPT_NAME)."?".$QUERY_STRING;
 								$message->no_from = true;
 								$message->AddMessage();
 							}
@@ -88,24 +88,24 @@ function review_changes_block($block = true, $config="", $side, $index) {
 			if ((($command=="gedcom")&&($gm_user->userGedcomAdmin())) || (($command=="user")&&($gm_user->username != ""))) {
 				if ($command=="gedcom") $name = preg_replace("/'/", "\'", get_gedcom_from_id($GEDCOMID));
 				else $name = $gm_user->username;
-				print "<a href=\"javascript: ".$gm_lang["config_block"]."\" onclick=\"window.open('index_edit.php?name=$name&amp;command=$command&amp;action=configure&amp;side=$side&amp;index=$index', '', 'top=50,left=50,width=500,height=250,scrollbars=1,resizable=1'); return false;\">";
-				print "<img class=\"adminicon\" src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["admin"]["small"]."\" width=\"15\" height=\"15\" border=\"0\" alt=\"".$gm_lang["config_block"]."\" /></a>\n";
+				print "<a href=\"javascript: ".GM_LANG_config_block."\" onclick=\"window.open('index_edit.php?name=$name&amp;command=$command&amp;action=configure&amp;side=$side&amp;index=$index', '', 'top=50,left=50,width=500,height=250,scrollbars=1,resizable=1'); return false;\">";
+				print "<img class=\"adminicon\" src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["admin"]["small"]."\" width=\"15\" height=\"15\" border=\"0\" alt=\"".GM_LANG_config_block."\" /></a>\n";
 			}
 		}
-		print $gm_lang["review_changes"];
+		print GM_LANG_review_changes;
 		print "</div>";
 		print "<div class=\"blockcontent\">";
-		if ($gm_user->userCanAccept()) print "<a href=\"#\" onclick=\"window.open('edit_changes.php','','width=600,height=600,resizable=1,scrollbars=1'); return false;\">".$gm_lang["accept_changes"]."</a><br />\n";
+		if ($gm_user->userCanAccept()) print "<a href=\"#\" onclick=\"window.open('edit_changes.php','','width=600,height=600,resizable=1,scrollbars=1'); return false;\">".GM_LANG_accept_changes."</a><br />\n";
 		if ($block) print "<div class=\"small_inner_block, $TEXT_DIRECTION\">\n";
 		if ($config["sendmail"]=="yes" && GedcomConfig::$LAST_CHANGE_EMAIL != 0) {
 			$day = date("j", GedcomConfig::$LAST_CHANGE_EMAIL);
 			$mon = date("M", GedcomConfig::$LAST_CHANGE_EMAIL);
 			$year = date("Y", GedcomConfig::$LAST_CHANGE_EMAIL);
-			print $gm_lang["last_email_sent"].GetChangedDate("$day $mon $year")." - ".date($TIME_FORMAT, GedcomConfig::$LAST_CHANGE_EMAIL)."<br />\n";
+			print GM_LANG_last_email_sent.GetChangedDate("$day $mon $year")." - ".date($TIME_FORMAT, GedcomConfig::$LAST_CHANGE_EMAIL)."<br />\n";
 			$day = date("j", GedcomConfig::$LAST_CHANGE_EMAIL+(60*60*24*$config["days"]));
 			$mon = date("M", GedcomConfig::$LAST_CHANGE_EMAIL+(60*60*24*$config["days"]));
 			$year = date("Y", GedcomConfig::$LAST_CHANGE_EMAIL+(60*60*24*$config["days"]));
-			print $gm_lang["next_email_sent"].GetChangedDate("$day $mon $year")." - ".date($TIME_FORMAT, GedcomConfig::$LAST_CHANGE_EMAIL+(60*60*24*$config["days"]))."<br /><br />\n";
+			print GM_LANG_next_email_sent.GetChangedDate("$day $mon $year")." - ".date($TIME_FORMAT, GedcomConfig::$LAST_CHANGE_EMAIL+(60*60*24*$config["days"]))."<br /><br />\n";
 		}
 		$gm_changes = GetChangeData(false, "", true, "gedlines");
 		foreach($gm_changes as $gedcomid=>$changes) {
@@ -134,12 +134,12 @@ function review_changes_block($block = true, $config="", $side, $index) {
 					}
 					else print "<b>".constant("GM_FACT_".$type)."</b> &lrm;(".$gid.")&lrm;\n";
 					if ($block) print "<br />";
-					if ($type=="INDI") print " <a href=\"individual.php?pid=".$person->xref."&amp;gedid=".$person->gedcomid."\">".$gm_lang["view_change_diff"]."</a>\n<br />";
-					if ($type=="FAM") print " <a href=\"family.php?famid=".$family->xref."&amp;gedid=".$family->gedcomid."\">".$gm_lang["view_change_diff"]."</a>\n<br />";
-					if ($type=="OBJE") print " <a href=\"mediadetail.php?mid=".$media->xref."&amp;gedid=".$media->gedcomid."\">".$gm_lang["view_change_diff"]."</a>\n<br />";
-					if ($type=="SOUR") print " <a href=\"source.php?sid=".$source->xref."&amp;gedid=".$source->gedcomid."\">".$gm_lang["view_change_diff"]."</a>\n<br />";
-					if ($type=="REPO") print " <a href=\"repo.php?rid=".$repo->xref."&amp;gedid=".$repo->gedcomid."\">".$gm_lang["view_change_diff"]."</a>\n<br />";
-					if ($type=="NOTE") print " <a href=\"note.php?oid=".$media->xref."&amp;gedid=".$media->gedcomid."\">".$gm_lang["view_change_diff"]."</a>\n<br />";
+					if ($type=="INDI") print " <a href=\"individual.php?pid=".$person->xref."&amp;gedid=".$person->gedcomid."\">".GM_LANG_view_change_diff."</a>\n<br />";
+					if ($type=="FAM") print " <a href=\"family.php?famid=".$family->xref."&amp;gedid=".$family->gedcomid."\">".GM_LANG_view_change_diff."</a>\n<br />";
+					if ($type=="OBJE") print " <a href=\"mediadetail.php?mid=".$media->xref."&amp;gedid=".$media->gedcomid."\">".GM_LANG_view_change_diff."</a>\n<br />";
+					if ($type=="SOUR") print " <a href=\"source.php?sid=".$source->xref."&amp;gedid=".$source->gedcomid."\">".GM_LANG_view_change_diff."</a>\n<br />";
+					if ($type=="REPO") print " <a href=\"repo.php?rid=".$repo->xref."&amp;gedid=".$repo->gedcomid."\">".GM_LANG_view_change_diff."</a>\n<br />";
+					if ($type=="NOTE") print " <a href=\"note.php?oid=".$media->xref."&amp;gedid=".$media->gedcomid."\">".GM_LANG_view_change_diff."</a>\n<br />";
 				}
 			}
 		}
@@ -150,19 +150,19 @@ function review_changes_block($block = true, $config="", $side, $index) {
 }
 
 function review_changes_block_config($config) {
-	global $gm_lang, $GM_BLOCKS, $TEXT_DIRECTION;
+	global $GM_BLOCKS, $TEXT_DIRECTION;
 	if (empty($config)) $config = $GM_BLOCKS["review_changes_block"]["config"];
 	print "<table class=\"facts_table ".$TEXT_DIRECTION."\">";
-	print "<tr><td class=\"shade2\">".$gm_lang["review_changes_email"]."</td><td class=\"shade1\">";
+	print "<tr><td class=\"shade2\">".GM_LANG_review_changes_email."</td><td class=\"shade1\">";
 	print "&nbsp;<select name='sendmail'>";
 		print "<option value='yes'";
 		if ($config["sendmail"]=="yes") print " selected='selected'";
-		print ">".$gm_lang["yes"]."</option>";
+		print ">".GM_LANG_yes."</option>";
 		print "<option value='no'";
 		if ($config["sendmail"]=="no") print " selected='selected'";
-		print ">".$gm_lang["no"]."</option>";
+		print ">".GM_LANG_no."</option>";
 	print "</select></td></tr>";
-	print "<tr><td class=\"shade2\">".$gm_lang["review_changes_email_freq"]."</td><td class=\"shade1\"><input type='text' name='days' value='".$config["days"]."' size='2' /></td></tr>";
+	print "<tr><td class=\"shade2\">".GM_LANG_review_changes_email_freq."</td><td class=\"shade1\"><input type='text' name='days' value='".$config["days"]."' size='2' /></td></tr>";
 	print "</table>";
 }
 

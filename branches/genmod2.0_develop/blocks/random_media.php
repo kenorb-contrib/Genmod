@@ -27,14 +27,14 @@
  */
 
 //-- only enable this block if multi media has been enabled
-$GM_BLOCKS["print_random_media"]["name"]		= $gm_lang["random_media_block"];
+$GM_BLOCKS["print_random_media"]["name"]		= GM_LANG_random_media_block;
 $GM_BLOCKS["print_random_media"]["descr"]		= "random_media_descr";
 $GM_BLOCKS["print_random_media"]["canconfig"]	= false;
 $GM_BLOCKS["print_random_media"]["rss"]     = false;
 
 //-- function to display a random picture from the gedcom
 function print_random_media($block = true, $config="", $side, $index) {
-	global $gm_lang, $TEXT_DIRECTION, $GM_IMAGES;
+	global $TEXT_DIRECTION, $GM_IMAGES;
 	global $MEDIATYPE;
 	
 	srand();
@@ -46,7 +46,7 @@ function print_random_media($block = true, $config="", $side, $index) {
 		print "<div id=\"random_picture\" class=\"block\">\n";
 		print "<div class=\"blockhc ltr\">";
 		print_help_link("index_media_help", "qm", "random_picture");
-		print $gm_lang["random_picture"];
+		print GM_LANG_random_picture;
 		print "</div>";
 		print "<div class=\"blockcontent";
 		if ($block) print " details1 wrap\"";
@@ -91,22 +91,22 @@ function print_random_media($block = true, $config="", $side, $index) {
 			print "</a>";
 		}
 		foreach($media->indilist as $key => $indi) {
-			print " <a href=\"individual.php?pid=".$indi->xref."&amp;gedid=".$indi->gedcomid."\">".$gm_lang["view_person"].": ";
+			print " <a href=\"individual.php?pid=".$indi->xref."&amp;gedid=".$indi->gedcomid."\">".GM_LANG_view_person.": ";
 			print $indi->name.($indi->addname == "" ? "" : " - ".$indi->addname).$indi->addxref;
 			print "</a><br />";
 		}
 		foreach($media->famlist as $key => $family) {
-			print " <a href=\"family.php?famid=".$family->xref."&amp;gedid=".$family->gedcomid."\">".$gm_lang["view_family"].": ";
+			print " <a href=\"family.php?famid=".$family->xref."&amp;gedid=".$family->gedcomid."\">".GM_LANG_view_family.": ";
 			print $family->descriptor.$family->addxref;
 			print "</a><br />";
 		}
 		foreach($media->sourcelist as $key => $source) {
-			print " <a href=\"source.php?sid=".$source->xref."&amp;gedid=".$source->gedcomid."\">".$gm_lang["view_source"].": ";
+			print " <a href=\"source.php?sid=".$source->xref."&amp;gedid=".$source->gedcomid."\">".GM_LANG_view_source.": ";
 			print $source->descriptor.$source->addxref;
 			print "</a><br />";
 		}
 		foreach($media->repolist as $key => $repo) {
-			print " <a href=\"repo.php?rid=".$repo->xref."&amp;gedid=".$repo->gedcomid."\">".$gm_lang["view_repo"].": ";
+			print " <a href=\"repo.php?rid=".$repo->xref."&amp;gedid=".$repo->gedcomid."\">".GM_LANG_view_repo.": ";
 			print $repo->descriptor.$repo->addxref;
 			print "</a><br />";
 		}

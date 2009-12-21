@@ -26,7 +26,7 @@
  * @version $Id$
  */
 
-$GM_BLOCKS["print_recent_changes"]["name"]      = $gm_lang["recent_changes_block"];
+$GM_BLOCKS["print_recent_changes"]["name"]      = GM_LANG_recent_changes_block;
 $GM_BLOCKS["print_recent_changes"]["descr"]     = "recent_changes_descr";
 $GM_BLOCKS["print_recent_changes"]["canconfig"]	= true;
 $GM_BLOCKS["print_recent_changes"]["config"] 	= array("days"=>30, "hide_empty"=>"no");
@@ -38,7 +38,7 @@ $GM_BLOCKS["print_recent_changes"]["rss"]       = true;
  * @todo Find out why TOTAL_QUERIES is here???
 **/
 function print_recent_changes($block=true, $config="", $side, $index) {
-	global $gm_lang, $month, $year, $day, $monthtonum, $HIDE_LIVE_PEOPLE, $command, $TEXT_DIRECTION;
+	global $month, $year, $day, $monthtonum, $HIDE_LIVE_PEOPLE, $command, $TEXT_DIRECTION;
 	global $GM_IMAGES, $GEDCOMID, $ASC, $IGNORE_FACTS, $IGNORE_YEAR, $TOTAL_QUERIES, $LAST_QUERY, $GM_BLOCKS, $SHOW_SOURCES;
 	global $medialist, $gm_user;
 
@@ -65,17 +65,18 @@ function print_recent_changes($block=true, $config="", $side, $index) {
 		if ((($command=="gedcom")&&($gm_user->userGedcomAdmin())) || (($command=="user")&&(!empty($username)))) {
 			if ($command=="gedcom") $name = preg_replace("/'/", "\'", get_gedcom_from_id($GEDCOMID));
 			else $name = $username;
-			print "<a href=\"javascript: ".$gm_lang["config_block"]."\" onclick=\"window.open('index_edit.php?name=$name&amp;command=$command&amp;action=configure&amp;side=$side&amp;index=$index', '', 'top=50,left=50,width=500,height=250,scrollbars=1,resizable=1'); return false;\">";
-			print "<img class=\"adminicon\" src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["admin"]["small"]."\" width=\"15\" height=\"15\" border=\"0\" alt=\"".$gm_lang["config_block"]."\" /></a>\n";
+			print "<a href=\"javascript: ".GM_LANG_config_block."\" onclick=\"window.open('index_edit.php?name=$name&amp;command=$command&amp;action=configure&amp;side=$side&amp;index=$index', '', 'top=50,left=50,width=500,height=250,scrollbars=1,resizable=1'); return false;\">";
+			print "<img class=\"adminicon\" src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["admin"]["small"]."\" width=\"15\" height=\"15\" border=\"0\" alt=\"".GM_LANG_config_block."\" /></a>\n";
 		}
 	}
-	print $gm_lang["recent_changes"];
+	print GM_LANG_recent_changes;
 	print "</div>";
 	print "<div class=\"blockcontent\" >";
 	if ($block) print "<div class=\"small_inner_block\">\n";
 
 	//	Print block content
-	$gm_lang["global_num1"] = $config["days"];		// Make this visible
+	// 3 is recent changes
+	define("GM_LANG_global_num3", $config["days"]);		// Make this visible
 	if (count($found_facts)==0) {
 		print_text("recent_changes_none");
 	} else {
@@ -94,9 +95,9 @@ function print_recent_changes($block=true, $config="", $side, $index) {
 					print $person->revname;
 					print "</b>";
 					print "<img id=\"box-".$person->xref."-".$index."-sex\" src=\"".GM_IMAGE_DIR."/";
-					if ($person->sex == "M") print $GM_IMAGES["sex"]["small"]."\" title=\"".$gm_lang["male"]."\" alt=\"".$gm_lang["male"];
-					else  if ($person->sex == "F") print $GM_IMAGES["sexf"]["small"]."\" title=\"".$gm_lang["female"]."\" alt=\"".$gm_lang["female"];
-					else print $GM_IMAGES["sexn"]["small"]."\" title=\"".$gm_lang["unknown"]."\" alt=\"".$gm_lang["unknown"];
+					if ($person->sex == "M") print $GM_IMAGES["sex"]["small"]."\" title=\"".GM_LANG_male."\" alt=\"".GM_LANG_male;
+					else  if ($person->sex == "F") print $GM_IMAGES["sexf"]["small"]."\" title=\"".GM_LANG_female."\" alt=\"".GM_LANG_female;
+					else print $GM_IMAGES["sexn"]["small"]."\" title=\"".GM_LANG_unknown."\" alt=\"".GM_LANG_unknown;
 					print "\" class=\"sex_image\" />";
 					print $person->addxref;
 					print "</a><br />\n";
@@ -205,24 +206,24 @@ function print_recent_changes($block=true, $config="", $side, $index) {
 }
 
 function print_recent_changes_config($config) {
-	global $gm_lang, $GM_BLOCKS, $TEXT_DIRECTION;
+	global $GM_BLOCKS, $TEXT_DIRECTION;
 	if (empty($config)) $config = $GM_BLOCKS["print_recent_changes"]["config"];
 
-	print "<tr><td width=\"20%\" class=\"shade2\">".$gm_lang["days_to_show"]."</td>";?>
+	print "<tr><td width=\"20%\" class=\"shade2\">".GM_LANG_days_to_show."</td>";?>
 	<td class="shade1">
 		<input type="text" name="days" size="2" value="<?php print $config["days"]; ?>" />
 	</td></tr>
 
 	<?php
-  	print "<tr><td width=\"20%\" class=\"shade2\">".$gm_lang["show_empty_block"]."</td>";?>
+  	print "<tr><td width=\"20%\" class=\"shade2\">".GM_LANG_show_empty_block."</td>";?>
 	<td class="shade1">
 	<select name="hide_empty">
-		<option value="no"<?php if ($config["hide_empty"]=="no") print " selected=\"selected\"";?>><?php print $gm_lang["no"]; ?></option>
-		<option value="yes"<?php if ($config["hide_empty"]=="yes") print " selected=\"selected\"";?>><?php print $gm_lang["yes"]; ?></option>
+		<option value="no"<?php if ($config["hide_empty"]=="no") print " selected=\"selected\"";?>><?php print GM_LANG_no; ?></option>
+		<option value="yes"<?php if ($config["hide_empty"]=="yes") print " selected=\"selected\"";?>><?php print GM_LANG_yes; ?></option>
 	</select>
 	</td></tr>
 	<tr><td colspan="2" class="shade1 wrap">
-		<span class="error"><?php print $gm_lang["hide_block_warn"]; ?></span>
+		<span class="error"><?php print GM_LANG_hide_block_warn; ?></span>
 	</td></tr>
 	<?php
 }

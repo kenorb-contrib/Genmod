@@ -25,8 +25,8 @@
  */
  ?>
 <div class="accesskeys">
-<a class="accesskeys" href="#content" title="<?php print $gm_lang["accesskey_skip_to_content_desc"]; ?>" tabindex="0" accesskey="<?php print $gm_lang["accesskey_skip_to_content"]; ?>"><?php print $gm_lang["accesskey_skip_to_content_desc"]; ?></a>
-<a class="accesskeys" href="javascript://accesskey_viewing_advice_help" onfocus="this.onclick" onclick="return helpPopup('accesskey_viewing_advice_help');" title="<?php print $gm_lang["accesskey_viewing_advice_desc"]; ?>" accesskey="<?php print $gm_lang["accesskey_viewing_advice"]; ?>"><?php print $gm_lang["accesskey_viewing_advice_desc"]; ?></a>
-<a href="javascript://help_<?php print basename($SCRIPT_NAME); ?>" onclick="return helpPopup('help_<?php print basename($SCRIPT_NAME); ?>&amp;action=<?php print $action;?>');" accesskey="<?php print $gm_lang["accesskey_help_current_page"]; ?>"> </a>
-<a href="javascript://help_contents_help" onclick="return helpPopup('help_contents_help');" accesskey="<?php print $gm_lang["accesskey_help_content"]; ?>"> </a>
+<a class="accesskeys" href="#content" title="<?php print GM_LANG_accesskey_skip_to_content_desc; ?>" tabindex="0" accesskey="<?php print GM_LANG_accesskey_skip_to_content; ?>"><?php print GM_LANG_accesskey_skip_to_content_desc; ?></a>
+<a class="accesskeys" href="javascript://accesskey_viewing_advice_help" onfocus="this.onclick" onclick="return helpPopup('accesskey_viewing_advice_help');" title="<?php print GM_LANG_accesskey_viewing_advice_desc; ?>" accesskey="<?php print GM_LANG_accesskey_viewing_advice; ?>"><?php print GM_LANG_accesskey_viewing_advice_desc; ?></a>
+<a href="javascript://help_<?php print basename(SCRIPT_NAME); ?>" onclick="return helpPopup('help_<?php print basename($SCRIPT_NAME); ?>&amp;action=<?php print $action;?>');" accesskey="<?php print GM_LANG_accesskey_help_current_page; ?>"> </a>
+<a href="javascript://help_contents_help" onclick="return helpPopup('help_contents_help');" accesskey="<?php print GM_LANG_accesskey_help_content; ?>"> </a>
 </div>

@@ -44,7 +44,7 @@ if ($action == "loadlanguage" && isset($language)) {
 	StoreLanguage($language);
 }
 
-PrintHeader($gm_lang["administration"]);
+PrintHeader(GM_LANG_administration);
 ?>
 <script type="text/javascript">
 <!--
@@ -91,7 +91,7 @@ if (file_exists(INDEX_DIRECTORY."emergency_syslog.txt")) {
  	<?php
 	$news = GetGMNewsItems();
 	if (count($news)>0) { ?>
-	     <div class="admin_topbottombar"><?php print $gm_lang["genmodnews"]; ?></div>
+	     <div class="admin_topbottombar"><?php print GM_LANG_genmodnews; ?></div>
           <div class="admin_genmod_content">
           <?php 
           foreach ($news as $key => $item) {
@@ -116,22 +116,22 @@ if (file_exists(INDEX_DIRECTORY."emergency_syslog.txt")) {
           if ($gm_user->userIsAdmin()) {
                if ($err_write) {
                     print "<div class=\"error admin_genmod_content\">";
-                    print $gm_lang["config_still_writable"];
+                    print GM_LANG_config_still_writable;
                     print "</div>";
                }
                if ($verify_msg) {
                     print "<div class=\"admin_genmod_content\">";
-                    print "<a href=\"useradmin.php?action=listusers&amp;filter=admunver\" class=\"error\">".$gm_lang["admin_verification_waiting"]."</a>";
+                    print "<a href=\"useradmin.php?action=listusers&amp;filter=admunver\" class=\"error\">".GM_LANG_admin_verification_waiting."</a>";
                     print "</div>";
                }
                if ($warn_msg) {
                     print "<div class=\"admin_genmod_content\">";
-                    print "<a href=\"useradmin.php?action=listusers&amp;filter=warnings\" class=\"error\" >".$gm_lang["admin_user_warnings"]."</a>";
+                    print "<a href=\"useradmin.php?action=listusers&amp;filter=warnings\" class=\"error\" >".GM_LANG_admin_user_warnings."</a>";
                     print "</div>";
                }
                if ($export_msg) {
                     print "<div class=\"error admin_genmod_content\">";
-                    print $gm_lang["export_warn"];
+                    print GM_LANG_export_warn;
                     foreach ($explangs as $key => $explang) {
 	                    print "<br /><a href=\"editlang.php?action=export&amp;language2=".$explang["lang"]."\" >".$explang["name"]."</a>";
                     }
@@ -139,7 +139,7 @@ if (file_exists(INDEX_DIRECTORY."emergency_syslog.txt")) {
                }
                if ($import_msg) {
                     print "<div class=\"error admin_genmod_content\">";
-                    print $gm_lang["import_warn"];
+                    print GM_LANG_import_warn;
                     $skip = false;
                     foreach ($implangs as $key => $implang) {
 	                    if ($implang["lang"] == "english") {
@@ -169,62 +169,62 @@ if (file_exists(INDEX_DIRECTORY."emergency_syslog.txt")) {
 	<div class="admin_topbottombar">
 		<?php
 		print "<h3>Genmod v" . GM_VERSION . " " . GM_VERSION_RELEASE . "<br />";
-		print $gm_lang["administration"];
+		print GM_LANG_administration;
 		print "</h3>";
-		print $gm_lang["system_time"];
+		print GM_LANG_system_time;
 		print " ".GetChangedDate(date("j M Y"))." - ".date($TIME_FORMAT);
 		?>
 	</div>
-	<div class="admin_topbottombar" style="margin-top: 1em;"><?php print $gm_lang["admin_info"]; ?></div>
+	<div class="admin_topbottombar" style="margin-top: 1em;"><?php print GM_LANG_admin_info; ?></div>
 	<div class="admin_item_box">
-		<div class="admin_item_left"><div class="helpicon"><?php print_help_link("readmefile_help", "qm"); ?></div><div class="description"><a href="readme.txt" target="manual" title="<?php print $gm_lang["view_readme"]; ?>"><?php print $gm_lang["readme_documentation"];?></a></div></div>
-		<div class="admin_item_right"><div class="helpicon"><?php print_help_link("phpinfo_help", "qm"); ?></div><div class="description"><a href="gminfo.php?action=phpinfo" title="<?php print $gm_lang["show_phpinfo"]; ?>"><?php print $gm_lang["phpinfo"];?></a></div></div>
+		<div class="admin_item_left"><div class="helpicon"><?php print_help_link("readmefile_help", "qm"); ?></div><div class="description"><a href="readme.txt" target="manual" title="<?php print GM_LANG_view_readme; ?>"><?php print GM_LANG_readme_documentation;?></a></div></div>
+		<div class="admin_item_right"><div class="helpicon"><?php print_help_link("phpinfo_help", "qm"); ?></div><div class="description"><a href="gminfo.php?action=phpinfo" title="<?php print GM_LANG_show_phpinfo; ?>"><?php print GM_LANG_phpinfo;?></a></div></div>
 	</div>
 	<div class="admin_item_box">
-		<div class="admin_item_left"><div class="helpicon"><?php print_help_link("config_help_help", "qm", "help_config"); ?></div><div class="description"><a href="gminfo.php?action=confighelp"><?php print $gm_lang["help_config"];?></a></div></div>
+		<div class="admin_item_left"><div class="helpicon"><?php print_help_link("config_help_help", "qm", "help_config"); ?></div><div class="description"><a href="gminfo.php?action=confighelp"><?php print GM_LANG_help_config;?></a></div></div>
 		<div class="admin_item_right"><div class="helpicon"><?php print_help_link("changelog_help", "qm"); ?></div><div class="description"><a href="changelog.php" target="manual" title="<?php print_text("changelog"); ?>"><?php print_text("changelog"); ?></a></div></div>
 	</div>
 	
-	<div class="admin_topbottombar" style="margin-top: 1em;"><?php print $gm_lang["admin_geds"]; ?></div>
+	<div class="admin_topbottombar" style="margin-top: 1em;"><?php print GM_LANG_admin_geds; ?></div>
 	<div class="admin_item_box">
-		<div class="admin_item_left"><div class="helpicon"><?php print_help_link("edit_gedcoms_help", "qm"); ?></div><div class="description"><a href="editgedcoms.php"><?php print $gm_lang["manage_gedcoms"];?></a></div></div>
-		<div class="admin_item_right"><div class="helpicon"><?php print_help_link("help_edit_merge.php", "qm"); ?></div><div class="description"><a href="edit_merge.php"><?php print $gm_lang["merge_records"]; ?></a></div></div>
+		<div class="admin_item_left"><div class="helpicon"><?php print_help_link("edit_gedcoms_help", "qm"); ?></div><div class="description"><a href="editgedcoms.php"><?php print GM_LANG_manage_gedcoms;?></a></div></div>
+		<div class="admin_item_right"><div class="helpicon"><?php print_help_link("help_edit_merge.php", "qm"); ?></div><div class="description"><a href="edit_merge.php"><?php print GM_LANG_merge_records; ?></a></div></div>
 	</div>
 	<div class="admin_item_box">
-		<div class="admin_item_left"><div class="helpicon"><?php print_help_link("help_media.php", "qm", "manage_media"); ?></div><div class="description"><a href="media.php"><?php print $gm_lang["manage_media"];?></a></div></div>
+		<div class="admin_item_left"><div class="helpicon"><?php print_help_link("help_media.php", "qm", "manage_media"); ?></div><div class="description"><a href="media.php"><?php print GM_LANG_manage_media;?></a></div></div>
 		<div class="admin_item_right"><?php if (GedcomConfig::$ALLOW_EDIT_GEDCOM) { ?>
-			<div class="helpicon"><?php print_help_link("edit_add_unlinked_person_help", "qm"); ?></div><div class="description"><a href="javascript: <?php print $gm_lang["add_unlinked_person"]; ?>" onclick="addnewchild('','add_unlinked_person'); return false;"><?php print $gm_lang["add_unlinked_person"]; ?></a></div>
+			<div class="helpicon"><?php print_help_link("edit_add_unlinked_person_help", "qm"); ?></div><div class="description"><a href="javascript: <?php print GM_LANG_add_unlinked_person; ?>" onclick="addnewchild('','add_unlinked_person'); return false;"><?php print GM_LANG_add_unlinked_person; ?></a></div>
 			<?php }
 			else print "&nbsp;"; ?>
 		</div>
 	</div>
 	<?php if (GetChangeData(true, "", true)) { ?>
 		<div class="admin_item_box">
-			<div class="admin_item_left"><div class="helpicon"><?php print_help_link("review_changes_help", "qm"); ?></div><div class="description"><a href="#" onclick="window.open('edit_changes.php','','width=600,height=600,resizable=1,scrollbars=1'); return false;"><?php print $gm_lang["accept_changes"]; ?></a></div></div>
+			<div class="admin_item_left"><div class="helpicon"><?php print_help_link("review_changes_help", "qm"); ?></div><div class="description"><a href="#" onclick="window.open('edit_changes.php','','width=600,height=600,resizable=1,scrollbars=1'); return false;"><?php print GM_LANG_accept_changes; ?></a></div></div>
 			<div class="admin_item_right"><div class="helpicon"></div><div class="description">&nbsp;</div></div>
 		</div>
 	<?php } ?>
 	
 	<?php if ($gm_user->userIsAdmin()) { ?>
-		<div class="admin_topbottombar" style="margin-top: 1em;"><?php print $gm_lang["admin_site"]; ?></div>
+		<div class="admin_topbottombar" style="margin-top: 1em;"><?php print GM_LANG_admin_site; ?></div>
 		<div class="admin_item_box">
-			<div class="admin_item_left"><div class="helpicon"><?php print_help_link("help_editconfig.php", "qm"); ?></div><div class="description"><a href="editconfig.php"><?php print $gm_lang["configuration"];?></a></div></div>
-			<div class="admin_item_right"><div class="helpicon"><?php print_help_link("um_bu_help", "qm"); ?></div><div class="description"><a href="backup.php?action=backup"><?php print $gm_lang["um_backup"];?></a></div></div>
+			<div class="admin_item_left"><div class="helpicon"><?php print_help_link("help_editconfig.php", "qm"); ?></div><div class="description"><a href="editconfig.php"><?php print GM_LANG_configuration;?></a></div></div>
+			<div class="admin_item_right"><div class="helpicon"><?php print_help_link("um_bu_help", "qm"); ?></div><div class="description"><a href="backup.php?action=backup"><?php print GM_LANG_um_backup;?></a></div></div>
 		</div>
 		<div class="admin_item_box">
-			<div class="admin_item_left"><div class="helpicon"><?php print_help_link("help_useradmin.php", "qm"); ?></div><div class="description"><a href="useradmin.php"><?php print $gm_lang["user_admin"];?></a></div></div>
-			<div class="admin_item_right"><div class="helpicon"><?php print_help_link("um_rest_help", "qm"); ?></div><div class="description"><a href="backup.php?action=restore"><?php print $gm_lang["um_restore"];?></a></div></div>
+			<div class="admin_item_left"><div class="helpicon"><?php print_help_link("help_useradmin.php", "qm"); ?></div><div class="description"><a href="useradmin.php"><?php print GM_LANG_user_admin;?></a></div></div>
+			<div class="admin_item_right"><div class="helpicon"><?php print_help_link("um_rest_help", "qm"); ?></div><div class="description"><a href="backup.php?action=restore"><?php print GM_LANG_um_restore;?></a></div></div>
 		</div>
 		<div class="admin_item_box">
-			<div class="admin_item_left"><div class="helpicon"><?php print_help_link("help_editlang.php", "qm"); ?></div><div class="description"><a href="editlang.php"><?php print $gm_lang["translator_tools"];?></a></div></div>
-			<div class="admin_item_right"><div class="helpicon"><?php print_help_link("help_faq.php", "qm"); ?></div><div class="description"><a href="faq.php"><?php print $gm_lang["faq_list"];?></a></div></div>
+			<div class="admin_item_left"><div class="helpicon"><?php print_help_link("help_editlang.php", "qm"); ?></div><div class="description"><a href="editlang.php"><?php print GM_LANG_translator_tools;?></a></div></div>
+			<div class="admin_item_right"><div class="helpicon"><?php print_help_link("help_faq.php", "qm"); ?></div><div class="description"><a href="faq.php"><?php print GM_LANG_faq_list;?></a></div></div>
 		</div>
 		<div class="admin_item_box">
-			<div class="admin_item_left"><div class="helpicon"><?php print_help_link("admin_maint_help", "qm", "maintenance"); ?></div><div class="description"><a href="admin_maint.php"><?php print $gm_lang["maintenance"]; ?></a></div></div>
-			<div class="admin_item_right"><div class="helpicon"><?php print_help_link("help_viewlog.php", "qm", "view_syslog"); ?></div><div class="description"><a href="javascript: <?php print $gm_lang["view_syslog"];?>" onclick="window.open('viewlog.php?cat=S&amp;max=20', '', 'top=50,left=10,width=1000,height=600,scrollbars=1,resizable=1'); ChangeClass('syslog', 'shade1'); return false;">
+			<div class="admin_item_left"><div class="helpicon"><?php print_help_link("admin_maint_help", "qm", "maintenance"); ?></div><div class="description"><a href="admin_maint.php"><?php print GM_LANG_maintenance; ?></a></div></div>
+			<div class="admin_item_right"><div class="helpicon"><?php print_help_link("help_viewlog.php", "qm", "view_syslog"); ?></div><div class="description"><a href="javascript: <?php print GM_LANG_view_syslog;?>" onclick="window.open('viewlog.php?cat=S&amp;max=20', '', 'top=50,left=10,width=1000,height=600,scrollbars=1,resizable=1'); ChangeClass('syslog', 'shade1'); return false;">
 			<?php
-			if (AdminFunctions::NewLogRecs("S")) print "<span id=\"syslog\" class=\"error\">".$gm_lang["view_syslog"]."</span>";
-			else print "<span id=\"syslog\">".$gm_lang["view_syslog"]."</span>";
+			if (AdminFunctions::NewLogRecs("S")) print "<span id=\"syslog\" class=\"error\">".GM_LANG_view_syslog."</span>";
+			else print "<span id=\"syslog\">".GM_LANG_view_syslog."</span>";
 			?>
 			</a></div></div>
 		</div>

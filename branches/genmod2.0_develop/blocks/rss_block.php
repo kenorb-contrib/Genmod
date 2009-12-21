@@ -25,7 +25,7 @@
  * @subpackage Blocks
  * @version $Id$
  */
-$GM_BLOCKS["print_RSS_block"]["name"]		= $gm_lang["rss_feeds"];
+$GM_BLOCKS["print_RSS_block"]["name"]		= GM_LANG_rss_feeds;
 $GM_BLOCKS["print_RSS_block"]["descr"]		= "rss_descr";
 $GM_BLOCKS["print_RSS_block"]["type"]		= "gedcom";
 $GM_BLOCKS["print_RSS_block"]["canconfig"]	= true;
@@ -43,7 +43,7 @@ $GM_BLOCKS["print_RSS_block"]["rss"]		= false;
  * Prints a block allowing the user to login to the site directly from the portal
  */
 function print_RSS_block($block = true, $config="", $side, $index) {
-	global $LANGUAGE, $gm_lang, $GEDCOMID, $command, $SCRIPT_NAME, $QUERY_STRING, $GM_BLOCKS, $gm_user, $GM_IMAGES;
+	global $LANGUAGE, $GEDCOMID, $command, $QUERY_STRING, $GM_BLOCKS, $gm_user, $GM_IMAGES;
 
 	print "<div id=\"login_block\" class=\"block\">\n";
 	print "<div class=\"blockhc\">";
@@ -52,11 +52,11 @@ function print_RSS_block($block = true, $config="", $side, $index) {
 		if ((($command=="gedcom")&&($gm_user->userGedcomAdmin())) || (($command=="user")&&(!empty($username)))) {
 			if ($command=="gedcom") $name = preg_replace("/'/", "\'", get_gedcom_from_id($GEDCOMID));
 			else $name = $gm_user->username;
-			print "<a href=\"javascript: ".$gm_lang["config_block"]."\" onclick=\"window.open('index_edit.php?name=$name&amp;command=$command&amp;action=configure&amp;side=$side&amp;index=$index', '', 'top=50,left=50,width=600,height=350,scrollbars=1,resizable=1'); return false;\">";
-			print "<img class=\"adminicon\" src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["admin"]["small"]."\" width=\"15\" height=\"15\" border=\"0\" alt=\"".$gm_lang["config_block"]."\" /></a>\n";
+			print "<a href=\"javascript: ".GM_LANG_config_block."\" onclick=\"window.open('index_edit.php?name=$name&amp;command=$command&amp;action=configure&amp;side=$side&amp;index=$index', '', 'top=50,left=50,width=600,height=350,scrollbars=1,resizable=1'); return false;\">";
+			print "<img class=\"adminicon\" src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["admin"]["small"]."\" width=\"15\" height=\"15\" border=\"0\" alt=\"".GM_LANG_config_block."\" /></a>\n";
 		}
 	}
-	print $gm_lang["rss_feeds"];
+	print GM_LANG_rss_feeds;
 	print "</div>";
 	print "<div class=\"blockcontent center\">";
 	print "<form method=\"post\" action=\"\" name=\"rssform\">\n";
@@ -85,7 +85,7 @@ function print_RSS_block($block = true, $config="", $side, $index) {
 	print "\n\t</select>";
 	//print "\n\t<select name=\"module\" class=\"header_select\" onchange=\"javascript:document.getElementById('rss_button').href = 'rss.php?lang=' + document.rssform.lang.value + (document.rssform.module.value==''? '' : '&module=' + document.rssform.module.value) + (document.rssform.rssStyle.value==''? '' : '&rssStyle=' + document.rssform.rssStyle.value);\">";
 	print "\n\t<select name=\"module\" class=\"header_select\" onchange=\"javascript:document.getElementById('rss_button').href = 'rss.php?lang=" . $LANGUAGE . "' + (document.rssform.module.value==''? '' : '&module=' + document.rssform.module.value) + (document.rssform.rssStyle.value==''? '' : '&rssStyle=' + document.rssform.rssStyle.value);\">";
-	print "\n\t\t<option value=\"\">" . $gm_lang["all"] . "</option>";
+	print "\n\t\t<option value=\"\">" . GM_LANG_all . "</option>";
 	if (empty($config)) $config = $GM_BLOCKS["print_RSS_block"]["config"];
 	foreach ($config as $block => $value) {
 		if ($value == "yes") {
@@ -100,11 +100,11 @@ function print_RSS_block($block = true, $config="", $side, $index) {
 }
 
 function print_rss_block_config($config) {
-	global $gm_lang, $GM_BLOCKS, $TEXT_DIRECTION;
+	global $GM_BLOCKS, $TEXT_DIRECTION;
 	
 	if (empty($config)) $config = $GM_BLOCKS["print_RSS_block"]["config"];
 	?><tr>
-		<td class="shade2 width20"><?php print $gm_lang["RSS_block_select"]; ?></td>
+		<td class="shade2 width20"><?php print GM_LANG_RSS_block_select; ?></td>
 		<td class="shade1">
 			<table>
 			<?php foreach($GM_BLOCKS as $blockname => $params) {
@@ -129,7 +129,7 @@ function print_rss_block_config($config) {
 /*function get_lang_select() {
 	 global $gm_lang, $gm_language, $flagsfile, $LANGUAGE, $language_settings;
 	 global $LANG_FORM_COUNT;
-	 global $SCRIPT_NAME, $QUERY_STRING;
+	 global $QUERY_STRING;
 	 $ret="";
 	 if (GedcomConfig::$ENABLE_MULTI_LANGUAGE) {
 		if (empty($LANG_FORM_COUNT)) $LANG_FORM_COUNT=1;

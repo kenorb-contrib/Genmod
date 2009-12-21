@@ -8,7 +8,7 @@
  * The alphabet bar shows all the available letters users can click. The bar is built
  * up from the lastnames first letter. Added to this bar is the symbol @, which is
  * shown as a translated version of the variable <var>gm_lang["NN"]</var>, and a
- * translated version of the word ALL by means of variable <var>$gm_lang["all"]</var>.
+ * translated version of the word ALL by means of variable <var>GM_LANG_all"]</var>.
  *
  * The details can be shown in two ways, with surnames or without surnames. By default
  * the user first sees a list of surnames of the chosen letter and by clicking on a
@@ -100,11 +100,11 @@ if (!isset($useMAA)) $useMAA = 0;
 if (isset($alpha)) $alpha = stripslashes($alpha);
 if (isset($surname)) $surname = stripslashes($surname);
 
-PrintHeader($gm_lang["alive_in_year"]);
+PrintHeader(GM_LANG_alive_in_year);
 print "<div class =\"center\">";
 print "\n\t<h3>";
 print_help_link("alive_in_year_help", "qm");
-print str_replace("#YEAR#", $year, $gm_lang["is_alive_in"]);
+print str_replace("#YEAR#", $year, GM_LANG_is_alive_in);
 
 print "</h3>";
 
@@ -115,32 +115,32 @@ if ($view != "preview") {
 	print "\n\t\t<input type=\"hidden\" name=\"surname_sublist\" value=\"$surname_sublist\" />";
 	print "\n\t\t<input type=\"hidden\" name=\"show_all\" value=\"$show_all\" />";
 	print "\n\t\t<table class=\"list_table center $TEXT_DIRECTION\">\n\t\t\t<tr>";
-	print "\n\t\t\t<td class=\"shade3 center\" colspan=\"4\">".$gm_lang["choose"]."</td></tr>";
+	print "\n\t\t\t<td class=\"shade3 center\" colspan=\"4\">".GM_LANG_choose."</td></tr>";
 	print "<tr><td class=\"shade1\" rowspan=\"4\" style=\"vertical-align: middle; text-align: center; padding: 5px;\" >";
 	print_help_link("year_help", "qm");
-	print $gm_lang["year"]."</td>";
+	print GM_LANG_year."</td>";
 	print "\n\t\t\t<td class=\"shade2\" rowspan=\"4\" style=\"vertical-align: middle;\" >";
 	print "\n\t\t\t\t<input class=\"pedigree_form\" type=\"text\" name=\"year\" size=\"3\" value=\"$year\" />";
 	print "\n\t\t\t\t";
 	print "\n\t\t\t</td>";
-	print "<td class=\"shade1\">".$gm_lang["aiy_usemaa"]."</td>";
+	print "<td class=\"shade1\">".GM_LANG_aiy_usemaa."</td>";
 	print "<td class=\"shade2\" style=\"vertical-align: middle;\"><input type=\"checkbox\" name=\"useMAA\" value=\"1\" onclick=\"submit()\"";
 	if ($useMAA == "1") print " checked=\"checked\"";
 	print " /></td></tr>";
-	print "<tr><td class=\"shade1\">".$gm_lang["aiy_trueyears"]."</td>";
+	print "<tr><td class=\"shade1\">".GM_LANG_aiy_trueyears."</td>";
 	print "<td class=\"shade2\" style=\"vertical-align: middle;\"><input type=\"radio\" name=\"type\" value=\"true\" onclick=\"submit()\"";
 	if ($type == "true") print " checked=\"checked\"";
 	print " /></td></tr>";
-	print "<tr><td class=\"shade1\">".$gm_lang["aiy_narrowyears"]."</td>";
+	print "<tr><td class=\"shade1\">".GM_LANG_aiy_narrowyears."</td>";
 	print "<td class=\"shade2\" style=\"vertical-align: middle;\"><input type=\"radio\" name=\"type\" value=\"narrow\" onclick=\"submit()\"";
 	if ($type == "narrow") print " checked=\"checked\"";
 	print " /></td></tr>";
-	print "<tr><td class=\"shade1\">".$gm_lang["aiy_wideyears"]."</td>";
+	print "<tr><td class=\"shade1\">".GM_LANG_aiy_wideyears."</td>";
 	print "<td class=\"shade2\" style=\"vertical-align: middle;\"><input type=\"radio\" name=\"type\" value=\"wide\" onclick=\"submit()\"";
 	if ($type == "wide") print " checked=\"checked\"";
 	print " /></td></tr>";
 	print "\n\t\t\t<tr><td colspan=\"4\" class=\"center\">";
-	print "<input type=\"submit\" value=\"".$gm_lang["view"]."\" /></td>";
+	print "<input type=\"submit\" value=\"".GM_LANG_view."\" /></td>";
 	print "\n\t\t\t</tr>\n\t\t</table>";
 	print "\n\t</form>\n";
 	print "<br />";
@@ -195,13 +195,13 @@ if (count($indialpha) > 0) {
 		if ($letter === "@") $pass = TRUE;
 	}
 	if ($pass == TRUE) {
-		if (isset($alpha) && $alpha == "@") print "<a href=\"aliveinyear.php?year=$year&amp;alpha=@&amp;surname_sublist=yes&amp;surname=@N.N.&amp;type=$type&amp;useMAA=$useMAA&amp;year=$year\"><span class=\"warning\">".PrintReady($gm_lang["NN"])."</span></a>";
-		else print "<a href=\"aliveinyear.php?year=$year&amp;alpha=@&amp;surname_sublist=yes&amp;surname=@N.N.&amp;type=$type&amp;useMAA=$useMAA&amp;year=$year\">".PrintReady($gm_lang["NN"])."</a>";
+		if (isset($alpha) && $alpha == "@") print "<a href=\"aliveinyear.php?year=$year&amp;alpha=@&amp;surname_sublist=yes&amp;surname=@N.N.&amp;type=$type&amp;useMAA=$useMAA&amp;year=$year\"><span class=\"warning\">".PrintReady(GM_LANG_NN)."</span></a>";
+		else print "<a href=\"aliveinyear.php?year=$year&amp;alpha=@&amp;surname_sublist=yes&amp;surname=@N.N.&amp;type=$type&amp;useMAA=$useMAA&amp;year=$year\">".PrintReady(GM_LANG_NN)."</a>";
 		print " | \n";
 		$pass = FALSE;
 	}
-	if ($show_all=="yes") print "<a href=\"aliveinyear.php?year=$year&amp;show_all=yes&amp;surname_sublist=$surname_sublist&amp;type=$type&amp;useMAA=$useMAA&amp;year=$year\"><span class=\"warning\">".$gm_lang["all"]."</span>\n";
-	else print "<a href=\"aliveinyear.php?year=$year&amp;show_all=yes&amp;surname_sublist=$surname_sublist&amp;type=$type&amp;useMAA=$useMAA&amp;year=$year\">".$gm_lang["all"]."</a>\n";
+	if ($show_all=="yes") print "<a href=\"aliveinyear.php?year=$year&amp;show_all=yes&amp;surname_sublist=$surname_sublist&amp;type=$type&amp;useMAA=$useMAA&amp;year=$year\"><span class=\"warning\">".GM_LANG_all."</span>\n";
+	else print "<a href=\"aliveinyear.php?year=$year&amp;show_all=yes&amp;surname_sublist=$surname_sublist&amp;type=$type&amp;useMAA=$useMAA&amp;year=$year\">".GM_LANG_all."</a>\n";
 	if (isset($startalpha)) $alpha = $startalpha;
 }
 
@@ -282,7 +282,7 @@ else if (($surname_sublist=="yes")&&(empty($surname))&&($show_all=="no")) {
 	}
 	$i = 0;
 	uasort($surnames, "ItemSort");
-	print "<td class=\"topbar\">".$gm_lang["surnames"]."</td>\n";
+	print "<td class=\"topbar\">".GM_LANG_surnames."</td>\n";
 	PrintSurnameList($surnames, $_SERVER["SCRIPT_NAME"], "no", "&amp;type=$type&amp;useMAA=$useMAA&amp;year=$year&amp;show_all=$show_all");
 }
 else {
@@ -344,8 +344,8 @@ else {
 	else {
 		// NOTE: If user wishes to skip surname do not print the surname
 		print "<td class=\"topbar\">";
-		if ($surname_sublist == "no") print $gm_lang["surnames"];
-		else	print PrintReady(str_replace("#surname#", CheckNN($surname), $gm_lang["indis_with_surname"]));
+		if ($surname_sublist == "no") print GM_LANG_surnames;
+		else	print PrintReady(str_replace("#surname#", CheckNN($surname), GM_LANG_indis_with_surname));
 		print "</td>\n";
 		PrintPersonList($tindilist);
 	}
@@ -353,8 +353,8 @@ else {
 print "</tr></table>";
 if ($alpha != "@") {
 	print_help_link("skip_sublist_help", "qm");
-	if ($surname_sublist=="yes") print "<a href=\"aliveinyear.php?year=$year&amp;alpha=".urlencode($alpha)."&amp;surname_sublist=no&amp;show_all=$show_all&amp;type=$type&amp;useMAA=$useMAA&amp;year=$year\">".$gm_lang["skip_surnames"]."</a>";
-	else print "<a href=\"aliveinyear.php?year=$year&amp;alpha=".urlencode($alpha)."&amp;surname_sublist=yes&amp;show_all=$show_all&amp;type=$type&amp;useMAA=$useMAA&amp;year=$year\">".$gm_lang["show_surnames"]."</a>";
+	if ($surname_sublist=="yes") print "<a href=\"aliveinyear.php?year=$year&amp;alpha=".urlencode($alpha)."&amp;surname_sublist=no&amp;show_all=$show_all&amp;type=$type&amp;useMAA=$useMAA&amp;year=$year\">".GM_LANG_skip_surnames."</a>";
+	else print "<a href=\"aliveinyear.php?year=$year&amp;alpha=".urlencode($alpha)."&amp;surname_sublist=yes&amp;show_all=$show_all&amp;type=$type&amp;useMAA=$useMAA&amp;year=$year\">".GM_LANG_show_surnames."</a>";
 }
 print "</div>\n";
 PrintFooter();
