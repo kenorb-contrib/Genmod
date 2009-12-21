@@ -5,7 +5,7 @@
  * The functions in this file are common to all PGV pages and include date conversion
  * routines and sorting functions.
  *
- * phpGedView: Genealogy Viewer
+ * Genmod: Genealogy Viewer
  * Copyright (C) 2002 to 2009  Genmod Development Team
  *
  * This program is free software; you can redistribute it and/or modify
@@ -22,7 +22,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
- * @package PhpGedView
+ * @package Genmod
  * @version $Id$
  */
 
@@ -627,13 +627,24 @@ function FirstnameSort($a, $b) {
  */
 function ItemSort($a, $b) {
 
-	if (isset($a["name"])) $aname = NameFunctions::SortableNameFromName($a["name"]);
-	else if (isset($a["names"])) $aname = NameFunctions::SortableNameFromName($a["names"][0][0]);
-	else if (is_array($a)) $aname = NameFunctions::SortableNameFromName($a[0]);
+	if (is_array($a)) {
+		if (isset($a["name"])) $aname = NameFunctions::SortableNameFromName($a["name"]);
+		else if (isset($a["names"])) $aname = NameFunctions::SortableNameFromName($a["names"][0][0]);
+		else if (isset($a[0])) $aname = NameFunctions::SortableNameFromName($a[0]);
+	}
+	else if (is_object($a)) {
+		$aname = $a->sortable_name;
+	}
 	else $aname = $a;
-	if (isset($b["name"])) $bname = NameFunctions::SortableNameFromName($b["name"]);
-	else if (isset($b["names"])) $bname = NameFunctions::SortableNameFromName($b["names"][0][0]);
-	else if (is_array($b)) $bname = NameFunctions::SortableNameFromName($b[0]);
+	
+	if (is_array($b)) {
+		if (isset($b["name"])) $bname = NameFunctions::SortableNameFromName($b["name"]);
+		else if (isset($b["names"])) $bname = NameFunctions::SortableNameFromName($b["names"][0][0]);
+		else if (isset($b[0])) $bname = NameFunctions::SortableNameFromName($b[0]);
+	}
+	else if (is_object($b)) {
+		$bname = $b->sortable_name;
+	}
 	else $bname = $b;
 
 	$aname = preg_replace("/([^ ]+)\*/", "$1", StripPrefix($aname));
@@ -692,7 +703,7 @@ function SourceAddDescrSort($a, $b) {
  * @return int -1 if $a should be sorted first, 0 if they are the same, 1 if $b should be sorted first
  */
 function CompareFacts($a, $b) {
-	global $gm_lang, $ASC, $IGNORE_YEAR, $IGNORE_FACTS, $CIRCULAR_BASE;
+	global $ASC, $IGNORE_YEAR, $IGNORE_FACTS, $CIRCULAR_BASE;
 	if (!isset($ASC)) $ASC = 0;
 	if (!isset($IGNORE_YEAR)) $IGNORE_YEAR = 0;
 	if (!isset($IGNORE_FACTS)) $IGNORE_FACTS = 0;
@@ -805,9 +816,9 @@ function CompareFacts($a, $b) {
 		}
 		else $bfact = "";
 		if (defined("GM_FACT_".$afact)) $afact = constant("GM_FACT_".$afact);
-		else if (isset($gm_lang[$afact])) $afact = $gm_lang[$afact];
+		else if (defined("GM_LANG_".$afact)) $afact = constant("GM_LANG_".$afact);
 		if (defined("GM_FACT_".$bfact)) $bfact = constant("GM_FACT_".$bfact);
-		else if (isset($gm_lang[$bfact])) $bfact = $gm_lang[$bfact];
+		else if (defined("GM_LANG_".$bfact)) $bfact = constant("GM_LANG_".$bfact);
 		return StringSort($afact, $bfact);
 	}
 	if ($IGNORE_YEAR) {
@@ -921,6 +932,7 @@ function GedcomObjSort($a, $b) {
 
 	return StringSort($aname, $bname);
 }
+
 function TitleObjSort($a, $b) {
 	if ($a->title != $b->title) return StringSort(ltrim($a->title), ltrim($b->title));
 	else {
@@ -929,6 +941,7 @@ function TitleObjSort($a, $b) {
 		return $anum > $bnum;
 	}
 }
+
 function ItemObjSort($a, $b) {
 	
 	if (is_object($a)) {
@@ -948,6 +961,15 @@ function ItemObjSort($a, $b) {
 	$aname = preg_replace("/([^ ]+)\*/", "$1", StripPrefix($aname));
 	$bname = preg_replace("/([^ ]+)\*/", "$1", StripPrefix($bname));
 	return StringSort($aname, $bname);
+}
+
+function SameGroup($a, $b) {
+	static $carray;
+	
+	// order: indi, fam, obje, note, sour, repo
+	if (!isset($carray)) $carray = array_flip(array("indi", "fam", "obje", "note", "sour", "repo"));
+	if ($a['type']==$b['type']) return strnatcasecmp($a['id'], $b['id']);
+	else return ($carray[$a['type']] > $carray[$b['type']]);
 }
 	
 ?>

@@ -48,31 +48,31 @@ if (stristr($_SERVER["SCRIPT_NAME"],basename(__FILE__))) {
 
 $specialchar_languages = array(
 	"af" => "Afrikaans",
-	"cs" => $gm_lang["lang_name_czech"], // Czech
-	"da" => $gm_lang["lang_name_danish"], // Danish
-	"de" => $gm_lang["lang_name_german"], // German
-	"en" => $gm_lang["lang_name_english"],
-	"es" => $gm_lang["lang_name_spanish"], // Spanish
+	"cs" => GM_LANG_lang_name_czech, // Czech
+	"da" => GM_LANG_lang_name_danish, // Danish
+	"de" => GM_LANG_lang_name_german, // German
+	"en" => GM_LANG_lang_name_english,
+	"es" => GM_LANG_lang_name_spanish, // Spanish
 	"eu" => "Euskara", // Basque
-	"fr" => $gm_lang["lang_name_french"], // French
+	"fr" => GM_LANG_lang_name_french, // French
 	"gd-ie" => "Gaeilge", // Irish
-	"el" => $gm_lang["lang_name_greek"],
+	"el" => GM_LANG_lang_name_greek,
 	"is" => "Íslenska", // Icelandic
-	"it" => $gm_lang["lang_name_italian"],
-	"hu" => $gm_lang["lang_name_hungarian"], // Hungarian
-	"lt" => $gm_lang["lang_name_lithuanian"], // Lithuanian
-	"nl" => $gm_lang["lang_name_dutch"], // Dutch
-	"no" => $gm_lang["lang_name_norwegian"], // Norwegian
+	"it" => GM_LANG_lang_name_italian,
+	"hu" => GM_LANG_lang_name_hungarian, // Hungarian
+	"lt" => GM_LANG_lang_name_lithuanian, // Lithuanian
+	"nl" => GM_LANG_lang_name_dutch, // Dutch
+	"no" => GM_LANG_lang_name_norwegian, // Norwegian
 	"hawaiian" => "‘Olelo Hawai‘i",
-	"pl" => $gm_lang["lang_name_polish"], // Polish
-	"pt" => $gm_lang["lang_name_portuguese"],
+	"pl" => GM_LANG_lang_name_polish, // Polish
+	"pt" => GM_LANG_lang_name_portuguese,
 	"sl" => "Slovenšcina", // Slovenian
-	"fi" => $gm_lang["lang_name_finnish"], // Finnish
-	"sv" => $gm_lang["lang_name_swedish"], // Swedish
-	"tr" => $gm_lang["lang_name_turkish"], // Turkish
-	"he" => $gm_lang["lang_name_hebrew"],
-	"ar" => $gm_lang["lang_name_arabic"],
-	"ru" => $gm_lang["lang_name_russian"]
+	"fi" => GM_LANG_lang_name_finnish, // Finnish
+	"sv" => GM_LANG_lang_name_swedish, // Swedish
+	"tr" => GM_LANG_lang_name_turkish, // Turkish
+	"he" => GM_LANG_lang_name_hebrew,
+	"ar" => GM_LANG_lang_name_arabic,
+	"ru" => GM_LANG_lang_name_russian
 );
 
 switch ($language_filter) {

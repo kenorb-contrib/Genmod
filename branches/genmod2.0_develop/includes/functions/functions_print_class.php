@@ -32,19 +32,18 @@ abstract class PrintFunctions {
 	
 	//-- function to print a privacy error with contact method
 	public function PrintPrivacyError($username) {
-		 global $gm_lang;
 		
 		 $method = GedcomConfig::$CONTACT_METHOD;
 		
 		 if ($username == GedcomConfig::$WEBMASTER_EMAIL) $method = GedcomConfig::$SUPPORT_METHOD;
 		 $user =& User::GetInstance($username);
 		 if (empty($user->username)) $method = "mailto";
-		 print "<br /><span class=\"error\">".$gm_lang["privacy_error"];
+		 print "<br /><span class=\"error\">".GM_LANG_privacy_error;
 		 if ($method=="none") {
 			  print "</span><br />\n";
 			  return;
 		 }
-		 print $gm_lang["more_information"];
+		 print GM_LANG_more_information;
 		 if ($method=="mailto") {
 			  if (!$user) {
 				   $email = $username;

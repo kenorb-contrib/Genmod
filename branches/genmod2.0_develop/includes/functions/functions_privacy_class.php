@@ -810,7 +810,7 @@ abstract class PrivacyFunctions {
 	 * @return string the privatized gedcom record
 	 */
 	public function PrivatizeGedcom($gedrec) {
-		global $gm_lang, $gm_user;
+		global $gm_user;
 		
 		$gt = preg_match("/0 @(.+)@ (.+)/", $gedrec, $gmatch);
 		if ($gt > 0) {
@@ -824,14 +824,14 @@ abstract class PrivacyFunctions {
 				if ($type == "INDI") {
 					if (!$object->disp_name) {
 						$newrec = "0 @".$gid."@ INDI\r\n";
-						$newrec .= "1 NAME " . $gm_lang["private"] . " /" . $gm_lang["private"] . "/" . "\r\n";
-						$newrec .= "2 SURN " . $gm_lang["private"] . "\r\n";
-						$newrec .= "2 GIVN " . $gm_lang["private"] . "\r\n";
+						$newrec .= "1 NAME " . GM_LANG_private . " /" . GM_LANG_private . "/" . "\r\n";
+						$newrec .= "2 SURN " . GM_LANG_private . "\r\n";
+						$newrec .= "2 GIVN " . GM_LANG_private . "\r\n";
 					}
 				}
 				else if ($type == "SOUR") {
 					$newrec = "0 @".$gid."@ SOUR\r\n";
-					$newrec .= "1 TITL ".$gm_lang["private"]."\r\n";
+					$newrec .= "1 TITL ".GM_LANG_private."\r\n";
 				}
 				else {
 					$newrec = "0 @".$gid."@ $type\r\n";
@@ -873,7 +873,7 @@ abstract class PrivacyFunctions {
 						}
 					}
 				}
-				$newrec .= "1 NOTE ".trim($gm_lang["person_private"])."\r\n";
+				$newrec .= "1 NOTE ".trim(GM_LANG_person_private)."\r\n";
 				return $newrec;
 			}
 			else {
@@ -991,7 +991,9 @@ abstract class PrivacyFunctions {
 		$sql = "SELECT p_show_sources FROM ".TBLPREFIX."privacy";
 		$res = NewQuery($sql);
 		while($row = $res->FetchRow()) {
-			if ($$row["0"] >= $acclevel) {
+			// Fix for first time storage of privacy values (numeric instead of char)
+			if (!is_numeric($row[0])) $row[0] = $$row[0];
+			if ($row["0"] >= $acclevel) {
 				$res->FreeResult();
 				return true;
 			}

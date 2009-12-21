@@ -67,7 +67,7 @@ abstract class BlockFunctions {
 	}
 	
 	public function GetCachedEvents($action, $daysprint, $filter, $onlyBDM="no", $skipfacts) {
-		global $gm_lang, $month, $year, $day, $monthtonum, $monthstart;
+		global $month, $year, $day, $monthtonum, $monthstart;
 		global $GEDCOMID, $ASC, $IGNORE_FACTS, $IGNORE_YEAR;
 		global $CIRCULAR_BASE;
 		
@@ -109,9 +109,9 @@ abstract class BlockFunctions {
 				$dend = $dstart;
 				$mend = date("n", $monthstart);
 			}
-			$indilist = SearchFunctions::SearchIndisDateRange($dstart, $mstart, "", $dend, $mend, "", $filter, "no", $skipfacts);
+			$indilist = self::SearchIndisDateRange($dstart, $mstart, "", $dend, $mend, "", $filter, "no", $skipfacts);
 			// Search database for raw Family data if no cache was found
-			$famlist = SearchFunctions::SearchFamsDateRange($dstart, $mstart, "", $dend, $mend, "", "no", $skipfacts);
+			$famlist = self::SearchFamsDateRange($dstart, $mstart, "", $dend, $mend, "", "no", $skipfacts);
 
 			// Apply filter criteria and perform other transformations on the raw data
 			foreach($indilist as $gid=>$indi) {
@@ -159,7 +159,7 @@ abstract class BlockFunctions {
 						$date = 0; //--- MA @@@
 						$hct = preg_match("/2 DATE.*(@#DHEBREW@)/", $factrec, $match);
 						if ($hct>0) {
-							if ($USE_RTL_FUNCTIONS) {
+							if (GedcomConfig::$USE_RTL_FUNCTIONS) {
 								$dct = preg_match("/2 DATE (.+)/", $factrec, $match);
 								$hebrew_date = ParseDate(trim($match[1]));
 								$date = JewishGedcomDateToCurrentGregorian($hebrew_date);
@@ -243,11 +243,11 @@ abstract class BlockFunctions {
 		
 		$todate = $year.date("m", $monthstart).$mday3;
 		
-		$dayindilist = SearchFunctions::SearchIndisDateRange($mday2, $monthtonum[$mmon2], $myear2, $mday3, $monthtonum[$mmon], $year, "", "no", "", false, "CHAN");
-		$dayfamlist = SearchFunctions::SearchFamsDateRange($mday2, $monthtonum[$mmon2], $myear2, $mday3, $monthtonum[$mmon], $year, "no", "", false, "CHAN");
-		if ($SHOW_SOURCES >= $gm_user->getUserAccessLevel()) $dayrepolist = SearchFunctions::SearchOtherDateRange($mday2, $monthtonum[$mmon2], $myear2, $mday3, $monthtonum[$mmon], $year, "", false, "CHAN");
-		if ($SHOW_SOURCES >= $gm_user->getUserAccessLevel()) $daysourcelist = SearchFunctions::SearchSourcesDateRange($mday2, $monthtonum[$mmon2], $myear2, $mday3, $monthtonum[$mmon], $year, "", false, "CHAN");
-		$daymedialist = SearchFunctions::SearchMediaDateRange($mday2, $monthtonum[$mmon2], $myear2, $mday3, $monthtonum[$mmon], $year, "", false, "CHAN");
+		$dayindilist = self::SearchIndisDateRange($mday2, $monthtonum[$mmon2], $myear2, $mday3, $monthtonum[$mmon], $year, "", "no", "", false, "CHAN");
+		$dayfamlist = self::SearchFamsDateRange($mday2, $monthtonum[$mmon2], $myear2, $mday3, $monthtonum[$mmon], $year, "no", "", false, "CHAN");
+		if ($SHOW_SOURCES >= $gm_user->getUserAccessLevel()) $dayrepolist = self::SearchOtherDateRange($mday2, $monthtonum[$mmon2], $myear2, $mday3, $monthtonum[$mmon], $year, "", false, "CHAN");
+		if ($SHOW_SOURCES >= $gm_user->getUserAccessLevel()) $daysourcelist = self::SearchSourcesDateRange($mday2, $monthtonum[$mmon2], $myear2, $mday3, $monthtonum[$mmon], $year, "", false, "CHAN");
+		$daymedialist = self::SearchMediaDateRange($mday2, $monthtonum[$mmon2], $myear2, $mday3, $monthtonum[$mmon], $year, "", false, "CHAN");
 	
 		if (count($dayindilist)>0 || count($dayfamlist)>0 || count($daysourcelist)>0 || count($dayrepolist) > 0 || count($daymedialist) > 0) {
 			$found_facts = array();
@@ -370,11 +370,11 @@ abstract class BlockFunctions {
 			}
 			print "</table>";
 		}
-		else print "<b>".$gm_lang["top10_pageviews_nohits"]."</b>\n";
+		else print "<b>".GM_LANG_top10_pageviews_nohits."</b>\n";
 	}
 	
 	public function PrintBlockFavorites(&$userfavs, $side, $index, $style) {
-		global $command, $gm_user, $gm_lang, $view;
+		global $command, $gm_user, $view;
 		
 		foreach($userfavs as $key=>$favorite) {
 			if (isset($favorite->id)) $key=$favorite->id;
@@ -406,20 +406,20 @@ abstract class BlockFunctions {
 					print "</ul>";
 				}
 			}
-			if (!empty($favorite->note)) print "<span class=\"favorite_padding\">".PrintReady($gm_lang["note"].": ".$favorite->note)."</span>";
+			if (!empty($favorite->note)) print "<span class=\"favorite_padding\">".PrintReady(GM_LANG_note.": ".$favorite->note)."</span>";
 			print "</div>\n";
 			if ($command=="user" || $gm_user->userIsAdmin()) {
 				if (!empty($favorite->note)) print "&nbsp;&nbsp;";
-				print "<a class=\"font9\" href=\"index.php?command=$command&amp;action=deletefav&amp;fv_id=".$key."\" onclick=\"return confirm('".$gm_lang["confirm_fav_remove"]."');\">".$gm_lang["remove"]."</a>\n";
+				print "<a class=\"font9\" href=\"index.php?command=$command&amp;action=deletefav&amp;fv_id=".$key."\" onclick=\"return confirm('".GM_LANG_confirm_fav_remove."');\">".GM_LANG_remove."</a>\n";
 				print "&nbsp;";
-				print "<a class=\"font9\" href=\"javascript: ".$gm_lang["config_block"]."\" onclick=\"window.open('index_edit.php?favid=$key&amp;name=$gm_user->username&amp;command=$command&amp;action=configure&amp;side=$side&amp;index=$index', '', 'top=50,left=50,width=600,height=400,scrollbars=1,resizable=1'); return false;\">".$gm_lang["edit"]."</a>";
+				print "<a class=\"font9\" href=\"javascript: ".GM_LANG_config_block."\" onclick=\"window.open('index_edit.php?favid=$key&amp;name=$gm_user->username&amp;command=$command&amp;action=configure&amp;side=$side&amp;index=$index', '', 'top=50,left=50,width=600,height=400,scrollbars=1,resizable=1'); return false;\">".GM_LANG_edit."</a>";
 			}
 			SwitchGedcom();
 		}
 	}
 	
 	public function PrintBlockAddFavorite($command, $type) {
-		global $GM_IMAGES, $gm_lang, $GEDCOMID;
+		global $GM_IMAGES, $GEDCOMID;
 		
 		?>
 			<script language="JavaScript" type="text/javascript">
@@ -433,32 +433,32 @@ abstract class BlockFunctions {
 			<br />
 		<?php
 		print_help_link("index_add_favorites_help", "qm", "add_favorite");
-		print "<b><a href=\"javascript: ".$gm_lang["add_favorite"]." \" onclick=\"expand_layer('add_".$type."_fav'); return false;\"><img id=\"add_ged_fav_img\" src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["plus"]["other"]."\" border=\"0\" alt=\"".$gm_lang["add_favorite"]."\" />&nbsp;".$gm_lang["add_favorite"]."</a></b>";
+		print "<b><a href=\"javascript: ".GM_LANG_add_favorite." \" onclick=\"expand_layer('add_".$type."_fav'); return false;\"><img id=\"add_ged_fav_img\" src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["plus"]["other"]."\" border=\"0\" alt=\"".GM_LANG_add_favorite."\" />&nbsp;".GM_LANG_add_favorite."</a></b>";
 		print "<br /><div id=\"add_".$type."_fav\" style=\"display: none;\">\n";
 		print "<form name=\"addfavform\" method=\"get\" action=\"index.php\">\n";
 		print "<input type=\"hidden\" name=\"action\" value=\"addfav\" />\n";
 		print "<input type=\"hidden\" name=\"command\" value=\"$command\" />\n";
 		print "<input type=\"hidden\" name=\"favtype\" value=\"".$type."\" />\n";
-		print "<table border=\"0\" cellspacing=\"0\" width=\"100%\"><tr><td>".$gm_lang["add_fav_enter_id"]." <br />";
+		print "<table border=\"0\" cellspacing=\"0\" width=\"100%\"><tr><td>".GM_LANG_add_fav_enter_id." <br />";
 		print "<input class=\"pedigree_form\" type=\"text\" name=\"gid\" id=\"gid\" size=\"3\" value=\"\" />";
 		LinkFunctions::PrintFindIndiLink("gid",$GEDCOMID);
 		LinkFunctions::PrintFindFamilyLink("gid");
 		LinkFunctions::PrintFindSourceLink("gid");
 		LinkFunctions::PrintFindObjectLink("gid");
 		LinkFunctions::PrintFindNoteLink("gid");
-		print "\n<br />".$gm_lang["add_fav_or_enter_url"];
-		print "\n<br />".$gm_lang["url"]."<input type=\"text\" name=\"url\" size=\"40\" value=\"\" />";
-		print "\n<br />".$gm_lang["title"]." <input type=\"text\" name=\"favtitle\" size=\"40\" value=\"\" />";
+		print "\n<br />".GM_LANG_add_fav_or_enter_url;
+		print "\n<br />".GM_LANG_url."<input type=\"text\" name=\"url\" size=\"40\" value=\"\" />";
+		print "\n<br />".GM_LANG_title." <input type=\"text\" name=\"favtitle\" size=\"40\" value=\"\" />";
 		print "\n</td><td>";
-		print "\n".$gm_lang["add_fav_enter_note"];
+		print "\n".GM_LANG_add_fav_enter_note;
 		print "\n<br /><textarea name=\"favnote\" rows=\"6\" cols=\"40\"></textarea>";
 		print "</td></tr></table>\n";
-		print "\n<br /><input type=\"submit\" value=\"".$gm_lang["add"]."\" style=\"font-size: 8pt; \" />";
+		print "\n<br /><input type=\"submit\" value=\"".GM_LANG_add."\" style=\"font-size: 8pt; \" />";
 		print "\n</form></div>\n";
 	}
 
 	public function GetCachedStatistics() {
-		global $gm_lang, $monthtonum, $GEDCOMID;
+		global $monthtonum, $GEDCOMID;
 		
 		// First see if the cache must be refreshed
 		$cache_load = GedcomConfig::GetLastCacheDate("stats", $GEDCOMID);
@@ -484,7 +484,7 @@ abstract class BlockFunctions {
 			if ($tt>0) $title = trim($tmatch[1]);
 			else $title = trim($match[1]);
 			if (!empty($title)) {
-					$text = str_replace("#SOFTWARE#", $title, $gm_lang["gedcom_created_using"]);
+					$text = str_replace("#SOFTWARE#", $title, GM_LANG_gedcom_created_using);
 					$tt = preg_match("/2 VERS (.*)/", $softrec, $tmatch);
 					if ($tt>0) $version = trim($tmatch[1]);
 					else $version="";
@@ -499,11 +499,11 @@ abstract class BlockFunctions {
 			if ($ct2 > 0) $time = trim($match[1]);
 			else $time = "";	
 			if (empty($title)) {
-				$text = str_replace("#DATE#", GetChangedDate($date), $gm_lang["gedcom_created_on"]);
+				$text = str_replace("#DATE#", GetChangedDate($date), GM_LANG_gedcom_created_on);
 				$text = str_replace("#TIME#", $time, $text);
 			}
 			else {
-				$text = str_replace("#DATE#", GetChangedDate($date), $gm_lang["gedcom_created_on2"]);
+				$text = str_replace("#DATE#", GetChangedDate($date), GM_LANG_gedcom_created_on2);
 				$text = str_replace("#TIME#", $time, $text);
 			}
 			$stats["gs_title"] .= " ".$text;
@@ -617,5 +617,230 @@ abstract class BlockFunctions {
 		}
 		return $stats;
 	}
+	
+	/**
+	 * Search the dates table for other records that had events on the given day
+	 * Used in: functions_block_class
+	 * @param	boolean $allgeds setting if all gedcoms should be searched, default is false
+	 * @return	array $mymedia array with all individuals that matched the query
+	 */
+	private function SearchMediaDateRange($dstart="1", $mstart="1", $ystart="", $dend="31", $mend="12", $yend="", $skipfacts="", $allgeds=false, $onlyfacts="") {
+		$medialist = array();
+		
+		$sql = "SELECT m_media, m_mfile, m_file, m_ext, m_titl, m_gedrec FROM ".TBLPREFIX."dates, ".TBLPREFIX."media WHERE m_media=d_gid AND m_file=d_file ";
+		
+		$sql .= self::DateRangeforQuery($dstart, $mstart, $ystart, $dend, $mend, $yend, $skipfacts, $allgeds, $onlyfacts);
+		
+		$sql .= "GROUP BY m_media ORDER BY d_year, d_month, d_day DESC";
+	
+		$res = NewQuery($sql);
+	
+		while($row = $res->fetchAssoc()){
+			$media = null;
+			$media =& MediaItem::GetInstance($row["m_media"], $row, $row["m_file"]);
+			$medialist[JoinKey($row["m_media"], $row["m_file"])] = $media;
+		}
+		$res->FreeResult();
+		return $medialist;
+	}
+
+	/**
+	 * Search the dates table for sources that had events on the given day
+	 *
+	 * @param	boolean $allgeds setting if all gedcoms should be searched, default is false
+	 * @return	array $myfamlist array with all individuals that matched the query
+	 */
+	private function SearchSourcesDateRange($dstart="1", $mstart="1", $ystart="", $dend="31", $mend="12", $yend="", $skipfacts="", $allgeds=false, $onlyfacts="") {
+		
+		$sourcelist = array();
+		
+		$sql = "SELECT s_key, s_id, s_name, s_file, s_gedrec, d_gid FROM ".TBLPREFIX."dates, ".TBLPREFIX."sources WHERE s_id=d_gid AND s_file=d_file ";
+		
+		$sql .= self::DateRangeforQuery($dstart, $mstart, $ystart, $dend, $mend, $yend, $skipfacts, $allgeds, $onlyfacts);
+		
+		$sql .= "GROUP BY s_id ORDER BY d_year, d_month, d_day DESC";
+		
+		$res = NewQuery($sql);
+		while($row = $res->fetchAssoc()){
+			$source = null;
+			$source =& Source::GetInstance($row["s_id"], $row, $row["s_file"]);
+			$sourcelist[$row["s_key"]] = $source;
+		}
+		$res->FreeResult();
+		return $sourcelist;
+	}
+	/**
+	 * Search the dates table for individuals that had events on the given day
+	 *
+	 * @param	int $day the day of the month to search for, leave empty to include all
+	 * @param	string $month the 3 letter abbr. of the month to search for, leave empty to include all
+	 * @param	int $year the year to search for, leave empty to include all
+	 * @param	string $fact the facts to include (use a comma seperated list to include multiple facts)
+	 * 				prepend the fact with a ! to not include that fact
+	 * @param	boolean $allgeds setting if all gedcoms should be searched, default is false
+	 * @return	array $myindilist array with all individuals that matched the query
+	 */
+	private function SearchIndisDateRange($dstart="1", $mstart="1", $ystart="", $dend="31", $mend="12", $yend="", $filter="all", $onlyBDM="no", $skipfacts="", $allgeds=false, $onlyfacts="") {
+		
+		$indilist = array();
+	//print "Dstart: ".$dstart."<br />";
+	//print "Mstart: ".$mstart." ".date("M", mktime(1,0,0,$mstart,1))."<br />";
+	//print "Dend: ".$dend."<br />";
+	//print "Mend: ".$mend." ".date("M", mktime(1,0,0,$mend,1))."<br />";
+		$sql = "SELECT i_key, i_id, i_file, i_gedrec, i_isdead, n_name, n_surname, n_letter, n_type FROM ".TBLPREFIX."dates, ".TBLPREFIX."individuals, ".TBLPREFIX."names WHERE i_key=d_key AND n_key=i_key ";
+		if ($onlyBDM == "yes") $sql .= " AND d_fact IN ('BIRT', 'DEAT')";
+		if ($filter == "living") $sql .= "AND i_isdead!='1'";
+	
+		$sql .= self::DateRangeforQuery($dstart, $mstart, $ystart, $dend, $mend, $yend, $skipfacts, $allgeds, $onlyfacts);
+	
+		$sql .= "GROUP BY n_id ORDER BY n_id, d_year, d_month, d_day DESC";
+
+		$res = NewQuery($sql);
+		$key = "";
+		while($row = $res->FetchAssoc($res->result)){
+			if ($key != $row["i_key"]) {
+				if ($key != "") $person->names_read = true;
+				$person = null;
+				$key = $row["i_key"];
+				$person =& Person::GetInstance($row["i_id"], $row);
+				$indilist[$row["i_key"]] = $person;
+			}
+			if ($person->disp_name) $indilist[$row["i_key"]]->addname = array($row["n_name"], $row["n_letter"], $row["n_surname"], $row["n_type"]);
+		}
+		if ($key != "") $person->names_read = true;
+		$res->FreeResult();
+		return $indilist;
+	}
+	
+	/**
+	 * Search the dates table for families that had events on the given day
+	 *
+	 * @param	int $day the day of the month to search for, leave empty to include all
+	 * @param	string $month the 3 letter abbr. of the month to search for, leave empty to include all
+	 * @param	int $year the year to search for, leave empty to include all
+	 * @param	string $fact the facts to include (use a comma seperated list to include multiple facts)
+	 * 				prepend the fact with a ! to not include that fact
+	 * @param	boolean $allgeds setting if all gedcoms should be searched, default is false
+	 * @return	array $myfamlist array with all individuals that matched the query
+	 */
+	private function SearchFamsDateRange($dstart="1", $mstart="1", $ystart, $dend="31", $mend="12", $yend, $onlyBDM="no", $skipfacts="", $allgeds=false, $onlyfacts="") {
+		
+		$famlist = array();
+		$sql = "SELECT f_key, f_id, f_husb, f_wife, f_file, f_gedrec FROM ".TBLPREFIX."dates, ".TBLPREFIX."families WHERE f_key=d_key ";
+	
+		$sql .= self::DateRangeforQuery($dstart, $mstart, $ystart, $dend, $mend, $yend, $skipfacts, $allgeds, $onlyfacts);
+	
+		if ($onlyBDM == "yes") $sql .= " AND d_fact='MARR'";
+		$sql .= "GROUP BY f_id ORDER BY d_year, d_month, d_day DESC";
+	
+		$res = NewQuery($sql);
+		while($row = $res->fetchAssoc()) {
+			$fam =& Family::GetInstance($row["f_id"], $row);
+			$famlist[$row["f_key"]] = $fam;
+		}
+		$res->FreeResult();
+		return $famlist;
+	}
+	
+	/**
+	 * Search the dates table for other records that had events on the given day
+	 *
+	 * @param	boolean $allgeds setting if all gedcoms should be searched, default is false
+	 * @return	array $myfamlist array with all individuals that matched the query
+	 */
+	private function SearchOtherDateRange($dstart="1", $mstart="1", $ystart="", $dend="31", $mend="12", $yend="", $skipfacts="", $allgeds=false, $onlyfacts="") {
+		$repolist = array();
+		
+		$sql = "SELECT o_key, o_id, o_file, o_gedrec, d_gid FROM ".TBLPREFIX."dates, ".TBLPREFIX."other WHERE o_id=d_gid AND o_file=d_file AND o_type='REPO' ";
+		
+		$sql .= self::DateRangeforQuery($dstart, $mstart, $ystart, $dend, $mend, $yend, $skipfacts, $allgeds, $onlyfacts);
+		
+		$sql .= "GROUP BY o_id ORDER BY d_year, d_month, d_day DESC";
+	
+		$res = NewQuery($sql);
+		while($row = $res->fetchAssoc()){
+			$repo = null;
+			$repo =& Repository::GetInstance($row["o_id"], $row, $row["o_file"]);
+			$repolist[$row["o_key"]] = $repo;
+		}
+		$res->FreeResult();
+		return $repolist;
+	}
+	
+	private function DateRangeforQuery($dstart="1", $mstart="1", $ystart="", $dend="31", $mend="12", $yend="", $skipfacts="", $allgeds=false, $onlyfacts="") {
+		global $GEDCOMID;
+		
+		//-- Compute start
+		$sql = "";
+		// SQL for 1 day
+		if ($dstart == $dend && $mstart == $mend && $ystart == $yend) {
+			$sql .= " AND d_day=".$dstart." AND d_month='".date("M", mktime(1,0,0,$mstart,1))."'";
+			if (!empty($ystart) && !empty($yend)) $sql .= "' AND d_year='".$ystart."'";
+		}
+		// SQL for dates in 1 month
+		else if ($mstart == $mend && $ystart == $yend) {
+			$sql .= " AND d_day BETWEEN ".$dstart." AND ".$dend." AND d_month='".date("M", mktime(1,0,0,$mstart,1))."'";
+			if (!empty($ystart) && !empty($yend)) $sql .= " AND d_year='".$ystart."'";
+		}
+		// SQL for >=2 months
+		else {
+			$sql .= " AND d_day!='0' AND ((d_day>=".$dstart." AND d_month='".date("M", mktime(1,0,0,$mstart,1));
+			if (!empty($ystart) && !empty($yend)) $sql .= "' AND d_year='".$ystart;
+			$sql .= "')";
+			//-- intermediate months
+			if (!empty($ystart) && !empty($yend)) {
+				if ($mend < $mstart) $mend = $mend + 12*($yend-$ystart);
+				else $mend = $mend + 12*($yend-$ystart);
+			}
+			else if ($mend < $mstart) $mend += 12;
+			for($i=$mstart+1; $i<$mend;$i++) {
+				if ($i>12) {
+					$m = $i%12;
+					if (!empty($ystart) && !empty($yend)) $y = $ystart + (($i - ($i % 12)) / 12);
+				}
+				else {
+					$m = $i;
+					if (!empty($ystart) && !empty($yend)) $y = $ystart;
+				}
+				$sql .= " OR (d_month='".date("M", mktime(1,0,0,$m,1))."'";
+				if (!empty($ystart) && !empty($yend)) $sql .= " AND d_year='".$y."'";
+				$sql .= ")";
+			}
+			//-- End 
+			$sql .= " OR (d_day<=".$dend." AND d_month='".date("M", mktime(1,0,0,$mend,1));
+			if (!empty($ystart) && !empty($yend)) $sql .= "' AND d_year='".$yend;
+			$sql .= "')";
+			$sql .= ")";
+		}
+		if (!empty($skipfacts)) {
+			$skip = preg_split("/[;, ]/", $skipfacts);
+			$sql .= " AND d_fact NOT IN (";
+			$i = 0;
+			foreach ($skip as $key=>$value) {
+				if ($i != 0 ) $sql .= ", ";
+				$i++; 
+				$sql .= "'".$value."'";
+			}
+		}
+	
+		if (!empty($onlyfacts)) {
+			$only = preg_split("/[;, ]/", $onlyfacts);
+			$sql .= " AND d_fact IN (";
+			$i = 0;
+			foreach ($only as $key=>$value) {
+				if ($i != 0 ) $sql .= ", ";
+				$i++; 
+				$sql .= "'".$value."'";
+			}
+			$sql .= ")";
+		}
+		else $sql .= ")";	
+		
+		if (!$allgeds) $sql .= " AND d_file='".$GEDCOMID."' ";
+		// General part ends here
+		
+		return $sql;
+	}
+
 }
 ?>

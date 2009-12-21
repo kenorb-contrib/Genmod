@@ -51,7 +51,7 @@ if (!defined('CONFIGURED')) {
  * their names and the function to call them
  * "name" is the name of the block in the lists
  * "descr" is the name of a $gm_lang variable to describe this block
- * - eg: "whatever" here means that $gm_lang["whatever"] describes this block
+ * - eg: "whatever" here means that GM_LANG_whatever describes this block
  * "type" the options are "user" or "gedcom" or undefined
  * - The type determines which lists the block is available in.
  * - Leaving the type undefined allows it to be on both the user and gedcom portal
@@ -114,9 +114,8 @@ if ($gm_user->username != "") {
 	if (($action=="addfav")&&(!empty($gid))) {
 		$gid = strtoupper($gid);
 		if (!isset($favnote)) $favnote = "";
-		$indirec = FindGedcomRecord($gid);
-		$ct = preg_match("/0 @(.*)@ (.*)/", $indirec, $match);
-		if ($indirec && $ct>0) {
+		$favobject = ConstructObject($gid, "", $GEDCOMID);
+		if (is_object($favobject)) {
 			$favorite = array();
 			if (!isset($favtype)) {
 				if ($command=="user") $favtype = "user";
@@ -126,7 +125,7 @@ if ($gm_user->username != "") {
 			if ($favtype == "gedcom") $favorite->username = "";
 			else $favorite->username = $gm_user->username;
 			$favorite->gid = $gid;
-			$favorite->type = trim($match[2]);
+			$favorite->type = $favobject->type;
 			$favorite->file = $GEDCOMID;
 			$favorite->url = "";
 			$favorite->note = $favnote;
@@ -177,7 +176,7 @@ else $ublocks = new Blocks("gedcom", "", $action);
 
 if ($command=="user") {
 	$helpindex = "index_myged_help";
-	PrintHeader($gm_lang["mygedview"]);
+	PrintHeader(GM_LANG_mygedview);
 }
 else {
 	PrintHeader("");
@@ -204,8 +203,8 @@ else {
 //-- start of main content section
 if ($command=="user") {
 	print "<div>";
-	print "<h3>".$gm_lang["mygedview"]."</h3>";
-	print $gm_lang["mygedview_desc"];
+	print "<h3>".GM_LANG_mygedview."</h3>";
+	print GM_LANG_mygedview_desc;
 	print "</div>\n";
 }
 if (count($ublocks->main) != 0) {
@@ -241,13 +240,13 @@ if (count($ublocks->right) != 0) {
 if (($command=="user") and (!$ublocks->welcome_block_present)) {
 	print "<div>";
 	print_help_link("mygedview_customize_help", "qm");
-	print "<a href=\"#\" onclick=\"window.open('index_edit.php?name=".$gm_user->username."&amp;command=user', '', 'top=50,left=10,width=1000,height=400,scrollbars=1,resizable=1');\">".$gm_lang["customize_page"]."</a>\n";
+	print "<a href=\"#\" onclick=\"window.open('index_edit.php?name=".$gm_user->username."&amp;command=user', '', 'top=50,left=10,width=1000,height=400,scrollbars=1,resizable=1');\">".GM_LANG_customize_page."</a>\n";
 	print "</div>";
 }
 if (($command=="gedcom") and (!$ublocks->gedcom_block_present)) {
 	if ($gm_user->userIsAdmin()) {
 		print "<div>";
-		print "<a href=\"#\" onclick=\"window.open('index_edit.php?name=$GEDCOMID&amp;command=gedcom', '', 'top=50,left=10,width=1000,height=400,scrollbars=1,resizable=1');\">".$gm_lang["customize_gedcom_page"]."</a>\n";
+		print "<a href=\"#\" onclick=\"window.open('index_edit.php?name=$GEDCOMID&amp;command=gedcom', '', 'top=50,left=10,width=1000,height=400,scrollbars=1,resizable=1');\">".GM_LANG_customize_gedcom_page."</a>\n";
 		print "</div>";
 	}
 }

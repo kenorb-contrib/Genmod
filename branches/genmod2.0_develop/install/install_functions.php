@@ -25,7 +25,7 @@
  */
 
 function InstallCheckDBLayout() {
-	global $gm_lang, $DBHOST, $DBUSER, $DBPASS, $DBNAME, $TBLPREFIX, $setup_db, $link, $db_original, $deleterows, $db_layout, $server_charset, $server_collation;
+	global $DBHOST, $DBUSER, $DBPASS, $DBNAME, $TBLPREFIX, $setup_db, $link, $db_original, $deleterows, $db_layout, $server_charset, $server_collation;
 	
 	// NOTE: Get the database layout
 	require("../includes/values/db_layout.php");
@@ -165,7 +165,7 @@ function InstallFixDBLayout() {
 				print "<br />";
 				print mysql_error();
 			}
-			else print $gm_lang["missing_fields_keys_restored"];
+			else print GM_LANG_missing_fields_keys_restored;
 			
 			// Delete obsolete rows
 			foreach ($deleterows as $key => $row) {
@@ -176,7 +176,7 @@ function InstallFixDBLayout() {
 					print "<br />";
 					print mysql_error();
 				}
-				else print $gm_lang["obsolete_row_deleted"];
+				else print GM_LANG_obsolete_row_deleted;
 			}
 		}
 		else {
@@ -187,11 +187,11 @@ function InstallFixDBLayout() {
 }
 
 function InstallAddMissingTable($tablename) {
-	global $TBLPREFIX, $gm_lang, $db_original, $server_charset, $server_collation;
+	global $TBLPREFIX, $db_original, $server_charset, $server_collation;
 
 	// NOTE: Set the response
-	$ok = $gm_lang["created_".$tablename];
-	$nok = $gm_lang["created_".$tablename."_fail"];
+	$ok = constant("GM_LANG_created_".$tablename);
+	$nok = constant("GM_LANG_created_".$tablename."_fail");
 
 	$sql = "CREATE TABLE `".$TBLPREFIX.$tablename."` (";
 	// NOTE: Add the fields
@@ -221,7 +221,7 @@ function InstallAddMissingTable($tablename) {
 }
 
 function InstallRestartButton() {
-	global $gm_lang, $DBHOST, $DBUSER, $DBPASS, $DBNAME, $TBLPREFIX;
+	global $DBHOST, $DBUSER, $DBPASS, $DBNAME, $TBLPREFIX;
 	
 	print "<form method=\"post\" name=\"next\" action=\"".$_SERVER["SCRIPT_NAME"]."\">\n";
 	print "<input type=\"hidden\" name=\"step\" value=\"2\">\n";
@@ -278,9 +278,7 @@ function InstallShowProgress() {
 }
 
 function InstallLoadLanguage() {
-	global $gm_lang;
 	
-	$gm_lang = array();
 	// Load the language
 	if (file_exists("install_lang.txt")) {
 		$lines = file("install_lang.txt");
@@ -288,7 +286,7 @@ function InstallLoadLanguage() {
 			$data = preg_split("/\";\"/", $line, 2);
 			$data[0] = substr(trim($data[0]), 1);
 			$data[1] = substr(trim($data[1]), 0, -1);
-			$gm_lang[$data[0]] = $data[1];
+			define("GM_LANG_".$data[0], $data[1]);
 		}
 	}
 }
@@ -404,7 +402,7 @@ function InstallRemoveLanguage($removelang) {
  * @see session.php
  */
 function InstallStoreConfig() {
-	global $newconfigparms, $gm_lang;
+	global $newconfigparms;
 
 	//-- Determine which values must be written as false/true
 	$boolean = array("DBPERSIST", "CONFIGURED");

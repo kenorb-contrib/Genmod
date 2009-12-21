@@ -40,7 +40,7 @@ $controller = new IndividualController();
 
 PrintHeader($controller->pagetitle);
 
-$controller->CheckNoResult($gm_lang["person_not_found"]);
+$controller->CheckNoResult(GM_LANG_person_not_found);
 
 $controller->CheckPrivate();
 
@@ -110,14 +110,14 @@ $controller->CheckRawEdited();
 				if($controller->show_changes) print $factobj->style;
 				print "\">";
 				$controller->GenderRecord($factobj->factrec, $factobj->fact);
-				print "<span class=\"label $TEXT_DIRECTION\">".PrintReady($gm_lang["sex"].":    ")."</span><span class=\"field\">".$controller->indi->sexdetails["gender"];
+				print "<span class=\"label $TEXT_DIRECTION\">".PrintReady(GM_LANG_sex.":    ")."</span><span class=\"field\">".$controller->indi->sexdetails["gender"];
 				print " <img src=\"".$controller->indi->sexdetails["image"]."\" title=\"".$controller->indi->sexdetails["gender"]."\" alt=\"".$controller->indi->sexdetails["gender"];
 				print "\" width=\"0\" height=\"0\" class=\"sex_image\" border=\"0\" />";
 				if (!$controller->indi->isdeleted && $factobj->style != "change_old" && $controller->indi->canedit) {
-					if ($controller->indi->sexdetails["add"]) print "<br /><a class=\"font9\" href=\"#\" onclick=\"add_new_record('".$controller->xref."', 'SEX'); return false;\">".$gm_lang["edit"]."</a>";
+					if ($controller->indi->sexdetails["add"]) print "<br /><a class=\"font9\" href=\"#\" onclick=\"add_new_record('".$controller->xref."', 'SEX'); return false;\">".GM_LANG_edit."</a>";
 					else {
-						print "<br /><a class=\"font9\" href=\"#\" onclick=\"edit_record('".$controller->xref."', 'SEX', 1, 'edit_gender', 'INDI'); return false;\">".$gm_lang["edit"]."</a> | ";
-						print "<a class=\"font9\" href=\"#\" onclick=\"delete_record('".$controller->xref."', 'SEX', 1, 'edit_gender', 'INDI'); return false;\">".$gm_lang["delete"]."</a>\n";
+						print "<br /><a class=\"font9\" href=\"#\" onclick=\"edit_record('".$controller->xref."', 'SEX', 1, 'edit_gender', 'INDI'); return false;\">".GM_LANG_edit."</a> | ";
+						print "<a class=\"font9\" href=\"#\" onclick=\"delete_record('".$controller->xref."', 'SEX', 1, 'edit_gender', 'INDI'); return false;\">".GM_LANG_delete."</a>\n";
 					}
 				}
 				print "</span>";
@@ -151,7 +151,7 @@ $controller->CheckRawEdited();
 		<?php 
 	}
 	// Print indi counter only if displaying a non-private person
-	if(GedcomConfig::$SHOW_COUNTER) print "\n<br /><br /><div style=\"margin-left: 3px; width: 100%; clear:both;\">".$gm_lang["hit_count"]."&nbsp;".$hits."</div>\n";
+	if(GedcomConfig::$SHOW_COUNTER) print "\n<br /><br /><div style=\"margin-left: 3px; width: 100%; clear:both;\">".GM_LANG_hit_count."&nbsp;".$hits."</div>\n";
 	
 print "</div><br /><br />";
 
@@ -159,16 +159,16 @@ print "</div><br /><br />";
 if (!$controller->view) {
 ?>
 	<div class="accesskeys">
-		<a class="accesskeys" href="<?php print "pedigree.php?rootid=$pid";?>" title="<?php print $gm_lang["pedigree_chart"] ?>" tabindex="-1" accesskey="<?php print $gm_lang["accesskey_individual_pedigree"]; ?>"><?php print $gm_lang["pedigree_chart"] ?></a>
-		<a class="accesskeys" href="<?php print "descendancy.php?rootid=$pid";?>" title="<?php print $gm_lang["descend_chart"] ?>" tabindex="-1" accesskey="<?php print $gm_lang["accesskey_individual_descendancy"]; ?>"><?php print $gm_lang["descend_chart"] ?></a>
-		<a class="accesskeys" href="<?php print "timeline.php?pids[]=$pid";?>" title="<?php print $gm_lang["timeline_chart"] ?>" tabindex="-1" accesskey="<?php print $gm_lang["accesskey_individual_timeline"]; ?>"><?php print $gm_lang["timeline_chart"] ?></a>
+		<a class="accesskeys" href="<?php print "pedigree.php?rootid=$pid";?>" title="<?php print GM_LANG_pedigree_chart ?>" tabindex="-1" accesskey="<?php print GM_LANG_accesskey_individual_pedigree; ?>"><?php print GM_LANG_pedigree_chart ?></a>
+		<a class="accesskeys" href="<?php print "descendancy.php?rootid=$pid";?>" title="<?php print GM_LANG_descend_chart ?>" tabindex="-1" accesskey="<?php print GM_LANG_accesskey_individual_descendancy; ?>"><?php print GM_LANG_descend_chart ?></a>
+		<a class="accesskeys" href="<?php print "timeline.php?pids[]=$pid";?>" title="<?php print GM_LANG_timeline_chart ?>" tabindex="-1" accesskey="<?php print GM_LANG_accesskey_individual_timeline; ?>"><?php print GM_LANG_timeline_chart ?></a>
 		<?php
 		if (!empty($controller->user)&&!empty($controller->user->gedcomid[$GEDCOMID])) {
 			?>
-		<a class="accesskeys" href="<?php print "relationship.php?pid1=".$controller->user->gedcomid[$GEDCOMID]."&amp;pid2=".$controller->xref;?>" title="<?php print $gm_lang["relationship_to_me"] ?>" tabindex="-1" accesskey="<?php print $gm_lang["accesskey_individual_relation_to_me"]; ?>"><?php print $gm_lang["relationship_to_me"] ?></a>
+		<a class="accesskeys" href="<?php print "relationship.php?pid1=".$controller->user->gedcomid[$GEDCOMID]."&amp;pid2=".$controller->xref;?>" title="<?php print GM_LANG_relationship_to_me ?>" tabindex="-1" accesskey="<?php print GM_LANG_accesskey_individual_relation_to_me; ?>"><?php print GM_LANG_relationship_to_me ?></a>
 		<?php 	}
 		if ($controller->canshowgedrec) {?>
-		<a class="accesskeys" href="javascript:show_gedcom_record();" title="<?php print $gm_lang["view_gedcom"] ?>" tabindex="-1" accesskey="<?php print $gm_lang["accesskey_individual_gedcom"]; ?>"><?php print $gm_lang["view_gedcom"] ?></a>
+		<a class="accesskeys" href="javascript:show_gedcom_record();" title="<?php print GM_LANG_view_gedcom ?>" tabindex="-1" accesskey="<?php print GM_LANG_accesskey_individual_gedcom; ?>"><?php print GM_LANG_view_gedcom ?></a>
 		<?php } ?>
 	</div>
 	

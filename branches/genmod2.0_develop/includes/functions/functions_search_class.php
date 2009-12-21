@@ -36,6 +36,8 @@ abstract class SearchFunctions {
 
 	static public $indi_total = array();
 	static public $indi_hide = array();
+	static public $fam_total = array();
+	static public $fam_hide = array();
 	
 	//-- search through the gedcom records for individuals
 	/**
@@ -571,229 +573,8 @@ abstract class SearchFunctions {
 		if ($chinese) return 1;
 		else return $minwlen;
 	}
-	/**
-	 * Search the dates table for individuals that had events on the given day
-	 *
-	 * @param	int $day the day of the month to search for, leave empty to include all
-	 * @param	string $month the 3 letter abbr. of the month to search for, leave empty to include all
-	 * @param	int $year the year to search for, leave empty to include all
-	 * @param	string $fact the facts to include (use a comma seperated list to include multiple facts)
-	 * 				prepend the fact with a ! to not include that fact
-	 * @param	boolean $allgeds setting if all gedcoms should be searched, default is false
-	 * @return	array $myindilist array with all individuals that matched the query
-	 */
-	public function SearchIndisDateRange($dstart="1", $mstart="1", $ystart="", $dend="31", $mend="12", $yend="", $filter="all", $onlyBDM="no", $skipfacts="", $allgeds=false, $onlyfacts="") {
-		
-		$indilist = array();
-	//print "Dstart: ".$dstart."<br />";
-	//print "Mstart: ".$mstart." ".date("M", mktime(1,0,0,$mstart,1))."<br />";
-	//print "Dend: ".$dend."<br />";
-	//print "Mend: ".$mend." ".date("M", mktime(1,0,0,$mend,1))."<br />";
-		$sql = "SELECT i_key, i_id, i_file, i_gedrec, i_isdead, n_name, n_surname, n_letter, n_type FROM ".TBLPREFIX."dates, ".TBLPREFIX."individuals, ".TBLPREFIX."names WHERE i_key=d_key AND n_key=i_key ";
-		if ($onlyBDM == "yes") $sql .= " AND d_fact IN ('BIRT', 'DEAT')";
-		if ($filter == "living") $sql .= "AND i_isdead!='1'";
 	
-		$sql .= self::DateRangeforQuery($dstart, $mstart, $ystart, $dend, $mend, $yend, $skipfacts, $allgeds, $onlyfacts);
-	
-		$sql .= "GROUP BY n_id ORDER BY n_id, d_year, d_month, d_day DESC";
-
-		$res = NewQuery($sql);
-		$key = "";
-		while($row = $res->FetchAssoc($res->result)){
-			if ($key != $row["i_key"]) {
-				if ($key != "") $person->names_read = true;
-				$person = null;
-				$key = $row["i_key"];
-				$person =& Person::GetInstance($row["i_id"], $row);
-				$indilist[$row["i_key"]] = $person;
-			}
-			if ($person->disp_name) $indilist[$row["i_key"]]->addname = array($row["n_name"], $row["n_letter"], $row["n_surname"], $row["n_type"]);
-		}
-		if ($key != "") $person->names_read = true;
-		$res->FreeResult();
-		return $indilist;
-	}
-	
-	/**
-	 * Search the dates table for families that had events on the given day
-	 *
-	 * @param	int $day the day of the month to search for, leave empty to include all
-	 * @param	string $month the 3 letter abbr. of the month to search for, leave empty to include all
-	 * @param	int $year the year to search for, leave empty to include all
-	 * @param	string $fact the facts to include (use a comma seperated list to include multiple facts)
-	 * 				prepend the fact with a ! to not include that fact
-	 * @param	boolean $allgeds setting if all gedcoms should be searched, default is false
-	 * @return	array $myfamlist array with all individuals that matched the query
-	 */
-	public function SearchFamsDateRange($dstart="1", $mstart="1", $ystart, $dend="31", $mend="12", $yend, $onlyBDM="no", $skipfacts="", $allgeds=false, $onlyfacts="") {
-		
-		$famlist = array();
-		$sql = "SELECT f_key, f_id, f_husb, f_wife, f_file, f_gedrec FROM ".TBLPREFIX."dates, ".TBLPREFIX."families WHERE f_key=d_key ";
-	
-		$sql .= self::DateRangeforQuery($dstart, $mstart, $ystart, $dend, $mend, $yend, $skipfacts, $allgeds, $onlyfacts);
-	
-		if ($onlyBDM == "yes") $sql .= " AND d_fact='MARR'";
-		$sql .= "GROUP BY f_id ORDER BY d_year, d_month, d_day DESC";
-	
-		$res = NewQuery($sql);
-		while($row = $res->fetchAssoc()) {
-			$fam =& Family::GetInstance($row["f_id"], $row);
-			$famlist[$row["f_key"]] = $fam;
-		}
-		$res->FreeResult();
-		return $famlist;
-	}
-	
-	/**
-	 * Search the dates table for other records that had events on the given day
-	 *
-	 * @param	boolean $allgeds setting if all gedcoms should be searched, default is false
-	 * @return	array $myfamlist array with all individuals that matched the query
-	 */
-	function SearchOtherDateRange($dstart="1", $mstart="1", $ystart="", $dend="31", $mend="12", $yend="", $skipfacts="", $allgeds=false, $onlyfacts="") {
-		$repolist = array();
-		
-		$sql = "SELECT o_key, o_id, o_file, o_gedrec, d_gid FROM ".TBLPREFIX."dates, ".TBLPREFIX."other WHERE o_id=d_gid AND o_file=d_file AND o_type='REPO' ";
-		
-		$sql .= self::DateRangeforQuery($dstart, $mstart, $ystart, $dend, $mend, $yend, $skipfacts, $allgeds, $onlyfacts);
-		
-		$sql .= "GROUP BY o_id ORDER BY d_year, d_month, d_day DESC";
-	
-		$res = NewQuery($sql);
-		while($row = $res->fetchAssoc()){
-			$repo = null;
-			$repo =& Repository::GetInstance($row["o_id"], $row, $row["o_file"]);
-			$repolist[$row["o_key"]] = $repo;
-		}
-		$res->FreeResult();
-		return $repolist;
-	}
-	/**
-	 * Search the dates table for sources that had events on the given day
-	 *
-	 * @param	boolean $allgeds setting if all gedcoms should be searched, default is false
-	 * @return	array $myfamlist array with all individuals that matched the query
-	 */
-	public function SearchSourcesDateRange($dstart="1", $mstart="1", $ystart="", $dend="31", $mend="12", $yend="", $skipfacts="", $allgeds=false, $onlyfacts="") {
-		
-		$sourcelist = array();
-		
-		$sql = "SELECT s_key, s_id, s_name, s_file, s_gedrec, d_gid FROM ".TBLPREFIX."dates, ".TBLPREFIX."sources WHERE s_id=d_gid AND s_file=d_file ";
-		
-		$sql .= self::DateRangeforQuery($dstart, $mstart, $ystart, $dend, $mend, $yend, $skipfacts, $allgeds, $onlyfacts);
-		
-		$sql .= "GROUP BY s_id ORDER BY d_year, d_month, d_day DESC";
-		
-		$res = NewQuery($sql);
-		while($row = $res->fetchAssoc()){
-			$source = null;
-			$source =& Source::GetInstance($row["s_id"], $row, $row["s_file"]);
-			$sourcelist[$row["s_key"]] = $source;
-		}
-		$res->FreeResult();
-		return $sourcelist;
-	}
-	/**
-	 * Search the dates table for other records that had events on the given day
-	 *
-	 * @param	boolean $allgeds setting if all gedcoms should be searched, default is false
-	 * @return	array $mymedia array with all individuals that matched the query
-	 */
-	function SearchMediaDateRange($dstart="1", $mstart="1", $ystart="", $dend="31", $mend="12", $yend="", $skipfacts="", $allgeds=false, $onlyfacts="") {
-		$medialist = array();
-		
-		$sql = "SELECT m_media, m_mfile, m_file, m_ext, m_titl, m_gedrec FROM ".TBLPREFIX."dates, ".TBLPREFIX."media WHERE m_media=d_gid AND m_file=d_file ";
-		
-		$sql .= self::DateRangeforQuery($dstart, $mstart, $ystart, $dend, $mend, $yend, $skipfacts, $allgeds, $onlyfacts);
-		
-		$sql .= "GROUP BY m_media ORDER BY d_year, d_month, d_day DESC";
-	
-		$res = NewQuery($sql);
-	
-		while($row = $res->fetchAssoc()){
-			$media = null;
-			$media =& MediaItem::GetInstance($row["m_media"], $row, $row["m_file"]);
-			$medialist[JoinKey($row["m_media"], $row["m_file"])] = $media;
-		}
-		$res->FreeResult();
-		return $medialist;
-	}
-	
-	private function DateRangeforQuery($dstart="1", $mstart="1", $ystart="", $dend="31", $mend="12", $yend="", $skipfacts="", $allgeds=false, $onlyfacts="") {
-		global $GEDCOMID;
-		
-		//-- Compute start
-		$sql = "";
-		// SQL for 1 day
-		if ($dstart == $dend && $mstart == $mend && $ystart == $yend) {
-			$sql .= " AND d_day=".$dstart." AND d_month='".date("M", mktime(1,0,0,$mstart,1))."'";
-			if (!empty($ystart) && !empty($yend)) $sql .= "' AND d_year='".$ystart."'";
-		}
-		// SQL for dates in 1 month
-		else if ($mstart == $mend && $ystart == $yend) {
-			$sql .= " AND d_day BETWEEN ".$dstart." AND ".$dend." AND d_month='".date("M", mktime(1,0,0,$mstart,1))."'";
-			if (!empty($ystart) && !empty($yend)) $sql .= " AND d_year='".$ystart."'";
-		}
-		// SQL for >=2 months
-		else {
-			$sql .= " AND d_day!='0' AND ((d_day>=".$dstart." AND d_month='".date("M", mktime(1,0,0,$mstart,1));
-			if (!empty($ystart) && !empty($yend)) $sql .= "' AND d_year='".$ystart;
-			$sql .= "')";
-			//-- intermediate months
-			if (!empty($ystart) && !empty($yend)) {
-				if ($mend < $mstart) $mend = $mend + 12*($yend-$ystart);
-				else $mend = $mend + 12*($yend-$ystart);
-			}
-			else if ($mend < $mstart) $mend += 12;
-			for($i=$mstart+1; $i<$mend;$i++) {
-				if ($i>12) {
-					$m = $i%12;
-					if (!empty($ystart) && !empty($yend)) $y = $ystart + (($i - ($i % 12)) / 12);
-				}
-				else {
-					$m = $i;
-					if (!empty($ystart) && !empty($yend)) $y = $ystart;
-				}
-				$sql .= " OR (d_month='".date("M", mktime(1,0,0,$m,1))."'";
-				if (!empty($ystart) && !empty($yend)) $sql .= " AND d_year='".$y."'";
-				$sql .= ")";
-			}
-			//-- End 
-			$sql .= " OR (d_day<=".$dend." AND d_month='".date("M", mktime(1,0,0,$mend,1));
-			if (!empty($ystart) && !empty($yend)) $sql .= "' AND d_year='".$yend;
-			$sql .= "')";
-			$sql .= ")";
-		}
-		if (!empty($skipfacts)) {
-			$skip = preg_split("/[;, ]/", $skipfacts);
-			$sql .= " AND d_fact NOT IN (";
-			$i = 0;
-			foreach ($skip as $key=>$value) {
-				if ($i != 0 ) $sql .= ", ";
-				$i++; 
-				$sql .= "'".$value."'";
-			}
-		}
-	
-		if (!empty($onlyfacts)) {
-			$only = preg_split("/[;, ]/", $onlyfacts);
-			$sql .= " AND d_fact IN (";
-			$i = 0;
-			foreach ($only as $key=>$value) {
-				if ($i != 0 ) $sql .= ", ";
-				$i++; 
-				$sql .= "'".$value."'";
-			}
-			$sql .= ")";
-		}
-		else $sql .= ")";	
-		
-		if (!$allgeds) $sql .= " AND d_file='".$GEDCOMID."' ";
-		// General part ends here
-		
-		return $sql;
-	}
-	
+	// Used in search.php
 	public function SearchAddAssos() {
 		global $assolist, $indi_printed, $fam_printed, $printindiname, $printfamname, $famlist;
 	
@@ -905,6 +686,376 @@ abstract class SearchFunctions {
 			}
 		}
 		SwitchGedcom();
+	}
+	// Used in calendar.php
+	public function SearchIndisYearRange($startyear, $endyear, $allgeds=false, $type="", $est="") {
+		global $GEDCOMID;
+	
+		$myindilist = array();
+		$sql = "SELECT DISTINCT i_key, i_id, i_file, i_gedrec, i_isdead, n_name, n_surname, n_letter, n_type FROM ".TBLPREFIX."individuals INNER JOIN ".TBLPREFIX."names ON i_key=n_key INNER JOIN ".TBLPREFIX."dates ON (i_key=d_key AND d_fact<>'CHAN') WHERE";
+		if ($startyear < $endyear) $sql .= " d_year>='".$startyear."' AND d_year<='".$endyear."'";
+		else $sql .= " d_year=".$startyear;
+		if (!empty($type)) $sql .= " AND d_fact IN ".$type;
+		if (!$allgeds) $sql .= " AND i_file='".$GEDCOMID."'";
+//		print $sql;
+		$res = NewQuery($sql);
+		
+		$key = "";
+		while($row = $res->FetchAssoc($res->result)){
+			if ($key != $row["i_key"]) {
+				if ($key != "") $person->names_read = true;
+				$person = null;
+				$key = $row["i_key"];
+				$person =& Person::GetInstance($row["i_id"], $row);
+				if ($person->disp_name) {
+					self::$indi_total[$row["i_key"]] = 1;
+					$myindilist[$row["i_key"]] = $person;
+				}
+				else self::$indi_hide[$key] = 1;
+			}
+			if ($person->disp_name) $myindilist[$row["i_key"]]->addname = array($row["n_name"], $row["n_letter"], $row["n_surname"], $row["n_type"]);
+		}
+		if ($key != "") $person->names_read = true;
+		
+		$res->FreeResult();
+		return $myindilist;
+	}
+	
+	/**
+	 * Search through the gedcom records for families with daterange
+	 * Used in:	calendar.php
+	 *
+	 * @package Genmod
+	 * @subpackage Calendar
+	**/
+	public function SearchFamsYearRange($startyear, $endyear, $allgeds=false, $type="") {
+		global $GEDCOMID;
+	
+		$myfamlist = array();
+		$sql = "SELECT DISTINCT f_key, f_id, f_husb, f_wife, f_file, f_gedrec FROM ".TBLPREFIX."families INNER JOIN ".TBLPREFIX."dates ON (d_key=f_key AND d_fact<>'CHAN') WHERE";
+		if ($endyear > $startyear) $sql .= " d_year>='".$startyear."' AND d_year<='".$endyear."'";
+		else $sql .= " d_year=".$startyear;
+/*		$i=$startyear;
+		while($i <= $endyear) {
+			if ($i > $startyear) $sql .= " OR ";
+			$sql .= "f_gedrec REGEXP '".DbLayer::EscapeQuery("2 DATE[^\n]* ".$i)."'";
+			$i++;
+		}
+		$sql .= ")";
+*/		if (!empty($type)) $sql .= " AND d_fact IN ".$type;
+		if (!$allgeds) $sql .= " AND f_file='".$GEDCOMID."'";
+		$res = NewQuery($sql);
+		
+		$select = array();
+		while($row = $res->FetchAssoc()){
+			if (!empty($row["f_husb"])) $select[] = $row["f_husb"];
+			if (!empty($row["f_wife"])) $select[] = $row["f_wife"];
+			$fam = null;
+			$fam =& Family::GetInstance($row["f_id"], $row);
+			$myfamlist[$row["f_key"]] = $fam;
+//			if ($fam->disp) $myfamlist[$row["f_key"]] = $fam;
+//			else self::$fam_hide[$row["f_key"]] = 1;
+//			self::$fam_total[$row["f_key"]] = 1;
+		}
+		$res->FreeResult();
+	
+		if (count($select) > 0) {
+			array_flip(array_flip($select));
+			//print "Indi's selected for fams: ".count($select)."<br />";
+			$selection = "'".implode("','", $select)."'";
+			ListFunctions::GetIndilist($allgeds, $selection, false);
+		}
+		
+		$res->FreeResult();
+		return $myfamlist;
+	}
+	
+	/**
+	 * Search the database for individuals that match the query
+	 * Used in:	calendar.php
+	 *			find.php
+	 *			search.php
+	 *			reportpdf.php
+	 *
+	 * uses a regular expression to search the gedcom records of all individuals and returns an
+	 * array list of the matching individuals
+	 *
+	 * @author	Genmod Development Team
+	 * @param		string $query a regular expression query to search for
+	 * @param		boolean $allgeds setting if all gedcoms should be searched, default is false
+	 * @return	array $myindilist array with all individuals that matched the query
+	 */
+	public function SearchIndis($query, $allgeds=false, $ANDOR="AND", $type="") {
+		global $GEDCOMS, $GEDCOMID;
+		
+		$myindilist = array();
+		$sql = "SELECT DISTINCT(i_key), i_id, i_file, i_gedrec, i_isdead FROM ".TBLPREFIX."individuals INNER JOIN ".TBLPREFIX."dates on (d_key=i_key AND d_fact<>'CHAN') WHERE (d_year='".$query."' OR d_ext='BET')";
+		if (!empty($type)) $sql .= " AND d_fact IN ".$type;
+/*		if (!is_array($query)) $sql = "SELECT i_key, i_id, i_file, i_gedrec, i_isdead FROM ".TBLPREFIX."individuals WHERE (i_gedrec REGEXP '".DbLayer::EscapeQuery($query)."')";
+		else {
+			$sql = "SELECT i_key, i_id, i_file, i_gedrec, i_isdead FROM ".TBLPREFIX."individuals WHERE (";
+			$i=0;
+			foreach($query as $indexval => $q) {
+				if ($i>0) $sql .= " $ANDOR ";
+				$sql .= "(i_gedrec REGEXP '".DbLayer::EscapeQuery($q)."')";
+				$i++;
+			}
+			$sql .= ")";
+		}
+*/		if (!$allgeds) $sql .= " AND i_file='".$GEDCOMID."'";
+	
+		if ((is_array($allgeds)) && (count($allgeds) != 0)) {
+			if (count($allgeds) != count($GEDCOMS)) {
+				$sql .= " AND (";
+				for ($i=0; $i<count($allgeds); $i++) {
+					$sql .= "i_file='".$allgeds[$i]."'";
+					if ($i < count($allgeds)-1) $sql .= " OR ";
+				}
+				$sql .= ")";
+			}
+		}
+//		print $sql;
+		$res = NewQuery($sql);
+		if ($res) {
+			while($row = $res->FetchAssoc()){
+				$person =& Person::GetInstance($row["i_id"], $row);
+				if ($person->disp) {
+					self::$indi_total[$row["i_key"]] = 1;
+					$myindilist[$row["i_key"]] = $person;
+				}
+				else {
+					//print "hidden: ".$row["i_key"]."<br />";
+					self::$indi_hide[$row["i_key"]] = 1;
+				}
+			}
+			$res->FreeResult();
+		}
+		return $myindilist;
+	}
+	
+	/**
+	 * Search through the gedcom records for families with daterange
+	 * Used in:	calendar.php
+	 *			find.php
+	 *			search.php
+	 *			reportpdf.php
+	 * @package Genmod
+	 * @subpackage Calendar
+	**/
+	public function SearchFams($query, $allgeds=false, $ANDOR="AND", $allnames=false, $type="") {
+		global $GEDCOMID;
+	
+	
+		$myfamlist = array();
+		$sql = "SELECT DISTINCT f_key, f_id, f_file, f_gedrec, f_wife, f_husb FROM ".TBLPREFIX."families INNER JOIN ".TBLPREFIX."dates on (d_key=f_key AND d_fact<>'CHAN') WHERE (d_year='".$query."' OR d_ext='BET')";
+		if (!empty($type)) $sql .= " AND d_fact IN ".$type;
+/*		if (!is_array($query)) $sql = "SELECT f_key, f_id, f_husb, f_wife, f_file, f_gedrec FROM ".TBLPREFIX."families WHERE (f_gedrec REGEXP '".DbLayer::EscapeQuery($query)."')";
+		else {
+			$sql = "SELECT f_key, f_id, f_husb, f_wife, f_file, f_gedrec FROM ".TBLPREFIX."families WHERE (";
+			$i=0;
+			foreach($query as $indexval => $q) {
+				if ($i>0) $sql .= " $ANDOR ";
+				$sql .= "(f_gedrec REGEXP '".DbLayer::EscapeQuery($q)."')";
+				$i++;
+			}
+			$sql .= ")";
+		}
+*/		
+		if (!$allgeds) $sql .= " AND f_file='".$GEDCOMID."'";
+	
+		if ((is_array($allgeds)) && (count($allgeds) != 0)) {
+			$sql .= " AND (";
+			for ($i=0, $max=count($allgeds); $i<$max; $i++) {
+				$sql .= "f_file='".$allgeds[$i]."'";
+				if ($i < $max-1) $sql .= " OR ";
+			}
+			$sql .= ")";
+		}
+		
+		$res = NewQuery($sql);
+		
+		$select = array();
+		while($row = $res->FetchAssoc()){
+			$fam = null;
+			$fam =& Family::GetInstance($row["f_id"], $row);
+			if (!empty($row["f_husb"])) $select[] = $row["f_husb"];
+			if (!empty($row["f_wife"])) $select[] = $row["f_wife"];
+			$myfamlist[$row["f_key"]] = $fam;
+			self::$fam_total[$row["f_key"]] = 1;
+		}
+		$res->FreeResult();
+	
+		if (count($myfamlist) > 0) {
+			if (count($select) > 0) {
+				array_flip(array_flip($select));
+				//print "Indi's selected for fams: ".count($select)."<br />";
+				$selection = "'".implode("','", $select)."'";
+				ListFunctions::GetIndilist($allgeds, $selection, false);
+			}
+		}
+		foreach ($myfamlist as $index => $fam) {
+			if (!$fam->disp) {
+				self::$fam_hide[$fam->key] = 1;
+				unset($myfamlist[$index]);
+			}
+		}
+				
+		
+		return $myfamlist;
+	}
+	
+	/**
+	 * Search the dates table for individuals that had events on the given day
+	 * Used in:	calendar.php
+	 *
+	 * @param	int $day the day of the month to search for, leave empty to include all
+	 * @param	string $month the 3 letter abbr. of the month to search for, leave empty to include all
+	 * @param	int $year the year to search for, leave empty to include all
+	 * @param	string $fact the facts to include (use a comma seperated list to include multiple facts)
+	 * 				prepend the fact with a ! to not include that fact
+	 * @param	boolean $allgeds setting if all gedcoms should be searched, default is false
+	 * @return	array $myindilist array with all individuals that matched the query
+	 */
+	public function SearchIndisDates($day="", $month="", $year="", $fact="", $allgeds=false, $ANDOR="AND") {
+		global $GEDCOMID;
+		
+		$myindilist = array();
+		
+		$sql = "SELECT DISTINCT i_key, i_id, i_file, i_gedrec, i_isdead, n_name, n_surname, n_type, n_letter FROM ".TBLPREFIX."individuals INNER JOIN ".TBLPREFIX."names ON n_key=i_key INNER JOIN ".TBLPREFIX."dates ON (d_key=i_key AND d_fact<>'CHAN') WHERE";
+		$and = "";
+		if (!empty($day)) {
+			$sql .= " d_day='".DbLayer::EscapeQuery($day)."'";
+			$and = " AND";
+		}
+		if (!empty($month)) {
+			$sql .= $and." d_month='".DbLayer::EscapeQuery($month)."'";
+			$and = " AND";
+		}
+		if (!empty($year)) {
+			$sql .= $and." d_year='".DbLayer::EscapeQuery($year)."'";
+			$and = " AND";
+		}
+
+/*		if (!empty($fact)) {
+			$sql .= "AND (";
+			$facts = preg_split("/[,:; ]/", $fact);
+			$i=0;
+			foreach($facts as $fact) {
+				if ($i!=0) $sql .= " OR ";
+				$ct = preg_match("/!(\w+)/", $fact, $match);
+				if ($ct > 0) {
+					$fact = $match[1];
+					$sql .= "d_fact!='".DbLayer::EscapeQuery($fact)."'";
+				}
+				else {
+					$sql .= "d_fact='".DbLayer::EscapeQuery($fact)."'";
+				}
+				$i++;
+			}
+			$sql .= ") ";
+		}
+*/		
+		if (!$allgeds) {
+			$sql .= $and." d_file='".$GEDCOMID."'";
+			$and = " AND";
+		}
+		if (!empty($fact)) $sql .= $and." d_fact IN ".$fact;
+//		$sql .= "GROUP BY i_id ORDER BY d_year, d_month, d_day DESC";
+//print $sql;
+		$res = NewQuery($sql);
+		if ($res) {
+			$key = "";
+			while($row = $res->FetchAssoc($res->result)){
+				if ($key != $row["i_key"]) {
+					if ($key != "") $person->names_read = true;
+					$person = null;
+					$key = $row["i_key"];
+					$person =& Person::GetInstance($row["i_id"], $row);
+					if ($person->disp_name) {
+						self::$indi_total[$row["i_key"]] = 1;
+						$myindilist[$row["i_key"]] = $person;
+					}
+					else self::$indi_hide[$key] = 1;
+				}
+				if ($person->disp_name) $myindilist[$row["i_key"]]->addname = array($row["n_name"], $row["n_letter"], $row["n_surname"], $row["n_type"]);
+			}
+			if ($key != "") $person->names_read = true;
+		}
+		return $myindilist;
+	}
+
+	/**
+	 * Search the dates table for families that had events on the given day
+	 * Used in:	calendar.php
+	 *
+	 * @param	int $day the day of the month to search for, leave empty to include all
+	 * @param	string $month the 3 letter abbr. of the month to search for, leave empty to include all
+	 * @param	int $year the year to search for, leave empty to include all
+	 * @param	string $fact the facts to include (use a comma seperated list to include multiple facts)
+	 * 				prepend the fact with a ! to not include that fact
+	 * @param	boolean $allgeds setting if all gedcoms should be searched, default is false
+	 * @return	array $myfamlist array with all individuals that matched the query
+	 */
+	public function SearchFamsDates($day="", $month="", $year="", $fact="", $allgeds=false) {
+		global $famlist, $GEDCOMS, $GEDCOMID;
+		$myfamlist = array();
+		
+		$sql = "SELECT f_key, f_id, f_husb, f_wife, f_file, f_gedrec, d_gid, d_fact FROM ".TBLPREFIX."dates, ".TBLPREFIX."families WHERE f_key=d_key";
+		if (!empty($day)) $sql .= " AND d_day='".DbLayer::EscapeQuery($day)."'";
+		if (!empty($month)) $sql .= " AND d_month='".DbLayer::EscapeQuery(Str2Upper($month))."'";
+		if (!empty($year)) $sql .= " AND d_year='".DbLayer::EscapeQuery($year)."'";
+		if (!empty($fact)) {
+			$sql .= " AND d_fact IN ".$fact;
+/*			$sql .= "AND (";
+			$facts = preg_split("/[,:; ]/", $fact);
+			$i=0;
+			foreach($facts as $fact) {
+				if ($i!=0) $sql .= " OR ";
+				$ct = preg_match("/!(\w+)/", $fact, $match);
+				if ($ct > 0) {
+					$fact = $match[1];
+					$sql .= "d_fact!='".DbLayer::EscapeQuery(Str2Upper($fact))."'";
+				}
+				else {
+					$sql .= "d_fact='".DbLayer::EscapeQuery(Str2Upper($fact))."'";
+				}
+				$i++;
+			}
+			$sql .= ") ";
+*/		}
+		if (!$allgeds) $sql .= " AND d_file='".$GEDCOMID."'";
+//		$sql .= "GROUP BY f_id ORDER BY d_year, d_month, d_day DESC";
+		
+		$res = NewQuery($sql);
+		$select = array();
+		
+		while($row = $res->FetchAssoc()){
+			$fam = null;
+			$fam =& Family::GetInstance($row["f_id"], $row);
+			if (!empty($row["f_husb"])) $select[] = $row["f_husb"];
+			if (!empty($row["f_wife"])) $select[] = $row["f_wife"];
+			$myfamlist[$row["f_key"]] = $fam;
+			self::$fam_total[$row["f_key"]] = 1;
+		}
+		$res->FreeResult();
+	
+		if (count($myfamlist) > 0) {
+			if (count($select) > 0) {
+				array_flip(array_flip($select));
+				//print "Indi's selected for fams: ".count($select)."<br />";
+				$selection = "'".implode("','", $select)."'";
+				ListFunctions::GetIndilist($allgeds, $selection, false);
+			}
+		}
+		foreach ($myfamlist as $index => $fam) {
+			if (!$fam->disp) {
+				self::$fam_hide[$fam->key] = 1;
+				unset($myfamlist[$index]);
+			}
+		}
+				
+		
+		return $myfamlist;
 	}
 
 }

@@ -72,7 +72,7 @@ function GetCommonSurnamesIndex($gedid) {
  * @param int $min the number of times a surname must occur before it is added to the array
  */
 function GetCommonSurnames($min) {
-	global $GEDCOMID, $indilist, $GEDCOMS, $gm_lang, $HNN, $ANN;
+	global $GEDCOMID, $indilist, $GEDCOMS, $HNN, $ANN;
 
 	$surnames = array();
 	if (!CONFIGURED || !UserController::AdminUserExists() || (count($GEDCOMS)==0) || (!CheckForImport($GEDCOMID))) return $surnames;
@@ -131,7 +131,7 @@ function GetCommonSurnames($min) {
  */
 function GetSortableName($pid, $alpha="", $surname="", $allnames=false, $rev = false, $changes = false) {
 	global $SHOW_LIVING_NAMES, $PRIV_PUBLIC, $GEDCOMID, $COMBIKEY;
-	global $indilist, $gm_lang, $GEDCOMID, $NAME_REVERSE;
+	global $indilist, $GEDCOMID, $NAME_REVERSE;
 
 	$mynames = array();
 
@@ -273,7 +273,7 @@ function GetPersonName($pid, $indirec="", $starred=true) {
  * @return string the title of the source
  */
 function GetSourceDescriptor($sid, $gedrec="") {
-	global $GEDCOMID, $sourcelist, $show_changes, $gm_lang;
+	global $GEDCOMID, $sourcelist, $show_changes;
 
 	if ($sid=="") return false;
 
@@ -287,12 +287,12 @@ function GetSourceDescriptor($sid, $gedrec="") {
 	if (!empty($gedrec)) {
 		$tt = preg_match("/1 TITL (.*)/", $gedrec, $smatch);
 		if ($tt>0) {
-			if (!PrivacyFunctions::showFact("TITL", $sid, "SOUR") || !PrivacyFunctions::showFactDetails("TITL", $sid, "SOUR")) return $gm_lang["private"];
+			if (!PrivacyFunctions::showFact("TITL", $sid, "SOUR") || !PrivacyFunctions::showFactDetails("TITL", $sid, "SOUR")) return GM_LANG_private;
 			return $smatch[1];
 		}
 		$et = preg_match("/1 ABBR (.*)/", $gedrec, $smatch);
 		if ($et>0) {
-			if (!PrivacyFunctions::showFact("ABBR", $sid, "SOUR") || !PrivacyFunctions::showFactDetails("ABBR", $sid, "SOUR")) return $gm_lang["private"];
+			if (!PrivacyFunctions::showFact("ABBR", $sid, "SOUR") || !PrivacyFunctions::showFactDetails("ABBR", $sid, "SOUR")) return GM_LANG_private;
 			return $smatch[1];
 		}
 		return $sid;
@@ -307,7 +307,7 @@ function GetSourceDescriptor($sid, $gedrec="") {
  * @return string the title of the repository
  */
 function GetRepoDescriptor($rid) {
-	global $GEDCOMID, $repo_id_list, $show_changes, $gm_lang;
+	global $GEDCOMID, $repo_id_list, $show_changes;
 
 	if ($rid=="") return false;
 
@@ -319,7 +319,7 @@ function GetRepoDescriptor($rid) {
 	if (!empty($gedrec)) {
 		$tt = preg_match("/1 NAME (.*)/", $gedrec, $smatch);
 		if ($tt>0) {
-			if (!PrivacyFunctions::showFact("NAME", $rid, "REPO") || !PrivacyFunctions::showFactDetails("NAME", $rid, "REPO")) return $gm_lang["private"];
+			if (!PrivacyFunctions::showFact("NAME", $rid, "REPO") || !PrivacyFunctions::showFactDetails("NAME", $rid, "REPO")) return GM_LANG_private;
 			return $smatch[1];
 		}
 	}
@@ -390,7 +390,6 @@ function GetAddRepoDescriptor($rid) {
 
 
 function GetFamilyDescriptor($fid, $rev = false, $famrec="", $changes = false, $starred=true) {
-	global $gm_lang;
 	
 	if (empty($famrec)) $parents = FindParents($fid);
 	else $parents = FindParentsInRecord($famrec);
@@ -399,7 +398,7 @@ function GetFamilyDescriptor($fid, $rev = false, $famrec="", $changes = false, $
 		$person =& Person::GetInstance($parents["HUSB"]);
 		if ($person->disp_name)
 			$hname = GetSortableName($parents["HUSB"], "", "", false, $rev, $changes);
-		else $hname = $gm_lang["private"];
+		else $hname = GM_LANG_private;
 	}
 	else {
 		if ($rev) $hname = "@P.N. @N.N.";
@@ -410,7 +409,7 @@ function GetFamilyDescriptor($fid, $rev = false, $famrec="", $changes = false, $
 		$person =& Person::GetInstance($parents["WIFE"]);
 		if ($person->disp_name)
 			$wname = GetSortableName($parents["WIFE"], "", "", false, $rev, $changes);
-		else $wname = $gm_lang["private"];
+		else $wname = GM_LANG_private;
 	}
 	else {
 		if ($rev) $wname = "@P.N. @N.N.";
@@ -423,7 +422,6 @@ function GetFamilyDescriptor($fid, $rev = false, $famrec="", $changes = false, $
 }
 
 function GetFamilyAddDescriptor($fid, $rev = false, $famrec="", $changes = false) {
-	global $gm_lang;
 	
 	if (empty($famrec)) $parents = FindParents($fid);
 	else $parents = FindParentsInRecord($famrec);
@@ -431,7 +429,7 @@ function GetFamilyAddDescriptor($fid, $rev = false, $famrec="", $changes = false
 	if ($parents["HUSB"]) {
 		if (PrivacyFunctions::showLivingNameByID($parents["HUSB"]))
 			$hname = GetSortableAddName($parents["HUSB"], "", $rev, $changes);
-		else $hname = $gm_lang["private"];
+		else $hname = GM_LANG_private;
 	}
 	else {
 		if ($rev) $hname = "@P.N. @N.N.";
@@ -441,7 +439,7 @@ function GetFamilyAddDescriptor($fid, $rev = false, $famrec="", $changes = false
 		if (PrivacyFunctions::showLivingNameByID($parents["WIFE"])) {
 			$wname = GetSortableAddName($parents["WIFE"], "", $rev, $changes);
 		}
-		else $wname = $gm_lang["private"];
+		else $wname = GM_LANG_private;
 	}
 	else {
 		if ($rev) $wname = "@P.N. @N.N.";
@@ -692,11 +690,11 @@ function GetFirstLetter($text, $import=false) {
  * @return string
  */
 function CheckNN($names, $starred=true) {
-	global $gm_lang, $HNN, $ANN;
+	global $HNN, $ANN;
 
 	$fullname = "";
-	$NN = $gm_lang["NN"];
- 	$PN = $gm_lang["PN"];
+	$NN = GM_LANG_NN;
+ 	$PN = GM_LANG_PN;
 
 	if (!is_array($names)){
 		if (hasRTLText($names)) {
@@ -719,7 +717,7 @@ function CheckNN($names, $starred=true) {
 		return $names;
 	}
 	if (count($names) == 2 && stristr($names[0], "@N.N") && stristr($names[1], "@N.N")){
-		$fullname = $gm_lang["NN"]. " + ". $gm_lang["NN"];
+		$fullname = GM_LANG_NN. " + ". GM_LANG_NN;
 	}
 	else {
 		for($i=0; $i<count($names); $i++) {
@@ -743,8 +741,8 @@ function CheckNN($names, $starred=true) {
 				if (substr(trim($names[$i]), 0, 5) == "@P.N." && strlen(trim($names[$i])) > 5) {
 					$names[$i] = substr(trim($names[$i]), 5, (strlen($names[$i])-5));
 				}
- 				if ($i==1 && (stristr($names[0], $gm_lang["NN"]) || stristr($names[0],$HNN) || stristr($names[0],$ANN)) && count($names) == 3) $fullname .= ", ";
- 				else if ($i==2 && (stristr($names[2], $gm_lang["NN"])||stristr($names[2],$HNN)||stristr($names[2],$ANN)) && count($names) == 3) $fullname .= " + ";
+ 				if ($i==1 && (stristr($names[0], GM_LANG_NN) || stristr($names[0],$HNN) || stristr($names[0],$ANN)) && count($names) == 3) $fullname .= ", ";
+ 				else if ($i==2 && (stristr($names[2], GM_LANG_NN)||stristr($names[2],$HNN)||stristr($names[2],$ANN)) && count($names) == 3) $fullname .= " + ";
 				else if ($i==2 && stristr($names[2], "Individual ") && count($names) == 3) $fullname .= " + ";
 				else if ($i==2 && count($names) > 3) $fullname .= " + ";
 				else $fullname .= ", ";
@@ -752,7 +750,7 @@ function CheckNN($names, $starred=true) {
 			}
 		}
 	}
-	if (empty($fullname)) return $gm_lang["NN"];
+	if (empty($fullname)) return GM_LANG_NN;
 	if (substr(trim($fullname),-1) === ",") $fullname = substr($fullname,0,strlen(trim($fullname))-1);
 	if (substr(trim($fullname),0,2) === ", ") $fullname = substr($fullname,2,strlen(trim($fullname)));
 
@@ -1328,23 +1326,22 @@ function GetGBPersonName($pid) {
 }
 
 Function GetPediName($pedi, $gender="") {
-	global $gm_lang;
 
 	if ($pedi == "birth" || $pedi == "") return "";
 	if ($pedi == "adopted") {
-		if ($gender == "M") return $gm_lang["adopted_son"];
-		if ($gender == "F") return $gm_lang["adopted_daughter"];
-		return $gm_lang["adopted_child"];
+		if ($gender == "M") return GM_LANG_adopted_son;
+		if ($gender == "F") return GM_LANG_adopted_daughter;
+		return GM_LANG_adopted_child;
 	}
 	if ($pedi == "foster") {
-		if ($gender == "M") return $gm_lang["foster_son"];
-		if ($gender == "F") return $gm_lang["foster_daughter"];
-		return $gm_lang["foster_child"];
+		if ($gender == "M") return GM_LANG_foster_son;
+		if ($gender == "F") return GM_LANG_foster_daughter;
+		return GM_LANG_foster_child;
 	}
 	if ($pedi == "sealing") {
-		if ($gender == "M") return $gm_lang["sealed_son"];
-		if ($gender == "F") return $gm_lang["sealed_daughter"];
-		return $gm_lang["sealed_child"];
+		if ($gender == "M") return GM_LANG_sealed_son;
+		if ($gender == "F") return GM_LANG_sealed_daughter;
+		return GM_LANG_sealed_child;
 	}
 	return "";
 }
@@ -1389,7 +1386,7 @@ function AbbreviateName($name, $length) {
  * @param string $sosa sosa number
  */
 function GetSosaName($sosa) {
-	global $LANGUAGE, $gm_lang;
+	global $LANGUAGE;
 
 	if ($sosa<2) return "";
 	$sosaname = "";
@@ -1398,8 +1395,8 @@ function GetSosaName($sosa) {
 
 	if ($LANGUAGE == "danish" || $LANGUAGE == "norwegian" || $LANGUAGE == "swedish") {
 		$addname = "";
-		$father = strtolower($gm_lang["father"]);
-		$mother = strtolower($gm_lang["mother"]);
+		$father = strtolower(GM_LANG_father);
+		$mother = strtolower(GM_LANG_mother);
 		$grand = "be".($LANGUAGE == "danish"?"dste":"ste");
 		$great = "olde";
 		$tip = "tip".($LANGUAGE == "danish"?"-":"p-");
@@ -1427,19 +1424,19 @@ function GetSosaName($sosa) {
 		if ($LANGUAGE != "swedish") if (!empty($addname)) $sosaname .= ($gen>5?"<br />&nbsp;&nbsp;&nbsp;&nbsp;":"")." <small>(".$addname.")</small>";
 	}
 	if ($LANGUAGE == "dutch") {
-		if ($gen & 256) $sosaname .= $gm_lang["sosa_11"];
-		if ($gen & 128) $sosaname .= $gm_lang["sosa_10"];
-		if ($gen & 64) $sosaname .= $gm_lang["sosa_9"];
-		if ($gen & 32) $sosaname .= $gm_lang["sosa_8"];
-		if ($gen & 16) $sosaname .= $gm_lang["sosa_7"];
-		if ($gen & 8) $sosaname .= $gm_lang["sosa_6"];
-		if ($gen & 4) $sosaname .= $gm_lang["sosa_5"];
+		if ($gen & 256) $sosaname .= GM_LANG_sosa_11;
+		if ($gen & 128) $sosaname .= GM_LANG_sosa_10;
+		if ($gen & 64) $sosaname .= GM_LANG_sosa_9;
+		if ($gen & 32) $sosaname .= GM_LANG_sosa_8;
+		if ($gen & 16) $sosaname .= GM_LANG_sosa_7;
+		if ($gen & 8) $sosaname .= GM_LANG_sosa_6;
+		if ($gen & 4) $sosaname .= GM_LANG_sosa_5;
 		$gen = $gen - floor($gen / 4)*4;
-		if ($gen == 3) $sosaname .= $gm_lang["sosa_4"].$gm_lang["sosa_3"].$gm_lang["sosa_2"];
-		if ($gen == 2) $sosaname .= $gm_lang["sosa_3"].$gm_lang["sosa_2"];
-		if ($gen == 1) $sosaname .= $gm_lang["sosa_2"];
-		if ($sosa%2) $sosaname .= strtolower($gm_lang["mother"]);
-		else $sosaname .= strtolower($gm_lang["father"]);
+		if ($gen == 3) $sosaname .= GM_LANG_sosa_4.GM_LANG_sosa_3.GM_LANG_sosa_2;
+		if ($gen == 2) $sosaname .= GM_LANG_sosa_3.GM_LANG_sosa_2;
+		if ($gen == 1) $sosaname .= GM_LANG_sosa_2;
+		if ($sosa%2) $sosaname .= strtolower(GM_LANG_mother);
+		else $sosaname .= strtolower(GM_LANG_father);
 		$sosaname = Str2Upper(substr($sosaname, 0,1)).substr($sosaname,1);
 		return $sosaname;
 	}
@@ -1448,19 +1445,19 @@ function GetSosaName($sosa) {
 			$sosaname .= "Great-";
 		}
 		if ($gen >= 1) $sosaname .= "Grand";
-		if (!($sosa%2)) $sosaname .= strtolower($gm_lang["father"]);
-		else $sosaname .= strtolower($gm_lang["mother"]);
+		if (!($sosa%2)) $sosaname .= strtolower(GM_LANG_father);
+		else $sosaname .= strtolower(GM_LANG_mother);
 		$sosaname = Str2Upper(substr($sosaname, 0,1)).substr($sosaname,1);
 	}
 	if ($LANGUAGE == "finnish") {
-		$father = Str2Lower($gm_lang["father"]);
-		$mother = Str2Lower($gm_lang["mother"]);
+		$father = Str2Lower(GM_LANG_father);
+		$mother = Str2Lower(GM_LANG_mother);
 //		$father = "isä";
 //		$mother = "äiti";
-//		$gm_lang["sosa_2"]= "äidin";	//Grand (mother)
+//		GM_LANG_sosa_2= "äidin";	//Grand (mother)
 		for ($i=$gen; $i>0; $i--){
 			if (!(floor($sosa/(pow(2,$i)))%2)) $sosaname .= $father."n";
-//			else $sosaname .= $gm_lang["sosa_2"];
+//			else $sosaname .= GM_LANG_sosa_2;
 			else $sosaname .= substr($mother, 0,3)."din";
 		}
 		if (!($sosa%2)) $sosaname .= $father;
@@ -1474,8 +1471,8 @@ function GetSosaName($sosa) {
 			$sosaname .= "Arrière-";
 		}
 		if ($gen >= 1) $sosaname .= "Grand-";
-		if (!($sosa%2)) $sosaname .= $gm_lang["father"];
-		else $sosaname .= $gm_lang["mother"];
+		if (!($sosa%2)) $sosaname .= GM_LANG_father;
+		else $sosaname .= GM_LANG_mother;
 		if ($gen == 1){
 			if ($sosa<6) $sosaname .= " Pater";
 			else $sosaname .= " Mater";
@@ -1488,19 +1485,19 @@ function GetSosaName($sosa) {
 			$sosaname .= "Ur-";
 		}
 		if ($gen >= 1) $sosaname .= "Groß";
-		if (!($sosa%2)) $sosaname .= strtolower($gm_lang["father"]);
-		else $sosaname .= strtolower($gm_lang["mother"]);
+		if (!($sosa%2)) $sosaname .= strtolower(GM_LANG_father);
+		else $sosaname .= strtolower(GM_LANG_mother);
 		$sosaname = Str2Upper(substr($sosaname, 0,1)).substr($sosaname,1);
 	}
 	if ($LANGUAGE == "hebrew") {
 		$addname = "";
-		$father = $gm_lang["father"];
-		$mother = $gm_lang["mother"];
-		$greatf = $gm_lang["sosa_22"];
-		$greatm = $gm_lang["sosa_21"];
-		$of = $gm_lang["sosa_23"];
-		$grandfather = $gm_lang["sosa_4"];
-		$grandmother = $gm_lang["sosa_5"];
+		$father = GM_LANG_father;
+		$mother = GM_LANG_mother;
+		$greatf = GM_LANG_sosa_22;
+		$greatm = GM_LANG_sosa_21;
+		$of = GM_LANG_sosa_23;
+		$grandfather = GM_LANG_sosa_4;
+		$grandmother = GM_LANG_sosa_5;
 //		$father = "Aba";
 //		$mother = "Ima";
 //		$grandfather = "Saba";
@@ -1535,8 +1532,8 @@ function GetSosaName($sosa) {
 	}
 	if (!empty($sosaname)) return "$sosaname<!-- sosa=$sosa nr=$sosanr gen=$gen -->";
 
-	if (isset($gm_lang["sosa_$sosa"])) return $gm_lang["sosa_$sosa"];
-	else return (($sosa%2) ? $gm_lang["mother"] : $gm_lang["father"]) . " " . floor($sosa/2);
+	if (defined("GM_LANG_sosa_".$sosa)) return constant("GM_LANG_sosa_".$sosa);
+	else return (($sosa%2) ? GM_LANG_mother : GM_LANG_father) . " " . floor($sosa/2);
 }
 
 ?>

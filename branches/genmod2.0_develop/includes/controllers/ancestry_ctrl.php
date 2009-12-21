@@ -61,12 +61,11 @@ class AncestryController extends ChartController {
 	}
 
 	protected function GetPageTitle() {
-		global $gm_lang;
 		
 		if (is_null($this->pagetitle)) {
 			$this->pagetitle = $this->GetRootObject()->name;
 			if (GedcomConfig::$SHOW_ID_NUMBERS) $this->pagetitle .= " - ".$this->xref;
-			$this->pagetitle .= " - ".$gm_lang["ancestry_chart"];
+			$this->pagetitle .= " - ".GM_LANG_ancestry_chart;
 		}
 		return $this->pagetitle;
 	}
@@ -79,7 +78,6 @@ class AncestryController extends ChartController {
 	 * @param int $depth the ascendancy depth to show
 	 */
 	public function PrintChildAscendancy($person, $sosa, $depth) {
-		global $gm_lang;
 		global $GM_IMAGES, $Dindent;
 		
 		static $pidarr;
@@ -95,7 +93,7 @@ class AncestryController extends ChartController {
 		
 		print "</td>";
 		print "<td style=\"vertical-align:middle;\">";
-		if ($sosa>1) ChartFunctions::PrintUrlArrow($person->xref, "?rootid=".$person->xref."&amp;num_generations=".$this->num_generations."&amp;show_details=".$this->show_details."&amp;box_width=".$this->box_width."&amp;chart_style=".$this->chart_style."", $gm_lang["ancestry_chart"], 3);
+		if ($sosa>1) ChartFunctions::PrintUrlArrow($person->xref, "?rootid=".$person->xref."&amp;num_generations=".$this->num_generations."&amp;show_details=".$this->show_details."&amp;box_width=".$this->box_width."&amp;chart_style=".$this->chart_style."", GM_LANG_ancestry_chart, 3);
 		print "</td>";
 		print "<td class=\"details1\" style=\"vertical-align:middle;\">&nbsp;<span class=\"person_box". (($sosa==1) ? "NN" : (($sosa%2) ? "F" : "")) . "\">&nbsp;$sosa&nbsp;</span>&nbsp;";
 		print "</td><td class=\"details1\" style=\"vertical-align:middle;\">";
@@ -112,8 +110,8 @@ class AncestryController extends ChartController {
 				if (($family->husb_id != "" || $family->wife_id != "" || GedcomConfig::$SHOW_EMPTY_BOXES) && $new && $depth>0) {
 					// print marriage info
 					print "<span class=\"details1\" style=\"white-space: nowrap;\" >";
-					print "<img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["spacer"]["other"]."\" height=\"2\" width=\"$Dindent\" border=\"0\" align=\"middle\" alt=\"\" /><a href=\"javascript: ".$gm_lang["view_family"]."\" onclick=\"expand_layer('sosa_".$sosa."'); return false;\" class=\"top\"><img id=\"sosa_".$sosa."_img\" src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["minus"]["other"]."\" align=\"middle\" hspace=\"0\" vspace=\"3\" border=\"0\" alt=\"".$gm_lang["view_family"]."\" /></a> ";
-					print "&nbsp;<span class=\"person_box\">&nbsp;".($sosa*2)."&nbsp;</span>&nbsp;".$gm_lang["and"];
+					print "<img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["spacer"]["other"]."\" height=\"2\" width=\"$Dindent\" border=\"0\" align=\"middle\" alt=\"\" /><a href=\"javascript: ".GM_LANG_view_family."\" onclick=\"expand_layer('sosa_".$sosa."'); return false;\" class=\"top\"><img id=\"sosa_".$sosa."_img\" src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["minus"]["other"]."\" align=\"middle\" hspace=\"0\" vspace=\"3\" border=\"0\" alt=\"".GM_LANG_view_family."\" /></a> ";
+					print "&nbsp;<span class=\"person_box\">&nbsp;".($sosa*2)."&nbsp;</span>&nbsp;".GM_LANG_and;
 			 		print "&nbsp;<span class=\"person_boxF\">&nbsp;".($sosa*2+1)." </span>&nbsp;";
 					if ($family->disp) FactFunctions::PrintSimpleFact($family->marr_fact, false, false); 
 					print "</span>";
