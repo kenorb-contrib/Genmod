@@ -115,7 +115,7 @@ abstract class DetailController extends BaseController{
 	}
 	
 	public function PrintTabs() {
-		global $GEDCOMID, $gm_user, $gm_lang;
+		global $GEDCOMID, $gm_user;
 		global $GM_IMAGES, $TEXT_DIRECTION;
 		
 		$object_name = $this->object_name;
@@ -160,28 +160,28 @@ abstract class DetailController extends BaseController{
 		<?php
 		if (!$this->IsPrintPreview()) {
 			// Print message is any changes to links are present
-			if ($this->show_changes && $this->HasUnapprovedLinks()) print "<br />".$gm_lang["unapproved_link"];
+			if ($this->show_changes && $this->HasUnapprovedLinks()) print "<br />".GM_LANG_unapproved_link;
 			print "<div class=\"door center\">";
 			print "<dl>";
 			foreach ($this->tabs as $index => $tab) {
 				if ($index != 0) {
 					print "<dd id=\"door".$index."\"><a href=\"javascript:;\" onclick=\"tabswitch(".$index.")\" >";
-					if ($tab == "facts") print $gm_lang["facts"]."</a></dd>\n";
-					if ($tab == "individuals_links") print $gm_lang["indi_linking"]." (".$this->$object_name->indi_count.")</a></dd>\n";
-					if ($tab == "families_links") print $gm_lang["fam_linking"]." (".$this->$object_name->fam_count.")</a></dd>\n";
-					if ($tab == "notes_links") print $gm_lang["note_linking"]." (".$this->$object_name->note_count.")</a></dd>\n";
-					if ($tab == "media_links") print $gm_lang["mm_linking"]." (".$this->$object_name->media_count.")</a></dd>\n";
-					if ($tab == "sources_links") print $gm_lang["sour_linking"]." (".$this->$object_name->sour_count.")</a></dd>\n";
-					if ($tab == "repositories_links") print $gm_lang["repo_linking"]." (".$this->$object_name->repo_count.")</a></dd>\n";
-					if ($tab == "actions_links") print $gm_lang["action_linking"]." (".$this->$object_name->action_count.")</a></dd>\n";
-					if ($tab == "relatives") print $gm_lang["relatives"]."</a></dd>\n";
-					if ($tab == "sources") print $gm_lang["ssourcess"]."</a></dd>\n";
-					if ($tab == "media") print $gm_lang["media"]."</a></dd>\n";
-					if ($tab == "notes") print $gm_lang["notes"]."</a></dd>\n";
-					if ($tab == "actions_person") print $gm_lang["research_log"]."</a></dd>\n";
+					if ($tab == "facts") print GM_LANG_facts."</a></dd>\n";
+					if ($tab == "individuals_links") print GM_LANG_indi_linking." (".$this->$object_name->indi_count.")</a></dd>\n";
+					if ($tab == "families_links") print GM_LANG_fam_linking." (".$this->$object_name->fam_count.")</a></dd>\n";
+					if ($tab == "notes_links") print GM_LANG_note_linking." (".$this->$object_name->note_count.")</a></dd>\n";
+					if ($tab == "media_links") print GM_LANG_mm_linking." (".$this->$object_name->media_count.")</a></dd>\n";
+					if ($tab == "sources_links") print GM_LANG_sour_linking." (".$this->$object_name->sour_count.")</a></dd>\n";
+					if ($tab == "repositories_links") print GM_LANG_repo_linking." (".$this->$object_name->repo_count.")</a></dd>\n";
+					if ($tab == "actions_links") print GM_LANG_action_linking." (".$this->$object_name->action_count.")</a></dd>\n";
+					if ($tab == "relatives") print GM_LANG_relatives."</a></dd>\n";
+					if ($tab == "sources") print GM_LANG_ssourcess."</a></dd>\n";
+					if ($tab == "media") print GM_LANG_media."</a></dd>\n";
+					if ($tab == "notes") print GM_LANG_notes."</a></dd>\n";
+					if ($tab == "actions_person") print GM_LANG_research_log."</a></dd>\n";
 				}
 			}
-			print "<dd id=\"door0\"><a href=\"javascript:;\" onclick=\"tabswitch(0)\" >".$gm_lang["all"]."</a></dd>\n";
+			print "<dd id=\"door0\"><a href=\"javascript:;\" onclick=\"tabswitch(0)\" >".GM_LANG_all."</a></dd>\n";
 			print "</dl>\n";
 			print "</div><div id=\"dummy\"></div><br /><br />\n";
 		}
@@ -203,9 +203,9 @@ abstract class DetailController extends BaseController{
 				if ($this->tabtype == "indi" && count($this->$object_name->facts) > 0) {
 					echo '<tr id="row_top"><td></td><td class="shade2 rela">';
 					echo '<a href="#" onclick="togglerow(\'row_rela\'); return false;">';
-					echo '<img style="display:none;" id="rela_plus" src="'.GM_IMAGE_DIR.'/'.$GM_IMAGES["plus"]["other"].'" border="0" width="11" height="11" alt="'.$gm_lang["show_details"].'" title="'.$gm_lang["show_details"].'" />';
-					echo '<img id="rela_minus" src="'.GM_IMAGE_DIR.'/'.$GM_IMAGES["minus"]["other"].'" border="0" width="11" height="11" alt="'.$gm_lang["hide_details"].'" title="'.$gm_lang["hide_details"].'" />';
-					echo ' '.$gm_lang["relatives_events"];
+					echo '<img style="display:none;" id="rela_plus" src="'.GM_IMAGE_DIR.'/'.$GM_IMAGES["plus"]["other"].'" border="0" width="11" height="11" alt="'.GM_LANG_show_details.'" title="'.GM_LANG_show_details.'" />';
+					echo '<img id="rela_minus" src="'.GM_IMAGE_DIR.'/'.$GM_IMAGES["minus"]["other"].'" border="0" width="11" height="11" alt="'.GM_LANG_hide_details.'" title="'.GM_LANG_hide_details.'" />';
+					echo ' '.GM_LANG_relatives_events;
 					echo '</a></td></tr>';
 				}
 				
@@ -235,9 +235,9 @@ abstract class DetailController extends BaseController{
 						print "<tr>";
 						print "<td class=\"shade2\">";
 						print_help_link("add_media_link_help", "qm");
-						print $gm_lang["add_media_link_lbl"]."</td>";
+						print GM_LANG_add_media_link_lbl."</td>";
 						print "<td class=\"shade1\">";
-						print "<a href=\"javascript: ".$gm_lang["add_media_lbl"]."\" onclick=\"add_new_record('". $this->$object_name->xref."','".$this->$object_name->datatype."', 'add_media_link'); return false;\">".$gm_lang["add_media_link"]."</a>";
+						print "<a href=\"javascript: ".GM_LANG_add_media_lbl."\" onclick=\"add_new_record('". $this->$object_name->xref."','".$this->$object_name->datatype."', 'add_media_link'); return false;\">".GM_LANG_add_media_link."</a>";
 						print "</td></tr>";
 					}
 				}
@@ -245,9 +245,9 @@ abstract class DetailController extends BaseController{
 				print "</div>";
 				if ($this->IsPrintPreview()) { 
 					print "<br /><span class=\"label\">";
-					if ($this->tabtype == "sour") print $gm_lang["other_records"];
-					else if ($this->tabtype == "media") print $gm_lang["other_mmrecords"];
-					elseif ($this->tabtype != "indi" && $this->tabtype != "fam") print $gm_lang["other_".$this->tabtype."_records"];
+					if ($this->tabtype == "sour") print GM_LANG_other_records;
+					else if ($this->tabtype == "media") print GM_LANG_other_mmrecords;
+					elseif ($this->tabtype != "indi" && $this->tabtype != "fam") print constant("GM_LANG_other_".$this->tabtype."_records");
 					print "</span>";
 				}
 				if ($this->tabtype == "indi" && count($this->$object_name->facts) > 0) $this->PrintToggleJS2();
@@ -259,8 +259,8 @@ abstract class DetailController extends BaseController{
 				if ($this->$object_name->indi_count>0) {
 					print "\n\t<table class=\"list_table $TEXT_DIRECTION\">\n\t\t<tr><td class=\"shade2 center\"";
 					if($this->$object_name->indi_count>12)	print " colspan=\"2\"";
-					print "><img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["indis"]["small"]."\" border=\"0\" title=\"".$gm_lang["individuals"]."\" alt=\"".$gm_lang["individuals"]."\" />&nbsp;&nbsp;";
-					print $gm_lang["individuals"];
+					print "><img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["indis"]["small"]."\" border=\"0\" title=\"".GM_LANG_individuals."\" alt=\"".GM_LANG_individuals."\" />&nbsp;&nbsp;";
+					print GM_LANG_individuals;
 					print "</td></tr><tr><td class=\"$TEXT_DIRECTION shade1 wrap\"><ul>";
 					$i=1;
 					// -- print the array
@@ -277,8 +277,8 @@ abstract class DetailController extends BaseController{
 					print "</tr>";
 						if ($this->$object_name->indi_count>0) { 
 							print "<tr><td>";
-							print $gm_lang["total_indis"]." ".$this->$object_name->indi_count;
-							if ($this->$object_name->indi_hide>0) print "&nbsp;--&nbsp;".$gm_lang["hidden"]." ".$this->$object_name->indi_hide;
+							print GM_LANG_total_indis." ".$this->$object_name->indi_count;
+							if ($this->$object_name->indi_hide>0) print "&nbsp;--&nbsp;".GM_LANG_hidden." ".$this->$object_name->indi_hide;
 							print "</td></tr>";
 						}
 					print "</table><br />";
@@ -293,8 +293,8 @@ abstract class DetailController extends BaseController{
 				if ($this->$object_name->fam_count>0) {
 					print "\n\t<table class=\"list_table  $TEXT_DIRECTION\">\n\t\t<tr><td class=\"shade2 center\"";
 					if($this->$object_name->fam_count>12)	print " colspan=\"2\"";
-					print "><img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["sfamily"]["small"]."\" border=\"0\" title=\"".$gm_lang["families"]."\" alt=\"".$gm_lang["families"]."\" />&nbsp;&nbsp;";
-					print $gm_lang["families"];
+					print "><img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["sfamily"]["small"]."\" border=\"0\" title=\"".GM_LANG_families."\" alt=\"".GM_LANG_families."\" />&nbsp;&nbsp;";
+					print GM_LANG_families;
 					print "</td></tr><tr><td class=\"$TEXT_DIRECTION shade1 wrap\"><ul>";
 					$i=1;
 					foreach ($this->$object_name->famlist as $key => $family) {
@@ -307,8 +307,8 @@ abstract class DetailController extends BaseController{
 					print "</tr>";
 					if ($this->$object_name->fam_count>0) { 
 						print "<tr><td>";
-						print $gm_lang["total_fams"]." ".$this->$object_name->fam_count;
-						if ($this->$object_name->fam_hide>0) print "&nbsp;--&nbsp;".$gm_lang["hidden"]." ".$this->$object_name->fam_hide;
+						print GM_LANG_total_fams." ".$this->$object_name->fam_count;
+						if ($this->$object_name->fam_hide>0) print "&nbsp;--&nbsp;".GM_LANG_hidden." ".$this->$object_name->fam_hide;
 						print "</td></tr>";
 					}
 					print "</table><br />";
@@ -323,8 +323,8 @@ abstract class DetailController extends BaseController{
 				if ($this->$object_name->note_count>0) {
 					print "\n\t<table class=\"list_table $TEXT_DIRECTION\">\n\t\t<tr><td class=\"shade2 center\"";
 					if($this->$object_name->note_count > 12) print " colspan=\"2\"";
-					print "><img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["note"]["other"]."\" border=\"0\" title=\"".$gm_lang["notes"]."\" alt=\"".$gm_lang["notes"]."\" />&nbsp;&nbsp;";
-					print $gm_lang["titles_found"];
+					print "><img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["note"]["other"]."\" border=\"0\" title=\"".GM_LANG_notes."\" alt=\"".GM_LANG_notes."\" />&nbsp;&nbsp;";
+					print GM_LANG_titles_found;
 					print "</td></tr><tr><td class=\"$TEXT_DIRECTION shade1 wrap\"><ul>";
 					$i=1;
 					foreach ($this->$object_name->notelist as $key => $note) {
@@ -337,8 +337,8 @@ abstract class DetailController extends BaseController{
 					print "</tr>";
 					if ($this->$object_name->note_count>0) { 
 						print "<tr><td>";
-						print $gm_lang["total_notes"]." ".$this->$object_name->note_count;
-						if ($this->$object_name->note_hide>0) print "&nbsp;--&nbsp;".$gm_lang["hidden"]." ".$this->$object_name->note_hide;
+						print GM_LANG_total_notes." ".$this->$object_name->note_count;
+						if ($this->$object_name->note_hide>0) print "&nbsp;--&nbsp;".GM_LANG_hidden." ".$this->$object_name->note_hide;
 						print "</td></tr>";
 					}
 					print "</table><br />";
@@ -354,8 +354,8 @@ abstract class DetailController extends BaseController{
 				if ($this->$object_name->sour_count>0 || $this->$object_name->sour_hide>0) {
 					print "\n\t<table class=\"list_table  $TEXT_DIRECTION\">\n\t\t<tr><td class=\"shade2 center\"";
 					if($this->$object_name->sour_count>12)	print " colspan=\"2\"";
-					print "><img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["source"]["small"]."\" border=\"0\" title=\"".$gm_lang["sources"]."\" alt=\"".$gm_lang["sources"]."\" />&nbsp;&nbsp;";
-					print $gm_lang["sources"];
+					print "><img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["source"]["small"]."\" border=\"0\" title=\"".GM_LANG_sources."\" alt=\"".GM_LANG_sources."\" />&nbsp;&nbsp;";
+					print GM_LANG_sources;
 					print "</td></tr><tr><td class=\"$TEXT_DIRECTION shade1 wrap\"><ul>";
 					$i=1;
 					// -- print the array
@@ -370,8 +370,8 @@ abstract class DetailController extends BaseController{
 					print "</tr>";
 						if ($this->$object_name->sour_count>0) { 
 							print "<tr><td>";
-							print $gm_lang["total_sources"]." ".$this->$object_name->sour_count;
-							if ($this->$object_name->sour_hide>0) print "&nbsp;--&nbsp;".$gm_lang["hidden"]." ".$this->$object_name->sour_hide;
+							print GM_LANG_total_sources." ".$this->$object_name->sour_count;
+							if ($this->$object_name->sour_hide>0) print "&nbsp;--&nbsp;".GM_LANG_hidden." ".$this->$object_name->sour_hide;
 							print "</td></tr>";
 						}
 					print "</table><br />";
@@ -386,8 +386,8 @@ abstract class DetailController extends BaseController{
 				if ($this->$object_name->media_count > 0 || $this->$object_name->media_hide > 0) {
 					print "\n\t<table class=\"list_table  $TEXT_DIRECTION\">\n\t\t<tr><td class=\"shade2 center\"";
 					if($this->$object_name->media_count>12)	print " colspan=\"2\"";
-					print "><img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["media"]["small"]."\" border=\"0\" title=\"".$gm_lang["media"]."\" alt=\"".$gm_lang["media"]."\" />&nbsp;&nbsp;";
-					print $gm_lang["media"];
+					print "><img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["media"]["small"]."\" border=\"0\" title=\"".GM_LANG_media."\" alt=\"".GM_LANG_media."\" />&nbsp;&nbsp;";
+					print GM_LANG_media;
 					print "</td></tr><tr><td class=\"$TEXT_DIRECTION shade1 wrap\"><ul>";
 					$i=1;
 					foreach ($this->$object_name->medialist as $key => $object) {
@@ -400,8 +400,8 @@ abstract class DetailController extends BaseController{
 					print "</tr>";
 					if ($this->$object_name->media_count>0) { 
 						print "<tr><td>";
-						print $gm_lang["total_media"]." ".$this->$object_name->media_count;
-						if ($this->$object_name->media_hide > 0) print "&nbsp;--&nbsp;".$gm_lang["hidden"]." ".$this->$object_name->media_hide;
+						print GM_LANG_total_media." ".$this->$object_name->media_count;
+						if ($this->$object_name->media_hide > 0) print "&nbsp;--&nbsp;".GM_LANG_hidden." ".$this->$object_name->media_hide;
 						print "</td></tr>";
 					}
 					print "</table><br />";
@@ -416,8 +416,8 @@ abstract class DetailController extends BaseController{
 				if ($this->$object_name->repo_count > 0 || $this->$object_name->repo_hide > 0) {
 					print "\n\t<table class=\"list_table  $TEXT_DIRECTION\">\n\t\t<tr><td class=\"shade2 center\"";
 					if($this->$object_name->repo_count>12)	print " colspan=\"2\"";
-					print "><img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["repository"]["small"]."\" border=\"0\" title=\"".$gm_lang["repos"]."\" alt=\"".$gm_lang["repos"]."\" />&nbsp;&nbsp;";
-					print $gm_lang["repos"];
+					print "><img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["repository"]["small"]."\" border=\"0\" title=\"".GM_LANG_repos."\" alt=\"".GM_LANG_repos."\" />&nbsp;&nbsp;";
+					print GM_LANG_repos;
 					print "</td></tr><tr><td class=\"$TEXT_DIRECTION shade1 wrap\"><ul>";
 					$i=1;
 					if ($this->$object_name->repo_count>0){
@@ -430,8 +430,8 @@ abstract class DetailController extends BaseController{
 						}
 						print "\n\t\t</ul></td>\n\t\t";
 				 	
-						print "</tr><tr><td>".$gm_lang["total_repositories"]." ".$this->$object_name->repo_count;
-						if ($this->$object_name->repo_hide > 0) print "  --  ".$gm_lang["hidden"]." ".$this->$object_name->repo_hide;
+						print "</tr><tr><td>".GM_LANG_total_repositories." ".$this->$object_name->repo_count;
+						if ($this->$object_name->repo_hide > 0) print "  --  ".GM_LANG_hidden." ".$this->$object_name->repo_hide;
 					}
 					print "</table><br />";
 				}
@@ -444,19 +444,19 @@ abstract class DetailController extends BaseController{
 					
 					// Start of todo list
 					print "\n\t<table class=\"list_table $TEXT_DIRECTION\">";
-					print "<tr><td colspan=\"3\" class=\"shade2 center\">".$gm_lang["actionlist"]."</td></tr>";
-					print "<tr><td class=\"shade2 center\">".$gm_lang["todo"]."</td><td class=\"shade2 center\">".$gm_lang["for"]."</td><td class=\"shade2 center\">".$gm_lang["status"]."</td></tr>";
+					print "<tr><td colspan=\"3\" class=\"shade2 center\">".GM_LANG_actionlist."</td></tr>";
+					print "<tr><td class=\"shade2 center\">".GM_LANG_todo."</td><td class=\"shade2 center\">".GM_LANG_for."</td><td class=\"shade2 center\">".GM_LANG_status."</td></tr>";
 					foreach ($this->$object_name->actionlist as $key => $item) {
 						print "<tr>";
 						print "<td class=\"shade1 wrap\">".nl2br(stripslashes($item->text))."</td>";
 						print "<td class=\"shade1\">";
 						print "<a href=\"individual.php?pid=".$item->pid."\">".$item->piddesc."</a>";
 						print "</td>";
-						print "<td class=\"shade1\">".$gm_lang["action".$item->status]."</td>";
+						print "<td class=\"shade1\">".constant("GM_LANG_action".$item->status)."</td>";
 						print "</tr>";
 					}
-					print "<tr><td>".$gm_lang["total_actions"]." ".$this->$object_name->action_count;
-					if ($this->$object_name->action_hide>0) print "  --  ".$gm_lang["hidden"]." ".$this->$object_name->action_hide;
+					print "<tr><td>".GM_LANG_total_actions." ".$this->$object_name->action_count;
+					if ($this->$object_name->action_hide>0) print "  --  ".GM_LANG_hidden." ".$this->$object_name->action_hide;
 					print "</table>";
 				}
 				else print "<div id=\"no_tab".$index."\"></div>";
@@ -476,14 +476,14 @@ abstract class DetailController extends BaseController{
 							print "<td><img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["cfamily"]["small"]."\" border=\"0\" class=\"icon\" alt=\"\" /></td>";
 							print "<td><span class=\"subheaders\">".$family->label."</span>";
 							if (!$this->view) {
-						 		print " - <a href=\"family.php?famid=".$family->xref."\">[".$gm_lang["view_family"].$family->addxref."]</a>&nbsp;&nbsp;";
+						 		print " - <a href=\"family.php?famid=".$family->xref."&amp;gedid=".$family->gedcomid."\">[".GM_LANG_view_family.$family->addxref."]</a>&nbsp;&nbsp;";
 					 			if ($family->husb_id == "" && $this->$object_name->canedit) { 
 					 				print_help_link("edit_add_parent_help", "qm");
-									print "<a href=\"javascript ".$gm_lang["add_father"]."\" onclick=\"return addnewparentfamily('', 'HUSB', '".$family->xref."', 'add_father');\">".$gm_lang["add_father"]."</a>";
+									print "<a href=\"javascript ".GM_LANG_add_father."\" onclick=\"return addnewparentfamily('', 'HUSB', '".$family->xref."', 'add_father');\">".GM_LANG_add_father."</a>";
 								}
 					 			if ($family->wife_id == "" && $this->$object_name->canedit) { 
 					 				print_help_link("edit_add_parent_help", "qm");
-									print "<a href=\"javascript ".$gm_lang["add_mother"]."\" onclick=\"return addnewparentfamily('', 'WIFE', '".$family->xref."', 'add_mother');\">".$gm_lang["add_mother"]."</a>";
+									print "<a href=\"javascript ".GM_LANG_add_mother."\" onclick=\"return addnewparentfamily('', 'WIFE', '".$family->xref."', 'add_mother');\">".GM_LANG_add_mother."</a>";
 								}
 							}
 							print "</td></tr>";
@@ -505,7 +505,7 @@ abstract class DetailController extends BaseController{
 										print "<table><tr>";
 										print "<td><img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["cfamily"]["small"]."\" border=\"0\" class=\"icon\" alt=\"\" /></td>";
 										print "<td><span class=\"subheaders\">".$family->label."</span>";
-										if (!$this->view) print " - <a href=\"family.php?famid=".$family->xref."\">[".$gm_lang["view_family"].$family->addxref."]</a>";
+										if (!$this->view) print " - <a href=\"family.php?famid=".$family->xref."&amp;gedid=".$family->gedcomid."\">[".GM_LANG_view_family.$family->addxref."]</a>";
 										print "</td></tr></table>";
 										
 										print "<table class=\"facts_table\">";
@@ -525,7 +525,7 @@ abstract class DetailController extends BaseController{
 										print "<table><tr>";
 										print "<td><img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["cfamily"]["small"]."\" border=\"0\" class=\"icon\" alt=\"\" /></td>";
 										print "<td><span class=\"subheaders\">".$family->label."</span>";
-										if (!$this->view) print " - <a href=\"family.php?famid=".$family->xref."\">[".$gm_lang["view_family"].$family->addxref."]</a>";
+										if (!$this->view) print " - <a href=\"family.php?famid=".$family->xref."&amp;gedid=".$family->gedcomid."\">[".GM_LANG_view_family.$family->addxref."]</a>";
 										print "</td></tr></table>";
 										
 										print "<table class=\"facts_table\">";
@@ -544,7 +544,7 @@ abstract class DetailController extends BaseController{
 							print "<tr>";
 							print "<td><img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["cfamily"]["small"]."\" border=\"0\" class=\"icon\" alt=\"\" /></td>";
 							print "<td><span class=\"subheaders\">".$family->label."</span>";
-							if (!$this->view) print " - <a href=\"family.php?famid=".$family->xref."\">[".$gm_lang["view_family"].$family->addxref."]</a>";
+							if (!$this->view) print " - <a href=\"family.php?famid=".$family->xref."&amp;gedid=".$family->gedcomid."\">[".GM_LANG_view_family.$family->addxref."]</a>";
 							print "</td></tr>";
 							print "</table>";
 							
@@ -555,7 +555,7 @@ abstract class DetailController extends BaseController{
 						}
 					}
 				}
-				else print "<div id=\"no_tab".$index."\" class=\"shade1\">".$gm_lang["no_tab5"]."</div>\n";
+				else print "<div id=\"no_tab".$index."\" class=\"shade1\">".GM_LANG_no_tab5."</div>\n";
 				print "</div>";
 			}
 			if ($tab == "sources") {
@@ -582,8 +582,8 @@ abstract class DetailController extends BaseController{
 					}
 					print "<tr><td class=\"width20 shade2\">";
 					print_help_link("add_source_help", "qm");
-					print $gm_lang["add_source_lbl"]."</td><td class=\"shade1\">";
-					print "<a href=\"javascript: ".$gm_lang["add_source"]."\" onclick=\"add_new_record('".$this->$object_name->xref."','SOUR', 'add_source'); return false;\">".$gm_lang["add_source"]."</a>";
+					print GM_LANG_add_source_lbl."</td><td class=\"shade1\">";
+					print "<a href=\"javascript: ".GM_LANG_add_source."\" onclick=\"add_new_record('".$this->$object_name->xref."','SOUR', 'add_source'); return false;\">".GM_LANG_add_source."</a>";
 					print "<br /></td></tr>";
 				}
 				if ($table) print "</table>";
@@ -615,8 +615,8 @@ abstract class DetailController extends BaseController{
 					}
 					print "<tr><td class=\"shade2 width20\">";
 					print_help_link("add_media_help", "qm");
-					print $gm_lang["add_media_lbl"]."</td><td class=\"shade1\">";
-					print "<a href=\"javascript: ".$gm_lang["add_media_lbl"]."\" onclick=\"add_new_record('".$this->$object_name->xref."','OBJE', 'add_media'); return false;\">".$gm_lang["add_media"]."</a>";
+					print GM_LANG_add_media_lbl."</td><td class=\"shade1\">";
+					print "<a href=\"javascript: ".GM_LANG_add_media_lbl."\" onclick=\"add_new_record('".$this->$object_name->xref."','OBJE', 'add_media'); return false;\">".GM_LANG_add_media."</a>";
 					print "</td></tr>";
 				}
 				if ($table) print "</table>";
@@ -647,12 +647,12 @@ abstract class DetailController extends BaseController{
 					}
 					print "<tr><td class=\"shade2 width20\">";
 					print_help_link("add_note_help", "qm");
-					print $gm_lang["add_note_lbl"]."</td><td class=\"shade1\">";
-					print "<a href=\"javascript: ".$gm_lang["add_note"]."\" onclick=\"add_new_record('".$this->$object_name->xref."','NOTE', 'add_note'); return false;\">".$gm_lang["add_note"]."</a>";
+					print GM_LANG_add_note_lbl."</td><td class=\"shade1\">";
+					print "<a href=\"javascript: ".GM_LANG_add_note."\" onclick=\"add_new_record('".$this->$object_name->xref."','NOTE', 'add_note'); return false;\">".GM_LANG_add_note."</a>";
 					print "</td></tr>";
 					print "<tr><td class=\"shade2 width20\">";
 					print_help_link("add_general_note_help", "qm");
-					print $gm_lang["add_gnote_lbl"]."</td><td class=\"shade1\"><a href=\"javascript: ".$gm_lang["add_gnote"]."\" onclick=\"add_new_record('".$this->$object_name->xref."','GNOTE', 'add_gnote'); return false;\">".$gm_lang["add_gnote"]."</a>";
+					print GM_LANG_add_gnote_lbl."</td><td class=\"shade1\"><a href=\"javascript: ".GM_LANG_add_gnote."\" onclick=\"add_new_record('".$this->$object_name->xref."','GNOTE', 'add_gnote'); return false;\">".GM_LANG_add_gnote."</a>";
 					print "</td></tr>";
 				}
 				if ($table) print "</table>";
@@ -737,10 +737,9 @@ abstract class DetailController extends BaseController{
 	}
 	
 	public function CheckRawEdited() {
-		global $gm_lang;
 		
 		$object_name = $this->object_name;
-		if ($this->$object_name->israwedited) print $gm_lang["is_rawedited"];
+		if ($this->$object_name->israwedited) print GM_LANG_is_rawedited;
 	}
 	
 	private function HasUnapprovedLinks() {

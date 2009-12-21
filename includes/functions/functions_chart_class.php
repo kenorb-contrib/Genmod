@@ -62,7 +62,7 @@ abstract class ChartFunctions {
 	 * @param string $gparid optional gd-parent ID (descendancy booklet)
 	 */
 	public function PrintSosaFamily(&$family, $childid, $sosa, $label="", $parid="", $gparid="", $view="") {
-		global $gm_lang, $pbwidth, $pbheight, $view;
+		global $pbwidth, $pbheight, $view;
 	
 		if ($view != "preview") print "<hr />";
 		print "\r\n\r\n<p style='page-break-before:always' />\r\n";
@@ -108,7 +108,7 @@ abstract class ChartFunctions {
 				if (!$person->isempty) $rootid = GedcomConfig::$PEDIGREE_ROOT_ID;
 			}
 		}
-		if (empty($rootid)) $rootid = FindFirstPerson();
+		if (empty($rootid)) $rootid = self::FindFirstPerson();
 		
 		if (GedcomConfig::$USE_RIN) {
 			$person =&Person::GetInstance($rootid, "", $GEDCOMID);
@@ -263,7 +263,7 @@ abstract class ChartFunctions {
 	 * @param string $dir arrow direction 0=left 1=right 2=up 3=down (default=2)
 	 */
 	public function PrintUrlArrow($id, $url, $label, $dir=2) {
-		global $gm_lang, $view;
+		global $view;
 		global $GM_IMAGES;
 		global $TEXT_DIRECTION;
 	
@@ -321,5 +321,20 @@ abstract class ChartFunctions {
 		}
 		print "</td>\n";
 	}
+	
+	/**
+	 * find and return the id of the first person in the gedcom
+	 * @return string the gedcom xref id of the first person in the gedcom
+	 */
+	public function FindFirstPerson() {
+		global $GEDCOMID;
+		
+		$sql = "SELECT i_id FROM ".TBLPREFIX."individuals WHERE i_file='".$GEDCOMID."' ORDER BY i_id LIMIT 1";
+		$res = NewQuery($sql);
+		$row = $res->FetchAssoc();
+		$res->FreeResult();
+		return $row["i_file"];
+	}
+
 }
 ?>

@@ -379,7 +379,7 @@ function GregorianToJewishGedcomDate($datearray){
 			if (empty($date["day"])) $date["day"] = 1;
 			if (empty($date["mon"])) $date["mon"] = 1;
 		}
-	
+
 		$jd = gregoriantojd($date["mon"], $date["day"], $date["year"]);
 		$hebrewDate = jdtojewish($jd);
 		list ($hMon, $hDay, $hYear) = split ('/', $hebrewDate);

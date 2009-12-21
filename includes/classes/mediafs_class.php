@@ -257,7 +257,7 @@ abstract class MediaFS {
 	}
 	
 	public function PrintViewLink($file, $thumb=false, $paste=false) {
-		global $MEDIA_IN_DB, $TEXT_DIRECTION, $gm_lang;
+		global $MEDIA_IN_DB, $TEXT_DIRECTION;
 
 		$fileobj = $file["filedata"];
 //		print_r($fileobj);
@@ -296,7 +296,7 @@ abstract class MediaFS {
 		print "<td class=\"list_value wrap $TEXT_DIRECTION\"";
 		if (!$thumb) print " colspan=\"2\" ";
 		print ">";
-		print $gm_lang["filename"]."&nbsp;";
+		print GM_LANG_filename."&nbsp;";
 		if (!$paste) print $fileobj->f_file."<br />";
 		else {
 			$m = RelativePathFile(GedcomConfig::$MEDIA_DIRECTORY);
@@ -308,7 +308,7 @@ abstract class MediaFS {
 		if (isset($file["objects"])) {
 			foreach ($file["objects"] as $index => $media) {
 				if (!empty($media->xref)) {
-					if (!$linked) print $gm_lang["used_in"]."&nbsp;";
+					if (!$linked) print GM_LANG_used_in."&nbsp;";
 					if ($media->title != "") $title = "<b>".$media->title."</b> (".$media->xref.")";
 					else $title = "";
 					print "<a href=\"mediadetail.php?mid=".$media->xref."&amp;gedid=".$media->m_gedcomid."\" target=\"blank\">".PrintReady($title)."</a><br />";
@@ -316,7 +316,7 @@ abstract class MediaFS {
 				}
 			}
 		}
-		if (!$linked) print "<span class=\"error\">".$gm_lang["media_not_linked"]."</span>";
+		if (!$linked) print "<span class=\"error\">".GM_LANG_media_not_linked."</span>";
 		print "</td>";
 	}
 	
@@ -640,7 +640,7 @@ abstract class MediaFS {
 	
 	
 	public function UploadFiles($files, $path, $overwrite=false) {
-		global $MEDIA_IN_DB, $gm_lang, $MEDIATYPE, $error;
+		global $MEDIA_IN_DB, $MEDIATYPE, $error;
 		
 		$error = "";
 		$result = array("filename"=>"", "error"=>"", "errno"=>"0");
@@ -655,7 +655,7 @@ abstract class MediaFS {
 		// 7 - Nothing uploaded
 		
 		if (count($files)>0) {
-			$upload_errors = array($gm_lang["file_success"], $gm_lang["file_too_big"], $gm_lang["file_too_big"],$gm_lang["file_partial"], $gm_lang["file_missing"]);
+			$upload_errors = array(GM_LANG_file_success, GM_LANG_file_too_big, GM_LANG_file_too_big,GM_LANG_file_partial, GM_LANG_file_missing);
 			if (!empty($path)) {
 				$path = RelativePathFile(self::CheckMediaDepth($path));
 				if (!empty($path) && substr($path,-1,1) != "/") $path .= "/";
@@ -676,7 +676,7 @@ abstract class MediaFS {
 					// Is such a file allowed?
 					if (!in_array(strtolower($ext), $MEDIATYPE)) {
 						WriteToLog("MediaFS->UploadFiles: Illegal upload attempt. File: ".$file, "W", "S");
-						$result["error"] = $gm_lang["ext_not_allowed"];
+						$result["error"] = GM_LANG_ext_not_allowed;
 						$result["errno"] = 5;
 						unlink($upload["tmp_name"]);
 					}
@@ -715,7 +715,7 @@ abstract class MediaFS {
 									if ($hasthumb) self::WriteDBThumbfile(self::$fdetails["file"], $thumb, $exists, true);
 								}
 								else {
-									$result["error"] = $gm_lang["file_exists"];
+									$result["error"] = GM_LANG_file_exists;
 									$result["errno"] = 6;
 								}
 								
@@ -727,7 +727,7 @@ abstract class MediaFS {
 									if ($exists) self::DeleteFile($fname, $path, $MEDIA_IN_DB);
 									if (!empty($upload['tmp_name'])) {
 										if (!move_uploaded_file($upload['tmp_name'], $file)) {
-											$result["error"] = "<br />".$gm_lang["upload_error"]."<br />".$upload_errors[$upload['error']];
+											$result["error"] = "<br />".GM_LANG_upload_error."<br />".$upload_errors[$upload['error']];
 											$result["errno"] = $upload['error'];
 										}
 										else {
@@ -736,7 +736,7 @@ abstract class MediaFS {
 									}
 								}
 								else {
-									$result["error"] = $gm_lang["file_exists"];
+									$result["error"] = GM_LANG_file_exists;
 									$result["errno"] = 6;
 								}
 							}
@@ -750,7 +750,7 @@ abstract class MediaFS {
 //						print "<span class=\"error\">".$error."</span><br />";
 						return $result;
 					}
-					$result["error"] = $gm_lang["upload_successful"];
+					$result["error"] = GM_LANG_upload_successful;
 					$result["filename"] = $file;
 					return $result;
 				}
@@ -931,7 +931,7 @@ abstract class MediaFS {
 	}
 
 	public function CreateFile($filename, $delete=false, $dbmode=false, $delonimport=false, $exportthum="no") {
-		global $MEDIA_IN_DB, $gm_lang;
+		global $MEDIA_IN_DB;
 
 		// File system to DB
 		if ($dbmode) {
@@ -1074,7 +1074,7 @@ abstract class MediaFS {
 	}
 
 	public function CreateDir($dir, $parent, $dbmode=false, $recurse=false) {
-		global $MEDIA_IN_DB, $gm_lang;
+		global $MEDIA_IN_DB;
 		static $dirlist;
 	
 		//Cleanup the dir

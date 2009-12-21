@@ -34,7 +34,7 @@ if (stristr($_SERVER["SCRIPT_NAME"],basename(__FILE__))) {
 	require "../../intrusion.php";
 }
 /**
- * Stores the languages in the database
+ * Stores the languages in the database, from the text files
  *
  * The function reads the language files, one language at a time and
  * stores the data in the TBLPREFIX_language and TBLPREFIX_help_language
@@ -80,8 +80,8 @@ function StoreEnglish($setup=false,$only_english=false) {
 			$data[1] = substr(trim($data[1]), 0, -1);
 //			print $data[0]." - ".$data[1]."<br />";
 			// NOTE: Add the language variable to the language array
-			$gm_lang[$data[0]] = $data[1];
 			
+//			$gm_lang[$data[0]] = $data[1];
 			// NOTE: Store the language variable in the database
 			if (!isset($data[1])) WriteToLog($line, "E", "S");
 			else {
@@ -141,7 +141,7 @@ function StoreEnglish($setup=false,$only_english=false) {
 			foreach ($lines as $key => $line) {
 				$data = preg_split("/\";\"/", $line, 2);
 				// NOTE: Add the help language variable to the language array
-				$gm_lang[$data[0]] = $data[1];
+//				$gm_lang[$data[0]] = $data[1];
 				
 				if (!isset($data[1])) WriteToLog($line, "E", "S");
 				else {
@@ -342,7 +342,7 @@ function RemoveLanguage($removelang) {
  * @return 	array          The array with the loaded language
  */
 function LoadEnglish($return=false, $help=false, $altlang = false) {
-	global $gm_lang, $DBCONN, $LANGUAGE, $GM_BASE_DIRECTORY, $language_settings;
+	global $DBCONN, $LANGUAGE, $GM_BASE_DIRECTORY, $language_settings;
 //	print $LANGUAGE;
 	$temp = array();
 	if (CONFIGURED && $DBCONN->connected) {
@@ -352,22 +352,8 @@ function LoadEnglish($return=false, $help=false, $altlang = false) {
 		if ($res) $total_columns = $res->FetchAssoc($res->result);
 		else $total_columns["total"] = 0 ;
 		if ($total_columns["total"] > 0) {
-			if ($altlang) $sql = "SELECT lg_string, lg_english, lg_".$LANGUAGE." FROM ".TBLPREFIX."language";
-			else $sql = "SELECT lg_string, lg_english FROM ".TBLPREFIX."language";
-			if ($help) $sql .= "_help";
-			$res = NewQuery($sql);
-			while ($row = $res->FetchAssoc($res->result)) {
-				if (!$return) {
-					if (!empty($row["lg_".$LANGUAGE])) $gm_lang[$row["lg_string"]] = $row["lg_".$LANGUAGE];
-					else $gm_lang[$row["lg_string"]] = $row["lg_english"];
-				}
-				else {
-					if (!empty($row["lg_".$LANGUAGE])) $temp[$row["lg_string"]] = $row["lg_".$LANGUAGE];
-					else $temp[$row["lg_string"]] = $row["lg_english"];
-				}
-			}
 			if (!$return) {
-			// NOTE: include the extra english file
+			// NOTE: include the extra english file BEFORE the DB
 				if (file_exists($GM_BASE_DIRECTORY . "languages/lang.".$language_settings["english"]["lang_short_cut"].".extra.php")) {
 					require_once $GM_BASE_DIRECTORY . "languages/lang.".$language_settings["english"]["lang_short_cut"].".extra.php";
 				}
@@ -376,6 +362,29 @@ function LoadEnglish($return=false, $help=false, $altlang = false) {
 					if (file_exists($GM_BASE_DIRECTORY . "languages/lang.".$language_settings[$LANGUAGE]["lang_short_cut"].".extra.php")) {
 						require_once $GM_BASE_DIRECTORY . "languages/lang.".$language_settings[$LANGUAGE]["lang_short_cut"].".extra.php";
 					}
+				}
+			}
+			if ($altlang) $sql = "SELECT lg_string, lg_english, lg_".$LANGUAGE." FROM ".TBLPREFIX."language";
+			else $sql = "SELECT lg_string, lg_english FROM ".TBLPREFIX."language";
+			if ($help) $sql .= "_help";
+			$res = NewQuery($sql);
+			while ($row = $res->FetchAssoc($res->result)) {
+				if (!$return) {
+					
+					if (!empty($row["lg_".$LANGUAGE])) {
+						if (!defined("GM_LANG_".$row["lg_string"])) {
+							define("GM_LANG_".$row["lg_string"], $row["lg_".$LANGUAGE]);
+						}
+					}
+					else {
+						if ($altlang && !defined("GM_LANG_".$row["lg_string"])) {
+							define("GM_LANG_".$row["lg_string"], $row["lg_english"]);
+						}
+					}
+				}
+				else {
+					if (!empty($row["lg_".$LANGUAGE])) $temp[$row["lg_string"]] = $row["lg_".$LANGUAGE];
+					else $temp[$row["lg_string"]] = $row["lg_english"];
 				}
 			}
 		}
@@ -387,14 +396,17 @@ function LoadEnglish($return=false, $help=false, $altlang = false) {
 			if (file_exists("languages/lang.en.txt")) {
 				// NOTE: Load the English language into memory
 				$lines = file("languages/lang.en.txt");
+				$number = 0;
 				foreach ($lines as $key => $line) {
 					$data = preg_split("/\";\"/", $line, 2);
 					// NOTE: Add the language variable to the language array
-					if (!$return) $gm_lang[substr($data[0],1)] = substr(trim($data[1]),0,(strlen(trim($data[1]))-1));
+					if (!$return) {
+						define("GM_LANG_".substr($data[0],1), substr(trim($data[1]),0,(strlen(trim($data[1]))-1)));
+						$number++;
+					}
 					else $temp[$row["lg_string"]] = substr(trim($data[1]),0,(strlen(trim($data[1]))-1));
 				}
-				if (count($gm_lang) > 0) {
-					$number = count($gm_lang);
+				if ($number > 0) {
 					WriteToLog("LoadEnglish-> Language successfully loaded from file.","I","S");
 				}
 				else WriteToLog("LoadEnglish-> Language was not loaded from file.","E","S");
@@ -403,13 +415,17 @@ function LoadEnglish($return=false, $help=false, $altlang = false) {
 			if (file_exists("languages/help_text.en.txt")) {
 				// NOTE: Load the English help language into memory since we have no database
 				$lines = file("languages/help_text.en.txt");
+				$number = 0;
 				foreach ($lines as $key => $line) {
 					$data = preg_split("/\";\"/", $line, 2);
 					// NOTE: Add the language variable to the language array
-					if (!$return) $gm_lang[substr($data[0],1)] = substr(trim($data[1]),0,(strlen(trim($data[1]))-1));
+					if (!$return) {
+						define("GM_LANG_".substr($data[0],1), substr(trim($data[1]),0,(strlen(trim($data[1]))-1)));
+						$number++;
+					}
 					else $temp[$row["lg_string"]] = substr(trim($data[1]),0,(strlen(trim($data[1]))-1));
 				}
-				if (count($gm_lang) > $number) WriteToLog("Language help successfully loaded from file.","I","S");
+				if ($number > 0) WriteToLog("Language help successfully loaded from file.","I","S");
 				else WriteToLog("LoadEnglish-> Language help was not loaded from file.","E","S");
 			}
 		}
@@ -419,7 +435,7 @@ function LoadEnglish($return=false, $help=false, $altlang = false) {
 // param return returns the factarray for editing purposes
 // param altlang if true fills in missing texts in the designated language with english ones
 function LoadEnglishFacts($return=false, $altlang = false) {
-	global $gm_lang, $DBCONN, $LANGUAGE, $GM_BASE_DIRECTORY, $language_settings;
+	global $DBCONN, $LANGUAGE, $GM_BASE_DIRECTORY, $language_settings;
 	
 	$temp = array();
 	if (CONFIGURED && $DBCONN->connected) {
@@ -514,7 +530,7 @@ function LoadEnglishFacts($return=false, $altlang = false) {
  * @return 	array          The array with the loaded language
  */
 function LoadLanguage($language, $return=false, $help=false) {
-	global $gm_language, $gm_lang;
+	global $gm_language;
 	
 	if (isset($gm_language[$language]) && CONFIGURED) {
 		$temp = array();
@@ -524,7 +540,7 @@ function LoadLanguage($language, $return=false, $help=false) {
 		$res = NewQuery($sql);
 		if ($res) {
 			while ($row = $res->FetchAssoc($res->result)) {
-				if (!$return) $gm_lang[$row["lg_string"]] = $row["lg_".$language];
+				if (!$return) define("GM_LANG_".$row["lg_string"], $row["lg_".$language]);
 				else $temp[$row["lg_string"]] = $row["lg_".$language];
 			}
 			if ($return) return $temp;
@@ -708,7 +724,7 @@ function LanguageInUse($lang="") {
 /* Get the language file and translation info for the admin messages
  */
 function GetLangfileInfo($impexp) {
-	global $language_settings, $gm_lang;
+	global $language_settings;
 	static $implangs, $explangs;
 	
 	if (!isset($implangs)) {
@@ -718,14 +734,14 @@ function GetLangfileInfo($impexp) {
 			$implangs = array();
 			$explangs = array();
 			while($lang = $res->FetchRow()) {
-				if ($lang[4] == 1) $explangs[] = array("name" => $gm_lang["lang_name_".$lang[0]], "lang" => $lang[0]);
+				if ($lang[4] == 1) $explangs[] = array("name" => constant("GM_LANG_lang_name_".$lang[0]), "lang" => $lang[0]);
 				if (file_exists($language_settings[$lang[0]]["gm_language"]) 
 				&& file_exists($language_settings[$lang[0]]["helptextfile"]) 
 				&& file_exists($language_settings[$lang[0]]["factsfile"])) {
 					if ($language_settings[$lang[0]]["gm_lang_use"] == true && (md5_file($language_settings[$lang[0]]["gm_language"]) != $lang[1] ||
 						md5_file($language_settings[$lang[0]]["helptextfile"]) != $lang[2] ||
 						md5_file($language_settings[$lang[0]]["factsfile"]) != $lang[3])) {
-						$implangs[] = array("name" => $gm_lang["lang_name_".$lang[0]], "lang" => $lang[0]);
+						$implangs[] = array("name" => constant("GM_LANG_lang_name_".$lang[0]), "lang" => $lang[0]);
 					}
 				}
 			}

@@ -159,7 +159,7 @@ class Message {
 	}
 	
 	public function AddMessage($admincopy=false) {
-		global $gm_lang, $LANGUAGE, $GM_STORE_MESSAGES, $GM_SIMPLE_MAIL;
+		global $LANGUAGE, $GM_STORE_MESSAGES, $GM_SIMPLE_MAIL;
 		global $TEXT_DIRECTION, $TEXT_DIRECTION_array, $DATE_FORMAT, $DATE_FORMAT_array, $TIME_FORMAT, $TIME_FORMAT_array, $WEEK_START, $WEEK_START_array, $NAME_REVERSE, $NAME_REVERSE_array;
 
 		// We cannot send already stored messages
@@ -171,13 +171,13 @@ class Message {
 		// NOTE: Check if it is a message from an unregistered user (from_name and from_email are set)
 		if (!is_null($this->from_name)) {
 			// NOTE: Username
-			$message_sender = $gm_lang["message_from_name"]." ".$this->from_name."<br />";
+			$message_sender = GM_LANG_message_from_name." ".$this->from_name."<br />";
 			// NOTE: Email address
-			$message_sender .= $gm_lang["message_from"]." ".$this->from_email."<br /><br />";
+			$message_sender .= GM_LANG_message_from." ".$this->from_email."<br /><br />";
 			
 			// NOTE: From header
-			$messagefrom = $gm_lang["message_from_name"]." ".$this->from_name."<br />";
-			$messagefrom .= $gm_lang["message_from"]." ".$this->from_email."<br /><br />";
+			$messagefrom = GM_LANG_message_from_name." ".$this->from_name."<br />";
+			$messagefrom .= GM_LANG_message_from." ".$this->from_email."<br /><br />";
 		}
 		else $this->from_name = '';
 	
@@ -192,7 +192,7 @@ class Message {
 		// NOTE: Check the URL where the message is sent from and add it to the message
 		if (!is_null($this->url) && $this->url != "") {
 			$message_sender .= "--------------------------------------<br />";
-			$message_sender .= $gm_lang["viewing_url"]."<br /><a href=\"".SERVER_URL.$this->url."\">".SERVER_URL.$this->url."</a><br />";
+			$message_sender .= GM_LANG_viewing_url."<br /><a href=\"".SERVER_URL.$this->url."\">".SERVER_URL.$this->url."</a><br />";
 		}
 		
 		// NOTE: Add system details
@@ -202,7 +202,7 @@ class Message {
 		$message_sender .= "LANGUAGE: ".$LANGUAGE."<br />";
 		
 		// NOTE: E-mail Subject
-		$subject_sender = "[".$gm_lang["Genmod_message"]."] ".stripslashes($this->subject);
+		$subject_sender = "[".GM_LANG_Genmod_message."] ".stripslashes($this->subject);
 		
 		// NOTE: E-mail from
 		$from ="";
@@ -211,12 +211,12 @@ class Message {
 		
 		if ($fuser->username == "") {
 			$from = $this->from_email;
-			$message_sender = $gm_lang["message_email3"]."<br /><br />".stripslashes($message_sender);
+			$message_sender = GM_LANG_message_email3."<br /><br />".stripslashes($message_sender);
 		}
 		else {
 			if (!$GM_SIMPLE_MAIL) $from = "'".stripslashes($fuser->firstname." ".$fuser->lastname). "' <".$fuser->email.">";
 			else $from = $fuser->email;
-			$message_sender = $gm_lang["message_email2"]." ".$tuser->firstname." ".$tuser->lastname."<br /><br />".stripslashes($message_sender);
+			$message_sender = GM_LANG_message_email2." ".$tuser->firstname." ".$tuser->lastname."<br /><br />".stripslashes($message_sender);
 	
 		}
 	
@@ -239,7 +239,7 @@ class Message {
 		// NOTE: Check the URL where the message is sent from and add it to the message
 		if (!is_null($this->url)) {
 			$messagebody = "<br /><br />--------------------------------------<br />";
-			$messagebody .= $gm_lang["viewing_url"]."<br /><a href=\"".SERVER_URL.$this->url."\">".SERVER_URL.$this->url."</a><br />\n";
+			$messagebody .= GM_LANG_viewing_url."<br /><a href=\"".SERVER_URL.$this->url."\">".SERVER_URL.$this->url."</a><br />\n";
 		}
 		else $messagebody = "";
 		
@@ -261,16 +261,16 @@ class Message {
 		
 		if ($this->method != "messaging") {
 			// NOTE: E-mail subject recipient
-			$subject_recipient = "[".$gm_lang["Genmod_message"]."] ".stripslashes($this->subject);
+			$subject_recipient = "[".GM_LANG_Genmod_message."] ".stripslashes($this->subject);
 			
 			// NOTE: E-mail from recipient
 			if (!is_object($fuser)) {
-				$message_recipient = $gm_lang["message_email1"];
+				$message_recipient = GM_LANG_message_email1;
 				if (!is_null($this->from_name && $this->from_name != "")) $message_recipient .= $this->from_name."<br /><br />".stripslashes($this->body);
-				else $message_recipient .= $gm_lang["message_from_name"].$from."<br /><br />".stripslashes($this->body);
+				else $message_recipient .= GM_LANG_message_from_name.$from."<br /><br />".stripslashes($this->body);
 			}
 			else {
-				$message_recipient = $gm_lang["message_email1"]."<br /><br />";
+				$message_recipient = GM_LANG_message_email1."<br /><br />";
 				$message_recipient .= stripslashes($fuser->firstname." ".$fuser->lastname)."<br /><br />".stripslashes($this->body);
 			}
 			// NOTE: Message body

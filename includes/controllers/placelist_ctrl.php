@@ -114,17 +114,15 @@ class PlaceListController extends ListController {
 	}
 
 	protected function GetPageTitle() {
-		global $gm_lang;
 		
 		if (is_null($this->pagetitle)) {
-			if ($this->display == "hierarchy") $this->pagetitle = $gm_lang["place_list"];
-			else $this->pagetitle = $gm_lang["place_list2"];
+			if ($this->display == "hierarchy") $this->pagetitle = GM_LANG_place_list;
+			else $this->pagetitle = GM_LANG_place_list2;
 		}
 		return $this->pagetitle;
 	}
 	
 	protected function GetTitle() {
-		global $gm_lang;
 		
 		if (is_null($this->title)) {
 			$this->title = $this->GetPageTitle();

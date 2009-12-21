@@ -92,7 +92,7 @@ class SystemConfig {
 	
 	// this function will store the <var>$CONFIG_PARMS</var> array in the config.php file.
 	public function StoreConfig($newconfig) {
-		global $CONFIG_PARMS, $gm_lang;
+		global $CONFIG_PARMS;
 
 		if (!is_array($newconfig)) return false;
 		

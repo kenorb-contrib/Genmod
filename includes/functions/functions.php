@@ -372,7 +372,6 @@ function GetAllSubrecords($gedrec, $ignore="", $families=true, $sort=true, $Appl
  * @return string
  */
 function GetGedcomValue($tag, $level, $gedrec, $truncate='', $convert=true) {
-	global $gm_lang;
 
 	$tags = preg_split("/:/", $tag);
 
@@ -466,9 +465,9 @@ function GetGedcomValue($tag, $level, $gedrec, $truncate='', $convert=true) {
 			}
 		}
 		else if ($convert && $t=="SEX") {
-			if ($value=="M") $value = GetFirstLetter($gm_lang["male"]);
-			else if ($value=="F") $value = GetFirstLetter($gm_lang["female"]);
-			else $value = GetFirstLetter($gm_lang["unknown"]);
+			if ($value=="M") $value = GetFirstLetter(GM_LANG_male);
+			else if ($value=="F") $value = GetFirstLetter(GM_LANG_female);
+			else $value = GetFirstLetter(GM_LANG_unknown);
 		}
 		else {
 			if (!empty($truncate)) {
@@ -553,7 +552,7 @@ function MakeCont($newged, $newline) {
  * @return array returns a two element array with indexes HUSB and WIFE for the parent ids
  */
 function FindParents($famid) {
-	global $gm_lang, $gm_username, $GEDCOMID, $show_changes, $gm_user;
+	global $gm_username, $GEDCOMID, $show_changes, $gm_user;
 
 	$famrec = FindFamilyRecord($famid);
 	if (empty($famrec)) {
@@ -581,7 +580,6 @@ function FindParents($famid) {
  * @return array returns a two element array with indexes HUSB and WIFE for the parent ids
  */
 function FindParentsInRecord($famrec) {
-	global $gm_lang;
 
 	if (empty($famrec)) return false;
 	$parents = array();
@@ -595,30 +593,6 @@ function FindParentsInRecord($famrec) {
 }
 
 /**
- * find the children in a family
- *
- * find and return an array containing the children of the given family record
- * @author Genmod Development Team
- * @param string $famid the gedcom xref id for the family
- * @param string $me	an xref id of a child to ignore, useful when you want to get a person's
- * siblings but do want to include them as well
- * @return array
- */
-/*function FindChildren($famid, $me='') {
-	global $gm_lang, $gm_username, $gm_user;
-
-	$famrec = FindFamilyRecord($famid);
-	if (empty($famrec)) {
-		if ($gm_user->userCanEdit($gm_username)) {
-			$famrec = FindGedcomRecord($famid);
-			if (empty($famrec)) return false;
-		}
-		else return false;
-	}
-	return FindChildrenInRecord($famrec);
-}
-*/
-/**
  * find the children in a family record
  *
  * find and return an array containing the children of the given family record
@@ -629,7 +603,6 @@ function FindParentsInRecord($famrec) {
  * @return array
  */
 function FindChildrenInRecord($famrec, $me='') {
-	global $gm_lang;
 
 	$children = array();
 	if (empty($famrec)) return $children;
@@ -720,51 +693,6 @@ function FindSfamilyIds($pid, $newfams = false) {
 	return $resultarray;
 }
 
-function FindPrimaryFamilyId($pid, $indirec="", $newfams=false) {
-	
-    $resultarray = array();
-    $famids = FindFamilyIds($pid,$indirec,$newfams);
-    if (count($famids)>1) {
-        $priority = array();
-        foreach ($famids as $indexval => $ffamid) {
-            if (!isset($priority["first"])) $priority["first"]=$indexval;
-            $priority["last"]=$indexval;
-            if ($ffamid["primary"]=='Y') {
-				if (!isset($priority["primary"])) $priority["primary"]=$indexval;
-            }
-
-            $relation = $ffamid["relation"];
-            switch ($relation) {
-            case "adopted":
-            case "foster": // Sometimes called "guardian"
-            case "sealing":
-                // nothing to do
-                break;
-            default: // Should be "". Sometimes called "birth","biological","challenged","disproved"
-                $relation = "birth";
-                break;
-            }
-            // in the future, we could use $ffamid["stat"]
-            // to further prioritize the family relation:
-            // "challenged", "disproven", ""/"proven"
-
-            // only store the first occurance of this type of family
-            if (!isset($priority[$relation])) $priority[$relation]=$indexval;
-        }
-
-        // get the actual family array according to the following priority
-        // at least one of these will get some results.
-        if (isset($priority["primary"])) $resultarray[]=$famids[$priority["primary"]];
-        else if (isset($priority["birth"])) $resultarray[]=$famids[$priority["birth"]];
-        else if (isset($priority["adopted"])) $resultarray[]=$famids[$priority["adopted"]];
-        else if (isset($priority["foster"])) $resultarray[]=$famids[$priority["foster"]];
-        else if (isset($priority["sealing"])) $resultarray[]=$famids[$priority["sealing"]];
-        else if (isset($priority["first"])) $resultarray[]=$famids[$priority["first"]];
-        else if (isset($priority["last"])) $resultarray[]=$famids[$priority["last"]];
-  		return $resultarray;
-    }
-    else return $famids;
-}
 
 function CleanupTagsY($irec) {
 	$cleanup_facts = array("ANUL","CENS","DIVF","ENGA","MARB","MARC","MARL","MARS","ADOP","DSCR","BAPM","BARM","BASM","BLES","CHRA","CONF","FCOM","ORDN","NATU","EMIG","IMMI","CENS","PROB","WILL","GRAD","RETI");
@@ -891,7 +819,7 @@ function FindHighlightedObject($pid) {
  * @param int $path_to_find which path in the relationship to find, 0 is the shortest path, 1 is the next shortest path, etc
  */
 function GetRelationship(&$pid1, &$pid2, $followspouse=true, $maxlength=0, $ignore_cache=false, $path_to_find=0) {
-	global $start_time, $gm_lang, $NODE_CACHE_LENGTH, $USE_RELATIONSHIP_PRIVACY, $GEDCOMID, $gm_username, $show_changes;
+	global $start_time, $NODE_CACHE_LENGTH, $USE_RELATIONSHIP_PRIVACY, $GEDCOMID, $gm_username, $show_changes;
 
 	//-- check the cache
 	if ($USE_RELATIONSHIP_PRIVACY && !$ignore_cache) {
@@ -965,7 +893,7 @@ function GetRelationship(&$pid1, &$pid2, $followspouse=true, $maxlength=0, $igno
 		$end_time = GetMicrotime();
 		$exectime = $end_time - $start_time;
 		if (GedcomConfig::$TIME_LIMIT > 1 && $exectime > GedcomConfig::$TIME_LIMIT - 1) {
-			print "<span class=\"error\">".$gm_lang["timeout_error"]."</span>\n";
+			print "<span class=\"error\">".GM_LANG_timeout_error."</span>\n";
 			return false;
 		}
 		if (count($p1nodes) == 0) {
@@ -1169,175 +1097,10 @@ function GetThemeNames() {
 	return $themes;
 }
 
-/**
- * format a fact for calendar viewing
- *
- * @param string $factrec the fact record
- * @param string $action tells what type calendar the user is viewing
- * @param string $filter should the fact be filtered by living people etc
- * @param string $pid the gedcom xref id of the record this fact belongs to
- * @param string $filterev "all" to show all events; "bdm" to show only Births, Deaths, Marriages; Event code to show only that event
- * @return string a html text string that can be printed
- */
-function GetCalendarFact($factrec, $action, $filterof, $pid, $filterev="all") {
-	global $gm_lang, $year, $month, $day, $TEMPLE_CODES, $monthtonum, $TEXT_DIRECTION, $caltype;
-	global $CalYear, $currhYear;
-	
-	$Upcoming = false;
-	if ($action == "upcoming") {
-		$action = "today";
-		$Upcoming = true;
-	}
-
-	$skipfacts = array("CHAN", "BAPL", "SLGC", "SLGS", "ENDL");
-	$BDMfacts = array("BIRT", "DEAT", "MARR");
-
-//	$ft = preg_match("/1\s(_?\w+)\s(.*)/", $factrec, $match);
-	$ft = preg_match("/1\s(\w+)(.*)/", $factrec, $match);
-	if ($ft>0) $fact = $match[1];
-	else return "filter";
-
-	if (in_array($fact, $skipfacts)) return "filter";
-// visitor returns in the following for BIRT ??
-// why does the visitor get a blank from showFactDetails($fact, $pid) - because he should not see data of live??
-// A logged in user in FF sees I92, in IE sees 2 on 21.4
-
-	if ((!PrivacyFunctions::showFact($fact, $pid))||(!PrivacyFunctions::showFactDetails($fact, $pid)))  return "";
-	if (PrivacyFunctions::FactViewRestricted($pid, $factrec)) return "";
-
-	$fact = trim($fact);
-	$factref = $fact;
-	if ($fact=="EVEN" || $fact=="FACT") {
-		$ct = preg_match("/2 TYPE (.*)/", $factrec, $tmatch);
-		if ($ct>0) {
-			$factref = trim($tmatch[1]);
-		    if ((!PrivacyFunctions::showFact($factref, $pid))||(!PrivacyFunctions::showFactDetails($factref, $pid))) return "";
-	    }
-	}
-
-	// Use current year for age in dayview
-	if ($action == "today"){
-		$yearnow = getdate();
-		$yearnow = $yearnow["year"];
-	}
-	else	{
-		$yearnow = $year;
-	}
-
-	$hct = preg_match("/2 DATE.*(@#DHEBREW@)/", $factrec, $match);
-	if ($hct>0 && GedcomConfig::$USE_RTL_FUNCTIONS)
-		if ($action == "today") $yearnow = $currhYear;
-		else $yearnow = $CalYear;
-
-	$text = "";
-
-	// See whether this Fact should be filtered out or not
-	$Filtered = false;
-	if (in_array($fact, $skipfacts) or in_array($factref, $skipfacts)) $Filtered = true;
-	if ($filterev=="bdm") {
-		if (!in_array($fact, $BDMfacts) and !in_array($factref, $BDMfacts)) $Filtered = true;
-	}
-	if ($filterev!="all" and $filterev!="bdm") {
-		if ($fact!=$filterev and $factref!=$filterev) $Filtered = true;
-	}
-
-	if (!$Filtered) {
-		if ($fact=="EVEN" || $fact=="FACT") {
-			if ($ct>0) {
-				if (defined("GM_FACT_".$factref)) $text .= constant("GM_FACT_".$factref);
-				else $text .= $factref;
-			}
-			else $text .= constant("GM_FACT_".$fact);
-		}
-		else {
-			if (defined("GM_FACT_".$fact)) $text .= constant("GM_FACT_".$fact);
-			else $text .= $fact;
-		}
-//		if ($filterev!="all" && $filterev!=$fact && $filterev!=$factref) return "filter";
-
-		if ($text!="") $text=PrintReady($text);
-
-		$ct = preg_match("/\d DATE(.*)/", $factrec, $match);
-		if ($ct>0) {
-			$text .= " - <span class=\"date\">".GetDateUrl($match[1])."</span>";
-//			$yt = preg_match("/ (\d\d\d\d)/", $match[1], $ymatch);
-			$yt = preg_match("/ (\d\d\d\d|\d\d\d)/", $match[1], $ymatch);
-			if ($yt>0) {
-
-				$hct = preg_match("/2 DATE.*(@#DHEBREW@)/", $match[1], $hmatch);
-	            if ($hct>0 && GedcomConfig::$USE_RTL_FUNCTIONS && $action=='today')
-
-// should perhaps use the month of the fact to find if should use $currhYear or $currhYear+1 or $currhYear-1 to calculate age
-// use $currhMonth and the fact month for this
-
-                   $age = $currhYear - $ymatch[1];
-				else
-				   $age = $yearnow - $ymatch[1];
-				$yt2 = preg_match("/(...) (\d\d\d\d|\d\d\d)/", $match[1], $bmatch);
-				if ($yt2>0) {
-					if (isset($monthtonum[strtolower(trim($bmatch[1]))])) {
-						$emonth = $monthtonum[strtolower(trim($bmatch[1]))];
-						if (!$Upcoming && ($emonth<$monthtonum[strtolower($month)])) $age--;
-						$bt = preg_match("/(\d+) ... (\d\d\d\d|\d\d\d)/", $match[1], $bmatch);
-						if ($bt>0) {
-							$edate = trim($bmatch[1]);
-							if (!$Upcoming && ($edate<$day)) $age--;
-						}
-					}
-				}
-				$yt3 = preg_match("/(.+) ... (\d\d\d\d|\d\d\d)/", $match[1], $bmatch);
-				if ($yt3>0) {
-					if (!$Upcoming && ($bmatch[1]>$day)) $age--;
-				}
-				if (($filterof=="recent")&&($age>100)) return "filter";
-				// Limit facts to before the given year in monthview
-				if (($age<0) && ($action == "calendar")) return "filter";
-				if ($action!='year'){
-					$text .= " (" . str_replace("#year_var#", ConvertNumber($age), $gm_lang["year_anniversary"]).")";
-				}
- 				if($TEXT_DIRECTION == "rtl"){
- 					$text .= "&lrm;";
- 				}
-			}
-			if (($action=='today')||($action=='year')) {
-				// -- find place for each fact
-				if (GedcomConfig::$SHOW_PEDIGREE_PLACES > 0) {
-					$ct = preg_match("/2 PLAC (.*)/", $factrec, $match);
-					if ($ct>0) {
-						$text .=($action=='today'?"<br />":" ");
-						$plevels = preg_split("/,/", $match[1]);
-						$plactext = "";
-						for($plevel=0; $plevel < GedcomConfig::$SHOW_PEDIGREE_PLACES; $plevel++) {
-							if (!empty($plevels[$plevel])) {
-								if ($plevel>0) $plactext .=", ";
-								$plactext .= PrintReady($plevels[$plevel]);
-							}
-						}
-						if (HasChinese($plactext)) $plactext .= PrintReady(" (".GetPinYin($plactext).")");
-						$text .= PrintReady($plactext);
-					}
-				}
-
-				// -- find temple code for lds facts
-				$ct = preg_match("/2 TEMP (.*)/", $factrec, $match);
-				if ($ct>0) {
-					$tcode = $match[1];
-					$tcode = trim($tcode);
-					if (array_key_exists($tcode, $TEMPLE_CODES)) $text .= "<br />".$gm_lang["temple"].": ".$TEMPLE_CODES[$tcode];
-					else $text .= "<br />".$gm_lang["temple_code"].$tcode;
-				}
-			}
-		}
-		$text .= "<br />";
-	}
-	if ($text=="") return "filter";
-
-	return $text;
-}
 
 //-- this function will convert a digit number to a number in a different language
 function ConvertNumber($num) {
-	global $gm_lang, $LANGUAGE;
+	global $LANGUAGE;
 
 	if ($LANGUAGE == "chinese") {
 		$numstr = "$num";
@@ -1350,10 +1113,10 @@ function ConvertNumber($num) {
 		for($i=0; $i<$ln; $i++) {
 			if (!is_numeric($numstr[$i])) $zhnum = $numstr[$i].$zhnum;
 			else {
-				if (($i==1)&&($numstr{$i}!="0")) $zhnum = $gm_lang["10"].$zhnum;
-				if (($i==2)&&($numstr{$i}!="0")) $zhnum = $gm_lang["100"].$zhnum;
-				if (($i==3)&&($numstr{$i}!="0")) $zhnum = $gm_lang["1000"].$zhnum;
-				if (($i!=1)||($numstr{$i}!=1)) $zhnum = $gm_lang[$numstr{$i}].$zhnum;
+				if (($i==1)&&($numstr{$i}!="0")) $zhnum = GM_LANG_10.$zhnum;
+				if (($i==2)&&($numstr{$i}!="0")) $zhnum = GM_LANG_100.$zhnum;
+				if (($i==3)&&($numstr{$i}!="0")) $zhnum = GM_LANG_1000.$zhnum;
+				if (($i!=1)||($numstr{$i}!=1)) $zhnum = constant("GM_LANG_".$numstr{$i}).$zhnum;
 			}
 		}
 		return $zhnum;
@@ -1800,187 +1563,6 @@ function GetQueryString($encode=false) {
 	else return $qstring;
 }
 
-//--- copied from reportpdf.php
-function AddAncestors($pid, $children=false, $generations=-1) {
-	global $list, $indilist, $genlist;
-
-	$genlist = array($pid);
-	$list[$pid]["generation"] = 1;
-	while(count($genlist)>0) {
-		$id = array_shift($genlist);
-		$famids = FindPrimaryFamilyId($id);
-		if (count($famids)>0) {
-			$ffamid = $famids[0];
-			$famid = $ffamid["famid"];
-			if (PrivacyFunctions::DisplayDetailsByID($famid, "FAM")) {
-				$parents = FindParents($famid);
-				if (!empty($parents["HUSB"]) && (PrivacyFunctions::DisplayDetailsByID($parents["HUSB"]) || PrivacyFunctions::showLivingNameByID($parents["HUSB"]))) {
-					FindPersonRecord($parents["HUSB"]);
-					$list[$parents["HUSB"]] = $indilist[$parents["HUSB"]];
-					$list[$parents["HUSB"]]["generation"] = $list[$id]["generation"]+1;
-				}
-				if (!empty($parents["WIFE"]) && (PrivacyFunctions::DisplayDetailsByID($parents["WIFE"]) || PrivacyFunctions::showLivingNameByID($parents["WIFE"]))) {
-					FindPersonRecord($parents["WIFE"]);
-					$list[$parents["WIFE"]] = $indilist[$parents["WIFE"]];
-					$list[$parents["WIFE"]]["generation"] = $list[$id]["generation"]+1;
-				}
-				if ($generations == -1 || $list[$id]["generation"]+1 < $generations) {
-					if (!empty($parents["HUSB"])) array_push($genlist, $parents["HUSB"]);
-					if (!empty($parents["WIFE"])) array_push($genlist, $parents["WIFE"]);
-				}
-				if ($children) {
-					$famrec = FindFamilyRecord($famid);
-					if ($famrec) {
-						$num = preg_match_all("/1\s*CHIL\s*@(.*)@/", $famrec, $smatch,PREG_SET_ORDER);
-						for($i=0; $i<$num; $i++) {
-							if (PrivacyFunctions::DisplayDetailsByID($smatch[$i][1]) || PrivacyFunctions::showLivingNameByID($smatch[$i][1])) {
-								FindPersonRecord($smatch[$i][1]);
-								$list[$smatch[$i][1]] = $indilist[$smatch[$i][1]];
-								if (isset($list[$id]["generation"])) $list[$smatch[$i][1]]["generation"] = $list[$id]["generation"];
-								else $list[$smatch[$i][1]]["generation"] = 1;
-							}
-						}
-					}
-				}
-			}
-		}
-	}
-}
-
-//--- copied from reportpdf.php
-function AddDescendancy($pid, $parents=false, $generations=-1) {
-	global $list, $indilist;
-
-	if (!isset($list[$pid])) {
-		FindPersonRecord($pid);
-		$list[$pid] = $indilist[$pid];
-	}
-	if (!isset($list[$pid]["generation"])) {
-		$list[$pid]["generation"] = 0;
-	}
-	$famids = FindSfamilyIds($pid);
-	if (count($famids)>0) {
-		foreach($famids as $indexval => $famid) {
-			$famrec = FindFamilyRecord($famid["famid"]);
-			if ($famrec && PrivacyFunctions::DisplayDetailsByID($famid["famid"], "FAM")) {
-				if ($parents) {
-					$parents = FindParentsInRecord($famrec);
-					if (!empty($parents["HUSB"]) && (PrivacyFunctions::DisplayDetailsByID($parents["HUSB"]) || PrivacyFunctions::showLivingNameByID($parents["HUSB"]))) {
-						FindPersonRecord($parents["HUSB"]);
-						$list[$parents["HUSB"]] = $indilist[$parents["HUSB"]];
-						if (isset($list[$pid]["generation"])) $list[$parents["HUSB"]]["generation"] = $list[$pid]["generation"]-1;
-						else $list[$parents["HUSB"]]["generation"] = 1;
-					}
-					if (!empty($parents["WIFE"]) && (PrivacyFunctions::DisplayDetailsByID($parents["WIFE"]) || PrivacyFunctions::showLivingNameByID($parents["WIFE"]))) {
-						FindPersonRecord($parents["WIFE"]);
-						$list[$parents["WIFE"]] = $indilist[$parents["WIFE"]];
-						if (isset($list[$pid]["generation"])) $list[$parents["WIFE"]]["generation"] = $list[$pid]["generation"]-1;
-						else $list[$parents["HUSB"]]["generation"] = 1;
-					}
-				}
-				$num = preg_match_all("/1\s*CHIL\s*@(.*)@/", $famrec, $smatch,PREG_SET_ORDER);
-				for($i=0; $i<$num; $i++) {
-					FindPersonRecord($smatch[$i][1]);
-					$list[$smatch[$i][1]] = $indilist[$smatch[$i][1]];
-					if (isset($list[$smatch[$i][1]]["generation"])) $list[$smatch[$smatch[$i][1]][1]]["generation"] = $list[$pid]["generation"]+1;
-					else $list[$smatch[$i][1]]["generation"] = 2;
-				}
-				if($generations == -1 || $list[$pid]["generation"]+1 < $generations)
-				{
-					for($i=0; $i<$num; $i++) {
-						AddDescendancy($smatch[$i][1], $parents, $generations);	// recurse on the childs family
-					}
-				}
-			}
-		}
-	}
-}
-
-/**
- * check if the maximum number of page views per hour for a session has been exeeded.
- */
-function CheckPageViews() {
-	global $MAX_VIEWS, $MAX_VIEW_TIME, $MAX_VIEW_LOGLEVEL, $gm_lang;
-	
-	if ($MAX_VIEW_TIME == 0) return;
-	
-	if (in_array(basename($_SERVER["SCRIPT_NAME"]), array("useradmin", "showblob.php")) || substr(basename($_SERVER["SCRIPT_NAME"]), 0, 4) == "edit") return;
-	
-	if ((!isset($_SESSION["pageviews"])) || (time() - $_SESSION["pageviews"]["time"] > $MAX_VIEW_TIME)) {
-		if (isset($_SESSION["pageviews"]) && $MAX_VIEW_LOGLEVEL == "2") {
-			$str = "Max pageview counter reset: max reached was ".$_SESSION["pageviews"]["number"];
-			WriteToLog("CheckPageViews-> ".$str, "I", "S");
-		}
-		$_SESSION["pageviews"]["time"] = time();
-		$_SESSION["pageviews"]["number"] = 0;
-		$_SESSION["pageviews"]["hadmsg"] = false;
-	}
-	
-	$_SESSION["pageviews"]["number"]++;
-	
-	if ($_SESSION["pageviews"]["number"] > $MAX_VIEWS) {
-		$time = time() - $_SESSION["pageviews"]["time"];
-		print $gm_lang["maxviews_exceeded"];
-		if (($MAX_VIEW_LOGLEVEL == "2" || $MAX_VIEW_LOGLEVEL == "1") && $_SESSION["pageviews"]["hadmsg"] == false) {
-			$str = "CheckPageViews-> Maximum number of pageviews exceeded after ".$time." seconds.";
-			WriteToLog($str, "W", "S");
-			$_SESSION["pageviews"]["hadmsg"] = true;
-		}
-		exit;
-	}
-	return;
-}	
-
-// This function checks if the IP from which the user authenticated, is still the IP where the request comes from.
-// It also checks if the current IP is in the exclude list
-function CheckSessionIP() {
-	global $EXCLUDE_HOSTS;
-	
-	if (isset($_SESSION['gm_user']) && !empty($_SESSION['gm_user'])) {
-		if (isset($_SESSION['IP']) && !empty($_SESSION['IP'])) {
-			if ($_SESSION['IP'] != $_SERVER['REMOTE_ADDR']) {
-				$excluded = false;
-				$lines = preg_split("/[;,]/", $EXCLUDE_HOSTS);
-				$hostname = gethostbyaddr($_SERVER["REMOTE_ADDR"]);
-				foreach ($lines as $key => $line) {
-					$line = trim($line);
-//					print $line."<br />";
-					if (!empty($line)) {
-						// is it a hostname?
-						if (preg_match("/[a-zA_Z]/", $line, $match)) {
-							$host = strtolower(preg_replace("/\*/", ".*", $line));
-							if (preg_match("/($host)/", strtolower($hostname), $match)) {
-								$excluded = true;
-								break;
-							}
-						}
-						// Is it a single IP?
-						if (preg_match("/^([0-9]{1,3}\.){3}[0-9]{1,3}$/", $line, $match)) {
-							if ($line == $_SERVER["REMOTE_ADDR"]) {
-								$excluded = true;
-								break;
-							}
-						}
-						// Is it an IP-range?
-						if (preg_match("/^([0-9]{1,3}\.){3}([0-9]{1,3}\-)([0-9]{1,3}\.){3}[0-9]{1,3}$/", $line, $match)) {
-							$ips = split("-", $line);
-							if (ip2long($_SERVER["REMOTE_ADDR"]) <= ip2long($ips[1]) && ip2long($_SERVER["REMOTE_ADDR"]) >= ip2long($ips[0])) {
-								$excluded = true;
-								break;
-							}
-						}
-					}
-				}
-				if (!$excluded) {
-					$string = "CheckSessionIP-> Intrusion detected on session for IP ".$_SESSION['IP']." by ".$_SERVER['REMOTE_ADDR'];
-					WriteToLog($string, "W", "S");
-					HandleIntrusion($string);
-					exit;
-				}
-			}
-		}
-	}
-}
 
 
 /**
@@ -2187,61 +1769,6 @@ function ArrayCopy (&$array, &$copy, $depth=0) {
 		else $copy[$k] = $v;
 	}
 }
-
-function ExtractFullpath($mediarec) {
-	preg_match("/(\d) _*FILE (.*)/", $mediarec, $amatch);
-	if (empty($amatch[2])) return "";
-	$level = trim($amatch[1]);
-	$fullpath = trim($amatch[2]);
-	$filerec = GetSubRecord($level, $amatch[0], $mediarec);
-	$fullpath .= GetCont($level+1, $filerec);
-	return $fullpath;
-}
-
-/**
- * get the relative filename for a media item
- *
- * gets the relative file path from the full media path for a media item.  checks the
- * <var>$MEDIA_DIRECTORY_LEVELS</var> to make sure the directory structure is maintained.
- * @param string $fullpath the full path from the media record
- * @return string a relative path that can be appended to the <var>$MEDIA_DIRECTORY</var> to reference the item
- */
-function ExtractFilename($fullpath) {
-
-	$filename="";
-	$regexp = "'[/\\\]'";
-	$srch = "/".addcslashes(GedcomConfig::$MEDIA_DIRECTORY,'/.')."/";
-	$repl = "";
-	if (!strstr($fullpath, "://")) $nomedia = stripcslashes(preg_replace($srch, $repl, $fullpath));
-	else $nomedia = $fullpath;
-	$ct = preg_match($regexp, $nomedia, $match);
-	if ($ct>0) {
-		$subelements = preg_split($regexp, $nomedia);
-		$subelements = array_reverse($subelements);
-		$max = GedcomConfig::$MEDIA_DIRECTORY_LEVELS;
-		if ($max>=count($subelements)) $max=count($subelements)-1;
-		for($s=$max; $s>=0; $s--) {
-			if ($s!=$max) $filename = $filename."/".$subelements[$s];
-			else $filename = $subelements[$s];
-		}
-	}
-	else $filename = $nomedia;
-	return $filename;
-}
-
-function findImageSize($file) {
-	if (strtolower(substr($file, 0, 7)) == "http://")
-		$file = "http://" . rawurlencode(substr($file, 7));
-	else
-		$file = FilenameDecode($file);
-	$imgsize = @ getimagesize($file);
-	if (!$imgsize) {
-		$imgsize[0] = 300;
-		$imgsize[1] = 300;
-		$imgsize[2] = false;
-	}
-	return $imgsize;
-}
 function CheckUTF8($string) {
        
     // From http://w3.org/International/questions/qa-forms-utf-8.html 
@@ -2297,86 +1824,7 @@ function utf8_isASCII($str){
   return true;
 }
 
-function HandleIntrusion($text="") {
-	global $_SERVER, $_REQUEST, $LOCKOUT_TIME, $gm_username;
 	
-	// Get the username to add to the log
-	if (!isset($gm_username) || empty($gm_username)) {
-		$gm_username = "";
-		if (isset($_SESSION)) {
-			if (!empty($_SESSION['gm_user'])) $gm_username = $_SESSION['gm_user'];
-		}
-		if (isset($HTTP_SESSION_VARS)) {
-			if (!empty($HTTP_SESSION_VARS['gm_user'])) $gm_username = $HTTP_SESSION_VARS['gm_user'];
-		}
-	}
-	
-	$ip = $_SERVER["REMOTE_ADDR"];
-	
-	// Make the logstring
-	$str = "HandleIntrusion-> Intrusion detected for ".$_SERVER["SCRIPT_NAME"]."<br />Query string:<br />";
-	foreach ($_REQUEST as $key => $value) {
-		$str.= $key."&nbsp;=&nbsp;".$value."<br />";
-	}
-	if ($LOCKOUT_TIME == "-1") $str .= "IP not locked out.";
-	else {
-		if ($LOCKOUT_TIME == "0") {
-			$str .= "IP locked out forever.";
-			$sql = "INSERT INTO ".TBLPREFIX."lockout VALUES ('".$ip."' , '".time()."', '0', '".$gm_username."') ON DUPLICATE KEY UPDATE lo_timestamp='".time()."', lo_release='0'";
-		}
-		else {
-			$str .= "IP locked out for ".$LOCKOUT_TIME." minutes.";
-			$newtime = time() + 60*$LOCKOUT_TIME;
-			$sql = "INSERT INTO ".TBLPREFIX."lockout VALUES ('".$ip."', '".time()."', '".$newtime."', '".$gm_username."') ON DUPLICATE KEY UPDATE lo_timestamp='".time()."', lo_release='".$newtime."'";
-		}
-		$res = NewQuery($sql);
-		@session_destroy();
-	}
-	WriteToLog($str, "W", "S");
-	
-	header("HTTP/1.1 403 Forbidden");
-	if (!empty($text)) print $text;
-	exit;
-}
-	
-function CheckLockout() {
-	global $_SERVER, $_REQUEST, $LOCKOUT_TIME, $gm_username;
-	
-	// Get the username to add to the log
-	if (!isset($gm_username) || empty($gm_username)) {
-		$gm_username = "";
-		if (isset($_SESSION)) {
-			if (!empty($_SESSION['gm_user'])) $gm_username = $_SESSION['gm_user'];
-		}
-		if (isset($HTTP_SESSION_VARS)) {
-			if (!empty($HTTP_SESSION_VARS['gm_user'])) $gm_username = $HTTP_SESSION_VARS['gm_user'];
-		}
-	}
-	
-	$ip = $_SERVER["REMOTE_ADDR"];
-	$sql = "SELECT * FROM ".TBLPREFIX."lockout WHERE lo_ip='".$ip."'";
-	if (!empty($gm_username)) $sql .= " OR lo_username='".$gm_username."'";
-	$res = NewQuery($sql);
-	$staylocked = false;
-	if ($res) {
-		if ($res->NumRows()>0) {
-			while($row = $res->FetchRow()){
-				$ntime = time();
-				if ($row[2] <= $ntime && $row[2] != '0') {
-					$sql = "DELETE FROM ".TBLPREFIX."lockout WHERE lo_ip='".$row[0]."' AND lo_username='".$row[3]."'";
-					$res2 = NewQuery($sql);
-				}
-				else {
-					$staylocked = true;
-				}
-			}
-			if ($staylocked) {
-				header("HTTP/1.1 403 Forbidden");
-				exit;
-			}
-		}
-	}
-}
 
 /* this function will read a person's gedcom record and try to determine the persons birth and death
  * year. See the rules in the code
@@ -2388,7 +1836,7 @@ function CheckLockout() {
  */
 function EstimateBD(&$person, $type) {
 	global $CHECK_CHILD_DATES, $MAX_ALIVE_AGE, $HIDE_LIVE_PEOPLE;
-	global $PRIVACY_BY_YEAR, $gm_lang, $COMBIKEY;
+	global $PRIVACY_BY_YEAR, $COMBIKEY;
 	global $GEDCOMID;
 
 	// Init values
@@ -2763,17 +2211,17 @@ function RelativePathFile($file) {
 }
 
 function ReplaceEmbedText($text) {
-	global $gm_lang, $CONFIG_VARS;
+	global $CONFIG_VARS;
 	
 	while (preg_match("/#(.+)#/", $text, $match) > 0) {
 		$varname = $match[1];
 		global $$varname;
 		
 		// check if config variable
-		if (in_array($varname, $CONFIG_VARS)) $text = preg_replace("/$match[0]/", $gm_lang["embedvar_not_allowed"], $text);
+		if (in_array($varname, $CONFIG_VARS)) $text = preg_replace("/$match[0]/", GM_LANG_embedvar_not_allowed, $text);
 		
 		// check language variable
-		else if (isset($gm_lang[$varname])) $text = preg_replace("/$match[0]/", $gm_lang[$varname], $text);
+		else if (defined("GM_LANG_".$varname)) $text = preg_replace("/$match[0]/", constant("GM_LANG_".$varname), $text);
 		
 		// check variable
 		else if (isset($$varname)) $text = preg_replace("/$match[0]/", $$varname, $text);
@@ -2785,22 +2233,88 @@ function ReplaceEmbedText($text) {
 		else if (defined("GM_".$varname)) $text = preg_replace("/$match[0]/", constant("GM_".$varname), $text);
 		
 		// if nothing is found, replace with error message. Doing nothing would cause an endless loop anyway
-		else $text = preg_replace("/$match[0]/", $gm_lang["embedvar_not_found"], $text);
+		else $text = preg_replace("/$match[0]/", GM_LANG_embedvar_not_found, $text);
 	}
 	return $text;
 }	
 
-function ConstructObject($pid, $type, $gedid, $data_array="") {
-
+// Returns the object only if it exists, otherwise false
+function ConstructObject($pid, $type="", $gedid="", $data_array="") {
+	global $GEDCOMID;
+	
+	if (empty($gedid)) $gedid = $GEDCOMID;
+	$type = strtoupper($type);
 	$object = null;
-	if ($type == "SOUR") $object =& Source::GetInstance($pid, $data_array, $gedid);
-	elseif ($type == "REPO") $object =& Repository::GetInstance($pid, $data_array, $gedid);
-	elseif ($type == "OBJE") $object =& MediaItem::GetInstance($pid, $data_array, $gedid);
-	elseif ($type == "NOTE") $object =& Note::GetInstance($pid, $data_array, $gedid);
-	elseif ($type == "ASSO" || $type == "INDI") $object =& Person::GetInstance($pid, $data_array, $gedid);
-	elseif ($type == "FAM") $object =& Family::GetInstance($pid, $data_array, $gedid);
-	if (is_object($object)) return $object;
-	else return false;
+	
+	if (!empty($type) && in_array($type, array("INDI", "FAM", "SOUR", "REPO", "ASSO", "NOTE", "SUBM"))) {
+		if ($type == "SOUR") $object =& Source::GetInstance($pid, $data_array, $gedid);
+		elseif ($type == "REPO") $object =& Repository::GetInstance($pid, $data_array, $gedid);
+		elseif ($type == "OBJE") $object =& MediaItem::GetInstance($pid, $data_array, $gedid);
+		elseif ($type == "NOTE") $object =& Note::GetInstance($pid, $data_array, $gedid);
+		elseif ($type == "ASSO" || $type == "INDI") $object =& Person::GetInstance($pid, $data_array, $gedid);
+		elseif ($type == "FAM") $object =& Family::GetInstance($pid, $data_array, $gedid);
+		elseif ($type == "SUBM") $object =& Submitter::GetInstance($pid, $data_array, $gedid);
+		if (is_object($object) && !$object->isempty) return $object;
+		else return false;
+	}
+	else {
+		// To minimize queries, we first start to guess what record type we must retrieve
+		$tried = "";
+		if (substr($pid,0,strlen(GedcomConfig::$GEDCOM_ID_PREFIX)) == GedcomConfig::$GEDCOM_ID_PREFIX) {
+			$object =& Person::GetInstance($pid, $data_array, $gedid);
+			$tried = "indi";
+		}
+		else if (substr($pid,0,strlen(GedcomConfig::$FAM_ID_PREFIX)) == GedcomConfig::$FAM_ID_PREFIX) {
+			$object =& Family::GetInstance($pid, $data_array, $gedid);
+			$tried = "fam";
+		}
+		else if (substr($pid,0,strlen(GedcomConfig::$SOURCE_ID_PREFIX)) == GedcomConfig::$SOURCE_ID_PREFIX) {
+			$object =& Source::GetInstance($pid, $data_array, $gedid);
+			$tried = "sour";
+		}
+		else if (substr($pid,0,strlen(GedcomConfig::$MEDIA_ID_PREFIX)) == GedcomConfig::$MEDIA_ID_PREFIX) {
+			$object =& MediaItem::GetInstance($pid, $data_array, $gedid);
+			$tried = "media";
+		}
+		else if (substr($pid,0,strlen(GedcomConfig::$NOTE_ID_PREFIX)) == GedcomConfig::$NOTE_ID_PREFIX) {
+			$object =& Note::GetInstance($pid, $data_array, $gedid);
+			$tried = "note";
+		}
+		else if (substr($pid,0,strlen(GedcomConfig::$REPO_ID_PREFIX)) == GedcomConfig::$REPO_ID_PREFIX) {
+			$object =& Repository::GetInstance($pid, $data_array, $gedid);
+			$tried = "repo";
+		}
+		if (is_object($object) && !$object->isempty) return $object;
+		else {
+			if ($tried != "indi") {
+				$object =& Person::GetInstance($pid, $data_array, $gedid);
+				if (is_object($object) && !$object->isempty) return $object;
+			}
+			if ($tried != "fam") {
+				$object =& Family::GetInstance($pid, $data_array, $gedid);
+				if (is_object($object) && !$object->isempty) return $object;
+			}
+			if ($tried != "sour") {
+				$object =& Source::GetInstance($pid, $data_array, $gedid);
+				if (is_object($object) && !$object->isempty) return $object;
+			}
+			if ($tried != "repo") {
+				$object =& Repository::GetInstance($pid, $data_array, $gedid);
+				if (is_object($object) && !$object->isempty) return $object;
+			}
+			if ($tried != "media") {
+				$object =& MediaItem::GetInstance($pid, $data_array, $gedid);
+				if (is_object($object) && !$object->isempty) return $object;
+			}
+			if ($tried != "note") {
+				$object =& Note::GetInstance($pid, $data_array, $gedid);
+				if (is_object($object) && !$object->isempty) return $object;
+			}
+			$object =& Submitter::GetInstance($pid, $data_array, $gedid);
+			if (is_object($object) && !$object->isempty) return $object;
+			else return false;
+		}
+	}
 }
 	
 ?>

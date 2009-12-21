@@ -41,7 +41,7 @@ abstract class FactFunctions {
 	 */
 	public function PrintFact($factobj, $pid, $mayedit=true) {
 		global $nonfacts;
-		global $gm_lang, $GEDCOMID;
+		global $GEDCOMID;
 		global $TEXT_DIRECTION;
 		global $FACT_COUNT;
 		static $rowcnt;
@@ -108,7 +108,7 @@ abstract class FactFunctions {
 						$type = trim($match[1]);
 						if (defined("GM_FACT_MARR_".Str2Upper($type))) print constant("GM_FACT_MARR_".Str2Upper($type));
 						else if (defined("GM_FACT_".$type)) print constant("GM_FACT_".$type);
-						else if (isset($gm_lang[$type])) print $gm_lang[$type];
+						else if (defined("GM_LANG_".$type)) print constant("GM_LANG_".$type);
 						else print $type;
 						print "<br />";
 					}
@@ -127,7 +127,7 @@ abstract class FactFunctions {
 							print $spouseobj->name;
 							if ($spouseobj->addname != "") print " - ".$spouseobj->addname;
 						 }
-						 else print $gm_lang["private"];
+						 else print GM_LANG_private;
 						 print "</a>";
 					}
 					$ct = preg_match("/_GMFS @(.*)@/", $factobj->factrec, $match);
@@ -137,7 +137,7 @@ abstract class FactFunctions {
 						print "<a href=\"family.php?famid=".$famid."&amp;gedid=".$GEDCOMID."\">";
 						if ($TEXT_DIRECTION == "ltr") print " &lrm;";
 						else print " &rlm;";
-						print "[".$gm_lang["view_family"];
+						print "[".GM_LANG_view_family;
 						if (GedcomConfig::$SHOW_FAM_ID_NUMBERS) print " &lrm;(".$famid.")&lrm;";
 						if ($TEXT_DIRECTION == "ltr") print "&lrm;]</a>\n";
 						else print "&rlm;]</a>\n";
@@ -154,7 +154,7 @@ abstract class FactFunctions {
 						else if ($fact == "REPO") {
 							$repo =& Repository::GetInstance($match[1]);
 							if (!$repo->isempty) {
-								print "<span class=\"label\">".$gm_lang["repo_name"]."</span><br /><span class=\"field\"><a href=\"repo.php?rid=".$repo->xref."&amp;gedid=".$repo->gedcomid."\">".$repo->title."</a></span>";
+								print "<span class=\"label\">".GM_LANG_repo_name."</span><br /><span class=\"field\"><a href=\"repo.php?rid=".$repo->xref."&amp;gedid=".$repo->gedcomid."\">".$repo->title."</a></span>";
 								$prt = true;
 							}
 							$prt = self::PrintAddressStructure($repo, 1, $prt) || $prt;
@@ -184,15 +184,15 @@ abstract class FactFunctions {
 						$prted = true;
 					}
 					else if ($fact == "RESN") {
-						print PrintReady(print_help_link("RESN_help", "qm", "", "", true).$gm_lang[$event]);
+						print PrintReady(print_help_link("RESN_help", "qm", "", "", true).constant("GM_LANG_".$event));
 					}
 					else if (!strstr("PHON ADDR ", $fact." ") && $event!="Y") {
 						print PrintReady($event." ");
 						$prted = true;
 					}
 					else if ($fact == "_PRIM" || $fact == "_THUM") {
-						if ($event == "Y") print PrintReady($gm_lang["yes"]);
-						else print PrintReady($gm_lang["no"]);
+						if ($event == "Y") print PrintReady(GM_LANG_yes);
+						else print PrintReady(GM_LANG_no);
 						$prted = true;
 					}
 				}
@@ -254,7 +254,7 @@ abstract class FactFunctions {
 								}
 							}
 							else {
-								if (isset($gm_lang[strtolower($value)])) print $gm_lang[strtolower($value)];
+								if (defined("GM_LANG_".strtolower($value))) print constant("GM_LANG_".strtolower($value));
 								else print PrintReady($value);
 							}
 	//						print "<br />\n";
@@ -278,7 +278,7 @@ abstract class FactFunctions {
 										if (file_exists(GM_IMAGE_DIR."/facts/".$factref.".gif")) print "<img src=\"".GM_IMAGE_DIR."/facts/".$factref.".gif\" alt=\"".$label."\" title=\"".$label."\" align=\"middle\" /> ";
 										else print "<span class=\"label\">".$label.": </span>";
 										$value = trim($matchf[$j][2]);
-										if (isset($gm_lang[strtolower($value)])) print $gm_lang[strtolower($value)];
+										if (defined("GM_LANG_".strtolower($value))) print constant("GM_LANG_".strtolower($value));
 										else print PrintReady($value);
 	//									if ($j < $ctf) print "<br />";
 										print "\n";
@@ -306,24 +306,24 @@ abstract class FactFunctions {
 					if (isset($resn_value)) {
 						if ($n1 ||$n2 || $n3) print "<br />";
 						print_help_link("RESN_help", "qm");
-						print PrintReady(GM_FACT_RESN.": ".$gm_lang[$resn_value])."\n";
+						print PrintReady(GM_FACT_RESN.": ".constant("GM_LANG_".$resn_value))."\n";
 					}
 				}
 			}
-			if (!$factobj->disp) print $gm_lang["private"];
+			if (!$factobj->disp) print GM_LANG_private;
 			print "</td>";
 			print "\n\t\t</tr>";
 		}
 		else {
 			// -- catch all unknown codes here
-			$body = $gm_lang["unrecognized_code"]." ".$fact;
-			if (!GedcomConfig::$HIDE_GEDCOM_ERRORS) print "\n\t\t<tr><td class=\"shade2 $factobj->style\"><span class=\"error\">".$gm_lang["unrecognized_code"].": $fact</span></td><td class=\"shade1\">$event<br />".$gm_lang["unrecognized_code_msg"]." <a href=\"#\" onclick=\"message('".GedcomConfig::$CONTACT_EMAIL."','', '', '$body'); return false;\">".GedcomConfig::$CONTACT_EMAIL."</a>.</td></tr>";
+			$body = GM_LANG_unrecognized_code." ".$fact;
+			if (!GedcomConfig::$HIDE_GEDCOM_ERRORS) print "\n\t\t<tr><td class=\"shade2 $factobj->style width20\"><span class=\"error\">".GM_LANG_unrecognized_code.": $fact</span></td><td class=\"shade1\">$event<br />".GM_LANG_unrecognized_code_msg." <a href=\"#\" onclick=\"message('".GedcomConfig::$CONTACT_EMAIL."','', '', '$body'); return false;\">".GedcomConfig::$CONTACT_EMAIL."</a>.</td></tr>";
 		}
 	}
 	//------------------- end print fact function
 	
 	public function PrintMainMedia($factobj, $pid, $mayedit=true) {
-		global $gm_lang, $TEXT_DIRECTION;
+		global $TEXT_DIRECTION;
 		static $rowcnt;
 		
 		if (!isset($rowcnt)) $rowcnt = 0;
@@ -372,19 +372,19 @@ abstract class FactFunctions {
 				if ($media->extension != "") {
 					print "\n\t\t\t<br /><span class=\"label\">".GM_FACT_FORM.": </span> <span class=\"field\">".$media->extension."</span>";
 					if ($media->fileobj->f_width != 0 &&  $media->fileobj->f_height != 0) {
-						print "\n\t\t\t<span class=\"label\"><br />".$gm_lang["image_size"].": </span> <span class=\"field\" style=\"direction: ltr;\">" . $media->fileobj->f_width . ($TEXT_DIRECTION =="rtl"?" &rlm;x&rlm; " : " x ") . $media->fileobj->f_height . "</span>";
+						print "\n\t\t\t<span class=\"label\"><br />".GM_LANG_image_size.": </span> <span class=\"field\" style=\"direction: ltr;\">" . $media->fileobj->f_width . ($TEXT_DIRECTION =="rtl"?" &rlm;x&rlm; " : " x ") . $media->fileobj->f_height . "</span>";
 					}
 				}
 				$ttype = preg_match("/3 TYPE (.*)/", $media->gedrec, $match);
 				if ($ttype>0){
-					print "\n\t\t\t<br /><span class=\"label\">".$gm_lang["type"].": </span> <span class=\"field\">".$match[1]."</span>";
+					print "\n\t\t\t<br /><span class=\"label\">".GM_LANG_type.": </span> <span class=\"field\">".$match[1]."</span>";
 				}
 				// Print PRIM from owner, NOT from the media object
 				$ttype = preg_match("/\d _PRIM (\w)/", $factobj->factrec, $match);
 				if ($ttype>0){
 					if ($match[1] == "Y") $val = "yes";
 					else $val = "no";
-					print "\n\t\t\t<br /><span class=\"label\">".GM_FACT__PRIM.": </span> <span class=\"field\">".$gm_lang[$val]."</span>";
+					print "\n\t\t\t<br /><span class=\"label\">".GM_FACT__PRIM.": </span> <span class=\"field\">".constant("GM_LANG_".$val)."</span>";
 				}
 				
 				// Print THUM from from owner, NOT from the media object
@@ -392,7 +392,7 @@ abstract class FactFunctions {
 				if ($ttype>0){
 					if ($match[1] == "Y") $val = "yes";
 					else $val = "no";
-					print "\n\t\t\t<br /><span class=\"label\">".GM_FACT__THUM.": </span> <span class=\"field\">".$gm_lang[$val]."</span>";
+					print "\n\t\t\t<br /><span class=\"label\">".GM_FACT__THUM.": </span> <span class=\"field\">".constant("GM_LANG_".$val)."</span>";
 				}
 		
 				print "<br />\n";
@@ -403,13 +403,12 @@ abstract class FactFunctions {
 				// Print the notes in the MM link
 				self::PrintFactNotes($factobj, 2);
 			}
-			else print $gm_lang["private"];
+			else print GM_LANG_private;
 			print "</span></td></tr>";
 		}
 	}
 	
 	public function PrintMainSources($factobj, $pid, $mayedit=true) {
-		 global $gm_lang;
 		
 		 // -- find source for each fact
 		// Here we check if we can show the source at all!
@@ -444,12 +443,12 @@ abstract class FactFunctions {
 //						print "<br /><span class=\"label\">".GM_FACT_DATA." </span>";
 					$srec = GetSubRecord(2, "2 DATA", $factobj->factrec);
 					$cs = preg_match("/3 DATE (.*)/", $srec, $cmatch);
-					if ($cs>0) print "\n\t\t\t<br /><span class=\"label\">".$gm_lang["date"].":  </span><span class=\"field\">".GetChangedDate($cmatch[1])."</span>";
+					if ($cs>0) print "\n\t\t\t<br /><span class=\"label\">".GM_LANG_date.":  </span><span class=\"field\">".GetChangedDate($cmatch[1])."</span>";
 					$i = 1;
 					do {
 						$trec = GetSubRecord(3, "3 TEXT", $srec, $i);
 						if ($trec != "") {
-							print "<br /><span class=\"label\">".$gm_lang["text"]." </span><span class=\"field\">".GetGedcomValue("TEXT", 3, $trec);
+							print "<br /><span class=\"label\">".GM_LANG_text." </span><span class=\"field\">".GetGedcomValue("TEXT", 3, $trec);
 							$text = GetCont(4, $trec);
 							$text = ExpandUrl($text);
 							print $text;
@@ -465,7 +464,7 @@ abstract class FactFunctions {
 					$trec = GetSubRecord(2, "2 TEXT", $factobj->factrec, $i);
 					print $trec;
 					if ($trec != "") {
-						print "<br /><span class=\"label\">".$gm_lang["text"]." </span><span class=\"field\">".GetGedcomValue("TEXT", 2, $trec);
+						print "<br /><span class=\"label\">".GM_LANG_text." </span><span class=\"field\">".GetGedcomValue("TEXT", 2, $trec);
 						$text = GetCont(3, $trec);
 						$text = ExpandUrl($text);
 						print $text;
@@ -480,7 +479,7 @@ abstract class FactFunctions {
 				self::PrintFactMedia($factobj, 2);
 				self::PrintFactNotes($factobj, 2);
 			}
-			else print $gm_lang["private"];
+			else print GM_LANG_private;
 			print "</span></td></tr>";
 		}
 	}
@@ -525,7 +524,6 @@ abstract class FactFunctions {
 	}
 	
 	public function PrintFactNotes($factobj, $level, $nobr=true) {
-		global $gm_lang;
 
 		// This is to prevent that notes are printed as part of the fact for family facts displayed on the indipage
 		if ($level == 2 && is_object($factobj) && !GedcomConfig::$INDI_EXT_FAM_FACTS && preg_match("/\n1 _GMFS @(.*)@/", $factobj->factrec)) return false;
@@ -581,7 +579,7 @@ abstract class FactFunctions {
 				if (!$first) print "<br />";
 				else $first = false;
 				$factnotesprinted = true;
-				print "\n\t\t<span class=\"label\">".$gm_lang["note"].": </span><span class=\"field wrap\">";
+				print "\n\t\t<span class=\"label\">".GM_LANG_note.": </span><span class=\"field wrap\">";
 				if ($link) {
 					$note->PrintListNote(0, false);
 //					self::PrintFactSources($note, 1);
@@ -603,7 +601,6 @@ abstract class FactFunctions {
 	}
 
 	public function PrintFactSources($factobj, $level, $nobr=true) {
-		global $gm_lang;
 		global $FACT_COUNT, $GM_IMAGES;
 		static $cnt;
 
@@ -668,7 +665,7 @@ abstract class FactFunctions {
 				}
 				else $owner = rand();
 				if (strstr($sourcerec, "\n$nlevel ")) print "<a href=\"#\" onclick=\"expand_layer('".$owner.$key."-".$FACT_COUNT."-".$cnt."'); return false;\"><img id=\"".$owner.$key."-".$FACT_COUNT."-".$cnt."_img\" src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["plus"]["other"]."\" border=\"0\" width=\"11\" height=\"11\" alt=\"\" /></a> ";
-				print $gm_lang["source"].":</span> <span class=\"field\">";
+				print GM_LANG_source.":</span> <span class=\"field\">";
 				if ($link) $source->PrintListSource(false);
 				else {
 					print PrintReady(nl2br(GetGedcomValue("SOUR", $level, $sourcerec, "")));
@@ -701,13 +698,13 @@ abstract class FactFunctions {
 						print "\n\t\t\t";
 						if (!$first) print "<br />";
 						else $first = false;
-						print "<span class=\"label\">".$gm_lang["date"].": </span><span class=\"field\">".GetChangedDate($cmatch[1])."</span>";
+						print "<span class=\"label\">".GM_LANG_date.": </span><span class=\"field\">".GetChangedDate($cmatch[1])."</span>";
 					}
 					$tt = preg_match_all("/\n$n2level TEXT (.*)(?:\r\n|\r|\n)/", $sourcerec, $tmatch, PREG_SET_ORDER);
 					for($k=0; $k<$tt; $k++) {
 						if (!$first || $k != 0) print "<br />";
 						else $first = false;
-						print "<span class=\"label\">".$gm_lang["text"]." </span><span class=\"field\">".PrintReady($tmatch[$k][1]);
+						print "<span class=\"label\">".GM_LANG_text." </span><span class=\"field\">".PrintReady($tmatch[$k][1]);
 						print PrintReady(GetCont($n2level+1, $sourcerec));
 						print "</span>";
 					}
@@ -717,7 +714,7 @@ abstract class FactFunctions {
 					print "\n\t\t\t";
 					if (!$first) print "<br />";
 					else $first = false;
-					print "<span class=\"label\">".$gm_lang["date"].": </span><span class=\"field\">".GetChangedDate($cmatch[1])."</span>";
+					print "<span class=\"label\">".GM_LANG_date.": </span><span class=\"field\">".GetChangedDate($cmatch[1])."</span>";
 				}
 				$cs = preg_match("/\n$nlevel QUAY (.*)/", $sourcerec, $cmatch);
 				if ($cs>0) {
@@ -729,7 +726,7 @@ abstract class FactFunctions {
 				for($k=0; $k<$cs; $k++) {
 					if (!$first || $k != 0) print "<br />";
 					else $first = false;
-					print "<span class=\"label\">".$gm_lang["text"]." </span><span class=\"field\">".$tmatch[$k][1];
+					print "<span class=\"label\">".GM_LANG_text." </span><span class=\"field\">".$tmatch[$k][1];
 					$text = GetCont($nlevel+1, $sourcerec);
 					$text = ExpandUrl($text);
 					print PrintReady($text);
@@ -750,7 +747,7 @@ abstract class FactFunctions {
 	//-- Print the links to multi-media objects
 	public function PrintFactMedia($factobj, $level, $nobr=true) {
 		global $TEXT_DIRECTION, $MEDIATYPE;
-		global $gm_lang, $GM_IMAGES;
+		global $GM_IMAGES;
 		global $GEDCOMID;
 		
 		// This is to prevent that notes are printed as part of the fact for family facts displayed on the indipage
@@ -844,12 +841,12 @@ abstract class FactFunctions {
 						if ($media->extension != "") {
 							print "\n\t\t\t<br /><span class=\"label\">".GM_FACT_FORM.": </span> <span class=\"field\">".$media->extension."</span>";
 							if ($media->fileobj->f_width != 0 && $media->fileobj->f_height != 0) {
-								print "\n\t\t\t<span class=\"label\"><br />".$gm_lang["image_size"].": </span> <span class=\"field\" style=\"direction: ltr;\">" . $media->fileobj->f_width . ($TEXT_DIRECTION =="rtl"?" &rlm;x&rlm; " : " x ") . $media->fileobj->f_height . "</span>";
+								print "\n\t\t\t<span class=\"label\"><br />".GM_LANG_image_size.": </span> <span class=\"field\" style=\"direction: ltr;\">" . $media->fileobj->f_width . ($TEXT_DIRECTION =="rtl"?" &rlm;x&rlm; " : " x ") . $media->fileobj->f_height . "</span>";
 							}
 						}
 						$ttype = preg_match("/\d TYPE (.*)/", $media->gedrec, $match);
 						if ($ttype>0){
-							print "\n\t\t\t<br /><span class=\"label\">".$gm_lang["type"].": </span> <span class=\"field\">$match[1]</span>";
+							print "\n\t\t\t<br /><span class=\"label\">".GM_LANG_type.": </span> <span class=\"field\">$match[1]</span>";
 						}
 						print "<br />\n";
 						if (PrivacyFunctions::showFact("NOTE", $media->xref) && PrivacyFunctions::showFactDetails("NOTE", $media->xref)) {
@@ -870,27 +867,26 @@ abstract class FactFunctions {
 	}
 	
 	private function PrintResn($factobj) {
-		global $gm_lang;
 		
 		if ($factobj->resnvalue != "") {
 			print_help_link("RESN_help", "qm");
-			print PrintReady(GM_FACT_RESN.": ".$gm_lang[$factobj->resnvalue])."\n";
+			print PrintReady(GM_FACT_RESN.": ".constant("GM_LANG_".$factobj->resnvalue))."\n";
 		}
 	}
 			
 	private function PrintFactTagBox($factobj, $mayedit) {
-		 global $GM_IMAGES, $gm_lang;
+		 global $GM_IMAGES;
 		 global $n_chil, $n_gchi;
 
 		print "<td class=\"shade2 ".$factobj->style." center width20\" style=\"vertical-align: middle;\">";
 		if ($factobj->fact == "SOUR") {
 			print "<img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["source"]["large"]."\" width=\"50\" height=\"50\" alt=\"\" /><br />";
-			print $gm_lang["source"];
+			print GM_LANG_source;
 			$edit_actions = array("edit_sour", "edit_sour", "copy_sour", "delete_sour");
 		}
 		else if ($factobj->fact == "NOTE") {
 			print "<img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["note"]["other"]."\" width=\"50\" height=\"50\" alt=\"\" /><br />";
-			print $gm_lang["note"];
+			print GM_LANG_note;
 			$edit_actions = array("edit_note", "edit_note", "copy_note", "delete_note");
 		}
 		else if ($factobj->fact == "OBJE") {
@@ -908,13 +904,13 @@ abstract class FactFunctions {
 //			$label = preg_replace("/^X_/", "_", $factobj->factref);
 //			if (defined("GM_FACT_".$label)) print constant("GM_FACT_".$label);
 //			else print $label;
-			if ($factobj->factref == "X_BIRT_CHIL" && isset($n_chil)) print "<br />".$gm_lang["number_sign"].$n_chil++;
-			if ($factobj->factref == "X_BIRT_GCHI" && isset($n_gchi)) print "<br />".$gm_lang["number_sign"].$n_gchi++;
+			if ($factobj->factref == "X_BIRT_CHIL" && isset($n_chil)) print "<br />".GM_LANG_number_sign.$n_chil++;
+			if ($factobj->factref == "X_BIRT_GCHI" && isset($n_gchi)) print "<br />".GM_LANG_number_sign.$n_gchi++;
 			$edit_actions = array("edit_fact", "edit_fact", "copy_fact", "delete_fact");
 		}
 		if ($factobj->canedit && $factobj->style!="change_old" && !$factobj->owner->view && $mayedit) {
 			$menu = array();
-			$menu["label"] = $gm_lang["edit"];
+			$menu["label"] = GM_LANG_edit;
 			$menu["labelpos"] = "right";
 			$menu["icon"] = "";
 			$menu["link"] = "#";
@@ -925,7 +921,7 @@ abstract class FactFunctions {
 			$menu["submenuclass"] = "submenu";
 			$menu["items"] = array();
 			$submenu = array();
-			$submenu["label"] = $gm_lang["edit"];
+			$submenu["label"] = GM_LANG_edit;
 			$submenu["labelpos"] = "right";
 			$submenu["icon"] = "";
 			$submenu["onclick"] = "return edit_record('".$factobj->owner->xref."', '".$factobj->fact."', '".$factobj->count."', '".$edit_actions[1]."', '".$factobj->owner_type."');";
@@ -935,7 +931,7 @@ abstract class FactFunctions {
 			$menu["items"][] = $submenu;
 			if (!stristr($factobj->factrec, "1 _GM")) {
 				$submenu = array();
-				$submenu["label"] = $gm_lang["copy"];
+				$submenu["label"] = GM_LANG_copy;
 				$submenu["labelpos"] = "right";
 				$submenu["icon"] = "";
 				$submenu["onclick"] = "return copy_record('".$factobj->owner->xref."', '".$factobj->fact."', '".$factobj->count."', '".$edit_actions[2]."', '".$factobj->owner_type."');";
@@ -945,11 +941,11 @@ abstract class FactFunctions {
 				$menu["items"][] = $submenu;
 			}
 			$submenu = array();
-			$submenu["label"] = $gm_lang["delete"];
+			$submenu["label"] = GM_LANG_delete;
 			$submenu["labelpos"] = "right";
 			$submenu["icon"] = "";
 //			$submenu["onclick"] = "return delete_record('".$factobj->owner->xref."', '".$factobj->fact."', '$count', '".$edit_actions[3]."');";
-			$submenu["onclick"] = "if (confirm('".$gm_lang["check_delete"]."')) return delete_record('".$factobj->owner->xref."', '".$factobj->fact."', '".$factobj->count."', '".$edit_actions[3]."', '".$factobj->owner_type."'); else return false;";
+			$submenu["onclick"] = "if (confirm('".GM_LANG_check_delete."')) return delete_record('".$factobj->owner->xref."', '".$factobj->fact."', '".$factobj->count."', '".$edit_actions[3]."', '".$factobj->owner_type."'); else return false;";
 			$submenu["link"] = "#";
 			$submenu["class"] = "submenuitem";
 			$submenu["hoverclass"] = "submenuitem_hover";
@@ -981,7 +977,7 @@ abstract class FactFunctions {
 	 * @param string $linebr 	optional linebreak
 	 */
 	public function PrintAssoRelaRecord($factobj, $pid, $linebr=false) {
-		global $GEDCOMID, $TEXT_DIRECTION, $gm_lang, $GM_IMAGES;
+		global $GEDCOMID, $TEXT_DIRECTION, $GM_IMAGES;
 		
 		$prted = false;
 		// get ASSOciate(s) ID(s)
@@ -999,13 +995,13 @@ abstract class FactFunctions {
 				if ($rct>0) {
 					// RELAtionship name in user language
 					$key = strtolower(trim($rmatch[1]));
-					if (isset($gm_lang["$key"])) $rela = $gm_lang[$key];
+					if (defined("GM_LANG_".$key)) $rela = constant("GM_LANG_".$key);
 					else $rela = $rmatch[1];
 					$p = strpos($rela, "(=");
 					if ($p>0) $rela = trim(substr($rela, 0, $p));
-					if ($pid2==$pid) print "<span class=\"details_label\">";
+					if ($pid2 == $pid) print "<span class=\"details_label\">";
 					print $rela.": ";
-					if ($pid2==$pid) print "</span>";
+					if ($pid2 == $pid) print "</span>";
 				}
 				else $rela = GM_FACT_RELA; // default
 	
@@ -1025,10 +1021,10 @@ abstract class FactFunctions {
 						if (!$asso->view) {
 							$family =& Family::GetInstance($pid);
 							if (!$family->isempty) {
-								if ($family->husb_id != "" && $family->husb_id != $asso->xref) print " - <a href=\"relationship.php?pid1=".$family->husb_id."&amp;pid2=".$asso->xref."&amp;followspouse=1&amp;gedid=".$asso->gedcomid."\">[" . $gm_lang["relationship_chart"] . "<img src=\"".GM_IMAGE_DIR."/" . $GM_IMAGES["sex"]["small"] . "\" title=\"" . $gm_lang["husband"] . "\" alt=\"" . $gm_lang["husband"] . "\" class=\"sex_image\" />]</a>";
-								if ($family->wife_id != "" && $family->wife_id != $asso->xref) print " - <a href=\"relationship.php?pid1=".$family->wife_id."&amp;pid2=".$asso->xref."&amp;followspouse=1&amp;gedid=".$asso->gedcomid."\">[" . $gm_lang["relationship_chart"] . "<img src=\"".GM_IMAGE_DIR."/" . $GM_IMAGES["sexf"]["small"] . "\" title=\"" . $gm_lang["wife"] . "\" alt=\"" . $gm_lang["wife"] . "\" class=\"sex_image\" />]</a>";
+								if ($family->husb_id != "" && $family->husb_id != $asso->xref) print " - <a href=\"relationship.php?pid1=".$family->husb_id."&amp;pid2=".$asso->xref."&amp;followspouse=1&amp;gedid=".$asso->gedcomid."\">[" . GM_LANG_relationship_chart . "<img src=\"".GM_IMAGE_DIR."/" . $GM_IMAGES["sex"]["small"] . "\" title=\"" . GM_LANG_husband . "\" alt=\"" . GM_LANG_husband . "\" class=\"sex_image\" />]</a>";
+								if ($family->wife_id != "" && $family->wife_id != $asso->xref) print " - <a href=\"relationship.php?pid1=".$family->wife_id."&amp;pid2=".$asso->xref."&amp;followspouse=1&amp;gedid=".$asso->gedcomid."\">[" . GM_LANG_relationship_chart . "<img src=\"".GM_IMAGE_DIR."/" . $GM_IMAGES["sexf"]["small"] . "\" title=\"" . GM_LANG_wife . "\" alt=\"" . GM_LANG_wife . "\" class=\"sex_image\" />]</a>";
 							}
-							else if ($pid != $asso->xref) print " - <a href=\"relationship.php?pid1=".$pid."&amp;pid2=".$asso->xref."&amp;followspouse=1&amp;gedid=".$asso->gedcomid."\">[" . $gm_lang["relationship_chart"] . "]</a>";
+							else if ($pid != $asso->xref) print " - <a href=\"relationship.php?pid1=".$pid."&amp;pid2=".$asso->xref."&amp;followspouse=1&amp;gedid=".$asso->gedcomid."\">[" . GM_LANG_relationship_chart . "]</a>";
 						}
 					}
 				}
@@ -1038,7 +1034,7 @@ abstract class FactFunctions {
 					print "</a>\n";
 				}
 				else {
-					print $gm_lang["unknown"];
+					print GM_LANG_unknown;
 					if (GedcomConfig::$SHOW_ID_NUMBERS) print " <span dir=\"$TEXT_DIRECTION\">($pid2)</span>";
 				}
 				$prted = true;
@@ -1056,7 +1052,6 @@ abstract class FactFunctions {
 		
 	// Print a new fact box on details pages
 	public function PrintAddNewFact($id, $usedfacts, $type) {
-		global $gm_lang;
 	
 		if ($type == "SOUR") $addfacts = array_merge(self::CheckFactUnique(preg_split("/[, ;:]+/", GedcomConfig::$SOUR_FACTS_UNIQUE, -1, PREG_SPLIT_NO_EMPTY), $usedfacts, "SOUR"), preg_split("/[, ;:]+/", GedcomConfig::$SOUR_FACTS_ADD, -1, PREG_SPLIT_NO_EMPTY));
 		else if ($type == "REPO") $addfacts = array_merge(self::CheckFactUnique(preg_split("/[, ;:]+/", GedcomConfig::$REPO_FACTS_UNIQUE, -1, PREG_SPLIT_NO_EMPTY), $usedfacts, "REPO"), preg_split("/[, ;:]+/", GedcomConfig::$REPO_FACTS_ADD, -1, PREG_SPLIT_NO_EMPTY));
@@ -1068,26 +1063,26 @@ abstract class FactFunctions {
 		if (count($addfacts) == 0) return;
 	
 		usort($addfacts, "FactSort");
-		print "<tr><td class=\"shade2\">";
+		print "<tr><td class=\"shade2 width20\">";
 		print_help_link("add_new_facts_help", "qm");
-		print $gm_lang["add_fact"]."</td>";
+		print GM_LANG_add_fact."</td>";
 		print "<td class=\"shade1\">";
 		print "<form method=\"get\" name=\"newfactform\" action=\"\">\n";
 		print "<select id=\"newfact\" name=\"newfact\">\n";
 		foreach($addfacts as $indexval => $fact) {
 	  		print PrintReady("<option value=\"$fact\">".constant("GM_FACT_".$fact). " [".$fact."]</option>\n");
 		}
-		if (($type == "INDI") || ($type == "FAM")) print "<option value=\"EVEN\">".$gm_lang["custom_event"]." [EVEN]</option>\n";
+		if (($type == "INDI") || ($type == "FAM")) print "<option value=\"EVEN\">".GM_LANG_custom_event." [EVEN]</option>\n";
 		if (!empty($_SESSION["clipboard"])) {
 			foreach($_SESSION["clipboard"] as $key=>$fact) {
 				if ($fact["type"]==$type) {
-					if (defined("GM_FACT_".$fact["fact"])) print "<option value=\"clipboard_$key\">".$gm_lang["add_from_clipboard"]." ".constant("GM_FACT_".$fact["fact"])."</option>\n";
-					else print "<option value=\"clipboard_$key\">".$gm_lang["add_from_clipboard"]." ".$fact["fact"]."</option>\n";
+					if (defined("GM_FACT_".$fact["fact"])) print "<option value=\"clipboard_$key\">".GM_LANG_add_from_clipboard." ".constant("GM_FACT_".$fact["fact"])."</option>\n";
+					else print "<option value=\"clipboard_$key\">".GM_LANG_add_from_clipboard." ".$fact["fact"]."</option>\n";
 				}
 			}
 		}
 		print "</select>";
-		print "&nbsp;<input type=\"button\" value=\"".$gm_lang["add"]."\" onclick=\"add_record('$id', 'newfact', 'newfact', '".$type."');\" />\n";
+		print "&nbsp;<input type=\"button\" value=\"".GM_LANG_add."\" onclick=\"add_record('$id', 'newfact', 'newfact', '".$type."');\" />\n";
 		
 		// Print the quick add fact links
 		$qfacts = array();
@@ -1112,7 +1107,6 @@ abstract class FactFunctions {
 	 * @param int $level		The gedcom line level of the main ADDR record
 	 */
 	public function PrintAddressStructure($object, $level, $br=false) {
-		global $gm_lang;
 	
 		//	 $POSTAL_CODE = 'false' - before city, 'true' - after city and/or state
 		//-- define per gedcom till can do per address countries in address languages
@@ -1264,7 +1258,6 @@ abstract class FactFunctions {
 	}
 	
 	public function PrintSimpleFact($factobj, $print_parents_age=false, $print_age_at_event=false) {
-		global $gm_lang;
 		
 		if (!is_object($factobj)) return false;
 		
@@ -1281,7 +1274,7 @@ abstract class FactFunctions {
 			$factobj->PrintFactDate(false, false, $print_parents_age, $print_age_at_event);
 			$factobj->PrintFactPlace();
 		}
-		else print $gm_lang["private"];
+		else print GM_LANG_private;
 		print "<br />\n";
 	}
 	
@@ -1301,6 +1294,147 @@ abstract class FactFunctions {
 		return $uniquefacts;
 	}
 
-
+	/**
+	 * format a fact for calendar viewing
+	 *
+	 * @param string $factrec the fact record
+	 * @param string $action tells what type calendar the user is viewing
+	 * @param string $filter should the fact be filtered by living people etc
+	 * @param string $filterev "all" to show all events; "bdm" to show only Births, Deaths, Marriages; Event code to show only that event
+	 * @return string a html text string that can be printed
+	 */
+	public function GetCalendarFact($factobj, $action, $filterof, $filterev="all") {
+		global $year, $month, $day, $TEMPLE_CODES, $monthtonum, $TEXT_DIRECTION, $caltype;
+		global $CalYear, $currhYear;
+		
+		$Upcoming = false;
+		if ($action == "upcoming") {
+			$action = "today";
+			$Upcoming = true;
+		}
+	
+		$skipfacts = array("CHAN", "BAPL", "SLGC", "SLGS", "ENDL");
+		$BDMfacts = array("BIRT", "DEAT", "MARR");
+	
+		if (in_array($factobj->fact, $skipfacts)) return "filter";
+	
+		if (!$factobj->disp || !$factobj->show) return "";
+		
+		// Use current year for age in dayview
+		if ($action == "today"){
+			$yearnow = getdate();
+			$yearnow = $yearnow["year"];
+		}
+		else	{
+			$yearnow = $year;
+		}
+	
+		$hct = preg_match("/2 DATE.*(@#DHEBREW@)/", $factobj->factrec, $match);
+		if ($hct>0 && GedcomConfig::$USE_RTL_FUNCTIONS)
+			if ($action == "today") $yearnow = $currhYear;
+			else $yearnow = $CalYear;
+	
+		$text = "";
+	
+		// See whether this Fact should be filtered out or not
+		$Filtered = false;
+		if ($filterev == "bdm") {
+			if (!in_array($factobj->fact, $BDMfacts) && !in_array($factobj->factref, $BDMfacts)) $Filtered = true;
+		}
+		if ($filterev != "all" && $filterev != "bdm") {
+			if ($factobj->fact != $filterev && $factobj->factref != $filterev) $Filtered = true;
+		}
+	
+		if (!$Filtered) {
+			if ($factobj->fact == "EVEN" || $factobj->fact == "FACT") {
+				if ($factobj->factref != "") {
+					if (defined("GM_FACT_".$factobj->factref)) $text .= constant("GM_FACT_".$factobj->factref);
+					else $text .= $factobj->factref;
+				}
+				else $text .= constant("GM_FACT_".$factobj->fact);
+			}
+			else {
+				if (defined("GM_FACT_".$factobj->fact)) $text .= constant("GM_FACT_".$factobj->fact);
+				else $text .= $factobj->fact;
+			}
+	
+			if ($text!="") $text=PrintReady($text);
+	
+			$ct = preg_match("/\d DATE(.*)/", $factobj->factrec, $match);
+			if ($ct>0) {
+				$text .= " - <span class=\"date\">".GetDateUrl($match[1])."</span>";
+				$yt = preg_match("/ (\d\d\d\d|\d\d\d)/", $match[1], $ymatch);
+				if ($yt>0) {
+	
+					$hct = preg_match("/2 DATE.*(@#DHEBREW@)/", $match[1], $hmatch);
+		            if ($hct>0 && GedcomConfig::$USE_RTL_FUNCTIONS && $action=='today')
+	
+	// should perhaps use the month of the fact to find if should use $currhYear or $currhYear+1 or $currhYear-1 to calculate age
+	// use $currhMonth and the fact month for this
+	
+	                   $age = $currhYear - $ymatch[1];
+					else
+					   $age = $yearnow - $ymatch[1];
+					$yt2 = preg_match("/(...) (\d\d\d\d|\d\d\d)/", $match[1], $bmatch);
+					if ($yt2>0) {
+						if (isset($monthtonum[strtolower(trim($bmatch[1]))])) {
+							$emonth = $monthtonum[strtolower(trim($bmatch[1]))];
+							if (!$Upcoming && ($emonth<$monthtonum[strtolower($month)])) $age--;
+							$bt = preg_match("/(\d+) ... (\d\d\d\d|\d\d\d)/", $match[1], $bmatch);
+							if ($bt>0) {
+								$edate = trim($bmatch[1]);
+								if (!$Upcoming && ($edate<$day)) $age--;
+							}
+						}
+					}
+					$yt3 = preg_match("/(.+) ... (\d\d\d\d|\d\d\d)/", $match[1], $bmatch);
+					if ($yt3>0) {
+						if (!$Upcoming && ($bmatch[1]>$day)) $age--;
+					}
+					if ($filterof == "recent" && $age > 100) return "filter";
+					// Limit facts to before the given year in monthview
+					if ($age < 0 && $action == "calendar") return "filter";
+					if ($action != 'year'){
+						$text .= " (" . str_replace("#year_var#", ConvertNumber($age), GM_LANG_year_anniversary).")";
+					}
+	 				if($TEXT_DIRECTION == "rtl"){
+	 					$text .= "&lrm;";
+	 				}
+				}
+				if ($action == 'today' || $action == 'year') {
+					// -- find place for each fact
+					if (GedcomConfig::$SHOW_PEDIGREE_PLACES > 0) {
+						$ct = preg_match("/2 PLAC (.*)/", $factobj->factrec, $match);
+						if ($ct>0) {
+							$text .= ($action == 'today' ? "<br />" : " ");
+							$plevels = preg_split("/,/", $match[1]);
+							$plactext = "";
+							for($plevel=0; $plevel < GedcomConfig::$SHOW_PEDIGREE_PLACES; $plevel++) {
+								if (!empty($plevels[$plevel])) {
+									if ($plevel > 0) $plactext .= ", ";
+									$plactext .= PrintReady($plevels[$plevel]);
+								}
+							}
+							if (HasChinese($plactext)) $plactext .= PrintReady(" (".GetPinYin($plactext).")");
+							$text .= PrintReady($plactext);
+						}
+					}
+	
+					// -- find temple code for lds facts
+					$ct = preg_match("/2 TEMP (.*)/", $factobj->factrec, $match);
+					if ($ct>0) {
+						$tcode = $match[1];
+						$tcode = trim($tcode);
+						if (array_key_exists($tcode, $TEMPLE_CODES)) $text .= "<br />".GM_LANG_temple.": ".$TEMPLE_CODES[$tcode];
+						else $text .= "<br />".GM_LANG_temple_code.$tcode;
+					}
+				}
+			}
+			$text .= "<br />";
+		}
+		if ($text=="") return "filter";
+	
+		return $text;
+	}
 }
 ?>

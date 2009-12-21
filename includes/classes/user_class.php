@@ -410,17 +410,18 @@ class User {
 		if (!empty($this->gedcomid[$GEDCOMID])) {
 			if ($pid == $this->gedcomid[$GEDCOMID]) return true;
 			else {
-				$famids = Array_Merge(FindSfamilyIds($this->gedcomid[$GEDCOMID]), FindFamilyIds($this->gedcomid[$GEDCOMID]));
-				foreach($famids as $indexval => $fam) {
-					$famid = $fam["famid"];
-					if (GetChangeData(true, $famid, true)) {
-						$rec = GetChangeData(false, $famid, true, "gedlines");
-						$famrec = $rec[$GEDCOMID][$famid];
+				$person =& Person::GetInstance($this->gedcomid[$GEDCOMID]);
+				foreach ($person->childfamilies as $index => $fam) {
+					if ($fam->husb_id == $pid || $fam->wife_id == $pid || $fam->husbold_id == $pid || $fam->wifeold_id == $pid) return true;
+					foreach ($fam->children_ids as $key => $childid) {
+						if ($pid == $childid) return true;
 					}
-					else $famrec = FindFamilyRecord($famid);
-					if (preg_match("/1 HUSB @$pid@/", $famrec)>0) return true;
-					if (preg_match("/1 WIFE @$pid@/", $famrec)>0) return true;
-					if (preg_match("/1 CHIL @$pid@/", $famrec)>0) return true;
+				}
+				foreach ($person->spousefamilies as $index => $fam) {
+					if ($fam->husb_id == $pid || $fam->wife_id == $pid || $fam->husbold_id == $pid || $fam->wifeold_id == $pid) return true;
+					foreach ($fam->children_ids as $key => $childid) {
+						if ($pid == $childid) return true;
+					}
 				}
 			}
 		}

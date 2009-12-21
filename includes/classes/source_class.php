@@ -115,7 +115,6 @@ class Source extends GedcomRecord {
 	 * @return string
 	 */
 	private function getTitle() {
-		global $gm_lang;
 		
 		if (is_null($this->name)) {
 			if ($this->DisplayDetails()) {
@@ -126,7 +125,7 @@ class Source extends GedcomRecord {
 					else $this->name = $add_descriptor;
 				}
 			}
-			else $this->name = $gm_lang["private"];
+			else $this->name = GM_LANG_private;
 		}
 		return $this->name;
 	}
@@ -138,7 +137,6 @@ class Source extends GedcomRecord {
 	 * @return string the title of the source
 	 */
 	private function getSourceDescriptor() {
-		global $gm_lang;
 		
 		if (is_null($this->descriptor)) {
 			if ($this->DisplayDetails()) {
@@ -151,10 +149,10 @@ class Source extends GedcomRecord {
 					if ($tt>0) {
 						$subrec = GetSubRecord(1, "1 TITL", $gedrec);
 						if (!PrivacyFunctions::showFact("TITL", $this->xref, "SOUR")) {
-							$this->descriptor = $gm_lang["unknown"];
+							$this->descriptor = GM_LANG_unknown;
 						}
 						else if(!PrivacyFunctions::showFactDetails("TITL", $this->xref, "SOUR") || PrivacyFunctions::FactViewRestricted($this->xref, $subrec, 2) || !$this->DisplayDetails()) {
-							$this->descriptor = $gm_lang["private"];
+							$this->descriptor = GM_LANG_private;
 						}
 						else {
 							// This automatically handles CONC/CONT lines below the title record
@@ -165,18 +163,18 @@ class Source extends GedcomRecord {
 					$et = preg_match("/1 ABBR (.*)/", $gedrec, $smatch);
 					if ($et>0) {
 						if (!PrivacyFunctions::showFact("ABBR", $this->xref, "SOUR")) {
-							$this->descriptor = $gm_lang["unknown"];
+							$this->descriptor = GM_LANG_unknown;
 						}
 						else if (!PrivacyFunctions::showFactDetails("ABBR", $this->xref, "SOUR") || !$this->DisplayDetails()) {
-							$this->descriptor =  $gm_lang["private"];
+							$this->descriptor =  GM_LANG_private;
 						}
 						else $this->descriptor = $smatch[1];
 						return $this->descriptor;
 					}
 				}
-				else $this->descriptor = $gm_lang["unknown"];
+				else $this->descriptor = GM_LANG_unknown;
 			}
-			else $this->descriptor = $gm_lang["private"];
+			else $this->descriptor = GM_LANG_private;
 		}
 		return $this->descriptor;
 	}	
@@ -188,7 +186,6 @@ class Source extends GedcomRecord {
 	 * @return string the additional title of the source
 	 */
 	private function getAddSourceDescriptor() {
-		global $gm_lang;
 	
 		if (is_null($this->adddescriptor)) {
 			if ($this->DisplayDetails()) {
@@ -215,7 +212,7 @@ class Source extends GedcomRecord {
 			 	}
 				$this->adddescriptor = "";
 			}
-			else $this->adddescriptor = $gm_lang["private"];
+			else $this->adddescriptor = GM_LANG_private;
 		}
 		return $this->adddescriptor;
 	}

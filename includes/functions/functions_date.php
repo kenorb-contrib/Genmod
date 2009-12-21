@@ -55,7 +55,7 @@ if (GedcomConfig::$CALENDAR_FORMAT=="hijri" || GedcomConfig::$CALENDAR_FORMAT=="
  * @return string the new converted date
  */
 function ConvertDate($dstr_beg, $dstr_end, $day, $month, $year) {
-	global $gm_lang, $DATE_FORMAT, $LANGUAGE, $monthtonum, $TEXT_DIRECTION;
+	global $DATE_FORMAT, $LANGUAGE, $monthtonum, $TEXT_DIRECTION;
 	$altDay=30;
 
 	$month = trim($month);
@@ -310,8 +310,6 @@ function ConvertDate($dstr_beg, $dstr_end, $day, $month, $year) {
 //-- updated by Meliza
 function GetFinnishDate($datestr, $day) {
 
-	global $gm_lang;
-
 	//-- the Finnish text of the value for one date is shown at the end of the date
 	//-- the Finnish values of two dates are replaced by a -
 	$array_short = array("aft", "bet", "from", "to");
@@ -333,7 +331,7 @@ function GetFinnishDate($datestr, $day) {
 							$datestr_02 = substr($datestr, $pos_of_to + 1);
 							$datestr = $datestr_01." - ".$datestr_02." ";
 						}
-						else $datestr = $datestr." ".$gm_lang[$value];
+						else $datestr = $datestr." ".constant("GM_LANG_".$value);
 						break;
 		  case "bet"  : $datestr = trim($datestr);
 						$temp_date = strtolower($datestr);
@@ -343,8 +341,8 @@ function GetFinnishDate($datestr, $day) {
 						if (strlen($datestr_01) > 0 && strlen($datestr_02) > 0)
 							$datestr = $datestr_01." - ".$datestr_02." ";
 						break;
-		  case "to"   : $datestr = $newdatestr." ".$gm_lang[$value]; break;
-		  case "aft"  : $datestr = $newdatestr." ".$gm_lang[$value]; break;
+		  case "to"   : $datestr = $newdatestr." ".constant("GM_LANG_".$value); break;
+		  case "aft"  : $datestr = $newdatestr." ".constant("GM_LANG_".$value); break;
 		  default	  : $datestr = $oldDateStr; break;
 		}
 	  }
@@ -352,20 +350,20 @@ function GetFinnishDate($datestr, $day) {
 	//-- the Finnish text of the value is shown bau before the date
 	$array_short = array("abt", "apx", "bef", "cal", "est", "int", "cir");
 	foreach($array_short as $indexval => $value) {
-		$datestr = preg_replace("/^$value([^a-zA-Z])/i", $gm_lang[$value]."\$1", $datestr);
-		$datestr = preg_replace("/(\W)$value([^a-zA-Z])/i", "\$1".$gm_lang[$value]."\$2", $datestr);
+		$datestr = preg_replace("/^$value([^a-zA-Z])/i", constant("GM_LANG_".$value)."\$1", $datestr);
+		$datestr = preg_replace("/(\W)$value([^a-zA-Z])/i", "\$1".constant("GM_LANG_".$value)."\$2", $datestr);
 	}
 	//-- Constant 'ta' is appended to the Finnish month values, if a day value exists (for the last date)
 	$array_short = array("jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep", "oct", "nov", "dec");
 	foreach($array_short as $indexval => $value) {
 
 	if ($day > 0) {
-		 $datestr = preg_replace("/(\W)$value([^a-zA-Z])/i", "\$1".$gm_lang[$value]."ta"."\$2", $datestr);
-		 $datestr = preg_replace("/^$value([^a-zA-Z])/i", $gm_lang[$value]."ta"."\$1", $datestr);
+		 $datestr = preg_replace("/(\W)$value([^a-zA-Z])/i", "\$1".constant("GM_LANG_".$value)."ta"."\$2", $datestr);
+		 $datestr = preg_replace("/^$value([^a-zA-Z])/i", constant("GM_LANG_".$value)."ta"."\$1", $datestr);
 	  }
 	else {
-		 $datestr = preg_replace("/(\W)$value([^a-zA-Z])/i", "\$1".$gm_lang[$value]."\$2", $datestr);
-		 $datestr = preg_replace("/^$value([^a-zA-Z])/i", $gm_lang[$value]."\$1", $datestr);
+		 $datestr = preg_replace("/(\W)$value([^a-zA-Z])/i", "\$1".constant("GM_LANG_".$value)."\$2", $datestr);
+		 $datestr = preg_replace("/^$value([^a-zA-Z])/i", constant("GM_LANG_".$value)."\$1", $datestr);
 	  }
 	}
 	return $datestr;
@@ -376,12 +374,11 @@ function GetFinnishDate($datestr, $day) {
 //-- functions to take a date and display it in Turkish.
 //-- provided by: KurtNorgaz
 function GetTurkishDate($datestr) {
-	global $gm_lang;
 
 	$array_short = array("jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep", "oct", "nov", "dec", "est");
 	foreach($array_short as $indexval => $value)
 	{
-	  $datestr = preg_replace("/$value([^a-zA-Z])/i", $gm_lang[$value] . "\$1", $datestr);
+	  $datestr = preg_replace("/$value([^a-zA-Z])/i", constant("GM_LANG_".$value) . "\$1", $datestr);
 	}
 
 	$array_short = array("abt", "aft", "and", "bef", "bet", "cal", "from", "int", "to", "cir");
@@ -429,7 +426,7 @@ function GetTurkishDate($datestr) {
 						case "9" : $extension = "dan"; break;
 						default  : $extension = "den"; break;
 					  }
-					  $datestr_01 .= stripslashes($gm_lang[$value]);
+					  $datestr_01 .= stripslashes(constant("GM_LANG_".$value));
 					  $datestr_01 = str_replace("#EXT#", $extension, $datestr_01);
 
 					  $datestr = $datestr_01 . $datestr_02;
@@ -450,7 +447,7 @@ function GetTurkishDate($datestr) {
 						case "6" : $extension = "ya"; break;
 						default  : $extension = "e"; break;
 					  }
-					  $datestr .= stripslashes($gm_lang[$value]);
+					  $datestr .= stripslashes(constant("GM_LANG_".$value));
 					  $datestr = str_replace("#EXT#", $extension, $datestr);
 					  break;
 
@@ -481,11 +478,11 @@ function GetTurkishDate($datestr) {
 						case "9" : $extension = "dan"; break;
 						default  : $extension = "den"; break;
 					  }
-					  $datestr .= stripslashes($gm_lang[$value]);
+					  $datestr .= stripslashes(constant("GM_LANG_".$value));
 					  $datestr = str_replace("#EXT#", $extension, $datestr);
 					  break;
 
-		  case "cir"	: $datestr .= stripslashes($gm_lang[$value]);
+		  case "cir"	: $datestr .= stripslashes(constant("GM_LANG_".$value));
 					  break;
 
 		  default		: $datestr = $oldDateStr;
@@ -509,7 +506,7 @@ function GetTurkishDate($datestr) {
  * @return string the new date string
  */
 function GetChangedDate($datestr) {
-	global $gm_lang, $DATE_FORMAT, $LANGUAGE, $monthtonum, $dHebrew;
+	global $DATE_FORMAT, $LANGUAGE, $monthtonum, $dHebrew;
 	global $CalYear;   //-- Hebrew calendar year
 
 	$checked_dates = array();
@@ -518,16 +515,16 @@ function GetChangedDate($datestr) {
 
 	// INFANT CHILD STILLBORN DEAD DECEASED Y AUG ...
 	if (preg_match("/\d/", $datestr)==0) 	{
-		if (isset($gm_lang[$datestr])) return $gm_lang[$datestr];
-		if (isset($gm_lang[Str2Upper($datestr)])) return $gm_lang[Str2Upper($datestr)];
-		if (isset($gm_lang[Str2Lower($datestr)])) return $gm_lang[Str2Lower($datestr)];
+		if (defined("GM_LANG_".$datestr)) return constant("GM_LANG_".$datestr);
+		if (defined("GM_LANG_".Str2Upper($datestr))) return constant("GM_LANG_".Str2Upper($datestr));
+		if (defined("GM_LANG_".Str2Lower($datestr))) return constant("GM_LANG_".Str2Lower($datestr));
 
 	    if (stristr($datestr, "#DHEBREW")) {
 			$datestr = preg_replace("/@([#A-Z]+)@/", "", $datestr);
 			$pdate = ParseDate($datestr);
-			if (isset($gm_lang[$pdate[0]["ext"]])) 				$tmp = $gm_lang[$pdate[0]["ext"]]." ";
-			else if (isset($gm_lang[Str2Upper($pdate[0]["ext"])])) $tmp = $gm_lang[Str2Upper($pdate[0]["ext"])]." ";
-			else if (isset($gm_lang[Str2Lower($pdate[0]["ext"])])) $tmp = $gm_lang[Str2Lower($pdate[0]["ext"])]." ";
+			if (defined("GM_LANG_".$pdate[0]["ext"]))				$tmp = constant("GM_LANG_".$pdate[0]["ext"])." ";
+			else if (defined("GM_LANG_".Str2Upper($pdate[0]["ext"]))) $tmp = constant("GM_LANG_".Str2Upper($pdate[0]["ext"]))." ";
+			else if (defined("GM_LANG_".Str2Lower($pdate[0]["ext"]))) $tmp = constant("GM_LANG_".Str2Lower($pdate[0]["ext"]))." ";
 			else if ($pdate[0]["ext"]=="") $tmp = "";
 	   	 	else return $datestr;
 	   		if (isset($pdate[0]["mon"]))
@@ -539,13 +536,13 @@ function GetChangedDate($datestr) {
 		// abt Aug
 		else {
 		$pdate = ParseDate($datestr);
-		if (isset($gm_lang[$pdate[0]["ext"]])) 				$tmp = $gm_lang[$pdate[0]["ext"]];
-		else if (isset($gm_lang[Str2Upper($pdate[0]["ext"])])) $tmp = $gm_lang[Str2Upper($pdate[0]["ext"])];
-		else if (isset($gm_lang[Str2Lower($pdate[0]["ext"])])) $tmp = $gm_lang[Str2Lower($pdate[0]["ext"])];
+		if (defined("GM_LANG_".$pdate[0]["ext"])) 				$tmp = constant("GM_LANG_".$pdate[0]["ext"]);
+		else if (defined("GM_LANG_".Str2Upper($pdate[0]["ext"]))) $tmp = constant("GM_LANG_".Str2Upper($pdate[0]["ext"]));
+		else if (defined("GM_LANG_".Str2Lower($pdate[0]["ext"]))) $tmp = constant("GM_LANG_".Str2Lower($pdate[0]["ext"]));
 		else return $datestr;
-		if (isset($gm_lang[$pdate[0]["month"]])) 				  $tmp .= " ".$gm_lang[$pdate[0]["month"]];
-		else if (isset($gm_lang[Str2Upper($pdate[0]["month"])])) $tmp .= " ".$gm_lang[Str2Upper($pdate[0]["month"])];
-		else if (isset($gm_lang[Str2Lower($pdate[0]["month"])])) $tmp .= " ".$gm_lang[Str2Lower($pdate[0]["month"])];
+		if (defined("GM_LANG_".$pdate[0]["month"])) 				  $tmp .= " ".constant("GM_LANG_".$pdate[0]["month"]);
+		else if (defined("GM_LANG_".Str2Upper($pdate[0]["month"]))) $tmp .= " ".constant("GM_LANG_".Str2Upper($pdate[0]["month"]));
+		else if (defined("GM_LANG_".Str2Lower($pdate[0]["month"]))) $tmp .= " ".constant("GM_LANG_".Str2Lower($pdate[0]["month"]));
 		else return $datestr;
         return $tmp;
         // 2 DATE from aug to sep or 2 DATE bet aug and sep still printed as are
@@ -566,13 +563,13 @@ function GetChangedDate($datestr) {
 				$fmt = str_replace("R", "", $fmt); // R = french Revolution date
 				$adate = adodb_date($fmt, adodb_mktime(0, 0, 0, $mon, $day, $year));
 			}
-			else if (!empty($mon)) $adate=$gm_lang[strtolower($pdate[$i]["month"])]." ".$year;
+			else if (!empty($mon)) $adate = constant("GM_LANG_".strtolower($pdate[$i]["month"]))." ".$year;
 			else $adate=$year;
 			// already in english !
 			if ($LANGUAGE!="english") {
 				foreach (array("January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December") as $indexval => $item) {
 					// February => F�vrier
-					$translated = $gm_lang[substr(strtolower($item),0,3)];
+					$translated = constant("GM_LANG_".substr(strtolower($item),0,3));
 					$adate = str_replace($item, $translated, $adate);
 					// Feb => F�v
 					$item = substr($item, 0, 3);
@@ -581,7 +578,7 @@ function GetChangedDate($datestr) {
 				}
 				foreach (array("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday") as $indexval => $item) {
 					// Friday => Vendredi
-					$translated = $gm_lang[strtolower($item)];
+					$translated = constant("GM_LANG_".strtolower($item));
 					$adate = str_replace($item, $translated, $adate);
 					// Fri => Ven
 					$item = substr($item, 0, 3);
@@ -603,7 +600,7 @@ function GetChangedDate($datestr) {
 			}
 			if (isset($pdate[$i]["ext"])) {
 				$txt = strtolower($pdate[$i]["ext"]);
-				if (isset($gm_lang[$txt])) $txt = $gm_lang[$txt];
+				if (defined("GM_LANG_".$txt)) $txt = constant("GM_LANG_".$txt);
 				else $txt = $pdate[$i]["ext"];
 				$adate = $txt. " ". $adate . " ";
 			}
@@ -717,8 +714,8 @@ function GetChangedDate($datestr) {
 	else {
 		$array_short = array("jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep", "oct", "nov", "dec", "abt", "aft", "and", "bef", "bet", "cal", "est", "from", "int", "to", "cir", "apx");
 		foreach($array_short as $indexval => $value){
-			$datestr = preg_replace("/(\W)$value([^a-zA-Z])/i", "\$1".$gm_lang[$value]."\$2", $datestr);
-			$datestr = preg_replace("/^$value([^a-zA-Z])/i", $gm_lang[$value]."\$1", $datestr);
+			$datestr = preg_replace("/(\W)$value([^a-zA-Z])/i", "\$1".constant("GM_LANG_".$value)."\$2", $datestr);
+			$datestr = preg_replace("/^$value([^a-zA-Z])/i", constant("GM_LANG_".$value)."\$1", $datestr);
 		}
 	  }
 	}
@@ -992,7 +989,7 @@ function GetDateUrl($datestr){
  * @return string the age in a string
  */
 function GetAge($indirec, $datestr, $style=1) {
-	global $gm_lang,$monthtonum;
+	global $monthtonum;
 	
 	$estimates = array("abt","aft","bef","est","cir");
 	$realbirthdt="";
@@ -1039,10 +1036,10 @@ function GetAge($indirec, $datestr, $style=1) {
 			if ($convert_hebrew) $date = JewishGedcomDateToGregorian($date);
 			$age1 = $date[0]["year"]-$birthdate[0]["year"];
 			$age2 = $date[1]["year"]-$birthdate[0]["year"];
-			if ($style) $realbirthdt = " <span class=\"age\">(".$gm_lang["age"]." ";
+			if ($style) $realbirthdt = " <span class=\"age\">(".GM_LANG_age." ";
 			$age1n = ConvertNumber($age1);
 			$age2n = ConvertNumber($age2);
-			$realbirthdt .= $gm_lang["apx"]." ".$age1n;
+			$realbirthdt .= GM_LANG_apx." ".$age1n;
 			if ($age2n > $age1n) $realbirthdt .= "-".$age2n;
 			if ($style) $realbirthdt .= ")</span>";
 		}
@@ -1061,12 +1058,12 @@ function GetAge($indirec, $datestr, $style=1) {
 						}
 					}
 				}
-				if ($style) $realbirthdt = " <span class=\"age\">(".$gm_lang["age"];
+				if ($style) $realbirthdt = " <span class=\"age\">(".GM_LANG_age;
 				$at = preg_match("/([a-zA-Z]{3})\.?/", $birthdate[0]["ext"], $amatch);
 				if ($at==0) $at = preg_match("/([a-zA-Z]{3})\.?/", $datestr, $amatch);
 				if ($at>0) {
 					if (in_array(strtolower($amatch[1]), $estimates)) {
-						$realbirthdt .= " ".$gm_lang["apx"];
+						$realbirthdt .= " ".GM_LANG_apx;
 					}
 				}
 				// age in months if < 2 years
@@ -1078,7 +1075,7 @@ function GetAge($indirec, $datestr, $style=1) {
 					$d1 = $birthdate[0]["day"];
 					$d2 = $date[0]["day"];
 					$apx = (empty($m2) or empty($m1) or empty($d2) or empty($d1)); // approx
-					if ($apx) $realbirthdt .= " ".$gm_lang["apx"];
+					if ($apx) $realbirthdt .= " ".GM_LANG_apx;
 					if (empty($m2)) $m2=$m1;
 					if (empty($m1)) $m1=$m2;
 					if (empty($d2)) $d2=$d1;
@@ -1095,14 +1092,14 @@ function GetAge($indirec, $datestr, $style=1) {
 						}
 						$age = $d2-$d1;
 						$realbirthdt .= " ".$age." ";
-						if ($age < 2) $realbirthdt .= $gm_lang["day1"];
-						else $realbirthdt .= $gm_lang["days"];
+						if ($age < 2) $realbirthdt .= GM_LANG_day1;
+						else $realbirthdt .= GM_LANG_days;
 					} else if ($age==12 and $apx) {
-						$realbirthdt .= " 1 ".$gm_lang["year1"]; // approx 1 year
+						$realbirthdt .= " 1 ".GM_LANG_year1; // approx 1 year
 					} else {
 						$realbirthdt .= " ".$age." ";
-						if ($age < 2) $realbirthdt .= $gm_lang["month1"];
-						else $realbirthdt .= $gm_lang["months"];
+						if ($age < 2) $realbirthdt .= GM_LANG_month1;
+						else $realbirthdt .= GM_LANG_months;
 					}
 				}
 				else $realbirthdt .= " ".ConvertNumber($age);
@@ -1129,7 +1126,6 @@ function GetAge($indirec, $datestr, $style=1) {
  */
 
 function GetAgeAtEvent($agestring) {
-	global $gm_lang;
 
 	$age = "";
 	$match = explode(" ", strtolower($agestring));
@@ -1139,24 +1135,24 @@ function GetAgeAtEvent($agestring) {
 		if ($txt=="chi") $txt="child";
 		if ($txt=="inf") $txt="infant";
 		if ($txt=="sti") $txt="stillborn";
-		if (isset($gm_lang[$txt])) $age.=$gm_lang[$txt];
+		if (defined("GM_LANG_".$txt)) $age .= constant("GM_LANG_".$txt);
 		else {
 			$n = trim(substr($txt,0,-1));
 			$u = substr($txt,-1,1);
 			if ($u=="y") {
 				$age.= " ".$n." ";
-				if ($n == 1) $age .= $gm_lang["year1"];
-				else $age .= $gm_lang["years"];
+				if ($n == 1) $age .= GM_LANG_year1;
+				else $age .= GM_LANG_years;
 			}
 			else if ($u=="m") {
 				$age.= " ".$n." ";
-				if ($n == 1) $age .= $gm_lang["month1"];
-				else $age .= $gm_lang["months"];
+				if ($n == 1) $age .= GM_LANG_month1;
+				else $age .= GM_LANG_months;
 			}
 			else if ($u=="d") {
 				$age.= " ".$n." ";
-				if ($n == 1) $age .= $gm_lang["day1"];
-				else $age .= $gm_lang["days"];
+				if ($n == 1) $age .= GM_LANG_day1;
+				else $age .= GM_LANG_days;
 			}
 			else $age.=" ".$txt;
 		}
@@ -1172,7 +1168,7 @@ function GetAgeAtEvent($agestring) {
  * @return array		returns an array with indexes "day"=1 "month"=JAN "mon"=1 "year"=2002 "ext" = abt
  */
 function ParseDate($datestr) {
-	global $monthtonum, $MON_SHORT, $gm_lang;
+	global $monthtonum, $MON_SHORT;
 	static $monthshort, $ests;
 
 	if (!isset($ests)) $ests = array("abt", "aft", "and", "bef", "bet", "cal", "from", "int", "to", "cir", "est", "apx");
@@ -1206,7 +1202,7 @@ function ParseDate($datestr) {
 //	$longmonth = array("january"=>"jan", "february"=>"feb", "march"=>"mar", "april"=>"apr", "may"=>"may", "june"=>"jun", "july"=>"jul", "august"=>"aug", "september"=>"sep", "october"=>"oct", "november"=>"nov", "december"=>"dec");
 	// Removed may, as this causes updates on every May, MAY, etc.
 	$longmonth = array("january"=>"jan", "february"=>"feb", "march"=>"mar", "april"=>"apr", "june"=>"jun", "july"=>"jul", "august"=>"aug", "september"=>"sep", "october"=>"oct", "november"=>"nov", "december"=>"dec");
-	$loclongmonth = array($gm_lang["jan"]=>"jan", $gm_lang["feb"]=>"feb", $gm_lang["mar"]=>"mar", $gm_lang["apr"]=>"apr", $gm_lang["may"]=>"may", $gm_lang["jun"]=>"jun", $gm_lang["jul"]=>"jul", $gm_lang["aug"]=>"aug", $gm_lang["sep"]=>"sep", $gm_lang["oct"]=>"oct", $gm_lang["nov"]=>"nov", $gm_lang["dec"]=>"dec");
+	$loclongmonth = array(GM_LANG_jan=>"jan", GM_LANG_feb=>"feb", GM_LANG_mar=>"mar", GM_LANG_apr=>"apr", GM_LANG_may=>"may", GM_LANG_jun=>"jun", GM_LANG_jul=>"jul", GM_LANG_aug=>"aug", GM_LANG_sep=>"sep", GM_LANG_oct=>"oct", GM_LANG_nov=>"nov", GM_LANG_dec=>"dec");
 
 	// This converts english long month names to short ones (january -> jan)
 	// If not found, it tries to convert the locale month name to a short one (mei -> MAY)
@@ -1263,7 +1259,8 @@ function ParseDate($datestr) {
 				// If no month name found, we presume it's a prefix
 				if (!isset($dates[$index]["ext"])) $dates[$index]["ext"] = "";
 				// Check if the user typed the prefix in his language
-				$pref = strtolower(array_search($strs[$i], $gm_lang));
+				$abbr = array(GM_LANG_abt, GM_LANG_aft, GM_LANG_bef, GM_LANG_bet, GM_LANG_cal, GM_LANG_est, GM_LANG_from, GM_LANG_int, GM_LANG_cir, GM_LANG_apx, GM_LANG_and, GM_LANG_to);
+				$pref = strtolower(array_search($strs[$i], $abbr));
 				if ($pref && in_array($pref, $ests)) $strs[$i] = strtoupper($pref);
 				$dates[$index]["ext"] .= strtoupper($strs[$i]);
 			}

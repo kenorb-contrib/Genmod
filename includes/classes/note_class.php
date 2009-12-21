@@ -108,10 +108,9 @@ class Note extends GedcomRecord {
 	 * @return string
 	 */
 	public function getTitle($l=40, $changed=false) {
-		global $gm_lang;
 
 		if (!$this->DisplayDetails()) {
-			$this->title = $gm_lang["private"];
+			$this->title = GM_LANG_private;
 			return $this->title;
 		}
 		
@@ -121,7 +120,7 @@ class Note extends GedcomRecord {
 				$this->newtitle = trim($this->newtitle); // we must show some starting characters
 				$this->newtitle = preg_replace("~[\r|\n]+~", " ", $this->newtitle);
 				$this->newtitle = preg_replace("~<br />~", " ", $this->newtitle);
-				if (empty($this->newtitle)) $this->newtitle = $gm_lang["unknown"];
+				if (empty($this->newtitle)) $this->newtitle = GM_LANG_unknown;
 			}
 			if ($l >= strlen($this->newtitle) || $l == 0) return $this->newtitle;
 			else return substr($this->newtitle, 0, $l).".....";
@@ -133,7 +132,7 @@ class Note extends GedcomRecord {
 			$this->title = preg_replace("~[\r|\n]+~", " ", $this->title);
 			$this->title = preg_replace("~<br />~", " ", $this->title);
 			if (empty($this->title)) {
-				$this->title = $gm_lang["unknown"];
+				$this->title = GM_LANG_unknown;
 				return $this->title;
 			}
 		}
@@ -147,7 +146,7 @@ class Note extends GedcomRecord {
 	public function getNoteText($changed=false) {
 		
 		if (!$this->DisplayDetails()) {
-			$this->newtext = $gm_lang["private"];
+			$this->newtext = GM_LANG_private;
 			return $this->text;
 		}
 		else if ($this->ThisChanged() && !is_null($this->GetChangedGedrec())) {
@@ -287,7 +286,7 @@ class Note extends GedcomRecord {
 	
 	protected function ReadNoteRecord() {
 		
-		$sql = "SELECT o_gedrec FROM ".TBLPREFIX."other WHERE o_key='".JoinKey($this->xref,	$this->gedcomid)."'";
+		$sql = "SELECT o_gedrec FROM ".TBLPREFIX."other WHERE o_key='".JoinKey($this->xref,	$this->gedcomid)."' AND o_type='NOTE'";
 		$res = NewQuery($sql);
 		if ($res) {
 			if ($res->NumRows() != 0) {

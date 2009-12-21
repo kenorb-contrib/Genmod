@@ -100,7 +100,6 @@ class Repository extends GedcomRecord {
 	 * @return string
 	 */
 	private function getTitle() {
-		global $gm_lang;
 		
 		if (is_null($this->name)) {
 			$this->name = $this->GetRepoDescriptor();
@@ -111,9 +110,9 @@ class Repository extends GedcomRecord {
 					else $this->name = $add_descriptor;
 				}
 			}
-			else $this->name = $gm_lang["private"];
+			else $this->name = GM_LANG_private;
 		}
-		if (!$this->name) return $gm_lang["unknown"];
+		if (!$this->name) return GM_LANG_unknown;
 		return $this->name;
 	}
 	
@@ -124,7 +123,6 @@ class Repository extends GedcomRecord {
 	 * @return string the title of the source
 	 */
 	private function GetRepoDescriptor() {
-		global $gm_lang;
 		
 		if (!is_null($this->descriptor)) return $this->descriptor;
 		
@@ -134,7 +132,7 @@ class Repository extends GedcomRecord {
 		if (!empty($gedrec)) {
 			$tt = preg_match("/1 NAME (.*)/", $gedrec, $smatch);
 			if ($tt>0) {
-				if (!PrivacyFunctions::showFact("NAME", $this->xref, "REPO") || !PrivacyFunctions::showFactDetails("NAME", $this->xref, "REPO")) return $gm_lang["private"];
+				if (!PrivacyFunctions::showFact("NAME", $this->xref, "REPO") || !PrivacyFunctions::showFactDetails("NAME", $this->xref, "REPO")) return GM_LANG_private;
 				$subrec = GetSubRecord(1, "1 NAME", $gedrec);
 				// This automatically handles CONC/CONT lines below the title record
 				$this->descriptor = GetGedcomValue("NAME", 1, $subrec);
@@ -225,7 +223,7 @@ class Repository extends GedcomRecord {
 
 	protected function ReadRepositoryRecord() {
 		
-		$sql = "SELECT o_gedrec FROM ".TBLPREFIX."other WHERE o_key='".JoinKey($this->xref,	$this->gedcomid)."'";
+		$sql = "SELECT o_gedrec FROM ".TBLPREFIX."other WHERE o_key='".JoinKey($this->xref,	$this->gedcomid)."' AND o_type='REPO'";
 		$res = NewQuery($sql);
 		if ($res) {
 			if ($res->NumRows() != 0) {

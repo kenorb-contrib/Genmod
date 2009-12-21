@@ -38,8 +38,9 @@ class RelationshipController extends ChartController {
 	private $person1 = null;						// Container for the first person
 	private $person2 = null;						// Container for the second person
 	public $path_to_find = null;					// # of path to find (starting with 0)
+	private $pretty = null;							// Outline equal generations horizontally
+	private $followspouse = null;					// Also follow spouse paths for determining the relation
 
-	
 	public function __construct() {
 		
 		parent::__construct();
@@ -95,20 +96,39 @@ class RelationshipController extends ChartController {
 			case "person2":
 				return $this->person2;
 				break;
+			case "pretty":
+				return $this->pretty;
+				break;
+			case "followspouse":
+				return $this->followspouse;
+				break;
 			default:
 				return parent::__get($property);
 				break;
 		}
 	}
 
+	public function __set($property, $value) {
+		switch($property) {
+			case "pretty":
+				$this->pretty = $value;
+				break;
+			case "followspouse":
+				$this->followspouse = $value;
+				break;
+			default:
+				parent::__set($property, $value);
+				break;
+		}
+	}
+	
 	protected function GetPageTitle() {
-		global $gm_lang;
 		
 		if (is_null($this->pagetitle)) {
 			$this->pagetitle = "";
 			if ($this->pid1 != "") $this->pagetitle .= $this->person1->name.$this->person1->addxref;
 			if ($this->pid2 != "") $this->pagetitle .= "/".$this->person2->name.$this->person2->addxref;;
-			$this->pagetitle .= " - ".$gm_lang["relationship_chart"];
+			$this->pagetitle .= " - ".GM_LANG_relationship_chart;
 		}
 		return $this->pagetitle;
 	}

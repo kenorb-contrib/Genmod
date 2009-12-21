@@ -142,7 +142,6 @@ class TimelineController extends BaseController {
 	}
 	
 	protected function GetPageTitle() {
-		global $gm_lang;
 		
 		if (is_null($this->pagetitle)) {
 			$this->pagetitle = "";
@@ -153,7 +152,7 @@ class TimelineController extends BaseController {
 				}
 				if ($this->pagetitle != "") $this->pagetitle .= " - ";
 			}
-			$this->pagetitle .= $gm_lang["timeline_title"];
+			$this->pagetitle .= GM_LANG_timeline_title;
 		}
 		return $this->pagetitle;
 	}

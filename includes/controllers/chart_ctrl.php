@@ -45,6 +45,7 @@ class ChartController extends BaseController {
 	protected $max_generation = null;		// Generate an error that no more than a maximum number of generations can be displayed
 	protected $num_generations = null;		// Number of generations to display
 	
+	
 	public function __construct() {
 		
 		parent::__construct();
@@ -127,11 +128,10 @@ class ChartController extends BaseController {
 	}
 	
 	public function PrintInputRootId() {
-		global $gm_lang;
 		
 		print "<tr><td class=\"shade2\">";
 		print_help_link("rootid_help", "qm");
-		print $gm_lang["root_person"]."&nbsp;</td>";
+		print GM_LANG_root_person."&nbsp;</td>";
 		print "<td class=\"shade1 vmiddle\">";
 		print "<input class=\"pedigree_form\" type=\"text\" name=\"rootid\" id=\"rootid\" size=\"3\" value=\"".$this->xref."\" />";
 		LinkFunctions::PrintFindIndiLink("rootid","");
@@ -139,32 +139,29 @@ class ChartController extends BaseController {
 	}
 	
 	public function PrintInputBoxWidth($tr=true) {
-		global $gm_lang;
 		
 		if ($tr) print "<tr>";
 		print "<td class=\"shade2\">";
 		print_help_link("box_width_help", "qm");
-		print $gm_lang["box_width"] . "&nbsp;</td>";
+		print GM_LANG_box_width . "&nbsp;</td>";
 		print "<td class=\"shade1 vmiddle\"><input type=\"text\" size=\"3\" name=\"box_width\" value=\"".$this->box_width."\" /> <b>%</b>";
 		print "</td>";
 		if ($tr) print "</tr>";
 	}
 
 	public function PrintInputHeader($tr=true) {
-		global $gm_lang;
 		
 		if ($tr) print "<tr>";
 		print "<td colspan=\"2\" class=\"topbottombar\" style=\"text-align:center; \">";
-		print $gm_lang["options"]."</td>";
+		print GM_LANG_options."</td>";
 		if ($tr) print "</tr>";
 	}
 	
 	public function PrintInputGenerations($gens, $help) {	
-		global $gm_lang;
 		
 		print "<tr><td class=\"shade2\">";
 		print_help_link($help, "qm");
-		print $gm_lang["generations"] . "&nbsp;</td>";
+		print GM_LANG_generations . "&nbsp;</td>";
 	
 		print "<td class=\"shade1 vmiddle\">";
 		print "<select name=\"num_generations\">";
@@ -178,22 +175,20 @@ class ChartController extends BaseController {
 	}
 	
 	public function PrintInputSubmit($tr=true) {
-		global $gm_lang;
 		
 		if ($tr) print "<tr>";
 		print "<td class=\"center\" colspan=\"2\">";
-		print "\n\t\t<input type=\"submit\" value=\"".$gm_lang["view"]."\" />";
+		print "\n\t\t<input type=\"submit\" value=\"".GM_LANG_view."\" />";
 		print "</td>";
 		if ($tr) print "</tr>";
 	}
 	
 	public function PrintInputShowCousins() {
-		global $gm_lang;
 		
 		print "<tr><td class=\"shade2\">";
 		print "<input type=\"hidden\" name=\"show_cousins\" value=\"".$this->show_cousins."\" />";
 		print_help_link("show_cousins_help", "qm");
-		print $gm_lang["show_cousins"]."</td>";
+		print GM_LANG_show_cousins."</td>";
 		print "<td class=\"shade1 vmiddle\"><input ";
 		if ($this->chart_style == "0") print "disabled=\"disabled\" ";
 		print "id=\"cousins\" type=\"checkbox\" value=\"";
@@ -204,34 +199,32 @@ class ChartController extends BaseController {
 	}
 	
 	public function PrintInputChartStyle() {
-		global $gm_lang;
 				
 		print "<tr><td class=\"shade2\">";
 		print_help_link("chart_style_help", "qm");
-		print $gm_lang["displ_layout_conf"];
+		print GM_LANG_displ_layout_conf;
 		print "</td>";
 		print "<td class=\"shade1 vmiddle\">";
 		print "<input type=\"radio\" name=\"chart_style\" value=\"0\" ";
 		if ($this->chart_style == "0") print "checked=\"checked\" ";
 		print "onclick=\"toggleStatus('cousins');";
 		if ($this->chart_style != "1") print " document.people.chart_style.value='1';";
-		print "\" />".$gm_lang["chart_list"];
+		print "\" />".GM_LANG_chart_list;
 		print "<br /><input type=\"radio\" name=\"chart_style\" value=\"1\" ";
 		if ($this->chart_style == "1") print "checked=\"checked\" ";
 		print "onclick=\"toggleStatus('cousins');";
 		if ($this->chart_style != "1") print " document.people.chart_style.value='0';";
-		print "\" />".$gm_lang["chart_booklet"];
+		print "\" />".GM_LANG_chart_booklet;
 		print "</td></tr>";
 	}
 	
 	public function PrintInputShowFull($tr=true) {
-		global $gm_lang;
 		
 		if ($tr) print "<tr>";
 		print "<td class=\"shade2\">";
 		print "<input type=\"hidden\" name=\"show_details\" value=\"".$this->show_details."\" />";
 		print_help_link("show_full_help", "qm");
-		print $gm_lang["show_details"];
+		print GM_LANG_show_details;
 		print "</td>";
 		print "<td class=\"shade1 vmiddle\">";
 		print "<input type=\"checkbox\" value=\"";
