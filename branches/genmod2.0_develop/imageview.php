@@ -38,7 +38,7 @@ if (!MediaFS::IsValidMedia($filename)) {
 	exit;
 }
 
-PrintSimpleHeader($gm_lang["imageview"]);
+PrintSimpleHeader(GM_LANG_imageview);
 ?>
 <script language="JavaScript" type="text/javascript">
 <!--
@@ -173,13 +173,13 @@ PrintSimpleHeader($gm_lang["imageview"]);
 print "<form name=\"zoomform\" onsubmit=\"setzoom(document.getElementById('zoomval').value); return false;\" action=\"imageview.php\">";
 if (strstr($filename, "://")) $filename = preg_replace("/ /", "%20", $filename);
 if (!$MEDIA_IN_DB && (empty($filename) || !@fclose(@fopen($filename,"r")))) {
-	print "<span class=\"error\">".$gm_lang["file_not_found"]."&nbsp;".$filename."</span>";
-	print "<br /><br /><div class=\"center\"><a href=\"javascript:// ".$gm_lang["close_window"]."\" onclick=\"self.close();\">".$gm_lang["close_window"]."</a></div>\n";
+	print "<span class=\"error\">".GM_LANG_file_not_found."&nbsp;".$filename."</span>";
+	print "<br /><br /><div class=\"center\"><a href=\"javascript:// ".GM_LANG_close_window."\" onclick=\"self.close();\">".GM_LANG_close_window."</a></div>\n";
 }
 else {
 	print "<font size=\"6\"><a href=\"#\" onclick=\"zoomin(); return false;\">+</a> <a href=\"#\" onclick=\"zoomout();\">-</a> </font>";
 	print "<input type=\"text\" size=\"2\" name=\"zoomval\" id=\"zoomval\" value=\"100\" />%\n";
-	print "<input type=\"button\" value=\"".$gm_lang["reset"]."\" onclick=\"resetimage(); return false;\" />\n";
+	print "<input type=\"button\" value=\"".GM_LANG_reset."\" onclick=\"resetimage(); return false;\" />\n";
 	
 	if (!strstr($filename, "://")) {
 		if (!$MEDIA_IN_DB) $details = MediaFS::GetFileDetails($filename, false);

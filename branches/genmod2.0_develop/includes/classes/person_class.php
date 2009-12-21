@@ -38,7 +38,7 @@ class Person extends GedcomRecord {
 	private static $personcache = array(); 	// Holder of the instances for this class
 	
 	private $name = null;					// Printable name of the person, after applying privacy (can be unknown of private)
-	private $revname = null;					// Printable name, in reversed order
+	private $revname = null;				// Printable name, in reversed order
 	private $addname = null;				// Printable addname of the person, after applying privacy (can be blank)
 	private $revaddname = null;				// Printable addname, in reversed order
 	private $name_array = null;				// Array of names from GetIndiNames
@@ -228,16 +228,15 @@ class Person extends GedcomRecord {
 	}	
 	
 	private function getName() {
-		global $gm_lang;
 		
 		if (is_null($this->name)) {
-			if (!$this->DispName()) $this->name = $gm_lang["private"];
+			if (!$this->DispName()) $this->name = GM_LANG_private;
 			else {
 				if ($this->show_changes && $this->ThisChanged()) $gedrec = $this->GetChangedGedRec();
 				else $gedrec = $this->gedrec;
 				$this->name = PrintReady(GetPersonName($this->xref, $gedrec));
 			}
-			if ($this->name == "") $this->name = $gm_lang["unknown"];
+			if ($this->name == "") $this->name = GM_LANG_unknown;
 		}
 		return $this->name;
 	}
@@ -566,7 +565,6 @@ if ($this->tracefacts) print "AddParentsFacts sosa ".$sosa."- Adding for ".$fam-
 	 * @return records added to indifacts array
 	 */
 	private function AddChildrenFacts($fam, $option="", $except="") {
-		global $gm_lang;
 
 		if (!GedcomConfig::$SHOW_RELATIVES_EVENTS) return;
 		if (!$fam->DisplayDetails()) return;
@@ -790,7 +788,6 @@ if ($this->tracefacts) print "AddSpouseFacts - Adding for ".$fam->$spperson->xre
 	 *
 	 */
 	private function AddAssoFacts($pid) {
-		global $gm_lang;
 		global $assolist, $GEDCOMID;
 
 		if (!function_exists("GetAssoList")) return;
@@ -819,7 +816,7 @@ if ($this->tracefacts) print "AddSpouseFacts - Adding for ".$fam->$spperson->xre
 										$sdate = GetSubRecord(2, "2 DATE", $srec);
 										// relationship ?
 										if (empty($asso["role"])) $rela = "ASSO";
-										if (isset($gm_lang[$asso["role"]])) $rela = $gm_lang[$asso["role"]];
+										if (defined("GM_LANG_".$asso["role"])) $rela = constant("GM_LANG_".$asso["role"]);
 										else if (defined("GM_FACT_".$asso["role"])) $rela = constant("GM_FACT_".$asso["role"]);
 										// add an event record
 										$factrec = "1 EVEN\n2 TYPE ".$label."<br/>[".$rela."]";
@@ -844,7 +841,6 @@ if ($this->tracefacts) print "AddSpouseFacts - Adding for ".$fam->$spperson->xre
 	}
 	
 	public function getParentFamily() {
-		global $gm_lang;
 		
 		$this->GetChildFamilies();
 		if (count($this->childfamilies) > 0) {
@@ -863,7 +859,7 @@ if ($this->tracefacts) print "AddSpouseFacts - Adding for ".$fam->$spperson->xre
 					$this->childfamilies[$id]->wife->setFamLabel($fam->xref, $label);
 				}
 				// NOTE: Set the family label, also if no parents exist.
-				if (isset($gm_lang["as_".$fam->pedigreetype."child"])) $this->childfamilies[$id]->label = $gm_lang["as_".$fam->pedigreetype."child"];
+				if (defined("GM_LANG_as_".$fam->pedigreetype."child")) $this->childfamilies[$id]->label = constant("GM_LANG_as_".$fam->pedigreetype."child");
 				else $this->childfamilies[$id]->label = $fam->pedigreetype;
 				
 				// NOTE: Create the children and set their label
@@ -884,7 +880,6 @@ if ($this->tracefacts) print "AddSpouseFacts - Adding for ".$fam->$spperson->xre
 	}
 	
 	public function getSpouseFamily() {
-		global $gm_lang;
 
 		if (count($this->spousefamilies) > 0) {
 			$this->close_relatives = true;
@@ -892,7 +887,7 @@ if ($this->tracefacts) print "AddSpouseFacts - Adding for ".$fam->$spperson->xre
 				$this->close_relatives = true;
 				
 				// NOTE: Get the label for the family
-				$this->spousefamilies[$id]->label = $gm_lang["family_with"] . " ";
+				$this->spousefamilies[$id]->label = GM_LANG_family_with . " ";
 				// Check if the husband is equal to the person we are displaying
 				// If so, add the wife to the tag
 				if ($this->xref == $this->spousefamilies[$id]->husb_id) {
@@ -900,18 +895,18 @@ if ($this->tracefacts) print "AddSpouseFacts - Adding for ".$fam->$spperson->xre
 						$name = $this->spousefamilies[$id]->wife->GetName();
 						if (HasChinese($name)) $name = PrintReady($name." (".$this->spousefamilies[$id]->wife->GetAddName().")");
 						if ($fam->wife->disp_name) $this->spousefamilies[$id]->label .= $name;
-						else $this->spousefamilies[$id]->label .= $gm_lang["private"];
+						else $this->spousefamilies[$id]->label .= GM_LANG_private;
 					}
-					else $this->spousefamilies[$id]->label .= $gm_lang["unknown"];
+					else $this->spousefamilies[$id]->label .= GM_LANG_unknown;
 				}
 				else {
 					if (is_object($this->spousefamilies[$id]->husb)) {
 						$name = $this->spousefamilies[$id]->husb->getName();
 						if (HasChinese($name)) $name = PrintReady($name." (".$this->spousefamilies[$id]->husb->getAddName().")");
 						if ($fam->husb->disp_name) $this->spousefamilies[$id]->label .= $name;
-						else $this->spousefamilies[$id]->label .= $gm_lang["private"];
+						else $this->spousefamilies[$id]->label .= GM_LANG_private;
 					}
-					else $this->spousefamilies[$id]->label .= $gm_lang["unknown"];
+					else $this->spousefamilies[$id]->label .= GM_LANG_unknown;
 				}
 				// NOTE: Create the parents and set their label
 				foreach ($this->spousefamilies[$id]->parents as $type => $parent) {
@@ -941,7 +936,6 @@ if ($this->tracefacts) print "AddSpouseFacts - Adding for ".$fam->$spperson->xre
 	}
 	
 	public function getParentOtherFamily() {
-		global $gm_lang;
 		
 		// NOTE: Get the parents other families
 		// NOTE: Get the fathers families only if they have kids
@@ -957,11 +951,11 @@ if ($this->tracefacts) print "AddSpouseFacts - Adding for ".$fam->$spperson->xre
 								// if this persons own relation to the family, AND that of the kid are birth, they are half brothers
 								if ($kid->xref == $this->xref) $label = "<img src=\"images/selected.png\" alt=\"\" />";
 								else if ($family->pedigreetype == "" && $kid->famc[$key]["relation"] == "") $label = $kid->gender($sex, "halfkids");
-								else $label = $gm_lang["no_relation"];
+								else $label = GM_LANG_no_relation;
 								$family->husb->spousefamilies[$key]->children[$kidkey]->setFamLabel($sfamily->xref, $label);
 							}
 							// NOTE: Get the label for the family
-							$this->childfamilies[$famid]->husb->spousefamilies[$key]->label = $gm_lang["fathers_family_with"] . " ";
+							$this->childfamilies[$famid]->husb->spousefamilies[$key]->label = GM_LANG_fathers_family_with . " ";
 							// Check if the husband is equal to the person we are displaying
 							// If so, add the wife to the tag
 							if ($family->husb->xref == $sfamily->husb->xref) {
@@ -996,11 +990,11 @@ if ($this->tracefacts) print "AddSpouseFacts - Adding for ".$fam->$spperson->xre
 								// if this persons own relation to the family, AND that of the kid are birth, they are half brothers
 								if ($kid->xref == $this->xref) $label = "<img src=\"images/selected.png\" alt=\"\" />";
 								else if ($family->pedigreetype == "" && $kid->famc[$key]["relation"] == "") $label = $kid->gender($sex, "halfkids");
-								else $label = $gm_lang["no_relation"];
+								else $label = GM_LANG_no_relation;
 								$family->wife->spousefamilies[$key]->children[$kidkey]->setFamLabel($sfamily->xref, $label);
 							}
 							// NOTE: Get the label for the family
-							$this->childfamilies[$famid]->wife->spousefamilies[$key]->label = $gm_lang["mothers_family_with"] . " ";
+							$this->childfamilies[$famid]->wife->spousefamilies[$key]->label = GM_LANG_mothers_family_with . " ";
 							// Check if the husband is equal to the person we are displaying
 							// If so, add the wife to the tag
 							if ($family->wife->xref == $sfamily->wife->xref) {
@@ -1027,19 +1021,18 @@ if ($this->tracefacts) print "AddSpouseFacts - Adding for ".$fam->$spperson->xre
 	}
 	
 	public function gender($sex, $type, $divorced="", $married = "") {
-		global $gm_lang;
 		
-		$label = $gm_lang["unknown"];
+		$label = GM_LANG_unknown;
 		switch ($type) {
 			case "spousekids" :
 				switch ($sex) {
 					case "F" :
 						// NOTE: Get the label for the daughter
-						$label = $gm_lang["daughter"];
+						$label = GM_LANG_daughter;
 						break;
 					case "M" :
 						// NOTE: Get the label for the son
-						$label = $gm_lang["son"];
+						$label = GM_LANG_son;
 						break;
 				}
 				return $label;
@@ -1048,11 +1041,11 @@ if ($this->tracefacts) print "AddSpouseFacts - Adding for ".$fam->$spperson->xre
 				switch ($sex) {
 					case "F" :
 						// NOTE: Get the label for the daughter
-						$label = $gm_lang["foster_daughter"];
+						$label = GM_LANG_foster_daughter;
 						break;
 					case "M" :
 						// NOTE: Get the label for the son
-						$label = $gm_lang["foster_son"];
+						$label = GM_LANG_foster_son;
 						break;
 				}
 				return $label;
@@ -1061,11 +1054,11 @@ if ($this->tracefacts) print "AddSpouseFacts - Adding for ".$fam->$spperson->xre
 				switch ($sex) {
 					case "F" :
 						// NOTE: Get the label for the daughter
-						$label = $gm_lang["adopted_daughter"];
+						$label = GM_LANG_adopted_daughter;
 						break;
 					case "M" :
 						// NOTE: Get the label for the son
-						$label = $gm_lang["adopted_son"];
+						$label = GM_LANG_adopted_son;
 						break;
 				}
 				return $label;
@@ -1074,11 +1067,11 @@ if ($this->tracefacts) print "AddSpouseFacts - Adding for ".$fam->$spperson->xre
 				switch ($sex) {
 					case "F" :
 						// NOTE: Get the label for the daughter
-						$label = $gm_lang["sealing_daughter"];
+						$label = GM_LANG_sealing_daughter;
 						break;
 					case "M" :
 						// NOTE: Get the label for the son
-						$label = $gm_lang["sealing_son"];
+						$label = GM_LANG_sealing_son;
 						break;
 				}
 				return $label;
@@ -1086,17 +1079,17 @@ if ($this->tracefacts) print "AddSpouseFacts - Adding for ".$fam->$spperson->xre
 			case "spouseparents" :
 				// NOTE: Get the label for the wife/ex-wife/husband/ex-husband/partner/ex-partner
 				if (strlen($married) == 0) {
-					$label = $gm_lang["partner"];
+					$label = GM_LANG_partner;
 				}
 				else {
 					if ($sex=="F") {
-						if (strlen($divorced) == 0) $label = $gm_lang["wife"];
-						else $label = $gm_lang["exwife"];
+						if (strlen($divorced) == 0) $label = GM_LANG_wife;
+						else $label = GM_LANG_exwife;
 					}
 					else {
 						if ($sex=="M") {
-							if (strlen($divorced) == 0) $label = $gm_lang["husband"];
-							else $label = $gm_lang["exhusband"];
+							if (strlen($divorced) == 0) $label = GM_LANG_husband;
+							else $label = GM_LANG_exhusband;
 						}
 					}
 				}
@@ -1106,11 +1099,11 @@ if ($this->tracefacts) print "AddSpouseFacts - Adding for ".$fam->$spperson->xre
 				switch ($sex) {
 					case "F" :
 						// NOTE: Get the label for the sister
-						$label = $gm_lang["sister"];
+						$label = GM_LANG_sister;
 						break;
 					case "M" :
 						// NOTE: Get the label for the brother
-						$label = $gm_lang["brother"];
+						$label = GM_LANG_brother;
 						break;
 				}
 				return $label;
@@ -1119,11 +1112,11 @@ if ($this->tracefacts) print "AddSpouseFacts - Adding for ".$fam->$spperson->xre
 				switch ($sex) {
 					case "F" :
 						// NOTE: Get the label for the sister
-						$label = $gm_lang["foster_sister"];
+						$label = GM_LANG_foster_sister;
 						break;
 					case "M" :
 						// NOTE: Get the label for the brother
-						$label = $gm_lang["foster_brother"];
+						$label = GM_LANG_foster_brother;
 						break;
 				}
 				return $label;
@@ -1132,11 +1125,11 @@ if ($this->tracefacts) print "AddSpouseFacts - Adding for ".$fam->$spperson->xre
 				switch ($sex) {
 					case "F" :
 						// NOTE: Get the label for the sister
-						$label = $gm_lang["adopted_sister"];
+						$label = GM_LANG_adopted_sister;
 						break;
 					case "M" :
 						// NOTE: Get the label for the brother
-						$label = $gm_lang["adopted_brother"];
+						$label = GM_LANG_adopted_brother;
 						break;
 				}
 				return $label;
@@ -1145,11 +1138,11 @@ if ($this->tracefacts) print "AddSpouseFacts - Adding for ".$fam->$spperson->xre
 				switch ($sex) {
 					case "F" :
 						// NOTE: Get the label for the sister
-						$label = $gm_lang["sealing_sister"];
+						$label = GM_LANG_sealing_sister;
 						break;
 					case "M" :
 						// NOTE: Get the label for the brother
-						$label = $gm_lang["sealing_brother"];
+						$label = GM_LANG_sealing_brother;
 						break;
 				}
 				return $label;
@@ -1158,11 +1151,11 @@ if ($this->tracefacts) print "AddSpouseFacts - Adding for ".$fam->$spperson->xre
 				switch ($sex) {
 					case "F" :
 						// Note: Get the label for the father
-						$label = $gm_lang["mother"];
+						$label = GM_LANG_mother;
 						break;
 					case "M" :
 						// Note: Get the label for the mother
-						$label = $gm_lang["father"];
+						$label = GM_LANG_father;
 						break;
 				}
 				return $label;
@@ -1171,11 +1164,11 @@ if ($this->tracefacts) print "AddSpouseFacts - Adding for ".$fam->$spperson->xre
 				switch ($sex) {
 					case "F" :
 						// Note: Get the label for the father
-						$label = $gm_lang["foster_mother"];
+						$label = GM_LANG_foster_mother;
 						break;
 					case "M" :
 						// Note: Get the label for the mother
-						$label = $gm_lang["foster_father"];
+						$label = GM_LANG_foster_father;
 						break;
 				}
 				return $label;
@@ -1184,11 +1177,11 @@ if ($this->tracefacts) print "AddSpouseFacts - Adding for ".$fam->$spperson->xre
 				switch ($sex) {
 					case "F" :
 						// Note: Get the label for the father
-						$label = $gm_lang["adopted_mother"];
+						$label = GM_LANG_adopted_mother;
 						break;
 					case "M" :
 						// Note: Get the label for the mother
-						$label = $gm_lang["adopted_father"];
+						$label = GM_LANG_adopted_father;
 						break;
 				}
 				return $label;
@@ -1197,11 +1190,11 @@ if ($this->tracefacts) print "AddSpouseFacts - Adding for ".$fam->$spperson->xre
 				switch ($sex) {
 					case "F" :
 						// Note: Get the label for the father
-						$label = $gm_lang["sealed_mother"];
+						$label = GM_LANG_sealed_mother;
 						break;
 					case "M" :
 						// Note: Get the label for the mother
-						$label = $gm_lang["sealed_father"];
+						$label = GM_LANG_sealed_father;
 						break;
 				}
 				return $label;
@@ -1210,11 +1203,11 @@ if ($this->tracefacts) print "AddSpouseFacts - Adding for ".$fam->$spperson->xre
 				switch ($sex) {
 					case "F" :
 						// NOTE: Get the label for the sister
-						$label = $gm_lang["halfsister"];
+						$label = GM_LANG_halfsister;
 						break;
 					case "M" :
 						// NOTE: Get the label for the brother
-						$label = $gm_lang["halfbrother"];
+						$label = GM_LANG_halfbrother;
 						break;
 				}
 				return $label;
@@ -1380,7 +1373,7 @@ if ($this->tracefacts) print "AddSpouseFacts - Adding for ".$fam->$spperson->xre
 	 * @return string the age in a string
 	 */
 	public function GetAge($datestr, $style=1) {
-		global $gm_lang, $monthtonum;
+		global $monthtonum;
 		
 		$estimates = array("abt","aft","bef","est","cir");
 		$realbirthdt="";
@@ -1415,10 +1408,10 @@ if ($this->tracefacts) print "AddSpouseFacts - Adding for ".$fam->$spperson->xre
 				if ($convert_hebrew) $date = JewishGedcomDateToGregorian($date);
 				$age1 = $date[0]["year"]-$birthdate[0]["year"];
 				$age2 = $date[1]["year"]-$birthdate[0]["year"];
-				if ($style) $realbirthdt = " <span class=\"age\">(".$gm_lang["age"]." ";
+				if ($style) $realbirthdt = " <span class=\"age\">(".GM_LANG_age." ";
 				$age1n = ConvertNumber($age1);
 				$age2n = ConvertNumber($age2);
-				$realbirthdt .= $gm_lang["apx"]." ".$age1n;
+				$realbirthdt .= GM_LANG_apx." ".$age1n;
 				if ($age2n > $age1n) $realbirthdt .= "-".$age2n;
 				if ($style) $realbirthdt .= ")</span>";
 			}
@@ -1437,12 +1430,12 @@ if ($this->tracefacts) print "AddSpouseFacts - Adding for ".$fam->$spperson->xre
 							}
 						}
 					}
-					if ($style) $realbirthdt = " <span class=\"age\">(".$gm_lang["age"];
+					if ($style) $realbirthdt = " <span class=\"age\">(".GM_LANG_age;
 					$at = preg_match("/([a-zA-Z]{3})\.?/", $birthdate[0]["ext"], $amatch);
 					if ($at==0) $at = preg_match("/([a-zA-Z]{3})\.?/", $datestr, $amatch);
 					if ($at>0) {
 						if (in_array(strtolower($amatch[1]), $estimates)) {
-							$realbirthdt .= " ".$gm_lang["apx"];
+							$realbirthdt .= " ".GM_LANG_apx;
 						}
 					}
 					// age in months if < 2 years
@@ -1454,7 +1447,7 @@ if ($this->tracefacts) print "AddSpouseFacts - Adding for ".$fam->$spperson->xre
 						$d1 = $birthdate[0]["day"];
 						$d2 = $date[0]["day"];
 						$apx = (empty($m2) or empty($m1) or empty($d2) or empty($d1)); // approx
-						if ($apx) $realbirthdt .= " ".$gm_lang["apx"];
+						if ($apx) $realbirthdt .= " ".GM_LANG_apx;
 						if (empty($m2)) $m2=$m1;
 						if (empty($m1)) $m1=$m2;
 						if (empty($d2)) $d2=$d1;
@@ -1471,14 +1464,14 @@ if ($this->tracefacts) print "AddSpouseFacts - Adding for ".$fam->$spperson->xre
 							}
 							$age = $d2-$d1;
 							$realbirthdt .= " ".$age." ";
-							if ($age < 2) $realbirthdt .= $gm_lang["day1"];
-							else $realbirthdt .= $gm_lang["days"];
+							if ($age < 2) $realbirthdt .= GM_LANG_day1;
+							else $realbirthdt .= GM_LANG_days;
 						} else if ($age==12 and $apx) {
-							$realbirthdt .= " 1 ".$gm_lang["year1"]; // approx 1 year
+							$realbirthdt .= " 1 ".GM_LANG_year1; // approx 1 year
 						} else {
 							$realbirthdt .= " ".$age." ";
-							if ($age < 2) $realbirthdt .= $gm_lang["month1"];
-							else $realbirthdt .= $gm_lang["months"];
+							if ($age < 2) $realbirthdt .= GM_LANG_month1;
+							else $realbirthdt .= GM_LANG_months;
 						}
 					}
 					else $realbirthdt .= " ".ConvertNumber($age);
@@ -1547,7 +1540,7 @@ if ($this->tracefacts) print "AddSpouseFacts - Adding for ".$fam->$spperson->xre
 	 * @param string $bdate	child birthdate
 	 */
 	public function PrintParentsAge($date) {
-		global $gm_lang, $GM_IMAGES;
+		global $GM_IMAGES;
 		
 		if (GedcomConfig::$SHOW_PARENTS_AGE) {
 			$childfam =& Family::GetInstance($this->GetPrimaryChildFamily());
@@ -1557,12 +1550,12 @@ if ($this->tracefacts) print "AddSpouseFacts - Adding for ".$fam->$spperson->xre
 				// father
 				if (is_object($childfam->husb)) {
 					$age = ConvertNumber($childfam->husb->GetAge($date, false));
-					if (10<$age && $age<80) $father_text = "<img src=\"".GM_IMAGE_DIR."/" . $GM_IMAGES["sex"]["small"] . "\" title=\"" . $gm_lang["father"] . "\" alt=\"" . $gm_lang["father"] . "\" class=\"sex_image\" />".$age;
+					if (10<$age && $age<80) $father_text = "<img src=\"".GM_IMAGE_DIR."/" . $GM_IMAGES["sex"]["small"] . "\" title=\"" . GM_LANG_father . "\" alt=\"" . GM_LANG_father . "\" class=\"sex_image\" />".$age;
 				}
 				// mother
 				if (is_object($childfam->wife)) {
 					$age = ConvertNumber($childfam->wife->GetAge($date, false));
-					if (10<$age && $age<80) $mother_text = "<img src=\"".GM_IMAGE_DIR."/" . $GM_IMAGES["sexf"]["small"] . "\" title=\"" . $gm_lang["mother"] . "\" alt=\"" . $gm_lang["mother"] . "\" class=\"sex_image\" />".$age;
+					if (10 < $age && $age < 80) $mother_text = "<img src=\"".GM_IMAGE_DIR."/" . $GM_IMAGES["sexf"]["small"] . "\" title=\"" . GM_LANG_mother . "\" alt=\"" . GM_LANG_mother . "\" class=\"sex_image\" />".$age;
 				}
 				if ((!empty($father_text)) || (!empty($mother_text))) print "<span class=\"age\">".$father_text.$mother_text."</span>";
 			}

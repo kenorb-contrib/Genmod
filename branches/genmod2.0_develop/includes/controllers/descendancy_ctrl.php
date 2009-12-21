@@ -64,12 +64,11 @@ class DescendancyController extends ChartController {
 	}
 
 	protected function GetPageTitle() {
-		global $gm_lang;
 		
 		if (is_null($this->pagetitle)) {
 			$this->pagetitle = $this->GetRootObject()->name;
 			if (GedcomConfig::$SHOW_ID_NUMBERS) $this->pagetitle .= " - ".$this->xref;
-			$this->pagetitle .= " - ".$gm_lang["descend_chart"];
+			$this->pagetitle .= " - ".GM_LANG_descend_chart;
 		}
 		return $this->pagetitle;
 	}
@@ -81,7 +80,6 @@ class DescendancyController extends ChartController {
 	 * @param int $depth the descendancy depth to show
 	 */
 	public function PrintChildDescendancy($pid, $depth) {
-		global $gm_lang;
 		global $GM_IMAGES, $Dindent;
 	
 		// print child
@@ -102,7 +100,7 @@ class DescendancyController extends ChartController {
 		if ($pfam->husb_id != "") $parid = $pfam->husb_id;
 		else if ($pfam->wife_id != "") $parid = $pfam->wife_id;
 		if ($parid!="") {
-			ChartFunctions::PrintUrlArrow($parid.$this->personcount.$pid, "?rootid=".$parid."&amp;num_generations=".$this->num_generations."&amp;chart_style=".$this->chart_style."&amp;show_details=".$this->show_details."&amp;box_width=".$this->box_width, PrintReady($gm_lang["start_at_parents"]."&nbsp;-&nbsp;".$pfam->descriptor), 2);
+			ChartFunctions::PrintUrlArrow($parid.$this->personcount.$pid, "?rootid=".$parid."&amp;num_generations=".$this->num_generations."&amp;chart_style=".$this->chart_style."&amp;show_details=".$this->show_details."&amp;box_width=".$this->box_width, PrintReady(GM_LANG_start_at_parents."&nbsp;-&nbsp;".$pfam->descriptor), 2);
 			$this->personcount++;
 		}
 	
@@ -137,7 +135,7 @@ class DescendancyController extends ChartController {
 	 * @param int $depth the descendancy depth to show
 	 */
 	public function PrintFamilyDescendancy($pid, &$family, $depth) {
-		global $gm_lang, $bwidth;
+		global $bwidth;
 		// Theme dependent globals
 		global $GM_IMAGES, $Dindent;
 	
@@ -153,7 +151,7 @@ class DescendancyController extends ChartController {
 			print "<li>";
 			print "<img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["spacer"]["other"]."\" height=\"2\" width=\"$Dindent\" border=\"0\" alt=\"\" />";
 			print "<span class=\"details1\" style=\"white-space: nowrap; \" >";
-			print "<a href=\"#\" onclick=\"expand_layer('".$family->xref.$this->personcount."'); return false;\" class=\"top\"><img id=\"".$family->xref.$this->personcount."_img\" src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["minus"]["other"]."\" align=\"middle\" hspace=\"0\" vspace=\"3\" border=\"0\" alt=\"".$gm_lang["view_family"]."\" /></a> ";
+			print "<a href=\"#\" onclick=\"expand_layer('".$family->xref.$this->personcount."'); return false;\" class=\"top\"><img id=\"".$family->xref.$this->personcount."_img\" src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["minus"]["other"]."\" align=\"middle\" hspace=\"0\" vspace=\"3\" border=\"0\" alt=\"".GM_LANG_view_family."\" /></a> ";
 			if ($family->disp) FactFunctions::PrintSimpleFact($family->marr_fact, false, false); 
 			print "</span>";
 	
@@ -173,7 +171,7 @@ class DescendancyController extends ChartController {
 				if ($pfam->husb_id != "") $parid = $pfam->husb_id;
 				else if ($pfam->wife_id != "") $parid = $pfam->wife_id;
 				if ($parid!="") {
-					ChartFunctions::PrintUrlArrow($parid.$this->personcount.$spouse->xref, "?rootid=".$parid."&amp;num_generations=".$this->num_generations."&amp;chart_style=".$this->chart_style."&amp;show_details=".$this->show_details."&amp;box_width=".$this->box_width, PrintReady($gm_lang["start_at_parents"]."&nbsp;-&nbsp;".$pfam->descriptor), 2);
+					ChartFunctions::PrintUrlArrow($parid.$this->personcount.$spouse->xref, "?rootid=".$parid."&amp;num_generations=".$this->num_generations."&amp;chart_style=".$this->chart_style."&amp;show_details=".$this->show_details."&amp;box_width=".$this->box_width, PrintReady(GM_LANG_start_at_parents."&nbsp;-&nbsp;".$pfam->descriptor), 2);
 				}
 			}
 			if ($this->show_full) print "<br /><br />&nbsp;";
@@ -183,7 +181,7 @@ class DescendancyController extends ChartController {
 			// children
 			print "<tr><td colspan=\"3\" class=\"details1\" >&nbsp;";
 			if ($family->disp) {
-				if ($family->children_count < 1) print $gm_lang["no_children"];
+				if ($family->children_count < 1) print GM_LANG_no_children;
 				else print GM_FACT_NCHI.": ".$family->children_count;
 			}
 			print "</td></tr></table>";

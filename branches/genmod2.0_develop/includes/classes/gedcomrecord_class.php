@@ -116,7 +116,7 @@ abstract class GedcomRecord {
 			$this->type = $this->datatype;
 			// Get the gedcom record
 			switch ($this->type) {
-				case "INDI": $this->ReadPersonRecord(); break;
+				case "INDI": $this->ReadPersonRecord(); if ($this->xref == "I1633") {print $pipo;} break;
 				case "FAM": $this->ReadFamilyRecord(); break;
 				case "SOUR": $this->ReadSourceRecord(); break;
 				case "REPO": $this->ReadRepositoryRecord(); break;
@@ -423,7 +423,7 @@ abstract class GedcomRecord {
 	/**
 	 * Parse the facts from the record
 	 */
-	protected function parseFacts($selection="") {
+	protected function parseFacts($selection="", $exclude_links=false) {
 
 		if (!is_null($this->facts) && !is_array($selection)) return $this->facts;
 		$facts = array();
@@ -442,7 +442,8 @@ abstract class GedcomRecord {
 				$ft = preg_match("/1\s(\w+)(.*)/", $subrecord, $match);
 				if ($ft>0) {
 					$fact = $match[1];
-					if (strstr($match[2], "@") && in_array($fact, array("INDI", "FAM", "SOUR", "OBJE", "NOTE", "ASSO"))) {
+					if (strstr($match[2], "@") && in_array($fact, array("INDI", "CHIL", "HUSB", "WIFE", "FAMC", "FAMS", "SOUR", "OBJE", "NOTE", "ASSO"))) {
+						if ($exclude_links) continue;
 						$gid = trim(str_replace("@", "", $match[2]));
 					}
 					else $gid = "";
@@ -571,25 +572,35 @@ abstract class GedcomRecord {
 		return $facts;
 	}
 	
-	public function	SelectFacts($factarr) {
+	public function	SelectFacts($factarr, $exclude_links=false) {
 		
 		// if the facts are already parsed, we taken them from the fact array
 		if (!is_null($this->facts)) {
 			$facts = array();
 			// We must retain the order of the fact array
-			foreach ($factarr as $key => $fact) {
+			if (is_array($factarr)) {
+				foreach ($factarr as $key => $fact) {
+					foreach ($this->facts as $key => $factobj) {
+						if ($factobj->fact == $fact && ($exclude_links == false || $factobj->linktype == "")) {
+							$facts[] = $factobj;
+						}
+					}
+				}
+			}
+			else if ($factarr == "" && $exclude_links) {
 				foreach ($this->facts as $key => $factobj) {
-					if ($factobj->fact == $fact) {
+					if ($factobj->linktype == "") {
 						$facts[] = $factobj;
 					}
 				}
 			}
+			else return $this->facts;
 			return $facts;
 		}
 		// If not, we just select the facts that we need, to prevent unnecessary privacy checking 
 		// This causes load if link privacy is enabled
 		else {
-			return $this->ParseFacts($factarr);
+			return $this->ParseFacts($factarr, $exclude_links);
 		}
 	}
 	

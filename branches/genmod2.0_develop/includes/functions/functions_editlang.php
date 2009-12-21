@@ -65,7 +65,7 @@ function mask_all($dstring)
 
 //-----------------------------------------------------------------*/
 function CheckBom(){
-	global $language_settings, $gm_lang;
+	global $language_settings;
 	$check = false;
 	$output = "";
 	foreach ($language_settings as $key => $language) {
@@ -76,24 +76,24 @@ function CheckBom(){
 				$str = file_get_contents($language["gm_language"]);
 				if (ord($str{0}) == 239 && ord($str{1}) == 187 && ord($str{2}) == 191) {
 					$check = true;
-					$output .= "<span class=\"warning\">".$gm_lang["bom_found"].substr($language["gm_language"], 10).".</span>";
+					$output .= "<span class=\"warning\">".GM_LANG_bom_found.substr($language["gm_language"], 10).".</span>";
 					$output .= "<br />";
 					$writetext = htmlentities(substr($str,3, strlen($str)));
 					if (!$handle = @fopen($language["gm_language"], "w")){
 						$output .= "<span class=\"warning\">";
-						$output .= str_replace("#lang_filename#", substr($language["gm_language"], 10), $gm_lang["no_open"]) . "<br /><br />";
+						$output .= str_replace("#lang_filename#", substr($language["gm_language"], 10), GM_LANG_no_open) . "<br /><br />";
 						$output .= "</span>";
 					}
 					if (@fwrite($handle,html_entity_decode($writetext)) === FALSE) {
 						$output .= "<span class=\"warning\">";
-						$output .= str_replace("#lang_filename#", substr($language["gm_language"], 10), $gm_lang["lang_file_write_error"]) . "<br /><br />";
+						$output .= str_replace("#lang_filename#", substr($language["gm_language"], 10), GM_LANG_lang_file_write_error) . "<br /><br />";
 						$output .= "</span>";
 					}
 				}
 			}
 			else {
 				$output .= "<span class=\"warning\">";
-				$output .= str_replace("#lang_filename#", substr($language["gm_language"], 10), $gm_lang["no_open"]) . "<br /><br />";
+				$output .= str_replace("#lang_filename#", substr($language["gm_language"], 10), GM_LANG_no_open) . "<br /><br />";
 				$output .= "</span>";
 			}
 			
@@ -103,17 +103,17 @@ function CheckBom(){
 					$str = file_get_contents($language["helptextfile"]);
 					if (ord($str{0}) == 239 && ord($str{1}) == 187 && ord($str{2}) == 191) {
 						$check = true;
-						$output .= "<span class=\"warning\">".$gm_lang["bom_found"].substr($language["helptextfile"], 10).".</span>";
+						$output .= "<span class=\"warning\">".GM_LANG_bom_found.substr($language["helptextfile"], 10).".</span>";
 						$output .= "<br />";
 						$writetext = htmlentities(substr($str,3, strlen($str)));
 						if (!$handle = @fopen($language["helptextfile"], "w")){
 							$output .= "<span class=\"warning\">";
-							$output .= str_replace("#lang_filename#", substr($language["helptextfile"], 10), $gm_lang["no_open"]) . "<br /><br />";
+							$output .= str_replace("#lang_filename#", substr($language["helptextfile"], 10), GM_LANG_no_open) . "<br /><br />";
 							$output .= "</span>";
 						}
 						if (@fwrite($handle,html_entity_decode($writetext)) === FALSE) {
 							$output .= "<span class=\"warning\">";
-							$output .= str_replace("#lang_filename#", substr($language["helptextfile"], 10), $gm_lang["lang_file_write_error"]) . "<br /><br />";
+							$output .= str_replace("#lang_filename#", substr($language["helptextfile"], 10), GM_LANG_lang_file_write_error) . "<br /><br />";
 							$output .= "</span>";
 						}
 					}
@@ -121,7 +121,7 @@ function CheckBom(){
 			}
 			else {
 				$output .= "<span class=\"warning\">";
-				$output .= str_replace("#lang_filename#", substr($language["helptextfile"], 10), $gm_lang["no_open"]) . "<br /><br />";
+				$output .= str_replace("#lang_filename#", substr($language["helptextfile"], 10), GM_LANG_no_open) . "<br /><br />";
 				$output .= "</span>";
 			}
 			// Check facts file
@@ -129,29 +129,29 @@ function CheckBom(){
 				$str = file_get_contents($language["factsfile"]);
 				if (ord($str{0}) == 239 && ord($str{1}) == 187 && ord($str{2}) == 191) {
 					$check = true;
-					$output .= "<span class=\"warning\">".$gm_lang["bom_found"].substr($language["factsfile"], 10).".</span>";
+					$output .= "<span class=\"warning\">".GM_LANG_bom_found.substr($language["factsfile"], 10).".</span>";
 					$output .= "<br />";
 					$writetext = htmlentities(substr($str,3, strlen($str)));
 					if (!$handle = @fopen($language["factsfile"], "w")){
 						$output .= "<span class=\"warning\">";
-						$output .= str_replace("#lang_filename#", substr($language["factsfile"], 10), $gm_lang["no_open"]) . "<br /><br />";
+						$output .= str_replace("#lang_filename#", substr($language["factsfile"], 10), GM_LANG_no_open) . "<br /><br />";
 						$output .= "</span>";
 					}
 					if (@fwrite($handle,html_entity_decode($writetext)) === FALSE) {
 						$output .= "<span class=\"warning\">";
-						$output .= str_replace("#lang_filename#", substr($language["factsfile"], 10), $gm_lang["lang_file_write_error"]) . "<br /><br />";
+						$output .= str_replace("#lang_filename#", substr($language["factsfile"], 10), GM_LANG_lang_file_write_error) . "<br /><br />";
 						$output .= "</span>";
 					}
 				}
 			}
 			else {
 				$output .= "<span class=\"warning\">";
-				$output .= str_replace("#lang_filename#", substr($language["factsfile"], 10), $gm_lang["no_open"]) . "<br /><br />";
+				$output .= str_replace("#lang_filename#", substr($language["factsfile"], 10), GM_LANG_no_open) . "<br /><br />";
 				$output .= "</span>";
 			}
 		}
 	}
-	if ($check == false) $output .= $gm_lang["bom_not_found"];
+	if ($check == false) $output .= GM_LANG_bom_not_found;
 	return $output;
 }
 ?>

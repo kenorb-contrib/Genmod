@@ -112,18 +112,17 @@ class MediaItem extends GedcomRecord {
 		return $count;
 	}	
 	private function getTitle() {
-		global $gm_lang;
 		
 		if (is_null($this->title)) {
 			if ($this->DisplayDetails()) {
 				if ($this->show_changes && $this->ThisChanged()) $gedrec = $this->GetChangedGedRec();
 				else $gedrec = $this->gedrec;
 
-				if (!PrivacyFunctions::ShowFactDetails("TITL", $this->xref, "OBJE") || !PrivacyFunctions::showFactDetails("FILE", $this->xref, "OBJE")) $this->title = $gm_lang["private"];
-				else if (!PrivacyFunctions::showFact("TITL", $this->xref, "OBJE")) $this->title = $gm_lang["unknown"];
+				if (!PrivacyFunctions::ShowFactDetails("TITL", $this->xref, "OBJE") || !PrivacyFunctions::showFactDetails("FILE", $this->xref, "OBJE")) $this->title = GM_LANG_private;
+				else if (!PrivacyFunctions::showFact("TITL", $this->xref, "OBJE")) $this->title = GM_LANG_unknown;
 				else $this->title = $this->GetMediaDescriptor();
 			}
-			else $this->title = $gm_lang["private"];
+			else $this->title = GM_LANG_private;
 		}
 		return $this->title;
 	}
@@ -318,7 +317,7 @@ class MediaItem extends GedcomRecord {
 			if (begRTLText($this->GetTitle())) print "\n\t\t\t<li class=\"rtl\" dir=\"rtl\">";
 			else print "\n\t\t\t<li class=\"ltr\" dir=\"ltr\">";
 		}
-		print "\n\t\t\t<a href=\"mediadetail.php?mid=$this->xref&amp;gedid=".$this->gedcomid."\" class=\"list_item\">".PrintReady($this->title);
+		print "\n\t\t\t<a href=\"mediadetail.php?mid=$this->xref&amp;gedid=".$this->gedcomid."\" class=\"list_item\">".PrintReady($this->GetTitle());
 		print $this->addxref;
 		if (!empty($fact)) {
 			print " <i>(";

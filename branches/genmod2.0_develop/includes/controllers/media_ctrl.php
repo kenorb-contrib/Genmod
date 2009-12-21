@@ -71,13 +71,12 @@ class MediaController extends DetailController {
 	 * @return string
 	 */
 	protected function getPageTitle() {
-		global $gm_lang;
 
 		if (is_null($this->pagetitle)) {
 			$this->pagetitle = "";
 			$this->pagetitle .= $this->media->title." - ";
 			if (GedcomConfig::$SHOW_ID_NUMBERS) $this->pagetitle .= $this->media->xref." - ";
-			$this->pagetitle .= $gm_lang["media_info"];
+			$this->pagetitle .= GM_LANG_media_info;
 		}
 		return $this->pagetitle;
 	}
@@ -87,22 +86,22 @@ class MediaController extends DetailController {
 	 * @return Menu
 	 */
 	public function &getEditMenu() {
-		global $TEXT_DIRECTION, $gm_lang, $gm_user;
+		global $TEXT_DIRECTION, $gm_user;
 		
 		// edit media menu
-		$menu = new Menu($gm_lang['edit_media']);
+		$menu = new Menu(GM_LANG_edit_media);
 
 		if (!$this->media->isdeleted) {
 			// edit media / edit_raw
 			if ($gm_user->userCanEditGedlines()) {
-				$submenu = new Menu($gm_lang['edit_raw']);
+				$submenu = new Menu(GM_LANG_edit_raw);
 				$submenu->addLink("edit_raw('".$this->media->xref."', 'edit_raw', 'OBJE');");
 				$menu->addSubmenu($submenu);
 			}
 
 			// edit media / delete_media
-			$submenu = new Menu($gm_lang['delete_media']);
-			$submenu->addLink("if (confirm('".$gm_lang["confirm_delete_media"]."'))  deletemedia('".$this->media->xref."', 'delete_media'); ");
+			$submenu = new Menu(GM_LANG_delete_media);
+			$submenu->addLink("if (confirm('".GM_LANG_confirm_delete_media."'))  deletemedia('".$this->media->xref."', 'delete_media'); ");
 			$menu->addSubmenu($submenu);
 
 		}
@@ -113,8 +112,8 @@ class MediaController extends DetailController {
 			$menu->addSubmenu($submenu);
 
 			// edit_sour / show/hide changes
-			if (!$this->show_changes) $submenu = new Menu($gm_lang['show_changes']);
-			else $submenu = new Menu($gm_lang['hide_changes']);
+			if (!$this->show_changes) $submenu = new Menu(GM_LANG_show_changes);
+			else $submenu = new Menu(GM_LANG_hide_changes);
 			$submenu->addLink('showchanges();');
 			$menu->addSubmenu($submenu);
 		}
@@ -126,28 +125,28 @@ class MediaController extends DetailController {
 	 * @return Menu
 	 */
 	public function &getOtherMenu() {
-		global $TEXT_DIRECTION, $gm_lang;
+		global $TEXT_DIRECTION;
 		global $ENABLE_CLIPPINGS_CART, $gm_user;
 		
 		// other menu
-		$menu = new Menu($gm_lang['other']);
+		$menu = new Menu(GM_LANG_other);
 		if ($gm_user->userCanViewGedlines()) {
 				// other / view_gedcom
 				if ($this->show_changes) $execute = "show_gedcom_record('new');";
 				else $execute = "show_gedcom_record();";
-				$submenu = new Menu($gm_lang['view_gedcom']);
+				$submenu = new Menu(GM_LANG_view_gedcom);
 				$submenu->addLink($execute);
 				$menu->addSubmenu($submenu);
 		}
 		if ($ENABLE_CLIPPINGS_CART >= $gm_user->getUserAccessLevel()) {
 				// other / add_to_cart
-				$submenu = new Menu($gm_lang['add_to_cart']);
+				$submenu = new Menu(GM_LANG_add_to_cart);
 				$submenu->addLink('clippings.php?action=add&id='.$this->media->xref.'&type=sour');
 				$menu->addSubmenu($submenu);
 		}
 		if ($this->media->disp && !empty($this->uname)) {
 				// other / add_to_my_favorites
-				$submenu = new Menu($gm_lang['add_to_my_favorites']);
+				$submenu = new Menu(GM_LANG_add_to_my_favorites);
 				$submenu->addLink('mediadetail.php?action=addfav&mid='.$this->media->xref.'&gedid='.$this->media->gedcomid);
 				$menu->addSubmenu($submenu);
 		}

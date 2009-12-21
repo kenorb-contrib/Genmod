@@ -38,7 +38,6 @@ abstract class AdminFunctions {
 	 * @return mixed 	$url if file is downloadable, false if not
 	 */
 	public function CheckGedcomDownloadable($gedfile) {
-		global $gm_lang;
 	
 		$url = "http://localhost/";
 		if (substr($url,-1,1)!="/") $url .= "/";
@@ -94,7 +93,7 @@ abstract class AdminFunctions {
 	}
 	
 	public function PrintGedcom($ged, $convert, $remove, $zip, $privatize_export, $privatize_export_level, $gedname, $embedmm) {
-		GLOBAL $GEDCOMID, $gm_lang, $GM_BASE_DIRECTORY, $gm_username, $gm_user;
+		GLOBAL $GEDCOMID, $GM_BASE_DIRECTORY, $gm_username, $gm_user;
 		if ($zip == "yes") {
 			$gedout = fopen($gedname, "w");
 		}
@@ -114,7 +113,13 @@ abstract class AdminFunctions {
 		}
 	
 		SwitchGedcom($ged);
-		$head = FindGedcomRecord("HEAD");
+		$head = "";
+		$sql = "SELECT o_gedrec FROM ".TBLPREFIX."other WHERE o_id='HEAD' AND o_file='".$GEDCOMID."'";
+		$res = NewQuery($sql);
+		if ($res->NumRows() > 0) {
+			$row = $res->FetchAssoc();
+			$head = $row["o_gedrec"];
+		}
 		if (!empty($head)) {
 			$pos1 = strpos($head, "1 SOUR");
 			if ($pos1!==false) {
@@ -139,12 +144,12 @@ abstract class AdminFunctions {
 			$head .= "1 DATE ".date("j M Y")."\r\n";
 			$head .= "2 TIME ".date("h:i:s")."\r\n";
 			if (strstr($head, "1 PLAC")===false) {
-				$head .= "1 PLAC\r\n2 FORM ".$gm_lang["default_form"]."\r\n";
+				$head .= "1 PLAC\r\n2 FORM ".GM_LANG_default_form."\r\n";
 			}
 		}
 		else {
 			$head = "0 HEAD\r\n1 SOUR Genmod\r\n2 NAME Genmod Online Genealogy\r\n2 VERS ".GM_VERSION." ".GM_VERSION_RELEASE."\r\n1 DEST DISKETTE\r\n1 DATE ".date("j M Y")."\r\n2 TIME ".date("h:i:s")."\r\n";
-			$head .= "1 GEDC\r\n2 VERS 5.5\r\n2 FORM LINEAGE-LINKED\r\n1 CHAR ".GedcomConfig::$CHARACTER_SET."\r\n1 PLAC\r\n2 FORM ".$gm_lang["default_form"]."\r\n";
+			$head .= "1 GEDC\r\n2 VERS 5.5\r\n2 FORM LINEAGE-LINKED\r\n1 CHAR ".GedcomConfig::$CHARACTER_SET."\r\n1 PLAC\r\n2 FORM ".GM_LANG_default_form."\r\n";
 		}
 		if ($convert=="yes") {
 			$head = preg_replace("/UTF-8/", "ANSI", $head);
@@ -433,11 +438,10 @@ abstract class AdminFunctions {
 	}
 	
 	public function ImportEmergencyLog() {
-		global $gm_lang;
 	
 		// If we cannot read/delete the file, don't process it.
 		$filename = INDEX_DIRECTORY."emergency_syslog.txt";
-		if (!AdminFunctions::FileIsWriteable($filename)) return $gm_lang["emergency_log_noprocess"];
+		if (!AdminFunctions::FileIsWriteable($filename)) return GM_LANG_emergency_log_noprocess;
 		
 		// Read the contents
 		$handle = fopen($filename, "r");
@@ -453,7 +457,7 @@ abstract class AdminFunctions {
 		//Delete the file
 		unlink($filename);
 		
-		return $gm_lang["emergency_log_exists"];
+		return GM_LANG_emergency_log_exists;
 	}
 
 	/** Import table(s) from a file
@@ -572,7 +576,7 @@ abstract class AdminFunctions {
 	 * @author	Genmod Development Team
 	 */
 	public function StoreGedcoms() {
-		global $GEDCOMS, $gm_lang, $DEFAULT_GEDCOM, $GEDCOMID;
+		global $GEDCOMS, $DEFAULT_GEDCOM, $GEDCOMID;
 	
 		if (!CONFIGURED) return false;
 		uasort($GEDCOMS, "GedcomSort");

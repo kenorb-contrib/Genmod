@@ -58,7 +58,6 @@ class Submitter extends GedcomRecord {
 		
 		parent::__construct($id, $gedrec, $gedcomid);
 
-		$this->tracefacts = false;
 		$this->exclude_facts = "";
 		
 	}

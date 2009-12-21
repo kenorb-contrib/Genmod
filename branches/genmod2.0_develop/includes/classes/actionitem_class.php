@@ -250,14 +250,14 @@ class ActionItem {
 	}
 			
 	public function PrintThis() {
-		global $gm_lang, $gm_user;
+		global $gm_user;
 		
 		if ($this->canshow) {
 			print "<tr>";
 			print "\n\t\t\t<td id=\"actionfull_".$this->id."\" class=\"shade2 center width20\" style=\"vertical-align: middle\">";
 			if ($gm_user->userCanEdit()) {
 				$menu = array();
-				$menu["label"] = $gm_lang["edit"];
+				$menu["label"] = GM_LANG_edit;
 				$menu["labelpos"] = "right";
 				$menu["icon"] = "";
 				$menu["link"] = "#";
@@ -268,7 +268,7 @@ class ActionItem {
 				$menu["submenuclass"] = "submenu";
 				$menu["items"] = array();
 				$submenu = array();
-				$submenu["label"] = $gm_lang["edit"];
+				$submenu["label"] = GM_LANG_edit;
 				$submenu["labelpos"] = "right";
 				$submenu["icon"] = "";
 				$submenu["onclick"] = "sndReq('action_".$this->id."', 'action_edit', 'aid', '".$this->id."', '', '');";
@@ -277,10 +277,10 @@ class ActionItem {
 				$submenu["hoverclass"] = "submenuitem_hover";
 				$menu["items"][] = $submenu;
 				$submenu = array();
-				$submenu["label"] = $gm_lang["delete"];
+				$submenu["label"] = GM_LANG_delete;
 				$submenu["labelpos"] = "right";
 				$submenu["icon"] = "";
-				$submenu["onclick"] = "if (confirm('".$gm_lang["check_delete"]."')) { sndReq('action_".$this->id."', 'action_delete', 'aid', '".$this->id."', '', ''); window.location.reload(); }";
+				$submenu["onclick"] = "if (confirm('".GM_LANG_check_delete."')) { sndReq('action_".$this->id."', 'action_delete', 'aid', '".$this->id."', '', ''); window.location.reload(); }";
 				$submenu["link"] = "#";
 				$submenu["class"] = "submenuitem";
 				$submenu["hoverclass"] = "submenuitem_hover";
@@ -297,63 +297,60 @@ class ActionItem {
 	}
 	
 	public function EditThisItem() {
-		global $gm_lang;
 		
 		if ($this->canshow) {
-			print "<b>".$gm_lang["todo"]."</b><br />";
+			print "<b>".GM_LANG_todo."</b><br />";
 			print "<textarea id=\"actiontext\" name=\"actiontext\" rows=\"4\" cols=\"60\">".stripslashes($this->text)."</textarea>";
-			print "<br /><br /><b>".$gm_lang["repo"]."</b><br />";
+			print "<br /><br /><b>".GM_LANG_repo."</b><br />";
 			print "<input type=\"text\" size=\"10\" value=\"".$this->repo."\" id=\"repo\" name=\"repo\" onblur=\"sndReq('desc_".$this->id."', 'getrepodescriptor', 'rid', this.value,'','');\">";
 			LinkFunctions::PrintFindRepositoryLink('repo');
 			LinkFunctions::PrintAddNewRepositoryLink('repo');
 		
 			print "&nbsp;&nbsp;<span id=\"desc_".$this->id."\">".$this->GetRepoDesc()."</span>";
-			print "<br /><br /><b>".$gm_lang["status"]."</b><br />";
+			print "<br /><br /><b>".GM_LANG_status."</b><br />";
 			print "<select name=\"status\">";
 			print "<option value=\"0\"";
 			if ($this->status == 0) print "selected=\"selected\" >";
 			else print ">";
-			print $gm_lang["action0"]."</option>";
+			print GM_LANG_action0."</option>";
 			print "<option value=\"1\"";
 			if ($this->status == 1) print "selected=\"selected\" >";
 			else print ">";
-			print $gm_lang["action1"]."</option>";
+			print GM_LANG_action1."</option>";
 			print "</select><br /><br />";
-			print "<input type=\"button\" value=\"".$gm_lang["save"]."\" onclick=\"sndReq('action_".$this->id."', 'action_update', 'aid','".$this->id."','actiontext', encodeURI(document.actionform.actiontext.value), 'repo', document.actionform.repo.value, 'status', document.actionform.status.value, 'pid', document.actionform.pid.value); \" />";
+			print "<input type=\"button\" value=\"".GM_LANG_save."\" onclick=\"sndReq('action_".$this->id."', 'action_update', 'aid','".$this->id."','actiontext', encodeURI(document.actionform.actiontext.value), 'repo', document.actionform.repo.value, 'status', document.actionform.status.value, 'pid', document.actionform.pid.value); \" />";
 		}
 	}
 	
 	public function AddThisItem() {
-		global $gm_lang;
 		
 		if ($this->canshow) {
-			print "<b>".$gm_lang["todo"]."</b><br />";
+			print "<b>".GM_LANG_todo."</b><br />";
 			print "<textarea id=\"actiontext\" name=\"actiontext\" rows=\"4\" cols=\"60\"></textarea>";
-			print "<br /><br /><b>".$gm_lang["repo"]."</b><br />";
+			print "<br /><br /><b>".GM_LANG_repo."</b><br />";
 			print "<input type=\"text\" size=\"10\" value=\"\" id=\"repo\" name=\"repo\" onblur=\"sndReq('desc_".$this->id."', 'getrepodescriptor', 'rid', this.value,'','');\">";
 			LinkFunctions::PrintFindRepositoryLink('repo');
 			LinkFunctions::PrintAddNewRepositoryLink('repo');
 	
 			print "&nbsp;&nbsp;<span id=\"desc_".$this->id."\"></span>";
-			print "<br /><br /><b>".$gm_lang["status"]."</b><br />";
+			print "<br /><br /><b>".GM_LANG_status."</b><br />";
 			print "<select name=\"status\">";
-			print "<option value=\"0\" selected=\"selected\" >".$gm_lang["action0"]."</option>";
-			print "<option value=\"1\" >".$gm_lang["action1"]."</option>";
+			print "<option value=\"0\" selected=\"selected\" >".GM_LANG_action0."</option>";
+			print "<option value=\"1\" >".GM_LANG_action1."</option>";
 			print "</select><br /><br />";
-			print "<input type=\"button\" value=\"".$gm_lang["save"]."\" onclick=\"sndReq('add_todo', 'action_add2', 'aid','".$this->id."','actiontext', encodeURI(document.actionform.actiontext.value), 'repo', document.actionform.repo.value, 'status', document.actionform.status.value, 'pid', document.actionform.pid.value, 'type', '".strtoupper($this->type)."'); window.location.reload()\" />";
+			print "<input type=\"button\" value=\"".GM_LANG_save."\" onclick=\"sndReq('add_todo', 'action_add2', 'aid','".$this->id."','actiontext', encodeURI(document.actionform.actiontext.value), 'repo', document.actionform.repo.value, 'status', document.actionform.status.value, 'pid', document.actionform.pid.value, 'type', '".strtoupper($this->type)."'); window.location.reload()\" />";
 		}
 	}
 	
 	public function PrintThisItem() {
-		global $gm_lang;
 		
 		if ($this->canshow) {
-			print "<b>".$gm_lang["todo"]."</b><br />";
+			print "<b>".GM_LANG_todo."</b><br />";
 			print nl2br(stripslashes($this->text));
-			print "<br /><br /><b>".$gm_lang["repo"]."</b><br />";
+			print "<br /><br /><b>".GM_LANG_repo."</b><br />";
 			print "<a href=\"repo.php?rid=".$this->repo."\">".$this->GetRepoDesc()."</a>";
-			print "<br /><br /><b>".$gm_lang["status"]."</b><br />";
-			print $gm_lang["action".$this->status];
+			print "<br /><br /><b>".GM_LANG_status."</b><br />";
+			print constant("GM_LANG_action".$this->status);
 			print "<br />";
 		}
 	}

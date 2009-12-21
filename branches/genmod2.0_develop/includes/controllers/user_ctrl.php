@@ -159,7 +159,7 @@ abstract class UserController {
 	* @return bool return true if the username and password credentials match a user in the database return false if they don't
 	*/
 	public function AuthenticateUser($username, $password) {
-		global $gm_lang, $GEDCOMID;
+		global $GEDCOMID;
 
 		$user =& User::GetInstance($username);
 
@@ -182,7 +182,7 @@ abstract class UserController {
 					
 					// -- The session vars MUST be set BEFORE writing to the log.
 					WriteToLog("Users->AuthenticateUser: Login Successful -> " . $username ." <-", "I", "S");
-					if (isset($gm_lang[$user->language])) $_SESSION['CLANGUAGE'] = $user->language;
+					if (defined("GM_LANG_".$user->language)) $_SESSION['CLANGUAGE'] = $user->language;
 					
 					//-- only change the gedcom if the user does not have a gedcom id
 					//-- for the currently active gedcom

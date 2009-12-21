@@ -52,7 +52,7 @@ class IndilistController extends ListController {
 	public function __construct() {
 		global $ALLOW_CHANGE_GEDCOM, $gm_user;
 		
-		global $gm_lang, $GM_IMAGES, $nonfacts, $nonfamfacts;
+		global $GM_IMAGES, $nonfacts, $nonfamfacts;
 		global $ENABLE_CLIPPINGS_CART, $show_changes;
 		
 		parent::__construct();
@@ -101,10 +101,9 @@ class IndilistController extends ListController {
 	
 	
 	protected function GetPageTitle() {
-		global $gm_lang;
 
 		if (is_null($this->pagetitle)) {
-			$this->pagetitle = $gm_lang["individual_list"]." ".$this->addheader;
+			$this->pagetitle = GM_LANG_individual_list." ".$this->addheader;
 		}
 		return $this->pagetitle;
 	}
@@ -210,7 +209,7 @@ class IndilistController extends ListController {
 	 * @param		string		$page		The page the links should point to
 	 */
 	public function PrintSurnameList($surnames, $page, $resturl="") {
-		global $TEXT_DIRECTION, $gm_lang;
+		global $TEXT_DIRECTION;
 		global $indi_hide, $indi_total;
 		
 		if (stristr($page, "aliveinyear")) {
@@ -244,7 +243,7 @@ class IndilistController extends ListController {
 			else if (substr($namecount["name"], 0, 4) == "@N.N") {
 				print "<div class =\"ltr\" dir=\"ltr\">&nbsp;<a href=\"".$page."?alpha=".urlencode($namecount["alpha"])."&amp;surname_sublist=".$this->surname_sublist."&amp;surname=@N.N.".$resturl;
 	 			if ($this->allgeds == "yes") print "&amp;allgeds=yes";
-				print "\">&nbsp;".$gm_lang["NN"] . "&lrm; - [".($namecount["match"])."]&lrm;&nbsp;";
+				print "\">&nbsp;".GM_LANG_NN . "&lrm; - [".($namecount["match"])."]&lrm;&nbsp;";
 			}
 			else {
 				print "<div class =\"ltr\" dir=\"ltr\">&nbsp;<a href=\"".$page."?alpha=".urlencode($namecount["alpha"])."&amp;surname_sublist=".$this->surname_sublist."&amp;surname=".urlencode($namecount["name"]).$resturl;
@@ -268,16 +267,16 @@ class IndilistController extends ListController {
 		print "</td>\n";
 		if ($count>1 || count($indi_hide)>0) {
 			print "</tr><tr><td colspan=\"$col\" class=\"center\">&nbsp;";
-			if (GedcomConfig::$SHOW_MARRIED_NAMES && $count>1) print $gm_lang["total_names"]." ".$this->count_indi."<br />";
-			if (isset($indi_total) && $count>1) print $gm_lang["total_indis"]." ".$indi_total."&nbsp;";
+			if (GedcomConfig::$SHOW_MARRIED_NAMES && $count>1) print GM_LANG_total_names." ".$this->count_indi."<br />";
+			if (isset($indi_total) && $count>1) print GM_LANG_total_indis." ".$indi_total."&nbsp;";
 			if ($count>1 && count($indi_hide)>0) print "--&nbsp;";
-			if (count($indi_hide)>0) print $gm_lang["hidden"]." ".count($indi_hide);
+			if (count($indi_hide)>0) print GM_LANG_hidden." ".count($indi_hide);
 			if ($count>1 && $aiy) {
-				print "<br />".$gm_lang["unborn"]."&nbsp;".$indi_unborn;
-				print "&nbsp;--&nbsp;".$gm_lang["alive"]."&nbsp;".$indi_alive;
-				print "&nbsp;--&nbsp;".$gm_lang["dead"]."&nbsp;".$indi_dead;
+				print "<br />".GM_LANG_unborn."&nbsp;".$indi_unborn;
+				print "&nbsp;--&nbsp;".GM_LANG_alive."&nbsp;".$indi_alive;
+				print "&nbsp;--&nbsp;".GM_LANG_dead."&nbsp;".$indi_dead;
 			}
-			if ($count>1) print "<br />".$gm_lang["surnames"]." ".$count;
+			if ($count>1) print "<br />".GM_LANG_surnames." ".$count;
 			print "</td>\n";
 		}
 		print "</tr></table>";
@@ -343,7 +342,7 @@ class IndilistController extends ListController {
 	 * @param		boolean	$find		Set to yes to print links for the find pages
 	 */
 	public function PrintPersonList($personlist, $print_all=true, $find=false) {
-		global $TEXT_DIRECTION, $gm_lang;
+		global $TEXT_DIRECTION;
 		global $indi_private, $indi_hide, $surname, $alpha, $falpha;
 		global $GEDCOMID, $year;
 	
@@ -365,7 +364,7 @@ class IndilistController extends ListController {
 			// NOTE: Print the second alpha letter list for the unknown names
 			print "<td class=\"shade1 list_value wrap center\" colspan=\"2\">\n";
 			print_help_link("firstname_alpha_help", "qm");
-			print $gm_lang["first_letter_fname"]."<br />\n";
+			print GM_LANG_first_letter_fname."<br />\n";
 			$first = true;
 			foreach($firstalpha as $letter=>$list) {
 				$pass = false;
@@ -403,13 +402,13 @@ class IndilistController extends ListController {
 					if (strstr($_SERVER["SCRIPT_NAME"],"aliveinyear.php")) print "<a href=\"aliveinyear.php?year=$year&amp;";
 					print "alpha=".urlencode($this->alpha)."&amp;falpha=@&amp;surname_sublist=yes";
 					if ($this->allgeds == "yes") print "&amp;allgeds=yes";
-					print "\"><span class=\"warning\">".PrintReady($gm_lang["NN"])."</span></a>\n";
+					print "\"><span class=\"warning\">".PrintReady(GM_LANG_NN)."</span></a>\n";
 				}
 				else {
 					if (strstr($_SERVER["SCRIPT_NAME"],"indilist.php")) print "<a href=\"indilist.php?";
 					if (strstr($_SERVER["SCRIPT_NAME"],"aliveinyear.php")) print "<a href=\"aliveinyear.php?year=$year&amp;";
 					print "alpha=".urlencode($this->alpha)."&amp;falpha=@&amp;surname_sublist=yes";
-					print "\">".PrintReady($gm_lang["NN"])."</a>\n";
+					print "\">".PrintReady(GM_LANG_NN)."</a>\n";
 				}
 				$pass = false;
 			}
@@ -422,8 +421,8 @@ class IndilistController extends ListController {
 				// NOTE: Include the surname if surnames are to be listed
 				if ($this->allgeds == "yes") print "&amp;allgeds=yes&amp;";
 				if ($this->surname_sublist == "yes" && isset($surname)) print "surname=".urlencode($surname)."&amp;";
-				if ($this->show_all_firstnames == "yes") print "show_all_firstnames=no&amp;show_all=".$this->show_all."&amp;surname_sublist=".$this->surname_sublist."\"><span class=\"warning\">".$gm_lang["all"]."</span>\n";
-				else print "show_all_firstnames=yes&amp;show_all=".$this->show_all."&amp;surname_sublist=".$this->surname_sublist."\">".$gm_lang["all"]."</a>\n";
+				if ($this->show_all_firstnames == "yes") print "show_all_firstnames=no&amp;show_all=".$this->show_all."&amp;surname_sublist=".$this->surname_sublist."\"><span class=\"warning\">".GM_LANG_all."</span>\n";
+				else print "show_all_firstnames=yes&amp;show_all=".$this->show_all."&amp;surname_sublist=".$this->surname_sublist."\">".GM_LANG_all."</a>\n";
 			}
 			print "</td></tr><tr>\n";
 			
@@ -471,10 +470,10 @@ class IndilistController extends ListController {
 			}
 			print "</ul></td>\n";
 			print "</tr><tr><td colspan=\"2\" class=\"center\">";
-			if (GedcomConfig::$SHOW_MARRIED_NAMES) print $gm_lang["total_names"]." ".count($names)."<br />\n";
-			print $gm_lang["total_indis"]." ".$total_indis;
-			if (count($indi_private)>0) print "  (".$gm_lang["private"]." ".count($indi_private).")";
-			if (count($indi_hide)>0) print "  --  ".$gm_lang["hidden"]." ".count($indi_hide);
+			if (GedcomConfig::$SHOW_MARRIED_NAMES) print GM_LANG_total_names." ".count($names)."<br />\n";
+			print GM_LANG_total_indis." ".$total_indis;
+			if (count($indi_private)>0) print "  (".GM_LANG_private." ".count($indi_private).")";
+			if (count($indi_hide)>0) print "  --  ".GM_LANG_hidden." ".count($indi_hide);
 			if (count($indi_private)>0 || count($indi_hide)>0) print_help_link("privacy_error_help", "qm");
 			print "</td>\n";
 		}

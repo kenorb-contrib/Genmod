@@ -78,34 +78,31 @@ class FamilyBookController extends ChartController {
 	}
 
 	protected function GetPageTitle() {
-		global $gm_lang;
 		
 		if (is_null($this->pagetitle)) {
 			$this->pagetitle = $this->GetRootObject()->name;
 			if (GedcomConfig::$SHOW_ID_NUMBERS) $this->pagetitle .= " - ".$this->xref;
-			$this->pagetitle .= " - ".$gm_lang["familybook_chart"];
+			$this->pagetitle .= " - ".GM_LANG_familybook_chart;
 		}
 		return $this->pagetitle;
 	}
 	
 	
 	public function PrintInputDescentSteps() {
-	global $gm_lang;
 	
 		print "<tr><td class=\"shade2\" >";
 		print_help_link("desc_descent_help", "qm");
-		print $gm_lang["descent_steps"]."&nbsp;</td>";
+		print GM_LANG_descent_steps."&nbsp;</td>";
 		print "<td class=\"shade1 vmiddle\">";
 		print "<input class=\"pedigree_form\" type=\"text\" size=\"3\" name=\"num_descent\" value=\"".$this->num_descent."\" />";
 		print "</td></tr>";
 	}
 	
 	public function PrintInputShowSpouse() {
-		global $gm_lang;
 		
 		print "<tr><td class=\"shade2\" >";
 		print_help_link("show_spouse_help", "qm");
-		print $gm_lang["show_spouses"]."&nbsp;</td>";
+		print GM_LANG_show_spouses."&nbsp;</td>";
 		print "<td class=\"shade1 vmiddle\">";
 		print "<input type=\"checkbox\" value=\"1\" name=\"show_spouse\"";
 		if ($this->show_spouse) print " checked=\"checked\"";
@@ -114,7 +111,7 @@ class FamilyBookController extends ChartController {
 	}
 	
 	public function PrintFamilyBook($person, $descent) {
-	    global $gm_lang, $firstrun;
+	    global $firstrun;
 	    
 		if ($descent == 0) return;
 		
@@ -164,7 +161,7 @@ class FamilyBookController extends ChartController {
 	}
 	
 	public function PrintDescendancy($person, $count) {
-		global $bwidth, $bheight, $TEXT_DIRECTION, $GM_IMAGES, $gm_lang;
+		global $bwidth, $bheight, $TEXT_DIRECTION, $GM_IMAGES;
 
 		if ($count >= $this->dgenerations) return 0;
 		// Table level 1
@@ -276,7 +273,7 @@ class FamilyBookController extends ChartController {
 					else print "ltr\" style=\"position:absolute; ";
 					print "width:10px; height:10px;\">";
 					if ($this->view != "preview") {
-						print "<a href=\"javascript: ".$gm_lang["show"]."\" onclick=\"return togglechildrenbox(".$this->boxcount.");\" onmouseover=\"swap_image('larrow".$this->boxcount."',3);\" onmouseout=\"swap_image('larrow".$this->boxcount."',3);\">";
+						print "<a href=\"javascript: ".GM_LANG_show."\" onclick=\"return togglechildrenbox(".$this->boxcount.");\" onmouseover=\"swap_image('larrow".$this->boxcount."',3);\" onmouseout=\"swap_image('larrow".$this->boxcount."',3);\">";
 						print "<img id=\"larrow".$this->boxcount."\" src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["darrow"]["other"]."\" border=\"0\" alt=\"\" />";
 						print "</a>";
 					}
@@ -298,7 +295,7 @@ class FamilyBookController extends ChartController {
 				   				else print "class=\"name1\">";
 								print $spouse->name;
 							}
-							else print $gm_lang["private"];
+							else print GM_LANG_private;
 							print "<br /></span></a>";
 						}
 						foreach($sfamily->children as $ckey => $child) {
@@ -309,14 +306,14 @@ class FamilyBookController extends ChartController {
 					   			else print "class=\"name1\">&lt; ";
 								print $child->name;
 							}
-							else print ">" . $gm_lang["private"];
+							else print ">" . GM_LANG_private;
 							print "<br /></span></a>";
 						}
 					}
 					//-- print the siblings
 					foreach($person->childfamilies as $key => $cfamily) {
 						if($cfamily->husb_id != "" || $cfamily->wife_id != "") {
-							print "<span class=\"name1\"><br />".$gm_lang["parents"]."<br /></span>";
+							print "<span class=\"name1\"><br />".GM_LANG_parents."<br /></span>";
 							if ($cfamily->husb_id != "") {
 								print "\n\t\t\t\t&nbsp;&nbsp;<a href=\"familybook.php?rootid=".$cfamily->husb_id."&amp;show_spouse=".$this->show_spouse."&amp;show_details=".$this->show_details."&amp;num_generations=".$this->num_generations."&amp;box_width=".$this->box_width."&amp;num_descent=".$this->num_descent."\"><span ";
 								if ($cfamily->husb->disp_name) {
@@ -325,7 +322,7 @@ class FamilyBookController extends ChartController {
 					   				else print "class=\"name1\">";
 									print $cfamily->husb->name;
 								}
-								else print $gm_lang["private"];
+								else print GM_LANG_private;
 								print "<br /></span></a>";
 							}
 							if ($cfamily->wife_id != "") {
@@ -336,12 +333,12 @@ class FamilyBookController extends ChartController {
 					   				else print "class=\"name1\">";
 									print $cfamily->wife->name;
 								}
-								else print $gm_lang["private"];
+								else print GM_LANG_private;
 								print "<br /></span></a>";
 							}
 						}
 						if ($cfamily->children_count > 1) {
-							print "<span class=\"name1\"><br />".$gm_lang["siblings"]."<br /></span>";
+							print "<span class=\"name1\"><br />".GM_LANG_siblings."<br /></span>";
 							foreach($cfamily->children as $key2 => $child) {
 								if ($child->xref != $person->xref) {
 									print "\n\t\t\t\t&nbsp;&nbsp;<a href=\"familybook.php?rootid=".$child->xref."&amp;show_spouse=".$this->show_spouse."&amp;show_details=".$this->show_details."&amp;num_generations=".$this->num_generations."&amp;box_width=".$this->box_width."&amp;num_descent=".$this->num_descent."\"><span ";
@@ -351,7 +348,7 @@ class FamilyBookController extends ChartController {
 						   				else print "class=\"name1\"> ";
 										print $child->name;
 									}
-									else print ">". $gm_lang["private"];
+									else print ">". GM_LANG_private;
 									print "<br /></span></a>";
 								}
 							}

@@ -72,7 +72,6 @@ class RepositoryController extends DetailController {
 	 * @return string
 	 */
 	protected function getPageTitle() {
-		global $gm_lang;
 
 		if (is_null($this->pagetitle)) {
 			$this->pagetitle = "";
@@ -80,7 +79,7 @@ class RepositoryController extends DetailController {
 				$this->pagetitle .= $this->repo->title." - ";
 				if (GedcomConfig::$SHOW_ID_NUMBERS) $this->pagetitle .= $this->repo->xref." - ";
 			}
-			$this->pagetitle .= $gm_lang["repo_info"];
+			$this->pagetitle .= GM_LANG_repo_info;
 		}
 		return $this->pagetitle;
 	}
@@ -90,22 +89,22 @@ class RepositoryController extends DetailController {
 	 * @return Menu
 	 */
 	public function &getEditMenu() {
-		global $gm_lang, $gm_user;
+		global $gm_user;
 		
 		// edit repo menu
-		$menu = new Menu($gm_lang['edit_repo']);
+		$menu = new Menu(GM_LANG_edit_repo);
 
 		if (!$this->repo->isdeleted) {
 			// edit repo / edit_raw
 			if ($gm_user->userCanEditGedlines()) {
-				$submenu = new Menu($gm_lang['edit_raw']);
+				$submenu = new Menu(GM_LANG_edit_raw);
 				$submenu->addLink("edit_raw('".$this->repo->xref."', 'edit_raw', 'REPO');");
 				$menu->addSubmenu($submenu);
 			}
 
 			// edit repo / delete_repo
-			$submenu = new Menu($gm_lang['delete_repo']);
-			$submenu->addLink("if (confirm('".$gm_lang["confirm_delete_repo"]."'))  deleterepository('".$this->repo->xref."', 'delete_repository'); ");
+			$submenu = new Menu(GM_LANG_delete_repo);
+			$submenu->addLink("if (confirm('".GM_LANG_confirm_delete_repo."'))  deleterepository('".$this->repo->xref."', 'delete_repository'); ");
 			$menu->addSubmenu($submenu);
 
 		}
@@ -116,8 +115,8 @@ class RepositoryController extends DetailController {
 			$menu->addSubmenu($submenu);
 
 			// edit_repo / show/hide changes
-			if (!$this->repo->show_changes) $submenu = new Menu($gm_lang['show_changes']);
-			else $submenu = new Menu($gm_lang['hide_changes']);
+			if (!$this->repo->show_changes) $submenu = new Menu(GM_LANG_show_changes);
+			else $submenu = new Menu(GM_LANG_hide_changes);
 			$submenu->addLink('showchanges();');
 			$menu->addSubmenu($submenu);
 		}
@@ -129,28 +128,28 @@ class RepositoryController extends DetailController {
 	 * @return Menu
 	 */
 	public function &getOtherMenu() {
-		global $GEDCOMID, $gm_lang;
+		global $GEDCOMID;
 		global $ENABLE_CLIPPINGS_CART, $gm_user;
 		
 		// other menu
-		$menu = new Menu($gm_lang['other']);
+		$menu = new Menu(GM_LANG_other);
 		if ($gm_user->userCanViewGedlines()) {
 				// other / view_gedcom
 				if ($this->repo->show_changes && $this->repo->canedit) $execute = "show_gedcom_record('new');";
 				else $execute = "show_gedcom_record();";
-				$submenu = new Menu($gm_lang['view_gedcom']);
+				$submenu = new Menu(GM_LANG_view_gedcom);
 				$submenu->addLink($execute);
 				$menu->addSubmenu($submenu);
 		}
 		if ($ENABLE_CLIPPINGS_CART >= $gm_user->getUserAccessLevel()) {
 				// other / add_to_cart
-				$submenu = new Menu($gm_lang['add_to_cart']);
+				$submenu = new Menu(GM_LANG_add_to_cart);
 				$submenu->addLink('clippings.php?action=add&id='.$this->repo->xref.'&type=repo');
 				$menu->addSubmenu($submenu);
 		}
 		if ($this->repo->disp && !empty($this->uname)) {
 				// other / add_to_my_favorites
-				$submenu = new Menu($gm_lang['add_to_my_favorites']);
+				$submenu = new Menu(GM_LANG_add_to_my_favorites);
 				$submenu->addLink('repo.php?action=addfav&rid='.$this->repo->xref.'&gedid='.$GEDCOMID);
 				$menu->addSubmenu($submenu);
 		}

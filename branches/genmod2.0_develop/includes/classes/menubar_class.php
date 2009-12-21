@@ -56,7 +56,7 @@ abstract class MenuBar {
 	 * @return Menu		the menu item
 	 */
 	public function GetCustomMenu() {
-		global $gm_lang, $gm_user, $DBCONN;
+		global $gm_user, $DBCONN;
 		
 		// Retrieve the current pages stored in the DB
 		$sql = "SELECT * FROM ".TBLPREFIX."pages";
@@ -72,7 +72,7 @@ abstract class MenuBar {
 			
 		//-- My Pages
 		if (count($pages) > 0) {
-			$menu = new Menu($gm_lang["my_pages"]);
+			$menu = new Menu(GM_LANG_my_pages);
 			foreach ( $pages as $key => $page) {
 				$submenu = new Menu($page["title"], "");
 				$submenu->addLink("custompage.php?action=show&id=".$page["id"]);
@@ -81,8 +81,8 @@ abstract class MenuBar {
 		}
 		else $menu = "";
 		if ($gm_user->userIsAdmin()) {
-			if (!is_object($menu)) $menu = new Menu($gm_lang["my_pages"]);
-			$submenu = new Menu($gm_lang["edit_pages"], "");
+			if (!is_object($menu)) $menu = new Menu(GM_LANG_my_pages);
+			$submenu = new Menu(GM_LANG_edit_pages, "");
 			$submenu->addLink("custompage.php?action=edit");
 			$menu->addSubmenu($submenu);
 		}
@@ -94,25 +94,25 @@ abstract class MenuBar {
 	 * @return Menu		the menu item
 	 */
 	public function GetFileMenu() {
-		global $GEDCOMID, $gm_lang;
-		global $SCRIPT_NAME, $QUERY_STRING;
+		global $GEDCOMID;
+		global $QUERY_STRING;
 		global $ALLOW_CHANGE_GEDCOM, $GEDCOMS, $gm_user;
 		
 
 		//-- main file menu item
-		$menu = new Menu($gm_lang["menu_file"]);
+		$menu = new Menu(GM_LANG_menu_file);
 		
 		// NOTE: Login link
 		if (empty($gm_user->username)) {
-			$submenu = new Menu($gm_lang["login"]);
-			if (!LOGIN_URL == "") $submenu->addLink(LOGIN_URL."?url=".urlencode(basename($SCRIPT_NAME)."?".$QUERY_STRING."&gedid=$GEDCOMID"));
-			else $submenu->addLink(SERVER_URL."login.php?url=".urlencode(basename($SCRIPT_NAME)."?".$QUERY_STRING."&gedid=$GEDCOMID"));
+			$submenu = new Menu(GM_LANG_login);
+			if (!LOGIN_URL == "") $submenu->addLink(LOGIN_URL."?url=".urlencode(basename(SCRIPT_NAME)."?".$QUERY_STRING."&gedid=$GEDCOMID"));
+			else $submenu->addLink(SERVER_URL."login.php?url=".urlencode(basename(SCRIPT_NAME)."?".$QUERY_STRING."&gedid=$GEDCOMID"));
 			$menu->addSubmenu($submenu);
 		}
 		
 		// NOTE: Open GEDCOM
 		if ($ALLOW_CHANGE_GEDCOM && count($GEDCOMS)>1) {
-			$submenu = new Menu($gm_lang["menu_open"]);
+			$submenu = new Menu(GM_LANG_menu_open);
 			$menu->addSubmenu($submenu);
 		
 		// NOTE: Add GEDCOMS to open
@@ -125,30 +125,30 @@ abstract class MenuBar {
 		
 		// NOTE: Admin link
 		if ($gm_user->canadmin || ($gm_user->userGedcomAdmin($GEDCOMID))) {
-			$submenu = new Menu($gm_lang["admin"]);
+			$submenu = new Menu(GM_LANG_admin);
 			$submenu->addLink("admin.php");
 			$menu->addSubmenu($submenu);
 		}
 		
 		// NOTE: User page
-		$submenu = new Menu($gm_lang["welcome_page"]);
+		$submenu = new Menu(GM_LANG_welcome_page);
 		$submenu->addLink("index.php?command=gedcom");
 		$menu->addSubmenu($submenu);
 		
 		// NOTE: User page
-		$submenu = new Menu($gm_lang["mgv"]);
+		$submenu = new Menu(GM_LANG_mgv);
 		$submenu->addLink("index.php?command=user");
 		$menu->addSubmenu($submenu);
 		
 		// NOTE: Print preview
-		$submenu = new Menu($gm_lang["print_preview"]);
+		$submenu = new Menu(GM_LANG_print_preview);
 		// TODO: Querystring contains htmlcode, kills the JS
-		$submenu->addLink($SCRIPT_NAME."?view=preview&".htmlentities(GetQueryString()));
+		$submenu->addLink(SCRIPT_NAME."?view=preview&".htmlentities(GetQueryString()));
 		$menu->addSubmenu($submenu);
 		
 		// NOTE: Logout link
 		if ($gm_user->username != "") {
-			$submenu = new Menu($gm_lang["logout"]);
+			$submenu = new Menu(GM_LANG_logout);
 			$submenu->addLink("index.php?logout=1");
 			$menu->addSubmenu($submenu);
 		}
@@ -157,30 +157,29 @@ abstract class MenuBar {
 	}
 
 	public function GetEditMenu() {
-		global $SCRIPT_NAME, $QUERY_STRING;
+		global $QUERY_STRING;
 		global $ALLOW_CHANGE_GEDCOM;
 		
 		global $ENABLE_CLIPPINGS_CART, $gm_user;
-		global $gm_lang;
 		
 		//-- main edit menu item
-		$menu = new Menu($gm_lang["edit"], "#");
+		$menu = new Menu(GM_LANG_edit, "#");
 		
 		// Clippings menu
 		if (file_exists("clippings.php") &&($ENABLE_CLIPPINGS_CART > $gm_user->getUserAccessLevel())) {
 			//-- main clippings menu item
-			$submenu = new Menu($gm_lang["clippings_cart"]);
+			$submenu = new Menu(GM_LANG_clippings_cart);
 			$submenu->addLink("clippings.php");
 			$menu->addSubmenu($submenu);
 		}
 				
 		//-- search_general sub menu
-		$submenu = new Menu($gm_lang["search"]);
+		$submenu = new Menu(GM_LANG_search);
 		$submenu->addLink("search.php");
 		$menu->addSubmenu($submenu);
 		
 		if ($gm_user->editaccount) {
-			$submenu = new Menu($gm_lang["editowndata"]);
+			$submenu = new Menu(GM_LANG_editowndata);
 			$submenu->addLink("edituser.php");
 			$menu->addSubmenu($submenu);
 		}
@@ -189,24 +188,24 @@ abstract class MenuBar {
 	}
 	
 	public function GetViewMenu() {
-		global $gm_lang, $SCRIPT_NAME, $gm_language, $language_settings;
+		global $gm_language, $language_settings;
 		global $LANGUAGE;
 		global $ALLOW_USER_THEMES, $gm_user;
 		
 		//-- main edit menu item
-		$menu = new Menu($gm_lang["menu_view"]);
+		$menu = new Menu(GM_LANG_menu_view);
 		
 		// Language selector
 		if (GedcomConfig::$ENABLE_MULTI_LANGUAGE) {
 			// Change language
-			$submenu = new Menu($gm_lang["inc_languages"]);
+			$submenu = new Menu(GM_LANG_inc_languages);
 			$menu->addSubmenu($submenu);
 			
 			// NOTE: Add languages available
 			foreach ($gm_language as $key=>$value) {
 				if ($language_settings[$key]["gm_lang_use"]) {
-					$submenu = new Menu(self::GetSubmenuText($gm_lang[$key], ($LANGUAGE == $key)), false);
-					$submenu->addLink($SCRIPT_NAME."?changelanguage=yes&NEWLANGUAGE=".$key."&".htmlentities(GetQueryString()));
+					$submenu = new Menu(self::GetSubmenuText(constant("GM_LANG_".$key), ($LANGUAGE == $key)), false);
+					$submenu->addLink(SCRIPT_NAME."?changelanguage=yes&NEWLANGUAGE=".$key."&".htmlentities(GetQueryString()));
 					$menu->submenus[count($menu->submenus)-1]->submenus[]=$submenu;
 				}
 			}
@@ -215,7 +214,7 @@ abstract class MenuBar {
 		// Theme selector
 		if (GedcomConfig::$ALLOW_THEME_DROPDOWN && $ALLOW_USER_THEMES) {
 			// Change theme
-			$submenu = new Menu($gm_lang["inc_themes"]);
+			$submenu = new Menu(GM_LANG_inc_themes);
 			$menu->addSubmenu($submenu);
 
 			isset($_SERVER["QUERY_STRING"]) == true?$tqstring = "?".$_SERVER["QUERY_STRING"]:$tqstring = "";
@@ -241,21 +240,21 @@ abstract class MenuBar {
 		}
 
 		// Calendar menu
-		$submenu = new Menu($gm_lang["menu_calendar"]);
+		$submenu = new Menu(GM_LANG_menu_calendar);
 		$menu->addSubmenu($submenu);
 		
 		// Day Calendar
-		$submenu = new Menu($gm_lang["menu_calendar_day"]);
+		$submenu = new Menu(GM_LANG_menu_calendar_day);
 		$submenu->addLink("calendar.php");
 		$menu->submenus[count($menu->submenus)-1]->submenus[]=$submenu;
 		
 		// Month Calendar
-		$submenu = new Menu($gm_lang["menu_calendar_month"]);
+		$submenu = new Menu(GM_LANG_menu_calendar_month);
 		$submenu->addLink("calendar.php?action=calendar");
 		$menu->submenus[count($menu->submenus)-1]->submenus[]=$submenu;
 		
 		// Year Calendar
-		$submenu = new Menu($gm_lang["menu_calendar_year"]);
+		$submenu = new Menu(GM_LANG_menu_calendar_year);
 		$submenu->addLink("calendar.php?action=year");
 		$menu->submenus[count($menu->submenus)-1]->submenus[]=$submenu;
 		
@@ -263,14 +262,14 @@ abstract class MenuBar {
 	}
 	
 	public function GetFavoritesMenu() {
-		global $gm_lang, $gm_user;
+		global $gm_user;
 		global $GEDCOMID;
 		
 		// NOTE: Favorites
-		$menu = new Menu($gm_lang["menu_favorites"]);
+		$menu = new Menu(GM_LANG_menu_favorites);
 		
 		if ($gm_user->username != "") {
-			$submenu = new Menu($gm_lang["my_favorites"]);
+			$submenu = new Menu(GM_LANG_my_favorites);
 			$menu->addSubmenu($submenu);
 			$userfavs = FavoritesController::getUserFavorites($gm_user->username);
 		}
@@ -288,7 +287,7 @@ abstract class MenuBar {
 		// NOTE: Gedcom Favorites
 		$gedcomfavs = FavoritesController::getGedcomFavorites($GEDCOMID);
 		if (count($gedcomfavs)>0) {
-			$submenu = new Menu($gm_lang["gedcom_favorites"]);
+			$submenu = new Menu(GM_LANG_gedcom_favorites);
 			$menu->addSubmenu($submenu);
 			
 			foreach($gedcomfavs as $key => $favorite) {
@@ -306,22 +305,22 @@ abstract class MenuBar {
 	 * @return Menu		the menu item
 	 */
 	public function GetChartsMenu($rootid='',$myid='') {
-		global $gm_lang, $gm_user, $GEDCOMID;
+		global $gm_user, $GEDCOMID;
 		
 		//-- main charts menu item
 		$link = "pedigree.php";
 		if ($rootid) {
 			$link .= "?rootid=".$rootid;
-			$menu = new Menu($gm_lang["charts"]);
+			$menu = new Menu(GM_LANG_charts);
 			$menu->addLink($link);
 		}
 		else {
 			// top menubar
-			$menu = new Menu($gm_lang["charts"]);
+			$menu = new Menu(GM_LANG_charts);
 			$menu->addLink($link);
 		}
 		//-- pedigree sub menu
-		$submenu = new Menu($gm_lang["pedigree_chart"]);
+		$submenu = new Menu(GM_LANG_pedigree_chart);
 		$submenu->addLink($link);
 		$menu->addSubmenu($submenu);
 		
@@ -329,7 +328,7 @@ abstract class MenuBar {
 		if (file_exists("descendancy.php")) {
 			$link = "descendancy.php";
 			if ($rootid) $link .= "?pid=".$rootid;
-			$submenu = new Menu($gm_lang["descend_chart"]);
+			$submenu = new Menu(GM_LANG_descend_chart);
 			$submenu->addLink($link);
 			$menu->addSubmenu($submenu);
 		}
@@ -337,7 +336,7 @@ abstract class MenuBar {
 		if (file_exists("ancestry.php")) {
 			$link = "ancestry.php";
 			if ($rootid) $link .= "?rootid=".$rootid;
-			$submenu = new Menu($gm_lang["ancestry_chart"]);
+			$submenu = new Menu(GM_LANG_ancestry_chart);
 			$submenu->addLink($link);
 			$menu->addSubmenu($submenu);
 		}
@@ -345,7 +344,7 @@ abstract class MenuBar {
 		if (file_exists("fanchart.php") and function_exists("imagettftext")) {
 			$link = "fanchart.php";
 			if ($rootid) $link .= "?rootid=".$rootid;
-			$submenu = new Menu($gm_lang["fan_chart"]);
+			$submenu = new Menu(GM_LANG_fan_chart);
 			$submenu->addLink($link);
 			$menu->addSubmenu($submenu);
 		}
@@ -353,7 +352,7 @@ abstract class MenuBar {
 		if (file_exists("hourglass.php")) {
 			$link = "hourglass.php";
 			if ($rootid) $link .= "?pid=".$rootid;
-			$submenu = new Menu($gm_lang["hourglass_chart"]);
+			$submenu = new Menu(GM_LANG_hourglass_chart);
 			$submenu->addLink($link);
 			$menu->addSubmenu($submenu);
 		}
@@ -361,7 +360,7 @@ abstract class MenuBar {
 		if (file_exists("familybook.php")) {
 			$link = "familybook.php";
 			if ($rootid) $link .= "?pid=".$rootid;
-			$submenu = new Menu($gm_lang["familybook_chart"]);
+			$submenu = new Menu(GM_LANG_familybook_chart);
 			$submenu->addLink($link);
 			$menu->addSubmenu($submenu);
 		}
@@ -369,7 +368,7 @@ abstract class MenuBar {
 		if (file_exists("timeline.php")) {
 			$link = "timeline.php";
 			if ($rootid) $link .= "?pids[]=".$rootid;
-			$submenu = new Menu($gm_lang["timeline_chart"]);
+			$submenu = new Menu(GM_LANG_timeline_chart);
 			$submenu->addLink($link);
 			$menu->addSubmenu($submenu);
 		}
@@ -384,10 +383,10 @@ abstract class MenuBar {
 				$link = "relationship.php";
 				if ($rootid) {
 					$link .= "?pid1=".$myid."&pid2=".$rootid;
-					$submenu = new Menu($gm_lang["relationship_to_me"]);
+					$submenu = new Menu(GM_LANG_relationship_to_me);
 					$submenu->addLink($link);
 				} else {
-					$submenu = new Menu($gm_lang["relationship_chart"]);
+					$submenu = new Menu(GM_LANG_relationship_chart);
 					$submenu->addLink($link);
 				}
 				$menu->addSubmenu($submenu);
@@ -395,7 +394,7 @@ abstract class MenuBar {
 		}
 		//-- produce a plot of statistics
 		if (!$rootid && file_exists("statistics.php") && file_exists("modules/jpgraph")) {
-			$submenu = new Menu($gm_lang["statistics"]);
+			$submenu = new Menu(GM_LANG_statistics);
 			$submenu->addLink("statistics.php");
 			$menu->addSubmenu($submenu);
 		}
@@ -403,11 +402,11 @@ abstract class MenuBar {
 	}
 	
 	public function GetReportMenu($pid="", $type="") {
-		global $gm_lang, $gm_user;
+		global $gm_user;
 		global $LANGUAGE, $PRIV_PUBLIC, $PRIV_USER, $PRIV_NONE, $PRIV_HIDE;
 
 		if (!file_exists("reportengine.php")) return null;
-		$menu = new Menu($gm_lang["reports"]);
+		$menu = new Menu(GM_LANG_reports);
 		
 		//-- reports submenus
 		$reports = GetReportList();
@@ -461,73 +460,73 @@ abstract class MenuBar {
 	 * @return Menu		the menu item
 	 */
 	public function GetListMenu() {
-		global $gm_lang, $gm_user;
+		global $gm_user;
 		global $SHOW_SOURCES;
 		
 		//-- main lists menu item
-		$menu = new Menu($gm_lang["lists"]);
+		$menu = new Menu(GM_LANG_lists);
 		
 		//-- indi list sub menu
-		$submenu = new Menu($gm_lang["individual_list"]);
+		$submenu = new Menu(GM_LANG_individual_list);
 		$submenu->addLink("indilist.php");
 		$menu->addSubmenu($submenu);
 		//-- famlist sub menu
 		if (file_exists("famlist.php")) {
-			$submenu = new Menu($gm_lang["family_list"]);
+			$submenu = new Menu(GM_LANG_family_list);
 			$submenu->addLink("famlist.php");
 			$menu->addSubmenu($submenu);
 		}
 		//-- source
 		if (file_exists("sourcelist.php") && $SHOW_SOURCES >= $gm_user->getUserAccessLevel()) {
-			$submenu = new Menu($gm_lang["source_list"]);
+			$submenu = new Menu(GM_LANG_source_list);
 			$submenu->addLink("sourcelist.php");
 			$menu->addSubmenu($submenu);
 		}
 		//-- repository
 		if (file_exists("repolist.php")&& $SHOW_SOURCES >= $gm_user->getUserAccessLevel()) {
-			$submenu = new Menu($gm_lang["repo_list"]);
+			$submenu = new Menu(GM_LANG_repo_list);
 			$submenu->addLink("repolist.php");
 			$menu->addSubmenu($submenu);
 		}
 		//-- general notes
 		if (file_exists("notelist.php")) {
-			$submenu = new Menu($gm_lang["note_list"]);
+			$submenu = new Menu(GM_LANG_note_list);
 			$submenu->addLink("notelist.php");
 			$menu->addSubmenu($submenu);
 		}
 		//-- places
 		if (file_exists("placelist.php")) {
-			$submenu = new Menu($gm_lang["place_list"]);
+			$submenu = new Menu(GM_LANG_place_list);
 			$submenu->addLink("placelist.php");
 			$menu->addSubmenu($submenu);
 		}
 		//-- medialist
 		if (file_exists("medialist.php")) {
-			$submenu = new Menu($gm_lang["media_list"]);
+			$submenu = new Menu(GM_LANG_media_list);
 			$submenu->addLink("medialist.php");
 			$menu->addSubmenu($submenu);
 		}
 		//-- list most ancient parent of a family
 //		if (file_exists("patriarchlist.php")) {
-//			$submenu = new Menu($gm_lang["patriarch_list"]);
+//			$submenu = new Menu(GM_LANG_patriarch_list);
 //			$submenu->addLink("patriarchlist.php");
 //			$menu->addSubmenu($submenu);
 //		}
 		//-- aliveinyear
 		if (file_exists("aliveinyear.php")) {
-			$submenu = new Menu($gm_lang["alive_in_year"]);
+			$submenu = new Menu(GM_LANG_alive_in_year);
 			$submenu->addLink("aliveinyear.php");
 			$menu->addSubmenu($submenu);
 		}
 		// NOTE: Unlinked individuals and families
 		if (file_exists("unlinked.php")) {
-			$submenu = new Menu($gm_lang["unlink_list"]);
+			$submenu = new Menu(GM_LANG_unlink_list);
 			$submenu->addLink("unlinked.php");
 			$menu->addSubmenu($submenu);
 		}
 		//-- Actionlist (admins only!)
 		if (file_exists("actionlist.php") && $gm_user->ShowActionLog()) {
-			$submenu = new Menu($gm_lang["actionlist"]);
+			$submenu = new Menu(GM_LANG_actionlist);
 			$submenu->addLink("actionlist.php");
 			$menu->addSubmenu($submenu);
 		}
@@ -539,31 +538,31 @@ abstract class MenuBar {
 	 * @return Menu		the menu item
 	 */
 	public function GetHelperMenu() {
-		global $gm_lang, $spider;
-		global $SCRIPT_NAME, $QUERY_STRING, $helpindex, $action;
+		global $spider;
+		global $QUERY_STRING, $helpindex, $action;
 		
 		//-- main help menu item
-		$menu = new Menu($gm_lang["help_page"]);
+		$menu = new Menu(GM_LANG_help_page);
 
 		//-- help_for_this_page sub menu
-		$submenu = new Menu($gm_lang["help_for_this_page"]);
-		$submenu->addLink("window.open.help_help_".basename($SCRIPT_NAME)."&action=".$action);
+		$submenu = new Menu(GM_LANG_help_for_this_page);
+		$submenu->addLink("window.open.help_help_".basename(SCRIPT_NAME)."&action=".$action);
 		$menu->addSubmenu($submenu);
 		
 		//-- help_contents sub menu
-		$submenu = new Menu($gm_lang["help_contents"]);
+		$submenu = new Menu(GM_LANG_help_contents);
 		$submenu->addLink("window.open.help_help_contents_help");
 		$menu->addSubmenu($submenu);
 		
 		//-- faq sub menu
 		if (file_exists("faq.php")) {
-			$submenu = new Menu($gm_lang["faq_list"]);
+			$submenu = new Menu(GM_LANG_faq_list);
 			$submenu->addLink("faq.php");
 			$menu->addSubmenu($submenu);
 		}
 		//-- searchhelp sub menu
 		if (file_exists("searchhelp.php")) {
-			$submenu = new Menu($gm_lang["hs_title"]);
+			$submenu = new Menu(GM_LANG_hs_title);
 			$submenu->addLink("window.open_index2.php?page=searchhelp");
 			$menu->addSubmenu($submenu);
 		}
@@ -581,12 +580,12 @@ abstract class MenuBar {
 		if (!$spider) {
 			$menu->addSeperator();
 			if ($_SESSION["show_context_help"]) {
-				$submenu = new Menu($gm_lang["hide_contexthelp"]);
-				$submenu->addLink($SCRIPT_NAME."?".$QUERY_STRING."&show_context_help=no");
+				$submenu = new Menu(GM_LANG_hide_contexthelp);
+				$submenu->addLink(SCRIPT_NAME."?".$QUERY_STRING."&show_context_help=no");
 			}
 			else {
-				$submenu = new Menu($gm_lang["show_contexthelp"]);
-				$submenu->addLink($SCRIPT_NAME."?".$QUERY_STRING."&show_context_help=yes");
+				$submenu = new Menu(GM_LANG_show_contexthelp);
+				$submenu->addLink(SCRIPT_NAME."?".$QUERY_STRING."&show_context_help=yes");
 			}
 			$menu->addSubmenu($submenu);
 		}
@@ -594,10 +593,9 @@ abstract class MenuBar {
 	}
 	
 	public function GetThisPersonMenu(&$controller) {
-		global $gm_lang;
 		
 		//-- main edit menu item
-		$menu = new Menu($gm_lang["this_individual"]);
+		$menu = new Menu(GM_LANG_this_individual);
 		
 		// Charts menu
 		$submenu = self::GetChartsMenu($controller->xref);
@@ -623,11 +621,10 @@ abstract class MenuBar {
 	}
 	
 	public function GetThisFamilyMenu(&$controller) {
-		global $gm_lang;
 		
 		if (!$controller->family->isempty) {
 			//-- main edit menu item
-			$menu = new Menu($gm_lang["this_family"]);
+			$menu = new Menu(GM_LANG_this_family);
 			
 			// Charts menu
 			$submenu = $controller->getChartsMenu();
@@ -654,11 +651,10 @@ abstract class MenuBar {
 	}
 	
 	public function GetThisSourceMenu(&$source_controller) {
-		global $gm_lang;
 		
 		if ($source_controller->source->canedit || $source_controller->display_other_menu) {
 			//-- main edit menu item
-			$menu = new Menu($gm_lang["this_source"]);
+			$menu = new Menu(GM_LANG_this_source);
 
 			// Reports menu
 			$submenu = self::GetReportMenu($source_controller->xref, "sour");
@@ -681,11 +677,10 @@ abstract class MenuBar {
 	}
 	
 	public function GetThisRepoMenu(&$repository_controller) {
-		global $gm_lang;
 		
 		if ($repository_controller->repo->canedit || $repository_controller->display_other_menu) {
 			//-- main edit menu item
-			$menu = new Menu($gm_lang["this_repository"]);
+			$menu = new Menu(GM_LANG_this_repository);
 		
 			// Reports menu
 			$submenu = self::GetReportMenu($repository_controller->xref, "repo");
@@ -707,11 +702,10 @@ abstract class MenuBar {
 	}
 	
 	public function GetThisMediaMenu(&$controller) {
-		global $gm_lang;
 		
 		if ($controller->media->canedit || !$controller->display_other_menu) {
 			//-- main edit menu item
-			$menu = new Menu($gm_lang["this_media"]);
+			$menu = new Menu(GM_LANG_this_media);
 			
 			// Reports menu
 			$submenu = self::GetReportMenu($controller->xref, "media");
@@ -735,11 +729,10 @@ abstract class MenuBar {
 	}
 	
 	public function GetThisNoteMenu(&$controller) {
-		global $gm_lang;
 		
 		if (!$controller->note->isempty && !$controller->note->isdeleted) {
 			//-- main edit menu item
-			$menu = new Menu($gm_lang["this_note"]);
+			$menu = new Menu(GM_LANG_this_note);
 			
 			// Reports menu
 			$submenu = self::GetReportMenu($controller->xref, "note");

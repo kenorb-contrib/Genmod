@@ -77,10 +77,9 @@ class RepoListController extends ListController {
 	 * @return string
 	 */
 	protected function getPageTitle() {
-		global $gm_lang;
 
 		if (is_null($this->pagetitle)) {
-			$this->pagetitle = $gm_lang["repo_list"];
+			$this->pagetitle = GM_LANG_repo_list;
 		}
 		return $this->pagetitle;
 	}

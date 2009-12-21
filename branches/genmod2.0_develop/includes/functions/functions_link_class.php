@@ -40,9 +40,9 @@ abstract class LinkFunctions {
 	 * @param		$element_id	The ID of the form field
 	 */
 	public function PrintFindIndiLink($element_id, $gedid) {
-		global $gm_lang, $GM_IMAGES, $GEDCOMID;
+		global $GM_IMAGES, $GEDCOMID;
 	
-		$text = $gm_lang["find_id"];
+		$text = GM_LANG_find_id;
 		if (isset($GM_IMAGES["indi"]["button"])) $Link = "<img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["indi"]["button"]."\" alt=\"".$text."\" title=\"".$text."\" border=\"0\" align=\"middle\" />";
 		else $Link = $text;
 		if (empty($gedid)) $gedid = $GEDCOMID;
@@ -61,9 +61,9 @@ abstract class LinkFunctions {
 	 */
 	 
 	public function PrintFindPlaceLink($element_id) {
-		global $gm_lang, $GM_IMAGES;
+		global $GM_IMAGES;
 	
-		$text = $gm_lang["find_place"];
+		$text = GM_LANG_find_place;
 		if (isset($GM_IMAGES["place"]["button"])) $Link = "<img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["place"]["button"]."\" alt=\"".$text."\" title=\"".$text."\" border=\"0\" align=\"middle\" />";
 		else $Link = $text;
 		print " <a href=\"javascript: ".$text."\" onclick=\"findPlace(document.getElementById('".$element_id."')); return false;\">";
@@ -81,9 +81,9 @@ abstract class LinkFunctions {
 	 * @param		$element_id	The ID of the form field
 	 */
 	public function PrintFindFamilyLink($element_id) {
-		global $gm_lang, $GM_IMAGES;
+		global $GM_IMAGES;
 	
-		$text = $gm_lang["find_family"];
+		$text = GM_LANG_find_family;
 		if (isset($GM_IMAGES["family"]["button"])) $Link = "<img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["family"]["button"]."\" alt=\"".$text."\" title=\"".$text."\" border=\"0\" align=\"middle\" />";
 		else $Link = $text;
 		print " <a href=\"javascript: ".$text."\" onclick=\"findFamily(document.getElementById('".$element_id."')); return false;\">";
@@ -101,9 +101,9 @@ abstract class LinkFunctions {
 	 * @param		$element_id	The ID of the form field
 	 */
 	public function PrintFindSourceLink($element_id) {
-		global $gm_lang, $GM_IMAGES;
+		global $GM_IMAGES;
 	
-		$text = $gm_lang["find_sourceid"];
+		$text = GM_LANG_find_sourceid;
 		if (isset($GM_IMAGES["source"]["button"])) $Link = "<img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["source"]["button"]."\" alt=\"".$text."\" title=\"".$text."\" border=\"0\" align=\"middle\" />";
 		else $Link = $text;
 		print " <a href=\"javascript: ".$text."\" onclick=\"findSource(document.getElementById('".$element_id."')); return false;\">";
@@ -121,9 +121,9 @@ abstract class LinkFunctions {
 	 * @param		$element_id	The ID of the form field
 	 */
 	public function PrintFindRepositoryLink($element_id) {
-		global $gm_lang, $GM_IMAGES;
+		global $GM_IMAGES;
 	
-		$text = $gm_lang["find_repository"];
+		$text = GM_LANG_find_repository;
 		if (isset($GM_IMAGES["repository"]["button"])) $Link = "<img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["repository"]["button"]."\" alt=\"".$text."\" title=\"".$text."\" border=\"0\" align=\"middle\" />";
 		else $Link = $text;
 		print " <a href=\"javascript: ".$text."\" onclick=\"findRepository(document.getElementById('".$element_id."')); return false;\">";
@@ -141,9 +141,9 @@ abstract class LinkFunctions {
 	 * @param		$element_id	The ID of the form field
 	 */
 	public function PrintFindMediaLink($element_id) {
-		global $gm_lang, $GM_IMAGES;
+		global $GM_IMAGES;
 	
-		$text = $gm_lang["find_media"];
+		$text = GM_LANG_find_media;
 		if (isset($GM_IMAGES["media"]["button"])) $Link = "<img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["media"]["button"]."\" alt=\"".$text."\" title=\"".$text."\" border=\"0\" align=\"middle\" />";
 		else $Link = $text;
 		print " <a href=\"javascript: ".$text."\" onclick=\"findMedia(document.getElementById('".$element_id."')); return false;\">";
@@ -161,9 +161,9 @@ abstract class LinkFunctions {
 	 * @param		$element_id	The ID of the form field
 	 */
 	public function PrintFindObjectLink($element_id) {
-		global $gm_lang, $GM_IMAGES;
+		global $GM_IMAGES;
 	
-		$text = $gm_lang["find_media"];
+		$text = GM_LANG_find_media;
 		if (isset($GM_IMAGES["media"]["button"])) $Link = "<img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["media"]["button"]."\" alt=\"".$text."\" title=\"".$text."\" border=\"0\" align=\"middle\" />";
 		else $Link = $text;
 		print " <a href=\"javascript: ".$text."\" onclick=\"findObject(document.getElementById('".$element_id."')); return false;\">";
@@ -181,9 +181,9 @@ abstract class LinkFunctions {
 	 * @param		$element_id	The ID of the form field
 	 */
 	public function PrintFindNoteLink($element_id) {
-		global $gm_lang, $GM_IMAGES;
+		global $GM_IMAGES;
 	
-		$text = $gm_lang["find_noteid"];
+		$text = GM_LANG_find_noteid;
 		if (isset($GM_IMAGES["note"]["button"])) $Link = "<img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["note"]["button"]."\" alt=\"".$text."\" title=\"".$text."\" border=\"0\" align=\"middle\" />";
 		else $Link = $text;
 		print " <a href=\"javascript: ".$text."\" onclick=\"findNote(document.getElementById('".$element_id."')); return false;\">";
@@ -201,9 +201,9 @@ abstract class LinkFunctions {
 	 * @param		$element_id	The ID of the form field
 	 */
 	public function PrintAddNewSourceLink($element_id) {
-		global $gm_lang, $GM_IMAGES;
+		global $GM_IMAGES;
 	
-		$text = $gm_lang["create_source"];
+		$text = GM_LANG_create_source;
 		if (isset($GM_IMAGES["addsource"]["button"])) $Link = "<img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["addsource"]["button"]."\" alt=\"".$text."\" title=\"".$text."\" border=\"0\" align=\"middle\" />";
 		else $Link = $text;
 		print "&nbsp;&nbsp;&nbsp;<a href=\"javascript: ".$text."\" onclick=\"addnewsource(document.getElementById('".$element_id."'), 'create_source'); return false;\">";
@@ -221,9 +221,9 @@ abstract class LinkFunctions {
 	 * @param		$element_id	The ID of the form field
 	 */
 	public function PrintAddNewRepositoryLink($element_id) {
-		global $gm_lang, $GM_IMAGES;
+		global $GM_IMAGES;
 	
-		$text = $gm_lang["create_repository"];
+		$text = GM_LANG_create_repository;
 		if (isset($GM_IMAGES["addrepository"]["button"])) $Link = "<img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["addrepository"]["button"]."\" alt=\"".$text."\" title=\"".$text."\" border=\"0\" align=\"middle\" />";
 		else $Link = $text;
 		print "&nbsp;&nbsp;&nbsp;<a href=\"javascript: ".$text."\" onclick=\"addnewrepository(document.getElementById('".$element_id."'), 'create_repository'); return false;\">";
@@ -241,9 +241,9 @@ abstract class LinkFunctions {
 	 * @param		$element_id	The ID of the form field
 	 */
 	public function PrintAddNewObjectLink($element_id) {
-		global $gm_lang, $GM_IMAGES;
+		global $GM_IMAGES;
 	
-		$text = $gm_lang["add_media"];
+		$text = GM_LANG_add_media;
 		if (isset($GM_IMAGES["addmedia"]["button"])) $Link = "<img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["addmedia"]["button"]."\" alt=\"".$text."\" title=\"".$text."\" border=\"0\" align=\"middle\" />";
 		else $Link = $text;
 		print "&nbsp;&nbsp;&nbsp;<a href=\"javascript: ".$text."\" onclick=\"addnewmedia(document.getElementById('".$element_id."'), 'create_media'); return false;\">";
@@ -261,9 +261,9 @@ abstract class LinkFunctions {
 	 * @param		$element_id	The ID of the form field
 	 */
 	public function PrintAddNewGNoteLink($element_id) {
-		global $gm_lang, $GM_IMAGES;
+		global $GM_IMAGES;
 	
-		$text = $gm_lang["create_general_note"];
+		$text = GM_LANG_create_general_note;
 		if (isset($GM_IMAGES["addnote"]["button"])) $Link = "<img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["addnote"]["button"]."\" alt=\"".$text."\" title=\"".$text."\" border=\"0\" align=\"middle\" />";
 		else $Link = $text;
 		print "&nbsp;&nbsp;&nbsp;<a href=\"javascript: ".$text."\" onclick=\"addnewgnote(document.getElementById('".$element_id."'), 'create_general_note'); return false;\">";
@@ -282,9 +282,9 @@ abstract class LinkFunctions {
 	 * @param		$element_id	The ID of the form field
 	 */
 	public function PrintSpecialCharLink($element_id) {
-		global $gm_lang, $GM_IMAGES;
+		global $GM_IMAGES;
 	
-		$text = $gm_lang["find_specialchar"];
+		$text = GM_LANG_find_specialchar;
 		if (isset($GM_IMAGES["keyboard"]["button"])) $Link = "<img id=\"".$element_id."_spec\" name=\"".$element_id."_spec\" src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["keyboard"]["button"]."\"  alt=\"".$text."\"  title=\"".$text."\" border=\"0\" align=\"middle\" />";
 		else $Link = $text;
 		print " <a href=\"javascript: ".$text."\" onclick=\"findSpecialChar(document.getElementById('$element_id')); return false;\">";
@@ -293,11 +293,10 @@ abstract class LinkFunctions {
 	}
 
 	public function PrintAutoPasteLink($element_id, $choices, $concat=1, $updatename=true) {
-		global $gm_lang;
 	
 		print "<small>";
 		foreach ($choices as $indexval => $choice) {
-			print " &nbsp;<a href=\"javascript: ".$gm_lang["copy"]."\" onclick=\"document.getElementById('".$element_id."').value ";
+			print " &nbsp;<a href=\"javascript: ".GM_LANG_copy."\" onclick=\"document.getElementById('".$element_id."').value ";
 			if ($concat) print "+=' "; else print "='";
 			print $choice."'; ";
 			if ($updatename) print "updatewholename(); ";

@@ -54,7 +54,7 @@ class Fact {
 	private $owner = null;			// Xref of the owner of this fact
 	private $owner_type = null;		// Datatype of the owner
 	private $disp = null;			// Result of ShowFactDetails
-	private $show = null;			// Result of ShowFact
+	private $show = null;			// Result of ShowFact. Facts in the factarray of other objects are already checked.
 	private $canedit = null;		// If privacy (resn) or the owner prevents editing
 	private $count = null;			// N-th fact of this type for the owner
 	private $style = null;			// Style to print this fact with
@@ -207,7 +207,7 @@ class Fact {
 		if (is_null($this->linktype)) {
 			$ct = preg_match("/1 (\w+) @.+@/", $this->factrec, $match);
 			if ($ct > 0) {
-				$types = array("INDI"=>"Person", "FAM"=>"Family", "SOUR"=>"Source", "REPO"=>"Repository", "OBJE"=>"MediaItem", "NOTE"=>"Note");
+				$types = array("INDI"=>"Person", "CHIL"=>"Person", "HUSB"=>"Person", "WIFE"=>"Person", "FAMS"=>"Family", "FAMC"=>"Family", "SOUR"=>"Source", "REPO"=>"Repository", "OBJE"=>"MediaItem", "NOTE"=>"Note");
 				$this->linktype = $types[$match[1]];
 			}
 			else $this->linktype = "";
@@ -334,7 +334,6 @@ class Fact {
 	 * @param string $pid		optional person ID (to print age)
 	 */
 	public function PrintFactDate($anchor=false, $time=false, $print_parents_age=false, $print_own_age=false, $prt=true) {
-		global $gm_lang;
 	
 		$prtstr = "";
 		$ct = preg_match("/2 DATE (.+)/", $this->factrec, $match);
@@ -371,7 +370,7 @@ class Fact {
 			// 1 DEAT Y with no DATE => print YES
 			// 1 DEAT N is not allowed
 			// It is not proper GEDCOM form to use a N(o) value with an event tag to infer that it did not happen.
-			if (preg_match("/^1\s(BIRT|DEAT|MARR|DIV|CHR|CREM|BURI)\sY/", $this->factrec) && !preg_match("/\n2\s(DATE|PLAC)/", $this->factrec)) $prtstr .= $gm_lang["yes"]."&nbsp;";
+			if (preg_match("/^1\s(BIRT|DEAT|MARR|DIV|CHR|CREM|BURI)\sY/", $this->factrec) && !preg_match("/\n2\s(DATE|PLAC)/", $this->factrec)) $prtstr .= GM_LANG_yes."&nbsp;";
 		}
 		
 		// gedcom indi age
@@ -399,8 +398,8 @@ class Fact {
 		foreach ($ages as $indexval=>$agerec) {
 			if (!empty($agerec)) {
 				$prtstr .= "<span class=\"label\">";
-				if ($indexval == 1) $prtstr .= $gm_lang["husband"];
-				else if ($indexval == 2) $prtstr .= $gm_lang["wife"];
+				if ($indexval == 1) $prtstr .= GM_LANG_husband;
+				else if ($indexval == 2) $prtstr .= GM_LANG_wife;
 				else $prtstr .= GM_FACT_AGE;
 				$prtstr .= "</span>: ";
 				$age = GetAgeAtEvent(substr($agerec,5));
@@ -424,7 +423,7 @@ class Fact {
 	 * @param boolean $lds		option to print LDS TEMPle and STATus
 	 */
 	public function PrintFactPlace($anchor=false, $sub=false, $lds=false, $prt=true) {
-		global $TEMPLE_CODES, $gm_lang;
+		global $TEMPLE_CODES;
 	
 		$printed = false;
 		$out = false;
@@ -530,15 +529,15 @@ class Fact {
 			if ($ct>0) {
 				$tcode = trim($match[1]);
 				if (array_key_exists($tcode, $TEMPLE_CODES)) {
-					$prtstr .= "<br />".$gm_lang["temple"].": ".$TEMPLE_CODES[$tcode];
+					$prtstr .= "<br />".GM_LANG_temple.": ".$TEMPLE_CODES[$tcode];
 				}
 				else {
-					$prtstr .= "<br />".$gm_lang["temple_code"].$tcode;
+					$prtstr .= "<br />".GM_LANG_temple_code.$tcode;
 				}
 			}
 			$ct = preg_match("/2 STAT (.*)/", $this->factrec, $match);
 			if ($ct>0) {
-				$prtstr .= "<br />".$gm_lang["status"].": ";
+				$prtstr .= "<br />".GM_LANG_status.": ";
 				$prtstr .= trim($match[1]);
 			}
 		}

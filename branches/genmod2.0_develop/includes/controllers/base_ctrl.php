@@ -63,7 +63,6 @@ abstract class BaseController {
 		$this->uname = $gm_user->username;
 		
 		$this->gedcomid = $GEDCOMID;
-		
 	}
 
 	public function __get($property) {
@@ -94,6 +93,14 @@ abstract class BaseController {
 				break;
 			default:
 				print "<span class=\"error\">Invalid property ".$property." for __get in ".get_class($this)." class</span><br />";
+				break;
+		}
+	}
+	
+	public function __set($property, $value) {
+		switch($property) {
+			default:
+				print "<span class=\"error\">Invalid property ".$property." for __set in ".get_class($this)." class</span><br />";
 				break;
 		}
 	}

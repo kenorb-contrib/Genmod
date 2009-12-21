@@ -343,23 +343,23 @@ abstract class ImportFunctions {
 	 * @param long $FILE_SIZE	the size of the file
 	 */
 	public function SetupProgressBar($FILE_SIZE) {
-		global $gm_lang, $gedid, $timelimit;
+		global $gedid, $timelimit;
 		?>
 		<script type="text/javascript">
 		<!--
 		function complete_progress(time, exectext, go_pedi, go_welc) {
 			progress = document.getElementById("progress_header");
-			if (progress) progress.innerHTML = '<?php print "<span class=\"error\"><b>".$gm_lang["import_complete"]."</b></span><br />";?>'+exectext+' '+time+' '+"<?php print $gm_lang["sec"]; ?>";
+			if (progress) progress.innerHTML = '<?php print "<span class=\"error\"><b>".GM_LANG_import_complete."</b></span><br />";?>'+exectext+' '+time+' '+"<?php print GM_LANG_sec; ?>";
 			progress = document.getElementById("link1");
 			if (progress) progress.innerHTML = '<a href="pedigree.php?gedid=<?php print $gedid; ?>">'+go_pedi+'</a>';
 			progress = document.getElementById("link2");
 			if (progress) progress.innerHTML = '<a href="index.php?command=gedcom&gedid=<?php print $gedid; ?>">'+go_welc+'</a>';
 			progress = document.getElementById("link3");
-			if (progress) progress.innerHTML = '<a href="editgedcoms.php">'+"<?php print $gm_lang["manage_gedcoms"]."</a>"; ?>";
+			if (progress) progress.innerHTML = '<a href="editgedcoms.php">'+"<?php print GM_LANG_manage_gedcoms."</a>"; ?>";
 		}
 		function wait_progress() {
 			progress = document.getElementById("progress_header");
-			if (progress) progress.innerHTML = '<?php print $gm_lang["please_be_patient"]; ?>';
+			if (progress) progress.innerHTML = '<?php print GM_LANG_please_be_patient; ?>';
 		}
 		
 		var FILE_SIZE = <?php print $FILE_SIZE; ?>;
@@ -386,7 +386,7 @@ abstract class ImportFunctions {
 		// NOTE: Print the progress bar for the GEDCOM file
 		print "<div>";
 			print "<div id=\"progress_header\" class=\"progress_box center\" style=\"float: left;\">\n";
-				print "<b>".$gm_lang["import_progress"]."</b>";
+				print "<b>".GM_LANG_import_progress."</b>";
 				print "<div class=\"inner_progress_bar center\">\n";
 					print "<div id=\"progress_div\" class=\"progress_bar center\">";
 					if (isset($_SESSION["TOTAL_BYTES"])) {
@@ -406,8 +406,8 @@ abstract class ImportFunctions {
 			
 			// NOTE: Print the progress bar for the time
 			print "<div id=\"progress_header\" class=\"progress_box center\">\n";
-				if ($timelimit == 0) print "<b>".$gm_lang["time_limit"]." ".$gm_lang["none"]."</b>";
-				else print "<b>".$gm_lang["time_limit"]." ".$timelimit." ".$gm_lang["sec"]."</b>";
+				if ($timelimit == 0) print "<b>".GM_LANG_time_limit." ".GM_LANG_none."</b>";
+				else print "<b>".GM_LANG_time_limit." ".$timelimit." ".GM_LANG_sec."</b>";
 				print "<div class=\"inner_progress_bar center\">\n";
 					print "<div id=\"time_div\" class=\"progress_bar center\">1%</div>\n";
 				print "</div>\n";
@@ -468,7 +468,7 @@ abstract class ImportFunctions {
 	 */
 	public function ImportRecord($indirec, $update=false) {
 		global $gid, $type, $indilist,$famlist,$sourcelist,$otherlist, $prepared_statement;
-		global $GEDCOM_FILE, $FILEID, $gm_lang, $gdfp, $placecache, $GEDCOMID;
+		global $GEDCOM_FILE, $FILEID, $gdfp, $placecache, $GEDCOMID;
 		global $ALPHABET_upper, $ALPHABET_lower, $place_id, $media_count;
 		
 		if ($update) $FILEID = $GEDCOMID;
@@ -486,7 +486,7 @@ abstract class ImportFunctions {
 				$type = trim($match[1]);
 			}
 			else {
-				print $gm_lang["invalid_gedformat"]; print "<br /><pre>$indirec</pre>\n";
+				print GM_LANG_invalid_gedformat; print "<br /><pre>$indirec</pre>\n";
 			}
 		}
 	

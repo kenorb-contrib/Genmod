@@ -597,7 +597,6 @@ class Family extends GedcomRecord {
 	}
 	
 	public function PrintListFamily($useli=true, $fact="") {
-		global $gm_lang;
 		
 		if (!$this->DisplayDetails()) return false;
 		
@@ -610,7 +609,7 @@ class Family extends GedcomRecord {
 		print "</b>";
 		print $this->addxref;
 		if ($this->GetMarriageFact() != "") {
-			print " -- <i>".$gm_lang["marriage"]." ";
+			print " -- <i>".GM_LANG_marriage." ";
 			$this->marr_fact->PrintFactDate();
 			$this->marr_fact->PrintFactPlace();
 			print "</i>";

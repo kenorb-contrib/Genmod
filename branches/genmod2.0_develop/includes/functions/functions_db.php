@@ -140,7 +140,6 @@ function FindFamilyRecord($famid, $gedfile="", $renew = false) {
  * @return string the raw gedcom record is returned
  */
 function FindPersonRecord($pid, $gedfile="", $renew = false, $nocache = false) {
-	global $gm_lang;
 	global $COMBIKEY;
 	global $GEDCOMID;
 	global $indilist;
@@ -188,7 +187,6 @@ function FindPersonRecord($pid, $gedfile="", $renew = false, $nocache = false) {
  * @return string the raw gedcom record is returned
  */
 function FindGedcomRecord($pid, $gedfile = "", $renew = false, $nocache = false) {
-	global $gm_lang;
 	global $GEDCOMID, $indilist, $famlist, $sourcelist, $otherlist, $repolist, $medialist;
 	
  	if (DEBUG) print "hit on findgecomrecord for: ".$pid."<br />".pipo;
@@ -280,7 +278,6 @@ function FindGedcomRecord($pid, $gedfile = "", $renew = false, $nocache = false)
  * @return string the raw gedcom record is returned
  */
 function FindOtherRecord($oid, $gedfile="", $renew = false, $type="") {
-	global $gm_lang;
 	global $GEDCOMID, $otherlist;
 	
 	if (DEBUG) print "Old function called: FindOtherRecord for ".$oid."<br />".pipo;
@@ -315,7 +312,6 @@ function FindOtherRecord($oid, $gedfile="", $renew = false, $type="") {
  * @return string the raw gedcom record is returned
  */
 function FindSourceRecord($sid, $gedfile="", $renew = false) {
-	global $gm_lang;
 	global $GEDCOMID, $sourcelist;
 	
 	if (DEBUG) print "Old function called: FindSourceRecord for ".$sid."<br />".pipo;
@@ -429,19 +425,6 @@ function FindMediaRecord($rid, $gedfile='', $renew = false) {
 	}
 }
 
-/**
- * find and return the id of the first person in the gedcom
- * @return string the gedcom xref id of the first person in the gedcom
- */
-function FindFirstPerson() {
-	global $GEDCOMID;
-	
-	$sql = "SELECT i_id FROM ".TBLPREFIX."individuals WHERE i_file='".$GEDCOMID."' ORDER BY i_id LIMIT 1";
-	$res = NewQuery($sql);
-	$row = $res->FetchAssoc();
-	$res->FreeResult();
-	return $row["i_file"];
-}
 
 function FindSubmitter($gedid) {
 	global $GEDCOMID;
@@ -1213,7 +1196,7 @@ function GetSurnameIndis($surname, $allgeds="no") {
 }
 
 function GetAlphaFamSurnames($letter, $allgeds="no") {
-	global $GEDCOMID, $famlist, $indilist, $gm_lang, $LANGUAGE, $COMBIKEY;
+	global $GEDCOMID, $famlist, $indilist, $LANGUAGE, $COMBIKEY;
 
 	$temp = GedcomConfig::$SHOW_MARRIED_NAMES;
 	GedcomConfig::$SHOW_MARRIED_NAMES = false;
@@ -1269,7 +1252,7 @@ function GetAlphaFamSurnames($letter, $allgeds="no") {
  * @see GetAlphaIndis()
  */
 function GetAlphaFams($letter, $allgeds="no") {
-	global $GEDCOMID, $famlist, $indilist, $gm_lang, $LANGUAGE, $COMBIKEY;
+	global $GEDCOMID, $famlist, $indilist, $LANGUAGE, $COMBIKEY;
 	
 	$search_letter = "";
 	
@@ -1331,7 +1314,7 @@ function GetAlphaFams($letter, $allgeds="no") {
  * @return array	$indilist array
  */
 function GetSurnameFams($surname, $allgeds="no") {
-	global $GEDCOMID, $famlist, $indilist, $gm_lang, $COMBIKEY;
+	global $GEDCOMID, $famlist, $indilist, $COMBIKEY;
 	
 	$trans = array();
 	$select = array();
@@ -1771,29 +1754,6 @@ function GetNextId($table, $field) {
 	return $newid;
 }
 
-/**
- * Retrieve the array of faqs from the DB table blocks
- *
- * @package Genmod
- * @subpackage FAQ
- * @param int $id		The FAQ ID to retrieve
- * @return array $faqs	The array containing the FAQ items
- */
-function GetFaqData($id='') {
-	global $GEDCOMID;
-	
-	$faqs = array();
-	// Read the faq data from the DB
-	$sql = "SELECT b_id, b_location, b_order, b_config FROM ".TBLPREFIX."blocks WHERE b_username='$GEDCOMID' AND (b_location='header' OR b_location = 'body')";
-	if ($id != '') $sql .= "AND b_order='".$id."'";
-	$res = NewQuery($sql);
-	while($row = $res->FetchAssoc()){
-		$faqs[$row["b_order"]][$row["b_location"]]["text"] = unserialize($row["b_config"]);
-		$faqs[$row["b_order"]][$row["b_location"]]["pid"] = $row["b_id"];
-	}
-	ksort($faqs);
-	return $faqs;
-}
 
 /**
  * Write a Log record to the database
@@ -1913,7 +1873,6 @@ function RetrieveChangedFact($gid, $fact, $oldfactrec) {
 
 function RetrieveNewFacts($gid, $includeall=false) {
 	global $GEDCOMID, $show_changes;
-	global $gm_lang;
 	
 	$facts = array();
 	$newfacts = array();
@@ -1958,7 +1917,7 @@ function RetrieveNewFacts($gid, $includeall=false) {
 						if ($pos!==false) {
 							$fact["old"] = substr($fact["old"], 0, $pos);
 						}
-						$fact["old"] .= "\n2 DATE (".strtolower($gm_lang["delete"]).")";
+						$fact["old"] .= "\n2 DATE (".strtolower(GM_LANG_delete).")";
 						$newfacts[] = $fact["old"];
 					}
 				} else {
@@ -2068,7 +2027,7 @@ function GetNewFams($pid) {
 					$fact for this fact
 */
 function GetChangeData($status=false, $gid="", $thisged=false, $data="gedlines", $fact="") {
-	global $changes, $gm_lang, $GEDCOMID;
+	global $changes, $GEDCOMID;
 	global $chcache, $chstatcache;
 	
 	// NOTE: If the file does not have an ID, go back
@@ -2202,7 +2161,7 @@ function GetChangeData($status=false, $gid="", $thisged=false, $data="gedlines",
 				// NOTE: Delete ID
 				// NOTE: if old is not empty and new is empty, AND new pid, the record needs to be deleted
 				else if (!empty($row["ch_old"]) && empty($row["ch_new"])&& preg_match("/0\s@(.*)@/", $row["ch_new"]) > 0) {
-					$gedlines[$gedname][$chgid] = $gm_lang["record_to_be_deleted"];
+					$gedlines[$gedname][$chgid] = GM_LANG_record_to_be_deleted;
 				}
 				
 				// NOTE: Replace any other, change or delete from ID
