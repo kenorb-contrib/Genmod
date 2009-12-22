@@ -116,7 +116,7 @@ abstract class GedcomRecord {
 			$this->type = $this->datatype;
 			// Get the gedcom record
 			switch ($this->type) {
-				case "INDI": $this->ReadPersonRecord(); if ($this->xref == "I1633") {print $pipo;} break;
+				case "INDI": $this->ReadPersonRecord(); break;
 				case "FAM": $this->ReadFamilyRecord(); break;
 				case "SOUR": $this->ReadSourceRecord(); break;
 				case "REPO": $this->ReadRepositoryRecord(); break;
@@ -435,7 +435,7 @@ abstract class GedcomRecord {
 		// Get the subrecords/facts. Don't apply privacy here, as it will disturb
 		// the fact numbering which is needed for editing (get the right fact number)
 		$allsubs = GetAllSubrecords($this->gedrec, $this->exclude_facts, false, false, false);
-
+		$added = false;
 		if (is_array($allsubs)) {
 			foreach ($allsubs as $key => $subrecord) {
 				$added = false;

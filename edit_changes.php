@@ -41,8 +41,8 @@ PrintSimpleHeader(GM_LANG_review_changes);
 ?>
 <script language="JavaScript" type="text/javascript">
 <!--
-	function show_gedcom_record(xref) {
-		var recwin = window.open("gedrecord.php?changed=1&pid="+xref, "", "top=50,left=50,width=800,height=400,scrollbars=1,scrollable=1,resizable=1");
+	function show_gedcom_record(xref, type) {
+		var recwin = window.open("gedrecord.php?changed=1&pid="+xref+"&type="+type , "", "top=50,left=50,width=800,height=400,scrollbars=1,scrollable=1,resizable=1");
 	}
 	function showchanges() {
 	   window.location = '<?php print SCRIPT_NAME; ?>';
@@ -124,17 +124,18 @@ else {
 		$rescid = NewQuery($sqlcid);
 		$change_row = 0;
 		while($rowcid = $rescid->FetchAssoc()){
-			if ($trace) print "ch_id: ".$rowcid["ch_id"];
+			if ($trace) print "<br />1. ch_cid: ".$row["cid"]." ch_id: ".$rowcid["ch_id"]."<br />";
 			// First we handle the level 0 changes.
 			// ADD ID
 			// If the ID is new, it is not dependent
 			if (preg_match("/0 @.*@ /", $rowcid["ch_new"]) > 0 && empty($rowcid["ch_old"])) {
-				if ($trace) print "Found add ".$rowcid["ch_gid"]." ";
+				if ($trace) print "2. Found add ".$rowcid["ch_gid"]." ";
 				$found0ids[$rowcid["ch_gid"]] = $row["cid"];
 				// But we check if it's really new: there must be no DB record AND no previous changes on this ID
 				// If not, there is a problem and we can only reject.
-				$oldrec = FindGedcomRecord($rowcid["ch_gid"], "", true);
-				if (empty($oldrec) && !in_array($rowcid["ch_gid"], $foundids)) {
+				$object =& ConstructObject($rowcid["ch_gid"], $rowcid["ch_gid_type"]);
+//				$oldrec = FindGedcomRecord($rowcid["ch_gid"], "", true);
+				if ($object->isnew && !in_array($rowcid["ch_gid"], $foundids)) {
 					$rowcid["canaccept"] = true;
 					$rowcid["canreject"] = true;
 				}
@@ -142,16 +143,17 @@ else {
 					$rowcid["canaccept"] = false;
 					$rowcid["canreject"] = true;
 				}
-				if ($trace) print "a: ".$rowcid["canaccept"]." r: ".$rowcid["canreject"]."<br />";
+				if ($trace) print "3. a: ".$rowcid["canaccept"]." r: ".$rowcid["canreject"]."<br />";
 			}
 			// DELETE ID
 			// If it's a delete, we check if the DB gedcom rec is the same. If so, there are no dependencies
 			// If not, we have previous changes, OR we have a problem.
 			else if (preg_match("/0 @.*@ /", $rowcid["ch_old"]) > 0 && empty($rowcid["ch_new"])) {
-				if ($trace) print "Found a deletion ".$rowcid["ch_gid"]." ";
+				if ($trace) print "4. Found a deletion ".$rowcid["ch_gid"]." ";
 				$found0ids[$rowcid["ch_gid"]] = $row["cid"];
-				$oldrec = FindGedcomRecord($rowcid["ch_gid"], "", true);
-				if ($oldrec != $rowcid["ch_old"]) {
+				$object =& ConstructObject($rowcid["ch_gid"], $rowcid["ch_gid_type"]);
+//				$oldrec = FindGedcomRecord($rowcid["ch_gid"], "", true);
+				if ($$object->gedrec != $rowcid["ch_old"]) {
 					// Not the same, check if we really have previous changes on this ID
 					if (in_array($rowcid["ch_gid"], $foundids)) {
 						// Yes, found one
@@ -169,16 +171,17 @@ else {
 					$rowcid["canaccept"] = true;
 					$rowcid["canreject"] = true;
 				}
-				if ($trace) print "a: ".$rowcid["canaccept"]." r: ".$rowcid["canreject"]."<br />";
+				if ($trace) print "5. a: ".$rowcid["canaccept"]." r: ".$rowcid["canreject"]."<br />";
 			}
 			// EDIT ID
 			// Here the record is edited. If based on the DB, we can accept it because there are no dependencies
 			// If not, we either have previous changes OR a problem. Same code as DELETE
 			else if (preg_match("/0 @.*@ /", $rowcid["ch_old"]) > 0 && preg_match("/0 @.*@ /", $rowcid["ch_new"]) > 0) {
-				if ($trace) print "Found edit ".$rowcid["ch_gid"]." ";
+				if ($trace) print "6. Found edit ".$rowcid["ch_gid"]."<br />";
 				$found0ids[$rowcid["ch_gid"]] = $row["cid"];
-				$oldrec = FindGedcomRecord($rowcid["ch_gid"], "", true);
-				if ($oldrec != $rowcid["ch_old"]) {
+				$object =& ConstructObject($rowcid["ch_gid"], $rowcid["ch_gid_type"]);
+//				$oldrec = FindGedcomRecord($rowcid["ch_gid"], "", true);
+				if ($object->gedrec != $rowcid["ch_old"]) {
 					// Not the same, check if we really have previous changes on this ID
 					if (in_array($rowcid["ch_gid"], $foundids)) {
 						// Yes, found one
@@ -196,18 +199,18 @@ else {
 					$rowcid["canaccept"] = true;
 					$rowcid["canreject"] = true;
 				}
-				if ($trace) print "a: ".$rowcid["canaccept"]." r: ".$rowcid["canreject"]."<br />";
+				if ($trace) print "7. a: ".$rowcid["canaccept"]." r: ".$rowcid["canreject"]."<br />";
 			}
 			else {
 				// FACTS
 				// Now we check the fact level changes
 				// If no previous changes on this ID, we check if the old value is in the DB
 				if (!in_array($rowcid["ch_gid"], $foundids)) {
-					if ($trace) print "Fact, no previous changes".$rowcid["ch_gid"];
-					$oldrec = FindGedcomRecord($rowcid["ch_gid"], "", true);
+					if ($trace) print "8. Fact, no previous changes ".$rowcid["ch_gid"]."<br />";
+					$object =& ConstructObject($rowcid["ch_gid"], $rowcid["ch_gid_type"]);
 					// Don't check when the old value is empty, Just see if the ID exists.
 					if (empty($rowcid["ch_old"])) {
-						if (!empty($oldrec)) {
+						if (!$object->isempty) {
 							$rowcid["canaccept"] = true;
 							$rowcid["canreject"] = true;
 						}
@@ -219,7 +222,7 @@ else {
 					}
 					else {
 						// here we handle fact changes and deletes.
-						$oldsub = GetSubRecord(1, trim($rowcid["ch_old"]), $oldrec);
+						$oldsub = GetSubRecord(1, trim($rowcid["ch_old"]), $object->gedrec);
 						if (!empty($oldsub)) {
 							// It's in the DB, so a valid change
 							$rowcid["canaccept"] = true;
@@ -231,18 +234,18 @@ else {
 							$rowcid["canreject"] = true;
 						}
 					}
-				if ($trace) print "a: ".$rowcid["canaccept"]." r: ".$rowcid["canreject"]."<br />";
+				if ($trace) print "9. a: ".$rowcid["canaccept"]." r: ".$rowcid["canreject"]."<br />";
 				}
 				else {
-					if ($trace) print "Fact, previous changes".$rowcid["ch_gid"];
+					if ($trace) print "10. Fact, previous changes ".$rowcid["ch_gid"]."<br />";
 					// There are previous changes.
 					// If the previous changes are level 0, we cannot be sure about what happens to this fact, so do nothing
 					// One exeption: if the previous change is in the same group, it will be accepted together, so we can accept it.
-					if ($trace) print "Check for ".$rowcid["ch_gid"]." in ";
+					if ($trace) print "11. Check for ".$rowcid["ch_gid"]." in ";
 					if ($trace) print_r($found0ids);
 					if ($trace) print"<br />";
 					if (array_key_exists($rowcid["ch_gid"], $found0ids)) {
-						if ($trace) print "check same group";
+						if ($trace) print "12. check same group";
 						if ($found0ids[$rowcid["ch_gid"]] == $row["cid"]) {
 							// Same change group
 							$rowcid["canaccept"] = true;
@@ -278,8 +281,8 @@ else {
 							}
 							else {
 								// It must be a change on the DB. Check that!
-								$oldrec = FindGedcomRecord($rowcid["ch_gid"], "", true);
-								$oldsub = GetSubRecord(1, trim($rowcid["ch_old"]), $oldrec);
+								$object =& ConstructObject($rowcid["ch_gid"], $rowcid["ch_gid_type"]);
+								$oldsub = GetSubRecord(1, trim($rowcid["ch_old"]), $object->gedrec);
 								if (!empty($oldsub)) {
 									// It's in the DB, so a valid change
 									$rowcid["canaccept"] = true;
@@ -298,11 +301,12 @@ else {
 							$rowcid["canreject"] = true;
 						}
 					}
-					if ($trace) print "a: ".$rowcid["canaccept"]." r: ".$rowcid["canreject"]."<br />";
+					if ($trace) print "13. a: ".$rowcid["canaccept"]." r: ".$rowcid["canreject"]."<br />";
 				}
 			}
 					
 			$changegroup[$rowcid["ch_cid"]][$change_row]["gid"] = $rowcid["ch_gid"];
+			$changegroup[$rowcid["ch_cid"]][$change_row]["gid_type"] = $rowcid["ch_gid_type"];
 			$changegroup[$rowcid["ch_cid"]][$change_row]["file"] = $rowcid["ch_file"];
 			$changegroup[$rowcid["ch_cid"]][$change_row]["type"] = $rowcid["ch_type"];
 			$changegroup[$rowcid["ch_cid"]][$change_row]["user"] = $rowcid["ch_user"];
@@ -384,54 +388,39 @@ else {
 						$gedrec = $rec[$GEDCOMID][$change["gid"]];
 					}
 				}
-				$type = IdType($change["gid"]);
-				switch ($type) {
+				$object = ConstructObject($change["gid"], $change["gid_type"]);
+				switch ($change["gid_type"]) {
 					case "INDI":
-						if (empty($gedrec)) $gedrec = RetrieveChangedFact($change["gid"], "INDI", "");
-						if (empty($gedrec)) $gedrec = RetrieveChangedFact($change["gid"], "FAMC", "");
-						$names = GetIndiNames($gedrec);
-						$printname = "<b>".PrintReady(CheckNN($names[0][0]))."</b> &lrm;(".$change["gid"].")&lrm;<br />\n";
-						print $printname;
+						$printname =  "<b>".$object->name."</b>".$object->addxref;
 						$changegids["individuals"][$change["gid"]] = $printname;
 						break;
 					case "FAM":
-						$printname = "<b>".PrintReady(GetFamilyDescriptor($change["gid"], "", $gedrec, true))."</b> &lrm;(".$change["gid"].")&lrm;<br />\n";;
-						print $printname;
+						$printname =  "<b>".$object->name."</b>".$object->addxref;
 						$changegids["families"][$change["gid"]] = $printname;
 						break;
 					case "SOUR":
-						$name = GetGedcomValue("ABBR", 1, $gedrec);
-						if (empty($name)) $name = GetGedcomValue("TITL", 1, $gedrec);
-						if (empty($name)) $name = GetGedcomValue("ABBR", 1, RetrieveChangedFact($change["gid"], "SOUR", $gedrec));
-						if (empty($name)) $name = GetGedcomValue("TITL", 1, RetrieveChangedFact($change["gid"], "SOUR", $gedrec));
-						$printname = "<b>".PrintReady($name)."</b> &lrm;(".$change["gid"].")&lrm;<br />\n";
-						print $printname;
+						$printname =  "<b>".$object->name."</b>".$object->addxref;
 						$changegids["source"][$change["gid"]] = $printname;
 						break;
 					case "REPO":
-						$name = GetGedcomValue("NAME", 1, $gedrec);
-						if (empty($name)) $name = GetGedcomValue("NAME", 1, RetrieveChangedFact($change["gid"], "REPO", $gedrec));
-						$printname = "<b>".PrintReady($name)."</b> &lrm;(".$change["gid"].")&lrm;<br />\n";
-						print $printname;
+						$printname =  "<b>".$object->name."</b>".$object->addxref;
 						$changegids["repo"][$change["gid"]] = $printname;
 						break;
 					case "OBJE":
-						$printname = "<b>".GM_LANG_media."</b> &lrm;(".$change["gid"].")&lrm;<br />\n";;
-						print $printname;
+						$printname =  "<b>".$object->title."</b>".$object->addxref;
 						$changegids["media"][$change["gid"]] = $printname;
 						break;
 					case "SUBM":
-						$printname = "<b>".GM_LANG_submitter_record."</b> &lrm;(".$change["gid"].")&lrm;<br />\n";;
-						print $printname;
+						$printname =  "<b>".$object->name."</b>".$object->addxref;
 						$changegids["subm"][$change["gid"]] = $printname;
 						break;
 					case "NOTE":
-						$printname = "<b>".GM_LANG_note."</b> &lrm;(".$change["gid"].")&lrm;<br />\n";;
-						print $printname;
+						$printname =  "<b>".$object->title."</b>".$object->addxref;
 						$changegids["note"][$change["gid"]] = $printname;
 						break;
 				}
-				if ($trace) print "a".$changegroup[$groupid]["canaccept"]."r".$changegroup[$groupid]["canreject"];
+				print $printname;
+				if ($trace) print "14. a".$changegroup[$groupid]["canaccept"]."r".$changegroup[$groupid]["canreject"];
 				print "</td>";
 				print "<td>";
 				$cuser =& User::GetInstance($change["user"]);
@@ -449,10 +438,12 @@ else {
 	print "<tr><td class=\"topbottombar\" colspan=\"2\">";
 	print_help_link("view_gedcom_help", "qm", "view_gedcom");
 	print GM_LANG_view_gedcom."</td></tr>";
+	$rectypes = array("note"=>"NOTE", "subm"=>"SUBM", "media"=>"OBJE", "repo"=>"REPO", "source"=>"SOUR", "families"=>"FAM", "individuals"=>"INDI");
 	foreach ($changegids as $type => $gids) {
+		$rectype = $rectypes[$type];
 		print "<tr><td class=\"shade2\">".constant("GM_LANG_".$type)."</td></tr>";
 		foreach ($gids as $gid => $name) {
-			print "<tr><td class=\"shade1 $TEXT_DIRECTION\"><a href=\"javascript:show_gedcom_record('".$gid."');\">".$name."</a></td></tr>";
+			print "<tr><td class=\"shade1 $TEXT_DIRECTION\"><a href=\"javascript:show_gedcom_record('".$gid."','".$rectype."');\">".$name."</a></td></tr>";
 		}
 	}
 	print "</table>";

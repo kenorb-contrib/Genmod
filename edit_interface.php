@@ -275,7 +275,7 @@ if (strstr($action,"addchild")) {
 }
 else if (strstr($action,"addspouse")) {
 	print_help_link("edit_add_spouse_help", "qm");
-	print "<b>".GM_LANG_add_".strtolower($famtag)]."</b><br />\n";
+	print "<b>".constant("GM_LANG_add_".strtolower($famtag))."</b><br />\n";
 }
 else if (strstr($action,"addnewparent")) {
 	print_help_link("edit_add_parent_help", "qm");

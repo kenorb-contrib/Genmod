@@ -39,16 +39,16 @@ if ((!$gm_user->userCanViewGedlines()) && (!$gm_user->UserCanAccept())) {
 	print "</body></html>";
 	exit;
 }
-$person = Person::GetInstance($pid);
-if (!$person->isempty && !$person->disp) {
+$object = ConstructObject($pid, $type);
+if (!$object->isempty && !$object->disp) {
 	PrintFunctions::PrintPrivacyError(GedcomConfig::$CONTACT_EMAIL);
 	print "</body></html>";
 	exit;
 }
 if ($changed) {
-	$newrec = $person->changedgedrec;
+	$newrec = $object->changedgedrec;
 	$newrec = PrivacyFunctions::PrivatizeGedcom($newrec);
-	$oldrec = $person->gedrec;
+	$oldrec = $object->gedrec;
 	$oldrec = PrivacyFunctions::PrivatizeGedcom($oldrec);
 	print "<table class=\"facts_table\">\r\n";
 	print "<tr class=\"topbottombar\"><td>".GM_LANG_old_record."</td><td>".GM_LANG_new_record."</td></tr>\r\n";
@@ -56,11 +56,10 @@ if ($changed) {
 	print "<tr class=\"topbottombar\"><td colspan=\"2\">&nbsp;</td></tr></table>\r\n";
 }
 else {
-	$indirec = PrivacyFunctions::PrivatizeGedcom($person->gedrec);
+	$indirec = PrivacyFunctions::PrivatizeGedcom($object->gedrec);
 	print nl2br($indirec);
 	print "<br />";
 }
 print "<div class=\"center\"><a href=\"#\" onclick=\"window.close();\">".GM_LANG_close_window."</a></div>\n";
-print "</body></html>";
-
+PrintSimpleFooter();
 ?>
