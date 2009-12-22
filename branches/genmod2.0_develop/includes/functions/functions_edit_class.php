@@ -1019,7 +1019,7 @@ abstract class EditFunctions {
 		
 		// pastable values
 		if ($fact=="NPFX") {
-			$text = GM_LANG_autocomplete"];
+			$text = GM_LANG_autocomplete;
 			if (isset($GM_IMAGES["autocomplete"]["button"])) $Link = "<img id=\"".$element_id."_spec\" name=\"".$element_id."_spec\" src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["autocomplete"]["button"]."\"  alt=\"".$text."\"  title=\"".$text."\" border=\"0\" align=\"middle\" />";
 			else $Link = $text;
 			print "&nbsp;".$Link;

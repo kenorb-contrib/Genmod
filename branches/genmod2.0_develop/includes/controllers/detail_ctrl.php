@@ -697,7 +697,7 @@ abstract class DetailController extends BaseController{
 		<script language="JavaScript" type="text/javascript">
 		<!--
 			function show_gedcom_record() {
-				var recwin = window.open("gedrecord.php?pid=<?php print $this->$object_name->xref; ?>", "", "top=0,left=0,width=300,height=400,scrollbars=1,scrollable=1,resizable=1");
+				var recwin = window.open("gedrecord.php?pid=<?php print $this->$object_name->xref; ?>&type=<?php print $this->$object_name->type;?>", "", "top=0,left=0,width=300,height=400,scrollbars=1,scrollable=1,resizable=1");
 			}
 			function showchanges() {
 				sndReq('show_changes', 'set_show_changes', 'set_show_changes', '<?php if ($this->show_changes) print false; else print true; ?>');

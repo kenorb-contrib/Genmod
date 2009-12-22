@@ -1056,12 +1056,12 @@ function addnewchild(famid, change_type) {
 }
 
 function addnewspouse(famid, famtag, change_type) {
-	window.open('edit_interface.php?action=addspouse&famid='+famid+'&change_type='+change_type+'&famtag='+famtag+"&"+sessionname+"="+sessionid, '', 'top=50,left=50,width=710,height=500,resizable=1,scrollbars=1');
+	window.open('edit_interface.php?action=addspouse&&pid_type=INDI&famid='+famid+'&change_type='+change_type+'&famtag='+famtag+"&"+sessionname+"="+sessionid, '', 'top=50,left=50,width=710,height=500,resizable=1,scrollbars=1');
 	return false;
 }
 
 function addspouse(pid, famtag, change_type) {
-	window.open('edit_interface.php?action=addspouse&pid='+pid+'&change_type='+change_type+'&famtag='+famtag+'&famid=new&'+sessionname+"="+sessionid, '', 'top=50,left=50,width=710,height=500,resizable=1,scrollbars=1');
+	window.open('edit_interface.php?action=addspouse&pid_type=INDI&&pid='+pid+'&change_type='+change_type+'&famtag='+famtag+'&famid=new&'+sessionname+"="+sessionid, '', 'top=50,left=50,width=710,height=500,resizable=1,scrollbars=1');
 	return false;
 }
 

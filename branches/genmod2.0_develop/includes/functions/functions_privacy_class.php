@@ -812,7 +812,7 @@ abstract class PrivacyFunctions {
 	public function PrivatizeGedcom($gedrec) {
 		global $gm_user;
 		
-		$gt = preg_match("/0 @(.+)@ (.+)/", $gedrec, $gmatch);
+		$gt = preg_match("/0 @(.+)@ (\w+)/", $gedrec, $gmatch);
 		if ($gt > 0) {
 			$gid = trim($gmatch[1]);
 			$type = trim($gmatch[2]);
@@ -873,11 +873,20 @@ abstract class PrivacyFunctions {
 						}
 					}
 				}
-				$newrec .= "1 NOTE ".trim(GM_LANG_person_private)."\r\n";
+				if ($type != "NOTE") $newrec .= "1 NOTE ".trim(GM_LANG_person_private)."\r\n";
+				else $newrec .= "1 CONT ".trim(GM_LANG_person_private)."\r\n";
 				return $newrec;
 			}
 			else {
-				$newrec = "0 @".$gid."@ $type\r\n";
+				if ($type == "NOTE") {
+					// Get the text on level 0
+					$nt = preg_match("/0 @.+@ NOTE (.+)(\r\n|\n|\r)*/", $gedrec, $n1match);
+					if ($nt>0) $text = $n1match[1];
+					// And the additional conc/cont lines
+					$text .= preg_replace("/<br \/>/", "", GetCont(1, $gedrec));
+					$newrec = MakeCont("0 @".$gid."@ NOTE", $text);
+				}
+				else $newrec = "0 @".$gid."@ $type\r\n";
 				//-- check all of the sub facts for access. As ->facts also contains changed factrecs, compare them with the original indirec.
 				foreach($object->facts as $indexval => $fact) {
 					if ($fact->disp && in_array($fact->factrec."\r\n", $allsubs)) $newrec .= $fact->factrec."\r\n";

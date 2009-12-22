@@ -100,7 +100,10 @@ class FAQController {
 					if (isset($_REQUEST["body"])) $body = $_REQUEST["body"];
 					else $body = "";
 					if (empty($body) || empty($header)) $this->error_message = GM_LANG_no_faq_content;
-					else $faq->UpdateMe($header, $body);
+					else {
+						$faq = FAQ::GetInstance($id);
+						$faq->UpdateMe($header, $body);
+					}
 					break;
 				case "moveup":
 					$faq = FAQ::GetInstance($id);
