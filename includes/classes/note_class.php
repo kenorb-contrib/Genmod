@@ -33,12 +33,13 @@ class Note extends GedcomRecord {
 	// General class information
 	public $classname = "Note";				// Name of this class
 	public $datatype = "NOTE";				// Type od data
-	private static $notecache = array();	// Holder of the instances for this class
+	private static $cache = array();	// Holder of the instances for this class
 	
 	// Data
 	private $text = null;					// Text of the note
 	private $newtext = null;				// Text of the note including pending changes
 	private $title = null;					// Title is shortened text
+	private $name = null;					// Title is shortened text (same as title)
 	private $newtitle = null;				// Title is shortened text after applying pending changes
 	
 	private $textchanged = null;			// If any pending changes exist for this note
@@ -47,10 +48,10 @@ class Note extends GedcomRecord {
 		global $GEDCOMID;
 		
 		if (empty($gedcomid)) $gedcomid = $GEDCOMID;
-		if (!isset(self::$notecache[$gedcomid][$xref])) {
-			self::$notecache[$gedcomid][$xref] = new Note($xref, $gedrec, $gedcomid);
+		if (!isset(self::$cache[$gedcomid][$xref])) {
+			self::$cache[$gedcomid][$xref] = new Note($xref, $gedrec, $gedcomid);
 		}
-		return self::$notecache[$gedcomid][$xref];
+		return self::$cache[$gedcomid][$xref];
 	}
 	
 	/**
@@ -89,6 +90,9 @@ class Note extends GedcomRecord {
 			case "title":
 				return $this->GetTitle();
 				break;
+			case "name":
+				return $this->GetTitle();
+				break;
 			default:
 				return parent::__get($property);
 				break;
@@ -97,7 +101,7 @@ class Note extends GedcomRecord {
 	
 	public function ObjCount() {
 		$count = 0;
-		foreach(self::$notecache as $ged => $note) {
+		foreach(self::$cache as $ged => $note) {
 			$count += count($note);
 		}
 		return $count;

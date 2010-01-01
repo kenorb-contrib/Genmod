@@ -42,7 +42,11 @@ IMG {
 div.row {
 	clear: both;
 }
-  
+div.left {
+	float: left;
+	padding: 0.2em 0em 0.2em 0em; /* top right bottom left */
+	background-color: #F5F5F5;
+}
 div.row span.label {
 *	clear: both;	/* applied * to hide from other browsers except IE */
 	float: left;
@@ -1034,7 +1038,7 @@ select {
      background-color: #F1F1F1;
 }
 /* lighter shade */
-.shade1, .admin_item_box, .language_item_box1, .block, .item_box, .change_language_item_right {
+.shade1, .admin_item_box, .language_item_box1, .block, .item_box, .change_language_item_right, #downloadgedcom_labels, #downloadgedcom_options, #downloadgedcom_content {
      background-color: #F5F5F5;
 }
 /* darker shade */
@@ -1567,14 +1571,19 @@ import_statistics {
 	float: left;
 	white-space: nowrap;
 	text-align: left;
+	padding: 0.2em 0em 0.2em 0em; /* top right bottom left */
+	width: 70%;
 }
 #downloadgedcom_options {
 	float: left;
 	text-align: left;
+	padding: 0.2em 0em 0.2em 0em; /* top right bottom left */
+	width: 30%;
 }
 #downloadgedcom_options #privradio {
 	float: left;
 	text-align: left;
+	padding: 0.2em 0em 0.2em 0em; /* top right bottom left */
 }
 
 #downloadgedcom_form br {

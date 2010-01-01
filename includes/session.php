@@ -600,7 +600,7 @@ if ($gm_user->userCanEdit()) {
 			$show_changes = true;
 		}
 		// Force show_changes off if no changes are present. This will save some queries
-		if (!GetChangeData(true, "", true)) $show_changes = false;
+		if (!ChangeFunctions::GetChangeData(true, "", true)) $show_changes = false;
 	}
 	else $_SESSION["show_changes"] = $show_changes;
 }
@@ -801,8 +801,17 @@ define('USE_GREYBOX', is_dir("modules/greybox/"));
 function __autoload($classname) {
 	global $GM_BASE_DIRECTORY;
 	
-	if (stristr($classname, "controller")) require_once($GM_BASE_DIRECTORY.strtolower("includes/controllers/".str_ireplace("controller", "", $classname)."_ctrl.php"));
-	else if (stristr($classname, "functions")) require_once($GM_BASE_DIRECTORY.strtolower("includes/functions/functions_".str_ireplace("functions", "", $classname)."_class.php"));
-	else require_once($GM_BASE_DIRECTORY.strtolower("includes/classes/".$classname."_class.php"));
+	if (stristr($classname, "controller")) {
+		require_once($GM_BASE_DIRECTORY.strtolower("includes/controllers/".str_ireplace("controller", "", $classname)."_ctrl.php"));
+		if (DEBUG) Debugcollector::OutputCollector("Loaded controller class: ".$classname, "output");
+	}
+	else if (stristr($classname, "functions")) {
+		require_once($GM_BASE_DIRECTORY.strtolower("includes/functions/functions_".str_ireplace("functions", "", $classname)."_class.php"));
+		if (DEBUG) Debugcollector::OutputCollector("Loaded function class: ".$classname, "output");
+	}
+	else {
+		require_once($GM_BASE_DIRECTORY.strtolower("includes/classes/".$classname."_class.php"));
+		if (DEBUG) Debugcollector::OutputCollector("Loaded data class: ".$classname, "output");
+	}
 }
 ?>

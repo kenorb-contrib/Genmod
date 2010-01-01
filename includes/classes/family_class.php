@@ -34,7 +34,7 @@ class Family extends GedcomRecord {
 	// General class information
 	public $classname = "Family";			// Name of this class
 	public $datatype = "FAM";				// Type of data collected here
-	private static $familycache = array(); // Holder of the instances for this class
+	private static $cache = array(); 		// Holder of the instances for this class
 
 	// data
 	private $sortable_name = null;			// Printable and sortable name of the family, after applying privacy (can be unknown of private)
@@ -79,10 +79,10 @@ class Family extends GedcomRecord {
 		global $GEDCOMID;
 		
 		if (empty($gedcomid)) $gedcomid = $GEDCOMID;
-		if (!isset(self::$familycache[$gedcomid][$xref])) {
-			self::$familycache[$gedcomid][$xref] = new Family($xref, $gedrec, $gedcomid);
+		if (!isset(self::$cache[$gedcomid][$xref])) {
+			self::$cache[$gedcomid][$xref] = new Family($xref, $gedrec, $gedcomid);
 		}
-		return self::$familycache[$gedcomid][$xref];
+		return self::$cache[$gedcomid][$xref];
 	}
 	
 	/**
@@ -200,7 +200,7 @@ class Family extends GedcomRecord {
 
 	public function ObjCount() {
 		$count = 0;
-		foreach(self::$familycache as $ged => $family) {
+		foreach(self::$cache as $ged => $family) {
 			$count += count($family);
 		}
 		return $count;
@@ -299,7 +299,7 @@ class Family extends GedcomRecord {
 	 * get the husbands ID
 	 * @return string
 	 */
-	private function getHusbId() {
+	protected function getHusbId() {
 		
 		if (is_null($this->husb_id)) {
 			if (is_null($this->husb)) $this->getHusband();
@@ -371,7 +371,7 @@ class Family extends GedcomRecord {
 	 * get the wife ID
 	 * @return string
 	 */
-	private function getWifeId() {
+	protected function getWifeId() {
 		
 		if (is_null($this->wife_id)) {
 			if (is_null($this->wife)) $this->getWife();
@@ -460,7 +460,7 @@ class Family extends GedcomRecord {
 	 * get the children IDs
 	 * @return array 	array of children Ids
 	 */
-	private function getChildrenIds() {
+	protected function getChildrenIds() {
 
 		if (!is_null($this->children_ids)) return $this->children_ids;
 		if (is_null($this->children)) $this->GetChildren();

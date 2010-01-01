@@ -147,8 +147,8 @@ function GetSortableName($pid, $alpha="", $surname="", $allnames=false, $rev = f
 		}
 	}
 	if ($changes) {
-		if (GetChangeData(true, $pid, true, "", "")) {
-			$rec = GetChangeData(false, $pid, true, "", "");
+		if (ChangeFunctions::GetChangeData(true, $pid, true, "", "")) {
+			$rec = ChangeFunctions::GetChangeData(false, $pid, true, "", "");
 			$gedrec = $rec[$GEDCOMID][$pid];
 			if (!empty($gedrec)) $names = GetIndiNames($gedrec);
 		}
@@ -244,14 +244,14 @@ function GetPersonName($pid, $indirec="", $starred=true) {
 			}
 		}
 		else {
-//			if (!empty($pid) && GetChangeData(true, $pid, true, "", "INDI")) {
-//					$rec = GetChangeData(false, $pid, true, "gedlines", "INDI");
+//			if (!empty($pid) && ChangeFunctions::GetChangeData(true, $pid, true, "", "INDI")) {
+//					$rec = ChangeFunctions::GetChangeData(false, $pid, true, "gedlines", "INDI");
 //					$names = GetIndiNames($rec[$GEDCOMID][$pid]);
 //					$name = $names[0][0];
 //				}
 //				else {
-//					if (!empty($pid) && GetChangeData(true, $pid, true, "", "FAMC")) {
-//						$rec = GetChangeData(false, $pid, true, "gedlines", "FAMC");
+//					if (!empty($pid) && ChangeFunctions::GetChangeData(true, $pid, true, "", "FAMC")) {
+//						$rec = ChangeFunctions::GetChangeData(false, $pid, true, "gedlines", "FAMC");
 //						$names = GetIndiNames($rec[$GEDCOMID][$pid]);
 //						$name = $names[0][0];
 //					}
@@ -279,8 +279,8 @@ function GetSourceDescriptor($sid, $gedrec="") {
 
 	if (empty($gedrec)) {
 		$gedrec = FindSourceRecord($sid);
-		if ($show_changes && GetChangeData(true, $sid, true)) {
-			$rec = GetChangeData(false, $sid, true, "gedlines");
+		if ($show_changes && ChangeFunctions::GetChangeData(true, $sid, true)) {
+			$rec = ChangeFunctions::GetChangeData(false, $sid, true, "gedlines");
 			$gedrec = $rec[$GEDCOMID][$sid];
 		}
 	}
@@ -312,8 +312,8 @@ function GetRepoDescriptor($rid) {
 	if ($rid=="") return false;
 
 	$gedrec = FindRepoRecord($rid);
-	if ($show_changes && GetChangeData(true, $rid, true)) {
-		$rec = GetChangeData(false, $rid, true, "gedlines");
+	if ($show_changes && ChangeFunctions::GetChangeData(true, $rid, true)) {
+		$rec = ChangeFunctions::GetChangeData(false, $rid, true, "gedlines");
 		$gedrec = $rec[$GEDCOMID][$rid];
 	}
 	if (!empty($gedrec)) {
@@ -338,8 +338,8 @@ function GetAddSourceDescriptor($sid) {
 	if ($sid=="") return false;
 
 	$gedrec = FindSourceRecord($sid);
-	if ($show_changes && GetChangeData(true, $sid, true)) {
-		$rec = GetChangeData(false, $sid, true, "gedlines");
+	if ($show_changes && ChangeFunctions::GetChangeData(true, $sid, true)) {
+		$rec = ChangeFunctions::GetChangeData(false, $sid, true, "gedlines");
 		$gedrec = $rec[$GEDCOMID][$sid];
 	}
 	if (!empty($gedrec)) {
@@ -369,8 +369,8 @@ function GetAddRepoDescriptor($rid) {
 	if ($rid=="") return false;
 
 	$gedrec = FindRepoRecord($rid);
-	if ($show_changes && GetChangeData(true, $rid, true)) {
-		$rec = GetChangeData(false, $rid, true, "gedlines");
+	if ($show_changes && ChangeFunctions::GetChangeData(true, $rid, true)) {
+		$rec = ChangeFunctions::GetChangeData(false, $rid, true, "gedlines");
 		$gedrec = $rec[$GEDCOMID][$rid];
 	}
 	if (!empty($gedrec)) {
@@ -463,8 +463,8 @@ function GetMediaDescriptor($mid, $gedrec="") {
 
 	if (empty($gedrec)) {
 		$gedrec = FindMediaRecord($mid);
-		if ($show_changes && GetChangeData(true, $mid, true)) {
-			$rec = GetChangeData(false, $mid, true, "gedlines");
+		if ($show_changes && ChangeFunctions::GetChangeData(true, $mid, true)) {
+			$rec = ChangeFunctions::GetChangeData(false, $mid, true, "gedlines");
 			$gedrec = $rec[$GEDCOMID][$mid];
 		}
 	}
@@ -540,8 +540,8 @@ function GetSortableAddName($pid, $record="", $rev = false, $changes = false) {
 	//-- get the name from the indexes
 	if (empty($record)) $record = FindPersonRecord($pid);
 	if ($changes) {
-		if (GetChangeData(true, $pid, true, "", "")) {
-			$rec = GetChangeData(false, $pid, true, "", "");
+		if (ChangeFunctions::GetChangeData(true, $pid, true, "", "")) {
+			$rec = ChangeFunctions::GetChangeData(false, $pid, true, "", "");
 			$record = $rec[$GEDCOMID][$pid];
 		}
 	}

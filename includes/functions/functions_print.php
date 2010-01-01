@@ -733,10 +733,6 @@ function PrintSimpleFooter() {
 	global $CONFIG_PARMS;
 	global $QUERY_STRING;
 	
-//	if (empty(SCRIPT_NAME)) {
-//		$SCRIPT_NAME = $_SERVER["SCRIPT_NAME"];
-//		$QUERY_STRING = $_SERVER["QUERY_STRING"];
-//	}
 	print "\n\t<br /><br /><div class=\"center\" style=\"width: 99%;\">";
 	PrintContactLinks();
 	print "<br />Running <a href=\"http://www.genmod.net/\" target=\"_blank\">Genmod";

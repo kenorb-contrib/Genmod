@@ -42,7 +42,7 @@ abstract class ImportFunctions {
 	public function NeedHeadCleanup($fcontents) {
 	
 		$pos1 = strpos($fcontents, "0 HEAD");
-		if ($pos1>2) return true;
+		if ($pos1 > 0) return true;
 		else return false;
 	}
 	
@@ -57,7 +57,7 @@ abstract class ImportFunctions {
 		global $fcontents;
 	
 		$pos1 = strpos($fcontents, "0 HEAD");
-		if ($pos1>0) {
+		if ($pos1 > 0) {
 			$fcontents = substr($fcontents, $pos1);
 			return true;
 		}
@@ -423,40 +423,40 @@ abstract class ImportFunctions {
 	 * deletes all of the imported data about a gedcom from the database
 	 * @param string $FILE	the gedcom to remove from the database
 	 */
-	public function EmptyDatabase($FILEID) {
+	public function EmptyDatabase($gedid) {
 	
-		$sql = "DELETE FROM ".TBLPREFIX."individuals WHERE i_file='$FILEID'";
+		$sql = "DELETE FROM ".TBLPREFIX."individuals WHERE i_file='".$gedid."'";
 		$res = NewQuery($sql);
-		$sql = "DELETE FROM ".TBLPREFIX."asso WHERE as_file='$FILEID'";
+		$sql = "DELETE FROM ".TBLPREFIX."asso WHERE as_file='".$gedid."'";
 		$res = NewQuery($sql);
-		$sql = "DELETE FROM ".TBLPREFIX."families WHERE f_file='$FILEID'";
+		$sql = "DELETE FROM ".TBLPREFIX."families WHERE f_file='".$gedid."'";
 		$res = NewQuery($sql);
-		$sql = "DELETE FROM ".TBLPREFIX."sources WHERE s_file='$FILEID'";
+		$sql = "DELETE FROM ".TBLPREFIX."sources WHERE s_file='".$gedid."'";
 		$res = NewQuery($sql);
-		$sql = "DELETE FROM ".TBLPREFIX."source_mapping WHERE sm_file='$FILEID'";
+		$sql = "DELETE FROM ".TBLPREFIX."source_mapping WHERE sm_file='".$gedid."'";
 		$res = NewQuery($sql);
-		$sql = "DELETE FROM ".TBLPREFIX."other WHERE o_file='$FILEID'";
+		$sql = "DELETE FROM ".TBLPREFIX."other WHERE o_file='".$gedid."'";
 		$res = NewQuery($sql);
-		$sql = "DELETE FROM ".TBLPREFIX."other_mapping WHERE om_file='$FILEID'";
+		$sql = "DELETE FROM ".TBLPREFIX."other_mapping WHERE om_file='".$gedid."'";
 		$res = NewQuery($sql);
-		$sql = "DELETE FROM ".TBLPREFIX."places WHERE p_file='$FILEID'";
+		$sql = "DELETE FROM ".TBLPREFIX."places WHERE p_file='".$gedid."'";
 		$res = NewQuery($sql);
-		$sql = "DELETE FROM ".TBLPREFIX."placelinks WHERE pl_file='$FILEID'";
+		$sql = "DELETE FROM ".TBLPREFIX."placelinks WHERE pl_file='".$gedid."'";
 		$res = NewQuery($sql);
-		$sql = "DELETE FROM ".TBLPREFIX."names WHERE n_file='$FILEID'";
+		$sql = "DELETE FROM ".TBLPREFIX."names WHERE n_file='".$gedid."'";
 		$res = NewQuery($sql);
-		$sql = "DELETE FROM ".TBLPREFIX."dates WHERE d_file='$FILEID'";
+		$sql = "DELETE FROM ".TBLPREFIX."dates WHERE d_file='".$gedid."'";
 		$res = NewQuery($sql);
-		$sql = "DELETE FROM ".TBLPREFIX."media WHERE m_file='$FILEID'";
+		$sql = "DELETE FROM ".TBLPREFIX."media WHERE m_file='".$gedid."'";
 		$res = NewQuery($sql);
-		$sql = "DELETE FROM ".TBLPREFIX."media_mapping WHERE mm_file='$FILEID'";
+		$sql = "DELETE FROM ".TBLPREFIX."media_mapping WHERE mm_file='".$gedid."'";
 		$res = NewQuery($sql);
-		$sql = "DELETE FROM ".TBLPREFIX."individual_family WHERE if_file='$FILEID'";
+		$sql = "DELETE FROM ".TBLPREFIX."individual_family WHERE if_file='".$gedid."'";
 		$res = NewQuery($sql);
-		$sql = "DELETE FROM ".TBLPREFIX."soundex WHERE s_file='$FILEID'";
+		$sql = "DELETE FROM ".TBLPREFIX."soundex WHERE s_file='".$gedid."'";
 		$res = NewQuery($sql);
 		// Flush the caches
-		GedcomConfig::ResetCaches($FILEID);
+		GedcomConfig::ResetCaches($gedid);
 	}
 	
 	/**
@@ -466,12 +466,10 @@ abstract class ImportFunctions {
 	 * @param string $indirec the raw gedcom record to parse
 	 * @param boolean $update whether or not this is an updated record that has been accepted
 	 */
-	public function ImportRecord($indirec, $update=false) {
-		global $gid, $type, $indilist,$famlist,$sourcelist,$otherlist, $prepared_statement;
-		global $GEDCOM_FILE, $FILEID, $gdfp, $placecache, $GEDCOMID;
-		global $ALPHABET_upper, $ALPHABET_lower, $place_id, $media_count;
+	public function ImportRecord($indirec, $update=false, $gedfile="") {
+		global $GEDCOMID;
 		
-		if ($update) $FILEID = $GEDCOMID;
+		if (empty($gedfile)) $gedfile = $GEDCOMID;
 		if (strlen(trim($indirec)) ==  0) return false;
 		//-- import different types of records
 		$ct = preg_match("/0 @(.*)@ ([A-Z_]+)/", $indirec, $match);
@@ -499,8 +497,8 @@ abstract class ImportFunctions {
 		//-- if this is an import from an online update then import the places
 		// NOTE: What's the difference? Oh... in uploadgedcom it's also done. So only do it here in case of updates
 		if ($update) {
-			self::UpdatePlaces($gid, $type, $indirec, true);
-			self::UpdateDates($gid, $indirec);
+			self::UpdatePlaces($gid, $type, $indirec, true, $gedfile);
+			self::UpdateDates($gid, $indirec, $gedfile);
 	
 			//-- Also add the MM links to the DB
 			$lines = preg_split("/[\r\n]+/", trim($indirec));
@@ -516,11 +514,11 @@ abstract class ImportFunctions {
 	//				print "media: ".$media."<br />";
 					$gedrec = GetSubRecord($level, $rec, $indirec, 1);
 	//				print "gedrec: ".$gedrec."<br />";
-					self::AddDBLink($media, $gid, $gedrec, $FILEID, -1, $type);
+					self::AddDBLink($media, $gid, $gedrec, $gedfile, -1, $type);
 				}
 			}
 		}
-		$indirec = self::UpdateMedia($gid, $indirec, $update);
+		$indirec = self::UpdateMedia($gid, $indirec, $update, $gedfile);
 		
 		// Insert the source links
 		// Recalculate $gid as it may have changed in UpdateMedia
@@ -539,13 +537,13 @@ abstract class ImportFunctions {
 				}
 			}
 		}
-		$kgid = JoinKey($gid, $FILEID);
+		$kgid = JoinKey($gid, $gedfile);
 		for ($i=0;$i<$ct;$i++) {
 			$rec = $match[0][$i];
 			$level = $match[1][$i];
 			$sour = $match[2][$i];
 			$gedrec = GetSubRecord($level, $rec, $indirec, 1);
-			$result = self::AddSourceLink($sour, $gid, $gedrec, $FILEID, $type);
+			$result = self::AddSourceLink($sour, $gid, $gedrec, $gedfile, $type);
 		}
 		
 		// Insert the other links
@@ -569,7 +567,7 @@ abstract class ImportFunctions {
 			$rec = $match[0][$i];
 			$level = $match[1][$i];
 			$note = $match[3][$i];
-			$result = self::AddOtherLink($note, $gid, $type, $FILEID);
+			$result = self::AddOtherLink($note, $gid, $type, $gedfile);
 		}
 		if ($type == "INDI" || $type == "FAM") {
 			if (preg_match("/[1-9]\sASSO\s@/", $indirec, $match) > 0) {
@@ -582,7 +580,7 @@ abstract class ImportFunctions {
 							$pid1 = $match[1][$i];
 							$rela = trim(GetGedcomValue("RELA", 2, $record, "", false));
 							$resn = trim(GetGedcomValue("RESN", 2, $record, "", false));
-							self::AddAssoLink(JoinKey($pid1, $FILEID), $kgid, $type, $fact, $rela, $resn, $FILEID);
+							self::AddAssoLink(JoinKey($pid1, $gedfile), $kgid, $type, $fact, $rela, $resn, $gedfile);
 						}
 					}
 					$ct = preg_match_all("/\n2\sASSO\s@(.+)@/", $record, $match);
@@ -595,7 +593,7 @@ abstract class ImportFunctions {
 							$pid1 = $match[1][$i];
 							$asso = GetSubRecord(2, "2 ASSO", $record, $i+1);
 							$rela = trim(GetGedcomValue("RELA", 3, $asso, "", false));
-							self::AddAssoLink(JoinKey($pid1, $FILEID), $kgid, $type, $fact, $rela, $resn, $FILEID);
+							self::AddAssoLink(JoinKey($pid1, $gedfile), $kgid, $type, $fact, $rela, $resn, $gedfile);
 						}
 					}
 				}
@@ -608,9 +606,9 @@ abstract class ImportFunctions {
 			$ct = preg_match_all("/1 FAMS @(.*)@/", $indirec, $match, PREG_SET_ORDER);
 			$sfams = "";
 			$order = 1;
-			$kgid = JoinKey($gid, $FILEID);
+			$kgid = JoinKey($gid, $gedfile);
 			for($j=0; $j<$ct; $j++) {
-				$sql = "INSERT INTO ".TBLPREFIX."individual_family VALUES(NULL, '".$kgid."', '".JoinKey($match[$j][1], $FILEID)."', '".$order."', 'S', '', '', '', '".$FILEID."') ON DUPLICATE KEY UPDATE if_order='".$order."'";
+				$sql = "INSERT INTO ".TBLPREFIX."individual_family VALUES(NULL, '".$kgid."', '".JoinKey($match[$j][1], $gedfile)."', '".$order."', 'S', '', '', '', '".$gedfile."') ON DUPLICATE KEY UPDATE if_order='".$order."'";
 				$res = NewQuery($sql);
 				$sfams .= $match[$j][1].";";
 				$order++;
@@ -634,7 +632,7 @@ abstract class ImportFunctions {
 				$stat = "";
 				if ($ct2>0) $stat = substr(trim($pmatch[1]),0 ,1);
 				// Insert the stuff in the DB
-				$sql = "INSERT INTO ".TBLPREFIX."individual_family VALUES(NULL, '".$kgid."', '".JoinKey($match[$j][1], $FILEID)."', '', 'C', '".$prim."', '".$ped."', '".$stat."', '".$FILEID."') ON DUPLICATE KEY UPDATE if_prim='".$prim."', if_pedi='".$ped."', if_stat='".$stat."'";
+				$sql = "INSERT INTO ".TBLPREFIX."individual_family VALUES(NULL, '".$kgid."', '".JoinKey($match[$j][1], $gedfile)."', '', 'C', '".$prim."', '".$ped."', '".$stat."', '".$gedfile."') ON DUPLICATE KEY UPDATE if_prim='".$prim."', if_pedi='".$ped."', if_stat='".$stat."'";
 				$res = NewQuery($sql);
 				$cfams .= $match[$j][1].";";
 				$i++;
@@ -644,14 +642,14 @@ abstract class ImportFunctions {
 			$names = GetIndiNames($indirec, true);
 			$soundex_codes = GetSoundexStrings($names, true, $indirec);
 			foreach($names as $indexval => $name) {
-				$sql = "INSERT INTO ".TBLPREFIX."names VALUES('0', '".DbLayer::EscapeQuery($gid)."[".$FILEID."]','".DbLayer::EscapeQuery($gid)."','".$FILEID."','".DbLayer::EscapeQuery($name[0])."','".DbLayer::EscapeQuery($name[1])."','".DbLayer::EscapeQuery($name[2])."','".DbLayer::EscapeQuery($name[3])."')";
+				$sql = "INSERT INTO ".TBLPREFIX."names VALUES('0', '".DbLayer::EscapeQuery($gid)."[".$gedfile."]','".DbLayer::EscapeQuery($gid)."','".$gedfile."','".DbLayer::EscapeQuery($name[0])."','".DbLayer::EscapeQuery($name[1])."','".DbLayer::EscapeQuery($name[2])."','".DbLayer::EscapeQuery($name[3])."')";
 				$res = NewQuery($sql);
 				if ($res) $res->FreeResult();
 			}
 			$indi["names"] = $names;
 			$indi["isdead"] = $isdead;
 			$indi["gedcom"] = $indirec;
-			$indi["gedfile"] = $FILEID;
+			$indi["gedfile"] = $gedfile;
 			$s = GetGedcomValue("SEX", 1, $indirec, '', false);
 			if (empty($s)) $indi["sex"] = "U";
 			else $indi["sex"] = $s;
@@ -673,7 +671,7 @@ abstract class ImportFunctions {
 					foreach ($tcodes as $key => $code) {
 						if (!$first) $sqlstr .= ", ";
 						$first = false;
-						$sqlstr .= "(NULL, '".$kgid."', '".$FILEID."', '".$stype."', '".$nametype."', '".$code."')";
+						$sqlstr .= "(NULL, '".$kgid."', '".$gedfile."', '".$stype."', '".$nametype."', '".$code."')";
 					}
 				}
 			}
@@ -682,7 +680,7 @@ abstract class ImportFunctions {
 				$res = NewQuery($sql);
 				if ($res) $res->FreeResult();
 			}
-			else WriteToLog("Import->Soundex: Indi without soundex codes encountered: ".$kgid, "W", "G", $FILEID);
+			else WriteToLog("Import->Soundex: Indi without soundex codes encountered: ".$kgid, "W", "G", $gedfile);
 		}
 		else if ($type == "FAM") {
 			$indirec = CleanupTagsY($indirec);
@@ -698,7 +696,7 @@ abstract class ImportFunctions {
 			// NOTE: only the children are added/updated here.
 			for($j=0; $j<$ct; $j++) {
 				$chil .= $match[$j][1].";";
-				$sql = "INSERT INTO ".TBLPREFIX."individual_family VALUES(NULL, '".Joinkey($match[$j][1], $FILEID)."', '".JoinKey(DbLayer::EscapeQuery($gid), $FILEID)."', '".($j+1)."', 'C', '', '', '', '".$FILEID."') ON DUPLICATE KEY UPDATE if_order='".($j+1)."'";
+				$sql = "INSERT INTO ".TBLPREFIX."individual_family VALUES(NULL, '".Joinkey($match[$j][1], $gedfile)."', '".JoinKey(DbLayer::EscapeQuery($gid), $gedfile)."', '".($j+1)."', 'C', '', '', '', '".$gedfile."') ON DUPLICATE KEY UPDATE if_order='".($j+1)."'";
 				$res = NewQuery($sql);
 			}
 			$fam = array();
@@ -706,8 +704,8 @@ abstract class ImportFunctions {
 			$fam["WIFE"] = $parents["WIFE"];
 			$fam["CHIL"] = $chil;
 			$fam["gedcom"] = $indirec;
-			$fam["gedfile"] = $FILEID;
-			$sql = "INSERT INTO ".TBLPREFIX."families (f_key, f_id, f_file, f_husb, f_wife, f_chil, f_gedrec, f_numchil) VALUES ('".DbLayer::EscapeQuery($gid)."[".DbLayer::EscapeQuery($fam["gedfile"])."]','".DbLayer::EscapeQuery($gid)."','".DbLayer::EscapeQuery($fam["gedfile"])."','".DbLayer::EscapeQuery(JoinKey($fam["HUSB"], $fam["gedfile"]))."','".DbLayer::EscapeQuery(JoinKey($fam["WIFE"], $FILEID))."','".DbLayer::EscapeQuery($fam["CHIL"])."','".DbLayer::EscapeQuery($fam["gedcom"])."','".DbLayer::EscapeQuery($ct)."')";
+			$fam["gedfile"] = $gedfile;
+			$sql = "INSERT INTO ".TBLPREFIX."families (f_key, f_id, f_file, f_husb, f_wife, f_chil, f_gedrec, f_numchil) VALUES ('".DbLayer::EscapeQuery($gid)."[".DbLayer::EscapeQuery($fam["gedfile"])."]','".DbLayer::EscapeQuery($gid)."','".DbLayer::EscapeQuery($fam["gedfile"])."','".DbLayer::EscapeQuery(JoinKey($fam["HUSB"], $fam["gedfile"]))."','".DbLayer::EscapeQuery(JoinKey($fam["WIFE"], $fam["gedfile"]))."','".DbLayer::EscapeQuery($fam["CHIL"])."','".DbLayer::EscapeQuery($fam["gedcom"])."','".DbLayer::EscapeQuery($ct)."')";
 			$res = NewQuery($sql);
 			if ($res) $res->FreeResult();
 		}
@@ -728,7 +726,7 @@ abstract class ImportFunctions {
 					else $name .= $match[$i][1];
 				}
 			}
-			$sql = "INSERT INTO ".TBLPREFIX."sources VALUES ('".Joinkey($gid, $FILEID)."', '".DbLayer::EscapeQuery($gid)."','".$FILEID."','".DbLayer::EscapeQuery($name)."','".DbLayer::EscapeQuery($indirec)."')";
+			$sql = "INSERT INTO ".TBLPREFIX."sources VALUES ('".Joinkey($gid, $gedfile)."', '".DbLayer::EscapeQuery($gid)."','".$gedfile."','".DbLayer::EscapeQuery($name)."','".DbLayer::EscapeQuery($indirec)."')";
 			$res = NewQuery($sql);
 			if ($res) $res->FreeResult();
 		}
@@ -744,7 +742,7 @@ abstract class ImportFunctions {
 					$indirec .= "\r\n1 DATE ".date("d")." ".date("M")." ".date("Y");
 				}
 			}
-			$sql = "INSERT INTO ".TBLPREFIX."other VALUES ('".Joinkey($gid, $FILEID)."', '".DbLayer::EscapeQuery($gid)."','".$FILEID."','".DbLayer::EscapeQuery($type)."','".DbLayer::EscapeQuery($indirec)."')";
+			$sql = "INSERT INTO ".TBLPREFIX."other VALUES ('".Joinkey($gid, $gedfile)."', '".DbLayer::EscapeQuery($gid)."','".$gedfile."','".DbLayer::EscapeQuery($type)."','".DbLayer::EscapeQuery($indirec)."')";
 			$res = NewQuery($sql);
 			if ($res) $res->FreeResult();
 		}
@@ -795,9 +793,10 @@ abstract class ImportFunctions {
 	 * into the places table
 	 * @param string $indirec
 	 */
-	public function UpdatePlaces($gid, $type, $indirec, $update=false) {
-		global $FILEID, $placecache;
+	public function UpdatePlaces($gid, $type, $indirec, $update=false, $gedfile="") {
+		global $placecache, $GEDCOMID;
 		
+		if (empty($gedfile)) $gedfile = $GEDCOMID;
 	// NOTE: $update=false causes double places to be added. Force true
 	$update = true;
 		if (!isset($placecache)) $placecache = array();
@@ -822,7 +821,7 @@ abstract class ImportFunctions {
 					$parent_id = $placecache[$key][0];
 					if (strpos($placecache[$key][1], $gid.",")===false) {
 						$placecache[$key][1] = "$gid,".$placecache[$key][1];
-						$sql = "INSERT INTO ".TBLPREFIX."placelinks VALUES($parent_id, '".DbLayer::EscapeQuery($gid)."', '".$type."', '".$FILEID."')";
+						$sql = "INSERT INTO ".TBLPREFIX."placelinks VALUES($parent_id, '".DbLayer::EscapeQuery($gid)."', '".$type."', '".$gedfile."')";
 						$res = NewQuery($sql);
 					}
 				}
@@ -830,7 +829,7 @@ abstract class ImportFunctions {
 					$skip = false;
 					if ($update) {
 	//					print "Search: ".$place." ".$level."<br />";
-						$sql = "SELECT p_id FROM ".TBLPREFIX."places WHERE p_place LIKE '".DbLayer::EscapeQuery($place)."' AND p_level=$level AND p_parent_id='$parent_id' AND p_file='".$FILEID."'";
+						$sql = "SELECT p_id FROM ".TBLPREFIX."places WHERE p_place LIKE '".DbLayer::EscapeQuery($place)."' AND p_level=$level AND p_parent_id='$parent_id' AND p_file='".$gedfile."'";
 						$res = NewQuery($sql);
 						if ($res->NumRows()>0) {
 	//						if ($level == 0) print "Hit on: ".$place." ".$level."<br />";
@@ -839,7 +838,7 @@ abstract class ImportFunctions {
 							$parent_id = $row["p_id"];
 							$skip=true;
 							$placecache[$key] = array($parent_id, $gid.",");
-							$sql = "INSERT INTO ".TBLPREFIX."placelinks VALUES($parent_id, '".DbLayer::EscapeQuery($gid)."', '".$type."', '".$FILEID."')";
+							$sql = "INSERT INTO ".TBLPREFIX."placelinks VALUES($parent_id, '".DbLayer::EscapeQuery($gid)."', '".$type."', '".$gedfile."')";
 							$res = NewQuery($sql);
 						}
 					}
@@ -849,11 +848,11 @@ abstract class ImportFunctions {
 						}
 						else $place_id++;
 	//					if ($level == 0) print "Insert: ".$place." ".$level."<br />";
-						$sql = "INSERT INTO ".TBLPREFIX."places VALUES($place_id, '".DbLayer::EscapeQuery($place)."', $level, '$parent_id', '".$FILEID."')";
+						$sql = "INSERT INTO ".TBLPREFIX."places VALUES($place_id, '".DbLayer::EscapeQuery($place)."', $level, '$parent_id', '".$gedfile."')";
 						$res = NewQuery($sql);
 						$parent_id = $place_id;
 						$placecache[$key] = array($parent_id, $gid.",");
-						$sql = "INSERT INTO ".TBLPREFIX."placelinks VALUES($place_id, '".DbLayer::EscapeQuery($gid)."', '".$type."', '".$FILEID."')";
+						$sql = "INSERT INTO ".TBLPREFIX."placelinks VALUES($place_id, '".DbLayer::EscapeQuery($gid)."', '".$type."', '".$gedfile."')";
 						$res = NewQuery($sql);
 					}
 				}
@@ -868,9 +867,10 @@ abstract class ImportFunctions {
 	 * into the dates table
 	 * @param string $indirec
 	 */
-	public function UpdateDates($gid, $indirec) {
-		global $FILEID, $GEDCOMID;
+	public function UpdateDates($gid, $indirec, $gedfile="") {
+		global $GEDCOMID;
 		
+		if (empty($gedfile)) $gedfile = $GEDCOMID;
 		$count = 0;
 		// NOTE: Check if the record has dates, if not return
 		$pt = preg_match("/\d DATE (.*)/", $indirec, $match);
@@ -892,7 +892,7 @@ abstract class ImportFunctions {
 				$datestr = trim($dates[1]);
 				$date = ParseDate($datestr);
 				if (empty($date[0]["day"])) $date[0]["day"] = 0;
-				$sql = "INSERT INTO ".TBLPREFIX."dates VALUES('".DbLayer::EscapeQuery($date[0]["day"])."','".DbLayer::EscapeQuery(Str2Upper($date[0]["month"]))."','".DbLayer::EscapeQuery($date[0]["year"])."','".DbLayer::EscapeQuery($fact)."','".DbLayer::EscapeQuery($gid)."','".DbLayer::EscapeQuery(JoinKey($gid, $GEDCOMID))."','".$FILEID."',";
+				$sql = "INSERT INTO ".TBLPREFIX."dates VALUES('".DbLayer::EscapeQuery($date[0]["day"])."','".DbLayer::EscapeQuery(Str2Upper($date[0]["month"]))."','".DbLayer::EscapeQuery($date[0]["year"])."','".DbLayer::EscapeQuery($fact)."','".DbLayer::EscapeQuery($gid)."','".DbLayer::EscapeQuery(JoinKey($gid, $GEDCOMID))."','".$gedfile."',";
 				if (isset($date[0]["ext"])) {
 					preg_match("/@#D(.*)@/", $date[0]["ext"], $extract_type);
 					$date_types = array("@#DGREGORIAN@","@#DJULIAN@","@#DHEBREW@","@#DFRENCH R@", "@#DROMAN@", "@#DUNKNOWN@");
@@ -911,20 +911,20 @@ abstract class ImportFunctions {
 	 * import media items from record
 	 * @return string	an updated record
 	 */
-	private function UpdateMedia($gid, $indirec, $update=false) {
-		global $FILEID, $media_count, $found_ids;
-		global $zero_level_media;
+	private function UpdateMedia($gid, $indirec, $update=false, $gedfile="") {
+		global $GEDCOMID, $media_count, $found_ids; // $found_ids must be global, as it is saved to/from $_SESSION during import
+		
+		if (empty($gedfile)) $gedfile = $GEDCOMID;
 		
 		if (!isset($media_count)) $media_count = 0;
 		if (!isset($found_ids)) $found_ids = array();
-		if (!isset($zero_level_media)) $zero_level_media = false;
 		
 		// Get the type of record we have here
 		$ct = preg_match("/0 @.+@ (\w+)/", $indirec, $tmatch);
 		if ($ct) $rectype = $tmatch[1];
 		else {
 			$r = substr($indirec, 0, 6);
-			if ($r != "0 HEAD" && $r != "0 TRLR") WriteToLog("UpdateMedia-> Unknown record type encountered on import: ".$indirec, "E", "G", $FILEID);
+			if ($r != "0 HEAD" && $r != "0 TRLR") WriteToLog("UpdateMedia-> Unknown record type encountered on import: ".$indirec, "E", "G", $gedfile);
 			return $indirec;
 		}
 		
@@ -975,13 +975,13 @@ abstract class ImportFunctions {
 			if ($et>0) $ext = substr(trim($ematch[1]),1);
 			if ($found) {
 				// It's the actual values for an inserted stub record. We only update the fields with the true values
-				$sql = "UPDATE ".TBLPREFIX."media SET m_ext = '".DbLayer::EscapeQuery($ext)."', m_titl = '".DbLayer::EscapeQuery($title)."', m_mfile = '".DbLayer::EscapeQuery($file)."', m_gedrec = '".DbLayer::EscapeQuery($indirec)."' WHERE m_media = '".$new_m_media."' AND m_file='".$FILEID."'";
+				$sql = "UPDATE ".TBLPREFIX."media SET m_ext = '".DbLayer::EscapeQuery($ext)."', m_titl = '".DbLayer::EscapeQuery($title)."', m_mfile = '".DbLayer::EscapeQuery($file)."', m_gedrec = '".DbLayer::EscapeQuery($indirec)."' WHERE m_media = '".$new_m_media."' AND m_file='".$gedfile."'";
 				$res = NewQuery($sql);
 			}
 			else {
 				// It's completely new, we insert a new record
 				$sql = "INSERT INTO ".TBLPREFIX."media (m_id, m_media, m_ext, m_titl, m_mfile, m_file, m_gedrec)";
-				$sql .= " VALUES('0', '".DbLayer::EscapeQuery($new_m_media)."', '".DbLayer::EscapeQuery($ext)."', '".DbLayer::EscapeQuery($title)."', '".DbLayer::EscapeQuery($file)."', '".$FILEID."', '".DbLayer::EscapeQuery($indirec)."')";
+				$sql .= " VALUES('0', '".DbLayer::EscapeQuery($new_m_media)."', '".DbLayer::EscapeQuery($ext)."', '".DbLayer::EscapeQuery($title)."', '".DbLayer::EscapeQuery($file)."', '".$gedfile."', '".DbLayer::EscapeQuery($indirec)."')";
 				$res = NewQuery($sql);
 			}
 			$found = false;
@@ -1019,7 +1019,7 @@ abstract class ImportFunctions {
 						$file = RelativePathFile(MediaFS::CheckMediaDepth($file));
 						
 						// Add a check for existing file here
-						$em = CheckDoubleMedia($file, $title, $FILEID);
+						$em = CheckDoubleMedia($file, $title, $gedfile);
 						if (!$em) $m_media = GetNewXref("OBJE");
 						else $m_media = $em;
 						
@@ -1050,11 +1050,11 @@ abstract class ImportFunctions {
 						}
 						if (!$em) {
 							$sql = "INSERT INTO ".TBLPREFIX."media (m_id, m_media, m_ext, m_titl, m_mfile, m_file, m_gedrec)";
-							$sql .= " VALUES('0', '".DbLayer::EscapeQuery($m_media)."', '".DbLayer::EscapeQuery($ext)."', '".DbLayer::EscapeQuery($title)."', '".DbLayer::EscapeQuery($file)."', '".$FILEID."', '".DbLayer::EscapeQuery($objrec)."')";
+							$sql .= " VALUES('0', '".DbLayer::EscapeQuery($m_media)."', '".DbLayer::EscapeQuery($ext)."', '".DbLayer::EscapeQuery($title)."', '".DbLayer::EscapeQuery($file)."', '".$gedfile."', '".DbLayer::EscapeQuery($objrec)."')";
 							$res = NewQuery($sql);
 						}
 						$sql = "INSERT INTO ".TBLPREFIX."media_mapping (mm_id, mm_media, mm_gid, mm_order, mm_file, mm_gedrec, mm_type)";
-						$sql .= " VALUES ('0', '".DbLayer::EscapeQuery($m_media)."', '".DbLayer::EscapeQuery($gid)."', '".DbLayer::EscapeQuery($count)."', '".$FILEID."', '".addslashes(''.$objlevel.' OBJE @'.$m_media.'@'.$add)."', '".$rectype."')";
+						$sql .= " VALUES ('0', '".DbLayer::EscapeQuery($m_media)."', '".DbLayer::EscapeQuery($gid)."', '".DbLayer::EscapeQuery($count)."', '".$gedfile."', '".addslashes(''.$objlevel.' OBJE @'.$m_media.'@'.$add)."', '".$rectype."')";
 						$res = NewQuery($sql);
 						$media_count++;
 						$count++;
@@ -1095,7 +1095,7 @@ abstract class ImportFunctions {
 								// NOTE: We found a media reference but no media item yet, we need to create an empty
 								// NOTE: media object, so we do not have orhpaned media mapping links
 								$sql = "INSERT INTO ".TBLPREFIX."media (m_id, m_media, m_ext, m_titl, m_mfile, m_file, m_gedrec)";
-								$sql .= " VALUES('0', '".DbLayer::EscapeQuery($new_mm_media)."', '', '', '', '".$FILEID."', '0 @".DbLayer::EscapeQuery($new_mm_media)."@ OBJE\r\n')";
+								$sql .= " VALUES('0', '".DbLayer::EscapeQuery($new_mm_media)."', '', '', '', '".$gedfile."', '0 @".DbLayer::EscapeQuery($new_mm_media)."@ OBJE\r\n')";
 								$res = NewQuery($sql);
 								
 								// NOTE: Add the mapping to the media reference
@@ -1104,12 +1104,12 @@ abstract class ImportFunctions {
 								$gedrec = preg_replace("/@(.*)@/", "@$new_mm_media@", $gedrec);
 								$line = preg_replace("/@(.*)@/", "@$new_mm_media@", $line);
 								$sql = "INSERT INTO ".TBLPREFIX."media_mapping (mm_id, mm_media, mm_gid, mm_order, mm_file, mm_gedrec, mm_type) ";
-								$sql .= "VALUES ('0', '".DbLayer::EscapeQuery($new_mm_media)."', '".DbLayer::EscapeQuery($gid)."', '".DbLayer::EscapeQuery($count)."', '".$FILEID."', '".$gedrec."', '".$rectype."')";
+								$sql .= "VALUES ('0', '".DbLayer::EscapeQuery($new_mm_media)."', '".DbLayer::EscapeQuery($gid)."', '".DbLayer::EscapeQuery($count)."', '".$gedfile."', '".$gedrec."', '".$rectype."')";
 								$res = NewQuery($sql);
 							}
 							else {
 								// NOTE: This is an online update. Let's see if we already have a media mapping for this item
-								$sql = "SELECT mm_media FROM ".TBLPREFIX."media_mapping WHERE mm_media = '".$new_mm_media."' AND mm_file = '".$FILEID."'";
+								$sql = "SELECT mm_media FROM ".TBLPREFIX."media_mapping WHERE mm_media = '".$new_mm_media."' AND mm_file = '".$gedfile."'";
 								$res = NewQuery($sql);
 								$row = $res->FetchAssoc();
 								if (count($row) == 0) {
@@ -1118,7 +1118,7 @@ abstract class ImportFunctions {
 									// NOTE: Add the mapping to the media reference
 									$line = preg_replace("/@(.*)@/", "@$new_mm_media@", $line);
 									$sql = "INSERT INTO ".TBLPREFIX."media_mapping (mm_id, mm_media, mm_gid, mm_order, mm_file, mm_gedrec, mm_type) ";
-									$sql .= "VALUES ('0', '".DbLayer::EscapeQuery($new_mm_media)."', '".DbLayer::EscapeQuery($gid)."', '".DbLayer::EscapeQuery($count)."', '".$FILEID."', '".$gedrec."', '".$rectype."')";
+									$sql .= "VALUES ('0', '".DbLayer::EscapeQuery($new_mm_media)."', '".DbLayer::EscapeQuery($gid)."', '".DbLayer::EscapeQuery($count)."', '".$gedfile."', '".$gedrec."', '".$rectype."')";
 									$res = NewQuery($sql);
 								}
 							}
@@ -1131,19 +1131,19 @@ abstract class ImportFunctions {
 								$gedrec = preg_replace("/@(.*)@/", "@$new_mm_media@", $gedrec);
 								$line = preg_replace("/@(.*)@/", "@$new_mm_media@", $line);
 								$sql = "INSERT INTO ".TBLPREFIX."media_mapping (mm_id, mm_media, mm_gid, mm_order, mm_file, mm_gedrec, mm_type) ";
-								$sql .= "VALUES ('0', '".DbLayer::EscapeQuery($new_mm_media)."', '".DbLayer::EscapeQuery($gid)."', '".DbLayer::EscapeQuery($count)."', '".$FILEID."', '".$gedrec."', '".$rectype."')";
+								$sql .= "VALUES ('0', '".DbLayer::EscapeQuery($new_mm_media)."', '".DbLayer::EscapeQuery($gid)."', '".DbLayer::EscapeQuery($count)."', '".$gedfile."', '".$gedrec."', '".$rectype."')";
 								$res = NewQuery($sql);
 							}
 							else {
 								// NOTE: This is an online update. Let's see if we already have a media mapping for this item
-								$sql = "SELECT mm_media FROM ".TBLPREFIX."media_mapping WHERE mm_media = '".$new_mm_media."' AND mm_file = '".$FILEID."'";
+								$sql = "SELECT mm_media FROM ".TBLPREFIX."media_mapping WHERE mm_media = '".$new_mm_media."' AND mm_file = '".$gedfile."'";
 								$res = NewQuery($sql);
 								$row = $res->FetchAssoc();
 								if (count($row) == 0) {
 									// NOTE: Add the mapping to the media reference
 									$line = preg_replace("/@(.+)@/", "@$new_mm_media@", $line);
 									$sql = "INSERT INTO ".TBLPREFIX."media_mapping (mm_id, mm_media, mm_gid, mm_order, mm_file, mm_gedrec, mm_type) ";
-									$sql .= "VALUES ('0', '".DbLayer::EscapeQuery($new_mm_media)."', '".DbLayer::EscapeQuery($gid)."', '".DbLayer::EscapeQuery($count)."', '".$FILEID."', '".$line."', '".$rectype."')";
+									$sql .= "VALUES ('0', '".DbLayer::EscapeQuery($new_mm_media)."', '".DbLayer::EscapeQuery($gid)."', '".DbLayer::EscapeQuery($count)."', '".$gedfile."', '".$line."', '".$rectype."')";
 									$res = NewQuery($sql);
 								}
 							}
@@ -1166,7 +1166,7 @@ abstract class ImportFunctions {
 						$file = RelativePathFile(MediaFS::CheckMediaDepth($file));
 						
 						// Add a check for existing file here
-						$em = CheckDoubleMedia($file, $title, $FILEID);
+						$em = CheckDoubleMedia($file, $title, $gedfile);
 						if (!$em) $m_media = GetNewXref("OBJE");
 						else $m_media = $em;
 	
@@ -1195,13 +1195,13 @@ abstract class ImportFunctions {
 						$objrec = preg_replace("/^(\d+) /me", "($1-$objlevel).' '", $objrec);
 						if (!$em) {
 							$sql = "INSERT INTO ".TBLPREFIX."media (m_id, m_media, m_ext, m_titl, m_mfile, m_file, m_gedrec)";
-							$sql .= " VALUES('0', '".DbLayer::EscapeQuery($m_media)."', '".DbLayer::EscapeQuery($ext)."', '".DbLayer::EscapeQuery($title)."', '".DbLayer::EscapeQuery($file)."', '".$FILEID."', '".DbLayer::EscapeQuery($objrec)."')";
+							$sql .= " VALUES('0', '".DbLayer::EscapeQuery($m_media)."', '".DbLayer::EscapeQuery($ext)."', '".DbLayer::EscapeQuery($title)."', '".DbLayer::EscapeQuery($file)."', '".$gedfile."', '".DbLayer::EscapeQuery($objrec)."')";
 							$res = NewQuery($sql);
 						}
 	
 						
 						$sql = "INSERT INTO ".TBLPREFIX."media_mapping (mm_id, mm_media, mm_gid, mm_order, mm_file, mm_gedrec, mm_type)";
-						$sql .= " VALUES ('0', '".DbLayer::EscapeQuery($m_media)."', '".DbLayer::EscapeQuery($gid)."', '".DbLayer::EscapeQuery($count)."', '".$FILEID."', '".addslashes(''.$objlevel.' OBJE @'.$m_media.'@'.$add)."', '".$rectype."')";
+						$sql .= " VALUES ('0', '".DbLayer::EscapeQuery($m_media)."', '".DbLayer::EscapeQuery($gid)."', '".DbLayer::EscapeQuery($count)."', '".$gedfile."', '".addslashes(''.$objlevel.' OBJE @'.$m_media.'@'.$add)."', '".$rectype."')";
 						$res = NewQuery($sql);
 						$media_count++;
 						$count++;
@@ -1236,7 +1236,7 @@ abstract class ImportFunctions {
 							if ($objrec{0} != 0) {
 								
 								// Add a check for existing file here
-								$em = CheckDoubleMedia($file, $title, $FILEID);
+								$em = CheckDoubleMedia($file, $title, $gedfile);
 								if (!$em) $m_media = GetNewXref("OBJE");
 								else $m_media = $em;
 								
@@ -1264,11 +1264,11 @@ abstract class ImportFunctions {
 	
 								if (!$em) {
 									$sql = "INSERT INTO ".TBLPREFIX."media (m_id, m_media, m_ext, m_titl, m_mfile, m_file, m_gedrec)";
-									$sql .= " VALUES('0', '".DbLayer::EscapeQuery($m_media)."', '".DbLayer::EscapeQuery($ext)."', '".DbLayer::EscapeQuery($title)."', '".DbLayer::EscapeQuery($file)."', '".$FILEID."', '".DbLayer::EscapeQuery($objrec)."')";
+									$sql .= " VALUES('0', '".DbLayer::EscapeQuery($m_media)."', '".DbLayer::EscapeQuery($ext)."', '".DbLayer::EscapeQuery($title)."', '".DbLayer::EscapeQuery($file)."', '".$gedfile."', '".DbLayer::EscapeQuery($objrec)."')";
 									$res = NewQuery($sql);
 								}
 								$sql = "INSERT INTO ".TBLPREFIX."media_mapping (mm_id, mm_media, mm_gid, mm_order, mm_file, mm_gedrec, mm_type)";
-								$sql .= " VALUES ('0', '".DbLayer::EscapeQuery($m_media)."', '".DbLayer::EscapeQuery($gid)."', '".DbLayer::EscapeQuery($count)."', '".$FILEID."', '".addslashes(''.$objlevel.' OBJE @'.$m_media.'@'.$add)."', '".$rectype."')";
+								$sql .= " VALUES ('0', '".DbLayer::EscapeQuery($m_media)."', '".DbLayer::EscapeQuery($gid)."', '".DbLayer::EscapeQuery($count)."', '".$gedfile."', '".addslashes(''.$objlevel.' OBJE @'.$m_media.'@'.$add)."', '".$rectype."')";
 								$res = NewQuery($sql);
 							}
 							else {
@@ -1369,6 +1369,82 @@ abstract class ImportFunctions {
 		TBLPREFIX."changes WRITE";
 		$res = NewQuery($sql);
 		
+	}
+	/**
+	 * Add a new calculated name to the individual names table
+	 *
+	 * this function will add a new name record for the given individual, this function is called from the
+	 * importgedcom.php script stage 5
+	 * @param string $gid	gedcom xref id of individual to update
+	 * @param string $newname	the new calculated name to add
+	 * @param string $surname	the surname for this name
+	 * @param string $letter	the letter for this name
+	 */
+	public function AddNewName($indi, $newname, $letter, $surname, $indirec) {
+	
+		$kgid = JoinKey($indi->xref, $indi->gedcomid);
+		$sql = "INSERT INTO ".TBLPREFIX."names VALUES('0', '".DbLayer::EscapeQuery($kgid)."','".DbLayer::EscapeQuery($indi->xref)."','".$indi->gedcomid."','".DbLayer::EscapeQuery($newname)."','".DbLayer::EscapeQuery($letter)."','".DbLayer::EscapeQuery($surname)."','C')";
+		$res = NewQuery($sql);
+		
+		$name_array = $indi->name_array;
+		$name_array[] = array($newname, $letter, $surname, "C");
+		$soundex_codes = GetSoundexStrings($name_array, false, $indirec);
+		$sql = "DELETE FROM ".TBLPREFIX."soundex WHERE s_gid='".$kgid."'";
+		$sql = "INSERT INTO ".TBLPREFIX."soundex VALUES ";
+		foreach ($soundex_codes as $type => $ncodes) {
+			foreach ($ncodes as $nametype => $tcodes) {
+				foreach ($tcodes as $key => $code) {
+					$sql .= "(NULL, '".$kgid."', '".$indi->gedcomid."', '".$type."', '".$nametype."', '".$code."'), ";
+				}
+			}
+		}
+		$sql = substr($sql, 0, strlen($sql)-2);
+		$res = NewQuery($sql);
+		if ($res) $res->FreeResult();
+		$sql = "UPDATE ".TBLPREFIX."individuals SET i_gedrec='".DbLayer::EscapeQuery($indirec)."' WHERE i_id='".DbLayer::EscapeQuery($indi->xref)."' AND i_file='".$indi->gedcomid."'";
+		$res = NewQuery($sql);
+	}
+	
+	public function GetFemalesWithFAMS($gedid) {
+		
+		$flist = array();
+		$sql = "SELECT i_key, i_gedrec, i_isdead, i_id, i_file, n_name, n_surname, n_letter, n_type ";
+		$sql .= "FROM ".TBLPREFIX."individuals INNER JOIN ".TBLPREFIX."names ON n_key=i_key ";
+		$sql .= "WHERE i_gender='F' AND i_file = '".$gedid."' AND i_gedrec LIKE '%1 FAMS%' AND n_type='P'";
+		// N.B. Only primary names are added, as this will be affected by married names!
+		
+		$res = NewQuery($sql);
+		$key = "";
+		while($row = $res->FetchAssoc($res->result)){
+			if ($key != $row["i_key"]) {
+				if ($key != "") $person->names_read = true;
+				$person = null;
+				$key = $row["i_key"];
+				$person =& Person::GetInstance($row["i_id"], $row, $row["i_file"]);
+				$flist[$row["i_key"]] = $person;
+			}
+			$flist[$row["i_key"]]->addname = array($row["n_name"], $row["n_letter"], $row["n_surname"], $row["n_type"]);
+		}
+		if ($key != "") $person->names_read = true;
+		$res->FreeResult();
+		return $flist;
+	}
+	
+	//-- get the famlist from the datastore
+	public function GetFamListWithMARR($gedid) {
+	
+		$famlist = array();
+		$sql = "SELECT f_id, f_gedrec, f_file FROM ".TBLPREFIX."families WHERE f_file='".$gedid."' AND f_gedrec LIKE '%1 MARR%'";
+		$res = NewQuery($sql);
+		$ct = $res->NumRows();
+		if ($ct > 0) {
+			while($row = $res->FetchAssoc()){
+				$fam = Family::GetInstance($row["f_id"], $row, $gedid);
+				$famlist[$row["f_id"]] = $fam;
+			}
+		}
+		$res->FreeResult();
+		return $famlist;
 	}
 }
 ?>

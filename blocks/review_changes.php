@@ -47,7 +47,7 @@ function review_changes_block($block = true, $config="", $side, $index) {
 
 	$lastmail = GedcomConfig::GetLastNotifMail();
 	$display_block = false;
-	$geds = GetChangeData(false, "", false, "gedcoms");
+	$geds = ChangeFunctions::GetChangeData(false, "", false, "gedcoms");
 	$sent = array();
 	$users = array();
 	foreach ($geds as $gedkey=>$gedvalue) {
@@ -96,7 +96,7 @@ function review_changes_block($block = true, $config="", $side, $index) {
 		print "</div>";
 		print "<div class=\"blockcontent\">";
 		if ($gm_user->userCanAccept()) print "<a href=\"#\" onclick=\"window.open('edit_changes.php','','width=600,height=600,resizable=1,scrollbars=1'); return false;\">".GM_LANG_accept_changes."</a><br />\n";
-		if ($block) print "<div class=\"small_inner_block, $TEXT_DIRECTION\">\n";
+		if ($block) print "<div class=\"small_inner_block $TEXT_DIRECTION\">\n";
 		if ($config["sendmail"]=="yes" && GedcomConfig::$LAST_CHANGE_EMAIL != 0) {
 			$day = date("j", GedcomConfig::$LAST_CHANGE_EMAIL);
 			$mon = date("M", GedcomConfig::$LAST_CHANGE_EMAIL);
@@ -107,39 +107,25 @@ function review_changes_block($block = true, $config="", $side, $index) {
 			$year = date("Y", GedcomConfig::$LAST_CHANGE_EMAIL+(60*60*24*$config["days"]));
 			print GM_LANG_next_email_sent.GetChangedDate("$day $mon $year")." - ".date($TIME_FORMAT, GedcomConfig::$LAST_CHANGE_EMAIL+(60*60*24*$config["days"]))."<br /><br />\n";
 		}
-		$gm_changes = GetChangeData(false, "", true, "gedlines");
+		$gm_changes = ChangeFunctions::GetChangeData(false, "", true, "gedlines");
 		foreach($gm_changes as $gedcomid=>$changes) {
 			if ($gedcomid == $GEDCOMID) {
 				foreach($changes as $gid=>$change) {
-					$type = GetRecType($change);
-					if ($type=="INDI") {
-						$person =& Person::GetInstance($gid, "", $gedcomid);
-						print "<b>".$person->name."</b>".$person->addxref;
+					$object = ConstructObject($gid, "", $gedcomid);
+					if (is_object($object)) {
+						$type = $object->type;
+						print "<div class=\"width20 left row\">";
+						if ($type=="INDI") print " <a href=\"individual.php?pid=".$object->xref."&amp;gedid=".$object->gedcomid."\">".GM_LANG_view_change_diff."</a>\n<br />";
+						if ($type=="FAM") print " <a href=\"family.php?famid=".$object->xref."&amp;gedid=".$object->gedcomid."\">".GM_LANG_view_change_diff."</a>\n<br />";
+						if ($type=="OBJE") print " <a href=\"mediadetail.php?mid=".$object->xref."&amp;gedid=".$object->gedcomid."\">".GM_LANG_view_change_diff."</a>\n<br />";
+						if ($type=="SOUR") print " <a href=\"source.php?sid=".$object->xref."&amp;gedid=".$object->gedcomid."\">".GM_LANG_view_change_diff."</a>\n<br />";
+						if ($type=="REPO") print " <a href=\"repo.php?rid=".$object->xref."&amp;gedid=".$object->gedcomid."\">".GM_LANG_view_change_diff."</a>\n<br />";
+						if ($type=="NOTE") print " <a href=\"note.php?oid=".$object->xref."&amp;gedid=".$object->gedcomid."\">".GM_LANG_view_change_diff."</a>\n<br />";
+						if ($block) print "<br />";
+						print "</div><div class=\"width80 left\">";
+						print "<b>".$object->name."</b>".$object->addxref;
+						print "</div>";
 					}
-					else if ($type=="FAM") {
-						$family =& Family::GetInstance($gid, "", $gedcomid);
-						print "<b>".$family->descriptor."</b>".$family->addxref;
-					}
-					else if ($type=="SOUR") {
-						$source =& Source::GetInstance($gid, "", $gedcomid);
-						print "<b>".$source->descriptor."</b>".$source->addxref;
-					}
-					else if ($type=="REPO") {
-						$repo =& Repository::GetInstance($gid, "", $gedcomid);
-						print "<b>".$repo->descriptor."</b>".$repo->addxref;
-					}
-					else if ($type == "OBJE") {
-						$media =& MediaItem::GetInstance($gid, "", $gedcomid);
-						print "<b>".$media->descriptor."</b>".$media->addxref;
-					}
-					else print "<b>".constant("GM_FACT_".$type)."</b> &lrm;(".$gid.")&lrm;\n";
-					if ($block) print "<br />";
-					if ($type=="INDI") print " <a href=\"individual.php?pid=".$person->xref."&amp;gedid=".$person->gedcomid."\">".GM_LANG_view_change_diff."</a>\n<br />";
-					if ($type=="FAM") print " <a href=\"family.php?famid=".$family->xref."&amp;gedid=".$family->gedcomid."\">".GM_LANG_view_change_diff."</a>\n<br />";
-					if ($type=="OBJE") print " <a href=\"mediadetail.php?mid=".$media->xref."&amp;gedid=".$media->gedcomid."\">".GM_LANG_view_change_diff."</a>\n<br />";
-					if ($type=="SOUR") print " <a href=\"source.php?sid=".$source->xref."&amp;gedid=".$source->gedcomid."\">".GM_LANG_view_change_diff."</a>\n<br />";
-					if ($type=="REPO") print " <a href=\"repo.php?rid=".$repo->xref."&amp;gedid=".$repo->gedcomid."\">".GM_LANG_view_change_diff."</a>\n<br />";
-					if ($type=="NOTE") print " <a href=\"note.php?oid=".$media->xref."&amp;gedid=".$media->gedcomid."\">".GM_LANG_view_change_diff."</a>\n<br />";
 				}
 			}
 		}

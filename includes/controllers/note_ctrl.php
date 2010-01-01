@@ -43,13 +43,12 @@ class NoteController extends DetailController {
 	 */
 	public function __construct() {
 		global $GEDCOMID;
-		global $ENABLE_CLIPPINGS_CART, $show_changes, $nonfacts;
+		global $ENABLE_CLIPPINGS_CART, $nonfacts;
 		
 		parent::__construct();
 
 		$nonfacts = array();
 				
-		$this->show_changes = $show_changes;
 		if (!empty($_REQUEST["oid"])) $this->xref = strtoupper($_REQUEST["oid"]);
 		
 		if (!is_null($this->xref)) {
@@ -93,7 +92,7 @@ class NoteController extends DetailController {
 	 * @return Menu
 	 */
 	public function &getEditMenu() {
-		global $gm_user, $show_changes;
+		global $gm_user;
 		
 		// edit note menu
 		$menu = new Menu(GM_LANG_edit_note);
@@ -119,7 +118,7 @@ class NoteController extends DetailController {
 			$menu->addSubmenu($submenu);
 
 			// edit_note / show/hide changes
-			if (!$show_changes) $submenu = new Menu(GM_LANG_show_changes);
+			if (!$this->show_changes) $submenu = new Menu(GM_LANG_show_changes);
 			else $submenu = new Menu(GM_LANG_hide_changes);
 			$submenu->addLink('showchanges();');
 			$menu->addSubmenu($submenu);
@@ -198,7 +197,6 @@ class NoteController extends DetailController {
 	 * @param string $pid		The gedcom XREF id for the level 0 record that this note is a part of
 	 */
 	protected function PrintGeneralNote($styleadd="", $mayedit=true) {
-		global $view, $show_changes;
 		global $GM_IMAGES;
 
 		if (!$this->note->disp) return false;
@@ -224,7 +222,7 @@ class NoteController extends DetailController {
 		if (($this->note->textchanged || $this->note->isnew) && !$this->note->isdeleted && $this->show_changes && !($this->view == "preview")) $styleadd = "change_new";
 		if (!$this->note->isdeleted || !$this->show_changes) {
 			print "\n\t\t<tr><td class=\"shade2 $styleadd center\" style=\"vertical-align: middle;\"><img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["note"]["other"]."\" width=\"50\" height=\"50\" alt=\"\" /><br />".GM_LANG_note.":";
-			if ($this->note->canedit && ($styleadd!="change_old")&&($view!="preview")&& $mayedit) {
+			if ($this->note->canedit && ($styleadd!="change_old")&&($this->view != "preview")&& $mayedit) {
 				$menu = array();
 				$menu["label"] = GM_LANG_edit;
 				$menu["labelpos"] = "right";

@@ -75,16 +75,22 @@ abstract class BlockFunctions {
 		$skip = preg_split("/[;, ]/", $skipfacts);
 		
 		// Add 1 to day to start from tomorrow
-		if ($action == "upcoming") $monthstart = mktime(1,0,0,$monthtonum[strtolower($month)],$day+1,$year);
+		if ($action == "upcoming") {
+			$monthstart = mktime(1,0,0,$monthtonum[strtolower($month)],$day+1,$year);
+			// Fix for 31 december!
+			if (date("Y", $monthstart) > $year) $year +=1;
+			//print "jaar: ".date("Y", $monthstart)." ".$year;
+		}
 		else $monthstart = mktime(1,0,0,$monthtonum[strtolower($month)],$day,$year);
 		$mstart = date("n", $monthstart);
-	
+		
 		// Look for cached Facts data
 		$cache_load = false;
 		$cache_refresh = false;
+		
 		// Retrieve the last change date
 		$mday = GedcomConfig::GetLastCacheDate($action, $GEDCOMID);
-	// $mday = 0;  // to force cache rebuild
+//	 $mday = 0;  // to force cache rebuild
 		if ($mday==$monthstart) {
 			$cache_load = true;
 	//		print "Retrieve from cache";
@@ -103,6 +109,7 @@ abstract class BlockFunctions {
 				$monthend = $monthstart + (60*60*24*(GedcomConfig::$DAYS_TO_SHOW_LIMIT-1));
 				$dend = date("j", $monthstart+(60*60*24*(GedcomConfig::$DAYS_TO_SHOW_LIMIT-1)));
 				$mend = date("n", $monthstart+(60*60*24*(GedcomConfig::$DAYS_TO_SHOW_LIMIT-1)));
+				//print "dstart: ".$dstart." mstart: ".$mstart." dend: ".$dend." mend: ".$mend;
 			}
 			else {
 				$monthend = $monthstart;
@@ -192,7 +199,7 @@ abstract class BlockFunctions {
 			$IGNORE_FACTS = 1;
 			$IGNORE_YEAR = 1;
 			uasort($found_facts, "CompareFacts");
-			
+		
 			foreach ($found_facts as $key => $factr) {
 				$sql = "INSERT INTO ".TBLPREFIX."eventcache VALUES('0','".$GEDCOMID."', '".$action."', '".$factr[0]."', '".$factr[7]."', '".$factr[6]."', '".mysql_real_escape_string($factr[1])."', '".$factr[2]."', '".$factr[3]."', '".mysql_real_escape_string($factr[4])."', '".$factr[5]."')";
 				$res = NewQuery($sql);

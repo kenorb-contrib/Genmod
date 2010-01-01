@@ -315,10 +315,11 @@ function GetAllSubrecords($gedrec, $ignore="", $families=true, $sort=true, $Appl
 		for($f=0; $f<$ft; $f++) {
 			$famid = $fmatch[$f][1];
 			if (!is_array($families) || in_array($famid, $families)) {
-			if (!$ApplyPriv || PrivacyFunctions::DisplayDetailsByID($famid, "FAM")) {
-				$famrec = FindGedcomRecord($fmatch[$f][1]);
+				$fam =& Family::GetInstance($fmatch[$f][1]);
+			if (!$ApplyPriv || $fam->disp) {
+				$famrec = $fam->gedrec;
 				$parents = FindParentsInRecord($famrec);
-				if ($id==$parents["HUSB"]) $spid = $parents["WIFE"];
+				if ($id == $parents["HUSB"]) $spid = $parents["WIFE"];
 				else $spid = $parents["HUSB"];
 				$prev_tags = array();
 				$ct = preg_match_all("/\n1 (\w+)(.*)/", $famrec, $match, PREG_SET_ORDER);
@@ -407,9 +408,10 @@ function GetGedcomValue($tag, $level, $gedrec, $truncate='', $convert=true) {
 		$ct = preg_match("/@(.*)@/", $value, $match);
 		if (($ct > 0 ) && ($t!="DATE")){
 			$oldsub = $subrec;
-			$subrec = FindGedcomRecord($match[1]);
-			if ($subrec) {
+			$object = ConstructObject($match[1]);
+			if (is_object($object)) {
 				$value=$match[1];
+				$subrec = $object->gedrec;
 				$ct = preg_match("/0 @$match[1]@ $t (.+)/", $subrec, $match);
 				if ($ct>0) {
 					$value = $match[1];
@@ -504,7 +506,7 @@ function GetCont($nlevel, $nrec) {
 	$text = "";
 	$tt = preg_match_all("/$nlevel CON[CT](.*)(\r\n|\r|\n)*/", $nrec, $cmatch, PREG_SET_ORDER);
 	for($i=0; $i<$tt; $i++) {
-		if (strstr($cmatch[$i][0], "CONT")) $text.="<br />\n";
+		if (strstr($cmatch[$i][0], "CONT")) $text.="<br />";
 		else if (GedcomConfig::$WORD_WRAPPED_NOTES) $text.=" ";
 		$conctxt = $cmatch[$i][1];
 		if (!empty($conctxt)) {
@@ -559,8 +561,8 @@ function FindParents($famid) {
 		if ($gm_user->userCanEdit($gm_username)) {
 			$famrec = FindGedcomRecord($famid);
 			if (empty($famrec)) {
-				if ($show_changes && GetChangeData(true, $famid, true, "", "FAM")) {
-					$f = GetChangeData(false, $famid, true, "gedlines", "FAM");
+				if ($show_changes && ChangeFunctions::GetChangeData(true, $famid, true, "", "FAM")) {
+					$f = ChangeFunctions::GetChangeData(false, $famid, true, "gedlines", "FAM");
 					$famrec = $f[$GEDCOMID][$famid];
 				}
 				else return false;
@@ -631,8 +633,8 @@ function FindFamilyIds($pid, $indirec="", $newfams = false) {
 	
 	// We must get the families from the gedcom record to preserve the order. 
 	$gedrec = FindGedcomRecord($pid);
-	if ($newfams && $gm_user->UserCanEdit() && $show_changes && GetChangeData(true, $pid, true, "", "")) {
-		$rec = GetChangeData(false, $pid, true, "gedlines", "");
+	if ($newfams && $gm_user->UserCanEdit() && $show_changes && ChangeFunctions::GetChangeData(true, $pid, true, "", "")) {
+		$rec = ChangeFunctions::GetChangeData(false, $pid, true, "gedlines", "");
 		$gedrec = $rec[$GEDCOMID][$pid];
 	}
 	$ct = preg_match_all("/1\s+FAMC\s+@(.*)@.*/", $gedrec, $fmatch, PREG_SET_ORDER);
@@ -680,8 +682,8 @@ function FindSfamilyIds($pid, $newfams = false) {
 //	}
 	// We must get the families from the gedcom record to preserve the order. 
 	$gedrec = FindGedcomRecord($pid);
-	if ($newfams && $gm_user->UserCanEdit() && $show_changes && GetChangeData(true, $pid, true, "", "")) {
-		$rec = GetChangeData(false, $pid, true, "gedlines", "");
+	if ($newfams && $gm_user->UserCanEdit() && $show_changes && ChangeFunctions::GetChangeData(true, $pid, true, "", "")) {
+		$rec = ChangeFunctions::GetChangeData(false, $pid, true, "gedlines", "");
 		$gedrec = $rec[$GEDCOMID][$pid];
 	}
 	$ct = preg_match_all("/1\s+FAMS\s+@(.*)@.*/", $gedrec, $fmatch, PREG_SET_ORDER);
@@ -1343,6 +1345,8 @@ function CleanInput($pid) {
  * @return string
  */
 function GetLdsGlance($indirec) {
+	global $GEDCOMID;
+	
 	$text = "";
 
 	$ord = GetSubRecord(1, "1 BAPL", $indirec);
@@ -1354,7 +1358,8 @@ function GetLdsGlance($indirec) {
 	$found = false;
 	$ct = preg_match_all("/1 FAMS @(.*)@/", $indirec, $match, PREG_SET_ORDER);
 	for($i=0; $i<$ct; $i++) {
-		$famrec = FindFamilyRecord($match[$i][1]);
+		$family =& Family::GetInstance($match[$i][1], "", $GEDCOMID);
+		$famrec = $family->gedrec;
 		if ($famrec) {
 			$ord = GetSubRecord(1, "1 SLGS", $famrec);
 			if ($ord) {
@@ -1388,22 +1393,6 @@ function RemoveCustomTags($gedrec, $remove="no") {
 	$gedrec = preg_replace(array("/(\r\n)+/", "/\r+/", "/\n+/"), array("\r\n", "\r", "\n"), $gedrec);
 	//-- make downloaded file DOS formatted
 	$gedrec = preg_replace("/([^\r])\n/", "$1\n", $gedrec);
-	return $gedrec;
-}
-
-
-function EmbedNote($gedrec) {
-
-	$ct = preg_match_all("/\n(\d) NOTE @(.+)@/", $gedrec, $match);
-	for ($i=1;$i<=$ct;$i++) {
-		$nid = $match[2][$i-1];
-		$level = $match[1][$i-1];
-		$noterec = FindGedcomRecord($nid);
-		$oldlevel = $noterec[0];
-		$noterec = preg_replace("/\n(\d) /e", "'\n'.SumNums($1, $level).' '", $noterec);
-		$noterec = preg_replace("/^0 @.+@ NOTE/", $level." NOTE", $noterec);
-		$gedrec = preg_replace("/$level NOTE @$nid@\s*/", $noterec, $gedrec);
-	}
 	return $gedrec;
 }
 

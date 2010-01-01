@@ -31,7 +31,7 @@ if (stristr($_SERVER["SCRIPT_NAME"],basename(__FILE__))) {
 class User {
 
 	public $classname = "User";					// Name of this class
-	private static $usercache = array();		// Holder of the instances for this class
+	private static $cache = array();			// Holder of the instances for this class
 
 	public $username = "";						// Name of the user (used to logon)
 	public $password = "";						// Encrypted password of the user
@@ -82,22 +82,22 @@ class User {
 		if (empty($username)) $cachename = "empty";
 		else $cachename = $username;
 		
-		if (!isset(self::$usercache[$cachename])) {
-			self::$usercache[$cachename] = new User($username, $userdata="");
+		if (!isset(self::$cache[$cachename])) {
+			self::$cache[$cachename] = new User($username, $userdata="");
 		}
-		return self::$usercache[$cachename];
+		return self::$cache[$cachename];
 	}
 	
 	public static function RenewInstance($username) {
 		
-		if (isset(self::$usercache[$username])) unset(self::$usercache[$username]);
-		if (!empty($username)) self::$usercache[$username] = new User($username);
+		if (isset(self::$cache[$username])) unset(self::$cache[$username]);
+		if (!empty($username)) self::$cache[$username] = new User($username);
 
 	}
 		
 	public static function DeleteInstance($username) {
 		
-		if (isset(self::$usercache[$username])) unset(self::$usercache[$username]);
+		if (isset(self::$cache[$username])) unset(self::$cache[$username]);
 
 	}
 	
@@ -106,7 +106,7 @@ class User {
 	}
 
 	public function ObjCount() {
-		return count(self::$usercache);
+		return count(self::$cache);
 	}	
 	
 	private function GetUser($username, $userfields="") {

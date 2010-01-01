@@ -471,7 +471,6 @@ function GetMediaFiles($gedid="") {
 	$sql .= "ORDER BY m_mfile ASC";
 	$res = NewQuery($sql);
 	while($row = $res->FetchRow()){
-		$row = db_cleanup($row);
 		if ($MEDIA_IN_DB || file_exists($row[0])) $mlist[] = $row[0];
 	}
 	return array_flip(array_flip($mlist));

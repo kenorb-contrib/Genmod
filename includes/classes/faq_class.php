@@ -33,27 +33,27 @@ if (stristr($_SERVER["SCRIPT_NAME"],basename(__FILE__))) {
 class FAQ {
 
 	// General class information
-	public $classname = "FAQ";	// Name of this class
-	public $datatype = "FAQ";	// Type of data collected here
+	public $classname = "FAQ";			// Name of this class
+	public $datatype = "FAQ";			// Type of data collected here
 	
-	private $header = null;		// Header text of the FAQ
-	private $body = null;		// Body text of the FAQ
-	private $order = null;		// Position to display
-	private $gedcomid = null;	// Gedcom ID to display for
-	private $id = null;			// Database ID of the FAQ
-	private $is_empty = null;	// If this FAQ really exists
+	private $header = null;				// Header text of the FAQ
+	private $body = null;				// Body text of the FAQ
+	private $order = null;				// Position to display
+	private $gedcomid = null;			// Gedcom ID to display for
+	private $id = null;					// Database ID of the FAQ
+	private $is_empty = null;			// If this FAQ really exists
 	
-	private static $faqcache = array();		 	// Holder of the instances for this class
+	private static $cache = array();	// Holder of the instances for this class
 	
 	
 	public static function GetInstance($id, $data_array="", $gedcomid="") {
 		global $GEDCOMID;
 		
 		if (empty($gedcomid)) $gedcomid = $GEDCOMID;
-		if (!isset(self::$faqcache[$gedcomid][$id])) {
-			self::$faqcache[$gedcomid][$id] = new FAQ($id, $data_array, $gedcomid);
+		if (!isset(self::$cache[$gedcomid][$id])) {
+			self::$cache[$gedcomid][$id] = new FAQ($id, $data_array, $gedcomid);
 		}
-		return self::$faqcache[$gedcomid][$id];
+		return self::$cache[$gedcomid][$id];
 	}
 		
 	public function __construct($id, $data_array="", $gedcomid="") {
@@ -76,7 +76,7 @@ class FAQ {
 		}
 		else $this->is_empty = true;
 		
-		self::$faqcache[$gedcomid][$id] = $this;
+		self::$cache[$gedcomid][$id] = $this;
 	}
 	
 	public function __get($property) {
@@ -107,7 +107,7 @@ class FAQ {
 		
 		$sql = "DELETE FROM ".TBLPREFIX."faqs WHERE fa_id='".$this->id."'";
 		$res = NewQuery($sql);
-		unset(self::$faqcache[$this->gedcomid][$this->id]);
+		unset(self::$cache[$this->gedcomid][$this->id]);
 		WriteToLog("FAQ-> FAQ item has been deleted.<br />ID: ".$this->id.".<br />Gedcom ID: ".$this->gedcomid, "I", "G", $this->gedcomid);
 	}
 	

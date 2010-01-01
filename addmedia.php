@@ -132,7 +132,7 @@ if ($action=="newentry") {
 			$xref = EditFunctions::AppendGedrec($newged, "OBJE", $change_id, $change_type);
 		
 			if ($can_auto_accept && (($gm_user->UserCanAccept() && $aa_attempt) || $gm_user->userAutoAccept())) {
-				AcceptChange($change_id, $GEDCOMID);
+				ChangeFunctions::AcceptChange($change_id, $GEDCOMID);
 			}
 			
 			print GM_LANG_update_successful;

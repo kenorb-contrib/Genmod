@@ -55,7 +55,7 @@ abstract class EditFunctions {
 		// NOTE: Check if auto accept is possible. If there are already changes present for any ID in one $change_id, changes cannot be auto accepted.
 		if (!isset($can_auto_accept)) $can_auto_accept = true;
 		if ($can_auto_accept) {
-			if (HasOtherChanges($gid, $change_id)) {
+			if (self::HasOtherChanges($gid, $change_id)) {
 				// We already have changes for this ID, so we cannot auto accept!
 				$can_auto_accept = false;
 			}
@@ -80,7 +80,7 @@ abstract class EditFunctions {
 		}
 		
 		// NOTE: Check if there are changes present, if so flag pending changes so they cannot be approved
-		if (GetChangeData(true, $gid, true) && ($change_type == "raw_edit" || $change_type == "reorder_families" || $change_type == "reorder_children")) {
+		if (ChangeFunctions::GetChangeData(true, $gid, true) && ($change_type == "raw_edit" || $change_type == "reorder_families" || $change_type == "reorder_children")) {
 			$sql = "select ch_cid as cid from ".TBLPREFIX."changes where ch_gid = '".$gid."' and ch_file = '".$gedid."' order by ch_cid ASC";
 			$res = NewQuery($sql);
 			while($row = $res->FetchAssoc()){
@@ -95,8 +95,8 @@ abstract class EditFunctions {
 		$res = NewQuery($sql);
 		
 		WriteToLog("ReplaceGedrec-> Replacing gedcom record $gid ->" . $gm_user->username ."<-", "I", "G", $gedid);
-		// Clear the GetChangeData cache
-		ResetChangeCaches();
+		// Clear the ChangeFunctions::GetChangeData cache
+		ChangeFunctions::ResetChangeCaches();
 		return true;
 	}
 	
@@ -122,8 +122,8 @@ abstract class EditFunctions {
 		$res = NewQuery($sql);
 		WriteToLog("AppendGedrec-> Appending new $type record $xref ->" . $gm_user->username ."<-", "I", "G", $gedid);
 	
-		// Clear the GetChangeData cache
-		ResetChangeCaches();
+		// Clear the ChangeFunctions::GetChangeData cache
+		ChangeFunctions::ResetChangeCaches();
 		return $xref;
 	}
 	
@@ -136,31 +136,31 @@ abstract class EditFunctions {
 		
 		// NOTE: Check if auto accept is possible. If there are already changes present for any ID in one $change_id, changes cannot be auto accepted.
 		if ($can_auto_accept) {
-			if (HasOtherChanges($gid, $change_id)) {
+			if (self::HasOtherChanges($gid, $change_id)) {
 				// We already have changes for this ID, so we cannot auto accept!
 				$can_auto_accept = false;
 			}
 		}
 		// NOTE: Check if there are changes present, if so flag pending changes so they cannot be approved
-		if (GetChangeData(true, $gid, true)) {
+		if (ChangeFunctions::GetChangeData(true, $gid, true)) {
 			$sql = "SELECT ch_cid AS cid FROM ".TBLPREFIX."changes WHERE ch_gid = '".$gid."' AND ch_file = '".$GEDCOMID."' ORDER BY ch_cid ASC";
 			$res = NewQuery($sql);
 			while($row = $res->FetchAssoc()){
 				$sqlcid = "UPDATE ".TBLPREFIX."changes SET ch_delete = '1' WHERE ch_cid = '".$row["cid"]."'";
 				$rescid = NewQuery($sqlcid);
 			}
-			// Clear the GetChangeData cache
-			ResetChangeCaches();
+			// Clear the ChangeFunctions::GetChangeData cache
+			ChangeFunctions::ResetChangeCaches();
 		}
 		
 		// NOTE Check if record exists in the database
-		if (!FindGedcomRecord($gid) && !GetChangeData(true, $gid, true)) {
+		if (!FindGedcomRecord($gid) && !ChangeFunctions::GetChangeData(true, $gid, true)) {
 			print "DeleteGedrec-> Could not find gedcom record with xref: $gid. <br />";
 			WriteToLog("DeleteGedrec-> Could not find gedcom record with xref: $gid ->" . $gm_user->username ."<-", "E", "G", $GEDCOMID);
 			return false;
 		}
 		else {
-			$rec = GetChangeData(false, $gid, true, "gedlines","");
+			$rec = ChangeFunctions::GetChangeData(false, $gid, true, "gedlines","");
 			if (isset($rec[$GEDCOMID][$gid])) $oldrec = $rec[$GEDCOMID][$gid];
 			else $oldrec = FindGedcomRecord($gid);
 			$ct = preg_match("/0 @.*@\s(\w+)\s/", $oldrec, $match);
@@ -175,7 +175,7 @@ abstract class EditFunctions {
 					foreach ($pidassos as $nothing =>$asso) {
 						$pid1 = SplitKey($p1key, "id");
 						$pid2 = SplitKey($asso["pid2"], "id");
-						$arec = GetChangeData(false, $pid2, true, "gedlines","");
+						$arec = ChangeFunctions::GetChangeData(false, $pid2, true, "gedlines","");
 						if (isset($rec[$GEDCOMID][$pid2])) $arec = $rec[$GEDCOMID][$pid2];
 						else $arec = FindGedcomRecord($pid2);
 						if (strstr($arec, "1 ASSO")) {
@@ -207,8 +207,8 @@ abstract class EditFunctions {
 				
 		}
 		WriteToLog("DeleteGedrec-> Deleting gedcom record $gid ->" . $gm_user->username ."<-", "I", "G", $GEDCOMID);
-		// Clear the GetChangeData cache
-		ResetChangeCaches();
+		// Clear the ChangeFunctions::GetChangeData cache
+		ChangeFunctions::ResetChangeCaches();
 		return true;
 	}
 	
@@ -289,14 +289,14 @@ abstract class EditFunctions {
 		if (empty($namerec)) {
 			$indirec = "";
 			if ($famtag=="CHIL" and $nextaction=="addchildaction") {
-				if (!empty($famid) && GetChangeData(true, $famid, true, "", "FAM")) {
-					$rec = GetChangeData(false, $famid, true, "gedlines", "FAM");
+				if (!empty($famid) && ChangeFunctions::GetChangeData(true, $famid, true, "", "FAM")) {
+					$rec = ChangeFunctions::GetChangeData(false, $famid, true, "gedlines", "FAM");
 					$famrec = $rec[$GEDCOMID][$famid];
 				}
 				else $famrec = FindGedcomRecord($famid);
 				$parents = FindParentsInRecord($famrec);
-				if (!empty($famid) && !empty($parents["HUSB"]) && GetChangeData(true, $parents["HUSB"], true, "", "INDI")) {
-					$rec = GetChangeData(false, $parents["HUSB"], true, "gedlines", "INDI");
+				if (!empty($famid) && !empty($parents["HUSB"]) && ChangeFunctions::GetChangeData(true, $parents["HUSB"], true, "", "INDI")) {
+					$rec = ChangeFunctions::GetChangeData(false, $parents["HUSB"], true, "gedlines", "INDI");
 					$indirec = $rec[$GEDCOMID][$parents["HUSB"]];
 				}
 				else $indirec = FindPersonRecord($parents["HUSB"]);
@@ -304,8 +304,8 @@ abstract class EditFunctions {
 			if ($famtag=="HUSB" and $nextaction=="addnewparentaction") {
 				$famrec = FindGedcomRecord($famid);
 				$parents = FindParentsInRecord($famrec);
-				if (!empty($parents["HUSB"]) && GetChangeData(true, $parents["HUSB"], true, "", "INDI")) {
-					$rec = GetChangeData(false, $parents["HUSB"], true, "gedlines", "INDI");
+				if (!empty($parents["HUSB"]) && ChangeFunctions::GetChangeData(true, $parents["HUSB"], true, "", "INDI")) {
+					$rec = ChangeFunctions::GetChangeData(false, $parents["HUSB"], true, "gedlines", "INDI");
 					$indirec = $rec[$GEDCOMID][$parents["HUSB"]];
 				}
 				else $indirec = FindPersonRecord($parents["HUSB"]);
@@ -313,8 +313,8 @@ abstract class EditFunctions {
 			if ($famtag=="WIFE" and $nextaction=="addnewparentaction") {
 				$famrec = FindGedcomRecord($famid);
 				$parents = FindParentsInRecord($famrec);
-				if (!empty($parents["WIFE"]) && GetChangeData(true, $parents["WIFE"], true, "", "INDI")) {
-					$rec = GetChangeData(false, $parents["WIFE"], true, "gedlines", "INDI");
+				if (!empty($parents["WIFE"]) && ChangeFunctions::GetChangeData(true, $parents["WIFE"], true, "", "INDI")) {
+					$rec = ChangeFunctions::GetChangeData(false, $parents["WIFE"], true, "gedlines", "INDI");
 					$indirec = $rec[$GEDCOMID][$parents["WIFE"]];
 				}
 				else $indirec = FindPersonRecord($parents["WIFE"]);
@@ -1230,8 +1230,8 @@ abstract class EditFunctions {
 						//print "ok link found".$text[$j];
 						$trec = FindGedcomRecord($text[$j]);
 						if (!empty($trec)) $passlink = true;
-						if (GetChangeData(true, $text[$j], true, "", "")) {
-							$t = GetChangeData(false, $text[$j], true, "gedlines", "");
+						if (ChangeFunctions::GetChangeData(true, $text[$j], true, "", "")) {
+							$t = ChangeFunctions::GetChangeData(false, $text[$j], true, "gedlines", "");
 							$ctrec = $t[$GEDCOMID][$text[$j]];
 							if (!empty($ctrec)) $passlink = true;
 							else $passlink = false;
@@ -1474,8 +1474,8 @@ abstract class EditFunctions {
 		}
 		if (IdType($pid) == "OBJE") {
 			$gedrec = FindMediaRecord($pid);
-			if (GetChangeData(true, $pid, true)) {
-				$rec = GetChangeData(false, $pid, true, "gedlines");
+			if (ChangeFunctions::GetChangeData(true, $pid, true)) {
+				$rec = ChangeFunctions::GetChangeData(false, $pid, true, "gedlines");
 				$gedrec = $rec[$GEDCOMID][$pid];
 			}
 		}
@@ -1591,7 +1591,7 @@ abstract class EditFunctions {
 	
 	public function ReplaceLinks($oldgid, $newgid, $mtype, $change_id, $change_type, $gedid) {
 	
-		$records = GetLinkedGedRecs($oldgid, $mtype, $gedid);
+		$records = self::GetLinkedGedRecs($oldgid, $mtype, $gedid);
 			
 		foreach ($records as $key1=>$record) {	
 			$tt = preg_match("/0 @(.+)@ (.+)/", $record, $match);
@@ -1603,7 +1603,7 @@ abstract class EditFunctions {
 					$tag = substr($sub, 2, 4);
 					if ($tag != "CHIL" && $tag != "HUSB" && $tag != "WIFE" && $tag != "FAMC" && $tag != "FAMS") {
 						$newsub = preg_replace("/(\d) (\w+) @$oldgid@/", "$1 $2 @$newgid@", $sub);
-						EditFunctions::ReplaceGedrec($gid, $sub, $newsub, $tag, $change_id, $change_type, $gedid, $type);
+						self::ReplaceGedrec($gid, $sub, $newsub, $tag, $change_id, $change_type, $gedid, $type);
 					}
 				}
 			}
@@ -1614,14 +1614,14 @@ abstract class EditFunctions {
 		global $GEDCOMID;
 	
 		// We miss the links on new records, which are only in the _changes table
-		$records = GetLinkedGedRecs($oldgid, $mtype, $gedid);
+		$records = self::GetLinkedGedRecs($oldgid, $mtype, $gedid);
 		$success = true;
 		foreach ($records as $key1=>$record) {	
 			$tt = preg_match("/0 @(.+)@ (.+)/", $record, $match);
 			$gid = $match[1];
 			$type = $match[2];
-			if (GetChangeData(true, $gid, true, "", "")) {
-				$rec = GetChangeData(false, $gid, true, "gedlines", "");
+			if (ChangeFunctions::GetChangeData(true, $gid, true, "", "")) {
+				$rec = ChangeFunctions::GetChangeData(false, $gid, true, "gedlines", "");
 				$record = $rec[$GEDCOMID][$gid];
 			}
 			$subs = Getallsubrecords($record, "", false, false, false);
@@ -1631,20 +1631,72 @@ abstract class EditFunctions {
 				if (preg_match("/(\d) (\w+) @$oldgid@/", $sub, $match2)) {
 					$subdel = GetSubRecord($match2[1], $match2[1]." ".$match2[2]." @".$oldgid."@", $sub);
 					$subnew = preg_replace("/$subdel/", "", $sub);
-					$success = $success && EditFunctions::ReplaceGedrec($gid, $sub, $subnew, $fact, $change_id, $change_type, $gedid, $type);
+					$success = $success && self::ReplaceGedrec($gid, $sub, $subnew, $fact, $change_id, $change_type, $gedid, $type);
 				}
 			}
 		}
 		return $success;
 	}
-/*	
+	
 	public function GetLinkedGedrecs($oldgid, $mtype, $gedid) {
 		
 		$records = array();
 		
 		//-- Collect all gedcom records
 		
-		//-- References from sources (REPO, OBJE, NOTE)
+		// All pointing to this source
+		if ($mtype == "SOUR") {
+			$sql = "SELECT sm_gid as pid, sm_type as type FROM ".TBLPREFIX."source_mapping WHERE sm_sid='".$oldgid."' AND sm_file='".$gedid."'";
+			$res = NewQuery($sql);
+			while($row = $res->FetchAssoc()) {
+				$object = ConstructObject($row["pid"], $row["type"], $gedid);
+				$records[$row["pid"]] = $object->gedrec;
+			}
+		}
+		// All pointing to this repo
+		if ($mtype == "REPO" || $mtype == "NOTE") {
+			$sql = "SELECT om_gid as pid, om_type as type FROM ".TBLPREFIX."other_mapping WHERE om_oid='".$oldgid."' AND om_file='".$gedid."'";
+			$res = NewQuery($sql);
+			while($row = $res->FetchAssoc()) {
+				$object = ConstructObject($row["pid"], $row["type"], $gedid);
+				$records[$row["pid"]] = $object->gedrec;
+			}
+		}
+		// All pointing to this mm-object
+		if ($mtype == "OBJE") {
+			$sql = "SELECT mm_gid as pid, mm_type as type FROM ".TBLPREFIX."media_mapping WHERE mm_media='".$oldgid."' AND mm_file='".$gedid."'";
+			$res = NewQuery($sql);
+			while($row = $res->FetchAssoc()) {
+				$object = ConstructObject($row["pid"], $row["type"], $gedid);
+				$records[$row["pid"]] = $object->gedrec;
+			}
+		}
+		// All pointing to this individual
+		if ($mtype == "INDI") {
+			$sql = "SELECT if_fkey as pid FROM ".TBLPREFIX."individual_family WHERE if_pkey='".JoinKey($oldgid, $gedid)."'";
+			$res = NewQuery($sql);
+			while($row = $res->FetchAssoc()) {
+				$object = ConstructObject(Splitkey($row["pid"], "id"), "FAM", $gedid);
+				$records[Splitkey($row["pid"], "id")] = $object->gedrec;
+			}
+			$sql = "SELECT as_of as pid, as_type as type FROM ".TBLPREFIX."asso WHERE as_pid='".JoinKey($oldgid, $gedid)."'";
+			$res = NewQuery($sql);
+			while($row = $res->FetchAssoc()) {
+				$object = ConstructObject(Splitkey($row["pid"], "id"), ($row["type"] == "I" ? "INDI" : "FAM"), $gedid);
+				$records[Splitkey($row["pid"], "id")] = $object->gedrec;
+			}
+		}
+		// All pointing to this family
+		if ($mtype == "FAM") {
+			$sql = "SELECT if_pkey as pid FROM ".TBLPREFIX."individual_family WHERE if_fkey='".JoinKey($oldgid, $gedid)."'";
+			$res = NewQuery($sql);
+			while($row = $res->FetchAssoc()) {
+				$object = ConstructObject(Splitkey($row["pid"], "id"), "INDI", $gedid);
+				$records[Splitkey($row["pid"], "id")] = $object->gedrec;
+			}
+		}
+		
+/*		//-- References from sources (REPO, OBJE, NOTE)
 		if ($mtype == "REPO" || $mtype == "OBJE" || $mtype == "NOTE") {
 			$sql = "SELECT s_gedrec, s_id FROM ".TBLPREFIX."sources WHERE s_gedrec REGEXP '[1-9] [[:alnum:]]+ @".$oldgid."@' AND s_file='".$gedid."'";
 			$res = NewQuery($sql);
@@ -1698,21 +1750,17 @@ abstract class EditFunctions {
 				}
 			}
 		}
-		
+*/		
 		return $records;
 	}
-*/	
+	
 	public function DeleteFamIfEmpty($famid, $change_id, $change_type, $gedid="") {
 		global $GEDCOMID;
 		
 		if (empty($gedid)) $gedid = $GEDCOMID;
-		$famrec = FindFamilyRecord($famid, $gedid);
-		if (GetChangeData(true, $famid, true)) {
-			$rec = GetChangeData(false, $famid, true, "gedlines");
-			$famrec = $rec[$GEDCOMID][$famid];
-		}
+		$family = Family::GetInstance($famid, "", $gedid);
+		$famrec = $family->changedgedrec;
 		$ct = preg_match("/1 CHIL|HUSB|WIFE/", $famrec);
-	//	print $famrec."<br />".$ct."<br />";
 		if ($ct == 0) return ReplaceGedRec($famid, $famrec, "", "FAM", $change_id, $change_type, $gedid, "FAM");
 		else return true;
 	}
@@ -1855,5 +1903,20 @@ abstract class EditFunctions {
 			self::AddSimpleTag("2 STAT");
 		}
 	}
+
+	public function HasOtherChanges($pid, $change_id, $gedid="") {
+		global $GEDCOMID;
+		
+		if (empty($gedid)) $gedid = $GEDCOMID;
+		if (ChangeFunctions::GetChangeData(true, $pid, true)) {
+			$sql = "SELECT count(ch_id) FROM ".TBLPREFIX."changes WHERE ch_file='".$gedid."' AND ch_gid='".$pid."' AND ch_cid<>'".$change_id."'";
+			$res = NewQuery($sql);
+			$row = $res->FetchRow();
+			return $row[0];
+		}
+		else return false;
+	}
+	
+	
 }
 ?>

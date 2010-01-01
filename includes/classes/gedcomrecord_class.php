@@ -39,6 +39,9 @@ abstract class GedcomRecord {
 	protected $gedrec = null;			// Gedcom record of the object
 	protected $gedcomid = null;			// Gedcom id in which this object exists
 	protected $changedgedrec = null;	// The gedcom record after changes would be applied
+	protected $privategedrec = null;	// The gedcom record after all is privatized
+	protected $oldprivategedrec = null;	// The gedcom record after all is privatized
+	protected $newprivategedrec = null;	// The gedcom record after all is privatized
 	protected $xref = null;				// ID of the object
 	protected $key = null;				// ID joined with the gedcomid
 	protected $type = null;				// Type of the object: INDI, FAM, SOUR, REPO, NOTE or OBJE
@@ -134,10 +137,12 @@ abstract class GedcomRecord {
 				}
 			}
 			else $this->isempty = false;
+			$this->gedrec = trim($this->gedrec)."\r\n";
 				
 		}
 		else {
 			$this->isempty = false;
+			$this->gedrec = trim($this->gedrec)."\r\n";
 
 			$ct = preg_match("/0 @(.*)@ (\w+)/", $this->gedrec, $match);
 			if ($ct>0) {
@@ -155,6 +160,15 @@ abstract class GedcomRecord {
 		switch ($property) {
 			case "gedrec":
 				return $this->gedrec;
+				break;
+			case "privategedrec":
+				return $this->GetPrivateGedrec(0);
+				break;
+			case "oldprivategedrec":
+				return $this->GetPrivateGedrec(-1);
+				break;
+			case "newprivategedrec":
+				return $this->GetPrivateGedrec(1);
 				break;
 			case "gedcomid":
 				return $this->gedcomid;
@@ -375,7 +389,7 @@ abstract class GedcomRecord {
 	protected function ThisChanged() {
 		
 		if (is_null($this->ischanged)) {
-			if (GetChangeData(true, $this->xref, true, "", "")) $this->ischanged = true;
+			if (ChangeFunctions::GetChangeData(true, $this->xref, true, "", "")) $this->ischanged = true;
 			else $this->ischanged = false;
 		}
 		return $this->ischanged;
@@ -384,7 +398,7 @@ abstract class GedcomRecord {
 	protected function ThisNew() {
 		
 		if (is_null($this->isnew)) {
-			if (empty($this->gedrec) && GetChangeData(true, $this->xref, true, "", "")) {
+			if (empty($this->gedrec) && ChangeFunctions::GetChangeData(true, $this->xref, true, "", "")) {
 				$this->isnew = true;
 				$this->ischanged = true;
 			}
@@ -414,7 +428,7 @@ abstract class GedcomRecord {
 		
 		if (!$this->ThisChanged()) return "";
 		if (is_null($this->changedgedrec)) {
-			$rec = GetChangeData(false, $this->xref, true, "gedlines", "");
+			$rec = ChangeFunctions::GetChangeData(false, $this->xref, true, "gedlines", "");
 			$this->changedgedrec = $rec[$this->gedcomid][$this->xref];
 		}
 		return $this->changedgedrec;
@@ -485,7 +499,7 @@ abstract class GedcomRecord {
 			// Set the deleted status
 			$this->ThisDeleted();
 			// Add the new facts first
-			$newrecs = RetrieveNewFacts($this->xref);
+			$newrecs = ChangeFunctions::RetrieveNewFacts($this->xref);
 			foreach($newrecs as $key=> $newrec) {
 				$ft = preg_match("/1\s(\w+)(.*)/", $newrec, $match);
 				if ($ft>0) {
@@ -520,9 +534,9 @@ abstract class GedcomRecord {
 				}
 				else {
 					// if anything changed but is not new........
-					if ($factobj->style != "change_new" && ($this->isdeleted || IsChangedFact($this->xref, $factobj->factrec))) {
+					if ($factobj->style != "change_new" && ($this->isdeleted || ChangeFunctions::IsChangedFact($this->xref, $factobj->factrec))) {
 						// if the record is changed, also show the new value
-						$cfact = RetrieveChangedFact($this->xref, $factobj->fact, $factobj->factrec);
+						$cfact = ChangeFunctions::RetrieveChangedFact($this->xref, $factobj->fact, $factobj->factrec);
 						// if only a fact is changed/deleted.....
 						if (!$this->isdeleted) {
 							// Add the old fact.
@@ -1147,6 +1161,112 @@ abstract class GedcomRecord {
 		}
 		return true;
 		
+	}
+	// Type is used to indicate what gedrec to privatize:
+	// -1: old gedrec
+	//  0: gedrec that is used depending on the user rights to see changes
+	//  1: new gedrec 
+	// Otherwise it will depend on the access level to determine if old/new is used.
+	private function GetPrivateGedrec($type=-1) {
+		global $gm_user;
+	
+		if ($type == 0) {
+			$gedrec = $this->gedrec;
+			if ($gm_user->userCanEdit()) {
+				$newrec = $this->GetChangedGedrec();
+				if (!empty($newrec)) $gedrec = $newrec;
+			}
+		}
+		else if ($type == 1 && $gm_user->userCanEdit()) $gedrec = $this->GetChangedGedrec();
+		else $gedrec = $this->gedrec;
+		
+		//-- check if the whole record is private
+		if (!$this->DisplayDetails()) {
+			//-- check if name should be private
+			if ($this->type == "INDI") {
+				$newrec = "0 @".$this->xref."@ INDI\r\n";
+				if (!$this->DispName()) {
+					$newrec .= "1 NAME " . GM_LANG_private . " /" . GM_LANG_private . "/" . "\r\n";
+					$newrec .= "2 SURN " . GM_LANG_private . "\r\n";
+					$newrec .= "2 GIVN " . GM_LANG_private . "\r\n";
+				}
+				else {
+					// Add the names
+					$cnt=1;
+					do {
+						$namerec = GetSubRecord(1, "1 NAME", $gedrec, $cnt);
+						if (!empty($namerec)) $newrec .= $namerec;
+						$cnt++;
+					} while (!empty($namerec));
+				}
+				// Always add famlinks
+				$ct = preg_match_all("/1\s+FAMS\s+@(.*)@.*/", $gedrec, $fmatch, PREG_SET_ORDER);
+				if ($ct>0) {
+					foreach($fmatch as $key => $value) {
+						$newrec .= "1 FAMS @".$value[1]."@\r\n";
+					}
+				}
+				$ct = preg_match_all("/1\s+FAMC\s+@(.*)@.*/", $gedrec, $fmatch, PREG_SET_ORDER);
+				if ($ct>0) {
+					foreach($fmatch as $key => $value) {
+						$newrec .= "1 FAMC @".$value[1]."@\r\n";
+					}
+				}
+			}
+			else if ($this->type == "SOUR") {
+				$newrec = "0 @".$this->xref."@ SOUR\r\n";
+				$newrec .= "1 TITL ".GM_LANG_private."\r\n";
+			}
+			else if ($this->type == "OBJE") {
+				$newrec = "0 @".$this->xref."@ OBJE\r\n";
+				$newrec .= "1 FILE\r\n2 TITL ".GM_LANG_private."\r\n";
+			}
+			else if ($this->type == "REPO") {
+				$newrec = "0 @".$this->xref."@ REPO\r\n";
+				$newrec .= "1 NAME ".GM_LANG_private."\r\n";
+			}
+			else if ($this->type == "NOTE") {
+				$newrec = "0 @".$this->xref."@ NOTE ".GM_LANG_private."\r\n";
+			}
+			else if ($this->type == "FAM") {
+				$newrec = "0 @".$this->xref."@ FAM\r\n";
+				// Always add fam links
+			    $ct1 = preg_match("/1 HUSB @(.*)@/", $gedrec, $match);
+				if ($ct1 > 0) $newrec .= "1 HUSB @".$match[1]."@\r\n";
+			    $ct1 = preg_match("/1 WIFE @(.*)@/", $gedrec, $match);
+				if ($ct1 > 0) $newrec .= "1 WIFE @".$match[1]."@\r\n";
+				$ct = preg_match_all("/1 CHIL @(.*)@/", $gedrec, $match, PREG_SET_ORDER);
+				for($i=0; $i<$ct; $i++) {
+					$newrec .= "1 CHIL @".$match[$i][1]."@\r\n";
+				}
+			}
+			else {
+				// remain all other types plus indi's that can show their name
+				$newrec = "0 @".$this->xref."@ ".$this->type."\r\n";
+			}
+			if ($this->type != "NOTE") $newrec .= "1 NOTE ".trim(GM_LANG_person_private)."\r\n";
+			else $newrec .= "1 CONT ".trim(GM_LANG_person_private)."\r\n";
+			return $newrec;
+		}
+		else {
+			if ($this->type == "NOTE") {
+				$newrec = MakeCont("0 @".$this->xref."@ NOTE", preg_replace("/\<br \/\>/", "\r\n", $this->GetNoteText(false)),false);
+			}
+			else $newrec = "0 @".$this->xref."@ ".$this->type."\r\n";
+
+			$allsubs = GetAllSubrecords($gedrec, "", false, false, false);
+			if (is_array($allsubs)) {
+				foreach ($allsubs as $key => $subrecord) {
+					$ft = preg_match("/1\s(\w+)(.*)/", $subrecord, $match);
+					if ($ft>0) $fact = $match[1];
+					if (!($this->type == "NOTE" && ($fact == "CONC" || $fact == "CONT"))) {
+						$fact = new Fact($this->xref, $this->type, $fact, $subrecord);
+						if ($fact->disp) $newrec .= $fact->factrec;
+					}
+				}
+			}
+			return $newrec;
+		}
 	}
 }
 ?>

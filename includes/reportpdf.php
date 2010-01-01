@@ -1714,8 +1714,8 @@ function GMRGedcomValueSHandler($attrs) {
 				}
 			}
 //LERMAN - add ability to get changed data
-                        if (isset($attrs["changed"]) && $attrs["changed"] && GetChangeData(true, $id, true, "gedlines")) {
-				$pend_gedcoms = GetChangeData(false, $id, true, "gedlinesCHAN");
+                        if (isset($attrs["changed"]) && $attrs["changed"] && ChangeFunctions::GetChangeData(true, $id, true, "gedlines")) {
+				$pend_gedcoms = ChangeFunctions::GetChangeData(false, $id, true, "gedlinesCHAN");
 				foreach($pend_gedcoms as $gedcom=>$pend_indis) {
 					if ($gedcom == $GEDCOMID) {
 						foreach ($pend_indis as $key=>$changed) {
@@ -1987,7 +1987,7 @@ function GMRFactsSHandler($attrs) {
 		$ignorefacts = preg_split("/[\s,;:]/", $tag);
 		$id = GetRecID($gedrec);
 		$oldperson = new Person($id, $gedrec);
-		$facts = RetrieveNewFacts($oldperson->xref, true);
+		$facts = ChangeFunctions::RetrieveNewFacts($oldperson->xref, true);
 		foreach ($facts as $key=>$fact) {
 			$ct = preg_match("/1 (.+)/", $fact, $match);
 			if ($ct<=0) {
@@ -2555,8 +2555,8 @@ function GMRListSHandler($attrs) {
 //LERMAN
 		case "pending":
 			$list = array();
-			if (GetChangeData(true, "", true, "gedlinesCHAN")) {
-				$pend_gedcoms = GetChangeData(false, "", true, "gedlinesCHAN");
+			if (ChangeFunctions::GetChangeData(true, "", true, "gedlinesCHAN")) {
+				$pend_gedcoms = ChangeFunctions::GetChangeData(false, "", true, "gedlinesCHAN");
 				foreach($pend_gedcoms as $gedcom=>$pend_indis) {
 					if ($gedcom == $GEDCOMID) {
 						foreach ($pend_indis as $key=>$changed) {

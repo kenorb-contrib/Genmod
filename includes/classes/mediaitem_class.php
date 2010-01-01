@@ -31,10 +31,11 @@ class MediaItem extends GedcomRecord {
 	
 	public $classname = "MediaItem";
 	public $datatype = "OBJE";
-	private static $mediaitemcache = array(); // Holder of the instances for this class
+	private static $cache = array(); 	// Holder of the instances for this class
 	
 	private $extension = null;
 	private $title = null; 
+	private $name = null; 						// Same as title
 	private $filename = null;
 	private $level = 0;
 	private $validmedia = null;
@@ -47,10 +48,10 @@ class MediaItem extends GedcomRecord {
 		global $GEDCOMID;
 		
 		if (empty($gedcomid)) $gedcomid = $GEDCOMID;
-		if (!isset(self::$mediaitemcache[$gedcomid][$id])) {
-			self::$mediaitemcache[$gedcomid][$id] = new MediaItem($id, $gedrec, $gedcomid);
+		if (!isset(self::$cache[$gedcomid][$id])) {
+			self::$cache[$gedcomid][$id] = new MediaItem($id, $gedrec, $gedcomid);
 		}
-		return self::$mediaitemcache[$gedcomid][$id];
+		return self::$cache[$gedcomid][$id];
 	}
 	
 	public function __construct($id, $gedrec="", $gedcomid="") {
@@ -86,6 +87,9 @@ class MediaItem extends GedcomRecord {
 			case "title":
 				return $this->getTitle();
 				break;
+			case "name":
+				return $this->getTitle();
+				break;
 			case "filename":
 				return $this->filename;
 				break;
@@ -106,7 +110,7 @@ class MediaItem extends GedcomRecord {
 
 	public function ObjCount() {
 		$count = 0;
-		foreach(self::$mediaitemcache as $ged => $media) {
+		foreach(self::$cache as $ged => $media) {
 			$count += count($media);
 		}
 		return $count;

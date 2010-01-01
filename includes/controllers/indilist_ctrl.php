@@ -52,9 +52,6 @@ class IndilistController extends ListController {
 	public function __construct() {
 		global $ALLOW_CHANGE_GEDCOM, $gm_user;
 		
-		global $GM_IMAGES, $nonfacts, $nonfamfacts;
-		global $ENABLE_CLIPPINGS_CART, $show_changes;
-		
 		parent::__construct();
 		
 		// Get the incoming letter

@@ -101,7 +101,6 @@ abstract class SearchFunctions {
 		$res = NewQuery($sql);
 		if ($res) {
 			while($row = $res->FetchAssoc()){
-				$row = db_cleanup($row);
 				if ($COMBIKEY) $key = $row["i_key"];
 				else $key = $row["i_id"];
 				if (!isset($myindilist[$key])) {
@@ -184,7 +183,6 @@ abstract class SearchFunctions {
 		$res = NewQuery($sql);
 		$gedold = $GEDCOMID;
 		while($row = $res->fetchAssoc()){
-			$row = db_cleanup($row);
 			$GEDCOMID = $row["f_file"];
 			$husb = SplitKey($row["f_husb"], "id");
 			$wife = SplitKey($row["f_wife"], "id");
@@ -268,7 +266,6 @@ abstract class SearchFunctions {
 		$res = NewQuery($sql);
 		if ($res) {
 			while($row = $res->fetchRow()){
-				$row = db_cleanup($row);
 				if (count($allgeds) > 1) {
 					$mysourcelist[$row[0]."[".$row[2]."]"]["name"] = $row[1];
 					$mysourcelist[$row[0]."[".$row[2]."]"]["gedfile"] = $row[2];
@@ -333,7 +330,6 @@ abstract class SearchFunctions {
 		$res = NewQuery($sql);
 		if ($res) {
 			while($row = $res->fetchAssoc()){
-				$row = db_cleanup($row);
 				$tt = preg_match("/1 NAME (.*)/", $row["o_gedrec"], $match);
 				if ($tt == "0") $name = $row["o_id"]; else $name = $match[1];
 				if (count($allgeds) > 1) {

@@ -191,8 +191,7 @@ class FamilyController extends DetailController
 				$menu->addSubmenu($submenu);
 			}
 		}
-		// TODO: also show this option when media changed
-		if ($this->family->ischanged || HasChangedMedia($this->family->gedrec)) {
+		if ($this->family->ischanged || ChangeFunctions::HasChangedMedia($this->family->gedrec)) {
 			// edit_fam / seperator
 			if (!$this->family->isdeleted) {
 				$submenu = new Menu();
