@@ -39,7 +39,7 @@ if (!$gm_user->userGedcomAdmin()) {
 
 // Incoming variables:
 //
-// $source: Set when loaded from uploadgedcom.php
+// $source: Set when loaded from editgedcoms.php
 // 		add_form: 		add new gedcom already on server
 // 		upload form: 	add new gedcom from upload
 // 		add_new_form: 	add new gedcom from scratch
@@ -49,7 +49,7 @@ if (!isset($source)) $source="";
 
 // $GEDCOMPATH: Set from input field for upload. Path and filename. Sets $_FILES['GEDCOMPATH']
 //
-// $GEDFILENAME: Name of the gedcom file.
+// $GEDFILENAME: Name of the gedcom file (filename and extension).
 if (!isset($GEDFILENAME)) $GEDFILENAME = "";
 
 // $gedid: ID of the gedcom being edited
@@ -139,9 +139,24 @@ else {
 		case("add_new_form"):
 			$path = AdminFunctions::CalculateGedcomPath($GEDCOMPATH);
 			$GEDFILENAME = basename($GEDCOMPATH);
+			// Check of a gedcom with that name already exists in the DB
 			if (get_id_from_gedcom($GEDFILENAME)) {
 				$error_msg = GM_LANG_gedcom_exists;
 				$action = "";
+			}
+			// if not, check if a file with the same name already exists on that place
+			else {
+				if (file_exists($path.$GEDFILENAME)) {
+					$error_msg = GM_LANG_file_exists;
+					$action = "";
+				}
+				// if not, check if we can crate the file there
+				else {
+					if (!MediaFS::DirIsWritable($path, false)) {
+						$error_msg = GM_LANG_cannot_create_file;
+						$action = "";
+					}
+				}
 			}
 			break;
 			
@@ -470,13 +485,13 @@ if ($action=="update") {
 			$news->date = time()-$_SESSION["timediff"];
 			$news->addNews();
 		}
-		if ($source == "upload_form" || $source == "reupload_form") $check = "upload";
-		else if ($source == "add_form") $check = "add";
-		else if ($source == "add_new_form") $check = "add_new";
-		if (!isset($bakfile)) $bakfile = "";
+//		if ($source == "upload_form" || $source == "reupload_form") $check = "upload";
+//		else if ($source == "add_form") $check = "add";
+//		else if ($source == "add_new_form") $check = "add_new";
 		//print "source: ".$source." check: ".$check." gedfilename: ".$GEDFILENAME." path: ".$path. " bakfile: ".$bakfile;
 		//exit;
-		if ($source !== "") header("Location: uploadgedcom.php?action=$source&check=$check&step=2&GEDFILENAME=$GEDFILENAME&path=$path&verify=verify_gedcom&bakfile=$bakfile");
+		// If the script was only for modifying the settings, return to editgedcoms. If not, go to import.
+		if ($source !== "") header("Location: uploadgedcom.php?action=".$source."&gedcomid=".get_id_from_gedcom($FILE)."&verify=verify_gedcom");
 		else {
 			header("Location: editgedcoms.php");
 		}
@@ -582,7 +597,7 @@ print "&nbsp;<a href=\"javascript: ".GM_LANG_gedcom_conf."\" onclick=\"expand_la
 			<input type="text" name="GEDCOMPATH" value="<?php print preg_replace('/\\*/', '\\', $GEDCOMPATH);?>" size="40" dir ="ltr" tabindex="<?php $i++; print $i?>" <?php if (empty($source)) print " disabled=\"disabled\"";?>/>
 			<?php
 		}
-		if ($GEDCOMPATH != "" || $GEDFILENAME != "") {
+		if ($source != "add_new_form" && ($GEDCOMPATH != "" || $GEDFILENAME != "")) {
 			if (!file_exists($path.$GEDFILENAME) && !empty($GEDCOMPATH)) {
 				if (strtolower(substr(trim($path.$GEDFILENAME), -4)) != ".ged") $GEDFILENAME .= ".ged";
 			}

@@ -35,6 +35,7 @@ class DownloadGedcom {
 	var $privatize_export = "";
 	var $privatize_export_level = "";
 	var $embedmm = "";
+	var $embednote = "";
 	var $comment = "";
 	var $output = "";
 	var $zipname = "";
@@ -53,9 +54,10 @@ class DownloadGedcom {
 							break;
 						case 'no':
 							header("Content-Type: text/plain; charset=".$genmod['character_set']);
-							if (file_exists($genmod['gedcoms'][$this->gedid]["path"])) header("Content-Disposition: attachment; filename=$this->gedid; size=".filesize($genmod['gedcoms'][$this->gedid]["path"]));
-							else header("Content-Disposition: attachment; filename=$this->gedid");
-							AdminFunctions::PrintGedcom($this->gedid, $this->convert, $this->remove, $this->zip, $this->privatize_export, $this->privatize_export_level, "", $this->embedmm);
+//							if (file_exists($genmod['gedcoms'][$this->gedid]["path"])) header("Content-Disposition: attachment; filename=DL_".get_gedcom_from_id($this->gedid)."; size=".filesize($genmod['gedcoms'][$this->gedid]["path"]));
+//							else header("Content-Disposition: attachment; filename=DL_".get_gedcom_from_id($this->gedid));
+							header("Content-Disposition: attachment; filename=DL_".get_gedcom_from_id($this->gedid));
+							AdminFunctions::PrintGedcom($this->gedid, $this->convert, $this->remove, $this->zip, $this->privatize_export, $this->privatize_export_level, "", $this->embedmm, $this->embednote);
 							exit;
 							break;
 					}
@@ -73,8 +75,6 @@ class DownloadGedcom {
 		global $gm_user;
 		
 		if ((!$gm_user->userGedcomAdmin())||(empty($this->gedid))) {
-			// header("Location: editgedcoms.php");
-			// exit;
 			return false;
 		}
 		else return true;
@@ -90,71 +90,85 @@ class DownloadGedcom {
 	
 	function ShowForm(&$genmod) {
 		?>
-		<div class="center">
-			<h3><?php echo GM_LANG_download_gedcom; ?></h3>
+		<!-- Setup the left box -->
+		<div id="admin_genmod_left">
+			<div class="admin_link"><a href="admin.php"><?php print GM_LANG_admin;?></a></div>
+			<div class="admin_link"><a href="editgedcoms.php"><?php print GM_LANG_manage_gedcoms;?></a></div>
+		</div>
+		<!-- Setup the right box -->
+		<div id="admin_genmod_right">
+		</div>
+		<div id="content">
+			<div class="topbottombar"><h3>
+				<?php echo GM_LANG_download_gedcom; ?></h3>
+			</div>
 			<br />
-			<div id="downloadgedcom_form">
-				<form name="genmodform" method="post" action="<?php echo $_SERVER['SCRIPT_NAME']; ?>">
-					<input type="hidden" name="page" value="<?php echo $genmod['page'];?>" />
-					<input type="hidden" name="action" value="download" />
-					<input type="hidden" name="gedid" value="<?php echo $this->gedid; ?>" />
-					<div class="topbottombar"><?php echo GM_LANG_options; ?></div>
-					<div id="downloadgedcom_content">
-						<div id="downloadgedcom_labels">
-							<label for="convert"><?php  print_help_link("utf8_ansi_help", "qm"); echo GM_LANG_utf8_to_ansi; ?></label>
-							<br />
-							<label for="remove"><?php print_help_link("remove_tags_help", "qm"); echo GM_LANG_remove_custom_tags; ?></label>
-							<br />
-							<label for="embedmm"><?php print_help_link("embedmm_help", "qm"); echo GM_LANG_embedmm; ?></label>
-							<br />
-							<label for="zip"><?php print_help_link("download_zipped_help", "qm"); echo GM_LANG_download_zipped; ?></label>
-							<br />
-							<label for="privatize_export"><?php print_help_link("apply_privacy_help", "qm"); echo GM_LANG_apply_privacy; ?></label>
-							<br />
-						</div>
-						<div id="downloadgedcom_options">
-							<input type="checkbox" name="convert" value="yes" />
-							<br />
-							<input type="checkbox" name="remove" value="yes" checked="checked" />
-							<br />
-							<input type="checkbox" name="embedmm" value="yes" checked="checked" />
-							<br />
-							<input type="checkbox" name="zip" value="yes" checked="checked" />
-							<br />
-							<input type="checkbox" name="privatize_export" value="yes" onclick="expand_layer('privradio'); return true;" />
-							<br />
-							<div id="privradio" style="display: none">
-								<?php echo GM_LANG_choose_priv; ?>
-								<br />
-								<input type="radio" name="privatize_export_level" value="visitor" checked="checked" /><?php echo GM_LANG_visitor; ?>
-								<br />
-								<input type="radio" name="privatize_export_level" value="user" /><?php echo GM_LANG_user; ?>
-								<br />
-								<input type="radio" name="privatize_export_level" value="gedadmin" /><?php echo GM_LANG_gedadmin; ?>
-								<br />
-								<input type="radio" name="privatize_export_level" value="siteadmin" /><?php echo GM_LANG_siteadmin; ?>
-							</div>
-						</div>
-					</div>
+			<form name="genmodform" method="post" action="<?php echo $_SERVER['SCRIPT_NAME']; ?>">
+			<input type="hidden" name="page" value="<?php echo $genmod['page'];?>" />
+			<input type="hidden" name="action" value="download" />
+			<input type="hidden" name="gedid" value="<?php echo $this->gedid; ?>" />
+			<div class="topbottombar"><?php echo GM_LANG_options; ?></div>
+			<div id="downloadgedcom_content">
+				<div id="downloadgedcom_labels">
+					<label for="convert"><?php  print_help_link("utf8_ansi_help", "qm"); echo GM_LANG_utf8_to_ansi; ?></label>
 					<br />
-					<div class="topbottombar">
-						<input type="submit" value="<?php echo GM_LANG_download_now; ?>" />
-						<input type="button" value="<?php echo GM_LANG_back;?>" onclick="window.location='editgedcoms.php';"/>
+					<label for="remove"><?php print_help_link("remove_tags_help", "qm"); echo GM_LANG_remove_custom_tags; ?></label>
+					<br />
+					<label for="embedmm"><?php print_help_link("embedmm_help", "qm"); echo GM_LANG_embedmm; ?></label>
+					<br />
+					<label for="embednote"><?php print_help_link("embednote_help", "qm"); echo GM_LANG_embednote; ?></label>
+					<br />
+					<label for="zip"><?php print_help_link("download_zipped_help", "qm"); echo GM_LANG_download_zipped; ?></label>
+					<br />
+					<label for="privatize_export"><?php print_help_link("apply_privacy_help", "qm"); echo GM_LANG_apply_privacy; ?></label>
+					<br />
+				</div>
+				<div id="downloadgedcom_options">
+					<input type="checkbox" name="convert" value="yes" />
+					<br />
+					<input type="checkbox" name="remove" value="yes" checked="checked" />
+					<br />
+					<input type="checkbox" name="embedmm" value="yes" checked="checked" />
+					<br />
+					<input type="checkbox" name="embednote" value="yes" checked="checked" />
+					<br />
+					<input type="checkbox" name="zip" value="yes" checked="checked" />
+					<br />
+					<input type="checkbox" name="privatize_export" value="yes" onclick="expand_layer('privradio'); return true;" />
+					<br />
+					<div id="privradio" style="display: none">
+						<?php echo GM_LANG_choose_priv; ?>
+						<br />
+						<input type="radio" name="privatize_export_level" value="visitor" checked="checked" /><?php echo GM_LANG_visitor; ?>
+						<br />
+						<input type="radio" name="privatize_export_level" value="user" /><?php echo GM_LANG_user; ?>
+						<br />
+						<input type="radio" name="privatize_export_level" value="gedadmin" /><?php echo GM_LANG_gedadmin; ?>
+						<br />
+						<input type="radio" name="privatize_export_level" value="siteadmin" /><?php echo GM_LANG_siteadmin; ?>
 					</div>
-				</form>
-				<br />
-				<div id="notice">
-					<?php echo GM_LANG_download_note; ?>
 				</div>
 			</div>
+			<br />
+			<div class="topbottombar row">
+				<input type="submit" value="<?php echo GM_LANG_download_now; ?>" />
+			</div>
+			</form>
+			<br />
+			<div id="notice">
+				<?php echo GM_LANG_download_note; ?>
+			</div>
 		</div>
-		<?php
+	<?php
 	}
 	
 	function GetPageValues() {
+		global $GEDCOMS;
+		
 		if (isset($_REQUEST['convert'])) $this->convert = $_REQUEST['convert'];
 		if (isset($_REQUEST['remove'])) $this->remove = $_REQUEST['remove'];
 		if (isset($_REQUEST['embedmm'])) $this->embedmm = $_REQUEST['embedmm'];
+		if (isset($_REQUEST['embednote'])) $this->embednote = $_REQUEST['embednote'];
 		if (isset($_REQUEST['zip'])) $this->zip = $_REQUEST['zip'];
 		if (isset($_REQUEST['privatize_export'])) $this->privatize_export = $_REQUEST['privatize_export'];
 		if (isset($_REQUEST['privatize_export_level'])) $this->privatize_export_level = $_REQUEST['privatize_export_level'];
@@ -168,9 +182,9 @@ class DownloadGedcom {
 		require('includes/pclzip.lib.php');
 		$this->zipname = "dl".adodb_date("YmdHis").".zip";
 		$this->zipfile = $genmod['index_directory'].$this->zipname;
-		$this->gedname = $genmod['index_directory']."DL_".$this->gedid;
+		$this->gedname = $genmod['index_directory']."DL_".get_gedcom_from_id($this->gedid);
 		if (file_exists($this->gedname)) unlink($this->gedname);
-		AdminFunctions::PrintGedcom($this->gedid, $this->convert, $this->remove, $this->zip, $this->privatize_export, $this->privatize_export_level, $this->gedname, $this->embedmm);
+		AdminFunctions::PrintGedcom($this->gedid, $this->convert, $this->remove, $this->zip, $this->privatize_export, $this->privatize_export_level, $this->gedname, $this->embedmm, $this->embednote);
 		$this->comment = "Created by Genmod ".$genmod["version"]." ".$genmod["version_release"]." on ".adodb_date("r").".";
 		$archive = new PclZip($this->zipfile);
 		$v_list = $archive->create($this->gedname, PCLZIP_OPT_COMMENT, $this->comment);

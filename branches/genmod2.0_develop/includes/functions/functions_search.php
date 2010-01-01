@@ -71,7 +71,6 @@ function SearchIndisNames($query, $allgeds=false, $gedid=0) {
 	}
 	$res = NewQuery($sql);
 	while($row = $res->fetchAssoc()){
-		$row = db_cleanup($row);
 		if ($allgeds) $key = $row["i_id"]."[".$row["i_file"]."]";
 		else $key = $row["i_id"];
 		if (!isset($myindilist[$key])) {
@@ -118,7 +117,6 @@ function SearchFams($query, $allgeds=false, $ANDOR="AND", $allnames=false) {
 	$res = NewQuery($sql);
 	$gedold = $GEDCOMID;
 	while($row = $res->fetchAssoc()){
-		$row = db_cleanup($row);
 		$GEDCOMID = $row["f_file"];
 		$husb = SplitKey($row["f_husb"], "id");
 		$wife = SplitKey($row["f_wife"], "id");
@@ -173,7 +171,6 @@ function SearchFamsNames($query, $ANDOR="AND", $allnames=false) {
 	$res = NewQuery($sql);
 	$gedold = $GEDCOMID;
 	while($row = $res->fetchAssoc()){
-		$row = db_cleanup($row);
 		$GEDCOMID = $row["f_file"];
 		$husb = SplitKey($row["f_husb"], "id");
 		$wife = SplitKey($row["f_wife"], "id");
@@ -234,7 +231,6 @@ function SearchFamsMembers($query, $allgeds=false, $ANDOR="AND", $allnames=false
 	
 	$res = NewQuery($sql);
 	while($row = $res->fetchAssoc()){
-		$row = db_cleanup($row);
 		$husb = SplitKey($row["f_husb"], "id");
 		$wife = SplitKey($row["f_wife"], "id");
 		$hname = GetSortableName($husb);
@@ -283,7 +279,6 @@ function SearchSources($query, $allgeds=false, $ANDOR="AND") {
 	$sql .= " ORDER BY s_name";
 	$res = NewQuery($sql);
 	while($row = $res->fetchRow()){
-		$row = db_cleanup($row);
 		if (count($allgeds) > 1) {
 			$mysourcelist[$row[0]."[".$row[2]."]"]["name"] = $row[1];
 			$mysourcelist[$row[0]."[".$row[2]."]"]["gedfile"] = $row[2];

@@ -331,7 +331,7 @@ class ClippingsController extends BaseController {
 	}
 	
 	public function PerformAction() {
-		global $GEDCOMID, $SCRIPT_NAME;
+		global $GEDCOMID;
 		
 		if ($this->action == 'add1') {
 			$clipping = array();
@@ -414,7 +414,7 @@ class ClippingsController extends BaseController {
 			$_SESSION["clippings"] = "";
 		}
 		else if($this->action == 'download') {
-			$path = substr(SCRIPT_NAME, 0, strrpos($SCRIPT_NAME, "/"));
+			$path = substr(SCRIPT_NAME, 0, strrpos(SCRIPT_NAME, "/"));
 			if (empty($path)) $path="/";
 			if ($path[strlen($path)-1]!="/") $path .= "/";
 			if (substr(SERVER_URL, strlen(SERVER_URL) - 1) == "/") {
@@ -439,7 +439,8 @@ class ClippingsController extends BaseController {
 			for($i=0; $i<$ct; $i++)	{
 				$clipping = $this->cart[$GEDCOMID][$i];
 				$object =& ConstructObject($clipping['id'], $clipping['type']);
-				$record = PrivacyFunctions::PrivatizeGedcom($object->gedrec);
+				$record = $object->oldprivategedrec;
+//				$record = PrivacyFunctions::PrivatizeGedcom($object->gedrec);
 				$record = RemoveCustomTags($record, $this->remove);
 				if ($this->convert == "yes") $record = utf8_decode($record);
 				if ($clipping['type'] == 'indi') {

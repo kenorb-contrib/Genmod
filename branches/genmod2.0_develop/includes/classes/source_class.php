@@ -33,7 +33,7 @@ class Source extends GedcomRecord {
 	// General class information
 	public $classname = "Source";			// Name of the class
 	public $datatype = "SOUR";				// Type of data collected here
-	private static $sourcecache = array();	// Holder of the instances for this class
+	private static $cache = array();		// Holder of the instances for this class
 	
 	// Data
 	private $name = null;					// Title of the source (both descriptors), privacy applied
@@ -45,10 +45,10 @@ class Source extends GedcomRecord {
 		global $GEDCOMID;
 		
 		if (empty($gedcomid)) $gedcomid = $GEDCOMID;
-		if (!isset(self::$sourcecache[$gedcomid][$xref])) {
-			self::$sourcecache[$gedcomid][$xref] = new Source($xref, $gedrec, $gedcomid);
+		if (!isset(self::$cache[$gedcomid][$xref])) {
+			self::$cache[$gedcomid][$xref] = new Source($xref, $gedrec, $gedcomid);
 		}
-		return self::$sourcecache[$gedcomid][$xref];
+		return self::$cache[$gedcomid][$xref];
 	}
 	
 	/**
@@ -104,7 +104,7 @@ class Source extends GedcomRecord {
 	
 	public function ObjCount() {
 		$count = 0;
-		foreach(self::$sourcecache as $ged => $source) {
+		foreach(self::$cache as $ged => $source) {
 			$count += count($source);
 		}
 		return $count;

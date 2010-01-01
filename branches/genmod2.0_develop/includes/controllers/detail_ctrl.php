@@ -683,7 +683,7 @@ abstract class DetailController extends BaseController{
 		}	
 		print "<script type=\"text/javascript\">\n<!--\n";
 		if ($this->isPrintPreview()) print "tabswitch(".count($this->tabs).")";
-		else if (isset($_SESSION[$this->tabtype][JoinKey($this->$object_name->xref, $GEDCOMID)])) print "tabswitch(".$_SESSION[$this->tabtype][JoinKey($this->$object_name->xref, $GEDCOMID)].")";
+		else if (isset($_SESSION["last_tab"][$this->tabtype][JoinKey($this->$object_name->xref, $GEDCOMID)])) print "tabswitch(".$_SESSION["last_tab"][$this->tabtype][JoinKey($this->$object_name->xref, $GEDCOMID)].")";
 		else if ($object_name == "indi") print "tabswitch(".$this->default_tab.")";
 		else print "tabswitch(1)";
 		print "\n//-->\n</script>\n";

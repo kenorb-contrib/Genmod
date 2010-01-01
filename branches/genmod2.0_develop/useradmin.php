@@ -1780,8 +1780,8 @@ if (($action == "listusers") || ($action == "edituser2") || ($action == "deleteu
 						?>
 					</div>
 					<div class="choice_middle width_languages">
-						<?php print GM_LANG_lang_name_".$user->language];?><br />
-						<img src="<?php print $language_settings[$user->language]["flagsfile"];?>" class="brightflag" alt="<?php print GM_LANG_lang_name_".$user->language];?>" title="<?php print GM_LANG_lang_name_".$user->language];?>" />
+						<?php print constant("GM_LANG_lang_name_".$user->language);?><br />
+						<img src="<?php print $language_settings[$user->language]["flagsfile"];?>" class="brightflag" alt="<?php print constant("GM_LANG_lang_name_".$user->language);?>" title="<?php print constant("GM_LANG_lang_name_".$user->language);?>" />
 					</div>
 					<div class="choice_middle width_priviliges">
 						<?php
@@ -2082,10 +2082,10 @@ if ($action == "") {
 					}
 				}
 			}
-			if (isset($userlang[GM_LANG_lang_name_".$user->language]])) $userlang[GM_LANG_lang_name_".$user->language]]["number"]++;
+			if (isset($userlang[constant("GM_LANG_lang_name_".$user->language)])) $userlang[constant("GM_LANG_lang_name_".$user->language)]["number"]++;
 			else {
-				$userlang[GM_LANG_lang_name_".$user->language]]["langname"] = $user->language;
-				$userlang[GM_LANG_lang_name_".$user->language]]["number"] = 1;
+				$userlang[constant("GM_LANG_lang_name_".$user->language)]["langname"] = $user->language;
+				$userlang[constant("GM_LANG_lang_name_".$user->language)]["number"] = 1;
 			}
 		}
 		?>

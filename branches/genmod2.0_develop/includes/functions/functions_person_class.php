@@ -737,7 +737,7 @@ abstract class PersonFunctions {
 		if ($deleted) return $name;
 		
 		// we have the original names, now we get all additions and changes TODO: DELETE
-		if (!$onlyold && GetChangeData(true, $person->xref, true)) {
+		if (!$onlyold && ChangeFunctions::GetChangeData(true, $person->xref, true)) {
 			$sql = "SELECT ch_type, ch_fact, ch_old, ch_new FROM ".TBLPREFIX."changes WHERE ch_gid='".$person->xref."' AND ch_fact='NAME' AND ch_file='".$person->gedcomid."' ORDER BY ch_id";
 			$res = NewQuery($sql);
 	//		if (!$res) return false;

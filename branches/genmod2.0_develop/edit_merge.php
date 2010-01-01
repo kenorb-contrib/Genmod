@@ -30,10 +30,13 @@
 */
 require("config.php");
 
+$trace = false;
 if (empty($action)) $action="choose";
 if (empty($gid1)) $gid1="";
+else $gid1 = strtoupper($gid1);
 if (empty($gid2)) $gid2="";
-if (empty($gedid)) $gedid=$GEDCOMID;
+else $gid2 = strtoupper($gid2);
+if (empty($mergeged)) $mergeged = $GEDCOMID;
 if (empty($keep1)) $keep1=array();
 if (empty($keep2)) $keep2=array();
 if (empty($skip1)) $skip1=array();
@@ -55,292 +58,330 @@ if (!$gm_user->userCanAccept()) {
 ?>	<!-- Setup the left box -->
 	<div id="admin_genmod_left">
 		<div class="admin_link"><a href="admin.php"><?php print GM_LANG_admin;?></a></div>
+		<?php if ($action != "choose") { ?>
+		<div class="admin_link"><a href="edit_merge.php"><?php print GM_LANG_merge_records;?></a></div>
+		<?php } ?>
 	</div>
 	
 	<!-- Setup the right box -->
 	<div id="admin_genmod_right">
 	</div>	
 <?php
-if ($action!="choose") {
-	if ($gid1==$gid2) {
+if ($action != "choose") {
+	if ($gid1 == $gid2) {
 		$error = 1;
-		$action="choose";
+		$action = "choose";
 	}
 	else {
-		$gedrec1 = FindGedcomRecord($gid1, $gedid);
-		$gedrec2 = FindGedcomRecord($gid2, $gedid);
-		$orggedrec1 = $gedrec1;
-		$oged = $GEDCOMID;
-		$GEDCOMID = $ged;
-		if (GetChangeData(true, $gid1, true, "", "") || GetChangeData(true, $gid2, true, "", "")) {
-			$error = 2;
-			$action = "choose";
-		}
-		$GEDCOMID = $oged;
-
-		if ($action != "choose" && (empty($gedrec1) || empty($gedrec2))) {
+		$oldged = $GEDCOMID;
+		SwitchGedcom($mergeged);
+		$object1 = ConstructObject($gid1, "", $mergeged); 
+		$object2 = ConstructObject($gid2, "", $mergeged); 
+		if (!is_object($object1) || !is_object($object2)) {
 			$error = 3;
 			$action="choose";
 		}
-		else {
-			$type1 = "";
-			$ct = preg_match("/0 @$gid1@ (\w+)/", $gedrec1, $match);
-			if ($ct>0) $type1 = trim($match[1]);
-			$type2 = "";
-			$ct = preg_match("/0 @$gid2@ (\w+)/", $gedrec2, $match);
-			if ($ct>0) $type2 = trim($match[1]);
-			if (!empty($type1) && ($type1!=$type2)) {
+		else if ($object1->ischanged || $object2->ischanged) {
+			$error = 2;
+			$action = "choose";
+		}
+		else if ($object1->type != $object2->type) {
 				$error = 4;
-				$action="choose";
+				$action = "choose";
+		}
+		if ($action != "choose") {
+			$orggedrec1 = $object1->gedrec;
+			$gedrec1 = $object1->gedrec;
+			$gedrec2 = $object2->gedrec;
+			// if it's a note, we move the text in the level 0 part to a separate temporary fact (NOTETEXT)
+			if ($object1->type == "NOTE") {
+				$notetext1 = "";
+				$cn = preg_match("/@ NOTE (.*)/", $gedrec1, $match);
+				if ($cn) $notetext1 = trim($match[1]);
+				$notetext1 .= GetCont(1, $gedrec1);
+				$gedrec1 = trim($gedrec1)."\r\n1 NOTETEXT ".$notetext1;
+				$notetext2 = "";
+				$cn = preg_match("/@ NOTE (.*)/", $gedrec2, $match);
+				if ($cn) $notetext2 = trim($match[1]);
+				$notetext2 .= GetCont(1, $gedrec2);
+				$gedrec2 = trim($gedrec2)."\r\n1 NOTETEXT ".$notetext2;
 			}
-			else {
-				// if it's a note, we move the text in the level 0 part to a separate temporary fact (NOTETEXT)
-				if ($type1 == "NOTE") {
-					$notetext1 = "";
-					$cn = preg_match("/@ NOTE (.*)/", $gedrec1, $match);
-					if ($cn) $notetext1 = trim($match[1]);
-					$notetext1 .= GetCont(1, $gedrec1);
-					$gedrec1 = trim($gedrec1)."\r\n1 NOTETEXT ".$notetext1;
-					$notetext2 = "";
-					$cn = preg_match("/@ NOTE (.*)/", $gedrec2, $match);
-					if ($cn) $notetext2 = trim($match[1]);
-					$notetext2 .= GetCont(1, $gedrec2);
-					$gedrec2 = trim($gedrec2)."\r\n1 NOTETEXT ".$notetext2;
-				}
-				$facts1 = array();
-				$facts2 = array();
-				$prev_tags = array();
-				$ct = preg_match_all("/\n1 (\w+)(.*)/", $gedrec1, $match, PREG_SET_ORDER);
-				for($i=0; $i<$ct; $i++) {
-					$fact = trim($match[$i][1]);
-					if (isset($prev_tags[$fact])) $prev_tags[$fact]++;
-					else $prev_tags[$fact] = 1;
-					$subrec = GetSubRecord(1, "1 $fact", $gedrec1, $prev_tags[$fact]);
-					if ($type1 != "NOTE" || ($fact != "CONC" && $fact != "CONT")) $facts1[] = array("fact"=>$fact, "subrec"=>trim($subrec));
-				}
-				$prev_tags = array();
-//				$ct = preg_match_all("/\n1 (_?[A-Z]{3,5})(.*)/", $gedrec2, $match, PREG_SET_ORDER);
-				$ct = preg_match_all("/\n1 (\w+)(.*)/", $gedrec2, $match, PREG_SET_ORDER);
-				for($i=0; $i<$ct; $i++) {
-					$fact = trim($match[$i][1]);
-					if (isset($prev_tags[$fact])) $prev_tags[$fact]++;
-					else $prev_tags[$fact] = 1;
-					$subrec = GetSubRecord(1, "1 $fact", $gedrec2, $prev_tags[$fact]);
-					if ($type2 != "NOTE" || ($fact != "CONC" && $fact != "CONT")) $facts2[] = array("fact"=>$fact, "subrec"=>trim($subrec));
-				}
-				if ($action=="merge") {
-					// before we do anything, we check for double selecting unique facts
-					$gedrec1 = FindGedcomRecord($gid1, $gedid);
-					$gedrec2 = FindGedcomRecord($gid2, $gedid);
-					$tt = preg_match("/0 @.+@ (\w+)/", $gedrec1, $match);
-					$mtype = $match[1];
-					$type = trim($match[1])."_FACTS_UNIQUE";
-					$unique = explode(",", $$type);
-					$factcount = array();
-					for($i=0; ($i<count($facts1) || $i<count($facts2)); $i++) {
-						if (isset($facts1[$i])) {
-							if (in_array($i, $keep1)) {
-								if (!isset($factcount[$facts1[$i]["fact"]])) $factcount[$facts1[$i]["fact"]] = 1;
-								else $factcount[$facts1[$i]["fact"]]++;
-							}
-						}
-						if (isset($facts2[$i])) {
-							if (in_array($i, $keep2)) {
-								if (!isset($factcount[$facts2[$i]["fact"]])) $factcount[$facts2[$i]["fact"]] = 1;
-								else $factcount[$facts2[$i]["fact"]]++;
-							}
+			$facts1 = array();
+			$facts2 = array();
+			$prev_tags = array();
+			$ct = preg_match_all("/\n1 (\w+)(.*)/", $gedrec1, $match, PREG_SET_ORDER);
+			for($i=0; $i<$ct; $i++) {
+				$fact = trim($match[$i][1]);
+				if (isset($prev_tags[$fact])) $prev_tags[$fact]++;
+				else $prev_tags[$fact] = 1;
+				$subrec = GetSubRecord(1, "1 $fact", $gedrec1, $prev_tags[$fact]);
+				if ($object1->type != "NOTE" || ($fact != "CONC" && $fact != "CONT")) $facts1[] = array("fact"=>$fact, "subrec"=>trim($subrec));
+			}
+			$prev_tags = array();
+			$ct = preg_match_all("/\n1 (\w+)(.*)/", $gedrec2, $match, PREG_SET_ORDER);
+			for($i=0; $i<$ct; $i++) {
+				$fact = trim($match[$i][1]);
+				if (isset($prev_tags[$fact])) $prev_tags[$fact]++;
+				else $prev_tags[$fact] = 1;
+				$subrec = GetSubRecord(1, "1 $fact", $gedrec2, $prev_tags[$fact]);
+				if ($object2->type != "NOTE" || ($fact != "CONC" && $fact != "CONT")) $facts2[] = array("fact"=>$fact, "subrec"=>trim($subrec));
+			}
+			if ($action == "merge") {
+				// before we do anything, we check for double selecting unique facts
+				$mtype = $object1->type;
+				$type = trim($mtype)."_FACTS_UNIQUE";
+				$unique = explode(",", GEDCOMCONFIG::$$type);
+				$factcount = array();
+				for($i=0; ($i<count($facts1) || $i<count($facts2)); $i++) {
+					if (isset($facts1[$i])) {
+						if (in_array($i, $keep1)) {
+							if (!isset($factcount[$facts1[$i]["fact"]])) $factcount[$facts1[$i]["fact"]] = 1;
+							else $factcount[$facts1[$i]["fact"]]++;
 						}
 					}
-					$errfacts = array();
-					foreach ($factcount as $fact=>$count) {
-						if (in_array($fact, $unique) && $count > 1) $errfacts[] = $fact;
-					}
-					if (count($errfacts) > 0) {
-						$action = "select";
-						$errorstring = implode(", ", $errfacts);
-					}
-				}
-				if ($action=="merge") {
-/*					print "gedrec1: ".$orggedrec1;
-					print "<br />gedrec2: ".$gedrec2;
-					print "<br />facts1: ";
-					print_r($facts1);
-					print "<br /><br />keep1: ";
-					print_r($keep1);
-					print "<br /><br />skip1: ";
-					print_r($skip1);
-					print "<br /><br />facts2: ";
-					print_r($facts2);
-					print "<br /><br />keep2: ";
-					print_r($keep2);
-					print "<br /><br />skip2: ";
-					print_r($skip2);
-					print "<br /><br />errfacts: ";
-					print_r($errfacts);
-*/					
-					$change_id = GetNewXref("CHANGE");
-					$change_type = "MERGE";
-					print "<div id=\"content\">";
-					print "<div class=\"admin_topbottombar\"><h3>".GM_LANG_merge_step3."</h3><br />\n";
-					print "Performing Record Merge<br /></div>\n";
-					// Delete the old record2
-					$ogedid = $GEDCOMID;
-					$GEDCOMID = $ged;
-					EditFunctions::DeleteGedrec($gid2, $change_id, $change_type, $type1);
-					$GEDCOMID = $ogedid;
-
-					// First add facts 2-> 1
-					$textfrom1 = "";
-					$textfrom2 = "";
-					for($i=0; ($i<count($facts2)); $i++) {
+					if (isset($facts2[$i])) {
 						if (in_array($i, $keep2)) {
-							// If notetext is kept, we must reconstruct the first gedrec.
-							// If 1 is selected and 2 is not, nothing will change in the notetext.
-							// If 1 is selected and 2 is selected, 1 AND 2 are added as notetext.
-							// If 1 is not selected and 2 is selected, 2 replaces 1 as notetext.
-							// I neither is selected, the text for 1 remains as is.
-							// This ignores the deselection of 1 AND 2. If 2 is not kept, 1 will not get deleted anyway.
-							if ($facts2[$i]["fact"] == "NOTETEXT") {
-								// If both notetexts are selected, merge them.
-								for ($j=0; $j<count($facts1); $j++) {
-									if (in_array($j, $keep1)) {
-										if ($facts1[$j]["fact"] == "NOTETEXT") {
-											$textfrom1 = substr($facts1[$j]["subrec"], 11)."\r\n";
-											break;
-										}
+							if (!isset($factcount[$facts2[$i]["fact"]])) $factcount[$facts2[$i]["fact"]] = 1;
+							else $factcount[$facts2[$i]["fact"]]++;
+						}
+					}
+				}
+				$errfacts = array();
+				foreach ($factcount as $fact=>$count) {
+					if (in_array($fact, $unique) && $count > 1) $errfacts[] = $fact;
+				}
+				if (count($errfacts) > 0) {
+					$action = "select";
+					$errorstring = implode(", ", $errfacts);
+				}
+			}
+			if ($action == "merge") {
+/*					print "gedrec1: ".$orggedrec1;
+				print "<br />gedrec2: ".$gedrec2;
+				print "<br />facts1: ";
+				print_r($facts1);
+				print "<br /><br />keep1: ";
+				print_r($keep1);
+				print "<br /><br />skip1: ";
+				print_r($skip1);
+				print "<br /><br />facts2: ";
+				print_r($facts2);
+				print "<br /><br />keep2: ";
+				print_r($keep2);
+				print "<br /><br />skip2: ";
+				print_r($skip2);
+				print "<br /><br />errfacts: ";
+				print_r($errfacts);
+*/					
+				$change_id = GetNewXref("CHANGE");
+				$change_type = "MERGE";
+				print "<div id=\"content\">";
+				print "<div class=\"admin_topbottombar\"><h3>".GM_LANG_merge_step3."</h3><br />\n";
+				print "Performing Record Merge<br /></div>\n";
+				// Delete the old record2
+				EditFunctions::DeleteGedrec($gid2, $change_id, $change_type, $object1->type);
+
+				// First add facts 2-> 1
+				$textfrom1 = "";
+				$textfrom2 = "";
+				for($i=0; ($i<count($facts2)); $i++) {
+					if (in_array($i, $keep2)) {
+						// If notetext is kept, we must reconstruct the first gedrec.
+						// If 1 is selected and 2 is not, nothing will change in the notetext.
+						// If 1 is selected and 2 is selected, 1 AND 2 are added as notetext.
+						// If 1 is not selected and 2 is selected, 2 replaces 1 as notetext.
+						// I neither is selected, the text for 1 remains as is.
+						// This ignores the deselection of 1 AND 2. If 2 is not kept, 1 will not get deleted anyway.
+						if ($facts2[$i]["fact"] == "NOTETEXT") {
+							// If both notetexts are selected, merge them.
+							for ($j=0; $j<count($facts1); $j++) {
+								if (in_array($j, $keep1)) {
+									if ($facts1[$j]["fact"] == "NOTETEXT") {
+										$textfrom1 = substr($facts1[$j]["subrec"], 11)."\r\n";
+										break;
 									}
 								}
-								// print "textfrom1: ".$textfrom1."<br />";
-								$textfrom2 = substr($facts2[$i]["subrec"], 11);
-								// print "textfrom2: ".$textfrom2."<br />";
-								if (!empty($textfrom1) || !empty($textfrom2)) {
-									$newrec1 = "0 @$gid1@ NOTE";
-									$newrec1 = MakeCont($newrec1, $textfrom1.$textfrom2);
-									// print "newrec1: ".$newrec1;
-									$subs1 = GetAllSubrecords($gedrec1, "CONC,CONT", false, false, false);
-									$newrec1 .= implode("\r\n", $subs1);
-									EditFunctions::ReplaceGedrec($gid1, $gedrec1, $newrec1, "NOTE", $change_id, $change_type, $ged, "NOTE");
-								}
 							}
-							else EditFunctions::ReplaceGedrec($gid1, "", $facts2[$i]["subrec"], $facts2[$i]["fact"], $change_id, $change_type, $gedid, $type1);
-						}
-					}
-					
-					// Then check for indi-fam relations in ged2; these must be deleted from the designated records, or changed to the new ID.
-					if ($mtype == "INDI" || $mtype == "FAM") {
-						for($i=0; $i<count($facts2); $i++) {
-							if ($facts2[$i]["fact"] == "FAMC" || $facts2[$i]["fact"] == "FAMS") {
-								// This is a indi->fam link, so we must remove or change the fam->indi link from the fam record
-								// Get the famid
-								$ct = preg_match("/1 FAM. @(.+)@/", $facts2[$i]["subrec"], $match);
-								$famid = $match[1];
-								// Get the role
-								$famrec = FindFamilyRecord($famid, get_gedcom_from_id($ged));
-								$ct = preg_match("/1 (HUSB|WIFE|CHIL) @$gid2@/", $famrec, $match);
-								$role = $match[1];
-								$subrec = GetSubrecord(1, "1 $role @$gid2@", $famrec);
-								if (!in_array($i, $keep2)) EditFunctions::ReplaceGedrec($famid, $subrec, "", $change_id, $change_type, $gedid, "FAM");
-								else {
-									$subrecnew = preg_replace("/@$gid2@/", "@$gid1@", $subrec);
-									EditFunctions::ReplaceGedrec($famid, $subrec, $subrecnew, $role, $change_id, $change_type, $ged, "FAM");
-								}
-							}
-							if ($facts2[$i]["fact"] == "HUSB" || $facts2[$i]["fact"] == "WIFE" || $facts2[$i]["fact"] == "CHIL") {
-								// This is a fam->indi link, so we must remove or change the indi->fam link from the indi record
-								// Get the pid
-								$ct = preg_match("/1 (HUSB|WIFE|CHIL) @(.+)@/", $facts2[$i]["subrec"], $match);
-								$pid = $match[2];
-								// Get the role
-								if ($match[1] == "CHIL") $role = "FAMC";
-								else $role = "FAMS";
-								$pidrec = FindPersonRecord($pid, get_gedcom_from_id($ged));
-								$subrec = GetSubrecord(1, "1 $role @$gid2@", $pidrec);
-								if (!in_array($i, $keep2)) EditFunctions::ReplaceGedrec($pid, $subrec, "", $role, $change_id, $change_type, $gedid, "INDI");
-								else {
-									$subrecnew = preg_replace("/@$gid2@/", "@$gid1@", $subrec);
-									EditFunctions::ReplaceGedrec($pid, $subrec, $subrecnew, $role, $change_id, $change_type, $gedid, "INDI");
-								}
+							// print "textfrom1: ".$textfrom1."<br />";
+							$textfrom2 = substr($facts2[$i]["subrec"], 11);
+							// print "textfrom2: ".$textfrom2."<br />";
+							if (!empty($textfrom1) || !empty($textfrom2)) {
+								$newrec1 = "0 @$gid1@ NOTE";
+								$newrec1 = MakeCont($newrec1, $textfrom1.$textfrom2);
+								// print "newrec1: ".$newrec1;
+								$subs1 = GetAllSubrecords($gedrec1, "CONC,CONT", false, false, false);
+								$newrec1 .= implode("\r\n", $subs1);
+								EditFunctions::ReplaceGedrec($gid1, $gedrec1, $newrec1, "NOTE", $change_id, $change_type, $mergeged, "NOTE");
 							}
 						}
+						else EditFunctions::ReplaceGedrec($gid1, "", $facts2[$i]["subrec"], $facts2[$i]["fact"], $change_id, $change_type, $mergeged, $object1->type);
 					}
-					
-					// Now remove the subrecs that are not kept in ged1
-					for($i=0; ($i<count($facts1)); $i++) {
-						if (!in_array($i, $keep1) && $facts1[$i]["fact"] != "CHAN" && $facts1[$i]["fact"] != "NOTETEXT") EditFunctions::ReplaceGedrec($gid1, $facts1[$i]["subrec"], "", $facts1[$i]["fact"], $change_id, $change_type, $gedid, $type1);
+				}
+				
+				// Then check for indi-fam relations in ged2; these must be deleted from the designated records, or changed to the new ID.
+				if ($mtype == "INDI" || $mtype == "FAM") {
+					for($i=0; $i<count($facts2); $i++) {
+						if ($facts2[$i]["fact"] == "FAMC" || $facts2[$i]["fact"] == "FAMS") {
+							// This is a indi->fam link, so we must remove or change the fam->indi link from the fam record
+							// Get the famid
+							$ct = preg_match("/1 FAM. @(.+)@/", $facts2[$i]["subrec"], $match);
+							$famid = $match[1];
+							// Get the role
+							$fam =& Family::GetInstance($famid, "", $mergeged);
+							$famrec = $fam->gedrec;
+							$ct = preg_match("/1 (HUSB|WIFE|CHIL) @$gid2@/", $famrec, $match);
+							$role = $match[1];
+							$subrec = GetSubrecord(1, "1 $role @$gid2@", $famrec);
+							if (!in_array($i, $keep2)) {
+								if ($trace) print "1. fam: ".$famid." out: ".$subrec."<br />";
+								EditFunctions::ReplaceGedrec($famid, $subrec, "", $role, $change_id, $change_type, $mergeged, "FAM");
+							}
+							else {
+								$subrecnew = preg_replace("/@$gid2@/", "@$gid1@", $subrec);
+								if ($trace) print "2. fam: ".$famid." out: ".$subrec." in: ".$subrecnew."<br />";
+								EditFunctions::ReplaceGedrec($famid, $subrec, $subrecnew, $role, $change_id, $change_type, $mergeged, "FAM");
+							}
+						}
+						if ($facts2[$i]["fact"] == "HUSB" || $facts2[$i]["fact"] == "WIFE" || $facts2[$i]["fact"] == "CHIL") {
+							// This is a fam->indi link, so we must remove or change the indi->fam link from the indi record
+							// Get the pid
+							$ct = preg_match("/1 (HUSB|WIFE|CHIL) @(.+)@/", $facts2[$i]["subrec"], $match);
+							$pid = $match[2];
+							// Get the role
+							if ($match[1] == "CHIL") $role = "FAMC";
+							else $role = "FAMS";
+							$person =& Person::GetInstance($pid, "", $mergeged);
+							$pidrec = $person->gedrec;
+							$subrec = GetSubrecord(1, "1 $role @$gid2@", $pidrec);
+							if (!in_array($i, $keep2)) {
+								if ($trace) print "3. indi: ".$pid." out: ".$subrec."<br />";
+								EditFunctions::ReplaceGedrec($pid, $subrec, "", $role, $change_id, $change_type, $mergeged, "INDI");
+							}
+							else {
+								$subrecnew = preg_replace("/@$gid2@/", "@$gid1@", $subrec);
+								if ($trace) print "4. indi: ".$pid." out: ".$subrec." in: ".$subrecnew."<br />";
+								EditFunctions::ReplaceGedrec($pid, $subrec, $subrecnew, $role, $change_id, $change_type, $mergeged, "INDI");
+							}
+						}
 					}
+					for($i=0; $i<count($facts1); $i++) {
+						if ($facts1[$i]["fact"] == "FAMC" || $facts1[$i]["fact"] == "FAMS") {
+							// This is a indi->fam link, so we must remove or change the fam->indi link from the fam record
+							// Get the famid
+							$ct = preg_match("/1 FAM. @(.+)@/", $facts1[$i]["subrec"], $match);
+							$famid = $match[1];
+							// Get the role
+							$fam =& Family::GetInstance($famid, "", $mergeged);
+							$famrec = $fam->gedrec;
+							$ct = preg_match("/1 (HUSB|WIFE|CHIL) @$gid1@/", $famrec, $match);
+							$role = $match[1];
+							$subrec = GetSubrecord(1, "1 $role @$gid1@", $famrec);
+							if (!in_array($i, $keep1)) {
+								if ($trace) print "5. fam: ".$famid." out: ".$subrec."<br />";
+								EditFunctions::ReplaceGedrec($famid, $subrec, "", $role, $change_id, $change_type, $mergeged, "FAM");
+							}
+							// Don't move anything here, only for 2 to 1
+						}
+						if ($facts1[$i]["fact"] == "HUSB" || $facts1[$i]["fact"] == "WIFE" || $facts1[$i]["fact"] == "CHIL") {
+							// This is a fam->indi link, so we must remove or change the indi->fam link from the indi record
+							// Get the pid
+							$ct = preg_match("/1 (HUSB|WIFE|CHIL) @(.+)@/", $facts1[$i]["subrec"], $match);
+							$pid = $match[2];
+							// Get the role
+							if ($match[1] == "CHIL") $role = "FAMC";
+							else $role = "FAMS";
+							$person =& Person::GetInstance($pid, "", $mergeged);
+							$pidrec = $person->gedrec;
+							$subrec = GetSubrecord(1, "1 $role @$gid1@", $pidrec);
+							if (!in_array($i, $keep1)) {
+								if ($trace) print "6. indi: ".$pid." out: ".$subrec."<br />";
+								EditFunctions::ReplaceGedrec($pid, $subrec, "", $role, $change_id, $change_type, $mergeged, "INDI");
+							}
+							// Don't move anything here, only for 2 to 1
+						}
+					}
+				}
+				
+				// Now remove the subrecs that are not kept in ged1
+				for($i=0; ($i<count($facts1)); $i++) {
+					if (!in_array($i, $keep1) && $facts1[$i]["fact"] != "CHAN" && $facts1[$i]["fact"] != "NOTETEXT") {
+						if ($trace) print "7. Remove ".$gid1." fact ".$facts1[$i]["subrec"]."<br />";
+						EditFunctions::ReplaceGedrec($gid1, $facts1[$i]["subrec"], "", $facts1[$i]["fact"], $change_id, $change_type, $mergeged, $object1->type);
+					}
+				}
 
-					// Now update all links in other records from ged2 to ged1
-					EditFunctions::ReplaceLinks($gid2, $gid1, $mtype, $change_id, $change_type, $gedid);
-					if (isset($change_id) && $can_auto_accept &&  $gm_user->userAutoAccept()) {
-						AcceptChange($change_id, $GEDCOMID);
-						print GM_LANG_merge_success_auto;
-					}
-					else print GM_LANG_merge_success;
-					
-					print "<br />\n";
-					print "<div class=\"topbottombar\"><a href=\"edit_merge.php?action=choose\">".GM_LANG_merge_more."</a><br /></div>\n";
-					print "</div>\n";
+				// Now update all links in other records from ged2 to ged1
+				EditFunctions::ReplaceLinks($gid2, $gid1, $mtype, $change_id, $change_type, $mergeged);
+				if (isset($change_id) && $can_auto_accept &&  $gm_user->userAutoAccept()) {
+					ChangeFunctions::AcceptChange($change_id, $GEDCOMID);
+					print GM_LANG_merge_success_auto;
 				}
-				if ($action=="select") {
-					print "<div id=\"content\">";
-					print "<div class=\"admin_topbottombar\"><h3>".GM_LANG_merge_step2."</h3>";
-					if (!empty($errorstring)) print "<span class=\"error\">".GM_LANG_merge_notunique."&nbsp;".$errorstring."</span><br />";
-					print "</div><form method=\"post\" action=\"edit_merge.php\">\n";
-					print "<div class=\"center\">".GM_LANG_merge_facts_same."<br /><br /></div>\n";
-					print "<input type=\"hidden\" name=\"gid1\" value=\"$gid1\">\n";
-					print "<input type=\"hidden\" name=\"gid2\" value=\"$gid2\">\n";
-					print "<input type=\"hidden\" name=\"ged\" value=\"$ged\">\n";
-					print "<input type=\"hidden\" name=\"action\" value=\"merge\">\n";
-					$equal_count=0;
-					$skip1 = array();
-					$skip2 = array();
-					print "<table border=\"1\" class=\"list_table wrap\" align=center style=\"width:50%;\">\n";
-					foreach($facts1 as $i=>$fact1) {
-						foreach($facts2 as $j=>$fact2) {
-							if (Str2Upper($fact1["subrec"])==Str2Upper($fact2["subrec"])) {
-								$skip1[] = $i;
-								$skip2[] = $j;
-								$equal_count++;
-								print "<tr><td>";
-								if (defined("GM_FACT_".$fact1["fact"])) print constant("GM_FACT_".$fact1["fact"]);
-								else print $fact1["fact"];
-								print "<input type=\"hidden\" name=\"keep1[]\" value=\"$i\" /></td>\n<td>".nl2br($fact1["subrec"])."</td></tr>\n";
-							}
-						}
-					}
-					if ($equal_count==0) {
-						print "<tr><td>".GM_LANG_no_matches_found."</td></tr>\n";
-					}
-					print "</table><br />\n";
-					print "<div class=\"center\">".GM_LANG_unmatching_facts."<br /></div>\n";
-					print "<table class=\"list_table wrap\" style=\"width:100%;\">\n";
-					print "<tr><td class=\"list_label\">".GM_LANG_record." $gid1</td><td class=\"list_label\">".GM_LANG_record." $gid2</td></tr>\n";
-					print "<tr><td valign=\"top\" class=\"list_value\">\n";
-					print "<table border=\"1\">\n";
-					foreach($facts1 as $i=>$fact1) {
-						if (($fact1["fact"]!="CHAN")&&(!in_array($i, $skip1))) {
-							print "<tr><td><input type=\"checkbox\" name=\"keep1[]\" value=\"$i\" checked=\"checked\" /></td>";
-							print "<td class=\"wrap\">".nl2br($fact1["subrec"])."</td></tr>\n";
-						}
-					}
-					print "</table>\n";
-					print "</td><td valign=\"top\" class=\"list_value\">\n";
-					print "<table border=\"1\">\n";
+				else print GM_LANG_merge_success;
+				
+				print "<br />\n";
+				print "<div class=\"topbottombar\"><a href=\"edit_merge.php?action=choose\">".GM_LANG_merge_more."</a><br /></div>\n";
+				print "</div>\n";
+			}
+			if ($action == "select") {
+				print "<div id=\"content\">";
+				print "<div class=\"admin_topbottombar\"><h3>".GM_LANG_merge_step2."</h3>";
+				if (!empty($errorstring)) print "<span class=\"error\">".GM_LANG_merge_notunique."&nbsp;".$errorstring."</span><br />";
+				print "</div><form method=\"post\" action=\"edit_merge.php\">\n";
+				print "<div class=\"center\">".GM_LANG_merge_facts_same."<br /><br /></div>\n";
+				print "<input type=\"hidden\" name=\"gid1\" value=\"$gid1\">\n";
+				print "<input type=\"hidden\" name=\"gid2\" value=\"$gid2\">\n";
+				print "<input type=\"hidden\" name=\"ged\" value=\"$mergeged\">\n";
+				print "<input type=\"hidden\" name=\"action\" value=\"merge\">\n";
+				$equal_count=0;
+				$skip1 = array();
+				$skip2 = array();
+				print "<table border=\"1\" class=\"list_table wrap\" align=center style=\"width:50%;\">\n";
+				foreach($facts1 as $i=>$fact1) {
 					foreach($facts2 as $j=>$fact2) {
-						if (($fact2["fact"]!="CHAN")&&(!in_array($j, $skip2))) {
-							print "<tr><td><input type=\"checkbox\" name=\"keep2[]\" value=\"$j\" checked=\"checked\" /></td>";
-							print "<td class=\"wrap\">".nl2br($fact2["subrec"])."</td></tr>\n";
+						if (Str2Upper($fact1["subrec"])==Str2Upper($fact2["subrec"])) {
+							$skip1[] = $i;
+							$skip2[] = $j;
+							$equal_count++;
+							print "<tr><td>";
+							if (defined("GM_FACT_".$fact1["fact"])) print constant("GM_FACT_".$fact1["fact"]);
+							else print $fact1["fact"];
+							print "<input type=\"hidden\" name=\"keep1[]\" value=\"$i\" /></td>\n<td>".nl2br($fact1["subrec"])."</td></tr>\n";
 						}
 					}
-					print "</table>\n";
-					print "</td></tr>\n";
-					print "</table>\n";
-					print "<div class=\"center\"><input type=\"submit\"  value=\"".GM_LANG_merge_records."\"></div>\n";
-					print "</form></div>\n";
 				}
+				if ($equal_count==0) {
+					print "<tr><td>".GM_LANG_no_matches_found."</td></tr>\n";
+				}
+				print "</table><br />\n";
+				print "<div class=\"center\">".GM_LANG_unmatching_facts."<br /></div>\n";
+				print "<table class=\"list_table wrap\" style=\"width:100%;\">\n";
+				print "<tr><td class=\"list_label\">".GM_LANG_record." $gid1</td><td class=\"list_label\">".GM_LANG_record." $gid2</td></tr>\n";
+				print "<tr><td valign=\"top\" class=\"list_value\">\n";
+				print "<table border=\"1\">\n";
+				foreach($facts1 as $i=>$fact1) {
+					if (($fact1["fact"]!="CHAN")&&(!in_array($i, $skip1))) {
+						print "<tr><td><input type=\"checkbox\" name=\"keep1[]\" value=\"$i\" checked=\"checked\" /></td>";
+						print "<td class=\"wrap\">".nl2br($fact1["subrec"])."</td></tr>\n";
+					}
+				}
+				print "</table>\n";
+				print "</td><td valign=\"top\" class=\"list_value\">\n";
+				print "<table border=\"1\">\n";
+				foreach($facts2 as $j=>$fact2) {
+					if (($fact2["fact"]!="CHAN")&&(!in_array($j, $skip2))) {
+						print "<tr><td><input type=\"checkbox\" name=\"keep2[]\" value=\"$j\" checked=\"checked\" /></td>";
+						print "<td class=\"wrap\">".nl2br($fact2["subrec"])."</td></tr>\n";
+					}
+				}
+				print "</table>\n";
+				print "</td></tr>\n";
+				print "</table>\n";
+				print "<div class=\"center\"><input type=\"submit\"  value=\"".GM_LANG_merge_records."\"></div>\n";
+				print "</form></div>\n";
 			}
 		}
 	}
+	SwitchGedcom($oldged);
 }
 ?>
 <script language="JavaScript" type="text/javascript">
@@ -395,13 +436,13 @@ if ($action=="choose") {
 			print "<input type=\"hidden\" name=\"action\" value=\"select\" />";
 			print "<table style=\"width:100%\">";
 				print "<tr><td class=\"shade1\">".GM_LANG_choose_gedcom."<br /></td>";
-				print "<td class=\"shade1\"><select name=\"ged\">\n";
-				if (!isset($ged) || empty($ged)) $ged = $GEDCOMID;
+				print "<td class=\"shade1\"><select name=\"mergeged\">\n";
+				if (!isset($mergeged) || empty($mergeged)) $mergeged = $GEDCOMID;
 				foreach($GEDCOMS as $gedc=>$gedarray) {
 					$gedid = $gedarray["id"];
 					if ($gm_user->userGedcomAdmin($gedc)) {
-						print "<option value=\"$gedid\"";
-						if ($ged == $gedid) print " selected=\"selected\"";
+						print "<option value=\"".$gedid."\"";
+						if ($mergeged == $gedid) print " selected=\"selected\"";
 						print ">".$gedarray["title"]."</option>\n";
 					}
 				}
@@ -409,20 +450,20 @@ if ($action=="choose") {
 				print "</td></tr>";
 
 				print "<tr><td class=\"shade1\">".GM_LANG_merge_to."<br /></td>";
-				print "<td class=\"shade1\"><input type=\"text\" name=\"gid1\" value=\"$gid1\" size=\"10\" tabindex=\"1\" /> ";
-				print "<a href=\"javascript:iopen_find(document.merge.gid1, document.merge.ged);\"> ".GM_LANG_find_individual."</a> |";
-				print " <a href=\"javascript:fopen_find(document.merge.gid1, document.merge.ged);\"> ".GM_LANG_find_familyid."</a> |";
-				print " <a href=\"javascript:sopen_find(document.merge.gid1, document.merge.ged);\"> ".GM_LANG_find_sourceid."</a> |";
-				print " <a href=\"javascript:nopen_find(document.merge.gid1, document.merge.ged);\"> ".GM_LANG_find_noteid."</a>";
+				print "<td class=\"shade1\"><input type=\"text\" name=\"gid1\" value=\"".$gid1."\" size=\"10\" tabindex=\"1\" /> ";
+				print "<a href=\"javascript:iopen_find(document.merge.gid1, document.merge.mergeged);\"> ".GM_LANG_find_individual."</a> |";
+				print " <a href=\"javascript:fopen_find(document.merge.gid1, document.merge.mergeged);\"> ".GM_LANG_find_familyid."</a> |";
+				print " <a href=\"javascript:sopen_find(document.merge.gid1, document.merge.mergeged);\"> ".GM_LANG_find_sourceid."</a> |";
+				print " <a href=\"javascript:nopen_find(document.merge.gid1, document.merge.mergeged);\"> ".GM_LANG_find_noteid."</a>";
 				print_help_link("rootid_help", "qm");
 				print "</td></tr>";
 
 				print "<tr><td class=\"shade1\">".GM_LANG_merge_from."<br /></td>";
-				print "<td class=\"shade1\"><input type=\"text\" name=\"gid2\" value=\"$gid2\" size=\"10\" tabindex=\"2\" /> ";
-				print "<a href=\"javascript:iopen_find(document.merge.gid2, document.merge.ged);\"> ".GM_LANG_find_individual."</a> |";
-				print " <a href=\"javascript:fopen_find(document.merge.gid2, document.merge.ged);\"> ".GM_LANG_find_familyid."</a> |";
-				print " <a href=\"javascript:sopen_find(document.merge.gid2, document.merge.ged);\"> ".GM_LANG_find_sourceid."</a> |";
-				print " <a href=\"javascript:nopen_find(document.merge.gid2, document.merge.ged);\"> ".GM_LANG_find_noteid."</a>";
+				print "<td class=\"shade1\"><input type=\"text\" name=\"gid2\" value=\"".$gid2."\" size=\"10\" tabindex=\"2\" /> ";
+				print "<a href=\"javascript:iopen_find(document.merge.gid2, document.merge.mergeged);\"> ".GM_LANG_find_individual."</a> |";
+				print " <a href=\"javascript:fopen_find(document.merge.gid2, document.merge.mergeged);\"> ".GM_LANG_find_familyid."</a> |";
+				print " <a href=\"javascript:sopen_find(document.merge.gid2, document.merge.mergeged);\"> ".GM_LANG_find_sourceid."</a> |";
+				print " <a href=\"javascript:nopen_find(document.merge.gid2, document.merge.mergeged);\"> ".GM_LANG_find_noteid."</a>";
 				print_help_link("rootid_help", "qm");
 				print "</td></tr>";
 

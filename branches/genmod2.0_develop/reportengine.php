@@ -55,7 +55,8 @@ foreach($vars as $name=>$var) {
 	$var = CleanInput($var);
 	$newvars[$name]["id"] = $var;
 	if (!empty($type[$name]) && (($type[$name]=="INDI")||($type[$name]=="FAM")||($type[$name]=="SOUR"))) {
-		$gedcom = FindGedcomRecord($var);
+		$object = ConstructObject($var);
+		$gedcom = $object->gedrec;;
 		if (empty($gedcom)) $action="setup";
 		if ($type[$name]=="FAM") {
 			if (preg_match("/0 @.*@ INDI/", $gedcom)>0) {

@@ -292,8 +292,8 @@ switch ($action) {
 		$subid = FindSubmitter($gedfile);
 		if (!empty($subid)) {
 			$record = FindGedcomRecord($subid, $gedfile);
-			if (GetChangeData(true, $subid, true, "", "SUBM")) {
-				$rec = GetChangeData(false, $subid, true, "gedlines", "SUBM");
+			if (ChangeFunctions::GetChangeData(true, $subid, true, "", "SUBM")) {
+				$rec = ChangeFunctions::GetChangeData(false, $subid, true, "gedlines", "SUBM");
 				if (isset($rec[$gedfile][$subid])) $record = $rec[$gedfile][$subid];
 			}
 		}
@@ -456,8 +456,8 @@ switch ($action) {
 			<?php print GM_LANG_reorder_media; ?>
 			</td></tr>
 			<?php
-				if (GetChangeData(true, $pid, true, "", "")) {
-					$rec = GetChangeData(false, $pid, true, "gedlines", "");
+				if (ChangeFunctions::GetChangeData(true, $pid, true, "", "")) {
+					$rec = ChangeFunctions::GetChangeData(false, $pid, true, "gedlines", "");
 					if (isset($rec[$GEDCOMID][$pid])) $gedrec = $rec[$GEDCOMID][$pid];
 				}
 				$ct = preg_match_all("/1\s+OBJE\s+@(.*)@.*/", $gedrec, $fmatch, PREG_SET_ORDER);
@@ -525,8 +525,8 @@ switch ($action) {
 			</td></tr>
 			<?php
 				$children = array();
-				if (GetChangeData(true, $pid, true, "", "")) {
-					$rec = GetChangeData(false, $pid, true, "gedlines", "");
+				if (ChangeFunctions::GetChangeData(true, $pid, true, "", "")) {
+					$rec = ChangeFunctions::GetChangeData(false, $pid, true, "gedlines", "");
 					if (isset($rec[$GEDCOMID][$pid])) $gedrec = $rec[$GEDCOMID][$pid];
 				}
 				$childids = FindChildrenInRecord($gedrec);
@@ -535,8 +535,8 @@ switch ($action) {
 					$irec = FindPersonRecord($childid);
 					if (isset($indilist[$childid])) $children[$childid] = $indilist[$childid];
 					// Always process changed records, they may contain changed birth dates
-					if (GetChangeData(true, $childid, true, "", "")) {
-						$rec = GetChangeData(false, $childid, true, "gedlines", "");
+					if (ChangeFunctions::GetChangeData(true, $childid, true, "", "")) {
+						$rec = ChangeFunctions::GetChangeData(false, $childid, true, "gedlines", "");
 						if (isset($rec[$GEDCOMID][$childid])) $childrec = $rec[$GEDCOMID][$childid];
 						$children[$childid]["names"] = GetIndiNames($childrec);
 						$children[$childid]["gedfile"] = $GEDCOMID;
@@ -616,8 +616,8 @@ switch ($action) {
 					$frec = FindFamilyRecord($famid);
 					if ($frec===false) $frec = FindGedcomRecord($famid);
 					if (isset($famlist[$famid])) $fams[$famid] = $famlist[$famid];
-					if (GetChangeData(true, $famid, true, "", "")) {
-						$rec = GetChangeData(false, $famid, true, "gedlines", "");
+					if (ChangeFunctions::GetChangeData(true, $famid, true, "", "")) {
+						$rec = ChangeFunctions::GetChangeData(false, $famid, true, "gedlines", "");
 						if (isset($rec[$GEDCOMID][$famid])) $fams[$famid]["gedcom"] = $rec[$GEDCOMID][$famid];
 					}
 				}
@@ -689,8 +689,8 @@ switch ($action) {
 				$famids = FindFamilyIds($pid, "", true);
 				$hasprimary = false;
 				foreach($famids as $famid=>$fam) {
-					if (GetChangeData(true, $fam["famid"], true, "", "")) {
-						$rec = GetChangeData(false, $fam["famid"], true, "gedlines", "");
+					if (ChangeFunctions::GetChangeData(true, $fam["famid"], true, "", "")) {
+						$rec = ChangeFunctions::GetChangeData(false, $fam["famid"], true, "gedlines", "");
 						if (isset($rec[$GEDCOMID][$fam["famid"]])) $famrec = $rec[$GEDCOMID][$fam["famid"]];
 					}
 					else $famrec = FindFamilyRecord($fam["famid"]);
@@ -728,8 +728,8 @@ switch ($action) {
 		$famids = FindFamilyIds($pid, "", true);
 		$success = true;
 		foreach($famids as $famid=>$fam) {
-			if (GetChangeData(true, $pid, true, "", "")) {
-				$rec = GetChangeData(false, $pid, true, "gedlines", "");
+			if (ChangeFunctions::GetChangeData(true, $pid, true, "", "")) {
+				$rec = ChangeFunctions::GetChangeData(false, $pid, true, "gedlines", "");
 				$pidrec = $rec[$GEDCOMID][$pid];
 			}
 			else {
@@ -750,8 +750,8 @@ switch ($action) {
 				}
 				$success = $success && EditFunctions::ReplaceGedrec($pid, $rec, $recnew, "FAMC", $change_id, $change_type, "", "INDI");
 			}
-			if (GetChangeData(true, $pid, true, "", "")) {
-				$rec = GetChangeData(false, $pid, true, "gedlines", "");
+			if (ChangeFunctions::GetChangeData(true, $pid, true, "", "")) {
+				$rec = ChangeFunctions::GetChangeData(false, $pid, true, "gedlines", "");
 				$pidrec = $rec[$GEDCOMID][$pid];
 			}
 			else $pidrec = FindPersonRecord($pid);
@@ -773,8 +773,8 @@ switch ($action) {
 		
 	// NOTE: changefamily 9/8/2007 ok
 	case "changefamily":
-		if(GetChangeData(true, $famid, true, "","")) {
-			$rec = GetChangeData(false, $famid, true, "gedlines", "");
+		if(ChangeFunctions::GetChangeData(true, $famid, true, "","")) {
+			$rec = ChangeFunctions::GetChangeData(false, $famid, true, "gedlines", "");
 			$gedrec = $rec[$GEDCOMID][$famid];
 		}
 		$family =& Family::GetInstance($famid, $gedrec);
@@ -921,8 +921,8 @@ switch ($action) {
 	// NOTE: changefamily_update 9/8/2007 ok
 	case "changefamily_update":
 		$change_id = GetNewXref("CHANGE");
-		if(GetChangeData(true, $famid, true, "","")) {
-			$rec = GetChangeData(false, $famid, true, "gedlines", "");
+		if(ChangeFunctions::GetChangeData(true, $famid, true, "","")) {
+			$rec = ChangeFunctions::GetChangeData(false, $famid, true, "gedlines", "");
 			$gedrec = $rec[$GEDCOMID][$famid];
 		}
 		$family =& Family::GetInstance($famid, $gedrec);
@@ -1097,8 +1097,8 @@ switch ($action) {
 				else $pedi = "";
 				if ($pedi == "birth") $pedi = "";
 				$newchildren[] = $CHIL;
-				if (GetChangeData(true, $CHIL, false, "", "")) {
-					$rec = GetChangeData(false, $CHIL, false, "gedlines", "");
+				if (ChangeFunctions::GetChangeData(true, $CHIL, false, "", "")) {
+					$rec = ChangeFunctions::GetChangeData(false, $CHIL, false, "gedlines", "");
 					$indirec = $rec[$GEDCOMID][$CHIL];
 				}					
 				else $indirec = FindGedcomRecord($CHIL);
@@ -1156,8 +1156,8 @@ switch ($action) {
 		}
 		
 		// Check if any family members are there
-		if (GetChangeData(true, $famid, true, "", "")) {
-			$rec = GetChangeData(false, $famid, true, "gedlines");
+		if (ChangeFunctions::GetChangeData(true, $famid, true, "", "")) {
+			$rec = ChangeFunctions::GetChangeData(false, $famid, true, "gedlines");
 			$newfamrec = $rec[$GEDCOMID][$famid];
 			$ct = preg_match("/1 CHIL|HUSB|WIFE/", $newfamrec, $match);
 			if ($ct == 0) $success = $success && EditFunctions::ReplaceGedRec($famid, $newfamrec, "", "FAM", $change_id, $change_type, "", "FAM");
@@ -1386,9 +1386,9 @@ switch ($action) {
 			print "<br /><br />".GM_LANG_update_successful;
 			$newrec = "";
 			// NOTE: Check if there are changes present, if not get the record otherwise the changed record
-			if (!GetChangeData(true, $famid, true)) $newrec = FindGedcomRecord($famid);
+			if (!ChangeFunctions::GetChangeData(true, $famid, true)) $newrec = FindGedcomRecord($famid);
 			else {
-				$rec = GetChangeData(false, $famid, true, "gedlines");
+				$rec = ChangeFunctions::GetChangeData(false, $famid, true, "gedlines");
 				$newrec = $rec[$GEDCOMID][$famid];
 			}
 			$newrec = trim($newrec);
@@ -1519,9 +1519,9 @@ switch ($action) {
 		else if (!empty($famid)) {
 			$famrec = "";
 			// NOTE: Check if there are changes present, if not get the record otherwise the changed record
-			if (!GetChangeData(true, $famid, true)) $famrec = FindGedcomRecord($famid);
+			if (!ChangeFunctions::GetChangeData(true, $famid, true)) $famrec = ChangeFunctions::ReadGedcomRecord($famid, $GEDCOMID, "FAM");
 			else {
-				$rec = GetChangeData(false, $famid, true, "gedlines");
+				$rec = ChangeFunctions::GetChangeData(false, $famid, true, "gedlines");
 				$famrec = $rec[$GEDCOMID][$famid];
 			}
 			if (!empty($famrec)) {
@@ -1533,13 +1533,13 @@ switch ($action) {
 		if ((!empty($famid)) && ($famid != "new")) {
 			$newrec = "";
 			// NOTE: Check if there are changes present, if not get the record otherwise the changed record
-			if (!GetChangeData(true, $xref, true)) {
-				$newrec = ReadGedcomRecord($xref, $GEDCOMID, "INDI");
+			if (!ChangeFunctions::GetChangeData(true, $xref, true)) {
+				$newrec = ChangeFunctions::ReadGedcomRecord($xref, $GEDCOMID, "INDI");
 			}
 			else {
-				$newrec = GetChangeData(false, $xref, true, "gedlines");
+				$newrec = ChangeFunctions::GetChangeData(false, $xref, true, "gedlines");
+				$newrec = trim($newrec[$GEDCOMID][$xref]);
 			}
-			$newrec = trim($newrec[$GEDCOMID][$xref]);
 			// NOTE: Check if the record already has a link to this family
 			$ct = preg_match("/1 FAMS @$famid@/", $newrec, $match);
 			if ($ct == 0) {
@@ -1551,9 +1551,9 @@ switch ($action) {
 		if (!empty($pid)) {
 			$newrec = "";
 			// NOTE: Check if there are changes present, if not get the record otherwise the changed record
-			if (!GetChangeData(true, $pid, true)) $newrec = trim(FindGedcomRecord($pid));
+			if (!ChangeFunctions::GetChangeData(true, $pid, true)) $newrec = trim(FindGedcomRecord($pid));
 			else {
-				$rec = GetChangeData(false, $pid, true, "gedlines");
+				$rec = ChangeFunctions::GetChangeData(false, $pid, true, "gedlines");
 				$newrec = $rec[$GEDCOMID][$pid];
 			}
 			// NOTE: Check if the record already has a link to this family
@@ -1671,9 +1671,9 @@ switch ($action) {
 			$success = true;
 	
 			// NOTE: Check if there are changes present, if not get the record otherwise the changed record
-			if (!GetChangeData(true, $famid, true)) $famrec = FindGedcomRecord($famid);
+			if (!ChangeFunctions::GetChangeData(true, $famid, true)) $famrec = FindGedcomRecord($famid);
 			else {
-				$rec = GetChangeData(false, $famid, true, "gedlines");
+				$rec = ChangeFunctions::GetChangeData(false, $famid, true, "gedlines");
 				$famrec = $rec[$GEDCOMID][$famid];
 			}
 			
@@ -1829,8 +1829,8 @@ switch ($action) {
 		else if (!empty($famid)) {
 			$famrec = "";
 			$famrec = FindGedcomRecord($famid);
-			if (GetChangeData(true, $famid, true)) {
-				$rec = GetChangeData(false, $famid, true, "gedlines");
+			if (ChangeFunctions::GetChangeData(true, $famid, true)) {
+				$rec = ChangeFunctions::GetChangeData(false, $famid, true, "gedlines");
 				$famrec = $rec[$GEDCOMID][$famid];
 			}
 			if (!empty($famrec)) {
@@ -2321,8 +2321,8 @@ switch ($action) {
 	
 	// NOTE editname done
 	case "editname":
-		if (GetChangeData(true, $pid, true)) {
-			$rec = GetChangeData(false, $pid, true, "gedlines");
+		if (ChangeFunctions::GetChangeData(true, $pid, true)) {
+			$rec = ChangeFunctions::GetChangeData(false, $pid, true, "gedlines");
 			$namerecnew = GetSubRecord(1, "1 NAME", $rec[$GEDCOMID][$pid], $count);
 		}
 		else $namerecnew = GetSubRecord(1, "1 NAME", $gedrec, $count);
@@ -2406,9 +2406,9 @@ switch ($action) {
 			}
 			if (!$exist) {
 				// NOTE: Check if there are changes present, if not get the record otherwise the changed record
-				if (!GetChangeData(true, $spid, true)) $gedrec = FindGedcomRecord($spid);
+				if (!ChangeFunctions::GetChangeData(true, $spid, true)) $gedrec = FindGedcomRecord($spid);
 				else {
-					$rec = GetChangeData(false, $spid, true, "gedlines");
+					$rec = ChangeFunctions::GetChangeData(false, $spid, true, "gedlines");
 					$gedrec = $rec[$GEDCOMID][$spid];
 				}
 				if (!empty($gedrec)) {
@@ -2465,8 +2465,8 @@ switch ($action) {
 		$change_id = GetNewXref("CHANGE");
 		if ($pid !== "NEW") {
 			$oldrecord = FindGedcomRecord($pid, get_gedcom_from_id($gedfile));
-			if (GetChangeData(true, $pid, true, "", "")) {
-				$rec = GetChangeData(false, $pid, true, "gedlines", "");
+			if (ChangeFunctions::GetChangeData(true, $pid, true, "", "")) {
+				$rec = ChangeFunctions::GetChangeData(false, $pid, true, "gedlines", "");
 				if (isset($rec[$gedfile][$pid])) $oldrecord = $rec[$gedfile][$pid];
 			}
 			$newrec = "0 @".$pid."@ SUBM\r\n";
@@ -2576,7 +2576,7 @@ switch ($action) {
 if (!isset($link_error)) $link_error = false;
 
 if (isset($change_id) && $can_auto_accept && !$link_error && (($gm_user->UserCanAccept() && $aa_attempt) || $gm_user->userAutoAccept())) {
-	AcceptChange($change_id, $GEDCOMID);
+	ChangeFunctions::AcceptChange($change_id, $GEDCOMID);
 }
 
 // autoclose window when update successful

@@ -92,11 +92,13 @@ abstract class AdminFunctions {
 		return($err_write);
 	}
 	
-	public function PrintGedcom($ged, $convert, $remove, $zip, $privatize_export, $privatize_export_level, $gedname, $embedmm) {
+	public function PrintGedcom($ged, $convert, $remove, $zip, $privatize_export, $privatize_export_level, $gedname, $embedmm, $embednote) {
 		GLOBAL $GEDCOMID, $GM_BASE_DIRECTORY, $gm_username, $gm_user;
+		
 		if ($zip == "yes") {
 			$gedout = fopen($gedname, "w");
 		}
+		else $gedout = "";
 	
 		if ($privatize_export == "yes") {
 			UserController::CreateExportUser($privatize_export_level);
@@ -160,79 +162,73 @@ abstract class AdminFunctions {
 		if ($zip == "yes") fwrite($gedout, $head);
 		else print $head;
 	
-		$sql = "SELECT i_gedrec FROM ".TBLPREFIX."individuals WHERE i_file=".$GEDCOMID." ORDER BY CAST(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(LOWER(i_id),'a',''),'b',''),'c',''),'d',''),'e',''),'f',''),'g',''),'h',''),'i',''),'j',''),'k',''),'l',''),'m',''),'n',''),'o',''),'p',''),'q',''),'r',''),'s',''),'t',''),'u',''),'v',''),'w',''),'x',''),'y',''),'z','') as unsigned)";
+		$sql = "SELECT i_key, i_gedrec, i_file, i_id, i_isdead, n_name, n_surname, n_type, n_letter FROM ".TBLPREFIX."individuals INNER JOIN ".TBLPREFIX."names ON i_key=n_key WHERE i_file=".$GEDCOMID." ORDER BY CAST(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(LOWER(i_id),'a',''),'b',''),'c',''),'d',''),'e',''),'f',''),'g',''),'h',''),'i',''),'j',''),'k',''),'l',''),'m',''),'n',''),'o',''),'p',''),'q',''),'r',''),'s',''),'t',''),'u',''),'v',''),'w',''),'x',''),'y',''),'z','') as unsigned), n_id";
 		$res = NewQuery($sql);
 		if ($res) {
-			while($row = $res->FetchRow()){
-				$rec = trim($row[0])."\r\n";
-				if ($embedmm=="yes") $rec = self::EmbedMM($rec);
-				$rec = RemoveCustomTags($rec, $remove);
-				if ($privatize_export == "yes") $rec = PrivacyFunctions::PrivatizeGedcom($rec);
-				if ($convert=="yes") $rec = utf8_decode($rec);
-				if ($zip == "yes") fwrite($gedout, $rec);
-				else print $rec;
+			$key = "";
+			while($row = $res->FetchAssoc()) {
+				if ($key != $row["i_key"]) {
+					if ($key != "") {
+						$person->names_read = true;
+						self::PrintGedcomObject($person, $privatize_export, $embedmm, $embednote, $remove, $convert, $zip, $gedout);
+					}
+					$person = null;
+					$key = $row["i_key"];
+					$person = new Person($row["i_id"], $row, $row["i_id"]);
+				}
+				$person->addname = array($row["n_name"], $row["n_letter"], $row["n_surname"], $row["n_type"]);
 			}
-			$res->FreeResult();
+			if ($key != "") {
+				$person->names_read = true;
+				self::PrintGedcomObject($person, $privatize_export, $embedmm, $embednote, $remove, $convert, $zip, $gedout);
+			}
 		}
 		
-		$sql = "SELECT f_gedrec FROM ".TBLPREFIX."families WHERE f_file=".$GEDCOMID." ORDER BY cast(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(LOWER(f_id),'a',''),'b',''),'c',''),'d',''),'e',''),'f',''),'g',''),'h',''),'i',''),'j',''),'k',''),'l',''),'m',''),'n',''),'o',''),'p',''),'q',''),'r',''),'s',''),'t',''),'u',''),'v',''),'w',''),'x',''),'y',''),'z','') as unsigned)";
+		$sql = "SELECT f_id, f_gedrec, f_file FROM ".TBLPREFIX."families WHERE f_file=".$GEDCOMID." ORDER BY cast(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(LOWER(f_id),'a',''),'b',''),'c',''),'d',''),'e',''),'f',''),'g',''),'h',''),'i',''),'j',''),'k',''),'l',''),'m',''),'n',''),'o',''),'p',''),'q',''),'r',''),'s',''),'t',''),'u',''),'v',''),'w',''),'x',''),'y',''),'z','') as unsigned)";
 		$res = NewQuery($sql);
 		if ($res) {
-			while($row = $res->FetchRow()){
-				$rec = trim($row[0])."\r\n";
-				if ($embedmm=="yes") $rec = self::EmbedMM($rec);
-				$rec = RemoveCustomTags($rec, $remove);
-				if ($privatize_export == "yes") $rec = PrivacyFunctions::PrivatizeGedcom($rec);
-				if ($convert=="yes") $rec = utf8_decode($rec);
-				if ($zip == "yes") fwrite($gedout, $rec);
-				else print $rec;
+			while($row = $res->FetchAssoc()){
+				$family = new Family($row["f_id"], $row, $row["f_file"]);
+				self::PrintGedcomObject($family, $privatize_export, $embedmm, $embednote, $remove, $convert, $zip, $gedout);
 			}
 			$res->FreeResult();
 		}
 	
-		$sql = "SELECT s_gedrec FROM ".TBLPREFIX."sources WHERE s_file=".$GEDCOMID." ORDER BY cast(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(LOWER(s_id),'a',''),'b',''),'c',''),'d',''),'e',''),'f',''),'g',''),'h',''),'i',''),'j',''),'k',''),'l',''),'m',''),'n',''),'o',''),'p',''),'q',''),'r',''),'s',''),'t',''),'u',''),'v',''),'w',''),'x',''),'y',''),'z','') as unsigned)";
+		$sql = "SELECT s_key, s_id, s_file, s_gedrec FROM ".TBLPREFIX."sources WHERE s_file=".$GEDCOMID." ORDER BY cast(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(LOWER(s_id),'a',''),'b',''),'c',''),'d',''),'e',''),'f',''),'g',''),'h',''),'i',''),'j',''),'k',''),'l',''),'m',''),'n',''),'o',''),'p',''),'q',''),'r',''),'s',''),'t',''),'u',''),'v',''),'w',''),'x',''),'y',''),'z','') as unsigned)";
 		$res = NewQuery($sql);
 		if ($res) {
-			while($row = $res->FetchRow()){
-				$rec = trim($row[0])."\r\n";
-				if ($embedmm=="yes") $rec = self::EmbedMM($rec);
-				$rec = RemoveCustomTags($rec, $remove);
-				if ($privatize_export == "yes") $rec = PrivacyFunctions::PrivatizeGedcom($rec);
-				if ($convert=="yes") $rec = utf8_decode($rec);
-				if ($zip == "yes") fwrite($gedout, $rec);
-				else print $rec;
+			while($row = $res->FetchAssoc()){
+				$source = null;
+				$source = new Source($row["s_id"], $row, $row["s_file"]);
+				self::PrintGedcomObject($source, $privatize_export, $embedmm, $embednote, $remove, $convert, $zip, $gedout);
 			}
 			$res->FreeResult();
 		}
 		
 		if ($embedmm != "yes") {
-			$sql = "SELECT m_gedrec FROM ".TBLPREFIX."media WHERE m_file=".$GEDCOMID." ORDER BY cast(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(LOWER(m_media),'a',''),'b',''),'c',''),'d',''),'e',''),'f',''),'g',''),'h',''),'i',''),'j',''),'k',''),'l',''),'m',''),'n',''),'o',''),'p',''),'q',''),'r',''),'s',''),'t',''),'u',''),'v',''),'w',''),'x',''),'y',''),'z','') as unsigned)";
+			$sql = "SELECT m_media, m_file, m_gedrec, m_ext, m_mfile FROM ".TBLPREFIX."media WHERE m_file=".$GEDCOMID." ORDER BY cast(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(LOWER(m_media),'a',''),'b',''),'c',''),'d',''),'e',''),'f',''),'g',''),'h',''),'i',''),'j',''),'k',''),'l',''),'m',''),'n',''),'o',''),'p',''),'q',''),'r',''),'s',''),'t',''),'u',''),'v',''),'w',''),'x',''),'y',''),'z','') as unsigned)";
 			$res = NewQuery($sql);
 			if ($res) {
-				while($row = $res->FetchRow()){
-					$rec = trim($row[0])."\r\n";
-					$rec = RemoveCustomTags($rec, $remove);
-					if ($privatize_export == "yes") $rec = PrivacyFunctions::PrivatizeGedcom($rec);
-					if ($convert=="yes") $rec = utf8_decode($rec);
-					if ($zip == "yes") fwrite($gedout, $rec);
-					else print $rec;
+				while($row = $res->FetchAssoc()){
+					$media = new MediaItem($row["m_media"], $row, $row["m_file"]);
+					self::PrintGedcomObject($media, $privatize_export, $embedmm, $embednote, $remove, $convert, $zip, $gedout);
 				}
 				$res->FreeResult();
 			}
 		}
 	
-		$sql = "SELECT o_gedrec, o_type FROM ".TBLPREFIX."other WHERE o_file=".$GEDCOMID." ORDER BY cast(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(LOWER(o_id),'a',''),'b',''),'c',''),'d',''),'e',''),'f',''),'g',''),'h',''),'i',''),'j',''),'k',''),'l',''),'m',''),'n',''),'o',''),'p',''),'q',''),'r',''),'s',''),'t',''),'u',''),'v',''),'w',''),'x',''),'y',''),'z','') as unsigned)";
+		$sql = "SELECT o_gedrec, o_type, o_file, o_id FROM ".TBLPREFIX."other WHERE o_file=".$GEDCOMID." ORDER BY o_type, cast(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(LOWER(o_id),'a',''),'b',''),'c',''),'d',''),'e',''),'f',''),'g',''),'h',''),'i',''),'j',''),'k',''),'l',''),'m',''),'n',''),'o',''),'p',''),'q',''),'r',''),'s',''),'t',''),'u',''),'v',''),'w',''),'x',''),'y',''),'z','') as unsigned)";
 		$res = NewQuery($sql);
 		if ($res) {
-			while($row = $res->FetchRow()){
-				$rec = trim($row[0])."\r\n";
-				$key = $row[1];
-				if (($key!="HEAD")&&($key!="TRLR")) {
-					$rec = RemoveCustomTags($rec, $remove);
-					if ($privatize_export == "yes") $rec = PrivacyFunctions::PrivatizeGedcom($rec);
-					if ($convert=="yes") $rec = utf8_decode($rec);
-					if ($zip == "yes") fwrite($gedout, $rec);
-					else print $rec;
+			while($row = $res->FetchAssoc()){
+				$key = $row["o_type"];
+				if ($key != "HEAD" && $key != "TRLR") {
+					if ($key != "NOTE" || $embednote != "yes") {
+						if ($key == "NOTE") $object = new Note($row["o_id"], $row, $row["o_file"]);
+						if ($key == "REPO") $object = new Repository($row["o_id"], $row, $row["o_file"]);
+						if ($key == "SUBM") $object = new Submitter($row["o_id"], $row, $row["o_file"]);
+						self::PrintGedcomObject($object, $privatize_export, $embedmm, $embednote, $remove, $convert, $zip, $gedout);
+					}
 				}
 			}
 			$res->FreeResult();
@@ -259,12 +255,24 @@ abstract class AdminFunctions {
 	}
 	
 	public function EmbedMM($gedrec) {
+		global $GEDCOMID;
 	
 		$ct = preg_match_all("/\n(\d) OBJE @(.+)@/", $gedrec, $match);
 		for ($i=1;$i<=$ct;$i++) {
 			$mmid = $match[2][$i-1];
 			$level = $match[1][$i-1];
-			$mediarec = FindMediaRecord($mmid);
+			$media =& MediaItem::GetInstance($mmid, "", $GEDCOMID);
+			$mediarec = $media->gedrec;
+			// Remove the CHAN record
+			$pos1 = strpos($mediarec, "1 CHAN");
+			if ($pos1 !== false) {
+				$pos2 = strpos($mediarec, "\n1", $pos1+4);
+				if ($pos2 === false) $pos2 = strlen($mediarec);
+				$newgedrec = substr($mediarec, 0, $pos1);
+				$newgedrec .= substr($mediarec, $pos2);
+				$mediarec = $newgedrec;
+			}
+			// Correct the level
 			$oldlevel = $mediarec[0];
 			$mediarec = preg_replace("/\n(\d) /e", "'\n'.SumNums($1, $level).' '", $mediarec);
 			$mediarec = preg_replace("/0 @.+@ OBJE\s*\r\n/", "", $mediarec);
@@ -274,13 +282,54 @@ abstract class AdminFunctions {
 		return $gedrec;
 	}
 	
+	public function EmbedNote($gedrec) {
+		global $GEDCOMID;
+	
+		$ct = preg_match_all("/\n(\d) NOTE @(.+)@/", $gedrec, $match);
+		for ($i=1;$i<=$ct;$i++) {
+			$nid = $match[2][$i-1];
+			$level = $match[1][$i-1];
+			$note =& Note::GetInstance($nid, "", $GEDCOMID);
+			$noterec = $note->gedrec;
+			// Remove the CHAN record
+			$pos1 = strpos($noterec, "1 CHAN");
+			if ($pos1 !== false) {
+				$pos2 = strpos($noterec, "\n1", $pos1+4);
+				if ($pos2 === false) $pos2 = strlen($noterec);
+				$newgedrec = substr($noterec, 0, $pos1);
+				$newgedrec .= substr($noterec, $pos2);
+				$noterec = $newgedrec;
+			}
+			// Correct the level
+			$oldlevel = $noterec[0];
+			$noterec = preg_replace("/\n(\d) /e", "'\n'.SumNums($1, $level).' '", $noterec);
+			$noterec = preg_replace("/^0 @.+@ NOTE/", $level." NOTE", $noterec);
+			$gedrec = preg_replace("/$level NOTE @$nid@\s*/", $noterec, $gedrec);
+		}
+		return $gedrec;
+	}
+
+	private function PrintGedcomObject(&$object, $privatize_export, $embedmm, $embednote, $remove, $convert, $zip, $gedout) {
+		
+		if ($privatize_export == "yes") $rec = $object->oldprivategedrec;
+		else $rec = $object->gedrec;
+		if ($object->disp) {
+			if ($embedmm == "yes") $rec = self::EmbedMM($rec);
+			if ($embednote == "yes") $rec = self::EmbedNote($rec);
+		}
+		$rec = RemoveCustomTags($rec, $remove);
+		if ($convert == "yes") $rec = utf8_decode($rec);
+		if ($zip == "yes") fwrite($gedout, $rec);
+		else print $rec;
+	}
+		
 	/**
 	 * find the name of the first GEDCOM file in a zipfile
 	 * @param string $zipfile	the path and filename
 	 * @param boolean $extract  true = extract and return filename, false = return filename
 	 * @return string		the path and filename of the gedcom file
 	 */
-	function GetGedFromZip($zipfile, $extract=true) {
+	public function GetGedFromZip($zipfile, $extract=true) {
 	
 		require_once "includes/pclzip.lib.php";
 		$zip = new PclZip($zipfile);
@@ -643,5 +692,62 @@ abstract class AdminFunctions {
 		}
 		else return $file;
 	}
+	
+	public function DeleteGedcom($gedid) {
+	
+		$sql = "DELETE FROM ".TBLPREFIX."blocks WHERE b_file='".DbLayer::EscapeQuery($gedid)."'";
+		$res = NewQuery($sql);
+		$sql = "DELETE FROM ".TBLPREFIX."changes WHERE ch_file='".DbLayer::EscapeQuery($gedid)."'";
+		$res = NewQuery($sql);
+		$sql = "DELETE FROM ".TBLPREFIX."dates WHERE d_file='".DbLayer::EscapeQuery($gedid)."'";
+		$res = NewQuery($sql);
+		$sql = "DELETE FROM ".TBLPREFIX."eventcache WHERE ge_file='".DbLayer::EscapeQuery($gedid)."'";
+		$res = NewQuery($sql);
+		$sql = "DELETE FROM ".TBLPREFIX."families WHERE f_file='".DbLayer::EscapeQuery($gedid)."'";
+		$res = NewQuery($sql);
+		$sql = "DELETE FROM ".TBLPREFIX."favorites WHERE fv_file='".DbLayer::EscapeQuery($gedid)."'";
+		$res = NewQuery($sql);
+		$sql = "DELETE FROM ".TBLPREFIX."individual_family WHERE if_file='".DbLayer::EscapeQuery($gedid)."'";
+		$res = NewQuery($sql);
+		$sql = "DELETE FROM ".TBLPREFIX."individuals WHERE i_file='".DbLayer::EscapeQuery($gedid)."'";
+		$res = NewQuery($sql);
+		$sql = "DELETE FROM ".TBLPREFIX."asso WHERE as_file='".DbLayer::EscapeQuery($gedid)."'";
+		$res = NewQuery($sql);
+		$sql = "DELETE FROM ".TBLPREFIX."log WHERE l_file='".DbLayer::EscapeQuery($gedid)."'";
+		$res = NewQuery($sql);
+		$sql = "DELETE FROM ".TBLPREFIX."media WHERE m_file='".DbLayer::EscapeQuery($gedid)."'";
+		$res = NewQuery($sql);
+		$sql = "DELETE FROM ".TBLPREFIX."media_mapping WHERE mm_file='".DbLayer::EscapeQuery($gedid)."'";
+		$res = NewQuery($sql);
+		$sql = "DELETE FROM ".TBLPREFIX."names WHERE n_file='".DbLayer::EscapeQuery($gedid)."'";
+		$res = NewQuery($sql);
+		NewsController::DeleteUserNews($gedid);
+		$sql = "DELETE FROM ".TBLPREFIX."other WHERE o_file='".DbLayer::EscapeQuery($gedid)."'";
+		$res = NewQuery($sql);
+		$sql = "DELETE FROM ".TBLPREFIX."other_mapping WHERE om_file='".DbLayer::EscapeQuery($gedid)."'";
+		$res = NewQuery($sql);
+		$sql = "DELETE FROM ".TBLPREFIX."placelinks WHERE pl_file='".DbLayer::EscapeQuery($gedid)."'";
+		$res = NewQuery($sql);
+		$sql = "DELETE FROM ".TBLPREFIX."places WHERE p_file='".DbLayer::EscapeQuery($gedid)."'";
+		$res = NewQuery($sql);
+		$sql = "DELETE FROM ".TBLPREFIX."sources WHERE s_file='".DbLayer::EscapeQuery($gedid)."'";
+		$res = NewQuery($sql);
+		$sql = "DELETE FROM ".TBLPREFIX."source_mapping WHERE sm_file='".DbLayer::EscapeQuery($gedid)."'";
+		$res = NewQuery($sql);
+		$sql = "DELETE FROM ".TBLPREFIX."statscache WHERE gs_file='".DbLayer::EscapeQuery($gedid)."'";
+		$res = NewQuery($sql);
+		$sql = "DELETE FROM ".TBLPREFIX."counters WHERE c_id LIKE '%[".DbLayer::EscapeQuery($gedid)."]%'";
+		$res = NewQuery($sql);
+		$sql = "DELETE FROM ".TBLPREFIX."users_gedcoms WHERE ug_file='".DbLayer::EscapeQuery($gedid)."'";
+		$res = NewQuery($sql);
+		$sql = "DELETE FROM ".TBLPREFIX."actions WHERE a_file='".DbLayer::EscapeQuery($gedid)."'";
+		$res = NewQuery($sql);
+		$sql = "DELETE FROM ".TBLPREFIX."pdata WHERE pd_file='".DbLayer::EscapeQuery($gedid)."'";
+		$res = NewQuery($sql);
+		$sql = "DELETE FROM ".TBLPREFIX."soundex WHERE s_file='".DbLayer::EscapeQuery($gedid)."'";
+		$res = NewQuery($sql);
+	}
+	
+
 }
 ?>

@@ -879,6 +879,7 @@ abstract class PrivacyFunctions {
 			}
 			else {
 				if ($type == "NOTE") {
+					$text = "";
 					// Get the text on level 0
 					$nt = preg_match("/0 @.+@ NOTE (.+)(\r\n|\n|\r)*/", $gedrec, $n1match);
 					if ($nt>0) $text = $n1match[1];

@@ -63,7 +63,7 @@ print "</span><br /><br />\n";
 
 // NOTE: User wants to reject the change
 if ($action=="reject") {
-	if (RejectChange($cid, $gedfile)) {
+	if (ChangeFunctions::RejectChange($cid, $gedfile)) {
 		print "<br /><br /><b>";
 		print GM_LANG_reject_successful;
 		print "</b><br /><br />";
@@ -71,7 +71,7 @@ if ($action=="reject") {
 }
 // NOTE: User rejects all changes
 if ($action=="rejectall") {
-	if (RejectChange("", $gedfile, true)) {
+	if (ChangeFunctions::RejectChange("", $gedfile, true)) {
 		print "<br /><br /><b>";
 		print GM_LANG_reject_successful;
 		print "</b><br /><br />";
@@ -79,7 +79,7 @@ if ($action=="rejectall") {
 }
 // NOTE: User has accepted the change
 if ($action=="accept") {
-	if (AcceptChange($cid, $gedfile)) {
+	if (ChangeFunctions::AcceptChange($cid, $gedfile)) {
 		print "<br /><br /><b>";
 		print GM_LANG_accept_successful;
 		print "</b><br /><br />";
@@ -87,14 +87,14 @@ if ($action=="accept") {
 }
 // NOTE: User accepted all changes
 if ($action=="acceptall") {
-	if (AcceptChange("", $gedfile, true)) {
+	if (ChangeFunctions::AcceptChange("", $gedfile, true)) {
 		print "<br /><br /><b>";
 		print GM_LANG_accept_successful;
 		print "</b><br /><br />";
 	}
 }
 
-if (GetChangeData(true, "", true)==0) {
+if (ChangeFunctions::GetChangeData(true, "", true)==0) {
 	print "<br /><br /><b>";
 	print GM_LANG_no_changes;
 	print "</b>";
@@ -134,7 +134,6 @@ else {
 				// But we check if it's really new: there must be no DB record AND no previous changes on this ID
 				// If not, there is a problem and we can only reject.
 				$object =& ConstructObject($rowcid["ch_gid"], $rowcid["ch_gid_type"]);
-//				$oldrec = FindGedcomRecord($rowcid["ch_gid"], "", true);
 				if ($object->isnew && !in_array($rowcid["ch_gid"], $foundids)) {
 					$rowcid["canaccept"] = true;
 					$rowcid["canreject"] = true;
@@ -152,8 +151,7 @@ else {
 				if ($trace) print "4. Found a deletion ".$rowcid["ch_gid"]." ";
 				$found0ids[$rowcid["ch_gid"]] = $row["cid"];
 				$object =& ConstructObject($rowcid["ch_gid"], $rowcid["ch_gid_type"]);
-//				$oldrec = FindGedcomRecord($rowcid["ch_gid"], "", true);
-				if ($$object->gedrec != $rowcid["ch_old"]) {
+				if ($object->gedrec != $rowcid["ch_old"]) {
 					// Not the same, check if we really have previous changes on this ID
 					if (in_array($rowcid["ch_gid"], $foundids)) {
 						// Yes, found one
@@ -180,7 +178,6 @@ else {
 				if ($trace) print "6. Found edit ".$rowcid["ch_gid"]."<br />";
 				$found0ids[$rowcid["ch_gid"]] = $row["cid"];
 				$object =& ConstructObject($rowcid["ch_gid"], $rowcid["ch_gid_type"]);
-//				$oldrec = FindGedcomRecord($rowcid["ch_gid"], "", true);
 				if ($object->gedrec != $rowcid["ch_old"]) {
 					// Not the same, check if we really have previous changes on this ID
 					if (in_array($rowcid["ch_gid"], $foundids)) {
@@ -381,13 +378,6 @@ else {
 			// $change also contains the canaccept and canreject values. Only process if it's an array
 			if (is_array($change)) {
 				print "<tr class=\"shade1\"><td>";
-				$gedrec = FindGedcomRecord($change["gid"], "", true);
-				if (empty($gedrec)) {
-					if (GetChangeData(true, $change["gid"], true)) {
-						$rec = GetChangeData(false, $change["gid"], true, "gedlines");
-						$gedrec = $rec[$GEDCOMID][$change["gid"]];
-					}
-				}
 				$object = ConstructObject($change["gid"], $change["gid_type"]);
 				switch ($change["gid_type"]) {
 					case "INDI":

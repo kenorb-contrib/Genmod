@@ -175,7 +175,7 @@ abstract class GedcomConfig {
 															// Done
 	public static $INDI_QUICK_ADDFACTS = "BIRT,DEAT,OCCU,RESI";
 															// Done
-	public static $FAM_FACTS_UNIQUE = "NCHI,MARL,DIV,ANUL,DIVF,ENGA,MARB,MARC,MARS";
+	public static $FAM_FACTS_UNIQUE = "NCHI,MARL,DIV,ANUL,DIVF,ENGA,MARB,MARC,MARS,HUSB,WIFE";
 															// Done
 	public static $FAM_FACTS_ADD = "CENS,MARR,RESI,SLGS,MARR_CIVIL,MARR_RELIGIOUS,MARR_PARTNERS";
 															// Done

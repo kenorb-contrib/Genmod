@@ -2349,6 +2349,7 @@
 "relation_families";"Set relation to families and primary display for charts"
 "relation_fams_short";"Set child/family relation and chart display"
 "embedmm";"Convert Multimedia records to embedded records"
+"embednote";"Convert Note records to embedded records"
 "merge_notunique";"The following facts are unique and must be selected no more than once:"
 "merge_haschanges";"One of the designated records has changes. Accept/reject those first, then try again."
 "merge_success";"Merge succesfully accomplished. Click Accept/Reject changes to make it permanent."
@@ -2585,3 +2586,4 @@
 "descent_steps";"Descent steps"
 "gedcom_exists";"A GEDCOM-file with this name is already in the database"
 "no_faq_content";"An FAQ must have header and body text."
+"cannot_create_file";"The file cannot be created. Check path name, acces rights etc."

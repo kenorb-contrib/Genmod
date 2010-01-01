@@ -33,7 +33,7 @@ class Repository extends GedcomRecord {
 	// General class information
 	public $classname = "Repository";		// Name of this class
 	public $datatype = "REPO";				// Type of data
-	private static $repocache = array();	// Holder of the instances for this class
+	private static $cache = array();		// Holder of the instances for this class
 	
 	// Data
 	private $name = null;					// Full title of the repository, including all descriptors
@@ -44,10 +44,10 @@ class Repository extends GedcomRecord {
 		global $GEDCOMID;
 		
 		if (empty($gedcomid)) $gedcomid = $GEDCOMID;
-		if (!isset(self::$repocache[$gedcomid][$xref])) {
-			self::$repocache[$gedcomid][$xref] = new Repository($xref, $gedrec, $gedcomid);
+		if (!isset(self::$cache[$gedcomid][$xref])) {
+			self::$cache[$gedcomid][$xref] = new Repository($xref, $gedrec, $gedcomid);
 		}
-		return self::$repocache[$gedcomid][$xref];
+		return self::$cache[$gedcomid][$xref];
 	}
 	
 	public function __construct($id, $gedrec="", $gedcomid="") {
@@ -88,7 +88,7 @@ class Repository extends GedcomRecord {
 		
 	public function ObjCount() {
 		$count = 0;
-		foreach(self::$repocache as $ged => $repo) {
+		foreach(self::$cache as $ged => $repo) {
 			$count += count($repo);
 		}
 		return $count;

@@ -35,7 +35,7 @@ class Header extends GedcomRecord {
 	// General class information
 	public $classname = "Header";			// Name of this class
 	public $datatype = "HEAD";				// Type of data collected here
-	private static $headercache = array(); 	// Holder of the instances for this class
+	private static $cache = array(); 		// Holder of the instances for this class
 	private $placeformat = null;			// Order of place hierarchy
 	
 	
@@ -43,10 +43,10 @@ class Header extends GedcomRecord {
 		global $GEDCOMID;
 		
 		if (empty($gedcomid)) $gedcomid = $GEDCOMID;
-		if (!isset(self::$headercache[$gedcomid][$xref])) {
-			self::$headercache[$gedcomid][$xref] = new Header($xref, $gedrec, $gedcomid);
+		if (!isset(self::$cache[$gedcomid][$xref])) {
+			self::$cache[$gedcomid][$xref] = new Header($xref, $gedrec, $gedcomid);
 		}
-		return self::$headercache[$gedcomid][$xref];
+		return self::$cache[$gedcomid][$xref];
 	}
 		
 	/**

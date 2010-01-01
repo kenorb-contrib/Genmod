@@ -55,7 +55,7 @@ if (!isset($MAX_ALIVE_AGE)) $MAX_ALIVE_AGE = 120;
  *
  * @param string $checkVar
  */
-function write_access_option($checkVar) {
+function WriteAccessOption($checkVar) {
   global $PRIV_HIDE, $PRIV_PUBLIC, $PRIV_USER, $PRIV_NONE;
   
   print "<option value=\"PRIV_PUBLIC\"";
@@ -77,7 +77,7 @@ function write_access_option($checkVar) {
  *
  * @param string $checkVar
  */
-function write_yes_no($checkVar) {
+function WriteYesNo($checkVar) {
 
   print "<option";
   if ($checkVar == false) print " selected=\"selected\"";
@@ -97,7 +97,7 @@ function write_yes_no($checkVar) {
  *
  * @param string $checkVar
  */
-function write_hide_show($checkVar) {
+function WriteHideShow($checkVar) {
 
   print "<option";
   if ($checkVar == 0) print " selected=\"selected\"";
@@ -117,39 +117,33 @@ function write_hide_show($checkVar) {
  * @param string $checkVar	gedcom key
  * @param string $outputVar	error message style
  */
-function search_ID_details($checkVar, $outputVar) {
-	global $GEDCOMS;
+function SearchIdDetails($checkVar, $outputVar) {
 
-	$indirec = FindGedcomRecord($checkVar);
-    
-	if (!empty($indirec)) {
-		$ct = preg_match("/0 @(.*)@ (.*)/", $indirec, $match);
-		if ($ct>0) {
-			$pid = $match[1];
-			$type = trim($match[2]);
-		}
-		if ($type=="INDI") {
-			$name = GetPersonName($pid);
-			print "\n<span class=\"list_item\">$name";
-			print_first_major_fact($pid);
+    $object = ConstructObject($checkVar);
+	
+	if (!$object->isempty) {
+		if ($object->type=="INDI") {
+			print "\n<span class=\"list_item\">".$object->name;
+			PersonFunctions::PrintFirstMajorFact($object);
 			print "</span>\n";
 		}
-		else if ($type=="SOUR") {
-			$name = GetSourceDescriptor($pid);
-			print "\n<span class=\"list_item\">$name";
+		else if ($object->type=="SOUR") {
+			print "\n<span class=\"list_item\">".$object->name;
 			print "</span>\n";
 		}
-		else if ($type=="FAM") {
-			$name = GetFamilyDescriptor($pid);
-			print "\n<span class=\"list_item\">$name";
+		else if ($object->type=="FAM") {
+			print "\n<span class=\"list_item\">".$object->name;
 			print "</span>\n";
 		}
-		else if ($type=="OBJE") {
-			$name = GetMediaDescriptor($pid);
-			print "\n<span class=\"list_item\">$name";
+		else if ($object->type=="OBJE") {
+			print "\n<span class=\"list_item\">".$object->title;
 			print "</span>\n";
 		}
-		else print "$type $pid";
+		else if ($object->type=="NOTE") {
+			print "\n<span class=\"list_item\">".$object->title;
+			print "</span>\n";
+		}
+		else print $object->type." ".$object->xref;
 	}
 	else {
 		print "<span class=\"error\">";
@@ -253,9 +247,8 @@ if ($action=="update") {
 		else unset($person_privacy[$key]);
 	}
 	if ((!empty($v_new_person_privacy_access_ID))&&(!empty($v_new_person_privacy_acess_option))) {
-		$ged = FindGedcomRecord($v_new_person_privacy_access_ID);
-		$v_new_person_privacy_access_ID = GetRecID($ged);
-		if (!empty($v_new_person_privacy_access_ID)) $person_privacy[$v_new_person_privacy_access_ID] = $v_new_person_privacy_acess_option;
+		$obj = ConstructObject($v_new_person_privacy_access_ID);
+		if (!$obj->isempty) $person_privacy[$v_new_person_privacy_access_ID] = $v_new_person_privacy_acess_option;
 	}
 	
 	if (file_exists("setpersonprivacy.php")) include("setpersonprivacy.php");
@@ -275,9 +268,8 @@ if ($action=="update") {
 		}
 	}
 	if ((!empty($v_new_user_privacy_username))&&(!empty($v_new_user_privacy_access_ID))) {
-		$ged = FindGedcomRecord($v_new_user_privacy_access_ID);
-		$v_new_user_privacy_access_ID = GetRecID($ged);
-		if (!empty($v_new_user_privacy_access_ID)) $user_privacy[$v_new_user_privacy_username][$v_new_user_privacy_access_ID] = $v_new_user_privacy_acess_option;
+		$obj = ConstructObject($v_new_user_privacy_access_ID);
+		if (!$obj->isempty) $user_privacy[$v_new_user_privacy_username][$v_new_user_privacy_access_ID] = $v_new_user_privacy_acess_option;
 	}
 	$settings->user_privacy = $user_privacy;	
 		
@@ -315,9 +307,8 @@ if ($action=="update") {
 		}
 	}
 	if (!empty($v_new_person_facts_access_ID) && !empty($v_new_person_facts_abbr) && !empty($v_new_global_facts_choice) && !empty($v_new_global_facts_access_option)) {
-		$ged = FindGedcomRecord($v_new_person_facts_access_ID);
-		$v_new_person_facts_access_ID = GetRecID($ged);
-		if (!empty($v_new_person_facts_access_ID)) $person_facts[$v_new_person_facts_access_ID][$v_new_person_facts_abbr][$v_new_person_facts_choice] = $v_new_person_facts_acess_option;
+		$obj = ConstructObject($v_new_person_facts_access_ID);
+		if (!$obj->isempty) $person_facts[$v_new_person_facts_access_ID][$v_new_person_facts_abbr][$v_new_person_facts_choice] = $v_new_person_facts_acess_option;
 	}
 	$settings->person_facts = $person_facts;	
 	PrivacyController::StorePrivacy($settings);
@@ -367,35 +358,35 @@ if ($action=="update") {
         <td class="shade2 wrap width40"><?php print_help_link("PRIVACY_BY_RESN_help", "qm", "PRIVACY_BY_RESN"); print GM_LANG_PRIVACY_BY_RESN; ?>
         </td>
         <td class="shade1 width60">
-          <select size="1" name="v_PRIVACY_BY_RESN"><?php write_yes_no($PRIVACY_BY_RESN); ?></select>
+          <select size="1" name="v_PRIVACY_BY_RESN"><?php WriteYesNo($PRIVACY_BY_RESN); ?></select>
         </td>
       </tr>
       <tr>
         <td class="shade2 wrap"><?php print_help_link("SHOW_SOURCES_help", "qm", "SHOW_SOURCES"); print GM_LANG_SHOW_SOURCES; ?>
         </td>
         <td class="shade1">
-          <select size="1" name="v_SHOW_SOURCES"><?php write_access_option($SHOW_SOURCES); ?></select>
+          <select size="1" name="v_SHOW_SOURCES"><?php WriteAccessOption($SHOW_SOURCES); ?></select>
         </td>
       </tr>
       <tr>
         <td class="shade2 wrap"><?php print_help_link("LINK_PRIVACY_help", "qm", "LINK_PRIVACY"); print GM_LANG_LINK_PRIVACY; ?>
         </td>
         <td class="shade1">
-          <select size="1" name="v_LINK_PRIVACY"><?php write_yes_no($LINK_PRIVACY); ?></select>
+          <select size="1" name="v_LINK_PRIVACY"><?php WriteYesNo($LINK_PRIVACY); ?></select>
         </td>
       </tr>
       <tr>
         <td class="shade2 wrap"><?php print_help_link("ENABLE_CLIPPINGS_CART_help", "qm", "ENABLE_CLIPPINGS_CART"); print GM_LANG_ENABLE_CLIPPINGS_CART; ?>
         </td>
         <td class="shade1">
-          <select size="1" name="v_ENABLE_CLIPPINGS_CART"><?php write_access_option($ENABLE_CLIPPINGS_CART); ?></select>
+          <select size="1" name="v_ENABLE_CLIPPINGS_CART"><?php WriteAccessOption($ENABLE_CLIPPINGS_CART); ?></select>
         </td>
       </tr>
       <tr>
         <td class="shade2 wrap"><?php print_help_link("SHOW_RESEARCH_LOG_help", "qm", "SHOW_RESEARCH_LOG"); print GM_LANG_SHOW_RESEARCH_LOG; ?>
         </td>
         <td class="shade1">
-          <select size="1" name="v_SHOW_ACTION_LIST"><?php write_access_option($SHOW_ACTION_LIST); ?></select>
+          <select size="1" name="v_SHOW_ACTION_LIST"><?php WriteAccessOption($SHOW_ACTION_LIST); ?></select>
         </td>
       </tr>
     </table>
@@ -421,28 +412,28 @@ if ($action=="update") {
 	<tr>
 		<td class="shade2 wrap width40 <?php print $TEXT_DIRECTION;?>"><?php print_help_link("HIDE_LIVE_PEOPLE_help", "qm", "HIDE_LIVE_PEOPLE"); print GM_LANG_HIDE_LIVE_PEOPLE;?></td>
 		<td class="shade1 width60">
-			<select size="1" name="v_HIDE_LIVE_PEOPLE"><?php write_access_option($HIDE_LIVE_PEOPLE); ?></select>
+			<select size="1" name="v_HIDE_LIVE_PEOPLE"><?php WriteAccessOption($HIDE_LIVE_PEOPLE); ?></select>
 		</td>
 	</tr>
       <tr>
         <td class="shade2 wrap width40 <?php print $TEXT_DIRECTION;?>"><?php print_help_link("SHOW_DEAD_PEOPLE_help", "qm", "SHOW_DEAD_PEOPLE"); print GM_LANG_SHOW_DEAD_PEOPLE; ?>
         </td>
         <td class="shade1 width60">
-          <select size="1" name="v_SHOW_DEAD_PEOPLE"><?php write_access_option($SHOW_DEAD_PEOPLE); ?></select>
+          <select size="1" name="v_SHOW_DEAD_PEOPLE"><?php WriteAccessOption($SHOW_DEAD_PEOPLE); ?></select>
         </td>
       </tr>
       <tr>
         <td class="shade2 wrap"><?php print_help_link("SHOW_LIVING_NAMES_help", "qm", "SHOW_LIVING_NAMES"); print GM_LANG_SHOW_LIVING_NAMES; ?>
         </td>
         <td class="shade1">
-          <select size="1" name="v_SHOW_LIVING_NAMES"><?php write_access_option($SHOW_LIVING_NAMES); ?></select>
+          <select size="1" name="v_SHOW_LIVING_NAMES"><?php WriteAccessOption($SHOW_LIVING_NAMES); ?></select>
         </td>
       </tr>
       <tr>
         <td class="shade2 wrap"><?php print_help_link("PRIVACY_BY_YEAR_help", "qm", "PRIVACY_BY_YEAR"); print GM_LANG_PRIVACY_BY_YEAR; ?>
         </td>
         <td class="shade1">
-          <select size="1" name="v_PRIVACY_BY_YEAR"><?php write_yes_no($PRIVACY_BY_YEAR); ?></select>
+          <select size="1" name="v_PRIVACY_BY_YEAR"><?php WriteYesNo($PRIVACY_BY_YEAR); ?></select>
         </td>
       </tr>
       
@@ -450,7 +441,7 @@ if ($action=="update") {
         <td class="shade2 wrap"><?php print_help_link("USE_RELATIONSHIP_PRIVACY_help", "qm", "USE_RELATIONSHIP_PRIVACY"); print GM_LANG_USE_RELATIONSHIP_PRIVACY; ?>
         </td>
         <td class="shade1">
-          <select size="1" name="v_USE_RELATIONSHIP_PRIVACY"><?php write_yes_no($USE_RELATIONSHIP_PRIVACY); ?></select>
+          <select size="1" name="v_USE_RELATIONSHIP_PRIVACY"><?php WriteYesNo($USE_RELATIONSHIP_PRIVACY); ?></select>
         </td>
       </tr>
 
@@ -474,7 +465,7 @@ if ($action=="update") {
         <td class="shade2 wrap"><?php print_help_link("CHECK_MARRIAGE_RELATIONS_help", "qm", "CHECK_MARRIAGE_RELATIONS"); print GM_LANG_CHECK_MARRIAGE_RELATIONS; ?>
         </td>
         <td class="shade1">
-          <select size="1" name="v_CHECK_MARRIAGE_RELATIONS"><?php write_yes_no($CHECK_MARRIAGE_RELATIONS); ?></select>
+          <select size="1" name="v_CHECK_MARRIAGE_RELATIONS"><?php WriteYesNo($CHECK_MARRIAGE_RELATIONS); ?></select>
         </td>
       </tr>
 	<tr>
@@ -535,7 +526,7 @@ if ($action=="update") {
 			 ?>
               </td>
               <td class="shade1">
-                <select size="1" name="v_new_person_privacy_acess_option"><?php write_access_option(""); ?></select>
+                <select size="1" name="v_new_person_privacy_acess_option"><?php WriteAccessOption(""); ?></select>
               </td>
             </tr>
 		</table>
@@ -563,9 +554,9 @@ if ($action=="update") {
               <input type="checkbox" name="v_person_privacy_del[<?php print $key; ?>]" value="1" />
               </td>
               <td class="shade1"><?php print $key; ?></td>
-              <td class="shade1 wrap"><?php search_ID_details($key, 1); ?></td>
+              <td class="shade1 wrap"><?php SearchIdDetails($key, 1); ?></td>
               <td class="shade1">
-                <select size="1" name="v_person_privacy[<?php print $key; ?>]"><?php write_access_option($value); ?></select>
+                <select size="1" name="v_person_privacy[<?php print $key; ?>]"><?php WriteAccessOption($value); ?></select>
               </td>
             </tr>
             <?php
@@ -633,7 +624,7 @@ if ($action=="update") {
                 ?>
               </td>
               <td class="shade1">
-                <select size="1" name="v_new_user_privacy_acess_option"><?php write_hide_show(""); ?></select>
+                <select size="1" name="v_new_user_privacy_acess_option"><?php WriteHideShow(""); ?></select>
               </td>
             </tr>
           </table>
@@ -663,9 +654,9 @@ if ($action=="update") {
               <td class="shade1"><?php if ($key == "all") print GM_LANG_all_users; else print $key; ?></td>
 	      <td class="shade1"><?php print $id; ?></td>
               <td class="shade1">
-                <select size="1" name="v_user_privacy[<?php print $key; ?>][<?php print $id; ?>]"><?php write_hide_show($setting); ?></select>
+                <select size="1" name="v_user_privacy[<?php print $key; ?>][<?php print $id; ?>]"><?php WriteHideShow($setting); ?></select>
               </td>
-              <td class="shade1"><?php search_ID_details($id, 2); ?>
+              <td class="shade1"><?php SearchIdDetails($id, 2); ?>
               </td>
             </tr>
             
@@ -716,7 +707,7 @@ if ($action=="update") {
                 </select>
               </td>
               <td class="shade1">
-                <select size="1" name="v_new_global_facts_access_option"><?php write_access_option(""); ?></select>
+                <select size="1" name="v_new_global_facts_access_option"><?php WriteAccessOption(""); ?></select>
               </td>
             </tr>
           </table>
@@ -751,7 +742,7 @@ if ($action=="update") {
               if ($key == "details") print GM_LANG_fact_details;
               ?></td>
               <td class="shade1">
-                <select size="1" name="v_global_facts[<?php print $tag; ?>][<?php print $key; ?>]"><?php write_access_option($setting); ?></select>
+                <select size="1" name="v_global_facts[<?php print $tag; ?>][<?php print $key; ?>]"><?php WriteAccessOption($setting); ?></select>
               </td>
             </tr>
             <?php
@@ -815,7 +806,7 @@ if ($action=="update") {
                 </select>
               </td>
               <td class="shade1">
-                <select size="1" name="v_new_person_facts_acess_option"><?php write_access_option(""); ?></select>
+                <select size="1" name="v_new_person_facts_acess_option"><?php WriteAccessOption(""); ?></select>
               </td>
             </tr>
             <?php //--End----add person_facts for individuals-----------------------------------------------
@@ -846,7 +837,7 @@ if ($action=="update") {
           <input type="checkbox" name="v_person_facts_del[<?php print $id; ?>][<?php print $tag; ?>][<?php print $key; ?>]" value="1" /></td>
           <td class="shade1"><?php print $id; ?></td>
           <td class="shade1"><?php
-              search_ID_details($id, 2);
+              SearchIdDetails($id, 2);
           ?></td>
           <td class="shade1">
           <?php
@@ -857,7 +848,7 @@ if ($action=="update") {
           if ($key == "details") print GM_LANG_fact_details;
           ?></td>
           <td class="shade1">
-            <select size="1" name="v_person_facts[<?php print $id; ?>][<?php print $tag; ?>][<?php print $key; ?>]"><?php write_access_option($setting); ?></select>
+            <select size="1" name="v_person_facts[<?php print $id; ?>][<?php print $tag; ?>][<?php print $key; ?>]"><?php WriteAccessOption($setting); ?></select>
           </td>
         </tr>
         <?php

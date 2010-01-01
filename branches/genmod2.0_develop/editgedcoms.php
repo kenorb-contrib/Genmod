@@ -51,7 +51,7 @@ print "<center>\n";
 if ($action=="delete") {
 	if (isset($GEDCOMS[$delged])) {
 		PrivacyController::DeletePrivacy($delged);
-		DeleteGedcom($delged);
+		AdminFunctions::DeleteGedcom($delged);
 		unset($GEDCOMS[$delged]);
 		AdminFunctions::StoreGedcoms();
 		GedcomConfig::DeleteGedcomConfig($delged);
@@ -185,7 +185,7 @@ if ($action == "deletecount") {
 				print "<td>&nbsp;</td>";
 				print "<td>";
 				if (file_exists($gedarray["path"])) {
-					print "<a href=\"uploadgedcom.php?FILEID=$gedc&amp;verify=verify_gedcom&amp;action=add_form&amp;import_existing=1\">".GM_LANG_ged_import."</a>";
+					print "<a href=\"uploadgedcom.php?gedcomid=".$gedc."&amp;verify=verify_gedcom&amp;action=add_form&amp;import_existing=1\">".GM_LANG_ged_import."</a>";
 					if (!$imported) {
 						print "<br /><span class=\"error\">".GM_LANG_gedcom_not_imported."</span>";
 					}

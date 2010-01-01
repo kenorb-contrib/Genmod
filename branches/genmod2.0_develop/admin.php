@@ -198,7 +198,7 @@ if (file_exists(INDEX_DIRECTORY."emergency_syslog.txt")) {
 			else print "&nbsp;"; ?>
 		</div>
 	</div>
-	<?php if (GetChangeData(true, "", true)) { ?>
+	<?php if (ChangeFunctions::GetChangeData(true, "", true)) { ?>
 		<div class="admin_item_box">
 			<div class="admin_item_left"><div class="helpicon"><?php print_help_link("review_changes_help", "qm"); ?></div><div class="description"><a href="#" onclick="window.open('edit_changes.php','','width=600,height=600,resizable=1,scrollbars=1'); return false;"><?php print GM_LANG_accept_changes; ?></a></div></div>
 			<div class="admin_item_right"><div class="helpicon"></div><div class="description">&nbsp;</div></div>

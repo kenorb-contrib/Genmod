@@ -35,7 +35,7 @@ class Person extends GedcomRecord {
 	// General class information
 	public $classname = "Person";			// Name of this class
 	public $datatype = "INDI";				// Type of data collected here
-	private static $personcache = array(); 	// Holder of the instances for this class
+	private static $cache = array(); 	// Holder of the instances for this class
 	
 	private $name = null;					// Printable name of the person, after applying privacy (can be unknown of private)
 	private $revname = null;				// Printable name, in reversed order
@@ -76,17 +76,17 @@ class Person extends GedcomRecord {
 		global $GEDCOMID;
 		
 		if (empty($gedcomid)) $gedcomid = $GEDCOMID;
-		if (!isset(self::$personcache[$gedcomid][$xref])) {
-			self::$personcache[$gedcomid][$xref] = new Person($xref, $gedrec, $gedcomid);
+		if (!isset(self::$cache[$gedcomid][$xref])) {
+			self::$cache[$gedcomid][$xref] = new Person($xref, $gedrec, $gedcomid);
 		}
-		return self::$personcache[$gedcomid][$xref];
+		return self::$cache[$gedcomid][$xref];
 	}
 		
 	public static function IsInstance($xref, $gedcomid="") {
 		global $GEDCOMID;
 		
 		if (empty($gedcomid)) $gedcomid = $GEDCOMID;
-		if (!isset(self::$personcache[$gedcomid][$xref])) return false;
+		if (!isset(self::$cache[$gedcomid][$xref])) return false;
 		else return true;
 	}
 		
@@ -221,7 +221,7 @@ class Person extends GedcomRecord {
 	
 	public function ObjCount() {
 		$count = 0;
-		foreach(self::$personcache as $ged => $person) {
+		foreach(self::$cache as $ged => $person) {
 			$count += count($person);
 		}
 		return $count;
@@ -272,12 +272,17 @@ class Person extends GedcomRecord {
 		return $this->addname;
 	}
 
-	private function getNameArray() {
+	protected function getNameArray($forceold=false) {
 
-		if (is_null($this->name_array)) {
-			if ($this->show_changes && $this->ThisChanged()) $gedrec = $this->GetChangedGedRec();
+		if (is_null($this->name_array) || $forceold) {
+			
+			$names = array();
+			
+			if ($this->show_changes && $this->ThisChanged() && !$forceold) $gedrec = $this->GetChangedGedRec();
 			else $gedrec = $this->gedrec;
-			$this->name_array = GetIndiNames($gedrec);
+			$names = GetIndiNames($gedrec);
+			if ($forceold) return $names;
+			else $this->name_array = $names;
 		}
 		return $this->name_array;
 	}
@@ -1329,7 +1334,7 @@ if ($this->tracefacts) print "AddSpouseFacts - Adding for ".$fam->$spperson->xre
 	 * get family with child ids
 	 * @return array	array of the FAMC ids
 	 */
-	private function getChildFamilyIds() {
+	protected function getChildFamilyIds() {
 		
 		if (is_null($this->famc)) {
 			
@@ -1543,8 +1548,9 @@ if ($this->tracefacts) print "AddSpouseFacts - Adding for ".$fam->$spperson->xre
 		global $GM_IMAGES;
 		
 		if (GedcomConfig::$SHOW_PARENTS_AGE) {
-			$childfam =& Family::GetInstance($this->GetPrimaryChildFamily());
-			if (is_object($childfam)) {
+			$childfamid = $this->GetPrimaryChildFamily();
+			if (!empty($childfamid)) {
+				$childfam =& Family::GetInstance($this->GetPrimaryChildFamily());
 				$father_text = "";
 				$mother_text = "";
 				// father

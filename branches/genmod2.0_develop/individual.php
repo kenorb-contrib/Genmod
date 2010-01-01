@@ -75,14 +75,14 @@ $controller->CheckRawEdited();
 			// Name not changed
 			if ($name["old"] == $name["new"]) {
 				print "<div class=\"indi_spacer";
-				if ($controller->indi->isdeleted && $controller->show_changes) print " change_old";
+				if ($controller->show_changes && $controller->indi->isdeleted) print " change_old";
 				print "\">";
 				$controller->PrintNameRecord($name["old"], $num);
 				print "</div>";
 				$num++;
 			}
 			// Name changed
-			elseif ($controller->caneditown && $controller->show_changes) {
+			elseif ($controller->show_changes && $controller->caneditown) {
 				print "<div>";
 				print "<table class=\"indi_spacer\">";
 				if (!empty($name["old"])) {
@@ -113,7 +113,7 @@ $controller->CheckRawEdited();
 				print "<span class=\"label $TEXT_DIRECTION\">".PrintReady(GM_LANG_sex.":    ")."</span><span class=\"field\">".$controller->indi->sexdetails["gender"];
 				print " <img src=\"".$controller->indi->sexdetails["image"]."\" title=\"".$controller->indi->sexdetails["gender"]."\" alt=\"".$controller->indi->sexdetails["gender"];
 				print "\" width=\"0\" height=\"0\" class=\"sex_image\" border=\"0\" />";
-				if (!$controller->indi->isdeleted && $factobj->style != "change_old" && $controller->indi->canedit) {
+				if ($controller->indi->canedit && !$controller->indi->isdeleted && $factobj->style != "change_old") {
 					if ($controller->indi->sexdetails["add"]) print "<br /><a class=\"font9\" href=\"#\" onclick=\"add_new_record('".$controller->xref."', 'SEX'); return false;\">".GM_LANG_edit."</a>";
 					else {
 						print "<br /><a class=\"font9\" href=\"#\" onclick=\"edit_record('".$controller->xref."', 'SEX', 1, 'edit_gender', 'INDI'); return false;\">".GM_LANG_edit."</a> | ";
@@ -156,7 +156,7 @@ $controller->CheckRawEdited();
 print "</div><br /><br />";
 
 // Print the accesskeys
-if (!$controller->view) {
+if ($controller->view != "preview") {
 ?>
 	<div class="accesskeys">
 		<a class="accesskeys" href="<?php print "pedigree.php?rootid=$pid";?>" title="<?php print GM_LANG_pedigree_chart ?>" tabindex="-1" accesskey="<?php print GM_LANG_accesskey_individual_pedigree; ?>"><?php print GM_LANG_pedigree_chart ?></a>

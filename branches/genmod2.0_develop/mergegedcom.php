@@ -1105,8 +1105,8 @@ print "<form enctype=\"multipart/form-data\" method=\"post\" name=\"configform\"
 			
 			if ($marr_names == "yes") {
 				$GEDCOM = $FILE;
-				$flist = GetFemalesWithFAMS();
-				$famlist = GetFamListWithMARR();
+				$flist = ImportFunctions::GetFemalesWithFAMS($gedcomid);
+				$famlist = ImportFunctions::GetFamListWithMARR($gedcomid);
 				print GM_LANG_calc_marr_names;
 				setup_progress_bar(count($flist));
 			
@@ -1119,38 +1119,41 @@ print "<form enctype=\"multipart/form-data\" method=\"post\" name=\"configform\"
 				DMSoundex("", "opencache");
 				if (!isset($lastgid)) $skip = false;
 				else $skip = true;
+				// Walk through the list of females that are spouse in a family
 				foreach($flist as $gid=>$indi) {
 					if ($skip == false) {
 						$lastgid = $gid;
-						$ct = preg_match_all("/1\s*FAMS\s*@(.*)@/", $indi["gedcom"], $match, PREG_SET_ORDER);
+						// Get the family ID's
+						$ct = preg_match_all("/1\s*FAMS\s*@(.*)@/", $indi->gedrec, $match, PREG_SET_ORDER);
 						if ($ct>0){
 							for($j=0; $j<$ct; $j++) {
+								// Process if the family is in the array (thus has a marriage)
 								if (isset($famlist[$match[$j][1]])) {
-									$marrrec = GetSubRecord(1, "1 MARR", $famlist[$match[$j][1]]["gedcom"]);
-									if ($marrrec) {
-										$parents = FindParentsInRecord($famlist[$match[$j][1]]["gedcom"]);
-										if ($parents["HUSB"]!=$gid) $spid = $parents["HUSB"];
-										else $spid = $parents["WIFE"];
-										$sprec = FindPersonRecord($spid, "", false, true);
-										if ($sprec) {
-											$spnames = GetIndiNames($sprec, true);
-											$surname = $spnames[0][2];
-											$letter = $spnames[0][1];
-											$indi["names"] = GetIndiNames($indi["gedcom"], true);
-											//-- uncomment the next line to put the maiden name in the given name area
-											//$newname = preg_replace("~/(.*)/~", " $1 /".$surname."/", $indi["names"][0][0]);
-											$newname = preg_replace("~/(.*)/~", "/".$surname."/", $indi["names"][0][0]);
-											if (strpos($indi["gedcom"], "_MARNM $newname")===false) {
-												$pos1 = strpos($indi["gedcom"], "1 NAME");
-												if ($pos1!==false) {
-													$pos1 = strpos($indi["gedcom"], "\n1", $pos1+1);
-													if ($pos1!==false) $indi["gedcom"] = substr($indi["gedcom"], 0, $pos1)."\n2 _MARNM $newname\r\n".substr($indi["gedcom"], $pos1+1);
-													else $indi["gedcom"]= trim($indi["gedcom"])."\r\n2 _MARNM $newname\r\n";
-													$indi["gedcom"] = EditFunctions::CheckGedcom($indi["gedcom"], false);
-													AddNewName($gid, $newname, $letter, $surname, $indi["gedcom"]);
-													$names_added++;
-												}
-											}
+									
+									// Get the other spouse's name from the family
+									$fam = $famlist[$match[$j][1]];
+									if ($fam->husb_id != $gid) $spouse = $fam->husb;
+									else $spouse = $fam->wife;
+									$spnames = $spouse->name_array;
+									$surname = $spnames[0][2];
+									$letter = $spnames[0][1];
+									
+									// Add the spouses name to the individual
+									$indi_names = $indi->name_array;
+									//-- uncomment the next line to put the maiden name in the given name area
+									//$newname = preg_replace("~/(.*)/~", " $1 /".$surname."/", $indi_names[0][0]);
+									$newname = preg_replace("~/(.*)/~", "/".$surname."/", $indi_names[0][0]);
+									// But only if it doesn't exist yet
+									if (strpos($indi->gedrec, "_MARNM $newname")===false) {
+										$gedrec = $indi->gedrec;
+										$pos1 = strpos($gedrec, "1 NAME");
+										if ($pos1!==false) {
+											$pos1 = strpos($gedrec, "\n1", $pos1+1);
+											if ($pos1!==false) $gedrec = substr($gedrec, 0, $pos1)."\n2 _MARNM $newname\r\n".substr($gedrec, $pos1+1);
+											else $gedrec = trim($gedrec)."\r\n2 _MARNM $newname\r\n";
+											$gedrec = EditFunctions::CheckGedcom($gedrec, false);
+											ImportFunctions::AddNewName($indi, $newname, $letter, $surname, $gedrec);
+											$names_added++;
 										}
 									}
 								}

@@ -616,9 +616,6 @@ class EditLang {
 			echo '<div class="language_item_box'.$colorid.'">';
 			if (!array_key_exists($key, $lang2)) {
 				echo '<div class="original_language width40">';
-//				if (!$facts && !$help) echo $genmod['gm_lang'][$key];
-//				else if ($facts) echo $genmod['factarray'][$key];
-//				else if ($help) echo $this->langhelp[$key];
 				echo $key;
 				echo '</div>';
 				echo '<div class="translated_language">'.$value.'</div>';

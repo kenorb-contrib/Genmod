@@ -33,21 +33,21 @@ if (stristr($_SERVER["SCRIPT_NAME"],basename(__FILE__))) {
 class Submitter extends GedcomRecord {
 
 	// General class information
-	public $classname = "Submitter";			// Name of this class
-	public $datatype = "SUBM";					// Type of data collected here
-	private static $submittercache = array(); 	// Holder of the instances for this class
+	public $classname = "Submitter";	// Name of this class
+	public $datatype = "SUBM";			// Type of data collected here
+	private static $cache = array(); 	// Holder of the instances for this class
 	
-	private $name = null;						// Printable name of the person, after applying privacy (can be unknown or private)
+	private $name = null;				// Printable name of the person, after applying privacy (can be unknown or private)
 
 	
 	public static function GetInstance($xref, $gedrec="", $gedcomid="") {
 		global $GEDCOMID;
 		
 		if (empty($gedcomid)) $gedcomid = $GEDCOMID;
-		if (!isset(self::$submittercache[$gedcomid][$xref])) {
-			self::$submittercache[$gedcomid][$xref] = new Submitter($xref, $gedrec, $gedcomid);
+		if (!isset(self::$cache[$gedcomid][$xref])) {
+			self::$cache[$gedcomid][$xref] = new Submitter($xref, $gedrec, $gedcomid);
 		}
-		return self::$submittercache[$gedcomid][$xref];
+		return self::$cache[$gedcomid][$xref];
 	}
 		
 	/**
@@ -56,6 +56,12 @@ class Submitter extends GedcomRecord {
 	 */
 	public function __construct($id, $gedrec="", $gedcomid) {
 		
+		if (is_array($gedrec)) {
+			// extract the construction parameters
+			$gedcomid = $gedrec["o_file"];
+			$id = $gedrec["o_id"];
+			$gedrec = $gedrec["o_gedrec"];
+		}
 		parent::__construct($id, $gedrec, $gedcomid);
 
 		$this->exclude_facts = "";

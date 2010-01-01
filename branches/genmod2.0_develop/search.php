@@ -711,7 +711,7 @@ else {
 		print_help_link("search_options_help", "qm","search_options");
 		print GM_LANG_search_options;
 		print "</div>";
-		print "<form method=\"post\" onsubmit=\""?>return checknames(this);<?php print " \" action=\"".$SCRIPT_NAME."\">";
+		print "<form method=\"post\" onsubmit=\""?>return checknames(this);<?php print " \" action=\"".SCRIPT_NAME."\">";
 		print "<table class=\"width100 center $TEXT_DIRECTION\">";
 		
 		// If more than one GEDCOM, switching is allowed AND DB mode is set, let the user select
