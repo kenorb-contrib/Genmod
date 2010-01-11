@@ -78,14 +78,14 @@ class EditLang {
 					?>
 					</div>
 					<div class="admin_item_box">
-						<div class="admin_item_left"><div class="helpicon"><?php print_help_link("help_changelanguage.php", "qm", "enable_disable_lang"); ?></div><div class="description"><a href="changelanguage.php"><?php print GM_LANG_enable_disable_lang;?></a>
+						<div class="admin_item_left"><div class="helpicon"><?php PrintHelpLink("help_changelanguage.php", "qm", "enable_disable_lang"); ?></div><div class="description"><a href="changelanguage.php"><?php print GM_LANG_enable_disable_lang;?></a>
 						</div></div>
-						<div class="admin_item_right"><div class="helpicon"><?php print_help_link("edit_lang_utility_help", "qm", "edit_lang_utility"); ?></div><div class="description"><a href="editlang.php?action=edit"><?php print GM_LANG_edit_lang_utility;?></a></div></div>
-						<div class="admin_item_left"><div class="helpicon"><?php print_help_link("export_lang_utility_help", "qm", "export_lang_utility"); ?></div><div class="description"><a href="editlang.php?action=export"><?php print GM_LANG_export_lang_utility;?></a></div></div>
-						<div class="admin_item_right"><div class="helpicon"><?php print_help_link("translation_forum_desc", "qm", "translation_forum"); ?></div><div class="description"><a href="http://www.genmod.net/forum/viewforum.php?f=4" target="_blank" ><?php print GM_LANG_translation_forum;?></a></div></div>
-						<div class="admin_item_left"><div class="helpicon"><?php print_help_link("compare_lang_utility_help", "qm", "compare_lang_utility"); ?></div><div class="description"><a href="editlang.php?action=compare"><?php print GM_LANG_compare_lang_utility;?></a></div></div>
-						<div class="admin_item_right"><div class="helpicon"><?php print_help_link("lang_debug_help", "qm", "lang_debug"); ?></div><div class="description"><a href="editlang.php?action=debug"><?php print GM_LANG_lang_debug;?></a></div></div>
-						<div class="admin_item_left"><div class="helpicon"><?php print_help_link("bom_check_help", "qm", "bom_check"); ?></div><div class="description"><a href="editlang.php?action=bom"><?php print GM_LANG_bom_check;?></a></div></div>
+						<div class="admin_item_right"><div class="helpicon"><?php PrintHelpLink("edit_lang_utility_help", "qm", "edit_lang_utility"); ?></div><div class="description"><a href="editlang.php?action=edit"><?php print GM_LANG_edit_lang_utility;?></a></div></div>
+						<div class="admin_item_left"><div class="helpicon"><?php PrintHelpLink("export_lang_utility_help", "qm", "export_lang_utility"); ?></div><div class="description"><a href="editlang.php?action=export"><?php print GM_LANG_export_lang_utility;?></a></div></div>
+						<div class="admin_item_right"><div class="helpicon"><?php PrintHelpLink("translation_forum_desc", "qm", "translation_forum"); ?></div><div class="description"><a href="http://www.genmod.net/forum/viewforum.php?f=4" target="_blank" ><?php print GM_LANG_translation_forum;?></a></div></div>
+						<div class="admin_item_left"><div class="helpicon"><?php PrintHelpLink("compare_lang_utility_help", "qm", "compare_lang_utility"); ?></div><div class="description"><a href="editlang.php?action=compare"><?php print GM_LANG_compare_lang_utility;?></a></div></div>
+						<div class="admin_item_right"><div class="helpicon"><?php PrintHelpLink("lang_debug_help", "qm", "lang_debug"); ?></div><div class="description"><a href="editlang.php?action=debug"><?php print GM_LANG_lang_debug;?></a></div></div>
+						<div class="admin_item_left"><div class="helpicon"><?php PrintHelpLink("bom_check_help", "qm", "bom_check"); ?></div><div class="description"><a href="editlang.php?action=bom"><?php print GM_LANG_bom_check;?></a></div></div>
 					</div>
 					<?php
 					if ($genmod['action'] == "bom") {
@@ -198,7 +198,7 @@ class EditLang {
 			<div class="admin_item_box">
 				<div class="width30 choice_left">
 					<div class="helpicon">
-						<?php print_help_link("language_to_edit_help", "qm", "language_to_edit");?>
+						<?php PrintHelpLink("language_to_edit_help", "qm", "language_to_edit");?>
 					</div>
 					<div class="description">
 						<?php
@@ -215,7 +215,7 @@ class EditLang {
 				</div>
 				<div class="width30 choice_middle">
 					<div class="helpicon">
-						<?php print_help_link("file_to_edit_help", "qm", "file_to_edit");?>
+						<?php PrintHelpLink("file_to_edit_help", "qm", "file_to_edit");?>
 					</div>
 					<div class="description">
 						<?php
@@ -238,7 +238,7 @@ class EditLang {
 				</div>
 				<div class="width30 choice_middle">
 					<div class="helpicon">
-						<?php print_help_link("hide_translated_help", "qm", "hide_translated");?>
+						<?php PrintHelpLink("hide_translated_help", "qm", "hide_translated");?>
 					</div>
 					<div class="description">
 						<?php
@@ -415,7 +415,7 @@ class EditLang {
 		<div class="admin_item_box">
 			<div class="width25 choice_left">
 				<div class="helpicon">
-					<?php print_help_link("language_to_export_help", "qm", "language_to_export"); ?>
+					<?php PrintHelpLink("language_to_export_help", "qm", "language_to_export"); ?>
 				</div>
 				<div class="description">
 					<?php print GM_LANG_language_to_export; ?>
@@ -540,7 +540,7 @@ class EditLang {
 		<div class="admin_item_box">
 			<div class="width25 choice_left">
 				<div class="helpicon">
-					<?php print_help_link("new_language_help", "qm", "new_language");?>
+					<?php PrintHelpLink("new_language_help", "qm", "new_language");?>
 				</div>
 				<div class="description">
 					<?php
@@ -559,7 +559,7 @@ class EditLang {
 			</div>
 			<div class="width25 choice_middle">
 				<div class="helpicon">
-					<?php print_help_link("old_language_help", "qm", "old_language");?>
+					<?php PrintHelpLink("old_language_help", "qm", "old_language");?>
 				</div>
 				<div class="description">
 					<?php

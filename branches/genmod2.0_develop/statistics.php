@@ -66,7 +66,7 @@ print "<form method=\"post\" name=\"form\" action=\"statisticsplot.php\">";
 print "<table class=\"facts_table width60 center $TEXT_DIRECTION\">";
 
 // statistics
-print "<tr><td class=\"topbottombar\" colspan=\"2\">".GM_LANG_statistics.print_help_link("stat_help","qm", "", false, true)."</td></tr>";
+print "<tr><td class=\"topbottombar\" colspan=\"2\">".GM_LANG_statistics.PrintHelpLink("stat_help","qm", "", false, true)."</td></tr>";
 print "<tr><td class=\"shade2 wrap width30 vmiddle\">".GM_LANG_statnnames."</td><td class=\"shade1\">".$nrpers."</td></tr>";
 print "<tr><td class=\"shade2 wrap width30 vmiddle\">".GM_LANG_statnfam."</td><td class=\"shade1\">".$nrfam."</td></tr>";
 print "<tr><td class=\"shade2 wrap width30 vmiddle\">".GM_LANG_statnmale."</td><td class=\"shade1\">".$nrman."</td></tr>";

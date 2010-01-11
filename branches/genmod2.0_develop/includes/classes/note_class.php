@@ -33,7 +33,7 @@ class Note extends GedcomRecord {
 	// General class information
 	public $classname = "Note";				// Name of this class
 	public $datatype = "NOTE";				// Type od data
-	private static $cache = array();	// Holder of the instances for this class
+	private static $cache = array();		// Holder of the instances for this class
 	
 	// Data
 	private $text = null;					// Text of the note
@@ -52,6 +52,14 @@ class Note extends GedcomRecord {
 			self::$cache[$gedcomid][$xref] = new Note($xref, $gedrec, $gedcomid);
 		}
 		return self::$cache[$gedcomid][$xref];
+	}
+	
+	public static function IsInstance($xref, $gedcomid="") {
+		global $GEDCOMID;
+		
+		if (empty($gedcomid)) $gedcomid = $GEDCOMID;
+		if (!isset(self::$cache[$gedcomid][$xref])) return false;
+		else return true;
 	}
 	
 	/**
@@ -178,7 +186,7 @@ class Note extends GedcomRecord {
 		$this->indi_hide = 0;
 		$key = "";
 		
-		$sql = "SELECT DISTINCT n_id, i_key, i_gedrec, i_isdead, i_id, i_file, n_name, n_surname, n_letter, n_type  FROM ".TBLPREFIX."other_mapping, ".TBLPREFIX."individuals, ".TBLPREFIX."names WHERE om_oid='".$this->xref."' AND om_file='".$this->gedcomid."' AND om_type='INDI' AND om_gid=i_id AND om_file=i_file AND i_key=n_key ORDER BY i_key, n_id";
+		$sql = "SELECT DISTINCT n_id, i_key, i_gedrec, i_isdead, i_id, i_file, n_name, n_surname, n_nick, n_letter, n_type  FROM ".TBLPREFIX."other_mapping, ".TBLPREFIX."individuals, ".TBLPREFIX."names WHERE om_oid='".$this->xref."' AND om_file='".$this->gedcomid."' AND om_type='INDI' AND om_gid=i_id AND om_file=i_file AND i_key=n_key ORDER BY i_key, n_id";
 		$res = NewQuery($sql);
 		while($row = $res->FetchAssoc()){
 			if ($key != $row["i_key"]) {
@@ -191,7 +199,7 @@ class Note extends GedcomRecord {
 				}
 				else $this->indi_hide++;
 			}
-			if ($person->DispName()) $person->addname = array($row["n_name"], $row["n_letter"], $row["n_surname"], $row["n_type"]);
+			if ($person->DispName()) $person->addname = array($row["n_name"], $row["n_letter"], $row["n_surname"], $row["n_nick"], $row["n_type"]);
 		}
 		if ($key != "") $person->names_read = true;
 		
@@ -300,7 +308,7 @@ class Note extends GedcomRecord {
 		}
 	}
 		
-	public function PrintListNote($len=60, $useli=true) {
+	public function PrintListNote($len=60, $useli=true, $paste=false) {
 		
 		if (!$this->DisplayDetails()) return false;
 		
@@ -308,10 +316,13 @@ class Note extends GedcomRecord {
 			if (begRTLText($this->GetTitle())) print "\n\t\t\t<li class=\"rtl\" dir=\"rtl\">";
 			else print "\n\t\t\t<li class=\"ltr\" dir=\"ltr\">";
 		}
-		print "\n\t\t\t<a href=\"note.php?oid=".$this->xref."&amp;gedid=".$this->gedcomid."\" class=\"list_item\">".PrintReady($this->GetTitle($len));
+		if ($paste) print "<a href=\"#\" onclick=\"sndReq(document.getElementById('dummy'), 'lastused', 'type', '".$this->datatype."', 'id', '".$this->key."'); pasteid('".$this->xref."', ''); return false;\" class=\"list_item\">";
+		else print "\n\t\t\t<a href=\"note.php?oid=".$this->xref."&amp;gedid=".$this->gedcomid."\" class=\"list_item\">";
+		print PrintReady($this->GetTitle($len));
 		print $this->addxref;
 		print "</a>\n";
 		if ($useli) print "</li>\n";
+		return true;
 	}	
 }
 ?>

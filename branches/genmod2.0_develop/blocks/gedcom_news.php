@@ -43,8 +43,8 @@ function print_gedcom_news($block = true, $config="", $side, $index) {
 	$usernews = NewsController::getUserNews($GEDCOMID);
 	print "<div id=\"gedcom_news\" class=\"block\">\n";
 	print "<div class=\"blockhc\">";
-	if ($gm_user->userGedcomAdmin()) print_help_link("index_gedcom_news_ahelp", "qm_ah");
-	else print_help_link("index_gedcom_news_help", "qm", "gedcom_news");
+	if ($gm_user->userGedcomAdmin()) PrintHelpLink("index_gedcom_news_ahelp", "qm_ah");
+	else PrintHelpLink("index_gedcom_news_help", "qm", "gedcom_news");
 	print GM_LANG_gedcom_news;
 	print "</div>";
 	print "<div class=\"blockcontent\">";

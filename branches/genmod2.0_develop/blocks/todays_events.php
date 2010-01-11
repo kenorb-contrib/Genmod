@@ -57,7 +57,7 @@ function print_todays_events($block=true, $config="", $side, $index) {
 	 //-- Start output
 	print "<div id=\"on_this_day_events\" class=\"block\">";
 	print "<div class=\"blockhc\">";
-	print_help_link("index_onthisday_help", "qm", "on_this_day");
+	PrintHelpLink("index_onthisday_help", "qm", "on_this_day");
 	if ($GM_BLOCKS["print_upcoming_events"]["canconfig"]) {
 		if ((($command=="gedcom")&&($gm_user->userGedcomAdmin())) || (($command=="user")&&($gm_user->username != ""))) {
 			if ($command=="gedcom") $name = preg_replace("/'/", "\'", get_gedcom_from_id($GEDCOMID));
@@ -95,7 +95,7 @@ function print_todays_events($block=true, $config="", $side, $index) {
 		$datestamp = $factarr[3];
 		if ($factarr[2]=="INDI") {
 			$person =& Person::GetInstance($factarr[0], "", $GEDCOMID);
-			$fact = new Fact($factarr[0], $factarr[2], $factarr[6], $factarr[1]);
+			$fact = new Fact($factarr[0], $factarr[2], $GEDCOMID, $factarr[6], $factarr[1]);
 			$gid = $factarr[0];
 			$factrec = $factarr[1];
 			if ($person->disp && $fact->disp) {
@@ -125,7 +125,7 @@ function print_todays_events($block=true, $config="", $side, $index) {
 
 		if ($factarr[2]=="FAM") {
 			$family =& Family::GetInstance($factarr[0], "", $GEDCOMID);
-			$fact = new Fact($factarr[0], $factarr[2], $factarr[6], $factarr[1]);
+			$fact = new Fact($factarr[0], $factarr[2], $GEDCOMID, $factarr[6], $factarr[1]);
 			if ($family->disp && $fact->disp) {
 				$text = FactFunctions::GetCalendarFact($fact, $action, $filter);
 				if ($text!="filter") {
@@ -151,12 +151,12 @@ function print_todays_events($block=true, $config="", $side, $index) {
 		$Advisory = "none_today_privacy";
 		if ($OutputDone) $Advisory = "more_today_privacy";
 		print "<b>";
-		print_text($Advisory);
+		PrintText($Advisory);
 		print "</b><br />";
 	} else if (!$OutputDone) {// No Facts were found
 		$Advisory = "none_today_" . $config["filter"];
 		print "<b>";
-		print_text($Advisory);
+		PrintText($Advisory);
 		print "</b><br />";
 	}
 
@@ -182,7 +182,7 @@ function print_todays_events_config($config) {
 
 	<?php
 	print "<tr><td class=\"shade2 width20\">";
- 	print_help_link("basic_or_all_help", "qm");
+ 	PrintHelpLink("basic_or_all_help", "qm");
 	print GM_LANG_basic_or_all."</td>";?>
 	<td class="shade1">
 	<select name="onlyBDM">

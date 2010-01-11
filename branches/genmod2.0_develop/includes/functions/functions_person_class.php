@@ -457,7 +457,7 @@ abstract class PersonFunctions {
 		if (!empty($upfamid) and ($sosa!=-1) and ($view != "preview")) {
 			print "<td style=\"vertical-align:middle;\" rowspan=\"2\">";
 			
-			ChartFunctions::PrintUrlArrow($upfamid, ($sosa==0 ? "?famid=".$upfamid."&amp;show_full=".$show_full."&amp;gedid=".$family->gedcomid : "#".$upfamid), PrintReady(GM_LANG_start_at_parents."&nbsp;-&nbsp;".htmlspecialchars($family->$husb->childfamilies[$hfam]->sortable_name)), 1);
+			ChartFunctions::PrintUrlArrow($upfamid, ($sosa==0 ? "?famid=".$upfamid."&amp;show_full=".$show_full."&amp;gedid=".$family->gedcomid : "#".$upfamid), PrintReady(GM_LANG_start_at_parents."&nbsp;-&nbsp;".htmlspecialchars($family->$husb->childfamilies[$hfam]->sortable_name.($family->$husb->childfamilies[$hfam]->sortable_addname == "" ? "" : " (".$family->$husb->childfamilies[$hfam]->sortable_addname.")")), 1));
 			print "</td>\n";
 		}
 	//	if ($hfam != "" || ($sosa != 0 &&  GedcomConfig::$SHOW_EMPTY_BOXES)) {
@@ -669,6 +669,7 @@ abstract class PersonFunctions {
 	 */
 	public function PrintFirstMajorFact($person, $prt=true, $break=false) {
 		
+		if (!$person->disp) return false;
 		$majorfacts = array("BIRT", "CHR", "BAPM", "DEAT", "BURI", "BAPL", "ADOP");
 		$retstr = "";
 		$foundfact = "";

@@ -265,20 +265,20 @@ if ($pid_type == "INDI" || $pid_type == "FAM" || $pid_type == "SOUR" || $pid_typ
 
 if (strstr($action,"addchild")) {
 	if (empty($famid)) {
-		print_help_link("edit_add_unlinked_person_help", "qm");
+		PrintHelpLink("edit_add_unlinked_person_help", "qm");
 		print "<b>".GM_LANG_add_unlinked_person."</b><br />\n";
 	}
 	else {
-		print_help_link("edit_add_child_help", "qm");
+		PrintHelpLink("edit_add_child_help", "qm");
 		print "<b>".GM_LANG_add_child."</b><br />\n";
 	}
 }
 else if (strstr($action,"addspouse")) {
-	print_help_link("edit_add_spouse_help", "qm");
+	PrintHelpLink("edit_add_spouse_help", "qm");
 	print "<b>".constant("GM_LANG_add_".strtolower($famtag))."</b><br />\n";
 }
 else if (strstr($action,"addnewparent")) {
-	print_help_link("edit_add_parent_help", "qm");
+	PrintHelpLink("edit_add_parent_help", "qm");
 	if ($famtag == "WIFE") print "<b>".GM_LANG_add_mother."</b><br />\n";
 	else print "<b>".GM_LANG_add_father."</b><br />\n";
 }
@@ -288,7 +288,7 @@ else {
 
 switch ($action) {
 	case "submitter":
-		$change_id = GetNewXref("CHANGE");
+		$change_id = EditFunctions::GetNewXref("CHANGE");
 		$subid = FindSubmitter($gedfile);
 		if (!empty($subid)) {
 			$record = FindGedcomRecord($subid, $gedfile);
@@ -319,7 +319,7 @@ switch ($action) {
 	// NOTE: Delete
 	// NOTE: deleteperson 4/8/2007 ok
 	case "deleteperson":
-		$change_id = GetNewXref("CHANGE");
+		$change_id = EditFunctions::GetNewXref("CHANGE");
 		
 		if (!$factedit) {
 			print "<br />".GM_LANG_privacy_prevented_editing;
@@ -352,7 +352,7 @@ switch ($action) {
 		break;
 	// NOTE: deletefamily 4/8/2007 ok
 	case "deletefamily":
-		$change_id = GetNewXref("CHANGE");
+		$change_id = EditFunctions::GetNewXref("CHANGE");
 		
 		if (!$factedit) {
 			print "<br />".GM_LANG_privacy_prevented_editing;
@@ -373,7 +373,7 @@ switch ($action) {
 		break;
 	// NOTE: deletesource 3/8/2007 ok
 	case "deletesource":
-		$change_id = GetNewXref("CHANGE");
+		$change_id = EditFunctions::GetNewXref("CHANGE");
 		
 		if (!empty($gedrec)) {
 			$success = false;
@@ -387,7 +387,7 @@ switch ($action) {
 		
 	// NOTE: deleterepo 3/8/2007 ok
 	case "deleterepo":
-		$change_id = GetNewXref("CHANGE");
+		$change_id = EditFunctions::GetNewXref("CHANGE");
 		
 		if (!empty($gedrec)) {
 			$success = false;
@@ -400,7 +400,7 @@ switch ($action) {
 		break;
 		
 	case "deletegnote":
-		$change_id = GetNewXref("CHANGE");
+		$change_id = EditFunctions::GetNewXref("CHANGE");
 		
 		if (!empty($gedrec)) {
 			$success = false;
@@ -413,7 +413,7 @@ switch ($action) {
 		break;
 		
 	case "deletemedia":
-		$change_id = GetNewXref("CHANGE");
+		$change_id = EditFunctions::GetNewXref("CHANGE");
 		if (!$factedit) {
 			print "<br />".GM_LANG_privacy_prevented_editing;
 			if (!empty($pid)) print "<br />".GM_LANG_privacy_not_granted." pid $pid.";
@@ -433,7 +433,7 @@ switch ($action) {
 		
 	// NOTE: delete done
 	case "delete":
-		$change_id = GetNewXref("CHANGE");
+		$change_id = EditFunctions::GetNewXref("CHANGE");
 		$success = false;
 		// Before using getsubrec, we must get the privatised gedrec. Otherwise the counter is not correct.
 		$gedrecpriv = implode("\r\n", GetAllSubrecords($gedrec, "", false, false));
@@ -452,7 +452,7 @@ switch ($action) {
 			<input type="hidden" name="change_type" value="<?php print $change_type; ?>" />
 			<table class="facts_table">
 			<tr><td class="topbottombar" colspan="2">
-			<?php print_help_link("reorder_media_help", "qm", "reorder_media"); ?>
+			<?php PrintHelpLink("reorder_media_help", "qm", "reorder_media"); ?>
 			<?php print GM_LANG_reorder_media; ?>
 			</td></tr>
 			<?php
@@ -488,7 +488,7 @@ switch ($action) {
 		break;
 
 	case "reorder_media_update":
-		$change_id = GetNewXref("CHANGE");
+		$change_id = EditFunctions::GetNewXref("CHANGE");
 		$success = true;
 		asort($order);
 		reset($order);
@@ -520,7 +520,7 @@ switch ($action) {
 			<input type="hidden" name="option" value="bybirth" />
 			<table class="facts_table">
 			<tr><td class="topbottombar" colspan="2">
-			<?php print_help_link("reorder_children_help", "qm", "reorder_children"); ?>
+			<?php PrintHelpLink("reorder_children_help", "qm", "reorder_children"); ?>
 			<?php print GM_LANG_reorder_children; ?>
 			</td></tr>
 			<?php
@@ -538,7 +538,7 @@ switch ($action) {
 					if (ChangeFunctions::GetChangeData(true, $childid, true, "", "")) {
 						$rec = ChangeFunctions::GetChangeData(false, $childid, true, "gedlines", "");
 						if (isset($rec[$GEDCOMID][$childid])) $childrec = $rec[$GEDCOMID][$childid];
-						$children[$childid]["names"] = GetIndiNames($childrec);
+						$children[$childid]["names"] = NameFunctions::GetIndiNames($childrec);
 						$children[$childid]["gedfile"] = $GEDCOMID;
 						$children[$childid]["gedcom"] = $childrec;
 					}
@@ -574,7 +574,7 @@ switch ($action) {
 		break;
 	// NOTE: reorder_update 4/8/2007 ok
 	case "reorder_update":
-		$change_id = GetNewXref("CHANGE");
+		$change_id = EditFunctions::GetNewXref("CHANGE");
 		$success = true;
 		asort($order);
 		reset($order);
@@ -604,7 +604,7 @@ switch ($action) {
 			<input type="hidden" name="option" value="bymarriage" />
 			<table class="facts_table">
 			<tr><td class="topbottombar <?php print $TEXT_DIRECTION; ?>" colspan="2">
-			<?php print_help_link("reorder_families_help", "qm", "reorder_families"); ?>
+			<?php PrintHelpLink("reorder_families_help", "qm", "reorder_families"); ?>
 			<?php print GM_LANG_reorder_families; ?>
 			</td></tr>
 			<?php
@@ -653,7 +653,7 @@ switch ($action) {
 		break;
 	// NOTE: reorder_fams_update 5/8/2007 ok
 	case "reorder_fams_update":
-		$change_id = GetNewXref("CHANGE");
+		$change_id = EditFunctions::GetNewXref("CHANGE");
 		asort($order);
 		reset($order);
 		$lines = count($order);
@@ -681,7 +681,7 @@ switch ($action) {
 			<input type="hidden" name="change_type" value="<?php print $change_type; ?>" />
 			<table class="facts_table">
 				<tr><td class="topbottombar <?php print $TEXT_DIRECTION; ?>" colspan="3">
-				<?php print_help_link("relation_families_help", "qm", "relation_families"); ?>
+				<?php PrintHelpLink("relation_families_help", "qm", "relation_families"); ?>
 				<?php print GM_LANG_relation_families; ?>
 				</td></tr>
 				<?php
@@ -724,7 +724,7 @@ switch ($action) {
 		
 	// NOTE: relation_fams_update ok 5/8/2007
 	case "relation_fams_update":
-		$change_id = GetNewXref("CHANGE");
+		$change_id = EditFunctions::GetNewXref("CHANGE");
 		$famids = FindFamilyIds($pid, "", true);
 		$success = true;
 		foreach($famids as $famid=>$fam) {
@@ -834,7 +834,7 @@ switch ($action) {
 			<input type="hidden" name="famid" value="<?php print $famid;?>" />
 			<input type="hidden" name="change_type" value="<?php print $change_type;?>" />
 			<table class="width50 <?php print $TEXT_DIRECTION; ?>">
-				<tr><td colspan="4" class="topbottombar"><?php print_help_link("change_family_instr","qm","change_family_instr"); ?><?php print GM_LANG_change_family_members; ?></td></tr>
+				<tr><td colspan="4" class="topbottombar"><?php PrintHelpLink("change_family_instr","qm","change_family_instr"); ?><?php print GM_LANG_change_family_members; ?></td></tr>
 				<tr>
 				<?php
 				if (is_object($father)) {
@@ -920,7 +920,7 @@ switch ($action) {
 		
 	// NOTE: changefamily_update 9/8/2007 ok
 	case "changefamily_update":
-		$change_id = GetNewXref("CHANGE");
+		$change_id = EditFunctions::GetNewXref("CHANGE");
 		if(ChangeFunctions::GetChangeData(true, $famid, true, "","")) {
 			$rec = ChangeFunctions::GetChangeData(false, $famid, true, "gedlines", "");
 			$gedrec = $rec[$GEDCOMID][$famid];
@@ -1187,7 +1187,7 @@ switch ($action) {
 		else {
 			$tags=array();
 			$tags[0]=$fact;
-			init_calendar_popup();
+			InitCalendarPopUp();
 			print "<form method=\"post\" action=\"edit_interface.php\" enctype=\"multipart/form-data\" style=\"display:inline;\">\n";
 			print "<input type=\"hidden\" name=\"action\" value=\"update\" />\n";
 			print "<input type=\"hidden\" name=\"fact\" value=\"".$fact."\" />\n";
@@ -1200,7 +1200,7 @@ switch ($action) {
 			if ($change_type == "add_media_link") {
 				EditFunctions::AddTagSeparator($fact);
 				print "<tr><td class=\"shade2 $TEXT_DIRECTION\">";
-				print_help_link("find_add_mmlink", "qm", "find_add_mmlink");
+				PrintHelpLink("find_add_mmlink", "qm", "find_add_mmlink");
 				print GM_LANG_find_add_mmlink."</td>";
 				print "<td class=\"shade1 $TEXT_DIRECTION\">";
                 print "<input type=\"text\" name=\"pid\" size=\"4\" tabindex=\"1\"/>";
@@ -1285,7 +1285,7 @@ switch ($action) {
 	case "paste":
 		$success = false;
 		$newrec = $_SESSION["clipboard"][$fact]["factrec"];
-		$change_id = GetNewXref("CHANGE");
+		$change_id = EditFunctions::GetNewXref("CHANGE");
 		$ct = preg_match("/1\s(\w+).*/", $newrec, $match);
 		if ($ct > 0) {
 			$fact = $match[1];
@@ -1301,7 +1301,7 @@ switch ($action) {
 		
 	// NOTE: addchildaction done
 	case "addchildaction":
-		$change_id = GetNewXref("CHANGE");
+		$change_id = EditFunctions::GetNewXref("CHANGE");
 		
 		// NOTE: Check if there is a source to be added to the facts
 		$addsourcevalue = "";
@@ -1410,7 +1410,7 @@ switch ($action) {
 		
 	// NOTE: addspouseaction done
 	case "addspouseaction":
-		$change_id = GetNewXref("CHANGE");
+		$change_id = EditFunctions::GetNewXref("CHANGE");
 		
 		// NOTE: Check if there is a source to be added to the facts
 		if (!isset($addsource)) $addsource = false;
@@ -1600,7 +1600,7 @@ switch ($action) {
 
 	case "linknewfamaction":
 		// NOTE: Get a change_id
-		$change_id = GetNewXref("CHANGE");
+		$change_id = EditFunctions::GetNewXref("CHANGE");
 		$success = false;
 		
 		if ($famtag == "CHIL") {
@@ -1666,7 +1666,7 @@ switch ($action) {
 	case "linkfamaction":
 		if (!empty($famid)) {
 			// NOTE: Get a change_id
-			$change_id = GetNewXref("CHANGE");
+			$change_id = EditFunctions::GetNewXref("CHANGE");
 			$famid = str2upper($famid);
 			$success = true;
 	
@@ -1735,7 +1735,7 @@ switch ($action) {
 		
 	// NOTE: addnewparentaction done
 	case "addnewparentaction":
-		$change_id = GetNewXref("CHANGE");
+		$change_id = EditFunctions::GetNewXref("CHANGE");
 		
 		// NOTE: Check if there is a source to be added to the facts
 		if (!isset($addsource)) $addsource = false;
@@ -1920,7 +1920,7 @@ switch ($action) {
 		
 	// NOTE: create a source record from the incoming variables done
 	case "addsourceaction":
-		$change_id = GetNewXref("CHANGE");
+		$change_id = EditFunctions::GetNewXref("CHANGE");
 		
 		$newged = "0 @XREF@ SOUR\r\n";
 		$newged = EditFunctions::HandleUpdates($newged);
@@ -1986,7 +1986,7 @@ switch ($action) {
 		
 	// NOTE: create a repository record from the incoming variables done
 	case "addrepoaction":
-		$change_id = GetNewXref("CHANGE");
+		$change_id = EditFunctions::GetNewXref("CHANGE");
 		
 		$newgedrec = "0 @XREF@ REPO\r\n";
 		if (!empty($NAME)) $newgedrec .= "1 NAME $NAME\r\n";
@@ -2057,7 +2057,7 @@ switch ($action) {
 			print "<span class=\"error\">".GM_LANG_no_empty_notes."</span>";
 		}
 		else {
-			$change_id = GetNewXref("CHANGE");
+			$change_id = EditFunctions::GetNewXref("CHANGE");
 			$newged = "0 @XREF@ NOTE";
 			$newged = MakeCont($newged, $NOTE);
 			$newged = EditFunctions::HandleUpdates($newged);
@@ -2074,7 +2074,7 @@ switch ($action) {
 	// NOTE: edit done
 	case "edit":
 
-		init_calendar_popup();
+		InitCalendarPopUp();
 
 		print "<form name=\"editform\" method=\"post\" action=\"edit_interface.php\" enctype=\"multipart/form-data\" style=\"display:inline;\">";
 		print "<input type=\"hidden\" name=\"action\" value=\"update\" />";
@@ -2290,7 +2290,7 @@ switch ($action) {
 		else {
 			print "<br />";
 			$gedrec = preg_replace(array("/(\r\n)+/", "/\r+/", "/\n+/"), array("\r\n", "\r", "\n"), $gedrec);
-			print_help_link("edit_edit_raw_help", "qm");
+			PrintHelpLink("edit_edit_raw_help", "qm");
 			print "<b>".GM_LANG_edit_raw."</b>";
 			print "<form method=\"post\" action=\"edit_interface.php\" style=\"display:inline;\">\n";
 			print "<input type=\"hidden\" name=\"action\" value=\"updateraw\" />\n";
@@ -2309,7 +2309,7 @@ switch ($action) {
 	// NOTE: updateraw done
 	case "updateraw":
 		$oldrec = urldecode($oldrec);
-		$change_id = GetNewXref("CHANGE");
+		$change_id = EditFunctions::GetNewXref("CHANGE");
 		$newrec = trim($newgedrec);
 		$rectype = GetRecType($newrec);
 		if (!$rectype) $rectype = "";
@@ -2352,7 +2352,7 @@ switch ($action) {
 	// NOTE: Link
 	// NOTE: linkspouse done
 	case "linkspouse":
-		init_calendar_popup();
+		InitCalendarPopUp();
 		print "<form method=\"post\" name=\"linkspouseform\" action=\"edit_interface.php\" style=\"display:inline;\">\n";
 		print "<input type=\"hidden\" name=\"action\" value=\"linkspouseaction\" />\n";
 		print "<input type=\"hidden\" name=\"pid\" value=\"".$pid."\" />\n";
@@ -2388,7 +2388,7 @@ switch ($action) {
 	// NOTE: linkspouseaction done
 	case "linkspouseaction":
 		// NOTE: Get a change_id
-		$change_id = GetNewXref("CHANGE");
+		$change_id = EditFunctions::GetNewXref("CHANGE");
 		$exist = false;
 		if (!empty($spid)) {
 			// NOTE: Check if the relation doesn't exist yet
@@ -2462,7 +2462,7 @@ switch ($action) {
 		break;
 	
 	case "update_submitter":
-		$change_id = GetNewXref("CHANGE");
+		$change_id = EditFunctions::GetNewXref("CHANGE");
 		if ($pid !== "NEW") {
 			$oldrecord = FindGedcomRecord($pid, get_gedcom_from_id($gedfile));
 			if (ChangeFunctions::GetChangeData(true, $pid, true, "", "")) {
@@ -2491,7 +2491,7 @@ switch ($action) {
 			
 	// NOTE: reconstruct the gedcom from the incoming fields and store it in the file done
 	case "update":
-		$change_id = GetNewXref("CHANGE");
+		$change_id = EditFunctions::GetNewXref("CHANGE");
 		if ($change_type == "add_name" || $change_type == "edit_name") $fact = "NAME";
 		// add or remove Y
 //		if ($text[0]=="Y" or $text[0]=="y") $text[0]="";

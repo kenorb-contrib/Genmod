@@ -83,10 +83,10 @@ class FamilyController extends DetailController
 		if (is_null($this->pagetitle)) {
 			
 			if (is_object($this->family->husb)) $hname = $this->family->husb->name;
-			else $hname = CheckNN("@P.N. @N.N.");
+			else $hname = NameFunctions::CheckNN("@P.N. @N.N.");
 			
 			if (is_object($this->family->wife)) $wname = $this->family->wife->name;
-			else $wname = CheckNN("@P.N. @N.N.");
+			else $wname = NameFunctions::CheckNN("@P.N. @N.N.");
 			
 			$this->pagetitle = $hname." + ".$wname;
 			if (GedcomConfig::$SHOW_ID_NUMBERS) $this->pagetitle .= " - ".$this->family->xref;
@@ -99,7 +99,7 @@ class FamilyController extends DetailController
 		
 		if (is_null($this->title)) {
 			$this->title = $this->family->descriptor;
-			$add = $this->family->adddescriptor;
+			$add = $this->family->sortable_addname;
 			if ($add != "") $this->title .= "<br />".$add;
 		}
 		return $this->title;

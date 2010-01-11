@@ -41,13 +41,13 @@ function print_user_favorites($block=true, $config="", $side, $index) {
 		print "<!-- Start of user favorites //-->";
 		print "<div id=\"user_favorites\" class=\"block\">\n"; // block
 		print "<div class=\"blockhc\">";
-		print_help_link("mygedview_favorites_help", "qm", "my_favorites");
+		PrintHelpLink("mygedview_favorites_help", "qm", "my_favorites");
 		print GM_LANG_my_favorites." &lrm;(".count($userfavs).")&lrm;";
 		print "</div>";
 		print "<div class=\"blockcontent\">";
 		if ($block) print "<div class=\"small_inner_block\">\n";
 		if (count($userfavs)==0) {
-			print_text("no_favorites");
+			PrintText("no_favorites");
 			print "\n";
 		} 
 		else {

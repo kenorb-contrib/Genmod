@@ -40,14 +40,14 @@ function print_gedcom_favorites($block = true, $config="", $side, $index) {
 	if (!is_array($userfavs)) $userfavs = array();
 	print "<div id=\"gedcom_favorites\" class=\"block\">\n";
 	print "<div class=\"blockhc\">";
-	print_help_link("index_favorites_help", "qm", "gedcom_favorites");
+	PrintHelpLink("index_favorites_help", "qm", "gedcom_favorites");
 	print GM_LANG_gedcom_favorites." &lrm;(".count($userfavs).")&lrm;";
 	print "</div>";
 	print "<div class=\"blockcontent\">";
 	if ($block) print "<div class=\"small_inner_block\">\n";
 	if (count($userfavs)==0) {
-		if ($gm_user->userGedcomAdmin()) print_text("no_favorites");
-		else print_text("no_gedcom_favorites");
+		if ($gm_user->userGedcomAdmin()) PrintText("no_favorites");
+		else PrintText("no_gedcom_favorites");
 	}
 	else {
 		if ($block) $style = 1;

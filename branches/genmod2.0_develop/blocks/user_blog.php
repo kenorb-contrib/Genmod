@@ -43,7 +43,7 @@ function print_user_news($block=true, $config="", $side, $index) {
 
 	print "<div id=\"user_news\" class=\"block\">\n";
 	print "<div class=\"blockhc\">";
-	print_help_link("mygedview_myjournal_help", "qm", "my_journal");
+	PrintHelpLink("mygedview_myjournal_help", "qm", "my_journal");
 	print GM_LANG_my_journal;
 	print "</div>";
 	print "<div class=\"blockcontent\">";

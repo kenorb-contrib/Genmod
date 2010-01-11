@@ -207,7 +207,7 @@ PrintHeader(GM_LANG_configure_head);
 		<input type="hidden" name="NEW_SERVER_URL" value="<?php print $SERVER_URL;?>" />
 		<div class="admin_topbottombar">
 			<h3>
-				<?php print_help_link("configure_genmod_help", "qm", "configure");?>
+				<?php PrintHelpLink("configure_genmod_help", "qm", "configure");?>
 				<?php print GM_LANG_configure; ?>
 			</h3>
 			<?php print GM_LANG_site_config.": ".$CONFIG_SITE; ?>
@@ -220,7 +220,7 @@ PrintHeader(GM_LANG_configure_head);
 		<div class="admin_item_box">
 			<div class="width30 choice_left">
 				<div class="helpicon">
-					<?php print_help_link("DBHOST_help", "qm", "DBHOST");?>
+					<?php PrintHelpLink("DBHOST_help", "qm", "DBHOST");?>
 				</div>
 				<div class="description">
 					<?php print GM_LANG_DBHOST; ?>
@@ -233,7 +233,7 @@ PrintHeader(GM_LANG_configure_head);
 		<div class="admin_item_box">
 			<div class="width30 choice_left">
 				<div class="helpicon">
-					<?php print_help_link("DBUSER_help", "qm", "DBUSER");?>
+					<?php PrintHelpLink("DBUSER_help", "qm", "DBUSER");?>
 				</div>
 				<div class="description">
 					<?php  print GM_LANG_DBUSER; ?>
@@ -246,7 +246,7 @@ PrintHeader(GM_LANG_configure_head);
 		<div class="admin_item_box">
 			<div class="width30 choice_left">
 				<div class="helpicon">
-					<?php print_help_link("DBPASS_help", "qm", "DBPASS");?>
+					<?php PrintHelpLink("DBPASS_help", "qm", "DBPASS");?>
 				</div>
 				<div class="description">
 					<?php print GM_LANG_DBPASS; ?>
@@ -259,7 +259,7 @@ PrintHeader(GM_LANG_configure_head);
 		<div class="admin_item_box">
 			<div class="width30 choice_left">
 				<div class="helpicon">
-					<?php print_help_link("DBNAME_help", "qm", "DBNAME");?>
+					<?php PrintHelpLink("DBNAME_help", "qm", "DBNAME");?>
 				</div>
 				<div class="description">
 					<?php print GM_LANG_DBNAME; ?>
@@ -272,7 +272,7 @@ PrintHeader(GM_LANG_configure_head);
 		<div class="admin_item_box">
 			<div class="width30 choice_left">
 				<div class="helpicon">
-					<?php print_help_link("DBPERSIST_help", "qm", "DBPERSIST");?>
+					<?php PrintHelpLink("DBPERSIST_help", "qm", "DBPERSIST");?>
 				</div>
 				<div class="description">
 					<?php print GM_LANG_DBPERSIST; ?>
@@ -288,7 +288,7 @@ PrintHeader(GM_LANG_configure_head);
 		<div class="admin_item_box">
 			<div class="width30 choice_left">
 				<div class="helpicon">
-					<?php print_help_link("TBLPREFIX_help", "qm", "TBLPREFIX");?>
+					<?php PrintHelpLink("TBLPREFIX_help", "qm", "TBLPREFIX");?>
 				</div>
 				<div class="description">
 					<?php print GM_LANG_TBLPREFIX; ?>
@@ -304,7 +304,7 @@ PrintHeader(GM_LANG_configure_head);
 		<div class="admin_item_box">
 			<div class="width30 choice_left">
 				<div class="helpicon">
-					<?php print_help_link("ALLOW_CHANGE_GEDCOM_help", "qm", "ALLOW_CHANGE_GEDCOM");?>
+					<?php PrintHelpLink("ALLOW_CHANGE_GEDCOM_help", "qm", "ALLOW_CHANGE_GEDCOM");?>
 				</div>
 				<div class="description">
 					<?php print GM_LANG_ALLOW_CHANGE_GEDCOM; ?>
@@ -320,7 +320,7 @@ PrintHeader(GM_LANG_configure_head);
 		<div class="admin_item_box">
 			<div class="width30 choice_left">
 				<div class="helpicon">
-					<?php print_help_link("INDEX_DIRECTORY_help", "qm", "INDEX_DIRECTORY");?>
+					<?php PrintHelpLink("INDEX_DIRECTORY_help", "qm", "INDEX_DIRECTORY");?>
 				</div>
 				<div class="description">
 					<?php print GM_LANG_INDEX_DIRECTORY; ?>
@@ -334,7 +334,7 @@ PrintHeader(GM_LANG_configure_head);
 		<div class="admin_item_box">
 			<div class="width30 choice_left">
 				<div class="helpicon">
-					<?php print_help_link("MEDIA_IN_DB_help", "qm", "MEDIA_IN_DB");?>
+					<?php PrintHelpLink("MEDIA_IN_DB_help", "qm", "MEDIA_IN_DB");?>
 				</div>
 				<div class="description">
 					<?php print GM_LANG_MEDIA_IN_DB; ?>
@@ -350,7 +350,7 @@ PrintHeader(GM_LANG_configure_head);
 		<div class="admin_item_box">
 			<div class="width30 choice_left">
 				<div class="helpicon">
-					<?php print_help_link("GM_STORE_MESSAGES_help", "qm", "GM_STORE_MESSAGES");?>
+					<?php PrintHelpLink("GM_STORE_MESSAGES_help", "qm", "GM_STORE_MESSAGES");?>
 				</div>
 				<div class="description">
 					<?php print GM_LANG_GM_STORE_MESSAGES; ?>
@@ -366,7 +366,7 @@ PrintHeader(GM_LANG_configure_head);
 		<div class="admin_item_box">
 			<div class="width30 choice_left">
 				<div class="helpicon">
-					<?php print_help_link("USE_REGISTRATION_MODULE_help", "qm", "USE_REGISTRATION_MODULE");?>
+					<?php PrintHelpLink("USE_REGISTRATION_MODULE_help", "qm", "USE_REGISTRATION_MODULE");?>
 				</div>
 				<div class="description">
 					<?php print GM_LANG_USE_REGISTRATION_MODULE; ?>
@@ -382,7 +382,7 @@ PrintHeader(GM_LANG_configure_head);
 		<div class="admin_item_box">
 			<div class="width30 choice_left">
 				<div class="helpicon">
-					<?php print_help_link("REQUIRE_ADMIN_AUTH_REGISTRATION_help", "qm", "REQUIRE_ADMIN_AUTH_REGISTRATION");?>
+					<?php PrintHelpLink("REQUIRE_ADMIN_AUTH_REGISTRATION_help", "qm", "REQUIRE_ADMIN_AUTH_REGISTRATION");?>
 				</div>
 				<div class="description">
 					<?php print GM_LANG_REQUIRE_ADMIN_AUTH_REGISTRATION; ?>
@@ -398,7 +398,7 @@ PrintHeader(GM_LANG_configure_head);
 		<div class="admin_item_box">
 			<div class="width30 choice_left">
 				<div class="helpicon">
-					<?php print_help_link("GM_SIMPLE_MAIL_help", "qm", "GM_SIMPLE_MAIL");?>
+					<?php PrintHelpLink("GM_SIMPLE_MAIL_help", "qm", "GM_SIMPLE_MAIL");?>
 				</div>
 				<div class="description">
 					<?php print GM_LANG_GM_SIMPLE_MAIL; ?>
@@ -414,7 +414,7 @@ PrintHeader(GM_LANG_configure_head);
 		<div class="admin_item_box">
 			<div class="width30 choice_left">
 				<div class="helpicon">
-					<?php print_help_link("ALLOW_USER_THEMES_help", "qm", "ALLOW_USER_THEMES");?>
+					<?php PrintHelpLink("ALLOW_USER_THEMES_help", "qm", "ALLOW_USER_THEMES");?>
 				</div>
 				<div class="description">
 					<?php print GM_LANG_ALLOW_USER_THEMES; ?>
@@ -430,7 +430,7 @@ PrintHeader(GM_LANG_configure_head);
 		<div class="admin_item_box">
 			<div class="width30 choice_left">
 				<div class="helpicon">
-					<?php print_help_link("NEWS_TYPE_help", "qm", "NEWS_TYPE");?>
+					<?php PrintHelpLink("NEWS_TYPE_help", "qm", "NEWS_TYPE");?>
 				</div>
 				<div class="description">
 					<?php print GM_LANG_NEWS_TYPE; ?>
@@ -446,7 +446,7 @@ PrintHeader(GM_LANG_configure_head);
 		<div class="admin_item_box">
 			<div class="width30 choice_left">
 				<div class="helpicon">
-					<?php print_help_link("ALLOW_REMEMBER_ME_help", "qm", "ALLOW_REMEMBER_ME");?>
+					<?php PrintHelpLink("ALLOW_REMEMBER_ME_help", "qm", "ALLOW_REMEMBER_ME");?>
 				</div>
 				<div class="description">
 					<?php print GM_LANG_ALLOW_REMEMBER_ME; ?>
@@ -462,7 +462,7 @@ PrintHeader(GM_LANG_configure_head);
 		<div class="admin_item_box">
 			<div class="width30 choice_left">
 				<div class="helpicon">
-					<?php print_help_link("LANG_SELECTION_help", "qm", "LANG_SELECTION");?>
+					<?php PrintHelpLink("LANG_SELECTION_help", "qm", "LANG_SELECTION");?>
 				</div>
 				<div class="description">
 					<?php print GM_LANG_LANG_SELECTION; ?>
@@ -534,7 +534,7 @@ PrintHeader(GM_LANG_configure_head);
 		<div class="admin_item_box">
 			<div class="width30 choice_left">
 				<div class="helpicon">
-					<?php print_help_link("VISITOR_LANG_help", "qm", "VISITOR_LANG");?>
+					<?php PrintHelpLink("VISITOR_LANG_help", "qm", "VISITOR_LANG");?>
 				</div>
 				<div class="description">
 					<?php print GM_LANG_VISITOR_LANG; ?>
@@ -557,7 +557,7 @@ PrintHeader(GM_LANG_configure_head);
 		<div class="admin_item_box">
 			<div class="width30 choice_left">
 				<div class="helpicon">
-					<?php print_help_link("SERVER_URL_help", "qm", "SERVER_URL");?>
+					<?php PrintHelpLink("SERVER_URL_help", "qm", "SERVER_URL");?>
 				</div>
 				<div class="description">
 					<?php print GM_LANG_SERVER_URL; ?>
@@ -572,13 +572,13 @@ PrintHeader(GM_LANG_configure_head);
 				if ($_SERVER["SERVER_PORT"] != 80) $GUESS_URL .= ":".$_SERVER["SERVER_PORT"];
 				$GUESS_URL .= dirname(SCRIPT_NAME)."/";
 				$GUESS_URL = stripslashes($GUESS_URL);
-				print "<div>".print_text("server_url_note",0,1)."</div>"; ?>
+				print "<div>".PrintText("server_url_note",0,1)."</div>"; ?>
 			</div>
 		</div>
 		<div class="admin_item_box">
 			<div class="width30 choice_left">
 				<div class="helpicon">
-					<?php print_help_link("LOGIN_URL_help", "qm", "LOGIN_URL");?>
+					<?php PrintHelpLink("LOGIN_URL_help", "qm", "LOGIN_URL");?>
 				</div>
 				<div class="description">
 					<?php print GM_LANG_LOGIN_URL; ?>
@@ -592,7 +592,7 @@ PrintHeader(GM_LANG_configure_head);
 		<div class="admin_item_box">
 			<div class="width30 choice_left">
 				<div class="helpicon">
-					<?php print_help_link("SITE_ALIAS_help", "qm", "LOGIN_URL");?>
+					<?php PrintHelpLink("SITE_ALIAS_help", "qm", "LOGIN_URL");?>
 				</div>
 				<div class="description">
 					<?php print GM_LANG_SITE_ALIAS; ?>
@@ -606,7 +606,7 @@ PrintHeader(GM_LANG_configure_head);
 		<div class="admin_item_box">
 			<div class="width30 choice_left">
 				<div class="helpicon">
-					<?php print_help_link("PROXY_ADDRESS_help", "qm", "PROXY_ADDRESS");?>
+					<?php PrintHelpLink("PROXY_ADDRESS_help", "qm", "PROXY_ADDRESS");?>
 				</div>
 				<div class="description">
 					<?php print GM_LANG_PROXY_ADDRESS; ?>
@@ -619,7 +619,7 @@ PrintHeader(GM_LANG_configure_head);
 		<div class="admin_item_box">
 			<div class="width30 choice_left">
 				<div class="helpicon">
-					<?php print_help_link("PROXY_PORT_help", "qm", "PROXY_PORT");?>
+					<?php PrintHelpLink("PROXY_PORT_help", "qm", "PROXY_PORT");?>
 				</div>
 				<div class="description">
 					<?php print GM_LANG_PROXY_PORT; ?>
@@ -632,7 +632,7 @@ PrintHeader(GM_LANG_configure_head);
 		<div class="admin_item_box">
 			<div class="width30 choice_left">
 				<div class="helpicon">
-					<?php print_help_link("GM_SESSION_SAVE_PATH_help", "qm", "GM_SESSION_SAVE_PATH");?>
+					<?php PrintHelpLink("GM_SESSION_SAVE_PATH_help", "qm", "GM_SESSION_SAVE_PATH");?>
 				</div>
 				<div class="description">
 					<?php print GM_LANG_GM_SESSION_SAVE_PATH; ?>
@@ -645,7 +645,7 @@ PrintHeader(GM_LANG_configure_head);
 		<div class="admin_item_box">
 			<div class="width30 choice_left">
 				<div class="helpicon">
-					<?php print_help_link("GM_SESSION_TIME_help", "qm", "GM_SESSION_TIME");?>
+					<?php PrintHelpLink("GM_SESSION_TIME_help", "qm", "GM_SESSION_TIME");?>
 				</div>
 				<div class="description">
 					<?php print GM_LANG_GM_SESSION_TIME; ?>
@@ -658,7 +658,7 @@ PrintHeader(GM_LANG_configure_head);
 		<div class="admin_item_box">
 			<div class="width30 choice_left">
 				<div class="helpicon">
-					<?php print_help_link("MAX_VIEW_RATE_help", "qm", "MAX_VIEW_RATE");?>
+					<?php PrintHelpLink("MAX_VIEW_RATE_help", "qm", "MAX_VIEW_RATE");?>
 				</div>
 				<div class="description">
 					<?php print GM_LANG_MAX_VIEW_RATE; ?>
@@ -687,7 +687,7 @@ PrintHeader(GM_LANG_configure_head);
 		<div class="admin_item_box">
 			<div class="width30 choice_left">
 				<div class="helpicon">
-					<?php print_help_link("EXCLUDE_HOSTS_help", "qm", "LOCKOUT_TIME");?>
+					<?php PrintHelpLink("EXCLUDE_HOSTS_help", "qm", "LOCKOUT_TIME");?>
 				</div>
 				<div class="description">
 					<?php print GM_LANG_EXCLUDE_HOSTS; ?>
@@ -700,7 +700,7 @@ PrintHeader(GM_LANG_configure_head);
 		<div class="admin_item_box">
 			<div class="width30 choice_left">
 				<div class="helpicon">
-					<?php print_help_link("LOCKOUT_TIME_help", "qm", "LOCKOUT_TIME");?>
+					<?php PrintHelpLink("LOCKOUT_TIME_help", "qm", "LOCKOUT_TIME");?>
 				</div>
 				<div class="description">
 					<?php print GM_LANG_LOCKOUT_TIME; ?>
@@ -713,7 +713,7 @@ PrintHeader(GM_LANG_configure_head);
 		<div class="admin_item_box">
 			<div class="width30 choice_left">
 				<div class="helpicon">
-					<?php print_help_link("GM_MEMORY_LIMIT_help", "qm", "GM_MEMORY_LIMIT");?>
+					<?php PrintHelpLink("GM_MEMORY_LIMIT_help", "qm", "GM_MEMORY_LIMIT");?>
 				</div>
 				<div class="description">
 					<?php print GM_LANG_GM_MEMORY_LIMIT; ?>
@@ -726,7 +726,7 @@ PrintHeader(GM_LANG_configure_head);
 		<div class="admin_item_box">
 			<div class="width30 choice_left">
 				<div class="helpicon">
-					<?php print_help_link("DEFAULT_PAGE_SIZE_help", "qm", "DEFAULT_PAGE_SIZE");?>
+					<?php PrintHelpLink("DEFAULT_PAGE_SIZE_help", "qm", "DEFAULT_PAGE_SIZE");?>
 				</div>
 				<div class="description">
 					<?php print GM_LANG_DEFAULT_PAGE_SIZE; ?>

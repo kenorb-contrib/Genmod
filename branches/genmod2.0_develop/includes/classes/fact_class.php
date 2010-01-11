@@ -46,6 +46,7 @@ class Fact {
 	private $linktype = null;		// If this fact links to another objest, the type is set here
 	private $linkxref = null;		// Xref of the linked object
 	private $resnvalue = null;		// The value for the 2 RESN tag
+	private $gedcomid = null;		// Gedcom ID in which the fact exists
 	
 	// Links
 //	private $factassos = null;		// Array of associates this fact links to
@@ -60,10 +61,11 @@ class Fact {
 	private $style = null;			// Style to print this fact with
 	private $descr = null;			// Fact description
 		
-	public function __construct($parent, $parent_type, $fact, $factrec, $count=1, $style = "") {
+	public function __construct($parent, $parent_type, $gedcomid, $fact, $factrec, $count=1, $style = "") {
 		
 		$this->fact = trim($fact);
 		$this->factrec = $factrec;
+		$this->gedcomid = $gedcomid;
 		$this->owner = $parent;
 		$this->owner_type = $parent_type;
 		$this->count = $count;
@@ -305,7 +307,7 @@ class Fact {
 	private function getOwner() {
 		
 		if ($this->owner != "") {
-			if (!is_object($this->owner)) return ConstructObject($this->owner, $this->owner_type, "");
+			if (!is_object($this->owner)) return ConstructObject($this->owner, $this->owner_type, $this->gedcomid);
 			else return $this->owner;
 		}
 	}

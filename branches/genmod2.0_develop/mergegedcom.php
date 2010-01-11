@@ -256,7 +256,7 @@ print "<form enctype=\"multipart/form-data\" method=\"post\" name=\"configform\"
 			if ($startimport != "true") print $GM_IMAGES["minus"]["other"];
 			else print $GM_IMAGES["plus"]["other"];
 			print "\" border=\"0\" width=\"11\" height=\"11\" alt=\"\" /></a>";
-			print_help_link("merge_gedcom_help", "qm","merge_gedcom");
+			PrintHelpLink("merge_gedcom_help", "qm","merge_gedcom");
 			print "&nbsp;<a href=\"javascript: ";
 			GM_LANG_merge_what;
 			print "\" onclick=\"expand_layer('add-form');return false\">";
@@ -285,7 +285,7 @@ print "<form enctype=\"multipart/form-data\" method=\"post\" name=\"configform\"
 						print "</div>";
 					}
 					?>
-					<?php print_help_link("gedcom_path_help", "qm","gedcom_path");?>
+					<?php PrintHelpLink("gedcom_path_help", "qm","gedcom_path");?>
 					<span style="vertical-align: 25%"><?php print GM_LANG_gedcom_file; ?></span>
 					<input type="text" name="GEDFILENAME" value="<?php if (isset($GEDFILENAME) && strlen($GEDFILENAME) > 4) print $GEDFILENAME; ?>" 
 					size="60" dir ="ltr" tabindex="<?php $i++; print $i?>"	<?php if ((!$no_upload && isset($GEDFILENAME)) && (empty($error))) print "disabled=\"disabled\" "; ?> />
@@ -299,7 +299,7 @@ print "<form enctype=\"multipart/form-data\" method=\"post\" name=\"configform\"
 			if ($startimport != "true") print $GM_IMAGES["minus"]["other"];
 			else print $GM_IMAGES["plus"]["other"];
 			print "\" border=\"0\" width=\"11\" height=\"11\" alt=\"\" /></a>";
-			print_help_link("upload_gedcom_help", "qm", "upload_gedcom");
+			PrintHelpLink("upload_gedcom_help", "qm", "upload_gedcom");
 			print "&nbsp;<a href=\"javascript: ".GM_LANG_merge_what_upload."\" onclick=\"expand_layer('upload_gedcom');return false\">".GM_LANG_merge_what_upload."</a>";
 		print "</div>";
 		print "<div class=\"shade1\" style=\"padding-top:5px;\">";
@@ -314,7 +314,7 @@ print "<form enctype=\"multipart/form-data\" method=\"post\" name=\"configform\"
 					<?php
 					if (!empty($error)) {
 						print "<span class=\"error\">".$error."</span><br />\n";
-						print_text("common_upload_errors");
+						PrintText("common_upload_errors");
 						print "<br />\n";
 					}
 					
@@ -341,7 +341,7 @@ print "<form enctype=\"multipart/form-data\" method=\"post\" name=\"configform\"
 			if ($startimport != "true") print $GM_IMAGES["minus"]["other"];
 			else print $GM_IMAGES["plus"]["other"];
 			print "\" border=\"0\" width=\"11\" height=\"11\" alt=\"\" /></a>";
-			print_help_link("upload_gedcom_help", "qm", "upload_gedcom");
+			PrintHelpLink("upload_gedcom_help", "qm", "upload_gedcom");
 			print "&nbsp;<a href=\"javascript: ".GM_LANG_merge_with."\" onclick=\"expand_layer('merge_gedcom');return false\">".GM_LANG_merge_with."</a>";
 		print "</div>";
 		print "<div class=\"shade1\" style=\"padding-top:5px;\">";
@@ -385,7 +385,7 @@ print "<form enctype=\"multipart/form-data\" method=\"post\" name=\"configform\"
 				if ($startimport != "true") print $GM_IMAGES["minus"]["other"];
 				else print $GM_IMAGES["plus"]["other"];
 				print "\" border=\"0\" width=\"11\" height=\"11\" alt=\"\" /></a>";
-				print_help_link("verify_gedcom_help", "qm", "verify_gedcom");
+				PrintHelpLink("verify_gedcom_help", "qm", "verify_gedcom");
 				print "&nbsp;<a href=\"javascript: ".GM_LANG_verify_gedcom."\" onclick=\"expand_layer('verify_gedcom');return false\">".GM_LANG_verify_gedcom."</a>";
 			print "</div>";
 			print "<div class=\"shade1 wrap\" style=\"padding-top:5px;\">";
@@ -430,7 +430,7 @@ print "<form enctype=\"multipart/form-data\" method=\"post\" name=\"configform\"
 			if ($startimport != "true") print $GM_IMAGES["minus"]["other"];
 			else print $GM_IMAGES["plus"]["other"];
 			print "\" border=\"0\" width=\"11\" height=\"11\" alt=\"\" /></a>";
-			print_help_link("validate_gedcom_help", "qm","validate_gedcom");
+			PrintHelpLink("validate_gedcom_help", "qm","validate_gedcom");
 			print "&nbsp;<a href=\"javascript: ".GM_LANG_validate_gedcom."\" onclick=\"expand_layer('validate_gedcom');return false\">".GM_LANG_validate_gedcom."</a>";
 		print "</div>";
 		print "<div class=\"shade1\" style=\"padding-top:5px;\">";
@@ -457,17 +457,17 @@ print "<form enctype=\"multipart/form-data\" method=\"post\" name=\"configform\"
 						$fp = fopen($GEDFILENAME, "r");
 						//-- read the gedcom and test it in 8KB chunks
 						SwitchGedcom($merge_ged);
-						$lastindi = GetNewXref("INDI");
+						$lastindi = EditFunctions::GetNewXref("INDI");
 						$lastindi = substr($lastindi,(strlen(GedcomConfig::$GEDCOM_ID_PREFIX)));
-						$lastfam = GetNewXref("FAM");
+						$lastfam = EditFunctions::GetNewXref("FAM");
 						$lastfam = substr($lastfam,(strlen(GedcomConfig::$FAM_ID_PREFIX)));
-						$lastobje = GetNewXref("OBJE");
+						$lastobje = EditFunctions::GetNewXref("OBJE");
 						$lastobje = substr($lastobje,(strlen(GedcomConfig::$MEDIA_ID_PREFIX)));
-						$lastsour = GetNewXref("SOUR");
+						$lastsour = EditFunctions::GetNewXref("SOUR");
 						$lastsour = substr($lastsour,(strlen(GedcomConfig::$SOURCE_ID_PREFIX)));
-						$lastrepo = GetNewXref("REPO");
+						$lastrepo = EditFunctions::GetNewXref("REPO");
 						$lastrepo = substr($lastrepo,(strlen(GedcomConfig::$REPO_ID_PREFIX)));
-						$lastnote = GetNewXref("NOTE");
+						$lastnote = EditFunctions::GetNewXref("NOTE");
 						$lastnote = substr($lastnote,(strlen(GedcomConfig::$NOTE_ID_PREFIX)));
 						$inditab = array();
 						$famtab = array();
@@ -581,21 +581,21 @@ print "<form enctype=\"multipart/form-data\" method=\"post\" name=\"configform\"
 							// NOTE: Check for head cleanu
 							if ($l_headcleanup) {
 								print "<div class=\"shade1 wrap\">";
-									print_help_link("invalid_header_help", "qm", "invalid_header");
+									PrintHelpLink("invalid_header_help", "qm", "invalid_header");
 									print "<span class=\"error\">".GM_LANG_invalid_header."</span>\n";
 								print "</div>";
 							}
 							// NOTE: Check for mac file cleanup
 							if ($l_macfilecleanup) {
 								print "<div class=\"shade1 wrap\">";
-									print_help_link("macfile_detected_help", "qm", "macfile_detected");
+									PrintHelpLink("macfile_detected_help", "qm", "macfile_detected");
 									print "<span class=\"error\">".GM_LANG_macfile_detected."</span>\n";
 								print "</div>";
 							}
 							// NOTE: Check for line endings cleanup
 							if ($l_lineendingscleanup) {
 								print "<div class=\"shade1 wrap\">";
-									print_help_link("empty_lines_detected_help", "qm", "empty_lines_detected");
+									PrintHelpLink("empty_lines_detected_help", "qm", "empty_lines_detected");
 									print "<span class=\"error\">".GM_LANG_empty_lines_detected."</span>\n";
 								print "</div>";
 							}
@@ -605,7 +605,7 @@ print "<form enctype=\"multipart/form-data\" method=\"post\" name=\"configform\"
 									print "<span class=\"error\">".GM_LANG_place_cleanup_detected."</span>\n";
 								print "</div>";
 								print "<div class=\"shade2 wrap\">";
-									print_help_link("cleanup_places_help", "qm", "cleanup_places");
+									PrintHelpLink("cleanup_places_help", "qm", "cleanup_places");
 									print GM_LANG_cleanup_places;
 									print "<select name=\"cleanup_places\">\n";
 									print "<option value=\"YES\" selected=\"selected\">".GM_LANG_yes."</option>\n<option value=\"NO\">".GM_LANG_no."</option>\n</select>";
@@ -618,7 +618,7 @@ print "<form enctype=\"multipart/form-data\" method=\"post\" name=\"configform\"
 									print "<span class=\"error\">".GM_LANG_invalid_dates."</span>\n";
 								print "</div>";
 								print "<div class=\"shade2\">";
-									print_help_link("detected_date_help", "qm");
+									PrintHelpLink("detected_date_help", "qm");
 									print GM_LANG_date_format;
 									if (isset($datesample["choose"])){
 										print "<select name=\"datetype\">\n";
@@ -634,7 +634,7 @@ print "<form enctype=\"multipart/form-data\" method=\"post\" name=\"configform\"
 									print "<span class=\"error\">".GM_LANG_ansi_encoding_detected."</span>\n";
 								print "</div>";
 								print "<div class=\"shade2 wrap\">";
-									print_help_link("detected_ansi2utf_help", "qm", "ansi_to_utf8");
+									PrintHelpLink("detected_ansi2utf_help", "qm", "ansi_to_utf8");
 									print GM_LANG_ansi_to_utf8;
 									print "<select name=\"utf8convert\">\n";
 									print "<option value=\"YES\" selected=\"selected\">".GM_LANG_yes."</option>\n";
@@ -670,7 +670,7 @@ print "<form enctype=\"multipart/form-data\" method=\"post\" name=\"configform\"
 			if ($startimport != "true") print $GM_IMAGES["minus"]["other"];
 			else print $GM_IMAGES["plus"]["other"];
 			print "\" border=\"0\" width=\"11\" height=\"11\" alt=\"\" /></a>";
-			print_help_link("import_options_help", "qm", "import_options");
+			PrintHelpLink("import_options_help", "qm", "import_options");
 			print "&nbsp;<a href=\"javascript: ".GM_LANG_import_options."\" onclick=\"expand_layer('import_options');return false\">".GM_LANG_import_options."</a>";
 		print "</div>";
 		print "<div class=\"shade1\" style=\"padding-top:5px;\">";
@@ -681,7 +681,7 @@ print "<form enctype=\"multipart/form-data\" method=\"post\" name=\"configform\"
 				// NOTE: Time limit for import
 				// TODO: Write help text
 				print "<div class=\"shade2 wrap\">";
-					print_help_link("time_limit_help", "qm", "time_limit");
+					PrintHelpLink("time_limit_help", "qm", "time_limit");
 					print "<span style=\"vertical-align: 25%\">".GM_LANG_time_limit."</span>&nbsp;";
 					print "<input type=\"text\" name=\"timelimit\" value=\"".$timelimit."\" size=\"5\"";
 					if ($startimport == "true")  print " disabled=\"disabled\" ";
@@ -690,7 +690,7 @@ print "<form enctype=\"multipart/form-data\" method=\"post\" name=\"configform\"
 				
 				// NOTE: Import married names
 				print "<div class=\"shade2 wrap\">";
-				print_help_link("import_marr_names_help", "qm", "import_marr_names");
+				PrintHelpLink("import_marr_names_help", "qm", "import_marr_names");
 				print "<span style=\"vertical-align: 25%\">".GM_LANG_import_marr_names.":</span>&nbsp;";
 				if ($startimport == "true") print "<span style=\"vertical-align: 25%\">".constant("GM_LANG_".$marr_names)."</span>";
 				else {
@@ -702,7 +702,7 @@ print "<form enctype=\"multipart/form-data\" method=\"post\" name=\"configform\"
 				
 				// NOTE: change XREF to RIN, REFN, or Don't change
 				print "<div class=\"shade2 wrap\">";
-				print_help_link("change_indi2id_help", "qm", "change_id");
+				PrintHelpLink("change_indi2id_help", "qm", "change_id");
 				print "<span style=\"vertical-align: 25%\">".GM_LANG_change_id."</span>&nbsp;";
 				if ($startimport == "true") {
 					if ($xreftype == "NA") print "<span style=\"vertical-align: 25%\">".GM_LANG_do_not_change."</span>";
@@ -717,7 +717,7 @@ print "<form enctype=\"multipart/form-data\" method=\"post\" name=\"configform\"
 				
 				// NOTE: option to convert to utf8
 				print "<div class=\"shade2 wrap\">";
-				print_help_link("convert_ansi2utf_help", "qm", "ansi_to_utf8");
+				PrintHelpLink("convert_ansi2utf_help", "qm", "ansi_to_utf8");
 				print "<span style=\"vertical-align: 25%\">".GM_LANG_ansi_to_utf8."</span>&nbsp;";
 				if ($startimport == "true") print "<span style=\"vertical-align: 25%\">".constant("GM_LANG_".strtolower($utf8convert))."</span>";
 				else {
@@ -1274,7 +1274,7 @@ print "<form enctype=\"multipart/form-data\" method=\"post\" name=\"configform\"
 	print "<div class=\"center\" style=\"margin-top: 5px;\">";
 	if ($startimport != "true") print "<input type=\"submit\" name=\"continue\" value=\"".GM_LANG_del_proceed."\" />&nbsp;";
 		if ($cleanup_needed && $skip_cleanup != GM_LANG_skip_cleanup) {
-			print_help_link("skip_cleanup_help", "qm", "skip_cleanup");
+			PrintHelpLink("skip_cleanup_help", "qm", "skip_cleanup");
 			print "<input type=\"submit\" name=\"skip_cleanup\" value=\"".GM_LANG_skip_cleanup."\" />&nbsp;\n";
 		}
 		if ($verify && $startimport != "true") print "<input type=\"button\" name=\"cancel\" value=\"".GM_LANG_cancel."\" onclick=\"document.configform.override.value='no'; document.configform.no_upload.value='cancel_upload'; document.configform.submit(); \" />";

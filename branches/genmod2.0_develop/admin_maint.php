@@ -118,16 +118,16 @@ foreach($users as $indexval => $user) {
 		<?php print "<h3>".GM_LANG_administration_maintenance."</h3>"; ?>
 	</div>
 	<div class="admin_item_box">
-		<div class="admin_item_left"><div class="helpicon"><?php print_help_link("help_sanity.php", "qm", "sc_sanity_check"); ?></div><div class="description"><a href="sanity.php"><?php print GM_LANG_sc_sanity_check;?></a></div></div>
-		<div class="admin_item_right"><div class="helpicon"><?php print_help_link("restart_setup_help", "qm", "restart_setup"); ?></div><div class="description"><a href="install/install.php"><?php print GM_LANG_restart_setup;?></a></div></div>
-		<div class="admin_item_left"><div class="helpicon"><?php print_help_link("load_english_help", "qm", "load_english"); ?></div><div class="description"><a href="admin_maint.php?action=loadenglish"><?php print GM_LANG_load_all_langs;?></a></div></div>
-		<div class="admin_item_right"><div class="helpicon"><?php print_help_link("reset_isdead_help", "qm", "reset_isdead"); ?></div><div class="description"><a href="admin_maint.php?action=resetisdead"><?php print GM_LANG_reset_isdead;?></a></div></div>
-		<div class="admin_item_left"><div class="helpicon"><?php print_help_link("generate_report_title_help", "qm", "generate_report_title"); ?></div><div class="description"><a href="admin_maint.php?action=reports"><?php print GM_LANG_generate_report_title;?></a></div></div>
-		<div class="admin_item_right"><div class="helpicon"><?php print_help_link("build_isdead", "qm", "build_isdead"); ?></div><div class="description"><a href="admin_maint.php?action=buildisdead"><?php print GM_LANG_build_isdead;?></a></div></div>
-		<div class="admin_item_left"><div class="helpicon"><?php print_help_link("reset_caches_help", "qm", "reset_caches"); ?></div><div class="description"><a href="admin_maint.php?action=resetcaches"><?php print GM_LANG_reset_caches;?></a></div></div>
-		<div class="admin_item_right"><div class="helpicon"><?php print_help_link("disp_db_settings_help", "qm", "disp_db_settings"); ?></div><div class="description"><a href="admin_maint.php?action=dispdbsettings"><?php print GM_LANG_disp_db_settings;?></a></div></div>
-		<div class="admin_item_left"><div class="helpicon"><?php print_help_link("config_maint_help", "qm", "config_maint"); ?></div><div class="description"><a href="config_maint.php"><?php print GM_LANG_config_maint;?></a></div></div>
-		<div class="admin_item_right"><div class="helpicon"><?php print_help_link("lockout_maint_help", "qm", "lockout_maint"); ?></div><div class="description"><a href="lockout_maint.php"><?php print GM_LANG_lockout_maint;?></a></div></div>
+		<div class="admin_item_left"><div class="helpicon"><?php PrintHelpLink("help_sanity.php", "qm", "sc_sanity_check"); ?></div><div class="description"><a href="sanity.php"><?php print GM_LANG_sc_sanity_check;?></a></div></div>
+		<div class="admin_item_right"><div class="helpicon"><?php PrintHelpLink("restart_setup_help", "qm", "restart_setup"); ?></div><div class="description"><a href="install/install.php"><?php print GM_LANG_restart_setup;?></a></div></div>
+		<div class="admin_item_left"><div class="helpicon"><?php PrintHelpLink("load_english_help", "qm", "load_english"); ?></div><div class="description"><a href="admin_maint.php?action=loadenglish"><?php print GM_LANG_load_all_langs;?></a></div></div>
+		<div class="admin_item_right"><div class="helpicon"><?php PrintHelpLink("reset_isdead_help", "qm", "reset_isdead"); ?></div><div class="description"><a href="admin_maint.php?action=resetisdead"><?php print GM_LANG_reset_isdead;?></a></div></div>
+		<div class="admin_item_left"><div class="helpicon"><?php PrintHelpLink("generate_report_title_help", "qm", "generate_report_title"); ?></div><div class="description"><a href="admin_maint.php?action=reports"><?php print GM_LANG_generate_report_title;?></a></div></div>
+		<div class="admin_item_right"><div class="helpicon"><?php PrintHelpLink("build_isdead", "qm", "build_isdead"); ?></div><div class="description"><a href="admin_maint.php?action=buildisdead"><?php print GM_LANG_build_isdead;?></a></div></div>
+		<div class="admin_item_left"><div class="helpicon"><?php PrintHelpLink("reset_caches_help", "qm", "reset_caches"); ?></div><div class="description"><a href="admin_maint.php?action=resetcaches"><?php print GM_LANG_reset_caches;?></a></div></div>
+		<div class="admin_item_right"><div class="helpicon"><?php PrintHelpLink("disp_db_settings_help", "qm", "disp_db_settings"); ?></div><div class="description"><a href="admin_maint.php?action=dispdbsettings"><?php print GM_LANG_disp_db_settings;?></a></div></div>
+		<div class="admin_item_left"><div class="helpicon"><?php PrintHelpLink("config_maint_help", "qm", "config_maint"); ?></div><div class="description"><a href="config_maint.php"><?php print GM_LANG_config_maint;?></a></div></div>
+		<div class="admin_item_right"><div class="helpicon"><?php PrintHelpLink("lockout_maint_help", "qm", "lockout_maint"); ?></div><div class="description"><a href="lockout_maint.php"><?php print GM_LANG_lockout_maint;?></a></div></div>
 	</div>
 	<?php
 	if ($message != "") {

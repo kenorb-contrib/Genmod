@@ -212,7 +212,7 @@ class NoteController extends DetailController {
 	 			if ($resn_tag > 0) $resn_value = strtolower(trim($match[1]));
 				// -- Find RESN tag
 				if (isset($resn_value)) {
-					print_help_link("RESN_help", "qm");
+					PrintHelpLink("RESN_help", "qm");
 					print constant("GM_LANG_".$resn_value)."\n";
 				}
 				print "<br />\n";
@@ -266,7 +266,7 @@ class NoteController extends DetailController {
 		 		if ($resn_tag > 0) $resn_value = strtolower(trim($match[1]));
 				// -- Find RESN tag
 				if (isset($resn_value)) {
-					print_help_link("RESN_help", "qm");
+					PrintHelpLink("RESN_help", "qm");
 					print constant("GM_LANG_".$resn_value)."\n";
 				}
 				print "<br />\n";

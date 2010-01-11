@@ -51,12 +51,12 @@ if ($faq_controller->canconfig && $faq_controller->adminedit) {?>
 			<input type="hidden" name="action" value="commit" />
 			<input type="hidden" name="type" value="add" />
 			<div class="admin_topbottombar">
-				<?php print_help_link("add_faq_item_help","qm","add_faq_item"); ?>
+				<?php PrintHelpLink("add_faq_item_help","qm","add_faq_item"); ?>
 				<?php print GM_LANG_add_faq_item;?>
 			</div>
 			<div class="item_box shade2">
 				<div class="width25 choice_left">
-					<div class="helpicon"><?php print_help_link("add_faq_header_help","qm","add_faq_header"); ?></div>
+					<div class="helpicon"><?php PrintHelpLink("add_faq_header_help","qm","add_faq_header"); ?></div>
 					<div class="description"><?php print GM_LANG_add_faq_header;?></div>
 				</div>
 			</div>
@@ -67,7 +67,7 @@ if ($faq_controller->canconfig && $faq_controller->adminedit) {?>
 			</div>
 			<div class="item_box shade2">
 				<div class="width25 choice_left">
-					<div class="helpicon"><?php print_help_link("add_faq_body_help","qm","add_faq_body"); ?></div>
+					<div class="helpicon"><?php PrintHelpLink("add_faq_body_help","qm","add_faq_body"); ?></div>
 					<div class="description"><?php print GM_LANG_add_faq_body;?></div>
 				</div>
 			</div>
@@ -92,12 +92,12 @@ if ($faq_controller->canconfig && $faq_controller->adminedit) {?>
 			<input type="hidden" name="type" value="update" />
 			<input type="hidden" name="id" value="<?php print $faq_controller->id;?>" />
 			<div class="admin_topbottombar">
-				<?php print_help_link("edit_faq_item_help","qm","edit_faq_item"); ?>
+				<?php PrintHelpLink("edit_faq_item_help","qm","edit_faq_item"); ?>
 				<?php print GM_LANG_edit_faq_item;?>
 			</div>
 				<div class="item_box shade2">
 					<div class="width25 choice_left">
-						<div class="helpicon"><?php print_help_link("add_faq_header_help","qm","add_faq_header"); ?></div>
+						<div class="helpicon"><?php PrintHelpLink("add_faq_header_help","qm","add_faq_header"); ?></div>
 						<div class="description"><?php print GM_LANG_add_faq_header;?></div>
 					</div>
 				</div>
@@ -108,7 +108,7 @@ if ($faq_controller->canconfig && $faq_controller->adminedit) {?>
 				</div>
 				<div class="item_box shade2">
 					<div class="width25 choice_left">
-						<div class="helpicon"><?php print_help_link("add_faq_body_help","qm","add_faq_body"); ?></div>
+						<div class="helpicon"><?php PrintHelpLink("add_faq_body_help","qm","add_faq_body"); ?></div>
 						<div class="description"><?php print GM_LANG_add_faq_body;?></div>
 					</div>
 				</div>
@@ -134,7 +134,7 @@ if ($faq_controller->canconfig && $faq_controller->adminedit) {?>
 			<?php
 			if (count($faqs) == 0 && $faq_controller->canconfig) { ?>
 				<div class="shade2 item_box">
-					<?php print_help_link("add_faq_item_help","qm","add_faq_item"); ?>
+					<?php PrintHelpLink("add_faq_item_help","qm","add_faq_item"); ?>
 					<a href="faq.php?action=add"><?php print GM_LANG_add_faq_item;?></a>
 				</div>
 				<?php
@@ -151,7 +151,7 @@ if ($faq_controller->canconfig && $faq_controller->adminedit) {?>
 				// NOTE: Add and preview link
 				if ($faq_controller->canconfig && $faq_controller->adminedit) { ?>
 					<div class="choice_left">
-						<?php print_help_link("add_faq_item_help","qm","add_faq_item");?>
+						<?php PrintHelpLink("add_faq_item_help","qm","add_faq_item");?>
 						<a href="faq.php?action=add"><?php print GM_LANG_add;?></a>
 					</div>
 					<?php
@@ -159,13 +159,13 @@ if ($faq_controller->canconfig && $faq_controller->adminedit) {?>
 				
 				if ($faq_controller->canconfig && $faq_controller->adminedit) { ?>
 					<div class="choice_middle">
-						<?php print_help_link("preview_faq_item_help","qm","preview_faq_item");?>
+						<?php PrintHelpLink("preview_faq_item_help","qm","preview_faq_item");?>
 						<a href="faq.php?adminedit=0"><?php print GM_LANG_preview;?></a>
 					</div>
 					<?php
 				}
 				else if ($faq_controller->canconfig && !$faq_controller->adminedit) {
-					print_help_link("restore_faq_edits_help","qm","restore_faq_edits");
+					PrintHelpLink("restore_faq_edits_help","qm","restore_faq_edits");
 					print "<a href=\"faq.php?adminedit=1\">".GM_LANG_edit."</a>";
 				}
 				
@@ -210,19 +210,19 @@ if ($faq_controller->canconfig && $faq_controller->adminedit) {?>
 								// NOTE: Print the edit options op the current item
 								if ($faq_controller->canconfig && $faq_controller->adminedit) { ?>
 									<div class="choice_left">
-										<?php print_help_link("moveup_faq_item_help","qm","moveup_faq_item");?>
+										<?php PrintHelpLink("moveup_faq_item_help","qm","moveup_faq_item");?>
 										<a href="faq.php?action=commit&amp;type=moveup&amp;id=<?php print $faq->id; ?>"><img src="<?php print GM_IMAGE_DIR."/".$GM_IMAGES["uarrow"]["other"];?>" alt="" /></a>
 									</div>
 									<div class="choice_middle">
-										<?php print_help_link("movedown_faq_item_help","qm","movedown_faq_item"); ?>
+										<?php PrintHelpLink("movedown_faq_item_help","qm","movedown_faq_item"); ?>
 										<a href="faq.php?action=commit&amp;type=movedown&amp;id=<?php print $faq->id; ?>"><img src="<?php print GM_IMAGE_DIR."/".$GM_IMAGES["darrow"]["other"];?>" alt="" /></a>
 									</div>
 									<div class="choice_middle">					
-										<?php print_help_link("edit_faq_item_help","qm","edit_faq_item"); ?>
+										<?php PrintHelpLink("edit_faq_item_help","qm","edit_faq_item"); ?>
 										<a href="faq.php?action=edit&amp;id=<?php print $faq->id;?>"><?php print GM_LANG_edit;?></a>
 									</div>
 									<div class="choice_middle">
-										<?php print_help_link("delete_faq_item_help","qm","delete_faq_item"); ?>
+										<?php PrintHelpLink("delete_faq_item_help","qm","delete_faq_item"); ?>
 										<a href="faq.php?action=commit&amp;type=delete&amp;id=<?php print $faq->id;?>" onclick="return confirm('<?php print GM_LANG_confirm_faq_delete;?>');"><?php print GM_LANG_delete;?></a>
 									</div>
 									<?php

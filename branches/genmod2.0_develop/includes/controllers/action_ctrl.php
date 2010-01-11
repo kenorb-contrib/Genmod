@@ -131,7 +131,7 @@ abstract class ActionController {
 		
 		print "<tr>";
 		print "<td class=\"shade2 width20\"><div id=\"todo_txt\">";
-		print_help_link("add_todo_help", "qm");
+		PrintHelpLink("add_todo_help", "qm");
 		print GM_LANG_add_todo."</div></td>";
 		print "<td class=\"shade1\" id=\"add_todo\"><a href=\"javascript: ".GM_LANG_add_todo."\" onclick=\"document.getElementById('todo_txt').style.display='none'; sndReq('add_todo', 'action_add', 'type', '".$type."'); return false;\">".GM_LANG_add_todo."</a>";
 		print "</td>";

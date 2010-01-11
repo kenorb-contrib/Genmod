@@ -92,7 +92,7 @@ if ($placelist_controller->display == "hierarchy") {
 	if ($placelist_controller->level == 0 || ($numls>=0 && (($TEXT_DIRECTION=="rtl" && hasRtLText($placelist_controller->parent[$numls])) || ($TEXT_DIRECTION=="ltr" && !hasRtLText($placelist_controller->parent[$numls]))))) print GM_LANG_top_level;
 	print "</a>";
 
-	print_help_link("ppp_levels_help", "qm");
+	PrintHelpLink("ppp_levels_help", "qm");
 
 	// show clickable map if found
 	print "\n\t<br /><br />\n\t<table class=\"width90 center\"><tr><td class=\"center\">";
@@ -231,7 +231,7 @@ if ($placelist_controller->display == "hierarchy") {
 			else print GM_LANG_place_list;
 
 			print "&nbsp;";
-			print_help_link("ppp_placelist_help", "qm");
+			PrintHelpLink("ppp_placelist_help", "qm");
 			print "</td></tr><tr><td class=\"shade1 center\"><ul>\n\t\t\t";
 		}
 
@@ -265,7 +265,7 @@ if ($placelist_controller->display == "hierarchy") {
 			else if ($ct1 > 4) print "colspan=\"2\"";
 			print ">\n\t";
 			print GM_LANG_view_records_in_place;
-			print_help_link("ppp_view_records_help", "qm");
+			PrintHelpLink("ppp_view_records_help", "qm");
 			print "</td></tr><tr><td class=\"shade1\" ";
 			if ($ct1 > 20) print "colspan=\"3\"";
 			else if ($ct1 > 4) print "colspan=\"2\"";
@@ -353,7 +353,7 @@ if ($placelist_controller->level > 0) {
 			if (count($placelist_controller->indi_hide) > 0) {
 				print "&nbsp;--&nbsp;";
 				print GM_LANG_hidden." ".count($placelist_controller->indi_hide);
-				print_help_link("privacy_error_help", "qm");
+				PrintHelpLink("privacy_error_help", "qm");
 			}
 			print "</td>\n";
 		}
@@ -363,7 +363,7 @@ if ($placelist_controller->level > 0) {
 			if (count($placelist_controller->sour_hide) > 0) {
 				print "&nbsp;--&nbsp;";
 				print GM_LANG_hidden." ".count($placelist_controller->sour_hide);
-				print_help_link("privacy_error_help", "qm");
+				PrintHelpLink("privacy_error_help", "qm");
 			}
 			print "</td>\n";
 		}
@@ -373,22 +373,21 @@ if ($placelist_controller->level > 0) {
 			if (count($placelist_controller->fam_hide) > 0) {
 				print "&nbsp;--&nbsp;";
 				print GM_LANG_hidden." ".count($placelist_controller->fam_hide);
-				print_help_link("privacy_error_help", "qm");
+				PrintHelpLink("privacy_error_help", "qm");
 			}
 			print "</td>\n";
 		}
 		print "</tr>\n\t</table>";
-		print_help_link("ppp_name_list_help", "qm");
+		PrintHelpLink("ppp_name_list_help", "qm");
 		print "<br />";
 	}
 }
 
 //-- list type display
 if ($placelist_controller->display=="list") {
-	$placelist = array();
-
-	FindPlaceList("");
-	uasort($placelist, "stringsort");
+	
+	$placelist = ListFunctions::FindPlaceList("");
+	
 	if (count($placelist)==0) {
 		print "<b>".GM_LANG_no_results."</b><br />";
 	}
@@ -401,7 +400,7 @@ if ($placelist_controller->display=="list") {
 		print "<img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["place"]["small"]."\" border=\"0\" title=\"".GM_LANG_search_place."\" alt=\"".GM_LANG_search_place."\" />&nbsp;&nbsp;";
 		print GM_LANG_place_list2;
 		print "&nbsp;";
-		print_help_link("ppp_placelist_help2", "qm");
+		PrintHelpLink("ppp_placelist_help2", "qm");
 		print "</td></tr><tr><td class=\"shade1 wrap\"><ul>\n\t\t\t";
 		$i=0;
 		foreach($placelist as $indexval => $revplace) {
@@ -448,11 +447,11 @@ print "</a><br /><br />\n";
 $head = Header::GetInstance("HEAD", "", $GEDCOMID);
 if ($head->placeformat != "") {
 	print  GM_LANG_form.$head->placeformat;
-	print_help_link("ppp_match_one_help", "qm");
+	PrintHelpLink("ppp_match_one_help", "qm");
 }
 else {
 	print GM_LANG_form.GM_LANG_default_form."  ".GM_LANG_default_form_info;
-	print_help_link("ppp_default_form_help", "qm");
+	PrintHelpLink("ppp_default_form_help", "qm");
 }
 
 print "<br /><br /></div>";

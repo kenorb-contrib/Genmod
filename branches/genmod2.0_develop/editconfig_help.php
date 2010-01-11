@@ -40,14 +40,14 @@ print '</span><br /><br /><span class="helptext">';
 if ($help == "help_contents_help") {
 		if ($gm_user->userIsAdmin()) {
 		$help = "admin_help_contents_help";
-		print_text("admin_help_contents_head_help");
+		PrintText("admin_help_contents_head_help");
 	}
-	else print_text("help_contents_head_help");
-	print_help_index($help);
+	else PrintText("help_contents_head_help");
+	PrintHelpIndex($help);
 }
 else {
 	if ($help == "help_uploadgedcom.php") $help = "help_addgedcom.php";
-	print_text($help);
+	PrintText($help);
 }
 print "</span><br /><br />";
 print "<a href=\"help_text.php?help=help_contents_help\"><b>";

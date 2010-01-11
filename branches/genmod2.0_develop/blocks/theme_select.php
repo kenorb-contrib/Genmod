@@ -38,7 +38,7 @@ function print_block_theme_select($style=0, $config="", $side, $index) {
 	if (GedcomConfig::$ALLOW_THEME_DROPDOWN && $ALLOW_USER_THEMES) {
 		print "<div id=\"theme_select\" class=\"block\">\n";
 		print "<div class=\"blockhc\">";
-		print_help_link("change_theme", "qm", "change_theme");
+		PrintHelpLink("change_theme", "qm", "change_theme");
 		print GM_LANG_change_theme;
 		print "</div>";
 		print "<div class=\"blockcontent center\">";

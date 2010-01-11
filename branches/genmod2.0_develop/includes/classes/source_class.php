@@ -51,6 +51,14 @@ class Source extends GedcomRecord {
 		return self::$cache[$gedcomid][$xref];
 	}
 	
+	public static function IsInstance($xref, $gedcomid="") {
+		global $GEDCOMID;
+		
+		if (empty($gedcomid)) $gedcomid = $GEDCOMID;
+		if (!isset(self::$cache[$gedcomid][$xref])) return false;
+		else return true;
+	}
+	
 	/**
 	 * Constructor for source object
 	 * @param string $gedrec	the raw source gedcom record
@@ -224,7 +232,7 @@ class Source extends GedcomRecord {
 		$this->indi_hide = 0;
 		$key = "";
 		
-		$sql = "SELECT DISTINCT n_id, i_key, i_gedrec, i_isdead, i_id, i_file, n_name, n_surname, n_letter, n_type  FROM ".TBLPREFIX."source_mapping, ".TBLPREFIX."individuals, ".TBLPREFIX."names WHERE sm_key='".$this->key."' AND sm_file='".$this->gedcomid."' AND sm_type='INDI' AND sm_gid=i_id AND sm_file=i_file AND i_key=n_key ORDER BY i_key, n_id";
+		$sql = "SELECT DISTINCT n_id, i_key, i_gedrec, i_isdead, i_id, i_file, n_name, n_surname, n_nick, n_letter, n_type  FROM ".TBLPREFIX."source_mapping, ".TBLPREFIX."individuals, ".TBLPREFIX."names WHERE sm_key='".$this->key."' AND sm_file='".$this->gedcomid."' AND sm_type='INDI' AND sm_gid=i_id AND sm_file=i_file AND i_key=n_key ORDER BY i_key, n_id";
 		$res = NewQuery($sql);
 		while($row = $res->FetchAssoc()){
 			if ($key != $row["i_key"]) {
@@ -237,7 +245,7 @@ class Source extends GedcomRecord {
 				}
 				else $this->indi_hide++;
 			}
-			if ($person->DispName()) $person->addname = array($row["n_name"], $row["n_letter"], $row["n_surname"], $row["n_type"]);
+			if ($person->DispName()) $person->addname = array($row["n_name"], $row["n_letter"], $row["n_surname"], $row["n_nick"], $row["n_type"]);
 		}
 		if ($key != "") $person->names_read = true;
 		
@@ -320,7 +328,7 @@ class Source extends GedcomRecord {
 	// Type	=	1	: normal title (descriptor and adddescriptor
 	// 			2	: descriptor
 	//			3	: adddescriptor
-	public function PrintListSource($useli=true, $type=1, $fact="") {
+	public function PrintListSource($useli=true, $type=1, $fact="", $paste=false) {
 
 		if (!$this->DisplayDetails()) return false;
 		
@@ -328,9 +336,11 @@ class Source extends GedcomRecord {
 			if (begRTLText($this->title)) print "\n\t\t\t<li class=\"rtl\" dir=\"rtl\">";
 			else print "\n\t\t\t<li class=\"ltr\" dir=\"ltr\">";
 		}
-		if ($type == 1) print "\n\t\t\t<a href=\"source.php?sid=$this->xref&amp;gedid=".$this->gedcomid."\" class=\"list_item\">".PrintReady($this->GetTitle());
-		else if ($type == 2) print "\n\t\t\t<a href=\"source.php?sid=$this->xref&amp;gedid=".$this->gedcomid."\" class=\"list_item\">".PrintReady($this->GetSourceDescriptor());
-		else if ($type == 3) print "\n\t\t\t<a href=\"source.php?sid=$this->xref&amp;gedid=".$this->gedcomid."\" class=\"list_item\">".PrintReady($this->GetAddSourceDescriptor());
+		if ($paste) print "<a href=\"#\" onclick=\"sndReq(document.getElementById('dummy'), 'lastused', 'type', '".$this->datatype."', 'id', '".$this->key."'); pasteid('".$this->xref."'); return false;\" class=\"list_item\">";
+		else print "\n\t\t\t<a href=\"source.php?sid=".$this->xref."&amp;gedid=".$this->gedcomid."\" class=\"list_item\">";
+		if ($type == 1) print PrintReady($this->GetTitle());
+		else if ($type == 2) print PrintReady($this->GetSourceDescriptor());
+		else if ($type == 3) print PrintReady($this->GetAddSourceDescriptor());
 		print $this->addxref;
 		if (!empty($fact)) {
 			print " <i>(";
@@ -340,6 +350,7 @@ class Source extends GedcomRecord {
 		}
 		print "</a>\n";
 		if ($useli) print "</li>\n";
+		return true;
 	}
 }
 ?>

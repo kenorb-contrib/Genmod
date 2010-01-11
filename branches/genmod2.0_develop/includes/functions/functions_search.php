@@ -52,9 +52,9 @@ function SearchIndisNames($query, $allgeds=false, $gedid=0) {
 	}
 
 	$myindilist = array();
-	if (!is_array($query)) $sql = "SELECT i_id, i_file, i_gedrec, i_isdead, n_name, n_letter, n_type, n_surname FROM ".TBLPREFIX."individuals, ".TBLPREFIX."names WHERE i_key=n_key AND n_name REGEXP '".DbLayer::EscapeQuery($query)."'";
+	if (!is_array($query)) $sql = "SELECT i_id, i_file, i_gedrec, i_isdead, n_name, n_letter, n_type, n_surname, n_nick FROM ".TBLPREFIX."individuals, ".TBLPREFIX."names WHERE i_key=n_key AND n_name REGEXP '".DbLayer::EscapeQuery($query)."'";
 	else {
-		$sql = "SELECT i_id, i_file, i_gedrec, i_isdead, n_name, n_letter, n_type, n_surname FROM ".TBLPREFIX."individuals, ".TBLPREFIX."names WHERE i_key=n_key AND (";
+		$sql = "SELECT i_id, i_file, i_gedrec, i_isdead, n_name, n_letter, n_type, n_surname, n_nick FROM ".TBLPREFIX."individuals, ".TBLPREFIX."names WHERE i_key=n_key AND (";
 		$i=0;
 		foreach($query as $indexval => $q) {
 			if (!empty($q)) {
@@ -69,17 +69,19 @@ function SearchIndisNames($query, $allgeds=false, $gedid=0) {
 		if ($gedid == 0) $sql .= " AND i_file='".$GEDCOMID."'";
 		else $sql .= " AND i_file='".$gedid."'";
 	}
+	$sql .= " ORDER BY i_key, n_id";
+	
 	$res = NewQuery($sql);
 	while($row = $res->fetchAssoc()){
 		if ($allgeds) $key = $row["i_id"]."[".$row["i_file"]."]";
 		else $key = $row["i_id"];
 		if (!isset($myindilist[$key])) {
-			$myindilist[$key]["names"][] = array($row["n_name"], $row["n_letter"], $row["n_surname"], $row["n_type"]);
+			$myindilist[$key]["names"][] = array($row["n_name"], $row["n_letter"], $row["n_surname"], $row["n_nick"], $row["n_type"]);
 			$myindilist[$key]["gedfile"] = $row["i_file"];
 			$myindilist[$key]["gedcom"] = $row["i_gedrec"];
 			$myindilist[$key]["isdead"] = $row["i_isdead"];
 		}
-		else $myindilist[$key]["names"][] = array($row["n_name"], $row["n_letter"], $row["n_surname"], $row["n_type"]);
+		else $myindilist[$key]["names"][] = array($row["n_name"], $row["n_letter"], $row["n_surname"], $row["n_nick"], $row["n_type"]);
 		$indilist[$key] = $myindilist[$key];
 	}
 	$res->FreeResult();
@@ -88,7 +90,7 @@ function SearchIndisNames($query, $allgeds=false, $gedid=0) {
 
 //-- search through the gedcom records for families
 function SearchFams($query, $allgeds=false, $ANDOR="AND", $allnames=false) {
-	global $famlist, $GEDCOMS, $GEDCOMID;
+	global $GEDCOMS, $GEDCOMID;
 	
 	$myfamlist = array();
 	if (!is_array($query)) $sql = "SELECT f_id, f_husb, f_wife, f_file, f_gedrec FROM ".TBLPREFIX."families WHERE (f_gedrec REGEXP '".DbLayer::EscapeQuery($query)."')";
@@ -153,67 +155,12 @@ function SearchFams($query, $allgeds=false, $ANDOR="AND", $allnames=false) {
 	return $myfamlist;
 }
 
-//-- search through the gedcom records for families
-function SearchFamsNames($query, $ANDOR="AND", $allnames=false) {
-	global $famlist, $GEDCOMS, $GEDCOMID, $COMBIKEY;
-
-	$myfamlist = array();
-	$sql = "SELECT f_key, f_id, f_husb, f_wife, f_file, f_gedrec FROM ".TBLPREFIX."families WHERE (";
-	$i=0;
-	foreach($query as $indexval => $q) {
-
-		if ($i>0) $sql .= " $ANDOR ";
-		$sql .= "((f_husb='".DbLayer::EscapeQuery(JoinKey($q[0], $q[1]))."' OR f_wife='".DbLayer::EscapeQuery(JoinKey($q[0], $q[1]))."') AND f_file='".DbLayer::EscapeQuery($q[1])."')";
-		$i++;
-	}
-	$sql .= ")";
-
-	$res = NewQuery($sql);
-	$gedold = $GEDCOMID;
-	while($row = $res->fetchAssoc()){
-		$GEDCOMID = $row["f_file"];
-		$husb = SplitKey($row["f_husb"], "id");
-		$wife = SplitKey($row["f_wife"], "id");
-		if ($allnames == true) {
-			$hname = GetSortableName($husb, "", "", true);
-			$wname = GetSortableName($wife, "", "", true);
-			if (empty($hname)) $hname = "@N.N.";
-			if (empty($wname)) $wname = "@N.N.";
-			$name = array();
-			foreach ($hname as $hkey => $hn) {
-				foreach ($wname as $wkey => $wn) {
-					$name[] = $hn." + ".$wn;
-					$name[] = $wn." + ".$hn;
-				}
-			}
-		}
-		else {
-			$hname = GetSortableName($husb);
-			$wname = GetSortableName($wife);
-			if (empty($hname)) $hname = "@N.N.";
-			if (empty($wname)) $wname = "@N.N.";
-			$name = $hname." + ".$wname;
-		}
-		if ($COMBIKEY) $key = $row["f_key"];
-		else $key = $row["f_id"];
-		$myfamlist[$key]["name"] = $name;
-		$myfamlist[$key]["gedfile"] = $row["f_file"];
-		$myfamlist[$key]["HUSB"] = $husb;
-		$myfamlist[$key]["WIFE"] = $wife;
-		$myfamlist[$key]["gedcom"] = $row["f_gedrec"];
-		$famlist[$key] = $myfamlist[$key];
-	}
-	$GEDCOMID = $gedold;
-	$res->FreeResult();
-	return $myfamlist;
-}
 
 /**
  * Search the families table for individuals are part of that family 
  * either as a husband, wife or child.
  *
  * @author	roland-d
- * @param	string $query the query to search for as a single string
  * @param	array $query the query to search for as an array
  * @param	boolean $allgeds setting if all gedcoms should be searched, default is false
  * @param	string $ANDOR setting if the sql query should be constructed with AND or OR
@@ -221,27 +168,15 @@ function SearchFamsNames($query, $ANDOR="AND", $allnames=false) {
  * @return	array $myfamlist array with all families that matched the query
  */
 function SearchFamsMembers($query, $allgeds=false, $ANDOR="AND", $allnames=false) {
-	global $famlist, $GEDCOMID;
-	
-	if (is_array($query)) $id = JoinKey($q[0], $q[1]);
-	else $id = JoinKey($query, $GEDCOMID);
+	global $GEDCOMID;
 	
 	$myfamlist = array();
-	$sql = "SELECT f_key, f_id, f_husb, f_wife, f_file FROM ".TBLPREFIX."individual_family, ".TBLPREFIX."families WHERE if_pkey='".DbLayer::EscapeQuery($id)."' AND f_key = if_fkey";
+	$sql = "SELECT f_key, f_id, f_husb, f_wife, f_file FROM ".TBLPREFIX."individual_family INNER JOIN ".TBLPREFIX."families on f_key=if_fkey WHERE if_pkey IN ('".implode("','", $query)."')";
 	
 	$res = NewQuery($sql);
-	while($row = $res->fetchAssoc()){
-		$husb = SplitKey($row["f_husb"], "id");
-		$wife = SplitKey($row["f_wife"], "id");
-		$hname = GetSortableName($husb);
-		$wname = GetSortableName($wife);
-		if (empty($hname)) $hname = "@N.N.";
-		if (empty($wname)) $wname = "@N.N.";
-		$name = CheckNN($hname." + ".$wname);
-		$myfamlist[$row["f_id"]][] = $name;
-		$myfamlist[$row["f_id"]][] = $row["f_id"];
-		$myfamlist[$row["f_id"]][] = $row["f_file"];
-		$famlist[$row["f_id"]] = $myfamlist[$row["f_id"]];
+	while ($row = $res->fetchAssoc()) {
+		$fam = Family::GetInstance($row["f_id"], $row, $row["f_file"]);
+		$myfamlist[$row["f_key"]] = $myfamlist[$row["f_id"]];
 	}
 	$res->FreeResult();
 	return $myfamlist;

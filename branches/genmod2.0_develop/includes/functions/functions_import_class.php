@@ -602,7 +602,7 @@ abstract class ImportFunctions {
 		
 		
 		if ($type == "INDI") {
-			$indirec = CleanupTagsY($indirec);
+			$indirec = EditFunctions::CleanupTagsY($indirec);
 			$ct = preg_match_all("/1 FAMS @(.*)@/", $indirec, $match, PREG_SET_ORDER);
 			$sfams = "";
 			$order = 1;
@@ -639,10 +639,10 @@ abstract class ImportFunctions {
 			}
 			$isdead = -1;
 			$indi = array();
-			$names = GetIndiNames($indirec, true);
+			$names = NameFunctions::GetIndiNames($indirec, true);
 			$soundex_codes = GetSoundexStrings($names, true, $indirec);
 			foreach($names as $indexval => $name) {
-				$sql = "INSERT INTO ".TBLPREFIX."names VALUES('0', '".DbLayer::EscapeQuery($gid)."[".$gedfile."]','".DbLayer::EscapeQuery($gid)."','".$gedfile."','".DbLayer::EscapeQuery($name[0])."','".DbLayer::EscapeQuery($name[1])."','".DbLayer::EscapeQuery($name[2])."','".DbLayer::EscapeQuery($name[3])."')";
+				$sql = "INSERT INTO ".TBLPREFIX."names VALUES('0', '".DbLayer::EscapeQuery($gid)."[".$gedfile."]','".DbLayer::EscapeQuery($gid)."','".$gedfile."','".DbLayer::EscapeQuery($name[0])."','".DbLayer::EscapeQuery($name[1])."','".DbLayer::EscapeQuery($name[2])."','".DbLayer::EscapeQuery($name[3])."','".DbLayer::EscapeQuery($name[4])."')";
 				$res = NewQuery($sql);
 				if ($res) $res->FreeResult();
 			}
@@ -683,7 +683,7 @@ abstract class ImportFunctions {
 			else WriteToLog("Import->Soundex: Indi without soundex codes encountered: ".$kgid, "W", "G", $gedfile);
 		}
 		else if ($type == "FAM") {
-			$indirec = CleanupTagsY($indirec);
+			$indirec = EditFunctions::CleanupTagsY($indirec);
 			$parents = array();
 			$ct = preg_match("/1 HUSB @(.*)@/", $indirec, $match);
 			if ($ct>0) $parents["HUSB"]=$match[1];
@@ -954,7 +954,7 @@ abstract class ImportFunctions {
 						}
 					}
 					// If not, keep the old ID. If assigned, generate a new one						
-					if ($exist) $new_m_media = GetNewXref("OBJE");
+					if ($exist) $new_m_media = EditFunctions::GetNewXref("OBJE");
 					else $new_m_media = $match[1];
 					$found_ids[$match[1]]["old_id"] = $match[1];
 					$found_ids[$match[1]]["new_id"] = $new_m_media;
@@ -1019,8 +1019,8 @@ abstract class ImportFunctions {
 						$file = RelativePathFile(MediaFS::CheckMediaDepth($file));
 						
 						// Add a check for existing file here
-						$em = CheckDoubleMedia($file, $title, $gedfile);
-						if (!$em) $m_media = GetNewXref("OBJE");
+						$em = EditFunctions::CheckDoubleMedia($file, $title, $gedfile);
+						if (!$em) $m_media = EditFunctions::GetNewXref("OBJE");
 						else $m_media = $em;
 						
 						// Get the extension
@@ -1084,7 +1084,7 @@ abstract class ImportFunctions {
 							}
 							else {
 								// NOTE: Get a new media ID
-								$new_mm_media = GetNewXref("OBJE");
+								$new_mm_media = EditFunctions::GetNewXref("OBJE");
 							}
 							// NOTE: Put both IDs in the found_ids array in case we later find the 0-level
 							// NOTE: The 0-level ID will have to be changed also
@@ -1166,8 +1166,8 @@ abstract class ImportFunctions {
 						$file = RelativePathFile(MediaFS::CheckMediaDepth($file));
 						
 						// Add a check for existing file here
-						$em = CheckDoubleMedia($file, $title, $gedfile);
-						if (!$em) $m_media = GetNewXref("OBJE");
+						$em = EditFunctions::CheckDoubleMedia($file, $title, $gedfile);
+						if (!$em) $m_media = EditFunctions::GetNewXref("OBJE");
 						else $m_media = $em;
 	
 						// Get the extension
@@ -1236,8 +1236,8 @@ abstract class ImportFunctions {
 							if ($objrec{0} != 0) {
 								
 								// Add a check for existing file here
-								$em = CheckDoubleMedia($file, $title, $gedfile);
-								if (!$em) $m_media = GetNewXref("OBJE");
+								$em = EditFunctions::CheckDoubleMedia($file, $title, $gedfile);
+								if (!$em) $m_media = EditFunctions::GetNewXref("OBJE");
 								else $m_media = $em;
 								
 								if (preg_match("/^\d+\s\w+\s@(.*)@/", $objrec) > 0) {
@@ -1380,10 +1380,10 @@ abstract class ImportFunctions {
 	 * @param string $surname	the surname for this name
 	 * @param string $letter	the letter for this name
 	 */
-	public function AddNewName($indi, $newname, $letter, $surname, $indirec) {
+	public function AddNewName($indi, $newname, $letter, $surname, $nick, $indirec) {
 	
 		$kgid = JoinKey($indi->xref, $indi->gedcomid);
-		$sql = "INSERT INTO ".TBLPREFIX."names VALUES('0', '".DbLayer::EscapeQuery($kgid)."','".DbLayer::EscapeQuery($indi->xref)."','".$indi->gedcomid."','".DbLayer::EscapeQuery($newname)."','".DbLayer::EscapeQuery($letter)."','".DbLayer::EscapeQuery($surname)."','C')";
+		$sql = "INSERT INTO ".TBLPREFIX."names VALUES('0', '".DbLayer::EscapeQuery($kgid)."','".DbLayer::EscapeQuery($indi->xref)."','".$indi->gedcomid."','".DbLayer::EscapeQuery($newname)."','".DbLayer::EscapeQuery($letter)."','".DbLayer::EscapeQuery($surname)."', '".DbLayer::EscapeQuery($nick)."','C')";
 		$res = NewQuery($sql);
 		
 		$name_array = $indi->name_array;
@@ -1408,9 +1408,9 @@ abstract class ImportFunctions {
 	public function GetFemalesWithFAMS($gedid) {
 		
 		$flist = array();
-		$sql = "SELECT i_key, i_gedrec, i_isdead, i_id, i_file, n_name, n_surname, n_letter, n_type ";
+		$sql = "SELECT i_key, i_gedrec, i_isdead, i_id, i_file, n_name, n_surname, n_nick, n_letter, n_type ";
 		$sql .= "FROM ".TBLPREFIX."individuals INNER JOIN ".TBLPREFIX."names ON n_key=i_key ";
-		$sql .= "WHERE i_gender='F' AND i_file = '".$gedid."' AND i_gedrec LIKE '%1 FAMS%' AND n_type='P'";
+		$sql .= "WHERE i_gender='F' AND i_file = '".$gedid."' AND i_gedrec LIKE '%1 FAMS%' AND n_type='P' ORDER BY i_key, n_id";
 		// N.B. Only primary names are added, as this will be affected by married names!
 		
 		$res = NewQuery($sql);
@@ -1423,7 +1423,7 @@ abstract class ImportFunctions {
 				$person =& Person::GetInstance($row["i_id"], $row, $row["i_file"]);
 				$flist[$row["i_key"]] = $person;
 			}
-			$flist[$row["i_key"]]->addname = array($row["n_name"], $row["n_letter"], $row["n_surname"], $row["n_type"]);
+			$flist[$row["i_key"]]->addname = array($row["n_name"], $row["n_letter"], $row["n_surname"], $row["n_nick"], $row["n_type"]);
 		}
 		if ($key != "") $person->names_read = true;
 		$res->FreeResult();

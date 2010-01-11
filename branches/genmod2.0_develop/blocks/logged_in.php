@@ -59,7 +59,7 @@ function print_logged_in_users($block=true, $config="", $side, $index) {
 
 		print "<div id=\"logged_in_users\" class=\"block\">\n";
 		print "<div class=\"blockhc\">";
-		print_help_link("index_loggedin_help", "qm", "users_logged_in");
+		PrintHelpLink("index_loggedin_help", "qm", "users_logged_in");
 		print GM_LANG_users_logged_in;
 		print "</div>";
 		print "<div class=\"blockcontent\">";
@@ -74,14 +74,14 @@ function print_logged_in_users($block=true, $config="", $side, $index) {
 		if ($NumAnonymous > 0) {
 			// Anonymous = 1
 			define("GM_LANG_global_num1", $NumAnonymous);	// Make it visible
-			print "<b>".print_text($Advisory,0,1)."</b>";
+			print "<b>".PrintText($Advisory,0,1)."</b>";
 		}
 		$Advisory = "login_user";
 		if ($LoginUsers > 1) $Advisory .= "s";
 		if ($LoginUsers > 0) {
 			// Logged_in = 2
 			define("GM_LANG_global_num2", $LoginUsers);		// Make it visible
-			print "<b>".print_text($Advisory,0,1)."</b>";
+			print "<b>".PrintText($Advisory,0,1)."</b>";
 		}
 		if (count($loggedusers) > 0) print "<table width=\"90%\">";
 		foreach($loggedusers as $indexval => $user) {

@@ -541,7 +541,7 @@ if ($view != "preview") {
 	
 	// NOTE: rootid
 	print "<td class=\"shade2\">";
-	print_help_link("rootid_help", "qm");
+	PrintHelpLink("rootid_help", "qm");
 	print GM_LANG_root_person."</td>";
 	print "<td class=\"shade1\">";
 	print "<input class=\"pedigree_form\" type=\"text\" name=\"rootid\" id=\"rootid\" size=\"3\" value=\"$rootid\" />";
@@ -550,7 +550,7 @@ if ($view != "preview") {
 	
 	// NOTE: fan style
 	print "<td rowspan=\"3\" class=\"shade2\">";
-	print_help_link("fan_style_help", "qm");
+	PrintHelpLink("fan_style_help", "qm");
 	print GM_LANG_fan_chart."</td>";
 	print "<td rowspan=\"3\" class=\"shade1\">";
 	print "<input type=\"radio\" name=\"fan_style\" value=\"2\"";
@@ -570,7 +570,7 @@ if ($view != "preview") {
 	
 	// NOTE: generations
 	print "<tr><td class=\"shade2\">";
-	print_help_link("PEDIGREE_GENERATIONS_help", "qm");	
+	PrintHelpLink("PEDIGREE_GENERATIONS_help", "qm");	
 	print GM_LANG_generations."</td>";
 	print "<td class=\"shade1\">";
 //	print "<input type=\"text\" name=\"PEDIGREE_GENERATIONS\" size=\"3\" value=\"$OLD_PGENS\" /> ";
@@ -585,7 +585,7 @@ if ($view != "preview") {
 	print "</tr><tr>";
 	// NOTE: fan width
 	print "<td class=\"shade2\">";
-	print_help_link("fan_width_help", "qm");
+	PrintHelpLink("fan_width_help", "qm");
 	print GM_LANG_fan_width."</td>";
 	print "<td class=\"shade1\">";
 	print "<input type=\"text\" size=\"3\" name=\"fan_width\" value=\"$fan_width\" /> <b>%</b> ";

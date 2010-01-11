@@ -28,127 +28,6 @@
 if (stristr($_SERVER["SCRIPT_NAME"],basename(__FILE__))) {
 	require "../../intrusion.php";
 }
-/**
- * print a person in a list
- *
- * This function will print a
- * clickable link to the individual.php
- * page with the person's name
- * lastname, firstname and their
- * birthplace and date
- * @param string $key the GEDCOM xref id of the person to print
- * @param array $value is an array of the form array($name, $GEDCOM)
- */
-function print_list_person($key, $value, $findid=false, $asso="", $useli=true, $fact="") {
-	global $pass, $indi_private, $indi_hide, $indi_total, $NAME_REVERSE;
-	global $GEDCOMID, $TEXT_DIRECTION, $GM_IMAGES, $SHOW_DEATH_LISTS;
-	
-	$key = splitkey($key, "id");
-	SwitchGedcom($value[1]);
-	
-	if (!isset($indi_private)) $indi_private=array();
-	if (!isset($indi_hide)) $indi_hide=array();
-	if (!isset($indi_total)) $indi_total=array();
-	$indi_total[$key."[".$GEDCOMID."]"] = 1;
-
-	$disp = PrivacyFunctions::displayDetailsByID($key);
-	if ($disp) $disp2 = true;
-	else $disp2 = PrivacyFunctions::showLivingNameByID($key);
-	if ($disp2 || $disp) {
-		if ($useli) {
-			if (begRTLText($value[0]))                            //-- For future use
-				 print "<li class=\"rtl\" dir=\"rtl\">";
-			else print "<li class=\"ltr\" dir=\"ltr\">";
-		}
-//		if ($NAME_REVERSE || HasChinese($value[0])) $value[0] = str_replace(", ", "", $value[0]);
-		if ($findid == true) {
-			print "<a href=\"#\" onclick=\"pasteid('".$key."', '".urlencode(preg_replace("/'/", "\\'", PrintReady($value[0])));
-			if ($disp) print "<br />".urlencode(print_first_major_fact($key, "", false));
-			print "'); return false;\" class=\"list_item\"><b>";
-			if (HasChinese($value[0])) print PrintReady($value[0]." (".GetPinYin($value[0]).")");
-			else print PrintReady($value[0]);
-			print "</b>";
-		}
-		else {
-			print "<a href=\"individual.php?pid=$key&amp;gedid=$value[1]\" class=\"list_item\"";
-			if (!empty($fact)) print " target=\"blank\" ";
-			print "><b>";
-//			if (HasChinese($value[0])) print PrintReady($value[0]." (".GetPinYin($value[0]).")");
-//			else print PrintReady($value[0]);
-			print PrintReady($value[0]);
-			print "</b>";
-		}
-		if (GedcomConfig::$SHOW_ID_NUMBERS){
-		   if ($TEXT_DIRECTION=="ltr") print " <span dir=\"ltr\">($key)</span>";
-  		   else print " <span dir=\"rtl\">($key)</span>";
-		}
-
-		if (!$disp) {
-			print " -- <i>".GM_LANG_private."</i>";
-			$indi_private[$key."[".$GEDCOMID."]"] = 1;
-		}
-		else {
-			$pfact = print_first_major_fact($key);
-			if (isset($SHOW_DEATH_LISTS) && $SHOW_DEATH_LISTS==true) {
-				if ($pfact!="DEAT") {
-					$indirec = FindPersonRecord($key);
-					$factrec = GetSubRecord(1, "1 DEAT", $indirec);
-					if (strlen($factrec)>7 && PrivacyFunctions::showFact("DEAT", $key, "INDI") && !PrivacyFunctions::FactViewRestricted($key, $factrec)) {
-						print " -- <i>";
-						print GM_FACT_DEAT;
-						print " ";
-						print_fact_date($factrec);
-						print_fact_place($factrec);
-						print "</i>";
-					}
-				}
-			}
-		}
-		if (!empty($fact)) {
-			print " <i>(";
-			if (defined("GM_FACT_".$fact)) print constant("GM_FACT_".$fact);
-			else print $fact;
-			print ")</i>";
-		}
-		print "</a>";
-		if (is_array($asso) && ($disp)) {
-			foreach ($asso as $akey => $avalue) {
-				$newged = splitkey($avalue[0], "gedid");
-				SwitchGedcom($newged);
-				$key = splitkey($avalue[0], "id");
-				if ($avalue[1] == "indi") {
-					$name = GetPersonName($key);
-					print "<br /><a href=\"individual.php?pid=$key&amp;gedid=$GEDCOMID\" title=\"$name\" class=\"list_item\">";
-  				}
-  				else {
-					$name = GetFamilyDescriptor($key);
-					print "<br /><a href=\"family.php?famid=$key&amp;gedid=$GEDCOMID\" title=\"$name\" class=\"list_item\">";
-				}
-				if ($TEXT_DIRECTION=="ltr") print " <span dir=\"ltr\">";
-				else print " <span dir=\"rtl\">";
-				print "(".GM_LANG_associate_with." ";
-				if (GedcomConfig::$SHOW_ID_NUMBERS) print $key;
-				print ": ".$name;
-				if (!empty($avalue[2]) || !empty($avalue[3])) {
-					print " - ";
-					if (!empty($avalue[2])) print constant("GM_FACT_".$avalue[2]);
-					if(!empty($avalue[2]) && !empty($avalue[3])) print " : ";
-					if (defined("GM_LANG_".$avalue[3])) print constant("GM_LANG_".$avalue[3]);
-					else print $avalue[3];
-				}
-				print ")</span></a>";
-	  			SwitchGedcom();
-			}
-		}
-
-		if ($useli) print "</li>";
-	}
-	else {
-		$pass = TRUE;
-		$indi_hide[$key."[".$GEDCOMID."]"] = 1;
-	}
-	SwitchGedcom();
-}
 
 //-- print information about a family for a list view
 // param fact is for sanitycheck to print the fact and open a new page in a new window.
@@ -268,49 +147,6 @@ function print_list_family($key, $value, $findid=false, $asso="", $useli=true, $
 	}															//end re-added by pluntke
 	SwitchGedcom();
 }
-// Initializes counters for lists
-function InitListCounters($action = "reset") {
-	global $indi_total, $indi_hide, $indi_private;
-	global $fam_total, $fam_hide, $fam_private;
-	global $repo_total, $repo_hide;
-	global $source_total, $source_hide;
-	global $note_total, $note_hide;
-	global $media_total, $media_hide;
-
-	if ($action != "reset") {
-		if (!isset($indi_total)) $indi_total = array();
-		if (!isset($indi_private)) $indi_private = array();
-		if (!isset($indi_hide)) $indi_hide = array();
-		if (!isset($fam_total)) $fam_total = array();
-		if (!isset($fam_private)) $fam_private = array();
-		if (!isset($fam_hide)) $fam_hide = array();
-		if (!isset($source_total)) $source_total = array();
-		if (!isset($source_hide)) $source_hide = array();
-		if (!isset($repo_total)) $repo_total = array();
-		if (!isset($repo_hide)) $repo_hide = array();
-		if (!isset($note_total)) $note_total = array();
-		if (!isset($note_hide)) $note_hide = array();
-		if (!isset($media_total)) $media_total = array();
-		if (!isset($media_hide)) $media_hide = array();
-	}
-	else {
-		$indi_total = array();
-		$indi_private = array();
-		$indi_hide = array();
-		$fam_total = array();
-		$fam_private = array();
-		$fam_hide = array();
-		$source_total = array();
-		$source_hide = array();
-		$repo_total = array();
-		$repo_hide = array();
-		$note_total = array();
-		$note_hide = array();
-		$media_total = array();
-		$media_hide = array();
-	}
-}
-
 /**
  * print out standard HTML header
  *
@@ -980,10 +816,10 @@ function print_simple_fact($indirec, $fact, $pid) {
  * @param string $help		The variable that needs to be processed.
  * @param int $helpText		The text to be printed if the theme does not use images for help links
  * @param int $show_desc		The text to be shown as JavaScript description
- * @param boolean $use_print_text	If the text needs to be printed with the print_text() function
+ * @param boolean $use_print_text	If the text needs to be printed with the PrintText() function
  * @param boolean $output	return the text instead of printing it
  */
-function print_help_link($help, $helpText, $show_desc="", $use_print_text=false, $return=false) {
+function PrintHelpLink($help, $helpText, $show_desc="", $use_print_text=false, $return=false) {
 	global $view, $GM_IMAGES, $gm_user;
 	
 	if (GM_USE_HELPIMG) $sentense = "<img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["help"]["small"]."\" class=\"icon\" width=\"15\" height=\"15\" alt=\"\" />";
@@ -994,7 +830,7 @@ function print_help_link($help, $helpText, $show_desc="", $use_print_text=false,
 			if ($gm_user->userIsAdmin()){
 				 $output .= " <a class=\"error help\" tabindex=\"0\" href=\"javascript:";
 				 if ($show_desc == "") $output .= $help;
-				 else if ($use_print_text) $output .= print_text($show_desc, 0, 1);
+				 else if ($use_print_text) $output .= PrintText($show_desc, 0, 1);
 				 else if (stristr(constant("GM_LANG_".$show_desc), "\"")) $output .= preg_replace('/\"/','\'', constant("GM_LANG_".$show_desc));
 				 else  $output .= strip_tags(constant("GM_LANG_".$show_desc));
 				 $output .= "\" onclick=\"helpPopup('$help'); return false;\">".$sentense."</a> \n";
@@ -1003,7 +839,7 @@ function print_help_link($help, $helpText, $show_desc="", $use_print_text=false,
 		else {
 			$output .= " <a class=\"help\" tabindex=\"0\" href=\"javascript: ";
 			if ($show_desc == "") $output .= $help;
-			else if ($use_print_text) $output .= print_text($show_desc, 0, 1);
+			else if ($use_print_text) $output .= PrintText($show_desc, 0, 1);
 			else if (stristr(constant("GM_LANG_".$show_desc), "\"")) $output .= preg_replace('/\"/','\'',constant("GM_LANG_".$show_desc));
 			else  $output .= strip_tags(constant("GM_LANG_".$show_desc));
 			$output .= "\" onclick=\"helpPopup('$help'); return false;\">".$sentense."</a> \n";
@@ -1034,12 +870,12 @@ function print_help_link($help, $helpText, $show_desc="", $use_print_text=false,
  *		on something other than $gm_lang array entries, but coded according to the
  *		same rules.
  * When we want it to return text we need to code:
- * print_text($mytext, 0, 1);
+ * PrintText($mytext, 0, 1);
  * @param string $help		The variable that needs to be processed.
  * @param int $level		The position of the embedded variable
  * @param int $noprint		The switch if the text needs to be printed or returned
  */
-function print_text($help, $level=0, $noprint=0){
+function PrintText($help, $level=0, $noprint=0){
 	 global $GEDCOM_TITLE, $LANGUAGE;
 	 global $GUESS_URL, $UpArrow;
 	 global $repeat, $thumbnail, $xref, $pid, $LANGUAGE;
@@ -1087,7 +923,7 @@ function print_text($help, $level=0, $noprint=0){
 		  $value = "";
 		  $newreplace = preg_replace(array("/factarray/","/gm_lang/","/\[/","/\]/"), array("","","",""), $match[$i][1]);
 		  if ($DEBUG_LANG == "yes") print "[LANG_DEBUG] Embedded variable: ".$match[$i][1]."<br /><br />";
-		  $value = print_text($newreplace, $level+1);
+		  $value = PrintText($newreplace, $level+1);
 		  if (!empty($value)) $sentence = str_replace($match[$i][0], $value, $sentence);
 		  else if ($noprint==0) $sentence = str_replace($match[$i][0], $match[$i][1].": ".GM_LANG_var_not_exist, $sentence);
 	 }
@@ -1106,7 +942,7 @@ function print_text($help, $level=0, $noprint=0){
 	 if ($level>0) return $sentence;
 	 print $sentence;
 }
-function print_help_index($help){
+function PrintHelpIndex($help){
 
 	 $sentence = constant("GM_LANG_".$help);
 	 $mod_sentence = "";
@@ -1127,7 +963,7 @@ function print_help_index($help){
 		$sub = preg_replace(array("/gm_lang\\[/","/\]/"), array("",""), $replace);
 		if (defined("GM_LANG_".$sub)) {
 			$items = preg_split("/,/", constant("GM_LANG_".$sub));
-			$var = print_text($items[1],0,1);
+			$var = PrintText($items[1],0,1);
 		}
 		$sub = preg_replace(array("/factarray\\[/","/\]/"), array("",""), $replace);
 //		print "sub: ".$sub."<br />";
@@ -1740,7 +1576,7 @@ function print_first_major_fact($key, $indirec="", $prt=true, $break=false) {
  *
  * @param none
  */
-function init_calendar_popup() {
+function InitCalendarPopUp() {
 	global $monthtonum, $WEEK_START;
 
 	print "<script language=\"JavaScript\" type='text/javascript'>\n<!--\n";
@@ -1970,7 +1806,7 @@ function PrintFamilyList($familylist, $print_all=true, $find=false, $allgeds="no
 		print "<td class=\"shade1 list_value indilist\">\n";
 		foreach($familylist as $gid => $fam) {
 			$fam = $famlist[$gid];
-			$fam["name"] = CheckNN($fam["name"]);
+			$fam["name"] = NameFunctions::CheckNN($fam["name"]);
 			$pass = false;
 			if ($COMBIKEY) $gid = SplitKey($gid, "id");
 			if (HasChinese($fam["name"])) $fam["name"] .= " (".GetFamilyAddDescriptor($gid, false, $fam["gedcom"], false).")";
@@ -2034,4 +1870,18 @@ function PrintFilterEvent($filterev) {
 		else print ">".constant("GM_FACT_".$event)."</option>\n";
 	}
 }
+
+function PrintCachedObjectCount() {
+	if (DEBUG) {
+		print "Objects:";
+		print " P: ".(class_exists("Person", false) ? Person::objcount() : 0);
+		print " F: ".(class_exists("Family", false) ? Family::objcount() : 0);
+		print " M: ".(class_exists("MediaItem", false) ? MediaItem::objcount() : 0);
+		print " S: ".(class_exists("Source", false) ? Source::objcount() : 0);
+		print " R: ".(class_exists("Repository", false) ? Repository::objcount() : 0);
+		print " N: ".(class_exists("Note", false) ? Note::Objcount() : 0);
+		print " U: ".(class_exists("User", false) ? User::objcount() : 0);
+		print "<br />";
+	}
+}	
 ?>

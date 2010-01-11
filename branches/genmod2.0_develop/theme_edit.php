@@ -49,7 +49,7 @@ PrintHeader("Theme editor");
 <form name="editform" method="post";">
 <input type="hidden" name="oldusername" value="<?php print $uname; ?>" />
 <table class="list_table <?php print $TEXT_DIRECTION; ?>">
-<tr><td class="facts_label"><?php print GM_LANG_user_theme;print_help_link("edituser_user_theme_help", "qm");?></td><td class="facts_value" valign="top">
+<tr><td class="facts_label"><?php print GM_LANG_user_theme;PrintHelpLink("edituser_user_theme_help", "qm");?></td><td class="facts_value" valign="top">
 	<select name="choose_theme">
 	<option value=""><?php print GM_LANG_site_default; ?></option>
 			<?php

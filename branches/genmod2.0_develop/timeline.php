@@ -293,13 +293,13 @@ $controller->checkPrivacy();
 			<input type="hidden" name="pids<?php print $p; ?>" value="<?php print $pid; ?>" />
 			<?php if (!$controller->isPrintPreview()) {
 				print "<br />";
-				print_help_link("remove_person_help", "qm");
+				PrintHelpLink("remove_person_help", "qm");
 				?>
 				<a href="timeline.php?<?php print $controller->pidlinks; ?>&amp;scale=<?php print $controller->scale; ?>&amp;remove=<?php print $pid;?>" >
 				<span class="details1"><?php print GM_LANG_remove_person; ?></span></a>
 			<?php if ($indi->brec != "") { ?>
 				<span class="details1"><br />
-				<?php print_help_link("show_age_marker_help", "qm"); ?>
+				<?php PrintHelpLink("show_age_marker_help", "qm"); ?>
 				<?php print GM_LANG_show_age; ?>
 				<input type="checkbox" name="agebar<?php print $p; ?>" value="ON" onclick="showhide('agebox<?php print $p; ?>', this);" />
 				</span>
@@ -314,7 +314,7 @@ $controller->checkPrivacy();
 			<input type="hidden" name="pids[<?php print $p; ?>]" value="<?php print $pid; ?>" />
 			<?php if (!$controller->isPrintPreview()) {
 				print "<br />";
-				print_help_link("remove_person_help", "qm");
+				PrintHelpLink("remove_person_help", "qm");
 				?>
 				<a href="timeline.php?<?php print $controller->pidlinks; ?>&amp;scale=<?php print $controller->scale; ?>&amp;remove=<?php print $pid;?>" >
 				<span class="details1"><?php print GM_LANG_remove_person; ?></span></a>
@@ -327,7 +327,7 @@ $controller->checkPrivacy();
 		if (!isset($col)) $col = 0;
 		?>
 		<td class="person<?php print $col; ?>" style="padding: 5px" valign="top">
-			<?php print_help_link("add_person_help", "qm"); ?>
+			<?php PrintHelpLink("add_person_help", "qm"); ?>
 			<?php print GM_LANG_add_another;?>&nbsp;
 			<input class="pedigree_form" type="text" size="5" id="newpid" name="newpid" />&nbsp;
 			<?php LinkFunctions::PrintFindIndiLink("newpid","");?>

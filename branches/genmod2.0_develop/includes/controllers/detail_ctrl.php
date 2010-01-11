@@ -234,7 +234,7 @@ abstract class DetailController extends BaseController{
 					if ($this->object_name == "media") {
 						print "<tr>";
 						print "<td class=\"shade2\">";
-						print_help_link("add_media_link_help", "qm");
+						PrintHelpLink("add_media_link_help", "qm");
 						print GM_LANG_add_media_link_lbl."</td>";
 						print "<td class=\"shade1\">";
 						print "<a href=\"javascript: ".GM_LANG_add_media_lbl."\" onclick=\"add_new_record('". $this->$object_name->xref."','".$this->$object_name->datatype."', 'add_media_link'); return false;\">".GM_LANG_add_media_link."</a>";
@@ -478,11 +478,11 @@ abstract class DetailController extends BaseController{
 							if (!$this->view) {
 						 		print " - <a href=\"family.php?famid=".$family->xref."&amp;gedid=".$family->gedcomid."\">[".GM_LANG_view_family.$family->addxref."]</a>&nbsp;&nbsp;";
 					 			if ($family->husb_id == "" && $this->$object_name->canedit) { 
-					 				print_help_link("edit_add_parent_help", "qm");
+					 				PrintHelpLink("edit_add_parent_help", "qm");
 									print "<a href=\"javascript ".GM_LANG_add_father."\" onclick=\"return addnewparentfamily('', 'HUSB', '".$family->xref."', 'add_father');\">".GM_LANG_add_father."</a>";
 								}
 					 			if ($family->wife_id == "" && $this->$object_name->canedit) { 
-					 				print_help_link("edit_add_parent_help", "qm");
+					 				PrintHelpLink("edit_add_parent_help", "qm");
 									print "<a href=\"javascript ".GM_LANG_add_mother."\" onclick=\"return addnewparentfamily('', 'WIFE', '".$family->xref."', 'add_mother');\">".GM_LANG_add_mother."</a>";
 								}
 							}
@@ -581,7 +581,7 @@ abstract class DetailController extends BaseController{
 						$table = true;
 					}
 					print "<tr><td class=\"width20 shade2\">";
-					print_help_link("add_source_help", "qm");
+					PrintHelpLink("add_source_help", "qm");
 					print GM_LANG_add_source_lbl."</td><td class=\"shade1\">";
 					print "<a href=\"javascript: ".GM_LANG_add_source."\" onclick=\"add_new_record('".$this->$object_name->xref."','SOUR', 'add_source'); return false;\">".GM_LANG_add_source."</a>";
 					print "<br /></td></tr>";
@@ -614,7 +614,7 @@ abstract class DetailController extends BaseController{
 						$table = true;
 					}
 					print "<tr><td class=\"shade2 width20\">";
-					print_help_link("add_media_help", "qm");
+					PrintHelpLink("add_media_help", "qm");
 					print GM_LANG_add_media_lbl."</td><td class=\"shade1\">";
 					print "<a href=\"javascript: ".GM_LANG_add_media_lbl."\" onclick=\"add_new_record('".$this->$object_name->xref."','OBJE', 'add_media'); return false;\">".GM_LANG_add_media."</a>";
 					print "</td></tr>";
@@ -646,12 +646,12 @@ abstract class DetailController extends BaseController{
 						$table = true;
 					}
 					print "<tr><td class=\"shade2 width20\">";
-					print_help_link("add_note_help", "qm");
+					PrintHelpLink("add_note_help", "qm");
 					print GM_LANG_add_note_lbl."</td><td class=\"shade1\">";
 					print "<a href=\"javascript: ".GM_LANG_add_note."\" onclick=\"add_new_record('".$this->$object_name->xref."','NOTE', 'add_note'); return false;\">".GM_LANG_add_note."</a>";
 					print "</td></tr>";
 					print "<tr><td class=\"shade2 width20\">";
-					print_help_link("add_general_note_help", "qm");
+					PrintHelpLink("add_general_note_help", "qm");
 					print GM_LANG_add_gnote_lbl."</td><td class=\"shade1\"><a href=\"javascript: ".GM_LANG_add_gnote."\" onclick=\"add_new_record('".$this->$object_name->xref."','GNOTE', 'add_gnote'); return false;\">".GM_LANG_add_gnote."</a>";
 					print "</td></tr>";
 				}
@@ -728,12 +728,13 @@ abstract class DetailController extends BaseController{
 	public function CheckPrivate() {
 		
 		$object_name = $this->object_name;
-		if (!$this->$object_name->disp && !($this->$object_name->datatype == "INDI" && $this->$object_name->disp_name)) {
-			$this->PrintDetailJS();
-			PrintFunctions::PrintPrivacyError(GedcomConfig::$CONTACT_EMAIL);
-			PrintFooter();
-			exit;
-		}
+		if ($this->$object_name->disp) return;
+		else if ($this->$object_name->datatype == "INDI" && $this->$object_name->disp_name) return;
+		else if ($this->$object_name->datatype == "FAM" && $this->$object_name->disp_name) return;
+		$this->PrintDetailJS();
+		PrintFunctions::PrintPrivacyError(GedcomConfig::$CONTACT_EMAIL);
+		PrintFooter();
+		exit;
 	}
 	
 	public function CheckRawEdited() {

@@ -97,7 +97,6 @@ function CheckForImport($gedid) {
  * @return string the raw gedcom record is returned
  */
 function FindFamilyRecord($famid, $gedfile="", $renew = false) {
-	global $COMBIKEY;
 	global $GEDCOMID, $famlist, $COMBIKEY;
 	
 	
@@ -165,7 +164,7 @@ function FindPersonRecord($pid, $gedfile="", $renew = false, $nocache = false) {
 		$indi = array();
 		$indi["gedcom"] = $row["i_gedrec"];
 		if ($nocache) return $indi["gedcom"];
-		$indi["names"] = GetIndiNames($row["i_gedrec"]);
+		$indi["names"] = NameFunctions::GetIndiNames($row["i_gedrec"]);
 		$indi["isdead"] = $row["i_isdead"];
 		$indi["gedfile"] = $row["i_file"];
 		$res->FreeResult();
@@ -517,54 +516,6 @@ function ResetIsDeadLinked($pid, $type="INDI") {
 }
 
 
-/*
-* Return the media ID based on the FILE and TITLE value, depending on the gedcom setting
-* If check for existing media is disabled, return false.
-*/
-function CheckDoubleMedia($file, $title, $gedid) {
-	
-	if (GedcomConfig::$MERGE_DOUBLE_MEDIA == 0) return false;
-	
-	$sql = "SELECT m_media FROM ".TBLPREFIX."media WHERE m_file='".$gedid."' AND m_mfile LIKE '".DbLayer::EscapeQuery($file)."'";
-	if (GedcomConfig::$MERGE_DOUBLE_MEDIA == "2") $sql .= " AND m_titl LIKE '".DbLayer::EscapeQuery($title)."'";
-	$res = NewQuery($sql);
-	if ($res->NumRows() == 0) return false;
-	else {
-		$row = $res->FetchAssoc();
-		return $row["m_media"];
-	}
-}
-
-/**
- * get a list of all the source titles
- *
- * returns an array of all of the sourcetitles in the database.
- * @link http://Genmod.sourceforge.net/devdocs/arrays.php#sources
- * @return array the array of source-titles
- */
-function GetSourceAddTitleList() {
-	global $sourcelist, $GEDCOMID;
-
-	$sourcelist = array();
-
- 	$sql = "SELECT s_id, s_file, s_file as s_name, s_gedrec FROM ".TBLPREFIX."sources WHERE s_file='".$GEDCOMID."' and ((s_gedrec LIKE '% _HEB %') || (s_gedrec LIKE '% ROMN %'));";
-
-	$res = NewQuery($sql);
-	$ct = $res->NumRows();
-	while($row = $res->FetchAssoc()){
-		$source = array();
-		$ct = preg_match("/\d ROMN (.*)/", $row["s_gedrec"], $match);
- 		if ($ct==0) $ct = preg_match("/\d _HEB (.*)/", $row["s_gedrec"], $match);
-		$source["name"] = $match[1];
-		$source["gedcom"] = $row["s_gedrec"];
-		$source["gedfile"] = $row["s_file"];
-		$sourcelist[$row["s_id"]] = $source;
-	}
-	$res->FreeResult();
-
-	return $sourcelist;
-}
-
 /**
  * get a list of all the sources
  *
@@ -742,7 +693,7 @@ function GetIndiList($allgeds="", $selection = "", $renew=true) {
 		$indilist = array();
 	}
 	
-	$sql = "SELECT i_key, i_gedrec, i_isdead, i_id, i_file, n_name, n_surname, n_letter, n_type ";
+	$sql = "SELECT i_key, i_gedrec, i_isdead, i_id, i_file, n_name, n_surname, n_nick, n_letter, n_type ";
 	$sql .= "FROM ".TBLPREFIX."individuals, ".TBLPREFIX."names WHERE n_key=i_key ";
 	if ($allgeds == "no") {
 		$sql .= "AND i_file = ".$GEDCOMID." ";
@@ -758,7 +709,7 @@ function GetIndiList($allgeds="", $selection = "", $renew=true) {
 		$sql .= ")";
 	}
 	else if (!empty($selection)) $sql .= "AND i_key IN (".$selection.") ";
-//	$sql .= "ORDER BY i_letter, i_surname ASC";
+	$sql .= "ORDER BY i_key, n_id ASC";
 	$res = NewQuery($sql);
 	$ct = $res->NumRows($res->result);
 	while($row = $res->FetchAssoc($res->result)){
@@ -767,12 +718,12 @@ function GetIndiList($allgeds="", $selection = "", $renew=true) {
 		if (!isset($indilist[$key])) {
 			$indi = array();
 			$indi["gedcom"] = $row["i_gedrec"];
-			$indi["names"][] = array($row["n_name"], $row["n_letter"], $row["n_surname"], $row["n_type"]);
+			$indi["names"][] = array($row["n_name"], $row["n_letter"], $row["n_surname"], $row["n_nick"], $row["n_type"]);
 			$indi["isdead"] = $row["i_isdead"];
 			$indi["gedfile"] = $row["i_file"];
 			$indilist[$key] = $indi;
 		}
-		else $indilist[$key]["names"][] = array($row["n_name"], $row["n_letter"], $row["n_surname"], $row["n_type"]);
+		else $indilist[$key]["names"][] = array($row["n_name"], $row["n_letter"], $row["n_surname"], $row["n_nick"], $row["n_type"]);
 	}
 	$res->FreeResult();
 	if ($allgeds == "no" && $selection = "") $INDILIST_RETRIEVED = true;
@@ -780,64 +731,6 @@ function GetIndiList($allgeds="", $selection = "", $renew=true) {
 }
 
 
-//-- get the assolist from the datastore
-function GetAssoList($type = "all", $id="") {
-	global $assolist, $GEDCOMID;
-	global $ASSOLIST_RETRIEVED, $COMBIKEY, $ftminwlen, $ftmaxwlen;
-
-	if ($ASSOLIST_RETRIEVED) return $assolist;
-	$type = str2lower($type);
-	$assolist = array();
-	$resnvalues = array(""=>"", "n"=>"none", "l"=>"locked", "p"=>"privacy", "c"=>"confidential");
-	$oldgedid = $GEDCOMID;
-	if (($type == "all") || ($type == "fam")) {
-		$sql = "SELECT f_key, f_id, f_husb, f_wife, f_file, f_gedrec, as_pid, as_fact, as_rela, as_resn FROM ".TBLPREFIX."asso, ".TBLPREFIX."families WHERE f_key=as_of AND as_type='F'"; 
-		if (!empty($id)) $sql .= " AND as_pid LIKE '".JoinKey($id, $GEDCOMID)."'";
-		$sql .= "ORDER BY as_id";
-		$res = NewQuery($sql);
-		$ct = $res->NumRows();
-		while($row = $res->FetchAssoc()){
-			$asso = array();
-			$asso["type"] = "FAM";
-			$asso["pid2"] = $row["as_pid"];
-			$asso["gedcom"] = $row["f_gedrec"];
-			$asso["gedfile"] = $row["f_file"];
-			$asso["fact"] = $row["as_fact"];
-			$asso["resn"] = $resnvalues[$row["as_resn"]];
-			$asso["role"] = $row["as_rela"];
-			// Get the family names
-			$GEDCOMID = $row["f_file"];
-			$assolist[$row["f_key"]][] = $asso;
-		}
-		$res->FreeResult();
-	}
-
-	if (($type == "all") || ($type == "indi")) {
-		
-		$sql = "SELECT i_key, i_id, i_file, i_gedrec, as_pid, as_fact, as_rela, as_resn FROM ".TBLPREFIX."asso, ".TBLPREFIX."individuals WHERE i_key=as_of AND as_type='I'";	
-		if (!empty($id)) $sql .= " AND as_pid LIKE '".JoinKey($id, $GEDCOMID)."'";
-		$sql .= "ORDER BY as_id";
-		$res = NewQuery($sql);
-		$ct = $res->NumRows();
-		while($row = $res->FetchAssoc()) {
-			$asso = array();
-			$asso["type"] = "indi";
-			$asso["pid2"] = $row["as_pid"];
-			$asso["gedcom"] = $row["i_gedrec"];
-			$asso["gedfile"] = $row["i_file"];
-			$asso["name"] = GetIndiNames($row["i_gedrec"]);
-			$asso["fact"] = $row["as_fact"];
-			$asso["resn"] = $resnvalues[$row["as_resn"]];
-			$asso["role"] = $row["as_rela"];
-			$assolist[$row["i_key"]][] = $asso;
-		}
-		$res->FreeResult();
-	}
-	
-	$GEDCOMID = $oldgedid;
-	$ASSOLIST_RETRIEVED = true;
-	return $assolist;
-}
 
 //-- get the famlist from the datastore
 function GetFamList($allgeds="no", $selection="", $renew=true, $trans=array()) {
@@ -944,31 +837,6 @@ function GetOtherList() {
 	$res->FreeResult();
 	return $otherlist;
 }
-	//-- find all of the places
-	function FindPlaceList($place) {
-		global $placelist, $GEDCOMID;
-		
-		$sql = "SELECT p_id, p_place, p_parent_id  FROM ".TBLPREFIX."places WHERE p_file='".$GEDCOMID."' ORDER BY p_parent_id, p_id";
-		$res = NewQuery($sql);
-		while($row = $res->fetchRow()) {
-			if ($row[2]==0) $placelist[$row[0]] = $row[1];
-			else {
-				$placelist[$row[0]] = $placelist[$row[2]].", ".$row[1];
-			}
-		}
-		if (!empty($place)) {
-			$found = array();
-			foreach($placelist as $indexval => $pplace) {
-				if (preg_match("/$place/i", $pplace)>0) {
-					$upperplace = Str2Upper($pplace);
-					if (!isset($found[$upperplace])) {
-						$found[$upperplace] = $pplace;
-					}
-				}
-			}
-			$placelist = array_values($found);
-		}
-	}
 
 //-- get the first character in the list
 function GetFamAlpha($allgeds="no") {
@@ -1001,10 +869,11 @@ function GetFamAlpha($allgeds="no") {
 		if (!isset($famalpha[$letter])) $famalpha[$letter]=$letter;
 	}
 	$res->FreeResult();
-	$sql = "SELECT f_id FROM ".TBLPREFIX."families WHERE (f_husb='' || f_wife='')";
+	$sql = "SELECT count(f_id) FROM ".TBLPREFIX."families WHERE (f_husb='' || f_wife='')";
 	if ($allgeds == "no") $sql .= " AND f_file='".$GEDCOMID."'";
 	$res = NewQuery($sql);
-	if ($res->NumRows()>0) {
+	$row = $res->FetchRow();
+	if ($row[0] > 0) {
 		$famalpha["@"] = "@";
 	}
 	$res->FreeResult();
@@ -1055,7 +924,7 @@ function GetAlphaIndis($letter, $allgeds="no") {
 	// NOTE: Select the records from the individual table
 	$sql = "";
 	// NOTE: Select the records from the names table
-	$sql .= "SELECT i_key, i_id, i_isdead, n_letter, i_gedrec, n_file, n_type, n_name, n_surname, n_letter ";
+	$sql .= "SELECT i_key, i_id, i_isdead, n_letter, i_gedrec, n_file, n_type, n_name, n_surname, n_nick, n_letter ";
 	$sql .= "FROM ".TBLPREFIX."names, ".TBLPREFIX."individuals ";
 	$sql .= "WHERE n_key = i_key ";
 	$sql .= "AND ".$search_letter;
@@ -1066,6 +935,8 @@ function GetAlphaIndis($letter, $allgeds="no") {
 	// NOTE: Make the selection on the currently active gedcom
 	if ($allgeds != "yes") $sql .= "AND n_file = '".$GEDCOMID."' ";
 	if ($allgeds != "yes") $sql .= "AND i_file = '".$GEDCOMID."'";
+	
+	$sql .= " ORDER BY i_key, n_id";
 
 	$res = NewQuery($sql);
 	while($row = $res->FetchAssoc()) {
@@ -1074,7 +945,7 @@ function GetAlphaIndis($letter, $allgeds="no") {
 			else $key = $row["i_id"];
 			if (!isset($indilist[$key])) {
 				$indi = array();
-				if ($row["n_type"] != "C" || ($row["n_type"] == "C" && GedcomConfig::$SHOW_MARRIED_NAMES)) $indi["names"][] = array($row["n_name"], $row["n_letter"], $row["n_surname"], $row["n_type"]);
+				if ($row["n_type"] != "C" || ($row["n_type"] == "C" && GedcomConfig::$SHOW_MARRIED_NAMES)) $indi["names"][] = array($row["n_name"], $row["n_letter"], $row["n_surname"], $row["n_nick"], $row["n_type"]);
 				$indi["isdead"] = $row["i_isdead"];
 				$indi["gedcom"] = $row["i_gedrec"];
 				$indi["gedfile"] = $row["n_file"];
@@ -1103,29 +974,20 @@ function GetSurnameIndis($surname, $allgeds="no") {
 	global $LANGUAGE, $indilist, $GEDCOMID, $COMBIKEY;
 
 	$tindilist = array();
-	$sql = "SELECT i_key, i_id, i_file, i_isdead, i_gedrec, n_letter, n_name, n_surname, n_type FROM ".TBLPREFIX."individuals, ".TBLPREFIX."names WHERE i_key=n_key AND n_surname LIKE '".DbLayer::EscapeQuery($surname)."' ";
+	$sql = "SELECT i_key, i_id, i_file, i_isdead, i_gedrec, n_letter, n_name, n_surname, n_nick, , n_type FROM ".TBLPREFIX."individuals, ".TBLPREFIX."names WHERE i_key=n_key AND n_surname LIKE '".DbLayer::EscapeQuery($surname)."' ";
 	if (!GedcomConfig::$SHOW_MARRIED_NAMES) $sql .= "AND n_type!='C' ";
 	if ($allgeds == "no") $sql .= "AND i_file='".$GEDCOMID."'";
-	$sql .= " ORDER BY n_surname";
+	$sql .= " ORDER BY i_key, n_id";
 	$res = NewQuery($sql);
 	while($row = $res->FetchAssoc()){
-		if (GedcomConfig::$SHOW_NICK) {
-			$n = NameFunctions::GetNicks($row["i_gedrec"]);
-			if (count($n) > 0) {
-				$ct = preg_match("~(.*)/(.*)/(.*)~", $row["n_name"], $match);
-				if ($ct>0) $row["n_name"] = $match[1].substr(GedcomConfig::$NICK_DELIM, 0, 1).$n[0].substr(GedcomConfig::$NICK_DELIM, 1, 1)."/".$match[2]."/".$match[3];
-//				$ct = preg_match("~(.*)/(.*)/(.*)~", $row["i_name"], $match);
-//				$row["i_name"] = $match[1].substr(GedcomConfig::$NICK_DELIM, 0, 1).$n[0].substr(GedcomConfig::$NICK_DELIM, 1, 1)."/".$match[2]."/".$match[3];
-			}
-		}
 		if (!$COMBIKEY) $key = $row["i_id"];
 		else $key = $row["i_key"];
 		if (isset($indilist[$key])) {
-			if ($row["n_type"] != "C" || ($row["n_type"] == "C" && GedcomConfig::$SHOW_MARRIED_NAMES)) $indilist[$key]["names"][] = array($row["n_name"], $row["n_letter"], $row["n_surname"], $row["n_type"]);
+			if ($row["n_type"] != "C" || ($row["n_type"] == "C" && GedcomConfig::$SHOW_MARRIED_NAMES)) $indilist[$key]["names"][] = array($row["n_name"], $row["n_letter"], $row["n_surname"], $row["n_nick"], $row["n_type"]);
 		}
 		else {
 			$indi = array();
-			if ($row["n_type"] != "C" || ($row["n_type"] == "C" && GedcomConfig::$SHOW_MARRIED_NAMES)) $indi["names"][] = array($row["n_name"], $row["n_letter"], $row["n_surname"], $row["n_type"]);
+			if ($row["n_type"] != "C" || ($row["n_type"] == "C" && GedcomConfig::$SHOW_MARRIED_NAMES)) $indi["names"][] = array($row["n_name"], $row["n_letter"], $row["n_surname"], $row["n_nick"], $row["n_type"]);
 			$indi["isdead"] = $row["i_isdead"];
 			$indi["gedcom"] = $row["i_gedrec"];
 			$indi["gedfile"] = $row["i_file"];
@@ -1423,7 +1285,7 @@ function WriteToLog($LogString, $type="I", $cat="S", $gedid="", $chkconn = true)
 	}
 	
 	if ($cat == "S") {
-		$sql = "INSERT INTO ".TBLPREFIX."log (l_type, l_category, l_timestamp, l_ip, l_user, l_text, l_file, l_new) VALUES('".$type."','".$cat."','".time()."', '".$_SERVER['REMOTE_ADDR']."', '".addslashes($gm_user->username)."', '".addslashes($LogString)."', '', '".$new."')";
+		$sql = "INSERT INTO ".TBLPREFIX."log (l_type, l_category, l_timestamp, l_ip, l_user, l_text, l_file, l_new) VALUES('".$type."','".$cat."',".time().", '".$_SERVER['REMOTE_ADDR']."', '".addslashes($gm_user->username)."', '".addslashes($LogString)."', '', '".$new."')";
 		$res = NewQuery($sql);
 		return;
 	}
@@ -1531,7 +1393,7 @@ function GetUnlinked() {
 	
 	$uindilist = array();
 	
-	$sql = "SELECT i_id, i_gedrec, i_file, i_isdead, n_name, n_letter, n_surname, n_type FROM ".TBLPREFIX."individuals LEFT JOIN ".TBLPREFIX."names ON i_key=n_key LEFT JOIN ".TBLPREFIX."individual_family ON i_key=if_pkey WHERE if_pkey IS NULL AND i_file='".$GEDCOMID."'";
+	$sql = "SELECT i_id, i_gedrec, i_file, i_isdead, n_name, n_letter, n_surname, n_nick, n_type FROM ".TBLPREFIX."individuals LEFT JOIN ".TBLPREFIX."names ON i_key=n_key LEFT JOIN ".TBLPREFIX."individual_family ON i_key=if_pkey WHERE if_pkey IS NULL AND i_file='".$GEDCOMID."' ORDER BY i_key, n_id";
 
 	$res = NewQuery($sql);
 	if ($res) {
@@ -1539,14 +1401,14 @@ function GetUnlinked() {
 		while($row = $res->FetchAssoc()){
 			if (!isset($indilist[$row["i_id"]])) {
 				$indi = array();
-				$indi["names"][] = array($row["n_name"], $row["n_letter"], $row["n_surname"], $row["n_type"]);
+				$indi["names"][] = array($row["n_name"], $row["n_letter"], $row["n_surname"], $row["n_nick"], $row["n_type"]);
 				$indi["isdead"] = $row["i_isdead"];
 				$indi["gedcom"] = $row["i_gedrec"];
 				$indi["gedfile"] = $row["i_file"];
 				$indilist[$row["i_id"]] = $indi;
 			}
 			else {
-				$indilist[$row["i_id"]]["names"][] = array($row["n_name"], $row["n_letter"], $row["n_surname"], $row["n_type"]);
+				$indilist[$row["i_id"]]["names"][] = array($row["n_name"], $row["n_letter"], $row["n_surname"], $row["n_nick"], $row["n_type"]);
 			}
 			$uindilist[$row["i_id"]] = $indilist[$row["i_id"]];
 		}

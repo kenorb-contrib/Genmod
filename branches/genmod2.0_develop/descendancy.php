@@ -68,7 +68,7 @@ function paste_id(value) {
 if ($descendancy_controller->view != "preview") {
 	$show_famlink = true;
 	print "<form method=\"get\" name=\"people\" action=\"?\">\n";
-	// 	print_help_link("descendancy_help", "page_help");
+	// 	PrintHelpLink("descendancy_help", "page_help");
 	print "\n\t\t<table class=\"list_table ".$TEXT_DIRECTION."\" align=\"";
 	if ($TEXT_DIRECTION == "ltr") print "right";
 	else print "left";

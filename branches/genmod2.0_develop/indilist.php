@@ -33,7 +33,7 @@ $COMBIKEY = true;
 PrintHeader($indilist_controller->pagetitle);
 print "<div class =\"center\">";
 print "\n\t<h3>";
-print_help_link("name_list_help", "qm", "name_list");
+PrintHelpLink("name_list_help", "qm", "name_list");
 print GM_LANG_individual_list."</h3>";
 
 /**
@@ -63,7 +63,7 @@ $indialpha = $indilist_controller->GetIndiAlpha($indilist_controller->allgeds);
 
 // Print the letter bar
 if (count($indialpha) > 0) {
-	print_help_link("alpha_help", "qm");
+	PrintHelpLink("alpha_help", "qm");
 	foreach($indialpha as $key=>$letter) {
 		if ($letter != "@") {
 			print "<a href=\"indilist.php?alpha=".urlencode($letter)."&amp;surname_sublist=".$indilist_controller->surname_sublist."&amp;show_all=no";
@@ -163,15 +163,15 @@ else {
 		// print "option 6";
 		// NOTE: If user wishes to skip surname do not print the surname
 		print "<div class=\"topbar\">";
-		if ($indilist_controller->surname_sublist == "no") print GM_LANG_surnames;
-		else print PrintReady(str_replace("#surname#", CheckNN($indilist_controller->surname), GM_LANG_indis_with_surname));
+		if ($indilist_controller->surname_sublist == "yes" && empty($indilist_controller->surname)) print GM_LANG_surnames;
+		else print PrintReady(str_replace("#surname#", NameFunctions::CheckNN($indilist_controller->surname), GM_LANG_indis_with_surname));
 		print "</div>\n";
 		$indilist_controller->PrintPersonList($tindilist, true, false, $indilist_controller->allgeds);
 	}
 }
 
 if ($indilist_controller->alpha != "@" && $indilist_controller->surname == "") {
-	print_help_link("skip_sublist_help", "qm", "skip_surnames");
+	PrintHelpLink("skip_sublist_help", "qm", "skip_surnames");
 	print "<br /><a href=\"indilist.php?alpha=".urlencode($indilist_controller->alpha)."&amp;surname_sublist=".($indilist_controller->surname_sublist == "yes" ? "no" : "yes")."&amp;show_all=".$indilist_controller->show_all;
 	if ($indilist_controller->allgeds == "yes") print "&amp;allgeds=yes";
 	print "\">".($indilist_controller->surname_sublist == "yes" ? GM_LANG_skip_surnames : GM_LANG_show_surnames)."</a>";

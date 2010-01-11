@@ -193,7 +193,7 @@ if ($action=="compose") {
 	print "<tr><td></td><td><input type=\"submit\" value=\"".GM_LANG_send."\" /></td></tr>\n";
 	print "</table>\n";
 	print "</form>\n";
-	if ($method=="messaging2") print_text("messaging2_help");
+	if ($method=="messaging2") PrintText("messaging2_help");
 }
 else if ($action=="delete") {
 	if (MessageController::deleteMessage($id)) print GM_LANG_message_deleted;

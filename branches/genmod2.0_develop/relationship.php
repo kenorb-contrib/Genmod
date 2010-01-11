@@ -105,7 +105,7 @@ if ($relationship_controller->view != "preview") {
 	
 	// Person 1
 	print "<td class=\"shade2\">";
-	print_help_link("relationship_id_help", "qm");
+	PrintHelpLink("relationship_id_help", "qm");
 	print GM_LANG_person1."</td>";
 	print "<td class=\"shade1 vmiddle\">";
 	print "<input tabindex=\"1\" class=\"pedigree_form\" type=\"text\" name=\"pid1\" id=\"pid1\" size=\"3\" value=\"".$relationship_controller->pid1."\" />";
@@ -124,7 +124,7 @@ if ($relationship_controller->view != "preview") {
 	
 	// Person 2
 	print "<td class=\"shade2\">";
-	print_help_link("relationship_id_help", "qm");
+	PrintHelpLink("relationship_id_help", "qm");
 	print GM_LANG_person2."</td>\n";
 	print "<td class=\"shade1 vmiddle\">";
 	print "<input tabindex=\"2\" class=\"pedigree_form\" type=\"text\" name=\"pid2\" id=\"pid2\" size=\"3\" value=\"".$relationship_controller->pid2."\" />";
@@ -143,7 +143,7 @@ if ($relationship_controller->view != "preview") {
 
 	// Check relationships by marriage
 	print "<td class=\"shade2\">";
-	print_help_link("follow_spouse_help", "qm");
+	PrintHelpLink("follow_spouse_help", "qm");
 	print GM_LANG_follow_spouse;
 	print "</td>";
 	print "<td class=\"shade1\">";
@@ -156,7 +156,7 @@ if ($relationship_controller->view != "preview") {
 
 	// Show oldest top
 	print "<td class=\"shade2\">";
-	print_help_link("oldest_top_help", "qm");
+	PrintHelpLink("oldest_top_help", "qm");
 	print GM_LANG_oldest_top;
 	print "</td><td class=\"shade1\">";
 	print "<input tabindex=\"5\" type=\"checkbox\" id=\"oldtop\" name=\"asc\" value=\"-1\" ";
@@ -240,7 +240,7 @@ if ($relationship_controller->view != "preview") {
 
 	// Line up generations
 	print "<td class=\"shade2\">";
-	print_help_link("line_up_generations_help", "qm");
+	PrintHelpLink("line_up_generations_help", "qm");
 	print GM_LANG_line_up_generations."</td>";
 	print "<td class=\"shade1\">";
 	print "<input tabindex=\"6\" type=\"checkbox\" name=\"pretty\" value=\"2\"";

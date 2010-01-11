@@ -103,7 +103,7 @@ if (isset($surname)) $surname = stripslashes($surname);
 PrintHeader(GM_LANG_alive_in_year);
 print "<div class =\"center\">";
 print "\n\t<h3>";
-print_help_link("alive_in_year_help", "qm");
+PrintHelpLink("alive_in_year_help", "qm");
 print str_replace("#YEAR#", $year, GM_LANG_is_alive_in);
 
 print "</h3>";
@@ -117,7 +117,7 @@ if ($view != "preview") {
 	print "\n\t\t<table class=\"list_table center $TEXT_DIRECTION\">\n\t\t\t<tr>";
 	print "\n\t\t\t<td class=\"shade3 center\" colspan=\"4\">".GM_LANG_choose."</td></tr>";
 	print "<tr><td class=\"shade1\" rowspan=\"4\" style=\"vertical-align: middle; text-align: center; padding: 5px;\" >";
-	print_help_link("year_help", "qm");
+	PrintHelpLink("year_help", "qm");
 	print GM_LANG_year."</td>";
 	print "\n\t\t\t<td class=\"shade2\" rowspan=\"4\" style=\"vertical-align: middle;\" >";
 	print "\n\t\t\t\t<input class=\"pedigree_form\" type=\"text\" name=\"year\" size=\"3\" value=\"$year\" />";
@@ -174,7 +174,7 @@ $indialpha = GetIndiAlpha();
 uasort($indialpha, "StringSort");
 
 if (isset($alpha) && !isset($indialpha["$alpha"])) unset($alpha);
-print_help_link("alpha_help", "qm");
+PrintHelpLink("alpha_help", "qm");
 if (count($indialpha) > 0) {
 	foreach($indialpha as $letter=>$list) {
 		if (empty($alpha)) {
@@ -210,7 +210,7 @@ $expalpha = $alpha;
 if ($expalpha=="(" || $expalpha=="[" || $expalpha=="?" || $expalpha=="/" || $expalpha=="*" || $expalpha=="+") $expalpha = "\\".$expalpha;
 
 print "<br />";
-print_help_link("name_list_help", "qm");
+PrintHelpLink("name_list_help", "qm");
 
 print "<br /><table class=\"list_table $TEXT_DIRECTION\"><tr>";
 if (($surname_sublist=="yes")&&($show_all=="yes")) {
@@ -345,14 +345,14 @@ else {
 		// NOTE: If user wishes to skip surname do not print the surname
 		print "<td class=\"topbar\">";
 		if ($surname_sublist == "no") print GM_LANG_surnames;
-		else	print PrintReady(str_replace("#surname#", CheckNN($surname), GM_LANG_indis_with_surname));
+		else	print PrintReady(str_replace("#surname#", NameFunctions::CheckNN($surname), GM_LANG_indis_with_surname));
 		print "</td>\n";
 		PrintPersonList($tindilist);
 	}
 }
 print "</tr></table>";
 if ($alpha != "@") {
-	print_help_link("skip_sublist_help", "qm");
+	PrintHelpLink("skip_sublist_help", "qm");
 	if ($surname_sublist=="yes") print "<a href=\"aliveinyear.php?year=$year&amp;alpha=".urlencode($alpha)."&amp;surname_sublist=no&amp;show_all=$show_all&amp;type=$type&amp;useMAA=$useMAA&amp;year=$year\">".GM_LANG_skip_surnames."</a>";
 	else print "<a href=\"aliveinyear.php?year=$year&amp;alpha=".urlencode($alpha)."&amp;surname_sublist=yes&amp;show_all=$show_all&amp;type=$type&amp;useMAA=$useMAA&amp;year=$year\">".GM_LANG_show_surnames."</a>";
 }

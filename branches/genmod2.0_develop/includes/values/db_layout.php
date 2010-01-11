@@ -534,6 +534,7 @@ $db_original[TBLPREFIX."names"]["row"]["n_file"]["details"] = "TINYINT UNSIGNED"
 $db_original[TBLPREFIX."names"]["row"]["n_name"]["details"] = "VARCHAR(255) CHARACTER SET #charset# COLLATE #collate# ";
 $db_original[TBLPREFIX."names"]["row"]["n_letter"]["details"] = "VARCHAR(5) CHARACTER SET #charset# COLLATE #collate# ";
 $db_original[TBLPREFIX."names"]["row"]["n_surname"]["details"] = "VARCHAR(100) CHARACTER SET #charset# COLLATE #collate# ";
+$db_original[TBLPREFIX."names"]["row"]["n_nick"]["details"] = "VARCHAR(100) CHARACTER SET #charset# COLLATE #collate# ";
 $db_original[TBLPREFIX."names"]["row"]["n_type"]["details"] = "VARCHAR(10) CHARACTER SET #charset# COLLATE #collate# ";
 $db_original[TBLPREFIX."names"]["key"]["primary"] = "PRIMARY KEY  (`n_id`)";
 $db_original[TBLPREFIX."names"]["key"]["name_key"] = "KEY `name_key` (`n_key`)";

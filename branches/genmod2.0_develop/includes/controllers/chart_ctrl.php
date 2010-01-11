@@ -130,7 +130,7 @@ class ChartController extends BaseController {
 	public function PrintInputRootId() {
 		
 		print "<tr><td class=\"shade2\">";
-		print_help_link("rootid_help", "qm");
+		PrintHelpLink("rootid_help", "qm");
 		print GM_LANG_root_person."&nbsp;</td>";
 		print "<td class=\"shade1 vmiddle\">";
 		print "<input class=\"pedigree_form\" type=\"text\" name=\"rootid\" id=\"rootid\" size=\"3\" value=\"".$this->xref."\" />";
@@ -142,7 +142,7 @@ class ChartController extends BaseController {
 		
 		if ($tr) print "<tr>";
 		print "<td class=\"shade2\">";
-		print_help_link("box_width_help", "qm");
+		PrintHelpLink("box_width_help", "qm");
 		print GM_LANG_box_width . "&nbsp;</td>";
 		print "<td class=\"shade1 vmiddle\"><input type=\"text\" size=\"3\" name=\"box_width\" value=\"".$this->box_width."\" /> <b>%</b>";
 		print "</td>";
@@ -160,7 +160,7 @@ class ChartController extends BaseController {
 	public function PrintInputGenerations($gens, $help) {	
 		
 		print "<tr><td class=\"shade2\">";
-		print_help_link($help, "qm");
+		PrintHelpLink($help, "qm");
 		print GM_LANG_generations . "&nbsp;</td>";
 	
 		print "<td class=\"shade1 vmiddle\">";
@@ -187,7 +187,7 @@ class ChartController extends BaseController {
 		
 		print "<tr><td class=\"shade2\">";
 		print "<input type=\"hidden\" name=\"show_cousins\" value=\"".$this->show_cousins."\" />";
-		print_help_link("show_cousins_help", "qm");
+		PrintHelpLink("show_cousins_help", "qm");
 		print GM_LANG_show_cousins."</td>";
 		print "<td class=\"shade1 vmiddle\"><input ";
 		if ($this->chart_style == "0") print "disabled=\"disabled\" ";
@@ -201,7 +201,7 @@ class ChartController extends BaseController {
 	public function PrintInputChartStyle() {
 				
 		print "<tr><td class=\"shade2\">";
-		print_help_link("chart_style_help", "qm");
+		PrintHelpLink("chart_style_help", "qm");
 		print GM_LANG_displ_layout_conf;
 		print "</td>";
 		print "<td class=\"shade1 vmiddle\">";
@@ -223,7 +223,7 @@ class ChartController extends BaseController {
 		if ($tr) print "<tr>";
 		print "<td class=\"shade2\">";
 		print "<input type=\"hidden\" name=\"show_details\" value=\"".$this->show_details."\" />";
-		print_help_link("show_full_help", "qm");
+		PrintHelpLink("show_full_help", "qm");
 		print GM_LANG_show_details;
 		print "</td>";
 		print "<td class=\"shade1 vmiddle\">";

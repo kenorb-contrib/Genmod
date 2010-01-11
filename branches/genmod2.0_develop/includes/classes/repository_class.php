@@ -50,6 +50,14 @@ class Repository extends GedcomRecord {
 		return self::$cache[$gedcomid][$xref];
 	}
 	
+	public static function IsInstance($xref, $gedcomid="") {
+		global $GEDCOMID;
+		
+		if (empty($gedcomid)) $gedcomid = $GEDCOMID;
+		if (!isset(self::$cache[$gedcomid][$xref])) return false;
+		else return true;
+	}
+	
 	public function __construct($id, $gedrec="", $gedcomid="") {
 		
 		if (is_array($gedrec)) {
@@ -236,7 +244,7 @@ class Repository extends GedcomRecord {
 	// Type	=	1	: normal title (descriptor and adddescriptor
 	// 			2	: descriptor
 	//			3	: adddescriptor
-	public function PrintListRepository($useli=true, $type=1, $prtact=true, $fact="") {
+	public function PrintListRepository($useli=true, $type=1, $prtact=true, $fact="", $paste=false) {
 		global $TEXT_DIRECTION;
 
 		if (!$this->DisplayDetails()) return false;
@@ -246,7 +254,8 @@ class Repository extends GedcomRecord {
 			else print "\n\t\t\t<li class=\"ltr\" dir=\"ltr\">";
 		}
 
-		print "<a href=\"repo.php?rid=".$this->xref."&amp;gedid=".$this->gedcomid."\" class=\"list_item\">";
+		if ($paste) print "<a href=\"#\" onclick=\"sndReq(document.getElementById('dummy'), 'lastused', 'type', '".$this->datatype."', 'id', '".$this->key."'); pasteid('".$this->xref."'); return false;\" class=\"list_item\">";
+		else print "<a href=\"repo.php?rid=".$this->xref."&amp;gedid=".$this->gedcomid."\" class=\"list_item\">";
 		if ($type == 1) print PrintReady($this->GetTitle());
 		else if ($type == 2) print PrintReady($this->GetRepoDescriptor());
 		else if ($type == 3) print PrintReady($this->GetAddRepoDescriptor());
@@ -271,6 +280,7 @@ class Repository extends GedcomRecord {
 		}
 		print "</a>\n";
 		if ($useli) print "</li>\n";
+		return true;
 	}
 }
 ?>

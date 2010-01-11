@@ -385,7 +385,7 @@ if ($view!="preview") {
 	
 	// NOTE: Root ID
 	print "<td class=\"shade2\">";
-	print_help_link("desc_rootid_help", "qm");	
+	PrintHelpLink("desc_rootid_help", "qm");	
 	print GM_LANG_root_person . "</td>";
 	print "<td class=\"shade1\">";
 	print "\n\t\t<input class=\"pedigree_form\" type=\"text\" name=\"pid\" id=\"pid\" size=\"3\" value=\"$pid\" />";
@@ -394,7 +394,7 @@ if ($view!="preview") {
 	
 	// NOTE: Show Details
 	print "<td class=\"shade2\">";
-	print_help_link("show_full_help", "qm");
+	PrintHelpLink("show_full_help", "qm");
 	print GM_LANG_show_details."</td>";
 	print "<td class=\"shade1\">";
 	print "<input type=\"checkbox\" value=\"";
@@ -409,7 +409,7 @@ if ($view!="preview") {
 	
 	// NOTE: Generations
 	print "<tr><td class=\"shade2\" >";
-	print_help_link("desc_generations_help", "qm");
+	PrintHelpLink("desc_generations_help", "qm");
 	print GM_LANG_generations."</td>";
 	print "<td class=\"shade1\">";
 //	print <input type=\"text\" size=\"3\" name=\"generations\" value=\"$generations\" />";
@@ -424,7 +424,7 @@ if ($view!="preview") {
 	
 	// NOTE: Show spouses
 	print "<td class=\"shade2\">";
-	print_help_link("show_spouse_help", "qm");
+	PrintHelpLink("show_spouse_help", "qm");
 	print GM_LANG_show_spouses."</td>";
 	print "<td class=\"shade1\">";
 	print "<input type=\"checkbox\" value=\"1\" name=\"show_spouse\"";
@@ -433,7 +433,7 @@ if ($view!="preview") {
 	
 	// NOTE: Box width
 	print "<tr><td class=\"shade2\">";
-	print_help_link("box_width_help", "qm");
+	PrintHelpLink("box_width_help", "qm");
 	print GM_LANG_box_width."</td>";
 	print "<td class=\"shade1\"><input type=\"text\" size=\"3\" name=\"box_width\" value=\"$box_width\" /> <b>%</b>";
 	print "</td><td class=\"shade2\">&nbsp;</td><td class=\"shade1\">&nbsp;</td></tr>";

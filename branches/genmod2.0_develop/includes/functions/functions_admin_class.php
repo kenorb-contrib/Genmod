@@ -162,7 +162,7 @@ abstract class AdminFunctions {
 		if ($zip == "yes") fwrite($gedout, $head);
 		else print $head;
 	
-		$sql = "SELECT i_key, i_gedrec, i_file, i_id, i_isdead, n_name, n_surname, n_type, n_letter FROM ".TBLPREFIX."individuals INNER JOIN ".TBLPREFIX."names ON i_key=n_key WHERE i_file=".$GEDCOMID." ORDER BY CAST(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(LOWER(i_id),'a',''),'b',''),'c',''),'d',''),'e',''),'f',''),'g',''),'h',''),'i',''),'j',''),'k',''),'l',''),'m',''),'n',''),'o',''),'p',''),'q',''),'r',''),'s',''),'t',''),'u',''),'v',''),'w',''),'x',''),'y',''),'z','') as unsigned), n_id";
+		$sql = "SELECT i_key, i_gedrec, i_file, i_id, i_isdead, n_name, n_surname, n_nick, n_type, n_letter FROM ".TBLPREFIX."individuals INNER JOIN ".TBLPREFIX."names ON i_key=n_key WHERE i_file=".$GEDCOMID." ORDER BY CAST(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(LOWER(i_id),'a',''),'b',''),'c',''),'d',''),'e',''),'f',''),'g',''),'h',''),'i',''),'j',''),'k',''),'l',''),'m',''),'n',''),'o',''),'p',''),'q',''),'r',''),'s',''),'t',''),'u',''),'v',''),'w',''),'x',''),'y',''),'z','') as unsigned), n_id";
 		$res = NewQuery($sql);
 		if ($res) {
 			$key = "";
@@ -176,7 +176,7 @@ abstract class AdminFunctions {
 					$key = $row["i_key"];
 					$person = new Person($row["i_id"], $row, $row["i_id"]);
 				}
-				$person->addname = array($row["n_name"], $row["n_letter"], $row["n_surname"], $row["n_type"]);
+				$person->addname = array($row["n_name"], $row["n_letter"], $row["n_surname"], $row["n_nick"], $row["n_type"]);
 			}
 			if ($key != "") {
 				$person->names_read = true;
@@ -382,7 +382,7 @@ abstract class AdminFunctions {
 						$found = false;
 						$sourstring = GetLangVarString("sync_mailsource", $GEDCOMID, "gedcomid");
 						foreach ($subrecords as $key =>$subrec) {
-							$change_id = GetNewXref("CHANGE");
+							$change_id = EditFunctions::GetNewXref("CHANGE");
 							if (preg_match("/(\d) (_?EMAIL .+)/", $subrec, $match)>0) {
 								$found = true;
 								$level = $match[1];
@@ -748,6 +748,88 @@ abstract class AdminFunctions {
 		$res = NewQuery($sql);
 	}
 	
+	/**
+	 * Read the Genmod News from the Genmod webserver
+	 *
+	 * The function reads the newsfile from the Genmod
+	 * webserver and stores the data in an array.
+	 * The array is returned and the data displayed on the admin page.
+	 * News is fetched per session and stored in the session data.
+	 * If no news is present in the newsfile on the server, nothing is displayed.
+	 * If the newsfile cannot be opened, an error message is displayed.
+	 * News format:
+	 * [Item]
+	 * [Date]mmm dd yyyy[/Date]
+	 * [Type]<Normal|Urgent>[/Type]
+	 * [Header]News header[/Header]
+	 * [Text]News text[/Text]
+	 * [/Item]
+	 *
+	 * @author	Genmod Development Team
+	 * @return	array	Array with news items
+	 */
+	public function GetGMNewsItems() {
+		global $NEWS_TYPE, $PROXY_ADDRESS, $PROXY_PORT;
+	
+		// -- If the news is already retrieved, get it from the session data.
+		if(isset($_SESSION["gmnews"])) return $_SESSION["gmnews"];
+	
+		// -- Retrieve the news from the website
+		$gmnews = array();
+		if (!empty($PROXY_ADDRESS) && !empty($PROXY_PORT)) {
+			$num = "(\\d|[1-9]\\d|1\\d\\d|2[0-4]\\d|25[0-5])";
+			if (!preg_match("/^$num\\.$num\\.$num\\.$num$/", $PROXY_ADDRESS)) $ip = gethostbyname($PROXY_ADDRESS);
+			else $ip = $PROXY_ADDRESS;
+			$handle = @fsockopen($ip, $PROXY_PORT);
+			if ($handle!=false) {
+				$com = "GET http://www.genmod.net/gmnews.txt HTTP/1.1\r\nAccept: */*\r\nAccept-Language: de-ch\r\nAccept-Encoding: gzip, deflate\r\nUser-Agent: Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.0)\r\nHost: $PROXY_ADDRESS:$PROXY_PORT\r\nConnection: Keep-Alive\r\n\r\n";
+				fputs($handle, $com);
+				$txt = fread($handle, 65535);
+				fclose($handle);
+				$txt = substr($txt, strpos($txt, "\r\n\r\n") + 4);
+			}
+		}
+		else {
+			@ini_set('user_agent','MSIE 4\.0b2;'); // force a HTTP/1.0 request
+			@ini_set('default_socket_timeout', '5'); // timeout
+			$handle = @fopen("http://www.genmod.net/gmnews.txt", "r");
+			if ($handle!=false) {
+				$txt = fread($handle, 65535);
+				fclose($handle);
+			}
+		}
+		if ($handle != false) {
+			$txt = preg_replace("/[\r\n]/", "", $txt);
+			$ct = preg_match_all("/\[Item](.+?)\[\/Item]/", $txt, $items);
+			for ($i = 0; $i < $ct; $i++) {
+				$item = array();
+				$ct1 = preg_match("/\[Date](.+?)\[\/Date]/", $items[1][$i], $date);
+				if ($ct1 > 0) $item["date"] = $date[1];
+				else $item["date"] = "";
+				$ct1 = preg_match("/\[Type](.+?)\[\/Type]/", $items[1][$i], $type);
+				if ($ct1 > 0) $item["type"] = $type[1];
+				else $item["type"] = "";
+				$ct1 = preg_match("/\[Header](.+?)\[\/Header]/", $items[1][$i], $header);
+				if ($ct1 > 0) $item["header"] = $header[1];
+				else $item["header"] = "";
+				$ct1 = preg_match("/\[Text](.+?)\[\/Text]/", $items[1][$i], $text);
+				if ($ct1 > 0) $item["text"] = $text[1];
+				else $item["text"] = "";
+				if (($NEWS_TYPE == "Normal") || ($NEWS_TYPE == $item["type"])) $gmnews[] = $item;
+			}
+		}
+		else {
+			WriteToLog("GetGMNewsItems-> News cannot be reached on Genmod News Server", "E");
+			$item["date"] = "";
+			$item["type"] = "Urgent";
+			$item["header"] = "Warning: News cannot be retrieved";
+			$item["text"] = "Genmod cannot retrieve the news from the news server. If this problem persist after next logons, please report this on the <a href=\"http://www.genmod.net\">Genmod Help forum</a>";
+			$gmnews[] = $item;
+		}
+		// -- Store the news in the session data
+		$_SESSION["gmnews"] = $gmnews;
+		return $gmnews;
+	}
 
 }
 ?>

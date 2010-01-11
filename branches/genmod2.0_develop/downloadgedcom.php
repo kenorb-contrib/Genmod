@@ -110,17 +110,17 @@ class DownloadGedcom {
 			<div class="topbottombar"><?php echo GM_LANG_options; ?></div>
 			<div id="downloadgedcom_content">
 				<div id="downloadgedcom_labels">
-					<label for="convert"><?php  print_help_link("utf8_ansi_help", "qm"); echo GM_LANG_utf8_to_ansi; ?></label>
+					<label for="convert"><?php  PrintHelpLink("utf8_ansi_help", "qm"); echo GM_LANG_utf8_to_ansi; ?></label>
 					<br />
-					<label for="remove"><?php print_help_link("remove_tags_help", "qm"); echo GM_LANG_remove_custom_tags; ?></label>
+					<label for="remove"><?php PrintHelpLink("remove_tags_help", "qm"); echo GM_LANG_remove_custom_tags; ?></label>
 					<br />
-					<label for="embedmm"><?php print_help_link("embedmm_help", "qm"); echo GM_LANG_embedmm; ?></label>
+					<label for="embedmm"><?php PrintHelpLink("embedmm_help", "qm"); echo GM_LANG_embedmm; ?></label>
 					<br />
-					<label for="embednote"><?php print_help_link("embednote_help", "qm"); echo GM_LANG_embednote; ?></label>
+					<label for="embednote"><?php PrintHelpLink("embednote_help", "qm"); echo GM_LANG_embednote; ?></label>
 					<br />
-					<label for="zip"><?php print_help_link("download_zipped_help", "qm"); echo GM_LANG_download_zipped; ?></label>
+					<label for="zip"><?php PrintHelpLink("download_zipped_help", "qm"); echo GM_LANG_download_zipped; ?></label>
 					<br />
-					<label for="privatize_export"><?php print_help_link("apply_privacy_help", "qm"); echo GM_LANG_apply_privacy; ?></label>
+					<label for="privatize_export"><?php PrintHelpLink("apply_privacy_help", "qm"); echo GM_LANG_apply_privacy; ?></label>
 					<br />
 				</div>
 				<div id="downloadgedcom_options">

@@ -97,7 +97,7 @@ PrintHeader(GM_LANG_lockout_maint);
 		<input type="hidden" name="action" value="update" />
 		<div class="admin_topbottombar">
 			<h3>
-				<?php print_help_link("lockout_maint_help", "qm", "lockout_maint");?>
+				<?php PrintHelpLink("lockout_maint_help", "qm", "lockout_maint");?>
 				<?php print GM_LANG_lockout_maint; ?>
 			</h3>
 		</div>

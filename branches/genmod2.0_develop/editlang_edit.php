@@ -84,31 +84,31 @@ if ($action != "save") {
 	print "<input type=\"hidden\" name=\"realtime\" value=\"" . $realtime . "\" />";
 	
 	print '<div id="editlang_edit_title" class="center">';
-	print_text("editlang_help");
+	PrintText("editlang_help");
 	if (!empty($lang_filename)) print ' '.$language_settings[$lang_filename]['gm_lang'];
 	print '</div>';
 	
 	print "<div id=\"toplinks\" name=\"toplinks\" class=\"center\">";
 	print "<input type=\"submit\" value=\"";
-	print_text("lang_save");
+	PrintText("lang_save");
 	if ($realtime) print "\" onclick=\"window.opener.location.reload()\" />";
 	else print "\" />";
 	print "&nbsp;&nbsp;";
 	print "<input  type=\"submit\" value=\"";
-	print_text("cancel");
+	PrintText("cancel");
 	print "\"" . " onclick=\"self.close()\" />";
 	print "</div>";
 	print "<hr />";
 	
 	print '<div id="original_text">';
-	print_text("original_message");
+	PrintText("original_message");
 	print "<textarea id=\"old_message\" readonly rows=\"10\" name=\"old_message\" cols=\"75\" >";
 	print stripslashes(mask_all(GetString($ls01, $lang_filename_orig, $file_type)));
 	print "</textarea>";
 	print '</div>';
 	
 	print '<div id="translated_text">';
-	print_text("message_to_edit");
+	PrintText("message_to_edit");
 	print "<textarea rows=\"10\" id=\"new_message\" name=\"new_message\" cols=\"75\" style=\"color: #FF0000\" >";
 	if (strlen($ls02) > 0) print stripslashes(mask_all(GetString($ls02, $lang_filename, $file_type)));
 	print "</textarea>";
@@ -139,7 +139,7 @@ if ($action == "save") {
 	print "<table class=\"facts_table\">";
 	print "<tr>";
 	print "<td class=\"facts_label03\">";
-	print_text("savelang_help");
+	PrintText("savelang_help");
 	print "</td>";
 	print "</tr>";
 	print "<tr>";
@@ -151,7 +151,7 @@ if ($action == "save") {
 	print "<input type=\"hidden\" name=\"lang_filename_orig\" value=\"".$lang_filename_orig."\" />";
 	print "<table class=\"facts_table\">";
 	print "<tr>";
-	if ($Write_Ok) print "<td class=\"facts_label03\" style=\"color: #0000FF; font-weight: bold; \">".print_text("original_message",0,1);
+	if ($Write_Ok) print "<td class=\"facts_label03\" style=\"color: #0000FF; font-weight: bold; \">".PrintText("original_message",0,1);
 	else {
 		print "<td class=\"warning\" >";
 		print str_replace("#lang_filename#", $lang_filename, GM_LANG_lang_file_write_error) . "<br /><br />";
@@ -172,7 +172,7 @@ if ($action == "save") {
 		print "<table class=\"facts_table\">";
 		print "<tr>";
 		print "<td class=\"facts_label03\" style=\"color: #0000FF; font-weight: bold; \">";
-		print_text("changed_message");
+		PrintText("changed_message");
 		print "</td>";
 		print "</tr>";
 		

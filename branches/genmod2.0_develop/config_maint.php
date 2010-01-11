@@ -67,7 +67,7 @@ PrintHeader(GM_LANG_config_maint);
 		<input type="hidden" name="action" value="update" />
 		<div class="admin_topbottombar">
 			<h3>
-				<?php print_help_link("config_maint_help", "qm", "config_maint");?>
+				<?php PrintHelpLink("config_maint_help", "qm", "config_maint");?>
 				<?php print GM_LANG_config_maint; ?>
 			</h3>
 		</div>

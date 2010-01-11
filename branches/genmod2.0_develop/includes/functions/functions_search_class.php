@@ -51,7 +51,7 @@ abstract class SearchFunctions {
 	 * @return	array $myindilist array with all individuals that matched the query
 	 */
 	public function FTSearchIndis($query, $allgeds=false, $ANDOR="AND") {
-		global $indilist, $GEDCOMID, $GEDCOMS, $ftminwlen, $ftmaxwlen, $COMBIKEY;
+		global $GEDCOMID, $GEDCOMS, $ftminwlen, $ftmaxwlen;
 		
 		// Get the min and max search word length
 		self::GetFTWordLengths();
@@ -79,10 +79,10 @@ abstract class SearchFunctions {
 					else $addsql .= " AND i_gedrec NOT REGEXP '[[:<:]]".DbLayer::EscapeQuery($keyword["term"]).$keyword["wildcard"]."[[:>:]]'";
 				}
 			}
-			$sql = "SELECT i_key, i_id, i_file, i_gedrec, i_isdead, n_name, n_letter, n_type, n_surname FROM ".TBLPREFIX."individuals, ".TBLPREFIX."names WHERE i_key=n_key AND (".substr($addsql,4).")";
+			$sql = "SELECT i_key, i_id, i_file, i_gedrec, i_isdead, n_name, n_letter, n_type, n_surname, n_nick FROM ".TBLPREFIX."individuals, ".TBLPREFIX."names WHERE i_key=n_key AND (".substr($addsql,4).")";
 		}
 		else {
-			$sql = "SELECT i_key, i_id, i_file, i_gedrec, i_isdead, n_name, n_letter, n_type, n_surname FROM ".TBLPREFIX."individuals, ".TBLPREFIX."names WHERE i_key=n_key AND (MATCH (i_gedrec) AGAINST ('".DbLayer::EscapeQuery($query)."' IN BOOLEAN MODE))";
+			$sql = "SELECT i_key, i_id, i_file, i_gedrec, i_isdead, n_name, n_letter, n_type, n_surname, n_nick FROM ".TBLPREFIX."individuals, ".TBLPREFIX."names WHERE i_key=n_key AND (MATCH (i_gedrec) AGAINST ('".DbLayer::EscapeQuery($query)."' IN BOOLEAN MODE))";
 		}
 			
 		if (!$allgeds) $sql .= " AND i_file='".$GEDCOMID."'";
@@ -97,21 +97,22 @@ abstract class SearchFunctions {
 				$sql .= ")";
 			}
 		}
+		$sql .= "  ORDER BY i_key, n_id";
 	
 		$res = NewQuery($sql);
 		if ($res) {
+			$key = "";
 			while($row = $res->FetchAssoc()){
-				if ($COMBIKEY) $key = $row["i_key"];
-				else $key = $row["i_id"];
-				if (!isset($myindilist[$key])) {
-					$myindilist[$key]["names"][] = array($row["n_name"], $row["n_letter"], $row["n_surname"], $row["n_type"]);
-					$myindilist[$key]["gedfile"] = $row["i_file"];
-					$myindilist[$key]["gedcom"] = $row["i_gedrec"];
-					$myindilist[$key]["isdead"] = $row["i_isdead"];
+				if ($key != $row["i_key"]) {
+					if ($key != "") $person->names_read = true;
+					$person = null;
+					$key = $row["i_key"];
+					$person =& Person::GetInstance($row["i_id"], $row, $row["i_file"]);
+					$myindilist[$row["i_key"]] = $person;
 				}
-				else $myindilist[$key]["names"][] = array($row["n_name"], $row["n_letter"], $row["n_surname"], $row["n_type"]);
-				$indilist[$key] = $myindilist[$key];
+				$myindilist[$row["i_key"]]->addname = array($row["n_name"], $row["n_letter"], $row["n_surname"], $row["n_nick"], $row["n_type"]);
 			}
+			if ($key != "") $person->names_read = true;
 			$res->FreeResult();
 		}
 		return $myindilist;
@@ -139,7 +140,7 @@ abstract class SearchFunctions {
 
 	//-- search through the gedcom records for families
 	public function FTSearchFams($query, $allgeds=false, $ANDOR="AND", $allnames=false) {
-		global $famlist, $GEDCOMS, $GEDCOMID, $ftminwlen, $ftmaxwlen, $COMBIKEY;
+		global $GEDCOMS, $GEDCOMID, $ftminwlen, $ftmaxwlen;
 	
 		// Get the min and max search word length
 		self::GetFTWordLengths();
@@ -182,47 +183,26 @@ abstract class SearchFunctions {
 	
 		$res = NewQuery($sql);
 		$gedold = $GEDCOMID;
+		$select = array();
 		while($row = $res->fetchAssoc()){
-			$GEDCOMID = $row["f_file"];
-			$husb = SplitKey($row["f_husb"], "id");
-			$wife = SplitKey($row["f_wife"], "id");
-			if ($allnames == true) {
-				$hname = GetSortableName($husb, "", "", true);
-				$wname = GetSortableName($wife, "", "", true);
-				if (empty($hname)) $hname = "@N.N.";
-				if (empty($wname)) $wname = "@N.N.";
-				$name = array();
-				foreach ($hname as $hkey => $hn) {
-					foreach ($wname as $wkey => $wn) {
-						$name[] = $hn." + ".$wn;
-						$name[] = $wn." + ".$hn;
-					}
-				}
-			}
-			else {
-				$hname = GetSortableName($husb);
-				$wname = GetSortableName($wife);
-				if (empty($hname)) $hname = "@N.N.";
-				if (empty($wname)) $wname = "@N.N.";
-				$name = $hname." + ".$wname;
-			}
-			if (count($allgeds) > 1 || $COMBIKEY) $key = $row["f_key"];
-			else $key = $row["f_id"];
-			$myfamlist[$key]["name"] = $name;
-			$myfamlist[$key]["gedfile"] = $row["f_file"];
-			$myfamlist[$key]["gedcom"] = $row["f_gedrec"];
-			$myfamlist[$key]["HUSB"] = $husb;
-			$myfamlist[$key]["WIFE"] = $wife;
-			$famlist[$key] = $myfamlist[$key];
+			$fam = Family::GetInstance($row["f_id"], $row, $row["f_file"]);
+			$myfamlist[$row["f_key"]] = $fam;
+			if ($row["f_husb"] != "" && !Person::IsInstance(SplitKey($row["f_husb"], "id"), $row["f_file"])) $select[] = $row["f_husb"];
+			if ($row["f_wife"] != "" && !Person::IsInstance(SplitKey($row["f_wife"], "id"), $row["f_file"])) $select[] = $row["f_wife"];
 		}
-		$GEDCOMID = $gedold;
 		$res->FreeResult();
+		if (count($select) > 0) {
+			array_flip(array_flip($select));
+			//print "Indi's selected for fams: ".count($select)."<br />";
+			$selection = "'".implode("','", $select)."'";
+			ListFunctions::GetIndilist($allgeds, $selection, false);
+		}
 		return $myfamlist;
 	}
 
 	//-- search through the gedcom records for sources, full text
 	public function FTSearchSources($query, $allgeds=false, $ANDOR="AND") {
-		global $GEDCOMS, $GEDCOMID, $ftminwlen, $ftmaxwlen;
+		global $GEDCOMS, $GEDCOMID, $ftminwlen, $ftmaxwlen, $LINK_PRIVACY;
 		
 		// Get the min and max search word length
 		self::GetFTWordLengths();
@@ -246,10 +226,10 @@ abstract class SearchFunctions {
 					else $addsql .= " AND s_gedrec NOT REGEXP '[[:<:]]".DbLayer::EscapeQuery($keyword["term"]).$keyword["wildcard"]."[[:>:]]'";
 				}
 			}
-			$sql = "SELECT s_id, s_name, s_file, s_gedrec FROM ".TBLPREFIX."sources WHERE (".substr($addsql,4).")";
+			$sql = "SELECT s_key, s_id, s_name, s_file, s_gedrec, sm_sid, sm_gid, sm_type FROM ".TBLPREFIX."sources LEFT JOIN ".TBLPREFIX."source_mapping ON s_key=sm_key WHERE (".substr($addsql,4).")";
 		}
 		else {
-			$sql = "SELECT s_id, s_name, s_file, s_gedrec FROM ".TBLPREFIX."sources WHERE (MATCH (s_gedrec) AGAINST ('".DbLayer::EscapeQuery($query)."' IN BOOLEAN MODE))";
+			$sql = "SELECT s_key, s_id, s_name, s_file, s_gedrec, sm_sid, sm_gid, sm_type FROM ".TBLPREFIX."sources LEFT JOIN ".TBLPREFIX."source_mapping ON s_key=sm_key WHERE (MATCH (s_gedrec) AGAINST ('".DbLayer::EscapeQuery($query)."' IN BOOLEAN MODE))";
 		}
 	
 		if (!$allgeds) $sql .= " AND s_file='".$GEDCOMID."'";
@@ -262,22 +242,34 @@ abstract class SearchFunctions {
 			}
 			$sql .= ")";
 		}
-	
 		$res = NewQuery($sql);
+		$indisel = array();
+		$famsel = array();
 		if ($res) {
-			while($row = $res->fetchRow()){
-				if (count($allgeds) > 1) {
-					$mysourcelist[$row[0]."[".$row[2]."]"]["name"] = $row[1];
-					$mysourcelist[$row[0]."[".$row[2]."]"]["gedfile"] = $row[2];
-					$mysourcelist[$row[0]."[".$row[2]."]"]["gedcom"] = $row[3];
+			$oldkey = "";
+			while($row = $res->fetchAssoc()){
+				if ($oldkey != $row["s_key"]) {
+					$oldkey = $row["s_key"];
+					$source = Source::GetInstance($row["s_id"], $row, $row["s_file"]);
+					$mysourcelist[$row["s_key"]] = $source;
 				}
-				else {
-					$mysourcelist[$row[0]]["name"] = $row[1];
-					$mysourcelist[$row[0]]["gedfile"] = $row[2];
-					$mysourcelist[$row[0]]["gedcom"] = $row[3];
+				$source->addlink = array($row["sm_gid"], $row["sm_type"], $row["s_file"]);
+				if ($LINK_PRIVACY) {
+					if ($row["sm_type"] == "INDI" && !Person::IsInstance($row["sm_gid"], $row["s_file"])) $indisel[] = JoinKey($row["sm_gid"], $row["s_file"]);
+					else if ($row["sm_type"] == "FAM" && !Family::IsInstance($row["sm_gid"], $row["s_file"])) $famsel[] = JoinKey($row["sm_gid"], $row["s_file"]);
 				}
 			}
 			$res->FreeResult();
+		}
+		if (count($indisel) > 0) {
+			array_flip(array_flip($indisel));
+			$indiselect = "'".implode("','", $indisel)."'";
+			ListFunctions::GetIndiList("", $indiselect, false);
+		}
+		if (count($famsel) > 0) {
+			array_flip(array_flip($famsel));
+			$famselect = "'".implode ("', '", $famsel)."'";
+			ListFunctions::GetFamList("", $famselect, false);
 		}
 		return $mysourcelist;
 	}
@@ -308,10 +300,10 @@ abstract class SearchFunctions {
 					else $addsql .= " AND o_gedrec NOT REGEXP '[[:<:]]".DbLayer::EscapeQuery($keyword["term"]).$keyword["wildcard"]."[[:>:]]'";
 				}
 			}
-			$sql = "SELECT o_id, o_file, o_type, o_gedrec FROM ".TBLPREFIX."other WHERE (".substr($addsql,4).")";
+			$sql = "SELECT o_key, o_id, o_file, o_type, o_gedrec FROM ".TBLPREFIX."other WHERE (".substr($addsql,4).")";
 		}
 		else {
-			$sql = "SELECT o_id, o_file, o_type, o_gedrec FROM ".TBLPREFIX."other WHERE (MATCH (o_gedrec) AGAINST ('".DbLayer::EscapeQuery($query)."' IN BOOLEAN MODE))";
+			$sql = "SELECT o_key, o_id, o_file, o_type, o_gedrec FROM ".TBLPREFIX."other WHERE (MATCH (o_gedrec) AGAINST ('".DbLayer::EscapeQuery($query)."' IN BOOLEAN MODE))";
 		}
 	
 		if (!$allgeds) $sql .= " AND o_file='".$GEDCOMID."'";
@@ -330,20 +322,8 @@ abstract class SearchFunctions {
 		$res = NewQuery($sql);
 		if ($res) {
 			while($row = $res->fetchAssoc()){
-				$tt = preg_match("/1 NAME (.*)/", $row["o_gedrec"], $match);
-				if ($tt == "0") $name = $row["o_id"]; else $name = $match[1];
-				if (count($allgeds) > 1) {
-					$myrepolist[$row["o_id"]."[".$row["o_file"]."]"]["id"] = $row["o_id"];
-					$myrepolist[$row["o_id"]."[".$row["o_file"]."]"]["name"] = $name;
-					$myrepolist[$row["o_id"]."[".$row["o_file"]."]"]["gedfile"] = $row["o_file"];
-					$myrepolist[$row["o_id"]."[".$row["o_file"]."]"]["gedcom"] = $row["o_gedrec"];
-				}
-				else {
-					$myrepolist[$row["o_id"]]["id"] = $row["o_id"];
-					$myrepolist[$row["o_id"]]["name"] = $name;
-					$myrepolist[$row["o_id"]]["gedfile"] = $row["o_file"];
-					$myrepolist[$row["o_id"]]["gedcom"] = $row["o_gedrec"];
-				}
+				$repo = Repository::GetInstance($row["o_id"], $row, $row["o_file"]);
+				$myrepolist[$row["o_key"]] = $repo;
 			}
 			$res->FreeResult();
 		}
@@ -352,7 +332,7 @@ abstract class SearchFunctions {
 
 	//-- search through the gedcom records for media, full text
 	public function FTSearchMedia($query, $allgeds=false, $ANDOR="AND") {
-		global $GEDCOMS, $GEDCOMID, $ftminwlen, $ftmaxwlen, $media_hide, $media_total;
+		global $GEDCOMS, $GEDCOMID, $ftminwlen, $ftmaxwlen, $media_hide, $media_total, $LINK_PRIVACY;
 		
 		// Get the min and max search word length
 		self::GetFTWordLengths();
@@ -375,12 +355,12 @@ abstract class SearchFunctions {
 					else $addsql .= " AND m_gedrec NOT REGEXP '[[:<:]]".DbLayer::EscapeQuery($keyword["term"]).$keyword["wildcard"]."[[:>:]]'";
 				}
 			}
-			$sql = "SELECT * FROM ".TBLPREFIX."media WHERE (".substr($addsql,4).")";
+			$sql = "SELECT m_media, m_ext, m_titl, m_mfile, m_file, m_gedrec, mm_gid, mm_type, mm_file FROM ".TBLPREFIX."media LEFT JOIN ".TBLPREFIX."media_mapping ON m_media=mm_media AND m_file=mm_file WHERE (".substr($addsql,4).")";
 		}
 		else {
-			$sql = "SELECT * FROM ".TBLPREFIX."media WHERE (MATCH (m_gedrec) AGAINST ('".DbLayer::EscapeQuery($query)."' IN BOOLEAN MODE))";
+			$sql = "SELECT m_media, m_ext, m_titl, m_mfile, m_file, m_gedrec, mm_gid, mm_type, mm_file FROM ".TBLPREFIX."media LEFT JOIN ".TBLPREFIX."media_mapping ON m_media=mm_media AND m_file=mm_file WHERE (MATCH (m_gedrec) AGAINST ('".DbLayer::EscapeQuery($query)."' IN BOOLEAN MODE))";
 		}
-	
+
 		if (!$allgeds) $sql .= " AND m_file='".$GEDCOMID."'";
 		
 		if ((is_array($allgeds) && count($allgeds) != 0) && count($allgeds) != count($GEDCOMS)) {
@@ -395,21 +375,41 @@ abstract class SearchFunctions {
 		$media_total = array();
 		$media_hide = array();
 		$medialist = array();
+		$indisel = array();
+		$famsel = array();
+		$soursel = array();
 		$res = NewQuery($sql);
 		if ($res) {
+			$oldkey = "";
 	 		while ($row = $res->FetchAssoc()) {
-		 		$media = array();
-		 		SwitchGedcom($row["m_file"]);
-				$media_total[$row["m_media"]."[".$GEDCOMID."]"] = 1;
-		 		if (PrivacyFunctions::DisplayDetailsByID($row["m_media"], "OBJE", 1, true)) {
-					$media = array();
-					$media["gedfile"] = $GEDCOMID;
-					$media["name"] = GetMediaDescriptor($row["m_media"], $row["m_gedrec"]);
-					$medialist[JoinKey($row["m_media"], $row["m_file"])] = $media;
-	 			}
-		 		else $media_hide[$row["m_media"]."[".$GEDCOMID."]"] = 1;
-		 		SwitchGedcom();
+		 		$key = $row["m_media"]."[".$row["m_file"]."]";
+				if ($oldkey != $key) {
+					$oldkey = $key;
+					$media = MediaItem::GetInstance($row["m_media"], $row, $row["m_file"]);
+					$medialist[$media->key] = $media;
+				}
+				$media->addlink = array($row["mm_gid"], $row["mm_type"], $row["mm_file"]);
+				if ($LINK_PRIVACY) {
+					if ($row["mm_type"] == "INDI" && !Person::IsInstance($row["mm_gid"], $row["mm_file"])) $indisel[] = $row["mm_gid"]."[".$row["mm_file"]."]";
+					else if ($row["mm_type"] == "FAM" && !Family::IsInstance($row["mm_gid"], $row["mm_file"])) $famsel[] = $row["mm_gid"]."[".$row["mm_file"]."]";
+					else if ($row["mm_type"] == "SOUR" && !Source::IsInstance($row["mm_gid"], $row["mm_file"])) $soursel[] = $row["mm_gid"]."[".$row["mm_file"]."]";
+				}
 	 		}
+			if (count($indisel) > 0) {
+				array_flip(array_flip($indisel));
+				$indiselect = "'".implode("','", $indisel)."'";
+				ListFunctions::GetIndiList("", $indiselect, false);
+			}
+			if (count($famsel) > 0) {
+				array_flip(array_flip($famsel));
+				$famselect = "'".implode ("','", $famsel)."'";
+				ListFunctions::GetFamList("", $famselect, false);
+			}
+			if (count($soursel) > 0) {
+				array_flip(array_flip($soursel));
+				$sourselect = "'".implode ("','", $soursel)."'";
+				ListFunctions::GetSourceList($sourselect, false);
+			}
 		}
 		return $medialist;
 	}
@@ -466,13 +466,9 @@ abstract class SearchFunctions {
 	 		while ($row = $res->FetchAssoc()) {
 		 		$note =& Note::GetInstance($row["o_id"], $row, $row["o_file"]);
 		 		$note->GetTitle(40);
-		 		SwitchGedcom($row["o_file"]);
-				$note_total[$note->xref."[".$GEDCOMID."]"] = 1;
-		 		if ($note->disp) $notelist[] = $note;
-		 		else $note_hide[$note->xref."[".$GEDCOMID."]"] = 1;
-		 		SwitchGedcom();
+		 		$notelist[$row["o_key"]] = $note;
 	 		}
-	 		usort($notelist, "TitleObjSort");
+	 		uasort($notelist, "TitleObjSort");
 		}
 		return $notelist;
 	}
@@ -570,129 +566,17 @@ abstract class SearchFunctions {
 		else return $minwlen;
 	}
 	
-	// Used in search.php
-	public function SearchAddAssos() {
-		global $assolist, $indi_printed, $fam_printed, $printindiname, $printfamname, $famlist;
-	
-		// Step 1: Pull the relations to the printed results from the assolist
-		$toadd = array();
-		foreach ($assolist as $p1key => $assos) {
-			// Get the person who might be a relation
-			// Check if we can show him/her
-			SwitchGedcom(SplitKey($p1key, "gedid"));
-			foreach ($assos as $key => $asso) {
-				$p2key = $asso["pid2"];
-				// Design choice: we add to->from and from->to
-				// Check if he/she  and the persons/fams he/she is related to, actually exist
-				// Also respect name privacy for all related individuals. If one is hidden, it prevents the relation to be displayed
-				// p1key can be either indi or fam, p2key can only be indi.
-				if (array_key_exists($p2key, $indi_printed) || array_key_exists($p1key, $indi_printed) || array_key_exists($p1key, $fam_printed)) {
-					// p2key is always an indi, so check this first
-					$disp = true;
-					if (!PrivacyFunctions::showLivingNameByID(SplitKey($p2key, "id"))) $disp = false;
-					else {
-						if (!empty($asso["fact"]) &&!PrivacyFunctions::showFact($asso["fact"], SplitKey($p2key, "id"))) $disp = false;
-						else {
-							// assotype is the type of p1key
-							if ($asso["type"] == "indi") {
-								if (!PrivacyFunctions::showLivingNameByID(SplitKey($p1key, "id"))) $disp = false;
-							}
-							else {
-								$parents = FindParentsInRecord($asso["gedcom"]);
-								if (!PrivacyFunctions::showLivingNameByID($parents["HUSB"]) || !PrivacyFunctions::showLivingNameByID($parents["WIFE"])) $disp = false;
-							}
-						}
-					}
-					if ($disp && !empty($asso["resn"])) {
-						if (!empty($asso["fact"])) {
-							$rec = "1 ".$fact."\r\n2 ASSO @".SplitKey($p1key, "id")."@\r\n2 RESN ".$asso["resn"]."\r\n";
-							$disp = PrivacyFunctions::FactViewRestricted(SplitKey($p2key, "id"), $rec, 2);
-						}
-						else {
-							$rec = "1 ASSO @".SplitKey($p1key, "id")."@\r\n2 RESN ".$asso["resn"]."\r\n";
-							$disp = PrivacyFunctions::FactViewRestricted(SplitKey($p2key, "id"), $rec, 2);
-						}
-					}
-					// save his relation to existing search results
-					if ($disp) {
-						$toadd[$p1key][] = array($p2key, "indi", $asso["fact"], $asso["role"]);
-						$toadd[$p2key][] = array($p1key, $asso["type"], $asso["fact"], $asso["role"]);
-					}
-				}
-			}
-		}
-	
-		// Step 2: Add the relations who are not printed themselves
-		foreach ($toadd as $add => $links) {
-			$arec = FindGedcomRecord(SplitKey($add, "id"));
-			$type = GetRecType($arec);
-			if ($type == "INDI") {
-				if (!array_key_exists($add, $indi_printed)) {
-					$indi_printed[$add] = "1";
-					$names = GetIndiNames($arec);
-					foreach ($names as $nkey => $namearray) {
-						$printindiname[] = array(NameFunctions::SortableNameFromName($namearray[0]), SplitKey($add, "id"), SplitKey($add, "gedid"), "");
-					}
-				}
-			}
-			else {
-				if (!array_key_exists($add, $fam_printed)) {
-					$fam_printed[$add] = "1";
-					$fam = $famlist[$add];
-					$hname = GetSortableName($fam["HUSB"], "", "", true);
-					$wname = GetSortableName($fam["WIFE"], "", "", true);
-					if (empty($hname)) $hname = "@N.N.";
-					if (empty($wname)) $wname = "@N.N.";
-					$name = array();
-					foreach ($hname as $hkey => $hn) {
-						foreach ($wname as $wkey => $wn) {
-							$name[] = $hn." + ".$wn;
-							$name[] = $wn." + ".$hn;
-						}
-					}
-					foreach ($name as $namekey => $famname) {
-						$famsplit = preg_split("/(\s\+\s)/", trim($famname));
-						// Both names have to have the same direction and combination of chinese/not chinese
-						if (hasRTLText($famsplit[0]) == hasRTLText($famsplit[1]) && HasChinese($famsplit[0], true) == HasChinese($famsplit[1], true)) {
-							$printfamname[]=array(CheckNN($famname), SplitKey($add, "id"), $fam["gedfile"],"");
-						}
-					}
-				}
-			}
-		}
-	
-		// Step 3: now cycle through the indi search results to add a relation link
-		foreach ($printindiname as $pkey => $printindi) {
-			$pikey = JoinKey($printindi[1], get_id_from_gedcom($printindi[2]));
-			if (isset($toadd[$pikey])) {
-				foreach ($toadd[$pikey] as $rkey => $asso) {
-					SwitchGedcom($printindi[2]);
-					$printindiname[$pkey][3][] = $asso;
-				}
-			}
-		}
-		// Step 4: now cycle through the fam search results to add a relation link
-		foreach ($printfamname as $pkey => $printfam) {
-			$pikey = JoinKey($printfam[1], get_id_from_gedcom($printfam[2]));
-			if (isset($toadd[$pikey])) {
-				foreach ($toadd[$pikey] as $rkey => $asso) {
-					SwitchGedcom($printfam[2]);
-					$printfamname[$pkey][3][] = $asso;
-				}
-			}
-		}
-		SwitchGedcom();
-	}
 	// Used in calendar.php
 	public function SearchIndisYearRange($startyear, $endyear, $allgeds=false, $type="", $est="") {
 		global $GEDCOMID;
 	
 		$myindilist = array();
-		$sql = "SELECT DISTINCT i_key, i_id, i_file, i_gedrec, i_isdead, n_name, n_surname, n_letter, n_type FROM ".TBLPREFIX."individuals INNER JOIN ".TBLPREFIX."names ON i_key=n_key INNER JOIN ".TBLPREFIX."dates ON (i_key=d_key AND d_fact<>'CHAN') WHERE";
+		$sql = "SELECT DISTINCT i_key, i_id, i_file, i_gedrec, i_isdead, n_name, n_surname, n_nick, n_letter, n_type FROM ".TBLPREFIX."individuals INNER JOIN ".TBLPREFIX."names ON i_key=n_key INNER JOIN ".TBLPREFIX."dates ON (i_key=d_key AND d_fact<>'CHAN') WHERE";
 		if ($startyear < $endyear) $sql .= " d_year>='".$startyear."' AND d_year<='".$endyear."'";
 		else $sql .= " d_year=".$startyear;
 		if (!empty($type)) $sql .= " AND d_fact IN ".$type;
 		if (!$allgeds) $sql .= " AND i_file='".$GEDCOMID."'";
+		$sql .= " ORDER BY i_key, n_id";
 //		print $sql;
 		$res = NewQuery($sql);
 		
@@ -709,7 +593,7 @@ abstract class SearchFunctions {
 				}
 				else self::$indi_hide[$key] = 1;
 			}
-			if ($person->disp_name) $myindilist[$row["i_key"]]->addname = array($row["n_name"], $row["n_letter"], $row["n_surname"], $row["n_type"]);
+			if ($person->disp_name) $myindilist[$row["i_key"]]->addname = array($row["n_name"], $row["n_letter"], $row["n_surname"], $row["n_nick"], $row["n_type"]);
 		}
 		if ($key != "") $person->names_read = true;
 		
@@ -744,8 +628,8 @@ abstract class SearchFunctions {
 		
 		$select = array();
 		while($row = $res->FetchAssoc()){
-			if (!empty($row["f_husb"])) $select[] = $row["f_husb"];
-			if (!empty($row["f_wife"])) $select[] = $row["f_wife"];
+			if ($row["f_husb"] != "" && !Person::IsInstance(SplitKey($row["f_husb"], "id"), $row["f_file"])) $select[] = $row["f_husb"];
+			if ($row["f_wife"] != "" && !Person::IsInstance(SplitKey($row["f_wife"], "id"), $row["f_file"])) $select[] = $row["f_wife"];
 			$fam = null;
 			$fam =& Family::GetInstance($row["f_id"], $row);
 			$myfamlist[$row["f_key"]] = $fam;
@@ -874,8 +758,8 @@ abstract class SearchFunctions {
 		while($row = $res->FetchAssoc()){
 			$fam = null;
 			$fam =& Family::GetInstance($row["f_id"], $row);
-			if (!empty($row["f_husb"])) $select[] = $row["f_husb"];
-			if (!empty($row["f_wife"])) $select[] = $row["f_wife"];
+			if ($row["f_husb"] != "" && !Person::IsInstance(SplitKey($row["f_husb"], "id"), $row["f_file"])) $select[] = $row["f_husb"];
+			if ($row["f_wife"] != "" && !Person::IsInstance(SplitKey($row["f_wife"], "id"), $row["f_file"])) $select[] = $row["f_wife"];
 			$myfamlist[$row["f_key"]] = $fam;
 			self::$fam_total[$row["f_key"]] = 1;
 		}
@@ -917,7 +801,7 @@ abstract class SearchFunctions {
 		
 		$myindilist = array();
 		
-		$sql = "SELECT DISTINCT i_key, i_id, i_file, i_gedrec, i_isdead, n_name, n_surname, n_type, n_letter FROM ".TBLPREFIX."individuals INNER JOIN ".TBLPREFIX."names ON n_key=i_key INNER JOIN ".TBLPREFIX."dates ON (d_key=i_key AND d_fact<>'CHAN') WHERE";
+		$sql = "SELECT DISTINCT i_key, i_id, i_file, i_gedrec, i_isdead, n_name, n_surname, n_nick, n_type, n_letter FROM ".TBLPREFIX."individuals INNER JOIN ".TBLPREFIX."names ON n_key=i_key INNER JOIN ".TBLPREFIX."dates ON (d_key=i_key AND d_fact<>'CHAN') WHERE";
 		$and = "";
 		if (!empty($day)) {
 			$sql .= " d_day='".DbLayer::EscapeQuery($day)."'";
@@ -956,6 +840,8 @@ abstract class SearchFunctions {
 			$and = " AND";
 		}
 		if (!empty($fact)) $sql .= $and." d_fact IN ".$fact;
+		
+		$sql .= "ORDER BY i_key, n_id";
 //		$sql .= "GROUP BY i_id ORDER BY d_year, d_month, d_day DESC";
 //print $sql;
 		$res = NewQuery($sql);
@@ -973,7 +859,7 @@ abstract class SearchFunctions {
 					}
 					else self::$indi_hide[$key] = 1;
 				}
-				if ($person->disp_name) $myindilist[$row["i_key"]]->addname = array($row["n_name"], $row["n_letter"], $row["n_surname"], $row["n_type"]);
+				if ($person->disp_name) $myindilist[$row["i_key"]]->addname = array($row["n_name"], $row["n_letter"], $row["n_surname"], $row["n_nick"], $row["n_type"]);
 			}
 			if ($key != "") $person->names_read = true;
 		}
@@ -993,7 +879,7 @@ abstract class SearchFunctions {
 	 * @return	array $myfamlist array with all individuals that matched the query
 	 */
 	public function SearchFamsDates($day="", $month="", $year="", $fact="", $allgeds=false) {
-		global $famlist, $GEDCOMS, $GEDCOMID;
+		global $GEDCOMS, $GEDCOMID;
 		$myfamlist = array();
 		
 		$sql = "SELECT f_key, f_id, f_husb, f_wife, f_file, f_gedrec, d_gid, d_fact FROM ".TBLPREFIX."dates, ".TBLPREFIX."families WHERE f_key=d_key";
@@ -1028,8 +914,8 @@ abstract class SearchFunctions {
 		while($row = $res->FetchAssoc()){
 			$fam = null;
 			$fam =& Family::GetInstance($row["f_id"], $row);
-			if (!empty($row["f_husb"])) $select[] = $row["f_husb"];
-			if (!empty($row["f_wife"])) $select[] = $row["f_wife"];
+			if ($row["f_husb"] != "" && !Person::IsInstance(SplitKey($row["f_husb"], "id"), $row["f_file"])) $select[] = $row["f_husb"];
+			if ($row["f_wife"] != "" && !Person::IsInstance(SplitKey($row["f_wife"], "id"), $row["f_file"])) $select[] = $row["f_wife"];
 			$myfamlist[$row["f_key"]] = $fam;
 			self::$fam_total[$row["f_key"]] = 1;
 		}
@@ -1053,6 +939,203 @@ abstract class SearchFunctions {
 		
 		return $myfamlist;
 	}
-
+	
+	
+	//-- search through the gedcom records for families
+	function SearchFamsNames($query, $ANDOR="AND", $allnames=false) {
+		global $GEDCOMID;
+	
+		$myfamlist = array();
+		$sql = "SELECT f_key, f_id, f_husb, f_wife, f_file, f_gedrec FROM ".TBLPREFIX."individual_family INNER JOIN ".TBLPREFIX."families on f_key=if_fkey WHERE if_pkey IN ('".implode("','", $query)."') AND if_role='S'";
+//		$sql = "SELECT f_key, f_id, f_husb, f_wife, f_file, f_gedrec FROM ".TBLPREFIX."families WHERE (";
+//		$i=0;
+//		foreach($query as $indexval => $q) {
+	
+//			if ($i>0) $sql .= " $ANDOR ";
+//			$sql .= "((f_husb='".DbLayer::EscapeQuery(JoinKey($q[0], $q[1]))."' OR f_wife='".DbLayer::EscapeQuery(JoinKey($q[0], $q[1]))."') AND f_file='".DbLayer::EscapeQuery($q[1])."')";
+//			$i++;
+//		}
+//		$sql .= ")";
+	
+		$res = NewQuery($sql);
+	//	$gedold = $GEDCOMID;
+		$select = array();
+		while($row = $res->fetchAssoc()){
+			$fam = Family::GetInstance($row["f_id"], $row, $row["f_file"]);
+			$myfamlist[$row["f_key"]] = $fam;
+			if ($row["f_husb"] != "" && !Person::IsInstance(SplitKey($row["f_husb"], "id"), $row["f_file"])) $select[] = $row["f_husb"];
+			if ($row["f_wife"] != "" && !Person::IsInstance(SplitKey($row["f_wife"], "id"), $row["f_file"])) $select[] = $row["f_wife"];
+		}
+		if (count($select) > 0) {
+			array_flip(array_flip($select));
+			//print "Indi's selected for fams: ".count($select)."<br />";
+			$selection = "'".implode("','", $select)."'";
+			ListFunctions::GetIndilist("", $selection, false);
+		}
+		$res->FreeResult();
+		return $myfamlist;
+	}
+	
+	public function PrintIndiSearchResults(&$controller, $paste=false) {
+		global $TEXT_DIRECTION, $GM_IMAGES;
+		
+		if (count($controller->indi_total) > 0 && !is_null($controller->srindi)) {
+			
+			$cti = count($controller->printindiname);
+			print "\n\t<table class=\"list_table ".$TEXT_DIRECTION."\">\n\t\t<tr><td class=\"shade2 center\"";
+			if($cti > 12) print " colspan=\"2\"";
+			print "><img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["indis"]["small"]."\" border=\"0\" title=\"".GM_LANG_people."\" alt=\"".GM_LANG_individuals."\" />&nbsp;&nbsp;";
+			print GM_LANG_individuals;
+			print "</td></tr><tr><td class=\"$TEXT_DIRECTION shade1 wrap\"><ul>";
+			$i=1;
+			$indi_private = array();
+			foreach($controller->printindiname as $pkey => $pvalue) {
+				$person = $controller->sindilist[JoinKey($pvalue[1], $pvalue[2])];
+				if (!$person->PrintListPerson(true, false, "", $pvalue[4], "", $pvalue[3], $paste)) $indi_private[$person->key] = true;;
+				print "\n";
+				if ($i==ceil($cti/2) && $cti>12) print "</ul></td><td class=\"shade1 wrap\"><ul>\n";
+				$i++;
+			}
+			print "\n\t\t</ul>&nbsp;</td></tr>";
+			
+			print "<tr><td>".GM_LANG_total_indis." ".count($controller->indi_total);
+			if (count($indi_private)>0) print "  (".GM_LANG_private." ".count($indi_private).")";
+			if (count($controller->indi_hide) > 0) print "  --  ".GM_LANG_hidden." ".count($controller->indi_hide);
+			if (count($indi_private) > 0 || count($controller->indi_hide) > 0) PrintHelpLink("privacy_error_help", "qm");
+			print "</td></tr>";
+			print "</table>";
+			return true;
+		}
+		else return false;
+	}
+	
+	public function PrintFamSearchResults(&$controller, $paste=false) {
+		global $TEXT_DIRECTION, $GM_IMAGES;
+		
+		if (count($controller->fam_total) > 0) {
+		
+			$ctf = count($controller->printfamname);
+			print "\n\t<table class=\"list_table ".$TEXT_DIRECTION."\">\n\t\t<tr><td class=\"shade2 center\"";
+			if ($ctf > 12) print " colspan=\"2\"";
+			print "><img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["sfamily"]["small"]."\" border=\"0\" alt=\"".GM_LANG_families."\" />&nbsp;&nbsp;";
+			print GM_LANG_families;
+			print "</td></tr><tr><td class=\"$TEXT_DIRECTION shade1 wrap\"><ul>";
+			$i=1;
+			$fam_private = array();
+			foreach($controller->printfamname as $pkey => $pvalue) {
+				$fam = $controller->sfamlist[JoinKey($pvalue[1], $pvalue[2])];
+				if (!$fam->PrintListFamily(true, "", $pvalue[0], $pvalue[3], $paste)) $fam_private[$fam->key] = true;
+				print "\n";
+				if ($i==ceil($ctf/2) && $ctf>12) print "</ul></td><td class=\"shade1 wrap\"><ul>\n";
+				$i++;
+			}
+			print "\n\t\t</ul>&nbsp;</td></tr>";
+			
+			print "<tr><td>".GM_LANG_total_fams." ".count($controller->fam_total);
+			if (count($fam_private) > 0) print "  (".GM_LANG_private." ".count($fam_private).")";
+			if (count($controller->fam_hide) > 0) print "  --  ".GM_LANG_hidden." ".count($controller->fam_hide);
+			if (count($fam_private) > 0 || count($controller->fam_hide) > 0) PrintHelpLink("privacy_error_help", "qm");
+			print "</td></tr>";
+			print "</table>";
+			return true;
+		}
+		else return false;
+	}
+	
+	public function PrintSourceSearchResults(&$controller, $paste=false) {
+		global $TEXT_DIRECTION, $GM_IMAGES;
+		
+		if (count($controller->sour_total) > 0) {
+			
+			$cts = count($controller->printsource);
+			print "\n\t<table class=\"list_table $TEXT_DIRECTION\">\n\t\t<tr><td class=\"shade2 center\"";
+			if($cts > 12) print " colspan=\"2\"";
+			print "><img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["source"]["small"]."\" border=\"0\" alt=\"".GM_LANG_sources."\" />&nbsp;&nbsp;";
+			print GM_LANG_sources;
+			print "</td></tr><tr><td class=\"$TEXT_DIRECTION shade1 wrap\"><ul>";
+			$sour_private = array();
+			$i=1;
+			foreach ($controller->printsource as $key => $sourcekey) {
+				$source = $controller->ssourcelist[$sourcekey];
+				if (!$source->PrintListSource(true, 1, "", $paste)) $sour_private[$source->key] = true;
+				if ($i==ceil($cts/2) && $cts>12) print "</ul></td><td class=\"shade1 wrap\"><ul>\n";
+				$i++;
+			}
+			print "\n\t\t</ul>&nbsp;</td></tr>";
+			
+			print "<tr><td>".GM_LANG_total_sources." ".count($controller->sour_total);
+			if (count($controller->sour_hide) > 0) print "  --  ".GM_LANG_hidden." ".count($controller->sour_hide);
+			if (count($sour_private) > 0) print "  --  ".GM_LANG_private." ".count($sour_private);
+			if (count($sour_private) > 0 || count($controller->sour_hide) > 0) PrintHelpLink("privacy_error_help", "qm");
+			print "</td></tr>";
+			print "</table>";
+			return true;
+		}
+		else return false;
+	}
+	
+	public function PrintRepoSearchResults(&$controller, $paste=false) {
+		global $TEXT_DIRECTION, $GM_IMAGES;
+		
+		if (count($controller->repo_total) > 0) {
+			
+			$ctr = count($controller->printrepo);
+			print "\n\t<table class=\"list_table $TEXT_DIRECTION\">\n\t\t<tr><td class=\"shade2 center\"";
+			if($ctr > 12) print " colspan=\"2\"";
+			print "><img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["repository"]["small"]."\" border=\"0\" alt=\"".GM_LANG_search_repos."\" />&nbsp;&nbsp;";
+			print GM_LANG_search_repos;
+			print "</td></tr><tr><td class=\"$TEXT_DIRECTION shade1 wrap\"><ul>";
+			$repo_private = array();
+			$i=1;
+			foreach ($controller->printrepo as $key => $repokey) {
+				$repo = $controller->srepolist[$repokey];
+				if (!$repo->PrintListRepository(true, 1, false, "", $paste)) $repo_private[$repo->key] = true;
+				if ($i==ceil($ctr/2) && $ctr>12) print "</ul></td><td class=\"shade1 wrap\"><ul>\n";
+				$i++;
+			}
+			print "\n\t\t</ul>&nbsp;</td></tr>";
+			
+			print "<tr><td>".GM_LANG_total_repositories." ".count($controller->repo_total);
+			if (count($controller->repo_hide) > 0) print "  --  ".GM_LANG_hidden." ".count($controller->repo_hide);
+			if (count($repo_private)>0) print "  --  ".GM_LANG_private." ".count($repo_private);
+			if (count($repo_private) > 0 || count($controller->repo_hide) > 0) PrintHelpLink("privacy_error_help", "qm");
+			print "</td></tr>";
+			print "</table>";
+			return true;
+		}
+		else return false;
+	}
+	
+	public function PrintNoteSearchResults(&$controller, $paste=false) {
+		global $TEXT_DIRECTION, $GM_IMAGES;
+		
+		if (count($controller->note_total) > 0) {
+			
+			$ctn = count($controller->printnote);
+			print "\n\t<table class=\"list_table $TEXT_DIRECTION\">\n\t\t<tr><td class=\"shade2 center\"";
+			if($ctn > 12) print " colspan=\"2\"";
+			print "><img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["note"]["other"]."\" border=\"0\" alt=\"".GM_LANG_notes."\" />&nbsp;&nbsp;";
+			print GM_LANG_notes;
+			print "</td></tr><tr><td class=\"$TEXT_DIRECTION shade1 wrap\"><ul>";
+			$i=1;
+			$note_private = array();
+			foreach ($controller->printnote as $key => $notekey) {
+				$note = $controller->snotelist[$notekey];
+				if (!$note->PrintListNote(60, true, $paste)) $note_private[$note->key] = true;
+				if ($i == ceil($ctn/2) && $ctn>12) print "</ul></td><td class=\"shade1 wrap\"><ul>\n";
+				$i++;
+			}
+			print "\n\t\t</ul>&nbsp;</td></tr>";
+			print "<tr><td>".GM_LANG_total_notes." ".count($controller->note_total);
+			if (count($controller->note_hide) > 0) print "  --  ".GM_LANG_hidden." ".count($controller->note_hide);
+			if (count($note_private) > 0) print "  --  ".GM_LANG_private." ".count($note_private);
+			if (count($note_private) > 0 || count($controller->note_hide) > 0) PrintHelpLink("privacy_error_help", "qm");
+			print "</td></tr>";
+			print "</table>";
+			return true;
+		}
+		else return false;
+		
+	}	
 }
 ?>

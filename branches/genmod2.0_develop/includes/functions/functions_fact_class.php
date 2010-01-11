@@ -73,7 +73,7 @@ abstract class FactFunctions {
 	
 		// -- avoid known non facts
 		if (in_array($fact, $nonfacts)) return;
-		
+
 		if (!$factobj->owner->canedit) {
 			//-- do not print empty facts to visitors. Editors may want to change them
 			$lines = preg_split("/\n/", trim($factobj->factrec));
@@ -184,7 +184,7 @@ abstract class FactFunctions {
 						$prted = true;
 					}
 					else if ($fact == "RESN") {
-						print PrintReady(print_help_link("RESN_help", "qm", "", "", true).constant("GM_LANG_".$event));
+						print PrintReady(PrintHelpLink("RESN_help", "qm", "", "", true).constant("GM_LANG_".$event));
 					}
 					else if (!strstr("PHON ADDR ", $fact." ") && $event!="Y") {
 						print PrintReady($event." ");
@@ -305,7 +305,7 @@ abstract class FactFunctions {
 					// -- Find RESN tag
 					if (isset($resn_value)) {
 						if ($n1 ||$n2 || $n3) print "<br />";
-						print_help_link("RESN_help", "qm");
+						PrintHelpLink("RESN_help", "qm");
 						print PrintReady(GM_FACT_RESN.": ".constant("GM_LANG_".$resn_value))."\n";
 					}
 				}
@@ -869,7 +869,7 @@ abstract class FactFunctions {
 	private function PrintResn($factobj) {
 		
 		if ($factobj->resnvalue != "") {
-			print_help_link("RESN_help", "qm");
+			PrintHelpLink("RESN_help", "qm");
 			print PrintReady(GM_FACT_RESN.": ".constant("GM_LANG_".$factobj->resnvalue))."\n";
 		}
 	}
@@ -1064,7 +1064,7 @@ abstract class FactFunctions {
 	
 		usort($addfacts, "FactSort");
 		print "<tr><td class=\"shade2 width20\">";
-		print_help_link("add_new_facts_help", "qm");
+		PrintHelpLink("add_new_facts_help", "qm");
 		print GM_LANG_add_fact."</td>";
 		print "<td class=\"shade1\">";
 		print "<form method=\"get\" name=\"newfactform\" action=\"\">\n";
