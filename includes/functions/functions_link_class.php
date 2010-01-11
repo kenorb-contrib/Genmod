@@ -140,13 +140,13 @@ abstract class LinkFunctions {
 	 * @author	Genmod Development Team
 	 * @param		$element_id	The ID of the form field
 	 */
-	public function PrintFindMediaLink($element_id) {
+	public function PrintFindMediaFileLink($element_id) {
 		global $GM_IMAGES;
 	
-		$text = GM_LANG_find_media;
+		$text = GM_LANG_find_mfile;
 		if (isset($GM_IMAGES["media"]["button"])) $Link = "<img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["media"]["button"]."\" alt=\"".$text."\" title=\"".$text."\" border=\"0\" align=\"middle\" />";
 		else $Link = $text;
-		print " <a href=\"javascript: ".$text."\" onclick=\"findMedia(document.getElementById('".$element_id."')); return false;\">";
+		print " <a href=\"javascript: ".$text."\" onclick=\"findMFile(document.getElementById('".$element_id."')); return false;\">";
 		print $Link;
 		print "</a>";
 	}
@@ -160,13 +160,13 @@ abstract class LinkFunctions {
 	 * @author	Genmod Development Team
 	 * @param		$element_id	The ID of the form field
 	 */
-	public function PrintFindObjectLink($element_id) {
+	public function PrintFindMediaLink($element_id) {
 		global $GM_IMAGES;
 	
 		$text = GM_LANG_find_media;
 		if (isset($GM_IMAGES["media"]["button"])) $Link = "<img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["media"]["button"]."\" alt=\"".$text."\" title=\"".$text."\" border=\"0\" align=\"middle\" />";
 		else $Link = $text;
-		print " <a href=\"javascript: ".$text."\" onclick=\"findObject(document.getElementById('".$element_id."')); return false;\">";
+		print " <a href=\"javascript: ".$text."\" onclick=\"findMedia(document.getElementById('".$element_id."')); return false;\">";
 		print $Link;
 		print "</a>";
 	}

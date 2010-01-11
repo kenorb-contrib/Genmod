@@ -113,7 +113,7 @@ abstract class EditFunctions {
 		
 		$ct = preg_match("/0 @(.*)@\s(\w+)/", $newrec, $match);
 		$type = trim($match[2]);
-		$xref = GetNewXref($type);
+		$xref = self::GetNewXref($type);
 		$_SESSION["last_used"][$type] = JoinKey($xref, $GEDCOMID);
 		$newrec = preg_replace("/0 @(.*)@/", "0 @$xref@", $newrec);
 		
@@ -170,11 +170,11 @@ abstract class EditFunctions {
 			$res = NewQuery($sql);
 			// Also delete the asso recs to an indi, to preserve referential integrity
 			if ($ch_fact == "INDI" || $ch_fact == "FAM") {
-				$assos = GetAssoList($ch_fact, $gid);
+				$assos = ListFunctions::GetAssoList($ch_fact, $gid);
 				foreach ($assos as $p1key => $pidassos) {
 					foreach ($pidassos as $nothing =>$asso) {
-						$pid1 = SplitKey($p1key, "id");
-						$pid2 = SplitKey($asso["pid2"], "id");
+						$pid1 = $asso->xref1;
+						$pid2 = $asso->xref2;
 						$arec = ChangeFunctions::GetChangeData(false, $pid2, true, "gedlines","");
 						if (isset($rec[$GEDCOMID][$pid2])) $arec = $rec[$GEDCOMID][$pid2];
 						else $arec = FindGedcomRecord($pid2);
@@ -274,7 +274,7 @@ abstract class EditFunctions {
 		global $NPFX_accept, $SPFX_accept, $NSFX_accept, $FILE_FORM_accept, $change_type;
 		global $GEDCOMID, $gm_user;
 	
-		init_calendar_popup();
+		InitCalendarPopUp();
 		print "<form method=\"post\" name=\"addchildform\" action=\"edit_interface.php\">\n";
 		print "<input type=\"hidden\" name=\"action\" value=\"".$nextaction."\" />\n";
 		print "<input type=\"hidden\" name=\"famid\" value=\"".$famid."\" />\n";
@@ -600,7 +600,7 @@ abstract class EditFunctions {
 	 * generates javascript code for calendar popup in user's language
 	 *
 	 * @param string id		form text element id where to return date value
-	 * @see init_calendar_popup()
+	 * @see InitCalendarPopUp()
 	 */
 	public function PrintCalendarPopup($id) {
 		global $GM_IMAGES;
@@ -694,9 +694,9 @@ abstract class EditFunctions {
 		// NOTE: Help link
 		if (!in_array($fact, $emptyfacts) || in_array($fact, $canhavey_facts)) {
 			print "<td class=\"shade2 $TEXT_DIRECTION\">";
-			if ($fact=="DATE") print_help_link("def_gedcom_date_help", "qm", "date");
-			else if ($fact=="RESN") print_help_link($fact."_help", "qm");
-			else print_help_link("edit_".$fact."_help", "qm");
+			if ($fact=="DATE") PrintHelpLink("def_gedcom_date_help", "qm", "date");
+			else if ($fact=="RESN") PrintHelpLink($fact."_help", "qm");
+			else PrintHelpLink("edit_".$fact."_help", "qm");
 			if (defined("GM_LANG_".$fact)) print constant("GM_LANG_".$fact);
 			else if (defined("GM_FACT_".$fact)) print constant("GM_FACT_".$fact);
 			else print $fact;
@@ -913,9 +913,9 @@ abstract class EditFunctions {
 		if ($fact=="FAMC") LinkFunctions::PrintFindFamilyLink($element_id);
 		if ($fact=="FAMS") LinkFunctions::PrintFindFamilyLink($element_id);
 		if ($fact=="ASSO") LinkFunctions::PrintFindIndiLink($element_id,"");
-		if ($fact=="FILE") LinkFunctions::PrintFindMediaLink($element_id);
+		if ($fact=="FILE") LinkFunctions::PrintFindMediaFileLink($element_id);
 		if ($fact=="OBJE" && $islink) {
-			LinkFunctions::PrintFindObjectLink($element_id);
+			LinkFunctions::PrintFindMediaLink($element_id);
 			LinkFunctions::PrintAddNewObjectLink($element_id);
 		}
 		if ($fact=="SOUR") {
@@ -1051,7 +1051,7 @@ abstract class EditFunctions {
 		if ($tag=="SOUR") {
 			//-- Add new source to fact
 			print "<a href=\"#\" onclick=\"expand_layer('newsource'); if(document.getElementById('newsource').style.display == 'block') document.getElementById(addsourcefocus).focus(); return false;\"><img id=\"newsource_img\" src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["plus"]["other"]."\" border=\"0\" width=\"11\" height=\"11\" alt=\"\" title=\"\" /> ".GM_LANG_add_source."</a>";
-			print_help_link("edit_add_SOUR_help", "qm");
+			PrintHelpLink("edit_add_SOUR_help", "qm");
 			print "<br />";
 			print "<div id=\"newsource\" style=\"display: none;\">\n";
 			print "<table class=\"facts_table\">\n";
@@ -1083,7 +1083,7 @@ abstract class EditFunctions {
 		if ($tag=="ASSO") {
 			//-- Add a new ASSOciate
 			print "<a href=\"#\" onclick=\"expand_layer('newasso'); if(document.getElementById('newasso').style.display == 'block') document.getElementById(addassofocus).focus(); return false;\"><img id=\"newasso_img\" src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["plus"]["other"]."\" border=\"0\" width=\"11\" height=\"11\" alt=\"\" title=\"\" /> ".GM_LANG_add_asso."</a>";
-			print_help_link("edit_add_ASSO_help", "qm");
+			PrintHelpLink("edit_add_ASSO_help", "qm");
 			print "<br />";
 			print "<div id=\"newasso\" style=\"display: none;\">\n";
 			print "<table class=\"facts_table\">\n";
@@ -1105,7 +1105,7 @@ abstract class EditFunctions {
 		if ($tag=="NOTE") {
 			//-- Add new note to fact
 			print "<a href=\"#\" onclick=\"expand_layer('newnote'); if(document.getElementById('newnote').style.display == 'block') document.getElementById(addnotefocus).focus(); return false;\"><img id=\"newnote_img\" src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["plus"]["other"]."\" border=\"0\" width=\"11\" height=\"11\" alt=\"\" title=\"\" /> ".GM_LANG_add_note."</a>";
-			print_help_link("edit_add_NOTE_help", "qm");
+			PrintHelpLink("edit_add_NOTE_help", "qm");
 			print "<br />\n";
 			print "<div id=\"newnote\" style=\"display: none;\">\n";
 			print "<table class=\"facts_table\">\n";
@@ -1123,7 +1123,7 @@ abstract class EditFunctions {
 		if ($tag=="GNOTE") {
 			//-- Add new general note to fact
 			print "<a href=\"#\" onclick=\"expand_layer('newgnote'); if(document.getElementById('newgnote').style.display == 'block') document.getElementById(addgnotefocus).focus(); return false;\"><img id=\"newnote_img\" src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["plus"]["other"]."\" border=\"0\" width=\"11\" height=\"11\" alt=\"\" title=\"\" /> ".GM_LANG_add_gnote."</a>";
-			print_help_link("edit_add_NOTE_help", "qm");
+			PrintHelpLink("edit_add_NOTE_help", "qm");
 			print "<br />";
 			print "<div id=\"newgnote\" style=\"display: none;\">\n";
 			print "<table class=\"facts_table\">\n";
@@ -1141,7 +1141,7 @@ abstract class EditFunctions {
 		if ($tag=="OBJE") {
 			//-- Add new obje to fact
 			print "<a href=\"#\" onclick=\"expand_layer('newobje'); if(document.getElementById('newobje').style.display == 'block') document.getElementById(addobjefocus).focus(); return false;\"><img id=\"newobje_img\" src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["plus"]["other"]."\" border=\"0\" width=\"11\" height=\"11\" alt=\"\" title=\"\" /> ".GM_LANG_add_obje."</a>";
-			print_help_link("add_media_help", "qm");
+			PrintHelpLink("add_media_help", "qm");
 			print "<br />";
 			print "<div id=\"newobje\" style=\"display: none;\">\n";
 			print "<table class=\"facts_table\">\n";
@@ -1311,7 +1311,7 @@ abstract class EditFunctions {
 				}
 			}
 		}
-		$newged = CleanupTagsY($newged);
+		$newged = self::CleanupTagsY($newged);
 		return $newged;
 	}
 	
@@ -1349,7 +1349,7 @@ abstract class EditFunctions {
 		
 		if (GedcomConfig::$SHOW_QUICK_RESN) {
 			print "<tr><td class=\"shade2\">";
-			print_help_link("RESN_help", "qm");
+			PrintHelpLink("RESN_help", "qm");
 			print GM_FACT_RESN; 
 			print "</td>\n";
 			print "<td class=\"shade1\" colspan=\"3\">\n";
@@ -1915,6 +1915,134 @@ abstract class EditFunctions {
 			return $row[0];
 		}
 		else return false;
+	}
+	
+	/**
+	 * Get the next available xref
+	 *
+	 * @author	Genmod Development Team
+	 * @param		string	$type		The type of xref to retrieve
+	 * @return 	string	The new xref that was found
+	 */
+	
+	public function GetNewXref($type='INDI') {
+		global $changes;
+		global $FILE, $GEDCOMID;
+		
+		
+		if (isset($FILE) && !is_array($FILE)) $gedid = get_id_from_gedcom($FILE);
+		else $gedid = $GEDCOMID;
+	
+		switch ($type) {
+			case "INDI":
+				$sqlc = "select max(cast(substring(ch_gid,".(strlen(GedcomConfig::$GEDCOM_ID_PREFIX)+1).") as signed)) as xref from ".TBLPREFIX."changes where ch_file = '".$gedid."' AND ch_gid LIKE '".GedcomConfig::$GEDCOM_ID_PREFIX."%'";
+				$sql = "select max(cast(substring(i_rin,".(strlen(GedcomConfig::$GEDCOM_ID_PREFIX)+1).") as signed)) as xref from ".TBLPREFIX."individuals where i_file = '".$gedid."'";
+				break;
+			case "FAM":
+				$sqlc = "select max(cast(substring(ch_gid,".(strlen(GedcomConfig::$FAM_ID_PREFIX)+1).") as signed)) as xref from ".TBLPREFIX."changes where ch_file = '".$gedid."' AND ch_gid LIKE '".GedcomConfig::$FAM_ID_PREFIX."%'";
+				$sql = "select max(cast(substring(f_id,".(strlen(GedcomConfig::$FAM_ID_PREFIX)+1).") as signed)) as xref from ".TBLPREFIX."families where f_file = '".$gedid."'";
+				break;
+			case "OBJE":
+				$sqlc = "select max(cast(substring(ch_gid,".(strlen(GedcomConfig::$MEDIA_ID_PREFIX)+1).") as signed)) as xref from ".TBLPREFIX."changes where ch_file = '".$gedid."' AND ch_gid LIKE '".GedcomConfig::$MEDIA_ID_PREFIX."%'";
+				$sql = "select max(cast(substring(m_media,".(strlen(GedcomConfig::$MEDIA_ID_PREFIX)+1).") as signed)) as xref from ".TBLPREFIX."media where m_file = '".$gedid."'";
+				break;
+			case "SOUR":
+				$sqlc = "select max(cast(substring(ch_gid,".(strlen(GedcomConfig::$SOURCE_ID_PREFIX)+1).") as signed)) as xref from ".TBLPREFIX."changes where ch_file = '".$gedid."' AND ch_gid LIKE '".GedcomConfig::$SOURCE_ID_PREFIX."%'";
+				$sql = "select max(cast(substring(s_id,".(strlen(GedcomConfig::$SOURCE_ID_PREFIX)+1).") as signed)) as xref from ".TBLPREFIX."sources where s_file = '".$gedid."'";
+				break;
+			case "REPO":
+				$sqlc = "select max(cast(substring(ch_gid,".(strlen(GedcomConfig::REPO_ID_PREFIX)+1).") as signed)) as xref from ".TBLPREFIX."changes where ch_file = '".$gedid."' AND ch_gid LIKE '".GedcomConfig::$REPO_ID_PREFIX."%'";
+				$sql = "select max(cast(substring(o_id,".(strlen(GedcomConfig::REPO_ID_PREFIX)+1).") as signed)) as xref from ".TBLPREFIX."other where o_file = '".$gedid."' and o_type = 'REPO'";
+				break;
+			case "NOTE":
+				$sqlc = "select max(cast(substring(ch_gid,".(strlen(GedcomConfig::$NOTE_ID_PREFIX)+1).") as signed)) as xref from ".TBLPREFIX."changes where ch_file = '".$gedid."' AND ch_gid LIKE '".GedcomConfig::$NOTE_ID_PREFIX."%'";
+				$sql = "select max(cast(substring(o_id,".(strlen(GedcomConfig::$NOTE_ID_PREFIX)+1).") as signed)) as xref from ".TBLPREFIX."other where o_file = '".$gedid."' and o_type = 'NOTE'";
+				break;
+			case "CHANGE":
+				$sql = "select max(ch_cid) as xref from ".TBLPREFIX."changes where ch_file = '".$gedid."'";
+				break;
+			case "SUBM":
+				return "SUB1";
+				break;
+		}
+		$res = NewQuery($sql);
+		$row = $res->fetchRow();
+		$num = $row[0];
+		
+		// NOTE: Query from the change table
+		if (isset($sqlc)) {
+			$res = NewQuery($sqlc);
+			$row = $res->fetchRow();
+			$numc = $row[0];	
+			if ($numc > $num) $num = $numc;
+		}
+		// NOTE: Increase the number with one
+		$num++;
+		
+		// NOTE: Determine prefix needed
+		if ($type == "INDI") $prefix = GedcomConfig::$GEDCOM_ID_PREFIX;
+		else if ($type == "FAM") $prefix = GedcomConfig::$FAM_ID_PREFIX;
+		else if ($type == "OBJE") $prefix = GedcomConfig::$MEDIA_ID_PREFIX;
+		else if ($type == "SOUR") $prefix = GedcomConfig::$SOURCE_ID_PREFIX;
+		else if ($type == "REPO") $prefix = GedcomConfig::$REPO_ID_PREFIX;
+		else if ($type == "NOTE") $prefix = GedcomConfig::$NOTE_ID_PREFIX;
+		else if ($type == "CHANGE") return $num;
+	
+		return $prefix.$num;;
+	}
+
+	/*
+	* Return the media ID based on the FILE and TITLE value, depending on the gedcom setting
+	* If check for existing media is disabled, return false.
+	*/
+	public function CheckDoubleMedia($file, $title, $gedid) {
+		
+		if (GedcomConfig::$MERGE_DOUBLE_MEDIA == 0) return false;
+		
+		$sql = "SELECT m_media FROM ".TBLPREFIX."media WHERE m_file='".$gedid."' AND m_mfile LIKE '".DbLayer::EscapeQuery($file)."'";
+		if (GedcomConfig::$MERGE_DOUBLE_MEDIA == "2") $sql .= " AND m_titl LIKE '".DbLayer::EscapeQuery($title)."'";
+		$res = NewQuery($sql);
+		if ($res->NumRows() == 0) return false;
+		else {
+			$row = $res->FetchAssoc();
+			return $row["m_media"];
+		}
+	}
+
+
+	function CleanupTagsY($irec) {
+		$cleanup_facts = array("ANUL","CENS","DIVF","ENGA","MARB","MARC","MARL","MARS","ADOP","DSCR","BAPM","BARM","BASM","BLES","CHRA","CONF","FCOM","ORDN","NATU","EMIG","IMMI","CENS","PROB","WILL","GRAD","RETI");
+		
+		// Removed MARR, CHR, BIRT, DEAT and DIV which are allowed to have "Y", but only if no DATE and PLAC are present
+		// DIV is not mentioned in the gedcom standard, but DIV Y is supported because PAF (!) uses it.
+		// Genmod also supports BURI Y and CREM Y
+		$canhavey_facts = array("MARR","DIV","BIRT","DEAT","CHR","BURI","CREM"); 
+	
+		$subs = GetAllSubrecords($irec, "", false, false, false);
+		foreach ($subs as $key => $subrec) {
+			$oldsub = $subrec;
+			$ft = preg_match("/1\s(\w+)/", $subrec, $match);
+			$sfact = trim($match[1]);
+			if (in_array($sfact, $cleanup_facts) || (in_array($sfact, $canhavey_facts) && stristr($subrec, "1 ".$sfact." Y") && (stristr($subrec, "2 DATE") || stristr($subrec, "2 PLAC")))) {
+				$srchstr = "/1\s".$sfact."\sY\r\n2/";
+				$replstr = "1 ".$sfact."\r\n2";
+				$srchstr2 = "/1\s".$sfact."(.{0,1})\r\n2/";
+				$srchstr = "/1\s".$sfact."\sY\r\n2/";
+				$srchstr3 = "/1\s".$sfact."\sY\r\n1/";
+				$subrec = preg_replace($srchstr,$replstr,$subrec);
+				if (preg_match($srchstr2,$subrec)){
+					$subrec = preg_replace($srchstr3,"1",$subrec);
+				}
+				$irec = str_replace($oldsub, $subrec, $irec); 
+			}
+			else {
+				if (in_array($sfact, $canhavey_facts) && !stristr($subrec, $sfact." Y") && !stristr($irec, "2 DATE") && !stristr($irec, "2 PLAC")) {
+					$subrec = preg_replace("/1 ".$sfact."/", "1 ".$sfact." Y", $subrec);
+					$irec = str_replace($oldsub, $subrec, $irec); 
+				}
+			}
+		}
+		return $irec;
 	}
 	
 	

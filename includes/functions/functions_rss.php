@@ -122,7 +122,7 @@ function getUpcomingEvents() {
 							$PrivateFacts = true;
 						} else {
 							if ($lastgid!=$gid) {
-								$name = CheckNN(GetSortableName($gid));
+								$name = NameFunctions::CheckNN(GetSortableName($gid));
 								$daytext .= "<li><a href=\"".SERVER_URL ."individual.php?pid=$gid&amp;gedid=".$GEDCOMID."\"><b>".PrintReady($name)."</b>";
 								if (GedcomConfig::$SHOW_ID_NUMBERS) {
 									if ($TEXT_DIRECTION=="ltr"){
@@ -202,12 +202,12 @@ function getUpcomingEvents() {
 			$Advisory = "no_events_privacy";
 			if ($OutputDone) $Advisory = "more_events_privacy";
 			if ($daysprint==1) $Advisory .= "1";
-			$daytext .= print_text($Advisory, 0, 1);
+			$daytext .= PrintText($Advisory, 0, 1);
 		} else if (!$OutputDone) {    // No Facts were found
 			define("GM_LANG_global_num4", $daysprint);
 			$Advisory = "no_events_" . $config["filter"];
 			if ($daysprint==1) $Advisory .= "1";
-			$daytext .= print_text($Advisory, 0, 1);
+			$daytext .= PrintText($Advisory, 0, 1);
 	}
 
 	$daytext = preg_replace("/<br \/>/", " ", $daytext);
@@ -255,7 +255,7 @@ function getTodaysEvents() {
 				$text = GetCalendarFact($factrec, $action, $filter, $gid);
 				if ($text!="filter") {
 					if ($lastgid!=$gid) {
-						$name = CheckNN(GetSortableName($gid));
+						$name = NameFunctions::CheckNN(GetSortableName($gid));
 						$daytext .= "<li><a href=\"".SERVER_URL ."individual.php?pid=$gid&amp;gedid=".$GEDCOMID."\"><b>".PrintReady($name)."</b>";
 						if (GedcomConfig::$SHOW_ID_NUMBERS) {
 							if ($TEXT_DIRECTION=="ltr")	$daytext .= " &lrm;($gid)&lrm;";
@@ -553,9 +553,9 @@ function getRecentChanges() {
 //		Print block content
 	define("GM_LANG_global_num3", $config["days"]);		// Make this visible
 	if (count($found_facts)==0) {
-		$recentText .= print_text("recent_changes_none", 0, 1);
+		$recentText .= PrintText("recent_changes_none", 0, 1);
 	} else {
-		$recentText .= print_text("recent_changes_some", 0, 1);
+		$recentText .= PrintText("recent_changes_some", 0, 1);
 		$ASC = 1;
 		$IGNORE_FACTS = 1;
 		$IGNORE_YEAR = 0;
@@ -581,7 +581,7 @@ function getRecentChanges() {
 				if (PrivacyFunctions::displayDetailsById($gid)) {
 					$indirec = FindPersonRecord($gid);
 					if ($lastgid!=$gid) {
-						$name = CheckNN(GetSortableName($gid));
+						$name = NameFunctions::CheckNN(GetSortableName($gid));
 						$recentText .= "<a href=\"".SERVER_URL ."individual.php?pid=$gid&amp;gedid=".$GEDCOMID."\"><b>".PrintReady($name)."</b>";
 						if (GedcomConfig::$SHOW_ID_NUMBERS) {
 							if ($TEXT_DIRECTION=="ltr")

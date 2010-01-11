@@ -163,7 +163,7 @@ abstract class MediaFS {
 		
 	public function GetMediaFilelist($directory, $filter="", $dbmode="unset") {
 		global $MEDIA_IN_DB, $MEDIATYPE;
- //print "Dir in filelist: ".$directory."<br />";
+
  		if ($dbmode == "unset") $dbmode = $MEDIA_IN_DB;
 		$directory = RelativePathFile($directory);
 		if ($directory != "external_links") $m = RelativePathFile(GedcomConfig::$MEDIA_DIRECTORY);
@@ -174,15 +174,12 @@ abstract class MediaFS {
 			$sql = "SELECT ".TBLPREFIX."media.*, ".TBLPREFIX."media_files.* FROM ".TBLPREFIX."media_files LEFT JOIN ".TBLPREFIX."media ON mf_file=CONCAT('".$m."', m_mfile) WHERE";
 			if ($directory == "external_links") {
 				$sql .= " mf_link NOT LIKE ''";
-				// Reset the directory, as the media items have no path recorded.
-//				$directory = "";
 			}
 			else $sql .= " mf_path LIKE '".$directory."' AND mf_link LIKE ''";
 			if (!empty($filter)) $sql .= " AND (mf_file LIKE '%".$filter."%' OR m_titl LIKE '%".$filter."%')"; 
 			$sql .= " AND mf_file NOT LIKE '<DIR>' ORDER BY mf_file";
-//			print $sql;
+			
 			$res = NewQuery($sql);
-//			print "found: ".$res->numrows();
 			while ($row = $res->FetchAssoc()) {
 				if ($directory == "external_links") {
 					if (!isset($files[$row["mf_link"]]["filedata"])) $files[$row["mf_link"]]["filedata"] = New MFile($row);
@@ -211,13 +208,11 @@ abstract class MediaFS {
 		else {
 			if (empty($directory)) $directory = "./";
 			$dirfiles = self::GetFileList($directory, $filter, $dbmode);
-//			print_r($dirfiles);
 			if (!count($dirfiles)) return $dirfiles;
 			$sql = "SELECT * FROM ".TBLPREFIX."media WHERE (";
 			$first = true;
 			foreach ($dirfiles as $key => $dir) {
 				$dir = self::NormalizeLink($dir);
-//				print "search ".$dir."<br />";
 				if (!$first) $sql .= " OR ";
 				else $first = false;
 				if (!empty($m)) $dir = preg_replace("~".$m."~", "", $dir); 
@@ -226,18 +221,12 @@ abstract class MediaFS {
 			$sql .=")";
 			if (!empty($filter)) $sql .= " AND m_mfile LIKE '%".DbLayer::EscapeQuery($filter)."%'"; 
 			$sql .= " ORDER BY m_mfile";
-//			print $sql;
 			$res = NewQuery($sql);
+			
 			while ($row = $res->FetchAssoc()) {
-//				print "<br />";
-//				print_r($row);
-//				$mi = new MediaItem($row);
-//				$f = $m.RelativePathFile(self::CheckMediaDepth($mi->m_mfile));
 				if ($directory != "external_links") $f = $m.RelativePathFile(self::CheckMediaDepth($row["m_mfile"]));
 				else $f = GetGedcomValue("FILE", "1", $row["m_gedrec"]);
-//				print "f: ".$f;
 				if (in_array($f, $dirfiles)) {
-//					print "added";
 					$files[$f]["objects"][] =& MediaItem::GetInstance($row["m_media"], $row);
 				}
 			}
@@ -248,6 +237,7 @@ abstract class MediaFS {
 					}
 				}
 			}
+
 			// NOW get the other file attributes
 			foreach ($dirfiles as $pipo => $file) {
 				$files[$file]["filedata"] = new MFile($file);
@@ -258,9 +248,8 @@ abstract class MediaFS {
 	
 	public function PrintViewLink($file, $thumb=false, $paste=false) {
 		global $MEDIA_IN_DB, $TEXT_DIRECTION;
-
+		
 		$fileobj = $file["filedata"];
-//		print_r($fileobj);
 		$realfile = RelativePathFile($fileobj->f_main_file);
 		$thumbfile = $fileobj->f_thumb_file;
 		if ($MEDIA_IN_DB) {
@@ -307,11 +296,11 @@ abstract class MediaFS {
 		$linked = false;
 		if (isset($file["objects"])) {
 			foreach ($file["objects"] as $index => $media) {
-				if (!empty($media->xref)) {
-					if (!$linked) print GM_LANG_used_in."&nbsp;";
+				if ($media->xref != "") {
+					if (!$linked) print "<br />".GM_LANG_used_in."<br />";
 					if ($media->title != "") $title = "<b>".$media->title."</b> (".$media->xref.")";
 					else $title = "";
-					print "<a href=\"mediadetail.php?mid=".$media->xref."&amp;gedid=".$media->m_gedcomid."\" target=\"blank\">".PrintReady($title)."</a><br />";
+					print "<a href=\"mediadetail.php?mid=".$media->xref."&amp;gedid=".$media->gedcomid."\" target=\"blank\">".PrintReady($title)."</a><br />";
 					$linked = true;
 				}
 			}
@@ -1187,7 +1176,7 @@ abstract class MediaFS {
 //			print $sql;
 			$res = NewQuery ($sql);
 			if ($res->NumRows() > 0) {
-				if (!isset($change_id)) $change_id = GetNewXref("CHANGE");
+				if (!isset($change_id)) $change_id = EditFunctions::GetNewXref("CHANGE");
 				while ($row = $res->FetchAssoc()) {
 					$old = GetSubRecord(1, "1 FILE", $row["m_gedrec"]);
 					$oldf = GetGedcomValue("FILE", "1", $old);

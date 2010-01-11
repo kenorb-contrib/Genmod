@@ -66,7 +66,7 @@ switch ($action) {
 	// Backup part
 	if ($action == "backup") { ?>
 		<div class="admin_topbottombar">
-			<h3> <?php print_help_link("um_bu_explain","qm","um_backup"); print GM_LANG_um_backup;?></h3>
+			<h3> <?php PrintHelpLink("um_bu_explain","qm","um_backup"); print GM_LANG_um_backup;?></h3>
 		</div>
 		<form action="<?php print SCRIPT_NAME; ?>" method="post">
 			<input type="hidden" name="action" value="backup" />

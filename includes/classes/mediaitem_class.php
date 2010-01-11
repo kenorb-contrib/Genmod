@@ -54,6 +54,14 @@ class MediaItem extends GedcomRecord {
 		return self::$cache[$gedcomid][$id];
 	}
 	
+	public static function IsInstance($xref, $gedcomid="") {
+		global $GEDCOMID;
+		
+		if (empty($gedcomid)) $gedcomid = $GEDCOMID;
+		if (!isset(self::$cache[$gedcomid][$xref])) return false;
+		else return true;
+	}
+	
 	public function __construct($id, $gedrec="", $gedcomid="") {
 		global $GEDCOMID;
 		
@@ -108,6 +116,18 @@ class MediaItem extends GedcomRecord {
 		}
 	}
 
+	public function __set($property, $value) {
+		switch ($property) {
+			case "addlink":
+				if (is_null($this->link_array)) $this->link_array = array();
+				$this->link_array[] = $value;
+				break;
+			default:
+				parent::__set($property, $value);
+				break;
+		}
+	}
+	
 	public function ObjCount() {
 		$count = 0;
 		foreach(self::$cache as $ged => $media) {
@@ -181,7 +201,7 @@ class MediaItem extends GedcomRecord {
 		$this->indi_hide = 0;
 		$key = "";
 		
-		$sql = "SELECT DISTINCT n_id, i_key, i_gedrec, i_isdead, i_id, i_file, n_name, n_surname, n_letter, n_type  FROM ".TBLPREFIX."media_mapping, ".TBLPREFIX."individuals, ".TBLPREFIX."names WHERE mm_media='".$this->xref."' AND mm_file='".$this->gedcomid."' AND mm_type='INDI' AND mm_gid=i_id AND mm_file=i_file AND i_key=n_key ORDER BY i_key, n_id";
+		$sql = "SELECT DISTINCT n_id, i_key, i_gedrec, i_isdead, i_id, i_file, n_name, n_surname, n_nick, n_letter, n_type  FROM ".TBLPREFIX."media_mapping, ".TBLPREFIX."individuals, ".TBLPREFIX."names WHERE mm_media='".$this->xref."' AND mm_file='".$this->gedcomid."' AND mm_type='INDI' AND mm_gid=i_id AND mm_file=i_file AND i_key=n_key ORDER BY i_key, n_id";
 		$res = NewQuery($sql);
 		while($row = $res->FetchAssoc()){
 			if ($key != $row["i_key"]) {
@@ -194,7 +214,7 @@ class MediaItem extends GedcomRecord {
 				}
 				else $this->indi_hide++;
 			}
-			if ($person->DispName()) $person->addname = array($row["n_name"], $row["n_letter"], $row["n_surname"], $row["n_type"]);
+			if ($person->DispName()) $person->addname = array($row["n_name"], $row["n_letter"], $row["n_surname"], $row["n_nick"], $row["n_type"]);
 		}
 		if ($key != "") $person->names_read = true;
 		
@@ -314,14 +334,18 @@ class MediaItem extends GedcomRecord {
 	}
 		
 	// Prints the information for media in a list view
-	public function PrintListMedia($useli=true, $fact="") {
+	public function PrintListMedia($useli=true, $fact="", $paste=false) {
 		
 		if (!$this->DisplayDetails()) return false;
 		if ($useli) {
 			if (begRTLText($this->GetTitle())) print "\n\t\t\t<li class=\"rtl\" dir=\"rtl\">";
 			else print "\n\t\t\t<li class=\"ltr\" dir=\"ltr\">";
 		}
-		print "\n\t\t\t<a href=\"mediadetail.php?mid=$this->xref&amp;gedid=".$this->gedcomid."\" class=\"list_item\">".PrintReady($this->GetTitle());
+		if ($paste) {
+			print "<a href=\"#\" onclick=\"sndReq(document.getElementById('dummy'), 'lastused', 'type', '".$this->datatype."', 'id', '".$this->key."'); pasteid('".$this->xref."', ''); return false;\" class=\"list_item\">";
+		}
+		else print "\n\t\t\t<a href=\"mediadetail.php?mid=".$this->xref."&amp;gedid=".$this->gedcomid."\" class=\"list_item\">";
+		print PrintReady($this->GetTitle());
 		print $this->addxref;
 		if (!empty($fact)) {
 			print " <i>(";
@@ -331,6 +355,7 @@ class MediaItem extends GedcomRecord {
 		}
 		print "</a>\n";
 		if ($useli) print "</li>\n";
+		return true;
 	}
 	
 	

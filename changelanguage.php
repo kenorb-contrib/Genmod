@@ -105,7 +105,7 @@ $maxlines = max($active, $inactive);
 			<div class="admin_item_box">
 				<div class="width25 choice_left">
 					<div class="helpicon">
-						<?php print_help_link("add_new_language_help", "qm", "add_new_language");?>
+						<?php PrintHelpLink("add_new_language_help", "qm", "add_new_language");?>
 					</div>
 					<div class="description">
 						<?php require($GM_BASE_DIRECTORY . "includes/values/lang_codes_std.php"); ?>
@@ -142,7 +142,7 @@ $maxlines = max($active, $inactive);
 			<form name="lang_config_form" method="get" action="<?php print SCRIPT_NAME;?>">
 				<input type="hidden" name="action" value="config_lang" />
 				<div class="admin_topbottombar">
-					<?php print_help_link("config_lang_utility_help", "qm", "config_lang_utility");?>
+					<?php PrintHelpLink("config_lang_utility_help", "qm", "config_lang_utility");?>
 					<?php print GM_LANG_config_lang_utility; ?>
 				</div>
 				<div class="admin_item_box">

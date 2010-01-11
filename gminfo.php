@@ -94,7 +94,7 @@ if ($action=="confighelp") {
 	foreach ($language_array as $string => $text) {
 		if (stristr($text, "~#gm_lang")) {
 			print "<li>";
-			print stripslashes(print_text($text,0,2)) . "<br /><br /></li>\r\n";
+			print stripslashes(PrintText($text,0,2)) . "<br /><br /></li>\r\n";
 		}
 	}
     	print "</ol>";

@@ -91,15 +91,15 @@ class SearchHelp {
 		<form name="entersearch" action="<?php echo $_SERVER['SCRIPT_NAME']; ?>" method="post" >
 			<input name="action" type="hidden" value="search" />
 			<input type="hidden" name="page" value="<?php echo $genmod['page'];?>" />
-			<div class="topbottombar"><?php print_help_link("hs_title_help", "qm", "hs_title"); echo GM_LANG_hs_title; ?></div>
+			<div class="topbottombar"><?php PrintHelpLink("hs_title_help", "qm", "hs_title"); echo GM_LANG_hs_title; ?></div>
 			<!-- // Enter the keyword(s) -->
 			<div id="searchhelp_text">
-				<label for="searchtext"><?php print_help_link("hs_keyword_advice", "qm", "hs_keyword"); echo GM_LANG_hs_keyword; ?></label>
+				<label for="searchtext"><?php PrintHelpLink("hs_keyword_advice", "qm", "hs_keyword"); echo GM_LANG_hs_keyword; ?></label>
 				<input type="text" id="searchtext" name="searchtext" dir="ltr" size="60" value="<?php echo $this->searchtext; ?>" />
 			</div>
 			<!-- // How to search -->
 			<div id="searchhelp_how">
-				<label for="searchhow"><?php print_help_link("hs_searchhow_advice", "qm", "hs_searchhow"); echo GM_LANG_hs_searchhow; ?></label>
+				<label for="searchhow"><?php PrintHelpLink("hs_searchhow_advice", "qm", "hs_searchhow"); echo GM_LANG_hs_searchhow; ?></label>
 				<input type="radio" id="searchhow" name="searchhow" dir="ltr" value="any"
 				<?php
 				if ($this->searchhow == "any") echo " checked=\"checked\"";
@@ -150,7 +150,7 @@ class SearchHelp {
 		// Search in the previously stored vars for a hit and print it
 		foreach ($helpvarnames as $key => $value) {
 			$repeat = 0;
-			$helptxt = print_text($key,0,1);
+			$helptxt = PrintText($key,0,1);
 			// Remove hyperlinks
 			$helptxt = preg_replace("/<a[^<>]+>/", "", $helptxt);
 			$helptxt = preg_replace("/<\/a>/", "", $helptxt);

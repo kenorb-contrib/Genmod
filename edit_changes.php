@@ -57,7 +57,7 @@ PrintSimpleHeader(GM_LANG_review_changes);
 <?php
 print "<div id=\"content_popup\" class=\"center\">\n";
 print "<span class=\"subheaders\">";
-print_help_link("accept_gedcom", "qm", "review_changes");
+PrintHelpLink("accept_gedcom", "qm", "review_changes");
 print GM_LANG_review_changes;
 print "</span><br /><br />\n";
 
@@ -426,7 +426,7 @@ else {
 	print "</table>";
 	print "<br /><br /><table class=\"list_table center\">\r\n";
 	print "<tr><td class=\"topbottombar\" colspan=\"2\">";
-	print_help_link("view_gedcom_help", "qm", "view_gedcom");
+	PrintHelpLink("view_gedcom_help", "qm", "view_gedcom");
 	print GM_LANG_view_gedcom."</td></tr>";
 	$rectypes = array("note"=>"NOTE", "subm"=>"SUBM", "media"=>"OBJE", "repo"=>"REPO", "source"=>"SOUR", "families"=>"FAM", "individuals"=>"INDI");
 	foreach ($changegids as $type => $gids) {

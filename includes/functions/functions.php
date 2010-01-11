@@ -211,22 +211,28 @@ function GetSubRecord($level, $tag, $gedrec, $num=1) {
 	$pos1=0;
 	$subrec = "";
 	if (empty($gedrec)) return "";
-	while(($num>0)&&($pos1<strlen($gedrec))) {
+	while($num > 0 && $pos1 < strlen($gedrec)) {
+		// Find the next occurance of the desired string
 		$pos1 = strpos($gedrec, $tag, $pos1);
-		if ($pos1===false) {
+		if ($pos1 === false) {
 			$tag = preg_replace("/(\w+)/", "_$1", $tag);
 			$pos1 = strpos($gedrec, $tag, $pos1);
-			if ($pos1===false) return "";
+			if ($pos1 === false) return "";
 		}
+//		print "pos1: ".$pos1;
 // This causes problems. If a level 2 is searched in a complete indirecord, it will return all up 
 // to the next level 2 record, including the level 1 in between.
-// This will find the nearest lower level.
+// This will find the nearest lower level:
+// E.g. first find the next level 3, then, the nearer level 2, etc, to 1.
 		$plow = 99999;
 		for ($L = $level; $L>0; $L--) {
 			$p = strpos($gedrec, "\n$L", $pos1+1);
 			if ($p !== false && $p < $plow) $plow = $p;
 		}
-		$pos2 = $plow;
+		if ($plow == 99999) $pos2 = false;
+		else $pos2 = $plow;
+//		$pos2 = $plow;
+//		print " pos2: ".$pos2."<br />";
 // Below is the original code			
 //		$pos2 = strpos($gedrec, "\n$level", $pos1+1);
 		if (!$pos2) $pos2 = strpos($gedrec, "\n1", $pos1+1);
@@ -238,13 +244,7 @@ function GetSubRecord($level, $tag, $gedrec, $num=1) {
 		if ($num==1) {
 			$subrec = substr($gedrec, $pos1, $pos2-$pos1);
 			$lowtag = "\n".($level-1).(substr($tag, 1));
-			if (phpversion() < 5) {
-				if ($newpos = StrrPos4($subrec, $lowtag)) {
-				$pos2 = $pos2 - (strlen($subrec) - $newpos);
-				$subrec = substr($gedrec, $pos1, $pos2-$pos1);
-				}
-			}
-			else if ($newpos = strripos($subrec, $lowtag)) {
+			if ($newpos = strripos($subrec, $lowtag)) {
 				$pos2 = $pos2 - (strlen($subrec) - $newpos);
 				$subrec = substr($gedrec, $pos1, $pos2-$pos1);
 			}
@@ -626,7 +626,7 @@ function FindChildrenInRecord($famrec, $me='') {
  * @return array array of family ids
  */
 function FindFamilyIds($pid, $indirec="", $newfams = false) {
-	global $GEDCOMID, $show_changes, $GEDCOMID, $gm_user;
+	global $GEDCOMID, $show_changes, $gm_user;
 	
 	$resultarray = array();
 	if (empty($pid)) return $resultarray;
@@ -693,42 +693,6 @@ function FindSfamilyIds($pid, $newfams = false) {
 		}
 	}
 	return $resultarray;
-}
-
-
-function CleanupTagsY($irec) {
-	$cleanup_facts = array("ANUL","CENS","DIVF","ENGA","MARB","MARC","MARL","MARS","ADOP","DSCR","BAPM","BARM","BASM","BLES","CHRA","CONF","FCOM","ORDN","NATU","EMIG","IMMI","CENS","PROB","WILL","GRAD","RETI");
-	
-	// Removed MARR, CHR, BIRT, DEAT and DIV which are allowed to have "Y", but only if no DATE and PLAC are present
-	// DIV is not mentioned in the gedcom standard, but DIV Y is supported because PAF (!) uses it.
-	// Genmod also supports BURI Y and CREM Y
-	$canhavey_facts = array("MARR","DIV","BIRT","DEAT","CHR","BURI","CREM"); 
-
-	$subs = GetAllSubrecords($irec, "", false, false, false);
-	foreach ($subs as $key => $subrec) {
-		$oldsub = $subrec;
-		$ft = preg_match("/1\s(\w+)/", $subrec, $match);
-		$sfact = trim($match[1]);
-		if (in_array($sfact, $cleanup_facts) || (in_array($sfact, $canhavey_facts) && stristr($subrec, "1 ".$sfact." Y") && (stristr($subrec, "2 DATE") || stristr($subrec, "2 PLAC")))) {
-			$srchstr = "/1\s".$sfact."\sY\r\n2/";
-			$replstr = "1 ".$sfact."\r\n2";
-			$srchstr2 = "/1\s".$sfact."(.{0,1})\r\n2/";
-			$srchstr = "/1\s".$sfact."\sY\r\n2/";
-			$srchstr3 = "/1\s".$sfact."\sY\r\n1/";
-			$subrec = preg_replace($srchstr,$replstr,$subrec);
-			if (preg_match($srchstr2,$subrec)){
-				$subrec = preg_replace($srchstr3,"1",$subrec);
-			}
-			$irec = str_replace($oldsub, $subrec, $irec); 
-		}
-		else {
-			if (in_array($sfact, $canhavey_facts) && !stristr($subrec, $sfact." Y") && !stristr($irec, "2 DATE") && !stristr($irec, "2 PLAC")) {
-				$subrec = preg_replace("/1 ".$sfact."/", "1 ".$sfact." Y", $subrec);
-				$irec = str_replace($oldsub, $subrec, $irec); 
-			}
-		}
-	}
-	return $irec;
 }
 
 // ************************************************* START OF MULTIMEDIA FUNCTIONS ********************************* //
@@ -1553,87 +1517,6 @@ function GetQueryString($encode=false) {
 }
 
 
-
-/**
- * Get the next available xref
- *
- * <Long description of your function. 
- * What does it do?
- * How does it work?
- * All that goes into the long description>
- *
- * @todo		Fix usage of $FILE, this is a reserved name
- * @author	Genmod Development Team
- * @param		string	$type		The type of xref to retrieve
- * @return 	string	The new xref that was found
- */
-
-function GetNewXref($type='INDI') {
-	global $changes;
-	global $FILE, $GEDCOMID;
-	
-	
-	if (isset($FILE) && !is_array($FILE)) $gedid = get_id_from_gedcom($FILE);
-	else $gedid = $GEDCOMID;
-
-	switch ($type) {
-		case "INDI":
-			$sqlc = "select max(cast(substring(ch_gid,".(strlen(GedcomConfig::$GEDCOM_ID_PREFIX)+1).") as signed)) as xref from ".TBLPREFIX."changes where ch_file = '".$gedid."' AND ch_gid LIKE '".GedcomConfig::$GEDCOM_ID_PREFIX."%'";
-			$sql = "select max(cast(substring(i_rin,".(strlen(GedcomConfig::$GEDCOM_ID_PREFIX)+1).") as signed)) as xref from ".TBLPREFIX."individuals where i_file = '".$gedid."'";
-			break;
-		case "FAM":
-			$sqlc = "select max(cast(substring(ch_gid,".(strlen(GedcomConfig::$FAM_ID_PREFIX)+1).") as signed)) as xref from ".TBLPREFIX."changes where ch_file = '".$gedid."' AND ch_gid LIKE '".GedcomConfig::$FAM_ID_PREFIX."%'";
-			$sql = "select max(cast(substring(f_id,".(strlen(GedcomConfig::$FAM_ID_PREFIX)+1).") as signed)) as xref from ".TBLPREFIX."families where f_file = '".$gedid."'";
-			break;
-		case "OBJE":
-			$sqlc = "select max(cast(substring(ch_gid,".(strlen(GedcomConfig::$MEDIA_ID_PREFIX)+1).") as signed)) as xref from ".TBLPREFIX."changes where ch_file = '".$gedid."' AND ch_gid LIKE '".GedcomConfig::$MEDIA_ID_PREFIX."%'";
-			$sql = "select max(cast(substring(m_media,".(strlen(GedcomConfig::$MEDIA_ID_PREFIX)+1).") as signed)) as xref from ".TBLPREFIX."media where m_file = '".$gedid."'";
-			break;
-		case "SOUR":
-			$sqlc = "select max(cast(substring(ch_gid,".(strlen(GedcomConfig::$SOURCE_ID_PREFIX)+1).") as signed)) as xref from ".TBLPREFIX."changes where ch_file = '".$gedid."' AND ch_gid LIKE '".GedcomConfig::$SOURCE_ID_PREFIX."%'";
-			$sql = "select max(cast(substring(s_id,".(strlen(GedcomConfig::$SOURCE_ID_PREFIX)+1).") as signed)) as xref from ".TBLPREFIX."sources where s_file = '".$gedid."'";
-			break;
-		case "REPO":
-			$sqlc = "select max(cast(substring(ch_gid,".(strlen(GedcomConfig::REPO_ID_PREFIX)+1).") as signed)) as xref from ".TBLPREFIX."changes where ch_file = '".$gedid."' AND ch_gid LIKE '".GedcomConfig::$REPO_ID_PREFIX."%'";
-			$sql = "select max(cast(substring(o_id,".(strlen(GedcomConfig::REPO_ID_PREFIX)+1).") as signed)) as xref from ".TBLPREFIX."other where o_file = '".$gedid."' and o_type = 'REPO'";
-			break;
-		case "NOTE":
-			$sqlc = "select max(cast(substring(ch_gid,".(strlen(GedcomConfig::$NOTE_ID_PREFIX)+1).") as signed)) as xref from ".TBLPREFIX."changes where ch_file = '".$gedid."' AND ch_gid LIKE '".GedcomConfig::$NOTE_ID_PREFIX."%'";
-			$sql = "select max(cast(substring(o_id,".(strlen(GedcomConfig::$NOTE_ID_PREFIX)+1).") as signed)) as xref from ".TBLPREFIX."other where o_file = '".$gedid."' and o_type = 'NOTE'";
-			break;
-		case "CHANGE":
-			$sql = "select max(ch_cid) as xref from ".TBLPREFIX."changes where ch_file = '".$gedid."'";
-			break;
-		case "SUBM":
-			return "SUB1";
-			break;
-	}
-	$res = NewQuery($sql);
-	$row = $res->fetchRow();
-	$num = $row[0];
-	
-	// NOTE: Query from the change table
-	if (isset($sqlc)) {
-		$res = NewQuery($sqlc);
-		$row = $res->fetchRow();
-		$numc = $row[0];	
-		if ($numc > $num) $num = $numc;
-	}
-	// NOTE: Increase the number with one
-	$num++;
-	
-	// NOTE: Determine prefix needed
-	if ($type == "INDI") $prefix = GedcomConfig::$GEDCOM_ID_PREFIX;
-	else if ($type == "FAM") $prefix = GedcomConfig::$FAM_ID_PREFIX;
-	else if ($type == "OBJE") $prefix = GedcomConfig::$MEDIA_ID_PREFIX;
-	else if ($type == "SOUR") $prefix = GedcomConfig::$SOURCE_ID_PREFIX;
-	else if ($type == "REPO") $prefix = GedcomConfig::$REPO_ID_PREFIX;
-	else if ($type == "NOTE") $prefix = GedcomConfig::$NOTE_ID_PREFIX;
-	else if ($type == "CHANGE") return $num;
-
-	return $prefix.$num;;
-}
-
 /**
  * Determine type of ID
  *
@@ -1667,88 +1550,6 @@ function IdType($id) {
 	else return "";
 }
 
-/**
- * Read the Genmod News from the Genmod webserver
- *
- * The function reads the newsfile from the Genmod
- * webserver and stores the data in an array.
- * The array is returned and the data displayed on the admin page.
- * News is fetched per session and stored in the session data.
- * If no news is present in the newsfile on the server, nothing is displayed.
- * If the newsfile cannot be opened, an error message is displayed.
- * News format:
- * [Item]
- * [Date]mmm dd yyyy[/Date]
- * [Type]<Normal|Urgent>[/Type]
- * [Header]News header[/Header]
- * [Text]News text[/Text]
- * [/Item]
- *
- * @author	Genmod Development Team
- * @return	array	Array with news items
- */
-function GetGMNewsItems() {
-	global $NEWS_TYPE, $PROXY_ADDRESS, $PROXY_PORT;
-
-	// -- If the news is already retrieved, get it from the session data.
-	if(isset($_SESSION["gmnews"])) return $_SESSION["gmnews"];
-
-	// -- Retrieve the news from the website
-	$gmnews = array();
-	if (!empty($PROXY_ADDRESS) && !empty($PROXY_PORT)) {
-		$num = "(\\d|[1-9]\\d|1\\d\\d|2[0-4]\\d|25[0-5])";
-		if (!preg_match("/^$num\\.$num\\.$num\\.$num$/", $PROXY_ADDRESS)) $ip = gethostbyname($PROXY_ADDRESS);
-		else $ip = $PROXY_ADDRESS;
-		$handle = @fsockopen($ip, $PROXY_PORT);
-		if ($handle!=false) {
-			$com = "GET http://www.genmod.net/gmnews.txt HTTP/1.1\r\nAccept: */*\r\nAccept-Language: de-ch\r\nAccept-Encoding: gzip, deflate\r\nUser-Agent: Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.0)\r\nHost: $PROXY_ADDRESS:$PROXY_PORT\r\nConnection: Keep-Alive\r\n\r\n";
-			fputs($handle, $com);
-			$txt = fread($handle, 65535);
-			fclose($handle);
-			$txt = substr($txt, strpos($txt, "\r\n\r\n") + 4);
-		}
-	}
-	else {
-		@ini_set('user_agent','MSIE 4\.0b2;'); // force a HTTP/1.0 request
-		@ini_set('default_socket_timeout', '5'); // timeout
-		$handle = @fopen("http://www.genmod.net/gmnews.txt", "r");
-		if ($handle!=false) {
-			$txt = fread($handle, 65535);
-			fclose($handle);
-		}
-	}
-	if ($handle != false) {
-		$txt = preg_replace("/[\r\n]/", "", $txt);
-		$ct = preg_match_all("/\[Item](.+?)\[\/Item]/", $txt, $items);
-		for ($i = 0; $i < $ct; $i++) {
-			$item = array();
-			$ct1 = preg_match("/\[Date](.+?)\[\/Date]/", $items[1][$i], $date);
-			if ($ct1 > 0) $item["date"] = $date[1];
-			else $item["date"] = "";
-			$ct1 = preg_match("/\[Type](.+?)\[\/Type]/", $items[1][$i], $type);
-			if ($ct1 > 0) $item["type"] = $type[1];
-			else $item["type"] = "";
-			$ct1 = preg_match("/\[Header](.+?)\[\/Header]/", $items[1][$i], $header);
-			if ($ct1 > 0) $item["header"] = $header[1];
-			else $item["header"] = "";
-			$ct1 = preg_match("/\[Text](.+?)\[\/Text]/", $items[1][$i], $text);
-			if ($ct1 > 0) $item["text"] = $text[1];
-			else $item["text"] = "";
-			if (($NEWS_TYPE == "Normal") || ($NEWS_TYPE == $item["type"])) $gmnews[] = $item;
-		}
-	}
-	else {
-		WriteToLog("GetGMNewsItems-> News cannot be reached on Genmod News Server", "E");
-		$item["date"] = "";
-		$item["type"] = "Urgent";
-		$item["header"] = "Warning: News cannot be retrieved";
-		$item["text"] = "Genmod cannot retrieve the news from the news server. If this problem persist after next logons, please report this on the <a href=\"http://www.genmod.net\">Genmod Help forum</a>";
-		$gmnews[] = $item;
-	}
-	// -- Store the news in the session data
-	$_SESSION["gmnews"] = $gmnews;
-	return $gmnews;
-}
 
 function ArrayCopy (&$array, &$copy, $depth=0) {
 
@@ -1822,11 +1623,10 @@ function utf8_isASCII($str){
  * @param string $indirec the raw gedcom record
  * @return array with 2 year values, pid and type (as 
  * requested or "true" is found a true year)
+ * Possible values for type: true, narrow and wide
  */
 function EstimateBD(&$person, $type) {
-	global $CHECK_CHILD_DATES, $MAX_ALIVE_AGE, $HIDE_LIVE_PEOPLE;
-	global $PRIVACY_BY_YEAR, $COMBIKEY;
-	global $GEDCOMID;
+	global $CHECK_CHILD_DATES, $MAX_ALIVE_AGE;
 
 	// Init values
 	$dates = array();
@@ -2074,6 +1874,10 @@ function EstimateBD(&$person, $type) {
 			// *     BUT no later than the death year of mother or father
 			if (isset($mdyear) && isset($birthyear) && $mdyear < $birthyear) $birthyear = $mdyear;
 			if (isset($fdyear) && isset($birthyear) && $fdyear-1 < $birthyear) $birthyear = $fdyear-1;
+			if (isset($birthyear)) {
+				$dates["birth"]["year"] = $birthyear;
+				$dates["birth"]["type"] = $type;
+			}
 		}
 		if (isset($truedeathyear)) {
 			$dates["death"]["year"] = $truedeathyear;
@@ -2095,6 +1899,10 @@ function EstimateBD(&$person, $type) {
 			if ($fgcbyear != 9999 && (!isset($deathyear) || ($fgcbyear - 30 + $MAX_ALIVE_AGE) > $deathyear)) $deathyear = $fgcbyear - 30 + $MAX_ALIVE_AGE;
 			// *     7. Marriage year + $MAX_ALIVE_AGE - 20
 			if ($lmarryear != 0 && (!isset($deathyear) || ($lmarryear - 20 + $MAX_ALIVE_AGE) < $deathyear)) $deathyear = $lmarryear - 20 + $MAX_ALIVE_AGE;
+			if (isset($deathyear)) {
+				$dates["death"]["year"] = $deathyear;
+				$dates["death"]["type"] = $type;
+			}
 		}
 	}
 	return $dates;

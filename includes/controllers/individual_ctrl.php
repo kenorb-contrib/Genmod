@@ -457,13 +457,13 @@ class IndividualController extends DetailController {
 					if ($NAME_REVERSE || HasChinese($name, true)) $name = NameFunctions::ReverseName($name);
 			  		$name = preg_replace("'/,'", ",", $name);
 					$name = preg_replace("'/'", " ", $name);
-					print PrintReady(CheckNN($name));
+					print PrintReady(NameFunctions::CheckNN($name));
 				}
 				print " </span><br />";
 			}
 		}
 		if ($this->TOTAL_NAMES>1 && !$this->isPrintPreview() && $this->indi->canedit && $showedit) {
-			if ($this->name_count==2) print_help_link("delete_name_help", "qm", "delete_name");
+			if ($this->name_count==2) PrintHelpLink("delete_name_help", "qm", "delete_name");
 	   		print "<a href=\"#\" class=\"font9\" onclick=\"edit_name('".$this->xref."', 'NAME', '".$this->name_count."', 'edit_name'); return false;\">".GM_LANG_edit_name."</a> | ";
 			print "<a class=\"font9\" href=\"#\" onclick=\"delete_record('".$this->xref."', 'NAME', '".$this->name_count."', 'delete_name', 'INDI'); return false;\">".GM_LANG_delete_name."</a>\n";
 			print "<br />\n";

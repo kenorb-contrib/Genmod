@@ -49,7 +49,7 @@ function print_welcome_block($block=true, $config="", $side, $index) {
 			print "<div><a href=\"individual.php?pid=".$gm_user->gedcomid[$GEDCOMID]."\"><img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["indis"]["small"]."\" border=\"0\" alt=\"".GM_LANG_my_indi."\" title=\"".GM_LANG_my_indi."\" /><br />".GM_LANG_my_indi."</a></div>\n";
 		}
 		print "<div>";
-		print_help_link("mygedview_customize_help", "qm", "customize_page");
+		PrintHelpLink("mygedview_customize_help", "qm", "customize_page");
 		print "<a href=\"#\" onclick=\"window.open('index_edit.php?name=".$gm_user->username."&amp;command=user', '', 'top=50,left=10,width=1000,height=400,scrollbars=1,resizable=1');\">".GM_LANG_customize_page."</a></div>\n";
 		print "\n<div>".GetChangedDate("$day $month $year")." - ".date($TIME_FORMAT, time()-$_SESSION["timediff"])."</div>\n";
 		print "</div>"; // blockcontent

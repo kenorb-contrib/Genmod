@@ -746,8 +746,8 @@ if (!empty($check_gedcoms)) {
 						}
 						if ($inames) {
 							$parents = FindParentsInRecord($gedlines["gedcom"]);
-							if (!empty($parents["HUSB"])) $indilist[$parents["HUSB"]]["names"] = GetIndiNames($indilist[$parents["HUSB"]]["gedcom"]);
-							if (!empty($parents["WIFE"])) $indilist[$parents["WIFE"]]["names"] = GetIndiNames($indilist[$parents["WIFE"]]["gedcom"]);
+							if (!empty($parents["HUSB"])) $indilist[$parents["HUSB"]]["names"] = NameFunctions::GetIndiNames($indilist[$parents["HUSB"]]["gedcom"]);
+							if (!empty($parents["WIFE"])) $indilist[$parents["WIFE"]]["names"] = NameFunctions::GetIndiNames($indilist[$parents["WIFE"]]["gedcom"]);
 						}
 					}
 				}
@@ -893,7 +893,8 @@ if (!empty($check_gedcoms)) {
 				}
 			}
 			if (!$error) print $info_icon.GM_LANG_sc_ok_all_rref." ";
-			print "</ul>".GM_LANG_sc_numrecs_checked." ".$num;
+			else print "</ul>";
+			print GM_LANG_sc_numrecs_checked." ".$num;
 			print "</td></tr>";
 	
 			// Print the non-existent facts
@@ -1360,7 +1361,7 @@ if (!empty($check_gedcoms)) {
 								$error = true;
 								print $error_icon.GM_LANG_sc_inv_mref_file."<ul>";
 							}
-							$media =& MediaItem::GetInstance($key, $cmedialist[$mid]["gedcom"], $cmedialist[$mid]["gedfile"]);
+							$media =& MediaItem::GetInstance($mid, $cmedialist[$mid]["gedcom"], $cmedialist[$mid]["gedfile"]);
 							$media->PrintListMedia(true, GM_LANG_sc_file." ".$file);
 						}
 					}

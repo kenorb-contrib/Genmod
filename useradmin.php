@@ -346,7 +346,7 @@ if ($action=="edituser2") {
 }
 //-- print the form to edit a user
 // NOTE: WORKING
-init_calendar_popup();
+InitCalendarPopUp();
 if ($action=="edituser" || $action == "createform") { ?>
 	<!-- Setup the left box -->
 	<div id="admin_genmod_left">
@@ -396,7 +396,7 @@ if ($action=="edituser" || $action == "createform") { ?>
 			<div class="admin_item_box">
 				<div class="width30 choice_left">
 					<div class="helpicon">
-						<?php print_help_link("useradmin_username_help", "qm","username");?>
+						<?php PrintHelpLink("useradmin_username_help", "qm","username");?>
 					</div>
 					<div class="description">
 						<?php print GM_LANG_username; ?>
@@ -409,7 +409,7 @@ if ($action=="edituser" || $action == "createform") { ?>
 			<div class="admin_item_box">
 				<div class="width30 choice_left">
 					<div class="helpicon">
-						<?php print_help_link("useradmin_firstname_help", "qm", "firstname");?>
+						<?php PrintHelpLink("useradmin_firstname_help", "qm", "firstname");?>
 					</div>
 					<div class="description">
 						<?php print GM_LANG_firstname; ?>
@@ -422,7 +422,7 @@ if ($action=="edituser" || $action == "createform") { ?>
 			<div class="admin_item_box">
 				<div class="width30 choice_left">
 					<div class="helpicon">
-						<?php print_help_link("useradmin_lastname_help", "qm","lastname");?>
+						<?php PrintHelpLink("useradmin_lastname_help", "qm","lastname");?>
 					</div>
 					<div class="description">
 						<?php print GM_LANG_lastname; ?>
@@ -435,7 +435,7 @@ if ($action=="edituser" || $action == "createform") { ?>
 			<div class="admin_item_box">
 				<div class="width30 choice_left">
 					<div class="helpicon">
-						<?php print_help_link("useradmin_password_help", "qm","password");?>
+						<?php PrintHelpLink("useradmin_password_help", "qm","password");?>
 					</div>
 					<div class="description">
 						<?php print GM_LANG_password; ?>
@@ -448,7 +448,7 @@ if ($action=="edituser" || $action == "createform") { ?>
 			<div class="admin_item_box">
 				<div class="width30 choice_left">
 					<div class="helpicon">
-						<?php print_help_link("useradmin_conf_password_help", "qm","confirm");?>
+						<?php PrintHelpLink("useradmin_conf_password_help", "qm","confirm");?>
 					</div>
 					<div class="description">
 						<?php print GM_LANG_confirm; ?>
@@ -461,7 +461,7 @@ if ($action=="edituser" || $action == "createform") { ?>
 			<div class="admin_item_box">
 				<div class="width30 choice_left">
 					<div class="helpicon">
-						<?php print_help_link("useradmin_sync_gedcom_help", "qm", "sync_gedcom");?>
+						<?php PrintHelpLink("useradmin_sync_gedcom_help", "qm", "sync_gedcom");?>
 					</div>
 					<div class="description">
 						<?php print GM_LANG_sync_gedcom; ?>
@@ -474,7 +474,7 @@ if ($action=="edituser" || $action == "createform") { ?>
 			<div class="admin_item_box">
 				<div class="width30 choice_left">
 					<div class="helpicon">
-						<?php print_help_link("useradmin_can_admin_help", "qm", "can_admin");?>
+						<?php PrintHelpLink("useradmin_can_admin_help", "qm", "can_admin");?>
 					</div>
 					<div class="description">
 						<?php print GM_LANG_can_admin; ?>
@@ -487,7 +487,7 @@ if ($action=="edituser" || $action == "createform") { ?>
 			<div class="admin_item_box">
 				<div class="width30 choice_left">
 					<div class="helpicon">
-						<?php print_help_link("useradmin_auto_accept_help", "qm", "user_auto_accept");?>
+						<?php PrintHelpLink("useradmin_auto_accept_help", "qm", "user_auto_accept");?>
 					</div>
 					<div class="description">
 						<?php print GM_LANG_user_auto_accept; ?>
@@ -500,7 +500,7 @@ if ($action=="edituser" || $action == "createform") { ?>
 			<div class="admin_item_box">
 				<div class="width30 choice_left">
 					<div class="helpicon">
-						<?php print_help_link("useradmin_email_help", "qm", "emailadress");?>
+						<?php PrintHelpLink("useradmin_email_help", "qm", "emailadress");?>
 					</div>
 					<div class="description">
 						<?php print GM_LANG_emailadress; ?>
@@ -513,7 +513,7 @@ if ($action=="edituser" || $action == "createform") { ?>
 			<div class="admin_item_box">
 				<div class="width30 choice_left">
 					<div class="helpicon">
-						<?php print_help_link("useradmin_verified_help", "qm", "verified");?>
+						<?php PrintHelpLink("useradmin_verified_help", "qm", "verified");?>
 					</div>
 					<div class="description">
 						<?php print GM_LANG_verified; ?>
@@ -526,7 +526,7 @@ if ($action=="edituser" || $action == "createform") { ?>
 			<div class="admin_item_box">
 				<div class="width30 choice_left">
 					<div class="helpicon">
-						<?php print_help_link("useradmin_verbyadmin_help", "qm", "verified_by_admin");?>
+						<?php PrintHelpLink("useradmin_verbyadmin_help", "qm", "verified_by_admin");?>
 					</div>
 					<div class="description">
 						<?php print GM_LANG_verified_by_admin; ?>
@@ -541,7 +541,7 @@ if ($action=="edituser" || $action == "createform") { ?>
 				<div class="admin_item_box">
 					<div class="width30 choice_left">
 						<div class="helpicon">
-							<?php print_help_link("edituser_change_lang_help", "qm", "change_lang");?>
+							<?php PrintHelpLink("edituser_change_lang_help", "qm", "change_lang");?>
 						</div>
 						<div class="description">
 							<?php print GM_LANG_change_lang; ?>
@@ -568,7 +568,7 @@ if ($action=="edituser" || $action == "createform") { ?>
 				<div class="admin_item_box">
 					<div class="width30 choice_left">
 						<div class="helpicon">
-							<?php print_help_link("useradmin_user_theme_help", "qm", "user_theme");?>
+							<?php PrintHelpLink("useradmin_user_theme_help", "qm", "user_theme");?>
 						</div>
 						<div class="description">
 							<?php print GM_LANG_user_theme; ?>
@@ -592,7 +592,7 @@ if ($action=="edituser" || $action == "createform") { ?>
 			<div class="admin_item_box">
 				<div class="width30 choice_left">
 					<div class="helpicon">
-						<?php print_help_link("useradmin_user_contact_help", "qm", "user_contact_method");?>
+						<?php PrintHelpLink("useradmin_user_contact_help", "qm", "user_contact_method");?>
 					</div>
 					<div class="description">
 						<?php print GM_LANG_user_contact_method; ?>
@@ -615,7 +615,7 @@ if ($action=="edituser" || $action == "createform") { ?>
 			<div class="admin_item_box">
 				<div class="width30 choice_left">
 					<div class="helpicon">
-						<?php print_help_link("useradmin_visibleonline_help", "qm", "visibleonline");?>
+						<?php PrintHelpLink("useradmin_visibleonline_help", "qm", "visibleonline");?>
 					</div>
 					<div class="description">
 						<?php print GM_LANG_visibleonline; ?>
@@ -628,7 +628,7 @@ if ($action=="edituser" || $action == "createform") { ?>
 			<div class="admin_item_box">
 				<div class="width30 choice_left">
 					<div class="helpicon">
-						<?php print_help_link("useradmin_editaccount_help", "qm", "editaccount");?>
+						<?php PrintHelpLink("useradmin_editaccount_help", "qm", "editaccount");?>
 					</div>
 					<div class="description">
 						<?php print GM_LANG_editaccount; ?>
@@ -641,7 +641,7 @@ if ($action=="edituser" || $action == "createform") { ?>
 			<div class="admin_item_box">
 				<div class="width30 choice_left">
 					<div class="helpicon">
-						<?php print_help_link("useradmin_user_default_tab_help", "qm", "user_default_tab");?>
+						<?php PrintHelpLink("useradmin_user_default_tab_help", "qm", "user_default_tab");?>
 					</div>
 					<div class="description">
 						<?php print GM_LANG_user_default_tab; ?>
@@ -663,7 +663,7 @@ if ($action=="edituser" || $action == "createform") { ?>
 				<div class="admin_item_box">
 					<div class="width30 choice_left">
 						<div class="helpicon">
-							<?php print_help_link("useradmin_comment_help", "qm", "comment");?>
+							<?php PrintHelpLink("useradmin_comment_help", "qm", "comment");?>
 						</div>
 						<div class="description">
 							<?php print GM_LANG_comment; ?>
@@ -676,7 +676,7 @@ if ($action=="edituser" || $action == "createform") { ?>
 				<div class="admin_item_box">
 					<div class="width30 choice_left">
 						<div class="helpicon">
-							<?php print_help_link("useradmin_comment_exp_help", "qm", "comment_exp");?>
+							<?php PrintHelpLink("useradmin_comment_exp_help", "qm", "comment_exp");?>
 						</div>
 						<div class="description">
 							<?php print GM_LANG_comment_exp; ?>
@@ -697,7 +697,7 @@ if ($action=="edituser" || $action == "createform") { ?>
 			
 				<div class="width30 choice_left">
 					<div class="helpicon">
-						<?php print_help_link("useradmin_gedcomid_help", "qm","gedcomid");?>
+						<?php PrintHelpLink("useradmin_gedcomid_help", "qm","gedcomid");?>
 					</div>
 					<div class="description">
 						<?php print GM_LANG_gedcomid; ?>
@@ -732,7 +732,7 @@ if ($action=="edituser" || $action == "createform") { ?>
 			<div class="admin_item_box">
 				<div class="width30 choice_left">
 					<div class="helpicon">
-						<?php print_help_link("useradmin_rootid_help", "qm", "rootid");?>
+						<?php PrintHelpLink("useradmin_rootid_help", "qm", "rootid");?>
 					</div>
 					<div class="description">
 						<?php print GM_LANG_rootid; ?>
@@ -768,7 +768,7 @@ if ($action=="edituser" || $action == "createform") { ?>
 			<div class="admin_item_box">
 				<div class="width30 choice_left">
 					<div class="helpicon">
-						<?php print_help_link("useradmin_gedcom_admin_help", "qm", "gedadmin");?>
+						<?php PrintHelpLink("useradmin_gedcom_admin_help", "qm", "gedadmin");?>
 					</div>
 					<div class="description">
 						<?php print GM_LANG_gedadmin; ?>
@@ -781,7 +781,7 @@ if ($action=="edituser" || $action == "createform") { ?>
 			<div class="admin_item_box">
 				<div class="width30 choice_left">
 					<div class="helpicon">
-						<?php print_help_link("useradmin_privgroup_help", "qm","accpriv_conf");?>
+						<?php PrintHelpLink("useradmin_privgroup_help", "qm","accpriv_conf");?>
 					</div>
 					<div class="description">
 						<?php print GM_LANG_accpriv_conf; ?>
@@ -819,7 +819,7 @@ if ($action=="edituser" || $action == "createform") { ?>
 			<div class="admin_item_box">
 				<div class="width30 choice_left">
 					<div class="helpicon">
-						<?php print_help_link("useradmin_relation_priv_help", "qm", "user_relationship_priv");?>
+						<?php PrintHelpLink("useradmin_relation_priv_help", "qm", "user_relationship_priv");?>
 					</div>
 					<div class="description">
 						<?php print GM_LANG_user_relationship_priv; ?>
@@ -836,7 +836,7 @@ if ($action=="edituser" || $action == "createform") { ?>
 			<div class="admin_item_box">
 				<div class="width30 choice_left">
 					<div class="helpicon">
-						<?php print_help_link("useradmin_path_length_help", "qm", "user_path_length");?>
+						<?php PrintHelpLink("useradmin_path_length_help", "qm", "user_path_length");?>
 					</div>
 					<div class="description">
 						<?php print GM_LANG_user_path_length; ?>
@@ -858,7 +858,7 @@ if ($action=="edituser" || $action == "createform") { ?>
 			<div class="admin_item_box">
 				<div class="width30 choice_left">
 					<div class="helpicon">
-						<?php print_help_link("useradmin_marr_priv_help", "qm", "user_path_marr");?>
+						<?php PrintHelpLink("useradmin_marr_priv_help", "qm", "user_path_marr");?>
 					</div>
 					<div class="description">
 						<?php print GM_LANG_user_path_marr; ?>
@@ -875,7 +875,7 @@ if ($action=="edituser" || $action == "createform") { ?>
 			<div class="admin_item_box">
 				<div class="width30 choice_left">
 					<div class="helpicon">
-						<?php print_help_link("useradmin_hide_live_people_help", "qm", "HIDE_LIVE_PEOPLE");?>
+						<?php PrintHelpLink("useradmin_hide_live_people_help", "qm", "HIDE_LIVE_PEOPLE");?>
 					</div>
 					<div class="description">
 						<?php print GM_LANG_HIDE_LIVE_PEOPLE; ?>
@@ -892,7 +892,7 @@ if ($action=="edituser" || $action == "createform") { ?>
 			<div class="admin_item_box">
 				<div class="width30 choice_left">
 					<div class="helpicon">
-						<?php print_help_link("useradmin_show_living_names_help", "qm", "SHOW_LIVING_NAMES");?>
+						<?php PrintHelpLink("useradmin_show_living_names_help", "qm", "SHOW_LIVING_NAMES");?>
 					</div>
 					<div class="description">
 						<?php print GM_LANG_SHOW_LIVING_NAMES; ?>
@@ -909,7 +909,7 @@ if ($action=="edituser" || $action == "createform") { ?>
 			<div class="admin_item_box">
 				<div class="width30 choice_left">
 					<div class="helpicon">
-						<?php print_help_link("useradmin_can_edit_help", "qm","edit_rights");?>
+						<?php PrintHelpLink("useradmin_can_edit_help", "qm","edit_rights");?>
 					</div>
 					<div class="description">
 						<?php print GM_LANG_edit_rights; ?>
@@ -1030,7 +1030,7 @@ if ($action == "massupdate") {
 			<div class="admin_item_box">
 				<div class="width30 choice_left">
 					<div class="helpicon">
-						<?php print_help_link("useradmin_sync_gedcom_help", "qm","sync_gedcom");?>
+						<?php PrintHelpLink("useradmin_sync_gedcom_help", "qm","sync_gedcom");?>
 					</div>
 					<div class="description">
 						<?php print GM_LANG_sync_gedcom; ?>
@@ -1052,7 +1052,7 @@ if ($action == "massupdate") {
 			<div class="admin_item_box">
 				<div class="width30 choice_left">
 					<div class="helpicon">
-						<?php print_help_link("useradmin_auto_accept_help", "qm", "user_auto_accept");?>
+						<?php PrintHelpLink("useradmin_auto_accept_help", "qm", "user_auto_accept");?>
 					</div>
 					<div class="description">
 						<?php print GM_LANG_user_auto_accept; ?>
@@ -1076,7 +1076,7 @@ if ($action == "massupdate") {
 				<div class="admin_item_box">
 					<div class="width30 choice_left">
 						<div class="helpicon">
-							<?php print_help_link("useradmin_user_theme_help", "qm", "user_theme");?>
+							<?php PrintHelpLink("useradmin_user_theme_help", "qm", "user_theme");?>
 						</div>
 						<div class="description">
 							<?php print GM_LANG_user_theme; ?>
@@ -1107,7 +1107,7 @@ if ($action == "massupdate") {
 			<div class="admin_item_box">
 				<div class="width30 choice_left">
 					<div class="helpicon">
-						<?php print_help_link("useradmin_user_contact_help", "qm", "user_contact_method");?>
+						<?php PrintHelpLink("useradmin_user_contact_help", "qm", "user_contact_method");?>
 					</div>
 					<div class="description">
 						<?php print GM_LANG_user_contact_method; ?>
@@ -1139,7 +1139,7 @@ if ($action == "massupdate") {
 			<div class="admin_item_box">
 				<div class="width30 choice_left">
 					<div class="helpicon">
-						<?php print_help_link("useradmin_visibleonline_help", "qm", "visibleonline");?>
+						<?php PrintHelpLink("useradmin_visibleonline_help", "qm", "visibleonline");?>
 					</div>
 					<div class="description">
 						<?php print GM_LANG_visibleonline; ?>
@@ -1161,7 +1161,7 @@ if ($action == "massupdate") {
 			<div class="admin_item_box">
 				<div class="width30 choice_left">
 					<div class="helpicon">
-						<?php print_help_link("useradmin_editaccount_help", "qm", "editaccount");?>
+						<?php PrintHelpLink("useradmin_editaccount_help", "qm", "editaccount");?>
 					</div>
 					<div class="description">
 						<?php print GM_LANG_editaccount; ?>
@@ -1183,7 +1183,7 @@ if ($action == "massupdate") {
 			<div class="admin_item_box">
 				<div class="width30 choice_left">
 					<div class="helpicon">
-						<?php print_help_link("useradmin_user_default_tab_help", "qm", "user_default_tab");?>
+						<?php PrintHelpLink("useradmin_user_default_tab_help", "qm", "user_default_tab");?>
 					</div>
 					<div class="description">
 						<?php print GM_LANG_user_default_tab; ?>
@@ -1217,7 +1217,7 @@ if ($action == "massupdate") {
 				<div class="admin_item_box">
 					<div class="width30 choice_left">
 						<div class="helpicon">
-							<?php print_help_link("useradmin_rootid_help", "qm","rootid");?>
+							<?php PrintHelpLink("useradmin_rootid_help", "qm","rootid");?>
 						</div>
 						<div class="description">
 							<?php print GM_LANG_rootid; ?>
@@ -1243,7 +1243,7 @@ if ($action == "massupdate") {
 				<div class="admin_item_box">
 					<div class="width30 choice_left">
 						<div class="helpicon">
-							<?php print_help_link("useradmin_gedcom_admin_help", "qm", "gedadmin");?>
+							<?php PrintHelpLink("useradmin_gedcom_admin_help", "qm", "gedadmin");?>
 						</div>
 						<div class="description">
 							<?php print GM_LANG_gedadmin; ?>
@@ -1266,7 +1266,7 @@ if ($action == "massupdate") {
 				<div class="admin_item_box">
 					<div class="width30 choice_left">
 						<div class="helpicon">
-							<?php print_help_link("useradmin_can_edit_help", "qm","can_edit");?>
+							<?php PrintHelpLink("useradmin_can_edit_help", "qm","can_edit");?>
 						</div>
 						<div class="description">
 							<?php print GM_LANG_accpriv_conf; ?>
@@ -1296,7 +1296,7 @@ if ($action == "massupdate") {
 				<div class="admin_item_box">
 					<div class="width30 choice_left">
 						<div class="helpicon">
-							<?php print_help_link("useradmin_relation_priv_help", "qm", "user_relationship_priv");?>
+							<?php PrintHelpLink("useradmin_relation_priv_help", "qm", "user_relationship_priv");?>
 						</div>
 						<div class="description">
 							<?php print GM_LANG_user_relationship_priv; ?>
@@ -1323,7 +1323,7 @@ if ($action == "massupdate") {
 				<div class="admin_item_box">
 					<div class="width30 choice_left">
 						<div class="helpicon">
-							<?php print_help_link("useradmin_path_length_help", "qm", "user_path_length");?>
+							<?php PrintHelpLink("useradmin_path_length_help", "qm", "user_path_length");?>
 						</div>
 						<div class="description">
 							<?php print GM_LANG_user_path_length; ?>
@@ -1350,7 +1350,7 @@ if ($action == "massupdate") {
 				<div class="admin_item_box">
 					<div class="width30 choice_left">
 						<div class="helpicon">
-							<?php print_help_link("useradmin_marr_priv_help", "qm", "user_path_marr");?>
+							<?php PrintHelpLink("useradmin_marr_priv_help", "qm", "user_path_marr");?>
 						</div>
 						<div class="description">
 							<?php print GM_LANG_user_path_marr; ?>
@@ -1377,7 +1377,7 @@ if ($action == "massupdate") {
 				<div class="admin_item_box">
 					<div class="width30 choice_left">
 						<div class="helpicon">
-							<?php print_help_link("useradmin_hide_live_people_help", "qm", "HIDE_LIVE_PEOPLE");?>
+							<?php PrintHelpLink("useradmin_hide_live_people_help", "qm", "HIDE_LIVE_PEOPLE");?>
 						</div>
 						<div class="description">
 							<?php print GM_LANG_HIDE_LIVE_PEOPLE; ?>
@@ -1404,7 +1404,7 @@ if ($action == "massupdate") {
 				<div class="admin_item_box">
 					<div class="width30 choice_left">
 						<div class="helpicon">
-							<?php print_help_link("useradmin_show_living_names_help", "qm", "SHOW_LIVING_NAMES");?>
+							<?php PrintHelpLink("useradmin_show_living_names_help", "qm", "SHOW_LIVING_NAMES");?>
 						</div>
 						<div class="description">
 							<?php print GM_LANG_SHOW_LIVING_NAMES; ?>
@@ -1431,7 +1431,7 @@ if ($action == "massupdate") {
 				<div class="admin_item_box">
 					<div class="width30 choice_left">
 						<div class="helpicon">
-							<?php print_help_link("useradmin_can_edit_help", "qm","can_edit");?>
+							<?php PrintHelpLink("useradmin_can_edit_help", "qm","can_edit");?>
 						</div>
 						<div class="description">
 							<?php print GM_LANG_edit_rights; ?>

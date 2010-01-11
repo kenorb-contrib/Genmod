@@ -84,7 +84,7 @@ print "<div id=\"content_pedigree\">";
 
 		// Orientation
 		print "<tr><td class=\"shade2 wrap\">";
-		print_help_link("talloffset_help", "qm");
+		PrintHelpLink("talloffset_help", "qm");
 		print GM_LANG_orientation;
 		print "</td><td class=\"shade1\">";
 		print "<input type=\"radio\" name=\"talloffset\" value=\"0\" ";

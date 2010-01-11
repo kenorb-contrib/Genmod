@@ -41,9 +41,10 @@ class Family extends GedcomRecord {
 	private $sortable_addname = null;		// Printable and sortable addname of the family, after applying privacy (can be blank)
 	public $label = null;					// Label set in the person class as a specific label for this family of the person
 	private $title = null;					// Printable name for the family in normal order
-	private $name = null;
+	private $name = null;					// Same as title
 	private $descriptor = null;				// Same as title
 	private $adddescriptor = null;			// Printable addname, names in order firstname lastname
+	private $allnames = null;				// Array of all family name combinations of the husband and wife
 		
 	// Family members
 	private $husb = null;					// Holder for the husband object (or new, if showing changes)
@@ -83,6 +84,14 @@ class Family extends GedcomRecord {
 			self::$cache[$gedcomid][$xref] = new Family($xref, $gedrec, $gedcomid);
 		}
 		return self::$cache[$gedcomid][$xref];
+	}
+	
+	public static function IsInstance($xref, $gedcomid="") {
+		global $GEDCOMID;
+		
+		if (empty($gedcomid)) $gedcomid = $GEDCOMID;
+		if (!isset(self::$cache[$gedcomid][$xref])) return false;
+		else return true;
 	}
 	
 	/**
@@ -192,6 +201,9 @@ class Family extends GedcomRecord {
 			case "adddescriptor":
 				return $this->GetAddTitle();
 				break;
+			case "allnames":
+				return $this->GetAllFamilyNames();
+				break;
 			default:
 				return parent::__get($property);
 				break;
@@ -266,7 +278,7 @@ class Family extends GedcomRecord {
 	
 	private function GetFamilyDescriptor() {
 		
-		if (is_null($this->sortable_name)) $this->sortable_name = NameFunctions::GetFamilyDescriptor($this, false);
+		if (is_null($this->sortable_name)) $this->sortable_name = NameFunctions::GetFamilyDescriptor($this, true);
 		return $this->sortable_name;
 	}
 	
@@ -281,7 +293,7 @@ class Family extends GedcomRecord {
 	private function GetTitle() {
 		
 		if (is_null($this->title)) {
-			$this->title = NameFunctions::GetFamilyDescriptor($this, true);
+			$this->title = NameFunctions::GetFamilyDescriptor($this, false);
 //			$add = NameFunctions::GetFamilyAddDescriptor($this, true);
 //			if ($add != "") $this->title .= "<br />".$add;
 		}
@@ -295,6 +307,15 @@ class Family extends GedcomRecord {
 		}
 		return $this->adddescriptor;
 	}
+	
+	private function GetAllFamilyNames() {
+		
+		if (is_null($this->allnames)) {
+			$this->allnames = NameFunctions::GetAllFamilyDescriptors($this, false);
+		}
+		return $this->allnames;
+	}
+	
 	/**
 	 * get the husbands ID
 	 * @return string
@@ -498,7 +519,7 @@ class Family extends GedcomRecord {
 
 			$subrecord = GetSubRecord(1, "1 DIV", $this->gedrec);
 			if (!empty($subrecord) && PrivacyFunctions::showFact("DIV", $this->xref, "FAM") && !PrivacyFunctions::FactViewRestricted($this->xref, $subrecord, 2)) {
-				$this->div_fact = new Fact($this->xref, $this->datatype, "DIV", $subrecord);
+				$this->div_fact = new Fact($this->xref, $this->datatype, $this->gedcomid, "DIV", $subrecord);
 				$this->div_date = $this->div_fact->simpledate;
 			}
 			else {
@@ -517,8 +538,8 @@ class Family extends GedcomRecord {
 		else $gedrec = $this->gedrec;
 
 		$subrecord = GetSubRecord(1, "1 MARR", $this->gedrec);
-		if (!empty($subrecord) && PrivacyFunctions::showFact("MARR", $this->xref, "FAM") && !PrivacyFunctions::FactViewRestricted($this->xref, $subrecord, 2)) {
-			$this->marr_fact = new Fact($this->xref, $this->datatype, "MARR", $subrecord);
+		if ($this->DisplayDetails() && !empty($subrecord) && PrivacyFunctions::showFact("MARR", $this->xref, "FAM") && !PrivacyFunctions::FactViewRestricted($this->xref, $subrecord, 2)) {
+			$this->marr_fact = new Fact($this->xref, $this->datatype, $this->gedcomid, "MARR", $subrecord);
 			$this->marr_date = $this->marr_fact->simpledate;
 			$this->marr_type = $this->marr_fact->simpletype;
 			$this->marr_plac = $this->marr_fact->simpleplace;
@@ -596,16 +617,22 @@ class Family extends GedcomRecord {
 		}
 	}
 	
-	public function PrintListFamily($useli=true, $fact="") {
+	public function PrintListFamily($useli=true, $fact="", $name="", $assos="", $paste=false) {
+		global $TEXT_DIRECTION;
 		
-		if (!$this->DisplayDetails()) return false;
+		if (!$this->DispName()) return false;
+		
+		if (empty($name)) $desc = $this->GetFamilyDescriptor();
+		else $desc = $name;
 		
 		if ($useli) {
-			if (begRTLText($this->GetFamilyDescriptor())) print "\n\t\t\t<li class=\"rtl\" dir=\"rtl\">";
+			if (begRTLText($desc)) print "\n\t\t\t<li class=\"rtl\" dir=\"rtl\">";
 			else print "\n\t\t\t<li class=\"ltr\" dir=\"ltr\">";
 		}
-		print "\n\t\t\t<a href=\"family.php?famid=".$this->xref."&amp;gedid=".$this->gedcomid."\" class=\"list_item\"><b>".$this->GetFamilyDescriptor();
-		if ($this->GetFamilyAddDescriptor() != "") print "&nbsp;(".$this->GetFamilyAddDescriptor().")";
+		if ($paste) print "<a href=\"#\" onclick=\"sndReq(document.getElementById('dummy'), 'lastused', 'type', '".$this->datatype."', 'id', '".$this->key."'); pasteid('".$this->xref."'); return false;\" class=\"list_item\">";
+		else print "\n\t\t\t<a href=\"family.php?famid=".$this->xref."&amp;gedid=".$this->gedcomid."\" class=\"list_item\">";
+		print "<b>".$desc;
+		if (empty($name) && $this->GetFamilyAddDescriptor() != "") print "&nbsp;(".$this->GetFamilyAddDescriptor().")";
 		print "</b>";
 		print $this->addxref;
 		if ($this->GetMarriageFact() != "") {
@@ -621,8 +648,28 @@ class Family extends GedcomRecord {
 			print ")</i>";
 		}
 		print "</a>\n";
+		if (is_array($assos) && ($this->disp)) {
+			foreach ($assos as $akey => $asso) {
+				SwitchGedcom($asso->gedcomid);
+				$assoname = $asso->assoperson->name;
+				$assoxref = $asso->assoperson->addxref;
+				print "<br /><a href=\"individual.php?pid=".$asso->xref2."&amp;gedid=".$asso->gedcomid."\" title=\"".$assoname."\" class=\"list_item\">";
+				if ($TEXT_DIRECTION=="ltr") print " <span dir=\"ltr\">";
+				else print " <span dir=\"rtl\">";
+				print "(".GM_LANG_associate_with.": ".$assoname.$assoxref;
+				if ($asso->fact != "" || $asso->role != "") {
+					print " - ";
+					if ($asso->fact != "") print constant("GM_FACT_".$asso->fact);
+					if ($asso->fact != "" && $asso->role != "") print " : ";
+					if (defined("GM_LANG_".$asso->role)) print constant("GM_LANG_".$asso->role);
+					else print $asso->role;
+				}
+				print ")</span></a>";
+		  		SwitchGedcom();
+			}
+		}
 		if ($useli) print "</li>\n";
-		
+		return true;
 	}
 }
 ?>

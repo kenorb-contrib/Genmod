@@ -139,7 +139,7 @@ if ($action != "save" && $action != "toggleActive") { ?>
 			?>
 			<div class="admin_item_box">
 				<div class="change_language_item_left">
-					<div class="helpicon"><?php print_help_link("active_help", "qm"); ?></div>
+					<div class="helpicon"><?php PrintHelpLink("active_help", "qm"); ?></div>
 					<div class="description"><?php print GM_LANG_active;?></div>
 				</div>
 				<div class="change_language_item_right">
@@ -160,7 +160,7 @@ if ($action != "save" && $action != "toggleActive") { ?>
 		<div class="admin_item_box">
 			<div class="change_language_item_left">
 				<?php if (!isset($v_original_lang_name)) $v_original_lang_name = constant("GM_LANG_".$ln);?>
-				<div class="helpicon"><?php print_help_link("original_lang_name_help", "qm"); ?></div>
+				<div class="helpicon"><?php PrintHelpLink("original_lang_name_help", "qm"); ?></div>
 				<div class="description"><?php print str_replace("#D_LANGNAME#", constant("GM_LANG_".$d_LangName), GM_LANG_original_lang_name);?></div>
 			</div>
 			<div class="change_language_item_right">
@@ -170,7 +170,7 @@ if ($action != "save" && $action != "toggleActive") { ?>
 		<div class="admin_item_box">
 			<div class="change_language_item_left">
 				<?php if (!isset($v_lang_shortcut)) $v_lang_shortcut = $lang_short_cut[$ln];?>
-				<div class="helpicon"><?php print_help_link("lang_shortcut_help", "qm"); ?></div>
+				<div class="helpicon"><?php PrintHelpLink("lang_shortcut_help", "qm"); ?></div>
 				<div class="description"><?php print GM_LANG_lang_shortcut;?></div>
 			</div>
 			<div class="change_language_item_right">
@@ -180,7 +180,7 @@ if ($action != "save" && $action != "toggleActive") { ?>
 		<div class="admin_item_box">
 			<div class="change_language_item_left">
 				<?php if (!isset($v_lang_langcode)) $v_lang_langcode = $lang_langcode[$ln];?>
-				<div class="helpicon"><?php print_help_link("lang_langcode_help", "qm"); ?></div>
+				<div class="helpicon"><?php PrintHelpLink("lang_langcode_help", "qm"); ?></div>
 				<div class="description"><?php print GM_LANG_lang_langcode;?></div>
 			</div>
 			<div class="change_language_item_right">
@@ -190,7 +190,7 @@ if ($action != "save" && $action != "toggleActive") { ?>
 		<div class="admin_item_box">
 			<div class="change_language_item_left">
 				<?php if (!isset($v_flagsfile)) $v_flagsfile = $flagsfile[$ln];?>
-				<div class="helpicon"><?php print_help_link("flagsfile_help", "qm"); ?></div>
+				<div class="helpicon"><?php PrintHelpLink("flagsfile_help", "qm"); ?></div>
 				<div class="description"><?php print GM_LANG_flagsfile;?></div>
 			</div>
 			<div class="change_language_item_right">
@@ -251,7 +251,7 @@ if ($action != "save" && $action != "toggleActive") { ?>
 		<div class="admin_item_box">
 			<div class="change_language_item_left">
 				<?php if (!isset($v_date_format)) $v_date_format = $DATE_FORMAT_array[$ln];?>
-				<div class="helpicon"><?php print_help_link("date_format_help", "qm", "date_format"); ?></div>
+				<div class="helpicon"><?php PrintHelpLink("date_format_help", "qm", "date_format"); ?></div>
 				<div class="description"><?php print GM_LANG_date_format;?></div>
 			</div>
 			<div class="change_language_item_right">
@@ -261,7 +261,7 @@ if ($action != "save" && $action != "toggleActive") { ?>
 		<div class="admin_item_box">
 			<div class="change_language_item_left">
 				<?php if (!isset($v_time_format)) $v_time_format = $TIME_FORMAT_array[$ln];?>
-				<div class="helpicon"><?php print_help_link("time_format_help", "qm", "time_format"); ?></div>
+				<div class="helpicon"><?php PrintHelpLink("time_format_help", "qm", "time_format"); ?></div>
 				<div class="description"><?php print GM_LANG_time_format;?></div>
 			</div>
 			<div class="change_language_item_right">
@@ -271,7 +271,7 @@ if ($action != "save" && $action != "toggleActive") { ?>
 		<div class="admin_item_box">
 			<div class="change_language_item_left">
 				<?php if (!isset($v_week_start)) $v_week_start = $WEEK_START_array[$ln];?>
-				<div class="helpicon"><?php print_help_link("week_start_help", "qm","week_start"); ?></div>
+				<div class="helpicon"><?php PrintHelpLink("week_start_help", "qm","week_start"); ?></div>
 				<div class="description"><?php print GM_LANG_week_start;?></div>
 			</div>
 			<div class="change_language_item_right">
@@ -294,7 +294,7 @@ if ($action != "save" && $action != "toggleActive") { ?>
 		<div class="admin_item_box">
 			<div class="change_language_item_left">
 				<?php if (!isset($v_text_direction)) $v_text_direction = $TEXT_DIRECTION_array[$ln];?>
-				<div class="helpicon"><?php print_help_link("text_direction_help", "qm", "text_direction"); ?></div>
+				<div class="helpicon"><?php PrintHelpLink("text_direction_help", "qm", "text_direction"); ?></div>
 				<div class="description"><?php print GM_LANG_text_direction;?></div>
 			</div>
 			<div class="change_language_item_right">
@@ -315,7 +315,7 @@ if ($action != "save" && $action != "toggleActive") { ?>
 		<div class="admin_item_box">
 			<div class="change_language_item_left">
 				<?php if (!isset($v_name_reverse)) $v_name_reverse = $NAME_REVERSE_array[$ln];?>
-				<div class="helpicon"><?php print_help_link("name_reverse_help", "qm", "name_reverse"); ?></div>
+				<div class="helpicon"><?php PrintHelpLink("name_reverse_help", "qm", "name_reverse"); ?></div>
 				<div class="description"><?php print GM_LANG_name_reverse;?></div>
 			</div>
 			<div class="change_language_item_right">
@@ -336,7 +336,7 @@ if ($action != "save" && $action != "toggleActive") { ?>
 		<div class="admin_item_box">
 			<div class="change_language_item_left">
 				<?php if (!isset($v_alphabet_upper)) $v_alphabet_upper = $ALPHABET_upper[$ln];?>
-				<div class="helpicon"><?php print_help_link("alphabet_upper_help", "qm", "alphabet_upper"); ?></div>
+				<div class="helpicon"><?php PrintHelpLink("alphabet_upper_help", "qm", "alphabet_upper"); ?></div>
 				<div class="description"><?php print GM_LANG_alphabet_upper;?></div>
 			</div>
 			<div class="change_language_item_right">
@@ -346,7 +346,7 @@ if ($action != "save" && $action != "toggleActive") { ?>
 		<div class="admin_item_box">
 			<div class="change_language_item_left">
 				<?php if (!isset($v_alphabet_lower)) $v_alphabet_lower = $ALPHABET_lower[$ln];?>
-				<div class="helpicon"><?php print_help_link("alphabet_lower_help", "qm", "alphabet_lower"); ?></div>
+				<div class="helpicon"><?php PrintHelpLink("alphabet_lower_help", "qm", "alphabet_lower"); ?></div>
 				<div class="description"><?php print GM_LANG_alphabet_lower;?></div>
 			</div>
 			<div class="change_language_item_right">
@@ -356,7 +356,7 @@ if ($action != "save" && $action != "toggleActive") { ?>
 		<div class="admin_item_box">
 			<div class="change_language_item_left">
 				<?php if (!isset($v_mon_short)) $v_mon_short = $MON_SHORT_array[$ln];?>
-				<div class="helpicon"><?php print_help_link("mon_short_help", "qm", "mon_short"); ?></div>
+				<div class="helpicon"><?php PrintHelpLink("mon_short_help", "qm", "mon_short"); ?></div>
 				<div class="description"><?php print GM_LANG_mon_short;?></div>
 			</div>
 			<div class="change_language_item_right">
@@ -372,7 +372,7 @@ if ($action != "save" && $action != "toggleActive") { ?>
 			?>
 			<div class="admin_item_box">
 				<div class="change_language_item_left">
-					<div class="helpicon"><?php print_help_link("lang_filenames_help", "qm", "lang_filenames"); ?></div>
+					<div class="helpicon"><?php PrintHelpLink("lang_filenames_help", "qm", "lang_filenames"); ?></div>
 					<div class="description"><?php print GM_LANG_lang_filenames;?></div>
 				</div>
 				<div class="change_language_item_right">

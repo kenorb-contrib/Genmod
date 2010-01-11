@@ -59,7 +59,7 @@ switch($action) {
 		$types = array("INDI", "FAM", "SOUR", "REPO", "OBJE", "NOTE");
 		$desc = array("individual", "family", "source", "repo", "media_object", "note");
 		foreach($types as $k=>$type) {
-			print GM_LANG_next_free." ".constant("GM_LANG_".$desc[$k]).": ".GetNewXref($type)."<br />";
+			print GM_LANG_next_free." ".constant("GM_LANG_".$desc[$k]).": ".EditFunctions::GetNewXref($type)."<br />";
 		}
 	break;
 	

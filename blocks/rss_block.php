@@ -47,7 +47,7 @@ function print_RSS_block($block = true, $config="", $side, $index) {
 
 	print "<div id=\"login_block\" class=\"block\">\n";
 	print "<div class=\"blockhc\">";
-	print_help_link("rss_feed_help", "qm", "rss_feeds");
+	PrintHelpLink("rss_feed_help", "qm", "rss_feeds");
 	if ($GM_BLOCKS["print_RSS_block"]["canconfig"]) {
 		if ((($command=="gedcom")&&($gm_user->userGedcomAdmin())) || (($command=="user")&&(!empty($username)))) {
 			if ($command=="gedcom") $name = preg_replace("/'/", "\'", get_gedcom_from_id($GEDCOMID));

@@ -44,9 +44,9 @@ abstract class ListFunctions {
 	// $allgeds is either "no", or an array with gedcomid's to search in
 	public function GetIndiList($allgeds="", $selection = "", $applypriv=true) {
 		global $GEDCOMID;
-		
+	
 		$indilist = array();
-		$sql = "SELECT i_key, i_gedrec, i_isdead, i_id, i_file, n_name, n_surname, n_letter, n_type ";
+		$sql = "SELECT i_key, i_gedrec, i_isdead, i_id, i_file, n_name, n_surname, n_nick, n_letter, n_type ";
 		$sql .= "FROM ".TBLPREFIX."individuals, ".TBLPREFIX."names WHERE n_key=i_key ";
 		if ($allgeds == "no") {
 			$sql .= "AND i_file = ".$GEDCOMID." ";
@@ -58,11 +58,13 @@ abstract class ListFunctions {
 			foreach ($allgeds as $key => $ged) {
 				if (!$first) $sql .= " OR ";
 				$sql .= "i_file='".$ged."'";
+				$first = false;
 			}
 			$sql .= ")";
 		}
-		else if (!empty($selection)) $sql .= "AND i_key IN (".$selection.") ";
+		if (!empty($selection)) $sql .= "AND i_key IN (".$selection.") ";
 		$sql .= "ORDER BY i_key, n_id ASC";
+
 		$res = NewQuery($sql);
 		$ct = $res->NumRows($res->result);
 		$key = "";
@@ -80,7 +82,7 @@ abstract class ListFunctions {
 					self::$indi_hide[$row["i_key"]] = 1;
 				}
 			}
-			if ($person->disp_name || !$applypriv) $indilist[$row["i_key"]]->addname = array($row["n_name"], $row["n_letter"], $row["n_surname"], $row["n_type"]);
+			if ($person->disp_name || !$applypriv) $indilist[$row["i_key"]]->addname = array($row["n_name"], $row["n_letter"], $row["n_surname"], $row["n_nick"], $row["n_type"]);
 		}
 		if ($key != "") $person->names_read = true;
 		$res->FreeResult();
@@ -221,32 +223,28 @@ abstract class ListFunctions {
 	
 		$res = NewQuery($sql);
 		$ct = $res->NumRows();
+		$select = array();
 		while($row = $res->FetchAssoc()){
 			$fam = null;
 			$fam =& Family::GetInstance($row["f_id"], $row);
 			$famlist[$row["f_key"]] = $fam;
 			self::$fam_total[$row["f_key"]] = 1;
+			if ($row["f_husb"] != "" && !Person::IsInstance(SplitKey($row["f_husb"], "id"), $row["f_file"])) $select[] = $row["f_husb"];
+			if ($row["f_wife"] != "" && !Person::IsInstance(SplitKey($row["f_wife"], "id"), $row["f_file"])) $select[] = $row["f_wife"];
 		}
 		$res->FreeResult();
 	
-		if (count($famlist) > 0) {
-			$select = array();
-			foreach ($famlist as $key => $fam) {
-				if ($fam->husb_id != "" && Person::IsInstance($fam->husb_id, $fam->gedcomid) == false) $select[] = JoinKey($fam->husb_id, $fam->gedcomid);
-				if ($fam->wife_id != "" && Person::IsInstance($fam->wife_id, $fam->gedcomid) == false) $select[] = JoinKey($fam->wife_id, $fam->gedcomid);
-			}
-			if (count($select) > 0) {
-				array_flip(array_flip($select));
-				//print "Indi's selected for fams: ".count($select)."<br />";
-				$selection = "'".implode("','", $select)."'";
-				self::GetIndilist($allgeds, $selection, false);
-			}
-			if ($applypriv) {
-				foreach($famlist as $key => $fam) {
-					if (!$fam->disp) {
-						unset($famlist[$key]);
-						self::$fam_hide[$key] = 1;
-					}
+		if (count($select) > 0) {
+			array_flip(array_flip($select));
+			//print "Indi's selected for fams: ".count($select)."<br />";
+			$selection = "'".implode("','", $select)."'";
+			self::GetIndilist($allgeds, $selection, false);
+		}
+		if ($applypriv) {
+			foreach($famlist as $key => $fam) {
+				if (!$fam->disp) {
+					unset($famlist[$key]);
+					self::$fam_hide[$key] = 1;
 				}
 			}
 		}
@@ -275,8 +273,8 @@ abstract class ListFunctions {
 			}
 			$source->addlink = array($row["sm_gid"], $row["sm_type"], $row["s_file"]);
 			if ($LINK_PRIVACY) {
-				if ($row["sm_type"] == "INDI") $indisel[] = $row["sm_gid"];
-				else if ($row["sm_type"] == "FAM") $famsel[] = $row["sm_gid"];
+				if ($row["sm_type"] == "INDI" && !Person::IsInstance($row["sm_gid"], $row["s_file"])) $indisel[] = $row["sm_gid"];
+				else if ($row["sm_type"] == "FAM" && !Family::IsInstance($row["sm_gid"], $row["s_file"])) $famsel[] = $row["sm_gid"];
 			}
 		}
 		$res->FreeResult();
@@ -284,12 +282,12 @@ abstract class ListFunctions {
 		if (count($indisel) > 0) {
 			array_flip(array_flip($indisel));
 			$indiselect = "'".implode("[".$GEDCOMID."]','", $indisel)."[".$GEDCOMID."]'";
-			self::GetIndiList("no", $indiselect, false);
+			self::GetIndiList("", $indiselect, false);
 		}
 		if (count($famsel) > 0) {
 			array_flip(array_flip($famsel));
 			$famselect = "'".implode ("[".$GEDCOMID."]','", $famsel)."[".$GEDCOMID."]'";
-			self::GetFamList("no", $famselect, false);
+			self::GetFamList("", $famselect, false);
 		}
 		if ($applypriv) {
 			foreach ($sourcelist as $key => $source) {
@@ -326,5 +324,84 @@ abstract class ListFunctions {
 		}
 		return $repolist;
 	}
+	
+	//-- get the assolist from the datastore
+	public function GetAssoList($type = "all", $id="") {
+		global $GEDCOMID;
+	
+		$type = str2lower($type);
+		$assolist = array();
+		$resnvalues = array(""=>"", "n"=>"none", "l"=>"locked", "p"=>"privacy", "c"=>"confidential");
+		$oldgedid = $GEDCOMID;
+		if (($type == "all") || ($type == "fam")) {
+			$sql1 = "SELECT f_key as as_key, f_file as as_file, as_pid, as_fact, as_rela, as_resn, as_type FROM ".TBLPREFIX."asso, ".TBLPREFIX."families WHERE f_key=as_of AND as_type='F'"; 
+			if (!empty($id)) $sql1 .= " AND as_pid LIKE '".JoinKey($id, $GEDCOMID)."'";
+		}
+		if (($type == "all") || ($type == "indi")) {
+			$sql2 = "SELECT i_key as as_key, i_file as as_file, as_pid, as_fact, as_rela, as_resn, as_type FROM ".TBLPREFIX."asso, ".TBLPREFIX."individuals WHERE i_key=as_of AND as_type='I'";	
+			if (!empty($id)) $sql2 .= " AND as_pid LIKE '".JoinKey($id, $GEDCOMID)."'";
+		}
+		if ($type == "fam") $sql = $sql1;
+		else if ($type == "indi") $sql = $sql2;
+		else $sql = $sql1." UNION ".$sql2;
+		
+		$famsel = array();
+		$indisel = array();
+		$res = NewQuery($sql);
+		$ct = $res->NumRows();
+		while($row = $res->FetchAssoc()){
+			$assolist[$row["as_key"]][] = new Asso($row);
+			if ($row["as_type"] == "I" && !Person::IsInstance(SplitKey($row["as_key"], "id"), $row["as_file"])) $indisel[] = $row["as_key"];
+			else if ($row["as_type"] == "F" && !Family::IsInstance(SplitKey($row["as_key"], "id"), $row["as_file"])) $famsel[] = $row["as_key"];
+		}
+		$res->FreeResult();
+		
+		if (count($indisel) > 0) {
+			array_flip(array_flip($indisel));
+			$indiselect = "'".implode("','", $indisel)."'";
+			ListFunctions::GetIndiList("", $indiselect, false);
+		}
+		if (count($famsel) > 0) {
+			array_flip(array_flip($famsel));
+			$famselect = "'".implode ("','", $famsel)."'";
+			ListFunctions::GetFamList("", $famselect, false);
+		}
+		return $assolist;
+	}
+	
+	//-- find all of the places
+	public function FindPlaceList($place) {
+		global $GEDCOMID, $LANGUAGE;
+		
+		$placelist = array();
+		$sql = "SELECT p_id, p_place, p_parent_id  FROM ".TBLPREFIX."places WHERE p_file='".$GEDCOMID."' ORDER BY p_parent_id, p_id";
+		$res = NewQuery($sql);
+		while($row = $res->fetchAssoc()) {
+			if ($row["p_parent_id"] == 0) $placelist[$row["p_id"]] = $row["p_place"];
+			else {
+				$placelist[$row["p_id"]] = $placelist[$row["p_parent_id"]].", ".$row["p_place"];
+			}
+		}
+		if (!empty($place)) {
+			$found = array();
+			foreach($placelist as $indexval => $pplace) {
+				if (preg_match("/$place/i", $pplace)>0) {
+					$upperplace = Str2Upper($pplace);
+					if (!isset($found[$upperplace])) {
+						$found[$upperplace] = $pplace;
+					}
+				}
+			}
+			$placelist = array_values($found);
+		}
+		usort($placelist, "stringsort");
+		if ($LANGUAGE != "chinese" && GedcomConfig::$DISPLAY_PINYIN) {
+			foreach ($placelist as $key => $place) {
+				if (HasChinese($place)) $placelist[$key] .= " (".GetPinYin($place).")";
+			}
+		}
+		return $placelist;
+	}
+	
 }
 ?>

@@ -390,7 +390,7 @@ if ($view!="preview") {
 	print "<input type=\"hidden\" name=\"action\" value=\"$action\" />";
 	print "\n\t\t<table class=\"facts_table $TEXT_DIRECTION width100\">\n\t\t<tr>";
 	print "<td class=\"shade2 vmiddle\">";
-	print_help_link("annivers_date_select_help", "qm", "day");
+	PrintHelpLink("annivers_date_select_help", "qm", "day");
 	print GM_LANG_day."</td>\n";
 	print "<td colspan=\"7\" class=\"shade1\">";
 	for($i=1; $i<($m_days+1); $i++) {
@@ -418,7 +418,7 @@ if ($view!="preview") {
 
 	print "</tr><tr>";
 	print "<td class=\"shade2 vmiddle\">";
-	print_help_link("annivers_month_select_help", "qm", "month");
+	PrintHelpLink("annivers_month_select_help", "qm", "month");
 	print GM_LANG_month."</td>\n";
 	print "<td colspan=\"7\" class=\"shade1\">";
 	foreach($monthtonum as $mon=>$num) {
@@ -436,7 +436,7 @@ if ($view!="preview") {
 	print "</td>\n";
 	print "</tr><tr>";
 	print "<td class=\"shade2 vmiddle\">";
-	print_help_link("annivers_year_select_help", "qm", "year");
+	PrintHelpLink("annivers_year_select_help", "qm", "year");
 	print GM_LANG_year."</td>\n";
 	print "<td class=\"shade1 vmiddle\">";
 	if (strlen($year)<5){
@@ -452,7 +452,7 @@ if ($view!="preview") {
 	print "</td>\n ";
 	if ($HIDE_LIVE_PEOPLE >= $gm_user->GetUserAccessLevel()) {
 		print "<td class=\"shade2 vmiddle\">";
-		print_help_link("annivers_show_help", "qm", "show");
+		PrintHelpLink("annivers_show_help", "qm", "show");
 		print GM_LANG_show.":&nbsp;</td>\n";
 		print "<td class=\"shade1 vmiddle\">";
 
@@ -488,7 +488,7 @@ if ($view!="preview") {
 	if ($HIDE_LIVE_PEOPLE >= $gm_user->GetUserAccessLevel()) {
 		print "</td>\n ";
 		print "<td class=\"shade2 vmiddle\">";
-		print_help_link("annivers_sex_help", "qm", "sex");
+		PrintHelpLink("annivers_sex_help", "qm", "sex");
 		print GM_LANG_sex.":&nbsp;</td>\n";
 		print "<td class=\"shade1 vmiddle\">";
 		if ($filtersx==""){
@@ -529,7 +529,7 @@ if ($view!="preview") {
 	if ($HIDE_LIVE_PEOPLE >= $gm_user->GetUserAccessLevel()) {
 		print "</td>\n ";
 		print "<td class=\"shade2 vmiddle\">";
-		print_help_link("annivers_event_help", "qm", "showcal");
+		PrintHelpLink("annivers_event_help", "qm", "showcal");
 		print GM_LANG_showcal."&nbsp;</td>\n";
 		print "<td class=\"shade1\"";
 		if ($HIDE_LIVE_PEOPLE >= $gm_user->GetUserAccessLevel()) print ">";
@@ -547,7 +547,7 @@ if ($view!="preview") {
 	print "</td>\n";
 	print "</tr>";
 	print "<tr><td class=\"topbottombar\" colspan=\"8\">";
-	print_help_link("day_month_help", "qm");
+	PrintHelpLink("day_month_help", "qm");
 	print "<input type=\"hidden\" name=\"day\" value=\"$dd\" />";
 	print "<input type=\"hidden\" name=\"month\" value=\"$mm\" />";
 	print "<input type=\"hidden\" name=\"filtersx\" value=\"$filtersx\" />";
@@ -955,7 +955,7 @@ if (($action=="today") || ($action=="year")) {
 			print "<td class=\"shade1\"><ul>\n\t\t";
 			if (!empty($text_indi)) print $text_indi;
 			if ($count_private_indi>0){
-				print_help_link("privacy_error_help", "qm", "private");
+				PrintHelpLink("privacy_error_help", "qm", "private");
 				print "<li><b>";
 				print GM_LANG_private;
 				print "</b> (".$count_private_indi.") ";
@@ -967,7 +967,7 @@ if (($action=="today") || ($action=="year")) {
 			print "<td class=\"shade1\"><ul>\n\t\t";
 			if (!empty($text_fam)) print $text_fam;
 			if ($count_private_fam>0){
-				print_help_link("privacy_error_help", "qm", "private");
+				PrintHelpLink("privacy_error_help", "qm", "private");
 				print "<li><b>";
 				print GM_LANG_private;
 				print "</b> (".$count_private_fam.") ";
@@ -1397,7 +1397,7 @@ else if ($action=="calendar") {
 				print "\">\n";
 				print $text_day;
 				if ($count_private>0){
-					print_help_link("privacy_error_help", "qm", "private");
+					PrintHelpLink("privacy_error_help", "qm", "private");
 					print "<a name=\"p\">".GM_LANG_private;
 					print "</a> (".$count_private.") ";
 					print "<br />\n";

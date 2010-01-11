@@ -173,7 +173,7 @@ if ($action != "choose") {
 				print "<br /><br />errfacts: ";
 				print_r($errfacts);
 */					
-				$change_id = GetNewXref("CHANGE");
+				$change_id = EditFunctions::GetNewXref("CHANGE");
 				$change_type = "MERGE";
 				print "<div id=\"content\">";
 				print "<div class=\"admin_topbottombar\"><h3>".GM_LANG_merge_step3."</h3><br />\n";
@@ -455,7 +455,7 @@ if ($action=="choose") {
 				print " <a href=\"javascript:fopen_find(document.merge.gid1, document.merge.mergeged);\"> ".GM_LANG_find_familyid."</a> |";
 				print " <a href=\"javascript:sopen_find(document.merge.gid1, document.merge.mergeged);\"> ".GM_LANG_find_sourceid."</a> |";
 				print " <a href=\"javascript:nopen_find(document.merge.gid1, document.merge.mergeged);\"> ".GM_LANG_find_noteid."</a>";
-				print_help_link("rootid_help", "qm");
+				PrintHelpLink("rootid_help", "qm");
 				print "</td></tr>";
 
 				print "<tr><td class=\"shade1\">".GM_LANG_merge_from."<br /></td>";
@@ -464,7 +464,7 @@ if ($action=="choose") {
 				print " <a href=\"javascript:fopen_find(document.merge.gid2, document.merge.mergeged);\"> ".GM_LANG_find_familyid."</a> |";
 				print " <a href=\"javascript:sopen_find(document.merge.gid2, document.merge.mergeged);\"> ".GM_LANG_find_sourceid."</a> |";
 				print " <a href=\"javascript:nopen_find(document.merge.gid2, document.merge.mergeged);\"> ".GM_LANG_find_noteid."</a>";
-				print_help_link("rootid_help", "qm");
+				PrintHelpLink("rootid_help", "qm");
 				print "</td></tr>";
 
 			print "</table>";

@@ -105,7 +105,7 @@ print "<div class=\"center\">\n";
 
 if ($_SESSION["cookie_login"]) {
 	print "<div style=\"width:70%\" align=\"left\">\n";
-	print_text("cookie_login_help");
+	PrintText("cookie_login_help");
 	print "</div><br /><br />\n";
 }
 if (GedcomConfig::$REQUIRE_AUTHENTICATION) {
@@ -115,32 +115,32 @@ if (GedcomConfig::$REQUIRE_AUTHENTICATION) {
 		switch (GedcomConfig::$WELCOME_TEXT_AUTH_MODE){
 			case "1":
 				$help_message = "welcome_text_auth_mode_1";
-				print_text($help_message,0,0,false);
+				PrintText($help_message,0,0,false);
 				break;
 			case "2":
 				 $help_message = "welcome_text_auth_mode_2";
-				 print_text($help_message,0,0,false);
+				 PrintText($help_message,0,0,false);
 				 break;
 			case "3":
 				 $help_message = "welcome_text_auth_mode_3";
-				 print_text($help_message,0,0,false);
+				 PrintText($help_message,0,0,false);
 				 break;
 			case "4":
 				 if (GedcomConfig::$WELCOME_TEXT_CUST_HEAD == "true"){
 					 $help_message = "welcome_text_cust_head";
-					 print_text($help_message,0,0,false);
+					 PrintText($help_message,0,0,false);
 				 }
 				 print GedcomConfig::$WELCOME_TEXT_AUTH_MODE_4;
 				 break;
 		}
 	}
-	else print_text($help_message);
+	else PrintText($help_message);
 	print "</td></tr></table><br /><br />\n";
 }
 else {
 	if (!empty($help_message) || isset($help_message)) {
 		print "<table class=\"center width60 ltr\"><tr><td class=\"wrap\">";
-		print_text($help_message);
+		PrintText($help_message);
 		print "</td></tr></table><br /><br />\n";
 	}
 }
@@ -158,16 +158,16 @@ else {
 		<table class="center facts_table width40">
 		  <tr><td class="topbottombar" colspan="2"><?php print GM_LANG_login?></td></tr>
 		  <tr>
-		    <td class="shade2 width40 <?php print $TEXT_DIRECTION; ?>"><?php print_help_link("username_help", "qm", "username"); print GM_LANG_username?></td>
+		    <td class="shade2 width40 <?php print $TEXT_DIRECTION; ?>"><?php PrintHelpLink("username_help", "qm", "username"); print GM_LANG_username?></td>
 		    <td class="shade1 <?php print $TEXT_DIRECTION; ?>"><input type="text" tabindex="<?php $i++; print $i?>" name="username" value="<?php print $username?>" size="20" /></td>
 		  </tr>
 		  <tr>
-		    <td class="shade2 <?php print $TEXT_DIRECTION; ?>"><?php print_help_link("password_help", "qm", "password"); print GM_LANG_password?></td>
+		    <td class="shade2 <?php print $TEXT_DIRECTION; ?>"><?php PrintHelpLink("password_help", "qm", "password"); print GM_LANG_password?></td>
 		    <td class="shade1 <?php print $TEXT_DIRECTION; ?>"><input type="password" tabindex="<?php $i++; print $i?>" name="password" size="20" /></td>
 		  </tr>
 		  <?php if ($ALLOW_REMEMBER_ME) { ?>
 		  <tr>
-		  	<td class="shade2 <?php print $TEXT_DIRECTION; ?>"><?php print_help_link("remember_me_help", "qm", "remember_me"); print GM_LANG_remember_me?></td>
+		  	<td class="shade2 <?php print $TEXT_DIRECTION; ?>"><?php PrintHelpLink("remember_me_help", "qm", "remember_me"); print GM_LANG_remember_me?></td>
 		    <td class="shade1 <?php print $TEXT_DIRECTION; ?> "><input type="checkbox" tabindex="<?php $i++; print $i?>" name="remember" value="yes" <?php if (!empty($_COOKIE["gm_rem"])) print "checked=\"checked\""; ?> /></td>
 		  </tr>
 		  <?php } ?>
@@ -176,10 +176,10 @@ else {
 		    <?php
 		        if (GedcomConfig::$SHOW_CONTEXT_HELP) {
 		          if (GedcomConfig::$REQUIRE_AUTHENTICATION) {
-		            print_help_link("login_buttons_aut_help", "qm", "login");
+		            PrintHelpLink("login_buttons_aut_help", "qm", "login");
 		          }
 		          else {
-		            print_help_link("login_buttons_help", "qm", "login");
+		            PrintHelpLink("login_buttons_help", "qm", "login");
 		          }
 		        }
 		    ?>
@@ -194,9 +194,9 @@ if (!isset($_COOKIE[$sessname]) && !isset($_COOKIE["gm_rem"])) print "<span clas
 if ($USE_REGISTRATION_MODULE) {?>
 	<table class="center facts_table width40">
 	<tr><td class="topbottombar" colspan="2"><?php print GM_LANG_account_information;?></td></tr>
-	<tr><td class="shade2 width40 <?php print $TEXT_DIRECTION; ?>"><?php print_help_link("new_user_help", "qm", "requestaccount"); print GM_LANG_no_account_yet;?></td>
+	<tr><td class="shade2 width40 <?php print $TEXT_DIRECTION; ?>"><?php PrintHelpLink("new_user_help", "qm", "requestaccount"); print GM_LANG_no_account_yet;?></td>
 	<td class="shade1 <?php print $TEXT_DIRECTION; ?>"><a href="login_register.php?action=register"><?php print GM_LANG_requestaccount;?></a></td></tr>
-	<tr><td class="shade2 <?php print $TEXT_DIRECTION; ?>"><?php print_help_link("new_password_help", "qm", "lost_password"); print GM_LANG_lost_password;?></td>
+	<tr><td class="shade2 <?php print $TEXT_DIRECTION; ?>"><?php PrintHelpLink("new_password_help", "qm", "lost_password"); print GM_LANG_lost_password;?></td>
 	<td class="shade1 <?php print $TEXT_DIRECTION; ?>"><a href="login_register.php?action=pwlost"><?php print GM_LANG_requestpassword;?></a></td></tr>
 	</table>
 <?php

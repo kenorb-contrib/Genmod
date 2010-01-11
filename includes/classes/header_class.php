@@ -49,6 +49,14 @@ class Header extends GedcomRecord {
 		return self::$cache[$gedcomid][$xref];
 	}
 		
+	public static function IsInstance($xref, $gedcomid="") {
+		global $GEDCOMID;
+		
+		if (empty($gedcomid)) $gedcomid = $GEDCOMID;
+		if (!isset(self::$cache[$gedcomid][$xref])) return false;
+		else return true;
+	}
+	
 	/**
 	 * Constructor for submitter object
 	 * @param string $gedrec	the raw submitter gedcom record

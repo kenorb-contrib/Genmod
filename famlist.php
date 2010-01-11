@@ -70,13 +70,13 @@ if (isset($alpha)) {
 }
 if (isset($surname)) {
 	$surname = stripslashes($surname);
-	$addheader = "(".CheckNN($surname).")";
+	$addheader = "(".NameFunctions::CheckNN($surname).")";
 }
 
 PrintHeader(GM_LANG_family_list." ".$addheader);
 print "<div class =\"center\">";
 print "\n\t<h3>";
-print_help_link("name_list_help", "qm", "name_list");
+PrintHelpLink("name_list_help", "qm", "name_list");
 print GM_LANG_family_list."</h3>";
 
 /**
@@ -111,7 +111,7 @@ if (isset($alpha) && !isset($famalpha["$alpha"])) unset($alpha);
 $TableTitle = "<img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["sfamily"]["small"]."\" border=\"0\" title=\"".GM_LANG_families."\" alt=\"".GM_LANG_families."\" />&nbsp;&nbsp;";
 
 if (count($famalpha) > 0) {
-	print_help_link("alpha_help", "qm", "alpha_index");
+	PrintHelpLink("alpha_help", "qm", "alpha_index");
 	foreach($famalpha as $letter=>$list) {
 		if (empty($alpha)) {
 			if (!empty($surname)) {
@@ -208,7 +208,7 @@ else {
 		// NOTE: If user wishes to skip surname do not print the surname
 		print "<div class=\"topbar\">";
 		if ($surname_sublist == "no") print GM_LANG_surnames;
-		else	print PrintReady(str_replace("#surname#", CheckNN($surname), GM_LANG_fams_with_surname));
+		else	print PrintReady(str_replace("#surname#", NameFunctions::CheckNN($surname), GM_LANG_fams_with_surname));
 		print "</div>\n";
 		PrintFamilyList($tfamlist, true, false, $allgeds);
 	}
@@ -216,7 +216,7 @@ else {
 
 print "<br />";
 if ($alpha != "@") {
-	print_help_link("skip_sublist_help", "qm", "skip_surnames");
+	PrintHelpLink("skip_sublist_help", "qm", "skip_surnames");
 	if ($surname_sublist=="yes") {
 		print "<br /><a href=\"famlist.php?alpha=$alpha&amp;surname_sublist=no&amp;show_all=".$show_all;
 		if ($allgeds == "yes") print "&amp;allgeds=yes";

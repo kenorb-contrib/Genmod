@@ -329,25 +329,25 @@ abstract class BlockFunctions {
 							print "<td class=\"name2 wrap\" ";
 							if ($block) print "width=\"86%\"";
 							print "><a href=\"individual.php?pid=".urlencode($id)."&amp;gedid=".$gedid."\">";
-							print $object->name.($object->addname == "" ? "" : "&nbsp;".$object->addname).$object->addxref;
+							print $object->name.($object->addname == "" ? "" : "&nbsp;(".$object->addname.")").$object->addxref;
 							print "</a></td>";
 							$i++;
 						}
 						elseif ($type=="FAM") {
 							print "<td class=\"name2 wrap\" ><a href=\"family.php?famid=".urlencode($id)."&amp;gedid=".$gedid."\">";
-							print $object->descriptor.($object->adddescriptor == "" ? "" : "&nbsp;".$object->adddescriptor).$object->addxref;
+							print $object->descriptor.($object->adddescriptor == "" ? "" : "&nbsp;(".$object->adddescriptor.")").$object->addxref;
 							print "</a></td>";
 							$i++;
 						}
 						elseif ($type=="REPO") {
 							print "<td class=\"name2 wrap\" ><a href=\"repo.php?rid=".urlencode($id)."&amp;gedid=".$gedid."\">";
-							print $object->descriptor.($object->adddescriptor == "" ? "" : "&nbsp;".$object->adddescriptor).$object->addxref;
+							print $object->descriptor.($object->adddescriptor == "" ? "" : "&nbsp;(".$object->adddescriptor.")").$object->addxref;
 							print "</a></td>";
 							$i++;
 						}
 						elseif ($type=="SOUR") {
 							print "<td class=\"name2 wrap\" ><a href=\"source.php?sid=".urlencode($id)."&amp;gedid=".$gedid."\">";
-							print $object->descriptor.($object->adddescriptor == "" ? "" : "&nbsp;".$object->adddescriptor).$object->addxref;
+							print $object->descriptor.($object->adddescriptor == "" ? "" : "&nbsp;(".$object->adddescriptor.")").$object->addxref;
 							print "</a></td>";
 							$i++;
 						}
@@ -439,7 +439,7 @@ abstract class BlockFunctions {
 			</script>
 			<br />
 		<?php
-		print_help_link("index_add_favorites_help", "qm", "add_favorite");
+		PrintHelpLink("index_add_favorites_help", "qm", "add_favorite");
 		print "<b><a href=\"javascript: ".GM_LANG_add_favorite." \" onclick=\"expand_layer('add_".$type."_fav'); return false;\"><img id=\"add_ged_fav_img\" src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["plus"]["other"]."\" border=\"0\" alt=\"".GM_LANG_add_favorite."\" />&nbsp;".GM_LANG_add_favorite."</a></b>";
 		print "<br /><div id=\"add_".$type."_fav\" style=\"display: none;\">\n";
 		print "<form name=\"addfavform\" method=\"get\" action=\"index.php\">\n";
@@ -451,7 +451,7 @@ abstract class BlockFunctions {
 		LinkFunctions::PrintFindIndiLink("gid",$GEDCOMID);
 		LinkFunctions::PrintFindFamilyLink("gid");
 		LinkFunctions::PrintFindSourceLink("gid");
-		LinkFunctions::PrintFindObjectLink("gid");
+		LinkFunctions::PrintFindMediaLink("gid");
 		LinkFunctions::PrintFindNoteLink("gid");
 		print "\n<br />".GM_LANG_add_fav_or_enter_url;
 		print "\n<br />".GM_LANG_url."<input type=\"text\" name=\"url\" size=\"40\" value=\"\" />";
@@ -694,13 +694,13 @@ abstract class BlockFunctions {
 	//print "Mstart: ".$mstart." ".date("M", mktime(1,0,0,$mstart,1))."<br />";
 	//print "Dend: ".$dend."<br />";
 	//print "Mend: ".$mend." ".date("M", mktime(1,0,0,$mend,1))."<br />";
-		$sql = "SELECT i_key, i_id, i_file, i_gedrec, i_isdead, n_name, n_surname, n_letter, n_type FROM ".TBLPREFIX."dates, ".TBLPREFIX."individuals, ".TBLPREFIX."names WHERE i_key=d_key AND n_key=i_key ";
+		$sql = "SELECT i_key, i_id, i_file, i_gedrec, i_isdead, n_name, n_surname, n_nick, n_letter, n_type FROM ".TBLPREFIX."dates, ".TBLPREFIX."individuals, ".TBLPREFIX."names WHERE i_key=d_key AND n_key=i_key ";
 		if ($onlyBDM == "yes") $sql .= " AND d_fact IN ('BIRT', 'DEAT')";
 		if ($filter == "living") $sql .= "AND i_isdead!='1'";
 	
 		$sql .= self::DateRangeforQuery($dstart, $mstart, $ystart, $dend, $mend, $yend, $skipfacts, $allgeds, $onlyfacts);
 	
-		$sql .= "GROUP BY n_id ORDER BY n_id, d_year, d_month, d_day DESC";
+		$sql .= "GROUP BY n_id ORDER BY i_key, n_id, d_year, d_month, d_day DESC";
 
 		$res = NewQuery($sql);
 		$key = "";
@@ -712,7 +712,7 @@ abstract class BlockFunctions {
 				$person =& Person::GetInstance($row["i_id"], $row);
 				$indilist[$row["i_key"]] = $person;
 			}
-			if ($person->disp_name) $indilist[$row["i_key"]]->addname = array($row["n_name"], $row["n_letter"], $row["n_surname"], $row["n_type"]);
+			if ($person->disp_name) $indilist[$row["i_key"]]->addname = array($row["n_name"], $row["n_letter"], $row["n_surname"], $row["n_nick"], $row["n_type"]);
 		}
 		if ($key != "") $person->names_read = true;
 		$res->FreeResult();

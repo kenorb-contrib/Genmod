@@ -53,7 +53,7 @@ print '<div class="center"><h3>'.GM_LANG_multi_title.'</h3></div>';
 	<td class="list-label <?php print $TEXT_DIRECTION; ?>"><?php print GM_LANG_filter; ?></td>
 	<td class="list-label <?php print $TEXT_DIRECTION; ?>">&nbsp;<input id="filter" name="filter" value="<?php print $filter; ?>" /></td>
 	<td class="list-label <?php print $TEXT_DIRECTION; ?>"><input type="submit" value=" &gt; " />
-	<?php print_help_link("simple_filter_help","qm"); ?></td>
+	<?php PrintHelpLink("simple_filter_help","qm"); ?></td>
 	</tr>
 	</table>
 </form>

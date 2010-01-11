@@ -159,7 +159,7 @@ function paste_id(value) {
 //-->
 </script>
 		<?php
-		init_calendar_popup();
+		InitCalendarPopUp();
 		print "<form name=\"setupreport\" method=\"get\" action=\"reportengine.php\">\n";
 		print "<input type=\"hidden\" name=\"action\" value=\"run\" />\n";
 		print "<input type=\"hidden\" name=\"report\" value=\"$report\" />\n";

@@ -52,7 +52,7 @@ function top10_botviews($block=true, $config="", $side, $index) {
 		if ($gm_user->userIsAdmin()) {
 			print "<div id=\"top10\" class=\"block\">\n";
 			print "<div class=\"blockhc\">";
-			print_help_link("index_top10_pageviews_help", "qm");
+			PrintHelpLink("index_top10_pageviews_help", "qm");
 			print GM_LANG_top10_botviews;
 			print "</div>";
 			print "<div class=\"blockcontent\">\n";
@@ -66,7 +66,7 @@ function top10_botviews($block=true, $config="", $side, $index) {
 	
 	print "<div id=\"top10hits\" class=\"block\">\n";
 	print "<div class=\"blockhc\">";
-	print_help_link("index_top10_pageviews_help", "qm", "top10_botviews");
+	PrintHelpLink("index_top10_pageviews_help", "qm", "top10_botviews");
 	if ($GM_BLOCKS["top10_botviews"]["canconfig"]) {
 		if ((($command=="gedcom")&&($gm_user->userGedcomAdmin())) || (($command=="user")&&($gm_user->username != ""))) {
 			if ($command=="gedcom") $name = preg_replace("/'/", "\'", get_gedcom_from_id($GEDCOMID));

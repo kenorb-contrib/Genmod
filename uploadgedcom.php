@@ -182,7 +182,7 @@ if ($step >= 1) {
 	if ($step > 3) print $GM_IMAGES["plus"]["other"];
 	else print $GM_IMAGES["minus"]["other"];
 	print "\" border=\"0\" width=\"11\" height=\"11\" alt=\"\" /></a>";
-	print_help_link($link1, "qm", $link2);
+	PrintHelpLink($link1, "qm", $link2);
 	print "&nbsp;<a href=\"javascript: ";
 	print $v1;
 	print "\" onclick=\"expand_layer('".$layer."');return false;\">";
@@ -197,7 +197,7 @@ if ($step >= 1) {
 		else print "block ";
 		print "\">";
 		$i = 0;
-		print_help_link("gedcom_path_help", "qm","gedcom_path");
+		PrintHelpLink("gedcom_path_help", "qm","gedcom_path");
 		print GM_LANG_gedcom_file;
 		// Actually this is dummy. The path and gedfilename are calculated from the gedcomid and not from this variable.
 		print "&nbsp;\n<input type=\"text\" name=\"gedfilename\" value=\"".$path.$gedfilename."\" size=\"60\" dir=\"ltr\" tabindex=\"".$i."\" disabled=\"disabled\" />";
@@ -220,7 +220,7 @@ if ($step == 2) {
 			print "\n<a href=\"javascript: ".GM_LANG_verify_gedcom."\" onclick=\"expand_layer('verify_gedcom');return false\"><img id=\"verify_gedcom_img\" src=\"".GM_IMAGE_DIR."/";
 			print $GM_IMAGES["plus"]["other"];
 			print "\" border=\"0\" width=\"11\" height=\"11\" alt=\"\" /></a>";
-			print_help_link("verify_gedcom_help", "qm", "verify_gedcom");
+			PrintHelpLink("verify_gedcom_help", "qm", "verify_gedcom");
 			print "&nbsp;<a href=\"javascript: ".GM_LANG_verify_gedcom."\" onclick=\"expand_layer('verify_gedcom');return false\">".GM_LANG_verify_gedcom."</a>";
 		print "\n</div>";
 		print "\n<div id=\"verify_gedcom\" class=\"shade1\" style=\"display: block;\">";
@@ -326,7 +326,7 @@ if ($step >= 3) {
 		if ($step > 3) print $GM_IMAGES["plus"]["other"];
 		else print $GM_IMAGES["minus"]["other"];
 		print "\" border=\"0\" width=\"11\" height=\"11\" alt=\"\" /></a>";
-		print_help_link("validate_gedcom_help", "qm","validate_gedcom");
+		PrintHelpLink("validate_gedcom_help", "qm","validate_gedcom");
 		print "&nbsp;\n<a href=\"javascript: ".GM_LANG_validate_gedcom."\" onclick=\"expand_layer('validate_gedcom');return false\">".GM_LANG_validate_gedcom."</a>";
 	print "\n</div>";
 	print "\n<div class=\"shade1\" style=\"padding-top:5px;\">";
@@ -377,28 +377,28 @@ if ($step >= 3) {
 					// NOTE: Check for head cleanu
 					if ($l_headcleanup) {
 						print "\n<div class=\"shade1 wrap\">";
-							print_help_link("invalid_header_help", "qm", "invalid_header");
+							PrintHelpLink("invalid_header_help", "qm", "invalid_header");
 							print "<span class=\"error\">".GM_LANG_invalid_header."</span>\n";
 						print "</div><br />";
 					}
 					// NOTE: Check for mac file cleanup
 					if ($l_macfilecleanup) {
 						print "\n<div class=\"shade1 wrap\">";
-							print_help_link("macfile_detected_help", "qm", "macfile_detected");
+							PrintHelpLink("macfile_detected_help", "qm", "macfile_detected");
 							print "<span class=\"error\">".GM_LANG_macfile_detected."</span>\n";
 						print "</div><br />";
 					}
 					// NOTE: Check for line endings cleanup
 					if ($l_lineendingscleanup) {
 						print "\n<div class=\"shade1 wrap\">";
-							print_help_link("empty_lines_detected_help", "qm", "empty_lines_detected");
+							PrintHelpLink("empty_lines_detected_help", "qm", "empty_lines_detected");
 							print "<span class=\"error\">".GM_LANG_empty_lines_detected."</span>\n";
 						print "</div><br />";
 					}
 					// NOTE: Check for place cleanup
 					if ($l_placecleanup) {
 						print "\n<div class=\"shade1 wrap\">";
-							print_help_link("cleanup_places_help", "qm", "cleanup_places");
+							PrintHelpLink("cleanup_places_help", "qm", "cleanup_places");
 							print "<span class=\"error\">".GM_LANG_place_cleanup_detected."</span>\n";
 						print "</div>";
 						print "\n<div class=\"shade2 wrap\">";
@@ -414,7 +414,7 @@ if ($step >= 3) {
 							print "<span class=\"error\">".GM_LANG_invalid_dates."</span>\n";
 						print "</div>";
 						print "\n<div class=\"shade2\">";
-							print_help_link("detected_date_help", "qm");
+							PrintHelpLink("detected_date_help", "qm");
 							print GM_LANG_date_format;
 							if (isset($datesample["choose"])){
 								print "<select name=\"datetype\">\n";
@@ -430,7 +430,7 @@ if ($step >= 3) {
 							print "<span class=\"error\">".GM_LANG_ansi_encoding_detected."</span>\n";
 						print "</div>";
 						print "\n<div class=\"shade2 wrap\">";
-							print_help_link("detected_ansi2utf_help", "qm", "ansi_to_utf8");
+							PrintHelpLink("detected_ansi2utf_help", "qm", "ansi_to_utf8");
 							print GM_LANG_ansi_to_utf8;
 							print "<select name=\"utf8convert\">\n";
 							print "<option value=\"yes\" selected=\"selected\">".GM_LANG_yes."</option>\n";
@@ -462,7 +462,7 @@ if ($step >= 4) {
 		if ($step > 4) print $GM_IMAGES["plus"]["other"];
 		else print $GM_IMAGES["minus"]["other"];
 		print "\" border=\"0\" width=\"11\" height=\"11\" alt=\"\" /></a>";
-		print_help_link("import_options_help", "qm", "import_options");
+		PrintHelpLink("import_options_help", "qm", "import_options");
 		print "&nbsp;<a href=\"javascript: ".GM_LANG_import_options."\" onclick=\"expand_layer('import_options');return false\">".GM_LANG_import_options."</a>";
 	print "</div>";
 	print "\n<div class=\"shade1 width100\" style=\"padding-top:5px;\">";
@@ -473,7 +473,7 @@ if ($step >= 4) {
 			// NOTE: Time limit for import
 			// TODO: Write help text
 			print "<tr><td class=\"shade2 wrap width20\">";
-				print_help_link("time_limit_help", "qm", "time_limit");
+				PrintHelpLink("time_limit_help", "qm", "time_limit");
 				print GM_LANG_time_limit;
 				print "</td><td class=\"shade2 wrap width20\">";
 				if ($step > 4)  {
@@ -485,7 +485,7 @@ if ($step >= 4) {
 			
 			// NOTE: Auto-click "Continue" button
 			print "<tr><td class=\"shade2 wrap width20\">";
-			print_help_link("auto_ontinue_help", "qm", "auto_continue");
+			PrintHelpLink("auto_ontinue_help", "qm", "auto_continue");
 			print GM_LANG_auto_continue;
 			print "</td><td class=\"shade2 width20\">";
 			if ($step > 4)  {
@@ -502,7 +502,7 @@ if ($step >= 4) {
 
 			// NOTE: Import married names
 			print "<tr><td class=\"shade2 wrap width20\">";
-			print_help_link("import_marr_names_help", "qm", "import_marr_names");
+			PrintHelpLink("import_marr_names_help", "qm", "import_marr_names");
 			print GM_LANG_import_marr_names.":";
 			print "</td><td class=\"shade2 wrap width20\">";
 			if ($step > 4) {
@@ -522,7 +522,7 @@ if ($step >= 4) {
 			
 			// NOTE: change XREF to RIN, REFN, or Don't change
 			print "<tr><td class=\"shade2 wrap width20\">";
-			print_help_link("change_indi2id_help", "qm", "change_id");
+			PrintHelpLink("change_indi2id_help", "qm", "change_id");
 			print GM_LANG_change_id;
 			print "</td><td class=\"shade2 wrap width20\">";
 			if ($step > 4) {
@@ -539,7 +539,7 @@ if ($step >= 4) {
 			
 			// NOTE: option to convert to utf8
 			print "<tr><td class=\"shade2 wrap width20\">";
-			print_help_link("convert_ansi2utf_help", "qm", "ansi_to_utf8");
+			PrintHelpLink("convert_ansi2utf_help", "qm", "ansi_to_utf8");
 			print GM_LANG_ansi_to_utf8;
 			print "</td><td class=\"shade2 wrap width20\">";
 			if ($step > 4) {
@@ -555,7 +555,7 @@ if ($step >= 4) {
 
 			// NOTE: option to merge double embedded MM items
 			print "<tr><td class=\"shade2 wrap width20\">";
-			print_help_link("MERGE_DOUBLE_MEDIA_help", "qm", "MERGE_DOUBLE_MEDIA");
+			PrintHelpLink("MERGE_DOUBLE_MEDIA_help", "qm", "MERGE_DOUBLE_MEDIA");
 			print GM_LANG_MERGE_DOUBLE_MEDIA;
 			print "</td><td class=\"shade2 wrap width20\">";
 			if ($step > 4) {
@@ -1011,7 +1011,7 @@ print "\n<div class=\"center\" style=\"margin-top: 5px;\">";
 if ($step < 5) print "<input type=\"submit\" name=\"continue\" value=\"".GM_LANG_del_proceed."\" />&nbsp;";
 
 if ($step == 3 && (isset($cleanup_needed) && $cleanup_needed == "yes") && (!isset($skip_cleanup) || $skip_cleanup != GM_LANG_skip_cleanup)) {
-	print_help_link("skip_cleanup_help", "qm", "skip_cleanup");
+	PrintHelpLink("skip_cleanup_help", "qm", "skip_cleanup");
 	print "<input type=\"submit\" name=\"skip_cleanup\" value=\"".GM_LANG_skip_cleanup."\" />&nbsp;\n";
 }
 

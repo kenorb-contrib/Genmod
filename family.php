@@ -54,11 +54,11 @@ $controller->CheckRawEdited();
 		print PersonFunctions::PrintFamilyParents($controller->family);
 		if (!$controller->isPrintPreview() && $controller->family->disp && $controller->family->canedit) {
 		if (!is_object($controller->family->husb) && !$controller->family->isdeleted) { ?>
-			<?php print_help_link("edit_add_parent_help", "qm"); ?> 
+			<?php PrintHelpLink("edit_add_parent_help", "qm"); ?> 
 			<a href="javascript <?php print GM_LANG_add_father; ?>" onclick="return addnewparentfamily('', 'HUSB', '<?php print $controller->family->xref; ?>', 'add_father');"><?php print GM_LANG_add_father; ?></a><br />
 		<?php }
 		if (!is_object($controller->family->wife) && !$controller->family->isdeleted)  { ?>
-			<?php print_help_link("edit_add_parent_help", "qm"); ?>
+			<?php PrintHelpLink("edit_add_parent_help", "qm"); ?>
 			<a href="javascript <?php print GM_LANG_add_mother; ?>" onclick="return addnewparentfamily('', 'WIFE', '<?php print $controller->family->xref; ?>', 'add_mother');"><?php print GM_LANG_add_mother; ?></a><br />
 		<?php }
 		}

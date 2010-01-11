@@ -50,7 +50,7 @@ abstract class GedcomRecord {
 	
 	// Arrays of records that link to this record
 	// and counters
-	protected $link_array = null;	// Array of links to this object. Format: id, type, gedcomid.
+	protected $link_array = null;		// Array of links to this object. Format: id, type, gedcomid.
 	
 	protected $indilist = null;			// Array of person objects that link to this object
 	protected $indi_count = null;		// Count of the above
@@ -345,6 +345,7 @@ abstract class GedcomRecord {
 	}
 
 	protected function DisplayDetails($links=true) {
+		
 		if (is_null($this->disp)) {
 			$this->disp = $this->CheckAccess(1, $links);
 		}
@@ -355,8 +356,11 @@ abstract class GedcomRecord {
 		
 		if (is_null($this->disp_name)) {
 			$this->disp_name = $this->DisplayDetails();
-			if (!$this->disp && $this->datatype == "INDI") {
-				$this->disp_name = $this->showLivingName();
+			if (!$this->disp) {
+				if ($this->datatype == "INDI") $this->disp_name = $this->showLivingName();
+				else if ($this->datatype == "FAM") {
+					$this->disp_name = (($this->husb_id == "" ? true : $this->husb->DispName()) && ($this->wife_id == "" ? true : $this->wife->DispName()));
+				}
 			}
 		}
 		return $this->disp_name;
@@ -475,7 +479,7 @@ abstract class GedcomRecord {
 					if ($ct>0) $typeshow = PrivacyFunctions::showFact(trim($match[1]), $this->xref, $this->type);
 				}
 				if (!empty($fact) && (!is_array($selection) || in_array($fact, $selection))&& $typeshow && !PrivacyFunctions::FactViewRestricted($this->xref, $subrecord, 2)) {
-					$factobj = new Fact($this->xref, $this->datatype, $fact, $subrecord, $count[$fact], "");
+					$factobj = new Fact($this->xref, $this->datatype, $this->gedcomid, $fact, $subrecord, $count[$fact], "");
 					$dispobj = $factobj->show;
 					if (!empty($gid) && $dispobj) {
 						$object =& ConstructObject($gid, $fact, $this->gedcomid, "");
@@ -516,7 +520,7 @@ abstract class GedcomRecord {
 				if (!empty($fact) && !in_array($fact, array($this->exclude_facts)) && PrivacyFunctions::showFact($fact, $this->xref, $this->type) && !PrivacyFunctions::FactViewRestricted($this->xref, $newrec, 2)) {
 					if (!is_array($selection) || in_array($fact, $selection)) {
 						$added = true;
-						$facts[] = new Fact($this->xref, $this->datatype, $fact, $newrec, $count[$fact], "change_new");
+						$facts[] = new Fact($this->xref, $this->datatype, $this->gedcomid, $fact, $newrec, $count[$fact], "change_new");
 					}
 				}
 				if (!$added) $this->hiddenfacts = true;
@@ -544,7 +548,7 @@ abstract class GedcomRecord {
 							$newfacts[] = $factobj;
 							// an empty record indicates deletion, so only add the new record if not empty
 							if (!empty($cfact)) {
-								$newfact = new Fact($this->xref, $this->datatype, $factobj->fact, $cfact, $factobj->count, "change_new");
+								$newfact = new Fact($this->xref, $this->datatype, $this->gedcomid, $factobj->fact, $cfact, $factobj->count, "change_new");
 								// add the new fact
 								$newfacts[] = $newfact;
 							}
@@ -656,8 +660,8 @@ abstract class GedcomRecord {
 		$ulevel = $gm_user->getUserAccessLevel();
 		if (!isset($hit)) $hit = array();
 
-		if (DEBUG && isset($hit[$this->xref])) print "ERROR: getting checked twice: ".$this->xref."<br />";
-		else $hit[$this->xref] = 1;
+		if (DEBUG && isset($hit[$this->key])) print "ERROR: getting checked twice: ".$this->key."<br />";
+		else $hit[$this->key] = 1;
 		
 		if (!isset($PRIVACY_CHECKS)) $PRIVACY_CHECKS = 1;
 		else $PRIVACY_CHECKS++;
@@ -988,7 +992,7 @@ abstract class GedcomRecord {
 	private function CheckSourceLinks() {
 		
 		if (!is_array($this->link_array)) {
-			$sql = "SELECT DISTINCT n_id, i_id, i_key, i_isdead, i_file, i_gedrec, n_name, n_surname, n_letter, n_type FROM ".TBLPREFIX."source_mapping, ".TBLPREFIX."individuals, ".TBLPREFIX."names WHERE sm_key='".$this->key."' AND sm_file='".$this->gedcomid."' AND sm_type='INDI' AND sm_gid=i_id AND sm_file=i_file AND i_key=n_key ORDER BY n_id";
+			$sql = "SELECT DISTINCT n_id, i_id, i_key, i_isdead, i_file, i_gedrec, n_name, n_surname, n_nick, n_letter, n_type FROM ".TBLPREFIX."source_mapping, ".TBLPREFIX."individuals, ".TBLPREFIX."names WHERE sm_key='".$this->key."' AND sm_file='".$this->gedcomid."' AND sm_type='INDI' AND sm_gid=i_id AND sm_file=i_file AND i_key=n_key ORDER BY i_key, n_id";
 			$res = NewQuery($sql);
 			$key = "";
 			$ok = true;
@@ -1007,7 +1011,7 @@ abstract class GedcomRecord {
 						// Don't return here, first add all names to the person
 					}
 				}
-				if ($person->disp_name) $person->addname = array($row["n_name"], $row["n_letter"], $row["n_surname"], $row["n_type"]);
+				if ($person->disp_name) $person->addname = array($row["n_name"], $row["n_letter"], $row["n_surname"], $row["n_nick"], $row["n_type"]);
 			}
 			if ($key != "") $person->names_read = true;
 			if (!$ok) return false;
@@ -1041,50 +1045,79 @@ abstract class GedcomRecord {
 	}
 		
 	private function CheckMediaLinks() {
-		
-		$sql = "SELECT DISTINCT n_id, i_id, i_key, i_isdead, i_file, i_gedrec, n_name, n_surname, n_letter, n_type FROM ".TBLPREFIX."media_mapping, ".TBLPREFIX."individuals, ".TBLPREFIX."names WHERE mm_media='".$this->xref."' AND mm_file='".$this->gedcomid."' AND mm_type='INDI' AND mm_gid=i_id AND mm_file=i_file and i_key=n_key";
-		$res = NewQuery($sql);
-		$key = "";
-		$ok = true;
-		while ($row = $res->FetchAssoc()) {
-			if ($key != $row["i_key"]) {
-				if ($key != "") $person->names_read = true;
-				if (!$ok) {
+
+		if (!is_array($this->link_array)) {
+			// Check links from sources
+			$sql = "SELECT DISTINCT s_key, s_id, s_file, s_gedrec FROM ".TBLPREFIX."sources INNER JOIN ".TBLPREFIX."media_mapping ON mm_gid=s_id AND mm_file=s_file WHERE mm_media='".$this->xref."' AND mm_file='".$this->gedcomid."' AND mm_type='SOUR'";
+			$res = NewQuery($sql);
+			while ($row = $res->FetchAssoc()) {
+				$source =& Source::GetInstance($row["s_id"], $row, $row["s_file"]);
+				if (!$source->DisplayDetails(false)) {
 					$res->FreeResult();
 					return false;
 				}
-				$key = $row["i_key"];
-				$person = null;
-				$person =& Person::GetInstance($row["i_id"], $row, $row["i_file"]);
-				if (!$person->DisplayDetails()) {
-					$ok = false;
-					// Don't return here, first add all names to the person
-				}
 			}
-			if ($person->disp_name) $person->addname = array($row["n_name"], $row["n_letter"], $row["n_surname"], $row["n_type"]);
+			
+			// Check links from individuals
+			$sql = "SELECT DISTINCT n_id, i_id, i_key, i_isdead, i_file, i_gedrec, n_name, n_surname, n_nick, n_letter, n_type FROM ".TBLPREFIX."media_mapping, ".TBLPREFIX."individuals, ".TBLPREFIX."names WHERE mm_media='".$this->xref."' AND mm_file='".$this->gedcomid."' AND mm_type='INDI' AND mm_gid=i_id AND mm_file=i_file and i_key=n_key ORDER BY i_key, n_id";
+			$res = NewQuery($sql);
+			$key = "";
+			$ok = true;
+			while ($row = $res->FetchAssoc()) {
+				if ($key != $row["i_key"]) {
+					if ($key != "") $person->names_read = true;
+					if (!$ok) {
+						$res->FreeResult();
+						return false;
+					}
+					$key = $row["i_key"];
+					$person = null;
+					$person =& Person::GetInstance($row["i_id"], $row, $row["i_file"]);
+					if (!$person->DisplayDetails()) {
+						$ok = false;
+						// Don't return here, first add all names to the person
+					}
+				}
+				if ($person->disp_name) $person->addname = array($row["n_name"], $row["n_letter"], $row["n_surname"], $row["n_nick"], $row["n_type"]);
+			}
+			if ($key != "") $person->names_read = true;
+			if (!$ok) return false;
+			
+			// Check links from families
+			$indiarr = array();
+			$famarr = array();
+			$sql = "SELECT DISTINCT mm_gid, f_id, f_file, f_gedrec, f_husb, f_wife FROM ".TBLPREFIX."media_mapping, ".TBLPREFIX."families WHERE mm_media='".$this->xref."' AND mm_file='".$this->gedcomid."' AND mm_type='FAM' AND mm_gid=f_id AND mm_file=f_file";
+			$res = NewQuery($sql);
+			while ($row = $res->FetchAssoc()) {
+				$family = null;
+				$family =& Family::GetInstance($row["f_id"], $row, $row["f_file"]);
+				$famarr[] = $family;
+				if (!empty($row["f_husb"])) $indiarr[] = $row["f_husb"];
+				if (!empty($row["f_wife"])) $indiarr[] = $row["f_wife"];
+			}
+			
+			$indiarr = array_flip(array_flip($indiarr));
+			return $this->IndiFamPrivCheck($indiarr, $famarr);
 		}
-		if ($key != "") $person->names_read = true;
-		if (!$ok) return false;
-		
-		$indiarr = array();
-		$famarr = array();
-		$sql = "SELECT DISTINCT mm_gid, f_id, f_file, f_gedrec, f_husb, f_wife FROM ".TBLPREFIX."media_mapping, ".TBLPREFIX."families WHERE mm_media='".$this->xref."' AND mm_file='".$this->gedcomid."' AND mm_type='FAM' AND mm_gid=f_id AND mm_file=f_file";
-		$res = NewQuery($sql);
-		while ($row = $res->FetchAssoc()) {
-			$family = null;
-			$family =& Family::GetInstance($row["f_id"], $row, $row["f_file"]);
-			$famarr[] = $family;
-			if (!empty($row["f_husb"])) $indiarr[] = $row["f_husb"];
-			if (!empty($row["f_wife"])) $indiarr[] = $row["f_wife"];
+		// else we presume that the linked objects are already cached somewhere
+		else {
+			foreach($this->link_array as $key => $link) {
+				$obj = null;
+				if ($link[1] == "INDI") $obj =& Person::GetInstance($link[0], "", $link[2]);
+				else if ($link[1] == "FAM") $obj =& Family::GetInstance($link[0], "", $link[2]);
+				else if ($link[1] == "SOUR") {
+					$obj =& Source::GetInstance($link[0], "", $link[2]);
+					if (is_object($obj) && !$obj->DisplayDetails(false)) return false;
+				}
+				if (is_object($obj) && !$obj->DispName()) return false;
+			}
 		}
-		
-		$indiarr = array_flip(array_flip($indiarr));
-		return $this->IndiFamPrivCheck($indiarr, $famarr);
+		return true;
 	}
 		
 	private function CheckNoteLinks() {
 		
-		$sql = "SELECT DISTINCT n_id, i_id, i_key, i_isdead, i_file, i_gedrec, n_name, n_surname, n_letter, n_type FROM ".TBLPREFIX."other, ".TBLPREFIX."other_mapping, ".TBLPREFIX."individuals, ".TBLPREFIX."names WHERE o_id='".$this->xref."' AND o_file='".$this->gedcomid."' AND o_id = om_oid AND o_file = om_file AND om_type='INDI' AND i_id=om_gid AND om_file=i_file AND i_key=n_key";
+		$sql = "SELECT DISTINCT n_id, i_id, i_key, i_isdead, i_file, i_gedrec, n_name, n_surname, n_nick, n_letter, n_type FROM ".TBLPREFIX."other, ".TBLPREFIX."other_mapping, ".TBLPREFIX."individuals, ".TBLPREFIX."names WHERE o_id='".$this->xref."' AND o_file='".$this->gedcomid."' AND o_id = om_oid AND o_file = om_file AND om_type='INDI' AND i_id=om_gid AND om_file=i_file AND i_key=n_key ORDER BY i_key, n_id";
 		$res = NewQuery($sql);
 		$key = "";
 		$ok = true;
@@ -1103,7 +1136,7 @@ abstract class GedcomRecord {
 					// Don't return here, first add all names to the person
 				}
 			}
-			if ($person->disp_name) $person->addname = array($row["n_name"], $row["n_letter"], $row["n_surname"], $row["n_type"]);
+			if ($person->disp_name) $person->addname = array($row["n_name"], $row["n_letter"], $row["n_surname"], $row["n_nick"], $row["n_type"]);
 		}
 		if ($key != "") $person->names_read = true;
 		if (!$ok) return false;
@@ -1143,7 +1176,7 @@ abstract class GedcomRecord {
 		
 		if (count($indiarr) != 0) {
 			$key = "";
-			$sql = "SELECT DISTINCT n_id, i_key, i_id, i_isdead, i_file, i_gedrec, n_name, n_surname, n_letter, n_type FROM ".TBLPREFIX."individuals, ".TBLPREFIX."names WHERE n_key=i_key AND i_key IN ('".implode("','", $indiarr)."') ORDER BY i_key, n_id";
+			$sql = "SELECT DISTINCT n_id, i_key, i_id, i_isdead, i_file, i_gedrec, n_name, n_surname, n_nick, n_letter, n_type FROM ".TBLPREFIX."individuals, ".TBLPREFIX."names WHERE n_key=i_key AND i_key IN ('".implode("','", $indiarr)."') ORDER BY i_key, n_id";
 			$res = NewQuery($sql);
 			while ($row = $res->FetchAssoc()) {
 				if ($key != $row["i_key"]) {
@@ -1152,7 +1185,7 @@ abstract class GedcomRecord {
 					$person = null;
 					$person =& Person::GetInstance($row["i_id"], $row, $row["i_file"]);
 				}
-				if ($person->disp_name) $person->addname = array($row["n_name"], $row["n_letter"], $row["n_surname"], $row["n_type"]);
+				if ($person->disp_name) $person->addname = array($row["n_name"], $row["n_letter"], $row["n_surname"], $row["n_nick"], $row["n_type"]);
 			}
 			if ($key != "") $person->names_read = true;
 		}
@@ -1162,6 +1195,7 @@ abstract class GedcomRecord {
 		return true;
 		
 	}
+	
 	// Type is used to indicate what gedrec to privatize:
 	// -1: old gedrec
 	//  0: gedrec that is used depending on the user rights to see changes
@@ -1260,7 +1294,7 @@ abstract class GedcomRecord {
 					$ft = preg_match("/1\s(\w+)(.*)/", $subrecord, $match);
 					if ($ft>0) $fact = $match[1];
 					if (!($this->type == "NOTE" && ($fact == "CONC" || $fact == "CONT"))) {
-						$fact = new Fact($this->xref, $this->type, $fact, $subrecord);
+						$fact = new Fact($this->xref, $this->type, $this->gedcomid, $fact, $subrecord);
 						if ($fact->disp) $newrec .= $fact->factrec;
 					}
 				}

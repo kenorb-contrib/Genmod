@@ -239,7 +239,7 @@ if (count($ublocks->right) != 0) {
 
 if (($command=="user") and (!$ublocks->welcome_block_present)) {
 	print "<div>";
-	print_help_link("mygedview_customize_help", "qm");
+	PrintHelpLink("mygedview_customize_help", "qm");
 	print "<a href=\"#\" onclick=\"window.open('index_edit.php?name=".$gm_user->username."&amp;command=user', '', 'top=50,left=10,width=1000,height=400,scrollbars=1,resizable=1');\">".GM_LANG_customize_page."</a>\n";
 	print "</div>";
 }

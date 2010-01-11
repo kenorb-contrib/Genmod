@@ -65,7 +65,7 @@ else print "<span class=\"warning\"><i>".GM_LANG_no_results."</span>";
 
 print "</td>\n\t\t</tr>\n\t</table>";
 
-print_help_link("notelist_listbox_help", "qm");
+PrintHelpLink("notelist_listbox_help", "qm");
 print "</div>";
 print "<br /><br />";
 PrintFooter();

@@ -929,14 +929,14 @@ function findFamily(field) {
 	window.open('find.php?type=fam', '', 'left=50,top=50,width=850,height=450,resizable=1,scrollbars=1');
 	return false;
 }
+function findMFile(field) {
+	pastefield = field;
+	window.open('find.php?type=file', '', 'left=50,top=50,width=850,height=450,resizable=1,scrollbars=1');
+	return false;
+}
 function findMedia(field) {
 	pastefield = field;
 	window.open('find.php?type=media', '', 'left=50,top=50,width=850,height=450,resizable=1,scrollbars=1');
-	return false;
-}
-function findObject(field) {
-	pastefield = field;
-	window.open('find.php?type=object', '', 'left=50,top=50,width=850,height=450,resizable=1,scrollbars=1');
 	return false;
 }
 function findSource(field) {

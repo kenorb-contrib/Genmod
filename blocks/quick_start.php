@@ -46,7 +46,7 @@ function print_quickstart_block($block = true, $config="", $side, $index) {
 
 	print "<div id=\"quickstart_block\" class=\"block $TEXT_DIRECTION\">\n";
 	print "<div class=\"blockhc\">";
-	print_help_link("index_quickstart_help", "qm", "quickstart");
+	PrintHelpLink("index_quickstart_help", "qm", "quickstart");
 	if ($GM_BLOCKS["print_quickstart_block"]["canconfig"]) {
 		if ((($command=="gedcom")&&($gm_user->userGedcomAdmin())) || (($command=="user")&&($gm_user->username != ""))) {
 			if ($command=="gedcom") $name = preg_replace("/'/", "\'", get_gedcom_from_id($GEDCOMID));
@@ -86,7 +86,7 @@ function print_quickstart_block($block = true, $config="", $side, $index) {
 		if (!empty($gm_user->gedcomid[$GEDCOMID])) print "<a href=\"pedigree.php?rootid=".$gm_user->gedcomid[$GEDCOMID]."\">".GM_LANG_my_pedigree."</a><br />";
 	}
 	print "<br /><br />";
-	print_help_link("QS_search_help", "qm", "QS_search_tips");
+	PrintHelpLink("QS_search_help", "qm", "QS_search_tips");
 	print "<b><a href=\"javascript: ".GM_LANG_QS_search_tips."\" onclick=\"helpPopup('QS_search_help'); return false;\">".GM_LANG_QS_search_click."</a></b> \n";
 	print "</td></tr><tr>";
 	print "<td>".GM_LANG_firstname_search."</td>";

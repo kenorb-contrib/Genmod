@@ -88,7 +88,7 @@ if (!isset($aa_attempt)) $aa_attempt = false;
 if ($action=="newentry") {
 	
 	// NOTE: Get a change id
-	$change_id = GetNewXref("CHANGE");
+	$change_id = EditFunctions::GetNewXref("CHANGE");
 	
 	// NOTE: Setting the pid
 	if (isset($gid)) $pid = $gid;
@@ -121,11 +121,11 @@ if ($action=="newentry") {
 				$title = $text[$i];
 			}
 		}
-		$dm = CheckDoubleMedia($newfile, $title, $GEDCOMID);
+		$dm = EditFunctions::CheckDoubleMedia($newfile, $title, $GEDCOMID);
 		if (!$dm) {
 			// NOTE: Build the gedcom record
 			// NOTE: Level 0
-			$media_id = GetNewXref("OBJE");
+			$media_id = EditFunctions::GetNewXref("OBJE");
 			$newged = "0 @".$media_id."@ OBJE\r\n";
 			
 			$newged = EditFunctions::HandleUpdates($newged);

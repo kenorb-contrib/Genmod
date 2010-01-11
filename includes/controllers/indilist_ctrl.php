@@ -38,15 +38,18 @@ class IndilistController extends ListController {
 	public $classname = "IndilistController";	// Name of this class
 	
 	// Parameters
-	public $alpha = null;
-	public $surname = null;
-	public $surname_sublist = null;
-	public $show_all = null;
-	public $show_all_firstnames = null;
-	public $allgeds = null;
-	private $addheader = null;
-	private $count_indi = 0;
-	private $count_names = 0;
+	public $alpha = null;						// Letter of which the indi's or surnames must be displayed
+	public $falpha = null;						// Letter of which the indi's with that firstname letter must be shown
+	public $surname = null;						// Surname of the indi's to display
+	public $surname_sublist = null;				// Whether or not to display a surname list after choosing a letter
+	public $show_all = null;					// Selected the "ALL" option from the letterbar
+	public $show_all_firstnames = null;			// Selected the "ALL" option from the firstname letterbar
+	public $allgeds = null;						// Indilist for all geds together or just the currend gedcom
+	
+	// Calculated values
+	private $addheader = null;					// Adds the chosen letter/name to the page header
+	private $count_indi = 0;					// Number of indi's found (individual list)
+	private $count_names = 0;					// Number of names found (surname sublist)
 	
 	
 	public function __construct() {
@@ -57,14 +60,20 @@ class IndilistController extends ListController {
 		// Get the incoming letter
 		if (isset($_GET["alpha"])) {
 			$this->alpha = urldecode($_GET["alpha"]);
-			$this->addheader = "(".$this->alpha.")";
 		}
 		else $this->alpha = "";
+		if (!empty($this->alpha)) $this->addheader = "(".$this->alpha.")";
+		
+		// Get the incoming first name letter
+		if (isset($_GET["falpha"])) {
+			$this->falpha = urldecode($_GET["falpha"]);
+		}
+		else $this->falpha = "";
 		
 		// Get the incoming surname
 		if (isset($_GET["surname"])) {
 			$this->surname = urldecode($_GET["surname"]);
-			$this->addheader = "(".CheckNN($this->surname).")";
+			$this->addheader = "(".NameFunctions::CheckNN($this->surname).")";
 		}
 		else $this->surname = "";
 
@@ -73,9 +82,13 @@ class IndilistController extends ListController {
 		// Get the sublist switch
 		if (isset($_GET["surname_sublist"])) $this->surname_sublist = $_GET["surname_sublist"];
 		if (is_null($this->surname_sublist)) $this->surname_sublist = "yes";
+		if ($this->surname_sublist == "yes") {
+			if (empty($this->surname)) $this->addheader = GM_LANG_surnames." ".$this->addheader;
+		}
 		
 		if (isset($_GET["show_all"])) $this->show_all = $_GET["show_all"];
 		if (is_null($this->show_all)) $this->show_all = "no";
+		if ($this->show_all == "yes") $this->addheader .= "(".GM_LANG_all.")";
 		
 		if (isset($_GET["show_all_firstnames"])) $this->show_all_firstnames = $_GET["show_all_firstnames"];
 		if (is_null($this->show_all_firstnames)) $this->show_all_firstnames = "no";
@@ -296,7 +309,7 @@ class IndilistController extends ListController {
 		else $search_letter = "";
 		
 		$tindilist = array();
-		$sql = "SELECT i_key, i_id, i_file, i_isdead, i_gedrec, n_letter, n_name, n_surname, n_type FROM ".TBLPREFIX."individuals, ".TBLPREFIX."names WHERE i_key=n_key";
+		$sql = "SELECT i_key, i_id, i_file, i_isdead, i_gedrec, n_letter, n_name, n_surname, n_nick, n_type FROM ".TBLPREFIX."individuals, ".TBLPREFIX."names WHERE i_key=n_key";
 		
 		if (!empty($surname)) $sql .= " AND n_surname LIKE '".DbLayer::EscapeQuery($surname)."'";
 		else if (!empty($search_letter)) $sql .= " AND ".$search_letter;
@@ -305,21 +318,16 @@ class IndilistController extends ListController {
 		
 		if ($this->allgeds == "no") $sql .= " AND i_file='".$GEDCOMID."'";
 
+		$sql .= " ORDER BY i_key, n_id"; // Don't remove this!
+		
 		$res = NewQuery($sql);
 		while($row = $res->FetchAssoc()){
 			SwitchGedcom($row["i_file"]);
-			if (GedcomConfig::$SHOW_NICK) {
-				$n = NameFunctions::GetNicks($row["i_gedrec"]);
-				if (count($n) > 0) {
-					$ct = preg_match("~(.*)/(.*)/(.*)~", $row["n_name"], $match);
-					if ($ct>0) $row["n_name"] = $match[1].substr(GedcomConfig::$NICK_DELIM, 0, 1).$n[0].substr(GedcomConfig::$NICK_DELIM, 1, 1)."/".$match[2]."/".$match[3];
-				}
-			}
 			$key = $row["i_key"];
 			if (!isset($tindilist[$key])) {
 				$tindilist[$key] = Person::GetInstance($row["i_id"], array("i_isdead" => $row["i_isdead"], "i_file" =>$row["i_file"], "i_id" => $row["i_id"], "i_gedrec" => $row["i_gedrec"]), $row["i_file"]);
 			}
-			$tindilist[$key]->addname = array($row["n_name"], $row["n_letter"], $row["n_surname"], $row["n_type"]);
+			$tindilist[$key]->addname = array($row["n_name"], $row["n_letter"], $row["n_surname"], $row["n_nick"], $row["n_type"]);
 		}
 		SwitchGedcom();
 		$res->FreeResult();
@@ -340,10 +348,9 @@ class IndilistController extends ListController {
 	 */
 	public function PrintPersonList($personlist, $print_all=true, $find=false) {
 		global $TEXT_DIRECTION;
-		global $indi_private, $indi_hide, $surname, $alpha, $falpha;
+		global $indi_private, $indi_hide;
 		global $GEDCOMID, $year;
 	
-		print "<table class=\"center ".$TEXT_DIRECTION."\"><tr>";
 		// NOTE: The list is really long so divide it up again by the first letter of the first name
 		if (GedcomConfig::$ALPHA_INDEX_LISTS && count($personlist) > GedcomConfig::$ALPHA_INDEX_LISTS && $print_all == true && $find == false) {
 			$firstalpha = array();
@@ -359,16 +366,16 @@ class IndilistController extends ListController {
 			// NOTE: Sort the person array
 			uasort($firstalpha, "LetterSort");
 			// NOTE: Print the second alpha letter list for the unknown names
-			print "<td class=\"shade1 list_value wrap center\" colspan=\"2\">\n";
-			print_help_link("firstname_alpha_help", "qm");
+			print "<div class=\"shade1 list_value center\" style=\"width:auto; margin: 0 auto 0 auto;\">\n";
+			PrintHelpLink("firstname_alpha_help", "qm");
 			print GM_LANG_first_letter_fname."<br />\n";
 			$first = true;
 			foreach($firstalpha as $letter=>$list) {
 				$pass = false;
 				if ($letter != "@") {
-					if (!isset($fstartalpha) && (!isset($falpha) || !isset($firstalpha[$falpha]))) {
+					if (!isset($fstartalpha) && (empty($this->falpha) || !isset($firstalpha[$this->falpha]))) {
 						$fstartalpha = $letter;
-						$falpha = $letter;
+						$this->falpha = $letter;
 					}
 					if (!$first) print " | ";
 					$first = false;
@@ -377,12 +384,12 @@ class IndilistController extends ListController {
 					if (strstr($_SERVER["SCRIPT_NAME"],"aliveinyear.php")) print "<a href=\"aliveinyear.php?year=$year&amp;";
 					// NOTE: only include the alpha letter when not showing the ALL list
 					if ($this->show_all == "no") print "alpha=".urlencode($this->alpha)."&amp;";
-					if ($this->surname_sublist == "yes" && isset($surname)) print "surname=".$surname."&amp;";
+					if ($this->surname_sublist == "yes" && !empty($this->surname)) print "surname=".$this->surname."&amp;";
 					print "falpha=".urlencode($letter)."&amp;show_all=".$this->show_all."&amp;surname_sublist=".$this->surname_sublist;
 					if ($this->allgeds == "yes") print "&amp;allgeds=yes";
 					print "\">";
 					// NOTE: Red color for the chosen letter otherwise simply print the letter
-					if (($falpha == $letter)&&($this->show_all_firstnames == "no")) print "<span class=\"warning\">".htmlspecialchars($letter)."</span>";
+					if ($this->falpha == $letter && $this->show_all_firstnames == "no") print "<span class=\"warning\">".htmlspecialchars($letter)."</span>";
 					else print htmlspecialchars($letter);
 					print "</a>\n";
 				}
@@ -394,7 +401,7 @@ class IndilistController extends ListController {
 			// NOTE: Print the Unknown text on the letter bar
 			if ($pass == true) {
 				print " | ";
-				if (isset($falpha) && $falpha == "@") {
+				if (!empty($this->falpha) && $this->falpha == "@") {
 					if (strstr($_SERVER["SCRIPT_NAME"],"indilist.php")) print "<a href=\"indilist.php?";
 					if (strstr($_SERVER["SCRIPT_NAME"],"aliveinyear.php")) print "<a href=\"aliveinyear.php?year=$year&amp;";
 					print "alpha=".urlencode($this->alpha)."&amp;falpha=@&amp;surname_sublist=yes";
@@ -417,18 +424,19 @@ class IndilistController extends ListController {
 				if ($this->show_all == "no") print "alpha=".urlencode($this->alpha)."&amp;";
 				// NOTE: Include the surname if surnames are to be listed
 				if ($this->allgeds == "yes") print "&amp;allgeds=yes&amp;";
-				if ($this->surname_sublist == "yes" && isset($surname)) print "surname=".urlencode($surname)."&amp;";
+				if ($this->surname_sublist == "yes" && !empty($this->surname)) print "surname=".urlencode($this->surname)."&amp;";
 				if ($this->show_all_firstnames == "yes") print "show_all_firstnames=no&amp;show_all=".$this->show_all."&amp;surname_sublist=".$this->surname_sublist."\"><span class=\"warning\">".GM_LANG_all."</span>\n";
 				else print "show_all_firstnames=yes&amp;show_all=".$this->show_all."&amp;surname_sublist=".$this->surname_sublist."\">".GM_LANG_all."</a>\n";
 			}
-			print "</td></tr><tr>\n";
+			print "</div><br />\n";
+			print "<div class=\"topbar\">".GM_LANG_individual_list."</div>\n";
 			
-			if (isset($fstartalpha)) $falpha = $fstartalpha;
+			if (isset($fstartalpha)) $this->falpha = $fstartalpha;
 			// NOTE: Get only the names who start with the matching first letter
 			if ($this->show_all_firstnames == "no") {
 				$findilist = array();
-				if (isset($firstalpha[$falpha])) {
-					$ids = preg_split("/,/", $firstalpha[$falpha]["ids"]);
+				if (isset($firstalpha[$this->falpha])) {
+					$ids = preg_split("/,/", $firstalpha[$this->falpha]["ids"]);
 					foreach($ids as $indexval => $id) {
 						$id = trim($id);
 						if (!empty($id)) $findilist[$id] = $personlist[$id];
@@ -455,6 +463,7 @@ class IndilistController extends ListController {
 			$total_indis = count($personlist);
 			$count = count($names);
 			$i=0;
+			print "<table class=\"center ".$TEXT_DIRECTION."\"><tr>";
 			print "<td class=\"shade1 list_value indilist $TEXT_DIRECTION\"><ul>\n";
 			foreach($names as $indexval => $namearray) {
 				$person = $personlist[$namearray[1]];
@@ -471,10 +480,10 @@ class IndilistController extends ListController {
 			print GM_LANG_total_indis." ".$total_indis;
 			if (count($indi_private)>0) print "  (".GM_LANG_private." ".count($indi_private).")";
 			if (count($indi_hide)>0) print "  --  ".GM_LANG_hidden." ".count($indi_hide);
-			if (count($indi_private)>0 || count($indi_hide)>0) print_help_link("privacy_error_help", "qm");
+			if (count($indi_private)>0 || count($indi_hide)>0) PrintHelpLink("privacy_error_help", "qm");
 			print "</td>\n";
+			print "</tr></table>";
 		}
-		print "</tr></table>";
 	}
 
 	private function GetNameString($letter) {

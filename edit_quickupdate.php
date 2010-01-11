@@ -265,7 +265,7 @@ if ($action=="update") {
 	
 	WriteToLog("EditQuickUpdate-> Quick update attempted for $pid by >".$gm_user->username."<", "I", "G", $GEDCOMID);
 
-	$change_id = GetNewXref("CHANGE");
+	$change_id = EditFunctions::GetNewXref("CHANGE");
 	$updated = false;
 	$error = "";
 	$oldgedrec = $gedrec;
@@ -1233,7 +1233,7 @@ if ($action=="update") {
 if ($action!="update") print "<h3>".GM_LANG_quick_update_title."</h3>\n";
 print GM_LANG_quick_update_instructions."<br /><br />";
 
-init_calendar_popup();
+InitCalendarPopUp();
 ?>
 <script language="JavaScript" type="text/javascript">
 <!--
@@ -1534,32 +1534,32 @@ function checkform(frm) {
 </table>
 <div id="tab0">
 <table class="<?php print $TEXT_DIRECTION; ?> width80">
-<tr><td class="topbottombar" colspan="4"><?php print_help_link("quick_update_name_help", "qm"); ?><?php print GM_LANG_update_name; ?></td></tr>
-<tr><td class="descriptionbox"><?php print_help_link("edit_given_name_help", "qm"); print $factarray["GIVN"];?></td>
+<tr><td class="topbottombar" colspan="4"><?php PrintHelpLink("quick_update_name_help", "qm"); ?><?php print GM_LANG_update_name; ?></td></tr>
+<tr><td class="descriptionbox"><?php PrintHelpLink("edit_given_name_help", "qm"); print $factarray["GIVN"];?></td>
 <td class="optionbox" colspan="3"><input size="50" type="text" tabindex="<?php print $tabkey; ?>" name="GIVN" value="<?php print PrintReady(htmlspecialchars($GIVN)); ?>" /></td></tr>
 <?php $tabkey++; ?>
-<tr><td class="descriptionbox"><?php print_help_link("edit_surname_help", "qm"); print $factarray["SURN"];?></td>
+<tr><td class="descriptionbox"><?php PrintHelpLink("edit_surname_help", "qm"); print $factarray["SURN"];?></td>
 <td class="optionbox" colspan="3"><input size="50" type="text" tabindex="<?php print $tabkey; ?>" name="SURN" value="<?php print PrintReady(htmlspecialchars($SURN)); ?>" /></td></tr>
 <?php $tabkey++; ?>
 <?php if (GedcomConfig::$USE_RTL_FUNCTIONS) { ?>
-<tr><td class="descriptionbox"><?php print_help_link("edit_given_name_help", "qm"); print GM_LANG_hebrew_givn;?></td>
+<tr><td class="descriptionbox"><?php PrintHelpLink("edit_given_name_help", "qm"); print GM_LANG_hebrew_givn;?></td>
 <td class="optionbox" colspan="3"><input size="50" type="text" tabindex="<?php print $tabkey; ?>" name="HGIVN" value="<?php print PrintReady(htmlspecialchars($HGIVN)); ?>" /></td></tr>
 <?php $tabkey++; ?>
-<tr><td class="descriptionbox"><?php print_help_link("edit_surname_help", "qm"); print GM_LANG_hebrew_surn;?></td>
+<tr><td class="descriptionbox"><?php PrintHelpLink("edit_surname_help", "qm"); print GM_LANG_hebrew_surn;?></td>
 <td class="optionbox" colspan="3"><input size="50" type="text" tabindex="<?php print $tabkey; ?>" name="HSURN" value="<?php print PrintReady(htmlspecialchars($HSURN)); ?>" /></td></tr>
 <?php $tabkey++; ?>
 </tr>
-<tr><td class="descriptionbox"><?php print_help_link("edit_given_name_help", "qm"); print GM_LANG_roman_givn;?></td>
+<tr><td class="descriptionbox"><?php PrintHelpLink("edit_given_name_help", "qm"); print GM_LANG_roman_givn;?></td>
 <td class="optionbox" colspan="3"><input size="50" type="text" tabindex="<?php print $tabkey; ?>" name="RGIVN" value="<?php print PrintReady(htmlspecialchars($RGIVN)); ?>" /></td></tr>
 <?php $tabkey++; ?>
-<tr><td class="descriptionbox"><?php print_help_link("edit_surname_help", "qm"); print GM_LANG_roman_surn;?></td>
+<tr><td class="descriptionbox"><?php PrintHelpLink("edit_surname_help", "qm"); print GM_LANG_roman_surn;?></td>
 <td class="optionbox" colspan="3"><input size="50" type="text" tabindex="<?php print $tabkey; ?>" name="RSURN" value="<?php print PrintReady(htmlspecialchars($RSURN)); ?>" /></td></tr>
 <?php $tabkey++; ?>
 </tr>
 <?php } ?>
 
 <tr>
-	<td class="descriptionbox"><?php print_help_link("edit_sex_help", "qm"); print GM_LANG_sex;?></td>
+	<td class="descriptionbox"><?php PrintHelpLink("edit_sex_help", "qm"); print GM_LANG_sex;?></td>
 	<td class="optionbox" colspan="3">
 		<select name="SEX" tabindex="<?php print $tabkey; ?>">
 			<option value="M"<?php if ($SEX=="M") print " selected=\"selected\""; ?>><?php print GM_LANG_male; ?></option>
@@ -1573,7 +1573,7 @@ function checkform(frm) {
 // NOTE: Update fact
 ?>
 <tr><td>&nbsp;</td></tr>
-<tr><td class="topbottombar" colspan="4"><?php print_help_link("quick_update_fact_help", "qm"); print GM_LANG_update_fact; ?></td></tr>
+<tr><td class="topbottombar" colspan="4"><?php PrintHelpLink("quick_update_fact_help", "qm"); print GM_LANG_update_fact; ?></td></tr>
 <tr>
 	<td class="descriptionbox">&nbsp;</td>
 	<td class="descriptionbox"><?php print $factarray["DATE"]; ?></td>
@@ -1656,11 +1656,11 @@ foreach($indifacts as $f=>$fact) {
 // NOTE: Add fact
 if (count($addfacts)>0) { ?>
 <tr><td>&nbsp;</td></tr>
-<tr><td class="topbottombar" colspan="4"><?php print_help_link("quick_update_fact_help", "qm"); print GM_LANG_add_fact; ?></td></tr>
+<tr><td class="topbottombar" colspan="4"><?php PrintHelpLink("quick_update_fact_help", "qm"); print GM_LANG_add_fact; ?></td></tr>
 <tr>
 	<td class="descriptionbox">&nbsp;</td>
-	<td class="descriptionbox"><?php print_help_link("def_gedcom_date_help", "qm"); print $factarray["DATE"]; ?></td>
-	<td class="descriptionbox"><?php print_help_link("edit_PLAC_help", "qm"); print $factarray["PLAC"]; ?></td>
+	<td class="descriptionbox"><?php PrintHelpLink("def_gedcom_date_help", "qm"); print $factarray["DATE"]; ?></td>
+	<td class="descriptionbox"><?php PrintHelpLink("edit_PLAC_help", "qm"); print $factarray["PLAC"]; ?></td>
 	<td class="descriptionbox">&nbsp;</td>
 	</tr>
 <tr><td class="optionbox">
@@ -1714,7 +1714,7 @@ if (count($addfacts)>0) { ?>
 // NOTE: Add photo
 if (MediaFS::DirIsWritable(GedcomConfig::$MEDIA_DIRECTORY)) { ?>
 <tr><td>&nbsp;</td></tr>
-<tr><td class="topbottombar" colspan="4"><b><?php print_help_link("quick_update_photo_help", "qm"); print GM_LANG_update_photo; ?></b></td></tr>
+<tr><td class="topbottombar" colspan="4"><b><?php PrintHelpLink("quick_update_photo_help", "qm"); print GM_LANG_update_photo; ?></b></td></tr>
 <tr>
 	<td class="descriptionbox">
 		<?php print $factarray["TITL"]; ?>
@@ -1748,7 +1748,7 @@ if (MediaFS::DirIsWritable(GedcomConfig::$MEDIA_DIRECTORY)) { ?>
 if (!IsDeadId($pid) || !empty($ADDR) || !empty($PHON) || !empty($FAX) || !empty($EMAIL)) { //-- don't show address for dead people 
 	 ?>
 <tr><td>&nbsp;</td></tr> 
-<tr><td class="topbottombar" colspan="4"><?php print_help_link("quick_update_address_help", "qm"); print GM_LANG_update_address; ?></td></tr>
+<tr><td class="topbottombar" colspan="4"><?php PrintHelpLink("quick_update_address_help", "qm"); print GM_LANG_update_address; ?></td></tr>
 <tr>
 	<td class="descriptionbox">
 		<?php print $factarray["ADDR"]; ?>
@@ -1874,41 +1874,41 @@ for($i=1; $i<=count($sfams); $i++) {
 	</tr>
 <?php if (empty($spid)) { ?>
 <tr><td>&nbsp;</td></tr>
-<tr><td class="topbottombar" colspan="4"><?php print_help_link("quick_update_spouse_help", "qm"); if (preg_match("/1 SEX M/", $gedrec)>0) print GM_LANG_add_new_wife; else print GM_LANG_add_new_husb;?></td></tr>
+<tr><td class="topbottombar" colspan="4"><?php PrintHelpLink("quick_update_spouse_help", "qm"); if (preg_match("/1 SEX M/", $gedrec)>0) print GM_LANG_add_new_wife; else print GM_LANG_add_new_husb;?></td></tr>
 <tr>
-	<td class="descriptionbox"><?php print_help_link("edit_given_name_help", "qm"); print $factarray["GIVN"];?></td>
+	<td class="descriptionbox"><?php PrintHelpLink("edit_given_name_help", "qm"); print $factarray["GIVN"];?></td>
 	<td class="optionbox" colspan="3"><input size="50" type="text" tabindex="<?php print $tabkey; ?>" name="SGIVN<?php echo $i; ?>" /></td>
 	</tr>
 	<?php $tabkey++; ?>
 	<tr>
-	<td class="descriptionbox"><?php print_help_link("edit_surname_help", "qm"); print $factarray["SURN"];?></td>
+	<td class="descriptionbox"><?php PrintHelpLink("edit_surname_help", "qm"); print $factarray["SURN"];?></td>
 	<td class="optionbox" colspan="3"><input size="50" type="text" tabindex="<?php print $tabkey; ?>" name="SSURN<?php echo $i; ?>" /></td>
 	<?php $tabkey++; ?>
 </tr>
 <?php if (GedcomConfig::$USE_RTL_FUNCTIONS) { ?>
 <tr>
-	<td class="descriptionbox"><?php print_help_link("edit_given_name_help", "qm"); print GM_LANG_hebrew_givn;?></td>
+	<td class="descriptionbox"><?php PrintHelpLink("edit_given_name_help", "qm"); print GM_LANG_hebrew_givn;?></td>
 	<td class="optionbox" colspan="3"><input size="50" type="text" tabindex="<?php print $tabkey; ?>" name="HSGIVN<?php echo $i; ?>" /></td>
 	</tr>
 	<?php $tabkey++; ?>
 	<tr>
-	<td class="descriptionbox"><?php print_help_link("edit_surname_help", "qm"); print GM_LANG_hebrew_surn;?></td>
+	<td class="descriptionbox"><?php PrintHelpLink("edit_surname_help", "qm"); print GM_LANG_hebrew_surn;?></td>
 	<td class="optionbox" colspan="3"><input size="50" type="text" tabindex="<?php print $tabkey; ?>" name="HSSURN<?php echo $i; ?>" /></td>
 	<?php $tabkey++; ?>
 </tr>
 <tr>
-	<td class="descriptionbox"><?php print_help_link("edit_given_name_help", "qm"); print GM_LANG_roman_givn;?></td>
+	<td class="descriptionbox"><?php PrintHelpLink("edit_given_name_help", "qm"); print GM_LANG_roman_givn;?></td>
 	<td class="optionbox" colspan="3"><input size="50" type="text" tabindex="<?php print $tabkey; ?>" name="RSGIVN<?php echo $i; ?>" /></td>
 	</tr>
 	<?php $tabkey++; ?>
 	<tr>
-	<td class="descriptionbox"><?php print_help_link("edit_surname_help", "qm"); print GM_LANG_roman_surn;?></td>
+	<td class="descriptionbox"><?php PrintHelpLink("edit_surname_help", "qm"); print GM_LANG_roman_surn;?></td>
 	<td class="optionbox" colspan="3"><input size="50" type="text" tabindex="<?php print $tabkey; ?>" name="RSSURN<?php echo $i; ?>" /></td>
 	<?php $tabkey++; ?>
 </tr>
 <?php } ?>
 <tr>
-	<td class="descriptionbox"><?php print_help_link("edit_sex_help", "qm"); print GM_LANG_sex;?></td>
+	<td class="descriptionbox"><?php PrintHelpLink("edit_sex_help", "qm"); print GM_LANG_sex;?></td>
 	<td class="optionbox" colspan="3">
 		<select name="SSEX<?php echo $i; ?>" tabindex="<?php print $tabkey; ?>">
 			<option value="M"<?php if (preg_match("/1 SEX F/", $gedrec)>0) print " selected=\"selected\""; ?>><?php print GM_LANG_male; ?></option>
@@ -1919,11 +1919,11 @@ for($i=1; $i<=count($sfams); $i++) {
 	</td>
 </tr>
 <tr>
-	<td class="descriptionbox"><?php print_help_link("def_gedcom_date_help", "qm"); print $factarray["BIRT"]; ?><?php print $factarray["DATE"];?></td>
+	<td class="descriptionbox"><?php PrintHelpLink("def_gedcom_date_help", "qm"); print $factarray["BIRT"]; ?><?php print $factarray["DATE"];?></td>
 	<td class="optionbox" colspan="3"><input type="text" tabindex="<?php print $tabkey; ?>" size="15" name="BDATE<?php echo $i; ?>" id="BDATE<?php echo $i; ?>" onblur="valid_date(this);" /><?php EditFunctions::PrintCalendarPopup("BDATE$i");?></td>
 	</tr>
 	<?php $tabkey++; ?>
-	<td class="descriptionbox"><?php print_help_link("edit_PLAC_help", "qm"); print $factarray["PLAC"];?></td>
+	<td class="descriptionbox"><?php PrintHelpLink("edit_PLAC_help", "qm"); print $factarray["PLAC"];?></td>
 	<td class="optionbox" colspan="3"><input size="30" type="text" tabindex="<?php print $tabkey; ?>" name="BPLAC<?php echo $i; ?>" id="bplace<?php echo $i; ?>" /><img src="<?php print GM_IMAGE_DIR."/".$GM_IMAGES["spacer"]["other"];?>" name="banchor1x" id="banchor1x" alt="" />
 	<?php LinkFunctions::PrintFindPlaceLink("place$f"); ?>
 	<?php $tabkey++; ?>
@@ -1934,7 +1934,7 @@ for($i=1; $i<=count($sfams); $i++) {
 //NOTE: Update fact
 ?>
 <tr><td>&nbsp;</td></tr>
-<tr><td class="topbottombar" colspan="4"><?php print_help_link("quick_update_fact_help", "qm"); print GM_LANG_update_fact; ?></td></tr>
+<tr><td class="topbottombar" colspan="4"><?php PrintHelpLink("quick_update_fact_help", "qm"); print GM_LANG_update_fact; ?></td></tr>
 <tr>
 	<td class="descriptionbox">&nbsp;</td>
 	<td class="descriptionbox"><?php print $factarray["DATE"]; ?></td>
@@ -1992,11 +1992,11 @@ foreach($famfacts as $f=>$fact) {
 // Note: add fact
 if (count($famaddfacts)>0) { ?>
 	<tr><td>&nbsp;</td></tr>
-	<tr><td class="topbottombar" colspan="4"><?php print_help_link("quick_update_fact_help", "qm"); print GM_LANG_add_fact; ?></td></tr>
+	<tr><td class="topbottombar" colspan="4"><?php PrintHelpLink("quick_update_fact_help", "qm"); print GM_LANG_add_fact; ?></td></tr>
 	<tr>
 	<td class="descriptionbox">&nbsp;</td>
-	<td class="descriptionbox"><?php print_help_link("def_gedcom_date_help", "qm"); print $factarray["DATE"]; ?></td>
-	<td class="descriptionbox"><?php print_help_link("edit_PLAC_help", "qm"); print $factarray["PLAC"]; ?></td>
+	<td class="descriptionbox"><?php PrintHelpLink("def_gedcom_date_help", "qm"); print $factarray["DATE"]; ?></td>
+	<td class="descriptionbox"><?php PrintHelpLink("edit_PLAC_help", "qm"); print $factarray["PLAC"]; ?></td>
 	<td class="descriptionbox">&nbsp;</td>
 	</tr>
 	<tr>
@@ -2105,41 +2105,41 @@ $chil = FindChildrenInRecord($famrec);
 if (empty($child_surname)) $child_surname = "";
 ?>
 <tr><td>&nbsp;</td></tr>
-<tr><td class="topbottombar" colspan="4"><b><?php print_help_link("quick_update_child_help", "qm"); print GM_LANG_add_new_chil; ?></b></td></tr>
+<tr><td class="topbottombar" colspan="4"><b><?php PrintHelpLink("quick_update_child_help", "qm"); print GM_LANG_add_new_chil; ?></b></td></tr>
 <tr>
-	<td class="descriptionbox"><?php print_help_link("edit_given_name_help", "qm"); print $factarray["GIVN"];?></td>
+	<td class="descriptionbox"><?php PrintHelpLink("edit_given_name_help", "qm"); print $factarray["GIVN"];?></td>
 	<td class="optionbox" colspan="3"><input size="50" type="text" tabindex="<?php print $tabkey; ?>" name="C<?php echo $i; ?>GIVN" /></td>
 </tr>
 	<?php $tabkey++; ?>
 <tr>
-	<td class="descriptionbox"><?php print_help_link("edit_surname_help", "qm"); print $factarray["SURN"];?></td>
+	<td class="descriptionbox"><?php PrintHelpLink("edit_surname_help", "qm"); print $factarray["SURN"];?></td>
 	<td class="optionbox" colspan="3"><input size="50" type="text" tabindex="<?php print $tabkey; ?>" name="C<?php echo $i; ?>SURN" value="<?php if (!empty($child_surname)) print $child_surname; ?>" /></td>
 	<?php $tabkey++; ?>
 </tr>
 <?php if (GedcomConfig::$USE_RTL_FUNCTIONS) { ?>
 <tr>
-	<td class="descriptionbox"><?php print_help_link("edit_given_name_help", "qm"); print GM_LANG_hebrew_givn;?></td>
+	<td class="descriptionbox"><?php PrintHelpLink("edit_given_name_help", "qm"); print GM_LANG_hebrew_givn;?></td>
 	<td class="optionbox" colspan="3"><input size="50" type="text" tabindex="<?php print $tabkey; ?>" name="HC<?php echo $i; ?>GIVN" /></td>
 </tr>
 	<?php $tabkey++; ?>
 <tr>
-	<td class="descriptionbox"><?php print_help_link("edit_surname_help", "qm"); print GM_LANG_hebrew_surn;?></td>
+	<td class="descriptionbox"><?php PrintHelpLink("edit_surname_help", "qm"); print GM_LANG_hebrew_surn;?></td>
 	<td class="optionbox" colspan="3"><input size="50" type="text" tabindex="<?php print $tabkey; ?>" name="HC<?php echo $i; ?>SURN" /></td>
 	<?php $tabkey++; ?>
 </tr>
 <tr>
-	<td class="descriptionbox"><?php print_help_link("edit_given_name_help", "qm"); print GM_LANG_roman_givn;?></td>
+	<td class="descriptionbox"><?php PrintHelpLink("edit_given_name_help", "qm"); print GM_LANG_roman_givn;?></td>
 	<td class="optionbox" colspan="3"><input size="50" type="text" tabindex="<?php print $tabkey; ?>" name="RC<?php echo $i; ?>GIVN" /></td>
 </tr>
 	<?php $tabkey++; ?>
 <tr>
-	<td class="descriptionbox"><?php print_help_link("edit_surname_help", "qm"); print GM_LANG_roman_surn;?></td>
+	<td class="descriptionbox"><?php PrintHelpLink("edit_surname_help", "qm"); print GM_LANG_roman_surn;?></td>
 	<td class="optionbox" colspan="3"><input size="50" type="text" tabindex="<?php print $tabkey; ?>" name="RC<?php echo $i; ?>SURN" /></td>
 	<?php $tabkey++; ?>
 </tr>
 <?php } ?>
 <tr>
-	<td class="descriptionbox"><?php print_help_link("edit_sex_help", "qm"); print GM_LANG_sex;?></td>
+	<td class="descriptionbox"><?php PrintHelpLink("edit_sex_help", "qm"); print GM_LANG_sex;?></td>
 	<td class="optionbox" colspan="3">
 		<select name="C<?php echo $i; ?>SEX" tabindex="<?php print $tabkey; ?>">
 			<option value="M"><?php print GM_LANG_male; ?></option>
@@ -2149,14 +2149,14 @@ if (empty($child_surname)) $child_surname = "";
 	</td></tr>
 	<?php $tabkey++; ?>
 <tr>
-	<td class="descriptionbox"><?php print_help_link("def_gedcom_date_help", "qm"); print $factarray["BIRT"]; ?>
+	<td class="descriptionbox"><?php PrintHelpLink("def_gedcom_date_help", "qm"); print $factarray["BIRT"]; ?>
 		<?php print $factarray["DATE"];?>
 	</td>
 	<td class="optionbox" colspan="3"><input type="text" tabindex="<?php print $tabkey; ?>" size="15" name="C<?php echo $i; ?>DATE" id="C<?php echo $i; ?>DATE" onblur="valid_date(this);" /><?php EditFunctions::PrintCalendarPopup("C{$i}DATE");?></td>
 	<?php $tabkey++; ?>
 	</tr>
 	<tr>
-	<td class="descriptionbox"><?php print_help_link("edit_PLAC_help", "qm"); print $factarray["PLAC"];?></td>
+	<td class="descriptionbox"><?php PrintHelpLink("edit_PLAC_help", "qm"); print $factarray["PLAC"];?></td>
 	<td class="optionbox" colspan="3"><input size="30" type="text" tabindex="<?php print $tabkey; ?>" name="C<?php echo $i; ?>PLAC" id="c<?php echo $i; ?>place" /><img src="<?php print GM_IMAGE_DIR."/".$GM_IMAGES["spacer"]["other"];?>" name="canchor1x" id="canchor1x" alt="" />
 	<?php LinkFunctions::PrintFindPlaceLink("c".$i."place"); ?>
 	</td>
@@ -2176,40 +2176,40 @@ if (empty($child_surname)) $child_surname = "";
 <?php
 // NOTE: New wife
 ?>
-<tr><td class="topbottombar" colspan="4"><?php print_help_link("quick_update_spouse_help", "qm"); if (preg_match("/1 SEX M/", $gedrec)>0) print GM_LANG_add_new_wife; else print GM_LANG_add_new_husb; ?></td></tr>
+<tr><td class="topbottombar" colspan="4"><?php PrintHelpLink("quick_update_spouse_help", "qm"); if (preg_match("/1 SEX M/", $gedrec)>0) print GM_LANG_add_new_wife; else print GM_LANG_add_new_husb; ?></td></tr>
 <tr>
-	<td class="descriptionbox"><?php print_help_link("edit_given_name_help", "qm"); print $factarray["GIVN"];?></td>
+	<td class="descriptionbox"><?php PrintHelpLink("edit_given_name_help", "qm"); print $factarray["GIVN"];?></td>
 	<td class="optionbox" colspan="3"><input size="50" type="text" tabindex="<?php print $tabkey; ?>" name="SGIVN" /></td></tr>
 	<?php $tabkey++; ?>
 	<tr>
-	<td class="descriptionbox"><?php print_help_link("edit_surname_help", "qm"); print $factarray["SURN"];?></td>
+	<td class="descriptionbox"><?php PrintHelpLink("edit_surname_help", "qm"); print $factarray["SURN"];?></td>
 	<td class="optionbox" colspan="3"><input size="50" type="text" tabindex="<?php print $tabkey; ?>" name="SSURN" /></td>
 	<?php $tabkey++; ?>
 </tr>
 <?php if (GedcomConfig::$USE_RTL_FUNCTIONS) { ?>
 <tr>
-	<td class="descriptionbox"><?php print_help_link("edit_given_name_help", "qm"); print GM_LANG_hebrew_givn;?></td>
+	<td class="descriptionbox"><?php PrintHelpLink("edit_given_name_help", "qm"); print GM_LANG_hebrew_givn;?></td>
 	<td class="optionbox" colspan="3"><input size="50" type="text" tabindex="<?php print $tabkey; ?>" name="HSGIVN" /></td>
 	<?php $tabkey++; ?>
 </tr>
 <tr>
-	<td class="descriptionbox"><?php print_help_link("edit_surname_help", "qm"); print GM_LANG_hebrew_surn;?></td>
+	<td class="descriptionbox"><?php PrintHelpLink("edit_surname_help", "qm"); print GM_LANG_hebrew_surn;?></td>
 	<td class="optionbox" colspan="3"><input size="50" type="text" tabindex="<?php print $tabkey; ?>" name="HSSURN" /></td>
 	<?php $tabkey++; ?>
 </tr>
 <tr>
-	<td class="descriptionbox"><?php print_help_link("edit_given_name_help", "qm"); print GM_LANG_roman_givn;?></td>
+	<td class="descriptionbox"><?php PrintHelpLink("edit_given_name_help", "qm"); print GM_LANG_roman_givn;?></td>
 	<td class="optionbox" colspan="3"><input size="50" type="text" tabindex="<?php print $tabkey; ?>" name="RSGIVN" /></td>
 	<?php $tabkey++; ?>
 </tr>
 <tr>
-	<td class="descriptionbox"><?php print_help_link("edit_surname_help", "qm"); print GM_LANG_roman_surn;?></td>
+	<td class="descriptionbox"><?php PrintHelpLink("edit_surname_help", "qm"); print GM_LANG_roman_surn;?></td>
 	<td class="optionbox" colspan="3"><input size="50" type="text" tabindex="<?php print $tabkey; ?>" name="RSSURN" /></td>
 	<?php $tabkey++; ?>
 </tr>
 <?php } ?>
 <tr>
-	<td class="descriptionbox"><?php print_help_link("edit_sex_help", "qm"); print GM_LANG_sex;?></td>
+	<td class="descriptionbox"><?php PrintHelpLink("edit_sex_help", "qm"); print GM_LANG_sex;?></td>
 	<td class="optionbox" colspan="3">
 		<select name="SSEX" tabindex="<?php print $tabkey; ?>">
 			<option value="M"<?php if (preg_match("/1 SEX F/", $gedrec)>0) print " selected=\"selected\""; ?>><?php print GM_LANG_male; ?></option>
@@ -2220,14 +2220,14 @@ if (empty($child_surname)) $child_surname = "";
 	</td>
 </tr>
 <tr>
-	<td class="descriptionbox"><?php print_help_link("def_gedcom_date_help", "qm"); print $factarray["BIRT"]; ?>
+	<td class="descriptionbox"><?php PrintHelpLink("def_gedcom_date_help", "qm"); print $factarray["BIRT"]; ?>
 		<?php print $factarray["DATE"];?>
 	</td>
 	<td class="optionbox" colspan="3"><input type="text" tabindex="<?php print $tabkey; ?>" size="15" name="BDATE" id="BDATE" onblur="valid_date(this);" /><?php EditFunctions::PrintCalendarPopup("BDATE");?></td>
 	</tr>
 	<?php $tabkey++; ?>
 	<tr>
-	<td class="descriptionbox"><?php print_help_link("edit_PLAC_help", "qm"); print $factarray["PLAC"];?></td>
+	<td class="descriptionbox"><?php PrintHelpLink("edit_PLAC_help", "qm"); print $factarray["PLAC"];?></td>
 	<td class="optionbox" colspan="3"><input size="30" type="text" tabindex="<?php print $tabkey; ?>" name="BPLAC" id="bplace" /><img src="<?php print GM_IMAGE_DIR."/".$GM_IMAGES["spacer"]["other"];?>" name="banchor1x" id="banchor1x" alt="" />
 	<?php LinkFunctions::PrintFindPlaceLink("bplace"); ?>
 	<?php $tabkey++; ?>
@@ -2239,16 +2239,16 @@ if (empty($child_surname)) $child_surname = "";
 ?>
 <tr><td>&nbsp;</td></tr>
 <tr>
-	<td class="topbottombar" colspan="4"><?php print_help_link("quick_update_marriage_help", "qm"); print $factarray["MARR"]; ?></td>
+	<td class="topbottombar" colspan="4"><?php PrintHelpLink("quick_update_marriage_help", "qm"); print $factarray["MARR"]; ?></td>
 </tr>
 <tr><td class="descriptionbox">
-		<?php print_help_link("def_gedcom_date_help", "qm"); print $factarray["DATE"];?>
+		<?php PrintHelpLink("def_gedcom_date_help", "qm"); print $factarray["DATE"];?>
 	</td>
 	<td class="optionbox" colspan="3"><input type="text" tabindex="<?php print $tabkey; ?>" size="15" name="MDATE" id="MDATE" onblur="valid_date(this);" /><?php EditFunctions::PrintCalendarPopup("MDATE");?></td>
 	</tr>
 	<?php $tabkey++; ?>
 	<tr>
-	<td class="descriptionbox"><?php print_help_link("edit_PLAC_help", "qm"); print $factarray["PLAC"];?></td>
+	<td class="descriptionbox"><?php PrintHelpLink("edit_PLAC_help", "qm"); print $factarray["PLAC"];?></td>
 	<td class="optionbox" colspan="3"><input size="30" type="text" tabindex="<?php print $tabkey; ?>" name="MPLAC" id="mplace" /><img src="<?php print GM_IMAGE_DIR."/".$GM_IMAGES["spacer"]["other"];?>" name="manchor1x" id="manchor1x" alt="" />
 	<?php LinkFunctions::PrintFindPlaceLink("mplace"); ?>
 	<?php $tabkey++; ?>
@@ -2260,41 +2260,41 @@ if (empty($child_surname)) $child_surname = "";
 if (empty($child_surname)) $child_surname = "";
 ?>
 <tr><td>&nbsp;</td></tr>
-<tr><td class="topbottombar" colspan="4"><b><?php print_help_link("quick_update_child_help", "qm"); print GM_LANG_add_new_chil; ?></b></td></tr>
+<tr><td class="topbottombar" colspan="4"><b><?php PrintHelpLink("quick_update_child_help", "qm"); print GM_LANG_add_new_chil; ?></b></td></tr>
 <tr>
-	<td class="descriptionbox"><?php print_help_link("edit_given_name_help", "qm"); print $factarray["GIVN"];?></td>
+	<td class="descriptionbox"><?php PrintHelpLink("edit_given_name_help", "qm"); print $factarray["GIVN"];?></td>
 	<td class="optionbox" colspan="3"><input size="50" type="text" tabindex="<?php print $tabkey; ?>" name="CGIVN" /></td>
 	</tr>
 	<?php $tabkey++; ?>
 	<tr>
-	<td class="descriptionbox"><?php print_help_link("edit_surname_help", "qm"); print $factarray["SURN"];?></td>
+	<td class="descriptionbox"><?php PrintHelpLink("edit_surname_help", "qm"); print $factarray["SURN"];?></td>
 	<td class="optionbox" colspan="3"><input size="50" type="text" tabindex="<?php print $tabkey; ?>" name="CSURN" value="<?php if (!empty($child_surname)) print $child_surname; ?>" /></td>
 	<?php $tabkey++; ?>
 </tr>
 <?php if (GedcomConfig::$USE_RTL_FUNCTIONS) { ?>
 <tr>
-	<td class="descriptionbox"><?php print_help_link("edit_given_name_help", "qm"); print GM_LANG_hebrew_givn;?></td>
+	<td class="descriptionbox"><?php PrintHelpLink("edit_given_name_help", "qm"); print GM_LANG_hebrew_givn;?></td>
 	<td class="optionbox" colspan="3"><input size="50" type="text" tabindex="<?php print $tabkey; ?>" name="HCGIVN" /></td>
 	</tr>
 	<?php $tabkey++; ?>
 	<tr>
-	<td class="descriptionbox"><?php print_help_link("edit_surname_help", "qm"); print GM_LANG_hebrew_surn;?></td>
+	<td class="descriptionbox"><?php PrintHelpLink("edit_surname_help", "qm"); print GM_LANG_hebrew_surn;?></td>
 	<td class="optionbox" colspan="3"><input size="50" type="text" tabindex="<?php print $tabkey; ?>" name="HCSURN" /></td>
 	<?php $tabkey++; ?>
 </tr>
 <tr>
-	<td class="descriptionbox"><?php print_help_link("edit_given_name_help", "qm"); print GM_LANG_roman_givn;?></td>
+	<td class="descriptionbox"><?php PrintHelpLink("edit_given_name_help", "qm"); print GM_LANG_roman_givn;?></td>
 	<td class="optionbox" colspan="3"><input size="50" type="text" tabindex="<?php print $tabkey; ?>" name="RCGIVN" /></td>
 	</tr>
 	<?php $tabkey++; ?>
 	<tr>
-	<td class="descriptionbox"><?php print_help_link("edit_surname_help", "qm"); print GM_LANG_roman_surn;?></td>
+	<td class="descriptionbox"><?php PrintHelpLink("edit_surname_help", "qm"); print GM_LANG_roman_surn;?></td>
 	<td class="optionbox" colspan="3"><input size="50" type="text" tabindex="<?php print $tabkey; ?>" name="RCSURN" /></td>
 	<?php $tabkey++; ?>
 </tr>
 <?php } ?>
 <tr>
-	<td class="descriptionbox"><?php print_help_link("edit_sex_help", "qm"); print GM_LANG_sex;?></td>
+	<td class="descriptionbox"><?php PrintHelpLink("edit_sex_help", "qm"); print GM_LANG_sex;?></td>
 	<td class="optionbox" colspan="3">
 		<select name="CSEX" tabindex="<?php print $tabkey; ?>">
 			<option value="M"><?php print GM_LANG_male; ?></option>
@@ -2304,14 +2304,14 @@ if (empty($child_surname)) $child_surname = "";
 	</td></tr>
 	<?php $tabkey++; ?>
 <tr>
-	<td class="descriptionbox"><?php print_help_link("def_gedcom_date_help", "qm"); print $factarray["BIRT"]; ?>
+	<td class="descriptionbox"><?php PrintHelpLink("def_gedcom_date_help", "qm"); print $factarray["BIRT"]; ?>
 		<?php print $factarray["DATE"];?>
 	</td>
 	<td class="optionbox" colspan="3"><input type="text" tabindex="<?php print $tabkey; ?>" size="15" name="CDATE" id="CDATE" onblur="valid_date(this);" /><?php EditFunctions::PrintCalendarPopup("CDATE");?></td>
 	</tr>
 	<?php $tabkey++; ?>
 	<tr>
-	<td class="descriptionbox"><?php print_help_link("edit_PLAC_help", "qm"); print $factarray["PLAC"];?></td>
+	<td class="descriptionbox"><?php PrintHelpLink("edit_PLAC_help", "qm"); print $factarray["PLAC"];?></td>
 	<td class="optionbox" colspan="3"><input size="30" type="text" tabindex="<?php print $tabkey; ?>" name="CPLAC" id="cplace" /><img src="<?php print GM_IMAGE_DIR."/".$GM_IMAGES["spacer"]["other"];?>" name="canchor2x" id="canchor2x" alt="" />
 	<?php LinkFunctions::PrintFindPlaceLink("cplace"); ?>
 	</td>
@@ -2404,41 +2404,41 @@ for($j=1; $j<=count($cfams); $j++) {
 	print "</td></tr>";
 ?>
 <?php if (empty($parents["HUSB"])) { ?>
-	<tr><td class="topbottombar" colspan="4"><?php print_help_link("quick_update_spouse_help", "qm"); print GM_LANG_add_father; ?></td></tr>
+	<tr><td class="topbottombar" colspan="4"><?php PrintHelpLink("quick_update_spouse_help", "qm"); print GM_LANG_add_father; ?></td></tr>
 	<tr>
-	<td class="descriptionbox"><?php print_help_link("edit_given_name_help", "qm"); print $factarray["GIVN"];?></td>
+	<td class="descriptionbox"><?php PrintHelpLink("edit_given_name_help", "qm"); print $factarray["GIVN"];?></td>
 	<td class="optionbox" colspan="3"><input size="50" type="text" tabindex="<?php print $tabkey; ?>" name="FGIVN<?php echo $i; ?>" /></td>
 	</tr>
 	<?php $tabkey++; ?>
 	<tr>
-	<td class="descriptionbox"><?php print_help_link("edit_surname_help", "qm"); print $factarray["SURN"];?></td>
+	<td class="descriptionbox"><?php PrintHelpLink("edit_surname_help", "qm"); print $factarray["SURN"];?></td>
 	<td class="optionbox" colspan="3"><input size="50" type="text" tabindex="<?php print $tabkey; ?>" name="FSURN<?php echo $i; ?>" /></td>
 	<?php $tabkey++; ?>
 	</tr>
 	<?php if (GedcomConfig::$USE_RTL_FUNCTIONS) { ?>
 	<tr>
-	<td class="descriptionbox"><?php print_help_link("edit_given_name_help", "qm"); print GM_LANG_hebrew_givn;?></td>
+	<td class="descriptionbox"><?php PrintHelpLink("edit_given_name_help", "qm"); print GM_LANG_hebrew_givn;?></td>
 	<td class="optionbox" colspan="3"><input size="50" type="text" tabindex="<?php print $tabkey; ?>" name="HFGIVN<?php echo $i; ?>" /></td>
 	</tr>
 	<?php $tabkey++; ?>
 	<tr>
-	<td class="descriptionbox"><?php print_help_link("edit_surname_help", "qm"); print GM_LANG_hebrew_surn;?></td>
+	<td class="descriptionbox"><?php PrintHelpLink("edit_surname_help", "qm"); print GM_LANG_hebrew_surn;?></td>
 	<td class="optionbox" colspan="3"><input size="50" type="text" tabindex="<?php print $tabkey; ?>" name="HFSURN<?php echo $i; ?>" /></td>
 	<?php $tabkey++; ?>
 	</tr>
 	<tr>
-	<td class="descriptionbox"><?php print_help_link("edit_given_name_help", "qm"); print GM_LANG_roman_givn;?></td>
+	<td class="descriptionbox"><?php PrintHelpLink("edit_given_name_help", "qm"); print GM_LANG_roman_givn;?></td>
 	<td class="optionbox" colspan="3"><input size="50" type="text" tabindex="<?php print $tabkey; ?>" name="RFGIVN<?php echo $i; ?>" /></td>
 	</tr>
 	<?php $tabkey++; ?>
 	<tr>
-	<td class="descriptionbox"><?php print_help_link("edit_surname_help", "qm"); print GM_LANG_roman_surn;?></td>
+	<td class="descriptionbox"><?php PrintHelpLink("edit_surname_help", "qm"); print GM_LANG_roman_surn;?></td>
 	<td class="optionbox" colspan="3"><input size="50" type="text" tabindex="<?php print $tabkey; ?>" name="RFSURN<?php echo $i; ?>" /></td>
 	<?php $tabkey++; ?>
 	</tr>
 	<?php } ?>
 	<tr>
-	<td class="descriptionbox"><?php print_help_link("edit_sex_help", "qm"); print GM_LANG_sex;?></td>
+	<td class="descriptionbox"><?php PrintHelpLink("edit_sex_help", "qm"); print GM_LANG_sex;?></td>
 	<td class="optionbox" colspan="3">
 		<select name="FSEX<?php echo $i; ?>" tabindex="<?php print $tabkey; ?>">
 			<option value="M" selected="selected"><?php print GM_LANG_male; ?></option>
@@ -2449,14 +2449,14 @@ for($j=1; $j<=count($cfams); $j++) {
 	</td>
 	</tr>
 	<tr>
-	<td class="descriptionbox"><?php print_help_link("def_gedcom_date_help", "qm"); print $factarray["BIRT"]; ?>
+	<td class="descriptionbox"><?php PrintHelpLink("def_gedcom_date_help", "qm"); print $factarray["BIRT"]; ?>
 		<?php print $factarray["DATE"];?>
 	</td>
 	<td class="optionbox" colspan="3"><input type="text" tabindex="<?php print $tabkey; ?>" size="15" name="FBDATE<?php echo $i; ?>" id="FBDATE<?php echo $i; ?>" onblur="valid_date(this);" /><?php EditFunctions::PrintCalendarPopup("FBDATE$i");?></td>
 	</tr>
 	<?php $tabkey++; ?>
 	<tr>
-	<td class="descriptionbox"><?php print_help_link("edit_PLAC_help", "qm"); print $factarray["PLAC"];?></td>
+	<td class="descriptionbox"><?php PrintHelpLink("edit_PLAC_help", "qm"); print $factarray["PLAC"];?></td>
 	<td class="optionbox" colspan="3"><input size="30" type="text" tabindex="<?php print $tabkey; ?>" name="FBPLAC<?php echo $i; ?>" id="Fbplace<?php echo $i; ?>" /><img src="<?php print GM_IMAGE_DIR."/".$GM_IMAGES["spacer"]["other"];?>" name="banchor1x" id="banchor1x" alt="" />
 	<?php LinkFunctions::PrintFindPlaceLink("Fbplace$i"); ?>
 	<?php $tabkey++; ?>
@@ -2464,14 +2464,14 @@ for($j=1; $j<=count($cfams); $j++) {
 	</tr>
 	<?php EditFunctions::PrintQuickResn("FBRESN$i"); ?>
 	<tr>
-	<td class="descriptionbox"><?php print_help_link("def_gedcom_date_help", "qm"); print $factarray["DEAT"]; ?>
+	<td class="descriptionbox"><?php PrintHelpLink("def_gedcom_date_help", "qm"); print $factarray["DEAT"]; ?>
 		<?php print $factarray["DATE"];?>
 	</td>
 	<td class="optionbox" colspan="3"><input type="text" tabindex="<?php print $tabkey; ?>" size="15" name="FDDATE<?php echo $i; ?>" id="FDDATE<?php echo $i; ?>" onblur="valid_date(this);" /><?php EditFunctions::PrintCalendarPopup("FDDATE$i");?></td>
 	</tr>
 	<?php $tabkey++; ?>
 	<tr>
-	<td class="descriptionbox"><?php print_help_link("edit_PLAC_help", "qm"); print $factarray["PLAC"];?></td>
+	<td class="descriptionbox"><?php PrintHelpLink("edit_PLAC_help", "qm"); print $factarray["PLAC"];?></td>
 	<td class="optionbox" colspan="3"><input size="30" type="text" tabindex="<?php print $tabkey; ?>" name="FDPLAC<?php echo $i; ?>" id="Fdplace<?php echo $i; ?>" /><img src="<?php print GM_IMAGE_DIR."/".$GM_IMAGES["spacer"]["other"];?>" name="danchor1x" id="danchor1x" alt="" />
 	<?php LinkFunctions::PrintFindPlaceLink("Fdplace$i"); ?>
 	<?php $tabkey++; ?>
@@ -2512,41 +2512,41 @@ for($j=1; $j<=count($cfams); $j++) {
 	?>
 </td></tr>
 <?php if (empty($parents["WIFE"])) { ?>
-<tr><td class="topbottombar" colspan="4"><?php print_help_link("quick_update_spouse_help", "qm"); print GM_LANG_add_mother; ?></td></tr>
+<tr><td class="topbottombar" colspan="4"><?php PrintHelpLink("quick_update_spouse_help", "qm"); print GM_LANG_add_mother; ?></td></tr>
 <tr>
-	<td class="descriptionbox"><?php print_help_link("edit_given_name_help", "qm"); print $factarray["GIVN"];?></td>
+	<td class="descriptionbox"><?php PrintHelpLink("edit_given_name_help", "qm"); print $factarray["GIVN"];?></td>
 	<td class="optionbox" colspan="3"><input size="50" type="text" tabindex="<?php print $tabkey; ?>" name="MGIVN<?php echo $i; ?>" /></td>
 	</tr>
 	<?php $tabkey++; ?>
 	<tr>
-	<td class="descriptionbox"><?php print_help_link("edit_surname_help", "qm"); print $factarray["SURN"];?></td>
+	<td class="descriptionbox"><?php PrintHelpLink("edit_surname_help", "qm"); print $factarray["SURN"];?></td>
 	<td class="optionbox" colspan="3"><input size="50" type="text" tabindex="<?php print $tabkey; ?>" name="MSURN<?php echo $i; ?>" /></td>
 	<?php $tabkey++; ?>
 </tr>
 <?php if (GedcomConfig::$USE_RTL_FUNCTIONS) { ?>
 <tr>
-	<td class="descriptionbox"><?php print_help_link("edit_given_name_help", "qm"); print GM_LANG_hebrew_givn;?></td>
+	<td class="descriptionbox"><?php PrintHelpLink("edit_given_name_help", "qm"); print GM_LANG_hebrew_givn;?></td>
 	<td class="optionbox" colspan="3"><input size="50" type="text" tabindex="<?php print $tabkey; ?>" name="HMGIVN<?php echo $i; ?>" /></td>
 	</tr>
 	<?php $tabkey++; ?>
 	</tr>
-	<td class="descriptionbox"><?php print_help_link("edit_surname_help", "qm"); print GM_LANG_hebrew_surn;?></td>
+	<td class="descriptionbox"><?php PrintHelpLink("edit_surname_help", "qm"); print GM_LANG_hebrew_surn;?></td>
 	<td class="optionbox" colspan="3"><input size="50" type="text" tabindex="<?php print $tabkey; ?>" name="HMSURN<?php echo $i; ?>" /></td>
 	<?php $tabkey++; ?>
 </tr>
 <tr>
-	<td class="descriptionbox"><?php print_help_link("edit_given_name_help", "qm"); print GM_LANG_roman_givn;?></td>
+	<td class="descriptionbox"><?php PrintHelpLink("edit_given_name_help", "qm"); print GM_LANG_roman_givn;?></td>
 	<td class="optionbox" colspan="3"><input size="50" type="text" tabindex="<?php print $tabkey; ?>" name="RMGIVN<?php echo $i; ?>" /></td>
 	</tr>
 	<?php $tabkey++; ?>
 	</tr>
-	<td class="descriptionbox"><?php print_help_link("edit_surname_help", "qm"); print GM_LANG_roman_surn;?></td>
+	<td class="descriptionbox"><?php PrintHelpLink("edit_surname_help", "qm"); print GM_LANG_roman_surn;?></td>
 	<td class="optionbox" colspan="3"><input size="50" type="text" tabindex="<?php print $tabkey; ?>" name="RMSURN<?php echo $i; ?>" /></td>
 	<?php $tabkey++; ?>
 </tr>
 <?php } ?>
 <tr>
-	<td class="descriptionbox"><?php print_help_link("edit_sex_help", "qm"); print GM_LANG_sex;?></td>
+	<td class="descriptionbox"><?php PrintHelpLink("edit_sex_help", "qm"); print GM_LANG_sex;?></td>
 	<td class="optionbox" colspan="3">
 		<select name="MSEX<?php echo $i; ?>" tabindex="<?php print $tabkey; ?>">
 			<option value="M"><?php print GM_LANG_male; ?></option>
@@ -2557,14 +2557,14 @@ for($j=1; $j<=count($cfams); $j++) {
 	</td>
 </tr>
 <tr>
-	<td class="descriptionbox"><?php print_help_link("def_gedcom_date_help", "qm"); print $factarray["BIRT"]; ?>
+	<td class="descriptionbox"><?php PrintHelpLink("def_gedcom_date_help", "qm"); print $factarray["BIRT"]; ?>
 		<?php print $factarray["DATE"];?>
 	</td>
 	<td class="optionbox" colspan="3"><input type="text" tabindex="<?php print $tabkey; ?>" size="15" name="MBDATE<?php echo $i; ?>" id="MBDATE<?php echo $i; ?>" onblur="valid_date(this);" /><?php EditFunctions::PrintCalendarPopup("MBDATE$i");?></td>
 	</tr>
 	<?php $tabkey++; ?>
 	<tr>
-	<td class="descriptionbox"><?php print_help_link("edit_PLAC_help", "qm"); print $factarray["PLAC"];?></td>
+	<td class="descriptionbox"><?php PrintHelpLink("edit_PLAC_help", "qm"); print $factarray["PLAC"];?></td>
 	<td class="optionbox" colspan="3"><input size="30" type="text" tabindex="<?php print $tabkey; ?>" name="MBPLAC<?php echo $i; ?>" id="Mbplace<?php echo $i; ?>" /><img src="<?php print GM_IMAGE_DIR."/".$GM_IMAGES["spacer"]["other"];?>" name="banchor1x" id="banchor1x" alt="" />
 	<?php LinkFunctions::PrintFindPlaceLink("Mbplace$i"); ?>
 	<?php $tabkey++; ?>
@@ -2572,14 +2572,14 @@ for($j=1; $j<=count($cfams); $j++) {
 </tr>
 <?php EditFunctions::PrintQuickResn("MBRESN$i"); ?>
 <tr>
-	<td class="descriptionbox"><?php print_help_link("def_gedcom_date_help", "qm"); print $factarray["DEAT"]; ?>
+	<td class="descriptionbox"><?php PrintHelpLink("def_gedcom_date_help", "qm"); print $factarray["DEAT"]; ?>
 		<?php print $factarray["DATE"];?>
 	</td>
 	<td class="optionbox" colspan="3"><input type="text" tabindex="<?php print $tabkey; ?>" size="15" name="MDDATE<?php echo $i; ?>" id="MDDATE<?php echo $i; ?>" onblur="valid_date(this);" /><?php EditFunctions::PrintCalendarPopup("MDDATE$i");?></td>
 	</tr>
 	<?php $tabkey++; ?>
 	<tr>
-	<td class="descriptionbox"><?php print_help_link("edit_PLAC_help", "qm"); print $factarray["PLAC"];?></td>
+	<td class="descriptionbox"><?php PrintHelpLink("edit_PLAC_help", "qm"); print $factarray["PLAC"];?></td>
 	<td class="optionbox" colspan="3"><input size="30" type="text" tabindex="<?php print $tabkey; ?>" name="MDPLAC<?php echo $i; ?>" id="Mdplace<?php echo $i; ?>" /><img src="<?php print GM_IMAGE_DIR."/".$GM_IMAGES["spacer"]["other"];?>" name="danchor1x" id="danchor1x" alt="" />
 	<?php LinkFunctions::PrintFindPlaceLink("Mdplace$i"); ?>
 	<?php $tabkey++; ?>
@@ -2590,7 +2590,7 @@ for($j=1; $j<=count($cfams); $j++) {
 // NOTE: Update fact 
 ?>
 <tr><td>&nbsp;</td></tr>
-<tr><td class="topbottombar" colspan="4"><?php print_help_link("quick_update_fact_help", "qm"); print GM_LANG_update_fact; ?></td></tr>
+<tr><td class="topbottombar" colspan="4"><?php PrintHelpLink("quick_update_fact_help", "qm"); print GM_LANG_update_fact; ?></td></tr>
 <tr>
 	<td class="descriptionbox">&nbsp;</td>
 	<td class="descriptionbox"><?php print $factarray["DATE"]; ?></td>
@@ -2651,11 +2651,11 @@ foreach($famfacts as $f=>$fact) {
 ?>
 <?php if (count($famaddfacts)>0) { ?>
 	<tr><td>&nbsp;</td></tr>
-	<tr><td class="topbottombar" colspan="4"><?php print_help_link("quick_update_fact_help", "qm"); print GM_LANG_add_fact; ?></td></tr>
+	<tr><td class="topbottombar" colspan="4"><?php PrintHelpLink("quick_update_fact_help", "qm"); print GM_LANG_add_fact; ?></td></tr>
 	<tr>
 		<td class="descriptionbox">&nbsp;</td>
-		<td class="descriptionbox"><?php print_help_link("def_gedcom_date_help", "qm"); print $factarray["DATE"]; ?></td>
-		<td class="descriptionbox"><?php print_help_link("edit_PLAC_help", "qm"); print $factarray["PLAC"]; ?></td>
+		<td class="descriptionbox"><?php PrintHelpLink("def_gedcom_date_help", "qm"); print $factarray["DATE"]; ?></td>
+		<td class="descriptionbox"><?php PrintHelpLink("edit_PLAC_help", "qm"); print $factarray["PLAC"]; ?></td>
 		<td class="descriptionbox">&nbsp;</td>
 		</tr>
 	<tr>
@@ -2763,37 +2763,37 @@ $chil = FindChildrenInRecord($famrec);
 // NOTE: Add a child
 ?>
 <tr><td>&nbsp;</td></tr>
-<tr><td class="topbottombar" colspan="4"><?php print_help_link("quick_update_child_help", "qm"); print GM_LANG_add_child_to_family; ?></td></tr>
+<tr><td class="topbottombar" colspan="4"><?php PrintHelpLink("quick_update_child_help", "qm"); print GM_LANG_add_child_to_family; ?></td></tr>
 <tr>
-	<td class="descriptionbox"><?php print_help_link("edit_given_name_help", "qm"); print $factarray["GIVN"];?></td>
+	<td class="descriptionbox"><?php PrintHelpLink("edit_given_name_help", "qm"); print $factarray["GIVN"];?></td>
 	<td class="optionbox" colspan="3"><input size="50" type="text" tabindex="<?php print $tabkey; ?>" name="C<?php echo $i; ?>GIVN" /></td>
 	</tr>
 	<?php $tabkey++; ?>
 	<tr>
-	<td class="descriptionbox"><?php print_help_link("edit_surname_help", "qm"); print $factarray["SURN"];?></td>
+	<td class="descriptionbox"><?php PrintHelpLink("edit_surname_help", "qm"); print $factarray["SURN"];?></td>
 	<td class="optionbox" colspan="3"><input size="50" type="text" tabindex="<?php print $tabkey; ?>" name="C<?php echo $i; ?>SURN" value="<?php //if (!empty($child_surname)) print $child_surname; ?>" /></td>
 	<?php $tabkey++; ?>
 </tr>
 <?php if (GedcomConfig::$USE_RTL_FUNCTIONS) { ?>
 <tr>
-	<td class="descriptionbox"><?php print_help_link("edit_given_name_help", "qm"); print GM_LANG_hebrew_givn;?></td>
+	<td class="descriptionbox"><?php PrintHelpLink("edit_given_name_help", "qm"); print GM_LANG_hebrew_givn;?></td>
 	<td class="optionbox" colspan="3"><input size="50" type="text" tabindex="<?php print $tabkey; ?>" name="HC<?php echo $i; ?>GIVN" /></td>
 	<?php $tabkey++; ?>
-	<td class="descriptionbox"><?php print_help_link("edit_surname_help", "qm"); print GM_LANG_hebrew_surn;?></td>
+	<td class="descriptionbox"><?php PrintHelpLink("edit_surname_help", "qm"); print GM_LANG_hebrew_surn;?></td>
 	<td class="optionbox" colspan="3"><input size="50" type="text" tabindex="<?php print $tabkey; ?>" name="HC<?php echo $i; ?>SURN" /></td>
 	<?php $tabkey++; ?>
 </tr>
 <tr>
-	<td class="descriptionbox"><?php print_help_link("edit_given_name_help", "qm"); print GM_LANG_roman_givn;?></td>
+	<td class="descriptionbox"><?php PrintHelpLink("edit_given_name_help", "qm"); print GM_LANG_roman_givn;?></td>
 	<td class="optionbox" colspan="3"><input size="50" type="text" tabindex="<?php print $tabkey; ?>" name="RC<?php echo $i; ?>GIVN" /></td>
 	<?php $tabkey++; ?>
-	<td class="descriptionbox"><?php print_help_link("edit_surname_help", "qm"); print GM_LANG_roman_surn;?></td>
+	<td class="descriptionbox"><?php PrintHelpLink("edit_surname_help", "qm"); print GM_LANG_roman_surn;?></td>
 	<td class="optionbox" colspan="3"><input size="50" type="text" tabindex="<?php print $tabkey; ?>" name="RC<?php echo $i; ?>SURN" /></td>
 	<?php $tabkey++; ?>
 </tr>
 <?php } ?>
 <tr>
-	<td class="descriptionbox"><?php print_help_link("edit_sex_help", "qm"); print GM_LANG_sex;?></td>
+	<td class="descriptionbox"><?php PrintHelpLink("edit_sex_help", "qm"); print GM_LANG_sex;?></td>
 	<td class="optionbox" colspan="3">
 		<select name="C<?php echo $i; ?>SEX" tabindex="<?php print $tabkey; ?>">
 			<option value="M"><?php print GM_LANG_male; ?></option>
@@ -2803,14 +2803,14 @@ $chil = FindChildrenInRecord($famrec);
 	</td></tr>
 	<?php $tabkey++; ?>
 <tr>
-	<td class="descriptionbox"><?php print_help_link("def_gedcom_date_help", "qm"); print $factarray["BIRT"]; ?>
+	<td class="descriptionbox"><?php PrintHelpLink("def_gedcom_date_help", "qm"); print $factarray["BIRT"]; ?>
 		<?php print $factarray["DATE"];?>
 	</td>
 	<td class="optionbox" colspan="3"><input type="text" tabindex="<?php print $tabkey; ?>" size="15" name="C<?php echo $i; ?>DATE" id="C<?php echo $i; ?>DATE" onblur="valid_date(this);" /><?php EditFunctions::PrintCalendarPopup("C{$i}DATE");?></td>
 	</tr>
 	<?php $tabkey++; ?>
 	<tr>
-	<td class="descriptionbox"><?php print_help_link("edit_PLAC_help", "qm"); print $factarray["PLAC"];?></td>
+	<td class="descriptionbox"><?php PrintHelpLink("edit_PLAC_help", "qm"); print $factarray["PLAC"];?></td>
 	<td class="optionbox" colspan="3"><input size="30" type="text" tabindex="<?php print $tabkey; ?>" name="C<?php echo $i; ?>PLAC" id="C<?php echo $i; ?>place" /><img src="<?php print GM_IMAGE_DIR."/".$GM_IMAGES["spacer"]["other"];?>" name="canchor3x" id="canchor3x" alt="" />
 	<?php LinkFunctions::PrintFindPlaceLink("c".$i."place"); ?>
 	</td>

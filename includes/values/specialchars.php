@@ -75,7 +75,7 @@ $specialchar_languages = array(
 	"ru" => GM_LANG_lang_name_russian
 );
 
-switch ($language_filter) {
+switch ($search_controller->language_filter) {
 case "af": // Afrikaans
    $ucspecialchars = array(
 		"&#200;" => "È",

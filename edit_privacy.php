@@ -343,7 +343,7 @@ if ($action=="update") {
     		<td class="topbottombar <?php print $TEXT_DIRECTION;?>">
 		<?php
     		print "<a href=\"javascript: ".GM_LANG_general_privacy."\" onclick=\"expand_layer('general-privacy-options');return false\"><img id=\"general-privacy-options_img\" src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["minus"]["other"]."\" border=\"0\" width=\"11\" height=\"11\" alt=\"\" /></a> ";
-		print_help_link("general_privacy_help", "qm", "general_privacy");
+		PrintHelpLink("general_privacy_help", "qm", "general_privacy");
     		?>
         	<a href="javascript: <?php print GM_LANG_general_privacy; ?>" onclick="expand_layer('general-privacy-options');return false"><b><?php print GM_LANG_general_privacy; ?></b></a>
         	</td>
@@ -355,35 +355,35 @@ if ($action=="update") {
     <div id="general-privacy-options" style="display: block">
     <table class="facts_table">
       <tr>
-        <td class="shade2 wrap width40"><?php print_help_link("PRIVACY_BY_RESN_help", "qm", "PRIVACY_BY_RESN"); print GM_LANG_PRIVACY_BY_RESN; ?>
+        <td class="shade2 wrap width40"><?php PrintHelpLink("PRIVACY_BY_RESN_help", "qm", "PRIVACY_BY_RESN"); print GM_LANG_PRIVACY_BY_RESN; ?>
         </td>
         <td class="shade1 width60">
           <select size="1" name="v_PRIVACY_BY_RESN"><?php WriteYesNo($PRIVACY_BY_RESN); ?></select>
         </td>
       </tr>
       <tr>
-        <td class="shade2 wrap"><?php print_help_link("SHOW_SOURCES_help", "qm", "SHOW_SOURCES"); print GM_LANG_SHOW_SOURCES; ?>
+        <td class="shade2 wrap"><?php PrintHelpLink("SHOW_SOURCES_help", "qm", "SHOW_SOURCES"); print GM_LANG_SHOW_SOURCES; ?>
         </td>
         <td class="shade1">
           <select size="1" name="v_SHOW_SOURCES"><?php WriteAccessOption($SHOW_SOURCES); ?></select>
         </td>
       </tr>
       <tr>
-        <td class="shade2 wrap"><?php print_help_link("LINK_PRIVACY_help", "qm", "LINK_PRIVACY"); print GM_LANG_LINK_PRIVACY; ?>
+        <td class="shade2 wrap"><?php PrintHelpLink("LINK_PRIVACY_help", "qm", "LINK_PRIVACY"); print GM_LANG_LINK_PRIVACY; ?>
         </td>
         <td class="shade1">
           <select size="1" name="v_LINK_PRIVACY"><?php WriteYesNo($LINK_PRIVACY); ?></select>
         </td>
       </tr>
       <tr>
-        <td class="shade2 wrap"><?php print_help_link("ENABLE_CLIPPINGS_CART_help", "qm", "ENABLE_CLIPPINGS_CART"); print GM_LANG_ENABLE_CLIPPINGS_CART; ?>
+        <td class="shade2 wrap"><?php PrintHelpLink("ENABLE_CLIPPINGS_CART_help", "qm", "ENABLE_CLIPPINGS_CART"); print GM_LANG_ENABLE_CLIPPINGS_CART; ?>
         </td>
         <td class="shade1">
           <select size="1" name="v_ENABLE_CLIPPINGS_CART"><?php WriteAccessOption($ENABLE_CLIPPINGS_CART); ?></select>
         </td>
       </tr>
       <tr>
-        <td class="shade2 wrap"><?php print_help_link("SHOW_RESEARCH_LOG_help", "qm", "SHOW_RESEARCH_LOG"); print GM_LANG_SHOW_RESEARCH_LOG; ?>
+        <td class="shade2 wrap"><?php PrintHelpLink("SHOW_RESEARCH_LOG_help", "qm", "SHOW_RESEARCH_LOG"); print GM_LANG_SHOW_RESEARCH_LOG; ?>
         </td>
         <td class="shade1">
           <select size="1" name="v_SHOW_ACTION_LIST"><?php WriteAccessOption($SHOW_ACTION_LIST); ?></select>
@@ -399,7 +399,7 @@ if ($action=="update") {
     		<td class="topbottombar <?php print $TEXT_DIRECTION;?>">
 		<?php
     		print "<a href=\"javascript: ".GM_LANG_age_privacy."\" onclick=\"expand_layer('age-privacy-options');return false\"><img id=\"age-privacy-options_img\" src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["plus"]["other"]."\" border=\"0\" width=\"11\" height=\"11\" alt=\"\" /></a> ";
-		print_help_link("age_privacy_help", "qm", "age_privacy");
+		PrintHelpLink("age_privacy_help", "qm", "age_privacy");
     		?>
         	<a href="javascript: <?php print GM_LANG_age_privacy; ?>" onclick="expand_layer('age-privacy-options');return false"><b><?php print GM_LANG_age_privacy; ?></b></a>
         	</td>
@@ -410,27 +410,27 @@ if ($action=="update") {
     <div id="age-privacy-options" style="display: none">
     <table class="facts_table">
 	<tr>
-		<td class="shade2 wrap width40 <?php print $TEXT_DIRECTION;?>"><?php print_help_link("HIDE_LIVE_PEOPLE_help", "qm", "HIDE_LIVE_PEOPLE"); print GM_LANG_HIDE_LIVE_PEOPLE;?></td>
+		<td class="shade2 wrap width40 <?php print $TEXT_DIRECTION;?>"><?php PrintHelpLink("HIDE_LIVE_PEOPLE_help", "qm", "HIDE_LIVE_PEOPLE"); print GM_LANG_HIDE_LIVE_PEOPLE;?></td>
 		<td class="shade1 width60">
 			<select size="1" name="v_HIDE_LIVE_PEOPLE"><?php WriteAccessOption($HIDE_LIVE_PEOPLE); ?></select>
 		</td>
 	</tr>
       <tr>
-        <td class="shade2 wrap width40 <?php print $TEXT_DIRECTION;?>"><?php print_help_link("SHOW_DEAD_PEOPLE_help", "qm", "SHOW_DEAD_PEOPLE"); print GM_LANG_SHOW_DEAD_PEOPLE; ?>
+        <td class="shade2 wrap width40 <?php print $TEXT_DIRECTION;?>"><?php PrintHelpLink("SHOW_DEAD_PEOPLE_help", "qm", "SHOW_DEAD_PEOPLE"); print GM_LANG_SHOW_DEAD_PEOPLE; ?>
         </td>
         <td class="shade1 width60">
           <select size="1" name="v_SHOW_DEAD_PEOPLE"><?php WriteAccessOption($SHOW_DEAD_PEOPLE); ?></select>
         </td>
       </tr>
       <tr>
-        <td class="shade2 wrap"><?php print_help_link("SHOW_LIVING_NAMES_help", "qm", "SHOW_LIVING_NAMES"); print GM_LANG_SHOW_LIVING_NAMES; ?>
+        <td class="shade2 wrap"><?php PrintHelpLink("SHOW_LIVING_NAMES_help", "qm", "SHOW_LIVING_NAMES"); print GM_LANG_SHOW_LIVING_NAMES; ?>
         </td>
         <td class="shade1">
           <select size="1" name="v_SHOW_LIVING_NAMES"><?php WriteAccessOption($SHOW_LIVING_NAMES); ?></select>
         </td>
       </tr>
       <tr>
-        <td class="shade2 wrap"><?php print_help_link("PRIVACY_BY_YEAR_help", "qm", "PRIVACY_BY_YEAR"); print GM_LANG_PRIVACY_BY_YEAR; ?>
+        <td class="shade2 wrap"><?php PrintHelpLink("PRIVACY_BY_YEAR_help", "qm", "PRIVACY_BY_YEAR"); print GM_LANG_PRIVACY_BY_YEAR; ?>
         </td>
         <td class="shade1">
           <select size="1" name="v_PRIVACY_BY_YEAR"><?php WriteYesNo($PRIVACY_BY_YEAR); ?></select>
@@ -438,7 +438,7 @@ if ($action=="update") {
       </tr>
       
       <tr>
-        <td class="shade2 wrap"><?php print_help_link("USE_RELATIONSHIP_PRIVACY_help", "qm", "USE_RELATIONSHIP_PRIVACY"); print GM_LANG_USE_RELATIONSHIP_PRIVACY; ?>
+        <td class="shade2 wrap"><?php PrintHelpLink("USE_RELATIONSHIP_PRIVACY_help", "qm", "USE_RELATIONSHIP_PRIVACY"); print GM_LANG_USE_RELATIONSHIP_PRIVACY; ?>
         </td>
         <td class="shade1">
           <select size="1" name="v_USE_RELATIONSHIP_PRIVACY"><?php WriteYesNo($USE_RELATIONSHIP_PRIVACY); ?></select>
@@ -446,7 +446,7 @@ if ($action=="update") {
       </tr>
 
       <tr>
-        <td class="shade2 wrap"><?php print_help_link("MAX_RELATION_PATH_LENGTH_help", "qm", "MAX_RELATION_PATH_LENGTH"); print GM_LANG_MAX_RELATION_PATH_LENGTH; ?>
+        <td class="shade2 wrap"><?php PrintHelpLink("MAX_RELATION_PATH_LENGTH_help", "qm", "MAX_RELATION_PATH_LENGTH"); print GM_LANG_MAX_RELATION_PATH_LENGTH; ?>
         </td>
         <td class="shade1">
           <select size="1" name="v_MAX_RELATION_PATH_LENGTH"><?php
@@ -462,14 +462,14 @@ if ($action=="update") {
       </tr>
 
       <tr>
-        <td class="shade2 wrap"><?php print_help_link("CHECK_MARRIAGE_RELATIONS_help", "qm", "CHECK_MARRIAGE_RELATIONS"); print GM_LANG_CHECK_MARRIAGE_RELATIONS; ?>
+        <td class="shade2 wrap"><?php PrintHelpLink("CHECK_MARRIAGE_RELATIONS_help", "qm", "CHECK_MARRIAGE_RELATIONS"); print GM_LANG_CHECK_MARRIAGE_RELATIONS; ?>
         </td>
         <td class="shade1">
           <select size="1" name="v_CHECK_MARRIAGE_RELATIONS"><?php WriteYesNo($CHECK_MARRIAGE_RELATIONS); ?></select>
         </td>
       </tr>
 	<tr>
-		<td class="shade2 wrap"><?php print_help_link("CHECK_CHILD_DATES_help", "qm", "CHECK_CHILD_DATES"); print GM_LANG_CHECK_CHILD_DATES;?></td>
+		<td class="shade2 wrap"><?php PrintHelpLink("CHECK_CHILD_DATES_help", "qm", "CHECK_CHILD_DATES"); print GM_LANG_CHECK_CHILD_DATES;?></td>
 		<td class="shade1"><select name="v_CHECK_CHILD_DATES">
 				<option value="yes" <?php if ($CHECK_CHILD_DATES) print "selected=\"selected\""; ?>><?php print GM_LANG_yes;?></option>
 				<option value="no" <?php if (!$CHECK_CHILD_DATES) print "selected=\"selected\""; ?>><?php print GM_LANG_no;?></option>
@@ -478,7 +478,7 @@ if ($action=="update") {
 	</tr>
       
 	  <tr>
-		<td class="shade2 wrap"><?php print_help_link("MAX_ALIVE_AGE_help", "qm", "MAX_ALIVE_AGE"); print GM_LANG_MAX_ALIVE_AGE?>
+		<td class="shade2 wrap"><?php PrintHelpLink("MAX_ALIVE_AGE_help", "qm", "MAX_ALIVE_AGE"); print GM_LANG_MAX_ALIVE_AGE?>
 		</td>
 		<td class="shade1"><input type="text" name="v_MAX_ALIVE_AGE" value="<?php print $MAX_ALIVE_AGE?>" size="5"/>
 		</td>
@@ -494,7 +494,7 @@ if ($action=="update") {
      	<tr>
      		<td class="topbottombar <?php print $TEXT_DIRECTION;?>">
      		<?php
-		print "<a href=\"javascript: ".GM_LANG_person_privacy."\" onclick=\"expand_layer('person-privacy-options');return false\"><img id=\"person-privacy-options_img\" src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["plus"]["other"]."\" border=\"0\" width=\"11\" height=\"11\" alt=\"\" /></a> ";?><?php print_help_link("person_privacy_help", "qm", "person_privacy");?>
+		print "<a href=\"javascript: ".GM_LANG_person_privacy."\" onclick=\"expand_layer('person-privacy-options');return false\"><img id=\"person-privacy-options_img\" src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["plus"]["other"]."\" border=\"0\" width=\"11\" height=\"11\" alt=\"\" /></a> ";?><?php PrintHelpLink("person_privacy_help", "qm", "person_privacy");?>
         	<a href="javascript: <?php print GM_LANG_person_privacy; ?>" onclick="expand_layer('person-privacy-options');return false"><b><?php print GM_LANG_person_privacy; ?></b></a>
         	</td>
 		</tr>
@@ -521,7 +521,7 @@ if ($action=="update") {
 			 LinkFunctions::PrintFindIndiLink("v_new_person_privacy_access_ID", $gedid);
 			 LinkFunctions::PrintFindFamilyLink("v_new_person_privacy_access_ID");
 			 LinkFunctions::PrintFindSourceLink("v_new_person_privacy_access_ID");
-			 LinkFunctions::PrintFindObjectLink("v_new_person_privacy_access_ID");             
+			 LinkFunctions::PrintFindMediaLink("v_new_person_privacy_access_ID");             
 			 LinkFunctions::PrintFindNoteLink("v_new_person_privacy_access_ID");             
 			 ?>
               </td>
@@ -574,7 +574,7 @@ if ($action=="update") {
 		<tr>
 			<td class="topbottombar <?php print $TEXT_DIRECTION;?>">
      		<?php
-    		print "<a href=\"javascript: ".GM_LANG_user_privacy."\" onclick=\"expand_layer('user-privacy-options');return false\"><img id=\"user-privacy-options_img\" src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["plus"]["other"]."\" border=\"0\" width=\"11\" height=\"11\" alt=\"\" /></a> ";?><?php print_help_link("user_privacy_help", "qm", "user_privacy");?>
+    		print "<a href=\"javascript: ".GM_LANG_user_privacy."\" onclick=\"expand_layer('user-privacy-options');return false\"><img id=\"user-privacy-options_img\" src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["plus"]["other"]."\" border=\"0\" width=\"11\" height=\"11\" alt=\"\" /></a> ";?><?php PrintHelpLink("user_privacy_help", "qm", "user_privacy");?>
 		<a href="javascript: <?php print GM_LANG_user_privacy; ?>" onclick="expand_layer('user-privacy-options');return false"><b><?php print GM_LANG_user_privacy; ?></b></a>
         	</td>
 		</tr>
@@ -619,7 +619,7 @@ if ($action=="update") {
 			 LinkFunctions::PrintFindIndiLink("v_new_user_privacy_access_ID","");
 			 LinkFunctions::PrintFindFamilyLink("v_new_user_privacy_access_ID");
 			 LinkFunctions::PrintFindSourceLink("v_new_user_privacy_access_ID");
-			 LinkFunctions::PrintFindObjectLink("v_new_user_privacy_access_ID");             
+			 LinkFunctions::PrintFindMediaLink("v_new_user_privacy_access_ID");             
 			 LinkFunctions::PrintFindNoteLink("v_new_user_privacy_access_ID");             
                 ?>
               </td>
@@ -674,7 +674,7 @@ if ($action=="update") {
 	<table class="facts_table"><tr><td class="topbottombar <?php print $TEXT_DIRECTION;?>">
      <?php
     print "<a href=\"javascript: ".GM_LANG_global_facts."\" onclick=\"expand_layer('global-facts-options');return false\"><img id=\"global-facts-options_img\" src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["plus"]["other"]."\" border=\"0\" width=\"11\" height=\"11\" alt=\"\" /></a> ";?>
-    	   <?php print_help_link("global_facts_help", "qm", "global_facts");?>
+    	   <?php PrintHelpLink("global_facts_help", "qm", "global_facts");?>
 	   <a href="javascript: <?php print GM_LANG_global_facts; ?>" onclick="expand_layer('global-facts-options');return false"><b><?php print GM_LANG_global_facts; ?></b></a></td>
       </tr>
     </table>
@@ -761,7 +761,7 @@ if ($action=="update") {
 	<table class="facts_table"><tr><td class="topbottombar <?php print $TEXT_DIRECTION;?>">
      <?php
     print "<a href=\"javascript: ".GM_LANG_person_facts."\" onclick=\"expand_layer('person-facts-options');return false\"><img id=\"person-facts-options_img\" src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["plus"]["other"]."\" border=\"0\" width=\"11\" height=\"11\" alt=\"\" /></a> ";?>
-    	   <?php print_help_link("person_facts_help", "qm", "person_facts");?>
+    	   <?php PrintHelpLink("person_facts_help", "qm", "person_facts");?>
 	   <a href="javascript: <?php print GM_LANG_person_facts; ?>" onclick="expand_layer('person-facts-options');return false"><b><?php print GM_LANG_person_facts; ?></b></a></td>
       </tr>
     </table>
@@ -788,7 +788,7 @@ if ($action=="update") {
              LinkFunctions::PrintFindIndiLink("v_new_person_facts_access_ID","");
 			 LinkFunctions::PrintFindFamilyLink("v_new_person_facts_access_ID");
 			 LinkFunctions::PrintFindSourceLink("v_new_person_facts_access_ID");
-			 LinkFunctions::PrintFindObjectLink("v_new_person_facts_access_ID");             
+			 LinkFunctions::PrintFindMediaLink("v_new_person_facts_access_ID");             
 			 LinkFunctions::PrintFindNoteLink("v_new_person_facts_access_ID");             
                 ?>
               </td>

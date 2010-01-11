@@ -58,7 +58,7 @@ function print_gedcom_stats($block = true, $config="", $side, $index) {
 
 		print "<div id=\"gedcom_stats\" class=\"block\">\n";
 		print "<div class=\"blockhc\">";
-		print_help_link("index_stats_help", "qm", "gedcom_stats");
+		PrintHelpLink("index_stats_help", "qm", "gedcom_stats");
 		if ($GM_BLOCKS["print_gedcom_stats"]["canconfig"]) {
 			$username = $gm_user->username;
 			if ((($command=="gedcom")&&($gm_user->userGedcomAdmin())) || (($command=="user")&&(!empty($username)))) {
@@ -143,7 +143,7 @@ function print_gedcom_stats($block = true, $config="", $side, $index) {
 			$surnames = GetCommonSurnamesIndex($GEDCOMID);
 			if (count($surnames)>0) {
 				print "<br />";
-				print_help_link("index_common_names_help", "qm", "common_surnames");
+				PrintHelpLink("index_common_names_help", "qm", "common_surnames");
 				print "<b>".GM_LANG_common_surnames."</b><br />\n";
 				$i=0;
 				foreach($surnames as $indexval => $surname) {

@@ -48,13 +48,13 @@ if (($help == "help_login_register.php")&& ($actione == "pwlost")) $help = "help
 if ($help == "help_contents_help") {
 	if ($gm_user->userIsAdmin()) {
 		$help = "admin_help_contents_help";
-		print_text("admin_help_contents_head_help");
+		PrintText("admin_help_contents_head_help");
 	}
-	else print_text("help_contents_head_help");
-	print_help_index($help);
+	else PrintText("help_contents_head_help");
+	PrintHelpIndex($help);
 }
 else {
-	$text = print_text($help, 0, 1);
+	$text = PrintText($help, 0, 1);
 	print $text;
 	if ($gm_user->UserIsAdmin()) {
 		$stat = GetLangvarStatus($help, $LANGUAGE, $type="help");

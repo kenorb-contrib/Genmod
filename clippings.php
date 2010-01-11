@@ -83,7 +83,7 @@ if($clippings_controller->action == 'download') {
 if (!isset($clippings_controller->cart[$GEDCOMID]) || count($clippings_controller->cart[$GEDCOMID]) == 0) {
 
 	// NOTE: display helptext when cart is empty
-	if ($clippings_controller->action != 'add') print_text("help_clippings.php");
+	if ($clippings_controller->action != 'add') PrintText("help_clippings.php");
 	
 	// -- end new lines
 	print "\r\n\t\t<br /><br />".GM_LANG_cart_is_empty."<br /><br />";
@@ -130,16 +130,16 @@ else {
 		print "<form method=\"post\" action=\"clippings.php\">\n<input type=\"hidden\" name=\"action\" value=\"download\" />\n";
 		?>
 		<table>
-		<tr><td><input type="checkbox" name="convert" value="yes" /></td><td><?php print GM_LANG_utf8_to_ansi; print_help_link("utf8_ansi_help", "qm"); ?></td></tr>
-		<tr><td><input type="checkbox" name="remove" value="yes" checked="checked" /></td><td><?php print GM_LANG_remove_custom_tags; print_help_link("remove_tags_help", "qm"); ?></td></tr>
+		<tr><td><input type="checkbox" name="convert" value="yes" /></td><td><?php print GM_LANG_utf8_to_ansi; PrintHelpLink("utf8_ansi_help", "qm"); ?></td></tr>
+		<tr><td><input type="checkbox" name="remove" value="yes" checked="checked" /></td><td><?php print GM_LANG_remove_custom_tags; PrintHelpLink("remove_tags_help", "qm"); ?></td></tr>
 		</table>
 		<input type="submit"  value="<?php print GM_LANG_download_now; ?>" />
 		<?php
-		print_help_link("clip_download_help", "qm");
+		PrintHelpLink("clip_download_help", "qm");
 		print "<br /></form>";
 	}
 	print "\r\n\t<br /><a href=\"clippings.php?action=empty\">".GM_LANG_empty_cart."  "."</a>";
-	print_help_link("empty_cart_help", "qm");
+	PrintHelpLink("empty_cart_help", "qm");
 }
 if (isset($_SESSION["cart"])) $_SESSION["cart"] = $clippings_controller->cart;
 PrintFooter();

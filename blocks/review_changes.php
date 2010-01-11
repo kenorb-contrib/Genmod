@@ -83,7 +83,7 @@ function review_changes_block($block = true, $config="", $side, $index) {
 	if ($display_block && $gm_user->userCanEdit()) {
 		print "<div id=\"review_changes_block\" class=\"block\">\n";
 		print "<div class=\"blockhc\">";
-		print_help_link("review_changes_help", "qm", "review_changes");
+		PrintHelpLink("review_changes_help", "qm", "review_changes");
 		if ($GM_BLOCKS["review_changes_block"]["canconfig"]) {
 			if ((($command=="gedcom")&&($gm_user->userGedcomAdmin())) || (($command=="user")&&($gm_user->username != ""))) {
 				if ($command=="gedcom") $name = preg_replace("/'/", "\'", get_gedcom_from_id($GEDCOMID));

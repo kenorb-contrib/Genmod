@@ -91,7 +91,7 @@ class FamilyBookController extends ChartController {
 	public function PrintInputDescentSteps() {
 	
 		print "<tr><td class=\"shade2\" >";
-		print_help_link("desc_descent_help", "qm");
+		PrintHelpLink("desc_descent_help", "qm");
 		print GM_LANG_descent_steps."&nbsp;</td>";
 		print "<td class=\"shade1 vmiddle\">";
 		print "<input class=\"pedigree_form\" type=\"text\" size=\"3\" name=\"num_descent\" value=\"".$this->num_descent."\" />";
@@ -101,7 +101,7 @@ class FamilyBookController extends ChartController {
 	public function PrintInputShowSpouse() {
 		
 		print "<tr><td class=\"shade2\" >";
-		print_help_link("show_spouse_help", "qm");
+		PrintHelpLink("show_spouse_help", "qm");
 		print GM_LANG_show_spouses."&nbsp;</td>";
 		print "<td class=\"shade1 vmiddle\">";
 		print "<input type=\"checkbox\" value=\"1\" name=\"show_spouse\"";

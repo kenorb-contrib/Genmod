@@ -150,7 +150,7 @@ function GetSortableName($pid, $alpha="", $surname="", $allnames=false, $rev = f
 		if (ChangeFunctions::GetChangeData(true, $pid, true, "", "")) {
 			$rec = ChangeFunctions::GetChangeData(false, $pid, true, "", "");
 			$gedrec = $rec[$GEDCOMID][$pid];
-			if (!empty($gedrec)) $names = GetIndiNames($gedrec);
+			if (!empty($gedrec)) $names = NameFunctions::GetIndiNames($gedrec);
 		}
 	}
 
@@ -168,7 +168,7 @@ function GetSortableName($pid, $alpha="", $surname="", $allnames=false, $rev = f
 		if (!empty($gedrec) && !isset($names)) {
 			// If called from the sanity check, the indilist doesn't contain the names. In that case we get them separately.
 			if (isset($indilist[$key]["names"])) $names = $indilist[$key]["names"];
-			else $names = GetIndiNames($gedrec);
+			else $names = NameFunctions::GetIndiNames($gedrec);
 		}
 		else {
 			if ($allnames == true && !isset($names)) {
@@ -239,7 +239,7 @@ function GetPersonName($pid, $indirec="", $starred=true) {
 				//-- cache missed, so load the person into the cache with the FindPersonRecord function
 				//-- and get the name from the cache again
 				$indirec = FindPersonRecord($pid);
-				$names = GetIndiNames($indirec);
+				$names = NameFunctions::GetIndiNames($indirec);
 				$name = $names[0][0];
 			}
 		}
@@ -256,12 +256,12 @@ function GetPersonName($pid, $indirec="", $starred=true) {
 //						$name = $names[0][0];
 //					}
 //				}
-			$names = GetIndiNames($indirec);
+			$names = NameFunctions::GetIndiNames($indirec);
 			$name = $names[0][0];
 		}
 	}
 	if ($NAME_REVERSE ||HasChinese($name, true)) $name = NameFunctions::ReverseName($name);
-	$name = CheckNN($name, $starred);
+	$name = NameFunctions::CheckNN($name, $starred);
 	return $name;
 }
 
@@ -416,9 +416,9 @@ function GetFamilyDescriptor($fid, $rev = false, $famrec="", $changes = false, $
 		else $wname = "@N.N., @P.N.";
 	}
 
-	if (!empty($hname) && !empty($wname)) return CheckNN($hname,$starred)." + ".CheckNN($wname,$starred);
-	else if (!empty($hname) && empty($wname)) return CheckNN($hname,$starred);
-	else if (empty($hname) && !empty($wname)) return CheckNN($wname,$starred);
+	if (!empty($hname) && !empty($wname)) return NameFunctions::CheckNN($hname,$starred)." + ".CheckNN($wname,$starred);
+	else if (!empty($hname) && empty($wname)) return NameFunctions::CheckNN($hname,$starred);
+	else if (empty($hname) && !empty($wname)) return NameFunctions::CheckNN($wname,$starred);
 }
 
 function GetFamilyAddDescriptor($fid, $rev = false, $famrec="", $changes = false) {
@@ -445,9 +445,9 @@ function GetFamilyAddDescriptor($fid, $rev = false, $famrec="", $changes = false
 		if ($rev) $wname = "@P.N. @N.N.";
 		else $wname = "@N.N., @P.N.";
 	}
-	if (!empty($hname) && !empty($wname)) return CheckNN($hname)." + ".CheckNN($wname);
-	else if (!empty($hname) && empty($wname)) return CheckNN($hname);
-	else if (empty($hname) && !empty($wname)) return CheckNN($wname);
+	if (!empty($hname) && !empty($wname)) return NameFunctions::CheckNN($hname)." + ".CheckNN($wname);
+	else if (!empty($hname) && empty($wname)) return NameFunctions::CheckNN($hname);
+	else if (empty($hname) && !empty($wname)) return NameFunctions::CheckNN($wname);
 }
 
 /**
@@ -684,78 +684,7 @@ function GetFirstLetter($text, $import=false) {
 	return $letter;
 }
 
-/**
- * This function replaces @N.N. and @P.N. with the language specific translations
- * @param mixed $names	$names could be an array of name parts or it could be a string of the name
- * @return string
- */
-function CheckNN($names, $starred=true) {
-	global $HNN, $ANN;
 
-	$fullname = "";
-	$NN = GM_LANG_NN;
- 	$PN = GM_LANG_PN;
-
-	if (!is_array($names)){
-		if (hasRTLText($names)) {
-			$NN = RTLUndefined($names);
-			$PN = $NN;
-		}
-		$names = stripslashes($names);
-		if (HasChinese($names, true)) $names = preg_replace(array("~ /~","~/,~","~/~"), array("", ",", ""), $names);
-		else $names = preg_replace(array("~ /~","~/,~","~/~"), array(" ", ",", " "), $names);
-		$names = preg_replace(array("/@N.N.?/","/@P.N.?/"), array($NN,$PN), trim($names));
-
-		if (GedcomConfig::$UNDERLINE_NAME_QUOTES) {
-			if ($starred) $names = preg_replace("/\"(.+)\"/", "<span class=\"starredname\">$1</span>", $names);
-			else $names = preg_replace("/\"(.+)\"/", "$1", $names);
-		}
-		//-- underline names with a * at the end
-		//-- see this forum thread http://sourceforge.net/forum/forum.php?thread_id=1223099&forum_id=185165
-		if ($starred) $names = preg_replace("/([^ ]+)\*/", "<span class=\"starredname\">$1</span>", $names);
-		else $names = preg_replace("/([^ ]+)\*/", "$1", $names);
-		return $names;
-	}
-	if (count($names) == 2 && stristr($names[0], "@N.N") && stristr($names[1], "@N.N")){
-		$fullname = GM_LANG_NN. " + ". GM_LANG_NN;
-	}
-	else {
-		for($i=0; $i<count($names); $i++) {
-			if (hasRTLText($names[$i])) {
-				$NN = RTLUndefined($names[$i]);
-				$PN = $NN;
-			}
-			
-			for($i=0; $i<count($names); $i++) {
-				if (GedcomConfig::$UNDERLINE_NAME_QUOTES) {
-					if ($starred) $names[$i] = preg_replace("/\"(.+)\"/", "<span class=\"starredname\">$1</span>", $names[$i]);
-					else $names[$i] = preg_replace("/\"(.+)\"/", "$1", $names[$i]);
-				}
-				//-- underline names with a * at the end
-				//-- see this forum thread http://sourceforge.net/forum/forum.php?thread_id=1223099&forum_id=185165
-				if ($starred) $names[$i] = preg_replace("/([^ ]+)\*/", "<span class=\"starredname\">$1</span>", $names[$i]);
-				else $names[$i] = preg_replace("/([^ ]+)\*/", "$1", $names[$i]);
-
-				if (stristr($names[$i], "@N.N")) $names[$i] = preg_replace("/@N.N.?/", $NN, trim($names[$i]));
-                if (stristr($names[$i], "@P.N")) $names[$i] = $PN;
-				if (substr(trim($names[$i]), 0, 5) == "@P.N." && strlen(trim($names[$i])) > 5) {
-					$names[$i] = substr(trim($names[$i]), 5, (strlen($names[$i])-5));
-				}
- 				if ($i==1 && (stristr($names[0], GM_LANG_NN) || stristr($names[0],$HNN) || stristr($names[0],$ANN)) && count($names) == 3) $fullname .= ", ";
- 				else if ($i==2 && (stristr($names[2], GM_LANG_NN)||stristr($names[2],$HNN)||stristr($names[2],$ANN)) && count($names) == 3) $fullname .= " + ";
-				else if ($i==2 && stristr($names[2], "Individual ") && count($names) == 3) $fullname .= " + ";
-				else if ($i==2 && count($names) > 3) $fullname .= " + ";
-				else $fullname .= ", ";
-				$fullname .= trim($names[$i]);
-			}
-		}
-	}
-	if (empty($fullname)) return GM_LANG_NN;
-	if (substr(trim($fullname),-1) === ",") $fullname = substr($fullname,0,strlen(trim($fullname))-1);
-	if (substr(trim($fullname),0,2) === ", ") $fullname = substr($fullname,2,strlen(trim($fullname)));
-
-	return $fullname;
-}
 
 /**
  * Put all characters in a string in lowercase
@@ -910,81 +839,6 @@ function SmartUtf8Decode($in_str) {
 	$new_str = str_replace("&oelig;", "\x9c", $new_str);
 	$new_str = str_replace("&OElig;", "\x8c", $new_str);
 	return $new_str;
-}
-
-/**
- * get an array of names from an indivdual record
- * @param string $indirec	The raw individual gedcom record
- * @return array	The array of individual names
- */
-function GetIndiNames($indirec, $import=false, $marr_names=true) {
-	$names = array();
-	//-- get all names
-	$namerec = GetSubRecord(1, "1 NAME", $indirec, 1);
-	if (empty($namerec)) $names[] = array("@P.N. /@N.N./", "@", "@N.N.", "A");
-	else {
-		$j = 1;
-		while(!empty($namerec)) {
-			$name = NameFunctions::GetNameInRecord($namerec, $import);
-			$surname = ExtractSurname($name);
-			if (empty($surname)) $surname = "@N.N.";
-			$lname = preg_replace("/^[a-z0-9 \.]+/", "", $surname);
-			if (empty($lname)) $lname = $surname;
-			$letter = GetFirstLetter($lname, $import);
-			$letter = Str2Upper($letter);
-			if (empty($letter)) $letter = "@";
-			if (preg_match("~/~", $name)==0) $name .= " /@N.N./";
-			if ($j == 1) $names[] = array($name, $letter, $surname, "P");
-			else $names[] = array($name, $letter, $surname, "A");
-
-			//-- check for _HEB or ROMN name sub tags
-			$addname = GetAddPersonNameInRecord($namerec, true, $import);
-			if (!empty($addname)) {
-				$surname = ExtractSurname($addname);
-				if (empty($surname)) $surname = "@N.N.";
-				$lname = preg_replace("/^[a-z0-9 \.]+/", "", $surname);
-				if (empty($lname)) $lname = $surname;
-				$letter = GetFirstLetter($lname, $import);
-				$letter = Str2Upper($letter);
-				if (empty($letter)) $letter = "@";
-				if (preg_match("~/~", $addname)==0) $addname .= " /@N.N./";
-				$names[] = array($addname, $letter, $surname, "A");
-			}
-			//-- check for _MARNM name subtags
-			if ($marr_names) {
-				$ct = preg_match_all("/\d _MARNM (.*)/", $namerec, $match, PREG_SET_ORDER);
-				for($i=0; $i<$ct; $i++) {
-					$marriedname = trim($match[$i][1]);
-					$surname = ExtractSurname($marriedname);
-					if (empty($surname)) $surname = "@N.N.";
-					$lname = preg_replace("/^[a-z0-9 \.]+/", "", $surname);
-					if (empty($lname)) $lname = $surname;
-					$letter = GetFirstLetter($lname, $import);
-					$letter = Str2Upper($letter);
-					if (empty($letter)) $letter = "@";
-					if (preg_match("~/~", $marriedname)==0) $marriedname .= " /@N.N./";
-					$names[] = array($marriedname, $letter, $surname, "C");
-				}
-			}
-			//-- check for _AKA name subtags
-			$ct = preg_match_all("/\d _AKA (.*)/", $namerec, $match, PREG_SET_ORDER);
-			for($i=0; $i<$ct; $i++) {
-				$marriedname = trim($match[$i][1]);
-				$surname = ExtractSurname($marriedname, false);
-				if (empty($surname)) $surname = "@N.N.";
-				$lname = preg_replace("/^[a-z0-9 \.]+/", "", $surname);
-				if (empty($lname)) $lname = $surname;
-				$letter = GetFirstLetter($lname, $import);
-				$letter = Str2Upper($letter);
-				if (empty($letter)) $letter = "@";
-				if (preg_match("~/~", $marriedname)==0) $marriedname .= " /@N.N./";
-				$names[] = array($marriedname, $letter, $surname, "A");
-			}
-			$j++;
-			$namerec = GetSubRecord(1, "1 NAME", $indirec, $j);
-		}
-	}
-	return $names;
 }
 
 /**

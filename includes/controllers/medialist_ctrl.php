@@ -157,22 +157,5 @@ class MediaListController {
 		$this->mediainlist = count($this->medialist);
 		$db->FreeResult();
 	}
-
-	public function RetrieveFilterMediaList($filter) {
-		global $GEDCOMID;
-		$sql = "SELECT *, concat(m_titl, if(substr(if(substr(m_mfile,1,1)='.',substr(m_mfile,2),m_mfile),1,1)='/',substr(if(substr(m_mfile,1,1)='.',substr(m_mfile,2),m_mfile),2),if(substr(m_mfile,1,1)='.',substr(m_mfile,2),m_mfile))) as k FROM ".TBLPREFIX."media WHERE m_file='".$GEDCOMID."'";
-		if (!empty($filter)) $sql .= " AND (m_titl LIKE '%".$filter."%' OR m_mfile LIKE '%".$filter."%')";
-		$sql .= " ORDER BY k";
-		$db = NewQuery($sql);
-		$this->totalmediaitems = $db->NumRows();
-		while($row = $db->FetchAssoc()) {
-			$media =& MediaItem::GetInstance($row["m_media"], $row);
-			if ($media->disp) {
-				$this->medialist[$row["m_media"]."_".$row["m_file"]] = $media;
-			}
-		}
-		$this->mediainlist = count($this->medialist);
-		$db->FreeResult();
-	}
 }
 ?>

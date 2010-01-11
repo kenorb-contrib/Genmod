@@ -76,19 +76,19 @@ if ($action == "deletecount") {
 	<div class="admin_link"><a href="admin.php"><?php print GM_LANG_admin;?></a></div>
 	<?php if ($gm_user->userIsAdmin()) { ?>
 		<div class="admin_link">
-			<?php print_help_link("add_gedcom_help", "qm", "add_gedcom"); ?>
+			<?php PrintHelpLink("add_gedcom_help", "qm", "add_gedcom"); ?>
 			<a href="editconfig_gedcom.php?source=add_form"><?php print GM_LANG_add_gedcom;?></a>
 		</div>
 		<div class="admin_link">
-			<?php print_help_link("upload_gedcom_help", "qm", "upload_gedcom"); ?>
+			<?php PrintHelpLink("upload_gedcom_help", "qm", "upload_gedcom"); ?>
 			<a href="editconfig_gedcom.php?source=upload_form"><?php print GM_LANG_upload_gedcom;?></a>
 		</div>
 		<div class="admin_link">
-			<?php print_help_link("add_new_gedcom_help", "qm", "add_new_gedcom"); ?>
+			<?php PrintHelpLink("add_new_gedcom_help", "qm", "add_new_gedcom"); ?>
 			<a href="editconfig_gedcom.php?source=add_new_form"><?php print GM_LANG_add_new_gedcom;?></a>
 		</div>
 		<div class="admin_link">
-			<?php print_help_link("merge_gedcom_help", "qm", "merge_gedcom"); ?>
+			<?php PrintHelpLink("merge_gedcom_help", "qm", "merge_gedcom"); ?>
 			<a href="mergegedcom.php"><?php print GM_LANG_merge_gedcom;?></a>
 		</div>
 	<?php } ?>
@@ -106,7 +106,7 @@ if ($action == "deletecount") {
 			// Default gedcom choice
 			if (count($GEDCOMS)>0) {
 				if ($gm_user->userIsAdmin()) {
-					print_help_link("default_gedcom_help", "qm");
+					PrintHelpLink("default_gedcom_help", "qm");
 					print GM_LANG_DEFAULT_GEDCOM."&nbsp;";
 					print "<select name=\"default_ged\" class=\"header_select\" onchange=\"document.defaultform.submit();\">";
 					foreach($GEDCOMS as $gedc=>$gedarray) {

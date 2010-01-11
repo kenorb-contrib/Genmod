@@ -187,7 +187,7 @@ class PlaceListController extends ListController {
 		if (count($indisel) > 0) {
 			$select = "'".implode("','", $indisel)."'";
 			$indilist =& ListFunctions::GetIndiList("no", $select, false);
-			usort($indilist, "ItemObjSort");
+			uasort($indilist, "ItemObjSort");
 			foreach($indilist as $key => $indi) {
 				if ($factsel != "all") {
 					$add = false;
@@ -211,7 +211,7 @@ class PlaceListController extends ListController {
 		$positions["FAM"] = array();
 		if (count($famsel) > 0) {
 			$famlist =& ListFunctions::GetfamList("no", "'".implode("','", $famsel)."'", false);
-			usort($famlist, "ItemObjSort");
+			uasort($famlist, "ItemObjSort");
 			foreach($famlist as $key => $fam) {
 				if ($factsel != "all") {
 					$add = false;
@@ -234,7 +234,7 @@ class PlaceListController extends ListController {
 		$positions["SOUR"] = array();
 		if (count($soursel) > 0) {
 			$sourcelist =& ListFunctions::GetSourceList("'".implode("','", $soursel)."'", false);
-			usort($sourcelist, "SourceDescrSort");
+			uasort($sourcelist, "SourceDescrSort");
 			foreach($sourcelist as $key => $source) {
 				if ($factsel != "all") {
 					$add = false;

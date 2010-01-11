@@ -45,7 +45,7 @@ function print_random_media($block = true, $config="", $side, $index) {
 		$media = $mediacontroller->lastitem;
 		print "<div id=\"random_picture\" class=\"block\">\n";
 		print "<div class=\"blockhc ltr\">";
-		print_help_link("index_media_help", "qm", "random_picture");
+		PrintHelpLink("index_media_help", "qm", "random_picture");
 		print GM_LANG_random_picture;
 		print "</div>";
 		print "<div class=\"blockcontent";
