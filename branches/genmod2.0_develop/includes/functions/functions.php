@@ -721,7 +721,6 @@ function FindHighlightedObject($pid) {
 	while ($row = $res->FetchAssoc()) {
 		$media =& Mediaitem::GetInstance($row["m_media"], $row);
 		if ($media->disp) $media_ids[] = $row;
-//		if (PrivacyFunctions::DisplayDetailsByID($row["m_media"], "OBJE", 1, true)) $media_ids[] = $row;
 	}
 	$ids = count($media_ids);
 	if ($ids==0) return false;

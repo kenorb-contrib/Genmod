@@ -99,7 +99,7 @@ class FamilyController extends DetailController
 		
 		if (is_null($this->title)) {
 			$this->title = $this->family->descriptor;
-			$add = $this->family->sortable_addname;
+			$add = $this->family->adddescriptor;
 			if ($add != "") $this->title .= "<br />".$add;
 		}
 		return $this->title;

@@ -232,7 +232,7 @@ function paste_id(value) {
 							}
 							print ">";
 							if (defined("GM_LANG_".$option)) print constant("GM_LANG_".$option);
-							else if (defined("GM_LANG_p_".$option])) print constant("GM_LANG_p_".$option);
+							else if (defined("GM_LANG_p_".$option)) print constant("GM_LANG_p_".$option);
 							else if (defined("GM_FACT_".$option)) print constant("GM_FACT_".$option);
 							else print $option;
 							print "</option>\n";

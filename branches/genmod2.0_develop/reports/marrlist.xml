@@ -1,14 +1,14 @@
 <GMReport access="PRIV_PUBLIC" icon="sfamily" type="general">
 	<!-- $Id$ -->
-	<GMRTitle><GMRvar var="gm_lang[marr_report]" /></GMRTitle>
+	<GMRTitle><GMRvar var="GM_LANG_marr_report" /></GMRTitle>
 	<GMRDescription>Prints a list of families matching specific name and/or marriage criteria</GMRDescription>
-	<GMRInput name="name" lookup="NAME" type="text"><GMRvar var="gm_lang[name]" /></GMRInput>
-	<GMRInput name="marrplace" lookup="PLAC" type="text"><GMRvar var="gm_lang[marrplace]" /> </GMRInput>
-	<GMRInput name="marrdate1" lookup="DATE" type="text"><GMRvar var="gm_lang[marrdate1]" /></GMRInput>
-	<GMRInput name="marrdate2" lookup="DATE" type="text"><GMRvar var="gm_lang[marrdate2]" /></GMRInput>
-	<GMRInput name="sortby" type="select" options="NAME,MARR"><GMRvar var="gm_lang[sort_by]" /></GMRInput>
-	<GMRInput name="showFamID" type="checkbox" default="SHOW_FAM_ID_NUMBERS"><GMRvar var="gm_lang[SHOW_FAM_ID_NUMBERS]" /></GMRInput>
-	<GMRInput name="pageSize" type="select" options="AVAIL_PAGE_SIZES" default="DEFAULT_PAGE_SIZE"><GMRvar var="gm_lang[page_size]" /></GMRInput>
+	<GMRInput name="name" lookup="NAME" type="text"><GMRvar var="GM_LANG_name" /></GMRInput>
+	<GMRInput name="marrplace" lookup="PLAC" type="text"><GMRvar var="GM_LANG_marrplace" /> </GMRInput>
+	<GMRInput name="marrdate1" lookup="DATE" type="text"><GMRvar var="GM_LANG_marrdate1" /></GMRInput>
+	<GMRInput name="marrdate2" lookup="DATE" type="text"><GMRvar var="GM_LANG_marrdate2" /></GMRInput>
+	<GMRInput name="sortby" type="select" options="NAME,MARR"><GMRvar var="GM_LANG_sort_by" /></GMRInput>
+	<GMRInput name="showFamID" type="checkbox" default="SHOW_FAM_ID_NUMBERS"><GMRvar var="GM_LANG_SHOW_FAM_ID_NUMBERS" /></GMRInput>
+	<GMRInput name="pageSize" type="select" options="AVAIL_PAGE_SIZES" default="DEFAULT_PAGE_SIZE"><GMRvar var="GM_LANG_page_size" /></GMRInput>
 	<GMRStyle name="header" font="LucidaSansUnicode" size="16" style="b" />
 	<GMRStyle name="pagenum" font="LucidaSansUnicode" size="8" style="" />
 	<GMRStyle name="text" font="LucidaSansUnicode" size="8" style="" />
@@ -16,25 +16,25 @@
 	<GMRStyle name="label" font="LucidaSansUnicode" size="8" style="" />
 	<GMRDoc pageSize="$pageSize" orientation="L" margin="24">
 		<GMRHeader>
-			<GMRCell width="0" height="20" align="center" style="header"><GMRvar var="gm_lang[marr_report]" /></GMRCell>
-			<!-- GMRCell width="0" height="10" align="right" style="pagenum"><GMRvar var="gm_lang[page]" /> <GMRPageNum /> <GMRvar var="gm_lang[of]" /> <GMRTotalPages /> - <GMRNow /></GMRCell -->
+			<GMRCell width="0" height="20" align="center" style="header"><GMRvar var="GM_LANG_marr_report" /></GMRCell>
+			<!-- GMRCell width="0" height="10" align="right" style="pagenum"><GMRvar var="GM_LANG_page" /> <GMRPageNum /> <GMRvar var="GM_LANG_of" /> <GMRTotalPages /> - <GMRNow /></GMRCell -->
 			<GMRTextBox width="50%" height="10" border="0">
 				<GMRText style="pagenum"><GMRNow /></GMRText>
 			</GMRTextBox>
 			<GMRTextBox width="0" height="10" border="0" newline="1">
-				<GMRText style="pagenum" align="right"><GMRvar var="gm_lang[page]" /> <GMRPageNum /> <GMRvar var="gm_lang[of]" /> <GMRTotalPages /></GMRText>
+				<GMRText style="pagenum" align="right"><GMRvar var="GM_LANG_page" /> <GMRPageNum /> <GMRvar var="GM_LANG_of" /> <GMRTotalPages /></GMRText>
 			</GMRTextBox>
 			<GMRTextBox width="200" height="12" border="1" fill="#DDDDDD">
-				<GMRText style="label"><GMRvar var="gm_lang[name]" /></GMRText>
+				<GMRText style="label"><GMRvar var="GM_LANG_name" /></GMRText>
 			</GMRTextBox>
 			<GMRTextBox width="100" height="12" border="1" fill="#DDDDDD">
-				<GMRText style="label"><GMRvar var="gm_lang[date]" /></GMRText>
+				<GMRText style="label"><GMRvar var="GM_LANG_date" /></GMRText>
 			</GMRTextBox>
 			<GMRTextBox width="225" height="12" border="1" fill="#DDDDDD">
-				<GMRText style="label"><GMRvar var="factarray[PLAC]" /></GMRText>
+				<GMRText style="label"><GMRvar var="GM_FACT_PLAC" /></GMRText>
 			</GMRTextBox>
 			<GMRTextBox width="225" height="12" border="1" fill="#DDDDDD" newline="1">
-				<GMRText style="label"><GMRvar var="factarray[SOUR]" /></GMRText>
+				<GMRText style="label"><GMRvar var="GM_FACT_SOUR" /></GMRText>
 			</GMRTextBox>
 		</GMRHeader>
 		<GMRBody>
@@ -84,7 +84,7 @@ i					<GMRTextBox width="220" height="12" border="0">
 				</GMRif>
 			</GMRList>
 			<GMRCell width="0" height="24" border="0" align="right" style="label">
-				<GMRvar var="gm_lang[total_fams]" />: <GMRvar var="printedFamilies" />
+				<GMRvar var="GM_LANG_total_fams" />: <GMRvar var="printedFamilies" />
 			</GMRCell>
 		</GMRBody>
 	</GMRDoc>

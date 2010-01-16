@@ -694,7 +694,7 @@ abstract class BlockFunctions {
 	//print "Mstart: ".$mstart." ".date("M", mktime(1,0,0,$mstart,1))."<br />";
 	//print "Dend: ".$dend."<br />";
 	//print "Mend: ".$mend." ".date("M", mktime(1,0,0,$mend,1))."<br />";
-		$sql = "SELECT i_key, i_id, i_file, i_gedrec, i_isdead, n_name, n_surname, n_nick, n_letter, n_type FROM ".TBLPREFIX."dates, ".TBLPREFIX."individuals, ".TBLPREFIX."names WHERE i_key=d_key AND n_key=i_key ";
+		$sql = "SELECT i_key, i_id, i_file, i_gedrec, i_isdead, n_name, n_surname, n_nick, n_letter, n_fletter, n_type FROM ".TBLPREFIX."dates, ".TBLPREFIX."individuals, ".TBLPREFIX."names WHERE i_key=d_key AND n_key=i_key ";
 		if ($onlyBDM == "yes") $sql .= " AND d_fact IN ('BIRT', 'DEAT')";
 		if ($filter == "living") $sql .= "AND i_isdead!='1'";
 	
@@ -712,7 +712,7 @@ abstract class BlockFunctions {
 				$person =& Person::GetInstance($row["i_id"], $row);
 				$indilist[$row["i_key"]] = $person;
 			}
-			if ($person->disp_name) $indilist[$row["i_key"]]->addname = array($row["n_name"], $row["n_letter"], $row["n_surname"], $row["n_nick"], $row["n_type"]);
+			if ($person->disp_name) $indilist[$row["i_key"]]->addname = array($row["n_name"], $row["n_letter"], $row["n_surname"], $row["n_nick"], $row["n_type"], $row["n_fletter"]);
 		}
 		if ($key != "") $person->names_read = true;
 		$res->FreeResult();

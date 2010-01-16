@@ -1910,6 +1910,7 @@ function GMRvarSHandler($attrs) {
 //print "<br />";
 	$var = $attrs["var"];
 	if (!empty($var)) {
+			print "var: ".$var."<br />";
 		if (!empty($vars[$var]['id'])) {
 			$var = $vars[$var]['id'];
 		}
@@ -1918,15 +1919,23 @@ function GMRvarSHandler($attrs) {
 			$ct = preg_match_all("/\\$(\w+)/", $var, $match, PREG_SET_ORDER);
 			for($i=0; $i<$ct; $i++) {
 				$t = $vars[$match[$i][1]]["id"];
+				print $t;
 				$var = preg_replace("/\\$".$match[$i][1]."/", $t, $var, 1);
 			}
 
 			$tfact = $fact;
 			if ($fact=="EVEN" || $fact=="FACT") $tfact = $type;
+			print "var2: ".$var."<br />";
 			$var = preg_replace(array("/\[/","/\]/","/@fact/","/@desc/"), array("['","']",$tfact,$desc), $var);
-			eval("if (!empty(\$$var)) \$var = \$$var;");
+			print "var3: ".$var."<br />";
+			eval("if (isset(\$$var) && !empty(\$$var)) \$var = \$$var;");
 			$ct = preg_match("/factarray\['(.*)'\]/", $var, $match);
 			if ($ct>0) $var = constant("GM_FACT_".$match[1]);
+			else {
+				$ct = preg_match("/gm_lang\['(.*)'\]/", $var, $match);
+				if ($ct>0) $var = constant("GM_LANG_".$match[1]);
+				else if (substr($var, 0, 8) == "GM_LANG_") $var = constant($var);
+			}
 		}
 		$currentElement->addText($var);
 	}
@@ -1939,7 +1948,7 @@ function GMRvarLetterSHandler($attrs) {
 	if (!empty($var)) {
 		$tfact = $fact;
 		$var = preg_replace(array("/\[/","/\]/","/@fact/","/@desc/"), array("['","']",$tfact,$desc), $var);
-		eval("if (!empty(\$$var)) \$var = \$$var;");
+		eval("if (isset(\$$var) && !empty(\$$var)) \$var = \$$var;");
 
 		$letter = GetFirstLetter($var);
 
@@ -2119,12 +2128,16 @@ function GMRSetVarSHandler($attrs) {
 		if ($gt > 0) $value = preg_replace("/@/", "", trim($gmatch[1]));
 	}
 
-	if ((substr($value, 0, 9) == "\GM_LANG_)) {
-		$var = preg_replace(array("/\[/","/\]/"), array("GM_LANG_",""), $value);
-		eval("\$value = $var;");
-	}
+//	if ((substr($value, 0, 9) == "\GM_LANG_)) {
+//		$var = preg_replace(array("/\[/","/\]/"), array("GM_LANG_",""), $value);
+//		eval("\$value = $var;");
+//	}
 	if (substr($value, 0, 11) == "\$factarray[") {
 		$var = preg_replace(array("/\$factarray\[/","/\]/"), array("GM_FACT_",""), $value);
+		eval("\$value = $var;");
+	}
+	if (substr($value, 0, 9) == "\$gm_lang[") {
+		$var = preg_replace(array("/\$gm_lang\[/","/\]/"), array("GM_LANG_",""), $value);
 		eval("\$value = $var;");
 	}
 
@@ -2526,7 +2539,7 @@ function GMRListSHandler($attrs) {
 						$gedline = FindRepoRecord($action->repo);
 						$gedline .= "\r\n1 _TODO\r\n";
 						$gedline .= "2 INDI @".$action->pid."@\r\n";
-						$gedline .= "2 _STAT ".GM_LANG_action.$action->status]."\r\n";
+						$gedline .= "2 _STAT ".constant("GM_LANG_action".$action->status)."\r\n";
 						$noteline = MakeCont("2 NOTE", $action->text);
 						$gedline .= $noteline;
 						$oldrepo = $action->repo;
@@ -2534,7 +2547,7 @@ function GMRListSHandler($attrs) {
 					else {
 						$gedline .= "1 _TODO\r\n";
 						$gedline .= "2 INDI @".$action->pid."@\r\n";
-						$gedline .= "2 _STAT ".GM_LANG_action.$action->status]."\r\n";
+						$gedline .= "2 _STAT ".constant("GM_LANG_action".$action->status)."\r\n";
 						$noteline = MakeCont("2 NOTE", $action->text);
 						$gedline .= $noteline;
 					}

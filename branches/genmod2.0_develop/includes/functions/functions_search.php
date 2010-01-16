@@ -52,9 +52,9 @@ function SearchIndisNames($query, $allgeds=false, $gedid=0) {
 	}
 
 	$myindilist = array();
-	if (!is_array($query)) $sql = "SELECT i_id, i_file, i_gedrec, i_isdead, n_name, n_letter, n_type, n_surname, n_nick FROM ".TBLPREFIX."individuals, ".TBLPREFIX."names WHERE i_key=n_key AND n_name REGEXP '".DbLayer::EscapeQuery($query)."'";
+	if (!is_array($query)) $sql = "SELECT i_id, i_file, i_gedrec, i_isdead, n_name, n_letter, n_fletter, n_type, n_surname, n_nick FROM ".TBLPREFIX."individuals, ".TBLPREFIX."names WHERE i_key=n_key AND n_name REGEXP '".DbLayer::EscapeQuery($query)."'";
 	else {
-		$sql = "SELECT i_id, i_file, i_gedrec, i_isdead, n_name, n_letter, n_type, n_surname, n_nick FROM ".TBLPREFIX."individuals, ".TBLPREFIX."names WHERE i_key=n_key AND (";
+		$sql = "SELECT i_id, i_file, i_gedrec, i_isdead, n_name, n_letter, n_fletter, n_type, n_surname, n_nick FROM ".TBLPREFIX."individuals, ".TBLPREFIX."names WHERE i_key=n_key AND (";
 		$i=0;
 		foreach($query as $indexval => $q) {
 			if (!empty($q)) {
@@ -76,12 +76,12 @@ function SearchIndisNames($query, $allgeds=false, $gedid=0) {
 		if ($allgeds) $key = $row["i_id"]."[".$row["i_file"]."]";
 		else $key = $row["i_id"];
 		if (!isset($myindilist[$key])) {
-			$myindilist[$key]["names"][] = array($row["n_name"], $row["n_letter"], $row["n_surname"], $row["n_nick"], $row["n_type"]);
+			$myindilist[$key]["names"][] = array($row["n_name"], $row["n_letter"], $row["n_surname"], $row["n_nick"], $row["n_type"], $row["n_fletter"]);
 			$myindilist[$key]["gedfile"] = $row["i_file"];
 			$myindilist[$key]["gedcom"] = $row["i_gedrec"];
 			$myindilist[$key]["isdead"] = $row["i_isdead"];
 		}
-		else $myindilist[$key]["names"][] = array($row["n_name"], $row["n_letter"], $row["n_surname"], $row["n_nick"], $row["n_type"]);
+		else $myindilist[$key]["names"][] = array($row["n_name"], $row["n_letter"], $row["n_surname"], $row["n_nick"], $row["n_type"], $row["n_fletter"]);
 		$indilist[$key] = $myindilist[$key];
 	}
 	$res->FreeResult();

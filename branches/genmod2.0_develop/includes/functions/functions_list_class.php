@@ -46,7 +46,7 @@ abstract class ListFunctions {
 		global $GEDCOMID;
 	
 		$indilist = array();
-		$sql = "SELECT i_key, i_gedrec, i_isdead, i_id, i_file, n_name, n_surname, n_nick, n_letter, n_type ";
+		$sql = "SELECT i_key, i_gedrec, i_isdead, i_id, i_file, n_name, n_surname, n_nick, n_letter, n_fletter, n_type ";
 		$sql .= "FROM ".TBLPREFIX."individuals, ".TBLPREFIX."names WHERE n_key=i_key ";
 		if ($allgeds == "no") {
 			$sql .= "AND i_file = ".$GEDCOMID." ";
@@ -82,7 +82,7 @@ abstract class ListFunctions {
 					self::$indi_hide[$row["i_key"]] = 1;
 				}
 			}
-			if ($person->disp_name || !$applypriv) $indilist[$row["i_key"]]->addname = array($row["n_name"], $row["n_letter"], $row["n_surname"], $row["n_nick"], $row["n_type"]);
+			if ($person->disp_name || !$applypriv) $indilist[$row["i_key"]]->addname = array($row["n_name"], $row["n_letter"], $row["n_surname"], $row["n_nick"], $row["n_type"], $row["n_fletter"]);
 		}
 		if ($key != "") $person->names_read = true;
 		$res->FreeResult();
@@ -90,91 +90,6 @@ abstract class ListFunctions {
 		return $indilist;
 	}
 	
-	/**
-	 * Print a list of surnames
-	 *
-	 * A table with columns is printed from an array of surnames. This can be individuals
-	 * or families.
-	 *
-	 * @todo		Add statistics for private and hidden links
-	 * @author	Genmod Development Team
-	 * @param		array		$personlist	The array with names to be printed
-	 * @param		string		$page		The page the links should point to
-	 */
-	public function PrintSurnameList($surnames, $page, $allgeds="no", $resturl="") {
-		global $TEXT_DIRECTION;
-		global $surname_sublist, $indilist;
-		
-		if (stristr($page, "aliveinyear")) {
-			$aiy = true;
-			global $indi_dead, $indi_alive, $indi_unborn;
-		}
-		else $aiy = false;
-		
-		$i = 0;
-		$count_indi = 0;
-		$col = 1;
-		$count = count($surnames);
-		if ($count == 0) return;
-		else if ($count>36) $col=4;
-		else if ($count>18) $col=3;
-		else if ($count>6) $col=2;
-		$newcol=ceil($count/$col);
-		print "<table class=\"center $TEXT_DIRECTION\"><tr>";
-		print "<td class=\"shade1 list_value wrap\">\n";
-		
-		// Surnames with starting and ending letters in 2 text orientations is shown in
-		// a wrong way on the page with different orientation from the orientation of the first name letter
-		foreach($surnames as $surname=>$namecount) {
-			if (begRTLText($namecount["name"])) {
-	 			print "<div class =\"rtl\" dir=\"rtl\">&nbsp;<a href=\"".$page."?alpha=".urlencode($namecount["alpha"])."&amp;surname_sublist=".$surname_sublist."&amp;surname=".urlencode($namecount["name"]).$resturl;
-	 			if ($allgeds == "yes") print "&amp;allgeds=yes";
-	 			print "\">&nbsp;";
-	 			if (HasChinese($namecount["name"])) print PrintReady($namecount["name"]." (".GetPinYin($namecount["name"]).")");
-	 			else print PrintReady($namecount["name"]);
-	 			print "&rlm; - [".($namecount["match"])."]&rlm;";
-			}
-			else if (substr($namecount["name"], 0, 4) == "@N.N") {
-				print "<div class =\"ltr\" dir=\"ltr\">&nbsp;<a href=\"".$page."?alpha=".$namecount["alpha"]."&amp;surname_sublist=$surname_sublist&amp;surname=@N.N.".$resturl;
-	 			if ($allgeds == "yes") print "&amp;allgeds=yes";
-				print "\">&nbsp;".GM_LANG_NN . "&lrm; - [".($namecount["match"])."]&lrm;&nbsp;";
-			}
-			else {
-				print "<div class =\"ltr\" dir=\"ltr\">&nbsp;<a href=\"".$page."?alpha=".urlencode($namecount["alpha"])."&amp;surname_sublist=$surname_sublist&amp;surname=".urlencode($namecount["name"]).$resturl;
-	 			if ($allgeds == "yes") print "&amp;allgeds=yes";
-				print "\">";
-	 			if (HasChinese($namecount["name"])) print PrintReady($namecount["name"]." (".GetPinYin($namecount["name"]).")");
-				else print PrintReady($namecount["name"]);
-				print "&lrm; - [".($namecount["match"])."]&lrm;";
-			}
-	
-	 		print "</a></div>\n";
-			$count_indi += $namecount["match"];
-			$i++;
-			if ($i==$newcol && $i<$count) {
-				print "</td><td class=\"shade1 list_value wrap\">\n";
-				$newcol=$i+ceil($count/$col);
-			}
-		}
-		if ($aiy) $indi_total = $indi_alive + $indi_dead + $indi_unborn + count(self::$indi_hide);
-		else if (is_array(self::$indi_total)) $indi_total = count(self::$indi_total);
-		print "</td>\n";
-		if ($count>1 || count(self::$indi_hide)>0) {
-			print "</tr><tr><td colspan=\"$col\" class=\"center\">&nbsp;";
-			if (GedcomConfig::$SHOW_MARRIED_NAMES && $count>1) print GM_LANG_total_names." ".$count_indi."<br />";
-			if (isset($indi_total) && $count>1) print GM_LANG_total_indis." ".$indi_total."&nbsp;";
-			if ($count>1 && count(self::$indi_hide)>0) print "--&nbsp;";
-			if (count(self::$indi_hide)>0) print GM_LANG_hidden." ".count(self::$indi_hide);
-			if ($count>1 && $aiy) {
-				print "<br />".GM_LANG_unborn."&nbsp;".$indi_unborn;
-				print "&nbsp;--&nbsp;".GM_LANG_alive."&nbsp;".$indi_alive;
-				print "&nbsp;--&nbsp;".GM_LANG_dead."&nbsp;".$indi_dead;
-			}
-			if ($count>1) print "<br />".GM_LANG_surnames." ".$count;
-			print "</td>\n";
-		}
-		print "</tr></table>";
-	}
 	/**
 	 * Add a surname to the surnames array for counting
 	 *
@@ -188,7 +103,6 @@ abstract class ListFunctions {
 		$lname = StripPrefix($nsurname);
 		if (empty($lname)) $lname = $nsurname;
 		if (($show_all=="yes") || empty($alpha) || ($alpha==$sort_letter)) {
-	//		$tsurname = preg_replace(array("/ [jJsS][rR]\.?/", "/ I+/"), array("",""), $nsurname);
 			$tsurname = Str2Upper(StripPrefix(preg_replace("/([^ ]+)\*/", "$1", $nsurname)));
 			if (empty($surname) || (Str2Upper($surname)==$tsurname)) {
 				if (!isset($surnames[$tsurname])) {

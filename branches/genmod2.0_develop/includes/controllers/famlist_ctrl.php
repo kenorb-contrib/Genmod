@@ -1,6 +1,6 @@
 <?php
 /**
- * Controller for the indilist Page
+ * Controller for the famlist Page
  *
  * Genmod: Genealogy Viewer
  * Copyright (C) 2005 - 2008 Genmod Development Team
@@ -33,12 +33,9 @@ if (stristr($_SERVER["SCRIPT_NAME"],basename(__FILE__))) {
 /**
  * Main controller class for the individual page.
  */
-class IndilistController extends ListController {
+class FamlistController extends ListController {
 	
-	public $classname = "IndilistController";	// Name of this class
-	
-	// Calculated values
-	
+	public $classname = "FamlistController";	// Name of this class
 	
 	public function __construct() {
 		
@@ -58,92 +55,85 @@ class IndilistController extends ListController {
 	protected function GetPageTitle() {
 
 		if (is_null($this->pagetitle)) {
-			$this->pagetitle = GM_LANG_individual_list." ".$this->addheader;
+			$this->pagetitle = GM_LANG_family_list." ".$this->addheader;
 		}
 		return $this->pagetitle;
 	}
 		
-	
-	/**
-	 * Get Individual surnames starting with a letter
-	 *
-	 * This function finds all of the individuals surnames who start with the given letter
-	 *
-	 * @param string $letter	The letter to search on
-	 * @return array	$names array
-	 */
-	public function GetAlphaIndiNames() {
+	public function GetAlphaFamSurnames($letter, $allgeds="no") {
 		global $GEDCOMID;
 	
-		$search_letter = $this->GetNameString($this->alpha);
+		$search_letter = $this->GetNameString($letter);
 		
-		// NOTE: Select the records from the individual table
-		$sql = "";
-		$sql = "SELECT DISTINCT n_surname, n_letter, count(i_key) as i_count FROM ".TBLPREFIX."names LEFT JOIN ".TBLPREFIX."individuals ON n_key=i_key";
-		$where = " WHERE ";
-		if (!empty($search_letter)) {
-			$sql .= $where.$search_letter;
-			$where = " AND ";
-		}
-		if (!GedcomConfig::$SHOW_MARRIED_NAMES) {
-			$sql .= $where."n_type NOT LIKE 'C'";
-			$where = " AND ";
-		}
-		if ($this->allgeds != "yes") {
-			$sql .= $where."n_file LIKE '".$GEDCOMID."'";
-			$where = " AND ";
-		}
-		$sql .= " GROUP BY n_surname";
-
+		$namelist = array();
+		$sql = "SELECT DISTINCT n_surname, count(DISTINCT if_fkey) as fams FROM ".TBLPREFIX."names, ".TBLPREFIX."individual_family WHERE n_key=if_pkey AND if_role='S' ";
+		if (!empty($search_letter)) $sql .= "AND ".$search_letter;
+		if ($allgeds != "yes") $sql .= " AND n_file = '".$GEDCOMID."' ";
+		$sql .= "GROUP BY n_surname";
 		$res = NewQuery($sql);
-		$names = array();
 		while($row = $res->FetchAssoc()) {
-			$names[] = array("name" => $row["n_surname"], "match" =>$row["i_count"], "alpha" => $row["n_letter"]);
+			$namelist[] = array("name"=>$row["n_surname"], "match"=>$row["fams"]);		
 		}
-		uasort($names, "ItemSort");
-		return $names;
-	}
-	
+		uasort($namelist, "ItemSort");
+		return $namelist;
+	}	
 	
 	/**
-	 * Get Individuals with a given surname or a given first surname letter or simply all indis
+	 * Get Families with a given surname
 	 *
 	 * This function finds all of the individuals who have the given surname
 	 * @param string $surname	The surname to search on
 	 * @return array	$indilist array
 	 */
-	public function GetIndis() {
+	public function GetFams() {
 		global $GEDCOMID;
-
+			
 		$search_letter = $this->GetNameString($this->alpha);
-		
-		$tindilist = array();
-		$sql = "SELECT i_key, i_id, i_file, i_isdead, i_gedrec, n_letter, n_fletter, n_name, n_surname, n_nick, n_type FROM ".TBLPREFIX."individuals, ".TBLPREFIX."names WHERE i_key=n_key";
+		$tfamlist = array();
+	
+		$sql = "SELECT DISTINCT f_key, f_id, f_husb, f_wife, f_file, f_gedrec FROM ".TBLPREFIX."names INNER JOIN ".TBLPREFIX."individual_family ON n_key=if_pkey INNER JOIN ".TBLPREFIX."families ON if_fkey=f_key WHERE if_role='S'";
 		
 		if ($this->surname != "") $sql .= " AND n_surname LIKE '".DbLayer::EscapeQuery($this->surname)."'";
 		else if (!empty($search_letter)) $sql .= " AND ".$search_letter;
 		if ($this->falpha != "") $sql .= " AND n_fletter='".$this->falpha."'";
 		if (!GedcomConfig::$SHOW_MARRIED_NAMES) $sql .= " AND n_type!='C'";
-		
-		if ($this->allgeds == "no") $sql .= " AND i_file='".$GEDCOMID."'";
+		if ($this->allgeds != "yes") $sql .= " AND n_file = '".$GEDCOMID."' ";
+		$sql .= "GROUP BY if_fkey";
 
-		$sql .= " ORDER BY i_key, n_id"; // Don't remove this!
-	
-		$res = NewQuery($sql);
-		while($row = $res->FetchAssoc()){
-			SwitchGedcom($row["i_file"]);
-			$key = $row["i_key"];
-			if (!isset($tindilist[$key])) {
-				$tindilist[$key] = Person::GetInstance($row["i_id"], array("i_isdead" => $row["i_isdead"], "i_file" =>$row["i_file"], "i_id" => $row["i_id"], "i_gedrec" => $row["i_gedrec"]), $row["i_file"]);
-			}
-			$tindilist[$key]->addname = array($row["n_name"], $row["n_letter"], $row["n_surname"], $row["n_nick"], $row["n_type"], $row["n_fletter"]);
+		// The previous query works for all surnames, including @N.N.
+		// But families with only one spouse (meaning the other is not known) are missing.
+		// In that case, we also select families with one role Spouse.
+		// What we exclude, is families where no spouses exist and which only consist of children.
+		if ($this->surname == "@N.N.") {
+			$sql .= " UNION SELECT f_key, f_id, f_husb, f_wife, f_file, f_gedrec FROM ".TBLPREFIX."individual_family WHERE if_role='S' ";
+			if ($this->allgeds != "yes") $sql .= " AND if_file = '".$GEDCOMID."'";
+			$sql .= " GROUP BY if_fkey HAVING count(if_fkey)=1";
 		}
-		SwitchGedcom();
+
+		$res = NewQuery($sql);
+		$select = array();
+		while($row = $res->FetchAssoc()){
+			$fam = null;
+			$fam =& Family::GetInstance($row["f_id"], $row, $row["f_file"]);
+			if ($row["f_husb"] != "" && !Person::IsInstance(SplitKey($row["f_husb"], "id"), $row["f_file"])) $select[] = $row["f_husb"];
+			if ($row["f_wife"] != "" && !Person::IsInstance(SplitKey($row["f_wife"], "id"), $row["f_file"])) $select[] = $row["f_wife"];
+			$tfamlist[$row["f_key"]] = $fam;
+		}
 		$res->FreeResult();
-		return $tindilist;
+	
+		if (count($tfamlist) > 0) {
+			if (count($select) > 0) {
+				array_flip(array_flip($select));
+				//print "Indi's selected for fams: ".count($select)."<br />";
+				$selection = "'".implode("','", $select)."'";
+				ListFunctions::GetIndilist($this->allgeds, $selection, false);
+			}
+		}
+		return $tfamlist;
 	}
+	
 	/**
-	 * Print a list of individual names
+	 * Print a list of family names
 	 *
 	 * A table with columns is printed from an array of names.
 	 * A distinction is made between a list for the find page or a
@@ -151,15 +141,15 @@ class IndilistController extends ListController {
 	 *
 	 * @todo		Add statistics for private and hidden links
 	 * @author	Genmod Development Team
-	 * @param		array		$personlist	The array with names to be printed
+	 * @param		array	$personlist	The array with names to be printed
 	 * @param		boolean	$print_all	Set to yes to print all individuals
 	 */
-	public function PrintPersonList($personlist, $print_all=true) {
+	public function PrintFamilyList($familylist, $print_all=true) {
 		global $TEXT_DIRECTION;
-		global $GEDCOMID, $year;
+		global $GEDCOMID;
 	
 		// NOTE: The list is really long so divide it up again by the first letter of the first name
-		if (((GedcomConfig::$ALPHA_INDEX_LISTS && count($personlist) > GedcomConfig::$ALPHA_INDEX_LISTS) || $this->falpha != "") && $print_all == true) {
+		if (((GedcomConfig::$ALPHA_INDEX_LISTS && count($familylist) > GedcomConfig::$ALPHA_INDEX_LISTS) || $this->falpha != "") && $print_all == true) {
 			
 			$firstalpha = $this->GetLetterBar(false);
 			
@@ -178,8 +168,7 @@ class IndilistController extends ListController {
 					if (!$first) print " | ";
 					$first = false;
 					// NOTE: Print the link letter
-					if (strstr($_SERVER["SCRIPT_NAME"],"indilist.php")) print "<a href=\"indilist.php?";
-					if (strstr($_SERVER["SCRIPT_NAME"],"aliveinyear.php")) print "<a href=\"aliveinyear.php?year=$year&amp;";
+					print "<a href=\"famlist.php?";
 					// NOTE: only include the alpha letter when not showing the ALL list
 					if ($this->show_all == "no") print "alpha=".urlencode($this->alpha)."&amp;";
 					if ($this->surname_sublist == "yes" && !empty($this->surname)) print "surname=".$this->surname."&amp;";
@@ -196,8 +185,7 @@ class IndilistController extends ListController {
 			// NOTE: Print the Unknown text on the letter bar
 			if ($pass == true) {
 				print " | ";
-				if (strstr($_SERVER["SCRIPT_NAME"],"indilist.php")) print "<a href=\"indilist.php?";
-				if (strstr($_SERVER["SCRIPT_NAME"],"aliveinyear.php")) print "<a href=\"aliveinyear.php?year=$year&amp;";
+				print "<a href=\"famlist.php?";
 				if ($this->surname_sublist == "yes" && !empty($this->surname)) print "surname=".$this->surname."&amp;";
 				print "alpha=".urlencode($this->alpha)."&amp;falpha=@&amp;surname_sublist=".$this->surname_sublist."&amp;show_all=".$this->show_all;
 				if ($this->allgeds == "yes") print "&amp;allgeds=yes";
@@ -207,8 +195,7 @@ class IndilistController extends ListController {
 			}
 			if (GedcomConfig::$LISTS_ALL) {
 				print " | ";
-				if (strstr($_SERVER["SCRIPT_NAME"],"indilist.php")) print "<a href=\"indilist.php?";
-				if (strstr($_SERVER["SCRIPT_NAME"],"aliveinyear.php")) print "<a href=\"aliveinyear.php?year=$year&amp;";
+				print "<a href=\"famlist.php?";
 				// NOTE: only include the alpha letter when not showing the ALL list
 				if ($this->show_all == "no") print "alpha=".urlencode($this->alpha)."&amp;";
 				// NOTE: Include the surname if surnames are to be listed
@@ -223,42 +210,35 @@ class IndilistController extends ListController {
 			if (isset($fstartalpha)) $this->falpha = $fstartalpha;
 			// NOTE: Get only the names who start with the matching first letter. This is the case if no firstletter is chosen yet, and the list must be split because of the number of records found.
 			if ($this->show_all_firstnames == "no") {
-				foreach($personlist as $key => $person) {
-					$hit = false;
-					foreach($person->name_array as $key2 => $namearr) {
-						if ($namearr[5] == $this->falpha) {
-							$hit = true;
-							break;
-						}
-					}
-					if (!$hit) unset($personlist[$key]);
+				foreach($familylist as $key => $family) {
+					$lnames = $family->GetLetterNames($this->alpha, $this->falpha);
+					if (count($lnames) == 0) unset($familylist[$key]);
 				}
 			}
-			$this->PrintPersonList($personlist, false);
+			$this->PrintFamilyList($familylist, false);
 		}
 		else {
 			$names = array();
-			foreach($personlist as $gid => $indi) {
+			foreach($familylist as $gid => $fam) {
 				// NOTE: make sure that favorites from other gedcoms are not shown
-				if ($indi->gedcomid == $GEDCOMID || $this->allgeds == "yes") {
-					foreach($indi->name_array as $indexval => $namearray) {
-						// NOTE: Only include married names if chosen to show so
-						// NOTE: Do not include calculated names. Identified by C.
-							$names[] = array($namearray[0], $gid, $indexval);
+				if ($fam->gedcomid == $GEDCOMID || $this->allgeds == "yes") {
+					$famnames = $fam->GetLetterNames($this->alpha, $this->falpha);
+					foreach($famnames as $indexval => $name) {
+							$names[] = array($name, $fam->key, $indexval);
 					}
 				}
 			}
 			uasort($names, "ItemSort");
 			reset($names);
-			$total_indis = count($personlist);
+			$fam_private = array();
 			$count = count($names);
 			$i=0;
 			print "<table class=\"center ".$TEXT_DIRECTION."\"><tr>";
 			print "<td class=\"shade1 list_value indilist $TEXT_DIRECTION\"><ul>\n";
 			foreach($names as $indexval => $namearray) {
-				$person = $personlist[$namearray[1]];
-				if (!$person->PrintListPerson(true, false, "", $namearray[2])) {
-					$indi_hide[$person->key] = true;
+				$family = $familylist[$namearray[1]];
+				if (!$family->PrintListFamily(true, "", $namearray[0])) {
+					$fam_private[$family->key] = true;
 				}
 				$i++;
 				if ($i==ceil($count/2) && $count>8) print "</ul></td><td class=\"shade1 list_value indilist $TEXT_DIRECTION\"><ul>\n";			
@@ -266,14 +246,14 @@ class IndilistController extends ListController {
 			print "</ul></td>\n";
 			print "</tr><tr><td colspan=\"2\" class=\"center\">";
 			if (GedcomConfig::$SHOW_MARRIED_NAMES) print GM_LANG_total_names." ".count($names)."<br />\n";
-			print GM_LANG_total_indis." ".$total_indis;
-			if (count($indi_private)>0) print "  (".GM_LANG_private." ".count($indi_private).")";
-			if (count($indi_hide)>0) print "  --  ".GM_LANG_hidden." ".count($indi_hide);
-			if (count($indi_private)>0 || count($indi_hide)>0) PrintHelpLink("privacy_error_help", "qm");
+			print GM_LANG_total_fams." ".count($familylist);
+			if (count($fam_private) > 0) {
+				print "  --  ".GM_LANG_hidden." ".count($fam_private);
+				PrintHelpLink("privacy_error_help", "qm");
+			}
 			print "</td>\n";
 			print "</tr></table>";
 		}
 	}
-
 }
 ?>

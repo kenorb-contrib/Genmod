@@ -693,7 +693,7 @@ function GetIndiList($allgeds="", $selection = "", $renew=true) {
 		$indilist = array();
 	}
 	
-	$sql = "SELECT i_key, i_gedrec, i_isdead, i_id, i_file, n_name, n_surname, n_nick, n_letter, n_type ";
+	$sql = "SELECT i_key, i_gedrec, i_isdead, i_id, i_file, n_name, n_surname, n_nick, n_letter, n_fletter, n_type ";
 	$sql .= "FROM ".TBLPREFIX."individuals, ".TBLPREFIX."names WHERE n_key=i_key ";
 	if ($allgeds == "no") {
 		$sql .= "AND i_file = ".$GEDCOMID." ";
@@ -718,12 +718,12 @@ function GetIndiList($allgeds="", $selection = "", $renew=true) {
 		if (!isset($indilist[$key])) {
 			$indi = array();
 			$indi["gedcom"] = $row["i_gedrec"];
-			$indi["names"][] = array($row["n_name"], $row["n_letter"], $row["n_surname"], $row["n_nick"], $row["n_type"]);
+			$indi["names"][] = array($row["n_name"], $row["n_letter"], $row["n_surname"], $row["n_nick"], $row["n_type"], $row["n_fletter"]);
 			$indi["isdead"] = $row["i_isdead"];
 			$indi["gedfile"] = $row["i_file"];
 			$indilist[$key] = $indi;
 		}
-		else $indilist[$key]["names"][] = array($row["n_name"], $row["n_letter"], $row["n_surname"], $row["n_nick"], $row["n_type"]);
+		else $indilist[$key]["names"][] = array($row["n_name"], $row["n_letter"], $row["n_surname"], $row["n_nick"], $row["n_type"], $row["n_fletter"]);
 	}
 	$res->FreeResult();
 	if ($allgeds == "no" && $selection = "") $INDILIST_RETRIEVED = true;
@@ -838,319 +838,8 @@ function GetOtherList() {
 	return $otherlist;
 }
 
-//-- get the first character in the list
-function GetFamAlpha($allgeds="no") {
-	global $LANGUAGE, $famalpha, $GEDCOMID;
 
-	$famalpha = array();
 
-	$sql = "SELECT DISTINCT n_letter as alpha FROM ".TBLPREFIX."names, ".TBLPREFIX."individual_family WHERE if_pkey=n_key and if_role='S'";	
-	if ($allgeds == "no") $sql .= " AND n_file='".$GEDCOMID."'";
-	$res = NewQuery($sql);
-	
-	$hungarianex = array("DZS", "CS", "DZ" , "GY", "LY", "NY", "SZ", "TY", "ZS");
-	$danishex = array("OE", "AE", "AA");
-	while($row = $res->FetchAssoc()){
-		$letter = $row["alpha"];
-		if ($LANGUAGE == "danish" || $LANGUAGE == "norwegian"){
-			if (in_array(strtoupper($letter), $danishex)) {
-				if (strtoupper($letter) == "OE") $letter = "Ø";
-				else if (strtoupper($letter) == "AE") $letter = "Æ";
-				else if (strtoupper($letter) == "AA") $letter = "Å";
-			}
-		}
-		if (strlen($letter) > 1){
-			if (ord($letter) < 92){
-				if ($LANGUAGE != "hungarian" && in_array($letter, $hungarianex)) $letter = substr($letter, 0, 1);
-				if (($LANGUAGE != "danish" || $LANGUAGE != "norwegian") && in_array($letter, $danishex)) $letter = substr($letter, 0, 1);
-			}
-		}
-
-		if (!isset($famalpha[$letter])) $famalpha[$letter]=$letter;
-	}
-	$res->FreeResult();
-	$sql = "SELECT count(f_id) FROM ".TBLPREFIX."families WHERE (f_husb='' || f_wife='')";
-	if ($allgeds == "no") $sql .= " AND f_file='".$GEDCOMID."'";
-	$res = NewQuery($sql);
-	$row = $res->FetchRow();
-	if ($row[0] > 0) {
-		$famalpha["@"] = "@";
-	}
-	$res->FreeResult();
-	return $famalpha;
-}
-
-/**
- * Get Individuals Starting with a letter
- *
- * This function finds all of the individuals who start with the given letter
- *
- * @param string $letter	The letter to search on
- * @return array	$indilist array
- */
-function GetAlphaIndis($letter, $allgeds="no") {
-	global $LANGUAGE, $indilist, $surname;
-	global $GEDCOMID, $COMBIKEY;
-
-	$tindilist = array();
-	$search_letter = "";
-	
-	// NOTE: Determine what letter to search for depending on the active language
-	if ($LANGUAGE == "hungarian"){
-		if (strlen($letter) >= 2) $search_letter = "'".DbLayer::EscapeQuery($letter)."' ";
-		else {
-			if ($letter == "C") $text = "CS";
-			else if ($letter == "D") $text = "DZ";
-			else if ($letter == "G") $text = "GY";
-			else if ($letter == "L") $text = "LY";
-			else if ($letter == "N") $text = "NY";
-			else if ($letter == "S") $text = "SZ";
-			else if ($letter == "T") $text = "TY";
-			else if ($letter == "Z") $text = "ZS";
-			if (isset($text)) $search_letter = "(n_letter = '".DbLayer::EscapeQuery($letter)."' AND n_letter != '".DbLayer::EscapeQuery($text)."') ";
-			else $search_letter = "n_letter LIKE '".DbLayer::EscapeQuery($letter)."' ";
-		}
-	}
-	else if ($LANGUAGE == "danish" || $LANGUAGE == "norwegian") {
-		if ($letter == "Ø") $text = "OE";
-		else if ($letter == "Æ") $text = "AE";
-		else if ($letter == "Å") $text = "AA";
-		if (isset($text)) $search_letter = "(n_letter = '".DbLayer::EscapeQuery($letter)."' OR n_letter = '".DbLayer::EscapeQuery($text)."') ";
-		else if ($letter=="A") $search_letter = "i_letter LIKE '".DbLayer::EscapeQuery($letter)."' ";
-		else $search_letter = "n_letter LIKE '".DbLayer::EscapeQuery($letter)."' ";
-	}
-	else $search_letter = "n_letter LIKE '".DbLayer::EscapeQuery($letter)."' ";
-	
-	// NOTE: Select the records from the individual table
-	$sql = "";
-	// NOTE: Select the records from the names table
-	$sql .= "SELECT i_key, i_id, i_isdead, n_letter, i_gedrec, n_file, n_type, n_name, n_surname, n_nick, n_letter ";
-	$sql .= "FROM ".TBLPREFIX."names, ".TBLPREFIX."individuals ";
-	$sql .= "WHERE n_key = i_key ";
-	$sql .= "AND ".$search_letter;
-	// NOTE: Add some optimization if the surname is set to speed up the lists
-	if (!empty($surname)) $sql .= "AND n_surname LIKE '%".DbLayer::EscapeQuery($surname)."%' ";
-	// NOTE: Do not retrieve married names if the user does not want to see them
-	if (!GedcomConfig::$SHOW_MARRIED_NAMES) $sql .= "AND n_type NOT LIKE 'C' ";
-	// NOTE: Make the selection on the currently active gedcom
-	if ($allgeds != "yes") $sql .= "AND n_file = '".$GEDCOMID."' ";
-	if ($allgeds != "yes") $sql .= "AND i_file = '".$GEDCOMID."'";
-	
-	$sql .= " ORDER BY i_key, n_id";
-
-	$res = NewQuery($sql);
-	while($row = $res->FetchAssoc()) {
-		if (substr($row["n_letter"], 0, 1) == substr($letter, 0, 1) || (isset($text) ? substr($row["n_letter"], 0, 1) == substr($text, 0, 1) : FALSE)){
-			if ($COMBIKEY) $key = $row["i_key"];
-			else $key = $row["i_id"];
-			if (!isset($indilist[$key])) {
-				$indi = array();
-				if ($row["n_type"] != "C" || ($row["n_type"] == "C" && GedcomConfig::$SHOW_MARRIED_NAMES)) $indi["names"][] = array($row["n_name"], $row["n_letter"], $row["n_surname"], $row["n_nick"], $row["n_type"]);
-				$indi["isdead"] = $row["i_isdead"];
-				$indi["gedcom"] = $row["i_gedrec"];
-				$indi["gedfile"] = $row["n_file"];
-				$tindilist[$key] = true;
-				// NOTE: Cache the item in the $indilist for improved speed
-				$indilist[$key] = $indi;
-			}
-			else {
-				if ($row["n_type"] != "C" || ($row["n_type"] == "C" && GedcomConfig::$SHOW_MARRIED_NAMES)) $indilist[$key]["names"][] = array($row["n_name"], $row["n_letter"], $row["n_surname"], $row["n_type"]);
-
-			}
-		}
-	}
-	$res->FreeResult();
-	return $tindilist;
-}
-
-/**
- * Get Individuals with a given surname
- *
- * This function finds all of the individuals who have the given surname
- * @param string $surname	The surname to search on
- * @return array	$indilist array
- */
-function GetSurnameIndis($surname, $allgeds="no") {
-	global $LANGUAGE, $indilist, $GEDCOMID, $COMBIKEY;
-
-	$tindilist = array();
-	$sql = "SELECT i_key, i_id, i_file, i_isdead, i_gedrec, n_letter, n_name, n_surname, n_nick, , n_type FROM ".TBLPREFIX."individuals, ".TBLPREFIX."names WHERE i_key=n_key AND n_surname LIKE '".DbLayer::EscapeQuery($surname)."' ";
-	if (!GedcomConfig::$SHOW_MARRIED_NAMES) $sql .= "AND n_type!='C' ";
-	if ($allgeds == "no") $sql .= "AND i_file='".$GEDCOMID."'";
-	$sql .= " ORDER BY i_key, n_id";
-	$res = NewQuery($sql);
-	while($row = $res->FetchAssoc()){
-		if (!$COMBIKEY) $key = $row["i_id"];
-		else $key = $row["i_key"];
-		if (isset($indilist[$key])) {
-			if ($row["n_type"] != "C" || ($row["n_type"] == "C" && GedcomConfig::$SHOW_MARRIED_NAMES)) $indilist[$key]["names"][] = array($row["n_name"], $row["n_letter"], $row["n_surname"], $row["n_nick"], $row["n_type"]);
-		}
-		else {
-			$indi = array();
-			if ($row["n_type"] != "C" || ($row["n_type"] == "C" && GedcomConfig::$SHOW_MARRIED_NAMES)) $indi["names"][] = array($row["n_name"], $row["n_letter"], $row["n_surname"], $row["n_nick"], $row["n_type"]);
-			$indi["isdead"] = $row["i_isdead"];
-			$indi["gedcom"] = $row["i_gedrec"];
-			$indi["gedfile"] = $row["i_file"];
-			$indilist[$key] = $indi;
-			$tindilist[$key] = true;
-		}
-	}
-	$res->FreeResult();
-	return $tindilist;
-}
-
-function GetAlphaFamSurnames($letter, $allgeds="no") {
-	global $GEDCOMID, $famlist, $indilist, $LANGUAGE, $COMBIKEY;
-
-	$temp = GedcomConfig::$SHOW_MARRIED_NAMES;
-	GedcomConfig::$SHOW_MARRIED_NAMES = false;
-	$search_letter = "";
-	
-	// NOTE: Determine what letter to search for depending on the active language
-	if (!empty($letter)) {
-		if ($LANGUAGE == "hungarian"){
-			if (strlen($letter) >= 2) $search_letter = "'".DbLayer::EscapeQuery($letter)."' ";
-			else {
-				if ($letter == "C") $text = "CS";
-				else if ($letter == "D") $text = "DZ";
-				else if ($letter == "G") $text = "GY";
-				else if ($letter == "L") $text = "LY";
-				else if ($letter == "N") $text = "NY";
-				else if ($letter == "S") $text = "SZ";
-				else if ($letter == "T") $text = "TY";
-				else if ($letter == "Z") $text = "ZS";
-				if (isset($text)) $search_letter = "(i_letter = '".DbLayer::EscapeQuery($letter)."' AND i_letter != '".DbLayer::EscapeQuery($text)."') ";
-				else $search_letter = "i_letter LIKE '".DbLayer::EscapeQuery($letter)."%' ";
-			}
-		}
-		else if ($LANGUAGE == "danish" || $LANGUAGE == "norwegian") {
-			if ($letter == "Ø") $text = "OE";
-			else if ($letter == "Æ") $text = "AE";
-			else if ($letter == "Å") $text = "AA";
-			if (isset($text)) $search_letter = "(i_letter = '".DbLayer::EscapeQuery($letter)."' OR i_letter = '".DbLayer::EscapeQuery($text)."') ";
-			else if ($letter=="A") $search_letter = "i_letter LIKE '".DbLayer::EscapeQuery($letter)."' ";
-			else $search_letter = "i_letter LIKE '".DbLayer::EscapeQuery($letter)."%' ";
-		}
-		else $search_letter = "i_letter LIKE '".DbLayer::EscapeQuery($letter)."%' ";
-	}
-	
-	$namelist = array();
-	$sql = "SELECT DISTINCT n_surname, count(DISTINCT if_fkey) as fams FROM ".TBLPREFIX."names, ".TBLPREFIX."individual_family WHERE n_key=if_pkey AND if_role='S' ";
-	if (!empty($search_letter)) $sql .= "AND ".str_replace("i_letter", "n_letter", $search_letter);
-	if ($allgeds != "yes") $sql .= " AND n_file = '".$GEDCOMID."' ";
-	$sql .= "GROUP BY n_surname";
-	$res = NewQuery($sql);
-	while($row = $res->FetchAssoc()) {
-		$namelist[] = array("name"=>$row["n_surname"], "count"=>$row["fams"]);		
-	}
-	GedcomConfig::$SHOW_MARRIED_NAMES = $temp;
-	return $namelist;
-}
-
-/**
- * Get Families Starting with a letter
- *
- * This function finds all of the families who start with the given letter
- * @param string $letter	The letter to search on
- * @return array	$indilist array
- * @see GetAlphaIndis()
- */
-function GetAlphaFams($letter, $allgeds="no") {
-	global $GEDCOMID, $famlist, $indilist, $LANGUAGE, $COMBIKEY;
-	
-	$search_letter = "";
-	
-	// NOTE: Determine what letter to search for depending on the active language
-	if ($LANGUAGE == "hungarian"){
-		if (strlen($letter) >= 2) $search_letter = "'".DbLayer::EscapeQuery($letter)."' ";
-		else {
-			if ($letter == "C") $text = "CS";
-			else if ($letter == "D") $text = "DZ";
-			else if ($letter == "G") $text = "GY";
-			else if ($letter == "L") $text = "LY";
-			else if ($letter == "N") $text = "NY";
-			else if ($letter == "S") $text = "SZ";
-			else if ($letter == "T") $text = "TY";
-			else if ($letter == "Z") $text = "ZS";
-			if (isset($text)) $search_letter = "(n_letter = '".DbLayer::EscapeQuery($letter)."' AND n_letter != '".DbLayer::EscapeQuery($text)."') ";
-			else $search_letter = "n_letter LIKE '".DbLayer::EscapeQuery($letter)."%' ";
-		}
-	}
-	else if ($LANGUAGE == "danish" || $LANGUAGE == "norwegian") {
-		if ($letter == "Ø") $text = "OE";
-		else if ($letter == "Æ") $text = "AE";
-		else if ($letter == "Å") $text = "AA";
-		if (isset($text)) $search_letter = "(n_letter = '".DbLayer::EscapeQuery($letter)."' OR n_letter = '".DbLayer::EscapeQuery($text)."') ";
-		else if ($letter=="A") $search_letter = "n_letter LIKE '".DbLayer::EscapeQuery($letter)."' ";
-		else $search_letter = "n_letter LIKE '".DbLayer::EscapeQuery($letter)."' ";
-	}
-	else $search_letter = "n_letter LIKE '".DbLayer::EscapeQuery($letter)."' ";
-	
-	$select = array();
-	// This table is to determine which of the indis for a family has the desired letter.
-	// Later, when building the famlist, it is used to place that person first in the familydescriptor
-	$trans = array();
-	$temp = GedcomConfig::$SHOW_MARRIED_NAMES;
-	GedcomConfig::$SHOW_MARRIED_NAMES = false;
-	
-	$sql = "SELECT DISTINCT if_fkey, if_pkey, n_name FROM ".TBLPREFIX."names, ".TBLPREFIX."individual_family WHERE n_key=if_pkey AND if_role='S' ";
-	$sql .= "AND n_type NOT LIKE 'C' ";
-	$sql .= "AND ".$search_letter;
-	if ($allgeds != "yes") $sql .= " AND n_file = '".$GEDCOMID."'";
-	$sql .= " GROUP BY if_fkey";
-	$res = NewQuery($sql);
-	while($row = $res->FetchAssoc()) {
-		$select[] = $row["if_fkey"];
-		$trans[$row["if_fkey"]]["id"] = $row["if_pkey"];
-		$trans[$row["if_fkey"]]["name"] = $row["n_name"];
-	}
-	$select = "'".implode("', '", $select)."'";
-	$f = GetFamlist($allgeds, $select, false, $trans);
-	GedcomConfig::$SHOW_MARRIED_NAMES = $temp;
-	return $f;
-}
-
-/**
- * Get Families with a given surname
- *
- * This function finds all of the individuals who have the given surname
- * @param string $surname	The surname to search on
- * @return array	$indilist array
- */
-function GetSurnameFams($surname, $allgeds="no") {
-	global $GEDCOMID, $famlist, $indilist, $COMBIKEY;
-	
-	$trans = array();
-	$select = array();
-	$temp = GedcomConfig::$SHOW_MARRIED_NAMES;
-	GedcomConfig::$SHOW_MARRIED_NAMES = false;
-
-	$sql = "SELECT DISTINCT if_fkey, if_pkey, n_name FROM ".TBLPREFIX."names, ".TBLPREFIX."individual_family WHERE n_key=if_pkey AND if_role='S' AND n_surname='".DbLayer::EscapeQuery($surname)."'";
-	if ($allgeds != "yes") $sql .= " AND n_file = '".$GEDCOMID."' ";
-	$sql .= "GROUP BY if_fkey";
-	// The previous query works for all surnames, including @N.N.
-	// But families with only one spouse (meaning the other is not known) are missing.
-	// In that case, we also select families with one role Spouse.
-	// What we exclude, is families where no spouses exist and which only consist of children.
-	if ($surname == "@N.N.") {
-		$sql .= " UNION SELECT if_fkey, '' AS if_pkey, '' AS n_name FROM ".TBLPREFIX."individual_family WHERE if_role='S' ";
-		if ($allgeds != "yes") $sql .= " AND if_file = '".$GEDCOMID."'";
-		$sql .= " GROUP BY if_fkey HAVING count(if_fkey)=1";
-	}
-	$res = NewQuery($sql);
-	while($row = $res->FetchAssoc()) {
-		$select[] = $row["if_fkey"];
-		if (!empty($row["if_pkey"])) {
-			$trans[$row["if_fkey"]]["id"] = $row["if_pkey"];
-			$trans[$row["if_fkey"]]["name"] = $row["n_name"];
-		}
-	}
-	$select = "'".implode("', '", $select)."'";
-	if ($select != "''") $f = GetFamlist($allgeds, $select, false, $trans);
-	else $f = array();
-	GedcomConfig::$SHOW_MARRIED_NAMES = $temp;
-	return $f;
-}
 
 //-- function to find the gedcom id for the given rin
 function FindRinId($rin) {
@@ -1393,7 +1082,7 @@ function GetUnlinked() {
 	
 	$uindilist = array();
 	
-	$sql = "SELECT i_id, i_gedrec, i_file, i_isdead, n_name, n_letter, n_surname, n_nick, n_type FROM ".TBLPREFIX."individuals LEFT JOIN ".TBLPREFIX."names ON i_key=n_key LEFT JOIN ".TBLPREFIX."individual_family ON i_key=if_pkey WHERE if_pkey IS NULL AND i_file='".$GEDCOMID."' ORDER BY i_key, n_id";
+	$sql = "SELECT i_id, i_gedrec, i_file, i_isdead, n_name, n_letter, n_fletter, n_surname, n_nick, n_type FROM ".TBLPREFIX."individuals LEFT JOIN ".TBLPREFIX."names ON i_key=n_key LEFT JOIN ".TBLPREFIX."individual_family ON i_key=if_pkey WHERE if_pkey IS NULL AND i_file='".$GEDCOMID."' ORDER BY i_key, n_id";
 
 	$res = NewQuery($sql);
 	if ($res) {
@@ -1401,14 +1090,14 @@ function GetUnlinked() {
 		while($row = $res->FetchAssoc()){
 			if (!isset($indilist[$row["i_id"]])) {
 				$indi = array();
-				$indi["names"][] = array($row["n_name"], $row["n_letter"], $row["n_surname"], $row["n_nick"], $row["n_type"]);
+				$indi["names"][] = array($row["n_name"], $row["n_letter"], $row["n_surname"], $row["n_nick"], $row["n_type"], $row["n_fletter"]);
 				$indi["isdead"] = $row["i_isdead"];
 				$indi["gedcom"] = $row["i_gedrec"];
 				$indi["gedfile"] = $row["i_file"];
 				$indilist[$row["i_id"]] = $indi;
 			}
 			else {
-				$indilist[$row["i_id"]]["names"][] = array($row["n_name"], $row["n_letter"], $row["n_surname"], $row["n_nick"], $row["n_type"]);
+				$indilist[$row["i_id"]]["names"][] = array($row["n_name"], $row["n_letter"], $row["n_surname"], $row["n_nick"], $row["n_type"], $row["n_fletter"]);
 			}
 			$uindilist[$row["i_id"]] = $indilist[$row["i_id"]];
 		}

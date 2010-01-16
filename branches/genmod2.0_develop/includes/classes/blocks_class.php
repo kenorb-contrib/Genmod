@@ -62,7 +62,7 @@ class Blocks {
 	private function GetBlocks() {
 		
 		// Try to retrieve a user stored blocks config
-		$sql = "SELECT * FROM ".TBLPREFIX."blocks WHERE b_username='".DbLayer::EscapeQuery($this->username)."' AND b_file='".$this->gedid."' ORDER BY b_location, b_order";
+		$sql = "SELECT * FROM ".TBLPREFIX."blocks WHERE b_username='".DbLayer::EscapeQuery($this->username)."' AND b_file='".$this->gedid."' AND b_name<>'faq' ORDER BY b_location, b_order";
 		$res = NewQuery($sql);
 		if ($res->NumRows() > 0) {
 			while($row = $res->FetchAssoc()){
@@ -75,7 +75,7 @@ class Blocks {
 		else {
 			if ($this->type == "user") {
 				// Try to retrieve a stored default blocks config
-				$sql = "SELECT * FROM ".TBLPREFIX."blocks WHERE b_username='defaultuser' AND b_file='".$this->gedid."' ORDER BY b_location, b_order";
+				$sql = "SELECT * FROM ".TBLPREFIX."blocks WHERE b_username='defaultuser' AND b_file='".$this->gedid."' AND b_name<>'faq' ORDER BY b_location, b_order";
 				$res2 = NewQuery($sql);
 				if ($res2->NumRows() > 0) {
 					while($row = $res2->FetchAssoc()){
@@ -96,7 +96,7 @@ class Blocks {
 	public function setValues($setdefault=false) {
 	
 		// Delete old settings
-		$sql = "DELETE FROM ".TBLPREFIX."blocks WHERE b_username='".DbLayer::EscapeQuery($this->username)."' AND b_file='".$this->gedid."'";
+		$sql = "DELETE FROM ".TBLPREFIX."blocks WHERE b_username='".DbLayer::EscapeQuery($this->username)."' AND b_file='".$this->gedid."'AND b_name<>'faq'";
 		$res = NewQuery($sql);
 		// Insert new values for the main column
 		foreach($this->main as $order=>$block) {

@@ -642,7 +642,7 @@ abstract class ImportFunctions {
 			$names = NameFunctions::GetIndiNames($indirec, true);
 			$soundex_codes = GetSoundexStrings($names, true, $indirec);
 			foreach($names as $indexval => $name) {
-				$sql = "INSERT INTO ".TBLPREFIX."names VALUES('0', '".DbLayer::EscapeQuery($gid)."[".$gedfile."]','".DbLayer::EscapeQuery($gid)."','".$gedfile."','".DbLayer::EscapeQuery($name[0])."','".DbLayer::EscapeQuery($name[1])."','".DbLayer::EscapeQuery($name[2])."','".DbLayer::EscapeQuery($name[3])."','".DbLayer::EscapeQuery($name[4])."')";
+				$sql = "INSERT INTO ".TBLPREFIX."names VALUES('0', '".DbLayer::EscapeQuery($gid)."[".$gedfile."]','".DbLayer::EscapeQuery($gid)."','".$gedfile."','".DbLayer::EscapeQuery($name[0])."','".DbLayer::EscapeQuery($name[1])."','".DbLayer::EscapeQuery($name[5])."', '".DbLayer::EscapeQuery($name[2])."', '".DbLayer::EscapeQuery($name[3])."','".DbLayer::EscapeQuery($name[4])."')";
 				$res = NewQuery($sql);
 				if ($res) $res->FreeResult();
 			}
@@ -1380,10 +1380,10 @@ abstract class ImportFunctions {
 	 * @param string $surname	the surname for this name
 	 * @param string $letter	the letter for this name
 	 */
-	public function AddNewName($indi, $newname, $letter, $surname, $nick, $indirec) {
+	public function AddNewName($indi, $newname, $letter, $fletter, $surname, $nick, $indirec) {
 	
 		$kgid = JoinKey($indi->xref, $indi->gedcomid);
-		$sql = "INSERT INTO ".TBLPREFIX."names VALUES('0', '".DbLayer::EscapeQuery($kgid)."','".DbLayer::EscapeQuery($indi->xref)."','".$indi->gedcomid."','".DbLayer::EscapeQuery($newname)."','".DbLayer::EscapeQuery($letter)."','".DbLayer::EscapeQuery($surname)."', '".DbLayer::EscapeQuery($nick)."','C')";
+		$sql = "INSERT INTO ".TBLPREFIX."names VALUES('0', '".DbLayer::EscapeQuery($kgid)."','".DbLayer::EscapeQuery($indi->xref)."','".$indi->gedcomid."','".DbLayer::EscapeQuery($newname)."','".DbLayer::EscapeQuery($letter)."','".DbLayer::EscapeQuery($fletter)."','".DbLayer::EscapeQuery($surname)."', '".DbLayer::EscapeQuery($nick)."','C')";
 		$res = NewQuery($sql);
 		
 		$name_array = $indi->name_array;
@@ -1408,7 +1408,7 @@ abstract class ImportFunctions {
 	public function GetFemalesWithFAMS($gedid) {
 		
 		$flist = array();
-		$sql = "SELECT i_key, i_gedrec, i_isdead, i_id, i_file, n_name, n_surname, n_nick, n_letter, n_type ";
+		$sql = "SELECT i_key, i_gedrec, i_isdead, i_id, i_file, n_name, n_surname, n_nick, n_letter, n_fletter, n_type ";
 		$sql .= "FROM ".TBLPREFIX."individuals INNER JOIN ".TBLPREFIX."names ON n_key=i_key ";
 		$sql .= "WHERE i_gender='F' AND i_file = '".$gedid."' AND i_gedrec LIKE '%1 FAMS%' AND n_type='P' ORDER BY i_key, n_id";
 		// N.B. Only primary names are added, as this will be affected by married names!
@@ -1423,7 +1423,7 @@ abstract class ImportFunctions {
 				$person =& Person::GetInstance($row["i_id"], $row, $row["i_file"]);
 				$flist[$row["i_key"]] = $person;
 			}
-			$flist[$row["i_key"]]->addname = array($row["n_name"], $row["n_letter"], $row["n_surname"], $row["n_nick"], $row["n_type"]);
+			$flist[$row["i_key"]]->addname = array($row["n_name"], $row["n_letter"], $row["n_surname"], $row["n_nick"], $row["n_type"], $row["n_fletter"]);
 		}
 		if ($key != "") $person->names_read = true;
 		$res->FreeResult();

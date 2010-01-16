@@ -890,7 +890,8 @@ if ($step == 6) {
 									if ($pos1!==false) $gedrec = substr($gedrec, 0, $pos1)."\n2 _MARNM ".$newname."\r\n".substr($gedrec, $pos1+1);
 									else $gedrec = trim($gedrec)."\r\n2 _MARNM ".$newname."\r\n";
 									$gedrec = EditFunctions::CheckGedcom($gedrec, false);
-									ImportFunctions::AddNewName($indi, $newname, $letter, $surname, $gedrec);
+									$fletter = $indi_names[0][5];
+									ImportFunctions::AddNewName($indi, $newname, $letter, $fletter, $surname, $gedrec);
 									$names_added++;
 								}
 							}

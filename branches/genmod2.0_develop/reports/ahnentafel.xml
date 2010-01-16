@@ -1,14 +1,14 @@
 <GMReport access="PRIV_PUBLIC" icon="ancestry" language="english" type="indi">
 	<!-- $Id$ -->
-	<GMRTitle><GMRvar var="gm_lang[ahnentafel_report]" /></GMRTitle>
+	<GMRTitle><GMRvar var="GM_LANG_ahnentafel_report" /></GMRTitle>
 	<GMRDescription>Prints an Ahnentafel report for the selected individual</GMRDescription>
-	<GMRInput name="pid" lookup="INDI" type="text"><GMRvar var="gm_lang[enter_pid]" /></GMRInput>
-	<GMRInput name="maxgen" type="select" options="3,4,5,6,7,8,9,*"><GMRvar var="gm_lang[generations]" /></GMRInput>
-	<GMRInput name="sources" type="checkbox" default="1"><GMRvar var="gm_lang[SHOW_SOURCES]" /></GMRInput>
-	<GMRInput name="notes" type="checkbox" default="1"><GMRvar var="gm_lang[show_notes]" /></GMRInput>
-	<GMRInput name="showIndID" type="checkbox" default="SHOW_ID_NUMBERS"><GMRvar var="gm_lang[SHOW_ID_NUMBERS]" /></GMRInput>
-	<GMRInput name="showFamID" type="checkbox" default="SHOW_FAM_ID_NUMBERS"><GMRvar var="gm_lang[SHOW_FAM_ID_NUMBERS]" /></GMRInput>
-	<GMRInput name="pageSize" type="select" options="AVAIL_PAGE_SIZES" default="DEFAULT_PAGE_SIZE"><GMRvar var="gm_lang[page_size]" /></GMRInput>
+	<GMRInput name="pid" lookup="INDI" type="text"><GMRvar var="GM_LANG_enter_pid" /></GMRInput>
+	<GMRInput name="maxgen" type="select" options="3,4,5,6,7,8,9,*"><GMRvar var="GM_LANG_generations" /></GMRInput>
+	<GMRInput name="sources" type="checkbox" default="1"><GMRvar var="GM_LANG_SHOW_SOURCES" /></GMRInput>
+	<GMRInput name="notes" type="checkbox" default="1"><GMRvar var="GM_LANG_show_notes" /></GMRInput>
+	<GMRInput name="showIndID" type="checkbox" default="SHOW_ID_NUMBERS"><GMRvar var="GM_LANG_SHOW_ID_NUMBERS" /></GMRInput>
+	<GMRInput name="showFamID" type="checkbox" default="SHOW_FAM_ID_NUMBERS"><GMRvar var="GM_LANG_SHOW_FAM_ID_NUMBERS" /></GMRInput>
+	<GMRInput name="pageSize" type="select" options="AVAIL_PAGE_SIZES" default="DEFAULT_PAGE_SIZE"><GMRvar var="GM_LANG_page_size" /></GMRInput>
 	<GMRStyle name="header" font="LucidaSansUnicode" size="14" style="b" />
 	<GMRStyle name="subheader" font="LucidaSansUnicode" size="12" style="b" />
 	<GMRStyle name="pagenum" font="LucidaSansUnicode" size="8" style="" />
@@ -25,12 +25,12 @@
 			<GMRSetVar name="generation" value="0" />
 			<GMRSetVar name="empty_name" value="f" />
 			<GMRSetVar name="empty_start_value" value="0" />
-			<GMRCell width="0" height="30" align="center" style="header"><GMRvar var="gm_lang[ahnentafel_header]" /><GMRGetPersonName id="$pid" hideID="true" /></GMRCell>
+			<GMRCell width="0" height="30" align="center" style="header"><GMRvar var="GM_LANG_ahnentafel_header" /><GMRGetPersonName id="$pid" hideID="true" /></GMRCell>
 			<GMRRelatives id="$pid" group="direct-ancestors" sortby="none" maxgen="$maxgen" showempty="true">
 				<GMRSetVar name="gender" value="m" />
-				<GMRSetVar name="pronoun" value="$gm_lang[ahnentafel_pronoun_m]" />
+				<GMRSetVar name="pronoun" value="$GM_LANG_ahnentafel_pronoun_m" />
 				<GMRif condition="@SEX=='F'">
-					<GMRSetVar name="pronoun" value="$gm_lang[ahnentafel_pronoun_f]" />
+					<GMRSetVar name="pronoun" value="$GM_LANG_ahnentafel_pronoun_f" />
 					<GMRSetVar name="gender" value="f" />
 				</GMRif>
 				<GMRSetVar name="printPronoun" value=" " />
@@ -48,7 +48,7 @@
 						</GMRTextBox>
 						<GMRSetVar name="empty_start_value" value="$num" />
 					</GMRif>
-					<GMRCell width="0" height="30" align="center" style="subheader"><GMRvar var="gm_lang[ahnentafel_generation]" /><GMRGeneration /></GMRCell>
+					<GMRCell width="0" height="30" align="center" style="subheader"><GMRvar var="GM_LANG_ahnentafel_generation" /><GMRGeneration /></GMRCell>
 					<GMRSetVar name="generation" value="@generation" />
 				</GMRif>
 				<GMRSetVar name="indiname" value="@NAME" />
@@ -80,10 +80,10 @@
 						<GMRGedcom id="BIRT">
 							<GMRText style="text"><GMRvar var="printPronoun" />
 								<GMRif condition="$gender=='m'">
-									<GMRvar var="gm_lang[ahnentafel_born_m]" />
+									<GMRvar var="GM_LANG_ahnentafel_born_m" />
 								</GMRif>
 								<GMRif condition="$gender=='f'">
-									<GMRvar var="gm_lang[ahnentafel_born_f]" />
+									<GMRvar var="GM_LANG_ahnentafel_born_f" />
 								</GMRif>
 							</GMRText>
 							<GMRif condition="$sources==1">
@@ -101,10 +101,10 @@
 								<GMRText style="text"> <GMRGedcomValue tag="DATE" level="2" /> </GMRText>
 							</GMRif>
 							<GMRif condition="@PLAC!=''">
-								<GMRText style="text"><GMRvar var="gm_lang[ahnentafel_place]" /><GMRGedcomValue tag="PLAC" level="2" /></GMRText>
+								<GMRText style="text"><GMRvar var="GM_LANG_ahnentafel_place" /><GMRGedcomValue tag="PLAC" level="2" /></GMRText>
 							</GMRif>
 							<GMRif condition="(@desc=='Y') or (@DATE=='' and @PLAC=='')">
-								<GMRText style="text"><GMRvar var="gm_lang[ahnentafel_no_details]" /></GMRText>
+								<GMRText style="text"><GMRvar var="GM_LANG_ahnentafel_no_details" /></GMRText>
 							</GMRif>
 							<GMRText style="text">.  </GMRText>
 							<GMRSetVar name="printPronoun" value="$pronoun" />
@@ -112,10 +112,10 @@
 						<GMRGedcom id="CHR">
 							<GMRText style="text"><GMRvar var="printPronoun" />
 								<GMRif condition="$gender=='m'">
-									<GMRvar var="gm_lang[ahnentafel_christened_m]" />
+									<GMRvar var="GM_LANG_ahnentafel_christened_m" />
 								</GMRif>
 								<GMRif condition="$gender=='f'">
-									<GMRvar var="gm_lang[ahnentafel_christened_f]" />
+									<GMRvar var="GM_LANG_ahnentafel_christened_f" />
 								</GMRif>
 							</GMRText>
 							<GMRif condition="$sources==1">
@@ -133,10 +133,10 @@
 								<GMRText style="text"> <GMRGedcomValue tag="DATE" level="2" /></GMRText>
 							</GMRif>
 							<GMRif condition="@PLAC!=''">
-								<GMRText style="text"><GMRvar var="gm_lang[ahnentafel_place]" /><GMRGedcomValue tag="PLAC" level="2" /></GMRText>
+								<GMRText style="text"><GMRvar var="GM_LANG_ahnentafel_place" /><GMRGedcomValue tag="PLAC" level="2" /></GMRText>
 							</GMRif>
 							<GMRif condition="(@desc=='Y') or (@DATE=='' and @PLAC=='')">
-								<GMRText style="text"><GMRvar var="gm_lang[ahnentafel_no_details]" /></GMRText>
+								<GMRText style="text"><GMRvar var="GM_LANG_ahnentafel_no_details" /></GMRText>
 							</GMRif>
 							<GMRText style="text">.  </GMRText>
 							<GMRSetVar name="printPronoun" value="$pronoun" />
@@ -156,10 +156,10 @@
 										<GMRif condition="$spid!='' and (@DATE!='' or @PLAC!='')">
 											<GMRText style="text"><!-- br / --><GMRvar var="printPronoun" />
 												<GMRif condition="$gender=='m'">
-													<GMRvar var="gm_lang[ahnentafel_married_m]" />
+													<GMRvar var="GM_LANG_ahnentafel_married_m" />
 												</GMRif>
 												<GMRif condition="$gender=='f'">
-													<GMRvar var="gm_lang[ahnentafel_married_f]" />
+													<GMRvar var="GM_LANG_ahnentafel_married_f" />
 												</GMRif>
 											</GMRText>
 											<GMRif condition="$showFamID">
@@ -183,10 +183,10 @@
 												<GMRText style="text"> <GMRGedcomValue tag="DATE" level="2" /><GMRif condition="@PLAC==''"> </GMRif></GMRText>
 											</GMRif>
 											<GMRif condition="@PLAC!=''">
-												<GMRText style="text"> <GMRvar var="gm_lang[ahnentafel_place]" /><GMRGedcomValue tag="PLAC" level="2" /></GMRText>
+												<GMRText style="text"> <GMRvar var="GM_LANG_ahnentafel_place" /><GMRGedcomValue tag="PLAC" level="2" /></GMRText>
 											</GMRif>
 											<GMRif condition="((@desc=='Y') or (@DATE=='' and @PLAC=='')) and ($spid=='')">
-												<GMRText style="text"><GMRvar var="gm_lang[ahnentafel_no_details]" /></GMRText>
+												<GMRText style="text"><GMRvar var="GM_LANG_ahnentafel_no_details" /></GMRText>
 											</GMRif>
 											<GMRText style="text">.  </GMRText>
 											<GMRSetVar name="printPronoun" value="$pronoun" />
@@ -198,10 +198,10 @@
 						<GMRGedcom id="DEAT">
 							<GMRText style="text"><!-- br / --><GMRvar var="printPronoun" />
 								<GMRif condition="$gender=='m'">
-									<GMRvar var="gm_lang[ahnentafel_died_m]" />
+									<GMRvar var="GM_LANG_ahnentafel_died_m" />
 								</GMRif>
 								<GMRif condition="$gender=='f'">
-									<GMRvar var="gm_lang[ahnentafel_died_f]" />
+									<GMRvar var="GM_LANG_ahnentafel_died_f" />
 								</GMRif>
 							</GMRText>
 							<GMRif condition="$sources==1">
@@ -219,10 +219,10 @@
 								<GMRText style="text"> <GMRGedcomValue tag="DATE" level="2" /></GMRText>
 							</GMRif>
 							<GMRif condition="@PLAC!=''">
-								<GMRText style="text"> <GMRvar var="gm_lang[ahnentafel_place]" /><GMRGedcomValue tag="PLAC" level="2" /></GMRText>
+								<GMRText style="text"> <GMRvar var="GM_LANG_ahnentafel_place" /><GMRGedcomValue tag="PLAC" level="2" /></GMRText>
 							</GMRif>
 							<GMRif condition="(@desc=='Y') or (@DATE=='' and @PLAC=='')">
-								<GMRText style="text"><GMRvar var="gm_lang[ahnentafel_no_details]" /></GMRText>
+								<GMRText style="text"><GMRvar var="GM_LANG_ahnentafel_no_details" /></GMRText>
 							</GMRif>
 							<GMRText style="text">.  </GMRText>
 							<GMRSetVar name="printPronoun" value="$pronoun" />
@@ -230,10 +230,10 @@
 						<GMRGedcom id="BURI">
 							<GMRText style="text"><GMRvar var="printPronoun" />
 								<GMRif condition="$gender=='m'">
-									<GMRvar var="gm_lang[ahnentafel_buried_m]" />
+									<GMRvar var="GM_LANG_ahnentafel_buried_m" />
 								</GMRif>
 								<GMRif condition="$gender=='f'">
-									<GMRvar var="gm_lang[ahnentafel_buried_f]" />
+									<GMRvar var="GM_LANG_ahnentafel_buried_f" />
 								</GMRif>
 							</GMRText>
 							<GMRif condition="$sources==1">
@@ -251,10 +251,10 @@
 								<GMRText style="text"> <GMRGedcomValue tag="DATE" level="2" /></GMRText>
 							</GMRif>
 							<GMRif condition="@PLAC!=''">
-								<GMRText style="text"> <GMRvar var="gm_lang[ahnentafel_place]" /><GMRGedcomValue tag="PLAC" level="2" /></GMRText>
+								<GMRText style="text"> <GMRvar var="GM_LANG_ahnentafel_place" /><GMRGedcomValue tag="PLAC" level="2" /></GMRText>
 							</GMRif>
 							<GMRif condition="(@desc=='Y') or (@DATE=='' and @PLAC=='')">
-								<GMRText style="text"><GMRvar var="gm_lang[ahnentafel_no_details]" /></GMRText>
+								<GMRText style="text"><GMRvar var="GM_LANG_ahnentafel_no_details" /></GMRText>
 							</GMRif>
 							<GMRText style="text">.  </GMRText>
 							<GMRSetVar name="printPronoun" value="$pronoun" />
@@ -280,13 +280,13 @@
 			<GMRif condition="$sources==1">
 				<GMRNewPage></GMRNewPage>
 				<GMRTextBox border="0" width="$width" height="20">
-					<GMRText style="subheader"><br /><GMRvar var="gm_lang[sources]" /><br /><br /></GMRText>
+					<GMRText style="subheader"><br /><GMRvar var="GM_LANG_sources" /><br /><br /></GMRText>
 					<GMRFootnoteTexts />
 				</GMRTextBox>
 			</GMRif>
 		</GMRBody>
 		<GMRFooter>
-			<GMRCell width="0" height="10" style="pagenum" align="center"><GMRNow />                            <GMRvar var="gm_lang[ahnentafel_report]" />                           <GMRvar var="gm_lang[page]" /> <GMRPageNum /> <GMRvar var="gm_lang[of]" /> <GMRTotalPages /></GMRCell>
+			<GMRCell width="0" height="10" style="pagenum" align="center"><GMRNow />                            <GMRvar var="GM_LANG_ahnentafel_report" />                           <GMRvar var="GM_LANG_page" /> <GMRPageNum /> <GMRvar var="GM_LANG_of" /> <GMRTotalPages /></GMRCell>
 		</GMRFooter>
 	</GMRDoc>
 </GMReport>

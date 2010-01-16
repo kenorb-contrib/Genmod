@@ -105,17 +105,40 @@ function GMRvarSHandler($attrs) {
 
 	$var = $attrs["var"];
 	if (!empty($var)) {
+		if (!empty($attrs["date"])) {
+		}
 		if (!empty($vars[$var]['id'])) {
 			$var = $vars[$var]['id'];
-		} else {
+		}
+		else if (substr($var, 0, 8) == "GM_LANG_") {
+			$ct = preg_match("/GM_LANG_(.*)/", $var, $match);
+			if ($ct > 0) {
+				if (substr($match[1], 0, 1) == "$") $match[1] = eval("if(isset($match[1])) print $match[1]; else print '';");
+				$var = "GM_LANG_".$match[1];
+			}
+			if (defined($var)) $var = constant($var);
+		}
+		else if (substr($var, 0, 8) == "gm_lang[") {
+			//print "var: ".$var."<br />";
+			$ct = preg_match("/gm_lang\[[\'|\"]*(.*)[\'|\"]*\]/", $var, $match);
+			if ($ct>0) {
+				if (substr($match[1], 0, 1) == "$") $match[1] = eval("if(isset($match[1])) print $match[1]; else print '';");
+				$var = "GM_LANG_".$match[1];
+			}
+			if (defined($var)) $var = constant($var);
+		}
+		else {
 			$tfact = $fact;
 			if ($fact=="EVEN" || $fact=="FACT") $tfact = $type;
 			$var = preg_replace(array("/\[/","/\]/","/@fact/","/@desc/"), array("['","']",$tfact,$desc), $var);
-			eval("if (!empty(\$$var)) \$var = \$$var;");
+			if (isset($$var)) {
+				eval("if (!empty(\$$var)) \$var = \$$var;");
+			}
 			$ct = preg_match("/factarray\['(.*)'\]/", $var, $match);
-			if ($ct>0) $var = $match[1];
-		}
-		if (!empty($attrs["date"])) {
+			if ($ct>0) {
+				if (defined("GM_FACT".$match[1])) $var = constant("GM_FACT_".$match[1]);
+				else $var = $match[1];
+			}
 		}
 		$text .= $var;
 	}
