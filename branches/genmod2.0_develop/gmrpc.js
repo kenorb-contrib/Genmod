@@ -31,6 +31,7 @@ function sndReq(element, action, param1, val1, param2, val2, param3, val3, param
 	val8 = typeof(val8) != 'undefined' ? val8 : "";
 	var randomnumber = Math.floor(Math.random()*1000001)
 	element_id = element;
+	action_value = action;
     http.open('GET', 'gmrpc.php?action='+action+'&'+param1+'='+val1+'&'+param2+'='+val2+'&'+param3+'='+val3+'&'+param4+'='+val4+'&'+param5+'='+val5+'&'+param6+'='+val6+'&'+param7+'='+val7+'&'+param8+'='+val8+'&'+sessionname+'='+sessionid+'&wqp='+randomnumber, true);
     http.send(null);
     http.onreadystatechange = handleResponse;
@@ -41,5 +42,5 @@ function handleResponse() {
     if(http.readyState == 4) {
         document.getElementById(element_id).innerHTML = http.responseText;
     }
-   	else document.getElementById(element_id).innerHTML = '<img src="images/ajax-loader.gif" />';
+   	else if (action_value != 'remembertab') document.getElementById(element_id).innerHTML = '<img src="images/ajax-loader.gif" />';
 }
