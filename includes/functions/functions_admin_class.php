@@ -162,7 +162,7 @@ abstract class AdminFunctions {
 		if ($zip == "yes") fwrite($gedout, $head);
 		else print $head;
 	
-		$sql = "SELECT i_key, i_gedrec, i_file, i_id, i_isdead, n_name, n_surname, n_nick, n_type, n_letter FROM ".TBLPREFIX."individuals INNER JOIN ".TBLPREFIX."names ON i_key=n_key WHERE i_file=".$GEDCOMID." ORDER BY CAST(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(LOWER(i_id),'a',''),'b',''),'c',''),'d',''),'e',''),'f',''),'g',''),'h',''),'i',''),'j',''),'k',''),'l',''),'m',''),'n',''),'o',''),'p',''),'q',''),'r',''),'s',''),'t',''),'u',''),'v',''),'w',''),'x',''),'y',''),'z','') as unsigned), n_id";
+		$sql = "SELECT i_key, i_gedrec, i_file, i_id, i_isdead, n_name, n_surname, n_nick, n_type, n_letter, n_fletter FROM ".TBLPREFIX."individuals INNER JOIN ".TBLPREFIX."names ON i_key=n_key WHERE i_file=".$GEDCOMID." ORDER BY CAST(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(LOWER(i_id),'a',''),'b',''),'c',''),'d',''),'e',''),'f',''),'g',''),'h',''),'i',''),'j',''),'k',''),'l',''),'m',''),'n',''),'o',''),'p',''),'q',''),'r',''),'s',''),'t',''),'u',''),'v',''),'w',''),'x',''),'y',''),'z','') as unsigned), n_id";
 		$res = NewQuery($sql);
 		if ($res) {
 			$key = "";
@@ -176,7 +176,7 @@ abstract class AdminFunctions {
 					$key = $row["i_key"];
 					$person = new Person($row["i_id"], $row, $row["i_id"]);
 				}
-				$person->addname = array($row["n_name"], $row["n_letter"], $row["n_surname"], $row["n_nick"], $row["n_type"]);
+				$person->addname = array($row["n_name"], $row["n_letter"], $row["n_surname"], $row["n_nick"], $row["n_type"], $row["n_fletter"]);
 			}
 			if ($key != "") {
 				$person->names_read = true;

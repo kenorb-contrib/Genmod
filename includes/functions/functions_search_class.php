@@ -79,10 +79,10 @@ abstract class SearchFunctions {
 					else $addsql .= " AND i_gedrec NOT REGEXP '[[:<:]]".DbLayer::EscapeQuery($keyword["term"]).$keyword["wildcard"]."[[:>:]]'";
 				}
 			}
-			$sql = "SELECT i_key, i_id, i_file, i_gedrec, i_isdead, n_name, n_letter, n_type, n_surname, n_nick FROM ".TBLPREFIX."individuals, ".TBLPREFIX."names WHERE i_key=n_key AND (".substr($addsql,4).")";
+			$sql = "SELECT i_key, i_id, i_file, i_gedrec, i_isdead, n_name, n_letter, n_fletter, n_type, n_surname, n_nick FROM ".TBLPREFIX."individuals, ".TBLPREFIX."names WHERE i_key=n_key AND (".substr($addsql,4).")";
 		}
 		else {
-			$sql = "SELECT i_key, i_id, i_file, i_gedrec, i_isdead, n_name, n_letter, n_type, n_surname, n_nick FROM ".TBLPREFIX."individuals, ".TBLPREFIX."names WHERE i_key=n_key AND (MATCH (i_gedrec) AGAINST ('".DbLayer::EscapeQuery($query)."' IN BOOLEAN MODE))";
+			$sql = "SELECT i_key, i_id, i_file, i_gedrec, i_isdead, n_name, n_letter, n_fletter, n_type, n_surname, n_nick FROM ".TBLPREFIX."individuals, ".TBLPREFIX."names WHERE i_key=n_key AND (MATCH (i_gedrec) AGAINST ('".DbLayer::EscapeQuery($query)."' IN BOOLEAN MODE))";
 		}
 			
 		if (!$allgeds) $sql .= " AND i_file='".$GEDCOMID."'";
@@ -110,7 +110,7 @@ abstract class SearchFunctions {
 					$person =& Person::GetInstance($row["i_id"], $row, $row["i_file"]);
 					$myindilist[$row["i_key"]] = $person;
 				}
-				$myindilist[$row["i_key"]]->addname = array($row["n_name"], $row["n_letter"], $row["n_surname"], $row["n_nick"], $row["n_type"]);
+				$myindilist[$row["i_key"]]->addname = array($row["n_name"], $row["n_letter"], $row["n_surname"], $row["n_nick"], $row["n_type"], $row["n_fletter"]);
 			}
 			if ($key != "") $person->names_read = true;
 			$res->FreeResult();
@@ -571,7 +571,7 @@ abstract class SearchFunctions {
 		global $GEDCOMID;
 	
 		$myindilist = array();
-		$sql = "SELECT DISTINCT i_key, i_id, i_file, i_gedrec, i_isdead, n_name, n_surname, n_nick, n_letter, n_type FROM ".TBLPREFIX."individuals INNER JOIN ".TBLPREFIX."names ON i_key=n_key INNER JOIN ".TBLPREFIX."dates ON (i_key=d_key AND d_fact<>'CHAN') WHERE";
+		$sql = "SELECT DISTINCT i_key, i_id, i_file, i_gedrec, i_isdead, n_name, n_surname, n_nick, n_letter, n_fletter, n_type FROM ".TBLPREFIX."individuals INNER JOIN ".TBLPREFIX."names ON i_key=n_key INNER JOIN ".TBLPREFIX."dates ON (i_key=d_key AND d_fact<>'CHAN') WHERE";
 		if ($startyear < $endyear) $sql .= " d_year>='".$startyear."' AND d_year<='".$endyear."'";
 		else $sql .= " d_year=".$startyear;
 		if (!empty($type)) $sql .= " AND d_fact IN ".$type;
@@ -593,7 +593,7 @@ abstract class SearchFunctions {
 				}
 				else self::$indi_hide[$key] = 1;
 			}
-			if ($person->disp_name) $myindilist[$row["i_key"]]->addname = array($row["n_name"], $row["n_letter"], $row["n_surname"], $row["n_nick"], $row["n_type"]);
+			if ($person->disp_name) $myindilist[$row["i_key"]]->addname = array($row["n_name"], $row["n_letter"], $row["n_surname"], $row["n_nick"], $row["n_type"], $row["n_fletter"]);
 		}
 		if ($key != "") $person->names_read = true;
 		
@@ -801,7 +801,7 @@ abstract class SearchFunctions {
 		
 		$myindilist = array();
 		
-		$sql = "SELECT DISTINCT i_key, i_id, i_file, i_gedrec, i_isdead, n_name, n_surname, n_nick, n_type, n_letter FROM ".TBLPREFIX."individuals INNER JOIN ".TBLPREFIX."names ON n_key=i_key INNER JOIN ".TBLPREFIX."dates ON (d_key=i_key AND d_fact<>'CHAN') WHERE";
+		$sql = "SELECT DISTINCT i_key, i_id, i_file, i_gedrec, i_isdead, n_name, n_surname, n_nick, n_type, n_letter, n_fletter FROM ".TBLPREFIX."individuals INNER JOIN ".TBLPREFIX."names ON n_key=i_key INNER JOIN ".TBLPREFIX."dates ON (d_key=i_key AND d_fact<>'CHAN') WHERE";
 		$and = "";
 		if (!empty($day)) {
 			$sql .= " d_day='".DbLayer::EscapeQuery($day)."'";
@@ -859,7 +859,7 @@ abstract class SearchFunctions {
 					}
 					else self::$indi_hide[$key] = 1;
 				}
-				if ($person->disp_name) $myindilist[$row["i_key"]]->addname = array($row["n_name"], $row["n_letter"], $row["n_surname"], $row["n_nick"], $row["n_type"]);
+				if ($person->disp_name) $myindilist[$row["i_key"]]->addname = array($row["n_name"], $row["n_letter"], $row["n_surname"], $row["n_nick"], $row["n_type"], $row["n_fletter"]);
 			}
 			if ($key != "") $person->names_read = true;
 		}

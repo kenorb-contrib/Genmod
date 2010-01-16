@@ -55,7 +55,7 @@ function print_block_name_top10($block=true, $config="", $side, $index) {
 	if (count($surnames)>0) {
 		print "<div id=\"top10surnames\" class=\"block\">\n";
 		print "<div class=\"blockhc\">";
-		print_help_link("index_common_names_help", "qm");
+		PrintHelpLink("index_common_names_help", "qm");
 		if ($GM_BLOCKS["print_block_name_top10"]["canconfig"]) {
 			if ((($command=="gedcom")&&($gm_user->userGedcomAdmin())) || (($command=="user")&&($gm_user->username != ""))) {
 				if ($command=="gedcom") $name = preg_replace("/'/", "\'", get_gedcom_from_id($GEDCOMID));

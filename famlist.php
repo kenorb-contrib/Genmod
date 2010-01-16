@@ -45,35 +45,11 @@
  * Inclusion of the configuration file
 */
 require("config.php");
+$famlist_controller = new FamlistController();
 
 $COMBIKEY = true;
 
-if (empty($surname_sublist)) $surname_sublist = "yes";
-if (empty($show_all)) $show_all = "no";
-if (!isset($allgeds) || $allgeds != "yes" || !$ALLOW_CHANGE_GEDCOM) $allgeds = "no";
-// Added if any of the gedcoms require authentication and the user is not logged on, we cannot do allgeds.
-if (!isset($allgeds) || $allgeds != "yes" || !$ALLOW_CHANGE_GEDCOM) $allgeds = "no";
-if ($allgeds == "yes" && empty($gm_user->username)) {
-	foreach($GEDCOMS as $key => $ged) {
-		SwitchGedcom($key);
-		if (GedcomConfig::$REQUIRE_AUTHENTICATION) $allgeds = "no";
-	}
-	SwitchGedcom();
-}
-
-// Remove slashes
-$addheader = "";
-if (empty($show_all_firstnames)) $show_all_firstnames = "no";
-if (isset($alpha)) {
-	$alpha = stripslashes($alpha);
-	$addheader = "(".$alpha.")";
-}
-if (isset($surname)) {
-	$surname = stripslashes($surname);
-	$addheader = "(".NameFunctions::CheckNN($surname).")";
-}
-
-PrintHeader(GM_LANG_family_list." ".$addheader);
+PrintHeader($famlist_controller->pagetitle);
 print "<div class =\"center\">";
 print "\n\t<h3>";
 PrintHelpLink("name_list_help", "qm", "name_list");
@@ -102,29 +78,17 @@ $tfamlist = array();
  * @var array $famalpha
  */
 
-$famalpha = GetFamAlpha($allgeds);
-
-uasort($famalpha, "stringsort");
-
-if (isset($alpha) && !isset($famalpha["$alpha"])) unset($alpha);
-
-$TableTitle = "<img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["sfamily"]["small"]."\" border=\"0\" title=\"".GM_LANG_families."\" alt=\"".GM_LANG_families."\" />&nbsp;&nbsp;";
+$famalpha = $famlist_controller->GetLetterBar();
 
 if (count($famalpha) > 0) {
 	PrintHelpLink("alpha_help", "qm", "alpha_index");
-	foreach($famalpha as $letter=>$list) {
-		if (empty($alpha)) {
-			if (!empty($surname)) {
-				if (GedcomConfig::$USE_RTL_FUNCTIONS && isRTLText($surname)) $alpha = substr(StripPrefix($surname),0,2);
-				else $alpha = substr(StripPrefix($surname),0,1);
-			}
-		}
+	foreach($famalpha as $index => $letter) {
 		if ($letter != "@") {
-			print "<a href=\"famlist.php?alpha=".urlencode($letter)."&amp;surname_sublist=".$surname_sublist;
-			if ($allgeds == "yes") print "&amp;allgeds=yes";
+			print "<a href=\"famlist.php?alpha=".urlencode($letter)."&amp;surname_sublist=".$famlist_controller->surname_sublist;
+			if ($famlist_controller->allgeds == "yes") print "&amp;allgeds=yes";
 			print "\">";
-			if (isset($alpha) && ($alpha==$letter)&&($show_all=="no")) print "<span class=\"warning\">".$letter."</span>";
-			else print $letter;
+			if ($famlist_controller->alpha == $letter && $famlist_controller->show_all=="no") print "<span class=\"warning\">".htmlspecialchars($letter)."</span>";
+			else print htmlspecialchars($letter);
 			print "</a> | \n";
 		}
 		
@@ -136,14 +100,14 @@ if (count($famalpha) > 0) {
 		}
 	}
 	if ($pass == TRUE) {
-		if (isset($alpha) && $alpha == "@") {
-			print "<a href=\"famlist.php?alpha=@&amp;surname_sublist=".$surname_sublist."&amp;surname=@N.N.";
-			if ($allgeds == "yes") print "&amp;allgeds=yes";
+		if ($famlist_controller->alpha == "@") {
+			print "<a href=\"famlist.php?alpha=".urlencode("@")."&amp;surname_sublist=yes&amp;surname=@N.N.";
+			if ($famlist_controller->allgeds == "yes") print "&amp;allgeds=yes";
 			print "\"><span class=\"warning\">".PrintReady(GM_LANG_NN)."</span></a>";
 		}
 		else {
-			print "<a href=\"famlist.php?alpha=@&amp;surname_sublist=yes&amp;surname=@N.N.";
-			if ($allgeds == "yes") print "&amp;allgeds=yes";
+			print "<a href=\"famlist.php?alpha=".urlencode("@")."&amp;surname_sublist=yes&amp;surname=@N.N.";
+			if ($famlist_controller->allgeds == "yes") print "&amp;allgeds=yes";
 			print "\">".PrintReady(GM_LANG_NN)."</a>";
 		}
 		/**
@@ -153,78 +117,76 @@ if (count($famalpha) > 0) {
 	}
 	if (GedcomConfig::$LISTS_ALL) {
 		print " | \n";
-		if ($show_all=="yes") {
-			print "<a href=\"famlist.php?show_all=yes&amp;surname_sublist=".$surname_sublist;
-			if ($allgeds == "yes") print "&amp;allgeds=yes";
+		if ($famlist_controller->show_all=="yes") {
+			print "<a href=\"famlist.php?show_all=yes&amp;surname_sublist=".$famlist_controller->surname_sublist;
+			if ($famlist_controller->allgeds == "yes") print "&amp;allgeds=yes";
 			print "\"><span class=\"warning\">".GM_LANG_all."</span></a>\n";
 		}
 		else {
-			print "<a href=\"famlist.php?show_all=yes&amp;surname_sublist=".$surname_sublist;
-			if ($allgeds == "yes") print "&amp;allgeds=yes";
+			print "<a href=\"famlist.php?show_all=yes&amp;surname_sublist=".$famlist_controller->surname_sublist;
+			if ($famlist_controller->allgeds == "yes") print "&amp;allgeds=yes";
 			print "\">".GM_LANG_all."</a>\n";
 		}
 	}
-	if (isset($startalpha)) $alpha = $startalpha;
+	if (isset($startalpha)) $famlist_controller->alpha = $startalpha;
 }
 print "<br /><br />";
-if (!isset($alpha)) $alpha="";
-if ($surname_sublist=="yes" && empty($surname)) {
-	if (!isset($alpha)) $alpha="";
-	if (!empty($alpha) || $show_all == "yes") {
-		$indi_total = 0;
-		$namelist = GetAlphaFamSurnames($alpha, $allgeds);
-		foreach ($namelist as $key => $nsurname) {
-			$tsurname = Str2Upper(StripPrefix(preg_replace("/([^ ]+)\*/", "$1", $nsurname["name"])));
-			$surnames[$tsurname]["name"] = preg_replace("/([^ ]+)\*/", "$1", $nsurname["name"]);
-			$surnames[$tsurname]["match"] = $nsurname["count"];
-			$surnames[$tsurname]["alpha"] = $alpha;
-			$indi_total += $nsurname["count"];
-		}
-		uasort($surnames, "ItemSort");
+if ($famlist_controller->surname_sublist=="yes" && $famlist_controller->show_all == "yes") {
+	// Get the surnames of all individuals belonging to a family
+	// print "option 1";
+	$namelist = $famlist_controller->GetAlphaFamSurnames($famlist_controller->alpha, $famlist_controller->allgeds);
+	print "<div class=\"topbar\">".GM_LANG_surnames."</div>\n";
+	$famlist_controller->PrintSurnameList($namelist);
+}
+else if ($famlist_controller->surname_sublist == "yes" && $famlist_controller->surname == "" && $famlist_controller->show_all == "no") {
+
+	// print "option 2";
+	// NOTE: Get all of the individuals whose last names start with this letter
+	if ($famlist_controller->alpha != "") {
+		$namelist = $famlist_controller->GetAlphaFamSurnames($famlist_controller->alpha, $famlist_controller->allgeds);
 		print "<div class=\"topbar\">".GM_LANG_surnames."</div>\n";
-		PrintSurnameList($surnames, $_SERVER["SCRIPT_NAME"], $allgeds);
+		$famlist_controller->PrintSurnameList($namelist);
+		
 	}
 }
 else {
-	$firstname_alpha = false;
 	// NOTE: If the surname is set then only get the names in that surname list
-	if ((!empty($surname))&&($surname_sublist=="yes")) {
-		$surname = trim($surname);
-		$tfamlist = GetSurnameFams($surname, $allgeds);
+	if ($famlist_controller->surname != "" && $famlist_controller->surname_sublist=="yes") {
+		$tfamlist = $famlist_controller->GetFams();
 	}
 	// NOTE: Get all individuals for the sublist
-	if (($surname_sublist=="no")&&(!empty($alpha))&&($show_all=="no")) {
-		$tfamlist = GetAlphaFams($alpha, $allgeds);
+	if ($famlist_controller->surname_sublist == "no" && $famlist_controller->alpha != "" && $famlist_controller->show_all == "no") {
+		$tfamlist = $famlist_controller->GetFams();
 	}
 	
 	// NOTE: Simplify processing for ALL indilist
 	// NOTE: Skip surname is yes and ALL is chosen
-	if (($surname_sublist=="no")&&($show_all=="yes")) {
-		$tfamlist = GetFamList($allgeds);
+	if ($famlist_controller->surname_sublist == "no" && $famlist_controller->show_all == "yes") {
+		$tfamlist = $famlist_controller->GetFams();
 		print "<div class=\"topbar\">".GM_LANG_families."</div>\n";
-		PrintFamilyList($tfamlist, true, false, $allgeds);
+		$famlist_controller->PrintFamilyList($tfamlist, true);
 	}
 	else {
 		// NOTE: If user wishes to skip surname do not print the surname
 		print "<div class=\"topbar\">";
-		if ($surname_sublist == "no") print GM_LANG_surnames;
+		if ($famlist_controller->surname_sublist == "no") print GM_LANG_surnames;
 		else	print PrintReady(str_replace("#surname#", NameFunctions::CheckNN($surname), GM_LANG_fams_with_surname));
 		print "</div>\n";
-		PrintFamilyList($tfamlist, true, false, $allgeds);
+		$famlist_controller->PrintFamilyList($tfamlist, true);
 	}
 }
 
 print "<br />";
-if ($alpha != "@") {
+if ($famlist_controller->alpha != "@") {
 	PrintHelpLink("skip_sublist_help", "qm", "skip_surnames");
-	if ($surname_sublist=="yes") {
-		print "<br /><a href=\"famlist.php?alpha=$alpha&amp;surname_sublist=no&amp;show_all=".$show_all;
-		if ($allgeds == "yes") print "&amp;allgeds=yes";
+	if ($famlist_controller->surname_sublist=="yes") {
+		print "<br /><a href=\"famlist.php?alpha=$famlist_controller->alpha&amp;surname_sublist=no&amp;show_all=".$famlist_controller->show_all;
+		if ($famlist_controller->allgeds == "yes") print "&amp;allgeds=yes";
 		print "\">".GM_LANG_skip_surnames."</a>";
 	}
 	else {
-		print "<br /><a href=\"famlist.php?alpha=$alpha&amp;surname_sublist=yes&amp;show_all=".$show_all;
-		if ($allgeds == "yes") print "&amp;allgeds=yes";
+		print "<br /><a href=\"famlist.php?alpha=$famlist_controller->alpha&amp;surname_sublist=yes&amp;show_all=".$famlist_controller->show_all;
+		if ($famlist_controller->allgeds == "yes") print "&amp;allgeds=yes";
 		print "\">".GM_LANG_show_surnames."</a>";
 	}
 }

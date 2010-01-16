@@ -188,6 +188,7 @@
 "_HAIR";"Kleur haar"
 "_HEB";"Hebreeuwse naam"
 "_HEIG";"Lengte"
+"_HIST";"Historische gebeurtenis"
 "_HNM";"Hebreeuwse naam"
 "_HOL";"Holocaust"
 "_INTE";"Bijgezet"
@@ -228,4 +229,3 @@
 "_UID";"Universeel kenmerk (UID)"
 "_WEIG";"Gewicht"
 "_YART";"Yartzeit"
-"_HIST";"Historische gebeurtenis"

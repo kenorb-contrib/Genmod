@@ -533,6 +533,7 @@ $db_original[TBLPREFIX."names"]["row"]["n_gid"]["details"] = "VARCHAR(64) CHARAC
 $db_original[TBLPREFIX."names"]["row"]["n_file"]["details"] = "TINYINT UNSIGNED";
 $db_original[TBLPREFIX."names"]["row"]["n_name"]["details"] = "VARCHAR(255) CHARACTER SET #charset# COLLATE #collate# ";
 $db_original[TBLPREFIX."names"]["row"]["n_letter"]["details"] = "VARCHAR(5) CHARACTER SET #charset# COLLATE #collate# ";
+$db_original[TBLPREFIX."names"]["row"]["n_fletter"]["details"] = "VARCHAR(5) CHARACTER SET #charset# COLLATE #collate# ";
 $db_original[TBLPREFIX."names"]["row"]["n_surname"]["details"] = "VARCHAR(100) CHARACTER SET #charset# COLLATE #collate# ";
 $db_original[TBLPREFIX."names"]["row"]["n_nick"]["details"] = "VARCHAR(100) CHARACTER SET #charset# COLLATE #collate# ";
 $db_original[TBLPREFIX."names"]["row"]["n_type"]["details"] = "VARCHAR(10) CHARACTER SET #charset# COLLATE #collate# ";

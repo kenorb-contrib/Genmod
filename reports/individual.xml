@@ -1,14 +1,14 @@
 <GMReport access="PRIV_PUBLIC" icon="indis" type="indi">
 	<!-- $Id$ -->
-	<GMRTitle><GMRvar var="gm_lang[individual_report]" /></GMRTitle>
+	<GMRTitle><GMRvar var="GM_LANG_individual_report" /></GMRTitle>
 	<GMRDescription>Prints an individual record report</GMRDescription>
-	<GMRInput name="pid" lookup="INDI" type="text" default=""><GMRvar var="gm_lang[enter_pid]" />:</GMRInput>
-	<GMRInput name="sources" type="checkbox" default="1"><GMRvar var="gm_lang[SHOW_SOURCES]" /></GMRInput>
-	<GMRInput name="notes" type="checkbox" default="1"><GMRvar var="gm_lang[show_notes]" /></GMRInput>
-	<GMRInput name="photos" type="checkbox" default="0"><GMRvar var="gm_lang[show_photos]" /></GMRInput>
-	<GMRInput name="showIndID" type="checkbox" default="SHOW_ID_NUMBERS"><GMRvar var="gm_lang[SHOW_ID_NUMBERS]" /></GMRInput>
-	<GMRInput name="showFamID" type="checkbox" default="SHOW_FAM_ID_NUMBERS"><GMRvar var="gm_lang[SHOW_FAM_ID_NUMBERS]" /></GMRInput>
-	<GMRInput name="pageSize" type="select" options="AVAIL_PAGE_SIZES" default="DEFAULT_PAGE_SIZE"><GMRvar var="gm_lang[page_size]" /></GMRInput>
+	<GMRInput name="pid" lookup="INDI" type="text" default=""><GMRvar var="GM_LANG_enter_pid" />:</GMRInput>
+	<GMRInput name="sources" type="checkbox" default="1"><GMRvar var="GM_LANG_SHOW_SOURCES" /></GMRInput>
+	<GMRInput name="notes" type="checkbox" default="1"><GMRvar var="GM_LANG_show_notes" /></GMRInput>
+	<GMRInput name="photos" type="checkbox" default="0"><GMRvar var="GM_LANG_show_photos" /></GMRInput>
+	<GMRInput name="showIndID" type="checkbox" default="SHOW_ID_NUMBERS"><GMRvar var="GM_LANG_SHOW_ID_NUMBERS" /></GMRInput>
+	<GMRInput name="showFamID" type="checkbox" default="SHOW_FAM_ID_NUMBERS"><GMRvar var="GM_LANG_SHOW_FAM_ID_NUMBERS" /></GMRInput>
+	<GMRInput name="pageSize" type="select" options="AVAIL_PAGE_SIZES" default="DEFAULT_PAGE_SIZE"><GMRvar var="GM_LANG_page_size" /></GMRInput>
 	<GMRStyle name="header" font="LucidaSansUnicode" size="18" style="" />
 	<GMRStyle name="pagenum" font="LucidaSansUnicode" size="8" style="" />
 	<GMRStyle name="label1" font="LucidaSansUnicode" size="9" style="" />
@@ -32,13 +32,13 @@
 			<GMRSetVar name="width2" value="270" />
 		</GMRif>
 		<GMRHeader>
-			<GMRCell width="$width" height="20" align="center" style="header"><GMRvar var="gm_lang[individual_report]" /></GMRCell>
-			<!-- GMRCell width="0" height="10" align="right" style="pagenum"><GMRvar var="gm_lang[page]" /> <GMRPageNum /> <GMRvar var="gm_lang[of]" /> <GMRTotalPages /> - <GMRNow /></GMRCell -->
+			<GMRCell width="$width" height="20" align="center" style="header"><GMRvar var="GM_LANG_individual_report" /><GMRvar var="$LANGUAGE" /></GMRCell>
+			<!-- GMRCell width="0" height="10" align="right" style="pagenum"><GMRvar var="GM_LANG_page" /> <GMRPageNum /> <GMRvar var="GM_LANG_of" /> <GMRTotalPages /> - <GMRNow /></GMRCell -->
 			<GMRTextBox width="50%" height="10" border="0">
 				<GMRText style="pagenum"><GMRNow /></GMRText>
 			</GMRTextBox>
 			<GMRTextBox width="0" height="10" border="0" newline="1">
-				<GMRText style="pagenum" align="right"><GMRvar var="gm_lang[page]" /> <GMRPageNum /> <GMRvar var="gm_lang[of]" /> <GMRTotalPages /></GMRText>
+				<GMRText style="pagenum" align="right"><GMRvar var="GM_LANG_page" /> <GMRPageNum /> <GMRvar var="GM_LANG_of" /> <GMRTotalPages /></GMRText>
 			</GMRTextBox>
 		</GMRHeader>
 		<GMRBody>
@@ -73,11 +73,11 @@
 
 				<!-- print the person's facts -->
 				<GMRTextBox border="1" width="$width" height="16" newline="1" fill="#DDDDDD">
-					<GMRText style="label1"><GMRvar var="gm_lang[personal_facts]" />   </GMRText>
+					<GMRText style="label1"><GMRvar var="GM_LANG_personal_facts" />   </GMRText>
 				</GMRTextBox>
 				<GMRFacts ignore="$ignore" families="1">
 					<GMRTextBox border="1" width="$dwidth" height="16">
-						<GMRText style="pagenum"><GMRvar var="factarray[@fact]" /><GMRif condition="@fact=='MARR'"><GMRif condition="$showFamID"> (<GMRGedcomValue tag="_GMFS" />)</GMRif></GMRif>  </GMRText>
+						<GMRText style="pagenum"><GMRvar var="GM_FACT_@fact" /><GMRif condition="@fact=='MARR'"><GMRif condition="$showFamID"> (<GMRGedcomValue tag="_GMFS" />)</GMRif></GMRif>  </GMRText>
 						<GMRText style="text"><GMRGedcomValue tag="@fact:DATE" /></GMRText>
 						<!-- look for fact level 2 sources -->
 						<GMRif condition="$sources==1">
@@ -99,10 +99,10 @@
 							<GMRText style="text"> <GMRGedcomValue tag="@fact:PLAC" /></GMRText>
 							<GMRGedcom id="@_GMS">
 								<GMRif condition="@SEX=='M'">
-									<GMRText style="pagenum">  <GMRvar var="gm_lang[husband]" /></GMRText>
+									<GMRText style="pagenum">  <GMRvar var="GM_LANG_husband" /></GMRText>
 								</GMRif>
 								<GMRif condition="@SEX=='F'">
-									<GMRText style="pagenum"> <GMRvar var="gm_lang[wife]" /></GMRText>
+									<GMRText style="pagenum"> <GMRvar var="GM_LANG_wife" /></GMRText>
 								</GMRif>
 								<GMRText style="text"> <GMRGetPersonName id="" /></GMRText>
 							</GMRGedcom>
@@ -112,16 +112,16 @@
 					<GMRif condition="@desc==''">
 						<GMRTextBox border="1" width="$width2" height="16" newline="1">
 							<GMRif condition="@PLAC!=''">
-								<GMRText style="pagenum"><GMRvar var="factarray[PLAC]" />   </GMRText>
+								<GMRText style="pagenum"><GMRvar var="GM_FACT_PLAC" />   </GMRText>
 							</GMRif>
 							<GMRText style="text"><GMRGedcomValue tag="@fact:PLAC" /></GMRText>
 							<GMRText style="text"><GMRGedcomValue tag="@fact:TEMP" /></GMRText>
 							<GMRGedcom id="@_GMS">
 								<GMRif condition="@SEX=='M'">
-									<GMRText style="pagenum">  <GMRvar var="gm_lang[husband]" /></GMRText>
+									<GMRText style="pagenum">  <GMRvar var="GM_LANG_husband" /></GMRText>
 								</GMRif>
 								<GMRif condition="@SEX=='F'">
-									<GMRText style="pagenum"> <GMRvar var="gm_lang[wife]" /></GMRText>
+									<GMRText style="pagenum"> <GMRvar var="GM_LANG_wife" /></GMRText>
 								</GMRif>
 								<GMRText style="text"> <GMRGetPersonName id="" /></GMRText>
 							</GMRGedcom>
@@ -134,7 +134,7 @@
 					<GMRif condition="@NOTE!=''">
 						<GMRTextBox border="0" width="15" height="16" newline="1" />
 						<GMRTextBox border="1" width="$width" height="16" newline="1" fill="#DDDDDD">
-							<GMRText style="label1"><GMRvar var="gm_lang[notes]" />   </GMRText>
+							<GMRText style="label1"><GMRvar var="GM_LANG_notes" />   </GMRText>
 						</GMRTextBox>
 						<GMRRepeatTag tag="NOTE">
 							<GMRTextBox border="1" width="$width" height="16" newline="1">
@@ -149,12 +149,12 @@
 					<GMRGedcom id="@FAMC">
 						<GMRTextBox border="0" width="15" height="16" newline="1" />
 						<GMRTextBox border="1" width="$width" height="16" newline="1" fill="#DDDDDD">
-							<GMRText style="label1"><GMRvar var="gm_lang[as_child]" /><GMRif condition="$showFamID"> (<GMRGedcomValue tag="@id" />)</GMRif></GMRText>
+							<GMRText style="label1"><GMRvar var="GM_LANG_as_child" /><GMRif condition="$showFamID"> (<GMRGedcomValue tag="@id" />)</GMRif></GMRText>
 						</GMRTextBox>
 						<!-- father -->
 						<GMRGedcom id="@HUSB">
 							<GMRTextBox border="1" width="$width" height="16" newline="1">
-								<GMRText style="label1"><GMRvar var="gm_lang[father]" />   </GMRText>
+								<GMRText style="label1"><GMRvar var="GM_LANG_father" />   </GMRText>
 								<GMRText style="name"><GMRGetPersonName id="" /></GMRText>
 								<GMRif condition="$sources==1">
 									<GMRRepeatTag tag="SOUR">
@@ -167,13 +167,13 @@
 									</GMRFootnote>
 									</GMRRepeatTag>
 								</GMRif>
-								<GMRText style="text">  (<GMRvar var="factarray[BIRT]" />: <GMRGedcomValue tag="BIRT:DATE" /> <GMRGedcomValue tag="BIRT:PLAC" /><GMRif condition="@DEAT:DATE!='' OR @DEAT:PLAC!=''"> - <GMRvar var="factarray[DEAT]" />: <GMRGedcomValue tag="DEAT:DATE" /> <GMRGedcomValue tag="DEAT:PLAC" /></GMRif>)</GMRText>
+								<GMRText style="text">  (<GMRvar var="GM_FACT_BIRT" />: <GMRGedcomValue tag="BIRT:DATE" /> <GMRGedcomValue tag="BIRT:PLAC" /><GMRif condition="@DEAT:DATE!='' OR @DEAT:PLAC!=''"> - <GMRvar var="GM_FACT_DEAT" />: <GMRGedcomValue tag="DEAT:DATE" /> <GMRGedcomValue tag="DEAT:PLAC" /></GMRif>)</GMRText>
 							</GMRTextBox>
 						</GMRGedcom>
 						<!-- mother -->
 						<GMRGedcom id="@WIFE">
 							<GMRTextBox border="1" width="$width" height="16" newline="1">
-								<GMRText style="label1"><GMRvar var="gm_lang[mother]" />   </GMRText>
+								<GMRText style="label1"><GMRvar var="GM_LANG_mother" />   </GMRText>
 								<GMRText style="name"><GMRGetPersonName id="" /></GMRText>
 								<GMRif condition="$sources==1">
 									<GMRRepeatTag tag="SOUR">
@@ -186,7 +186,7 @@
 										</GMRFootnote>
 									</GMRRepeatTag>
 								</GMRif>
-								<GMRText style="text">  (<GMRvar var="factarray[BIRT]" />: <GMRGedcomValue tag="BIRT:DATE" /> <GMRGedcomValue tag="BIRT:PLAC" /><GMRif condition="@DEAT:DATE!='' OR @DEAT:PLAC!=''"> - <GMRvar var="factarray[DEAT]" />: <GMRGedcomValue tag="DEAT:DATE" /> <GMRGedcomValue tag="DEAT:PLAC" /></GMRif>)</GMRText>
+								<GMRText style="text">  (<GMRvar var="GM_FACT_BIRT" />: <GMRGedcomValue tag="BIRT:DATE" /> <GMRGedcomValue tag="BIRT:PLAC" /><GMRif condition="@DEAT:DATE!='' OR @DEAT:PLAC!=''"> - <GMRvar var="GM_FACT_DEAT" />: <GMRGedcomValue tag="DEAT:DATE" /> <GMRGedcomValue tag="DEAT:PLAC" /></GMRif>)</GMRText>
 							</GMRTextBox>
 						</GMRGedcom>
 						<!-- siblings -->
@@ -196,10 +196,10 @@
 									<GMRTextBox border="0" width="15" height="16" newline="0" />
 									<GMRTextBox border="1" width="$width1" height="16" newline="1">
 										<GMRif condition="@SEX=='M'">
-											<GMRText style="label1"><GMRvar var="gm_lang[brother]" />   </GMRText>
+											<GMRText style="label1"><GMRvar var="GM_LANG_brother" />   </GMRText>
 										</GMRif>
 										<GMRif condition="@SEX=='F'">
-											<GMRText style="label1"><GMRvar var="gm_lang[sister]" />   </GMRText>
+											<GMRText style="label1"><GMRvar var="GM_LANG_sister" />   </GMRText>
 										</GMRif>
 										<GMRText style="name"><GMRGetPersonName id="" /></GMRText>
 										<GMRif condition="$sources==1">
@@ -213,7 +213,7 @@
 												</GMRFootnote>
 											</GMRRepeatTag>
 										</GMRif>
-										<GMRText style="text">  (<GMRvar var="factarray[BIRT]" />: <GMRGedcomValue tag="BIRT:DATE" /> <GMRGedcomValue tag="BIRT:PLAC" /><GMRif condition="@DEAT:DATE!='' OR @DEAT:PLAC!=''"> - <GMRvar var="factarray[DEAT]" />: <GMRGedcomValue tag="DEAT:DATE" /> <GMRGedcomValue tag="DEAT:PLAC" /></GMRif>)</GMRText>
+										<GMRText style="text">  (<GMRvar var="GM_FACT_BIRT" />: <GMRGedcomValue tag="BIRT:DATE" /> <GMRGedcomValue tag="BIRT:PLAC" /><GMRif condition="@DEAT:DATE!='' OR @DEAT:PLAC!=''"> - <GMRvar var="GM_FACT_DEAT" />: <GMRGedcomValue tag="DEAT:DATE" /> <GMRGedcomValue tag="DEAT:PLAC" /></GMRif>)</GMRText>
 									</GMRTextBox>
 								</GMRGedcom>
 							</GMRif>
@@ -231,12 +231,12 @@
 									<GMRText style="name1"><GMRGedcom id="$pid"><GMRGetPersonName id="$pid" /></GMRGedcom></GMRText>
 								</GMRTextBox>
 								<GMRTextBox border="1" width="$width" height="16" newline="1" fill="#DDDDDD">
-									<GMRText style="label1"><GMRvar var="gm_lang[family_with]" /> <GMRvar var="gm_lang[wife]" /><GMRif condition="$showFamID"> (<GMRGedcomValue tag="@id" />)</GMRif></GMRText>
+									<GMRText style="label1"><GMRvar var="GM_LANG_family_with" /> <GMRvar var="GM_LANG_wife" /><GMRif condition="$showFamID"> (<GMRGedcomValue tag="@id" />)</GMRif></GMRText>
 								</GMRTextBox>
 							</GMRPageHeader>
 							<GMRTextBox border="0" width="15" height="16" newline="1" />
 							<GMRTextBox border="1" width="$width" height="16" newline="1" fill="#DDDDDD">
-								<GMRText style="label1"><GMRvar var="gm_lang[family_with]" /> <GMRvar var="gm_lang[wife]" /><GMRif condition="$showFamID"> (<GMRGedcomValue tag="@id" />)</GMRif></GMRText>
+								<GMRText style="label1"><GMRvar var="GM_LANG_family_with" /> <GMRvar var="GM_LANG_wife" /><GMRif condition="$showFamID"> (<GMRGedcomValue tag="@id" />)</GMRif></GMRText>
 							</GMRTextBox>
 							<GMRSetVar name="spid" value="@WIFE" />
 						</GMRif>
@@ -247,12 +247,12 @@
 									<GMRText style="name1"><GMRGedcom id="$pid"><GMRGetPersonName id="$id" /></GMRGedcom></GMRText>
 								</GMRTextBox>
 								<GMRTextBox border="1" width="$width" height="16" newline="1" fill="#DDDDDD">
-									<GMRText style="label1"><GMRvar var="gm_lang[family_with]" /> <GMRvar var="gm_lang[husband]" /><GMRif condition="$showFamID"> (<GMRGedcomValue tag="@id" />)</GMRif></GMRText>
+									<GMRText style="label1"><GMRvar var="GM_LANG_family_with" /> <GMRvar var="GM_LANG_husband" /><GMRif condition="$showFamID"> (<GMRGedcomValue tag="@id" />)</GMRif></GMRText>
 								</GMRTextBox>
 							</GMRPageHeader>
 							<GMRTextBox border="0" width="15" height="16" newline="1" />
 							<GMRTextBox border="1" width="$width" height="16" newline="1" fill="#DDDDDD">
-								<GMRText style="label1"><GMRvar var="gm_lang[family_with]" /> <GMRvar var="gm_lang[husband]" /><GMRif condition="$showFamID"> (<GMRGedcomValue tag="@id" />)</GMRif></GMRText>
+								<GMRText style="label1"><GMRvar var="GM_LANG_family_with" /> <GMRvar var="GM_LANG_husband" /><GMRif condition="$showFamID"> (<GMRGedcomValue tag="@id" />)</GMRif></GMRText>
 							</GMRTextBox>
 							<GMRSetVar name="spid" value="@HUSB" />
 						</GMRif>
@@ -261,10 +261,10 @@
 						<GMRGedcom id="$spid">
 							<GMRTextBox border="1" width="$width" height="16" newline="1">
 								<GMRif condition="@SEX=='M'">
-									<GMRText style="label1"><GMRvar var="gm_lang[husband]" />   </GMRText>
+									<GMRText style="label1"><GMRvar var="GM_LANG_husband" />   </GMRText>
 								</GMRif>
 								<GMRif condition="@SEX=='F'">
-									<GMRText style="label1"><GMRvar var="gm_lang[wife]" />   </GMRText>
+									<GMRText style="label1"><GMRvar var="GM_LANG_wife" />   </GMRText>
 								</GMRif>
 								<GMRText style="name"><GMRGetPersonName id="" /></GMRText>
 								<GMRif condition="$sources==1">
@@ -278,7 +278,7 @@
 										</GMRFootnote>
 									</GMRRepeatTag>
 								</GMRif>
-								<GMRText style="text">  (<GMRvar var="factarray[BIRT]" />: <GMRGedcomValue tag="BIRT:DATE" /> <GMRGedcomValue tag="BIRT:PLAC" /><GMRif condition="@DEAT:DATE!='' OR @DEAT:PLAC!=''"> - <GMRvar var="factarray[DEAT]" />: <GMRGedcomValue tag="DEAT:DATE" /> <GMRGedcomValue tag="DEAT:PLAC" /></GMRif>)</GMRText>
+								<GMRText style="text">  (<GMRvar var="GM_FACT_BIRT" />: <GMRGedcomValue tag="BIRT:DATE" /> <GMRGedcomValue tag="BIRT:PLAC" /><GMRif condition="@DEAT:DATE!='' OR @DEAT:PLAC!=''"> - <GMRvar var="GM_FACT_DEAT" />: <GMRGedcomValue tag="DEAT:DATE" /> <GMRGedcomValue tag="DEAT:PLAC" /></GMRif>)</GMRText>
 							</GMRTextBox>
 						</GMRGedcom>
 						<!-- print children -->
@@ -288,10 +288,10 @@
 									<GMRTextBox border="0" width="15" height="16" newline="0" />
 									<GMRTextBox border="1" width="$width1" height="16" newline="1">
 										<GMRif condition="@SEX=='M'">
-											<GMRText style="label1"><GMRvar var="gm_lang[son]" />   </GMRText>
+											<GMRText style="label1"><GMRvar var="GM_LANG_son" />   </GMRText>
 										</GMRif>
 										<GMRif condition="@SEX=='F'">
-											<GMRText style="label1"><GMRvar var="gm_lang[daughter]" />   </GMRText>
+											<GMRText style="label1"><GMRvar var="GM_LANG_daughter" />   </GMRText>
 										</GMRif>
 										<GMRText style="name"><GMRGetPersonName id="" /></GMRText>
 										<GMRif condition="$sources==1">
@@ -305,7 +305,7 @@
 												</GMRFootnote>
 											</GMRRepeatTag>
 										</GMRif>
-										<GMRText style="text">  (<GMRvar var="factarray[BIRT]" />: <GMRGedcomValue tag="BIRT:DATE" /> <GMRGedcomValue tag="BIRT:PLAC" /><GMRif condition="@DEAT:DATE!='' OR @DEAT:PLAC!=''"> - <GMRvar var="factarray[DEAT]" />: <GMRGedcomValue tag="DEAT:DATE" /> <GMRGedcomValue tag="DEAT:PLAC" /></GMRif>)</GMRText>
+										<GMRText style="text">  (<GMRvar var="GM_FACT_BIRT" />: <GMRGedcomValue tag="BIRT:DATE" /> <GMRGedcomValue tag="BIRT:PLAC" /><GMRif condition="@DEAT:DATE!='' OR @DEAT:PLAC!=''"> - <GMRvar var="GM_FACT_DEAT" />: <GMRGedcomValue tag="DEAT:DATE" /> <GMRGedcomValue tag="DEAT:PLAC" /></GMRif>)</GMRText>
 									</GMRTextBox>
 								</GMRGedcom>
 							</GMRif>
@@ -321,11 +321,11 @@
 						<GMRText style="name1"><GMRGedcom id="$pid"><GMRGetPersonName id="" /></GMRGedcom></GMRText>
 					</GMRTextBox>
 					<GMRTextBox border="0" width="$width" height="20" newline="1">
-						<GMRText style="label1"><br /><GMRvar var="gm_lang[sources]" /><br /><br /></GMRText>
+						<GMRText style="label1"><br /><GMRvar var="GM_LANG_sources" /><br /><br /></GMRText>
 					</GMRTextBox>
 				</GMRPageHeader>
 				<GMRTextBox border="0" width="$width" height="20" newline="1">
-					<GMRText style="label1"><br /><GMRvar var="gm_lang[sources]" /><br /><br /></GMRText>
+					<GMRText style="label1"><br /><GMRvar var="GM_LANG_sources" /><br /><br /></GMRText>
 					<GMRFootnoteTexts />
 				</GMRTextBox>
 			</GMRif>

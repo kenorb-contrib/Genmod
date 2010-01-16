@@ -64,15 +64,22 @@ abstract class NameFunctions {
 		else if (empty($hname) && !empty($wname)) return self::CheckNN($wname,$starred);
 	}
 	
-	public function GetAllFamilyDescriptors(&$family, $rev = false, $starred=true) {
+	public function GetAllFamilyDescriptors(&$family, $rev = false, $starred=true, $letter="", $fletter="") {
 		global $NAME_REVERSE;
 
 		$hnamearray = array();
 		$wnamearray = array();
+		$phnamearray = array();
+		$pwnamearray = array();
 		$names = array();
-		
+		// print "letter: ".$letter." fletter ".$fletter."<br />";
 		if (is_object($family->husb)) {
 			foreach($family->husb->name_array as $key => $name) {
+				if (($letter == "" || $letter == $name[1]) && ($fletter == "" || $fletter == $name[5])) {
+					if ($NAME_REVERSE) $phnamearray[] = self::SortableNameFromName(self::ReverseName($name[0]), $rev);
+					else $phnamearray[] = self::SortableNameFromName($name[0], $rev);
+					// print "addh ".self::SortableNameFromName($name[0], $rev)."<br />";
+				}
 				if ($NAME_REVERSE) $hnamearray[] = self::SortableNameFromName(self::ReverseName($name[0]), $rev);
 				else $hnamearray[] = self::SortableNameFromName($name[0], $rev);
 			}
@@ -81,15 +88,24 @@ abstract class NameFunctions {
 
 		if (is_object($family->wife)) {
 			foreach($family->wife->name_array as $key => $name) {
+				if (($letter == "" || $letter == $name[1]) && ($fletter == "" || $fletter == $name[5])) {
+					if ($NAME_REVERSE) $pwnamearray[] = self::SortableNameFromName(self::ReverseName($name[0]), $rev);
+					else $pwnamearray[] = self::SortableNameFromName($name[0], $rev);
+					// print "addw ".self::SortableNameFromName($name[0], $rev)." ".$name[1]." ".$name[5]."<br />";
+				}
 				if ($NAME_REVERSE) $wnamearray[] = self::SortableNameFromName(self::ReverseName($name[0]), $rev);
 				else $wnamearray[] = self::SortableNameFromName($name[0], $rev);
 			}
 		}
 		else $wnamearray[] = "@N.N., @P.N.";
 
-		foreach($hnamearray as $key1 => $hname) {
+		foreach($phnamearray as $key1 => $hname) {
 			foreach($wnamearray as $key2 => $wname) {
 				$names[] = self::CheckNN($hname,$starred)." + ".self::CheckNN($wname,$starred);
+			}
+		}
+		foreach($pwnamearray as $key1 => $wname) {
+			foreach($hnamearray as $key2 => $hname) {
 				$names[] = self::CheckNN($wname,$starred)." + ".self::CheckNN($hname,$starred);
 			}
 		}
@@ -159,14 +175,14 @@ abstract class NameFunctions {
 			$names = $person->name_array;
 			$mynames = array();
 			foreach ($names as $key => $name) {
-				if ($NAME_REVERSE) $mynames[] = self::SortableNameFromName(self::ReverseName($name[0]), $rev).(empty($name[3]) ? "" : "&nbsp".substr(GedcomConfig::$NICK_DELIM, 0, 1).$name[3].substr(GedcomConfig::$NICK_DELIM, 1, 1));
-				else $mynames[] = self::SortableNameFromName($name[0], $rev).(empty($name[3]) ? "" : "&nbsp".substr(GedcomConfig::$NICK_DELIM, 0, 1).$name[3].substr(GedcomConfig::$NICK_DELIM, 1, 1));
+				if ($NAME_REVERSE) $mynames[] = self::SortableNameFromName(self::ReverseName($name[0]), $rev).(empty($name[3]) ? "" : " ".substr(GedcomConfig::$NICK_DELIM, 0, 1).$name[3].substr(GedcomConfig::$NICK_DELIM, 1, 1));
+				else $mynames[] = self::SortableNameFromName($name[0], $rev).(empty($name[3]) ? "" : " ".substr(GedcomConfig::$NICK_DELIM, 0, 1).$name[3].substr(GedcomConfig::$NICK_DELIM, 1, 1));
 			}
 			return $mynames;
 		}
 		$name = $person->name_array[$count];
-		if ($NAME_REVERSE) return self::SortableNameFromName(self::ReverseName($name[0]), $rev).(empty($name[3]) ? "" : "&nbsp".substr(GedcomConfig::$NICK_DELIM, 0, 1).$name[3].substr(GedcomConfig::$NICK_DELIM, 1, 1));
-		else return self::SortableNameFromName($name[0], $rev).(empty($name[3]) ? "" : "&nbsp".substr(GedcomConfig::$NICK_DELIM, 0, 1).$name[3].substr(GedcomConfig::$NICK_DELIM, 1, 1));
+		if ($NAME_REVERSE) return self::SortableNameFromName(self::ReverseName($name[0]), $rev).(empty($name[3]) ? "" : " ".substr(GedcomConfig::$NICK_DELIM, 0, 1).$name[3].substr(GedcomConfig::$NICK_DELIM, 1, 1));
+		else return self::SortableNameFromName($name[0], $rev).(empty($name[3]) ? "" : " ".substr(GedcomConfig::$NICK_DELIM, 0, 1).$name[3].substr(GedcomConfig::$NICK_DELIM, 1, 1));
 	}
 	
 	// -- find and return a given individual's second name in sort format: familyname, firstname
@@ -390,7 +406,7 @@ abstract class NameFunctions {
 		$names = array();
 		//-- get all names
 		$namerec = GetSubRecord(1, "1 NAME", $indirec, 1);
-		if (empty($namerec)) $names[] = array("@P.N. /@N.N./", "@", "@N.N.", "", "A");
+		if (empty($namerec)) $names[] = array("@P.N. /@N.N./", "@", "@N.N.", "", "A", "@");
 		else {
 			$j = 1;
 			while(!empty($namerec)) {
@@ -402,10 +418,13 @@ abstract class NameFunctions {
 				if (empty($lname)) $lname = $surname;
 				$letter = GetFirstLetter($lname, $import);
 				$letter = Str2Upper($letter);
+				$fletter = GetFirstLetter($name, $import);
+				$fletter = Str2Upper($fletter);
+				if ($fletter == "/") $fletter = "@";
 				if (empty($letter)) $letter = "@";
 				if (preg_match("~/~", $name)==0) $name .= " /@N.N./";
-				if ($j == 1) $names[] = array($name, $letter, $surname, $nick, "P");
-				else $names[] = array($name, $letter, $surname, $nick, "A");
+				if ($j == 1) $names[] = array($name, $letter, $surname, $nick, "P", $fletter);
+				else $names[] = array($name, $letter, $surname, $nick, "A", $fletter);
 	
 				//-- check for _HEB or ROMN name sub tags
 				$addname = GetAddPersonNameInRecord($namerec, true, $import);
@@ -416,9 +435,12 @@ abstract class NameFunctions {
 					if (empty($lname)) $lname = $surname;
 					$letter = GetFirstLetter($lname, $import);
 					$letter = Str2Upper($letter);
+					$fletter = GetFirstLetter($addname, $import);
+					$fletter = Str2Upper($fletter);
+					if ($fletter == "/") $fletter = "@";
 					if (empty($letter)) $letter = "@";
 					if (preg_match("~/~", $addname)==0) $addname .= " /@N.N./";
-					$names[] = array($addname, $letter, $surname, "", "A");
+					$names[] = array($addname, $letter, $surname, "", "A", $fletter);
 				}
 				//-- check for _MARNM name subtags
 				if ($marr_names) {
@@ -431,24 +453,30 @@ abstract class NameFunctions {
 						if (empty($lname)) $lname = $surname;
 						$letter = GetFirstLetter($lname, $import);
 						$letter = Str2Upper($letter);
+						$fletter = GetFirstLetter($marriedname, $import);
+						$fletter = Str2Upper($fletter);
+						if ($fletter == "/") $fletter = "@";
 						if (empty($letter)) $letter = "@";
 						if (preg_match("~/~", $marriedname)==0) $marriedname .= " /@N.N./";
-						$names[] = array($marriedname, $letter, $surname, "", "C");
+						$names[] = array($marriedname, $letter, $surname, "", "C", $fletter);
 					}
 				}
 				//-- check for _AKA name subtags
 				$ct = preg_match_all("/\d _AKA (.*)/", $namerec, $match, PREG_SET_ORDER);
 				for($i=0; $i<$ct; $i++) {
-					$marriedname = trim($match[$i][1]);
-					$surname = ExtractSurname($marriedname, false);
+					$akaname = trim($match[$i][1]);
+					$surname = ExtractSurname($akaname, false);
 					if (empty($surname)) $surname = "@N.N.";
 					$lname = preg_replace("/^[a-z0-9 \.]+/", "", $surname);
 					if (empty($lname)) $lname = $surname;
 					$letter = GetFirstLetter($lname, $import);
 					$letter = Str2Upper($letter);
+					$fletter = GetFirstLetter($akaname, $import);
+					$fletter = Str2Upper($fletter);
+					if ($fletter == "/") $fletter = "@";
 					if (empty($letter)) $letter = "@";
-					if (preg_match("~/~", $marriedname)==0) $marriedname .= " /@N.N./";
-					$names[] = array($marriedname, $letter, $surname, "", "A");
+					if (preg_match("~/~", $akaname)==0) $akaname .= " /@N.N./";
+					$names[] = array($akaname, $letter, $surname, "", "A", $fletter);
 				}
 				$j++;
 				$namerec = GetSubRecord(1, "1 NAME", $indirec, $j);

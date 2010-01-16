@@ -186,7 +186,7 @@ class Note extends GedcomRecord {
 		$this->indi_hide = 0;
 		$key = "";
 		
-		$sql = "SELECT DISTINCT n_id, i_key, i_gedrec, i_isdead, i_id, i_file, n_name, n_surname, n_nick, n_letter, n_type  FROM ".TBLPREFIX."other_mapping, ".TBLPREFIX."individuals, ".TBLPREFIX."names WHERE om_oid='".$this->xref."' AND om_file='".$this->gedcomid."' AND om_type='INDI' AND om_gid=i_id AND om_file=i_file AND i_key=n_key ORDER BY i_key, n_id";
+		$sql = "SELECT DISTINCT n_id, i_key, i_gedrec, i_isdead, i_id, i_file, n_name, n_surname, n_nick, n_letter, n_fletter, n_type  FROM ".TBLPREFIX."other_mapping, ".TBLPREFIX."individuals, ".TBLPREFIX."names WHERE om_oid='".$this->xref."' AND om_file='".$this->gedcomid."' AND om_type='INDI' AND om_gid=i_id AND om_file=i_file AND i_key=n_key ORDER BY i_key, n_id";
 		$res = NewQuery($sql);
 		while($row = $res->FetchAssoc()){
 			if ($key != $row["i_key"]) {
@@ -199,7 +199,7 @@ class Note extends GedcomRecord {
 				}
 				else $this->indi_hide++;
 			}
-			if ($person->DispName()) $person->addname = array($row["n_name"], $row["n_letter"], $row["n_surname"], $row["n_nick"], $row["n_type"]);
+			if ($person->DispName()) $person->addname = array($row["n_name"], $row["n_letter"], $row["n_surname"], $row["n_nick"], $row["n_type"], $row["n_fletter"]);
 		}
 		if ($key != "") $person->names_read = true;
 		

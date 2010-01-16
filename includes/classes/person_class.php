@@ -54,7 +54,7 @@ class Person extends GedcomRecord {
 	private $drec = null;					// The complete deathrecord in gedcom format. Privacy is applied.
 	private $sex = null;					// Gender of the person: M, F, U. Privacy is applied.
 	private $age = null;					// Age of the person
-	private $isdead = null;					// If the person is dead, -1 if not known
+	protected $isdead = null;				// If the person is dead, -1 if not known
 	private $highlightedimage = null;		// Array with info on the media item that is primary to show
 	
 	public $sexdetails = array();	 		// Set by individual controller
@@ -245,7 +245,7 @@ class Person extends GedcomRecord {
 				if ($NAME_REVERSE || HasChinese($name[0], true)) $this->name = NameFunctions::ReverseName($name[0]);
 				else $this->name = $name[0];
 				$this->name = NameFunctions::CheckNN($this->name, true);
-				if (!empty($name[3])) $this->name .= "&nbsp;".substr(GedcomConfig::$NICK_DELIM, 0, 1).$name[3].substr(GedcomConfig::$NICK_DELIM, 1, 1);
+				if (!empty($name[3])) $this->name .= " ".substr(GedcomConfig::$NICK_DELIM, 0, 1).$name[3].substr(GedcomConfig::$NICK_DELIM, 1, 1);
 			}
 			if ($this->name == "") $this->name = GM_LANG_unknown;
 		}
@@ -1620,17 +1620,17 @@ if ($this->tracefacts) print "AddSpouseFacts - Adding for ".$fam->$spperson->xre
 
 	protected function ReadPersonRecord() {
 		
-		$sql = "SELECT i_key, i_gedrec, i_isdead, i_file, n_name, n_surname, n_nick, n_letter, n_type FROM ".TBLPREFIX."individuals, ".TBLPREFIX."names WHERE i_key='".DbLayer::EscapeQuery(JoinKey($this->xref, $this->gedcomid))."' AND i_key=n_key  ORDER BY n_id";
+		$sql = "SELECT i_key, i_gedrec, i_isdead, i_file, n_name, n_surname, n_nick, n_letter, n_fletter, n_type FROM ".TBLPREFIX."individuals, ".TBLPREFIX."names WHERE i_key='".DbLayer::EscapeQuery(JoinKey($this->xref, $this->gedcomid))."' AND i_key=n_key  ORDER BY n_id";
 		$res = NewQuery($sql);
 //		print $pipo;
 		if ($res) {
 			if ($res->NumRows() != 0) {
 				$row = $res->fetchAssoc();
 				$this->gedrec = $row["i_gedrec"];
-				$this->name_array[] = array($row["n_name"], $row["n_letter"], $row["n_surname"], $row["n_nick"], $row["n_type"]);
+				$this->name_array[] = array($row["n_name"], $row["n_letter"], $row["n_surname"], $row["n_nick"], $row["n_type"], $row["n_fletter"]);
 				$this->isdead = $row["i_isdead"];
 				while ($row = $res->FetchAssoc()) {
-					$this->name_array[] = array($row["n_name"], $row["n_letter"], $row["n_surname"], $row["n_nick"], $row["n_type"]);
+					$this->name_array[] = array($row["n_name"], $row["n_letter"], $row["n_surname"], $row["n_nick"], $row["n_type"], $row["n_fletter"]);
 				}
 			}
 		}

@@ -641,34 +641,35 @@ function ExtractSurname($indiname) {
  * @return string 	the first letter UTF-8 encoded
  */
 function GetFirstLetter($text, $import=false) {
-	global $LANGUAGE;
 
 	$text = trim(Str2Upper($text));
 
-	if ($import == true) {
-		$hungarianex = array("CS", "DZ" ,"GY", "LY", "NY", "SZ", "TY", "ZS", "DZS");
-		$danishex = array("OE", "AE", "AA");
-		if (substr($text, 0, 3)=="DZS") $letter = substr($text, 0, 3);
-		else if (in_array(substr($text, 0, 2), $hungarianex) || in_array(substr($text, 0, 2), $danishex)) $letter = substr($text, 0, 2);
-		else $letter = substr($text, 0, 1);
-	}
-	else if ($LANGUAGE == "hungarian"){
-		$hungarianex = array("CS", "DZ" ,"GY", "LY", "NY", "SZ", "TY", "ZS", "DZS");
-		if (substr($text, 0, 3)=="DZS") $letter = substr($text, 0, 3);
-		else if (in_array(substr($text, 0, 2), $hungarianex)) $letter = substr($text, 0, 2);
-		else $letter = substr($text, 0, 1);
-	}
-	else if ($LANGUAGE == "danish" || $LANGUAGE == "norwegian"){
-		$danishex = array("OE", "AE", "AA");
-		$letter = Str2Upper(substr($text, 0, 2));
-		if (in_array($letter, $danishex)) {
-			if ($letter == "AA") $text = "Å";
-			else if ($letter == "OE") $text = "Ø";
-			else if ($letter == "AE") $text = "Æ";
+//	if ($import == true) {
+//		$hungarianex = array("CS", "DZ" ,"GY", "LY", "NY", "SZ", "TY", "ZS", "DZS");
+//		$danishex = array("OE", "AE", "AA");
+//		if (substr($text, 0, 3)=="DZS") $letter = substr($text, 0, 3);
+//		else if (in_array(substr($text, 0, 2), $hungarianex) || in_array(substr($text, 0, 2), $danishex)) $letter = substr($text, 0, 2);
+//		else $letter = substr($text, 0, 1);
+//	}
+//	else {
+		if (GedcomConfig::$GEDCOMLANG == "hungarian"){
+			$hungarianex = array("CS", "DZ" ,"GY", "LY", "NY", "SZ", "TY", "ZS", "DZS");
+			if (substr($text, 0, 3)=="DZS") $letter = substr($text, 0, 3);
+			else if (in_array(substr($text, 0, 2), $hungarianex)) $letter = substr($text, 0, 2);
+			else $letter = substr($text, 0, 1);
 		}
-		$letter = substr($text, 0, 1);
-	}
-	
+		if (GedcomConfig::$GEDCOMLANG == "danish" || GedcomConfig::$GEDCOMLANG == "norwegian"){
+			$danishex = array("OE", "AE", "AA");
+			$letter = Str2Upper(substr($text, 0, 2));
+			if (in_array($letter, $danishex)) {
+				if ($letter == "AA") $text = "Å";
+				else if ($letter == "OE") $text = "Ø";
+				else if ($letter == "AE") $text = "Æ";
+			}
+			$letter = substr($text, 0, 1);
+		}
+
+//	}
 	if (MB_FUNCTIONS) {
 		if (isset($letter) && mb_detect_encoding(mb_substr($text, 0, 1)) == "ASCII") return $letter;
 		else return mb_substr($text, 0, 1);

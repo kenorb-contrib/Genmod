@@ -220,7 +220,11 @@ class MFile {
 			$et = preg_match("/(\.\w+)$/", $this->f_file, $ematch);
 			if ($et>0) $this->f_ext = substr(trim($ematch[1]),1);
 		}
-		else $this->f_file_exists = false;
+		else {
+			// The file does not exist, but we must have a placeholder for the media to display
+			$this->f_file_exists = false;
+			$this->f_thumb_file = MediaFS::ThumbnailFile($file);
+		}
 		
 //		print "<pre>";
 //		print_r($this);

@@ -56,7 +56,6 @@ print '<div class="center"><h3>'.GM_LANG_multi_title.'</h3></div>';
 	<?php PrintHelpLink("simple_filter_help","qm"); ?></td>
 	</tr>
 	</table>
-</form>
 <?php  
 
 // Retrieve the media items
@@ -71,15 +70,15 @@ print '<div align="center">'.$mediacontroller->totalmediaitems.' '.GM_LANG_media
 
 // Dropdown selector for number of items to show
 if ($mediacontroller->totalmediaitems > 0) {
-	print '<form action="'.SCRIPT_NAME.'" method="get" > '.GM_LANG_medialist_show.' <select name="max" onchange="javascript:submit();">';
+	print GM_LANG_medialist_show.' <select name="max" onchange="javascript:submit();">';
 	for ($i=1;($i<=20&&$i-1<ceil($mediacontroller->totalmediaitems/10));$i++) {
 		print '<option value="'.($i*10).'" ';
 		if ($i*10==$max) print 'selected="selected" ';
 		print ' >'.($i*10).'</option>';
 	}
 	print '</select> '.GM_LANG_per_page;
-	print '</form>';
 }
+print '</form>';
 
 print '<table class="list_table">';
 	print '<tr>';
@@ -90,7 +89,7 @@ print '<table class="list_table">';
 		print '<a href="medialist.php?filter='.$filter.'&amp;search=no&amp;start='.$newstart.'&amp;max='.$max.'">'.htmlentities(GM_LANG_prev).'</a>';
 	}
 	print '</td><td align="'.($TEXT_DIRECTION == "ltr"?"right":"left").'">';
-	if ($max <= $mediacontroller->mediainlist) {
+	if ($max < $mediacontroller->mediainlist) {
 		$newstart = $start + $max;
 		print '<a href="medialist.php?filter='.$filter.'&amp;search=no&amp;start='.$newstart.'&amp;max='.$max.'">'.htmlentities(GM_LANG_next).'</a>';
 	}
@@ -169,7 +168,7 @@ print "</tr>";
 		print '<a href="medialist.php?filter='.$filter.'&amp;search=no&amp;start='.$newstart.'&amp;max='.$max.'">'.GM_LANG_prev.'</a>';
 	}
 	print '</td><td align="'.($TEXT_DIRECTION == "ltr"?"right":"left").'">';
-	if ($max <= $mediacontroller->mediainlist) {
+	if ($max < $mediacontroller->mediainlist) {
 		$newstart = $start + $max;
 		print '<a href="medialist.php?filter='.$filter.'&amp;search=no&amp;start='.$newstart.'&amp;max='.$max.'">'.GM_LANG_next.'</a>';
 	}

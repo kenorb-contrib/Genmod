@@ -1,17 +1,17 @@
 <GMReport access="PRIV_USER" icon="place" type="general">
 	<!-- $Id$ -->
-	<GMRTitle><GMRvar var="gm_lang[address_labels]" /></GMRTitle>
+	<GMRTitle><GMRvar var="GM_LANG_address_labels" /></GMRTitle>
 	<GMRDescription>Prints address labels</GMRDescription>
 	<GMRStyle name="header" font="LucidaSansUnicode" size="16" style="b" />
 	<GMRStyle name="pagenum" font="LucidaSansUnicode" size="8" style="" />
 	<GMRStyle name="text" font="LucidaSansUnicode" size="8" style="" />
 	<GMRStyle name="label" font="LucidaSansUnicode" size="8" style="b" />
 	<GMRStyle name="idstyle" font="LucidaSansUnicode" size="6" style="" />
-	<GMRInput name="address" type="text"><GMRvar var="gm_lang[filter_address]" /> </GMRInput>
-	<GMRInput name="sortby" type="select" options="NAME,ID"><GMRvar var="gm_lang[sort_by]" /></GMRInput>
-	<GMRInput name="email_in" type="select" options="all,noemail,onlyemail"><GMRvar var="gm_lang[include]"/> </GMRInput>
-	<GMRInput name="showIndID" type="checkbox" default="SHOW_ID_NUMBERS"><GMRvar var="gm_lang[SHOW_ID_NUMBERS]" /></GMRInput>
-	<GMRInput name="pageSize" type="select" options="AVAIL_PAGE_SIZES" default="DEFAULT_PAGE_SIZE"><GMRvar var="gm_lang[page_size]" /></GMRInput>
+	<GMRInput name="address" type="text"><GMRvar var="GM_LANG_filter_address" /> </GMRInput>
+	<GMRInput name="sortby" type="select" options="NAME,ID"><GMRvar var="GM_LANG_sort_by" /></GMRInput>
+	<GMRInput name="email_in" type="select" options="all,noemail,onlyemail"><GMRvar var="GM_LANG_include"/> </GMRInput>
+	<GMRInput name="showIndID" type="checkbox" default="SHOW_ID_NUMBERS"><GMRvar var="GM_LANG_SHOW_ID_NUMBERS" /></GMRInput>
+	<GMRInput name="pageSize" type="select" options="AVAIL_PAGE_SIZES" default="DEFAULT_PAGE_SIZE"><GMRvar var="GM_LANG_page_size" /></GMRInput>
 	<GMRDoc pageSize="$pageSize" orientation="P" margin="1" showGeneratedBy="0">
 		<GMRHeader>
 		</GMRHeader>

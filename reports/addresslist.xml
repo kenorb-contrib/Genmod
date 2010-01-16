@@ -1,34 +1,34 @@
 <GMReport access="PRIV_USER" icon="place" type="general">
 	<!-- $Id$ -->
-	<GMRTitle><GMRvar var="gm_lang[address_list]" /></GMRTitle>
+	<GMRTitle><GMRvar var="GM_LANG_address_list" /></GMRTitle>
 	<GMRDescription>Prints a list of addresses</GMRDescription>
 	<GMRStyle name="header" font="LucidaSansUnicode" size="16" style="b" />
 	<GMRStyle name="pagenum" font="LucidaSansUnicode" size="8" style="" />
 	<GMRStyle name="text" font="LucidaSansUnicode" size="9" style="" />
 	<GMRStyle name="label" font="LucidaSansUnicode" size="10" style="b" />
-	<GMRInput name="address" type="text"><GMRvar var="gm_lang[filter_address]" /> </GMRInput>
-	<GMRInput name="sortby" type="select" options="NAME,ID"><GMRvar var="gm_lang[sort_by]" /></GMRInput>
-	<GMRInput name="email_in" type="select" options="all,noemail,onlyemail"><GMRvar var="gm_lang[include]"/> </GMRInput>
-	<GMRInput name="showIndID" type="checkbox" default="SHOW_ID_NUMBERS"><GMRvar var="gm_lang[SHOW_ID_NUMBERS]" /></GMRInput>
-	<GMRInput name="pageSize" type="select" options="AVAIL_PAGE_SIZES" default="DEFAULT_PAGE_SIZE"><GMRvar var="gm_lang[page_size]" /></GMRInput>
+	<GMRInput name="address" type="text"><GMRvar var="GM_LANG_filter_address" /> </GMRInput>
+	<GMRInput name="sortby" type="select" options="NAME,ID"><GMRvar var="GM_LANG_sort_by" /></GMRInput>
+	<GMRInput name="email_in" type="select" options="all,noemail,onlyemail"><GMRvar var="GM_LANG_include"/> </GMRInput>
+	<GMRInput name="showIndID" type="checkbox" default="SHOW_ID_NUMBERS"><GMRvar var="GM_LANG_SHOW_ID_NUMBERS" /></GMRInput>
+	<GMRInput name="pageSize" type="select" options="AVAIL_PAGE_SIZES" default="DEFAULT_PAGE_SIZE"><GMRvar var="GM_LANG_page_size" /></GMRInput>
 	<GMRDoc pageSize="$pageSize" orientation="P" margin="24">
 		<GMRHeader>
-			<GMRCell width="0" height="20" align="center" style="header"><GMRvar var="gm_lang[address_list]" /></GMRCell>
-			<!-- GMRCell width="0" height="10" align="right" style="pagenum"><GMRvar var="gm_lang[page]" /> <GMRPageNum /> <GMRvar var="gm_lang[of]" /> <GMRTotalPages /> - <GMRNow /></GMRCell -->
+			<GMRCell width="0" height="20" align="center" style="header"><GMRvar var="GM_LANG_address_list" /></GMRCell>
+			<!-- GMRCell width="0" height="10" align="right" style="pagenum"><GMRvar var="GM_LANG_page" /> <GMRPageNum /> <GMRvar var="GM_LANG_of" /> <GMRTotalPages /> - <GMRNow /></GMRCell -->
 			<GMRTextBox width="50%" height="10" border="0">
 				<GMRText style="pagenum"><GMRNow /></GMRText>
 			</GMRTextBox>
 			<GMRTextBox width="0" height="10" border="0" newline="1">
-				<GMRText style="pagenum" align="right"><GMRvar var="gm_lang[page]" /> <GMRPageNum /> <GMRvar var="gm_lang[of]" /> <GMRTotalPages /></GMRText>
+				<GMRText style="pagenum" align="right"><GMRvar var="GM_LANG_page" /> <GMRPageNum /> <GMRvar var="GM_LANG_of" /> <GMRTotalPages /></GMRText>
 			</GMRTextBox>
 			<GMRTextBox width="200" height="12" border="1">
-				<GMRText style="label"><GMRvar var="gm_lang[name]" /></GMRText>
+				<GMRText style="label"><GMRvar var="GM_LANG_name" /></GMRText>
 			</GMRTextBox>
 			<GMRTextBox width="170" height="12" border="1">
-				<GMRText style="label"><GMRvar var="factarray[ADDR]" /></GMRText>
+				<GMRText style="label"><GMRvar var="GM_FACT_ADDR" /></GMRText>
 			</GMRTextBox>
 			<GMRTextBox width="0" height="12" border="1" newline="1">
-				<GMRText style="label"><GMRvar var="factarray[PHON]" /> / <GMRvar var="factarray[_EMAIL]" /></GMRText>
+				<GMRText style="label"><GMRvar var="GM_FACT_PHON" /> / <GMRvar var="GM_FACT__EMAIL" /></GMRText>
 			</GMRTextBox>
 		</GMRHeader>
 		<GMRBody>
@@ -94,14 +94,14 @@
 				</GMRTextBox>
 				<GMRTextBox width="0" height="52" border="1" newline="1">
 					<GMRText style="text">
-						<GMRvarLetter var="factarray[PHON]" />: <GMRGedcomValue tag="PHON" /><br />
-						<GMRvarLetter var="factarray[FAX]" />: <GMRGedcomValue tag="FAX" /><br />
-						<GMRvarLetter var="factarray[_EMAIL]" />: <GMRGedcomValue tag="_EMAIL" /><GMRGedcomValue tag="EMAIL" />
+						<GMRvarLetter var="GM_FACT_PHON" />: <GMRGedcomValue tag="PHON" /><br />
+						<GMRvarLetter var="GM_FACT_FAX" />: <GMRGedcomValue tag="FAX" /><br />
+						<GMRvarLetter var="GM_FACT__EMAIL" />: <GMRGedcomValue tag="_EMAIL" /><GMRGedcomValue tag="EMAIL" />
 					</GMRText>
 				</GMRTextBox>
 			</GMRList>
 			<GMRCell width="0" height="12" border="0" align="right" style="label">
-				<br /><GMRvar var="gm_lang[total_indis]" />: <GMRListTotal />
+				<br /><GMRvar var="GM_LANG_total_indis" />: <GMRListTotal />
 			</GMRCell>
 		</GMRBody>
 	</GMRDoc>

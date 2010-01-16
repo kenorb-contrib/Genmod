@@ -59,7 +59,7 @@ $tindilist = array();
  * lastname.
  * @var array $indialpha
  */
-$indialpha = $indilist_controller->GetIndiAlpha($indilist_controller->allgeds);
+$indialpha = $indilist_controller->GetLetterBar();
 
 // Print the letter bar
 if (count($indialpha) > 0) {
@@ -88,7 +88,7 @@ if (count($indialpha) > 0) {
 			print "\"><span class=\"warning\">".PrintReady(GM_LANG_NN)."</span></a>";
 		}
 		else {
-			print "<a href=\"indilist.php?alpha=".urlencode("@")."@&amp;surname_sublist=yes&amp;surname=@N.N.";
+			print "<a href=\"indilist.php?alpha=".urlencode("@")."&amp;surname_sublist=yes&amp;surname=@N.N.";
 			if ($indilist_controller->allgeds == "yes") print "&amp;allgeds=yes";
 			print "\">".PrintReady(GM_LANG_NN)."</a>";
 		}
@@ -114,17 +114,13 @@ if (count($indialpha) > 0) {
 	if (isset($startalpha)) $indilist_controller->alpha = $startalpha;
 }
 //-- escaped letter for regular expressions
-$expalpha = $indilist_controller->alpha;
-if ($expalpha=="(" || $expalpha=="[" || $expalpha=="?" || $expalpha=="/" || $expalpha=="*" || $expalpha=="+") $expalpha = "\\".$expalpha;
 print "<br /><br />";
-
 if ($indilist_controller->surname_sublist == "yes" && $indilist_controller->show_all == "yes") {
 	// Get the surnames of all individuals
 	// print "option 1";
-	$surnames = $indilist_controller->GetAlphaIndiNames($indilist_controller->alpha, $indilist_controller->allgeds);
-	uasort($surnames, "ItemSort");
+	$surnames = $indilist_controller->GetAlphaIndiNames();
 	print "<div class=\"topbar\">".GM_LANG_surnames."</div>\n";
-	$indilist_controller->PrintSurnameList($surnames, $_SERVER["SCRIPT_NAME"]);
+	$indilist_controller->PrintSurnameList($surnames);
 
 }
 else if ($indilist_controller->surname_sublist == "yes" && $indilist_controller->surname == "" && $indilist_controller->show_all == "no") {
@@ -132,10 +128,9 @@ else if ($indilist_controller->surname_sublist == "yes" && $indilist_controller-
 	// print "option 2";
 	// NOTE: Get all of the individuals whose last names start with this letter
 	if ($indilist_controller->alpha != "") {
-		$surnames = $indilist_controller->GetAlphaIndiNames($indilist_controller->alpha, $indilist_controller->allgeds);
-		uasort($surnames, "ItemSort");
+		$surnames = $indilist_controller->GetAlphaIndiNames();
 		print "<div class=\"topbar\">".GM_LANG_surnames."</div>\n";
-		$indilist_controller->PrintSurnameList($surnames, $_SERVER["SCRIPT_NAME"]);
+		$indilist_controller->PrintSurnameList($surnames);
 		
 	}
 }
@@ -143,21 +138,20 @@ else {
 	// NOTE: If the surname is set then only get the names in that surname list
 	if ($indilist_controller->surname != "" && $indilist_controller->surname_sublist=="yes") {
 		// print "option 3";
-		$indilist_controller->surname = trim($indilist_controller->surname);
-		$tindilist = $indilist_controller->GetSurnameIndis($indilist_controller->surname, "");
+		$tindilist = $indilist_controller->GetIndis();
 	}
 	// NOTE: Get all individuals for the sublist
-	if ($indilist_controller->surname_sublist == "no" && $indilist_controller->alpha != "" && $show_all == "no") {
+	if ($indilist_controller->surname_sublist == "no" && $indilist_controller->alpha != "" && $indilist_controller->show_all == "no") {
 		// print "option 4 for ".$indilist_controller->alpha;
-		$tindilist = $indilist_controller->GetSurnameIndis("", $indilist_controller->alpha);
+		$tindilist = $indilist_controller->GetIndis();
 	}
 	
 	// NOTE: Simplify processing for ALL indilist
 	// NOTE: Skip surname is yes and ALL is chosen
 	if ($indilist_controller->surname_sublist == "no" && $indilist_controller->show_all == "yes") {
 		// print "option 5";
-		$tindilist = $indilist_controller->GetSurnameIndis();
-		$indilist_controller->PrintPersonList($tindilist, true, false, $indilist_controller->allgeds);
+		$tindilist = $indilist_controller->GetIndis();
+		$indilist_controller->PrintPersonList($tindilist, true);
 	}
 	else {
 		// print "option 6";
@@ -166,7 +160,7 @@ else {
 		if ($indilist_controller->surname_sublist == "yes" && empty($indilist_controller->surname)) print GM_LANG_surnames;
 		else print PrintReady(str_replace("#surname#", NameFunctions::CheckNN($indilist_controller->surname), GM_LANG_indis_with_surname));
 		print "</div>\n";
-		$indilist_controller->PrintPersonList($tindilist, true, false, $indilist_controller->allgeds);
+		$indilist_controller->PrintPersonList($tindilist, true);
 	}
 }
 

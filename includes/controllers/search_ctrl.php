@@ -1354,7 +1354,7 @@ class SearchController extends BaseController {
 		$oldged = $GEDCOMID;
 
 		// Build the query
-		$sql = "SELECT DISTINCT n_id, i_key, i_id, i_gedrec, i_file, i_isdead, n_name, n_surname, n_nick, n_type, n_letter FROM ";
+		$sql = "SELECT DISTINCT n_id, i_key, i_id, i_gedrec, i_file, i_isdead, n_name, n_surname, n_nick, n_type, n_letter, n_fletter FROM ";
 
 		if (isset($farr)) $sql .= TBLPREFIX."soundex as s1, ";
 		if (isset($larr)) $sql .= TBLPREFIX."soundex as s2, ";
@@ -1443,7 +1443,7 @@ class SearchController extends BaseController {
 					$person =& Person::GetInstance($row["i_id"], $row, $row["i_file"]);
 					$this->sindilist[$row["i_key"]] = $person;
 				}
-				$this->sindilist[$row["i_key"]]->addname = array($row["n_name"], $row["n_letter"], $row["n_surname"], $row["n_nick"], $row["n_type"]);
+				$this->sindilist[$row["i_key"]]->addname = array($row["n_name"], $row["n_letter"], $row["n_surname"], $row["n_nick"], $row["n_type"], $row["n_fletter"]);
 			}
 			if ($key != "") $person->names_read = true;
 			$res->FreeResult();

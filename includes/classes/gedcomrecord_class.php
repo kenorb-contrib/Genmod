@@ -992,7 +992,7 @@ abstract class GedcomRecord {
 	private function CheckSourceLinks() {
 		
 		if (!is_array($this->link_array)) {
-			$sql = "SELECT DISTINCT n_id, i_id, i_key, i_isdead, i_file, i_gedrec, n_name, n_surname, n_nick, n_letter, n_type FROM ".TBLPREFIX."source_mapping, ".TBLPREFIX."individuals, ".TBLPREFIX."names WHERE sm_key='".$this->key."' AND sm_file='".$this->gedcomid."' AND sm_type='INDI' AND sm_gid=i_id AND sm_file=i_file AND i_key=n_key ORDER BY i_key, n_id";
+			$sql = "SELECT DISTINCT n_id, i_id, i_key, i_isdead, i_file, i_gedrec, n_name, n_surname, n_nick, n_letter, n_fletter, n_type FROM ".TBLPREFIX."source_mapping, ".TBLPREFIX."individuals, ".TBLPREFIX."names WHERE sm_key='".$this->key."' AND sm_file='".$this->gedcomid."' AND sm_type='INDI' AND sm_gid=i_id AND sm_file=i_file AND i_key=n_key ORDER BY i_key, n_id";
 			$res = NewQuery($sql);
 			$key = "";
 			$ok = true;
@@ -1011,7 +1011,7 @@ abstract class GedcomRecord {
 						// Don't return here, first add all names to the person
 					}
 				}
-				if ($person->disp_name) $person->addname = array($row["n_name"], $row["n_letter"], $row["n_surname"], $row["n_nick"], $row["n_type"]);
+				if ($person->disp_name) $person->addname = array($row["n_name"], $row["n_letter"], $row["n_surname"], $row["n_nick"], $row["n_type"], $row["n_fletter"]);
 			}
 			if ($key != "") $person->names_read = true;
 			if (!$ok) return false;
@@ -1059,7 +1059,7 @@ abstract class GedcomRecord {
 			}
 			
 			// Check links from individuals
-			$sql = "SELECT DISTINCT n_id, i_id, i_key, i_isdead, i_file, i_gedrec, n_name, n_surname, n_nick, n_letter, n_type FROM ".TBLPREFIX."media_mapping, ".TBLPREFIX."individuals, ".TBLPREFIX."names WHERE mm_media='".$this->xref."' AND mm_file='".$this->gedcomid."' AND mm_type='INDI' AND mm_gid=i_id AND mm_file=i_file and i_key=n_key ORDER BY i_key, n_id";
+			$sql = "SELECT DISTINCT n_id, i_id, i_key, i_isdead, i_file, i_gedrec, n_name, n_surname, n_nick, n_letter, n_fletter, n_type FROM ".TBLPREFIX."media_mapping, ".TBLPREFIX."individuals, ".TBLPREFIX."names WHERE mm_media='".$this->xref."' AND mm_file='".$this->gedcomid."' AND mm_type='INDI' AND mm_gid=i_id AND mm_file=i_file and i_key=n_key ORDER BY i_key, n_id";
 			$res = NewQuery($sql);
 			$key = "";
 			$ok = true;
@@ -1078,7 +1078,7 @@ abstract class GedcomRecord {
 						// Don't return here, first add all names to the person
 					}
 				}
-				if ($person->disp_name) $person->addname = array($row["n_name"], $row["n_letter"], $row["n_surname"], $row["n_nick"], $row["n_type"]);
+				if ($person->disp_name) $person->addname = array($row["n_name"], $row["n_letter"], $row["n_surname"], $row["n_nick"], $row["n_type"], $row["n_fletter"]);
 			}
 			if ($key != "") $person->names_read = true;
 			if (!$ok) return false;
@@ -1117,7 +1117,7 @@ abstract class GedcomRecord {
 		
 	private function CheckNoteLinks() {
 		
-		$sql = "SELECT DISTINCT n_id, i_id, i_key, i_isdead, i_file, i_gedrec, n_name, n_surname, n_nick, n_letter, n_type FROM ".TBLPREFIX."other, ".TBLPREFIX."other_mapping, ".TBLPREFIX."individuals, ".TBLPREFIX."names WHERE o_id='".$this->xref."' AND o_file='".$this->gedcomid."' AND o_id = om_oid AND o_file = om_file AND om_type='INDI' AND i_id=om_gid AND om_file=i_file AND i_key=n_key ORDER BY i_key, n_id";
+		$sql = "SELECT DISTINCT n_id, i_id, i_key, i_isdead, i_file, i_gedrec, n_name, n_surname, n_nick, n_letter, n_fletter, n_type FROM ".TBLPREFIX."other, ".TBLPREFIX."other_mapping, ".TBLPREFIX."individuals, ".TBLPREFIX."names WHERE o_id='".$this->xref."' AND o_file='".$this->gedcomid."' AND o_id = om_oid AND o_file = om_file AND om_type='INDI' AND i_id=om_gid AND om_file=i_file AND i_key=n_key ORDER BY i_key, n_id";
 		$res = NewQuery($sql);
 		$key = "";
 		$ok = true;
@@ -1136,7 +1136,7 @@ abstract class GedcomRecord {
 					// Don't return here, first add all names to the person
 				}
 			}
-			if ($person->disp_name) $person->addname = array($row["n_name"], $row["n_letter"], $row["n_surname"], $row["n_nick"], $row["n_type"]);
+			if ($person->disp_name) $person->addname = array($row["n_name"], $row["n_letter"], $row["n_surname"], $row["n_nick"], $row["n_type"], $row["n_fletter"]);
 		}
 		if ($key != "") $person->names_read = true;
 		if (!$ok) return false;
@@ -1176,7 +1176,7 @@ abstract class GedcomRecord {
 		
 		if (count($indiarr) != 0) {
 			$key = "";
-			$sql = "SELECT DISTINCT n_id, i_key, i_id, i_isdead, i_file, i_gedrec, n_name, n_surname, n_nick, n_letter, n_type FROM ".TBLPREFIX."individuals, ".TBLPREFIX."names WHERE n_key=i_key AND i_key IN ('".implode("','", $indiarr)."') ORDER BY i_key, n_id";
+			$sql = "SELECT DISTINCT n_id, i_key, i_id, i_isdead, i_file, i_gedrec, n_name, n_surname, n_nick, n_letter, n_fletter, n_type FROM ".TBLPREFIX."individuals, ".TBLPREFIX."names WHERE n_key=i_key AND i_key IN ('".implode("','", $indiarr)."') ORDER BY i_key, n_id";
 			$res = NewQuery($sql);
 			while ($row = $res->FetchAssoc()) {
 				if ($key != $row["i_key"]) {
@@ -1185,7 +1185,7 @@ abstract class GedcomRecord {
 					$person = null;
 					$person =& Person::GetInstance($row["i_id"], $row, $row["i_file"]);
 				}
-				if ($person->disp_name) $person->addname = array($row["n_name"], $row["n_letter"], $row["n_surname"], $row["n_nick"], $row["n_type"]);
+				if ($person->disp_name) $person->addname = array($row["n_name"], $row["n_letter"], $row["n_surname"], $row["n_nick"], $row["n_type"], $row["n_fletter"]);
 			}
 			if ($key != "") $person->names_read = true;
 		}

@@ -316,6 +316,11 @@ class Family extends GedcomRecord {
 		return $this->allnames;
 	}
 	
+	public function GetLetterNames($sletter, $fletter) {
+		
+		return NameFunctions::GetAllFamilyDescriptors($this, false, true, $sletter, $fletter);
+	}
+	
 	/**
 	 * get the husbands ID
 	 * @return string
@@ -632,7 +637,8 @@ class Family extends GedcomRecord {
 		if ($paste) print "<a href=\"#\" onclick=\"sndReq(document.getElementById('dummy'), 'lastused', 'type', '".$this->datatype."', 'id', '".$this->key."'); pasteid('".$this->xref."'); return false;\" class=\"list_item\">";
 		else print "\n\t\t\t<a href=\"family.php?famid=".$this->xref."&amp;gedid=".$this->gedcomid."\" class=\"list_item\">";
 		print "<b>".$desc;
-		if (empty($name) && $this->GetFamilyAddDescriptor() != "") print "&nbsp;(".$this->GetFamilyAddDescriptor().")";
+		// There must be a primary name to add the additional name. And they must not be the same (might be the case if the name parameter was filled).
+		if (!empty($desc) && $this->GetFamilyAddDescriptor() != "" && $this->GetFamilyAddDescriptor() != $desc) print "&nbsp;(".$this->GetFamilyAddDescriptor().")";
 		print "</b>";
 		print $this->addxref;
 		if ($this->GetMarriageFact() != "") {
