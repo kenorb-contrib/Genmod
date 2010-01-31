@@ -75,6 +75,9 @@ class Family extends GedcomRecord {
 	public $pedigreetype = null;			// Pedigree type of this family from the childs perspective (set in person class)
 	public $status = null;					// Status of this family from the childs perspective (set in person class)
 	
+	// Relations to this family
+	private $relationstome = null;			// Holder for the assolist, containing all associates that are mentioned in this families ASSO records
+	
 	
 	public static function GetInstance($xref, $gedrec="", $gedcomid="") {
 		
@@ -209,6 +212,9 @@ class Family extends GedcomRecord {
 			case "allnames":
 				return $this->GetAllFamilyNames();
 				break;
+			case "relationstome":
+				return $this->GetRelationsToMe();
+				break;
 			default:
 				return parent::__get($property);
 				break;
@@ -221,7 +227,17 @@ class Family extends GedcomRecord {
 			$count += count($family);
 		}
 		return $count;
-	}	
+	}
+		
+	private function GetRelationsToMe() {
+		
+		if (is_null($this->relationstome)) {
+			$list = ListFunctions::GetAssoList("fam", "", $this->xref);
+			uasort($list,"AssoSort");
+			$this->relationstome = $list;
+		}
+		return $this->relationstome;
+	}
 	
 	/**
 	 * get the children

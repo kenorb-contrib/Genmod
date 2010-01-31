@@ -50,13 +50,13 @@ abstract class DetailController extends BaseController{
 		// The array always starts with '0', which indicates the "all" option.
 		switch (get_class($this)) {
 			case "IndividualController":
-				$this->tabs = array('0', 'relatives', 'facts', 'sources', 'media', 'notes', 'actions_person');
+				$this->tabs = array('0', 'relatives', 'facts', 'sources', 'media', 'notes', 'relations', 'actions_person');
 				$this->tabtype = "indi";
 				$this->object_name = "indi";
 				$this->fact_filter = array("OBJE", "SOUR", "NOTE", "SEX", "NAME");
 				break;
 			case "FamilyController":
-				$this->tabs = array('0', 'facts', 'sources', 'media', 'notes', 'actions_person');
+				$this->tabs = array('0', 'facts', 'sources', 'media', 'notes', 'relations', 'actions_person');
 				$this->tabtype = "fam";
 				$this->object_name = "family";
 				$this->fact_filter = array("OBJE", "SOUR", "NOTE");
@@ -178,6 +178,7 @@ abstract class DetailController extends BaseController{
 					if ($tab == "sources") print GM_LANG_ssourcess."</a></dd>\n";
 					if ($tab == "media") print GM_LANG_media."</a></dd>\n";
 					if ($tab == "notes") print GM_LANG_notes."</a></dd>\n";
+					if ($tab == "relations") print GM_LANG_relations."</a></dd>\n";
 					if ($tab == "actions_person") print GM_LANG_research_log."</a></dd>\n";
 				}
 			}
@@ -679,6 +680,65 @@ abstract class DetailController extends BaseController{
 				}
 				else print "<div id=\"no_tab".$index."\" class=\"shade1\"></div>\n";
 				print "</div>";
+			}
+			if ($tab == "relations") {
+				print "<div id=\"relations\" class=\"tab_page\" style=\"display:none;\" >";
+				$me = (count($this->$object_name->relationstome) > 0);
+				$other = ($this->$object_name->datatype == "INDI" && count($this->$object_name->relationstoothers) > 0);
+				if ($me || $other) {
+					if ($me) {
+						print "<div style=\"float: left;\" class=\"width".($this->$object_name->datatype == "INDI" ? "50" : "80")."\">";
+						print "\n\t<table class=\"list_table $TEXT_DIRECTION width100\">\n\t\t<tr><td colspan=\"3\" class=\"shade2 center\">";
+						print ($this->$object_name->datatype == "INDI" ? GM_LANG_relationstomeperson : GM_LANG_relationstomefamily);
+						print "</td></tr>";
+						print "<tr><td class=\"$TEXT_DIRECTION shade2\">".GM_LANG_name."</td>";
+						print "<td class=\"$TEXT_DIRECTION shade2\">".GM_LANG_related_event."</td>";
+						print "<td class=\"$TEXT_DIRECTION shade2\">".GM_LANG_role."</td></tr>";
+						foreach($this->$object_name->relationstome as $key => $assos) {
+							usort($assos,"assosort");
+							foreach($assos as $key2 => $asso) {
+								if ($asso->disp) {
+									print "<tr><td class=\"$TEXT_DIRECTION shade1 wrap\">";
+									$asso->assoperson->PrintListPerson(false);
+									print "</td><td class=\"$TEXT_DIRECTION shade1 wrap\">";
+									if (defined("GM_FACT_".$asso->fact)) print constant("GM_FACT_".$asso->fact);
+									else print $asso->fact;
+									print "</td><td class=\"$TEXT_DIRECTION shade1 wrap\">";
+									if (defined("GM_LANG_".$asso->role)) print constant("GM_LANG_".$asso->role);
+									else print $asso->role;
+									print "</td></tr>";
+								}
+							}
+						}
+						print "</table></div>";
+					}
+					if ($other) {
+						print "<div style=\"float: ".($me ? "right" : "left").";\" class=\"width50\">";
+						print "\n\t<table class=\"list_table $TEXT_DIRECTION width100\">\n\t\t<tr><td colspan=\"3\" class=\"shade2 center\">";
+						print GM_LANG_relationstoothers;
+						print "</td></tr>";
+						print "<tr><td class=\"$TEXT_DIRECTION shade2\">".GM_LANG_name."</td>";
+						print "<td class=\"$TEXT_DIRECTION shade2\">".GM_LANG_related_event."</td>";
+						print "<td class=\"$TEXT_DIRECTION shade2\">".GM_LANG_role."</td></tr>";
+						foreach($this->$object_name->relationstoothers as $key => $asso) {
+							if ($asso->disp) {
+								print "<tr><td class=\"$TEXT_DIRECTION shade1 wrap\">";
+								if ($asso->associated->datatype == "INDI") $asso->associated->PrintListPerson(false);
+								else $asso->associated->PrintListFamily(false);
+								print "</td><td class=\"$TEXT_DIRECTION shade1 wrap\">";
+								if (defined("GM_FACT_".$asso->fact)) print constant("GM_FACT_".$asso->fact);
+								else print $asso->fact;
+								print "</td><td class=\"$TEXT_DIRECTION shade1 wrap\">";
+								if (defined("GM_LANG_".$asso->role)) print constant("GM_LANG_".$asso->role);
+								else print $asso->role;
+								print "</td></tr>";
+							}
+						}
+						print "</table></div>";
+					}
+				}
+				else print "<div id=\"no_tab".$index."\" class=\"shade1\"></div>\n";
+				print "<br style=\" clear: both;\" /></div>";
 			}
 		}	
 		print "<script type=\"text/javascript\">\n<!--\n";

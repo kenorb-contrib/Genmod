@@ -67,8 +67,10 @@ class Person extends GedcomRecord {
 	private $famc = null;					// container for array of family ID's and relational info where this person is child
 	private $fams = null;					// container for array of family ID's where this person is spouse
 	private $generation = null;				// Used in reports
+	private $relationstome = null;			// Holder for the assolist, containing all associates that are mentioned in this persons ASSO records
+	private $relationstoothers = null;		// Holder for the assolist, containing all associates that are mentioned in other persons/families ASSO records
 	
-	protected $globalfacts = array();			// Array with name and sex facts. Showfact, Factviewrestricted are applied
+	protected $globalfacts = array();		// Array with name and sex facts. Showfact, Factviewrestricted are applied
 	
 	private $close_relatives = false;		// True if all labels have been set for display on the individual page; if false the close relatives tab hides
 	private $sosamax = 7;					// Maximum sosa number for parents facts
@@ -196,6 +198,12 @@ class Person extends GedcomRecord {
 			case "generation":
 				return $this->generation;
 				break;
+			case "relationstome":
+				return $this->GetRelationsToMe();
+				break;
+			case "relationstoothers":
+				return $this->GetRelationsToOthers();
+				break;
 			default:
 				return parent::__get($property);
 				break;
@@ -222,6 +230,32 @@ class Person extends GedcomRecord {
 				parent::__set($property, $value);
 				break;
 		}
+	}
+	
+	private function GetRelationsToMe() {
+		
+		if (is_null($this->relationstome)) {
+			$list = ListFunctions::GetAssoList("indi", "", $this->xref);
+			uasort($list,"AssoSort");
+			$this->relationstome = $list;
+		}
+		return $this->relationstome;
+	}
+	
+	private function GetRelationsToOthers() {
+		
+		if (is_null($this->relationstoothers)) {
+			$list = ListFunctions::GetAssoList("all", $this->xref);
+			$list2 = array();
+			foreach ($list as $key => $assos) {
+				foreach ($assos as $key => $asso) {
+					$list2[] = $asso;
+				}
+			}
+			usort($list2, "AssoOSort");
+			$this->relationstoothers = $list2;
+		}
+		return $this->relationstoothers;
 	}
 	
 	private function GetDeathStatus() {
@@ -1596,7 +1630,6 @@ if ($this->tracefacts) print "AddSpouseFacts - Adding for ".$fam->$spperson->xre
 		}
 		if ($useli) print "</li>";
 		return true;
-
 	}
 	
 	/**
