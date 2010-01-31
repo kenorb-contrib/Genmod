@@ -35,6 +35,7 @@ class MediaItem extends GedcomRecord {
 	
 	private $extension = null;
 	private $title = null; 
+	private $oldtitle = null; 
 	private $name = null; 						// Same as title
 	private $filename = null;
 	private $level = 0;
@@ -45,25 +46,29 @@ class MediaItem extends GedcomRecord {
 	public  $linked = false; // set in media class
 
 	public static function GetInstance($id, $gedrec="", $gedcomid="") {
-		global $GEDCOMID;
 		
-		if (empty($gedcomid)) $gedcomid = $GEDCOMID;
+		if (empty($gedcomid)) $gedcomid = GedcomConfig::$GEDCOMID;
 		if (!isset(self::$cache[$gedcomid][$id])) {
 			self::$cache[$gedcomid][$id] = new MediaItem($id, $gedrec, $gedcomid);
 		}
 		return self::$cache[$gedcomid][$id];
 	}
 	
-	public static function IsInstance($xref, $gedcomid="") {
-		global $GEDCOMID;
+	public static function NewInstance($id, $gedrec="", $gedcomid="") {
 		
-		if (empty($gedcomid)) $gedcomid = $GEDCOMID;
+		if (empty($gedcomid)) $gedcomid = GedcomConfig::$GEDCOMID;
+		self::$cache[$gedcomid][$id] = new MediaItem($id, $gedrec, $gedcomid);
+		return self::$cache[$gedcomid][$id];
+	}
+	
+	public static function IsInstance($xref, $gedcomid="") {
+		
+		if (empty($gedcomid)) $gedcomid = GedcomConfig::$GEDCOMID;
 		if (!isset(self::$cache[$gedcomid][$xref])) return false;
 		else return true;
 	}
 	
 	public function __construct($id, $gedrec="", $gedcomid="") {
-		global $GEDCOMID;
 		
 		if (is_array($gedrec)) {
 			// Prefill some variables
@@ -94,6 +99,9 @@ class MediaItem extends GedcomRecord {
 		switch ($property) {
 			case "title":
 				return $this->getTitle();
+				break;
+			case "oldtitle":
+				return $this->getTitle("old");
 				break;
 			case "name":
 				return $this->getTitle();
@@ -135,25 +143,26 @@ class MediaItem extends GedcomRecord {
 		}
 		return $count;
 	}	
-	private function getTitle() {
+	private function getTitle($type="") {
 		
-		if (is_null($this->title)) {
+		$title = $type."title";
+		if (is_null($this->$title)) {
 			if ($this->DisplayDetails()) {
-				if ($this->show_changes && $this->ThisChanged()) $gedrec = $this->GetChangedGedRec();
+				if ($this->show_changes && $this->ThisChanged() && $type != "old") $gedrec = $this->GetChangedGedRec();
 				else $gedrec = $this->gedrec;
 
-				if (!PrivacyFunctions::ShowFactDetails("TITL", $this->xref, "OBJE") || !PrivacyFunctions::showFactDetails("FILE", $this->xref, "OBJE")) $this->title = GM_LANG_private;
-				else if (!PrivacyFunctions::showFact("TITL", $this->xref, "OBJE")) $this->title = GM_LANG_unknown;
-				else $this->title = $this->GetMediaDescriptor();
+				if (!PrivacyFunctions::ShowFactDetails("TITL", $this->xref, "OBJE") || !PrivacyFunctions::showFactDetails("FILE", $this->xref, "OBJE")) $this->$title = GM_LANG_private;
+				else if (!PrivacyFunctions::showFact("TITL", $this->xref, "OBJE")) $this->$title = GM_LANG_unknown;
+				else $this->$title = $this->GetMediaDescriptor($type);
 			}
-			else $this->title = GM_LANG_private;
+			else $this->$title = GM_LANG_private;
 		}
-		return $this->title;
+		return $this->$title;
 	}
 
-	private function GetMediaDescriptor() {
+	private function GetMediaDescriptor($type="") {
 		
-		if ($this->show_changes && $this->ThisChanged()) $gedrec = $this->GetChangedGedRec();
+		if ($this->show_changes && $this->ThisChanged() && $type != "old") $gedrec = $this->GetChangedGedRec();
 		else $gedrec = $this->gedrec;
 		
 		$title = GetGedcomValue("TITL", 1, $gedrec);
@@ -299,14 +308,13 @@ class MediaItem extends GedcomRecord {
 	/** Get the ID's linked to this media
 	*/
 	public function GetMediaLinks($pid, $type="", $applypriv=true) {
-		global $GEDCOMID;
 	
 		if (empty($pid)) return false;
 
 		$links = array();	
 		$sql = "SELECT mm_gid FROM ".TBLPREFIX."media_mapping WHERE mm_media='".$pid."'";
 		if (!empty($type)) $sql .= " AND mm_type='".$type."'";
-		$sql .= " AND mm_file='".$GEDCOMID."'";
+		$sql .= " AND mm_file='".GedcomConfig::$GEDCOMID."'";
 		$res = NewQuery($sql);
 		while($row = $res->FetchAssoc()){
 			if (!$applypriv) {

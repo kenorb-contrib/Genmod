@@ -28,6 +28,7 @@
 	<GMRSetVar name="widthB2" value="280" />
 	<GMRSetVar name="widthB3" value="40" />
 	<GMRSetVar name="widthB4" value="375" />
+	<GMRSetVar name="NICK" value="false" />
 
 		<GMRHeader>
 			<GMRCell width="0" height="20" align="center" style="header"><GMRvar var="GM_LANG_relatives_report_ext" /></GMRCell>

@@ -50,7 +50,7 @@ function PrintHeader($title, $head="",$use_alternate_styles=true) {
 	global $QUERY_STRING, $action, $query, $changelanguage,$theme_name;
 	global $GM_IMAGES, $TEXT_DIRECTION, $ONLOADFUNCTION, $SHOW_SOURCES;
 	// globals for the bot 304 mechanism
-	global $bot, $_SERVER, $GEDCOMID, $pid, $famid, $rid, $sid;
+	global $bot, $_SERVER, $pid, $famid, $rid, $sid;
 
 	// Determine browser type
 	if (!isset($_SERVER["HTTP_USER_AGENT"])) $BROWSERTYPE = "other";
@@ -82,16 +82,16 @@ function PrintHeader($title, $head="",$use_alternate_styles=true) {
 		
 		switch (basename(SCRIPT_NAME)) {
 		case "individual.php":
-			$lastchange = GetLastChangeDate("INDI", $pid, $GEDCOMID, true);
+			$lastchange = GetLastChangeDate("INDI", $pid, GedcomConfig::$GEDCOMID, true);
 			break;
 		case "family.php":
-			$lastchange = GetLastChangeDate("FAM", $famid, $GEDCOMID, true);
+			$lastchange = GetLastChangeDate("FAM", $famid, GedcomConfig::$GEDCOMID, true);
 			break;
 		case "source.php":
-			$lastchange = GetLastChangeDate("FAM", $sid, $GEDCOMID, true);
+			$lastchange = GetLastChangeDate("FAM", $sid, GedcomConfig::$GEDCOMID, true);
 			break;
 		case "repo.php":
-			$lastchange = GetLastChangeDate("REPO", $rid, $GEDCOMID, true);
+			$lastchange = GetLastChangeDate("REPO", $rid, GedcomConfig::$GEDCOMID, true);
 			break;
 		}
 		// If the last change date cannot be retrieved, just continue processing
@@ -126,7 +126,7 @@ function PrintHeader($title, $head="",$use_alternate_styles=true) {
 	   print "<link rel=\"shortcut icon\" href=\"".GedcomConfig::$FAVICON."\" type=\"image/x-icon\"></link>\n\t\t";
 	}
 //	if (!isset(GedcomConfig::$META_TITLE)) GedcomConfig::$META_TITLE = "";
-	if (isset($GEDCOMS[$GEDCOMID]["title"])) $title = $GEDCOMS[$GEDCOMID]["title"]." :: ".$title;
+	if (isset($GEDCOMS[GedcomConfig::$GEDCOMID]["title"])) $title = $GEDCOMS[GedcomConfig::$GEDCOMID]["title"]." :: ".$title;
 	print "<title>".PrintReady(strip_tags($title)." - ".GedcomConfig::$META_TITLE." - Genmod", TRUE)."</title>\n\t";
 	 if (!GedcomConfig::$REQUIRE_AUTHENTICATION){
 		print "<link href=\"" . SERVER_URL .  "rss.php\" rel=\"alternate\" type=\"application/rss+xml\" title=\"RSS\"></link>\n\t";
@@ -168,13 +168,13 @@ function PrintHeader($title, $head="",$use_alternate_styles=true) {
 		  if (!empty(GedcomConfig::$META_PUBLISHER)) print "<meta name=\"publisher\" content=\"".GedcomConfig::$META_PUBLISHER."\" />\n";
 		  if (!empty(GedcomConfig::$META_COPYRIGHT)) print "<meta name=\"copyright\" content=\"".GedcomConfig::$META_COPYRIGHT."\" />\n";
 		  print "<meta name=\"keywords\" content=\"".GedcomConfig::$META_KEYWORDS;
-		  $surnames = GetCommonSurnamesIndex($GEDCOMID);
+		  $surnames = GetCommonSurnamesIndex(GedcomConfig::$GEDCOMID);
 		  foreach($surnames as $surname=>$count) if (!empty($surname)) print ", $surname";
 		  print "\" />\n";
-		  if ((empty(GedcomConfig::$META_PAGE_TOPIC))&&(!empty($GEDCOMS[$GEDCOMID]["title"]))) GedcomConfig::$META_PAGE_TOPIC = $GEDCOMS[$GEDCOMID]["title"];
+		  if ((empty(GedcomConfig::$META_PAGE_TOPIC))&&(!empty($GEDCOMS[GedcomConfig::$GEDCOMID]["title"]))) GedcomConfig::$META_PAGE_TOPIC = $GEDCOMS[GedcomConfig::$GEDCOMID]["title"];
 		//LERMAN - make meta description unique, like the title
 		  if (empty(GedcomConfig::$META_DESCRIPTION)) GedcomConfig::$META_DESCRIPTION = PrintReady(strip_tags($title)." - ".GedcomConfig::$META_TITLE." - Genmod", TRUE);
-		  //if ((empty($META_DESCRIPTION))&&(!empty($GEDCOMS[$GEDCOMID]["title"]))) $META_DESCRIPTION = $GEDCOMS[$GEDCOMID]["title"];
+		  //if ((empty($META_DESCRIPTION))&&(!empty($GEDCOMS[GedcomConfig::$GEDCOMID]["title"]))) $META_DESCRIPTION = $GEDCOMS[GedcomConfig::$GEDCOMID]["title"];
 		  if (!empty(GedcomConfig::$META_DESCRIPTION)) print "<meta name=\"description\" content=\"".preg_replace("/\"/", "", GedcomConfig::$META_DESCRIPTION)."\" />\n";
 		  if (!empty(GedcomConfig::$META_PAGE_TOPIC)) print "<meta name=\"page-topic\" content=\"".preg_replace("/\"/", "", GedcomConfig::$META_PAGE_TOPIC)."\" />\n";
 	 	  if (!empty(GedcomConfig::$META_AUDIENCE)) print "<meta name=\"audience\" content=\"".GedcomConfig::$META_AUDIENCE."\" />\n";
@@ -309,7 +309,7 @@ var whichhelp = 'help_<?php print basename(SCRIPT_NAME)."&amp;action=".$action; 
 function PrintSimpleHeader($title) {
 	 global $view;
 	 global $QUERY_STRING, $action, $query, $changelanguage;
-	 global $TEXT_DIRECTION, $GEDCOMS, $GEDCOMID,$GM_IMAGES;
+	 global $TEXT_DIRECTION, $GEDCOMS, $GM_IMAGES;
 	 
 	 header("Content-Type: text/html; charset=".GedcomConfig::$CHARACTER_SET);
 	 print "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">\n";
@@ -336,10 +336,10 @@ function PrintSimpleHeader($title) {
 	if (!empty(GedcomConfig::$META_PUBLISHER)) print "<meta name=\"publisher\" content=\"".GedcomConfig::$META_PUBLISHER."\" />\n";
 	if (!empty(GedcomConfig::$META_COPYRIGHT)) print "<meta name=\"copyright\" content=\"".GedcomConfig::$META_COPYRIGHT."\" />\n";
 	print "<meta name=\"keywords\" content=\"".GedcomConfig::$META_KEYWORDS;
-	$surnames = GetCommonSurnamesIndex($GEDCOMID);
+	$surnames = GetCommonSurnamesIndex(GedcomConfig::$GEDCOMID);
 	foreach($surnames as $surname=>$count) print ", $surname";
 	print "\" />\n";
-	if ((empty(GedcomConfig::$META_PAGE_TOPIC))&&(!empty($GEDCOMS[$GEDCOMID]["title"]))) GedcomConfig::$META_PAGE_TOPIC = $GEDCOMS[$GEDCOMID]["title"];
+	if ((empty(GedcomConfig::$META_PAGE_TOPIC))&&(!empty($GEDCOMS[GedcomConfig::$GEDCOMID]["title"]))) GedcomConfig::$META_PAGE_TOPIC = $GEDCOMS[GedcomConfig::$GEDCOMID]["title"];
 	//LERMAN - make meta description unique, like the title
 	if (empty(GedcomConfig::$META_DESCRIPTION)) GedcomConfig::$META_DESCRIPTION = PrintReady(strip_tags($title)." - ".GedcomConfig::$META_TITLE." - Genmod", TRUE);
 	if (!empty(GedcomConfig::$META_DESCRIPTION)) print "<meta name=\"description\" content=\"".preg_replace("/\"/", "", GedcomConfig::$META_DESCRIPTION)."\" />\n";
@@ -872,77 +872,6 @@ function PrintHelpIndex($help){
 		if ($i==ceil($ch/2)) print "</ul></td><td style=\"vertical-align: top;\"><ul>";
 	 }
 	 if ($ch>0) print "</ul></td></tr></table>";
-}
-/**
- * prints a JavaScript popup menu
- *
- * This function will print the DHTML required
- * to create a JavaScript Popup menu.  The $menu
- * parameter is an array that looks like this
- * $menu["label"] = "Charts";
- * $menu["labelpos"] = "down"; // tells where the text should be positioned relative to the picture options are up down left right
- * $menu["icon"] = "images/pedigree.gif";
- * $menu["hovericon"] = "images/pedigree2.gif";
- * $menu["link"] = "pedigree.php";
- * $menu["accesskey"] = "Z"; // optional accesskey
- * $menu["class"] = "menuitem";
- * $menu["hoverclass"] = "menuitem_hover";
- * $menu["flyout"] = "down"; // options are up down left right
- * $menu["items"] = array(); // an array of like menu items
- * $menu["onclick"] = "return javascript";  // java script to run on click
- * @author Genmod Development Team
- * @param array $menu the menuitems array to print
- */
-function PrintFactMenu($menu, $parentmenu="") {
-	$conv = array(
-		'label'=>'label',
-		'labelpos'=>'labelpos',
-		'icon'=>'icon',
-		'hovericon'=>'hovericon',
-		'link'=>'link',
-		'accesskey'=>'accesskey',
-		'class'=>'class',
-		'hoverclass'=>'hoverclass',
-		'flyout'=>'flyout',
-		'submenuclass'=>'submenuclass',
-		'onclick'=>'onclick'
-	);
-	$obj = new Menu();
-	if ($menu == 'separator') {
-		$obj->isSeperator();
-		$obj->printMenu();
-		return;
-	}
-	$items = false;
-	foreach ($menu as $k=>$v) {
-		if ($k == 'items' && is_array($v) && count($v) > 0) $items = $v;
-		else {
-			if (isset($conv[$k])){
-				if ($v != '') {
-					$obj->$conv[$k] = $v;
-				}
-			}
-		}
-	}
-	if ($items !== false) {
-		foreach ($items as $sub) {
-			$sobj = new Menu();
-			if ($sub == 'separator') {
-				$sobj->isSeperator();
-				$obj->addSubmenu($sobj);
-				continue;
-			}
-			foreach ($sub as $k2=>$v2) {
-				if (isset($conv[$k2])) {
-					if ($v2 != '') {
-						$sobj->$conv[$k2] = $v2;
-					}
-				}
-			}
-			$obj->addSubmenu($sobj);
-		}
-	}
-	$obj->printMenu();
 }
 /**
  * Prepare text with parenthesis for printing

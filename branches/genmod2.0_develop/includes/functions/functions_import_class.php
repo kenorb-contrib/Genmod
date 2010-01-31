@@ -466,10 +466,9 @@ abstract class ImportFunctions {
 	 * @param string $indirec the raw gedcom record to parse
 	 * @param boolean $update whether or not this is an updated record that has been accepted
 	 */
-	public function ImportRecord($indirec, $update=false, $gedfile="") {
-		global $GEDCOMID;
+	public function ImportRecord($indirec, $update, $gedfile) {
 		
-		if (empty($gedfile)) $gedfile = $GEDCOMID;
+		if (empty($gedfile)) $gedfile = GedcomConfig::$GEDCOMID;
 		if (strlen(trim($indirec)) ==  0) return false;
 		//-- import different types of records
 		$ct = preg_match("/0 @(.*)@ ([A-Z_]+)/", $indirec, $match);
@@ -765,7 +764,6 @@ abstract class ImportFunctions {
 	 // This function is used in ImportRecord only
 	 
 	private function AddDBLink($media, $indi, $gedrec, $gedid, $order=-1, $rectype) {
-		global $GEDCOMID;
 	
 		// if no preference to order find the number of records and add to the end
 		if ($order=-1) {
@@ -793,10 +791,10 @@ abstract class ImportFunctions {
 	 * into the places table
 	 * @param string $indirec
 	 */
-	public function UpdatePlaces($gid, $type, $indirec, $update=false, $gedfile="") {
-		global $placecache, $GEDCOMID;
+	public function UpdatePlaces($gid, $type, $indirec, $update, $gedfile) {
+		global $placecache;
 		
-		if (empty($gedfile)) $gedfile = $GEDCOMID;
+		if (empty($gedfile)) $gedfile = GedcomConfig::$GEDCOMID;
 	// NOTE: $update=false causes double places to be added. Force true
 	$update = true;
 		if (!isset($placecache)) $placecache = array();
@@ -867,10 +865,9 @@ abstract class ImportFunctions {
 	 * into the dates table
 	 * @param string $indirec
 	 */
-	public function UpdateDates($gid, $indirec, $gedfile="") {
-		global $GEDCOMID;
+	public function UpdateDates($gid, $indirec, $gedfile) {
 		
-		if (empty($gedfile)) $gedfile = $GEDCOMID;
+		if (empty($gedfile)) $gedfile = GedcomConfig::$GEDCOMID;
 		$count = 0;
 		// NOTE: Check if the record has dates, if not return
 		$pt = preg_match("/\d DATE (.*)/", $indirec, $match);
@@ -892,7 +889,7 @@ abstract class ImportFunctions {
 				$datestr = trim($dates[1]);
 				$date = ParseDate($datestr);
 				if (empty($date[0]["day"])) $date[0]["day"] = 0;
-				$sql = "INSERT INTO ".TBLPREFIX."dates VALUES('".DbLayer::EscapeQuery($date[0]["day"])."','".DbLayer::EscapeQuery(Str2Upper($date[0]["month"]))."','".DbLayer::EscapeQuery($date[0]["year"])."','".DbLayer::EscapeQuery($fact)."','".DbLayer::EscapeQuery($gid)."','".DbLayer::EscapeQuery(JoinKey($gid, $GEDCOMID))."','".$gedfile."',";
+				$sql = "INSERT INTO ".TBLPREFIX."dates VALUES('".DbLayer::EscapeQuery($date[0]["day"])."','".DbLayer::EscapeQuery(Str2Upper($date[0]["month"]))."','".DbLayer::EscapeQuery($date[0]["year"])."','".DbLayer::EscapeQuery($fact)."','".DbLayer::EscapeQuery($gid)."','".DbLayer::EscapeQuery(JoinKey($gid, GedcomConfig::$GEDCOMID))."','".$gedfile."',";
 				if (isset($date[0]["ext"])) {
 					preg_match("/@#D(.*)@/", $date[0]["ext"], $extract_type);
 					$date_types = array("@#DGREGORIAN@","@#DJULIAN@","@#DHEBREW@","@#DFRENCH R@", "@#DROMAN@", "@#DUNKNOWN@");
@@ -911,10 +908,10 @@ abstract class ImportFunctions {
 	 * import media items from record
 	 * @return string	an updated record
 	 */
-	private function UpdateMedia($gid, $indirec, $update=false, $gedfile="") {
-		global $GEDCOMID, $media_count, $found_ids; // $found_ids must be global, as it is saved to/from $_SESSION during import
+	private function UpdateMedia($gid, $indirec, $update, $gedfile) {
+		global $media_count, $found_ids; // $found_ids must be global, as it is saved to/from $_SESSION during import
 		
-		if (empty($gedfile)) $gedfile = $GEDCOMID;
+		if (empty($gedfile)) $gedfile = GedcomConfig::$GEDCOMID;
 		
 		if (!isset($media_count)) $media_count = 0;
 		if (!isset($found_ids)) $found_ids = array();
@@ -1323,7 +1320,6 @@ abstract class ImportFunctions {
 	}
 		
 	private function AddSourceLink($sour, $gid, $gedrec, $gedid, $type) {
-		global $GEDCOMID;
 		
 		$sql = "INSERT INTO ".TBLPREFIX."source_mapping (sm_id, sm_sid, sm_type, sm_gid, sm_file, sm_gedrec, sm_key) VALUES ('0', '".$sour."', '".$type."', '".$gid."', '".$gedid."', '".DbLayer::EscapeQuery($gedrec)."', '".JoinKey($sour, $gedid)."')";
 		$res = NewQuery($sql);
@@ -1335,7 +1331,6 @@ abstract class ImportFunctions {
 	}
 	
 	private function AddOtherLink($note, $gid, $type, $gedid) {
-		global $GEDCOMID;
 		
 		$sql = "INSERT INTO ".TBLPREFIX."other_mapping (om_id, om_oid, om_gid, om_type, om_file) VALUES ('0', '".$note."', '".$gid."', '".$type."', '".$gedid."')";
 		$res = NewQuery($sql);

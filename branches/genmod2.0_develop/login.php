@@ -84,7 +84,7 @@ else {
 		if ((isset($_SERVER['HTTP_REFERER'])) && ((stristr($_SERVER['HTTP_REFERER'],$tSERVER_URL)!==false)||(stristr($_SERVER['HTTP_REFERER'],$tLOGIN_URL)!==false))) {
 			$url = basename($_SERVER['HTTP_REFERER']);
 			if (stristr($url, ".php")===false) {
-				$url = SERVER_URL."index.php?command=gedcom&amp;gedid=$GEDCOMID";
+				$url = SERVER_URL."index.php?command=gedcom&amp;gedid=".GedcomConfig::$GEDCOMID;
 			}
 		}
 		else {
@@ -111,7 +111,7 @@ if ($_SESSION["cookie_login"]) {
 if (GedcomConfig::$REQUIRE_AUTHENTICATION) {
 	print "<table class=\"center width60 ".$TEXT_DIRECTION."\"><tr><td class=\"wrap\">";
 	if (empty($help_message) || !isset($help_message)) {
-		if (!empty($GEDCOMID)) SwitchGedcom($GEDCOMID);
+		if (!empty(GedcomConfig::$GEDCOMID)) SwitchGedcom(GedcomConfig::$GEDCOMID);
 		switch (GedcomConfig::$WELCOME_TEXT_AUTH_MODE){
 			case "1":
 				$help_message = "welcome_text_auth_mode_1";
@@ -149,7 +149,7 @@ else {
 		<?php $i = 0;?>
 		<input type="hidden" name="action" value="login" />
 		<input type="hidden" name="url" value="<?php print htmlspecialchars($url); ?>" />
-		<input type="hidden" name="gedid" value="<?php if (isset($gedid)) print $gedid; else print $GEDCOMID; ?>" />
+		<input type="hidden" name="gedid" value="<?php if (isset($gedid)) print $gedid; else print GedcomConfig::$GEDCOMID; ?>" />
 		<input type="hidden" name="pid" value="<?php if (isset($pid)) print $pid; ?>" />
 		<input type="hidden" name="type" value="<?php print $type; ?>" />
 		<input type="hidden" name="usertime" value="" />

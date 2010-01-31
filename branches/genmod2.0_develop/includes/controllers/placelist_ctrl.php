@@ -141,14 +141,13 @@ class PlaceListController extends ListController {
 	 * @subpackage Places
 	 */
 	public function GetPlaceList($parent, $level) {
-		global $GEDCOMID;
 	
 		$placelist = array();
 		// --- find all of the place in the file
-		if ($level==0) $sql = "SELECT p_place FROM ".TBLPREFIX."places WHERE p_level=0 AND p_file='".$GEDCOMID."' ORDER BY p_place";
+		if ($level==0) $sql = "SELECT p_place FROM ".TBLPREFIX."places WHERE p_level=0 AND p_file='".GedcomConfig::$GEDCOMID."' ORDER BY p_place";
 		else {
 			$parent_id = $this->GetPlaceParentId($parent, $level);
-			$sql = "SELECT p_place FROM ".TBLPREFIX."places WHERE p_level=$level AND p_parent_id=$parent_id AND p_file='".$GEDCOMID."' ORDER BY p_place";
+			$sql = "SELECT p_place FROM ".TBLPREFIX."places WHERE p_level=$level AND p_parent_id=$parent_id AND p_file='".GedcomConfig::$GEDCOMID."' ORDER BY p_place";
 		}
 		$res = NewQuery($sql);
 		while ($row = $res->fetchAssoc()) {
@@ -167,7 +166,6 @@ class PlaceListController extends ListController {
 	 * @return array
 	 */
 	public function GetPlacePositions($parent, $level, $factsel) {
-		global $GEDCOMID;
 		
 		$positions = array();
 		$indisel = array();
@@ -175,13 +173,13 @@ class PlaceListController extends ListController {
 		$soursel = array();
 		
 		$p_id = $this->GetPlaceParentId($parent, $level);
-		$sql = "SELECT DISTINCT pl_gid, pl_type FROM ".TBLPREFIX."placelinks WHERE pl_p_id='".$p_id."' AND pl_file='".$GEDCOMID."'";
+		$sql = "SELECT DISTINCT pl_gid, pl_type FROM ".TBLPREFIX."placelinks WHERE pl_p_id='".$p_id."' AND pl_file='".GedcomConfig::$GEDCOMID."'";
 		$res = NewQuery($sql);
 		while ($row = $res->fetchAssoc()) {
 			// We want to build a cache for all the attached indi's, fams and sources
-			if ($row["pl_type"] == "INDI") $indisel[] = JoinKey($row["pl_gid"], $GEDCOMID);
-			elseif ($row["pl_type"] == "FAM") $famsel[] = JoinKey($row["pl_gid"], $GEDCOMID);
-			elseif ($row["pl_type"] == "SOUR") $soursel[] = JoinKey($row["pl_gid"], $GEDCOMID);
+			if ($row["pl_type"] == "INDI") $indisel[] = JoinKey($row["pl_gid"], GedcomConfig::$GEDCOMID);
+			elseif ($row["pl_type"] == "FAM") $famsel[] = JoinKey($row["pl_gid"], GedcomConfig::$GEDCOMID);
+			elseif ($row["pl_type"] == "SOUR") $soursel[] = JoinKey($row["pl_gid"], GedcomConfig::$GEDCOMID);
 		}
 		$positions["INDI"] = array();
 		if (count($indisel) > 0) {
@@ -201,9 +199,9 @@ class PlaceListController extends ListController {
 				}
 				else $add = true;
 				if ($add) {
-					$this->indi_total[JoinKey($indi->xref, $GEDCOMID)] = 1;
+					$this->indi_total[JoinKey($indi->xref, GedcomConfig::$GEDCOMID)] = 1;
 					if ($indi->disp_name) $positions["INDI"][] = $indi;
-					else $this->indi_hide[JoinKey($indi->xref, $GEDCOMID)] = 1;
+					else $this->indi_hide[JoinKey($indi->xref, GedcomConfig::$GEDCOMID)] = 1;
 				}
 			}
 		}
@@ -224,9 +222,9 @@ class PlaceListController extends ListController {
 				}
 				else $add = true;
 				if ($add) {
-					$this->fam_total[JoinKey($fam->xref, $GEDCOMID)] = 1;
+					$this->fam_total[JoinKey($fam->xref, GedcomConfig::$GEDCOMID)] = 1;
 					if ($fam->disp) $positions["FAM"][] = $fam;
-					else $this->fam_hide[JoinKey($fam->xref, $GEDCOMID)] = 1;
+					else $this->fam_hide[JoinKey($fam->xref, GedcomConfig::$GEDCOMID)] = 1;
 				}
 			}
 		}
@@ -247,9 +245,9 @@ class PlaceListController extends ListController {
 				}
 				else $add = true;
 				if ($add) {
-					$this->sour_total[JoinKey($source->xref, $GEDCOMID)] = 1;
+					$this->sour_total[JoinKey($source->xref, GedcomConfig::$GEDCOMID)] = 1;
 					if ($source->disp) $positions["SOUR"][] = $source;
-					else $this->sour_hide[JoinKey($source->xref, $GEDCOMID)] = 1;
+					else $this->sour_hide[JoinKey($source->xref, GedcomConfig::$GEDCOMID)] = 1;
 				}
 			}
 		}
@@ -263,12 +261,11 @@ class PlaceListController extends ListController {
 	 * @return int
 	 */
 	private function GetPlaceParentId($parent, $level) {
-		global $GEDCOMID;
 	
 		$parent_id=0;
 		for($i=0; $i<$level; $i++) {
 			$escparent = preg_replace("/\?/","\\\\\\?", DbLayer::EscapeQuery($parent[$i]));
-			$psql = "SELECT p_id FROM ".TBLPREFIX."places WHERE p_level='".$i."' AND p_parent_id='".$parent_id."' AND p_place LIKE '".$escparent."' AND p_file='".$GEDCOMID."' ORDER BY p_place";
+			$psql = "SELECT p_id FROM ".TBLPREFIX."places WHERE p_level='".$i."' AND p_parent_id='".$parent_id."' AND p_place LIKE '".$escparent."' AND p_file='".GedcomConfig::$GEDCOMID."' ORDER BY p_place";
 			$res = NewQuery($psql);
 			$row = $res->fetchAssoc();
 			$res->FreeResult();

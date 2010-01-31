@@ -34,6 +34,8 @@ if (!$gm_user->userCanAccept()) {
 	else header("Location: ".LOGIN_URL."?url=edit_changes.php");
 	exit;
 }
+// Force to show changes
+$show_changes = true;
 
 if (empty($action)) $action="";
 
@@ -117,10 +119,10 @@ else {
 	$changegids = array();
 	
 	// First read all changes
-	$sql = "SELECT DISTINCT ch_cid AS cid FROM ".TBLPREFIX."changes WHERE ch_file = '".$GEDCOMID."' ORDER BY ch_cid ASC, ch_fact ASC, ch_time DESC";
+	$sql = "SELECT DISTINCT ch_cid AS cid FROM ".TBLPREFIX."changes WHERE ch_file = '".GedcomConfig::$GEDCOMID."' ORDER BY ch_cid ASC, ch_fact ASC, ch_time DESC";
 	$res = NewQuery($sql);
 	while($row = $res->FetchAssoc()){
-		$sqlcid = "SELECT * FROM ".TBLPREFIX."changes WHERE ch_cid = '".$row["cid"]."' AND ch_file = '".$GEDCOMID."' ORDER BY ch_id ASC";
+		$sqlcid = "SELECT * FROM ".TBLPREFIX."changes WHERE ch_cid = '".$row["cid"]."' AND ch_file = '".GedcomConfig::$GEDCOMID."' ORDER BY ch_id ASC";
 		$rescid = NewQuery($sqlcid);
 		$change_row = 0;
 		while($rowcid = $rescid->FetchAssoc()){
@@ -151,7 +153,7 @@ else {
 				if ($trace) print "4. Found a deletion ".$rowcid["ch_gid"]." ";
 				$found0ids[$rowcid["ch_gid"]] = $row["cid"];
 				$object =& ConstructObject($rowcid["ch_gid"], $rowcid["ch_gid_type"]);
-				if ($object->gedrec != $rowcid["ch_old"]) {
+				if (trim($object->gedrec) != trim($rowcid["ch_old"])) {
 					// Not the same, check if we really have previous changes on this ID
 					if (in_array($rowcid["ch_gid"], $foundids)) {
 						// Yes, found one
@@ -159,9 +161,24 @@ else {
 						$rowcid["canreject"] = false;
 					}
 					else {
-						// No, we have a problem and must reject
-						$rowcid["canaccept"] = false;
-						$rowcid["canreject"] = true;
+						// If the ch_old was constructed from the original gedrec AND factlevel changes, 
+						// the CHAN subrecord is changed meanwhile and does not have the value mentioned in ch_old anymore
+						// Therefore we compare the records again. If they match, it's ok.
+//						$chanrec1 = GetSubrecord(1, "1 CHAN", $object->gedrec);
+//						$chanrec2 = GetSubrecord(1, "1 CHAN", $rowcid["ch_old"]);
+//						if (!empty($chanrec1)) $rec1 = preg_replace("/$chanrec1/", "", $object->gedrec);
+//						else $rec1 = $object->gedrec;
+//						if (!empty($chanrec2)) $rec2 = preg_replace("/$chanrec2/", "", $rowcid["ch_old"]);
+//						else $rec2 = $rowcid["ch_old"];
+//						if ($rec1 != $rec2) {
+							// No, we have a problem and must reject
+							$rowcid["canaccept"] = false;
+							$rowcid["canreject"] = true;
+//						}
+//						else {
+//							$rowcid["canaccept"] = true;
+//							$rowcid["canreject"] = true;
+//						}
 					}
 				}
 				else {
@@ -178,7 +195,10 @@ else {
 				if ($trace) print "6. Found edit ".$rowcid["ch_gid"]."<br />";
 				$found0ids[$rowcid["ch_gid"]] = $row["cid"];
 				$object =& ConstructObject($rowcid["ch_gid"], $rowcid["ch_gid_type"]);
-				if ($object->gedrec != $rowcid["ch_old"]) {
+				// Oops we cannot compare the current gedrec with ch_old, because the latter is without CHAN tag even if the same
+				if ($rowcid["ch_old"] != substr($object->gedrec, 0, strlen($rowcid["ch_old"]))) {
+					//print "<br />".strlen($rowcid["ch_old"])."<br />".strlen($object->gedrec)."<br />";
+					//print "<br />".$rowcid["ch_old"]."<br />".$object->gedrec."<br />";
 					// Not the same, check if we really have previous changes on this ID
 					if (in_array($rowcid["ch_gid"], $foundids)) {
 						// Yes, found one
@@ -265,8 +285,12 @@ else {
 									// Make sure we talk about the same gid here
 									if ($change["gid"] == $rowcid["ch_gid"]) {
 										if (trim($change["new"]) == trim($rowcid["ch_old"])) {
-											$foundearlier = true;
-											break 2;
+											// If reorder, there may be two changes eachothers opposite
+											// In that case, gid and groupid must be the same AND change type must be reorder_* for both
+											if (!($groupid == $rowcid["ch_cid"] && substr($change["type"], 0, 8) == "reorder_" && $change["type"] == $rowcid["ch_type"])) {
+												$foundearlier = true;
+												break 2;
+											}
 										}
 									}
 								}
@@ -303,7 +327,7 @@ else {
 			}
 					
 			$changegroup[$rowcid["ch_cid"]][$change_row]["gid"] = $rowcid["ch_gid"];
-			$changegroup[$rowcid["ch_cid"]][$change_row]["gid_type"] = $rowcid["ch_gid_type"];
+			$changegroup[$rowcid["ch_cid"]][$change_row]["gid_type"] = trim($rowcid["ch_gid_type"]);
 			$changegroup[$rowcid["ch_cid"]][$change_row]["file"] = $rowcid["ch_file"];
 			$changegroup[$rowcid["ch_cid"]][$change_row]["type"] = $rowcid["ch_type"];
 			$changegroup[$rowcid["ch_cid"]][$change_row]["user"] = $rowcid["ch_user"];
@@ -408,6 +432,9 @@ else {
 						$printname =  "<b>".$object->title."</b>".$object->addxref;
 						$changegids["note"][$change["gid"]] = $printname;
 						break;
+					default:
+						print "change type not found: ".$change["gid_type"];
+						break;
 				}
 				print $printname;
 				if ($trace) print "14. a".$changegroup[$groupid]["canaccept"]."r".$changegroup[$groupid]["canreject"];
@@ -440,10 +467,10 @@ else {
 	//-- accept and reject all
 	print "<br /><br /><table class=\"list_table center\">";
 	print "<tr><td class=\"shade2\">";
-	print "<a href=\"edit_changes.php?action=acceptall&amp;gedfile=".$GEDCOMID."\" onclick=\"return confirm('".GM_LANG_accept_all_confirm."');\">".GM_LANG_accept_all."</a>\n";
+	print "<a href=\"edit_changes.php?action=acceptall&amp;gedfile=".GedcomConfig::$GEDCOMID."\" onclick=\"return confirm('".GM_LANG_accept_all_confirm."');\">".GM_LANG_accept_all."</a>\n";
 	print "</td>";
 	print "<td class=\"shade2\">";
-	print "<a href=\"edit_changes.php?action=rejectall&amp;gedfile=".$GEDCOMID."\" onclick=\"return confirm('".GM_LANG_reject_all_confirm."');\">".GM_LANG_reject_all."</a>\n";
+	print "<a href=\"edit_changes.php?action=rejectall&amp;gedfile=".GedcomConfig::$GEDCOMID."\" onclick=\"return confirm('".GM_LANG_reject_all_confirm."');\">".GM_LANG_reject_all."</a>\n";
 	print "</td></tr></table>";
 }
 print "<br /><br />\n</center></div>\n";

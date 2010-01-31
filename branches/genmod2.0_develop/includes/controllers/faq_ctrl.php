@@ -170,16 +170,15 @@ class FAQController {
 	 * @return array $faqs	The array containing the FAQ items
 	 */
 	private function GetFaqData() {
-		global $GEDCOMID;
 		
 		if (is_null($this->faqs)) {
 			$this->faqs = array();
 			// Read the faq data from the DB
-			$sql = "SELECT fa_id, fa_order, fa_body, fa_header FROM ".TBLPREFIX."faqs WHERE fa_file='".$GEDCOMID."'";
+			$sql = "SELECT fa_id, fa_order, fa_body, fa_header FROM ".TBLPREFIX."faqs WHERE fa_file='".GedcomConfig::$GEDCOMID."'";
 	
 			$res = NewQuery($sql);
 			while($row = $res->FetchAssoc()){
-				$this->faqs[$row["fa_order"]] = new FAQ($row["fa_id"], $row, $GEDCOMID);
+				$this->faqs[$row["fa_order"]] = new FAQ($row["fa_id"], $row, GedcomConfig::$GEDCOMID);
 			}
 			ksort($this->faqs);
 		}

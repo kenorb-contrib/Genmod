@@ -32,7 +32,7 @@
 			<GMRSetVar name="width2" value="270" />
 		</GMRif>
 		<GMRHeader>
-			<GMRCell width="$width" height="20" align="center" style="header"><GMRvar var="GM_LANG_individual_report" /><GMRvar var="$LANGUAGE" /></GMRCell>
+			<GMRCell width="$width" height="20" align="center" style="header"><GMRvar var="GM_LANG_individual_report" /></GMRCell>
 			<!-- GMRCell width="0" height="10" align="right" style="pagenum"><GMRvar var="GM_LANG_page" /> <GMRPageNum /> <GMRvar var="GM_LANG_of" /> <GMRTotalPages /> - <GMRNow /></GMRCell -->
 			<GMRTextBox width="50%" height="10" border="0">
 				<GMRText style="pagenum"><GMRNow /></GMRText>

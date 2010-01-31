@@ -39,7 +39,6 @@ class RepositoryController extends DetailController {
 	 * constructor
 	 */
 	public function __construct() {
-		global $GEDCOMID, $ENABLE_CLIPPINGS_CART;
 		global $nonfacts;
 		
 		parent::__construct();
@@ -48,9 +47,9 @@ class RepositoryController extends DetailController {
 		
 		if (!empty($_REQUEST["rid"])) $this->xref = strtoupper($_REQUEST["rid"]);
 		$this->xref = CleanInput($this->xref);
-		$this->gedcomid = $GEDCOMID;
+		$this->gedcomid = GedcomConfig::$GEDCOMID;
 		
-		$this->repo =& Repository::GetInstance($this->xref, "", $GEDCOMID);
+		$this->repo =& Repository::GetInstance($this->xref, "", GedcomConfig::$GEDCOMID);
 		
 		//-- perform the desired action
 		switch($this->action) {
@@ -128,7 +127,6 @@ class RepositoryController extends DetailController {
 	 * @return Menu
 	 */
 	public function &getOtherMenu() {
-		global $GEDCOMID;
 		global $ENABLE_CLIPPINGS_CART, $gm_user;
 		
 		// other menu
@@ -150,7 +148,7 @@ class RepositoryController extends DetailController {
 		if ($this->repo->disp && !empty($this->uname)) {
 				// other / add_to_my_favorites
 				$submenu = new Menu(GM_LANG_add_to_my_favorites);
-				$submenu->addLink('repo.php?action=addfav&rid='.$this->repo->xref.'&gedid='.$GEDCOMID);
+				$submenu->addLink('repo.php?action=addfav&rid='.$this->repo->xref.'&gedid='.GedcomConfig::$GEDCOMID);
 				$menu->addSubmenu($submenu);
 		}
 		return $menu;

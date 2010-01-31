@@ -29,6 +29,10 @@ if (stristr($_SERVER["SCRIPT_NAME"],basename(__FILE__))) {
 }
 
 abstract class ChangeFunctions {
+
+	private static $chcache = null;		// Cache for change records	
+	private static $chstatcache = null;	// Cache for status requests regarding changes
+	
 	
 	public function ReadGedcomRecord($id, $gedid, $type) {
 	
@@ -37,6 +41,11 @@ abstract class ChangeFunctions {
 		else if ($type == "SOUR") $sql = "SELECT s_gedrec FROM ".TBLPREFIX."sources WHERE s_key='".DbLayer::EscapeQuery(JoinKey($id, $gedid))."'";
 		else if ($type == "REPO" || $type == "NOTE" || $type == "HEAD" || $type == "SUBM") $sql = "SELECT o_gedrec FROM ".TBLPREFIX."other WHERE o_key='".DbLayer::EscapeQuery(JoinKey($id, $gedid))."'";
 		else if ($type == "OBJE") $sql = "SELECT m_gedrec FROM ".TBLPREFIX."media WHERE m_media LIKE '".DbLayer::EscapeQuery($id)."' AND m_file='".$gedid."'";
+		else {
+			print "invalid type: ".$type." for id: ".$id." in ".$gedid;
+			print $pipo;
+			exit;
+		}
 		$res = NewQuery($sql);
 		if ($res->NumRows() == 0) return false;
 		else {
@@ -58,44 +67,47 @@ abstract class ChangeFunctions {
 						$fact for this fact
 	*/
 	public function GetChangeData($status=false, $gid="", $thisged=false, $data="gedlines", $fact="") {
-		global $changes, $GEDCOMID;
-		global $chcache, $chstatcache;
+		global $changes;
 		
 		// NOTE: If the file does not have an ID, go back
-		if (!isset($GEDCOMID)) return false;
+		if (!isset(GedcomConfig::$GEDCOMID)) return false;
 		
 		// Initialise the results cache
-		if (!isset($chcache)) $chcache = array();
+		if (is_null(self::$chcache)) self::$chcache = array();
 		
 		// Initialise the status cache
-		if (!isset($chstatcache)) {
-			$chstatcache = array();
+		if (is_null(self::$chstatcache)) {
+			self::$chstatcache = array();
 			$sql = "SELECT ch_gid, ch_file, ch_gid_type FROM ".TBLPREFIX."changes";
 			$resc = NewQuery($sql);
 			if($resc) {
 				while ($row = $resc->FetchAssoc()) {
-					$chstatcache[$row["ch_gid"]][$row["ch_file"]] = true;
+					self::$chstatcache[$row["ch_gid"]][$row["ch_file"]] = true;
 				}
 			}
 		}
-		
+		// See if $gid is an object. In that case we can select for pid_type, which will prevent returning changes from objects that have a wrong type.
+		if (is_object($gid)) {
+			$gid_type = $gid->datatype;
+			$gid = $gid->xref;
+		}
 		// Check in the cache if this gid has any changes. If not, no need to get anything from the DB	
 		if ($status) {
 			// Specific gid
 			if (!empty($gid)) {
 				// Specific gid, current gedcom
 				if ($thisged) {
-					if (!isset($chstatcache[$gid][$GEDCOMID])) return 0;
+					if (!isset(self::$chstatcache[$gid][GedcomConfig::$GEDCOMID])) return 0;
 				}
 				// Specific gid, all gedcoms
-				else if (!isset($chstatcache[$gid])) return 0;
+				else if (!isset(self::$chstatcache[$gid])) return 0;
 			}
 			else {
 				// No gid, current gedcom
 				if ($thisged) {
 					$has = false;
-					foreach ($chstatcache as $gkey => $gged) {
-						if (isset($gged[$GEDCOMID])) {
+					foreach (self::$chstatcache as $gkey => $gged) {
+						if (isset($gged[GedcomConfig::$GEDCOMID])) {
 							$has = true;
 							break;
 						}
@@ -103,12 +115,12 @@ abstract class ChangeFunctions {
 					if (!$has) return 0;
 				}
 				// No gid, all gedcoms
-				else if (count($chstatcache) == 0) return 0;
+				else if (count(self::$chstatcache) == 0) return 0;
 			}
 		}
 		
 		$whereclause = "";
-		if ($thisged) $whereclause .= "ch_file = '".$GEDCOMID."'";
+		if ($thisged) $whereclause .= "ch_file = '".GedcomConfig::$GEDCOMID."'";
 		if (!empty($gid)) {
 			if (!empty($whereclause)) $whereclause .= " AND ";
 			$whereclause .= "ch_gid = '".$gid."'";
@@ -127,12 +139,17 @@ abstract class ChangeFunctions {
 			}
 			if (count($factarr) >1) $whereclause .=")";
 		}
-	
+		
+		if (isset($gid_type)) {
+			if (!empty($whereclause)) $whereclause .= " AND ";
+			$whereclause .= "ch_gid_type LIKE '".$gid_type."'";
+		}
+		
 		if ($status) $selectclause = "SELECT COUNT(ch_id) ";
 		else {
 			if ($data == "gedcoms") $selectclause = "SELECT ch_file ";
 			else {
-				$selectclause = "SELECT ch_gid, ch_type, ch_fact, ch_file, ch_old, ch_new, ch_gid_type";
+				$selectclause = "SELECT ch_cid, ch_id, ch_gid, ch_type, ch_fact, ch_file, ch_old, ch_new, ch_gid_type";
 				$whereclause .= " ORDER BY";
 				if ($data == "gedlinesCHAN") {
 					$data = "gedlines";
@@ -146,14 +163,14 @@ abstract class ChangeFunctions {
 	
 		$sql = $selectclause."FROM ".TBLPREFIX."changes";
 		if (!empty($whereclause)) $sql .= " WHERE ".$whereclause;
-	
-		if (array_key_exists($sql, $chcache)) return $chcache[$sql];
+
+		if (array_key_exists($sql, self::$chcache)) return self::$chcache[$sql];
 		$res = NewQuery($sql);
 		if (!$res) return false;	
 		
 		if($status) {
 			$row = $res->FetchRow();
-			$chcache[$sql] = $row[0];
+			self::$chcache[$sql] = $row[0];
 			return $row[0];
 		}
 		else {
@@ -163,54 +180,88 @@ abstract class ChangeFunctions {
 				while ($row = $res->FetchAssoc($res->result)) {
 					$gedfiles[$row["ch_file"]] = $row["ch_file"];
 				}
-				$chcache[$sql] = $gedfiles;
+				self::$chcache[$sql] = $gedfiles;
 				return $gedfiles;
 			}
 			else {
+				$cidchanges = array();
+				while ($row = $res->FetchAssoc()) {
+					$cidchanges[$row["ch_cid"]][$row["ch_id"]]["cid"] = $row["ch_cid"];
+					$cidchanges[$row["ch_cid"]][$row["ch_id"]]["gid"] = $row["ch_gid"];
+					$cidchanges[$row["ch_cid"]][$row["ch_id"]]["file"] = $row["ch_file"];
+					$cidchanges[$row["ch_cid"]][$row["ch_id"]]["old"] = $row["ch_old"];
+					$cidchanges[$row["ch_cid"]][$row["ch_id"]]["new"] = $row["ch_new"];
+					$cidchanges[$row["ch_cid"]][$row["ch_id"]]["type"] = $row["ch_type"];
+					if (isset($row["ch_user"])) $cidchanges[$row["ch_cid"]][$row["ch_id"]]["user"] = $row["ch_user"];
+					if (isset($row["ch_time"])) $cidchanges[$row["ch_cid"]][$row["ch_id"]]["time"] = $row["ch_time"];
+					$cidchanges[$row["ch_cid"]][$row["ch_id"]]["gid_type"] = $row["ch_gid_type"];
+				}
+				
 				// NOTE: Construct the changed gedcom record
 				$gedlines = array();
-				while ($row = $res->FetchAssoc($res->result)) {
-					$gedname = $row["ch_file"];
-					$chgid = $row["ch_gid"];
-					$gidtype = trim($row["ch_gid_type"]); // Very funny. If not trimmed, the length is 4!
-					if (!isset($gedlines[$gedname][$chgid])) {
-						$gedlines[$gedname][$chgid] = trim(self::ReadGedcomRecord($chgid, $gedname, $gidtype));
-					}
-	
-					// NOTE: Add to existing ID
-					// NOTE: If old is empty, just add the new data, make sure it is not new record
-					if (empty($row["ch_old"]) && !empty($row["ch_new"]) && preg_match("/0\s@(.*)@/", $row["ch_new"]) == 0) {
-						$gedlines[$gedname][$chgid] .= "\r\n".$row["ch_new"];
-					}
-					
-					// NOTE: Add new ID
-					// NOTE: If the old is empty and the new is a new record make sure we just store the new record
-					else if (empty($row["ch_old"]) && preg_match("/0\s@(.*)@/", $row["ch_new"]) > 0) {
-						$gedlines[$gedname][$chgid] = $row["ch_new"];
-					}
-					
-					// NOTE: Delete ID
-					// NOTE: if old is not empty and new is empty, AND new pid, the record needs to be deleted
-					else if (!empty($row["ch_old"]) && empty($row["ch_new"])&& preg_match("/0\s@(.*)@/", $row["ch_new"]) > 0) {
-						$gedlines[$gedname][$chgid] = GM_LANG_record_to_be_deleted;
-					}
-					
-					// NOTE: Replace any other, change or delete from ID
-					// NOTE: If new is empty or filled, the old needs to be replaced
-					else $gedlines[$gedname][$chgid] = str_replace(trim($row["ch_old"]), $row["ch_new"], $gedlines[$gedname][$chgid]);
-	
-					if (isset($row["ch_user"]) && isset($row["ch_time"])) {
-						$gedrecord = $gedlines[$gedname][$chgid];
-						if (empty($gedrecord)) {
-							// deleted record
-							$gedrecord = trim(FindGedcomRecord($chgid, $gedname));
+				foreach ($cidchanges as $changegroup => $changes) {
+					$toadd = array();
+					$counttoadd = 1;
+					foreach ($changes as $changeid => $change) {
+						$gedname = $change["file"];
+						$chgid = $change["gid"];
+						$gidtype = trim($change["gid_type"]); // Very funny. If not trimmed, the length is 4!
+						if (!isset($gedlines[$gedname][$chgid])) {
+							$gedlines[$gedname][$chgid] = trim(self::ReadGedcomRecord($chgid, $gedname, $gidtype))."\r\n";
 						}
-						//LERMAN
-						$gedrecord = EditFunctions::CheckGedcom($gedrecord, true, $row["ch_user"], $row["ch_time"]);
-						$gedlines[$gedname][$chgid] = trim($gedrecord);
+		
+						// NOTE: Add to existing ID
+						// NOTE: If old is empty, just add the new data, make sure it is not new record
+						if (empty($change["old"]) && !empty($change["new"]) && preg_match("/0\s@(.*)@/", $change["new"]) == 0) {
+							$gedlines[$gedname][$chgid] .= "\r\n".$change["new"];
+						}
+						
+						// NOTE: Add new ID
+						// NOTE: If the old is empty and the new is a new record make sure we just store the new record
+						else if (empty($change["old"]) && preg_match("/0\s@(.*)@/", $change["new"]) > 0) {
+							$gedlines[$gedname][$chgid] = $change["new"];
+						}
+						
+						// NOTE: Delete ID
+						// NOTE: if old is not empty and new is empty, AND new pid, the record needs to be deleted
+						else if (!empty($change["old"]) && empty($change["new"])&& preg_match("/0\s@(.*)@/", $change["old"]) > 0) {
+							//$gedlines[$gedname][$chgid] = GM_LANG_record_to_be_deleted;
+							$gedlines[$gedname][$chgid] = "";
+						}
+						
+						// NOTE: Replace any other, change or delete from ID
+						// NOTE: If new is empty or filled, the old needs to be replaced
+						else {
+							if (substr($change["type"], 0, 8) == "reorder_") {
+								$toadd[] = array($change["new"], $counttoadd);
+								$change["new"] = "reorder".$counttoadd;
+								$counttoadd++;
+							}
+							$gedlines[$gedname][$chgid] = str_replace(trim($change["old"]), $change["new"], $gedlines[$gedname][$chgid]);
+						}
+						
+						if (isset($change["user"]) && isset($change["time"])) {
+							$gedrecord = $gedlines[$gedname][$chgid];
+							if (empty($gedrecord)) {
+								// deleted record
+								$gedrecord = trim(FindGedcomRecord($chgid, $gedname));
+							}
+							//LERMAN
+							$gedrecord = EditFunctions::CheckGedcom($gedrecord, true, $change["user"], $change["time"]);
+							$gedlines[$gedname][$chgid] = trim($gedrecord);
+						}
+						$gedlines[$gedname][$chgid] = preg_replace("/([\r\n])+/", "\r\n", $gedlines[$gedname][$chgid]);
+						// print $gedlines[$gedname][$chgid]."<br /><br />";
+					}
+					// End of change group
+					// Process the reorders
+					if ($counttoadd > 1) {
+						foreach ($toadd as $key => $addrec) {
+							$gedlines[$gedname][$chgid] = str_replace("reorder".$addrec[1], $addrec[0], $gedlines[$gedname][$chgid]);
+						}
 					}
 				}
-				$chcache[$sql] = $gedlines;
+				self::$chcache[$sql] = $gedlines;
 				return $gedlines;
 			}
 		}
@@ -224,80 +275,103 @@ abstract class ChangeFunctions {
 	 * @return 	boolean	true if changes were processed correctly, false if there was a problem
 	 */
 	public function AcceptChange($cid, $gedfile, $all=false) {
-		global $GEDCOMID, $FILE, $gm_user, $chcache;
+		global $FILE, $gm_user;
 		
 		$cidchanges = array();
 		if ($all) $sql = "SELECT ch_id, ch_cid, ch_gid, ch_file, ch_old, ch_new, ch_type, ch_user, ch_time, ch_gid_type FROM ".TBLPREFIX."changes WHERE ch_file = '".$gedfile."' ORDER BY ch_id ASC";
 		else $sql = "SELECT ch_id, ch_cid, ch_gid, ch_file, ch_old, ch_new, ch_type, ch_user, ch_time, ch_gid_type FROM ".TBLPREFIX."changes WHERE ch_cid = '".$cid."' AND ch_file = '".$gedfile."' ORDER BY ch_id ASC";
 		$res = NewQuery($sql);
 		while ($row = $res->FetchAssoc()) {
-			$cidchanges[$row["ch_id"]]["cid"] = $row["ch_cid"];
-			$cidchanges[$row["ch_id"]]["gid"] = $row["ch_gid"];
-			$cidchanges[$row["ch_id"]]["file"] = $row["ch_file"];
-			$cidchanges[$row["ch_id"]]["old"] = $row["ch_old"];
-			$cidchanges[$row["ch_id"]]["new"] = $row["ch_new"];
-			$cidchanges[$row["ch_id"]]["type"] = $row["ch_type"];
-			$cidchanges[$row["ch_id"]]["user"] = $row["ch_user"];
-			$cidchanges[$row["ch_id"]]["time"] = $row["ch_time"];
-			$cidchanges[$row["ch_id"]]["gid_type"] = $row["ch_gid_type"];
+			$cidchanges[$row["ch_cid"]][$row["ch_id"]]["cid"] = $row["ch_cid"];
+			$cidchanges[$row["ch_cid"]][$row["ch_id"]]["gid"] = $row["ch_gid"];
+			$cidchanges[$row["ch_cid"]][$row["ch_id"]]["file"] = $row["ch_file"];
+			$cidchanges[$row["ch_cid"]][$row["ch_id"]]["old"] = $row["ch_old"];
+			$cidchanges[$row["ch_cid"]][$row["ch_id"]]["new"] = $row["ch_new"];
+			$cidchanges[$row["ch_cid"]][$row["ch_id"]]["type"] = $row["ch_type"];
+			$cidchanges[$row["ch_cid"]][$row["ch_id"]]["user"] = $row["ch_user"];
+			$cidchanges[$row["ch_cid"]][$row["ch_id"]]["time"] = $row["ch_time"];
+			$cidchanges[$row["ch_cid"]][$row["ch_id"]]["gid_type"] = $row["ch_gid_type"];
 		}
 		if (count($cidchanges) > 0) {
-			foreach ($cidchanges as $id => $details) {
-				$FILE = $details["file"];
-				$object = ConstructObject($details["gid"], $details["gid_type"]);
-				$gedrec = $object->gedrec;
-				// print "Old value of gedrec: ".$gedrec."<br />";
-				// NOTE: Import the record
-				$update_id = "";
-				if (empty($gedrec)) $gedrec = "";
-				
-				// NOTE: Add anything to existing ID
-				// NOTE: If old is empty, just add the new data makes sure it is not new record
-				if (empty($details["old"]) && !empty($details["new"]) && preg_match("/0\s@(.*)@/", $details["new"]) == 0) {
-					$gedrec .= "\r\n".$details["new"];
-					// print "New value of gedrec (add to existing): ".$gedrec."<br />";
-					$update_id = self::UpdateRecord(EditFunctions::CheckGedcom($gedrec, true, $details["user"], $details["time"]));
-				}
-				
-				// NOTE: Add new ID
-				// NOTE: If the old is empty and the new is a new record make sure we just store the new record
-				else if (empty($details["old"]) && preg_match("/0\s@(.*)@/", $details["new"]) > 0) {
-					// print "New gedrec: ".$details["new"]."<br />";
-					$update_id = self::UpdateRecord(EditFunctions::CheckGedcom($details["new"], true, $details["user"], $details["time"]));
-				}
-				
-				// Note: Delete ID
-				// NOTE: if old is not empty and new is  empty, AND it's 0-level, the record needs to be deleted
-				else if (!empty($details["old"]) && empty($details["new"])&& preg_match("/0\s@(.*)@/", $details["old"]) > 0) {
-					$update_id = self::UpdateRecord(EditFunctions::CheckGedcom($gedrec, true, $details["user"], $details["time"]), true);
+			foreach ($cidchanges as $groupid => $changegroup) {
+				$toadd = array();
+				$counttoadd = 1;
+				foreach ($changegroup as $id => $details) {
+					$FILE = $details["file"];
+					// If we are in the middle of a reorder, don't reconstruct
+					if ($counttoadd == 1) {
+						$object = ReConstructObject($details["gid"], $details["gid_type"], $details["file"]);
+						if (is_object($object)) $gedrec = $object->gedrec;
+					}
+	//				 print "<br /><br />Old value of gedrec: ".$gedrec."<br />";
+					// NOTE: Import the record
+					$update_id = "";
+					if (!isset($gedrec)) $gedrec = "";
 					
-					// NOTE: Delete change records related to this record
-					$sql = "select ch_cid from ".TBLPREFIX."changes where ch_gid = '".$details["gid"]."' AND ch_file = '".$details["file"]."'";
-					$res = NewQuery($sql);
-					while ($row = $res->FetchAssoc()) {
-						self::RejectChange($row["ch_cid"], $details["file"]);
+					// NOTE: Add anything to existing ID
+					// NOTE: If old is empty, just add the new data makes sure it is not new record
+					if (empty($details["old"]) && !empty($details["new"]) && preg_match("/0\s@(.*)@/", $details["new"]) == 0) {
+						$gedrec .= "\r\n".$details["new"];
+						// print "New value of gedrec (add to existing): ".$gedrec."<br />";
+						$update_id = self::UpdateRecord(EditFunctions::CheckGedcom($gedrec, true, $details["user"], $details["time"]));
 					}
 					
-				}
-				
-				// NOTE: Change anything on an existing ID
-				// NOTE: If new is empty or filled, the old needs to be replaced
-				else {
-					if ($details["type"] == "raw_edit") $gedrec = $details["new"];
+					// NOTE: Add new ID
+					// NOTE: If the old is empty and the new is a new record make sure we just store the new record
+					else if (empty($details["old"]) && preg_match("/0\s@(.*)@/", $details["new"]) > 0) {
+						// print "New gedrec: ".$details["new"]."<br />";
+						$update_id = self::UpdateRecord(EditFunctions::CheckGedcom($details["new"], true, $details["user"], $details["time"]));
+					}
+					
+					// Note: Delete ID
+					// NOTE: if old is not empty and new is  empty, AND it's 0-level, the record needs to be deleted
+					else if (!empty($details["old"]) && empty($details["new"])&& preg_match("/0\s@(.*)@/", $details["old"]) > 0) {
+						$update_id = self::UpdateRecord(EditFunctions::CheckGedcom($gedrec, true, $details["user"], $details["time"]), true);
+						
+						// NOTE: Delete change records related to this record
+						$sql = "select ch_cid from ".TBLPREFIX."changes where ch_gid = '".$details["gid"]."' AND ch_file = '".$details["file"]."'";
+						$res = NewQuery($sql);
+						while ($row = $res->FetchAssoc()) {
+							self::RejectChange($row["ch_cid"], $details["file"]);
+						}
+						
+					}
+					
+					// NOTE: Change anything on an existing ID
+					// NOTE: If new is empty or filled, the old needs to be replaced
 					else {
-						$gedrec = str_replace(trim($details["old"]), trim($details["new"]), $gedrec);
+						if (substr($details["type"], 0, 8) == "reorder_") {
+							$toadd[] = array(trim($details["new"]), $counttoadd);
+							$details["new"] = "reorder".$counttoadd;
+							$counttoadd++;
+						}
+						if ($details["type"] == "raw_edit") $gedrec = $details["new"];
+						else {
+							$gedrec = str_replace(trim($details["old"]), trim($details["new"]), $gedrec);
+						}
+	//					print "Acceptchange: ".$id."<br /><br />Details old: ".$details["old"]."<br /><br />Details new:".$details["new"]."<br /><br />New gedrec: ".$gedrec."<br /><br /><br />";
+						if ($counttoadd == 1) {
+							$update_id = self::UpdateRecord(EditFunctions::CheckGedcom($gedrec, true, $details["user"], $details["time"]));
+							WriteToLog("AcceptChange-> Accepted change for ".$details["gid"].". ->".$gm_user->username."<-", "I", "G", $gedfile);
+						}
 					}
-	//				print "Acceptchange: ".$gedrec;
+				}
+				// End of group
+				// Process the reorders
+				if ($counttoadd > 1) {
+					foreach ($toadd as $key => $addrec) {
+						$gedrec = str_replace("reorder".$addrec[1], $addrec[0], $gedrec);
+					}
 					$update_id = self::UpdateRecord(EditFunctions::CheckGedcom($gedrec, true, $details["user"], $details["time"]));
 				}
-				WriteToLog("AcceptChange-> Accepted change for ".$details["gid"].". ->".$gm_user->username."<-", "I", "G", $gedfile);
 			}
-			GedcomConfig::ResetCaches($GEDCOMID);
+			GedcomConfig::ResetCaches(GedcomConfig::$GEDCOMID);
 			self::ResetChangeCaches();
 		}
+		
 		// NOTE: record has been imported in DB, now remove the change
 		foreach ($cidchanges as $id => $value) {
-			$sql = "DELETE from ".TBLPREFIX."changes where ch_cid = '".$value["cid"]."'";
+			$sql = "DELETE from ".TBLPREFIX."changes where ch_cid = '".$id."'";
 			$res = NewQuery($sql);
 		}
 		return true;
@@ -358,7 +432,6 @@ abstract class ChangeFunctions {
 	 * @param string $indirec
 	 */
 	public function UpdateRecord($indirec, $delete=false) {
-		global $GEDCOMID;
 	
 		$tt = preg_match("/0 @(.+)@ (.+)/", $indirec, $match);
 		if ($tt>0) {
@@ -377,132 +450,134 @@ abstract class ChangeFunctions {
 				$gid = "HEAD";
 			}
 		}
-		$kgid = JoinKey($gid, $GEDCOMID);
+		$kgid = JoinKey($gid, GedcomConfig::$GEDCOMID);
 		
-		$sql = "SELECT pl_p_id FROM ".TBLPREFIX."placelinks WHERE pl_gid='".DbLayer::EscapeQuery($gid)."' AND pl_file='".$GEDCOMID."'";
+		$sql = "SELECT pl_p_id FROM ".TBLPREFIX."placelinks WHERE pl_gid='".DbLayer::EscapeQuery($gid)."' AND pl_file='".GedcomConfig::$GEDCOMID."'";
 		$res = NewQuery($sql);
 		$placeids = array();
 		while($row = $res->fetchRow()) {
 			$placeids[] = $row[0];
 		}
-		$sql = "DELETE FROM ".TBLPREFIX."placelinks WHERE pl_gid='".DbLayer::EscapeQuery($gid)."' AND pl_file='".$GEDCOMID."'";
+		$sql = "DELETE FROM ".TBLPREFIX."placelinks WHERE pl_gid='".DbLayer::EscapeQuery($gid)."' AND pl_file='".GedcomConfig::$GEDCOMID."'";
 		$res = NewQuery($sql);
-		$sql = "DELETE FROM ".TBLPREFIX."dates WHERE d_key='".DbLayer::EscapeQuery(JoinKey($gid, $GEDCOMID))."'";
+		$sql = "DELETE FROM ".TBLPREFIX."dates WHERE d_key='".DbLayer::EscapeQuery(JoinKey($gid, GedcomConfig::$GEDCOMID))."'";
 		$res = NewQuery($sql);
 	
 		//-- delete any unlinked places
 		foreach($placeids as $indexval => $p_id) {
-			$sql = "SELECT count(pl_p_id) FROM ".TBLPREFIX."placelinks WHERE pl_p_id=$p_id AND pl_file='".$GEDCOMID."'";
+			$sql = "SELECT count(pl_p_id) FROM ".TBLPREFIX."placelinks WHERE pl_p_id=$p_id AND pl_file='".GedcomConfig::$GEDCOMID."'";
 			$res = NewQuery($sql);
 			$row = $res->fetchRow();
 			if ($row[0]==0) {
-				$sql = "DELETE FROM ".TBLPREFIX."places WHERE p_id=$p_id AND p_file='".$GEDCOMID."'";
+				$sql = "DELETE FROM ".TBLPREFIX."places WHERE p_id=$p_id AND p_file='".GedcomConfig::$GEDCOMID."'";
 				$res = NewQuery($sql);
 			}
 		}
 	
 		//-- delete any MM links to this pid
-			$sql = "DELETE FROM ".TBLPREFIX."media_mapping WHERE mm_gid='".DbLayer::EscapeQuery($gid)."' AND mm_file='".$GEDCOMID."'";
+			$sql = "DELETE FROM ".TBLPREFIX."media_mapping WHERE mm_gid='".DbLayer::EscapeQuery($gid)."' AND mm_file='".GedcomConfig::$GEDCOMID."'";
 			$res = NewQuery($sql);
 		
 		if ($type=="INDI") {
 			// First reset the isdead status for the surrounding records. 
 			ResetIsDeadLinked($gid, "INDI");
-			$sql = "DELETE FROM ".TBLPREFIX."individuals WHERE i_id='".DbLayer::EscapeQuery($gid)."' AND i_file='".$GEDCOMID."'";
+			$sql = "DELETE FROM ".TBLPREFIX."individuals WHERE i_id='".DbLayer::EscapeQuery($gid)."' AND i_file='".GedcomConfig::$GEDCOMID."'";
 			$res = NewQuery($sql);
-			$sql = "DELETE FROM ".TBLPREFIX."asso WHERE as_of='".DbLayer::EscapeQuery(JoinKey($gid, $GEDCOMID))."'";
+			$sql = "DELETE FROM ".TBLPREFIX."asso WHERE as_of='".DbLayer::EscapeQuery(JoinKey($gid, GedcomConfig::$GEDCOMID))."'";
 			$res = NewQuery($sql);
-			$sql = "DELETE FROM ".TBLPREFIX."names WHERE n_gid='".DbLayer::EscapeQuery($gid)."' AND n_file='".$GEDCOMID."'";
+			$sql = "DELETE FROM ".TBLPREFIX."names WHERE n_gid='".DbLayer::EscapeQuery($gid)."' AND n_file='".GedcomConfig::$GEDCOMID."'";
 			$res = NewQuery($sql);
 			$sql = "DELETE FROM ".TBLPREFIX."soundex WHERE s_gid='".DbLayer::EscapeQuery($kgid)."'";
 			$res = NewQuery($sql);
 			// Only delete the fam-indi info if the whole individual is deleted. 
 			// Otherwise the info does not get reconstructed as some of it is in the family records (order).
 			if ($delete) {
-				$sql = "DELETE FROM ".TBLPREFIX."individual_family WHERE if_pkey='".JoinKey(DbLayer::EscapeQuery($gid), $GEDCOMID)."'";
+				$sql = "DELETE FROM ".TBLPREFIX."individual_family WHERE if_pkey='".JoinKey(DbLayer::EscapeQuery($gid), GedcomConfig::$GEDCOMID)."'";
 				$res = NewQuery($sql);
 			}
-			$sql = "DELETE FROM ".TBLPREFIX."source_mapping WHERE sm_gid='".DbLayer::EscapeQuery($gid)."' AND sm_file='".$GEDCOMID."'";
+			$sql = "DELETE FROM ".TBLPREFIX."source_mapping WHERE sm_gid='".DbLayer::EscapeQuery($gid)."' AND sm_file='".GedcomConfig::$GEDCOMID."'";
 			$res = NewQuery($sql);
-			$sql = "DELETE FROM ".TBLPREFIX."other_mapping WHERE om_gid='".DbLayer::EscapeQuery($gid)."' AND om_file='".$GEDCOMID."'";
+			$sql = "DELETE FROM ".TBLPREFIX."other_mapping WHERE om_gid='".DbLayer::EscapeQuery($gid)."' AND om_file='".GedcomConfig::$GEDCOMID."'";
 			$res = NewQuery($sql);
 		}
 		else if ($type=="FAM") {
 			// First reset the isdead status for the surrounding records. 
 			ResetIsDeadLinked($gid, "FAM");
-			$sql = "DELETE FROM ".TBLPREFIX."families WHERE f_id='".DbLayer::EscapeQuery($gid)."' AND f_file='".$GEDCOMID."'";
+			$sql = "DELETE FROM ".TBLPREFIX."families WHERE f_id='".DbLayer::EscapeQuery($gid)."' AND f_file='".GedcomConfig::$GEDCOMID."'";
 			$res = NewQuery($sql);
-			$sql = "DELETE FROM ".TBLPREFIX."asso WHERE as_of='".DbLayer::EscapeQuery(JoinKey($gid, $GEDCOMID))."'";
+			$sql = "DELETE FROM ".TBLPREFIX."asso WHERE as_of='".DbLayer::EscapeQuery(JoinKey($gid, GedcomConfig::$GEDCOMID))."'";
 			$res = NewQuery($sql);
 			// Only delete the fam-indi info if the whole family is deleted. 
 			// Otherwise the info does not get reconstructed as most of it is in the individual records.
 			if ($delete) {
-				$sql = "DELETE FROM ".TBLPREFIX."individual_family WHERE if_fkey='".JoinKey(DbLayer::EscapeQuery($gid), $GEDCOMID)."'";
+				$sql = "DELETE FROM ".TBLPREFIX."individual_family WHERE if_fkey='".JoinKey(DbLayer::EscapeQuery($gid), GedcomConfig::$GEDCOMID)."'";
 				$res = NewQuery($sql);
 			}
-			$sql = "DELETE FROM ".TBLPREFIX."source_mapping WHERE sm_gid='".DbLayer::EscapeQuery($gid)."' AND sm_file='".$GEDCOMID."'";
+			$sql = "DELETE FROM ".TBLPREFIX."source_mapping WHERE sm_gid='".DbLayer::EscapeQuery($gid)."' AND sm_file='".GedcomConfig::$GEDCOMID."'";
 			$res = NewQuery($sql);
-			$sql = "DELETE FROM ".TBLPREFIX."other_mapping WHERE om_gid='".DbLayer::EscapeQuery($gid)."' AND om_file='".$GEDCOMID."'";
+			$sql = "DELETE FROM ".TBLPREFIX."other_mapping WHERE om_gid='".DbLayer::EscapeQuery($gid)."' AND om_file='".GedcomConfig::$GEDCOMID."'";
 			$res = NewQuery($sql);
 		}
 		else if ($type=="SOUR") {
-			$sql = "DELETE FROM ".TBLPREFIX."sources WHERE s_id='".DbLayer::EscapeQuery($gid)."' AND s_file='".$GEDCOMID."'";
+			$sql = "DELETE FROM ".TBLPREFIX."sources WHERE s_id='".DbLayer::EscapeQuery($gid)."' AND s_file='".GedcomConfig::$GEDCOMID."'";
 			$res = NewQuery($sql);
 			// We must preserve the links if the record is just changed and not deleted. 
 			if ($delete) {
-				$sql = "DELETE FROM ".TBLPREFIX."source_mapping WHERE sm_sid='".DbLayer::EscapeQuery($gid)."' AND sm_file='".$GEDCOMID."'";
+				$sql = "DELETE FROM ".TBLPREFIX."source_mapping WHERE sm_sid='".DbLayer::EscapeQuery($gid)."' AND sm_file='".GedcomConfig::$GEDCOMID."'";
 				$res = NewQuery($sql);
 			}
+			$sql = "DELETE FROM ".TBLPREFIX."other_mapping WHERE om_gid='".DbLayer::EscapeQuery($gid)."' AND om_file='".GedcomConfig::$GEDCOMID."' AND om_type='".DbLayer::EscapeQuery($type)."'";
+			$res = NewQuery($sql);
 		}
 		else if ($type == "OBJE") {
-			$sql = "DELETE FROM ".TBLPREFIX."media WHERE m_media='".DbLayer::EscapeQuery($gid)."' AND m_file='".$GEDCOMID."'";
+			$sql = "DELETE FROM ".TBLPREFIX."media WHERE m_media='".DbLayer::EscapeQuery($gid)."' AND m_file='".GedcomConfig::$GEDCOMID."'";
 			$res = NewQuery($sql);
-			$sql = "DELETE FROM ".TBLPREFIX."source_mapping WHERE sm_gid='".DbLayer::EscapeQuery($gid)."' AND sm_file='".$GEDCOMID."'";
+			$sql = "DELETE FROM ".TBLPREFIX."source_mapping WHERE sm_gid='".DbLayer::EscapeQuery($gid)."' AND sm_file='".GedcomConfig::$GEDCOMID."'";
 			$res = NewQuery($sql);
-			$sql = "DELETE FROM ".TBLPREFIX."other_mapping WHERE om_gid='".DbLayer::EscapeQuery($gid)."' AND om_file='".$GEDCOMID."'";
+			$sql = "DELETE FROM ".TBLPREFIX."other_mapping WHERE om_gid='".DbLayer::EscapeQuery($gid)."' AND om_file='".GedcomConfig::$GEDCOMID."'";
 		}
 		else {
-			$sql = "DELETE FROM ".TBLPREFIX."other WHERE o_id='".DbLayer::EscapeQuery($gid)."' AND o_file='".$GEDCOMID."'";
+			$sql = "DELETE FROM ".TBLPREFIX."other WHERE o_id='".DbLayer::EscapeQuery($gid)."' AND o_file='".GedcomConfig::$GEDCOMID."'";
 			$res = NewQuery($sql);
-			$sql = "DELETE FROM ".TBLPREFIX."source_mapping WHERE sm_gid='".DbLayer::EscapeQuery($gid)."' AND sm_file='".$GEDCOMID."'";
+			$sql = "DELETE FROM ".TBLPREFIX."source_mapping WHERE sm_gid='".DbLayer::EscapeQuery($gid)."' AND sm_file='".GedcomConfig::$GEDCOMID."'";
 			$res = NewQuery($sql);
 			// We must preserve the links if the record is just changed and not deleted. 
 			if ($delete) {
-				$sql = "DELETE FROM ".TBLPREFIX."other_mapping WHERE om_gid='".DbLayer::EscapeQuery($gid)."' AND om_file='".$GEDCOMID."'";
+				$sql = "DELETE FROM ".TBLPREFIX."other_mapping WHERE om_gid='".DbLayer::EscapeQuery($gid)."' AND om_file='".GedcomConfig::$GEDCOMID."'";
 				$res = NewQuery($sql);
 			}
 		}
 		if ($delete) {
-			if ($type == "FAM" || $type = "INDI" || $type == "SOUR" || $type == "OBJE") {
+			if ($type == "FAM" || $type == "INDI" || $type == "SOUR" || $type == "OBJE") {
 				// Delete favs
-				$sql = "DELETE FROM ".TBLPREFIX."favorites WHERE fv_gid='".$gid."' AND fv_type='".$type."' AND fv_file='".$GEDCOMID."'";
+				$sql = "DELETE FROM ".TBLPREFIX."favorites WHERE fv_gid='".$gid."' AND fv_type='".$type."' AND fv_file='".GedcomConfig::$GEDCOMID."'";
 				$res = NewQuery($sql);
 			}
 			if ($type == "INDI") {
 				// Clear users
-				UserController::ClearUserGedcomIDs($gid, $GEDCOMID);
+				UserController::ClearUserGedcomIDs($gid, GedcomConfig::$GEDCOMID);
 				if (GedcomConfig::$PEDIGREE_ROOT_ID == $gid) {
 					GedcomConfig::$PEDIGREE_ROOT_ID = "";
-					GedcomConfig::SetPedigreeRootId("", $GEDCOMID);
+					GedcomConfig::SetPedigreeRootId("", GedcomConfig::$GEDCOMID);
 				}
 			}
 			// Clear privacy
-			PrivacyController::ClearPrivacyGedcomIDs($gid, $GEDCOMID);
+			PrivacyController::ClearPrivacyGedcomIDs($gid, GedcomConfig::$GEDCOMID);
 		}
 	
 		if (!$delete) {
-			ImportFunctions::ImportRecord($indirec, true. $GEDCOMID);
+			ImportFunctions::ImportRecord($indirec, true, GedcomConfig::$GEDCOMID);
 		}
 	}	
 	
 	public function IsChangedFact($gid, $oldfactrec) {
-		global $GEDCOMID, $show_changes, $gm_user;
+		global $show_changes, $gm_user;
 		
 	//print "checking ".$gid." ".$oldfactrec."<br />";
 		if ($show_changes && $gm_user->UserCanEditOwn($gid) && self::GetChangeData(true, $gid, true)) {
 			$string = trim($oldfactrec);
 			if (empty($string)) return false;
-			$sql = "SELECT ch_old, ch_new FROM ".TBLPREFIX."changes where ch_gid = '".$gid."' AND ch_file = '".$GEDCOMID."' ORDER BY ch_time ASC";
+			$sql = "SELECT ch_old, ch_new FROM ".TBLPREFIX."changes where ch_gid = '".$gid."' AND ch_file = '".GedcomConfig::$GEDCOMID."' ORDER BY ch_time ASC";
 			$res = NewQuery($sql);
 			if (!$res) return false;
 			while ($row = $res->FetchRow()) {
@@ -516,31 +591,43 @@ abstract class ChangeFunctions {
 	
 	
 	public function RetrieveChangedFact($gid, $fact, $oldfactrec) {
-		global $GEDCOMID, $show_changes, $gm_user;
+		global $show_changes, $gm_user;
 		
 		if ($show_changes && $gm_user->UserCanEditOwn($gid) && self::GetChangeData(true, $gid, true)) {
-			$sql = "SELECT ch_old, ch_new FROM ".TBLPREFIX."changes where ch_gid = '".$gid."' AND ch_fact = '".$fact."' AND ch_file = '".$GEDCOMID."' ORDER BY ch_time ASC";
+			$sql = "SELECT ch_cid, ch_id, ch_old, ch_new, ch_type FROM ".TBLPREFIX."changes where ch_gid = '".$gid."' AND ch_fact = '".$fact."' AND ch_file = '".GedcomConfig::$GEDCOMID."' ORDER BY ch_id ASC";
 			$res = NewQuery($sql);
 			$factrec = $oldfactrec;
-			$found = false;
+			$cidchanges = array();
 			while ($row = $res->FetchAssoc()) {
-				if (trim($row["ch_old"]) == trim($factrec)) {
-					$factrec = trim($row["ch_new"]);
-					$found = true;
-				}
+				$cidchanges[$row["ch_cid"]][$row["ch_id"]]["cid"] = $row["ch_cid"];
+				$cidchanges[$row["ch_cid"]][$row["ch_id"]]["old"] = $row["ch_old"];
+				$cidchanges[$row["ch_cid"]][$row["ch_id"]]["new"] = $row["ch_new"];
+				$cidchanges[$row["ch_cid"]][$row["ch_id"]]["type"] = $row["ch_type"];
 			}
-			if ($found) return $factrec;
+			if (count($cidchanges) > 0) {
+				foreach ($cidchanges as $group => $changes) {
+					$reorder = false;
+					foreach ($changes as $id => $change) {
+						if (trim($change["old"]) == trim($factrec)) {
+							// Do not apply a second reorder
+							if (!($reorder && substr($change["type"], 0, 8) == "reorder_")) $factrec = trim($change["new"]);
+							if (substr($change["type"], 0, 8) == "reorder_") $reorder = true;
+						}
+					}
+				}
+				return $factrec;
+			}
 		}
 		return false;
 	}
 	
 	public function RetrieveNewFacts($gid, $includeall=false) {
-		global $GEDCOMID, $show_changes;
+		global $show_changes;
 		
 		$facts = array();
 		$newfacts = array();
 		if ($show_changes && self::GetChangeData(true, $gid, true)) {
-			$sql = "SELECT ch_old, ch_new FROM ".TBLPREFIX."changes where ch_gid = '".$gid."' AND ch_file = '".$GEDCOMID."' ORDER BY ch_time ASC";
+			$sql = "SELECT ch_old, ch_new FROM ".TBLPREFIX."changes where ch_gid = '".$gid."' AND ch_file = '".GedcomConfig::$GEDCOMID."' ORDER BY ch_id ASC";
 			$res = NewQuery($sql);
 			if ($res) {
 				while($row = $res->FetchAssoc()){
@@ -573,7 +660,8 @@ abstract class ChangeFunctions {
 					if (empty($fact["old"])) {
 						//print "Added--->".$fact["new"]."<BR>";
 						$newfacts[] = $fact["new"];
-					} else if (empty($fact["new"])) {
+					} 
+					else if (empty($fact["new"])) {
 						//print "Deleted--->".$fact["old"]."<BR>";
 						if ($includeall) {
 							$pos = strpos ($fact["old"], "\n");
@@ -607,11 +695,9 @@ abstract class ChangeFunctions {
 	
 	public function ResetChangeCaches() {
 		
-		// Use globals here, otherwise the cache won't be reset.
-		unset($GLOBALS['chcache']);
-		unset($GLOBALS['chstatcache']);
+		self::$chcache = null;
+		self::$chstatcache = null;
 	}
-
 	
 }
 ?>

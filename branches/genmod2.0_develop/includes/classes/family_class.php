@@ -77,19 +77,24 @@ class Family extends GedcomRecord {
 	
 	
 	public static function GetInstance($xref, $gedrec="", $gedcomid="") {
-		global $GEDCOMID;
 		
-		if (empty($gedcomid)) $gedcomid = $GEDCOMID;
+		if (empty($gedcomid)) $gedcomid = GedcomConfig::$GEDCOMID;
 		if (!isset(self::$cache[$gedcomid][$xref])) {
 			self::$cache[$gedcomid][$xref] = new Family($xref, $gedrec, $gedcomid);
 		}
 		return self::$cache[$gedcomid][$xref];
 	}
 	
-	public static function IsInstance($xref, $gedcomid="") {
-		global $GEDCOMID;
+	public static function NewInstance($xref, $gedrec="", $gedcomid="") {
 		
-		if (empty($gedcomid)) $gedcomid = $GEDCOMID;
+		if (empty($gedcomid)) $gedcomid = GedcomConfig::$GEDCOMID;
+		self::$cache[$gedcomid][$xref] = new Family($xref, $gedrec, $gedcomid);
+		return self::$cache[$gedcomid][$xref];
+	}
+	
+	public static function IsInstance($xref, $gedcomid="") {
+		
+		if (empty($gedcomid)) $gedcomid = GedcomConfig::$GEDCOMID;
 		if (!isset(self::$cache[$gedcomid][$xref])) return false;
 		else return true;
 	}

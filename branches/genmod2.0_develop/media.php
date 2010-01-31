@@ -51,7 +51,7 @@ if ($disp1 == "block") $disp2 = "none";
 
 GedcomConfig::$AUTO_GENERATE_THUMBS = $autothumbs;
 
-PrintHeader(GM_LANG_manage_media." - ".$GEDCOMS[$GEDCOMID]['title']);
+PrintHeader(GM_LANG_manage_media." - ".$GEDCOMS[GedcomConfig::$GEDCOMID]['title']);
 
 if ($action == "delete") {
 	MediaFS::DeleteFile(basename($file), RelativePathFile($directory));
@@ -135,7 +135,7 @@ if ($action == "import_action") {
 	// Linked only
 	if ($linked) {
 		// Read the files into the table
-		$sql = "SELECT m_mfile, m_gedrec FROM ".TBLPREFIX."media WHERE m_file='".$GEDCOMID."'";
+		$sql = "SELECT m_mfile, m_gedrec FROM ".TBLPREFIX."media WHERE m_file='".GedcomConfig::$GEDCOMID."'";
 		$res = NewQuery($sql);
 		while ($row = $res->Fetchrow()) {
 			$filefromged = GetGedcomValue("FILE", 1, $row[1]);
@@ -172,7 +172,7 @@ if ($action == "export_action") {
 
 	// Linked only
 	if ($linked) {
-		$sql = "SELECT m_mfile, m_gedrec FROM ".TBLPREFIX."media WHERE m_file='".$GEDCOMID."'";
+		$sql = "SELECT m_mfile, m_gedrec FROM ".TBLPREFIX."media WHERE m_file='".GedcomConfig::$GEDCOMID."'";
 		$res = NewQuery($sql);
 		while ($row = $res->Fetchrow()) {
 			$filefromged = GetGedcomValue("FILE", 1, $row[1]);
@@ -376,7 +376,7 @@ if ($disp1 == "block") {
 	$cols = 1; // 1 or 2
 	print "\n<div id=\"content\" style=\"display: ".$disp1.";\">";
 		print "\n<div class=\"".$TEXT_DIRECTION."\">";
-			print "<div class=\"admin_topbottombar\">".GM_LANG_manage_media." - ".$GEDCOMS[$GEDCOMID]['title'];
+			print "<div class=\"admin_topbottombar\">".GM_LANG_manage_media." - ".$GEDCOMS[GedcomConfig::$GEDCOMID]['title'];
 			if (!empty($error)) print "<br /><span class=\"error\">".$error."</span>";
 			print "<br />".GM_LANG_files_found."&nbsp;".count($files);
 			print "</div>";
@@ -536,7 +536,7 @@ if ($disp2 == "block") {
 	// Setup the middle box
 	print "\n<div id=\"content\" style=\"display: ".$disp2.";\">";
 		print "\n<div class=\"".$TEXT_DIRECTION."\">";
-			print "<div class=\"admin_topbottombar\">".GM_LANG_manage_media." - ".$GEDCOMS[$GEDCOMID]['title'];
+			print "<div class=\"admin_topbottombar\">".GM_LANG_manage_media." - ".$GEDCOMS[GedcomConfig::$GEDCOMID]['title'];
 			if (!empty($error)) print "<br /><span class=\"error\">".$error."</span>";
 			print "</div>";
 			

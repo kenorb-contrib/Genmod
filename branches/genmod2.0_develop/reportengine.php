@@ -56,14 +56,13 @@ foreach($vars as $name=>$var) {
 	$newvars[$name]["id"] = $var;
 	if (!empty($type[$name]) && (($type[$name]=="INDI")||($type[$name]=="FAM")||($type[$name]=="SOUR"))) {
 		$object = ConstructObject($var);
-		$gedcom = $object->gedrec;;
+		$gedcom = $object->gedrec;
 		if (empty($gedcom)) $action="setup";
 		if ($type[$name]=="FAM") {
 			if (preg_match("/0 @.*@ INDI/", $gedcom)>0) {
-				$fams = FindSfamilyIds($var);
-				if (!empty($fams[0])) {
-					$gedcom = FindFamilyRecord($fams[0]["famid"]);
-					if (!empty($gedcom)) $vars[$name] = $fams[0]["famid"];
+				foreach($object->spousefamilies as $key => $fam) {
+					$gedcom = $fam->gedrec;
+					if (!empty($gedcom)) $vars[$name] = $fam->xref;
 					else $action="setup";
 				}
 			}

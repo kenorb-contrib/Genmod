@@ -115,7 +115,7 @@ abstract class DetailController extends BaseController{
 	}
 	
 	public function PrintTabs() {
-		global $GEDCOMID, $gm_user;
+		global $gm_user;
 		global $GM_IMAGES, $TEXT_DIRECTION;
 		
 		$object_name = $this->object_name;
@@ -123,7 +123,7 @@ abstract class DetailController extends BaseController{
 		<script type="text/javascript">
 		<!--
 		function tabswitch(n) {
-			sndReq('dummy', 'remembertab', 'xref', '<?php print JoinKey($this->xref, $GEDCOMID); ?>' , 'tab_tab', n, 'type', '<?php print $this->tabtype; ?>');
+			sndReq('dummy', 'remembertab', 'xref', '<?php print JoinKey($this->xref, GedcomConfig::$GEDCOMID); ?>' , 'tab_tab', n, 'type', '<?php print $this->tabtype; ?>');
 			if (n==<?php print count($this->tabs); ?>) n = 0;
 			var tabid = new Array(<?php print "'".implode("','", $this->tabs)."'"; ?>);
 			// show all tabs ?
@@ -237,7 +237,7 @@ abstract class DetailController extends BaseController{
 						PrintHelpLink("add_media_link_help", "qm");
 						print GM_LANG_add_media_link_lbl."</td>";
 						print "<td class=\"shade1\">";
-						print "<a href=\"javascript: ".GM_LANG_add_media_lbl."\" onclick=\"add_new_record('". $this->$object_name->xref."','".$this->$object_name->datatype."', 'add_media_link'); return false;\">".GM_LANG_add_media_link."</a>";
+						print "<a href=\"javascript: ".GM_LANG_add_media_lbl."\" onclick=\"add_new_record('". $this->$object_name->xref."','".$this->$object_name->datatype."', 'add_media_link', '".$this->$object_name->datatype."'); return false;\">".GM_LANG_add_media_link."</a>";
 						print "</td></tr>";
 					}
 				}
@@ -450,7 +450,7 @@ abstract class DetailController extends BaseController{
 						print "<tr>";
 						print "<td class=\"shade1 wrap\">".nl2br(stripslashes($item->text))."</td>";
 						print "<td class=\"shade1\">";
-						print "<a href=\"individual.php?pid=".$item->pid."\">".$item->piddesc."</a>";
+						print "<a href=\"individual.php?pid=".$item->pid."&amp;gedid=".$item->gedcomid."\">".$item->piddesc."</a>";
 						print "</td>";
 						print "<td class=\"shade1\">".constant("GM_LANG_action".$item->status)."</td>";
 						print "</tr>";
@@ -583,7 +583,7 @@ abstract class DetailController extends BaseController{
 					print "<tr><td class=\"width20 shade2\">";
 					PrintHelpLink("add_source_help", "qm");
 					print GM_LANG_add_source_lbl."</td><td class=\"shade1\">";
-					print "<a href=\"javascript: ".GM_LANG_add_source."\" onclick=\"add_new_record('".$this->$object_name->xref."','SOUR', 'add_source'); return false;\">".GM_LANG_add_source."</a>";
+					print "<a href=\"javascript: ".GM_LANG_add_source."\" onclick=\"add_new_record('".$this->$object_name->xref."','SOUR', 'add_source', '".$this->$object_name->datatype."'); return false;\">".GM_LANG_add_source."</a>";
 					print "<br /></td></tr>";
 				}
 				if ($table) print "</table>";
@@ -616,7 +616,7 @@ abstract class DetailController extends BaseController{
 					print "<tr><td class=\"shade2 width20\">";
 					PrintHelpLink("add_media_help", "qm");
 					print GM_LANG_add_media_lbl."</td><td class=\"shade1\">";
-					print "<a href=\"javascript: ".GM_LANG_add_media_lbl."\" onclick=\"add_new_record('".$this->$object_name->xref."','OBJE', 'add_media'); return false;\">".GM_LANG_add_media."</a>";
+					print "<a href=\"javascript: ".GM_LANG_add_media_lbl."\" onclick=\"add_new_record('".$this->$object_name->xref."','OBJE', 'add_media', '".$this->$object_name->datatype."'); return false;\">".GM_LANG_add_media."</a>";
 					print "</td></tr>";
 				}
 				if ($table) print "</table>";
@@ -648,11 +648,11 @@ abstract class DetailController extends BaseController{
 					print "<tr><td class=\"shade2 width20\">";
 					PrintHelpLink("add_note_help", "qm");
 					print GM_LANG_add_note_lbl."</td><td class=\"shade1\">";
-					print "<a href=\"javascript: ".GM_LANG_add_note."\" onclick=\"add_new_record('".$this->$object_name->xref."','NOTE', 'add_note'); return false;\">".GM_LANG_add_note."</a>";
+					print "<a href=\"javascript: ".GM_LANG_add_note."\" onclick=\"add_new_record('".$this->$object_name->xref."','NOTE', 'add_note', '".$this->$object_name->datatype."'); return false;\">".GM_LANG_add_note."</a>";
 					print "</td></tr>";
 					print "<tr><td class=\"shade2 width20\">";
 					PrintHelpLink("add_general_note_help", "qm");
-					print GM_LANG_add_gnote_lbl."</td><td class=\"shade1\"><a href=\"javascript: ".GM_LANG_add_gnote."\" onclick=\"add_new_record('".$this->$object_name->xref."','GNOTE', 'add_gnote'); return false;\">".GM_LANG_add_gnote."</a>";
+					print GM_LANG_add_gnote_lbl."</td><td class=\"shade1\"><a href=\"javascript: ".GM_LANG_add_gnote."\" onclick=\"add_new_record('".$this->$object_name->xref."','GNOTE', 'add_gnote', '".$this->$object_name->datatype."'); return false;\">".GM_LANG_add_gnote."</a>";
 					print "</td></tr>";
 				}
 				if ($table) print "</table>";
@@ -683,7 +683,7 @@ abstract class DetailController extends BaseController{
 		}	
 		print "<script type=\"text/javascript\">\n<!--\n";
 		if ($this->isPrintPreview()) print "tabswitch(".count($this->tabs).")";
-		else if (isset($_SESSION["last_tab"][$this->tabtype][JoinKey($this->$object_name->xref, $GEDCOMID)])) print "tabswitch(".$_SESSION["last_tab"][$this->tabtype][JoinKey($this->$object_name->xref, $GEDCOMID)].")";
+		else if (isset($_SESSION["last_tab"][$this->tabtype][JoinKey($this->$object_name->xref, GedcomConfig::$GEDCOMID)])) print "tabswitch(".$_SESSION["last_tab"][$this->tabtype][JoinKey($this->$object_name->xref, GedcomConfig::$GEDCOMID)].")";
 		else if ($object_name == "indi") print "tabswitch(".$this->default_tab.")";
 		else print "tabswitch(1)";
 		print "\n//-->\n</script>\n";
@@ -823,7 +823,6 @@ abstract class DetailController extends BaseController{
 	}
 	
 	protected function addFavorite() {
-		global $GEDCOMID;
 		
 		if (empty($this->uname)) return;
 		
@@ -834,7 +833,7 @@ abstract class DetailController extends BaseController{
 			$favorite->gid = $this->$object_name->xref;
 			$favorite->type = $this->$object_name->datatype;
 			// Don't set the type (only for URL's)
-			$favorite->file = $GEDCOMID;
+			$favorite->file = GedcomConfig::$GEDCOMID;
 			$favorite->SetFavorite();
 		}
 	}

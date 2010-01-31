@@ -39,8 +39,7 @@ if (isset($_REQUEST['task'])) $genmod['task'] = $_REQUEST['task'];
 else $genmod['task'] = '';
 
 // Check if we have a gedcom to work with
-$genmod['gedcomid'] = $GEDCOMID;
-$genmod['gedcomname'] = $GEDCOM;
+$genmod['gedcomid'] = GedcomConfig::$GEDCOMID;
 
 // Get some general settings
 $genmod['index_directory'] = INDEX_DIRECTORY;

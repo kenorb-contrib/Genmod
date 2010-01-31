@@ -34,7 +34,12 @@ switch($action) {
 		if (isset($id) && isset($type)) $_SESSION["last_used"][$type] = $id;
 		print "";
 	break;
-		
+
+	case "clear_clipboard":
+		unset($_SESSION["clipboard"]);
+		print "";
+	break;
+			
 	case "remembertab":
 		if (!isset($xref) || !isset($tab_tab) || !isset($type)) print "";
 		else {
@@ -75,7 +80,7 @@ switch($action) {
 	break;
 
 	case "getpersonname":
-		if (!isset($gedid)) $gedid = $GEDCOMID;
+		if (!isset($gedid)) $gedid = GedcomConfig::$GEDCOMID;
 		SwitchGedcom($gedid);
 		if (empty($pid)) print "";
 		else {
@@ -90,7 +95,7 @@ switch($action) {
 	break;
 	
 	case "getpersonnamefact":
-		if (!isset($gedid)) $gedid = $GEDCOMID;
+		if (!isset($gedid)) $gedid = GedcomConfig::$GEDCOMID;
 		SwitchGedcom($gedid);
 		if (empty($pid)) print "";
 		else {
@@ -188,7 +193,7 @@ switch($action) {
 		if (isset($repo))$action->repo = $repo;
 		if (isset($status)) $action->status = $status;
 		$action->pid = $pid;
-		$action->gedfile = $GEDCOMID;
+		$action->gedcomid = GedcomConfig::$GEDCOMID;
 		$action->UpdateThis();
 		$action->PrintThisItem();
 	break;
@@ -204,7 +209,7 @@ switch($action) {
 		if (isset($repo))$action->repo = $repo;
 		if (isset($status)) $action->status = $status;
 		$action->pid = $pid;
-		$action->gedfile = $GEDCOMID;
+		$action->gedcomid = GedcomConfig::$GEDCOMID;
 		$action->AddThis();
 		print "";
 	break;
@@ -258,7 +263,7 @@ switch($action) {
 						print "</a>";
 					}
 					if ($spouse != "" && !$factobj->owner->view) print " - ";
-					if (!$factobj->owner->view) print "<a href=\"family.php?famid=".$famid."&amp;gedid=".$GEDCOMID."\">[".GM_LANG_view_family."]</a>\n";
+					if (!$factobj->owner->view) print "<a href=\"family.php?famid=".$famid."&amp;gedid=".GedcomConfig::$GEDCOMID."\">[".GM_LANG_view_family."]</a>\n";
 				}
 				$factobj->PrintFactPlace(true, true);
 				$prted = FactFunctions::PrintAssoRelaRecord($factobj, $pid, true);

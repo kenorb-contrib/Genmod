@@ -41,7 +41,6 @@ abstract class FactFunctions {
 	 */
 	public function PrintFact($factobj, $pid, $mayedit=true) {
 		global $nonfacts;
-		global $GEDCOMID;
 		global $TEXT_DIRECTION;
 		global $FACT_COUNT;
 		static $rowcnt;
@@ -134,7 +133,7 @@ abstract class FactFunctions {
 					if ((!$factobj->owner->view) && ($spouse !== "") && ($ct > 0)) {
 						print " - ";
 						$famid = $match[1];
-						print "<a href=\"family.php?famid=".$famid."&amp;gedid=".$GEDCOMID."\">";
+						print "<a href=\"family.php?famid=".$famid."&amp;gedid=".GedcomConfig::$GEDCOMID."\">";
 						if ($TEXT_DIRECTION == "ltr") print " &lrm;";
 						else print " &rlm;";
 						print "[".GM_LANG_view_family;
@@ -366,7 +365,7 @@ abstract class FactFunctions {
 					else print "<a href=\"#\" onclick=\"return openImage('".$media->fileobj->f_main_file."', '".$imgwidth."', '".$imgheight."', '".$media->fileobj->f_is_image."');\">";
 					print "<img src=\"".$media->fileobj->f_thumb_file."\" border=\"0\" align=\"" . ($TEXT_DIRECTION== "rtl"?"right": "left") . "\" class=\"thumbnail\" alt=\"\" /></a>";
 				}
-				print "<a href=\"mediadetail.php?mid=".$media->xref."&amp;gedid=".$media->gedcomid."\"><i>".PrintReady($media->title)."</i></a>";
+				print "<a href=\"mediadetail.php?mid=".$media->xref."&amp;gedid=".$media->gedcomid."\"><i>".PrintReady(($factobj->style == "change_old" ? $media->oldtitle : $media->title))."</i></a>";
 				if (empty($media->fileobj->f_thumb_file) && preg_match("'://'", $media->filename)) print "<br /><a href=\"".$media->filename."\" target=\"_blank\">".$media->filename."</a>";
 				// NOTE: Print the format of the media
 				if ($media->extension != "") {
@@ -419,9 +418,10 @@ abstract class FactFunctions {
 			print "\n\t\t\t<td class=\"shade1 wrap ".$factobj->style."\"><span class=\"field\">";
 			if ($factobj->disp) {
 				print "<a href=\"source.php?sid=".$source->xref."\">";
-    			print $source->descriptor;
+    			print ($factobj->style == "change_old" ? $source->olddescriptor : $source->descriptor);
    				//-- Print additional source title
-   				if ($source->adddescriptor != "") print " - ".$source->adddescriptor;
+   				if ($factobj->style == "change_old" && $source->oldadddescriptor != "") print " - ".$source->oldadddescriptor;
+   				else if ($source->adddescriptor != "") print " - ".$source->adddescriptor;
 				print "</a>";
 				$cs = preg_match("/2 PAGE (.*)/", $factobj->factrec, $cmatch);
 				if ($cs>0) {
@@ -510,7 +510,7 @@ abstract class FactFunctions {
 				}
 				else {
 					//-- print linked note records
-				   	print "<a href=\"note.php?oid=".$note->xref."&amp;gedid=".$note->gedcomid."\">".$note->text."</a>";
+				   	print "<a href=\"note.php?oid=".$note->xref."&amp;gedid=".$note->gedcomid."\">".($factobj->style == "change_old" ? $note->oldtext : $note->text)."</a>";
 					self::PrintFactSources($note, 2);
 				}
 				// See if RESN tag prevents display or edit/delete
@@ -615,6 +615,7 @@ abstract class FactFunctions {
 		$factsources = array();
 		
 		if (is_string($factobj)) {
+			$type = "";
 			$i = 1;
 			do {
 				$rec = GetSubRecord(2, "$level SOUR", $factobj, $i);
@@ -625,6 +626,7 @@ abstract class FactFunctions {
 		elseif ($factobj->disp) {
 			// We have a factobject as input, and must print the level 2 or higher sources
 			if ($level > 1 && $factobj->datatype == "sub") {
+				$type = ($factobj->style == "change_old" ? "old" : "");
 				$i = 1;
 				do {
 					$rec = GetSubRecord(2, "$level SOUR", $factobj->factrec, $i);
@@ -634,6 +636,7 @@ abstract class FactFunctions {
 			}
 			// We have a main entity as input
 			elseif ($level == 1 && $factobj->datatype != "sub") {
+				$type = "";
 				foreach($factobj->facts as $key => $fact) {
 					if ($fact->fact == "SOUR" && $fact->disp) {
 						$factsources[] = $fact->factrec;
@@ -666,7 +669,7 @@ abstract class FactFunctions {
 				else $owner = rand();
 				if (strstr($sourcerec, "\n$nlevel ")) print "<a href=\"#\" onclick=\"expand_layer('".$owner.$key."-".$FACT_COUNT."-".$cnt."'); return false;\"><img id=\"".$owner.$key."-".$FACT_COUNT."-".$cnt."_img\" src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["plus"]["other"]."\" border=\"0\" width=\"11\" height=\"11\" alt=\"\" /></a> ";
 				print GM_LANG_source.":</span> <span class=\"field\">";
-				if ($link) $source->PrintListSource(false);
+				if ($link) $source->PrintListSource(false, 1, "", false, $type);
 				else {
 					print PrintReady(nl2br(GetGedcomValue("SOUR", $level, $sourcerec, "")));
 				}
@@ -748,7 +751,6 @@ abstract class FactFunctions {
 	public function PrintFactMedia($factobj, $level, $nobr=true) {
 		global $TEXT_DIRECTION, $MEDIATYPE;
 		global $GM_IMAGES;
-		global $GEDCOMID;
 		
 		// This is to prevent that notes are printed as part of the fact for family facts displayed on the indipage
 		if ($level == 2 && !GedcomConfig::$INDI_EXT_FAM_FACTS && preg_match("/\n1 _GMFS @(.*)@/", $factobj->factrec)) return false;
@@ -951,7 +953,7 @@ abstract class FactFunctions {
 			$submenu["hoverclass"] = "submenuitem_hover";
 			$menu["items"][] = $submenu;
 			print " <div style=\"width:25px;\" class=\"center\">";
-			PrintFactMenu($menu);
+			self::PrintFactMenu($menu);
 			print "</div>";
 		}
 		print "</td>";
@@ -977,7 +979,7 @@ abstract class FactFunctions {
 	 * @param string $linebr 	optional linebreak
 	 */
 	public function PrintAssoRelaRecord($factobj, $pid, $linebr=false) {
-		global $GEDCOMID, $TEXT_DIRECTION, $GM_IMAGES;
+		global $TEXT_DIRECTION, $GM_IMAGES;
 		
 		$prted = false;
 		// get ASSOciate(s) ID(s)
@@ -1063,9 +1065,16 @@ abstract class FactFunctions {
 		if (count($addfacts) == 0) return;
 	
 		usort($addfacts, "FactSort");
-		print "<tr><td class=\"shade2 width20\">";
+		print "<tr><td class=\"shade2 center width20\">";
 		PrintHelpLink("add_new_facts_help", "qm");
-		print GM_LANG_add_fact."</td>";
+		print GM_LANG_add_fact;
+		if (isset($_SESSION["clipboard"]) && count($_SESSION["clipboard"]) != 0) {
+			print "<class id=\"clear_clipboard\"><br />";
+			print "<a href=\"#\" onclick=\"sndReq('clear_clipboard', 'clear_clipboard'); window.reload(); return false;\">";
+			print GM_LANG_clear_clipboard;
+			print "</a></span>";
+		}
+		print "</td>";
 		print "<td class=\"shade1\">";
 		print "<form method=\"get\" name=\"newfactform\" action=\"\">\n";
 		print "<select id=\"newfact\" name=\"newfact\">\n";
@@ -1075,7 +1084,7 @@ abstract class FactFunctions {
 		if (($type == "INDI") || ($type == "FAM")) print "<option value=\"EVEN\">".GM_LANG_custom_event." [EVEN]</option>\n";
 		if (!empty($_SESSION["clipboard"])) {
 			foreach($_SESSION["clipboard"] as $key=>$fact) {
-				if ($fact["type"]==$type) {
+				if ($fact["type"] == $type) {
 					if (defined("GM_FACT_".$fact["fact"])) print "<option value=\"clipboard_$key\">".GM_LANG_add_from_clipboard." ".constant("GM_FACT_".$fact["fact"])."</option>\n";
 					else print "<option value=\"clipboard_$key\">".GM_LANG_add_from_clipboard." ".$fact["fact"]."</option>\n";
 				}
@@ -1093,7 +1102,7 @@ abstract class FactFunctions {
 		else if ($type == "OBJE" && !empty(GedcomConfig::$MEDIA_QUICK_ADDFACTS)) $qfacts = preg_split("/[, ;:]+/", GedcomConfig::$MEDIA_QUICK_ADDFACTS, -1, PREG_SPLIT_NO_EMPTY);
 		else if ($type == "NOTE" && !empty(GedcomConfig::$NOTE_QUICK_ADDFACTS)) $qfacts = preg_split("/[, ;:]+/", GedcomConfig::$NOTE_QUICK_ADDFACTS, -1, PREG_SPLIT_NO_EMPTY);
 		foreach ($qfacts as $key => $qfact) {
-			if (in_array($qfact, $addfacts)) print "&nbsp;&nbsp;<a href=\"javascript: ".constant("GM_FACT_".$qfact)."\" onclick=\"add_new_record('".$id."', '".$qfact."', 'newfact'); return false;\">".constant("GM_FACT_".$qfact)."</a>";
+			if (in_array($qfact, $addfacts)) print "&nbsp;&nbsp;<a href=\"javascript: ".constant("GM_FACT_".$qfact)."\" onclick=\"add_new_record('".$id."', '".$qfact."', 'newfact', '".$type."'); return false;\">".constant("GM_FACT_".$qfact)."</a>";
 		}
 		print "</form>\n";
 		print "</td></tr>\n";
@@ -1435,6 +1444,78 @@ abstract class FactFunctions {
 		if ($text=="") return "filter";
 	
 		return $text;
+	}
+	
+	/**
+	 * prints a JavaScript popup menu
+	 *
+	 * This function will print the DHTML required
+	 * to create a JavaScript Popup menu.  The $menu
+	 * parameter is an array that looks like this
+	 * $menu["label"] = "Charts";
+	 * $menu["labelpos"] = "down"; // tells where the text should be positioned relative to the picture options are up down left right
+	 * $menu["icon"] = "images/pedigree.gif";
+	 * $menu["hovericon"] = "images/pedigree2.gif";
+	 * $menu["link"] = "pedigree.php";
+	 * $menu["accesskey"] = "Z"; // optional accesskey
+	 * $menu["class"] = "menuitem";
+	 * $menu["hoverclass"] = "menuitem_hover";
+	 * $menu["flyout"] = "down"; // options are up down left right
+	 * $menu["items"] = array(); // an array of like menu items
+	 * $menu["onclick"] = "return javascript";  // java script to run on click
+	 * @author Genmod Development Team
+	 * @param array $menu the menuitems array to print
+	 */
+	public function PrintFactMenu($menu, $parentmenu="") {
+		$conv = array(
+			'label'=>'label',
+			'labelpos'=>'labelpos',
+			'icon'=>'icon',
+			'hovericon'=>'hovericon',
+			'link'=>'link',
+			'accesskey'=>'accesskey',
+			'class'=>'class',
+			'hoverclass'=>'hoverclass',
+			'flyout'=>'flyout',
+			'submenuclass'=>'submenuclass',
+			'onclick'=>'onclick'
+		);
+		$obj = new Menu();
+		if ($menu == 'separator') {
+			$obj->isSeperator();
+			$obj->printMenu();
+			return;
+		}
+		$items = false;
+		foreach ($menu as $k=>$v) {
+			if ($k == 'items' && is_array($v) && count($v) > 0) $items = $v;
+			else {
+				if (isset($conv[$k])){
+					if ($v != '') {
+						$obj->$conv[$k] = $v;
+					}
+				}
+			}
+		}
+		if ($items !== false) {
+			foreach ($items as $sub) {
+				$sobj = new Menu();
+				if ($sub == 'separator') {
+					$sobj->isSeperator();
+					$obj->addSubmenu($sobj);
+					continue;
+				}
+				foreach ($sub as $k2=>$v2) {
+					if (isset($conv[$k2])) {
+						if ($v2 != '') {
+							$sobj->$conv[$k2] = $v2;
+						}
+					}
+				}
+				$obj->addSubmenu($sobj);
+			}
+		}
+		$obj->printMenu();
 	}
 }
 ?>

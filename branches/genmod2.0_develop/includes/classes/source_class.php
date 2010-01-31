@@ -37,24 +37,32 @@ class Source extends GedcomRecord {
 	
 	// Data
 	private $name = null;					// Title of the source (both descriptors), privacy applied
+	private $oldname = null;				// Title of the source (both descriptors), privacy applied, from the original source gedrec
 	private $descriptor = null;				// Main title of the source, privacy applied
+	private $olddescriptor = null;			// Main title of the source, privacy applied, from the original source gedrec
 	private $adddescriptor = null;			// Additional title, privacy applied
+	private $oldadddescriptor = null;		// Additional title, privacy applied, from the original source gedrec
 
 		
 	public static function GetInstance($xref, $gedrec="", $gedcomid="") {
-		global $GEDCOMID;
 		
-		if (empty($gedcomid)) $gedcomid = $GEDCOMID;
+		if (empty($gedcomid)) $gedcomid = GedcomConfig::$GEDCOMID;
 		if (!isset(self::$cache[$gedcomid][$xref])) {
 			self::$cache[$gedcomid][$xref] = new Source($xref, $gedrec, $gedcomid);
 		}
 		return self::$cache[$gedcomid][$xref];
 	}
 	
-	public static function IsInstance($xref, $gedcomid="") {
-		global $GEDCOMID;
+	public static function NewInstance($xref, $gedrec="", $gedcomid="") {
 		
-		if (empty($gedcomid)) $gedcomid = $GEDCOMID;
+		if (empty($gedcomid)) $gedcomid = GedcomConfig::$GEDCOMID;
+		self::$cache[$gedcomid][$xref] = new Source($xref, $gedrec, $gedcomid);
+		return self::$cache[$gedcomid][$xref];
+	}
+	
+	public static function IsInstance($xref, $gedcomid="") {
+		
+		if (empty($gedcomid)) $gedcomid = GedcomConfig::$GEDCOMID;
 		if (!isset(self::$cache[$gedcomid][$xref])) return false;
 		else return true;
 	}
@@ -83,14 +91,23 @@ class Source extends GedcomRecord {
 			case "descriptor":
 				return $this->GetSourceDescriptor();
 				break;
+			case "olddescriptor":
+				return $this->GetSourceDescriptor("old");
+				break;
 			case "adddescriptor":
 				return $this->GetAddSourceDescriptor();
+				break;
+			case "oldadddescriptor":
+				return $this->GetAddSourceDescriptor("old");
 				break;
 			case "title":
 				return $this->GetTitle();
 				break;
 			case "name":
 				return $this->GetTitle();
+				break;
+			case "oldname":
+				return $this->GetTitle("old");
 				break;
 			default:
 				return parent::__get($property);
@@ -122,34 +139,35 @@ class Source extends GedcomRecord {
 	 * get the title of this source record
 	 * @return string
 	 */
-	private function getTitle() {
+	private function getTitle($type="") {
 		
-		if (is_null($this->name)) {
+		$name = $type."name";
+		if (is_null($this->$name)) {
 			if ($this->DisplayDetails()) {
-				$this->name = $this->GetSourceDescriptor();
-				$add_descriptor = $this->GetAddSourceDescriptor();
+				$this->$name = $this->GetSourceDescriptor($type);
+				$add_descriptor = $this->GetAddSourceDescriptor($type);
 				if ($add_descriptor) {
-					if ($this->name) $this->name .= " - ".$add_descriptor;
-					else $this->name = $add_descriptor;
+					if ($this->$name) $this->$name .= " - ".$add_descriptor;
+					else $this->$name = $add_descriptor;
 				}
 			}
-			else $this->name = GM_LANG_private;
+			else $this->$name = GM_LANG_private;
 		}
-		return $this->name;
+		return $this->$name;
 	}
 	
 	/**
 	 * get the descriptive title of the source
-	 *
 	 * @param string $sid the gedcom xref id for the source to find
 	 * @return string the title of the source
 	 */
-	private function getSourceDescriptor() {
+	private function getSourceDescriptor($style="") {
 		
-		if (is_null($this->descriptor)) {
+		$descriptor = $style."descriptor";
+		if (is_null($this->$descriptor)) {
 			if ($this->DisplayDetails()) {
 		
-				if ($this->show_changes && $this->ThisChanged()) $gedrec = $this->GetChangedGedRec();
+				if ($this->show_changes && $this->ThisChanged() && $style != "old") $gedrec = $this->GetChangedGedRec();
 				else $gedrec = $this->gedrec;
 		
 				if (!empty($gedrec)) {
@@ -157,35 +175,35 @@ class Source extends GedcomRecord {
 					if ($tt>0) {
 						$subrec = GetSubRecord(1, "1 TITL", $gedrec);
 						if (!PrivacyFunctions::showFact("TITL", $this->xref, "SOUR")) {
-							$this->descriptor = GM_LANG_unknown;
+							$this->$descriptor = GM_LANG_unknown;
 						}
 						else if(!PrivacyFunctions::showFactDetails("TITL", $this->xref, "SOUR") || PrivacyFunctions::FactViewRestricted($this->xref, $subrec, 2) || !$this->DisplayDetails()) {
-							$this->descriptor = GM_LANG_private;
+							$this->$descriptor = GM_LANG_private;
 						}
 						else {
 							// This automatically handles CONC/CONT lines below the title record
-							$this->descriptor = GetGedcomValue("TITL", 1, $subrec);
+							$this->$descriptor = GetGedcomValue("TITL", 1, $subrec);
 						}				
-						return $this->descriptor;
+						return $this->$descriptor;
 					}
 					$et = preg_match("/1 ABBR (.*)/", $gedrec, $smatch);
 					if ($et>0) {
 						if (!PrivacyFunctions::showFact("ABBR", $this->xref, "SOUR")) {
-							$this->descriptor = GM_LANG_unknown;
+							$this->$descriptor = GM_LANG_unknown;
 						}
 						else if (!PrivacyFunctions::showFactDetails("ABBR", $this->xref, "SOUR") || !$this->DisplayDetails()) {
-							$this->descriptor =  GM_LANG_private;
+							$this->$descriptor =  GM_LANG_private;
 						}
-						else $this->descriptor = $smatch[1];
-						return $this->descriptor;
+						else $this->$descriptor = $smatch[1];
+						return $this->$descriptor;
 					}
 				}
-				else $this->descriptor = GM_LANG_unknown;
+				else $this->$descriptor = GM_LANG_unknown;
 			}
-			else $this->descriptor = GM_LANG_private;
+			else $this->$descriptor = GM_LANG_private;
 		}
-		return $this->descriptor;
-	}	
+		return $this->$descriptor;
+	}
 
 	/**
 	 * get the additional descriptive title of the source
@@ -193,36 +211,37 @@ class Source extends GedcomRecord {
 	 * @param string $sid the gedcom xref id for the source to find
 	 * @return string the additional title of the source
 	 */
-	private function getAddSourceDescriptor() {
+	private function getAddSourceDescriptor($style="") {
 	
-		if (is_null($this->adddescriptor)) {
+		$adddescriptor = $style."adddescriptor";
+		if (is_null($this->$adddescriptor)) {
 			if ($this->DisplayDetails()) {
-				if ($this->show_changes && $this->ThisChanged()) $gedrec = $this->GetChangedGedRec();
+				if ($this->show_changes && $this->ThisChanged() && $style != "old") $gedrec = $this->GetChangedGedRec();
 				else $gedrec = $this->gedrec;
 				
 				if (!empty($gedrec)) {
 					$ct = preg_match("/\d ROMN (.*)/", $gedrec, $match);
 			 		if ($ct>0) {
 						if (!PrivacyFunctions::showFact("ROMN", $this->xref, "SOUR") || !PrivacyFunctions::showFactDetails("ROMN", $this->xref, "SOUR") || !$this->DisplayDetails()) {
-							$this->adddescriptor = "";
+							$this->$adddescriptor = "";
 						}
-						else $this->adddescriptor = $match[1];
-						return $this->adddescriptor;
+						else $this->$adddescriptor = $match[1];
+						return $this->$adddescriptor;
 			 		}
 					$ct = preg_match("/\d _HEB (.*)/", $gedrec, $match);
 			 		if ($ct>0) {
 						if (!PrivacyFunctions::showFact("_HEB", $this->xref, "SOUR")|| !PrivacyFunctions::showFactDetails("_HEB", $this->xref, "SOUR") || !$this->DisplayDetails()) {
-							$this->adddescriptor = "";
+							$this->$adddescriptor = "";
 						}
-						else $this->adddescriptor = $match[1];
-						return $this->adddescriptor;
+						else $this->$adddescriptor = $match[1];
+						return $this->$adddescriptor;
 			 		}
 			 	}
-				$this->adddescriptor = "";
+				$this->$adddescriptor = "";
 			}
-			else $this->adddescriptor = GM_LANG_private;
+			else $this->$adddescriptor = GM_LANG_private;
 		}
-		return $this->adddescriptor;
+		return $this->$adddescriptor;
 	}
 	
 	protected function getLinksFromIndis() {
@@ -328,7 +347,9 @@ class Source extends GedcomRecord {
 	// Type	=	1	: normal title (descriptor and adddescriptor
 	// 			2	: descriptor
 	//			3	: adddescriptor
-	public function PrintListSource($useli=true, $type=1, $fact="", $paste=false) {
+	// Style =  empty: Name depending on general settings
+	//       = "old": Name forced from old gedrec
+	public function PrintListSource($useli=true, $type=1, $fact="", $paste=false, $style="") {
 
 		if (!$this->DisplayDetails()) return false;
 		
@@ -338,9 +359,9 @@ class Source extends GedcomRecord {
 		}
 		if ($paste) print "<a href=\"#\" onclick=\"sndReq(document.getElementById('dummy'), 'lastused', 'type', '".$this->datatype."', 'id', '".$this->key."'); pasteid('".$this->xref."'); return false;\" class=\"list_item\">";
 		else print "\n\t\t\t<a href=\"source.php?sid=".$this->xref."&amp;gedid=".$this->gedcomid."\" class=\"list_item\">";
-		if ($type == 1) print PrintReady($this->GetTitle());
-		else if ($type == 2) print PrintReady($this->GetSourceDescriptor());
-		else if ($type == 3) print PrintReady($this->GetAddSourceDescriptor());
+		if ($type == 1) print PrintReady($this->GetTitle($style));
+		else if ($type == 2) print PrintReady($this->GetSourceDescriptor($style));
+		else if ($type == 3) print PrintReady($this->GetAddSourceDescriptor($style));
 		print $this->addxref;
 		if (!empty($fact)) {
 			print " <i>(";

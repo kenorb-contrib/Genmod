@@ -50,7 +50,7 @@ abstract class EditFunctions {
 	 * @return 	boolean	true if succeed/false if failed
 	 */
 	public function ReplaceGedrec($gid, $oldrec, $newrec, $fact="", $change_id, $change_type, $gedid="", $gid_type) {
-		global $manual_save, $gm_user, $GEDCOMID, $chcache, $can_auto_accept, $aa_attempt;
+		global $manual_save, $gm_user, $can_auto_accept, $aa_attempt;
 	
 		// NOTE: Check if auto accept is possible. If there are already changes present for any ID in one $change_id, changes cannot be auto accepted.
 		if (!isset($can_auto_accept)) $can_auto_accept = true;
@@ -65,8 +65,7 @@ abstract class EditFunctions {
 		$newrec = preg_replace(array("/(\r\n)+/", "/\r+/", "/\n+/"), array("\r\n", "\r", "\n"), $newrec);
 		$newrec = trim($newrec);
 		// NOTE: Determine which gedcom is being updated
-		if ($gedid == "") $gedid = $GEDCOMID;
-	//	else $gedid = $GEDCOMS[$gedid]["id"];
+		if ($gedid == "") $gedid = GedcomConfig::$GEDCOMID;
 		
 		//-- the following block of code checks if the XREF was changed in this record.
 		//-- if it was changed we add a warning to the change log
@@ -91,7 +90,7 @@ abstract class EditFunctions {
 	
 		$sql = "INSERT INTO ".TBLPREFIX."changes (ch_cid, ch_gid, ch_file, ch_type, ch_user, ch_time, ch_fact, ch_old, ch_new, ch_gid_type)";
 		$sql .= "VALUES ('".$change_id."', '".$gid."', '".$gedid."', '".$change_type."', '".$gm_user->username."', '".time()."'";
-		$sql .= ", '".$fact."', '".DbLayer::EscapeQuery($oldrec)."', '".DbLayer::EscapeQuery($newrec)."', '".$gid_type."')";
+		$sql .= ", '".$fact."', '".DbLayer::EscapeQuery($oldrec)."', '".DbLayer::EscapeQuery($newrec)."', '".trim($gid_type)."')";
 		$res = NewQuery($sql);
 		
 		WriteToLog("ReplaceGedrec-> Replacing gedcom record $gid ->" . $gm_user->username ."<-", "I", "G", $gedid);
@@ -104,17 +103,17 @@ abstract class EditFunctions {
 	//-- this function will append a new gedcom record at
 	//-- the end of the gedcom file.
 	public function AppendGedrec($newrec, $fact="", $change_id, $change_type, $gedid="") {
-		global $manual_save, $gm_user, $GEDCOMID, $chcache;
+		global $manual_save, $gm_user;
 	
 		$newrec = preg_replace(array("/(\r\n)+/", "/\r+/", "/\n+/"), array("\r\n", "\r", "\n"), $newrec);
 		$newrec = stripslashes(trim($newrec));
 		// NOTE: Determine which gedcom is being updated
-		if ($gedid == "") $gedid = $GEDCOMID;
+		if ($gedid == "") $gedid = GedcomConfig::$GEDCOMID;
 		
 		$ct = preg_match("/0 @(.*)@\s(\w+)/", $newrec, $match);
 		$type = trim($match[2]);
 		$xref = self::GetNewXref($type);
-		$_SESSION["last_used"][$type] = JoinKey($xref, $GEDCOMID);
+		$_SESSION["last_used"][$type] = JoinKey($xref, GedcomConfig::$GEDCOMID);
 		$newrec = preg_replace("/0 @(.*)@/", "0 @$xref@", $newrec);
 		
 		$sql = "INSERT INTO ".TBLPREFIX."changes (ch_cid, ch_gid, ch_file, ch_type, ch_user, ch_time, ch_fact, ch_new, ch_gid_type)";
@@ -131,9 +130,10 @@ abstract class EditFunctions {
 	//-- this function will delete the gedcom record with
 	//-- the given $gid
 	public function DeleteGedrec($gid, $change_id, $change_type, $gid_type) {
-		global $manual_save, $gm_user, $GEDCOMID, $chcache, $can_auto_accept, $aa_attempt;
-		$gid = strtoupper($gid);
+		global $manual_save, $gm_user, $can_auto_accept, $aa_attempt;
 		
+		$gid = strtoupper($gid);
+
 		// NOTE: Check if auto accept is possible. If there are already changes present for any ID in one $change_id, changes cannot be auto accepted.
 		if ($can_auto_accept) {
 			if (self::HasOtherChanges($gid, $change_id)) {
@@ -143,7 +143,7 @@ abstract class EditFunctions {
 		}
 		// NOTE: Check if there are changes present, if so flag pending changes so they cannot be approved
 		if (ChangeFunctions::GetChangeData(true, $gid, true)) {
-			$sql = "SELECT ch_cid AS cid FROM ".TBLPREFIX."changes WHERE ch_gid = '".$gid."' AND ch_file = '".$GEDCOMID."' ORDER BY ch_cid ASC";
+			$sql = "SELECT ch_cid AS cid FROM ".TBLPREFIX."changes WHERE ch_gid = '".$gid."' AND ch_file = '".GedcomConfig::$GEDCOMID."' ORDER BY ch_cid ASC";
 			$res = NewQuery($sql);
 			while($row = $res->FetchAssoc()){
 				$sqlcid = "UPDATE ".TBLPREFIX."changes SET ch_delete = '1' WHERE ch_cid = '".$row["cid"]."'";
@@ -154,19 +154,19 @@ abstract class EditFunctions {
 		}
 		
 		// NOTE Check if record exists in the database
-		if (!FindGedcomRecord($gid) && !ChangeFunctions::GetChangeData(true, $gid, true)) {
+		$object = ReConstructObject($gid, $gid_type);
+		if (!is_object($object) || $object->isempty) {
 			print "DeleteGedrec-> Could not find gedcom record with xref: $gid. <br />";
-			WriteToLog("DeleteGedrec-> Could not find gedcom record with xref: $gid ->" . $gm_user->username ."<-", "E", "G", $GEDCOMID);
+			WriteToLog("DeleteGedrec-> Could not find gedcom record with xref: $gid ->" . $gm_user->username ."<-", "E", "G", GedcomConfig::$GEDCOMID);
 			return false;
 		}
 		else {
-			$rec = ChangeFunctions::GetChangeData(false, $gid, true, "gedlines","");
-			if (isset($rec[$GEDCOMID][$gid])) $oldrec = $rec[$GEDCOMID][$gid];
-			else $oldrec = FindGedcomRecord($gid);
+			if ($object->ischanged) $oldrec = $object->changedgedrec;
+			else $oldrec = $object->gedrec;
 			$ct = preg_match("/0 @.*@\s(\w+)\s/", $oldrec, $match);
 			$ch_fact = $match[1];
 			$sql = "INSERT INTO ".TBLPREFIX."changes (ch_cid, ch_gid, ch_fact, ch_old, ch_file, ch_type, ch_user, ch_time, ch_gid_type)";
-			$sql .= "VALUES ('".$change_id."', '".$gid."', '".$ch_fact."', '".DbLayer::EscapeQuery($oldrec)."', '".$GEDCOMID."', '".$change_type."', '".$gm_user->username."', '".time()."', '".$gid_type."')";
+			$sql .= "VALUES ('".$change_id."', '".$gid."', '".$ch_fact."', '".DbLayer::EscapeQuery($oldrec)."', '".GedcomConfig::$GEDCOMID."', '".$change_type."', '".$gm_user->username."', '".time()."', '".$gid_type."')";
 			$res = NewQuery($sql);
 			// Also delete the asso recs to an indi, to preserve referential integrity
 			if ($ch_fact == "INDI" || $ch_fact == "FAM") {
@@ -175,16 +175,15 @@ abstract class EditFunctions {
 					foreach ($pidassos as $nothing =>$asso) {
 						$pid1 = $asso->xref1;
 						$pid2 = $asso->xref2;
-						$arec = ChangeFunctions::GetChangeData(false, $pid2, true, "gedlines","");
-						if (isset($rec[$GEDCOMID][$pid2])) $arec = $rec[$GEDCOMID][$pid2];
-						else $arec = FindGedcomRecord($pid2);
+						if ($asso->assoperson->ischanged) $arec = $asso->assoperson->changedgedrec;
+						else $arec = $asso->assoperson->gedrec;
 						if (strstr($arec, "1 ASSO")) {
 							$i = 1;
 							do {
 								$asubrec = GetSubrecord(1, "1 ASSO @".$pid1."@", $arec, $i);
 								if (!empty($asubrec)) {
 									$sql = "INSERT INTO ".TBLPREFIX."changes (ch_cid, ch_gid, ch_fact, ch_old, ch_file, ch_type, ch_user, ch_time, ch_gid_type)";
-									$sql .= "VALUES ('".$change_id."', '".$pid2."', 'ASSO', '".DbLayer::EscapeQuery($asubrec)."', '".$GEDCOMID."', '".$change_type."', '".$gm_user->username."', '".time()."', 'INDI')";
+									$sql .= "VALUES ('".$change_id."', '".$pid2."', 'ASSO', '".DbLayer::EscapeQuery($asubrec)."', '".GedcomConfig::$GEDCOMID."', '".$change_type."', '".$gm_user->username."', '".time()."', 'INDI')";
 								}
 								$i++;
 							} while (!empty($asubrec));
@@ -196,7 +195,7 @@ abstract class EditFunctions {
 									$asubrec = GetSubrecord(2, "2 ASSO @".$pid1."@", $subrec);
 									$newsubrec = preg_replace($asubrec, "", $subrec);
 									$sql = "INSERT INTO ".TBLPREFIX."changes (ch_cid, ch_gid, ch_fact, ch_old, ch_new, ch_file, ch_type, ch_user, ch_time, ch_gid_type)";
-									$sql .= "VALUES ('".$change_id."', '".$pid2."', 'ASSO', '".DbLayer::EscapeQuery($subrec)."', '".DbLayer::EscapeQuery($newsubrec)."', '".$GEDCOMID."', '".$change_type."', '".$gm_user->username."', '".time()."', 'INDI')";
+									$sql .= "VALUES ('".$change_id."', '".$pid2."', 'ASSO', '".DbLayer::EscapeQuery($subrec)."', '".DbLayer::EscapeQuery($newsubrec)."', '".GedcomConfig::$GEDCOMID."', '".$change_type."', '".$gm_user->username."', '".time()."', 'INDI')";
 								}
 							}
 						}
@@ -206,7 +205,7 @@ abstract class EditFunctions {
 						
 				
 		}
-		WriteToLog("DeleteGedrec-> Deleting gedcom record $gid ->" . $gm_user->username ."<-", "I", "G", $GEDCOMID);
+		WriteToLog("DeleteGedrec-> Deleting gedcom record $gid ->" . $gm_user->username ."<-", "I", "G", GedcomConfig::$GEDCOMID);
 		// Clear the ChangeFunctions::GetChangeData cache
 		ChangeFunctions::ResetChangeCaches();
 		return true;
@@ -215,7 +214,7 @@ abstract class EditFunctions {
 	//-------------------------------------------- check_gedcom
 	//-- this function will check a GEDCOM record for valid gedcom format
 	public function CheckGedcom($gedrec, $chan=true, $user="", $tstamp="") {
-		global $GEDCOMID, $gm_user;
+		global $gm_user;
 	
 		$gedrec = stripslashes($gedrec);
 		$ct = preg_match("/0 @(.*)@ (.*)/", $gedrec, $match);
@@ -224,7 +223,9 @@ abstract class EditFunctions {
 			$ct2 = preg_match("/0 HEAD/", $gedrec, $match2);
 			if ($ct2 == 0) {
 				print "CheckGedcom-> Invalid GEDCOM 5.5 format.\n";
-				WriteToLog("CheckGedcom-> Invalid GEDCOM 5.5 format.->" . $gm_user->username ."<-", "I", "G", $GEDCOMID);
+				print "<pre>".$gedrec."</pre>";
+				WriteToLog("CheckGedcom-> Invalid GEDCOM 5.5 format.->" . $gm_user->username ."<-", "I", "G", GedcomConfig::$GEDCOMID);
+				print $pipo;
 				return false;
 			}
 		}
@@ -271,8 +272,8 @@ abstract class EditFunctions {
 	 */
 	public function PrintIndiForm($nextaction, $famid, $linenum="", $namerec="", $famtag="CHIL") {
 		global $pid, $GM_IMAGES, $monthtonum;
-		global $NPFX_accept, $SPFX_accept, $NSFX_accept, $FILE_FORM_accept, $change_type;
-		global $GEDCOMID, $gm_user;
+		global $NPFX_accept, $SPFX_accept, $NSFX_accept, $FILE_FORM_accept, $change_type, $pid_type;
+		global $gm_user;
 	
 		InitCalendarPopUp();
 		print "<form method=\"post\" name=\"addchildform\" action=\"edit_interface.php\">\n";
@@ -280,53 +281,33 @@ abstract class EditFunctions {
 		print "<input type=\"hidden\" name=\"famid\" value=\"".$famid."\" />\n";
 		print "<input type=\"hidden\" name=\"pid\" value=\"".$pid."\" />\n";
 		print "<input type=\"hidden\" name=\"change_type\" value=\"".$change_type."\" />\n";
-		print "<input type=\"hidden\" name=\"pid_type\" value=\"INDI\" />\n";
+		print "<input type=\"hidden\" name=\"pid_type\" value=\"".$pid_type."\" />\n";
 		print "<input type=\"hidden\" name=\"famtag\" value=\"".$famtag."\" />\n";
 		print "<table class=\"facts_table\">";
 		
 		// preset child/father SURN
 		$surn = "";
 		if (empty($namerec)) {
-			$indirec = "";
-			if ($famtag=="CHIL" and $nextaction=="addchildaction") {
-				if (!empty($famid) && ChangeFunctions::GetChangeData(true, $famid, true, "", "FAM")) {
-					$rec = ChangeFunctions::GetChangeData(false, $famid, true, "gedlines", "FAM");
-					$famrec = $rec[$GEDCOMID][$famid];
+			$namerec = "";
+			if ($famtag == "CHIL" && $nextaction=="addchildaction") {
+				// The child will get the fathers surname as preset
+				$famrec = "";
+				if (!empty($famid)) {
+					$family =& Family::GetInstance($famid);
+					if (is_object($family->husb)) $namerec = "1 NAME ".$family->husb->name_array[0][0];
 				}
-				else $famrec = FindGedcomRecord($famid);
-				$parents = FindParentsInRecord($famrec);
-				if (!empty($famid) && !empty($parents["HUSB"]) && ChangeFunctions::GetChangeData(true, $parents["HUSB"], true, "", "INDI")) {
-					$rec = ChangeFunctions::GetChangeData(false, $parents["HUSB"], true, "gedlines", "INDI");
-					$indirec = $rec[$GEDCOMID][$parents["HUSB"]];
-				}
-				else $indirec = FindPersonRecord($parents["HUSB"]);
 			}
-			if ($famtag=="HUSB" and $nextaction=="addnewparentaction") {
-				$famrec = FindGedcomRecord($famid);
-				$parents = FindParentsInRecord($famrec);
-				if (!empty($parents["HUSB"]) && ChangeFunctions::GetChangeData(true, $parents["HUSB"], true, "", "INDI")) {
-					$rec = ChangeFunctions::GetChangeData(false, $parents["HUSB"], true, "gedlines", "INDI");
-					$indirec = $rec[$GEDCOMID][$parents["HUSB"]];
+			if ($famtag == "HUSB" && $nextaction=="addnewparentaction") {
+				// The husband will get the surname of one of the kids as preset
+				$family =& Family::GetInstance($famid);
+				foreach ($family->children as $key => $child) {
+					$namerec = "1 NAME ".$child->name_array[0][0];
+					break;
 				}
-				else $indirec = FindPersonRecord($parents["HUSB"]);
 			}
-			if ($famtag=="WIFE" and $nextaction=="addnewparentaction") {
-				$famrec = FindGedcomRecord($famid);
-				$parents = FindParentsInRecord($famrec);
-				if (!empty($parents["WIFE"]) && ChangeFunctions::GetChangeData(true, $parents["WIFE"], true, "", "INDI")) {
-					$rec = ChangeFunctions::GetChangeData(false, $parents["WIFE"], true, "gedlines", "INDI");
-					$indirec = $rec[$GEDCOMID][$parents["WIFE"]];
-				}
-				else $indirec = FindPersonRecord($parents["WIFE"]);
-			}
-			// If the surname is split in SPFX and SURN we get the wrong surname. So, as NAME is most reliable
-			// we get it from there
-	//		$nt = preg_match("/\d SURN (.*)/", $indirec, $ntmatch);
-	//		if ($nt) $surn = $ntmatch[1];
-	//		else {
-				$nt = preg_match("/1 NAME (.*)[\/](.*)[\/]/", $indirec, $ntmatch);
-				if ($nt) $surn = $ntmatch[2];
-	//		}
+			// For the wife we don't know....
+			$nt = preg_match("~1 NAME (.*)/(.*)/~", $namerec, $ntmatch);
+			if ($nt) $surn = $ntmatch[2];
 			if ($surn) $namerec = "1 NAME  /".trim($surn,"\r\n")."/";
 		}
 		self::AddTagSeparator("NAME");
@@ -335,38 +316,53 @@ abstract class EditFunctions {
 		$npfx=trim(@$nmatch[1]);
 		// 1 NAME = NPFX GIVN /SURN/ NSFX
 		$nt = preg_match("/\d NAME (.*)/", $namerec, $nmatch);
-		$name=@$nmatch[1];
-		if (strlen($npfx) and strpos($name, $npfx)===false) $name = $npfx." ".$name;
+		if ($nt) $name = $nmatch[1];
+		else $name = "";
+		if (strlen($npfx) && strpos($name, $npfx) === false) $name = $npfx." ".$name;
 		self::AddSimpleTag("0 NAME ".$name);
 		// 2 NPFX
 		self::AddSimpleTag("0 NPFX ".$npfx);
 		// 2 GIVN
 		// Start input field is here
 		$nt = preg_match("/\d GIVN (.*)/", $namerec, $nmatch);
-		$focusfld = self::AddSimpleTag("0 GIVN ".@$nmatch[1]);
+		if ($nt) $name = $nmatch[1];
+		else $name = "";
+		$focusfld = self::AddSimpleTag("0 GIVN ".$name);
 		// 2 NICK
 		$nt = preg_match("/\d NICK (.*)/", $namerec, $nmatch);
-		self::AddSimpleTag("0 NICK ".@$nmatch[1]);
+		if ($nt) $name = $nmatch[1];
+		else $name = "";
+		self::AddSimpleTag("0 NICK ".$name);
 		// 2 SPFX
 		$nt = preg_match("/\d SPFX (.*)/", $namerec, $nmatch);
-		self::AddSimpleTag("0 SPFX ".@$nmatch[1]);
+		if ($nt) $name = $nmatch[1];
+		else $name = "";
+		self::AddSimpleTag("0 SPFX ".$name);
 		// 2 SURN
 		$nt = preg_match("/\d SURN (.*)/", $namerec, $nmatch);
-		self::AddSimpleTag("0 SURN ".@$nmatch[1]);
+		if ($nt) $name = $nmatch[1];
+		else $name = "";
+		self::AddSimpleTag("0 SURN ".$name);
 		// 2 NSFX
 		$nt = preg_match("/\d NSFX (.*)/", $namerec, $nmatch);
-		self::AddSimpleTag("0 NSFX ".@$nmatch[1]);
+		if ($nt) $name = $nmatch[1];
+		else $name = "";
+		self::AddSimpleTag("0 NSFX ".$name);
 		// 2 _HEB
 		$nt = preg_match("/\d _HEB (.*)/", $namerec, $nmatch);
+		if ($nt) $name = $nmatch[1];
+		else $name = "";
 		if ($nt>0 || GedcomConfig::$USE_RTL_FUNCTIONS) {
-			self::AddSimpleTag("0 _HEB ".@$nmatch[1]);
+			self::AddSimpleTag("0 _HEB ".$name);
 		}
 		// 2 ROMN
 		$nt = preg_match("/\d ROMN (.*)/", $namerec, $nmatch);
-		self::AddSimpleTag("0 ROMN ".@$nmatch[1]);
+		if ($nt) $name = $nmatch[1];
+		else $name = "";
+		self::AddSimpleTag("0 ROMN ".$name);
 	
 		if ($surn) $namerec = ""; // reset if modified
-	
+
 		if (empty($namerec)) {
 			// 2 _MARNM
 			self::AddSimpleTag("0 _MARNM");
@@ -400,8 +396,7 @@ abstract class EditFunctions {
 			self::AddSimpleTag("0 TIME", "DEAT");
 			self::AddSimpleTag("0 PLAC", "DEAT");
 			// print $famtag." ".$nextaction;
-	//		if (($famtag=="CHIL" and $nextaction=="addchildaction") || (($famtag == "HUSB" || $famtag == "WIFE") && $nextaction == "addnewparentaction")) 
-			if ($famtag=="CHIL" and $nextaction=="addchildaction" and !empty($famid)) {
+			if ($famtag=="CHIL" && $nextaction=="addchildaction" && !empty($famid)) {
 				self::AddTagSeparator("PEDI");
 				self::AddSimpleTag("0 PEDI");
 			}
@@ -413,12 +408,24 @@ abstract class EditFunctions {
 				self::AddSimpleTag("0 DATE", "MARR");
 				self::AddSimpleTag("0 PLAC", "MARR");
 			}
+			if ($nextaction == "addnewparentaction" && $famid == 'new') {
+				$child =& Person::GetInstance($pid);
+				$showbio = true;
+				foreach ($child->childfamilies as $id => $family) {
+					if ($family->pedigreetype == "") {
+						$showbio = false;
+						break;
+					}
+				}
+				self::AddTagSeparator("PEDI");
+				self::AddSimpleTag("0 PEDI", "", 1, $showbio);
+			}
+				
 			print "</table>\n";
 			self::PrintAddLayer("SOUR", 1, true);
 			self::PrintAddLayer("OBJE", 1);
 			self::PrintAddLayer("NOTE", 1);
 			self::PrintAddLayer("GNOTE", 1);
-	//		print "<input type=\"checkbox\" name=\"addsource\" />".GM_LANG_add_source_to_fact"]."<br />\n";
 			if ($gm_user->UserCanAccept() && !$gm_user->userAutoAccept()) print "<br /><input name=\"aa_attempt\" type=\"checkbox\" value=\"1\" />".GM_LANG_attempt_auto_acc."<br /><br />\n";
 			print "<input type=\"submit\" value=\"".GM_LANG_save."\" /><br />\n";
 		}
@@ -466,7 +473,6 @@ abstract class EditFunctions {
 			self::PrintAddLayer("SOUR");
 			self::PrintAddLayer("NOTE");
 			self::PrintAddLayer("GNOTE");
-	//		print "<input type=\"submit\" value=\"".GM_LANG_save."\" /><br />\n";
 			if ($gm_user->UserCanAccept() && !$gm_user->userAutoAccept()) print "<br /><input name=\"aa_attempt\" type=\"checkbox\" value=\"1\" />".GM_LANG_attempt_auto_acc."<br /><br />\n";
 			print "<input type=\"button\" value=\"".GM_LANG_save."\" onclick=\"document.addchildform.submit(); return false;\"/><br />\n";
 		}
@@ -641,9 +647,9 @@ abstract class EditFunctions {
 	 * @param string $tag			fact record to edit (eg 2 DATE xxxxx)
 	 * @param string $upperlevel	optional upper level tag (eg BIRT)
 	 */
-	public function AddSimpleTag($tag, $upperlevel="", $tab="1") {
+	public function AddSimpleTag($tag, $upperlevel="", $tab="1", $switch=false) {
 		global $GM_IMAGES, $TEMPLE_CODES, $STATUS_CODES;
-		global $assorela, $tags, $emptyfacts, $TEXT_DIRECTION, $confighelpfile, $GM_BASE_DIRECTORY, $GEDCOMID;
+		global $assorela, $tags, $emptyfacts, $TEXT_DIRECTION, $confighelpfile, $GM_BASE_DIRECTORY;
 		global $NPFX_accept, $SPFX_accept, $NSFX_accept, $FILE_FORM_accept, $upload_count, $separatorfacts, $canhavey_facts;
 		static $tabkey;
 		if (!isset($tabkey)) $tabkey = $tab;
@@ -798,9 +804,11 @@ abstract class EditFunctions {
 		else if ($fact=="PEDI") {
 			print "<select tabindex=\"".$tabkey."\" id=\"".$element_id."\" name=\"".$element_name."\">\n";
 			
-			print "<option value=\"birth\"";
-			if ($value=="birth") print " selected=\"selected\"";
-			print ">".GM_LANG_biological."</option>\n";
+			if ($switch) {
+				print "<option value=\"birth\"";
+				if ($value=="birth") print " selected=\"selected\"";
+				print ">".GM_LANG_biological."</option>\n";
+			}
 			
 			print "<option value=\"adopted\"";
 			if ($value=="adopted") print " selected=\"selected\"";
@@ -939,7 +947,7 @@ abstract class EditFunctions {
 			else {
 				if (isset($_SESSION["last_used"]["REPO"])) {
 					$gedid = SplitKey($_SESSION["last_used"]["REPO"], "gedid");
-					if ($gedid == $GEDCOMID) {
+					if ($gedid == GedcomConfig::$GEDCOMID) {
 						$id = SplitKey($_SESSION["last_used"]["REPO"], "id");
 						if (CheckExists($id, "REPO")) print "<a href=\"javascript\" onclick=\"document.getElementById('".$element_id."').value='".$id."'; sndReq('".$element_id."_repo', 'getrepodescriptor', 'rid', '".$id."', '', ''); return false;\">".GM_LANG_click_for." ".GetRepoDescriptor($id)."</a>";
 					}
@@ -969,7 +977,7 @@ abstract class EditFunctions {
 			else {
 				if (isset($_SESSION["last_used"]["NOTE"])) {
 					$gedid = SplitKey($_SESSION["last_used"]["NOTE"], "gedid");
-					if ($gedid == $GEDCOMID) {
+					if ($gedid == GedcomConfig::$GEDCOMID) {
 						$id = SplitKey($_SESSION["last_used"]["NOTE"], "id");
 						if (CheckExists($id, "NOTE")) {
 							print "<a href=\"javascript\" onclick=\"document.getElementById('".$element_id."').value='".$id."'; sndReq('".$element_id."_gnote', 'getnotedescriptor', 'oid', '".$id."', '', ''); return false;\">".GM_LANG_click_for." ";
@@ -993,7 +1001,7 @@ abstract class EditFunctions {
 			else {
 				if (isset($_SESSION["last_used"]["SOUR"])) {
 					$gedid = SplitKey($_SESSION["last_used"]["SOUR"], "gedid");
-					if ($gedid == $GEDCOMID) {
+					if ($gedid == GedcomConfig::$GEDCOMID) {
 						$id = SplitKey($_SESSION["last_used"]["SOUR"], "id");
 						if (CheckExists($id, "SOUR")) print "<a href=\"javascript\" onclick=\"document.getElementById('".$element_id."').value='".$id."'; sndReq('".$element_id."_src', 'getsourcedescriptor', 'sid', '".$id."', '', ''); return false;\">".GM_LANG_click_for." ".GetSourceDescriptor($id)."</a>";
 					}
@@ -1008,7 +1016,7 @@ abstract class EditFunctions {
 			else {
 				if (isset($_SESSION["last_used"]["OBJE"])) {
 					$gedid = SplitKey($_SESSION["last_used"]["OBJE"], "gedid");
-					if ($gedid == $GEDCOMID) {
+					if ($gedid == GedcomConfig::$GEDCOMID) {
 						$id = SplitKey($_SESSION["last_used"]["OBJE"], "id");
 						if (CheckExists($id, "OBJE")) print "<a href=\"javascript\" onclick=\"document.getElementById('".$element_id."').value='".$id."'; sndReq('".$element_id."_obj', 'getmediadescriptor', 'mid', '".$id."', '', ''); return false;\">".GM_LANG_click_for." ".GetMediaDescriptor($id)."</a>";
 					}
@@ -1193,7 +1201,8 @@ abstract class EditFunctions {
 			// print "value j:".$j."glevels: ".$glevels[$j]." tag: ".$tag[$j]." text: ".$text[$j]." strl: ".strlen($text[$j])." islink: ".$islink[$j]."<br />";
 			//-- for facts with empty values they must have sub records
 			//-- this section checks if they have subrecords
-			if (empty($text[$j])) {
+			// Compare with "" as 'empty' would also include '0'.
+			if ($text[$j] == "") {
 				$k=$j+1;
 				$pass=false;
 				while(($k<count($glevels))&&($glevels[$k]>$glevels[$j])) {
@@ -1228,20 +1237,15 @@ abstract class EditFunctions {
 					//print "link found<br />";
 					if (!empty($text[$j]) || $text[$j] == "0") {
 						//print "ok link found".$text[$j];
-						$trec = FindGedcomRecord($text[$j]);
-						if (!empty($trec)) $passlink = true;
-						if (ChangeFunctions::GetChangeData(true, $text[$j], true, "", "")) {
-							$t = ChangeFunctions::GetChangeData(false, $text[$j], true, "gedlines", "");
-							$ctrec = $t[$GEDCOMID][$text[$j]];
-							if (!empty($ctrec)) $passlink = true;
-							else $passlink = false;
-						}
+						$object = ConstructObject($text[$j]);
+						if (!is_object($object) || $object->isempty) $passlink = false;
+						else $passlink = true;
 						if (!$passlink) {
 							print "<span class=\"error\">".GM_LANG_link_not_added.": ".$text[$j]."</span><br />";
 							$link_error = true;
 						}
 						else {
-							$text[$j]="@".$text[$j]."@";
+							$text[$j] = "@".strtoupper($text[$j])."@";
 							$newline = $glevels[$j]." ".$tag[$j];
 						}
 					}
@@ -1257,13 +1261,16 @@ abstract class EditFunctions {
 								break;
 							}
 						}
-						if (!$skip) $j = count($glevels) - 1;
+						if (!$skip) {
+							$j = count($glevels) - 1;
+							$skip = true;
+						}
 					}
 				}
 				if (!$skip) {
 				
 					// NOTE: check and translate the incoming dates
-					if ($tag[$j]=="DATE" && !empty($text[$j])) {
+					if ($tag[$j] == "DATE" && !empty($text[$j])) {
 						$text[$j] = self::CheckInputDate($text[$j]);
 					}
 				
@@ -1394,6 +1401,8 @@ abstract class EditFunctions {
 	}
 	
 	public function SubmitterRecord($level, $gedrec) {
+		
+		self::AddTagSeparator("SUBM");
 		if ($gedrec == "") {
 			self::AddSimpleTag(($level+1)." NAME");
 			self::AddSimpleTag(($level+1)." ADDR");
@@ -1449,7 +1458,7 @@ abstract class EditFunctions {
 	}
 	
 	public function ShowMediaForm($pid, $action="newentry", $change_type="add_media") {
-		global $GEDCOMID, $TEXT_DIRECTION;
+		global $TEXT_DIRECTION;
 		global $gm_user;
 		
 		$facts_add = explode(",", GedcomConfig::$MEDIA_FACTS_ADD);
@@ -1460,7 +1469,6 @@ abstract class EditFunctions {
 		print "<input type=\"hidden\" name=\"action\" value=\"$action\" />\n";
 		print "<input type=\"hidden\" name=\"paste\" value=\"1\" />\n";
 		print "<input type=\"hidden\" name=\"change_type\" value=\"$change_type\" />\n";
-		print "<input type=\"hidden\" name=\"gedid\" value=\"$GEDCOMID\" />\n";
 		if (isset($pid)) print "<input type=\"hidden\" name=\"pid\" value=\"$pid\" />\n";
 		print "<table class=\"facts_table center $TEXT_DIRECTION\">\n";
 		print "<tr><td class=\"topbottombar\" colspan=\"2\">".GM_LANG_add_media."</td></tr>";
@@ -1473,11 +1481,9 @@ abstract class EditFunctions {
 			print "</td></tr>";
 		}
 		if (IdType($pid) == "OBJE") {
-			$gedrec = FindMediaRecord($pid);
-			if (ChangeFunctions::GetChangeData(true, $pid, true)) {
-				$rec = ChangeFunctions::GetChangeData(false, $pid, true, "gedlines");
-				$gedrec = $rec[$GEDCOMID][$pid];
-			}
+			$media =& MediaItem::GetInstance($pid);
+			if ($media->ischanged) $gedrec = $media->changedgedrec;
+			else $gedrec = $media->gedrec;
 		}
 		else {
 			$gedrec = "";
@@ -1574,7 +1580,6 @@ abstract class EditFunctions {
 			if (in_array("RIN", $facts_add) || in_array("RIN", $facts_unique)) self::AddSimpleTag("1 RIN");
 	// 		PRIM and THUM are added at linklevel		
 			if (in_array("NOTE", $facts_add) || in_array("NOTE", $facts_unique)) self::AddSimpleTag("1 NOTE");
-	//		if (in_array("SOUR", $facts_add) || in_array("SOUR", $facts_unique)) self::AddSimpleTag("1 SOUR");
 			if (in_array("SOUR", $facts_add) || in_array("SOUR", $facts_unique)) {
 				print "<tr><td colspan=\"2\">";
 				self::PrintAddLayer("SOUR", 1);
@@ -1593,17 +1598,14 @@ abstract class EditFunctions {
 	
 		$records = self::GetLinkedGedRecs($oldgid, $mtype, $gedid);
 			
-		foreach ($records as $key1=>$record) {	
-			$tt = preg_match("/0 @(.+)@ (.+)/", $record, $match);
-			$gid = $match[1];
-			$type = $match[2];
-			$subs = Getallsubrecords($record, "", false, false, false);
-			foreach ($subs as $key=>$sub) {
-				if (preg_match("/@$oldgid@/", $sub)) {
-					$tag = substr($sub, 2, 4);
-					if ($tag != "CHIL" && $tag != "HUSB" && $tag != "WIFE" && $tag != "FAMC" && $tag != "FAMS") {
-						$newsub = preg_replace("/(\d) (\w+) @$oldgid@/", "$1 $2 @$newgid@", $sub);
-						self::ReplaceGedrec($gid, $sub, $newsub, $tag, $change_id, $change_type, $gedid, $type);
+		foreach ($records as $key1 => $object) {	
+			foreach ($object->facts as $key2 => $fact) {
+				if ($fact->style != "change_old") {
+					if (preg_match("/@$oldgid@/", $fact->factrec)) {
+						if ($fact->fact != "CHIL" && $fact->fact != "HUSB" && $fact->fact != "WIFE" && $fact->fact != "FAMC" && $fact->fact != "FAMS") {
+							$newsub = preg_replace("/(\d) (\w+) @$oldgid@/", "$1 $2 @$newgid@", $fact->factrec);
+							self::ReplaceGedrec($fact->owner->xref, $fact->factrec, $newsub, $fact->fact, $change_id, $change_type, $gedid, $object->datatype);
+						}
 					}
 				}
 			}
@@ -1611,27 +1613,23 @@ abstract class EditFunctions {
 	}
 	
 	public function DeleteLinks($oldgid, $mtype, $change_id, $change_type, $gedid) {
-		global $GEDCOMID;
 	
 		// We miss the links on new records, which are only in the _changes table
 		$records = self::GetLinkedGedRecs($oldgid, $mtype, $gedid);
 		$success = true;
-		foreach ($records as $key1=>$record) {	
-			$tt = preg_match("/0 @(.+)@ (.+)/", $record, $match);
-			$gid = $match[1];
-			$type = $match[2];
-			if (ChangeFunctions::GetChangeData(true, $gid, true, "", "")) {
-				$rec = ChangeFunctions::GetChangeData(false, $gid, true, "gedlines", "");
-				$record = $rec[$GEDCOMID][$gid];
-			}
-			$subs = Getallsubrecords($record, "", false, false, false);
-			foreach ($subs as $key=>$sub) {
-				$ttt = preg_match("/1\s(\w+)/", $sub, $match3);
-				$fact = $match3[1];
-				if (preg_match("/(\d) (\w+) @$oldgid@/", $sub, $match2)) {
-					$subdel = GetSubRecord($match2[1], $match2[1]." ".$match2[2]." @".$oldgid."@", $sub);
-					$subnew = preg_replace("/$subdel/", "", $sub);
-					$success = $success && self::ReplaceGedrec($gid, $sub, $subnew, $fact, $change_id, $change_type, $gedid, $type);
+		foreach ($records as $key1 => $object) {
+			foreach($object->facts as $key2 => $fact) {
+				if ($fact->style != "change_old") {
+					if (preg_match("/(\d) (\w+ @$oldgid@)/", $fact->factrec, $match2)) {
+						// print "subold: ".$fact->factrec."<br />";
+						$subdel = GetSubRecord($match2[1], $match2[1]." ".$match2[2], $fact->factrec);
+						// print "string: ".$subdel."<br />";
+						// if (!strstr($fact->factrec, $subdel)) print "Not found!<br />";
+						$subnew = str_replace($subdel, "", $fact->factrec, $count);
+						// if ($count == 0) print "NOT REPLACED<br />";
+						// print "subnew: ".$subnew."<br /><br />";
+						$success = $success && self::ReplaceGedrec($fact->owner->xref, $fact->factrec, $subnew, $fact->fact, $change_id, $change_type, $gedid, $object->datatype);
+					}
 				}
 			}
 		}
@@ -1650,7 +1648,7 @@ abstract class EditFunctions {
 			$res = NewQuery($sql);
 			while($row = $res->FetchAssoc()) {
 				$object = ConstructObject($row["pid"], $row["type"], $gedid);
-				$records[$row["pid"]] = $object->gedrec;
+				$records[$row["pid"]] = $object;
 			}
 		}
 		// All pointing to this repo
@@ -1659,7 +1657,7 @@ abstract class EditFunctions {
 			$res = NewQuery($sql);
 			while($row = $res->FetchAssoc()) {
 				$object = ConstructObject($row["pid"], $row["type"], $gedid);
-				$records[$row["pid"]] = $object->gedrec;
+				$records[$row["pid"]] = $object;
 			}
 		}
 		// All pointing to this mm-object
@@ -1668,7 +1666,7 @@ abstract class EditFunctions {
 			$res = NewQuery($sql);
 			while($row = $res->FetchAssoc()) {
 				$object = ConstructObject($row["pid"], $row["type"], $gedid);
-				$records[$row["pid"]] = $object->gedrec;
+				$records[$row["pid"]] = $object;
 			}
 		}
 		// All pointing to this individual
@@ -1677,13 +1675,13 @@ abstract class EditFunctions {
 			$res = NewQuery($sql);
 			while($row = $res->FetchAssoc()) {
 				$object = ConstructObject(Splitkey($row["pid"], "id"), "FAM", $gedid);
-				$records[Splitkey($row["pid"], "id")] = $object->gedrec;
+				$records[Splitkey($row["pid"], "id")] = $object;
 			}
 			$sql = "SELECT as_of as pid, as_type as type FROM ".TBLPREFIX."asso WHERE as_pid='".JoinKey($oldgid, $gedid)."'";
 			$res = NewQuery($sql);
 			while($row = $res->FetchAssoc()) {
 				$object = ConstructObject(Splitkey($row["pid"], "id"), ($row["type"] == "I" ? "INDI" : "FAM"), $gedid);
-				$records[Splitkey($row["pid"], "id")] = $object->gedrec;
+				$records[Splitkey($row["pid"], "id")] = $object;
 			}
 		}
 		// All pointing to this family
@@ -1692,7 +1690,7 @@ abstract class EditFunctions {
 			$res = NewQuery($sql);
 			while($row = $res->FetchAssoc()) {
 				$object = ConstructObject(Splitkey($row["pid"], "id"), "INDI", $gedid);
-				$records[Splitkey($row["pid"], "id")] = $object->gedrec;
+				$records[Splitkey($row["pid"], "id")] = $object;
 			}
 		}
 		
@@ -1755,13 +1753,16 @@ abstract class EditFunctions {
 	}
 	
 	public function DeleteFamIfEmpty($famid, $change_id, $change_type, $gedid="") {
-		global $GEDCOMID;
+		static $chid;
 		
-		if (empty($gedid)) $gedid = $GEDCOMID;
-		$family = Family::GetInstance($famid, "", $gedid);
-		$famrec = $family->changedgedrec;
+		// Get a new change ID. Deletions must be in another change group as changes on the same record.
+		if (!isset($chid)) $chid = EditFunctions::GetNewXref("CHANGE");
+		if (empty($gedid)) $gedid = GedcomConfig::$GEDCOMID;
+		$family =& Family::NewInstance($famid, "", $gedid);
+		if ($family->ischanged) $famrec = $family->changedgedrec;
+		else $famrec = $family->gedrec;
 		$ct = preg_match("/1 CHIL|HUSB|WIFE/", $famrec);
-		if ($ct == 0) return ReplaceGedRec($famid, $famrec, "", "FAM", $change_id, $change_type, $gedid, "FAM");
+		if ($ct == 0) return self::ReplaceGedRec($famid, $famrec, "", "FAM", $chid, "delete_family", $gedid, "FAM");
 		else return true;
 	}
 	
@@ -1905,9 +1906,8 @@ abstract class EditFunctions {
 	}
 
 	public function HasOtherChanges($pid, $change_id, $gedid="") {
-		global $GEDCOMID;
 		
-		if (empty($gedid)) $gedid = $GEDCOMID;
+		if (empty($gedid)) $gedid = GedcomConfig::$GEDCOMID;
 		if (ChangeFunctions::GetChangeData(true, $pid, true)) {
 			$sql = "SELECT count(ch_id) FROM ".TBLPREFIX."changes WHERE ch_file='".$gedid."' AND ch_gid='".$pid."' AND ch_cid<>'".$change_id."'";
 			$res = NewQuery($sql);
@@ -1927,11 +1927,11 @@ abstract class EditFunctions {
 	
 	public function GetNewXref($type='INDI') {
 		global $changes;
-		global $FILE, $GEDCOMID;
+		global $FILE;
 		
 		
 		if (isset($FILE) && !is_array($FILE)) $gedid = get_id_from_gedcom($FILE);
-		else $gedid = $GEDCOMID;
+		else $gedid = GedcomConfig::$GEDCOMID;
 	
 		switch ($type) {
 			case "INDI":
@@ -1951,8 +1951,8 @@ abstract class EditFunctions {
 				$sql = "select max(cast(substring(s_id,".(strlen(GedcomConfig::$SOURCE_ID_PREFIX)+1).") as signed)) as xref from ".TBLPREFIX."sources where s_file = '".$gedid."'";
 				break;
 			case "REPO":
-				$sqlc = "select max(cast(substring(ch_gid,".(strlen(GedcomConfig::REPO_ID_PREFIX)+1).") as signed)) as xref from ".TBLPREFIX."changes where ch_file = '".$gedid."' AND ch_gid LIKE '".GedcomConfig::$REPO_ID_PREFIX."%'";
-				$sql = "select max(cast(substring(o_id,".(strlen(GedcomConfig::REPO_ID_PREFIX)+1).") as signed)) as xref from ".TBLPREFIX."other where o_file = '".$gedid."' and o_type = 'REPO'";
+				$sqlc = "select max(cast(substring(ch_gid,".(strlen(GedcomConfig::$REPO_ID_PREFIX)+1).") as signed)) as xref from ".TBLPREFIX."changes where ch_file = '".$gedid."' AND ch_gid LIKE '".GedcomConfig::$REPO_ID_PREFIX."%'";
+				$sql = "select max(cast(substring(o_id,".(strlen(GedcomConfig::$REPO_ID_PREFIX)+1).") as signed)) as xref from ".TBLPREFIX."other where o_file = '".$gedid."' and o_type = 'REPO'";
 				break;
 			case "NOTE":
 				$sqlc = "select max(cast(substring(ch_gid,".(strlen(GedcomConfig::$NOTE_ID_PREFIX)+1).") as signed)) as xref from ".TBLPREFIX."changes where ch_file = '".$gedid."' AND ch_gid LIKE '".GedcomConfig::$NOTE_ID_PREFIX."%'";
@@ -2044,7 +2044,79 @@ abstract class EditFunctions {
 		}
 		return $irec;
 	}
+
+	public function GetAssoRela() {
+			
+		// items for ASSO RELA selector :
+		$assokeys = array(
+		"attendant",
+		"attending",
+		"circumciser",
+		"civil_registrar",
+		"friend",
+		"godfather",
+		"godmother",
+		"godparent",
+		"informant",
+		"lodger",
+		"nurse",
+		"priest",
+		"rabbi",
+		"registry_officer",
+		"servant",
+		"submitter",
+		"twin",
+		"twin_brother",
+		"twin_sister",
+		"witness",
+		"" // DO NOT DELETE
+		);
+		$assorela = array();
+		foreach ($assokeys as $indexval => $key) {
+		  if (defined("GM_LANG_".$key)) $assorela["$key"] = constant("GM_LANG_".$key);
+		  else $assorela["$key"] = "? $key";
+		}
+		natsort($assorela);
+		return $assorela;
+	}
 	
+	public function FindSubmitter($gedid) {
+		
+		if (!isset($gedid)) $gedid = GedcomConfig::$GEDCOMID;
+		$sql = "SELECT * FROM ".TBLPREFIX."other WHERE o_file='".$gedid."' AND o_type='SUBM'";
+		$res = NewQuery($sql);
+		if ($res && $res->NumRows() > 0) {
+			$row = $res->FetchAssoc();
+			return Submitter::GetInstance($row["o_id"], $row, $row["o_file"]);
+		}
+		else {
+			// If there is a new unapproved submitter record, is has the default pid
+			if (ChangeFunctions::GetChangeData(true, "SUB1", false, "", "")) {
+				return Submitter::GetInstance("SUB1", "", $gedid);
+			}
+		}
+		return "";
+	}
 	
+	public function CheckReorder($array) {
+		
+		$check = array();
+		for ($i = 1; $i <= count($array); $i++) {
+			$check[$i] = true;
+		}
+		foreach ($array as $key => $value) {
+			if (!isset($check[$value])) return false;
+			else unset($check[$value]);
+		}
+		return true;
+	} 
+
+	public function DeleteIDFromChangeGroup($id, $file, $group) {
+		
+		$sql = "DELETE FROM ".TBLPREFIX."changes WHERE ch_cid='".$group."' AND ch_file='".$file."' AND ch_gid='".$id."'";
+		$res = NewQuery($sql);
+		if ($res) return true;
+		else return false;
+	}
 }
 ?>

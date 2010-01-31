@@ -46,7 +46,6 @@ class FamilyController extends DetailController
 			$pbheight,
 			$bheight,
 			$famlist,
-			$GEDCOMID,
 			$ENABLE_CLIPPINGS_CART,
 			$nonfacts
 		;

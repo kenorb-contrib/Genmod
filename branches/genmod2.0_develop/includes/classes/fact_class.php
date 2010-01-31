@@ -111,6 +111,9 @@ class Fact {
 			case "resnvalue":
 				return $this->getResnValue();
 				break;
+			case "gedcomid":
+				return $this->gedcomid;
+				break;
 //			case "factassos":
 //				return $this->getFactAssos();
 //				break;

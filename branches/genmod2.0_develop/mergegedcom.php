@@ -364,7 +364,7 @@ print "<form enctype=\"multipart/form-data\" method=\"post\" name=\"configform\"
 						if (isset($merge_ged)) {
 							if ($merge_ged==$gedc) print " selected=\"selected\"";
 						}
-						else if ($GEDCOMID == $gedc) print " selected=\"selected\"";
+						else if (GedcomConfig::$GEDCOMID == $gedc) print " selected=\"selected\"";
 						print ">".PrintReady($gedarray["title"])."</option>";
 					}
 					print "</select>";
@@ -576,7 +576,7 @@ print "<form enctype=\"multipart/form-data\" method=\"post\" name=\"configform\"
 							$cleanup_needed = true;
 							print "<input type=\"hidden\" name=\"cleanup_needed\" value=\"cleanup_needed\">";
 							if (!AdminFunctions::FileIsWriteable($GEDFILENAME) && (file_exists($GEDFILENAME))) {
-								print "<span class=\"error\">".str_replace("#GEDCOM#", get_gedcom_from_id($GEDCOMID), GM_LANG_error_header_write)."</span>\n";
+								print "<span class=\"error\">".str_replace("#GEDCOM#", get_gedcom_from_id(GedcomConfig::$GEDCOMID), GM_LANG_error_header_write)."</span>\n";
 							}
 							// NOTE: Check for head cleanu
 							if ($l_headcleanup) {
@@ -759,7 +759,6 @@ print "<form enctype=\"multipart/form-data\" method=\"post\" name=\"configform\"
 		 * @param long $FILE_SIZE	the size of the file
 		 */
 		function setup_progress_bar($FILE_SIZE) {
-			global $GEDCOMID, $timelimit;
 			?>
 			<script type="text/javascript">
 			<!--
@@ -767,9 +766,9 @@ print "<form enctype=\"multipart/form-data\" method=\"post\" name=\"configform\"
 				progress = document.getElementById("progress_header");
 				if (progress) progress.innerHTML = '<?php print "<span class=\"error\"><b>".GM_LANG_import_complete."</b></span><br />";?>'+exectext+' '+time+' '+"<?php print GM_LANG_sec; ?>";
 				progress = document.getElementById("link1");
-				if (progress) progress.innerHTML = '<a href="pedigree.php?gedid=<?php print $GEDCOMID; ?>">'+go_pedi+'</a>';
+				if (progress) progress.innerHTML = '<a href="pedigree.php?gedid=<?php print GedcomConfig::$GEDCOMID; ?>">'+go_pedi+'</a>';
 				progress = document.getElementById("link2");
-				if (progress) progress.innerHTML = '<a href="index.php?command=gedcom&gedid=<?php print $GEDCOMID; ?>">'+go_welc+'</a>';
+				if (progress) progress.innerHTML = '<a href="index.php?command=gedcom&gedid=<?php print GedcomConfig::$GEDCOMID; ?>">'+go_welc+'</a>';
 				progress = document.getElementById("link3");
 				if (progress) progress.innerHTML = '<a href="editgedcoms.php">'+"<?php print GM_LANG_manage_gedcoms."</a>"; ?>";
 			}
@@ -991,10 +990,10 @@ print "<form enctype=\"multipart/form-data\" method=\"post\" name=\"configform\"
 												
 						//-- import anything that is not a blob
 						if (preg_match("/\n1 BLOB/", $indirec)==0) {
-							$gid = ImportFunctions::ImportRecord($indirec);
+							$gid = ImportFunctions::ImportRecord($indirec, false, GedcomConfig::$GEDCOMID);
 							$type = GetRecType($indirec);
-							$place_count += ImportFunctions::UpdatePlaces($gid, $type, $indirec);
-							$date_count += ImportFunctions::UpdateDates($gid, $indirec);
+							$place_count += ImportFunctions::UpdatePlaces($gid, $type, $indirec, false, GedcomConfig::$GEDCOMID);
+							$date_count += ImportFunctions::UpdateDates($gid, $indirec, GedcomConfig::$GEDCOMID);
 						}
 						else WriteToLog("MergeGedcom -> Import skipped a aecord with a BLOB tag: ".$indirec, "E", "G", get_gedcomid_from_file($FILE));
 						

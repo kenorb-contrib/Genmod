@@ -223,7 +223,7 @@ if (($surname_sublist=="yes")&&($show_all=="yes")) {
 	$indi_alive = 0;
 	foreach($indilist as $gid=>$indi) {
 		// NOTE: Make sure that favorites from other gedcoms are not shown
-		if ($indi["gedfile"]==$GEDCOMID) {
+		if ($indi["gedfile"]==GedcomConfig::$GEDCOMID) {
 			if (PrivacyFunctions::showLivingNameById($gid)) {
 				$ret = check_alive($indi["gedcom"], $year, $type, $useMAA);
 				if ($ret==0) {

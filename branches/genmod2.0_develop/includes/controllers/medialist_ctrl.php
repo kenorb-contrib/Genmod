@@ -63,12 +63,12 @@ class MediaListController {
 	** @param $max		how many max to return (counted after privacy is applied
 	*/	
 	public function RetrieveMedia($count=0, $start=0, $max=0) {
-		global $GEDCOMID;
+		
 		$found = 0;
 		$added = 0;
 		// sort the data on title, if absent on the filename with heading . and / stripped.
-		if ($count == 0) $sql = "SELECT *, concat(m_titl, if(substr(if(substr(m_mfile,1,1)='.',substr(m_mfile,2),m_mfile),1,1)='/',substr(if(substr(m_mfile,1,1)='.',substr(m_mfile,2),m_mfile),2),if(substr(m_mfile,1,1)='.',substr(m_mfile,2),m_mfile))) as k FROM ".TBLPREFIX."media WHERE m_file='".$GEDCOMID."' ORDER BY k";
-		else $sql = "SELECT * FROM ".TBLPREFIX."media WHERE m_file='".$GEDCOMID."' ORDER BY RAND() LIMIT ".$count;
+		if ($count == 0) $sql = "SELECT *, concat(m_titl, if(substr(if(substr(m_mfile,1,1)='.',substr(m_mfile,2),m_mfile),1,1)='/',substr(if(substr(m_mfile,1,1)='.',substr(m_mfile,2),m_mfile),2),if(substr(m_mfile,1,1)='.',substr(m_mfile,2),m_mfile))) as k FROM ".TBLPREFIX."media WHERE m_file='".GedcomConfig::$GEDCOMID."' ORDER BY k";
+		else $sql = "SELECT * FROM ".TBLPREFIX."media WHERE m_file='".GedcomConfig::$GEDCOMID."' ORDER BY RAND() LIMIT ".$count;
 		$db = NewQuery($sql);
 		$this->totalmediaitems = $db->NumRows();
 		while($row = $db->FetchAssoc()) {
@@ -94,51 +94,51 @@ class MediaListController {
 	}
 		
 	public function RetrieveFilterMedia($filter, $start=0, $max=0) {
-		global $GEDCOMID;
+		
 		$found = 0;
 		$added = 0;
 		$t = 1;
 		if ($t == 1) {
-		$sql = "SELECT *, concat(m_titl, if(substr(if(substr(m_mfile,1,1)='.',substr(m_mfile,2),m_mfile),1,1)='/',substr(if(substr(m_mfile,1,1)='.',substr(m_mfile,2),m_mfile),2),if(substr(m_mfile,1,1)='.',substr(m_mfile,2),m_mfile))) as k FROM ".TBLPREFIX."media WHERE m_file='".$GEDCOMID."' AND m_media IN
+		$sql = "SELECT *, concat(m_titl, if(substr(if(substr(m_mfile,1,1)='.',substr(m_mfile,2),m_mfile),1,1)='/',substr(if(substr(m_mfile,1,1)='.',substr(m_mfile,2),m_mfile),2),if(substr(m_mfile,1,1)='.',substr(m_mfile,2),m_mfile))) as k FROM ".TBLPREFIX."media WHERE m_file='".GedcomConfig::$GEDCOMID."' AND m_media IN
 		(SELECT mm_media FROM ".TBLPREFIX."media_mapping WHERE mm_gid IN
-			(SELECT n_gid FROM ".TBLPREFIX."names WHERE n_name LIKE '%".$filter."%' AND n_file = '".$GEDCOMID."'
+			(SELECT n_gid FROM ".TBLPREFIX."names WHERE n_name LIKE '%".$filter."%' AND n_file = '".GedcomConfig::$GEDCOMID."'
 			UNION
 			SELECT f_id FROM ".TBLPREFIX."families f
 			JOIN ".TBLPREFIX."names i
 			ON f_husb = n_key
-			WHERE f.f_file = '".$GEDCOMID."'
-			AND i.n_file = '".$GEDCOMID."'
+			WHERE f.f_file = '".GedcomConfig::$GEDCOMID."'
+			AND i.n_file = '".GedcomConfig::$GEDCOMID."'
 			AND n_name LIKE '%".$filter."%'
 			UNION
 			SELECT f_id FROM ".TBLPREFIX."families f
 			JOIN ".TBLPREFIX."names i
 			ON f_wife = n_key
-			WHERE f.f_file = '".$GEDCOMID."'
-			AND i.n_file = '".$GEDCOMID."'
+			WHERE f.f_file = '".GedcomConfig::$GEDCOMID."'
+			AND i.n_file = '".GedcomConfig::$GEDCOMID."'
 			AND n_name LIKE '%".$filter."%'
 			UNION
-			SELECT s_id FROM ".TBLPREFIX."sources WHERE s_name LIKE '%".$filter."%' AND s_file = '".$GEDCOMID."')
-			AND mm_file = '".$GEDCOMID."'
+			SELECT s_id FROM ".TBLPREFIX."sources WHERE s_name LIKE '%".$filter."%' AND s_file = '".GedcomConfig::$GEDCOMID."')
+			AND mm_file = '".GedcomConfig::$GEDCOMID."'
 		) 
 		OR
-		((m_titl LIKE '%".$filter."%' OR m_gedrec LIKE '%".$filter."%') AND m_file = '".$GEDCOMID."')
+		((m_titl LIKE '%".$filter."%' OR m_gedrec LIKE '%".$filter."%') AND m_file = '".GedcomConfig::$GEDCOMID."')
 		ORDER BY k";
 		}
 		else {
-		$sql = "SELECT *, concat(m_titl, if(substr(if(substr(m_mfile,1,1)='.',substr(m_mfile,2),m_mfile),1,1)='/',substr(if(substr(m_mfile,1,1)='.',substr(m_mfile,2),m_mfile),2),if(substr(m_mfile,1,1)='.',substr(m_mfile,2),m_mfile))) as k FROM ".TBLPREFIX."media WHERE m_file='".$GEDCOMID."' AND m_media IN
-		(SELECT mm_media FROM ".TBLPREFIX."media_mapping WHERE CONCAT(mm_gid,'[".$GEDCOMID."]') IN
-			(SELECT n_key FROM ".TBLPREFIX."names WHERE n_name LIKE '%".$filter."%' AND n_file = '".$GEDCOMID."'
+		$sql = "SELECT *, concat(m_titl, if(substr(if(substr(m_mfile,1,1)='.',substr(m_mfile,2),m_mfile),1,1)='/',substr(if(substr(m_mfile,1,1)='.',substr(m_mfile,2),m_mfile),2),if(substr(m_mfile,1,1)='.',substr(m_mfile,2),m_mfile))) as k FROM ".TBLPREFIX."media WHERE m_file='".GedcomConfig::$GEDCOMID."' AND m_media IN
+		(SELECT mm_media FROM ".TBLPREFIX."media_mapping WHERE CONCAT(mm_gid,'[".GedcomConfig::$GEDCOMID."]') IN
+			(SELECT n_key FROM ".TBLPREFIX."names WHERE n_name LIKE '%".$filter."%' AND n_file = '".GedcomConfig::$GEDCOMID."'
 			UNION
 			SELECT if_fkey FROM ".TBLPREFIX."names 
 			JOIN ".TBLPREFIX."individual_family 
 			ON if_pkey = n_key  
-			WHERE n_name LIKE '%".$filter."%' AND if_role='S' AND n_file='".$GEDCOMID."'
+			WHERE n_name LIKE '%".$filter."%' AND if_role='S' AND n_file='".GedcomConfig::$GEDCOMID."'
 			UNION
-			SELECT CONCAT(s_id,'[".$GEDCOMID."]') FROM ".TBLPREFIX."sources WHERE s_name LIKE '%".$filter."%' AND s_file = '".$GEDCOMID."')
-			AND mm_file = '".$GEDCOMID."'
+			SELECT CONCAT(s_id,'[".GedcomConfig::$GEDCOMID."]') FROM ".TBLPREFIX."sources WHERE s_name LIKE '%".$filter."%' AND s_file = '".GedcomConfig::$GEDCOMID."')
+			AND mm_file = '".GedcomConfig::$GEDCOMID."'
 		) 
 		OR
-		((m_titl LIKE '%".$filter."%' OR m_gedrec LIKE '%".$filter."%') AND m_file = '".$GEDCOMID."')
+		((m_titl LIKE '%".$filter."%' OR m_gedrec LIKE '%".$filter."%') AND m_file = '".GedcomConfig::$GEDCOMID."')
 		ORDER BY k";
 		}
 		$db = NewQuery($sql);

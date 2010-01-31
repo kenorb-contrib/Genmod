@@ -28,9 +28,9 @@
 			<GMRCell width="0" height="30" align="center" style="header"><GMRvar var="GM_LANG_ahnentafel_header" /><GMRGetPersonName id="$pid" hideID="true" /></GMRCell>
 			<GMRRelatives id="$pid" group="direct-ancestors" sortby="none" maxgen="$maxgen" showempty="true">
 				<GMRSetVar name="gender" value="m" />
-				<GMRSetVar name="pronoun" value="$GM_LANG_ahnentafel_pronoun_m" />
+				<GMRSetVar name="pronoun" value="GM_LANG_ahnentafel_pronoun_m" />
 				<GMRif condition="@SEX=='F'">
-					<GMRSetVar name="pronoun" value="$GM_LANG_ahnentafel_pronoun_f" />
+					<GMRSetVar name="pronoun" value="GM_LANG_ahnentafel_pronoun_f" />
 					<GMRSetVar name="gender" value="f" />
 				</GMRif>
 				<GMRSetVar name="printPronoun" value=" " />

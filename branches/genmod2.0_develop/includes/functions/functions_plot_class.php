@@ -35,10 +35,9 @@ if (stristr($_SERVER["SCRIPT_NAME"],basename(__FILE__))) {
 abstract class PlotFunctions {
 
 	public function GetPlotData($gedcomid="") {
-		global $GEDCOMID;
 		global $nrfam, $famgeg, $nrpers, $persgeg, $key2ind, $nrman, $nrvrouw;
 		
-		if (empty($gedcomid)) $gedcomid = $GEDCOMID;
+		if (empty($gedcomid)) $gedcomid = GedcomConfig::$GEDCOMID;
 		
 		// check if we must update the cache anyway
 		$cache_load = GedcomConfig::GetLastCacheDate("plotdata", $gedcomid);
@@ -128,9 +127,9 @@ abstract class PlotFunctions {
 	}		
 	private function GetPlotPerson() {
 		global $nrfam, $famgeg, $famgeg1, $nrpers, $persgeg, $persgeg1, $key2ind, $nrman, $nrvrouw;
-		global $GEDCOMID, $monthtonum;
+		global $monthtonum;
 	
-		$sql = "SELECT i_key, i_gender, d_fact, d_month, d_year, if_fkey FROM ".TBLPREFIX."individuals LEFT JOIN ".TBLPREFIX."individual_family ON ((i_key=if_pkey AND if_role='S') OR if_pkey IS NULL) LEFT JOIN ".TBLPREFIX."dates ON (i_key=d_key AND (d_fact IS NULL OR (d_month<>'' AND d_year<>0 AND d_fact IN ('BIRT', 'CHR', 'BAPM', 'DEAT') AND d_ext=''))) WHERE i_file=".$GEDCOMID." ORDER BY i_key, d_year, d_month, d_day";
+		$sql = "SELECT i_key, i_gender, d_fact, d_month, d_year, if_fkey FROM ".TBLPREFIX."individuals LEFT JOIN ".TBLPREFIX."individual_family ON ((i_key=if_pkey AND if_role='S') OR if_pkey IS NULL) LEFT JOIN ".TBLPREFIX."dates ON (i_key=d_key AND (d_fact IS NULL OR (d_month<>'' AND d_year<>0 AND d_fact IN ('BIRT', 'CHR', 'BAPM', 'DEAT') AND d_ext=''))) WHERE i_file=".GedcomConfig::$GEDCOMID." ORDER BY i_key, d_year, d_month, d_day";
 	
 		$res = NewQuery($sql);
 		$persgeg = array();
@@ -184,7 +183,6 @@ abstract class PlotFunctions {
 	
 	private function CompletePlotData() {
 		global $nrfam, $famgeg, $famgeg1, $nrpers, $persgeg, $persgeg1,$key2ind,$nrman,$nrvrouw;
-		global $GEDCOMID;
 		
 		// fill in the first marriages instead of the keys.
 		$childs = array();
@@ -271,14 +269,14 @@ abstract class PlotFunctions {
 	private function GetPlotFamily() {
 		global $nrfam, $famgeg, $famgeg1, $nrpers, $persgeg, $persgeg1,$key2ind,$nrman,$nrvrouw;
 		global $match1, $famlist;
-		global $GEDCOMID, $monthtonum;
+		global $monthtonum;
 	
 		$famgeg = array();
 		$famgeg1 = array();
 		$count = -1;
 		$lastkey = "";
 		
-		$sql = "SELECT f_key, f_husb, f_wife, d_fact, d_month, d_year, if_pkey FROM ".TBLPREFIX."families LEFT JOIN ".TBLPREFIX."individual_family ON ((f_key=if_fkey AND if_role='C') OR if_fkey IS NULL) LEFT JOIN ".TBLPREFIX."dates ON (f_key=d_key AND (d_fact IS NULL OR (d_month<>'' AND d_year<>0 AND d_fact IN ('MARR', 'MARS', 'DIV') AND d_ext=''))) WHERE f_file=".$GEDCOMID." ORDER BY f_key, d_year, d_month, d_day";
+		$sql = "SELECT f_key, f_husb, f_wife, d_fact, d_month, d_year, if_pkey FROM ".TBLPREFIX."families LEFT JOIN ".TBLPREFIX."individual_family ON ((f_key=if_fkey AND if_role='C') OR if_fkey IS NULL) LEFT JOIN ".TBLPREFIX."dates ON (f_key=d_key AND (d_fact IS NULL OR (d_month<>'' AND d_year<>0 AND d_fact IN ('MARR', 'MARS', 'DIV') AND d_ext=''))) WHERE f_file=".GedcomConfig::$GEDCOMID." ORDER BY f_key, d_year, d_month, d_day";
 		$res = NewQuery($sql);
 		
 		while ($row = $res->FetchAssoc()) {	

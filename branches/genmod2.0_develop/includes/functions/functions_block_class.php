@@ -38,7 +38,6 @@ abstract class BlockFunctions {
 	 * @return array
 	 */
 	public function GetTopSurnames($num) {
-		global $GEDCOMID;
 	
 		//-- Exclude the common surnames to be removed
 		$delnames = array();
@@ -51,7 +50,7 @@ abstract class BlockFunctions {
 		}
 		//-- Perform the query
 		$surnames = array();
-		$sql = "(SELECT COUNT(n_surname) as count, n_surname FROM ".TBLPREFIX."names WHERE n_file='".$GEDCOMID."' AND n_type!='C' AND n_surname<>'@N.N.'".$delstrn." GROUP BY n_surname) ORDER BY count DESC LIMIT ".$num;
+		$sql = "(SELECT COUNT(n_surname) as count, n_surname FROM ".TBLPREFIX."names WHERE n_file='".GedcomConfig::$GEDCOMID."' AND n_type!='C' AND n_surname<>'@N.N.'".$delstrn." GROUP BY n_surname) ORDER BY count DESC LIMIT ".$num;
 		$res = NewQuery($sql);
 		if ($res) {
 			while($row = $res->FetchRow()) {
@@ -68,7 +67,7 @@ abstract class BlockFunctions {
 	
 	public function GetCachedEvents($action, $daysprint, $filter, $onlyBDM="no", $skipfacts) {
 		global $month, $year, $day, $monthtonum, $monthstart;
-		global $GEDCOMID, $ASC, $IGNORE_FACTS, $IGNORE_YEAR;
+		global $ASC, $IGNORE_FACTS, $IGNORE_YEAR;
 		global $CIRCULAR_BASE;
 		
 		$found_facts = array();
@@ -89,14 +88,14 @@ abstract class BlockFunctions {
 		$cache_refresh = false;
 		
 		// Retrieve the last change date
-		$mday = GedcomConfig::GetLastCacheDate($action, $GEDCOMID);
+		$mday = GedcomConfig::GetLastCacheDate($action, GedcomConfig::$GEDCOMID);
 //	 $mday = 0;  // to force cache rebuild
 		if ($mday==$monthstart) {
 			$cache_load = true;
 	//		print "Retrieve from cache";
 		}
 		else {
-			$sql = "DELETE FROM ".TBLPREFIX."eventcache WHERE ge_cache='".$action."' AND ge_file='".$GEDCOMID."'";
+			$sql = "DELETE FROM ".TBLPREFIX."eventcache WHERE ge_cache='".$action."' AND ge_file='".GedcomConfig::$GEDCOMID."'";
 			$res = NewQuery($sql);
 		}
 		
@@ -201,19 +200,19 @@ abstract class BlockFunctions {
 			uasort($found_facts, "CompareFacts");
 		
 			foreach ($found_facts as $key => $factr) {
-				$sql = "INSERT INTO ".TBLPREFIX."eventcache VALUES('0','".$GEDCOMID."', '".$action."', '".$factr[0]."', '".$factr[7]."', '".$factr[6]."', '".mysql_real_escape_string($factr[1])."', '".$factr[2]."', '".$factr[3]."', '".mysql_real_escape_string($factr[4])."', '".$factr[5]."')";
+				$sql = "INSERT INTO ".TBLPREFIX."eventcache VALUES('0','".GedcomConfig::$GEDCOMID."', '".$action."', '".$factr[0]."', '".$factr[7]."', '".$factr[6]."', '".mysql_real_escape_string($factr[1])."', '".$factr[2]."', '".$factr[3]."', '".mysql_real_escape_string($factr[4])."', '".$factr[5]."')";
 				$res = NewQuery($sql);
 				$error = mysql_error();
 				if (!empty($error)) print $error."<br />";
 			}
-			GedcomConfig::SetLastCacheDate($action, $monthstart, $GEDCOMID);
+			GedcomConfig::SetLastCacheDate($action, $monthstart, GedcomConfig::$GEDCOMID);
 		}
 		
 		// load the cache from DB
 	
 		$monthend = $monthstart + (60*60*24*($daysprint-1));
 		$found_facts = array();
-		$sql = "SELECT ge_gid, ge_factrec, ge_type, ge_datestamp, ge_name, ge_gender, ge_fact, ge_isdead FROM ".TBLPREFIX."eventcache WHERE ge_cache='".$action."' AND ge_file='".$GEDCOMID."' AND ge_datestamp BETWEEN ".$monthstart." AND ".$monthend;
+		$sql = "SELECT ge_gid, ge_factrec, ge_type, ge_datestamp, ge_name, ge_gender, ge_fact, ge_isdead FROM ".TBLPREFIX."eventcache WHERE ge_cache='".$action."' AND ge_file='".GedcomConfig::$GEDCOMID."' AND ge_datestamp BETWEEN ".$monthstart." AND ".$monthend;
 		if ($onlyBDM == "yes") $sql .= " AND ge_fact IN ('BIRT', 'DEAT', 'MARR')";
 		if ($filter == "alive") $sql .= " AND ge_isdead=0";
 		$sql .= " ORDER BY ge_order";
@@ -426,7 +425,7 @@ abstract class BlockFunctions {
 	}
 	
 	public function PrintBlockAddFavorite($command, $type) {
-		global $GM_IMAGES, $GEDCOMID;
+		global $GM_IMAGES;
 		
 		?>
 			<script language="JavaScript" type="text/javascript">
@@ -448,7 +447,7 @@ abstract class BlockFunctions {
 		print "<input type=\"hidden\" name=\"favtype\" value=\"".$type."\" />\n";
 		print "<table border=\"0\" cellspacing=\"0\" width=\"100%\"><tr><td>".GM_LANG_add_fav_enter_id." <br />";
 		print "<input class=\"pedigree_form\" type=\"text\" name=\"gid\" id=\"gid\" size=\"3\" value=\"\" />";
-		LinkFunctions::PrintFindIndiLink("gid",$GEDCOMID);
+		LinkFunctions::PrintFindIndiLink("gid",GedcomConfig::$GEDCOMID);
 		LinkFunctions::PrintFindFamilyLink("gid");
 		LinkFunctions::PrintFindSourceLink("gid");
 		LinkFunctions::PrintFindMediaLink("gid");
@@ -465,19 +464,19 @@ abstract class BlockFunctions {
 	}
 
 	public function GetCachedStatistics() {
-		global $monthtonum, $GEDCOMID;
+		global $monthtonum;
 		
 		// First see if the cache must be refreshed
-		$cache_load = GedcomConfig::GetLastCacheDate("stats", $GEDCOMID);
+		$cache_load = GedcomConfig::GetLastCacheDate("stats", GedcomConfig::$GEDCOMID);
 		if (!$cache_load) {
-			$sql = "DELETE FROM ".TBLPREFIX."statscache WHERE gs_file='".$GEDCOMID."'";
+			$sql = "DELETE FROM ".TBLPREFIX."statscache WHERE gs_file='".GedcomConfig::$GEDCOMID."'";
 			$res = NewQuery($sql);
 		}
 		$stats = array();
 		// The title must be generated every time because the language may differ
 		$stats["gs_title"] = "";
 		$head = "";
-		$sql = "SELECT o_gedrec FROM ".TBLPREFIX."other WHERE o_id='HEAD' AND o_file='".$GEDCOMID."'";
+		$sql = "SELECT o_gedrec FROM ".TBLPREFIX."other WHERE o_id='HEAD' AND o_file='".GedcomConfig::$GEDCOMID."'";
 		$res = NewQuery($sql);
 		if ($res->NumRows() > 0) {
 			$row = $res->FetchAssoc();
@@ -520,7 +519,7 @@ abstract class BlockFunctions {
 	
 			//-- total unique surnames
 			$sql = "SELECT count(surnames) FROM (";
-			$sql .= "SELECT distinct n_surname as surnames FROM ".TBLPREFIX."names WHERE n_file='".$GEDCOMID."'";
+			$sql .= "SELECT distinct n_surname as surnames FROM ".TBLPREFIX."names WHERE n_file='".GedcomConfig::$GEDCOMID."'";
 			$sql .= ") as sn GROUP BY surnames";
 			$res = NewQuery($sql);
 			$stats["gs_nr_surnames"] = $res->NumRows();
@@ -532,7 +531,7 @@ abstract class BlockFunctions {
 			$stats["gs_nr_media"] = GetListSize("medialist");
 	
 			//-- total events
-			$sql = "SELECT COUNT(d_gid) FROM ".TBLPREFIX."dates WHERE d_file='".$GEDCOMID."'";
+			$sql = "SELECT COUNT(d_gid) FROM ".TBLPREFIX."dates WHERE d_file='".GedcomConfig::$GEDCOMID."'";
 			$res = NewQuery($sql);
 			$row = $res->FetchRow();
 			$stats["gs_nr_events"] = $row[0];
@@ -541,7 +540,7 @@ abstract class BlockFunctions {
 			// NOTE: Get earliest birth year
 			$sql = "SELECT d_gid, d_year, d_month, FIELD(d_month";
 			foreach($monthtonum as $month=>$mon) $sql .= ", '".$month."'";
-			$sql .= ") as d_mon, d_day FROM ".TBLPREFIX."dates WHERE d_file = '".$GEDCOMID."' AND d_fact = 'BIRT' AND d_year != '0' AND d_type IS NULL ORDER BY d_year ASC, d_mon ASC, d_day ASC LIMIT 1";
+			$sql .= ") as d_mon, d_day FROM ".TBLPREFIX."dates WHERE d_file = '".GedcomConfig::$GEDCOMID."' AND d_fact = 'BIRT' AND d_year != '0' AND d_type IS NULL ORDER BY d_year ASC, d_mon ASC, d_day ASC LIMIT 1";
 			// print $sql;
 			$res = NewQuery($sql);
 			$row = $res->FetchRow();
@@ -552,7 +551,7 @@ abstract class BlockFunctions {
 			// NOTE: Get the latest birth year
 			$sql = "select d_gid, d_year, d_month, FIELD(d_month";
 			foreach($monthtonum as $month=>$mon) $sql .= ", '".$month."'";
-			$sql .= ") as d_mon, d_day from ".TBLPREFIX."dates where d_file = '".$GEDCOMID."' and d_fact = 'BIRT' and d_year != '0' and d_type is null ORDER BY d_year DESC, d_mon DESC , d_day DESC LIMIT 1";
+			$sql .= ") as d_mon, d_day from ".TBLPREFIX."dates where d_file = '".GedcomConfig::$GEDCOMID."' and d_fact = 'BIRT' and d_year != '0' and d_type is null ORDER BY d_year DESC, d_mon DESC , d_day DESC LIMIT 1";
 			$res = NewQuery($sql);
 			$row = $res->FetchRow();
 			$res->FreeResult();
@@ -560,7 +559,7 @@ abstract class BlockFunctions {
 			$stats["gs_latest_birth_gid"] = $row[0];
 	
 			// NOTE: Get the person who lived the longest
-			$sql = "SELECT death.d_year-birth.d_year AS age, death.d_gid FROM ".TBLPREFIX."dates AS death, ".TBLPREFIX."dates AS birth WHERE birth.d_gid=death.d_gid AND death.d_file='".$GEDCOMID."' and birth.d_file=death.d_file AND birth.d_fact='BIRT' AND death.d_fact='DEAT' AND birth.d_year>0 AND death.d_year>0 AND birth.d_type IS NULL AND death.d_type IS NULL ORDER BY age DESC limit 1";
+			$sql = "SELECT death.d_year-birth.d_year AS age, death.d_gid FROM ".TBLPREFIX."dates AS death, ".TBLPREFIX."dates AS birth WHERE birth.d_gid=death.d_gid AND death.d_file='".GedcomConfig::$GEDCOMID."' and birth.d_file=death.d_file AND birth.d_fact='BIRT' AND death.d_fact='DEAT' AND birth.d_year>0 AND death.d_year>0 AND birth.d_type IS NULL AND death.d_type IS NULL ORDER BY age DESC limit 1";
 			$res = NewQuery($sql);
 			$row = $res->FetchRow();
 			$res->FreeResult();
@@ -568,7 +567,7 @@ abstract class BlockFunctions {
 			$stats["gs_longest_live_gid"] = $row[1];
 			
 			//-- avg age at death
-			$sql = "SELECT AVG(death.d_year-birth.d_year) AS age FROM ".TBLPREFIX."dates AS death, ".TBLPREFIX."dates AS birth WHERE birth.d_gid=death.d_gid AND death.d_file='".$GEDCOMID."' AND birth.d_file=death.d_file AND birth.d_fact='BIRT' AND death.d_fact='DEAT' AND birth.d_year>0 AND death.d_year>0 AND birth.d_type IS NULL AND death.d_type IS NULL";
+			$sql = "SELECT AVG(death.d_year-birth.d_year) AS age FROM ".TBLPREFIX."dates AS death, ".TBLPREFIX."dates AS birth WHERE birth.d_gid=death.d_gid AND death.d_file='".GedcomConfig::$GEDCOMID."' AND birth.d_file=death.d_file AND birth.d_fact='BIRT' AND death.d_fact='DEAT' AND birth.d_year>0 AND death.d_year>0 AND birth.d_type IS NULL AND death.d_type IS NULL";
 			$res = NewQuery($sql);
 			if ($res) {
 				$row = $res->FetchRow();
@@ -577,7 +576,7 @@ abstract class BlockFunctions {
 			else $stats["gs_avg_age"] = "";
 						
 			//-- most children
-			$sql = "SELECT f_numchil, f_id FROM ".TBLPREFIX."families WHERE f_file='".$GEDCOMID."' ORDER BY f_numchil DESC LIMIT 10";
+			$sql = "SELECT f_numchil, f_id FROM ".TBLPREFIX."families WHERE f_file='".GedcomConfig::$GEDCOMID."' ORDER BY f_numchil DESC LIMIT 10";
 			$res = NewQuery($sql);
 			if ($res) {
 				$row = $res->FetchRow();
@@ -591,7 +590,7 @@ abstract class BlockFunctions {
 			}
 	
 			//-- avg number of children
-			$sql = "SELECT AVG(f_numchil) FROM ".TBLPREFIX."families WHERE f_file='".$GEDCOMID."'";
+			$sql = "SELECT AVG(f_numchil) FROM ".TBLPREFIX."families WHERE f_file='".GedcomConfig::$GEDCOMID."'";
 			$res = NewQuery($sql, false);
 			if ($res) {
 				$row = $res->FetchRow();
@@ -602,7 +601,7 @@ abstract class BlockFunctions {
 			
 			$sql = "INSERT INTO ".TBLPREFIX."statscache ";
 			$sqlf = "(gs_file";
-			$sqlv = "('".$GEDCOMID."'";
+			$sqlv = "('".GedcomConfig::$GEDCOMID."'";
 			foreach($stats as $skey => $svalue) {
 				if ($skey != "gs_title") {
 					$sqlf .= ", ".$skey;
@@ -613,9 +612,9 @@ abstract class BlockFunctions {
 			$sqlv .= ")";
 			$sql .= $sqlf." VALUES ".$sqlv;
 			$res = NewQuery($sql);
-			GedcomConfig::SetLastCacheDate("stats", time(), $GEDCOMID);
+			GedcomConfig::SetLastCacheDate("stats", time(), GedcomConfig::$GEDCOMID);
 		}
-		$sql = "SELECT * FROM ".TBLPREFIX."statscache WHERE gs_file='".$GEDCOMID."'";
+		$sql = "SELECT * FROM ".TBLPREFIX."statscache WHERE gs_file='".GedcomConfig::$GEDCOMID."'";
 		$res = NewQuery($sql);
 		while($row = $res->FetchAssoc($res->result)){
 			foreach ($row as $key => $value) {
@@ -775,7 +774,6 @@ abstract class BlockFunctions {
 	}
 	
 	private function DateRangeforQuery($dstart="1", $mstart="1", $ystart="", $dend="31", $mend="12", $yend="", $skipfacts="", $allgeds=false, $onlyfacts="") {
-		global $GEDCOMID;
 		
 		//-- Compute start
 		$sql = "";
@@ -843,7 +841,7 @@ abstract class BlockFunctions {
 		}
 		else $sql .= ")";	
 		
-		if (!$allgeds) $sql .= " AND d_file='".$GEDCOMID."' ";
+		if (!$allgeds) $sql .= " AND d_file='".GedcomConfig::$GEDCOMID."' ";
 		// General part ends here
 		
 		return $sql;

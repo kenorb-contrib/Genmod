@@ -123,7 +123,7 @@ if ($action == "deletecount") {
 		</div>
 	<?php
 	
-	$current_ged = $GEDCOMID;
+	$current_ged = GedcomConfig::$GEDCOMID;
 	$GedCount = 0;
 	// Print the table of available GEDCOMs
 	if (count($GEDCOMS)>0) {

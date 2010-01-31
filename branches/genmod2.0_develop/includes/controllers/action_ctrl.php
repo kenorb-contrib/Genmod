@@ -33,13 +33,12 @@ abstract class ActionController {
 	private static $actionlist = array();	// Holder of the action array
 
 	public function AddItem($pid, $text, $repo, $status=0) {
-		global $GEDCOMID;
 
 		$item = new ActionItem();
 		$item->pid = $pid;
 		$item->text = addslashes($text);
 		$item->repo = $repo;
-		$item->gedfile = $GEDCOMID;
+		$item->gedcomid = GedcomConfig::$GEDCOMID;
 		$item->status = $status;
 		$item->AddThis();
 		return $item;
@@ -61,15 +60,15 @@ abstract class ActionController {
 		}
 	}
 	
-	public function GetSelectActionList($repo="", $pid="", $gedcomid="", $status="", $countonly=false) {
-		global $GEDCOMID, $gm_user;
-		
+	public function GetSelectActionList($repo="", $pid="", $gedcomid="", $status="", $countonly=false, $sort="name") {
+		global $gm_user;
+	
 		self::$actionlist = array();
 		$action_open = 0;
 		$action_closed = 0;
 		$action_hide = 0;
 		if ($gm_user->ShowActionLog()) { 
-			if ($gedcomid == "") $gedcomid = $GEDCOMID;
+			if ($gedcomid == "") $gedcomid = GedcomConfig::$GEDCOMID;
 			if ($countonly) {
 				$sql = "SELECT count(a_status) as count, a_status FROM ".TBLPREFIX."actions WHERE a_file='".$gedcomid."'";
 				if (!empty($repo)) $sql .= " AND a_repo='".$repo."'";
@@ -98,21 +97,21 @@ abstract class ActionController {
 					}
 					else $action_hide++;
 				}
-				if (empty($repo)) self::RepoSort();
-				else self::PidSort();
+				if (empty($repo)) self::RepoSort($sort);
+				else self::PidSort($sort);
 			}
 		}
 		return array(self::$actionlist, $action_open, $action_closed, $action_hide);
 	}
 
-	public function GetActionList($status="", $reposort=false) {
-		global $GEDCOMID, $gm_user;
+	public function GetActionList($status="", $reposort=false, $sort="name") {
+		global $gm_user;
 		
 		self::$actionlist = array();
 		$actionopen = 0;
 		$actionclosed = 0;
 		if ($gm_user->ShowActionLog()) { 
-			$sql = "SELECT * FROM ".TBLPREFIX."actions WHERE a_file='".$GEDCOMID."'";
+			$sql = "SELECT * FROM ".TBLPREFIX."actions WHERE a_file='".GedcomConfig::$GEDCOMID."'";
 			if ($status == "0" || $status == "1") $sql .= " AND a_status='".$status."'";
 			$sql .= " ORDER BY a_repo ASC, a_status ASC";
 			$res = NewQuery($sql);
@@ -120,9 +119,9 @@ abstract class ActionController {
 				self::$actionlist[] = new ActionItem($row);
 			}
 			if ($reposort) {
-				self::RepoSort();
+				self::RepoSort($sort);
 			}
-			else self::PidSort();
+			else self::PidSort($sort);
 		}
 		return self::$actionlist;
 	}
@@ -138,22 +137,34 @@ abstract class ActionController {
 		print "</tr>";
 	}
 
-	private function RepoSort() {
-		uasort(self::$actionlist, array("ActionController", "ActionRepoSort"));
+	private function RepoSort($sort) {
+		if ($sort == "name") uasort(self::$actionlist, array("ActionController", "ActionRepoSort"));
+		else uasort(self::$actionlist, array("ActionController", "ActionRepoIDSort"));
 	}
 	
-	private function PidSort() {
-		uasort(self::$actionlist, array("ActionController", "ActionPidSort"));
+	private function PidSort($sort) {
+		if ($sort == "name") uasort(self::$actionlist, array("ActionController", "ActionPidSort"));
+		else uasort(self::$actionlist, array("ActionController", "ActionPidIDSort"));
 	}
 	
 	private function ActionRepoSort($a, $b) {
 		if ($a->repodesc != $b->repodesc) return StringSort($a->repodesc, $b->repodesc);
-		else return StringSort($a->piddesc, $b->piddesc);
+		else return StringSort(preg_replace("/([^ ]+)\*/", "$1", StripPrefix($a->piddesc)), preg_replace("/([^ ]+)\*/", "$1", StripPrefix($b->piddesc)));
+	}
+	
+	private function ActionRepoIDSort($a, $b) {
+		if ($a->repo != $b->repo) return StringSort($a->repo, $b->repo);
+		else return StringSort($a->pid, $b->pid);
 	}
 	
 	private function ActionPidSort($a, $b) {
-		if ($a->piddesc != $b->piddesc) return StringSort($a->piddesc, $b->piddesc);
+		if ($a->piddesc != $b->piddesc) return StringSort(preg_replace("/([^ ]+)\*/", "$1", StripPrefix($a->piddesc)), preg_replace("/([^ ]+)\*/", "$1", StripPrefix($b->piddesc)));
 		else return StringSort($a->repodesc, $b->repodesc);
+	}
+
+	private function ActionPidIDSort($a, $b) {
+		if ($a->pid != $b->pid) return StringSort($a->pid, $b->pid);
+		else return StringSort($a->repo, $b->repo);
 	}
 	
 	public function GetNewItem($type) {

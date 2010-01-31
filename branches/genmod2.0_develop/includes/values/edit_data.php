@@ -55,7 +55,19 @@ global $nonplacfacts;
 $nonplacfacts = array("SLGC","SLGS","ENDL","ASSO","RESN");
 
 global $nondatefacts;
-$nondatefacts = array("ABBR","ADDR","ASSO","AFN","AUTH","EMAIL","FAX","NAME","NOTE","GNOTE","OBJE","PHON","PUBL","REPO","SEX","SOUR","TEXT","TITL","WWW","_EMAIL","EMAIL","REFN","NCHI","RIN","FILE","FORM","_PRIM","_SSHOW","_TYPE","_SCBK","RESN");
+$nondatefacts = array("ABBR","ADDR","ASSO","AFN","AUTH","EMAIL","FAX","NAME","NOTE","GNOTE","OBJE","PHON","PUBL","REPO","SEX","SOUR","TEXT","TITL","WWW","_EMAIL","EMAIL","REFN","NCHI","NMR","RIN","FILE","FORM","_PRIM","_SSHOW","_TYPE","_SCBK","RESN");
+
+global $nonassolayerfacts;
+$nonassolayerfacts = array("ASSO","OBJE","REPO","SOUR","NOTE","GNOTE");
+
+global $nonsourlayerfacts;
+$nonsourlayerfacts = array("SOUR","OBJE","REPO","GNOTE");
+
+global $nonobjelayerfacts;
+$nonobjelayerfacts = array("OBJE","REPO","NOTE","GNOTE");
+
+global $nonnotelayerfacts;
+$nonnotelayerfacts = array("NOTE","GNOTE");
 
 global $typefacts;
 $typefacts = array();	//-- special facts that go on 2 TYPE lines

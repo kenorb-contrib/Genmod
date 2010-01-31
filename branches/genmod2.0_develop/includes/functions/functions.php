@@ -98,22 +98,22 @@ function get_gedcom_from_id($ged_id) {
  * @return boolean			True if dead, false if alive
  */
 function IsDeadId($pid) {
-	global $indilist, $GEDCOMID, $COMBIKEY;
+	global $indilist, $COMBIKEY;
 
 	if (empty($pid)) return true;
-	if ($COMBIKEY) $key = JoinKey($pid, $GEDCOMID);
+	if ($COMBIKEY) $key = JoinKey($pid, GedcomConfig::$GEDCOMID);
 	else $key = $pid;
 
 	//-- if using indexes then first check the indi_isdead array
 	if (isset($indilist)) {
 		//-- check if the person is already in the $indilist cache
-		if (!isset($indilist[$key]["isdead"]) || $indilist[$key]["gedfile"] != $GEDCOMID) {
+		if (!isset($indilist[$key]["isdead"]) || $indilist[$key]["gedfile"] != GedcomConfig::$GEDCOMID) {
 			//-- load the individual into the cache by calling the FindPersonRecord function
 			$gedrec = FindPersonRecord($pid);
 			if (empty($gedrec)) return true;
 		}
 		if (isset($indilist[$key])) {
-			if ($indilist[$key]["gedfile"]==$GEDCOMID) {
+			if ($indilist[$key]["gedfile"]==GedcomConfig::$GEDCOMID) {
 				if (!isset($indilist[$key]["isdead"])) $indilist[$key]["isdead"] = -1;
 				if ($indilist[$key]["isdead"]==-1) {
 					$indilist[$key]["isdead"] = UpdateIsDead($pid, $indilist[$key]);
@@ -211,6 +211,7 @@ function GetSubRecord($level, $tag, $gedrec, $num=1) {
 	$pos1=0;
 	$subrec = "";
 	if (empty($gedrec)) return "";
+if (is_object($gedrec)) print $pipo;
 	while($num > 0 && $pos1 < strlen($gedrec)) {
 		// Find the next occurance of the desired string
 		$pos1 = strpos($gedrec, $tag, $pos1);
@@ -554,7 +555,7 @@ function MakeCont($newged, $newline) {
  * @return array returns a two element array with indexes HUSB and WIFE for the parent ids
  */
 function FindParents($famid) {
-	global $gm_username, $GEDCOMID, $show_changes, $gm_user;
+	global $gm_username, $show_changes, $gm_user;
 
 	$famrec = FindFamilyRecord($famid);
 	if (empty($famrec)) {
@@ -563,7 +564,7 @@ function FindParents($famid) {
 			if (empty($famrec)) {
 				if ($show_changes && ChangeFunctions::GetChangeData(true, $famid, true, "", "FAM")) {
 					$f = ChangeFunctions::GetChangeData(false, $famid, true, "gedlines", "FAM");
-					$famrec = $f[$GEDCOMID][$famid];
+					$famrec = $f[GedcomConfig::$GEDCOMID][$famid];
 				}
 				else return false;
 			}
@@ -626,7 +627,7 @@ function FindChildrenInRecord($famrec, $me='') {
  * @return array array of family ids
  */
 function FindFamilyIds($pid, $indirec="", $newfams = false) {
-	global $GEDCOMID, $show_changes, $gm_user;
+	global $show_changes, $gm_user;
 	
 	$resultarray = array();
 	if (empty($pid)) return $resultarray;
@@ -635,7 +636,7 @@ function FindFamilyIds($pid, $indirec="", $newfams = false) {
 	$gedrec = FindGedcomRecord($pid);
 	if ($newfams && $gm_user->UserCanEdit() && $show_changes && ChangeFunctions::GetChangeData(true, $pid, true, "", "")) {
 		$rec = ChangeFunctions::GetChangeData(false, $pid, true, "gedlines", "");
-		$gedrec = $rec[$GEDCOMID][$pid];
+		$gedrec = $rec[GedcomConfig::$GEDCOMID][$pid];
 	}
 	$ct = preg_match_all("/1\s+FAMC\s+@(.*)@.*/", $gedrec, $fmatch, PREG_SET_ORDER);
 	if ($ct>0) {
@@ -668,11 +669,11 @@ function FindFamilyIds($pid, $indirec="", $newfams = false) {
  * @return array array of family ids
  */
 function FindSfamilyIds($pid, $newfams = false) {
-	global $GEDCOMID, $show_changes, $gm_user;
+	global $show_changes, $gm_user;
 	
 	$resultarray = array();
 	if (empty($pid)) return $resultarray;
-//	$sql = "SELECT family_id FROM ".TBLPREFIX."individual_spouse WHERE pid = '".$pid."' AND gedfile = ".$GEDCOMID;
+//	$sql = "SELECT family_id FROM ".TBLPREFIX."individual_spouse WHERE pid = '".$pid."' AND gedfile = ".GedcomConfig::$GEDCOMID;
 //	$res = NewQuery($sql);
 //	if (!$res) return array();
 //	else {
@@ -684,7 +685,7 @@ function FindSfamilyIds($pid, $newfams = false) {
 	$gedrec = FindGedcomRecord($pid);
 	if ($newfams && $gm_user->UserCanEdit() && $show_changes && ChangeFunctions::GetChangeData(true, $pid, true, "", "")) {
 		$rec = ChangeFunctions::GetChangeData(false, $pid, true, "gedlines", "");
-		$gedrec = $rec[$GEDCOMID][$pid];
+		$gedrec = $rec[GedcomConfig::$GEDCOMID][$pid];
 	}
 	$ct = preg_match_all("/1\s+FAMS\s+@(.*)@.*/", $gedrec, $fmatch, PREG_SET_ORDER);
 	if ($ct>0) {
@@ -707,59 +708,70 @@ function FindSfamilyIds($pid, $newfams = false) {
  * @param string $pid the individual, source, or family id
  * @return array an object array with indexes "thumb" and "file" for thumbnail and filename
  */
-function FindHighlightedObject($pid) {
+function FindHighlightedObject($obj) {
 	global $GM_IMAGES;
-	global $GEDCOMID;
 	
-	if (!PrivacyFunctions::showFactDetails("OBJE", $pid)) return false;
-	$object = array();
-	$media_ids = array();
 
-	// NOTE: Find the media items for that person
-	$sql = "select m_mfile, m_media, mm_gedrec, m_gedrec, m_file, m_ext, m_titl from ".TBLPREFIX."media, ".TBLPREFIX."media_mapping where mm_gid LIKE '".$pid."' AND m_file = '".$GEDCOMID."' AND m_file = mm_file AND m_media = mm_media AND mm_gedrec NOT LIKE '%\_PRIM N%' AND mm_gedrec LIKE '1 OBJE%' ORDER BY mm_order";
-	$res = NewQuery($sql);
-	while ($row = $res->FetchAssoc()) {
-		$media =& Mediaitem::GetInstance($row["m_media"], $row);
-		if ($media->disp) $media_ids[] = $row;
-	}
-	$ids = count($media_ids);
-	if ($ids==0) return false;
+	$facts = $obj->SelectFacts(array("OBJE"));
+	$medias = array();
+	if (count($facts) == 0) return false;
 	
 	// We have the candidates that can be displayed. Check for a _PRIM Y in the link record.
 	// On the fly we also check the _THUM tag, first in the link, then in the media record.
-	foreach($media_ids as $key => $media) {
-		$prim = GetGedcomValue("_PRIM", 2, $media["mm_gedrec"]);
-		if ($prim == "Y") {
-			$primfile = $media["m_mfile"];
-			$thum = GetGedcomValue("_THUM", 2, $media["mm_gedrec"]);
-			if (empty($thum)) $thum = GetGedcomValue("_THUM", 1, $media["m_gedrec"]);
-			$id = $media["m_media"];
-			break;
+	// If a media item has no PRIM Y and PRIM N, store it for further investigation.
+	foreach($facts as $key => $fact) {
+		$media =& MediaItem::GetInstance($fact->linkxref, "", $fact->gedcomid);
+		if ($fact->style != "change_old") {
+			$prim = GetGedcomValue("_PRIM", 2, $fact->factrec);
+			if ($prim == "Y") {
+				$primfile = $media->filename;
+				$thum = GetGedcomValue("_THUM", 2, $fact->factrec);
+				if (empty($thum)) $thum = GetGedcomValue("_THUM", 1, $fact->factrec);
+				$id = $media->xref;
+				break;
+			}
+			else if ($prim != "N") {
+				$medias[] = $media;
+			}
 		}
 	}
-	
-	// Nothing in the link records. Now check the media records for "defaults".
+
+	// Nothing in the link records. Now check the media records for "defaults", PRIM Y in the media item.
 	// On the fly we also check the _THUM tag, first in the link, then in the media record.
 	if (!isset($primfile)) {
-		foreach($media_ids as $key => $media) {
-			$prim = GetGedcomValue("_PRIM", 1, $media["m_gedrec"]);
+		foreach($medias as $key => $media) {
+			if ($media->ischanged) $gedrec = $media->changedgedrec;
+			else $gedrec = $media->gedrec;
+			$prim = GetGedcomValue("_PRIM", 1, $gedrec);
 			if ($prim == "Y") {
-				$primfile = $media["m_mfile"];
-				$thum = GetGedcomValue("_THUM", 2, $media["mm_gedrec"]);
-				if (empty($thum)) $thum = GetGedcomValue("_THUM", 1, $media["m_gedrec"]);
-				$id = $media["m_media"];
+				$primfile = $media->filename;
+				$thum = GetGedcomValue("_THUM", 2, $gedrec);
+				if (empty($thum)) $thum = GetGedcomValue("_THUM", 1, $gedrec);
+				$id = $media->xref;
 				break;
 			}
 		}
 	}
+	
 	// If a PRIM Y is found nowhere, we just take the first link.
+	// We can do that safely because the media items with PRIM N are already filtered out.
 	if (!isset($primfile)) {
-		$primfile = $media_ids[0]["m_mfile"];
-		$thum = GetGedcomValue("_THUM", 2, $media_ids[0]["mm_gedrec"]);
-		if (empty($thum)) $thum = GetGedcomValue("_THUM", 1, $media_ids[0]["m_gedrec"]);
-		$id = $media_ids[0]["m_media"];
+		foreach($medias as $key => $media) {
+			if ($media->ischanged) $gedrec = $media->changedgedrec;
+			else $gedrec = $media->gedrec;
+			$prim = GetGedcomValue("_PRIM", 1, $gedrec);
+			$primfile = $media->filename;
+			$thum = GetGedcomValue("_THUM", 2, $gedrec);
+			if (empty($thum)) $thum = GetGedcomValue("_THUM", 1, $gedrec);
+			$id = $media->xref;
+			break;
+		}
 	}
-		 
+	
+	// If nothing found, just return false
+	if (!isset($primfile)) return false;
+	
+	$object = array(); 
 	$object["use_thum"] = $thum;
 	$object["file"] = MediaFS::CheckMediaDepth($primfile);
 	$object["thumb"] = MediaFS::ThumbnailFile(GedcomConfig::$MEDIA_DIRECTORY.RelativePathFile($object["file"]));
@@ -784,7 +796,7 @@ function FindHighlightedObject($pid) {
  * @param int $path_to_find which path in the relationship to find, 0 is the shortest path, 1 is the next shortest path, etc
  */
 function GetRelationship(&$pid1, &$pid2, $followspouse=true, $maxlength=0, $ignore_cache=false, $path_to_find=0) {
-	global $start_time, $NODE_CACHE_LENGTH, $USE_RELATIONSHIP_PRIVACY, $GEDCOMID, $gm_username, $show_changes;
+	global $start_time, $NODE_CACHE_LENGTH, $USE_RELATIONSHIP_PRIVACY, $gm_username, $show_changes;
 
 	//-- check the cache
 	if ($USE_RELATIONSHIP_PRIVACY && !$ignore_cache) {
@@ -961,7 +973,7 @@ function GetRelationship(&$pid1, &$pid2, $followspouse=true, $maxlength=0, $igno
 					}
 				}
 				// Get the ID's in the surrounding families. Also save the parents ID's for getting the grandparents
-				$sql = "SELECT n.if_pkey as d_pid, n.if_role as d_role, i.i_gender as d_gender, d.d_year as d_bdate, m.if_role as n_role, n.if_fkey as d_fam FROM ".TBLPREFIX."individual_family as m LEFT JOIN ".TBLPREFIX."individual_family as n ON n.if_fkey=m.if_fkey LEFT JOIN ".TBLPREFIX."individuals AS i ON i.i_key=n.if_pkey LEFT JOIN ".TBLPREFIX."dates AS d ON (n.if_pkey=d.d_key AND (d.d_fact IS NULL OR d.d_fact='BIRT')) WHERE m.if_pkey='".DbLayer::EscapeQuery(JoinKey($node["pid"], $GEDCOMID))."' AND n.if_pkey<>m.if_pkey ORDER BY n_role, d_role";
+				$sql = "SELECT n.if_pkey as d_pid, n.if_role as d_role, i.i_gender as d_gender, d.d_year as d_bdate, m.if_role as n_role, n.if_fkey as d_fam FROM ".TBLPREFIX."individual_family as m LEFT JOIN ".TBLPREFIX."individual_family as n ON n.if_fkey=m.if_fkey LEFT JOIN ".TBLPREFIX."individuals AS i ON i.i_key=n.if_pkey LEFT JOIN ".TBLPREFIX."dates AS d ON (n.if_pkey=d.d_key AND (d.d_fact IS NULL OR d.d_fact='BIRT')) WHERE m.if_pkey='".DbLayer::EscapeQuery(JoinKey($node["pid"], GedcomConfig::$GEDCOMID))."' AND n.if_pkey<>m.if_pkey ORDER BY n_role, d_role";
 				$res = NewQuery($sql);
 				while ($row = $res->FetchAssoc()) {
 					$rela = "";
@@ -1308,7 +1320,6 @@ function CleanInput($pid) {
  * @return string
  */
 function GetLdsGlance($indirec) {
-	global $GEDCOMID;
 	
 	$text = "";
 
@@ -1321,7 +1332,7 @@ function GetLdsGlance($indirec) {
 	$found = false;
 	$ct = preg_match_all("/1 FAMS @(.*)@/", $indirec, $match, PREG_SET_ORDER);
 	for($i=0; $i<$ct; $i++) {
-		$family =& Family::GetInstance($match[$i][1], "", $GEDCOMID);
+		$family =& Family::GetInstance($match[$i][1], "", GedcomConfig::$GEDCOMID);
 		$famrec = $family->gedrec;
 		if ($famrec) {
 			$ord = GetSubRecord(1, "1 SLGS", $famrec);
@@ -1451,15 +1462,14 @@ function GetFileSize($bytes) {
  * @return string			either the key or the gedcom name
  */
 function SplitKey($key, $type) {
-	global $GEDCOMID;
 	
 	$p1 = strpos($key,"[");
 	if ($p1 === false) $id = $key;
 	else $id = substr($key,0,$p1);
 	if ($type == "id") return $id;
 	if ($p1 === false) {
-		if ($type == "ged") return get_gedcom_from_id($GEDCOMID);
-		if ($type == "gedid") return $GEDCOMID;
+		if ($type == "ged") return get_gedcom_from_id(GedcomConfig::$GEDCOMID);
+		if ($type == "gedid") return GedcomConfig::$GEDCOMID;
 	}
 	$p2 = strpos($key,"]");
 	$ged = substr($key,$p1+1,$p2-$p1-1);
@@ -1689,7 +1699,7 @@ function EstimateBD(&$person, $type) {
 	}
 
 	// If we found no dates then check the dates of close relatives.
-	if($CHECK_CHILD_DATES ) {
+	if($CHECK_CHILD_DATES) {
 		foreach($person->childfamilies as $key => $family) {
 			if ($family->husb_id != "") {
 				$ct = preg_match_all("/\d DATE.*\s(\d{3,4})\s/", $family->husb->brec, $match, PREG_SET_ORDER);
@@ -1792,7 +1802,7 @@ function EstimateBD(&$person, $type) {
 		}
 	}
 	// We have all data, now apply the rules
-	if ($type = "narrow") {	
+	if ($type == "narrow") {	
 		// * The latest estimated birth year is the lowest value of:
 		if (isset($truebirthyear)) {
 			$dates["birth"]["year"] = $truebirthyear;
@@ -1803,20 +1813,22 @@ function EstimateBD(&$person, $type) {
 			if (isset($truedeathyear)) $birthyear = $truedeathyear;
 			// *     2. Earliest fact year
 			if ($ffactyear != 9999 && (!isset($birthyear) || $ffactyear < $birthyear)) $birthyear = $ffactyear;
-			// *     3. Mothers birth year + 50
-			if (isset($mbyear) && (!isset($birthyear) || ($mbyear + 50) < $birthyear)) $birthyear = $mbyear + 50;
-			// *     4. Fathers birth year + 50
-			if (isset($fbyear) && (!isset($birthyear) || ($fbyear + 50) < $birthyear)) $birthyear = $fbyear + 50;
-			// *     5. First childs birth year - 15
-			if ($fcbyear != 9999 && (!isset($birthyear) || ($fcbyear - 15) < $birthyear)) $birthyear = $fcbyear - 15;
-			// *     6. First grandchilds birth year - 30
-			if (!isset($birthyear) || ($fgcbyear - 30) < $birthyear) $birthyear = $fgcbyear - 30;
-			// *     7. First marriage year - 20
-			if ($fmarryear != 9999 && (!isset($birthyear) || ($fmarryear - 20) < $birthyear)) $birthyear = $fmarryear - 20;
-			// *     8. Mothers death year
-			if (isset($mdyear) && (!isset($birthyear) || $mdyear < $birthyear)) $birthyear = $mdyear;
-			// *     9. Fathers death year
-			if (isset($fdyear) && (!isset($birthyear) || $fdyear < ($birthyear - 1))) $birthyear = $fdyear;
+			if($CHECK_CHILD_DATES) {
+				// *     3. Mothers birth year + 50
+				if (isset($mbyear) && (!isset($birthyear) || ($mbyear + 50) < $birthyear)) $birthyear = $mbyear + 50;
+				// *     4. Fathers birth year + 50
+				if (isset($fbyear) && (!isset($birthyear) || ($fbyear + 50) < $birthyear)) $birthyear = $fbyear + 50;
+				// *     5. First childs birth year - 15
+				if ($fcbyear != 9999 && (!isset($birthyear) || ($fcbyear - 15) < $birthyear)) $birthyear = $fcbyear - 15;
+				// *     6. First grandchilds birth year - 30
+				if (!isset($birthyear) || ($fgcbyear - 30) < $birthyear) $birthyear = $fgcbyear - 30;
+				// *     7. First marriage year - 20
+				if ($fmarryear != 9999 && (!isset($birthyear) || ($fmarryear - 20) < $birthyear)) $birthyear = $fmarryear - 20;
+				// *     8. Mothers death year
+				if (isset($mdyear) && (!isset($birthyear) || $mdyear < $birthyear)) $birthyear = $mdyear;
+				// *     9. Fathers death year
+				if (isset($fdyear) && (!isset($birthyear) || $fdyear < ($birthyear - 1))) $birthyear = $fdyear;
+			}
 			if (isset($birthyear)) {
 				$dates["birth"]["year"] = $birthyear;
 				$dates["birth"]["type"] = $type;
@@ -1831,25 +1843,26 @@ function EstimateBD(&$person, $type) {
 			// *     1. Birth year
 			if (isset($truebirthyear)) $deathyear = $truebirthyear;
 			// *     2. Latest fact year
-//			print $lfactyear;
 			if ($lfactyear != 0 && (!isset($deathyear) || $lfactyear > $deathyear)) $deathyear = $lfactyear;
-			// *     3. Mothers birth year + 15
-			if (isset($mbyear) && (!isset($deathyear) || ($mbyear + 15) > $deathyear)) $deathyear = $mbyear + 15;
-			// *     4. Fathers birth year + 15
-			if (isset($fbyear) && (!isset($deathyear) || ($fbyear + 15) > $deathyear)) $deathyear = $fbyear + 15;
-			// *     5. Last childs birth year
-			if ($lcbyear != 0 && (!isset($deathyear) || $lcbyear > $deathyear)) $deathyear = $lcbyear;
-			// *     6. First grandchilds birth year - 15
-			if ($fgcbyear != 9999 && (!isset($deathyear) || $fgcbyear > $deathyear)) $deathyear = $fgcbyear;
-			// *     7. Latest marriage year and 8. Latest divorce year
-			if ($lmarryear != 0 && (!isset($deathyear) || $lmarryear > $deathyear)) $deathyear = $lmarryear;
+			if($CHECK_CHILD_DATES) {
+				// *     3. Mothers birth year + 15
+				if (isset($mbyear) && (!isset($deathyear) || ($mbyear + 15) > $deathyear)) $deathyear = $mbyear + 15;
+				// *     4. Fathers birth year + 15
+				if (isset($fbyear) && (!isset($deathyear) || ($fbyear + 15) > $deathyear)) $deathyear = $fbyear + 15;
+				// *     5. Last childs birth year
+				if ($lcbyear != 0 && (!isset($deathyear) || $lcbyear > $deathyear)) $deathyear = $lcbyear;
+				// *     6. First grandchilds birth year - 15
+				if ($fgcbyear != 9999 && (!isset($deathyear) || $fgcbyear > $deathyear)) $deathyear = $fgcbyear;
+				// *     7. Latest marriage year and 8. Latest divorce year
+				if ($lmarryear != 0 && (!isset($deathyear) || $lmarryear > $deathyear)) $deathyear = $lmarryear;
+			}
 			if (isset($deathyear)) {
 				$dates["death"]["year"] = $deathyear;
 				$dates["death"]["type"] = $type;
 			}
 		}
 	}
-	if ($type = "wide") {	
+	if ($type == "wide") {	
 		// * The earliest estimated birth year is the lowest value of:
 		if (isset($truebirthyear)) {
 			$dates["birth"]["year"] = $truebirthyear;
@@ -1860,19 +1873,21 @@ function EstimateBD(&$person, $type) {
 			if (isset($truedeathyear)) $birthyear = $truedeathyear - $MAX_ALIVE_AGE;
 			// *     2. Latest fact year - $MAX_ALIVE_AGE
 			if ($lfactyear != 0 && (!isset($birthyear) || ($lfactyear - $MAX_ALIVE_AGE) < $birthyear)) $birthyear = $lfactyear - $MAX_ALIVE_AGE;
-			// *     3. Mothers birth year + 15
-			if (isset($mbyear) && (!isset($birthyear) || ($mbyear + 15) < $birthyear)) $birthyear = $mbyear + 15;
-			// *     4. Fathers birth year + 15
-			if (isset($fbyear) && (!isset($birthyear) || ($fbyear + 15) < $birthyear)) $birthyear = $fbyear + 15;
-			// *     5. First childs birth year - 50
-			if ($fcbyear != 9999 && (!isset($birthyear) || ($fcbyear - 50)) < $birthyear) $birthyear = $fcbyear - 50;
-			// *     6. First grandchilds birth year - 100
-			if ($fgcbyear != 9999 && (!isset($birthyear) || ($fgcbyear - 100) < $birthyear)) $birthyear = $fgcbyear-100;
-			// *     7. Marriage year - 70
-			if ($fmarryear != 9999 && (!isset($birthyear) || ($fmarryear - 70) < $birthyear)) $birthyear = $fmarryear - 70;
-			// *     BUT no later than the death year of mother or father
-			if (isset($mdyear) && isset($birthyear) && $mdyear < $birthyear) $birthyear = $mdyear;
-			if (isset($fdyear) && isset($birthyear) && $fdyear-1 < $birthyear) $birthyear = $fdyear-1;
+			if($CHECK_CHILD_DATES) {
+				// *     3. Mothers birth year + 15
+				if (isset($mbyear) && (!isset($birthyear) || ($mbyear + 15) < $birthyear)) $birthyear = $mbyear + 15;
+				// *     4. Fathers birth year + 15
+				if (isset($fbyear) && (!isset($birthyear) || ($fbyear + 15) < $birthyear)) $birthyear = $fbyear + 15;
+				// *     5. First childs birth year - 50
+				if ($fcbyear != 9999 && (!isset($birthyear) || ($fcbyear - 50)) < $birthyear) $birthyear = $fcbyear - 50;
+				// *     6. First grandchilds birth year - 100
+				if ($fgcbyear != 9999 && (!isset($birthyear) || ($fgcbyear - 100) < $birthyear)) $birthyear = $fgcbyear-100;
+				// *     7. Marriage year - 70
+				if ($fmarryear != 9999 && (!isset($birthyear) || ($fmarryear - 70) < $birthyear)) $birthyear = $fmarryear - 70;
+				// *     BUT no later than the death year of mother or father
+				if (isset($mdyear) && isset($birthyear) && $mdyear < $birthyear) $birthyear = $mdyear;
+				if (isset($fdyear) && isset($birthyear) && $fdyear-1 < $birthyear) $birthyear = $fdyear-1;
+			}
 			if (isset($birthyear)) {
 				$dates["birth"]["year"] = $birthyear;
 				$dates["birth"]["type"] = $type;
@@ -1888,16 +1903,18 @@ function EstimateBD(&$person, $type) {
 			if (isset($truebirthyear)) $deathyear = $truebirthyear + $MAX_ALIVE_AGE;
 			// *     2. Latest fact year + $MAX_ALIVE_AGE
 			if ($lfactyear != 0 && (!isset($deathyear) || ($lfactyear + $MAX_ALIVE_AGE) > $deathyear)) $deathyear = $lfactyear + $MAX_ALIVE_AGE;
-			// *     3. Mothers birth year + $MAX_ALIVE_AGE + 15
-			if (isset($mbyear) && (!isset($deathyear) || ($mbyear + 15 + $MAX_ALIVE_AGE) > $deathyear)) $deathyear = $mbyear + 15 + $MAX_ALIVE_AGE;
-			// *     4. Fathers birth year + $MAX_ALIVE_AGE + 15
-			if (isset($fbyear) && (!isset($deathyear) || ($fbyear + 15 + $MAX_ALIVE_AGE) > $deathyear)) $deathyear = $fbyear + 15 + $MAX_ALIVE_AGE;
-			// *     5. Last childs birth year + $MAX_ALIVE_AGE - 15
-			if ($lcbyear != 0 && (!isset($deathyear) || ($lcbyear - 15 + $MAX_ALIVE_AGE)) > $deathyear) $deathyear = $fcbyear - 15 + $MAX_ALIVE_AGE;
-			// *     6. First grandchilds birth year + $MAX_ALIVE_AGE - 30
-			if ($fgcbyear != 9999 && (!isset($deathyear) || ($fgcbyear - 30 + $MAX_ALIVE_AGE) > $deathyear)) $deathyear = $fgcbyear - 30 + $MAX_ALIVE_AGE;
-			// *     7. Marriage year + $MAX_ALIVE_AGE - 20
-			if ($lmarryear != 0 && (!isset($deathyear) || ($lmarryear - 20 + $MAX_ALIVE_AGE) < $deathyear)) $deathyear = $lmarryear - 20 + $MAX_ALIVE_AGE;
+			if($CHECK_CHILD_DATES) {
+				// *     3. Mothers birth year + $MAX_ALIVE_AGE + 15
+				if (isset($mbyear) && (!isset($deathyear) || ($mbyear + 15 + $MAX_ALIVE_AGE) > $deathyear)) $deathyear = $mbyear + 15 + $MAX_ALIVE_AGE;
+				// *     4. Fathers birth year + $MAX_ALIVE_AGE + 15
+				if (isset($fbyear) && (!isset($deathyear) || ($fbyear + 15 + $MAX_ALIVE_AGE) > $deathyear)) $deathyear = $fbyear + 15 + $MAX_ALIVE_AGE;
+				// *     5. Last childs birth year + $MAX_ALIVE_AGE - 15
+				if ($lcbyear != 0 && (!isset($deathyear) || ($lcbyear - 15 + $MAX_ALIVE_AGE)) > $deathyear) $deathyear = $fcbyear - 15 + $MAX_ALIVE_AGE;
+				// *     6. First grandchilds birth year + $MAX_ALIVE_AGE - 30
+				if ($fgcbyear != 9999 && (!isset($deathyear) || ($fgcbyear - 30 + $MAX_ALIVE_AGE) > $deathyear)) $deathyear = $fgcbyear - 30 + $MAX_ALIVE_AGE;
+				// *     7. Marriage year + $MAX_ALIVE_AGE - 20
+				if ($lmarryear != 0 && (!isset($deathyear) || ($lmarryear - 20 + $MAX_ALIVE_AGE) < $deathyear)) $deathyear = $lmarryear - 20 + $MAX_ALIVE_AGE;
+			}
 			if (isset($deathyear)) {
 				$dates["death"]["year"] = $deathyear;
 				$dates["death"]["type"] = $type;
@@ -1968,11 +1985,10 @@ function CheckEmailAddress($address) {
 // Switch gedcoms on the fly. 
 // Call this function with an empty string to go back to the original values.
 function SwitchGedcom($gedid="") {
-	global $GEDCOMID;
 	static $orgged;
 	
 	// If we are already there, stay there.
-	if ($gedid == $GEDCOMID) return;
+	if ($gedid == GedcomConfig::$GEDCOMID) return;
 	
 	// Switching back if nothing ever changed or back to the original.
 	if (empty($gedid)) {
@@ -1985,14 +2001,13 @@ function SwitchGedcom($gedid="") {
 	// Switch to something else.
 	if (is_numeric($gedid)) {
 		// Save the old value
-		if (!isset($orgged)) $orgged = $GEDCOMID;
-		// Set the new values
-		$GEDCOMID = $gedid;
+		if (!isset($orgged)) $orgged = GedcomConfig::$GEDCOMID;
 	}
 	else return;
+	
 	// Make the switch
-	PrivacyController::ReadPrivacy($GEDCOMID);
-	GedcomConfig::ReadGedcomConfig($GEDCOMID);
+	PrivacyController::ReadPrivacy($gedid);
+	GedcomConfig::ReadGedcomConfig($gedid);
 	return;
 }
 
@@ -2036,13 +2051,14 @@ function ReplaceEmbedText($text) {
 
 // Returns the object only if it exists, otherwise false
 function ConstructObject($pid, $type="", $gedid="", $data_array="") {
-	global $GEDCOMID;
 	
-	if (empty($gedid)) $gedid = $GEDCOMID;
+	$pid = trim($pid);
+	if (empty($pid)) return false;
+	if (empty($gedid)) $gedid = GedcomConfig::$GEDCOMID;
 	$type = strtoupper($type);
 	$object = null;
 	
-	if (!empty($type) && in_array($type, array("INDI", "FAM", "SOUR", "REPO", "ASSO", "NOTE", "SUBM"))) {
+	if (!empty($type) && in_array($type, array("INDI", "FAM", "SOUR", "REPO", "ASSO", "NOTE", "SUBM", "HEAD"))) {
 		if ($type == "SOUR") $object =& Source::GetInstance($pid, $data_array, $gedid);
 		elseif ($type == "REPO") $object =& Repository::GetInstance($pid, $data_array, $gedid);
 		elseif ($type == "OBJE") $object =& MediaItem::GetInstance($pid, $data_array, $gedid);
@@ -2050,6 +2066,7 @@ function ConstructObject($pid, $type="", $gedid="", $data_array="") {
 		elseif ($type == "ASSO" || $type == "INDI") $object =& Person::GetInstance($pid, $data_array, $gedid);
 		elseif ($type == "FAM") $object =& Family::GetInstance($pid, $data_array, $gedid);
 		elseif ($type == "SUBM") $object =& Submitter::GetInstance($pid, $data_array, $gedid);
+		elseif ($type == "HEAD") $object =& Header::GetInstance($pid, $data_array, $gedid);
 		if (is_object($object) && !$object->isempty) return $object;
 		else return false;
 	}
@@ -2111,6 +2128,27 @@ function ConstructObject($pid, $type="", $gedid="", $data_array="") {
 			else return false;
 		}
 	}
+}
+	
+// Returns the object only if it exists, otherwise false
+function ReConstructObject($pid, $type, $gedid="", $data_array="") {
+	
+	if (empty($gedid)) $gedid = GedcomConfig::$GEDCOMID;
+	$type = strtoupper($type);
+	$object = null;
+	
+	if (!empty($type) && in_array($type, array("INDI", "FAM", "SOUR", "REPO", "ASSO", "NOTE", "SUBM", "HEAD"))) {
+		if ($type == "SOUR") $object =& Source::NewInstance($pid, $data_array, $gedid);
+		elseif ($type == "REPO") $object =& Repository::NewInstance($pid, $data_array, $gedid);
+		elseif ($type == "OBJE") $object =& MediaItem::NewInstance($pid, $data_array, $gedid);
+		elseif ($type == "NOTE") $object =& Note::NewInstance($pid, $data_array, $gedid);
+		elseif ($type == "ASSO" || $type == "INDI") $object =& Person::NewInstance($pid, $data_array, $gedid);
+		elseif ($type == "FAM") $object =& Family::NewInstance($pid, $data_array, $gedid);
+		elseif ($type == "SUBM") $object =& Submitter::NewInstance($pid, $data_array, $gedid);
+		elseif ($type == "HEAD") $object =& Header::NewInstance($pid, $data_array, $gedid);
+		if (is_object($object) && !$object->isempty) return $object;
+	}
+	return false;
 }
 	
 ?>

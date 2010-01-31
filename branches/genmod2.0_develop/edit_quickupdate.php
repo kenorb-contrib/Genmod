@@ -65,7 +65,7 @@ $can_auto_accept = true;
 if (!isset($action)) $action="";
 if (!isset($closewin)) $closewin=0;
 if (empty($pid)) {
-	if (!empty($gm_user->gedcomid[$GEDCOMID])) $pid = $gm_user->gedcomid[$GEDCOMID];
+	if (!empty($gm_user->gedcomid[GedcomConfig::$GEDCOMID])) $pid = $gm_user->gedcomid[GedcomConfig::$GEDCOMID];
 	else $pid = "";
 }
 $pid = CleanInput($pid);
@@ -80,7 +80,7 @@ if (!$gm_user->userCanEditOwn($pid)) {
 //-- find the latest gedrec for the individual
 if (ChangeFunctions::GetChangeData(true, $pid, true, "", "")) {
 	$rec = ChangeFunctions::GetChangeData(false, $pid, true, "gedlines", "");
-	$gedrec = $rec[$GEDCOMID][$pid];
+	$gedrec = $rec[GedcomConfig::$GEDCOMID][$pid];
 }
 else $gedrec = FindGedcomRecord($pid);
 
@@ -263,7 +263,7 @@ if ($action=="update") {
 	print "<h3>".GM_LANG_quick_update_title."</h3>\n";
 	print "<b>".PrintReady(GetPersonName($pid, $gedrec))."</b><br /><br />";
 	
-	WriteToLog("EditQuickUpdate-> Quick update attempted for $pid by >".$gm_user->username."<", "I", "G", $GEDCOMID);
+	WriteToLog("EditQuickUpdate-> Quick update attempted for $pid by >".$gm_user->username."<", "I", "G", GedcomConfig::$GEDCOMID);
 
 	$change_id = EditFunctions::GetNewXref("CHANGE");
 	$updated = false;
@@ -484,7 +484,7 @@ if ($action=="update") {
 		$famid = $sfams[$i-1]["famid"];
 		if (ChangeFunctions::GetChangeData(true, $famid, true)) {
 			$rec = ChangeFunctions::GetChangeData(false, $famid, true, "gedlines");
-			$famrec = $rec[$GEDCOMID][$famid];
+			$famrec = $rec[GedcomConfig::$GEDCOMID][$famid];
 		}
 		else $famrec = FindFamilyRecord($famid);
 		$oldfamrec = $famrec;
@@ -556,7 +556,7 @@ if ($action=="update") {
 //				print "Oldpid: ".$oldpid;
 //				if (ChangeFunctions::GetChangeData(true, $spid, true)) {
 //					$rec = ChangeFunctions::GetChangeData(false, $spid, true, "gedlines");
-//					$oldgedrec = $rec[$GEDCOMID][$spid];
+//					$oldgedrec = $rec[GedcomConfig::$GEDCOMID][$spid];
 //				}
 //				else $oldgedrec = FindGedcomRecord($oldpid);
 //				$oldfam = GetSubRecord(1, "1 FAMS", $oldgedrec);
@@ -623,7 +623,7 @@ if ($action=="update") {
 			$famupdate = EditFunctions::ReplaceGedrec($famid, "", "1 CHIL @".$CHIL[$i]."@", "CHIL", $change_id, $change_type);
 			if (ChangeFunctions::GetChangeData(true, $CHIL[$i], true)) {
 					$rec = ChangeFunctions::GetChangeData(false, $CHIL[$i], true, "gedlines");
-					$childrec = $rec[$GEDCOMID][$CHIL[$i]];
+					$childrec = $rec[GedcomConfig::$GEDCOMID][$CHIL[$i]];
 				}
 			else $childrec = FindGedcomRecord($CHIL[$i]);
 			if (preg_match("/1 FAMC @$famid@/", $childrec)==0) {
@@ -732,7 +732,7 @@ if ($action=="update") {
 
 		//-- add the new family id to the new spouse record
 		$rec = ChangeFunctions::GetChangeData(false, $xref, true, "gedlines");
-		$spouserec = $rec[$GEDCOMID][$xref];
+		$spouserec = $rec[GedcomConfig::$GEDCOMID][$xref];
 //		$spouserec = find_record_in_file($xref);
 		$spouserec .= "\r\n1 FAMS @$newfamid@\r\n";
 		EditFunctions::ReplaceGedrec($xref, "", "1 FAMS @$newfamid@", "FAMS", $change_id, $change_type);
@@ -796,7 +796,7 @@ if ($action=="update") {
 			
 			//-- add the new family to the new child
 			$rec = ChangeFunctions::GetChangeData(false, $cxref, true, "gedlines");
-			$childrec = $rec[$GEDCOMID][$cxref];
+			$childrec = $rec[GedcomConfig::$GEDCOMID][$cxref];
 //			$childrec = find_record_in_file($cxref);
 			$childrec .= "\r\n1 FAMC @$newfamid@\r\n";
 			EditFunctions::ReplaceGedrec($cxref, "", "1 FAMC @$newfamid@", "FAMC", $change_id, $change_type);
@@ -811,7 +811,7 @@ if ($action=="update") {
 			
 			//-- add the family to the new child
 			$rec = ChangeFunctions::GetChangeData(false, $cxref, true, "gedlines");
-			$childrec = $rec[$GEDCOMID][$cxref];
+			$childrec = $rec[GedcomConfig::$GEDCOMID][$cxref];
 //			$childrec = find_record_in_file($cxref);
 			$childrec .= "\r\n1 FAMC @$newfamid@\r\n";
 //			replace_gedrec($cxref, $childrec);
@@ -835,7 +835,7 @@ if ($action=="update") {
 		if (!empty($famid)) {
 			if (ChangeFunctions::GetChangeData(true, $famid, true)) {
 				$rec = ChangeFunctions::GetChangeData(false, $famid, true, "gedlines");
-				$famrec = $rec[$GEDCOMID][$famid];
+				$famrec = $rec[GedcomConfig::$GEDCOMID][$famid];
 			}
 			else $famrec = FindFamilyRecord($famid);
 			$oldfamrec = $famrec;
@@ -921,7 +921,7 @@ if ($action=="update") {
 			if (empty($oldfamrec)) {
 				if (ChangeFunctions::GetChangeData(true, $FATHER[$i], true)) {
 					$rec = ChangeFunctions::GetChangeData(false, $FATHER[$i], true, "gedlines");
-					$spouserec = $rec[$GEDCOMID][$FATHER[$i]];
+					$spouserec = $rec[GedcomConfig::$GEDCOMID][$FATHER[$i]];
 				}
 				else $spouserec = FindGedcomRecord($FATHER[$i]);
 //				$spouserec = find_record_in_file($FATHER[$i]);
@@ -1021,7 +1021,7 @@ if ($action=="update") {
 			if (empty($oldfamrec)) {
 				if (ChangeFunctions::GetChangeData(true, $MOTHER[$i], true)) {
 					$rec = ChangeFunctions::GetChangeData(false, $MOTHER[$i], true, "gedlines");
-					$spouserec = $rec[$GEDCOMID][$MOTHER[$i]];
+					$spouserec = $rec[GedcomConfig::$GEDCOMID][$MOTHER[$i]];
 				}
 				else $spouse = FindGedcomRecord($MOTHER[$i]);
 //				$spouserec = find_record_in_file($MOTHER[$i]);
@@ -1100,7 +1100,7 @@ if ($action=="update") {
 			$famrec .= "\r\n1 CHIL @".$CHIL[$i]."@";
 			if (ChangeFunctions::GetChangeData(true, $CHIL[$i], true)) {
 					$rec = ChangeFunctions::GetChangeData(false, $CHIL[$i], true, "gedlines");
-					$childrec = $rec[$GEDCOMID][$CHIL[$i]];
+					$childrec = $rec[GedcomConfig::$GEDCOMID][$CHIL[$i]];
 				}
 			else $childrec = FindGedcomRecord($CHIL[$i]);
 //			$childrec = find_record_in_file($CHIL[$i]);
@@ -1216,7 +1216,7 @@ if ($action=="update") {
 		print "<span class=\"error\">".$error."</span>";
 	}
 		if ($can_auto_accept && ($gm_user->UserCanAccept() || $gm_user->userAutoAccept())) {
-		ChangeFunctions::AcceptChange($change_id, $GEDCOMID);
+		ChangeFunctions::AcceptChange($change_id, GedcomConfig::$GEDCOMID);
 	}
 
 	if ($closewin) {
@@ -1475,7 +1475,7 @@ function checkform(frm) {
 			$famrec = FindFamilyRecord($famid);
 			if (ChangeFunctions::GetChangeData(true, $famid, true)) {
 				$rec = ChangeFunctions::GetChangeData(false, $famid, true, "gedlines");
-				$famrec = $rec[$GEDCOMID][$famid];
+				$famrec = $rec[GedcomConfig::$GEDCOMID][$famid];
 			}
 			$parents = FindParentsInRecord($famrec);
 			$spid = "";
@@ -1486,7 +1486,7 @@ function checkform(frm) {
 			$parrec = FindGedcomRecord($spid);
 			if (!empty($spid) && ChangeFunctions::GetChangeData(true, $spid, true)) {
 				$rec = ChangeFunctions::GetChangeData(false, $spid, true, "gedlines");
-				$parrec = $rec[$GEDCOMID][$spid];
+				$parrec = $rec[GedcomConfig::$GEDCOMID][$spid];
 			}
 						
 			print "<td id=\"pagetab$i\" class=\"tab_cell_inactive\" onclick=\"switch_tab($i); return false;\"><a href=\"javascript: ".GM_LANG_family_with."&nbsp;";
@@ -1812,7 +1812,7 @@ for($i=1; $i<=count($sfams); $i++) {
 	$famrec = FindFamilyRecord($famid);
 	if (ChangeFunctions::GetChangeData(true, $famid, true)) {
 		$rec = ChangeFunctions::GetChangeData(false, $famid, true, "gedlines");
-		$famrec = $rec[$GEDCOMID][$famid];
+		$famrec = $rec[GedcomConfig::$GEDCOMID][$famid];
 	}
 	print GM_LANG_family_with." ";
 	$parents = FindParentsInRecord($famrec);
@@ -1825,7 +1825,7 @@ for($i=1; $i<=count($sfams); $i++) {
 		$parrec = FindGedcomRecord($spid);
 		if (ChangeFunctions::GetChangeData(true, $spid, true)) {
 			$rec = ChangeFunctions::GetChangeData(false, $spid, true, "gedlines");
-			$parrec = $rec[$GEDCOMID][$spid];
+			$parrec = $rec[GedcomConfig::$GEDCOMID][$spid];
 		}
 		if (PrivacyFunctions::displayDetailsById($spid) && PrivacyFunctions::showLivingNameById($spid)) {
 			print "<a href=\"#\" onclick=\"return quickEdit('".$spid."');\">";
@@ -2046,7 +2046,7 @@ $chil = FindChildrenInRecord($famrec);
 					$childrec = FindPersonRecord($child);
 					if (ChangeFunctions::GetChangeData(true, $child, true)) {
 						$rec = ChangeFunctions::GetChangeData(false, $child, true, "gedlines");
-						$childrec = $rec[$GEDCOMID][$child];
+						$childrec = $rec[GedcomConfig::$GEDCOMID][$child];
 					}
 					print "<tr><td class=\"optionbox\">";
 					$name = GetPersonName($child, $childrec);
@@ -2333,7 +2333,7 @@ for($j=1; $j<=count($cfams); $j++) {
 	// NOTE $famid can be empty to generate empty tab
 	if (!empty($famid) && ChangeFunctions::GetChangeData(true, $famid, true)) {
 		$rec = ChangeFunctions::GetChangeData(false, $famid, true, "gedlines");
-		$famrec = $rec[$GEDCOMID][$famid];
+		$famrec = $rec[GedcomConfig::$GEDCOMID][$famid];
 	}
 	else $famrec = FindFamilyRecord($famid);
 	$parents = FindParentsInRecord($famrec);
@@ -2381,7 +2381,7 @@ for($j=1; $j<=count($cfams); $j++) {
 			$fatherrec = FindPersonRecord($parents["HUSB"]);
 			if (ChangeFunctions::GetChangeData(true, $parents["HUSB"], true)) {
 				$rec = ChangeFunctions::GetChangeData(false, $parents["HUSB"], true, "gedlines");
-				$fatherrec = $rec[$GEDCOMID][$parents["HUSB"]];
+				$fatherrec = $rec[GedcomConfig::$GEDCOMID][$parents["HUSB"]];
 			}
 			$fsex = GetGedcomValue("SEX", 1, $fatherrec, '', false);
 			$child_surname = "";
@@ -2492,7 +2492,7 @@ for($j=1; $j<=count($cfams); $j++) {
 			$motherrec = FindPersonRecord($parents["WIFE"]);
 			if (ChangeFunctions::GetChangeData(true, $parents["WIFE"], true)) {
 				$rec = ChangeFunctions::GetChangeData(false, $parents["WIFE"], true, "gedlines");
-				$motherrec = $rec[$GEDCOMID][$parents["WIFE"]];
+				$motherrec = $rec[GedcomConfig::$GEDCOMID][$parents["WIFE"]];
 			}
 			$msex = GetGedcomValue("SEX", 1, $motherrec, '', false);
 			if ($msex=="M") $label = GM_LANG_father;
@@ -2707,7 +2707,7 @@ $chil = FindChildrenInRecord($famrec);
 					$childrec = FindPersonRecord($child);
 					if (ChangeFunctions::GetChangeData(true, $child, true)) {
 						$rec = ChangeFunctions::GetChangeData(false, $child, true, "gedlines");
-						$childrec = $rec[$GEDCOMID][$child];
+						$childrec = $rec[GedcomConfig::$GEDCOMID][$child];
 					}
 					$name = GetPersonName($child, $childrec);
 					$disp = PrivacyFunctions::displayDetailsById($child);

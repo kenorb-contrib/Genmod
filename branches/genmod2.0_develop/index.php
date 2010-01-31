@@ -114,7 +114,7 @@ if ($gm_user->username != "") {
 	if (($action=="addfav")&&(!empty($gid))) {
 		$gid = strtoupper($gid);
 		if (!isset($favnote)) $favnote = "";
-		$favobject = ConstructObject($gid, "", $GEDCOMID);
+		$favobject = ConstructObject($gid, "", GedcomConfig::$GEDCOMID);
 		if (is_object($favobject)) {
 			$favorite = array();
 			if (!isset($favtype)) {
@@ -126,7 +126,7 @@ if ($gm_user->username != "") {
 			else $favorite->username = $gm_user->username;
 			$favorite->gid = $gid;
 			$favorite->type = $favobject->type;
-			$favorite->file = $GEDCOMID;
+			$favorite->file = GedcomConfig::$GEDCOMID;
 			$favorite->url = "";
 			$favorite->note = $favnote;
 			$favorite->title = "";
@@ -146,7 +146,7 @@ if ($gm_user->username != "") {
 		else $favorite->username = $gm_user->username;
 		$favorite->gid = "";
 		$favorite->type = "URL";
-		$favorite->file = $GEDCOMID;
+		$favorite->file = GedcomConfig::$GEDCOMID;
 		$favorite->url = $url;
 		$favorite->note = $favnote;
 		$favorite->title = $favtitle;
@@ -246,7 +246,7 @@ if (($command=="user") and (!$ublocks->welcome_block_present)) {
 if (($command=="gedcom") and (!$ublocks->gedcom_block_present)) {
 	if ($gm_user->userIsAdmin()) {
 		print "<div>";
-		print "<a href=\"#\" onclick=\"window.open('index_edit.php?name=$GEDCOMID&amp;command=gedcom', '', 'top=50,left=10,width=1000,height=400,scrollbars=1,resizable=1');\">".GM_LANG_customize_gedcom_page."</a>\n";
+		print "<a href=\"#\" onclick=\"window.open('index_edit.php?name=GedcomConfig::$GEDCOMID&amp;command=gedcom', '', 'top=50,left=10,width=1000,height=400,scrollbars=1,resizable=1');\">".GM_LANG_customize_gedcom_page."</a>\n";
 		print "</div>";
 	}
 }

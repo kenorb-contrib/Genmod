@@ -99,7 +99,7 @@ $db_original[TBLPREFIX."changes"]["row"]["ch_fact"]["details"] = "VARCHAR(15) CH
 $db_original[TBLPREFIX."changes"]["row"]["ch_old"]["details"] = "TEXT CHARACTER SET #charset# COLLATE #collate# ";
 $db_original[TBLPREFIX."changes"]["row"]["ch_new"]["details"] = "TEXT CHARACTER SET #charset# COLLATE #collate# ";
 $db_original[TBLPREFIX."changes"]["row"]["ch_delete"]["details"] = "TINYINT(1) NOT NULL DEFAULT '0'";
-$db_original[TBLPREFIX."changes"]["row"]["ch_gid_type"]["details"] = "VARCHAR(4) CHARACTER SET #charset# COLLATE #collate#  DEFAULT NULL";
+$db_original[TBLPREFIX."changes"]["row"]["ch_gid_type"]["details"] = "ENUM('INDI','FAM', 'SOUR', 'REPO', 'NOTE', 'OBJE', 'HEAD', 'SUBM') CHARACTER SET #charset# COLLATE #collate# NOT NULL";
 $db_original[TBLPREFIX."changes"]["key"]["primary"] = "PRIMARY KEY  (`ch_id`)";
 $db_original[TBLPREFIX."changes"]["key"]["ch_gid"] = "KEY `ch_gid` (`ch_gid`)";
              

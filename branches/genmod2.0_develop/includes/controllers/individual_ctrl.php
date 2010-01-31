@@ -48,7 +48,7 @@ class IndividualController extends DetailController {
 	
 	public function __construct() {
 		global $GM_IMAGES, $nonfacts, $nonfamfacts;
-		global $GEDCOMID, $gm_user;
+		global $gm_user;
 		
 		parent::__construct();
 
@@ -79,7 +79,7 @@ class IndividualController extends DetailController {
 			if ($gm_user->default_tab != $this->default_tab && $gm_user->default_tab != 9) $this->default_tab = $gm_user->default_tab;
 			
 			// Only display the user link for authenticated users
-			$indi_username = UserController::getUserByGedcomId($this->xref, $GEDCOMID);
+			$indi_username = UserController::getUserByGedcomId($this->xref, GedcomConfig::$GEDCOMID);
 			$this->indi_userlink = "";
 			if ($indi_username) {
 				if ($gm_user->UserIsAdmin()) $this->indi_userlink = "<a href=\"useradmin.php?action=edituser&username=".$indi_username."\">";
@@ -109,7 +109,7 @@ class IndividualController extends DetailController {
 		// NOTE: Can we show the gedcom record?
 		if ($gm_user->userCanViewGedlines() && $this->indi->disp) $this->canshowgedrec = true;
 		else $this->canshowgedrec = false;
-		if ($this->indi->disp) {
+		if ($this->indi->disp && !$this->indi->isempty) {
 			// NOTE: add_family_facts parses all facts as it calls the parseFacts function
 			$this->indi->AddFamilyFacts();
 			
@@ -205,7 +205,6 @@ class IndividualController extends DetailController {
 	 */
 	public function &getEditMenu() {
 		global $gm_user;
-		global $SEX_LINENUM;
 		
 		//-- main edit menu
 		$menu = new Menu(GM_LANG_edit);
@@ -299,7 +298,7 @@ class IndividualController extends DetailController {
 				// Reorder families
 				$menu->addSeperator();
 				$thisopt = false;
-				if (isset($this->indi->spouses) && count($this->indi->spouses) > 1) {
+				if (count($this->indi->spousefamilies) > 1) {
 					$submenu = new Menu(GM_LANG_reorder_families);
 					$submenu->addLink("reorder_families('".$this->xref."', 'reorder_families');");
 					$menu->addSubmenu($submenu);
@@ -307,7 +306,7 @@ class IndividualController extends DetailController {
 				}
 			
 				// NOTE: Set family relations and primary
-				if (count($this->indi->childfamilies)>0) {
+				if (count($this->indi->childfamilies) > 0) {
 					$submenu = new Menu(GM_LANG_relation_fams_short);
 					$submenu->addLink("relation_families('".$this->xref."', 'relation_families');");
 					$menu->addSubmenu($submenu);
@@ -336,8 +335,8 @@ class IndividualController extends DetailController {
 				$menu->addSeperator();
 			
 				// NOTE: Gender
-				if ($this->SEX_COUNT<2) {
-					if ($SEX_LINENUM=="new") $execute = "add_new_record('".$this->xref."', 'SEX', 'sex_edit');";
+				if ($this->SEX_COUNT < 2) {
+					if ($this->SEX_COUNT == 0) $execute = "add_new_record('".$this->xref."', 'SEX', 'sex_edit', '".$this->indi->datatype."');";
 					else $execute = "edit_record('".$this->xref."', 'SEX', 1, 'edit_gender', 'INDI');";
 					$submenu = new Menu(GM_LANG_edit." ".GM_LANG_sex);
 					$submenu->addLink($execute);
@@ -375,7 +374,7 @@ class IndividualController extends DetailController {
 	 * @return Menu
 	 */
 	public function &getOtherMenu() {
-		global $ENABLE_CLIPPINGS_CART, $gm_user, $GEDCOMID;
+		global $ENABLE_CLIPPINGS_CART, $gm_user;
 		
 		//-- main other menu item
 		$menu = new Menu(GM_LANG_other);
@@ -398,7 +397,7 @@ class IndividualController extends DetailController {
 			// Add favorite
 			if ($this->indi->disp && !empty($this->uname)) {
 				$submenu = new Menu(GM_LANG_add_to_my_favorites);
-				$submenu->addLink("individual.php?action=addfav&pid=".$this->xref.'&gedid='.$GEDCOMID);
+				$submenu->addLink("individual.php?action=addfav&pid=".$this->xref.'&gedid='.GedcomConfig::$GEDCOMID);
 				$menu->addSubmenu($submenu);
 			}
 		}

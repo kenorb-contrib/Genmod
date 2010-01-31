@@ -201,7 +201,7 @@ switch ($action) {
 				
 				// Backup multimediafiles in GM
 				if (isset($_POST["um_media"])) {
-					$mlist = GetMediaFiles($GEDCOMID);
+					$mlist = GetMediaFiles(GedcomConfig::$GEDCOMID);
 					foreach ($mlist as $key => $mfile) {
 						$file = RelativePathFile(GedcomConfig::$MEDIA_DIRECTORY.MediaFS::CheckMediaDepth($mfile));
 						if (file_exists($file)) $flist[] = $file;

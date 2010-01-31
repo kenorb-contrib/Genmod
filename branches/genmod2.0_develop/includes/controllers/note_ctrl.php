@@ -42,7 +42,6 @@ class NoteController extends DetailController {
 	 * constructor
 	 */
 	public function __construct() {
-		global $GEDCOMID;
 		global $ENABLE_CLIPPINGS_CART, $nonfacts;
 		
 		parent::__construct();
@@ -131,7 +130,6 @@ class NoteController extends DetailController {
 	 * @return Menu
 	 */
 	public function &getOtherMenu() {
-		global $GEDCOMID;
 		global $ENABLE_CLIPPINGS_CART, $gm_user;
 		
 		// other menu
@@ -153,16 +151,16 @@ class NoteController extends DetailController {
 		if ($this->note->disp && !empty($this->uname)) {
 				// other / add_to_my_favorites
 				$submenu = new Menu(GM_LANG_add_to_my_favorites);
-				$submenu->addLink('note.php?action=addfav&oid='.$this->xref.'&gedid='.$GEDCOMID);
+				$submenu->addLink('note.php?action=addfav&oid='.$this->xref.'&gedid='.GedcomConfig::$GEDCOMID);
 				$menu->addSubmenu($submenu);
 		}
 		return $menu;
 	}
 	
 	public function GetNoteList($filter="", $selection="") {
-		global $GEDCOMID, $note_hide;
+		global $note_hide;
 		
- 		$sql = "SELECT * FROM ".TBLPREFIX."other WHERE o_type='NOTE' AND o_file='".$GEDCOMID."'";
+ 		$sql = "SELECT * FROM ".TBLPREFIX."other WHERE o_type='NOTE' AND o_file='".GedcomConfig::$GEDCOMID."'";
  		if (!empty($filter)) $sql .= " AND o_gedrec LIKE '%".$filter."%'";
  		if (!empty($selection)) $sql .= " AND o_id IN (".$selection.")";
  		$res = NewQuery($sql);
@@ -247,14 +245,14 @@ class NoteController extends DetailController {
 				$submenu["label"] = GM_LANG_copy;
 				$submenu["labelpos"] = "right";
 				$submenu["icon"] = "";
-				$submenu["onclick"] = "return copy_record('$this->xref', 'NOTE', '1', 'copy_general_note');";
+				$submenu["onclick"] = "return copy_record('$this->xref', 'NOTE', '1', 'copy_general_note', 'NOTE');";
 				$submenu["link"] = "#";
 				$submenu["class"] = "submenuitem";
 				$submenu["hoverclass"] = "submenuitem_hover";
 				$menu["items"][] = $submenu;
 				// No delete option. A note cannot be without text!
 				print " <div style=\"width:25px;\" class=\"center\">";
-				PrintFactMenu($menu);
+				FactFunctions::PrintFactMenu($menu);
 				print "</div>";
 			}
 			print " </td>\n<td class=\"shade1 $styleadd wrap\">";

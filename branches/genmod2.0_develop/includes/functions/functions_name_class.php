@@ -175,14 +175,14 @@ abstract class NameFunctions {
 			$names = $person->name_array;
 			$mynames = array();
 			foreach ($names as $key => $name) {
-				if ($NAME_REVERSE) $mynames[] = self::SortableNameFromName(self::ReverseName($name[0]), $rev).(empty($name[3]) ? "" : " ".substr(GedcomConfig::$NICK_DELIM, 0, 1).$name[3].substr(GedcomConfig::$NICK_DELIM, 1, 1));
-				else $mynames[] = self::SortableNameFromName($name[0], $rev).(empty($name[3]) ? "" : " ".substr(GedcomConfig::$NICK_DELIM, 0, 1).$name[3].substr(GedcomConfig::$NICK_DELIM, 1, 1));
+				if ($NAME_REVERSE) $mynames[] = self::SortableNameFromName(self::ReverseName($name[0]), $rev).(empty($name[3]) || !GedcomConfig::$SHOW_NICK ? "" : " ".substr(GedcomConfig::$NICK_DELIM, 0, 1).$name[3].substr(GedcomConfig::$NICK_DELIM, 1, 1));
+				else $mynames[] = self::SortableNameFromName($name[0], $rev).(empty($name[3]) || !GedcomConfig::$SHOW_NICK ? "" : " ".substr(GedcomConfig::$NICK_DELIM, 0, 1).$name[3].substr(GedcomConfig::$NICK_DELIM, 1, 1));
 			}
 			return $mynames;
 		}
 		$name = $person->name_array[$count];
-		if ($NAME_REVERSE) return self::SortableNameFromName(self::ReverseName($name[0]), $rev).(empty($name[3]) ? "" : " ".substr(GedcomConfig::$NICK_DELIM, 0, 1).$name[3].substr(GedcomConfig::$NICK_DELIM, 1, 1));
-		else return self::SortableNameFromName($name[0], $rev).(empty($name[3]) ? "" : " ".substr(GedcomConfig::$NICK_DELIM, 0, 1).$name[3].substr(GedcomConfig::$NICK_DELIM, 1, 1));
+		if ($NAME_REVERSE) return self::SortableNameFromName(self::ReverseName($name[0]), $rev).(empty($name[3]) || !GedcomConfig::$SHOW_NICK ? "" : " ".substr(GedcomConfig::$NICK_DELIM, 0, 1).$name[3].substr(GedcomConfig::$NICK_DELIM, 1, 1));
+		else return self::SortableNameFromName($name[0], $rev).(empty($name[3]) || !GedcomConfig::$SHOW_NICK ? "" : " ".substr(GedcomConfig::$NICK_DELIM, 0, 1).$name[3].substr(GedcomConfig::$NICK_DELIM, 1, 1));
 	}
 	
 	// -- find and return a given individual's second name in sort format: familyname, firstname

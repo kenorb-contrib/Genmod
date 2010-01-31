@@ -39,7 +39,7 @@ class ActionItem {
 	private $type = null;				// Type of pid: INDI, FAM, etc.
 	private $pid_obj = null;			// The related object
 	private $pid_disp = null;		 	// Can we display the related object
-	private $gedfile = "";				// The gedfile ID in which this action exists
+	private $gedcomid = "";				// The gedfile ID in which this action exists
 	private $text = "";					// Text for the item
 	private $repo = null;				// The xref of the repository that this action relates to
 	private $repo_obj = null;			// The repository object
@@ -58,7 +58,7 @@ class ActionItem {
 			$this->pid = $values["a_pid"];
 			$this->type = $values["a_type"];
 			$this->repo = $values["a_repo"];
-			$this->gedfile = $values["a_file"];
+			$this->gedcomid = $values["a_file"];
 			$this->text = stripslashes($values["a_text"]);
 			$this->status = $values["a_status"];
 		}
@@ -76,8 +76,8 @@ class ActionItem {
 				case "type":
 					return $this->type;
 					break;
-				case "gedfile":
-					return $this->gedfile;
+				case "gedcomid":
+					return $this->gedcomid;
 					break;
 				case "text":
 					return $this->text;
@@ -123,7 +123,7 @@ class ActionItem {
 					$this->type = $value;
 					break;
 				case "gedfile":
-					if (is_numeric($value)) $this->gedfile = $value;
+					if (is_numeric($value)) $this->gedcomid = $value;
 					break;
 				case "text":
 					$this->text = $value;
@@ -224,10 +224,9 @@ class ActionItem {
 	}
  	
 	public function AddThis() {
-		global $GEDCOMID;
 		
 		if ($this->canshow) {
-			$sql = "INSERT INTO ".TBLPREFIX."actions VALUES('', '".$this->pid."', '".$this->type."', '".$this->repo."','".$this->gedfile."', '".DbLayer::EscapeQuery($this->text)."','".$this->status."')";
+			$sql = "INSERT INTO ".TBLPREFIX."actions VALUES('', '".$this->pid."', '".$this->type."', '".$this->repo."','".$this->gedcomid."', '".DbLayer::EscapeQuery($this->text)."','".$this->status."')";
 			$res = NewQuery($sql);
 			$this->id = $res->InsertID();
 		}
@@ -286,7 +285,7 @@ class ActionItem {
 				$submenu["hoverclass"] = "submenuitem_hover";
 				$menu["items"][] = $submenu;
 				print "<div style=\"width:25px;\" class=\"center\" id=\"menu_".$this->id."\">";
-				PrintFactMenu($menu);
+				FactFunctions::PrintFactMenu($menu);
 				print "</div>";
 			}
 			print "</td>";
@@ -348,7 +347,7 @@ class ActionItem {
 			print "<b>".GM_LANG_todo."</b><br />";
 			print nl2br(stripslashes($this->text));
 			print "<br /><br /><b>".GM_LANG_repo."</b><br />";
-			print "<a href=\"repo.php?rid=".$this->repo."\">".$this->GetRepoDesc()."</a>";
+			print "<a href=\"repo.php?rid=".$this->repo."&amp;gedid=".$this->gedcomid."\">".$this->GetRepoDesc()."</a>";
 			print "<br /><br /><b>".GM_LANG_status."</b><br />";
 			print constant("GM_LANG_action".$this->status);
 			print "<br />";
