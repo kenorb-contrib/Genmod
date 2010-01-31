@@ -87,7 +87,7 @@ class Asso {
 				return $this->key2;
 				break;
 			case "assoperson":
-				return $this->GetAssoPerson();;
+				return $this->GetAssoPerson();
 				break;
 			case "type":
 				return $this->type;

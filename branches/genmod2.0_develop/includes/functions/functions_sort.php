@@ -991,4 +991,12 @@ function IndiBirthSort($a, $b) {
 function IndiDeathSort($a, $b) {
 	return CompareFacts($a->drec, $b->drec);
 }
+function AssoSort($a, $b) {
+	return ItemObjSort($a->assoperson, $b->assoperson);
+}
+
+function AssoOSort($a, $b) {
+	if ($a->xref1 != $b->xref1) return ItemObjSort($a->associated, $b->associated);
+	else return CompareFacts("1 ".$a->fact."\r\n", "1 ".$b->fact."\r\n");
+}
 ?>

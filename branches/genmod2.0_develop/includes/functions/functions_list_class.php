@@ -237,7 +237,10 @@ abstract class ListFunctions {
 	}
 	
 	//-- get the assolist from the datastore
-	public function GetAssoList($type = "all", $id="") {
+	// type = all or fam or indi
+	// id   = id of the person who is asso to a family or person (the latter holder of the ASSO tag)
+	// asso = id of the person or family that another person relates to (the former holder of the ASSO tag)
+	public function GetAssoList($type = "all", $id="", $asso="") {
 	
 		$type = str2lower($type);
 		$assolist = array();
@@ -246,10 +249,12 @@ abstract class ListFunctions {
 		if (($type == "all") || ($type == "fam")) {
 			$sql1 = "SELECT f_key as as_key, f_file as as_file, as_pid, as_fact, as_rela, as_resn, as_type FROM ".TBLPREFIX."asso, ".TBLPREFIX."families WHERE f_key=as_of AND as_type='F'"; 
 			if (!empty($id)) $sql1 .= " AND as_pid LIKE '".JoinKey($id, GedcomConfig::$GEDCOMID)."'";
+			if (!empty($asso)) $sql1 .= " AND as_of LIKE '".JoinKey($asso, GedcomConfig::$GEDCOMID)."'";
 		}
 		if (($type == "all") || ($type == "indi")) {
 			$sql2 = "SELECT i_key as as_key, i_file as as_file, as_pid, as_fact, as_rela, as_resn, as_type FROM ".TBLPREFIX."asso, ".TBLPREFIX."individuals WHERE i_key=as_of AND as_type='I'";	
 			if (!empty($id)) $sql2 .= " AND as_pid LIKE '".JoinKey($id, GedcomConfig::$GEDCOMID)."'";
+			if (!empty($asso)) $sql2 .= " AND as_of LIKE '".JoinKey($asso, GedcomConfig::$GEDCOMID)."'";
 		}
 		if ($type == "fam") $sql = $sql1;
 		else if ($type == "indi") $sql = $sql2;
