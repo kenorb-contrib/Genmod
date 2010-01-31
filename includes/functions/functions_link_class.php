@@ -40,12 +40,12 @@ abstract class LinkFunctions {
 	 * @param		$element_id	The ID of the form field
 	 */
 	public function PrintFindIndiLink($element_id, $gedid) {
-		global $GM_IMAGES, $GEDCOMID;
+		global $GM_IMAGES;
 	
 		$text = GM_LANG_find_id;
 		if (isset($GM_IMAGES["indi"]["button"])) $Link = "<img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["indi"]["button"]."\" alt=\"".$text."\" title=\"".$text."\" border=\"0\" align=\"middle\" />";
 		else $Link = $text;
-		if (empty($gedid)) $gedid = $GEDCOMID;
+		if (empty($gedid)) $gedid = GedcomConfig::$GEDCOMID;
 		print " <a href=\"javascript: ".$text."\" onclick=\"findIndi(document.getElementById('".$element_id."'), '".$gedid."'); return false;\">";
 		print $Link;
 		print "</a>";

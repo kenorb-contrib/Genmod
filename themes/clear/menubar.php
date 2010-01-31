@@ -129,10 +129,10 @@ if (is_object($custommenu)) $showmenu[GM_LANG_my_pages] = CreateMenu($custommenu
 		$ldir = "right";
 	}
 	?>
-	<?php if (isset($GEDCOMS[$GEDCOMID])) { ?>
+	<?php if (isset($GEDCOMS[GedcomConfig::$GEDCOMID])) { ?>
 		<div style="width: 1em; height: 1em;">
 		<a href="index.php?command=gedcom">
-		<img src="<?php print GM_IMAGE_DIR."/".$GM_IMAGES['gedcom']['small']; ?>" alt="<?php print $GEDCOMS[$GEDCOMID]['title']; ?>" />
+		<img src="<?php print GM_IMAGE_DIR."/".$GM_IMAGES['gedcom']['small']; ?>" alt="<?php print $GEDCOMS[GedcomConfig::$GEDCOMID]['title']; ?>" />
 		</a>
 		</div>
 	<?php } 
@@ -149,9 +149,9 @@ if (is_object($custommenu)) $showmenu[GM_LANG_my_pages] = CreateMenu($custommenu
 		</div>
 		<div class="shade1" style="float: <?php print $rdir; ?>; text-align: <?php print $ldir; ?>; margin-<?php print $rdir; ?>: 0em; width: 20em;">
 			<?php 
-			if (isset($gm_user->gedcomid[$GEDCOMID]) && !empty($gm_user->gedcomid[$GEDCOMID])) {
-				$person =& Person::GetInstance($gm_user->gedcomid[$GEDCOMID], "", $GEDCOMID);
-				if ($person->disp_name) print "<a href=\"individual.php?pid=".$gm_user->gedcomid[$GEDCOMID]."&amp;gedid=".$GEDCOMID."\">".$gm_user->firstname.' '.$gm_user->lastname."</a><br />";
+			if (isset($gm_user->gedcomid[GedcomConfig::$GEDCOMID]) && !empty($gm_user->gedcomid[GedcomConfig::$GEDCOMID])) {
+				$person =& Person::GetInstance($gm_user->gedcomid[GedcomConfig::$GEDCOMID], "", GedcomConfig::$GEDCOMID);
+				if ($person->disp_name) print "<a href=\"individual.php?pid=".$gm_user->gedcomid[GedcomConfig::$GEDCOMID]."&amp;gedid=".GedcomConfig::$GEDCOMID."\">".$gm_user->firstname.' '.$gm_user->lastname."</a><br />";
 			}
 			else echo $gm_user->firstname.' '.$gm_user->lastname.'<br />';
 			echo "<a href=\"".GedcomConfig::$HOME_SITE_URL."\">".GedcomConfig::$HOME_SITE_TEXT."</a>";
@@ -159,7 +159,7 @@ if (is_object($custommenu)) $showmenu[GM_LANG_my_pages] = CreateMenu($custommenu
 		</div>
 	</div>
 	<br clear="all" />
-	<div style="float: <?php print $rdir; ?>; margin-<?php print $rdir; ?>: 0em; text-align: <?php print $rdir; ?>; height: 50px;">
+	<div style="float: <?php print $rdir; ?>; margin-<?php print $rdir; ?>: 0em; text-align: <?php print $rdir; ?>;">
 		<form action="search.php" method="get" name="searchformtop">
 			<input type="hidden" name="action" value="general" />
 			<input type="hidden" name="topsearch" value="yes" />

@@ -36,7 +36,7 @@ if (empty($gid1)) $gid1="";
 else $gid1 = strtoupper($gid1);
 if (empty($gid2)) $gid2="";
 else $gid2 = strtoupper($gid2);
-if (empty($mergeged)) $mergeged = $GEDCOMID;
+if (empty($mergeged)) $mergeged = GedcomConfig::$GEDCOMID;
 if (empty($keep1)) $keep1=array();
 if (empty($keep2)) $keep2=array();
 if (empty($skip1)) $skip1=array();
@@ -73,7 +73,7 @@ if ($action != "choose") {
 		$action = "choose";
 	}
 	else {
-		$oldged = $GEDCOMID;
+		$oldged = GedcomConfig::$GEDCOMID;
 		SwitchGedcom($mergeged);
 		$object1 = ConstructObject($gid1, "", $mergeged); 
 		$object2 = ConstructObject($gid2, "", $mergeged); 
@@ -313,7 +313,7 @@ if ($action != "choose") {
 				// Now update all links in other records from ged2 to ged1
 				EditFunctions::ReplaceLinks($gid2, $gid1, $mtype, $change_id, $change_type, $mergeged);
 				if (isset($change_id) && $can_auto_accept &&  $gm_user->userAutoAccept()) {
-					ChangeFunctions::AcceptChange($change_id, $GEDCOMID);
+					ChangeFunctions::AcceptChange($change_id, GedcomConfig::$GEDCOMID);
 					print GM_LANG_merge_success_auto;
 				}
 				else print GM_LANG_merge_success;
@@ -437,7 +437,7 @@ if ($action=="choose") {
 			print "<table style=\"width:100%\">";
 				print "<tr><td class=\"shade1\">".GM_LANG_choose_gedcom."<br /></td>";
 				print "<td class=\"shade1\"><select name=\"mergeged\">\n";
-				if (!isset($mergeged) || empty($mergeged)) $mergeged = $GEDCOMID;
+				if (!isset($mergeged) || empty($mergeged)) $mergeged = GedcomConfig::$GEDCOMID;
 				foreach($GEDCOMS as $gedc=>$gedarray) {
 					$gedid = $gedarray["id"];
 					if ($gm_user->userGedcomAdmin($gedc)) {

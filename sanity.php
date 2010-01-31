@@ -387,7 +387,6 @@ if (!empty($check_gedcoms)) {
 			SwitchGedcom($ged);
 			$LANGUAGE = $lang;
 			print "<tr><td class=\"shade1 wrap\" rowspan=\"23\">".$value["title"]."</td><td class=\"shade1 wrap\">";
-			
 			// Get the partial indilist
 			$sql = "SELECT i_id, i_gedrec, i_file FROM ".TBLPREFIX."individuals WHERE i_file='".$id."'";
 			$res = NewQuery($sql);
@@ -413,7 +412,7 @@ if (!empty($check_gedcoms)) {
 							print $warn_icon.GM_LANG_sc_ged_unlink;
 							print "<br /><ul>";
 						}
-						$person =& Person::GetInstance($row["i_id"], $row, $GEDCOMID);
+						$person =& Person::GetInstance($row["i_id"], $row, GedcomConfig::$GEDCOMID);
 						$person->PrintListPerson();
 					}
 				}
@@ -538,7 +537,7 @@ if (!empty($check_gedcoms)) {
 								$error = true;
 								print $error_icon.GM_LANG_sc_inv_sref."<ul>";
 							}
-							$person =& Person::GetInstance($key, $gedlines["gedcom"], $GEDCOMID);
+							$person =& Person::GetInstance($key, $gedlines["gedcom"], GedcomConfig::$GEDCOMID);
 							$person->PrintListPerson(true, false, GM_LANG_source.": ".$sid);
 						}
 					}
@@ -565,7 +564,7 @@ if (!empty($check_gedcoms)) {
 							foreach($subs as $keyf2 => $sub) {
 								preg_match("/(\d)\s(\w+)[\s.+\r\n|\r\n]/", $sub, $tags);
 								$numcf++;
-								if (isset($tags[2]) && !defined("GM_FACT_".$tags[2]) && !in_array($tags[2],$rightfacts)) $wrongfacts[$tags[2]][] = array($key, $GEDCOMID, "INDI");
+								if (isset($tags[2]) && !defined("GM_FACT_".$tags[2]) && !in_array($tags[2],$rightfacts)) $wrongfacts[$tags[2]][] = array($key, GedcomConfig::$GEDCOMID, "INDI");
 							}
 						}
 						// Source citations
@@ -575,7 +574,7 @@ if (!empty($check_gedcoms)) {
 								$type = $match[1];
 								$numnc++;
 								if (stristr($fact, "2 SOUR") == 0 && !in_array($type, $non_cits_facts)) {
-									$no_cits[$key."[".$GEDCOMID."]"] = array($key, $GEDCOMID, "INDI", $type, $gedlines["gedcom"]);
+									$no_cits[$key."[".GedcomConfig::$GEDCOMID."]"] = array($key, GedcomConfig::$GEDCOMID, "INDI", $type, $gedlines["gedcom"]);
 								}
 							}
 						}
@@ -603,7 +602,7 @@ if (!empty($check_gedcoms)) {
 								$error = true;
 								print $error_icon.GM_LANG_sc_inv_aref."<ul>";
 							}
-							$person =& Person::GetInstance($key, $gedlines["gedcom"], $GEDCOMID);
+							$person =& Person::GetInstance($key, $gedlines["gedcom"], GedcomConfig::$GEDCOMID);
 							$person->PrintListPerson(true, false, GM_LANG_asso_alia.": ".$pid);
 						}
 					}
@@ -621,7 +620,7 @@ if (!empty($check_gedcoms)) {
 								$error = true;
 								print $error_icon.GM_LANG_sc_inv_aref."<ul>";
 							}
-							$family =& Family::GetInstance($key, $gedlines["gedcom"], $GEDCOMID);
+							$family =& Family::GetInstance($key, $gedlines["gedcom"], GedcomConfig::$GEDCOMID);
 							$family->PrintListFamily(true, GM_LANG_asso_alia.": ".$pid);
 						}
 					}
@@ -674,7 +673,7 @@ if (!empty($check_gedcoms)) {
 						foreach($subs as $keyf2 => $sub) {
 							preg_match("/(\d)\s(\w+)[\s.+\r\n|\r\n]/", $sub, $tags);
 							$numcf++;
-							if (isset($tags[2]) && !defined("GM_FACT_".$tags[2]) && !in_array($tags[2],$rightfacts)) $wrongfacts[$tags[2]][] = array($key, $GEDCOMID, "MEDIA", $gedlines["gedcom"]);
+							if (isset($tags[2]) && !defined("GM_FACT_".$tags[2]) && !in_array($tags[2],$rightfacts)) $wrongfacts[$tags[2]][] = array($key, GedcomConfig::$GEDCOMID, "MEDIA", $gedlines["gedcom"]);
 						}
 					}
 				}
@@ -701,7 +700,7 @@ if (!empty($check_gedcoms)) {
 								$error = true;
 								print $error_icon.GM_LANG_sc_inv_sref_fam."<ul>";
 							}
-							$family =& Family::GetInstance($key, $gedlines["gedcom"], $GEDCOMID);
+							$family =& Family::GetInstance($key, $gedlines["gedcom"], GedcomConfig::$GEDCOMID);
 							$family->PrintListFamily(true, GM_LANG_source." ".$sid);
 						}
 					}
@@ -728,7 +727,7 @@ if (!empty($check_gedcoms)) {
 							preg_match("/(\d)\s(\w+)[\s.+\r\n|\r\n]/", $sub, $tags);
 							$numcf++;
 							if (isset($tags[2]) && !defined("GM_FACT_".$tags[2]) && !in_array($tags[2],$rightfacts)) {
-								$wrongfacts[$tags[2]][] = array($key, $GEDCOMID, "FAM", $gedlines["gedcom"]);
+								$wrongfacts[$tags[2]][] = array($key, GedcomConfig::$GEDCOMID, "FAM", $gedlines["gedcom"]);
 								$inames = true;
 							}
 						}
@@ -738,7 +737,7 @@ if (!empty($check_gedcoms)) {
 								$ft = preg_match("/^1\s(\w+)/", $fact, $match);
 								$type = $match[1];
 								if (stristr($fact, "2 SOUR") == 0 && !in_array($type, $non_cits_facts)) {
-									$no_cits[$key."[".$GEDCOMID."]"] = array($key, $GEDCOMID, "FAM", $type, $gedlines["gedcom"]);
+									$no_cits[$key."[".GedcomConfig::$GEDCOMID."]"] = array($key, GedcomConfig::$GEDCOMID, "FAM", $type, $gedlines["gedcom"]);
 									$numnc++;
 									$inames = true;
 								}
@@ -774,7 +773,7 @@ if (!empty($check_gedcoms)) {
 								$error = true;
 								print $error_icon.GM_LANG_sc_inv_rref_sour."<ul>";
 							}
-							$source =& Source::GetInstance($key, $sourcelist[$key]["gedcom"], $GEDCOMID);
+							$source =& Source::GetInstance($key, $sourcelist[$key]["gedcom"], GedcomConfig::$GEDCOMID);
 							$source->PrintListSource(true, 1, GM_LANG_repo." ".$rid);
 						}
 					}
@@ -799,7 +798,7 @@ if (!empty($check_gedcoms)) {
 						foreach($subs as $keyf2 => $sub) {
 							preg_match("/(\d)\s(\w+)[\s.+\r\n|\r\n]/", $sub, $tags);
 							$numcf++;
-							if (isset($tags[2]) && !defined("GM_FACT_".$tags[2]) && !in_array($tags[2],$rightfacts)) $wrongfacts[$tags[2]][] = array($key, $GEDCOMID, "SOUR");
+							if (isset($tags[2]) && !defined("GM_FACT_".$tags[2]) && !in_array($tags[2],$rightfacts)) $wrongfacts[$tags[2]][] = array($key, GedcomConfig::$GEDCOMID, "SOUR");
 						}
 					}
 				}
@@ -823,7 +822,7 @@ if (!empty($check_gedcoms)) {
 						print $warn_icon.GM_LANG_sc_noref_sour_repo;
 						print "<ul>";
 					}
-					$source =& Source::GetInstance($key, $sourcelist[$key]["gedcom"], $GEDCOMID);
+					$source =& Source::GetInstance($key, $sourcelist[$key]["gedcom"], GedcomConfig::$GEDCOMID);
 					$source->PrintListSource();
 				}
 			}
@@ -844,7 +843,7 @@ if (!empty($check_gedcoms)) {
 						print $warn_icon.GM_LANG_sc_unu_sref;
 						print "<ul>";
 					}
-					$source =& Source::GetInstance($sid, $sourcelist[$sid]["gedcom"], $GEDCOMID);
+					$source =& Source::GetInstance($sid, $sourcelist[$sid]["gedcom"], GedcomConfig::$GEDCOMID);
 					$source->PrintListSource();
 				}
 			}
@@ -864,7 +863,7 @@ if (!empty($check_gedcoms)) {
 						$error = true;
 						print $warn_icon.GM_LANG_sc_unu_rref."<ul>";
 					}
-					$repo =& Repository::GetInstance($rid, $value["gedcom"], $GEDCOMID);
+					$repo =& Repository::GetInstance($rid, $value["gedcom"], GedcomConfig::$GEDCOMID);
 					$repo->PrintListRepository(true, 1, false);
 				}
 				$s = preg_match_all("/\n\d NOTE @(.+)@/", $value["gedcom"], $match);
@@ -887,7 +886,7 @@ if (!empty($check_gedcoms)) {
 						foreach($subs as $keyf2 => $sub) {
 							preg_match("/(\d)\s(\w+)[\s.+\r\n|\r\n]/", $sub, $tags);
 							$numcf++;
-							if (isset($tags[2]) && !defined("GM_FACT_".$tags[2]) && !in_array($tags[2],$rightfacts)) $wrongfacts[$tags[2]][] = array($rid, $GEDCOMID, "REPO", $value["gedcom"]);
+							if (isset($tags[2]) && !defined("GM_FACT_".$tags[2]) && !in_array($tags[2],$rightfacts)) $wrongfacts[$tags[2]][] = array($rid, GedcomConfig::$GEDCOMID, "REPO", $value["gedcom"]);
 						}
 					}
 				}
@@ -998,7 +997,7 @@ if (!empty($check_gedcoms)) {
 									print $warn_icon.GM_LANG_sc_order_fam."<ul>";
 								}
 								if (!$printed) {
-									$family =& Family::GetInstance($key, $fam["gedcom"], $GEDCOMID);
+									$family =& Family::GetInstance($key, $fam["gedcom"], GedcomConfig::$GEDCOMID);
 									$family->PrintListFamily();
 									$printed = true;
 								}
@@ -1041,7 +1040,7 @@ if (!empty($check_gedcoms)) {
 						$error = true;
 						print $error_icon.GM_LANG_sc_empty_fam."<ul>";
 					}
-					$family =& Family::GetInstance($key, $cfam["gedcom"], $GEDCOMID);
+					$family =& Family::GetInstance($key, $cfam["gedcom"], GedcomConfig::$GEDCOMID);
 					$family->PrintListFamily();
 				}
 			}
@@ -1070,9 +1069,9 @@ if (!empty($check_gedcoms)) {
 							else {
 								if (!$error) print $error_icon.GM_LANG_sc_inv_pointer."<br />";
 								if (isset($cfamlist[$pointer])) {
-									print "<br />".GM_LANG_sc_no_backward_fam."<br />".GM_LANG_sc_indi." <a href=\"individual.php?gedid=".$GEDCOMID."&amp;pid=".$key."\" target=\"_BLANK\">".$key."</a><br />".GM_LANG_sc_fam." <a href=\"family.php?gedid=".$GEDCOMID."&amp;famid=".$pointer."\" target=\"_BLANK\">".$pointer."</a><br />".GM_LANG_sc_role." ".$role."<br />";
+									print "<br />".GM_LANG_sc_no_backward_fam."<br />".GM_LANG_sc_indi." <a href=\"individual.php?gedid=".GedcomConfig::$GEDCOMID."&amp;pid=".$key."\" target=\"_BLANK\">".$key."</a><br />".GM_LANG_sc_fam." <a href=\"family.php?gedid=".GedcomConfig::$GEDCOMID."&amp;famid=".$pointer."\" target=\"_BLANK\">".$pointer."</a><br />".GM_LANG_sc_role." ".$role."<br />";
 								}
-								else print "<br />".GM_LANG_sc_no_fam."<br />".GM_LANG_sc_indi." <a href=\"individual.php?gedid=".$GEDCOMID."&amp;pid=".$key."\" target=\"_BLANK\">".$key."</a><br />".GM_LANG_sc_fam." ".$pointer."<br />".GM_LANG_sc_role." ".$role."<br />";
+								else print "<br />".GM_LANG_sc_no_fam."<br />".GM_LANG_sc_indi." <a href=\"individual.php?gedid=".GedcomConfig::$GEDCOMID."&amp;pid=".$key."\" target=\"_BLANK\">".$key."</a><br />".GM_LANG_sc_fam." ".$pointer."<br />".GM_LANG_sc_role." ".$role."<br />";
 								$error = true;
 							}
 						}
@@ -1087,9 +1086,9 @@ if (!empty($check_gedcoms)) {
 							else {
 								if (!$error) print $error_icon.GM_LANG_sc_inv_pointer."<br />";
 								if (isset($cfamlist[$pointer])) {
-									print "<br />".GM_LANG_sc_no_backward_fam."<br />".GM_LANG_sc_indi." <a href=\"individual.php?gedid=".$GEDCOMID."&amp;pid=".$key."\" target=\"_BLANK\">".$key."</a><br />".GM_LANG_sc_fam." <a href=\"family.php?gedid=".$GEDCOMID."&amp;famid=".$pointer."\" target=\"_BLANK\">".$pointer."</a><br />".GM_LANG_sc_role." ".$role."<br />";
+									print "<br />".GM_LANG_sc_no_backward_fam."<br />".GM_LANG_sc_indi." <a href=\"individual.php?gedid=".GedcomConfig::$GEDCOMID."&amp;pid=".$key."\" target=\"_BLANK\">".$key."</a><br />".GM_LANG_sc_fam." <a href=\"family.php?gedid=".GedcomConfig::$GEDCOMID."&amp;famid=".$pointer."\" target=\"_BLANK\">".$pointer."</a><br />".GM_LANG_sc_role." ".$role."<br />";
 								}
-								else print "<br />".GM_LANG_sc_no_fam."<br />".GM_LANG_sc_indi." <a href=\"individual.php?gedid=".$GEDCOMID."&pid=".$key."\" target=\"_BLANK\">".$key."</a><br />".GM_LANG_sc_fam." ".$pointer."<br />".GM_LANG_sc_role." ".$role."<br />";
+								else print "<br />".GM_LANG_sc_no_fam."<br />".GM_LANG_sc_indi." <a href=\"individual.php?gedid=".GedcomConfig::$GEDCOMID."&pid=".$key."\" target=\"_BLANK\">".$key."</a><br />".GM_LANG_sc_fam." ".$pointer."<br />".GM_LANG_sc_role." ".$role."<br />";
 								$error = true;
 							}
 						}
@@ -1110,9 +1109,9 @@ if (!empty($check_gedcoms)) {
 							else {
 								if (!$error) print $error_icon.GM_LANG_sc_inv_pointer."<br />";
 								if (isset($indilist[$pointer])) {
-									print "<br />".GM_LANG_sc_no_backward_indi."<br />".GM_LANG_sc_indi." <a href=\"individual.php?gedid=".$GEDCOMID."&amp;pid=".$pointer."\" target=\"_BLANK\">".$pointer."</a><br />".GM_LANG_sc_fam." <a href=\"family.php?gedid=".$GEDCOMID."&amp;famid=".$key."\" target=\"_BLANK\">".$key."</a><br />".GM_LANG_sc_role." ".$role."<br />";
+									print "<br />".GM_LANG_sc_no_backward_indi."<br />".GM_LANG_sc_indi." <a href=\"individual.php?gedid=".GedcomConfig::$GEDCOMID."&amp;pid=".$pointer."\" target=\"_BLANK\">".$pointer."</a><br />".GM_LANG_sc_fam." <a href=\"family.php?gedid=".GedcomConfig::$GEDCOMID."&amp;famid=".$key."\" target=\"_BLANK\">".$key."</a><br />".GM_LANG_sc_role." ".$role."<br />";
 								}
-								else print "<br />".GM_LANG_sc_no_indi."<br />".GM_LANG_sc_indi." ".$pointer."<br />".GM_LANG_sc_fam." <a href=\"family.php?gedid=".$GEDCOMID."&amp;famid=".$key."\" target=\"_BLANK\">".$key."</a><br />".GM_LANG_sc_role." ".$role."<br />";
+								else print "<br />".GM_LANG_sc_no_indi."<br />".GM_LANG_sc_indi." ".$pointer."<br />".GM_LANG_sc_fam." <a href=\"family.php?gedid=".GedcomConfig::$GEDCOMID."&amp;famid=".$key."\" target=\"_BLANK\">".$key."</a><br />".GM_LANG_sc_role." ".$role."<br />";
 								$error = true;
 							}
 						}
@@ -1127,9 +1126,9 @@ if (!empty($check_gedcoms)) {
 							else {
 								if (!$error) print $error_icon.GM_LANG_sc_inv_pointer."<br />";
 								if (isset($indilist[$pointer])) {
-									print "<br />".GM_LANG_sc_no_backward_indi."<br />".GM_LANG_sc_indi." <a href=\"individual.php?gedid=".$GEDCOMID."&amp;pid=".$pointer."\" target=\"_BLANK\">".$pointer."</a><br />".GM_LANG_sc_fam." <a href=\"family.php?gedid=".$GEDCOMID."&amp;famid=".$key."\" target=\"_BLANK\">".$key."</a><br />".GM_LANG_sc_role." ".$role."<br />";
+									print "<br />".GM_LANG_sc_no_backward_indi."<br />".GM_LANG_sc_indi." <a href=\"individual.php?gedid=".GedcomConfig::$GEDCOMID."&amp;pid=".$pointer."\" target=\"_BLANK\">".$pointer."</a><br />".GM_LANG_sc_fam." <a href=\"family.php?gedid=".GedcomConfig::$GEDCOMID."&amp;famid=".$key."\" target=\"_BLANK\">".$key."</a><br />".GM_LANG_sc_role." ".$role."<br />";
 								}
-								else print "<br />".GM_LANG_sc_no_indi."<br />".GM_LANG_sc_indi." ".$pointer."<br />".GM_LANG_sc_fam." <a href=\"family.php?gedid=".$GEDCOMID."&amp;famid=".$key."\" target=\"_BLANK\">".$key."</a><br />".GM_LANG_sc_role." ".$role."<br />";
+								else print "<br />".GM_LANG_sc_no_indi."<br />".GM_LANG_sc_indi." ".$pointer."<br />".GM_LANG_sc_fam." <a href=\"family.php?gedid=".GedcomConfig::$GEDCOMID."&amp;famid=".$key."\" target=\"_BLANK\">".$key."</a><br />".GM_LANG_sc_role." ".$role."<br />";
 								$error = true;
 							}
 						}
@@ -1144,9 +1143,9 @@ if (!empty($check_gedcoms)) {
 							else {
 								if (!$error) print $error_icon.GM_LANG_sc_inv_pointer."<br />";
 								if (isset($indilist[$pointer])) {
-									print "<br />".GM_LANG_sc_no_backward_indi."<br />".GM_LANG_sc_indi." <a href=\"individual.php?gedid=".$GEDCOMID."&amp;pid=".$pointer."\" target=\"_BLANK\">".$pointer."</a><br />".GM_LANG_sc_fam." <a href=\"family.php?gedid=".$GEDCOMID."&amp;famid=".$key."\" target=\"_BLANK\">".$key."</a><br />".GM_LANG_sc_role." ".$role."<br />";
+									print "<br />".GM_LANG_sc_no_backward_indi."<br />".GM_LANG_sc_indi." <a href=\"individual.php?gedid=".GedcomConfig::$GEDCOMID."&amp;pid=".$pointer."\" target=\"_BLANK\">".$pointer."</a><br />".GM_LANG_sc_fam." <a href=\"family.php?gedid=".GedcomConfig::$GEDCOMID."&amp;famid=".$key."\" target=\"_BLANK\">".$key."</a><br />".GM_LANG_sc_role." ".$role."<br />";
 								}
-								else print "<br />".GM_LANG_sc_no_indi."<br />".GM_LANG_sc_indi." ".$pointer."<br />".GM_LANG_sc_fam." <a href=\"family.php?gedid=".$GEDCOMID."&amp;famid=".$key."\" target=\"_BLANK\">".$key."</a><br />".GM_LANG_sc_role." ".$role."<br />";
+								else print "<br />".GM_LANG_sc_no_indi."<br />".GM_LANG_sc_indi." ".$pointer."<br />".GM_LANG_sc_fam." <a href=\"family.php?gedid=".GedcomConfig::$GEDCOMID."&amp;famid=".$key."\" target=\"_BLANK\">".$key."</a><br />".GM_LANG_sc_role." ".$role."<br />";
 								$error = true;
 							}
 						}
@@ -1175,7 +1174,7 @@ if (!empty($check_gedcoms)) {
 								$error = true;
 								print $error_icon.GM_LANG_sc_inv_mref."<ul>";
 							}
-							$person =& Person::GetInstance($key, $gedlines["gedcom"], $GEDCOMID);
+							$person =& Person::GetInstance($key, $gedlines["gedcom"], GedcomConfig::$GEDCOMID);
 							$person->PrintListPerson(true, false, GM_LANG_sc_media." ".$mid);
 						}
 					}
@@ -1203,7 +1202,7 @@ if (!empty($check_gedcoms)) {
 								$error = true;
 								print $error_icon.GM_LANG_sc_inv_mref_fam."<ul>";
 							}
-							$family =& Family::GetInstance($key, $gedlines["gedcom"], $GEDCOMID);
+							$family =& Family::GetInstance($key, $gedlines["gedcom"], GedcomConfig::$GEDCOMID);
 							$family->PrintListFamily(true, GM_LANG_sc_media." ".$mid);
 						}
 					}
@@ -1231,7 +1230,7 @@ if (!empty($check_gedcoms)) {
 								$error = true;
 								print $error_icon.GM_LANG_sc_inv_mref_sour."<ul>";
 							}
-							$source =& Source::GetInstance($key, $sourcelist[$key]["gedcom"], $GEDCOMID);
+							$source =& Source::GetInstance($key, $sourcelist[$key]["gedcom"], GedcomConfig::$GEDCOMID);
 							$source->PrintListSource(true, 1, GM_LANG_sc_media." ".$mid);
 						}
 					}
@@ -1259,7 +1258,7 @@ if (!empty($check_gedcoms)) {
 								$error = true;
 								print $error_icon.GM_LANG_sc_inv_mref_repo."<ul>";
 							}
-							$repo =& Repository::GetInstance($key, $repo["gedcom"], $GEDCOMID);
+							$repo =& Repository::GetInstance($key, $repo["gedcom"], GedcomConfig::$GEDCOMID);
 							$repo->PrintListRepository(true, 1, false, GM_LANG_sc_media." ".$mid);
 						}
 					}
@@ -1402,25 +1401,25 @@ if (!empty($check_gedcoms)) {
 				foreach ($inv_noteref as $type => $keys) {
 					if ($type == "INDI") {
 						foreach ($keys as $key => $nothing) {
-							$person =& Person::GetInstance($key, $indilist[$key]["gedcom"], $GEDCOMID);
+							$person =& Person::GetInstance($key, $indilist[$key]["gedcom"], GedcomConfig::$GEDCOMID);
 							$person->PrintListPerson();
 						}
 					}
 					if ($type == "FAM") {
 						foreach ($keys as $key => $nothing) {
-							$family =& Family::GetInstance($key, $cfamlist[$key]["gedcom"], $GEDCOMID);
+							$family =& Family::GetInstance($key, $cfamlist[$key]["gedcom"], GedcomConfig::$GEDCOMID);
 							$family->PrintListFamily();
 						}
 					}
 					if ($type == "SOUR") {
 						foreach ($keys as $key => $nothing) {
-							$source =& Source::GetInstance($key, $sourcelist[$key]["gedcom"], $GEDCOMID);
+							$source =& Source::GetInstance($key, $sourcelist[$key]["gedcom"], GedcomConfig::$GEDCOMID);
 							$source->PrintListSource();
 						}
 					}
 					if ($type == "REPO") {
 						foreach ($keys as $key => $nothing) {
-							$repo =& Repository::GetInstance($key, $crepolist[$key]["gedcom"], $GEDCOMID);
+							$repo =& Repository::GetInstance($key, $crepolist[$key]["gedcom"], GedcomConfig::$GEDCOMID);
 							$repo->PrintListRepository(true, 1, false);
 						}
 					}

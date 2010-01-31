@@ -31,14 +31,14 @@ if (stristr($_SERVER["SCRIPT_NAME"],basename(__FILE__))) {
 abstract class CounterFunctions {
 
 	public function GetCounter() {
-		global $GEDCOMID, $GM_IMAGES, $bot;
+		global $GM_IMAGES, $bot;
 		global $pid, $famid, $sid, $rid, $mid, $oid;
 		
 		//only do counter stuff if counters are enabled
 		if(GedcomConfig::$SHOW_COUNTER) {
 		
-			$GM_COUNTER_NAME     = $GEDCOMID."gm_counter";
-			$GM_INDI_COUNTER_NAME = $GEDCOMID."gm_indi_counter";
+			$GM_COUNTER_NAME     = GedcomConfig::$GEDCOMID."gm_counter";
+			$GM_INDI_COUNTER_NAME = GedcomConfig::$GEDCOMID."gm_indi_counter";
 			$type = "";
 		
 			// First check if any id is set. If not, we assume it's the index page
@@ -91,8 +91,8 @@ abstract class CounterFunctions {
 			  		}
 			  		else { 
 			  		//haven't viewed individual this session
-						$id = $cpid."[".$GEDCOMID."]";
-						$hits = self::UpdateCounter($id, $type, $GEDCOMID, $bot);
+						$id = $cpid."[".GedcomConfig::$GEDCOMID."]";
+						$hits = self::UpdateCounter($id, $type, GedcomConfig::$GEDCOMID, $bot);
 					}
 					$_SESSION[$GM_INDI_COUNTER_NAME][$cpid] = $hits;
 				}
@@ -103,8 +103,8 @@ abstract class CounterFunctions {
 			    // has user started a session on site yet
 		    	if(isset($_SESSION[$GM_COUNTER_NAME])) $hits = $_SESSION[$GM_COUNTER_NAME];
 		    	else { //new user so increment counter and save
-					$id = "Index"."[".$GEDCOMID."]";
-					$hits = self::UpdateCounter($id, $type, $GEDCOMID, $bot);
+					$id = "Index"."[".GedcomConfig::$GEDCOMID."]";
+					$hits = self::UpdateCounter($id, $type, GedcomConfig::$GEDCOMID, $bot);
 					$_SESSION[$GM_COUNTER_NAME]=$hits;
 		  		}
 			}

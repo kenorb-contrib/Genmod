@@ -80,7 +80,7 @@ if($clippings_controller->action == 'download') {
 	}
 	print "<br /><br />";
 }
-if (!isset($clippings_controller->cart[$GEDCOMID]) || count($clippings_controller->cart[$GEDCOMID]) == 0) {
+if (!isset($clippings_controller->cart[GedcomConfig::$GEDCOMID]) || count($clippings_controller->cart[GedcomConfig::$GEDCOMID]) == 0) {
 
 	// NOTE: display helptext when cart is empty
 	if ($clippings_controller->action != 'add') PrintText("help_clippings.php");
@@ -89,11 +89,11 @@ if (!isset($clippings_controller->cart[$GEDCOMID]) || count($clippings_controlle
 	print "\r\n\t\t<br /><br />".GM_LANG_cart_is_empty."<br /><br />";
 }
 else {
-	$ct = count($clippings_controller->cart[$GEDCOMID]);
+	$ct = count($clippings_controller->cart[GedcomConfig::$GEDCOMID]);
 	print "\r\n\t<table class=\"list_table\">\r\n\t\t<tr>\r\n\t\t\t<td class=\"list_label\">".GM_LANG_type."</td><td class=\"list_label\">".GM_LANG_id."</td><td class=\"list_label\">".GM_LANG_name_description."</td><td class=\"list_label\">".GM_LANG_remove."</td>\r\n\t\t</tr>";
 	for($i=0; $i<$ct; $i++) {
 		print "\r\n\t\t<tr>\r\n\t\t<td class=\"list_value\">";
-		$clipping = $clippings_controller->cart[$GEDCOMID][$i];
+		$clipping = $clippings_controller->cart[GedcomConfig::$GEDCOMID][$i];
 		if($clipping['type']=='indi') print "<img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["indis"]["small"]."\" border=\"0\" alt=\"".GM_LANG_individual."\" />";
 		else if($clipping['type']=='fam') print "<img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["sfamily"]["small"]."\" border=\"0\" alt=\"".GM_LANG_family."\" />";
 		else if($clipping['type']=='sour') print "<img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["source"]["small"]."\" border=\"0\" alt=\"".GM_LANG_source."\" />";

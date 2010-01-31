@@ -93,7 +93,7 @@ abstract class AdminFunctions {
 	}
 	
 	public function PrintGedcom($ged, $convert, $remove, $zip, $privatize_export, $privatize_export_level, $gedname, $embedmm, $embednote) {
-		GLOBAL $GEDCOMID, $GM_BASE_DIRECTORY, $gm_username, $gm_user;
+		GLOBAL $GM_BASE_DIRECTORY, $gm_username, $gm_user;
 		
 		if ($zip == "yes") {
 			$gedout = fopen($gedname, "w");
@@ -116,7 +116,7 @@ abstract class AdminFunctions {
 	
 		SwitchGedcom($ged);
 		$head = "";
-		$sql = "SELECT o_gedrec FROM ".TBLPREFIX."other WHERE o_id='HEAD' AND o_file='".$GEDCOMID."'";
+		$sql = "SELECT o_gedrec FROM ".TBLPREFIX."other WHERE o_id='HEAD' AND o_file='".GedcomConfig::$GEDCOMID."'";
 		$res = NewQuery($sql);
 		if ($res->NumRows() > 0) {
 			$row = $res->FetchAssoc();
@@ -162,7 +162,7 @@ abstract class AdminFunctions {
 		if ($zip == "yes") fwrite($gedout, $head);
 		else print $head;
 	
-		$sql = "SELECT i_key, i_gedrec, i_file, i_id, i_isdead, n_name, n_surname, n_nick, n_type, n_letter, n_fletter FROM ".TBLPREFIX."individuals INNER JOIN ".TBLPREFIX."names ON i_key=n_key WHERE i_file=".$GEDCOMID." ORDER BY CAST(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(LOWER(i_id),'a',''),'b',''),'c',''),'d',''),'e',''),'f',''),'g',''),'h',''),'i',''),'j',''),'k',''),'l',''),'m',''),'n',''),'o',''),'p',''),'q',''),'r',''),'s',''),'t',''),'u',''),'v',''),'w',''),'x',''),'y',''),'z','') as unsigned), n_id";
+		$sql = "SELECT i_key, i_gedrec, i_file, i_id, i_isdead, n_name, n_surname, n_nick, n_type, n_letter, n_fletter FROM ".TBLPREFIX."individuals INNER JOIN ".TBLPREFIX."names ON i_key=n_key WHERE i_file=".GedcomConfig::$GEDCOMID." ORDER BY CAST(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(LOWER(i_id),'a',''),'b',''),'c',''),'d',''),'e',''),'f',''),'g',''),'h',''),'i',''),'j',''),'k',''),'l',''),'m',''),'n',''),'o',''),'p',''),'q',''),'r',''),'s',''),'t',''),'u',''),'v',''),'w',''),'x',''),'y',''),'z','') as unsigned), n_id";
 		$res = NewQuery($sql);
 		if ($res) {
 			$key = "";
@@ -184,7 +184,7 @@ abstract class AdminFunctions {
 			}
 		}
 		
-		$sql = "SELECT f_id, f_gedrec, f_file FROM ".TBLPREFIX."families WHERE f_file=".$GEDCOMID." ORDER BY cast(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(LOWER(f_id),'a',''),'b',''),'c',''),'d',''),'e',''),'f',''),'g',''),'h',''),'i',''),'j',''),'k',''),'l',''),'m',''),'n',''),'o',''),'p',''),'q',''),'r',''),'s',''),'t',''),'u',''),'v',''),'w',''),'x',''),'y',''),'z','') as unsigned)";
+		$sql = "SELECT f_id, f_gedrec, f_file FROM ".TBLPREFIX."families WHERE f_file=".GedcomConfig::$GEDCOMID." ORDER BY cast(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(LOWER(f_id),'a',''),'b',''),'c',''),'d',''),'e',''),'f',''),'g',''),'h',''),'i',''),'j',''),'k',''),'l',''),'m',''),'n',''),'o',''),'p',''),'q',''),'r',''),'s',''),'t',''),'u',''),'v',''),'w',''),'x',''),'y',''),'z','') as unsigned)";
 		$res = NewQuery($sql);
 		if ($res) {
 			while($row = $res->FetchAssoc()){
@@ -194,7 +194,7 @@ abstract class AdminFunctions {
 			$res->FreeResult();
 		}
 	
-		$sql = "SELECT s_key, s_id, s_file, s_gedrec FROM ".TBLPREFIX."sources WHERE s_file=".$GEDCOMID." ORDER BY cast(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(LOWER(s_id),'a',''),'b',''),'c',''),'d',''),'e',''),'f',''),'g',''),'h',''),'i',''),'j',''),'k',''),'l',''),'m',''),'n',''),'o',''),'p',''),'q',''),'r',''),'s',''),'t',''),'u',''),'v',''),'w',''),'x',''),'y',''),'z','') as unsigned)";
+		$sql = "SELECT s_key, s_id, s_file, s_gedrec FROM ".TBLPREFIX."sources WHERE s_file=".GedcomConfig::$GEDCOMID." ORDER BY cast(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(LOWER(s_id),'a',''),'b',''),'c',''),'d',''),'e',''),'f',''),'g',''),'h',''),'i',''),'j',''),'k',''),'l',''),'m',''),'n',''),'o',''),'p',''),'q',''),'r',''),'s',''),'t',''),'u',''),'v',''),'w',''),'x',''),'y',''),'z','') as unsigned)";
 		$res = NewQuery($sql);
 		if ($res) {
 			while($row = $res->FetchAssoc()){
@@ -206,7 +206,7 @@ abstract class AdminFunctions {
 		}
 		
 		if ($embedmm != "yes") {
-			$sql = "SELECT m_media, m_file, m_gedrec, m_ext, m_mfile FROM ".TBLPREFIX."media WHERE m_file=".$GEDCOMID." ORDER BY cast(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(LOWER(m_media),'a',''),'b',''),'c',''),'d',''),'e',''),'f',''),'g',''),'h',''),'i',''),'j',''),'k',''),'l',''),'m',''),'n',''),'o',''),'p',''),'q',''),'r',''),'s',''),'t',''),'u',''),'v',''),'w',''),'x',''),'y',''),'z','') as unsigned)";
+			$sql = "SELECT m_media, m_file, m_gedrec, m_ext, m_mfile FROM ".TBLPREFIX."media WHERE m_file=".GedcomConfig::$GEDCOMID." ORDER BY cast(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(LOWER(m_media),'a',''),'b',''),'c',''),'d',''),'e',''),'f',''),'g',''),'h',''),'i',''),'j',''),'k',''),'l',''),'m',''),'n',''),'o',''),'p',''),'q',''),'r',''),'s',''),'t',''),'u',''),'v',''),'w',''),'x',''),'y',''),'z','') as unsigned)";
 			$res = NewQuery($sql);
 			if ($res) {
 				while($row = $res->FetchAssoc()){
@@ -217,7 +217,7 @@ abstract class AdminFunctions {
 			}
 		}
 	
-		$sql = "SELECT o_gedrec, o_type, o_file, o_id FROM ".TBLPREFIX."other WHERE o_file=".$GEDCOMID." ORDER BY o_type, cast(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(LOWER(o_id),'a',''),'b',''),'c',''),'d',''),'e',''),'f',''),'g',''),'h',''),'i',''),'j',''),'k',''),'l',''),'m',''),'n',''),'o',''),'p',''),'q',''),'r',''),'s',''),'t',''),'u',''),'v',''),'w',''),'x',''),'y',''),'z','') as unsigned)";
+		$sql = "SELECT o_gedrec, o_type, o_file, o_id FROM ".TBLPREFIX."other WHERE o_file=".GedcomConfig::$GEDCOMID." ORDER BY o_type, cast(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(LOWER(o_id),'a',''),'b',''),'c',''),'d',''),'e',''),'f',''),'g',''),'h',''),'i',''),'j',''),'k',''),'l',''),'m',''),'n',''),'o',''),'p',''),'q',''),'r',''),'s',''),'t',''),'u',''),'v',''),'w',''),'x',''),'y',''),'z','') as unsigned)";
 		$res = NewQuery($sql);
 		if ($res) {
 			while($row = $res->FetchAssoc()){
@@ -255,13 +255,12 @@ abstract class AdminFunctions {
 	}
 	
 	public function EmbedMM($gedrec) {
-		global $GEDCOMID;
 	
 		$ct = preg_match_all("/\n(\d) OBJE @(.+)@/", $gedrec, $match);
 		for ($i=1;$i<=$ct;$i++) {
 			$mmid = $match[2][$i-1];
 			$level = $match[1][$i-1];
-			$media =& MediaItem::GetInstance($mmid, "", $GEDCOMID);
+			$media =& MediaItem::GetInstance($mmid, "", GedcomConfig::$GEDCOMID);
 			$mediarec = $media->gedrec;
 			// Remove the CHAN record
 			$pos1 = strpos($mediarec, "1 CHAN");
@@ -283,13 +282,12 @@ abstract class AdminFunctions {
 	}
 	
 	public function EmbedNote($gedrec) {
-		global $GEDCOMID;
 	
 		$ct = preg_match_all("/\n(\d) NOTE @(.+)@/", $gedrec, $match);
 		for ($i=1;$i<=$ct;$i++) {
 			$nid = $match[2][$i-1];
 			$level = $match[1][$i-1];
-			$note =& Note::GetInstance($nid, "", $GEDCOMID);
+			$note =& Note::GetInstance($nid, "", GedcomConfig::$GEDCOMID);
 			$noterec = $note->gedrec;
 			// Remove the CHAN record
 			$pos1 = strpos($noterec, "1 CHAN");
@@ -366,21 +364,20 @@ abstract class AdminFunctions {
 	}
 	
 	public function UpdateUserIndiEmail($user) {
-		global $GEDCOMS, $GEDCOMID;
 		
 		if ($user->email != "" && $user->sync_gedcom == "Y") {
-			$oldged = $GEDCOMID;
+			$oldged = GedcomConfig::$GEDCOMID;
 			foreach($user->gedcomid as $gedcid => $gedid) {
 				if (!empty($gedid) && isset($GEDCOMS[$gedcid])) {
-					$GEDCOMID = $gedcid;
-					$sourstring = GetLangVarString("sync_mailsource", $GEDCOMID, "gedcomid");
+					GedcomConfig::$GEDCOMID = $gedcid;
+					$sourstring = GetLangVarString("sync_mailsource", GedcomConfig::$GEDCOMID, "gedcomid");
 					$person = Person::GetInstance($gedid, "", $gedcid);
 					if ($person->ischanged) $indirec = $person->changedgedrec;
 					else $indirec = $person->gedrec;
 					if (!empty($indirec)) {
 						$subrecords = GetAllSubrecords($indirec, "", false, false, false);
 						$found = false;
-						$sourstring = GetLangVarString("sync_mailsource", $GEDCOMID, "gedcomid");
+						$sourstring = GetLangVarString("sync_mailsource", GedcomConfig::$GEDCOMID, "gedcomid");
 						foreach ($subrecords as $key =>$subrec) {
 							$change_id = EditFunctions::GetNewXref("CHANGE");
 							if (preg_match("/(\d) (_?EMAIL .+)/", $subrec, $match)>0) {
@@ -393,14 +390,14 @@ abstract class AdminFunctions {
 									$oldrec = $match[0];
 									$newrec = preg_replace("/(\d _?EMAIL)[^\r\n]*/", "$1 ".$user->email, $subrec);
 								}
-								if ($subrec != $newrec) EditFunctions::ReplaceGedrec($gedid, $subrec, $newrec, "EMAIL", $change_id, "edit_fact", $GEDCOMID, "INDI");
+								if ($subrec != $newrec) EditFunctions::ReplaceGedrec($gedid, $subrec, $newrec, "EMAIL", $change_id, "edit_fact", GedcomConfig::$GEDCOMID, "INDI");
 							}
 						}
-						if (!$found) EditFunctions::ReplaceGedrec($gedid, "", "1 EMAIL ".$user->email."\r\n2 RESN privacy\r\n2 SOUR ".$sourstring."\r\n", "EMAIL", $change_id, "add_fact", $GEDCOMID, "INDI");
+						if (!$found) EditFunctions::ReplaceGedrec($gedid, "", "1 EMAIL ".$user->email."\r\n2 RESN privacy\r\n2 SOUR ".$sourstring."\r\n", "EMAIL", $change_id, "add_fact", GedcomConfig::$GEDCOMID, "INDI");
 					}
 				}
 			}
-			$GEDCOMID = $oldged;
+			GedcomConfig::$GEDCOMID = $oldged;
 		}
 	}
 
@@ -625,7 +622,7 @@ abstract class AdminFunctions {
 	 * @author	Genmod Development Team
 	 */
 	public function StoreGedcoms() {
-		global $GEDCOMS, $DEFAULT_GEDCOM, $GEDCOMID;
+		global $GEDCOMS, $DEFAULT_GEDCOM;
 	
 		if (!CONFIGURED) return false;
 		uasort($GEDCOMS, "GedcomSort");
@@ -651,7 +648,7 @@ abstract class AdminFunctions {
 			if (!isset($GED["id"]) || (empty($GED["id"]))) $GED["id"] = $maxid;
 	
 			if (empty($GED["commonsurnames"])) {
-				if ($GED["gedcom"] == get_gedcom_from_id($GEDCOMID)) {
+				if ($GED["gedcom"] == get_gedcom_from_id(GedcomConfig::$GEDCOMID)) {
 					$GED["commonsurnames"] = "";
 					$surnames = GetCommonSurnames(GedcomConfig::$COMMON_NAMES_THRESHOLD);
 					foreach($surnames as $indexval => $surname) {

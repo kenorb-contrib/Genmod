@@ -66,6 +66,7 @@ class Person extends GedcomRecord {
 	private $spousefamilies = null;		 	// container for array of family objects where this person is spouse
 	private $famc = null;					// container for array of family ID's and relational info where this person is child
 	private $fams = null;					// container for array of family ID's where this person is spouse
+	private $generation = null;				// Used in reports
 	
 	protected $globalfacts = array();			// Array with name and sex facts. Showfact, Factviewrestricted are applied
 	
@@ -74,19 +75,24 @@ class Person extends GedcomRecord {
 	private $tracefacts = false;			// traces all relatives events that are added to the indifacts array
 	
 	public static function GetInstance($xref, $gedrec="", $gedcomid="") {
-		global $GEDCOMID;
 		
-		if (empty($gedcomid)) $gedcomid = $GEDCOMID;
+		if (empty($gedcomid)) $gedcomid = GedcomConfig::$GEDCOMID;
 		if (!isset(self::$cache[$gedcomid][$xref])) {
 			self::$cache[$gedcomid][$xref] = new Person($xref, $gedrec, $gedcomid);
 		}
 		return self::$cache[$gedcomid][$xref];
 	}
 		
-	public static function IsInstance($xref, $gedcomid="") {
-		global $GEDCOMID;
+	public static function NewInstance($xref, $gedrec="", $gedcomid="") {
 		
-		if (empty($gedcomid)) $gedcomid = $GEDCOMID;
+		if (empty($gedcomid)) $gedcomid = GedcomConfig::$GEDCOMID;
+		self::$cache[$gedcomid][$xref] = new Person($xref, $gedrec, $gedcomid);
+		return self::$cache[$gedcomid][$xref];
+	}
+	
+	public static function IsInstance($xref, $gedcomid="") {
+		
+		if (empty($gedcomid)) $gedcomid = GedcomConfig::$GEDCOMID;
 		if (!isset(self::$cache[$gedcomid][$xref])) return false;
 		else return true;
 	}
@@ -187,6 +193,9 @@ class Person extends GedcomRecord {
 			case "title":
 				return $this->GetName();
 				break;
+			case "generation":
+				return $this->generation;
+				break;
 			default:
 				return parent::__get($property);
 				break;
@@ -205,6 +214,9 @@ class Person extends GedcomRecord {
 				break;
 			case "names_read":
 				if ($this->names_read != true) $this->names_read = $value;
+				break;
+			case "generation": // Used in reports
+				$this->generation = $value;
 				break;
 			default:
 				parent::__set($property, $value);
@@ -234,7 +246,7 @@ class Person extends GedcomRecord {
 		if (is_null($this->name)) {
 			if (!$this->DispName()) $this->name = GM_LANG_private;
 			else {
-				if ($this->show_changes && $this->ThisChanged()) {
+				if ($this->show_changes && $this->ThisChanged() && !$this->ThisDeleted()) {
 					if (is_null($this->newname_array)) $this->newname_array = NameFunctions::GetIndiNames($this->GetChangedGedRec());
 					$name = $this->newname_array[0];
 				}
@@ -245,7 +257,7 @@ class Person extends GedcomRecord {
 				if ($NAME_REVERSE || HasChinese($name[0], true)) $this->name = NameFunctions::ReverseName($name[0]);
 				else $this->name = $name[0];
 				$this->name = NameFunctions::CheckNN($this->name, true);
-				if (!empty($name[3])) $this->name .= " ".substr(GedcomConfig::$NICK_DELIM, 0, 1).$name[3].substr(GedcomConfig::$NICK_DELIM, 1, 1);
+				if (!empty($name[3]) && GedcomConfig::$SHOW_NICK) $this->name .= " ".substr(GedcomConfig::$NICK_DELIM, 0, 1).$name[3].substr(GedcomConfig::$NICK_DELIM, 1, 1);
 			}
 			if ($this->name == "") $this->name = GM_LANG_unknown;
 		}
@@ -331,7 +343,7 @@ class Person extends GedcomRecord {
 	private function findHighlightedMedia() {
 		
 		if (is_null($this->highlightedimage)) {
-			$this->highlightedimage = FindHighlightedObject($this->xref);
+			$this->highlightedimage = FindHighlightedObject($this);
 		}
 		return $this->highlightedimage;
 	}
@@ -804,10 +816,9 @@ if ($this->tracefacts) print "AddSpouseFacts - Adding for ".$fam->$spperson->xre
 	 *
 	 */
 	private function AddAssoFacts($pid) {
-		global $GEDCOMID;
 
 		$assolist = ListFunctions::GetAssoList("all", $pid);
-		$apid = $pid."[".$GEDCOMID."]";
+		$apid = $pid."[".GedcomConfig::$GEDCOMID."]";
 		// associates exist ?
 		if (count($assolist) > 0) {
 			// if so, print all indi's where the indi is associated to
@@ -1299,7 +1310,7 @@ if ($this->tracefacts) print "AddSpouseFacts - Adding for ".$fam->$spperson->xre
      		$priority = array();
 			foreach ($this->childfamilies as $id => $family) {
 				if (!isset($priority["first"])) $priority["first"] = $id;
-				$priority["last"]=$id;
+				$priority["last"] = $id;
 				if ($family->showprimary) {
 					if (!isset($priority["primary"])) $priority["primary"] = $id;
 				}
@@ -1345,8 +1356,8 @@ if ($this->tracefacts) print "AddSpouseFacts - Adding for ".$fam->$spperson->xre
 		if (is_null($this->famc)) {
 			
 			$gedrecs = array();
-			if ($this->show_changes && $this->ThisChanged() && !$this->ThisDeleted()) $gedrecs[] = $this->GetChangedGedRec();
 			$gedrecs[] = $this->gedrec;
+			if ($this->show_changes && $this->ThisChanged() && !$this->ThisDeleted()) $gedrecs[] = $this->GetChangedGedRec();
 
 			$this->famc = array();
 			foreach($gedrecs as $key => $gedrec) {
@@ -1638,14 +1649,14 @@ if ($this->tracefacts) print "AddSpouseFacts - Adding for ".$fam->$spperson->xre
 	}
 	
 	protected function showLivingName() {
-		global $SHOW_LIVING_NAMES, $person_privacy, $user_privacy, $gm_user, $USE_RELATIONSHIP_PRIVACY, $CHECK_MARRIAGE_RELATIONS, $GEDCOMID, $MAX_RELATION_PATH_LENGTH;
+		global $SHOW_LIVING_NAMES, $person_privacy, $user_privacy, $gm_user, $USE_RELATIONSHIP_PRIVACY, $CHECK_MARRIAGE_RELATIONS, $MAX_RELATION_PATH_LENGTH;
 		
 		// If we can show the details, we can also show the name
 		if ($this->DisplayDetails()) return true;
 		
 		// Check the gedcom context
-		$oldgedid = $GEDCOMID;
-		if ($GEDCOMID != $this->gedcomid) SwitchGedcom($this->gedcomid);
+		$oldgedid = GedcomConfig::$GEDCOMID;
+		if (GedcomConfig::$GEDCOMID != $this->gedcomid) SwitchGedcom($this->gedcomid);
 		
 		// If a pid is hidden or shown due to user privacy, the name is hidden or shown also
 		if (!empty($gm_user->username)) {

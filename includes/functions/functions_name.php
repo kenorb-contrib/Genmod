@@ -72,10 +72,10 @@ function GetCommonSurnamesIndex($gedid) {
  * @param int $min the number of times a surname must occur before it is added to the array
  */
 function GetCommonSurnames($min) {
-	global $GEDCOMID, $indilist, $GEDCOMS, $HNN, $ANN;
+	global $indilist, $GEDCOMS, $HNN, $ANN;
 
 	$surnames = array();
-	if (!CONFIGURED || !UserController::AdminUserExists() || (count($GEDCOMS)==0) || (!CheckForImport($GEDCOMID))) return $surnames;
+	if (!CONFIGURED || !UserController::AdminUserExists() || (count($GEDCOMS)==0) || (!CheckForImport(GedcomConfig::$GEDCOMID))) return $surnames;
 	//-- this line causes a bug where the common surnames list is not properly updated
 	// if ((!isset($indilist))||(!is_array($indilist))) return $surnames;
 	$surnames = BlockFunctions::GetTopSurnames(100);
@@ -130,8 +130,8 @@ function GetCommonSurnames($min) {
  * @return string the sortable name
  */
 function GetSortableName($pid, $alpha="", $surname="", $allnames=false, $rev = false, $changes = false) {
-	global $SHOW_LIVING_NAMES, $PRIV_PUBLIC, $GEDCOMID, $COMBIKEY;
-	global $indilist, $GEDCOMID, $NAME_REVERSE;
+	global $SHOW_LIVING_NAMES, $PRIV_PUBLIC, $COMBIKEY;
+	global $indilist, $NAME_REVERSE;
 
 	$mynames = array();
 
@@ -149,16 +149,16 @@ function GetSortableName($pid, $alpha="", $surname="", $allnames=false, $rev = f
 	if ($changes) {
 		if (ChangeFunctions::GetChangeData(true, $pid, true, "", "")) {
 			$rec = ChangeFunctions::GetChangeData(false, $pid, true, "", "");
-			$gedrec = $rec[$GEDCOMID][$pid];
+			$gedrec = $rec[GedcomConfig::$GEDCOMID][$pid];
 			if (!empty($gedrec)) $names = NameFunctions::GetIndiNames($gedrec);
 		}
 	}
 
-	if ($COMBIKEY) $key = JoinKey($pid, $GEDCOMID);
+	if ($COMBIKEY) $key = JoinKey($pid, GedcomConfig::$GEDCOMID);
 	else $key = $pid;
 	
 	//-- first check if the person is in the cache
-	if ((!isset($names) && isset($indilist[$key]["names"]))&&($indilist[$key]["gedfile"]==$GEDCOMID)) {
+	if ((!isset($names) && isset($indilist[$key]["names"]))&&($indilist[$key]["gedfile"]==GedcomConfig::$GEDCOMID)) {
 		$names = $indilist[$key]["names"];
 	}
 	else {
@@ -218,9 +218,9 @@ function GetSortableName($pid, $alpha="", $surname="", $allnames=false, $rev = f
  */
 function GetPersonName($pid, $indirec="", $starred=true) {
 	global $NAME_REVERSE, $COMBIKEY;
-	global $indilist, $GEDCOMID;
+	global $indilist;
 
-	if ($COMBIKEY) $key = JoinKey($pid, $GEDCOMID);
+	if ($COMBIKEY) $key = JoinKey($pid, GedcomConfig::$GEDCOMID);
 	else $key = $pid;
 	
 	$name = "";
@@ -232,7 +232,7 @@ function GetPersonName($pid, $indirec="", $starred=true) {
 	else {
 		if ($indirec == "") {
 			//-- first check if the person is in the cache
-			if ((isset($indilist[$key]["names"][0][0]))&&($indilist[$key]["gedfile"]==$GEDCOMID)) {
+			if ((isset($indilist[$key]["names"][0][0]))&&($indilist[$key]["gedfile"]==GedcomConfig::$GEDCOMID)) {
 				$name = $indilist[$key]["names"][0][0];
 			}
 			else {
@@ -246,13 +246,13 @@ function GetPersonName($pid, $indirec="", $starred=true) {
 		else {
 //			if (!empty($pid) && ChangeFunctions::GetChangeData(true, $pid, true, "", "INDI")) {
 //					$rec = ChangeFunctions::GetChangeData(false, $pid, true, "gedlines", "INDI");
-//					$names = GetIndiNames($rec[$GEDCOMID][$pid]);
+//					$names = GetIndiNames($rec[GedcomConfig::$GEDCOMID][$pid]);
 //					$name = $names[0][0];
 //				}
 //				else {
 //					if (!empty($pid) && ChangeFunctions::GetChangeData(true, $pid, true, "", "FAMC")) {
 //						$rec = ChangeFunctions::GetChangeData(false, $pid, true, "gedlines", "FAMC");
-//						$names = GetIndiNames($rec[$GEDCOMID][$pid]);
+//						$names = GetIndiNames($rec[GedcomConfig::$GEDCOMID][$pid]);
 //						$name = $names[0][0];
 //					}
 //				}
@@ -273,7 +273,7 @@ function GetPersonName($pid, $indirec="", $starred=true) {
  * @return string the title of the source
  */
 function GetSourceDescriptor($sid, $gedrec="") {
-	global $GEDCOMID, $sourcelist, $show_changes;
+	global $sourcelist, $show_changes;
 
 	if ($sid=="") return false;
 
@@ -281,7 +281,7 @@ function GetSourceDescriptor($sid, $gedrec="") {
 		$gedrec = FindSourceRecord($sid);
 		if ($show_changes && ChangeFunctions::GetChangeData(true, $sid, true)) {
 			$rec = ChangeFunctions::GetChangeData(false, $sid, true, "gedlines");
-			$gedrec = $rec[$GEDCOMID][$sid];
+			$gedrec = $rec[GedcomConfig::$GEDCOMID][$sid];
 		}
 	}
 	if (!empty($gedrec)) {
@@ -307,14 +307,14 @@ function GetSourceDescriptor($sid, $gedrec="") {
  * @return string the title of the repository
  */
 function GetRepoDescriptor($rid) {
-	global $GEDCOMID, $repo_id_list, $show_changes;
+	global $repo_id_list, $show_changes;
 
 	if ($rid=="") return false;
 
 	$gedrec = FindRepoRecord($rid);
 	if ($show_changes && ChangeFunctions::GetChangeData(true, $rid, true)) {
 		$rec = ChangeFunctions::GetChangeData(false, $rid, true, "gedlines");
-		$gedrec = $rec[$GEDCOMID][$rid];
+		$gedrec = $rec[GedcomConfig::$GEDCOMID][$rid];
 	}
 	if (!empty($gedrec)) {
 		$tt = preg_match("/1 NAME (.*)/", $gedrec, $smatch);
@@ -333,14 +333,14 @@ function GetRepoDescriptor($rid) {
  * @return string the additional title of the source
  */
 function GetAddSourceDescriptor($sid) {
-	global $GEDCOMID, $sourcelist, $show_changes;
+	global $sourcelist, $show_changes;
 	$title = "";
 	if ($sid=="") return false;
 
 	$gedrec = FindSourceRecord($sid);
 	if ($show_changes && ChangeFunctions::GetChangeData(true, $sid, true)) {
 		$rec = ChangeFunctions::GetChangeData(false, $sid, true, "gedlines");
-		$gedrec = $rec[$GEDCOMID][$sid];
+		$gedrec = $rec[GedcomConfig::$GEDCOMID][$sid];
 	}
 	if (!empty($gedrec)) {
 		$ct = preg_match("/\d ROMN (.*)/", $gedrec, $match);
@@ -364,14 +364,14 @@ function GetAddSourceDescriptor($sid) {
  * @return string the additional title of the repository
  */
 function GetAddRepoDescriptor($rid) {
-	global $GEDCOMID, $repolist, $show_changes;
+	global $repolist, $show_changes;
 	$title = "";
 	if ($rid=="") return false;
 
 	$gedrec = FindRepoRecord($rid);
 	if ($show_changes && ChangeFunctions::GetChangeData(true, $rid, true)) {
 		$rec = ChangeFunctions::GetChangeData(false, $rid, true, "gedlines");
-		$gedrec = $rec[$GEDCOMID][$rid];
+		$gedrec = $rec[GedcomConfig::$GEDCOMID][$rid];
 	}
 	if (!empty($gedrec)) {
 		$ct = preg_match("/\d ROMN (.*)/", $gedrec, $match);
@@ -457,7 +457,7 @@ function GetFamilyAddDescriptor($fid, $rev = false, $famrec="", $changes = false
  * @return string the title of the object
  */
 function GetMediaDescriptor($mid, $gedrec="") {
-	global $GEDCOMID, $show_changes;
+	global $show_changes;
 	$title = "";
 	if ($mid=="") return false;
 
@@ -465,7 +465,7 @@ function GetMediaDescriptor($mid, $gedrec="") {
 		$gedrec = FindMediaRecord($mid);
 		if ($show_changes && ChangeFunctions::GetChangeData(true, $mid, true)) {
 			$rec = ChangeFunctions::GetChangeData(false, $mid, true, "gedlines");
-			$gedrec = $rec[$GEDCOMID][$mid];
+			$gedrec = $rec[GedcomConfig::$GEDCOMID][$mid];
 		}
 	}
 	$rec = GetSubRecord(1, "1 TITL", $gedrec, 1);
@@ -535,14 +535,13 @@ function GetAddPersonNameInRecord($name_record, $keep_slash=false, $import=false
 // -- find and return a given individual's second name in sort format: familyname, firstname
 function GetSortableAddName($pid, $record="", $rev = false, $changes = false) {
 	global $NAME_REVERSE;
-	global $GEDCOMID;
 
 	//-- get the name from the indexes
 	if (empty($record)) $record = FindPersonRecord($pid);
 	if ($changes) {
 		if (ChangeFunctions::GetChangeData(true, $pid, true, "", "")) {
 			$rec = ChangeFunctions::GetChangeData(false, $pid, true, "", "");
-			$record = $rec[$GEDCOMID][$pid];
+			$record = $rec[GedcomConfig::$GEDCOMID][$pid];
 		}
 	}
 	$name_record = GetSubRecord(1, "1 NAME", $record);

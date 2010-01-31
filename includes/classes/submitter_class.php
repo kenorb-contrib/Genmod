@@ -41,19 +41,24 @@ class Submitter extends GedcomRecord {
 
 	
 	public static function GetInstance($xref, $gedrec="", $gedcomid="") {
-		global $GEDCOMID;
 		
-		if (empty($gedcomid)) $gedcomid = $GEDCOMID;
+		if (empty($gedcomid)) $gedcomid = GedcomConfig::$GEDCOMID;
 		if (!isset(self::$cache[$gedcomid][$xref])) {
 			self::$cache[$gedcomid][$xref] = new Submitter($xref, $gedrec, $gedcomid);
 		}
 		return self::$cache[$gedcomid][$xref];
 	}
 		
-	public static function IsInstance($xref, $gedcomid="") {
-		global $GEDCOMID;
+	public static function NewInstance($xref, $gedrec="", $gedcomid="") {
 		
-		if (empty($gedcomid)) $gedcomid = $GEDCOMID;
+		if (empty($gedcomid)) $gedcomid = GedcomConfig::$GEDCOMID;
+		self::$cache[$gedcomid][$xref] = new Submitter($xref, $gedrec, $gedcomid);
+		return self::$cache[$gedcomid][$xref];
+	}
+	
+	public static function IsInstance($xref, $gedcomid="") {
+		
+		if (empty($gedcomid)) $gedcomid = GedcomConfig::$GEDCOMID;
 		if (!isset(self::$cache[$gedcomid][$xref])) return false;
 		else return true;
 	}
@@ -91,7 +96,9 @@ class Submitter extends GedcomRecord {
 	private function getName() {
 		
 		if (is_null($this->name)) {
-			$ct = preg_match("/1 NAME (.*)/", $this->gedrec, $match);
+			if ($this->show_changes && $this->ThisChanged()) $gedrec = $this->GetChangedGedRec();
+			else $gedrec = $this->gedrec;
+			$ct = preg_match("/1 NAME (.*)/", $gedrec, $match);
 			if ($ct > 0) $this->name = $match[1];
 			else $this->name = "";
 		}

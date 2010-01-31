@@ -47,9 +47,8 @@ class FAQ {
 	
 	
 	public static function GetInstance($id, $data_array="", $gedcomid="") {
-		global $GEDCOMID;
 		
-		if (empty($gedcomid)) $gedcomid = $GEDCOMID;
+		if (empty($gedcomid)) $gedcomid = GedcomConfig::$GEDCOMID;
 		if (!isset(self::$cache[$gedcomid][$id])) {
 			self::$cache[$gedcomid][$id] = new FAQ($id, $data_array, $gedcomid);
 		}

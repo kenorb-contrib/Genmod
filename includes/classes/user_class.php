@@ -239,12 +239,11 @@ class User {
 	* @return boolean true if user can access false if they cannot
 	*/
 	public function userPrivAccess() {
-		global $GEDCOMID;
 
 		if ($this->username == "") return false;
 		if ($this->userIsAdmin()) return true;
-		if (isset($this->privgroup[$GEDCOMID])) {
-			if ($this->privgroup[$GEDCOMID]!="none") return true;
+		if (isset($this->privgroup[GedcomConfig::$GEDCOMID])) {
+			if ($this->privgroup[GedcomConfig::$GEDCOMID]!="none") return true;
 			else return false;
 		}
 		else return false;
@@ -258,9 +257,8 @@ class User {
 	* to change the configuration files for the currently active gedcom
 	*/
 	public function userGedcomAdmin($gedid="") {
-		global $GEDCOMID;
 
-		if (empty($gedid)) $gedid = $GEDCOMID;
+		if (empty($gedid)) $gedid = GedcomConfig::$GEDCOMID;
 
 		if ($_SESSION['cookie_login']) return false;
 		if ($this->username == "") return false;
@@ -292,9 +290,8 @@ class User {
 	* @return boolean true if user can edit false if they cannot
 	*/
 	public function userCanEdit($gedid="") {
-		global $GEDCOMID;
 
-		if (empty($gedid)) $gedid = $GEDCOMID;
+		if (empty($gedid)) $gedid = GedcomConfig::$GEDCOMID;
 
 		if (!GedcomConfig::$ALLOW_EDIT_GEDCOM) return false;
 		if ($this->username == "empty" || $this->username == "") return false;
@@ -318,9 +315,8 @@ class User {
 	* @return boolean true if user can accept false if user cannot accept
 	*/ 
 	public function userCanAccept($gedid="") {
-		global $GEDCOMID;
 
-		if (empty($gedid)) $gedid = $GEDCOMID;
+		if (empty($gedid)) $gedid = GedcomConfig::$GEDCOMID;
 
 		if (!GedcomConfig::$ALLOW_EDIT_GEDCOM) return false;
 		if ($this->username == "") return false;
@@ -356,11 +352,10 @@ class User {
 	* @return 		boolean					Return true or false as a result
 	*/ 
 	public function userCanViewGedlines($gedid="") {
-		global $GEDCOMID;
 		
 		if ($this->username == "empty" || $this->username == "") return false;
 
-		if (empty($gedid)) $gedid = $GEDCOMID;
+		if (empty($gedid)) $gedid = GedcomConfig::$GEDCOMID;
 		
 		if (GedcomConfig::$SHOW_GEDCOM_RECORD == -1) return false;
 		if (GedcomConfig::$SHOW_GEDCOM_RECORD == 0) return true;
@@ -380,9 +375,8 @@ class User {
 	* @return 		boolean					Return true or false as a result
 	*/ 
 	public function userCanEditGedlines($username="", $gedid="") {
-		global $GEDCOMID;
 		
-		if (empty($gedid)) $gedid = $GEDCOMID;
+		if (empty($gedid)) $gedid = GedcomConfig::$GEDCOMID;
 		$can = false;
 		SwitchGedcom($gedid);
 		if (GedcomConfig::$ALLOW_EDIT_GEDCOM) {
@@ -390,10 +384,10 @@ class User {
 			// Note: options 0 and 1 are not configurable in the settings.
 			elseif (GedcomConfig::$EDIT_GEDCOM_RECORD == -1) $can = false;
 			elseif (GedcomConfig::$EDIT_GEDCOM_RECORD == 0) $can = true;
-			elseif (GedcomConfig::$EDIT_GEDCOM_RECORD == 1 && $this->UserPrivAccess($GEDCOMID)) $can = true;
-			elseif (GedcomConfig::$EDIT_GEDCOM_RECORD == 2 && $this->UserCanEdit($GEDCOMID)) $can = true;
-			elseif (GedcomConfig::$EDIT_GEDCOM_RECORD == 3 && $this->UserCanAccept($GEDCOMID)) $can = true;
-			elseif (GedcomConfig::$EDIT_GEDCOM_RECORD == 4 && $this->UserGedcomAdmin($GEDCOMID)) $can = true;
+			elseif (GedcomConfig::$EDIT_GEDCOM_RECORD == 1 && $this->UserPrivAccess(GedcomConfig::$GEDCOMID)) $can = true;
+			elseif (GedcomConfig::$EDIT_GEDCOM_RECORD == 2 && $this->UserCanEdit(GedcomConfig::$GEDCOMID)) $can = true;
+			elseif (GedcomConfig::$EDIT_GEDCOM_RECORD == 3 && $this->UserCanAccept(GedcomConfig::$GEDCOMID)) $can = true;
+			elseif (GedcomConfig::$EDIT_GEDCOM_RECORD == 4 && $this->UserGedcomAdmin(GedcomConfig::$GEDCOMID)) $can = true;
 			elseif (GedcomConfig::$EDIT_GEDCOM_RECORD == 5 && $this->UserIsAdmin()) $can = true;
 		}
 		SwitchGedcom();
@@ -401,16 +395,15 @@ class User {
 	}
 	
 	public function UserCanEditOwn($pid) {
-		global $GEDCOMID;
 	
 		if ($this->UserCanEdit()) return true;
 		if (!GedcomConfig::$USE_QUICK_UPDATE) return false;
 		if (empty($pid)) return false;
 
-		if (!empty($this->gedcomid[$GEDCOMID])) {
-			if ($pid == $this->gedcomid[$GEDCOMID]) return true;
+		if (!empty($this->gedcomid[GedcomConfig::$GEDCOMID])) {
+			if ($pid == $this->gedcomid[GedcomConfig::$GEDCOMID]) return true;
 			else {
-				$person =& Person::GetInstance($this->gedcomid[$GEDCOMID]);
+				$person =& Person::GetInstance($this->gedcomid[GedcomConfig::$GEDCOMID]);
 				foreach ($person->childfamilies as $index => $fam) {
 					if ($fam->husb_id == $pid || $fam->wife_id == $pid || $fam->husbold_id == $pid || $fam->wifeold_id == $pid) return true;
 					foreach ($fam->children_ids as $key => $childid) {

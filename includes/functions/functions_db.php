@@ -97,13 +97,13 @@ function CheckForImport($gedid) {
  * @return string the raw gedcom record is returned
  */
 function FindFamilyRecord($famid, $gedfile="", $renew = false) {
-	global $GEDCOMID, $famlist, $COMBIKEY;
+	global $famlist, $COMBIKEY;
 	
 	
 	if (DEBUG) print "Old function called: FindFamilyRecord for ".$famid."<br />".pipo;
 	
 	if (empty($famid)) return false;
-	if (empty($gedfile)) $gedfile = $GEDCOMID;
+	if (empty($gedfile)) $gedfile = GedcomConfig::$GEDCOMID;
 	
 	if ($COMBIKEY) $key = JoinKey($famid, $gedfile);
 	else $key = $famid;
@@ -140,13 +140,12 @@ function FindFamilyRecord($famid, $gedfile="", $renew = false) {
  */
 function FindPersonRecord($pid, $gedfile="", $renew = false, $nocache = false) {
 	global $COMBIKEY;
-	global $GEDCOMID;
 	global $indilist;
 	
 	if (DEBUG) print "Old function called: FindPersonRecord for ".$pid."<br />".pipo;
 	
 	if (empty($pid)) return false;
-	if (empty($gedfile)) $gedfile = $GEDCOMID;
+	if (empty($gedfile)) $gedfile = GedcomConfig::$GEDCOMID;
 	if (empty($gedfile)) return "";
 	
 	// print $pid." ".$gedfileid."<br />";
@@ -186,11 +185,11 @@ function FindPersonRecord($pid, $gedfile="", $renew = false, $nocache = false) {
  * @return string the raw gedcom record is returned
  */
 function FindGedcomRecord($pid, $gedfile = "", $renew = false, $nocache = false) {
-	global $GEDCOMID, $indilist, $famlist, $sourcelist, $otherlist, $repolist, $medialist;
+	global $indilist, $famlist, $sourcelist, $otherlist, $repolist, $medialist;
 	
  	if (DEBUG) print "hit on findgecomrecord for: ".$pid."<br />".pipo;
 	if (empty($pid)) return false;
-	if (empty($gedfile)) $gedfile = $GEDCOMID;
+	if (empty($gedfile)) $gedfile = GedcomConfig::$GEDCOMID;
 	if (!$renew) {
 		if (isset($indilist[$pid."[".$gedfile."]"]["gedcom"])) {
 //			print "Hit on indilist for ".$pid."<br />";
@@ -277,12 +276,12 @@ function FindGedcomRecord($pid, $gedfile = "", $renew = false, $nocache = false)
  * @return string the raw gedcom record is returned
  */
 function FindOtherRecord($oid, $gedfile="", $renew = false, $type="") {
-	global $GEDCOMID, $otherlist;
+	global $otherlist;
 	
 	if (DEBUG) print "Old function called: FindOtherRecord for ".$oid."<br />".pipo;
 
 	if ($oid=="") return false;
-	if (empty($gedfile)) $gedfile = $GEDCOMID;
+	if (empty($gedfile)) $gedfile = GedcomConfig::$GEDCOMID;
 
 	if (!$renew && isset($otherlist[$oid]["gedcom"]) && ($otherlist[$oid]["gedfile"] == $gedfile)) return $otherlist[$oid]["gedcom"];
 
@@ -311,12 +310,12 @@ function FindOtherRecord($oid, $gedfile="", $renew = false, $type="") {
  * @return string the raw gedcom record is returned
  */
 function FindSourceRecord($sid, $gedfile="", $renew = false) {
-	global $GEDCOMID, $sourcelist;
+	global $sourcelist;
 	
 	if (DEBUG) print "Old function called: FindSourceRecord for ".$sid."<br />".pipo;
 
 	if ($sid=="") return false;
-	if (empty($gedfile)) $gedfile = $GEDCOMID;
+	if (empty($gedfile)) $gedfile = GedcomConfig::$GEDCOMID;
 	
 	if (!$renew && isset($sourcelist[$sid]["gedcom"]) && ($sourcelist[$sid]["gedfile"] == $gedfile)) return $sourcelist[$sid]["gedcom"];
 
@@ -336,12 +335,11 @@ function FindSourceRecord($sid, $gedfile="", $renew = false) {
 }
 // This function checks if a record exists. It also considers pending changes.
 function CheckExists($pid, $type="") {
-	global $GEDCOMID;
 
 	if (empty($pid)) return false;
 	$gedrec = "";
 	if (in_array($type, array("INDI", "FAM", "SOUR", "REPO", "OBJE", "NOTE"))) {
-		$object = ConstructObject($pid, $type, $GEDCOMID);
+		$object = ConstructObject($pid, $type, GedcomConfig::$GEDCOMID);
 		return $object->isempty;
 	}
 	else return false;
@@ -353,12 +351,12 @@ function CheckExists($pid, $type="") {
  * @param string $gedfile	the gedcom file id
  */
 function FindRepoRecord($rid, $gedfile="") {
-	global $GEDCOMID, $repolist;
+	global $repolist;
 	
 	if (DEBUG) print "Old function called: FindRepoRecord for ".$rid."<br />".pipo;
 
 	if ($rid=="") return false;
-	if (empty($gedfile)) $gedfile = $GEDCOMID;
+	if (empty($gedfile)) $gedfile = GedcomConfig::$GEDCOMID;
 	if (isset($repolist[$rid]["gedcom"]) && ($repolist[$rid]["gedfile"] == $gedfile)) return $repolist[$rid]["gedcom"];
 	
 	$sql = "SELECT o_id, o_gedrec, o_file FROM ".TBLPREFIX."other WHERE o_type='REPO' AND o_id LIKE '".DbLayer::EscapeQuery($rid)."' AND o_file='".$gedfile."'";
@@ -383,12 +381,12 @@ function FindRepoRecord($rid, $gedfile="") {
  * @param string $rid	the record id
  */
 function FindMediaRecord($rid, $gedfile='', $renew = false) {
-	global $medialist, $GEDCOMID;
+	global $medialist;
 	
 	if (DEBUG) print "Old function called: FindMediaRecord for ".$rid."<br />".pipo;
 	
 	if ($rid=="") return false;
-	if (empty($gedfile)) $gedfile = $GEDCOMID;
+	if (empty($gedfile)) $gedfile = GedcomConfig::$GEDCOMID;
 	
 	//-- first check for the record in the cache
 	if (!$renew && isset($medialist[$rid]["gedcom"]) && ($medialist[$rid]["gedfile"]==$gedfile)) return $medialist[$rid]["gedcom"];
@@ -410,25 +408,6 @@ function FindMediaRecord($rid, $gedfile='', $renew = false) {
 	}
 }
 
-
-function FindSubmitter($gedid) {
-	global $GEDCOMID;
-	
-	if (!isset($gedid)) $gedid = $GEDCOMID;
-	$sql = "SELECT o_id FROM ".TBLPREFIX."other WHERE o_file='".$gedid."' AND o_type='SUBM'";
-	$res = NewQuery($sql);
-	if (!$res || $res->NumRows() == 0) {
-		// If there is a new unapproved submitter record, is has the default pid
-		if (ChangeFunctions::GetChangeData(true, "SUB1", false, "", "")) {
-			$rec = ChangeFunctions::GetChangeData(false, "SUB1", false, "gedlines", "");
-			if (isset($rec[$gedid]["SUB1"])) return "SUB1";
-			else return "";
-		}
-	}
-	$row = $res->FetchAssoc();
-	$res->FreeResult();
-	return $row["o_id"];
-}
 
 /**
  * update the is_dead status in the database
@@ -460,9 +439,8 @@ function UpdateIsDead($gid, $indi) {
  * items will be recalculated.
  */
 function ResetIsDead() {
-	global $GEDCOMID;
 	
-	$sql = "UPDATE ".TBLPREFIX."individuals SET i_isdead=-1 WHERE i_file='".$GEDCOMID."'";
+	$sql = "UPDATE ".TBLPREFIX."individuals SET i_isdead=-1 WHERE i_file='".GedcomConfig::$GEDCOMID."'";
 	$res = NewQuery($sql);
 	return $res;
 }
@@ -474,11 +452,10 @@ function ResetIsDead() {
  *
  */
 function ResetIsDeadLinked($pid, $type="INDI") {
-	global $GEDCOMID;
 	
 	$resets = array();
 	if ($type == "FAM") {
-		$sql = "SELECT if_pkey FROM ".TBLPREFIX."individual_family WHERE if_role='S' AND if_fkey='".JoinKey($pid, $GEDCOMID)."'";
+		$sql = "SELECT if_pkey FROM ".TBLPREFIX."individual_family WHERE if_role='S' AND if_fkey='".JoinKey($pid, GedcomConfig::$GEDCOMID)."'";
 		$res =  NewQuery($sql);
 		while ($row = $res->FetchAssoc()) {
 			$resets[] = $row["if_pkey"];
@@ -489,7 +466,7 @@ function ResetIsDeadLinked($pid, $type="INDI") {
 		$parents = array();
 	
 		// Get the ID's in the surrounding families. Also save the parents ID's for getting the grandparents
-		$sql = "SELECT n.if_pkey, n.if_role, m.if_role FROM ".TBLPREFIX."individual_family as m LEFT JOIN ".TBLPREFIX."individual_family as n ON n.if_fkey=m.if_fkey WHERE m.if_pkey='".DbLayer::EscapeQuery(JoinKey($pid, $GEDCOMID))."' AND n.if_pkey<>m.if_pkey";
+		$sql = "SELECT n.if_pkey, n.if_role, m.if_role FROM ".TBLPREFIX."individual_family as m LEFT JOIN ".TBLPREFIX."individual_family as n ON n.if_fkey=m.if_fkey WHERE m.if_pkey='".DbLayer::EscapeQuery(JoinKey($pid, GedcomConfig::$GEDCOMID))."' AND n.if_pkey<>m.if_pkey";
 		$res = NewQuery($sql);
 		
 		while ($row = $res->FetchRow()) {
@@ -524,11 +501,11 @@ function ResetIsDeadLinked($pid, $type="INDI") {
  * @return array the array of sources
  */
 function GetSourceList($selection="") {
-	global $sourcelist, $GEDCOMID;
+	global $sourcelist;
 
 	$sourcelist = array();
 
-	$sql = "SELECT * FROM ".TBLPREFIX."sources WHERE s_file='".$GEDCOMID."'";
+	$sql = "SELECT * FROM ".TBLPREFIX."sources WHERE s_file='".GedcomConfig::$GEDCOMID."'";
 	if (!empty($selection)) $sql .= " AND s_id IN (".$selection.") ";
 	$sql .= " ORDER BY s_name";
 	$res = NewQuery($sql);
@@ -548,7 +525,6 @@ function GetSourceList($selection="") {
 
 //-- get the repositorylist from the datastore
 function GetRepoList($filter = "", $selection="") {
-	global $GEDCOMID;
 	
 	$repolist = array();
 	$repoaction = array();
@@ -566,7 +542,7 @@ function GetRepoList($filter = "", $selection="") {
 		}
 	}
 
-	$sql = "SELECT * FROM ".TBLPREFIX."other WHERE o_file='".$GEDCOMID."' AND o_type='REPO'";
+	$sql = "SELECT * FROM ".TBLPREFIX."other WHERE o_file='".GedcomConfig::$GEDCOMID."' AND o_type='REPO'";
 	if (!empty($filter)) $sql .= " AND o_gedrec LIKE '%".DbLayer::EscapeQuery($filter)."%'";
 	if (!empty($selection)) $sql .= "AND o_id IN (".$selection.") ";
 	$resr = NewQuery($sql);
@@ -592,11 +568,10 @@ function GetRepoList($filter = "", $selection="") {
 // This function doesn't seem to be used (11 may 2008)
 //-- get the repositorylist from the datastore
 function GetRepoIdList() {
-	global $GEDCOMID;
 
 	$repo_id_list = array();
 
-	$sql = "SELECT * FROM ".TBLPREFIX."other WHERE o_file='".$GEDCOMID."' AND o_type='REPO' ORDER BY o_id";
+	$sql = "SELECT * FROM ".TBLPREFIX."other WHERE o_file='".GedcomConfig::$GEDCOMID."' AND o_type='REPO' ORDER BY o_id";
 	$res = NewQuery($sql);
 	$ct = $res->NumRows();
 	while($row = $res->FetchAssoc()){
@@ -621,7 +596,6 @@ function GetRepoIdList() {
  * @return array the array of repository-titles
  */
 function GetRepoAddTitleList() {
-	global $GEDCOMID;
 
 	$addrepolist = array();
 	$repoaction = array();
@@ -639,7 +613,7 @@ function GetRepoAddTitleList() {
 		}
 	}
 
- 	$sql = "SELECT o_id, o_file, o_file as o_name, o_type, o_gedrec FROM ".TBLPREFIX."other WHERE o_type='REPO' AND o_file='".$GEDCOMID."' and ((o_gedrec LIKE '% _HEB %') || (o_gedrec LIKE '% ROMN %'));";
+ 	$sql = "SELECT o_id, o_file, o_file as o_name, o_type, o_gedrec FROM ".TBLPREFIX."other WHERE o_type='REPO' AND o_file='".GedcomConfig::$GEDCOMID."' and ((o_gedrec LIKE '% _HEB %') || (o_gedrec LIKE '% ROMN %'));";
 
 	$res = NewQuery($sql);
 	$ct = $res->NumRows();
@@ -685,7 +659,7 @@ function GetRepoAddTitleList() {
  * @return 	array	Array of all individuals of the active GEDCOM
  */
 function GetIndiList($allgeds="", $selection = "", $renew=true) {
-	global $indilist, $GEDCOMID, $COMBIKEY;
+	global $indilist, $COMBIKEY;
 	global $INDILIST_RETRIEVED;
 	
 	if ($renew) {
@@ -696,7 +670,7 @@ function GetIndiList($allgeds="", $selection = "", $renew=true) {
 	$sql = "SELECT i_key, i_gedrec, i_isdead, i_id, i_file, n_name, n_surname, n_nick, n_letter, n_fletter, n_type ";
 	$sql .= "FROM ".TBLPREFIX."individuals, ".TBLPREFIX."names WHERE n_key=i_key ";
 	if ($allgeds == "no") {
-		$sql .= "AND i_file = ".$GEDCOMID." ";
+		$sql .= "AND i_file = ".GedcomConfig::$GEDCOMID." ";
 		if (!empty($selection)) $sql .= "AND i_key IN (".$selection.") ";
 	}
 	else if (is_array($allgeds)) {
@@ -734,7 +708,7 @@ function GetIndiList($allgeds="", $selection = "", $renew=true) {
 
 //-- get the famlist from the datastore
 function GetFamList($allgeds="no", $selection="", $renew=true, $trans=array()) {
-	global $famlist, $GEDCOMID, $indilist;
+	global $famlist, $indilist;
 	global $FAMLIST_RETRIEVED, $COMBIKEY;
 
 	if ($renew) {
@@ -745,7 +719,7 @@ function GetFamList($allgeds="no", $selection="", $renew=true, $trans=array()) {
 	$sql = "SELECT * FROM ".TBLPREFIX."families";
 	if ($allgeds != "yes") {
 		if (!empty($selection)) $sql .= " WHERE f_key IN (".$selection.") ";
-		else $sql .= " WHERE f_file='".$GEDCOMID."'";
+		else $sql .= " WHERE f_file='".GedcomConfig::$GEDCOMID."'";
 	}
 	else if (!empty($selection)) $sql .= " WHERE f_key IN (".$selection.") ";
 
@@ -777,16 +751,16 @@ function GetFamList($allgeds="no", $selection="", $renew=true, $trans=array()) {
 			$selection = substr($selection, 0, strlen($selection)-2);
 			GetIndilist($allgeds, $selection, false);
 		}
-		$oldgedid = $GEDCOMID;
+		$oldgedid = GedcomConfig::$GEDCOMID;
 		foreach ($famlist as $key => $fam) {
 			if (!isset($famlist[$key]["name"])) {
 				if ($COMBIKEY) {
-					$GEDCOMID = SplitKey($key, "gedid");
+					GedcomConfig::$GEDCOMID = SplitKey($key, "gedid");
 				}
 				if (isset($trans[$key])) {
 					// First check the husband. If both have the same selected letter/name, 
 					// only the name with the husband first will appear
-					if (JoinKey($fam["HUSB"], $GEDCOMID) == $trans[$key]["id"]) {
+					if (JoinKey($fam["HUSB"], GedcomConfig::$GEDCOMID) == $trans[$key]["id"]) {
 						$hname = NameFunctions::SortableNameFromName($trans[$key]["name"]);
 						$wname = GetSortableName($fam["WIFE"]);
 					}
@@ -809,7 +783,7 @@ function GetFamList($allgeds="no", $selection="", $renew=true, $trans=array()) {
 				$famlist[$key]["name"] = $name;
 			}
 		}
-		$GEDCOMID = $oldgedid;
+		GedcomConfig::$GEDCOMID = $oldgedid;
 	}
 	if ($allgeds == "no" && $selection = "") $FAMLIST_RETRIEVED = true;
 	return $famlist;
@@ -820,11 +794,11 @@ function GetFamList($allgeds="no", $selection="", $renew=true, $trans=array()) {
  @todo Check if function is still needed
  **/
 function GetOtherList() {
-	global $otherlist, $GEDCOMID;
+	global $otherlist;
 
 	$otherlist = array();
 
-	$sql = "SELECT * FROM ".TBLPREFIX."other WHERE o_file='".$GEDCOMID."'";
+	$sql = "SELECT * FROM ".TBLPREFIX."other WHERE o_file='".GedcomConfig::$GEDCOMID."'";
 	$res = NewQuery($sql);
 	$ct = $res->NumRows();
 	while($row = $res->FetchAssoc()){
@@ -843,9 +817,8 @@ function GetOtherList() {
 
 //-- function to find the gedcom id for the given rin
 function FindRinId($rin) {
-	global $GEDCOMID;
 
-	$sql = "SELECT i_id FROM ".TBLPREFIX."individuals WHERE i_rin='".$rin."' AND i_file='".$GEDCOMID."'";
+	$sql = "SELECT i_id FROM ".TBLPREFIX."individuals WHERE i_rin='".$rin."' AND i_file='".GedcomConfig::$GEDCOMID."'";
 	$res = NewQuery($sql);
 	while($row = $res->FetchAssoc()){
 		return $row["i_id"];
@@ -856,36 +829,35 @@ function FindRinId($rin) {
 //-- return the current size of the given list
 //- list options are indilist famlist sourcelist and otherlist
 function GetListSize($list) {
-	global $GEDCOMID;
 
 	switch($list) {
 		case "indilist":
-			$sql = "SELECT count(i_id) FROM ".TBLPREFIX."individuals WHERE i_file='".$GEDCOMID."'";
+			$sql = "SELECT count(i_id) FROM ".TBLPREFIX."individuals WHERE i_file='".GedcomConfig::$GEDCOMID."'";
 			$res = NewQuery($sql);
 			while($row = $res->fetchRow()) return $row[0];
 		break;
 		case "famlist":
-			$sql = "SELECT count(f_id) FROM ".TBLPREFIX."families WHERE f_file='".$GEDCOMID."'";
+			$sql = "SELECT count(f_id) FROM ".TBLPREFIX."families WHERE f_file='".GedcomConfig::$GEDCOMID."'";
 			$res = NewQuery($sql);
 			while($row = $res->fetchRow()) return $row[0];
 		break;
 		case "sourcelist":
-			$sql = "SELECT count(s_id) FROM ".TBLPREFIX."sources WHERE s_file='".$GEDCOMID."'";
+			$sql = "SELECT count(s_id) FROM ".TBLPREFIX."sources WHERE s_file='".GedcomConfig::$GEDCOMID."'";
 			$res = NewQuery($sql);
 			while($row = $res->fetchRow()) return $row[0];
 		break;
 		case "otherlist":
-			$sql = "SELECT count(o_id) FROM ".TBLPREFIX."other WHERE o_file='".$GEDCOMID."'";
+			$sql = "SELECT count(o_id) FROM ".TBLPREFIX."other WHERE o_file='".GedcomConfig::$GEDCOMID."'";
 			$res = NewQuery($sql);
 			while($row = $res->fetchRow()) return $row[0];
 		break;
 		case "medialist":
-			$sql = "SELECT count(m_id) FROM ".TBLPREFIX."media WHERE m_file='".$GEDCOMID."'";
+			$sql = "SELECT count(m_id) FROM ".TBLPREFIX."media WHERE m_file='".GedcomConfig::$GEDCOMID."'";
 			$res = NewQuery($sql);
 			while($row = $res->fetchRow()) return $row[0];
 		break;
 		case "notelist":
-			$sql = "SELECT count(o_id) FROM ".TBLPREFIX."other WHERE o_file='".$GEDCOMID."' AND o_type='NOTE'";
+			$sql = "SELECT count(o_id) FROM ".TBLPREFIX."other WHERE o_file='".GedcomConfig::$GEDCOMID."' AND o_type='NOTE'";
 			$res = NewQuery($sql);
 			while($row = $res->fetchRow()) return $row[0];
 		break;
@@ -1040,13 +1012,13 @@ function ReadGedcoms() {
 
 //
 //function GetNewFams($pid) {
-//	global $GEDCOMID;
+//	global GedcomConfig::$GEDCOMID;
 //	
 //	$newfams = array();
 //
 //	if (!empty($pid) && GetChangeData(true, $pid, true, "","")) {
 //		$rec = GetChangeData(false, $pid, true, "gedlines","");
-//		$gedrec = $rec[$GEDCOMID][$pid];
+//		$gedrec = $rec[GedcomConfig::$GEDCOMID][$pid];
 //		$ct = preg_match_all("/1\s+FAMS\s+@(.*)@.*/", $gedrec, $fmatch, PREG_SET_ORDER);
 //		if ($ct>0) {
 //			$oldfams = FindSfamilyIds($pid);
@@ -1078,11 +1050,11 @@ function ReadGedcoms() {
  * @return 	<type>	<description>
  */
 function GetUnlinked() {
-	global $TOTAL_COUNT, $GEDCOMID, $indilist;
+	global $TOTAL_COUNT, $indilist;
 	
 	$uindilist = array();
 	
-	$sql = "SELECT i_id, i_gedrec, i_file, i_isdead, n_name, n_letter, n_fletter, n_surname, n_nick, n_type FROM ".TBLPREFIX."individuals LEFT JOIN ".TBLPREFIX."names ON i_key=n_key LEFT JOIN ".TBLPREFIX."individual_family ON i_key=if_pkey WHERE if_pkey IS NULL AND i_file='".$GEDCOMID."' ORDER BY i_key, n_id";
+	$sql = "SELECT i_id, i_gedrec, i_file, i_isdead, n_name, n_letter, n_fletter, n_surname, n_nick, n_type FROM ".TBLPREFIX."individuals LEFT JOIN ".TBLPREFIX."names ON i_key=n_key LEFT JOIN ".TBLPREFIX."individual_family ON i_key=if_pkey WHERE if_pkey IS NULL AND i_file='".GedcomConfig::$GEDCOMID."' ORDER BY i_key, n_id";
 
 	$res = NewQuery($sql);
 	if ($res) {
@@ -1145,12 +1117,11 @@ function GetLangVarString($var, $value, $type) {
 }
 
 function GetNoteLinks($oid, $type="", $applypriv=true) {
-	global $GEDCOMID;
 
 	if (empty($oid)) return false;
 	
 	$links = array();
-	$sql = 	"SELECT DISTINCT om_gid, om_type FROM ".TBLPREFIX."other_mapping WHERE om_oid='".$oid."' AND om_file='".$GEDCOMID."'";
+	$sql = 	"SELECT DISTINCT om_gid, om_type FROM ".TBLPREFIX."other_mapping WHERE om_oid='".$oid."' AND om_file='".GedcomConfig::$GEDCOMID."'";
 	if (!empty($type)) $sql .= " AND om_type='".$type."'";
 	$res = NewQuery($sql);
 	while($row = $res->FetchAssoc()){
@@ -1163,7 +1134,6 @@ function GetNoteLinks($oid, $type="", $applypriv=true) {
 }
 	
 function GetSourceLinks($pid, $type="", $applypriv=true, $getfamindi=true) {
-	global $GEDCOMID;
 	global $alllinks, $indilist, $famlist, $LINK_PRIVACY;
 	
 	if (empty($pid)) return false;
@@ -1176,7 +1146,7 @@ function GetSourceLinks($pid, $type="", $applypriv=true, $getfamindi=true) {
 	$links = array();
 	$indisel = array();
 	$famsel = array();	
-	$sql = "SELECT DISTINCT sm_gid, sm_type FROM ".TBLPREFIX."source_mapping WHERE sm_sid='".$pid."' AND sm_file='".$GEDCOMID."'";
+	$sql = "SELECT DISTINCT sm_gid, sm_type FROM ".TBLPREFIX."source_mapping WHERE sm_sid='".$pid."' AND sm_file='".GedcomConfig::$GEDCOMID."'";
 	if (!empty($type)) $sql .= " AND sm_type='".$type."'";
 	$res = NewQuery($sql);
 	while($row = $res->FetchRow()){
@@ -1205,12 +1175,12 @@ function GetSourceLinks($pid, $type="", $applypriv=true, $getfamindi=true) {
 	if ($LINK_PRIVACY && $getfamindi) {
 		if (count($indisel) > 0) {
 			$indisel = array_flip(array_flip($indisel));
-			$indisel = "'".implode("[".$GEDCOMID."]','", $indisel)."[".$GEDCOMID."]'";
+			$indisel = "'".implode("[".GedcomConfig::$GEDCOMID."]','", $indisel)."[".GedcomConfig::$GEDCOMID."]'";
 			GetIndiList("no", $indisel, false);
 		}
 		if (count($famsel) > 0) {
 			$famsel = array_flip(array_flip($famsel));
-			$famsel = "'".implode ("[".$GEDCOMID."]','", $famsel)."[".$GEDCOMID."]'";
+			$famsel = "'".implode ("[".GedcomConfig::$GEDCOMID."]','", $famsel)."[".GedcomConfig::$GEDCOMID."]'";
 			GetFamList("no", $famsel, false);
 		}
 	}
@@ -1228,14 +1198,14 @@ function GetSourceLinks($pid, $type="", $applypriv=true, $getfamindi=true) {
 // This creates the full cache for GetSourceLinks
 // It also creates the gedcom caches for indis and fams at once, if link privacy is enabled
 function GetAllSourceLinks($applypriv=true) {
-	global $GEDCOMID, $alllinks, $LINK_PRIVACY;
+	global $alllinks, $LINK_PRIVACY;
 	
 	if (!isset($alllinks)) $alllinks = array();
 	if ($LINK_PRIVACY) {
 		$famsel = array();
 		$indisel = array();	
 	}
-	$sql = "SELECT sm_sid, sm_gid, sm_type FROM ".TBLPREFIX."source_mapping WHERE sm_file='".$GEDCOMID."'";
+	$sql = "SELECT sm_sid, sm_gid, sm_type FROM ".TBLPREFIX."source_mapping WHERE sm_file='".GedcomConfig::$GEDCOMID."'";
 	$res = NewQuery($sql);
 	while($row = $res->FetchAssoc()){
 		$alllinks[$row["sm_sid"]][0][] = $row["sm_gid"];
@@ -1250,19 +1220,18 @@ function GetAllSourceLinks($applypriv=true) {
 	if ($LINK_PRIVACY) {
 		if (count($indisel) > 0) {
 			array_flip(array_flip($indisel));
-			$indisel = "'".implode("[".$GEDCOMID."]','", $indisel)."[".$GEDCOMID."]'";
+			$indisel = "'".implode("[".GedcomConfig::$GEDCOMID."]','", $indisel)."[".GedcomConfig::$GEDCOMID."]'";
 			GetIndiList("no", $indisel, false);
 		}
 		if (count($famsel) > 0) {
 			array_flip(array_flip($famsel));
-			$famsel = "'".implode ("[".$GEDCOMID."]','", $famsel)."[".$GEDCOMID."]'";
+			$famsel = "'".implode ("[".GedcomConfig::$GEDCOMID."]','", $famsel)."[".GedcomConfig::$GEDCOMID."]'";
 			GetFamList("no", $famsel, false);
 		}
 	}
 }
 
 function GetMediaLinks($pid, $type="", $applypriv=true) {
-	global $GEDCOMID;
 	global $allmlinks, $indilist, $famlist, $LINK_PRIVACY;
 	
 	if (empty($pid)) return false;
@@ -1275,7 +1244,7 @@ function GetMediaLinks($pid, $type="", $applypriv=true) {
 	$famsel = array();	
 	$sql = "SELECT DISTINCT mm_gid, mm_type FROM ".TBLPREFIX."media_mapping WHERE mm_media='".$pid."'";
 	if (!empty($type)) $sql .= " AND mm_type='".$type."'";
-	$sql .= " AND mm_file='".$GEDCOMID."'";
+	$sql .= " AND mm_file='".GedcomConfig::$GEDCOMID."'";
 	$res = NewQuery($sql);
 	while($row = $res->FetchRow()){
 		$added = false;
@@ -1301,8 +1270,8 @@ function GetMediaLinks($pid, $type="", $applypriv=true) {
 		}
 	}
 	if ($LINK_PRIVACY) {
-		$indisel = "'".implode("[".$GEDCOMID."]','", $indisel)."[".$GEDCOMID."]'";
-		$famsel = "'".implode ("[".$GEDCOMID."]','", $famsel)."[".$GEDCOMID."]'";
+		$indisel = "'".implode("[".GedcomConfig::$GEDCOMID."]','", $indisel)."[".GedcomConfig::$GEDCOMID."]'";
+		$famsel = "'".implode ("[".GedcomConfig::$GEDCOMID."]','", $famsel)."[".GedcomConfig::$GEDCOMID."]'";
 		GetIndiList("no", $indisel, false);
 		GetFamList("no", $famsel);
 	}

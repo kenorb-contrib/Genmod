@@ -137,7 +137,7 @@ abstract class GedcomRecord {
 				}
 			}
 			else $this->isempty = false;
-			$this->gedrec = trim($this->gedrec)."\r\n";
+			if (!empty($this->gedrec)) $this->gedrec = trim($this->gedrec)."\r\n";
 				
 		}
 		else {
@@ -382,7 +382,7 @@ abstract class GedcomRecord {
 		if (is_null($this->isdeleted)) {
 			if (!$this->ThisChanged()) $this->isdeleted = false;
 			else {
-				$ch = $this->GetChangedGedRec();
+				$ch = trim($this->GetChangedGedRec());
 				if (empty($ch)) $this->isdeleted = true;
 				else $this->isdeleted = false;
 			}
@@ -393,16 +393,15 @@ abstract class GedcomRecord {
 	protected function ThisChanged() {
 		
 		if (is_null($this->ischanged)) {
-			if (ChangeFunctions::GetChangeData(true, $this->xref, true, "", "")) $this->ischanged = true;
+			if (ChangeFunctions::GetChangeData(true, $this, true, "", "")) $this->ischanged = true;
 			else $this->ischanged = false;
 		}
 		return $this->ischanged;
 	}
 	
 	protected function ThisNew() {
-		
 		if (is_null($this->isnew)) {
-			if (empty($this->gedrec) && ChangeFunctions::GetChangeData(true, $this->xref, true, "", "")) {
+			if (empty($this->gedrec) && ChangeFunctions::GetChangeData(true, $this, true, "", "")) {
 				$this->isnew = true;
 				$this->ischanged = true;
 			}
@@ -432,7 +431,7 @@ abstract class GedcomRecord {
 		
 		if (!$this->ThisChanged()) return "";
 		if (is_null($this->changedgedrec)) {
-			$rec = ChangeFunctions::GetChangeData(false, $this->xref, true, "gedlines", "");
+			$rec = ChangeFunctions::GetChangeData(false, $this, true, "gedlines", "");
 			$this->changedgedrec = $rec[$this->gedcomid][$this->xref];
 		}
 		return $this->changedgedrec;
@@ -521,6 +520,12 @@ abstract class GedcomRecord {
 					if (!is_array($selection) || in_array($fact, $selection)) {
 						$added = true;
 						$facts[] = new Fact($this->xref, $this->datatype, $this->gedcomid, $fact, $newrec, $count[$fact], "change_new");
+						// We also must raise the counters for new links, otherwise the tab on the detail pages won't display
+						if (!is_array($selection)) {
+							if ($fact == "SOUR") $this->sourfacts_count++;
+							elseif ($fact == "NOTE") $this->notefacts_count++;
+							elseif ($fact == "OBJE") $this->mediafacts_count++;
+						}
 					}
 				}
 				if (!$added) $this->hiddenfacts = true;
@@ -541,6 +546,7 @@ abstract class GedcomRecord {
 					if ($factobj->style != "change_new" && ($this->isdeleted || ChangeFunctions::IsChangedFact($this->xref, $factobj->factrec))) {
 						// if the record is changed, also show the new value
 						$cfact = ChangeFunctions::RetrieveChangedFact($this->xref, $factobj->fact, $factobj->factrec);
+//						if ($factobj->fact == "OBJE") print "cfact: ".$cfact;
 						// if only a fact is changed/deleted.....
 						if (!$this->isdeleted) {
 							// Add the old fact.
@@ -550,6 +556,7 @@ abstract class GedcomRecord {
 							if (!empty($cfact)) {
 								$newfact = new Fact($this->xref, $this->datatype, $this->gedcomid, $factobj->fact, $cfact, $factobj->count, "change_new");
 								// add the new fact
+//								print "<br />added:";
 								$newfacts[] = $newfact;
 							}
 						}
@@ -600,8 +607,10 @@ abstract class GedcomRecord {
 				foreach ($factarr as $key => $fact) {
 					foreach ($this->facts as $key => $factobj) {
 						if ($factobj->fact == $fact && ($exclude_links == false || $factobj->linktype == "")) {
+//							print "<br />yes: ".$factobj->fact." ";
 							$facts[] = $factobj;
 						}
+//						else print "<br />not: ".$factobj->fact;
 					}
 				}
 			}
@@ -1207,13 +1216,19 @@ abstract class GedcomRecord {
 		if ($type == 0) {
 			$gedrec = $this->gedrec;
 			if ($gm_user->userCanEdit()) {
-				$newrec = $this->GetChangedGedrec();
-				if (!empty($newrec)) $gedrec = $newrec;
+				if ($this->ThisChanged()) $gedrec = trim($this->GetChangedGedrec());
 			}
 		}
-		else if ($type == 1 && $gm_user->userCanEdit()) $gedrec = $this->GetChangedGedrec();
+		else if ($type == 1) {
+			if ($gm_user->userCanEdit()) {
+				if ($this->ThisChanged()) $gedrec = trim($this->GetChangedGedrec());
+				else $gedrec = $this->gedrec;
+			}
+			else $gedrec = "";
+		}
 		else $gedrec = $this->gedrec;
-		
+		if (trim($gedrec) == "") return "";
+
 		//-- check if the whole record is private
 		if (!$this->DisplayDetails()) {
 			//-- check if name should be private

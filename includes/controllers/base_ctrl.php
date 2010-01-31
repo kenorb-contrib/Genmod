@@ -53,7 +53,7 @@ abstract class BaseController {
 	 * constructor for this class
 	 */
 	protected function __construct() {
-		global $show_changes, $gm_user, $GEDCOMID;
+		global $show_changes, $gm_user;
 		
 		if (isset($_REQUEST["view"])) $this->view = $_REQUEST["view"];
 		if (isset($_REQUEST["action"])) $this->action = $_REQUEST["action"];
@@ -62,7 +62,7 @@ abstract class BaseController {
 		
 		$this->uname = $gm_user->username;
 		
-		$this->gedcomid = $GEDCOMID;
+		$this->gedcomid = GedcomConfig::$GEDCOMID;
 	}
 
 	public function __get($property) {

@@ -227,7 +227,7 @@ abstract class GedcomConfig {
 			
 		if (isset(self::$GEDCONF[$gedcomid])) {
 			foreach (self::$GEDCONF[$gedcomid] as $var => $value) {
-				if ($var == "GEDCOMID" || $var == "GEDCOM") {
+				if ($var == "GEDCOMID") {
 					global $$var;
 					$$var = $value;
 				}					
@@ -246,7 +246,7 @@ abstract class GedcomConfig {
 					while($row = $res->FetchAssoc($res->result)){
 						foreach ($row as $key => $value) {
 							$var = strtoupper(substr($key, 3));
-							if ($var == "GEDCOMID" || $var == "GEDCOM") {
+							if ($var == "GEDCOMID") {
 								global $$var;
 								$$var = $value;
 							}
@@ -273,7 +273,7 @@ abstract class GedcomConfig {
 			require_once($GM_BASE_DIRECTORY."includes/values/pinyin.php");
 		}
 		//-- This is copied from the config_gedcom.php
-		if ($gedcomid == $GEDCOMID) @set_time_limit(self::$TIME_LIMIT);
+		if ($gedcomid == self::$GEDCOMID) @set_time_limit(self::$TIME_LIMIT);
 		return true;
 	}
 	

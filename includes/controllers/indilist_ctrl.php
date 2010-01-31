@@ -73,7 +73,6 @@ class IndilistController extends ListController {
 	 * @return array	$names array
 	 */
 	public function GetAlphaIndiNames() {
-		global $GEDCOMID;
 	
 		$search_letter = $this->GetNameString($this->alpha);
 		
@@ -90,7 +89,7 @@ class IndilistController extends ListController {
 			$where = " AND ";
 		}
 		if ($this->allgeds != "yes") {
-			$sql .= $where."n_file LIKE '".$GEDCOMID."'";
+			$sql .= $where."n_file LIKE '".GedcomConfig::$GEDCOMID."'";
 			$where = " AND ";
 		}
 		$sql .= " GROUP BY n_surname";
@@ -113,7 +112,6 @@ class IndilistController extends ListController {
 	 * @return array	$indilist array
 	 */
 	public function GetIndis() {
-		global $GEDCOMID;
 
 		$search_letter = $this->GetNameString($this->alpha);
 		
@@ -125,7 +123,7 @@ class IndilistController extends ListController {
 		if ($this->falpha != "") $sql .= " AND n_fletter='".$this->falpha."'";
 		if (!GedcomConfig::$SHOW_MARRIED_NAMES) $sql .= " AND n_type!='C'";
 		
-		if ($this->allgeds == "no") $sql .= " AND i_file='".$GEDCOMID."'";
+		if ($this->allgeds == "no") $sql .= " AND i_file='".GedcomConfig::$GEDCOMID."'";
 
 		$sql .= " ORDER BY i_key, n_id"; // Don't remove this!
 	
@@ -156,7 +154,7 @@ class IndilistController extends ListController {
 	 */
 	public function PrintPersonList($personlist, $print_all=true) {
 		global $TEXT_DIRECTION;
-		global $GEDCOMID, $year;
+		global $year;
 	
 		// NOTE: The list is really long so divide it up again by the first letter of the first name
 		if (((GedcomConfig::$ALPHA_INDEX_LISTS && count($personlist) > GedcomConfig::$ALPHA_INDEX_LISTS) || $this->falpha != "") && $print_all == true) {
@@ -240,7 +238,7 @@ class IndilistController extends ListController {
 			$names = array();
 			foreach($personlist as $gid => $indi) {
 				// NOTE: make sure that favorites from other gedcoms are not shown
-				if ($indi->gedcomid == $GEDCOMID || $this->allgeds == "yes") {
+				if ($indi->gedcomid == GedcomConfig::$GEDCOMID || $this->allgeds == "yes") {
 					foreach($indi->name_array as $indexval => $namearray) {
 						// NOTE: Only include married names if chosen to show so
 						// NOTE: Do not include calculated names. Identified by C.
@@ -250,6 +248,7 @@ class IndilistController extends ListController {
 			}
 			uasort($names, "ItemSort");
 			reset($names);
+			$indi_private = array();
 			$total_indis = count($personlist);
 			$count = count($names);
 			$i=0;
@@ -258,7 +257,7 @@ class IndilistController extends ListController {
 			foreach($names as $indexval => $namearray) {
 				$person = $personlist[$namearray[1]];
 				if (!$person->PrintListPerson(true, false, "", $namearray[2])) {
-					$indi_hide[$person->key] = true;
+					$indi_private[$person->key] = true;
 				}
 				$i++;
 				if ($i==ceil($count/2) && $count>8) print "</ul></td><td class=\"shade1 list_value indilist $TEXT_DIRECTION\"><ul>\n";			
@@ -267,9 +266,10 @@ class IndilistController extends ListController {
 			print "</tr><tr><td colspan=\"2\" class=\"center\">";
 			if (GedcomConfig::$SHOW_MARRIED_NAMES) print GM_LANG_total_names." ".count($names)."<br />\n";
 			print GM_LANG_total_indis." ".$total_indis;
-			if (count($indi_private)>0) print "  (".GM_LANG_private." ".count($indi_private).")";
-			if (count($indi_hide)>0) print "  --  ".GM_LANG_hidden." ".count($indi_hide);
-			if (count($indi_private)>0 || count($indi_hide)>0) PrintHelpLink("privacy_error_help", "qm");
+			if (count($indi_private)>0) {
+				print "  (".GM_LANG_private." ".count($indi_private).")";
+				PrintHelpLink("privacy_error_help", "qm");
+			}
 			print "</td>\n";
 			print "</tr></table>";
 		}

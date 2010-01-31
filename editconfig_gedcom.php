@@ -269,7 +269,7 @@ $temp = GedcomConfig::$THEME_DIR;
 // If it's a new gedcom, read the default settings (auto calculate and set the new GEDCOMID)
 if (!isset($gedid) || !isset($GEDCOMS[$gedid])) {
 	GedcomConfig::ReadGedcomConfig(0);
-	$gedid = $GEDCOMID;
+	$gedid = GedcomConfig::$GEDCOMID;
 }
 else SwitchGedcom($gedid);
 

@@ -39,17 +39,13 @@ if ((!$gm_user->userCanViewGedlines()) && (!$gm_user->UserCanAccept())) {
 	print "</body></html>";
 	exit;
 }
-$object = ConstructObject($pid, $type);
+$object =& ConstructObject($pid, $type);
 if (!$object->isempty && !$object->disp) {
 	PrintFunctions::PrintPrivacyError(GedcomConfig::$CONTACT_EMAIL);
 	print "</body></html>";
 	exit;
 }
 if ($changed) {
-//	$newrec = $object->newprivategedrec;
-//	$newrec = PrivacyFunctions::PrivatizeGedcom($newrec);
-//	$oldrec = $object->oldprivategedrec;
-//	$oldrec = PrivacyFunctions::PrivatizeGedcom($oldrec);
 	print "<table class=\"facts_table\">\r\n";
 	print "<tr class=\"topbottombar\"><td>".GM_LANG_old_record."</td><td>".GM_LANG_new_record."</td></tr>\r\n";
 	print "<tr class=\"shade1 wrap\"><td>".nl2br($object->oldprivategedrec)."</td><td>".nl2br($object->newprivategedrec)."</td></tr>\r\n";

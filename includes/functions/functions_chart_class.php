@@ -88,30 +88,30 @@ abstract class ChartFunctions {
 	 * @return string $rootid validated root ID
 	 */
 	public function CheckRootId($rootid) {
-		global $GEDCOMID, $gm_user;
+		global $gm_user;
 		
 		// -- if the $rootid is not already there then find the first person in the file and make him the root
-		if (empty($rootid) &&!empty($gm_user->rootid[$GEDCOMID])) {
-			$person =&Person::GetInstance($gm_user->rootid[$GEDCOMID], "", $GEDCOMID);
-			if (!$person->isempty) $rootid = $gm_user->rootid[$GEDCOMID];
+		if (empty($rootid) &&!empty($gm_user->rootid[GedcomConfig::$GEDCOMID])) {
+			$person =&Person::GetInstance($gm_user->rootid[GedcomConfig::$GEDCOMID], "", GedcomConfig::$GEDCOMID);
+			if (!$person->isempty) $rootid = $gm_user->rootid[GedcomConfig::$GEDCOMID];
 		}
-		if (empty($rootid) &&!empty($gm_user->gedcomid[$GEDCOMID])) {
-			$person =&Person::GetInstance($gm_user->gedcomid[$GEDCOMID], "", $GEDCOMID);
-			if (!$person->isempty) $rootid = $gm_user->gedcomid[$GEDCOMID];
+		if (empty($rootid) &&!empty($gm_user->gedcomid[GedcomConfig::$GEDCOMID])) {
+			$person =&Person::GetInstance($gm_user->gedcomid[GedcomConfig::$GEDCOMID], "", GedcomConfig::$GEDCOMID);
+			if (!$person->isempty) $rootid = $gm_user->gedcomid[GedcomConfig::$GEDCOMID];
 		}
 			
 		// -- allow users to overide default id in the config file.
 		if (empty($rootid)) {
 			GedcomConfig::$PEDIGREE_ROOT_ID = trim(GedcomConfig::$PEDIGREE_ROOT_ID);
 			if (!empty(GedcomConfig::$PEDIGREE_ROOT_ID)) {
-				$person =&Person::GetInstance(GedcomConfig::$PEDIGREE_ROOT_ID, "", $GEDCOMID);
+				$person =&Person::GetInstance(GedcomConfig::$PEDIGREE_ROOT_ID, "", GedcomConfig::$GEDCOMID);
 				if (!$person->isempty) $rootid = GedcomConfig::$PEDIGREE_ROOT_ID;
 			}
 		}
 		if (empty($rootid)) $rootid = self::FindFirstPerson();
 		
 		if (GedcomConfig::$USE_RIN) {
-			$person =&Person::GetInstance($rootid, "", $GEDCOMID);
+			$person =&Person::GetInstance($rootid, "", GedcomConfig::$GEDCOMID);
 			if ($person->isempty) $rootid = FindRinId($rootid);
 		} 
 		else {
@@ -327,9 +327,8 @@ abstract class ChartFunctions {
 	 * @return string the gedcom xref id of the first person in the gedcom
 	 */
 	public function FindFirstPerson() {
-		global $GEDCOMID;
 		
-		$sql = "SELECT i_id FROM ".TBLPREFIX."individuals WHERE i_file='".$GEDCOMID."' ORDER BY i_id LIMIT 1";
+		$sql = "SELECT i_id FROM ".TBLPREFIX."individuals WHERE i_file='".GedcomConfig::$GEDCOMID."' ORDER BY i_id LIMIT 1";
 		$res = NewQuery($sql);
 		$row = $res->FetchAssoc();
 		$res->FreeResult();

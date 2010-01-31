@@ -127,12 +127,11 @@ class ClippingsController extends BaseController {
 	}
 	
 	private function IdInCart($id) {
-		global $GEDCOMID;
 		
-		if (!isset($this->cart[$GEDCOMID])) return false;
-		$ct = count($this->cart[$GEDCOMID]);
+		if (!isset($this->cart[GedcomConfig::$GEDCOMID])) return false;
+		$ct = count($this->cart[GedcomConfig::$GEDCOMID]);
 		for($i=0; $i<$ct; $i++) {
-			$temp = $this->cart[$GEDCOMID][$i];
+			$temp = $this->cart[GedcomConfig::$GEDCOMID][$i];
 			if ($temp['id']==$id) {
 				return true;
 			}
@@ -141,15 +140,14 @@ class ClippingsController extends BaseController {
 	}
 	
 	private function AddClipping($clipping) {
-		global $GEDCOMID;
 		
 		if (($clipping['id']==false)||($clipping['id']=="")) return false;
 	
 		if (!$this->IdInCart($clipping['id'])) {
 			if ($clipping['type']=="indi") {
-				$person =& Person::GetInstance($clipping['id'], "", $GEDCOMID);
+				$person =& Person::GetInstance($clipping['id'], "", GedcomConfig::$GEDCOMID);
 				if ($person->disp_name) {
-					$this->cart[$GEDCOMID][]=$clipping;
+					$this->cart[GedcomConfig::$GEDCOMID][]=$clipping;
 					$gedrec = $person->gedrec;
 					$st = preg_match_all("/\d (\w+) @(.*)@/", $gedrec, $match, PREG_SET_ORDER);
 					for($i=0; $i<$st; $i++) {
@@ -167,9 +165,9 @@ class ClippingsController extends BaseController {
 				else return false;
 			}
 			else if ($clipping['type']=="fam") {
-				$family =& Family::GetInstance($clipping['id'], "", $GEDCOMID);
+				$family =& Family::GetInstance($clipping['id'], "", GedcomConfig::$GEDCOMID);
 				if ((!is_object($family->husb) || $family->husb->disp_name) && (!is_object($family->wife) || $family->wife->disp_name)) {
-					$this->cart[$GEDCOMID][]=$clipping;
+					$this->cart[GedcomConfig::$GEDCOMID][]=$clipping;
 					$gedrec = $family->gedrec;
 					$st = preg_match_all("/\d (\w+) @(.*)@/", $gedrec, $match, PREG_SET_ORDER);
 					for($i=0; $i<$st; $i++) {
@@ -189,7 +187,7 @@ class ClippingsController extends BaseController {
 			else {
 				$object =& ConstructObject($clipping['id'], $clipping['type']);
 				if ($object->disp) {
-					$this->cart[$GEDCOMID][] = $clipping;
+					$this->cart[GedcomConfig::$GEDCOMID][] = $clipping;
 					$gedrec = $object->gedrec;
 					$nt = preg_match_all("/\d (\w+) @(.*)@/", $gedrec, $match, PREG_SET_ORDER);
 					for($i=0; $i<$nt; $i++) {
@@ -331,7 +329,6 @@ class ClippingsController extends BaseController {
 	}
 	
 	public function PerformAction() {
-		global $GEDCOMID;
 		
 		if ($this->action == 'add1') {
 			$clipping = array();
@@ -403,14 +400,14 @@ class ClippingsController extends BaseController {
 			}
 		}
 		else if($this->action == 'remove') {
-			$ct = count($this->cart[$GEDCOMID]);
+			$ct = count($this->cart[GedcomConfig::$GEDCOMID]);
 			for($i=$item+1; $i<$ct; $i++) {
-				$this->cart[$GEDCOMID][$i-1] = $this->cart[$GEDCOMID][$i];
+				$this->cart[GedcomConfig::$GEDCOMID][$i-1] = $this->cart[GedcomConfig::$GEDCOMID][$i];
 			}
 			unset($this->cart[$ct-1]);
 		}
 		else if($this->action == 'empty') {
-			$this->cart[$GEDCOMID] = array();
+			$this->cart[GedcomConfig::$GEDCOMID] = array();
 			$_SESSION["clippings"] = "";
 		}
 		else if($this->action == 'download') {
@@ -421,8 +418,8 @@ class ClippingsController extends BaseController {
 			  $dSERVER_URL = substr(SERVER_URL, 0, strlen(SERVER_URL) - 1);
 			}
 			else $dSERVER_URL = SERVER_URL;
-			usort($this->cart[$GEDCOMID], "SameGroup");
-			$ct = count($this->cart[$GEDCOMID]);
+			usort($this->cart[GedcomConfig::$GEDCOMID], "SameGroup");
+			$ct = count($this->cart[GedcomConfig::$GEDCOMID]);
 			
 			$filetext = "0 HEAD\r\n1 SOUR Genmod\r\n2 NAME Genmod Online Genealogy\r\n2 VERS ".GM_VERSION." ".GM_VERSION_RELEASE."\r\n1 DEST DISKETTE\r\n1 DATE ".date("j M Y")."\r\n2 TIME ".date("h:i:s")."\r\n";
 			$filetext .= "1 GEDC\r\n2 VERS 5.5\r\n2 FORM LINEAGE-LINKED\r\n1 CHAR ".GedcomConfig::$CHARACTER_SET."\r\n";
@@ -437,10 +434,9 @@ class ClippingsController extends BaseController {
 				$filetext = utf8_decode($filetext);
 			}
 			for($i=0; $i<$ct; $i++)	{
-				$clipping = $this->cart[$GEDCOMID][$i];
+				$clipping = $this->cart[GedcomConfig::$GEDCOMID][$i];
 				$object =& ConstructObject($clipping['id'], $clipping['type']);
 				$record = $object->oldprivategedrec;
-//				$record = PrivacyFunctions::PrivatizeGedcom($object->gedrec);
 				$record = RemoveCustomTags($record, $this->remove);
 				if ($this->convert == "yes") $record = utf8_decode($record);
 				if ($clipping['type'] == 'indi') {
@@ -459,7 +455,7 @@ class ClippingsController extends BaseController {
 					$filetext .= "2 PAGE ".$dSERVER_URL."/individual.php?pid=".$clipping['id']."\r\n";
 					$filetext .= "2 DATA\r\n";
 					$filetext .= "3 TEXT ".GM_LANG_indi_downloaded_from."\r\n";
-					$filetext .= "4 CONT ".$dSERVER_URL."/individual.php?pid=".$clipping['id']."&gedid=".$GEDCOMID."\r\n";
+					$filetext .= "4 CONT ".$dSERVER_URL."/individual.php?pid=".$clipping['id']."&gedid=".GedcomConfig::$GEDCOMID."\r\n";
 				}
 				else if ($clipping['type'] == 'fam') {
 					foreach ($object->children_ids as $key => $childid) {
@@ -473,25 +469,25 @@ class ClippingsController extends BaseController {
 		
 					$filetext .= trim($record)."\r\n";
 					$filetext .= "1 SOUR @SGM1@\r\n";
-					$filetext .= "2 PAGE ".$dSERVER_URL.$path."family.php?famid=".$clipping['id']."&gedid=".$GEDCOMID."\r\n";
+					$filetext .= "2 PAGE ".$dSERVER_URL.$path."family.php?famid=".$clipping['id']."&gedid=".GedcomConfig::$GEDCOMID."\r\n";
 					$filetext .= "2 DATA\r\n";
 					$filetext .= "3 TEXT ".GM_LANG_family_downloaded_from."\r\n";
-					$filetext .= "4 CONT ".$dSERVER_URL."/family.php?famid=".$clipping['id']."&gedid=".$GEDCOMID."\r\n";
+					$filetext .= "4 CONT ".$dSERVER_URL."/family.php?famid=".$clipping['id']."&gedid=".GedcomConfig::$GEDCOMID."\r\n";
 				}
 				else if($clipping['type'] == "sour") {
 					$filetext .= trim($record)."\r\n";
 					$filetext .= "1 NOTE ".GM_LANG_source_downloaded_from."\r\n";
-					$filetext .= "2 CONT ".$dSERVER_URL."/source.php?sid=".$clipping['id']."&gedid=".$GEDCOMID."\r\n";
+					$filetext .= "2 CONT ".$dSERVER_URL."/source.php?sid=".$clipping['id']."&gedid=".GedcomConfig::$GEDCOMID."\r\n";
 				}
 				else if($clipping['type'] == "repo") {
 					$filetext .= trim($record)."\r\n";
 					$filetext .= "1 NOTE ".GM_LANG_repo_downloaded_from."\r\n";
-					$filetext .= "2 CONT ".$dSERVER_URL."/repo.php?rid=".$clipping['id']."&gedid=".$GEDCOMID."\r\n";
+					$filetext .= "2 CONT ".$dSERVER_URL."/repo.php?rid=".$clipping['id']."&gedid=".GedcomConfig::$GEDCOMID."\r\n";
 				}
 				else if($clipping['type'] == "note") {
 					$filetext .= trim($record)."\r\n";
 					$filetext .= "1 CONT ".GM_LANG_note_downloaded_from."\r\n";
-					$filetext .= "1 CONT ".$dSERVER_URL."/note.php?oid=".$clipping['id']."&gedid=".$GEDCOMID."\r\n";
+					$filetext .= "1 CONT ".$dSERVER_URL."/note.php?oid=".$clipping['id']."&gedid=".GedcomConfig::$GEDCOMID."\r\n";
 				}
 				else if($clipping['type'] == "obje") {
 					$ft = preg_match_all("/\d FILE (.*)/", $record, $match, PREG_SET_ORDER);
@@ -503,7 +499,7 @@ class ClippingsController extends BaseController {
 					}
 					$filetext .= trim($record)."\r\n";
 					$filetext .= "1 NOTE ".GM_LANG_media_downloaded_from."\r\n";
-					$filetext .= "2 CONT ".$dSERVER_URL."/mediadetail.php?mid=".$clipping['id']."&gedid=".$GEDCOMID."\r\n";
+					$filetext .= "2 CONT ".$dSERVER_URL."/mediadetail.php?mid=".$clipping['id']."&gedid=".GedcomConfig::$GEDCOMID."\r\n";
 				}
 				else $filetext .= trim($record)."\r\n";
 			}

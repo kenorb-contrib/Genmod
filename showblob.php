@@ -50,12 +50,12 @@ if (!MediaFS::IsValidMedia($file)) {
 $m = RelativePathFile(GedcomConfig::$MEDIA_DIRECTORY);
 if (!empty($m)) $mfile = preg_replace("~^$m~", "", $file);
 else $mfile = $file;
-$sql = "SELECT m_media FROM ".TBLPREFIX."media WHERE m_mfile='".$mfile."' AND m_file='".$GEDCOMID."'";
+$sql = "SELECT m_media FROM ".TBLPREFIX."media WHERE m_mfile='".$mfile."' AND m_file='".GedcomConfig::$GEDCOMID."'";
 $res = NewQuery($sql);
 
 // Check the privacy settings
 while ($row = $res->FetchRow()) {
-	$media =& MediaItem::GetInstance($row[0], "", $GEDCOMID);
+	$media =& MediaItem::GetInstance($row[0], "", GedcomConfig::$GEDCOMID);
 	if (!$media->disp_as_link) {
 		WriteToLog("ShowBlob-> Unauthorised access to media: ".$file, "W", "S");
 		header("HTTP/1.1 403 Forbidden");

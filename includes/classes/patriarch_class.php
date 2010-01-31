@@ -131,9 +131,9 @@ class Patriarch {
 	
 	function put_patri_list() {
 		//-- save the items in the database
-		global $GEDCOMID, $FP;
+		global $FP;
 	
-		$indexfile = INDEX_DIRECTORY.$GEDCOMID."_patriarch.php";
+		$indexfile = INDEX_DIRECTORY.GedcomConfig::$GEDCOMID."_patriarch.php";
 		$FP = fopen($indexfile, "wb");
 		if (!$FP) {
 			print "<font class=\"error\">".GM_LANG_unable_to_create_index."</font>";

@@ -676,10 +676,10 @@ if ($step == 5) {
 				
 				//-- import anything that is not a blob
 				if (preg_match("/\n\d BLOB/", $indirec)==0) {
-					$gid = ImportFunctions::ImportRecord($indirec);
+					$gid = ImportFunctions::ImportRecord($indirec, false, $gedcomid);
 					$type = GetRecType($indirec);
-					$place_count += ImportFunctions::UpdatePlaces($gid, $type, $indirec);
-					$date_count += ImportFunctions::UpdateDates($gid, $indirec);
+					$place_count += ImportFunctions::UpdatePlaces($gid, $type, $indirec, false, $gedcomid);
+					$date_count += ImportFunctions::UpdateDates($gid, $indirec, $gedcomid);
 				}
 				else WriteToLog("UploadGedcom -> Import skipped a aecord with a BLOB tag: ".$indirec, "E", "G", get_gedcom_from_id($gedcomid));
 					

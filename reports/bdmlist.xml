@@ -134,7 +134,7 @@
 						<GMRGedcom id="@FAMS">
 							<GMRif condition="$more==1">
 								<GMRText style="small">
-									<br /><br />
+									<br />
 									~~~~~~~~~~~~~~~~~~~~~~~~~~~
 									<br />
 								</GMRText>

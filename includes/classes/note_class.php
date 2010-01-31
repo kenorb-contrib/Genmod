@@ -37,6 +37,7 @@ class Note extends GedcomRecord {
 	
 	// Data
 	private $text = null;					// Text of the note
+	private $oldtext = null;				// Text of the note, forced from old record
 	private $newtext = null;				// Text of the note including pending changes
 	private $title = null;					// Title is shortened text
 	private $name = null;					// Title is shortened text (same as title)
@@ -45,19 +46,24 @@ class Note extends GedcomRecord {
 	private $textchanged = null;			// If any pending changes exist for this note
 	
 	public static function GetInstance($xref, $gedrec="", $gedcomid="") {
-		global $GEDCOMID;
 		
-		if (empty($gedcomid)) $gedcomid = $GEDCOMID;
+		if (empty($gedcomid)) $gedcomid = GedcomConfig::$GEDCOMID;
 		if (!isset(self::$cache[$gedcomid][$xref])) {
 			self::$cache[$gedcomid][$xref] = new Note($xref, $gedrec, $gedcomid);
 		}
 		return self::$cache[$gedcomid][$xref];
 	}
 	
-	public static function IsInstance($xref, $gedcomid="") {
-		global $GEDCOMID;
+	public static function NewInstance($xref, $gedrec="", $gedcomid="") {
 		
-		if (empty($gedcomid)) $gedcomid = $GEDCOMID;
+		if (empty($gedcomid)) $gedcomid = GedcomConfig::$GEDCOMID;
+		self::$cache[$gedcomid][$xref] = new Note($xref, $gedrec, $gedcomid);
+		return self::$cache[$gedcomid][$xref];
+	}
+	
+	public static function IsInstance($xref, $gedcomid="") {
+		
+		if (empty($gedcomid)) $gedcomid = GedcomConfig::$GEDCOMID;
 		if (!isset(self::$cache[$gedcomid][$xref])) return false;
 		else return true;
 	}
@@ -67,7 +73,6 @@ class Note extends GedcomRecord {
 	 * @param string $gedrec	the raw note gedcom record
 	 */
 	public function __construct($id, $gedrec="", $gedcomid="", $new=false) {
-		global $GEDCOMID;
 
 		if (is_array($gedrec)) {
 			$id = $gedrec["o_id"];
@@ -91,6 +96,9 @@ class Note extends GedcomRecord {
 		switch ($property) {
 			case "text":
 				return $this->GetNoteText();
+				break;
+			case "oldtext":
+				return $this->GetNoteText("old");
 				break;
 			case "textchanged":
 				return $this->textchanged;
@@ -155,13 +163,13 @@ class Note extends GedcomRecord {
 	/**
 	 * get the text of the note
 	 */
-	public function getNoteText($changed=false) {
+	public function getNoteText($type="") {
 		
 		if (!$this->DisplayDetails()) {
 			$this->newtext = GM_LANG_private;
 			return $this->text;
 		}
-		else if ($this->ThisChanged() && !is_null($this->GetChangedGedrec())) {
+		else if ($type != "old" && $this->ThisChanged() && !is_null($this->GetChangedGedrec())) {
 			if (!is_null($this->newtext)) return $this->newtext;
 			$this->newtext = "";
 			$nt = preg_match("/0 @.+@ NOTE (.*)(\r\n|\n|\r)*/", $this->GetChangedGedrec(), $n1match);

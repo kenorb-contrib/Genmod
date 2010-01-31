@@ -81,7 +81,7 @@ if ($action=="edituser2") {
 			$newuser->username = $username;
 			$newuser->firstname = $firstname;
 			$newuser->lastname = $lastname;
-			$newuser->rootid[$GEDCOMID] = $rootid;
+			$newuser->rootid[GedcomConfig::$GEDCOMID] = $rootid;
 			if (isset($user_language)) $newuser->language = $user_language;
 			if ($olduser->email != $user_email) $sync_data_changed = true;
 			$newuser->email = $user_email;
@@ -150,15 +150,15 @@ if ($action=="edituser2") {
 	<tr><td class="shade2 wrap"><div class="helpicon"><?php PrintHelpLink("edituser_lastname_help", "qm"); print "</div><div class=\"description\">"; print GM_LANG_lastname;?></div></td><td class="shade1"><input type="text" name="lastname" tabindex="<?php $tab++; print $tab; ?>" value="<?php print $gm_user->lastname?>" /></td></tr>
 	<tr><td class="shade2 wrap"><div class="helpicon"><?php PrintHelpLink("edituser_gedcomid_help", "qm"); print "</div><div class=\"description\">"; print GM_LANG_gedcomid;?></div></td><td class="shade1">
 		<?php
-			if (!empty($gm_user->gedcomid[$GEDCOMID])) {
-				$person =& Person::GetInstance($gm_user->gedcomid[$GEDCOMID], "", $GEDCOMID);
+			if (!empty($gm_user->gedcomid[GedcomConfig::$GEDCOMID])) {
+				$person =& Person::GetInstance($gm_user->gedcomid[GedcomConfig::$GEDCOMID], "", GedcomConfig::$GEDCOMID);
 				$person->PrintListPerson(false);
 			}
 			else print "&nbsp;";
 		?>
 	</td></tr>
-	<tr><td class="shade2 wrap"><div class="helpicon"><?php PrintHelpLink("edituser_rootid_help", "qm"); print "</div><div class=\"description\">"; print GM_LANG_rootid;?></div></td><td class="shade1"><input type="text" name="rootid" id="rootid" tabindex="<?php $tab++; print $tab; ?>" value="<?php if (isset($gm_user->rootid[$GEDCOMID])) print $gm_user->rootid[$GEDCOMID]; ?>" />
-	<?php LinkFunctions::PrintFindIndiLink("rootid",$GEDCOMID); ?>
+	<tr><td class="shade2 wrap"><div class="helpicon"><?php PrintHelpLink("edituser_rootid_help", "qm"); print "</div><div class=\"description\">"; print GM_LANG_rootid;?></div></td><td class="shade1"><input type="text" name="rootid" id="rootid" tabindex="<?php $tab++; print $tab; ?>" value="<?php if (isset($gm_user->rootid[GedcomConfig::$GEDCOMID])) print $gm_user->rootid[GedcomConfig::$GEDCOMID]; ?>" />
+	<?php LinkFunctions::PrintFindIndiLink("rootid",GedcomConfig::$GEDCOMID); ?>
 	</td></tr>
 	<tr><td class="shade2 wrap"><div class="helpicon"><?php PrintHelpLink("edituser_password_help", "qm"); print "</div><div class=\"description\">"; print GM_LANG_password;?></div></td><td class="shade1"><input type="password" name="pass1" tabindex="<?php $tab++; print $tab; ?>" /><br /><?php print GM_LANG_leave_blank;?></td></tr>
 	<tr><td class="shade2 wrap"><div class="helpicon"><?php PrintHelpLink("edituser_conf_password_help", "qm"); print "</div><div class=\"description\">"; print GM_LANG_confirm;?></div></td><td class="shade1"><input type="password" name="pass2" tabindex="<?php $tab++; print $tab; ?>" /></td></tr>

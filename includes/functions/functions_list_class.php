@@ -43,13 +43,12 @@ abstract class ListFunctions {
 	// $applypriv true does not add indi's where disp_name is false to the array
 	// $allgeds is either "no", or an array with gedcomid's to search in
 	public function GetIndiList($allgeds="", $selection = "", $applypriv=true) {
-		global $GEDCOMID;
 	
 		$indilist = array();
 		$sql = "SELECT i_key, i_gedrec, i_isdead, i_id, i_file, n_name, n_surname, n_nick, n_letter, n_fletter, n_type ";
 		$sql .= "FROM ".TBLPREFIX."individuals, ".TBLPREFIX."names WHERE n_key=i_key ";
 		if ($allgeds == "no") {
-			$sql .= "AND i_file = ".$GEDCOMID." ";
+			$sql .= "AND i_file = ".GedcomConfig::$GEDCOMID." ";
 			if (!empty($selection)) $sql .= "AND i_key IN (".$selection.") ";
 		}
 		else if (is_array($allgeds)) {
@@ -125,13 +124,12 @@ abstract class ListFunctions {
 	
 	//-- get the famlist from the datastore
 	public function GetFamList($allgeds="no", $selection="", $applypriv=true) {
-		global $GEDCOMID;
 	
 		$famlist = array();
 		$sql = "SELECT * FROM ".TBLPREFIX."families";
 		if ($allgeds != "yes") {
 			if (!empty($selection)) $sql .= " WHERE f_key IN (".$selection.") ";
-			else $sql .= " WHERE f_file='".$GEDCOMID."'";
+			else $sql .= " WHERE f_file='".GedcomConfig::$GEDCOMID."'";
 		}
 		else if (!empty($selection)) $sql .= " WHERE f_key IN (".$selection.") ";
 	
@@ -167,14 +165,14 @@ abstract class ListFunctions {
 	}
 	
 	public function GetSourceList($selection="", $applypriv=true) {
-		global $GEDCOMID, $LINK_PRIVACY;
+		global $LINK_PRIVACY;
 		
 		$links = array();
 		$famsel = array();
 		$indisel = array();	
 		$sourcelist = array();
 		
-		$sql = "SELECT s_id, s_gedrec, s_file, s_key, sm_sid, sm_gid, sm_type FROM ".TBLPREFIX."sources, ".TBLPREFIX."source_mapping WHERE sm_file='".$GEDCOMID."' AND sm_file=s_file AND s_key=sm_key";
+		$sql = "SELECT s_id, s_gedrec, s_file, s_key, sm_sid, sm_gid, sm_type FROM ".TBLPREFIX."sources, ".TBLPREFIX."source_mapping WHERE sm_file='".GedcomConfig::$GEDCOMID."' AND sm_file=s_file AND s_key=sm_key";
 		if (!empty($selection)) $sql .= " AND s_key IN (".$selection.") ";
 		$res = NewQuery($sql);
 		$oldkey = "";
@@ -195,12 +193,12 @@ abstract class ListFunctions {
 		
 		if (count($indisel) > 0) {
 			array_flip(array_flip($indisel));
-			$indiselect = "'".implode("[".$GEDCOMID."]','", $indisel)."[".$GEDCOMID."]'";
+			$indiselect = "'".implode("[".GedcomConfig::$GEDCOMID."]','", $indisel)."[".GedcomConfig::$GEDCOMID."]'";
 			self::GetIndiList("", $indiselect, false);
 		}
 		if (count($famsel) > 0) {
 			array_flip(array_flip($famsel));
-			$famselect = "'".implode ("[".$GEDCOMID."]','", $famsel)."[".$GEDCOMID."]'";
+			$famselect = "'".implode ("[".GedcomConfig::$GEDCOMID."]','", $famsel)."[".GedcomConfig::$GEDCOMID."]'";
 			self::GetFamList("", $famselect, false);
 		}
 		if ($applypriv) {
@@ -216,11 +214,10 @@ abstract class ListFunctions {
 
 	//-- get the repositorylist from the datastore
 	public function GetRepoList($selection="", $applypriv=true) {
-		global $GEDCOMID;
 		
 		$repolist = array();
 	
-		$sql = "SELECT * FROM ".TBLPREFIX."other WHERE o_file='".$GEDCOMID."' AND o_type='REPO'";
+		$sql = "SELECT * FROM ".TBLPREFIX."other WHERE o_file='".GedcomConfig::$GEDCOMID."' AND o_type='REPO'";
 		if (!empty($filter)) $sql .= " AND o_gedrec LIKE '%".DbLayer::EscapeQuery($filter)."%'";
 		if (!empty($selection)) $sql .= "AND o_id IN (".$selection.") ";
 		$resr = NewQuery($sql);
@@ -241,19 +238,18 @@ abstract class ListFunctions {
 	
 	//-- get the assolist from the datastore
 	public function GetAssoList($type = "all", $id="") {
-		global $GEDCOMID;
 	
 		$type = str2lower($type);
 		$assolist = array();
 		$resnvalues = array(""=>"", "n"=>"none", "l"=>"locked", "p"=>"privacy", "c"=>"confidential");
-		$oldgedid = $GEDCOMID;
+		$oldgedid = GedcomConfig::$GEDCOMID;
 		if (($type == "all") || ($type == "fam")) {
 			$sql1 = "SELECT f_key as as_key, f_file as as_file, as_pid, as_fact, as_rela, as_resn, as_type FROM ".TBLPREFIX."asso, ".TBLPREFIX."families WHERE f_key=as_of AND as_type='F'"; 
-			if (!empty($id)) $sql1 .= " AND as_pid LIKE '".JoinKey($id, $GEDCOMID)."'";
+			if (!empty($id)) $sql1 .= " AND as_pid LIKE '".JoinKey($id, GedcomConfig::$GEDCOMID)."'";
 		}
 		if (($type == "all") || ($type == "indi")) {
 			$sql2 = "SELECT i_key as as_key, i_file as as_file, as_pid, as_fact, as_rela, as_resn, as_type FROM ".TBLPREFIX."asso, ".TBLPREFIX."individuals WHERE i_key=as_of AND as_type='I'";	
-			if (!empty($id)) $sql2 .= " AND as_pid LIKE '".JoinKey($id, $GEDCOMID)."'";
+			if (!empty($id)) $sql2 .= " AND as_pid LIKE '".JoinKey($id, GedcomConfig::$GEDCOMID)."'";
 		}
 		if ($type == "fam") $sql = $sql1;
 		else if ($type == "indi") $sql = $sql2;
@@ -285,10 +281,10 @@ abstract class ListFunctions {
 	
 	//-- find all of the places
 	public function FindPlaceList($place) {
-		global $GEDCOMID, $LANGUAGE;
+		global $LANGUAGE;
 		
 		$placelist = array();
-		$sql = "SELECT p_id, p_place, p_parent_id  FROM ".TBLPREFIX."places WHERE p_file='".$GEDCOMID."' ORDER BY p_parent_id, p_id";
+		$sql = "SELECT p_id, p_place, p_parent_id  FROM ".TBLPREFIX."places WHERE p_file='".GedcomConfig::$GEDCOMID."' ORDER BY p_parent_id, p_id";
 		$res = NewQuery($sql);
 		while($row = $res->fetchAssoc()) {
 			if ($row["p_parent_id"] == 0) $placelist[$row["p_id"]] = $row["p_place"];

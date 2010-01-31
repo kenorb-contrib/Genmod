@@ -94,7 +94,6 @@ abstract class MenuBar {
 	 * @return Menu		the menu item
 	 */
 	public function GetFileMenu() {
-		global $GEDCOMID;
 		global $QUERY_STRING;
 		global $ALLOW_CHANGE_GEDCOM, $GEDCOMS, $gm_user;
 		
@@ -105,8 +104,8 @@ abstract class MenuBar {
 		// NOTE: Login link
 		if (empty($gm_user->username)) {
 			$submenu = new Menu(GM_LANG_login);
-			if (!LOGIN_URL == "") $submenu->addLink(LOGIN_URL."?url=".urlencode(basename(SCRIPT_NAME)."?".$QUERY_STRING."&gedid=$GEDCOMID"));
-			else $submenu->addLink(SERVER_URL."login.php?url=".urlencode(basename(SCRIPT_NAME)."?".$QUERY_STRING."&gedid=$GEDCOMID"));
+			if (!LOGIN_URL == "") $submenu->addLink(LOGIN_URL."?url=".urlencode(basename(SCRIPT_NAME)."?".$QUERY_STRING."&gedid=".GedcomConfig::$GEDCOMID));
+			else $submenu->addLink(SERVER_URL."login.php?url=".urlencode(basename(SCRIPT_NAME)."?".$QUERY_STRING."&gedid=".GedcomConfig::$GEDCOMID));
 			$menu->addSubmenu($submenu);
 		}
 		
@@ -117,14 +116,14 @@ abstract class MenuBar {
 		
 		// NOTE: Add GEDCOMS to open
 			foreach($GEDCOMS as $gedid => $gedarray) {
-				$submenu = new Menu(self::GetSubmenuText(PrintReady($gedarray["title"]), ($gedid == $GEDCOMID)), false);
+				$submenu = new Menu(self::GetSubmenuText(PrintReady($gedarray["title"]), ($gedid == GedcomConfig::$GEDCOMID)), false);
 				$submenu->addLink("index.php?command=gedcom&gedid=".$gedid);
 				$menu->submenus[count($menu->submenus)-1]->submenus[]=$submenu;
 			}
 		}
 		
 		// NOTE: Admin link
-		if ($gm_user->canadmin || ($gm_user->userGedcomAdmin($GEDCOMID))) {
+		if ($gm_user->canadmin || ($gm_user->userGedcomAdmin(GedcomConfig::$GEDCOMID))) {
 			$submenu = new Menu(GM_LANG_admin);
 			$submenu->addLink("admin.php");
 			$menu->addSubmenu($submenu);
@@ -263,7 +262,6 @@ abstract class MenuBar {
 	
 	public function GetFavoritesMenu() {
 		global $gm_user;
-		global $GEDCOMID;
 		
 		// NOTE: Favorites
 		$menu = new Menu(GM_LANG_menu_favorites);
@@ -285,7 +283,7 @@ abstract class MenuBar {
 		}
 			
 		// NOTE: Gedcom Favorites
-		$gedcomfavs = FavoritesController::getGedcomFavorites($GEDCOMID);
+		$gedcomfavs = FavoritesController::getGedcomFavorites(GedcomConfig::$GEDCOMID);
 		if (count($gedcomfavs)>0) {
 			$submenu = new Menu(GM_LANG_gedcom_favorites);
 			$menu->addSubmenu($submenu);
@@ -305,7 +303,7 @@ abstract class MenuBar {
 	 * @return Menu		the menu item
 	 */
 	public function GetChartsMenu($rootid='',$myid='') {
-		global $gm_user, $GEDCOMID;
+		global $gm_user;
 		
 		//-- main charts menu item
 		$link = "pedigree.php";
@@ -376,7 +374,7 @@ abstract class MenuBar {
 		if (file_exists("relationship.php")) {
 			if ($rootid && empty($myid)) {
 				if ($gm_user->username != "") {
-					$myid = $gm_user->gedcomid[$GEDCOMID];
+					$myid = $gm_user->gedcomid[GedcomConfig::$GEDCOMID];
 				}
 			}
 			if ((!empty($myid) && $myid != $rootid) || empty($rootid)) {

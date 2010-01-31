@@ -44,8 +44,8 @@ if (!$gm_user->userGedcomAdmin()) {
 }
 
 if ($_SESSION["cookie_login"]) {
-	if (empty(LOGIN_URL)) header("Location: login.php?gedid=$GEDCOMID&url=addmedia.php");
-	else header("Location: ".LOGIN_URL."?gedid=$GEDCOMID&url=addmedia.php");
+	if (LOGIN_URL == "") header("Location: login.php?gedid=".GedcomConfig::$GEDCOMID."&url=addmedia.php");
+	else header("Location: ".LOGIN_URL."?gedid=".GedcomConfig::$GEDCOMID."&url=addmedia.php");
 	exit;
 }
 
@@ -121,7 +121,7 @@ if ($action=="newentry") {
 				$title = $text[$i];
 			}
 		}
-		$dm = EditFunctions::CheckDoubleMedia($newfile, $title, $GEDCOMID);
+		$dm = EditFunctions::CheckDoubleMedia($newfile, $title, GedcomConfig::$GEDCOMID);
 		if (!$dm) {
 			// NOTE: Build the gedcom record
 			// NOTE: Level 0
@@ -132,7 +132,7 @@ if ($action=="newentry") {
 			$xref = EditFunctions::AppendGedrec($newged, "OBJE", $change_id, $change_type);
 		
 			if ($can_auto_accept && (($gm_user->UserCanAccept() && $aa_attempt) || $gm_user->userAutoAccept())) {
-				ChangeFunctions::AcceptChange($change_id, $GEDCOMID);
+				ChangeFunctions::AcceptChange($change_id, GedcomConfig::$GEDCOMID);
 			}
 			
 			print GM_LANG_update_successful;

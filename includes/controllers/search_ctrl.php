@@ -120,7 +120,6 @@ class SearchController extends BaseController {
 
 	
 	public function __construct($org="search") {
-		global $GEDCOMID;
 		
 		parent::__construct();
 		
@@ -161,7 +160,7 @@ class SearchController extends BaseController {
 		}
 		else if ($this->origin == "find") {
 			$this->GetFindParms();
-			$this->searchgeds[] = $GEDCOMID;
+			$this->searchgeds[] = GedcomConfig::$GEDCOMID;
 			if ($this->action == "filter" && !in_array($this->type, array("specialchar", "file", "place"))) $this->GetGeneralResults();
 		}
 	}
@@ -392,13 +391,13 @@ class SearchController extends BaseController {
 	// Set the gedcoms to search in, either from the seletion boxes, or from the crossgeds option in quickstart
 	// If the search is performed from the topsearch box on top of the page, search only in the current gedcom.
 	private function GetSearchGeds() {
-		global $GEDCOMID, $GEDCOMS, $ALLOW_CHANGE_GEDCOM;
+		global $GEDCOMS, $ALLOW_CHANGE_GEDCOM;
 		
 		if (!isset($_REQUEST["crossged"])) $this->crossged = "";
 		else $this->crossged = $_REQUEST["crossged"];
 		
 		if ($this->topsearch == "yes") {
-			$this->searchgeds[] = $GEDCOMID;
+			$this->searchgeds[] = GedcomConfig::$GEDCOMID;
 		}
 		if ($this->action == "quickstart" && $ALLOW_CHANGE_GEDCOM && $this->crossged == "yes") {
 			foreach($GEDCOMS as $ged => $gedvalues) {
@@ -412,7 +411,7 @@ class SearchController extends BaseController {
 			}
 		}
 		
-		if (count($this->searchgeds) == 0) $this->searchgeds[] = $GEDCOMID;
+		if (count($this->searchgeds) == 0) $this->searchgeds[] = GedcomConfig::$GEDCOMID;
 		
 		// Check if we may search in the selected geds
 		foreach($this->searchgeds as $key => $gedid) {
@@ -444,50 +443,49 @@ class SearchController extends BaseController {
 	
 	// This section is to handle searches entered in the top search box in the themes
 	private function CheckTopSearch() {
-		global $GEDCOMID;
 		
 		// first set some required variables. Search only in current gedcom, only in indi's.
 		$this->srindi = "yes";
 		
 		// Then see if an ID is typed in. If so, we might want to jump there.
-		if (!is_null($this->query)) {
+		if (!is_null($this->query) && $this->query != "") {
 	
 			$object = ConstructObject(str2upper($this->query));
 			if (is_object($object)) {
 				switch($object->type) {
 					case "INDI":
 						if ($object->disp_name) {
-							header("Location: individual.php?pid=".$this->query."&gedid=".$GEDCOMID);
+							header("Location: individual.php?pid=".$this->query."&gedid=".GedcomConfig::$GEDCOMID);
 							exit;
 						}
 						break;
 					case "FAM":
 						if (($object->husb_id != "" && $object->husb->disp_name) && ($object->wife_id != "" && $object->wife->disp_name)) {
-							header("Location: family.php?famid=".$this->query."&gedid=".$GEDCOMID);
+							header("Location: family.php?famid=".$this->query."&gedid=".GedcomConfig::$GEDCOMID);
 							exit;
 						}
 						break;
 					case "SOUR":
 						if ($object->disp) {
-							header("Location: source.php?sid=".$this->query."&gedid=".$GEDCOMID);
+							header("Location: source.php?sid=".$this->query."&gedid=".GedcomConfig::$GEDCOMID);
 							exit;
 						}
 						break;
 					case "REPO":
 						if ($object->disp) {
-							header("Location: repo.php?rid=".$this->query."&gedid=".$GEDCOMID);
+							header("Location: repo.php?rid=".$this->query."&gedid=".GedcomConfig::$GEDCOMID);
 							exit;
 						}
 						break;
 					case "OBJE":
 						if ($object->disp) {
-							header("Location: mediadetail.php?mid=".$this->query."&gedid=".$GEDCOMID);
+							header("Location: mediadetail.php?mid=".$this->query."&gedid=".GedcomConfig::$GEDCOMID);
 							exit;
 						}
 						break;
 					case "NOTE":
 						if ($object->disp) {
-							header("Location: note.php?oid=".$this->query."&gedid=".$GEDCOMID);
+							header("Location: note.php?oid=".$this->query."&gedid=".GedcomConfig::$GEDCOMID);
 							exit;
 						}
 						break;
@@ -609,7 +607,7 @@ class SearchController extends BaseController {
 	}		
 	
 	private function GetGeneralResults() {
-		global $gm_user, $global_facts, $GEDCOMID;
+		global $gm_user, $global_facts;
 		
 		if ($this->origin == "search") {
 			// Write a log entry
@@ -728,7 +726,7 @@ class SearchController extends BaseController {
 			}
 			if ((count($this->sindilist)==0 || is_null($this->srindi)) && count($this->sfamlist) == 0 && count($this->ssourcelist) == 0 && count($this->srepolist) == 0 && count($this->smedialist) == 1 && count($this->snotelist) == 0) {
 				foreach($this->smedialist as $mid => $media) {
-					header("Location: mediaitem.php?mid=".$media->xref."&gedid=".$media->gedcomid);
+					header("Location: mediadetail.php?mid=".$media->xref."&gedid=".$media->gedcomid);
 					exit;
 				}
 			}
@@ -745,12 +743,12 @@ class SearchController extends BaseController {
 		$skiptags_option = ", _GMU, FORM, CHAN, SUBM, REFN";
     	if ($this->tagfilter == "on") $skiptags .= $skiptags_option;
    		$userlevel = $gm_user->GetUserAccessLevel();
-		$oldged = $GEDCOMID;
+		$oldged = GedcomConfig::$GEDCOMID;
 		
 		// Prepare the individuals
 		$cti=count($this->sindilist);
 		if (($cti>0) && (!is_null($this->srindi))) {
-			$curged = $GEDCOMID;
+			$curged = GedcomConfig::$GEDCOMID;
 
 			// Add the facts in $global_facts that should not show
 			$skiptagsged = $skiptags;
@@ -760,10 +758,10 @@ class SearchController extends BaseController {
 	    		}
   		  	}
 			foreach ($this->sindilist as $key => $myindi) {
-				$GEDCOMID = $myindi->gedcomid;
-				if ($GEDCOMID != $curged) {
-					SwitchGedcom($GEDCOMID);
-					$curged = $GEDCOMID;
+				$newged = $myindi->gedcomid;
+				if ($newged != $curged) {
+					SwitchGedcom($newged);
+					$curged = $newged;
 					// Recalculate the tags to skip
 					$skiptagsged = $skiptags;
 					foreach ($global_facts as $gfact => $gvalue) {
@@ -798,15 +796,13 @@ class SearchController extends BaseController {
 //		print_r($this->indi_printed);
 //		print "<br />hide: ";
 //		print_r($this->indi_hide);
-		$GEDCOMID = $oldged;
-		SwitchGedcom($GEDCOMID);
+		SwitchGedcom();
 		
 		// Get the fams to be printed
 		$ctf = count($this->sfamlist);
 		// What is the count for?
 		if ($ctf>0 || count($this->printfamname) > 0) {
-			$oldged = $GEDCOMID;
-			$curged = $GEDCOMID;
+			$curged = GedcomConfig::$GEDCOMID;
 			// Add the facts in $global_facts that should not show
 			$skiptagsged = $skiptags;
     		foreach ($global_facts as $gfact => $gvalue) {
@@ -815,10 +811,10 @@ class SearchController extends BaseController {
 	    		}
   		  	}
 			foreach ($this->sfamlist as $key => $fam) {
-				$GEDCOMID = $fam->gedcomid;
-				if ($GEDCOMID != $curged) {
-					SwitchGedcom($GEDCOMID);
-					$curged = $GEDCOMID;
+				$newged = $fam->gedcomid;
+				if ($newged != $curged) {
+					SwitchGedcom($newged);
+					$curged = $newged;
 					// Recalculate the tags to skip
 					$skiptagsged = $skiptags;
 					foreach ($global_facts as $gfact => $gvalue) {
@@ -910,8 +906,8 @@ class SearchController extends BaseController {
 		$cts=count($this->ssourcelist);
 		if ($cts>0) {
 			uasort($this->ssourcelist, "SourceDescrSort"); 
-			$oldged = $GEDCOMID;
-			$curged = $GEDCOMID;
+			$oldged = GedcomConfig::$GEDCOMID;
+			$curged = GedcomConfig::$GEDCOMID;
 
 			// Add the facts in $global_facts that should not show
 			$skiptagsged = $skiptags;
@@ -921,10 +917,10 @@ class SearchController extends BaseController {
 	    		}
   		  	}
 			foreach ($this->ssourcelist as $key => $source) {
-				$GEDCOMID = $source->gedcomid;
-				if ($curged != $GEDCOMID) {
-					SwitchGedcom($GEDCOMID);
-					$curged = $GEDCOMID;
+				$newged = $source->gedcomid;
+				if ($curged != $newged) {
+					SwitchGedcom(GedcomConfig::$GEDCOMID);
+					$curged = $newged;
 					// Recalculate the tags to skip
 					$skiptagsged = $skiptags;
 					foreach ($global_facts as $gfact => $gvalue) {
@@ -958,8 +954,8 @@ class SearchController extends BaseController {
 		$ctr = count($this->srepolist);
 		if ($ctr > 0) {
 			uasort($this->srepolist, "SourceDescrSort"); 
-			$oldged = $GEDCOMID;
-			$curged = $GEDCOMID;
+			$oldged = GedcomConfig::$GEDCOMID;
+			$curged = GedcomConfig::$GEDCOMID;
 
 			// Add the facts in $global_facts that should not show
 			$skiptagsged = $skiptags;
@@ -969,11 +965,11 @@ class SearchController extends BaseController {
 	    		}
   		  	}
 			foreach ($this->srepolist as $key => $repo) {
-				$GEDCOMID = $repo->gedcomid;
+				$newged = $repo->gedcomid;
 				$key = SplitKey($key, "id");
-				if ($curged != $GEDCOMID) {
-					SwitchGedcom($GEDCOMID);
-					$curged = $GEDCOMID;
+				if ($curged != $newged) {
+					SwitchGedcom($newged);
+					$curged = $newged;
 					// Recalculate the tags to skip
 					$skiptagsged = $skiptags;
 					foreach ($global_facts as $gfact => $gvalue) {
@@ -1005,8 +1001,8 @@ class SearchController extends BaseController {
 		$ctr = count($this->smedialist);
 		if ($ctr > 0) {
 			uasort($this->smedialist, "TitleObjSort"); 
-			$oldged = $GEDCOMID;
-			$curged = $GEDCOMID;
+			$oldged = GedcomConfig::$GEDCOMID;
+			$curged = GedcomConfig::$GEDCOMID;
 
 			// Add the facts in $global_facts that should not show
 			$skiptagsged = $skiptags;
@@ -1016,11 +1012,11 @@ class SearchController extends BaseController {
 	    		}
   		  	}
 			foreach ($this->smedialist as $key => $media) {
-				$GEDCOMID = $media->gedcomid;
+				$newged = $media->gedcomid;
 				$key = SplitKey($key, "id");
-				if ($curged != $GEDCOMID) {
-					SwitchGedcom($GEDCOMID);
-					$curged = $GEDCOMID;
+				if ($curged != $newged) {
+					SwitchGedcom($newged);
+					$curged = $newged;
 					// Recalculate the tags to skip
 					$skiptagsged = $skiptags;
 					foreach ($global_facts as $gfact => $gvalue) {
@@ -1049,8 +1045,8 @@ class SearchController extends BaseController {
 		
 		// Print the notes
 		$ctn = count($this->snotelist);
-		$oldged = $GEDCOMID;
-		$curged = $GEDCOMID;
+		$oldged = GedcomConfig::$GEDCOMID;
+		$curged = GedcomConfig::$GEDCOMID;
 		if ($ctn>0) {
 			// Add the facts in $global_facts that should not show
 			$skiptagsged = $skiptags;
@@ -1060,7 +1056,7 @@ class SearchController extends BaseController {
 	    		}
   		  	}
 			foreach ($this->snotelist as $key => $note) {
-				if ($note->gedcomid != $GEDCOMID) {
+				if ($note->gedcomid != GedcomConfig::$GEDCOMID) {
 					SwitchGedcom($note->gedcomid);
 					$skiptagsged = $skiptags;
 					foreach ($global_facts as $gfact => $gvalue) {
@@ -1158,8 +1154,6 @@ class SearchController extends BaseController {
 		// Step 2: Add the relations who are not printed themselves
 		foreach ($toadd as $add => $assos) {
 			foreach ($assos as $key => $asso) {
-	//			$arec = FindGedcomRecord(SplitKey($add, "id"));
-	//			$type = GetRecType($arec);
 				if ($asso->type == "INDI") {
 					if (!array_key_exists($asso->key1, $this->indi_printed)) {
 						$this->indi_printed[$asso->key1] = "1";
@@ -1284,7 +1278,7 @@ class SearchController extends BaseController {
 	}
 	
 	private function GetSoundexResults() {
-		global $GEDCOMS, $GEDCOMID;
+		global $GEDCOMS;
 		
 		// Write the search action to the logfile
 		$logstring = "Soundex, ";
@@ -1351,7 +1345,7 @@ class SearchController extends BaseController {
 			if ($this->place != "" && $this->soundex == "Russell") $parr = soundex(trim($this->place));
 		}
 		// Start the search
-		$oldged = $GEDCOMID;
+		$oldged = GedcomConfig::$GEDCOMID;
 
 		// Build the query
 		$sql = "SELECT DISTINCT n_id, i_key, i_id, i_gedrec, i_file, i_isdead, n_name, n_surname, n_nick, n_type, n_letter, n_fletter FROM ";
@@ -1560,7 +1554,7 @@ class SearchController extends BaseController {
 			}
 		}
 		DMSoundex("", "closecache");
-		$GEDCOMID = $oldged;
+		SwitchGedcom();
 		// check the result on required characters
 		if (isset($barr)) {
 			foreach ($this->printindiname as $pkey=>$pname) {

@@ -125,7 +125,6 @@ class SourceController extends DetailController {
 	 * @return Menu
 	 */
 	public function &getOtherMenu() {
-		global $GEDCOMID;
 		global $ENABLE_CLIPPINGS_CART, $gm_user;
 		
 		// other menu
@@ -147,7 +146,7 @@ class SourceController extends DetailController {
 		if ($this->source->disp && !empty($this->uname)) {
 				// other / add_to_my_favorites
 				$submenu = new Menu(GM_LANG_add_to_my_favorites);
-				$submenu->addLink('source.php?action=addfav&sid='.$this->source->xref.'&gedid='.$GEDCOMID);
+				$submenu->addLink('source.php?action=addfav&sid='.$this->source->xref.'&gedid='.GedcomConfig::$GEDCOMID);
 				$menu->addSubmenu($submenu);
 		}
 		return $menu;

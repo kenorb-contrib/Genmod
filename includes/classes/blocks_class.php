@@ -42,11 +42,10 @@ class Blocks {
 	public $login_block_present = false;	// Switch to indicate if the login block is present
 	
 	public function __construct($type, $id="", $action="") {
-		global $GEDCOMID;
 
 		$this->type = $type;
 		if ($this->type == "user") $this->username = $id;
-		$this->gedid = $GEDCOMID;
+		$this->gedid = GedcomConfig::$GEDCOMID;
 		
 		// action init gets an empty object to be filled
 		if ($action != "init") {

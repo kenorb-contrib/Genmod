@@ -44,7 +44,6 @@ abstract class PersonFunctions {
 	 */
 	public function PrintPedigreePerson($person, $style=1, $show_famlink=true, $count=0, $personcount="1", $view="", $num_gens=0, $chart_style=1) {
 		// Global settings
-		global $GEDCOMID;
 		global $TEXT_DIRECTION;
 		global $GM_IMAGES;
 		global $gm_user;
@@ -107,8 +106,8 @@ abstract class PersonFunctions {
 					print "<a href=\"pedigree.php?rootid=".$person->xref."&amp;num_generations=".$num_gens."&amp;talloffset=".$chart_style."&amp;gedid=".$person->gedcomid."\"><b>".GM_LANG_index_header."</b></a>\n";
 					print "<br /><a href=\"descendancy.php?rootid=".$person->xref."&amp;show_full=$show_full&amp;num_generations=".$num_gens."&amp;box_width=$box_width&amp;gedid=".$person->gedcomid."\"><b>".GM_LANG_descend_chart."</b></a><br />\n";
 					if ($gm_user->username != "") {
-						if (!empty($gm_user->gedcomid[$GEDCOMID])) {
-							print "<a href=\"relationship.php?pid1=".$gm_user->gedcomid[$GEDCOMID]."&amp;pid2=".$person->xref."&amp;gedid=".$person->gedcomid."\"><b>".GM_LANG_relationship_to_me."</b></a><br />\n";
+						if (!empty($gm_user->gedcomid[GedcomConfig::$GEDCOMID])) {
+							print "<a href=\"relationship.php?pid1=".$gm_user->gedcomid[GedcomConfig::$GEDCOMID]."&amp;pid2=".$person->xref."&amp;gedid=".$person->gedcomid."\"><b>".GM_LANG_relationship_to_me."</b></a><br />\n";
 						}
 					}
 					// NOTE: Zoom
@@ -292,7 +291,7 @@ abstract class PersonFunctions {
 				if (!empty(GedcomConfig::$CHART_BOX_TAGS)) {
 					$opt_tags = preg_split("/[, ]+/", GedcomConfig::$CHART_BOX_TAGS);
 					foreach ($opt_tags as $key => $tag) {
-						if (strpos($person->gedrec, "\n1 ".$tag)) {
+						if (strpos($person->gedrec, "\n1 ".$tag) || strpos($person->changedgedrec, "\n1 ".$tag)) {
 							$tagstoprint[] = $tag;
 							break;
 						}
@@ -301,14 +300,14 @@ abstract class PersonFunctions {
 				// Then add the fixed tags
 				// First the birth related tags
 				foreach (array("BIRT", "CHR", "BAPM") as $key => $tag) {
-					if (strpos($person->gedrec, "\n1 ".$tag)) {
+					if (strpos($person->gedrec, "\n1 ".$tag) || strpos($person->changedgedrec, "\n1 ".$tag)) {
 						$tagstoprint[] = $tag;
 						break;
 					}
 				}
 				// Then add the death related tags
 				foreach (array("DEAT", "CREM", "BURI") as $key => $tag) {
-					if (strpos($person->gedrec, "\n1 ".$tag)) {
+					if (strpos($person->gedrec, "\n1 ".$tag) || strpos($person->changedgedrec, "\n1 ".$tag)) {
 						$tagstoprint[] = $tag;
 						break;
 					}
@@ -698,7 +697,7 @@ abstract class PersonFunctions {
 	}
 	
 	public function GetChangeNames($person) {
-		global $changes, $GEDCOMID, $show_changes, $gm_user;
+		global $changes, $show_changes, $gm_user;
 		
 		$name = array();
 		if ($show_changes && $gm_user->UserCanEditOwn($person->xref)) $onlyold = false;
@@ -738,7 +737,7 @@ abstract class PersonFunctions {
 		if ($deleted) return $name;
 		
 		// we have the original names, now we get all additions and changes TODO: DELETE
-		if (!$onlyold && ChangeFunctions::GetChangeData(true, $person->xref, true)) {
+		if (!$onlyold && ChangeFunctions::GetChangeData(true, $person, true)) {
 			$sql = "SELECT ch_type, ch_fact, ch_old, ch_new FROM ".TBLPREFIX."changes WHERE ch_gid='".$person->xref."' AND ch_fact='NAME' AND ch_file='".$person->gedcomid."' ORDER BY ch_id";
 			$res = NewQuery($sql);
 	//		if (!$res) return false;

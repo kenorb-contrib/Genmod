@@ -30,7 +30,7 @@
 if (stristr($_SERVER["SCRIPT_NAME"],basename(__FILE__))) {
 	require "../intrusion.php";
 }
-
+require_once("includes/functions/functions_report.php");
 
 define('FPDF_FONTPATH','fonts/');
 
@@ -1132,7 +1132,7 @@ class GMRLine extends GMRElement {
  */
 $elementHandler = array();
 $elementHandler["GMRStyle"]["start"] 		= "GMRStyleSHandler";
-$elementHandler["GMRDoc"]["start"] 		= "GMRDocSHandler";
+$elementHandler["GMRDoc"]["start"] 			= "GMRDocSHandler";
 $elementHandler["GMRDoc"]["end"] 			= "GMRDocEHandler";
 $elementHandler["GMRHeader"]["start"] 		= "GMRHeaderSHandler";
 $elementHandler["GMRFooter"]["start"] 		= "GMRFooterSHandler";
@@ -1143,12 +1143,12 @@ $elementHandler["GMRPageNum"]["start"]		= "GMRPageNumSHandler";
 $elementHandler["GMRTotalPages"]["start"]	= "GMRTotalPagesSHandler";
 $elementHandler["GMRNow"]["start"]			= "GMRNowSHandler";
 $elementHandler["GMRGedcom"]["start"]		= "GMRGedcomSHandler";
-$elementHandler["GMRGedcom"]["end"]		= "GMRGedcomEHandler";
-$elementHandler["GMRTextBox"]["start"] 	= "GMRTextBoxSHandler";
+$elementHandler["GMRGedcom"]["end"]			= "GMRGedcomEHandler";
+$elementHandler["GMRTextBox"]["start"] 		= "GMRTextBoxSHandler";
 $elementHandler["GMRTextBox"]["end"] 		= "GMRTextBoxEHandler";
 $elementHandler["GMRText"]["start"] 		= "GMRTextSHandler";
 $elementHandler["GMRText"]["end"] 			= "GMRTextEHandler";
-$elementHandler["GMRGetPersonName"]["start"]	= "GMRGetPersonNameSHandler";
+$elementHandler["GMRGetPersonName"]["start"]= "GMRGetPersonNameSHandler";
 $elementHandler["GMRGedcomValue"]["start"]	= "GMRGedcomValueSHandler";
 $elementHandler["GMRRepeatTag"]["start"]	= "GMRRepeatTagSHandler";
 $elementHandler["GMRRepeatTag"]["end"]		= "GMRRepeatTagEHandler";
@@ -1158,23 +1158,23 @@ $elementHandler["GMRFacts"]["start"]		= "GMRFactsSHandler";
 $elementHandler["GMRFacts"]["end"]			= "GMRFactsEHandler";
 $elementHandler["GMRSetVar"]["start"]		= "GMRSetVarSHandler";
 $elementHandler["GMRif"]["start"]			= "GMRifSHandler";
-$elementHandler["GMRif"]["end"]			= "GMRifEHandler";
-$elementHandler["GMRFootnote"]["start"]	= "GMRFootnoteSHandler";
+$elementHandler["GMRif"]["end"]				= "GMRifEHandler";
+$elementHandler["GMRFootnote"]["start"]		= "GMRFootnoteSHandler";
 $elementHandler["GMRFootnote"]["end"]		= "GMRFootnoteEHandler";
-$elementHandler["GMRFootnoteTexts"]["start"]	= "GMRFootnoteTextsSHandler";
+$elementHandler["GMRFootnoteTexts"]["start"]= "GMRFootnoteTextsSHandler";
 $elementHandler["br"]["start"]				= "brSHandler";
-$elementHandler["GMRPageHeader"]["start"] 		= "GMRPageHeaderSHandler";
-$elementHandler["GMRPageHeader"]["end"] 		= "GMRPageHeaderEHandler";
+$elementHandler["GMRPageHeader"]["start"] 	= "GMRPageHeaderSHandler";
+$elementHandler["GMRPageHeader"]["end"] 	= "GMRPageHeaderEHandler";
 $elementHandler["GMRHighlightedImage"]["start"] 		= "GMRHighlightedImageSHandler";
 $elementHandler["GMRImage"]["start"] 		= "GMRImageSHandler";
 $elementHandler["GMRLine"]["start"] 		= "GMRLineSHandler";
 $elementHandler["GMRList"]["start"] 		= "GMRListSHandler";
-$elementHandler["GMRList"]["end"] 		= "GMRListEHandler";
-$elementHandler["GMRListTotal"]["start"]       = "GMRListTotalSHandler";
-$elementHandler["GMRRelatives"]["start"] 		= "GMRRelativesSHandler";
+$elementHandler["GMRList"]["end"] 			= "GMRListEHandler";
+$elementHandler["GMRListTotal"]["start"]    = "GMRListTotalSHandler";
+$elementHandler["GMRRelatives"]["start"]	= "GMRRelativesSHandler";
 $elementHandler["GMRRelatives"]["end"] 		= "GMRRelativesEHandler";
-$elementHandler["GMRGeneration"]["start"]      = "GMRGenerationSHandler";
-$elementHandler["GMRNewPage"]["start"]			= "GMRNewPageSHandler";
+$elementHandler["GMRGeneration"]["start"]   = "GMRGenerationSHandler";
+$elementHandler["GMRNewPage"]["start"]		= "GMRNewPageSHandler";
 
 $gmreport = new GMReport();
 $gmreportStack = array();
@@ -1425,9 +1425,9 @@ function GMRGedcomSHandler($attrs) {
 	$tags = preg_split("/:/", $tag);
 	$newgedrec = "";
 	if (count($tags)<2) {
-		//$newgedrec = findgedcomrecord($attrs["id"]);
-		$newgedrec = findgedcomrecord($tag);
-//		print "1 rec added: ".$newgedrec."<br />";
+		$obj = ConstructObject($tag);
+		if (is_object($obj)) $newgedrec = $obj->gedrec;
+		if ($debug) print "1 rec added: ".$newgedrec."<br />";
 	}
 	if (empty($newgedrec)) {
 		$tgedrec = $gedrec;
@@ -1437,8 +1437,11 @@ function GMRGedcomSHandler($attrs) {
 			$ct = preg_match("/\\$(.+)/", $tag, $match);
 			if ($ct>0) {
 				if (isset($vars[$match[1]]["gedcom"])) $newgedrec = $vars[$match[1]]["gedcom"];
-				else $newgedrec = FindGedcomRecord($match[1]);
-//		print "2 rec added: ".$newgedrec."<br />";
+				else {
+					$obj = ConstructObject($match[1]);
+					if (is_object($obj)) $newgedrec = $obj->gedrec;
+				}
+				if ($debug) print "2 rec added: ".$newgedrec."<br />";
 			}
 			else {
 				$ct = preg_match("/@(.+)/", $tag, $match);
@@ -1447,8 +1450,9 @@ function GMRGedcomSHandler($attrs) {
 					//print $gt;
 					if ($gt > 0) {
 						//print "[".$gmatch[1]."]";
-						$newgedrec = FindGedcomRecord($gmatch[1]);
-//		print "3 rec added: ".$newgedrec."<br />";
+						$obj = ConstructObject($gmatch[1]);
+						if (is_object($obj)) $newgedrec = $obj->gedrec;
+						if ($debug) print "3 rec added: ".$newgedrec."<br />";
 						//print $newgedrec;
 						$tgedrec = $newgedrec;
 					}
@@ -1459,7 +1463,6 @@ function GMRGedcomSHandler($attrs) {
 					}
 				}
 				else {
-					//$newgedrec = FindGedcomRecord($gmatch[1]);
 					$temp = preg_split("/\s+/", trim($tgedrec));
 					$level = $temp[0] + 1;
 					if (PrivacyFunctions::showFact($tag, $id) && PrivacyFunctions::showFactDetails($tag,$id)) {
@@ -1479,17 +1482,16 @@ function GMRGedcomSHandler($attrs) {
 		$newreclevel = GetRecLevel($newgedrec);
 		$newid = GetRecID($newgedrec);
 		$newrectype = GetRecType($newgedrec);
+		if (!empty($newid)) $newobj = ConstructObject($newid, $newrectype);
+		if (!empty($id)) $obj = ConstructObject($id, $rectype);
 		if ($debug) {
 			print "Start output<br />";
 			print "newgedrec: ".$newgedrec."<br />";
-			print "tag: ".$tags[0]."<br />fact: ".$fact."<br />id: ".$id."<br />desc: ".$desc."<br />gedrec: ".$gedrec."<br />rectype: ".$rectype."<br />";
+			print "tag: ".$tags[0]."<br />fact: ".$fact."<br />id: ".$id."<br />rectype: ".$rectype."<br />desc: ".$desc."<br />gedrec: ".$gedrec."<br />rectype: ".$rectype."<br />newreclevel ".$newreclevel."<br />newrectype ".$newrectype."<br />newid ".$newid."<br />";
 		}
 		if (($newreclevel == 1 && !PrivacyFunctions::FactViewRestricted($id, $newgedrec)) || 
-		($newreclevel == 0 && PrivacyFunctions::DisplayDetailsByID($newid, $newrectype)) &&
-		PrivacyFunctions::DisplayDetailsById($id, $rectype)) {
+		($newreclevel == 0 && $newobj->disp) || (!empty($id) && $obj->disp)) {
 			if ($debug) print "can show<br />";
-//			$newgedrec = PrivatizeGedcom($newgedrec);
-//			$gedObj = new GedcomRecord($newgedrec);
 			array_push($gedrecStack, array($gedrec, $fact, $desc));
 			//print "[$newgedrec]";
 //			$gedrec = $gedObj->getGedcomRecord();
@@ -1622,7 +1624,8 @@ function GMRGetPersonNameSHandler($attrs) {
 			if (isset($vars[$match[1]]["id"])) {
 				$id = $vars[$match[1]]["id"];
 			}
-		} else {
+		} 
+		else {
 			$ct = preg_match("/@(.+)/", $attrs["id"], $match);
 			if ($ct>0) {
 				$gt = preg_match("/\d $match[1] @([^@]+)@/", $gedrec, $gmatch);
@@ -1631,37 +1634,29 @@ function GMRGetPersonNameSHandler($attrs) {
 					$id = $gmatch[1];
 					//print "[$id]";
 				}
-			} else {
+			} 
+			else {
 				$id = $attrs["id"];
 			}
 		}
 	}
 	if (!empty($id)) {
-		if (!PrivacyFunctions::displayDetailsById($id) && !PrivacyFunctions::showLivingNameByID($id)) {
+		$object = ConstructObject($id);
+		if (!$object->disp_name) {
 			$name = GM_LANG_private;
-		} else {
-			$name = trim(GetPersonName($id));
+		} 
+		else {
+			$name = $object->name;
 			//LERMAN-- added individuals in pending list does not have Gedcom record yet
-			if ($name == GM_LANG_PN." ".GM_LANG_NN) $name = trim(GetPersonName($id,$gedrec));
-			$addname = trim(GetAddPersonName($id, "", true));
-			if (!empty($addname)) $name .= " ".$addname;
+//			if ($name == GM_LANG_PN." ".GM_LANG_NN) $name = trim(GetPersonName($id,$gedrec));
 			// This is a workaround to display the PinYin name instead of the name in Chinese characters, as Chinese characters are not printed properly.
-			if (HasChinese($name, true)) $name = $addname;
+			if (HasChinese($name, true)) $name = $object->addname;
 			if (!empty($attrs["truncate"])) {
-				if (strlen($name)>$attrs["truncate"]) {
-					//LERMAN-was this removing the nickname? If so, replace with what follows
-					//$name = preg_replace("/\(.*\) ?/", "", $name);
-					// remove nickname if exists
-					// BEWARE this is reversed engineering. Could cause problems depending on what the admin set as delimiters.
-					if (GedcomConfig::$SHOW_NICK) $name = preg_replace("/".substr(GedcomConfig::$NICK_DELIM, 0, 1).".*".substr(GedcomConfig::$NICK_DELIM, 1, 1)." ?/", "", $name);
-				}
-				if (strlen($name)>$attrs["truncate"]) {
 					$name = AbbreviateName($name, $attrs["truncate"]);
-				}
 			}
 		}
 		$currentElement->addText(trim($name));
-		if ($showIndID) $currentElement->addText(" ($id)");
+		if ($showIndID) $currentElement->addText($object->addxref);
 	}
 }
 
@@ -1717,7 +1712,7 @@ function GMRGedcomValueSHandler($attrs) {
                         if (isset($attrs["changed"]) && $attrs["changed"] && ChangeFunctions::GetChangeData(true, $id, true, "gedlines")) {
 				$pend_gedcoms = ChangeFunctions::GetChangeData(false, $id, true, "gedlinesCHAN");
 				foreach($pend_gedcoms as $gedcom=>$pend_indis) {
-					if ($gedcom == $GEDCOMID) {
+					if ($gedcom == GedcomConfig::$GEDCOMID) {
 						foreach ($pend_indis as $key=>$changed) {
 							$value = GetGedcomValue($tag, $level, $changed, $truncate);
 						}
@@ -1767,7 +1762,12 @@ function GMRRepeatTagSHandler($attrs) {
 		print "Start debug<br />";
 		print "tag: ".$tag."<br />fact: ".$fact."<br />id: ".$id."<br />desc: ".$desc."<br />gedrec: ".$gedrec."<br /><br />";
 	}
-	if (!empty($tag) && PrivacyFunctions::DisplayDetailsById($id)) {
+	$disp = true;
+	if (!empty($id)) {
+		$obj = ConstructObject($id);
+		if (is_object($obj)) $disp = $obj->disp;
+	}
+	if (!empty($tag) && $disp) {
 		// Get the factrec to check RESN privacy
 		$sub = GetSubRecord(1, "1 ".$tag, $gedrec);
 		if ($debug) print "sub: ".$sub;
@@ -1819,7 +1819,8 @@ function GMRRepeatTagSHandler($attrs) {
 						$ct2 = preg_match("/".$level."\sNOTE\s@(.+)@\s/", $rec, $nmatch);
 						if ($ct2>0) {
 							if ($debug) print "Linked note found to ".$nmatch[1];
-							$rec = FindGedcomRecord($nmatch[1]);
+							$obj = Note::GetInstance($match[1]);
+							$rec = $obj->gedrec;
 //		print "4 rec added: ".$newgedrec."<br />";
 							$fact = "NOTE";
 							//$noterecs = GetAllSubRecords($noterec);
@@ -1906,11 +1907,9 @@ function GMRRepeatTagEHandler() {
 
 function GMRvarSHandler($attrs) {
 	global $currentElement, $vars, $gedrec, $gedrecStack, $fact, $desc, $type;
-//print_r($attrs);
-//print "<br />";
+
 	$var = $attrs["var"];
 	if (!empty($var)) {
-			print "var: ".$var."<br />";
 		if (!empty($vars[$var]['id'])) {
 			$var = $vars[$var]['id'];
 		}
@@ -1918,24 +1917,24 @@ function GMRvarSHandler($attrs) {
 //LERMAN - add ability to put a variable in the tag
 			$ct = preg_match_all("/\\$(\w+)/", $var, $match, PREG_SET_ORDER);
 			for($i=0; $i<$ct; $i++) {
-				$t = $vars[$match[$i][1]]["id"];
-				print $t;
-				$var = preg_replace("/\\$".$match[$i][1]."/", $t, $var, 1);
+				if (isset($vars[$match[$i][1]]["id"])) {
+					$t = $vars[$match[$i][1]]["id"];
+					$var = preg_replace("/\\$".$match[$i][1]."/", $t, $var, 1);
+				}
+				// Just a loose variable. Make it global.
+				else {
+					$var = $match[$i][1];
+					eval ("global \$$var;");
+				}
 			}
 
 			$tfact = $fact;
 			if ($fact=="EVEN" || $fact=="FACT") $tfact = $type;
-			print "var2: ".$var."<br />";
+//			print "var2: ".$var."<br />";
 			$var = preg_replace(array("/\[/","/\]/","/@fact/","/@desc/"), array("['","']",$tfact,$desc), $var);
-			print "var3: ".$var."<br />";
-			eval("if (isset(\$$var) && !empty(\$$var)) \$var = \$$var;");
-			$ct = preg_match("/factarray\['(.*)'\]/", $var, $match);
-			if ($ct>0) $var = constant("GM_FACT_".$match[1]);
-			else {
-				$ct = preg_match("/gm_lang\['(.*)'\]/", $var, $match);
-				if ($ct>0) $var = constant("GM_LANG_".$match[1]);
-				else if (substr($var, 0, 8) == "GM_LANG_") $var = constant($var);
-			}
+			//print "var3: ".$var."<br />";
+			if (substr($var, 0, 8) == "GM_LANG_" || substr($var, 0, 8) == "GM_FACT_") $var = constant($var);
+			else eval("if (isset(\$$var) && !empty(\$$var)) \$var = \$$var;");
 		}
 		$currentElement->addText($var);
 	}
@@ -1948,7 +1947,8 @@ function GMRvarLetterSHandler($attrs) {
 	if (!empty($var)) {
 		$tfact = $fact;
 		$var = preg_replace(array("/\[/","/\]/","/@fact/","/@desc/"), array("['","']",$tfact,$desc), $var);
-		eval("if (isset(\$$var) && !empty(\$$var)) \$var = \$$var;");
+		if (substr($var, 0, 8) == "GM_FACT_" || substr($ver, 0, 8) == "GM_LANG_") $var = constant($var);
+		else eval("if (isset(\$$var) && !empty(\$$var)) \$var = \$$var;");
 
 		$letter = GetFirstLetter($var);
 
@@ -1995,7 +1995,7 @@ function GMRFactsSHandler($attrs) {
 	} else {
 		$ignorefacts = preg_split("/[\s,;:]/", $tag);
 		$id = GetRecID($gedrec);
-		$oldperson = new Person($id, $gedrec);
+		$oldperson = Person::GetInstance($id);
 		$facts = ChangeFunctions::RetrieveNewFacts($oldperson->xref, true);
 		foreach ($facts as $key=>$fact) {
 			$ct = preg_match("/1 (.+)/", $fact, $match);
@@ -2104,6 +2104,10 @@ function GMRSetVarSHandler($attrs) {
 
 	$name = $attrs["name"];
 	$value = $attrs["value"];
+	if ($name == "NICK") {
+		GedcomConfig::$SHOW_NICK = ($value == "false" ? false : true);
+		return;
+	}
 	if ($value=="@ID") {
 		$ct = preg_match("/0 @(.+)@/", $gedrec, $match);
 		if ($ct>0) $value = $match[1];
@@ -2132,18 +2136,18 @@ function GMRSetVarSHandler($attrs) {
 //		$var = preg_replace(array("/\[/","/\]/"), array("GM_LANG_",""), $value);
 //		eval("\$value = $var;");
 //	}
-	if (substr($value, 0, 11) == "\$factarray[") {
-		$var = preg_replace(array("/\$factarray\[/","/\]/"), array("GM_FACT_",""), $value);
-		eval("\$value = $var;");
+	if (substr($value, 0, 8) == "GM_FACT_" || substr($value, 0, 8) == "GM_LANG_") {
+		$value = constant($value);
+//		eval("\$value = $var;");
 	}
-	if (substr($value, 0, 9) == "\$gm_lang[") {
-		$var = preg_replace(array("/\$gm_lang\[/","/\]/"), array("GM_LANG_",""), $value);
-		eval("\$value = $var;");
-	}
+//	if (substr($value, 0, 9) == "\$gm_lang[") {
+//		$var = preg_replace(array("/\$gm_lang\[/","/\]/"), array("GM_LANG_",""), $value);
+//		eval("\$value = $var;");
+//	}
 
 	$ct = preg_match_all("/\\$(\w+)/", $value, $match, PREG_SET_ORDER);
 	for($i=0; $i<$ct; $i++) {
-		// print $match[$i][1]."<br />";
+		//print $match[$i][1]."<br />";
 		$t = $vars[$match[$i][1]]["id"];
 		$value = preg_replace("/\\$".$match[$i][1]."/", $t, $value, 1);
 	}
@@ -2363,7 +2367,10 @@ function GMRImageSHandler($attrs) {
 	if (isset($attrs["file"])) $file = $attrs["file"];
 	if ($file=="@FILE") {
 		$ct = preg_match("/\d OBJE @(.+)@/", $gedrec, $match);
-		if ($ct>0) $orec = FindGedcomRecord($match[1]);
+		if ($ct>0) {
+			$obj = MediaItem::GetInstance($match[1]);
+			$orec = $obj->gedrec;
+		}
 		else $orec = $gedrec;
 		if (!empty($orec)) {
 			$fullpath = ExtractFullpath($orec);
@@ -2429,19 +2436,19 @@ function GMRLineSHandler($attrs) {
 }
 
 function GMRListSHandler($attrs) {
-	global $gmreport, $gedrec, $repeats, $repeatBytes, $list, $repeatsStack, $processRepeats, $parser, $vars, $sortby;
+	global $gmreport, $gedrec, $repeats, $repeatBytes, $list, $repeatsStack, $processRepeats, $parser, $vars, $sortby, $selevent;
 	global $status;
 
 	$processRepeats++;
 	if ($processRepeats>1) return;
 
 	$sortby = "NAME";
-	if (isset($attrs["sortby"])) $sortby = $attrs["sortby"];
+	if (isset($vars["selevent"])) $selevent = $vars["selevent"]["id"];
+	if (isset($vars["sortby"])) $sortby = $vars["sortby"]["id"];
 	if (preg_match("/\\$(\w+)/", $sortby, $vmatch)>0) {
 		$sortby = $vars[$vmatch[1]]["id"];
 		$sortby = trim($sortby);
 	}
-
 	$list = array();
 	$listname = "individual";
 	if (isset($attrs["list"])) $listname=$attrs["list"];
@@ -2511,8 +2518,12 @@ function GMRListSHandler($attrs) {
 	}
 	switch($listname) {
 		case "family":
-			if (count($filters)>0) $list = SearchFams($filters);
-			else $list = GetFamList("no");
+			if (count($filters)>0) $list = SearchFunctions::SearchFams($filters);
+			else $list = ListFunctions::GetFamList("no");
+			if ($sortby == "NAME") uasort($list, "ItemSort");
+			else if ($sortby == "ID") uasort($list, "IDSort");
+			else if ($sortby == "DATE") uasort($list, "CompareDate");
+			//print "sortby: ".$sortby." selevent: ".$selevent;
 			break;
 		case "actions":
 			$select = "";
@@ -2523,26 +2534,27 @@ function GMRListSHandler($attrs) {
 			}
 			if (isset($vars["repo"]) && !empty($vars["repo"]["id"])) {
 				$repo_obj =& Repository::GetInstance($vars["repo"]["id"]);
-				$alist = $repo_obj->GetRepoActions($vars["repo"]["id"], $select);
+				$alist = ActionController::GetSelectActionList($repo_obj->xref, "", $repo_obj->gedcomid, $select, false, strtolower($sortby));
+				$alist = $alist[0];
 			}
-			else $alist = ActionController::GetActionList($select, true);
+			else $alist = ActionController::GetActionList($select, true, strtolower($sortby));
 			$list = array();
 			$oldrepo = "";
 			foreach ($alist as $key => $action) {
 				// Skip action with no repo
 				if ($action->repo != "") {
-					if ($action->repo != $oldrepo) {
-						if ($oldrepo != "") {
-							$list[$oldrepo]["gedcom"] = $gedline;
-							$list[$oldrepo]["name"] = GetRepoDescriptor($oldrepo);
+					if (!is_object($oldrepo) || $action->repo_obj->xref != $oldrepo->xref) {
+						if (is_object($oldrepo)) {
+							$list[$oldrepo->xref]["gedcom"] = $gedline;
+							$list[$oldrepo->xref]["name"] = $oldrepo->descriptor;
 						}
-						$gedline = FindRepoRecord($action->repo);
+						$gedline = $action->repo_obj->gedrec;
 						$gedline .= "\r\n1 _TODO\r\n";
 						$gedline .= "2 INDI @".$action->pid."@\r\n";
 						$gedline .= "2 _STAT ".constant("GM_LANG_action".$action->status)."\r\n";
 						$noteline = MakeCont("2 NOTE", $action->text);
 						$gedline .= $noteline;
-						$oldrepo = $action->repo;
+						$oldrepo = $action->repo_obj;
 					}
 					else {
 						$gedline .= "1 _TODO\r\n";
@@ -2553,9 +2565,9 @@ function GMRListSHandler($attrs) {
 					}
 				}
 			}
-			if (!empty($oldrepo)) {
-				$list[$oldrepo]["gedcom"] = $gedline;
-				$list[$oldrepo]["name"] = GetRepoDescriptor($oldrepo);
+			if (is_object($oldrepo)) {
+				$list[$oldrepo->xref]["gedcom"] = $gedline;
+				$list[$oldrepo->xref]["name"] = $oldrepo->descriptor;
 			}
 			break;
 		/*
@@ -2570,19 +2582,23 @@ function GMRListSHandler($attrs) {
 			$list = array();
 			if (ChangeFunctions::GetChangeData(true, "", true, "gedlinesCHAN")) {
 				$pend_gedcoms = ChangeFunctions::GetChangeData(false, "", true, "gedlinesCHAN");
-				foreach($pend_gedcoms as $gedcom=>$pend_indis) {
-					if ($gedcom == $GEDCOMID) {
-						foreach ($pend_indis as $key=>$changed) {
-							$list[$key] = $changed;
+				foreach($pend_gedcoms as $gedcomid => $pend_indis) {
+					if ($gedcomid == GedcomConfig::$GEDCOMID) {
+						foreach ($pend_indis as $key => $changed) {
+							$obj = ConstructObject($key);
+							$list[$key] = $obj;
 						}
 					}
 				}
 			}
 			break;
 		default:
-			if (count($filters)>0) $list = SearchIndis($filters);
+//			print_r($filters);
+			if (count($filters)>0) $list = SearchFunctions::SearchIndis($filters);
 //LERMAN - added "no" parameter. Fixes one list, but not sure if have other ramifications
-			else $list = GetIndiList("no");
+			else $list = ListFunctions::GetIndiList("no");
+			if ($sortby == "NAME") uasort($list, "ItemSort");
+			else if ($sortby == "ID") uasort($list, "IDSort");
 			break;
 	}
 			//print_r($list);
@@ -2590,7 +2606,7 @@ function GMRListSHandler($attrs) {
 	//-- apply other filters to the list that could not be added to the search string
 	if (count($filters2)>0) {
 		$mylist = array();
-		foreach($list as $key=>$value) {
+		foreach($list as $key => $object) {
 			$keep = true;
 			foreach($filters2 as $indexval => $filter) {
 				if ($keep) {
@@ -2600,11 +2616,11 @@ function GMRListSHandler($attrs) {
 					if ($val=="''") $val = "";
 					$tags = preg_split("/:/", $tag);
 					$level = 1;
-					$subrec = $value["gedcom"];
+					$subrec = $object->gedrec;
 					foreach($tags as $indexval => $t) {
 						$oldsub = $subrec;
 						$subrec = GetSubRecord($level, $level." ".$t, $subrec);
-						if ($t=='EMAIL' && empty($subrec)) {
+						if ($t == 'EMAIL' && empty($subrec)) {
 							$t = "_EMAIL";
 							$subrec = GetSubRecord($level, $level." ".$t, $oldsub);
 						}
@@ -2662,28 +2678,31 @@ function GMRListSHandler($attrs) {
 						default:
 							$v = GetGedcomValue($t, $level, $subrec);
 							//-- check for EMAIL and _EMAIL (silly double gedcom standard :P)
-							if ($t=="EMAIL"&&empty($v)) {
+							if ($t == "EMAIL" && empty($v)) {
 								$t = "_EMAIL";
 								$v = GetGedcomValue($t, $level, $subrec);
 							}
 							//print "[$key $t $v == $val $subrec]<br />";
-							if ($v==$val) $keep=true;
+							if ($v == $val) $keep = true;
 							else $keep = false;
 							//print $keep;
 							break;
 					}
 				}
 			}
-			if ($keep) $mylist[$key]=$value;
+			if ($keep) $mylist[$key] = $object;
 		}
 		$list = $mylist;
 	}
 //LERMAN - fix case (not case sensitive, but that confused me)
-	if ($sortby=="NAME") uasort($list, "ItemSort");
-	else if ($sortby=="ID") uasort($list, "IdSort");
+	if ($sortby == "NAME" || $sortby == "ID") {
+		// Do nothing, handle this above!
+	}
 //LERMAN
-	else if ($sortby=="CHAN") uasort($list, "CompareDateDescending");
-	else uasort($list, "CompareDate");
+	else if ($sortby == "CHAN") uasort($list, "CompareDateDescending");
+	else if ($sortby == "BIRT") uasort($list, "IndiBirthSort");
+	else if ($sortby == "DEAT") uasort($list, "IndiDeathSort");
+//	else uasort($list, "CompareDate");
 	//print count($list);
 	array_push($repeatsStack, array($repeats, $repeatBytes));
 	$repeatBytes = xml_get_current_line_number($parser)+1;
@@ -2722,12 +2741,9 @@ function GMRListEHandler() {
 	$oldgedrec = $gedrec;
 	$list_total = count($list);
 	$list_private = 0;
-	foreach($list as $key=>$value) {
-		$rectype = GetRecType($value["gedcom"]);
-		if (PrivacyFunctions::displayDetailsById($key, $rectype)) {
-			$gedrec = $value["gedcom"];
-//			print $gedrec."<br />";
-//			$gedrec = FindGedcomRecord($key);
+	foreach($list as $key => $object) {
+		if ($object->disp) {
+			$gedrec = $object->gedrec;
 			//LERMAN-- added individuals in pending list does not have Gedcom record yet. Could check $lines[$repeatBytes+$lineoffset-1] to see if list="pending"
 			if (empty($gedrec)) { $gedrec = $value; }
 			//-- start the sax parser
@@ -2766,7 +2782,7 @@ function GMRListTotalSHandler($attrs) {
 }
 
 function GMRRelativesSHandler($attrs) {
-	global $gmreport, $gedrec, $repeats, $repeatBytes, $list, $repeatsStack, $processRepeats, $parser, $vars, $sortby, $indilist;
+	global $gmreport, $gedrec, $repeats, $repeatBytes, $list, $repeatsStack, $processRepeats, $parser, $vars, $sortby;
 
 	$debug = false;
 	
@@ -2807,50 +2823,32 @@ function GMRRelativesSHandler($attrs) {
 	
 
 	$list = array();
-	$indirec = FindPersonRecord($id);
-	if (!empty($indirec) && (PrivacyFunctions::DisplayDetailsByID($id, "INDI") || PrivacyFunctions::showLivingNameByID($id))) {
-		$list[$id] = $indilist[$id];
+	$person = Person::GetInstance($id);
+	if (!$person->isempty && $person->disp_name) {
+		$list[$id] = $person;
 		if ($debug) print "we have group: ".$group." id: ".$id."<br />";
 		switch ($group) {
 			case "child-family":
-				$famids = FindPrimaryFamilyId($id);
-				foreach($famids as $indexval => $ffamid) {
-					$famid = $ffamid["famid"];
-					if (PrivacyFunctions::DisplayDetailsByID($famid, "FAM")) {
+				$famid = $person->primaryfamily;
+				if (!empty($famid)) {
+					$fam = Family::GetInstance($famid);
+					if ($fam->disp) {
 						if ($debug) print "we can show ".$famid."<br />";
-						$parents = FindParents($famid);
-						if (!empty($parents["HUSB"])) {
-							FindPersonRecord($parents["HUSB"]);
-							$list[$parents["HUSB"]] = $indilist[$parents["HUSB"]];
-						}
-						if (!empty($parents["WIFE"])) {
-							FindPersonRecord($parents["WIFE"]);
-							$list[$parents["WIFE"]] = $indilist[$parents["WIFE"]];
-						}
-						$famrec = FindFamilyRecord($famid);
-						$num = preg_match_all("/1\s*CHIL\s*@(.*)@/", $famrec, $smatch,PREG_SET_ORDER);
-						for($i=0; $i<$num; $i++) {
-							FindPersonRecord($smatch[$i][1]);
-							$list[$smatch[$i][1]] = $indilist[$smatch[$i][1]];
+						if ($fam->husb_id != "") $list[$fam->husb_id] = $fam->husb;
+						if ($fam->wife_id != "") $list[$fam->wife_id] = $fam->wife;
+						foreach($fam->children as $id => $child) {
+							$list[$child->xref] = $child;
 						}
 					}
 				}
 				break;
 			case "spouse-family":
-				$famids = FindSfamilyIds($id);
-				foreach($famids as $indexval => $fams) {
-					$famid = $fams["famid"];
-					if (PrivacyFunctions::DisplayDetailsByID($famid, "FAM")) {
-						$parents = FindParents($famid);
-						FindPersonRecord($parents["HUSB"]);
-						FindPersonRecord($parents["WIFE"]);
-						$list[$parents["HUSB"]] = $indilist[$parents["HUSB"]];
-						$list[$parents["WIFE"]] = $indilist[$parents["WIFE"]];
-						$famrec = FindFamilyRecord($famid);
-						$num = preg_match_all("/1\s*CHIL\s*@(.*)@/", $famrec, $smatch,PREG_SET_ORDER);
-						for($i=0; $i<$num; $i++) {
-							FindPersonRecord($smatch[$i][1]);
-							if (PrivacyFunctions::DisplayDetailsByID($smatch[$i][1])) $list[$smatch[$i][1]] = $indilist[$smatch[$i][1]];
+				foreach($person->spousefamilies as $key => $fam) {
+					if ($fam->disp) {
+						if ($fam->husb_id != "") $list[$fam->husb_id] = $fam->husb;
+						if ($fam->wife_id != "") $list[$fam->wife_id] = $fam->wife;
+						foreach($fam->children as $id => $child) {
+							$list[$child->xref] = $child;
 						}
 					}
 				}
@@ -2862,7 +2860,7 @@ function GMRRelativesSHandler($attrs) {
 				AddAncestors($id,true,$maxgen,$showempty); 
 				break;
 			case "descendants":
-				$list[$id]["generation"] = 1;
+				$list[$id]->generation = 1;
 				AddDescendancy($id,false,$maxgen);
 				break;
 			case "all":
@@ -2880,10 +2878,10 @@ function GMRRelativesSHandler($attrs) {
 			reset($list);
 			$genCounter = 1;
 			while (count($newarray) < count($list)) {
-		        	foreach ($list as $key => $value) {
-			                $generation = $value["generation"];
-			                if ($generation == $genCounter) {
-						$newarray[$key]["generation"]=$generation;
+		        foreach ($list as $key => $object) {
+			    	$generation = $object->generation;
+			        if ($generation == $genCounter) {
+						$newarray[$key]["generation"] = $generation;
 					}
 				}
 				$genCounter++;
@@ -2930,10 +2928,9 @@ function GMRRelativesEHandler() {
 	$oldgedrec = $gedrec;
 	$list_total = count($list);
 	$list_private = 0;
-	foreach($list as $key=>$value) {
-		if (isset($value["generation"])) $generation = $value["generation"];
-//KN		if (PrivacyFunctions::displayDetailsById($key)) {
-			$gedrec = FindGedcomRecord($key);
+	foreach($list as $key=>$object) {
+		if (!is_null($object->generation)) $generation = $object->generation;
+		$gedrec = $object->gedrec;
 //		print "5 rec added: ".$gedrec."<br />";
 			//-- start the sax parser
 			$repeat_parser = xml_parser_create();

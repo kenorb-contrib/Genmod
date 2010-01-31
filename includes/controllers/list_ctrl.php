@@ -176,18 +176,18 @@ class ListController extends BaseController {
 	 */
 	
 	public function GetLetterBar($lastname=true) {
-		global $LANGUAGE, $GEDCOMID;
+		global $LANGUAGE;
 		
 		$alphalist = array();
 		
 		if ($lastname) {
 			if ($this->classname == "FamlistController") {
 				$sql = "SELECT DISTINCT n_letter AS alpha FROM ".TBLPREFIX."names INNER JOIN ".TBLPREFIX."individual_family ON if_pkey=n_key WHERE if_role='S'";
-				if ($this->allgeds == "no") $sql .= " AND n_file = '".$GEDCOMID."'";
+				if ($this->allgeds == "no") $sql .= " AND n_file = '".GedcomConfig::$GEDCOMID."'";
 			}
 			else {
 				$sql = "SELECT DISTINCT n_letter AS alpha FROM ".TBLPREFIX."names ";
-				if ($this->allgeds == "no") $sql .= "WHERE n_file = '".$GEDCOMID."'";
+				if ($this->allgeds == "no") $sql .= "WHERE n_file = '".GedcomConfig::$GEDCOMID."'";
 			}
 		}
 		else {
@@ -195,13 +195,13 @@ class ListController extends BaseController {
 				$sql = "SELECT DISTINCT n_fletter AS alpha FROM ".TBLPREFIX."names INNER JOIN ".TBLPREFIX."individual_family ON if_pkey=n_key WHERE if_role='S'";
 				if ($this->surname != "") $sql .= " AND n_surname='".DbLayer::EscapeQuery($this->surname)."'";
 				else if ($this->alpha != "") $sql .= " AND n_letter='".DbLayer::EscapeQuery($this->alpha)."'";
-				if ($this->allgeds == "no") $sql .= " AND n_file = '".$GEDCOMID."'";
+				if ($this->allgeds == "no") $sql .= " AND n_file = '".GedcomConfig::$GEDCOMID."'";
 			}
 			else {
 				$sql = "SELECT DISTINCT n_fletter as alpha FROM ".TBLPREFIX."names WHERE";
 				if ($this->surname != "") $sql .= " n_surname='".DbLayer::EscapeQuery($this->surname)."'";
 				elseif ($this->alpha != "") $sql .= " n_letter='".DbLayer::EscapeQuery($this->alpha)."'";
-				if ($this->allgeds == "no") $sql .= ($this->alpha == "" || $this->surname == "" ? "" : " AND")." n_file = '".$GEDCOMID."'";
+				if ($this->allgeds == "no") $sql .= ($this->alpha == "" || $this->surname == "" ? "" : " AND")." n_file = '".GedcomConfig::$GEDCOMID."'";
 			}
 		}
 		$res = NewQuery($sql);
@@ -229,7 +229,7 @@ class ListController extends BaseController {
 		
 		if ($this->classname == "FamlistController") {
 			$sql = "SELECT count(f_id) FROM ".TBLPREFIX."families WHERE (f_husb='' || f_wife='')";
-			if ($this->allgeds == "no") $sql .= " AND f_file='".$GEDCOMID."'";
+			if ($this->allgeds == "no") $sql .= " AND f_file='".GedcomConfig::$GEDCOMID."'";
 			$res = NewQuery($sql);
 			$row = $res->FetchRow();
 			if ($row[0] > 0) {

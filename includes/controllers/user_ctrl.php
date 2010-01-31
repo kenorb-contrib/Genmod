@@ -159,7 +159,6 @@ abstract class UserController {
 	* @return bool return true if the username and password credentials match a user in the database return false if they don't
 	*/
 	public function AuthenticateUser($username, $password) {
-		global $GEDCOMID;
 
 		$user =& User::GetInstance($username);
 
@@ -186,7 +185,7 @@ abstract class UserController {
 					
 					//-- only change the gedcom if the user does not have a gedcom id
 					//-- for the currently active gedcom
-					if (empty($user->gedcomid[$GEDCOMID])) {
+					if (empty($user->gedcomid[GedcomConfig::$GEDCOMID])) {
 						//-- if the user is not in the currently active gedcom then switch them
 						//-- to the first gedcom for which they have an ID
 						foreach($user->gedcomid as $ged=>$id) {
@@ -218,7 +217,7 @@ abstract class UserController {
 	 * @param		string	$logtext		Optional text to write to the log for reason of user logout
 	 */
 	public function UserLogout($username, $logtext = "") {
-		global $GEDCOMID, $LANGUAGE, $gm_username;
+		global $LANGUAGE, $gm_username;
 
 		if ($username=="") {
 			if (isset($_SESSION["gm_user"])) $username = $_SESSION["gm_user"];
@@ -237,7 +236,7 @@ abstract class UserController {
 				if (isset($_SESSION["gm_counter"])) $tmphits = $_SESSION["gm_counter"];
 				else $tmphits = -1;
 				@session_destroy();
-				$_SESSION["GEDCOMID"]=$GEDCOMID;
+				$_SESSION["GEDCOMID"]=GedcomConfig::$GEDCOMID;
 				$_SESSION["show_context_help"]="yes";
 				@setcookie("gm_rem", "", -1000);
 				if($tmphits>=0) $_SESSION["gm_counter"]=$tmphits; //set since it was set before so don't get double hits
@@ -394,7 +393,6 @@ abstract class UserController {
 	* @param string $export_accesslevel
 	*/
 	public function CreateExportUser($export_accesslevel) {
-		global $GEDCOMID;
 		
 		$u =& User::GetInstance("export");
 		if (!$u->is_empty) self::DeleteUser("export");
@@ -413,9 +411,9 @@ abstract class UserController {
 		$newuser->rootid = "";
 		if ($export_accesslevel == "admin") $newuser->canadmin = true;
 		else $newuser->canadmin = false;
-		if ($export_accesslevel == "gedadmin") $newuser->canedit[$GEDCOMID] = "admin";
-		elseif ($export_accesslevel == "user") $newuser->canedit[$GEDCOMID] = "access";
-		else $newuser->canedit[$GEDCOMID] = "none";
+		if ($export_accesslevel == "gedadmin") $newuser->canedit[GedcomConfig::$GEDCOMID] = "admin";
+		elseif ($export_accesslevel == "user") $newuser->canedit[GedcomConfig::$GEDCOMID] = "access";
+		else $newuser->canedit[GedcomConfig::$GEDCOMID] = "none";
 		$newuser->email = "";
 		$newuser->verified = "Y";
 		$newuser->verified_by_admin = "Y";

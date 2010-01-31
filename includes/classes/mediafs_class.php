@@ -591,7 +591,7 @@ abstract class MediaFS {
 			else if ($ext=="jpg" || $ext=="jpeg") {
 				if (function_exists("imagecreatefromjpeg") && function_exists("imagejpeg")) {
 					WriteToLog("MediaFS->GenerateThumbnail: Create thumb attempt for ".$filename, "I", "S");
-					$im = imagecreatefromjpeg($filename);
+					$im = @imagecreatefromjpeg($filename);
 					if (empty($im)) {
 						WriteToLog("MediaFS->GenerateThumbnail: There were problems creating thumb for ".$filename, "W", "S");
 						return false;
@@ -1136,7 +1136,7 @@ abstract class MediaFS {
 	}
 	
 	public function MoveFile($file, $from, $to) {
-		global $MEDIA_IN_DB, $GEDCOMID;
+		global $MEDIA_IN_DB;
 		static $change_id;
 		
 		$file = basename($file);
@@ -1172,7 +1172,7 @@ abstract class MediaFS {
 		
 		if ($MEDIA_IN_DB || (self::DirIsWritable($from, false) && self::DirIsWritable($to, false) && AdminFunctions::FileIsWriteable($from.$file))) {
 			// Retrieve the media in which this file is used
-			$sql = "SELECT m_media, m_gedrec FROM ".TBLPREFIX."media WHERE m_mfile LIKE '".DbLayer::EscapeQuery($mfrom.$file)."%' AND m_file LIKE '".$GEDCOMID."'";
+			$sql = "SELECT m_media, m_gedrec FROM ".TBLPREFIX."media WHERE m_mfile LIKE '".DbLayer::EscapeQuery($mfrom.$file)."%' AND m_file LIKE '".GedcomConfig::$GEDCOMID."'";
 //			print $sql;
 			$res = NewQuery ($sql);
 			if ($res->NumRows() > 0) {
@@ -1192,7 +1192,7 @@ abstract class MediaFS {
 					// media/pics/I1.jpg instead of media/I1.jpg!!!!!!!!
 					$new = preg_replace("~".$oldf."~", $mto.$file, $old);
 					if (!empty($old) && !empty($new)) {
-						ReplaceGedRec($row["m_media"], $old, $new, "FILE", $change_id, $GEDCOMID, "OBJE");
+						ReplaceGedRec($row["m_media"], $old, $new, "FILE", $change_id, GedcomConfig::$GEDCOMID, "OBJE");
 					}
 					else return false;
 				}

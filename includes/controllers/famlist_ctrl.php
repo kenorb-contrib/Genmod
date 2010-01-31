@@ -61,14 +61,13 @@ class FamlistController extends ListController {
 	}
 		
 	public function GetAlphaFamSurnames($letter, $allgeds="no") {
-		global $GEDCOMID;
 	
 		$search_letter = $this->GetNameString($letter);
 		
 		$namelist = array();
 		$sql = "SELECT DISTINCT n_surname, count(DISTINCT if_fkey) as fams FROM ".TBLPREFIX."names, ".TBLPREFIX."individual_family WHERE n_key=if_pkey AND if_role='S' ";
 		if (!empty($search_letter)) $sql .= "AND ".$search_letter;
-		if ($allgeds != "yes") $sql .= " AND n_file = '".$GEDCOMID."' ";
+		if ($allgeds != "yes") $sql .= " AND n_file = '".GedcomConfig::$GEDCOMID."' ";
 		$sql .= "GROUP BY n_surname";
 		$res = NewQuery($sql);
 		while($row = $res->FetchAssoc()) {
@@ -86,7 +85,6 @@ class FamlistController extends ListController {
 	 * @return array	$indilist array
 	 */
 	public function GetFams() {
-		global $GEDCOMID;
 			
 		$search_letter = $this->GetNameString($this->alpha);
 		$tfamlist = array();
@@ -97,7 +95,7 @@ class FamlistController extends ListController {
 		else if (!empty($search_letter)) $sql .= " AND ".$search_letter;
 		if ($this->falpha != "") $sql .= " AND n_fletter='".$this->falpha."'";
 		if (!GedcomConfig::$SHOW_MARRIED_NAMES) $sql .= " AND n_type!='C'";
-		if ($this->allgeds != "yes") $sql .= " AND n_file = '".$GEDCOMID."' ";
+		if ($this->allgeds != "yes") $sql .= " AND n_file = '".GedcomConfig::$GEDCOMID."' ";
 		$sql .= "GROUP BY if_fkey";
 
 		// The previous query works for all surnames, including @N.N.
@@ -106,7 +104,7 @@ class FamlistController extends ListController {
 		// What we exclude, is families where no spouses exist and which only consist of children.
 		if ($this->surname == "@N.N.") {
 			$sql .= " UNION SELECT f_key, f_id, f_husb, f_wife, f_file, f_gedrec FROM ".TBLPREFIX."individual_family WHERE if_role='S' ";
-			if ($this->allgeds != "yes") $sql .= " AND if_file = '".$GEDCOMID."'";
+			if ($this->allgeds != "yes") $sql .= " AND if_file = '".GedcomConfig::$GEDCOMID."'";
 			$sql .= " GROUP BY if_fkey HAVING count(if_fkey)=1";
 		}
 
@@ -146,7 +144,6 @@ class FamlistController extends ListController {
 	 */
 	public function PrintFamilyList($familylist, $print_all=true) {
 		global $TEXT_DIRECTION;
-		global $GEDCOMID;
 	
 		// NOTE: The list is really long so divide it up again by the first letter of the first name
 		if (((GedcomConfig::$ALPHA_INDEX_LISTS && count($familylist) > GedcomConfig::$ALPHA_INDEX_LISTS) || $this->falpha != "") && $print_all == true) {
@@ -221,7 +218,7 @@ class FamlistController extends ListController {
 			$names = array();
 			foreach($familylist as $gid => $fam) {
 				// NOTE: make sure that favorites from other gedcoms are not shown
-				if ($fam->gedcomid == $GEDCOMID || $this->allgeds == "yes") {
+				if ($fam->gedcomid == GedcomConfig::$GEDCOMID || $this->allgeds == "yes") {
 					$famnames = $fam->GetLetterNames($this->alpha, $this->falpha);
 					foreach($famnames as $indexval => $name) {
 							$names[] = array($name, $fam->key, $indexval);

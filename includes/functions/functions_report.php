@@ -32,43 +32,37 @@ if (stristr($_SERVER["SCRIPT_NAME"],basename(__FILE__))) {
 
 //--- copied from reportpdf.php
 function AddAncestors($pid, $children=false, $generations=-1) {
-	global $list, $indilist, $genlist;
+	global $list, $genlist;
 
 	$genlist = array($pid);
-	$list[$pid]["generation"] = 1;
+	if (!isset($list[$pid])) $list[$pid] = Person::GetInstance($pid);
+	$list[$pid]->generation = 1;
+	
 	while(count($genlist)>0) {
 		$id = array_shift($genlist);
-		$famids = FindPrimaryFamilyId($id);
-		if (count($famids)>0) {
-			$ffamid = $famids[0];
-			$famid = $ffamid["famid"];
-			if (PrivacyFunctions::DisplayDetailsByID($famid, "FAM")) {
-				$parents = FindParents($famid);
-				if (!empty($parents["HUSB"]) && (PrivacyFunctions::DisplayDetailsByID($parents["HUSB"]) || PrivacyFunctions::showLivingNameByID($parents["HUSB"]))) {
-					FindPersonRecord($parents["HUSB"]);
-					$list[$parents["HUSB"]] = $indilist[$parents["HUSB"]];
-					$list[$parents["HUSB"]]["generation"] = $list[$id]["generation"]+1;
+		$person =& Person::GetInstance($id);
+		$famid = $person->primaryfamily;
+		if (!empty($famid)) {
+			$fam =& Family::GetInstance($famid);
+			if ($fam->disp) {
+				if (!$fam->husb_id == "" && $fam->husb->disp_name) {
+					$list[$fam->husb_id] = $fam->husb;
+					$list[$fam->husb_id]->generation = $list[$id]->generation+1;
 				}
-				if (!empty($parents["WIFE"]) && (PrivacyFunctions::DisplayDetailsByID($parents["WIFE"]) || PrivacyFunctions::showLivingNameByID($parents["WIFE"]))) {
-					FindPersonRecord($parents["WIFE"]);
-					$list[$parents["WIFE"]] = $indilist[$parents["WIFE"]];
-					$list[$parents["WIFE"]]["generation"] = $list[$id]["generation"]+1;
+				if (!$fam->wife_id == "" && $fam->wife->disp_name) {
+					$list[$fam->wife_id] = $fam->wife;
+					$list[$fam->wife_id]->generation = $list[$id]->generation+1;
 				}
-				if ($generations == -1 || $list[$id]["generation"]+1 < $generations) {
-					if (!empty($parents["HUSB"])) array_push($genlist, $parents["HUSB"]);
-					if (!empty($parents["WIFE"])) array_push($genlist, $parents["WIFE"]);
+				if ($generations == -1 || $list[$id]->generation+1 < $generations) {
+					if (!$fam->husb_id == "") array_push($genlist, $fam->husb_id);
+					if (!$fam->wife_id == "") array_push($genlist, $fam->wife_id);
 				}
 				if ($children) {
-					$famrec = FindFamilyRecord($famid);
-					if ($famrec) {
-						$num = preg_match_all("/1\s*CHIL\s*@(.*)@/", $famrec, $smatch,PREG_SET_ORDER);
-						for($i=0; $i<$num; $i++) {
-							if (PrivacyFunctions::DisplayDetailsByID($smatch[$i][1]) || PrivacyFunctions::showLivingNameByID($smatch[$i][1])) {
-								FindPersonRecord($smatch[$i][1]);
-								$list[$smatch[$i][1]] = $indilist[$smatch[$i][1]];
-								if (isset($list[$id]["generation"])) $list[$smatch[$i][1]]["generation"] = $list[$id]["generation"];
-								else $list[$smatch[$i][1]]["generation"] = 1;
-							}
+					foreach($fam->children as $key =>$child) {
+						if ($child->disp) {
+							$list[$child->xref] = $child;
+							if (!is_null($list[$id]->generation)) $list[$child->xref]->generation = $list[$id]->generation;
+							else $list[$child->xref]->generation = 1;
 						}
 					}
 				}
@@ -77,95 +71,47 @@ function AddAncestors($pid, $children=false, $generations=-1) {
 	}
 }
 
-function FindPrimaryFamilyId($pid, $indirec="", $newfams=false) {
-	
-    $resultarray = array();
-    $famids = FindFamilyIds($pid,$indirec,$newfams);
-    if (count($famids)>1) {
-        $priority = array();
-        foreach ($famids as $indexval => $ffamid) {
-            if (!isset($priority["first"])) $priority["first"]=$indexval;
-            $priority["last"]=$indexval;
-            if ($ffamid["primary"]=='Y') {
-				if (!isset($priority["primary"])) $priority["primary"]=$indexval;
-            }
-
-            $relation = $ffamid["relation"];
-            switch ($relation) {
-            case "adopted":
-            case "foster": // Sometimes called "guardian"
-            case "sealing":
-                // nothing to do
-                break;
-            default: // Should be "". Sometimes called "birth","biological","challenged","disproved"
-                $relation = "birth";
-                break;
-            }
-            // in the future, we could use $ffamid["stat"]
-            // to further prioritize the family relation:
-            // "challenged", "disproven", ""/"proven"
-
-            // only store the first occurance of this type of family
-            if (!isset($priority[$relation])) $priority[$relation]=$indexval;
-        }
-
-        // get the actual family array according to the following priority
-        // at least one of these will get some results.
-        if (isset($priority["primary"])) $resultarray[]=$famids[$priority["primary"]];
-        else if (isset($priority["birth"])) $resultarray[]=$famids[$priority["birth"]];
-        else if (isset($priority["adopted"])) $resultarray[]=$famids[$priority["adopted"]];
-        else if (isset($priority["foster"])) $resultarray[]=$famids[$priority["foster"]];
-        else if (isset($priority["sealing"])) $resultarray[]=$famids[$priority["sealing"]];
-        else if (isset($priority["first"])) $resultarray[]=$famids[$priority["first"]];
-        else if (isset($priority["last"])) $resultarray[]=$famids[$priority["last"]];
-  		return $resultarray;
-    }
-    else return $famids;
-}
-
 //--- copied from reportpdf.php
 function AddDescendancy($pid, $parents=false, $generations=-1) {
-	global $list, $indilist;
+	global $list;
+	if (!isset($list[$pid])) $list[$pid] = Person::GetInstance($pid);
+//	print "gen: ".$list[$pid]->generation." for ".$pid."<br />";
+	
+	if (is_null($list[$pid]->generation)) $list[$pid]->generation = 0;
 
-	if (!isset($list[$pid])) {
-		FindPersonRecord($pid);
-		$list[$pid] = $indilist[$pid];
-	}
-	if (!isset($list[$pid]["generation"])) {
-		$list[$pid]["generation"] = 0;
-	}
-	$famids = FindSfamilyIds($pid);
-	if (count($famids)>0) {
-		foreach($famids as $indexval => $famid) {
-			$famrec = FindFamilyRecord($famid["famid"]);
-			if ($famrec && PrivacyFunctions::DisplayDetailsByID($famid["famid"], "FAM")) {
-				if ($parents) {
-					$parents = FindParentsInRecord($famrec);
-					if (!empty($parents["HUSB"]) && (PrivacyFunctions::DisplayDetailsByID($parents["HUSB"]) || PrivacyFunctions::showLivingNameByID($parents["HUSB"]))) {
-						FindPersonRecord($parents["HUSB"]);
-						$list[$parents["HUSB"]] = $indilist[$parents["HUSB"]];
-						if (isset($list[$pid]["generation"])) $list[$parents["HUSB"]]["generation"] = $list[$pid]["generation"]-1;
-						else $list[$parents["HUSB"]]["generation"] = 1;
-					}
-					if (!empty($parents["WIFE"]) && (PrivacyFunctions::DisplayDetailsByID($parents["WIFE"]) || PrivacyFunctions::showLivingNameByID($parents["WIFE"]))) {
-						FindPersonRecord($parents["WIFE"]);
-						$list[$parents["WIFE"]] = $indilist[$parents["WIFE"]];
-						if (isset($list[$pid]["generation"])) $list[$parents["WIFE"]]["generation"] = $list[$pid]["generation"]-1;
-						else $list[$parents["HUSB"]]["generation"] = 1;
-					}
+	$person =& Person::GetInstance($pid);
+	foreach($person->spousefamilies as $key => $fam) {
+		if ($fam->disp) {
+			if ($parents) {
+				if (!$fam->husb_id == "" && $fam->husb->disp_name) {
+					$list[$fam->husb_id] = $fam->husb;
+					if (!is_null($list[$pid]->generation)) $list[$fam->husb_id]->generation = $list[$pid]->generation-1;
+					else $list[$fam->husb_id]->generation = 1;
 				}
-				$num = preg_match_all("/1\s*CHIL\s*@(.*)@/", $famrec, $smatch,PREG_SET_ORDER);
-				for($i=0; $i<$num; $i++) {
-					FindPersonRecord($smatch[$i][1]);
-					$list[$smatch[$i][1]] = $indilist[$smatch[$i][1]];
-					if (isset($list[$smatch[$i][1]]["generation"])) $list[$smatch[$smatch[$i][1]][1]]["generation"] = $list[$pid]["generation"]+1;
-					else $list[$smatch[$i][1]]["generation"] = 2;
+				if (!$fam->wife_id == "" && $fam->wife->disp_name) {
+					$list[$fam->wife_id] = $fam->wife;
+					if (!is_null($list[$pid]->generation)) $list[$fam->wife_id]->generation = $list[$pid]->generation-1;
+					else $list[$fam->wife_id]->generation = 1;
 				}
-				if($generations == -1 || $list[$pid]["generation"]+1 < $generations)
-				{
-					for($i=0; $i<$num; $i++) {
-						AddDescendancy($smatch[$i][1], $parents, $generations);	// recurse on the childs family
-					}
+			}
+			foreach ($fam->children as $key2 => $child) {
+				$list[$child->xref] = $child;
+				$list[$child->xref]->generation = $list[$pid]->generation+1;
+//				if (!is_null($list[$child->xref]->generation)) $list[$child->xref]->generation = $list[$pid]->generation+1;
+//				else $list[$child->xref]->generation = 2;
+			}
+					
+//				$num = preg_match_all("/1\s*CHIL\s*@(.*)@/", $famrec, $smatch,PREG_SET_ORDER);
+//				for($i=0; $i<$num; $i++) {
+//					FindPersonRecord($smatch[$i][1]);
+//					$list[$smatch[$i][1]] = $indilist[$smatch[$i][1]];
+//					if (isset($list[$smatch[$i][1]]["generation"])) $list[$smatch[$smatch[$i][1]][1]]["generation"] = $list[$pid]["generation"]+1;
+//					else $list[$smatch[$i][1]]["generation"] = 2;
+//				}
+			if($generations == -1 || $list[$pid]->generation+1 < $generations) {
+				foreach($fam->children as $key3 => $child) {
+//					print "call from ".$fam->xref." for ".$child->xref."<br />";
+					AddDescendancy($child->xref, $parents, $generations);	// recurse on the childs family
 				}
 			}
 		}

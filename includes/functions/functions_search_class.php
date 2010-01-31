@@ -51,7 +51,7 @@ abstract class SearchFunctions {
 	 * @return	array $myindilist array with all individuals that matched the query
 	 */
 	public function FTSearchIndis($query, $allgeds=false, $ANDOR="AND") {
-		global $GEDCOMID, $GEDCOMS, $ftminwlen, $ftmaxwlen;
+		global $GEDCOMS, $ftminwlen, $ftmaxwlen;
 		
 		// Get the min and max search word length
 		self::GetFTWordLengths();
@@ -85,7 +85,7 @@ abstract class SearchFunctions {
 			$sql = "SELECT i_key, i_id, i_file, i_gedrec, i_isdead, n_name, n_letter, n_fletter, n_type, n_surname, n_nick FROM ".TBLPREFIX."individuals, ".TBLPREFIX."names WHERE i_key=n_key AND (MATCH (i_gedrec) AGAINST ('".DbLayer::EscapeQuery($query)."' IN BOOLEAN MODE))";
 		}
 			
-		if (!$allgeds) $sql .= " AND i_file='".$GEDCOMID."'";
+		if (!$allgeds) $sql .= " AND i_file='".GedcomConfig::$GEDCOMID."'";
 	
 		if ((is_array($allgeds)) && (count($allgeds) != 0)) {
 			if (count($allgeds) != count($GEDCOMS)) {
@@ -140,7 +140,7 @@ abstract class SearchFunctions {
 
 	//-- search through the gedcom records for families
 	public function FTSearchFams($query, $allgeds=false, $ANDOR="AND", $allnames=false) {
-		global $GEDCOMS, $GEDCOMID, $ftminwlen, $ftmaxwlen;
+		global $GEDCOMS, $ftminwlen, $ftmaxwlen;
 	
 		// Get the min and max search word length
 		self::GetFTWordLengths();
@@ -170,7 +170,7 @@ abstract class SearchFunctions {
 			$sql = "SELECT f_key, f_id, f_husb, f_wife, f_file, f_gedrec FROM ".TBLPREFIX."families WHERE (MATCH (f_gedrec) AGAINST ('".DbLayer::EscapeQuery($query)."' IN BOOLEAN MODE))";
 		}
 		
-		if (!$allgeds) $sql .= " AND f_file='".$GEDCOMID."'";
+		if (!$allgeds) $sql .= " AND f_file='".GedcomConfig::$GEDCOMID."'";
 	
 		if ((is_array($allgeds)) && (count($allgeds) != 0) && count($allgeds) != count($GEDCOMS)) {
 			$sql .= " AND (";
@@ -182,7 +182,7 @@ abstract class SearchFunctions {
 		}
 	
 		$res = NewQuery($sql);
-		$gedold = $GEDCOMID;
+		$gedold = GedcomConfig::$GEDCOMID;
 		$select = array();
 		while($row = $res->fetchAssoc()){
 			$fam = Family::GetInstance($row["f_id"], $row, $row["f_file"]);
@@ -202,7 +202,7 @@ abstract class SearchFunctions {
 
 	//-- search through the gedcom records for sources, full text
 	public function FTSearchSources($query, $allgeds=false, $ANDOR="AND") {
-		global $GEDCOMS, $GEDCOMID, $ftminwlen, $ftmaxwlen, $LINK_PRIVACY;
+		global $GEDCOMS, $ftminwlen, $ftmaxwlen, $LINK_PRIVACY;
 		
 		// Get the min and max search word length
 		self::GetFTWordLengths();
@@ -232,7 +232,7 @@ abstract class SearchFunctions {
 			$sql = "SELECT s_key, s_id, s_name, s_file, s_gedrec, sm_sid, sm_gid, sm_type FROM ".TBLPREFIX."sources LEFT JOIN ".TBLPREFIX."source_mapping ON s_key=sm_key WHERE (MATCH (s_gedrec) AGAINST ('".DbLayer::EscapeQuery($query)."' IN BOOLEAN MODE))";
 		}
 	
-		if (!$allgeds) $sql .= " AND s_file='".$GEDCOMID."'";
+		if (!$allgeds) $sql .= " AND s_file='".GedcomConfig::$GEDCOMID."'";
 	
 		if ((is_array($allgeds) && count($allgeds) != 0) && count($allgeds) != count($GEDCOMS)) {
 			$sql .= " AND (";
@@ -276,7 +276,7 @@ abstract class SearchFunctions {
 
 	//-- search through the gedcom records for repositories, full text
 	public function FTSearchRepos($query, $allgeds=false, $ANDOR="AND") {
-		global $GEDCOMS, $GEDCOMID, $ftminwlen, $ftmaxwlen;
+		global $GEDCOMS, $ftminwlen, $ftmaxwlen;
 		
 		// Get the min and max search word length
 		self::GetFTWordLengths();
@@ -306,7 +306,7 @@ abstract class SearchFunctions {
 			$sql = "SELECT o_key, o_id, o_file, o_type, o_gedrec FROM ".TBLPREFIX."other WHERE (MATCH (o_gedrec) AGAINST ('".DbLayer::EscapeQuery($query)."' IN BOOLEAN MODE))";
 		}
 	
-		if (!$allgeds) $sql .= " AND o_file='".$GEDCOMID."'";
+		if (!$allgeds) $sql .= " AND o_file='".GedcomConfig::$GEDCOMID."'";
 		
 		$sql .= " AND o_type='REPO'";
 	
@@ -332,7 +332,7 @@ abstract class SearchFunctions {
 
 	//-- search through the gedcom records for media, full text
 	public function FTSearchMedia($query, $allgeds=false, $ANDOR="AND") {
-		global $GEDCOMS, $GEDCOMID, $ftminwlen, $ftmaxwlen, $media_hide, $media_total, $LINK_PRIVACY;
+		global $GEDCOMS, $ftminwlen, $ftmaxwlen, $media_hide, $media_total, $LINK_PRIVACY;
 		
 		// Get the min and max search word length
 		self::GetFTWordLengths();
@@ -361,7 +361,7 @@ abstract class SearchFunctions {
 			$sql = "SELECT m_media, m_ext, m_titl, m_mfile, m_file, m_gedrec, mm_gid, mm_type, mm_file FROM ".TBLPREFIX."media LEFT JOIN ".TBLPREFIX."media_mapping ON m_media=mm_media AND m_file=mm_file WHERE (MATCH (m_gedrec) AGAINST ('".DbLayer::EscapeQuery($query)."' IN BOOLEAN MODE))";
 		}
 
-		if (!$allgeds) $sql .= " AND m_file='".$GEDCOMID."'";
+		if (!$allgeds) $sql .= " AND m_file='".GedcomConfig::$GEDCOMID."'";
 		
 		if ((is_array($allgeds) && count($allgeds) != 0) && count($allgeds) != count($GEDCOMS)) {
 			$sql .= " AND (";
@@ -416,7 +416,7 @@ abstract class SearchFunctions {
 	
 	//-- search through the gedcom records for notes, full text
 	public function FTSearchNotes($query, $allgeds=false, $ANDOR="AND") {
-		global $GEDCOMS, $GEDCOMID, $ftminwlen, $ftmaxwlen, $note_hide, $note_total;
+		global $GEDCOMS, $ftminwlen, $ftmaxwlen, $note_hide, $note_total;
 		
 		// Get the min and max search word length
 		self::GetFTWordLengths();
@@ -445,7 +445,7 @@ abstract class SearchFunctions {
 			$sql = "SELECT * FROM ".TBLPREFIX."other WHERE (MATCH (o_gedrec) AGAINST ('".DbLayer::EscapeQuery($query)."' IN BOOLEAN MODE))";
 		}
 	
-		if (!$allgeds) $sql .= " AND o_file='".$GEDCOMID."'";
+		if (!$allgeds) $sql .= " AND o_file='".GedcomConfig::$GEDCOMID."'";
 		
 		$sql .= " AND o_type='NOTE'";
 	
@@ -568,14 +568,13 @@ abstract class SearchFunctions {
 	
 	// Used in calendar.php
 	public function SearchIndisYearRange($startyear, $endyear, $allgeds=false, $type="", $est="") {
-		global $GEDCOMID;
 	
 		$myindilist = array();
 		$sql = "SELECT DISTINCT i_key, i_id, i_file, i_gedrec, i_isdead, n_name, n_surname, n_nick, n_letter, n_fletter, n_type FROM ".TBLPREFIX."individuals INNER JOIN ".TBLPREFIX."names ON i_key=n_key INNER JOIN ".TBLPREFIX."dates ON (i_key=d_key AND d_fact<>'CHAN') WHERE";
 		if ($startyear < $endyear) $sql .= " d_year>='".$startyear."' AND d_year<='".$endyear."'";
 		else $sql .= " d_year=".$startyear;
 		if (!empty($type)) $sql .= " AND d_fact IN ".$type;
-		if (!$allgeds) $sql .= " AND i_file='".$GEDCOMID."'";
+		if (!$allgeds) $sql .= " AND i_file='".GedcomConfig::$GEDCOMID."'";
 		$sql .= " ORDER BY i_key, n_id";
 //		print $sql;
 		$res = NewQuery($sql);
@@ -609,7 +608,6 @@ abstract class SearchFunctions {
 	 * @subpackage Calendar
 	**/
 	public function SearchFamsYearRange($startyear, $endyear, $allgeds=false, $type="") {
-		global $GEDCOMID;
 	
 		$myfamlist = array();
 		$sql = "SELECT DISTINCT f_key, f_id, f_husb, f_wife, f_file, f_gedrec FROM ".TBLPREFIX."families INNER JOIN ".TBLPREFIX."dates ON (d_key=f_key AND d_fact<>'CHAN') WHERE";
@@ -623,7 +621,7 @@ abstract class SearchFunctions {
 		}
 		$sql .= ")";
 */		if (!empty($type)) $sql .= " AND d_fact IN ".$type;
-		if (!$allgeds) $sql .= " AND f_file='".$GEDCOMID."'";
+		if (!$allgeds) $sql .= " AND f_file='".GedcomConfig::$GEDCOMID."'";
 		$res = NewQuery($sql);
 		
 		$select = array();
@@ -666,12 +664,15 @@ abstract class SearchFunctions {
 	 * @return	array $myindilist array with all individuals that matched the query
 	 */
 	public function SearchIndis($query, $allgeds=false, $ANDOR="AND", $type="") {
-		global $GEDCOMS, $GEDCOMID;
+		global $GEDCOMS;
 		
 		$myindilist = array();
-		$sql = "SELECT DISTINCT(i_key), i_id, i_file, i_gedrec, i_isdead FROM ".TBLPREFIX."individuals INNER JOIN ".TBLPREFIX."dates on (d_key=i_key AND d_fact<>'CHAN') WHERE (d_year='".$query."' OR d_ext='BET')";
-		if (!empty($type)) $sql .= " AND d_fact IN ".$type;
-/*		if (!is_array($query)) $sql = "SELECT i_key, i_id, i_file, i_gedrec, i_isdead FROM ".TBLPREFIX."individuals WHERE (i_gedrec REGEXP '".DbLayer::EscapeQuery($query)."')";
+		// From calendar, search for a year
+		if (!is_array($query)) { 
+			$sql = "SELECT DISTINCT(i_key), i_id, i_file, i_gedrec, i_isdead FROM ".TBLPREFIX."individuals INNER JOIN ".TBLPREFIX."dates on (d_key=i_key AND d_fact<>'CHAN') WHERE (d_year='".$query."' OR d_ext='BET')";
+			if (!empty($type)) $sql .= " AND d_fact IN ".$type;
+		}
+		// Else from reports, we have a regexp query array
 		else {
 			$sql = "SELECT i_key, i_id, i_file, i_gedrec, i_isdead FROM ".TBLPREFIX."individuals WHERE (";
 			$i=0;
@@ -682,7 +683,11 @@ abstract class SearchFunctions {
 			}
 			$sql .= ")";
 		}
-*/		if (!$allgeds) $sql .= " AND i_file='".$GEDCOMID."'";
+		
+/*		if (!is_array($query)) $sql = "SELECT i_key, i_id, i_file, i_gedrec, i_isdead FROM ".TBLPREFIX."individuals WHERE (i_gedrec REGEXP '".DbLayer::EscapeQuery($query)."')";
+		else {
+		}
+*/		if (!$allgeds) $sql .= " AND i_file='".GedcomConfig::$GEDCOMID."'";
 	
 		if ((is_array($allgeds)) && (count($allgeds) != 0)) {
 			if (count($allgeds) != count($GEDCOMS)) {
@@ -723,13 +728,12 @@ abstract class SearchFunctions {
 	 * @subpackage Calendar
 	**/
 	public function SearchFams($query, $allgeds=false, $ANDOR="AND", $allnames=false, $type="") {
-		global $GEDCOMID;
-	
 	
 		$myfamlist = array();
-		$sql = "SELECT DISTINCT f_key, f_id, f_file, f_gedrec, f_wife, f_husb FROM ".TBLPREFIX."families INNER JOIN ".TBLPREFIX."dates on (d_key=f_key AND d_fact<>'CHAN') WHERE (d_year='".$query."' OR d_ext='BET')";
-		if (!empty($type)) $sql .= " AND d_fact IN ".$type;
-/*		if (!is_array($query)) $sql = "SELECT f_key, f_id, f_husb, f_wife, f_file, f_gedrec FROM ".TBLPREFIX."families WHERE (f_gedrec REGEXP '".DbLayer::EscapeQuery($query)."')";
+		if (!is_array($query)) {
+			$sql = "SELECT DISTINCT f_key, f_id, f_file, f_gedrec, f_wife, f_husb FROM ".TBLPREFIX."families INNER JOIN ".TBLPREFIX."dates on (d_key=f_key AND d_fact<>'CHAN') WHERE (d_year='".$query."' OR d_ext='BET')";
+			if (!empty($type)) $sql .= " AND d_fact IN ".$type;
+		}
 		else {
 			$sql = "SELECT f_key, f_id, f_husb, f_wife, f_file, f_gedrec FROM ".TBLPREFIX."families WHERE (";
 			$i=0;
@@ -740,8 +744,7 @@ abstract class SearchFunctions {
 			}
 			$sql .= ")";
 		}
-*/		
-		if (!$allgeds) $sql .= " AND f_file='".$GEDCOMID."'";
+		if (!$allgeds) $sql .= " AND f_file='".GedcomConfig::$GEDCOMID."'";
 	
 		if ((is_array($allgeds)) && (count($allgeds) != 0)) {
 			$sql .= " AND (";
@@ -797,7 +800,6 @@ abstract class SearchFunctions {
 	 * @return	array $myindilist array with all individuals that matched the query
 	 */
 	public function SearchIndisDates($day="", $month="", $year="", $fact="", $allgeds=false, $ANDOR="AND") {
-		global $GEDCOMID;
 		
 		$myindilist = array();
 		
@@ -836,7 +838,7 @@ abstract class SearchFunctions {
 		}
 */		
 		if (!$allgeds) {
-			$sql .= $and." d_file='".$GEDCOMID."'";
+			$sql .= $and." d_file='".GedcomConfig::$GEDCOMID."'";
 			$and = " AND";
 		}
 		if (!empty($fact)) $sql .= $and." d_fact IN ".$fact;
@@ -879,7 +881,7 @@ abstract class SearchFunctions {
 	 * @return	array $myfamlist array with all individuals that matched the query
 	 */
 	public function SearchFamsDates($day="", $month="", $year="", $fact="", $allgeds=false) {
-		global $GEDCOMS, $GEDCOMID;
+		global $GEDCOMS;
 		$myfamlist = array();
 		
 		$sql = "SELECT f_key, f_id, f_husb, f_wife, f_file, f_gedrec, d_gid, d_fact FROM ".TBLPREFIX."dates, ".TBLPREFIX."families WHERE f_key=d_key";
@@ -905,7 +907,7 @@ abstract class SearchFunctions {
 			}
 			$sql .= ") ";
 */		}
-		if (!$allgeds) $sql .= " AND d_file='".$GEDCOMID."'";
+		if (!$allgeds) $sql .= " AND d_file='".GedcomConfig::$GEDCOMID."'";
 //		$sql .= "GROUP BY f_id ORDER BY d_year, d_month, d_day DESC";
 		
 		$res = NewQuery($sql);
@@ -943,7 +945,6 @@ abstract class SearchFunctions {
 	
 	//-- search through the gedcom records for families
 	function SearchFamsNames($query, $ANDOR="AND", $allnames=false) {
-		global $GEDCOMID;
 	
 		$myfamlist = array();
 		$sql = "SELECT f_key, f_id, f_husb, f_wife, f_file, f_gedrec FROM ".TBLPREFIX."individual_family INNER JOIN ".TBLPREFIX."families on f_key=if_fkey WHERE if_pkey IN ('".implode("','", $query)."') AND if_role='S'";
@@ -958,7 +959,7 @@ abstract class SearchFunctions {
 //		$sql .= ")";
 	
 		$res = NewQuery($sql);
-	//	$gedold = $GEDCOMID;
+	//	$gedold = GedcomConfig::$GEDCOMID;
 		$select = array();
 		while($row = $res->fetchAssoc()){
 			$fam = Family::GetInstance($row["f_id"], $row, $row["f_file"]);

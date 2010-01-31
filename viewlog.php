@@ -34,7 +34,7 @@ if (!isset($cat)) exit;
 if (!isset($max)) $max=20;
 if (!isset($type)) $type = "";
 if($type == "All") $type = "";
-if (!isset($gedid)) $gedid = $GEDCOMID;
+if (!isset($gedid)) $gedid = GedcomConfig::$GEDCOMID;
 if (!isset($cleanup)) $cleanup = "";
 if (!isset($action)) $action = "";
 if ($action != "download") PrintSimpleHeader("Print logfile");

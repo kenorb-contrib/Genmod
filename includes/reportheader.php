@@ -79,7 +79,6 @@ function endElement($parser, $name) {
  */
 function characterData($parser, $data) {
 	global $text;
-	
 	$text .= $data;
 }
 
@@ -118,12 +117,13 @@ function GMRvarSHandler($attrs) {
 			}
 			if (defined($var)) $var = constant($var);
 		}
-		else if (substr($var, 0, 8) == "gm_lang[") {
-			//print "var: ".$var."<br />";
-			$ct = preg_match("/gm_lang\[[\'|\"]*(.*)[\'|\"]*\]/", $var, $match);
-			if ($ct>0) {
-				if (substr($match[1], 0, 1) == "$") $match[1] = eval("if(isset($match[1])) print $match[1]; else print '';");
-				$var = "GM_LANG_".$match[1];
+		else if (substr($var, 0, 8) == "GM_FACT_") {
+			$ct = preg_match("/GM_FACT_(.*)/", $var, $match);
+			if ($ct > 0) {
+				if (substr($match[1], 0, 1) == "$") {
+					$match[1] = eval("if(isset($match[1])) print $match[1]; else print '';");
+					$var = "GM_FACT_".$match[1];
+				}
 			}
 			if (defined($var)) $var = constant($var);
 		}
@@ -136,7 +136,7 @@ function GMRvarSHandler($attrs) {
 			}
 			$ct = preg_match("/factarray\['(.*)'\]/", $var, $match);
 			if ($ct>0) {
-				if (defined("GM_FACT".$match[1])) $var = constant("GM_FACT_".$match[1]);
+				if (defined("GM_FACT_".$match[1])) $var = constant("GM_FACT_".$match[1]);
 				else $var = $match[1];
 			}
 		}

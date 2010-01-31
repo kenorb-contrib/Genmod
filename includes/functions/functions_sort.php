@@ -659,6 +659,7 @@ function ItemSort($a, $b) {
  * @return int negative numbers sort $a first, positive sort $b first
  */
 function IdSort($a, $b) {
+	if (is_object($a) && is_object($b)) return StringSort($a->xref, $b->xref);
 	if (isset($a["gedcom"])) {
 		$ct = preg_match("/0 @(.*)@/", $a["gedcom"], $match);
 		if ($ct>0) $aid = $match[1];
@@ -888,11 +889,18 @@ function CompareFacts($a, $b) {
  * compare individuals by a fact date
  */
 function CompareDate($a, $b) {
-	global $sortby;
+	global $sortby, $selevent;
 
 	$tag = "BIRT";
-	if (!empty($sortby)) $tag = $sortby;
-	if (is_array($a)) {
+	if (!empty($sortby)) {
+		if ($sortby == "DATE") $tag = $selevent;
+		else $tag = $sortby;
+	}
+	if (is_object($a)) {
+		$arec = $a->gedrec;
+		$brec = $b->gedrec;
+	}
+	else if (is_array($a)) {
 		$arec = $a["gedcom"];
 		$brec = $b["gedcom"];
 	}
@@ -911,7 +919,11 @@ function CompareDate($a, $b) {
 		if (empty($bbirt)) $bbirt = GetSubRecord(1, "1 BAPM", $brec);
 	}
 	$c = CompareFactsDate($abirt, $bbirt);
-	if ($c==0) return ItemSort($a, $b);
+	if ($c == 0) {
+		$atime = GetSubRecord(3, "3 TIME", $abirt);
+		$btime = GetSubRecord(3, "3 TIME", $bbirt);
+		return StringSort($atime, $btime);
+	}
 	else return $c;
 }
 function CompareDateDescending($a, $b) {
@@ -971,5 +983,12 @@ function SameGroup($a, $b) {
 	if ($a['type']==$b['type']) return strnatcasecmp($a['id'], $b['id']);
 	else return ($carray[$a['type']] > $carray[$b['type']]);
 }
-	
+
+function IndiBirthSort($a, $b) {
+	return CompareFacts($a->brec, $b->brec);
+}
+
+function IndiDeathSort($a, $b) {
+	return CompareFacts($a->drec, $b->drec);
+}
 ?>

@@ -114,7 +114,7 @@ $controller->CheckRawEdited();
 				print " <img src=\"".$controller->indi->sexdetails["image"]."\" title=\"".$controller->indi->sexdetails["gender"]."\" alt=\"".$controller->indi->sexdetails["gender"];
 				print "\" width=\"0\" height=\"0\" class=\"sex_image\" border=\"0\" />";
 				if ($controller->indi->canedit && !$controller->indi->isdeleted && $factobj->style != "change_old") {
-					if ($controller->indi->sexdetails["add"]) print "<br /><a class=\"font9\" href=\"#\" onclick=\"add_new_record('".$controller->xref."', 'SEX'); return false;\">".GM_LANG_edit."</a>";
+					if ($controller->indi->sexdetails["add"]) print "<br /><a class=\"font9\" href=\"#\" onclick=\"add_new_record('".$controller->xref."', 'SEX', 'add_gender', 'INDI'); return false;\">".GM_LANG_edit."</a>";
 					else {
 						print "<br /><a class=\"font9\" href=\"#\" onclick=\"edit_record('".$controller->xref."', 'SEX', 1, 'edit_gender', 'INDI'); return false;\">".GM_LANG_edit."</a> | ";
 						print "<a class=\"font9\" href=\"#\" onclick=\"delete_record('".$controller->xref."', 'SEX', 1, 'edit_gender', 'INDI'); return false;\">".GM_LANG_delete."</a>\n";
@@ -163,9 +163,9 @@ if ($controller->view != "preview") {
 		<a class="accesskeys" href="<?php print "descendancy.php?rootid=$pid";?>" title="<?php print GM_LANG_descend_chart ?>" tabindex="-1" accesskey="<?php print GM_LANG_accesskey_individual_descendancy; ?>"><?php print GM_LANG_descend_chart ?></a>
 		<a class="accesskeys" href="<?php print "timeline.php?pids[]=$pid";?>" title="<?php print GM_LANG_timeline_chart ?>" tabindex="-1" accesskey="<?php print GM_LANG_accesskey_individual_timeline; ?>"><?php print GM_LANG_timeline_chart ?></a>
 		<?php
-		if (!empty($controller->user)&&!empty($controller->user->gedcomid[$GEDCOMID])) {
+		if (!empty($controller->user)&&!empty($controller->user->gedcomid[GedcomConfig::$GEDCOMID])) {
 			?>
-		<a class="accesskeys" href="<?php print "relationship.php?pid1=".$controller->user->gedcomid[$GEDCOMID]."&amp;pid2=".$controller->xref;?>" title="<?php print GM_LANG_relationship_to_me ?>" tabindex="-1" accesskey="<?php print GM_LANG_accesskey_individual_relation_to_me; ?>"><?php print GM_LANG_relationship_to_me ?></a>
+		<a class="accesskeys" href="<?php print "relationship.php?pid1=".$controller->user->gedcomid[GedcomConfig::$GEDCOMID]."&amp;pid2=".$controller->xref;?>" title="<?php print GM_LANG_relationship_to_me ?>" tabindex="-1" accesskey="<?php print GM_LANG_accesskey_individual_relation_to_me; ?>"><?php print GM_LANG_relationship_to_me ?></a>
 		<?php 	}
 		if ($controller->canshowgedrec) {?>
 		<a class="accesskeys" href="javascript:show_gedcom_record();" title="<?php print GM_LANG_view_gedcom ?>" tabindex="-1" accesskey="<?php print GM_LANG_accesskey_individual_gedcom; ?>"><?php print GM_LANG_view_gedcom ?></a>

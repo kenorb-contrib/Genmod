@@ -328,10 +328,10 @@ PrintHeader(GM_LANG_anniversary_calendar);
 print "<div style=\" text-align: center;\" id=\"calendar_page\">\n";
 
 	//-- moved here from session.php, should probably be moved somewhere else still
-	$sql = "SELECT i_id FROM ".TBLPREFIX."individuals where i_file='".$GEDCOMID."' AND i_gedrec like '%@#DHEBREW@%' LIMIT 1";
+	$sql = "SELECT i_id FROM ".TBLPREFIX."individuals where i_file='".GedcomConfig::$GEDCOMID."' AND i_gedrec like '%@#DHEBREW@%' LIMIT 1";
 	$res = NewQuery($sql);
-	if ($res->NumRows()>0) $HEBREWFOUND[$GEDCOMID] = true;
-	else $HEBREWFOUND[$GEDCOMID] = false;
+	if ($res->NumRows()>0) $HEBREWFOUND[GedcomConfig::$GEDCOMID] = true;
+	else $HEBREWFOUND[GedcomConfig::$GEDCOMID] = false;
 	$res->FreeResult();
 
 	// Print top text
@@ -345,13 +345,13 @@ if ($action=="today") {
 	//-- the year is needed for alternate calendars
  	if (GedcomConfig::$CALENDAR_FORMAT!="gregorian") print GetChangedDate("$day $month $year");
 	else print GetChangedDate("$day $month");
-	if (GedcomConfig::$CALENDAR_FORMAT=="gregorian" && GedcomConfig::$USE_RTL_FUNCTIONS && $HEBREWFOUND[$GEDCOMID] == true) print " / ".GetChangedDate("@#DHEBREW@ $hDay $hMonth $CalYear"); 
+	if (GedcomConfig::$CALENDAR_FORMAT=="gregorian" && GedcomConfig::$USE_RTL_FUNCTIONS && $HEBREWFOUND[GedcomConfig::$GEDCOMID] == true) print " / ".GetChangedDate("@#DHEBREW@ $hDay $hMonth $CalYear"); 
 }
 else if ($action=="calendar") {
 	print GM_LANG_in_this_month."</h3></td></tr>\n";
 	print "<tr><td class=\"topbottombar\">";
 	print GetChangedDate(" $month $year ");
-	if (GedcomConfig::$CALENDAR_FORMAT=="gregorian" && GedcomConfig::$USE_RTL_FUNCTIONS && $HEBREWFOUND[$GEDCOMID] == true) {
+	if (GedcomConfig::$CALENDAR_FORMAT=="gregorian" && GedcomConfig::$USE_RTL_FUNCTIONS && $HEBREWFOUND[GedcomConfig::$GEDCOMID] == true) {
 		$hdd = $date[1]["day"];
 		$hmm = $date[1]["month"];
 		$hyy = $date[1]["year"];
@@ -368,7 +368,7 @@ else if ($action=="year") {
 	print GM_LANG_in_this_year."</h3></td></tr>\n";
 	print "<tr><td class=\"topbottombar\">";
 	print GetChangedDate(" $year_text ");
-	if (GedcomConfig::$CALENDAR_FORMAT=="gregorian" && GedcomConfig::$USE_RTL_FUNCTIONS && $HEBREWFOUND[$GEDCOMID] == true) {
+	if (GedcomConfig::$CALENDAR_FORMAT=="gregorian" && GedcomConfig::$USE_RTL_FUNCTIONS && $HEBREWFOUND[GedcomConfig::$GEDCOMID] == true) {
 		$hdd = $date[3]["day"];
 		$hmm = $date[3]["month"];
 		$hstartyear = $date[3]["year"];
@@ -405,11 +405,11 @@ if ($view!="preview") {
 	$Yy = adodb_date("Y");
 //	print "<a href=\"calendar.php?filterev=$filterev&amp;filterof=$filterof&amp;filtersx=$filtersx\"><b>".GetChangedDate("$Dd $Mm $Yy")."</b></a> | ";
 	//-- for alternate calendars the year is needed
-  	if (GedcomConfig::$CALENDAR_FORMAT!="gregorian" || (GedcomConfig::$USE_RTL_FUNCTIONS && $HEBREWFOUND[$GEDCOMID] == true)) $datestr = "$Dd $Mm $Yy";
+  	if (GedcomConfig::$CALENDAR_FORMAT!="gregorian" || (GedcomConfig::$USE_RTL_FUNCTIONS && $HEBREWFOUND[GedcomConfig::$GEDCOMID] == true)) $datestr = "$Dd $Mm $Yy";
 // 	if ($CALENDAR_FORMAT!="gregorian") $datestr = "$Dd $Mm $Yy"; // MA @@@
 	else $datestr = "$Dd $Mm";
 	print "<a href=\"calendar.php?filterev=$filterev&amp;filterof=$filterof&amp;filtersx=$filtersx&amp;year=$year\"><b>".GetChangedDate($datestr);
-	if (GedcomConfig::$USE_RTL_FUNCTIONS && $HEBREWFOUND[$GEDCOMID] == true) {
+	if (GedcomConfig::$USE_RTL_FUNCTIONS && $HEBREWFOUND[GedcomConfig::$GEDCOMID] == true) {
 		$hdatestr = "@#DHEBREW@ $currhDay $currhMon $currhYear";
 		print " / ".GetChangedDate($hdatestr);
 	}
@@ -1194,22 +1194,22 @@ else if ($action=="calendar") {
 						$currentDay = true;
 					print "<span class=\"cal_day". ($currentDay?" current_day":"") ."\">".$mday."</span>";
 					if (GedcomConfig::$CALENDAR_FORMAT=="hebrew_and_gregorian" || GedcomConfig::$CALENDAR_FORMAT=="hebrew" ||
-						((GedcomConfig::$CALENDAR_FORMAT=="jewish_and_gregorian" || GedcomConfig::$CALENDAR_FORMAT=="jewish" || (GedcomConfig::$USE_RTL_FUNCTIONS &&  $HEBREWFOUND[$GEDCOMID] == true)) && $LANGUAGE == "hebrew")) {
+						((GedcomConfig::$CALENDAR_FORMAT=="jewish_and_gregorian" || GedcomConfig::$CALENDAR_FORMAT=="jewish" || (GedcomConfig::$USE_RTL_FUNCTIONS &&  $HEBREWFOUND[GedcomConfig::$GEDCOMID] == true)) && $LANGUAGE == "hebrew")) {
 						$monthTemp = $monthtonum[strtolower($month)];
 						$jd = gregoriantojd($monthTemp, $mday, $year);
 						$hebrewDate = jdtojewish($jd);
-						// if (GedcomConfig::$USE_RTL_FUNCTIONS &&  $HEBREWFOUND[$GEDCOMID] == true) {
+						// if (GedcomConfig::$USE_RTL_FUNCTIONS &&  $HEBREWFOUND[GedcomConfig::$GEDCOMID] == true) {
 							list ($hebrewMonth, $hebrewDay, $hebrewYear) = split ('/', $hebrewDate);
 							print "<span class=\"rtl_cal_day". ($currentDay?" current_day":"") ."\">";
 							print GetHebrewJewishDay($hebrewDay) . " " .GetHebrewJewishMonth($hebrewMonth, $hebrewYear) . "</span>";
 						// }
 					}
-					else if(GedcomConfig::$CALENDAR_FORMAT=="jewish_and_gregorian" || GedcomConfig::$CALENDAR_FORMAT=="jewish" || (GedcomConfig::$USE_RTL_FUNCTIONS && $HEBREWFOUND[$GEDCOMID] == true)) {
+					else if(GedcomConfig::$CALENDAR_FORMAT=="jewish_and_gregorian" || GedcomConfig::$CALENDAR_FORMAT=="jewish" || (GedcomConfig::$USE_RTL_FUNCTIONS && $HEBREWFOUND[GedcomConfig::$GEDCOMID] == true)) {
 						// else if(GedcomConfig::$CALENDAR_FORMAT=="jewish_and_gregorian" || GedcomConfig::$CALENDAR_FORMAT=="jewish" || GedcomConfig::$USE_RTL_FUNCTIONS) {
 						$monthTemp = $monthtonum[strtolower($month)];
 						$jd = gregoriantojd($monthTemp, $mday, $year);
 						$hebrewDate = jdtojewish($jd);
-						// if (GedcomConfig::$USE_RTL_FUNCTIONS &&  $HEBREWFOUND[$GEDCOMID] == true) {
+						// if (GedcomConfig::$USE_RTL_FUNCTIONS &&  $HEBREWFOUND[GedcomConfig::$GEDCOMID] == true) {
 							list ($hebrewMonth, $hebrewDay, $hebrewYear) = split ('/', $hebrewDate);
 							print "<span class=\"rtl_cal_day". ($currentDay?" current_day":"") ."\">";
 							print $hebrewDay . " " . GetJewishMonthName($hebrewMonth, $hebrewYear) . "</span>";
@@ -1429,7 +1429,7 @@ if ($view=="preview"){
 		if (isset($myindilist[$gid]["gedfile"])) $showfile=$myindilist[$gid]["gedfile"];
 		else $showfile=$myfamlist[$gid]["gedfile"];
 	}
-	else $showfile = $GEDCOMID;
+	else $showfile = GedcomConfig::$GEDCOMID;
 	$showfilter="";
 	if ($filterof!="all") $showfilter = ($filterof=="living"? GM_LANG_living_only : GM_LANG_recent_events);
 	if (!empty($filtersx)){
