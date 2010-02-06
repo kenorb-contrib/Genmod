@@ -101,13 +101,6 @@ function AddDescendancy($pid, $parents=false, $generations=-1) {
 //				else $list[$child->xref]->generation = 2;
 			}
 					
-//				$num = preg_match_all("/1\s*CHIL\s*@(.*)@/", $famrec, $smatch,PREG_SET_ORDER);
-//				for($i=0; $i<$num; $i++) {
-//					FindPersonRecord($smatch[$i][1]);
-//					$list[$smatch[$i][1]] = $indilist[$smatch[$i][1]];
-//					if (isset($list[$smatch[$i][1]]["generation"])) $list[$smatch[$smatch[$i][1]][1]]["generation"] = $list[$pid]["generation"]+1;
-//					else $list[$smatch[$i][1]]["generation"] = 2;
-//				}
 			if($generations == -1 || $list[$pid]->generation+1 < $generations) {
 				foreach($fam->children as $key3 => $child) {
 //					print "call from ".$fam->xref." for ".$child->xref."<br />";

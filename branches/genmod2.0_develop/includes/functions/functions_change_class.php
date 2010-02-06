@@ -244,7 +244,8 @@ abstract class ChangeFunctions {
 							$gedrecord = $gedlines[$gedname][$chgid];
 							if (empty($gedrecord)) {
 								// deleted record
-								$gedrecord = trim(FindGedcomRecord($chgid, $gedname));
+								$object = ConstructObject($chgid, $gidtype, $gedname);
+								$gedrecord = trim($object->gedrec);
 							}
 							//LERMAN
 							$gedrecord = EditFunctions::CheckGedcom($gedrecord, true, $change["user"], $change["time"]);
@@ -480,7 +481,7 @@ abstract class ChangeFunctions {
 		
 		if ($type=="INDI") {
 			// First reset the isdead status for the surrounding records. 
-			ResetIsDeadLinked($gid, "INDI");
+			self::ResetIsDeadLinked($gid, "INDI");
 			$sql = "DELETE FROM ".TBLPREFIX."individuals WHERE i_id='".DbLayer::EscapeQuery($gid)."' AND i_file='".GedcomConfig::$GEDCOMID."'";
 			$res = NewQuery($sql);
 			$sql = "DELETE FROM ".TBLPREFIX."asso WHERE as_of='".DbLayer::EscapeQuery(JoinKey($gid, GedcomConfig::$GEDCOMID))."'";
@@ -502,7 +503,7 @@ abstract class ChangeFunctions {
 		}
 		else if ($type=="FAM") {
 			// First reset the isdead status for the surrounding records. 
-			ResetIsDeadLinked($gid, "FAM");
+			self::ResetIsDeadLinked($gid, "FAM");
 			$sql = "DELETE FROM ".TBLPREFIX."families WHERE f_id='".DbLayer::EscapeQuery($gid)."' AND f_file='".GedcomConfig::$GEDCOMID."'";
 			$res = NewQuery($sql);
 			$sql = "DELETE FROM ".TBLPREFIX."asso WHERE as_of='".DbLayer::EscapeQuery(JoinKey($gid, GedcomConfig::$GEDCOMID))."'";
@@ -698,6 +699,54 @@ abstract class ChangeFunctions {
 		self::$chcache = null;
 		self::$chstatcache = null;
 	}
+	
+	/**
+	 * Reset the Isdead status for those individuals, that could have relied on this record for determining their isdead status.
+	 * For indi's, reset grandparents, parents, partners and children.
+	 * For fams, reset husband and wife.
+	 *
+	 */
+	function ResetIsDeadLinked($pid, $type="INDI") {
+		
+		$resets = array();
+		if ($type == "FAM") {
+			$sql = "SELECT if_pkey FROM ".TBLPREFIX."individual_family WHERE if_role='S' AND if_fkey='".JoinKey($pid, GedcomConfig::$GEDCOMID)."'";
+			$res =  NewQuery($sql);
+			while ($row = $res->FetchAssoc()) {
+				$resets[] = $row["if_pkey"];
+			}
+		}
+		
+		if ($type == "INDI") {
+			$parents = array();
+		
+			// Get the ID's in the surrounding families. Also save the parents ID's for getting the grandparents
+			$sql = "SELECT n.if_pkey, n.if_role, m.if_role FROM ".TBLPREFIX."individual_family as m LEFT JOIN ".TBLPREFIX."individual_family as n ON n.if_fkey=m.if_fkey WHERE m.if_pkey='".DbLayer::EscapeQuery(JoinKey($pid, GedcomConfig::$GEDCOMID))."' AND n.if_pkey<>m.if_pkey";
+			$res = NewQuery($sql);
+			
+			while ($row = $res->FetchRow()) {
+				$resets[] = $row[0];
+				if ($row[1] == "S" && $row[2] == "C") $parents[] = $row[0];
+			}
+			
+			// Get the grandparents
+			if (count($parents) > 0) {
+				$listfams = "'".implode("', '", $parents)."'";
+				$sql = "SELECT n.if_pkey, n.if_role, m.if_role FROM ".TBLPREFIX."individual_family as m LEFT JOIN ".TBLPREFIX."individual_family as n ON n.if_fkey=m.if_fkey WHERE m.if_pkey IN (".$listfams.") AND m.if_role='C' AND n.if_role='S'";
+				$res = NewQuery($sql);
+				while ($row = $res->FetchRow()) {
+					$resets[] = $row[0];
+				}
+			}
+		}
+			
+		// Now reset the isdead status for these individuals
+		if (count($resets) > 0) {
+			$sql = "UPDATE ".TBLPREFIX."individuals SET i_isdead='-1' WHERE i_key IN ('".implode("', '", $resets)."')";
+			$res = NewQuery($sql);
+		}
+	}
+	
 	
 }
 ?>

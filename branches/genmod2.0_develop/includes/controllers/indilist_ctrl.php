@@ -58,7 +58,8 @@ class IndilistController extends ListController {
 	protected function GetPageTitle() {
 
 		if (is_null($this->pagetitle)) {
-			$this->pagetitle = GM_LANG_individual_list." ".$this->addheader;
+			if (stristr(SCRIPT_NAME, "indilist.php")) $this->pagetitle = GM_LANG_individual_list." ".$this->addheader;
+			if (stristr(SCRIPT_NAME, "unlinked.php")) $this->pagetitle = GM_LANG_unlink_list;
 		}
 		return $this->pagetitle;
 	}
@@ -169,15 +170,16 @@ class IndilistController extends ListController {
 			$pass = false;
 			foreach($firstalpha as $index=>$letter) {
 				if ($letter != "@") {
-					if (!isset($fstartalpha) && ($this->falpha == "") || !in_array($this->falpha, $firstalpha)) {
+					if ((!isset($fstartalpha) && $this->falpha == "") || !in_array($this->falpha, $firstalpha)) {
 						$fstartalpha = $letter;
 						$this->falpha = $letter;
 					}
 					if (!$first) print " | ";
 					$first = false;
 					// NOTE: Print the link letter
-					if (strstr($_SERVER["SCRIPT_NAME"],"indilist.php")) print "<a href=\"indilist.php?";
-					if (strstr($_SERVER["SCRIPT_NAME"],"aliveinyear.php")) print "<a href=\"aliveinyear.php?year=$year&amp;";
+					if (stristr(SCRIPT_NAME,"indilist.php")) print "<a href=\"indilist.php?";
+					if (stristr(SCRIPT_NAME,"unlinked.php")) print "<a href=\"unlinked.php?";
+					if (stristr(SCRIPT_NAME,"aliveinyear.php")) print "<a href=\"aliveinyear.php?year=$year&amp;";
 					// NOTE: only include the alpha letter when not showing the ALL list
 					if ($this->show_all == "no") print "alpha=".urlencode($this->alpha)."&amp;";
 					if ($this->surname_sublist == "yes" && !empty($this->surname)) print "surname=".$this->surname."&amp;";
@@ -194,8 +196,9 @@ class IndilistController extends ListController {
 			// NOTE: Print the Unknown text on the letter bar
 			if ($pass == true) {
 				print " | ";
-				if (strstr($_SERVER["SCRIPT_NAME"],"indilist.php")) print "<a href=\"indilist.php?";
-				if (strstr($_SERVER["SCRIPT_NAME"],"aliveinyear.php")) print "<a href=\"aliveinyear.php?year=$year&amp;";
+				if (stristr(SCRIPT_NAME,"indilist.php")) print "<a href=\"indilist.php?";
+				if (stristr(SCRIPT_NAME,"unlinked.php")) print "<a href=\"unlinked.php?";
+				if (stristr(SCRIPT_NAME,"aliveinyear.php")) print "<a href=\"aliveinyear.php?year=$year&amp;";
 				if ($this->surname_sublist == "yes" && !empty($this->surname)) print "surname=".$this->surname."&amp;";
 				print "alpha=".urlencode($this->alpha)."&amp;falpha=@&amp;surname_sublist=".$this->surname_sublist."&amp;show_all=".$this->show_all;
 				if ($this->allgeds == "yes") print "&amp;allgeds=yes";
@@ -205,14 +208,15 @@ class IndilistController extends ListController {
 			}
 			if (GedcomConfig::$LISTS_ALL) {
 				print " | ";
-				if (strstr($_SERVER["SCRIPT_NAME"],"indilist.php")) print "<a href=\"indilist.php?";
-				if (strstr($_SERVER["SCRIPT_NAME"],"aliveinyear.php")) print "<a href=\"aliveinyear.php?year=$year&amp;";
+				if (stristr(SCRIPT_NAME,"indilist.php")) print "<a href=\"indilist.php?";
+				if (stristr(SCRIPT_NAME,"unlinked.php")) print "<a href=\"unlinked.php?";
+				if (stristr(SCRIPT_NAME,"aliveinyear.php")) print "<a href=\"aliveinyear.php?year=$year&amp;";
 				// NOTE: only include the alpha letter when not showing the ALL list
 				if ($this->show_all == "no") print "alpha=".urlencode($this->alpha)."&amp;";
 				// NOTE: Include the surname if surnames are to be listed
 				if ($this->allgeds == "yes") print "&amp;allgeds=yes&amp;";
 				if ($this->surname_sublist == "yes" && !empty($this->surname)) print "surname=".urlencode($this->surname)."&amp;";
-				if ($this->show_all_firstnames == "yes") print "show_all_firstnames=no&amp;show_all=".$this->show_all."&amp;surname_sublist=".$this->surname_sublist."\"><span class=\"warning\">".GM_LANG_all."</span>\n";
+				if ($this->show_all_firstnames == "yes") print "show_all_firstnames=no&amp;show_all=".$this->show_all."&amp;surname_sublist=".$this->surname_sublist."\"><span class=\"warning\">".GM_LANG_all."</span></a>\n";
 				else print "show_all_firstnames=yes&amp;show_all=".$this->show_all."&amp;surname_sublist=".$this->surname_sublist."\">".GM_LANG_all."</a>\n";
 			}
 			print "</div><br />\n";

@@ -47,7 +47,7 @@
 require("config.php");
 $famlist_controller = new FamlistController();
 
-$COMBIKEY = true;
+$trace = false;
 
 PrintHeader($famlist_controller->pagetitle);
 print "<div class =\"center\">";
@@ -131,16 +131,16 @@ if (count($famalpha) > 0) {
 	if (isset($startalpha)) $famlist_controller->alpha = $startalpha;
 }
 print "<br /><br />";
-if ($famlist_controller->surname_sublist=="yes" && $famlist_controller->show_all == "yes") {
+if ($famlist_controller->surname_sublist == "yes" && $famlist_controller->show_all == "yes") {
 	// Get the surnames of all individuals belonging to a family
-	// print "option 1";
+	if ($trace) print "option 1";
 	$namelist = $famlist_controller->GetAlphaFamSurnames($famlist_controller->alpha, $famlist_controller->allgeds);
 	print "<div class=\"topbar\">".GM_LANG_surnames."</div>\n";
 	$famlist_controller->PrintSurnameList($namelist);
 }
 else if ($famlist_controller->surname_sublist == "yes" && $famlist_controller->surname == "" && $famlist_controller->show_all == "no") {
 
-	// print "option 2";
+	if ($trace) print "option 2";
 	// NOTE: Get all of the individuals whose last names start with this letter
 	if ($famlist_controller->alpha != "") {
 		$namelist = $famlist_controller->GetAlphaFamSurnames($famlist_controller->alpha, $famlist_controller->allgeds);
@@ -151,23 +151,27 @@ else if ($famlist_controller->surname_sublist == "yes" && $famlist_controller->s
 }
 else {
 	// NOTE: If the surname is set then only get the names in that surname list
-	if ($famlist_controller->surname != "" && $famlist_controller->surname_sublist=="yes") {
+	if ($famlist_controller->surname != "" && $famlist_controller->surname_sublist == "yes") {
+		if ($trace) print "option 3";
 		$tfamlist = $famlist_controller->GetFams();
 	}
 	// NOTE: Get all individuals for the sublist
 	if ($famlist_controller->surname_sublist == "no" && $famlist_controller->alpha != "" && $famlist_controller->show_all == "no") {
+		if ($trace)  print "option 4 for ".$famlist_controller->alpha;
 		$tfamlist = $famlist_controller->GetFams();
 	}
 	
 	// NOTE: Simplify processing for ALL indilist
 	// NOTE: Skip surname is yes and ALL is chosen
 	if ($famlist_controller->surname_sublist == "no" && $famlist_controller->show_all == "yes") {
+		if ($trace)  print "option 5";
 		$tfamlist = $famlist_controller->GetFams();
 		print "<div class=\"topbar\">".GM_LANG_families."</div>\n";
 		$famlist_controller->PrintFamilyList($tfamlist, true);
 	}
 	else {
 		// NOTE: If user wishes to skip surname do not print the surname
+		if ($trace) print "option 6";
 		print "<div class=\"topbar\">";
 		if ($famlist_controller->surname_sublist == "no") print GM_LANG_surnames;
 		else	print PrintReady(str_replace("#surname#", NameFunctions::CheckNN($surname), GM_LANG_fams_with_surname));

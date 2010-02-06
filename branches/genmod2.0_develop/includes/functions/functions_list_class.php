@@ -39,40 +39,47 @@ abstract class ListFunctions {
 	public static $repo_total = array();
 	public static $repo_hide = array();
 	
-	// $selection is a string with joined keys, quoted and comma separated
+	// $selection is a string with joined keys, quoted and comma separated.
+	// $selection can also be "unlinked": the function will return all unlinked persons
 	// $applypriv true does not add indi's where disp_name is false to the array
 	// $allgeds is either "no", or an array with gedcomid's to search in
 	public function GetIndiList($allgeds="", $selection = "", $applypriv=true) {
 	
 		$indilist = array();
-		$sql = "SELECT i_key, i_gedrec, i_isdead, i_id, i_file, n_name, n_surname, n_nick, n_letter, n_fletter, n_type ";
-		$sql .= "FROM ".TBLPREFIX."individuals, ".TBLPREFIX."names WHERE n_key=i_key ";
-		if ($allgeds == "no") {
-			$sql .= "AND i_file = ".GedcomConfig::$GEDCOMID." ";
-			if (!empty($selection)) $sql .= "AND i_key IN (".$selection.") ";
+		if ($selection == "unlinked") {
+			$sql = "SELECT i_id, i_key, i_gedrec, i_file, i_isdead, n_name, n_letter, n_fletter, n_surname, n_nick, n_type FROM ".TBLPREFIX."individuals LEFT JOIN ".TBLPREFIX."names ON i_key=n_key LEFT JOIN ".TBLPREFIX."individual_family ON i_key=if_pkey WHERE if_pkey IS NULL AND i_file='".GedcomConfig::$GEDCOMID."' ORDER BY i_key, n_id";
 		}
-		else if (is_array($allgeds)) {
-			$sql .= "AND (";
-			$first = true;
-			foreach ($allgeds as $key => $ged) {
-				if (!$first) $sql .= " OR ";
-				$sql .= "i_file='".$ged."'";
-				$first = false;
+		else {	
+			$sql = "SELECT i_key, i_gedrec, i_isdead, i_id, i_file, n_name, n_surname, n_nick, n_letter, n_fletter, n_type ";
+			$sql .= "FROM ".TBLPREFIX."individuals, ".TBLPREFIX."names WHERE n_key=i_key ";
+			if ($allgeds == "no") {
+				$sql .= "AND i_file = ".GedcomConfig::$GEDCOMID." ";
+				if (!empty($selection)) $sql .= "AND i_key IN (".$selection.") ";
 			}
-			$sql .= ")";
+			else if (is_array($allgeds)) {
+				$sql .= "AND (";
+				$first = true;
+				foreach ($allgeds as $key => $ged) {
+					if (!$first) $sql .= " OR ";
+					$sql .= "i_file='".$ged."'";
+					$first = false;
+				}
+				$sql .= ")";
+			}
+			if (!empty($selection)) $sql .= "AND i_key IN (".$selection.") ";
+			$sql .= "ORDER BY i_key, n_id ASC";
 		}
-		if (!empty($selection)) $sql .= "AND i_key IN (".$selection.") ";
-		$sql .= "ORDER BY i_key, n_id ASC";
 
 		$res = NewQuery($sql);
 		$ct = $res->NumRows($res->result);
 		$key = "";
-		while($row = $res->FetchAssoc($res->result)){
+		$person = null;
+		while($row = $res->FetchAssoc()){
 			if ($key != $row["i_key"]) {
 				if ($key != "") $person->names_read = true;
 				$person = null;
 				$key = $row["i_key"];
-				$person =& Person::GetInstance($row["i_id"], $row);
+				$person =& Person::GetInstance($row["i_id"], $row, $row["i_file"]);
 				self::$indi_total[$row["i_key"]] = 1;
 				if (!$applypriv || $person->disp_name) {
 					$indilist[$row["i_key"]] = $person;
@@ -81,7 +88,7 @@ abstract class ListFunctions {
 					self::$indi_hide[$row["i_key"]] = 1;
 				}
 			}
-			if ($person->disp_name || !$applypriv) $indilist[$row["i_key"]]->addname = array($row["n_name"], $row["n_letter"], $row["n_surname"], $row["n_nick"], $row["n_type"], $row["n_fletter"]);
+			if (!$applypriv || $person->disp_name) $indilist[$row["i_key"]]->addname = array($row["n_name"], $row["n_letter"], $row["n_surname"], $row["n_nick"], $row["n_type"], $row["n_fletter"]);
 		}
 		if ($key != "") $person->names_read = true;
 		$res->FreeResult();
@@ -240,7 +247,7 @@ abstract class ListFunctions {
 	// type = all or fam or indi
 	// id   = id of the person who is asso to a family or person (the latter holder of the ASSO tag)
 	// asso = id of the person or family that another person relates to (the former holder of the ASSO tag)
-	public function GetAssoList($type = "all", $id="", $asso="") {
+	public function GetAssoList($type = "all", $id="", $asso="", $applypriv=false) {
 	
 		$type = str2lower($type);
 		$assolist = array();
@@ -280,6 +287,16 @@ abstract class ListFunctions {
 			array_flip(array_flip($famsel));
 			$famselect = "'".implode ("','", $famsel)."'";
 			ListFunctions::GetFamList("", $famselect, false);
+		}
+		if ($applypriv) {
+			foreach ($assolist as $key => $assos) {
+				foreach($assos as $key2 => $asso) {
+					if (!$asso->disp) {
+						unset($assolist[$key][$key2]);
+						if (count($assolist[$key]) == 0) unset($assolist[$key]);
+					}
+				}
+			}
 		}
 		return $assolist;
 	}

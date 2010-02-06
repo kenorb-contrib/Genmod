@@ -50,9 +50,6 @@ class DescendancyController extends ChartController {
 		if ($this->num_generations < 2) {
 			$this->num_generations = 2;
 		}
-		
-		if (isset($_REQUEST["rootid"])) $this->xref = $_REQUEST["rootid"];
-		$this->xref = ChartFunctions::CheckRootId(CleanInput($this->xref));
 	}
 
 	public function __get($property) {

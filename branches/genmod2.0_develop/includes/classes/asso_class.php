@@ -141,6 +141,8 @@ class Asso {
 	private function CanDisplay() {
 		
 		if (is_null($this->disp)) {
+			// The associated must be visible WITH his details, as ASSO is fact related!
+			// The asso can just have his name displayed
 			if (!$this->GetAssociated()->disp) $this->disp = false;
 			else if (!$this->GetAssoPerson()->disp_name) $this->disp = false;
 			if (is_null($this->disp)) {

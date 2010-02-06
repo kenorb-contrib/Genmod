@@ -263,7 +263,7 @@ require_once("fonts/".$ff[0].".php");
 $wmax = floor($maxpix/$fontsize);				
 				
 				$altname = $name; // Full name for alt
-				$name = AbbreviateName($name, $wmax);
+				$name = NameFunctions::AbbreviateName($name, $wmax);
 print " ".strlen($altname)." ".$wmax." ".$name." ";
 				$text = ltr_string($name) . "\r\n" . ltr_string($addname). "\r\n";
 				if (PrivacyFunctions::displayDetailsByID($pid)) {

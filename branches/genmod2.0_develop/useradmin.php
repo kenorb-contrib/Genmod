@@ -1644,10 +1644,10 @@ if (($action == "listusers") || ($action == "edituser2") || ($action == "deleteu
 			else unset($users[$username]);
 		}
 		else if ($filter == "privoverride") {
-			if ((!isset($user->relationship_privacy[$gedid]) || empty($user->relationship_privacy[$gedid])) &&
-			(!isset($user->hide_live_people[$gedid]) || empty($user->hide_live_people[$gedid])) &&
-			(!isset($user->check_marriage_relations[$gedid]) || empty($user->check_marriage_relations[$gedid])) &&
-			(!isset($user->show_living_names[$gedid]) || empty($user->show_living_names[$gedid]))) unset($users[$username]);
+			if ((!isset($user->relationship_privacy[$gedid]) || $user->relationship_privacy[$gedid] == "") &&
+			(!isset($user->hide_live_people[$gedid]) || $user->hide_live_people[$gedid] == "") &&
+			(!isset($user->check_marriage_relations[$gedid]) || $user->check_marriage_relations[$gedid] == "") &&
+			(!isset($user->show_living_names[$gedid]) || $user->show_living_names[$gedid] == "")) unset($users[$username]);
 		}
 	}
 	// If a name filter is entered, check for existence of the string in the user fullname

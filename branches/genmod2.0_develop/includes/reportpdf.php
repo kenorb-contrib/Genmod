@@ -1647,12 +1647,10 @@ function GMRGetPersonNameSHandler($attrs) {
 		} 
 		else {
 			$name = $object->name;
-			//LERMAN-- added individuals in pending list does not have Gedcom record yet
-//			if ($name == GM_LANG_PN." ".GM_LANG_NN) $name = trim(GetPersonName($id,$gedrec));
 			// This is a workaround to display the PinYin name instead of the name in Chinese characters, as Chinese characters are not printed properly.
 			if (HasChinese($name, true)) $name = $object->addname;
 			if (!empty($attrs["truncate"])) {
-					$name = AbbreviateName($name, $attrs["truncate"]);
+					$name = NameFunctions::AbbreviateName($name, $attrs["truncate"]);
 			}
 		}
 		$currentElement->addText(trim($name));
@@ -2862,6 +2860,7 @@ function GMRRelativesSHandler($attrs) {
 			case "descendants":
 				$list[$id]->generation = 1;
 				AddDescendancy($id,false,$maxgen);
+//				print_r($list);
 				break;
 			case "all":
 				AddAncestors($id,true,$maxgen,$showempty);
@@ -2881,7 +2880,7 @@ function GMRRelativesSHandler($attrs) {
 		        foreach ($list as $key => $object) {
 			    	$generation = $object->generation;
 			        if ($generation == $genCounter) {
-						$newarray[$key]["generation"] = $generation;
+						$newarray[$key] = $object;
 					}
 				}
 				$genCounter++;

@@ -67,8 +67,8 @@ class TimelineController extends BaseController {
 		}
 		// NOTE: pids array
 		$i = 0;
-		while(isset($_REQUEST["pids".$i])) {
-			$this->pids[] = $_REQUEST["pids".$i];
+		while(isset($_REQUEST["pids"][$i])) {
+			$this->pids[] = $_REQUEST["pids"][$i];
 			$i++;
 		}
 		if (!empty($newpid)) $this->pids[] = $newpid;
@@ -135,7 +135,7 @@ class TimelineController extends BaseController {
 			if ($this->scale<6) $this->scale = 6;
 		}
 		else $this->scale = $_REQUEST['scale'];
-		if ($this->scale<2) $this->scale=2;
+		if ($this->scale < 2) $this->scale = 2;
 		
 		$this->baseyear -= 5;
 		$this->topyear += 5;
@@ -167,12 +167,12 @@ class TimelineController extends BaseController {
 			if (!$this->people[$i]->disp) {
 				if ($this->people[$i]->disp_name) {
 					print "&nbsp;<a href=\"individual.php?pid=".$this->people[$i]->xref."\">".PrintReady($this->people[$i]->name)."</a>";
-					PrintFunctions::PrintPrivacyError(GedcomConfig::$CONTACT_EMAIL);
+					PrintPrivacyError(GedcomConfig::$CONTACT_EMAIL);
 					print "<br />";
 					$printed = true;
 				}
 				else if (!$printed) {
-					PrintFunctions::PrintPrivacyError(GedcomConfig::$CONTACT_EMAIL);
+					PrintPrivacyError(GedcomConfig::$CONTACT_EMAIL);
 					print "<br />";
 				}
 			}
@@ -197,7 +197,7 @@ class TimelineController extends BaseController {
 	
 		$month = $date[0]["mon"];
 		$day = $date[0]["day"];
-		$xoffset = $basexoffset+20;
+		$xoffset = $basexoffset+22;
 		$yoffset = $baseyoffset+(($year-$this->baseyear) * $this->scale)-($this->scale);
 		$yoffset = $yoffset + (($month / 12) * $this->scale);
 		$yoffset = $yoffset + (($day / 30) * ($this->scale/12));
@@ -224,7 +224,7 @@ class TimelineController extends BaseController {
 		if (($date[0]["year"]!=0)&&(stristr($date[0]["ext"], "hebrew")===false)) {
 			$thisperson =& $factobj->owner;
 			print "\n\t\t<div id=\"fact$factcount\" style=\"position:absolute; ".($TEXT_DIRECTION =="ltr"?"left: ".($xoffset):"right: ".($xoffset))."px; top:".($yoffset)."px; font-size: 8pt; height: ".($this->bheight)."px; \" onmousedown=\"factMD(this, '".$factcount."', ".($yoffset-$tyoffset).");\">\n";
-			print "<table cellspacing=\"0\" cellpadding=\"0\" border=\"0\" style=\"cursor: hand;\"><tr><td>\n";
+			print "<table cellspacing=\"0\" cellpadding=\"0\" border=\"0\" style=\"cursor: hand;\"><tr><td style=\"vertical-align: middle;\">\n";
 			print "<img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["hline"]["other"]."\" name=\"boxline$factcount\" id=\"boxline$factcount\" height=\"3\" align=\"left\" hspace=\"0\" width=\"10\" vspace=\"0\" alt=\"\" />\n";
 			$col = $factitem["p"] % 6;
 			print "</td><td valign=\"top\" class=\"person".$col."\">\n";
@@ -275,8 +275,8 @@ class TimelineController extends BaseController {
 					$ypos = "0%";
 				}
 			}
-			//-- print the diagnal line
-			print "\n\t\t<div id=\"dbox$factcount\" style=\"position:absolute; ".($TEXT_DIRECTION =="ltr"?"left: ".($basexoffset+20):"right: ".($basexoffset+20))."px; top:".($dyoffset)."px; font-size: 8pt; height: ".(abs($tyoffset))."px; width: ".(abs($tyoffset))."px;";
+			//-- print the diagonal line
+			print "\n\t\t<div id=\"dbox$factcount\" style=\"position:absolute; ".($TEXT_DIRECTION =="ltr"?"left: ".($basexoffset+22):"right: ".($basexoffset+22))."px; top:".($dyoffset)."px; font-size: 8pt; height: ".(abs($tyoffset))."px; width: ".(abs($tyoffset))."px;";
 			print " background-image: url('".GM_IMAGE_DIR."/".$GM_IMAGES[$img]["other"]."');";
 			print " background-position: 0% $ypos; \" >\n";
 			print "</div>\n";

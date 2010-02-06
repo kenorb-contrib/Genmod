@@ -41,7 +41,7 @@ if ((!$gm_user->userCanViewGedlines()) && (!$gm_user->UserCanAccept())) {
 }
 $object =& ConstructObject($pid, $type);
 if (!$object->isempty && !$object->disp) {
-	PrintFunctions::PrintPrivacyError(GedcomConfig::$CONTACT_EMAIL);
+	PrintPrivacyError(GedcomConfig::$CONTACT_EMAIL);
 	print "</body></html>";
 	exit;
 }

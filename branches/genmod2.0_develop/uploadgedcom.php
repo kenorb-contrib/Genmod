@@ -297,12 +297,6 @@ if ($step >= 3) {
 					//month first
 					ImportFunctions::DateCleanup($_POST["datetype"]);
 				}
-				/**
-				if($_POST["xreftype"]!="NA") {
-					$filechanged=true;
-					ImportFunctions::XrefChange($_POST["xreftype"]);
-				}
-				**/
 				if (isset($_POST["utf8convert"])=="yes") {
 					$filechanged=true;
 					ImportFunctions::ConvertAnsiUtf8();

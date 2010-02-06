@@ -200,6 +200,8 @@ class User {
 			if (!isset($this->gedcomadmin[$ged])) $this->gedcomadmin[$ged] = false;
 			if (!isset($this->privgroup[$ged])) $this->privgroup[$ged] = "access";
 			if (!isset($this->relationship_privacy[$ged])) $this->relationship_privacy[$ged] = "";
+			// Gedcom admins and admins are excluded from relationship privacy
+			if ($this->UserGedcomAdmin($ged)) $this->relationship_privacy[$ged] = "N";
 			if (!isset($this->max_relation_path[$ged])) $this->max_relation_path[$ged] = $MAX_RELATION_PATH_LENGTH;
 			if (!isset($this->check_marriage_relations[$ged])) $this->check_marriage_relations[$ged] = "";
 			if (!isset($this->hide_live_people[$ged])) $this->hide_live_people[$ged] = "";

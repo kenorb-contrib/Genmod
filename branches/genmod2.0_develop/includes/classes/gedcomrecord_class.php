@@ -733,7 +733,7 @@ abstract class GedcomRecord {
 					}
 						
 					// If it's the user himself, we can show him
-					if ($gm_user->gedcomid[$GEDCOMID]==$this->xref) {
+					if ($gm_user->gedcomid[$GEDCOMID] == $this->xref) {
 						SwitchGedcom($oldgedid);
 						return true;
 					}

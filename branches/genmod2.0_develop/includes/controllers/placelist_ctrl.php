@@ -166,13 +166,14 @@ class PlaceListController extends ListController {
 	 * @return array
 	 */
 	public function GetPlacePositions($parent, $level, $factsel) {
-		
+
 		$positions = array();
 		$indisel = array();
 		$famsel = array();
 		$soursel = array();
 		
 		$p_id = $this->GetPlaceParentId($parent, $level);
+
 		$sql = "SELECT DISTINCT pl_gid, pl_type FROM ".TBLPREFIX."placelinks WHERE pl_p_id='".$p_id."' AND pl_file='".GedcomConfig::$GEDCOMID."'";
 		$res = NewQuery($sql);
 		while ($row = $res->fetchAssoc()) {
@@ -187,7 +188,7 @@ class PlaceListController extends ListController {
 			$indilist =& ListFunctions::GetIndiList("no", $select, false);
 			uasort($indilist, "ItemObjSort");
 			foreach($indilist as $key => $indi) {
-				if ($factsel != "all") {
+				if ($factsel != "ALL") {
 					$add = false;
 					$facts =& $indi->SelectFacts(array($factsel));
 					foreach($facts as $key => $fact) {

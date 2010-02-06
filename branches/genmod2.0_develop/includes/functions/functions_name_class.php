@@ -72,9 +72,10 @@ abstract class NameFunctions {
 		$phnamearray = array();
 		$pwnamearray = array();
 		$names = array();
-		// print "letter: ".$letter." fletter ".$fletter."<br />";
+		//print "letter: ".$letter." fletter ".$fletter."<br />";
 		if (is_object($family->husb)) {
 			foreach($family->husb->name_array as $key => $name) {
+				// print $letter."-".$name[1]."==".$fletter."-".$name[5]."<br />";
 				if (($letter == "" || $letter == $name[1]) && ($fletter == "" || $fletter == $name[5])) {
 					if ($NAME_REVERSE) $phnamearray[] = self::SortableNameFromName(self::ReverseName($name[0]), $rev);
 					else $phnamearray[] = self::SortableNameFromName($name[0], $rev);
@@ -225,9 +226,6 @@ abstract class NameFunctions {
 				else $name = trim($names[0])." ,".trim($names[1]);
 			}
 		}
-	
-	//	else $name = GetSortableName($pid, "", "", false, $rev, $changes);
-	
 		return $name;
 	}
 	/**
@@ -412,7 +410,7 @@ abstract class NameFunctions {
 			while(!empty($namerec)) {
 				$name = self::GetNameInRecord($namerec, $import);
 				$nick = GetGedcomValue("NAME:NICK", 1, $namerec);
-				$surname = ExtractSurname($name);
+				$surname = self::ExtractSurname($name);
 				if (empty($surname)) $surname = "@N.N.";
 				$lname = preg_replace("/^[a-z0-9 \.]+/", "", $surname);
 				if (empty($lname)) $lname = $surname;
@@ -427,9 +425,9 @@ abstract class NameFunctions {
 				else $names[] = array($name, $letter, $surname, $nick, "A", $fletter);
 	
 				//-- check for _HEB or ROMN name sub tags
-				$addname = GetAddPersonNameInRecord($namerec, true, $import);
+				$addname = self::GetAddPersonNameInRecord($namerec, true, $import);
 				if (!empty($addname)) {
-					$surname = ExtractSurname($addname);
+					$surname = self::ExtractSurname($addname);
 					if (empty($surname)) $surname = "@N.N.";
 					$lname = preg_replace("/^[a-z0-9 \.]+/", "", $surname);
 					if (empty($lname)) $lname = $surname;
@@ -447,7 +445,7 @@ abstract class NameFunctions {
 					$ct = preg_match_all("/\d _MARNM (.*)/", $namerec, $match, PREG_SET_ORDER);
 					for($i=0; $i<$ct; $i++) {
 						$marriedname = trim($match[$i][1]);
-						$surname = ExtractSurname($marriedname);
+						$surname = self::ExtractSurname($marriedname);
 						if (empty($surname)) $surname = "@N.N.";
 						$lname = preg_replace("/^[a-z0-9 \.]+/", "", $surname);
 						if (empty($lname)) $lname = $surname;
@@ -465,7 +463,7 @@ abstract class NameFunctions {
 				$ct = preg_match_all("/\d _AKA (.*)/", $namerec, $match, PREG_SET_ORDER);
 				for($i=0; $i<$ct; $i++) {
 					$akaname = trim($match[$i][1]);
-					$surname = ExtractSurname($akaname, false);
+					$surname = self::ExtractSurname($akaname, false);
 					if (empty($surname)) $surname = "@N.N.";
 					$lname = preg_replace("/^[a-z0-9 \.]+/", "", $surname);
 					if (empty($lname)) $lname = $surname;
@@ -557,5 +555,112 @@ abstract class NameFunctions {
 	
 		return $fullname;
 	}
+	
+	public function AbbreviateName($name, $length) {
+		
+		// For now, we can only abbreviate 1 byte character strings
+		if (!utf8_isASCII($name)) return $name;
+		
+		$prevabbrev = false;
+		$words = preg_split("/ /", $name);
+		$name = $words[count($words)-1];
+		for($i=count($words)-2; $i>=0; $i--) {
+			$len = strlen($name);
+			for($j=$i; $j>=0; $j--) {
+				// Added: count the space
+				$len += strlen($words[$j]) + 1;
+			}
+			if ($len>$length) {
+				// Added: only convert upper case first letter nameparts to first letters. This prevents a surname as "de Haan" to convert to "D. Haan"
+				if (str2lower($words[$i]) == $words[$i]) {
+					$name = $words[$i]." ".$name;
+				}
+				else {
+					if ($prevabbrev) $name = GetFirstLetter($words[$i]).".".$name;
+					else {
+						$name = GetFirstLetter($words[$i]).". ".$name;
+						$prevabbrev = true;
+					}
+				}
+			}
+			else $name = $words[$i]." ".$name;
+		}
+		return $name;
+	}
+	
+	public function GetAddPersonNameInRecord($name_record, $keep_slash=false, $import=false) {
+		global $NAME_REVERSE;
+	
+		// Check for ROMN name
+		$romn = preg_match("/(2 ROMN (.*)|2 _HEB (.*))/", $name_record, $romn_match);
+		if ($romn > 0){
+			if ($keep_slash) return trim($romn_match[count($romn_match)-1]);
+			$names = preg_split("/\//", $romn_match[count($romn_match)-1]);
+			if (count($names)>1) {
+				if ($NAME_REVERSE) {
+					$name = trim($names[1])." ".trim($names[0]);
+				}
+				else {
+					$name = trim($names[0])." ".trim($names[1]);
+				}
+			}
+		    else $name = trim($names[0]);
+		}
+		// If not found, and chinese, generate the PinYin equivalent of the name
+		else {
+			$orgname = self::GetNameInRecord($name_record, $import);
+			if (HasChinese($orgname, $import)){
+				$name = GetPinYin($orgname, $import);
+				if ($keep_slash) return trim($name);
+				$names = preg_split("/\//", $name);
+				if (count($names)>1) {
+					if ($NAME_REVERSE) {
+						$name = trim($names[1])." ".trim($names[0]);
+					}
+					else {
+						$name = trim($names[0])." ".trim($names[1]);
+					}
+				}
+			    else $name = trim($names[0]);
+			}
+			else $name = "";
+		}
+		if ($NAME_REVERSE) $name = self::ReverseName($name);
+		return $name;
+	}
+	
+	/**
+	 * Extract the surname from a name
+	 *
+	 * This function will extract the surname from an individual name in the form
+	 * Surname, Given Name
+	 * All surnames are stored in the global $surnames array
+	 * It will only get the surnames that start with the letter $alpha
+	 * For names like van den Burg, it will only return the "Burg"
+	 * It will work if the surname is all lowercase
+	 * @param string $indiname	the name to extract the surname from
+	 */
+	public function ExtractSurname($indiname) {
+		global $surnames, $alpha, $surname, $show_all, $i, $testname;
+	
+		if (!isset($testname)) $testname="";
+	
+		$nsurname = "";
+		//-- get surname from a standard name
+		if (preg_match("~/([^/]*)/~", $indiname, $match)>0) {
+			$nsurname = trim($match[1]);
+		}
+		//-- get surname from a sortable name
+		else {
+			$names = preg_split("/,/", $indiname);
+			if (count($names)==1) $nsurname = "@N.N.";
+			else $nsurname = trim($names[0]);
+			$nsurname = preg_replace(array("/ [jJsS][rR]\.?/", "/ I+/"), array("",""), $nsurname);
+			
+		}
+		return $nsurname;
+	}
+	
+	
 }
 ?>

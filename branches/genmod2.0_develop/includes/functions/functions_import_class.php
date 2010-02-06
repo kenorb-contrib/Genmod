@@ -276,42 +276,6 @@ abstract class ImportFunctions {
 		return true;
 	}
 	
-	/**
-	 * convert XREFs to the value of another tag in the gedcom record
-	 *
-	 * Some genealogy applications do not maintain the gedcom XREF IDs between gedcom exports
-	 * but instead use another Identifying tag in the Gedcom record.  This function will allow
-	 * the admin to replace the XREF IDs with the value of another tag.  So for example you could replace
-	 * the 0 @I1@ INDI with the value of the RIN tag R101 making the line look like this 0 @R101@ INDI
-	 * @param String $tag	the alternate tag in the gedcom record to use when replacing the xref id, defaults to RIN
-	 */
-	public function XrefChange($tag="RIN") {
-		global $fcontents;
-		
-		//-- find all of the XREFS in the file
-		$ct = preg_match_all("/0 @(.*)@ INDI/", $fcontents, $match, PREG_SET_ORDER);
-		for($i=0; $i<$ct; $i++) {
-			$xref = trim($match[$i][1]);
-			$indirec = FindGedcomRecord($xref);
-			if ($indirec!==false) {
-				$rt = preg_match("/1 NAME (.*)/", $indirec, $rmatch);
-				if($rt>0) {
-					$name = trim($rmatch[1])." (".$xref.")";
-					$name = preg_replace("/\//","",$name);
-				}
-				else $name = $xref;
-		//  	print "Found record $i - $name: ";
-	  			$rt = preg_match("/1 $tag (.*)/", $indirec, $rmatch);
-	  			if ($rt>0) {
-	  				$rin = trim($rmatch[1]);
-	  				$fcontents = preg_replace("/@$xref@/", "@$rin@", $fcontents);
-	//  			print "successfully set to $rin<br />\n";
-	  			}
-	  			else print "<span class=\"error\">No $tag found in record<br /></span>\n";
-	  		}
-		}
-		return true;
-	}
 	
 	/**
 	 * Check for ANSI encoded file
