@@ -652,48 +652,6 @@ function PrintContactLinks($style=0) {
 	}
 }
 
-/**
- * print a simple form of the fact
- *
- * function to print the details of a fact in a simple format
- * @param string $indirec the gedcom record to get the fact from
- * @param string $fact the fact to print
- * @param string $pid the id of the individual to print, required to check privacy
- */
-function print_simple_fact($indirec, $fact, $pid) {
-	
-	$emptyfacts = array("BIRT","CHR","DEAT","BURI","CREM","ADOP","BAPM","BARM","BASM","BLES","CHRA","CONF","FCOM","ORDN","NATU","EMIG","IMMI","CENS","PROB","WILL","GRAD","RETI","BAPL","CONL","ENDL","SLGC","EVEN","MARR","SLGS","MARL","ANUL","CENS","DIV","DIVF","ENGA","MARB","MARC","MARS","OBJE","CHAN","_SEPR","RESI", "DATA", "MAP");
-	$factrec = GetSubRecord(1, "1 $fact", $indirec);
-	if ((empty($factrec))||(PrivacyFunctions::FactViewRestricted($pid, $factrec))) return;
-	$label = "";
-	if (defined("GM_LANG_".$fact)) $label = constant("GM_LANG_".$fact);
-	else if (defined("GM_FACT_".$fact)) $label = constant("GM_FACT_".$fact);
-	if (GedcomConfig::$ABBREVIATE_CHART_LABELS) $label = GetFirstLetter($label);
-	// RFE [ 1229233 ] "DEAT" vs "DEAT Y"
-	// The check $factrec != "1 DEAT" will not show any records that only have 1 DEAT in them
-	if (trim($factrec) != "1 DEAT"){
-	   print "<span class=\"details_label\">".$label."</span> ";
-	}
-	if (PrivacyFunctions::showFactDetails($fact, $pid)) {
-		if (!in_array($fact, $emptyfacts)) {
-			$ct = preg_match("/1 $fact(.*)/", $factrec, $match);
-			if ($ct>0) print PrintReady(trim($match[1]));
-		}
-		// 1 DEAT Y with no DATE => print YES
-		// 1 DEAT N is not allowed
-		// It is not proper GEDCOM form to use a N(o) value with an event tag to infer that it did not happen.
-		/*-- handled by print_fact_date()
-		 * if (GetSubRecord(2, "2 DATE", $factrec)=="") {
-			if (strtoupper(trim(substr($factrec,6,2)))=="Y") print GM_LANG_yes;
-		}*/
-		print_fact_date($factrec, false, false, $fact, $pid, $indirec);
-		print_fact_place($factrec);
-	}
-	else print GM_LANG_private;
-	print "<br />\n";
-}
-
-
 /* Function to print popup help boxes
  * @param string $help		The variable that needs to be processed.
  * @param int $helpText		The text to be printed if the theme does not use images for help links
@@ -1102,287 +1060,6 @@ function PrintReady($text, $InHeaders=false) {
 }
 
 /**
- * Print age of parents
- *
- * @param string $pid	child ID
- * @param string $bdate	child birthdate
- */
-function print_parents_age($pid, $bdate) {
-	global $GM_IMAGES;
-	
-	if (GedcomConfig::$SHOW_PARENTS_AGE) {
-		$famids = FindFamilyIds($pid);
-		// dont show age of parents if more than one family (ADOPtion)
-		if (count($famids)==1) {
-			$father_text = "";
-			$mother_text = "";
-			$parents = FindParents($famids[0]["famid"]);
-			// father
-			$spouse = $parents["HUSB"];
-			if ($spouse && PrivacyFunctions::showFact("BIRT", $spouse)) {
-				$age = ConvertNumber(GetAge(FindPersonRecord($spouse), $bdate, false));
-				if (10<$age && $age<80) $father_text = "<img src=\"".GM_IMAGE_DIR."/" . $GM_IMAGES["sex"]["small"] . "\" title=\"" . GM_LANG_father . "\" alt=\"" . GM_LANG_father . "\" class=\"sex_image\" />$age";
-			}
-			// mother
-			$spouse = $parents["WIFE"];
-			if ($spouse && PrivacyFunctions::showFact("BIRT", $spouse)) {
-				$age = ConvertNumber(GetAge(FindPersonRecord($spouse), $bdate, false));
-				if (10<$age && $age<80) $mother_text = "<img src=\"".GM_IMAGE_DIR."/" . $GM_IMAGES["sexf"]["small"] . "\" title=\"" . GM_LANG_mother . "\" alt=\"" . GM_LANG_mother . "\" class=\"sex_image\" />$age";
-			}
-			if ((!empty($father_text)) || (!empty($mother_text))) print "<span class=\"age\">".$father_text.$mother_text."</span>";
-		}
-	}
-}
-/**
- * print fact DATE TIME
- *
- * @param string $factrec	gedcom fact record
- * @param boolean $anchor	option to print a link to calendar
- * @param boolean $time		option to print TIME value
- * @param string $fact		optional fact name (to print age)
- * @param string $pid		optional person ID (to print age)
- * @param string $indirec	optional individual record (to print age)
- */
-function print_fact_date($factrec, $anchor=false, $time=false, $fact=false, $pid=false, $indirec=false, $prt=true) {
-
-	$prtstr = "";
-	$ct = preg_match("/2 DATE (.+)/", $factrec, $match);
-	if ($ct>0) {
-		$prtstr .= " ";
-		// link to calendar ==> $anchor is never set to true
-		if ($anchor) $prtstr .= GetDateUrl($match[1]);
-		// simple date
-		else $prtstr .= GetChangedDate(trim($match[1]));
-		// time
-		if ($time) {
-			$timerec = GetSubRecord(2, "2 TIME", $factrec);
-			if (empty($timerec)) $timerec = GetSubRecord(2, "2 DATE", $factrec);
-			$tt = preg_match("/[2-3] TIME (.*)/", $timerec, $tmatch);
-			if ($tt>0) $prtstr .= " - <span class=\"date\">".$tmatch[1]."</span>";
-		}
-		if ($fact and $pid) {
-			// age of parents at child birth
-			if ($fact=="BIRT") print_parents_age($pid, $match[1]);
-			// age at event
-			else if ($fact!="CHAN") {
-				if (!$indirec) $indirec=FindPersonRecord($pid);
-				// do not print age after death
-				$deatrec=GetSubRecord(1, "1 DEAT", $indirec);
-				if ((CompareFacts($factrec, $deatrec)!=1)||(strstr($factrec, "1 DEAT"))) $prtstr .= GetAge($indirec,$match[1]);
-			}
-		}
-		$prtstr .= " ";
-	}
-	else {
-		// 1 DEAT Y with no DATE => print YES
-		// 1 DEAT N is not allowed
-		// It is not proper GEDCOM form to use a N(o) value with an event tag to infer that it did not happen.
-		if (preg_match("/^1\s(BIRT|DEAT|MARR|DIV|CHR|CREM|BURI)\sY/", $factrec) && !preg_match("/\n2\s(DATE|PLAC)/", $factrec)) $prtstr .= GM_LANG_yes."&nbsp;";
-	}
-	// gedcom indi age
-	$ages=array();
-	$agerec = GetSubRecord(2, "2 AGE", $factrec);
-	$daterec = GetSubRecord(2, "2 DATE", $factrec);
-	if (empty($agerec)) $agerec = GetSubRecord(3, "3 AGE", $daterec);
-	$ages[0] = $agerec;
-	// gedcom husband age
-	$husbrec = GetSubRecord(2, "2 HUSB", $factrec);
-	if (!empty($husbrec)) $agerec = GetSubRecord(3, "3 AGE", $husbrec);
-	else $agerec = "";
-	$ages[1] = $agerec;
-	// gedcom wife age
-	$wiferec = GetSubRecord(2, "2 WIFE", $factrec);
-	if (!empty($wiferec)) $agerec = GetSubRecord(3, "3 AGE", $wiferec);
-	else $agerec = "";
-	$ages[2] = $agerec;
-	// print gedcom ages
-	foreach ($ages as $indexval=>$agerec) {
-		if (!empty($agerec)) {
-			$prtstr .= "<span class=\"label\">";
-			if ($indexval==1) $prtstr .= GM_LANG_husband;
-			else if ($indexval==2) $prtstr .= GM_LANG_wife;
-			else $prtstr .= GM_FACT_AGE;
-			$prtstr .= "</span>: ";
-			$age = GetAgeAtEvent(substr($agerec,5));
-			$prtstr .= PrintReady($age);
-			$prtstr .= " ";
-		}
-	}
-	if ($prt) {
-		print $prtstr;
-		if (!empty($prtstr)) return true;
-		else return false;
-	}
-	else return $prtstr;
-}
-/**
- * print fact PLACe TEMPle STATus
- *
- * @param string $factrec	gedcom fact record
- * @param boolean $anchor	option to print a link to placelist
- * @param boolean $sub		option to print place subrecords
- * @param boolean $lds		option to print LDS TEMPle and STATus
- */
-function print_fact_place($factrec, $anchor=false, $sub=false, $lds=false, $prt=true) {
-	global $TEMPLE_CODES;
-
-	$printed = false;
-	$out = false;
-	$prtstr = "";
-	$ct = preg_match("/2 PLAC (.*)/", $factrec, $match);
-	if ($ct>0) {
-		$printed = true;
-		$prtstr .= "&nbsp;";
-		// Split on chinese comma 239 188 140
-		$match[1] = preg_replace("/".chr(239).chr(188).chr(140)."/", ",", $match[1]);
-		$levels = preg_split("/,/", $match[1]);
-		if ($anchor) {
-			$place = trim($match[1]);
-			$place = preg_replace("/\,(\w+)/",", $1", $place);
-			// reverse the array so that we get the top level first
-			$levels = array_reverse($levels);
-			$prtstr .= "<a href=\"placelist.php?action=show&amp;";
-			foreach($levels as $pindex=>$ppart) {
-				 // routine for replacing ampersands
-				 $ppart = preg_replace("/amp\%3B/", "", trim($ppart));
-//				 print "parent[$pindex]=".htmlentities($ppart)."&amp;";
-				 $prtstr .= "parent[$pindex]=".urlencode($ppart)."&amp;";			}
-			$prtstr .= "level=".count($levels);
-			$prtstr .= "\"> ";
-			if (HasChinese($place)) $prtstr .= PrintReady($place."&nbsp;(".GetPinYin($place).")");
-			else $prtstr .= PrintReady($place);
-			$prtstr .= "</a>";
-		}
-		else {
-			$prtstr .= " -- ";
-			for ($level=0; $level < GedcomConfig::$SHOW_PEDIGREE_PLACES; $level++) {
-				if (!empty($levels[$level])) {
-					if ($level>0) $prtstr .= ", ";
-					$prtstr .= PrintReady($levels[$level]);
-				}
-			}
-			if (HasChinese($match[1])) {
-				$ptext = "(";
-				for ($level=0; $level < GedcomConfig::$SHOW_PEDIGREE_PLACES; $level++) {
-					if (!empty($levels[$level])) {
-						if ($level>0) $ptext .= ", ";
-						$ptext .= GetPinYin($levels[$level]);
-					}
-				}
-				$ptext .= ")";
-				$prtstr .= " ".PrintReady($ptext);
-			}
-		}
-	}
-	$ctn=0;
-	if ($sub) {
-		$placerec = GetSubRecord(2, "2 PLAC", $factrec);
-		if (!empty($placerec)) {
-			$rorec = GetSubRecord(3, "3 ROMN", $placerec);
-			if (!empty($rorec)) {
-				$roplac = GetGedcomValue("ROMN", 3, $rorec);
-				if (!empty($roplac)) {
-					if ($ct>0) $prtstr .= " - ";
-					$prtstr .= " ".PrintReady($roplac);
-					$rotype = GetGedcomValue("TYPE", 4, $rorec);
-					if (!empty($rotype)) {
-						$prtstr .= " ".PrintReady("(".$rotype.")");
-					}
-				}
-			}
-			$cts = preg_match("/\d _HEB (.*)/", $placerec, $match);
-			if ($cts>0) {
-				if ($ct>0) $prtstr .= " - ";
-				$prtstr .= " ".PrintReady($match[1]);
-			}
-			$map_lati="";
-			$cts = preg_match("/\d LATI (.*)/", $placerec, $match);
-			if ($cts>0) {
-				$map_lati = trim($match[1]);
-				$prtstr .= "<br />".GM_FACT_LATI.": ".$match[1];
-			}
-			$map_long="";
-			$cts = preg_match("/\d LONG (.*)/", $placerec, $match);
-			if ($cts>0) {
-				$map_long = trim($match[1]);
-				$prtstr .= " ".GM_FACT_LONG.": ".$match[1];
-			}
-			if (!empty($map_lati) and !empty($map_long)) {
-				$prtstr .= " <a target=\"_BLANK\" href=\"http://www.mapquest.com/maps/map.adp?searchtype=address&formtype=latlong&latlongtype=decimal&latitude=".$map_lati."&longitude=".$map_long."\"><img src=\"images/mapq.gif\" border=\"0\" alt=\"Mapquest &copy;\" title=\"Mapquest &copy;\" /></a>";
-				if (is_numeric($map_lati) && is_numeric($map_long)) {
-					$prtstr .= " <a target=\"_BLANK\" href=\"http://maps.google.com/maps?spn=.2,.2&ll=".$map_lati.",".$map_long."\"><img src=\"images/bubble.gif\" border=\"0\" alt=\"Google Maps &copy;\" title=\"Google Maps &copy;\" /></a>";
-				}
-				else $prtstr .= " <a target=\"_BLANK\" href=\"http://maps.google.com/maps?q=".$map_lati.",".$map_long."\"><img src=\"images/bubble.gif\" border=\"0\" alt=\"Google Maps &copy;\" title=\"Google Maps &copy;\" /></a>";
-				$prtstr .= " <a target=\"_BLANK\" href=\"http://www.multimap.com/map/browse.cgi?lat=".$map_lati."&lon=".$map_long."&scale=icon=x\"><img src=\"images/multim.gif\" border=\"0\" alt=\"Multimap &copy;\" title=\"Multimap &copy;\" /></a>";
-				$prtstr .= " <a target=\"_BLANK\" href=\"http://www.terraserver.com/imagery/image_gx.asp?cpx=".$map_long."&cpy=".$map_lati."&res=30&provider_id=340\"><img src=\"images/terrasrv.gif\" border=\"0\" alt=\"TerraServer &copy;\" title=\"TerraServer &copy;\" /></a>";
-			}
-			$ctn = preg_match("/\d NOTE (.*)/", $placerec, $match);
-			if ($ctn>0) {
-				// To be done: part of returnstring of this function
-				print_fact_notes($placerec, 3);
-				$out = true;
-			}
-		}
-	}
-	if ($lds) {
-		$ct = preg_match("/2 TEMP (.*)/", $factrec, $match);
-		if ($ct>0) {
-			$tcode = trim($match[1]);
-			if (array_key_exists($tcode, $TEMPLE_CODES)) {
-				$prtstr .= "<br />".GM_LANG_temple.": ".$TEMPLE_CODES[$tcode];
-			}
-			else {
-				$prtstr .= "<br />".GM_LANG_temple_code.$tcode;
-			}
-		}
-		$ct = preg_match("/2 STAT (.*)/", $factrec, $match);
-		if ($ct>0) {
-			$prtstr .= "<br />".GM_LANG_status.": ";
-			$prtstr .= trim($match[1]);
-		}
-	}
-	if ($prt) {
-		print $prtstr;
-		return $printed;
-	}
-	else return $prtstr;
-}
-/**
- * print first major fact for an Individual
- *
- * @param string $key	indi pid
- */
-function print_first_major_fact($key, $indirec="", $prt=true, $break=false) {
-	global $GM_BASE_DIRECTORY, $factsfile, $LANGUAGE;
-	
-	$majorfacts = array("BIRT", "CHR", "BAPM", "DEAT", "BURI", "BAPL", "ADOP");
-	if (empty($indirec)) $indirec = FindPersonRecord($key);
-	$retstr = "";
-	foreach ($majorfacts as $indexval => $fact) {
-		$factrec = GetSubRecord(1, "1 $fact", $indirec);
-		if (strlen($factrec)>7 and PrivacyFunctions::showFact("$fact", $key) and !PrivacyFunctions::FactViewRestricted($key, $factrec)) {
-			if ($break) $retstr .= "<br />";
-			else $retstr .= " -- ";
-			$retstr .= "<i>";
-			if (defined("GM_LANG_".$fact)) $retstr .= constant("GM_LANG_".$fact);
-			else if (defined("GM_FACT_".$fact)) $retstr .= constant("GM_FACT_".$fact);
-			else $retstr .= $fact;
-			$retstr .= " ";
-			$retstr .= print_fact_date($factrec, false, false, false, false, false, false);
-			$retstr .= print_fact_place($factrec, false, false, false, false);
-			$retstr .= "</i>";
-			break;
-		}
-	}
-	if ($prt) {
-		print $retstr;
-		return $fact;
-	}
-	else return addslashes($retstr);
-}
-
-
-/**
  * javascript declaration for calendar popup
  *
  * @param none
@@ -1447,7 +1124,7 @@ function PrintFilterEvent($filterev) {
 	foreach($events as $nothing => $event) {
 		print "<option value=\"".$event."\"";
 		if ($filterev == $event) print " selected=\"selected\"";
-		if ($filterev == "EVEN") print ">".GM_LANG_custom_event."</option>\n";
+		if ($event == "EVEN") print ">".GM_LANG_custom_event."</option>\n";
 		else print ">".constant("GM_FACT_".$event)."</option>\n";
 	}
 }
@@ -1465,4 +1142,35 @@ function PrintCachedObjectCount() {
 		print "<br />";
 	}
 }	
+
+//-- function to print a privacy error with contact method
+function PrintPrivacyError($username) {
+	
+	 $method = GedcomConfig::$CONTACT_METHOD;
+	
+	 if ($username == GedcomConfig::$WEBMASTER_EMAIL) $method = GedcomConfig::$SUPPORT_METHOD;
+	 $user =& User::GetInstance($username);
+	 if (empty($user->username)) $method = "mailto";
+	 print "<br /><span class=\"error\">".GM_LANG_privacy_error;
+	 if ($method=="none") {
+		  print "</span><br />\n";
+		  return;
+	 }
+	 print GM_LANG_more_information;
+	 if ($method=="mailto") {
+		  if (!$user) {
+			   $email = $username;
+			   $fullname = $username;
+		  }
+		  else {
+			   $email = $user->email;
+			   $fullname = $user->firstname." ".$user->lastname;
+		  }
+		  print " <a href=\"mailto:$email\">".$fullname."</a></span><br />";
+	 }
+	 else {
+		  print " <a href=\"#\" onclick=\"message('$username','$method'); return false;\">".$user->firstname." ".$user->lastname."</a></span><br />";
+	 }
+}
+
 ?>

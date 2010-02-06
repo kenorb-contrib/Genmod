@@ -305,30 +305,6 @@ class MediaItem extends GedcomRecord {
 		return $this->repolist;
 	}
 
-	/** Get the ID's linked to this media
-	*/
-	public function GetMediaLinks($pid, $type="", $applypriv=true) {
-	
-		if (empty($pid)) return false;
-
-		$links = array();	
-		$sql = "SELECT mm_gid FROM ".TBLPREFIX."media_mapping WHERE mm_media='".$pid."'";
-		if (!empty($type)) $sql .= " AND mm_type='".$type."'";
-		$sql .= " AND mm_file='".GedcomConfig::$GEDCOMID."'";
-		$res = NewQuery($sql);
-		while($row = $res->FetchAssoc()){
-			if (!$applypriv) {
-				$links[] = $row["mm_gid"];
-			}
-			else {
-				if (PrivacyFunctions::showFact("OBJE", $row["mm_gid"], $type)) {
-					$links[] = $row["mm_gid"];
-				}
-			}
-		}
-		return $links;
-	}
-	
 	protected function ReadMediaRecord() {
 		
 		$sql = "SELECT m_gedrec FROM ".TBLPREFIX."media WHERE m_media='".$this->xref."' AND m_file='".$this->gedcomid."'";

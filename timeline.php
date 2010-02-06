@@ -309,7 +309,7 @@ $controller->checkPrivacy();
 		<?php
 		}
 		else {
-			PrintFunctions::PrintPrivacyError(GedcomConfig::$CONTACT_EMAIL);
+			PrintPrivacyError(GedcomConfig::$CONTACT_EMAIL);
 			?>
 			<input type="hidden" name="pids[<?php print $p; ?>]" value="<?php print $pid; ?>" />
 			<?php if (!$controller->isPrintPreview()) {
@@ -352,17 +352,17 @@ if (count($controller->people)>0) {
 	<?php if ($controller->isPrintPreview()) print "\n\t".GM_LANG_timeline_instructions."<br /><br />"; ?>
 <div id="timeline_chart">
 	<!-- print the timeline line image -->
-	<div id="line" style="position:absolute; <?php print $TEXT_DIRECTION =="ltr"?"left: ".($basexoffset+20):"right: ".($basexoffset+20); ?>px; top: <?php print $baseyoffset; ?>px; ">
+	<div id="line" style="position:absolute; <?php print $TEXT_DIRECTION =="ltr"?"left: ".($basexoffset+22):"right: ".($basexoffset+22); ?>px; top: <?php print $baseyoffset; ?>px; ">
 		<img src="<?php print GM_IMAGE_DIR."/".$GM_IMAGES["vline"]["other"]; ?>" width="3" height="<?php print ($baseyoffset+(($controller->topyear-$controller->baseyear)*$controller->scale)); ?>" alt="" />
 	</div>
 	<!-- print divs for the grid -->
-	<div id="scale<?php print $controller->baseyear; ?>" style="font-family: Arial; position:absolute; <?php print ($TEXT_DIRECTION =="ltr"?"left: $basexoffset":"right: $basexoffset"); ?>px; top: <?php print ($baseyoffset-5); ?>px; font-size: 7pt; text-align: <?php print ($TEXT_DIRECTION =="ltr"?"left":"right"); ?>;">
+	<div id="scale<?php print $controller->baseyear; ?>" style="font-family: Arial; position:absolute; <?php print ($TEXT_DIRECTION =="ltr" ? "left: ".$basexoffset : "right: ".$basexoffset); ?>px; top: <?php print ($baseyoffset-5); ?>px; font-size: 7pt; text-align: <?php print ($TEXT_DIRECTION =="ltr"?"left":"right"); ?>;">
 	<?php print $controller->baseyear."--"; ?>
 	</div>
 	<?php
-	for($i=$controller->baseyear+1; $i<$controller->topyear; $i++) {
-		if ($i % (25/$controller->scale)==0)  {
-			print "\n\t\t<div id=\"scale$i\" style=\"font-family: Arial; position:absolute; ".($TEXT_DIRECTION =="ltr"?"left: $basexoffset":"right: $basexoffset")."px; top:".floor($baseyoffset+(($i-$controller->baseyear)*$controller->scale)-$controller->scale/2)."px; font-size: 7pt; text-align:".($TEXT_DIRECTION =="ltr"?"left":"right").";\">\n";
+	for($i = $controller->baseyear+1; $i < $controller->topyear; $i++) {
+		if ($i % (25/$controller->scale < 1 ? 1 : 25/$controller->scale) == 0)  {
+			print "\n\t\t<div id=\"scale$i\" style=\"font-family: Arial; position:absolute; ".($TEXT_DIRECTION =="ltr" ? "left: ".$basexoffset : "right: ".$basexoffset)."px; top:".floor($baseyoffset+(($i-$controller->baseyear)*$controller->scale)-$controller->scale/2)."px; font-size: 7pt; text-align:".($TEXT_DIRECTION =="ltr"?"left":"right").";\">\n";
 			print $i."--";
 			print "</div>";
 		}

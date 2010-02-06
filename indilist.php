@@ -28,7 +28,7 @@
 require("config.php");
 $indilist_controller = new IndilistController();
 
-$COMBIKEY = true;
+$trace = false;
 
 PrintHeader($indilist_controller->pagetitle);
 print "<div class =\"center\">";
@@ -117,7 +117,7 @@ if (count($indialpha) > 0) {
 print "<br /><br />";
 if ($indilist_controller->surname_sublist == "yes" && $indilist_controller->show_all == "yes") {
 	// Get the surnames of all individuals
-	// print "option 1";
+	if ($trace) print "option 1";
 	$surnames = $indilist_controller->GetAlphaIndiNames();
 	print "<div class=\"topbar\">".GM_LANG_surnames."</div>\n";
 	$indilist_controller->PrintSurnameList($surnames);
@@ -125,7 +125,7 @@ if ($indilist_controller->surname_sublist == "yes" && $indilist_controller->show
 }
 else if ($indilist_controller->surname_sublist == "yes" && $indilist_controller->surname == "" && $indilist_controller->show_all == "no") {
 
-	// print "option 2";
+	if ($trace) print "option 2";
 	// NOTE: Get all of the individuals whose last names start with this letter
 	if ($indilist_controller->alpha != "") {
 		$surnames = $indilist_controller->GetAlphaIndiNames();
@@ -136,25 +136,25 @@ else if ($indilist_controller->surname_sublist == "yes" && $indilist_controller-
 }
 else {
 	// NOTE: If the surname is set then only get the names in that surname list
-	if ($indilist_controller->surname != "" && $indilist_controller->surname_sublist=="yes") {
-		// print "option 3";
+	if ($indilist_controller->surname != "" && $indilist_controller->surname_sublist == "yes") {
+		if ($trace) print "option 3";
 		$tindilist = $indilist_controller->GetIndis();
 	}
 	// NOTE: Get all individuals for the sublist
 	if ($indilist_controller->surname_sublist == "no" && $indilist_controller->alpha != "" && $indilist_controller->show_all == "no") {
-		// print "option 4 for ".$indilist_controller->alpha;
+		if ($trace)  print "option 4 for ".$indilist_controller->alpha;
 		$tindilist = $indilist_controller->GetIndis();
 	}
 	
 	// NOTE: Simplify processing for ALL indilist
 	// NOTE: Skip surname is yes and ALL is chosen
 	if ($indilist_controller->surname_sublist == "no" && $indilist_controller->show_all == "yes") {
-		// print "option 5";
+		if ($trace)  print "option 5";
 		$tindilist = $indilist_controller->GetIndis();
 		$indilist_controller->PrintPersonList($tindilist, true);
 	}
 	else {
-		// print "option 6";
+		if ($trace) print "option 6";
 		// NOTE: If user wishes to skip surname do not print the surname
 		print "<div class=\"topbar\">";
 		if ($indilist_controller->surname_sublist == "yes" && empty($indilist_controller->surname)) print GM_LANG_surnames;

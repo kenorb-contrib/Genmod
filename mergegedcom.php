@@ -170,12 +170,6 @@ if ($cleanup_needed == "cleanup_needed" && $continue == GM_LANG_del_proceed) {
 				//month first
 				ImportFunctions::DateCleanup($_POST["datetype"]);
 			}
-			/**
-			if($_POST["xreftype"]!="NA") {
-				$filechanged=true;
-				ImportFunctions::XrefChange($_POST["xreftype"]);
-			}
-			**/
 			if (isset($_POST["utf8convert"])=="YES") {
 				$filechanged=true;
 				ImportFunctions::ConvertAnsiUtf8();

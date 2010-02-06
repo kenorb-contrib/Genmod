@@ -424,11 +424,6 @@ $without_close = true;
 
 if (CONFIGURED) if ($DBCONN->connected) GedcomConfig::ReadGedcomConfig($GEDCOMID);
 require_once($GM_BASE_DIRECTORY."includes/functions/functions_name.php");
-require_once($GM_BASE_DIRECTORY."includes/functions/functions_search.php");
-
-// This is for choosing either normal or combined keys. It defaults to false to ensure backwards compatibility.
-// When all code is adjusted, this can be removed.
-$COMBIKEY = false;
 
 //-- load file for language settings
 require_once($GM_BASE_DIRECTORY . "includes/values/lang_settings_std.php");

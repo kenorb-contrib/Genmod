@@ -30,19 +30,17 @@
 */
 require("config.php");
 
-PrintHeader(GM_LANG_unlink_list);
+$unlinkedlist_controller = new IndilistController();
+
+PrintHeader($unlinkedlist_controller->pagetitle);
 print "<div class=\"center\"><h3>".GM_LANG_unlink_list."</h3></div>\n";
 
-$indis = GetUnlinked();
-print "<div id=\"content\">";
-$printlist = array();
+$indis = ListFunctions::GetIndiList("no", "unlinked");
 
-uasort($indis, "ItemSort");
 if (count($indis) == 0) {
 	print "<div class=\"error center\">".GM_LANG_sc_ged_nounlink."</div>";
 }
-else PrintPersonList($indis);
-print "</div>";
+else $unlinkedlist_controller->PrintPersonList($indis);
 PrintFooter();
 
 ?>

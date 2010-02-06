@@ -232,7 +232,7 @@ class Family extends GedcomRecord {
 	private function GetRelationsToMe() {
 		
 		if (is_null($this->relationstome)) {
-			$list = ListFunctions::GetAssoList("fam", "", $this->xref);
+			$list = ListFunctions::GetAssoList("fam", "", $this->xref, true);
 			uasort($list,"AssoSort");
 			$this->relationstome = $list;
 		}

@@ -88,43 +88,6 @@ function get_gedcom_from_id($ged_id) {
 	else return false;
 }
 
-
-/**
- * Check if a person is dead
- *
- * For the given XREF id, this function will return true if the person is dead
- * and false if the person is alive.
- * @param string $pid		The Gedcom XREF ID of the person to check
- * @return boolean			True if dead, false if alive
- */
-function IsDeadId($pid) {
-	global $indilist, $COMBIKEY;
-
-	if (empty($pid)) return true;
-	if ($COMBIKEY) $key = JoinKey($pid, GedcomConfig::$GEDCOMID);
-	else $key = $pid;
-
-	//-- if using indexes then first check the indi_isdead array
-	if (isset($indilist)) {
-		//-- check if the person is already in the $indilist cache
-		if (!isset($indilist[$key]["isdead"]) || $indilist[$key]["gedfile"] != GedcomConfig::$GEDCOMID) {
-			//-- load the individual into the cache by calling the FindPersonRecord function
-			$gedrec = FindPersonRecord($pid);
-			if (empty($gedrec)) return true;
-		}
-		if (isset($indilist[$key])) {
-			if ($indilist[$key]["gedfile"]==GedcomConfig::$GEDCOMID) {
-				if (!isset($indilist[$key]["isdead"])) $indilist[$key]["isdead"] = -1;
-				if ($indilist[$key]["isdead"]==-1) {
-					$indilist[$key]["isdead"] = UpdateIsDead($pid, $indilist[$key]);
-				}
-				return $indilist[$key]["isdead"];
-			}
-		}
-	}
-	return PrivacyFunctions::IsDead(FindPersonRecord($pid));
-}
-
 /**
  * GM Error Handling function
  *
@@ -157,8 +120,8 @@ function GmErrorHandler($errno, $errstr, $errfile, $errline) {
 				if (isset($backtrace[$i]["line"]) && isset($backtrace[$i]["file"])) $logline .= "line <b>".$backtrace[$i]["line"]."</b> of file <b>".basename($backtrace[$i]["file"])."</b>";
 				if ($i<$num-1) $logline .= " in function <b>".$backtrace[$i+1]["function"]."</b>";
 				$logline .= "<br />\n";
-				print $logline;
 			}
+			print $logline;
 		}
 		WriteToLog("GmErrorHandler-> ".$logline, "E", "S");
 		if ($errno==1) die();
@@ -287,11 +250,20 @@ function GetAllSubrecords($gedrec, $ignore="", $families=true, $sort=true, $Appl
 		if (isset($prev_tags[$fact])) $prev_tags[$fact]++;
 		else $prev_tags[$fact] = 1;
 		if (strpos($ignore, $fact)===false) {
-			if ($ApplyPriv && preg_match("/\d\sOBJE\s@(\w+)@/", $match[$i][0], $mmatch)) $dispmedialink = PrivacyFunctions::DisplayDetailsByID($mmatch[1], "OBJE", 1, true);
+			if ($ApplyPriv && preg_match("/\d\sOBJE\s@(\w+)@/", $match[$i][0], $mmatch)) {
+				$object = ConstructObject($match[1], "OBJE");
+				$dispmedialink = $object->disp;
+			}
 			else $dispmedialink = true;
-			if ($ApplyPriv && preg_match("/\d\sSOUR\s@(\w+)@/", $match[$i][0], $mmatch)) $dispsourcelink = PrivacyFunctions::DisplayDetailsByID($mmatch[1], "SOUR", 1, true);
+			if ($ApplyPriv && preg_match("/\d\sSOUR\s@(\w+)@/", $match[$i][0], $mmatch)) {
+				$object = ConstructObject($match[1], "SOUR");
+				$dispsourcelink = $object->disp;
+			}
 			else $dispsourcelink = true;
-			if ($ApplyPriv && preg_match("/\d\sNOTE\s@(\w+)@/", $match[$i][0], $mmatch)) $dispnotelink = PrivacyFunctions::DisplayDetailsByID($mmatch[1], "NOTE", 1, true);
+			if ($ApplyPriv && preg_match("/\d\sNOTE\s@(\w+)@/", $match[$i][0], $mmatch)) {
+				$object = ConstructObject($match[1], "NOTE");
+				$dispnotelink = $object->disp;
+			}
 			else $dispnotelink = true;
 			if (!$ApplyPriv || (PrivacyFunctions::showFact($fact, $id, $type) && PrivacyFunctions::showFactDetails($fact,$id) && $dispmedialink && $dispsourcelink && $dispnotelink)) {
 				$subrec = GetSubRecord(1, "1 $fact", $gedrec, $prev_tags[$fact]);
@@ -319,9 +291,8 @@ function GetAllSubrecords($gedrec, $ignore="", $families=true, $sort=true, $Appl
 				$fam =& Family::GetInstance($fmatch[$f][1]);
 			if (!$ApplyPriv || $fam->disp) {
 				$famrec = $fam->gedrec;
-				$parents = FindParentsInRecord($famrec);
-				if ($id == $parents["HUSB"]) $spid = $parents["WIFE"];
-				else $spid = $parents["HUSB"];
+				if ($id == $fam->husb_id) $spid = $fam->wife_id;
+				else $spid = $fam->husb_id;
 				$prev_tags = array();
 				$ct = preg_match_all("/\n1 (\w+)(.*)/", $famrec, $match, PREG_SET_ORDER);
 				for($i=0; $i<$ct; $i++) {
@@ -547,34 +518,6 @@ function MakeCont($newged, $newline) {
 }
 
 /**
- * find the parents in a family
- *
- * find and return a two element array containing the parents of the given family record
- * @author Genmod Development Team
- * @param string $famid the gedcom xref id for the family
- * @return array returns a two element array with indexes HUSB and WIFE for the parent ids
- */
-function FindParents($famid) {
-	global $gm_username, $show_changes, $gm_user;
-
-	$famrec = FindFamilyRecord($famid);
-	if (empty($famrec)) {
-		if ($gm_user->userCanEdit($gm_username)) {
-			$famrec = FindGedcomRecord($famid);
-			if (empty($famrec)) {
-				if ($show_changes && ChangeFunctions::GetChangeData(true, $famid, true, "", "FAM")) {
-					$f = ChangeFunctions::GetChangeData(false, $famid, true, "gedlines", "FAM");
-					$famrec = $f[GedcomConfig::$GEDCOMID][$famid];
-				}
-				else return false;
-			}
-		}
-		else return false;
-	}
-	return FindParentsInRecord($famrec);
-}
-
-/**
  * find the parents in a family record
  *
  * find and return a two element array containing the parents of the given family record
@@ -616,84 +559,6 @@ function FindChildrenInRecord($famrec, $me='') {
 		if ($child!=$me) $children[] = $child;
 	}
 	return $children;
-}
-
-/**
- * find all child family ids
- *
- * Retrieve all the ID's where the person is a child from the individual_child table
- *
- * @param string $pid the gedcom xref id for the person to look in
- * @return array array of family ids
- */
-function FindFamilyIds($pid, $indirec="", $newfams = false) {
-	global $show_changes, $gm_user;
-	
-	$resultarray = array();
-	if (empty($pid)) return $resultarray;
-	
-	// We must get the families from the gedcom record to preserve the order. 
-	$gedrec = FindGedcomRecord($pid);
-	if ($newfams && $gm_user->UserCanEdit() && $show_changes && ChangeFunctions::GetChangeData(true, $pid, true, "", "")) {
-		$rec = ChangeFunctions::GetChangeData(false, $pid, true, "gedlines", "");
-		$gedrec = $rec[GedcomConfig::$GEDCOMID][$pid];
-	}
-	$ct = preg_match_all("/1\s+FAMC\s+@(.*)@.*/", $gedrec, $fmatch, PREG_SET_ORDER);
-	if ($ct>0) {
-		$i = 1;
-		foreach($fmatch as $key => $value) {
-			$famcrec = GetSubRecord(1, "1 FAMC", $gedrec, $i);
-			$ct = preg_match("/2\s+_PRIMARY\s(.+)/", $famcrec, $pmatch);
-			if ($ct>0) $prim = trim($pmatch[1]);
-			else $prim = "";
-			$ct = preg_match("/2\s+PEDI\s+(adopted|birth|foster|sealing)/", $famcrec, $pmatch);
-			$ped = "";
-			if ($ct>0) $ped = trim($pmatch[1]);
-			if ($ped == "birth") $ped = "";
-			$ct = preg_match("/2\s+STAT\s+(challenged|proven|disproven)/", $famcrec, $pmatch);
-			$stat = "";
-			if ($ct>0) $stat = trim($pmatch[1]);
-			$resultarray[] = array("famid"=>$value[1], "primary"=>$prim, "relation"=>$ped, "status"=>$stat);
-			$i++;
-		}
-	}
-	return $resultarray;
-}
-
-/**
- * Find all spouse family ids
- *
- * Retrieve all the ID's where the person is a spouse from the individual_spouse table
- *
- * @param string $pid the gedcom xref id for the person to look in
- * @return array array of family ids
- */
-function FindSfamilyIds($pid, $newfams = false) {
-	global $show_changes, $gm_user;
-	
-	$resultarray = array();
-	if (empty($pid)) return $resultarray;
-//	$sql = "SELECT family_id FROM ".TBLPREFIX."individual_spouse WHERE pid = '".$pid."' AND gedfile = ".GedcomConfig::$GEDCOMID;
-//	$res = NewQuery($sql);
-//	if (!$res) return array();
-//	else {
-//		while ($row = $res->FetchRow()) {
-//			$resultarray[] = $row[0];
-//		}
-//	}
-	// We must get the families from the gedcom record to preserve the order. 
-	$gedrec = FindGedcomRecord($pid);
-	if ($newfams && $gm_user->UserCanEdit() && $show_changes && ChangeFunctions::GetChangeData(true, $pid, true, "", "")) {
-		$rec = ChangeFunctions::GetChangeData(false, $pid, true, "gedlines", "");
-		$gedrec = $rec[GedcomConfig::$GEDCOMID][$pid];
-	}
-	$ct = preg_match_all("/1\s+FAMS\s+@(.*)@.*/", $gedrec, $fmatch, PREG_SET_ORDER);
-	if ($ct>0) {
-		foreach($fmatch as $key => $value) {
-			$resultarray[] = array("famid"=>$value[1]);
-		}
-	}
-	return $resultarray;
 }
 
 // ************************************************* START OF MULTIMEDIA FUNCTIONS ********************************* //
@@ -798,6 +663,12 @@ function FindHighlightedObject($obj) {
 function GetRelationship(&$pid1, &$pid2, $followspouse=true, $maxlength=0, $ignore_cache=false, $path_to_find=0) {
 	global $start_time, $NODE_CACHE_LENGTH, $USE_RELATIONSHIP_PRIVACY, $gm_username, $show_changes;
 
+	if (!is_object($pid1) || !is_object($pid2)) {
+		print "error";
+		exit;
+	}
+	// print "<br /><br />Check ".$pid1->xref." and ".$pid2->xref."<br />";
+	// print_r(PrivacyFunctions::$NODE_CACHE);
 	//-- check the cache
 	if ($USE_RELATIONSHIP_PRIVACY && !$ignore_cache) {
 		if(isset(PrivacyFunctions::$NODE_CACHE[$pid1->xref."-".$pid2->xref])) {
@@ -805,14 +676,15 @@ function GetRelationship(&$pid1, &$pid2, $followspouse=true, $maxlength=0, $igno
 			if ($maxlength==0 || count(PrivacyFunctions::$NODE_CACHE[$pid1->xref."-".$pid2->xref]["path"])-1<=$maxlength) return PrivacyFunctions::$NODE_CACHE[$pid1->xref."-".$pid2->xref];
 			else return false;
 		}
-		foreach($pid2->spousefamilies as $indexval => $fam) {
-			foreach($fam->children as $key => $child) {
+		foreach($pid2->fams as $indexval => $fam) {
+			$family =& Family::GetInstance($fam);
+			foreach($family->children as $key => $child) {
 				if(isset(PrivacyFunctions::$NODE_CACHE[$pid1->xref."-".$child->xref])) {
 					if ($maxlength == 0 || count(PrivacyFunctions::$NODE_CACHE[$pid1->xref."-".$child->xref]["path"])+1 <= $maxlength) {
 						$node1 = PrivacyFunctions::$NODE_CACHE[$pid1->xref."-".$child->xref];
 						if ($node1 != "NOT FOUND") {
 							$node1["path"][] = $pid2->xref;
-							$node1["pid"][] = $pid2->xref;
+							$node1["pid"] = $pid2->xref;
 							if ($pid2->sex == "F") $node1["relations"][] = "mother";
 							else $node1["relations"][] = "father";
 						}
@@ -982,7 +854,13 @@ function GetRelationship(&$pid1, &$pid2, $followspouse=true, $maxlength=0, $igno
 					if (!isset($visited[$dpid])) {
 						$nrole = $row["n_role"];
 						$drole = $row["d_role"];
-						if ($followspouse || ($drole != "S" || $nrole != "S")) {
+						// First check: node length 0 means add children, parents, spouses regardless of relationship privacy
+						// Second check: with relationship privacy, don't add spouse to spouse.
+						// Because of adding the wife in the first check, while spouses should not be followed, in the second check a check
+						// for the role is added.
+						// print "1: ".$pid1->xref." 2: ".$pid2->xref." nodepid: ".$node["pid"]." length: ".$node["length"]." role: ".(isset($node["relations"][1]) ? $node["relations"][1] : "")." found: ".$dpid."<br />";
+						if (($followspouse || $node["length"] == 0) || (($drole != "S" || $nrole != "S") && (isset($node["relations"][1]) && $node["relations"][1] != "wife"))) {
+							// print "added<br />";
 							$ddate = $row["d_bdate"];
 							$dgender = $row["d_gender"];
 							if ($nrole == "C") {
@@ -1647,17 +1525,20 @@ function EstimateBD(&$person, $type) {
 	$cyear = date("Y");
 	
 	// -- check for a death record
-	if ($person->drec != "") {
-		if (preg_match("/1 DEAT Y/", $person->drec)>0) $deathyear = $cyear;
+	// We cannot use $person->drec here
+	$drec = GetSubRecord(1, "1 DEAT", $person->gedrec);
+	if ($drec != "") {
+		if (preg_match("/1 DEAT Y/", $drec)>0) $deathyear = $cyear;
 		else {
-			$ct = preg_match("/\d DATE.*\s(\d{3,4})\s/", $person->drec, $match);
+			$ct = preg_match("/\d DATE.*\s(\d{3,4})\s/", $drec, $match);
 			if ($ct>0) $truedeathyear = $match[1];
 		}
 	}
 
 	//-- check for birth record
-	if ($person->brec != "") {
-		$ct = preg_match("/\d DATE.*\s(\d{3,4})\s/", $person->brec, $match);
+	$brec = GetSubRecord(1, "1 BIRT", $person->gedrec);
+	if ($brec != "") {
+		$ct = preg_match("/\d DATE.*\s(\d{3,4})\s/", $brec, $match);
 		if ($ct>0) $truebirthyear = $match[1];
 	}
 
@@ -1687,8 +1568,9 @@ function EstimateBD(&$person, $type) {
 	// Check the fact dates
 	$ffactyear = 9999;
 	$lfactyear = 0;
-	foreach ($person->facts as $key => $fact) {
-		$ct = preg_match_all("/\d DATE.*\s(\d{3,4})\s/", $fact->factrec, $match, PREG_SET_ORDER);
+	$facts = GetAllSubrecords($person->gedrec, "", false, false, false);
+	foreach ($facts as $key => $factrec) {
+		$ct = preg_match_all("/\d DATE.*\s(\d{3,4})\s/", $factrec, $match, PREG_SET_ORDER);
 		for($i=0; $i<$ct; $i++) {
 			if (strstr($match[$i][0], "@#DHEBREW@")===false) {
 				$byear = $match[$i][1];
@@ -1700,28 +1582,33 @@ function EstimateBD(&$person, $type) {
 
 	// If we found no dates then check the dates of close relatives.
 	if($CHECK_CHILD_DATES) {
-		foreach($person->childfamilies as $key => $family) {
+		foreach($person->famc as $key => $famid) {
+			$family =& Family::GetInstance($famid["famid"]);
 			if ($family->husb_id != "") {
-				$ct = preg_match_all("/\d DATE.*\s(\d{3,4})\s/", $family->husb->brec, $match, PREG_SET_ORDER);
+				$brec = GetSubRecord(1, "1 BIRT", $family->husb->gedrec);
+				$ct = preg_match_all("/\d DATE.*\s(\d{3,4})\s/", $brec, $match, PREG_SET_ORDER);
 				// loop for later if also facts are scanned
 				for($i=0; $i<$ct; $i++) {
 					$fbyear = $match[$i][1];
 				}
-				if (preg_match("/1 DEAT Y/", $family->husb->drec)>0) $fddate = $cyear;
+				$drec = GetSubRecord(1, "1 DEAT", $family->husb->gedrec);
+				if (preg_match("/1 DEAT Y/", $drec)>0) $fddate = $cyear;
 				else {
-					$ct = preg_match("/\d DATE.*\s(\d{3,4})\s/", $family->husb->drec, $match);
+					$ct = preg_match("/\d DATE.*\s(\d{3,4})\s/", $drec, $match);
 					if ($ct>0) $fdyear = $match[1];
 				}
 			}
 			if ($family->wife_id != "") {
-				$ct = preg_match_all("/\d DATE.*\s(\d{3,4})\s/", $family->wife->brec, $match, PREG_SET_ORDER);
+				$brec = GetSubRecord(1, "1 BIRT", $family->wife->gedrec);
+				$ct = preg_match_all("/\d DATE.*\s(\d{3,4})\s/", $brec, $match, PREG_SET_ORDER);
 				// loop for later if also facts are scanned
 				for($i=0; $i<$ct; $i++) {
 					$mbyear = $match[$i][1];
 				}
-				if (preg_match("/1 DEAT Y/", $family->wife->drec)>0) $mddate = $cyear;
+				$drec = GetSubRecord(1, "1 DEAT", $family->wife->gedrec);
+				if (preg_match("/1 DEAT Y/", $drec)>0) $mddate = $cyear;
 				else {
-					$ct = preg_match("/\d DATE.*\s(\d{3,4})\s/", $family->wife->drec, $match);
+					$ct = preg_match("/\d DATE.*\s(\d{3,4})\s/", $drec, $match);
 					if ($ct>0) $mdyear = $match[1];
 				}
 			}
@@ -1732,10 +1619,12 @@ function EstimateBD(&$person, $type) {
 		$lmarryear = 0;
 		$fcbyear = 9999;
 		$lcbyear = 0;
-		foreach ($person->spousefamilies as $key => $family) {
+		foreach ($person->fams as $key => $famid) {
+			$family =& Family::GetInstance($famid);
 			//-- check for marriage date
-			if (is_object($family->marr_fact)) {
-				$bt = preg_match_all("/\d DATE.*\s(\d{3,4})\s/", $family->marr_fact->simpledate, $bmatch, PREG_SET_ORDER);
+			$marr_fact = GetSubRecord(1, "1 MARR", $family->gedrec);
+			if (!empty($marr_fact)) {
+				$bt = preg_match_all("/\d DATE.*\s(\d{3,4})\s/", $marr_fact, $bmatch, PREG_SET_ORDER);
 				for($h=0; $h<$bt; $h++) {
 					$byear = $bmatch[$h][1];
 					if ($fmarryear > $byear) $fmarryear = $byear;
@@ -1744,8 +1633,9 @@ function EstimateBD(&$person, $type) {
 			}
 			
 			//-- check for divorce date
-			if (is_object($family->div_fact)) {
-				$bt = preg_match_all("/\d DATE.*\s(\d{3,4})\s/", $family->div_fact->simpledate, $bmatch, PREG_SET_ORDER);
+			$div_fact = GetSubRecord(1, "1 DIV", $family->gedrec);
+			if (!empty($div_fact)) {
+				$bt = preg_match_all("/\d DATE.*\s(\d{3,4})\s/", $div_fact, $bmatch, PREG_SET_ORDER);
 				for($h=0; $h<$bt; $h++) {
 					$byear = $bmatch[$h][1];
 					if ($fmarryear > $byear) $fmarryear = $byear;
@@ -1753,30 +1643,14 @@ function EstimateBD(&$person, $type) {
 				}
 			}
 			
-			//-- check spouse record for dates (not yet)
-//			$parents = FindParentsInRecord($famrec);
-//			if ($parents) {
-//				if ($parents["HUSB"]!=$pid) $spid = $parents["HUSB"];
-//				else $spid = $parents["WIFE"];
-//				$spouserec = FindPersonRecord($spid);
-//				// Check dates
-//				$bt = preg_match_all("/\d DATE.*\s(\d{3,4})\s/", $spouserec, $bmatch, PREG_SET_ORDER);
-//				for($h=0; $h<$bt; $h++) {
-//					$byear = $bmatch[$h][1];
-//					// if the spouse is > $MAX_ALIVE_AGE assume the individual is dead
-//					if (($cyear-$byear) > $MAX_ALIVE_AGE) {
-//						//print "spouse older than $MAX_ALIVE_AGE (".$bmatch[$h][0].") year is $byear\n";
-//						return true;
-//					}
-//				}
-//			}
 			// Get the set of children
 			foreach ($family->children as $key2 => $child) {
 				// Get each child's object and keep it. This will gather all children from all spousefamilies
 				$children[] = $child;
 
 				// Check each child's dates (for now only birth)
-				$bt = preg_match_all("/\d DATE.*\s(\d{3,4})\s/", $child->brec, $bmatch, PREG_SET_ORDER);
+				$brec = GetSubRecord(1, "1 BIRT", $child->gedrec);
+				$bt = preg_match_all("/\d DATE.*\s(\d{3,4})\s/", $brec, $bmatch, PREG_SET_ORDER);
 				for($h=0; $h<$bt; $h++) {
 					$byear = $bmatch[$h][1];
 					if ($fcbyear > $byear) $fcbyear = $byear;
@@ -1788,11 +1662,13 @@ function EstimateBD(&$person, $type) {
 		$fgcbyear = 9999;
 		foreach($children as $key => $child) {
 			// For each family in which this person is a spouse...
-			foreach ($child->spousefamilies as $key2 => $family) {
+			foreach ($child->fams as $key2 => $famid) {
+				$family =& Family::GetInstance($famid);
 				// Get the set of children
 				foreach ($family->children as $key3 => $fchild) {
 					// Check each grandchild's dates
-					$bt = preg_match_all("/\d DATE.*\s(\d{3,4})\s/", $fchild->brec, $bmatch, PREG_SET_ORDER);
+					$brec = GetSubRecord(1, "1 BIRT", $fchild->gedrec);
+					$bt = preg_match_all("/\d DATE.*\s(\d{3,4})\s/", $brec, $bmatch, PREG_SET_ORDER);
 					for($h=0; $h<$bt; $h++) {
 						$byear = $bmatch[$h][1];
 						if ($fgcbyear > $byear) $fgcbyear = $byear;

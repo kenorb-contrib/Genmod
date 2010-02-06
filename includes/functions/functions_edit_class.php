@@ -943,13 +943,17 @@ abstract class EditFunctions {
 		if ($fact=="DATE") print " <span id=\"".$element_id."_date\">".GetChangedDate($value)."</span>";
 		if ($fact=="REPO") {
 			print " <span id=\"".$element_id."_repo\">";
-			if ($value) print GetRepoDescriptor($value)." (".$value.")";
+			if ($value) {
+				$repo =& Repository::GetInstance($value);
+				print $repo->name.$repo->addxref;
+			}
 			else {
 				if (isset($_SESSION["last_used"]["REPO"])) {
 					$gedid = SplitKey($_SESSION["last_used"]["REPO"], "gedid");
 					if ($gedid == GedcomConfig::$GEDCOMID) {
 						$id = SplitKey($_SESSION["last_used"]["REPO"], "id");
-						if (CheckExists($id, "REPO")) print "<a href=\"javascript\" onclick=\"document.getElementById('".$element_id."').value='".$id."'; sndReq('".$element_id."_repo', 'getrepodescriptor', 'rid', '".$id."', '', ''); return false;\">".GM_LANG_click_for." ".GetRepoDescriptor($id)."</a>";
+						$repo =& Repository::GetInstance($id);
+						if (CheckExists($id, "REPO")) print "<a href=\"javascript\" onclick=\"document.getElementById('".$element_id."').value='".$id."'; sndReq('".$element_id."_repo', 'getrepodescriptor', 'rid', '".$id."', '', ''); return false;\">".GM_LANG_click_for." ".$repo->name.$repo->addxref."</a>";
 					}
 				}
 			}
@@ -959,7 +963,10 @@ abstract class EditFunctions {
 		if ($fact=="EMAIL") print " <span id=\"".$element_id."_email\"></span>";
 		if ($fact=="ASSO") {
 			print " <span id=\"".$element_id."_asso\">";
-			if ($value) print GetPersonName($value)." (".$value.")";
+			if ($value) {
+				$person =& Person::GetInstance($value);
+				print $person->name.$person->addxref;
+			}
 			print "</span>";
 		}
 		if ($fact=="NOTE" && $islink) {
@@ -997,7 +1004,10 @@ abstract class EditFunctions {
 		}
 		if ($fact=="SOUR") {
 			print " <span id=\"".$element_id."_src\">";
-			if ($value) print GetSourceDescriptor($value)." (".$value.")";
+			if ($value) {
+				$source =& Source::GetInstance($value);
+				print $source->name.$source->addxref;
+			}
 			else {
 				if (isset($_SESSION["last_used"]["SOUR"])) {
 					$gedid = SplitKey($_SESSION["last_used"]["SOUR"], "gedid");
@@ -1012,7 +1022,10 @@ abstract class EditFunctions {
 	
 		if ($fact=="OBJE") {
 			print " <span id=\"".$element_id."_obj\">";
-			if ($value) print GetMediaDescriptor($value)." (".$value.")";
+			if ($value) {
+				$media =& MediaItem::GetInstance($value);
+				print $media->name.$media->addxref;
+			}
 			else {
 				if (isset($_SESSION["last_used"]["OBJE"])) {
 					$gedid = SplitKey($_SESSION["last_used"]["OBJE"], "gedid");

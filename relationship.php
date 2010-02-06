@@ -280,7 +280,7 @@ print "</div>\n";
 
 $maxyoffset = $Dbaseyoffset;
 if (!$relationship_controller->person1->isempty && !$relationship_controller->person2->isempty) {
-	if (!$disp) PrintFunctions::PrintPrivacyError(GedcomConfig::$CONTACT_EMAIL);
+	if (!$disp) PrintPrivacyError(GedcomConfig::$CONTACT_EMAIL);
 	else {
 		if (isset($_SESSION["relationships"][$relationship_controller->path_to_find])) $node = $_SESSION["relationships"][$relationship_controller->path_to_find];
 		else {

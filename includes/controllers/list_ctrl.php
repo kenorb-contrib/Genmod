@@ -205,7 +205,7 @@ class ListController extends BaseController {
 			}
 		}
 		$res = NewQuery($sql);
-		
+
 		$hungarianex = array("DZS", "CS", "DZ" , "GY", "LY", "NY", "SZ", "TY", "ZS");
 		$danishex = array("OE", "AE", "AA");
 		while($row = $res->FetchAssoc()){
@@ -227,7 +227,7 @@ class ListController extends BaseController {
 		}
 		$res->FreeResult();
 		
-		if ($this->classname == "FamlistController") {
+		if ($this->classname == "FamlistController" && $lastname) {
 			$sql = "SELECT count(f_id) FROM ".TBLPREFIX."families WHERE (f_husb='' || f_wife='')";
 			if ($this->allgeds == "no") $sql .= " AND f_file='".GedcomConfig::$GEDCOMID."'";
 			$res = NewQuery($sql);

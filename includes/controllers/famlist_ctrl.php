@@ -103,7 +103,7 @@ class FamlistController extends ListController {
 		// In that case, we also select families with one role Spouse.
 		// What we exclude, is families where no spouses exist and which only consist of children.
 		if ($this->surname == "@N.N.") {
-			$sql .= " UNION SELECT f_key, f_id, f_husb, f_wife, f_file, f_gedrec FROM ".TBLPREFIX."individual_family WHERE if_role='S' ";
+			$sql .= " UNION SELECT f_key, f_id, f_husb, f_wife, f_file, f_gedrec FROM ".TBLPREFIX."individual_family INNER JOIN ".TBLPREFIX."families on if_fkey=f_key WHERE if_role='S' ";
 			if ($this->allgeds != "yes") $sql .= " AND if_file = '".GedcomConfig::$GEDCOMID."'";
 			$sql .= " GROUP BY if_fkey HAVING count(if_fkey)=1";
 		}
@@ -188,7 +188,7 @@ class FamlistController extends ListController {
 				if ($this->allgeds == "yes") print "&amp;allgeds=yes";
 				if (!empty($this->falpha) && $this->falpha == "@") print "\"><span class=\"warning\">".PrintReady(GM_LANG_NN)."</span></a>\n";
 				else print "\">".PrintReady(GM_LANG_NN)."</a>\n";
-			$pass = false;
+				$pass = false;
 			}
 			if (GedcomConfig::$LISTS_ALL) {
 				print " | ";
@@ -198,7 +198,7 @@ class FamlistController extends ListController {
 				// NOTE: Include the surname if surnames are to be listed
 				if ($this->allgeds == "yes") print "&amp;allgeds=yes&amp;";
 				if ($this->surname_sublist == "yes" && !empty($this->surname)) print "surname=".urlencode($this->surname)."&amp;";
-				if ($this->show_all_firstnames == "yes") print "show_all_firstnames=no&amp;show_all=".$this->show_all."&amp;surname_sublist=".$this->surname_sublist."\"><span class=\"warning\">".GM_LANG_all."</span>\n";
+				if ($this->show_all_firstnames == "yes") print "show_all_firstnames=no&amp;show_all=".$this->show_all."&amp;surname_sublist=".$this->surname_sublist."\"><span class=\"warning\">".GM_LANG_all."</span></a>\n";
 				else print "show_all_firstnames=yes&amp;show_all=".$this->show_all."&amp;surname_sublist=".$this->surname_sublist."\">".GM_LANG_all."</a>\n";
 			}
 			print "</div><br />\n";
@@ -219,7 +219,7 @@ class FamlistController extends ListController {
 			foreach($familylist as $gid => $fam) {
 				// NOTE: make sure that favorites from other gedcoms are not shown
 				if ($fam->gedcomid == GedcomConfig::$GEDCOMID || $this->allgeds == "yes") {
-					$famnames = $fam->GetLetterNames($this->alpha, $this->falpha);
+					$famnames = $fam->GetLetterNames($this->alpha, ($this->show_all_firstnames == "yes" ? "" : $this->falpha));
 					foreach($famnames as $indexval => $name) {
 							$names[] = array($name, $fam->key, $indexval);
 					}

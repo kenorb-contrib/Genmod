@@ -726,11 +726,15 @@ abstract class DetailController extends BaseController{
 								if ($asso->associated->datatype == "INDI") $asso->associated->PrintListPerson(false);
 								else $asso->associated->PrintListFamily(false);
 								print "</td><td class=\"$TEXT_DIRECTION shade1 wrap\">";
-								if (defined("GM_FACT_".$asso->fact)) print constant("GM_FACT_".$asso->fact);
-								else print $asso->fact;
+								if ($asso->associated->disp) {
+									if (defined("GM_FACT_".$asso->fact)) print constant("GM_FACT_".$asso->fact);
+									else print $asso->fact;
+								}
 								print "</td><td class=\"$TEXT_DIRECTION shade1 wrap\">";
-								if (defined("GM_LANG_".$asso->role)) print constant("GM_LANG_".$asso->role);
-								else print $asso->role;
+								if ($asso->associated->disp) {
+									if (defined("GM_LANG_".$asso->role)) print constant("GM_LANG_".$asso->role);
+									else print $asso->role;
+								}
 								print "</td></tr>";
 							}
 						}
@@ -792,7 +796,7 @@ abstract class DetailController extends BaseController{
 		else if ($this->$object_name->datatype == "INDI" && $this->$object_name->disp_name) return;
 		else if ($this->$object_name->datatype == "FAM" && $this->$object_name->disp_name) return;
 		$this->PrintDetailJS();
-		PrintFunctions::PrintPrivacyError(GedcomConfig::$CONTACT_EMAIL);
+		PrintPrivacyError(GedcomConfig::$CONTACT_EMAIL);
 		PrintFooter();
 		exit;
 	}

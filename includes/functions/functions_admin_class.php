@@ -827,6 +827,19 @@ abstract class AdminFunctions {
 		$_SESSION["gmnews"] = $gmnews;
 		return $gmnews;
 	}
+	
+	/**
+	 * reset the i_isdead column
+	 * 
+	 * This function will reset the i_isdead column with the default -1 so that all is dead status
+	 * items will be recalculated.
+	 */
+	public function ResetIsDead() {
+		
+		$sql = "UPDATE ".TBLPREFIX."individuals SET i_isdead=-1 WHERE i_file='".GedcomConfig::$GEDCOMID."'";
+		$res = NewQuery($sql);
+		return $res;
+	}
 
 }
 ?>

@@ -325,7 +325,7 @@ abstract class MenuBar {
 		//-- descendancy sub menu
 		if (file_exists("descendancy.php")) {
 			$link = "descendancy.php";
-			if ($rootid) $link .= "?pid=".$rootid;
+			if ($rootid) $link .= "?rootid=".$rootid;
 			$submenu = new Menu(GM_LANG_descend_chart);
 			$submenu->addLink($link);
 			$menu->addSubmenu($submenu);

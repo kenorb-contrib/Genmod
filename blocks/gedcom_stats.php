@@ -94,13 +94,13 @@ function print_gedcom_stats($block = true, $config="", $side, $index) {
 		if ($config["stat_first_birth"]=="yes" && !empty($stats["gs_earliest_birth_gid"])) {
 			print "<tr><td valign=\"top\">".GM_LANG_stat_earliest_birth."</td><td class=\"rtl\">&nbsp;<span style=\"font-weight: bold\"><a href=\"calendar.php?action=year&amp;year=".$stats["gs_earliest_birth_year"]."\">".$stats["gs_earliest_birth_year"]."</a></span>&nbsp;</td><td valign=\"top\" class=\"ltr wrap\">";
 			$person =& Person::GetInstance($stats["gs_earliest_birth_gid"]);
-			$person->PrintListPerson(false, false);
+			if ($person->disp) $person->PrintListPerson(false, false);
 			print "</td></tr>\n";
 		}
 		if ($config["stat_last_birth"]=="yes" && !empty($stats["gs_latest_birth_gid"])) {
 			print "<tr><td valign=\"top\">".GM_LANG_stat_latest_birth."</td><td class=\"rtl\">&nbsp;<span style=\"font-weight: bold\"><a href=\"calendar.php?action=year&amp;year=".$stats["gs_latest_birth_year"]."\">".$stats["gs_latest_birth_year"]."</a></span>&nbsp;</td><td valign=\"top\" class=\"ltr wrap\">";
 			$person =& Person::GetInstance($stats["gs_latest_birth_gid"]);
-			$person->PrintListPerson(false, false);
+			if ($person->disp) $person->PrintListPerson(false, false);
 			print "</td></tr>\n";
 		}
 		if ($config["stat_long_life"]=="yes" && !empty($stats["gs_longest_live_gid"])) {
@@ -123,7 +123,7 @@ function print_gedcom_stats($block = true, $config="", $side, $index) {
 			if (!empty($stats["gs_most_children_nr"])) {
 				print "<tr><td valign=\"top\">".GM_LANG_stat_most_children."</td><td class=\"rtl\">&nbsp;<span style=\"font-weight: bold\">".$stats["gs_most_children_nr"]."</span>&nbsp;</td><td valign=\"top\" class=\"ltr wrap\">";
 				$family =& Family::GetInstance($stats["gs_most_children_gid"]);
-				$family->PrintListFamily(false);
+				if ($family->disp) $family->PrintListFamily(false);
 				print "</td></tr>\n";
 			}
 		}

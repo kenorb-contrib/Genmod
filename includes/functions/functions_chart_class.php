@@ -332,7 +332,7 @@ abstract class ChartFunctions {
 		$res = NewQuery($sql);
 		$row = $res->FetchAssoc();
 		$res->FreeResult();
-		return $row["i_file"];
+		return $row["i_id"];
 	}
 
 }

@@ -173,16 +173,18 @@ class PrivacyObject {
 		}
 		if ($user_override && $gm_user->username != "") {
 			$ged = $gedcomid;
-			if (isset($gm_user->relationship_privacy[$ged]) && !empty($gm_user->relationship_privacy[$ged])) {
+			// Blank is default for this user setting
+			if (isset($gm_user->relationship_privacy[$ged]) && $gm_user->relationship_privacy[$ged] != "") {
 				$this->USE_RELATIONSHIP_PRIVACY = ($gm_user->relationship_privacy[$ged] == "Y" ? true : false);
 			}
 			if (isset($gm_user->max_relation_path[$ged]) && $gm_user->max_relation_path[$ged] > 0) {
 				$this->MAX_RELATION_PATH_LENGTH = $gm_user->max_relation_path[$ged];
 			}
-			if (isset($gm_user->check_marriage_relations[$ged]) && !empty($gm_user->check_marriage_relations[$ged])) {
+			if (isset($gm_user->check_marriage_relations[$ged]) && $gm_user->check_marriage_relations[$ged] != "") {
 				$this->CHECK_MARRIAGE_RELATIONS = ($gm_user->check_marriage_relations[$ged] == "Y" ? true : false);
 			}
-			if (isset($gm_user->hide_live_people[$ged]) && !empty($gm_user->hide_live_people[$ged])) {
+			// Blank is default for these user settings
+			if (isset($gm_user->hide_live_people[$ged]) && $gm_user->hide_live_people[$ged] != "") {
 				// If yes, give HIDE_LIVE_PEOPLE the lowest possible value. This will always hide them to any user with this override, no matter what status this user has (except site admin)
 				// If no, give HIDE_LIVE_PEOPLE the highest possible value. This will always show them to any user with this override
 				$this->HIDE_LIVE_PEOPLE = ($gm_user->hide_live_people[$ged] == "N" ? $this->PRIV_PUBLIC : $this->PRIV_HIDE);
