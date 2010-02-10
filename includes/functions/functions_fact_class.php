@@ -366,7 +366,7 @@ abstract class FactFunctions {
 					print "<img src=\"".$media->fileobj->f_thumb_file."\" border=\"0\" align=\"" . ($TEXT_DIRECTION== "rtl"?"right": "left") . "\" class=\"thumbnail\" alt=\"\" /></a>";
 				}
 				print "<a href=\"mediadetail.php?mid=".$media->xref."&amp;gedid=".$media->gedcomid."\"><i>".PrintReady(($factobj->style == "change_old" ? $media->oldtitle : $media->title))."</i></a>";
-				if (empty($media->fileobj->f_thumb_file) && preg_match("'://'", $media->filename)) print "<br /><a href=\"".$media->filename."\" target=\"_blank\">".$media->filename."</a>";
+				if ($media->fileobj->f_thumb_file == "" && preg_match("'://'", $media->filename)) print "<br /><a href=\"".$media->filename."\" target=\"_blank\">".$media->filename."</a>";
 				// NOTE: Print the format of the media
 				if ($media->extension != "") {
 					print "\n\t\t\t<br /><span class=\"label\">".GM_FACT_FORM.": </span> <span class=\"field\">".$media->extension."</span>";
@@ -1010,7 +1010,7 @@ abstract class FactFunctions {
 				// ASSOciate ID link
 				if ($asso->datatype == "INDI") {
 					print "<a href=\"individual.php?pid=".$asso->xref."&amp;gedid=".$asso->gedcomid."\">" . $asso->name;
-					if (!empty($asso->addname)) print " - " . PrintReady($asso->addname);
+					if ($asso->addname != "") print " - " . PrintReady($asso->addname);
 					print $asso->addxref;
 					print "</a>";
 					// ID age. The age and relationship links should only be printed if relevant, i.e. if the details of pid2 are not hidden.
@@ -1032,7 +1032,9 @@ abstract class FactFunctions {
 				}
 				else if ($asso->disp) {
 					print "<a href=\"family.php?famid=".$pid2."&amp;gedid=".$asso->gedcomid."\">";
-					print $asso->sortable_name.$asso->addxref;
+					print $asso->name;
+					if ($asso->addname != "") print " - " . PrintReady($asso->addname);
+					print $asso->addxref;
 					print "</a>\n";
 				}
 				else {

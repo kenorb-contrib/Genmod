@@ -325,40 +325,40 @@ abstract class BlockFunctions {
 							print "</td>";
 						}
 						if ($type=="INDI") {
-							print "<td class=\"name2 wrap\" ";
+							print "<td class=\"wrap\"";
 							if ($block) print "width=\"86%\"";
-							print "><a href=\"individual.php?pid=".urlencode($id)."&amp;gedid=".$gedid."\">";
-							print $object->name.($object->addname == "" ? "" : "&nbsp;(".$object->addname.")").$object->addxref;
+							print "><span class=\"name2\"><a href=\"individual.php?pid=".urlencode($id)."&amp;gedid=".$gedid."\">";
+							print $object->name.($object->addname == "" ? "" : "&nbsp;(".$object->addname.")")."</span>".$object->addxref;
 							print "</a></td>";
 							$i++;
 						}
 						elseif ($type=="FAM") {
-							print "<td class=\"name2 wrap\" ><a href=\"family.php?famid=".urlencode($id)."&amp;gedid=".$gedid."\">";
-							print $object->descriptor.($object->adddescriptor == "" ? "" : "&nbsp;(".$object->adddescriptor.")").$object->addxref;
+							print "<td class=\"wrap\"><span class=\"name2\" ><a href=\"family.php?famid=".urlencode($id)."&amp;gedid=".$gedid."\">";
+							print $object->descriptor.($object->adddescriptor == "" ? "" : "&nbsp;(".$object->adddescriptor.")")."</span>".$object->addxref;
 							print "</a></td>";
 							$i++;
 						}
 						elseif ($type=="REPO") {
-							print "<td class=\"name2 wrap\" ><a href=\"repo.php?rid=".urlencode($id)."&amp;gedid=".$gedid."\">";
-							print $object->descriptor.($object->adddescriptor == "" ? "" : "&nbsp;(".$object->adddescriptor.")").$object->addxref;
+							print "<td><span class=\"name2\" ><a href=\"repo.php?rid=".urlencode($id)."&amp;gedid=".$gedid."\">";
+							print $object->descriptor.($object->adddescriptor == "" ? "" : "&nbsp;(".$object->adddescriptor.")")."</span>".$object->addxref;
 							print "</a></td>";
 							$i++;
 						}
 						elseif ($type=="SOUR") {
-							print "<td class=\"name2 wrap\" ><a href=\"source.php?sid=".urlencode($id)."&amp;gedid=".$gedid."\">";
-							print $object->descriptor.($object->adddescriptor == "" ? "" : "&nbsp;(".$object->adddescriptor.")").$object->addxref;
+							print "<td><span class=\"name2\" ><a href=\"source.php?sid=".urlencode($id)."&amp;gedid=".$gedid."\">";
+							print $object->descriptor.($object->adddescriptor == "" ? "" : "&nbsp;(".$object->adddescriptor.")")."</span>".$object->addxref;
 							print "</a></td>";
 							$i++;
 						}
 						elseif ($type=="OBJE") {
-							print "<td class=\"name2 wrap\" ><a href=\"mediadetail.php?mid=".urlencode($id)."&amp;gedid=".$gedid."\">";
-							print $object->title.$object->addxref;
+							print "<td><span class=\"name2\" ><a href=\"mediadetail.php?mid=".urlencode($id)."&amp;gedid=".$gedid."\">";
+							print $object->title."</span>".$object->addxref;
 							print "</a></td>";
 							$i++;
 						}
 						elseif ($type=="NOTE") {
-							print "<td class=\"name2 wrap\" ><a href=\"note.php?oid=".urlencode($id)."&amp;gedid=".$gedid."\">";
-							print $object->title.$object->addxref;
+							print "<td><span class=\"name2\" ><a href=\"note.php?oid=".urlencode($id)."&amp;gedid=".$gedid."\">";
+							print $object->title."</span>".$object->addxref;
 							print "</a></td>";
 							$i++;
 						}

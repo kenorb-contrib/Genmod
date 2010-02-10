@@ -8,10 +8,6 @@
 .dimflag {
 	filter: alpha(opacity=40);
 }
-.small_inner_block {
-	height: 215px;
-	overflow: auto;
-}
 #content {
 	 height: 1%;
 }

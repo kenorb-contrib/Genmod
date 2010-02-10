@@ -63,19 +63,15 @@ abstract class MenuBar {
 		$result = NewQuery($sql);
 		$pages = array();
 		while ($row = $result->FetchAssoc()) {
-			$page = array();
-			$page["id"] = $row["pag_id"];
-			$page["html"] = $row["pag_content"];
-			$page["title"] = $row["pag_title"];
-			$pages[$row["pag_id"]] = $page;
+			$pages[$row["pag_id"]] = new CustomPage($row);
 		}
 			
 		//-- My Pages
 		if (count($pages) > 0) {
 			$menu = new Menu(GM_LANG_my_pages);
 			foreach ( $pages as $key => $page) {
-				$submenu = new Menu($page["title"], "");
-				$submenu->addLink("custompage.php?action=show&id=".$page["id"]);
+				$submenu = new Menu($page->title, "");
+				$submenu->addLink("custompage.php?action=show&page_id=".$page->id);
 				$menu->addSubmenu($submenu);
 			}
 		}

@@ -583,7 +583,7 @@ function FindHighlightedObject($obj) {
 	
 	// We have the candidates that can be displayed. Check for a _PRIM Y in the link record.
 	// On the fly we also check the _THUM tag, first in the link, then in the media record.
-	// If a media item has no PRIM Y and PRIM N, store it for further investigation.
+	// If a media item has no PRIM Y and PRIM N in the fact record that is pointing to it, store it for further investigation.
 	foreach($facts as $key => $fact) {
 		$media =& MediaItem::GetInstance($fact->linkxref, "", $fact->gedcomid);
 		if ($fact->style != "change_old") {
@@ -605,16 +605,13 @@ function FindHighlightedObject($obj) {
 	// On the fly we also check the _THUM tag, first in the link, then in the media record.
 	if (!isset($primfile)) {
 		foreach($medias as $key => $media) {
-			if ($media->ischanged) $gedrec = $media->changedgedrec;
-			else $gedrec = $media->gedrec;
-			$prim = GetGedcomValue("_PRIM", 1, $gedrec);
-			if ($prim == "Y") {
+			if ($media->isprimary == "Y") {
 				$primfile = $media->filename;
-				$thum = GetGedcomValue("_THUM", 2, $gedrec);
-				if (empty($thum)) $thum = GetGedcomValue("_THUM", 1, $gedrec);
+				$thum = $media->useasthumb;
 				$id = $media->xref;
 				break;
 			}
+			else if ($media->isprimary == "N") unset($medias[$key]);
 		}
 	}
 	
@@ -622,12 +619,8 @@ function FindHighlightedObject($obj) {
 	// We can do that safely because the media items with PRIM N are already filtered out.
 	if (!isset($primfile)) {
 		foreach($medias as $key => $media) {
-			if ($media->ischanged) $gedrec = $media->changedgedrec;
-			else $gedrec = $media->gedrec;
-			$prim = GetGedcomValue("_PRIM", 1, $gedrec);
 			$primfile = $media->filename;
-			$thum = GetGedcomValue("_THUM", 2, $gedrec);
-			if (empty($thum)) $thum = GetGedcomValue("_THUM", 1, $gedrec);
+			$thum = $media->useasthumb;
 			$id = $media->xref;
 			break;
 		}
@@ -2013,7 +2006,7 @@ function ReConstructObject($pid, $type, $gedid="", $data_array="") {
 	$type = strtoupper($type);
 	$object = null;
 	
-	if (!empty($type) && in_array($type, array("INDI", "FAM", "SOUR", "REPO", "ASSO", "NOTE", "SUBM", "HEAD"))) {
+	if (!empty($type) && in_array($type, array("INDI", "FAM", "SOUR", "REPO", "OBJE", "ASSO", "NOTE", "SUBM", "HEAD"))) {
 		if ($type == "SOUR") $object =& Source::NewInstance($pid, $data_array, $gedid);
 		elseif ($type == "REPO") $object =& Repository::NewInstance($pid, $data_array, $gedid);
 		elseif ($type == "OBJE") $object =& MediaItem::NewInstance($pid, $data_array, $gedid);

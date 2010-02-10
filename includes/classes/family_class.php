@@ -43,6 +43,7 @@ class Family extends GedcomRecord {
 	private $title = null;					// Printable name for the family in normal order
 	private $name = null;					// Same as title
 	private $descriptor = null;				// Same as title
+	private $addname = null;				// Same as adddescriptor
 	private $adddescriptor = null;			// Printable addname, names in order firstname lastname
 	private $allnames = null;				// Array of all family name combinations of the husband and wife
 		
@@ -199,6 +200,9 @@ class Family extends GedcomRecord {
 				break;
 			case "name":
 				return $this->GetTitle();
+				break;
+			case "addname":
+				return $this->GetAddTitle();
 				break;
 			case "title":
 				return $this->GetTitle();
