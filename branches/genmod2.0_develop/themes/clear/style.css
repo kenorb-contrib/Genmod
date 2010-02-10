@@ -1062,7 +1062,7 @@ select {
 
 /* block styles */
 .small_inner_block {
-	max-height: 215px;
+	max-height: 225px;
 	overflow: auto;
 	font-size: 10px;
 	text-decoration: none;

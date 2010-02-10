@@ -41,6 +41,8 @@ class MediaItem extends GedcomRecord {
 	private $level = 0;
 	private $validmedia = null;
 	public  $fileobj = null;
+	private $isprimary = null;			// This record has a 1 _PRIM Y/N tag or not
+	private $useasthumb = null;			// This record has a 1 _THUM Y/N tag or not
 	
 	public  $links = array(); // set in media class
 	public  $linked = false; // set in media class
@@ -117,6 +119,12 @@ class MediaItem extends GedcomRecord {
 				break;
 			case "validmedia":
 				return $this->IsValidMedia();
+				break;
+			case "isprimary":
+				return $this->IsPrimaryObject();
+				break;
+			case "useasthumb":
+				return $this->UseAsThumb();
 				break;
 			default:
 				return parent::__get($property);
@@ -342,6 +350,22 @@ class MediaItem extends GedcomRecord {
 		return true;
 	}
 	
+	private function IsPrimaryObject() {
+		
+		if (is_null($this->isprimary)) {
+			$this->isprimary = GetGedcomValue("_PRIM", 1, ($this->ischanged ? $this->changedgedrec : $this->gedrec));
+		}
+		return $this->isprimary;
+	}
 	
+	private function UseAsThumb() {
+		
+		if (is_null($this->useasthumb)) {
+			$this->useasthumb = GetGedcomValue("_THUM", 1, ($this->ischanged ? $this->changedgedrec : $this->gedrec));
+			if ($this->useasthumb == "") $this->isprimary = GetGedcomValue("_THUM", 2, ($this->ischanged ? $this->changedgedrec : $this->gedrec));
+		}
+		return $this->useasthumb;
+	}
+			
 }
 ?>

@@ -75,8 +75,8 @@ function print_random_media($block = true, $config="", $side, $index) {
 		}
 		else {
 			if ($media->fileobj->f_file_exists || strstr($media->filename, "://")) {
-				print "<img src=\"".$media->m_main_file."\" border=\"0\" class=\"thumbnail\" alt=\"\" ";
-				if (!stristr($media->m_main_file, "://")) {
+				print "<img src=\"".$media->fileobj->f_main_file."\" border=\"0\" class=\"thumbnail\" alt=\"\" ";
+				if (!stristr($media->fileobj->f_main_file, "://")) {
 					if ($media->fileobj->f_width > 175) print "width=\"175\" ";
 				}
 				else print "width=\"175\" ";

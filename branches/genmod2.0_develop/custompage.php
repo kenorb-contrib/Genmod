@@ -22,201 +22,80 @@
  * @package Genmod
  * @version $Id$
  */
-class CustomPage {
-	
-	var $name = 'CustomPage';
-	var $output = '';
-	var $message = '';
-	var $id = 0;
-	var $page_id = 0;
-	var $pages = array();
-	var $page = array();
-	var $html = '';
-	var $title = '';
-	var $storenew = '';
-	
-	function CustomPage(&$genmod) {
-		$this->CheckUrl();
-		$this->GetPageValues($genmod);
-		switch ($genmod['action']) {
-			case 'show':
-				if ($this->id > 0) {
-					// Retrieve the page to be shown
-					$sql = "SELECT * FROM ".TBLPREFIX."pages WHERE `pag_id` = '".$this->id."'";
-					$result = NewQuery($sql);
-					if (!$result) {
-						$message  = 'Invalid query: ' . mysql_error() . "\n";
-						$message .= 'Whole query: ' . $sql;
-						die($message);
-					}
-					else {
-						while ($row = $result->FetchAssoc()) {
-							$this->page = array();
-							$this->page["id"] = $row["pag_id"];
-							$this->page["html"] = stripslashes($row["pag_content"]);
-							$this->page["title"] = stripslashes($row["pag_title"]);
-						}
-					}
-					$this->AddHeader($this->page["title"]);
-					echo html_entity_decode($this->page["html"]);
+ 
+require "config.php";
+
+$custompage = new CustomPageController();
+
+PrintHeader($custompage->pagetitle);
+
+if ($custompage->action == "edit") {
+	print "<div id=\"content\">";
+		print "<div id=\"mainpage\">";
+			print "<div class=\"topbottombar\">".GM_LANG_my_pages."</div>";
+			if ($custompage->task != GM_LANG_edit) {
+				print "<table class=\"width100\">";
+				print "<tr class=\"shade3\"><td class=\"width10\">".GM_LANG_options."</td><td>".GM_LANG_title."</td></tr>";
+				print "<tr><td class=\"shade2\"><a style=\"text-decoration: none;\" href=\"custompage.php?action=".$custompage->action."&amp;task=".GM_LANG_edit."&amp;page_id=newpage\"><img class=\"noborder\" src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["edit"]["button"]."\" alt=\"".GM_LANG_edit."\" /></a>";
+				print "&nbsp;</td>";
+				print "<td class=\"shade1\">".GM_LANG_new."</td></tr>";
+				foreach ($custompage->pages as $ct => $page) {
+					print "<tr><td class=\"shade2\"><a style=\"text-decoration: none;\" href=\"custompage.php?action=".$custompage->action."&amp;task=".GM_LANG_edit."&amp;page_id=".$page->id."\"><img class=\"noborder\" src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["edit"]["button"]."\" alt=\"".GM_LANG_edit."\" /></a>&nbsp;";
+					print "<a href=\"custompage.php?action=".$custompage->action."&amp;task=".GM_LANG_delete."&amp;page_id=".$page->id."\" onclick=\"return confirm('".GM_LANG_confirm_page_delete."'); \"><img class=\"noborder\" src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["delete"]["button"]."\" alt=\"".GM_LANG_delete."\" /></a></td>";
+					print "<td class=\"shade1\">".$page->title."</td></tr>"';
 				}
-				break;
-			case 'edit':
-				if ($this->CheckAccess()) {
-					$this->AddHeader(GM_LANG_my_pages);
-					switch ($genmod['task']) {
-						case GM_LANG_save:
-							if ($this->storenew == "newpage") $sql = "INSERT INTO ".TBLPREFIX."pages (`pag_content`, `pag_title`) VALUES ('".mysql_real_escape_string($this->html)."', '".mysql_real_escape_string($this->title)."')";
-							else $sql = "UPDATE ".TBLPREFIX."pages SET `pag_content` = '".mysql_real_escape_string($this->html)."', `pag_title` = '".mysql_real_escape_string($this->title)."' WHERE `pag_id` = '".$this->page_id."'";
-							$result = NewQuery($sql);
-							if (!$result) {
-							   $message  = 'Invalid query: ' . mysql_error() . "\n";
-							   $message .= 'Whole query: ' . $query;
-							   die($message);
-							}
-							break;
-						case GM_LANG_delete:
-							$sql = "DELETE FROM ".TBLPREFIX."pages WHERE `pag_id` = '".$this->page_id."'";
-							$result = NewQuery($sql);
-							if (!$result) {
-							   $message  = 'Invalid query: ' . mysql_error() . "\n";
-							   $message .= 'Whole query: ' . $query;
-							   die($message);
-							}
-							// TODO: Add appropiate text
-							else $this->message .= GM_LANG_page_deleted;
-							break;
-					}
-					// Retrieve the current pages stored in the DB
-					$sql = "SELECT * FROM ".TBLPREFIX."pages";
-					$result = NewQuery($sql);
-					if (!$result) {
-						$message  = 'Invalid query: ' . mysql_error() . "\n";
-						$message .= 'Whole query: ' . $query;
-						die($message);
-					}
-					else {
-						while ($row = $result->FetchAssoc()) {
-							$this->page["id"] = $row["pag_id"];
-							$this->page["html"] = stripslashes($row["pag_content"]);
-							$this->page["title"] = stripslashes($row["pag_title"]);
-							$this->pages[$row["pag_id"]] = $this->page;
-						}
-					}
-					$this->ShowForm($genmod);
+				print "</table>";
+			}
+			else {
+				/**
+				 * Inclusion of the FCK Editor
+				*/
+				$useFCK = file_exists("./modules/FCKeditor/fckeditor.php");
+				if($useFCK){
+					include("./modules/FCKeditor/fckeditor.php");
 				}
-				else return false;
-				break;
-			default:
-				$this->AddHeader(GM_LANG_edit);
-				echo GM_LANG_access_denied;
-				break;
-		}
-		$this->AddFooter();
-	}
-	
-	function CheckUrl() {
-		// Do not allow direct access to the script
-//		if ($_SERVER['SCRIPT_NAME'] == '/custompage.php') {
-//			require_once("includes/functions.php");
-//			header('Location: index2.php?page=custompage&'.GetQueryString());
-//		}
-	}
-	
-	function CheckAccess() {
-		global $gm_user;
-		// If no admin, always search in user help
-		if (!$gm_user->userIsAdmin()) return false;
-		else return true;
-	}
-	
-	function GetPageValues(&$genmod) {
-		if (isset($_REQUEST['id'])) $this->id = $_REQUEST['id'];
-		if (isset($_REQUEST['page_id'])) $this->page_id = $_REQUEST['page_id'];
-		if (isset($_REQUEST['html'])) $this->html = $_REQUEST['html'];
-		if (isset($_REQUEST['title'])) $this->title = $_REQUEST['title'];
-		if (isset($_REQUEST['storenew'])) $this->storenew = $_REQUEST['storenew'];
-	}
-	
-	function AddHeader($title) {
-		PrintHeader($title);
-	}
-	
-	function AddFooter() {
-		if (!empty($this->message)) echo $this->message;
-		PrintFooter();
-	}
-	
-	function ShowForm(&$genmod) {
-		global $useFCK, $language_settings, $LANGUAGE;
-		
-		echo '<div id="content">';
-		echo '<div id="mainpage">';
-		echo '<div class="topbottombar">'.GM_LANG_my_pages.'</div>';
-		switch ($genmod['task']) {
-			case GM_LANG_edit:
-/**
- * Inclusion of the FCK Editor
-*/
-$useFCK = file_exists("./modules/FCKeditor/fckeditor.php");
-if($useFCK){
-	include("./modules/FCKeditor/fckeditor.php");
-}
+				print "<form name=\"htmlpage\" method=\"post\" action=\"custompage.php\">";
+				print "<input type=\"hidden\" name=\"action\" value=\"".$custompage->action."\">";
+			
+				if ($custompage->page_id == "newpage") print "<input type=\"hidden\" name=\"page_id\" value=\"newpage\">";
+				else print "<input type=\"hidden\" name=\"page_id\" value=\"".$custompage->page_id."\">";
 				
-				?>
-				<form name="htmlpage" method="post" action="custompage.php">
-				<?php
-				echo '<input type="hidden" name="action" value="'.$genmod['action'].'">';
-				echo '<input type="hidden" name="page" value="'.$genmod['page'].'">';
-				if ($this->page_id == "newpage") echo '<input type="hidden" name="storenew" value="newpage">';
-				else echo '<input type="hidden" name="page_id" value="'.$this->page_id.'">';
-				echo GM_LANG_title.':<br /><input type="text" name="title" value="';
-				if ($this->page_id != "newpage") echo $this->pages[$this->page_id]["title"]; 
-				echo '" /><br />';
-				echo GM_LANG_content.':<br />';
+				print GM_LANG_title.":<br /><input type=\"text\" name=\"title\" value=\"";
+				if ($custompage->page_id != "newpage") print $custompage->page->title;
+				print "\" /><br />";
+				
+				print GM_LANG_content.":<br />";
 				if ($useFCK) { // use FCKeditor module
-					if ($this->page_id != "newpage") $text = $this->pages[$this->page_id]["html"];
+					if ($custompage->page_id != "newpage") $text = $custompage->page->content;
 					else $text = "";
 					
-					$oFCKeditor = new FCKeditor('html') ;
-					$oFCKeditor->BasePath =  './modules/FCKeditor/';
+					$oFCKeditor = new FCKeditor("html");
+					$oFCKeditor->BasePath =  "./modules/FCKeditor/";
 					$oFCKeditor->Value = $text;
 					$oFCKeditor->Width = 700;
 					$oFCKeditor->Height = 450;
-					$oFCKeditor->Config['EnterMode'] = 'br';
-					$oFCKeditor->Config['AutoDetectLanguage'] = false ;
-					$oFCKeditor->Config['DefaultLanguage'] = $language_settings[$LANGUAGE]["lang_short_cut"];
+					$oFCKeditor->Config["EnterMode"] = "br";
+					$oFCKeditor->Config["AutoDetectLanguage"] = false ;
+					$oFCKeditor->Config["DefaultLanguage"] = $language_settings[$LANGUAGE]["lang_short_cut"];
 					$oFCKeditor->Create() ;
-				} else { //use standard textarea
-					echo '<textarea name="html" rows="15" cols="80">';
-					if ($this->page_id != "newpage") echo $this->pages[$this->page_id]["html"];
-					?></textarea>
-				<?php } ?>
-				<br />
-				<input type="submit" name="task" value="<?php print GM_LANG_save; ?>">
-				<input type="submit" name="task" value="<?php print GM_LANG_cancel; ?>">
-				</form>
-				<?php
-				break;
-			default:
-				// Form with pages to edit
-				echo '<table class="width100">';
-				echo '<tr class="shade3"><td class="width10">'.GM_LANG_options.'</td><td>'.GM_LANG_title.'</td></tr>';
-				echo '<tr><td class="shade2"><a style="text-decoration: none;" href="custompage.php?action='.$genmod['action'].'&amp;task='.GM_LANG_edit.'&amp;page_id=newpage"><img class="noborder" src="'.$genmod['gm_image_dir'].'/'.$genmod['gm_images']["edit"]["button"].'" alt="'.GM_LANG_edit.'"/></a>';
-				echo '&nbsp;</td>';
-				echo '<td class="shade1">'.GM_LANG_new.'</td></tr>';
-				foreach ($this->pages as $ct => $page) {
-					echo '<tr><td class="shade2"><a style="text-decoration: none;" href="custompage.php?action='.$genmod['action'].'&amp;task='.GM_LANG_edit.'&amp;page_id='.$page["id"].'"><img class="noborder" src="'.$genmod['gm_image_dir'].'/'.$genmod['gm_images']["edit"]["button"].'" alt="'.GM_LANG_edit.'"/></a>&nbsp;';
-					echo '<a href="custompage.php?action='.$genmod['action'].'&amp;task='.GM_LANG_delete.'&amp;page_id='.$page["id"].'" onclick="return confirm(\''.GM_LANG_confirm_page_delete.'\');"><img class="noborder" src="'.$genmod['gm_image_dir'].'/'.$genmod['gm_images']["delete"]["button"].'" alt="'.GM_LANG_delete.'"/></a></td>';
-					echo '<td class="shade1">'.$page["title"].'</td></tr>';
+				} 
+				else { //use standard textarea
+					print "<textarea name=\"html\" rows=\"15\" cols=\"80\">";
+					if ($custompage->page_id != "newpage") print $custompage->page->content;
+					print "</textarea>";
 				}
-				echo '</table>';
-				break;
-		}
-		echo '</div>';
-	}
+				print "<br />";
+				print "<input type=\"submit\" name=\"task\" value=\"".GM_LANG_save."\">";
+				print "<input type=\"submit\" name=\"task\" value=\"".GM_LANG_cancel."\">";
+				print "</form>";
+			}
+			print "</div>";
+		print "</div>";
+	print "</div>";
 }
-require "config.php";
-require "includes/setgenmod.php";
-$custompage = new CustomPage($genmod);
+else {
+	print html_entity_decode($custompage->page->content);
+}
+print "<div class=\"error center\">".$custompage->message."</div>";
+PrintFooter();
 ?>

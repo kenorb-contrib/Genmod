@@ -303,8 +303,9 @@ abstract class ChangeFunctions {
 					if ($counttoadd == 1) {
 						$object = ReConstructObject($details["gid"], $details["gid_type"], $details["file"]);
 						if (is_object($object)) $gedrec = $object->gedrec;
+						else $gedrec = "";
 					}
-	//				 print "<br /><br />Old value of gedrec: ".$gedrec."<br />";
+					// print "<br /><br />Old value of gedrec: ".$gedrec."<br />";
 					// NOTE: Import the record
 					$update_id = "";
 					if (!isset($gedrec)) $gedrec = "";
