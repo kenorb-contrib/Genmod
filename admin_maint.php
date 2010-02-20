@@ -58,7 +58,7 @@ switch ($action) {
 		else $message = "<span class=\"error\">".GM_LANG_report_titles_not_generated."</span>";
 		break;
 	case "resetisdead": 
-		if (ResetIsDead()) $message = GM_LANG_isdead_reset;
+		if (AdminFunctions::ResetIsDead()) $message = GM_LANG_isdead_reset;
 		else $message = "<span class=\"error\">".GM_LANG_isdead_not_reset."</span>";
 		break;
 	case "buildisdead":

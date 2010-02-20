@@ -92,7 +92,7 @@ abstract class AdminFunctions {
 		return($err_write);
 	}
 	
-	public function PrintGedcom($ged, $convert, $remove, $zip, $privatize_export, $privatize_export_level, $gedname, $embedmm, $embednote) {
+	public function PrintGedcom($ged, $convert, $remove, $zip, $privatize_export, $privatize_export_level, $gedname, $embedmm, $embednote, $addaction) {
 		GLOBAL $GM_BASE_DIRECTORY, $gm_username, $gm_user;
 		
 		if ($zip == "yes") {
@@ -103,7 +103,7 @@ abstract class AdminFunctions {
 		if ($privatize_export == "yes") {
 			UserController::CreateExportUser($privatize_export_level);
 			if (isset($_SESSION)) {
-				$_SESSION["org_user"] = $_SESSION["gm_user"];
+				$_SESSION["org_user"] = $gm_user->username;
 				$_SESSION["gm_user"] = "export";
 			}
 			if (isset($HTTP_SESSION_VARS)) {
@@ -162,35 +162,58 @@ abstract class AdminFunctions {
 		if ($zip == "yes") fwrite($gedout, $head);
 		else print $head;
 	
-		$sql = "SELECT i_key, i_gedrec, i_file, i_id, i_isdead, n_name, n_surname, n_nick, n_type, n_letter, n_fletter FROM ".TBLPREFIX."individuals INNER JOIN ".TBLPREFIX."names ON i_key=n_key WHERE i_file=".GedcomConfig::$GEDCOMID." ORDER BY CAST(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(LOWER(i_id),'a',''),'b',''),'c',''),'d',''),'e',''),'f',''),'g',''),'h',''),'i',''),'j',''),'k',''),'l',''),'m',''),'n',''),'o',''),'p',''),'q',''),'r',''),'s',''),'t',''),'u',''),'v',''),'w',''),'x',''),'y',''),'z','') as unsigned), n_id";
+		$sql = "SELECT i_key, i_gedrec, i_file, i_id, i_isdead, n_id, n_name, n_surname, n_nick, n_type, n_letter, n_fletter".($addaction == "yes" ? ", a_pid, a_type, a_file, a_id, a_repo, a_text, a_status" : "")." FROM ".TBLPREFIX."individuals INNER JOIN ".TBLPREFIX."names ON i_key=n_key ".($addaction == "yes" ? "LEFT JOIN ".TBLPREFIX."actions ON (a_file=i_file AND a_pid=i_id)" : "")." WHERE i_file=".GedcomConfig::$GEDCOMID." ORDER BY CAST(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(LOWER(i_id),'a',''),'b',''),'c',''),'d',''),'e',''),'f',''),'g',''),'h',''),'i',''),'j',''),'k',''),'l',''),'m',''),'n',''),'o',''),'p',''),'q',''),'r',''),'s',''),'t',''),'u',''),'v',''),'w',''),'x',''),'y',''),'z','') as unsigned), n_id";
 		$res = NewQuery($sql);
 		if ($res) {
+			$actionstr = "";
 			$key = "";
+			$keyn = "";
 			while($row = $res->FetchAssoc()) {
 				if ($key != $row["i_key"]) {
 					if ($key != "") {
 						$person->names_read = true;
-						self::PrintGedcomObject($person, $privatize_export, $embedmm, $embednote, $remove, $convert, $zip, $gedout);
+						self::PrintGedcomObject($person, $privatize_export, $embedmm, $embednote, $remove, $convert, $zip, $gedout, $actionstr);
+						$actionstr = "";
 					}
 					$person = null;
 					$key = $row["i_key"];
 					$person = new Person($row["i_id"], $row, $row["i_id"]);
 				}
-				$person->addname = array($row["n_name"], $row["n_letter"], $row["n_surname"], $row["n_nick"], $row["n_type"], $row["n_fletter"]);
+				if ($keyn != $row["n_id"]) {
+					$person->addname = array($row["n_name"], $row["n_letter"], $row["n_surname"], $row["n_nick"], $row["n_type"], $row["n_fletter"]);
+					$keyn = $row["n_id"];
+				}
+				if ($addaction == "yes" && !is_null($row["a_id"])) {
+					$action = new ActionItem($row);
+					$actionstr .= $action->GetGedcomString();
+				}
 			}
 			if ($key != "") {
 				$person->names_read = true;
-				self::PrintGedcomObject($person, $privatize_export, $embedmm, $embednote, $remove, $convert, $zip, $gedout);
+				self::PrintGedcomObject($person, $privatize_export, $embedmm, $embednote, $remove, $convert, $zip, $gedout, $actionstr);
 			}
 		}
 		
-		$sql = "SELECT f_id, f_gedrec, f_file FROM ".TBLPREFIX."families WHERE f_file=".GedcomConfig::$GEDCOMID." ORDER BY cast(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(LOWER(f_id),'a',''),'b',''),'c',''),'d',''),'e',''),'f',''),'g',''),'h',''),'i',''),'j',''),'k',''),'l',''),'m',''),'n',''),'o',''),'p',''),'q',''),'r',''),'s',''),'t',''),'u',''),'v',''),'w',''),'x',''),'y',''),'z','') as unsigned)";
+		$sql = "SELECT f_id, f_gedrec, f_file".($addaction == "yes" ? ", a_pid, a_type, a_file, a_id, a_repo, a_text, a_status" : "")."  FROM ".TBLPREFIX."families ".($addaction == "yes" ? "LEFT JOIN ".TBLPREFIX."actions ON (a_file=f_file AND a_pid=f_id)" : "")." WHERE f_file=".GedcomConfig::$GEDCOMID." ORDER BY cast(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(LOWER(f_id),'a',''),'b',''),'c',''),'d',''),'e',''),'f',''),'g',''),'h',''),'i',''),'j',''),'k',''),'l',''),'m',''),'n',''),'o',''),'p',''),'q',''),'r',''),'s',''),'t',''),'u',''),'v',''),'w',''),'x',''),'y',''),'z','') as unsigned)";
 		$res = NewQuery($sql);
 		if ($res) {
+			$actionstr = "";
+			$key = "";
 			while($row = $res->FetchAssoc()){
-				$family = new Family($row["f_id"], $row, $row["f_file"]);
-				self::PrintGedcomObject($family, $privatize_export, $embedmm, $embednote, $remove, $convert, $zip, $gedout);
+				if ($key != $row["f_id"]) {
+					if ($key != "") {
+						self::PrintGedcomObject($family, $privatize_export, $embedmm, $embednote, $remove, $convert, $zip, $gedout, $actionstr);
+						$actionstr = "";
+					}
+					$key = $row["f_id"];
+					$family = new Family($row["f_id"], $row, $row["f_file"]);
+				}
+				if ($addaction == "yes" && !is_null($row["a_id"])) {
+					$action = new ActionItem($row);
+					$actionstr .= $action->GetGedcomString();
+				}
 			}
+			if ($key != "") self::PrintGedcomObject($family, $privatize_export, $embedmm, $embednote, $remove, $convert, $zip, $gedout, $actionstr);
 			$res->FreeResult();
 		}
 	
@@ -217,20 +240,37 @@ abstract class AdminFunctions {
 			}
 		}
 	
-		$sql = "SELECT o_gedrec, o_type, o_file, o_id FROM ".TBLPREFIX."other WHERE o_file=".GedcomConfig::$GEDCOMID." ORDER BY o_type, cast(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(LOWER(o_id),'a',''),'b',''),'c',''),'d',''),'e',''),'f',''),'g',''),'h',''),'i',''),'j',''),'k',''),'l',''),'m',''),'n',''),'o',''),'p',''),'q',''),'r',''),'s',''),'t',''),'u',''),'v',''),'w',''),'x',''),'y',''),'z','') as unsigned)";
+		$sql = "SELECT o_gedrec, o_type, o_file, o_id".($addaction == "yes" ? ", a_pid, a_type, a_file, a_id, a_repo, a_text, a_status" : "")." FROM ".TBLPREFIX."other ".($addaction == "yes" ? "LEFT JOIN ".TBLPREFIX."actions ON (a_file=o_file AND a_repo=o_id)" : "")." WHERE o_file=".GedcomConfig::$GEDCOMID." ORDER BY o_type, cast(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(LOWER(o_id),'a',''),'b',''),'c',''),'d',''),'e',''),'f',''),'g',''),'h',''),'i',''),'j',''),'k',''),'l',''),'m',''),'n',''),'o',''),'p',''),'q',''),'r',''),'s',''),'t',''),'u',''),'v',''),'w',''),'x',''),'y',''),'z','') as unsigned)";
 		$res = NewQuery($sql);
 		if ($res) {
-			while($row = $res->FetchAssoc()){
-				$key = $row["o_type"];
-				if ($key != "HEAD" && $key != "TRLR") {
-					if ($key != "NOTE" || $embednote != "yes") {
-						if ($key == "NOTE") $object = new Note($row["o_id"], $row, $row["o_file"]);
-						if ($key == "REPO") $object = new Repository($row["o_id"], $row, $row["o_file"]);
-						if ($key == "SUBM") $object = new Submitter($row["o_id"], $row, $row["o_file"]);
-						self::PrintGedcomObject($object, $privatize_export, $embedmm, $embednote, $remove, $convert, $zip, $gedout);
+			$actionstr = "";
+			$nkey = "";
+			$object = "";
+			while($row = $res->FetchAssoc()) {
+				if ($nkey != $row["o_id"]) {
+					if ($nkey != "" && is_object($object)) {
+						// we must check for an object, because a HEAD line doesn't create one.
+						self::PrintGedcomObject($object, $privatize_export, $embedmm, $embednote, $remove, $convert, $zip, $gedout, $actionstr);
+						$actionstr = "";
 					}
+					$nkey = $row["o_id"];
+					$key = $row["o_type"];
+					if ($key != "HEAD" && $key != "TRLR") {
+						if ($key != "NOTE" || $embednote != "yes") {
+							if ($key == "NOTE") $object = new Note($row["o_id"], $row, $row["o_file"]);
+							if ($key == "REPO") $object = new Repository($row["o_id"], $row, $row["o_file"]);
+							if ($key == "SUBM") $object = new Submitter($row["o_id"], $row, $row["o_file"]);
+						}
+						else $object = "";
+					}
+					else $object = "";
+				}
+				if ($addaction == "yes" && !is_null($row["a_id"]) && is_null($row["a_pid"])) {
+					$action = new ActionItem($row);
+					$actionstr .= $action->GetGedcomString();
 				}
 			}
+			if ($nkey != "" && is_object($object)) self::PrintGedcomObject($object, $privatize_export, $embedmm, $embednote, $remove, $convert, $zip, $gedout, $actionstr);
 			$res->FreeResult();
 		}
 	
@@ -307,15 +347,16 @@ abstract class AdminFunctions {
 		return $gedrec;
 	}
 
-	private function PrintGedcomObject(&$object, $privatize_export, $embedmm, $embednote, $remove, $convert, $zip, $gedout) {
+	private function PrintGedcomObject(&$object, $privatize_export, $embedmm, $embednote, $remove, $convert, $zip, $gedout, $actionrec="") {
 		
 		if ($privatize_export == "yes") $rec = $object->oldprivategedrec;
 		else $rec = $object->gedrec;
-		if ($object->disp) {
+		if ($privatize_export != "yes" || $object->disp) {
 			if ($embedmm == "yes") $rec = self::EmbedMM($rec);
 			if ($embednote == "yes") $rec = self::EmbedNote($rec);
 		}
 		$rec = RemoveCustomTags($rec, $remove);
+		$rec .= $actionrec;
 		if ($convert == "yes") $rec = utf8_decode($rec);
 		if ($zip == "yes") fwrite($gedout, $rec);
 		else print $rec;

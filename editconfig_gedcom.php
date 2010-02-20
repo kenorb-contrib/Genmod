@@ -369,6 +369,7 @@ if ($action=="update") {
 	$newconf["indi_quick_addfacts"] = $_POST["NEW_INDI_QUICK_ADDFACTS"];
 	$newconf["indi_ext_fam_facts"] = $boolarray[$_POST["NEW_INDI_EXT_FAM_FACTS"]];
 	$newconf["jewish_ashkenaz_pronunciation"] = $boolarray[$_POST["NEW_JEWISH_ASHKENAZ_PRONUNCIATION"]];
+	$newconf["keep_actions"] = $boolarray[$_POST["NEW_KEEP_ACTIONS"]];
 	$newconf["link_icons"] = $_POST["NEW_LINK_ICONS"];
 	$newconf["max_descendancy_generations"] = $_POST["NEW_MAX_DESCENDANCY_GENERATIONS"];
 	$newconf["max_pedigree_generations"] = $_POST["NEW_MAX_PEDIGREE_GENERATIONS"];
@@ -811,6 +812,15 @@ print "&nbsp;<a href=\"javascript: ".GM_LANG_gedcom_conf."\" onclick=\"expand_la
 	<tr>
 		<td class="shade2 wrap"><div class="helpicon"><?php PrintHelpLink("NOTE_ID_PREFIX_help", "qm", "NOTE_ID_PREFIX"); print "</div><div class=\"description\">";print GM_LANG_NOTE_ID_PREFIX;?></div></td>
 		<td class="shade1"><input type="text" name="NEW_NOTE_ID_PREFIX" dir="ltr" value="<?php print GedcomConfig::$NOTE_ID_PREFIX?>" size="5" tabindex="<?php $i++; print $i?>" />
+		</td>
+	</tr>
+	<tr>
+		<td class="shade2 wrap width20">
+		<div class="helpicon"><?php PrintHelpLink("KEEP_ACTIONS_help", "qm", "KEEP_ACTIONS"); print "</div><div class=\"description\">"; print GM_LANG_KEEP_ACTIONS;?></div></td>
+		<td class="shade1"><select name="NEW_KEEP_ACTIONS" tabindex="<?php $i++; print $i?>">
+				<option value="yes" <?php if (GedcomConfig::$KEEP_ACTIONS) print "selected=\"selected\""; ?>><?php print GM_LANG_yes;?></option>
+				<option value="no" <?php if (!GedcomConfig::$KEEP_ACTIONS) print "selected=\"selected\""; ?>><?php print GM_LANG_no;?></option>
+			</select>
 		</td>
 	</tr>
 	<tr>

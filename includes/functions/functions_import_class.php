@@ -389,6 +389,10 @@ abstract class ImportFunctions {
 	 */
 	public function EmptyDatabase($gedid) {
 	
+		if (!GedcomConfig::$KEEP_ACTIONS) {
+			$sql = "DELETE FROM ".TBLPREFIX."actions WHERE a_file='".$gedid."'";
+			$res = NewQuery($sql);
+		}
 		$sql = "DELETE FROM ".TBLPREFIX."individuals WHERE i_file='".$gedid."'";
 		$res = NewQuery($sql);
 		$sql = "DELETE FROM ".TBLPREFIX."asso WHERE as_file='".$gedid."'";
@@ -482,6 +486,8 @@ abstract class ImportFunctions {
 			}
 		}
 		$indirec = self::UpdateMedia($gid, $indirec, $update, $gedfile);
+		
+		if (!$update) $indirec = self::ExtractTodo($gid, $type, $indirec, $gedfile);
 		
 		// Insert the source links
 		// Recalculate $gid as it may have changed in UpdateMedia
@@ -1405,5 +1411,42 @@ abstract class ImportFunctions {
 		$res->FreeResult();
 		return $famlist;
 	}
+	
+	private function ExtractTodo($gid, $type, $indirec, $gedfile) {
+		
+		if ($type == "INDI" || $type == "FAM" || $type == "REPO") {
+			do {
+				// Always take the first todo, as it will be removed before the next cycle
+				$todo = GetSubRecord(1, "1 _TODO", $indirec);
+				if (!empty($todo)) {
+					if (!GedcomConfig::$KEEP_ACTIONS) {
+						$action = new ActionItem();
+						$action->gedcomid = $gedfile;
+						if ($type != "REPO") {
+							$action->pid = $gid;
+							$action->type = $type;
+							$ct = preg_match("/2 REPO @(.+)@/", $todo, $match);
+							if ($ct > 0) $action->repo = $match[1];
+						}
+						else {
+							$action->repo = $gid;
+						}
+						$textrec = GetSubRecord(2, "2 TEXT", $todo);
+						if (!empty($textrec)) {
+							$action->text = str_replace(array("2 TEXT ", "\r\n3 CONT "), array("", "\r\n"), $textrec);
+						}
+						$ct = preg_match("/2 STAT (\w+)/", $todo, $match);
+						if ($ct > 0) $action->status = ($match[1] == "Closed" ? 1 : 0);
+						$action->AddThis();
+					}
+					// Even if we don't add the actions, we must remove the action from the gedrec
+					$indirec = str_replace($todo, "", $indirec);
+				}
+			} while (!empty($todo)); 
+		}
+		return $indirec;
+	}
+		
+					
 }
 ?>

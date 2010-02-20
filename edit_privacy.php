@@ -225,7 +225,7 @@ if ($action=="update") {
 	$settings->SHOW_SOURCES = $_POST["v_SHOW_SOURCES"];
 	$settings->LINK_PRIVACY = $boolarray[$_POST["v_LINK_PRIVACY"]];
 	$settings->MAX_ALIVE_AGE = $_POST["v_MAX_ALIVE_AGE"];
-	if ($MAX_ALIVE_AGE!=$_POST["v_MAX_ALIVE_AGE"]) ResetIsDead();
+	if ($MAX_ALIVE_AGE!=$_POST["v_MAX_ALIVE_AGE"]) AdminFunctions::ResetIsDead();
 	$settings->ENABLE_CLIPPINGS_CART = $_POST["v_ENABLE_CLIPPINGS_CART"];
 	$settings->SHOW_ACTION_LIST = $_POST["v_SHOW_ACTION_LIST"];
 	$settings->PRIVACY_BY_YEAR = $boolarray[$_POST["v_PRIVACY_BY_YEAR"]];

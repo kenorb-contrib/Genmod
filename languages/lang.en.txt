@@ -2356,6 +2356,7 @@
 "relation_fams_short";"Set child/family relation and chart display"
 "embedmm";"Convert Multimedia records to embedded records"
 "embednote";"Convert Note records to embedded records"
+"add_action";"Add actions to the various record types"
 "merge_notunique";"The following facts are unique and must be selected no more than once:"
 "merge_haschanges";"One of the designated records has changes. Accept/reject those first, then try again."
 "merge_success";"Merge succesfully accomplished. Click Accept/Reject changes to make it permanent."
@@ -2606,3 +2607,4 @@
 "relationstoothers";"Persons and families this person relates to"
 "related_event";"Related event"
 "role";"Role"
+"KEEP_ACTIONS";"Retain old ToDo's during re-import"

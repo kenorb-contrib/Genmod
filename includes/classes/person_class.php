@@ -258,7 +258,7 @@ class Person extends GedcomRecord {
 		return $this->relationstoothers;
 	}
 	
-	private function GetDeathStatus() {
+	protected function GetDeathStatus() {
 		
 		if ($this->isdead != "0" && $this->isdead != "1") {
 			$this->isdead = PrivacyFunctions::UpdateIsDead($this);
@@ -1736,7 +1736,7 @@ class Person extends GedcomRecord {
 		// Now split dead and alive people
 		// If dead, we follow DisplayDetails
 		// If alive, we check if the general rule allows displaying the name. If not, return false.
-		if ($this->isdead) {
+		if ($this->GetDeathStatus()) {
 			SwitchGedcom($oldgedid);
 			return false;
 		}

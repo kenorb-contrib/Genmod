@@ -204,6 +204,7 @@ $db_original[TBLPREFIX."gedconf"]["row"]["gc_repo_id_prefix"]["details"] = "VARC
 $db_original[TBLPREFIX."gedconf"]["row"]["gc_fam_id_prefix"]["details"] = "VARCHAR (6) CHARACTER SET #charset# COLLATE #collate# ";
 $db_original[TBLPREFIX."gedconf"]["row"]["gc_media_id_prefix"]["details"] = "VARCHAR (6) CHARACTER SET #charset# COLLATE #collate# ";
 $db_original[TBLPREFIX."gedconf"]["row"]["gc_note_id_prefix"]["details"] = "VARCHAR (6) CHARACTER SET #charset# COLLATE #collate# ";
+$db_original[TBLPREFIX."gedconf"]["row"]["gc_keep_actions"]["details"] = "TINYINT(1)";
 $db_original[TBLPREFIX."gedconf"]["row"]["gc_pedigree_full_details"]["details"] = "TINYINT(1)";
 $db_original[TBLPREFIX."gedconf"]["row"]["gc_pedigree_layout"]["details"] = "TINYINT(1)";
 $db_original[TBLPREFIX."gedconf"]["row"]["gc_show_empty_boxes"]["details"] = "TINYINT(1)";

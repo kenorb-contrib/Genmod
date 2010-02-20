@@ -168,7 +168,8 @@ abstract class PrivacyFunctions {
 				// Get the family record
 				$family =& Family::GetInstance($fmatch[$j][1]);
 				//-- check for marriage date
-				$mardate = $family->marr_date;
+				$marrec = GetSubRecord(1, "1 MARR", $family->gedrec);
+				$mardate = GetSubRecord(2, "2 DATE", $marrec);
 				if ($mardate != "") {
 					$bt = preg_match_all("/\d DATE.*\s(\d{3,4})\s/", $mardate, $bmatch, PREG_SET_ORDER);
 					for($h=0; $h<$bt; $h++) {

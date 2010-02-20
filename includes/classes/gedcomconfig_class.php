@@ -63,6 +63,7 @@ abstract class GedcomConfig {
 	public static $FAM_ID_PREFIX = "F";						// This is the prefix prepend to newly generated family records
 	public static $MEDIA_ID_PREFIX = "M";					// This is the prefix prepend to newly generated media records
 	public static $NOTE_ID_PREFIX = "N";					// This is the prefix prepend to newly generated note records
+	public static $KEEP_ACTIONS = 0;						// If 0, actions will be deleted on re-import and actions will be imported. If 1, contrary.
 	public static $PEDIGREE_FULL_DETAILS = true;			// Show the birth and death details of an individual on the pedigree tree
 	public static $PEDIGREE_LAYOUT = true;					// Set to true for Landscape mode, false for portrait mode
 	public static $SHOW_EMPTY_BOXES = true;					// Show empty boxes on charts if the person is unknown
