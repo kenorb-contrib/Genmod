@@ -359,7 +359,7 @@ abstract class UserController {
 			}
 			$activeuser = self::GetUserName();
 			if ($activeuser == "") $activeuser = "Anonymous user";
-			$newuser =& User::GetInstance($newuser->username);
+			$newuser =& User::RenewInstance($newuser->username);
 			WriteToLog("UserController::AddUser: ".$activeuser." ".$msg." user -> ".$newuser->username." <-", "I", "S");
 			return true;
 		}
@@ -393,9 +393,10 @@ abstract class UserController {
 	* @param string $export_accesslevel
 	*/
 	public function CreateExportUser($export_accesslevel) {
-		
+	
 		$u =& User::GetInstance("export");
 		if (!$u->is_empty) self::DeleteUser("export");
+		else User::DeleteInstance("export");
 		$newuser = new User("");
 		$newuser->firstname = "Export";
 		$newuser->lastname = "useraccount";
@@ -411,9 +412,10 @@ abstract class UserController {
 		$newuser->rootid = "";
 		if ($export_accesslevel == "admin") $newuser->canadmin = true;
 		else $newuser->canadmin = false;
-		if ($export_accesslevel == "gedadmin") $newuser->canedit[GedcomConfig::$GEDCOMID] = "admin";
-		elseif ($export_accesslevel == "user") $newuser->canedit[GedcomConfig::$GEDCOMID] = "access";
-		else $newuser->canedit[GedcomConfig::$GEDCOMID] = "none";
+		$newuser->privgroup = array();
+		if ($export_accesslevel == "gedadmin") $newuser->privgroup[GedcomConfig::$GEDCOMID] = "admin";
+		elseif ($export_accesslevel == "user") $newuser->privgroup[GedcomConfig::$GEDCOMID] = "access";
+		else $newuser->privgroup[GedcomConfig::$GEDCOMID] = "none";
 		$newuser->email = "";
 		$newuser->verified = "Y";
 		$newuser->verified_by_admin = "Y";
@@ -437,7 +439,6 @@ abstract class UserController {
 		$newuser->show_living_names = array();
 		$newuser->hide_live_people = array();
 		$newuser->canedit = array();
-		$newuser->privgroup = array();
 		$newuser->auto_accept = "N";
 		self::AddUser($newuser);
 	}

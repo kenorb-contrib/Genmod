@@ -92,6 +92,7 @@ class User {
 		
 		if (isset(self::$cache[$username])) unset(self::$cache[$username]);
 		if (!empty($username)) self::$cache[$username] = new User($username);
+		return self::$cache[$username];
 
 	}
 		
@@ -102,7 +103,7 @@ class User {
 	}
 	
 	public function __construct($username="", $userfields="") {
-		return $this->GetUser($username, $userfields);
+		$this->GetUser($username, $userfields);
 	}
 
 	public function ObjCount() {
@@ -110,7 +111,7 @@ class User {
 	}	
 	
 	private function GetUser($username, $userfields="") {
-		global $userobjects, $DBCONN;
+		global $DBCONN;
 
 		if (empty($username) || $username == "empty") return false;
 
@@ -142,7 +143,7 @@ class User {
 	}
 
 	private function FillUser($username, $user_data) {
-		global $userobjects, $MAX_RELATION_PATH_LENGTH, $GEDCOMS;
+		global $MAX_RELATION_PATH_LENGTH, $GEDCOMS;
 		
 		foreach ($user_data as $key => $user_row) {
 			if (empty($this->username) && !empty($username)) {

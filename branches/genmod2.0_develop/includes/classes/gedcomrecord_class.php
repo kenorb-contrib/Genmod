@@ -722,7 +722,7 @@ abstract class GedcomRecord {
 			
 			// Check privacy by isdead status
 			if ($this->datatype == "INDI") {
-				$isdead = $this->isdead;
+				$isdead = $this->GetDeathStatus();
 				// The person is still hidden at this point and cannot be shown, either dead or alive.
 				// Check the relation privacy. If within the range, people can be shown. 
 				if ($USE_RELATIONSHIP_PRIVACY) {
@@ -745,7 +745,7 @@ abstract class GedcomRecord {
 					$relationship = GetRelationship($user_indi, $this, $CHECK_MARRIAGE_RELATIONS, $path_length);
 
 					// Only limit access to live people!
-					if ($relationship == false && !$this->isdead) {
+					if ($relationship == false && !$this->GetDeathStatus()) {
 						SwitchGedcom($oldgedid);
 						return false;
 					}
@@ -755,13 +755,13 @@ abstract class GedcomRecord {
 				}
 				
 				// First check if the person is dead. If so, it can be shown, depending on the setting for dead people.
-				if ($this->isdead && $SHOW_DEAD_PEOPLE >= $ulevel) {
+				if ($this->GetDeathStatus() && $SHOW_DEAD_PEOPLE >= $ulevel) {
 					SwitchGedcom($oldgedid);
 					return true;
 				}
 				
 				// Alive people. If the user is allowed to see the person, show it.
-				if (!$this->isdead && $HIDE_LIVE_PEOPLE >= $ulevel) {
+				if (!$this->GetDeathStatus() && $HIDE_LIVE_PEOPLE >= $ulevel) {
 					SwitchGedcom($oldgedid);
 					return true;
 				}
@@ -793,7 +793,7 @@ abstract class GedcomRecord {
 			// - Died within the last 95 years
 			// - Married within the last 105 years
 			// - Born within the last 120 years
-			$dead = $this->isdead;
+			$dead = $this->GetDeathStatus();
 			if ($PRIVACY_BY_YEAR) {
 				$cyear = date("Y");
 				//-- check death record

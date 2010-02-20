@@ -31,7 +31,7 @@
  * load the configuration and create the context
  */
 require("config.php");
-
+ 
 if (empty($day)) $day = adodb_date("j");
 if (empty($month)) $month = adodb_date("M");
 if (empty($year)) $year = adodb_date("Y");

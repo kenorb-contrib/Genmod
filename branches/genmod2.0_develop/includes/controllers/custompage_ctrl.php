@@ -32,6 +32,7 @@ class CustomPageController extends BaseController {
 	private $page = null;						// Holder for the single page
 	
 	public function __construct() {
+		global $gm_user;
 		
 		parent::__construct();
 		
@@ -39,7 +40,7 @@ class CustomPageController extends BaseController {
 		if (isset($_REQUEST["page_id"])) $this->page_id = $_REQUEST["page_id"];
 		
 		
-		if ($this->action == "edit" && $this->CheckAccess()) {
+		if ($this->action == "edit" && $gm_user->userIsAdmin()) {
 		 	if ($this->task == GM_LANG_delete && !is_null($this->page_id)) {
 				$page = new CustomPage($this->page_id);
 				$page->Delete();

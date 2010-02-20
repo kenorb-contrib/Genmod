@@ -73,6 +73,9 @@ class ActionItem {
 				case "pid":
 					return $this->pid;
 					break;
+				case "gedcomid":
+					return $this->gedcomid;
+					break;
 				case "type":
 					return $this->type;
 					break;
@@ -118,6 +121,9 @@ class ActionItem {
 			switch ($property) {
 				case "pid":
 					$this->pid = $value;
+					break;
+				case "gedcomid":
+					$this->gedcomid = $value;
 					break;
 				case "type":
 					$this->type = $value;
@@ -223,9 +229,9 @@ class ActionItem {
 		return $this->canshow;
 	}
  	
-	public function AddThis() {
-		
-		if ($this->canshow) {
+	public function AddThis($import=false) {
+
+		if ($import || $this->canShow()) {
 			$sql = "INSERT INTO ".TBLPREFIX."actions VALUES('', '".$this->pid."', '".$this->type."', '".$this->repo."','".$this->gedcomid."', '".DbLayer::EscapeQuery($this->text)."','".$this->status."')";
 			$res = NewQuery($sql);
 			$this->id = $res->InsertID();
@@ -234,7 +240,7 @@ class ActionItem {
 	
 	public function DeleteThis() {
 		
-		if ($this->canshow) {
+		if ($this->canShow()) {
 			$sql = "DELETE FROM ".TBLPREFIX."actions WHERE a_id='".$this->id."'";
 			$res = NewQuery($sql);
 		}
@@ -242,7 +248,7 @@ class ActionItem {
 
 	public function UpdateThis() {
 
-		if ($this->canshow) {
+		if ($this->canShow()) {
 			$sql = "UPDATE ".TBLPREFIX."actions SET a_pid='".$this->pid."', a_text='".DbLayer::EscapeQuery($this->text)."', a_repo='".$this->repo."', a_status='".$this->status."' WHERE a_id='".$this->id."'";
 			$res = NewQuery($sql);
 		}
@@ -251,7 +257,7 @@ class ActionItem {
 	public function PrintThis() {
 		global $gm_user;
 		
-		if ($this->canshow) {
+		if ($this->canShow()) {
 			print "<tr>";
 			print "\n\t\t\t<td id=\"actionfull_".$this->id."\" class=\"shade2 center width20\" style=\"vertical-align: middle\">";
 			if ($gm_user->userCanEdit()) {
@@ -297,7 +303,7 @@ class ActionItem {
 	
 	public function EditThisItem() {
 		
-		if ($this->canshow) {
+		if ($this->canShow()) {
 			print "<b>".GM_LANG_todo."</b><br />";
 			print "<textarea id=\"actiontext\" name=\"actiontext\" rows=\"4\" cols=\"60\">".stripslashes($this->text)."</textarea>";
 			print "<br /><br /><b>".GM_LANG_repo."</b><br />";
@@ -323,7 +329,7 @@ class ActionItem {
 	
 	public function AddThisItem() {
 		
-		if ($this->canshow) {
+		if ($this->canShow()) {
 			print "<b>".GM_LANG_todo."</b><br />";
 			print "<textarea id=\"actiontext\" name=\"actiontext\" rows=\"4\" cols=\"60\"></textarea>";
 			print "<br /><br /><b>".GM_LANG_repo."</b><br />";
@@ -337,13 +343,13 @@ class ActionItem {
 			print "<option value=\"0\" selected=\"selected\" >".GM_LANG_action0."</option>";
 			print "<option value=\"1\" >".GM_LANG_action1."</option>";
 			print "</select><br /><br />";
-			print "<input type=\"button\" value=\"".GM_LANG_save."\" onclick=\"sndReq('add_todo', 'action_add2', 'aid','".$this->id."','actiontext', encodeURI(document.actionform.actiontext.value), 'repo', document.actionform.repo.value, 'status', document.actionform.status.value, 'pid', document.actionform.pid.value, 'type', '".strtoupper($this->type)."'); window.location.reload()\" />";
+			print "<input type=\"button\" value=\"".GM_LANG_save."\" onclick=\"sndReq('add_todo', 'action_add2', 'aid','".$this->id."','actiontext', encodeURI(document.actionform.actiontext.value), 'repo', document.actionform.repo.value, 'status', document.actionform.status.value, 'pid', document.actionform.pid.value, 'type', '".strtoupper($this->type)."'); window.location.reload();\" />";
 		}
 	}
 	
 	public function PrintThisItem() {
 		
-		if ($this->canshow) {
+		if ($this->canShow()) {
 			print "<b>".GM_LANG_todo."</b><br />";
 			print nl2br(stripslashes($this->text));
 			print "<br /><br /><b>".GM_LANG_repo."</b><br />";
@@ -352,6 +358,16 @@ class ActionItem {
 			print constant("GM_LANG_action".$this->status);
 			print "<br />";
 		}
+	}
+	
+	public function GetGedcomString() {
+		
+		$string = "1 _TODO\r\n";
+		if ($this->pid != "") $string .= "2 REPO @".$this->repo."@\r\n";
+		$string .= "2 ID ".$this->id."\r\n";
+		$string .= "2 STAT ".($this->status == 0 ? "Open" : "Closed")."\r\n";
+		$string .= "2 TEXT ".preg_replace("/\r\n/", "\r\n3 CONT ", trim($this->text))."\r\n";
+		return $string;
 	}
 }
 ?>
