@@ -237,9 +237,9 @@ function WriteToLog($LogString, $type="I", $cat="S", $gedid="", $chkconn = true)
  * @author	Genmod Development Team
  */
 function ReadGedcoms() {
-	global $GEDCOMS, $DEFAULT_GEDCOM, $DEFAULT_GEDCOMID;
+	global $GEDCOMS, $DEFAULT_GEDCOMID;
+	
 	$GEDCOMS=array();
-	$DEFAULT_GEDCOM = "";
 	$DEFAULT_GEDCOMID = "";
 	$sql = "SELECT * FROM ".TBLPREFIX."gedcoms ORDER BY g_title";
 	$res = NewQuery($sql);
@@ -255,12 +255,10 @@ function ReadGedcoms() {
 				$g["id"] = $row["g_file"];
 				$g["commonsurnames"] = $row["g_commonsurnames"];
 				if ($row["g_isdefault"] == "Y") {
-					$DEFAULT_GEDCOM = $row["g_gedcom"];
 					$DEFAULT_GEDCOMID = $row["g_file"];
 				}
 				$GEDCOMS[$row["g_file"]] = $g;
 				if ($i == "0") {
-					$DEFAULT_GEDCOM = $row["g_gedcom"];
 					$DEFAULT_GEDCOMID = $row["g_file"];
 				}
 				$i++;

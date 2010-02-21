@@ -790,7 +790,7 @@ class Person extends GedcomRecord {
 				$factrec .= "\n2 ASSO @".$fam->$spperson->xref."@";
 				$factrec .= "\n3 RELA spouse";
 				if ($this->tracefacts) print "AddSpouseFacts - Adding for ".$fam->$spperson->xref.": ".$fact." ".$factrec."<br />";
-				$this->facts[] = new Fact($spperson->xref, $spperson->datatype, $spperson->gedcomid, "X$fact", $factrec, 0, "");
+				$this->facts[] = new Fact($fam->$spperson->xref, $fam->$spperson->datatype, $fam->$spperson->gedcomid, "X$fact", $factrec, 0, "");
 			}
 		}
 	}
