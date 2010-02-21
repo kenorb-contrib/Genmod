@@ -663,7 +663,7 @@ abstract class AdminFunctions {
 	 * @author	Genmod Development Team
 	 */
 	public function StoreGedcoms() {
-		global $GEDCOMS, $DEFAULT_GEDCOM;
+		global $GEDCOMS, $DEFAULT_GEDCOMID;
 	
 		if (!CONFIGURED) return false;
 		uasort($GEDCOMS, "GedcomSort");
@@ -698,7 +698,7 @@ abstract class AdminFunctions {
 				}
 				else $GED["commonsurnames"]="";
 			}
-			if ($GED["gedcom"] == $DEFAULT_GEDCOM) $is_default = "Y";
+			if ($GED["id"] == $DEFAULT_GEDCOMID) $is_default = "Y";
 			else $is_default = "N";
 			$sql = "INSERT INTO ".TBLPREFIX."gedcoms VALUES('".DbLayer::EscapeQuery($GED["id"])."','".DbLayer::EscapeQuery($GED["gedcom"])."','".DbLayer::EscapeQuery($GED["title"])."','".DbLayer::EscapeQuery($GED["path"])."','".DbLayer::EscapeQuery($GED["commonsurnames"])."','".DbLayer::EscapeQuery($is_default)."')";
 			$res = NewQuery($sql);

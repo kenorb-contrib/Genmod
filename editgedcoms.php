@@ -61,14 +61,15 @@ if ($action=="delete") {
 	else print "<br /><span class=\"error\">".GM_LANG_gedcom_not_exist."</span>";
 }
 
-if (($action=="setdefault") && isset($default_ged)) {
-	$DEFAULT_GEDCOM = urldecode($_POST["default_ged"]);
+if (($action == "setdefault") && isset($default_ged)) {
+	$DEFAULT_GEDCOMID = $_POST["default_ged"];
 	AdminFunctions::StoreGedcoms();
 }
 
 if ($action == "deletecount") {
 	$sql = "DELETE FROM ".TBLPREFIX."counters WHERE c_id LIKE '%[".$GEDCOMS[$delged]["id"]."]%'";
 	$res = NewQuery($sql);
+	unset($_SESSION[$delged."gm_counter"]);
 }
 ?>
 <!-- Setup the left box -->
@@ -109,10 +110,10 @@ if ($action == "deletecount") {
 					PrintHelpLink("default_gedcom_help", "qm");
 					print GM_LANG_DEFAULT_GEDCOM."&nbsp;";
 					print "<select name=\"default_ged\" class=\"header_select\" onchange=\"document.defaultform.submit();\">";
-					foreach($GEDCOMS as $gedc=>$gedarray) {
-						if (empty($DEFAULT_GEDCOM)) $DEFAULT_GEDCOM = $gedc;
-						print "<option value=\"".urlencode($gedc)."\"";
-						if ($DEFAULT_GEDCOM==$gedc) print " selected=\"selected\"";
+					foreach($GEDCOMS as $gedc => $gedarray) {
+						if (empty($DEFAULT_GEDCOMID)) $DEFAULT_GEDCOM = $gedc;
+						print "<option value=\"".$gedc."\"";
+						if ($DEFAULT_GEDCOMID == $gedc) print " selected=\"selected\"";
 						print " onclick=\"document.defaultform.submit();\">";
 						print PrintReady($gedarray["title"])."</option>";
 					}
@@ -145,7 +146,7 @@ if ($action == "deletecount") {
 				// Row 1: Title
 				print "<tr>";
 				print "<td colspan=\"5\" class=\"topbottombar\">";
-				if ($DEFAULT_GEDCOMID==$gedc) print "<span class=\"label\">".PrintReady($gedarray["title"])."</span></td>";
+				if ($DEFAULT_GEDCOMID == $gedc) print "<span class=\"label\">".PrintReady($gedarray["title"])."</span></td>";
 				else print PrintReady($gedarray["title"])."</td>";
 				print "</tr>";
 				
@@ -197,7 +198,7 @@ if ($action == "deletecount") {
 				if (AdminFunctions::NewLogRecs("F", $gedc)) print "<span class=\"error\">".GM_LANG_view_searchlog."</span>";
 				else print GM_LANG_view_searchlog;
 				print "</a></td>";
-				print "<td><a href=\"editgedcoms.php?action=delete&amp;delged=".$gedc."\" onclick=\"return confirm('".GM_LANG_confirm_gedcom_delete." ".preg_replace("/'/", "\'", $gedc)."?');\">".GM_LANG_ged_gedcom."</a></td>";
+				print "<td><a href=\"editgedcoms.php?action=delete&amp;delged=".$gedc."\" onclick=\"return confirm('".GM_LANG_confirm_gedcom_delete." ".preg_replace("/'/", "\'", get_gedcom_from_id($gedc))."?');\">".GM_LANG_ged_gedcom."</a></td>";
 				print "</tr>";
 				
 				// Row 4: Options
@@ -213,7 +214,7 @@ if ($action == "deletecount") {
 			  if (AdminFunctions::NewLogRecs("G", $gedc)) print "<span id=\"gedlog".$GedCount."\" class=\"error\">".GM_LANG_view_gedlog."</span>";
 			  else print "<span id=\"gedlog".$GedCount."\">".GM_LANG_view_gedlog."</span>";
 				print "</a></td>";
-				print "<td><a href=\"editgedcoms.php?action=deletecount&amp;delged=".$gedc."\" onclick=\"return confirm('".GM_LANG_confirm_count_delete." ".preg_replace("/'/", "\'", $gedc)."?');\">".GM_LANG_counters."</a></td>";
+				print "<td><a href=\"editgedcoms.php?action=deletecount&amp;delged=".$gedc."\" onclick=\"return confirm('".GM_LANG_confirm_count_delete." ".preg_replace("/'/", "\'", get_gedcom_from_id($gedc))."?');\">".GM_LANG_counters."</a></td>";
 				print "</tr>";
 				
 				// Row 5: Options
