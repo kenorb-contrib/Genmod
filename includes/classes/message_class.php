@@ -228,7 +228,7 @@ class Message {
 		$oldlanguage = $LANGUAGE;
 		if (is_object($tuser) && $tuser->language != "" && $tuser->language != $LANGUAGE) {
 			$LANGUAGE = $tuser->language;
-			LoadEnglish(false, false, true);
+			LanguageFunctions::LoadEnglish(false, false, true);
 			$TEXT_DIRECTION = $TEXT_DIRECTION_array[$LANGUAGE];
 			$DATE_FORMAT	= $DATE_FORMAT_array[$LANGUAGE];
 			$TIME_FORMAT	= $TIME_FORMAT_array[$LANGUAGE];
@@ -297,7 +297,7 @@ class Message {
 		// NOTE: Unload the recipients language and load the users language
 		if (($tuser)&&(!empty($LANGUAGE))&&($oldlanguage!=$LANGUAGE)) {
 			$LANGUAGE = $oldlanguage;
-			LoadEnglish(false, false, true);
+			LanguageFunctions::LoadEnglish(false, false, true);
 			$TEXT_DIRECTION = $TEXT_DIRECTION_array[$LANGUAGE];
 			$DATE_FORMAT	= $DATE_FORMAT_array[$LANGUAGE];
 			$TIME_FORMAT	= $TIME_FORMAT_array[$LANGUAGE];

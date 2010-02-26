@@ -88,7 +88,7 @@ if ($action=="confighelp") {
 	PrintHeader(GM_LANG_help_config);
 	print "<h3 class=\"center\">".Str2Upper(GM_LANG_help_config)."</h3><br />";
 	$language_array = array();
-	$language_array = LoadLanguage($LANGUAGE,true, true);
+	$language_array = LanguageFunctions::LoadLanguage($LANGUAGE,true, true);
 	
 	print "<ol>";
 	foreach ($language_array as $string => $text) {
@@ -97,7 +97,7 @@ if ($action=="confighelp") {
 			print stripslashes(PrintText($text,0,2)) . "<br /><br /></li>\r\n";
 		}
 	}
-    	print "</ol>";
+    print "</ol>";
 }
 
 PrintFooter();

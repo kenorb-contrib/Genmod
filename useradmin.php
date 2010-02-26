@@ -298,7 +298,7 @@ if ($action=="edituser2") {
 				// Switch to the users language
 				$oldlanguage = $LANGUAGE;
 				$LANGUAGE = $newuser->language;
-				if (isset($gm_language[$LANGUAGE])) LoadEnglish(false, false, true);
+				if (isset($gm_language[$LANGUAGE])) LanguageFunctions::LoadEnglish(false, false, true);
 				$TEXT_DIRECTION = $TEXT_DIRECTION_array[$LANGUAGE];
 				$DATE_FORMAT	= $DATE_FORMAT_array[$LANGUAGE];
 				$TIME_FORMAT	= $TIME_FORMAT_array[$LANGUAGE];
@@ -325,7 +325,7 @@ if ($action=="edituser2") {
 
 				// Switch back to the page language
 				$LANGUAGE = $oldlanguage;
-				if (isset($gm_language[$LANGUAGE])) LoadEnglish(false, false, true);
+				if (isset($gm_language[$LANGUAGE])) LanguageFunctions::LoadEnglish(false, false, true);
 				$TEXT_DIRECTION = $TEXT_DIRECTION_array[$LANGUAGE];
 				$DATE_FORMAT	= $DATE_FORMAT_array[$LANGUAGE];
 				$TIME_FORMAT	= $TIME_FORMAT_array[$LANGUAGE];

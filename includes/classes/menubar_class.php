@@ -557,7 +557,7 @@ abstract class MenuBar {
 		//-- searchhelp sub menu
 		if (file_exists("searchhelp.php")) {
 			$submenu = new Menu(GM_LANG_hs_title);
-			$submenu->addLink("window.open_index2.php?page=searchhelp");
+			$submenu->addLink("window.open_searchhelp.php");
 			$menu->addSubmenu($submenu);
 		}
 		

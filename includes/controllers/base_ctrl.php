@@ -63,6 +63,8 @@ abstract class BaseController {
 		$this->uname = $gm_user->username;
 		
 		$this->gedcomid = GedcomConfig::$GEDCOMID;
+		
+		$this->CheckAccess();
 	}
 
 	public function __get($property) {
@@ -112,5 +114,35 @@ abstract class BaseController {
 		if ($this->view == "preview") return true;
 		else return false;
 	}
+	
+	private function CheckAccess() {
+		static $user, $gedadmin, $siteadmin;
+		global $gm_user;
+		
+		// Build the array of pages where only logged in users have access
+		if (!isset($user)) $user = array();
+		if (!isset($gedadmin)) $gedadmin = array();
+		if (!isset($siteadmin)) $siteadmin = array("admin.php", "downloadgedcom.php", "editlang.php");
+		
+		$noaccess = false;
+		$script = substr(SCRIPT_NAME, 1);
+		if (in_array($script, $user)) {
+			if ($gm_user->username != "") return;
+			else $noaccess = true;
+		}
+		if (!$noaccess && in_array($script, $gedadmin)) {
+			if ($gm_user->UserGedcomAdmin()) return;
+			else $noaccess = true;
+		}
+		if (!$noaccess && in_array($script, $siteadmin)) {
+			if ($gm_user->UserIsAdmin()) return;
+			else $noaccess = true;
+		}
+		if (!$noaccess) return;
+		if (LOGIN_URL == "") header("Location: login.php?url=".$script.GetQueryString(true));
+		else header("Location: ".LOGIN_URL."?url=".$script.GetQueryString(true));
+		exit;
+	}
+		
 }
 ?>

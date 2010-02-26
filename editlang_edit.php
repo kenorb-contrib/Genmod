@@ -29,11 +29,6 @@
 */
 require "config.php";
 
-/**
- * Inclusion of the language editing functions
-*/
-require $GM_BASE_DIRECTORY . "includes/functions/functions_editlang.php";
-
 //-- make sure that they have admin status before they can use this page
 //-- otherwise have them login again
 $uname = $gm_username;
@@ -103,14 +98,14 @@ if ($action != "save") {
 	print '<div id="original_text">';
 	PrintText("original_message");
 	print "<textarea id=\"old_message\" readonly rows=\"10\" name=\"old_message\" cols=\"75\" >";
-	print stripslashes(mask_all(GetString($ls01, $lang_filename_orig, $file_type)));
+	print stripslashes(AdminFunctions::Mask_all(LanguageFunctions::GetString($ls01, $lang_filename_orig, $file_type)));
 	print "</textarea>";
 	print '</div>';
 	
 	print '<div id="translated_text">';
 	PrintText("message_to_edit");
 	print "<textarea rows=\"10\" id=\"new_message\" name=\"new_message\" cols=\"75\" style=\"color: #FF0000\" >";
-	if (strlen($ls02) > 0) print stripslashes(mask_all(GetString($ls02, $lang_filename, $file_type)));
+	if (strlen($ls02) > 0) print stripslashes(AdminFunctions::Mask_all(LanguageFunctions::GetString($ls02, $lang_filename, $file_type)));
 	print "</textarea>";
 	print '</div>';
 	print "</form>";
@@ -132,7 +127,7 @@ if ($action == "save") {
 	// $ls02 is the number of the message in the edited language file
 	// $file_type defines which language file
 	$new_message = preg_replace(array("/&amp;/","/&lt;/","/&gt;/"), array("&","<",">"), $new_message);
-	$Write_Ok = WriteString($new_message, $ls01, $language2, $file_type);
+	$Write_Ok = AdminFunctions::WriteString($new_message, $ls01, $language2, $file_type);
 	
 	print "<div align=\"center\"><center>";
 	
@@ -161,7 +156,7 @@ if ($action == "save") {
 	if ($Write_Ok) {
 		print "<tr>";
 		print "<td class=\"facts_value wrap\" style=\"text-align:center; color: #0000FF\" >";
-		print "<strong style=\"color: red\">|</strong>".stripslashes(mask_all(GetString($ls01, $lang_filename_orig, $file_type)))."<strong style=\"color: red\">|</strong>";
+		print "<strong style=\"color: red\">|</strong>".stripslashes(AdminFunctions::Mask_all(LanguageFunctions::GetString($ls01, $lang_filename_orig, $file_type)))."<strong style=\"color: red\">|</strong>";
 		print "</td>";
 		print "</tr>";
 	}
@@ -178,7 +173,7 @@ if ($action == "save") {
 		
 		print "<tr>";
 		print "<td class=\"facts_value wrap\" style=\"text-align:center; color: #0000FF\" >";
-		print "<strong style=\"color: red; \">|</strong>" . stripslashes(mask_all($new_message)) . "<strong style=\"color: red\">|</strong>";
+		print "<strong style=\"color: red; \">|</strong>" . stripslashes(AdminFunctions::Mask_all($new_message)) . "<strong style=\"color: red\">|</strong>";
 		print "</td>";
 		print "</tr>";
 		print "</table>";

@@ -41,13 +41,13 @@ $message = "";
 $output = "";
 switch ($action) {
 	case "loadenglish" :
-		if (StoreEnglish()) {
+		if (AdminFunctions::StoreEnglish()) {
                WriteToLog("AdminMaint-> ".GM_LANG_all_loaded);
                $message = GM_LANG_all_loaded;
           }
           else {
-               LoadEnglish();
-               LoadEnglishFacts();
+               LanguageFunctions::LoadEnglish();
+               LanguageFunctions::LoadEnglishFacts();
                WriteToLog("AdminMaint-> ".GM_LANG_all_not_loaded, "E", "S");
                $message = "<span class=\"error\">".GM_LANG_all_not_loaded."</span>";
 		}

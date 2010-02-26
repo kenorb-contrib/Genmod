@@ -1,4 +1,4 @@
-﻿"menu_help";"Help"
+"menu_help";"Help"
 "comparing_help";"Help texts"
 "created_language_help";"Successfully created <i>Language Help</i> table."
 "cookie_login_help";"This site remembered you from a previous login.  This allows you to access private information and other user-based features, but in order to edit or administer the site, you must login again for increased security."

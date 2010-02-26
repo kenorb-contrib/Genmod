@@ -741,7 +741,7 @@ abstract class DetailController extends BaseController{
 						print "</table></div>";
 					}
 				}
-				else print "<div id=\"no_tab".$index."\" class=\"shade1\"></div>\n";
+				else print "<div id=\"no_tab".$index."\" class=\"shade1\">".GM_LANG_no_tab7."</div>\n";
 				print "<br style=\" clear: both;\" /></div>";
 			}
 		}	

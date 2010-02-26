@@ -201,7 +201,7 @@ class ListController extends BaseController {
 				$sql = "SELECT DISTINCT n_fletter as alpha FROM ".TBLPREFIX."names WHERE";
 				if ($this->surname != "") $sql .= " n_surname='".DbLayer::EscapeQuery($this->surname)."'";
 				elseif ($this->alpha != "") $sql .= " n_letter='".DbLayer::EscapeQuery($this->alpha)."'";
-				if ($this->allgeds == "no") $sql .= ($this->alpha == "" || $this->surname == "" ? "" : " AND")." n_file = '".GedcomConfig::$GEDCOMID."'";
+				if ($this->allgeds == "no") $sql .= ($this->alpha != "" || $this->surname != "" ? " AND" : "")." n_file = '".GedcomConfig::$GEDCOMID."'";
 			}
 		}
 		$res = NewQuery($sql);
@@ -258,11 +258,11 @@ class ListController extends BaseController {
 		global $TEXT_DIRECTION;
 		global $indi_hide, $indi_total;
 		
-		if ($this->classname == "FamlistController") $page = "famlist.php";
-		else if ($this->classname == "IndilistController") $page = "indilist.php";
-		else if ($this->classname == "AliveInYearController") $page = "aliveinyear.php";
+//		if ($this->classname == "FamlistController") $page = "famlist.php";
+//		else if ($this->classname == "IndilistController") $page = "indilist.php";
+//		else if ($this->classname == "AliveInYearController") $page = "aliveinyear.php";
 		
-		if (stristr($page, "aliveinyear")) {
+		if (stristr(SCRIPT_NAME, "aliveinyear")) {
 			$aiy = true;
 			global $indi_dead, $indi_alive, $indi_unborn;
 		}
@@ -283,7 +283,7 @@ class ListController extends BaseController {
 		// a wrong way on the page with different orientation from the orientation of the first name letter
 		foreach($surnames as $surname=>$namecount) {
 			if (begRTLText($namecount["name"])) {
-	 			print "<div class =\"rtl\" dir=\"rtl\">&nbsp;<a href=\"".$page."?alpha=".urlencode($this->alpha)."&amp;surname_sublist=".$this->surname_sublist."&amp;surname=".urlencode($namecount["name"]).$resturl;
+	 			print "<div class =\"rtl\" dir=\"rtl\">&nbsp;<a href=\"".SCRIPT_NAME."?alpha=".urlencode($this->alpha)."&amp;surname_sublist=".$this->surname_sublist."&amp;surname=".urlencode($namecount["name"]).$resturl;
 	 			if ($this->allgeds == "yes") print "&amp;allgeds=yes";
 	 			print "\">&nbsp;";
 	 			if (HasChinese($namecount["name"])) print PrintReady($namecount["name"]." (".GetPinYin($namecount["name"]).")");
@@ -291,12 +291,12 @@ class ListController extends BaseController {
 	 			print "&rlm; - [".($namecount["match"])."]&rlm;";
 			}
 			else if (substr($namecount["name"], 0, 4) == "@N.N") {
-				print "<div class =\"ltr\" dir=\"ltr\">&nbsp;<a href=\"".$page."?alpha=".urlencode($this->alpha)."&amp;surname_sublist=".$this->surname_sublist."&amp;surname=@N.N.".$resturl;
+				print "<div class =\"ltr\" dir=\"ltr\">&nbsp;<a href=\"".SCRIPT_NAME."?alpha=".urlencode($this->alpha)."&amp;surname_sublist=".$this->surname_sublist."&amp;surname=@N.N.".$resturl;
 	 			if ($this->allgeds == "yes") print "&amp;allgeds=yes";
 				print "\">&nbsp;".GM_LANG_NN . "&lrm; - [".($namecount["match"])."]&lrm;&nbsp;";
 			}
 			else {
-				print "<div class =\"ltr\" dir=\"ltr\">&nbsp;<a href=\"".$page."?alpha=".urlencode($this->alpha)."&amp;surname_sublist=".$this->surname_sublist."&amp;surname=".urlencode($namecount["name"]).$resturl;
+				print "<div class =\"ltr\" dir=\"ltr\">&nbsp;<a href=\"".SCRIPT_NAME."?alpha=".urlencode($this->alpha)."&amp;surname_sublist=".$this->surname_sublist."&amp;surname=".urlencode($namecount["name"]).$resturl;
 	 			if ($this->allgeds == "yes") print "&amp;allgeds=yes";
 				print "\">";
 	 			if (HasChinese($namecount["name"])) print PrintReady($namecount["name"]." (".GetPinYin($namecount["name"]).")");
