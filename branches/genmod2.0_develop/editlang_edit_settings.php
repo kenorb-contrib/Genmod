@@ -38,14 +38,13 @@ if ($action == "" and $ln == "") {
   
 // NOTE: make sure that they have admin status before they can use this page
 // NOTE: otherwise have them login again
-$uname = $gm_username;
-if (empty($uname)) {
+if (!$gm_user->UserIsAdmin()) {
   print "Please close this window and do a Login in the former window first...";
   exit;
 }
 
 // Determine whether this language's Active status should be protected
-if (LanguageInUse($ln)) $protectActive = true;
+if (AdminFunctions::LanguageInUse($ln)) $protectActive = true;
 else$protectActive = false;
 
 $d_LangName = "lang_name_" . $ln;
@@ -405,13 +404,13 @@ if ($action != "save" && $action != "toggleActive") { ?>
 if ($action == "toggleActive") {
 	if ($language_settings[$ln]["gm_lang_use"] == true) {
 		$gm_lang_use[$ln] = false;
-		RemoveLanguage($ln);
-		DeactivateLanguage($ln);
+		AdminFunctions::RemoveLanguage($ln);
+		AdminFunctions::DeactivateLanguage($ln);
 	}
 	else {
 		$gm_lang_use[$ln] = true;
-		StoreLanguage($ln);
-		ActivateLanguage($ln);
+		AdminFunctions::StoreLanguage($ln);
+		AdminFunctions::ActivateLanguage($ln);
 	}
 }
 
@@ -423,9 +422,9 @@ if ($action == "save") {
 		$lang = array();
 		$d_LangName      = "lang_name_".$ln;
 //		$gm_lang[$d_LangName]  = $v_original_lang_name;
-		define("GM_LANG_".$d_LangName, $v_original_lang_name);
+//		define("GM_LANG_".$d_LangName, $v_original_lang_name);
 //		$gm_lang[$ln]    = $ln;
-		define("GM_LANG_".$ln, $ln);
+//		define("GM_LANG_".$ln, $ln);
 		$gm_language[$ln]    = "languages/lang.".$v_lang_shortcut.".txt";
 		$confighelpfile[$ln]  = "";
 		$helptextfile[$ln]    = "languages/help_text.".$v_lang_shortcut.".txt";
@@ -435,9 +434,9 @@ if ($action == "save") {
 	}
 	
 	$flagsfile[$ln]    = $v_flagsfile;
-	define("GM_LANG_".$ln, $_POST["v_original_lang_name"]);
-	if ($gm_lang_use[$ln] == "1" && $_POST["v_lang_use"] == false) RemoveLanguage($ln);
-	if ($gm_lang_use[$ln] == "0" && $_POST["v_lang_use"] == true) StoreLanguage($ln);
+	// define("GM_LANG_".$ln, $_POST["v_original_lang_name"]); already defined
+	if ($gm_lang_use[$ln] == "1" && $_POST["v_lang_use"] == false) AdminFunctions::RemoveLanguage($ln);
+	if ($gm_lang_use[$ln] == "0" && $_POST["v_lang_use"] == true) AdminFunctions::StoreLanguage($ln);
 	$gm_lang_use[$ln]  = $_POST["v_lang_use"];
 	$lang_short_cut[$ln]  = $_POST["v_lang_shortcut"];
 	$lang_langcode[$ln]  = $_POST["v_lang_langcode"];
@@ -457,7 +456,7 @@ if ($action == "save") {
 	$newvars["gm_langname"] 	= $languages[$ln];
 	if ($gm_lang_use[$ln] == true) $newvars["gm_lang_use"] = "1";
 	else $newvars["gm_lang_use"] = "0";
-	$newvars["gm_lang"] 		= constant("GM_LANG_".$ln);
+	$newvars["gm_lang"] 		= $v_original_lang_name;
 	$newvars["lang_short_cut"] 	= $lang_short_cut[$ln];
 	$newvars["langcode"] 		= $lang_langcode[$ln];
 	$newvars["gm_language"] 	= $gm_language[$ln];
@@ -474,7 +473,7 @@ if ($action == "save") {
 	$newvars["ALPHABET_upper"]	= $ALPHABET_upper[$ln];
 	$newvars["ALPHABET_lower"]	= $ALPHABET_lower[$ln];
 	$newvars["MON_SHORT"]		= $MON_SHORT_array[$ln];
-	if (!StoreLangVars($newvars)) $error = "lang_config_write_error";
+	if (!AdminFunctions::StoreLangVars($newvars)) $error = "lang_config_write_error";
 	else $error = "";
 	
 	if ($error != "") {

@@ -41,7 +41,7 @@ if (!$gm_user->userGedcomAdmin()) {
 if (!isset($action)) $action="";
 
 if ($action == "loadlanguage" && isset($language)) {
-	StoreLanguage($language);
+	AdminFunctions::StoreLanguage($language);
 }
 
 PrintHeader(GM_LANG_administration);
@@ -74,9 +74,9 @@ foreach($users as $indexval => $user) {
 	if (($verify_msg) && ($warn_msg)) break;
 }
 
-$implangs = GetLangfileInfo("import");
+$implangs = AdminFunctions::GetLangfileInfo("import");
 if (count($implangs) > 0) $import_msg = true;
-$explangs = GetLangfileInfo("export");
+$explangs = AdminFunctions::GetLangfileInfo("export");
 if (count($explangs) > 0) $export_msg = true;
 
 if (file_exists(INDEX_DIRECTORY."emergency_syslog.txt")) {

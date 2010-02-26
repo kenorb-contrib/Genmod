@@ -61,7 +61,7 @@ switch ($action) {
 
 <?php
 // Create array with configured languages in gedcoms and users
-$configuredlanguages = LanguageInUse();
+$configuredlanguages = AdminFunctions::LanguageInUse();
 
 // Sort the Language table into localized language name order
 foreach ($gm_language as $key => $value){
@@ -177,7 +177,7 @@ $maxlines = max($active, $inactive);
 							<div class="width10 choice_middle">
 								<input
 								<?php
-								if (LanguageInUse($value)) print " disabled";
+								if (AdminFunctions::LanguageInUse($value)) print " disabled";
 								print " type=\"checkbox\" value=\"$value\" checked=\"checked\" onclick=\"enabledisablelanguage('$value');\" />";
 								?>
 							</div>

@@ -37,17 +37,36 @@ class IndilistController extends ListController {
 	
 	public $classname = "IndilistController";	// Name of this class
 	
+	// Extra variables for aliveinyear
+	private $type = "narrow";					// Type can be either "true", "wide" or "narrow"
+	private $useMAA = 0;						// Use the MAX_ALIVE_AGE to determine if a person is dead. Values 0 or 1
+	private $year = null;						// Year in which the person must be alive
+	
 	// Calculated values
 	
 	
 	public function __construct() {
 		
 		parent::__construct();
+
+		if (isset($_REQUEST["type"])) $this->type = $_REQUEST["type"];
+		if (isset($_REQUEST["useMAA"])) $this->useMAA = $_REQUEST["useMAA"];
+		if (isset($_REQUEST["year"])) $this->year = $_REQUEST["year"];
+		if (!is_numeric($this->year)) $this->year = date("Y");
 		
 	}
 
 	public function __get($property) {
 		switch($property) {
+			case "type":
+				return $this->type;
+				break;
+			case "useMAA":
+				return $this->useMAA;
+				break;
+			case "year":
+				return $this->year;
+				break;
 			default:
 				return parent::__get($property);
 				break;
@@ -60,6 +79,7 @@ class IndilistController extends ListController {
 		if (is_null($this->pagetitle)) {
 			if (stristr(SCRIPT_NAME, "indilist.php")) $this->pagetitle = GM_LANG_individual_list." ".$this->addheader;
 			if (stristr(SCRIPT_NAME, "unlinked.php")) $this->pagetitle = GM_LANG_unlink_list;
+			if (stristr(SCRIPT_NAME, "aliveinyear.php")) $this->pagetitle = GM_LANG_alive_in_year." ".$this->year;
 		}
 		return $this->pagetitle;
 	}
@@ -179,7 +199,7 @@ class IndilistController extends ListController {
 					// NOTE: Print the link letter
 					if (stristr(SCRIPT_NAME,"indilist.php")) print "<a href=\"indilist.php?";
 					if (stristr(SCRIPT_NAME,"unlinked.php")) print "<a href=\"unlinked.php?";
-					if (stristr(SCRIPT_NAME,"aliveinyear.php")) print "<a href=\"aliveinyear.php?year=$year&amp;";
+					if (stristr(SCRIPT_NAME,"aliveinyear.php")) print "<a href=\"aliveinyear.php?year=".$this->year."&amp;type=".$this->type."&amp;useMAA=".$this->useMAA."&amp;";
 					// NOTE: only include the alpha letter when not showing the ALL list
 					if ($this->show_all == "no") print "alpha=".urlencode($this->alpha)."&amp;";
 					if ($this->surname_sublist == "yes" && !empty($this->surname)) print "surname=".$this->surname."&amp;";
@@ -198,7 +218,7 @@ class IndilistController extends ListController {
 				print " | ";
 				if (stristr(SCRIPT_NAME,"indilist.php")) print "<a href=\"indilist.php?";
 				if (stristr(SCRIPT_NAME,"unlinked.php")) print "<a href=\"unlinked.php?";
-				if (stristr(SCRIPT_NAME,"aliveinyear.php")) print "<a href=\"aliveinyear.php?year=$year&amp;";
+				if (stristr(SCRIPT_NAME,"aliveinyear.php")) print "<a href=\"aliveinyear.php?year=".$this->year."&amp;type=".$this->type."&amp;useMAA=".$this->useMAA."&amp;";
 				if ($this->surname_sublist == "yes" && !empty($this->surname)) print "surname=".$this->surname."&amp;";
 				print "alpha=".urlencode($this->alpha)."&amp;falpha=@&amp;surname_sublist=".$this->surname_sublist."&amp;show_all=".$this->show_all;
 				if ($this->allgeds == "yes") print "&amp;allgeds=yes";
@@ -210,7 +230,7 @@ class IndilistController extends ListController {
 				print " | ";
 				if (stristr(SCRIPT_NAME,"indilist.php")) print "<a href=\"indilist.php?";
 				if (stristr(SCRIPT_NAME,"unlinked.php")) print "<a href=\"unlinked.php?";
-				if (stristr(SCRIPT_NAME,"aliveinyear.php")) print "<a href=\"aliveinyear.php?year=$year&amp;";
+				if (stristr(SCRIPT_NAME,"aliveinyear.php")) print "<a href=\"aliveinyear.php?year=".$this->year."&amp;type=".$this->type."&amp;useMAA=".$this->useMAA."&amp;";
 				// NOTE: only include the alpha letter when not showing the ALL list
 				if ($this->show_all == "no") print "alpha=".urlencode($this->alpha)."&amp;";
 				// NOTE: Include the surname if surnames are to be listed
@@ -253,6 +273,10 @@ class IndilistController extends ListController {
 			uasort($names, "ItemSort");
 			reset($names);
 			$indi_private = array();
+			$indi_dead = array();
+			$indi_unborn = array();
+			$indi_alive = array();
+			$indi_unknown = array();
 			$total_indis = count($personlist);
 			$count = count($names);
 			$i=0;
@@ -260,8 +284,20 @@ class IndilistController extends ListController {
 			print "<td class=\"shade1 list_value indilist $TEXT_DIRECTION\"><ul>\n";
 			foreach($names as $indexval => $namearray) {
 				$person = $personlist[$namearray[1]];
-				if (!$person->PrintListPerson(true, false, "", $namearray[2])) {
-					$indi_private[$person->key] = true;
+				if (stristr(SCRIPT_NAME,"aliveinyear.php")) {
+					if (!$person->disp) $indi_private[$person->key] = true;
+					else if ($this->CheckAlive($person) == -1) $indi_unborn[$person->key] = true;
+					else if ($this->CheckAlive($person) == 1) $indi_dead[$person->key] = true;
+					else if ($this->CheckAlive($person) == -2) $indi_unknown[$person->key] = true;
+					else {
+						$indi_alive[$person->key] = true;
+						$person->PrintListPerson(true, false, "", $namearray[2]);
+					}
+				}
+				else {
+					if (!$person->PrintListPerson(true, false, "", $namearray[2])) {
+						$indi_private[$person->key] = true;
+					}
 				}
 				$i++;
 				if ($i==ceil($count/2) && $count>8) print "</ul></td><td class=\"shade1 list_value indilist $TEXT_DIRECTION\"><ul>\n";			
@@ -274,9 +310,60 @@ class IndilistController extends ListController {
 				print "  (".GM_LANG_private." ".count($indi_private).")";
 				PrintHelpLink("privacy_error_help", "qm");
 			}
+			if (stristr(SCRIPT_NAME,"aliveinyear.php")) {
+				print "<br />".GM_LANG_unborn."&nbsp;".count($indi_unborn);
+				print "&nbsp;--&nbsp;".GM_LANG_alive."&nbsp;".count($indi_alive);
+				print "&nbsp;--&nbsp;".GM_LANG_dead."&nbsp;".count($indi_dead);
+				print "&nbsp;--&nbsp;".GM_LANG_unknown."&nbsp;".count($indi_unknown);
+			}
 			print "</td>\n";
 			print "</tr></table>";
 		}
+	}
+	
+	private function CheckAlive($person) {
+		global $MAX_ALIVE_AGE;
+		static $alive;
+		
+		if (!is_numeric($this->year)) return -2;
+		if (!isset($alive)) $alive = array();
+		if (isset($alive[$person->key])) return $alive[$person->key];
+	
+		$bddates = estimateBD($person, $this->type);
+		// First check if we must assume something
+		if ($this->useMAA) {
+			if (isset($bddates["birth"]["year"]) && $bddates["birth"]["type"] == "true" && (!isset($bddates["death"]["year"]) || $bddates["death"]["type"] != "true")) {
+				$bddates["death"]["year"] = $bddates["birth"]["year"] + $MAX_ALIVE_AGE;
+				$bddates["death"]["type"] = "est";
+			}
+			if (isset($bddates["death"]["year"]) && $bddates["death"]["type"] == "true" && (!isset($bddates["birth"]["year"]) || $bddates["birth"]["type"] != "true")) {
+				$bddates["birth"]["year"] = $bddates["death"]["year"] - $MAX_ALIVE_AGE;
+				$bddates["birth"]["type"] = "est";
+			}
+		}
+		
+		// For sure born after
+		if (isset($bddates["birth"]["year"]) && $bddates["birth"]["year"] > $this->year) {
+			$alive[$person->key] = -1;
+			return -1;
+		}
+		
+		// For sure died before
+		if (isset($bddates["death"]["year"]) && $bddates["death"]["year"] < $this->year) {
+			$alive[$person->key] = 1;
+			return 1;
+		}
+		
+		// For sure lived in that year
+		if (isset($bddates["death"]["year"]) && isset($bddates["birth"]["year"]) && $bddates["birth"]["year"] <= $this->year && $bddates["death"]["year"] >= $this->year) {
+			$alive[$person->key] = "0";
+			return 0;
+		}
+		
+		// All else don't know, we assume nothing
+		$alive[$person->key] = -2;
+		return -2;
+		
 	}
 
 }

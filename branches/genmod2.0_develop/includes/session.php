@@ -210,7 +210,6 @@ if (isset($CONFIG_PARMS)) {
 							if ($var != "SERVER_URL") define($var, $value);
 						}
 						define('SERVER_URL', $alias);
-//						$SERVER_URL = $alias;
 						break;
 					}
 				}
@@ -300,7 +299,6 @@ if (!defined('SERVER_URL')) {
 
 //--load common functions
 require_once($GM_BASE_DIRECTORY."includes/functions/functions.php");
-require_once($GM_BASE_DIRECTORY."includes/functions/functions_language.php");
 //-- load db specific functions
 require_once($GM_BASE_DIRECTORY."includes/functions/functions_db.php");
 // -- load print functions
@@ -428,7 +426,7 @@ require_once($GM_BASE_DIRECTORY."includes/functions/functions_name.php");
 //-- load file for language settings
 require_once($GM_BASE_DIRECTORY . "includes/values/lang_settings_std.php");
 $Languages_Default = true;
-$ConfiguredSettings = LoadLangVars();
+$ConfiguredSettings = AdminFunctions::LoadLangVars();
 if (count($ConfiguredSettings) > 0) {
 	$DefaultSettings = $language_settings;		// Save default settings, so we can merge properly
 	$language_settings = array_merge($DefaultSettings, $ConfiguredSettings);	// Copy new langs into config
@@ -602,10 +600,10 @@ if ($gm_user->userCanEdit()) {
 else $show_changes = false;
 
 // NOTE: Load English as the default language
-LoadEnglish(false, false, true);
+LanguageFunctions::LoadEnglish(false, false, true);
 
 //NOTE: Load factsfile
-LoadEnglishFacts(false, true);
+LanguageFunctions::LoadEnglishFacts(false, true);
 
 // Check for page views exceeding the limit
 SystemFunctions::CheckPageViews();

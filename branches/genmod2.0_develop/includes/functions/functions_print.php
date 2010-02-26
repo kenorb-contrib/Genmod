@@ -736,14 +736,14 @@ function PrintText($help, $level=0, $noprint=0){
 		 else if (defined("GM_FACT_".$help)) $sentence = constant("GM_FACT_".$help);
 		 // check langvar
 		 else if (defined("GM_LANG_".$help)) $sentence = constant("GM_LANG_".$help);
-		 else (!defined("GM_LANG_".$help) ? $sentence = GetString($help, $LANGUAGE) : $sentence = constant("GM_LANG_".$help));
+		 else (!defined("GM_LANG_".$help) ? $sentence = LanguageFunctions::GetString($help, $LANGUAGE) : $sentence = constant("GM_LANG_".$help));
 	 }
 	 if (empty($sentence)) {
 		  if ($noprint == 2) {
 			  $sentence = $help;
 	  	  }
 	  	  else {
-			  if (!defined("GM_LANG_".$help)) $sentence = GetString($help, $LANGUAGE);
+			  if (!defined("GM_LANG_".$help)) $sentence = LanguageFunctions::GetString($help, $LANGUAGE);
 			  else $sentence = constant("GM_LANG_".$help);
 		  }
 		

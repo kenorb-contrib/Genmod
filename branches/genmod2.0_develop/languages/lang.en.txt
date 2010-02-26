@@ -441,7 +441,7 @@
 "no_tab4";"There are no media objects for this individual."
 "no_tab5";"There are no close relatives for this individual."
 "no_tab6";"There are no ToDo's attached to this individual."
-"no_tab6";"There are no associates."
+"no_tab7";"There are no associates."
 "family_info";"Family Information"
 "family_group_info";"Family Group Information"
 "husband";"Husband"
