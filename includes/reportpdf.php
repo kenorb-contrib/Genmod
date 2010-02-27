@@ -2591,7 +2591,7 @@ function GMRListSHandler($attrs) {
 			}
 			break;
 		default:
-//			print_r($filters);
+			//print_r($filters);
 			if (count($filters)>0) $list = SearchFunctions::SearchIndis($filters);
 //LERMAN - added "no" parameter. Fixes one list, but not sure if have other ramifications
 			else $list = ListFunctions::GetIndiList("no");
@@ -2740,8 +2740,9 @@ function GMRListEHandler() {
 	$list_total = count($list);
 	$list_private = 0;
 	foreach($list as $key => $object) {
-		if ($object->disp) {
-			$gedrec = $object->gedrec;
+		if ((is_object($object) && $object->disp) || is_array($object)) {
+			if (is_object($object)) $gedrec = $object->gedrec;
+			else if (isset($object["gedcom"])) $gedrec = $object["gedcom"];
 			//LERMAN-- added individuals in pending list does not have Gedcom record yet. Could check $lines[$repeatBytes+$lineoffset-1] to see if list="pending"
 			if (empty($gedrec)) { $gedrec = $value; }
 			//-- start the sax parser
