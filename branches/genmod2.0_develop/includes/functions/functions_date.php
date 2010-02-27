@@ -988,7 +988,7 @@ function GetDateUrl($datestr){
  * @param string $style optional style (default 1=HTML style)
  * @return string the age in a string
  */
-function GetAge($indirec, $datestr, $style=1) {
+/*function GetAge($indirec, $datestr, $style=1) {
 	global $monthtonum;
 	
 	$estimates = array("abt","aft","bef","est","cir");
@@ -1111,7 +1111,7 @@ function GetAge($indirec, $datestr, $style=1) {
 	if ($style) return $realbirthdt;
 	else return trim($realbirthdt);
 }
-
+*/
 /**
  * translate gedcom age string
  *

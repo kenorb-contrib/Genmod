@@ -287,7 +287,7 @@ $controller->checkPrivacy();
 				break;
 			}
 		?>
- 			<a href="individual.php?pid=<?php print $pid; ?>">&nbsp;<?php print PrintReady($indi->name); ?><br />
+ 			<a href="individual.php?pid=<?php print $indi->xref; ?>&amp;gedid=<?php print $indi->gedcomid; ?>">&nbsp;<?php print PrintReady($indi->name); ?><br />
  			<?php $addname = $indi->addname; if (strlen($addname) > 0) print PrintReady($addname); ?> 
 			</a>
 			<input type="hidden" name="pids<?php print $p; ?>" value="<?php print $pid; ?>" />

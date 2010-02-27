@@ -36,8 +36,11 @@ class FamilyBookController extends ChartController {
 	private $show_spouse = null;				// Show spouses with persons
 	private $dgenerations = null;				// Calculated maximum generations
 	private $boxcount = 0;						// To keep track of the number of printed boxes
+	private $page = null;						// Page this controller is called from
 	
 	public function __construct() {
+		
+		$this->page = substr(SCRIPT_NAME, 1);
 		
 		parent::__construct();
 
@@ -58,8 +61,11 @@ class FamilyBookController extends ChartController {
 		else $this->show_spouse = $_REQUEST["show_spouse"];
 		if ($this->show_spouse == "") $this->show_spouse = 0;
 		
-		if (!isset($_REQUEST["num_descent"]) || $_REQUEST["num_descent"] == "") $this->num_descent = 2;
-		else $this->num_descent = $_REQUEST["num_descent"];
+		if ($this->page == "familybook.php") {
+			if (!isset($_REQUEST["num_descent"]) || $_REQUEST["num_descent"] == "") $this->num_descent = 2;
+			else $this->num_descent = $_REQUEST["num_descent"];
+		}
+		else $this->num_descent = 1;
 		
 	}
 
@@ -82,7 +88,8 @@ class FamilyBookController extends ChartController {
 		if (is_null($this->pagetitle)) {
 			$this->pagetitle = $this->GetRootObject()->name;
 			if (GedcomConfig::$SHOW_ID_NUMBERS) $this->pagetitle .= " - ".$this->xref;
-			$this->pagetitle .= " - ".GM_LANG_familybook_chart;
+			if ($this->page == "familybook.php") $this->pagetitle .= " - ".GM_LANG_familybook_chart;
+			else if ($this->page == "hourglass.php") $this->pagetitle .= " - ".GM_LANG_hourglass_chart;
 		}
 		return $this->pagetitle;
 	}
@@ -90,12 +97,14 @@ class FamilyBookController extends ChartController {
 	
 	public function PrintInputDescentSteps() {
 	
-		print "<tr><td class=\"shade2\" >";
-		PrintHelpLink("desc_descent_help", "qm");
-		print GM_LANG_descent_steps."&nbsp;</td>";
-		print "<td class=\"shade1 vmiddle\">";
-		print "<input class=\"pedigree_form\" type=\"text\" size=\"3\" name=\"num_descent\" value=\"".$this->num_descent."\" />";
-		print "</td></tr>";
+		if ($this->page == "familybook.php") {
+			print "<tr><td class=\"shade2\" >";
+			PrintHelpLink("desc_descent_help", "qm");
+			print GM_LANG_descent_steps."&nbsp;</td>";
+			print "<td class=\"shade1 vmiddle\">";
+			print "<input class=\"pedigree_form\" type=\"text\" size=\"3\" name=\"num_descent\" value=\"".$this->num_descent."\" />";
+			print "</td></tr>";
+		}
 	}
 	
 	public function PrintInputShowSpouse() {
@@ -118,7 +127,7 @@ class FamilyBookController extends ChartController {
 	    if (count($person->spousefamilies) > 0 || empty($firstrun)) {
 	    	$firstrun = true;
 	        
-	        print "\n\t<h3 style=\"text-align: center\">"."Family of".": ".PrintReady($person->name)."</h3>";
+	        if ($this->page == "familybook.php") print "\n\t<h3 style=\"text-align: center\">"."Family of".": ".PrintReady($person->name)."</h3>";
 	        print "<table cellspacing=\"0\" cellpadding=\"0\" border=\"0\" style=\"vertical-align:middle;\"><tr>\n";
 	        
 	        //-- descendancy
@@ -133,7 +142,7 @@ class FamilyBookController extends ChartController {
 	        print "</td>\n";
 	        print "</tr></table>\n";
 	        print "<br /><br />\n";
-	        print "<hr />\n";
+	        if ($this->page == "familybook.php") print "<hr />\n";
 	        print "<br /><br />\n";
 	        
 	        foreach($person->spousefamilies as $indexval => $fam) {
@@ -288,7 +297,7 @@ class FamilyBookController extends ChartController {
 						if($person->xref != $sfamily->husb_id) $spouse = $sfamily->husb;
 						else $spouse = $sfamily->wife;
 						if (is_object($spouse)) {
-							print "\n\t\t\t\t<a href=\"familybook.php?rootid=".$spouse->xref."&amp;show_spouse=".$this->show_spouse."&amp;show_details=".$this->show_details."&amp;num_generations=".$this->num_generations."&amp;box_width=".$this->box_width."&amp;num_descent=".$this->num_descent."\"><span ";
+							print "\n\t\t\t\t<a href=\"".SCRIPT_NAME."?rootid=".$spouse->xref."&amp;show_spouse=".$this->show_spouse."&amp;show_details=".$this->show_details."&amp;num_generations=".$this->num_generations."&amp;box_width=".$this->box_width."&amp;num_descent=".$this->num_descent."\"><span ";
 							if ($spouse->disp_name) {
 								if (hasRTLText($spouse->name))
 								     print "class=\"name2\">";
@@ -299,7 +308,7 @@ class FamilyBookController extends ChartController {
 							print "<br /></span></a>";
 						}
 						foreach($sfamily->children as $ckey => $child) {
-							print "\n\t\t\t\t&nbsp;&nbsp;<a href=\"familybook.php?rootid=".$child->xref."&amp;show_spouse=".$this->show_spouse."&amp;show_details=".$this->show_details."&amp;num_generations=".$this->num_generations."&amp;box_width=".$this->box_width."&amp;num_descent=".$this->num_descent."\"><span ";
+							print "\n\t\t\t\t&nbsp;&nbsp;<a href=\"".SCRIPT_NAME."?rootid=".$child->xref."&amp;show_spouse=".$this->show_spouse."&amp;show_details=".$this->show_details."&amp;num_generations=".$this->num_generations."&amp;box_width=".$this->box_width."&amp;num_descent=".$this->num_descent."\"><span ";
 							if ($child->disp_name) {
 								if (hasRTLText($child->name))
 								     print "class=\"name2\">&lt; ";
@@ -315,7 +324,7 @@ class FamilyBookController extends ChartController {
 						if($cfamily->husb_id != "" || $cfamily->wife_id != "") {
 							print "<span class=\"name1\"><br />".GM_LANG_parents."<br /></span>";
 							if ($cfamily->husb_id != "") {
-								print "\n\t\t\t\t&nbsp;&nbsp;<a href=\"familybook.php?rootid=".$cfamily->husb_id."&amp;show_spouse=".$this->show_spouse."&amp;show_details=".$this->show_details."&amp;num_generations=".$this->num_generations."&amp;box_width=".$this->box_width."&amp;num_descent=".$this->num_descent."\"><span ";
+								print "\n\t\t\t\t&nbsp;&nbsp;<a href=\"".SCRIPT_NAME."?rootid=".$cfamily->husb_id."&amp;show_spouse=".$this->show_spouse."&amp;show_details=".$this->show_details."&amp;num_generations=".$this->num_generations."&amp;box_width=".$this->box_width."&amp;num_descent=".$this->num_descent."\"><span ";
 								if ($cfamily->husb->disp_name) {
 									if (hasRTLText($cfamily->husb->name))
 									     print "class=\"name2\">";
@@ -326,7 +335,7 @@ class FamilyBookController extends ChartController {
 								print "<br /></span></a>";
 							}
 							if ($cfamily->wife_id != "") {
-								print "\n\t\t\t\t&nbsp;&nbsp;<a href=\"familybook.php?rootid=".$cfamily->wife_id."&amp;show_spouse=".$this->show_spouse."&amp;show_details=".$this->show_details."&amp;num_generations=".$this->num_generations."&amp;box_width=".$this->box_width."&amp;num_descent=".$this->num_descent."\"><span ";
+								print "\n\t\t\t\t&nbsp;&nbsp;<a href=\"".SCRIPT_NAME."?rootid=".$cfamily->wife_id."&amp;show_spouse=".$this->show_spouse."&amp;show_details=".$this->show_details."&amp;num_generations=".$this->num_generations."&amp;box_width=".$this->box_width."&amp;num_descent=".$this->num_descent."\"><span ";
 								if ($cfamily->wife->disp_name) {
 									if (hasRTLText($cfamily->wife->name))
 									     print "class=\"name2\">";
@@ -341,7 +350,7 @@ class FamilyBookController extends ChartController {
 							print "<span class=\"name1\"><br />".GM_LANG_siblings."<br /></span>";
 							foreach($cfamily->children as $key2 => $child) {
 								if ($child->xref != $person->xref) {
-									print "\n\t\t\t\t&nbsp;&nbsp;<a href=\"familybook.php?rootid=".$child->xref."&amp;show_spouse=".$this->show_spouse."&amp;show_details=".$this->show_details."&amp;num_generations=".$this->num_generations."&amp;box_width=".$this->box_width."&amp;num_descent=".$this->num_descent."\"><span ";
+									print "\n\t\t\t\t&nbsp;&nbsp;<a href=\"".SCRIPT_NAME."?rootid=".$child->xref."&amp;show_spouse=".$this->show_spouse."&amp;show_details=".$this->show_details."&amp;num_generations=".$this->num_generations."&amp;box_width=".$this->box_width."&amp;num_descent=".$this->num_descent."\"><span ";
 									if ($child->disp_name) {
 										if (hasRTLText($child->name))
 										print "class=\"name2\"> ";

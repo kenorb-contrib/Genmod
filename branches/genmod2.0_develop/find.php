@@ -336,7 +336,7 @@ if ($search_controller->action == "filter") {
 	// Output Places
 	else if ($search_controller->type == "place") {
 		print "\n\t<table class=\"tabs_table $TEXT_DIRECTION\" width=\"90%\">\n\t\t";
--		$placelist = ListFunctions::FindPlaceList($search_controller->query);
+		$placelist = ListFunctions::FindPlaceList($search_controller->query);
 		$ctplace = count($placelist);
 		if ($ctplace>0) {
 			print "\n\t\t<tr><td class=\"list_value_wrap $TEXT_DIRECTION\"><ul>";

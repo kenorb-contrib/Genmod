@@ -67,13 +67,13 @@ class TimelineController extends BaseController {
 		}
 		// NOTE: pids array
 		$i = 0;
-		while(isset($_REQUEST["pids"][$i])) {
-			$this->pids[] = $_REQUEST["pids"][$i];
+		while(isset($_REQUEST["pids".$i])) {
+			$this->pids[] = $_REQUEST["pids".$i];
 			$i++;
 		}
 		if (!empty($newpid)) $this->pids[] = $newpid;
 		if (count($this->pids) == 0) $this->pids[] = ChartFunctions::CheckRootId("");
-		
+
 		//-- make sure that arrays are indexed by numbers
 		$this->pids = array_values($this->pids);
 		$remove = "";
@@ -88,10 +88,12 @@ class TimelineController extends BaseController {
 		}
 		
 		$this->pidlinks = "";
+		$i = 0;
 		foreach($this->people as $p => $indi) {
 			if (!is_null($indi) && $indi->disp) {
 				//-- setup string of valid pids for links
-				$this->pidlinks .= "pids[]=".$indi->xref."&amp;";
+				$this->pidlinks .= "pids".$i."=".$indi->xref."&amp;";
+				$i++;
 				$bdate = $indi->bdate;
 				if (!empty($bdate) && (stristr($bdate, "hebrew")===false)) {
 					$date = ParseDate($bdate);
@@ -235,7 +237,8 @@ class TimelineController extends BaseController {
 			if (GedcomConfig::$SHOW_PEDIGREE_PLACES > 0) {
 				$factobj->PrintFactPlace(false, false, false, true);
 			}
-			$age = $thisperson->GetAge($factobj->datestring);
+			$person =& Person::GetInstance($factitem["pid"]);
+			$age = $person->GetAge($factobj->datestring);
 			if (!empty($age)) print $age;
 			//-- print spouse name for marriage events
 			$ct = preg_match("/1 _GMS @(.*)@/", $factobj->factrec, $match);
@@ -250,7 +253,8 @@ class TimelineController extends BaseController {
 					$spouse =& Person::GetInstance($spouse);
 					print " <span class=\"person".$col."\"> <a href=\"individual.php?pid=".$spouse->xref."&amp;gedid=".$spouse->gedcomid."\">";
 					print $spouse->name;
-					print "</a> </span>";
+					$age = $spouse->GetAge($factobj->datestring);
+					print "</a> ".$age."</span>";
 				}
 			}
 			print "</td></tr></table>\n";
