@@ -82,6 +82,12 @@ switch ($action) {
 		GedcomConfig::ResetCaches();
 		$message = GM_LANG_reset_caches_ok;
 		break;
+	case "createmd5":
+		AdminFunctions::GetGMFileList();
+		break;
+	case "checkmd5":
+		$message = AdminFunctions::CheckGMFileList();
+		break;
 	default:
 		$message = "";
 		break;
@@ -128,6 +134,7 @@ foreach($users as $indexval => $user) {
 		<div class="admin_item_right"><div class="helpicon"><?php PrintHelpLink("disp_db_settings_help", "qm", "disp_db_settings"); ?></div><div class="description"><a href="admin_maint.php?action=dispdbsettings"><?php print GM_LANG_disp_db_settings;?></a></div></div>
 		<div class="admin_item_left"><div class="helpicon"><?php PrintHelpLink("config_maint_help", "qm", "config_maint"); ?></div><div class="description"><a href="config_maint.php"><?php print GM_LANG_config_maint;?></a></div></div>
 		<div class="admin_item_right"><div class="helpicon"><?php PrintHelpLink("lockout_maint_help", "qm", "lockout_maint"); ?></div><div class="description"><a href="lockout_maint.php"><?php print GM_LANG_lockout_maint;?></a></div></div>
+		<div class="admin_item_left"><div class="helpicon"><?php PrintHelpLink("check_md5_help", "qm", "check_md5"); ?></div><div class="description"><a href="admin_maint.php?action=checkmd5"><?php print GM_LANG_check_md5;?></a></div></div>
 	</div>
 	<?php
 	if ($message != "") {

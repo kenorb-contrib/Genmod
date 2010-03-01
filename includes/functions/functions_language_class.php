@@ -287,6 +287,21 @@ abstract class LanguageFunctions {
 		else return $row["lg_".$language2];
 	
 	}
-	
+
+	public function LoadLangVars($langname="") {
+		
+		$langsettings = array();
+		$sql = "SELECT * FROM ".TBLPREFIX."lang_settings";
+		if (!empty($lang)) $sql .= " WHERE ls_gm_langname='".$langname."'";
+		$res = NewQuery($sql);
+		while ($row = $res->FetchAssoc()) {
+			$lang = array();
+			foreach ($row as $key => $value) {
+				$lang[substr($key, 3)] = $value;
+			}
+			$langsettings[$row["ls_gm_langname"]] = $lang;
+		}
+		return $langsettings;
+	}		
 }
 ?>

@@ -311,63 +311,67 @@ if ($disp1 == "block") {
 			// Actions with selected
 			print "\n<div class=\"admin_genmod_content\" style=\"border-bottom:1px solid #493424;\" >";
 			print "<div class=\"center\"><b>".GM_LANG_with_selected."</b></div>";
-			// Move
-			print "<input type=\"radio\" name=\"sel_action\" value=\"move\" checked=\"checked\"/>";
-			print GM_LANG_sel_location."<br />";
-			print "<div style=\"overflow-x:scroll; width:99%; overflow: -moz-scrollbars-horizontal;\">";
-			print "<select name=\"move_folder\">";
-			$d = RelativePathFile($directory);
-			foreach($dirs as $key => $dir) {
-				if (MediaFS::DirIsWritable($dir)) {
-					if ($dir != $d) print "<option value=\"".urlencode($dir)."\">".$dir."</option>";
+			if (GedcomConfig::$MEDIA_DIRECTORY_LEVELS > 0) {
+				// Move
+				print "<input type=\"radio\" name=\"sel_action\" value=\"move\" checked=\"checked\"/>";
+				print GM_LANG_sel_location."<br />";
+				print "<div style=\"overflow-x:scroll; width:99%; overflow: -moz-scrollbars-horizontal;\">";
+				print "<select name=\"move_folder\">";
+				$d = RelativePathFile($directory);
+				foreach($dirs as $key => $dir) {
+					if (MediaFS::DirIsWritable($dir)) {
+						if ($dir != $d) print "<option value=\"".urlencode($dir)."\">".$dir."</option>";
+					}
 				}
+				print "</select></div><br />";
 			}
-			print "</select></div><br />";
 			// Delete
-			print "<input type=\"radio\" name=\"sel_action\" value=\"delete\" />".GM_LANG_delete."<br />";
+			print "<input type=\"radio\" name=\"sel_action\" value=\"delete\" ".(GedcomConfig::$MEDIA_DIRECTORY_LEVELS == 0 ? "checked=\"checked\"" : "")." />".GM_LANG_delete."<br />";
 			// The submit button
 			print "<div class=\"center\"><input type=\"button\" value=\"".GM_LANG_go."\" onclick=\"document.managemedia.action.value='select_action'; document.managemedia.submit(); return false;\" /></div>";
 			print "\n</div>";
-			
-			// Directory maintenance
-			print "\n<div class=\"admin_genmod_content\" style=\"border-bottom:1px solid #493424;\" >";
-			print "<div class=\"center\"><b>".GM_LANG_directories."</b></div>";
-			// Create
-			print "<input type=\"radio\" name=\"dir_action\" value=\"create\" checked=\"checked\"/>";
-			print GM_LANG_create_dir."<br /><input class=\"width90\" type=\"text\" name=\"new_dir\" /><br />";
-			print GM_LANG_under."<br />";
-			print "<div style=\"overflow-x:scroll; width:99%; overflow: -moz-scrollbars-horizontal;\">";			
-			print "<select name=\"parent_dir\">";
-			foreach($dirs as $key => $dir) {
-				if (MediaFS::DirIsWritable($dir)) {
-					$d = RelativePathFile($dir);
-					$l = preg_split("/\//", $d);
-					if (count($l)-1 <= GedcomConfig::$MEDIA_DIRECTORY_LEVELS) print "<option value=\"".urlencode($dir)."\">".$dir."</option>";
+		
+			if (GedcomConfig::$MEDIA_DIRECTORY_LEVELS > 0) {
+				// Directory maintenance
+				print "\n<div class=\"admin_genmod_content\" style=\"border-bottom:1px solid #493424;\" >";
+				print "<div class=\"center\"><b>".GM_LANG_directories."</b></div>";
+				// Create
+				print "<input type=\"radio\" name=\"dir_action\" value=\"create\" checked=\"checked\"/>";
+				print GM_LANG_create_dir."<br /><input class=\"width90\" type=\"text\" name=\"new_dir\" /><br />";
+				print GM_LANG_under."<br />";
+				print "<div style=\"overflow-x:scroll; width:99%; overflow: -moz-scrollbars-horizontal;\">";			
+				print "<select name=\"parent_dir\">";
+				foreach($dirs as $key => $dir) {
+					if (MediaFS::DirIsWritable($dir)) {
+						$d = RelativePathFile($dir);
+						$l = preg_split("/\//", $d);
+						if (count($l)-1 <= GedcomConfig::$MEDIA_DIRECTORY_LEVELS) print "<option value=\"".urlencode($dir)."\">".$dir."</option>";
+					}
 				}
-			}
-			print "</select>";
-			print "</div><br />";
-			// Delete
-			$csel = 0;
-			$sel = "<div style=\"overflow-x:scroll; width:99%; overflow: -moz-scrollbars-horizontal;\">";
-			$sel .= "<select name=\"del_dir\">";
-			// To fix: only dirs with no subdirs
-			foreach($dirs as $key => $dir) {
-				if (MediaFS::DirIsWritable($dir) && MediaFS::DeleteDir($dir, $MEDIA_IN_DB, true) && $dir != RelativePathFile(GedcomConfig::$MEDIA_DIRECTORY)) {
-					$sel .= "<option value=\"".urlencode($dir)."\">".$dir."</option>";
-					$csel++;
+				print "</select>";
+				print "</div><br />";
+				// Delete
+				$csel = 0;
+				$sel = "<div style=\"overflow-x:scroll; width:99%; overflow: -moz-scrollbars-horizontal;\">";
+				$sel .= "<select name=\"del_dir\">";
+				// To fix: only dirs with no subdirs
+				foreach($dirs as $key => $dir) {
+					if (MediaFS::DirIsWritable($dir) && MediaFS::DeleteDir($dir, $MEDIA_IN_DB, true) && $dir != RelativePathFile(GedcomConfig::$MEDIA_DIRECTORY)) {
+						$sel .= "<option value=\"".urlencode($dir)."\">".$dir."</option>";
+						$csel++;
+					}
 				}
+				$sel .= "</select></div>";
+				print "<input type=\"radio\" name=\"dir_action\" value=\"delete\" ";
+				if (!$csel) print "disabled=\"disabled\" ";
+				print "/>";
+				print GM_LANG_delete_directory."<br />";
+				if ($csel) print $sel;
+				else print GM_LANG_no_empty_dirs;
+				// The submit button
+				print "<br /><div class=\"center\"><input type=\"button\" value=\"".GM_LANG_go."\" onclick=\"document.managemedia.action.value='directory_action'; document.managemedia.submit(); return false;\" /></div>";
+				print "</div>";
 			}
-			$sel .= "</select></div>";
-			print "<input type=\"radio\" name=\"dir_action\" value=\"delete\" ";
-			if (!$csel) print "disabled=\"disabled\" ";
-			print "/>";
-			print GM_LANG_delete_directory."<br />";
-			if ($csel) print $sel;
-			else print GM_LANG_no_empty_dirs;
-			// The submit button
-			print "<br /><div class=\"center\"><input type=\"button\" value=\"".GM_LANG_go."\" onclick=\"document.managemedia.action.value='directory_action'; document.managemedia.submit(); return false;\" /></div>";
-			print "</div>";
 		
 		print "</div>";
 	print "</div>";

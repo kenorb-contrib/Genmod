@@ -2608,3 +2608,5 @@
 "related_event";"Related event"
 "role";"Role"
 "KEEP_ACTIONS";"Retain old ToDo's during re-import"
+"check_md5";"Check file versions of this installation"
+"wrong_md5";"Wrong version of this file is present:"
