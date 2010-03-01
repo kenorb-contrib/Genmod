@@ -376,36 +376,6 @@ abstract class PrivacyFunctions {
 		}
 		return true;
 	}
-	// used in old print_fact
-	public function ShowRelaFact($factrec) {
-		
-		$fact = substr($factrec, 3, 4);
-		$ct = preg_match_all("/\d ASSO @(.*)@/", $factrec, $match);
-		if ($fact == "MARR") {
-			foreach($match[1] as $key => $id) {
-				if (IDType($id) == "FAM") return self::ShowFact("MARR", $id);
-			}
-		}
-		else {
-			$id = $match[1][0];
-			return self::ShowFact($fact, $id);
-		}
-	}
-	// used in old print_fact
-	public function ShowRelaFactDetails($factrec) {
-		
-		$fact = substr($factrec, 3, 4);
-		$ct = preg_match_all("/\d ASSO @(.*)@/", $factrec, $match);
-		if ($fact == "MARR") {
-			foreach($match[1] as $key => $id) {
-				if (IDType($id) == "FAM") return self::ShowFactDetails("MARR", $id);
-			}
-		}
-		else {
-			$id = $match[1][0];
-			return self::ShowFactDetails($fact, $id);
-		}
-	}
 
 	// Used in search to determine if the source search must be shown
 	public function ShowSourceFromAnyGed() {

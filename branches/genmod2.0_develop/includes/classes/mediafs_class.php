@@ -76,7 +76,7 @@ abstract class MediaFS {
 				$d = @dir($directory);
 				if (is_object($d)) {
 					while (false !== ($entry = $d->read())) {
-						if ($entry != ".." && $entry != "." && $entry != "CVS" && ($incthumbdir || $entry != "thumbs")) {
+						if ($entry != ".." && $entry != "." && $entry != "CVS" && $entry != ".svn" && ($incthumbdir || $entry != "thumbs")) {
 							$entry = $directory.$entry."/";
 							if(is_dir($entry)) {
 								if ($checkwrite) $canwrite = self::DirIsWritable($entry, false);

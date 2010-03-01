@@ -1232,22 +1232,6 @@ abstract class AdminFunctions {
 		else return false;
 	}
 	
-	public function LoadLangVars($langname="") {
-		
-		$langsettings = array();
-		$sql = "SELECT * FROM ".TBLPREFIX."lang_settings";
-		if (!empty($lang)) $sql .= " WHERE ls_gm_langname='".$langname."'";
-		$res = NewQuery($sql);
-		while ($row = $res->FetchAssoc()) {
-			$lang = array();
-			foreach ($row as $key => $value) {
-				$lang[substr($key, 3)] = $value;
-			}
-			$langsettings[$row["ls_gm_langname"]] = $lang;
-		}
-		return $langsettings;
-	}
-	
 	public function StoreLangVars($vars) {
 		
 		$string = "";
@@ -1484,5 +1468,65 @@ abstract class AdminFunctions {
 		else return $success;
 	}
 	
+	public function GetGMFileList($dirs="", $recursive=false) {
+		static $include_dirs, $recurse_dirs;
+		
+		if (!isset($include_dirs)) $include_dirs = array("blocks", "fonts", "hooks", "hooks/logout", "images", "images/buttons", "images/flags", "images/media", "images/small", "includes", "includes/classes", "includes/controllers", "includes/functions", "includes/values", "index", "install", "install/images", "languages", "media", "media/thumbs", "places", "places/AUS", "places/AUT", "places/BEL", "places/BRA", "places/CAN", "places/CHE", "places/CZE", "places/DEU", "places/DNK", "places/ENG", "places/ESP", "places/FIN", "places/flags", "places/FRA", "places/GBR", "places/HUN", "places/IDN", "places/IND", "places/IRL", "places/ISR", "places/ITA", "places/KEN", "places/LBA", "places/NLD", "places/NOR", "places/NZL", "places/PAK", "places/POL", "places/PRT", "places/ROM", "places/RUS", "places/SCT", "places/SVK", "places/SWE", "places/TUR", "places/UKR", "places/USA", "places/WLS", "places/ZAF", "reports", "themes/clear", "themes/standard", "ufpdf");
+//		if (!isset($include_dirs)) $include_dirs = array("places", "themes");
+		
+		$dirlist = array();
+		if (!is_array($dirs)) $dirs = array($dirs);
+	
+		foreach ($dirs as $key=>$dir) {
+			$d = @dir(($dir == "" ? "includes/.." : $dir));
+			if (is_object($d)) {
+				while (false !== ($entry = $d->read())) {
+					if ($entry != ".." && $entry != "." && $entry != ".svn") {
+						$direntry = $dir.$entry."/";
+						if(is_dir($direntry)) {
+							if (in_array($dir.$entry, $include_dirs)) {
+								$dirlist = array_merge($dirlist, self::GetGMFileList(array($direntry), true));
+							}
+						}
+						else {
+							print $dir.$entry."<br />";
+							if ($entry != "md5_files.php") $dirlist[$dir.$entry] = md5_file($dir.$entry);
+						}
+					}
+				}
+				$d->close();
+			}
+		}
+		if ($recursive) return $dirlist;
+		@unlink(INDEX_DIRECTORY."md5_files.php");
+		$handle = @fopen(INDEX_DIRECTORY."md5_files.php", "wb");
+		if (!$handle) return false;
+		fwrite($handle, "<"."?php\n");
+		fwrite($handle, "if (preg_match(\"/\Wmd5_files.php/\", \$_SERVER[\"SCRIPT_NAME\"])>0) {\n");
+		fwrite($handle, "\$INTRUSION_DETECTED = true;\n");
+		fwrite($handle, "}\n");
+		fwrite($handle, "// This file is for checking if the right files exist in a Genmod installation");
+		fwrite($handle, "// It is created with the hidden function admin_maint.php?action=createmd5");
+		fwrite($handle, "// It should be run on an existing installation with files of the latest SVN version.");
+		fwrite($handle, "\$md5_array = array();\n");
+		foreach($dirlist as $file => $md5) {
+			fwrite($handle, "\$md5_array[\"".$file."\"] = \"".$md5."\";\n");
+		}
+		fwrite($handle, "?>\n");
+		fclose($handle);
+		return true;
+	}
+	
+	public function CheckGMFileList() {
+		
+		require_once("includes/values/md5_files.php");
+		$message = "";
+		foreach($md5_array as $file => $md5) {
+			if (md5_file($file) != $md5) {
+				$message .= GM_LANG_wrong_md5."&nbsp;".$file."<br />";
+			}
+		}
+		return $message;
+	}	
 }
 ?>

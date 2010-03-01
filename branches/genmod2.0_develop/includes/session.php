@@ -426,7 +426,7 @@ require_once($GM_BASE_DIRECTORY."includes/functions/functions_name.php");
 //-- load file for language settings
 require_once($GM_BASE_DIRECTORY . "includes/values/lang_settings_std.php");
 $Languages_Default = true;
-$ConfiguredSettings = AdminFunctions::LoadLangVars();
+$ConfiguredSettings = LanguageFunctions::LoadLangVars();
 if (count($ConfiguredSettings) > 0) {
 	$DefaultSettings = $language_settings;		// Save default settings, so we can merge properly
 	$language_settings = array_merge($DefaultSettings, $ConfiguredSettings);	// Copy new langs into config
