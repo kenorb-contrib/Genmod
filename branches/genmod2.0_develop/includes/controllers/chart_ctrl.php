@@ -44,6 +44,7 @@ class ChartController extends BaseController {
 	protected $min_generation = null;		// Generate an error that a minimum number of generations must be displayed
 	protected $max_generation = null;		// Generate an error that no more than a maximum number of generations can be displayed
 	protected $num_generations = null;		// Number of generations to display
+	protected $boxcount = 0;				// To keep track of the number of printed boxes
 	
 	
 	public function __construct() {
@@ -233,6 +234,116 @@ class ChartController extends BaseController {
 		print " />";
 		print "</td>";
 		if ($tr) print "</tr>";
+	}
+
+	protected function PrintFamArrow($arrow, $person) {
+		global $bwidth, $bheight, $TEXT_DIRECTION, $GM_IMAGES;
+		
+		if ($person->disp_name) {
+			// -- print left arrow for decendants so that we can move down the tree
+			//-- make sure there is more than 1 child in the family with parents
+			$num=0;
+			// NOTE: For statement OK
+			foreach($person->childfamilies as $key => $fam) {
+				$num += $fam->children_count;
+			}
+			// NOTE: If statement OK
+			if (count($person->spousefamilies) > 0 || $num > 1) {
+				// Open div childarrow_boxcount
+				print "\n\t\t<div id=\"childarrow".$this->boxcount."\" dir=\"";
+				if ($TEXT_DIRECTION=="rtl") print "rtl\" style=\"position:absolute; ";
+				else print "ltr\" style=\"position:absolute; ";
+				print "width:10px; height:10px;\">";
+				if ($this->view != "preview") {
+					print "<a href=\"javascript: ".GM_LANG_show."\" onclick=\"return togglechildrenbox(".$this->boxcount.");\" onmouseover=\"swap_image('larrow".$this->boxcount."',3);\" onmouseout=\"swap_image('larrow".$this->boxcount."',3);\">";
+					print "<img id=\"larrow".$this->boxcount."\" src=\"".GM_IMAGE_DIR."/".$GM_IMAGES[$arrow."arrow"]["other"]."\" border=\"0\" alt=\"\" />";
+					print "</a>";
+				}
+				// Open div childbox_boxcount
+				print "\n\t\t<div id=\"childbox".$this->boxcount."\" dir=\"";
+				if ($TEXT_DIRECTION=="rtl") print "rtl\" style=\"position:absolute; right: 20px; ";
+				else print "ltr\" style=\"position:absolute; left: 20px;";
+				print " width:".$bwidth."px; height:".$bheight."px; visibility: hidden;\">";
+				// Table level 2-2
+				print "\n\t\t\t<table class=\"person_box\"><tr><td align=\"left\">";
+				foreach($person->spousefamilies as $key => $sfamily) {
+					if($person->xref != $sfamily->husb_id) $spouse = $sfamily->husb;
+					else $spouse = $sfamily->wife;
+					if (is_object($spouse)) {
+						print "\n\t\t\t\t<a href=\"".SCRIPT_NAME."?rootid=".$spouse->xref.(isset($this->line) ? "&amp;line=".$this->line : "").(isset($this->split) ? "&amp;split=".$this->split : "").(isset($this->show_spouse) ? "&amp;show_spouse=".$this->show_spouse : "")."&amp;show_details=".$this->show_details."&amp;num_generations=".$this->num_generations."&amp;box_width=".$this->box_width.(isset($this->num_descent) ? "&amp;num_descent=".$this->num_descent : "")."\"><span ";
+						if ($spouse->disp_name) {
+							if (hasRTLText($spouse->name))
+							     print "class=\"name2\">";
+			   				else print "class=\"name1\">";
+							print $spouse->name;
+						}
+						else print GM_LANG_private;
+						print "<br /></span></a>";
+					}
+					foreach($sfamily->children as $ckey => $child) {
+						print "\n\t\t\t\t&nbsp;&nbsp;<a href=\"".SCRIPT_NAME."?rootid=".$child->xref.(isset($this->line) ? "&amp;line=".$this->line : "").(isset($this->split) ? "&amp;split=".$this->split : "").(isset($this->show_spouse) ? "&amp;show_spouse=".$this->show_spouse : "")."&amp;show_details=".$this->show_details."&amp;num_generations=".$this->num_generations."&amp;box_width=".$this->box_width.(isset($this->num_descent) ? "&amp;num_descent=".$this->num_descent : "")."\"><span ";
+						if ($child->disp_name) {
+							if (hasRTLText($child->name))
+							     print "class=\"name2\">&lt; ";
+				   			else print "class=\"name1\">&lt; ";
+							print $child->name;
+						}
+						else print ">" . GM_LANG_private;
+						print "<br /></span></a>";
+					}
+				}
+				//-- print the siblings
+				foreach($person->childfamilies as $key => $cfamily) {
+					if($cfamily->husb_id != "" || $cfamily->wife_id != "") {
+						print "<span class=\"name1\"><br />".GM_LANG_parents."<br /></span>";
+						if ($cfamily->husb_id != "") {
+							print "\n\t\t\t\t&nbsp;&nbsp;<a href=\"".SCRIPT_NAME."?rootid=".$cfamily->husb_id.(isset($this->line) ? "&amp;line=".$this->line : "").(isset($this->split) ? "&amp;split=".$this->split : "").(isset($this->show_spouse) ? "&amp;show_spouse=".$this->show_spouse : "")."&amp;show_details=".$this->show_details."&amp;num_generations=".$this->num_generations."&amp;box_width=".$this->box_width.(isset($this->num_descent) ? "&amp;num_descent=".$this->num_descent : "")."\"><span ";
+							if ($cfamily->husb->disp_name) {
+								if (hasRTLText($cfamily->husb->name))
+								     print "class=\"name2\">";
+				   				else print "class=\"name1\">";
+								print $cfamily->husb->name;
+							}
+							else print GM_LANG_private;
+							print "<br /></span></a>";
+						}
+						if ($cfamily->wife_id != "") {
+							print "\n\t\t\t\t&nbsp;&nbsp;<a href=\"".SCRIPT_NAME."?rootid=".$cfamily->wife_id.(isset($this->line) ? "&amp;line=".$this->line : "").(isset($this->split) ? "&amp;split=".$this->split : "").(isset($this->show_spouse) ? "&amp;show_spouse=".$this->show_spouse : "")."&amp;show_details=".$this->show_details."&amp;num_generations=".$this->num_generations."&amp;box_width=".$this->box_width.(isset($this->num_descent) ? "&amp;num_descent=".$this->num_descent : "")."\"><span ";
+							if ($cfamily->wife->disp_name) {
+								if (hasRTLText($cfamily->wife->name))
+								     print "class=\"name2\">";
+				   				else print "class=\"name1\">";
+								print $cfamily->wife->name;
+							}
+							else print GM_LANG_private;
+							print "<br /></span></a>";
+						}
+					}
+					if ($cfamily->children_count > 1) {
+						print "<span class=\"name1\"><br />".GM_LANG_siblings."<br /></span>";
+						foreach($cfamily->children as $key2 => $child) {
+							if ($child->xref != $person->xref) {
+								print "\n\t\t\t\t&nbsp;&nbsp;<a href=\"".SCRIPT_NAME."?rootid=".$child->xref.(isset($this->line) ? "&amp;line=".$this->line : "").(isset($this->split) ? "&amp;split=".$this->split : "").(isset($this->show_spouse) ? "&amp;show_spouse=".$this->show_spouse : "")."&amp;show_details=".$this->show_details."&amp;num_generations=".$this->num_generations."&amp;box_width=".$this->box_width.(isset($this->num_descent) ? "&amp;num_descent=".$this->num_descent : "")."\"><span ";
+								if ($child->disp_name) {
+									if (hasRTLText($child->name))
+									print "class=\"name2\"> ";
+					   				else print "class=\"name1\"> ";
+									print $child->name;
+								}
+								else print ">". GM_LANG_private;
+								print "<br /></span></a>";
+							}
+						}
+					}
+				}
+				// Close table level 2-2
+				print "\n\t\t\t</td></tr></table>";
+				// Close div childbox_boxcount
+				print "\n\t\t</div>";
+				// Close div childarrow_boxcount
+				print "\n\t\t</div>";
+			}
+		}
 	}
 }
 ?>

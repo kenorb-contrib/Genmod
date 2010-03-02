@@ -392,6 +392,14 @@ abstract class MenuBar {
 			$submenu->addLink("statistics.php");
 			$menu->addSubmenu($submenu);
 		}
+		//-- ancestry submenu
+		if (file_exists("paternals.php")) {
+			$link = "paternals.php";
+			if ($rootid) $link .= "?rootid=".$rootid;
+			$submenu = new Menu(GM_LANG_paternal_chart);
+			$submenu->addLink($link);
+			$menu->addSubmenu($submenu);
+		}
 		return $menu;
 	}
 	

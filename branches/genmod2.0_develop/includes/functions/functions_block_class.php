@@ -326,10 +326,10 @@ abstract class BlockFunctions {
 						}
 						if ($type=="INDI") {
 							print "<td class=\"wrap\"";
-							if ($block) print "width=\"86%\"";
-							print "><span class=\"name2\"><a href=\"individual.php?pid=".urlencode($id)."&amp;gedid=".$gedid."\">";
+							if ($block) print " width=\"86%\"";
+							print "><a href=\"individual.php?pid=".urlencode($id)."&amp;gedid=".$gedid."\"><span class=\"name2\">\n";
 							print $object->name.($object->addname == "" ? "" : "&nbsp;(".$object->addname.")")."</span>".$object->addxref;
-							print "</a></td>";
+							print "</a></td>\n";
 							$i++;
 						}
 						elseif ($type=="FAM") {
