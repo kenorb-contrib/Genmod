@@ -35,11 +35,12 @@ abstract class PersonFunctions {
 	 *
 	 * Find and print a given individuals information for a pedigree chart
 	 *
-	 * @param string $pid	the Gedcom Xref ID of the   to print
-	 * @param int $style	the style to print the box in, 1 for smaller boxes, 2 for larger boxes
+	 * @param string $pid			the Gedcom Xref ID of the   to print
+	 * @param int $style			the style to print the box in, 1 for smaller boxes, 2 for larger boxes
 	 * @param boolean $show_famlink	set to true to show the icons for the popup links and the zoomboxes
-	 * @param int $count	on some charts it is important to keep a count of how many boxes were printed
-	 * @param string $view	number of generations as parameter for links to various charts
+	 * @param int $count			on some charts it is important to keep a count of how many boxes were printed
+	 * @param string $view	
+	 * @param string num_gens		number of generations as parameter for links to various charts
 	 * @param string $chart_style	style of chart as parameter for links to various charts
 	 */
 	public function PrintPedigreePerson($person, $style=1, $show_famlink=true, $count=0, $personcount="1", $view="", $num_gens=0, $chart_style=1) {
@@ -98,7 +99,7 @@ abstract class PersonFunctions {
 					// NOTE: draw a popup box for the links to other pages and family members
 					// NOTE: Start div I.$pid.$personcount.$count.links
 					// NOTE: ie_popup_width is needed to set the width of the popup box in IE for the gedcom favorites
-					print "\n\t\t<div id=\"I".$person->xref.".".$personcount.".".$count.".".$random."links\" class=\"wrap ie_popup_width person_box$isF details1\" style=\"position:absolute; height:auto; ";
+					print "\n\t\t<div id=\"I".$person->xref.".".$personcount.".".$count.".".$random."links\" class=\"wrap ie_popup_width person_box$isF details1\" align=\"".$ldir."\" style=\"position:absolute; height:auto; ";
 					print "visibility:hidden;\" onmouseover=\"keepbox('".$person->xref.".".$personcount.".".$count.".".$random."'); return false;\" ";
 					print "onmouseout=\"moveout('".$person->xref.".".$personcount.".".$count.".".$random."'); return false;\">";
 					// This div is filled by an AJAX call! Not yet as placement is a problem!
@@ -112,6 +113,7 @@ abstract class PersonFunctions {
 					}
 					// NOTE: Zoom
 					if (file_exists("ancestry.php")) print "<a href=\"ancestry.php?rootid=".$person->xref."&amp;chart_style=$chart_style&amp;num_generations=".$num_gens."&amp;box_width=$box_width&amp;gedid=".$person->gedcomid."\"><b>".GM_LANG_ancestry_chart."</b></a><br />\n";
+					if (file_exists("paternals.php")) print "<a href=\"paternals.php?rootid=".$person->xref."&amp;split=".$num_gens."&amp;line=".$chart_style."&amp;box_width=".$box_width."&amp;gedid=".$person->gedcomid."\"><b>".GM_LANG_paternal_chart."</b></a><br />\n";
 					if (file_exists("fanchart.php") and defined("IMG_ARC_PIE") and function_exists("imagettftext"))  print "<a href=\"fanchart.php?rootid=".$person->xref."&amp;PEDIGREE_GENERATIONS=".$num_gens."&amp;gedid=".$person->gedcomid."\"><b>".GM_LANG_fan_chart."</b></a><br />\n";
 					if (file_exists("hourglass.php")) print "<a href=\"hourglass.php?pid=".$person->xref."&amp;chart_style=$chart_style&amp;PEDIGREE_GENERATIONS=".$num_gens."&amp;box_width=$box_width&amp;gedid=".$person->gedcomid."\"><b>".GM_LANG_hourglass_chart."</b></a><br />\n";
 					foreach ($person->spousefamilies as $skey => $sfam) {
@@ -140,7 +142,7 @@ abstract class PersonFunctions {
 		}
 		// NOTE: Draw the inner box that shows the person details
 		// NOTE: Start div out-$pid.$personcount.$count
-		print "\n\t\t\t<div id=\"out-".$person->xref.".".$personcount.".".$count.".".$random."\"";
+		print "\n\t\t\t<div align=\"".$ldir."\" id=\"out-".$person->xref.".".$personcount.".".$count.".".$random."\"";
 		if ($style==1) {
 			print " class=\"person_box$isF\" style=\"width: ".$bwidth."px; height: ".$bheight."px; padding: 2px; overflow: hidden;\"";
 		}
@@ -363,11 +365,13 @@ abstract class PersonFunctions {
 					$click_link="#";
 					if (preg_match("/pedigree.php/", SCRIPT_NAME)>0) $click_link="pedigree.php?rootid=".$person->xref."&amp;num_generations=".$num_gens."&amp;talloffset=".$chart_style."&amp;gedid=".$person->gedcomid;
 					if (preg_match("/hourglass.php/", SCRIPT_NAME)>0) $click_link="hourglass.php?pid=".$person->xref."&amp;generations=".$num_gens."&amp;box_width=$box_width&amp;gedid=".$person->gedcomid;
+					if (preg_match("/paternals.php/", SCRIPT_NAME)>0) $click_link="paternals.php?rootid=".$person->xref."&amp;split=".$num_gens."&amp;line=".$chart_style."&amp;box_width=".$box_width."&amp;gedid=".$person->gedcomid;
 					if (preg_match("/ancestry.php/", SCRIPT_NAME)>0) $click_link="ancestry.php?rootid=".$person->xref."&amp;chart_style=$chart_style&amp;num_generations=".$num_gens."&amp;box_width=$box_width&amp;gedid=".$person->gedcomid;
 					if (preg_match("/descendancy.php/", SCRIPT_NAME)>0) $click_link="descendancy.php?rootid=".$person->xref."&amp;show_full=$show_full&amp;num_generations=".$num_gens."&amp;box_width=$box_width&amp;gedid=".$person->gedcomid;
 					if ((preg_match("/family.php/", SCRIPT_NAME)>0)&&!empty($famid)) $click_link="family.php?famid=".$sfam->xref."&amp;gedid=".$sfam->gedcomid;
 					if (preg_match("/individual.php/", SCRIPT_NAME)>0) $click_link="individual.php?pid=".$person->xref."&amp;gedid=".$person->gedcomid;
-					print "<br /><img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["pedigree"]["small"]."\" width=\"25\" border=\"0\" vspace=\"0\" hspace=\"0\" alt=\"".GM_LANG_person_links."\" title=\"".GM_LANG_person_links."\"";
+					print "<br />";
+					print "<a href=\"".$click_link."\"";
 					if (GedcomConfig::$LINK_ICONS=="mouseover") print " onmouseover";
 					if (GedcomConfig::$LINK_ICONS=="click") print " onclick";
 					print "=\"";
@@ -381,7 +385,8 @@ abstract class PersonFunctions {
 					print "onmouseout=\"moveout('".$person->xref.".".$personcount.".".$count.".".$random."');";
 					print " return false;\"";
 					if (($click_link=="#")&&(GedcomConfig::$LINK_ICONS!="click")) print " onclick=\"return false;\"";
-					print " />";
+					print ">";
+					print "<img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["pedigree"]["small"]."\" width=\"25\" border=\"0\" vspace=\"0\" hspace=\"0\" alt=\"".GM_LANG_person_links."\" title=\"".GM_LANG_person_links."\" /></a>";
 				}
 			// NOTE: Close div icons-$personcount.$pid.$count
 			print "</div>\n";
