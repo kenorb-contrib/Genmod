@@ -286,7 +286,9 @@ class IndilistController extends ListController {
 				$person = $personlist[$namearray[1]];
 				if (stristr(SCRIPT_NAME,"aliveinyear.php")) {
 					if (!$person->disp) $indi_private[$person->key] = true;
-					else if ($this->CheckAlive($person) == -1) $indi_unborn[$person->key] = true;
+					else if ($this->CheckAlive($person) == -1) {
+						$indi_unborn[$person->key] = true;
+					}
 					else if ($this->CheckAlive($person) == 1) $indi_dead[$person->key] = true;
 					else if ($this->CheckAlive($person) == -2) $indi_unknown[$person->key] = true;
 					else {
@@ -340,6 +342,11 @@ class IndilistController extends ListController {
 				$bddates["birth"]["year"] = $bddates["death"]["year"] - $MAX_ALIVE_AGE;
 				$bddates["birth"]["type"] = "est";
 			}
+		}
+		// Nothing to tell for sure: estimated death year is before estimated birth year
+		if (isset($bddates["birth"]["year"]) && isset($bddates["death"]["year"]) && $bddates["death"]["year"] < $bddates["birth"]["year"]) {
+			$alive[$person->key] = -2;
+			return -2;
 		}
 		
 		// For sure born after

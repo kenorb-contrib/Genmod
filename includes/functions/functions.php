@@ -1557,11 +1557,10 @@ function EstimateBD(&$person, $type) {
 		return $dates;
 	}
 		
-	
 	// Check the fact dates
 	$ffactyear = 9999;
 	$lfactyear = 0;
-	$facts = GetAllSubrecords($person->gedrec, "", false, false, false);
+	$facts = GetAllSubrecords($person->gedrec, "CHAN", false, false, false);
 	foreach ($facts as $key => $factrec) {
 		$ct = preg_match_all("/\d DATE.*\s(\d{3,4})\s/", $factrec, $match, PREG_SET_ORDER);
 		for($i=0; $i<$ct; $i++) {
@@ -1636,6 +1635,21 @@ function EstimateBD(&$person, $type) {
 				}
 			}
 			
+			// Check for the spouses date
+			if ($family->husb_id != "" && $family->husb_id != $person->xref) $spouse = "husb";
+			else if ($family->wife_id != "" && $family->wife_id != $person->xref) $spouse = "wife";
+			if (isset($spouse)) {
+				// Check the spouses birthrec
+				$brec = GetSubRecord(1, "1 BIRT", $family->$spouse->brec);
+				$bs = preg_match("/\d DATE.*\s(\d{3,4})\s/", $brec, $bmatch);
+				if ($bs) $sbyear = $bmatch[1];
+
+				// Check the spouses deathrec
+				$drec = GetSubRecord(1, "1 DEAT", $family->$spouse->drec);
+				$ds = preg_match("/\d DATE.*\s(\d{3,4})\s/", $drec, $dmatch);
+				if ($ds) $sdyear = $dmatch[1];
+			}
+			
 			// Get the set of children
 			foreach ($family->children as $key2 => $child) {
 				// Get each child's object and keep it. This will gather all children from all spousefamilies
@@ -1687,23 +1701,25 @@ function EstimateBD(&$person, $type) {
 				if (isset($mbyear) && (!isset($birthyear) || ($mbyear + 50) < $birthyear)) $birthyear = $mbyear + 50;
 				// *     4. Fathers birth year + 50
 				if (isset($fbyear) && (!isset($birthyear) || ($fbyear + 50) < $birthyear)) $birthyear = $fbyear + 50;
-				// *     5. First childs birth year - 15
+				// *     5. Spouses birth year
+				if (isset($sbyear) && !isset($birthyear)) $birthyear = $sbyear;
+				// *     6. First childs birth year - 15
 				if ($fcbyear != 9999 && (!isset($birthyear) || ($fcbyear - 15) < $birthyear)) $birthyear = $fcbyear - 15;
-				// *     6. First grandchilds birth year - 30
-				if (!isset($birthyear) || ($fgcbyear - 30) < $birthyear) $birthyear = $fgcbyear - 30;
-				// *     7. First marriage year - 20
+				// *     7. First grandchilds birth year - 30
+				if ($fgcbyear != 9999 && (!isset($birthyear) || ($fgcbyear - 30) < $birthyear)) $birthyear = $fgcbyear - 30;
+				// *     8. First marriage year - 20
 				if ($fmarryear != 9999 && (!isset($birthyear) || ($fmarryear - 20) < $birthyear)) $birthyear = $fmarryear - 20;
-				// *     8. Mothers death year
+				// *     9. Mothers death year
 				if (isset($mdyear) && (!isset($birthyear) || $mdyear < $birthyear)) $birthyear = $mdyear;
-				// *     9. Fathers death year
+				// *     10. Fathers death year
 				if (isset($fdyear) && (!isset($birthyear) || $fdyear < ($birthyear - 1))) $birthyear = $fdyear;
 			}
 			if (isset($birthyear)) {
-				$dates["birth"]["year"] = $birthyear;
+				$dates["birth"]["year"] = ($birthyear > $cyear ? $cyear : $birthyear);
 				$dates["birth"]["type"] = $type;
 			}
 		}
- 		// * The earliest estimated death year is the highest value of:
+		// * The earliest estimated death year is the highest value of:
 		if (isset($truedeathyear)) {
 			$dates["death"]["year"] = $truedeathyear;
 			$dates["death"]["type"] = "true";
@@ -1718,6 +1734,8 @@ function EstimateBD(&$person, $type) {
 				if (isset($mbyear) && (!isset($deathyear) || ($mbyear + 15) > $deathyear)) $deathyear = $mbyear + 15;
 				// *     4. Fathers birth year + 15
 				if (isset($fbyear) && (!isset($deathyear) || ($fbyear + 15) > $deathyear)) $deathyear = $fbyear + 15;
+				// *     5. Spouses death year
+				if (isset($sdyear) && !isset($deathyear)) $deathyear = $sdyear;
 				// *     5. Last childs birth year
 				if ($lcbyear != 0 && (!isset($deathyear) || $lcbyear > $deathyear)) $deathyear = $lcbyear;
 				// *     6. First grandchilds birth year - 15
@@ -1747,8 +1765,10 @@ function EstimateBD(&$person, $type) {
 				if (isset($mbyear) && (!isset($birthyear) || ($mbyear + 15) < $birthyear)) $birthyear = $mbyear + 15;
 				// *     4. Fathers birth year + 15
 				if (isset($fbyear) && (!isset($birthyear) || ($fbyear + 15) < $birthyear)) $birthyear = $fbyear + 15;
+				// *     5. Spouses birth year
+				if (isset($sbyear) && !isset($birthyear)) $birthyear = $sbyear;
 				// *     5. First childs birth year - 50
-				if ($fcbyear != 9999 && (!isset($birthyear) || ($fcbyear - 50)) < $birthyear) $birthyear = $fcbyear - 50;
+				if ($fcbyear != 9999 && (!isset($birthyear) || ($fcbyear - 50) < $birthyear)) $birthyear = $fcbyear - 50;
 				// *     6. First grandchilds birth year - 100
 				if ($fgcbyear != 9999 && (!isset($birthyear) || ($fgcbyear - 100) < $birthyear)) $birthyear = $fgcbyear-100;
 				// *     7. Marriage year - 70
@@ -1758,7 +1778,7 @@ function EstimateBD(&$person, $type) {
 				if (isset($fdyear) && isset($birthyear) && $fdyear-1 < $birthyear) $birthyear = $fdyear-1;
 			}
 			if (isset($birthyear)) {
-				$dates["birth"]["year"] = $birthyear;
+				$dates["birth"]["year"] = ($birthyear > $cyear ? $cyear : $birthyear);
 				$dates["birth"]["type"] = $type;
 			}
 		}
@@ -1777,8 +1797,10 @@ function EstimateBD(&$person, $type) {
 				if (isset($mbyear) && (!isset($deathyear) || ($mbyear + 15 + $MAX_ALIVE_AGE) > $deathyear)) $deathyear = $mbyear + 15 + $MAX_ALIVE_AGE;
 				// *     4. Fathers birth year + $MAX_ALIVE_AGE + 15
 				if (isset($fbyear) && (!isset($deathyear) || ($fbyear + 15 + $MAX_ALIVE_AGE) > $deathyear)) $deathyear = $fbyear + 15 + $MAX_ALIVE_AGE;
+				// *     5. Spouses death year
+				if (isset($sdyear) && !isset($deathyear)) $deathyear = $sdyear;
 				// *     5. Last childs birth year + $MAX_ALIVE_AGE - 15
-				if ($lcbyear != 0 && (!isset($deathyear) || ($lcbyear - 15 + $MAX_ALIVE_AGE)) > $deathyear) $deathyear = $fcbyear - 15 + $MAX_ALIVE_AGE;
+				if ($lcbyear != 0 && (!isset($deathyear) || ($lcbyear - 15 + $MAX_ALIVE_AGE) > $deathyear)) $deathyear = $fcbyear - 15 + $MAX_ALIVE_AGE;
 				// *     6. First grandchilds birth year + $MAX_ALIVE_AGE - 30
 				if ($fgcbyear != 9999 && (!isset($deathyear) || ($fgcbyear - 30 + $MAX_ALIVE_AGE) > $deathyear)) $deathyear = $fgcbyear - 30 + $MAX_ALIVE_AGE;
 				// *     7. Marriage year + $MAX_ALIVE_AGE - 20
