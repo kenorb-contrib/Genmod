@@ -705,28 +705,33 @@ abstract class AdminFunctions {
 		}
 	}
 	
-	public function CheckUploadedGedcom($filename) {
+	public function CheckUploadedGedcom($filename, $uploadname="", $checkzip=true) {
 		
-		if (!isset($_FILES['GEDCOMPATH']) || filesize($_FILES['GEDCOMPATH']['tmp_name'])== 0 || (strstr(strtolower(trim($_FILES['GEDCOMPATH']['name'])), ".zip") == ".zip" && AdminFunctions::GetGedFromZip($_FILES['GEDCOMPATH']['tmp_name'], false) != $filename) || (strstr(strtolower(trim($_FILES['GEDCOMPATH']['name'])), ".ged") == ".ged" && $_FILES['GEDCOMPATH']['name'] != $filename)) {
-			unlink($_FILES['GEDCOMPATH']['tmp_name']);
+		if ($uploadname == "") $uploadname = "GEDCOMPATH";
+		if (!isset($_FILES[$uploadname]) 
+			|| filesize($_FILES[$uploadname]['tmp_name'])== 0 
+			|| ($checkzip && strstr(strtolower(trim($_FILES[$uploadname]['name'])), ".zip") == ".zip" && AdminFunctions::GetGedFromZip($_FILES[$uploadname]['tmp_name'], false) != $filename) 
+			|| (strstr(strtolower(trim($_FILES[$uploadname]['name'])), ".ged") == ".ged" && $_FILES[$uploadname]['name'] != $filename)) {
+			unlink($_FILES[$uploadname]['tmp_name']);
 			return false;
 		}
 		return true;
 	}
 	
-	public function MoveUploadedGedcom($file, $path) {
+	public function MoveUploadedGedcom($file, $path, $uploadname="") {
 		
-		if (file_exists($path.$_FILES['GEDCOMPATH']['name'])) {
-			if (file_exists($path.$_FILES['GEDCOMPATH']['name'].".old")) unlink($path.$_FILES['GEDCOMPATH']['name'].".old");
-			copy($path.$_FILES['GEDCOMPATH']['name'], $path.$_FILES['GEDCOMPATH']['name'].".old");
-			unlink($path.$_FILES['GEDCOMPATH']['name']);
+		if ($uploadname == "") $uploadname = "GEDCOMPATH";
+		if (file_exists($path.$_FILES[$uploadname]['name'])) {
+			if (file_exists($path.$_FILES[$uploadname]['name'].".old")) unlink($path.$_FILES[$uploadname]['name'].".old");
+			copy($path.$_FILES[$uploadname]['name'], $path.$_FILES[$uploadname]['name'].".old");
+			unlink($path.$_FILES[$uploadname]['name']);
 		}
-		if (move_uploaded_file($_FILES['GEDCOMPATH']['tmp_name'], $path.$_FILES['GEDCOMPATH']['name'])) {
-				WriteToLog("EditConfigGedcom-> Gedcom ".$path.$_FILES['GEDCOMPATH']['name']." uploaded", "I", "S");
+		if (move_uploaded_file($_FILES[$uploadname]['tmp_name'], $path.$_FILES[$uploadname]['name'])) {
+				WriteToLog("MoveUploadedGedcom-> Gedcom ".$path.$_FILES[$uploadname]['name']." uploaded", "I", "S");
 		}
 		// Get the gedcom name from the ZIP 
-		if (strstr(strtolower(trim($_FILES['GEDCOMPATH']['name'])), ".zip") == ".zip") {
-			return AdminFunctions::GetGedFromZip($path.$_FILES['GEDCOMPATH']['name']);
+		if (strstr(strtolower(trim($_FILES[$uploadname]['name'])), ".zip") == ".zip") {
+			return AdminFunctions::GetGedFromZip($path.$_FILES[$uploadname]['name']);
 		}
 		else return $file;
 	}
@@ -1527,6 +1532,106 @@ abstract class AdminFunctions {
 			}
 		}
 		return $message;
-	}	
+	}
+	
+	public function MakeTransTab($gedfile, $merge_ged) {
+		
+		$fp = fopen($gedfile, "r");
+		if (!$fp) return false;
+		//-- read the gedcom and test it in 8KB chunks
+		SwitchGedcom($merge_ged);
+		$lastindi = EditFunctions::GetNewXref("INDI");
+		$lastindi = substr($lastindi,(strlen(GedcomConfig::$GEDCOM_ID_PREFIX)));
+		$lastfam = EditFunctions::GetNewXref("FAM");
+		$lastfam = substr($lastfam,(strlen(GedcomConfig::$FAM_ID_PREFIX)));
+		$lastobje = EditFunctions::GetNewXref("OBJE");
+		$lastobje = substr($lastobje,(strlen(GedcomConfig::$MEDIA_ID_PREFIX)));
+		$lastsour = EditFunctions::GetNewXref("SOUR");
+		$lastsour = substr($lastsour,(strlen(GedcomConfig::$SOURCE_ID_PREFIX)));
+		$lastrepo = EditFunctions::GetNewXref("REPO");
+		$lastrepo = substr($lastrepo,(strlen(GedcomConfig::$REPO_ID_PREFIX)));
+		$lastnote = EditFunctions::GetNewXref("NOTE");
+		$lastnote = substr($lastnote,(strlen(GedcomConfig::$NOTE_ID_PREFIX)));
+		$inditab = array();
+		$famtab = array();
+		$objetab = array();
+		$sourtab = array();
+		$repotab = array();
+		$notetab = array();
+		$fcontents = "";
+		$end = false;
+		$pos1 = 0;
+		while(!$end) {
+			$pos2 = 0;
+			// NOTE: find the start of the next record
+			if (strlen($fcontents) > $pos1+1) $pos2 = strpos($fcontents, "\n0", $pos1+1);
+			while((!$pos2)&&(!feof($fp))) {
+				$fcontents .= fread($fp, 1024*8);
+				$pos2 = strpos($fcontents, "\n0", $pos1+1);
+			}
+	
+			//-- pull the next record out of the file
+			if ($pos2) $indirec = substr($fcontents, $pos1, $pos2-$pos1);
+			else $indirec = substr($fcontents, $pos1);
+
+			// Get all xrefs
+			$ct = preg_match_all("/\n\d\s+@(.*)@\s(\w*)/", $indirec, $match);
+			if ($ct>0) {
+				for ($i=0;$i<$ct;$i++) {
+					$match[2][$i] = trim($match[2][$i]);
+					// print "Handling ".$match[1][$i]." at ".$pos1."<br />";
+					switch ($match[2][$i]) {
+						case "INDI": 
+							$inditab[$match[1][$i]] = GedcomConfig::$GEDCOM_ID_PREFIX.$lastindi;
+							$lastindi++;
+							break;
+						case "FAM":
+							$famtab[$match[1][$i]] = GedcomConfig::$FAM_ID_PREFIX.$lastfam;
+							$lastfam++;
+							break;
+						case "OBJE":
+							$objetab[$match[1][$i]] = GedcomConfig::$MEDIA_ID_PREFIX.$lastobje;
+							$lastobje++;
+							break;
+						case "SOUR":
+							$sourtab[$match[1][$i]] = GedcomConfig::$SOURCE_ID_PREFIX.$lastsour;
+							$lastsour++;
+							break;
+						case "REPO":
+							$repotab[$match[1][$i]] = GedcomConfig::$REPO_ID_PREFIX.$lastrepo;
+							$lastrepo++;
+							break;
+						case "NOTE":
+							$notetab[$match[1][$i]] = GedcomConfig::$NOTE_ID_PREFIX.$lastnote;
+							$lastnote++;
+							break;
+						default:
+							// print "Not found type: ".$match[2][$i]." ID: ".$match[1][$i]." <br /><br />";
+							// ignored
+							break;
+					}
+				}
+			}
+			//-- move the cursor to the start of the next record
+			$pos1 = 0;
+			$fcontents = substr($fcontents, $pos2);
+			if ($pos2 == 0 && feof($fp)) $end = true;
+		}
+		fclose($fp);
+		$transtab = array();
+		$transtab["INDI"] = $inditab;
+		$transtab["FAM"] = $famtab;
+		$transtab["OBJE"] = $objetab;
+		$transtab["SOUR"] = $sourtab;
+		$transtab["REPO"] = $repotab;
+		$transtab["NOTE"] = $notetab;
+		@unlink(INDEX_DIRECTORY."transtab.txt");
+		$fp = fopen(INDEX_DIRECTORY."transtab.txt", "wb");
+		if ($fp) {
+			fwrite($fp, serialize($transtab));
+			fclose($fp);
+		}
+		return true;
+	}		
 }
 ?>
