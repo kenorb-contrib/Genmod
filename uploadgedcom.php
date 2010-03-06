@@ -26,13 +26,6 @@
  * @subpackage Admin
  * @version $Id$
  */
- // NOTE: No direct access to this script
- //-- Be careful this may not be a good idea... 
- //-- the browser is not necessarily required to send a HTTP_REFERER 
- if (!isset($_SERVER["HTTP_REFERER"])) {
-	header("Location: editgedcoms.php");
-	exit;
-}
 require "config.php";
 
 if (!$gm_user->userGedcomAdmin()) {
@@ -77,11 +70,30 @@ if(function_exists('apache_setenv')) {
  
  // $step: determines where the upload is in the process
  	if (!isset($step)) $step = 1;
- 	
- // $path: The path to the GEDCOM file. Calculated here:
-	$path = AdminFunctions::CalculateGedcomPath($GEDCOMS[$gedcomid]["path"]);
-	$gedfilename = $GEDCOMS[$gedcomid]["gedcom"];
  
+ 	// Check if we uploaded a file for merge
+ 	if (isset($uploadfile) && !empty($uploadfile["name"])) {
+	 	if (!AdminFunctions::CheckUploadedGedcom($uploadfile['name'], "uploadfile", false)) {
+			$error_msg = GM_LANG_upload_error;
+		}
+		else {
+			$mergefile = INDEX_DIRECTORY.AdminFunctions::MoveUploadedGedcom($uploadfile['name'], INDEX_DIRECTORY, "uploadfile");
+		}
+	}
+ // $path: The path to the GEDCOM file. 
+ // In case of upload, name/path are already stored in $GEDCOMS. Calculated here.
+ // In case of merge, it's the name/path of the file being merged, so it is input from step 1.
+ // Gedfilename is the name of the file + extension, path is only the path
+ 	if ($action == "merge_form") {
+	 	if (!isset($mergefile)) $mergefile = "";
+		$path = AdminFunctions::CalculateGedcomPath($mergefile);
+		$gedfilename = basename($mergefile);
+ 	}
+ 	else {
+		$path = AdminFunctions::CalculateGedcomPath($GEDCOMS[$gedcomid]["path"]);
+		$gedfilename = $GEDCOMS[$gedcomid]["gedcom"];
+	}
+
  // NOTE: $contine = When the user decided to move on to the next step
 	
  
@@ -102,6 +114,7 @@ if(function_exists('apache_setenv')) {
 if ($action == "upload_form" || $action == "reupload_form") PrintHeader(GM_LANG_upload_gedcom);
 else if ($action == "add_form") PrintHeader(GM_LANG_add_gedcom);
 else if ($action == "add_new_form") PrintHeader(GM_LANG_add_new_gedcom);
+else if ($action == "merge_form") PrintHeader(GM_LANG_merge_gedcom);
 else PrintHeader(GM_LANG_ged_import);
 
 print "\n<div id=\"import_content\">";
@@ -116,6 +129,7 @@ print "\n<input type=\"hidden\" name=\"override\" value=\"".(isset($override) &&
 // Step 1
 // Add a new empty gedcom if requested
 // Display the file section and check nothing.
+// On merge, let the user select the gedcomid and the path/name of the file.
 
 if ($step >= 1) {
 	if ($action == "add_new_form") {
@@ -153,7 +167,7 @@ if ($step >= 1) {
 	
 	// Print the first block: name of the gedcom file to import
 		
-	// Print the +/- for the admin box and the content for all actions
+	// Print the +/- for the admin box and the content for all actions except merge
 	if ($action == "add_form") {
 		if (!isset($import_existing) || $import_existing != true) $v1 = GM_LANG_add_gedcom;
 		else $v1 = GM_LANG_ged_import;
@@ -176,6 +190,13 @@ if ($step >= 1) {
 		$link1 = "add_gedcom_instructions";
 		$link2 = "add_new_gedcom";
 	}
+	else if ($action == "merge_form") {
+		$v1 = GM_LANG_merge_what;
+		$layer = "add-form";
+		$img = "add-form_img";
+		$link1 = "merge_gedcom_help";
+		$link2 = "merge_gedcom";
+	}
 	print "\n\n<div class=\"topbottombar $TEXT_DIRECTION\">";
 	print "<a href=\"javascript: ";
 	print $v1."\" onclick=\"expand_layer('".$layer."');return false\"><img id=\"".$img."\" src=\"".GM_IMAGE_DIR."/";
@@ -189,23 +210,103 @@ if ($step >= 1) {
 	print $v1;
 	print "</a>";
 	print "\n</div>";
-	
-	// Now print the content of this section: filename
-	print "\n\n<div class=\"shade1\" style=\"padding-top:5px;\">";
-		print "\n<div id=\"".$layer."\" class=\"shade1 width100\" style=\"padding: 0.2em 0em 0.2em 0em; display: ";
-		if ($step > 3) print "none ";
-		else print "block ";
-		print "\">";
-		$i = 0;
-		PrintHelpLink("gedcom_path_help", "qm","gedcom_path");
-		print GM_LANG_gedcom_file;
-		// Actually this is dummy. The path and gedfilename are calculated from the gedcomid and not from this variable.
-		print "&nbsp;\n<input type=\"text\" name=\"gedfilename\" value=\"".$path.$gedfilename."\" size=\"60\" dir=\"ltr\" tabindex=\"".$i."\" disabled=\"disabled\" />";
+		
+	$i = 0;
+	if ($action != "merge_form") {
+		// Now print the content of this section: filename
+		print "\n\n<div class=\"shade1\" style=\"padding-top:5px;\">";
+			print "\n<div id=\"".$layer."\" class=\"shade1 width100\" style=\"padding: 0.2em 0em 0.2em 0em; display: ";
+			if ($step > 3) print "none ";
+			else print "block ";
+			print "\">";
+			PrintHelpLink("gedcom_path_help", "qm","gedcom_path");
+			print GM_LANG_gedcom_file;
+			// Actually this is dummy. The path and gedfilename are calculated from the gedcomid and not from this variable.
+			print "&nbsp;\n<input type=\"text\" name=\"gedfilename\" value=\"".$path.$gedfilename."\" size=\"60\" dir=\"ltr\" tabindex=\"".$i."\" disabled=\"disabled\" />";
+			print "\n</div>";
 		print "\n</div>";
-	print "\n</div>";
-	
-	// if we have nothing to do here, we can proceed
-	if ($step == 1) $step = 2;
+		
+		// if we have nothing to do here, we can proceed
+		if ($step == 1) $step = 2;
+	}
+	else {
+		if ($step == 1 && !empty($gedfilename)) $step = 3;
+		// Print the inputs for the mergefile
+		// 1. File on the server
+		print "<div class=\"shade1\" style=\"padding-top:5px;\">";
+			print "<div id=\"".$layer."\" style=\"display: ";
+			if ($step > 3) print "none ";
+			else print "block ";
+			print "\">";
+			if (!empty($gedfilename) && !file_exists($path.$gedfilename)) {
+				print "<div class=\"shade1 wrap\">";
+				print "<span class=\"error\">".GM_LANG_file_not_found."&nbsp;".$path.$gedfilename."</span>\n";
+				print "</div>";
+				$step = 1;
+				$gedfilename = "";
+			}
+			PrintHelpLink("gedcom_path_help", "qm","gedcom_path");
+			print "<span style=\"vertical-align: 25%;\">".GM_LANG_gedcom_file."</span>&nbsp;";
+			print "<input type=\"text\" name=\"mergefile\" value=\"".(isset($gedfilename) && strlen($gedfilename) > 4 ? $path.$gedfilename : "")."\" size=\"60\" dir=\"ltr\" tabindex=\"".$i."\"" .($step > 1 ? "disabled=\"disabled\" " : "")." />";
+			if ($step > 1) print "\n<input type=\"hidden\" name=\"mergefile\" value=\"".$mergefile."\" />";
+			print "</div>";
+		print "</div>";
+		// 2. Upload file. Show only if no gedfilename is know.
+		if (empty($gedfilename)) {
+			// Print the bar
+			print "<div class=\"topbottombar $TEXT_DIRECTION\">";
+				print "<a href=\"javascript: ".GM_LANG_merge_what_upload."\" onclick=\"expand_layer('upload_gedcom'); return false;\"><img id=\"upload_gedcom_img\" src=\"".GM_IMAGE_DIR."/";
+				if ($step > 2) print $GM_IMAGES["plus"]["other"];
+				else print $GM_IMAGES["minus"]["other"];
+				print "\" border=\"0\" width=\"11\" height=\"11\" alt=\"\" /></a>";
+				PrintHelpLink("upload_gedcom_help", "qm", "upload_gedcom");
+				print "&nbsp;<a href=\"javascript: ".GM_LANG_merge_what_upload."\" onclick=\"expand_layer('upload_gedcom');return false\">".GM_LANG_merge_what_upload."</a>";
+			print "</div>";
+			// Print the content
+			print "<div class=\"shade1\" style=\"padding-top:5px;\">";
+				print "<div id=\"upload_gedcom\" style=\"display: ";
+				if ($step > 2) print "none ";
+				else print "block ";
+				print "\">";
+				print "<span style=\"vertical-align: 25%;\">".GM_LANG_gedcom_file."</span>&nbsp;";
+				print "<input name=\"uploadfile\" type=\"file\" size=\"60\" /><span style=\"vertical-align: 25%\">";
+				if (!$filesize = ini_get('upload_max_filesize')) $filesize = "2M";
+				print " (".GM_LANG_max_upload_size." ".$filesize.")</span>".(isset($error_msg) ? "&nbsp;<span class=\"error\" style=\"vertical-align: 25%;\">".$error_msg."</span>" : "");
+				if (isset($error_msg)) $step = 1;
+				print "</div>";
+			print "</div>";
+		}
+		// 3. File to merge with
+		print "<div class=\"topbottombar $TEXT_DIRECTION\">";
+			print "<a href=\"javascript: ".GM_LANG_merge_with."\" onclick=\"expand_layer('merge_gedcom'); return false;\"><img id=\"merge_gedcom_img\" src=\"".GM_IMAGE_DIR."/";
+			if ($step > 3) print $GM_IMAGES["plus"]["other"];
+			else print $GM_IMAGES["minus"]["other"];
+			print "\" border=\"0\" width=\"11\" height=\"11\" alt=\"\" /></a>";
+			PrintHelpLink("upload_gedcom_help", "qm", "upload_gedcom");
+			print "&nbsp;<a href=\"javascript: ".GM_LANG_merge_with."\" onclick=\"expand_layer('merge_gedcom');return false\">".GM_LANG_merge_with."</a>";
+		print "</div>";
+		print "<div class=\"shade1\" style=\"padding-top:5px;\">";
+			print "<div id=\"merge_gedcom\" style=\"display: ";
+			if ($step > 3) print "none ";
+			else print "block ";
+			print "\">";
+			print "<div class=\"shade1 wrap\"><span style=\"vertical-align: 25%\">".GM_LANG_merge_with."</span>&nbsp;";
+				print "<select name=\"gedcomid\"";
+				if ($step > 1) print "disabled=\"disabled\" ";
+				print ">";
+				foreach($GEDCOMS as $gedc=>$gedarray) {
+					print "<option value=\"".$gedc."\"";
+					if (isset($gedcomid)) {
+						if ($gedcomid == $gedc) print " selected=\"selected\"";
+					}
+					else if (GedcomConfig::$GEDCOMID == $gedc) print " selected=\"selected\"";
+					print ">".PrintReady($gedarray["title"])."</option>";
+				}
+				print "</select>";
+				print "</div>";
+			print "</div>";
+		print "</div>";
+	}
 }
 
 // Step 2: Check if the file already exists in the DB. If so, the user must choose what to do.
@@ -218,7 +319,7 @@ if ($step == 2) {
 		// print the second block
 		print "\n\n<div class=\"topbottombar $TEXT_DIRECTION\">";
 			print "\n<a href=\"javascript: ".GM_LANG_verify_gedcom."\" onclick=\"expand_layer('verify_gedcom');return false\"><img id=\"verify_gedcom_img\" src=\"".GM_IMAGE_DIR."/";
-			print $GM_IMAGES["plus"]["other"];
+			print $GM_IMAGES["minus"]["other"];
 			print "\" border=\"0\" width=\"11\" height=\"11\" alt=\"\" /></a>";
 			PrintHelpLink("verify_gedcom_help", "qm", "verify_gedcom");
 			print "&nbsp;<a href=\"javascript: ".GM_LANG_verify_gedcom."\" onclick=\"expand_layer('verify_gedcom');return false\">".GM_LANG_verify_gedcom."</a>";
@@ -305,7 +406,7 @@ if ($step >= 3) {
 			}
 			fclose($fp);
 			fclose($fw);
-			copy(INDEX_DIRECTORY."/".$gedfilename.".bak", $GEDCOMS[$gedcomid]["path"]);
+			copy(INDEX_DIRECTORY."/".$gedfilename.".bak", $path.$gedfilename);
 			$cleaned = "yes";
 			$step = 4;
 		}
@@ -590,8 +691,11 @@ if ($step == 5) {
 	
 	if ($stage == 0) {
 		$_SESSION["import"]["resumed"] = 0;
-		ImportFunctions::EmptyDatabase($gedcomid);
+		if ($action != "merge_form") ImportFunctions::EmptyDatabase($gedcomid);
 		$stage=1;
+		if ($action == "merge_form") {
+			if (!AdminFunctions::MakeTransTab($path.$gedfilename, $gedcomid)) exit;
+		}
 	}
 	flush();
 	@ob_flush();
@@ -610,7 +714,16 @@ if ($step == 5) {
 		@ob_flush();
 		// ------------------------------------------------------ Begin importing data
 		$i=0;
-	
+		if ($action == "merge_form") {
+			$ft = fopen(INDEX_DIRECTORY."transtab.txt", "rb");
+			$ftt = fread($ft, filesize(INDEX_DIRECTORY."transtab.txt"));
+			fclose($ft);
+			$transtab = unserialize($ftt);
+			reset($transtab);
+			unset($ftt);
+			$skiprecs = array("HEAD", "SUBM", "TRLR");
+			$reftype = array("HUSB"=>"INDI", "WIFE"=>"INDI", "CHIL"=>"INDI", "ALIA"=>"INDI", "ASSO"=>"INDI", "FAMC"=>"FAM", "FAMS"=>"FAM", "SOUR"=>"SOUR", "REPO"=>"REPO", "OBJE"=>"OBJE", "NOTE"=>"NOTE");
+		}
 		$fpged = fopen($path.$gedfilename, "rb");
 		$BLOCK_SIZE = 1024*4;	//-- 4k bytes per read
 		$fcontents = ""; //ok
@@ -668,65 +781,66 @@ if ($step == 5) {
 				//-- Rename PGVU references to GMU
 				$indirec = str_replace("2 _PGVU", "2 _GMU", $indirec);
 				
-				//-- import anything that is not a blob
-				if (preg_match("/\n\d BLOB/", $indirec)==0) {
-					$gid = ImportFunctions::ImportRecord($indirec, false, $gedcomid);
-					$type = GetRecType($indirec);
-					$place_count += ImportFunctions::UpdatePlaces($gid, $type, $indirec, false, $gedcomid);
-					$date_count += ImportFunctions::UpdateDates($gid, $indirec, $gedcomid);
-				}
-				else WriteToLog("UploadGedcom -> Import skipped a aecord with a BLOB tag: ".$indirec, "E", "G", get_gedcom_from_id($gedcomid));
-					
-				//-- calculate some statistics
-				if (!isset($show_type)){
-					$show_type = $type;
-					$i_start = 1;
-					$exectime_start = 0;
-					$type_BYTES = $TOTAL_BYTES;
-				}
-				$i++;
-				if ($show_type != $type) {
-					$newtime = time();
-					$exectime = $newtime - $oldtime;
-					$show_exectime = $exectime - $exectime_start;
-					$show_i = $i - $i_start;
-					$type_BYTES = $TOTAL_BYTES - $type_BYTES;
-					if (!isset($listtype[$show_type]["type"])) {
-						$listtype[$show_type]["exectime"]	= $show_exectime;
-						$listtype[$show_type]["bytes"]		= $type_BYTES;
-						$listtype[$show_type]["i"]			= $show_i;
-						$listtype[$show_type]["type"]		= $show_type;
+				if ($action == "merge_form") $ct = preg_match("/0\s+@(.*)@\s+(\w*)/", $indirec, $match);
+				
+				// On normal import, import all records
+				// On merge, only recordtypes not in the array skiprecs must be imported
+				if ($action != "merge_form" || ($ct && !in_array(trim($match[2]), $skiprecs))) {
+					// Only renumber on merge
+					if ($action == "merge_form") {
+						if (array_key_exists(trim($match[2]), $transtab) && array_key_exists($match[1], $transtab[trim($match[2])])) $indirec = preg_replace("/@$match[1]@/", "@".$transtab[trim($match[2])][$match[1]]."@", $indirec);
+						else print "Problem with: ".$indirec."<br />This record cannot be renumbered, as the recordtype could not be determined earlier. Key: ".$match[2]."<br />";
+						$indisubrecs = preg_split("/\r\n/", $indirec);
+						$indiline = "";
+						foreach ($indisubrecs as $key => $subrec) {
+							$ct2 = preg_match_all("/\n\d\s(\w+)\s@(\w+)@/", "\n".$subrec, $match2);
+							if ($ct2 && !in_array(trim($match[2]), $skiprecs)) {
+								for ($j=0;$j<$ct2;$j++) {
+									$match2[1][$j] = trim($match2[1][$j]);
+									$match2[2][$j] = trim($match2[2][$j]);
+//if (!isset($reftype[$match2[1][$j]])) print $indirec;
+										// NOTE exclude SUBM, SUB1
+//print "replace: ".$match2[1][$j]." ".$match2[2][$j]." with ".$transtab[$reftype[$match2[1][$j]]][$match2[2][$j]];
+									if (array_key_exists($reftype[$match2[1][$j]], $transtab) && isset($transtab[$reftype[$match2[1][$j]]][$match2[2][$j]])) {
+//print "Found!";
+										$subrec = str_replace("@".$match2[2][$j]."@", "@".$transtab[$reftype[$match2[1][$j]]][$match2[2][$j]]."@", $subrec);
+									}
+									else {
+										print "Problem with: ".$indirec."<br />A reference in this record cannot be renumbered, as is points to a non existent level O record.<br />Reference type: ".$match2[1][$j]."<br />Reference: ".$match2[2][$j]."<br />You must repair this later manually.<br /><br />";
+									}
+								}
+//print "<br />";
+//print $match2[1][$j]." ".$match2[2][$j];
+//pb();
+							}
+							$indiline .= "\r\n".$subrec;
+						}
+						$indirec = $indiline;
+	//print $indirec."<br />";
+					} // End renumbering
+
+					//-- import anything that is not a blob
+					if (preg_match("/\n\d BLOB/", $indirec)==0) {
+						$gid = ImportFunctions::ImportRecord($indirec, false, $gedcomid);
+						$type = GetRecType($indirec);
+						$place_count += ImportFunctions::UpdatePlaces($gid, $type, $indirec, false, $gedcomid);
+						$date_count += ImportFunctions::UpdateDates($gid, $indirec, $gedcomid);
 					}
-					else {
-						$listtype[$show_type]["exectime"]	+= $show_exectime;
-						$listtype[$show_type]["bytes"]		+= $type_BYTES;
-						$listtype[$show_type]["i"]			+= $show_i;
+					else WriteToLog("UploadGedcom -> Import skipped a aecord with a BLOB tag: ".$indirec, "E", "G", get_gedcom_from_id($gedcomid));
+						
+					//-- calculate some statistics
+					if (!isset($show_type)){
+						$show_type = $type;
+						$i_start = 1;
+						$exectime_start = 0;
+						$type_BYTES = $TOTAL_BYTES;
 					}
-					$show_type = $type;
-					$i_start = $i;
-					$exectime_start = $exectime;
-					$type_BYTES=$TOTAL_BYTES;
-				}
-				//-- update the progress bars at every 10 records
-				if ($i%10==0) {
-					$newtime = time();
-					$exectime = $newtime - $oldtime;
-					print "\n<script type=\"text/javascript\"><!--\nupdate_progress(".$TOTAL_BYTES.", ".$exectime.");\n//-->\n</script>\n";
-					flush();
-					@ob_flush();
-				}
-				$show_gid=$gid;
-			
-				//-- check if we are getting close to timing out
-				if ($i%10 == 0) {
-					$newtime = time();
-					$exectime = $newtime - $oldtime;
-					if (($timelimit != 0) && ($timelimit - $exectime) < 10) {
-						$sql = "UNLOCK TABLES";
-						$res = NewQuery($sql);
-						// Update all counters before restarting
+					$i++;
+					if ($show_type != $type) {
+						$newtime = time();
+						$exectime = $newtime - $oldtime;
 						$show_exectime = $exectime - $exectime_start;
-						$show_i = $i - $i_start + 1;
+						$show_i = $i - $i_start;
 						$type_BYTES = $TOTAL_BYTES - $type_BYTES;
 						if (!isset($listtype[$show_type]["type"])) {
 							$listtype[$show_type]["exectime"]	= $show_exectime;
@@ -736,52 +850,91 @@ if ($step == 5) {
 						}
 						else {
 							$listtype[$show_type]["exectime"]	+= $show_exectime;
-							$listtype[$show_type]["bytes"] 		+= $type_BYTES;
+							$listtype[$show_type]["bytes"]		+= $type_BYTES;
 							$listtype[$show_type]["i"]			+= $show_i;
 						}
-						$importtime = $importtime + $exectime;
-						$fcontents = substr($fcontents, $pos2);
-						//-- store the resume information in the session
-						$_SESSION["import"]["fcontents"]	= $fcontents;
-						$_SESSION["import"]["place_count"]	= $place_count;
-						$_SESSION["import"]["date_count"]	= $date_count;
-						$_SESSION["import"]["media_count"]	= $media_count; // For UpdateMedia
-						$_SESSION["import"]["found_ids"]	= $found_ids; // Saved for UpdateMedia!
-						$_SESSION["import"]["TOTAL_BYTES"]	= $TOTAL_BYTES;
-						$_SESSION["import"]["listtype"]		= $listtype;
-						$_SESSION["import"]["importtime"]	= $importtime;
-						
-						//-- close the file connection
-						fclose($fpged);
-						$_SESSION["import"]["resumed"]++;
-						
-						print GM_LANG_import_time_exceeded;
-						print "<input type=\"hidden\" name=\"stage\" value=\"1\" />";
-						print "<input type=\"hidden\" name=\"step\" value=\"5\" />";
-						// This is the (auto)continue button
-						print "<input type=\"submit\" name=\"continue\" value=\"".GM_LANG_del_proceed."\" />";
-						DMSoundex("", "closecache");
-						//-- We write the session data and close it. Fix for intermittend logoff.
-						session_write_close();
-						if ($auto_continue == "yes") { ?>
-							<script type="text/javascript">
-								<!--
-								(function (fn) {
-									if (window.addEventListener) window.addEventListener('load', fn, false);
-									else window.attachEvent('onload', fn);
-								})
-								(function() {
-									document.forms['configform'].elements['continue'].click();
-								});
-								//-->
-							</script>
-						<?php 
+						$show_type = $type;
+						$i_start = $i;
+						$exectime_start = $exectime;
+						$type_BYTES=$TOTAL_BYTES;
+					}
+					//-- update the progress bars at every 10 records
+					if ($i%10==0) {
+						$newtime = time();
+						$exectime = $newtime - $oldtime;
+						print "\n<script type=\"text/javascript\"><!--\nupdate_progress(".$TOTAL_BYTES.", ".$exectime.");\n//-->\n</script>\n";
+						flush();
+						@ob_flush();
+					}
+					$show_gid=$gid;
+				
+					//-- check if we are getting close to timing out
+					if ($i%10 == 0) {
+						$newtime = time();
+						$exectime = $newtime - $oldtime;
+						if (($timelimit != 0) && ($timelimit - $exectime) < 10) {
+							$sql = "UNLOCK TABLES";
+							$res = NewQuery($sql);
+							// Update all counters before restarting
+							$show_exectime = $exectime - $exectime_start;
+							$show_i = $i - $i_start + 1;
+							$type_BYTES = $TOTAL_BYTES - $type_BYTES;
+							if (!isset($listtype[$show_type]["type"])) {
+								$listtype[$show_type]["exectime"]	= $show_exectime;
+								$listtype[$show_type]["bytes"]		= $type_BYTES;
+								$listtype[$show_type]["i"]			= $show_i;
+								$listtype[$show_type]["type"]		= $show_type;
+							}
+							else {
+								$listtype[$show_type]["exectime"]	+= $show_exectime;
+								$listtype[$show_type]["bytes"] 		+= $type_BYTES;
+								$listtype[$show_type]["i"]			+= $show_i;
+							}
+							$importtime = $importtime + $exectime;
+							$fcontents = substr($fcontents, $pos2);
+							//-- store the resume information in the session
+							$_SESSION["import"]["fcontents"]	= $fcontents;
+							$_SESSION["import"]["place_count"]	= $place_count;
+							$_SESSION["import"]["date_count"]	= $date_count;
+							$_SESSION["import"]["media_count"]	= $media_count; // For UpdateMedia
+							$_SESSION["import"]["found_ids"]	= $found_ids; // Saved for UpdateMedia!
+							$_SESSION["import"]["TOTAL_BYTES"]	= $TOTAL_BYTES;
+							$_SESSION["import"]["listtype"]		= $listtype;
+							$_SESSION["import"]["importtime"]	= $importtime;
+							
+							//-- close the file connection
+							fclose($fpged);
+							$_SESSION["import"]["resumed"]++;
+							
+							print GM_LANG_import_time_exceeded;
+							print "<input type=\"hidden\" name=\"stage\" value=\"1\" />";
+							print "<input type=\"hidden\" name=\"step\" value=\"5\" />";
+							// This is the (auto)continue button
+							print "<input type=\"submit\" name=\"continue\" value=\"".GM_LANG_del_proceed."\" />";
+							DMSoundex("", "closecache");
+							//-- We write the session data and close it. Fix for intermittend logoff.
+							session_write_close();
+							if ($auto_continue == "yes") { ?>
+								<script type="text/javascript">
+									<!--
+									(function (fn) {
+										if (window.addEventListener) window.addEventListener('load', fn, false);
+										else window.attachEvent('onload', fn);
+									})
+									(function() {
+										document.forms['configform'].elements['continue'].click();
+									});
+									//-->
+								</script>
+							<?php 
+							}
+							SwitchGedcom();
+							PrintFooter();
+							exit;
 						}
-						SwitchGedcom();
-						PrintFooter();
-						exit;
 					}
 				}
+				// loop merge until here
 				$pos1 = 0;
 				$fcontents = substr($fcontents, $pos2);
 				if ($pos2 == 0 && feof($fpged)) $end = true;

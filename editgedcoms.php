@@ -90,7 +90,7 @@ if ($action == "deletecount") {
 		</div>
 		<div class="admin_link">
 			<?php PrintHelpLink("merge_gedcom_help", "qm", "merge_gedcom"); ?>
-			<a href="mergegedcom.php"><?php print GM_LANG_merge_gedcom;?></a>
+			<a href="uploadgedcom.php?action=merge_form"><?php print GM_LANG_merge_gedcom;?></a>
 		</div>
 	<?php } ?>
 </div>
