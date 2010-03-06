@@ -400,7 +400,6 @@ class User {
 	public function UserCanEditOwn($pid) {
 	
 		if ($this->UserCanEdit()) return true;
-		if (!GedcomConfig::$USE_QUICK_UPDATE) return false;
 		if (empty($pid)) return false;
 
 		if (!empty($this->gedcomid[GedcomConfig::$GEDCOMID])) {

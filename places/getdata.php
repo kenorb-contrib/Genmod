@@ -22,7 +22,6 @@
  * @package Genmod
  * @subpackage Edit
  * @version $Id$
- * @see functions_places.php
  */
 
 $field=@$HTTP_GET_VARS["field"];

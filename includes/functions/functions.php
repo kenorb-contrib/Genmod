@@ -100,8 +100,8 @@ function GmErrorHandler($errno, $errstr, $errfile, $errline) {
 
 	if ((error_reporting() > 0)&&($errno<2048)) {
 		$LAST_ERROR = $errstr." in ".$errfile." on line ".$errline;
-		if ($ERROR_LEVEL==0) return;
-		if (stristr($errstr,"by reference")==true) return;
+		if ($ERROR_LEVEL == 0) return;
+		if (stristr($errstr,"by reference") == true) return;
 		$msg = "ERROR ".$errno.": ".$errstr."<br />";
 		$logline = $msg."Error occurred on line ".$errline." of file ".basename($errfile)."<br />";
 		$logline .= "Using URL: ".$_SERVER["SCRIPT_NAME"]."?".GetQueryString()."<br />";
@@ -112,7 +112,7 @@ function GmErrorHandler($errno, $errstr, $errfile, $errline) {
 			$backtrace = array();
 			$backtrace = debug_backtrace();
 			$num = count($backtrace);
-			if ($ERROR_LEVEL==1) $num = 1;
+			if ($ERROR_LEVEL == 1) $num = 1;
 			for($i=0; $i<$num; $i++) {
 				$logline .= $i;
 				if ($i==0) $logline .= " Error occurred on ";
@@ -128,27 +128,6 @@ function GmErrorHandler($errno, $errstr, $errfile, $errline) {
 	}
 	return false;
 }
-
-// ************************************************* START OF GEDCOM FUNCTIONS ********************************* //
-
-/**
- * Replacement function for strrpos()
- * Returns the numeric position of the last occurrence of needle in the haystack string.
- * Note that the needle in this case can only be a single character in PHP 4. If a string
- * is passed as the needle, then only the first character of that string will be used.
- * @author escii at hotmail dot com ( Brendan )
- * @param string $haystack The text to be searched through
- * @param string $needle The text to be found
- * @param int $ret The position at which the needle is found
- */
-function StrrPos4($haystack, $needle) {
-       while($ret = strrpos($haystack,$needle)) {
-		  if(strncmp(substr($haystack,$ret,strlen($needle)), $needle,strlen($needle)) == 0 ) return $ret;
-            $haystack = substr($haystack,0,$ret -1 );
-       }
-       return $ret;
-}
-
 /**
  * get a gedcom subrecord
  *
@@ -515,50 +494,6 @@ function MakeCont($newged, $newline) {
 		}
 	}
 	return $newged;
-}
-
-/**
- * find the parents in a family record
- *
- * find and return a two element array containing the parents of the given family record
- * @author Genmod Development Team
- * @param string $famrec the gedcom record of the family to search in
- * @return array returns a two element array with indexes HUSB and WIFE for the parent ids
- */
-function FindParentsInRecord($famrec) {
-
-	if (empty($famrec)) return false;
-	$parents = array();
-	$ct = preg_match("/1 HUSB @(.*)@/", $famrec, $match);
-	if ($ct>0) $parents["HUSB"]=$match[1];
-	else $parents["HUSB"]="";
-	$ct = preg_match("/1 WIFE @(.*)@/", $famrec, $match);
-	if ($ct>0) $parents["WIFE"]=$match[1];
-	else $parents["WIFE"]="";
-	return $parents;
-}
-
-/**
- * find the children in a family record
- *
- * find and return an array containing the children of the given family record
- * @author Genmod Development Team
- * @param string $famrec the gedcom record of the family to search in
- * @param string $me	an xref id of a child to ignore, useful when you want to get a person's
- * siblings but do want to include them as well
- * @return array
- */
-function FindChildrenInRecord($famrec, $me='') {
-
-	$children = array();
-	if (empty($famrec)) return $children;
-
-	$num = preg_match_all("/1\s*CHIL\s*@(.*)@/", $famrec, $match,PREG_SET_ORDER);
-	for($i=0; $i<$num; $i++) {
-		$child = trim($match[$i][1]);
-		if ($child!=$me) $children[] = $child;
-	}
-	return $children;
 }
 
 // ************************************************* START OF MULTIMEDIA FUNCTIONS ********************************* //

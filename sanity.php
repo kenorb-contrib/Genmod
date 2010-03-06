@@ -744,7 +744,13 @@ if (!empty($check_gedcoms)) {
 							}
 						}
 						if ($inames) {
-							$parents = FindParentsInRecord($gedlines["gedcom"]);
+							$parents = array();
+							$ct = preg_match("/1 HUSB @(.*)@/", $famrec, $match);
+							if ($ct>0) $parents["HUSB"] = $match[1];
+							else $parents["HUSB"] = "";
+							$ct = preg_match("/1 WIFE @(.*)@/", $famrec, $match);
+							if ($ct>0) $parents["WIFE"]=$match[1];
+							else $parents["WIFE"] = "";
 							if (!empty($parents["HUSB"])) $indilist[$parents["HUSB"]]["names"] = NameFunctions::GetIndiNames($indilist[$parents["HUSB"]]["gedcom"]);
 							if (!empty($parents["WIFE"])) $indilist[$parents["WIFE"]]["names"] = NameFunctions::GetIndiNames($indilist[$parents["WIFE"]]["gedcom"]);
 						}

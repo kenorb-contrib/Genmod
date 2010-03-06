@@ -185,84 +185,6 @@ else {
 	}
 }
 	
-/*
-// Process (re-)upload or add
-if (isset($GEDCOMPATH)) {
-	
-	// NOTE: Check if we are uploading a file and retrieve the filename
-	if (isset($_FILES['GEDCOMPATH'])) {
-		if (filesize($_FILES['GEDCOMPATH']['tmp_name'])!= 0) $GEDCOMPATH = $_FILES['GEDCOMPATH']['name'];
-	}
-	else {
-		// TODO: We cannot upload the file. Too big or something else.
-	}
-
-	// NOTE: Extract the GEDCOM filename
-	$GEDFILENAME = basename($GEDCOMPATH);
-	
-	// NOTE: Check if it is a zipfile, only extract it if it's not an upload (already there)
-	if (strstr(strtolower(trim($GEDFILENAME)), ".zip")==".zip") {
-		// Get the filename of the gedcom file. It is extracted in the folder of $GEDCOMPATH (if empty: INDEX_DIRECTORY)
-		if ($source == "add_form") $GEDFILENAME = AdminFunctions::GetGedFromZip($GEDCOMPATH);
-	}
-	
-	// Now GEDFILENAME either has it's name extracted from the ZIP, or from the entry in GEDCOMPATH
-	// Check if there is an extension, if not: add it.
-	if (strtolower(substr(trim($GEDFILENAME), -4)) != ".ged" && strtolower(substr(trim($GEDFILENAME), -4)) != ".zip") $GEDFILENAME .= ".ged";
-	
-	// NOTE: Check if there is a path in GEDCOMPATH (only the case if the file already is on the server)
-	$path = AdminFunctions::CalculateGedcomPath($GEDCOMPATH);
-	// At this point, $path represents the path to the gedcom file. 
-	
-	// If a file is uploaded, place it in the previously determinated $path folder
-	$ctupload = count($_FILES);
-	if ($ctupload > 0) {
-		// NOTE: When uploading a file check if it doesn't exist yet, either in $GEDCOMS or on disk
-		if (!isset($GEDCOMS[get_id_from_gedcom($GEDFILENAME)]) || !file_exists($path.$GEDFILENAME)) {
-			if (move_uploaded_file($_FILES['GEDCOMPATH']['tmp_name'], $path.$GEDFILENAME)) {
-				WriteToLog("EditConfigGedcom-> Gedcom ".$path.$GEDFILENAME." uploaded", "I", "S");
-			}
-		}
-		// NOTE: If the file exists we will make a backup file
-		else if (file_exists($path.$GEDFILENAME)) {
-			if (file_exists($path.$GEDFILENAME.".old")) unlink($path.$GEDFILENAME.".old");
-				copy($path.$GEDFILENAME, $path.$GEDFILENAME.".old");
-				unlink($path.$GEDFILENAME);
-			move_uploaded_file($_FILES['GEDCOMPATH']['tmp_name'], $path.$GEDFILENAME);
-		}
-		// A bit odd to have this extracted here, but if it works... 
-		// Get the gedcom name from the ZIP 
-		if (strstr(strtolower(trim($GEDFILENAME)), ".zip") == ".zip") $GEDFILENAME = AdminFunctions::GetGedFromZip($path.$GEDFILENAME);
-	}
-	
-	$ged = $GEDFILENAME;
-	$gedid = get_id_from_gedcom($ged);
-}
-// $gedid is false when it doesn't exist yet in the system. 
-if ($gedid) {
-	if (isset($GEDCOMS[$gedid])) {
-		$GEDCOMPATH = $GEDCOMS[$gedid]["path"];
-		// recalculate the path
-		$path = AdminFunctions::CalculateGedcomPath($GEDCOMPATH);
-		$GEDFILENAME = $GEDCOMS[$gedid]["gedcom"];
-		if (!isset($gedcom_title)) $gedcom_title = $GEDCOMS[$gedid]["title"];
-		$gedid = $GEDCOMS[$gedid]["id"];
-		$FILE = $GEDFILENAME;
-		$oldgedid = $gedid;
-	}
-	else {
-		if (!isset($_POST["GEDCOMPATH"])) {
-			$GEDCOMPATH = "";
-			$gedcom_title = "";
-		}
-	}
-}
-// We have to fill in the form with new values, so some must exist (empty)
-else {
-	$GEDCOMPATH = "";
-	$gedcom_title = "";
-}
-*/
 $USERLANG = $LANGUAGE;
 $temp = GedcomConfig::$THEME_DIR;
 
@@ -402,10 +324,6 @@ if ($action=="update") {
 	$newconf["pedigree_layout"] = $boolarray[$_POST["NEW_PEDIGREE_LAYOUT"]];
 	$newconf["pedigree_root_id"] = $_POST["NEW_PEDIGREE_ROOT_ID"];
 	$newconf["postal_code"] = $boolarray[$_POST["NEW_POSTAL_CODE"]];
-	$newconf["quick_add_facts"] = $_POST["NEW_QUICK_ADD_FACTS"];
-	$newconf["quick_add_famfacts"] = $_POST["NEW_QUICK_ADD_FAMFACTS"];
-	$newconf["quick_required_facts"] = $_POST["NEW_QUICK_REQUIRED_FACTS"];
-	$newconf["quick_required_famfacts"] = $_POST["NEW_QUICK_REQUIRED_FAMFACTS"];
 	$newconf["repo_facts_add"] = $_POST["NEW_REPO_FACTS_ADD"];
 	$newconf["repo_facts_unique"] = $_POST["NEW_REPO_FACTS_UNIQUE"];
 	$newconf["repo_quick_addfacts"] = $_POST["NEW_REPO_QUICK_ADDFACTS"];
@@ -425,7 +343,6 @@ if ($action=="update") {
 	$newconf["show_married_names"] = $boolarray[$_POST["NEW_SHOW_MARRIED_NAMES"]];
 	$newconf["show_parents_age"] = $boolarray[$_POST["NEW_SHOW_PARENTS_AGE"]];
 	$newconf["show_pedigree_places"] = $_POST["NEW_SHOW_PEDIGREE_PLACES"];
-	$newconf["show_quick_resn"] = $boolarray[$_POST["NEW_SHOW_QUICK_RESN"]];
 	$newconf["show_relatives_events"] = $_POST["NEW_SHOW_RELATIVES_EVENTS"];
 	$newconf["show_stats"] = $boolarray[$_POST["NEW_SHOW_STATS"]];
 	$newconf["sour_facts_add"] = $_POST["NEW_SOUR_FACTS_ADD"];
@@ -436,7 +353,6 @@ if ($action=="update") {
 	$newconf["support_method"] = $_POST["NEW_SUPPORT_METHOD"];
 	$newconf["thumbnail_width"] = $_POST["NEW_THUMBNAIL_WIDTH"];
 	$newconf["underline_name_quotes"] = $boolarray[$_POST["NEW_UNDERLINE_NAME_QUOTES"]];
-	$newconf["use_quick_update"] = $boolarray[$_POST["NEW_USE_QUICK_UPDATE"]];
 	$newconf["use_rin"] = $boolarray[$_POST["NEW_USE_RIN"]];
 	$newconf["use_rtl_functions"] = $boolarray[$_POST["NEW_USE_RTL_FUNCTIONS"]];
 	$newconf["use_thumbs_main"] = $boolarray[$_POST["NEW_USE_THUMBS_MAIN"]];
@@ -1403,38 +1319,6 @@ print "&nbsp;<a href=\"javascript: ".GM_LANG_editopt_conf."\" onclick=\"expand_l
 				<option value="no" <?php if (!GedcomConfig::$SPLIT_PLACES) print "selected=\"selected\""; ?>><?php print GM_LANG_no;?></option>
 			</select>
 		</td>
-	</tr>
-	<tr>
-		<td class="shade2 wrap"><div class="helpicon"><?php PrintHelpLink("USE_QUICK_UPDATE_help", "qm", "USE_QUICK_UPDATE", true); print "</div><div class=\"description\">"; print PrintText("USE_QUICK_UPDATE",0,0,false);?></div></td>
-		<td class="shade1"><select name="NEW_USE_QUICK_UPDATE" tabindex="<?php $i++; print $i?>">
-				<option value="yes" <?php if (GedcomConfig::$USE_QUICK_UPDATE) print "selected=\"selected\""; ?>><?php print GM_LANG_yes;?></option>
-				<option value="no" <?php if (!GedcomConfig::$USE_QUICK_UPDATE) print "selected=\"selected\""; ?>><?php print GM_LANG_no;?></option>
-			</select>
-		</td>
-	</tr>
-	<tr>
-		<td class="shade2 wrap"><div class="helpicon"><?php PrintHelpLink("SHOW_QUICK_RESN_help", "qm", "SHOW_QUICK_RESN", true); print "</div><div class=\"description\">"; print PrintText("SHOW_QUICK_RESN",0,0,false);?></div></td>
-		<td class="shade1"><select name="NEW_SHOW_QUICK_RESN" tabindex="<?php $i++; print $i?>">
-				<option value="yes" <?php if (GedcomConfig::$SHOW_QUICK_RESN) print "selected=\"selected\""; ?>><?php print GM_LANG_yes;?></option>
-				<option value="no" <?php if (!GedcomConfig::$SHOW_QUICK_RESN) print "selected=\"selected\""; ?>><?php print GM_LANG_no;?></option>
-			</select>
-		</td>
-	</tr>
-	<tr>
-		<td class="shade2 wrap"><div class="helpicon"><?php PrintHelpLink("QUICK_ADD_FACTS_help", "qm", "QUICK_ADD_FACTS"); print "</div><div class=\"description\">"; print GM_LANG_QUICK_ADD_FACTS;?></div></td>
-		<td class="shade1"><input type="text" name="NEW_QUICK_ADD_FACTS" value="<?php print GedcomConfig::$QUICK_ADD_FACTS?>" size="80" dir="ltr" tabindex="<?php $i++; print $i?>" /></td>
-	</tr>
-	<tr>
-		<td class="shade2 wrap"><div class="helpicon"><?php PrintHelpLink("QUICK_REQUIRED_FACTS_help", "qm", "QUICK_REQUIRED_FACTS"); print "</div><div class=\"description\">"; print GM_LANG_QUICK_REQUIRED_FACTS;?></div></td>
-		<td class="shade1"><input type="text" name="NEW_QUICK_REQUIRED_FACTS" value="<?php print GedcomConfig::$QUICK_REQUIRED_FACTS?>" size="80" dir="ltr" tabindex="<?php $i++; print $i?>" /></td>
-	</tr>
-	<tr>
-		<td class="shade2 wrap"><div class="helpicon"><?php PrintHelpLink("QUICK_ADD_FAMFACTS_help", "qm", "QUICK_ADD_FAMFACTS"); print "</div><div class=\"description\">"; print GM_LANG_QUICK_ADD_FAMFACTS;?></div></td>
-		<td class="shade1"><input type="text" name="NEW_QUICK_ADD_FAMFACTS" value="<?php print GedcomConfig::$QUICK_ADD_FAMFACTS?>" size="80" dir="ltr" tabindex="<?php $i++; print $i?>" /></td>
-	</tr>
-	<tr>
-		<td class="shade2 wrap"><div class="helpicon"><?php PrintHelpLink("QUICK_REQUIRED_FAMFACTS_help", "qm", "QUICK_REQUIRED_FAMFACTS"); print "</div><div class=\"description\">"; print GM_LANG_QUICK_REQUIRED_FAMFACTS;?></div></td>
-		<td class="shade1"><input type="text" name="NEW_QUICK_REQUIRED_FAMFACTS" value="<?php print GedcomConfig::$QUICK_REQUIRED_FAMFACTS?>" size="40" dir="ltr" tabindex="<?php $i++; print $i?>" /></td>
 	</tr>
 </table>
 </div>

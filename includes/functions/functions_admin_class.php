@@ -411,14 +411,14 @@ abstract class AdminFunctions {
 			foreach($user->gedcomid as $gedcid => $gedid) {
 				if (!empty($gedid) && isset($GEDCOMS[$gedcid])) {
 					GedcomConfig::$GEDCOMID = $gedcid;
-					$sourstring = GetLangVarString("sync_mailsource", GedcomConfig::$GEDCOMID, "gedcomid");
+					$sourstring = self::GetLangVarString("sync_mailsource", GedcomConfig::$GEDCOMID, "gedcomid");
 					$person = Person::GetInstance($gedid, "", $gedcid);
 					if ($person->ischanged) $indirec = $person->changedgedrec;
 					else $indirec = $person->gedrec;
 					if (!empty($indirec)) {
 						$subrecords = GetAllSubrecords($indirec, "", false, false, false);
 						$found = false;
-						$sourstring = GetLangVarString("sync_mailsource", GedcomConfig::$GEDCOMID, "gedcomid");
+						$sourstring = self::GetLangVarString("sync_mailsource", GedcomConfig::$GEDCOMID, "gedcomid");
 						foreach ($subrecords as $key =>$subrec) {
 							$change_id = EditFunctions::GetNewXref("CHANGE");
 							if (preg_match("/(\d) (_?EMAIL .+)/", $subrec, $match)>0) {
@@ -1633,5 +1633,25 @@ abstract class AdminFunctions {
 		}
 		return true;
 	}		
+
+	private function GetLangVarString($var, $value, $type) {
+	
+		// This gets the langvar in the gedcom's language
+		if ($type == "gedcom" || $type = "gedcomid") {
+			if ($type = "gedcom") $value = get_id_from_gedcom($value);
+			$language = GedcomConfig::GetGedcomLanguage($value);
+			if (!$language) return false;
+			$type = "lang";
+		}
+		else $language = $value;
+		// This gets the langvar in the parameter language
+		if ($type == "lang") {
+			$sql = "SELECT lg_english, lg_".$language." FROM ".TBLPREFIX."language WHERE lg_string='".$var."'";
+			$res = NewQuery($sql);
+			$lang = $res->FetchRow();
+			if (!empty($lang[1])) return $lang[1];
+			else return $lang[0];
+		}
+	}
 }
 ?>

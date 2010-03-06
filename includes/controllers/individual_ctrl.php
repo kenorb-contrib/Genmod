@@ -209,14 +209,6 @@ class IndividualController extends DetailController {
 		//-- main edit menu
 		$menu = new Menu(GM_LANG_edit);
 		if (!$this->indi->isdeleted) {
-			// NOTE: Quickedit sub menu
-			if (GedcomConfig::$USE_QUICK_UPDATE) {
-				$submenu = new Menu(GM_LANG_quick_update_title);
-				$submenu->addLink("quickEdit('".$this->xref."', '', 'edit_quickupdate');");
-				$menu->addSubmenu($submenu);
-				if ($this->indi->canedit) $menu->addSeperator();
-			}
-				
 			if ($this->indi->canedit) {
 				// Add a new father
 				$submenu = new Menu(GM_LANG_add_father);

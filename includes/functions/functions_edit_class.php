@@ -21,7 +21,6 @@
  *
  * @package Genmod
  * @subpackage Edit
- * @see functions_places.php
  * @version $Id$
  */
 
@@ -1359,29 +1358,6 @@ abstract class EditFunctions {
 		$str = trim ($str);
 		if (!empty($str)) return $str;
 		else return $datestr;
-	}
-	
-	public function PrintQuickResn($name, $default="") {
-		global $align, $tabkey;
-		
-		if (GedcomConfig::$SHOW_QUICK_RESN) {
-			print "<tr><td class=\"shade2\">";
-			PrintHelpLink("RESN_help", "qm");
-			print GM_FACT_RESN; 
-			print "</td>\n";
-			print "<td class=\"shade1\" colspan=\"3\">\n";
-			print "<select name=\"$name\" tabindex=\"".$tabkey."\" ><option value=\"\"></option><option value=\"confidential\"";
-			if ($default == "confidential") print "selected=\"selected\"";
-			$tabkey++;
-			print ">".GM_LANG_confidential."</option><option value=\"locked\"";
-			if ($default == "locked") print "selected=\"selected\"";
-			print ">".GM_LANG_locked."</option><option value=\"privacy\"";
-			if ($default == "privacy") print "selected=\"selected\"";
-			print ">".GM_LANG_privacy."</option>";
-			print "</select>\n";
-			print "</td>\n";
-			print "</tr>\n";
-		}
 	}
 	
 	public function PrintPedi($name, $value="", $showbio=true) {

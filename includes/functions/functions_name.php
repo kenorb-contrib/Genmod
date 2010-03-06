@@ -131,7 +131,6 @@ function StripPrefix($lastname){
 	return $name;
 }
 
-
 /**
  * Get first letter
  *
