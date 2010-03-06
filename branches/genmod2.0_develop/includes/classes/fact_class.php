@@ -407,7 +407,7 @@ class Fact {
 				else if ($indexval == 2) $prtstr .= GM_LANG_wife;
 				else $prtstr .= GM_FACT_AGE;
 				$prtstr .= "</span>: ";
-				$age = GetAgeAtEvent(substr($agerec,5));
+				$age = FactFunctions::GetAgeAtEvent(substr($agerec,5));
 				$prtstr .= PrintReady($age);
 				$prtstr .= " ";
 			}

@@ -288,26 +288,6 @@ function GetLangvarStatus($var, $language, $type="help") {
 	return -1;
 }
 
-function GetLangVarString($var, $value, $type) {
-
-	// This gets the langvar in the gedcom's language
-	if ($type == "gedcom" || $type = "gedcomid") {
-		if ($type = "gedcom") $value = get_id_from_gedcom($value);
-		$language = GedcomConfig::GetGedcomLanguage($value);
-		if (!$language) return false;
-		$type = "lang";
-	}
-	else $language = $value;
-	// This gets the langvar in the parameter language
-	if ($type == "lang") {
-		$sql = "SELECT lg_english, lg_".$language." FROM ".TBLPREFIX."language WHERE lg_string='".$var."'";
-		$res = NewQuery($sql);
-		$lang = $res->FetchRow();
-		if (!empty($lang[1])) return $lang[1];
-		else return $lang[0];
-	}
-}
-
 function GetLastChangeDate($type, $pid, $gedid, $head=false) {
 	
 	$object = ConstructObject($pid, $type, $gedid);

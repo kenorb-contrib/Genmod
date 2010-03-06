@@ -1519,5 +1519,54 @@ abstract class FactFunctions {
 		}
 		$obj->printMenu();
 	}
+	
+	/**
+	 * translate gedcom age string
+	 *
+	 * Examples:
+	 * 4y 8m 10d.
+	 * Chi
+	 * INFANT
+	 *
+	 * @param string $agestring gedcom AGE field value
+	 * @return string age in user language
+	 * @see http://homepages.rootsweb.com/~pmcbride/gedcom/55gcch2.htm#AGE_AT_EVENT
+	 */
+	
+	public function GetAgeAtEvent($agestring) {
+	
+		$age = "";
+		$match = explode(" ", strtolower($agestring));
+		for ($i=0; $i<count($match); $i++) {
+			$txt = trim($match[$i]);
+			$txt = trim($txt, ".");
+			if ($txt=="chi") $txt="child";
+			if ($txt=="inf") $txt="infant";
+			if ($txt=="sti") $txt="stillborn";
+			if (defined("GM_LANG_".$txt)) $age .= constant("GM_LANG_".$txt);
+			else {
+				$n = trim(substr($txt,0,-1));
+				$u = substr($txt,-1,1);
+				if ($u=="y") {
+					$age.= " ".$n." ";
+					if ($n == 1) $age .= GM_LANG_year1;
+					else $age .= GM_LANG_years;
+				}
+				else if ($u=="m") {
+					$age.= " ".$n." ";
+					if ($n == 1) $age .= GM_LANG_month1;
+					else $age .= GM_LANG_months;
+				}
+				else if ($u=="d") {
+					$age.= " ".$n." ";
+					if ($n == 1) $age .= GM_LANG_day1;
+					else $age .= GM_LANG_days;
+				}
+				else $age.=" ".$txt;
+			}
+		}
+		return $age;
+	}
+	
 }
 ?>

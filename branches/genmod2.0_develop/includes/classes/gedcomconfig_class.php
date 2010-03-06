@@ -148,13 +148,6 @@ abstract class GedcomConfig {
 	public static $META_TITLE = "";							// Optional text that can be added to the html page <title></title> line
 	public static $META_SURNAME_KEYWORDS = true;			// Option to use the most common surnames in the keywords field
 	public static $CHART_BOX_TAGS = "";						// Optional comma seperated gedcom tags to show in chart boxes
-	public static $USE_QUICK_UPDATE = false;				// whether or not to use the quick update form
-	public static $SHOW_QUICK_RESN = false;					// Whether or not to show RESN tags on the quick update form
-	public static $QUICK_ADD_FACTS = "BIRT,CHR,DEAT,BURI,CREM,ADOP,BAPM,BARM,BASM,BLES,CHRA,CONF,FCOM,ORDN,NATU,EMIG,IMMI,GRAD,BAPL,CONL,ENDL,SLGC";									
-															// Comma delimited list of facts that can be added on the quick update form
-	public static $QUICK_REQUIRED_FACTS = "BIRT,DEAT";		// Comma delimited list of facts that will be required by default on the quick update
-	public static $QUICK_ADD_FAMFACTS = "MARR,DIV,SLGS";	// Comma delimited list of facts that can be added on the quick update form for families
-	public static $QUICK_REQUIRED_FAMFACTS = "MARR";		// Comma delimited list of facts that will be required by on the quick update for families
 	public static $SHOW_LDS_AT_GLANCE = false;				// Show status of LDS ordinances in chart boxes
 	public static $UNDERLINE_NAME_QUOTES = false;			// Convert double quotes in names to underlines
 	public static $SPLIT_PLACES = false;					// Split PLAC tag into subtags (town, county, state...) in edit mode
