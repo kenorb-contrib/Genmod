@@ -724,7 +724,7 @@ if ((strstr(SCRIPT_NAME, "editconfig.php")===false) &&(strstr(SCRIPT_NAME, "edit
 					}
 				}
 				if (stristr($url, "gedid=")===false)  {
-					$url.="&gedid=".$GEDCOMID;
+					$url.="&gedid=".GedcomConfig::$GEDCOMID;
 				}
 				if (LOGIN_URL == "") header("Location: login.php?url=".urlencode($url));
 				else header("Location: ".LOGIN_URL."?url=".urlencode($url));

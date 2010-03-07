@@ -39,7 +39,7 @@ $GM_BLOCKS["print_quickstart_block"]["rss"]       	= false;
  * Prints a block allowing the user to login to the site directly from the portal
  */
 function print_quickstart_block($block = true, $config="", $side, $index) {
-	global $GEDCOMID, $command, $gm_user, $TEXT_DIRECTION, $GM_IMAGES, $ALLOW_CHANGE_GEDCOM, $GM_BLOCKS;
+	global $command, $gm_user, $TEXT_DIRECTION, $GM_IMAGES, $ALLOW_CHANGE_GEDCOM, $GM_BLOCKS;
 	
 	if (empty($config)) $config = $GM_BLOCKS["print_quickstart_block"]["config"];
 	if (!isset($config['search_all_geds'])) $config = $GM_BLOCKS["print_quickstart_block"]["config"];
@@ -49,7 +49,7 @@ function print_quickstart_block($block = true, $config="", $side, $index) {
 	PrintHelpLink("index_quickstart_help", "qm", "quickstart");
 	if ($GM_BLOCKS["print_quickstart_block"]["canconfig"]) {
 		if ((($command=="gedcom")&&($gm_user->userGedcomAdmin())) || (($command=="user")&&($gm_user->username != ""))) {
-			if ($command=="gedcom") $name = preg_replace("/'/", "\'", get_gedcom_from_id($GEDCOMID));
+			if ($command=="gedcom") $name = preg_replace("/'/", "\'", get_gedcom_from_id(GedcomConfig::$GEDCOMID));
 			else $name = $gm_user->username;
 			print "<a href=\"javascript: ".GM_LANG_config_block."\" onclick=\"window.open('index_edit.php?name=$name&amp;command=$command&amp;action=configure&amp;side=$side&amp;index=$index', '', 'top=50,left=50,width=600,height=350,scrollbars=1,resizable=1'); return false;\">";
 			print "<img class=\"adminicon\" src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["admin"]["small"]."\" width=\"15\" height=\"15\" border=\"0\" alt=\"".GM_LANG_config_block."\" /></a>\n";
@@ -83,7 +83,7 @@ function print_quickstart_block($block = true, $config="", $side, $index) {
 		print "<a href=\"login_register.php?action=register\">".GM_LANG_requestaccount."</a><br />";
 	}
 	else {
-		if (!empty($gm_user->gedcomid[$GEDCOMID])) print "<a href=\"pedigree.php?rootid=".$gm_user->gedcomid[$GEDCOMID]."\">".GM_LANG_my_pedigree."</a><br />";
+		if (!empty($gm_user->gedcomid[GedcomConfig::$GEDCOMID])) print "<a href=\"pedigree.php?rootid=".$gm_user->gedcomid[GedcomConfig::$GEDCOMID]."\">".GM_LANG_my_pedigree."</a><br />";
 	}
 	print "<br /><br />";
 	PrintHelpLink("QS_search_help", "qm", "QS_search_tips");

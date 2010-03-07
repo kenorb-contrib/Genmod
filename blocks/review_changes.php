@@ -38,7 +38,7 @@ $GM_BLOCKS["review_changes_block"]["rss"]       = false;
  * Prints a block allowing the user review all changes pending approval
  */
 function review_changes_block($block = true, $config="", $side, $index) {
-	global $GEDCOMID, $GEDCOMS, $command, $QUERY_STRING, $GM_IMAGES;
+	global $GEDCOMS, $command, $QUERY_STRING, $GM_IMAGES;
 	global $gm_changes, $TEXT_DIRECTION, $SHOW_SOURCES, $TIME_FORMAT, $GM_BLOCKS, $gm_user;
 
 	if (!GedcomConfig::$ALLOW_EDIT_GEDCOM) return;
@@ -51,7 +51,7 @@ function review_changes_block($block = true, $config="", $side, $index) {
 	$sent = array();
 	$users = array();
 	foreach ($geds as $gedkey=>$gedvalue) {
-		if ($gedvalue == $GEDCOMID) $display_block = true;
+		if ($gedvalue == GedcomConfig::$GEDCOMID) $display_block = true;
 		if (isset($lastmail[$gedvalue])) {
 			//-- if the time difference from the last email is greater than 24 hours then send out another email
 			if (time()-$lastmail[$gedvalue] > (60*60*24*$config["days"])) {
@@ -86,7 +86,7 @@ function review_changes_block($block = true, $config="", $side, $index) {
 		PrintHelpLink("review_changes_help", "qm", "review_changes");
 		if ($GM_BLOCKS["review_changes_block"]["canconfig"]) {
 			if ((($command=="gedcom")&&($gm_user->userGedcomAdmin())) || (($command=="user")&&($gm_user->username != ""))) {
-				if ($command=="gedcom") $name = preg_replace("/'/", "\'", get_gedcom_from_id($GEDCOMID));
+				if ($command=="gedcom") $name = preg_replace("/'/", "\'", get_gedcom_from_id(GedcomConfig::$GEDCOMID));
 				else $name = $gm_user->username;
 				print "<a href=\"javascript: ".GM_LANG_config_block."\" onclick=\"window.open('index_edit.php?name=$name&amp;command=$command&amp;action=configure&amp;side=$side&amp;index=$index', '', 'top=50,left=50,width=500,height=250,scrollbars=1,resizable=1'); return false;\">";
 				print "<img class=\"adminicon\" src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["admin"]["small"]."\" width=\"15\" height=\"15\" border=\"0\" alt=\"".GM_LANG_config_block."\" /></a>\n";
@@ -109,7 +109,7 @@ function review_changes_block($block = true, $config="", $side, $index) {
 		}
 		$gm_changes = ChangeFunctions::GetChangeData(false, "", true, "gedlines");
 		foreach($gm_changes as $gedcomid=>$changes) {
-			if ($gedcomid == $GEDCOMID) {
+			if ($gedcomid == GedcomConfig::$GEDCOMID) {
 				foreach($changes as $gid=>$change) {
 					$object = ConstructObject($gid, "", $gedcomid);
 					if (is_object($object)) {

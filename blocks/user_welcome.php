@@ -34,7 +34,7 @@ $GM_BLOCKS["print_welcome_block"]["rss"]       	= false;
 
 //-- function to print the welcome block
 function print_welcome_block($block=true, $config="", $side, $index) {
-		global $day, $month, $year, $GM_IMAGES, $GEDCOMID, $TIME_FORMAT, $gm_user;
+		global $day, $month, $year, $GM_IMAGES, $TIME_FORMAT, $gm_user;
 
 		print "<div id=\"user_welcome\" class=\"block\">\n";
 		print "<div class=\"blockhc\">";
@@ -44,9 +44,9 @@ function print_welcome_block($block=true, $config="", $side, $index) {
 		if ($gm_user->editaccount) {
 			print "<div><a href=\"edituser.php\"><img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["mygedview"]["small"]."\" border=\"0\" alt=\"".GM_LANG_myuserdata."\" title=\"".GM_LANG_myuserdata."\" /><br />".GM_LANG_myuserdata."</a></div>";
 		}
-		if (!empty($gm_user->gedcomid[$GEDCOMID])) {
-			print "<div><a href=\"pedigree.php?rootid=".$gm_user->gedcomid[$GEDCOMID]."\"><img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["pedigree"]["small"]."\" border=\"0\" alt=\"".GM_LANG_my_pedigree."\" title=\"".GM_LANG_my_pedigree."\" /><br />".GM_LANG_my_pedigree."</a></div>";
-			print "<div><a href=\"individual.php?pid=".$gm_user->gedcomid[$GEDCOMID]."\"><img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["indis"]["small"]."\" border=\"0\" alt=\"".GM_LANG_my_indi."\" title=\"".GM_LANG_my_indi."\" /><br />".GM_LANG_my_indi."</a></div>\n";
+		if (!empty($gm_user->gedcomid[GedcomConfig::$GEDCOMID])) {
+			print "<div><a href=\"pedigree.php?rootid=".$gm_user->gedcomid[GedcomConfig::$GEDCOMID]."\"><img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["pedigree"]["small"]."\" border=\"0\" alt=\"".GM_LANG_my_pedigree."\" title=\"".GM_LANG_my_pedigree."\" /><br />".GM_LANG_my_pedigree."</a></div>";
+			print "<div><a href=\"individual.php?pid=".$gm_user->gedcomid[GedcomConfig::$GEDCOMID]."\"><img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["indis"]["small"]."\" border=\"0\" alt=\"".GM_LANG_my_indi."\" title=\"".GM_LANG_my_indi."\" /><br />".GM_LANG_my_indi."</a></div>\n";
 		}
 		print "<div>";
 		PrintHelpLink("mygedview_customize_help", "qm", "customize_page");

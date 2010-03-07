@@ -39,7 +39,7 @@ $GM_BLOCKS["print_recent_changes"]["rss"]       = true;
 **/
 function print_recent_changes($block=true, $config="", $side, $index) {
 	global $month, $year, $day, $monthtonum, $HIDE_LIVE_PEOPLE, $command, $TEXT_DIRECTION;
-	global $GM_IMAGES, $GEDCOMID, $ASC, $IGNORE_FACTS, $IGNORE_YEAR, $TOTAL_QUERIES, $LAST_QUERY, $GM_BLOCKS, $SHOW_SOURCES;
+	global $GM_IMAGES, $ASC, $IGNORE_FACTS, $IGNORE_YEAR, $TOTAL_QUERIES, $LAST_QUERY, $GM_BLOCKS, $SHOW_SOURCES;
 	global $medialist, $gm_user;
 
 	$block = true;			// Always restrict this block's height
@@ -63,7 +63,7 @@ function print_recent_changes($block=true, $config="", $side, $index) {
 	if ($GM_BLOCKS["print_recent_changes"]["canconfig"]) {
 		$username = $gm_user->username;
 		if ((($command=="gedcom")&&($gm_user->userGedcomAdmin())) || (($command=="user")&&(!empty($username)))) {
-			if ($command=="gedcom") $name = preg_replace("/'/", "\'", get_gedcom_from_id($GEDCOMID));
+			if ($command=="gedcom") $name = preg_replace("/'/", "\'", get_gedcom_from_id(GedcomConfig::$GEDCOMID));
 			else $name = $username;
 			print "<a href=\"javascript: ".GM_LANG_config_block."\" onclick=\"window.open('index_edit.php?name=$name&amp;command=$command&amp;action=configure&amp;side=$side&amp;index=$index', '', 'top=50,left=50,width=500,height=250,scrollbars=1,resizable=1'); return false;\">";
 			print "<img class=\"adminicon\" src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["admin"]["small"]."\" width=\"15\" height=\"15\" border=\"0\" alt=\"".GM_LANG_config_block."\" /></a>\n";
@@ -89,7 +89,7 @@ function print_recent_changes($block=true, $config="", $side, $index) {
 		foreach($found_facts as $index=>$factarr) {
 			if ($factarr[2]=="INDI") {
 				$person =& Person::GetInstance($factarr[0]);
-				$fact = New Fact($person->xref, "INDI", $GEDCOMID, $factarr[3], $factarr[1]);
+				$fact = New Fact($person->xref, "INDI", GedcomConfig::$GEDCOMID, $factarr[3], $factarr[1]);
 				if ($lastgid != $person->xref) {
 					print "<a href=\"individual.php?pid=".$person->xref."&amp;gedid=".$person->gedcomid."\"><b>";
 					print $person->revname;
@@ -115,7 +115,7 @@ function print_recent_changes($block=true, $config="", $side, $index) {
 
 			if ($factarr[2]=="FAM") {
 				$family =& Family::GetInstance($factarr[0]);
-				$fact = New Fact($family->xref, "FAM", $GEDCOMID, $factarr[3], $factarr[1]);
+				$fact = New Fact($family->xref, "FAM", GedcomConfig::$GEDCOMID, $factarr[3], $factarr[1]);
 				if ($lastgid != $family->xref) {
 					print "<a href=\"family.php?famid=".$family->xref."&amp;gedid=".$family->gedcomid."\"><b>";
 					print $family->sortable_name;
@@ -136,7 +136,7 @@ function print_recent_changes($block=true, $config="", $side, $index) {
 
 			if ($factarr[2]=="SOUR") {
 				$source =& Source::GetInstance($factarr[0]);
-				$fact = New Fact($source->xref, "SOUR", $GEDCOMID, $factarr[3], $factarr[1]);
+				$fact = New Fact($source->xref, "SOUR", GedcomConfig::$GEDCOMID, $factarr[3], $factarr[1]);
 				if ($lastgid != $source->xref) {
 					print "<a href=\"source.php?sid=".$source->xref."&amp;gedid=".$source->gedcomid."\"><b>";
 					print $source->descriptor;
@@ -157,7 +157,7 @@ function print_recent_changes($block=true, $config="", $side, $index) {
 
 			if ($factarr[2]=="REPO") {
 				$repo =& Repository::GetInstance($factarr[0]);
-				$fact = New Fact($repo->xref, "REPO", $GEDCOMID, $factarr[3], $factarr[1]);
+				$fact = New Fact($repo->xref, "REPO", GedcomConfig::$GEDCOMID, $factarr[3], $factarr[1]);
 				if ($lastgid != $repo->xref) {
 					print "<a href=\"repo.php?rid=".$repo->xref."&amp;gedid=".$repo->gedcomid."\"><b>";
 					print $repo->descriptor;
@@ -177,7 +177,7 @@ function print_recent_changes($block=true, $config="", $side, $index) {
 			}
 			if ($factarr[2]=="OBJE") {
 				$media =& MediaItem::GetInstance($factarr[0]);
-				$fact = New Fact($media->xref, "OBJE", $GEDCOMID, $factarr[3], $factarr[1]);
+				$fact = New Fact($media->xref, "OBJE", GedcomConfig::$GEDCOMID, $factarr[3], $factarr[1]);
 				if ($lastgid != $media->xref) {
 					print "<a href=\"mediadetail.php?mid=".$media->xref."&amp;gedid=".$media->gedcomid."\"><b>";
 					print $media->title;

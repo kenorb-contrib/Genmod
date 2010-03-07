@@ -105,13 +105,13 @@ abstract class GedcomRecord {
 	 * constructor for this class
 	 */
 	protected function __construct($id, $gedrec="", $gedcomid="") {
-		global $show_changes, $GEDCOMID;
+		global $show_changes;
 		
 		// The class might be called with an ID or with a gedcom record.
 		// The gedcom record might be empty, in which case it's a new or non existent record.
 		$this->gedrec = trim($gedrec);
 		$this->show_changes = $show_changes;
-		if (empty($gedcomid)) $this->gedcomid = $GEDCOMID;
+		if (empty($gedcomid)) $this->gedcomid = GedcomConfig::$GEDCOMID;
 		else $this->gedcomid = $gedcomid;
 	
 		if ($this->gedrec == "") {
@@ -654,7 +654,7 @@ abstract class GedcomRecord {
 	}
 	
 	private function CheckAccess($recursive=1, $checklinks=false) {
-		global $USE_RELATIONSHIP_PRIVACY, $CHECK_MARRIAGE_RELATIONS, $MAX_RELATION_PATH_LENGTH, $GEDCOMID;
+		global $USE_RELATIONSHIP_PRIVACY, $CHECK_MARRIAGE_RELATIONS, $MAX_RELATION_PATH_LENGTH;
 		global $global_facts, $person_privacy, $user_privacy, $HIDE_LIVE_PEOPLE, $SHOW_DEAD_PEOPLE, $MAX_ALIVE_AGE, $PRIVACY_BY_YEAR;
 		global $PRIVACY_CHECKS, $PRIVACY_BY_RESN, $SHOW_SOURCES, $SHOW_LIVING_NAMES, $LINK_PRIVACY, $gm_user;
 		static $hit;
@@ -663,8 +663,8 @@ abstract class GedcomRecord {
 		if ($this->isempty) return true;
 		
 		// Check the gedcom context
-		$oldgedid = $GEDCOMID;
-		if ($GEDCOMID != $this->gedcomid) SwitchGedcom($this->gedcomid);
+		$oldgedid = GedcomConfig::$GEDCOMID;
+		if (GedcomConfig::$GEDCOMID != $this->gedcomid) SwitchGedcom($this->gedcomid);
 		
 		$ulevel = $gm_user->getUserAccessLevel();
 		if (!isset($hit)) $hit = array();
@@ -727,13 +727,13 @@ abstract class GedcomRecord {
 				// Check the relation privacy. If within the range, people can be shown. 
 				if ($USE_RELATIONSHIP_PRIVACY) {
 					// If we don't know the user's gedcom ID, we cannot determine the relationship so no reason to show
-					if ($gm_user->gedcomid[$GEDCOMID] == "") {
+					if ($gm_user->gedcomid[GedcomConfig::$GEDCOMID] == "") {
 						SwitchGedcom($oldgedid);
 						return false;
 					}
 						
 					// If it's the user himself, we can show him
-					if ($gm_user->gedcomid[$GEDCOMID] == $this->xref) {
+					if ($gm_user->gedcomid[GedcomConfig::$GEDCOMID] == $this->xref) {
 						SwitchGedcom($oldgedid);
 						return true;
 					}
@@ -741,7 +741,7 @@ abstract class GedcomRecord {
 					// Determine if the person is within range
 					$path_length = $MAX_RELATION_PATH_LENGTH;
 					// print "get relation ".$gm_user->gedcomid[$GEDCOMID]." with ".$this->xref;
-					$user_indi =& Person::GetInstance($gm_user->gedcomid[$GEDCOMID]);
+					$user_indi =& Person::GetInstance($gm_user->gedcomid[GedcomConfig::$GEDCOMID]);
 					$relationship = GetRelationship($user_indi, $this, $CHECK_MARRIAGE_RELATIONS, $path_length);
 
 					// Only limit access to live people!
@@ -805,7 +805,7 @@ abstract class GedcomRecord {
 				}
 				//-- check marriage records
 				foreach($this->getSpouseFamilyIds() as $indexval => $fam) {
-					$family =& Family::GetInstance($fam, "", $GEDCOMID);
+					$family =& Family::GetInstance($fam, "", GedcomConfig::$GEDCOMID);
 					//-- check marriage record
 					$marrrec = GetSubRecord(1, "1 MARR", $family->gedrec);
 					$ct = preg_match("/2 DATE .*(\d\d\d|\d\d\d\d).*/", $marrrec, $match);
@@ -856,7 +856,7 @@ abstract class GedcomRecord {
 		    //-- check if we can display both parents. If not, the family will be hidden.	
 		    $ct1 = preg_match("/1 HUSB @(.*)@/", $this->gedrec, $match);
 			if ($ct1 > 0) {
-				$husb =& Person::GetInstance($match[1], "", $GEDCOMID);
+				$husb =& Person::GetInstance($match[1], "", GedcomConfig::$GEDCOMID);
 				if ($type == "AND" && !$husb->DisplayDetails()) {
 					SwitchGedcom($oldgedid);
 					return false;
@@ -864,7 +864,7 @@ abstract class GedcomRecord {
 			}
 		    $ct2 = preg_match("/1 WIFE @(.*)@/", $this->gedrec, $match);
 			if ($ct2 > 0) {
-				$wife =& Person::GetInstance($match[1], "", $GEDCOMID);
+				$wife =& Person::GetInstance($match[1], "", GedcomConfig::$GEDCOMID);
 				if ($type == "AND" && !$wife->DisplayDetails()) {
 					SwitchGedcom($oldgedid);
 					return false;

@@ -29,8 +29,6 @@ if (stristr($_SERVER["SCRIPT_NAME"],basename(__FILE__))) {
 }
 
 require("config.php");
-//require($GM_BASE_DIRECTORY.$factsfile["english"]);
-//if (file_exists($GM_BASE_DIRECTORY.$factsfile[$LANGUAGE])) require($GM_BASE_DIRECTORY.$factsfile[$LANGUAGE]);
 
 if (isset($_SESSION["timediff"])) $time = time()-$_SESSION["timediff"];
 else $time = time();
@@ -98,103 +96,63 @@ function getUpcomingEvents() {
 	$OutputDone = false;
 	$PrivateFacts = false;
 	$lastgid="";
+	// Cache the selected indi's and fams in the indilist and famlist
+	$selindi = array();
+	$selfam = array();
+	foreach($found_facts as $key=>$factarr) {
+		if ($factarr[2] == "INDI") $selindi[] = $factarr[0];
+		if ($factarr[2] == "FAM") $selfam[] = $factarr[0];
+	}
+	
+	$selindi = implode("[".GedcomConfig::$GEDCOMID."]','", $selindi);
+	$selindi .= "[".GedcomConfig::$GEDCOMID."]'";
+	$selindi = "'".$selindi;
+	ListFunctions::GetIndiList("no", $selindi);
+	$selfam = implode("[".GedcomConfig::$GEDCOMID."]','", $selfam);
+	$selfam .= "[".GedcomConfig::$GEDCOMID."]'";
+	$selfam = "'".$selfam;
+	ListFunctions::GetFamList("no", $selfam);
 	foreach($found_facts as $key=>$factarr) {
 		$datestamp = $factarr[3];
-		if (($datestamp>=$monthstart) && ($datestamp<=$monthstart+(60*60*24*$daysprint))) {
-			if ($factarr[2]=="INDI") {
-				$gid = $factarr[0];
+		if ($datestamp >= $monthstart && $datestamp <= ($monthstart+(60*60*24*$daysprint))) {
+			if ($factarr[2] == "INDI") {
+				$person =& Person::GetInstance($factarr[0], "", GedcomConfig::$GEDCOMID);
+				$fact = new Fact($factarr[0], $factarr[2], GedcomConfig::$GEDCOMID, $factarr[6], $factarr[1]);
 				$factrec = $factarr[1];
-				$disp = true;
-				if ($filter=="living" and IsDeadId($gid)){
-					$disp = false;
-				} else if (!PrivacyFunctions::displayDetailsByID($gid)) {
-          			$disp = false;
-          			$PrivateFacts = true;
-        		}
-				if ($disp) {
-					$indirec = FindPersonRecord($gid);
-					$filterev = "all";
-					if ($onlyBDM == "yes") $filterev = "bdm";
-					$tempText = GetCalendarFact($factrec, $action, $filter, $gid, $filterev);
-					$text= preg_replace("/href=\"calendar\.php/", "href=".SERVER_URL."calendar.php", $tempText);
+				if ($person->disp && $fact->disp) {
+					$text = FactFunctions::GetCalendarFact($fact, $action, $filter);
 					if ($text!="filter") {
-						if (PrivacyFunctions::FactViewRestricted($gid, $factrec) or $text=="") {
-							$PrivateFacts = true;
-						} else {
-							if ($lastgid!=$gid) {
-								$name = NameFunctions::CheckNN(GetSortableName($gid));
-								$daytext .= "<li><a href=\"".SERVER_URL ."individual.php?pid=$gid&amp;gedid=".GedcomConfig::$GEDCOMID."\"><b>".PrintReady($name)."</b>";
-								if (GedcomConfig::$SHOW_ID_NUMBERS) {
-									if ($TEXT_DIRECTION=="ltr"){
-										$daytext .=  " &lrm;($gid)&lrm; ";
-									} else {
-										$daytext .=  " &rlm;($gid)&rlm; ";
-									}
-								}
-								$daytext .=  "</a>\n";
-								$lastgid=$gid;
-							}
-							$daytext .=  $text. "</li>";
-							$OutputDone = true;
+						if ($lastgid != $person->xref) {
+							$daytext .= "<li><a href=\"".SERVER_URL ."individual.php?pid=".$person->xref."&amp;gedid=".GedcomConfig::$GEDCOMID."\"><b>".PrintReady($person->sortable_name)."</b>".$person->addxref;
+							$daytext .=  "</a>\n";
+							$lastgid = $person->xref;
 						}
+						$daytext .=  $text. "</li>";
+						$OutputDone = true;
 					}
 				}
+				else $PrivateFacts = true;
 			}
 
-			if ($factarr[2]=="FAM") {
-				$gid = $factarr[0];
-				$factrec = $factarr[1];
-
-				$disp = true;
-				if ($filter=="living") {
-					$parents = FindParentsInRecord($gid["gedcom"]);
-					if (IsDeadId($parents["HUSB"])){
-						$disp = false;
-					} else if (!PrivacyFunctions::displayDetailsByID($parents["HUSB"])) {
-						$disp = false;
-						$PrivateFacts = true;
-					}
-					if ($disp) {
-						if (IsDeadId($parents["WIFE"])) $disp = false;
-						else if (!PrivacyFunctions::displayDetailsByID($parents["WIFE"])) {
-							$disp = false;
-							$PrivateFacts = true;
-						}
-					}
-				} else if (!PrivacyFunctions::displayDetailsByID($gid, "FAM")) {
-					$disp = false;
-					$PrivateFacts = true;
-				}
-				if($disp) {
-					$famrec = FindFamilyRecord($gid);
-					$name = GetFamilyDescriptor($gid);
-					$filterev = "all";
-					if ($onlyBDM == "yes") $filterev = "bdm";
-					$tempText = GetCalendarFact($factrec, $action, $filter, $gid, $filterev);
-					$text = preg_replace("/href=\"calendar\.php/", "href=".SERVER_URL."calendar.php", $tempText);
+			if ($factarr[2] == "FAM") {
+				$family =& Family::GetInstance($factarr[0], "", GedcomConfig::$GEDCOMID);
+				$fact = new Fact($factarr[0], $factarr[2], GedcomConfig::$GEDCOMID, $factarr[6], $factarr[1]);
+				if ($family->disp && $fact->disp) {
+					$text = FactFunctions::GetCalendarFact($fact, $action, $filter);
 					if ($text!="filter") {
-						if (PrivacyFunctions::FactViewRestricted($gid, $factrec) or $text=="") {
-							$PrivateFacts = true;
-						} else {
-							if ($lastgid!=$gid) {
-								$daytext .=  "<li><a href=\"".SERVER_URL ."family.php?famid=$gid&amp;gedid=".GedcomConfig::$GEDCOMID."\"><b>".PrintReady($name)."</b>";
-								if (GedcomConfig::$SHOW_FAM_ID_NUMBERS) {
-									if ($TEXT_DIRECTION=="ltr")
-										$daytext .=  " &lrm;($gid)&lrm; ";
-									else $daytext .=  " &rlm;($gid)&rlm; ";
-								}
-								$daytext .=  "</a>\n";
-								$lastgid=$gid;
-							}
-							$daytext .=  $text . "</li>";
-							$OutputDone = true;
+						if ($lastgid != $family->xref) {
+							$daytext .=  "<li><a href=\"".SERVER_URL ."family.php?famid=".$family->xref."&amp;gedid=".GedcomConfig::$GEDCOMID."\"><b>".PrintReady($family->sortable_name)."</b>".$family->addxref;
+							$daytext .=  "</a>\n";
+							$lastgid = $family->xref;
 						}
+						$daytext .=  $text . "</li>";
+						$OutputDone = true;
 					}
 				}
+				else $PrivateFacts = true;
 			}
 		}
 	}
-
 	$daytext .= "</ul>";
 
 	if ($PrivateFacts) {    // Facts were found but not printed for some reason
@@ -212,7 +170,7 @@ function getUpcomingEvents() {
 
 	$daytext = preg_replace("/<br \/>/", " ", $daytext);
 	$daytext = strip_tags($daytext, '<a><ul><li><b>');
-	if($daytext == "<ul></ul>"){
+	if($daytext == "<ul></ul>") {
 		$daytext = "";
 	}
 	$dataArray[2]  = $daytext;
@@ -246,48 +204,51 @@ function getTodaysEvents() {
 	$found_facts = BlockFunctions::GetCachedEvents($action, 1, $filter, "no", $skipfacts);
 
 	$lastgid="";
+	// Cache the selected indi's and fams in the indilist and famlist
+	$selindi = array();
+	$selfam = array();
+	foreach($found_facts as $key=>$factarr) {
+		if ($factarr[2] == "INDI") $selindi[] = $factarr[0];
+		if ($factarr[2] == "FAM") $selfam[] = $factarr[0];
+	}
+	$selindi = implode("[".GedcomConfig::$GEDCOMID."]','", $selindi);
+	$selindi .= "[".GedcomConfig::$GEDCOMID."]'";
+	$selindi = "'".$selindi;
+	ListFunctions::GetIndiList("no", $selindi);
+	$selfam = implode("[".GedcomConfig::$GEDCOMID."]','", $selfam);
+	$selfam .= "[".GedcomConfig::$GEDCOMID."]'";
+	$selfam = "'".$selfam;
+	ListFunctions::GetFamList("no", $selfam);
 	foreach($found_facts as $index=>$factarr) {
-		if ($factarr[2]=="INDI") {
-			$gid = $factarr[0];
+		if ($factarr[2] == "INDI") {
+			$person =& Person::GetInstance($factarr[0], "", GedcomConfig::$GEDCOMID);
+			$fact = new Fact($factarr[0], $factarr[2], GedcomConfig::$GEDCOMID, $factarr[6], $factarr[1]);
 			$factrec = $factarr[1];
-	  		if ((PrivacyFunctions::displayDetailsById($gid)) && (!PrivacyFunctions::FactViewRestricted($gid, $factrec))) {
-				$indirec = FindPersonRecord($gid);
-				$text = GetCalendarFact($factrec, $action, $filter, $gid);
-				if ($text!="filter") {
-					if ($lastgid!=$gid) {
-						$name = NameFunctions::CheckNN(GetSortableName($gid));
-						$daytext .= "<li><a href=\"".SERVER_URL ."individual.php?pid=$gid&amp;gedid=".GedcomConfig::$GEDCOMID."\"><b>".PrintReady($name)."</b>";
-						if (GedcomConfig::$SHOW_ID_NUMBERS) {
-							if ($TEXT_DIRECTION=="ltr")	$daytext .= " &lrm;($gid)&lrm;";
-							else $daytext .= " &rlm;($gid)&rlm;";
-						}
+			if ($person->disp && $fact->disp) {
+				$text = FactFunctions::GetCalendarFact($fact, $action, $filter);
+				if ($text != "filter") {
+					if ($lastgid != $person->xref) {
+						$daytext .= "<li><a href=\"".SERVER_URL ."individual.php?pid=".$person->xref."&amp;gedid=".GedcomConfig::$GEDCOMID."\"><b>".PrintReady($person->sortable_name)."</b>".$person->addxref;
 						$daytext .= "</a>\n";
-						$lastgid=$gid;
+						$lastgid = $person->xref;
 					}
 				$daytext .= $text . "</li>";
 				}
 			}
 		}
 
-		if ($factarr[2]=="FAM") {
-			$gid = $factarr[0];
-			$factrec = $factarr[1];
-	  		if ((PrivacyFunctions::displayDetailsById($gid, "FAM")) && (!PrivacyFunctions::FactViewRestricted($gid, $factrec))) {
-				$famrec = FindFamilyRecord($gid);
-				$name = GetFamilyDescriptor($gid);
-				$text = GetCalendarFact($factrec, $action, $filter, $gid);
+		if ($factarr[2] == "FAM") {
+			$family =& Family::GetInstance($factarr[0], "", GedcomConfig::$GEDCOMID);
+			$fact = new Fact($factarr[0], $factarr[2], GedcomConfig::$GEDCOMID, $factarr[6], $factarr[1]);
+			if ($family->disp && $fact->disp) {
+				$text = FactFunctions::GetCalendarFact($fact, $action, $filter);
 				if ($text!="filter") {
-					if ($lastgid!=$gid) {
-						$daytext .= "<li><a href=\"".SERVER_URL ."family.php?famid=$gid&amp;gedid=".GedcomConfig::$GEDCOMID."\"><b>".PrintReady($name)."</b>";
-						if (GedcomConfig::$SHOW_FAM_ID_NUMBERS) {
-						   if ($TEXT_DIRECTION=="ltr")
-								$daytext .=  " &lrm;($gid)&lrm;";
-						   else $daytext .=  " &rlm;($gid)&rlm;";
-						}
+					if ($lastgid != $family->xref) {
+						$daytext .= "<li><a href=\"".SERVER_URL ."family.php?famid=".$family->xref."&amp;gedid=".GedcomConfig::$GEDCOMID."\"><b>".PrintReady($family->sortable_name)."</b>".$family->addxref;
 						$daytext .=  "</a>\n";
-						$lastgid=$gid;
+						$lastgid = $family->xref;
+						$daytext .=  $text . "</li>";
 					}
-					$daytext .=  $text . "</li>";
 				}
 			}
 		}
@@ -385,9 +346,9 @@ function getGedcomStats() {
 			if ($i>0) $data .= ", ";
 			if (in_array(ord(substr($surname["name"], 0, 2)),$RTLOrd)) {
 				//if (ord(substr($surname["name"], 0, 2),$RTLOrd)){}
-				$data .= "<a href=\"".SERVER_URL ."indilist.php?surname=".urlencode($surname["name"])."\">".$surname["name"]."</a>";
+				$data .= "<a href=\"".SERVER_URL ."indilist.php?surname=".urlencode($surname["name"])."&amp;gedid=".GedcomConfig::$GEDCOMID."\">".$surname["name"]."</a>";
 			}
-			else $data .= "<a href=\"".SERVER_URL ."indilist.php?surname=".$surname["name"]."\">".$surname["name"]."</a>";
+			else $data .= "<a href=\"".SERVER_URL ."indilist.php?surname=".$surname["name"]."&amp;gedid=".GedcomConfig::$GEDCOMID."\">".$surname["name"]."</a>";
 			$i++;
 		}
 	}
@@ -506,7 +467,7 @@ function getTop10Surnames() {
 		$i=0;
 		foreach($surnames as $indexval => $surname) {
 			if (stristr($surname["name"], "@N.N")===false) {
-				$data .= "<a href=\"".SERVER_URL ."indilist.php?surname=".urlencode($surname["name"])."\">".PrintReady($surname["name"])."</a> [".$surname["match"]."] <br />";
+				$data .= "<a href=\"".SERVER_URL ."indilist.php?surname=".urlencode($surname["name"])."&amp;gedid=".GedcomConfig::$GEDCOMID."\">".PrintReady($surname["name"])."</a> [".$surname["match"]."] <br />";
 				$i++;
 				if ($i>=$config["num"]) break;
 			}
@@ -528,7 +489,6 @@ function getTop10Surnames() {
 function getRecentChanges() {
 	global $month, $year, $day, $monthtonum, $HIDE_LIVE_PEOPLE, $command, $TEXT_DIRECTION;
 	global $GM_IMAGES, $ASC, $IGNORE_FACTS, $IGNORE_YEAR, $TOTAL_QUERIES, $LAST_QUERY, $GM_BLOCKS, $SHOW_SOURCES;
-	global $medialist;
 
 	if ($command=="user") $filter = "living";
 	else $filter = "all";
@@ -574,147 +534,75 @@ function getRecentChanges() {
 					$first = false;
 				}
 			}
-			if ($factarr[2]=="INDI") {
-				$gid = $factarr[0];
-				$factrec = $factarr[1];
-				if (PrivacyFunctions::displayDetailsById($gid)) {
-					$indirec = FindPersonRecord($gid);
-					if ($lastgid!=$gid) {
-						$name = NameFunctions::CheckNN(GetSortableName($gid));
-						$recentText .= "<a href=\"".SERVER_URL ."individual.php?pid=$gid&amp;gedid=".GedcomConfig::$GEDCOMID."\"><b>".PrintReady($name)."</b>";
-						if (GedcomConfig::$SHOW_ID_NUMBERS) {
-							if ($TEXT_DIRECTION=="ltr")
-								$recentText .= " &lrm;($gid)&lrm; ";
-							else $recentText .= " &rlm;($gid)&rlm; ";
-						}
-						$recentText .= "</a><br />\n";
-						$lastgid=$gid;
-					}
+			if ($factarr[2] == "INDI") {
+				$person =& Person::GetInstance($factarr[0]);
+				$fact = New Fact($person->xref, "INDI", GedcomConfig::$GEDCOMID, $factarr[3], $factarr[1]);
+				if ($lastgid != $person->xref && $person->disp) {
+					$recentText .= "<a href=\"".SERVER_URL ."individual.php?pid=".$person->xref."&amp;gedid=".GedcomConfig::$GEDCOMID."\"><b>".$person->revname."</b>".$person->addxref;
+					$recentText .= "</a><br />\n";
+					$lastgid = $person->xref;
 					$recentText .= GM_FACT_CHAN;
-					$ct = preg_match("/\d DATE (.*)/", $factrec, $match);
-					if ($ct>0) {
-							$recentText .= " - ".GetChangedDate($match[1]);
-							$tt = preg_match("/3 TIME (.*)/", $factrec, $match);
-							if ($tt>0) {
-									$recentText .= " - ".$match[1];
-							}
+					if ($fact->datestring != "") {
+						$recentText .= " - ".$fact->datestring."&nbsp;".$fact->timestring;
 					}
 					$recentText .= "<br />";
 				}
 			}
 
-			if ($factarr[2]=="FAM") {
-				$gid = $factarr[0];
-				$factrec = $factarr[1];
-				if (PrivacyFunctions::displayDetailsById($gid, "FAM")) {
-					$famrec = FindFamilyRecord($gid);
-					$name = GetFamilyDescriptor($gid);
-					if ($lastgid!=$gid) {
-						$recentText .= "<a href=\"".SERVER_URL ."family.php?famid=$gid&amp;gedid=".GedcomConfig::$GEDCOMID."\"><b>".PrintReady($name)."</b>";
-						if (GedcomConfig::$SHOW_FAM_ID_NUMBERS) {
-							if ($TEXT_DIRECTION=="ltr")
-								$recentText .= " &lrm;($gid)&lrm; ";
-							else $recentText .= " &rlm;($gid)&rlm; ";
-						}
-						$recentText .= "</a><br />\n";
-						$lastgid=$gid;
-					}
+			if ($factarr[2] == "FAM") {
+				$family =& Family::GetInstance($factarr[0]);
+				$fact = New Fact($family->xref, "FAM", GedcomConfig::$GEDCOMID, $factarr[3], $factarr[1]);
+				if ($lastgid != $family->xref && $family->disp) {
+					$recentText .= "<a href=\"".SERVER_URL ."family.php?famid=".$family->xref."&amp;gedid=".GedcomConfig::$GEDCOMID."\"><b>".PrintReady($family->sortable_name)."</b>".$family->addxref;
+					$recentText .= "</a><br />\n";
+					$lastgid = $family->xref;
 					$recentText .= GM_FACT_CHAN;
-					$ct = preg_match("/\d DATE (.*)/", $factrec, $match);
-					if ($ct>0) {
-							$recentText .= " - ".GetChangedDate($match[1]);
-							$tt = preg_match("/3 TIME (.*)/", $factrec, $match);
-							if ($tt>0) {
-									$recentText .= " - ".$match[1];
-							}
+					if ($fact->datestring != "") {
+						$recentText .= " - ".$fact->datestring."&nbsp;".$fact->timestring;
 					}
 					$recentText .= "<br />";
 				}
 			}
 
 			if ($factarr[2]=="SOUR") {
-				$gid = $factarr[0];
-				$factrec = $factarr[1];
-				if (PrivacyFunctions::displayDetailsById($gid, "SOUR", 1, true)) {
-					$sourcerec = FindSourceRecord($gid);
-					$name = GetSourceDescriptor($gid);
-					if ($lastgid!=$gid) {
-						$recentText .= "<a href=\"".SERVER_URL ."source.php?sid=$gid&amp;gedid=".GedcomConfig::$GEDCOMID."\"><b>".PrintReady($name)."</b>";
-						if (GedcomConfig::$SHOW_FAM_ID_NUMBERS) {
-							if ($TEXT_DIRECTION=="ltr")
-								$recentText .= " &lrm;($gid)&lrm; ";
-							else $recentText .= " &rlm;($gid)&rlm; ";
-						}
-						$recentText .= "</a><br />\n";
-						$lastgid=$gid;
-					}
+				$source =& Source::GetInstance($factarr[0]);
+				$fact = New Fact($source->xref, "SOUR", GedcomConfig::$GEDCOMID, $factarr[3], $factarr[1]);
+				if ($lastgid != $source->xref && $source->disp) {
+					$recentText .= "<a href=\"".SERVER_URL ."source.php?sid=".$source->xref."&amp;gedid=".GedcomConfig::$GEDCOMID."\"><b>".PrintReady($source->name)."</b>".$source->addxref;
+					$recentText .= "</a><br />\n";
+					$lastgid = $source->xref;
 					$recentText .= GM_FACT_CHAN;
-					$ct = preg_match("/\d DATE (.*)/", $factrec, $match);
-					if ($ct>0) {
-							$recentText .= " - ".GetChangedDate($match[1]);
-							$tt = preg_match("/3 TIME (.*)/", $factrec, $match);
-							if ($tt>0) {
-									$recentText .= " - ".$match[1];
-							}
+					if ($fact->datestring != "") {
+						$recentText .= " - ".$fact->datestring."&nbsp;".$fact->timestring;
 					}
 					$recentText .= "<br />";
 				}
 			}
 
 			if ($factarr[2]=="REPO") {
-				$gid = $factarr[0];
-				$factrec = $factarr[1];
-				if (PrivacyFunctions::displayDetailsById($gid, "REPO")) {
-					$reporec = FindRepoRecord($gid);
-					$name = GetRepoDescriptor($gid);
-					if ($lastgid!=$gid) {
-						$recentText .= "<a href=\"".SERVER_URL ."repo.php?rid=$gid&amp;gedid=".GedcomConfig::$GEDCOMID."\"><b>".PrintReady($name)."</b>";
-						if (GedcomConfig::$SHOW_FAM_ID_NUMBERS) {
-							if ($TEXT_DIRECTION=="ltr")
-								$recentText .= " &lrm;($gid)&lrm; ";
-							else $recentText .= " &rlm;($gid)&rlm; ";
-						}
-						$recentText .= "</a><br />\n";
-						$lastgid=$gid;
-					}
+				$repo =& Repository::GetInstance($factarr[0]);
+				$fact = New Fact($repo->xref, "REPO", GedcomConfig::$GEDCOMID, $factarr[3], $factarr[1]);
+				if ($lastgid != $repo->xref) {
+					$recentText .= "<a href=\"".SERVER_URL ."repo.php?rid=".$repo->xref."&amp;gedid=".GedcomConfig::$GEDCOMID."\"><b>".PrintReady($repo->name)."</b>".$repo->addxref;
+					$recentText .= "</a><br />\n";
+					$lastgid = $repo->xref;
 					$recentText .= GM_FACT_CHAN;
-					$ct = preg_match("/\d DATE (.*)/", $factrec, $match);
-					if ($ct>0) {
-							$recentText .= " - ".GetChangedDate($match[1]);
-							$tt = preg_match("/3 TIME (.*)/", $factrec, $match);
-							if ($tt>0) {
-								$recentText .= " - ".$match[1];
-							}
+					if ($fact->datestring != "") {
+						$recentText .= " - ".$fact->datestring."&nbsp;".$fact->timestring;
 					}
 					$recentText .= "<br />";
 				}
 			}
 			if ($factarr[2]=="OBJE") {
-				$gid = $factarr[0];
-				$factrec = $factarr[1];
-				if (PrivacyFunctions::displayDetailsById($gid, "OBJE", 1, true)) {
-					$mediarec = FindMediaRecord($gid);
-					if (isset($medialist[$gid]["title"]) && $medialist[$gid]["title"] != "") $title=$medialist[$gid]["title"];
-					else $title = $medialist[$gid]["file"];
-					$SearchTitle = preg_replace("/ /","+",$title);
-					if ($lastgid!=$gid) {
- 						$recentText .= "<a href=\"".SERVER_URL ."medialist.php?action=filter&amp;search=yes&amp;filter=$SearchTitle&amp;gedid=".GedcomConfig::$GEDCOMID."\"><b>".PrintReady($title)."</b>";
-						if (GedcomConfig::$SHOW_FAM_ID_NUMBERS) {
-							if ($TEXT_DIRECTION=="ltr")
-								$recentText .= " &lrm;($gid)&lrm; ";
-							else $recentText .= " &rlm;($gid)&rlm; ";
-						}
-						$recentText .= "</a><br />\n";
-						$lastgid=$gid;
-					}
+				$media =& MediaItem::GetInstance($factarr[0]);
+				$fact = New Fact($media->xref, "OBJE", GedcomConfig::$GEDCOMID, $factarr[3], $factarr[1]);
+				if ($lastgid != $media->xref) {
+					$recentText .= "<a href=\"".SERVER_URL ."mediadetail.php?mid=".$media->xref."&amp;gedid=".GedcomConfig::$GEDCOMID."\"><b>".PrintReady($media->name)."</b>".$media->addxref;
+					$recentText .= "</a><br />\n";
+					$lastgid = $media->xref;
 					$recentText .= GM_FACT_CHAN;
-					$ct = preg_match("/\d DATE (.*)/", $factrec, $match);
-					if ($ct>0) {
-							$recentText .= " - ".GetChangedDate($match[1]);
-							$tt = preg_match("/3 TIME (.*)/", $factrec, $match);
-							if ($tt>0) {
-									$recentText .= " - ".$match[1];
-							}
+					if ($fact->datestring != "") {
+						$recentText .= " - ".$fact->datestring."&nbsp;".$fact->timestring;
 					}
 					$recentText .= "<br />";
 				}

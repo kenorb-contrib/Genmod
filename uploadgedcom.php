@@ -61,7 +61,7 @@ if(function_exists('apache_setenv')) {
 	if (empty($action)) $action = "upload_form";
 
  // $gedcomid: Which gedcom to process
- 	if (!isset($gedcomid) || !isset($GEDCOMS[$gedcomid])) $gedcomid = $GEDCOMID;
+ 	if (!isset($gedcomid) || !isset($GEDCOMS[$gedcomid])) $gedcomid = GedcomConfig::$GEDCOMID;
 	
  // $import_existing = See if we are just importing an existing GEDCOM: the script is called from the import option of the gedcom in editgedcoms.
 	if (!isset($import_existing)) $import_existing = false;
@@ -467,7 +467,7 @@ if ($step >= 3) {
 					$cleanup_needed = "yes";
 					print "<input type=\"hidden\" name=\"cleanup_needed\" value=\"yes\">";
 					if (!AdminFunctions::FileIsWriteable($path.$gedfilename) && (file_exists($path.$gedfilename))) {
-						print "<span class=\"error\">".str_replace("#GEDCOM#", get_gedcom_from_id($GEDCOMID), GM_LANG_error_header_write)."</span>\n";
+						print "<span class=\"error\">".str_replace("#GEDCOM#", get_gedcom_from_id(GedcomConfig::$GEDCOMID), GM_LANG_error_header_write)."</span>\n";
 					}
 					// NOTE: Check for head cleanu
 					if ($l_headcleanup) {

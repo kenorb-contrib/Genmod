@@ -33,7 +33,7 @@ $GM_BLOCKS["print_block_name_top10"]["config"] 		= array("num"=>10, "count_place
 $GM_BLOCKS["print_block_name_top10"]["rss"]			= true;
 
 function print_block_name_top10($block=true, $config="", $side, $index) {
-	global $GEDCOMID, $TEXT_DIRECTION;
+	global $TEXT_DIRECTION;
 	global $GM_BLOCKS, $command, $GM_IMAGES, $gm_user;
 
 	function top_surname_sort($a, $b) {
@@ -58,7 +58,7 @@ function print_block_name_top10($block=true, $config="", $side, $index) {
 		PrintHelpLink("index_common_names_help", "qm");
 		if ($GM_BLOCKS["print_block_name_top10"]["canconfig"]) {
 			if ((($command=="gedcom")&&($gm_user->userGedcomAdmin())) || (($command=="user")&&($gm_user->username != ""))) {
-				if ($command=="gedcom") $name = preg_replace("/'/", "\'", get_gedcom_from_id($GEDCOMID));
+				if ($command=="gedcom") $name = preg_replace("/'/", "\'", get_gedcom_from_id(GedcomConfig::$GEDCOMID));
 				else $name = $gm_user->username;
 				print "<a href=\"javascript: ".GM_LANG_config_block."\" onclick=\"window.open('index_edit.php?name=$name&amp;command=$command&amp;action=configure&amp;side=$side&amp;index=$index', '', 'top=50,left=50,width=500,height=250,scrollbars=1,resizable=1'); return false;\">";
 				print "<img class=\"adminicon\" src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["admin"]["small"]."\" width=\"15\" height=\"15\" border=\"0\" alt=\"".GM_LANG_config_block."\" /></a>\n";
