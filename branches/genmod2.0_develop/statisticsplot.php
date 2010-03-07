@@ -102,7 +102,7 @@ $savedInput["zasGrPeriode"] = $zasGrPeriode;
 $savedInput["showShadow"] = $showShadow;
 $savedInput["valuePos"] = $valuePos;
 $savedInput["graphSize"] = $graphSize;
-$_SESSION[$GEDCOMID."statisticsplot"] = $savedInput;
+$_SESSION[GedcomConfig::$GEDCOMID."statisticsplot"] = $savedInput;
 unset($savedInput);
 
 //--	print " sort, x_as:" . $x_as . ", y_as:". $y_as . ", x_as:". $z_as . ", xas_gr_leef:" . $xas_grenzen_leeftijden . ", xas_gr_maan:" . $xas_grenzen_maanden . ", xas_gr_aant:" . $xas_grenzen_aantallen . ", zas_gr_peri:" . $zas_grenzen_periode . "<BR>";

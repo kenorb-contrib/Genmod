@@ -34,12 +34,12 @@ $GM_BLOCKS["print_gedcom_block"]["rss"]			= false;
 
 //-- function to print the gedcom block
 function print_gedcom_block($block = true, $config="", $side, $index) {
-	global $hits, $day, $month, $year, $GEDCOMID, $GEDCOMS, $TIME_FORMAT, $command,$TEXT_DIRECTION, $gm_user;
+	global $hits, $day, $month, $year, $GEDCOMS, $TIME_FORMAT, $command,$TEXT_DIRECTION, $gm_user;
 
 
 	print "<div id=\"gedcom_welcome\" class=\"block\" >\n";
 	print "<div class=\"blockhc\">";
-	print PrintReady($GEDCOMS[$GEDCOMID]["title"]);	 
+	print PrintReady($GEDCOMS[GedcomConfig::$GEDCOMID]["title"]);	 
 	print "</div>";
 	print "<div class=\"blockcontent center\">";
 	print "<br />".GetChangedDate("$day $month $year")." - ".date($TIME_FORMAT, time()-$_SESSION["timediff"])."<br />\n";
@@ -48,7 +48,7 @@ function print_gedcom_block($block = true, $config="", $side, $index) {
 	print "\n<br />";
 	print "<a href=\"javascript: ".GM_LANG_add_site_to_favs."\" onclick='window.external.AddFavorite(location.href, document.title); return false;'>".GM_LANG_add_site_to_favs."</a><br />";
 	if ($gm_user->userGedcomAdmin()) {
-		print "<a href=\"javascript: ".GM_LANG_customize_gedcom_page."\" onclick=\"window.open('index_edit.php?name=".preg_replace("/'/", "\'", get_gedcom_from_id($GEDCOMID))."&amp;command=gedcom', '', 'top=50,left=10,width=1000,height=400,scrollbars=1,resizable=1'); return false;\">".GM_LANG_customize_gedcom_page."</a>\n";
+		print "<a href=\"javascript: ".GM_LANG_customize_gedcom_page."\" onclick=\"window.open('index_edit.php?name=".preg_replace("/'/", "\'", get_gedcom_from_id(GedcomConfig::$GEDCOMID))."&amp;command=gedcom', '', 'top=50,left=10,width=1000,height=400,scrollbars=1,resizable=1'); return false;\">".GM_LANG_customize_gedcom_page."</a>\n";
 	}
 	print "</div>\n";
 	print "</div>";

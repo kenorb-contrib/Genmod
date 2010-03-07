@@ -90,7 +90,7 @@ else {
 				if ($gm_user->username != "" || !GedcomConfig::$REQUIRE_AUTHENTICATION) {
 					$str = "sg".$key;
 					print "<input type=\"checkbox\" ";
-					if (($key == $GEDCOMID) && ($search_controller->action == "")) print "checked=\"checked\" ";
+					if (($key == GedcomConfig::$GEDCOMID) && ($search_controller->action == "")) print "checked=\"checked\" ";
 					else {
 						if (in_array($key, $search_controller->searchgeds)) print "checked=\"checked\" ";
 					}

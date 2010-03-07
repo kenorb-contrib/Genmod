@@ -444,7 +444,7 @@ if ($placelist_controller->display == "list") print "hierarchy\">".GM_LANG_show_
 else print "list\">".GM_LANG_show_place_list;
 print "</a><br /><br />\n";
 
-$head = Header::GetInstance("HEAD", "", $GEDCOMID);
+$head = Header::GetInstance("HEAD", "", GedcomConfig::$GEDCOMID);
 if ($head->placeformat != "") {
 	print  GM_LANG_form.$head->placeformat;
 	PrintHelpLink("ppp_match_one_help", "qm");

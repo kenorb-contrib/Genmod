@@ -322,7 +322,7 @@ abstract class GedcomConfig {
 		}
 		//-- This is copied from the config_gedcom.php. Added: only re-set the limit 
 		//-- when it's the current gedcom.
-		if ($settings["gedcom"] == get_gedcom_from_id($GEDCOMID)) @set_time_limit(self::$TIME_LIMIT);
+		if ($settings["gedcom"] == get_gedcom_from_id(self::$GEDCOMID)) @set_time_limit(self::$TIME_LIMIT);
 		
 		return;
 	}

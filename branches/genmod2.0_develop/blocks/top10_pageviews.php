@@ -33,7 +33,7 @@ $GM_BLOCKS["top10_pageviews"]["config"] 	= array("num"=>10, "count_placement"=>"
 $GM_BLOCKS["top10_pageviews"]["rss"]		= false;
 
 function top10_pageviews($block=true, $config="", $side, $index) {
-	global $GEDCOMID, $GM_BLOCKS, $command, $GM_IMAGES, $gm_user;
+	global $GM_BLOCKS, $command, $GM_IMAGES, $gm_user;
 
 	if (empty($config)) $config = $GM_BLOCKS["top10_pageviews"]["config"];
 	if (isset($config["count_placement"])) $CountSide = $config["count_placement"];
@@ -42,7 +42,7 @@ function top10_pageviews($block=true, $config="", $side, $index) {
 	//-- load the lines from the database
 	$ids = array();
 	$limit = $config["num"]+1;
-	$ids = CounterFunctions::GetCounters($limit, $GEDCOMID, false);
+	$ids = CounterFunctions::GetCounters($limit, GedcomConfig::$GEDCOMID, false);
 
 	//-- if no results are returned then don't do anything
 	if (count($ids) == 0) {
@@ -66,7 +66,7 @@ function top10_pageviews($block=true, $config="", $side, $index) {
 	PrintHelpLink("index_top10_pageviews_help", "qm", "top10_pageviews");
 	if ($GM_BLOCKS["top10_pageviews"]["canconfig"]) {
 		if ((($command=="gedcom")&&($gm_user->userGedcomAdmin())) || (($command=="user")&&($gm_user->username != ""))) {
-			if ($command=="gedcom") $name = preg_replace("/'/", "\'", get_gedcom_from_id($GEDCOMID));
+			if ($command=="gedcom") $name = preg_replace("/'/", "\'", get_gedcom_from_id(GedcomConfig::$GEDCOMID));
 			else $name = $gm_user->username;
 			print "<a href=\"javascript: ".GM_LANG_config_block."\" onclick=\"window.open('index_edit.php?name=$name&amp;command=$command&amp;action=configure&amp;side=$side&amp;index=$index', '', 'top=50,left=50,width=500,height=250,scrollbars=1,resizable=1'); return false;\">";
 			print "<img class=\"adminicon\" src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["admin"]["small"]."\" width=\"15\" height=\"15\" border=\"0\" alt=\"".GM_LANG_config_block."\" /></a>\n";

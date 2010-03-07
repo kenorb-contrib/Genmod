@@ -48,7 +48,7 @@ print "<div id=\"content_pedigree\">";
 	
 	// Print the family relation
 	$fam = $pedigree_controller->root->primaryfamily;
-	$family =& Family::GetInstance($fam, "", $GEDCOMID);
+	$family =& Family::GetInstance($fam, "", GedcomConfig::$GEDCOMID);
 	$famrela = $family->pedigreetype;
 	if (!empty($famrela)) {
 		if ($TEXT_DIRECTION == "ltr") print "&nbsp;&lrm;(".constant("GM_LANG_".$famrela."_parents").")&lrm;";
@@ -281,7 +281,7 @@ print "<div id=\"content_pedigree\">";
 			else print "<tr><td width=\"100%\">";
 			
 			if (!isset($treeid[$i])) $treeid[$i] = false;
-			$person =& Person::GetInstance($treeid[$i], "", $GEDCOMID);
+			$person =& Person::GetInstance($treeid[$i], "", GedcomConfig::$GEDCOMID);
 			$fams = count($person->childfamilies);
 			
 			PersonFunctions::PrintPedigreePerson($person, 1, 1, 0, 1, $pedigree_controller->view, $pedigree_controller->num_generations, $pedigree_controller->talloffset);

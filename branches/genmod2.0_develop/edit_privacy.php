@@ -33,9 +33,9 @@
 require "config.php";
 
 // Reload the privacy settings with no user overrides
-PrivacyController::ReadPrivacy($GEDCOMID, false);
+PrivacyController::ReadPrivacy(GedcomConfig::$GEDCOMID, false);
 
-if (empty($gedid)) $gedid = $GEDCOMID;
+if (empty($gedid)) $gedid = GedcomConfig::$GEDCOMID;
 
 if ((!$gm_user->userGedcomAdmin($gedid))||(empty($gedid))) {
 	header("Location: editgedcoms.php");
@@ -209,9 +209,9 @@ if ($action=="update") {
 	print "<tr><td class=\"shade2\">";
 	print GM_LANG_performing_update;
 	print "<br />";
-	$settings = PrivacyController::GetPrivacyObject($GEDCOMID);
-	$settings->GEDCOM = get_gedcom_from_id($GEDCOMID);
-	$settings->GEDCOMID = $GEDCOMID;
+	$settings = PrivacyController::GetPrivacyObject(GedcomConfig::$GEDCOMID);
+	$settings->GEDCOM = get_gedcom_from_id(GedcomConfig::$GEDCOMID);
+	$settings->GEDCOMID = GedcomConfig::$GEDCOMID;
 	$settings->PRIV_USER = $PRIV_USER;
 	$settings->PRIV_NONE = $PRIV_NONE;
 	$settings->PRIV_HIDE = $PRIV_HIDE;
@@ -312,7 +312,7 @@ if ($action=="update") {
 	}
 	$settings->person_facts = $person_facts;	
 	PrivacyController::StorePrivacy($settings);
-	WriteToLog("Privacy-> Privacy file updated", "I", "G", $GEDCOMID);
+	WriteToLog("Privacy-> Privacy file updated", "I", "G", GedcomConfig::$GEDCOMID);
 	
 }
 
@@ -334,7 +334,7 @@ if ($action=="update") {
 
 <form name="editprivacyform" method="post" action="edit_privacy.php">
     <input type="hidden" name="action" value="update" />
-    <?php print "<input type=\"hidden\" name=\"gedid\" value=\"".$GEDCOMID."\" />\n";
+    <?php print "<input type=\"hidden\" name=\"gedid\" value=\"".GedcomConfig::$GEDCOMID."\" />\n";
 
     // NOTE: General Privacy Settings header bar
     ?>

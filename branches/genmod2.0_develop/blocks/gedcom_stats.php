@@ -50,7 +50,7 @@ $GM_BLOCKS["print_gedcom_stats"]["rss"]			= true;
 //-- function to print the gedcom statistics block
 
 function print_gedcom_stats($block = true, $config="", $side, $index) {
-		global $GM_BLOCKS, $GEDCOMID, $GEDCOMS, $ALLOW_CHANGE_GEDCOM, $command, $GM_IMAGES;
+		global $GM_BLOCKS, $GEDCOMS, $ALLOW_CHANGE_GEDCOM, $command, $GM_IMAGES;
 		global $top10_block_present, $monthtonum, $gm_user;		// Set in index.php
 
 		if (empty($config)) $config = $GM_BLOCKS["print_gedcom_stats"]["config"];
@@ -62,7 +62,7 @@ function print_gedcom_stats($block = true, $config="", $side, $index) {
 		if ($GM_BLOCKS["print_gedcom_stats"]["canconfig"]) {
 			$username = $gm_user->username;
 			if ((($command=="gedcom")&&($gm_user->userGedcomAdmin())) || (($command=="user")&&(!empty($username)))) {
-				if ($command=="gedcom") $name = $GEDCOMID;
+				if ($command=="gedcom") $name = GedcomConfig::$GEDCOMID;
 				else $name = $username;
 				print "<a href=\"javascript: ".GM_LANG_config_block."\" onclick=\"window.open('index_edit.php?name=$name&amp;command=$command&amp;action=configure&amp;side=$side&amp;index=$index', '', 'top=50,left=50,width=600,height=350,scrollbars=1,resizable=1'); return false;\">";
 				print "<img class=\"adminicon\" src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["admin"]["small"]."\" width=\"15\" height=\"15\" border=\"0\" alt=\"".GM_LANG_config_block."\" /></a>\n";
@@ -71,7 +71,7 @@ function print_gedcom_stats($block = true, $config="", $side, $index) {
 		print GM_LANG_gedcom_stats;
 		print "</div>";
 		print "<div class=\"blockcontent\">";
-		print "<b><a href=\"index.php?command=gedcom\">".PrintReady($GEDCOMS[$GEDCOMID]["title"])."</a></b><br />\n";
+		print "<b><a href=\"index.php?command=gedcom\">".PrintReady($GEDCOMS[GedcomConfig::$GEDCOMID]["title"])."</a></b><br />\n";
 		$stats = BlockFunctions::GetCachedStatistics();
 		if (isset($stats["gs_title"])) print $stats["gs_title"];
 		
@@ -140,7 +140,7 @@ function print_gedcom_stats($block = true, $config="", $side, $index) {
 		print "</td></tr></table>";
 		// NOTE: Print the most common surnames
 		if ($config["show_common_surnames"]=="yes") {
-			$surnames = GetCommonSurnamesIndex($GEDCOMID);
+			$surnames = GetCommonSurnamesIndex(GedcomConfig::$GEDCOMID);
 			if (count($surnames)>0) {
 				print "<br />";
 				PrintHelpLink("index_common_names_help", "qm", "common_surnames");

@@ -37,7 +37,7 @@ $GM_BLOCKS["print_upcoming_events"]["rss"]			= true;
 function print_upcoming_events($block=true, $config="", $side, $index) {
 	global $command, $TEXT_DIRECTION;
 	global $GM_IMAGES, $GM_BLOCKS;
-	global $NAME_REVERSE, $GEDCOMID;
+	global $NAME_REVERSE;
 	global $gm_user;
 
 	$block = true; // Always restrict this block's height
@@ -64,7 +64,7 @@ function print_upcoming_events($block=true, $config="", $side, $index) {
 	PrintHelpLink("index_events_help", "qm", "upcoming_events");
 	if ($GM_BLOCKS["print_upcoming_events"]["canconfig"]) {
 		if ((($command=="gedcom")&&($gm_user->userGedcomAdmin())) || (($command=="user")&&($gm_user->username != ""))) {
-			if ($command=="gedcom") $name = preg_replace("/'/", "\'", get_gedcom_from_id($GEDCOMID));
+			if ($command=="gedcom") $name = preg_replace("/'/", "\'", get_gedcom_from_id(GedcomConfig::$GEDCOMID));
 			else $name = $gm_user->username;
 			print "<a href=\"javascript: ".GM_LANG_config_block."\" onclick=\"window.open('index_edit.php?name=$name&amp;command=$command&amp;action=configure&amp;side=$side&amp;index=$index', '', 'top=50,left=50,width=500,height=250,scrollbars=1,resizable=1'); return false;\">";
 			print "<img class=\"adminicon\" src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["admin"]["small"]."\" width=\"15\" height=\"15\" border=\"0\" alt=\"".GM_LANG_config_block."\" /></a>\n";
@@ -88,20 +88,20 @@ function print_upcoming_events($block=true, $config="", $side, $index) {
 		if ($factarr[2] == "FAM") $selfam[] = $factarr[0];
 	}
 	
-	$selindi = implode("[".$GEDCOMID."]','", $selindi);
-	$selindi .= "[".$GEDCOMID."]'";
+	$selindi = implode("[".GedcomConfig::$GEDCOMID."]','", $selindi);
+	$selindi .= "[".GedcomConfig::$GEDCOMID."]'";
 	$selindi = "'".$selindi;
 	ListFunctions::GetIndiList("no", $selindi);
-	$selfam = implode("[".$GEDCOMID."]','", $selfam);
-	$selfam .= "[".$GEDCOMID."]'";
+	$selfam = implode("[".GedcomConfig::$GEDCOMID."]','", $selfam);
+	$selfam .= "[".GedcomConfig::$GEDCOMID."]'";
 	$selfam = "'".$selfam;
 	ListFunctions::GetFamList("no", $selfam);
 	
 	foreach($found_facts as $key=>$factarr) {
 		$datestamp = $factarr[3];
 		if ($factarr[2]=="INDI") {
-			$person =& Person::GetInstance($factarr[0], "", $GEDCOMID);
-			$fact = new Fact($factarr[0], $factarr[2], $GEDCOMID, $factarr[6], $factarr[1]);
+			$person =& Person::GetInstance($factarr[0], "", GedcomConfig::$GEDCOMID);
+			$fact = new Fact($factarr[0], $factarr[2], GedcomConfig::$GEDCOMID, $factarr[6], $factarr[1]);
 			$gid = $factarr[0];
 			$factrec = $factarr[1];
 			if ($person->disp && $fact->disp) {
@@ -111,7 +111,7 @@ function print_upcoming_events($block=true, $config="", $side, $index) {
 						if ($lastgid != "") print "<br />";
 						if ($NAME_REVERSE) $name = str_replace(",", "", $factarr[4]);
 						else $name = $factarr[4];
-						print "<a href=\"individual.php?pid=$gid&amp;gedid=".$GEDCOMID."\"><b>".$name."</b>";
+						print "<a href=\"individual.php?pid=$gid&amp;gedid=".GedcomConfig::$GEDCOMID."\"><b>".$name."</b>";
 						print "<img id=\"box-".$gid."-".$key."-sex\" src=\"".GM_IMAGE_DIR."/";
 						if ($factarr[5] == "M") print $GM_IMAGES["sex"]["small"]."\" title=\"".GM_LANG_male."\" alt=\"".GM_LANG_male;
 						else if ($factarr[5] == "F") print $GM_IMAGES["sexf"]["small"]."\" title=\"".GM_LANG_female."\" alt=\"".GM_LANG_female;
@@ -130,8 +130,8 @@ function print_upcoming_events($block=true, $config="", $side, $index) {
 		}
 
 		if ($factarr[2]=="FAM") {
-			$family =& Family::GetInstance($factarr[0], "", $GEDCOMID);
-			$fact = new Fact($factarr[0], $factarr[2], $GEDCOMID, $factarr[6], $factarr[1]);
+			$family =& Family::GetInstance($factarr[0], "", GedcomConfig::$GEDCOMID);
+			$fact = new Fact($factarr[0], $factarr[2], GedcomConfig::$GEDCOMID, $factarr[6], $factarr[1]);
 			if ($family->disp && $fact->disp) {
 				$text = FactFunctions::GetCalendarFact($fact, $action, $filter);
 				if ($text!="filter") {
