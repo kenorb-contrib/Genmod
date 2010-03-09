@@ -1632,7 +1632,7 @@ if (($action == "listusers") || ($action == "edituser2") || ($action == "deleteu
 			if ($user->verified == "Y") unset($users[$username]);
 		}
 		else if ($filter == "admunver") {
-			if (($user->verified_by_admin == "Y") || ($user->verified != "yes")) unset($users[$username]);
+			if (($user->verified_by_admin == "Y") || ($user->verified != "Y")) unset($users[$username]);
 		}
 		else if ($filter == "language") {
 			if ($user->language != $usrlang) unset($users[$username]);
@@ -1936,7 +1936,7 @@ if ($action == "cleanup") {
 			
 			// Check users not verified by admin
 			foreach($users as $key=>$user) {
-				if (($user->verified_by_admin!="yes") && ($user->verified == "Y")) {
+				if (($user->verified_by_admin!="Y") && ($user->verified == "Y")) {
 				?>
 				<div class="admin_item_box">
 					<div class="width30 choice_left wrap">
@@ -2067,7 +2067,7 @@ if ($action == "") {
 					if ((strtotime($user->comment_exp) != "-1") && (strtotime($user->comment_exp) < time("U"))) $warnusers++;
 				}
 			}
-			if (($user->verified_by_admin != "yes") && ($user->verified == "Y")) $nverusers++;
+			if (($user->verified_by_admin != "Y") && ($user->verified == "Y")) $nverusers++;
 			if ($user->verified != "Y") $applusers++;
 			if ($user->canadmin) $adminusers++;
 			foreach($user->gedcomadmin as $gedid=>$rights) {

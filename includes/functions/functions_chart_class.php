@@ -150,24 +150,11 @@ abstract class ChartFunctions {
 			if (!empty($treeid[$i])) {
 				print " ";
 				$person =& Person::GetInstance($treeid[$i]);
-				if (count($person->childfamilies) > 0) {
-					foreach($person->childfamilies as $famid => $family) {
-						if (is_object($family) && $family->showprimary) {
-							$wife = $family->wife;
-							$husb = $family->husb;
-							if (is_object($wife) || is_object($husb)) {
-								$parents = true;
-								$husb_id = $family->husb_id;
-								$wife_id = $family->wife_id;
-								break;
-							}
-						}
-					}
-	
-					if ($parents) {
-						$treeid[($i * 2)] = $husb_id; 	 // -- set father id
-						$treeid[($i * 2) + 1] = $wife_id; // -- set mother id
-					}
+				$family = $person->primaryfamily;
+				if ($person->childfamilies != "") {
+					$family =& Family::GetInstance($person->primaryfamily);
+					if ($family->husb_id != "") $treeid[($i * 2)] = $family->husb_id; 	 // -- set father id
+					if ($family->wife_id != "") $treeid[($i * 2) + 1] = $family->wife_id; // -- set mother id
 				}
 			}
 		}

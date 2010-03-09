@@ -38,7 +38,7 @@ $GM_BLOCKS["print_login_block"]["rss"]     		= false;
  * Prints a block allowing the user to login to the site directly from the portal
  */
 function print_login_block($block = true, $config="", $side, $index) {
-	global $pid, $command, $USE_REGISTRATION_MODULE, $ALLOW_REMEMBER_ME, $gm_user, $TEXT_DIRECTION;
+	global $pid, $command, $USE_REGISTRATION_MODULE, $ALLOW_REMEMBER_ME, $gm_user, $TEXT_DIRECTION, $GEDCOMS;
 	
 	if ((LOGIN_URL == "" && substr(SERVER_URL,0,5) != "https") || substr(LOGIN_URL,0,5) != "https") {
 		if (!empty($gm_user->username)) return;
@@ -73,7 +73,7 @@ function print_login_block($block = true, $config="", $side, $index) {
 		print "<input type=\"submit\" id=\"submitlogin\"  tabindex=\"23\" value=\"".GM_LANG_login."\" />&nbsp;";
 		print "</form>\n";
 		print "<br />";
-		if ($USE_REGISTRATION_MODULE){
+		if ($USE_REGISTRATION_MODULE && count($GEDCOMS) > 0){
 			PrintHelpLink("new_user_help", "qm", "no_account_yet");
 			print GM_LANG_no_account_yet;
 			print "<br />";

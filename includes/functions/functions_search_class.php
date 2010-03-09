@@ -620,10 +620,10 @@ abstract class SearchFunctions {
 			$i++;
 		}
 		$sql .= ")";
-*/		if (!empty($type)) $sql .= " AND d_fact IN ".$type;
+*/		if (!empty($type)) $sql .= " AND d_fact IN ('".$type."')";
 		if (!$allgeds) $sql .= " AND f_file='".GedcomConfig::$GEDCOMID."'";
 		$res = NewQuery($sql);
-		
+	
 		$select = array();
 		while($row = $res->FetchAssoc()){
 			if ($row["f_husb"] != "" && !Person::IsInstance(SplitKey($row["f_husb"], "id"), $row["f_file"])) $select[] = $row["f_husb"];
@@ -669,7 +669,7 @@ abstract class SearchFunctions {
 		$myindilist = array();
 		// From calendar, search for a year
 		if (!is_array($query)) { 
-			$sql = "SELECT DISTINCT(i_key), i_id, i_file, i_gedrec, i_isdead FROM ".TBLPREFIX."individuals INNER JOIN ".TBLPREFIX."dates on (d_key=i_key AND d_fact<>'CHAN') WHERE (d_year='".$query."' OR d_ext='BET')";
+			$sql = "SELECT DISTINCT i_key, i_id, i_file, i_gedrec, i_isdead FROM ".TBLPREFIX."individuals INNER JOIN ".TBLPREFIX."dates on (d_key=i_key AND d_fact<>'CHAN') WHERE (d_year='".$query."' OR d_ext='BET')";
 			if (!empty($type)) $sql .= " AND d_fact IN ".$type;
 		}
 		// Else from reports, we have a regexp query array
@@ -699,7 +699,7 @@ abstract class SearchFunctions {
 				$sql .= ")";
 			}
 		}
-//		print $sql;
+		print $sql;
 		$res = NewQuery($sql);
 		if ($res) {
 			while($row = $res->FetchAssoc()){
@@ -845,7 +845,7 @@ abstract class SearchFunctions {
 		
 		$sql .= "ORDER BY i_key, n_id";
 //		$sql .= "GROUP BY i_id ORDER BY d_year, d_month, d_day DESC";
-//print $sql;
+
 		$res = NewQuery($sql);
 		if ($res) {
 			$key = "";

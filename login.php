@@ -191,7 +191,7 @@ else {
 <?php
 $sessname = session_name();
 if (!isset($_COOKIE[$sessname]) && !isset($_COOKIE["gm_rem"])) print "<span class=\"error\">".GM_LANG_cookie_message."</span><br /><br />";
-if ($USE_REGISTRATION_MODULE) {?>
+if ($USE_REGISTRATION_MODULE && count($GEDCOMS) > 0) {?>
 	<table class="center facts_table width40">
 	<tr><td class="topbottombar" colspan="2"><?php print GM_LANG_account_information;?></td></tr>
 	<tr><td class="shade2 width40 <?php print $TEXT_DIRECTION; ?>"><?php PrintHelpLink("new_user_help", "qm", "requestaccount"); print GM_LANG_no_account_yet;?></td>
