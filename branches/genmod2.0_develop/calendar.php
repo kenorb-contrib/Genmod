@@ -573,10 +573,10 @@ if (($action=="today") || ($action=="year")) {
 		$selfacts = $filterev;
 		if (in_array($filterev, $famfacts)) {
 			$findindis = false;
-			$selfamfacts = $filterev;
+			$selfamfacts = "('".$filterev."')";
 		}
 		else {
-			$selindifacts = $filterev;
+			$selindifacts = "('".$filterev."')";
 			$findfams = false;
 		}
 	}
@@ -611,21 +611,25 @@ if (($action=="today") || ($action=="year")) {
 		if (GedcomConfig::$USE_RTL_FUNCTIONS) {
 //			$myindilist1 = SearchFunctions::SearchIndis($query);
 			if ($findindis) {
-				$myindilist1 = SearchFunctions::SearchIndis($year, false, "AND", $selindifacts);
+//				$myindilist1 = SearchFunctions::SearchIndis($year, false, "AND", $selindifacts);
+				$myindilist1 = SearchFunctions::SearchIndisDates($dd, $month, "", $selindifacts);
 				$myindilist = GmArrayMerge($myindilist, $myindilist1);
 			}
 		
 //			$myfamlist1 = SearchFunctions::SearchFams($query);
 			if ($findfams) {
-				$myfamlist1 = SearchFunctions::SearchFams($year, false, "AND", $selfamfacts);
+				$myfamlist1 = SearchFunctions::SearchFamsDates($dd, $month, "", $selfamfacts);
+//				$myfamlist1 = SearchFunctions::SearchFams($year, false, "AND", $selfamfacts);
 				$myfamlist = GmArrayMerge($myfamlist, $myfamlist1);
 			}
 		}
 		else {
 //			$myindilist = SearchFunctions::SearchIndis($query);
-			if ($findindis) $myindilist = SearchFunctions::SearchIndis($year, false, "AND", $selindifacts);
+//			if ($findindis) $myindilist = SearchFunctions::SearchIndis($year, false, "AND", $selindifacts);
+			if ($findindis) $myindilist = SearchFunctions::SearchIndisDates($dd, $month, "", $selindifacts);
 //			$myfamlist = SearchFunctions::SearchFams($query);
-			if ($findfams) $myfamlist = SearchFunctions::SearchFams($year, false, "AND", $selfamfacts);
+//			if ($findfams) $myfamlist = SearchFunctions::SearchFams($year, false, "AND", $selfamfacts);
+			if ($findfams) $myfamlist = SearchFunctions::SearchFamsDates($dd, $month, "", $selfamfacts);
         }
 
 		if (GedcomConfig::$USE_RTL_FUNCTIONS && isset($queryhb) && $action!="year") {
@@ -815,9 +819,8 @@ if (($action=="today") || ($action=="year")) {
 		foreach($myfamlist as $gid=>$fam) {
 			$display=true;
 			if ($filterof=="living") {
-				if (($fam->husb_id != "" && !$fam->husb->isdead) && ($fam->wifeid != "" && !$fam->wife->isdead)) {
-					$display = false;
-				}
+				if (($fam->husb_id != "" && !$fam->husb->isdead) && ($fam->wife_id != "" && !$fam->wife->isdead)) $display = true;
+				else $display = false;
 			}
   			if ($display) {
 				$filterout=false;
@@ -1070,7 +1073,7 @@ else if ($action=="calendar") {
 	$findfams = true;
 	if ($filterev == "bdm") $fact = "('BIRT', 'DEAT', 'MARR')";
 	else if ($filterev != "all" && !empty($filterev)) {
-		$fact = $filterev;
+		$fact = "('".$filterev."')";
 		if (in_array($filterev, $famfacts)) $findindis = false;
 		else $findfams = false;
 	}

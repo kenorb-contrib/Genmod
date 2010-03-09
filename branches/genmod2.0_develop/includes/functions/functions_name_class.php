@@ -561,6 +561,18 @@ abstract class NameFunctions {
 		// For now, we can only abbreviate 1 byte character strings
 		if (!utf8_isASCII($name)) return $name;
 		
+		// If the string length is ok, just return the name
+		
+		// Check for nicknames and remove them
+		if (GedcomConfig::$SHOW_NICK) {
+			$part = strstr($name, " ".substr(GedcomConfig::$NICK_DELIM, 0, 1));
+			if ($part) {
+				$name = str_replace($part, "", $name);
+				if (strlen($name) <= $length) return $name;
+			}
+		}
+		
+		// Continue with normal checking
 		$prevabbrev = false;
 		$words = preg_split("/ /", $name);
 		$name = $words[count($words)-1];

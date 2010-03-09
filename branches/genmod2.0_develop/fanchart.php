@@ -37,6 +37,7 @@ function PointLen($string) {
 	$len = 0;
 	$slen = strlen($string);
 	for ($i=0; $i<$slen; $i++) {
+		//print "cw: ".ord(substr($string, $i,1))." waarde ".$cw[ord(substr($string, $i,1))]."<br />";
 		$len += $cw[ord(substr($string, $i,1))];
 	}
 	return $len;
@@ -49,7 +50,7 @@ function PointLen($string) {
  * @param int $maxlen max length of each line
  * @return string $text output string
  */
-function split_align_text($data, $maxlen) {
+function SplitAlignText($data, $maxlen) {
 	global $RTLOrd;
 
 	$maxpoints = 554 * $maxlen;
@@ -57,7 +58,7 @@ function split_align_text($data, $maxlen) {
 	// more than 1 line : recursive calls
 	if (count($lines)>1) {
 		$text = "";
-		foreach ($lines as $indexval => $line) $text .= split_align_text($line, $maxlen)."\r\n";
+		foreach ($lines as $indexval => $line) $text .= SplitAlignText($line, $maxlen)."\r\n";
 		return $text;
 	}
 	// process current line word by word
@@ -71,30 +72,31 @@ function split_align_text($data, $maxlen) {
     	if (strpos($data, chr($ord)) !== false) $found=true;
 	}
 	if ($found) $line=$data;
-	else
-	foreach ($split as $indexval => $word) {
-		$len = PointLen($line);
-		//if (!empty($line) and ord($line{0})==215) $len/=2; // hebrew text
-		$wlen = PointLen($word);
-		// line too long ?
-		if (($len+$wlen)<$maxpoints) {
-			if (!empty($line)) $line .= " ";
-			$line .= $word;
-		}
-		else {
-			if (!empty($line)) {
-				$text .= "$line\r\n";
+	else {
+		foreach ($split as $indexval => $word) {
+			$len = PointLen($line);
+			//if (!empty($line) and ord($line{0})==215) $len/=2; // hebrew text
+			$wlen = PointLen($word);
+			// line too long ?
+			if (($len + $wlen) < $maxpoints) {
+				if (!empty($line)) $line .= " ";
+				$line .= $word;
 			}
-			$line = $word;
+			else {
+				if (!empty($line)) {
+					$text .= "$line\r\n";
+				}
+				$line = $word;
+			}
 		}
 	}
 	// last line
 	if (!empty($line)) {
 		$len = Pointlen($line);
 		$extra = max(0,floor(($maxpoints - $len)/2));
-		print "puntlengte: ".$len." extra: ".$extra." ";
+//		print "puntlengte: ".$len." extra: ".$extra." ";
 		while ($extra > 0) {
-			$line = " ".$line;
+			$line = " ".$line." ";
 			$len = Pointlen($line);
 			$extra = max(0,floor(($maxpoints - $len)/2));
 		}
@@ -110,7 +112,7 @@ function split_align_text($data, $maxlen) {
  * @param int $fanw fan width in px (default=640)
  * @param int $fandeg fan size in deg (default=270)
  */
-function print_fan_chart($treeid, $fanw=640, $fandeg=270) {
+function PrintFanChart($treeid, $fanw=640, $fandeg=270) {
 	global $PEDIGREE_GENERATIONS, $fan_width, $fan_style, $cw, $fontsize;
 	global $name, $view, $TEXT_DIRECTION;
 	global $gm_user;
@@ -155,10 +157,10 @@ function print_fan_chart($treeid, $fanw=640, $fandeg=270) {
 	}
 	if (intval($fontsize)<2) $fontsize = 7;
 	else $fontsize = intval($fontsize);
-print "Fontsize: ".$fontsize."<br />";
-print "Fontfile: ".basename($fontfile)."<br />";
+//print "Fontsize: ".$fontsize."<br />";
+//print "Fontfile: ".basename($fontfile)."<br />";
 $ff = explode(".", basename($fontfile));
-print_r($ff);
+//print_r($ff);
 require_once("fonts/".$ff[0].".php");
 	print "\r\n<!-- trace start\r\n font-family\t=\t$fontfile\r\n font-size\t=\t$fontsize\r\n-->";
 
@@ -213,7 +215,7 @@ require_once("fonts/".$ff[0].".php");
 	if (!empty($gm_user->gedcomid[GedcomConfig::$GEDCOMID])) $reltome=true;
 
 	// loop to create fan cells
-	while ($gen>=0) {
+	while ($gen >= 0) {
 		// clean current generation area
 		$deg2=360+($fandeg-180)/2;
 		$deg1=$deg2-$fandeg;
@@ -221,62 +223,49 @@ require_once("fonts/".$ff[0].".php");
 		$rx-=3;
 
 		// calculate new angle
-		$p2=pow(2, $gen);
-		$angle=$fandeg/$p2;
-		$deg2=360+($fandeg-180)/2;
-		$deg1=$deg2-$angle;
+		$p2 = pow(2, $gen);
+		$angle = $fandeg/$p2;
+		$deg2 = 360 + ($fandeg - 180)/2;
+		$deg1 = $deg2 - $angle;
 		// special case for rootid cell
-		if ($gen==0) {
-			$deg1=90;
-			$deg2=360+$deg1;
+		if ($gen == 0) {
+			$deg1 = 90;
+			$deg2 = 360 + $deg1;
 		}
 
 		// draw each cell
 		while ($sosa >= $p2) {
-			$pid=$treeid[$sosa];
+			$pid = $treeid[$sosa];
 			if (!empty($pid)) {
-				$indirec=FindPersonRecord($pid);
+				$person =& Person::GetInstance($pid);
 
 				if ($sosa%2) $bg=$bgcolorF;
 				else $bg=$bgcolorM;
 				if ($sosa==1) {
 					$bg=$bgcolor; // sex unknown
-					if (preg_match("/1 SEX F/", $indirec)>0) $bg=$bgcolorF;
-					else if (preg_match("/1 SEX M/", $indirec)>0) $bg=$bgcolorM;
+					if ($person->sex == "F") $bg=$bgcolorF;
+					else if ($person->sex == "M") $bg=$bgcolorM;
 				}
-				print "<br />Arc: cx: ".$cx." cy: ".$cy." rx: ".$rx." ";
+//				print "<br />Arc: cx: ".$cx." cy: ".$cy." rx: ".$rx." ";
 				ImageFilledArc($image, $cx, $cy, $rx, $rx, $deg1, $deg2, $bg, IMG_ARC_PIE);
+//				print "deg1 ".$deg1. " deg2 ".$deg2." rx ".$rx." ";
 				$maxpix = sin(deg2rad($deg2-$deg1))*$rx/2;
-				print "strlen kan: ".$maxpix." ";
-				if (!PrivacyFunctions::showLivingNameByID($pid)) {
-					$name = GM_LANG_private;
-					$addname = "";
-				}
-				else {
-					$name = GetPersonName($pid);
-					$addname = GetAddPersonName($pid);
-				}
+				if ($gen == 0) $maxpix = $rx;
+//				print "strlen kan: ".$maxpix." ";
+				$name = $person->name;
+				$addname = $person->addname;
 
-				$wmax = floor($angle*7/$fontsize*$scale);
-				$wmax = min($wmax, 35*$scale);
-				if ($gen==0) $wmax = min($wmax, 17*$scale);
+				$wmax = floor(($scale * $angle * 7) /$fontsize);
+//				if ($gen == 0) $wmax = min($wmax, 17*$scale);
+//				else $wmax = min($wmax, 35*$scale);
 $wmax = floor($maxpix/$fontsize);				
 				
-				$altname = $name; // Full name for alt
 				$name = NameFunctions::AbbreviateName($name, $wmax);
-print " ".strlen($altname)." ".$wmax." ".$name." ";
+//print " ".strlen($name)." ".$wmax." ".$name."<br />";
 				$text = ltr_string($name) . "\r\n" . ltr_string($addname). "\r\n";
-				if (PrivacyFunctions::displayDetailsByID($pid)) {
-					$birthrec = GetSubRecord(1, "1 BIRT", $indirec);
-					if (!PrivacyFunctions::FactViewRestricted($pid, $birthrec)) {
-						$ctb = preg_match("/2 DATE.*(\d\d\d\d)/", $birthrec, $matchb);
-					}
-					else $ctb=0;
-					$deathrec = GetSubRecord(1, "1 DEAT", $indirec);
-					if (!PrivacyFunctions::FactViewRestricted($pid, $deathrec)) {
-						$ctd = preg_match("/2 DATE.*(\d\d\d\d)/", $deathrec, $matchd);
-					}
-					else $ctd=0;
+				if ($person->disp) {
+					$ctb = preg_match("/2 DATE.*(\d\d\d\d)/", $person->brec, $matchb);
+					$ctd = preg_match("/2 DATE.*(\d\d\d\d)/", $person->drec, $matchd);
 					if ($ctb > 0 || $ctd > 0) {
 						if ($ctb>0) $text .= trim($matchb[1]);
 						$text .= "-";
@@ -287,7 +276,7 @@ print " ".strlen($altname)." ".$wmax." ".$name." ";
 				$text = strip_tags($text);
 
 				// split and center text by lines
-				$text = split_align_text($text, $wmax);
+				$text = SplitAlignText($text, $wmax);
 
 				// text angle
 				$tangle = 270-($deg1+$angle/2);
@@ -303,18 +292,18 @@ print " ".strlen($altname)." ".$wmax." ".$name." ";
 				if ($gen==0) $deg=180;
 				$rad=deg2rad($deg);
 				$mr=($rx-$rw/4)/2;
-				print "textwidth: ".$textwidth." mr: ".$mr." center x: ".$cx." center y: ".$cy;
-				print "degree: ".$deg." tangle: ".$tangle." correctie x: ".(-$maxpix*cos(deg2rad($tangle))/2);
+//				print "textwidth: ".$textwidth." mr: ".$mr." center x: ".$cx." center y: ".$cy;
+//				print "degree: ".$deg." tangle: ".$tangle." correctie x: ".(-$maxpix*cos(deg2rad($tangle))/2);
 //				if ($gen>0 and $deg2-$deg1>80) $mr=$rx/2;
-				$tx=$cx + ($mr) * cos($rad);
-				$ty=$cy - $mr * -sin($rad);
+				$tx = $cx + ($mr) * cos($rad);
+				$ty = $cy - $mr * -sin($rad);
 				if ($sosa==1) $ty-=$mr/2;
 //$tx = $tx + ($maxpix-$textwidth)*cos(deg2rad($tangle))/2;
 //$ty = $ty - ($maxpix-$textwidth)*sin(deg2rad($tangle))/2;
 
 				// print text
 				ImageTtfText($image, (double)$fontsize, $tangle, $tx, $ty, $color, $fontfile, $text);
-
+				
 				$imagemap .= "\r\n<area shape=\"poly\" coords=\"";
 				// plot upper points
 				$mr=$rx/2;
@@ -344,99 +333,74 @@ print " ".strlen($altname)." ".$wmax." ".$name." ";
 				$ty=round($cy - $mr * -sin($rad));
 				$imagemap .= "$tx, $ty";
 				// NOTE remove this line after fixing JS links
-				$imagemap .= "\"";
+//				$imagemap .= "\"";
 				// TODO: Fix JavaScript links
-				/**
 				// add action url
-				$url = "javascript:// " . PrintReady(strip_tags($name));
-				if (GedcomConfig::$SHOW_ID_NUMBERS) $url .= " (".$pid.")";
+				$url = "javascript:// " . PrintReady(strip_tags($person->name.$person->addxref));
 				$imagemap .= "\" href=\"$url\" ";
-				$url = "?rootid=$pid&amp;PEDIGREE_GENERATIONS=$PEDIGREE_GENERATIONS&amp;fan_width=$fan_width&amp;fan_style=$fan_style";
+				$url = "?rootid=".$person->xref."&amp;PEDIGREE_GENERATIONS=$PEDIGREE_GENERATIONS&amp;fan_width=$fan_width&amp;fan_style=$fan_style";
 				if (!empty($view)) $url .= "&amp;view=$view";
-				**/
 				$count=0;
+				$mousecode = " onmouseover=\"clear_family_box_timeout('".$person->xref.".".$count."');\" onmouseout=\"family_box_timeout('".$person->xref.".".$count."');\"";
 				$lbwidth=200;
-				
-				print "\n\t\t<div id=\"I".$pid.".".$count."links\" style=\"position:absolute; >";
-				print "left:".$tx."px; top:".$ty."px; width: ".($lbwidth)."px; visibility:hidden; z-index:'100';\">";
-				/**
+//print "tx: ".$tx." ty ".$ty."<br />";				
+				print "\n\t\t<div id=\"I".$person->xref.".".$count."links\" style=\"position:absolute; left:".$tx."px; top:".$ty."px; width:".$lbwidth."px; visibility:hidden; z-index:'1000';\">";
+
 				print "\n\t\t\t<table class=\"person_box\"><tr><td class=\"details1\">";
-				print "<a href=\"individual.php?pid=$pid\" class=\"name1\">" . PrintReady($name);
-				if (!empty($addname)) print "<br />" . PrintReady($addname);
+				print "<a href=\"individual.php?pid=".$person->xref."&amp;gedid=".GedcomConfig::$GEDCOMID."\"".$mousecode." class=\"name1\">" . PrintReady($person->name);
+				if (!empty($person->addname)) print "<br />" . PrintReady($person->addname);
 				print "</a>\n";
-				print "<br /><a href=\"pedigree.php?rootid=$pid\" >".GM_LANG_index_header."</a>\n";
-				print "<br /><a href=\"descendancy.php?rootid=$pid\" >".GM_LANG_descend_chart."</a>\n";
-				if ($reltome)  print "<br /><a href=\"relationship.php?pid1=".$tuser->gedcomid[GedcomConfig::$GEDCOMID]."&amp;pid2=".$pid."&amp;ged=GedcomConfig::$GEDCOMID\" onmouseover=\"clear_family_box_timeout('".$pid.".".$count."');\" onmouseout=\"family_box_timeout('".$pid.".".$count."');\">".GM_LANG_relationship_to_me."</a>\n";
-				print "<br /><a href=\"ancestry.php?rootid=$pid\" onmouseover=\"clear_family_box_timeout('".$pid.".".$count."');\" onmouseout=\"family_box_timeout('".$pid.".".$count."');\">".GM_LANG_ancestry_chart."</a>\n";
-				print "<br /><a href=\"fanchart.php?rootid=$pid&amp;PEDIGREE_GENERATIONS=$PEDIGREE_GENERATIONS&amp;fan_width=$fan_width&amp;fan_style=$fan_style\" onmouseover=\"clear_family_box_timeout('".$pid.".".$count."');\" onmouseout=\"family_box_timeout('".$pid.".".$count."');\">".GM_LANG_fan_chart."</a>\n";
-				print "<br /><a href=\"hourglass.php?pid=$pid\" onmouseover=\"clear_family_box_timeout('".$pid.".".$count."');\" onmouseout=\"family_box_timeout('".$pid.".".$count."');\">".GM_LANG_hourglass_chart."</a>\n";
-				**/
+				print "<br /><a href=\"pedigree.php?rootid=".$person->xref."&amp;gedid=".GedcomConfig::$GEDCOMID."\"".$mousecode.">".GM_LANG_index_header."</a>\n";
+				print "<br /><a href=\"descendancy.php?rootid=".$person->xref."&amp;gedid=".GedcomConfig::$GEDCOMID."\"".$mousecode.">".GM_LANG_descend_chart."</a>\n";
+				if ($reltome)  print "<br /><a href=\"relationship.php?pid1=".$gm_user->gedcomid[GedcomConfig::$GEDCOMID]."&amp;pid2=".$person->xref."&amp;gedid=".GedcomConfig::$GEDCOMID."\"".$mousecode.">".GM_LANG_relationship_to_me."</a>\n";
+				print "<br /><a href=\"ancestry.php?rootid=".$person->xref."&amp;gedid=".GedcomConfig::$GEDCOMID."\"".$mousecode.">".GM_LANG_ancestry_chart."</a>\n";
+				print "<br /><a href=\"fanchart.php?rootid=".$person->xref."&amp;gedid=".GedcomConfig::$GEDCOMID."&amp;PEDIGREE_GENERATIONS=".$PEDIGREE_GENERATIONS."&amp;fan_width=".$fan_width."&amp;fan_style=".$fan_style."\"".$mousecode.">".GM_LANG_fan_chart."</a>\n";
+				print "<br /><a href=\"hourglass.php?pid=".$person->xref."&amp;gedid=".GedcomConfig::$GEDCOMID."\"".$mousecode.">".GM_LANG_hourglass_chart."</a>\n";
+
 				if ($sosa>=1) {
-					$famids = FindSfamilyIds($pid);
-					//-- make sure there is more than 1 child in the family with parents
-					$cfamids = FindFamilyIds($pid);
 					$num=0;
-					for ($f=0; $f<count($cfamids); $f++) {
-						$famrec = FindFamilyRecord($cfamids[$f]["famid"]);
-						if ($famrec) $num += preg_match_all("/1\s*CHIL\s*@(.*)@/", $famrec, $smatch,PREG_SET_ORDER);
+					foreach($person->childfamilies as $key => $childfamily) {
+						$num += $childfamily->children_count;
 					}
-					if ($famids ||($num>1)) {
+					if (count($person->spousefamilies) > 0 || $num > 1) {
 						//-- spouse(s) and children
-						for ($f=0; $f<count($famids); $f++) {
-							$famrec = FindFamilyRecord(trim($famids[$f]["famid"]));
-							if ($famrec) {
-								$parents = FindParents($famids[$f]["famid"]);
-								if($parents) {
-									if ($pid!=$parents["HUSB"]) $spid=$parents["HUSB"];
-									else $spid=$parents["WIFE"];
-//									if (!empty($spid)) {
-//										$linkurl=str_replace("id=".$pid, "id=".$spid, $url);
-										// TODO: Fix links
-										//print "\n<br /><a href=\"$linkurl\" class=\"name1\">";
-										//if (displayDetailsById($spid) || showLivingNameById($spid)) print PrintReady(rtrim(GetPersonName($spid)));
-										//else print GM_LANG_private;
-										//print "</a>";
-//									}
-								}
-//								$num = preg_match_all("/1\s*CHIL\s*@(.*)@/", $famrec, $smatch,PREG_SET_ORDER);
-//								for ($i=0; $i<$num; $i++) {
-//									$cpid = $smatch[$i][1];
-//									$linkurl=str_replace("id=".$pid, "id=".$cpid, $url);
+						foreach($person->spousefamilies as $key2 => $spfamily) {
+							if($spfamily->husb_id != "" && $spfamily->wife_id != "") {
+								if ($person->xref != $spfamily->husb_id) $spid = $spfamily->husb_id;
+								else $spid = $spfamily->wife_id;
+								$linkurl = str_replace("id=".$person->xref, "id=".$spid, $url);
 									// TODO: Fix links
-									// print "\n<br />&nbsp;&nbsp;<a href=\"$linkurl\" class=\"name1\">&lt; ";
-									//if (displayDetailsById($cpid) || showLivingNameById($cpid)) print PrintReady(rtrim(GetPersonName($cpid)));
-									//else print GM_LANG_private;
-									//print "</a>";
-//								}
+								print "\n<br /><a href=\"".$linkurl."\"".$mousecode." class=\"name1\">";
+								print ($spid == $spfamily->husb_id ? $spfamily->husb->name : $spfamily->wife->name);
+								print "</a>";
+							}
+							foreach ($spfamily->children as $key3 => $child) {
+								$linkurl=str_replace("id=".$person->xref, "id=".$child->xref, $url);
+								print "\n<br />&nbsp;&nbsp;<a href=\"$linkurl\"".$mousecode." class=\"name1\">&lt; ";
+								print $child->name;
+								print "</a>";
 							}
 						}
 						//-- siblings
-						for ($f=0; $f<count($cfamids); $f++) {
-							$famrec = FindFamilyRecord($cfamids[$f]["famid"]);
-							if ($famrec) {
-								$num = preg_match_all("/1\s*CHIL\s*@(.*)@/", $famrec, $smatch,PREG_SET_ORDER);
-								if ($num>1) print "\n<br /><span class=\"name1\">".GM_LANG_siblings."</span>";
-								for($i=0; $i<$num; $i++) {
-									$cpid = $smatch[$i][1];
-									if ($cpid!=$pid) {
-//										$linkurl=str_replace("id=".$pid, "id=".$cpid, $url);
+						foreach($person->childfamilies as $key => $chfamily) {
+							if ($chfamily->children_count > 1) print "\n<br /><span class=\"name1\">".GM_LANG_siblings."</span>";
+							foreach ($chfamily->children as $key2 => $child) {
+								if ($child->xref != $person->xref) {
+									$linkurl = str_replace("id=".$person->xref, "id=".$child->xref, $url);
 										// TODO: Fix links
-										//print "\n<br />&nbsp;&nbsp;<a href=\"$linkurl\" class=\"name1\"> ";
-										//if (displayDetailsById($cpid) || showLivingNameById($cpid)) print PrintReady(rtrim(GetPersonName($cpid)));
-										//else print GM_LANG_private;
-										//print "</a>";
-									}
+									print "\n<br />&nbsp;&nbsp;<a href=\"$linkurl\"".$mousecode." class=\"name1\"> ";
+									print $child->name.$child->addxref;
+									print "</a>";
 								}
 							}
 						}
 					}
 				}
-//				print "</td></tr></table>\n\t\t";
+				print "</td></tr></table>\n\t\t";
 				print "</div>";
-				// TODO: Fix JavaScript
-				//$imagemap .= " onclick=\"show_family_box('".$pid.".".$count."', 'relatives'); return false;\"";
-				//$imagemap .= " onmouseout=\"family_box_timeout('".$pid.".".$count."'); return false;\"";
-				$imagemap .= " alt=\"".PrintReady(strip_tags($altname))."\" title=\"".PrintReady(strip_tags($name))."\" />";
+				$imagemap .= " onclick=\"show_family_box('".$person->xref.".".$count."', 'relatives'); return false;\"";
+				$imagemap .= " onmouseout=\"family_box_timeout('".$person->xref.".".$count."'); return false;\"";
+				$imagemap .= " alt=\"".PrintReady(strip_tags($person->name))."\" title=\"".PrintReady(strip_tags($person->name))."\" />";
 			}
 			$deg1-=$angle;
 			$deg2-=$angle;
@@ -500,26 +464,20 @@ if (!isset($fan_width)) $fan_width = "100";
 $fan_width=max($fan_width, 50);
 $fan_width=min($fan_width, 300);
 
-if (PrivacyFunctions::showLivingNameByID($rootid)) {
-	$name = GetPersonName($rootid);
-	$addname = GetAddPersonName($rootid);
-}
-else {
-	$name = GM_LANG_private;
-	$addname = "";
-}
+$person =& Person::GetInstance($rootid);
+
 // -- print html header information
-$title = PrintReady($name);
+$title = PrintReady($person->name);
 if (GedcomConfig::$SHOW_ID_NUMBERS) $title .= " - ".$rootid;
 $title .= " - ".GM_LANG_fan_chart;
 PrintHeader($title);
-if (strlen($name)<30) $cellwidth="420";
-else $cellwidth=(strlen($name)*14);
+if (strlen($person->name)<30) $cellwidth="420";
+else $cellwidth=(strlen($person->name)*14);
 print "\n\t<table class=\"list_table $TEXT_DIRECTION\"><tr><td width=\"${cellwidth}\" valign=\"top\">\n\t\t";
 if ($view == "preview") print "<h3>" . str_replace("#PEDIGREE_GENERATIONS#", ConvertNumber($PEDIGREE_GENERATIONS), GM_LANG_gen_fan_chart) . ":";
 else print "<h3>" . GM_LANG_fan_chart . ":";
-print "<br />".PrintReady($name);
-if ($addname != "") print "<br />" . PrintReady($addname);
+print "<br />".PrintReady($person->name);
+if ($person->addname != "") print "<br />" . PrintReady($person->addname);
 print "</h3>";
 
 // -- print the form to change the number of displayed generations
@@ -573,7 +531,6 @@ if ($view != "preview") {
 	PrintHelpLink("PEDIGREE_GENERATIONS_help", "qm");	
 	print GM_LANG_generations."</td>";
 	print "<td class=\"shade1\">";
-//	print "<input type=\"text\" name=\"PEDIGREE_GENERATIONS\" size=\"3\" value=\"$OLD_PGENS\" /> ";
 	print "<select name=\"PEDIGREE_GENERATIONS\">";
 	for ($i=2; $i<=GedcomConfig::$MAX_PEDIGREE_GENERATIONS; $i++) {
 	print "<option value=\"".$i."\"";
@@ -601,7 +558,8 @@ else {
 print "</td></tr></table>";
 
 $treeid = ChartFunctions::AncestryArray($rootid, $PEDIGREE_GENERATIONS);
-print_fan_chart($treeid, 640*$fan_width/100, $fan_style*90);
+
+PrintFanChart($treeid, 640*$fan_width/100, $fan_style*90);
 
 PrintFooter();
 ?>

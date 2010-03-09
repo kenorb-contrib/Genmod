@@ -328,7 +328,7 @@ switch ($action) {
 						if ($language_settings[$key]["gm_lang_use"]) {
 							print "\n\t\t\t<option value=\"$key\"";
 							if ($key == $thislang) print " selected=\"selected\"";
-							print ">" . constant("GM_LANG_lang_name".$key) . "</option>";
+							print ">" . constant("GM_LANG_lang_name_".$key) . "</option>";
 					    }
 					}
 					print "</select>\n\t\t";

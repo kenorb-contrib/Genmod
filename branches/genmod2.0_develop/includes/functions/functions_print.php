@@ -45,7 +45,7 @@ if (stristr($_SERVER["SCRIPT_NAME"],basename(__FILE__))) {
 function PrintHeader($title, $head="",$use_alternate_styles=true) {
 	global $bwidth;
 	global $BROWSERTYPE, $indilist, $INDILIST_RETRIEVED;
-	global $view;
+	global $view, $gm_user;
 	global $GEDCOMS;
 	global $QUERY_STRING, $action, $query, $changelanguage,$theme_name;
 	global $GM_IMAGES, $TEXT_DIRECTION, $ONLOADFUNCTION, $SHOW_SOURCES;
@@ -251,6 +251,7 @@ var whichhelp = 'help_<?php print basename(SCRIPT_NAME)."&amp;action=".$action; 
 //-->
 </script>
 <script src="genmod.js" language="JavaScript" type="text/javascript"></script>
+<?php if ($gm_user->canedit) { ?><script src="genmod_edit.js" language="JavaScript" type="text/javascript"></script><?php } ?>
 <script src="gmrpc.js" language="JavaScript" type="text/javascript"></script>
 <?php if (USE_GREYBOX) { ?>
 <script type="text/javascript">
@@ -307,7 +308,7 @@ var whichhelp = 'help_<?php print basename(SCRIPT_NAME)."&amp;action=".$action; 
  * @param boolean $use_alternate_styles
  */
 function PrintSimpleHeader($title) {
-	 global $view;
+	 global $view, $gm_user;
 	 global $QUERY_STRING, $action, $query, $changelanguage;
 	 global $TEXT_DIRECTION, $GEDCOMS, $GM_IMAGES;
 	 
@@ -393,6 +394,7 @@ function PrintSimpleHeader($title) {
 	//-->
 	</script>
 	<script src="genmod.js" language="JavaScript" type="text/javascript"></script>
+	<?php if ($gm_user->canedit) { ?><script src="genmod_edit.js" language="JavaScript" type="text/javascript"></script><?php } ?>
 	<script src="gmrpc.js" language="JavaScript" type="text/javascript"></script>
 	<?php if (USE_GREYBOX) { ?>
 		<script type="text/javascript">

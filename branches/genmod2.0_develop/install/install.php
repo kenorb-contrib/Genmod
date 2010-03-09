@@ -405,8 +405,8 @@ if ($step == 4) {
 		$user["gedcomid"] = array();
 		$user["canadmin"]=true;
 		$user["email"]=$emailadress;
-		$user["verified"] = "yes";
-		$user["verified_by_admin"] = "yes";
+		$user["verified"] = "Y";
+		$user["verified_by_admin"] = "Y";
 		$user["theme"] = "";
 		$user["theme"] = "Y";
 		$user["language"] = "english";

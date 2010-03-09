@@ -39,7 +39,7 @@ $GM_BLOCKS["print_quickstart_block"]["rss"]       	= false;
  * Prints a block allowing the user to login to the site directly from the portal
  */
 function print_quickstart_block($block = true, $config="", $side, $index) {
-	global $command, $gm_user, $TEXT_DIRECTION, $GM_IMAGES, $ALLOW_CHANGE_GEDCOM, $GM_BLOCKS;
+	global $command, $gm_user, $TEXT_DIRECTION, $GM_IMAGES, $ALLOW_CHANGE_GEDCOM, $GM_BLOCKS, $GEDCOMS;
 	
 	if (empty($config)) $config = $GM_BLOCKS["print_quickstart_block"]["config"];
 	if (!isset($config['search_all_geds'])) $config = $GM_BLOCKS["print_quickstart_block"]["config"];
@@ -78,7 +78,7 @@ function print_quickstart_block($block = true, $config="", $side, $index) {
 	if ($ALLOW_CHANGE_GEDCOM && $config["search_all_geds"] == "yes") print "?allgeds=yes";
 	print "\">".GM_LANG_qs_findfam."</a><br />";
 	print "<a href=\"calendar.php\">".GM_LANG_qs_calendar."</a><br />";
-	if ($gm_user->username == "") {
+	if ($gm_user->username == "" && count($GEDCOMS) > 0) {
 		print "<a href=\"login.php\">".GM_LANG_qs_login."</a><br />";
 		print "<a href=\"login_register.php?action=register\">".GM_LANG_requestaccount."</a><br />";
 	}
