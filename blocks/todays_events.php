@@ -99,7 +99,7 @@ function print_todays_events($block=true, $config="", $side, $index) {
 			$gid = $factarr[0];
 			$factrec = $factarr[1];
 			if ($person->disp && $fact->disp) {
-				$text = FactFunctions::GetCalendarFact($fact, $action, $filter);
+				$text = FactFunctions::GetCalendarFact($fact, $action, $filter, "all", GetCurrentYear(), GetCurrentMonth(), GetCurrentDay());
 				if ($text != "filter") {
 					if ($lastgid != $gid) {
 						if ($lastgid != "") print "<br />";
@@ -127,7 +127,7 @@ function print_todays_events($block=true, $config="", $side, $index) {
 			$family =& Family::GetInstance($factarr[0], "", GedcomConfig::$GEDCOMID);
 			$fact = new Fact($factarr[0], $factarr[2], GedcomConfig::$GEDCOMID, $factarr[6], $factarr[1]);
 			if ($family->disp && $fact->disp) {
-				$text = FactFunctions::GetCalendarFact($fact, $action, $filter);
+				$text = FactFunctions::GetCalendarFact($fact, $action, $filter, "all", GetCurrentYear(), GetCurrentMonth(), GetCurrentDay());
 				if ($text!="filter") {
 					if ($lastgid!=$factarr[0]) {
 						if ($lastgid != "") print "<br />";

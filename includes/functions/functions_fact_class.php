@@ -1314,9 +1314,8 @@ abstract class FactFunctions {
 	 * @param string $filterev "all" to show all events; "bdm" to show only Births, Deaths, Marriages; Event code to show only that event
 	 * @return string a html text string that can be printed
 	 */
-	public function GetCalendarFact($factobj, $action, $filterof, $filterev="all") {
-		global $year, $month, $day, $TEMPLE_CODES, $monthtonum, $TEXT_DIRECTION, $caltype;
-		global $CalYear, $currhYear;
+	public function GetCalendarFact($factobj, $action, $filterof, $filterev="all", $year="", $month="", $day="", $CalYear="", $currhYear="") {
+		global $TEMPLE_CODES, $monthtonum, $TEXT_DIRECTION, $caltype;
 		
 		$Upcoming = false;
 		if ($action == "upcoming") {
@@ -1390,7 +1389,7 @@ abstract class FactFunctions {
 					if ($yt2>0) {
 						if (isset($monthtonum[strtolower(trim($bmatch[1]))])) {
 							$emonth = $monthtonum[strtolower(trim($bmatch[1]))];
-							if (!$Upcoming && ($emonth<$monthtonum[strtolower($month)])) $age--;
+							if (!$Upcoming && ($emonth < $monthtonum[strtolower($month)])) $age--;
 							$bt = preg_match("/(\d+) ... (\d\d\d\d|\d\d\d)/", $match[1], $bmatch);
 							if ($bt>0) {
 								$edate = trim($bmatch[1]);
