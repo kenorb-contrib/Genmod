@@ -613,17 +613,10 @@ abstract class SearchFunctions {
 		$sql = "SELECT DISTINCT f_key, f_id, f_husb, f_wife, f_file, f_gedrec FROM ".TBLPREFIX."families INNER JOIN ".TBLPREFIX."dates ON (d_key=f_key AND d_fact<>'CHAN') WHERE";
 		if ($endyear > $startyear) $sql .= " d_year>='".$startyear."' AND d_year<='".$endyear."'";
 		else $sql .= " d_year=".$startyear;
-/*		$i=$startyear;
-		while($i <= $endyear) {
-			if ($i > $startyear) $sql .= " OR ";
-			$sql .= "f_gedrec REGEXP '".DbLayer::EscapeQuery("2 DATE[^\n]* ".$i)."'";
-			$i++;
-		}
-		$sql .= ")";
-*/		if (!empty($type)) $sql .= " AND d_fact IN ('".$type."')";
+		if (!empty($type)) $sql .= " AND d_fact IN ".$type;
 		if (!$allgeds) $sql .= " AND f_file='".GedcomConfig::$GEDCOMID."'";
 		$res = NewQuery($sql);
-	
+
 		$select = array();
 		while($row = $res->FetchAssoc()){
 			if ($row["f_husb"] != "" && !Person::IsInstance(SplitKey($row["f_husb"], "id"), $row["f_file"])) $select[] = $row["f_husb"];
@@ -684,10 +677,7 @@ abstract class SearchFunctions {
 			$sql .= ")";
 		}
 		
-/*		if (!is_array($query)) $sql = "SELECT i_key, i_id, i_file, i_gedrec, i_isdead FROM ".TBLPREFIX."individuals WHERE (i_gedrec REGEXP '".DbLayer::EscapeQuery($query)."')";
-		else {
-		}
-*/		if (!$allgeds) $sql .= " AND i_file='".GedcomConfig::$GEDCOMID."'";
+		if (!$allgeds) $sql .= " AND i_file='".GedcomConfig::$GEDCOMID."'";
 	
 		if ((is_array($allgeds)) && (count($allgeds) != 0)) {
 			if (count($allgeds) != count($GEDCOMS)) {
@@ -699,7 +689,6 @@ abstract class SearchFunctions {
 				$sql .= ")";
 			}
 		}
-		print $sql;
 		$res = NewQuery($sql);
 		if ($res) {
 			while($row = $res->FetchAssoc()){
@@ -818,25 +807,6 @@ abstract class SearchFunctions {
 			$and = " AND";
 		}
 
-/*		if (!empty($fact)) {
-			$sql .= "AND (";
-			$facts = preg_split("/[,:; ]/", $fact);
-			$i=0;
-			foreach($facts as $fact) {
-				if ($i!=0) $sql .= " OR ";
-				$ct = preg_match("/!(\w+)/", $fact, $match);
-				if ($ct > 0) {
-					$fact = $match[1];
-					$sql .= "d_fact!='".DbLayer::EscapeQuery($fact)."'";
-				}
-				else {
-					$sql .= "d_fact='".DbLayer::EscapeQuery($fact)."'";
-				}
-				$i++;
-			}
-			$sql .= ") ";
-		}
-*/		
 		if (!$allgeds) {
 			$sql .= $and." d_file='".GedcomConfig::$GEDCOMID."'";
 			$and = " AND";
@@ -844,7 +814,6 @@ abstract class SearchFunctions {
 		if (!empty($fact)) $sql .= $and." d_fact IN ".$fact;
 		
 		$sql .= "ORDER BY i_key, n_id";
-//		$sql .= "GROUP BY i_id ORDER BY d_year, d_month, d_day DESC";
 
 		$res = NewQuery($sql);
 		if ($res) {
@@ -890,25 +859,8 @@ abstract class SearchFunctions {
 		if (!empty($year)) $sql .= " AND d_year='".DbLayer::EscapeQuery($year)."'";
 		if (!empty($fact)) {
 			$sql .= " AND d_fact IN ".$fact;
-/*			$sql .= "AND (";
-			$facts = preg_split("/[,:; ]/", $fact);
-			$i=0;
-			foreach($facts as $fact) {
-				if ($i!=0) $sql .= " OR ";
-				$ct = preg_match("/!(\w+)/", $fact, $match);
-				if ($ct > 0) {
-					$fact = $match[1];
-					$sql .= "d_fact!='".DbLayer::EscapeQuery(Str2Upper($fact))."'";
-				}
-				else {
-					$sql .= "d_fact='".DbLayer::EscapeQuery(Str2Upper($fact))."'";
-				}
-				$i++;
-			}
-			$sql .= ") ";
-*/		}
+		}
 		if (!$allgeds) $sql .= " AND d_file='".GedcomConfig::$GEDCOMID."'";
-//		$sql .= "GROUP BY f_id ORDER BY d_year, d_month, d_day DESC";
 		
 		$res = NewQuery($sql);
 		$select = array();
@@ -948,18 +900,8 @@ abstract class SearchFunctions {
 	
 		$myfamlist = array();
 		$sql = "SELECT f_key, f_id, f_husb, f_wife, f_file, f_gedrec FROM ".TBLPREFIX."individual_family INNER JOIN ".TBLPREFIX."families on f_key=if_fkey WHERE if_pkey IN ('".implode("','", $query)."') AND if_role='S'";
-//		$sql = "SELECT f_key, f_id, f_husb, f_wife, f_file, f_gedrec FROM ".TBLPREFIX."families WHERE (";
-//		$i=0;
-//		foreach($query as $indexval => $q) {
-	
-//			if ($i>0) $sql .= " $ANDOR ";
-//			$sql .= "((f_husb='".DbLayer::EscapeQuery(JoinKey($q[0], $q[1]))."' OR f_wife='".DbLayer::EscapeQuery(JoinKey($q[0], $q[1]))."') AND f_file='".DbLayer::EscapeQuery($q[1])."')";
-//			$i++;
-//		}
-//		$sql .= ")";
 	
 		$res = NewQuery($sql);
-	//	$gedold = GedcomConfig::$GEDCOMID;
 		$select = array();
 		while($row = $res->fetchAssoc()){
 			$fam = Family::GetInstance($row["f_id"], $row, $row["f_file"]);

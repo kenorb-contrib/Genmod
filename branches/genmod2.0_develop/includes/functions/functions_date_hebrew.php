@@ -321,8 +321,11 @@ function JewishGedcomDateToGregorian($datearray){
  * @TODO Actually implement parse method (done in other places but should be unified into one function
  */
 function JewishGedcomDateToCurrentGregorian($datearray){
-	global $monthtonum, $month, $year, $hMonth, $hYear; 
+	global $monthtonum, $hMonth, $hYear; 
+	
 	$dates = array();
+	$month = GetCurrentMonth();
+	$year = GetCurrentYear();
 	
      if (empty($hYear)) {
 	    if (isset($_SESSION["timediff"])) $time = time()-$_SESSION["timediff"];

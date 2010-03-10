@@ -68,18 +68,13 @@ while (false !== ($entry = $d->read())) {
 }
 $d->close();
 
-if (isset($_SESSION["timediff"])) $time = time()-$_SESSION["timediff"];
-else $time = time();
-$day = date("j", $time);
-$month = date("M", $time);
-$year = date("Y", $time);
 if (GedcomConfig::$USE_RTL_FUNCTIONS) {
 	//-------> Today's Hebrew Day with Gedcom Month
 	$datearray = array();
- 	$datearray[0]["day"]   = $day;
- 	$datearray[0]["mon"]   = $monthtonum[Str2Lower(trim($month))];
- 	$datearray[0]["year"]  = $year;
- 	$datearray[0]["month"] = $month;
+ 	$datearray[0]["day"]   = GetCurrentDay();
+ 	$datearray[0]["mon"]   = $monthtonum[Str2Lower(trim(GetCurrentMonth()))];
+ 	$datearray[0]["year"]  = GetCurrentYear();
+ 	$datearray[0]["month"] = GetCurrentMonth();
 
     $date   = GregorianToJewishGedcomDate($datearray);
     $hDay   = $date[0]["day"];

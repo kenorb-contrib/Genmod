@@ -1088,4 +1088,32 @@ function ParseDate($datestr) {
 	}
 	return $dates;
 }
+	
+function GetCurrentYear() {
+	static $year;
+	if (!isset($year)) {
+		if (isset($_SESSION["timediff"])) $time = time()-$_SESSION["timediff"];
+		else $time = time();
+		$year = date("Y", $time);
+	}
+	return $year;
+}
+function GetCurrentMonth() {
+	static $month;
+	if (!isset($month)) {
+		if (isset($_SESSION["timediff"])) $time = time()-$_SESSION["timediff"];
+		else $time = time();
+		$month = date("M", $time);
+	}
+	return $month;
+}
+function GetCurrentDay() {
+	static $day;
+	if (!isset($day)) {
+		if (isset($_SESSION["timediff"])) $time = time()-$_SESSION["timediff"];
+		else $time = time();
+		$day = date("j", $time);
+	}
+	return $day;
+}
 ?>

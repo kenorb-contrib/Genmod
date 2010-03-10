@@ -188,7 +188,7 @@ class PlaceListController extends ListController {
 			$indilist =& ListFunctions::GetIndiList("no", $select, false);
 			uasort($indilist, "ItemObjSort");
 			foreach($indilist as $key => $indi) {
-				if ($factsel != "ALL") {
+				if ($factsel != "all") {
 					$add = false;
 					$facts =& $indi->SelectFacts(array($factsel));
 					foreach($facts as $key => $fact) {

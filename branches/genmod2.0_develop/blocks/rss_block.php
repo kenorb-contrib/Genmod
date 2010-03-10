@@ -45,7 +45,7 @@ $GM_BLOCKS["print_RSS_block"]["rss"]		= false;
 function print_RSS_block($block = true, $config="", $side, $index) {
 	global $LANGUAGE, $command, $QUERY_STRING, $GM_BLOCKS, $gm_user, $GM_IMAGES;
 
-	print "<div id=\"login_block\" class=\"block\">\n";
+	print "<div id=\"rss_block\" class=\"block\">\n";
 	print "<div class=\"blockhc\">";
 	PrintHelpLink("rss_feed_help", "qm", "rss_feeds");
 	if ($GM_BLOCKS["print_RSS_block"]["canconfig"]) {

@@ -439,7 +439,7 @@ if ($placelist_controller->display=="list") {
 	}
 }
 
-print "<br /><a href=\"placelist.php?select=ALL&amp;display=";
+print "<br /><a href=\"placelist.php?select=all&amp;display=";
 if ($placelist_controller->display == "list") print "hierarchy\">".GM_LANG_show_place_hierarchy;
 else print "list\">".GM_LANG_show_place_list;
 print "</a><br /><br />\n";

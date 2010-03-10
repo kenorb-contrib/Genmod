@@ -38,9 +38,9 @@ $GM_BLOCKS["print_recent_changes"]["rss"]       = true;
  * @todo Find out why TOTAL_QUERIES is here???
 **/
 function print_recent_changes($block=true, $config="", $side, $index) {
-	global $month, $year, $day, $monthtonum, $HIDE_LIVE_PEOPLE, $command, $TEXT_DIRECTION;
+	global $monthtonum, $HIDE_LIVE_PEOPLE, $command, $TEXT_DIRECTION;
 	global $GM_IMAGES, $ASC, $IGNORE_FACTS, $IGNORE_YEAR, $TOTAL_QUERIES, $LAST_QUERY, $GM_BLOCKS, $SHOW_SOURCES;
-	global $medialist, $gm_user;
+	global $gm_user;
 
 	$block = true;			// Always restrict this block's height
 
@@ -52,7 +52,7 @@ function print_recent_changes($block=true, $config="", $side, $index) {
 
 	$action = "today";
 
-	$found_facts = BlockFunctions::GetRecentChangeFacts($day, $month, $year, $config["days"]);
+	$found_facts = BlockFunctions::GetRecentChangeFacts(GetCurrentDay(), GetCurrentMonth(), GetCurrentYear(), $config["days"]);
 
 // Start output
 	if (count($found_facts)==0 and $HideEmpty=="yes") return false;

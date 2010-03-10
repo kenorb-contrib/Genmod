@@ -66,10 +66,13 @@ abstract class BlockFunctions {
 	}
 	
 	public function GetCachedEvents($action, $daysprint, $filter, $onlyBDM="no", $skipfacts) {
-		global $month, $year, $day, $monthtonum, $monthstart;
+		global $monthtonum, $monthstart;
 		global $ASC, $IGNORE_FACTS, $IGNORE_YEAR;
 		global $CIRCULAR_BASE;
 		
+		$day = GetCurrentDay();
+		$month = GetCurrentMonth();
+		$year = GetCurrentYear();
 		$found_facts = array();
 		$skip = preg_split("/[;, ]/", $skipfacts);
 		

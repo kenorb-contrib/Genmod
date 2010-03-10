@@ -34,7 +34,7 @@ $GM_BLOCKS["print_gedcom_block"]["rss"]			= false;
 
 //-- function to print the gedcom block
 function print_gedcom_block($block = true, $config="", $side, $index) {
-	global $hits, $day, $month, $year, $GEDCOMS, $TIME_FORMAT, $command,$TEXT_DIRECTION, $gm_user;
+	global $hits, $GEDCOMS, $TIME_FORMAT, $command,$TEXT_DIRECTION, $gm_user;
 
 
 	print "<div id=\"gedcom_welcome\" class=\"block\" >\n";
@@ -42,7 +42,7 @@ function print_gedcom_block($block = true, $config="", $side, $index) {
 	print PrintReady($GEDCOMS[GedcomConfig::$GEDCOMID]["title"]);	 
 	print "</div>";
 	print "<div class=\"blockcontent center\">";
-	print "<br />".GetChangedDate("$day $month $year")." - ".date($TIME_FORMAT, time()-$_SESSION["timediff"])."<br />\n";
+	print "<br />".GetChangedDate(GetCurrentDay()." ".GetCurrentMonth()." ".GetCurrentYear())." - ".date($TIME_FORMAT, time()-$_SESSION["timediff"])."<br />\n";
 	if(GedcomConfig::$SHOW_COUNTER)
 			print GM_LANG_hit_count."  ".$hits."<br />\n";
 	print "\n<br />";
