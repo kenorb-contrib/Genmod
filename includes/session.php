@@ -677,6 +677,7 @@ if ((strstr(SCRIPT_NAME, "editconfig.php")===false) &&(strstr(SCRIPT_NAME, "edit
 	&&(strstr(SCRIPT_NAME, "edit_privacy.php")===false)
 	&&(strstr(SCRIPT_NAME, "editconfig_help.php")===false)
 	&&(strstr(SCRIPT_NAME, "editgedcoms.php")===false)
+	&&(strstr(SCRIPT_NAME, "gmrpc.php")===false)
 	&&(strstr(SCRIPT_NAME, "help_text.php")===false)
 	&&(strstr(SCRIPT_NAME, "importgedcom.php")===false)
 	&&(strstr(SCRIPT_NAME, "lockout_maint.php")===false)
@@ -686,7 +687,7 @@ if ((strstr(SCRIPT_NAME, "editconfig.php")===false) &&(strstr(SCRIPT_NAME, "edit
 	&&(strstr(SCRIPT_NAME, "useradmin.php")===false)
 	&&(strstr(SCRIPT_NAME, "validategedcom.php")===false)
 	&&(strstr(SCRIPT_NAME, "viewlog.php")===false)) {
-		if (((count($GEDCOMS)==0)||(!CheckForImport($GEDCOMID)))&&empty($logout)) {
+		if ((count($GEDCOMS) ==0 || !CheckForImport($GEDCOMID)) && empty($logout)) {
 			header("Location: editgedcoms.php");
 			exit;
 		}
