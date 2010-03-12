@@ -260,9 +260,9 @@ require_once("fonts/".$ff[0].".php");
 //				else $wmax = min($wmax, 35*$scale);
 $wmax = floor($maxpix/$fontsize);				
 				
-				$name = NameFunctions::AbbreviateName($name, $wmax);
+				$name = NameFunctions::AbbreviateName((HasChinese($name) ? $addname : $name), $wmax);
 //print " ".strlen($name)." ".$wmax." ".$name."<br />";
-				$text = ltr_string($name) . "\r\n" . ltr_string($addname). "\r\n";
+				$text = ltr_string($name) . "\r\n" . (HasChinese($person->name) ? "" : ltr_string($addname)."\r\n");
 				if ($person->disp) {
 					$ctb = preg_match("/2 DATE.*(\d\d\d\d)/", $person->brec, $matchb);
 					$ctd = preg_match("/2 DATE.*(\d\d\d\d)/", $person->drec, $matchd);
