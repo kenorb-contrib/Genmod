@@ -57,9 +57,8 @@ class MFile {
 
 		
 	public function __construct($file) {
-		global $MEDIA_IN_DB;
 		
-		if ($MEDIA_IN_DB) {
+		if (SystemConfig::$MEDIA_IN_DB) {
 			if (!is_array($file)) {
 				if (stristr($file, "://")) {
 					// If link, normalize it so we know the DB filename

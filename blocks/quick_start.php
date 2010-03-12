@@ -39,7 +39,7 @@ $GM_BLOCKS["print_quickstart_block"]["rss"]       	= false;
  * Prints a block allowing the user to login to the site directly from the portal
  */
 function print_quickstart_block($block = true, $config="", $side, $index) {
-	global $command, $gm_user, $TEXT_DIRECTION, $GM_IMAGES, $ALLOW_CHANGE_GEDCOM, $GM_BLOCKS, $GEDCOMS;
+	global $command, $gm_user, $TEXT_DIRECTION, $GM_IMAGES, $GM_BLOCKS, $GEDCOMS;
 	
 	if (empty($config)) $config = $GM_BLOCKS["print_quickstart_block"]["config"];
 	if (!isset($config['search_all_geds'])) $config = $GM_BLOCKS["print_quickstart_block"]["config"];
@@ -60,7 +60,7 @@ function print_quickstart_block($block = true, $config="", $side, $index) {
 	print "<form method=\"post\" action=\"search.php\" name=\"searchform\">";
 	print "<input type=\"hidden\" name=\"action\" value=\"quickstart\" />";
 	print "<input type=\"hidden\" name=\"crossged\" value=\"";
-	if ($ALLOW_CHANGE_GEDCOM && $config["search_all_geds"] == "yes") print "yes";
+	if (SystemConfig::$ALLOW_CHANGE_GEDCOM && $config["search_all_geds"] == "yes") print "yes";
 	else print "no";
 	print "\" />";
 	print "<table class=\"blockcontent $TEXT_DIRECTION\">";
@@ -72,10 +72,10 @@ function print_quickstart_block($block = true, $config="", $side, $index) {
 	print "<td><input type=\"text\" name=\"lastname\" tabindex=\"1\" /></td>";
 	print "<td rowspan=\"8\">";
 	print "<a href=\"indilist.php";
-	if ($ALLOW_CHANGE_GEDCOM && $config["search_all_geds"] == "yes") print "?allgeds=yes";
+	if (SystemConfig::$ALLOW_CHANGE_GEDCOM && $config["search_all_geds"] == "yes") print "?allgeds=yes";
 	print "\">".GM_LANG_qs_findindi."</a><br />";
 	print "<a href=\"famlist.php";
-	if ($ALLOW_CHANGE_GEDCOM && $config["search_all_geds"] == "yes") print "?allgeds=yes";
+	if (SystemConfig::$ALLOW_CHANGE_GEDCOM && $config["search_all_geds"] == "yes") print "?allgeds=yes";
 	print "\">".GM_LANG_qs_findfam."</a><br />";
 	print "<a href=\"calendar.php\">".GM_LANG_qs_calendar."</a><br />";
 	if ($gm_user->username == "" && count($GEDCOMS) > 0) {

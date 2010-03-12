@@ -172,7 +172,7 @@ PrintSimpleHeader(GM_LANG_imageview);
 //$filename = FilenameDecode($filename);
 print "<form name=\"zoomform\" onsubmit=\"setzoom(document.getElementById('zoomval').value); return false;\" action=\"imageview.php\">";
 if (strstr($filename, "://")) $filename = preg_replace("/ /", "%20", $filename);
-if (!$MEDIA_IN_DB && (empty($filename) || !@fclose(@fopen($filename,"r")))) {
+if (!SystemConfig::$MEDIA_IN_DB && (empty($filename) || !@fclose(@fopen($filename,"r")))) {
 	print "<span class=\"error\">".GM_LANG_file_not_found."&nbsp;".$filename."</span>";
 	print "<br /><br /><div class=\"center\"><a href=\"javascript:// ".GM_LANG_close_window."\" onclick=\"self.close();\">".GM_LANG_close_window."</a></div>\n";
 }
@@ -182,7 +182,7 @@ else {
 	print "<input type=\"button\" value=\"".GM_LANG_reset."\" onclick=\"resetimage(); return false;\" />\n";
 	
 	if (!strstr($filename, "://")) {
-		if (!$MEDIA_IN_DB) $details = MediaFS::GetFileDetails($filename, false);
+		if (!SystemConfig::$MEDIA_IN_DB) $details = MediaFS::GetFileDetails($filename, false);
 		else {
 			// we must strip showblob?file= from the filename, to get the real file
 			$fn = preg_replace("/showblob.php\?file=/", "", $filename);

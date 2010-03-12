@@ -178,7 +178,7 @@ if ($action=="edituser2") {
 	else print "&nbsp;";
     ?></td></tr>
     <tr><td class="shade2 wrap"><div class="helpicon"><?php PrintHelpLink("edituser_email_help", "qm"); print "</div><div class=\"description\">"; print GM_LANG_emailadress;?></div></td><td class="shade1" valign="top"><input type="text" name="user_email" tabindex="<?php $tab++; print $tab; ?>" value="<?php print $gm_user->email; ?>" size="50" onchange="sndReq('errem', 'checkemail', 'email', this.value);" />&nbsp;&nbsp;<span id="errem"></span></td></tr>
-    <?php if ($ALLOW_USER_THEMES) { ?>
+    <?php if (SystemConfig::$ALLOW_USER_THEMES) { ?>
     <tr><td class="shade2 wrap"><div class="helpicon"><?php PrintHelpLink("edituser_user_theme_help", "qm"); print "</div><div class=\"description\">"; print GM_LANG_user_theme;?></div></td><td class="shade1" valign="top">
     	<select name="user_theme" tabindex="<?php $tab++; print $tab; ?>">
     	<option value=""><?php print GM_LANG_site_default; ?></option>
@@ -196,7 +196,7 @@ if ($action=="edituser2") {
 	<tr>
 		<td class="shade2 wrap"><div class="helpicon"><?php PrintHelpLink("edituser_user_contact_help", "qm"); print "</div><div class=\"description\">"; print GM_LANG_user_contact_method;?></td>
 		<td class="shade1"><select name="new_contact_method" tabindex="<?php $tab++; print $tab; ?>">
-		<?php if ($GM_STORE_MESSAGES) { ?>
+		<?php if (SystemConfig::$GM_STORE_MESSAGES) { ?>
 				<option value="messaging" <?php if ($gm_user->contactmethod=='messaging') print "selected=\"selected\""; ?>><?php print GM_LANG_messaging;?></option>
 				<option value="messaging2" <?php if ($gm_user->contactmethod=='messaging2') print "selected=\"selected\""; ?>><?php print GM_LANG_messaging2;?></option>
 		<?php } else { ?>

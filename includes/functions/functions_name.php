@@ -349,20 +349,20 @@ function SmartUtf8Decode($in_str) {
  */
 
 function DMSoundex($name, $option = "") {
-	global $GM_BASE_DIRECTORY, $dmsoundexlist, $dmcoding, $maxchar, $cachecount, $cachename;
+	global $dmsoundexlist, $dmcoding, $maxchar, $cachecount, $cachename;
 	
 //	Check for empty string
 	if (empty($name)) return array();
 	
 	// If the code tables are not loaded, reload! Keep them global!
 	if (!isset($dmcoding)) {
-		$fname = $GM_BASE_DIRECTORY."includes/values/dmarray.full.utf-8.php";
+		$fname = SystemConfig::$GM_BASE_DIRECTORY."includes/values/dmarray.full.utf-8.php";
 		require($fname);
 	}
 
 	// Load the previously saved cachefile and return. Keep the cache global!
 	if ($option == "opencache") {
-		$cachename = INDEX_DIRECTORY."DM".date("mdHis", filemtime($GM_BASE_DIRECTORY."includes/values/dmarray.full.utf-8.php")).".dat";
+		$cachename = INDEX_DIRECTORY."DM".date("mdHis", filemtime(SystemConfig::$GM_BASE_DIRECTORY."includes/values/dmarray.full.utf-8.php")).".dat";
 		if (file_exists($cachename) && filesize($cachename) != 0) {
 //			print "Opening cache file<br />";
 			$fp = fopen($cachename, "rb");
@@ -623,9 +623,9 @@ function HasChinese($name, $import = false) {
 }
 	
 function GetPinYin($name, $import = false) {
-	global $pinyin, $GM_BASE_DIRECTORY;
+	global $pinyin;
 
-	if (!isset($pinyin) && $import) require_once($GM_BASE_DIRECTORY."includes/values/pinyin.php");
+	if (!isset($pinyin) && $import) require_once(SystemConfig::$GM_BASE_DIRECTORY."includes/values/pinyin.php");
 	
 	$pyname = "";
 	$pos1 = 0;
@@ -649,7 +649,7 @@ function GetPinYin($name, $import = false) {
 }	
 
 function GetGBcode($name) {
-	global $GBcode, $GM_BASE_DIRECTORY;
+	global $GBcode;
 	$gbstr = "";
 	$pos1 = 0;
 	$pos2 = 2;
@@ -657,7 +657,7 @@ function GetGBcode($name) {
 		$char = substr($name, $pos1, $pos2 - $pos1 + 1);
 		if (HasChinese($char, true)) {
 			if (!isset($GBcode)) {
-				$fname = $GM_BASE_DIRECTORY."includes/gbcode.php";
+				$fname = SystemConfig::$GM_BASE_DIRECTORY."includes/gbcode.php";
 				require($fname);
 			}
 			$gbstr .= chr(hexdec(substr($GBcode[$char],0,2))).chr(hexdec(substr($GBcode[$char],2,2)));

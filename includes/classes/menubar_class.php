@@ -91,7 +91,7 @@ abstract class MenuBar {
 	 */
 	public function GetFileMenu() {
 		global $QUERY_STRING;
-		global $ALLOW_CHANGE_GEDCOM, $GEDCOMS, $gm_user;
+		global $GEDCOMS, $gm_user;
 		
 
 		//-- main file menu item
@@ -106,7 +106,7 @@ abstract class MenuBar {
 		}
 		
 		// NOTE: Open GEDCOM
-		if ($ALLOW_CHANGE_GEDCOM && count($GEDCOMS)>1) {
+		if (SystemConfig::$ALLOW_CHANGE_GEDCOM && count($GEDCOMS)>1) {
 			$submenu = new Menu(GM_LANG_menu_open);
 			$menu->addSubmenu($submenu);
 		
@@ -153,8 +153,6 @@ abstract class MenuBar {
 
 	public function GetEditMenu() {
 		global $QUERY_STRING;
-		global $ALLOW_CHANGE_GEDCOM;
-		
 		global $ENABLE_CLIPPINGS_CART, $gm_user;
 		
 		//-- main edit menu item
@@ -185,7 +183,7 @@ abstract class MenuBar {
 	public function GetViewMenu() {
 		global $gm_language, $language_settings;
 		global $LANGUAGE;
-		global $ALLOW_USER_THEMES, $gm_user;
+		global $gm_user;
 		
 		//-- main edit menu item
 		$menu = new Menu(GM_LANG_menu_view);
@@ -207,7 +205,7 @@ abstract class MenuBar {
 		}
 
 		// Theme selector
-		if (GedcomConfig::$ALLOW_THEME_DROPDOWN && $ALLOW_USER_THEMES) {
+		if (GedcomConfig::$ALLOW_THEME_DROPDOWN && SystemConfig::$ALLOW_USER_THEMES) {
 			// Change theme
 			$submenu = new Menu(GM_LANG_inc_themes);
 			$menu->addSubmenu($submenu);

@@ -93,7 +93,7 @@ abstract class AdminFunctions {
 	}
 	
 	public function PrintGedcom($ged, $convert, $remove, $zip, $privatize_export, $privatize_export_level, $gedname, $embedmm, $embednote, $addaction) {
-		GLOBAL $GM_BASE_DIRECTORY, $gm_username, $gm_user;
+		GLOBAL $gm_username, $gm_user;
 		
 		if ($zip == "yes") {
 			$gedout = fopen($gedname, "w");
@@ -812,20 +812,19 @@ abstract class AdminFunctions {
 	 * @return	array	Array with news items
 	 */
 	public function GetGMNewsItems() {
-		global $NEWS_TYPE, $PROXY_ADDRESS, $PROXY_PORT;
 	
 		// -- If the news is already retrieved, get it from the session data.
 		if(isset($_SESSION["gmnews"])) return $_SESSION["gmnews"];
 	
 		// -- Retrieve the news from the website
 		$gmnews = array();
-		if (!empty($PROXY_ADDRESS) && !empty($PROXY_PORT)) {
+		if (SystemConfig::$PROXY_ADDRESS != "" && SystemConfig::$PROXY_PORT != "") {
 			$num = "(\\d|[1-9]\\d|1\\d\\d|2[0-4]\\d|25[0-5])";
-			if (!preg_match("/^$num\\.$num\\.$num\\.$num$/", $PROXY_ADDRESS)) $ip = gethostbyname($PROXY_ADDRESS);
-			else $ip = $PROXY_ADDRESS;
-			$handle = @fsockopen($ip, $PROXY_PORT);
+			if (!preg_match("/^$num\\.$num\\.$num\\.$num$/", SystemConfig::$PROXY_ADDRESS)) $ip = gethostbyname(SystemConfig::$PROXY_ADDRESS);
+			else $ip = SystemConfig::$PROXY_ADDRESS;
+			$handle = @fsockopen($ip, SystemConfig::$PROXY_PORT);
 			if ($handle!=false) {
-				$com = "GET http://www.genmod.net/gmnews.txt HTTP/1.1\r\nAccept: */*\r\nAccept-Language: de-ch\r\nAccept-Encoding: gzip, deflate\r\nUser-Agent: Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.0)\r\nHost: $PROXY_ADDRESS:$PROXY_PORT\r\nConnection: Keep-Alive\r\n\r\n";
+				$com = "GET http://www.genmod.net/gmnews.txt HTTP/1.1\r\nAccept: */*\r\nAccept-Language: de-ch\r\nAccept-Encoding: gzip, deflate\r\nUser-Agent: Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.0)\r\nHost: ".SystemConfig::$PROXY_ADDRESS.":".SystemConfig::$PROXY_PORT."\r\nConnection: Keep-Alive\r\n\r\n";
 				fputs($handle, $com);
 				$txt = fread($handle, 65535);
 				fclose($handle);
@@ -858,7 +857,7 @@ abstract class AdminFunctions {
 				$ct1 = preg_match("/\[Text](.+?)\[\/Text]/", $items[1][$i], $text);
 				if ($ct1 > 0) $item["text"] = $text[1];
 				else $item["text"] = "";
-				if (($NEWS_TYPE == "Normal") || ($NEWS_TYPE == $item["type"])) $gmnews[] = $item;
+				if (SystemConfig::$NEWS_TYPE == "Normal" || SystemConfig::$NEWS_TYPE == $item["type"]) $gmnews[] = $item;
 			}
 		}
 		else {

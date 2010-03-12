@@ -456,10 +456,10 @@ abstract class UserController {
 	* @return 	boolean	Return true or false as a result of the update
 	*/
 	public function UpdateSessiontime() {
-		global $gm_user, $GM_SESSION_TIME;
+		global $gm_user;
 	
 		if (!$gm_user->is_empty) {
-			if(time() - $gm_user->sessiontime > $GM_SESSION_TIME) {
+			if(time() - $gm_user->sessiontime > GM_SESSION_TIME) {
 				self::UserLogout($gm_user->username);
 				return false;
 			}

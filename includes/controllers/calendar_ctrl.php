@@ -43,23 +43,27 @@ class CalendarController extends ChartController {
 	// action values are calendar, today and year
 	
 	// Internal values
-	public $datearray = null;						// Array to keep the dates to be converted to Hebrew etc.
-	public $date = null;							// Array to keep the dates converted to Hebrew etc.
+	private $hebrewfound = null;					// Check if any dates are in hebrew
+	public $datearray = null;						// Array to keep the dates to be converted to Hebrew etc. =>not called from calendar
+	public $date = null;							// Array to keep the dates converted to Hebrew etc. =>not called from calendar
 	private $hDay = null;							// (First) day of date entered in Hebrew
 	private $hMonth = null;							// (First) month of date entered in Hebrew
 	private $hYear = null;							// (First) year of date entered in Hebrew
-	private $year_text = null;						// Year (range) to print in the title
+	private $year_text = null;						// Year (range) to print in the titlebar =>not called from calendar
 	private $startyear = null;						// First year of year range
 	private $endyear = null;						// Last year of year range
+	private $gstartyear = null;						// First year of year range
+	private $gendyear = null;						// Last year of year range
 	private $m_days = null;							// Number of days in the selected month
 	private $year_query = null;						// Query to match fact dates after retrieval of indi's/fams
-	private $query = null;							// Query to match fact dates after retrieval of indi's/fams
+	private $query = null;							// Query to match fact dates after retrieval of indi's/fams =>not called from calendar
 	private $pregquery = null;						// Query to match fact dates after retrieval of indi's/fams
-	private $CalYear = null;
-	private $currhDay = null;
-	private $currhMonth = null;
-	private $currhYear = null;
+	private $CalYear = null;					
+	private $currhDay = null;					
+	private $currhMonth = null;					
+	private $currhYear = null;					
 	private $leap = null;							// True or false a leap year
+	private $bartext = null;							// Text with dates to print in the topbar
 	
 	public function __construct() {
 		
@@ -122,14 +126,20 @@ class CalendarController extends ChartController {
 			case "year_query":
 				return $this->year_query;
 				break;
-			case "year_text":
-				return $this->year_text;
-				break;
+//			case "year_text":
+//				return $this->year_text;
+//				break;
 			case "startyear":
 				return $this->startyear;
 				break;
 			case "endyear":
 				return $this->endyear;
+				break;
+			case "gstartyear":
+				return $this->gstartyear;
+				break;
+			case "gendyear":
+				return $this->gendyear;
 				break;
 			case "pregquery":
 				return $this->pregquery;
@@ -152,11 +162,17 @@ class CalendarController extends ChartController {
 			case "hMonth":
 				return $this->hMonth;
 				break;
-			case "hYear":
-				return $this->hYear;
-				break;
+//			case "hYear":
+//				return $this->hYear;
+//				break;
 			case "leap":
 				return $this->leap;
+				break;
+			case "usehebrew";
+				return $this->GetUseHebrew();
+				break;
+			case "bartext";
+				return $this->GetBarText();
 				break;
 			default:
 				return parent::__get($property);
@@ -166,42 +182,42 @@ class CalendarController extends ChartController {
 
 	public function __set($property, $value) {
 		switch($property) {
-			case "year_query":
-				$this->year_query = $value;
-				break;
-			case "year_text":
-				$this->year_text = $value;
-				break;
+//			case "year_query":
+//				$this->year_query = $value;
+//				break;
+//			case "year_text":
+//				$this->year_text = $value;
+//				break;
 			case "pregquery":
 				$this->pregquery = $value;
 				break;
-			case "CalYear":
-				$this->CalYear = $value;
-				break;
-			case "currhYear":
-				$this->currhYear = $value;
-				break;
-			case "currhMonth":
-				$this->currhMonth = $value;
-				break;
-			case "currhDay":
-				$this->currhDay = $value;
-				break;
+//			case "CalYear":
+//				$this->CalYear = $value;
+//				break;
+//			case "currhYear":
+//				$this->currhYear = $value;
+//				break;
+//			case "currhMonth":
+//				$this->currhMonth = $value;
+//				break;
+//			case "currhDay":
+//				$this->currhDay = $value;
+//				break;
 			case "hYear":
 				$this->hYear = $value;
 				break;
-			case "hMonth":
-				$this->hMonth = $value;
-				break;
+//			case "hMonth":
+//				$this->hMonth = $value;
+//				break;
 			case "hDay":
 				$this->hDay = $value;
 				break;
 			case "day":
 				$this->day = $value;
 				break;
-			case "month":
-				$this->month = $value;
-				break;
+//			case "month":
+//				$this->month = $value;
+//				break;
 			case "year":
 				$this->year = $value;
 				break;
@@ -214,12 +230,22 @@ class CalendarController extends ChartController {
 	protected function GetPageTitle() {
 		
 		if (is_null($this->pagetitle)) {
-			$this->pagetitle = "";
-			if ($this->pid1 != "") $this->pagetitle .= $this->person1->name.$this->person1->addxref;
-			if ($this->pid2 != "") $this->pagetitle .= "/".$this->person2->name.$this->person2->addxref;;
-			$this->pagetitle .= " - ".GM_LANG_relationship_chart;
+			$this->pagetitle = GM_LANG_anniversary_calendar;
 		}
 		return $this->pagetitle;
+	}
+
+	function GetUseHebrew() {
+		
+		if (!GedcomConfig::$USE_RTL_FUNCTIONS) return false;
+		if (!isset($this->hebrewfound[GedcomConfig::$GEDCOMID])) {
+			$sql = "SELECT i_id FROM ".TBLPREFIX."individuals where i_file='".GedcomConfig::$GEDCOMID."' AND i_gedrec like '%@#DHEBREW@%' LIMIT 1";
+			$res = NewQuery($sql);
+			if ($res->NumRows()>0) $this->hebrewfound[GedcomConfig::$GEDCOMID] = true;
+			else $this->hebrewfound[GedcomConfig::$GEDCOMID] = false;
+			$res->FreeResult();
+		}
+		return $this->hebrewfound[GedcomConfig::$GEDCOMID];
 	}
 	
 	private function ParseInput() {
@@ -242,8 +268,7 @@ class CalendarController extends ChartController {
 			// Search for spaces and get the string up to the space
 			$pos1 = strpos($this->year," ");
 			if ($pos1 == 0) $pos1 = strlen($this->year);
-			if (function_exists("Str2Lower")) $in_year = Str2Lower(substr($this->year, 0, $pos1));
-			else $in_year = substr($this->year, 0, $pos1);
+			$in_year = Str2Lower(substr($this->year, 0, $pos1));
 			
 			// If the characters before the space are in the translated prefix array, replace them with the gedcom expressions (ongeveer => abt)
 			if (in_array($in_year, $abbr)){
@@ -302,7 +327,7 @@ class CalendarController extends ChartController {
 					$this->endyear   = substr($this->year, ($pos1+1));
 					$this->year_text = $this->startyear." - ".$this->endyear;
 				}
-				if ($this->startyear>$this->endyear){
+				if ($this->startyear > $this->endyear){
 					$this->year_text = $this->startyear;
 					$this->startyear = $this->endyear;
 					$this->endyear   = $this->year_text;
@@ -353,7 +378,9 @@ class CalendarController extends ChartController {
 		// print "3. lengte < 4 start: ".$this->startyear." end: ".$this->endyear." year: ".$this->year."yearquery: ".$this->year_query."<br />";
 			}
 		}
-		if ($this->startyear == 0) {
+		else if (!is_numeric($this->year)) $this->year = adodb_date("Y");
+		
+		if ($this->startyear == 0 && $this->action != "today") {
 			$this->startyear = $this->year;
 			$this->endyear = $this->year;
 		}
@@ -452,7 +479,7 @@ class CalendarController extends ChartController {
 			// (First) entered date to Hebrew
 		 	$this->datearray[0]["day"]   = $this->day;
 		 	$this->datearray[0]["mon"]   = $monthtonum[Str2Lower(trim($this->month))];	
-		 	$this->datearray[0]["year"]  = $this->startyear;
+		 	$this->datearray[0]["year"]  = $this->startyear; //
 		 	$this->datearray[0]["month"] = $this->month;
 		 	// for month
 		 	$this->datearray[1]["day"]   = 01;
@@ -466,32 +493,71 @@ class CalendarController extends ChartController {
 			if ($this->action == "year") {
 				$pattern = "[ - |-|and|bet|from|to|abt|bef|aft|cal|cir|est|apx|int]";
 				$a = preg_split($pattern, $this->year_text);
-				if ($a[0] != "") $gstartyear = $a[0]; 
+				if ($a[0] != "") $this->gstartyear = $a[0]; 
 				if (isset($a[1])) {
-					if ($a[0] != "") $gendyear = $a[1];
+					if ($a[0] != "") $this->gendyear = $a[1];
 					else {
-						$gstartyear = $a[1];
-						if (isset($a[2])) $gendyear = $a[2];
-						else $gendyear = $a[1];
+						$this->gstartyear = $a[1];
+						if (isset($a[2])) $this->gendyear = $a[2];
+						else $this->gendyear = $a[1];
 					}
 				}
-				else $gendyear = $a[0];
+				else $this->gendyear = $a[0];
 				
 		 		$this->datearray[3]["day"]   = 01;
 		 		$this->datearray[3]["mon"]   = 01;	
-		 		$this->datearray[3]["year"]  = $gstartyear;
+		 		$this->datearray[3]["year"]  = $this->gstartyear;
 		 		$this->datearray[4]["day"]   = 31;
 		 		$this->datearray[4]["mon"]   = 12;	
-		 		$this->datearray[4]["year"]  = $gendyear;
-		// print "gstart: ".$gstartyear." ".$gendyear; 	
+		 		$this->datearray[4]["year"]  = $this->gendyear;
+		// print "gstart: ".$this->gstartyear." ".$this->gendyear; 	
 			}
-		
 		    $this->date   	= GregorianToJewishGedcomDate($this->datearray);
 		    $this->hDay   	= $this->date[0]["day"];
 		    $this->hMonth 	= $this->date[0]["month"];
 		    $this->CalYear	= $this->date[0]["year"];
 		}
 	}
+	private function GetBarText() {
 		
+		if (is_null($this->bartext)) {
+			$this->bartext = "";
+			if ($this->action == "today") {
+				//-- the year is needed for alternate calendars
+			 	if (GedcomConfig::$CALENDAR_FORMAT != "gregorian") $this->bartext .= GetChangedDate($this->day." ". $this->month." ". $this->startyear);
+				else $this->bartext .= GetChangedDate($this->day." ".$this->month);
+				if (GedcomConfig::$CALENDAR_FORMAT == "gregorian" && $this->GetUseHebrew()) $this->bartext .= " / ".GetChangedDate("@#DHEBREW@ ".$this->hDay." ".$this->hMonth." ".$this->CalYear); 
+			}
+			else if ($this->action == "calendar") {
+				$this->bartext .= GetChangedDate(" ".$this->month." ".$this->year." ");
+				if (GedcomConfig::$CALENDAR_FORMAT=="gregorian" && $this->GetUseHebrew()) {
+					$hdd = $this->date[1]["day"];
+					$hmm = $this->date[1]["month"];
+					$hyy = $this->date[1]["year"];
+					$this->bartext .= " /  ".GetChangedDate("@#DHEBREW@ ".$hdd." ".$hmm." ".$hyy);
+			        if ($hmm!=$this->date[2]["month"]) {
+				            $hdd = $this->date[2]["day"];
+			        		$hmm = $this->date[2]["month"];
+							$hyy = $this->date[2]["year"];
+							$this->bartext .= " -".GetChangedDate("@#DHEBREW@ ".$hdd." ".$hmm." ".$hyy);
+					}
+			    }
+			}
+			else if ($this->action == "year") {
+				$this->bartext .= GetChangedDate(" ".$this->year_text." ");
+				if (GedcomConfig::$CALENDAR_FORMAT == "gregorian" && $this->GetUseHebrew()) {
+					$hdd = $this->date[3]["day"];
+					$hmm = $this->date[3]["month"];
+					$hstartyear = $this->date[3]["year"];
+					$this->bartext .= " /  ".GetChangedDate("@#DHEBREW@ ".$hdd." ".$hmm." ".$hstartyear);
+				    $hdd = $this->date[4]["day"];
+			        $hmm = $this->date[4]["month"];
+					$hendyear = $this->date[4]["year"];
+					$this->bartext .= " -".GetChangedDate("@#DHEBREW@ ".$hdd." ".$hmm." ".$hendyear);
+				}
+			}
+		}
+		return $this->bartext;
+	}		
 }
 ?>

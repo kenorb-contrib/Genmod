@@ -453,7 +453,7 @@ switch ($action) {
 				$mail_body .= GM_LANG_lastname . " " . $user_lastname . "\r\n\r\n";
 				$mail_body .= GM_LANG_comments.": " . $user_comments . "\r\n\r\n";
 				$mail_body .= GM_LANG_mail02_line03 . " <a href=\"".$link."\">".$link."</a>\r\n";
-				if ($REQUIRE_ADMIN_AUTH_REGISTRATION) {
+				if (SystemConfig::$REQUIRE_ADMIN_AUTH_REGISTRATION) {
 					$mail_body .= GM_LANG_mail02_line04 . "\r\n";
 				} 
 				else {
@@ -485,7 +485,7 @@ switch ($action) {
 				<table class="center facts_table">
 				<tr><td class="ltr wrap"><?php print str_replace("#user_fullname#", $user_firstname." ".$user_lastname, GM_LANG_thankyou);?><br /><br />
 				<?php
-				if ($REQUIRE_ADMIN_AUTH_REGISTRATION) print str_replace("#user_email#", $user_email, GM_LANG_pls_note06);
+				if (SystemConfig::$REQUIRE_ADMIN_AUTH_REGISTRATION) print str_replace("#user_email#", $user_email, GM_LANG_pls_note06);
 				else print str_replace("#user_email#", $user_email, GM_LANG_pls_note06a);
 				?>
 				</td></tr></table>
@@ -544,7 +544,7 @@ switch ($action) {
 				$newuser->verified = "Y";
 				$newuser->reg_timestamp = date("U");
 				$newuser->hashcode = "";
-				if (!$REQUIRE_ADMIN_AUTH_REGISTRATION) $newuser->verified_by_admin = "Y";
+				if (!SystemConfig::$REQUIRE_ADMIN_AUTH_REGISTRATION) $newuser->verified_by_admin = "Y";
 				UserController::AddUser($newuser, "verified");
 				// switch language to webmaster settings
 				$admuser =& User::GetInstance(GedcomConfig::$WEBMASTER_EMAIL);
@@ -559,7 +559,7 @@ switch ($action) {
 				$mail_body = "";
 				$mail_body .= GM_LANG_mail03_line01 . "\r\n\r\n";
 				$mail_body .= str_replace("#newuser[username]# ( #newuser[fullname]# )", $newuser->username . " (" . $newuser->firstname." ".$newuser->lastname . ") ", GM_LANG_mail03_line02) . "\r\n\r\n";
-				if ($REQUIRE_ADMIN_AUTH_REGISTRATION) $mail_body .= GM_LANG_mail03_line03 . "\r\n";
+				if (SystemConfig::$REQUIRE_ADMIN_AUTH_REGISTRATION) $mail_body .= GM_LANG_mail03_line03 . "\r\n";
 				else $mail_body .= GM_LANG_mail03_line03a . "\r\n";
 				$reflink = SERVER_URL;
 				if (substr(SERVER_URL, -1) != "/") $reflink .= "/";
@@ -587,7 +587,7 @@ switch ($action) {
 				$NAME_REVERSE	= $NAME_REVERSE_array[$LANGUAGE];
 				
 				print "<br /><br />".GM_LANG_pls_note09."<br /><br />";
-				if ($REQUIRE_ADMIN_AUTH_REGISTRATION) print GM_LANG_pls_note10;
+				if (SystemConfig::$REQUIRE_ADMIN_AUTH_REGISTRATION) print GM_LANG_pls_note10;
 				else print GM_LANG_pls_note10a;
 				print "<br /><br /></td></tr>";
 			} 

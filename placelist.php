@@ -102,10 +102,10 @@ if ($placelist_controller->display == "hierarchy") {
 		$country = strtoupper($country);
 		if (strlen($country)!=3) {
 			// search country code using current language countries table
-			require($GM_BASE_DIRECTORY."languages/countries.en.php");
+			require(SystemConfig::$GM_BASE_DIRECTORY."languages/countries.en.php");
 			// changed $LANGUAGE to $deflang (the language set for the current gedcom)	// eikland
 			// changed to $GEDCOMLANG sjouke
-			if (file_exists($GM_BASE_DIRECTORY."languages/countries.".$lang_short_cut[GedcomConfig::$GEDCOMLANG].".php")) require($GM_BASE_DIRECTORY."languages/countries.".$lang_short_cut[GedcomConfig::$GEDCOMLANG].".php");
+			if (file_exists(SystemConfig::$GM_BASE_DIRECTORY."languages/countries.".$lang_short_cut[GedcomConfig::$GEDCOMLANG].".php")) require(SystemConfig::$GM_BASE_DIRECTORY."languages/countries.".$lang_short_cut[GedcomConfig::$GEDCOMLANG].".php");
 			foreach ($countries as $countrycode => $countryname) {
 				if (strtoupper($countryname) == $country) {
 					$country = $countrycode;

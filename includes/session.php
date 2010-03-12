@@ -190,7 +190,7 @@ if (isset($CONFIG_PARMS)) {
 			$found = true;
 			$CONFIG_SITE = $key;
 			foreach($config as $var => $value) {
-				$$var = $value;
+//				$$var = $value;
 				define($var, $value);
 			}
 		break;
@@ -206,7 +206,7 @@ if (isset($CONFIG_PARMS)) {
 						$found = true;
 						$CONFIG_SITE = $key;
 						foreach($config as $var => $value) {
-							$$var = $value;
+//							$$var = $value;
 							if ($var != "SERVER_URL") define($var, $value);
 						}
 						define('SERVER_URL', $alias);
@@ -287,8 +287,6 @@ foreach($CONFIG_VARS as $indexval => $VAR) {
 	}
 }
 
-if (empty($CONFIG_VERSION)) $CONFIG_VERSION = "2.65";
-//if (empty($SERVER_URL)) {
 if (!defined('SERVER_URL')) {
 	$SERVER_URL = "http://".$_SERVER["SERVER_NAME"];
 	if ($_SERVER["SERVER_PORT"] != 80) $SERVER_URL .= ":".$SERVER["SERVER_PORT"];
@@ -322,48 +320,42 @@ $start_time = GetMicrotime();
 $MEDIATYPE = array("a11","acb","adc","adf","afm","ai","aiff","aif","amg","anm","ans","apd","asf","au","avi","awm","bga","bmp","bob","bpt","bw","cal","cel","cdr","cgm","cmp","cmv","cmx","cpi","cur","cut","cvs","cwk","dcs","dib","dmf","dng","doc","dsm","dxf","dwg","emf","enc","eps","fac","fax","fit","fla","flc","fli","fpx","ftk","ged","gif","gmf","hdf","iax","ica","icb","ico","idw","iff","img","jbg","jbig","jfif","jpe","jpeg","jp2","jpg","jtf","jtp","lwf","mac","mid","midi","miff","mki","mmm",".mod","mov","mp2","mp3","mpg","mpt","msk","msp","mus","mvi","nap","ogg","pal","pbm","pcc","pcd","pcf","pct","pcx","pdd","pdf","pfr","pgm","pic","pict","pk","pm3","pm4","pm5","png","ppm","ppt","ps","psd","psp","pxr","qt","qxd","ras","rgb","rgba","rif","rip","rla","rle","rpf","rtf","scr","sdc","sdd","sdw","sgi","sid","sng","swf","tga","tiff","tif","txt","text","tub","ul","vda","vis","vob","vpg","vst","wav","wdb","win","wk1","wks","wmf","wmv","wpd","wxf","wp4","wp5","wp6","wpg","wpp","xbm","xls","xpm","xwd","yuv","zgm");
 
 //-- start the php session
-$time = time()+$GM_SESSION_TIME;
+$time = time() + GM_SESSION_TIME;
 $date = date("D M j H:i:s T Y", $time);
 session_set_cookie_params($date, "/");
-if (($GM_SESSION_TIME>0)&&(function_exists('session_cache_expire'))) session_cache_expire($GM_SESSION_TIME/60);
+if (GM_SESSION_TIME > 0 && function_exists('session_cache_expire')) session_cache_expire(GM_SESSION_TIME/60);
 if (GM_SESSION_SAVE_PATH != "") session_save_path(GM_SESSION_SAVE_PATH);
 if (isset($MANUAL_SESSION_START) && !empty($SID)) session_id($SID);
 @session_start();
 
 //-- import the post, get, and cookie variable into the scope on new versions of php
-if (phpversion() >= '4.1') {
-	@import_request_variables("cgp");
-}
+@import_request_variables("cgp");
 
-if (phpversion() > '4.2.2') {
-	//-- prevent sql and code injection
-	foreach($_REQUEST as $key=>$value) {
-		if (!is_array($value)) {
-			if (preg_match("/((DELETE)|(INSERT)|(UPDATE)|(ALTER)|(CREATE)|( TABLE)|(DROP))\s[A-Za-z0-9 ]{0,200}(\s(FROM)|(INTO)|(TABLE)\s)/i", $value, $imatch) > 0 && SCRIPT_NAME != "/editlang_edit.php") {
-				// NOTE: Setup the database connection, needed for logging
-//				include("db_layer.php");
-				$DBCONN = New DbLayer();
-				WriteToLog("Session-> Possible SQL injection detected: $key=>$value. <b>$imatch[0]</b> Script terminated.", "W", "S");
-				SystemFunctions::HandleIntrusion("Session-> Possible SQL injection detected: $key=>$value.  <b>$imatch[0]</b> Script terminated.");
-				exit;
-			}
-			//-- don't let any html in
-			if (!empty($value)) ${$key} = preg_replace(array("/</","/>/"), array("&lt;","&gt;"), $value);
+//-- prevent sql and code injection
+foreach($_REQUEST as $key=>$value) {
+	if (!is_array($value)) {
+		if (preg_match("/((DELETE)|(INSERT)|(UPDATE)|(ALTER)|(CREATE)|( TABLE)|(DROP))\s[A-Za-z0-9 ]{0,200}(\s(FROM)|(INTO)|(TABLE)\s)/i", $value, $imatch) > 0 && SCRIPT_NAME != "/editlang_edit.php") {
+			// NOTE: Setup the database connection, needed for logging
+			$DBCONN = New DbLayer();
+			WriteToLog("Session-> Possible SQL injection detected: $key=>$value. <b>$imatch[0]</b> Script terminated.", "W", "S");
+			SystemFunctions::HandleIntrusion("Session-> Possible SQL injection detected: $key=>$value.  <b>$imatch[0]</b> Script terminated.");
+			exit;
 		}
-		else {
-			foreach($value as $key1=>$val) {
-				if (!is_array($val)) {
-					if (preg_match("/((DELETE)|(INSERT)|(UPDATE)|(ALTER)|(CREATE)|( TABLE)|(DROP))\s[A-Za-z0-9 ]{0,200}(\s(FROM)|(INTO)|(TABLE)\s)/i", $val, $imatch)>0) {
-						// NOTE: Setup the database connection
-//						include("db_layer.php");
-						$DBCONN = New DbLayer();
-						WriteToLog("Session-> Possible SQL injection detected: $key=>$val <b>$imatch[0]</b>.  Script terminated.", "W", "S");
-						SystemFunctions::HandleIntrusion("Session-> Possible SQL injection detected: $key=>$val <b>$imatch[0]</b>.  Script terminated.");
-						exit;
-					}
-					//-- don't let any html in
-					if (!empty($val)) ${$key}[$key1] = preg_replace(array("/</","/>/"), array("&lt;","&gt;"), $val);
+		//-- don't let any html in
+		if (!empty($value)) ${$key} = preg_replace(array("/</","/>/"), array("&lt;","&gt;"), $value);
+	}
+	else {
+		foreach($value as $key1=>$val) {
+			if (!is_array($val)) {
+				if (preg_match("/((DELETE)|(INSERT)|(UPDATE)|(ALTER)|(CREATE)|( TABLE)|(DROP))\s[A-Za-z0-9 ]{0,200}(\s(FROM)|(INTO)|(TABLE)\s)/i", $val, $imatch)>0) {
+					// NOTE: Setup the database connection
+					$DBCONN = New DbLayer();
+					WriteToLog("Session-> Possible SQL injection detected: $key=>$val <b>$imatch[0]</b>.  Script terminated.", "W", "S");
+					SystemFunctions::HandleIntrusion("Session-> Possible SQL injection detected: $key=>$val <b>$imatch[0]</b>.  Script terminated.");
+					exit;
 				}
+				//-- don't let any html in
+				if (!empty($val)) ${$key}[$key1] = preg_replace(array("/</","/>/"), array("&lt;","&gt;"), $val);
 			}
 		}
 	}
@@ -373,12 +365,9 @@ if (phpversion() > '4.2.2') {
 //include("db_layer.php");
 $DBCONN = New DbLayer();
 
-$SystemConfig = new SystemConfig();
-if (!isset($ALLOW_REMEMBER_ME)) $ALLOW_REMEMBER_ME = true;
-if (!isset($GM_SIMPLE_MAIL)) $GM_SIMPLE_MAIL = false;
+SystemConfig::Initialise();
 
-if (empty($GM_MEMORY_LIMIT)) $GM_MEMORY_LIMIT = "32M";
-@ini_set('memory_limit', $GM_MEMORY_LIMIT);
+@ini_set('memory_limit', SystemConfig::$GM_MEMORY_LIMIT);
 
 // If this is an intrusion attempt, first handle it. This can update the lockout time. THEN check if locked. 
 if (isset($INTRUSION_DETECTED) && $INTRUSION_DETECTED) SystemFunctions::HandleIntrusion();
@@ -414,17 +403,14 @@ else {
 
 $_SESSION["GEDCOMID"] = $GEDCOMID;
 
-$INDILIST_RETRIEVED = false;
-$FAMLIST_RETRIEVED = false;
-
 // NOTE: This is to suppress the closing div tag in the footer
 $without_close = true;
 
 if (CONFIGURED) if ($DBCONN->connected) GedcomConfig::ReadGedcomConfig($GEDCOMID);
-require_once($GM_BASE_DIRECTORY."includes/functions/functions_name.php");
+require_once(SystemConfig::$GM_BASE_DIRECTORY."includes/functions/functions_name.php");
 
 //-- load file for language settings
-require_once($GM_BASE_DIRECTORY . "includes/values/lang_settings_std.php");
+require_once(SystemConfig::$GM_BASE_DIRECTORY . "includes/values/lang_settings_std.php");
 $Languages_Default = true;
 $ConfiguredSettings = LanguageFunctions::LoadLangVars();
 if (count($ConfiguredSettings) > 0) {
@@ -442,7 +428,6 @@ if (count($ConfiguredSettings) > 0) {
  */
 $languages 				= array();
 $gm_lang_use 			= array();
-//$gm_lang 				= array();
 $lang_short_cut 		= array();
 $lang_langcode 			= array();
 $gm_language 			= array();
@@ -512,8 +497,8 @@ if ((!empty($logout))&&($logout==1)) unset($_SESSION["CLANGUAGE"]);		// user is 
 else {
 	if ((GedcomConfig::$ENABLE_MULTI_LANGUAGE)&&(empty($_SESSION["CLANGUAGE"]))) {
 		// If visitor language is forced, set it
-		if ($VISITOR_LANG != "Genmod" && isset($gm_lang_use[$VISITOR_LANG])) {
-			$LANGUAGE = $VISITOR_LANG;
+		if (SystemConfig::$VISITOR_LANG != "Genmod" && isset($gm_lang_use[SystemConfig::$VISITOR_LANG])) {
+			$LANGUAGE = SystemConfig::$VISITOR_LANG;
 		}
 		else {
 			// get the language from the browser
@@ -611,7 +596,7 @@ SystemFunctions::CheckPageViews();
 // Check for the IP address where the request comes from
 SystemFunctions::CheckSessionIP();
 
-require_once($GM_BASE_DIRECTORY . "includes/values/templecodes.php");		//-- load in the LDS temple code translations
+require_once(SystemConfig::$GM_BASE_DIRECTORY . "includes/values/templecodes.php");		//-- load in the LDS temple code translations
 
 //-- load the privacy settings
 PrivacyController::ReadPrivacy($GEDCOMID);
@@ -758,9 +743,9 @@ if (isset($_SESSION["theme_dir"])) {
 }
 
 if (empty(GedcomConfig::$THEME_DIR)) GedcomConfig::$THEME_DIR="standard/";
-if (file_exists($GM_BASE_DIRECTORY.GedcomConfig::$THEME_DIR."theme.php")) require_once($GM_BASE_DIRECTORY.GedcomConfig::$THEME_DIR."theme.php");
+if (file_exists(SystemConfig::$GM_BASE_DIRECTORY.GedcomConfig::$THEME_DIR."theme.php")) require_once(SystemConfig::$GM_BASE_DIRECTORY.GedcomConfig::$THEME_DIR."theme.php");
 else {
-	GedcomConfig::$THEME_DIR = $GM_BASE_DIRECTORY."themes/standard/";
+	GedcomConfig::$THEME_DIR = SystemConfig::$GM_BASE_DIRECTORY."themes/standard/";
 	require_once(GedcomConfig::$THEME_DIR."theme.php");
 }
 
@@ -783,7 +768,7 @@ if (!isset($_SESSION["check_login"])) $_SESSION["check_login"] = time();
 if ((time() - $_SESSION["check_login"]) > 900) {
 	$users = UserController::GetUsers("username", "asc", "firstname", "u_loggedin='Y'");
 	foreach($users as $indexval => $user) {
-		if (time() - $user->sessiontime > $GM_SESSION_TIME) UserController::UserLogout($user->username, "Session expired");
+		if (time() - $user->sessiontime > GM_SESSION_TIME) UserController::UserLogout($user->username, "Session expired");
 	}
 	$_SESSION["check_login"] = time();
 }
@@ -797,15 +782,15 @@ function __autoload($classname) {
 	
 	if (stristr($classname, "controller")) {
 		require_once($GM_BASE_DIRECTORY.strtolower("includes/controllers/".str_ireplace("controller", "", $classname)."_ctrl.php"));
-		if (DEBUG) Debugcollector::OutputCollector("Loaded controller class: ".$classname, "output");
+		if (DEBUG) Debugcollector::OutputCollector("Loaded controller class: ".$classname, "autoload");
 	}
 	else if (stristr($classname, "functions")) {
 		require_once($GM_BASE_DIRECTORY.strtolower("includes/functions/functions_".str_ireplace("functions", "", $classname)."_class.php"));
-		if (DEBUG) Debugcollector::OutputCollector("Loaded function class: ".$classname, "output");
+		if (DEBUG) Debugcollector::OutputCollector("Loaded function class: ".$classname, "autoload");
 	}
 	else {
 		require_once($GM_BASE_DIRECTORY.strtolower("includes/classes/".$classname."_class.php"));
-		if (DEBUG) Debugcollector::OutputCollector("Loaded data class: ".$classname, "output");
+		if (DEBUG) Debugcollector::OutputCollector("Loaded data class: ".$classname, "autoload");
 	}
 }
 ?>

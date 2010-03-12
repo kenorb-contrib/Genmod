@@ -44,7 +44,7 @@ if (!isset($action)) $action = "backup";
 if (!isset($step)) $step = "1";
 
 if ($action == "backup") {
-	if ($MEDIA_IN_DB && (2 * MediaFS::GetTotalMediaSize() >= disk_free_space(INDEX_DIRECTORY) || !MediaFS::DirIsWritable(GedcomConfig::$MEDIA_DIRECTORY, false))) $nomedia = true;
+	if (SystemConfig::$MEDIA_IN_DB && (2 * MediaFS::GetTotalMediaSize() >= disk_free_space(INDEX_DIRECTORY) || !MediaFS::DirIsWritable(GedcomConfig::$MEDIA_DIRECTORY, false))) $nomedia = true;
 	else $nomedia = false;
 }
 
@@ -463,7 +463,6 @@ switch ($action) {
 
 
 function GetMediaFiles($gedid="") {
-	global $MEDIA_IN_DB;
 	
 	$mlist = array();
 	$sql = "SELECT m_mfile from ".TBLPREFIX."media WHERE m_mfile NOT LIKE '%://%'";
@@ -471,7 +470,7 @@ function GetMediaFiles($gedid="") {
 	$sql .= "ORDER BY m_mfile ASC";
 	$res = NewQuery($sql);
 	while($row = $res->FetchRow()){
-		if ($MEDIA_IN_DB || file_exists($row[0])) $mlist[] = $row[0];
+		if (SystemConfig::$MEDIA_IN_DB || file_exists($row[0])) $mlist[] = $row[0];
 	}
 	return array_flip(array_flip($mlist));
 }

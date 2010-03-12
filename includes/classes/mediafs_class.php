@@ -35,9 +35,8 @@ abstract class MediaFS {
 	public static $fdetails = array();
 	
 	public function GetMediaDirList($directory="", $all=true, $level=1, $checkwrite=true, $incthumbdir=false, $dbmode="unset") {
-		global $MEDIA_IN_DB;
 		
-		if ($dbmode == "unset") $dbmode = $MEDIA_IN_DB;
+		if ($dbmode == "unset") $dbmode = SystemConfig::$MEDIA_IN_DB;
 // print "Dir in dirlist: ".$directory."<br />";
 		$directory = RelativePathFile($directory);
 		$dirs = array();
@@ -162,9 +161,9 @@ abstract class MediaFS {
 		
 		
 	public function GetMediaFilelist($directory, $filter="", $dbmode="unset") {
-		global $MEDIA_IN_DB, $MEDIATYPE;
+		global $MEDIATYPE;
 
- 		if ($dbmode == "unset") $dbmode = $MEDIA_IN_DB;
+ 		if ($dbmode == "unset") $dbmode = SystemConfig::$MEDIA_IN_DB;
 		$directory = RelativePathFile($directory);
 		if ($directory != "external_links") $m = RelativePathFile(GedcomConfig::$MEDIA_DIRECTORY);
 		else $m = "";
@@ -247,12 +246,12 @@ abstract class MediaFS {
 	}
 	
 	public function PrintViewLink($file, $thumb=false, $paste=false) {
-		global $MEDIA_IN_DB, $TEXT_DIRECTION;
+		global $TEXT_DIRECTION;
 		
 		$fileobj = $file["filedata"];
 		$realfile = RelativePathFile($fileobj->f_main_file);
 		$thumbfile = $fileobj->f_thumb_file;
-		if ($MEDIA_IN_DB) {
+		if (SystemConfig::$MEDIA_IN_DB) {
 			if (!empty($fileobj->f_link)) {
 				$realfile = $fileobj->f_link;
 			}
@@ -264,7 +263,7 @@ abstract class MediaFS {
 			// If not an image, let the function take care of what to display
 			// Also, if MM-items are attached, there will probably be thumbs, also let the function handle this.
 			// Else use the original file for display
-			if (!$fileobj->f_is_image || isset($file["objects"])) $thumbfile = self::ThumbNailFile($realfile, $MEDIA_IN_DB);
+			if (!$fileobj->f_is_image || isset($file["objects"])) $thumbfile = self::ThumbNailFile($realfile, SystemConfig::$MEDIA_IN_DB);
 			else $thumbfile = $realfile;
 		}
 
@@ -320,9 +319,8 @@ abstract class MediaFS {
 	 */
 	public function ThumbnailFile($filename, $dbmode="unset", $placeholder=true) {
 		global $GM_IMAGES;
-		global $MEDIA_IN_DB;
 
-		if ($dbmode == "unset") $dbmode = $MEDIA_IN_DB;
+		if ($dbmode == "unset") $dbmode = SystemConfig::$MEDIA_IN_DB;
 		if (strlen($filename) == 0) return false;
 		// NOTE: Lets get the file details
 //		print "file: ".$filename."<br />";
@@ -505,7 +503,6 @@ abstract class MediaFS {
 	 * @return	boolean	true|false
 	 */
 	public function GenerateThumbnail($filename, $thumbnail, $ignoremediadir=false, $ext="") {
-		global $MEDIA_IN_DB;
 //						print "Generating thumb for: ".$filename."<br />";
 
 //		print "filename: ".$filename."<br />";
@@ -514,7 +511,7 @@ abstract class MediaFS {
 		$dirname = RelativePathFile($parts["dirname"]."/");
 //		print "dirname: ".$dirname;
 		if (!GedcomConfig::$AUTO_GENERATE_THUMBS) return false;
-		if (!$MEDIA_IN_DB && file_exists($thumbnail)) return false;
+		if (!SystemConfig::$MEDIA_IN_DB && file_exists($thumbnail)) return false;
 		
 		if (!$ignoremediadir && !self::DirIsWritable($dirname, false)) return false;
 	
@@ -629,7 +626,7 @@ abstract class MediaFS {
 	
 	
 	public function UploadFiles($files, $path, $overwrite=false) {
-		global $MEDIA_IN_DB, $MEDIATYPE, $error;
+		global $MEDIATYPE, $error;
 		
 		$error = "";
 		$result = array("filename"=>"", "error"=>"", "errno"=>"0");
@@ -672,7 +669,7 @@ abstract class MediaFS {
 					else {
 						if (file_exists($upload["tmp_name"]) && $upload["size"] > 0) {
 							
-							if ($MEDIA_IN_DB) {
+							if (SystemConfig::$MEDIA_IN_DB) {
 							
 								// check if already exists
 								$exists = self::GetFileDetails($file, true);
@@ -713,7 +710,7 @@ abstract class MediaFS {
 								// Real file system mode
 								$exists = self::GetFileDetails($file, false);
 								if (!$exists || $overwrite) {
-									if ($exists) self::DeleteFile($fname, $path, $MEDIA_IN_DB);
+									if ($exists) self::DeleteFile($fname, $path, SystemConfig::$MEDIA_IN_DB);
 									if (!empty($upload['tmp_name'])) {
 										if (!move_uploaded_file($upload['tmp_name'], $file)) {
 											$result["error"] = "<br />".GM_LANG_upload_error."<br />".$upload_errors[$upload['error']];
@@ -751,9 +748,8 @@ abstract class MediaFS {
 	}
 	
 	public function GetFileDetails($filename, $dbmode="unset") {
-		global $MEDIA_IN_DB;
 		
-		if ($dbmode == "unset") $dbmode = $MEDIA_IN_DB;
+		if ($dbmode == "unset") $dbmode = SystemConfig::$MEDIA_IN_DB;
 
 		if ($dbmode) {
 			self::$fdetails = array();
@@ -920,7 +916,6 @@ abstract class MediaFS {
 	}
 
 	public function CreateFile($filename, $delete=false, $dbmode=false, $delonimport=false, $exportthum="no") {
-		global $MEDIA_IN_DB;
 
 		// File system to DB
 		if ($dbmode) {
@@ -1063,7 +1058,6 @@ abstract class MediaFS {
 	}
 
 	public function CreateDir($dir, $parent, $dbmode=false, $recurse=false) {
-		global $MEDIA_IN_DB;
 		static $dirlist;
 	
 		//Cleanup the dir
@@ -1136,7 +1130,6 @@ abstract class MediaFS {
 	}
 	
 	public function MoveFile($file, $from, $to) {
-		global $MEDIA_IN_DB;
 		static $change_id;
 		
 		$file = basename($file);
@@ -1170,7 +1163,7 @@ abstract class MediaFS {
 		$cnt = $res->FetchRow();
 		if ($cnt[0] > 0) return false;
 		
-		if ($MEDIA_IN_DB || (self::DirIsWritable($from, false) && self::DirIsWritable($to, false) && AdminFunctions::FileIsWriteable($from.$file))) {
+		if (SystemConfig::$MEDIA_IN_DB || (self::DirIsWritable($from, false) && self::DirIsWritable($to, false) && AdminFunctions::FileIsWriteable($from.$file))) {
 			// Retrieve the media in which this file is used
 			$sql = "SELECT m_media, m_gedrec FROM ".TBLPREFIX."media WHERE m_mfile LIKE '".DbLayer::EscapeQuery($mfrom.$file)."%' AND m_file LIKE '".GedcomConfig::$GEDCOMID."'";
 //			print $sql;
@@ -1197,7 +1190,7 @@ abstract class MediaFS {
 					else return false;
 				}
 			}
-			if (!$MEDIA_IN_DB) {
+			if (!SystemConfig::$MEDIA_IN_DB) {
 				// The gedcom records are fixed. Now move the file.
 				$success = @copy($from.$file, $to.$file);
 				// Dont forget the thumb! No problem if it cannot be moved, it will be deleted now and created later.
@@ -1219,9 +1212,8 @@ abstract class MediaFS {
 	}
 	
 	public function DeleteFile($file, $folder, $fromdb="unset") {
-		global $MEDIA_IN_DB;
 	
-		if ($fromdb == "unset") $fromdb = $MEDIA_IN_DB;
+		if ($fromdb == "unset") $fromdb = SystemConfig::$MEDIA_IN_DB;
 		if ($fromdb) {
 			if ($folder == "external_links") $folder = "";
 			$sql = "DELETE FROM ".TBLPREFIX."media_thumbfiles WHERE mtf_file LIKE '".DbLayer::EscapeQuery($folder.$file)."'";
@@ -1241,7 +1233,6 @@ abstract class MediaFS {
 	}
 	
 	public function DeleteDir($folder, $dbmode=false, $fake=false) {
-		global $MEDIA_IN_DB;
 	
 		if ($dbmode) {
 			if (!$fake) $sql = "SELECT count(mf_path) as count FROM ".TBLPREFIX."media_files WHERE mf_path='".DbLayer::EscapeQuery($folder)."' GROUP BY mf_path";
@@ -1290,9 +1281,8 @@ abstract class MediaFS {
 	}
 	
 	public function FileExists($filename) {
-		global $MEDIA_IN_DB;
 		
-		if ($MEDIA_IN_DB) {
+		if (SystemConfig::$MEDIA_IN_DB) {
 			$res = NewQuery("SELECT mf_file FROM ".TBLPREFIX."media_files WHERE mf_file LIKE '".DbLayer::EscapeQuery($filename)."'");
 			return $res->NumRows();
 		}
@@ -1302,9 +1292,8 @@ abstract class MediaFS {
 	}
 	
 	public function GetTotalMediaSize() {
-		global $MEDIA_IN_DB;
 		
-		if ($MEDIA_IN_DB) {
+		if (SystemConfig::$MEDIA_IN_DB) {
 			$res = NewQuery("SELECT sum(mf_size) FROM ".TBLPREFIX."media_files");
 			$row = $res->FetchRow();
 			return $row[0];
@@ -1315,9 +1304,8 @@ abstract class MediaFS {
 	}
 	
 	public function GetStorageType() {
-		global $MEDIA_IN_DB;
 		
-		if ($MEDIA_IN_DB) return "VFS";
+		if (SystemConfig::$MEDIA_IN_DB) return "VFS";
 		else return "";
 	}
 
@@ -1325,9 +1313,8 @@ abstract class MediaFS {
 	// The standard PHP function only checks for the R/O attribute and doesn't
 	// detect authorisation by ACL.
 	public function DirIsWritable($dir, $dbmode="unset") {
-		global $MEDIA_IN_DB;
 		
-		if ($dbmode == "unset") $dbmode = $MEDIA_IN_DB;
+		if ($dbmode == "unset") $dbmode = SystemConfig::$MEDIA_IN_DB;
 		
 		if (!$dbmode) {
 			if (substr($dir,-1) !="/") $dir .="/";

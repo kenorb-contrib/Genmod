@@ -391,7 +391,7 @@ class SearchController extends BaseController {
 	// Set the gedcoms to search in, either from the seletion boxes, or from the crossgeds option in quickstart
 	// If the search is performed from the topsearch box on top of the page, search only in the current gedcom.
 	private function GetSearchGeds() {
-		global $GEDCOMS, $ALLOW_CHANGE_GEDCOM;
+		global $GEDCOMS;
 		
 		if (!isset($_REQUEST["crossged"])) $this->crossged = "";
 		else $this->crossged = $_REQUEST["crossged"];
@@ -399,7 +399,7 @@ class SearchController extends BaseController {
 		if ($this->topsearch == "yes") {
 			$this->searchgeds[] = GedcomConfig::$GEDCOMID;
 		}
-		if ($this->action == "quickstart" && $ALLOW_CHANGE_GEDCOM && $this->crossged == "yes") {
+		if ($this->action == "quickstart" && SystemConfig::$ALLOW_CHANGE_GEDCOM && $this->crossged == "yes") {
 			foreach($GEDCOMS as $ged => $gedvalues) {
 				$this->searchgeds[] = $ged;
 			}

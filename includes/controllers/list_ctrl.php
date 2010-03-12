@@ -52,7 +52,7 @@ class ListController extends BaseController {
 	
 	
 	public function __construct() {
-		global $ALLOW_CHANGE_GEDCOM, $gm_user;
+		global $gm_user;
 		
 		parent::__construct();
 		
@@ -92,7 +92,7 @@ class ListController extends BaseController {
 		if (isset($_GET["show_all_firstnames"])) $this->show_all_firstnames = $_GET["show_all_firstnames"];
 		if (is_null($this->show_all_firstnames)) $this->show_all_firstnames = "no";
 		
-		if (!isset($_GET["allgeds"]) || $_GET["allgeds"] != "yes" || !$ALLOW_CHANGE_GEDCOM) $this->allgeds = "no";
+		if (!isset($_GET["allgeds"]) || $_GET["allgeds"] != "yes" || !SystemConfig::$ALLOW_CHANGE_GEDCOM) $this->allgeds = "no";
 		else $this->allgeds = "yes";
 		
 		if ($this->allgeds == "yes" && $gm_user->username == "") {

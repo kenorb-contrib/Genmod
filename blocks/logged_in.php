@@ -42,7 +42,7 @@ $GM_BLOCKS["print_logged_in_users"]["rss"]     		= false;
  * prints a list of other users who are logged in
  */
 function print_logged_in_users($block=true, $config="", $side, $index) {
-		global $GM_SESSION_TIME, $TEXT_DIRECTION, $NAME_REVERSE, $gm_user;
+		global $TEXT_DIRECTION, $NAME_REVERSE, $gm_user;
 		
 		$block = true;			// Always restrict this block's height
 		
@@ -50,7 +50,7 @@ function print_logged_in_users($block=true, $config="", $side, $index) {
 		$users = UserController::GetUsers("username", "asc", "firstname", "u_loggedin='Y'");
 		$loggedusers = array();
 		foreach($users as $indexval => $user) {
-			if (time() - $user->sessiontime > $GM_SESSION_TIME) UserController::UserLogout($user->username);
+			if (time() - $user->sessiontime > GM_SESSION_TIME) UserController::UserLogout($user->username);
 			else {
 				if (($gm_user->userIsAdmin()) || (($user->visibleonline) && ($gm_user->visibleonline))) $loggedusers[] = $user;
 				else $NumAnonymous ++;

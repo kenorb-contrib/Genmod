@@ -108,7 +108,7 @@ $maxlines = max($active, $inactive);
 						<?php PrintHelpLink("add_new_language_help", "qm", "add_new_language");?>
 					</div>
 					<div class="description">
-						<?php require($GM_BASE_DIRECTORY . "includes/values/lang_codes_std.php"); ?>
+						<?php require(SystemConfig::$GM_BASE_DIRECTORY . "includes/values/lang_codes_std.php"); ?>
 						<select name="new_shortcut">
 						<?php
 						asort($lng_codes);		// Sort the language codes table into language name order

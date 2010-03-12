@@ -95,7 +95,7 @@ if (file_exists(INDEX_DIRECTORY."emergency_syslog.txt")) {
           <div class="admin_genmod_content">
           <?php 
           foreach ($news as $key => $item) {
-               if ($NEWS_TYPE == "Normal" || $item["type"] == $NEWS_TYPE) {
+               if (SystemConfig::$NEWS_TYPE == "Normal" || $item["type"] == SystemConfig::$NEWS_TYPE) {
                     print "<b>".$item["date"];
                     if ($item["type"] == "Urgent") print "&nbsp;-&nbsp;<span class=\"error\">".$item["type"]."</span>";
                     print "&nbsp;-&nbsp;".$item["header"]."</b><br />";

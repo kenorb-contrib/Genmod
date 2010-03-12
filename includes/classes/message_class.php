@@ -159,7 +159,7 @@ class Message {
 	}
 	
 	public function AddMessage($admincopy=false) {
-		global $LANGUAGE, $GM_STORE_MESSAGES, $GM_SIMPLE_MAIL;
+		global $LANGUAGE;
 		global $TEXT_DIRECTION, $TEXT_DIRECTION_array, $DATE_FORMAT, $DATE_FORMAT_array, $TIME_FORMAT, $TIME_FORMAT_array, $WEEK_START, $WEEK_START_array, $NAME_REVERSE, $NAME_REVERSE_array;
 
 		// We cannot send already stored messages
@@ -214,7 +214,7 @@ class Message {
 			$message_sender = GM_LANG_message_email3."<br /><br />".stripslashes($message_sender);
 		}
 		else {
-			if (!$GM_SIMPLE_MAIL) $from = "'".stripslashes($fuser->firstname." ".$fuser->lastname). "' <".$fuser->email.">";
+			if (!SystemConfig::$GM_SIMPLE_MAIL) $from = "'".stripslashes($fuser->firstname." ".$fuser->lastname). "' <".$fuser->email.">";
 			else $from = $fuser->email;
 			$message_sender = GM_LANG_message_email2." ".$tuser->firstname." ".$tuser->lastname."<br /><br />".stripslashes($message_sender);
 	
@@ -251,7 +251,7 @@ class Message {
 
 		// NOTE: If admin wants the messages to be stored, we do it here
 		if (is_null($this->created) || $this->created == "") $this->created = gmdate ("M d Y H:i:s");
-		if ($GM_STORE_MESSAGES && ($this->method != "messaging3" && $this->method != "mailto" && $this->method != "none")) {
+		if (SystemConfig::$GM_STORE_MESSAGES && ($this->method != "messaging3" && $this->method != "mailto" && $this->method != "none")) {
 			$messagestore = "";
 			if (isset($messagefrom)) $messagestore .= $messagefrom;
 			$messagestore .= $this->body.$messagebody;
@@ -279,7 +279,7 @@ class Message {
 			// NOTE: the recipient must be a valid user in the system before it will send any mails
 			if (!is_object($tuser)) return false;
 			else {
-				if (!$GM_SIMPLE_MAIL) $to = "'".stripslashes($tuser->firstname." ".$tuser->lastname). "' <".$tuser->email.">";
+				if (!SystemConfig::$GM_SIMPLE_MAIL) $to = "'".stripslashes($tuser->firstname." ".$tuser->lastname). "' <".$tuser->email.">";
 				else $to = $tuser->email;
 			}
 			if (!$fuser) {
