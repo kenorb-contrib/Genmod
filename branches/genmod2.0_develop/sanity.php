@@ -1298,7 +1298,7 @@ if (!empty($check_gedcoms)) {
 			
 			// Check for physical files 
 			$flist = array();
-			if (!$MEDIA_IN_DB) {
+			if (!SystemConfig::$MEDIA_IN_DB) {
 				
 				// Build the directorylist
 				$dirs = AdminFunctions::GetDirList(array(GedcomConfig::$MEDIA_DIRECTORY));
@@ -1561,7 +1561,7 @@ if (!empty($check_filesys)) {
 		
 		// Media directories
 		// Check only if media is stored in the physical file system
-		if (!$MEDIA_IN_DB) {
+		if (!SystemConfig::$MEDIA_IN_DB) {
 			print "<tr><td class=\"shade1 wrap\">".GM_LANG_sc_fs_media."</td><td class=\"shade1 wrap\">";
 			$res = NewQuery("SELECT gc_media_directory, gc_gedcomid FROM ".TBLPREFIX."gedconf");
 			if ($res) {

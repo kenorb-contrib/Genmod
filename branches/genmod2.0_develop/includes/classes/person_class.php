@@ -824,14 +824,14 @@ class Person extends GedcomRecord {
 	 *
 	 */
 	private function AddHistoricalFacts() {
-		global $GM_BASE_DIRECTORY, $LANGUAGE, $lang_short_cut;
+		global $LANGUAGE, $lang_short_cut;
 		
 		if (!GedcomConfig::$SHOW_RELATIVES_EVENTS) return;
 		if (empty($this->bdate)) return;
 		
 		$histo=array();
-		if (file_exists($GM_BASE_DIRECTORY."languages/histo.".$lang_short_cut[$LANGUAGE].".php")) {
-			@include($GM_BASE_DIRECTORY."languages/histo.".$lang_short_cut[$LANGUAGE].".php");
+		if (file_exists(SystemConfig::$GM_BASE_DIRECTORY."languages/histo.".$lang_short_cut[$LANGUAGE].".php")) {
+			@include(SystemConfig::$GM_BASE_DIRECTORY."languages/histo.".$lang_short_cut[$LANGUAGE].".php");
 		}
 		foreach ($histo as $indexval=>$hrec) {
 			if (!isset($count)) $count = 1;

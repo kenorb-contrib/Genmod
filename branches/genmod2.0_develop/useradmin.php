@@ -564,7 +564,7 @@ if ($action=="edituser" || $action == "createform") { ?>
 					</div>
 				</div>
 			<?php }
-			if ($ALLOW_USER_THEMES) { ?>
+			if (SystemConfig::$ALLOW_USER_THEMES) { ?>
 				<div class="admin_item_box">
 					<div class="width30 choice_left">
 						<div class="helpicon">
@@ -600,7 +600,7 @@ if ($action=="edituser" || $action == "createform") { ?>
 				</div>
 				<div class="choice_right">
 					<select name="new_contact_method" tabindex="<?php $tab++; print $tab; ?>">
-						<?php if ($GM_STORE_MESSAGES) { ?>
+						<?php if (SystemConfig::$GM_STORE_MESSAGES) { ?>
 							<option value="messaging" <?php if ($action == "edituser") if ($user->contactmethod=='messaging') print "selected=\"selected\""; ?>><?php print GM_LANG_messaging;?></option>
 							<option value="messaging2" <?php if ($action == "edituser") { if ($user->contactmethod=='messaging2') print "selected=\"selected\""; } else print "selected=\"selected\"";?>><?php print GM_LANG_messaging2;?></option>
 						<?php } 
@@ -1072,7 +1072,7 @@ if ($action == "massupdate") {
 			</div>
 			<!-- User theme -->
 			<?php
-			if ($ALLOW_USER_THEMES) { ?>
+			if (SystemConfig::$ALLOW_USER_THEMES) { ?>
 				<div class="admin_item_box">
 					<div class="width30 choice_left">
 						<div class="helpicon">
@@ -1120,7 +1120,7 @@ if ($action == "massupdate") {
 						</div>
 						<div class="width80 choice_right">
 							<select name="new_contact_method" tabindex="<?php print $tab;?>">
-							<?php if ($GM_STORE_MESSAGES) { ?>
+							<?php if (SystemConfig::$GM_STORE_MESSAGES) { ?>
 								<option value="messaging"><?php print GM_LANG_messaging;?></option>
 								<option value="messaging2" selected="selected"><?php print GM_LANG_messaging2;?></option>
 							<?php }

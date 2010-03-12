@@ -208,7 +208,7 @@ abstract class GedcomConfig {
 	 * @return 	boolean		true if success, false if failed
 	**/
 	public function ReadGedcomConfig($gedcomid=0) {
-		global $GEDCOMID, $GM_BASE_DIRECTORY;
+		global $GEDCOMID;
 
 		// Save the default settings to assign to unknown gedcoms
 		if (is_null(self::$defaults)) {
@@ -264,7 +264,7 @@ abstract class GedcomConfig {
 		// If the pinyin table wasn't previously loaded and is required, load it now
 		if (self::$DISPLAY_PINYIN) {
 			global $pinyin;
-			require_once($GM_BASE_DIRECTORY."includes/values/pinyin.php");
+			require_once(SystemConfig::$GM_BASE_DIRECTORY."includes/values/pinyin.php");
 		}
 		//-- This is copied from the config_gedcom.php
 		if ($gedcomid == self::$GEDCOMID) @set_time_limit(self::$TIME_LIMIT);

@@ -31,7 +31,7 @@ if (stristr($_SERVER["SCRIPT_NAME"],basename(__FILE__))) {
 abstract class SystemFunctions {
 
 	public function CheckLockout() {
-		global $_SERVER, $_REQUEST, $LOCKOUT_TIME, $gm_username;
+		global $_SERVER, $_REQUEST, $gm_username;
 		
 		// Get the username to add to the log
 		if (!isset($gm_username) || empty($gm_username)) {
@@ -70,7 +70,7 @@ abstract class SystemFunctions {
 	}
 	
 	public function HandleIntrusion($text="") {
-		global $_SERVER, $_REQUEST, $LOCKOUT_TIME, $gm_username;
+		global $_SERVER, $_REQUEST, $gm_username;
 		
 		// Get the username to add to the log
 		if (!isset($gm_username) || empty($gm_username)) {
@@ -90,15 +90,15 @@ abstract class SystemFunctions {
 		foreach ($_REQUEST as $key => $value) {
 			$str.= $key."&nbsp;=&nbsp;".$value."<br />";
 		}
-		if ($LOCKOUT_TIME == "-1") $str .= "IP not locked out.";
+		if (SystemConfig::$LOCKOUT_TIME == "-1") $str .= "IP not locked out.";
 		else {
-			if ($LOCKOUT_TIME == "0") {
+			if (SystemConfig::$LOCKOUT_TIME == "0") {
 				$str .= "IP locked out forever.";
 				$sql = "INSERT INTO ".TBLPREFIX."lockout VALUES ('".$ip."' , '".time()."', '0', '".$gm_username."') ON DUPLICATE KEY UPDATE lo_timestamp='".time()."', lo_release='0'";
 			}
 			else {
-				$str .= "IP locked out for ".$LOCKOUT_TIME." minutes.";
-				$newtime = time() + 60*$LOCKOUT_TIME;
+				$str .= "IP locked out for ".SystemConfig::$LOCKOUT_TIME." minutes.";
+				$newtime = time() + 60*SystemConfig::$LOCKOUT_TIME;
 				$sql = "INSERT INTO ".TBLPREFIX."lockout VALUES ('".$ip."', '".time()."', '".$newtime."', '".$gm_username."') ON DUPLICATE KEY UPDATE lo_timestamp='".time()."', lo_release='".$newtime."'";
 			}
 			$res = NewQuery($sql);
@@ -114,13 +114,12 @@ abstract class SystemFunctions {
 	// This function checks if the IP from which the user authenticated, is still the IP where the request comes from.
 	// It also checks if the current IP is in the exclude list
 	public function CheckSessionIP() {
-		global $EXCLUDE_HOSTS;
 		
 		if (isset($_SESSION['gm_user']) && !empty($_SESSION['gm_user'])) {
 			if (isset($_SESSION['IP']) && !empty($_SESSION['IP'])) {
 				if ($_SESSION['IP'] != $_SERVER['REMOTE_ADDR']) {
 					$excluded = false;
-					$lines = preg_split("/[;,]/", $EXCLUDE_HOSTS);
+					$lines = preg_split("/[;,]/", SystemConfig::$EXCLUDE_HOSTS);
 					$hostname = gethostbyaddr($_SERVER["REMOTE_ADDR"]);
 					foreach ($lines as $key => $line) {
 						$line = trim($line);
@@ -166,14 +165,13 @@ abstract class SystemFunctions {
 	 * check if the maximum number of page views per hour for a session has been exeeded.
 	 */
 	public function CheckPageViews() {
-		global $MAX_VIEWS, $MAX_VIEW_TIME, $MAX_VIEW_LOGLEVEL;
 		
-		if ($MAX_VIEW_TIME == 0) return;
+		if (SystemConfig::$MAX_VIEW_TIME == 0) return;
 		
 		if (in_array(basename($_SERVER["SCRIPT_NAME"]), array("useradmin", "showblob.php")) || substr(basename($_SERVER["SCRIPT_NAME"]), 0, 4) == "edit") return;
 		
-		if ((!isset($_SESSION["pageviews"])) || (time() - $_SESSION["pageviews"]["time"] > $MAX_VIEW_TIME)) {
-			if (isset($_SESSION["pageviews"]) && $MAX_VIEW_LOGLEVEL == "2") {
+		if ((!isset($_SESSION["pageviews"])) || (time() - $_SESSION["pageviews"]["time"] > SystemConfig::$MAX_VIEW_TIME)) {
+			if (isset($_SESSION["pageviews"]) && SystemConfig::$MAX_VIEW_LOGLEVEL == "2") {
 				$str = "Max pageview counter reset: max reached was ".$_SESSION["pageviews"]["number"];
 				WriteToLog("CheckPageViews-> ".$str, "I", "S");
 			}
@@ -184,10 +182,10 @@ abstract class SystemFunctions {
 		
 		$_SESSION["pageviews"]["number"]++;
 		
-		if ($_SESSION["pageviews"]["number"] > $MAX_VIEWS) {
+		if ($_SESSION["pageviews"]["number"] > SystemConfig::$MAX_VIEWS) {
 			$time = time() - $_SESSION["pageviews"]["time"];
 			print GM_LANG_maxviews_exceeded;
-			if (($MAX_VIEW_LOGLEVEL == "2" || $MAX_VIEW_LOGLEVEL == "1") && $_SESSION["pageviews"]["hadmsg"] == false) {
+			if ((SystemConfig::$MAX_VIEW_LOGLEVEL == "2" || SystemConfig::$MAX_VIEW_LOGLEVEL == "1") && $_SESSION["pageviews"]["hadmsg"] == false) {
 				$str = "CheckPageViews-> Maximum number of pageviews exceeded after ".$time." seconds.";
 				WriteToLog($str, "W", "S");
 				$_SESSION["pageviews"]["hadmsg"] = true;

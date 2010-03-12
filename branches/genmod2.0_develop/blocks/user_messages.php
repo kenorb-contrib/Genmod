@@ -34,7 +34,7 @@ $GM_BLOCKS["print_user_messages"]["rss"]		= false;
 
 //-- print user messages
 function print_user_messages($block=true, $config="", $side, $index) {
-		global $TEXT_DIRECTION, $TIME_FORMAT, $GM_STORE_MESSAGES, $GM_IMAGES, $gm_user;
+		global $TEXT_DIRECTION, $TIME_FORMAT, $GM_IMAGES, $gm_user;
 
 		$usermessages = MessageController::getUserMessages($gm_user->username);
 

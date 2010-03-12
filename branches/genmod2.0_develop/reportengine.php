@@ -178,7 +178,7 @@ function paste_id(value) {
 		if (!isset($report_array["inputs"])) $report_array["inputs"] = array();
 		foreach($report_array["inputs"] as $indexval => $input) {
 			if ((($input["name"] == "sources") && ($SHOW_SOURCES >= $gm_user->getUserAccessLevel())) || ($input["name"] != "sources")) {
-				if (!($input["name"] == "photos" && $MEDIA_IN_DB)) {
+				if (!($input["name"] == "photos" && SystemConfig::$MEDIA_IN_DB)) {
 					print "<tr><td class=\"shade2 wrap\">\n";
 					print "<input type=\"hidden\" name=\"varnames[]\" value=\"".$input["name"]."\" />\n";
 					print $input["value"]."</td><td class=\"shade1\">";

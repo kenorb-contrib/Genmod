@@ -56,7 +56,7 @@ if ($action !="save" and $action != "toggleActive") {
 }
 
 if ($action == "new_lang") {
-	require($GM_BASE_DIRECTORY . "includes/values/lang_codes_std.php");
+	require(SystemConfig::$GM_BASE_DIRECTORY . "includes/values/lang_codes_std.php");
 	$ln = strtolower($lng_codes[$new_shortcut][0]);
 	
 	$d_LangName      = "lang_name_" . $ln;

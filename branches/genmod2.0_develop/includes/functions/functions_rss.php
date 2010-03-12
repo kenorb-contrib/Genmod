@@ -271,7 +271,7 @@ function getTodaysEvents() {
  * @TODO does not pick up the GEDCOM stats block config and always shows most common names.
  */
 function getGedcomStats() {
-	global $day, $month, $year, $GEDCOMS, $ALLOW_CHANGE_GEDCOM;
+	global $day, $month, $year, $GEDCOMS;
 	global $command, $RTLOrd;
 	global $lastcachedate;
 

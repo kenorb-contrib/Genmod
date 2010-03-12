@@ -80,7 +80,7 @@ else {
 		print "<table class=\"width100 center $TEXT_DIRECTION\">";
 		
 		// If more than one GEDCOM, switching is allowed AND DB mode is set, let the user select
-		if ((count($GEDCOMS) > 1) && ($ALLOW_CHANGE_GEDCOM)) {
+		if ((count($GEDCOMS) > 1) && (SystemConfig::$ALLOW_CHANGE_GEDCOM)) {
 			print "<tr><td class=\"shade2\" style=\"padding: 5px;\">";
 			print GM_LANG_search_geds;
 			print "</td><td class=\"shade1\" style=\"padding: 5px;\">";

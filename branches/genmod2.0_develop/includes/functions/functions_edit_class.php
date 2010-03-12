@@ -648,7 +648,7 @@ abstract class EditFunctions {
 	 */
 	public function AddSimpleTag($tag, $upperlevel="", $tab="1", $switch=false) {
 		global $GM_IMAGES, $TEMPLE_CODES, $STATUS_CODES;
-		global $assorela, $tags, $emptyfacts, $TEXT_DIRECTION, $confighelpfile, $GM_BASE_DIRECTORY;
+		global $assorela, $tags, $emptyfacts, $TEXT_DIRECTION, $confighelpfile;
 		global $NPFX_accept, $SPFX_accept, $NSFX_accept, $FILE_FORM_accept, $upload_count, $separatorfacts, $canhavey_facts;
 		static $tabkey;
 		if (!isset($tabkey)) $tabkey = $tab;

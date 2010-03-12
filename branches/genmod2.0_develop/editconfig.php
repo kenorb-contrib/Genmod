@@ -108,13 +108,14 @@ if ($action == "update") {
 	
 	// Before resetting the DB parms, we first test them.
 	if (!empty($_POST["NEW_DBPASS"])) $PASS = $_POST["NEW_DBPASS"];
-	else $PASS = $DBPASS;
+	else $PASS = DBPASS;
 	// Try to make a new connection
-	$conn = @mysql_connect($_POST["NEW_DBHOST"],$_POST["NEW_DBUSER"],$PASS, true);
+	$conn = mysql_connect($_POST["NEW_DBHOST"],$_POST["NEW_DBUSER"],$PASS, true);
 	if ($conn === false) $error_db2 = true;
 	// If a db name was entered, try to select it
 	if (!$error_db2) {
 		if (!empty($_POST["NEW_DBNAME"])) {
+			print "connect to: ".$_POST["NEW_DBNAME"];
 			$conn2 = mysql_select_db($_POST["NEW_DBNAME"], $conn);
 			if ($conn2 === false) $error_db3 = true;
 		}
@@ -151,8 +152,7 @@ if ($action == "update") {
 					
 	if (!$error_db && !$error_db2 && !$error_db3 && !$error_indexdir && !$error_url && !$error_ali && !$error_ali_login) {
 		
-		
-		if (!$SystemConfig->StoreConfig($CONFIG)) {
+		if (!SystemConfig::StoreConfig($CONFIG)) {
 			$message .= "<span class=\"error\">".GM_LANG_gm_config_write_error."</span>";
 			$error_cnf = true;
 		}
@@ -197,7 +197,11 @@ if ($action == "update") {
 //		else $$key=$value;
 //	}
 	if (!$error_db && !$error_db2 && !$error_db3 && !$error_indexdir && !$error_url && !$error_cnf && !$error_ali && !$error_ali_login) WriteToLog("EditConfig-> System configuration updated successfully.","I","S");
-	else WriteToLog("EditConfig-> System configuration update failed.","E","S");
+	else {
+		print "db: ".$error_db." db2: ".$error_db2." db3: ".$error_db3." indexdir: ".$error_indexdir." url: ".$error_url." cnf: ".$error_cnf." ali: ".$error_ali." all_login: ".$error_ali_login."<br />";
+		WriteToLog("EditConfig-> System configuration update failed.","E","S");
+		exit;
+	}
 	header("Location: editconfig.php?message=".urlencode($message));
 }
 PrintHeader(GM_LANG_configure_head);
@@ -236,7 +240,7 @@ PrintHeader(GM_LANG_configure_head);
 				</div>
 			</div>
 			<div class="choice_right">
-				<input type="text" dir="ltr" name="NEW_DBHOST" value="<?php if ($gm_user->UserIsAdmin()) print $DBHOST?>" size="40" tabindex="<?php $i++; print $i?>" />
+				<input type="text" dir="ltr" name="NEW_DBHOST" value="<?php if ($gm_user->UserIsAdmin()) print DBHOST?>" size="40" tabindex="<?php $i++; print $i?>" />
 			</div>
 		</div>
 		<div class="admin_item_box">
@@ -249,7 +253,7 @@ PrintHeader(GM_LANG_configure_head);
 				</div>
 			</div>
 			<div class="choice_right">
-				<input type="text" dir="ltr" name="NEW_DBUSER" value="<?php if ($gm_user->UserIsAdmin()) print $DBUSER?>" size="40" tabindex="<?php $i++; print $i?>" />
+				<input type="text" dir="ltr" name="NEW_DBUSER" value="<?php if ($gm_user->UserIsAdmin()) print DBUSER?>" size="40" tabindex="<?php $i++; print $i?>" />
 			</div>
 		</div>
 		<div class="admin_item_box">
@@ -275,7 +279,7 @@ PrintHeader(GM_LANG_configure_head);
 				</div>
 			</div>
 			<div class="choice_right">
-				<input type="text" dir="ltr" name="NEW_DBNAME" value="<?php if ($gm_user->UserIsAdmin()) print $DBNAME?>" size="40" tabindex="<?php $i++; print $i?>" />
+				<input type="text" dir="ltr" name="NEW_DBNAME" value="<?php if ($gm_user->UserIsAdmin()) print DBNAME?>" size="40" tabindex="<?php $i++; print $i?>" />
 			</div>
 		</div>
 		<div class="admin_item_box">
@@ -321,8 +325,8 @@ PrintHeader(GM_LANG_configure_head);
 			</div>
 			<div class="choice_right">
 				<select name="NEW_ALLOW_CHANGE_GEDCOM" tabindex="<?php $i++; print $i?>">
-					<option value="yes" <?php if ($ALLOW_CHANGE_GEDCOM) print "selected=\"selected\""; ?>><?php print GM_LANG_yes;?></option>
-					<option value="no" <?php if (!$ALLOW_CHANGE_GEDCOM) print "selected=\"selected\""; ?>><?php print GM_LANG_no;?></option>
+					<option value="yes" <?php if (SystemConfig::$ALLOW_CHANGE_GEDCOM) print "selected=\"selected\""; ?>><?php print GM_LANG_yes;?></option>
+					<option value="no" <?php if (!SystemConfig::$ALLOW_CHANGE_GEDCOM) print "selected=\"selected\""; ?>><?php print GM_LANG_no;?></option>
 				</select>
 			</div>
 		</div>
@@ -351,8 +355,8 @@ PrintHeader(GM_LANG_configure_head);
 			</div>
 			<div class="choice_right">
 				<select name="NEW_MEDIA_IN_DB" tabindex="<?php $i++; print $i?>">
-					<option value="yes" <?php if ($MEDIA_IN_DB) print "selected=\"selected\""; ?>><?php print GM_LANG_yes;?></option>
-					<option value="no" <?php if (!$MEDIA_IN_DB) print "selected=\"selected\""; ?>><?php print GM_LANG_no;?></option>
+					<option value="yes" <?php if (SystemConfig::$MEDIA_IN_DB) print "selected=\"selected\""; ?>><?php print GM_LANG_yes;?></option>
+					<option value="no" <?php if (!SystemConfig::$MEDIA_IN_DB) print "selected=\"selected\""; ?>><?php print GM_LANG_no;?></option>
 				</select>
 			</div>
 		</div>
@@ -367,8 +371,8 @@ PrintHeader(GM_LANG_configure_head);
 			</div>
 			<div class="choice_right">
 				<select name="NEW_GM_STORE_MESSAGES" tabindex="<?php $i++; print $i?>">
-					<option value="yes" <?php if ($GM_STORE_MESSAGES) print "selected=\"selected\""; ?>><?php print GM_LANG_yes;?></option>
-					<option value="no" <?php if (!$GM_STORE_MESSAGES) print "selected=\"selected\""; ?>><?php print GM_LANG_no;?></option>
+					<option value="yes" <?php if (SystemConfig::$GM_STORE_MESSAGES) print "selected=\"selected\""; ?>><?php print GM_LANG_yes;?></option>
+					<option value="no" <?php if (!SystemConfig::$GM_STORE_MESSAGES) print "selected=\"selected\""; ?>><?php print GM_LANG_no;?></option>
 				</select>
 			</div>
 		</div>
@@ -383,8 +387,8 @@ PrintHeader(GM_LANG_configure_head);
 			</div>
 			<div class="choice_right">
 				<select name="NEW_USE_REGISTRATION_MODULE" tabindex="<?php $i++; print $i?>">
-					<option value="yes" <?php if ($USE_REGISTRATION_MODULE) print "selected=\"selected\""; ?>><?php print GM_LANG_yes;?></option>
-					<option value="no" <?php if (!$USE_REGISTRATION_MODULE) print "selected=\"selected\""; ?>><?php print GM_LANG_no;?></option>
+					<option value="yes" <?php if (SystemConfig::$USE_REGISTRATION_MODULE) print "selected=\"selected\""; ?>><?php print GM_LANG_yes;?></option>
+					<option value="no" <?php if (!SystemConfig::$USE_REGISTRATION_MODULE) print "selected=\"selected\""; ?>><?php print GM_LANG_no;?></option>
 				</select>
 			</div>
 		</div>
@@ -399,8 +403,8 @@ PrintHeader(GM_LANG_configure_head);
 			</div>
 			<div class="choice_right">
 				<select name="NEW_REQUIRE_ADMIN_AUTH_REGISTRATION" tabindex="<?php $i++; print $i?>">
-					<option value="yes" <?php if ($REQUIRE_ADMIN_AUTH_REGISTRATION) print "selected=\"selected\""; ?>><?php print GM_LANG_yes;?></option>
-					<option value="no" <?php if (!$REQUIRE_ADMIN_AUTH_REGISTRATION) print "selected=\"selected\""; ?>><?php print GM_LANG_no;?></option>
+					<option value="yes" <?php if (SystemConfig::$REQUIRE_ADMIN_AUTH_REGISTRATION) print "selected=\"selected\""; ?>><?php print GM_LANG_yes;?></option>
+					<option value="no" <?php if (!SystemConfig::$REQUIRE_ADMIN_AUTH_REGISTRATION) print "selected=\"selected\""; ?>><?php print GM_LANG_no;?></option>
 				</select>
 			</div>
 		</div>
@@ -415,8 +419,8 @@ PrintHeader(GM_LANG_configure_head);
 			</div>
 			<div class="choice_right">
 				<select name="NEW_GM_SIMPLE_MAIL" tabindex="<?php $i++; print $i?>">
-					<option value="yes" <?php if ($GM_SIMPLE_MAIL) print "selected=\"selected\""; ?>><?php print GM_LANG_yes;?></option>
-					<option value="no" <?php if (!$GM_SIMPLE_MAIL) print "selected=\"selected\""; ?>><?php print GM_LANG_no;?></option>
+					<option value="yes" <?php if (SystemConfig::$GM_SIMPLE_MAIL) print "selected=\"selected\""; ?>><?php print GM_LANG_yes;?></option>
+					<option value="no" <?php if (!SystemConfig::$GM_SIMPLE_MAIL) print "selected=\"selected\""; ?>><?php print GM_LANG_no;?></option>
 				</select>
 			</div>
 		</div>
@@ -431,8 +435,8 @@ PrintHeader(GM_LANG_configure_head);
 			</div>
 			<div class="choice_right">
 				<select name="NEW_ALLOW_USER_THEMES" tabindex="<?php $i++; print $i?>">
-					<option value="yes" <?php if ($ALLOW_USER_THEMES) print "selected=\"selected\""; ?>><?php print GM_LANG_yes;?></option>
-					<option value="no" <?php if (!$ALLOW_USER_THEMES) print "selected=\"selected\""; ?>><?php print GM_LANG_no;?></option>
+					<option value="yes" <?php if (SystemConfig::$ALLOW_USER_THEMES) print "selected=\"selected\""; ?>><?php print GM_LANG_yes;?></option>
+					<option value="no" <?php if (!SystemConfig::$ALLOW_USER_THEMES) print "selected=\"selected\""; ?>><?php print GM_LANG_no;?></option>
 				</select>
 			</div>
 		</div>
@@ -447,8 +451,8 @@ PrintHeader(GM_LANG_configure_head);
 			</div>
 			<div class="choice_right">
 				<select name="NEW_NEWS_TYPE" tabindex="<?php $i++; print $i?>">
-					<option value="Normal" <?php if ($NEWS_TYPE == "Normal") print "selected=\"selected\""; ?>><?php print GM_LANG_normal;?></option>
-					<option value="Urgent" <?php if ($NEWS_TYPE == "Urgent") print "selected=\"selected\""; ?>><?php print GM_LANG_urgent;?></option>
+					<option value="Normal" <?php if (SystemConfig::$NEWS_TYPE == "Normal") print "selected=\"selected\""; ?>><?php print GM_LANG_normal;?></option>
+					<option value="Urgent" <?php if (SystemConfig::$NEWS_TYPE == "Urgent") print "selected=\"selected\""; ?>><?php print GM_LANG_urgent;?></option>
 				</select>
 			</div>
 		</div>
@@ -463,8 +467,8 @@ PrintHeader(GM_LANG_configure_head);
 			</div>
 			<div class="choice_right">
 				<select name="NEW_ALLOW_REMEMBER_ME" tabindex="<?php $i++; print $i?>">
-					<option value="yes" <?php if ($ALLOW_REMEMBER_ME) print "selected=\"selected\""; ?>><?php print GM_LANG_yes;?></option>
-					<option value="no" <?php if (!$ALLOW_REMEMBER_ME) print "selected=\"selected\""; ?>><?php print GM_LANG_no;?></option>
+					<option value="yes" <?php if (SystemConfig::$ALLOW_REMEMBER_ME) print "selected=\"selected\""; ?>><?php print GM_LANG_yes;?></option>
+					<option value="no" <?php if (!SystemConfig::$ALLOW_REMEMBER_ME) print "selected=\"selected\""; ?>><?php print GM_LANG_no;?></option>
 				</select>
 			</div>
 		</div>
@@ -551,12 +555,12 @@ PrintHeader(GM_LANG_configure_head);
 			</div>
 			<div class="choice_right">
 				<select name="NEW_VISITOR_LANG" tabindex="<?php $i++; print $i?>">
-					<option value="Genmod" <?php if ($VISITOR_LANG == "Genmod") print "selected=\"selected\""; ?>><?php print GM_LANG_genmod_lang;?></option>
+					<option value="Genmod" <?php if (SystemConfig::$VISITOR_LANG == "Genmod") print "selected=\"selected\""; ?>><?php print GM_LANG_genmod_lang;?></option>
 					<?php
 					foreach ($gm_language as $key=>$value) {
 						if ($language_settings[$key]["gm_lang_use"]) {
 							print "<option value=\"".$key."\"";
-							if ($VISITOR_LANG == $key) print " selected=\"selected\"";
+							if (SystemConfig::$VISITOR_LANG == $key) print " selected=\"selected\"";
 							print ">".constant("GM_LANG_lang_name_".$key)."</option>";
 						}
 					} ?>
@@ -622,7 +626,7 @@ PrintHeader(GM_LANG_configure_head);
 				</div>
 			</div>
 			<div class="choice_right">
-				<input type="text" name="NEW_PROXY_ADDRESS" value="<?php print $PROXY_ADDRESS;?>" dir="ltr" tabindex="<?php $i++; print $i?>" size="40" />
+				<input type="text" name="NEW_PROXY_ADDRESS" value="<?php print SystemConfig::$PROXY_ADDRESS;?>" dir="ltr" tabindex="<?php $i++; print $i?>" size="40" />
 			</div>
 		</div>
 		<div class="admin_item_box">
@@ -635,7 +639,7 @@ PrintHeader(GM_LANG_configure_head);
 				</div>
 			</div>
 			<div class="choice_right">
-				<input type="text" name="NEW_PROXY_PORT" value="<?php print $PROXY_PORT;?>" dir="ltr" tabindex="<?php $i++; print $i?>" size="5" />
+				<input type="text" name="NEW_PROXY_PORT" value="<?php print SystemConfig::$PROXY_PORT;?>" dir="ltr" tabindex="<?php $i++; print $i?>" size="5" />
 			</div>
 		</div>
 		<div class="admin_item_box">
@@ -661,7 +665,7 @@ PrintHeader(GM_LANG_configure_head);
 				</div>
 			</div>
 			<div class="choice_right">
-				<input type="text" name="NEW_GM_SESSION_TIME" value="<?php print $GM_SESSION_TIME;?>" tabindex="<?php $i++; print $i?>" size="5" />
+				<input type="text" name="NEW_GM_SESSION_TIME" value="<?php print GM_SESSION_TIME;?>" tabindex="<?php $i++; print $i?>" size="5" />
 			</div>
 		</div>
 		<div class="admin_item_box">
@@ -674,21 +678,21 @@ PrintHeader(GM_LANG_configure_head);
 				</div>
 			</div>
 			<div class="choice_right">
-				<input type="text" name="NEW_MAX_VIEWS" value="<?php print $MAX_VIEWS;?>" tabindex="<?php $i++; print $i?>" size="5" />
+				<input type="text" name="NEW_MAX_VIEWS" value="<?php print SystemConfig::$MAX_VIEWS;?>" tabindex="<?php $i++; print $i?>" size="5" />
 				<?php
 					if ($TEXT_DIRECTION == "ltr") print GM_LANG_page_views;
 					else print GM_LANG_seconds;
 				?>
-				<input type="text" name="NEW_MAX_VIEW_TIME" value="<?php print $MAX_VIEW_TIME?>" tabindex="<?php $i++; print $i?>" size="5" />
+				<input type="text" name="NEW_MAX_VIEW_TIME" value="<?php print SystemConfig::$MAX_VIEW_TIME?>" tabindex="<?php $i++; print $i?>" size="5" />
 				<?php 
 					if ($TEXT_DIRECTION == "ltr") print GM_LANG_seconds;
 					else print GM_LANG_page_views;
 				?>
 				<br />
 				<select name="NEW_MAX_VIEW_LOGLEVEL" tabindex="<?php $i++; print $i?>">
-					<option value="0" <?php if ($MAX_VIEW_LOGLEVEL == "0") print "selected=\"selected\""; ?>><?php print GM_LANG_loglevel_0;?></option>
-					<option value="1" <?php if ($MAX_VIEW_LOGLEVEL == "1") print "selected=\"selected\""; ?>><?php print GM_LANG_loglevel_1;?></option>
-					<option value="2" <?php if ($MAX_VIEW_LOGLEVEL == "2") print "selected=\"selected\""; ?>><?php print GM_LANG_loglevel_2;?></option>
+					<option value="0" <?php if (SystemConfig::$MAX_VIEW_LOGLEVEL == "0") print "selected=\"selected\""; ?>><?php print GM_LANG_loglevel_0;?></option>
+					<option value="1" <?php if (SystemConfig::$MAX_VIEW_LOGLEVEL == "1") print "selected=\"selected\""; ?>><?php print GM_LANG_loglevel_1;?></option>
+					<option value="2" <?php if (SystemConfig::$MAX_VIEW_LOGLEVEL == "2") print "selected=\"selected\""; ?>><?php print GM_LANG_loglevel_2;?></option>
 				</select>
 				
 			</div>
@@ -703,7 +707,7 @@ PrintHeader(GM_LANG_configure_head);
 				</div>
 			</div>
 			<div class="choice_right">
-				<input type="text" name="NEW_EXCLUDE_HOSTS" value="<?php print $EXCLUDE_HOSTS;?>" tabindex="<?php $i++; print $i?>" size="60" />
+				<input type="text" name="NEW_EXCLUDE_HOSTS" value="<?php print SystemConfig::$EXCLUDE_HOSTS;?>" tabindex="<?php $i++; print $i?>" size="60" />
 			</div>
 		</div>
 		<div class="admin_item_box">
@@ -716,7 +720,7 @@ PrintHeader(GM_LANG_configure_head);
 				</div>
 			</div>
 			<div class="choice_right">
-				<input type="text" name="NEW_LOCKOUT_TIME" value="<?php print $LOCKOUT_TIME;?>" tabindex="<?php $i++; print $i?>" size="5" />
+				<input type="text" name="NEW_LOCKOUT_TIME" value="<?php print SystemConfig::$LOCKOUT_TIME;?>" tabindex="<?php $i++; print $i?>" size="5" />
 			</div>
 		</div>
 		<div class="admin_item_box">
@@ -729,7 +733,7 @@ PrintHeader(GM_LANG_configure_head);
 				</div>
 			</div>
 			<div class="choice_right">
-				<input type="text" name="NEW_GM_MEMORY_LIMIT" value="<?php print $GM_MEMORY_LIMIT;?>" tabindex="<?php $i++; print $i?>" size="5" />
+				<input type="text" name="NEW_GM_MEMORY_LIMIT" value="<?php print SystemConfig::$GM_MEMORY_LIMIT;?>" tabindex="<?php $i++; print $i?>" size="5" />
 			</div>
 		</div>
 		<div class="admin_item_box">
@@ -749,7 +753,7 @@ PrintHeader(GM_LANG_configure_head);
 				<select name="NEW_DEFAULT_PAGE_SIZE" tabindex="<?php $i++; print $i?>">
 				<?php foreach ($sizes as $key => $size) {
 						print "<option value=\"".$size."\" ";
-						if ($DEFAULT_PAGE_SIZE == $size) print "selected=\"selected\"";
+						if (SystemConfig::$DEFAULT_PAGE_SIZE == $size) print "selected=\"selected\"";
 						print ">".constant("GM_LANG_p_".$size);
 						print "</option>";
 					} ?>

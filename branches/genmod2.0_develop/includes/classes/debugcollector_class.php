@@ -30,9 +30,9 @@ if (stristr($_SERVER["SCRIPT_NAME"],basename(__FILE__))) {
 
 abstract class DebugCollector {
 	
-	public $classname = "DebugCollector"; 											// Name of this class
-	public static $show = false;													// Switch on/off the collector
-	private static $debugoutput = array("output" => array(), "query" => array());	// Collector for the debug output
+	public $classname = "DebugCollector"; 																	// Name of this class
+	public static $show = false;																			// Switch on/off the collector
+	private static $debugoutput = array("output" => array(), "query" => array(), "autoload" => array());	// Collector for the debug output
 	
 	private function PrintRecord($record) {
 		self::OutputCollector(print_r($record, true));
@@ -41,11 +41,13 @@ abstract class DebugCollector {
 	private function debugoutputselect($type="output") {
 		if ($type == "output") return self::$debugoutput["output"];
 		else if ($type == "queries") return self::$debugoutput["query"];
+		else if ($type == "autoload") return self::$debugoutput["autoload"];
 	}
 	
 	public function OutputCollector($output, $type="output") {
 		if ($type == "output") self::$debugoutput["output"][] = $output;
 		else if ($type == "query") self::$debugoutput["query"][] = $output;
+		else if ($type == "autoload") self::$debugoutput["autoload"][] = $output;
 	}
 	
 	private function PrintRHtml($arr, $style = "display: none; margin-left: 10px;") {
@@ -138,11 +140,12 @@ abstract class DebugCollector {
 		// If we don't show the debug, return empty
 		if (!self::$show) return false;
 		else {
-			$pages = array("output", "queries", "session", "post", "get");
+			$pages = array("output", "autoload", "queries", "session", "post", "get");
 			?>
 			<div id="debug_output">
 			<ul>
 				<li id="output_tab" class="current" ><a href="#" onclick="<?php self::HideDivs($pages, 'output');  ?> return false;">Output</a></li>
+				<li id="autoload_tab"><a href="#" onclick="<?php self::HideDivs($pages, 'autoload');  ?> return false;">Autoload</a></li>
 				<li id="queries_tab"><a href="#" onclick="<?php self::HideDivs($pages, 'queries');  ?> return false;">Queries</a></li>
 				<li id="session_tab"><a href="#" onclick="<?php self::HideDivs($pages, 'session');  ?> return false;">SESSION</a></li>
 				<li id="post_tab"><a href="#" onclick="<?php self::HideDivs($pages, 'post');  ?> return false;">POST</a></li>
@@ -152,6 +155,9 @@ abstract class DebugCollector {
 			<?php
 			echo '<div id="output" style="display: show;">';
 			echo self::PrintRHtml(self::debugoutputselect("output"));
+			echo '</div>';
+			echo '<div id="autoload" style="display: none;">';
+			echo self::PrintRHtml(self::debugoutputselect("autoload"));
 			echo '</div>';
 			echo '<div id="queries" style="display: none;">';
 			echo self::PrintRHtml(self::debugoutputselect("queries"));

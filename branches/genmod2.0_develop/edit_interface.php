@@ -34,8 +34,8 @@ $show_changes = true;
 
 /** * Inclusion of the country names
 */
-require($GM_BASE_DIRECTORY."languages/countries.en.php");
-if (file_exists($GM_BASE_DIRECTORY."languages/countries.".$lang_short_cut[$LANGUAGE].".php")) require($GM_BASE_DIRECTORY."languages/countries.".$lang_short_cut[$LANGUAGE].".php");
+require(SystemConfig::$GM_BASE_DIRECTORY."languages/countries.en.php");
+if (file_exists(SystemConfig::$GM_BASE_DIRECTORY."languages/countries.".$lang_short_cut[$LANGUAGE].".php")) require(SystemConfig::$GM_BASE_DIRECTORY."languages/countries.".$lang_short_cut[$LANGUAGE].".php");
 asort($countries);
 
 if ($_SESSION["cookie_login"]) {

@@ -742,8 +742,8 @@ print "&nbsp;<a href=\"javascript: ".GM_LANG_gedcom_conf."\" onclick=\"expand_la
 	<tr>
 		<td class="shade2 wrap"><div class="helpicon"><?php PrintHelpLink("time_limit_help", "qm", "PHP_TIME_LIMIT"); print "</div><div class=\"description\">"; print GM_LANG_PHP_TIME_LIMIT;?></div></td>
 		<td class="shade1"><input type="text" name="NEW_TIME_LIMIT" value="<?php print GedcomConfig::$TIME_LIMIT?>" size="5" tabindex="<?php $i++; print $i?>"/><br />
-		<?php if ($SystemConfig->max_execution_time == 0) print GM_LANG_maxtime_not_set;
-		else print GM_LANG_maxtime_is."&nbsp;".$SystemConfig->max_execution_time;
+		<?php if (SystemConfig::$max_execution_time == 0) print GM_LANG_maxtime_not_set;
+		else print GM_LANG_maxtime_is."&nbsp;".SystemConfig::$max_execution_time;
 		print "<br />".GM_LANG_maxtime_measure;
 		?></td>
 	</tr>
@@ -1414,7 +1414,7 @@ print "&nbsp;<a href=\"javascript: ".GM_LANG_contact_conf."\" onclick=\"expand_l
 	<tr>
 		<td class="shade2 wrap"><div class="helpicon"><?php PrintHelpLink("CONTACT_METHOD_help", "qm", "CONTACT_METHOD"); print "</div><div class=\"description\">"; print GM_LANG_CONTACT_METHOD;?></div></td>
 		<td class="shade1"><select name="NEW_CONTACT_METHOD" tabindex="<?php $i++; print $i?>">
-		<?php if ($GM_STORE_MESSAGES) { ?>
+		<?php if (SystemConfig::$GM_STORE_MESSAGES) { ?>
 				<option value="messaging" <?php if (GedcomConfig::$CONTACT_METHOD=='messaging') print "selected=\"selected\""; ?>><?php print GM_LANG_messaging;?></option>
 				<option value="messaging2" <?php if (GedcomConfig::$CONTACT_METHOD=='messaging2') print "selected=\"selected\""; ?>><?php print GM_LANG_messaging2;?></option>
 		<?php } else { ?>
@@ -1445,7 +1445,7 @@ print "&nbsp;<a href=\"javascript: ".GM_LANG_contact_conf."\" onclick=\"expand_l
 	<tr>
 		<td class="shade2 wrap"><div class="helpicon"><?php PrintHelpLink("SUPPORT_METHOD_help", "qm", "SUPPORT_METHOD"); print "</div><div class=\"description\">"; print GM_LANG_SUPPORT_METHOD;?></div></td>
 		<td class="shade1"><select name="NEW_SUPPORT_METHOD" tabindex="<?php $i++; print $i?>">
-		<?php if ($GM_STORE_MESSAGES) { ?>
+		<?php if (SystemConfig::$GM_STORE_MESSAGES) { ?>
 				<option value="messaging" <?php if (GedcomConfig::$SUPPORT_METHOD=='messaging') print "selected=\"selected\""; ?>><?php print GM_LANG_messaging;?></option>
 				<option value="messaging2" <?php if (GedcomConfig::$SUPPORT_METHOD=='messaging2') print "selected=\"selected\""; ?>><?php print GM_LANG_messaging2;?></option>
 		<?php } else { ?>

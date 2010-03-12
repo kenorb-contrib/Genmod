@@ -31,23 +31,54 @@ if (stristr($_SERVER["SCRIPT_NAME"],basename(__FILE__))) {
 class SystemConfig {
 
 	// Classname of this class
-	private $classname = "SystemConfig";
+	private static $classname = "SystemConfig";
 	
 	// Default value for this setting, that stores the maximum tried execution time
-	public $max_execution_time = 0;
+	public static $max_execution_time = 0;
 	
 	// To store the names and values of the variables read from the database. Used for determining the changes made.
-	private $configdb_list = array(); 	
+	private static $configdb_list = array(); 	
 	
 	// Initialize the exclude parameter array. These variables are excluded from the database and will be stored in config.php
+	// They are available throughout the program as constants.
+	// All other variables can be accessed with SystemConfig::$VARIABLE.
 	// INDEX_DIRECTORY must NOT be stored in the DB, as changes to this parameter must be checked against the values for all sites.
-	private $exclude_parms = array("DBHOST", "DBUSER", "DBPASS", "DBNAME", "DBPERSIST", "TBLPREFIX", "SERVER_URL", "LOGIN_URL", "SITE_ALIAS", "CONFIGURED", "INDEX_DIRECTORY", "GM_SESSION_SAVE_PATH", "GM_SESSION_TIME");
+	private static $exclude_parms = array("DBHOST", "DBUSER", "DBPASS", "DBNAME", "DBPERSIST", "TBLPREFIX", "SERVER_URL", "LOGIN_URL", "SITE_ALIAS", "CONFIGURED", "INDEX_DIRECTORY", "GM_SESSION_SAVE_PATH", "GM_SESSION_TIME");
 	
 	// Array of boolean type variables
-	private $boolean  = array("DBPERSIST", "GM_STORE_MESSAGES", "GM_SIMPLE_MAIL", "USE_REGISTRATION_MODULE", "REQUIRE_ADMIN_AUTH_REGISTRATION", "ALLOW_USER_THEMES", "ALLOW_CHANGE_GEDCOM", "ALLOW_REMEMBER_ME", "CONFIGURED", "MEDIA_IN_DB");
+	private static $boolean  = array("DBPERSIST", "GM_STORE_MESSAGES", "GM_SIMPLE_MAIL", "USE_REGISTRATION_MODULE", "REQUIRE_ADMIN_AUTH_REGISTRATION", "ALLOW_USER_THEMES", "ALLOW_CHANGE_GEDCOM", "ALLOW_REMEMBER_ME", "CONFIGURED", "MEDIA_IN_DB");
+
+	// Static variables
+	public static $GM_BASE_DIRECTORY			 	= "";		//-- path to Genmod (Only needed when running as Genmod from another php program 
+																//-- such as postNuke, otherwise leave it blank)
+	public static $MEDIA_IN_DB 						= false;
+	public static $GM_STORE_MESSAGES				= true;		//-- allow messages sent to users to be stored in the GM system
+	public static $GM_SIMPLE_MAIL					= true;		//-- allow admins to set this so that they can override the name <emailaddress> 
+																//-- combination in the emails
+	public static $USE_REGISTRATION_MODULE			= true;		//-- turn on the user self registration module
+	public static $REQUIRE_ADMIN_AUTH_REGISTRATION	= true;		//-- require an admin user to authorize a new registration before a user can login
+	public static $ALLOW_USER_THEMES				= true;		//-- Allow user to set their own theme
+	public static $ALLOW_CHANGE_GEDCOM				= true;		//-- A true value will provide a link in the footer to allow users to change the 
+																//-- gedcom they are viewing
+	public static $MAX_VIEWS						= 100;		//-- the maximum number of page views per xx seconds per session
+	public static $MAX_VIEW_TIME					= 0;		//-- the number of seconds in which the maximum number of views must not be reached
+	public static $MAX_VIEW_LOGLEVEL				= 0;		//-- 0 no logging, 1 exceeding treshold, 2 # views when MAX_VIEW_TIME has passed 
+																//-- and reset
+	public static $EXCLUDE_HOSTS					= "";		//-- List of hosts and IP's to exclude from session-IP check
+	public static $GM_MEMORY_LIMIT					= "32M";	//-- the maximum amount of memory that GM should be allowed to consume
+	public static $ALLOW_REMEMBER_ME				= true;		//-- whether the users have the option of being remembered on the current computer
+	public static $CONFIG_VERSION					= "1.0";	//-- the version this config file goes to
+	public static $NEWS_TYPE						= "Normal";	//-- Type of news to be retrieved from the Genmod website
+	public static $PROXY_ADDRESS					= "";		//-- Allows obtaining GM-News and GEDCOM checking when the server is behind a proxy.	
+																//-- Type either IP address or name (e.g. mywwwproxy.net)
+	public static $PROXY_PORT						= "";		//-- Proxy port to be used
+	public static $LOCKOUT_TIME						= -1;		//-- Lockout time after intrusion attempt. -1 = no lockout, 0 = forever, 
+																//-- any other = # minutes
+	public static $VISITOR_LANG						= "Genmod";	//-- Let Genmod determine the site language, or a specific language
+	public static $DEFAULT_PAGE_SIZE				= "A4";		//-- Sets the default page size for reports
 	
 	// On instantiation, only the vars from the DB are read. The vars stored in the config.php are already read.
-	public function __construct() {
+	public static function Initialise() {
 		
 		// Read the current config parms
 		$sql = "SELECT * FROM ".TBLPREFIX."sysconf WHERE 1";
@@ -56,36 +87,30 @@ class SystemConfig {
 			while($row = $res->FetchAssoc()) {
 				$var = substr($row["s_name"], 2);
 				// Catch variables that don't belong in the DB
-				if (!in_array($var, $this->exclude_parms)) {
-					if ($row["s_value"] == "false") $this->$var = false;
-					else if ($row["s_value"] == "true") $this->$var = true;
-					else $this->$var = $row["s_value"];
-					// temporary also make it global variables
-					global $$var;
-					$$var = $this->$var;
-					$this->configdb_list[$var] = $row["s_value"];
+				if (!in_array($var, self::$exclude_parms)) {
+					if ($row["s_value"] == "false") self::$$var = false;
+					else if ($row["s_value"] == "true") self::$$var = true;
+					else self::$$var = $row["s_value"];
+					
+					self::$configdb_list[$var] = $row["s_value"];
 				}
 				// this variable should not be in the DB, so delete it.
-				else $this->DeleteConfigDBValue($var);
+				else self::DeleteConfigDBValue($var);
 			}
 		}
 	}
 	
 	public function SetConfigDBValue($name, $value) {
 		
-		if (in_array($name, $this->exclude_parms)) return false;
+		if (in_array($name, self::$exclude_parms)) return false;
 		$sql = "INSERT INTO ".TBLPREFIX."sysconf (s_name, s_value) VALUES ('s_".$name."', '".$value."') ON DUPLICATE KEY UPDATE s_value='".$value."'";
 		$res = NewQuery($sql);
-		if ($value == "false") $this->$name = false;
-		else if ($value == "true") $this->$name = true;
-		else $this->$name = $value;
-		
-		// temporary also make it global variables
-		global $$name;
-		$$name = $this->$name;
+		if ($value == "false") self::$$name = false;
+		else if ($value == "true") self::$$name = true;
+		else self::$$name = $value;
 		
 		// And add it to the list
-		$this->configdb_list[$name] = $value;
+		self::$configdb_list[$name] = $value;
 		
 		return true;
 	}
@@ -101,12 +126,12 @@ class SystemConfig {
 		$config_file_update = false;
 		foreach ($newconfig as $key => $param) {
 			// normalise the param.
-			if (in_array($key, $this->boolean)) {
+			if (in_array($key, self::$boolean)) {
 				if ($param) $param = "true";
 				else $param = "false";
 			}
 			// Check if it's a config.php value
-			if (in_array($key, $this->exclude_parms)) {
+			if (in_array($key, self::$exclude_parms)) {
 				// if yes, check if it has changed or doesn't exist yet
 				if ($config_file_update == false && (!isset($CONFIG_PARMS[$newconfig["SERVER_URL"]][$key]) || $newconfig[$key] != $CONFIG_PARMS[$newconfig["SERVER_URL"]][$key])) {
 					$config_file_update = true;
@@ -114,9 +139,9 @@ class SystemConfig {
 			}
 			// Otherwise, it's a DB value and we must check if it has changed or is even new
 			else {
-				if (!isset($this->configdb_list[$key]) || $this->configdb_list[$key] != $param) {
+				if (!isset(self::$configdb_list[$key]) || self::$configdb_list[$key] != $param) {
 					WriteToLog("SystemConfig-> Admin has set ".$key." to ".$param, "I", "S");
-					$this->SetConfigDBValue($key, $param);
+					self::SetConfigDBValue($key, $param);
 				}
 			}
 		}
@@ -124,17 +149,17 @@ class SystemConfig {
 		// Construct config.php only if changes must be made to that file
 		if ($config_file_update) {
 			//-- First lines
-			$configtext = $this->AddConfigHeader();
+			$configtext = self::AddConfigHeader();
 		
 			//-- Scroll through the site configs
 			foreach($CONFIG_PARMS as $installurl => $CONFIG) {
-				if ($installurl == $newconfig["SERVER_URL"]) $configtext .= $this->AddConfig($newconfig);
-				else $configtext .= $this->AddConfig($CONFIG);
+				if ($installurl == $newconfig["SERVER_URL"]) $configtext .= self::AddConfig($newconfig);
+				else $configtext .= self::AddConfig($CONFIG);
 			}
 			//-- Add last lines
-			$configtext .= $this->AddConfigFooter();
+			$configtext .= self::AddConfigFooter();
 			// Write the config file
-			if ($this->WriteConfig($configtext)) {
+			if (self::WriteConfig($configtext)) {
 				WriteToLog("SystemConfig-> Admin has updated config for ".$newconfig["SERVER_URL"], "I", "S");
 				return true;
 			}
@@ -148,16 +173,16 @@ class SystemConfig {
 		
 		if (!isset($CONFIG_PARMS[$config_name])) return false;
 		
-		$configtext = $this->AddConfigHeader();
+		$configtext = self::AddConfigHeader();
 		
 		// Only add configs that are not to be deleted
 		foreach($CONFIG_PARMS as $site => $config) {
-			if ($site != $config_name) $configtext .= $this->AddConfig($config);
+			if ($site != $config_name) $configtext .= self::AddConfig($config);
 		}
 		//-- Add last line
-		$configtext .= $this->AddConfigFooter();
+		$configtext .= self::AddConfigFooter();
 		// Write the config file
-		if ($this->WriteConfig($configtext)) {
+		if (self::WriteConfig($configtext)) {
 			WriteToLog("SystemConfig-> Admin has deleted config for ".$config_name, "I", "S");
 			return true;
 		}
@@ -170,7 +195,7 @@ class SystemConfig {
 		
 		$sql = "DELETE FROM ".TBLPREFIX."sysconf WHERE s_name='s_".$name."'";
 		$res = NewQuery($sql);
-		unset($this->configdb_list[$name]);
+		unset(self::$configdb_list[$name]);
 	}
 	
 	private function AddConfigHeader() {
@@ -194,9 +219,9 @@ class SystemConfig {
 
 		//-- Scroll through the site parms
 		foreach($config as $key=>$conf) {
-			if (in_array($key, $this->exclude_parms)) {
+			if (in_array($key, self::$exclude_parms)) {
 				//-- If boolean, add true or false
-				if (in_array($key, $this->boolean)) {
+				if (in_array($key, self::$boolean)) {
 					if ($conf == true || $conf == "true") $text .= "\$CONFIG[\"".$key."\"] = true;\n";
 					else $text .= "\$CONFIG[\"".$key."\"] = false;\n";
 				}

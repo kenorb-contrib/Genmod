@@ -45,79 +45,29 @@ if (GedcomConfig::$USE_RTL_FUNCTIONS) {
 		}
 	}
 }
-PrintHeader(GM_LANG_anniversary_calendar);
+PrintHeader($calendar_controller->pagetitle);
 print "<div style=\" text-align: center;\" id=\"calendar_page\">\n";
+print "<table class=\"facts_table ".$TEXT_DIRECTION." width100\">";
+print "<tr><td class=\"facts_label\"><h3>";
+print ($calendar_controller->action == "today" ? GM_LANG_on_this_day : ($calendar_controller->action == "calendar" ? GM_LANG_in_this_month : GM_LANG_in_this_year));
+print "</h3></td></tr>\n";
+print "<tr><td class=\"topbottombar\">";
+print $calendar_controller->bartext;
+print "</td></tr></table>";
 
-	//-- moved here from session.php, should probably be moved somewhere else still
-	$sql = "SELECT i_id FROM ".TBLPREFIX."individuals where i_file='".GedcomConfig::$GEDCOMID."' AND i_gedrec like '%@#DHEBREW@%' LIMIT 1";
-	$res = NewQuery($sql);
-	if ($res->NumRows()>0) $HEBREWFOUND[GedcomConfig::$GEDCOMID] = true;
-	else $HEBREWFOUND[GedcomConfig::$GEDCOMID] = false;
-	$res->FreeResult();
-
-	// Print top text
-	?>
-	<table class="facts_table <?php print $TEXT_DIRECTION ?> width100">
-	  <tr><td class="facts_label"><h3>
-<?php
-if ($calendar_controller->action == "today") {
-	print GM_LANG_on_this_day."</h3></td></tr>\n";
-	print "<tr><td class=\"topbottombar\">";
-	//-- the year is needed for alternate calendars
- 	if (GedcomConfig::$CALENDAR_FORMAT != "gregorian") print GetChangedDate($calendar_controller->day." ". $calendar_controller->month." ". $calendar_controller->startyear);
-	else print GetChangedDate($calendar_controller->day." ".$calendar_controller->month);
-	if (GedcomConfig::$CALENDAR_FORMAT == "gregorian" && GedcomConfig::$USE_RTL_FUNCTIONS && $HEBREWFOUND[GedcomConfig::$GEDCOMID] == true) print " / ".GetChangedDate("@#DHEBREW@ ".$calendar_controller->hDay." ".$calendar_controller->hMonth." ".$calendar_controller->CalYear); 
-}
-else if ($calendar_controller->action == "calendar") {
-	print GM_LANG_in_this_month."</h3></td></tr>\n";
-	print "<tr><td class=\"topbottombar\">";
-	print GetChangedDate(" ".$calendar_controller->month." ".$calendar_controller->year." ");
-	if (GedcomConfig::$CALENDAR_FORMAT=="gregorian" && GedcomConfig::$USE_RTL_FUNCTIONS && $HEBREWFOUND[GedcomConfig::$GEDCOMID] == true) {
-		$hdd = $calendar_controller->date[1]["day"];
-		$hmm = $calendar_controller->date[1]["month"];
-		$hyy = $calendar_controller->date[1]["year"];
-		print " /  ".GetChangedDate("@#DHEBREW@ ".$hdd." ".$hmm." ".$hyy);
-        if ($hmm!=$calendar_controller->date[2]["month"]) {
-	            $hdd = $calendar_controller->date[2]["day"];
-        		$hmm = $calendar_controller->date[2]["month"];
-				$hyy = $calendar_controller->date[2]["year"];
-				print " -".GetChangedDate("@#DHEBREW@ ".$hdd." ".$hmm." ".$hyy);
-		}
-    }
-}
-else if ($calendar_controller->action == "year") {
-	print GM_LANG_in_this_year."</h3></td></tr>\n";
-	print "<tr><td class=\"topbottombar\">";
-	print GetChangedDate(" ".$calendar_controller->year_text." ");
-	if (GedcomConfig::$CALENDAR_FORMAT == "gregorian" && GedcomConfig::$USE_RTL_FUNCTIONS && $HEBREWFOUND[GedcomConfig::$GEDCOMID] == true) {
-		$hdd = $calendar_controller->date[3]["day"];
-		$hmm = $calendar_controller->date[3]["month"];
-		$hstartyear = $calendar_controller->date[3]["year"];
-		print " /  ".GetChangedDate("@#DHEBREW@ ".$hdd." ".$hmm." ".$hstartyear);
-	    $hdd = $calendar_controller->date[4]["day"];
-        $hmm = $calendar_controller->date[4]["month"];
-		$hendyear = $calendar_controller->date[4]["year"];
-		print " -".GetChangedDate("@#DHEBREW@ ".$hdd." ".$hmm." ".$hendyear);
-	}
-}
-	?>
-    </td>
-  </tr>
-</table>
-<?php
 if ($view!="preview") {
 // Print calender form
 	print "<form name=\"dateform\" method=\"get\" action=\"calendar.php\">";
 	print "<input type=\"hidden\" name=\"action\" value=\"".$calendar_controller->action."\" />";
-	print "\n\t\t<table class=\"facts_table $TEXT_DIRECTION width100\">\n\t\t<tr>";
+	print "\n\t\t<table class=\"facts_table ".$TEXT_DIRECTION." width100\">\n\t\t<tr>";
 	print "<td class=\"shade2 vmiddle\">";
 	PrintHelpLink("annivers_date_select_help", "qm", "day");
 	print GM_LANG_day."</td>\n";
 	print "<td colspan=\"7\" class=\"shade1\">";
-	for($i=1; $i<($calendar_controller->m_days+1); $i++) {
+	for($i = 1; $i < ($calendar_controller->m_days+1); $i++) {
 		if (empty($dd)) $dd = $calendar_controller->day;
 		print "<a href=\"calendar.php?day=".$i."&amp;month=".strtolower($calendar_controller->month)."&amp;year=".$calendar_controller->year."&amp;filterev=".$calendar_controller->filterev."&amp;filterof=".$calendar_controller->filterof."&amp;filtersx=".$calendar_controller->filtersx."&amp;action=today\">";
-		if ($i==$dd) print "<span class=\"error\">$i</span>";
+		if ($i == $dd) print "<span class=\"error\">".$i."</span>";
 		else print $i;
 		print "</a> | ";
 	}
@@ -126,11 +76,11 @@ if ($view!="preview") {
 	$Yy = adodb_date("Y");
 //	print "<a href=\"calendar.php?filterev=$calendar_controller->filterev&amp;filterof=$calendar_controller->filterof&amp;filtersx=$calendar_controller->filtersx\"><b>".GetChangedDate("$Dd $Mm $Yy")."</b></a> | ";
 	//-- for alternate calendars the year is needed
-  	if (GedcomConfig::$CALENDAR_FORMAT!="gregorian" || (GedcomConfig::$USE_RTL_FUNCTIONS && $HEBREWFOUND[GedcomConfig::$GEDCOMID] == true)) $datestr = "$Dd $Mm $Yy";
+  	if (GedcomConfig::$CALENDAR_FORMAT!="gregorian" || $calendar_controller->usehebrew) $datestr = "$Dd $Mm $Yy";
 // 	if ($CALENDAR_FORMAT!="gregorian") $datestr = "$Dd $Mm $Yy"; // MA @@@
 	else $datestr = "$Dd $Mm";
 	print "<a href=\"calendar.php?filterev=".$calendar_controller->filterev."&amp;filterof=".$calendar_controller->filterof."&amp;filtersx=".$calendar_controller->filtersx."&amp;year=".$calendar_controller->year."\"><b>".GetChangedDate($datestr);
-	if (GedcomConfig::$USE_RTL_FUNCTIONS && $HEBREWFOUND[GedcomConfig::$GEDCOMID] == true) {
+	if ($calendar_controller->usehebrew) {
 		$hdatestr = "@#DHEBREW@ ".$calendar_controller->currhDay." ".$calendar_controller->currhMonth." ".$calendar_controller->currhYear;
 		print " / ".GetChangedDate($hdatestr);
 	}
@@ -212,7 +162,7 @@ if ($view!="preview") {
 		PrintHelpLink("annivers_sex_help", "qm", "sex");
 		print GM_LANG_sex.":&nbsp;</td>\n";
 		print "<td class=\"shade1 vmiddle\">";
-		if ($calendar_controller->filtersx==""){
+		if ($calendar_controller->filtersx == ""){
 			print " <img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["sex"]["small"]."\" title=\"".GM_LANG_all."\" alt=\"".GM_LANG_all."\" width=\"15\" height=\"15\" border=\"0\" align=\"middle\" />";
 			print "<img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["sexf"]["small"]."\" title=\"".GM_LANG_all."\" alt=\"".GM_LANG_all."\" width=\"15\" height=\"15\" border=\"0\" align=\"middle\" />";
 			print " | ";
@@ -224,22 +174,22 @@ if ($view!="preview") {
 			print "<img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["sexf"]["small"]."\" title=\"".GM_LANG_all."\" alt=\"".GM_LANG_all."\" width=\"9\" height=\"9\" border=\"0\" align=\"middle\" />";
 			print "</a>"." | ";
 		}
-		if ($calendar_controller->filtersx=="M"){
+		if ($calendar_controller->filtersx == "M"){
 			print "<img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["sex"]["small"]."\" title=\"".GM_LANG_male."\" alt=\"".GM_LANG_male."\" width=\"15\" height=\"15\" border=\"0\" align=\"middle\" />";
 			print " | ";
 		}
 		else {
-			$fs="M";
+			$fs = "M";
 			print "<a href=\"calendar.php?day=".$dd."&amp;month=".$calendar_controller->month."&amp;year=".$calendar_controller->year."&amp;filterev=".$calendar_controller->filterev."&amp;filterof=".$calendar_controller->filterof."&amp;filtersx=".$fs."&amp;action=".$calendar_controller->action."\">";
 			print "<img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["sex"]["small"]."\" title=\"".GM_LANG_male."\" alt=\"".GM_LANG_male."\" width=\"9\" height=\"9\" border=\"0\" align=\"middle\" />";
 			print "</a>"." | ";
 		}
-		if ($calendar_controller->filtersx=="F"){
+		if ($calendar_controller->filtersx == "F"){
 			print "<img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["sexf"]["small"]."\" title=\"".GM_LANG_female."\" alt=\"".GM_LANG_female."\" width=\"15\" height=\"15\" border=\"0\" align=\"middle\" />";
 			print " | ";
 		}
 		else {
-			$fs="F";
+			$fs = "F";
 			print "<a href=\"calendar.php?day=".$dd."&amp;month=".$calendar_controller->month."&amp;year=".$calendar_controller->year."&amp;filterev=".$calendar_controller->filterev."&amp;filterof=".$calendar_controller->filterof."&amp;filtersx=".$fs."&amp;action=".$calendar_controller->action."\">";
 			print "<img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["sexf"]["small"]."\" title=\"".GM_LANG_female."\" alt=\"".GM_LANG_female."\" width=\"9\" height=\"9\" border=\"0\" align=\"middle\" />";
 			print "</a>"." | ";
@@ -367,13 +317,13 @@ if ($calendar_controller->action == "today" || $calendar_controller->action == "
 
 	uasort($myindilist, "ItemSort");
 	if ($calendar_controller->filtersx == "") uasort($myfamlist, "ItemSort");
-	$count_private_indi=array();
-	$count_indi=0;
-	$count_male=0;
-	$count_female=0;
-	$count_unknown=0;
-	$text_indi="";
-	$sx=1;
+	$count_private_indi = array();
+	$count_indi = 0;
+	$count_male = 0;
+	$count_female = 0;
+	$count_unknown = 0;
+	$text_indi = "";
+	$sx = 1;
 	if ($calendar_controller->filterev == "bdm") $select = array("BIRT", "DEAT");
 	else if ($calendar_controller->filterev == "all") $select = "";
 	else $select = array($calendar_controller->filterev);
@@ -382,23 +332,23 @@ if ($calendar_controller->action == "today" || $calendar_controller->action == "
 			$filterout=false;
 			$text_fact = "";
 			$indifacts = $indi->SelectFacts($select, true);
-//			print "check ".$indi->xref." ".$indi->name."<br >";
+			//print "check ".$indi->xref." ".$indi->name."<br >";
 			foreach($indifacts as $index => $factobj) {
-//				print "check ".$factobj->fact."<br />";
+				//print "check ".$factobj->fact."<br />";
 				$text_temp = "";
 				
-				$t1 = preg_match("/2 DATE.*DHEBREW.* (\d\d\d\d)/i", $factobj->factrec, $m1);
-				if (GedcomConfig::$USE_RTL_FUNCTIONS && $calendar_controller->action == "year" && isset($hendyear) && $hendyear>0 && $t1>0) {
-					if ($m1[1]==$hstartyear || $m1[1]==$hendyear) {
+				$t1 = preg_match("/2 DATE.*DHEBREW.* (\d\d\d\d|\d\d\d)/i", $factobj->factrec, $m1);
+				if (GedcomConfig::$USE_RTL_FUNCTIONS && $calendar_controller->action == "year" && isset($hendyear) && $hendyear > 0 && $t1 > 0) {
+					if ($m1[1] == $hstartyear || $m1[1] == $hendyear) {
 						// verify if the date falls within the first or the last range gregorian year @@@@ !!!!
 						$fdate = $factobj->datestring;
 						if ($fdate != "") {
 							$hdate = ParseDate(trim($fdate));
 							$gdate = JewishGedcomDateToGregorian($hdate);
 
-                    	    $gyear=$gdate[0]["year"]; 
+                    	    $gyear = $gdate[0]["year"]; 
 
-							if ($gyear>=$gstartyear && $gyear<=$gendyear) $hprocess=true;
+							if ($gyear >= $calendar_controller->gstartyear && $gyear <= $calendar_controller->gendyear) $hprocess=true;
 							else $hprocess=false;
 						}
 						else $hprocess=false;
@@ -410,15 +360,9 @@ if ($calendar_controller->action == "today" || $calendar_controller->action == "
 				}
 				else 
 				if ($calendar_controller->endyear > 0) {
-					$t1 = preg_match("/2 DATE.* (\d\d\d\d)/i", $factobj->factrec, $m1);
+					$t1 = preg_match("/2 DATE.* (\d\d\d\d|\d\d\d)/i", $factobj->factrec, $m1);
 					if (($t1 > 0) && ($m1[1] >= $calendar_controller->startyear) && ($m1[1] <= $calendar_controller->endyear)){
 						$text_temp .= FactFunctions::GetCalendarFact($factobj, $calendar_controller->action, $calendar_controller->filterof, $calendar_controller->filterev, $calendar_controller->year, $calendar_controller->month, $calendar_controller->day, $calendar_controller->CalYear, $calendar_controller->currhYear);
-					}
-					else {  
-						$t2 = preg_match("/2 DATE.* (\d\d\d)/i", $factobj->factrec, $m2);
-						if (($t2 > 0) && ($m2[1] >= $calendar_controller->startyear) && ($m2[1] <= $calendar_controller->endyear)){									
-							$text_temp .= FactFunctions::GetCalendarFact($factobj, $calendar_controller->action, $calendar_controller->filterof, $calendar_controller->filterev, $calendar_controller->year, $calendar_controller->month, $calendar_controller->day, $calendar_controller->CalYear, $calendar_controller->currhYear);
-						}
 					}
 				}
 				else {
@@ -477,12 +421,13 @@ if ($calendar_controller->action == "today" || $calendar_controller->action == "
 							}
 						}
 					}
-					if ($ct>0) $text_temp .= FactFunctions::GetCalendarFact($factobj, $calendar_controller->action, $calendar_controller->filterof, $calendar_controller->filterev, $calendar_controller->year, $calendar_controller->month, $calendar_controller->day, $calendar_controller->CalYear, $calendar_controller->currhYear);
+					if ($ct > 0) $text_temp .= FactFunctions::GetCalendarFact($factobj, $calendar_controller->action, $calendar_controller->filterof, $calendar_controller->filterev, $calendar_controller->year, $calendar_controller->month, $calendar_controller->day, $calendar_controller->CalYear, $calendar_controller->currhYear);
                 }						
  				if ($text_temp == "filter") $filterout = true; 
  				else if ($text_temp == "filterfilter") $filterout = true;
 				else $text_fact .= $text_temp;
 			} // end fact loop
+			//print $text_fact."<br />";
 //print "owner: ".$factobj->owner->xref." fact: ".$factobj->factrec." ".$text_temp."<br />";
 			if (!empty($text_fact)) {
 				
@@ -539,8 +484,8 @@ if ($calendar_controller->action == "today" || $calendar_controller->action == "
 				$famfacts = $fam->SelectFacts($select, true);
 				foreach ($famfacts as $index => $factobj) {
 					$text_temp = "";
-					$t1 = preg_match("/2 DATE.*DHEBREW.* (\d\d\d\d)/i", $factobj->factrec, $m1);
-					if (GedcomConfig::$USE_RTL_FUNCTIONS && $calendar_controller->action=="year" && isset($hendyear) && $hendyear>0 && $t1>0) {
+					$t1 = preg_match("/2 DATE.*DHEBREW.* (\d\d\d\d|\d\d\d)/i", $factobj->factrec, $m1);
+					if (GedcomConfig::$USE_RTL_FUNCTIONS && $calendar_controller->action == "year" && isset($hendyear) && $hendyear>0 && $t1>0) {
 						if ($m1[1]==$hstartyear || $m1[1]==$hendyear) {
 						// verify if the date falls within the first or the last range gregorian year @@@@ !!!!
 						// find gregorian year of the fact hebrew date
@@ -549,9 +494,9 @@ if ($calendar_controller->action == "today" || $calendar_controller->action == "
 								$hdate = ParseDate(trim($fdate));
 								$gdate = JewishGedcomDateToGregorian($hdate);
 
-                        	    $gyear=$gdate[0]["year"]; 
+                        	    $gyear = $gdate[0]["year"]; 
 
-								if ($gyear>=$gstartyear && $gyear<=$gendyear) $hprocess=true;
+								if ($gyear >= $calendar_controller->gstartyear && $gyear <= $calendar_controller->gendyear) $hprocess=true;
 								else $hprocess=false;
 							}
 							else $hprocess=false;
@@ -562,16 +507,10 @@ if ($calendar_controller->action == "today" || $calendar_controller->action == "
                         else $text_temp = "filter";
 					}
 				    else 
-					if ($calendar_controller->endyear>0){
-						$t1 = preg_match("/2 DATE.* (\d\d\d\d)/i", $factobj->factrec, $m1);
+					if ($calendar_controller->endyear > 0){
+						$t1 = preg_match("/2 DATE.* (\d\d\d\d|\d\d\d)/i", $factobj->factrec, $m1);
 						if (($t1 > 0) && ($m1[1] >= $calendar_controller->startyear) && ($m1[1] <= $calendar_controller->endyear)){
 							$text_temp .= FactFunctions::GetCalendarFact($factobj, $calendar_controller->action, $calendar_controller->filterof, $calendar_controller->filterev, $calendar_controller->year, $calendar_controller->month, $calendar_controller->day, $calendar_controller->CalYear, $calendar_controller->currhYear);
-						}
-						else {
-							$t2 = preg_match("/2 DATE.* (\d\d\d)/i", $factobj->factrec, $m2);
-							if (($t2 > 0) && ($m2[1] >= $calendar_controller->startyear) && ($m2[1] <= $calendar_controller->endyear)){
-								$text_temp .= FactFunctions::GetCalendarFact($factobj, $calendar_controller->action, $calendar_controller->filterof, $calendar_controller->filterev, $calendar_controller->year, $calendar_controller->month, $calendar_controller->day, $calendar_controller->CalYear, $calendar_controller->currhYear);
-							}
 						}
 					}
 					else {
@@ -666,7 +605,7 @@ if ($calendar_controller->action == "today" || $calendar_controller->action == "
 		if (!empty($text_indi) || ($count_private_indi)) {
 			print "<td class=\"shade1\"><ul>\n\t\t";
 			if (!empty($text_indi)) print $text_indi;
-			if ($count_private_indi>0){
+			if ($count_private_indi > 0){
 				PrintHelpLink("privacy_error_help", "qm", "private");
 				print "<li><b>";
 				print GM_LANG_private;
@@ -678,7 +617,7 @@ if ($calendar_controller->action == "today" || $calendar_controller->action == "
 		if (!empty($text_fam) || ($count_private_fam)) {
 			print "<td class=\"shade1\"><ul>\n\t\t";
 			if (!empty($text_fam)) print $text_fam;
-			if ($count_private_fam>0){
+			if ($count_private_fam > 0){
 				PrintHelpLink("privacy_error_help", "qm", "private");
 				print "<li><b>";
 				print GM_LANG_private;
@@ -690,20 +629,20 @@ if ($calendar_controller->action == "today" || $calendar_controller->action == "
 		print "</tr><tr>";
 		if ($count_indi > 0 || $count_private_indi > 0){
 			print "<td class=\"shade2\">\n";
-			if (($count_male+$count_female+$count_unknown+$count_private_indi)>0)
+			if (($count_male + $count_female + $count_unknown + $count_private_indi) > 0)
 			print GM_LANG_total_indis." ".($count_male+$count_female+$count_unknown+$count_private_indi)."<br />&nbsp;&nbsp;";
-			if ($count_male>0){
+			if ($count_male > 0){
 				print "<img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["sex"]["small"]."\" ";
 				print "title=\"".GM_LANG_male."\" alt=\"".GM_LANG_male."\" class=\"sex_image\" />&nbsp;";
 				print $count_male;
 			}
-			if (($count_male>0)&&($count_female>0)) print "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
-			if ($count_female>0) {
+			if ($count_male > 0 && $count_female > 0) print "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
+			if ($count_female > 0) {
 				print "<img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["sexf"]["small"]."\" ";
 				print "title=\"".GM_LANG_female."\" alt=\"".GM_LANG_female."\" class=\"sex_image\"  />&nbsp;";
 				print $count_female;
 			}
-			if ($count_unknown>0) {
+			if ($count_unknown > 0) {
 				print "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
 				print "<img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["sexn"]["small"]."\" ";
 				print "title=\"".GM_LANG_unknown."\" alt=\"".GM_LANG_unknown."\" class=\"sex_image\" />&nbsp;";
@@ -711,9 +650,9 @@ if ($calendar_controller->action == "today" || $calendar_controller->action == "
 			}
 			print "</td>";
 		}
-		if (($count_fam>0)||($count_private_fam>0)) {
+		if ($count_fam > 0 || $count_private_fam > 0) {
 			print "<td class=\"shade2\">\n";
-			if (($count_fam>0)||($count_private_fam>0)) print GM_LANG_total_fams;
+			if ($count_fam > 0 || $count_private_fam > 0) print GM_LANG_total_fams;
 			print "&nbsp;&nbsp;".($count_fam+$count_private_fam);
 			print "</td>";
 		}
@@ -727,7 +666,7 @@ if ($calendar_controller->action == "today" || $calendar_controller->action == "
 		print GM_LANG_no_results;
 		print "</i><br />\n\t\t</td></tr>";
 	}
-	if ($view=="preview") print "<tr><td>";
+	if ($view == "preview") print "<tr><td>";
 }
 else if ($calendar_controller->action == "calendar") {
 	if(GedcomConfig::$CALENDAR_FORMAT == "jewish" || GedcomConfig::$CALENDAR_FORMAT == "hebrew" || GedcomConfig::$CALENDAR_FORMAT == "hijri") { //since calendar is based on gregorian it doesn't make sense to not display the gregorian caption
@@ -897,22 +836,22 @@ else if ($calendar_controller->action == "calendar") {
 						$currentDay = true;
 					print "<span class=\"cal_day". ($currentDay?" current_day":"") ."\">".$mday."</span>";
 					if (GedcomConfig::$CALENDAR_FORMAT == "hebrew_and_gregorian" || GedcomConfig::$CALENDAR_FORMAT == "hebrew" ||
-						((GedcomConfig::$CALENDAR_FORMAT == "jewish_and_gregorian" || GedcomConfig::$CALENDAR_FORMAT == "jewish" || (GedcomConfig::$USE_RTL_FUNCTIONS &&  $HEBREWFOUND[GedcomConfig::$GEDCOMID] == true)) && $LANGUAGE == "hebrew")) {
+						((GedcomConfig::$CALENDAR_FORMAT == "jewish_and_gregorian" || GedcomConfig::$CALENDAR_FORMAT == "jewish" || ($calendar_controller->usehebrew)) && $LANGUAGE == "hebrew")) {
 						$monthTemp = $monthtonum[strtolower($calendar_controller->month)];
 						$jd = gregoriantojd($monthTemp, $mday, $calendar_controller->year);
 						$hebrewDate = jdtojewish($jd);
-						// if (GedcomConfig::$USE_RTL_FUNCTIONS &&  $HEBREWFOUND[GedcomConfig::$GEDCOMID] == true) {
+						// if ($calendar_controller->usehebrew) {
 							list ($hebrewMonth, $hebrewDay, $hebrewYear) = split ('/', $hebrewDate);
 							print "<span class=\"rtl_cal_day". ($currentDay?" current_day":"") ."\">";
 							print GetHebrewJewishDay($hebrewDay) . " " .GetHebrewJewishMonth($hebrewMonth, $hebrewYear) . "</span>";
 						// }
 					}
-					else if(GedcomConfig::$CALENDAR_FORMAT == "jewish_and_gregorian" || GedcomConfig::$CALENDAR_FORMAT == "jewish" || (GedcomConfig::$USE_RTL_FUNCTIONS && $HEBREWFOUND[GedcomConfig::$GEDCOMID] == true)) {
+					else if(GedcomConfig::$CALENDAR_FORMAT == "jewish_and_gregorian" || GedcomConfig::$CALENDAR_FORMAT == "jewish" || ($calendar_controller->usehebrew)) {
 						// else if(GedcomConfig::$CALENDAR_FORMAT=="jewish_and_gregorian" || GedcomConfig::$CALENDAR_FORMAT=="jewish" || GedcomConfig::$USE_RTL_FUNCTIONS) {
 						$monthTemp = $monthtonum[strtolower($calendar_controller->month)];
 						$jd = gregoriantojd($monthTemp, $mday, $calendar_controller->year);
 						$hebrewDate = jdtojewish($jd);
-						// if (GedcomConfig::$USE_RTL_FUNCTIONS &&  $HEBREWFOUND[GedcomConfig::$GEDCOMID] == true) {
+						// if ($calendar_controller->usehebrew) {
 							list ($hebrewMonth, $hebrewDay, $hebrewYear) = split ('/', $hebrewDate);
 							print "<span class=\"rtl_cal_day". ($currentDay?" current_day":"") ."\">";
 							print $hebrewDay . " " . GetJewishMonthName($hebrewMonth, $hebrewYear) . "</span>";
@@ -1009,14 +948,16 @@ else if ($calendar_controller->action == "calendar") {
 							foreach($indifacts as $index => $factobj) {
 								$text_temp = "";
 								$ct = preg_match("/$calendar_controller->pregquery/i", $factobj->factrec, $match);
-								if ($ct < 1 && GedcomConfig::$USE_RTL_FUNCTIONS) $ct = preg_match("/$preghbquery/i", $factobj->factrec, $match);
-								if ($ct < 1 && GedcomConfig::$USE_RTL_FUNCTIONS && $preghbquery1!="") $ct = preg_match("/$preghbquery1/i", $factobj->factrec, $match);
-								if ($ct < 1 && GedcomConfig::$USE_RTL_FUNCTIONS && $preghbquery2!="") $ct = preg_match("/$preghbquery2/i", $factobj->factrec, $match);
-								if ($ct < 1 && GedcomConfig::$USE_RTL_FUNCTIONS && $preghbquery3!="") $ct = preg_match("/$preghbquery3/i", $factobj->factrec, $match);
+								if (GedcomConfig::$USE_RTL_FUNCTIONS) {
+									if ($ct < 1) $ct = preg_match("/$preghbquery/i", $factobj->factrec, $match);
+									if ($ct < 1 && $preghbquery1 != "") $ct = preg_match("/$preghbquery1/i", $factobj->factrec, $match);
+									if ($ct < 1 && $preghbquery2 != "") $ct = preg_match("/$preghbquery2/i", $factobj->factrec, $match);
+									if ($ct < 1 && $preghbquery3 != "") $ct = preg_match("/$preghbquery3/i", $factobj->factrec, $match);
+								}
 								if ($ct>0) {
 									$text_temp .= FactFunctions::GetCalendarFact($factobj, $calendar_controller->action, $calendar_controller->filterof, $calendar_controller->filterev, $calendar_controller->year, $calendar_controller->month, $calendar_controller->day, $calendar_controller->CalYear, $calendar_controller->currhYear);
 								}
-								if ($text_temp=="filter") $filterout=true;
+								if ($text_temp == "filter") $filterout = true;
 								else $text_fact .= $text_temp;
 							}
 							if (!empty($text_fact) && $indi->disp) {
@@ -1043,7 +984,7 @@ else if ($calendar_controller->action == "calendar") {
 				else $select = array($calendar_controller->filterev);
 				if ($calendar_controller->filtersx == ""){
 					foreach($myfamlist as $gid=>$fam) {
-						$display=true;
+						$display = true;
 						if ($calendar_controller->filterof == "living"){
 							if (($fam->husb_id != "" && $fam->husb->isdead) || ($fam->wife_id != "" && $fam->wife->isdead)) $display=false;
 						}
@@ -1056,14 +997,16 @@ else if ($calendar_controller->action == "calendar") {
 								foreach($famfacts as $index => $factobj) {
 									$text_temp = "";
 									$ct = preg_match("/$calendar_controller->pregquery/i", $factobj->factrec, $match);
-									if ($ct < 1 && GedcomConfig::$USE_RTL_FUNCTIONS) $ct = preg_match("/$preghbquery/i", $factobj->factrec, $match);
-									if ($ct < 1 && GedcomConfig::$USE_RTL_FUNCTIONS && $preghbquery1!="") $ct = preg_match("/$preghbquery1/i", $factobj->factrec, $match);
-									if ($ct < 1 && GedcomConfig::$USE_RTL_FUNCTIONS && $preghbquery2!="") $ct = preg_match("/$preghbquery2/i", $factobj->factrec, $match);
-									if ($ct < 1 && GedcomConfig::$USE_RTL_FUNCTIONS && $preghbquery3!="") $ct = preg_match("/$preghbquery3/i", $factobj->factrec, $match);
+									if (GedcomConfig::$USE_RTL_FUNCTIONS) {
+										if ($ct < 1) $ct = preg_match("/$preghbquery/i", $factobj->factrec, $match);
+										if ($ct < 1 && $preghbquery1 != "") $ct = preg_match("/$preghbquery1/i", $factobj->factrec, $match);
+										if ($ct < 1 && $preghbquery2 != "") $ct = preg_match("/$preghbquery2/i", $factobj->factrec, $match);
+										if ($ct < 1 && $preghbquery3 != "") $ct = preg_match("/$preghbquery3/i", $factobj->factrec, $match);
+									}
 									if ($ct>0) {
 										$text_temp .= FactFunctions::GetCalendarFact($factobj, $calendar_controller->action, $calendar_controller->filterof, $calendar_controller->filterev, $calendar_controller->year, $calendar_controller->month, $calendar_controller->day, $calendar_controller->CalYear, $calendar_controller->currhYear);
 									}
-									if ($text_temp=="filter") $filterout=true;
+									if ($text_temp == "filter") $filterout = true;
 									else $text_fact .= $text_temp;
 								}
 								if (!empty($text_fact) && $fam->disp) {
@@ -1137,7 +1080,7 @@ if ($view=="preview"){
 	if ($calendar_controller->filterof != "all") $showfilter = htmlentities($calendar_controller->filterof == "living"? GM_LANG_living_only : GM_LANG_recent_events);
 	if ($calendar_controller->filtersx != ""){
 		if (!empty($showfilter)) $showfilter .= " - ";
-		$showfilter .= ($calendar_controller->filtersx=="M"?GM_LANG_male : GM_LANG_female);
+		$showfilter .= ($calendar_controller->filtersx == "M" ? GM_LANG_male : GM_LANG_female);
 	}
 	if ($calendar_controller->filterev != "all"){
 		if (!empty($showfilter)) $showfilter .= " - ";

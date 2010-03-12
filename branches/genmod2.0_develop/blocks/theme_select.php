@@ -33,9 +33,9 @@ $GM_BLOCKS["print_block_theme_select"]["canconfig"]	= false;
 $GM_BLOCKS["print_block_theme_select"]["rss"]       = false;
 
 function print_block_theme_select($style=0, $config="", $side, $index) {
-	global $ALLOW_USER_THEMES, $gm_user, $themeformcount;
+	global $gm_user, $themeformcount;
 	
-	if (GedcomConfig::$ALLOW_THEME_DROPDOWN && $ALLOW_USER_THEMES) {
+	if (GedcomConfig::$ALLOW_THEME_DROPDOWN && SystemConfig::$ALLOW_USER_THEMES) {
 		print "<div id=\"theme_select\" class=\"block\">\n";
 		print "<div class=\"blockhc\">";
 		PrintHelpLink("change_theme", "qm", "change_theme");

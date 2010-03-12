@@ -50,7 +50,7 @@ abstract class LanguageFunctions {
 	 * @return 	array          The array with the loaded language
 	 */
 	public function LoadEnglish($return=false, $help=false, $altlang = false) {
-		global $DBCONN, $LANGUAGE, $GM_BASE_DIRECTORY, $language_settings;
+		global $DBCONN, $LANGUAGE, $language_settings;
 	//	print $LANGUAGE;
 		$temp = array();
 		if (CONFIGURED && $DBCONN->connected) {
@@ -62,13 +62,13 @@ abstract class LanguageFunctions {
 			if ($total_columns["total"] > 0) {
 				if (!$return) {
 				// NOTE: include the extra english file BEFORE the DB
-					if (file_exists($GM_BASE_DIRECTORY . "languages/lang.".$language_settings["english"]["lang_short_cut"].".extra.php")) {
-						require_once $GM_BASE_DIRECTORY . "languages/lang.".$language_settings["english"]["lang_short_cut"].".extra.php";
+					if (file_exists(SystemConfig::$GM_BASE_DIRECTORY . "languages/lang.".$language_settings["english"]["lang_short_cut"].".extra.php")) {
+						require_once SystemConfig::$GM_BASE_DIRECTORY . "languages/lang.".$language_settings["english"]["lang_short_cut"].".extra.php";
 					}
 					if ($altlang) {
 						// NOTE: include the extra file
-						if (file_exists($GM_BASE_DIRECTORY . "languages/lang.".$language_settings[$LANGUAGE]["lang_short_cut"].".extra.php")) {
-							require_once $GM_BASE_DIRECTORY . "languages/lang.".$language_settings[$LANGUAGE]["lang_short_cut"].".extra.php";
+						if (file_exists(SystemConfig::$GM_BASE_DIRECTORY . "languages/lang.".$language_settings[$LANGUAGE]["lang_short_cut"].".extra.php")) {
+							require_once SystemConfig::$GM_BASE_DIRECTORY . "languages/lang.".$language_settings[$LANGUAGE]["lang_short_cut"].".extra.php";
 						}
 					}
 				}
@@ -143,7 +143,7 @@ abstract class LanguageFunctions {
 	// param return returns the factarray for editing purposes
 	// param altlang if true fills in missing texts in the designated language with english ones
 	public function LoadEnglishFacts($return=false, $altlang = false) {
-		global $DBCONN, $LANGUAGE, $GM_BASE_DIRECTORY, $language_settings;
+		global $DBCONN, $LANGUAGE, $language_settings;
 		
 		$temp = array();
 		if (CONFIGURED && $DBCONN->connected) {
@@ -155,12 +155,12 @@ abstract class LanguageFunctions {
 				// Load the extra files BEFORE the DB
 				if (!$return) {
 						// NOTE: include the extra file
-					if (file_exists($GM_BASE_DIRECTORY . "languages/facts.".$language_settings[$LANGUAGE]["lang_short_cut"].".extra.php")) {
-							require_once $GM_BASE_DIRECTORY . "languages/facts.".$language_settings[$LANGUAGE]["lang_short_cut"].".extra.php";
+					if (file_exists(SystemConfig::$GM_BASE_DIRECTORY . "languages/facts.".$language_settings[$LANGUAGE]["lang_short_cut"].".extra.php")) {
+							require_once SystemConfig::$GM_BASE_DIRECTORY . "languages/facts.".$language_settings[$LANGUAGE]["lang_short_cut"].".extra.php";
 					}
 					// NOTE: include the extra english file
-					if ($altlang && file_exists($GM_BASE_DIRECTORY . "languages/facts.".$language_settings["english"]["lang_short_cut"].".extra.php")) {
-						require_once $GM_BASE_DIRECTORY . "languages/facts.".$language_settings["english"]["lang_short_cut"].".extra.php";
+					if ($altlang && file_exists(SystemConfig::$GM_BASE_DIRECTORY . "languages/facts.".$language_settings["english"]["lang_short_cut"].".extra.php")) {
+						require_once SystemConfig::$GM_BASE_DIRECTORY . "languages/facts.".$language_settings["english"]["lang_short_cut"].".extra.php";
 					}
 				}
 				if ($altlang) $sql = "SELECT lg_string, lg_english, lg_".$LANGUAGE." FROM ".TBLPREFIX."facts";

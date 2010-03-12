@@ -38,7 +38,7 @@ $GM_BLOCKS["print_login_block"]["rss"]     		= false;
  * Prints a block allowing the user to login to the site directly from the portal
  */
 function print_login_block($block = true, $config="", $side, $index) {
-	global $pid, $command, $USE_REGISTRATION_MODULE, $ALLOW_REMEMBER_ME, $gm_user, $TEXT_DIRECTION, $GEDCOMS;
+	global $pid, $command, $gm_user, $TEXT_DIRECTION, $GEDCOMS;
 	
 	if ((LOGIN_URL == "" && substr(SERVER_URL,0,5) != "https") || substr(LOGIN_URL,0,5) != "https") {
 		if (!empty($gm_user->username)) return;
@@ -46,7 +46,7 @@ function print_login_block($block = true, $config="", $side, $index) {
 		else $login = LOGIN_URL;
 		print "<div id=\"login_block\" class=\"block\">\n";
 		print "<div class=\"blockhc\">";
-		if ($USE_REGISTRATION_MODULE) PrintHelpLink("index_login_register_help", "qm");
+		if (SystemConfig::$USE_REGISTRATION_MODULE) PrintHelpLink("index_login_register_help", "qm");
 		else PrintHelpLink("index_login_help", "qm", "login");
 		print GM_LANG_login;
 		print "</div>";
@@ -61,7 +61,7 @@ function print_login_block($block = true, $config="", $side, $index) {
 		print "<input type=\"text\" id=\"username\" name=\"username\" tabindex=\"20\" /><br style=\"clear: left;\"/>";
 		print "<label class=\"label_form\" for=\"password\">".GM_LANG_password."</label>";
 		print "<input type=\"password\" id=\"password\" name=\"password\" tabindex=\"21\" /><br style=\"clear: left;\"/>";
-		if ($ALLOW_REMEMBER_ME) {
+		if (SystemConfig::$ALLOW_REMEMBER_ME) {
 			print "<label class=\"label_form_remember\" for=\"remember\">";
 			PrintHelpLink("remember_me_help", "qm", "remember_me");
 			print GM_LANG_remember_me."</label>";
@@ -73,7 +73,7 @@ function print_login_block($block = true, $config="", $side, $index) {
 		print "<input type=\"submit\" id=\"submitlogin\"  tabindex=\"23\" value=\"".GM_LANG_login."\" />&nbsp;";
 		print "</form>\n";
 		print "<br />";
-		if ($USE_REGISTRATION_MODULE && count($GEDCOMS) > 0){
+		if (SystemConfig::$USE_REGISTRATION_MODULE && count($GEDCOMS) > 0){
 			PrintHelpLink("new_user_help", "qm", "no_account_yet");
 			print GM_LANG_no_account_yet;
 			print "<br />";

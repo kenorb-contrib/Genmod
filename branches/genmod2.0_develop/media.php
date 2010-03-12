@@ -108,13 +108,13 @@ if ($action == "select_action") {
 	
 if ($action == "directory_action") {
 	if ($dir_action == "create" && isset($new_dir) && !empty($new_dir)) {
-		if (MediaFS::CreateDir($new_dir, $parent_dir, $MEDIA_IN_DB)) $error = GM_LANG_dir_created;
+		if (MediaFS::CreateDir($new_dir, $parent_dir, SystemConfig::$MEDIA_IN_DB)) $error = GM_LANG_dir_created;
 		else $error = GM_LANG_dir_not_created;
 	}
 	if ($dir_action == "delete") {
 		if (!isset($del_dir)) $error = GM_LANG_dirdel_fail;
 		else {
-			if (MediaFS::DeleteDir(urldecode($del_dir), $MEDIA_IN_DB)) $error = GM_LANG_dirdel_ok;
+			if (MediaFS::DeleteDir(urldecode($del_dir), SystemConfig::$MEDIA_IN_DB)) $error = GM_LANG_dirdel_ok;
 			else $error = GM_LANG_dirdel_fail;
 		}
 	}
@@ -356,7 +356,7 @@ if ($disp1 == "block") {
 				$sel .= "<select name=\"del_dir\">";
 				// To fix: only dirs with no subdirs
 				foreach($dirs as $key => $dir) {
-					if (MediaFS::DirIsWritable($dir) && MediaFS::DeleteDir($dir, $MEDIA_IN_DB, true) && $dir != RelativePathFile(GedcomConfig::$MEDIA_DIRECTORY)) {
+					if (MediaFS::DirIsWritable($dir) && MediaFS::DeleteDir($dir, SystemConfig::$MEDIA_IN_DB, true) && $dir != RelativePathFile(GedcomConfig::$MEDIA_DIRECTORY)) {
 						$sel .= "<option value=\"".urlencode($dir)."\">".$dir."</option>";
 						$csel++;
 					}
@@ -406,7 +406,7 @@ if ($disp1 == "block") {
 				
 				// print filename
 				print "<td style=\"border-bottom:1px solid #493424;\" class=\"wrap\">";
-				if (!$MEDIA_IN_DB) $canwrite = AdminFunctions::FileIsWriteable($filename);
+				if (!SystemConfig::$MEDIA_IN_DB) $canwrite = AdminFunctions::FileIsWriteable($filename);
 				if (USE_GREYBOX && $fileobj->f_is_image) print "<a href=\"".FilenameEncode($fileobj->f_main_file)."\" title=\"".$fileobj->f_file."\" rel=\"gb_imageset[]\">";
 				else print "<a href=\"#\" onclick=\"return openImage('".$fileobj->f_main_file."','".$fileobj->f_width."','".$fileobj->f_height."','".$fileobj->f_is_image."');\">";
 //				print $fileobj->f_thumb_file."<br />";
@@ -454,7 +454,7 @@ if ($disp1 == "block") {
 				
 				// Download
 				print "<td style=\"border-bottom:1px solid #493424; text-align:center\">";
-				if ($MEDIA_IN_DB) {
+				if (SystemConfig::$MEDIA_IN_DB) {
 					if (!empty($fileobj->f_link)) {
 						print "<a href=\"showblob.php?link=".urlencode($fileobj->f_link);
 					}
@@ -559,7 +559,7 @@ if ($disp2 == "block") {
 			</script> <?php
 			print "\n<div class=\"admin_genmod_content\" style=\"border-bottom:1px solid #493424;\" >";
 				print "<div class=\"center\"><b>";
-				if ($MEDIA_IN_DB) print GM_LANG_upload_db;
+				if (SystemConfig::$MEDIA_IN_DB) print GM_LANG_upload_db;
 				else print GM_LANG_upload_filesys;
 				print "</b><br />";
 				if (!$filesize = ini_get('upload_max_filesize')) $filesize = "2M";
@@ -570,7 +570,7 @@ if ($disp2 == "block") {
 					// Box for user to choose to upload thumb from local computer
 //					print "<input type=\"file\" name=\"thumbnail\" size=\"30\" />&nbsp;&nbsp;&nbsp;".GM_LANG_upl_thumb."<br /><br />";
 					// Box for user to choose the folder to store the image
-					$dirlist = MediaFS::GetMediaDirList(GedcomConfig::$MEDIA_DIRECTORY, true, 1, true, false, $MEDIA_IN_DB);
+					$dirlist = MediaFS::GetMediaDirList(GedcomConfig::$MEDIA_DIRECTORY, true, 1, true, false, SystemConfig::$MEDIA_IN_DB);
 //					if (!in_array(GedcomConfig::$MEDIA_DIRECTORY, $dirlist)) $dirlist[] = GedcomConfig::$MEDIA_DIRECTORY;
 					sort($dirlist);
 					print "<select name=\"folder\">";

@@ -44,7 +44,7 @@ if (stristr($_SERVER["SCRIPT_NAME"],basename(__FILE__))) {
  */
 function PrintHeader($title, $head="",$use_alternate_styles=true) {
 	global $bwidth;
-	global $BROWSERTYPE, $indilist, $INDILIST_RETRIEVED;
+	global $BROWSERTYPE;
 	global $view, $gm_user;
 	global $GEDCOMS;
 	global $QUERY_STRING, $action, $query, $changelanguage,$theme_name;
@@ -292,9 +292,6 @@ var whichhelp = 'help_<?php print basename(SCRIPT_NAME)."&amp;action=".$action; 
 		<script type="text/javascript" src="modules/greybox/gb_scripts.js"></script>
 	 <?php
  	}
-	 // Unset the indilist as it is contaminated with ID's from other gedcoms
-	 $INDILIST_RETRIEVED = false;
-	 $indilist = array();
 }
 /**
  * print simple HTML header
@@ -417,7 +414,7 @@ function PrintSimpleHeader($title) {
 // -- print the html to close the page
 function PrintFooter() {
 	global $without_close, $view, $buildindex;
-	global $QUERY_STRING, $ALLOW_CHANGE_GEDCOM, $printlink;
+	global $QUERY_STRING, $printlink;
 	global $theme_name, $GM_IMAGES, $TEXT_DIRECTION, $footer_count;
 	
 	if (!isset($footer_count)) $footer_count = 1;
