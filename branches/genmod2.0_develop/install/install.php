@@ -783,6 +783,7 @@ if ($step == 7) {
 	else if (preg_match("/:\/\/www\./", $LOCATION)) {
 		$CONFIG["SITE_ALIAS"] = preg_replace("/:\/\/www\./", "://", $LOCATION);
 	}
+	else $CONFIG["SITE_ALIAS"] = "";
 	if ($upgrade && isset($newconfigparms[$LOCATION]["GM_SESSION_SAVE_PATH"])) $CONFIG["GM_SESSION_SAVE_PATH"] = $newconfigparms[$LOCATION]["GM_SESSION_SAVE_PATH"];
 	else $CONFIG["GM_SESSION_SAVE_PATH"] = "";
 	if ($upgrade && isset($newconfigparms[$LOCATION]["GM_SESSION_TIME"])) $CONFIG["GM_SESSION_TIME"] = $newconfigparms[$LOCATION]["GM_SESSION_TIME"];
