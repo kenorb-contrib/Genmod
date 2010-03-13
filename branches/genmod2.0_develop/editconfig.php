@@ -141,12 +141,16 @@ if ($action == "update") {
 		}
 	}
 	// The site URL has aliases, the login URL has not. In most cases, each site has it's own login URL, therefore we cannot have both defined
-	if (!empty($CONFIG["LOGIN_URL"]) && !empty($CONFIG["SITE_ALIAS"])) $error_ali_login = true;
+	if (!empty($CONFIG["LOGIN_URL"]) && !empty($CONFIG["SITE_ALIAS"])) {
+		$error_ali_login = true;
+		$message .= GM_LANG_aliaslogin;
+	}
 	
 	$aliases = explode(",", $CONFIG["SITE_ALIAS"]);
 	foreach ($aliases as $key => $alias) {
 		if (!empty($alias) && preg_match("/^(http|https):\/\/(([A-Z0-9][A-Z0-9_-]*)(\.[A-Z0-9][A-Z0-9_-]*)+)(:(\d+))?\//i", $alias) == 0 && preg_match("/^(http|https):\/\/localhost(:(\d+))?\//i", $alias) == 0) {
 			$error_ali = true;
+			$message .= GM_LANG_invalidalias;
 		}
 	}
 					
@@ -198,9 +202,9 @@ if ($action == "update") {
 //	}
 	if (!$error_db && !$error_db2 && !$error_db3 && !$error_indexdir && !$error_url && !$error_cnf && !$error_ali && !$error_ali_login) WriteToLog("EditConfig-> System configuration updated successfully.","I","S");
 	else {
-		print "db: ".$error_db." db2: ".$error_db2." db3: ".$error_db3." indexdir: ".$error_indexdir." url: ".$error_url." cnf: ".$error_cnf." ali: ".$error_ali." all_login: ".$error_ali_login."<br />";
+//		print "db: ".$error_db." db2: ".$error_db2." db3: ".$error_db3." indexdir: ".$error_indexdir." url: ".$error_url." cnf: ".$error_cnf." ali: ".$error_ali." all_login: ".$error_ali_login."<br />";
 		WriteToLog("EditConfig-> System configuration update failed.","E","S");
-		exit;
+//		exit;
 	}
 	header("Location: editconfig.php?message=".urlencode($message));
 }
@@ -577,7 +581,7 @@ PrintHeader(GM_LANG_configure_head);
 				</div>
 			</div>
 			<div class="choice_right width65">
-				<input type="text" name="NEW_SERVER_URL" value="<?php print $SERVER_URL?>" dir="ltr" tabindex="<?php $i++; print $i?>" size="40" 
+				<input type="text" name="NEW_SERVER_URL" value="<?php print SERVER_URL?>" dir="ltr" tabindex="<?php $i++; print $i?>" size="40" 
 				<?php if (isset($CONFIG["SERVER_URL"]) && isset($CONFIG_PARMS[$CONFIG["SERVER_URL"]])) print "disabled=\"disabled\""; ?> />
 				<?php
 				if ($error_url) print "<div class=\"error\">".GM_LANG_emptyserverurl."</div>";
@@ -612,7 +616,7 @@ PrintHeader(GM_LANG_configure_head);
 				</div>
 			</div>
 			<div class="choice_right">
-				<input type="text" name="NEW_SITE_ALIAS" value="<?php print $SITE_ALIAS?>" dir="ltr" tabindex="<?php $i++; print $i?>" size="40" />
+				<input type="text" name="NEW_SITE_ALIAS" value="<?php print SITE_ALIAS?>" dir="ltr" tabindex="<?php $i++; print $i?>" size="40" />
 				<?php if ($error_ali) print "<div class=\"error\">".GM_LANG_invalidalias."</div>"; ?>
 			</div>
 		</div>

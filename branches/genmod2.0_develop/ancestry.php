@@ -138,6 +138,6 @@ else {
 	print "</ul>";
 	print "<br />";
 }
-
+print "</div>";
 PrintFooter();
 ?>
