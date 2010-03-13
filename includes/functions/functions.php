@@ -230,17 +230,17 @@ function GetAllSubrecords($gedrec, $ignore="", $families=true, $sort=true, $Appl
 		else $prev_tags[$fact] = 1;
 		if (strpos($ignore, $fact)===false) {
 			if ($ApplyPriv && preg_match("/\d\sOBJE\s@(\w+)@/", $match[$i][0], $mmatch)) {
-				$object = ConstructObject($match[1], "OBJE");
+				$object = ConstructObject($mmatch[1], "OBJE");
 				$dispmedialink = $object->disp;
 			}
 			else $dispmedialink = true;
 			if ($ApplyPriv && preg_match("/\d\sSOUR\s@(\w+)@/", $match[$i][0], $mmatch)) {
-				$object = ConstructObject($match[1], "SOUR");
+				$object = ConstructObject($mmatch[1], "SOUR");
 				$dispsourcelink = $object->disp;
 			}
 			else $dispsourcelink = true;
 			if ($ApplyPriv && preg_match("/\d\sNOTE\s@(\w+)@/", $match[$i][0], $mmatch)) {
-				$object = ConstructObject($match[1], "NOTE");
+				$object = ConstructObject($mmatch[1], "NOTE");
 				$dispnotelink = $object->disp;
 			}
 			else $dispnotelink = true;
