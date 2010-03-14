@@ -1009,7 +1009,8 @@ abstract class EditFunctions {
 					$gedid = SplitKey($_SESSION["last_used"]["SOUR"], "gedid");
 					if ($gedid == GedcomConfig::$GEDCOMID) {
 						$id = SplitKey($_SESSION["last_used"]["SOUR"], "id");
-						if (CheckExists($id, "SOUR")) print "<a href=\"javascript\" onclick=\"document.getElementById('".$element_id."').value='".$id."'; sndReq('".$element_id."_src', 'getsourcedescriptor', 'sid', '".$id."', '', ''); return false;\">".GM_LANG_click_for." ".GetSourceDescriptor($id)."</a>";
+						$obj = ConstructObject($id, "SOUR");
+						if (is_object($obj)) print "<a href=\"javascript\" onclick=\"document.getElementById('".$element_id."').value='".$id."'; sndReq('".$element_id."_src', 'getsourcedescriptor', 'sid', '".$id."', '', ''); return false;\">".GM_LANG_click_for." ".$obj->name.$obj->addxref."</a>";
 					}
 				}
 			}
@@ -1027,7 +1028,8 @@ abstract class EditFunctions {
 					$gedid = SplitKey($_SESSION["last_used"]["OBJE"], "gedid");
 					if ($gedid == GedcomConfig::$GEDCOMID) {
 						$id = SplitKey($_SESSION["last_used"]["OBJE"], "id");
-						if (CheckExists($id, "OBJE")) print "<a href=\"javascript\" onclick=\"document.getElementById('".$element_id."').value='".$id."'; sndReq('".$element_id."_obj', 'getmediadescriptor', 'mid', '".$id."', '', ''); return false;\">".GM_LANG_click_for." ".GetMediaDescriptor($id)."</a>";
+						$obj = ConstructObject($id, "OBJE");
+						if (is_object($obj)) print "<a href=\"javascript\" onclick=\"document.getElementById('".$element_id."').value='".$id."'; sndReq('".$element_id."_obj', 'getmediadescriptor', 'mid', '".$id."', '', ''); return false;\">".GM_LANG_click_for." ".$obj->name.$obj->addxref."</a>";
 					}
 				}
 			}
