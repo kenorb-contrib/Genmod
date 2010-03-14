@@ -1163,7 +1163,7 @@ function GetLdsGlance($indirec) {
  * @return string		the updated gedcom record
  */
 function RemoveCustomTags($gedrec, $remove="no") {
-	if ($remove=="yes") {
+	if ($remove == "yes") {
 		//-- remove _GMU
 		$gedrec = preg_replace("/\d _GMU .*/", "", $gedrec);
 		//-- remove _THUM

@@ -661,7 +661,7 @@ abstract class GedcomRecord {
 	
 					
 		if ($this->isempty) return true;
-		
+	
 		// Check the gedcom context
 		$oldgedid = GedcomConfig::$GEDCOMID;
 		if (GedcomConfig::$GEDCOMID != $this->gedcomid) SwitchGedcom($this->gedcomid);

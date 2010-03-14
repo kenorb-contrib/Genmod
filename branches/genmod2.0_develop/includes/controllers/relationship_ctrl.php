@@ -32,7 +32,7 @@ if (stristr($_SERVER["SCRIPT_NAME"],basename(__FILE__))) {
 class RelationshipController extends ChartController {
 	
 	public $classname = "RelationshipController";	// Name of this class
-	public $asc = null;								// Option to show oldest on top
+	private $asc = null;							// Option to show oldest on top
 	private $pid1 = null;							// ID of the first person
 	private $pid2 = null;							// ID of the second person
 	private $person1 = null;						// Container for the first person
@@ -98,6 +98,9 @@ class RelationshipController extends ChartController {
 				break;
 			case "pretty":
 				return $this->pretty;
+				break;
+			case "asc":
+				return $this->asc;
 				break;
 			case "followspouse":
 				return $this->followspouse;

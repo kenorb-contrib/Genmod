@@ -84,11 +84,6 @@ class Note extends GedcomRecord {
 		
 		$this->exclude_facts = "CONC,CONT";
 		
-		if ($this->DisplayDetails()) {
-			// If the record is changed, check WHAT is changed.
-			if ($this->ThisChanged() && ($this->GetNoteText() != $this->GetNoteText(true))) $this->textchanged = true;
-			
-		}
 	}
 	
 	public function __get($property) {
@@ -108,6 +103,9 @@ class Note extends GedcomRecord {
 				break;
 			case "name":
 				return $this->GetTitle();
+				break;
+			case "textchanged":
+				return $this->IsTextChanged();
 				break;
 			default:
 				return parent::__get($property);
@@ -331,6 +329,18 @@ class Note extends GedcomRecord {
 		print "</a>\n";
 		if ($useli) print "</li>\n";
 		return true;
+	}
+	
+	private function IsTextChanged() {
+		
+		if (is_null($this->textchanged)) {
+			if ($this->DisplayDetails()) {
+				// If the record is changed, check WHAT is changed.
+				if ($this->ThisChanged() && ($this->GetNoteText() != $this->GetNoteText(true))) $this->textchanged = true;
+				else $this->textchanged = false;
+			}
+		}
+		return $this->textchanged;
 	}	
 }
 ?>
