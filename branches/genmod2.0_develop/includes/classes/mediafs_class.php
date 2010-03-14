@@ -322,16 +322,25 @@ abstract class MediaFS {
 
 		if ($dbmode == "unset") $dbmode = SystemConfig::$MEDIA_IN_DB;
 		if (strlen($filename) == 0) return false;
+		if ($filename == GedcomConfig::$MEDIA_DIRECTORY) $filename = "";
+		
 		// NOTE: Lets get the file details
-//		print "file: ".$filename."<br />";
+		//print "file: ".$filename."<br />";
+		//print "media dir: ".GedcomConfig::$MEDIA_DIRECTORY."<br />";
 		$parts = pathinfo($filename);
-		$dirname = RelativePathFile($parts["dirname"]."/");
-//		print "dir: ".$dirname."<br />";
-		$file_basename = $parts["basename"];
+		if (isset($parts["dirname"])) $dirname = RelativePathFile($parts["dirname"]."/");
+		else $dirname = RelativePathFile(GedcomConfig::$MEDIA_DIRECTORY);
+		//print "dir: ".$dirname."<br />";
+		//print "basename of file: ".basename($filename)."<br />";
+		//print "dirname of file: ".dirname($filename)."<br />";
+		// print "parts: ";
+		// print_r($parts);
+		if (isset($parts["basename"])) $file_basename = $parts["basename"];
+		else $file_basename = "";
 		if (isset($parts["extension"])) $thumb_extension = $parts["extension"];
 		else $thumb_extension = "";
 		// We can skip this part for media in DB
-		if (!$dbmode && GedcomConfig::$AUTO_GENERATE_THUMBS) {	
+		if (!$dbmode && GedcomConfig::$AUTO_GENERATE_THUMBS) {
 //			if ((stristr($filename, "://") && !GedcomConfig::$MEDIA_EXTERNAL) || !stristr($filename, "://")) {
 				// in case of a link we set the thumb dir to the media directory
 				if (stristr($filename, "://")) $dirname = RelativePathFile(GedcomConfig::$MEDIA_DIRECTORY);
@@ -342,7 +351,7 @@ abstract class MediaFS {
 				}
 				if (GedcomConfig::$MEDIA_DIRECTORY_LEVELS == 0) $dirname = RelativePathFile(GedcomConfig::$MEDIA_DIRECTORY);
 				if (!is_dir($dirname."thumbs/")&& !stristr($dirname, "thumbs")) {
-//					print "dirname: ".$dirname."<br />";
+					// print "dirname: ".$dirname."<br />";
 					self::CreateDir("thumbs", $dirname); 
 				}
 //			}
@@ -1111,6 +1120,8 @@ abstract class MediaFS {
 				if (!@mkdir($parent.$dir, 0777)) {
 					return false;
 				}
+				else WriteToLog("MediaFS->CreateDir: Created folder ".$parent.$dir, "I", "S");
+
 			}
 			else return true;
 			
