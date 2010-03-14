@@ -40,6 +40,7 @@ class PaternalsController extends ChartController {
 	private $show_spouse = null;				// Show spouses with persons
 	private $dgenerations = null;				// Calculated maximum generations
 	private $page = null;						// Page this controller is called from
+	private $pagewidth = null;					// Minimum width of the page in pix
 	
 	public function __construct() {
 		
@@ -52,10 +53,16 @@ class PaternalsController extends ChartController {
 		
 		if (!isset($_REQUEST["line"])) $this->line = "paternal";
 		else $this->line = $_REQUEST["line"];
+		
+		global $bwidth;
+		$this->pagewidth = pow(2, ($this->split-1)) * ($bwidth * 1.1) * ($this->box_width / 100);
 	}
 
 	public function __get($property) {
 		switch($property) {
+			case "pagewidth":
+				return $this->pagewidth;
+				break;
 			default:
 				return parent::__get($property);
 				break;

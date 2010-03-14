@@ -74,7 +74,7 @@ if ($fanchart_controller->view != "preview") {
 	$fanchart_controller->PrintInputGenerations(GedcomConfig::$MAX_PEDIGREE_GENERATIONS, "PEDIGREE_GENERATIONS_help");
 	
 	// NOTE: fan width
-	$fanchart_controller->PrintInputFanWidth();
+	$fanchart_controller->PrintInputBoxWidth();
 	
 	// NOTE: submit
 	$fanchart_controller->PrintInputSubmit();
@@ -90,7 +90,7 @@ else {
 
 $treeid = ChartFunctions::AncestryArray($fanchart_controller->root->xref, $fanchart_controller->num_generations);
 
-$fanchart_controller->PrintFanChart($treeid, 640*$fanchart_controller->fan_width/100, $fanchart_controller->fan_style*90);
+$fanchart_controller->PrintFanChart($treeid, 640*$fanchart_controller->box_width/100, $fanchart_controller->fan_style*90);
 print "</div>";
 PrintFooter();
 ?>

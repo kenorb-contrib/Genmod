@@ -38,7 +38,8 @@ if ($paternals_controller->show_full == false) {
 }
 
 // -- print html header information
-print "<div id=\"content_pedigree\">";
+//print "<div id=\"content_pedigree\" style=\"width:".($paternals_controller->box_width < 100 ? "100" :  $paternals_controller->box_width)."%;\">";
+print "<div id=\"content_pedigree\" style=\"width:".$paternals_controller->pagewidth."px; min-width:100%\">";
 
 print "\n\t<h3>".GM_LANG_paternal_chart.": ";
 print PrintReady($paternals_controller->root->name);
@@ -94,5 +95,6 @@ if ($paternals_controller->view != "preview") {
 $paternals_controller->PrintPaternalLines();
 print "</div>\n";
 print "<br /><br />\n";
+
 PrintFooter();
 ?>

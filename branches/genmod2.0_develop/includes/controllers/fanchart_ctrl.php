@@ -33,7 +33,6 @@ class FanchartController extends ChartController {
 	
 	public $classname = "FanchartController";	// Name of this class
 	private $fan_style = null;					// Style of the fanchart (2 = 1/2, 3 = 3/4, 4 = 4/4)
-	private $fan_width = null;					// Size of the fanchart (between 50 and 300%)
 	
 	public function __construct() {
 		
@@ -45,11 +44,6 @@ class FanchartController extends ChartController {
 		if (!isset($_REQUEST["fan_style"]) || $_REQUEST["fan_style"] == "" || !is_numeric($_REQUEST["fan_style"])) $this->fan_style = 3;
 		else $this->fan_style = $_REQUEST["fan_style"];
 		
-		// -- size of the chart
-		if (!isset($_REQUEST["fan_width"]) || $_REQUEST["fan_width"] == "" || !is_numeric($_REQUEST["fan_width"])) $this->fan_width = 100;
-		else $this->fan_width = $_REQUEST["fan_width"];
-		$this->fan_width = max($this->fan_width, 50);
-		$this->fan_width = min($this->fan_width, 300);
 
 		if ($this->num_generations > GedcomConfig::$MAX_PEDIGREE_GENERATIONS) {
 			$this->num_generations = GedcomConfig::$MAX_PEDIGREE_GENERATIONS;
@@ -66,9 +60,6 @@ class FanchartController extends ChartController {
 		switch($property) {
 			case "fan_style":
 				return $this->fan_style;
-				break;
-			case "fan_width":
-				return $this->fan_width;
 				break;
 			default:
 				return parent::__get($property);
@@ -102,15 +93,6 @@ class FanchartController extends ChartController {
 		print " /> 4/4</td></tr>";
 	}
 		
-	public function PrintInputFanWidth() {
-		print "<tr><td class=\"shade2\">";
-		PrintHelpLink("fan_width_help", "qm");
-		print GM_LANG_fan_width."</td>";
-		print "<td class=\"shade1\">";
-		print "<input type=\"text\" size=\"3\" name=\"fan_width\" value=\"".$this->fan_width."\" /> <b>%</b> ";
-		print "</td></tr>";
-	}
-
 	public function PointLen($string) {
 		global $cw;
 		
@@ -411,7 +393,7 @@ class FanchartController extends ChartController {
 					// add action url
 					$url = "javascript:// " . PrintReady(strip_tags($person->name.$person->addxref));
 					$imagemap .= "\" href=\"$url\" ";
-					$url = "?rootid=".$person->xref."&amp;num_generations=".$this->num_generations."&amp;fan_width=".$this->fan_width."&amp;fan_style=".$this->fan_style;
+					$url = "?rootid=".$person->xref."&amp;num_generations=".$this->num_generations."&amp;box_width=".$this->box_width."&amp;fan_style=".$this->fan_style;
 					if ($this->view != "") $url .= "&amp;view=".$this->view;
 					$count=0;
 					$mousecode = " onmouseover=\"clear_family_box_timeout('".$person->xref.".".$count."');\" onmouseout=\"family_box_timeout('".$person->xref.".".$count."');\"";
@@ -427,7 +409,7 @@ class FanchartController extends ChartController {
 					print "<br /><a href=\"descendancy.php?rootid=".$person->xref."&amp;gedid=".GedcomConfig::$GEDCOMID."\"".$mousecode.">".GM_LANG_descend_chart."</a>\n";
 					if ($reltome)  print "<br /><a href=\"relationship.php?pid1=".$gm_user->gedcomid[GedcomConfig::$GEDCOMID]."&amp;pid2=".$person->xref."&amp;gedid=".GedcomConfig::$GEDCOMID."\"".$mousecode.">".GM_LANG_relationship_to_me."</a>\n";
 					print "<br /><a href=\"ancestry.php?rootid=".$person->xref."&amp;gedid=".GedcomConfig::$GEDCOMID."\"".$mousecode.">".GM_LANG_ancestry_chart."</a>\n";
-					print "<br /><a href=\"fanchart.php?rootid=".$person->xref."&amp;gedid=".GedcomConfig::$GEDCOMID."&amp;num_generations=".$this->num_generations."&amp;fan_width=".$this->fan_width."&amp;fan_style=".$this->fan_style."\"".$mousecode.">".GM_LANG_fan_chart."</a>\n";
+					print "<br /><a href=\"fanchart.php?rootid=".$person->xref."&amp;gedid=".GedcomConfig::$GEDCOMID."&amp;num_generations=".$this->num_generations."&amp;box_width=".$this->box_width."&amp;fan_style=".$this->fan_style."\"".$mousecode.">".GM_LANG_fan_chart."</a>\n";
 					print "<br /><a href=\"hourglass.php?pid=".$person->xref."&amp;gedid=".GedcomConfig::$GEDCOMID."\"".$mousecode.">".GM_LANG_hourglass_chart."</a>\n";
 	
 					if ($sosa>=1) {
