@@ -161,7 +161,7 @@ if ($relationship_controller->view != "preview") {
 	print "</td><td class=\"shade1\">";
 	print "<input tabindex=\"5\" type=\"checkbox\" id=\"oldtop\" name=\"asc\" value=\"-1\" ";
 	if ($relationship_controller->asc == -1) print " checked=\"checked\"";
-	if ($relationship_controller->pretty) print " disabled=\"disabled\"";
+	if (!$relationship_controller->pretty) print " disabled=\"disabled\"";
 	print " />";
 	print "</td>";
 	
@@ -187,7 +187,7 @@ if ($relationship_controller->view != "preview") {
 			$_SESSION["relationships"][$relationship_controller->path_to_find] = $node;
 		}
 		if (!$node){
-			print "path --";
+			//print "path --";
 			$relationship_controller->path_to_find--;
 			$check_node = $node;
 		}
@@ -208,6 +208,7 @@ if ($relationship_controller->view != "preview") {
 			$i++;
 		}
 		if ($new_path && $relationship_controller->path_to_find < $i+1 && $check_node) print " | <span class=\"error\">".($i+1)."</span>";
+		if ($i == 0) print "</td><td class=\"shade1\">";
 		print "</td>";
 	}
 	else {
@@ -301,24 +302,25 @@ if (!$relationship_controller->person1->isempty && !$relationship_controller->pe
            $dmin = 0;
            $dmax = 0;
            $depth = 0;
-           foreach($node["path"] as $index=>$pid) {
-              if ($node["relations"][$index] == "father" || $node["relations"][$index] == "mother") {
-                 $depth++;
-                 if ($depth>$dmax) $dmax=$depth;
-                 if ($relationship_controller->asc == 0) $relationship_controller->asc = 1; // the first link is a parent link
-              }
-              if ($node["relations"][$index] == "son" || $node["relations"][$index] == "daughter") {
-                 $depth--;
-                 if ($depth<$dmin) $dmin=$depth;
-                 if ($relationship_controller->asc == 0) $relationship_controller->asc = -1; // the first link is a child link
-              }
-           }
-           $depth=$dmax+$dmin;
-		   // need more yoffset before the first box ?
-           if ($relationship_controller->asc == 1) $yoffset -= $dmin * ($Dbheight + $ys);
-           if ($relationship_controller->asc == -1) $yoffset += $dmax * ($Dbheight + $ys);
+           if (isset($node["path"])) {
+	           foreach($node["path"] as $index=>$pid) {
+	              if ($node["relations"][$index] == "father" || $node["relations"][$index] == "mother") {
+	                 $depth++;
+	                 if ($depth>$dmax) $dmax=$depth;
+	                 if ($relationship_controller->asc == 0) $relationship_controller->asc = 1; // the first link is a parent link
+	              }
+	              if ($node["relations"][$index] == "son" || $node["relations"][$index] == "daughter") {
+	                 $depth--;
+	                 if ($depth<$dmin) $dmin=$depth;
+	                 if ($relationship_controller->asc == 0) $relationship_controller->asc = -1; // the first link is a child link
+	              }
+	           }
+	           $depth=$dmax+$dmin;
+			   // need more yoffset before the first box ?
+	           if ($relationship_controller->asc == 1) $yoffset -= $dmin * ($Dbheight + $ys);
+	           if ($relationship_controller->asc == -1) $yoffset += $dmax * ($Dbheight + $ys);
+			}
 		}
-
 		$maxxoffset = -1 * $Dbwidth - 20;
 		$maxyoffset = $yoffset;
 		if ($TEXT_DIRECTION == "rtl") {
@@ -327,139 +329,141 @@ if (!$relationship_controller->person1->isempty && !$relationship_controller->pe
 		print "<div id=\"relationship_chart";
 		if ($TEXT_DIRECTION=="rtl") print "_rtl";
 		print "\">\n";
-		foreach($node["path"] as $index=>$pid) {
-		    print "\r\n\r\n<!-- Node ".$index." ".$node["relations"][$index]." ".$pid." -->\r\n";
-			$linex = $xoffset;
-			$liney = $yoffset;
-			$arrow_img = GM_IMAGE_DIR."/".$GM_IMAGES["darrow"]["other"];
-			if ($node["relations"][$index] == "father" ||$node["relations"][$index] == "mother") {
-				$line = $GM_IMAGES["vline"]["other"];
-				$liney += $Dbheight;
-				$linex += $Dbwidth/2;
-				$lh = 54;
-				$lw = 3;
-				if ($relationship_controller->pretty) {
-                   if ($relationship_controller->asc == 0) $relationship_controller->asc = 1;
-                   if ($relationship_controller->asc == -1) $arrow_img = GM_IMAGE_DIR."/".$GM_IMAGES["uarrow"]["other"];
-				   $lh = $ys;
-                   $linex = $xoffset + $Dbwidth / 2;
-                   // put the box up or down ?
-                   $yoffset += $relationship_controller->asc * ($Dbheight + $lh);
-                   if ($relationship_controller->asc == 1) $liney = $yoffset - $lh; 
-                   else $liney = $yoffset+$Dbheight;
-                   // need to draw a joining line ?
-                   if ($previous == "child" && $previous2 != "parent") {
-                      $joinh = 3;
-                      $joinw = $xs / 2 + 2;
-                      $xoffset += $Dbwidth + $xs;
-                      $linex = $xoffset - $xs / 2;
-                      if ($relationship_controller->asc == -1) $liney = $yoffset + $Dbheight; 
-                      else $liney = $yoffset - $lh;
-                      $joinx = $xoffset - $xs;
-                      $joiny = $liney - 2 - ($relationship_controller->asc - 1) / 2 * $lh;
-                      print "<div id=\"joina".$index."\" style=\"position:absolute; ".($TEXT_DIRECTION=="ltr"?"left":"right").":".($joinx + $Dbxspacing)."px; top:".($joiny + $Dbyspacing)."px; z-index:".(count($node["path"]) - $index)."; \" align=\"center\"><img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["hline"]["other"]."\" align=\"left\" width=\"".$joinw."\" height=\"".$joinh."\" alt=\"\" /></div>\n";
-                      $joinw = $xs / 2 + 2;
-                      $joinx = $joinx + $xs / 2;
-                      $joiny = $joiny + $relationship_controller->asc * $lh;
-                      print "<div id=\"joinb".$index."\" style=\"position:absolute; ".($TEXT_DIRECTION == "ltr"?"left":"right").":".($joinx + $Dbxspacing)."px; top:".($joiny + $Dbyspacing)."px; z-index:".(count($node["path"]) - $index)."; \" align=\"center\"><img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["hline"]["other"]."\" align=\"left\" width=\"".$joinw."\" height=\"".$joinh."\" alt=\"\" /></div>\n";
-                   }
-                   $previous2 = $previous;
-                   $previous = "parent";
-                }
-				else $yoffset += $Dbheight + $Dbyspacing + 50;
-		    }
-			if ($node["relations"][$index] == "brother" || $node["relations"][$index] == "sister" || $node["relations"][$index] == "sibling") {
-				$arrow_img = GM_IMAGE_DIR."/".$GM_IMAGES["rarrow"]["other"];
-				$xoffset += $Dbwidth + $Dbxspacing + 70;
-				$line = $GM_IMAGES["hline"]["other"];
-				$linex += $Dbwidth;
-				$liney += $Dbheight / 2;
-				$lh = 3;
-				$lw = 70;
-				if ($relationship_controller->pretty) {
-				   $lw = $xs;
-                   $linex = $xoffset - $lw;
-                   $liney = $yoffset + $Dbheight / 4;
-                   $previous2 = $previous;;
-				   $previous = "";
+		if (isset($node["path"])) {
+			foreach($node["path"] as $index=>$pid) {
+			    print "\r\n\r\n<!-- Node ".$index." ".$node["relations"][$index]." ".$pid." -->\r\n";
+				$linex = $xoffset;
+				$liney = $yoffset;
+				$arrow_img = GM_IMAGE_DIR."/".$GM_IMAGES["darrow"]["other"];
+				if ($node["relations"][$index] == "father" || $node["relations"][$index] == "mother") {
+					$line = $GM_IMAGES["vline"]["other"];
+					$liney += $Dbheight;
+					$linex += $Dbwidth/2;
+					$lh = 54;
+					$lw = 3;
+					if ($relationship_controller->pretty) {
+	                   if ($relationship_controller->asc == 0) $relationship_controller->asc = 1;
+	                   if ($relationship_controller->asc == -1) $arrow_img = GM_IMAGE_DIR."/".$GM_IMAGES["uarrow"]["other"];
+					   $lh = $ys;
+	                   $linex = $xoffset + $Dbwidth / 2;
+	                   // put the box up or down ?
+	                   $yoffset += $relationship_controller->asc * ($Dbheight + $lh);
+	                   if ($relationship_controller->asc == 1) $liney = $yoffset - $lh; 
+	                   else $liney = $yoffset+$Dbheight;
+	                   // need to draw a joining line ?
+	                   if ($previous == "child" && $previous2 != "parent") {
+	                      $joinh = 3;
+	                      $joinw = $xs / 2 + 2;
+	                      $xoffset += $Dbwidth + $xs;
+	                      $linex = $xoffset - $xs / 2;
+	                      if ($relationship_controller->asc == -1) $liney = $yoffset + $Dbheight; 
+	                      else $liney = $yoffset - $lh;
+	                      $joinx = $xoffset - $xs;
+	                      $joiny = $liney - 2 - ($relationship_controller->asc - 1) / 2 * $lh;
+	                      print "<div id=\"joina".$index."\" style=\"position:absolute; ".($TEXT_DIRECTION=="ltr"?"left":"right").":".($joinx + $Dbxspacing)."px; top:".($joiny + $Dbyspacing)."px; z-index:".(count($node["path"]) - $index)."; \" align=\"center\"><img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["hline"]["other"]."\" align=\"left\" width=\"".$joinw."\" height=\"".$joinh."\" alt=\"\" /></div>\n";
+	                      $joinw = $xs / 2 + 2;
+	                      $joinx = $joinx + $xs / 2;
+	                      $joiny = $joiny + $relationship_controller->asc * $lh;
+	                      print "<div id=\"joinb".$index."\" style=\"position:absolute; ".($TEXT_DIRECTION == "ltr"?"left":"right").":".($joinx + $Dbxspacing)."px; top:".($joiny + $Dbyspacing)."px; z-index:".(count($node["path"]) - $index)."; \" align=\"center\"><img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["hline"]["other"]."\" align=\"left\" width=\"".$joinw."\" height=\"".$joinh."\" alt=\"\" /></div>\n";
+	                   }
+	                   $previous2 = $previous;
+	                   $previous = "parent";
+	                }
+					else $yoffset += $Dbheight + $Dbyspacing + 50;
+			    }
+				if ($node["relations"][$index] == "brother" || $node["relations"][$index] == "sister" || $node["relations"][$index] == "sibling") {
+					$arrow_img = GM_IMAGE_DIR."/".$GM_IMAGES["rarrow"]["other"];
+					$xoffset += $Dbwidth + $Dbxspacing + 70;
+					$line = $GM_IMAGES["hline"]["other"];
+					$linex += $Dbwidth;
+					$liney += $Dbheight / 2;
+					$lh = 3;
+					$lw = 70;
+					if ($relationship_controller->pretty) {
+					   $lw = $xs;
+	                   $linex = $xoffset - $lw;
+	                   $liney = $yoffset + $Dbheight / 4;
+	                   $previous2 = $previous;;
+					   $previous = "";
+					}
 				}
-			}
-			if ($node["relations"][$index] == "husband" || $node["relations"][$index] == "wife") {
-				$arrow_img = GM_IMAGE_DIR."/".$GM_IMAGES["rarrow"]["other"];
-				$xoffset += $Dbwidth + $Dbxspacing + 70;
-				$line = $GM_IMAGES["hline"]["other"];
-				$linex += $Dbwidth;
-				$liney += $Dbheight / 2;
-				$lh = 3;
-				$lw = 70;
-				if ($relationship_controller->pretty) {
-				   $lw = $xs;
-                   $linex = $xoffset - $lw;
-                   $liney = $yoffset + $Dbheight / 4;
-                   $previous2 = $previous;
-				   $previous = "";
+				if ($node["relations"][$index] == "husband" || $node["relations"][$index] == "wife") {
+					$arrow_img = GM_IMAGE_DIR."/".$GM_IMAGES["rarrow"]["other"];
+					$xoffset += $Dbwidth + $Dbxspacing + 70;
+					$line = $GM_IMAGES["hline"]["other"];
+					$linex += $Dbwidth;
+					$liney += $Dbheight / 2;
+					$lh = 3;
+					$lw = 70;
+					if ($relationship_controller->pretty) {
+					   $lw = $xs;
+	                   $linex = $xoffset - $lw;
+	                   $liney = $yoffset + $Dbheight / 4;
+	                   $previous2 = $previous;
+					   $previous = "";
+					}
 				}
-			}
-			if ($node["relations"][$index] == "son" || $node["relations"][$index] == "daughter" || $node["relations"][$index] == "child") {
-				$line = $GM_IMAGES["vline"]["other"];
-				$liney += $Dbheight;
-				$linex += $Dbwidth / 2;
-				$lh = 54;
-				$lw = 3;
-				if ($relationship_controller->pretty) {
-			       if ($relationship_controller->asc == 0) $relationship_controller->asc = -1;
-                   if ($relationship_controller->asc == 1) $arrow_img = GM_IMAGE_DIR."/".$GM_IMAGES["uarrow"]["other"];
-				   $lh = $ys;
-                   $linex = $xoffset + $Dbwidth / 2;
-                   // put the box up or down ?
-                   $yoffset -= $relationship_controller->asc * ($Dbheight + $lh);
-                   if ($relationship_controller->asc == -1) $liney = $yoffset - $lh; 
-                   else $liney = $yoffset + $Dbheight;
-                   // need to draw a joining line ?
-                   if ($previous == "parent" && $previous2 != "child") {
-                      $joinh = 3;
-                      $joinw = $xs / 2 + 2;
-                      $xoffset += $Dbwidth + $xs;
-                      $linex = $xoffset-$xs / 2;
-                      if ($relationship_controller->asc == 1) $liney=$yoffset+$Dbheight; 
-                      else $liney = $yoffset - ($lh + $Dbyspacing);
-                      $joinx = $xoffset - $xs;
-                      $joiny = $liney - 2 + ($relationship_controller->asc + 1) / 2 * $lh;
-                      print "<div id=\"joina".$index."\" style=\"position:absolute; ".($TEXT_DIRECTION == "ltr"?"left":"right").":".($joinx + $Dbxspacing)."px; top:".($joiny + $Dbyspacing)."px; z-index:".(count($node["path"]) - $index)."; \" align=\"center\"><img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["hline"]["other"]."\" align=\"left\" width=\"".$joinw."\" height=\"".$joinh."\" alt=\"\" /></div>\n";
-                      $joinw = $xs / 2 + 2;
-                      $joinx = $joinx + $xs / 2;
-                      $joiny = $joiny - $relationship_controller->asc * $lh;
-                      print "<div id=\"joinb".$index."\" style=\"position:absolute; ".($TEXT_DIRECTION == "ltr"?"left":"right").":".($joinx + $Dbxspacing)."px; top:".($joiny + $Dbyspacing)."px; z-index:".(count($node["path"]) - $index)."; \" align=\"center\"><img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["hline"]["other"]."\" align=\"left\" width=\"".$joinw."\" height=\"".$joinh."\" alt=\"\" /></div>\n";
-                   }
-                   $previous2 = $previous;;
-                   $previous = "child";
-                }
-				else $yoffset += $Dbheight + $Dbyspacing + 50;
-			}
-			if ($yoffset > $maxyoffset) $maxyoffset = $yoffset;
-			$plinex = $linex;
-			$pxoffset = $xoffset;
-			if ($index > 0) {
-				if ($TEXT_DIRECTION == "rtl" && $line != $GM_IMAGES["hline"]["other"]) {
-					print "<div id=\"line".$index."\" dir=\"ltr\" style=\"background:none; position:absolute; right:".($plinex + $Dbxspacing)."px; top:".($liney + $Dbyspacing)."px; width:".($lw + $lh * 2)."px; z-index:".(count($node["path"]) - $index)."; \" align=\"right\">";
-					print "<img src=\"".GM_IMAGE_DIR."/".$line."\" align=\"right\" width=\"".$lw."\" height=\"".$lh."\" alt=\"\" />\n";
-					print "<br />";
-					print constant("GM_LANG_".$node["relations"][$index])."\n";
-					print "<img src=\"".$arrow_img."\" border=\"0\" align=\"middle\" alt=\"\" />\n";
+				if ($node["relations"][$index] == "son" || $node["relations"][$index] == "daughter" || $node["relations"][$index] == "child") {
+					$line = $GM_IMAGES["vline"]["other"];
+					$liney += $Dbheight;
+					$linex += $Dbwidth / 2;
+					$lh = 54;
+					$lw = 3;
+					if ($relationship_controller->pretty) {
+				       if ($relationship_controller->asc == 0) $relationship_controller->asc = -1;
+	                   if ($relationship_controller->asc == 1) $arrow_img = GM_IMAGE_DIR."/".$GM_IMAGES["uarrow"]["other"];
+					   $lh = $ys;
+	                   $linex = $xoffset + $Dbwidth / 2;
+	                   // put the box up or down ?
+	                   $yoffset -= $relationship_controller->asc * ($Dbheight + $lh);
+	                   if ($relationship_controller->asc == -1) $liney = $yoffset - $lh; 
+	                   else $liney = $yoffset + $Dbheight;
+	                   // need to draw a joining line ?
+	                   if ($previous == "parent" && $previous2 != "child") {
+	                      $joinh = 3;
+	                      $joinw = $xs / 2 + 2;
+	                      $xoffset += $Dbwidth + $xs;
+	                      $linex = $xoffset-$xs / 2;
+	                      if ($relationship_controller->asc == 1) $liney=$yoffset+$Dbheight; 
+	                      else $liney = $yoffset - ($lh + $Dbyspacing);
+	                      $joinx = $xoffset - $xs;
+	                      $joiny = $liney - 2 + ($relationship_controller->asc + 1) / 2 * $lh;
+	                      print "<div id=\"joina".$index."\" style=\"position:absolute; ".($TEXT_DIRECTION == "ltr"?"left":"right").":".($joinx + $Dbxspacing)."px; top:".($joiny + $Dbyspacing)."px; z-index:".(count($node["path"]) - $index)."; \" align=\"center\"><img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["hline"]["other"]."\" align=\"left\" width=\"".$joinw."\" height=\"".$joinh."\" alt=\"\" /></div>\n";
+	                      $joinw = $xs / 2 + 2;
+	                      $joinx = $joinx + $xs / 2;
+	                      $joiny = $joiny - $relationship_controller->asc * $lh;
+	                      print "<div id=\"joinb".$index."\" style=\"position:absolute; ".($TEXT_DIRECTION == "ltr"?"left":"right").":".($joinx + $Dbxspacing)."px; top:".($joiny + $Dbyspacing)."px; z-index:".(count($node["path"]) - $index)."; \" align=\"center\"><img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["hline"]["other"]."\" align=\"left\" width=\"".$joinw."\" height=\"".$joinh."\" alt=\"\" /></div>\n";
+	                   }
+	                   $previous2 = $previous;;
+	                   $previous = "child";
+	                }
+					else $yoffset += $Dbheight + $Dbyspacing + 50;
 				}
-				else {
-					print "<div id=\"line".$index."\" style=\"background:none;  position:absolute; ".($TEXT_DIRECTION == "ltr"?"left":"right").":".($plinex + $Dbxspacing)."px; top:".($liney + $Dbyspacing)."px; width:".($lw + $lh * 2)."px; z-index:".(count($node["path"]) - $index)."; \" align=\"".($lh==3?"center":"left")."\"><img src=\"".GM_IMAGE_DIR."/".$line."\" align=\"left\" width=\"".$lw."\" height=\"".$lh."\" alt=\"\" />\n";
-					print "<br />";
-					print "<img src=\"".$arrow_img."\" border=\"0\" align=\"middle\" alt=\"\" />\n";
-					if ($lh == 3) print "<br />"; // note: $lh==3 means horiz arrow
-					print constant("GM_LANG_".$node["relations"][$index])."\n";
+				if ($yoffset > $maxyoffset) $maxyoffset = $yoffset;
+				$plinex = $linex;
+				$pxoffset = $xoffset;
+				if ($index > 0) {
+					if ($TEXT_DIRECTION == "rtl" && $line != $GM_IMAGES["hline"]["other"]) {
+						print "<div id=\"line".$index."\" dir=\"ltr\" style=\"background:none; position:absolute; right:".($plinex + $Dbxspacing)."px; top:".($liney + $Dbyspacing)."px; width:".($lw + $lh * 2)."px; z-index:".(count($node["path"]) - $index)."; \" align=\"right\">";
+						print "<img src=\"".GM_IMAGE_DIR."/".$line."\" align=\"right\" width=\"".$lw."\" height=\"".$lh."\" alt=\"\" />\n";
+						print "<br />";
+						print constant("GM_LANG_".$node["relations"][$index])."\n";
+						print "<img src=\"".$arrow_img."\" border=\"0\" align=\"middle\" alt=\"\" />\n";
+					}
+					else {
+						print "<div id=\"line".$index."\" style=\"background:none;  position:absolute; ".($TEXT_DIRECTION == "ltr"?"left":"right").":".($plinex + $Dbxspacing)."px; top:".($liney + $Dbyspacing)."px; width:".($lw + $lh * 2)."px; z-index:".(count($node["path"]) - $index)."; \" align=\"".($lh==3?"center":"left")."\"><img src=\"".GM_IMAGE_DIR."/".$line."\" align=\"left\" width=\"".$lw."\" height=\"".$lh."\" alt=\"\" />\n";
+						print "<br />";
+						print "<img src=\"".$arrow_img."\" border=\"0\" align=\"middle\" alt=\"\" />\n";
+						if ($lh == 3) print "<br />"; // note: $lh==3 means horiz arrow
+						print constant("GM_LANG_".$node["relations"][$index])."\n";
+					}
+					print "</div>\n";
 				}
-				print "</div>\n";
+				print "<div id=\"box".$pid.".1.0\" style=\"position:absolute; ".($TEXT_DIRECTION == "ltr" ? "left" : "right").":".$pxoffset."px; top:".$yoffset."px; width:".$Dbwidth."px; height:".$Dbheight."px; z-index:".(count($node["path"]) - $index)."; \"><table><tr><td colspan=\"2\" width=\"".$Dbwidth."\" height=\"".$Dbheight."\">";
+				$person =& Person::GetInstance($pid);
+				PersonFunctions::PrintPedigreePerson($person, 1, ($relationship_controller->view != "preview"));
+				print "</td></tr></table></div>\n";
 			}
-			print "<div id=\"box".$pid.".1.0\" style=\"position:absolute; ".($TEXT_DIRECTION == "ltr" ? "left" : "right").":".$pxoffset."px; top:".$yoffset."px; width:".$Dbwidth."px; height:".$Dbheight."px; z-index:".(count($node["path"]) - $index)."; \"><table><tr><td colspan=\"2\" width=\"".$Dbwidth."\" height=\"".$Dbheight."\">";
-			$person =& Person::GetInstance($pid);
-			PersonFunctions::PrintPedigreePerson($person, 1, ($relationship_controller->view != "preview"));
-			print "</td></tr></table></div>\n";
 		}
 		print "</div>\n";
 	}

@@ -106,16 +106,17 @@ abstract class PersonFunctions {
 					// NOTE: Zoom
 					print "<a href=\"pedigree.php?rootid=".$person->xref."&amp;num_generations=".$num_gens."&amp;talloffset=".$chart_style."&amp;gedid=".$person->gedcomid."\"><b>".GM_LANG_index_header."</b></a>\n";
 					print "<br /><a href=\"descendancy.php?rootid=".$person->xref."&amp;show_full=$show_full&amp;num_generations=".$num_gens."&amp;box_width=$box_width&amp;gedid=".$person->gedcomid."\"><b>".GM_LANG_descend_chart."</b></a><br />\n";
+					print "<a href=\"ancestry.php?rootid=".$person->xref."&amp;chart_style=$chart_style&amp;num_generations=".$num_gens."&amp;box_width=$box_width&amp;gedid=".$person->gedcomid."\"><b>".GM_LANG_ancestry_chart."</b></a><br />\n";
+					if (defined("IMG_ARC_PIE") && function_exists("imagettftext"))  print "<a href=\"fanchart.php?rootid=".$person->xref."&amp;PEDIGREE_GENERATIONS=".$num_gens."&amp;gedid=".$person->gedcomid."\"><b>".GM_LANG_fan_chart."</b></a><br />\n";
+					print "<a href=\"hourglass.php?pid=".$person->xref."&amp;chart_style=$chart_style&amp;PEDIGREE_GENERATIONS=".$num_gens."&amp;box_width=".$box_width."&amp;gedid=".$person->gedcomid."\"><b>".GM_LANG_hourglass_chart."</b></a><br />\n";
+					print "<a href=\"familybook.php?rootid=".$person->xref."&amp;gedid=".$person->gedcomid."\"><b>".GM_LANG_familybook_chart."</b></a><br />\n";
 					if ($gm_user->username != "") {
 						if (!empty($gm_user->gedcomid[GedcomConfig::$GEDCOMID])) {
 							print "<a href=\"relationship.php?pid1=".$gm_user->gedcomid[GedcomConfig::$GEDCOMID]."&amp;pid2=".$person->xref."&amp;gedid=".$person->gedcomid."\"><b>".GM_LANG_relationship_to_me."</b></a><br />\n";
 						}
 					}
 					// NOTE: Zoom
-					if (file_exists("ancestry.php")) print "<a href=\"ancestry.php?rootid=".$person->xref."&amp;chart_style=$chart_style&amp;num_generations=".$num_gens."&amp;box_width=$box_width&amp;gedid=".$person->gedcomid."\"><b>".GM_LANG_ancestry_chart."</b></a><br />\n";
-					if (file_exists("paternals.php")) print "<a href=\"paternals.php?rootid=".$person->xref."&amp;split=".$num_gens."&amp;line=".$chart_style."&amp;box_width=".$box_width."&amp;gedid=".$person->gedcomid."\"><b>".GM_LANG_paternal_chart."</b></a><br />\n";
-					if (file_exists("fanchart.php") and defined("IMG_ARC_PIE") and function_exists("imagettftext"))  print "<a href=\"fanchart.php?rootid=".$person->xref."&amp;PEDIGREE_GENERATIONS=".$num_gens."&amp;gedid=".$person->gedcomid."\"><b>".GM_LANG_fan_chart."</b></a><br />\n";
-					if (file_exists("hourglass.php")) print "<a href=\"hourglass.php?pid=".$person->xref."&amp;chart_style=$chart_style&amp;PEDIGREE_GENERATIONS=".$num_gens."&amp;box_width=$box_width&amp;gedid=".$person->gedcomid."\"><b>".GM_LANG_hourglass_chart."</b></a><br />\n";
+					print "<a href=\"paternals.php?rootid=".$person->xref."&amp;split=".$num_gens."&amp;line=".$chart_style."&amp;box_width=".$box_width."&amp;gedid=".$person->gedcomid."\"><b>".GM_LANG_paternal_chart."</b></a><br />\n";
 					foreach ($person->spousefamilies as $skey => $sfam) {
 						if (is_object($sfam)) {
 							if ($person->xref == $sfam->husb_id) $spouse = "wife";
@@ -125,12 +126,14 @@ abstract class PersonFunctions {
 								if (is_object($sfam->$spouse)) {
 									print "<a href=\"individual.php?pid=".$sfam->$spouse->xref."&amp;gedid=".$sfam->$spouse->gedcomid."\">";
 									print $sfam->$spouse->name;
+									if (HasChinese($sfam->$spouse->name)) print PrintReady("(".$sfam->$spouse->addname.")");
 									print "</a><br />\n";
 								}
 							}
 							foreach ($sfam->children as $ckey => $child) {
 								print "\n\t\t\t\t&nbsp;&nbsp;<a href=\"individual.php?pid=".$child->xref."&amp;gedid=".$child->gedcomid."\">";
 								print $child->name;
+								if (HasChinese($child->name)) print PrintReady("(".$child->addname.")");
 								print "</a><br />";
 							}
 						}
