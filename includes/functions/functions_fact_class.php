@@ -428,7 +428,7 @@ abstract class FactFunctions {
 					print "\n\t\t\t<br />".GM_FACT_PAGE.": ".$cmatch[1];
 					$srec = GetSubRecord(2, "2 PAGE", $factobj->factrec);
 					$text = GetCont(3, $srec);
-					$text = ExpandUrl($text);
+					$text = self::ExpandUrl($text);
 					print PrintReady($text);
 				}
 				$cs = preg_match("/2 EVEN (.*)/", $factobj->factrec, $cmatch);
@@ -450,7 +450,7 @@ abstract class FactFunctions {
 						if ($trec != "") {
 							print "<br /><span class=\"label\">".GM_LANG_text." </span><span class=\"field\">".GetGedcomValue("TEXT", 3, $trec);
 							$text = GetCont(4, $trec);
-							$text = ExpandUrl($text);
+							$text = self::ExpandUrl($text);
 							print $text;
 							print "</span>";
 						}
@@ -466,7 +466,7 @@ abstract class FactFunctions {
 					if ($trec != "") {
 						print "<br /><span class=\"label\">".GM_LANG_text." </span><span class=\"field\">".GetGedcomValue("TEXT", 2, $trec);
 						$text = GetCont(3, $trec);
-						$text = ExpandUrl($text);
+						$text = self::ExpandUrl($text);
 						print $text;
 						print "</span>";
 					}
@@ -505,7 +505,7 @@ abstract class FactFunctions {
 					$nt = preg_match("/1 NOTE (.*)(\r\n|\n|\r)*/", $factobj->factrec, $n1match);
 					if ($nt>0) $text = preg_replace("/~~/", "<br />", $n1match[1]);
 					$text .= GetCont(2, $factobj->factrec);
-					$text = ExpandUrl($text);
+					$text = self::ExpandUrl($text);
 					print PrintReady($text);
 				}
 				else {
@@ -682,7 +682,7 @@ abstract class FactFunctions {
 					print "\n\t\t\t<span class=\"label\">".GM_FACT_PAGE.": </span><span class=\"field\">".PrintReady($cmatch[1]);
 					$pagerec = GetSubRecord($nlevel, $cmatch[0], $sourcerec);
 					$text = GetCont($nlevel+1, $pagerec);
-					$text = ExpandUrl($text);
+					$text = self::ExpandUrl($text);
 					print PrintReady($text);
 					print "</span>";
 				}
@@ -731,7 +731,7 @@ abstract class FactFunctions {
 					else $first = false;
 					print "<span class=\"label\">".GM_LANG_text." </span><span class=\"field\">".$tmatch[$k][1];
 					$text = GetCont($nlevel+1, $sourcerec);
-					$text = ExpandUrl($text);
+					$text = self::ExpandUrl($text);
 					print PrintReady($text);
 					print "</span>";
 				}
@@ -1566,6 +1566,26 @@ abstract class FactFunctions {
 		}
 		return $age;
 	}
+
+	private function ExpandUrl($text) {
+	  // Some versions of RFC3987 have an appendix B which gives the following regex
+	  // (([^:/?#]+):)?(//([^/?#]*))?([^?#]*)(\?([^#]*))?(#(.*))?
+	  // This matches far too much while a "precise" regex is several pages long.
+	  // This is a compromise.
+	  $URL_REGEX='((https?|ftp]):)(//([^\s/?#<\)\,]*))?([^\s?#<\)\,]*)(\?([^\s#<\)\,]*))?(#(\S*))?';
+	
+	  return preg_replace_callback(
+	    '/'.addcslashes("(?!>)$URL_REGEX(?!</a>)", '/').'/i',
+	    create_function( // Insert <wbr/> codes into the replaced string
+	      '$m',
+	      'if (strlen($m[0])>30) $url = substr($m[0],0,30).".....";
+	      else $url = $m[0];
+	      return "<a href=\"".$m[0]."\" target=\"blank\">".preg_replace("/\b/", "<wbr/>", $url)."</a>";'
+	    ),
+	    $text
+	  );
+	}
+
 	
 }
 ?>

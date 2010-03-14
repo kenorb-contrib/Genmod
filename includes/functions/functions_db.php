@@ -70,7 +70,9 @@ function CheckExists($pid, $type="") {
 	$gedrec = "";
 	if (in_array($type, array("INDI", "FAM", "SOUR", "REPO", "OBJE", "NOTE"))) {
 		$object = ConstructObject($pid, $type, GedcomConfig::$GEDCOMID);
-		return $object->isempty;
+		// $object is either false (doesn't exist or the object
+		if (!$object) return false;
+		else return true;
 	}
 	else return false;
 }

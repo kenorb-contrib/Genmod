@@ -30,8 +30,6 @@
 if (stristr($_SERVER["SCRIPT_NAME"],basename(__FILE__))) {
 	require "../intrusion.php";
 }
-require_once("includes/functions/functions_report.php");
-
 define('FPDF_FONTPATH','fonts/');
 
 /**
@@ -2371,15 +2369,15 @@ function GMRImageSHandler($attrs) {
 		}
 		else $orec = $gedrec;
 		if (!empty($orec)) {
-			$fullpath = ExtractFullpath($orec);
+			$fullpath = ReportFunctions::ExtractFullpath($orec);
 			$filename = "";
-			$filename = ExtractFilename($fullpath);
+			$filename = ReportFunctions::ExtractFilename($fullpath);
 			$filename = GedcomConfig::$MEDIA_DIRECTORY.$filename;
 			$filename = trim($filename);
 			if (!empty($filename)) {
 				if (preg_match("/(jpg)|(jpeg)|(png)$/i", $filename)>0) {
 					if (file_exists($filename)) {
-						$size = findImageSize($filename);
+						$size = ReportFunctions::findImageSize($filename);
 						if (($width>0)&&($height==0)) {
 							$perc = $width / $size[0];
 							$height= round($size[1]*$perc);
@@ -2400,7 +2398,7 @@ function GMRImageSHandler($attrs) {
 		$filename = $file;
 		if (preg_match("/(jpg)|(jpeg)|(png)$/i", $filename)>0) {
 			if (file_exists($filename)) {
-				$size = findImageSize($filename);
+				$size = ReportFunctions::findImageSize($filename);
 				if (($width>0)&&($size[0]>$size[1])) {
 					$perc = $width / $size[0];
 					$height= round($size[1]*$perc);
@@ -2853,19 +2851,19 @@ function GMRRelativesSHandler($attrs) {
 				}
 				break;
 			case "direct-ancestors":
-				AddAncestors($id,false,$maxgen, $showempty);
+				ReportFunctions::AddAncestors($id,false,$maxgen, $showempty);
 				break;
 			case "ancestors":
-				AddAncestors($id,true,$maxgen,$showempty); 
+				ReportFunctions::AddAncestors($id,true,$maxgen,$showempty); 
 				break;
 			case "descendants":
 				$list[$id]->generation = 1;
-				AddDescendancy($id,false,$maxgen);
+				ReportFunctions::AddDescendancy($id,false,$maxgen);
 //				print_r($list);
 				break;
 			case "all":
-				AddAncestors($id,true,$maxgen,$showempty);
-				AddDescendancy($id,true,$maxgen);
+				ReportFunctions::AddAncestors($id,true,$maxgen,$showempty);
+				ReportFunctions::AddDescendancy($id,true,$maxgen);
 				break;
 		}
 	}

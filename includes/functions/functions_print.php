@@ -1091,26 +1091,6 @@ function InitCalendarPopUp() {
 }
 
 
-
-function ExpandUrl($text) {
-  // Some versions of RFC3987 have an appendix B which gives the following regex
-  // (([^:/?#]+):)?(//([^/?#]*))?([^?#]*)(\?([^#]*))?(#(.*))?
-  // This matches far too much while a "precise" regex is several pages long.
-  // This is a compromise.
-  $URL_REGEX='((https?|ftp]):)(//([^\s/?#<\)\,]*))?([^\s?#<\)\,]*)(\?([^\s#<\)\,]*))?(#(\S*))?';
-
-  return preg_replace_callback(
-    '/'.addcslashes("(?!>)$URL_REGEX(?!</a>)", '/').'/i',
-    create_function( // Insert <wbr/> codes into the replaced string
-      '$m',
-      'if (strlen($m[0])>30) $url = substr($m[0],0,30).".....";
-      else $url = $m[0];
-      return "<a href=\"".$m[0]."\" target=\"blank\">".preg_replace("/\b/", "<wbr/>", $url)."</a>";'
-    ),
-    $text
-  );
-}
-
 function PrintFilterEvent($filterev) {
 	
 	print "<option value=\"all\"";
