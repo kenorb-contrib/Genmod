@@ -171,9 +171,9 @@ class MFile {
 			}
 			
 		}
-		else if (file_exists($file) || stristr($file, "://")) {
+		else if ((file_exists($file) && !is_dir($file)) || stristr($file, "://")) {
 			$this->f_file = $file;
-//			print "getting details for ".$this->f_file."<br />";
+			// print "getting details for ".$this->f_file."<br />";
 			$this->f_main_file = $file;
 			// check this!
 			$this->f_pastelink = MediaFS::CheckMediaDepth($this->f_file);

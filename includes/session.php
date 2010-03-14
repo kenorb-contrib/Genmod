@@ -143,6 +143,7 @@ else define("MB_FUNCTIONS", false);
 
 set_magic_quotes_runtime(0);
 
+
 if (!empty($_SERVER["SCRIPT_NAME"])) define("SCRIPT_NAME", $_SERVER["SCRIPT_NAME"]);
 else if (!empty($_SERVER["PHP_SELF"])) define("SCRIPT_NAME", $_SERVER["PHP_SELF"]);
 if (!empty($_SERVER["QUERY_STRING"])) $QUERY_STRING = $_SERVER["QUERY_STRING"];
@@ -161,7 +162,6 @@ if ($bot && preg_match("/(&amp;)?(show_changes=|show_full=)/", $QUERY_STRING)) {
 	exit;
 }
 	
-
 // First load the base configuration to cover missing vars
 require("configbase.php");
 if (isset($CONFIG_PARMS)) {
