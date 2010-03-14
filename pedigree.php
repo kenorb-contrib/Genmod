@@ -95,6 +95,9 @@ print "<div id=\"content_pedigree\">";
 		print "onclick=\"document.people.talloffset.value='0';\" />".GM_LANG_landscape;
 		print "<br /></td></tr>";
 	
+		// box width
+		$pedigree_controller->PrintInputBoxWidth();
+		
 		// Show details
 		$pedigree_controller->PrintInputShowFull();
 		
@@ -123,6 +126,8 @@ print "<div id=\"content_pedigree\">";
 	if ($pedigree_controller->view=="preview") {
 		$baseyoffset -= 20;
 	}
+	// This line added for resizing of the boxes
+	$bwidth = $bwidth * $pedigree_controller->box_width / 100;
 	
 	$pbwidth = $bwidth;
 	$pbheight = $bheight - 1;

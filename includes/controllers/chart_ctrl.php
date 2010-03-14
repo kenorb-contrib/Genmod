@@ -140,12 +140,15 @@ class ChartController extends BaseController {
 	}
 	
 	public function PrintInputBoxWidth($tr=true) {
-		
+
 		if ($tr) print "<tr>";
 		print "<td class=\"shade2\">";
-		PrintHelpLink("box_width_help", "qm");
-		print GM_LANG_box_width . "&nbsp;</td>";
-		print "<td class=\"shade1 vmiddle\"><input type=\"text\" size=\"3\" name=\"box_width\" value=\"".$this->box_width."\" /> <b>%</b>";
+		PrintHelpLink((SCRIPT_NAME == "/fanchart.php" ? "fan_width_help" : "box_width_help"), "qm");
+		print (SCRIPT_NAME == "/fanchart.php" ? GM_LANG_fan_width : GM_LANG_box_width) . "&nbsp;</td>";
+		print "<td class=\"shade1 vmiddle\">";
+		print "<input type=\"text\" size=\"3\" id=\"box_width\" name=\"box_width\" value=\"".$this->box_width."\" />&nbsp;<b>%</b>";
+		print "<a href=\"javascript:\" onclick=\"var a=Number(document.getElementById('box_width').value); a-=10; if(a<50||isNaN(a)) a=50; document.getElementById('box_width').value=a; return false;\">&nbsp;&nbsp;-&nbsp;/</a>";
+		print "<a href=\"javascript:\" onclick=\"var a=Number(document.getElementById('box_width').value); a+=10; if(a>300||isNaN(a)) a=300; document.getElementById('box_width').value=a; return false;\">&nbsp;+&nbsp;</a>";
 		print "</td>";
 		if ($tr) print "</tr>";
 	}
