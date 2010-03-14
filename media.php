@@ -393,6 +393,15 @@ if ($disp1 == "block") {
 			print "</tr>";
 			$i=0;
 			$canwrite = true;
+			
+			// Get the type of dir we have here. If it's a thumb dir or the url dir where the thumbs for the urls are stored,
+			// we will display the thumb itself instead of it's thumb, which is a placeholder.
+			$curdir = RelativePathFile($directory);
+			$d = preg_split("/\//",$curdir);
+			$d = array_reverse($d);
+			if (isset($d[1]) && ($d[1] == "thumbs" || $d[1] == "urls")) $is_thumb_dir = true;
+			else $is_thumb_dir = false;
+			
 			foreach ($files as $filename => $file) {
 				if ($i%2 == 0) print "<tr>";
 				$fileobj = $file["filedata"];
@@ -410,7 +419,7 @@ if ($disp1 == "block") {
 				if (USE_GREYBOX && $fileobj->f_is_image) print "<a href=\"".FilenameEncode($fileobj->f_main_file)."\" title=\"".$fileobj->f_file."\" rel=\"gb_imageset[]\">";
 				else print "<a href=\"#\" onclick=\"return openImage('".$fileobj->f_main_file."','".$fileobj->f_width."','".$fileobj->f_height."','".$fileobj->f_is_image."');\">";
 //				print $fileobj->f_thumb_file."<br />";
-				if ($thumbs) print "<img src=\"".$fileobj->f_thumb_file."\" border=\"0\" align=\"left\" class=\"thumbnail\" alt=\"\" width=\"100\" height=\"100\" />";
+				if ($thumbs) print "<img src=\"".($is_thumb_dir ? ($fileobj->f_is_image ? $fileobj->f_main_file : $fileobj->f_thumb_file) : $fileobj->f_thumb_file)."\" border=\"0\" align=\"left\" class=\"thumbnail\" alt=\"\" width=\"100\" height=\"100\" />";
 				if (!$canwrite) print "<span class=\"readonly\">";
 				if ($directory == "external_links") print $filename;
 				else print basename($filename);

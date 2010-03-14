@@ -378,6 +378,7 @@ abstract class MediaFS {
 					
 					// it's a link
 					self::$fdetails["link"] = $filename;
+					self::$fdetails["fname"] = $file_basename;
 					
 					// Whatever was taken from the file, we know it's a pic
 					self::$fdetails["is_image"] = true;
