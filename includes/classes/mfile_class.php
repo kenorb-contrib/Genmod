@@ -222,7 +222,7 @@ class MFile {
 		else {
 			// The file does not exist, but we must have a placeholder for the media to display
 			$this->f_file_exists = false;
-			$this->f_thumb_file = MediaFS::ThumbnailFile($file);
+			$this->f_thumb_file = MediaFS::ThumbnailFile("");
 		}
 		
 //		print "<pre>";
