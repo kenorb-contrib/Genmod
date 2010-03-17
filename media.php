@@ -36,6 +36,7 @@ if (!$gm_user->userGedcomAdmin()) {
 	else header("Location: ".LOGIN_URL."?url=media.php&amp;".GetQueryString(true));
 	exit;
 }
+if (!isset($sort)) $sort = "name";
 if (!isset($directory)) $directory = GedcomConfig::$MEDIA_DIRECTORY;
 else $directory = urldecode($directory);
 if (!isset($action)) $action = "";
@@ -61,7 +62,9 @@ if ($disp1 == "block") {
 //	if (!in_array(GedcomConfig::$MEDIA_DIRECTORY, $dirs)) $dirs[] = GedcomConfig::$MEDIA_DIRECTORY;
 	sort($dirs);
 	$files = MediaFS::GetMediaFileList($directory, $filter);
-	ksort($files);
+	if ($sort == "name") uasort($files, "MMNameSort");
+	else if ($sort == "size") uasort($files, "MMSizeSort");
+	else uasort($files, "MMLinkSort");
 }
 
 if ($action == "select_action") {
@@ -102,10 +105,14 @@ if ($action == "select_action") {
 	if ($changed) {
 		// Get the file list again, it's changed by the mass update
 		$files = MediaFS::GetMediaFileList($directory, $filter);
-		ksort($files);
+		if ($sort == "name") uasort($files, "MMNameSort");
+		else if ($sort == "size") uasort($files, "MMSizeSort");
+		else uasort($files, "MMLinkSort");
 	}
 }
-	
+//print "<pre>";
+//print_r($files);	
+//print "</pre>";
 if ($action == "directory_action") {
 	if ($dir_action == "create" && isset($new_dir) && !empty($new_dir)) {
 		if (MediaFS::CreateDir($new_dir, $parent_dir, SystemConfig::$MEDIA_IN_DB)) $error = GM_LANG_dir_created;
@@ -214,6 +221,9 @@ if ($action == "upload_action" && (!empty($picture))) {
 print "<form action=\"media.php\" method=\"post\" name=\"managemedia\" enctype=\"multipart/form-data\">";
 print "<input type=\"hidden\" name=\"action\" value=\"\" />";
 print "<input type=\"hidden\" name=\"directory\" value=\"".urlencode($directory)."\" />";
+
+// Sort order
+print "<input type=\"hidden\" name=\"sort\" value=\"".$sort."\" />";
 
 // Declare the switch variables
 print "<input type=\"hidden\" name=\"disp1\" />";
@@ -388,7 +398,11 @@ if ($disp1 == "block") {
 			print "<table class=\"width100\">";
 			print "<tr class=\"shade3\">";
 			for ($i=1;$i<=$cols;$i++) {
-				print "<td class=\"width5\">".GM_LANG_select."</td><td>".GM_LANG_name."</td><td class=\"width10\">".GM_LANG_size."</td><td class=\"width5\">".GM_LANG_linked."</td><td class=\"width15\" colspan=\"3\" style=\"text-align:center;\">".GM_LANG_action."</td>";
+				print "<td class=\"width5\">".GM_LANG_select."</td>";
+				print "<td><a href=\"javascript: ".GM_LANG_sort_on_name."\" onclick=\"document.managemedia.sort.value='name'; document.managemedia.submit(); return false;\" title=\"".GM_LANG_sort_on_name."\">".GM_LANG_name."</a></td>";
+				print "<td class=\"width10\"><a href=\"javascript: ".GM_LANG_sort_on_size."\" onclick=\"document.managemedia.sort.value='size'; document.managemedia.submit(); return false;\" title=\"".GM_LANG_sort_on_size."\">".GM_LANG_size."</td>";
+				print "<td class=\"width5\"><a href=\"javascript: ".GM_LANG_sort_on_linked."\" onclick=\"document.managemedia.sort.value='linked'; document.managemedia.submit(); return false;\" title=\"".GM_LANG_sort_on_linked."\">".GM_LANG_linked."</td>";
+				print "<td class=\"width15\" colspan=\"3\" style=\"text-align:center;\">".GM_LANG_action."</td>";
 			}
 			print "</tr>";
 			$i=0;
@@ -621,5 +635,29 @@ if ($disp2 == "block") {
 	print "</div>";
 }
 print "</form>";
+
+function MMNameSort($a, $b) {
+	
+	$aname = (is_null($a["filedata"]->f_link) ? basename($a["filedata"]->f_file) : $a["filedata"]->f_file);
+	$bname = (is_null($b["filedata"]->f_link) ? basename($b["filedata"]->f_file) : $b["filedata"]->f_file);
+	return StringSort($aname, $bname);
+}
+
+function MMSizeSort($a, $b) {
+	
+	return ($a["filedata"]->f_file_size == $b["filedata"]->f_file_size ? MMNameSort($a, $b) : ($a["filedata"]->f_file_size > $b["filedata"]->f_file_size ? 1 : -1));
+}
+
+function MMLinkSort($a, $b) {
+	
+	if (isset($a["objects"])) $cnta = count($a["objects"]);
+	else $cnta = 0;
+	
+	if (isset($b["objects"])) $cntb = count($b["objects"]);
+	else $cntb = 0;
+	
+	if ($cnta == $cntb) return MMNameSort($a, $b); 
+	else return ($cnta  < $cntb);
+}
 PrintFooter();
 ?>
