@@ -581,7 +581,7 @@ PrintHeader(GM_LANG_configure_head);
 				</div>
 			</div>
 			<div class="choice_right width65">
-				<input type="text" name="NEW_SERVER_URL" value="<?php print SERVER_URL?>" dir="ltr" tabindex="<?php $i++; print $i?>" size="40" 
+				<input type="text" name="NEW_SERVER_URL" value="<?php print $SERVER_URL?>" dir="ltr" tabindex="<?php $i++; print $i?>" size="40" 
 				<?php if (isset($CONFIG["SERVER_URL"]) && isset($CONFIG_PARMS[$CONFIG["SERVER_URL"]])) print "disabled=\"disabled\""; ?> />
 				<?php
 				if ($error_url) print "<div class=\"error\">".GM_LANG_emptyserverurl."</div>";

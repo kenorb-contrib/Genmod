@@ -2619,3 +2619,6 @@
 "paternal_paternal";"Paternal"
 "paternal_maternal";"Maternal"
 "paternal_longest";"Longest"
+"sort_on_name";"Sort on name"
+"sort_on_size";"Sort on size"
+"sort_on_linked";"Sort on linked"
