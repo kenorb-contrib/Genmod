@@ -920,7 +920,7 @@ abstract class EditFunctions {
 		if ($fact=="FILE") LinkFunctions::PrintFindMediaFileLink($element_id);
 		if ($fact=="OBJE" && $islink) {
 			LinkFunctions::PrintFindMediaLink($element_id);
-			LinkFunctions::PrintAddNewObjectLink($element_id);
+			if (MediaFS::DirIsWritable(GedcomConfig::$MEDIA_DIRECTORY)) LinkFunctions::PrintAddNewObjectLink($element_id);
 		}
 		if ($fact=="SOUR") {
 			LinkFunctions::PrintFindSourceLink($element_id);
