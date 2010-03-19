@@ -733,7 +733,7 @@ if ($action=="update") {
               <input type="checkbox" name="v_global_facts_del[<?php print $tag; ?>][<?php print $key; ?>]" value="1" /></td>
               <td class="shade1">
               <?php
-                if (defined("GM_FACT_".$tag)) print constant("GM_FACT_".$tag);
+                if (defined("GM_FACT_".$tag)) print $tag. " - ".constant("GM_FACT_".$tag);
                 else print $tag;
                 ?>
               </td>

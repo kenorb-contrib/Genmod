@@ -161,7 +161,7 @@ if ($controller->view != "preview") {
 	<div class="accesskeys">
 		<a class="accesskeys" href="<?php print "pedigree.php?rootid=$pid";?>" title="<?php print GM_LANG_pedigree_chart ?>" tabindex="-1" accesskey="<?php print GM_LANG_accesskey_individual_pedigree; ?>"><?php print GM_LANG_pedigree_chart ?></a>
 		<a class="accesskeys" href="<?php print "descendancy.php?rootid=$pid";?>" title="<?php print GM_LANG_descend_chart ?>" tabindex="-1" accesskey="<?php print GM_LANG_accesskey_individual_descendancy; ?>"><?php print GM_LANG_descend_chart ?></a>
-		<a class="accesskeys" href="<?php print "timeline.php?pids[]=$pid";?>" title="<?php print GM_LANG_timeline_chart ?>" tabindex="-1" accesskey="<?php print GM_LANG_accesskey_individual_timeline; ?>"><?php print GM_LANG_timeline_chart ?></a>
+		<a class="accesskeys" href="<?php print "timeline.php?pids0=$pid";?>" title="<?php print GM_LANG_timeline_chart ?>" tabindex="-1" accesskey="<?php print GM_LANG_accesskey_individual_timeline; ?>"><?php print GM_LANG_timeline_chart ?></a>
 		<?php
 		if (!empty($controller->user)&&!empty($controller->user->gedcomid[GedcomConfig::$GEDCOMID])) {
 			?>

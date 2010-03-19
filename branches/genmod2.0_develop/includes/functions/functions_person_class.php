@@ -108,7 +108,7 @@ abstract class PersonFunctions {
 					print "<br /><a href=\"descendancy.php?rootid=".$person->xref."&amp;show_full=$show_full&amp;num_generations=".$num_gens."&amp;box_width=$box_width&amp;gedid=".$person->gedcomid."\"><b>".GM_LANG_descend_chart."</b></a><br />\n";
 					print "<a href=\"ancestry.php?rootid=".$person->xref."&amp;chart_style=$chart_style&amp;num_generations=".$num_gens."&amp;box_width=$box_width&amp;gedid=".$person->gedcomid."\"><b>".GM_LANG_ancestry_chart."</b></a><br />\n";
 					if (defined("IMG_ARC_PIE") && function_exists("imagettftext"))  print "<a href=\"fanchart.php?rootid=".$person->xref."&amp;PEDIGREE_GENERATIONS=".$num_gens."&amp;gedid=".$person->gedcomid."\"><b>".GM_LANG_fan_chart."</b></a><br />\n";
-					print "<a href=\"hourglass.php?pid=".$person->xref."&amp;chart_style=$chart_style&amp;PEDIGREE_GENERATIONS=".$num_gens."&amp;box_width=".$box_width."&amp;gedid=".$person->gedcomid."\"><b>".GM_LANG_hourglass_chart."</b></a><br />\n";
+					print "<a href=\"hourglass.php?pid=".$person->xref."&amp;chart_style=".$chart_style."&amp;PEDIGREE_GENERATIONS=".$num_gens."&amp;box_width=".$box_width."&amp;gedid=".$person->gedcomid."\"><b>".GM_LANG_hourglass_chart."</b></a><br />\n";
 					print "<a href=\"familybook.php?rootid=".$person->xref."&amp;gedid=".$person->gedcomid."\"><b>".GM_LANG_familybook_chart."</b></a><br />\n";
 					if ($gm_user->username != "") {
 						if (!empty($gm_user->gedcomid[GedcomConfig::$GEDCOMID])) {
@@ -116,7 +116,8 @@ abstract class PersonFunctions {
 						}
 					}
 					// NOTE: Zoom
-					print "<a href=\"paternals.php?rootid=".$person->xref."&amp;split=".$num_gens."&amp;line=".$chart_style."&amp;box_width=".$box_width."&amp;gedid=".$person->gedcomid."\"><b>".GM_LANG_paternal_chart."</b></a><br />\n";
+					print "<a href=\"timeline.php?pids0=".$person->xref."&amp;gedid=".$person->gedcomid."\"><b>".GM_LANG_timeline_chart."</b></a><br />\n";
+					print "<a href=\"paternals.php?rootid=".$person->xref."&amp;split=1&amp;line=paternal&amp;box_width=".$box_width."&amp;gedid=".$person->gedcomid."\"><b>".GM_LANG_paternal_chart."</b></a><br />\n";
 					foreach ($person->spousefamilies as $skey => $sfam) {
 						if (is_object($sfam)) {
 							if ($person->xref == $sfam->husb_id) $spouse = "wife";
@@ -356,7 +357,7 @@ abstract class PersonFunctions {
 				// NOTE: If box zooming is allowed and person details are shown
 				// NOTE: determine what mouse behavior to add
 				// NOTE: Zoom icon
-				if (GedcomConfig::$ZOOM_BOXES != "disabled" && $show_full && !$view && ($person->disp_name)) {
+				if (GedcomConfig::$ZOOM_BOXES != "disabled" && $show_famlink && $show_full && !$view && $person->disp_name) {
 					print "<a href=\"javascript: ".GM_LANG_zoom_box."\"";
 					if (GedcomConfig::$ZOOM_BOXES=="mouseover") print " onmouseover=\"expandbox('".$person->xref.".".$personcount.".".$count."', $style, '".$random."'); if(document.getElementById('inout-".$person->xref.".".$personcount.".".$count.".".$random."').innerHTML=='') sndReq('inout-".$person->xref.".".$personcount.".".$count.".".$random."', 'getzoomfacts', 'pid', '".$person->xref."', 'gedcomid', '".$person->gedcomid."', 'canshow', '".$canshow."', 'view', '".$view."');\" onmouseout=\"restorebox('".$person->xref.".".$personcount.".".$count."', $style, '".$random."');\" onclick=\"return false;\"";
 					if (GedcomConfig::$ZOOM_BOXES=="mousedown") print " onmousedown=\"expandbox('".$person->xref.".".$personcount.".".$count."', $style, '".$random."'); if(document.getElementById('inout-".$person->xref.".".$personcount.".".$count.".".$random."').innerHTML=='') sndReq('inout-".$person->xref.".".$personcount.".".$count.".".$random."', 'getzoomfacts', 'pid', '".$person->xref."', 'gedcomid', '".$person->gedcomid."', 'canshow', '".$canshow."', 'view', '".$view."');\" onmouseup=\"restorebox('".$person->xref.".".$personcount.".".$count."', $style, '".$random."');\" onclick=\"return false;\"";
@@ -367,10 +368,11 @@ abstract class PersonFunctions {
 				if (GedcomConfig::$LINK_ICONS!="disabled" && $show_famlink && !$view && ($person->disp_name)) {
 					$click_link="#";
 					if (preg_match("/pedigree.php/", SCRIPT_NAME)>0) $click_link="pedigree.php?rootid=".$person->xref."&amp;num_generations=".$num_gens."&amp;talloffset=".$chart_style."&amp;gedid=".$person->gedcomid;
-					if (preg_match("/hourglass.php/", SCRIPT_NAME)>0) $click_link="hourglass.php?pid=".$person->xref."&amp;generations=".$num_gens."&amp;box_width=$box_width&amp;gedid=".$person->gedcomid;
-					if (preg_match("/paternals.php/", SCRIPT_NAME)>0) $click_link="paternals.php?rootid=".$person->xref."&amp;split=".$num_gens."&amp;line=".$chart_style."&amp;box_width=".$box_width."&amp;gedid=".$person->gedcomid;
-					if (preg_match("/ancestry.php/", SCRIPT_NAME)>0) $click_link="ancestry.php?rootid=".$person->xref."&amp;chart_style=$chart_style&amp;num_generations=".$num_gens."&amp;box_width=$box_width&amp;gedid=".$person->gedcomid;
 					if (preg_match("/descendancy.php/", SCRIPT_NAME)>0) $click_link="descendancy.php?rootid=".$person->xref."&amp;show_full=$show_full&amp;num_generations=".$num_gens."&amp;box_width=$box_width&amp;gedid=".$person->gedcomid;
+					if (preg_match("/ancestry.php/", SCRIPT_NAME)>0) $click_link="ancestry.php?rootid=".$person->xref."&amp;chart_style=$chart_style&amp;num_generations=".$num_gens."&amp;box_width=$box_width&amp;gedid=".$person->gedcomid;
+					if (preg_match("/hourglass.php/", SCRIPT_NAME)>0) $click_link="hourglass.php?pid=".$person->xref."&amp;generations=".$num_gens."&amp;box_width=".$box_width."&amp;gedid=".$person->gedcomid;
+					if (preg_match("/familybook.php/", SCRIPT_NAME)>0) $click_link="familybook.php?rootid=".$person->xref."&amp;num_generations=".$num_gens."&amp;box_width=".$box_width."&amp;gedid=".$person->gedcomid;
+					if (preg_match("/paternals.php/", SCRIPT_NAME)>0) $click_link="paternals.php?rootid=".$person->xref."&amp;split=".$num_gens."&amp;line=".$chart_style."&amp;box_width=".$box_width."&amp;gedid=".$person->gedcomid;
 					if ((preg_match("/family.php/", SCRIPT_NAME)>0)&&!empty($famid)) $click_link="family.php?famid=".$sfam->xref."&amp;gedid=".$sfam->gedcomid;
 					if (preg_match("/individual.php/", SCRIPT_NAME)>0) $click_link="individual.php?pid=".$person->xref."&amp;gedid=".$person->gedcomid;
 					print "<br />";

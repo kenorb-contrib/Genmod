@@ -144,7 +144,7 @@ class MediaController extends DetailController {
 				$submenu->addLink('clippings.php?action=add&id='.$this->media->xref.'&type=sour');
 				$menu->addSubmenu($submenu);
 		}
-		if ($this->media->disp && !empty($this->uname)) {
+		if ($this->media->disp && !empty($this->uname) && !$this->media->isuserfav) {
 				// other / add_to_my_favorites
 				$submenu = new Menu(GM_LANG_add_to_my_favorites);
 				$submenu->addLink('mediadetail.php?action=addfav&mid='.$this->media->xref.'&gedid='.$this->media->gedcomid);

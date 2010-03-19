@@ -65,9 +65,9 @@ $controller->CheckRawEdited();
 		?></td>
 		<td valign="top">
 			<div class="accesskeys">
-				<a class="accesskeys" href="<?php print 'timeline.php?pids[0]=' . $controller->family->husb_id.'&amp;pids[1]='.$controller->family->wife_id;?>" title="<?php print GM_LANG_parents_timeline ?>" tabindex="-1" accesskey="<?php print GM_LANG_accesskey_family_parents_timeline; ?>"><?php print GM_LANG_parents_timeline ?></a>
+				<a class="accesskeys" href="<?php print 'timeline.php?pids0=' . $controller->family->husb_id.'&amp;pids1='.$controller->family->wife_id;?>" title="<?php print GM_LANG_parents_timeline ?>" tabindex="-1" accesskey="<?php print GM_LANG_accesskey_family_parents_timeline; ?>"><?php print GM_LANG_parents_timeline ?></a>
 				<a class="accesskeys" href="<?php print 'timeline.php?' . $controller->getChildrenUrlTimeline();?>" title="<?php print GM_LANG_children_timeline ?>" tabindex="-1" accesskey="<?php print GM_LANG_accesskey_family_children_timeline; ?>"><?php print GM_LANG_children_timeline ?></a>
-				<a class="accesskeys" href="<?php print 'timeline.php?pids[0]=' .$controller->family->husb_id.'&amp;pids[1]='.$controller->family->wife_id.'&amp;'.$controller->getChildrenUrlTimeline(2);?>" title="<?php print GM_LANG_family_timeline ?>" tabindex="-1" accesskey="<?php print GM_LANG_accesskey_family_timeline; ?>"><?php print GM_LANG_family_timeline ?></a>
+				<a class="accesskeys" href="<?php print 'timeline.php?pids0=' .$controller->family->husb_id.'&amp;pids1='.$controller->family->wife_id.'&amp;'.$controller->getChildrenUrlTimeline(2);?>" title="<?php print GM_LANG_family_timeline ?>" tabindex="-1" accesskey="<?php print GM_LANG_accesskey_family_timeline; ?>"><?php print GM_LANG_family_timeline ?></a>
 				<?php if ($gm_user->userCanViewGedlines()) { ?>
 				<a class="accesskeys" href="javascript:show_gedcom_record();" title="<?php print GM_LANG_view_gedcom ?>" tabindex="-1" accesskey="<?php print GM_LANG_accesskey_family_gedcom; ?>"><?php print GM_LANG_view_gedcom ?></a>
 				<?php } ?>

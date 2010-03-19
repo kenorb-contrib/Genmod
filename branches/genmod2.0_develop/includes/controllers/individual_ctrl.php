@@ -387,7 +387,7 @@ class IndividualController extends DetailController {
 				$menu->addSubmenu($submenu);
 			}
 			// Add favorite
-			if ($this->indi->disp && !empty($this->uname)) {
+			if ($this->indi->disp && !empty($this->uname) && !$this->indi->isuserfav) {
 				$submenu = new Menu(GM_LANG_add_to_my_favorites);
 				$submenu->addLink("individual.php?action=addfav&pid=".$this->xref.'&gedid='.GedcomConfig::$GEDCOMID);
 				$menu->addSubmenu($submenu);

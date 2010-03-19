@@ -145,7 +145,7 @@ class RepositoryController extends DetailController {
 				$submenu->addLink('clippings.php?action=add&id='.$this->repo->xref.'&type=repo');
 				$menu->addSubmenu($submenu);
 		}
-		if ($this->repo->disp && !empty($this->uname)) {
+		if ($this->repo->disp && !empty($this->uname) && !$this->repo->isuserfav) {
 				// other / add_to_my_favorites
 				$submenu = new Menu(GM_LANG_add_to_my_favorites);
 				$submenu->addLink('repo.php?action=addfav&rid='.$this->repo->xref.'&gedid='.GedcomConfig::$GEDCOMID);

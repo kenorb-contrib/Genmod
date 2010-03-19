@@ -565,9 +565,12 @@ abstract class NameFunctions {
 		
 		// Check for nicknames and remove them
 		if (GedcomConfig::$SHOW_NICK) {
-			$part = strstr($name, " ".substr(GedcomConfig::$NICK_DELIM, 0, 1));
-			if ($part) {
-				$name = str_replace($part, "", $name);
+			$start = strpos($name, " ".substr(GedcomConfig::$NICK_DELIM, 0, 1));
+			if ($start) {
+				$part1 = substr($name, 0, $start);
+				$pos2 = strpos($name, substr(GedcomConfig::$NICK_DELIM, 1, 1));
+				$part2 = substr($name, $pos2 + 1);
+				$name = $part1.$part2;
 				if (strlen($name) <= $length) return $name;
 			}
 		}

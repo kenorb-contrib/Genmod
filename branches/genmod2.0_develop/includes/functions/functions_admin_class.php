@@ -1036,6 +1036,8 @@ abstract class AdminFunctions {
 	 */
 	public function StoreLanguage($storelang) {
 		global $gm_user, $language_settings;
+		
+		if (!self::CheckBom(false))	return false;
 	
 		if (file_exists("languages/lang.".$language_settings[$storelang]["lang_short_cut"].".txt")) {
 			$lines = file("languages/lang.".$language_settings[$storelang]["lang_short_cut"].".txt");
@@ -1221,12 +1223,12 @@ abstract class AdminFunctions {
 		
 		if ($file_type == "facts") {
 			$sql = "UPDATE ".TBLPREFIX."facts";
-			$sql .= " SET lg_".$language2."= '".$string."' WHERE lg_string = '".$value."'";
+			$sql .= " SET lg_".$language2."= '".DbLayer::EscapeQuery($string)."' WHERE lg_string = '".$value."'";
 		}
 		else {
 			$sql = "UPDATE ".TBLPREFIX."language";
 			if (substr($value, -5) == "_help") $sql .= "_help";
-			$sql .= " SET lg_".$language2."= '".$string."' WHERE lg_string = '".$value."'";
+			$sql .= " SET lg_".$language2."= '".DbLayer::EscapeQuery($string)."' WHERE lg_string = '".$value."'";
 		}
 		if ($res = NewQuery($sql)) {
 			$sql = "UPDATE ".TBLPREFIX."lang_settings SET ls_translated='1' WHERE ls_gm_langname='".$language2."'";
