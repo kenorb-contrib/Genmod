@@ -100,6 +100,7 @@ abstract class GedcomRecord {
 	protected $exclude_facts = "";		// Facts that should be excluded while parsing the facts
 	protected $hiddenfacts = null;		// False or true that 1 or more facts are hidden
 	protected $view = null;				// If preview mode is on
+	protected $isuserfav = null;		// If this object is a favorite of the current user
 	
 	/**
 	 * constructor for this class
@@ -329,6 +330,9 @@ abstract class GedcomRecord {
 				break;
 			case "view":
 				return $this->IsPreview();
+				break;
+			case "isuserfav":
+				return $this->IsUserFav();
 				break;
 			default:
 				print "<span class=\"error\">Invalid property ".$property." for __get in ".get_class($this)." class</span><br />";
@@ -1316,6 +1320,16 @@ abstract class GedcomRecord {
 			}
 			return $newrec;
 		}
+	}
+	
+	private function IsUserFav() {
+		global $gm_user;
+		
+		if (is_null($this->isuserfav)) {
+			if ($gm_user->username == "") $this->isuserfav = false;
+			else $this->isuserfav = FavoritesController::IsUserFav($this->xref, $this->type, $this->gedcomid);
+		}
+		return $this->isuserfav;
 	}
 }
 ?>

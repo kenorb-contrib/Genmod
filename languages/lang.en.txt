@@ -1391,6 +1391,7 @@
 "accesskey_viewing_advice";"0"
 "accesskey_viewing_advice_desc";"Viewing advice"
 "accesskey_contact";"4"
+"accesskey_individual_relations";"E"
 "accesskey_individual_details";"I"
 "accesskey_individual_relatives";"R"
 "accesskey_individual_notes";"N"

@@ -109,7 +109,8 @@ class FamilyController extends DetailController
 		$children = $this->family->children_ids;
 		$c = 0;
 		foreach($children as $id => $child) {
-			$children[$id] = 'pids['.($c + $start).']='.$children[$id];
+			$children[$id] = 'pids'.($c + $start).'='.$children[$id];
+			$c++;
 		}
 		return join('&amp;', $children);
 	}
@@ -122,11 +123,11 @@ class FamilyController extends DetailController
 		
 		// charts menu
 		$menu = new Menu(GM_LANG_charts);
-		$menu->addLink('timeline.php?pids[0]='.$this->family->husb_id.'&pids[1]='.$this->family->wife_id);
+		$menu->addLink('timeline.php?pids0='.$this->family->husb_id.'&pids1='.$this->family->wife_id);
 		
 		// charts / parents_timeline
 		$submenu = new Menu(GM_LANG_parents_timeline);
-		$submenu->addLink('timeline.php?pids[0]='.$this->family->husb_id.'&pids[1]='.$this->family->wife_id);
+		$submenu->addLink('timeline.php?pids0='.$this->family->husb_id.'&pids1='.$this->family->wife_id);
 		$menu->addSubmenu($submenu);
 		
 		// charts / children_timeline
@@ -136,7 +137,7 @@ class FamilyController extends DetailController
 		
 		// charts / family_timeline
 		$submenu = new Menu(GM_LANG_family_timeline);
-		$submenu->addLink('timeline.php?pids[0]='.$this->family->husb_id.'&pids[1]='.$this->family->wife_id.'&'.$this->getChildrenUrlTimeline(2));
+		$submenu->addLink('timeline.php?pids0='.$this->family->husb_id.'&pids1='.$this->family->wife_id.'&'.$this->getChildrenUrlTimeline(2));
 		$menu->addSubmenu($submenu);
 		
 		return $menu;
@@ -230,7 +231,7 @@ class FamilyController extends DetailController
 				$submenu->addLink('clippings.php?action=add&id='.$this->family->xref.'&type=fam');
 				$menu->addSubmenu($submenu);
 		}
-		if ($this->family->disp && $this->uname != "") {
+		if ($this->family->disp && $this->uname != "" && !$this->family->isuserfav) {
 				// other / add_to_my_favorites
 				$submenu = new Menu(GM_LANG_add_to_my_favorites);
 				$submenu->addLink('family.php?action=addfav&famid='.$this->family->xref.'&gedid='.$this->family->gedcomid);

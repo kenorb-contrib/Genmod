@@ -73,7 +73,20 @@ abstract class FavoritesController {
 		$res->FreeResult();
 		return $favorites;
 	}
-	
+
+	public function IsUserFav($xref, $type, $gedid) {
+		global $gm_user;
+
+		if (!CONFIGURED) return false;
+		
+		$sql = "SELECT count(fv_id) as count FROM ".TBLPREFIX."favorites WHERE fv_username='".DbLayer::EscapeQuery($gm_user->username)."' AND fv_gid='".$xref."' AND fv_type='".$type."' AND fv_file='".$gedid."'";
+		$res = NewQuery($sql);
+		if (!$res) return false;
+		while($row = $res->FetchAssoc()){
+			return $row["count"];
+		}
+	}
+			
 	/**
 	 * Get the gedcom favorites
 	 * Return an array of a users messages

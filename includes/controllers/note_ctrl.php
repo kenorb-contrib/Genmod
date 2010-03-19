@@ -148,7 +148,7 @@ class NoteController extends DetailController {
 				$submenu->addLink('clippings.php?action=add&id='.$this->xref.'&type=note');
 				$menu->addSubmenu($submenu);
 		}
-		if ($this->note->disp && !empty($this->uname)) {
+		if ($this->note->disp && !empty($this->uname) && !$this->note->isuserfav) {
 				// other / add_to_my_favorites
 				$submenu = new Menu(GM_LANG_add_to_my_favorites);
 				$submenu->addLink('note.php?action=addfav&oid='.$this->xref.'&gedid='.GedcomConfig::$GEDCOMID);

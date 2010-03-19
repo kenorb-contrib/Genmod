@@ -261,10 +261,10 @@ var whichhelp = 'help_<?php print basename(SCRIPT_NAME)."&amp;action=".$action; 
 </script>
 <link href="modules/greybox/gb_styles.css" rel="stylesheet" type="text/css" />
 <?php }
-	 print $head;
-	 print "</head>\n\t<body";
-	 if ($view=="preview") print " onbeforeprint=\"hidePrint();\" onafterprint=\"showBack();\"";
-	 if ($TEXT_DIRECTION=="rtl" || !empty($ONLOADFUNCTION)) {
+	print $head;
+	print "</head>\n\t<body";
+	if ($view=="preview") print " onbeforeprint=\"hidePrint();\" onafterprint=\"showBack();\"";
+	if ($TEXT_DIRECTION=="rtl" || !empty($ONLOADFUNCTION)) {
 		print " onload=\"$ONLOADFUNCTION";
 	 	if ($TEXT_DIRECTION=="rtl") print " maxscroll = document.documentElement.scrollLeft;";
 	 	print " loadHandler();";
@@ -275,22 +275,23 @@ var whichhelp = 'help_<?php print basename(SCRIPT_NAME)."&amp;action=".$action; 
 		if ($view !== "preview") echo 'init();"';
 		else echo '"';
 	}
-	 print ">\n\t";
-	 // Start the container
-	 // print "<div id=\"container\">";
-	 print "<!-- begin header section -->\n";
-	 include("includes/values/include_top.php");
+	print ">\n\t";
+	// Start the container
+	// print "<div id=\"container\">";
+	print "<!-- begin header section -->\n";
+	include("includes/values/include_top.php");
 	 
-	 if ($view!="preview") include(GM_MENUBAR);
-	 else include(GM_PRINT_HEADERFILE);
-	 print "<!-- end header section -->\n";
-	 print "<!-- begin content section -->\n";
+	if ($view!="preview") include(GM_MENUBAR);
+	else include(GM_PRINT_HEADERFILE);
+	include_once("accesskeyHeaders.php");
+	print "<!-- end header section -->\n";
+	print "<!-- begin content section -->\n";
 	
-	 if (USE_GREYBOX) { ?>
+	if (USE_GREYBOX) { ?>
 		<script type="text/javascript" src="modules/greybox/AJS.js"></script>
 		<script type="text/javascript" src="modules/greybox/AJS_fx.js"></script>
 		<script type="text/javascript" src="modules/greybox/gb_scripts.js"></script>
-	 <?php
+	<?php
  	}
 }
 /**

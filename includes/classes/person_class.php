@@ -288,10 +288,15 @@ class Person extends GedcomRecord {
 					if (is_null($this->name_array)) $this->GetNameArray();
 					$name = $this->name_array[0];
 				}
+
+				if (!empty($name[3]) && GedcomConfig::$SHOW_NICK) {
+					$repl = " ".substr(GedcomConfig::$NICK_DELIM, 0, 1).$name[3].substr(GedcomConfig::$NICK_DELIM, 1, 1);
+					$name[0] = preg_replace("/(.*)(\s{0,1})\/(.*)\/(.*)/",  "$1$repl$2/$3/$4", $name[0], 1);
+				}
+				
 				if ($NAME_REVERSE || HasChinese($name[0], true)) $this->name = NameFunctions::ReverseName($name[0]);
 				else $this->name = $name[0];
 				$this->name = NameFunctions::CheckNN($this->name, true);
-				if (!empty($name[3]) && GedcomConfig::$SHOW_NICK) $this->name .= " ".substr(GedcomConfig::$NICK_DELIM, 0, 1).$name[3].substr(GedcomConfig::$NICK_DELIM, 1, 1);
 			}
 			if ($this->name == "") $this->name = GM_LANG_unknown;
 		}

@@ -257,12 +257,8 @@ abstract class MenuBar {
 	public function GetFavoritesMenu() {
 		global $gm_user;
 		
-		// NOTE: Favorites
-		$menu = new Menu(GM_LANG_menu_favorites);
-		
+		// NOTE: User Favorites
 		if ($gm_user->username != "") {
-			$submenu = new Menu(GM_LANG_my_favorites);
-			$menu->addSubmenu($submenu);
 			$userfavs = FavoritesController::getUserFavorites($gm_user->username);
 		}
 		else {
@@ -270,15 +266,21 @@ abstract class MenuBar {
 			$userfavs = array();
 		}
 		
-		foreach($userfavs as $key => $favorite) {
-			$submenu = new Menu($favorite->title);
-			$submenu->addLink($favorite->link);
-			$menu->submenus[count($menu->submenus)-1]->submenus[]=$submenu;
+		if (count($userfavs) > 0) {
+			$menu = new Menu(GM_LANG_menu_favorites);
+			$submenu = new Menu(GM_LANG_my_favorites);
+			$menu->addSubmenu($submenu);
+			foreach($userfavs as $key => $favorite) {
+				$submenu = new Menu($favorite->title);
+				$submenu->addLink($favorite->link);
+				$menu->submenus[count($menu->submenus)-1]->submenus[]=$submenu;
+			}
 		}
 			
 		// NOTE: Gedcom Favorites
 		$gedcomfavs = FavoritesController::getGedcomFavorites(GedcomConfig::$GEDCOMID);
-		if (count($gedcomfavs)>0) {
+		if (count($gedcomfavs) > 0) {
+			if (!is_object($menu)) $menu = new Menu(GM_LANG_menu_favorites);
 			$submenu = new Menu(GM_LANG_gedcom_favorites);
 			$menu->addSubmenu($submenu);
 			
@@ -289,7 +291,7 @@ abstract class MenuBar {
 			}
 		}
 		
-		return $menu;
+		return (isset($menu) && is_object($menu) ? $menu : false);
 	}
 	
 	/**
@@ -359,7 +361,7 @@ abstract class MenuBar {
 		//-- timeline chart submenu
 		if (file_exists("timeline.php")) {
 			$link = "timeline.php";
-			if ($rootid) $link .= "?pids[]=".$rootid;
+			if ($rootid) $link .= "?pids0=".$rootid;
 			$submenu = new Menu(GM_LANG_timeline_chart);
 			$submenu->addLink($link);
 			$menu->addSubmenu($submenu);

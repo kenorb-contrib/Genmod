@@ -143,7 +143,7 @@ class SourceController extends DetailController {
 				$submenu->addLink('clippings.php?action=add&id='.$this->source->xref.'&type=sour');
 				$menu->addSubmenu($submenu);
 		}
-		if ($this->source->disp && !empty($this->uname)) {
+		if ($this->source->disp && !empty($this->uname) && !$this->source->isuserfav) {
 				// other / add_to_my_favorites
 				$submenu = new Menu(GM_LANG_add_to_my_favorites);
 				$submenu->addLink('source.php?action=addfav&sid='.$this->source->xref.'&gedid='.GedcomConfig::$GEDCOMID);

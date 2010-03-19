@@ -165,21 +165,21 @@ abstract class DetailController extends BaseController{
 			print "<dl>";
 			foreach ($this->tabs as $index => $tab) {
 				if ($index != 0) {
-					print "<dd id=\"door".$index."\"><a href=\"javascript:;\" onclick=\"tabswitch(".$index.")\" >";
-					if ($tab == "facts") print GM_LANG_facts."</a></dd>\n";
-					if ($tab == "individuals_links") print GM_LANG_indi_linking." (".$this->$object_name->indi_count.")</a></dd>\n";
-					if ($tab == "families_links") print GM_LANG_fam_linking." (".$this->$object_name->fam_count.")</a></dd>\n";
-					if ($tab == "notes_links") print GM_LANG_note_linking." (".$this->$object_name->note_count.")</a></dd>\n";
-					if ($tab == "media_links") print GM_LANG_mm_linking." (".$this->$object_name->media_count.")</a></dd>\n";
-					if ($tab == "sources_links") print GM_LANG_sour_linking." (".$this->$object_name->sour_count.")</a></dd>\n";
-					if ($tab == "repositories_links") print GM_LANG_repo_linking." (".$this->$object_name->repo_count.")</a></dd>\n";
-					if ($tab == "actions_links") print GM_LANG_action_linking." (".$this->$object_name->action_count.")</a></dd>\n";
-					if ($tab == "relatives") print GM_LANG_relatives."</a></dd>\n";
-					if ($tab == "sources") print GM_LANG_ssourcess."</a></dd>\n";
-					if ($tab == "media") print GM_LANG_media."</a></dd>\n";
-					if ($tab == "notes") print GM_LANG_notes."</a></dd>\n";
-					if ($tab == "relations") print GM_LANG_relations."</a></dd>\n";
-					if ($tab == "actions_person") print GM_LANG_research_log."</a></dd>\n";
+					print "<dd id=\"door".$index."\"><a href=\"javascript:;\" onclick=\"tabswitch(".$index.")\" ";
+					if ($tab == "facts") print ($this->tabtype == "indi" ? "accesskey=\"".GM_LANG_accesskey_individual_details."\"" : "").">".GM_LANG_facts."</a></dd>\n";
+					if ($tab == "individuals_links") print ">".GM_LANG_indi_linking." (".$this->$object_name->indi_count.")</a></dd>\n";
+					if ($tab == "families_links") print ">".GM_LANG_fam_linking." (".$this->$object_name->fam_count.")</a></dd>\n";
+					if ($tab == "notes_links") print ">".GM_LANG_note_linking." (".$this->$object_name->note_count.")</a></dd>\n";
+					if ($tab == "media_links") print ">".GM_LANG_mm_linking." (".$this->$object_name->media_count.")</a></dd>\n";
+					if ($tab == "sources_links") print ">".GM_LANG_sour_linking." (".$this->$object_name->sour_count.")</a></dd>\n";
+					if ($tab == "repositories_links") print ">".GM_LANG_repo_linking." (".$this->$object_name->repo_count.")</a></dd>\n";
+					if ($tab == "actions_links") print ">".GM_LANG_action_linking." (".$this->$object_name->action_count.")</a></dd>\n";
+					if ($tab == "relatives") print ($this->tabtype == "indi" || $this->tabtype == "fam" ? "accesskey=\"".GM_LANG_accesskey_individual_relatives."\"" : "").">".GM_LANG_relatives."</a></dd>\n";
+					if ($tab == "sources") print ($this->tabtype == "indi" || $this->tabtype == "fam" ? "accesskey=\"".GM_LANG_accesskey_individual_sources."\"" : "").">".GM_LANG_ssourcess."</a></dd>\n";
+					if ($tab == "media") print ($this->tabtype == "indi" || $this->tabtype == "fam" ? "accesskey=\"".GM_LANG_accesskey_individual_media."\"" : "").">".GM_LANG_media."</a></dd>\n";
+					if ($tab == "notes") print ($this->tabtype == "indi" || $this->tabtype == "fam" ? "accesskey=\"".GM_LANG_accesskey_individual_notes."\"" : "").">".GM_LANG_notes."</a></dd>\n";
+					if ($tab == "relations") print ($this->tabtype == "indi" || $this->tabtype == "fam" ? "accesskey=\"".GM_LANG_accesskey_individual_relations."\"" : "").">".GM_LANG_relations."</a></dd>\n";
+					if ($tab == "actions_person") print ($this->tabtype == "indi" || $this->tabtype == "fam" ? "accesskey=\"".GM_LANG_accesskey_individual_research_log."\"" : "").">".GM_LANG_research_log."</a></dd>\n";
 				}
 			}
 			print "<dd id=\"door0\"><a href=\"javascript:;\" onclick=\"tabswitch(0)\" >".GM_LANG_all."</a></dd>\n";
@@ -466,6 +466,10 @@ abstract class DetailController extends BaseController{
 			if ($tab == "relatives") {
 				print "<div id=\"relatives\" class=\"tab_page\" style=\"display:none;\" >";
 				if ($this->$object_name->close_relatives) {
+					// Print the access key
+//					print "<a href=\"javascript:".GM_LANG_relatives."\" onclick=\"tabswitch(".array_search("relatives", $this->tabs)."); return false;\" title=\"".GM_LANG_relatives."\" accesskey=\"".GM_LANG_accesskey_individual_relatives."\"></a>";
+//					print "<a href=\"javascript:tabswitch(".array_search("relatives", $this->tabs)."); return false;\" accesskey=\"".GM_LANG_accesskey_individual_relatives."\"></a>";
+					
 					$show_full = true;
 					$prtcount = 0;
 					// NOTE: parent families
