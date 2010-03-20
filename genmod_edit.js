@@ -29,7 +29,7 @@
  */
 function edit_name(pid, fact, count, change_type) {
 	if (!count) count = 1;
-	window.open('edit_interface.php?action=editname&pid='+pid+'&fact='+fact+'&count='+count+'&change_type='+change_type+"&"+sessionname+"="+sessionid, '', 'top=50,left=50,width=710,height=500,resizable=1,scrollbars=1');
+	window.open('edit_interface.php?action=editname&pid='+pid+'&fact='+fact+'&count='+count+'&change_type='+change_type+'&pid_type=INDI&'+sessionname+'='+sessionid, '', 'top=50,left=50,width=710,height=500,resizable=1,scrollbars=1');
 	return false;
 }
 

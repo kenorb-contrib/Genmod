@@ -37,7 +37,7 @@ $ancestry_controller = new AncestryController();
 
 // -- size of the boxes
 $Dbwidth *= $ancestry_controller->box_width/100;
-if (!$ancestry_controller->show_details) $Dbheight=25;
+if (!$ancestry_controller->show_full) $Dbheight=25;
 $bwidth=$Dbwidth;
 $bheight=$Dbheight;
 $pbwidth = $bwidth+12;
@@ -105,7 +105,7 @@ if ($ancestry_controller->view != "preview") {
 
 if ($ancestry_controller->chart_style) {
 	// first page : show indi facts
-	PersonFunctions::PrintPedigreePerson($ancestry_controller->root, 2, false, 1);
+	PersonFunctions::PrintPedigreePerson($ancestry_controller->root, 2, false, 1, 1, "", $ancestry_controller->params);
 	// expand the layer
 	echo <<< END
 	<script language="JavaScript" type="text/javascript">

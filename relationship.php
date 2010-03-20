@@ -69,8 +69,7 @@ print "<div style=\"position: relative; z-index: 1; width:98%;\">\n";
 print "<table class=\"list_table $TEXT_DIRECTION\" style=\"width:100%;\"><tr><td valign=\"top\">";
 $title_string = GM_LANG_relationship_chart;
 if ($relationship_controller->pid1 != "" && $relationship_controller->pid2 != "") {
-	$title_string .= ":<br /><br />".$relationship_controller->person1->name;
-	$title_string .= "<br />".GM_LANG_and." ".$relationship_controller->person2->name;
+	$title_string .= ":<br /><br />".$relationship_controller->person1->name." ".GM_LANG_and." ".$relationship_controller->person2->name;
 }
 print "\n\t<h3>".PrintReady($title_string)."</h3>";
 print "</td><td>";
@@ -461,7 +460,7 @@ if (!$relationship_controller->person1->isempty && !$relationship_controller->pe
 				}
 				print "<div id=\"box".$pid.".1.0\" style=\"position:absolute; ".($TEXT_DIRECTION == "ltr" ? "left" : "right").":".$pxoffset."px; top:".$yoffset."px; width:".$Dbwidth."px; height:".$Dbheight."px; z-index:".(count($node["path"]) - $index)."; \"><table><tr><td colspan=\"2\" width=\"".$Dbwidth."\" height=\"".$Dbheight."\">";
 				$person =& Person::GetInstance($pid);
-				PersonFunctions::PrintPedigreePerson($person, 1, ($relationship_controller->view != "preview"));
+				PersonFunctions::PrintPedigreePerson($person, 1, ($relationship_controller->view != "preview"), 0, 1, "", $relationship_controller->params);
 				print "</td></tr></table></div>\n";
 			}
 		}

@@ -88,7 +88,7 @@ class AncestryController extends ChartController {
 		$new = (!isset($pidarr[$person->xref]));
 		if ($sosa==1) print "<img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["spacer"]["other"]."\" height=\"2\" width=\"".$Dindent."\" border=\"0\" alt=\"\" /></td><td>\n";
 		else print "<img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["hline"]["other"]."\" height=\"2\" width=\"".$Dindent."\" border=\"0\" alt=\"\" /></td><td>\n";
-		PersonFunctions::PrintPedigreePerson($person, 1, 1, 0, 1, $this->view, $this->num_generations, $this->chart_style);
+		PersonFunctions::PrintPedigreePerson($person, 1, true, 0, 1, $this->view, $this->params);
 		
 		print "</td>";
 		print "<td style=\"vertical-align:middle;\">";

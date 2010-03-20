@@ -38,13 +38,15 @@ class ChartController extends BaseController {
 	protected $root = null;					// Holder for the root person object
 	protected $show_full = null;			// Display details in chart boxes
 	protected $show_details = null;			// Display details in chart boxes (input variable)
-	protected $show_cousins = null;
-	protected $box_width = null;
-	protected $chart_style = null;
+	protected $show_cousins = null;			// Show cousins in ancestry and descendancy charts
+	protected $show_spouse = null;			// Show spouses with persons
+	protected $box_width = null;			// Width of the person boxes
+	protected $chart_style = null;			// Type of chart: booklet = 0, list = 1
 	protected $min_generation = null;		// Generate an error that a minimum number of generations must be displayed
 	protected $max_generation = null;		// Generate an error that no more than a maximum number of generations can be displayed
 	protected $num_generations = null;		// Number of generations to display
 	protected $boxcount = 0;				// To keep track of the number of printed boxes
+	protected $params = null;				// Page parameters to send to various functions to construct pagelinks
 	
 	
 	public function __construct() {
@@ -76,6 +78,10 @@ class ChartController extends BaseController {
 		global $show_cousins;
 		$show_cousins = $this->show_cousins;
 
+		if (!isset($_REQUEST["show_spouse"])) $this->show_spouse = 0;
+		else $this->show_spouse = $_REQUEST["show_spouse"];
+		if ($this->show_spouse == "") $this->show_spouse = 0;
+		
 		if (!isset($_REQUEST["box_width"]) || $_REQUEST["box_width"] == "") $this->box_width = "100";
 		else $this->box_width = $_REQUEST["box_width"];
 		$this->box_width = max($this->box_width, 50);
@@ -83,6 +89,16 @@ class ChartController extends BaseController {
 		
 		global $box_width;
 		$box_width = $this->box_width;
+		
+		$this->params = array();
+		$this->params["rootid"] = $this->xref;
+		$this->params["num_generations"] = $this->num_generations;
+		$this->params["box_width"] = $this->box_width;
+		$this->params["show_details"] = $this->show_details;
+		$this->params["chart_style"] = $this->chart_style;
+		$this->params["show_spouse"] = $this->show_spouse;
+		$this->params["show_cousins"] = $this->show_cousins;
+		
 	}
 
 	public function __get($property) {
@@ -102,6 +118,9 @@ class ChartController extends BaseController {
 			case "show_cousins":
 				return $this->show_cousins;
 				break;
+			case "show_spouse":
+				return $this->show_spouse;
+				break;
 			case "show_details":
 				return $this->show_details;
 				break;
@@ -113,6 +132,9 @@ class ChartController extends BaseController {
 				break;
 			case "num_generations":
 				return $this->num_generations;
+				break;
+			case "params":
+				return $this->params;
 				break;
 			default:
 				return parent::__get($property);

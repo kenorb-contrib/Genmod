@@ -36,24 +36,37 @@ abstract class PersonFunctions {
 	 * Find and print a given individuals information for a pedigree chart
 	 *
 	 * @param string $pid			the Gedcom Xref ID of the   to print
-	 * @param int $style			the style to print the box in, 1 for smaller boxes, 2 for larger boxes
+	 * @param int $style			the style to print the box in, 1 for smaller boxes, 2 for larger boxes (individual.php)
 	 * @param boolean $show_famlink	set to true to show the icons for the popup links and the zoomboxes
 	 * @param int $count			on some charts it is important to keep a count of how many boxes were printed
 	 * @param string $view	
-	 * @param string num_gens		number of generations as parameter for links to various charts
-	 * @param string $chart_style	style of chart as parameter for links to various charts
+	 * @param array params			parameters from the chart controllers
 	 */
-	public function PrintPedigreePerson($person, $style=1, $show_famlink=true, $count=0, $personcount="1", $view="", $num_gens=0, $chart_style=1) {
+	public function PrintPedigreePerson($person, $style=1, $show_famlink=true, $count=0, $personcount="1", $view="", $params="") {
 		// Global settings
 		global $TEXT_DIRECTION;
 		global $GM_IMAGES;
 		global $gm_user;
-		
+
 		// Theme dependent settings, must be kept global
 		global $bwidth, $bheight;
 		
 		// Settings for pedigree, descendancy, ancestry etc.
+		if (is_array($params)) extract($params);
+		
 		global $show_full, $box_width;
+		
+		if (!isset($num_generations)) $num_generations = GedcomConfig::$DEFAULT_PEDIGREE_GENERATIONS;
+		if (!isset($box_width)) $box_width = "";
+		if (!isset($show_full)) $show_full = GedcomConfig::$PEDIGREE_FULL_DETAILS;
+		if (!isset($chart_style)) $chart_style = "";
+		if (!isset($show_spouse)) $show_spouse = "";
+		if (!isset($show_cousins)) $show_cousins = "";
+		if (!isset($line)) $line = "";
+		if (!isset($split)) $split = "";
+		if (!isset($talloffset)) $talloffset = "";
+		if (!isset($num_descent)) $num_descent = "";
+		
 		
 		static $personcount;
 		if(!isset($personcount)) $personcount = 0;
@@ -63,8 +76,6 @@ abstract class PersonFunctions {
 		if (is_object($person) && $person->show_changes && $gm_user->UserCanEdit()) $canshow = true;
 		else $canshow = false;
 	
-		if ($num_gens == 0) $num_gens = GedcomConfig::$DEFAULT_PEDIGREE_GENERATIONS;
-		if (!isset($show_full)) $show_full = GedcomConfig::$PEDIGREE_FULL_DETAILS;
 	
 		if ($TEXT_DIRECTION == "ltr") {
 			$ldir = "left";
@@ -104,12 +115,12 @@ abstract class PersonFunctions {
 					print "onmouseout=\"moveout('".$person->xref.".".$personcount.".".$count.".".$random."'); return false;\">";
 					// This div is filled by an AJAX call! Not yet as placement is a problem!
 					// NOTE: Zoom
-					print "<a href=\"pedigree.php?rootid=".$person->xref."&amp;num_generations=".$num_gens."&amp;talloffset=".$chart_style."&amp;gedid=".$person->gedcomid."\"><b>".GM_LANG_index_header."</b></a>\n";
-					print "<br /><a href=\"descendancy.php?rootid=".$person->xref."&amp;show_full=$show_full&amp;num_generations=".$num_gens."&amp;box_width=$box_width&amp;gedid=".$person->gedcomid."\"><b>".GM_LANG_descend_chart."</b></a><br />\n";
-					print "<a href=\"ancestry.php?rootid=".$person->xref."&amp;chart_style=$chart_style&amp;num_generations=".$num_gens."&amp;box_width=$box_width&amp;gedid=".$person->gedcomid."\"><b>".GM_LANG_ancestry_chart."</b></a><br />\n";
-					if (defined("IMG_ARC_PIE") && function_exists("imagettftext"))  print "<a href=\"fanchart.php?rootid=".$person->xref."&amp;PEDIGREE_GENERATIONS=".$num_gens."&amp;gedid=".$person->gedcomid."\"><b>".GM_LANG_fan_chart."</b></a><br />\n";
-					print "<a href=\"hourglass.php?pid=".$person->xref."&amp;chart_style=".$chart_style."&amp;PEDIGREE_GENERATIONS=".$num_gens."&amp;box_width=".$box_width."&amp;gedid=".$person->gedcomid."\"><b>".GM_LANG_hourglass_chart."</b></a><br />\n";
-					print "<a href=\"familybook.php?rootid=".$person->xref."&amp;gedid=".$person->gedcomid."\"><b>".GM_LANG_familybook_chart."</b></a><br />\n";
+					print "<a href=\"pedigree.php?rootid=".$person->xref."&amp;show_details=".$show_full."&amp;box_width=".$box_width."&amp;num_generations=".$num_generations."&amp;talloffset=".$talloffset."&amp;gedid=".$person->gedcomid."\"><b>".GM_LANG_index_header."</b></a>\n";
+					print "<br /><a href=\"descendancy.php?rootid=".$person->xref."&amp;show_details=".$show_full."&amp;num_generations=".$num_generations."&amp;box_width=".$box_width."&amp;chart_style=".$chart_style."&amp;show_cousins=".$show_cousins."&amp;gedid=".$person->gedcomid."\"><b>".GM_LANG_descend_chart."</b></a><br />\n";
+					print "<a href=\"ancestry.php?rootid=".$person->xref."&amp;chart_style=".$chart_style."&amp;num_generations=".$num_generations."&amp;box_width=".$box_width."&amp;show_details=".$show_full."&amp;gedid=".$person->gedcomid."\"><b>".GM_LANG_ancestry_chart."</b></a><br />\n";
+					if (defined("IMG_ARC_PIE") && function_exists("imagettftext"))  print "<a href=\"fanchart.php?rootid=".$person->xref."&amp;num_generations=".$num_generations."&amp;gedid=".$person->gedcomid."\"><b>".GM_LANG_fan_chart."</b></a><br />\n";
+					print "<a href=\"hourglass.php?rootid=".$person->xref."&amp;num_generations=".$num_generations."&amp;show_details=".$show_full."&amp;show_spouse=".$show_spouse."&amp;box_width=".$box_width."&amp;gedid=".$person->gedcomid."\"><b>".GM_LANG_hourglass_chart."</b></a><br />\n";
+					print "<a href=\"familybook.php?rootid=".$person->xref."&amp;num_generations=".$num_generations."&amp;show_details=".$show_full."&amp;show_spouse=".$show_spouse."&amp;box_width=".$box_width."&amp;num_descent=".$num_descent."&amp;gedid=".$person->gedcomid."\"><b>".GM_LANG_familybook_chart."</b></a><br />\n";
 					if ($gm_user->username != "") {
 						if (!empty($gm_user->gedcomid[GedcomConfig::$GEDCOMID])) {
 							print "<a href=\"relationship.php?pid1=".$gm_user->gedcomid[GedcomConfig::$GEDCOMID]."&amp;pid2=".$person->xref."&amp;gedid=".$person->gedcomid."\"><b>".GM_LANG_relationship_to_me."</b></a><br />\n";
@@ -117,7 +128,7 @@ abstract class PersonFunctions {
 					}
 					// NOTE: Zoom
 					print "<a href=\"timeline.php?pids0=".$person->xref."&amp;gedid=".$person->gedcomid."\"><b>".GM_LANG_timeline_chart."</b></a><br />\n";
-					print "<a href=\"paternals.php?rootid=".$person->xref."&amp;split=1&amp;line=paternal&amp;box_width=".$box_width."&amp;gedid=".$person->gedcomid."\"><b>".GM_LANG_paternal_chart."</b></a><br />\n";
+					print "<a href=\"paternals.php?rootid=".$person->xref."&amp;split=".$split."&amp;line=".$line."&amp;box_width=".$box_width."&amp;show_details=".$show_full."&amp;gedid=".$person->gedcomid."\"><b>".GM_LANG_paternal_chart."</b></a><br />\n";
 					foreach ($person->spousefamilies as $skey => $sfam) {
 						if (is_object($sfam)) {
 							if ($person->xref == $sfam->husb_id) $spouse = "wife";
@@ -362,17 +373,17 @@ abstract class PersonFunctions {
 					if (GedcomConfig::$ZOOM_BOXES=="mouseover") print " onmouseover=\"expandbox('".$person->xref.".".$personcount.".".$count."', $style, '".$random."'); if(document.getElementById('inout-".$person->xref.".".$personcount.".".$count.".".$random."').innerHTML=='') sndReq('inout-".$person->xref.".".$personcount.".".$count.".".$random."', 'getzoomfacts', 'pid', '".$person->xref."', 'gedcomid', '".$person->gedcomid."', 'canshow', '".$canshow."', 'view', '".$view."');\" onmouseout=\"restorebox('".$person->xref.".".$personcount.".".$count."', $style, '".$random."');\" onclick=\"return false;\"";
 					if (GedcomConfig::$ZOOM_BOXES=="mousedown") print " onmousedown=\"expandbox('".$person->xref.".".$personcount.".".$count."', $style, '".$random."'); if(document.getElementById('inout-".$person->xref.".".$personcount.".".$count.".".$random."').innerHTML=='') sndReq('inout-".$person->xref.".".$personcount.".".$count.".".$random."', 'getzoomfacts', 'pid', '".$person->xref."', 'gedcomid', '".$person->gedcomid."', 'canshow', '".$canshow."', 'view', '".$view."');\" onmouseup=\"restorebox('".$person->xref.".".$personcount.".".$count."', $style, '".$random."');\" onclick=\"return false;\"";
 					if (GedcomConfig::$ZOOM_BOXES=="click") print " onclick=\"expandbox('".$person->xref.".".$personcount.".".$count."', $style, '".$random."'); if(document.getElementById('inout-".$person->xref.".".$personcount.".".$count.".".$random."').innerHTML=='') sndReq('inout-".$person->xref.".".$personcount.".".$count.".".$random."', 'getzoomfacts', 'pid', '".$person->xref."', 'gedcomid', '".$person->gedcomid."', 'canshow', '".$canshow."', 'view', '".$view."'); return false;\"";
-					print "><img id=\"iconz-".$person->xref.".".$personcount.".".$count."\" src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["zoomin"]["other"]."\" width=\"25\" height=\"25\" border=\"0\" alt=\"".GM_LANG_zoom_box."\" title=\"".GM_LANG_zoom_box."\" /></a>";
+					print "><img id=\"iconz-".$person->xref.".".$personcount.".".$count.".".$random."\" src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["zoomin"]["other"]."\" width=\"25\" height=\"25\" border=\"0\" alt=\"".GM_LANG_zoom_box."\" title=\"".GM_LANG_zoom_box."\" /></a>";
 				}
 				// NOTE: Popup box icon (don't show if the person is private)
 				if (GedcomConfig::$LINK_ICONS!="disabled" && $show_famlink && !$view && ($person->disp_name)) {
 					$click_link="#";
-					if (preg_match("/pedigree.php/", SCRIPT_NAME)>0) $click_link="pedigree.php?rootid=".$person->xref."&amp;num_generations=".$num_gens."&amp;talloffset=".$chart_style."&amp;gedid=".$person->gedcomid;
-					if (preg_match("/descendancy.php/", SCRIPT_NAME)>0) $click_link="descendancy.php?rootid=".$person->xref."&amp;show_full=$show_full&amp;num_generations=".$num_gens."&amp;box_width=$box_width&amp;gedid=".$person->gedcomid;
-					if (preg_match("/ancestry.php/", SCRIPT_NAME)>0) $click_link="ancestry.php?rootid=".$person->xref."&amp;chart_style=$chart_style&amp;num_generations=".$num_gens."&amp;box_width=$box_width&amp;gedid=".$person->gedcomid;
-					if (preg_match("/hourglass.php/", SCRIPT_NAME)>0) $click_link="hourglass.php?pid=".$person->xref."&amp;generations=".$num_gens."&amp;box_width=".$box_width."&amp;gedid=".$person->gedcomid;
-					if (preg_match("/familybook.php/", SCRIPT_NAME)>0) $click_link="familybook.php?rootid=".$person->xref."&amp;num_generations=".$num_gens."&amp;box_width=".$box_width."&amp;gedid=".$person->gedcomid;
-					if (preg_match("/paternals.php/", SCRIPT_NAME)>0) $click_link="paternals.php?rootid=".$person->xref."&amp;split=".$num_gens."&amp;line=".$chart_style."&amp;box_width=".$box_width."&amp;gedid=".$person->gedcomid;
+					if (preg_match("/pedigree.php/", SCRIPT_NAME)>0) $click_link="pedigree.php?rootid=".$person->xref."&amp;num_generations=".$num_generations."&amp;talloffset=".$talloffset."&amp;box_width=".$box_width."&amp;show_details=".$show_full."&amp;gedid=".$person->gedcomid;
+					if (preg_match("/descendancy.php/", SCRIPT_NAME)>0) $click_link="descendancy.php?rootid=".$person->xref."&amp;show_details=".$show_full."&amp;num_generations=".$num_generations."&amp;box_width=".$box_width."&amp;chart_style=".$chart_style."&amp;show_cousins=".$show_cousins."&amp;gedid=".$person->gedcomid;
+					if (preg_match("/ancestry.php/", SCRIPT_NAME)>0) $click_link="ancestry.php?rootid=".$person->xref."&amp;chart_style=".$chart_style."&amp;num_generations=".$num_generations."&amp;box_width=".$box_width."&amp;show_details=".$show_full."&amp;gedid=".$person->gedcomid;
+					if (preg_match("/hourglass.php/", SCRIPT_NAME)>0) $click_link="hourglass.php?rootid=".$person->xref."&amp;num_generations=".$num_generations."&amp;show_details=".$show_full."&amp;show_spouse=".$show_spouse."&amp;box_width=".$box_width."&amp;gedid=".$person->gedcomid;
+					if (preg_match("/familybook.php/", SCRIPT_NAME)>0) $click_link="familybook.php?rootid=".$person->xref."&amp;num_generations=".$num_generations."&amp;show_details=".$show_full."&amp;show_spouse=".$show_spouse."&amp;box_width=".$box_width."&amp;num_descent=".$num_descent."&amp;gedid=".$person->gedcomid;
+					if (preg_match("/paternals.php/", SCRIPT_NAME)>0) $click_link="paternals.php?rootid=".$person->xref."&amp;split=".$split."&amp;line=".$line."&amp;box_width=".$box_width."&amp;show_details=".$show_full."&amp;gedid=".$person->gedcomid;
 					if ((preg_match("/family.php/", SCRIPT_NAME)>0)&&!empty($famid)) $click_link="family.php?famid=".$sfam->xref."&amp;gedid=".$sfam->gedcomid;
 					if (preg_match("/individual.php/", SCRIPT_NAME)>0) $click_link="individual.php?pid=".$person->xref."&amp;gedid=".$person->gedcomid;
 					print "<br />";
@@ -466,7 +477,7 @@ abstract class PersonFunctions {
 		if (!empty($upfamid) and ($sosa!=-1) and ($view != "preview")) {
 			print "<td style=\"vertical-align:middle;\" rowspan=\"2\">";
 			
-			ChartFunctions::PrintUrlArrow($upfamid.$label, ($sosa==0 ? "?famid=".$upfamid."&amp;show_full=".$show_full."&amp;gedid=".$family->gedcomid : "#".$upfamid), PrintReady(GM_LANG_start_at_parents."&nbsp;-&nbsp;".htmlspecialchars($family->$husb->childfamilies[$hfam]->sortable_name.($family->$husb->childfamilies[$hfam]->sortable_addname == "" ? "" : " (".$family->$husb->childfamilies[$hfam]->sortable_addname.")"))), 1);
+			ChartFunctions::PrintUrlArrow($upfamid.$label, ($sosa==0 ? "?famid=".$upfamid."&amp;show_details=".$show_full."&amp;gedid=".$family->gedcomid : "#".$upfamid), PrintReady(GM_LANG_start_at_parents."&nbsp;-&nbsp;".htmlspecialchars($family->$husb->childfamilies[$hfam]->sortable_name.($family->$husb->childfamilies[$hfam]->sortable_addname == "" ? "" : " (".$family->$husb->childfamilies[$hfam]->sortable_addname.")"))), 1);
 			print "</td>\n";
 		}
 	//	if ($hfam != "" || ($sosa != 0 &&  GedcomConfig::$SHOW_EMPTY_BOXES)) {
@@ -545,7 +556,7 @@ abstract class PersonFunctions {
 		if (!empty($upfamid) and ($sosa!=-1) and ($view != "preview")) {
 			print "<td style=\"vertical-align:middle;\" rowspan=\"2\">";
 			
-			ChartFunctions::PrintUrlArrow($upfamid.$label, ($sosa==0 ? "?famid=$upfamid&amp;show_full=".$show_full."&amp;gedid=".$family->gedcomid : "#$upfamid"), PrintReady(GM_LANG_start_at_parents."&nbsp;-&nbsp;".htmlspecialchars($family->$wife->childfamilies[$wfam]->sortable_name)), 1);
+			ChartFunctions::PrintUrlArrow($upfamid.$label, ($sosa==0 ? "?famid=$upfamid&amp;show_details=".$show_full."&amp;gedid=".$family->gedcomid : "#$upfamid"), PrintReady(GM_LANG_start_at_parents."&nbsp;-&nbsp;".htmlspecialchars($family->$wife->childfamilies[$wfam]->sortable_name)), 1);
 			print "</td>\n";
 		}
 	//	if ($wfam != "" || ($sosa != 0 &&  GedcomConfig::$SHOW_EMPTY_BOXES)) {

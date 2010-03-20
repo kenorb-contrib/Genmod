@@ -56,6 +56,8 @@ class PedigreeController extends ChartController {
 			$this->num_generations = 3;
 			$this->min_generation = true;
 		}
+		
+		$this->params["talloffset"] = $this->talloffset;
 	}
 
 	public function __get($property) {
