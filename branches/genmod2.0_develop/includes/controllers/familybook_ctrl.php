@@ -32,8 +32,7 @@ if (stristr($_SERVER["SCRIPT_NAME"],basename(__FILE__))) {
 class FamilyBookController extends ChartController {
 	
 	public $classname = "FamilyBookController";	// Name of this class
-	private $num_descent = null;				// Number of time to repeat the family book for a descendant generation (depth)
-	private $show_spouse = null;				// Show spouses with persons
+	protected $num_descent = null;				// Number of time to repeat the family book for a descendant generation (depth)
 	private $dgenerations = null;				// Calculated maximum generations
 	private $page = null;						// Page this controller is called from
 	
@@ -56,25 +55,19 @@ class FamilyBookController extends ChartController {
 			$this->min_generation = true;
 		}
 		
-		if (!isset($_REQUEST["show_spouse"])) $this->show_spouse = 0;
-		else $this->show_spouse = $_REQUEST["show_spouse"];
-		if ($this->show_spouse == "") $this->show_spouse = 0;
-		
 		if ($this->page == "familybook.php") {
 			if (!isset($_REQUEST["num_descent"]) || $_REQUEST["num_descent"] == "") $this->num_descent = 2;
 			else $this->num_descent = $_REQUEST["num_descent"];
 		}
 		else $this->num_descent = 1;
 		
+		$this->params["num_descent"] = $this->num_descent;
 	}
 
 	public function __get($property) {
 		switch($property) {
 			case "num_descent":
 				return $this->num_descent;
-				break;
-			case "show_spouse":
-				return $this->show_spouse;
 				break;
 			default:
 				return parent::__get($property);
@@ -193,7 +186,7 @@ class FamilyBookController extends ChartController {
 						$numkids += $kids;
 					}
 					else {
-						PersonFunctions::PrintPedigreePerson($child, 1, true, $this->boxcount);
+						PersonFunctions::PrintPedigreePerson($child, 1, true, $this->boxcount, 1, $this->view, $this->params);
 						$this->boxcount++;
 						$numkids++;
 					}
@@ -246,7 +239,7 @@ class FamilyBookController extends ChartController {
 				print "<div style=\"height: ".$bheight."px; width: ".$bwidth."px;\"><br /></div>\n";
 			}
 		}
-		PersonFunctions::PrintPedigreePerson($person, 1, true, $this->boxcount);
+		PersonFunctions::PrintPedigreePerson($person, 1, true, $this->boxcount, 1, $this->view, $this->params);
 		$this->boxcount++;
 		// NOTE: If statement OK
 		if ($this->show_spouse) {
@@ -256,8 +249,8 @@ class FamilyBookController extends ChartController {
 					if ($fam->disp && $fam->marr_date != "") print "<span class=\"date\">".NameFunctions::GetFirstLetter($fam->marr_fact->descr).": ".$fam->marr_fact->datestring."</span>";
 //					FactFunctions::PrintSimpleFact($fam->marr_fact, false, false); 
 				}
-				if ($fam->husb_id != $person->xref) PersonFunctions::PrintPedigreePerson($fam->husb, 1, true, $this->boxcount);
-				else PersonFunctions::PrintPedigreePerson($fam->wife, 1, true, $this->boxcount);
+				if ($fam->husb_id != $person->xref) PersonFunctions::PrintPedigreePerson($fam->husb, 1, true, $this->boxcount, 1, $this->view, $this->params);
+				else PersonFunctions::PrintPedigreePerson($fam->wife, 1, true, $this->boxcount, 1, $this->view, $this->params);
 				$this->boxcount++;
 			}
 		}
@@ -284,7 +277,7 @@ class FamilyBookController extends ChartController {
 			if ($count < $this->num_generations - 1) print "<td height=\"50%\" style=\"vertical-align:middle;\"><img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["spacer"]["other"]."\" width=\"3\" alt=\"\" /></td>\n";
 			if ($count < $this->num_generations - 1) print "<td rowspan=\"2\" style=\"vertical-align:middle;\" ><img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["hline"]["other"]."\" width=\"7\" height=\"3\" alt=\"\" /></td>\n";
 			print "<td rowspan=\"2\" style=\"vertical-align:middle;\">\n";
-			PersonFunctions::PrintPedigreePerson($family->husb, 1, true, $this->boxcount);
+			PersonFunctions::PrintPedigreePerson($family->husb, 1, true, $this->boxcount, 1, $this->view, $this->params);
 			$this->boxcount++;
 			print "</td>\n";
 			print "<td rowspan=\"2\" style=\"vertical-align:middle;\">\n";
@@ -296,7 +289,7 @@ class FamilyBookController extends ChartController {
 			if ($count < $this->num_generations - 1) print "<td height=\"50%\" style=\"vertical-align:middle; background: url('".GM_IMAGE_DIR."/".$GM_IMAGES["vline"]["other"]."'); \"><img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["spacer"]["other"]."\" width=\"3\" alt=\"\" /></td>";
 			if ($count < $this->num_generations - 1) print "<td rowspan=\"2\" style=\"vertical-align:middle;\"><img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["hline"]["other"]."\" width=\"7\" height=\"3\" alt=\"\" /></td>\n";
 			print "<td rowspan=\"2\" style=\"vertical-align:middle;\">\n";
-			PersonFunctions::PrintPedigreePerson($family->wife, 1, true, $this->boxcount);
+			PersonFunctions::PrintPedigreePerson($family->wife, 1, true, $this->boxcount, 1, $this->view, $this->params);
 			$this->boxcount++;
 			print "</td>\n";
 			print "<td rowspan=\"2\" style=\"vertical-align:middle;\">\n";

@@ -33,18 +33,12 @@ class PaternalsController extends ChartController {
 	
 	public $classname = "PaternalsController";	// Name of this class
 	protected $split = null;					// Where to start the single line of ancestors: me (1), parents (2), grandparents (3)
-	private $rootfams = null;					// Array of fams for the lines
 	protected $line = "paternal";				// Type of ancestry for the lines: maternal, paternal, long
 		
-	private $num_descent = null;				// Number of time to repeat the family book for a descendant generation (depth)
-	private $show_spouse = null;				// Show spouses with persons
-	private $dgenerations = null;				// Calculated maximum generations
-	private $page = null;						// Page this controller is called from
+	private $rootfams = null;					// Array of fams for the lines
 	private $pagewidth = null;					// Minimum width of the page in pix
 	
 	public function __construct() {
-		
-		$this->page = substr(SCRIPT_NAME, 1);
 		
 		parent::__construct();
 
@@ -56,6 +50,9 @@ class PaternalsController extends ChartController {
 		
 		global $bwidth;
 		$this->pagewidth = pow(2, ($this->split-1)) * ($bwidth * 1.1) * ($this->box_width / 100);
+		
+		$this->params["split"] = $this->split;
+		$this->params["line"] = $this->line;
 	}
 
 	public function __get($property) {
@@ -108,19 +105,6 @@ class PaternalsController extends ChartController {
 		print "</select>";
 		print "</td></tr>";
 	}
-	
-	public function PrintInputShowSpouse() {
-		
-		print "<tr><td class=\"shade2\" >";
-		PrintHelpLink("show_spouse_help", "qm");
-		print GM_LANG_show_spouses."&nbsp;</td>";
-		print "<td class=\"shade1 vmiddle\">";
-		print "<input type=\"checkbox\" value=\"1\" name=\"show_spouse\"";
-		if ($this->show_spouse) print " checked=\"checked\"";
-		print " />";
-		print "</td></tr>";
-	}
-	
 
 	public function PrintPaternalLines() {
 		global $bwidth, $bheight, $TEXT_DIRECTION, $GM_IMAGES;
@@ -132,7 +116,7 @@ class PaternalsController extends ChartController {
 		$this->PrintFamArrow("u", $this->GetRootObject());
 		print "</div>";
 		print "<br /><br />";
-		PersonFunctions::PrintPedigreePerson($this->GetRootObject(), 1, true, $this->boxcount, 1, $this->view, $this->split, $this->line);
+		PersonFunctions::PrintPedigreePerson($this->GetRootObject(), 1, true, $this->boxcount, 1, $this->view, $this->params);
 		$this->boxcount++;
 		$this->rootfams = array($this->GetRootObject()->primaryfamily);
 		for ($i = 2; $i <= $this->split; $i++) {
@@ -171,7 +155,7 @@ class PaternalsController extends ChartController {
 			print "<br style=\"clear:both;\" />";
 			foreach($persons as $key2 => $person) {
 				print "<div style=\"width:".$perc."%; float:left;\" align=\"center\">";
-				if (is_object($person) || GedcomConfig::$SHOW_EMPTY_BOXES) PersonFunctions::PrintPedigreePerson($person, 1, true, $this->boxcount, 1, $this->view, $this->split, $this->line);
+				if (is_object($person) || GedcomConfig::$SHOW_EMPTY_BOXES) PersonFunctions::PrintPedigreePerson($person, 1, true, $this->boxcount, 1, $this->view, $this->params);
 				else print "&nbsp;";
 				$this->boxcount++;
 				print "</div>";
@@ -189,12 +173,12 @@ class PaternalsController extends ChartController {
 		foreach ($fams as $key =>$famid) {
 			$family =& Family::GetInstance($famid);
 			print "<div style=\"width:".$perc."%; float:left;\" align=\"center\">";
-			PersonFunctions::PrintPedigreePerson($family->husb, 1, true, $this->boxcount, 1, $this->view, $this->split, $this->line);
+			PersonFunctions::PrintPedigreePerson($family->husb, 1, true, $this->boxcount, 1, $this->view, $this->params);
 			$this->boxcount++;
 			$newfams[] = (is_object($family->husb) ? $family->husb->primaryfamily : "");
 			print "</div>";
 			print "<div style=\"width:".$perc."%; float:left;\" align=\"center\">";
-			PersonFunctions::PrintPedigreePerson($family->wife, 1, true, $this->boxcount, 1, $this->view, $this->split, $this->line);
+			PersonFunctions::PrintPedigreePerson($family->wife, 1, true, $this->boxcount, 1, $this->view, $this->params);
 			$this->boxcount++;
 			$newfams[] = (is_object($family->wife) ? $family->wife->primaryfamily : "");
 			print "</div>";
@@ -266,7 +250,7 @@ class PaternalsController extends ChartController {
 					$person = Person::GetInstance(SplitKey($cols[$i][$cnt], "id"));
 				}
 				else $person = "";
-				PersonFunctions::PrintPedigreePerson($person, 1, true, $this->boxcount, 1, $this->view, $this->split, $this->line);
+				PersonFunctions::PrintPedigreePerson($person, 1, true, $this->boxcount, 1, $this->view, $this->params);
 				$this->boxcount++;
 				print "</div>";
 			}

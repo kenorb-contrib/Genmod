@@ -369,6 +369,8 @@ var oldz = 0;
 var oldleft = 0;
 var big = 0;
 var oldboxid = "";
+var oldbstyle = "";
+var oldrandom = 0;
 var oldimgw = 0;
 var oldimgh = 0;
 var oldimgw1 = 0;
@@ -382,18 +384,19 @@ var oldiconsdislpay = 0;
 function expandbox(boxid, bstyle, random) {
 	// NOTE: Check if the box has already been zoomed into
 	if (big==1) {
-		restorebox(oldboxid, bstyle, random);
+		// This will also close another box if still open
+		restorebox(oldboxid, oldbstyle, oldrandom);
 		if (boxid==oldboxid) return true;
 	}
 	// Set the correct identifiers
-	boxidparent = boxid;
 	boxid = boxid+"."+random;
-	
+	boxidparent = boxid;
+
 	url = window.location.toString();
 	divbox = document.getElementById("out-"+boxid);
 	inbox = document.getElementById("inout-"+boxid);
 	inbox2 = document.getElementById("inout2-"+boxid);
-	parentbox = document.getElementById("box"+boxidparent);
+	parentbox = document.getElementById("box-"+boxidparent);
 	if (!parentbox) {
 		parentbox=divbox;
 	}
@@ -412,6 +415,8 @@ function expandbox(boxid, bstyle, random) {
 			else iconz.src = zoominout[0].src;
 		}
 		oldboxid=boxidparent;
+		oldbstyle=bstyle;
+		oldrandom=random;
 		big = 1;
 		oldheight=divbox.style.height;
 		oldwidth=divbox.style.width;
@@ -437,10 +442,10 @@ function expandbox(boxid, bstyle, random) {
 			repositioned = 1;
 			divleft=0;
 		}
-		if (url.indexOf("pedigree.php")!=-1) {
-			if (textDirection=="ltr") parentbox.style.left=divleft+"px";
-			else parentbox.style.right=divleft+"px";
-		}
+//		if (url.indexOf("pedigree.php")!=-1) {
+//			if (textDirection=="ltr") parentbox.style.left=divleft+"px";
+//			else parentbox.style.right=divleft+"px";
+//		}
 		divbox.style.height='auto';
 		if (inbox) inbox.style.display='block';
 		if (inbox2) inbox2.style.display='none';
@@ -482,6 +487,11 @@ function restorebox(boxid, bstyle, random) {
 	// Set the correct identifiers
 	boxidparent = boxid;
 	boxid = boxid+"."+random; 
+
+	// Reset the previous boxid
+	prevboxid = "";
+	prevbstyle = "";
+	prevrandom = "";
 	
 	divbox = document.getElementById("out-"+boxid);
 	inbox = document.getElementById("inout-"+boxid);
