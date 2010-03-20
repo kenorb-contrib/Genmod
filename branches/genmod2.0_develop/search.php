@@ -370,7 +370,7 @@ if ($search_controller->action == "general") {
 
 // ----- section to search and display results for a Soundex last name search
 if ($search_controller->action == "soundex") {
-	if ($search_controller->soundex == "DaitchM") DMsoundex("", "closecache");
+	if ($search_controller->soundex == "DaitchM") NameFunctions::DMsoundex("", "closecache");
 // 	$query = "";	// Stop function PrintReady from doing strange things to accented names
 	if (!is_null($search_controller->lastname) || !is_null($search_controller->firstname) || !is_null($search_controller->place)) {
 		$ct = count($search_controller->printindiname);

@@ -79,9 +79,8 @@ class NoteController extends DetailController {
 
 		if (is_null($this->pagetitle)) {
 			$this->pagetitle = "";
-			$this->pagetitle .= $this->note->getTitle()." - ";
-			if (GedcomConfig::$SHOW_ID_NUMBERS) $this->pagetitle .= $this->note->xref." - ";
-			$this->pagetitle .= GM_LANG_note_info;
+			$this->pagetitle .= $this->note->getTitle().$this->note->addxref;
+			$this->pagetitle .= " - ".GM_LANG_note_info;
 		}
 		return $this->pagetitle;
 	}

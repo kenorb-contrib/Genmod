@@ -105,11 +105,11 @@ abstract class ListFunctions {
 	public function SurnameCount($nsurname, $sort_letter="") {
 		global $surnames, $alpha, $surname, $show_all, $i, $testname;
 		
-		if ($sort_letter == "") $sort_letter = GetFirstLetter($nsurname);
-		$lname = StripPrefix($nsurname);
+		if ($sort_letter == "") $sort_letter = NameFunctions::GetFirstLetter($nsurname);
+		$lname = NameFunctions::StripPrefix($nsurname);
 		if (empty($lname)) $lname = $nsurname;
 		if (($show_all=="yes") || empty($alpha) || ($alpha==$sort_letter)) {
-			$tsurname = Str2Upper(StripPrefix(preg_replace("/([^ ]+)\*/", "$1", $nsurname)));
+			$tsurname = Str2Upper(NameFunctions::StripPrefix(preg_replace("/([^ ]+)\*/", "$1", $nsurname)));
 			if (empty($surname) || (Str2Upper($surname)==$tsurname)) {
 				if (!isset($surnames[$tsurname])) {
 					$surnames[$tsurname] = array();
@@ -329,7 +329,7 @@ abstract class ListFunctions {
 		usort($placelist, "stringsort");
 		if ($LANGUAGE != "chinese" && GedcomConfig::$DISPLAY_PINYIN) {
 			foreach ($placelist as $key => $place) {
-				if (HasChinese($place)) $placelist[$key] .= " (".GetPinYin($place).")";
+				if (NameFunctions::HasChinese($place)) $placelist[$key] .= " (".NameFunctions::GetPinYin($place).")";
 			}
 		}
 		return $placelist;

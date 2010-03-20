@@ -140,7 +140,7 @@ function print_gedcom_stats($block = true, $config="", $side, $index) {
 		print "</td></tr></table>";
 		// NOTE: Print the most common surnames
 		if ($config["show_common_surnames"]=="yes") {
-			$surnames = GetCommonSurnamesIndex(GedcomConfig::$GEDCOMID);
+			$surnames = NameFunctions::GetCommonSurnamesIndex(GedcomConfig::$GEDCOMID);
 			if (count($surnames)>0) {
 				print "<br />";
 				PrintHelpLink("index_common_names_help", "qm", "common_surnames");

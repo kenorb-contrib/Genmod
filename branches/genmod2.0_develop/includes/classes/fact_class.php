@@ -48,9 +48,6 @@ class Fact {
 	private $resnvalue = null;		// The value for the 2 RESN tag
 	private $gedcomid = null;		// Gedcom ID in which the fact exists
 	
-	// Links
-//	private $factassos = null;		// Array of associates this fact links to
-	
 	// Other attributes
 	private $owner = null;			// Xref of the owner of this fact
 	private $owner_type = null;		// Datatype of the owner
@@ -114,9 +111,6 @@ class Fact {
 			case "gedcomid":
 				return $this->gedcomid;
 				break;
-//			case "factassos":
-//				return $this->getFactAssos();
-//				break;
 			case "owner":
 				return $this->getOwner();
 				break;
@@ -243,14 +237,11 @@ class Fact {
 	private function getFactDescription() {
 		
 		if (is_null($this->descr)) {
-//			if ($this->ShowDetails()) {
-				$fact = preg_replace("/^X_/", "_", $this->factref);
-				if (defined("GM_FACT_".$fact)) $this->descr = constant("GM_FACT_".$fact);
-				else $this->descr = $fact;
-//			}
-//			else $this->descr = "";
+			$fact = preg_replace("/^X_/", "_", $this->factref);
+			if (defined("GM_FACT_".$fact)) $this->descr = constant("GM_FACT_".$fact);
+			else $this->descr = $fact;
 		}
-		if (GedcomConfig::$ABBREVIATE_CHART_LABELS) return GetFirstLetter($this->descr);
+		if (GedcomConfig::$ABBREVIATE_CHART_LABELS) return NameFunctions::GetFirstLetter($this->descr);
 		else return $this->descr;
 	}
 	
@@ -419,6 +410,7 @@ class Fact {
 		}
 		else return $prtstr;
 	}
+	
 	/**
 	 * print fact PLACe TEMPle STATus
 	 *
@@ -453,7 +445,7 @@ class Fact {
 					 $prtstr .= "parent[$pindex]=".urlencode($ppart)."&amp;";			}
 				$prtstr .= "level=".count($levels);
 				$prtstr .= "\"> ";
-				if (HasChinese($place)) $prtstr .= PrintReady($place."&nbsp;(".GetPinYin($place).")");
+				if (NameFunctions::HasChinese($place)) $prtstr .= PrintReady($place."&nbsp;(".NameFunctions::GetPinYin($place).")");
 				else $prtstr .= PrintReady($place);
 				$prtstr .= "</a>";
 			}
@@ -465,12 +457,12 @@ class Fact {
 						$prtstr .= PrintReady($levels[$level]);
 					}
 				}
-				if (HasChinese($match[1])) {
+				if (NameFunctions::HasChinese($match[1])) {
 					$ptext = "(";
 					for ($level=0; $level < GedcomConfig::$SHOW_PEDIGREE_PLACES; $level++) {
 						if (!empty($levels[$level])) {
 							if ($level>0) $ptext .= ", ";
-							$ptext .= GetPinYin(trim($levels[$level]));
+							$ptext .= NameFunctions::GetPinYin(trim($levels[$level]));
 						}
 					}
 					$ptext .= ")";

@@ -47,8 +47,8 @@ function PrintHeader($title, $head="",$use_alternate_styles=true) {
 	global $BROWSERTYPE;
 	global $view, $gm_user;
 	global $GEDCOMS;
-	global $QUERY_STRING, $action, $query, $changelanguage,$theme_name;
-	global $GM_IMAGES, $TEXT_DIRECTION, $ONLOADFUNCTION, $SHOW_SOURCES;
+	global $QUERY_STRING, $action, $changelanguage,$theme_name;
+	global $GM_IMAGES, $TEXT_DIRECTION, $ONLOADFUNCTION;
 	// globals for the bot 304 mechanism
 	global $bot, $_SERVER, $pid, $famid, $rid, $sid;
 
@@ -168,7 +168,7 @@ function PrintHeader($title, $head="",$use_alternate_styles=true) {
 		  if (!empty(GedcomConfig::$META_PUBLISHER)) print "<meta name=\"publisher\" content=\"".GedcomConfig::$META_PUBLISHER."\" />\n";
 		  if (!empty(GedcomConfig::$META_COPYRIGHT)) print "<meta name=\"copyright\" content=\"".GedcomConfig::$META_COPYRIGHT."\" />\n";
 		  print "<meta name=\"keywords\" content=\"".GedcomConfig::$META_KEYWORDS;
-		  $surnames = GetCommonSurnamesIndex(GedcomConfig::$GEDCOMID);
+		  $surnames = NameFunctions::GetCommonSurnamesIndex(GedcomConfig::$GEDCOMID);
 		  foreach($surnames as $surname=>$count) if (!empty($surname)) print ", $surname";
 		  print "\" />\n";
 		  if ((empty(GedcomConfig::$META_PAGE_TOPIC))&&(!empty($GEDCOMS[GedcomConfig::$GEDCOMID]["title"]))) GedcomConfig::$META_PAGE_TOPIC = $GEDCOMS[GedcomConfig::$GEDCOMID]["title"];
@@ -283,7 +283,7 @@ var whichhelp = 'help_<?php print basename(SCRIPT_NAME)."&amp;action=".$action; 
 	 
 	if ($view!="preview") include(GM_MENUBAR);
 	else include(GM_PRINT_HEADERFILE);
-	include_once("accesskeyHeaders.php");
+	PrintAccessKeyHeaders();
 	print "<!-- end header section -->\n";
 	print "<!-- begin content section -->\n";
 	
@@ -294,6 +294,7 @@ var whichhelp = 'help_<?php print basename(SCRIPT_NAME)."&amp;action=".$action; 
 	<?php
  	}
 }
+
 /**
  * print simple HTML header
  *
@@ -335,7 +336,7 @@ function PrintSimpleHeader($title) {
 	if (!empty(GedcomConfig::$META_PUBLISHER)) print "<meta name=\"publisher\" content=\"".GedcomConfig::$META_PUBLISHER."\" />\n";
 	if (!empty(GedcomConfig::$META_COPYRIGHT)) print "<meta name=\"copyright\" content=\"".GedcomConfig::$META_COPYRIGHT."\" />\n";
 	print "<meta name=\"keywords\" content=\"".GedcomConfig::$META_KEYWORDS;
-	$surnames = GetCommonSurnamesIndex(GedcomConfig::$GEDCOMID);
+	$surnames = NameFunctions::GetCommonSurnamesIndex(GedcomConfig::$GEDCOMID);
 	foreach($surnames as $surname=>$count) print ", $surname";
 	print "\" />\n";
 	if ((empty(GedcomConfig::$META_PAGE_TOPIC))&&(!empty($GEDCOMS[GedcomConfig::$GEDCOMID]["title"]))) GedcomConfig::$META_PAGE_TOPIC = $GEDCOMS[GedcomConfig::$GEDCOMID]["title"];
@@ -445,6 +446,7 @@ function PrintFooter() {
 	session_write_close();
 
 }
+
 // -- print the html to close the page
 function PrintSimpleFooter() {
 	global $start_time, $buildindex;
@@ -782,6 +784,7 @@ function PrintText($help, $level=0, $noprint=0){
 	 if ($level>0) return $sentence;
 	 print $sentence;
 }
+
 function PrintHelpIndex($help){
 
 	 $sentence = constant("GM_LANG_".$help);
@@ -831,6 +834,7 @@ function PrintHelpIndex($help){
 	 }
 	 if ($ch>0) print "</ul></td></tr></table>";
 }
+
 /**
  * Prepare text with parenthesis for printing
  * Convert & to &amp; for xhtml compliance
@@ -1153,4 +1157,16 @@ function PrintPrivacyError($username) {
 	 }
 }
 
+function PrintAccessKeyHeaders() {
+	global $action;
+	
+	?>
+	<div class="accesskeys">
+	<a class="accesskeys" href="#content" title="<?php print GM_LANG_accesskey_skip_to_content_desc; ?>" tabindex="0" accesskey="<?php print GM_LANG_accesskey_skip_to_content; ?>"><?php print GM_LANG_accesskey_skip_to_content_desc; ?></a>
+	<a class="accesskeys" href="javascript://accesskey_viewing_advice_help" onfocus="this.onclick" onclick="return helpPopup('accesskey_viewing_advice_help');" title="<?php print GM_LANG_accesskey_viewing_advice_desc; ?>" accesskey="<?php print GM_LANG_accesskey_viewing_advice; ?>"><?php print GM_LANG_accesskey_viewing_advice_desc; ?></a>
+	<a href="javascript://help_<?php print basename(SCRIPT_NAME); ?>" onclick="return helpPopup('help_<?php print basename(SCRIPT_NAME); ?>&amp;action=<?php print $action;?>');" accesskey="<?php print GM_LANG_accesskey_help_current_page; ?>"> </a>
+	<a href="javascript://help_contents_help" onclick="return helpPopup('help_contents_help');" accesskey="<?php print GM_LANG_accesskey_help_content; ?>"> </a>
+	</div>
+	<?php
+}
 ?>

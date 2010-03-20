@@ -1425,7 +1425,7 @@ abstract class FactFunctions {
 									$plactext .= PrintReady($plevels[$plevel]);
 								}
 							}
-							if (HasChinese($plactext)) $plactext .= PrintReady(" (".GetPinYin($plactext).")");
+							if (NameFunctions::HasChinese($plactext)) $plactext .= PrintReady(" (".NameFunctions::GetPinYin($plactext).")");
 							$text .= PrintReady($plactext);
 						}
 					}

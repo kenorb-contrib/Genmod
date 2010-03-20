@@ -87,8 +87,7 @@ class FamilyController extends DetailController
 			if (is_object($this->family->wife)) $wname = $this->family->wife->name;
 			else $wname = NameFunctions::CheckNN("@P.N. @N.N.");
 			
-			$this->pagetitle = $hname." + ".$wname;
-			if (GedcomConfig::$SHOW_ID_NUMBERS) $this->pagetitle .= " - ".$this->family->xref;
+			$this->pagetitle = $hname." + ".$wname.$this->family->addxref;
 			$this->pagetitle .= " - ".GM_LANG_family_info;
 		}
 		return $this->pagetitle;

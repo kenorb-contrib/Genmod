@@ -460,9 +460,9 @@ function StringSort($aname, $bname) {
 		else {
 			
 	// Handle chinese order, force this check even if pinyin is disabled
-	if(HasChinese($aname, true) && HasChinese($bname, true)) {
-		$aname = GetPinYin($aname);
-		$bname = GetPinYin($bname);
+	if(NameFunctions::HasChinese($aname, true) && NameFunctions::HasChinese($bname, true)) {
+		$aname = NameFunctions::GetPinYin($aname);
+		$bname = NameFunctions::GetPinYin($bname);
 	}
 	
 	//-- get the name lengths
@@ -604,8 +604,8 @@ function FirstnameSort($a, $b) {
 	else if (isset($b["names"])) $bname = NameFunctions::SortableNameFromName($b["names"][0][0]);
 	else if (is_array($b)) $bname = NameFunctions::SortableNameFromName($b[0]);
 	else $bname=$b;
-	$aname = StripPrefix($aname);
-	$bname = StripPrefix($bname);
+	$aname = NameFunctions::StripPrefix($aname);
+	$bname = NameFunctions::StripPrefix($bname);
 	$an = split(", ", $aname);
 	if (isset($an[1])) $aname = $an[1].", ".$an[0];
 	$bn = split(", ", $bname);
@@ -647,8 +647,8 @@ function ItemSort($a, $b) {
 	}
 	else $bname = $b;
 
-	$aname = preg_replace("/([^ ]+)\*/", "$1", StripPrefix($aname));
-	$bname = preg_replace("/([^ ]+)\*/", "$1", StripPrefix($bname));
+	$aname = preg_replace("/([^ ]+)\*/", "$1", NameFunctions::StripPrefix($aname));
+	$bname = preg_replace("/([^ ]+)\*/", "$1", NameFunctions::StripPrefix($bname));
 	return StringSort($aname, $bname);
 }
 
@@ -970,8 +970,8 @@ function ItemObjSort($a, $b) {
 	else if (is_array($b)) $bname = NameFunctions::SortableNameFromName($b[0]);
 	else if (is_string($b)) $aname = $b;
 
-	$aname = preg_replace("/([^ ]+)\*/", "$1", StripPrefix($aname));
-	$bname = preg_replace("/([^ ]+)\*/", "$1", StripPrefix($bname));
+	$aname = preg_replace("/([^ ]+)\*/", "$1", NameFunctions::StripPrefix($aname));
+	$bname = preg_replace("/([^ ]+)\*/", "$1", NameFunctions::StripPrefix($bname));
 	return StringSort($aname, $bname);
 }
 

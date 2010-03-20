@@ -749,7 +749,7 @@ if ($step == 5) {
 		else $_SESSION["import"]["resumed"] = 0;
 		if (!isset($lastgid)) {
 			ImportFunctions::LockTables();
-			DMSoundex("", "opencache");
+			NameFunctions::DMSoundex("", "opencache");
 			$end = false;
 			$pos1 = 0;
 			while(!$end) {
@@ -911,7 +911,7 @@ if ($step == 5) {
 							print "<input type=\"hidden\" name=\"step\" value=\"5\" />";
 							// This is the (auto)continue button
 							print "<input type=\"submit\" name=\"continue\" value=\"".GM_LANG_del_proceed."\" />";
-							DMSoundex("", "closecache");
+							NameFunctions::DMSoundex("", "closecache");
 							//-- We write the session data and close it. Fix for intermittend logoff.
 							session_write_close();
 							if ($auto_continue == "yes") { ?>
@@ -940,7 +940,7 @@ if ($step == 5) {
 				if ($pos2 == 0 && feof($fpged)) $end = true;
 			}
 			fclose($fpged);
-			DMSoundex("", "closecache");
+			NameFunctions::DMSoundex("", "closecache");
 			$newtime = time();
 			$exectime = $newtime - $oldtime;
 			$importtime = $importtime + $exectime;
@@ -1001,7 +1001,7 @@ if ($step == 6) {
 	$exectime_start = $_SESSION["import"]["exectime_start"]; //ok
 	$importtime = $_SESSION["import"]["importtime"];
 	
-	DMSoundex("", "opencache");
+	NameFunctions::DMSoundex("", "opencache");
 	if (!isset($lastgid)) $skip = false;
 	else $skip = true;
 	foreach($flist as $gid => $indi) {
@@ -1027,7 +1027,7 @@ if ($step == 6) {
 						//$newname = preg_replace("~/(.*)/~", " $1 /".$surname."/", $indi_names[0][0]);
 						$newname = preg_replace("~/(.*)/~", "/".$surname."/", $indi_names[0][0]);
 						// But only if both are the same for chinese
-						if (HasChinese($surname, true) == HasChinese($indi_names[0][0], true)) {
+						if (NameFunctions::HasChinese($surname, true) == NameFunctions::HasChinese($indi_names[0][0], true)) {
 							// and only if it doesn't exist yet
 							if (strpos($indi->gedrec, "_MARNM $newname")===false) {
 								$gedrec = $indi->gedrec;
@@ -1073,7 +1073,7 @@ if ($step == 6) {
 				<?php
 				// This is the (auto)continue button
 				print "<input type=\"submit\" name=\"continue\" value=\"".GM_LANG_del_proceed."\" />";
-				DMSoundex("", "closecache");
+				NameFunctions::DMSoundex("", "closecache");
 				//-- We write the session data and close it. Fix for intermittend logoff.
 				session_write_close();
 				if ($auto_continue == "yes") { ?>
@@ -1096,7 +1096,7 @@ if ($step == 6) {
 			}
 		}
 	}
-	DMSoundex("", "closecache");
+	NameFunctions::DMSoundex("", "closecache");
 	$show_table_marr = "<table class=\"list_table center\"><tr>";
 	$show_table_marr .= "<tr><td class=\"topbottombar\" colspan=\"3\">".GM_LANG_import_marr_names."</td></tr>";
 	$show_table_marr .= "<td class=\"shade2\">&nbsp;".GM_LANG_exec_time."&nbsp;</td>";

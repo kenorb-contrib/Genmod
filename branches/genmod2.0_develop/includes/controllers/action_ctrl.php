@@ -149,7 +149,7 @@ abstract class ActionController {
 	
 	private function ActionRepoSort($a, $b) {
 		if ($a->repodesc != $b->repodesc) return StringSort($a->repodesc, $b->repodesc);
-		else return StringSort(preg_replace("/([^ ]+)\*/", "$1", StripPrefix($a->piddesc)), preg_replace("/([^ ]+)\*/", "$1", StripPrefix($b->piddesc)));
+		else return StringSort(preg_replace("/([^ ]+)\*/", "$1", NameFunctions::StripPrefix($a->piddesc)), preg_replace("/([^ ]+)\*/", "$1", NameFunctions::StripPrefix($b->piddesc)));
 	}
 	
 	private function ActionRepoIDSort($a, $b) {
@@ -158,7 +158,7 @@ abstract class ActionController {
 	}
 	
 	private function ActionPidSort($a, $b) {
-		if ($a->piddesc != $b->piddesc) return StringSort(preg_replace("/([^ ]+)\*/", "$1", StripPrefix($a->piddesc)), preg_replace("/([^ ]+)\*/", "$1", StripPrefix($b->piddesc)));
+		if ($a->piddesc != $b->piddesc) return StringSort(preg_replace("/([^ ]+)\*/", "$1", NameFunctions::StripPrefix($a->piddesc)), preg_replace("/([^ ]+)\*/", "$1", NameFunctions::StripPrefix($b->piddesc)));
 		else return StringSort($a->repodesc, $b->repodesc);
 	}
 

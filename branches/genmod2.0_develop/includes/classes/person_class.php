@@ -294,7 +294,7 @@ class Person extends GedcomRecord {
 					$name[0] = preg_replace("/(.*)(\s{0,1})\/(.*)\/(.*)/",  "$1$repl$2/$3/$4", $name[0], 1);
 				}
 				
-				if ($NAME_REVERSE || HasChinese($name[0], true)) $this->name = NameFunctions::ReverseName($name[0]);
+				if ($NAME_REVERSE || NameFunctions::HasChinese($name[0], true)) $this->name = NameFunctions::ReverseName($name[0]);
 				else $this->name = $name[0];
 				$this->name = NameFunctions::CheckNN($this->name, true);
 			}
@@ -553,7 +553,7 @@ class Person extends GedcomRecord {
 							$factrec = "1 ".$fact;
 							$factrec .= "\n".trim($fam->husb->GetDeathDate());
 							$factrec .= "\n2 ASSO @".$fam->husb->xref."@";
-							$factrec .= "\n3 RELA ".(GetSosaName($sosa*2));
+							$factrec .= "\n3 RELA ".(NameFunctions::GetSosaName($sosa*2));
 							if ($this->tracefacts) print "AddParentsFacts sosa ".$sosa."- Adding for ".$fam->xref.": ".$fact." ".$factrec."<br />";
 							$this->facts[] = new Fact($fam->husb->xref, $fam->husb->datatype, $fam->husb->gedcomid, "X$fact", $factrec, 0, "");
 						}
@@ -570,7 +570,7 @@ class Person extends GedcomRecord {
 							$factrec = "1 ".$fact;
 							$factrec .= "\n".trim($fam->wife->GetDeathDate());
 							$factrec .= "\n2 ASSO @".$fam->wife->xref."@";
-							$factrec .= "\n3 RELA ".(GetSosaName($sosa*2+1));
+							$factrec .= "\n3 RELA ".(NameFunctions::GetSosaName($sosa*2+1));
 							if ($this->tracefacts) print "AddParentsFacts sosa ".$sosa."- Adding for ".$fam->xref.": ".$fact." ".$factrec."<br />";
 							$this->facts[] = new Fact($fam->wife->xref, $fam->wife->datatype, $fam->wife->gedcomid, "X$fact", $factrec, 0, "");
 						}
@@ -953,7 +953,7 @@ class Person extends GedcomRecord {
 				if ($this->xref == $this->spousefamilies[$id]->husb_id) {
 					if (is_object($this->spousefamilies[$id]->wife)) {
 						$name = $this->spousefamilies[$id]->wife->GetName();
-						if (HasChinese($name)) $name = PrintReady($name." (".$this->spousefamilies[$id]->wife->GetAddName().")");
+						if (NameFunctions::HasChinese($name)) $name = PrintReady($name." (".$this->spousefamilies[$id]->wife->GetAddName().")");
 						if ($fam->wife->disp_name) $this->spousefamilies[$id]->label .= $name;
 						else $this->spousefamilies[$id]->label .= GM_LANG_private;
 					}
@@ -962,7 +962,7 @@ class Person extends GedcomRecord {
 				else {
 					if (is_object($this->spousefamilies[$id]->husb)) {
 						$name = $this->spousefamilies[$id]->husb->getName();
-						if (HasChinese($name)) $name = PrintReady($name." (".$this->spousefamilies[$id]->husb->getAddName().")");
+						if (NameFunctions::HasChinese($name)) $name = PrintReady($name." (".$this->spousefamilies[$id]->husb->getAddName().")");
 						if ($fam->husb->disp_name) $this->spousefamilies[$id]->label .= $name;
 						else $this->spousefamilies[$id]->label .= GM_LANG_private;
 					}
@@ -1023,7 +1023,7 @@ class Person extends GedcomRecord {
 									$name = $sfamily->wife->GetName();
 									// empty the label, as the wife is not related
 									$sfamily->wife->SetFamLabel($sfamily->xref, "");
-									if (HasChinese($name)) $name = PrintReady($name." (".$sfamily->wife->GetAddName().")");
+									if (NameFunctions::HasChinese($name)) $name = PrintReady($name." (".$sfamily->wife->GetAddName().")");
 								}
 								else $name = NameFunctions::CheckNN("@P.N./@N.N./");
 								$this->childfamilies[$famid]->husb->spousefamilies[$key]->label .= $name;
@@ -1031,7 +1031,7 @@ class Person extends GedcomRecord {
 							// NOTE: We are not viewing the husband, so add the husbands label
 							else {
 								$name = $sfamily->husb->GetName();
-								if (HasChinese($name)) $name = PrintReady($name." (".$sfamily->husb->GetAddName().")");
+								if (NameFunctions::HasChinese($name)) $name = PrintReady($name." (".$sfamily->husb->GetAddName().")");
 								$this->childfamilies[$famid]->husb->spousefamilies[$key]->label .= $name;
 							}
 						}
@@ -1062,7 +1062,7 @@ class Person extends GedcomRecord {
 									// empty the label, as the husb is not related
 									$sfamily->husb->SetFamLabel($sfamily->xref, "");
 									$name = $sfamily->husb->GetName();
-									if (HasChinese($name)) $name = PrintReady($name." (".$sfamily->husb->GetAddName().")");
+									if (NameFunctions::HasChinese($name)) $name = PrintReady($name." (".$sfamily->husb->GetAddName().")");
 								}
 								else $name = NameFunctions::CheckNN("@P.N./@N.N./");
 								$this->childfamilies[$famid]->wife->spousefamilies[$key]->label .= $name;
@@ -1070,7 +1070,7 @@ class Person extends GedcomRecord {
 							// NOTE: We are not viewing the husband, so add the husbands label
 							else {
 								$name = $sfamily->wife->GetName();
-								if (HasChinese($name)) $name = PrintReady($name." (".$sfamily->wife->GetAddName().")");
+								if (NameFunctions::HasChinese($name)) $name = PrintReady($name." (".$sfamily->wife->GetAddName().")");
 								$this->childfamilies[$famid]->wife->spousefamilies[$key]->label .= $name;
 							}
 						}
@@ -1581,7 +1581,7 @@ class Person extends GedcomRecord {
 			if (begRTLText($desc)) print "<li class=\"rtl\" dir=\"rtl\">";
 			else print "<li class=\"ltr\" dir=\"ltr\">";
 		}
-		if (HasChinese($desc)) $addname = "&nbsp;(".$this->GetSortableAddName($namenum).")";
+		if (NameFunctions::HasChinese($desc)) $addname = "&nbsp;(".$this->GetSortableAddName($namenum).")";
 		else $addname = "";
 		
 		if ($paste) {

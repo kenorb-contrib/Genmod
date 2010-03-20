@@ -76,7 +76,7 @@ class ListController extends BaseController {
 		}
 		else $this->surname = "";
 
-		if ($this->alpha == "" && $this->surname != "") $this->alpha = GetFirstLetter(StripPrefix($this->surname));
+		if ($this->alpha == "" && $this->surname != "") $this->alpha = NameFunctions::GetFirstLetter(NameFunctions::StripPrefix($this->surname));
 		
 		// Get the sublist switch
 		if (isset($_GET["surname_sublist"])) $this->surname_sublist = $_GET["surname_sublist"];
@@ -286,7 +286,7 @@ class ListController extends BaseController {
 	 			print "<div class =\"rtl\" dir=\"rtl\">&nbsp;<a href=\"".SCRIPT_NAME."?alpha=".urlencode($this->alpha)."&amp;surname_sublist=".$this->surname_sublist."&amp;surname=".urlencode($namecount["name"]).$resturl;
 	 			if ($this->allgeds == "yes") print "&amp;allgeds=yes";
 	 			print "\">&nbsp;";
-	 			if (HasChinese($namecount["name"])) print PrintReady($namecount["name"]." (".GetPinYin($namecount["name"]).")");
+	 			if (NameFunctions::HasChinese($namecount["name"])) print PrintReady($namecount["name"]." (".NameFunctions::GetPinYin($namecount["name"]).")");
 	 			else print PrintReady($namecount["name"]);
 	 			print "&rlm; - [".($namecount["match"])."]&rlm;";
 			}
@@ -299,7 +299,7 @@ class ListController extends BaseController {
 				print "<div class =\"ltr\" dir=\"ltr\">&nbsp;<a href=\"".SCRIPT_NAME."?alpha=".urlencode($this->alpha)."&amp;surname_sublist=".$this->surname_sublist."&amp;surname=".urlencode($namecount["name"]).$resturl;
 	 			if ($this->allgeds == "yes") print "&amp;allgeds=yes";
 				print "\">";
-	 			if (HasChinese($namecount["name"])) print PrintReady($namecount["name"]." (".GetPinYin($namecount["name"]).")");
+	 			if (NameFunctions::HasChinese($namecount["name"])) print PrintReady($namecount["name"]." (".NameFunctions::GetPinYin($namecount["name"]).")");
 				else print PrintReady($namecount["name"]);
 				print "&lrm; - [".($namecount["match"])."]&lrm;";
 			}

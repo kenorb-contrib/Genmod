@@ -417,10 +417,10 @@ function GetGedcomValue($tag, $level, $gedrec, $truncate='', $convert=true) {
 				}
 			}
 		}
-		else if ($convert && $t=="SEX") {
-			if ($value=="M") $value = GetFirstLetter(GM_LANG_male);
-			else if ($value=="F") $value = GetFirstLetter(GM_LANG_female);
-			else $value = GetFirstLetter(GM_LANG_unknown);
+		else if ($convert && $t == "SEX") {
+			if ($value == "M") $value = NameFunctions::GetFirstLetter(GM_LANG_male);
+			else if ($value == "F") $value = NameFunctions::GetFirstLetter(GM_LANG_female);
+			else $value = NameFunctions::GetFirstLetter(GM_LANG_unknown);
 		}
 		else {
 			if (!empty($truncate)) {
@@ -1975,6 +1975,160 @@ function ReConstructObject($pid, $type, $gedid="", $data_array="") {
 		if (is_object($object) && !$object->isempty) return $object;
 	}
 	return false;
+}
+
+/**
+ * Put all characters in a string in lowercase
+ *
+ * This function is a replacement for strtolower() and will put all characters in lowercase
+ *
+ * @author	eikland
+ * @param	string $value the text to be converted to lowercase
+ * @return	string $value_lower the converted text in lowercase
+ * @todo look at function performance as it is much slower than strtolower
+ */
+function Str2Lower($value) {
+	global $language_settings,$LANGUAGE, $ALPHABET_upper, $ALPHABET_lower;
+	global $all_ALPHABET_upper, $all_ALPHABET_lower;
+
+	//-- get all of the upper and lower alphabets as a string
+	if (!isset($all_ALPHABET_upper)) {
+		$all_ALPHABET_upper = "";
+		$all_ALPHABET_lower = "";
+		foreach ($ALPHABET_upper as $l => $up_alphabet){
+			$lo_alphabet = $ALPHABET_lower[$l];
+			$ll = strlen($lo_alphabet);
+			$ul = strlen($up_alphabet);
+			if ($ll < $ul) $lo_alphabet .= substr($up_alphabet, $ll);
+			if ($ul < $ll) $up_alphabet .= substr($lo_alphabet, $ul);
+			$all_ALPHABET_lower .= $lo_alphabet;
+			$all_ALPHABET_upper .= $up_alphabet;
+		}
+	}
+
+	$value_lower = "";
+	if (MB_FUNCTIONS) $len = mb_strlen($value);
+	else $len = strlen($value);
+
+	//-- loop through all of the letters in the value and find their position in the
+	//-- upper case alphabet.  Then use that position to get the correct letter from the
+	//-- lower case alphabet.
+	$ord_value2 = array(92, 195, 196, 197, 206, 207, 208, 209, 214, 215, 216, 217, 218, 219);
+	$ord_value3 = array(228, 229, 230, 232, 233);
+	for($i=0; $i<$len; $i++) {
+		if (!MB_FUNCTIONS) {
+			$letter = substr($value, $i, 1);
+			$ord = ord($letter);
+			if (in_array($ord, $ord_value2)) {
+				$i++;
+				$letter .= substr($value, $i, 1);
+			}
+			else if (in_array($ord, $ord_value3)) {
+				$i++;
+				$letter .= substr($value, $i, 2);
+				$i++;
+			}
+			$pos = strpos($all_ALPHABET_upper, $letter);
+			if ($pos!==false) {
+				$letter = substr($all_ALPHABET_lower, $pos, strlen($letter));
+			}
+			$value_lower .= $letter;
+		}
+		else {
+			$letter = mb_substr($value, $i, 1);
+			$pos = mb_strpos($all_ALPHABET_upper, $letter);
+			if ($pos!==false) {
+				$letter = mb_substr($all_ALPHABET_lower, $pos, 1);
+			}
+			$value_lower .= $letter;
+		}
+	}
+	return $value_lower;
+}
+
+/**
+ * Put all characters in a string in uppercase
+ *
+ * This function is a replacement for strtoupper() and will put all characters in uppercase
+ *
+ * @author Genmod Development Team
+ * @param	string $value the text to be converted to uppercase
+ * @return	string $value_upper the converted text in uppercase
+ * @todo look at function performance as it is much slower than strtoupper
+ */
+function Str2Upper($value) {
+	global $language_settings,$LANGUAGE, $ALPHABET_upper, $ALPHABET_lower;
+	global $all_ALPHABET_upper, $all_ALPHABET_lower;
+
+	//-- get all of the upper and lower alphabets as a string
+	if (!isset($all_ALPHABET_upper)) {
+		$all_ALPHABET_upper = "";
+		$all_ALPHABET_lower = "";
+		foreach ($ALPHABET_upper as $l => $up_alphabet){
+			$lo_alphabet = $ALPHABET_lower[$l];
+			$ll = strlen($lo_alphabet);
+			$ul = strlen($up_alphabet);
+			if ($ll < $ul) $lo_alphabet .= substr($up_alphabet, $ll);
+			if ($ul < $ll) $up_alphabet .= substr($lo_alphabet, $ul);
+			$all_ALPHABET_lower .= $lo_alphabet;
+			$all_ALPHABET_upper .= $up_alphabet;
+		}
+	}
+
+	$value_upper = "";
+	if (MB_FUNCTIONS) $len = mb_strlen($value);
+	else $len = strlen($value);
+
+	//-- loop through all of the letters in the value and find their position in the
+	//-- lower case alphabet.  Then use that position to get the correct letter from the
+	//-- upper case alphabet.
+	$ord_value2 = array(92, 195, 196, 197, 206, 207, 208, 209, 214, 215, 216, 217, 218, 219);
+	$ord_value3 = array(228, 229, 230, 232, 233);
+	for($i=0; $i<$len; $i++) {
+		if (!MB_FUNCTIONS) {
+			$letter = substr($value, $i, 1);
+			$ord = ord($letter);
+			if (in_array($ord, $ord_value2)) {
+				$i++;
+				$letter .= substr($value, $i, 1);
+			}
+			else if (in_array($ord, $ord_value3)) {
+				$i++;
+				$letter .= substr($value, $i, 2);
+				$i++;
+			}
+			$pos = strpos($all_ALPHABET_lower, $letter);
+			if ($pos!==false) {
+				$letter = substr($all_ALPHABET_upper, $pos, strlen($letter));
+			}
+			$value_upper .= $letter;
+		}
+		else {
+			$letter = mb_substr($value, $i, 1);
+			$pos = mb_strpos($all_ALPHABET_lower, $letter);
+			if ($pos!==false) {
+				$letter = mb_substr($all_ALPHABET_upper, $pos, 1);
+			}
+			$value_upper .= $letter;
+		}
+	}
+	return $value_upper;
+}
+
+/**
+ * Convert a string to UTF8
+ *
+ * This function is a replacement for utf8_decode()
+ *
+ * @author	http://www.php.net/manual/en/function.utf8-decode.php
+ * @param	string $in_str the text to be converted
+ * @return	string $new_str the converted text
+ */
+function SmartUtf8Decode($in_str) {
+	$new_str = html_entity_decode(htmlentities($in_str, ENT_COMPAT, 'UTF-8'));
+	$new_str = str_replace("&oelig;", "\x9c", $new_str);
+	$new_str = str_replace("&OElig;", "\x8c", $new_str);
+	return $new_str;
 }
 	
 ?>

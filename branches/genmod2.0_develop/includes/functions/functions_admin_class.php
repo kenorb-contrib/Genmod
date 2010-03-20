@@ -691,7 +691,7 @@ abstract class AdminFunctions {
 			if (empty($GED["commonsurnames"])) {
 				if ($GED["gedcom"] == get_gedcom_from_id(GedcomConfig::$GEDCOMID)) {
 					$GED["commonsurnames"] = "";
-					$surnames = GetCommonSurnames(GedcomConfig::$COMMON_NAMES_THRESHOLD);
+					$surnames = NameFunctions::GetCommonSurnames(GedcomConfig::$COMMON_NAMES_THRESHOLD);
 					foreach($surnames as $indexval => $surname) {
 						$GED["commonsurnames"] .= $surname["name"].", ";
 					}

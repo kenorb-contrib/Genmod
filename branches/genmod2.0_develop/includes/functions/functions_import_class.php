@@ -609,7 +609,7 @@ abstract class ImportFunctions {
 			$isdead = -1;
 			$indi = array();
 			$names = NameFunctions::GetIndiNames($indirec, true);
-			$soundex_codes = GetSoundexStrings($names, true, $indirec);
+			$soundex_codes = ImportFunctions::GetSoundexStrings($names, true, $indirec);
 			foreach($names as $indexval => $name) {
 				$sql = "INSERT INTO ".TBLPREFIX."names VALUES('0', '".DbLayer::EscapeQuery($gid)."[".$gedfile."]','".DbLayer::EscapeQuery($gid)."','".$gedfile."','".DbLayer::EscapeQuery($name[0])."','".DbLayer::EscapeQuery($name[1])."','".DbLayer::EscapeQuery($name[5])."', '".DbLayer::EscapeQuery($name[2])."', '".DbLayer::EscapeQuery($name[3])."','".DbLayer::EscapeQuery($name[4])."')";
 				$res = NewQuery($sql);
@@ -1353,7 +1353,7 @@ abstract class ImportFunctions {
 		
 		$name_array = $indi->name_array;
 		$name_array[] = array($newname, $letter, $surname, "C");
-		$soundex_codes = GetSoundexStrings($name_array, false, $indirec);
+		$soundex_codes = ImportFunctions::GetSoundexStrings($name_array, false, $indirec);
 		$sql = "DELETE FROM ".TBLPREFIX."soundex WHERE s_gid='".$kgid."'";
 		$sql = "INSERT INTO ".TBLPREFIX."soundex VALUES ";
 		foreach ($soundex_codes as $type => $ncodes) {
@@ -1447,6 +1447,76 @@ abstract class ImportFunctions {
 		return $indirec;
 	}
 		
+	public function GetSoundexStrings($namearray, $import=false, $indirec="") {
+	
+		$snsndx = "";
+		$sndmsndx = "";
+		$fnsndx = "";
+		$fndmsndx = "";
+		$soundexarray = array();
+		$soundexarray["R"] = array();
+		$soundexarray["R"]["F"] = array();
+		$soundexarray["R"]["L"] = array();
+		$soundexarray["R"]["P"] = array();
+		$soundexarray["D"] = array();
+		$soundexarray["D"]["F"] = array();
+		$soundexarray["D"]["L"] = array();
+		$soundexarray["D"]["P"] = array();
+		foreach ($namearray as $key => $names) {
+			if ($names[2] != "@N.N.") {
+				if (NameFunctions::HasChinese($names[2], $import)) $names[2] = NameFunctions::GetPinYin($names[2], $import);
+				$nameparts = explode(" ",trim($names[2]));
+				foreach ($nameparts as $key3 => $namepart) {
+					$sval = soundex($namepart);
+					if ($sval != "0000") {
+						if (!in_array($sval, $soundexarray["R"]["L"])) $soundexarray["R"]["L"][] = $sval;
+					}
+					$sval = NameFunctions::DMsoundex($namepart);
+					if (is_array($sval)) {
+						foreach ($sval as $key4 => $dmcode) {
+							if (!in_array($dmcode, $soundexarray["D"]["L"])) $soundexarray["D"]["L"][] = $dmcode;
+						}
+					}
+				}
+			}
+			$lnames = preg_split("/\//",$names[0]);
+			$fname = $lnames[0];
+			if ($fname != "@P.N." && $fname !="") {
+				if (NameFunctions::HasChinese($fname, $import)) $fname = NameFunctions::GetPinYin($fname, $import);
+				$nameparts = explode(" ",trim($fname));
+				foreach ($nameparts as $key3 => $namepart) {
+				// Added: The nickname is embedded in parenthesis. They must be removed and will be added later
+				// In one blow, also remove stars (starred names)
+				$namepart = preg_replace(array("/\(.*\)/","/\*/"), array("", ""), $namepart);
+					$sval = soundex($namepart);
+					if ($sval != "0000") {
+						if (!in_array($sval, $soundexarray["R"]["F"])) $soundexarray["R"]["F"][] = $sval;
+					}
+					$sval = NameFunctions::DMsoundex($namepart);
+					if (is_array($sval)) {
+						foreach ($sval as $key4 => $dmcode) {
+							if (!in_array($dmcode, $soundexarray["D"]["F"])) $soundexarray["D"]["F"][] = $dmcode;
+						}
+					}
+				}
+			}
+			// Now also add the nicks. Only if the indirec is added, we will get any result.
+			$nicks = NameFunctions::GetNicks($indirec);
+			foreach ($nicks as $key => $nick) {
+				$sval = soundex($nick);
+				if ($sval != "0000") {
+					if (!in_array($sval, $soundexarray["R"]["F"])) $soundexarray["R"]["F"][] = $sval;
+				}
+				$sval = NameFunctions::DMsoundex($nick);
+				if (is_array($sval)) {
+					foreach ($sval as $key4 => $dmcode) {
+						if (!in_array($dmcode, $soundexarray["D"]["F"])) $soundexarray["D"]["F"][] = $dmcode;
+					}
+				}
+			}
+		}
+		return $soundexarray;
+	}
 					
 }
 ?>

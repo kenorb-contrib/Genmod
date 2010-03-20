@@ -34,9 +34,9 @@ class CustomPage {
 	public $classname = "CustomPage";	// The name of this class
 	
 	// Data
-	private $id = null;			// Unique ID for this page
-	private $content = null;	// Content of the page
-	private $title = null;		// Title of the page
+	private $id = null;					// Unique ID for this page
+	private $content = null;			// Content of the page
+	private $title = null;				// Title of the page
 	
 	public function __construct($values="") {
 		

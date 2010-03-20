@@ -70,8 +70,7 @@ class FanchartController extends ChartController {
 	protected function GetPageTitle() {
 		
 		if (is_null($this->pagetitle)) {
-			$this->pagetitle = $this->GetRootObject()->name;
-			if (GedcomConfig::$SHOW_ID_NUMBERS) $this->pagetitle .= " - ".$this->xref;
+			$this->pagetitle = $this->GetRootObject()->name.$this->GetRootObject()->addxref;
 			$this->pagetitle .= " - ".GM_LANG_fan_chart;
 		}
 		return $this->pagetitle;
@@ -317,9 +316,9 @@ class FanchartController extends ChartController {
 	//				else $wmax = min($wmax, 35*$scale);
 					$wmax = floor($maxpix/$fontsize);				
 					
-					$name = NameFunctions::AbbreviateName((HasChinese($name) ? $addname : $name), $wmax);
+					$name = NameFunctions::AbbreviateName((NameFunctions::HasChinese($name) ? $addname : $name), $wmax);
 	//print " ".strlen($name)." ".$wmax." ".$name."<br />";
-					$text = ltr_string($name) . "\r\n" . (HasChinese($person->name) ? "" : ltr_string($addname)."\r\n");
+					$text = ltr_string($name) . "\r\n" . (NameFunctions::HasChinese($person->name) ? "" : ltr_string($addname)."\r\n");
 					if ($person->disp) {
 						$ctb = preg_match("/2 DATE.*(\d\d\d\d)/", $person->brec, $matchb);
 						$ctd = preg_match("/2 DATE.*(\d\d\d\d)/", $person->drec, $matchd);
