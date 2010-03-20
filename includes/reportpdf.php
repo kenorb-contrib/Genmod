@@ -1646,7 +1646,7 @@ function GMRGetPersonNameSHandler($attrs) {
 		else {
 			$name = $object->name;
 			// This is a workaround to display the PinYin name instead of the name in Chinese characters, as Chinese characters are not printed properly.
-			if (HasChinese($name, true)) $name = $object->addname;
+			if (NameFunctions::HasChinese($name, true)) $name = $object->addname;
 			if (!empty($attrs["truncate"])) {
 					$name = NameFunctions::AbbreviateName($name, $attrs["truncate"]);
 			}
@@ -1674,7 +1674,7 @@ function GMRGedcomValueSHandler($attrs) {
 			if (PrivacyFunctions::showFact($fact, $id) && PrivacyFunctions::showFactDetails($fact,$id)) $value = $desc;
 			else $value = GM_LANG_private;
 			$value = trim($value);
-			if (HasChinese($value, true)) $currentElement->addText(GetPinYin($value, true));
+			if (NameFunctions::HasChinese($value, true)) $currentElement->addText(NameFunctions::GetPinYin($value, true));
 			else $currentElement->addText($value);
 		}
 		if ($tag=="@id") {
@@ -1724,7 +1724,7 @@ function GMRGedcomValueSHandler($attrs) {
 				if (!empty($id)) $factrec = GetSubRecord(1, $tags[0], $gedrec);
 				else $factrec = "";
 				if (!PrivacyFunctions::FactViewRestricted($id, $factrec)) {
-					if (HasChinese($value, true)) $currentElement->addText(GetPinYin($value, true));
+					if (NameFunctions::HasChinese($value, true)) $currentElement->addText(NameFunctions::GetPinYin($value, true));
 					else $currentElement->addText($value);
 				}
 			}
@@ -1946,7 +1946,7 @@ function GMRvarLetterSHandler($attrs) {
 		if (substr($var, 0, 8) == "GM_FACT_" || substr($ver, 0, 8) == "GM_LANG_") $var = constant($var);
 		else eval("if (isset(\$$var) && !empty(\$$var)) \$var = \$$var;");
 
-		$letter = GetFirstLetter($var);
+		$letter = NameFunctions::GetFirstLetter($var);
 
 		$currentElement->addText($letter);
 	}

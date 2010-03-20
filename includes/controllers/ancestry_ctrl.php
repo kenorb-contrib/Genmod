@@ -63,8 +63,7 @@ class AncestryController extends ChartController {
 	protected function GetPageTitle() {
 		
 		if (is_null($this->pagetitle)) {
-			$this->pagetitle = $this->GetRootObject()->name;
-			if (GedcomConfig::$SHOW_ID_NUMBERS) $this->pagetitle .= " - ".$this->xref;
+			$this->pagetitle = $this->GetRootObject()->name.$this->GetRootObject()->addxref;
 			$this->pagetitle .= " - ".GM_LANG_ancestry_chart;
 		}
 		return $this->pagetitle;
@@ -98,9 +97,9 @@ class AncestryController extends ChartController {
 		print "<td class=\"details1\" style=\"vertical-align:middle;\">&nbsp;<span class=\"person_box". (($sosa==1) ? "NN" : (($sosa%2) ? "F" : "")) . "\">&nbsp;$sosa&nbsp;</span>&nbsp;";
 		print "</td><td class=\"details1\" style=\"vertical-align:middle;\">";
 		$relation ="";
-		if (!$new) $relation = "<br />[=<a href=\"#sosa".$pidarr[$person->xref]."\">".$pidarr[$person->xref]."</a> - ".GetSosaName($pidarr[$person->xref])."]";
+		if (!$new) $relation = "<br />[=<a href=\"#sosa".$pidarr[$person->xref]."\">".$pidarr[$person->xref]."</a> - ".NameFunctions::GetSosaName($pidarr[$person->xref])."]";
 		else $pidarr[$person->xref] = $sosa;
-		print GetSosaName($sosa).$relation;
+		print NameFunctions::GetSosaName($sosa).$relation;
 		print "</td>";
 		print "</tr></table>";
 	

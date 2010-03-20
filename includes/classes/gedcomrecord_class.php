@@ -840,9 +840,6 @@ abstract class GedcomRecord {
 			}
 			else {
 				// The person is dead, let's see if we can show him
-	//				print "DDbyID showlivingn: ".$SHOW_LIVING_NAMES."    useracc: ".getUserAccessLevel($username)."    ".$this->xref."<br />";
-	//				if ($SHOW_LIVING_NAMES>getUserAccessLevel($username)) return true;
-	//				else return false;
 				if ($SHOW_DEAD_PEOPLE >= $ulevel) {
 					SwitchGedcom($oldgedid);
 					return true;

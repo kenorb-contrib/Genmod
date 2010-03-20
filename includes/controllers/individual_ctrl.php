@@ -163,7 +163,7 @@ class IndividualController extends DetailController {
 			if ($this->indi->disp) $this->pagetitle = $this->indi->name;
 			else $this->pagetitle = GM_LANG_private;
 			
-			if (GedcomConfig::$SHOW_ID_NUMBERS) $this->pagetitle .= " - ".$this->indi->xref;
+			$this->pagetitle .= $this->indi->addxref;
 			$this->pagetitle .= " - ".GM_LANG_indi_info;
 		}
 		return $this->pagetitle;
@@ -420,9 +420,9 @@ class IndividualController extends DetailController {
 			if ($nt>0){
 				print "\n\t\t<span class=\"label\">".GM_LANG_name.": </span><br />";
 				$name = trim($nmatch[1]);
-				if (HasChinese($name, true)) $add = "";
+				if (NameFunctions::HasChinese($name, true)) $add = "";
 				else $add = " ";
-				if ($NAME_REVERSE || HasChinese($name, true)) $name = NameFunctions::ReverseName($name);
+				if ($NAME_REVERSE || NameFunctions::HasChinese($name, true)) $name = NameFunctions::ReverseName($name);
 				$name = preg_replace("'/,'", ",", $name);
 	   			$name = preg_replace("'/'", $add, $name);
 				// handle PAF extra NPFX [ 961860 ]
@@ -445,7 +445,7 @@ class IndividualController extends DetailController {
 				print ":</span><span class=\"field\"> ";
 				if (isset($nmatch[$i][2])) {
 			  		$name = trim($nmatch[$i][2]);
-					if ($NAME_REVERSE || HasChinese($name, true)) $name = NameFunctions::ReverseName($name);
+					if ($NAME_REVERSE || NameFunctions::HasChinese($name, true)) $name = NameFunctions::ReverseName($name);
 			  		$name = preg_replace("'/,'", ",", $name);
 					$name = preg_replace("'/'", " ", $name);
 					print PrintReady(NameFunctions::CheckNN($name));

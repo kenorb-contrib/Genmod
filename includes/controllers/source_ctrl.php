@@ -75,8 +75,7 @@ class SourceController extends DetailController {
 		if (is_null($this->pagetitle)) {
 			$this->pagetitle = "";
 			if ($this->source->title) {
-				$this->pagetitle .= $this->source->title." - ";
-				if (GedcomConfig::$SHOW_ID_NUMBERS) $this->pagetitle .= $this->source->xref." - ";
+				$this->pagetitle .= $this->source->title.$this->source->addxref." - ";
 			}
 			$this->pagetitle .= GM_LANG_source_info;
 		}

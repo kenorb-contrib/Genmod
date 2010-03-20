@@ -154,13 +154,13 @@ abstract class SearchFunctions {
 		if ($mlen < $ftminwlen || self::HasMySQLStopwords($cquery)) {
 			if (isset($cquery["includes"])) {
 				foreach ($cquery["includes"] as $index => $keyword) {
-					if (HasChinese($keyword["term"])) $addsql .= " ".$keyword["operator"]." f_gedrec REGEXP '".DbLayer::EscapeQuery($keyword["term"]).$keyword["wildcard"]."'";
+					if (NameFunctions::HasChinese($keyword["term"])) $addsql .= " ".$keyword["operator"]." f_gedrec REGEXP '".DbLayer::EscapeQuery($keyword["term"]).$keyword["wildcard"]."'";
 					else $addsql .= " ".$keyword["operator"]." f_gedrec REGEXP '[[:<:]]".DbLayer::EscapeQuery($keyword["term"]).$keyword["wildcard"]."[[:>:]]'";
 				}
 			}
 			if (isset($cquery["excludes"])) {
 				foreach ($cquery["excludes"] as $index => $keyword) {
-					if (HasChinese($keyword["term"])) $addsql .= " AND f_gedrec NOT REGEXP '".DbLayer::EscapeQuery($keyword["term"]).$keyword["wildcard"]."'";
+					if (NameFunctions::HasChinese($keyword["term"])) $addsql .= " AND f_gedrec NOT REGEXP '".DbLayer::EscapeQuery($keyword["term"]).$keyword["wildcard"]."'";
 					else $addsql .= " AND f_gedrec NOT REGEXP '[[:<:]]".DbLayer::EscapeQuery($keyword["term"]).$keyword["wildcard"]."[[:>:]]'";
 				}
 			}
@@ -216,13 +216,13 @@ abstract class SearchFunctions {
 		if ($mlen < $ftminwlen || self::HasMySQLStopwords($cquery)) {
 			if (isset($cquery["includes"])) {
 				foreach ($cquery["includes"] as $index => $keyword) {
-					if (HasChinese($keyword["term"])) $addsql .= " ".$keyword["operator"]." s_gedrec REGEXP '".DbLayer::EscapeQuery($keyword["term"]).$keyword["wildcard"]."'";
+					if (NameFunctions::HasChinese($keyword["term"])) $addsql .= " ".$keyword["operator"]." s_gedrec REGEXP '".DbLayer::EscapeQuery($keyword["term"]).$keyword["wildcard"]."'";
 					else $addsql .= " ".$keyword["operator"]." s_gedrec REGEXP '[[:<:]]".DbLayer::EscapeQuery($keyword["term"]).$keyword["wildcard"]."[[:>:]]'";
 				}
 			}
 			if (isset($cquery["excludes"])) {
 				foreach ($cquery["excludes"] as $index => $keyword) {
-					if (HasChinese($keyword["term"])) $addsql .= " AND s_gedrec NOT REGEXP '".DbLayer::EscapeQuery($keyword["term"]).$keyword["wildcard"]."'";
+					if (NameFunctions::HasChinese($keyword["term"])) $addsql .= " AND s_gedrec NOT REGEXP '".DbLayer::EscapeQuery($keyword["term"]).$keyword["wildcard"]."'";
 					else $addsql .= " AND s_gedrec NOT REGEXP '[[:<:]]".DbLayer::EscapeQuery($keyword["term"]).$keyword["wildcard"]."[[:>:]]'";
 				}
 			}
@@ -290,13 +290,13 @@ abstract class SearchFunctions {
 		if ($mlen < $ftminwlen || self::HasMySQLStopwords($cquery)) {
 			if (isset($cquery["includes"])) {
 				foreach ($cquery["includes"] as $index => $keyword) {
-					if (HasChinese($keyword["term"])) $addsql .= " ".$keyword["operator"]." o_gedrec REGEXP '".DbLayer::EscapeQuery($keyword["term"]).$keyword["wildcard"]."'";
+					if (NameFunctions::HasChinese($keyword["term"])) $addsql .= " ".$keyword["operator"]." o_gedrec REGEXP '".DbLayer::EscapeQuery($keyword["term"]).$keyword["wildcard"]."'";
 					else $addsql .= " ".$keyword["operator"]." o_gedrec REGEXP '[[:<:]]".DbLayer::EscapeQuery($keyword["term"]).$keyword["wildcard"]."[[:>:]]'";
 				}
 			}
 			if (isset($cquery["excludes"])) {
 				foreach ($cquery["excludes"] as $index => $keyword) {
-					if (HasChinese($keyword["term"])) $addsql .= " AND o_gedrec NOT REGEXP '".DbLayer::EscapeQuery($keyword["term"]).$keyword["wildcard"]."'";
+					if (NameFunctions::HasChinese($keyword["term"])) $addsql .= " AND o_gedrec NOT REGEXP '".DbLayer::EscapeQuery($keyword["term"]).$keyword["wildcard"]."'";
 					else $addsql .= " AND o_gedrec NOT REGEXP '[[:<:]]".DbLayer::EscapeQuery($keyword["term"]).$keyword["wildcard"]."[[:>:]]'";
 				}
 			}
@@ -345,13 +345,13 @@ abstract class SearchFunctions {
 		if ($mlen < $ftminwlen || self::HasMySQLStopwords($cquery)) {
 			if (isset($cquery["includes"])) {
 				foreach ($cquery["includes"] as $index => $keyword) {
-					if (HasChinese($keyword["term"])) $addsql .= " ".$keyword["operator"]." m_gedrec REGEXP '".DbLayer::EscapeQuery($keyword["term"]).$keyword["wildcard"]."'";
+					if (NameFunctions::HasChinese($keyword["term"])) $addsql .= " ".$keyword["operator"]." m_gedrec REGEXP '".DbLayer::EscapeQuery($keyword["term"]).$keyword["wildcard"]."'";
 					else $addsql .= " ".$keyword["operator"]." m_gedrec REGEXP '[[:<:]]".DbLayer::EscapeQuery($keyword["term"]).$keyword["wildcard"]."[[:>:]]'";
 				}
 			}
 			if (isset($cquery["excludes"])) {
 				foreach ($cquery["excludes"] as $index => $keyword) {
-					if (HasChinese($keyword["term"])) $addsql .= " AND m_gedrec NOT REGEXP '".DbLayer::EscapeQuery($keyword["term"]).$keyword["wildcard"]."'";
+					if (NameFunctions::HasChinese($keyword["term"])) $addsql .= " AND m_gedrec NOT REGEXP '".DbLayer::EscapeQuery($keyword["term"]).$keyword["wildcard"]."'";
 					else $addsql .= " AND m_gedrec NOT REGEXP '[[:<:]]".DbLayer::EscapeQuery($keyword["term"]).$keyword["wildcard"]."[[:>:]]'";
 				}
 			}
@@ -429,13 +429,13 @@ abstract class SearchFunctions {
 		if ($mlen < $ftminwlen || self::HasMySQLStopwords($cquery)) {
 			if (isset($cquery["includes"])) {
 				foreach ($cquery["includes"] as $index => $keyword) {
-					if (HasChinese($keyword["term"])) $addsql .= " ".$keyword["operator"]." o_gedrec REGEXP '".DbLayer::EscapeQuery($keyword["term"]).$keyword["wildcard"]."'";
+					if (NameFunctions::HasChinese($keyword["term"])) $addsql .= " ".$keyword["operator"]." o_gedrec REGEXP '".DbLayer::EscapeQuery($keyword["term"]).$keyword["wildcard"]."'";
 					else $addsql .= " ".$keyword["operator"]." o_gedrec REGEXP '[[:<:]]".DbLayer::EscapeQuery($keyword["term"]).$keyword["wildcard"]."[[:>:]]'";
 				}
 			}
 			if (isset($cquery["excludes"])) {
 				foreach ($cquery["excludes"] as $index => $keyword) {
-					if (HasChinese($keyword["term"])) $addsql .= " AND o_gedrec NOT REGEXP '".DbLayer::EscapeQuery($keyword["term"]).$keyword["wildcard"]."'";
+					if (NameFunctions::HasChinese($keyword["term"])) $addsql .= " AND o_gedrec NOT REGEXP '".DbLayer::EscapeQuery($keyword["term"]).$keyword["wildcard"]."'";
 					else $addsql .= " AND o_gedrec NOT REGEXP '[[:<:]]".DbLayer::EscapeQuery($keyword["term"]).$keyword["wildcard"]."[[:>:]]'";
 				}
 			}
@@ -546,7 +546,7 @@ abstract class SearchFunctions {
 				foreach($subkeywords as $key => $subkeyword) {
 					$subkeyword = trim ($subkeyword);
 					$len = utf8_strlen($subkeyword);
-					if (HasChinese($subkeyword)) $chinese = true;
+					if (NameFunctions::HasChinese($subkeyword)) $chinese = true;
 					if ($len < $minwlen) $minwlen = $len;
 				}
 			}
@@ -557,7 +557,7 @@ abstract class SearchFunctions {
 				foreach($subkeywords as $key => $subkeyword) {
 					$subkeyword = trim ($subkeyword);
 					$len = utf8_strlen($subkeyword);
-					if (HasChinese($subkeyword)) $chinese = true;
+					if (NameFunctions::HasChinese($subkeyword)) $chinese = true;
 					if ($len < $minwlen) $minwlen = $len;
 				}
 			}

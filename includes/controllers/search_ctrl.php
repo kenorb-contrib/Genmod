@@ -432,9 +432,9 @@ class SearchController extends BaseController {
 				$this->action = "soundex";
 				$this->GetSoundexParms();
 				$this->soundex = "Russell";
-				if (!is_null($this->firstname) && HasChinese($this->firstname)) $this->soundex = "DaitchM"; 
-				if (!is_null($this->lastname) && HasChinese($this->lastname)) $this->soundex = "DaitchM"; 
-				if (!is_null($this->place) && HasChinese($this->place)) $this->soundex = "DaitchM";
+				if (!is_null($this->firstname) && NameFunctions::HasChinese($this->firstname)) $this->soundex = "DaitchM"; 
+				if (!is_null($this->lastname) && NameFunctions::HasChinese($this->lastname)) $this->soundex = "DaitchM"; 
+				if (!is_null($this->place) && NameFunctions::HasChinese($this->place)) $this->soundex = "DaitchM";
 			}
 			return true;
 		}
@@ -857,7 +857,7 @@ class SearchController extends BaseController {
 						$foundf = false;
 						$founds = false;
 						$founde = false;
-						if (hasRTLText($famsplit[0]) == hasRTLText($famsplit[1]) && HasChinese($famsplit[0], true) == HasChinese($famsplit[1], true)) {
+						if (hasRTLText($famsplit[0]) == hasRTLText($famsplit[1]) && NameFunctions::HasChinese($famsplit[0], true) == NameFunctions::HasChinese($famsplit[1], true)) {
 							// do not print if the hit only in the second name. We want it first.
 							foreach ($this->cquery["includes"] as $qindex => $squery) {
 //								print $squery."<br />".$famsplit[0]."<br />".$famsplit[1]."<br />";
@@ -1170,7 +1170,7 @@ class SearchController extends BaseController {
 						foreach ($asso->associated->allnames as $namekey => $famname) {
 							$famsplit = preg_split("/(\s\+\s)/", trim($famname));
 							// Both names have to have the same direction and combination of chinese/not chinese
-							if (hasRTLText($famsplit[0]) == hasRTLText($famsplit[1]) && HasChinese($famsplit[0], true) == HasChinese($famsplit[1], true)) {
+							if (hasRTLText($famsplit[0]) == hasRTLText($famsplit[1]) && NameFunctions::HasChinese($famsplit[0], true) == NameFunctions::HasChinese($famsplit[1], true)) {
 								$this->printfamname[]=array(NameFunctions::CheckNN($famname), $asso->associated->xref, $asso->associated->gedcomid, "", $namekey);
 							}
 						}
@@ -1315,33 +1315,33 @@ class SearchController extends BaseController {
 			$this->year = preg_replace(array("/\s+/", "/\(/", "/\)/"), array(".*",'\(','\)'), $this->year);
 		}
 			
-		if ($this->soundex == "DaitchM") DMsoundex("", "opencache");
+		if ($this->soundex == "DaitchM") NameFunctions::DMsoundex("", "opencache");
 
 		// Do some preliminary stuff: determine the soundex codes for the search criteria
 		if (!is_null($this->lastname)) {
 			$orglastname = $this->lastname;
-			if (HasChinese($this->lastname, true)) $this->lastname = GetPinYin($this->lastname, true);
+			if (NameFunctions::HasChinese($this->lastname, true)) $this->lastname = NameFunctions::GetPinYin($this->lastname, true);
 			$lastnames = preg_split("/\s/", trim($this->lastname));
 			$larr = array();
 			for($j=0; $j<count($lastnames); $j++) {
 				if ($this->soundex == "Russell") $larr[$j] = soundex($lastnames[$j]);
-				if ($this->soundex == "DaitchM") $larr[$j] = DMsoundex($lastnames[$j]);
+				if ($this->soundex == "DaitchM") $larr[$j] = NameFunctions::DMsoundex($lastnames[$j]);
 			}
 		}
 		if (!is_null($this->firstname)) {
 			$orgfirstname = $this->firstname;
-			if (HasChinese($this->firstname, true)) $this->firstname = GetPinYin($this->firstname, true);
+			if (NameFunctions::HasChinese($this->firstname, true)) $this->firstname = NameFunctions::GetPinYin($this->firstname, true);
 			$firstnames = preg_split("/\s/", trim($this->firstname));
 			$farr = array();
 			for($j=0; $j<count($firstnames); $j++) {
 				if ($this->soundex == "Russell") $farr[$j] = soundex($firstnames[$j]);
-				if ($this->soundex == "DaitchM") $farr[$j] = DMsoundex($firstnames[$j]);
+				if ($this->soundex == "DaitchM") $farr[$j] = NameFunctions::DMsoundex($firstnames[$j]);
 			}
 		}
 		$parr = array();
 		if (!is_null($this->place)) {
-			if (HasChinese($this->place, true)) $this->place = GetPinYin($this->place, true);
-			if ($this->place != "" && $this->soundex == "DaitchM") $parr = DMsoundex($this->place);
+			if (NameFunctions::HasChinese($this->place, true)) $this->place = NameFunctions::GetPinYin($this->place, true);
+			if ($this->place != "" && $this->soundex == "DaitchM") $parr = NameFunctions::DMsoundex($this->place);
 			if ($this->place != "" && $this->soundex == "Russell") $parr = soundex(trim($this->place));
 		}
 		// Start the search
@@ -1463,13 +1463,13 @@ class SearchController extends BaseController {
 						while($p < $cp && $savep == false) {
 							$pp = 0;
 							while($pp < count($places[$p]) && $savep == false) {
-								if (HasChinese($places[$p][$pp])) $pl = GetPinYin(trim($places[$p][$pp]));
+								if (NameFunctions::HasChinese($places[$p][$pp])) $pl = NameFunctions::GetPinYin(trim($places[$p][$pp]));
 								else $pl = trim($places[$p][$pp]);
 								if ($this->soundex == "Russell") {
 									if (soundex($pl) == $parr) $savep = true;
 								}
 								if ($this->soundex == "DaitchM") {
-									$arr1 = DMsoundex($pl);
+									$arr1 = NameFunctions::DMsoundex($pl);
 									$a = array_intersect($arr1, $parr);
 									if (!empty($a)) $savep = true;
 								}
@@ -1498,12 +1498,12 @@ class SearchController extends BaseController {
 					foreach($indi->name_array as $indexval => $namearray) {
 						$printl = false;
 						$name = split("/", $namearray[0]);
-						if ($this->lastname != "" && HasChinese($orglastname, true) == HasChinese($name[1], true)) {
-							if (HasChinese($name[1], true)) $name[1] = GetPinYin($name[1], true);
+						if ($this->lastname != "" && NameFunctions::HasChinese($orglastname, true) == NameFunctions::HasChinese($name[1], true)) {
+							if (NameFunctions::HasChinese($name[1], true)) $name[1] = NameFunctions::GetPinYin($name[1], true);
 							$lnames = preg_split("/\s/", trim($name[1]));
 							foreach ($lnames as $namekey => $namepart) {
 								if ($this->soundex == "DaitchM") {
-									$lndm = DMSoundex($namepart);
+									$lndm = NameFunctions::DMSoundex($namepart);
 									foreach($larr as $arrkey => $arrvalue) {
 										$a = array_intersect($lndm, $arrvalue);
 										if (!empty($a)) {
@@ -1522,12 +1522,12 @@ class SearchController extends BaseController {
 						else $printl = true;
 						
 						$printf = false;
-						if ($this->firstname != "" && $printl == true  && HasChinese($orgfirstname, true) == HasChinese($name[0], true)) {
-							if (HasChinese($name[0], true)) $name[0] = GetPinYin($name[0], true);
+						if ($this->firstname != "" && $printl == true  && NameFunctions::HasChinese($orgfirstname, true) == NameFunctions::HasChinese($name[0], true)) {
+							if (NameFunctions::HasChinese($name[0], true)) $name[0] = NameFunctions::GetPinYin($name[0], true);
 							$fnames = preg_split("/\s/", trim($name[0]));
 							foreach ($fnames as $namekey => $name) {
 								if ($this->soundex == "DaitchM") {
-									$fndm = DMSoundex($name);
+									$fndm = NameFunctions::DMSoundex($name);
 									foreach($farr as $arrkey => $arrvalue) {
 										$a = array_intersect($fndm, $arrvalue);
 										if (!empty($a)) {
@@ -1553,7 +1553,7 @@ class SearchController extends BaseController {
 				}
 			}
 		}
-		DMSoundex("", "closecache");
+		NameFunctions::DMSoundex("", "closecache");
 		SwitchGedcom();
 		// check the result on required characters
 		if (isset($barr)) {

@@ -32,8 +32,8 @@ abstract class GedcomConfig {
 
 	public $classname = "GedcomConfig";
 	
-	public static $GEDCOMID = null;
-	public static $GEDCOM = null;
+	public static $GEDCOMID = null;							// Gedcom ID of the gedcom
+	public static $GEDCOM = null;							// Gedcom filename of the gedcom
 	public static $GEDCOMLANG = "english";					// Assign the default language.  
 															// User can override this setting if $ENABLE_MULTI_LANGUAGE = true
 	public static $CALENDAR_FORMAT = "gregorian";			// Translate dates to the specified Calendar
@@ -156,30 +156,30 @@ abstract class GedcomConfig {
 	public static $EXPAND_RELATIVES_EVENTS = false;			// Auto-expand the relatives facts on the individual page
 	public static $EDIT_AUTOCLOSE = false;					// Autoclose edit window when update successful
 	public static $SOUR_FACTS_UNIQUE = "AUTH,ABBR,TITL,PUBL,TEXT";
-															// Done
-	public static $SOUR_FACTS_ADD = "NOTE,OBJE,REPO,GNOTE";	// Done
+															// Facts for sources of which there can only be one
+	public static $SOUR_FACTS_ADD = "NOTE,OBJE,REPO,GNOTE";	// Facts for sources that can be added more than once
 	public static $SOUR_QUICK_ADDFACTS = "";				// Done
-	public static $REPO_FACTS_UNIQUE = "NAME,ADDR";			// Done
+	public static $REPO_FACTS_UNIQUE = "NAME,ADDR";			// Facts for repositories of which there can only be one.
 	public static $REPO_FACTS_ADD = "PHON,EMAIL,FAX,WWW,NOTE,GNOTE";
-															// Done
+															// Facts for repositories that can be added more than once
 	public static $REPO_QUICK_ADDFACTS = "";				// Done
 	public static $INDI_FACTS_UNIQUE = "SEX,BIRT,DEAT,CREM";
-															// Done
+															// Facts for individuals of which there can only be one.
 	public static $INDI_FACTS_ADD = "ADDR,AFN,CHR,BURI,ADOP,BAPM,BARM,BASM,BLES,CHRA,CONF,EMAIL,FAX,PHON,FCOM,ORDN,NATU,EMIG,IMMI,CENS,PROB,WILL,GRAD,RETI,CAST,DSCR,EDUC,IDNO,NATI,NCHI,NMR,OCCU,PROP,RELI,RESI,SSN,TITL,BAPL,CONL,ENDL,SLGC,_MILI";
-															// Done
+															// Facts for individuals that can be added more than once
 	public static $INDI_QUICK_ADDFACTS = "BIRT,DEAT,OCCU,RESI";
 															// Done
 	public static $FAM_FACTS_UNIQUE = "NCHI,MARL,DIV,ANUL,DIVF,ENGA,MARB,MARC,MARS,HUSB,WIFE";
-															// Done
+															// Facts for families of which there can only be one.
 	public static $FAM_FACTS_ADD = "CENS,MARR,RESI,SLGS,MARR_CIVIL,MARR_RELIGIOUS,MARR_PARTNERS";
-															// Done
+															// Facts for families that can be added more than once
 	public static $FAM_QUICK_ADDFACTS = "";					// Done
-	public static $MEDIA_FACTS_UNIQUE = "TITL";				// Done
+	public static $MEDIA_FACTS_UNIQUE = "TITL";				// Facts for media items of which there can only be one.
 	public static $MEDIA_FACTS_ADD = "FILE,REFN,NOTE,SOUR,GNOTE";
-															// Done
+															// Facts for media items that can be added more than once
 	public static $MEDIA_QUICK_ADDFACTS = "";				// Done
-	public static $NOTE_FACTS_UNIQUE = "RIN";				// Done
-	public static $NOTE_FACTS_ADD = "";						// Done
+	public static $NOTE_FACTS_UNIQUE = "RIN";				// Facts for notes of which there can only be one.
+	public static $NOTE_FACTS_ADD = "";						// Facts for notes that can be added more than once
 	public static $NOTE_QUICK_ADDFACTS = "";				// Done
 	public static $RSS_FORMAT = "RSS1.0";					// format of RSS to use
 	public static $TIME_LIMIT = "60";						// Amount of time to execute before quitting in seconds

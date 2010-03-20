@@ -75,8 +75,7 @@ class RepositoryController extends DetailController {
 		if (is_null($this->pagetitle)) {
 			$this->pagetitle = "";
 			if ($this->repo->title) {
-				$this->pagetitle .= $this->repo->title." - ";
-				if (GedcomConfig::$SHOW_ID_NUMBERS) $this->pagetitle .= $this->repo->xref." - ";
+				$this->pagetitle .= $this->repo->title.$this->repo->addxref." - ";
 			}
 			$this->pagetitle .= GM_LANG_repo_info;
 		}

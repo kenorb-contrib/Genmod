@@ -267,7 +267,7 @@ abstract class DetailController extends BaseController{
 					// -- print the array
 					foreach ($this->$object_name->indilist as $key => $indi) {
 						$addname = "";
-						if (HasChinese($indi->name_array[0][0])) $addname = " (".$indi->sortable_addname.")";
+						if (NameFunctions::HasChinese($indi->name_array[0][0])) $addname = " (".$indi->sortable_addname.")";
 						$indi->PrintListPerson();
 						if ($i==ceil($this->$object_name->indi_count/2) && $this->$object_name->indi_count>12) print "</ul></td><td class=\"shade1 wrap\"><ul>\n";
 						$i++;

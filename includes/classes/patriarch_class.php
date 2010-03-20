@@ -100,13 +100,13 @@ class Patriarch {
 			$person= FindPersonRecord($key);
 			//--> Changed MA @@@ as in extract_surname() etc.
 			$tmpnames = preg_split("/,/", $value);
-			$tmpnames[0] = StripPrefix($tmpnames[0]);
+			$tmpnames[0] = NameFunctions::StripPrefix($tmpnames[0]);
 			//-- check for all lowercase name and start over
 			if (empty($tmpnames[0])) {
 				$tmpnames = preg_split("/,/", $value);
 				$tmpnames[0] = trim($tmpnames[0]);
 			}
-			$tmpletter = GetFirstLetter($tmpnames[0]);
+			$tmpletter = NameFunctions::GetFirstLetter($tmpnames[0]);
 			if ($tmpletter!=$oldletter) $oldletter=$tmpletter;
 			if ((!isset($alpha)) || ($alpha = $tmpletter)) {
 				$this->orignames["$key"]["name"]=$value;

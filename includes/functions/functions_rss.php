@@ -338,7 +338,7 @@ function getGedcomStats() {
 
 
 
-	$surnames = GetCommonSurnamesIndex(GedcomConfig::$GEDCOMID);
+	$surnames = NameFunctions::GetCommonSurnamesIndex(GedcomConfig::$GEDCOMID);
 	if (count($surnames)>0) {
 		$data .="<b>" . GM_LANG_common_surnames."</b><br />";
 		$i=0;

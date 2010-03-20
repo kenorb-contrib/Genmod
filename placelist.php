@@ -79,7 +79,7 @@ if ($placelist_controller->display == "hierarchy") {
  			if (trim($placelist_controller->parent[$i])=="") print GM_LANG_unknown;
 			else {
 				print PrintReady($placelist_controller->parent[$i]);
-				if (HasChinese($placelist_controller->parent[$i])) print " (".printReady(GetPinYin($placelist_controller->parent[$i])).")";
+				if (NameFunctions::HasChinese($placelist_controller->parent[$i])) print " (".printReady(NameFunctions::GetPinYin($placelist_controller->parent[$i])).")";
 			}
 			print "</a>";
  			if ($i>0) print ", ";
@@ -245,8 +245,8 @@ if ($placelist_controller->display == "hierarchy") {
 		if (trim($value)=="") print GM_LANG_unknown;
 		else {
 			print PrintReady($value);
-			if (HasChinese($value)) {
-				print " (".printReady(GetPinYin($value)).")";
+			if (NameFunctions::HasChinese($value)) {
+				print " (".printReady(NameFunctions::GetPinYin($value)).")";
 			}
 		}
 		print "</a></li>\n";
@@ -278,7 +278,7 @@ if ($placelist_controller->display == "hierarchy") {
 			if (trim($value)=="") print GM_LANG_unknown;
 			else {
 				print PrintReady($value);
-				if (HasChinese($value)) print " (".printReady(GetPinYin($value)).")";
+				if (NameFunctions::HasChinese($value)) print " (".printReady(NameFunctions::GetPinYin($value)).")";
 			}
 			print "</span></a> ";
 			print "</td></tr>";

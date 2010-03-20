@@ -74,9 +74,8 @@ class MediaController extends DetailController {
 
 		if (is_null($this->pagetitle)) {
 			$this->pagetitle = "";
-			$this->pagetitle .= $this->media->title." - ";
-			if (GedcomConfig::$SHOW_ID_NUMBERS) $this->pagetitle .= $this->media->xref." - ";
-			$this->pagetitle .= GM_LANG_media_info;
+			$this->pagetitle .= $this->media->title.$this->media->addxref;
+			$this->pagetitle .= " - ".GM_LANG_media_info;
 		}
 		return $this->pagetitle;
 	}

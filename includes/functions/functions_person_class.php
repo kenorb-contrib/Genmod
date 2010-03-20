@@ -127,14 +127,14 @@ abstract class PersonFunctions {
 								if (is_object($sfam->$spouse)) {
 									print "<a href=\"individual.php?pid=".$sfam->$spouse->xref."&amp;gedid=".$sfam->$spouse->gedcomid."\">";
 									print $sfam->$spouse->name;
-									if (HasChinese($sfam->$spouse->name)) print PrintReady("(".$sfam->$spouse->addname.")");
+									if (NameFunctions::HasChinese($sfam->$spouse->name)) print PrintReady("(".$sfam->$spouse->addname.")");
 									print "</a><br />\n";
 								}
 							}
 							foreach ($sfam->children as $ckey => $child) {
 								print "\n\t\t\t\t&nbsp;&nbsp;<a href=\"individual.php?pid=".$child->xref."&amp;gedid=".$child->gedcomid."\">";
 								print $child->name;
-								if (HasChinese($child->name)) print PrintReady("(".$child->addname.")");
+								if (NameFunctions::HasChinese($child->name)) print PrintReady("(".$child->addname.")");
 								print "</a><br />";
 							}
 						}
@@ -415,7 +415,7 @@ abstract class PersonFunctions {
 		global $GM_IMAGES;
 
 		print "<table cellspacing=\"0\" cellpadding=\"0\" border=\"0\"><tr><td rowspan=\"2\" style=\"vertical-align:middle;\">";
-		print "<span class=\"subheaders\">" . GetSosaName($sosa*2) . "</span>";
+		print "<span class=\"subheaders\">" . NameFunctions::GetSosaName($sosa*2) . "</span>";
 		print "\n\t<table style=\"width: " . ($pbwidth) . "px; height: " . $pbheight . "px;\" border=\"0\"><tr>";
 		if ($parid) {
 			if ($family->husb_id == $parid) ChartFunctions::PrintSosaNumber($label);
@@ -494,7 +494,7 @@ abstract class PersonFunctions {
 		 * wife side
 		 */
 		print "<table cellspacing=\"0\" cellpadding=\"0\" border=\"0\"><tr><td rowspan=\"2\" style=\"vertical-align:middle;\">";
-		print "<span class=\"subheaders\">" . GetSosaName($sosa*2+1) . "</span>";
+		print "<span class=\"subheaders\">" . NameFunctions::GetSosaName($sosa*2+1) . "</span>";
 		print "\n\t<table style=\"width: " . ($pbwidth) . "px; height: " . $pbheight . "px;\"><tr>";
 		if ($parid) {
 			if ($family->wife->xref == $parid) ChartFunctions::PrintSosaNumber($label);
@@ -599,7 +599,7 @@ abstract class PersonFunctions {
 					}
 					
 					print "<td ".$style."style=\"vertical-align:middle;\" >";
-					print GetPediName($chil->famc[$family->xref]["relation"], $chil->sex);
+					print self::GetPediName($chil->famc[$family->xref]["relation"], $chil->sex);
 					self::PrintPedigreePerson($chil, 1, true, 1, $chil->view);
 					print "</td>";
 					// Don't print the children's spouses and children if private
@@ -775,5 +775,27 @@ abstract class PersonFunctions {
 		}
 		return $name;
 	}
+	
+	public Function GetPediName($pedi, $gender="") {
+	
+		if ($pedi == "birth" || $pedi == "") return "";
+		if ($pedi == "adopted") {
+			if ($gender == "M") return GM_LANG_adopted_son;
+			if ($gender == "F") return GM_LANG_adopted_daughter;
+			return GM_LANG_adopted_child;
+		}
+		if ($pedi == "foster") {
+			if ($gender == "M") return GM_LANG_foster_son;
+			if ($gender == "F") return GM_LANG_foster_daughter;
+			return GM_LANG_foster_child;
+		}
+		if ($pedi == "sealing") {
+			if ($gender == "M") return GM_LANG_sealed_son;
+			if ($gender == "F") return GM_LANG_sealed_daughter;
+			return GM_LANG_sealed_child;
+		}
+		return "";
+	}
+
 }
 ?>

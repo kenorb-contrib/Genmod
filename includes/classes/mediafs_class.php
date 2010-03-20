@@ -37,17 +37,13 @@ abstract class MediaFS {
 	public function GetMediaDirList($directory="", $all=true, $level=1, $checkwrite=true, $incthumbdir=false, $dbmode="unset") {
 		
 		if ($dbmode == "unset") $dbmode = SystemConfig::$MEDIA_IN_DB;
-// print "Dir in dirlist: ".$directory."<br />";
 		$directory = RelativePathFile($directory);
 		$dirs = array();
 		if (!empty($directory) && $level = 1) $dirs[] = $directory;
 		
 		if ($dbmode) {
-//			print "directory: ".$directory."<br />";
 			$l = preg_split("/\//", $directory);
 			$thislevel = count($l)-1;
-//			print "thislevel: ".$thislevel."<br />";
-//			print_r($l);
 			$sql = "SELECT mf_path FROM ".TBLPREFIX."media_files";
 			if (!empty($directory)) $sql .= " WHERE mf_path LIKE '".$directory."%'";
 			else $sql .= " WHERE mf_link NOT LIKE '%://%'";
@@ -55,10 +51,8 @@ abstract class MediaFS {
 			$res = NewQuery($sql);
 			while ($row = $res->FetchRow()) {
 				$folders = preg_split("/\//", $row[0]);
-//				print_r($folders);
 				$base = "";
 				foreach ($folders as $level => $foldername) {
-//					print $foldername."<br />";
 					if ($level <= GedcomConfig::$MEDIA_DIRECTORY_LEVELS && !empty($foldername)) {
 						$base = $base.$foldername."/";
 						if (($all || $level == $thislevel) && !in_array($base, $dirs)) $dirs[] = $base;
@@ -90,7 +84,6 @@ abstract class MediaFS {
 				}
 			}
 		}
-//		print_r($dirs);
 		return $dirs;
 	}
 
@@ -150,7 +143,6 @@ abstract class MediaFS {
 			else $sql = "SELECT mf_file FROM ".TBLPREFIX."media_files WHERE mf_path LIKE '".$directory."' AND mf_link LIKE ''";
 			if (!empty($filter)) $sql .= " AND (mf_file LIKE '%".$filter."%' OR m_titl LIKE '%".$filter."%')"; 
 			$sql .= " AND mf_file NOT LIKE '<DIR>' ORDER BY mf_file";
-//			print $sql."<br /><br />";
 			$res = NewQuery($sql);
 			while ($row = $res->FetchRow()) {
 				if (!in_array($row[0], $dirfiles)) $dirfiles[] = $row[0];
@@ -325,16 +317,9 @@ abstract class MediaFS {
 		if ($filename == GedcomConfig::$MEDIA_DIRECTORY) $filename = "";
 		
 		// NOTE: Lets get the file details
-		//print "file: ".$filename."<br />";
-		//print "media dir: ".GedcomConfig::$MEDIA_DIRECTORY."<br />";
 		$parts = pathinfo($filename);
 		if (isset($parts["dirname"])) $dirname = RelativePathFile($parts["dirname"]."/");
 		else $dirname = RelativePathFile(GedcomConfig::$MEDIA_DIRECTORY);
-		//print "dir: ".$dirname."<br />";
-		//print "basename of file: ".basename($filename)."<br />";
-		//print "dirname of file: ".dirname($filename)."<br />";
-		// print "parts: ";
-		// print_r($parts);
 		if (isset($parts["basename"])) $file_basename = $parts["basename"];
 		else $file_basename = "";
 		if (isset($parts["extension"])) $thumb_extension = $parts["extension"];
@@ -513,13 +498,9 @@ abstract class MediaFS {
 	 * @return	boolean	true|false
 	 */
 	public function GenerateThumbnail($filename, $thumbnail, $ignoremediadir=false, $ext="") {
-//						print "Generating thumb for: ".$filename."<br />";
 
-//		print "filename: ".$filename."<br />";
-//		print "thumbnail: ".$thumbnail."<br />";
 		$parts = pathinfo($thumbnail);
 		$dirname = RelativePathFile($parts["dirname"]."/");
-//		print "dirname: ".$dirname;
 		if (!GedcomConfig::$AUTO_GENERATE_THUMBS) return false;
 		if (!SystemConfig::$MEDIA_IN_DB && file_exists($thumbnail)) return false;
 		
@@ -650,7 +631,7 @@ abstract class MediaFS {
 		// 6 - File already exists
 		// 7 - Nothing uploaded
 		
-		if (count($files)>0) {
+		if (count($files) > 0) {
 			$upload_errors = array(GM_LANG_file_success, GM_LANG_file_too_big, GM_LANG_file_too_big,GM_LANG_file_partial, GM_LANG_file_missing);
 			if (!empty($path)) {
 				$path = RelativePathFile(self::CheckMediaDepth($path));

@@ -70,7 +70,7 @@ function print_login_block($block = true, $config="", $side, $index) {
 			print "/>";
 			print "<br style=\"clear: left;\"/>\n";
 		}
-		print "<input type=\"submit\" id=\"submitlogin\"  tabindex=\"23\" value=\"".GM_LANG_login."\" />&nbsp;";
+		print "<div class=\"width100 center\"><input type=\"submit\" id=\"submitlogin\"  tabindex=\"23\" value=\"".GM_LANG_login."\" />&nbsp;";
 		print "</form>\n";
 		print "<br />";
 		if (SystemConfig::$USE_REGISTRATION_MODULE && count($GEDCOMS) > 0){
@@ -88,7 +88,7 @@ function print_login_block($block = true, $config="", $side, $index) {
 			print GM_LANG_requestpassword;
 			print "</a>";
 		}
-		print "</div>";
+		print "</div></div>";
 		print "</div>";
 	}
 }

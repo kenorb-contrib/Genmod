@@ -407,7 +407,6 @@ $_SESSION["GEDCOMID"] = $GEDCOMID;
 $without_close = true;
 
 if (CONFIGURED) if ($DBCONN->connected) GedcomConfig::ReadGedcomConfig($GEDCOMID);
-require_once(SystemConfig::$GM_BASE_DIRECTORY."includes/functions/functions_name.php");
 
 //-- load file for language settings
 require_once(SystemConfig::$GM_BASE_DIRECTORY . "includes/values/lang_settings_std.php");

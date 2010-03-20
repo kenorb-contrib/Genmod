@@ -85,8 +85,7 @@ class FamilyBookController extends ChartController {
 	protected function GetPageTitle() {
 		
 		if (is_null($this->pagetitle)) {
-			$this->pagetitle = $this->GetRootObject()->name;
-			if (GedcomConfig::$SHOW_ID_NUMBERS) $this->pagetitle .= " - ".$this->xref;
+			$this->pagetitle = $this->GetRootObject()->name.$this->GetRootObject()->addxref;
 			if ($this->page == "familybook.php") $this->pagetitle .= " - ".GM_LANG_familybook_chart;
 			else if ($this->page == "hourglass.php") $this->pagetitle .= " - ".GM_LANG_hourglass_chart;
 		}
@@ -254,7 +253,7 @@ class FamilyBookController extends ChartController {
 			foreach($person->spousefamilies as $indexval => $fam) {
 				if (is_object($fam->marr_fact)) {
 //					print "<br />";
-					if ($fam->disp && $fam->marr_date != "") print "<span class=\"date\">".GetFirstLetter($fam->marr_fact->descr).": ".$fam->marr_fact->datestring."</span>";
+					if ($fam->disp && $fam->marr_date != "") print "<span class=\"date\">".NameFunctions::GetFirstLetter($fam->marr_fact->descr).": ".$fam->marr_fact->datestring."</span>";
 //					FactFunctions::PrintSimpleFact($fam->marr_fact, false, false); 
 				}
 				if ($fam->husb_id != $person->xref) PersonFunctions::PrintPedigreePerson($fam->husb, 1, true, $this->boxcount);

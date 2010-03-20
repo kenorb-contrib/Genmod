@@ -72,8 +72,7 @@ class PaternalsController extends ChartController {
 	protected function GetPageTitle() {
 		
 		if (is_null($this->pagetitle)) {
-			$this->pagetitle = $this->GetRootObject()->name;
-			if (GedcomConfig::$SHOW_ID_NUMBERS) $this->pagetitle .= " - ".$this->xref;
+			$this->pagetitle = $this->GetRootObject()->name.$this->GetRootObject()->addxref;
 			$this->pagetitle .= " - ".GM_LANG_paternal_chart;
 		}
 		return $this->pagetitle;
