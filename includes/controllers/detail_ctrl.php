@@ -202,12 +202,12 @@ abstract class DetailController extends BaseController{
 				print "\n<table class=\"facts_table\">";
 				
 				if ($this->tabtype == "indi" && count($this->$object_name->facts) > 0) {
-					echo '<tr id="row_top"><td></td><td class="shade2 rela">';
-					echo '<a href="#" onclick="togglerow(\'row_rela\'); return false;">';
-					echo '<img style="display:none;" id="rela_plus" src="'.GM_IMAGE_DIR.'/'.$GM_IMAGES["plus"]["other"].'" border="0" width="11" height="11" alt="'.GM_LANG_show_details.'" title="'.GM_LANG_show_details.'" />';
-					echo '<img id="rela_minus" src="'.GM_IMAGE_DIR.'/'.$GM_IMAGES["minus"]["other"].'" border="0" width="11" height="11" alt="'.GM_LANG_hide_details.'" title="'.GM_LANG_hide_details.'" />';
-					echo ' '.GM_LANG_relatives_events;
-					echo '</a></td></tr>';
+					print '<tr id="row_top"><td></td><td class="shade2 rela">';
+					print '<a href="#" onclick="togglerow(\'row_rela\'); return false;">';
+					print '<img style="display:none;" id="rela_plus" src="'.GM_IMAGE_DIR.'/'.$GM_IMAGES["plus"]["other"].'" border="0" width="11" height="11" alt="'.GM_LANG_show_details.'" title="'.GM_LANG_show_details.'" />';
+					print '<img id="rela_minus" src="'.GM_IMAGE_DIR.'/'.$GM_IMAGES["minus"]["other"].'" border="0" width="11" height="11" alt="'.GM_LANG_hide_details.'" title="'.GM_LANG_hide_details.'" />';
+					print ' '.GM_LANG_relatives_events;
+					print '</a></td></tr>';
 				}
 				
 				if ($this->tabtype == "note") $this->PrintGeneralNote();
@@ -745,7 +745,7 @@ abstract class DetailController extends BaseController{
 						print "</table></div>";
 					}
 				}
-				else print "<div id=\"no_tab".$index."\" class=\"shade1\">".GM_LANG_no_tab7."</div>\n";
+				else print "<div id=\"no_tab".$index."\" class=\"shade1\">".($gm_user->userCanEdit() ? GM_LANG_no_tab7 : "")."</div>\n";
 				print "<br style=\" clear: both;\" /></div>";
 			}
 		}	

@@ -43,8 +43,8 @@ abstract class NameFunctions {
 			else $hname = GM_LANG_private;
 		}
 		else {
-			if ($rev) $hname = "@P.N. @N.N.";
-			else $hname = "@N.N., @P.N.";
+			if ($rev) $hname = "@N.N., @P.N.";
+			else $hname = "@P.N. @N.N.";
 		}
 		if (is_object($family->wife)) {
 			if ($family->wife->disp_name) {
@@ -55,10 +55,10 @@ abstract class NameFunctions {
 			else $wname = GM_LANG_private;
 		}
 		else {
-			if ($rev) $wname = "@P.N. @N.N.";
-			else $wname = "@N.N., @P.N.";
+			if ($rev) $wname = "@N.N., @P.N.";
+			else $wname = "@P.N. @N.N.";
 		}
-	
+
 		if (!empty($hname) && !empty($wname)) return self::CheckNN($hname,$starred)." + ".self::CheckNN($wname,$starred);
 		else if (!empty($hname) && empty($wname)) return self::CheckNN($hname,$starred);
 		else if (empty($hname) && !empty($wname)) return self::CheckNN($wname,$starred);
@@ -115,27 +115,39 @@ abstract class NameFunctions {
 	
 	public function GetFamilyAddDescriptor($family, $rev = false, $changes = false) {
 		
+		$hname = "";
+		$wname = "";
+		$disph = false;
+		$dispw = false;
+		
 		if (is_object($family->husb)) {
-			if ($family->husb->disp_name) {
-				$hname = self::GetSortableAddName($family->husb, $rev, $changes);
-			}
-			else $hname = GM_LANG_private;
-		}
-		else {
-			if ($rev) $hname = "@P.N. @N.N.";
-			else $hname = "@N.N., @P.N.";
+			$hname = self::GetSortableAddName($family->husb, $rev, $changes);
+			if (!empty($hname) && $family->husb->disp_name) $disph = true;
 		}
 		if (is_object($family->wife)) {
-			if ($family->wife->disp_name) {
-				$wname = self::GetSortableAddName($family->wife, $rev, $changes);
-			}
-			else $wname = GM_LANG_private;
+			$wname = self::GetSortableAddName($family->wife, $rev, $changes);
+			if (!empty($wname) && $family->wife->disp_name) $dispw = true;
+		}
+		
+		// One of both addnames must be found, otherwise it's no use to return anything
+		if (!$disph && !$dispw) return "";
+
+		// if we cannot display the name, or the person does not exist, fill the name with the appropriate values
+		if (is_object($family->wife)) {
+			if (!$family->wife->disp_name) $wname = GM_LANG_private;
 		}
 		else {
 			if ($rev) $wname = "@P.N. @N.N.";
 			else $wname = "@N.N., @P.N.";
 		}
-
+		if (is_object($family->husb)) {
+			if (!$family->husb->disp_name) $hname = GM_LANG_private;
+		}
+		else {
+			if ($rev) $hname = "@P.N. @N.N.";
+			else $hname = "@N.N., @P.N.";
+		}
+		
 		if (!empty($hname) && !empty($wname)) return self::CheckNN($hname)." + ".self::CheckNN($wname);
 		else if (!empty($hname) && empty($wname)) return self::CheckNN($hname)." + ".self::CheckNN(self::GetSortableName($family->wife, false, $rev));
 		else if (empty($hname) && !empty($wname)) return self::CheckNN(self::GetSortableName($family->husb, false, $rev))." + ".self::CheckNN($wname);
@@ -552,7 +564,7 @@ abstract class NameFunctions {
 		if (empty($fullname)) return GM_LANG_NN;
 		if (substr(trim($fullname),-1) === ",") $fullname = substr($fullname,0,strlen(trim($fullname))-1);
 		if (substr(trim($fullname),0,2) === ", ") $fullname = substr($fullname,2,strlen(trim($fullname)));
-	
+
 		return $fullname;
 	}
 	
