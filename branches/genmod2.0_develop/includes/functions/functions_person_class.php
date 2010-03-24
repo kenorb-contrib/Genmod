@@ -508,7 +508,7 @@ abstract class PersonFunctions {
 		print "<span class=\"subheaders\">" . NameFunctions::GetSosaName($sosa*2+1) . "</span>";
 		print "\n\t<table style=\"width: " . ($pbwidth) . "px; height: " . $pbheight . "px;\"><tr>";
 		if ($parid) {
-			if ($family->wife->xref == $parid) ChartFunctions::PrintSosaNumber($label);
+			if ($family->wife_id == $parid) ChartFunctions::PrintSosaNumber($label);
 			else ChartFunctions::PrintSosaNumber(str_repeat("&nbsp; ", strlen($label)-1));
 		}
 		else if ($sosa > 0) ChartFunctions::PrintSosaNumber($sosa * 2 + 1);

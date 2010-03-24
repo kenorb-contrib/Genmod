@@ -386,9 +386,10 @@ function expandbox(boxid, bstyle, random) {
 	if (big==1) {
 		// This will also close another box if still open
 		restorebox(oldboxid, oldbstyle, oldrandom);
-		if (boxid==oldboxid) return true;
+		if (boxid == oldboxid) return true;
 	}
 	// Set the correct identifiers
+	boxsav = boxid;
 	boxid = boxid+"."+random;
 	boxidparent = boxid;
 
@@ -414,7 +415,7 @@ function expandbox(boxid, bstyle, random) {
 			if (iconz.src==zoominout[0].src) iconz.src = zoominout[1].src;
 			else iconz.src = zoominout[0].src;
 		}
-		oldboxid=boxidparent;
+		oldboxid=boxsav;
 		oldbstyle=bstyle;
 		oldrandom=random;
 		big = 1;

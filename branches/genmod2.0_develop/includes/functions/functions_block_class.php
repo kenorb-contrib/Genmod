@@ -93,7 +93,7 @@ abstract class BlockFunctions {
 		// Retrieve the last change date
 		$mday = GedcomConfig::GetLastCacheDate($action, GedcomConfig::$GEDCOMID);
 //	 $mday = 0;  // to force cache rebuild
-		if ($mday==$monthstart) {
+		if ($mday == $monthstart) {
 			$cache_load = true;
 	//		print "Retrieve from cache";
 		}

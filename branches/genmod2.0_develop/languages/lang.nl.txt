@@ -1510,7 +1510,6 @@
 "paternal_parents";"Ouders"
 "paternal_paternal";"Patriarch"
 "paternal_self";"Deze persoon"
-"paternals";"Patriarchale/matriarchale lijnen"
 "path_to_gedcom";"Geef het pad naar uw GEDCOM-bestand:"
 "patriarch_list";"Stamouders"
 "pdf_reports";"PDF rapporten"
