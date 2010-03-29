@@ -1024,22 +1024,23 @@ function ParseDate($datestr) {
 	$longmonth = array("january"=>"jan", "february"=>"feb", "march"=>"mar", "april"=>"apr", "june"=>"jun", "july"=>"jul", "august"=>"aug", "september"=>"sep", "october"=>"oct", "november"=>"nov", "december"=>"dec");
 	$loclongmonth = array(GM_LANG_jan=>"jan", GM_LANG_feb=>"feb", GM_LANG_mar=>"mar", GM_LANG_apr=>"apr", GM_LANG_may=>"may", GM_LANG_jun=>"jun", GM_LANG_jul=>"jul", GM_LANG_aug=>"aug", GM_LANG_sep=>"sep", GM_LANG_oct=>"oct", GM_LANG_nov=>"nov", GM_LANG_dec=>"dec");
 
-	// This converts english long month names to short ones (january -> jan)
-	// If not found, it tries to convert the locale month name to a short one (mei -> MAY)
+
+	// This converts the current language long month names to short ones (Mei -> MAY)
+	// If not found, it tries to convert the english month name to a short one (january -> jan)
 	for($i=0; $i<count($strs); $i++) {
+		// Check for locale long months
 		if (isset($loclongmonth[strtolower($strs[$i])])) {
 			$strs[$i] = $loclongmonth[strtolower($strs[$i])];
 		}
+		// Check for English long months
 		elseif (isset($longmonth[strtolower($strs[$i])])) {
 			$strs[$i] = $longmonth[strtolower($strs[$i])];
 		}
-		else {
-			if (isset($monthshort[Str2Upper($strs[$i])])) {
-				$strs[$i] = $monthshort[Str2Upper($strs[$i])];
-			}
+		// Check for locale short month names
+		else if (isset($monthshort[Str2Upper($strs[$i])])) {
+			$strs[$i] = $monthshort[Str2Upper($strs[$i])];
 		}
 	}
-	
 	//-- this section will convert a date like 2005.10.10 to 10 oct 2005
 	if (count($strs)==3) {
 		if ($strs[0]>31) {
@@ -1050,7 +1051,7 @@ function ParseDate($datestr) {
 
 	
 	for($i=0; $i<count($strs); $i++) {
-//		print "Processing ".$strs[$i]."<br />";
+		//print "Processing ".$strs[$i]."<br />";
 		$ct = preg_match("/^\d+$/", $strs[$i]);
 		if ($ct>0) {
 			// If it's the first or second element AND the value <32, we have day or month.

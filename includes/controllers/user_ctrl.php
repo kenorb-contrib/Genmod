@@ -122,7 +122,7 @@ abstract class UserController {
 	* @return string 	the username of the user or an empty string if the user is not logged in
 	*/
 	public function GetUserName() {
-		global $ALLOW_REMEMBER_ME, $logout, $DBCONN;
+		global $logout, $DBCONN;
 		//-- this section checks if the session exists and uses it to get the username
 		if (isset($_SESSION)) {
 			if (!empty($_SESSION['gm_user'])) return $_SESSION['gm_user'];
@@ -130,7 +130,7 @@ abstract class UserController {
 		if (isset($HTTP_SESSION_VARS)) {
 			if (!empty($HTTP_SESSION_VARS['gm_user'])) return $HTTP_SESSION_VARS['gm_user'];
 		}
-		if ($ALLOW_REMEMBER_ME) {
+		if (SystemConfig::$ALLOW_REMEMBER_ME) {
 			$tSERVER_URL = preg_replace(array("'https?://'", "'www.'", "'/$'"), array("","",""), SERVER_URL);
 			if ((isset($_SERVER['HTTP_REFERER'])) && (stristr($_SERVER['HTTP_REFERER'],$tSERVER_URL)!==false)) $referrer_found=true;
 			if (!empty($_COOKIE["gm_rem"])&& (empty($referrer_found)) && empty($logout)) {

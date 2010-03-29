@@ -283,8 +283,8 @@ function GetAllSubrecords($gedrec, $ignore="", $families=true, $sort=true, $Appl
 							$subrec = GetSubRecord(1, "1 $fact", $famrec, $prev_tags[$fact]);
 							// NOTE: Record needs to be trimmed to make sure no extra linebreaks are left
 							$subrec = trim($subrec)."\r\n";
-							$subrec .= "1 _GMS @$spid@\r\n";
-							$subrec .= "1 _GMFS @$famid@\r\n";
+							$subrec .= "2 _GMS @$spid@\r\n";
+							$subrec .= "2 _GMFS @$famid@\r\n";
 							if ($fact=="EVEN") {
 								$ct2 = preg_match("/2 TYPE (.*)/", $subrec, $tmatch);
 								if ($ct2>0) {

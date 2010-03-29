@@ -94,7 +94,7 @@ abstract class FactFunctions {
 				print "\n\t\t<tr id=\"row_".$factobj->style.$relacnt."\" >";
 				$relacnt++;
 			}
-			self::PrintFactTagBox(&$factobj, $mayedit);
+			self::PrintFactTagBox($factobj, $mayedit);
 			
 			$prted = false;
 			print "<td class=\"shade1 $factobj->style wrap\">";
@@ -230,12 +230,13 @@ abstract class FactFunctions {
 					$special_facts = array("ADDR","ALIA","ASSO","CEME","CONC","CONT","DATE","DESC","EMAIL",
 					"FAMC","FAMS","FAX","NOTE","OBJE","PHON","PLAC","RESN","SOUR","STAT","TEMP",
 					"TIME","TYPE","WWW","_EMAIL","_GMU", "URL", "AGE", "RELA");
+					$suppress_subs = array("_GMS", "_GMFS");
 	
 					$ct = preg_match_all("/\n2 (\w+) (.*)/", $factobj->factrec, $match, PREG_SET_ORDER);
 					$prtbr = false;
 					for($i=0; $i<$ct; $i++) {
 						$factref = $match[$i][1];
-						if (!in_array($factref, $special_facts)) {
+						if (!in_array($factref, $special_facts) && !in_array($factref, $suppress_subs)) {
 							if ($prtbr || $prted) {
 								print "<br />";
 								$prtbr = true;
@@ -353,7 +354,7 @@ abstract class FactFunctions {
 			// NOTE: Start printing the media details
 			print "\n\t\t<tr id=\"mrow_".$rowcnt."\">";
 			$rowcnt++;
-			self::PrintFactTagBox(&$factobj, $mayedit);
+			self::PrintFactTagBox($factobj, $mayedit);
 	
 			// NOTE Print the title of the media
 			print "<td class=\"shade1 ".$factobj->style." wrap\"><span class=\"field\">";
@@ -414,7 +415,7 @@ abstract class FactFunctions {
 		$source =& Source::GetInstance($factobj->linkxref);
 		if ($source->disp) {
 			print "\n\t\t\t<tr>";
-			self::PrintFactTagBox(&$factobj, $mayedit);
+			self::PrintFactTagBox($factobj, $mayedit);
 			print "\n\t\t\t<td class=\"shade1 wrap ".$factobj->style."\"><span class=\"field\">";
 			if ($factobj->disp) {
 				print "<a href=\"source.php?sid=".$source->xref."\">";
@@ -475,7 +476,7 @@ abstract class FactFunctions {
 				// See if RESN tag prevents display or edit/delete
 				// -- Find RESN tag
 				print "<br />";
-				self::PrintResn(&$factobj);
+				self::PrintResn($factobj);
 				self::PrintFactMedia($factobj, 2);
 				self::PrintFactNotes($factobj, 2);
 			}
@@ -497,7 +498,7 @@ abstract class FactFunctions {
 		if ($factobj->linktype == "Note") $note =& Note::GetInstance($factobj->linkxref);
 		if ($factobj->linktype != "Note" || $note->disp) {
 			print "\n\t\t\t<tr>";
-			self::PrintFactTagBox(&$factobj, $mayedit);
+			self::PrintFactTagBox($factobj, $mayedit);
 			print "\n<td class=\"shade1 ".$factobj->style." wrap\">";
 			if ($factobj->disp) {
 				if ($factobj->linktype == "") {
@@ -517,7 +518,7 @@ abstract class FactFunctions {
 				// -- Find RESN tag
 				print "<br />\n";
 				if (self::PrintFactSources($factobj, 2)) print "<br />";
-				self::PrintResn(&$factobj);
+				self::PrintResn($factobj);
 			}
 			print "</td></tr>";
 		}
@@ -526,7 +527,7 @@ abstract class FactFunctions {
 	public function PrintFactNotes($factobj, $level, $nobr=true) {
 
 		// This is to prevent that notes are printed as part of the fact for family facts displayed on the indipage
-		if ($level == 2 && is_object($factobj) && !GedcomConfig::$INDI_EXT_FAM_FACTS && preg_match("/\n1 _GMFS @(.*)@/", $factobj->factrec)) return false;
+		if ($level == 2 && is_object($factobj) && !GedcomConfig::$INDI_EXT_FAM_FACTS && preg_match("/\n2 _GMFS @(.*)@/", $factobj->factrec)) return false;
 	
 		$factnotesprinted = false;
 		$nlevel = $level+1;
@@ -753,7 +754,7 @@ abstract class FactFunctions {
 		global $GM_IMAGES;
 		
 		// This is to prevent that notes are printed as part of the fact for family facts displayed on the indipage
-		if ($level == 2 && !GedcomConfig::$INDI_EXT_FAM_FACTS && preg_match("/\n1 _GMFS @(.*)@/", $factobj->factrec)) return false;
+		if ($level == 2 && !GedcomConfig::$INDI_EXT_FAM_FACTS && preg_match("/\n2 _GMFS @(.*)@/", $factobj->factrec)) return false;
 		
 		$printed = false;
 		$nlevel = $level+1;
@@ -868,7 +869,7 @@ abstract class FactFunctions {
 		 return $printed;
 	}
 	
-	private function PrintResn($factobj) {
+	private function PrintResn(&$factobj) {
 		
 		if ($factobj->resnvalue != "") {
 			PrintHelpLink("RESN_help", "qm");
@@ -876,7 +877,7 @@ abstract class FactFunctions {
 		}
 	}
 			
-	private function PrintFactTagBox($factobj, $mayedit) {
+	private function PrintFactTagBox(&$factobj, $mayedit) {
 		 global $GM_IMAGES;
 		 global $n_chil, $n_gchi;
 
@@ -931,7 +932,7 @@ abstract class FactFunctions {
 			$submenu["class"] = "submenuitem";
 			$submenu["hoverclass"] = "submenuitem_hover";
 			$menu["items"][] = $submenu;
-			if (!stristr($factobj->factrec, "1 _GM")) {
+			if (!stristr($factobj->factrec, "2 _GM")) {
 				$submenu = array();
 				$submenu["label"] = GM_LANG_copy;
 				$submenu["labelpos"] = "right";
@@ -1378,10 +1379,6 @@ abstract class FactFunctions {
 	
 					$hct = preg_match("/2 DATE.*(@#DHEBREW@)/", $match[1], $hmatch);
 		            if ($hct>0 && GedcomConfig::$USE_RTL_FUNCTIONS && $action=='today')
-	
-	// should perhaps use the month of the fact to find if should use $currhYear or $currhYear+1 or $currhYear-1 to calculate age
-	// use $currhMonth and the fact month for this
-	
 	                   $age = $currhYear - $ymatch[1];
 					else
 					   $age = $yearnow - $ymatch[1];

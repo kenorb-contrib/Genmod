@@ -610,7 +610,7 @@ abstract class MenuBar {
 		// Edit menu
 		if ($controller->indi->canedit || $controller->caneditown) {
 			$submenu = $controller->getEditMenu();
-			$menu->addSubmenu($submenu);
+			if ($submenu->hasSubMenus()) $menu->addSubmenu($submenu);
 		}
 		
 		// Other menu

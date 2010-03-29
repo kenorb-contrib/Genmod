@@ -187,7 +187,7 @@ class TimelineController extends BaseController {
 	
 		$factobj = $factitem[1];
 		//-- check if this is a family fact
-		$ct = preg_match("/1 _GMFS @(.*)@/", $factobj->factrec, $fmatch);
+		$ct = preg_match("/2 _GMFS @(.*)@/", $factobj->factrec, $fmatch);
 		if ($ct>0) {
 			$famid = trim($fmatch[1]);
 			//-- if we already showed this family fact then don't print it
@@ -241,7 +241,7 @@ class TimelineController extends BaseController {
 			$age = $person->GetAge($factobj->datestring);
 			if (!empty($age)) print $age;
 			//-- print spouse name for marriage events
-			$ct = preg_match("/1 _GMS @(.*)@/", $factobj->factrec, $match);
+			$ct = preg_match("/2 _GMS @(.*)@/", $factobj->factrec, $match);
 			if ($ct > 0) {
 				$spouse = $match[1];
 				if ($spouse != "") {

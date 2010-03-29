@@ -563,6 +563,7 @@ if (GedcomConfig::$ENABLE_MULTI_LANGUAGE) {
 // if ($spider) WriteToLog("Spider ".$spider." set language to ".$LANGUAGE, "I", "S");
 
 // Get the username
+if (!isset($_SESSION["cookie_login"])) $_SESSION["cookie_login"] = false;
 $gm_username = UserController::GetUserName();
 
 $gm_user =& User::GetInstance($gm_username);
