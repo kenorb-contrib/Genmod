@@ -168,7 +168,7 @@ class Fact {
 	private function getDateString() {
 		
 		if (is_null($this->datestring)) {
-			if ($this->ShowDetails()) $this->datestring = GetGedcomValue("DATE", "2", $this->factrec);
+			if ($this->ShowDetails()) $this->datestring = GetGedcomValue("DATE", "2", $this->factrec, "", false);
 			else $this->datestring = "";
 		}
 		return $this->datestring;
@@ -204,10 +204,11 @@ class Fact {
 	private function getLinkType() {
 		
 		if (is_null($this->linktype)) {
-			$ct = preg_match("/1 (\w+) @.+@/", $this->factrec, $match);
+			$ct = preg_match("/^1 (\w+) @.+@/", $this->factrec, $match);
 			if ($ct > 0) {
 				$types = array("INDI"=>"Person", "CHIL"=>"Person", "HUSB"=>"Person", "WIFE"=>"Person", "FAMS"=>"Family", "FAMC"=>"Family", "SOUR"=>"Source", "REPO"=>"Repository", "OBJE"=>"MediaItem", "NOTE"=>"Note");
 				$this->linktype = $types[$match[1]];
+				//if ($this->linktype == "Person") print "linktype set to person for: ".$this->factrec."<br />";
 			}
 			else $this->linktype = "";
 		}

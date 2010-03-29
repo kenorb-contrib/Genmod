@@ -38,8 +38,8 @@ $GM_BLOCKS["review_changes_block"]["rss"]       = false;
  * Prints a block allowing the user review all changes pending approval
  */
 function review_changes_block($block = true, $config="", $side, $index) {
-	global $GEDCOMS, $command, $QUERY_STRING, $GM_IMAGES;
-	global $gm_changes, $TEXT_DIRECTION, $SHOW_SOURCES, $TIME_FORMAT, $GM_BLOCKS, $gm_user;
+	global $command, $QUERY_STRING, $GM_IMAGES;
+	global $gm_changes, $TEXT_DIRECTION, $TIME_FORMAT, $GM_BLOCKS, $gm_user;
 
 	if (!GedcomConfig::$ALLOW_EDIT_GEDCOM) return;
 

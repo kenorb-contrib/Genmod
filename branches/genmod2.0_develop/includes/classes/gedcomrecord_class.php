@@ -603,6 +603,9 @@ abstract class GedcomRecord {
 	
 	public function	SelectFacts($factarr, $exclude_links=false) {
 		
+		//print "select ";
+		//print_r($factarr);
+		//print " present: ".count($this->facts)."<br />";
 		// if the facts are already parsed, we taken them from the fact array
 		if (!is_null($this->facts)) {
 			$facts = array();
@@ -621,11 +624,14 @@ abstract class GedcomRecord {
 			else if ($factarr == "" && $exclude_links) {
 				foreach ($this->facts as $key => $factobj) {
 					if ($factobj->linktype == "") {
+						//print "Added: ".$factobj->fact." ";
 						$facts[] = $factobj;
 					}
+					//else print "rejected: ".$factobj->fact." ".$factobj->linktype."<br />";
 				}
 			}
 			else return $this->facts;
+			//print "returning ".count($facts)." facts<br />";
 			return $facts;
 		}
 		// If not, we just select the facts that we need, to prevent unnecessary privacy checking 

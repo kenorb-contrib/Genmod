@@ -743,7 +743,6 @@ abstract class SearchFunctions {
 			}
 			$sql .= ")";
 		}
-		
 		$res = NewQuery($sql);
 		
 		$select = array();
@@ -771,8 +770,6 @@ abstract class SearchFunctions {
 				unset($myfamlist[$index]);
 			}
 		}
-				
-		
 		return $myfamlist;
 	}
 	

@@ -486,10 +486,10 @@ class Person extends GedcomRecord {
 	 */
 	public function AddFamilyFacts($continue=true) {
 		global $nonfacts, $nonfamfacts;
-	
 		if (!$this->DisplayDetails()) return;
 		if (is_null($this->facts)) $this->ParseFacts();
 		$this->GetSpouseFamilies();
+		if ($this->tracefacts) print "AddFamilyFacts - Before adding famfacts, present: ".count($this->facts)."<br />";
 		foreach ($this->spousefamilies as $key => $fam) {
 			// If the family is (partly) private, we must not show facts
 			if ($fam->disp) {
@@ -505,8 +505,8 @@ class Person extends GedcomRecord {
 					if ($factobj->fact != "SOUR" && $factobj->fact != "OBJE" && $factobj->fact != "NOTE" && $factobj->fact != "CHAN" && $factobj->fact != "_UID" && $factobj->fact!="RIN") {
 						if (!in_array($factobj->fact, $nonfacts) && !in_array($factobj->fact, $nonfamfacts)) {
 							$subrecord = trim($factobj->factrec)."\r\n";
-							if (is_object($fam->$spperson)) $subrecord.="1 _GMS @".$fam->$spperson->xref."@\r\n";
-							$subrecord.="1 _GMFS @".$fam->xref."@\r\n";
+							if (is_object($fam->$spperson)) $subrecord.="2 _GMS @".$fam->$spperson->xref."@\r\n";
+							$subrecord.="2 _GMFS @".$fam->xref."@\r\n";
 							if ($this->tracefacts) print "AddFamilyFacts - Adding for ".$fam->xref.": ".$factobj->fact." ".$subrecord."<br />";
 							// Beware! This fact is owned by the family, NOT by this individual!
 							$this->facts[] = new fact($fam->xref, $fam->datatype, $fam->gedcomid, $factobj->fact, $subrecord, $count_facts[$factobj->fact], $factobj->style);
@@ -524,7 +524,7 @@ class Person extends GedcomRecord {
 			$this->AddAssoFacts($this->xref);
 		}
 		SortFactObjs($this->facts, $this->type);
-
+		if ($this->tracefacts) print "AddFamilyFacts - After adding famfacts, present: ".count($this->facts)."<br />";
 	}
 	/**
 	 * add parents events to individual facts array

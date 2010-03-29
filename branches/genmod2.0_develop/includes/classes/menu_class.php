@@ -56,6 +56,9 @@ class Menu {
 		else $this->addLabel($label);
 	}
 
+	public function hasSubMenus() {
+		return count($this->submenus);
+	}
 	public function isSeperator() {
 		$this->seperator = true;
 	}
