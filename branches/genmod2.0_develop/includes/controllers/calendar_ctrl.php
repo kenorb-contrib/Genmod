@@ -50,8 +50,6 @@ class CalendarController extends ChartController {
 	private $hMonth = null;							// (First) month of date entered in Hebrew
 	private $hYear = null;							// (First) year of date entered in Hebrew
 	private $year_text = null;						// Year (range) to print in the titlebar =>not called from calendar
-	private $startyear = null;						// First year of year range
-	private $endyear = null;						// Last year of year range
 	private $gstartyear = null;						// First year of year range
 	private $gendyear = null;						// Last year of year range
 	private $m_days = null;							// Number of days in the selected month
@@ -65,9 +63,37 @@ class CalendarController extends ChartController {
 	private $leap = null;							// True or false a leap year
 	private $bartext = null;							// Text with dates to print in the topbar
 	
+	// for year
+	private $startyear = null;						// First year of year range (used for search parameters)
+	private $endyear = null;						// Last year of year range (used for search parameters)
+	private $hstartyear = null;						// First year of year range in hebrew calendar (used for search parameters)
+	private $hendyear = null;						// Last year of year range in hebrew calendar (used for search parameters)
+	
+	// for calendar
+	private $show_no_day = null;					// In which column show the persons with a date in which the day is not set
+	private $lastday = null;					
+	
+	private $myfamlist = null;
+	private $myindilist = null;
+	
 	public function __construct() {
+		global $nonfacts, $nonfamfacts;
 		
 		parent::__construct();
+		
+		// -- array of GEDCOM elements that will be found but should not be displayed
+		$nonfacts[] = "FAMS";
+		$nonfacts[] = "FAMC";
+		$nonfacts[] = "MAY";
+		$nonfacts[] = "BLOB";
+		$nonfacts[] = "CHIL";
+		$nonfacts[] = "HUSB";
+		$nonfacts[] = "WIFE";
+		$nonfacts[] = "RFN";
+		$nonfacts[] = "";
+		$nonfamfacts[] = "UID";
+		$nonfamfacts[] = "RESN";
+		
 		
 		// Get the day
 		if (!isset($_REQUEST["day"]) || $_REQUEST["day"] == "") $this->day = adodb_date("j");
@@ -126,14 +152,20 @@ class CalendarController extends ChartController {
 			case "year_query":
 				return $this->year_query;
 				break;
-//			case "year_text":
-//				return $this->year_text;
-//				break;
+			case "lastday":
+				return $this->lastday;
+				break;
 			case "startyear":
 				return $this->startyear;
 				break;
 			case "endyear":
 				return $this->endyear;
+				break;
+			case "hstartyear":
+				return $this->hstartyear;
+				break;
+			case "hendyear":
+				return $this->hendyear;
 				break;
 			case "gstartyear":
 				return $this->gstartyear;
@@ -143,6 +175,9 @@ class CalendarController extends ChartController {
 				break;
 			case "pregquery":
 				return $this->pregquery;
+				break;
+			case "show_no_day":
+				return $this->show_no_day;
 				break;
 			case "CalYear":
 				return $this->CalYear;
@@ -162,9 +197,9 @@ class CalendarController extends ChartController {
 			case "hMonth":
 				return $this->hMonth;
 				break;
-//			case "hYear":
-//				return $this->hYear;
-//				break;
+			case "hYear":
+				return $this->hYear;
+				break;
 			case "leap":
 				return $this->leap;
 				break;
@@ -174,6 +209,12 @@ class CalendarController extends ChartController {
 			case "bartext";
 				return $this->GetBarText();
 				break;
+			case "myindilist";
+				return $this->myindilist;
+				break;
+			case "myfamlist";
+				return $this->myfamlist;
+				break;
 			default:
 				return parent::__get($property);
 				break;
@@ -182,9 +223,9 @@ class CalendarController extends ChartController {
 
 	public function __set($property, $value) {
 		switch($property) {
-//			case "year_query":
-//				$this->year_query = $value;
-//				break;
+			case "show_no_day":
+				$this->show_no_day = $value;
+				break;
 //			case "year_text":
 //				$this->year_text = $value;
 //				break;
@@ -256,154 +297,26 @@ class CalendarController extends ChartController {
 		// Only for the year option we can specify ranges.
 		if ($this->action == "year") {
 			
-			// Check for abbreviations
-			$abbr = array(GM_LANG_abt, GM_LANG_aft, GM_LANG_bef, GM_LANG_bet, GM_LANG_cal, GM_LANG_est, GM_LANG_from, GM_LANG_int, GM_LANG_cir, GM_LANG_apx, GM_LANG_and, GM_LANG_to);
+			// Check for a year range, split on any not numeric character
+			$years = preg_split("/[^0-9]/",$this->year);
+			$this->startyear = $years[0];
+			if (isset($years[1])) $this->endyear = $years[1];
+			else $this->endyear = $this->startyear;
+			$this->startyear = $this->CheckYear($this->startyear, adodb_date("Y"));
+			$this->endyear = $this->CheckYear($this->endyear, $this->startyear);
 			
-			// strip heading and trailing spaces and heading zero's
-			$this->year = trim($this->year);
-			for ($i = 0; $i <= strlen($this->year); $i++) {
-				if (substr($this->year,0,1) == "0" && substr($this->year,1,1) != "-") $this->year = substr($this->year,1);
-			}
+			$this->year_text = $this->startyear.($this->endyear != $this->startyear ? " - ".$this->endyear : "");
+			// Also reset the input
+			$this->year = $this->year_text;
 			
-			// Search for spaces and get the string up to the space
-			$pos1 = strpos($this->year," ");
-			if ($pos1 == 0) $pos1 = strlen($this->year);
-			$in_year = Str2Lower(substr($this->year, 0, $pos1));
-			
-			// If the characters before the space are in the translated prefix array, replace them with the gedcom expressions (ongeveer => abt)
-			if (in_array($in_year, $abbr)){
-				if (function_exists("Str2Lower")) $this->year = preg_replace(array("/$abbr[0]/","/$abbr[1]/","/$abbr[2]/","/$abbr[3]/","/$abbr[4]/","/$abbr[5]/","/$abbr[6]/","/$abbr[7]/","/$abbr[8]/","/$abbr[9]/","/ $abbr[10] /","/ $abbr[11] /"), array("abt","aft","bef","bet","cal","est","from","int","cir","apx"," and "," to "), Str2Lower($this->year));
-				else $this->year = preg_replace(array("/$abbr[0]/","/$abbr[1]/","/$abbr[2]/","/$abbr[3]/","/$abbr[4]/","/$abbr[5]/","/$abbr[6]/","/$abbr[7]/","/$abbr[8]/","/$abbr[9]/"), array("abt","aft","bef","bet","cal","est","from","int","cir","apx"), $this->year);
-			}
-			
-			
-			// replace a question mark with [0-9]
-			if (strlen($this->year) > 1 && preg_match("/\?/", $this->year)) $this->year = preg_replace("/\?/", "[0-9]", $this->year);
-			
-			// Replace all other invalid characters
-			$this->year = preg_replace(array("/&lt;/", "/&gt;/", "/[?*+|&.,:'%_<>!#?{}=^]/", "/\\$/", "/\\\/",  "/\"/"), "", $this->year);
-			
-			// If what remains cannot be a year, set it to the current year
-			if (preg_match("/[\D]{1,2}/", $this->year) && strlen($this->year) <= 2) $this->year="";
-			if (empty($this->year)) $this->year = adodb_date("Y");
-			$this->year = trim($this->year);
-			$this->year_text = $this->year;
-			$this->year_query = $this->year;
-		//	print $this->year;
-		
-			if ((strpos($this->year, "-") > 0) && !preg_match("/[\[\]]/", $this->year)){
-				if (substr($this->year,0,1) > 9){
-					while (substr($this->year,0,1) > 9) $this->year = trim(substr($this->year, 1));
-				}
-				$pos1 = strpos($this->year, "-");
-				if (strlen($this->year) == $pos1 + 2){					// endyear n
-					$this->year_query = substr($this->year, 0, ($pos1-1))."[".substr($this->year, ($pos1-1), 3)."]";
-					$this->year_text  = substr($this->year, 0, ($pos1+1)).substr($this->year, 0, ($pos1-1)).substr($this->year, ($pos1+1), 1);
-				}
-				else if (strlen($this->year) == $pos1+3){				// endyear nn
-					$this->year_text = substr($this->year, 0, ($pos1-2));
-					if ((substr($this->year, ($pos1-1), 1)=="0") && (substr($this->year, ($pos1+2), 1)=="9")){
-						$this->year_query  = $this->year_text."[".substr($this->year, ($pos1-2), 1)."-".substr($this->year, ($pos1+1), 1)."][0-9]";
-					}
-					else {
-						$this->startyear= substr($this->year, 0, $pos1);
-						$this->endyear= substr($this->year, 0, ($pos1-2)).substr($this->year, ($pos1+1), 2);
-					}
-					$this->year_text = substr($this->year, 0, ($pos1))." - ".($this->startyear=="0"?"":$this->year_text).substr($this->year, ($pos1+1), 2);
-				}
-				else if ((strlen($this->year) == $pos1+4) && ($pos1==4)){	// endyear nnn
-					$this->year_text = substr($this->year, 0, ($pos1-3));
-					if ((substr($this->year, ($pos1-2), 2)=="00")&&(substr($this->year, ($pos1+2), 2)=="99")){
-						$this->year_query  = $this->year_text."[".substr($this->year, ($pos1-3), 1)."-".substr($this->year, ($pos1+1), 1)."][0-9][0-9]";
-					}
-					else {
-						$this->startyear= substr($this->year, 0, $pos1);
-						$this->endyear= substr($this->year, 0, ($pos1-3)).substr($this->year, ($pos1+1), 3);
-					}
-					$this->year_text = substr($this->year, 0, ($pos1))." - ".$this->year_text.substr($this->year, ($pos1+1), 3);
-				}
-				else {											// endyear nnn(n)
-					$this->startyear = substr($this->year, 0, $pos1);
-					$this->endyear   = substr($this->year, ($pos1+1));
-					$this->year_text = $this->startyear." - ".$this->endyear;
-				}
-				if ($this->startyear > $this->endyear){
-					$this->year_text = $this->startyear;
-					$this->startyear = $this->endyear;
-					$this->endyear   = $this->year_text;
-					$this->year = $this->startyear."-".$this->endyear;
-					$this->year_text = $this->startyear." - ".$this->endyear;
-				}
-		// print "1. met streepjes start: ".$this->startyear." end: ".$this->endyear." year: ".$this->year."yearquery: ".$this->year_query."<br />";
-			}
-			if (strpos($this->year, "[", 1)>"0") {
-				$pos1 = strpos($this->year, "[", 0);
-				$this->year_text=substr($this->year, 0, $pos1);
-				while (($pos1 = strpos($this->year, "[", $pos1)) !== false) {
-					$this->year_text .= substr($this->year, ($pos1+1), 1);
-					$pos1++;
-				}
-				$pos1 = strpos($this->year, "]", $pos1);
-				if (strlen($this->year) > $pos1 && !strpos($this->year, "]", $pos1+1)) $year_add=substr($this->year, $pos1+1, strlen($this->year));
-				$pos1=strpos($this->year, "]", $pos1+1);
-				if (strlen($this->year) > $pos1 && !strpos($this->year, "]", $pos1+1)) $year_add=substr($this->year, $pos1+1, strlen($this->year));
-				if (isset($year_add)) $this->year_text .= $year_add." ~ ";
-				else $this->year_text .= " - ";
-				if (strpos($this->year, " ", 0)>0) $pos1=(strpos($this->year, " ", 0)+1);
-				else $pos1=0;
-				$this->year_text .= substr($this->year, $pos1, (strpos($this->year, "[", 0))-$pos1);
-				$pos1=(strpos($this->year, "[", 0));
-				while (($pos1 = strpos($this->year, "]", $pos1))!==false) {
-					$this->year_text .= substr($this->year, ($pos1-1), 1);
-					$pos1++;
-				}
-				if (isset($year_add)) $this->year_text .= $year_add;
-				$this->year_query=$this->year;
-		// print "2. met haken start: ".$this->startyear." end: ".$this->endyear." year: ".$this->year."yearquery: ".$this->year_query."<br />";
-			}
-			else if (strlen($this->year) < 4 && preg_match("/[\d]{1,3}/", $this->year)) {
-				if (substr($this->year, 0, 2) <= substr(adodb_date("Y"), 0, 2)){
-					for ($i=strlen($this->year); $i<4; $i++) $this->year_text .="0";
-					$this->startyear = $this->year_text;
-					$this->year_text .= " - ".$this->year;
-					for ($i=strlen($this->year); $i<4; $i++) $this->year_text .="9";
-					$this->endyear=$this->year;
-					for ($i=strlen($this->year); $i<4; $i++) $this->endyear .="9";
-				}
-				else {
-					for ($i=strlen($this->year); $i<3; $i++) $this->year_text .="0";
-					for ($i=strlen($this->year); $i<3; $i++) $this->year .= "0";
-				}
-				$this->year_query = $this->year;
-		// print "3. lengte < 4 start: ".$this->startyear." end: ".$this->endyear." year: ".$this->year."yearquery: ".$this->year_query."<br />";
-			}
 		}
-		else if (!is_numeric($this->year)) $this->year = adodb_date("Y");
-		
-		if ($this->startyear == 0 && $this->action != "today") {
+		else {
+			// For actions month and day are only real years allowed
+			$this->year = $this->CheckYear($this->year, adodb_date("Y"));
 			$this->startyear = $this->year;
 			$this->endyear = $this->year;
-		}
 	 	//print "year final: startyear: ".$this->startyear." endyear: ".$this->endyear." year: ".$this->year." yearquery: ".$this->year_query." year_text: ".$this->year_text."<br />";
-		// For actions month and day are only real years allowed
-		if ($this->action != "year") {
-			if (strlen($this->year) < 3) $this->year = adodb_date("Y");
-			if (strlen($this->year) > 4){
-				if (strpos($this->year, "[", 1) > "0"){
-					$pos1 = (strpos($this->year, "[", 0));
-					$this->year_text = $this->year;
-					$yy = $this->year;
-					$this->year = substr($yy, 0, ($pos1));
-					$this->year .= substr($yy, ($pos1+1), 1);
-					if (strlen($this->year_text) == $pos1+10) $this->year .= substr($yy, ($pos1+6), 1);
-				}
-				else if (strpos($this->year, "-", 1) > "0") $this->year = substr($this->year, 0, (strpos($this->year, "-", 0)));
-					else $this->year = adodb_date("Y");
-			}
-			$this->year = trim($this->year);
-		//print "alle andere  year: ".$year."yearquery: ".$year_query."<br />";
-		}
-		
+		}		
 		// calculate leap year
 		if (strlen($this->year) < 5 && preg_match("/[\d]{2,4}/", $this->year)) {
 			if (checkdate(2,29,$this->year)) $leap = TRUE;
@@ -491,25 +404,12 @@ class CalendarController extends ChartController {
 		 	
 		 	// for year
 			if ($this->action == "year") {
-				$pattern = "[ - |-|and|bet|from|to|abt|bef|aft|cal|cir|est|apx|int]";
-				$a = preg_split($pattern, $this->year_text);
-				if ($a[0] != "") $this->gstartyear = $a[0]; 
-				if (isset($a[1])) {
-					if ($a[0] != "") $this->gendyear = $a[1];
-					else {
-						$this->gstartyear = $a[1];
-						if (isset($a[2])) $this->gendyear = $a[2];
-						else $this->gendyear = $a[1];
-					}
-				}
-				else $this->gendyear = $a[0];
-				
 		 		$this->datearray[3]["day"]   = 01;
 		 		$this->datearray[3]["mon"]   = 01;	
-		 		$this->datearray[3]["year"]  = $this->gstartyear;
+		 		$this->datearray[3]["year"]  = $this->startyear;
 		 		$this->datearray[4]["day"]   = 31;
 		 		$this->datearray[4]["mon"]   = 12;	
-		 		$this->datearray[4]["year"]  = $this->gendyear;
+		 		$this->datearray[4]["year"]  = $this->endyear;
 		// print "gstart: ".$this->gstartyear." ".$this->gendyear; 	
 			}
 		    $this->date   	= GregorianToJewishGedcomDate($this->datearray);
@@ -548,16 +448,276 @@ class CalendarController extends ChartController {
 				if (GedcomConfig::$CALENDAR_FORMAT == "gregorian" && $this->GetUseHebrew()) {
 					$hdd = $this->date[3]["day"];
 					$hmm = $this->date[3]["month"];
-					$hstartyear = $this->date[3]["year"];
-					$this->bartext .= " /  ".GetChangedDate("@#DHEBREW@ ".$hdd." ".$hmm." ".$hstartyear);
+					$this->hstartyear = $this->date[3]["year"];
+					$this->bartext .= " /  ".GetChangedDate("@#DHEBREW@ ".$hdd." ".$hmm." ".$this->hstartyear);
 				    $hdd = $this->date[4]["day"];
 			        $hmm = $this->date[4]["month"];
-					$hendyear = $this->date[4]["year"];
-					$this->bartext .= " -".GetChangedDate("@#DHEBREW@ ".$hdd." ".$hmm." ".$hendyear);
+					$this->hendyear = $this->date[4]["year"];
+					$this->bartext .= " -".GetChangedDate("@#DHEBREW@ ".$hdd." ".$hmm." ".$this->hendyear);
 				}
 			}
 		}
 		return $this->bartext;
-	}		
+	}
+	
+	private function CheckYear($year, $default) {
+		
+		$year = trim($year, " ");
+		if ($year != 0) $year = ltrim($year, "0");
+		if (!is_numeric($year)) $year = $default;
+		return $year;
+	}
+	
+	public function GetDateFacts($facts) {
+		
+		$text_fact = "";
+		foreach($facts as $index => $factobj) {
+			//print "Checking ".$factobj->fact."<br />";
+			$text_temp = "";
+			$t1 = preg_match("/2 DATE.*DHEBREW.* (\d\d\d\d|\d\d\d)/i", $factobj->factrec, $m1);
+			if (GedcomConfig::$USE_RTL_FUNCTIONS && $this->action == "year" && !is_null($this->hendyear) && $this->hendyear > 0 && $t1 > 0) {
+				if ($m1[1] == $this->hstartyear || $m1[1] == $this->hendyear) {
+					//print "check hebrew".$factobj->factrec."<br />";
+					// verify if the date falls within the first or the last range gregorian year @@@@ !!!!
+					$fdate = $factobj->datestring;
+					if ($fdate != "") {
+						$hdate = ParseDate(trim($fdate));
+						$gdate = JewishGedcomDateToGregorian($hdate);
+                	    $gyear = $gdate[0]["year"]; 
+
+						if ($gyear >= $this->startyear && $gyear <= $this->endyear) $hprocess=true;
+						else $hprocess = false;
+					}
+					else $hprocess = false;
+				}
+				else if ($m1[1] > $this->hstartyear && $m1[1] < $this->hendyear) $hprocess = true;
+				     else $hprocess = false;
+				     //if ($hprocess) print "heb_proc";
+				if ($hprocess) $text_temp .= FactFunctions::GetCalendarFact($factobj, $this->action, $this->filterof, $this->filterev, $this->year, $this->month, $this->day, $this->CalYear, $this->currhYear);
+				else $text_temp .= "filter";
+			}
+			elseif (GedcomConfig::$USE_RTL_FUNCTIONS && $this->action == "today" && $t1) {
+				//print "check hebrew".$factobj->factrec."<br />";
+				// verify if the date falls within the first or the last range gregorian year @@@@ !!!!
+				$fdate = $factobj->datestring;
+				if ($fdate != "") {
+					$hdate = ParseDate(trim($fdate));
+					if ($hdate[0]["day"] == $this->hDay && Str2Lower($hdate[0]["month"]) == Str2Lower($this->hMonth)) $hprocess=true;
+					else $hprocess=false;
+				}
+				else $hprocess=false;
+			     //if ($hprocess) print "heb_proc";
+				if ($hprocess) $text_temp .= FactFunctions::GetCalendarFact($factobj, $this->action, $this->filterof, $this->filterev, $this->hYear, $this->hMonth, $this->hDay, $this->CalYear, $this->currhYear);
+				else $text_temp .= "filter";
+			}
+			elseif ($factobj->datestring != "") {
+				$dates = ParseDate($factobj->datestring);
+				$print = false;
+				if ($this->action == "year" && $dates[0]["year"] >= $this->startyear && $dates[0]["year"] <= $this->endyear) $print = true;
+				if ($this->action == "today" && $dates[0]["day"] == $this->day && Str2Lower($dates[0]["month"]) == Str2Lower($this->month)) $print = true;
+//					print ($print ? "true":"false");
+//					print "<br />";
+				if ($print) $text_temp .= FactFunctions::GetCalendarFact($factobj, $this->action, $this->filterof, $this->filterev, $this->year, $this->month, $this->day, $this->CalYear, $this->currhYear);
+				else $text_temp .= "filter";
+			}
+							
+				if ($text_temp != "filter" && $text_temp != "filterfilter") $text_fact .= $text_temp;
+		} // end fact loop
+		return $text_fact;
+	}
+	
+	public function GetDayYearLists() {
+		
+		// Determine what facts to search and where to search
+		$this->myindilist = array();
+		$this->myfamlist = array();
+		$famfacts = array("_COML", "MARR", "DIV", "EVEN");
+		$findindis = true;
+		$findfams = true;
+		if ($this->filterev == "bdm") {
+			$selindifacts = "('BIRT', 'DEAT')";
+			$selfamfacts = "('MARR')";
+		}
+		else if ($this->filterev != "all" && $this->filterev != "") {
+			if (in_array($this->filterev, $famfacts)) {
+				$findindis = false;
+				$selfamfacts = "('".$this->filterev."')";
+			}
+			else {
+				$selindifacts = "('".$this->filterev."')";
+				$findfams = false;
+			}
+		}
+		else {
+			$selindifacts = "";
+			$selfamfacts = "";
+		}
+		
+		if ($this->action == "year"){
+			if ($findindis) $this->myindilist = SearchFunctions::SearchIndisYearRange($this->startyear,$this->endyear, false, $selindifacts);
+			if ($findfams) $this->myfamlist = SearchFunctions::SearchFamsYearRange($this->startyear,$this->endyear, false, $selfamfacts);
+			
+			if (GedcomConfig::$USE_RTL_FUNCTIONS && !is_null($this->hstartyear) && !is_null($this->hendyear)) {
+				if ($findindis) {
+					$myindilist1 = SearchFunctions::SearchIndisYearRange($this->hstartyear, $this->hendyear, false, $selindifacts);
+					$this->myindilist = GmArrayMerge($this->myindilist, $myindilist1);
+				}
+				
+				if ($findfams) {
+					$myfamlist1 = SearchFunctions::SearchFamsYearRange($this->hstartyear, $this->hendyear, false, $selfamfacts);
+					$this->myfamlist = GmArrayMerge($this->myfamlist, $myfamlist1);
+				}
+			}
+		}
+		if ($this->action == "today") {
+			if ($findindis) $this->myindilist = SearchFunctions::SearchIndisDates($this->day, $this->month, "", $selindifacts);
+			if ($findfams) $this->myfamlist = SearchFunctions::SearchFamsDates($this->day, $this->month, "", $selfamfacts);
+			
+			if (GedcomConfig::$USE_RTL_FUNCTIONS) {
+				if ($findindis) {
+					$myindilist1 = SearchFunctions::SearchIndisDates($this->hDay, $this->hMonth, "", $selindifacts);
+					$this->myindilist = GmArrayMerge($this->myindilist, $myindilist1);
+				}
+				
+				if ($findfams) {
+					$myfamlist1 = SearchFunctions::SearchFamsDates($this->hDay, $this->hMonth, "", $selfamfacts);
+//					$myfamlist1 = SearchFunctions::SearchFams(array($queryhb));
+					$this->myfamlist = GmArrayMerge($this->myfamlist, $myfamlist1);
+				}
+			}
+		}	
+		
+		if (isset($query1)) {
+			$query = $query1;
+			$this->pregquery = $pregquery1;
+		}
+		
+		// If filter on gender is chosen, we display the fam facts with the person of that gender.
+		// Of course, only if any fam facts were selected
+		// So we copy them from fam to indi. This may causes doubles (indi AND fam fact in the same date range) but we will filter them out later
+		if ($this->filtersx != "" && $findfams) {
+			foreach($this->myfamlist as $key => $fam) {
+				if ($fam->husb_id != "" && $fam->husb->sex == $this->filtersx) {
+					$this->myindilist[] =& $fam->husb;
+					//print "Added: ".$fam->husb->name."<br />";
+				}
+				if ($fam->wife_id != "" && $fam->wife->sex == $this->filtersx) {
+					$this->myindilist[] =& $fam->wife;
+					//print "Added: ".$fam->wife->name."<br />";
+				}
+			}
+		}
+	/*	
+	 print "indicount: ".count($this->myindilist)."<br />";
+	 print "famcount: ".count($this->myfamlist)."<br />";
+	 print "filterof: ".$this->filterof."<br />";
+	 print "filterev: ".$this->filterev."<br />";
+	 print "filtersx: ".$this->filtersx."<br />";
+	*/
+		uasort($this->myindilist, "ItemSort");
+		if ($this->filtersx == "") uasort($this->myfamlist, "ItemSort");
+	}
+	
+	public function GetCalendarLists() {
+		global $monthtonum, $WEEK_START, $monthstart;
+	
+		$monthstart 	= adodb_mktime(1,0,0,$monthtonum[strtolower($this->month)],1,$this->year);
+		$startday 		= adodb_date("w", $monthstart);
+		$endday 		= adodb_dow($this->year,$monthtonum[strtolower($this->month)],adodb_date("t", $monthstart));
+		$this->lastday		= adodb_date("t", $monthstart);
+		$mmon 			= strtolower(adodb_date("M", $monthstart));
+		$monthstart 	= $monthstart-(60*60*24*$startday);
+		if ($WEEK_START <= $startday)
+			$monthstart += $WEEK_START*(60*60*24);
+		else //week start > $startday
+			$monthstart -= (7-$WEEK_START)*(60*60*24);
+		if (($endday == 6 && $WEEK_START == 0) || ($endday == 0 && $WEEK_START == 1)) $this->show_no_day = 0;
+		else $this->show_no_day = 6;
+		if ((($startday == 0 && $WEEK_START == 0) || ($startday == 2 && $WEEK_START == 1)) && $this->show_no_day == 0) $this->show_no_day = 6;
+		$this->lastday -= 29;   
+		if ($this->lastday < 0) $this->lastday = 0;
+		$this->myindilist = array();
+		$this->myfamlist = array();
+		$this->pregquery = "2 DATE[^\n]*".$mmon;
+	//	$query = "2 DATE[^\n]*".$mmon;
+	
+		$fact = "";	
+	
+		$famfacts = array("_COML", "MARR", "DIV", "EVEN");
+		$findindis = true;
+		$findfams = true;
+		if ($this->filterev == "bdm") $fact = "('BIRT', 'DEAT', 'MARR')";
+		else if ($this->filterev != "all" && !empty($this->filterev)) {
+			$fact = "('".$this->filterev."')";
+			if (in_array($this->filterev, $famfacts)) $findindis = false;
+			else $findfams = false;
+		}
+		else $fact = "";
+		
+		if ($findindis) $this->myindilist = SearchFunctions::SearchIndisDates("", $mmon, "", $fact);
+		if ($findfams) $this->myfamlist = SearchFunctions::SearchFamsDates("", $mmon, "", $fact);
+	
+		if (GedcomConfig::$USE_RTL_FUNCTIONS) {
+			$datearray[0]["day"]   = 01;
+	 		$datearray[0]["mon"]   = $monthtonum[Str2Lower($this->month)];	
+	 		$datearray[0]["year"]  = $this->year;
+	 		$datearray[0]["month"] = $this->month;
+	 		$datearray[1]["day"]   = 15;
+	 		$datearray[1]["mon"]   = $monthtonum[Str2Lower($this->month)];	
+	 		$datearray[1]["year"]  = $this->year;
+	 		$datearray[1]["month"] = $this->month;
+	 		$datearray[2]["day"]   = adodb_date("t", $monthstart);
+	 		$datearray[2]["mon"]   = $monthtonum[Str2Lower($this->month)];	
+	 		$datearray[2]["year"]  = $this->year;
+	 		$datearray[2]["month"] = $this->month;
+	
+			$date   = GregorianToJewishGedcomDate($datearray);
+			$HBMonth1 = $date[0]["month"];
+			$HBYear1  = $date[0]["year"];
+			$HBMonth2 = $date[1]["month"];
+			$HBMonth3 = $date[2]["month"];
+			
+	//		$preghbquery1 = "2 DATE[^\n]*$HBMonth1";
+	//		$query1 = "2 DATE[^\n]*$HBMonth1";
+			
+			if ($findindis) $myindilist1 = SearchFunctions::SearchIndisDates("", $HBMonth1, "", $fact);
+			if ($findfams) $myfamlist1 = SearchFunctions::SearchFamsDates("", $HBMonth1, "", $fact);
+				
+			if ($findindis) $this->myindilist = GmArrayMerge($this->myindilist, $myindilist1);
+			if ($findfams) $this->myfamlist  = GmArrayMerge($this->myfamlist, $myfamlist1);
+			
+			if ($HBMonth1 != $HBMonth2) {		
+				$preghbquery2 = "2 DATE[^\n]*$HBMonth2";
+					
+				if ($findindis) $myindilist1 = SearchFunctions::SearchIndisDates("", $HBMonth2, "", $fact);
+				if ($findfams) $myfamlist1 = SearchFunctions::SearchFamsDates("", $HBMonth2, "", $fact);
+				
+				if ($findindis) $this->myindilist = GmArrayMerge($this->myindilist, $myindilist1);
+				if ($findfams) $this->myfamlist  = GmArrayMerge($this->myfamlist, $myfamlist1);
+			}
+			
+			if ($HBMonth2 != $HBMonth3) {		
+				$preghbquery3 = "2 DATE[^\n]*$HBMonth3";
+					
+				if ($findindis) $myindilist1 = SearchFunctions::SearchIndisDates("", $HBMonth3, "", $fact);
+				if ($findfams) $myfamlist1 = SearchFunctions::SearchFamsDates("", $HBMonth3, "", $fact);
+				
+				if ($findindis) $this->myindilist = GmArrayMerge($this->myindilist, $myindilist1);
+				if ($findfams) $this->myfamlist  = GmArrayMerge($this->myfamlist, $myfamlist1);
+			}
+			
+			if (!IsJewishLeapYear($HBYear1) && ($HBMonth1 == "adr" || $HBMonth2 == "adr" || $HBMonth3 == "adr")) {
+				$HBMonth4 = "ads"; 
+			
+				if ($findindis) $myindilist1 = SearchFunctions::SearchIndisDates("", $HBMonth4, "", $fact);
+				if ($findfams) $myfamlist1 = SearchFunctions::SearchFamsDates("", $HBMonth4, "", $fact);
+				
+				if ($findindis) $this->myindilist = GmArrayMerge($this->myindilist, $myindilist1);
+				if ($findfams) $this->myfamlist  = GmArrayMerge($this->myfamlist, $myfamlist1);
+			}
+		}
+		
+		uasort($this->myindilist, "ItemSort");
+	}
 }
 ?>

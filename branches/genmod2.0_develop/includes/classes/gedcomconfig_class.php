@@ -225,7 +225,7 @@ abstract class GedcomConfig {
 					global $$var;
 					$$var = $value;
 				}					
-				self::$$var = $value;
+				if (isset(self::$$var) || is_null(self::$$var)) self::$$var = $value;
 			}
 		}
 		else {
@@ -244,7 +244,7 @@ abstract class GedcomConfig {
 								global $$var;
 								$$var = $value;
 							}
-							self::$$var = $value;
+							if (property_exists("GedcomConfig", $var)) self::$$var = $value;
 							$gc[$var] = $value;
 						}
 					}

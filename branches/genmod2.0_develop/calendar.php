@@ -31,26 +31,19 @@
  * load the configuration and create the context
  */
 require("config.php");
+
 $calendar_controller = new CalendarController();
- 
-if (GedcomConfig::$USE_RTL_FUNCTIONS) {
-    if ($calendar_controller->action != "year") {   //---- ?????? does not work - see I90 in 1042 @@@@@
-    	if ($calendar_controller->hDay < 10) {
-			$preghbquery = "2 DATE[^\n]*[ |0]".$calendar_controller->hDay." ".$calendar_controller->hMonth;
-			$queryhb = "2 DATE[^\n]*[ |0]".$calendar_controller->hDay." ".$calendar_controller->hMonth;
-		}
-		else {
-			$preghbquery = "2 DATE[^\n]*".$calendar_controller->hDay." ".$calendar_controller->hMonth;
-			$queryhb = "2 DATE[^\n]*".$calendar_controller->hDay." ".$calendar_controller->hMonth;
-		}
-	}
-}
+
 PrintHeader($calendar_controller->pagetitle);
+
+//Print page top title
 print "<div style=\" text-align: center;\" id=\"calendar_page\">\n";
 print "<table class=\"facts_table ".$TEXT_DIRECTION." width100\">";
 print "<tr><td class=\"facts_label\"><h3>";
 print ($calendar_controller->action == "today" ? GM_LANG_on_this_day : ($calendar_controller->action == "calendar" ? GM_LANG_in_this_month : GM_LANG_in_this_year));
 print "</h3></td></tr>\n";
+
+// Print the title bar
 print "<tr><td class=\"topbottombar\">";
 print $calendar_controller->bartext;
 print "</td></tr></table>";
@@ -65,9 +58,8 @@ if ($view!="preview") {
 	print GM_LANG_day."</td>\n";
 	print "<td colspan=\"7\" class=\"shade1\">";
 	for($i = 1; $i < ($calendar_controller->m_days+1); $i++) {
-		if (empty($dd)) $dd = $calendar_controller->day;
 		print "<a href=\"calendar.php?day=".$i."&amp;month=".strtolower($calendar_controller->month)."&amp;year=".$calendar_controller->year."&amp;filterev=".$calendar_controller->filterev."&amp;filterof=".$calendar_controller->filterof."&amp;filtersx=".$calendar_controller->filtersx."&amp;action=today\">";
-		if ($i == $dd) print "<span class=\"error\">".$i."</span>";
+		if ($i == $calendar_controller->day) print "<span class=\"error\">".$i."</span>";
 		else print $i;
 		print "</a> | ";
 	}
@@ -95,7 +87,7 @@ if ($view!="preview") {
 	foreach($monthtonum as $mon=>$num) {
 		if (defined("GM_LANG_".$mon)) {
 			if (empty($mm)) $mm=strtolower($calendar_controller->month);
-			print "<a href=\"calendar.php?day=".$dd."&amp;month=".$mon."&amp;year=".$calendar_controller->year."&amp;filterev=".$calendar_controller->filterev."&amp;filterof=".$calendar_controller->filterof."&amp;filtersx=".$calendar_controller->filtersx."&amp;action=".($calendar_controller->action == "year" ? "calendar" : $calendar_controller->action)."\">";
+			print "<a href=\"calendar.php?day=".$calendar_controller->day."&amp;month=".$mon."&amp;year=".$calendar_controller->year."&amp;filterev=".$calendar_controller->filterev."&amp;filterof=".$calendar_controller->filterof."&amp;filtersx=".$calendar_controller->filtersx."&amp;action=".($calendar_controller->action == "year" ? "calendar" : $calendar_controller->action)."\">";
 			$monthstr = constant("GM_LANG_".$mon);
 			if ($mon==$mm) print "<span class=\"error\">".$monthstr."</span>";
 			else print $monthstr;
@@ -110,7 +102,7 @@ if ($view!="preview") {
 	PrintHelpLink("annivers_year_select_help", "qm", "year");
 	print GM_LANG_year."</td>\n";
 	print "<td class=\"shade1 vmiddle\">";
-	if (strlen($calendar_controller->year)<5){
+	if (strlen($calendar_controller->year) < 5){
 		if ($calendar_controller->year<"AA") print " <a href=\"calendar.php?day=".$calendar_controller->day."&amp;month=".$calendar_controller->month."&amp;year=".($calendar_controller->year-1)."&amp;action=".($calendar_controller->action == "calendar" ? "calendar" : "year")."&amp;filterev=".$calendar_controller->filterev."&amp;filterof=".$calendar_controller->filterof."&amp;filtersx=".$calendar_controller->filtersx."\" title=\"".($calendar_controller->year-1)."\" >-1</a> ";
 	}
 	print "<input type=\"text\" name=\"year\" value=\"".$calendar_controller->year."\" size=\"7\" />";
@@ -146,12 +138,12 @@ if ($view!="preview") {
 		if ($calendar_controller->filterof=="all") print "<span class=\"error\">".GM_LANG_all_people. "</span> | ";
 		else {
 			$filt="all";
-			print "<a href=\"calendar.php?day=$dd&amp;month=".$calendar_controller->month."&amp;year=".$calendar_controller->year."&amp;filterof=".$filt."&amp;filtersx=".$calendar_controller->filtersx."&amp;action=".$calendar_controller->action."\">".htmlentities(GM_LANG_all_people)."</a>"." | ";
+			print "<a href=\"calendar.php?day=".$calendar_controller->day."&amp;month=".$calendar_controller->month."&amp;year=".$calendar_controller->year."&amp;filterof=".$filt."&amp;filtersx=".$calendar_controller->filtersx."&amp;action=".$calendar_controller->action."\">".htmlentities(GM_LANG_all_people)."</a>"." | ";
 		}
 		if ($calendar_controller->filterof == "recent") print "<span class=\"error\">".htmlentities(GM_LANG_recent_events). "</span> | ";
 		else {
 			$filt = "recent";
-			print "<a href=\"calendar.php?day=".$dd."&amp;month=".$calendar_controller->month."&amp;year=".$calendar_controller->year."&amp;filterof=".$filt."&amp;filtersx=".$calendar_controller->filtersx."&amp;action=".$calendar_controller->action."\">".htmlentities(GM_LANG_recent_events)."</a>"." | ";
+			print "<a href=\"calendar.php?day=".$calendar_controller->day."&amp;month=".$calendar_controller->month."&amp;year=".$calendar_controller->year."&amp;filterof=".$filt."&amp;filtersx=".$calendar_controller->filtersx."&amp;action=".$calendar_controller->action."\">".htmlentities(GM_LANG_recent_events)."</a>"." | ";
 		}
 	}
 	
@@ -169,7 +161,7 @@ if ($view!="preview") {
 		}
 		else {
 			$fs="";
-			print " <a href=\"calendar.php?day=".$dd."&amp;month=".$calendar_controller->month."&amp;year=".$calendar_controller->year."&amp;filterev=".$calendar_controller->filterev."&amp;filterof=".$calendar_controller->filterof."&amp;filtersx=".$fs."&amp;action=".$calendar_controller->action."\">";
+			print " <a href=\"calendar.php?day=".$calendar_controller->day."&amp;month=".$calendar_controller->month."&amp;year=".$calendar_controller->year."&amp;filterev=".$calendar_controller->filterev."&amp;filterof=".$calendar_controller->filterof."&amp;filtersx=".$fs."&amp;action=".$calendar_controller->action."\">";
 			print "<img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["sex"]["small"]."\" title=\"".GM_LANG_all."\" alt=\"".GM_LANG_all."\" width=\"9\" height=\"9\" border=\"0\" align=\"middle\" />";
 			print "<img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["sexf"]["small"]."\" title=\"".GM_LANG_all."\" alt=\"".GM_LANG_all."\" width=\"9\" height=\"9\" border=\"0\" align=\"middle\" />";
 			print "</a>"." | ";
@@ -180,7 +172,7 @@ if ($view!="preview") {
 		}
 		else {
 			$fs = "M";
-			print "<a href=\"calendar.php?day=".$dd."&amp;month=".$calendar_controller->month."&amp;year=".$calendar_controller->year."&amp;filterev=".$calendar_controller->filterev."&amp;filterof=".$calendar_controller->filterof."&amp;filtersx=".$fs."&amp;action=".$calendar_controller->action."\">";
+			print "<a href=\"calendar.php?day=".$calendar_controller->day."&amp;month=".$calendar_controller->month."&amp;year=".$calendar_controller->year."&amp;filterev=".$calendar_controller->filterev."&amp;filterof=".$calendar_controller->filterof."&amp;filtersx=".$fs."&amp;action=".$calendar_controller->action."\">";
 			print "<img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["sex"]["small"]."\" title=\"".GM_LANG_male."\" alt=\"".GM_LANG_male."\" width=\"9\" height=\"9\" border=\"0\" align=\"middle\" />";
 			print "</a>"." | ";
 		}
@@ -190,7 +182,7 @@ if ($view!="preview") {
 		}
 		else {
 			$fs = "F";
-			print "<a href=\"calendar.php?day=".$dd."&amp;month=".$calendar_controller->month."&amp;year=".$calendar_controller->year."&amp;filterev=".$calendar_controller->filterev."&amp;filterof=".$calendar_controller->filterof."&amp;filtersx=".$fs."&amp;action=".$calendar_controller->action."\">";
+			print "<a href=\"calendar.php?day=".$calendar_controller->day."&amp;month=".$calendar_controller->month."&amp;year=".$calendar_controller->year."&amp;filterev=".$calendar_controller->filterev."&amp;filterof=".$calendar_controller->filterof."&amp;filtersx=".$fs."&amp;action=".$calendar_controller->action."\">";
 			print "<img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["sexf"]["small"]."\" title=\"".GM_LANG_female."\" alt=\"".GM_LANG_female."\" width=\"9\" height=\"9\" border=\"0\" align=\"middle\" />";
 			print "</a>"." | ";
 		}
@@ -219,7 +211,7 @@ if ($view!="preview") {
 	print "</tr>";
 	print "<tr><td class=\"topbottombar\" colspan=\"8\">";
 	PrintHelpLink("day_month_help", "qm");
-	print "<input type=\"hidden\" name=\"day\" value=\"".$dd."\" />";
+	print "<input type=\"hidden\" name=\"day\" value=\"".$calendar_controller->day."\" />";
 	print "<input type=\"hidden\" name=\"month\" value=\"".$mm."\" />";
 	print "<input type=\"hidden\" name=\"filtersx\" value=\"".$calendar_controller->filtersx."\" />";
 	print "<input type=\"submit\"  value=\"".GM_LANG_viewday."\" onclick=\"document.dateform.elements['action'].value='today';\" />\n";
@@ -231,206 +223,33 @@ if ($view!="preview") {
 	
 }
 if ($calendar_controller->action == "today" || $calendar_controller->action == "year") {
-	$myindilist = array();
-	$myfamlist = array();
-	$famfacts = array("_COML", "MARR", "DIV", "EVEN");
-	$findindis = true;
-	$findfams = true;
-	if ($calendar_controller->filterev == "bdm") {
-		$selindifacts = "('BIRT', 'DEAT')";
-		$selfamfacts = "('MARR')";
-	}
-	else if ($calendar_controller->filterev != "all" && $calendar_controller->filterev != "") {
-		$selfacts = $calendar_controller->filterev;
-		if (in_array($calendar_controller->filterev, $famfacts)) {
-			$findindis = false;
-			$selfamfacts = "('".$calendar_controller->filterev."')";
-		}
-		else {
-			$selindifacts = "('".$calendar_controller->filterev."')";
-			$findfams = false;
-		}
-	}
-	else {
-		$selindifacts = "";
-		$selfamfacts = "";
-	}
 	
-	if ($calendar_controller->action == "year"){
-		if ($calendar_controller->year_query != null) $calendar_controller->year = $calendar_controller->year_query;
-		$calendar_controller->pregquery = "2 DATE[^\n]*(bet|".$calendar_controller->year.")";
-		$query = "2 DATE[^\n]*(bet|".$calendar_controller->year.")";
-		$pregquery1 = "2 DATE[^\n]*".$calendar_controller->year;
-		$query1 = "2 DATE[^\n]*".$calendar_controller->year;
-		
-		if ($findindis) $myindilist = SearchFunctions::SearchIndisYearRange($calendar_controller->startyear,$calendar_controller->endyear, false, $selindifacts);
-		if ($findfams) $myfamlist = SearchFunctions::SearchFamsYearRange($calendar_controller->startyear,$calendar_controller->endyear, false, $selfamfacts);
-		if (GedcomConfig::$USE_RTL_FUNCTIONS && isset($hstartyear) && isset($hendyear)) {
-			
-			if ($findindis) {
-				$myindilist1 = SearchFunctions::SearchIndisYearRange($hstartyear, $hendyear, false, $selindifacts);
-				$myindilist = GmArrayMerge($myindilist, $myindilist1);
-			}
-			
-			if ($findfams) {
-				$myfamlist1 = SearchFunctions::SearchFamsYearRange($hstartyear, $hendyear, false, $selfamfacts);
-				$myfamlist = GmArrayMerge($myfamlist, $myfamlist1);
-			}
-		}
-	}
-	if ($calendar_controller->action == "today") {
-		if (GedcomConfig::$USE_RTL_FUNCTIONS) {
-			if ($findindis) {
-				$myindilist1 = SearchFunctions::SearchIndisDates($dd, $calendar_controller->month, "", $selindifacts);
-				$myindilist = GmArrayMerge($myindilist, $myindilist1);
-			}
-		
-			if ($findfams) {
-				$myfamlist1 = SearchFunctions::SearchFamsDates($dd, $calendar_controller->month, "", $selfamfacts);
-				$myfamlist = GmArrayMerge($myfamlist, $myfamlist1);
-			}
-		}
-		else {
-			if ($findindis) $myindilist = SearchFunctions::SearchIndisDates($dd, $calendar_controller->month, "", $selindifacts);
-			if ($findfams) $myfamlist = SearchFunctions::SearchFamsDates($dd, $calendar_controller->month, "", $selfamfacts);
-        }
-
-		if (GedcomConfig::$USE_RTL_FUNCTIONS && isset($queryhb) && $calendar_controller->action!="year") {
-			if ($findindis) {
-				$myindilist1 = SearchFunctions::SearchIndis($queryhb);
-				$myindilist = GmArrayMerge($myindilist, $myindilist1);
-			}
-			
-			if ($findfams) {
-				$myfamlist1 = SearchFunctions::SearchFams($queryhb);
-				$myfamlist = GmArrayMerge($myfamlist, $myfamlist1);
-			}
-		}	
-	}
-	if (isset($query1)) {
-		$query = $query1;
-		$calendar_controller->pregquery = $pregquery1;
-	}
+	$calendar_controller->GetDayYearLists();
 	
- //print "indicount: ".count($myindilist)."<br />";
- //print "famcount: ".count($myfamlist)."<br />";
-
-	uasort($myindilist, "ItemSort");
-	if ($calendar_controller->filtersx == "") uasort($myfamlist, "ItemSort");
 	$count_private_indi = array();
+	$indi_printed = array();
 	$count_indi = 0;
 	$count_male = 0;
 	$count_female = 0;
 	$count_unknown = 0;
 	$text_indi = "";
 	$sx = 1;
-	if ($calendar_controller->filterev == "bdm") $select = array("BIRT", "DEAT");
+	$index = 0;
+	if ($calendar_controller->filterev == "bdm") $select = array("BIRT", "DEAT", "MARR");
 	else if ($calendar_controller->filterev == "all") $select = "";
 	else $select = array($calendar_controller->filterev);
-	foreach($myindilist as $gid=>$indi) {
-		if ((($calendar_controller->filterof == "living" && !$indi->isdead) || $calendar_controller->filterof != "living") && (($calendar_controller->filtersx != "") && $indi->sex == $calendar_controller->filtersx) || $calendar_controller->filtersx == "") {
-			$filterout=false;
+ 	//print "selectfacts: ".$select."<br />";
+	foreach($calendar_controller->myindilist as $gid=>$indi) {
+		//print $indi->name.$indi->addxref."<br />";
+		if ((($calendar_controller->filterof == "living" && !$indi->isdead) || $calendar_controller->filterof != "living") && (($calendar_controller->filtersx != "" && $indi->sex == $calendar_controller->filtersx) || $calendar_controller->filtersx == "") && !isset($indi_printed[$indi->key])) {
+			$indi_printed[$indi->key] = true;
 			$text_fact = "";
+			if ($calendar_controller->filtersx != "" && $findfams) $indi->AddFamilyFacts(false);
 			$indifacts = $indi->SelectFacts($select, true);
 			//print "check ".$indi->xref." ".$indi->name."<br >";
-			foreach($indifacts as $index => $factobj) {
-				//print "check ".$factobj->fact."<br />";
-				$text_temp = "";
-				
-				$t1 = preg_match("/2 DATE.*DHEBREW.* (\d\d\d\d|\d\d\d)/i", $factobj->factrec, $m1);
-				if (GedcomConfig::$USE_RTL_FUNCTIONS && $calendar_controller->action == "year" && isset($hendyear) && $hendyear > 0 && $t1 > 0) {
-					if ($m1[1] == $hstartyear || $m1[1] == $hendyear) {
-						// verify if the date falls within the first or the last range gregorian year @@@@ !!!!
-						$fdate = $factobj->datestring;
-						if ($fdate != "") {
-							$hdate = ParseDate(trim($fdate));
-							$gdate = JewishGedcomDateToGregorian($hdate);
-
-                    	    $gyear = $gdate[0]["year"]; 
-
-							if ($gyear >= $calendar_controller->gstartyear && $gyear <= $calendar_controller->gendyear) $hprocess=true;
-							else $hprocess=false;
-						}
-						else $hprocess=false;
-					}
-					else if ($m1[1]>$hstartyear && $m1[1]<$hendyear) $hprocess = true;
-					     else $hprocess=false;
-					if ($hprocess) $text_temp .= FactFunctions::GetCalendarFact($factobj, $calendar_controller->action, $calendar_controller->filterof, $calendar_controller->filterev, $calendar_controller->year, $calendar_controller->month, $calendar_controller->day, $calendar_controller->CalYear, $calendar_controller->currhYear);
-					else $text_temp .="filter";
-				}
-				else 
-				if ($calendar_controller->endyear > 0) {
-					$t1 = preg_match("/2 DATE.* (\d\d\d\d|\d\d\d)/i", $factobj->factrec, $m1);
-					if (($t1 > 0) && ($m1[1] >= $calendar_controller->startyear) && ($m1[1] <= $calendar_controller->endyear)){
-						$text_temp .= FactFunctions::GetCalendarFact($factobj, $calendar_controller->action, $calendar_controller->filterof, $calendar_controller->filterev, $calendar_controller->year, $calendar_controller->month, $calendar_controller->day, $calendar_controller->CalYear, $calendar_controller->currhYear);
-					}
-				}
-				else {
-					$ct = preg_match("/$calendar_controller->pregquery/i", $factobj->factrec, $match);
-					if ($calendar_controller->action == "year"){
-						if ($ct == 0){
-							$cb = preg_match("/2 DATE[^\n]*(bet)/i", $factobj->factrec, $m1);
-							if ($cb>0) {
-								$cy = preg_match("/DATE.* [\d]{3,4}/i", $factobj->factrec, $m2);
-								if ($cy>0) {
-									$numbers = preg_split("/[^\d]{4,9}/i", $m2[0]);
-									$years = array();
-									if (count($numbers) > 2){
-										$y=0;
-										foreach($numbers as $key => $value) {
-											if (!($value > 0 && $value < 32) && $value != ""){
-												$years[$y] = $value;
-												$y++;
-											}
-										}
-									}
-									if (!isset($years[0])) $years[0] = 0;
-									if (!isset($years[1])) $years[1] = 0;
-									if ($years[0] < $calendar_controller->year && $years[1] > $calendar_controller->year) $ct = 1;
-									else $text_temp .= "filter";
-								}
-								else $text_temp .= "filter";
-							}
-						}
-					}
-					if ($ct < 1 && GedcomConfig::$USE_RTL_FUNCTIONS && isset($preghbquery)) $ct = preg_match("/$preghbquery/i", $factobj->factrec, $match);
-					if ($calendar_controller->action == "year"){
-						if ($ct == 0){
-							$cb = preg_match("/2 DATE[^\n]*(bet)/i", $factobj->factrec, $m1);
-							if ($cb>0) {
-								$cy = preg_match("/DATE.* [\d]{3,4}/i", $factobj->factrec, $m2);
-								if ($cy>0) {											
-									$numbers = preg_split("/[^\d]{4,9}/i", $m2[0]);
-									$years = array();
-									if (count($numbers) > 2){
-										$y = 0;
-										foreach($numbers as $key => $value) {
-											if (!($value > 0 && $value < 32) && $value != ""){
-												$years[$y]=$value;
-												$y++;
-											}
-										}
-									}
-									if (!isset($years[0])) $years[0] = 0;
-									if (!isset($years[1])) $years[1] = 0;
-									if ($years[0] < $calendar_controller->year && $years[1] > $calendar_controller->year) $ct = 1;
-									else $text_temp .= "filter";
-								}
-								else $text_temp .= "filter";
-									
-							}
-						}
-					}
-					if ($ct > 0) $text_temp .= FactFunctions::GetCalendarFact($factobj, $calendar_controller->action, $calendar_controller->filterof, $calendar_controller->filterev, $calendar_controller->year, $calendar_controller->month, $calendar_controller->day, $calendar_controller->CalYear, $calendar_controller->currhYear);
-                }						
- 				if ($text_temp == "filter") $filterout = true; 
- 				else if ($text_temp == "filterfilter") $filterout = true;
-				else $text_fact .= $text_temp;
-			} // end fact loop
-			//print $text_fact."<br />";
-//print "owner: ".$factobj->owner->xref." fact: ".$factobj->factrec." ".$text_temp."<br />";
+			$text_fact = $calendar_controller->GetDateFacts($indifacts);
 			if (!empty($text_fact)) {
-				
+				$index++;
 				// $text_indi .= "<tr><td>";
 				$text_indi .= "<li><a href=\"individual.php?pid=".$indi->xref."&amp;gedid=".$indi->gedcomid."\"><b>";
 				$text_indi .= $indi->revname;
@@ -472,105 +291,12 @@ if ($calendar_controller->action == "today" || $calendar_controller->action == "
 	else if ($calendar_controller->filterev == "all") $select = "";
 	else $select = array($calendar_controller->filterev);
 	if ($calendar_controller->filtersx == "") {
-		foreach($myfamlist as $gid=>$fam) {
-			$display=true;
-			if ($calendar_controller->filterof=="living") {
-				if (($fam->husb_id != "" && !$fam->husb->isdead) && ($fam->wife_id != "" && !$fam->wife->isdead)) $display = true;
-				else $display = false;
-			}
-  			if ($display) {
+		foreach($calendar_controller->myfamlist as $gid => $fam) {
+			if ($calendar_controller->filterof != "living" || (($fam->husb_id == "" || !$fam->husb->isdead) && ($fam->wife_id == "" || !$fam->wife->isdead))) {
 				$filterout=false;
 				$text_fact = "";
 				$famfacts = $fam->SelectFacts($select, true);
-				foreach ($famfacts as $index => $factobj) {
-					$text_temp = "";
-					$t1 = preg_match("/2 DATE.*DHEBREW.* (\d\d\d\d|\d\d\d)/i", $factobj->factrec, $m1);
-					if (GedcomConfig::$USE_RTL_FUNCTIONS && $calendar_controller->action == "year" && isset($hendyear) && $hendyear>0 && $t1>0) {
-						if ($m1[1]==$hstartyear || $m1[1]==$hendyear) {
-						// verify if the date falls within the first or the last range gregorian year @@@@ !!!!
-						// find gregorian year of the fact hebrew date
-							$fdate = $factobj->datestring;
-							if ($fdate != "") {
-								$hdate = ParseDate(trim($fdate));
-								$gdate = JewishGedcomDateToGregorian($hdate);
-
-                        	    $gyear = $gdate[0]["year"]; 
-
-								if ($gyear >= $calendar_controller->gstartyear && $gyear <= $calendar_controller->gendyear) $hprocess=true;
-								else $hprocess=false;
-							}
-							else $hprocess=false;
-						}
-						else if ($m1[1]>$hstartyear && $m1[1]<$hendyear) $hprocess = true;
-						     else $hprocess=false;
-						if ($hprocess) $text_temp .= FactFunctions::GetCalendarFact($factobj, $calendar_controller->action, $calendar_controller->filterof, $calendar_controller->filterev, $calendar_controller->year, $calendar_controller->month, $calendar_controller->day, $calendar_controller->CalYear, $calendar_controller->currhYear);
-                        else $text_temp = "filter";
-					}
-				    else 
-					if ($calendar_controller->endyear > 0){
-						$t1 = preg_match("/2 DATE.* (\d\d\d\d|\d\d\d)/i", $factobj->factrec, $m1);
-						if (($t1 > 0) && ($m1[1] >= $calendar_controller->startyear) && ($m1[1] <= $calendar_controller->endyear)){
-							$text_temp .= FactFunctions::GetCalendarFact($factobj, $calendar_controller->action, $calendar_controller->filterof, $calendar_controller->filterev, $calendar_controller->year, $calendar_controller->month, $calendar_controller->day, $calendar_controller->CalYear, $calendar_controller->currhYear);
-						}
-					}
-					else {
-						$ct = preg_match("/$calendar_controller->pregquery/i", $factobj->factrec, $match);
-						if ($calendar_controller->action == "year"){
-							if ($ct == 0){
-								$cb = preg_match("/2 DATE[^\n]*(bet)/i", $factobj->factrec, $m1);
-								if ($cb > 0) {
-									$cy = preg_match("/DATE.* [\d]{3,4}/i", $factobj->factrec, $m2);
-									if ($cy > 0) {
-										$numbers = preg_split("/[^\d]{4,9}/i", $m2[0]);
-										$years= array();
-										if (count($numbers) > 2){
-											$y=0;
-											foreach($numbers as $key => $value) {
-												if (!($value > 0 && $value < 32) && $value != ""){
-													$years[$y] = $value;
-													$y++;
-												}
-											}
-										}
-										if (!isset($years[0])) $years[0] = 0;
-										if (!isset($years[1])) $years[1] = 0;
-										if ($years[0] < $calendar_controller->year && $years[1] > $calendar_controller->year) $ct = 1;
-										else $text_temp="filter";
-									}
-								}
-							}
-						}
-						if ($ct < 1 && GedcomConfig::$USE_RTL_FUNCTIONS && isset($preghbquery)) $ct = preg_match("/$preghbquery/i", $factobj->factrec, $match);
-						if ($calendar_controller->action == "year"){
-							if ($ct == 0){
-								$cb = preg_match("/2 DATE[^\n]*(bet)/i", $factobj->factrec, $m1);
-								if ($cb > 0) {
-									$cy = preg_match("/DATE.* [\d]{3,4}/i", $factobj->factrec, $m2);
-									if ($cy > 0) {
-										$numbers = preg_split("/[^\d]{4,9}/i", $m2[0]);
-										$years = array();
-										if (count($numbers) > 2){
-											$y = 0;
-											foreach($numbers as $key => $value) {
-												if (!($value > 0 && $value < 32) && $value != ""){
-													$years[$y] = $value;
-													$y++;
-												}
-											}
-										}
-										if (!isset($years[0])) $years[0] = 0;
-										if (!isset($years[1])) $years[1] = 0;
-										if ($years[0] < $calendar_controller->year && $years[1] > $calendar_controller->year) $ct = 1;
-										else $text_temp = "filter";
-									}
-								}
-							}
-						}
-						if ($ct>0) $text_temp .= FactFunctions::GetCalendarFact($factobj, $calendar_controller->action, $calendar_controller->filterof, $calendar_controller->filterev, $calendar_controller->year, $calendar_controller->month, $calendar_controller->day, $calendar_controller->CalYear, $calendar_controller->currhYear);
-					}
-					if ($text_temp == "filter") $filterout = true;
-					else $text_fact .= $text_temp;
-				} // end loop famfacts
+				$text_fact = $calendar_controller->GetDateFacts($famfacts);
 				if (!empty($text_fact) && $fam->disp) {
 					$text_fam .= "<li><a href=\"family.php?famid=".$fam->xref."&amp;gedid=".$fam->gedcomid."\"><b>";
 					$text_fam .= $fam->sortable_name;
@@ -690,104 +416,8 @@ else if ($calendar_controller->action == "calendar") {
 		if ($j>6) $j=0;
 	}
 	print "\t</tr>\n";
-	$monthstart 	= adodb_mktime(1,0,0,$monthtonum[strtolower($calendar_controller->month)],1,$calendar_controller->year);
-	$startday 		= adodb_date("w", $monthstart);
-	$endday 		= adodb_dow($calendar_controller->year,$monthtonum[strtolower($calendar_controller->month)],adodb_date("t", $monthstart));
-	$lastday		= adodb_date("t", $monthstart);
-	$mmon 			= strtolower(adodb_date("M", $monthstart));
-	$monthstart 	= $monthstart-(60*60*24*$startday);
-	if($WEEK_START<=$startday)
-		$monthstart += $WEEK_START*(60*60*24);
-	else //week start > $startday
-		$monthstart -= (7-$WEEK_START)*(60*60*24);
-	if (($endday == 6 && $WEEK_START == 0) || ($endday == 0 && $WEEK_START == 1)) $show_no_day = 0;
-	else $show_no_day=6;
-	if ((($startday==0 && $WEEK_START == 0) || ($startday == 2 && $WEEK_START == 1)) && $show_no_day == 0) $show_no_day = 6;
+	$calendar_controller->GetCalendarLists();
 	$show_not_set = false;
-	$lastday -= 29;   
-	if ($lastday < 0) $lastday = 0;
-	$myindilist = array();
-	$myfamlist = array();
-	$calendar_controller->pregquery = "2 DATE[^\n]*".$mmon;
-	$query = "2 DATE[^\n]*".$mmon;
-
-	$fact = "";	
-
-	$famfacts = array("_COML", "MARR", "DIV", "EVEN");
-	$findindis = true;
-	$findfams = true;
-	if ($calendar_controller->filterev == "bdm") $fact = "('BIRT', 'DEAT', 'MARR')";
-	else if ($calendar_controller->filterev != "all" && !empty($calendar_controller->filterev)) {
-		$fact = "('".$calendar_controller->filterev."')";
-		if (in_array($calendar_controller->filterev, $famfacts)) $findindis = false;
-		else $findfams = false;
-	}
-	else $fact = "";
-	
-	if ($findindis) $myindilist = SearchFunctions::SearchIndisDates("", $mmon, "", $fact);
-	if ($findfams) $myfamlist = SearchFunctions::SearchFamsDates("", $mmon, "", $fact);
-
-	if (GedcomConfig::$USE_RTL_FUNCTIONS) {
-		$datearray[0]["day"]   = 01;
- 		$datearray[0]["mon"]   = $monthtonum[Str2Lower($calendar_controller->month)];	
- 		$datearray[0]["year"]  = $calendar_controller->year;
- 		$datearray[0]["month"] = $calendar_controller->month;
- 		$datearray[1]["day"]   = 15;
- 		$datearray[1]["mon"]   = $monthtonum[Str2Lower($calendar_controller->month)];	
- 		$datearray[1]["year"]  = $calendar_controller->year;
- 		$datearray[1]["month"] = $calendar_controller->month;
- 		$datearray[2]["day"]   = adodb_date("t", $monthstart);
- 		$datearray[2]["mon"]   = $monthtonum[Str2Lower($calendar_controller->month)];	
- 		$datearray[2]["year"]  = $calendar_controller->year;
- 		$datearray[2]["month"] = $calendar_controller->month;
-
-		$date   = GregorianToJewishGedcomDate($datearray);
-		$HBMonth1 = $date[0]["month"];
-		$HBYear1  = $date[0]["year"];
-		$HBMonth2 = $date[1]["month"];
-		$HBMonth3 = $date[2]["month"];
-		
-		$preghbquery1 = "2 DATE[^\n]*$HBMonth1";
-		$query1 = "2 DATE[^\n]*$HBMonth1";
-		
-		if ($findindis) $myindilist1 = SearchFunctions::SearchIndisDates("", $HBMonth1, "", $fact);
-		if ($findfams) $myfamlist1 = SearchFunctions::SearchFamsDates("", $HBMonth1, "", $fact);
-			
-		if ($findindis) $myindilist = GmArrayMerge($myindilist, $myindilist1);
-		if ($findfams) $myfamlist  = GmArrayMerge($myfamlist, $myfamlist1);
-		
-		if ($HBMonth1 != $HBMonth2) {		
-			$preghbquery2 = "2 DATE[^\n]*$HBMonth2";
-				
-			if ($findindis) $myindilist1 = SearchFunctions::SearchIndisDates("", $HBMonth2, "", $fact);
-			if ($findfams) $myfamlist1 = SearchFunctions::SearchFamsDates("", $HBMonth2, "", $fact);
-			
-			if ($findindis) $myindilist = GmArrayMerge($myindilist, $myindilist1);
-			if ($findfams) $myfamlist  = GmArrayMerge($myfamlist, $myfamlist1);
-		}
-		
-		if ($HBMonth2 != $HBMonth3) {		
-			$preghbquery3 = "2 DATE[^\n]*$HBMonth3";
-				
-			if ($findindis) $myindilist1 = SearchFunctions::SearchIndisDates("", $HBMonth3, "", $fact);
-			if ($findfams) $myfamlist1 = SearchFunctions::SearchFamsDates("", $HBMonth3, "", $fact);
-			
-			if ($findindis) $myindilist = GmArrayMerge($myindilist, $myindilist1);
-			if ($findfams) $myfamlist  = GmArrayMerge($myfamlist, $myfamlist1);
-		}
-		
-		if (!IsJewishLeapYear($HBYear1) && ($HBMonth1 == "adr" || $HBMonth2 == "adr" || $HBMonth3 == "adr")) {
-			$HBMonth4 = "ads"; 
-		
-			if ($findindis) $myindilist1 = SearchFunctions::SearchIndisDates("", $HBMonth4, "", $fact);
-			if ($findfams) $myfamlist1 = SearchFunctions::SearchFamsDates("", $HBMonth4, "", $fact);
-			
-			if ($findindis) $myindilist = GmArrayMerge($myindilist, $myindilist1);
-			if ($findfams) $myfamlist  = GmArrayMerge($myfamlist, $myfamlist1);
-		}
-	}
-	
-	uasort($myindilist, "ItemSort");
 	for($k=0; $k<6; $k++) {
 		print "\t<tr>\n";
 		for($j=0; $j<7; $j++) {
@@ -795,11 +425,11 @@ else if ($calendar_controller->action == "calendar") {
 			$mmon = strtolower(adodb_date("M", $monthstart));
 
 			print "\t\t<td class=\"shade1 wrap\">\n";
-			if ($show_no_day == 0 && $j == 0 && $k == 0) $show_not_set = true;
-			else if ($show_no_day == $k && $j == 6) $show_not_set = true;
+			if ($calendar_controller->show_no_day == 0 && $j == 0 && $k == 0) $show_not_set = true;
+			else if ($calendar_controller->show_no_day == $k && $j == 6) $show_not_set = true;
 			if ($mmon == strtolower($calendar_controller->month) || $show_not_set) {
 				if ($show_not_set) {
-					$calendar_controller->pregquery = "2 DATE(|[^\n]*[^\d]+|[^\n]*([ |0]0)|[^\n]*3[$lastday-9]|[^\n]*[4-9][0-9]) $calendar_controller->month";
+					$calendar_controller->pregquery = "2 DATE(|[^\n]*[^\d]+|[^\n]*([ |0]0)|[^\n]*3[$calendar_controller->lastday-9]|[^\n]*[4-9][0-9]) $calendar_controller->month";
 					
 					// I see April 1973 in 2004 both correctly in April and in March with another event
 
@@ -937,7 +567,7 @@ else if ($calendar_controller->action == "calendar") {
 				if ($calendar_controller->filterev == "bdm") $select = array("BIRT", "DEAT");
 				else if ($calendar_controller->filterev == "all") $select = "";
 				else $select = array($calendar_controller->filterev);
-				foreach($myindilist as $gid=>$indi) {
+				foreach($calendar_controller->myindilist as $gid=>$indi) {
 			
 					if ((($calendar_controller->filterof == "living" && !$indi->isdead) || $calendar_controller->filterof != "living") && (($calendar_controller->filtersx != "" && $indi->sex == $calendar_controller->filtersx) || $calendar_controller->filtersx == "")) {
 						
@@ -977,13 +607,13 @@ else if ($calendar_controller->action == "calendar") {
 					}
 				}
 				$dayfamlist = array();
-				reset($myfamlist);
+//				reset($calendar_controller->myfamlist);
 				$count_private_fam = 0;
 				if ($calendar_controller->filterev == "bdm") $select = array("MARR");
 				else if ($calendar_controller->filterev == "all") $select = "";
 				else $select = array($calendar_controller->filterev);
 				if ($calendar_controller->filtersx == ""){
-					foreach($myfamlist as $gid=>$fam) {
+					foreach($calendar_controller->myfamlist as $gid=>$fam) {
 						$display = true;
 						if ($calendar_controller->filterof == "living"){
 							if (($fam->husb_id != "" && $fam->husb->isdead) || ($fam->wife_id != "" && $fam->wife->isdead)) $display=false;
@@ -1034,8 +664,8 @@ else if ($calendar_controller->action == "calendar") {
 						print " >".GM_LANG_day_not_set."</span>";
 						print "<br style=\"clear: both\" />";
 					}
-					$show_not_set=false;
-					$show_no_day=-1;
+					$show_not_set = false;
+					$calendar_controller->show_no_day = -1;
 				}
 				print "<div id=\"day$k-$j\" class=\"details1\" style=\"width: 120px; height: ";
 				if ($view=="preview") print "100%;";
@@ -1059,11 +689,11 @@ else if ($calendar_controller->action == "calendar") {
 			$monthstart+=(60*60*24);
 			$mmon = strtolower(adodb_date("M", $monthstart));
 			if (($mmon!=strtolower($calendar_controller->month)) && ($k>2)) {
-				if ($show_no_day==6){
-					$show_no_day=$k;
-					if ($j==6) $show_no_day++;
+				if ($calendar_controller->show_no_day == 6){
+					$calendar_controller->show_no_day = $k;
+					if ($j==6) $calendar_controller->show_no_day++;
 				}
-				else if ($show_no_day<0) $k=6;
+				else if ($calendar_controller->show_no_day < 0) $k=6;
 			}
 		} //-- end day for loop
 		print "\t</tr>\n";
@@ -1072,8 +702,8 @@ else if ($calendar_controller->action == "calendar") {
 }
 if ($view=="preview"){
 	if (isset($gid)) {
-		if (isset($myindilist[$gid]["gedfile"])) $showfile=$myindilist[$gid]["gedfile"];
-		else $showfile=$myfamlist[$gid]["gedfile"];
+		if (isset($calendar_controller->myindilist[$gid]["gedfile"])) $showfile = $calendar_controller->myindilist[$gid]["gedfile"];
+		else $showfile = $calendar_controller->myfamlist[$gid]["gedfile"];
 	}
 	else $showfile = GedcomConfig::$GEDCOMID;
 	$showfilter="";
