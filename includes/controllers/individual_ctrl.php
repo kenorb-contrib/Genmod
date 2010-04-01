@@ -184,11 +184,10 @@ class IndividualController extends DetailController {
 					// new from here
 					$media =& MediaItem::GetInstance($firstmediarec["id"]);
 					if (GedcomConfig::$USE_THUMBS_MAIN && $firstmediarec["use_thum"] != "Y") $filename = $media->fileobj->f_thumb_file;
-					else $filename = $media->fileobj->f_main_file;
+					else $filename = ($media->fileobj->f_file_exists ? $media->fileobj->f_main_file : $media->fileobj->f_thumb_file);
 					if ($media->fileobj->f_height != 0 && $media->fileobj->f_height < 150) $height = $media->fileobj->f_height;
 					else $height = 150;
-					if ($media->fileobj->f_file_exists) $this->HighlightedObject = '<img src="'.$filename.'" class="image" height="'.$height.'" alt="'.$media->title.'" />';
-					else $this->HighlightedObject = "";
+					$this->HighlightedObject = '<img src="'.$filename.'" class="image" height="'.$height.'" alt="'.$media->title.'" />';
 					$this->canshowhighlightedobj = true;
 				}
 				else $this->canshowhighlightedobj = false;

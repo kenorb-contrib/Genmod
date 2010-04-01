@@ -269,7 +269,7 @@ class MFile {
 				return $this->f_is_image;
 				break;
 			case "f_file_exists":
-				return $this->f_thumb_file;
+				return $this->f_file_exists;
 				break;
 			case "f_link":
 				return $this->f_link;

@@ -643,10 +643,7 @@ abstract class SearchFunctions {
 	
 	/**
 	 * Search the database for individuals that match the query
-	 * Used in:	calendar.php
-	 *			find.php
-	 *			search.php
-	 *			reportpdf.php
+	 * Used in:	reportpdf.php
 	 *
 	 * uses a regular expression to search the gedcom records of all individuals and returns an
 	 * array list of the matching individuals
@@ -709,10 +706,7 @@ abstract class SearchFunctions {
 	
 	/**
 	 * Search through the gedcom records for families with daterange
-	 * Used in:	calendar.php
-	 *			find.php
-	 *			search.php
-	 *			reportpdf.php
+	 * Used in:	reportpdf.php
 	 * @package Genmod
 	 * @subpackage Calendar
 	**/
@@ -785,7 +779,7 @@ abstract class SearchFunctions {
 	 * @param	boolean $allgeds setting if all gedcoms should be searched, default is false
 	 * @return	array $myindilist array with all individuals that matched the query
 	 */
-	public function SearchIndisDates($day="", $month="", $year="", $fact="", $allgeds=false, $ANDOR="AND") {
+	public function SearchIndisDates($day="", $month="", $year="", $fact="", $startyear="", $allgeds=false, $ANDOR="AND") {
 		
 		$myindilist = array();
 		
@@ -801,6 +795,10 @@ abstract class SearchFunctions {
 		}
 		if (!empty($year)) {
 			$sql .= $and." d_year='".DbLayer::EscapeQuery($year)."'";
+			$and = " AND";
+		}
+		if (!empty($startyear)) {
+			$sql .= $and." d_year>='".DbLayer::EscapeQuery($startyear)."'";
 			$and = " AND";
 		}
 
@@ -846,7 +844,7 @@ abstract class SearchFunctions {
 	 * @param	boolean $allgeds setting if all gedcoms should be searched, default is false
 	 * @return	array $myfamlist array with all individuals that matched the query
 	 */
-	public function SearchFamsDates($day="", $month="", $year="", $fact="", $allgeds=false) {
+	public function SearchFamsDates($day="", $month="", $year="", $fact="", $startyear="", $allgeds=false) {
 		global $GEDCOMS;
 		$myfamlist = array();
 		
@@ -854,6 +852,7 @@ abstract class SearchFunctions {
 		if (!empty($day)) $sql .= " AND d_day='".DbLayer::EscapeQuery($day)."'";
 		if (!empty($month)) $sql .= " AND d_month='".DbLayer::EscapeQuery(Str2Upper($month))."'";
 		if (!empty($year)) $sql .= " AND d_year='".DbLayer::EscapeQuery($year)."'";
+		if (!empty($startyear)) $sql .= "AND d_year>='".DbLayer::EscapeQuery($startyear)."'";
 		if (!empty($fact)) {
 			$sql .= " AND d_fact IN ".$fact;
 		}

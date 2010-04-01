@@ -102,18 +102,13 @@ foreach($mediacontroller->medialist as $index => $mediaitem) {
 	print '<td class="list_value wrap width50">';
 	print '<table class="'.$TEXT_DIRECTION.'"><tr><td valign="top" class="wrap">';
 
-	if (USE_GREYBOX && $mediaitem->fileobj->f_is_image) print "<a href=\"".FilenameEncode($mediaitem->fileobj->f_main_file)."\" title=\"".$mediaitem->title."\" rel=\"gb_imageset[]\">";
-	else print "<a href=\"#\" onclick=\"return openImage('".$mediaitem->fileobj->f_main_file."','".$mediaitem->fileobj->f_width."','".$mediaitem->fileobj->f_height."','".$mediaitem->fileobj->f_is_image."');\">";
-	// NOTE: print the thumbnail
-	print '<img src="'.$mediaitem->fileobj->f_thumb_file.'" border="0" align="left" class="thumbnail" alt="" />';
-	if (GedcomConfig::$MEDIA_EXTERNAL || $mediaitem->fileobj->f_file_exists) print "</a>";
+	MediaFS::DispImgLink($mediaitem->fileobj->f_main_file, $mediaitem->fileobj->f_thumb_file, $mediaitem->title, "", 0, 0, $mediaitem->fileobj->f_width, $mediaitem->fileobj->f_height, $mediaitem->fileobj->f_is_image, $mediaitem->fileobj->f_file_exists);
 	print '</td><td class="list_value wrap width100" style="border: none;">';
 
 	if (!GedcomConfig::$MEDIA_EXTERNAL && !$mediaitem->fileobj->f_file_exists);
-//	else print '<a href="#" onclick="return openImage(\''.urlencode($mediaitem->fileobj->f_file).'\','.$mediaitem->fileobj->f_width.','.$mediaitem->fileobj->f_height.');">';
 	else print "<a href=\"mediadetail.php?mid=".$mediaitem->xref."\">";
 
-	if ($mediaitem->title==$mediaitem->filename) print '<b>&lrm;'.$mediaitem->title.'</b>';
+	if ($mediaitem->title == $mediaitem->filename) print '<b>&lrm;'.$mediaitem->title.'</b>';
 	else if ($mediaitem->title != "") print '<b>'.PrintReady($mediaitem->title).'</b>';
 	else print '<b>'.PrintReady($mediaitem->filename).'</b>';
 	

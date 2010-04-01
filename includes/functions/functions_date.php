@@ -505,9 +505,8 @@ function GetTurkishDate($datestr) {
  * @param string $datestr the date string (ie everything after the DATE tag)
  * @return string the new date string
  */
-function GetChangedDate($datestr) {
+function GetChangedDate($datestr, $CalYear="") {
 	global $DATE_FORMAT, $LANGUAGE, $monthtonum, $dHebrew;
-	global $CalYear;   //-- Hebrew calendar year
 
 	$checked_dates = array();
 
@@ -734,9 +733,8 @@ function GetChangedDate($datestr) {
  * @param string $datestr the date string (ie everything after the DATE tag)
  * @return string a converted date with anchor html tags around it <a href="">date</a>
  */
-function GetDateUrl($datestr){
+function GetDateUrl($datestr, $CalYear=""){
 	global $monthtonum;
-	global $CalYear;   //-- Hebrew calendar year
 	
     if (!stristr($datestr, "#DHEBREW") || GedcomConfig::$USE_RTL_FUNCTIONS) {
 

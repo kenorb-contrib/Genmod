@@ -44,18 +44,13 @@ class CalendarController extends ChartController {
 	
 	// Internal values
 	private $hebrewfound = null;					// Check if any dates are in hebrew
-	public $datearray = null;						// Array to keep the dates to be converted to Hebrew etc. =>not called from calendar
-	public $date = null;							// Array to keep the dates converted to Hebrew etc. =>not called from calendar
+	private $datearray = null;						// Array to keep the dates to be converted to Hebrew etc. =>not called from calendar
+	private $date = null;							// Array to keep the dates converted to Hebrew etc. =>not called from calendar
 	private $hDay = null;							// (First) day of date entered in Hebrew
 	private $hMonth = null;							// (First) month of date entered in Hebrew
 	private $hYear = null;							// (First) year of date entered in Hebrew
 	private $year_text = null;						// Year (range) to print in the titlebar =>not called from calendar
-	private $gstartyear = null;						// First year of year range
-	private $gendyear = null;						// Last year of year range
 	private $m_days = null;							// Number of days in the selected month
-	private $year_query = null;						// Query to match fact dates after retrieval of indi's/fams
-	private $query = null;							// Query to match fact dates after retrieval of indi's/fams =>not called from calendar
-	private $pregquery = null;						// Query to match fact dates after retrieval of indi's/fams
 	private $CalYear = null;					
 	private $currhDay = null;					
 	private $currhMonth = null;					
@@ -149,32 +144,8 @@ class CalendarController extends ChartController {
 			case "filterof":
 				return $this->filterof;
 				break;
-			case "year_query":
-				return $this->year_query;
-				break;
 			case "lastday":
 				return $this->lastday;
-				break;
-			case "startyear":
-				return $this->startyear;
-				break;
-			case "endyear":
-				return $this->endyear;
-				break;
-			case "hstartyear":
-				return $this->hstartyear;
-				break;
-			case "hendyear":
-				return $this->hendyear;
-				break;
-			case "gstartyear":
-				return $this->gstartyear;
-				break;
-			case "gendyear":
-				return $this->gendyear;
-				break;
-			case "pregquery":
-				return $this->pregquery;
 				break;
 			case "show_no_day":
 				return $this->show_no_day;
@@ -193,9 +164,6 @@ class CalendarController extends ChartController {
 				break;
 			case "hDay":
 				return $this->hDay;
-				break;
-			case "hMonth":
-				return $this->hMonth;
 				break;
 			case "hYear":
 				return $this->hYear;
@@ -226,41 +194,8 @@ class CalendarController extends ChartController {
 			case "show_no_day":
 				$this->show_no_day = $value;
 				break;
-//			case "year_text":
-//				$this->year_text = $value;
-//				break;
-			case "pregquery":
-				$this->pregquery = $value;
-				break;
-//			case "CalYear":
-//				$this->CalYear = $value;
-//				break;
-//			case "currhYear":
-//				$this->currhYear = $value;
-//				break;
-//			case "currhMonth":
-//				$this->currhMonth = $value;
-//				break;
-//			case "currhDay":
-//				$this->currhDay = $value;
-//				break;
-			case "hYear":
-				$this->hYear = $value;
-				break;
-//			case "hMonth":
-//				$this->hMonth = $value;
-//				break;
-			case "hDay":
-				$this->hDay = $value;
-				break;
 			case "day":
 				$this->day = $value;
-				break;
-//			case "month":
-//				$this->month = $value;
-//				break;
-			case "year":
-				$this->year = $value;
 				break;
 			default:
 				parent::__set($property, $value);
@@ -332,16 +267,12 @@ class CalendarController extends ChartController {
 				$this->m_days = 28;
 				if ($this->day >= '28') {
 					$this->day = "28";
-					$this->pregquery = "2 DATE[^\n]*2[8|9] ".$this->month;
-					$this->query = "2 DATE[^\n]*2[8|9] ".$this->month;
 				}
 			}
 			else {
 				$this->m_days = 29;
 				if ($this->day >= '29') {
 					$this->day = "29";
-					$this->pregquery = "2 DATE[^\n]*29 ".$this->month;
-					$this->query = "2 DATE[^\n]*29 ".$this->month;
 				}
 			}
 		}
@@ -349,21 +280,9 @@ class CalendarController extends ChartController {
 			$this->m_days = 30;
 			if ($this->day >= '30') {
 				$this->day = "30";
-				$this->pregquery = "2 DATE[^\n]*30 ".$this->month;
-				$this->query = "2 DATE[^\n]*30 ".$this->month;
 			}
 		}
 		
-		if (!isset($this->query)) {
-			if ($this->day < 10) {
-				$this->pregquery = "2 DATE[^\n]*[ |0]".$this->day." ".$this->month;
-				$this->query = "2 DATE[^\n]*[ |0]".$this->day." ".$this->month;
-			}
-			else {
-				$this->pregquery = "2 DATE[^\n]*".$this->day." ".$this->month;
-				$this->query = "2 DATE[^\n]*".$this->day." ".$this->month;
-			}
-		}
 		if (GedcomConfig::$USE_RTL_FUNCTIONS) {
 			
 			$this->datearray = array();
@@ -410,7 +329,6 @@ class CalendarController extends ChartController {
 		 		$this->datearray[4]["day"]   = 31;
 		 		$this->datearray[4]["mon"]   = 12;	
 		 		$this->datearray[4]["year"]  = $this->endyear;
-		// print "gstart: ".$this->gstartyear." ".$this->gendyear; 	
 			}
 		    $this->date   	= GregorianToJewishGedcomDate($this->datearray);
 		    $this->hDay   	= $this->date[0]["day"];
@@ -570,8 +488,8 @@ class CalendarController extends ChartController {
 			}
 		}
 		if ($this->action == "today") {
-			if ($findindis) $this->myindilist = SearchFunctions::SearchIndisDates($this->day, $this->month, "", $selindifacts);
-			if ($findfams) $this->myfamlist = SearchFunctions::SearchFamsDates($this->day, $this->month, "", $selfamfacts);
+			if ($findindis) $this->myindilist = SearchFunctions::SearchIndisDates($this->day, $this->month, "", $selindifacts, ($this->filterof == "recent" ? ($this->startyear-100) : ""));
+			if ($findfams) $this->myfamlist = SearchFunctions::SearchFamsDates($this->day, $this->month, "", $selfamfacts, ($this->filterof == "recent" ? ($this->startyear-100) : ""));
 			
 			if (GedcomConfig::$USE_RTL_FUNCTIONS) {
 				if ($findindis) {
@@ -581,16 +499,10 @@ class CalendarController extends ChartController {
 				
 				if ($findfams) {
 					$myfamlist1 = SearchFunctions::SearchFamsDates($this->hDay, $this->hMonth, "", $selfamfacts);
-//					$myfamlist1 = SearchFunctions::SearchFams(array($queryhb));
 					$this->myfamlist = GmArrayMerge($this->myfamlist, $myfamlist1);
 				}
 			}
 		}	
-		
-		if (isset($query1)) {
-			$query = $query1;
-			$this->pregquery = $pregquery1;
-		}
 		
 		// If filter on gender is chosen, we display the fam facts with the person of that gender.
 		// Of course, only if any fam facts were selected
@@ -638,8 +550,6 @@ class CalendarController extends ChartController {
 		if ($this->lastday < 0) $this->lastday = 0;
 		$this->myindilist = array();
 		$this->myfamlist = array();
-		$this->pregquery = "2 DATE[^\n]*".$mmon;
-	//	$query = "2 DATE[^\n]*".$mmon;
 	
 		$fact = "";	
 	
@@ -654,8 +564,8 @@ class CalendarController extends ChartController {
 		}
 		else $fact = "";
 		
-		if ($findindis) $this->myindilist = SearchFunctions::SearchIndisDates("", $mmon, "", $fact);
-		if ($findfams) $this->myfamlist = SearchFunctions::SearchFamsDates("", $mmon, "", $fact);
+		if ($findindis) $this->myindilist = SearchFunctions::SearchIndisDates("", $mmon, "", $fact, ($this->filterof == "recent" ? ($this->startyear-100) : ""));
+		if ($findfams) $this->myfamlist = SearchFunctions::SearchFamsDates("", $mmon, "", $fact, ($this->filterof == "recent" ? ($this->startyear-100) : ""));
 	
 		if (GedcomConfig::$USE_RTL_FUNCTIONS) {
 			$datearray[0]["day"]   = 01;
@@ -676,9 +586,6 @@ class CalendarController extends ChartController {
 			$HBYear1  = $date[0]["year"];
 			$HBMonth2 = $date[1]["month"];
 			$HBMonth3 = $date[2]["month"];
-			
-	//		$preghbquery1 = "2 DATE[^\n]*$HBMonth1";
-	//		$query1 = "2 DATE[^\n]*$HBMonth1";
 			
 			if ($findindis) $myindilist1 = SearchFunctions::SearchIndisDates("", $HBMonth1, "", $fact);
 			if ($findfams) $myfamlist1 = SearchFunctions::SearchFamsDates("", $HBMonth1, "", $fact);
@@ -716,7 +623,13 @@ class CalendarController extends ChartController {
 				if ($findfams) $this->myfamlist  = GmArrayMerge($this->myfamlist, $myfamlist1);
 			}
 		}
-		
+		/*
+		 print "indicount: ".count($this->myindilist)."<br />";
+		 print "famcount: ".count($this->myfamlist)."<br />";
+		 print "filterof: ".$this->filterof."<br />";
+		 print "filterev: ".$this->filterev."<br />";
+		 print "filtersx: ".$this->filtersx."<br />";
+		*/
 		uasort($this->myindilist, "ItemSort");
 	}
 }

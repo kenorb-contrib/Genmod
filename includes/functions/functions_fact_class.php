@@ -359,13 +359,7 @@ abstract class FactFunctions {
 			// NOTE Print the title of the media
 			print "<td class=\"shade1 ".$factobj->style." wrap\"><span class=\"field\">";
 			if ($factobj->disp) {
-				if (preg_match("'://'", $media->fileobj->f_thumb_file)||(preg_match("'://'", GedcomConfig::$MEDIA_DIRECTORY)>0)||($media->fileobj->f_file_exists)) {
-					if (USE_GREYBOX && $media->fileobj->f_is_image) {
-						print "<a href=\"".FilenameEncode($media->fileobj->f_main_file)."\" title=\"".$media->title."\" rel=\"gb_imageset[mainmedia]\">";
-					}
-					else print "<a href=\"#\" onclick=\"return openImage('".$media->fileobj->f_main_file."', '".$imgwidth."', '".$imgheight."', '".$media->fileobj->f_is_image."');\">";
-					print "<img src=\"".$media->fileobj->f_thumb_file."\" border=\"0\" align=\"" . ($TEXT_DIRECTION== "rtl"?"right": "left") . "\" class=\"thumbnail\" alt=\"\" /></a>";
-				}
+				MediaFS::DispImgLink($media->fileobj->f_main_file, $media->fileobj->f_thumb_file, $media->title, "mainmedia", 0, 0, $imgwidth, $imgheight, $media->fileobj->f_is_image, $media->fileobj->f_file_exists);
 				print "<a href=\"mediadetail.php?mid=".$media->xref."&amp;gedid=".$media->gedcomid."\"><i>".PrintReady(($factobj->style == "change_old" ? $media->oldtitle : $media->title))."</i></a>";
 				if ($media->fileobj->f_thumb_file == "" && preg_match("'://'", $media->filename)) print "<br /><a href=\"".$media->filename."\" target=\"_blank\">".$media->filename."</a>";
 				// NOTE: Print the format of the media
@@ -829,13 +823,7 @@ abstract class FactFunctions {
 						}
 					}
 					if ($factobj->disp) {
-						if (preg_match("'://'", $media->fileobj->f_thumb_file) || preg_match("'://'", GedcomConfig::$MEDIA_DIRECTORY) > 0 || $media->fileobj->f_file_exists) {
-							if (USE_GREYBOX && $media->fileobj->f_is_image) {
-								print "<a href=\"".FilenameEncode($media->fileobj->f_main_file)."\" title=\"".$media->title."\" rel=\"gb_imageset[medialinks]\">";
-							}
-							else print "<a href=\"#\" onclick=\"return openImage('".$media->fileobj->f_main_file."', '".$imgwidth."', '".$imgheight."', '".$media->fileobj->f_is_image."');\">";
-							print "<img src=\"".$media->fileobj->f_thumb_file."\" border=\"0\" align=\"" . ($TEXT_DIRECTION== "rtl"?"right": "left") . "\" class=\"thumbnail\" alt=\"\" /></a>";
-						}
+						MediaFS::DispImgLink($media->fileobj->f_main_file, $media->fileobj->f_thumb_file, $media->title, "medialinks", 0, 0, $imgwidth, $imgheight, $media->fileobj->f_is_image, $media->fileobj->f_file_exists);
 						print "<a href=\"mediadetail.php?mid=".$media->xref."&amp;gedid=".$media->gedcomid."\">";
 						if ($TEXT_DIRECTION=="rtl" && !hasRTLText($media->title)) print "<i>&lrm;".PrintReady($media->title)."</i></a>";
 						else print "<i>".PrintReady($media->title)."</i></a>";
@@ -1373,7 +1361,7 @@ abstract class FactFunctions {
 	
 			$ct = preg_match("/\d DATE(.*)/", $factobj->factrec, $match);
 			if ($ct>0) {
-				$text .= " - <span class=\"date\">".GetDateUrl($match[1])."</span>";
+				$text .= " - <span class=\"date\">".GetDateUrl($match[1], $CalYear)."</span>";
 				$yt = preg_match("/ (\d\d\d\d|\d\d\d)/", $match[1], $ymatch);
 				if ($yt>0) {
 	

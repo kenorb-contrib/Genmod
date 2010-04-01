@@ -74,7 +74,7 @@ if ($view!="preview") {
 	print "<a href=\"calendar.php?filterev=".$calendar_controller->filterev."&amp;filterof=".$calendar_controller->filterof."&amp;filtersx=".$calendar_controller->filtersx."&amp;year=".$calendar_controller->year."\"><b>".GetChangedDate($datestr);
 	if ($calendar_controller->usehebrew) {
 		$hdatestr = "@#DHEBREW@ ".$calendar_controller->currhDay." ".$calendar_controller->currhMonth." ".$calendar_controller->currhYear;
-		print " / ".GetChangedDate($hdatestr);
+		print " / ".GetChangedDate($hdatestr, $calendar_controller->CalYear);
 	}
 	print "</b></a> | ";
 	print "</td>\n";
@@ -135,7 +135,7 @@ if ($view!="preview") {
 	else {
 		print "<td class=\"shade2 vmiddle\">".GM_LANG_showcal."</td>\n";
 		print "<td colspan=\"5\" class=\"shade1 vmiddle\">";
-		if ($calendar_controller->filterof=="all") print "<span class=\"error\">".GM_LANG_all_people. "</span> | ";
+		if ($calendar_controller->filterof == "all") print "<span class=\"error\">".GM_LANG_all_people. "</span> | ";
 		else {
 			$filt="all";
 			print "<a href=\"calendar.php?day=".$calendar_controller->day."&amp;month=".$calendar_controller->month."&amp;year=".$calendar_controller->year."&amp;filterof=".$filt."&amp;filtersx=".$calendar_controller->filtersx."&amp;action=".$calendar_controller->action."\">".htmlentities(GM_LANG_all_people)."</a>"." | ";
@@ -244,16 +244,15 @@ if ($calendar_controller->action == "today" || $calendar_controller->action == "
 		if ((($calendar_controller->filterof == "living" && !$indi->isdead) || $calendar_controller->filterof != "living") && (($calendar_controller->filtersx != "" && $indi->sex == $calendar_controller->filtersx) || $calendar_controller->filtersx == "") && !isset($indi_printed[$indi->key])) {
 			$indi_printed[$indi->key] = true;
 			$text_fact = "";
-			if ($calendar_controller->filtersx != "" && $findfams) $indi->AddFamilyFacts(false);
+			if ($calendar_controller->filtersx != "" && !is_null($calendar_controller->myfamlist)) $indi->AddFamilyFacts(false);
 			$indifacts = $indi->SelectFacts($select, true);
 			//print "check ".$indi->xref." ".$indi->name."<br >";
 			$text_fact = $calendar_controller->GetDateFacts($indifacts);
 			if (!empty($text_fact)) {
 				$index++;
-				// $text_indi .= "<tr><td>";
 				$text_indi .= "<li><a href=\"individual.php?pid=".$indi->xref."&amp;gedid=".$indi->gedcomid."\"><b>";
 				$text_indi .= $indi->revname;
-				if ($indi->addname != "") $text_indi .= "&nbsp;(".$indi->revaddname.")";
+				if ($indi->addname != "") $text_indi .= "&nbsp;".PrintReady("(".$indi->revaddname.")");
 				$text_indi .= "</b><img id=\"box-".$indi->xref.".".$index."-sex\" src=\"".GM_IMAGE_DIR."/";
 				if ($indi->sex == "M"){
 					$count_male++;
@@ -429,7 +428,7 @@ else if ($calendar_controller->action == "calendar") {
 			else if ($calendar_controller->show_no_day == $k && $j == 6) $show_not_set = true;
 			if ($mmon == strtolower($calendar_controller->month) || $show_not_set) {
 				if ($show_not_set) {
-					$calendar_controller->pregquery = "2 DATE(|[^\n]*[^\d]+|[^\n]*([ |0]0)|[^\n]*3[$calendar_controller->lastday-9]|[^\n]*[4-9][0-9]) $calendar_controller->month";
+					$pregquery = "2 DATE(|[^\n]*[^\d]+|[^\n]*([ |0]0)|[^\n]*3[$calendar_controller->lastday-9]|[^\n]*[4-9][0-9]) $calendar_controller->month";
 					
 					// I see April 1973 in 2004 both correctly in April and in March with another event
 
@@ -497,9 +496,9 @@ else if ($calendar_controller->action == "calendar") {
 					print "<br style=\"clear: both\" />";
 					$dayindilist = array();
 
-					if ($mday<10) $calendar_controller->pregquery = "2 DATE[^\n]*[ |0]$mday $mmon";
-					else if (!$calendar_controller->leap && $mmon == "feb" && $mday == '28') $calendar_controller->pregquery = "2 DATE[^\n]*2[8|9] $mmon";
-					else $calendar_controller->pregquery = "2 DATE[^\n]*$mday $mmon";
+					if ($mday<10) $pregquery = "2 DATE[^\n]*[ |0]$mday $mmon";
+					else if (!$calendar_controller->leap && $mmon == "feb" && $mday == '28') $pregquery = "2 DATE[^\n]*2[8|9] $mmon";
+					else $pregquery = "2 DATE[^\n]*$mday $mmon";
 				
 					if (GedcomConfig::$USE_RTL_FUNCTIONS) {
 						    $preghbquery1 = "";
@@ -571,13 +570,13 @@ else if ($calendar_controller->action == "calendar") {
 			
 					if ((($calendar_controller->filterof == "living" && !$indi->isdead) || $calendar_controller->filterof != "living") && (($calendar_controller->filtersx != "" && $indi->sex == $calendar_controller->filtersx) || $calendar_controller->filtersx == "")) {
 						
-						if (preg_match("/$calendar_controller->pregquery/i", $indi->gedrec) > 0 || (GedcomConfig::$USE_RTL_FUNCTIONS && (preg_match("/$preghbquery/i", $indi->gedrec) > 0 || ($preghbquery1!="" && preg_match("/$preghbquery1/i", $indi->gedrec) > 0) || ($preghbquery2!="" && preg_match("/$preghbquery2/i", $indi->gedrec) > 0) || ($preghbquery3 != "" && preg_match("/$preghbquery3/i", $indi->gedrec) > 0)))) {
+						if (preg_match("/$pregquery/i", $indi->gedrec) > 0 || (GedcomConfig::$USE_RTL_FUNCTIONS && (preg_match("/$preghbquery/i", $indi->gedrec) > 0 || ($preghbquery1!="" && preg_match("/$preghbquery1/i", $indi->gedrec) > 0) || ($preghbquery2!="" && preg_match("/$preghbquery2/i", $indi->gedrec) > 0) || ($preghbquery3 != "" && preg_match("/$preghbquery3/i", $indi->gedrec) > 0)))) {
 							$filterout=false;
 							$indifacts = $indi->SelectFacts($select, true);
 							$text_fact = "";
 							foreach($indifacts as $index => $factobj) {
 								$text_temp = "";
-								$ct = preg_match("/$calendar_controller->pregquery/i", $factobj->factrec, $match);
+								$ct = preg_match("/$pregquery/i", $factobj->factrec, $match);
 								if (GedcomConfig::$USE_RTL_FUNCTIONS) {
 									if ($ct < 1) $ct = preg_match("/$preghbquery/i", $factobj->factrec, $match);
 									if ($ct < 1 && $preghbquery1 != "") $ct = preg_match("/$preghbquery1/i", $factobj->factrec, $match);
@@ -593,7 +592,7 @@ else if ($calendar_controller->action == "calendar") {
 							if (!empty($text_fact) && $indi->disp) {
 								$text_day .= "<a href=\"individual.php?pid=".$indi->xref."&amp;gedid=".$indi->gedcomid."\"><b>";
 								$text_day .= $indi->revname;
-								if ($indi->addname != "") $text_day .= "&nbsp;(".$indi->revaddname.")";
+								if ($indi->addname != "") $text_day .= "&nbsp;".PrintReady("(".$indi->revaddname.")");
 								$text_day .= "</b>".$indi->addxref;
 								$text_day .= "</a><br />\n";
 								$text_day .= "<div class=\"indent";
@@ -619,14 +618,14 @@ else if ($calendar_controller->action == "calendar") {
 							if (($fam->husb_id != "" && $fam->husb->isdead) || ($fam->wife_id != "" && $fam->wife->isdead)) $display=false;
 						}
 						if ($display) {
-			    			if (preg_match("/$calendar_controller->pregquery/i", $fam->gedrec) > 0 || (GedcomConfig::$USE_RTL_FUNCTIONS && (preg_match("/$preghbquery/i", $fam->gedrec) > 0 || ($preghbquery1!="" && preg_match("/$preghbquery1/i", $fam->gedrec) > 0) || ($preghbquery2!="" && preg_match("/$preghbquery2/i", $fam->gedrec) > 0) || ($preghbquery3!="" && preg_match("/$preghbquery3/i", $fam->gedrec) > 0)))) {
+			    			if (preg_match("/$pregquery/i", $fam->gedrec) > 0 || (GedcomConfig::$USE_RTL_FUNCTIONS && (preg_match("/$preghbquery/i", $fam->gedrec) > 0 || ($preghbquery1!="" && preg_match("/$preghbquery1/i", $fam->gedrec) > 0) || ($preghbquery2!="" && preg_match("/$preghbquery2/i", $fam->gedrec) > 0) || ($preghbquery3!="" && preg_match("/$preghbquery3/i", $fam->gedrec) > 0)))) {
 								
 								$filterout = false;
 								$famfacts = $fam->SelectFacts($select, true);
 								$text_fact = "";
 								foreach($famfacts as $index => $factobj) {
 									$text_temp = "";
-									$ct = preg_match("/$calendar_controller->pregquery/i", $factobj->factrec, $match);
+									$ct = preg_match("/$pregquery/i", $factobj->factrec, $match);
 									if (GedcomConfig::$USE_RTL_FUNCTIONS) {
 										if ($ct < 1) $ct = preg_match("/$preghbquery/i", $factobj->factrec, $match);
 										if ($ct < 1 && $preghbquery1 != "") $ct = preg_match("/$preghbquery1/i", $factobj->factrec, $match);
@@ -642,7 +641,7 @@ else if ($calendar_controller->action == "calendar") {
 								if (!empty($text_fact) && $fam->disp) {
 									$text_day .= "<a href=\"family.php?famid=".$fam->xref."&amp;gedid=".$fam->gedcomid."\"><b>";
 									$text_day .= $fam->sortable_name;
-									if ($fam->sortable_addname != "") $text_day .= "&nbsp(".$fam->sortable_addname.")";
+									if ($fam->sortable_addname != "") $text_day .= "&nbsp".PrintReady("(".$fam->sortable_addname.")");
 									$text_day .= "</b>".$fam->addxref;
 									$text_day .= "</a><br />\n";
 									$text_day .= "<div class=\"indent";

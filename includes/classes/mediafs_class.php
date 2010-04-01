@@ -263,14 +263,8 @@ abstract class MediaFS {
 			print "\n\t\t\t<td class=\"list_value wrap $TEXT_DIRECTION\">";
 			$twidth = 50;
 			$theight = 50;
-			if (USE_GREYBOX && $fileobj->f_is_image) {
-				print "<a href=\"".FilenameEncode($realfile)."\" title=\"".$fileobj->f_main_file."\" rel=\"gb_imageset[]\">";
-			}
-			else {
-				print "<a href=\"#\" onclick=\"return openImage('".$realfile."','".$fileobj->f_width."','".$fileobj->f_height."', '".$fileobj->f_is_image."');\">";
-			}
-			print "<img src=\"".$thumbfile."\" border=\"0\" align=\"left\" class=\"thumbnail\" alt=\"\" width=\"".$twidth."\" height=\"".$theight."\" />";
-			print "</a></td>";
+			self::DispImgLink($realfile, $thumbfile, $fileobj->f_main_file, "", $twidth, $theight, $fileobj->f_width, $fileobj->f_height, $fileobj->f_is_image, $fileobj->f_file_exists);
+			print "</td>";
 		}
 		
 		print "<td class=\"list_value wrap $TEXT_DIRECTION\"";
@@ -313,7 +307,8 @@ abstract class MediaFS {
 		global $GM_IMAGES;
 
 		if ($dbmode == "unset") $dbmode = SystemConfig::$MEDIA_IN_DB;
-		if (strlen($filename) == 0) return false;
+		// Removed this line: an empty filename should return a placeholder (if selected)
+//		if (strlen($filename) == 0) return false;
 		if ($filename == GedcomConfig::$MEDIA_DIRECTORY) $filename = "";
 		
 		// NOTE: Lets get the file details
@@ -414,7 +409,7 @@ abstract class MediaFS {
 			else {
 				// Handle files
 //				print "Search thumb :".FilenameDecode($dirname."thumbs/".$file_basename)."<br />";
-				if (file_exists(FilenameDecode($dirname."thumbs/".$file_basename))) {
+				if (file_exists(FilenameDecode($dirname."thumbs/".$file_basename)) && !empty($file_basename)) {
 					return $dirname."thumbs/".$file_basename;
 				}
 				else {
@@ -1321,6 +1316,28 @@ abstract class MediaFS {
 			return($err_write);
 		}
 		else return true;
+	}
+	
+	public function DispImgLink($filename, $thumbname, $title, $setname, $width, $height, $fullwidth, $fullheight, $is_image, $file_exists, $closelink=true, $center=false) {
+		global $TEXT_DIRECTION;
+		
+		$close = false;
+		if ($file_exists) {
+			if (USE_GREYBOX && $is_image) {
+				print "<a href=\"".FilenameEncode($filename)."\" title=\"".$title."\" rel=\"gb_imageset[".$setname."]\">";
+				$close = true;
+			}
+			elseif (!USE_GREYBOX) {
+				print "<a href=\"#\" onclick=\"return openImage('".$filename."','".$fullwidth."','".$fullheight."', '".$is_image."');\">";
+				$close = true;
+			}
+		}
+		if (!empty($thumbname)) print "<img src=\"".FilenameEncode($thumbname)."\" border=\"0\" ".($width > 0 ? "width=\"".$width."\" " : "").($height > 0 ? "height=\"".$height."\" " : "")." class=\"thumbnail\" align=\"".($center ? "center" : ($TEXT_DIRECTION == "rtl" ? "right" : "left"))."\" />";
+		if ($close) {
+			if ($closelink) print "</a>\n";
+			return true;
+		}
+		else return false;
 	}
 }
 
