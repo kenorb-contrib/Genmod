@@ -52,7 +52,7 @@ $controller->CheckRawEdited();
 ?>
 <div id="indi_content" class="<?php echo $TEXT_DIRECTION;?>">
 	<!-- NOTE: Display person picture -->
-	<?php if ($controller->canshowhighlightedobj && $controller->HighlightedObject != "") {
+	<?php if ($controller->canshowhighlightedobj) {
 		print '<div id="indi_picture" class="'.$TEXT_DIRECTION.'">';
 			print $controller->HighlightedObject;
 		print "</div>";

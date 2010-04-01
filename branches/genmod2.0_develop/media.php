@@ -430,15 +430,14 @@ if ($disp1 == "block") {
 				// print filename
 				print "<td style=\"border-bottom:1px solid #493424;\" class=\"wrap\">";
 				if (!SystemConfig::$MEDIA_IN_DB) $canwrite = AdminFunctions::FileIsWriteable($filename);
-				if (USE_GREYBOX && $fileobj->f_is_image) print "<a href=\"".FilenameEncode($fileobj->f_main_file)."\" title=\"".$fileobj->f_file."\" rel=\"gb_imageset[]\">";
-				else print "<a href=\"#\" onclick=\"return openImage('".$fileobj->f_main_file."','".$fileobj->f_width."','".$fileobj->f_height."','".$fileobj->f_is_image."');\">";
-//				print $fileobj->f_thumb_file."<br />";
-				if ($thumbs) print "<img src=\"".($is_thumb_dir ? ($fileobj->f_is_image ? $fileobj->f_main_file : $fileobj->f_thumb_file) : $fileobj->f_thumb_file)."\" border=\"0\" align=\"left\" class=\"thumbnail\" alt=\"\" width=\"100\" height=\"100\" />";
+				if (!$thumbs) $thumbname = "";
+				else $thumbname = ($is_thumb_dir ? ($fileobj->f_is_image ? $fileobj->f_main_file : $fileobj->f_thumb_file) : $fileobj->f_thumb_file);
+				$close = MediaFS::DispImgLink($fileobj->f_main_file, $thumbname, $fileobj->f_file, "", 100, 100, $fileobj->f_width, $fileobj->f_height, $fileobj->f_is_image, $fileobj->f_file_exists, false);
 				if (!$canwrite) print "<span class=\"readonly\">";
 				if ($directory == "external_links") print $filename;
 				else print basename($filename);
 				if (!$canwrite) print "</span>";
-				print "</a>";
+				if ($close) print "</a>";
 				print "</td>";
 	
 				// print size

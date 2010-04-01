@@ -77,13 +77,7 @@ $media_controller->CheckRawEdited();
 				$imgheight = $media_controller->media->fileobj->f_height + 50;
 			}
 		}
-		if (preg_match("'://'", $thumbnail)||(preg_match("'://'", GedcomConfig::$MEDIA_DIRECTORY)>0)||($media_controller->media->fileobj->f_file_exists)) {
-			if (USE_GREYBOX && $media_controller->media->fileobj->f_is_image) print "<a href=\"".FilenameEncode($filename)."\" title=\"".PrintReady($media_controller->media->title)."\" rel=\"gb_imageset[]\">";
-			else {
-				print "<a href=\"#\" onclick=\"return openImage('".$filename."',".$imgwidth.", ".$imgheight.", ".$media_controller->media->fileobj->f_is_image.");\">";
-			}
-			print "<img src=\"".$thumbnail."\" border=\"0\" align=\"" . ($TEXT_DIRECTION== "rtl"?"right": "left") . "\" class=\"thumbnail\" alt=\"\" /></a>";
-		}
+		MediaFS::DispImgLink($filename, $thumbnail, $media_controller->media->title, "", 0, 0, $imgwidth, $imgheight, $media_controller->media->fileobj->f_is_image, $media_controller->media->fileobj->f_file_exists);
 		?>
 		<?php if(GedcomConfig::$SHOW_COUNTER) {
 			print "\n<br /><br /><span style=\"margin-left: 3px;\">".GM_LANG_hit_count."&nbsp;".$hits."</span>\n";

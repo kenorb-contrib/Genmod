@@ -64,26 +64,21 @@ function print_random_media($block = true, $config="", $side, $index) {
 			   $imgwidth = $media->fileobj->f_width+50;
 			   $imgheight = $media->fileobj->f_height+50;
 		}
-		if (USE_GREYBOX && $media->fileobj->f_is_image) {
-			print "<a href=\"".FilenameEncode($media->fileobj->f_main_file)."\" title=\"".$media->title."\" rel=\"gb_imageset[random]\">";
-		}
-		else print "<a href=\"#\" onclick=\"return openImage('".$media->fileobj->f_main_file."', '".$imgwidth."', '".$imgheight."', '".$media->fileobj->f_is_image."');\">";
+		$twidth = 0;
 		if ($block) {
-			print "<img src=\"".$media->fileobj->f_thumb_file."\" border=\"0\" class=\"thumbnail\" alt=\"\" ";
-			if ($media->fileobj->f_twidth > 175) print "width=\"175\" ";
-			print "/>";
+			$tfile = $media->fileobj->f_thumb_file;
+			if ($media->fileobj->f_twidth > 175) $twidth = 175;
 		}
 		else {
 			if ($media->fileobj->f_file_exists || strstr($media->filename, "://")) {
-				print "<img src=\"".$media->fileobj->f_main_file."\" border=\"0\" class=\"thumbnail\" alt=\"\" ";
+				$tfile = $media->fileobj->f_main_file;
 				if (!stristr($media->fileobj->f_main_file, "://")) {
-					if ($media->fileobj->f_width > 175) print "width=\"175\" ";
+					if ($media->fileobj->f_width > 175) print $twidth = 175;
 				}
-				else print "width=\"175\" ";
-				print "/>";
+				else $twidth = 175;
 			}
 		}
-		print "</a>\n";
+		MediaFS::DispImgLink($media->fileobj->f_main_file, $media->fileobj->f_thumb_file, $media->title, "random", $twidth, 0, $imgwidth, $imgheight, $media->fileobj->f_is_image, $media->fileobj->f_file_exists, true, true);
 		if ($block) print "<br />";
 		if ($media->title!=$media->filename) {
 		    print "<a href=\"mediadetail.php?mid=".$media->xref."&amp;gedid=".$media->gedcomid."\">";
