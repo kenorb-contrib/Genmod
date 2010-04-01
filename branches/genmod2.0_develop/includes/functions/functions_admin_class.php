@@ -1513,7 +1513,7 @@ abstract class AdminFunctions {
 		fwrite($handle, "}\n");
 		fwrite($handle, "// This file is for checking if the right files exist in a Genmod installation");
 		fwrite($handle, "// It is created with the hidden function admin_maint.php?action=createmd5");
-		fwrite($handle, "// It should be run on an existing installation with files of the latest SVN version.");
+		fwrite($handle, "// It should be run on an existing, clean and freshly setup installation with files of the latest SVN version.");
 		fwrite($handle, "\$md5_array = array();\n");
 		foreach($dirlist as $file => $md5) {
 			fwrite($handle, "\$md5_array[\"".$file."\"] = \"".$md5."\";\n");
@@ -1528,7 +1528,10 @@ abstract class AdminFunctions {
 		require_once("includes/values/md5_files.php");
 		$message = "";
 		foreach($md5_array as $file => $md5) {
-			if (md5_file($file) != $md5) {
+			if (!file_exists($file)) {
+				$message .= GM_LANG_file_absent."&nbsp;".$file."<br />";
+			}
+			elseif (md5_file($file) != $md5) {
 				$message .= GM_LANG_wrong_md5."&nbsp;".$file."<br />";
 			}
 		}
