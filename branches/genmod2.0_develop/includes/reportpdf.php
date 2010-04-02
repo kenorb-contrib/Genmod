@@ -678,6 +678,7 @@ $debug = false;
 			}
 			if ($h < $this->height) $h = $this->height;
 			if ($debug) print "standard height: ".$this->height."<br />";
+			if ($debug) print "pageheight: ".$pdf->getPageHeight()."<br />";
 		}
 //		$styleh = $pdf->getCurrentStyleHeight();
 //		$h += $styleh;
@@ -1668,7 +1669,7 @@ function GMRGedcomValueSHandler($attrs) {
 
 	$tag = $attrs["tag"];
 	//print $tag;
-	//		print "tag: ".$tag." fact: ".$fact." desc: ".$desc."<br />";
+	//print "<br /><br />tag: ".$tag." fact: ".$fact." desc: ".$desc."<br />";
 	if (!empty($tag)) {
 		if ($tag=="@desc") {
 			if (PrivacyFunctions::showFact($fact, $id) && PrivacyFunctions::showFactDetails($fact,$id)) $value = $desc;
@@ -1719,10 +1720,11 @@ function GMRGedcomValueSHandler($attrs) {
 				if ($fact == "NOTE") $value .= GetCont($level, $gedrec);
 			}
 			if ($debug) print "gedrec: ".$gedrec." tag: ".$tag." value: ".$value." fact: ".$fact."<br /><br />";
-//		print "tag: ".$tags[0]."<br />fact: ".$fact."<br />id: ".$id."<br />desc: ".$desc."<br />type: ".$type."<br />gedrec: ".$gedrec."<br />value: ".$value."<br /><br />";
+		//print "tag: ".$tag."<br />fact: ".$fact."<br />id: ".$id."<br />desc: ".$desc."<br />type: ".$type."<br />gedrec: ".$gedrec."<br />value: ".$value."<br />level: ".$level."<br /><br />";
 			if (PrivacyFunctions::showFact($tags[0], $id) && PrivacyFunctions::showFactDetails($tags[0],$id)) {
 				if (!empty($id)) $factrec = GetSubRecord(1, $tags[0], $gedrec);
 				else $factrec = "";
+		//print "<br /><br />value: ".nl2br($value);
 				if (!PrivacyFunctions::FactViewRestricted($id, $factrec)) {
 					if (NameFunctions::HasChinese($value, true)) $currentElement->addText(NameFunctions::GetPinYin($value, true));
 					else $currentElement->addText($value);
@@ -1737,7 +1739,7 @@ function GMRRepeatTagSHandler($attrs) {
 	global $fact, $desc, $debug;
 	
 	$debug = false;
-//	if ($attrs["tag"] == "EMAIL") $debug = true;
+	//if ($attrs["tag"] == "NOTE") $debug = true;
 
 	$processRepeats++;
 	if ($processRepeats>1) return;
@@ -1766,7 +1768,7 @@ function GMRRepeatTagSHandler($attrs) {
 	if (!empty($tag) && $disp) {
 		// Get the factrec to check RESN privacy
 		$sub = GetSubRecord(1, "1 ".$tag, $gedrec);
-		if ($debug) print "sub: ".$sub;
+		if ($debug) print "sub: ".$sub."<br />";
 		if (!PrivacyFunctions::FactViewRestricted($id, $sub)) {
 			if ($debug) print "processing......<br />";
 			if ($tag=="@desc") {
@@ -1780,7 +1782,10 @@ function GMRRepeatTagSHandler($attrs) {
 				if ($debug) Print "else branch<br />";
 				$tag = preg_replace("/@fact/", $fact, $tag);
 				$tags = preg_split("/:/", $tag);
-				if ($debug) Print_r($tags);
+				if ($debug) {
+					Print_r($tags);
+					print "<br />";
+				}
 				$temp = preg_split("/\s+/", trim($gedrec));
 				$level = $temp[0];
 				if ($level==0) $level++;
@@ -1815,7 +1820,7 @@ function GMRRepeatTagSHandler($attrs) {
 						$ct2 = preg_match("/".$level."\sNOTE\s@(.+)@\s/", $rec, $nmatch);
 						if ($ct2>0) {
 							if ($debug) print "Linked note found to ".$nmatch[1];
-							$obj = Note::GetInstance($match[1]);
+							$obj = Note::GetInstance($nmatch[1]);
 							$rec = $obj->gedrec;
 //		print "4 rec added: ".$newgedrec."<br />";
 							$fact = "NOTE";
