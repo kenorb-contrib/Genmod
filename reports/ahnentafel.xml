@@ -17,7 +17,7 @@
 	<GMRStyle name="note" font="LucidaSansUnicode" size="9" style="" />
 	<GMRStyle name="footnote" font="LucidaSansUnicode" size="8" style="" />
 	<GMRStyle name="footnotenum" font="LucidaSansUnicode" size="6" style="" />
-	<GMRDoc pageSize="$pageSize" orientation="P" margin="24">
+	<GMRDoc pageSize="$pageSize" orientation="P" margin="36">
 		<GMRHeader>
 		</GMRHeader>
 		<GMRBody>
@@ -35,6 +35,7 @@
 				</GMRif>
 				<GMRSetVar name="printPronoun" value=" " />
 				<GMRif condition="$generation!=@generation">
+					<GMRif condition="$generation!=0"><GMRNewPage /></GMRif>
 					<GMRif condition="$empty_name=='t'" >
 						<GMRTextBox width="50" height="20" border="0">
 							<GMRSetVar name="empty_end_value" value="$num-1" />
@@ -98,13 +99,13 @@
 								</GMRRepeatTag>
 							</GMRif>
 							<GMRif condition="@DATE!=''">
-								<GMRText style="text"> <GMRGedcomValue tag="DATE" level="2" /> </GMRText>
+								<GMRText style="text"> <GMRGedcomValue tag="DATE" level="2" /></GMRText>
 							</GMRif>
 							<GMRif condition="@PLAC!=''">
-								<GMRText style="text"><GMRvar var="GM_LANG_ahnentafel_place" /><GMRGedcomValue tag="PLAC" level="2" /></GMRText>
+								<GMRText style="text"> <GMRvar var="GM_LANG_ahnentafel_place" /><GMRGedcomValue tag="PLAC" level="2" /></GMRText>
 							</GMRif>
 							<GMRif condition="(@desc=='Y') or (@DATE=='' and @PLAC=='')">
-								<GMRText style="text"><GMRvar var="GM_LANG_ahnentafel_no_details" /></GMRText>
+								<GMRText style="text"> <GMRvar var="GM_LANG_ahnentafel_no_details" /></GMRText>
 							</GMRif>
 							<GMRText style="text">.  </GMRText>
 							<GMRSetVar name="printPronoun" value="$pronoun" />
@@ -133,10 +134,10 @@
 								<GMRText style="text"> <GMRGedcomValue tag="DATE" level="2" /></GMRText>
 							</GMRif>
 							<GMRif condition="@PLAC!=''">
-								<GMRText style="text"><GMRvar var="GM_LANG_ahnentafel_place" /><GMRGedcomValue tag="PLAC" level="2" /></GMRText>
+								<GMRText style="text"> <GMRvar var="GM_LANG_ahnentafel_place" /><GMRGedcomValue tag="PLAC" level="2" /></GMRText>
 							</GMRif>
 							<GMRif condition="(@desc=='Y') or (@DATE=='' and @PLAC=='')">
-								<GMRText style="text"><GMRvar var="GM_LANG_ahnentafel_no_details" /></GMRText>
+								<GMRText style="text"> <GMRvar var="GM_LANG_ahnentafel_no_details" /></GMRText>
 							</GMRif>
 							<GMRText style="text">.  </GMRText>
 							<GMRSetVar name="printPronoun" value="$pronoun" />
@@ -222,7 +223,7 @@
 								<GMRText style="text"> <GMRvar var="GM_LANG_ahnentafel_place" /><GMRGedcomValue tag="PLAC" level="2" /></GMRText>
 							</GMRif>
 							<GMRif condition="(@desc=='Y') or (@DATE=='' and @PLAC=='')">
-								<GMRText style="text"><GMRvar var="GM_LANG_ahnentafel_no_details" /></GMRText>
+								<GMRText style="text"> <GMRvar var="GM_LANG_ahnentafel_no_details" /></GMRText>
 							</GMRif>
 							<GMRText style="text">.  </GMRText>
 							<GMRSetVar name="printPronoun" value="$pronoun" />
@@ -254,7 +255,7 @@
 								<GMRText style="text"> <GMRvar var="GM_LANG_ahnentafel_place" /><GMRGedcomValue tag="PLAC" level="2" /></GMRText>
 							</GMRif>
 							<GMRif condition="(@desc=='Y') or (@DATE=='' and @PLAC=='')">
-								<GMRText style="text"><GMRvar var="GM_LANG_ahnentafel_no_details" /></GMRText>
+								<GMRText style="text"> <GMRvar var="GM_LANG_ahnentafel_no_details" /></GMRText>
 							</GMRif>
 							<GMRText style="text">.  </GMRText>
 							<GMRSetVar name="printPronoun" value="$pronoun" />
@@ -266,7 +267,7 @@
 								<GMRText style="text"><br /></GMRText>
 							</GMRTextBox>
 							<GMRTextBox width="0" height="12" border="0" newline="1">
-								<GMRText style="note"><br /><GMRGedcomValue tag="@fact" /></GMRText>
+								<GMRText style="note"><br /><GMRvar var="GM_FACT_NOTE" />: <GMRGedcomValue tag="NOTE" /></GMRText>
 							</GMRTextBox>
 						</GMRRepeatTag>
 					</GMRif>
