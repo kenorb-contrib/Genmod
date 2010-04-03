@@ -90,12 +90,13 @@ abstract class BlockFunctions {
 		$cache_load = false;
 		$cache_refresh = false;
 		
+		// to force cache rebuild
+		// GedcomConfig::ResetCaches();
+	
 		// Retrieve the last change date
 		$mday = GedcomConfig::GetLastCacheDate($action, GedcomConfig::$GEDCOMID);
-//	 $mday = 0;  // to force cache rebuild
 		if ($mday == $monthstart) {
 			$cache_load = true;
-	//		print "Retrieve from cache";
 		}
 		else {
 			$sql = "DELETE FROM ".TBLPREFIX."eventcache WHERE ge_cache='".$action."' AND ge_file='".GedcomConfig::$GEDCOMID."'";
@@ -123,14 +124,14 @@ abstract class BlockFunctions {
 			$famlist = self::SearchFamsDateRange($dstart, $mstart, "", $dend, $mend, "", "no", $skipfacts);
 
 			// Apply filter criteria and perform other transformations on the raw data
-			foreach($indilist as $gid=>$indi) {
-				foreach($indi->facts as $key => $factobj) {
-					if (!in_array($factobj->fact, $skip)) {
-						$factrec = $factobj->factrec;
+			foreach($indilist as $gid => $indi) {
+				$allsubs = GetAllSubrecords($indi->gedrec, "ASSO, FAMS, FAMC, CHIL, REPO, SOUR, OBJE, NOTE", false, false, false);
+				foreach($allsubs as $key => $factrec) {
+					if (!in_array(GetFactType($factrec), $skip)) {
 						$date = 0; //--- MA @@@
-						$hct = preg_match("/2 DATE.*(@#DHEBREW@)/", $factrec, $match);
-						if ($hct>0) {
-							if (GedcomConfig::$USE_RTL_FUNCTIONS) {
+						if (GedcomConfig::$USE_RTL_FUNCTIONS) {
+							$hct = preg_match("/2 DATE.*(@#DHEBREW@)/", $factrec, $match);
+							if ($hct > 0) {
 								$dct = preg_match("/2 DATE (.+)/", $factrec, $match);
 								if ($dct>0) {
 									$hebrew_date = ParseDate(trim($match[1]));
@@ -138,18 +139,17 @@ abstract class BlockFunctions {
 								}
 							}
 						}
-						else {
+						if ($date == 0) {
 							$dct = preg_match("/2 DATE (.+)/", $factrec, $match);
-							if ($dct>0) {
+							if ($dct > 0) {
 								$date = ParseDate(trim($match[1]));
-								//print $gid." ".$factobj->fact." ".$match[1]."<br />";
 							}
 						}
 						if (!empty($date[0]["mon"]) && !empty($date[0]["day"])) {
 							if ($date[0]["mon"]< $mstart) $y = $year+1;
 							else $y = $year;
 							$datestamp = mktime(1,0,0,$date[0]["mon"],$date[0]["day"],$y);
-							if (($datestamp >= $monthstart) && ($datestamp<=$monthend)) {
+							if ($datestamp >= $monthstart && $datestamp <= $monthend) {
 								// Strip useless information:
 								//   NOTE, ADDR, OBJE, SOUR, PAGE, DATA, TEXT
 								$factrec = preg_replace("/\d\s+(NOTE|ADDR|OBJE|SOUR|PAGE|DATA|TEXT|CONT|CONC|QUAY|CAUS|CEME)\s+(.+)\n/", "", $factrec);
@@ -162,19 +162,19 @@ abstract class BlockFunctions {
 				}
 			}
 			foreach($famlist as $gid => $family) {
-				foreach($family->facts as $key => $factobj) {
-					if (!in_array($factobj->fact, $skip)) {
-						$factrec = $factobj->factrec;
+				$allsubs = GetAllSubrecords($family->gedrec, "ASSO, FAMS, FAMC, CHIL, REPO, SOUR, OBJE, NOTE", false, false, false);
+				foreach($allsubs as $key => $factrec) {
+					if (!in_array(GetFactType($factrec), $skip)) {
 						$date = 0; //--- MA @@@
-						$hct = preg_match("/2 DATE.*(@#DHEBREW@)/", $factrec, $match);
-						if ($hct>0) {
-							if (GedcomConfig::$USE_RTL_FUNCTIONS) {
+						if (GedcomConfig::$USE_RTL_FUNCTIONS) {
+							$hct = preg_match("/2 DATE.*(@#DHEBREW@)/", $factrec, $match);
+							if ($hct>0) {
 								$dct = preg_match("/2 DATE (.+)/", $factrec, $match);
 								$hebrew_date = ParseDate(trim($match[1]));
 								$date = JewishGedcomDateToCurrentGregorian($hebrew_date);
 							}
 						}
-						else {
+						if ($date == 0) {
 							$ct = preg_match("/2 DATE (.+)/", $factrec, $match);
 							if ($ct>0) $date = ParseDate(trim($match[1]));
 						}
@@ -202,11 +202,17 @@ abstract class BlockFunctions {
 			$IGNORE_YEAR = 1;
 			uasort($found_facts, "CompareFacts");
 		
+			$sqlstr = "";
+			$first = true;
 			foreach ($found_facts as $key => $factr) {
-				$sql = "INSERT INTO ".TBLPREFIX."eventcache VALUES('0','".GedcomConfig::$GEDCOMID."', '".$action."', '".$factr[0]."', '".$factr[7]."', '".$factr[6]."', '".mysql_real_escape_string($factr[1])."', '".$factr[2]."', '".$factr[3]."', '".mysql_real_escape_string($factr[4])."', '".$factr[5]."')";
+				if (!$first) $sqlstr .= ", ";
+				$first = false;
+				$sqlstr .= "('0','".GedcomConfig::$GEDCOMID."', '".$action."', '".$factr[0]."', '".$factr[7]."', '".$factr[6]."', '".mysql_real_escape_string($factr[1])."', '".$factr[2]."', '".$factr[3]."', '".mysql_real_escape_string($factr[4])."', '".$factr[5]."')";
+			}
+			if (!empty($sqlstr)) {
+				$sql = "INSERT INTO ".TBLPREFIX."eventcache VALUES ".$sqlstr;
 				$res = NewQuery($sql);
-				$error = mysql_error();
-				if (!empty($error)) print $error."<br />";
+				if ($res) $res->FreeResult();
 			}
 			GedcomConfig::SetLastCacheDate($action, $monthstart, GedcomConfig::$GEDCOMID);
 		}
@@ -320,14 +326,14 @@ abstract class BlockFunctions {
 				if (is_object($object)) {
 					if ($object->disp_name && !$object->isempty) {
 						print "<tr valign=\"top\">";
-						if ($CountSide=="left") {
+						if ($CountSide == "left") {
 							print "<td dir=\"ltr\" align=\"right\">";
 							if ($TEXT_DIRECTION=="rtl") print "&nbsp;";
 							print "[".$count."]";
 							if ($TEXT_DIRECTION=="ltr") print "&nbsp;";
 							print "</td>";
 						}
-						if ($type=="INDI") {
+						if ($type == "INDI") {
 							print "<td class=\"wrap\"";
 							if ($block) print " width=\"86%\"";
 							print "><a href=\"individual.php?pid=".urlencode($id)."&amp;gedid=".$gedid."\"><span class=\"name2\">\n";
@@ -335,37 +341,37 @@ abstract class BlockFunctions {
 							print "</a></td>\n";
 							$i++;
 						}
-						elseif ($type=="FAM") {
+						elseif ($type == "FAM") {
 							print "<td class=\"wrap\"><span class=\"name2\" ><a href=\"family.php?famid=".urlencode($id)."&amp;gedid=".$gedid."\">";
 							print $object->descriptor.($object->adddescriptor == "" ? "" : "&nbsp;(".$object->adddescriptor.")")."</span>".$object->addxref;
 							print "</a></td>";
 							$i++;
 						}
-						elseif ($type=="REPO") {
+						elseif ($type == "REPO") {
 							print "<td><span class=\"name2\" ><a href=\"repo.php?rid=".urlencode($id)."&amp;gedid=".$gedid."\">";
 							print $object->descriptor.($object->adddescriptor == "" ? "" : "&nbsp;(".$object->adddescriptor.")")."</span>".$object->addxref;
 							print "</a></td>";
 							$i++;
 						}
-						elseif ($type=="SOUR") {
+						elseif ($type == "SOUR") {
 							print "<td><span class=\"name2\" ><a href=\"source.php?sid=".urlencode($id)."&amp;gedid=".$gedid."\">";
 							print $object->descriptor.($object->adddescriptor == "" ? "" : "&nbsp;(".$object->adddescriptor.")")."</span>".$object->addxref;
 							print "</a></td>";
 							$i++;
 						}
-						elseif ($type=="OBJE") {
+						elseif ($type == "OBJE") {
 							print "<td><span class=\"name2\" ><a href=\"mediadetail.php?mid=".urlencode($id)."&amp;gedid=".$gedid."\">";
 							print $object->title."</span>".$object->addxref;
 							print "</a></td>";
 							$i++;
 						}
-						elseif ($type=="NOTE") {
+						elseif ($type == "NOTE") {
 							print "<td><span class=\"name2\" ><a href=\"note.php?oid=".urlencode($id)."&amp;gedid=".$gedid."\">";
 							print $object->title."</span>".$object->addxref;
 							print "</a></td>";
 							$i++;
 						}
-						if ($CountSide=="right") {
+						if ($CountSide == "right") {
 							print "<td dir=\"ltr\" align=\"right\">";
 							if ($TEXT_DIRECTION=="ltr") print "&nbsp;";
 							print "[".$count."]";
@@ -743,11 +749,20 @@ abstract class BlockFunctions {
 		$sql .= "GROUP BY f_id ORDER BY d_year, d_month, d_day DESC";
 	
 		$res = NewQuery($sql);
+		$select = array();
 		while($row = $res->fetchAssoc()) {
 			$fam =& Family::GetInstance($row["f_id"], $row);
 			$famlist[$row["f_key"]] = $fam;
+			if ($row["f_husb"] != "" && !Person::IsInstance(SplitKey($row["f_husb"], "id"), $row["f_file"])) $select[] = $row["f_husb"];
+			if ($row["f_wife"] != "" && !Person::IsInstance(SplitKey($row["f_wife"], "id"), $row["f_file"])) $select[] = $row["f_wife"];
 		}
 		$res->FreeResult();
+		if (count($select) > 0) {
+			array_flip(array_flip($select));
+			//print "Indi's selected for fams: ".count($select)."<br />";
+			$selection = "'".implode("','", $select)."'";
+			ListFunctions::GetIndilist($allgeds, $selection, false);
+		}
 		return $famlist;
 	}
 	
@@ -849,6 +864,5 @@ abstract class BlockFunctions {
 		
 		return $sql;
 	}
-
 }
 ?>

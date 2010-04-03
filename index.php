@@ -202,13 +202,25 @@ if ($command=="user") {
 	print GM_LANG_mygedview_desc;
 	print "</div>\n";
 }
+$disp_stats = false;
 if (count($ublocks->main) != 0) {
 	if (count($ublocks->right) != 0) print "\t<div id=\"index_main_blocks\">\n";
 	else print "\t<div id=\"index_full_blocks\">\n";
 
 	foreach($ublocks->main as $bindex=>$block) {
+		if ($disp_stats) {
+			$time1 = getmicrotime();
+			$queries1 = $TOTAL_QUERIES;
+		}
 		if (function_exists($block[0])) eval($block[0]."(false, \$block[1], \"main\", $bindex);");
-//		print $TOTAL_QUERIES." ";
+		if ($disp_stats) {
+			$time2 = getmicrotime();
+			$time = $time2 - $time1;
+			print "Execution time: ";
+			printf(" %.3f ", $time);
+			print "<br />";
+			print "Queries: ".($TOTAL_QUERIES - $queries1)." ";
+		}
 	}
 	print "</div>\n";
 }
@@ -220,13 +232,19 @@ if (count($ublocks->right) != 0) {
 	else print "\t<div id=\"index_full_blocks\">\n";
 	foreach($ublocks->right as $bindex => $block) {
 		// NOTE: print_random_media(true, $block[1], right, $bindex
-//		$time1 = getmicrotime();
+		if ($disp_stats) {
+			$time1 = getmicrotime();
+			$queries1 = $TOTAL_QUERIES;
+		}
 		if (function_exists($block[0])) eval($block[0]."(true, \$block[1], \"right\", $bindex);");
-//		$time2 = getmicrotime();
-//		$time = $time2 - $time1;
-//		printf(" %.3f ", $time);
-//		print "<br />";
-//		print $TOTAL_QUERIES." ";
+		if ($disp_stats) {
+			$time2 = getmicrotime();
+			$time = $time2 - $time1;
+			print "Execution time: ";
+			printf(" %.3f ", $time);
+			print "<br />";
+			print "Queries: ".($TOTAL_QUERIES - $queries1)." ";
+		}
 	}
 	print "\t</div>\n";
 }
