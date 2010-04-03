@@ -87,7 +87,7 @@ class SystemConfig {
 			while($row = $res->FetchAssoc()) {
 				$var = substr($row["s_name"], 2);
 				// Catch variables that don't belong in the DB
-				if (!in_array($var, self::$exclude_parms)) {
+				if (!in_array($var, self::$exclude_parms) && property_exists("SystemConfig", $var)) {
 					if ($row["s_value"] == "false") self::$$var = false;
 					else if ($row["s_value"] == "true") self::$$var = true;
 					else self::$$var = $row["s_value"];

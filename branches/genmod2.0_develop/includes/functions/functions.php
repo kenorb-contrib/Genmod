@@ -1766,11 +1766,19 @@ function GetRecType($gedrec) {
 	else return false;
 }
 
-// Get the recordtype
+// Get the recordlevel
 function GetRecLevel($gedrec) {
 	
 	if (empty($gedrec)) return -1;
 	else return substr($gedrec, 0, 1);
+}
+
+// Get the recordtype
+function GetFactType($factrec) {
+	
+	$gt = preg_match("/1 @.+@ (\w+)/", $factrec, $gmatch);
+	if ($gt > 0) return $gmatch[1];
+	else return false;
 }
 
 /* Cloning an object */

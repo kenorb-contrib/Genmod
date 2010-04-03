@@ -163,20 +163,20 @@ function InstallFixDBLayout() {
 			if (!$res = mysql_query($sql)) {
 				print "Query error:<br />".$sql; 
 				print "<br />";
-				print mysql_error();
+				print mysql_error()."<br />";
 			}
-			else print GM_LANG_missing_fields_keys_restored;
+			else print GM_LANG_missing_fields_keys_restored."<br />";
 			
 			// Delete obsolete rows
 			foreach ($deleterows as $key => $row) {
-				$sql = "ALTER TABLE `".$row[0]."` DROP ".$row[1];
+				$sql = "ALTER TABLE `".$row[0]."` DROP `".$row[1]."`";
 				$res = mysql_query($sql);
-				if ($res) {
+				if (!$res) {
 					print "Query error:<br />".$sql; 
 					print "<br />";
-					print mysql_error();
+					print mysql_error()."<br />";
 				}
-				else print GM_LANG_obsolete_row_deleted;
+				else print GM_LANG_obsolete_row_deleted." ".$row[1]."<br />";
 			}
 		}
 		else {
