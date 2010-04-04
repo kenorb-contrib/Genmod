@@ -55,7 +55,7 @@ PrintHeader(GM_LANG_config_maint);
 	<?php
 	if ($action == "update" && isset($delconf)) {
 		foreach ($delconf as $key => $value) {
-			if (!$SystemConfig::DeleteConfig($value)) {
+			if (!SystemConfig::DeleteConfig($value)) {
 				$message = "<span class=\"error\">".GM_LANG_gm_config_write_error."</span>";
 				break;
 			}

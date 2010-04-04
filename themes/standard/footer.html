@@ -1,7 +1,7 @@
 <!-- linkbreaks added to give space between footer and content -->
 <br /><br />
 <?php
-global $CONFIG_PARMS, $spider, $gm_user, $MEDIA_IN_DB;
+global $CONFIG_PARMS, $spider, $gm_user;
 if (!isset($without_close)) print "</div> <!-- closing div id=\"content\" -->\n";
 print "<div id=\"footer\" class=\"$TEXT_DIRECTION\">";
 	PrintContactLinks();
@@ -16,7 +16,7 @@ print "<div id=\"footer\" class=\"$TEXT_DIRECTION\">";
 	}
 	print "<br />Running <a href=\"http://www.genmod.net\" target=\"_blank\">Genmod";
 	if (count($CONFIG_PARMS) >1) print " Enterprise";
-	if ($MEDIA_IN_DB) print " VFS";
+	if (SystemConfig::$MEDIA_IN_DB) print " VFS";
 	print "</a>  - Version ".GM_VERSION." ".GM_VERSION_RELEASE;
 	print "</div>";
 	print "</div> <!-- close div id=\"footer\" -->\n";

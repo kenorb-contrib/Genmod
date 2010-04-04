@@ -180,22 +180,38 @@ abstract class PersonFunctions {
 			if (!empty($object["thumb"])) {
 				$media =& MediaItem::GetInstance($object["id"], "", $person->gedcomid);
 				// NOTE: IMG ID
-				$class = "pedigree_image_portrait";
-				if ($media->fileobj->f_width > $media->fileobj->f_height) $class = "pedigree_image_landscape";
+				if ($media->fileobj->f_width > $media->fileobj->f_height) {
+					$class = "pedigree_image_landscape";
+					$has_thumb = 63;
+				}
+				else {
+					$class = "pedigree_image_portrait";
+					$has_thumb = floor(60 * $media->fileobj->f_width / $media->fileobj->f_height) + 5;
+				}
 				if($TEXT_DIRECTION == "rtl") $class .= "_rtl";
 				// NOTE: IMG ID
 				print "<div class=\"$class\" style=\"float: left; border: none;\">";
 				print "<img id=\"box-".$person->xref.".".$personcount.".".$count."-thumb\" src=\"".$media->fileobj->f_thumb_file."\" vspace=\"0\" hspace=\"0\" class=\"$class\" alt =\"\" title=\"\" ";
-				$has_thumb = true;
+				//$has_thumb = true;
 				if (!$show_full) print " style=\"display: none;\"";
 				print " /></div>\n";
 			}
 		}
 				
 		// NOTE: Start the person details div. Adjust the print width to the purpose and filling
+		// Calculate the max width: $bwidth - 4 (=padding) - 25 (= icons) - image width
+		$pwidth = $bwidth - 4 - (isset($has_thumb) ? $has_thumb : 0) - 25;
+
 		if (!$show_full) print "<div class=\"person_details width100\">";
-		else if (isset($has_thumb)) print "<div class=\"person_details width60\">";
-		else print "<div class=\"person_details width80\">";
+		else {
+			if ($style == 1) {
+				print "<div class=\"person_details\" style=\"width:".$pwidth."px\">";
+			}
+			else {
+				if (isset($has_thumb)) print "<div class=\"person_details width60\">";
+				else print "<div class=\"person_details width90\">";
+			}
+		}
 			//-- check if the person is visible
 			if (!$person->disp) {
 				if ($person->disp_name) {
@@ -333,7 +349,8 @@ abstract class PersonFunctions {
 				$tagstoprint = array_flip(array_flip($tagstoprint));
 
 				// Get the subrecords and sort them
-				$factobjs = $person->SelectFacts($tagstoprint);	
+				$factobjs = $person->SelectFacts($tagstoprint);
+				SortFactObjs($factobjs, "INDI");
 				foreach($factobjs as $key => $factobj) {
 					FactFunctions::PrintSimpleFact($factobj, true, false);
 				}			
@@ -357,7 +374,8 @@ abstract class PersonFunctions {
 					
 			// NOTE: links and zoom icons
 			// NOTE: Start div icons-$personcount.$pid.$count
-			print "<div id=\"icons-".$person->xref.".".$personcount.".".$count.".".$random."\"  class=\"width10\" style=\"float:";
+			// Set width exactely to the width of the icons
+			print "<div id=\"icons-".$person->xref.".".$personcount.".".$count.".".$random."\" style=\"width:25px; float:";
 			if ($TEXT_DIRECTION == "rtl") print "left"; else print "right";
 			print "; text-align: ";
 			if ($TEXT_DIRECTION == "rtl") print "left"; else print "right";
