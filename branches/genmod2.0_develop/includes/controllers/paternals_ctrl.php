@@ -42,10 +42,10 @@ class PaternalsController extends ChartController {
 		
 		parent::__construct();
 
-		if (!isset($_REQUEST["split"])) $this->split = 1;
+		if (!isset($_REQUEST["split"]) || empty($_REQUEST["split"])) $this->split = 1;
 		else $this->split = $_REQUEST["split"];
 		
-		if (!isset($_REQUEST["line"])) $this->line = "paternal";
+		if (!isset($_REQUEST["line"]) || empty($_REQUEST["line"])) $this->line = "paternal";
 		else $this->line = $_REQUEST["line"];
 		
 		global $bwidth;
@@ -112,7 +112,7 @@ class PaternalsController extends ChartController {
 		print "<br style=\"clear:both;\" />";
 		// Print the root person
 		print "<div style=\"width:100%\" align=\"center\">";
-		print "<div style=\"width:51%; float:right;\">";
+		print "<div style=\"width:51%; float:right;\" align=\"left\">";
 		$this->PrintFamArrow("u", $this->GetRootObject());
 		print "</div>";
 		print "<br /><br />";
