@@ -54,14 +54,14 @@ class FAQController {
 		
 		if ($gm_user->userGedcomAdmin()) $this->canconfig = true;
 		else $this->canconfig = false;
-
-		if (isset($_REQUEST["id"])) {
-			$this->id = $_REQUEST["id"];
-			$this->faq = FAQ::GetInstance($this->id);
-		}
 				
 		if (!isset($_REQUEST["action"])) $this->action = "show";
 		else $this->action = $_REQUEST["action"];
+
+		if (isset($_REQUEST["id"])) {
+			$this->id = $_REQUEST["id"];
+			if ($this->action != "commit" && $this->type != "delete") $this->faq = FAQ::GetInstance($this->id);
+		}
 		
 		if (isset($_REQUEST["type"])) $this->type = $_REQUEST["type"];
 		

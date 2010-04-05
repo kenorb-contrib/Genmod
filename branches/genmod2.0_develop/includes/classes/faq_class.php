@@ -106,6 +106,8 @@ class FAQ {
 		
 		$sql = "DELETE FROM ".TBLPREFIX."faqs WHERE fa_id='".$this->id."'";
 		$res = NewQuery($sql);
+		$sql = "UPDATE ".TBLPREFIX."faqs SET fa_order=fa_order-1 WHERE fa_order>".$this->order." AND fa_file=".$this->gedcomid;
+		$res = NewQuery($sql);
 		unset(self::$cache[$this->gedcomid][$this->id]);
 		WriteToLog("FAQ-> FAQ item has been deleted.<br />ID: ".$this->id.".<br />Gedcom ID: ".$this->gedcomid, "I", "G", $this->gedcomid);
 	}

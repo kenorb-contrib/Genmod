@@ -175,7 +175,9 @@ if ($faq_controller->canconfig && $faq_controller->adminedit) {?>
 				?>
 				</div><hr />
 				<?php
+				$highid = array_pop(array_keys($faqs));
 				foreach($faqs as $id => $faq) {
+					if (!isset($lowid)) $lowid = $id;
 					if (!is_null($faq->header) && !is_null($faq->body)) { ?>
 						<div class="item_box">
 							<?php
@@ -209,13 +211,19 @@ if ($faq_controller->canconfig && $faq_controller->adminedit) {?>
 								<?php
 								// NOTE: Print the edit options op the current item
 								if ($faq_controller->canconfig && $faq_controller->adminedit) { ?>
-									<div class="choice_left">
-										<?php PrintHelpLink("moveup_faq_item_help","qm","moveup_faq_item");?>
-										<a href="faq.php?action=commit&amp;type=moveup&amp;id=<?php print $faq->id; ?>"><img src="<?php print GM_IMAGE_DIR."/".$GM_IMAGES["uarrow"]["other"];?>" alt="" /></a>
+									<div class="choice_left width20">
+										<?php if ($id != $lowid) {
+											PrintHelpLink("moveup_faq_item_help","qm","moveup_faq_item");?>
+											<a href="faq.php?action=commit&amp;type=moveup&amp;id=<?php print $faq->id; ?>"><img src="<?php print GM_IMAGE_DIR."/".$GM_IMAGES["uarrow"]["other"];?>" alt="" /></a>
+										<?php } 
+										else print "&nbsp";?>
 									</div>
-									<div class="choice_middle">
-										<?php PrintHelpLink("movedown_faq_item_help","qm","movedown_faq_item"); ?>
-										<a href="faq.php?action=commit&amp;type=movedown&amp;id=<?php print $faq->id; ?>"><img src="<?php print GM_IMAGE_DIR."/".$GM_IMAGES["darrow"]["other"];?>" alt="" /></a>
+									<div class="choice_middle width20">
+										<?php if ($id != $highid) {
+											PrintHelpLink("movedown_faq_item_help","qm","movedown_faq_item"); ?>
+											<a href="faq.php?action=commit&amp;type=movedown&amp;id=<?php print $faq->id; ?>"><img src="<?php print GM_IMAGE_DIR."/".$GM_IMAGES["darrow"]["other"];?>" alt="" /></a>
+										<?php } 
+										else print "&nbsp";?>
 									</div>
 									<div class="choice_middle">					
 										<?php PrintHelpLink("edit_faq_item_help","qm","edit_faq_item"); ?>
