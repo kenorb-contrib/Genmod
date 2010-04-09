@@ -199,7 +199,7 @@ else {
 		if ($trace) print "option 6";
 		// NOTE: If user wishes to skip surname do not print the surname
 		print "<div class=\"topbar\">";
-		if ($indilist_controller->surname_sublist == "yes" && empty($indilist_controller->surname)) print GM_LANG_surnames;
+		if ($indilist_controller->surname_sublist == "yes" && $indilist_controller->surname == "") print GM_LANG_surnames;
 		else print PrintReady(str_replace("#surname#", NameFunctions::CheckNN($indilist_controller->surname), GM_LANG_indis_with_surname));
 		print "</div>\n";
 		$indilist_controller->PrintPersonList($tindilist, true);
