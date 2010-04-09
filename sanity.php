@@ -745,10 +745,10 @@ if (!empty($check_gedcoms)) {
 						}
 						if ($inames) {
 							$parents = array();
-							$ct = preg_match("/1 HUSB @(.*)@/", $famrec, $match);
+							$ct = preg_match("/1 HUSB @(.*)@/", $gedlines["gedcom"], $match);
 							if ($ct>0) $parents["HUSB"] = $match[1];
 							else $parents["HUSB"] = "";
-							$ct = preg_match("/1 WIFE @(.*)@/", $famrec, $match);
+							$ct = preg_match("/1 WIFE @(.*)@/", $gedlines["gedcom"], $match);
 							if ($ct>0) $parents["WIFE"]=$match[1];
 							else $parents["WIFE"] = "";
 							if (!empty($parents["HUSB"])) $indilist[$parents["HUSB"]]["names"] = NameFunctions::GetIndiNames($indilist[$parents["HUSB"]]["gedcom"]);
