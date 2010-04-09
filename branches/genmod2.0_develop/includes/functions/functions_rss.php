@@ -225,7 +225,7 @@ function getTodaysEvents() {
 			$fact = new Fact($factarr[0], $factarr[2], GedcomConfig::$GEDCOMID, $factarr[6], $factarr[1]);
 			$factrec = $factarr[1];
 			if ($person->disp && $fact->disp) {
-				$text = FactFunctions::GetCalendarFact($fact, $action, $filter);
+				$text = FactFunctions::GetCalendarFact($fact, $action, $filter, "all", GetCurrentYear(), GetCurrentMonth(), GetCurrentDay());
 				if ($text != "filter") {
 					if ($lastgid != $person->xref) {
 						$daytext .= "<li><a href=\"".SERVER_URL ."individual.php?pid=".$person->xref."&amp;gedid=".GedcomConfig::$GEDCOMID."\"><b>".PrintReady($person->sortable_name)."</b>".$person->addxref;
@@ -241,7 +241,7 @@ function getTodaysEvents() {
 			$family =& Family::GetInstance($factarr[0], "", GedcomConfig::$GEDCOMID);
 			$fact = new Fact($factarr[0], $factarr[2], GedcomConfig::$GEDCOMID, $factarr[6], $factarr[1]);
 			if ($family->disp && $fact->disp) {
-				$text = FactFunctions::GetCalendarFact($fact, $action, $filter);
+				$text = FactFunctions::GetCalendarFact($fact, $action, $filter, "all", GetCurrentYear(), GetCurrentMonth(), GetCurrentDay());
 				if ($text!="filter") {
 					if ($lastgid != $family->xref) {
 						$daytext .= "<li><a href=\"".SERVER_URL ."family.php?famid=".$family->xref."&amp;gedid=".GedcomConfig::$GEDCOMID."\"><b>".PrintReady($family->sortable_name)."</b>".$family->addxref;
