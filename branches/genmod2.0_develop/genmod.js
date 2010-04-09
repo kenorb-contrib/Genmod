@@ -1066,3 +1066,11 @@ function Urldecode(string) {
 	var string = string.replace(/\+/g," ");
 	return string;
 }
+
+function SetBoxSize(add) {
+	var a=Number(document.getElementById('box_width').value); 
+	a+=add;
+	if(a<50||isNaN(a)) a=50; 
+	document.getElementById('box_width').value=a;
+	return false;
+}
