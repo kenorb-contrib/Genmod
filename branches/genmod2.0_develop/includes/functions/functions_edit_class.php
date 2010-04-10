@@ -288,7 +288,7 @@ abstract class EditFunctions {
 		$surn = "";
 		if (empty($namerec)) {
 			$namerec = "";
-			if ($famtag == "CHIL" && $nextaction=="addchildaction") {
+			if ($famtag == "CHIL" && $nextaction == "addchildaction") {
 				// The child will get the fathers surname as preset
 				$famrec = "";
 				if (!empty($famid)) {
@@ -296,12 +296,19 @@ abstract class EditFunctions {
 					if (is_object($family->husb)) $namerec = "1 NAME ".$family->husb->name_array[0][0];
 				}
 			}
-			if ($famtag == "HUSB" && $nextaction=="addnewparentaction") {
+			if ($famtag == "HUSB" && $nextaction == "addnewparentaction") {
 				// The husband will get the surname of one of the kids as preset
-				$family =& Family::GetInstance($famid);
-				foreach ($family->children as $key => $child) {
-					$namerec = "1 NAME ".$child->name_array[0][0];
-					break;
+				// The family may not exist yet.....
+				if ($famid != "new") {
+					$family =& Family::GetInstance($famid);
+					foreach ($family->children as $key => $child) {
+						$namerec = "1 NAME ".$child->name_array[0][0];
+						break;
+					}
+				}
+				else {
+					$person =& Person::GetInstance($pid);
+					if (!$person->isempty) $namerec = "1 NAME ".$person->name_array[0][0];
 				}
 			}
 			// For the wife we don't know....
@@ -395,9 +402,9 @@ abstract class EditFunctions {
 			self::AddSimpleTag("0 TIME", "DEAT");
 			self::AddSimpleTag("0 PLAC", "DEAT");
 			// print $famtag." ".$nextaction;
-			if ($famtag=="CHIL" && $nextaction=="addchildaction" && !empty($famid)) {
+			if ($famtag == "CHIL" && $nextaction == "addchildaction" && !empty($famid)) {
 				self::AddTagSeparator("PEDI");
-				self::AddSimpleTag("0 PEDI");
+				self::AddSimpleTag("0 PEDI", "", 1, true);
 			}
 			//-- if adding a spouse add the option to add a marriage fact to the new family
 			if ($nextaction=='addspouseaction' || ($nextaction=='addnewparentaction' && $famid!='new')) {
@@ -791,7 +798,7 @@ abstract class EditFunctions {
 			print ">".GM_LANG_no."</option>\n";
 			print "</select>\n";
 		}
-		else if ($fact=="SEX") {
+		else if ($fact == "SEX") {
 			print "<select tabindex=\"".$tabkey."\" id=\"".$element_id."\" name=\"".$element_name."\">\n<option value=\"M\"";
 			if ($value=="M") print " selected=\"selected\"";
 			print ">".GM_LANG_male."</option>\n<option value=\"F\"";
@@ -800,28 +807,8 @@ abstract class EditFunctions {
 			if ($value=="U" || empty($value)) print " selected=\"selected\"";
 			print ">".GM_LANG_unknown."</option>\n</select>\n";
 		}
-		else if ($fact=="PEDI") {
-			print "<select tabindex=\"".$tabkey."\" id=\"".$element_id."\" name=\"".$element_name."\">\n";
-			
-			if ($switch) {
-				print "<option value=\"birth\"";
-				if ($value=="birth") print " selected=\"selected\"";
-				print ">".GM_LANG_biological."</option>\n";
-			}
-			
-			print "<option value=\"adopted\"";
-			if ($value=="adopted") print " selected=\"selected\"";
-			print ">".GM_LANG_adopted."</option>\n";
-	
-			print "<option value=\"foster\"";
-			if ($value=="foster") print " selected=\"selected\"";
-			print ">".GM_LANG_foster."</option>\n";
-			
-			print "<option value=\"sealing\"";
-			if ($value=="sealing") print " selected=\"selected\"";
-			print ">".GM_LANG_sealing."</option>\n";
-			
-			print "</select>\n";
+		else if ($fact == "PEDI") {
+			self::PrintPedi($element_id, $element_name, $value, $switch);
 		}
 		else if ($fact == "TYPE" && $level == '3') {?>
 			<select name="text[]">
@@ -842,7 +829,7 @@ abstract class EditFunctions {
 			</select>
 			<?php
 		}
-		else if ($fact=="QUAY") {
+		else if ($fact == "QUAY") {
 			print "<select tabindex=\"".$tabkey."\" id=\"".$element_id."\" name=\"".$element_name."\">\n";
 			print "<option value=\"\"";
 				if ($value=="") print " selected=\"selected\"";
@@ -1362,10 +1349,12 @@ abstract class EditFunctions {
 		else return $datestr;
 	}
 	
-	public function PrintPedi($name, $value="", $showbio=true) {
+	public function PrintPedi($id, $name="", $value="", $showbio=true) {
 		global $align, $tabkey;
 	
-		print "<select tabindex=\"".$tabkey."\" id=\"".$name."\" name=\"".$name."\">\n";
+		if (empty($name)) $name = $id;
+		
+		print "<select tabindex=\"".$tabkey."\" id=\"".$id."\" name=\"".$name."\">\n";
 			
 		if ($showbio) {
 			print "<option value=\"birth\"";
