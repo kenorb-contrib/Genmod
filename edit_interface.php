@@ -700,7 +700,7 @@ switch ($action) {
 				$hasprimary = false;
 				foreach($families as $famid => $fam) {
 					print "<tr>\n<td class=\"shade2\">\n";
-					EditFunctions::PrintPedi("pedi_".$fam->xref, $fam->pedigreetype);
+					EditFunctions::PrintPedi("pedi_".$fam->xref, "", $fam->pedigreetype);
 					print "</td><td class=\"shade1\">";
 					print $fam->name;
 					print "<br />";
@@ -897,7 +897,7 @@ switch ($action) {
 				<tr>
 					<td class="shade1 <?php print $TEXT_DIRECTION; ?>"><b><?php print $child->label[$famid]; ?></b><input type="hidden" name="CHIL<?php print $i; ?>" value="<?php print $child->xref;?>" /></td>
 					<td id="CHILName<?php print $i; ?>" class="shade1"><?php print PrintReady($child->name); ?><br /><?php 					PersonFunctions::PrintFirstMajorFact($child); ?></td>
-					<td id="CHILPedi<?php print $i; ?>" class="shade1"><?php EditFunctions::PrintPedi("CHILPedisel".$i, $pedi); ?></td>
+					<td id="CHILPedi<?php print $i; ?>" class="shade1"><?php EditFunctions::PrintPedi("CHILPedisel".$i, "", $pedi); ?></td>
 					<td class="shade1 <?php print $TEXT_DIRECTION; ?>">
 						<a href="#" id="childrem<?php print $i; ?>" style="display:block;" onclick="document.changefamform.CHIL<?php print $i; ?>.value=''; document.getElementById('CHILName<?php print $i; ?>').innerHTML=''; this.style.display='none'; return false;"><?php print GM_LANG_remove; ?></a>
 						<a href="#" onclick="nameElement = document.getElementById('CHILName<?php print $i; ?>'); remElement = document.getElementById('childrem<?php print $i; ?>'); return findIndi(document.changefamform.CHIL<?php print $i; ?>);"><?php print GM_LANG_change; ?></a><br />
@@ -912,7 +912,7 @@ switch ($action) {
 				<tr>
 					<td class="shade1 <?php print $TEXT_DIRECTION; ?>"><b><?php print GM_LANG_add_child; ?></b><input type="hidden" name="CHIL<?php print $i; ?>" value="" /></td>
 					<td id="CHILName<?php print $i; ?>" class="shade1">
-					<td id="CHILPedi<?php print $i; ?>" class="shade1"><div id="CHILHide<?php print $i; ?>" style="display: none;"><?php EditFunctions::PrintPedi("CHILPedisel".$i, $pedi); ?></div></td>
+					<td id="CHILPedi<?php print $i; ?>" class="shade1"><div id="CHILHide<?php print $i; ?>" style="display: none;"><?php EditFunctions::PrintPedi("CHILPedisel".$i, "", $pedi); ?></div></td>
 					<td class="shade1 <?php print $TEXT_DIRECTION; ?>">
 						<a href="#" id="childrem<?php print $i; ?>" style="display: none;" onclick="document.changefamform.CHIL<?php print $i; ?>.value=''; document.getElementById('CHILName<?php print $i; ?>').innerHTML=''; this.style.display='none'; return false;"><?php print GM_LANG_remove; ?></a>
 						<a href="#" onclick="pediElement = document.getElementById('CHILHide<?php print $i; ?>'); nameElement = document.getElementById('CHILName<?php print $i; ?>'); remElement = document.getElementById('childrem<?php print $i; ?>'); return findIndi(document.changefamform.CHIL<?php print $i; ?>);"><?php print GM_LANG_change; ?></a><br />
@@ -1566,7 +1566,7 @@ switch ($action) {
 			}
 			print "<tr><td class=\"shade2\">".GM_FACT_PEDI."</td>";
 			print "<td class=\"shade1\">";
-			EditFunctions::PrintPedi("PEDI", "", $showbio);
+			EditFunctions::PrintPedi("PEDI", "", "", $showbio);
 			print "</td></tr>";
 		}
 		if ($gm_user->UserCanAccept() && !$gm_user->userAutoAccept()) print "<tr><td class=\"shade1\" colspan=\"2\"><input name=\"aa_attempt\" type=\"checkbox\" value=\"1\" />".GM_LANG_attempt_auto_acc."</td></tr>";
@@ -1637,7 +1637,7 @@ switch ($action) {
 			}
 			print "<tr><td class=\"shade2\">".GM_FACT_PEDI."</td>";
 			print "<td class=\"shade1\">";
-			EditFunctions::PrintPedi("PEDI", "", $showbio);
+			EditFunctions::PrintPedi("PEDI", "", "", $showbio);
 			print "</td></tr>";
 		}
 		if ($gm_user->UserCanAccept() && !$gm_user->userAutoAccept()) print "<tr><td class=\"shade1\" colspan=\"2\"><input name=\"aa_attempt\" type=\"checkbox\" value=\"1\" />".GM_LANG_attempt_auto_acc."</td></tr>";

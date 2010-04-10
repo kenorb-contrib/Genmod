@@ -350,10 +350,18 @@ abstract class GedcomRecord {
 
 	protected function DisplayDetails($links=true) {
 		
-		if (is_null($this->disp)) {
-			$this->disp = $this->CheckAccess(1, $links);
+		if ($links) {
+			if (is_null($this->disp)) {
+				$this->disp = $this->CheckAccess(1, $links);
+			}
+			return $this->disp;
 		}
-		return $this->disp;
+		else {
+			if (is_null($this->disp_as_link)) {
+				$this->disp_as_link = $this->CheckAccess(1, $links);
+			}
+			return $this->disp_as_link;
+		}
 	}
 	
 	protected function DispName() {
@@ -679,8 +687,8 @@ abstract class GedcomRecord {
 		$ulevel = $gm_user->getUserAccessLevel();
 		if (!isset($hit)) $hit = array();
 
-		if (DEBUG && isset($hit[$this->key])) print "ERROR: getting checked twice: ".$this->key."<br />";
-		else $hit[$this->key] = 1;
+		if (DEBUG && isset($hit[$this->key][$checklinks])) print "ERROR: getting checked twice: ".$this->key."<br />";
+		else $hit[$this->key][$checklinks] = 1;
 		
 		if (!isset($PRIVACY_CHECKS)) $PRIVACY_CHECKS = 1;
 		else $PRIVACY_CHECKS++;
