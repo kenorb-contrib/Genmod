@@ -155,32 +155,32 @@ abstract class GedcomConfig {
 															// Show birth and death of relatives on individual page
 	public static $EXPAND_RELATIVES_EVENTS = false;			// Auto-expand the relatives facts on the individual page
 	public static $EDIT_AUTOCLOSE = false;					// Autoclose edit window when update successful
-	public static $SOUR_FACTS_UNIQUE = "AUTH,ABBR,TITL,PUBL,TEXT";
+	public static $SOUR_FACTS_UNIQUE = "AUTH,ABBR,TITL,PUBL,TEXT,RESN";
 															// Facts for sources of which there can only be one
 	public static $SOUR_FACTS_ADD = "NOTE,OBJE,REPO,GNOTE";	// Facts for sources that can be added more than once
-	public static $SOUR_QUICK_ADDFACTS = "";				// Done
-	public static $REPO_FACTS_UNIQUE = "NAME,ADDR";			// Facts for repositories of which there can only be one.
+	public static $SOUR_QUICK_ADDFACTS = "OBJE";			// Done
+	public static $REPO_FACTS_UNIQUE = "NAME,ADDR,RESN";	// Facts for repositories of which there can only be one.
 	public static $REPO_FACTS_ADD = "PHON,EMAIL,FAX,WWW,NOTE,GNOTE";
 															// Facts for repositories that can be added more than once
-	public static $REPO_QUICK_ADDFACTS = "";				// Done
-	public static $INDI_FACTS_UNIQUE = "SEX,BIRT,DEAT,CREM";
+	public static $REPO_QUICK_ADDFACTS = "";				// A link to add these facts will display next to the dropdown for add facts
+	public static $INDI_FACTS_UNIQUE = "SEX,BIRT,DEAT,CREM,RESN";
 															// Facts for individuals of which there can only be one.
 	public static $INDI_FACTS_ADD = "ADDR,AFN,CHR,BURI,ADOP,BAPM,BARM,BASM,BLES,CHRA,CONF,EMAIL,FAX,PHON,FCOM,ORDN,NATU,EMIG,IMMI,CENS,PROB,WILL,GRAD,RETI,CAST,DSCR,EDUC,IDNO,NATI,NCHI,NMR,OCCU,PROP,RELI,RESI,SSN,TITL,BAPL,CONL,ENDL,SLGC,_MILI";
 															// Facts for individuals that can be added more than once
 	public static $INDI_QUICK_ADDFACTS = "BIRT,DEAT,OCCU,RESI";
-															// Done
-	public static $FAM_FACTS_UNIQUE = "NCHI,MARL,DIV,ANUL,DIVF,ENGA,MARB,MARC,MARS,HUSB,WIFE";
+															// A link to add these facts will display next to the dropdown for add facts
+	public static $FAM_FACTS_UNIQUE = "NCHI,MARL,DIV,ANUL,DIVF,ENGA,MARB,MARC,MARS,HUSB,WIFE,RESN";
 															// Facts for families of which there can only be one.
 	public static $FAM_FACTS_ADD = "CENS,MARR,RESI,SLGS,MARR_CIVIL,MARR_RELIGIOUS,MARR_PARTNERS";
 															// Facts for families that can be added more than once
-	public static $FAM_QUICK_ADDFACTS = "";					// Done
-	public static $MEDIA_FACTS_UNIQUE = "TITL";				// Facts for media items of which there can only be one.
+	public static $FAM_QUICK_ADDFACTS = "MARR";				// A link to add these facts will display next to the dropdown for add facts
+	public static $MEDIA_FACTS_UNIQUE = "TITL,RESN";		// Facts for media items of which there can only be one.
 	public static $MEDIA_FACTS_ADD = "FILE,REFN,NOTE,SOUR,GNOTE";
 															// Facts for media items that can be added more than once
-	public static $MEDIA_QUICK_ADDFACTS = "";				// Done
-	public static $NOTE_FACTS_UNIQUE = "RIN";				// Facts for notes of which there can only be one.
+	public static $MEDIA_QUICK_ADDFACTS = "";				// A link to add these facts will display next to the dropdown for add facts
+	public static $NOTE_FACTS_UNIQUE = "RIN,RESN";			// Facts for notes of which there can only be one.
 	public static $NOTE_FACTS_ADD = "";						// Facts for notes that can be added more than once
-	public static $NOTE_QUICK_ADDFACTS = "";				// Done
+	public static $NOTE_QUICK_ADDFACTS = "";				// A link to add these facts will display next to the dropdown for add facts
 	public static $RSS_FORMAT = "RSS1.0";					// format of RSS to use
 	public static $TIME_LIMIT = "60";						// Amount of time to execute before quitting in seconds
 															// Set this to 0 to remove all time limits
