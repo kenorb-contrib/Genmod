@@ -330,7 +330,7 @@ abstract class PrivacyFunctions {
 		if ($ct == 0) return false;
 		if ($level == 1 && !$PRIVACY_BY_RESN) return false;
 		$myindi = "";
-		if (!empty($gm_user->gedcomid[GedcomConfig::$GEDCOMID])) trim($myindi = $gm_user->gedcomid[GedcomConfig::$GEDCOMID]);
+		if (isset($gm_user->gedcomid[GedcomConfig::$GEDCOMID])) $myindi = trim($gm_user->gedcomid[GedcomConfig::$GEDCOMID]);
 		if ($ct > 0) {
 			$match[1] = strtolower(trim($match[1]));
 			if ($match[1] == "none") return false;
@@ -359,14 +359,21 @@ abstract class PrivacyFunctions {
 		$ct = preg_match("/$level RESN (.*)/", $factrec, $match);
 		if ($ct == 0) return false;
 		if ($level == 1 && !$PRIVACY_BY_RESN) return false;
-		$myindi = "";
-		if (!empty($gm_user->gedcomid[GedcomConfig::$GEDCOMID])) $myindi = trim($gm_user->gedcomid[GedcomConfig::$GEDCOMID]);
+		
 		$pid = trim($pid);
+		$type = IDType($pid);
+		$myindi = "";
+		// Only for indi's and fams we restrict privacy to the user himself.
+		// For other record types it's no use, so authenticated users (users with access priviledge) can see it.
+		if ($type == "INDI" || $type == "FAM") {
+			if (isset($gm_user->gedcomid[GedcomConfig::$GEDCOMID])) $myindi = trim($gm_user->gedcomid[GedcomConfig::$GEDCOMID]);
+		}
+		else if ($gm_user->userPrivAccess()) $myindi = $pid;
 		if ($ct > 0) {
 			$match[1] = strtolower(trim($match[1]));
 			if ($match[1] == "none") return false;
 			if ($match[1] == "locked") return false;
-			if (($match[1] == "confidential") && (($gm_user->userIsAdmin()) || ($gm_user->userGedcomAdmin()))) return false;
+			if (($match[1] == "confidential") && ($gm_user->userIsAdmin() || $gm_user->userGedcomAdmin())) return false;
 			if (($match[1] == "privacy") && (($gm_user->userIsAdmin()) || ($myindi == $pid) || ($gm_user->userGedcomAdmin()))) return false;
 			if (IDType($pid) == "FAM"){
 				$family =& Family::GetInstance($pid); 
