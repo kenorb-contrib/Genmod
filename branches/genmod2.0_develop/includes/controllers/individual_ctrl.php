@@ -183,12 +183,15 @@ class IndividualController extends DetailController {
 				if ($firstmediarec) {
 					// new from here
 					$media =& MediaItem::GetInstance($firstmediarec["id"]);
-					if (GedcomConfig::$USE_THUMBS_MAIN && $firstmediarec["use_thum"] != "Y") $filename = $media->fileobj->f_thumb_file;
-					else $filename = ($media->fileobj->f_file_exists ? $media->fileobj->f_main_file : $media->fileobj->f_thumb_file);
-					if ($media->fileobj->f_height != 0 && $media->fileobj->f_height < 150) $height = $media->fileobj->f_height;
-					else $height = 150;
-					$this->HighlightedObject = '<img src="'.$filename.'" class="image" height="'.$height.'" alt="'.$media->title.'" />';
-					$this->canshowhighlightedobj = true;
+					if ($media->fileobj->f_file_exists) {
+						if (GedcomConfig::$USE_THUMBS_MAIN && $firstmediarec["use_thum"] != "Y") $filename = $media->fileobj->f_thumb_file;
+						else $filename = $media->fileobj->f_main_file;
+						if ($media->fileobj->f_height != 0 && $media->fileobj->f_height < 150) $height = $media->fileobj->f_height;
+						else $height = 150;
+						$this->HighlightedObject = '<img src="'.$filename.'" class="image" height="'.$height.'" alt="'.$media->title.'" />';
+						$this->canshowhighlightedobj = true;
+					}
+					else $this->canshowhighlightedobj = false;
 				}
 				else $this->canshowhighlightedobj = false;
 			}

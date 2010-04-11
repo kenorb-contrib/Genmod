@@ -1173,7 +1173,7 @@ abstract class MediaFS {
 					// media/pics/I1.jpg instead of media/I1.jpg!!!!!!!!
 					$new = preg_replace("~".$oldf."~", $mto.$file, $old);
 					if (!empty($old) && !empty($new)) {
-						ReplaceGedRec($row["m_media"], $old, $new, "FILE", $change_id, GedcomConfig::$GEDCOMID, "OBJE");
+						EditFunctions::ReplaceGedRec($row["m_media"], $old, $new, "FILE", $change_id, "edit_fact", GedcomConfig::$GEDCOMID, "OBJE");
 					}
 					else return false;
 				}

@@ -179,22 +179,24 @@ abstract class PersonFunctions {
 			// NOTE: Print the pedigree tumbnail
 			if (!empty($object["thumb"])) {
 				$media =& MediaItem::GetInstance($object["id"], "", $person->gedcomid);
-				// NOTE: IMG ID
-				if ($media->fileobj->f_width > $media->fileobj->f_height) {
-					$class = "pedigree_image_landscape";
-					$has_thumb = 63;
+				if ($media->fileobj->f_file_exists) {
+					// NOTE: IMG ID
+					if ($media->fileobj->f_width > $media->fileobj->f_height) {
+						$class = "pedigree_image_landscape";
+						$has_thumb = 63;
+					}
+					else {
+						$class = "pedigree_image_portrait";
+						$has_thumb = floor(60 * $media->fileobj->f_width / $media->fileobj->f_height) + 5;
+					}
+					if($TEXT_DIRECTION == "rtl") $class .= "_rtl";
+					// NOTE: IMG ID
+					print "<div class=\"$class\" style=\"float: left; border: none;\">";
+					print "<img id=\"box-".$person->xref.".".$personcount.".".$count."-thumb\" src=\"".$media->fileobj->f_thumb_file."\" vspace=\"0\" hspace=\"0\" class=\"$class\" alt =\"\" title=\"\" ";
+					//$has_thumb = true;
+					if (!$show_full) print " style=\"display: none;\"";
+					print " /></div>\n";
 				}
-				else {
-					$class = "pedigree_image_portrait";
-					$has_thumb = floor(60 * $media->fileobj->f_width / $media->fileobj->f_height) + 5;
-				}
-				if($TEXT_DIRECTION == "rtl") $class .= "_rtl";
-				// NOTE: IMG ID
-				print "<div class=\"$class\" style=\"float: left; border: none;\">";
-				print "<img id=\"box-".$person->xref.".".$personcount.".".$count."-thumb\" src=\"".$media->fileobj->f_thumb_file."\" vspace=\"0\" hspace=\"0\" class=\"$class\" alt =\"\" title=\"\" ";
-				//$has_thumb = true;
-				if (!$show_full) print " style=\"display: none;\"";
-				print " /></div>\n";
 			}
 		}
 				
