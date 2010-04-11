@@ -110,7 +110,7 @@ if (file_exists(INDEX_DIRECTORY."emergency_syslog.txt")) {
 <!-- Setup the right box -->
 <div id="admin_genmod_right">
      <div class="<?php print $TEXT_DIRECTION ?>">
-     	<div class="admin_topbottombar">Messages</div>
+     	<div class="admin_topbottombar"><?php print GM_LANG_messages; ?></div>
           <div class="admin_genmod_content">
           <?php
           if ($gm_user->userIsAdmin()) {
