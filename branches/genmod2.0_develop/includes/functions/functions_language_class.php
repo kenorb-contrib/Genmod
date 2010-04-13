@@ -187,7 +187,7 @@ abstract class LanguageFunctions {
 			}
 			else {
 				$number = 0;
-				WriteToLog("Facts table not available in database. Trying to load facts from file.","E","S");
+				WriteToLog("LoadEnglishFacts-> Facts table not available in database. Trying to load facts from file.","E","S");
 				// NOTE: If both string arrays are empty, no data came out of the database
 				// NOTE: We load the language from the file and write an error to the log
 				if (file_exists("languages/facts.en.txt")) {

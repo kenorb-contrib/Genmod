@@ -747,11 +747,11 @@ abstract class ImportFunctions {
 		$sql = "INSERT INTO ".TBLPREFIX."media_mapping VALUES(NULL,'".addslashes($media)."','".addslashes($indi)."','".addslashes($order)."','".$gedid."','".addslashes($gedrec)."', '".$rectype."')";
 		$res = NewQuery($sql);
 		if ($res) {
-			WriteToLog("New media link added to the database: ".$media, "I", "G", $gedid);
+			WriteToLog("AddDBLink->New media link added to the database: ".$media, "I", "G", $gedid);
 			return true;
 		}
 		else {
-			WriteToLog("There was a problem adding media record: ".$media, "E", "G", $gedid);
+			WriteToLog("AddDBLink->There was a problem adding media record: ".$media, "E", "G", $gedid);
 			return false;
 		}
 	}

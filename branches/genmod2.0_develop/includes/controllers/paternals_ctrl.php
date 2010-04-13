@@ -49,8 +49,8 @@ class PaternalsController extends ChartController {
 		else $this->line = $_REQUEST["line"];
 		
 		global $bwidth;
-		$this->pagewidth = pow(2, ($this->split-1)) * ($bwidth * 1.1) * ($this->box_width / 100);
-		
+		$this->pagewidth = floor(pow(2, ($this->split-1)) * ($bwidth * 1.1) * ($this->box_width / 100) + 0.5);
+
 		$this->params["split"] = $this->split;
 		$this->params["line"] = $this->line;
 	}
@@ -111,7 +111,9 @@ class PaternalsController extends ChartController {
 	
 		print "<br style=\"clear:both;\" />";
 		// Print the root person
-		print "<div style=\"width:100%\" align=\"center\">";
+		// Set the width of the containing div to the calculated value.
+		// Minimum if full screen width to keep it centered
+		print "<div style=\"width:".$this->pagewidth."px; min-width:100%\" align=\"center\">";
 		print "<div style=\"width:51%; float:right;\" align=\"left\">";
 		$this->PrintFamArrow("u", $this->GetRootObject());
 		print "</div>";
@@ -132,7 +134,8 @@ class PaternalsController extends ChartController {
 
 	private function PrintAncestors() {
 
-		$perc = 100 / pow(2, $this->split-1);
+		$perc = floor(100 / pow(2, $this->split-1)) - 0.1;
+		$width = floor($this->pagewidth / pow(2, $this->split-1));
 		$found = true;
 		while ($found) {
 			$found = false;
@@ -148,18 +151,19 @@ class PaternalsController extends ChartController {
 			}
 			if (!$found) break;
 			for ($i = 0; $i < count($this->rootfams); $i++) {
-				print "<div style=\"width:".$perc."%; float:left;\" align=\"center\">";
+				print "<div style=\"width:".$width."px; min-width:".$perc."%; float:left;\" align=\"center\">";
 				print (is_object($persons[$i]) || GedcomConfig::$SHOW_EMPTY_BOXES ? $this->PrintVLine() : "&nbsp");
 				print "</div>";
 			}
 			print "<br style=\"clear:both;\" />";
 			foreach($persons as $key2 => $person) {
-				print "<div style=\"width:".$perc."%; float:left;\" align=\"center\">";
+				print "<div style=\"width:".$width."px; min-width:".$perc."%; float:left;\" align=\"center\">";
 				if (is_object($person) || GedcomConfig::$SHOW_EMPTY_BOXES) PersonFunctions::PrintPedigreePerson($person, 1, true, $this->boxcount, 1, $this->view, $this->params);
 				else print "&nbsp;";
 				$this->boxcount++;
 				print "</div>";
 			}
+			print "<br style=\"clear:both;\" />";
 		}
 	}
 	
@@ -167,37 +171,39 @@ class PaternalsController extends ChartController {
 		global $GM_IMAGES;
 		
 		$cnt = count($fams);
-		$perc = 100 / pow(2, $cnt);
+		$width = floor($this->pagewidth / pow(2, $cnt));
+		$perc = floor(100 / pow(2, $cnt)) - 0.1;
 		$newfams = array();
-		$this->PrintLines($cnt, $perc);
+		$this->PrintLines($cnt, $width, $perc);
 		foreach ($fams as $key =>$famid) {
 			$family =& Family::GetInstance($famid);
-			print "<div style=\"width:".$perc."%; float:left;\" align=\"center\">";
+			print "<div style=\"width:".$width."px; min-width:".$perc."%; float:left;\" align=\"center\">";
 			PersonFunctions::PrintPedigreePerson($family->husb, 1, true, $this->boxcount, 1, $this->view, $this->params);
 			$this->boxcount++;
 			$newfams[] = (is_object($family->husb) ? $family->husb->primaryfamily : "");
 			print "</div>";
-			print "<div style=\"width:".$perc."%; float:left;\" align=\"center\">";
+			print "<div style=\"width:".$width."px; min-width:".$perc."%; float:left;\" align=\"center\">";
 			PersonFunctions::PrintPedigreePerson($family->wife, 1, true, $this->boxcount, 1, $this->view, $this->params);
 			$this->boxcount++;
 			$newfams[] = (is_object($family->wife) ? $family->wife->primaryfamily : "");
 			print "</div>";
 		}
+		print "<br style=\"clear:both;\" />";
 		return $newfams;
 	}
 	
-	private function PrintLines($cnt, $perc) {
+	private function PrintLines($cnt, $width, $perc) {
 		global $GM_IMAGES;
 		
 		// Print all the lines
 		for ($i = 1; $i <= $cnt;$i++) {
-			print "<div style=\"width:".($perc*2)."%; float:left;\" align=\"center\">";
+			print "<div style=\"width:".($width*2)."px; min-width:".($perc*2)."%; float:left;\" align=\"center\">";
 			$this->PrintVLine();
-			print "<div style=\"width:50%;\"><img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["hline"]["other"]."\" width=\"100%\" height=\"3\" alt=\"\" /></div>\n";
-			print "<div style=\"width:50%; float:left;\" align=\"center\">";
+			print "<div style=\"width:49.9%;\"><img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["hline"]["other"]."\" width=\"100%\" height=\"3\" alt=\"\" /></div>\n";
+			print "<div style=\"width:49.9%; float:left;\" align=\"center\">";
 			$this->PrintVLine();
 			print "</div>";
-			print "<div style=\"width:50%; float:left;\" align=\"center\">";
+			print "<div style=\"width:49.9%; float:left;\" align=\"center\">";
 			$this->PrintVLine();
 			print "</div>";
 			print "</div>";
@@ -207,7 +213,7 @@ class PaternalsController extends ChartController {
 	
 	private function PrintVLine() {
 		global $GM_IMAGES;
-//trbl
+		
 		print "<div style=\"width:6px; height:20px; margin: 5px 0px 5px 0px; vertical-align:middle; background: url('".GM_IMAGE_DIR."/".$GM_IMAGES["vline"]["other"]."');\"><img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["spacer"]["other"]."\" width=\"3\" alt=\"\" /></div>";
 	}
 	
@@ -216,7 +222,8 @@ class PaternalsController extends ChartController {
 		foreach($this->rootfams as $key => $fam) {
 			$personsarray[] = $this->GetLine($fam);
 		}
-		$perc = 100 / pow(2, $this->split-1);
+		$perc = floor(100 / pow(2, $this->split-1)) - 0.1;
+		$width = floor($this->pagewidth / pow(2, $this->split-1));
 		$cols = array();
 		foreach($personsarray as $key => $last) {
 			// Here we have 1-4 arrays
