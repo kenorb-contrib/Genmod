@@ -120,7 +120,7 @@ class FAQ {
 		$res = NewQuery($sql);
 		$sql = "UPDATE ".TBLPREFIX."faqs SET fa_order=fa_order-1 WHERE fa_id=".$this->id." AND fa_file=".$this->gedcomid;
 		$res = NewQuery($sql);
-		WriteToLog("FAQ item has been moved up.<br />ID: ".$this->id.".<br />Gedcom ID: ".$this->gedcomid, "I", "G", $this->gedcomid);
+		WriteToLog("FAQ-> FAQ item has been moved up.<br />ID: ".$this->id.".<br />Gedcom ID: ".$this->gedcomid, "I", "G", $this->gedcomid);
 	}
 		
 	public function MoveMeDown() {
@@ -129,7 +129,7 @@ class FAQ {
 		$res = NewQuery($sql);
 		$sql = "UPDATE ".TBLPREFIX."faqs SET fa_order=fa_order+1 WHERE fa_id=".$this->id." AND fa_file=".$this->gedcomid;
 		$res = NewQuery($sql);
-		WriteToLog("FAQ item has been moved down.<br />ID: ".$this->id.".<br />Gedcom ID: ".$this->gedcomid, "I", "G", $this->gedcomid);
+		WriteToLog("FAQ-> FAQ item has been moved down.<br />ID: ".$this->id.".<br />Gedcom ID: ".$this->gedcomid, "I", "G", $this->gedcomid);
 	}
 	
 	public function UpdateMe($header, $body) {

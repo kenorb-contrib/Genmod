@@ -12,14 +12,13 @@ Disallow: /login.php
 Disallow: /login_register.php
 Disallow: /mediadetail.php
 Disallow: /medialist.php
-Disallow: /patriarchlist.php
+Disallow: /paternals.php
 Disallow: /pedigree.php
 Disallow: /placelist.php
 Disallow: /relationship.php
 Disallow: /repo.php
 Disallow: /repolist.php
 Disallow: /reportengine.php
-Disallow: /showblob.php
 Disallow: /search.php
 Disallow: /source.php
 Disallow: /sourcelist.php

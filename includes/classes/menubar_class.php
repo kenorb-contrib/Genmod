@@ -508,12 +508,6 @@ abstract class MenuBar {
 			$submenu->addLink("medialist.php");
 			$menu->addSubmenu($submenu);
 		}
-		//-- list most ancient parent of a family
-//		if (file_exists("patriarchlist.php")) {
-//			$submenu = new Menu(GM_LANG_patriarch_list);
-//			$submenu->addLink("patriarchlist.php");
-//			$menu->addSubmenu($submenu);
-//		}
 		//-- aliveinyear
 		if (file_exists("aliveinyear.php")) {
 			$submenu = new Menu(GM_LANG_alive_in_year);
