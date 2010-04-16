@@ -2381,7 +2381,7 @@ function GMRImageSHandler($attrs) {
 			$filename = trim($filename);
 			if (!empty($filename)) {
 				if (preg_match("/(jpg)|(jpeg)|(png)$/i", $filename)>0) {
-					if (file_exists($filename)) {
+					if (MediaFS::FileExists($filename)) {
 						$size = ReportFunctions::findImageSize($filename);
 						if (($width>0)&&($height==0)) {
 							$perc = $width / $size[0];
@@ -2402,7 +2402,7 @@ function GMRImageSHandler($attrs) {
 	else {
 		$filename = $file;
 		if (preg_match("/(jpg)|(jpeg)|(png)$/i", $filename)>0) {
-			if (file_exists($filename)) {
+			if (MediaFS::FileExists($filename)) {
 				$size = ReportFunctions::findImageSize($filename);
 				if (($width>0)&&($size[0]>$size[1])) {
 					$perc = $width / $size[0];

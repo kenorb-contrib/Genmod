@@ -590,19 +590,20 @@ abstract class GedcomRecord {
 		}
 		else SortFactObjs($facts, $this->type);
 		if ($this->type == "INDI") {
-			$sexfound = false;
+//			$sexfound = false;
 			foreach($facts as $key => $factobj) {
-				if ($factobj->fact == "NAME") $this->globalfacts[] = $factobj;
-				elseif ($factobj->fact == "SEX") {
-					$this->globalfacts[] = $factobj;
-					$sexfound = true;
-				}
+				if ($factobj->fact == "NAME" || $factobj->fact == "SEX") $this->globalfacts[] = $factobj;
+//				elseif ($factobj->fact == "SEX") {
+//					$this->globalfacts[] = $factobj;
+//					$sexfound = true;
+//				}
 			}
 	
 			//-- add a new sex fact if one was not found
-			if (!$sexfound) {
-				$this->globalfacts[] = array('new', "1 SEX U");
-			}
+//			if (!$sexfound) {
+//				$this->globalfacts[] = array('new', "1 SEX U");
+//				$this->globalfacts[] = new Fact($this->xref, $this->datatype, $this->gedcomid, "SEX", "1 SEX U", 1, "");
+//			}
 		}
 		if (!is_array($selection)) $this->facts = $facts;
 

@@ -224,7 +224,7 @@ else {
 				// If no previous changes on this ID, we check if the old value is in the DB
 				if (!in_array($rowcid["ch_gid"], $foundids)) {
 					if ($trace) print "8. Fact, no previous changes ".$rowcid["ch_gid"]."<br />";
-					$object =& ConstructObject($rowcid["ch_gid"], $rowcid["ch_gid_type"]);
+					$object =& ReConstructObject($rowcid["ch_gid"], $rowcid["ch_gid_type"]);
 					// Don't check when the old value is empty, Just see if the ID exists.
 					if (empty($rowcid["ch_old"])) {
 						if (!$object->isempty) {
