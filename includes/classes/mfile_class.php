@@ -277,10 +277,37 @@ class MFile {
 			case "f_pastelink":
 				return $this->f_pastelink;
 				break;
+			case "f_content_main":
+				return $this->GetMainContent();
+				break;
 			default:
 				print "<span class=\"error\">Invalid property ".$property." for __get in ".get_class($this)." class</span><br />";
 				break;
 		}
 	}
+	private function GetMainContent() {
+		
+		if (!$this->f_file_exists) return "";
+		$data = "";
+		if (SystemConfig::$MEDIA_IN_DB) {
+			$sql = "SELECT mdf_data FROM ".TBLPREFIX."media_datafiles WHERE mdf_file='".$this->f_file."' ORDER BY mdf_id ASC";
+			$res = NewQuery($sql);
+			while ($row = $res->FetchRow()) {
+				$data .= $row[0];
+			}
+		}
+		else {
+			$f = fopen($this->f_file,'rb');
+			while(!feof($f)) {
+				$data .= fread($f,4096);
+			}
+			fclose($f);
+		}
+		return $data;
+	}
+			
+		
+
+		
 }
 ?>

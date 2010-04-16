@@ -330,7 +330,7 @@ class IndividualController extends DetailController {
 			
 				// NOTE: Gender
 				if ($this->SEX_COUNT < 2) {
-					if ($this->SEX_COUNT == 0) $execute = "add_new_record('".$this->xref."', 'SEX', 'sex_edit', '".$this->indi->datatype."');";
+					if ($this->SEX_COUNT == 0) $execute = "add_new_record('".$this->xref."', 'SEX', 'edit_gender', '".$this->indi->datatype."');";
 					else $execute = "edit_record('".$this->xref."', 'SEX', 1, 'edit_gender', 'INDI');";
 					$submenu = new Menu(GM_LANG_edit." ".GM_LANG_sex);
 					$submenu->addLink($execute);
