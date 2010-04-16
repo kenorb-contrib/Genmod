@@ -118,7 +118,7 @@ class FamilyBookController extends ChartController {
 	    if (count($person->spousefamilies) > 0 || empty($firstrun)) {
 	    	$firstrun = true;
 	        
-	        if ($this->page == "familybook.php") print "\n\t<h3 style=\"text-align: center\">"."Family of".": ".PrintReady($person->name)."</h3>";
+	        if ($this->page == "familybook.php") print "\n\t<h3 style=\"text-align: center\">".GM_LANG_family_of.": ".PrintReady($person->name)."</h3>";
 	        print "<table cellspacing=\"0\" cellpadding=\"0\" border=\"0\" style=\"vertical-align:middle;\"><tr>\n";
 	        
 	        //-- descendancy
