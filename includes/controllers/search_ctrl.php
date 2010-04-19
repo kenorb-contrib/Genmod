@@ -1235,12 +1235,13 @@ class SearchController extends BaseController {
 			foreach ($recs2 as $keysr2 => $subrec2) {
 				// There must be a hit in a subrec. If found, check in which tag
 				foreach ($this->cquery["includes"] as $qindex => $squery) {
-					if (preg_match("/".$squery["term"]."/i", $subrec2, $result) > 0) {
+					if (preg_match("/\b".$squery["term"]."/i", $subrec2, $result) > 0) {
 						// There is a hit in a subrec
+						// Now get the tag
 						$ct = preg_match("/\d\s(\S*)\s*.*/i", $subrec2, $result2);
 						if (($ct > 0) && (!empty($result2[1]))) {
 							// we found the tag of the subrecord where the hit was
-//										print "Hit in".$subrec2."<br />leveltag: ".$level1tag."<br />tag:".$result2[1]."<br />";
+//							print "Hit in".$subrec2."<br />leveltag: ".$level1tag."<br />tag:".$result2[1]."<br />";
 							$this->hit = true;
 							// if the tag can be displayed, do so
 							// but first check if the hit is in a link to a hidden record
@@ -1256,13 +1257,18 @@ class SearchController extends BaseController {
 									else if ($result2[1] == "REPO") $rtype = "REPO";
 									else if ($result2[1] == "NOTE") $rtype = "NOTE";
 									else $rtype = "OBJE";
-//												print "Check ".$match9[1]." leveltag ".$result2[1]." type ".$rtype." subrec ".$subrec2." for display<br />";
+//									print "Check ".$match9[1]." leveltag ".$result2[1]." type ".$rtype." subrec ".$subrec2." for display<br />";
 									$obj = ConstructObject($match9[1], $rtype, $object->gedcomid);
 									// If we can display the name of the record, we have a valid hit.
-									if ($obj->disp_name) {
-										$this->found = true;
-										break;
+									// Also check if an object is returned, we might have found two @ signs with some garbage in between.
+									// If not an object, it was just a string, and we did find a hit but not a link.
+									if (is_object($obj)) {
+										if ($obj->disp_name) {
+											$this->found = true;
+											break;
+										}
 									}
+									else $this->found = true;
 								}
 								// Hit found in subrec, no link
 								else $this->found = true;

@@ -301,6 +301,12 @@ abstract class ChangeFunctions {
 					$FILE = $details["file"];
 					// If we are in the middle of a reorder, don't reconstruct
 					if ($counttoadd == 1) {
+						// In some rare cases we don't know the object type. In that case, retrieve the current object first,
+						// then use the type to reconstruct it again.
+						if ($details["gid_type"] == "") {
+							$object = ConstructObject($details["gid"], "", $details["file"]);
+							if (is_object($object)) $details["gid_type"] = $object->type;
+						}
 						$object = ReConstructObject($details["gid"], $details["gid_type"], $details["file"]);
 						if (is_object($object)) $gedrec = $object->gedrec;
 						else $gedrec = "";
