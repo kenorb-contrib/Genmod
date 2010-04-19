@@ -178,87 +178,85 @@ function paste_id(value) {
 		if (!isset($report_array["inputs"])) $report_array["inputs"] = array();
 		foreach($report_array["inputs"] as $indexval => $input) {
 			if ((($input["name"] == "sources") && ($SHOW_SOURCES >= $gm_user->getUserAccessLevel())) || ($input["name"] != "sources")) {
-				if (!($input["name"] == "photos" && SystemConfig::$MEDIA_IN_DB)) {
-					print "<tr><td class=\"shade2 wrap\">\n";
-					print "<input type=\"hidden\" name=\"varnames[]\" value=\"".$input["name"]."\" />\n";
-					print $input["value"]."</td><td class=\"shade1\">";
-					if (!isset($input["type"])) $input["type"] = "text";
-					if (!isset($input["default"])) $input["default"] = "";
-					if (isset($input["lookup"])) {
-						if ($input["lookup"]=="INDI") {
-							if (!empty($pid)) $input["default"] = CleanInput($pid);
-							else $input["default"] = ChartFunctions::CheckRootId($input["default"]);
-						}
-						if ($input["lookup"]=="FAM") {
-							if (!empty($famid)) $input["default"] = CleanInput($famid);
-						}
-						if ($input["lookup"]=="SOUR") {
-							if (!empty($sid)) $input["default"] = CleanInput($sid);
-						}
-						if ($input["lookup"]=="REPO") {
-							if (!empty($repo)) $input["default"] = CleanInput($repo);
-						}
+				print "<tr><td class=\"shade2 wrap\">\n";
+				print "<input type=\"hidden\" name=\"varnames[]\" value=\"".$input["name"]."\" />\n";
+				print $input["value"]."</td><td class=\"shade1\">";
+				if (!isset($input["type"])) $input["type"] = "text";
+				if (!isset($input["default"])) $input["default"] = "";
+				if (isset($input["lookup"])) {
+					if ($input["lookup"]=="INDI") {
+						if (!empty($pid)) $input["default"] = CleanInput($pid);
+						else $input["default"] = ChartFunctions::CheckRootId($input["default"]);
 					}
-					if ($input["type"]=="text") {
-						print "<input type=\"text\" name=\"vars[".$input["name"]."]\" id=\"".$input["name"]."\" ";
-						print "value=\"".$input["default"]."\" ";
-						print " style=\"direction: ltr;\" ";
-						print "/>";
+					if ($input["lookup"]=="FAM") {
+						if (!empty($famid)) $input["default"] = CleanInput($famid);
 					}
-					if ($firstrun == 0) {
-						?>
-						<script language="JavaScript" type="text/javascript">
-						<!--
-							document.getElementById('<?php print $input["name"]; ?>').focus();
-						//-->
-						</script>
-						<?php
-						$firstrun++;
+					if ($input["lookup"]=="SOUR") {
+						if (!empty($sid)) $input["default"] = CleanInput($sid);
 					}
-					if ($input["type"]=="checkbox") {
-						print "<input type=\"checkbox\" name=\"vars[".$input["name"]."]\" id=\"".$input["name"]."\" value=\"1\"";
-						if ($input["default"]=="1") print "checked=\"checked\"";
-						print " />";
+					if ($input["lookup"]=="REPO") {
+						if (!empty($repo)) $input["default"] = CleanInput($repo);
 					}
-					if ($input["type"]=="select") {
-						print "<select name=\"vars[".$input["name"]."]\" id=\"".$input["name"]." var\">\n";
-						$options = preg_split("/[, ]+/", $input["options"]);
-						foreach($options as $indexval => $option) {
-							print "\t<option value=\"$option\"";
-//LERMAN - add ability to have a selected item
-							if (isset($input["default"]) && ($input["default"] == $option)) {
-								print " SELECTED=selected";
-							}
-							print ">";
-							if (defined("GM_LANG_".$option)) print constant("GM_LANG_".$option);
-							else if (defined("GM_LANG_p_".$option)) print constant("GM_LANG_p_".$option);
-							else if (defined("GM_FACT_".$option)) print constant("GM_FACT_".$option);
-							else print $option;
-							print "</option>\n";
-						}
-						print "</select>\n";
-					}		
-					if (isset($input["lookup"])) {
-						print "<input type=\"hidden\" name=\"type[".$input["name"]."]\" value=\"".$input["lookup"]."\" />";
-						if ($input["lookup"]=="FAM") LinkFunctions::PrintFindFamilyLink("famid");
-						if ($input["lookup"]=="INDI") LinkFunctions::PrintFindIndiLink("pid","");
-						if ($input["lookup"]=="PLAC") LinkFunctions::PrintFindPlaceLink($input["name"]);
-						if ($input["lookup"]=="REPO") LinkFunctions::PrintFindRepositoryLink($input["name"]);
-						if ($input["lookup"]=="DATE") {
-							$text = GM_LANG_select_date;
-							if (isset($GM_IMAGES["calendar"]["button"])) $Link = "<img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["calendar"]["button"]."\" name=\"a_".$input["name"]."\" id=\"a_".$input["name"]."\" alt=\"".$text."\" title=\"".$text."\" border=\"0\" align=\"middle\" />";
-							else $Link = $text;
-
-							?>
-							<a href="javascript: <?php print $input["name"]; ?>" onclick="cal_toggleDate('div_<?php print $input["name"]; ?>', '<?php print $input["name"]; ?>'); return false;">
-							<?php print $Link;?>
-							</a>
-							<div id="div_<?php print $input["name"]; ?>" style="position:absolute;visibility:hidden;background-color:white;layer-background-color:white;"></div>
-							<?php
-						}
-					}
-					print "</td></tr>\n";
 				}
+				if ($input["type"]=="text") {
+					print "<input type=\"text\" name=\"vars[".$input["name"]."]\" id=\"".$input["name"]."\" ";
+					print "value=\"".$input["default"]."\" ";
+					print " style=\"direction: ltr;\" ";
+					print "/>";
+				}
+				if ($firstrun == 0) {
+					?>
+					<script language="JavaScript" type="text/javascript">
+					<!--
+						document.getElementById('<?php print $input["name"]; ?>').focus();
+					//-->
+					</script>
+					<?php
+					$firstrun++;
+				}
+				if ($input["type"]=="checkbox") {
+					print "<input type=\"checkbox\" name=\"vars[".$input["name"]."]\" id=\"".$input["name"]."\" value=\"1\"";
+					if ($input["default"]=="1") print "checked=\"checked\"";
+					print " />";
+				}
+				if ($input["type"]=="select") {
+					print "<select name=\"vars[".$input["name"]."]\" id=\"".$input["name"]." var\">\n";
+					$options = preg_split("/[, ]+/", $input["options"]);
+					foreach($options as $indexval => $option) {
+						print "\t<option value=\"$option\"";
+//LERMAN - add ability to have a selected item
+						if (isset($input["default"]) && ($input["default"] == $option)) {
+							print " SELECTED=selected";
+						}
+						print ">";
+						if (defined("GM_LANG_".$option)) print constant("GM_LANG_".$option);
+						else if (defined("GM_LANG_p_".$option)) print constant("GM_LANG_p_".$option);
+						else if (defined("GM_FACT_".$option)) print constant("GM_FACT_".$option);
+						else print $option;
+						print "</option>\n";
+					}
+					print "</select>\n";
+				}		
+				if (isset($input["lookup"])) {
+					print "<input type=\"hidden\" name=\"type[".$input["name"]."]\" value=\"".$input["lookup"]."\" />";
+					if ($input["lookup"]=="FAM") LinkFunctions::PrintFindFamilyLink("famid");
+					if ($input["lookup"]=="INDI") LinkFunctions::PrintFindIndiLink("pid","");
+					if ($input["lookup"]=="PLAC") LinkFunctions::PrintFindPlaceLink($input["name"]);
+					if ($input["lookup"]=="REPO") LinkFunctions::PrintFindRepositoryLink($input["name"]);
+					if ($input["lookup"]=="DATE") {
+						$text = GM_LANG_select_date;
+						if (isset($GM_IMAGES["calendar"]["button"])) $Link = "<img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["calendar"]["button"]."\" name=\"a_".$input["name"]."\" id=\"a_".$input["name"]."\" alt=\"".$text."\" title=\"".$text."\" border=\"0\" align=\"middle\" />";
+						else $Link = $text;
+
+						?>
+						<a href="javascript: <?php print $input["name"]; ?>" onclick="cal_toggleDate('div_<?php print $input["name"]; ?>', '<?php print $input["name"]; ?>'); return false;">
+						<?php print $Link;?>
+						</a>
+						<div id="div_<?php print $input["name"]; ?>" style="position:absolute;visibility:hidden;background-color:white;layer-background-color:white;"></div>
+						<?php
+					}
+				}
+				print "</td></tr>\n";
 			}
 		}
 

@@ -537,20 +537,27 @@ switch ($action) {
 			<?php
 				$children = $object->children;
 				// Filter out the deleted children
+				$keys = array();
+				$index = 1;
 				foreach($children as $key => $child) {
 					if ($child->isdeleted) unset ($children[$key]);
+					else {
+						$keys[$child->xref] = $index;
+						$index++;
+					}
+					
 				}
 				if (!empty($option) && $option == "bybirth") {
 					uasort($children, "IndiBirthSort");
 				}
-				$i=1;
 				$ct = count($children);
+				$i = 1;
 				foreach($children as $pid => $child) {
 					print "<tr>\n<td class=\"shade2\">\n";
-					print "<select name=\"order[$i]\">\n";
+					print "<select name=\"order[".$keys[$child->xref]."]\">\n";
 					for($j = 1; $j <= $ct; $j++) {
 						print "<option value=\"".($j)."\"";
-						if ($j==$i) print " selected=\"selected\"";
+						if ($j == $keys[$child->xref]) print " selected=\"selected\"";
 						print ">".($j)."</option>\n";
 					}
 					print "</select>\n";
@@ -615,8 +622,14 @@ switch ($action) {
 			print "<tr class=\"shade2\"><td>".GM_LANG_order."</td><td>".GM_LANG_family."</td></tr>";
 				$fams = $object->spousefamilies;
 				// Filter out the deleted children
+				$keys = array();
+				$index = 1;
 				foreach($fams as $key => $family) {
 					if ($family->isdeleted) unset ($fams[$key]);
+					else {
+						$keys[$family->xref] = $index;
+						$index++;
+					}
 				}
 				if (!empty($option) && $option == "bymarriage") {
 					$sortby = "MARR";
@@ -625,13 +638,12 @@ switch ($action) {
 				
 				$i=1;
 				$ct = count($fams);
-				
 				foreach($fams as $famid => $family) {
 					print "<tr>\n<td class=\"shade2\">\n";
-					print "<select name=\"order[$i]\">\n";
+					print "<select name=\"order[".$keys[$family->xref]."]\">\n";
 					for($j = 1; $j <= $ct; $j++) {
 						print "<option value=\"".($j)."\"";
-						if ($j==$i) print " selected=\"selected\"";
+						if ($j == $keys[$family->xref]) print " selected=\"selected\"";
 						print ">".($j)."</option>\n";
 					}
 					print "</select>\n";
@@ -1199,7 +1211,9 @@ switch ($action) {
 			print "<input type=\"hidden\" name=\"fact\" value=\"".$fact."\" />\n";
 			if ($change_type != "add_media_link") print "<input type=\"hidden\" name=\"pid\" value=\"".$pid."\" />\n";
 			print "<input type=\"hidden\" name=\"change_type\" value=\"".$change_type."\" />\n";
-			print "<input type=\"hidden\" name=\"pid_type\" value=\"".$pid_type."\" />\n";
+			// We don't know the pid type, as the pid is selected on this page and can be anything
+			if ($change_type == "add_media_link") print "<input type=\"hidden\" name=\"pid_type\" value=\"\" />\n";
+			else print "<input type=\"hidden\" name=\"pid_type\" value=\"".$pid_type."\" />\n";
 			print "<table class=\"facts_table\">";
 			
 			if (!in_array($fact, $separatorfacts)) EditFunctions::AddTagSeparator($fact);
