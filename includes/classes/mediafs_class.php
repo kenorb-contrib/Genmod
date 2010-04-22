@@ -745,6 +745,8 @@ abstract class MediaFS {
 			self::$fdetails["is_image"] = false;
 			self::$fdetails["width"] = "0";
 			self::$fdetails["height"] = "0";
+			self::$fdetails["bits"] = 0;
+			self::$fdetails["channels"] = 0;
 			self::$fdetails["size"] = "0";
 			self::$fdetails["twidth"] = "0";
 			self::$fdetails["theight"] = "0";
@@ -769,6 +771,8 @@ abstract class MediaFS {
 			self::$fdetails["width"] = 0;
 			self::$fdetails["height"] = 0;
 			self::$fdetails["size"] = 0;
+			self::$fdetails["bits"] = 0;
+			self::$fdetails["channels"] = 0;
 			self::$fdetails["mimetype"] = "";
 			self::$fdetails["mimedesc"] = "";
 			self::$fdetails["extension"] = "";
@@ -787,6 +791,8 @@ abstract class MediaFS {
 				if ($file_details = @getimagesize($filename)) {
 					self::$fdetails["width"] = $file_details[0];
 					self::$fdetails["height"] = $file_details[1];
+					self::$fdetails["bits"] = $file_details["bits"];
+					self::$fdetails["channels"] = $file_details["channels"];
 					self::$fdetails["is_image"] = true;
 				}
 				$mimetypedetect = New MimeTypeDetect();
@@ -837,7 +843,7 @@ abstract class MediaFS {
 		}
 		
 		// Insert the file details
-		$sql = "INSERT INTO ".TBLPREFIX."media_files (mf_id, mf_file, mf_path, mf_fname, mf_is_image, mf_width, mf_height, mf_size, mf_twidth, mf_theight, mf_tsize, mf_mimetype, mf_mimedesc, mf_link) VALUES ('0', '".self::$fdetails["file"]."', '".self::$fdetails["path"]."', '".self::$fdetails["fname"]."', '".self::$fdetails["is_image"]."', '".self::$fdetails["width"]."', '".self::$fdetails["height"]."', '".self::$fdetails["size"]."', '".self::$fdetails["twidth"]."', '".self::$fdetails["theight"]."', '".self::$fdetails["tsize"]."', '".self::$fdetails["mimetype"]."', '".self::$fdetails["mimedesc"]."', '".self::$fdetails["link"]."')";
+		$sql = "INSERT INTO ".TBLPREFIX."media_files (mf_id, mf_file, mf_path, mf_fname, mf_is_image, mf_width, mf_height, mf_bits, mf_channels, mf_size, mf_twidth, mf_theight, mf_tsize, mf_mimetype, mf_mimedesc, mf_link) VALUES ('0', '".self::$fdetails["file"]."', '".self::$fdetails["path"]."', '".self::$fdetails["fname"]."', '".self::$fdetails["is_image"]."', '".self::$fdetails["width"]."', '".self::$fdetails["height"]."', '".self::$fdetails["bits"]."', '".self::$fdetails["channels"]."', '".self::$fdetails["size"]."', '".self::$fdetails["twidth"]."', '".self::$fdetails["theight"]."', '".self::$fdetails["tsize"]."', '".self::$fdetails["mimetype"]."', '".self::$fdetails["mimedesc"]."', '".self::$fdetails["link"]."')";
 		$ires = NewQuery($sql);
 		if ($ires) return true;
 		else return false;

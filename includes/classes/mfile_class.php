@@ -41,6 +41,8 @@ class MFile {
 	private $f_main_file = null;		// Physical location (including mediadir) of the file, or showblob with correct params (if media in DB) OR URL to the external file
 	private $f_width = 0;				// Width of the file (not set if external file)
 	private $f_height = 0;				// Height of the file (not set if external file)
+	private $f_bits = null;				// Bit rate of the file (not set if external file)
+	private $f_channels = null;			// Color channels of the file (not set if external file)
 	private $f_file_size = 0;			// Size of the file in bytes (not set if external file)
 	
 	private $f_thumb_file = null;		// Physical location (including mediadir) of the thumnailfile, or showblob with correct params (if media in DB)
@@ -99,6 +101,8 @@ class MFile {
 				$this->f_path = $file["mf_path"];
 				$this->f_fname = $file["mf_fname"];
 				$this->f_tfile_size = $file["mf_tsize"];
+				$this->f_bits = $file["mf_bits"];
+				$this->f_channels = $file["mf_channels"];
 				// If the thumbimage exists, set the link
 				// If not, and it's an image, generate it
 				// If not an image, link the placeholder
@@ -140,6 +144,8 @@ class MFile {
 				if (!empty($this->f_link)) $this->f_file = $this->f_link;
 				$this->f_height = $file["mf_height"];
 				$this->f_width = $file["mf_width"];
+				$this->f_bits = $file["mf_bits"];
+				$this->f_channels = $file["mf_channels"];
 				$this->f_file_size = $file["mf_size"];
 				$this->f_theight = $file["mf_theight"];
 				$this->f_twidth = $file["mf_twidth"];
@@ -191,6 +197,8 @@ class MFile {
 					$this->f_twidth = $file_details[0];
 					$this->f_theight = $file_details[1];
 					$this->f_is_image = true;
+					$this->f_bits = $file_details["bits"];
+					$this->f_channels = $file_details["channels"];
 				}
 				else $this->f_is_image = false;
 			}
@@ -200,6 +208,8 @@ class MFile {
 				if ($file_details = @getimagesize($this->f_file)) {
 					$this->f_width = $file_details[0];
 					$this->f_height = $file_details[1];
+					$this->f_bits = $file_details["bits"];
+					$this->f_channels = $file_details["channels"];
 					$this->f_is_image = true;
 				}
 				else $this->f_is_image = false;
@@ -246,6 +256,12 @@ class MFile {
 				break;
 			case "f_height":
 				return $this->f_height;
+				break;
+			case "f_bits":
+				return $this->f_bits;
+				break;
+			case "f_channels":
+				return $this->f_channels;
 				break;
 			case "f_file_size":
 				return $this->f_file_size;

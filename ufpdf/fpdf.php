@@ -1522,26 +1522,17 @@ function _dounderline($x,$y,$txt)
 
 function _parsejpg($file)
 {
-	//Extract info from a JPEG file
-	$a=GetImageSize($file);
-	if(!$a)
-		$this->Error('Missing or incorrect image file: '.$file);
-	if($a[2]!=2)
-		$this->Error('Not a JPEG file: '.$file);
-	if(!isset($a['channels']) || $a['channels']==3)
-		$colspace='DeviceRGB';
-	elseif($a['channels']==4)
-		$colspace='DeviceCMYK';
-	else
-		$colspace='DeviceGray';
-	$bpc=isset($a['bits']) ? $a['bits'] : 8;
-	//Read whole file
-	$f=fopen($file,'rb');
-	$data='';
-	while(!feof($f))
-		$data.=fread($f,4096);
-	fclose($f);
-	return array('w'=>$a[0],'h'=>$a[1],'cs'=>$colspace,'bpc'=>$bpc,'f'=>'DCTDecode','data'=>$data);
+	$fileobj = new MFile($file);
+	if(!$fileobj->f_file_exists) $this->Error('Missing or incorrect image file: '.$file);
+	if(!$fileobj->f_is_image) $this->Error('Not a JPEG file: '.$file);
+	if ($fileobj->f_channels == 3) $colspace = 'DeviceRGB';
+	elseif($fileobj->f_channels == 4) $colspace = 'DeviceCMYK';
+	else $colspace = 'DeviceGray';
+	$width = $fileobj->f_width;
+	$height = $fileobj->f_height;
+	$bpc = $fileobj->f_bits;
+	$data = $fileobj->f_content_main;
+	return array('w'=>$width,'h'=>$height,'cs'=>$colspace,'bpc'=>$bpc,'f'=>'DCTDecode','data'=>$data);
 }
 
 function _parsepng($file)

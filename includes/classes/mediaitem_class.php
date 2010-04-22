@@ -40,7 +40,7 @@ class MediaItem extends GedcomRecord {
 	private $filename = null;
 	private $level = 0;
 	private $validmedia = null;
-	public  $fileobj = null;
+	public  $fileobj = null;			// Objectholder of the physical file object
 	private $isprimary = null;			// This record has a 1 _PRIM Y/N tag or not
 	private $useasthumb = null;			// This record has a 1 _THUM Y/N tag or not
 	
