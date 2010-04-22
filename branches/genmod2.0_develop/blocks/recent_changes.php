@@ -29,7 +29,7 @@
 $GM_BLOCKS["print_recent_changes"]["name"]      = GM_LANG_recent_changes_block;
 $GM_BLOCKS["print_recent_changes"]["descr"]     = "recent_changes_descr";
 $GM_BLOCKS["print_recent_changes"]["canconfig"]	= true;
-$GM_BLOCKS["print_recent_changes"]["config"] 	= array("days"=>30, "hide_empty"=>"no");
+$GM_BLOCKS["print_recent_changes"]["config"] 	= array("days"=>30, "hide_empty"=>"no", "show_indi"=>"yes", "show_fam"=>"yes", "show_sour"=>"yes", "show_repo"=>"yes", "show_obje"=>"yes");
 $GM_BLOCKS["print_recent_changes"]["rss"]       = true;
 
 //-- Recent Changes block
@@ -45,14 +45,14 @@ function print_recent_changes($block=true, $config="", $side, $index) {
 	$block = true;			// Always restrict this block's height
 
 	if (empty($config)) $config = $GM_BLOCKS["print_recent_changes"]["config"];
-	if ($config["days"]<1 or $config["days"]>30) $config["days"] = 30;
+	if ($config["days"] < 1 or $config["days"] > 30) $config["days"] = 30;
 	if (isset($config["hide_empty"])) $HideEmpty = $config["hide_empty"];
 	else $HideEmpty = "no";
 
 
 	$action = "today";
 
-	$found_facts = BlockFunctions::GetRecentChangeFacts(GetCurrentDay(), GetCurrentMonth(), GetCurrentYear(), $config["days"]);
+	$found_facts = BlockFunctions::GetRecentChangeFacts(GetCurrentDay(), GetCurrentMonth(), GetCurrentYear(), $config["days"], $config);
 
 // Start output
 	if (count($found_facts)==0 and $HideEmpty=="yes") return false;
@@ -214,6 +214,52 @@ function print_recent_changes_config($config) {
 		<input type="text" name="days" size="2" value="<?php print $config["days"]; ?>" />
 	</td></tr>
 
+	<?php
+	print "<tr><td width=\"20%\" class=\"shade2\">".GM_LANG_rcblock_show_indi."</td>";?>
+	<td class="shade1">
+	<select name="show_indi">
+		<option value="no"<?php if ($config["show_indi"] == "no") print " selected=\"selected\"";?>><?php print GM_LANG_no; ?></option>
+		<option value="yes"<?php if ($config["show_indi"] == "yes") print " selected=\"selected\"";?>><?php print GM_LANG_yes; ?></option>
+	</select>
+	</td></tr>
+	
+
+	<?php
+	print "<tr><td width=\"20%\" class=\"shade2\">".GM_LANG_rcblock_show_fam."</td>";?>
+	<td class="shade1">
+	<select name="show_fam">
+		<option value="no"<?php if ($config["show_fam"] == "no") print " selected=\"selected\"";?>><?php print GM_LANG_no; ?></option>
+		<option value="yes"<?php if ($config["show_fam"] == "yes") print " selected=\"selected\"";?>><?php print GM_LANG_yes; ?></option>
+	</select>
+	</td></tr>
+
+	<?php
+	print "<tr><td width=\"20%\" class=\"shade2\">".GM_LANG_rcblock_show_sour."</td>";?>
+	<td class="shade1">
+	<select name="show_sour">
+		<option value="no"<?php if ($config["show_sour"] == "no") print " selected=\"selected\"";?>><?php print GM_LANG_no; ?></option>
+		<option value="yes"<?php if ($config["show_sour"] == "yes") print " selected=\"selected\"";?>><?php print GM_LANG_yes; ?></option>
+	</select>
+	</td></tr>
+
+	<?php
+	print "<tr><td width=\"20%\" class=\"shade2\">".GM_LANG_rcblock_show_repo."</td>";?>
+	<td class="shade1">
+	<select name="show_repo">
+		<option value="no"<?php if ($config["show_repo"] == "no") print " selected=\"selected\"";?>><?php print GM_LANG_no; ?></option>
+		<option value="yes"<?php if ($config["show_repo"] == "yes") print " selected=\"selected\"";?>><?php print GM_LANG_yes; ?></option>
+	</select>
+	</td></tr>
+
+	<?php
+	print "<tr><td width=\"20%\" class=\"shade2\">".GM_LANG_rcblock_show_obje."</td>";?>
+	<td class="shade1">
+	<select name="show_obje">
+		<option value="no"<?php if ($config["show_obje"] == "no") print " selected=\"selected\"";?>><?php print GM_LANG_no; ?></option>
+		<option value="yes"<?php if ($config["show_obje"] == "yes") print " selected=\"selected\"";?>><?php print GM_LANG_yes; ?></option>
+	</select>
+	</td></tr>
+	
 	<?php
   	print "<tr><td width=\"20%\" class=\"shade2\">".GM_LANG_show_empty_block."</td>";?>
 	<td class="shade1">

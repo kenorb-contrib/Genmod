@@ -354,8 +354,11 @@ abstract class PersonFunctions {
 				$factobjs = $person->SelectFacts($tagstoprint);
 				SortFactObjs($factobjs, "INDI");
 				foreach($factobjs as $key => $factobj) {
-					FactFunctions::PrintSimpleFact($factobj, true, false);
-				}			
+					// Exclude old values if we show changes
+					if (!($person->show_changes && $factobj->style == "change_old")) {
+						FactFunctions::PrintSimpleFact($factobj, true, false);
+					}
+				}
 				// NOTE: Close div inout2-$pid.$personcount.$count
 				if ($show_full) print "</div>\n";
 				

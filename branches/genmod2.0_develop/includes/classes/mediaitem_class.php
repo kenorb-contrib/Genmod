@@ -29,18 +29,18 @@ if (stristr($_SERVER["SCRIPT_NAME"],basename(__FILE__))) {
 }
 class MediaItem extends GedcomRecord {
 	
-	public $classname = "MediaItem";
-	public $datatype = "OBJE";
+	public $classname = "MediaItem";	// Name of this class
+	public $datatype = "OBJE";			// Datatype
 	private static $cache = array(); 	// Holder of the instances for this class
 	
-	private $extension = null;
-	private $title = null; 
-	private $oldtitle = null; 
-	private $name = null; 						// Same as title
-	private $filename = null;
-	private $level = 0;
-	private $validmedia = null;
-	public  $fileobj = null;			// Objectholder of the physical file object
+	private $extension = null;			// file extension
+	private $title = null; 				// Title (if present) or filename of media file
+	private $oldtitle = null; 			// As above, but from the unchanged data
+	private $name = null; 				// Same as title
+	private $filename = null;			// Calculated filename
+	private $level = 0;					// Level of the OBJE record (should be 0)
+	private $validmedia = null;			// If the extension exists in the $MEDIA_TYPE array
+	private $fileobj = null;			// Objectholder of the physical file object
 	private $isprimary = null;			// This record has a 1 _PRIM Y/N tag or not
 	private $useasthumb = null;			// This record has a 1 _THUM Y/N tag or not
 	
@@ -90,9 +90,6 @@ class MediaItem extends GedcomRecord {
 			if (isset($file)) $this->filename = RelativePathFile(FilenameDecode(MediaFS::CheckMediaDepth($file)));
 			else $this->filename = RelativePathFile(FilenameDecode(MediaFS::CheckMediaDepth(GetGedcomValue("FILE", 1,$this->gedrec))));
 		}
-			
-		if (stristr($this->filename, "://")) $this->fileobj = new MFile($this->filename);
-		else $this->fileobj = new MFile(GedcomConfig::$MEDIA_DIRECTORY.$this->filename);
 
 	}
 	
@@ -126,6 +123,8 @@ class MediaItem extends GedcomRecord {
 			case "useasthumb":
 				return $this->UseAsThumb();
 				break;
+			case "fileobj":
+				return $this->GetFileObject();
 			default:
 				return parent::__get($property);
 				break;
@@ -143,7 +142,16 @@ class MediaItem extends GedcomRecord {
 				break;
 		}
 	}
-	
+
+	private function GetFileObject() {
+		
+		if (is_null($this->fileobj)) {
+			if (stristr($this->filename, "://")) $this->fileobj = new MFile($this->filename);
+			else $this->fileobj = new MFile(GedcomConfig::$MEDIA_DIRECTORY.$this->filename);
+		}
+		return $this->fileobj;
+	}
+		
 	public function ObjCount() {
 		$count = 0;
 		foreach(self::$cache as $ged => $media) {

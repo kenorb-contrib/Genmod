@@ -503,7 +503,7 @@ function getRecentChanges() {
 
 	$recentText = "";
 	
-	$found_facts = BlockFunctions::GetRecentChangeFacts($day, $month, $year, $config["days"]);
+	$found_facts = BlockFunctions::GetRecentChangeFacts($day, $month, $year, $config["days"], $config);
 	
 // Start output
 	if (count($found_facts)==0 and $HideEmpty=="yes") return false;

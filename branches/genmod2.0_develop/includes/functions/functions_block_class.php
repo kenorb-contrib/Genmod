@@ -234,9 +234,9 @@ abstract class BlockFunctions {
 		return $found_facts;
 	}
 	
-	public function GetRecentChangeFacts($day, $month, $year, $days) {
+	public function GetRecentChangeFacts($day, $month, $year, $days, $config) {
 		global $monthtonum, $gm_user, $SHOW_SOURCES, $TOTAL_QUERIES;
-		
+
 		$dayindilist = array();
 		$dayfamlist = array();
 		$daysourcelist = array();
@@ -258,12 +258,13 @@ abstract class BlockFunctions {
 		
 		$todate = $year.date("m", $monthstart).$mday3;
 		
-		$dayindilist = self::SearchIndisDateRange($mday2, $monthtonum[$mmon2], $myear2, $mday3, $monthtonum[$mmon], $year, "", "no", "", false, "CHAN");
-		$dayfamlist = self::SearchFamsDateRange($mday2, $monthtonum[$mmon2], $myear2, $mday3, $monthtonum[$mmon], $year, "no", "", false, "CHAN");
-		if ($SHOW_SOURCES >= $gm_user->getUserAccessLevel()) $dayrepolist = self::SearchOtherDateRange($mday2, $monthtonum[$mmon2], $myear2, $mday3, $monthtonum[$mmon], $year, "", false, "CHAN");
-		if ($SHOW_SOURCES >= $gm_user->getUserAccessLevel()) $daysourcelist = self::SearchSourcesDateRange($mday2, $monthtonum[$mmon2], $myear2, $mday3, $monthtonum[$mmon], $year, "", false, "CHAN");
-		$daymedialist = self::SearchMediaDateRange($mday2, $monthtonum[$mmon2], $myear2, $mday3, $monthtonum[$mmon], $year, "", false, "CHAN");
-	
+		if ($config["show_indi"] == "yes") $dayindilist = self::SearchIndisDateRange($mday2, $monthtonum[$mmon2], $myear2, $mday3, $monthtonum[$mmon], $year, "", "no", "", false, "CHAN");
+		if ($config["show_fam"] == "yes") $dayfamlist = self::SearchFamsDateRange($mday2, $monthtonum[$mmon2], $myear2, $mday3, $monthtonum[$mmon], $year, "no", "", false, "CHAN");
+		if ($config["show_repo"] == "yes" && $SHOW_SOURCES >= $gm_user->getUserAccessLevel()) $dayrepolist = self::SearchOtherDateRange($mday2, $monthtonum[$mmon2], $myear2, $mday3, $monthtonum[$mmon], $year, "", false, "CHAN");
+		if ($config["show_sour"] == "yes" && $SHOW_SOURCES >= $gm_user->getUserAccessLevel()) $daysourcelist = self::SearchSourcesDateRange($mday2, $monthtonum[$mmon2], $myear2, $mday3, $monthtonum[$mmon], $year, "", false, "CHAN");
+	global $TOTAL_QUESRIES; print $TOTAL_QUERIES."<br />";	
+		if ($config["show_obje"] == "yes") $daymedialist = self::SearchMediaDateRange($mday2, $monthtonum[$mmon2], $myear2, $mday3, $monthtonum[$mmon], $year, "", false, "CHAN");
+	global $TOTAL_QUESRIES; print $TOTAL_QUERIES."<br />";	
 		if (count($dayindilist)>0 || count($dayfamlist)>0 || count($daysourcelist)>0 || count($dayrepolist) > 0 || count($daymedialist) > 0) {
 			$found_facts = array();
 			$last_total = $TOTAL_QUERIES;
