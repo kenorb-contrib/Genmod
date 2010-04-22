@@ -262,9 +262,7 @@ abstract class BlockFunctions {
 		if ($config["show_fam"] == "yes") $dayfamlist = self::SearchFamsDateRange($mday2, $monthtonum[$mmon2], $myear2, $mday3, $monthtonum[$mmon], $year, "no", "", false, "CHAN");
 		if ($config["show_repo"] == "yes" && $SHOW_SOURCES >= $gm_user->getUserAccessLevel()) $dayrepolist = self::SearchOtherDateRange($mday2, $monthtonum[$mmon2], $myear2, $mday3, $monthtonum[$mmon], $year, "", false, "CHAN");
 		if ($config["show_sour"] == "yes" && $SHOW_SOURCES >= $gm_user->getUserAccessLevel()) $daysourcelist = self::SearchSourcesDateRange($mday2, $monthtonum[$mmon2], $myear2, $mday3, $monthtonum[$mmon], $year, "", false, "CHAN");
-	global $TOTAL_QUESRIES; print $TOTAL_QUERIES."<br />";	
 		if ($config["show_obje"] == "yes") $daymedialist = self::SearchMediaDateRange($mday2, $monthtonum[$mmon2], $myear2, $mday3, $monthtonum[$mmon], $year, "", false, "CHAN");
-	global $TOTAL_QUESRIES; print $TOTAL_QUERIES."<br />";	
 		if (count($dayindilist)>0 || count($dayfamlist)>0 || count($daysourcelist)>0 || count($dayrepolist) > 0 || count($daymedialist) > 0) {
 			$found_facts = array();
 			$last_total = $TOTAL_QUERIES;
