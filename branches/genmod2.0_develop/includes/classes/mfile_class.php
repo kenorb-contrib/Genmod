@@ -198,7 +198,7 @@ class MFile {
 					$this->f_theight = $file_details[1];
 					$this->f_is_image = true;
 					$this->f_bits = $file_details["bits"];
-					$this->f_channels = $file_details["channels"];
+					if (isset($file_details["channels"])) $this->f_channels = $file_details["channels"];
 				}
 				else $this->f_is_image = false;
 			}
@@ -209,7 +209,7 @@ class MFile {
 					$this->f_width = $file_details[0];
 					$this->f_height = $file_details[1];
 					$this->f_bits = $file_details["bits"];
-					$this->f_channels = $file_details["channels"];
+					if (isset($file_details["channels"])) $this->f_channels = $file_details["channels"];
 					$this->f_is_image = true;
 				}
 				else $this->f_is_image = false;

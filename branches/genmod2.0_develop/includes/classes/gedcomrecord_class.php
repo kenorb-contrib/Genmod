@@ -623,7 +623,7 @@ abstract class GedcomRecord {
 				foreach ($factarr as $key => $fact) {
 					foreach ($this->facts as $key => $factobj) {
 						if ($factobj->fact == $fact && ($exclude_links == false || $factobj->linktype == "")) {
-//							print "<br />yes: ".$factobj->fact." ";
+//							print "<br />yes: ".$factobj->fact." ".$factobj->style." ";
 							$facts[] = $factobj;
 						}
 //						else print "<br />not: ".$factobj->fact;
