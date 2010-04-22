@@ -2626,3 +2626,8 @@
 "file_absent";"This file is not present:"
 "messages";"Messages"
 "family_of";"Family of"
+"rcblock_show_indi";"Show changes for individuals"
+"rcblock_show_fam";"Show changes for families"
+"rcblock_show_sour";"Show changes for sources"
+"rcblock_show_repo";"Show changes for repositories"
+"rcblock_show_obje";"Show changes for media items"
