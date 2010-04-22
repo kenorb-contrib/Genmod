@@ -66,9 +66,10 @@
 				</GMRTextBox>
 				<!-- put the person's pictures -->
 				<GMRif condition="$photos==1">
-					<GMRRepeatTag tag="OBJE">
+<!--					<GMRRepeatTag tag="OBJE">
 						<GMRImage file="@FILE" left="$pwidth" width="80" />
-					</GMRRepeatTag>
+					</GMRRepeatTag> -->
+					<GMRHighlightedImage left="$pwidth" width="80" />
 				</GMRif>
 
 				<!-- print the person's facts -->

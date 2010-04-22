@@ -2326,22 +2326,26 @@ function GMRHighlightedImageSHandler($attrs) {
 	if (isset($attrs["height"])) $height = $attrs["height"];
 
 	if (PrivacyFunctions::showFact("OBJE", $id)) {
-		$media = FindHighlightedObject($id);
+		$person = Person::GetInstance($id);
+		$media = FindHighlightedObject($person);
 		//print_r($media);
 		//print "<br /><br />";
 		$mfile =& MediaItem::GetInstance($media["id"]);
 		//print_r($mfile);
 		//print "<br /><br />";
 		if ($mfile->fileobj->f_is_image) {
-			if (($width>0) && ($mfile->fileobj->f_width > $mfile->fileobj->f_height)) {
+			if ($width > 0 && $height == 0) {
+//			if (($width>0) && ($mfile->fileobj->f_width > $mfile->fileobj->f_height)) {
 				$perc = $width / $mfile->fileobj->f_width;
-				$height= round($mfile->fileobj->f_height*$perc);
+				$height = round($mfile->fileobj->f_height * $perc);
 			}
-			if (($height>0) && ($mfile->fileobj->f_height > $mfile->fileobj->f_width)) {
+			if ($height > 0 && $width == 0) {
+//			if (($height>0) && ($mfile->fileobj->f_height > $mfile->fileobj->f_width)) {
 				$perc = $height / $mfile->fileobj->f_height;
-				$width= round($mfile->fileobj->f_width*$perc);
+				$width = round($mfile->fileobj->f_width * $perc);
 			}
-			$image = new GMRImage(SERVER_URL.$mfile->fileobj->f_main_file, $left, $top, $width, $height, $mfile->fileobj->f_ext);
+			//print "l: ".$left." t: ".$top." w: ".$width." h: ".$height;
+			$image = new GMRImage($mfile->fileobj->f_file, $left, $top, $width, $height, $mfile->fileobj->f_ext);
 			$gmreport->addElement($image);
 		}
 	}
@@ -2368,34 +2372,20 @@ function GMRImageSHandler($attrs) {
 	if (isset($attrs["file"])) $file = $attrs["file"];
 	if ($file=="@FILE") {
 		$ct = preg_match("/\d OBJE @(.+)@/", $gedrec, $match);
-		if ($ct>0) {
-			$obj = MediaItem::GetInstance($match[1]);
-			$orec = $obj->gedrec;
-		}
-		else $orec = $gedrec;
-		if (!empty($orec)) {
-			$fullpath = ReportFunctions::ExtractFullpath($orec);
-			$filename = "";
-			$filename = ReportFunctions::ExtractFilename($fullpath);
-			$filename = GedcomConfig::$MEDIA_DIRECTORY.$filename;
-			$filename = trim($filename);
-			if (!empty($filename)) {
-				if (preg_match("/(jpg)|(jpeg)|(png)$/i", $filename)>0) {
-					if (MediaFS::FileExists($filename)) {
-						$size = ReportFunctions::findImageSize($filename);
-						if (($width>0)&&($height==0)) {
-							$perc = $width / $size[0];
-							$height= round($size[1]*$perc);
-						}
-						if (($height>0)&&($width==0)) {
-							$perc = $height / $size[1];
-							$width= round($size[0]*$perc);
-						}
-						//print "1 width:$width height:$height ";
-						$image = new GMRImage($filename, $left, $top, $width, $height);
-						$gmreport->addElement($image);
-					}
+		if ($ct > 0) {
+			$mfile = MediaItem::GetInstance($match[1]);
+			if ($mfile->fileobj->f_is_image) {
+				if ($width > 0 && $height == 0) {
+				$perc = $width / $mfile->fileobj->f_width;
+				$height = round($mfile->fileobj->f_height * $perc);
 				}
+				if ($height > 0 && $width == 0) {
+					$perc = $height / $mfile->fileobj->f_height;
+					$width = round($mfile->fileobj->f_width * $perc);
+				}
+				//print "l: ".$left." t: ".$top." w: ".$width." h: ".$height;
+				$image = new GMRImage($mfile->fileobj->f_file, $left, $top, $width, $height, $mfile->fileobj->f_ext);
+				$gmreport->addElement($image);
 			}
 		}
 	}
