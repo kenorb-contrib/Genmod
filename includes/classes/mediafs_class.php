@@ -792,7 +792,7 @@ abstract class MediaFS {
 					self::$fdetails["width"] = $file_details[0];
 					self::$fdetails["height"] = $file_details[1];
 					self::$fdetails["bits"] = $file_details["bits"];
-					self::$fdetails["channels"] = $file_details["channels"];
+					if (isset($file_details["channels"])) self::$fdetails["channels"] = $file_details["channels"];
 					self::$fdetails["is_image"] = true;
 				}
 				$mimetypedetect = New MimeTypeDetect();
