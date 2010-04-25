@@ -103,14 +103,16 @@ function print_recent_changes($block=true, $config="", $side, $index) {
 					print "</a><br />\n";
 					$lastgid = $person->xref;
 				}
-				print "<div class=\"indent" . ($TEXT_DIRECTION=="rtl"?"_rtl":"") . "\">";
-				print GM_FACT_CHAN;
-				print " - <span class=\"date\">".GetChangedDate($fact->datestring);
-				if ($fact->timestring != "") {
-					print " - ".$fact->timestring;
+				if ($fact->disp) {
+					print "<div class=\"indent" . ($TEXT_DIRECTION=="rtl"?"_rtl":"") . "\">";
+					print GM_FACT_CHAN;
+					print " - <span class=\"date\">".GetChangedDate($fact->datestring);
+					if ($fact->timestring != "") {
+						print " - ".$fact->timestring;
+					}
+					print "</span>\n";
+					print "</div><br />";
 				}
-				print "</span>\n";
-				print "</div><br />";
 			}
 
 			if ($factarr[2]=="FAM") {
@@ -124,14 +126,16 @@ function print_recent_changes($block=true, $config="", $side, $index) {
 					print "</a><br />\n";
 					$lastgid = $family->xref;
 				}
-				print "<div class=\"indent" . ($TEXT_DIRECTION=="rtl"?"_rtl":"") . "\">";
-				print GM_FACT_CHAN;
-				print " - <span class=\"date\">".GetChangedDate($fact->datestring);
-				if ($fact->timestring != "") {
-					print " - ".$fact->timestring;
+				if ($fact->disp) {
+					print "<div class=\"indent" . ($TEXT_DIRECTION=="rtl"?"_rtl":"") . "\">";
+					print GM_FACT_CHAN;
+					print " - <span class=\"date\">".GetChangedDate($fact->datestring);
+					if ($fact->timestring != "") {
+						print " - ".$fact->timestring;
+					}
+					print "</span>\n";
+					print "</div><br />";
 				}
-				print "</span>\n";
-				print "</div><br />";
 			}
 
 			if ($factarr[2]=="SOUR") {
@@ -145,14 +149,16 @@ function print_recent_changes($block=true, $config="", $side, $index) {
 					print "</a><br />\n";
 					$lastgid = $source->xref;
 				}
-				print "<div class=\"indent" . ($TEXT_DIRECTION=="rtl"?"_rtl":"") . "\">";
-				print GM_FACT_CHAN;
-				print " - <span class=\"date\">".GetChangedDate($fact->datestring);
-				if ($fact->timestring != "") {
-					print " - ".$fact->timestring;
+				if ($fact->disp) {
+					print "<div class=\"indent" . ($TEXT_DIRECTION=="rtl"?"_rtl":"") . "\">";
+					print GM_FACT_CHAN;
+					print " - <span class=\"date\">".GetChangedDate($fact->datestring);
+					if ($fact->timestring != "") {
+						print " - ".$fact->timestring;
+					}
+					print "</span>\n";
+					print "</div><br />";
 				}
-				print "</span>\n";
-				print "</div><br />";
 			}
 
 			if ($factarr[2]=="REPO") {
@@ -166,14 +172,16 @@ function print_recent_changes($block=true, $config="", $side, $index) {
 					print "</a><br />\n";
 					$lastgid = $repo->xref;
 				}
-				print "<div class=\"indent" . ($TEXT_DIRECTION=="rtl"?"_rtl":"") . "\">";
-				print GM_FACT_CHAN;
-				print " - <span class=\"date\">".GetChangedDate($fact->datestring);
-				if ($fact->timestring != "") {
-					print " - ".$fact->timestring;
+				if ($fact->disp) {
+					print "<div class=\"indent" . ($TEXT_DIRECTION=="rtl"?"_rtl":"") . "\">";
+					print GM_FACT_CHAN;
+					print " - <span class=\"date\">".GetChangedDate($fact->datestring);
+					if ($fact->timestring != "") {
+						print " - ".$fact->timestring;
+					}
+					print "</span>\n";
+					print "</div><br />";
 				}
-				print "</span>\n";
-				print "</div><br />";
 			}
 			if ($factarr[2]=="OBJE") {
 				$media =& MediaItem::GetInstance($factarr[0]);
@@ -186,14 +194,16 @@ function print_recent_changes($block=true, $config="", $side, $index) {
 					print "</a><br />\n";
 					$lastgid = $media->xref;
 				}
-				print "<div class=\"indent" . ($TEXT_DIRECTION=="rtl"?"_rtl":"") . "\">";
-				print GM_FACT_CHAN;
-				print " - <span class=\"date\">".GetChangedDate($fact->datestring);
-				if ($fact->timestring != "") {
-					print " - ".$fact->timestring;
+				if ($fact->disp) {
+					print "<div class=\"indent" . ($TEXT_DIRECTION=="rtl"?"_rtl":"") . "\">";
+					print GM_FACT_CHAN;
+					print " - <span class=\"date\">".GetChangedDate($fact->datestring);
+					if ($fact->timestring != "") {
+						print " - ".$fact->timestring;
+					}
+					print "</span>\n";
+					print "</div><br />";
 				}
-				print "</span>\n";
-				print "</div><br />";
 			}
 		}
 
