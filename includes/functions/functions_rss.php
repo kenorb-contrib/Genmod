@@ -36,7 +36,7 @@ $day = date("j", $time);
 $month = date("M", $time);
 $year = date("Y", $time);
 
-$GM_BLOCKS["print_recent_changes"]["config"] = array("days"=>30, "hide_empty"=>"no");
+$GM_BLOCKS["print_recent_changes"]["config"] = array("days"=>30, "hide_empty"=>"no", "show_indi"=>"yes", "show_fam"=>"yes", "show_sour"=>"yes", "show_repo"=>"yes", "show_obje"=>"yes");
 $GM_BLOCKS["print_upcoming_events"]["config"] = array("days"=>30, "filter"=>"all", "onlyBDM"=>"no");
 
 
@@ -493,7 +493,7 @@ function getRecentChanges() {
 	if ($command=="user") $filter = "living";
 	else $filter = "all";
 
-	if (empty($config)) $config = $GM_BLOCKS["print_recent_changes"]["config"];
+	$config = $GM_BLOCKS["print_recent_changes"]["config"];
 	if ($config["days"]<1 or $config["days"]>30) $config["days"] = 30;
 	if (isset($config["hide_empty"])) $HideEmpty = $config["hide_empty"];
 	else $HideEmpty = "no";
@@ -502,9 +502,9 @@ function getRecentChanges() {
 	$dataArray[1] = time();//FIXED: get overwritten later, if any found.
 
 	$recentText = "";
-	
-	$found_facts = BlockFunctions::GetRecentChangeFacts($day, $month, $year, $config["days"], $config);
-	
+
+	$found_facts = BlockFunctions::GetRecentChangeFacts(GetCurrentDay(), GetCurrentMonth(), GetCurrentYear(), $config["days"], $config);
+
 // Start output
 	if (count($found_facts)==0 and $HideEmpty=="yes") return false;
 
@@ -541,11 +541,13 @@ function getRecentChanges() {
 					$recentText .= "<a href=\"".SERVER_URL ."individual.php?pid=".$person->xref."&amp;gedid=".GedcomConfig::$GEDCOMID."\"><b>".$person->revname."</b>".$person->addxref;
 					$recentText .= "</a><br />\n";
 					$lastgid = $person->xref;
-					$recentText .= GM_FACT_CHAN;
-					if ($fact->datestring != "") {
-						$recentText .= " - ".$fact->datestring."&nbsp;".$fact->timestring;
+					if ($fact->disp) { 
+						$recentText .= GM_FACT_CHAN;
+						if ($fact->datestring != "") {
+							$recentText .= " - ".$fact->datestring."&nbsp;".$fact->timestring;
+						}
+						$recentText .= "<br />";
 					}
-					$recentText .= "<br />";
 				}
 			}
 
@@ -556,11 +558,13 @@ function getRecentChanges() {
 					$recentText .= "<a href=\"".SERVER_URL ."family.php?famid=".$family->xref."&amp;gedid=".GedcomConfig::$GEDCOMID."\"><b>".PrintReady($family->sortable_name)."</b>".$family->addxref;
 					$recentText .= "</a><br />\n";
 					$lastgid = $family->xref;
-					$recentText .= GM_FACT_CHAN;
-					if ($fact->datestring != "") {
-						$recentText .= " - ".$fact->datestring."&nbsp;".$fact->timestring;
+					if ($fact->disp) { 
+						$recentText .= GM_FACT_CHAN;
+						if ($fact->datestring != "") {
+							$recentText .= " - ".$fact->datestring."&nbsp;".$fact->timestring;
+						}
+						$recentText .= "<br />";
 					}
-					$recentText .= "<br />";
 				}
 			}
 
@@ -571,11 +575,13 @@ function getRecentChanges() {
 					$recentText .= "<a href=\"".SERVER_URL ."source.php?sid=".$source->xref."&amp;gedid=".GedcomConfig::$GEDCOMID."\"><b>".PrintReady($source->name)."</b>".$source->addxref;
 					$recentText .= "</a><br />\n";
 					$lastgid = $source->xref;
-					$recentText .= GM_FACT_CHAN;
-					if ($fact->datestring != "") {
-						$recentText .= " - ".$fact->datestring."&nbsp;".$fact->timestring;
+					if ($fact->disp) { 
+						$recentText .= GM_FACT_CHAN;
+						if ($fact->datestring != "") {
+							$recentText .= " - ".$fact->datestring."&nbsp;".$fact->timestring;
+						}
+						$recentText .= "<br />";
 					}
-					$recentText .= "<br />";
 				}
 			}
 
@@ -586,11 +592,13 @@ function getRecentChanges() {
 					$recentText .= "<a href=\"".SERVER_URL ."repo.php?rid=".$repo->xref."&amp;gedid=".GedcomConfig::$GEDCOMID."\"><b>".PrintReady($repo->name)."</b>".$repo->addxref;
 					$recentText .= "</a><br />\n";
 					$lastgid = $repo->xref;
-					$recentText .= GM_FACT_CHAN;
-					if ($fact->datestring != "") {
-						$recentText .= " - ".$fact->datestring."&nbsp;".$fact->timestring;
+					if ($fact->disp) { 
+						$recentText .= GM_FACT_CHAN;
+						if ($fact->datestring != "") {
+							$recentText .= " - ".$fact->datestring."&nbsp;".$fact->timestring;
+						}
+						$recentText .= "<br />";
 					}
-					$recentText .= "<br />";
 				}
 			}
 			if ($factarr[2]=="OBJE") {
@@ -600,11 +608,13 @@ function getRecentChanges() {
 					$recentText .= "<a href=\"".SERVER_URL ."mediadetail.php?mid=".$media->xref."&amp;gedid=".GedcomConfig::$GEDCOMID."\"><b>".PrintReady($media->name)."</b>".$media->addxref;
 					$recentText .= "</a><br />\n";
 					$lastgid = $media->xref;
-					$recentText .= GM_FACT_CHAN;
-					if ($fact->datestring != "") {
-						$recentText .= " - ".$fact->datestring."&nbsp;".$fact->timestring;
+					if ($fact->disp) { 
+						$recentText .= GM_FACT_CHAN;
+						if ($fact->datestring != "") {
+							$recentText .= " - ".$fact->datestring."&nbsp;".$fact->timestring;
+						}
+						$recentText .= "<br />";
 					}
-					$recentText .= "<br />";
 				}
 			}
 		}
