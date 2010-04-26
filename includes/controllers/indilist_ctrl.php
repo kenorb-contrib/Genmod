@@ -285,15 +285,12 @@ class IndilistController extends ListController {
 			foreach($names as $indexval => $namearray) {
 				$person = $personlist[$namearray[1]];
 				if (stristr(SCRIPT_NAME,"aliveinyear.php")) {
-					if (!$person->disp) $indi_private[$person->key] = true;
-					else if ($this->CheckAlive($person) == -1) {
-						$indi_unborn[$person->key] = true;
-					}
+					if ($this->CheckAlive($person) == -1) $indi_unborn[$person->key] = true;
 					else if ($this->CheckAlive($person) == 1) $indi_dead[$person->key] = true;
 					else if ($this->CheckAlive($person) == -2) $indi_unknown[$person->key] = true;
 					else {
 						$indi_alive[$person->key] = true;
-						$person->PrintListPerson(true, false, "", $namearray[2]);
+						if (!$person->PrintListPerson(true, false, "", $namearray[2])) $indi_private[$person->key] = true;
 					}
 				}
 				else {
