@@ -2552,7 +2552,6 @@ switch ($action) {
 		else $oldrec = "";
 		
 		if (!isset($gedfile)) $gedfile = GedcomConfig::$GEDCOMID;
-		
 		//-- check for photo update
 		if (count($_FILES)>0) {
 			$result = MediaFS::UploadFiles($_FILES, $folder, true);
@@ -2560,12 +2559,16 @@ switch ($action) {
 				print "<span class=\"error\">".GM_LANG_upload_error."<br />".$result["error"]."</span><br />";
 			}
 			else {
+				print $result["error"];
 				$newmfile = $result["filename"];
 				if (!empty($newmfile)) {
 					$m = RelativePathFile(GedcomConfig::$MEDIA_DIRECTORY);
 					if (!empty($m)) $newmfile = preg_replace("~$m~", "", $newmfile);
 					if (!empty($oldrec)) $old = GetGedcomValue("FILE", 1, $oldrec);
+					// Old is not empty if a filename already follows the 1 FILE tag
+					// If no file was selected/uploaded previously, it's a tag with no value
 					if (isset($old) && !empty($old)) $newrec = preg_replace("~".addslashes($old)."~", $newmfile, $newrec);
+					else $newrec = preg_replace("~1 FILE\s*~", "1 FILE ".$newmfile."\r\n", $newrec);
 				}
 			}
 		}
