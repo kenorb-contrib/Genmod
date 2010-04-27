@@ -72,7 +72,7 @@ abstract class CounterFunctions {
 						break;
 				}
 					
-				if (is_object($object)) {
+				if (is_object($object) && !$object->isempty) {
 					
 					if (isset($pid)) $cpid = $pid;
 					if (isset($famid)) $cpid = $famid;
