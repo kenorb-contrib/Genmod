@@ -96,7 +96,7 @@ class DescendancyController extends ChartController {
 		if ($pfam->husb_id != "") $parid = $pfam->husb_id;
 		else if ($pfam->wife_id != "") $parid = $pfam->wife_id;
 		if ($parid!="") {
-			ChartFunctions::PrintUrlArrow($parid.$this->personcount.$pid, "?rootid=".$parid."&amp;num_generations=".$this->num_generations."&amp;chart_style=".$this->chart_style."&amp;show_details=".$this->show_details."&amp;box_width=".$this->box_width, PrintReady(GM_LANG_start_at_parents."&nbsp;-&nbsp;".$pfam->descriptor), 2);
+			ChartFunctions::PrintUrlArrow($parid.$this->personcount.$pid, "?rootid=".$parid."&amp;num_generations=".$this->num_generations."&amp;chart_style=".$this->chart_style."&amp;show_details=".$this->show_details."&amp;box_width=".$this->box_width, PrintReady(GM_LANG_start_at_parents."&nbsp;-&nbsp;".$pfam->name), 2);
 			$this->personcount++;
 		}
 	
@@ -167,7 +167,7 @@ class DescendancyController extends ChartController {
 				if ($pfam->husb_id != "") $parid = $pfam->husb_id;
 				else if ($pfam->wife_id != "") $parid = $pfam->wife_id;
 				if ($parid!="") {
-					ChartFunctions::PrintUrlArrow($parid.$this->personcount.$spouse->xref, "?rootid=".$parid."&amp;num_generations=".$this->num_generations."&amp;chart_style=".$this->chart_style."&amp;show_details=".$this->show_details."&amp;box_width=".$this->box_width, PrintReady(GM_LANG_start_at_parents."&nbsp;-&nbsp;".$pfam->descriptor), 2);
+					ChartFunctions::PrintUrlArrow($parid.$this->personcount.$spouse->xref, "?rootid=".$parid."&amp;num_generations=".$this->num_generations."&amp;chart_style=".$this->chart_style."&amp;show_details=".$this->show_details."&amp;box_width=".$this->box_width, PrintReady(GM_LANG_start_at_parents."&nbsp;-&nbsp;".$pfam->name), 2);
 				}
 			}
 			if ($this->show_full) print "<br /><br />&nbsp;";

@@ -37,14 +37,14 @@ class Person extends GedcomRecord {
 	public $datatype = "INDI";				// Type of data collected here
 	private static $cache = array(); 	// Holder of the instances for this class
 	
-	private $name = null;					// Printable name of the person, after applying privacy (can be unknown of private)
-	private $revname = null;				// Printable name, in reversed order
-	private $addname = null;				// Printable addname of the person, after applying privacy (can be blank)
-	private $revaddname = null;				// Printable addname, in reversed order
+	private $name = null;					// Printable name of the person, after applying privacy (can be unknown of private) and after CheckNN
+	private $revname = null;				// Printable name, in reversed order, after CheckNN
+	private $addname = null;				// Printable addname of the person, after applying privacy (can be blank), after CheckNN
+	private $revaddname = null;				// Printable addname, in reversed order, after CheckNN
 	private $name_array = null;				// Array of names from GetIndiNames
 	private $newname_array = null;			// Array of names from GetIndiNames from the new gedcom record
-	private $sortable_name = null;			// Sortable name of the person, no privacy applied
-	private $sortable_addname = null;		// Sortable addname of the person, no privacy applied
+	private $sortable_name = null;			// Sortable name of the person, no privacy applied, no CheckNN
+	private $sortable_addname = null;		// Sortable addname of the person, no privacy applied, no CheckNN
 	private $changednames = null;			// Array with old and new values of the names. No privacy applied. Only old names if user cannot edit.
 	private $bdate = null;					// The birth date in gedcom 2 DATE xxxxxx format. Privacy is applied. 
 											// N.B.: If unknown, it is estimated.

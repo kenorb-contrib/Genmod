@@ -37,7 +37,6 @@ $GM_BLOCKS["print_todays_events"]["rss"]		= true;
 function print_todays_events($block=true, $config="", $side, $index) {
 	global $command, $TEXT_DIRECTION;
 	global $GM_IMAGES, $GM_BLOCKS;
-	global $NAME_REVERSE;
 	global $gm_user;
 
 	$block = true;// Always restrict this block's height
@@ -103,9 +102,7 @@ function print_todays_events($block=true, $config="", $side, $index) {
 				if ($text != "filter") {
 					if ($lastgid != $gid) {
 						if ($lastgid != "") print "<br />";
-						if ($NAME_REVERSE) $name = str_replace(",", "", $factarr[4]);
-						else $name = $factarr[4];
-						print "<a href=\"individual.php?pid=$gid&amp;gedid=".GedcomConfig::$GEDCOMID."\"><b>".$name."</b>";
+						print "<a href=\"individual.php?pid=".$person->xref."&amp;gedid=".GedcomConfig::$GEDCOMID."\"><b>".PrintReady($person->revname.($person->revaddname == "" ? "" : " (".$person->revaddname.")"))."</b>";
 						print "<img id=\"box-".$gid."-".$key."-sex\" src=\"".GM_IMAGE_DIR."/";
 						if ($factarr[5] == "M") print $GM_IMAGES["sex"]["small"]."\" title=\"".GM_LANG_male."\" alt=\"".GM_LANG_male;
 						else if ($factarr[5] == "F") print $GM_IMAGES["sexf"]["small"]."\" title=\"".GM_LANG_female."\" alt=\"".GM_LANG_female;
@@ -132,7 +129,7 @@ function print_todays_events($block=true, $config="", $side, $index) {
 					if ($lastgid!=$factarr[0]) {
 						if ($lastgid != "") print "<br />";
 						print "<a href=\"family.php?famid=".$family->xref."&amp;gedid=".$family->gedcomid."\"><b>";
-						print $family->sortable_name;
+						print PrintReady($family->sortable_name.($family->sortable_addname == "" ? "" : "(".$family->sortable_addname.")"));
 						print "</b>";
 						print $family->addxref;
 						print "</a><br />\n";

@@ -92,8 +92,7 @@ function print_recent_changes($block=true, $config="", $side, $index) {
 				$fact = New Fact($person->xref, "INDI", GedcomConfig::$GEDCOMID, $factarr[3], $factarr[1]);
 				if ($lastgid != $person->xref) {
 					print "<a href=\"individual.php?pid=".$person->xref."&amp;gedid=".$person->gedcomid."\"><b>";
-					print $person->revname;
-					print "</b>";
+					print PrintReady($person->revname.($person->revaddname == "" ? "" : " (".$person->revaddname.")"))."</b>";
 					print "<img id=\"box-".$person->xref."-".$index."-sex\" src=\"".GM_IMAGE_DIR."/";
 					if ($person->sex == "M") print $GM_IMAGES["sex"]["small"]."\" title=\"".GM_LANG_male."\" alt=\"".GM_LANG_male;
 					else  if ($person->sex == "F") print $GM_IMAGES["sexf"]["small"]."\" title=\"".GM_LANG_female."\" alt=\"".GM_LANG_female;
@@ -120,7 +119,7 @@ function print_recent_changes($block=true, $config="", $side, $index) {
 				$fact = New Fact($family->xref, "FAM", GedcomConfig::$GEDCOMID, $factarr[3], $factarr[1]);
 				if ($lastgid != $family->xref) {
 					print "<a href=\"family.php?famid=".$family->xref."&amp;gedid=".$family->gedcomid."\"><b>";
-					print $family->sortable_name;
+					print PrintReady($family->sortable_name.($family->sortable_addname == "" ? "" : "(".$family->sortable_addname.")"));
 					print "</b>";
 					print $family->addxref;
 					print "</a><br />\n";

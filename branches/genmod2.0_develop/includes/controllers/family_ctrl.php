@@ -96,8 +96,8 @@ class FamilyController extends DetailController
 	protected function GetTitle() {
 		
 		if (is_null($this->title)) {
-			$this->title = $this->family->descriptor;
-			$add = $this->family->adddescriptor;
+			$this->title = $this->family->name;
+			$add = $this->family->addname;
 			if ($add != "") $this->title .= "<br />".$add;
 		}
 		return $this->title;

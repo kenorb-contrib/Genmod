@@ -123,7 +123,7 @@ function getUpcomingEvents() {
 					$text = FactFunctions::GetCalendarFact($fact, $action, $filter);
 					if ($text!="filter") {
 						if ($lastgid != $person->xref) {
-							$daytext .= "<li><a href=\"".SERVER_URL ."individual.php?pid=".$person->xref."&amp;gedid=".GedcomConfig::$GEDCOMID."\"><b>".PrintReady($person->sortable_name)."</b>".$person->addxref;
+							$daytext .= "<li><a href=\"".SERVER_URL ."individual.php?pid=".$person->xref."&amp;gedid=".GedcomConfig::$GEDCOMID."\"><b>".PrintReady($person->revname.($person->revaddname == "" ? "" : " (".$person->revaddname.")"))."</b>".$person->addxref;
 							$daytext .=  "</a>\n";
 							$lastgid = $person->xref;
 						}
@@ -141,7 +141,7 @@ function getUpcomingEvents() {
 					$text = FactFunctions::GetCalendarFact($fact, $action, $filter);
 					if ($text!="filter") {
 						if ($lastgid != $family->xref) {
-							$daytext .=  "<li><a href=\"".SERVER_URL ."family.php?famid=".$family->xref."&amp;gedid=".GedcomConfig::$GEDCOMID."\"><b>".PrintReady($family->sortable_name)."</b>".$family->addxref;
+							$daytext .=  "<li><a href=\"".SERVER_URL ."family.php?famid=".$family->xref."&amp;gedid=".GedcomConfig::$GEDCOMID."\"><b>".PrintReady($family->sortable_name.($family->sortable_addname == "" ? "" : "(".$family->sortable_addname.")"))."</b>".$family->addxref;
 							$daytext .=  "</a>\n";
 							$lastgid = $family->xref;
 						}
@@ -228,7 +228,7 @@ function getTodaysEvents() {
 				$text = FactFunctions::GetCalendarFact($fact, $action, $filter, "all", GetCurrentYear(), GetCurrentMonth(), GetCurrentDay());
 				if ($text != "filter") {
 					if ($lastgid != $person->xref) {
-						$daytext .= "<li><a href=\"".SERVER_URL ."individual.php?pid=".$person->xref."&amp;gedid=".GedcomConfig::$GEDCOMID."\"><b>".PrintReady($person->sortable_name)."</b>".$person->addxref;
+						$daytext .= "<li><a href=\"".SERVER_URL ."individual.php?pid=".$person->xref."&amp;gedid=".GedcomConfig::$GEDCOMID."\"><b>".						PrintReady($person->revname.($person->revaddname == "" ? "" : " (".$person->revaddname.")"))."</b>".$person->addxref;
 						$daytext .= "</a>\n";
 						$lastgid = $person->xref;
 					}
@@ -244,7 +244,7 @@ function getTodaysEvents() {
 				$text = FactFunctions::GetCalendarFact($fact, $action, $filter, "all", GetCurrentYear(), GetCurrentMonth(), GetCurrentDay());
 				if ($text!="filter") {
 					if ($lastgid != $family->xref) {
-						$daytext .= "<li><a href=\"".SERVER_URL ."family.php?famid=".$family->xref."&amp;gedid=".GedcomConfig::$GEDCOMID."\"><b>".PrintReady($family->sortable_name)."</b>".$family->addxref;
+							$daytext .=  "<li><a href=\"".SERVER_URL ."family.php?famid=".$family->xref."&amp;gedid=".GedcomConfig::$GEDCOMID."\"><b>".PrintReady($family->sortable_name.($family->sortable_addname == "" ? "" : "(".$family->sortable_addname.")"))."</b>".$family->addxref;
 						$daytext .=  "</a>\n";
 						$lastgid = $family->xref;
 						$daytext .=  $text . "</li>";
@@ -538,7 +538,7 @@ function getRecentChanges() {
 				$person =& Person::GetInstance($factarr[0]);
 				$fact = New Fact($person->xref, "INDI", GedcomConfig::$GEDCOMID, $factarr[3], $factarr[1]);
 				if ($lastgid != $person->xref && $person->disp) {
-					$recentText .= "<a href=\"".SERVER_URL ."individual.php?pid=".$person->xref."&amp;gedid=".GedcomConfig::$GEDCOMID."\"><b>".$person->revname."</b>".$person->addxref;
+					$recentText .= "<a href=\"".SERVER_URL ."individual.php?pid=".$person->xref."&amp;gedid=".GedcomConfig::$GEDCOMID."\"><b>".PrintReady($person->revname.($person->revaddname == "" ? "" : " (".$person->revaddname.")"))."</b>".$person->addxref;
 					$recentText .= "</a><br />\n";
 					$lastgid = $person->xref;
 					if ($fact->disp) { 
@@ -555,7 +555,7 @@ function getRecentChanges() {
 				$family =& Family::GetInstance($factarr[0]);
 				$fact = New Fact($family->xref, "FAM", GedcomConfig::$GEDCOMID, $factarr[3], $factarr[1]);
 				if ($lastgid != $family->xref && $family->disp) {
-					$recentText .= "<a href=\"".SERVER_URL ."family.php?famid=".$family->xref."&amp;gedid=".GedcomConfig::$GEDCOMID."\"><b>".PrintReady($family->sortable_name)."</b>".$family->addxref;
+					$recentText .=  "<li><a href=\"".SERVER_URL ."family.php?famid=".$family->xref."&amp;gedid=".GedcomConfig::$GEDCOMID."\"><b>".PrintReady($family->sortable_name.($family->sortable_addname == "" ? "" : "(".$family->sortable_addname.")"))."</b>".$family->addxref;
 					$recentText .= "</a><br />\n";
 					$lastgid = $family->xref;
 					if ($fact->disp) { 
