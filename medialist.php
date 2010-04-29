@@ -123,7 +123,7 @@ foreach($mediacontroller->medialist as $index => $mediaitem) {
 	}
 	if ($indiexists) print "<br />";
 	foreach($mediaitem->famlist as $key => $family) {
-		print "<br /><a href=\"family.php?famid=".$family->xref."&amp;gedid=".$family->gedcomid."\">".GM_LANG_view_family.": ".$family->descriptor.$family->addxref."</a>";
+		print "<br /><a href=\"family.php?famid=".$family->xref."&amp;gedid=".$family->gedcomid."\">".GM_LANG_view_family.": ".$family->name.$family->addxref."</a>";
 		$famexists = true;
 	}
 	if ($famexists) print "<br />";

@@ -342,7 +342,7 @@ abstract class BlockFunctions {
 						}
 						elseif ($type == "FAM") {
 							print "<td class=\"wrap\"><span class=\"name2\" ><a href=\"family.php?famid=".urlencode($id)."&amp;gedid=".$gedid."\">";
-							print $object->descriptor.($object->adddescriptor == "" ? "" : "&nbsp;(".$object->adddescriptor.")")."</span>".$object->addxref;
+							print $object->name.($object->addname == "" ? "" : "&nbsp;(".$object->addname.")")."</span>".$object->addxref;
 							print "</a></td>";
 							$i++;
 						}

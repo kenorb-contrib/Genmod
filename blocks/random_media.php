@@ -92,7 +92,7 @@ function print_random_media($block = true, $config="", $side, $index) {
 		}
 		foreach($media->famlist as $key => $family) {
 			print " <a href=\"family.php?famid=".$family->xref."&amp;gedid=".$family->gedcomid."\">".GM_LANG_view_family.": ";
-			print $family->descriptor.$family->addxref;
+			print $family->name.$family->addxref;
 			print "</a><br />";
 		}
 		foreach($media->sourcelist as $key => $source) {

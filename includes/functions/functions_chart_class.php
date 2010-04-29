@@ -68,8 +68,8 @@ abstract class ChartFunctions {
 		print "\r\n\r\n<p style='page-break-before:always' />\r\n";
 		print "<a name=\"".$family->xref."\"></a>\r\n";
 		
-		print "<p class=\"name_head\">".$family->descriptor;
-		if ($family->adddescriptor != "") print "<br />".$family->adddescriptor;
+		print "<p class=\"name_head\">".$family->name;
+		if ($family->addname != "") print "<br />".$family->addname;
 		print "</p>\r\n";
 		
 		PersonFunctions::PrintFamilyParents($family, $sosa, $label, $parid, $gparid, $view);
