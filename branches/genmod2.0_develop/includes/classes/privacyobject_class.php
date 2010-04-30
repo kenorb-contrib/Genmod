@@ -30,7 +30,7 @@ if (stristr($_SERVER["SCRIPT_NAME"],basename(__FILE__))) {
 
 class PrivacyObject {
 	
-	public $classname = "PrivacyObject";
+	public $classname = "PrivacyObject";		// Name of this class
 	private static $GEDPRIV = array();			// Holder of the instances for this class
 
 	// These vars are the same as (uppercase) the fields in the DB.

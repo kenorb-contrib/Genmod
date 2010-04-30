@@ -142,8 +142,8 @@ function MM(e) {
 			}
 			yearform = document.getElementById('yearform'+personnum);
 			ageform = document.getElementById('ageform'+personnum);
-			yearform.innerHTML = year+"      "+month+" <?php print GetFirstLetter(GM_LANG_month);?>   "+day+" <?php print NameFunctions::GetFirstLetter(GM_LANG_day);?>";
-			ageform.innerHTML = (ba*yage)+" <?php print GetFirstLetter(GM_LANG_year);?>   "+(ba*mage)+" <?php print NameFunctions::GetFirstLetter(GM_LANG_month);?>   "+(ba*dage)+" <?php print GetFirstLetter(GM_LANG_day);?>";
+			yearform.innerHTML = year+"      "+month+" <?php print NameFunctions::GetFirstLetter(GM_LANG_month);?>   "+day+" <?php print NameFunctions::GetFirstLetter(GM_LANG_day);?>";
+			ageform.innerHTML = (ba*yage)+" <?php print NameFunctions::GetFirstLetter(GM_LANG_year);?>   "+(ba*mage)+" <?php print NameFunctions::GetFirstLetter(GM_LANG_month);?>   "+(ba*dage)+" <?php print NameFunctions::GetFirstLetter(GM_LANG_day);?>";
 			var line = document.getElementById('ageline'+personnum);
 			temp = newx-oldx;
 			if (textDirection=='rtl') temp = temp * -1;

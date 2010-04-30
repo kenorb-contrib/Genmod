@@ -44,8 +44,8 @@ class MediaItem extends GedcomRecord {
 	private $isprimary = null;			// This record has a 1 _PRIM Y/N tag or not
 	private $useasthumb = null;			// This record has a 1 _THUM Y/N tag or not
 	
-	public  $links = array(); // set in media class
-	public  $linked = false; // set in media class
+	public  $links = array();			// set in media class
+	public  $linked = false; 			// set in media class
 
 	public static function GetInstance($id, $gedrec="", $gedcomid="") {
 		

@@ -32,7 +32,7 @@ if (stristr($_SERVER["SCRIPT_NAME"],basename(__FILE__))) {
 /**
  * Main controller class for the individual page.
  */
-class ChartController extends BaseController {
+abstract class ChartController extends BaseController {
 	
 	public $classname = "ChartController";	// Name of this class
 	protected $root = null;					// Holder for the root person object

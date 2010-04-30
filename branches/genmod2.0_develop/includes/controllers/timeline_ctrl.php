@@ -33,24 +33,24 @@ if (stristr($_SERVER["SCRIPT_NAME"],basename(__FILE__))) {
  */
 class TimelineController extends BaseController {
 	
-	public $classname = "TimelineController";
-	public $bheight = 30;
-	public $placements = array();
-	public $familyfacts = array();
-	public $indifacts = array();						// array to store the fact records in for sorting and displaying
-	public $birthyears=array();
-	public $birthmonths=array();
-	public $birthdays=array();
-	public $baseyear=0;
-	public $topyear=0;
-	public $pids = array();
-	public $people = array();
-	public $pidlinks = "";
-	public $scale = 2;
+	// Classname
+	public $classname = "TimelineController";			// Name of this class
 	
-	/**
-	 * constructor
-	 */
+	// Data
+	public $bheight = 30;								// Height of the infoboxes
+	public $placements = array();						// Array to store the places where a fact will be printed
+	public $familyfacts = array();						// Array to store the family fact records in for sorting and display
+	public $indifacts = array();						// Array to store the individual fact records in for sorting and display
+	public $birthyears = array();						// Array to store the birthyears of the individuals
+	public $birthmonths = array();						// Array to store the birthmonths of the individuals
+	public $birthdays = array();						// Array to store the birthdays of the individuals
+	public $baseyear = 0;								// First year on the timeline
+	public $topyear = 0;								// Last year on the timeline
+	public $pids = array();								// ID's of persons appearing on the timeline
+	public $people = array();							// Person objects of the persons on the timeline
+	public $pidlinks = "";								// String of pids to include in the URLs
+	public $scale = 2;									// Scale of the timeline
+	
 	public function __construct() {
 		global $nonfamfacts, $nonfacts;
 		
@@ -252,7 +252,7 @@ class TimelineController extends BaseController {
 					$col = $p % 6;
 					$spouse =& Person::GetInstance($spouse);
 					print " <span class=\"person".$col."\"> <a href=\"individual.php?pid=".$spouse->xref."&amp;gedid=".$spouse->gedcomid."\">";
-					print $spouse->name;
+					print PrintReady($spouse->name.($spouse->addname == "" ? "" : "&nbsp;(".$spouse->addname.")"));
 					$age = $spouse->GetAge($factobj->datestring);
 					print "</a> ".$age."</span>";
 				}

@@ -29,9 +29,9 @@ if (stristr($_SERVER["SCRIPT_NAME"],basename(__FILE__))) {
 
 class MimeTypeDetect {
 	
-	public $classname = "MimeTypeDetect";
-	private $mime_types = array();
-	private $found_mime_type = array();
+	public $classname = "MimeTypeDetect";	// Name of the class
+	private $mime_types = array();			// Array of mime types
+	private $found_mime_type = array();		// Holder for the results to return from this class
 	
 	public function __construct() {
 		$this->LoadMimeTypes();

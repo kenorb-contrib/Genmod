@@ -32,7 +32,7 @@ if (stristr($_SERVER["SCRIPT_NAME"],basename(__FILE__))) {
 /**
  * Main controller class for the individual page.
  */
-class ListController extends BaseController {
+abstract class ListController extends BaseController {
 	
 	public $classname = "ListController";	// Name of this class
 	

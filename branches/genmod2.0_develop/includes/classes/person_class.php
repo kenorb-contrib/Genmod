@@ -35,7 +35,7 @@ class Person extends GedcomRecord {
 	// General class information
 	public $classname = "Person";			// Name of this class
 	public $datatype = "INDI";				// Type of data collected here
-	private static $cache = array(); 	// Holder of the instances for this class
+	private static $cache = array(); 		// Holder of the instances for this class
 	
 	private $name = null;					// Printable name of the person, after applying privacy (can be unknown of private) and after CheckNN
 	private $revname = null;				// Printable name, in reversed order, after CheckNN

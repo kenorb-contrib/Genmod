@@ -29,6 +29,9 @@ if (stristr($_SERVER["SCRIPT_NAME"],basename(__FILE__))) {
 
 abstract class MenuBar {
 	
+	// General class information
+	public $classname = "MenuBar";	// Name of the class
+	
 	/**
 	 * Create text for sub-menu where one will be checked and others not
 	 * @return Text         the sub-menu text

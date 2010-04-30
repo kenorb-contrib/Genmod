@@ -35,6 +35,8 @@ if (stristr($_SERVER["SCRIPT_NAME"],basename(__FILE__))) {
 
 abstract class MessageController {
 	
+	public $classname = "MessageController";	// Name of this class
+	
 	//-- deletes a message in the database
 	public function deleteMessage($message_id) {
 	

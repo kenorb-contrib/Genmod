@@ -31,8 +31,8 @@ if (stristr($_SERVER["SCRIPT_NAME"],basename(__FILE__))) {
  
 abstract class MediaFS {
 	
-	public  $classname = "MediaFS";
-	public static $fdetails = array();
+	public $classname 		= "MediaFS";	// Name of the class
+	public static $fdetails = array();		// Holder for the file details
 	
 	public function GetMediaDirList($directory="", $all=true, $level=1, $checkwrite=true, $incthumbdir=false, $dbmode="unset") {
 		
