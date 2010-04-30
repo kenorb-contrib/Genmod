@@ -51,11 +51,9 @@ function print_user_favorites($block=true, $config="", $side, $index) {
 			print "\n";
 		} 
 		else {
-			if ($block) $style = 1;
-			else $style = 2;
-			BlockFunctions::PrintBlockFavorites($userfavs, $side, $index, $style);
+			BlockFunctions::PrintBlockFavorites($userfavs, $side, $index);
 		}
-		BlockFunctions::PrintBlockAddFavorite($command, "user");	
+		BlockFunctions::PrintBlockAddFavorite($command, "user", $side);	
 		if ($block) print "</div>\n";
 		print "</div>\n"; // content
 		print "</div>";   // block

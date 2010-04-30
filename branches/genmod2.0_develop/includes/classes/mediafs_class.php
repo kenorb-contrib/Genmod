@@ -1338,7 +1338,7 @@ abstract class MediaFS {
 				$close = true;
 			}
 		}
-		if (!empty($thumbname)) print "<img src=\"".FilenameEncode($thumbname)."\" border=\"0\" ".($width > 0 ? "width=\"".$width."\" " : "").($height > 0 ? "height=\"".$height."\" " : "")." class=\"thumbnail\" align=\"".($center ? "center" : ($TEXT_DIRECTION == "rtl" ? "right" : "left"))."\" />";
+		if (!empty($thumbname)) print "<img src=\"".FilenameEncode($thumbname)."\" border=\"0\" ".($width > 0 ? "width=\"".$width."\" " : "").($height > 0 ? "height=\"".$height."\" " : "")." class=\"thumbnail\" ".($center ? "" : "align=\"".($TEXT_DIRECTION == "rtl" ? "right" : "left")."\"")." alt=\"\" />";
 		if ($close) {
 			if ($closelink) print "</a>\n";
 			return true;

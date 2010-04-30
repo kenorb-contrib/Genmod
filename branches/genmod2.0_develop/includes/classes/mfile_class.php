@@ -159,7 +159,7 @@ class MFile {
 				else {
 //					if (!$this->f_is_image) {
 						$this->f_main_file = "showblob.php?file=".urlencode($this->f_file);
-						if (!empty($this->f_mimetype)) $this->f_main_file .= "&header=".urlencode($this->f_mimetype);
+						if (!empty($this->f_mimetype)) $this->f_main_file .= "&amp;header=".urlencode($this->f_mimetype);
 //					}
 //					else {
 //						$this->f_main_file = urlencode($this->f_file);
