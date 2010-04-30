@@ -30,7 +30,10 @@ if (stristr($_SERVER["SCRIPT_NAME"],basename(__FILE__))) {
 
 class Blocks {
 	
+	// General class information
 	public $classname = "Blocks";			// Name of this class
+	
+	// Variables
 	public $main = array();					// Array of block for the main part of the page
 	public $right = array();				// Array of blocks for the right part of the page
 	public $type = "gedcom";				// What type: gedcom or user

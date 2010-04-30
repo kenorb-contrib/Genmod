@@ -35,6 +35,8 @@ if (stristr($_SERVER["SCRIPT_NAME"],basename(__FILE__))) {
 
 abstract class NewsController {
 	
+	public $classname = "NewsController";	// Name of this class
+	
 	public function getNewsItem($id) {
 	
 		$sql = "SELECT * FROM ".TBLPREFIX."news WHERE n_id='".$id."'";

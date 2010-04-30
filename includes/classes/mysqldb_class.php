@@ -30,17 +30,17 @@ if (stristr($_SERVER["SCRIPT_NAME"],basename(__FILE__))) {
 
 abstract class MysqlDb {
 	
-	public $classname = "MysqlDb";
+	public $classname = "MysqlDb";	// Name of this class
 	
-	public $connected = null;
-	public $connection = null;
+	public $connected = null;		// The result of MakeConnection. Set in childclass DbLayer
+	public $connection = null;		// Acquired connection handle
 	
-	public $sqlerror = false;
-	public $sqlerrordesc = null;
-	public $sqlerrorno = null;
-	public $sqlquery = null;
-	public $sqlfile	= null;
-	public $sqlline	= null;
+	public $sqlerror = false;		// Set to true if a query failed and error reporting is on
+	public $sqlerrordesc = null;	// Description of the error
+	public $sqlerrorno = null;		// Number of the error
+	public $sqlquery = null;		// SQL query that went wrong
+	public $sqlfile	= null;			// If there was an error in NewQuery, the file where that occured is here
+	public $sqlline	= null;			// Also the line number
 	
 	public function __construct() {
 	}

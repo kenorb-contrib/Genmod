@@ -28,10 +28,10 @@ if (stristr($_SERVER["SCRIPT_NAME"],basename(__FILE__))) {
 	require "../../intrusion.php";
 }
 
-class SystemConfig {
+abstract class SystemConfig {
 
 	// Classname of this class
-	private static $classname = "SystemConfig";
+	public static $classname = "SystemConfig";
 	
 	// Default value for this setting, that stores the maximum tried execution time
 	public static $max_execution_time = 0;

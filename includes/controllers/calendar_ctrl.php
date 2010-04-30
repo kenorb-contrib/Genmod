@@ -56,7 +56,7 @@ class CalendarController extends ChartController {
 	private $currhMonth = null;					
 	private $currhYear = null;					
 	private $leap = null;							// True or false a leap year
-	private $bartext = null;							// Text with dates to print in the topbar
+	private $bartext = null;						// Text with dates to print in the topbar
 	
 	// for year
 	private $startyear = null;						// First year of year range (used for search parameters)
@@ -66,10 +66,10 @@ class CalendarController extends ChartController {
 	
 	// for calendar
 	private $show_no_day = null;					// In which column show the persons with a date in which the day is not set
-	private $lastday = null;					
+	private $lastday = null;						// Have to find this out...
 	
-	private $myfamlist = null;
-	private $myindilist = null;
+	private $myfamlist = null;						// Holder for the resulting familylist
+	private $myindilist = null;						// Holder for the resulting individuallist
 	
 	public function __construct() {
 		global $nonfacts, $nonfamfacts;

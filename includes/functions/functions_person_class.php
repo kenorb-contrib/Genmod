@@ -94,7 +94,7 @@ abstract class PersonFunctions {
 			return false;
 		}
 		
-		// NOTE: Set the width of the box
+		// NOTE: Set the width of the box <= what is this for?
 		$lbwidth = $bwidth*.75;
 		if ($lbwidth < 150) $lbwidth = 150;
 		

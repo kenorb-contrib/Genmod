@@ -32,7 +32,7 @@ if (stristr($_SERVER["SCRIPT_NAME"],basename(__FILE__))) {
 class DescendancyController extends ChartController {
 	
 	public $classname = "DescendancyController";	// Name of this class
-	private $personcount = 0;
+	private $personcount = 0;						// Helper for the number of personboxes printed
 	private $dabo = array();						// Helper for keeping track of SOSA numbers
 
 	

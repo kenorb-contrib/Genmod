@@ -32,13 +32,13 @@ class Menu {
 	public $classname = "Menu";		// Name of this class
 	public $seperator = false;		// If this menu object is just a separator line
 	public $label = ' ';			// Label of the menu option
-	public $labelpos = 'right';	// Tells where the text should be positioned relative to the picture options are up down left right
+	public $labelpos = 'right';		// Tells where the text should be positioned relative to the picture options are up down left right
 	public $link = '#';				// Link for the menu option: either # for JS or the actual link without server URL
-	public $onclick = null;		// JS to run on click
+	public $onclick = null;			// JS to run on click
 	public $icon = null;			// Icon to show in front of the menu option
 	public $hovericon = null;		// Icon to show when hovering over the option
 	public $flyout = 'down';		// Options are up down left right
-	public $class = '';			// CSS class for the item
+	public $class = '';				// CSS class for the item
 	public $hoverclass = '';		// CSS class for the item when hovering over it
 	public $submenuclass = '';		// CSS class for the submenu
 	public $accesskey = null;		// Access key for the menu option
