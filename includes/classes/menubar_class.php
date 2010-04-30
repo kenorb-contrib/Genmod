@@ -280,7 +280,7 @@ abstract class MenuBar {
 		// NOTE: Gedcom Favorites
 		$gedcomfavs = FavoritesController::getGedcomFavorites(GedcomConfig::$GEDCOMID);
 		if (count($gedcomfavs) > 0) {
-			if (!is_object($menu)) $menu = new Menu(GM_LANG_menu_favorites);
+			if (!isset($menu)) $menu = new Menu(GM_LANG_menu_favorites);
 			$submenu = new Menu(GM_LANG_gedcom_favorites);
 			$menu->addSubmenu($submenu);
 			

@@ -341,31 +341,31 @@ abstract class BlockFunctions {
 							$i++;
 						}
 						elseif ($type == "FAM") {
-							print "<td class=\"wrap\"><span class=\"name2\" ><a href=\"family.php?famid=".urlencode($id)."&amp;gedid=".$gedid."\">";
+							print "<td class=\"wrap\"><a href=\"family.php?famid=".urlencode($id)."&amp;gedid=".$gedid."\"><span class=\"name2\" >";
 							print $object->name.($object->addname == "" ? "" : "&nbsp;(".$object->addname.")")."</span>".$object->addxref;
 							print "</a></td>";
 							$i++;
 						}
 						elseif ($type == "REPO") {
-							print "<td><span class=\"name2\" ><a href=\"repo.php?rid=".urlencode($id)."&amp;gedid=".$gedid."\">";
+							print "<td><a href=\"repo.php?rid=".urlencode($id)."&amp;gedid=".$gedid."\"><span class=\"name2\" >";
 							print $object->descriptor.($object->adddescriptor == "" ? "" : "&nbsp;(".$object->adddescriptor.")")."</span>".$object->addxref;
 							print "</a></td>";
 							$i++;
 						}
 						elseif ($type == "SOUR") {
-							print "<td><span class=\"name2\" ><a href=\"source.php?sid=".urlencode($id)."&amp;gedid=".$gedid."\">";
+							print "<td><a href=\"source.php?sid=".urlencode($id)."&amp;gedid=".$gedid."\"><span class=\"name2\" >";
 							print $object->descriptor.($object->adddescriptor == "" ? "" : "&nbsp;(".$object->adddescriptor.")")."</span>".$object->addxref;
 							print "</a></td>";
 							$i++;
 						}
 						elseif ($type == "OBJE") {
-							print "<td><span class=\"name2\" ><a href=\"mediadetail.php?mid=".urlencode($id)."&amp;gedid=".$gedid."\">";
+							print "<td><a href=\"mediadetail.php?mid=".urlencode($id)."&amp;gedid=".$gedid."\"><span class=\"name2\" >";
 							print $object->title."</span>".$object->addxref;
 							print "</a></td>";
 							$i++;
 						}
 						elseif ($type == "NOTE") {
-							print "<td><span class=\"name2\" ><a href=\"note.php?oid=".urlencode($id)."&amp;gedid=".$gedid."\">";
+							print "<td><a href=\"note.php?oid=".urlencode($id)."&amp;gedid=".$gedid."\"><span class=\"name2\" >";
 							print $object->title."</span>".$object->addxref;
 							print "</a></td>";
 							$i++;
@@ -387,7 +387,7 @@ abstract class BlockFunctions {
 		else print "<b>".GM_LANG_top10_pageviews_nohits."</b>\n";
 	}
 	
-	public function PrintBlockFavorites(&$userfavs, $side, $index, $style) {
+	public function PrintBlockFavorites(&$userfavs, $side, $index) {
 		global $command, $gm_user, $view;
 		
 		foreach($userfavs as $key=>$favorite) {
@@ -408,7 +408,7 @@ abstract class BlockFunctions {
 					if ($favorite->object->sex == "F") print "F\">\n";
 					elseif ($favorite->object->sex == "U") print "NN\">\n";
 					else print "\">\n";
-					PersonFunctions::PrintPedigreePerson($favorite->object, $style, 1, $key, 1, $view);
+					PersonFunctions::PrintPedigreePerson($favorite->object, 2, 1, $key, 1, $view);
 				}
 				else {
 					print "\"><ul>\n";
@@ -432,7 +432,7 @@ abstract class BlockFunctions {
 		}
 	}
 	
-	public function PrintBlockAddFavorite($command, $type) {
+	public function PrintBlockAddFavorite($command, $type, $side) {
 		global $GM_IMAGES;
 		
 		?>
@@ -447,7 +447,7 @@ abstract class BlockFunctions {
 			<br />
 		<?php
 		PrintHelpLink("index_add_favorites_help", "qm", "add_favorite");
-		print "<b><a href=\"javascript: ".GM_LANG_add_favorite." \" onclick=\"expand_layer('add_".$type."_fav'); return false;\"><img id=\"add_ged_fav_img\" src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["plus"]["other"]."\" border=\"0\" alt=\"".GM_LANG_add_favorite."\" />&nbsp;".GM_LANG_add_favorite."</a></b>";
+		print "<b><a href=\"javascript: ".GM_LANG_add_favorite." \" onclick=\"expand_layer('add_".$type."_fav'); return false;\"><img id=\"add_".$type."_fav_img\" src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["plus"]["other"]."\" border=\"0\" alt=\"".GM_LANG_add_favorite."\" />&nbsp;".GM_LANG_add_favorite."</a></b>";
 		print "<br /><div id=\"add_".$type."_fav\" style=\"display: none;\">\n";
 		print "<form name=\"addfavform\" method=\"get\" action=\"index.php\">\n";
 		print "<input type=\"hidden\" name=\"action\" value=\"addfav\" />\n";
@@ -463,7 +463,8 @@ abstract class BlockFunctions {
 		print "\n<br />".GM_LANG_add_fav_or_enter_url;
 		print "\n<br />".GM_LANG_url."<input type=\"text\" name=\"url\" size=\"40\" value=\"\" />";
 		print "\n<br />".GM_LANG_title." <input type=\"text\" name=\"favtitle\" size=\"40\" value=\"\" />";
-		print "\n</td><td>";
+		if ($side != "right") print "\n</td><td>";
+		else print "<br /><br />";
 		print "\n".GM_LANG_add_fav_enter_note;
 		print "\n<br /><textarea name=\"favnote\" rows=\"6\" cols=\"40\"></textarea>";
 		print "</td></tr></table>\n";

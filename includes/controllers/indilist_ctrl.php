@@ -332,40 +332,50 @@ class IndilistController extends ListController {
 		// First check if we must assume something
 		if ($this->useMAA) {
 			if (isset($bddates["birth"]["year"]) && $bddates["birth"]["type"] == "true" && (!isset($bddates["death"]["year"]) || $bddates["death"]["type"] != "true")) {
-				$bddates["death"]["year"] = $bddates["birth"]["year"] + $MAX_ALIVE_AGE;
-				$bddates["death"]["type"] = "est";
+				if (!isset($bddates["death"]["year"]) || (isset($bddates["death"]["year"]) && $bddates["death"]["year"] > $bddates["birth"]["year"] + $MAX_ALIVE_AGE)) {
+					$bddates["death"]["year"] = $bddates["birth"]["year"] + $MAX_ALIVE_AGE;
+					$bddates["death"]["type"] = "est";
+				}
 			}
 			if (isset($bddates["death"]["year"]) && $bddates["death"]["type"] == "true" && (!isset($bddates["birth"]["year"]) || $bddates["birth"]["type"] != "true")) {
-				$bddates["birth"]["year"] = $bddates["death"]["year"] - $MAX_ALIVE_AGE;
-				$bddates["birth"]["type"] = "est";
+				if ($person->xref == "I405") print "hier2";
+				if (!isset($bddates["birth"]["year"]) || (isset($bddates["birth"]["year"]) && $bddates["birth"]["year"] < $bddates["death"]["year"] - $MAX_ALIVE_AGE)) {
+					$bddates["birth"]["year"] = $bddates["birth"]["year"] - $MAX_ALIVE_AGE;
+					$bddates["birth"]["type"] = "est";
+				}
 			}
 		}
 		// Nothing to tell for sure: estimated death year is before estimated birth year
 		if (isset($bddates["birth"]["year"]) && isset($bddates["death"]["year"]) && $bddates["death"]["year"] < $bddates["birth"]["year"]) {
 			$alive[$person->key] = -2;
+			//print $person->xref." not for sure (-2)<br />";
 			return -2;
 		}
 		
 		// For sure born after
 		if (isset($bddates["birth"]["year"]) && $bddates["birth"]["year"] > $this->year) {
 			$alive[$person->key] = -1;
+			//print $person->xref." for sure born after (-1)<br />";
 			return -1;
 		}
 		
 		// For sure died before
 		if (isset($bddates["death"]["year"]) && $bddates["death"]["year"] < $this->year) {
 			$alive[$person->key] = 1;
+			//print $person->xref." for sure died before (1)<br />";
 			return 1;
 		}
 		
 		// For sure lived in that year
 		if (isset($bddates["death"]["year"]) && isset($bddates["birth"]["year"]) && $bddates["birth"]["year"] <= $this->year && $bddates["death"]["year"] >= $this->year) {
 			$alive[$person->key] = "0";
+			//print $person->xref." for sure alive (0)<br />";
 			return 0;
 		}
 		
 		// All else don't know, we assume nothing
 		$alive[$person->key] = -2;
+		//print $person->xref." we know nothing (-2)<br />";
 		return -2;
 		
 	}
