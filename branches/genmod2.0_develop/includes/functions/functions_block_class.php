@@ -416,7 +416,10 @@ abstract class BlockFunctions {
 					elseif ($favorite->type=="REPO") $favorite->object->PrintListRepository();
 					elseif ($favorite->type=="NOTE") $favorite->object->PrintListNote();
 					elseif ($favorite->type=="FAM") $favorite->object->PrintListFamily();
-					elseif ($favorite->type=="OBJE") $favorite->object->PrintListMedia();
+					elseif ($favorite->type=="OBJE") {
+						MediaFS::DispImgLink($favorite->object->fileobj->f_main_file, $favorite->object->fileobj->f_thumb_file, $favorite->object->title, "", $favorite->object->fileobj->f_twidth, 0, 100, 100, $favorite->object->fileobj->f_is_image, $favorite->object->fileobj->f_file_exists, true, true);
+						$favorite->object->PrintListMedia(false, "", false);
+					}
 					print "</ul>";
 				}
 			}
