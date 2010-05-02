@@ -108,6 +108,7 @@ function print_todays_events($block=true, $config="", $side, $index) {
 						else if ($factarr[5] == "F") print $GM_IMAGES["sexf"]["small"]."\" title=\"".GM_LANG_female."\" alt=\"".GM_LANG_female;
 						else print $GM_IMAGES["sexn"]["small"]."\" title=\"".GM_LANG_unknown."\" alt=\"".GM_LANG_unknown;
 						print "\" class=\"sex_image\" />";
+						print $person->addxref;
 						print "</a><br />\n";
 						$lastgid = $gid;
 					}
