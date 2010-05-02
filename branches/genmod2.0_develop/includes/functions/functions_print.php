@@ -138,7 +138,7 @@ function PrintHeader($title, $head="",$use_alternate_styles=true) {
 			print "<link rel=\"stylesheet\" href=\"".GedcomConfig::$THEME_DIR.$BROWSERTYPE.".css\" type=\"text/css\" media=\"all\"></link>\n\t";
 		}
 	 }
-	 print "<link rel=\"stylesheet\" href=\"".GM_PRINT_STYLESHEET."\" type=\"text/css\" media=\"print\"></link>\n\t";
+	 if ($view == "preview") print "<link rel=\"stylesheet\" href=\"".GM_PRINT_STYLESHEET."\" type=\"text/css\" media=\"print\"></link>\n\t";
 	 if ($BROWSERTYPE == "msie") print "<style type=\"text/css\">\nFORM { margin-top: 0px; margin-bottom: 0px; }\n</style>\n";
 	 print "<!-- Genmod v".GM_VERSION." -->\n";
 	 if (isset($changelanguage)) {
