@@ -1536,7 +1536,8 @@ abstract class AdminFunctions {
 				$message .= GM_LANG_wrong_md5."&nbsp;".$file."<br />";
 			}
 		}
-		return $message;
+		if (empty($message)) return GM_LANG_md5_ok;
+		else return $message;
 	}
 	
 	public function MakeTransTab($gedfile, $merge_ged) {
