@@ -2611,6 +2611,7 @@
 "KEEP_ACTIONS";"Retain old ToDo's during re-import"
 "check_md5";"Check file versions of this installation"
 "wrong_md5";"Wrong version of this file is present:"
+"md5_ok";"All files have the correct version"
 "paternal_chart";"Paternal/Maternal lines"
 "paternal_line_type";"Line type"
 "paternal_lines_from";"Lines from"

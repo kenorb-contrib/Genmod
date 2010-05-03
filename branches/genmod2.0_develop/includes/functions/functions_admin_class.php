@@ -1479,7 +1479,7 @@ abstract class AdminFunctions {
 		
 		if (!isset($include_dirs)) $include_dirs = array("blocks", "fonts", "hooks", "hooks/logout", "images", "images/buttons", "images/flags", "images/media", "images/small", "includes", "includes/classes", "includes/controllers", "includes/functions", "includes/values", "index", "install", "install/images", "languages", "media", "media/thumbs", "places", "places/AUS", "places/AUT", "places/BEL", "places/BRA", "places/CAN", "places/CHE", "places/CZE", "places/DEU", "places/DNK", "places/ENG", "places/ESP", "places/FIN", "places/flags", "places/FRA", "places/GBR", "places/HUN", "places/IDN", "places/IND", "places/IRL", "places/ISR", "places/ITA", "places/KEN", "places/LBA", "places/NLD", "places/NOR", "places/NZL", "places/PAK", "places/POL", "places/PRT", "places/ROM", "places/RUS", "places/SCT", "places/SVK", "places/SWE", "places/TUR", "places/UKR", "places/USA", "places/WLS", "places/ZAF", "reports", "themes/clear", "themes/standard", "ufpdf");
 //		if (!isset($include_dirs)) $include_dirs = array("places", "themes");
-		
+
 		$dirlist = array();
 		if (!is_array($dirs)) $dirs = array($dirs);
 	
@@ -1495,7 +1495,7 @@ abstract class AdminFunctions {
 							}
 						}
 						else {
-							print $dir.$entry."<br />";
+							//print $dir.$entry."<br />";
 							if ($entry != "md5_files.php") $dirlist[$dir.$entry] = md5_file($dir.$entry);
 						}
 					}
@@ -1511,12 +1511,12 @@ abstract class AdminFunctions {
 		fwrite($handle, "if (preg_match(\"/\Wmd5_files.php/\", \$_SERVER[\"SCRIPT_NAME\"])>0) {\n");
 		fwrite($handle, "\$INTRUSION_DETECTED = true;\n");
 		fwrite($handle, "}\n");
-		fwrite($handle, "// This file is for checking if the right files exist in a Genmod installation");
-		fwrite($handle, "// It is created with the hidden function admin_maint.php?action=createmd5");
-		fwrite($handle, "// It should be run on an existing, clean and freshly setup installation with files of the latest SVN version.");
+		fwrite($handle, "// This file is for checking if the right files exist in a Genmod installation\n");
+		fwrite($handle, "// It is created with the hidden function admin_maint.php?action=createmd5\n");
+		fwrite($handle, "// It should be run on an existing, clean and freshly setup installation with files of the latest SVN version.\n\n");
 		fwrite($handle, "\$md5_array = array();\n");
 		foreach($dirlist as $file => $md5) {
-			fwrite($handle, "\$md5_array[\"".$file."\"] = \"".$md5."\";\n");
+			fwrite($handle, "\$md5_array[\"".addslashes($file)."\"] = \"".$md5."\";\n");
 		}
 		fwrite($handle, "?>\n");
 		fclose($handle);
@@ -1528,6 +1528,7 @@ abstract class AdminFunctions {
 		require_once("includes/values/md5_files.php");
 		$message = "";
 		foreach($md5_array as $file => $md5) {
+			$file = stripslashes($file);
 			if (!file_exists($file)) {
 				$message .= GM_LANG_file_absent."&nbsp;".$file."<br />";
 			}
