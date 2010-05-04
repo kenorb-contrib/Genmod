@@ -87,12 +87,12 @@ function print_random_media($block = true, $config="", $side, $index) {
 		}
 		foreach($media->indilist as $key => $indi) {
 			print " <a href=\"individual.php?pid=".$indi->xref."&amp;gedid=".$indi->gedcomid."\">".GM_LANG_view_person.": ";
-			print $indi->name.($indi->addname == "" ? "" : " - ".$indi->addname).$indi->addxref;
+			print $indi->name.($indi->addname == "" ? "" : "  (".$indi->addname.")").$indi->addxref;
 			print "</a><br />";
 		}
 		foreach($media->famlist as $key => $family) {
 			print " <a href=\"family.php?famid=".$family->xref."&amp;gedid=".$family->gedcomid."\">".GM_LANG_view_family.": ";
-			print $family->name.$family->addxref;
+			print $family->name.($family->addname == "" ? "" : "  (".$family->addname.")").$family->addxref;
 			print "</a><br />";
 		}
 		foreach($media->sourcelist as $key => $source) {
