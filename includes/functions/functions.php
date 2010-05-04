@@ -862,7 +862,7 @@ function GetThemeNames() {
 	$themes = array();
 	$d = dir("themes");
 	while (false !== ($entry = $d->read())) {
-		if ($entry!="." && $entry!=".." && $entry!="CVS" && is_dir("themes/$entry")) {
+		if ($entry != ".." && $entry != "." && $entry != "CVS" && $entry != ".svn" && $entry != "_svn" && is_dir("themes/$entry")) {
 			$theme = array();
 			if (file_exists("themes/$entry/theme.php")) {
 				$themefile = implode("", file("themes/$entry/theme.php"));
@@ -1057,7 +1057,7 @@ function GetReportList($force=false) {
 	//-- find all of the reports in the reports directory
 	$d = dir("reports");
 	while (false !== ($entry = $d->read())) {
-		if (($entry!=".") && ($entry!="..") && ($entry!="CVS") && (strstr($entry, ".") == ".xml")) {
+		if (strstr($entry, ".") == ".xml") {
 			if (!isset($files[$entry]["file"])) $files[$entry]["file"] = "reports/".$entry;
 		}
 	}
