@@ -69,7 +69,7 @@ abstract class MediaFS {
 				$d = @dir($directory);
 				if (is_object($d)) {
 					while (false !== ($entry = $d->read())) {
-						if ($entry != ".." && $entry != "." && $entry != "CVS" && $entry != ".svn" && ($incthumbdir || $entry != "thumbs")) {
+						if ($entry != ".." && $entry != "." && $entry != "CVS" && $entry != ".svn" && $entry != "_svn" && ($incthumbdir || $entry != "thumbs")) {
 							$entry = $directory.$entry."/";
 							if(is_dir($entry)) {
 								if ($checkwrite) $canwrite = self::DirIsWritable($entry, false);
@@ -1249,7 +1249,7 @@ abstract class MediaFS {
 			if (is_object($d)) {
 				$candelete = true;
 				while (false !== ($entry = $d->read())) {
-					if ($entry != "." && $entry != ".." && $entry != "CVS" && $entry != "index.php") {
+					if ($entry != ".." && $entry != "." && $entry != "CVS" && $entry != ".svn" && $entry != "_svn" &&  $entry != "index.php") {
 						$candelete = false;
 						break;
 					}

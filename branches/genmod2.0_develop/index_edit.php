@@ -91,7 +91,7 @@ if ((LOGIN_URL == "" && substr(SERVER_URL,0,5) == "https") || substr(LOGIN_URL,0
 
 $d = dir("blocks");
 while (false !== ($entry = $d->read())) {
-	if (($entry!=".") && ($entry!="..") && ($entry!="CVS") && (strstr($entry, ".")==".php")) {
+	if (strstr($entry, ".")==".php") {
 		if (!($entry == "login_block.php" && $httpslogin)) include_once("blocks/".$entry);
 	}
 }

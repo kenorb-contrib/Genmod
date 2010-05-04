@@ -97,7 +97,7 @@ if ($action=="choose") {
 	print "<form name=\"choosereport\" method=\"get\" action=\"reportengine.php\">\n";
 	print "<input type=\"hidden\" name=\"action\" value=\"setup\" />\n";
 	print "<input type=\"hidden\" name=\"output\" value=\"$output\" />\n";
-	print "<table class=\"facts_table center $TEXT_DIRECTION\">";
+	print "<table class=\"facts_table center width50 $TEXT_DIRECTION\">";
 	print "<tr><td class=\"topbottombar\" colspan=\"2\">".GM_LANG_choose_report."</td></tr>";
 	print "<tr><td class=\"shade2 wrap width20 vmiddle\">".GM_LANG_select_report."</td>";
 	print "<td class=\"shade1\">";
