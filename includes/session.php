@@ -525,10 +525,14 @@ else {
         			// First see if the full code is found (like nl-nl)
          			if (!empty($langcode[$accept_langs])) $LANGUAGE = $langcode[$accept_langs];
          			else {
-	            		$parts = preg_split("/-/", $accept_langs);
-	            		if (isset ($parts[0]) && !empty($langcode[$parts[0]])) {
-               				$LANGUAGE = $langcode[$parts[0]];
-               				break;
+		      			if (strstr($accept_langs, "-")) {
+		            		$parts = preg_split("/-/", $accept_langs);
+		        			for ($i=0; $i<count($parts); $i++) {
+			            		if (isset ($langcode[$parts[$i]]) && !empty($langcode[$parts[0]])) {
+    		           				$LANGUAGE = $langcode[$parts[$i]];
+        		       				break;
+    	       					}
+	       					}
 	            		}
          			}
       			}
