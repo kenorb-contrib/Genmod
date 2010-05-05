@@ -425,12 +425,13 @@ abstract class BlockFunctions {
 			}
 			if (!empty($favorite->note)) print "<span class=\"favorite_padding\">".PrintReady(GM_LANG_note.": ".$favorite->note)."</span>";
 			print "</div>\n";
-			if ($command=="user" || $gm_user->userIsAdmin()) {
+			if ($command == "user" || $gm_user->userIsAdmin()) {
 				if (!empty($favorite->note)) print "&nbsp;&nbsp;";
 				print "<a class=\"font9\" href=\"index.php?command=$command&amp;action=deletefav&amp;fv_id=".$key."\" onclick=\"return confirm('".GM_LANG_confirm_fav_remove."');\">".GM_LANG_remove."</a>\n";
 				print "&nbsp;";
 				print "<a class=\"font9\" href=\"javascript: ".GM_LANG_config_block."\" onclick=\"window.open('index_edit.php?favid=$key&amp;name=$gm_user->username&amp;command=$command&amp;action=configure&amp;side=$side&amp;index=$index', '', 'top=50,left=50,width=600,height=400,scrollbars=1,resizable=1'); return false;\">".GM_LANG_edit."</a>";
 			}
+			else print "&nbsp;";
 			SwitchGedcom();
 		}
 	}

@@ -492,7 +492,7 @@ asort($gm_language);
 if ($spider) {
 	GedcomConfig::$ENABLE_MULTI_LANGUAGE = false;
 }
-if ((!empty($logout))&&($logout==1)) unset($_SESSION["CLANGUAGE"]);		// user is about to log out
+if (!empty($logout) && $logout == 1) unset($_SESSION["CLANGUAGE"]);		// user is about to log out
 else {
 	if ((GedcomConfig::$ENABLE_MULTI_LANGUAGE)&&(empty($_SESSION["CLANGUAGE"]))) {
 		// If visitor language is forced, set it
@@ -514,10 +514,12 @@ else {
                				break;
 	            		}
 	            		// Then try the partial code (like nl)
-	            		$parts = preg_split("/-/", $langs_array[$i]);
-	            		if (isset ($parts[0]) && !empty($langcode[$parts[0]])) {
-               				$LANGUAGE = $langcode[$parts[0]];
-               				break;
+		      			if (strstr($langs_array[$i], "-")) {
+		            		$parts = preg_split("/-/", $langs_array[$i]);
+		            		if (isset ($parts[0]) && !empty($langcode[$parts[0]])) {
+        	       				$LANGUAGE = $langcode[$parts[0]];
+            	   				break;
+        	   				}
 	            		}
     	     		}
       			}
