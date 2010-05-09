@@ -336,36 +336,36 @@ abstract class BlockFunctions {
 							print "<td class=\"wrap\"";
 							if ($block) print " width=\"86%\"";
 							print "><a href=\"individual.php?pid=".urlencode($id)."&amp;gedid=".$gedid."\"><span class=\"name2\">\n";
-							print $object->name.($object->addname == "" ? "" : "&nbsp;(".$object->addname.")")."</span>".$object->addxref;
+							print $object->revname.($object->revaddname == "" ? "" : "&nbsp;(".$object->revaddname.")")."</span>".$object->addxref;
 							print "</a></td>\n";
 							$i++;
 						}
 						elseif ($type == "FAM") {
 							print "<td class=\"wrap\"><a href=\"family.php?famid=".urlencode($id)."&amp;gedid=".$gedid."\"><span class=\"name2\" >";
-							print $object->name.($object->addname == "" ? "" : "&nbsp;(".$object->addname.")")."</span>".$object->addxref;
+							print $object->sortable_name.($object->sortable_addname == "" ? "" : "&nbsp;(".$object->sortable_addname.")")."</span>".$object->addxref;
 							print "</a></td>";
 							$i++;
 						}
 						elseif ($type == "REPO") {
-							print "<td><a href=\"repo.php?rid=".urlencode($id)."&amp;gedid=".$gedid."\"><span class=\"name2\" >";
+							print "<td class=\"wrap\"><a href=\"repo.php?rid=".urlencode($id)."&amp;gedid=".$gedid."\"><span class=\"name2\" >";
 							print $object->descriptor.($object->adddescriptor == "" ? "" : "&nbsp;(".$object->adddescriptor.")")."</span>".$object->addxref;
 							print "</a></td>";
 							$i++;
 						}
 						elseif ($type == "SOUR") {
-							print "<td><a href=\"source.php?sid=".urlencode($id)."&amp;gedid=".$gedid."\"><span class=\"name2\" >";
+							print "<td class=\"wrap\"><a href=\"source.php?sid=".urlencode($id)."&amp;gedid=".$gedid."\"><span class=\"name2\" >";
 							print $object->descriptor.($object->adddescriptor == "" ? "" : "&nbsp;(".$object->adddescriptor.")")."</span>".$object->addxref;
 							print "</a></td>";
 							$i++;
 						}
 						elseif ($type == "OBJE") {
-							print "<td><a href=\"mediadetail.php?mid=".urlencode($id)."&amp;gedid=".$gedid."\"><span class=\"name2\" >";
+							print "<td class=\"wrap\"><a href=\"mediadetail.php?mid=".urlencode($id)."&amp;gedid=".$gedid."\"><span class=\"name2\" >";
 							print $object->title."</span>".$object->addxref;
 							print "</a></td>";
 							$i++;
 						}
 						elseif ($type == "NOTE") {
-							print "<td><a href=\"note.php?oid=".urlencode($id)."&amp;gedid=".$gedid."\"><span class=\"name2\" >";
+							print "<td class=\"wrap\"><a href=\"note.php?oid=".urlencode($id)."&amp;gedid=".$gedid."\"><span class=\"name2\" >";
 							print $object->title."</span>".$object->addxref;
 							print "</a></td>";
 							$i++;
