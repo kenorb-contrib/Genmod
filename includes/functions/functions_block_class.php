@@ -394,7 +394,7 @@ abstract class BlockFunctions {
 			if (isset($favorite->id)) $key=$favorite->id;
 			$oldgedid = 
 			SwitchGedcom($favorite->file);
-			if ($favorite->type=="URL") {
+			if ($favorite->type == "URL") {
 				print "<div id=\"boxurl".$key.".0\" class=\"person_box";
 				print "\"><ul>\n";
 				print "<li><a href=\"".$favorite->url."\">".PrintReady($favorite->title)."</a></li>";
@@ -411,16 +411,17 @@ abstract class BlockFunctions {
 					PersonFunctions::PrintPedigreePerson($favorite->object, 2, 1, $key, 1, $view);
 				}
 				else {
-					print "\"><ul>\n";
-					if ($favorite->type=="SOUR") $favorite->object->PrintListSource();
-					elseif ($favorite->type=="REPO") $favorite->object->PrintListRepository();
-					elseif ($favorite->type=="NOTE") $favorite->object->PrintListNote();
-					elseif ($favorite->type=="FAM") $favorite->object->PrintListFamily();
-					elseif ($favorite->type=="OBJE") {
+					print "\">";
+					if ($favorite->type != "OBJE") print "<ul>\n";
+					if ($favorite->type == "SOUR") $favorite->object->PrintListSource();
+					elseif ($favorite->type == "REPO") $favorite->object->PrintListRepository();
+					elseif ($favorite->type == "NOTE") $favorite->object->PrintListNote();
+					elseif ($favorite->type == "FAM") $favorite->object->PrintListFamily();
+					elseif ($favorite->type == "OBJE") {
 						MediaFS::DispImgLink($favorite->object->fileobj->f_main_file, $favorite->object->fileobj->f_thumb_file, $favorite->object->title, "", $favorite->object->fileobj->f_twidth, 0, 100, 100, $favorite->object->fileobj->f_is_image, $favorite->object->fileobj->f_file_exists, true, true);
 						$favorite->object->PrintListMedia(false, "", false);
 					}
-					print "</ul>";
+					if ($favorite->type != "OBJE") print "</ul>";
 				}
 			}
 			if (!empty($favorite->note)) print "<span class=\"favorite_padding\">".PrintReady(GM_LANG_note.": ".$favorite->note)."</span>";
