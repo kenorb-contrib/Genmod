@@ -51,7 +51,7 @@ abstract class LanguageFunctions {
 	 */
 	public function LoadEnglish($return=false, $help=false, $altlang = false) {
 		global $DBCONN, $LANGUAGE, $language_settings;
-	//	print $LANGUAGE;
+		//print $LANGUAGE;
 		$temp = array();
 		if (CONFIGURED && $DBCONN->connected) {
 			$sql = "SELECT COUNT(*) as total FROM ".TBLPREFIX."language";

@@ -104,7 +104,7 @@ switch ($action) {
 			// switch language to user settings
 			$oldlanguage = $LANGUAGE;
 			$LANGUAGE = $newuser->language;
-			if (isset($gm_language[$LANGUAGE])) LanguageFunctions::LoadEnglish(false, false, true);
+			if (isset($gm_language[$LANGUAGE])) $templang = LanguageFunctions::LoadEnglish(true, false, true);
 			$TEXT_DIRECTION = $TEXT_DIRECTION_array[$LANGUAGE];
 			$DATE_FORMAT	= $DATE_FORMAT_array[$LANGUAGE];
 			$TIME_FORMAT	= $TIME_FORMAT_array[$LANGUAGE];
@@ -112,12 +112,12 @@ switch ($action) {
 			$NAME_REVERSE	= $NAME_REVERSE_array[$LANGUAGE];
 			
 			$mail_body = "";
-			$mail_body .= str_replace("#user_fullname#", $newuser->firstname." ".$newuser->lastname, GM_LANG_mail04_line01) . "\r\n\r\n";
-			$mail_body .= GM_LANG_mail04_line02 . "\r\n\r\n";
-			$mail_body .= GM_LANG_username . " " . $newuser->username . "\r\n";
-			$mail_body .= GM_LANG_password . " " . $user_new_pw . "\r\n";
-			$mail_body .= GM_LANG_mail04_line03 . "\r\n";
-			$mail_body .= GM_LANG_mail04_line04 . "\r\n";
+			$mail_body .= str_replace("#user_fullname#", $newuser->firstname." ".$newuser->lastname, $templang["mail04_line01"]) . "\r\n\r\n";
+			$mail_body .= $templang["mail04_line02"] . "\r\n\r\n";
+			$mail_body .= $templang["username"] . " " . $newuser->username . "\r\n";
+			$mail_body .= $templang["password"] . " " . $user_new_pw . "\r\n";
+			$mail_body .= $templang["mail04_line03"] . "\r\n";
+			$mail_body .= $templang["mail04_line04"] . "\r\n";
 			$mail_body .= PrintText("mail04_line05", 0, 1) . "\r\n\r\n";
 			
 			if (LOGIN_URL == "") $target = SERVER_URL;
@@ -126,11 +126,10 @@ switch ($action) {
 			if (LOGIN_URL == "") $target .= "/login.php";
 			$mail_body .= "<a href=\"".$target."\">".$target."</a>";
 			
-			GmMail($newuser->email, str_replace("#SERVER_NAME#", SERVER_URL, GM_LANG_mail04_subject), $mail_body, "", "", "", "", "", true);
+			GmMail($newuser->email, str_replace("#SERVER_NAME#", SERVER_URL, $templang["mail04_subject"]), $mail_body, "", "", "", "", "", true);
 			
 			// Reset language to original page language
 			$LANGUAGE = $oldlanguage;
-			if (isset($gm_language[$LANGUAGE])) LanguageFunctions::LoadEnglish(false, false, true);	//-- load language file
 			$TEXT_DIRECTION = $TEXT_DIRECTION_array[$LANGUAGE];
 			$DATE_FORMAT	= $DATE_FORMAT_array[$LANGUAGE];
 			$TIME_FORMAT	= $TIME_FORMAT_array[$LANGUAGE];
@@ -404,7 +403,7 @@ switch ($action) {
 				// switch to the users language
 				$oldlanguage = $LANGUAGE;
 				$LANGUAGE = $user_language;
-				if (isset($gm_language[$LANGUAGE])) LanguageFunctions::LoadEnglish(false, false, true);
+				if (isset($gm_language[$LANGUAGE])) $templang = LanguageFunctions::LoadEnglish(true, false, true);
 				$TEXT_DIRECTION = $TEXT_DIRECTION_array[$LANGUAGE];
 				$DATE_FORMAT	= $DATE_FORMAT_array[$LANGUAGE];
 				$TIME_FORMAT	= $TIME_FORMAT_array[$LANGUAGE];
@@ -412,25 +411,25 @@ switch ($action) {
 				$NAME_REVERSE	= $NAME_REVERSE_array[$LANGUAGE];
 				
 				$mail_body = "";
-				$mail_body .= str_replace("#user_fullname#", $user_firstname." ".$user_lastname, GM_LANG_mail01_line01) . "\r\n\r\n";
-				$mail_body .= str_replace("#user_email#", $user_email, str_replace("#SERVER_NAME#", SERVER_URL, GM_LANG_mail01_line02)) . "\r\n";
-				$mail_body .= GM_LANG_mail01_line03 . "\r\n\r\n";
+				$mail_body .= str_replace("#user_fullname#", $user_firstname." ".$user_lastname, $templang["mail01_line01"]) . "\r\n\r\n";
+				$mail_body .= str_replace("#user_email#", $user_email, str_replace("#SERVER_NAME#", SERVER_URL, $templang["mail01_line02"])) . "\r\n";
+				$mail_body .= $templang["mail01_line03"] . "\r\n\r\n";
 				// $mail_body .= GM_LANG_mail01_line04 . "\r\n\r\n";
 				if (substr(SERVER_URL, -1) == "/") {
 					$link = substr(SERVER_URL,0, (strlen(SERVER_URL)-1)). "/login_register.php?action=userverify&user_name=".urlencode($user_name)."&user_hashcode=".urlencode($user->reg_hashcode);
-					$mail_body .= "<a href=\"". $link . "\">".GM_LANG_mail01_line04."</a>\r\n";
+					$mail_body .= "<a href=\"". $link . "\">".$templang["mail01_line04"]."</a>\r\n";
 				}
 				else {
 					$link = SERVER_URL. "/login_register.php?action=userverify&user_name=".urlencode($user_name)."&user_hashcode=".urlencode($user->reg_hashcode);
-					$mail_body .= "<a href=\"". $link . "\">".GM_LANG_mail01_line04."</a>\r\n";
+					$mail_body .= "<a href=\"". $link . "\">".$templang["mail01_line04"]."</a>\r\n";
 				}
-				$mail_body .= GM_LANG_username . " " . $user_name . "\r\n";
+				$mail_body .= $templang["username"] . " " . $user_name . "\r\n";
 				//-- sending the password back to the user is a security risk
 				//--$mail_body .= GM_LANG_password . " " . $user_password01 . "\r\n";
-				$mail_body .= GM_LANG_hashcode . " " . $user->reg_hashcode . "\r\n\r\n";
-				$mail_body .= GM_LANG_comments.": " . $user_comments . "\r\n\r\n";
-				$mail_body .= GM_LANG_mail01_line05 . "\r\n";
-				$mail_body .= GM_LANG_mail01_line06 . "\r\n";
+				$mail_body .= $templang["hashcode"] . " " . $user->reg_hashcode . "\r\n\r\n";
+				$mail_body .= $templang["comments"].": " . $user_comments . "\r\n\r\n";
+				$mail_body .= $templang["mail01_line05"] . "\r\n";
+				$mail_body .= $templang["mail01_line06"] . "\r\n";
 				
 				/* Send a confirmation mail to the user */
 				GmMail($user_email, str_replace("#SERVER_NAME#", SERVER_URL, GM_LANG_mail01_subject), $mail_body, "", "", "", "", "", true);
@@ -438,7 +437,8 @@ switch ($action) {
 				// switch language to webmaster settings
 				$admuser =& User::GetInstance(GedcomConfig::$WEBMASTER_EMAIL);
 				$LANGUAGE = $admuser->language;
-				if (isset($gm_language[$LANGUAGE])) LanguageFunctions::LoadEnglish(false, false, true);	//-- load language file
+				
+				if (isset($gm_language[$LANGUAGE])) $templang = LanguageFunctions::LoadEnglish(true, false, true);	//-- load language file
 				$TEXT_DIRECTION = $TEXT_DIRECTION_array[$LANGUAGE];
 				$DATE_FORMAT	= $DATE_FORMAT_array[$LANGUAGE];
 				$TIME_FORMAT	= $TIME_FORMAT_array[$LANGUAGE];
@@ -446,18 +446,18 @@ switch ($action) {
 				$NAME_REVERSE	= $NAME_REVERSE_array[$LANGUAGE];
 				
 				$mail_body = "";
-				$mail_body .= GM_LANG_mail02_line01 . "\r\n\r\n";
-				$mail_body .= str_replace("#SERVER_NAME#", SERVER_URL, GM_LANG_mail02_line02) . "\r\n\r\n";
-				$mail_body .= GM_LANG_username . " " . $user_name . "\r\n";
-				$mail_body .= GM_LANG_firstname . " " . $user_firstname . "\r\n";
-				$mail_body .= GM_LANG_lastname . " " . $user_lastname . "\r\n\r\n";
-				$mail_body .= GM_LANG_comments.": " . $user_comments . "\r\n\r\n";
-				$mail_body .= GM_LANG_mail02_line03 . " <a href=\"".$link."\">".$link."</a>\r\n";
+				$mail_body .= $templang["mail02_line01"] . "\r\n\r\n";
+				$mail_body .= str_replace("#SERVER_NAME#", SERVER_URL, $templang["mail02_line02"]) . "\r\n\r\n";
+				$mail_body .= $templang["username"] . " " . $user_name . "\r\n";
+				$mail_body .= $templang["firstname"] . " " . $user_firstname . "\r\n";
+				$mail_body .= $templang["lastname"] . " " . $user_lastname . "\r\n\r\n";
+				$mail_body .= $templang["comments"].": " . $user_comments . "\r\n\r\n";
+				$mail_body .= $templang["mail02_line03"] . " <a href=\"".$link."\">".$link."</a>\r\n";
 				if (SystemConfig::$REQUIRE_ADMIN_AUTH_REGISTRATION) {
-					$mail_body .= GM_LANG_mail02_line04 . "\r\n";
+					$mail_body .= $templang["mail02_line04"] . "\r\n";
 				} 
 				else {
-					$mail_body .= GM_LANG_mail02_line04a . "\r\n";
+					$mail_body .= $templang["mail02_line04a"] . "\r\n";
 				}
 				/* 2 lines below seem obsolete */
 				$message = new Message();
@@ -465,7 +465,7 @@ switch ($action) {
 				$message->from = $user_name;
 				$message->from_email = $user_email;
 				$message->from_name = $user_firstname.' '.$user_lastname;
-				$message->subject = str_replace("#SERVER_NAME#", SERVER_URL, str_replace("#user_email#", $user_email, GM_LANG_mail02_subject));
+				$message->subject = str_replace("#SERVER_NAME#", SERVER_URL, str_replace("#user_email#", $user_email, $templang["mail02_subject"]));
 				$message->body = $mail_body;
 				$message->created = $time;
 				$message->method = GedcomConfig::$SUPPORT_METHOD;
@@ -475,7 +475,6 @@ switch ($action) {
 				
 				// switch language back to earlier settings
 				$LANGUAGE = $oldlanguage;
-				if (isset($gm_language[$LANGUAGE])) LanguageFunctions::LoadEnglish(false, false, true);
 				$TEXT_DIRECTION = $TEXT_DIRECTION_array[$LANGUAGE];
 				$DATE_FORMAT	= $DATE_FORMAT_array[$LANGUAGE];
 				$TIME_FORMAT	= $TIME_FORMAT_array[$LANGUAGE];
@@ -550,17 +549,17 @@ switch ($action) {
 				$admuser =& User::GetInstance(GedcomConfig::$WEBMASTER_EMAIL);
 				$oldlanguage = $LANGUAGE;
 				$LANGUAGE = $admuser->language;
-				if (isset($gm_language[$LANGUAGE])) LanguageFunctions::LoadEnglish(false, false, true);
+				if (isset($gm_language[$LANGUAGE])) $templang = LanguageFunctions::LoadEnglish(true, false, true);
 				$TEXT_DIRECTION = $TEXT_DIRECTION_array[$LANGUAGE];
 				$DATE_FORMAT	= $DATE_FORMAT_array[$LANGUAGE];
 				$TIME_FORMAT	= $TIME_FORMAT_array[$LANGUAGE];
 				$WEEK_START	= $WEEK_START_array[$LANGUAGE];
 				$NAME_REVERSE	= $NAME_REVERSE_array[$LANGUAGE];
 				$mail_body = "";
-				$mail_body .= GM_LANG_mail03_line01 . "\r\n\r\n";
-				$mail_body .= str_replace("#newuser[username]# ( #newuser[fullname]# )", $newuser->username . " (" . $newuser->firstname." ".$newuser->lastname . ") ", GM_LANG_mail03_line02) . "\r\n\r\n";
-				if (SystemConfig::$REQUIRE_ADMIN_AUTH_REGISTRATION) $mail_body .= GM_LANG_mail03_line03 . "\r\n";
-				else $mail_body .= GM_LANG_mail03_line03a . "\r\n";
+				$mail_body .= $templang["mail03_line01"] . "\r\n\r\n";
+				$mail_body .= str_replace("#newuser[username]# ( #newuser[fullname]# )", $newuser->username . " (" . $newuser->firstname." ".$newuser->lastname . ") ", $templang["mail03_line02"]) . "\r\n\r\n";
+				if (SystemConfig::$REQUIRE_ADMIN_AUTH_REGISTRATION) $mail_body .= $templang["mail03_line03"] . "\r\n";
+				else $mail_body .= $templang["mail03_line03a"] . "\r\n";
 				$reflink = SERVER_URL;
 				if (substr(SERVER_URL, -1) != "/") $reflink .= "/";
 				$reflink .= "useradmin.php?action=edituser&username=".urlencode($newuser->username);
@@ -570,7 +569,7 @@ switch ($action) {
 				$message = new Message();
 				$message->to = GedcomConfig::$WEBMASTER_EMAIL;
 				$message->from = "Genmod-noreply@".$host;
-				$message->subject = str_replace("#SERVER_NAME#", SERVER_URL, GM_LANG_mail03_subject);
+				$message->subject = str_replace("#SERVER_NAME#", SERVER_URL, $templang["mail03_subject"]);
 				$message->body = $mail_body;
 				$message->created = $time;
 				$message->method = GedcomConfig::$SUPPORT_METHOD;
@@ -579,7 +578,6 @@ switch ($action) {
 				
 				// Reset language to original page language
 				$LANGUAGE = $oldlanguage;
-				if (isset($gm_language[$LANGUAGE])) LanguageFunctions::LoadEnglish(false, false, true);
 				$TEXT_DIRECTION = $TEXT_DIRECTION_array[$LANGUAGE];
 				$DATE_FORMAT	= $DATE_FORMAT_array[$LANGUAGE];
 				$TIME_FORMAT	= $TIME_FORMAT_array[$LANGUAGE];

@@ -422,6 +422,7 @@ abstract class BlockFunctions {
 						$favorite->object->PrintListMedia(false, "", false);
 					}
 					if ($favorite->type != "OBJE") print "</ul>";
+					else print "<br />";
 				}
 			}
 			if (!empty($favorite->note)) print "<span class=\"favorite_padding\">".PrintReady(GM_LANG_note.": ".$favorite->note)."</span>";
