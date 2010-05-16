@@ -298,7 +298,7 @@ if ($action=="edituser2") {
 				// Switch to the users language
 				$oldlanguage = $LANGUAGE;
 				$LANGUAGE = $newuser->language;
-				if (isset($gm_language[$LANGUAGE])) LanguageFunctions::LoadEnglish(false, false, true);
+				if (isset($gm_language[$LANGUAGE])) $templang = LanguageFunctions::LoadEnglish(true, false, true);
 				$TEXT_DIRECTION = $TEXT_DIRECTION_array[$LANGUAGE];
 				$DATE_FORMAT	= $DATE_FORMAT_array[$LANGUAGE];
 				$TIME_FORMAT	= $TIME_FORMAT_array[$LANGUAGE];
@@ -312,12 +312,12 @@ if ($action=="edituser2") {
 				$message->from_name = $newuser->firstname.' '.$newuser->lastname;
 				$message->from = "genmod-noreply@".$host;
 				if (substr(SERVER_URL, -1) == "/"){
-					$message->subject = str_replace("#SERVER_NAME#", substr(SERVER_URL,0, (strlen(SERVER_URL)-1)), GM_LANG_admin_approved);
-					$message->body = str_replace("#SERVER_NAME#", SERVER_URL, GM_LANG_admin_approved)." ".GM_LANG_you_may_login."\r\n\r\n"."<a href=\"".substr(SERVER_URL,0, (strlen(SERVER_URL)-1))."/index.php?command=user\">".substr(SERVER_URL,0, (strlen(SERVER_URL)-1))."/index.php?command=user</a>\r\n";
+					$message->subject = str_replace("#SERVER_NAME#", substr(SERVER_URL,0, (strlen(SERVER_URL)-1)), $templang["admin_approved"]);
+					$message->body = str_replace("#SERVER_NAME#", SERVER_URL, $templang["admin_approved"])." ".$templang["you_may_login"]."\r\n\r\n"."<a href=\"".substr(SERVER_URL,0, (strlen(SERVER_URL)-1))."/index.php?command=user\">".substr(SERVER_URL,0, (strlen(SERVER_URL)-1))."/index.php?command=user</a>\r\n";
 				}
 				else {
-					$message->subject = str_replace("#SERVER_NAME#", SERVER_URL, GM_LANG_admin_approved);
-					$message->body = str_replace("#SERVER_NAME#", SERVER_URL, GM_LANG_admin_approved)." ".GM_LANG_you_may_login."\r\n\r\n"."<a href=\"".SERVER_URL."/index.php?command=user\">".SERVER_URL."/index.php?command=user</a>\r\n";
+					$message->subject = str_replace("#SERVER_NAME#", SERVER_URL, $templang["admin_approved"]);
+					$message->body = str_replace("#SERVER_NAME#", SERVER_URL, $templang["admin_approved"])." ".$templang["you_may_login"]."\r\n\r\n"."<a href=\"".SERVER_URL."/index.php?command=user\">".SERVER_URL."/index.php?command=user</a>\r\n";
 				}
 				$message->created = "";
 				$message->method = "messaging2";
@@ -325,7 +325,6 @@ if ($action=="edituser2") {
 
 				// Switch back to the page language
 				$LANGUAGE = $oldlanguage;
-				if (isset($gm_language[$LANGUAGE])) LanguageFunctions::LoadEnglish(false, false, true);
 				$TEXT_DIRECTION = $TEXT_DIRECTION_array[$LANGUAGE];
 				$DATE_FORMAT	= $DATE_FORMAT_array[$LANGUAGE];
 				$TIME_FORMAT	= $TIME_FORMAT_array[$LANGUAGE];

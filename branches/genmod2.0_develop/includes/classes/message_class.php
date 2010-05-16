@@ -228,18 +228,18 @@ class Message {
 		$oldlanguage = $LANGUAGE;
 		if (is_object($tuser) && $tuser->language != "" && $tuser->language != $LANGUAGE) {
 			$LANGUAGE = $tuser->language;
-			LanguageFunctions::LoadEnglish(false, false, true);
 			$TEXT_DIRECTION = $TEXT_DIRECTION_array[$LANGUAGE];
 			$DATE_FORMAT	= $DATE_FORMAT_array[$LANGUAGE];
 			$TIME_FORMAT	= $TIME_FORMAT_array[$LANGUAGE];
 			$WEEK_START	= $WEEK_START_array[$LANGUAGE];
 			$NAME_REVERSE	= $NAME_REVERSE_array[$LANGUAGE];
 		}
+		$templang = LanguageFunctions::LoadEnglish(true, false, true);
 		
 		// NOTE: Check the URL where the message is sent from and add it to the message
 		if (!is_null($this->url)) {
 			$messagebody = "<br /><br />--------------------------------------<br />";
-			$messagebody .= GM_LANG_viewing_url."<br /><a href=\"".SERVER_URL.$this->url."\">".SERVER_URL.$this->url."</a><br />\n";
+			$messagebody .= $templang["viewing_url"]."<br /><a href=\"".SERVER_URL.$this->url."\">".SERVER_URL.$this->url."</a><br />\n";
 		}
 		else $messagebody = "";
 		
@@ -261,16 +261,16 @@ class Message {
 		
 		if ($this->method != "messaging") {
 			// NOTE: E-mail subject recipient
-			$subject_recipient = "[".GM_LANG_Genmod_message."] ".stripslashes($this->subject);
+			$subject_recipient = "[".$templang["Genmod_message"]."] ".stripslashes($this->subject);
 			
 			// NOTE: E-mail from recipient
 			if (!is_object($fuser)) {
-				$message_recipient = GM_LANG_message_email1;
+				$message_recipient = $templang["message_email1"];
 				if (!is_null($this->from_name && $this->from_name != "")) $message_recipient .= $this->from_name."<br /><br />".stripslashes($this->body);
-				else $message_recipient .= GM_LANG_message_from_name.$from."<br /><br />".stripslashes($this->body);
+				else $message_recipient .= $templang["message_from_name"].$from."<br /><br />".stripslashes($this->body);
 			}
 			else {
-				$message_recipient = GM_LANG_message_email1."<br /><br />";
+				$message_recipient = $templang["message_email1"]."<br /><br />";
 				$message_recipient .= stripslashes($fuser->firstname." ".$fuser->lastname)."<br /><br />".stripslashes($this->body);
 			}
 			// NOTE: Message body
@@ -297,7 +297,6 @@ class Message {
 		// NOTE: Unload the recipients language and load the users language
 		if (($tuser)&&(!empty($LANGUAGE))&&($oldlanguage!=$LANGUAGE)) {
 			$LANGUAGE = $oldlanguage;
-			LanguageFunctions::LoadEnglish(false, false, true);
 			$TEXT_DIRECTION = $TEXT_DIRECTION_array[$LANGUAGE];
 			$DATE_FORMAT	= $DATE_FORMAT_array[$LANGUAGE];
 			$TIME_FORMAT	= $TIME_FORMAT_array[$LANGUAGE];
