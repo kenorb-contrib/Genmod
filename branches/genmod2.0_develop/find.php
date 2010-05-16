@@ -103,12 +103,12 @@ switch ($search_controller->type) {
 		print GM_LANG_find_specialchar;
 		break;
 }
-print "</div>";
+print "</div>\n";
 
 // NOTE: Show inputs for indi, fam
 if (in_array($search_controller->type, array("indi", "fam", "media", "note", "source", "repo")))  {
-	print "<div class=\"width60 center shade1\"><br />";
 	print "<form name=\"filter".$search_controller->type."\" method=\"post\" onsubmit=\"return checknames(this);\" action=\"find.php\">";
+	print "<div class=\"width60 center shade1\"><br />";
 	print "<input type=\"hidden\" name=\"action\" value=\"filter\" />";
 	print "<input type=\"hidden\" name=\"type\" value=\"".$search_controller->type."\" />";
 	print "<label class=\"width10\" style=\"padding: 5px;\">";
@@ -119,44 +119,44 @@ if (in_array($search_controller->type, array("indi", "fam", "media", "note", "so
 	print "<br /><br /></div>";
 	print "<div class=\"width60 center\" style=\"padding: 5px;\">";
 	print "<input type=\"submit\"  value=\"".GM_LANG_filter."\" /><br />";
-	print "</form></div>";
+	print "</div></form>";
 }		
 
 // Show mediafiles and hide the rest
 else if ($search_controller->type == "file") {
-	print "<div class=\"width60 center shade1\">";
-	print "<form name=\"filterfile\" method=\"post\" onsubmit=\"return checknames(this);\" action=\"find.php\">";
-	print "<input type=\"hidden\" name=\"directory\" value=\"".$search_controller->directory."\" />";
-	print "<input type=\"hidden\" name=\"thumbdir\" value=\"".$search_controller->thumbdir."\" />";
-	print "<input type=\"hidden\" name=\"level\" value=\"".$search_controller->level."\" />";
-	print "<input type=\"hidden\" name=\"action\" value=\"filter\" />";
-	print "<input type=\"hidden\" name=\"external_links\" value=\"".$search_controller->external_links."\" />";
-	print "<input type=\"hidden\" name=\"type\" value=\"file\" />";
-	print "<input type=\"hidden\" name=\"subclick\" value=\"\">"; // This is for passing the name of which submit button was clicked		
-	print "<label class=\"width10\"style=\"padding: 5px;\">";
+	print "<form name=\"filterfile\" method=\"post\" onsubmit=\"return checknames(this);\" action=\"find.php\">\n";
+	print "<div class=\"width60 center shade1\">\n";
+	print "<input type=\"hidden\" name=\"directory\" value=\"".$search_controller->directory."\" />\n";
+	print "<input type=\"hidden\" name=\"thumbdir\" value=\"".$search_controller->thumbdir."\" />\n";
+	print "<input type=\"hidden\" name=\"level\" value=\"".$search_controller->level."\" />\n";
+	print "<input type=\"hidden\" name=\"action\" value=\"filter\" />\n";
+	print "<input type=\"hidden\" name=\"external_links\" value=\"".$search_controller->external_links."\" />\n";
+	print "<input type=\"hidden\" name=\"type\" value=\"file\" />\n";
+	print "<input type=\"hidden\" name=\"subclick\" value=\"\" />\n"; // This is for passing the name of which submit button was clicked		
+	print "<label class=\"width10\" style=\"padding: 5px;\">";
 	print GM_LANG_file_contains."</label> <input type=\"text\" name=\"query\" value=\"";
 	if (!is_null($search_controller->query)) print $search_controller->query;
-	print "\" />";
+	print "\" />\n";
 	PrintHelpLink("simple_filter_help","qm");
-	print "</div>";
-	print "<div class=\"width60 center\" style=\"padding: 5px;\">";
-	print "<input type=\"checkbox\" name=\"showthumb\" value=\"true\"";
-	if( $search_controller->showthumb) print "checked=\"checked\"";
+	print "</div>\n";
+	print "<div class=\"width60 center\" style=\"padding: 5px;\">\n";
+	print "<input type=\"checkbox\" name=\"showthumb\" value=\"true\" ";
+	if( $search_controller->showthumb) print "checked=\"checked\" ";
 	print "onclick=\"javascript: this.form.submit();\" />".GM_LANG_show_thumbnail;
 	PrintHelpLink("show_thumb_help","qm");
 	print "<br /><br /><input type=\"submit\"  name=\"search\" value=\"".GM_LANG_filter."\" onclick=\"this.form.subclick.value=this.name; return true;\" />&nbsp;";
 	print "<input type=\"submit\"  name=\"all\" value=\"".GM_LANG_display_all."\" onclick=\"this.form.subclick.value=this.name; return true;\" />";
-	print "</form></div>";
+	print "</div>\n</form>\n";
 }
 
 // Show place and hide the rest
 else if ($search_controller->type == "place") {
-	print "<div class=\"width60 center shade1\"><br />";
-	print "<form name=\"filterplace\" method=\"post\"  onsubmit=\"return checknames(this);\" action=\"find.php\">";
-	print "<input type=\"hidden\" name=\"action\" value=\"filter\" />";
-	print "<input type=\"hidden\" name=\"type\" value=\"place\" />";
-	print "<input type=\"hidden\" name=\"subclick\">"; // This is for passing the name of which submit button was clicked				
-	print "<label class=\"width10\"style=\"padding: 5px;\">";
+	print "<form name=\"filterplace\" method=\"post\"  onsubmit=\"return checknames(this);\" action=\"find.php\">\n";
+	print "<div class=\"width60 center shade1\"><br />\n";
+	print "<input type=\"hidden\" name=\"action\" value=\"filter\" />\n";
+	print "<input type=\"hidden\" name=\"type\" value=\"place\" />\n";
+	print "<input type=\"hidden\" name=\"subclick\" />\n"; // This is for passing the name of which submit button was clicked				
+	print "<label class=\"width10\" style=\"padding: 5px;\">";
 	print GM_LANG_place_contains."</label> <input type=\"text\" name=\"query\" value=\"";
 	if (!is_null($search_controller->query)) print stripslashes($search_controller->query);
 	print "\" />";
@@ -164,17 +164,17 @@ else if ($search_controller->type == "place") {
 	print "<div class=\"width60 center\" style=\"padding: 5px;\">";
 	print "<input type=\"submit\"  name=\"search\" value=\"".GM_LANG_filter."\" onclick=\"this.form.subclick.value=this.name\" />&nbsp;";
 	print "<input type=\"submit\"  name=\"all\" value=\"".GM_LANG_display_all."\" onclick=\"this.form.subclick.value=this.name\" />";
-	print "</form></div>";
+	print "</div></form>";
 }
 
 // Show specialchar and hide the rest
 else if ($search_controller->type == "specialchar") {
-	print "<div class=\"width60 center shade1\"><br />";
 	print "<form name=\"filterspecialchar\" method=\"post\" action=\"find.php\">";
+	print "<div class=\"width60 center shade1\"><br />";
 	print "<input type=\"hidden\" name=\"action\" value=\"filter\" />";
 	print "<input type=\"hidden\" name=\"type\" value=\"specialchar\" />";
 	print "<input type=\"hidden\" name=\"magnify\" value=\"".$search_controller->magnify."\" />";
-	print "<label class=\"width10\"style=\"padding: 5px;\">";
+	print "<label class=\"width10\" style=\"padding: 5px;\">";
 	print GM_LANG_change_lang."</label> ";
 	print "<select id=\"language_filter\" name=\"language_filter\" onchange=\"submit();\">";
 	foreach($specialchar_languages as $key=>$value) {
@@ -183,7 +183,7 @@ else if ($search_controller->type == "specialchar") {
 		print ">".$value."</option>";
 	}
 	print "</select><br /><br /><a href=\"#\" onclick=\"setMagnify()\">".($search_controller->magnify ? GM_LANG_reduce : GM_LANG_magnify)."</a><br />";
-	print "</form></div>";
+	print "</div></form>";
 }
 // end column for find options
 print "<br />";
@@ -255,7 +255,7 @@ if ($search_controller->action == "filter") {
 		print "<tr><td class=\"list_value wrap $TEXT_DIRECTION\" colspan=\"4\">".GM_LANG_current_dir;
 		if ($search_controller->external_links == "1") print GM_LANG_external_media;
 		else print $directory;
-		print "</td></tr>";
+		print "</td></tr>\n";
 
 		
 		// display the directory list
@@ -267,28 +267,25 @@ if ($search_controller->action == "filter") {
 			}
 			print "<tr><td class=\"shade2 $TEXT_DIRECTION\" colspan=\"4\">";
 			print "<a href=\"find.php?directory=&amp;external_links=1&amp;type=file".$thumbget."&amp;level=0\">".GM_LANG_external_media."</a>";
-			print "</td></tr>";
+			print "</td></tr>\n";
 			// If we view the external links, add a link to the main directory
 			if ($search_controller->external_links == "1") {
 				print "<tr><td class=\"list_value wrap $TEXT_DIRECTION\" colspan=\"4\" width=\"45%\">";
-				print "<a href=\"find.php?directory=".GedcomConfig::$MEDIA_DIRECTORY."&thumbdir=".GedcomConfig::$MEDIA_DIRECTORY.$thumbget."&level=0&amp;type=file&amp;query=".$search_controller->query."\">".$mdir."</a>";
-				print "</td></tr>";
+				print "<a href=\"find.php?directory=".GedcomConfig::$MEDIA_DIRECTORY."&amp;thumbdir=".GedcomConfig::$MEDIA_DIRECTORY.$thumbget."&amp;level=0&amp;type=file&amp;query=".$search_controller->query."\">".$mdir."</a>";
+				print "</td></tr>\n";
 			}
 			if ($search_controller->level < GedcomConfig::$MEDIA_DIRECTORY_LEVELS) {
 				foreach ($dirs as $indexval => $dir) {
 					if ($dir != $directory) {
 						print "<tr><td class=\"list_value wrap $TEXT_DIRECTION\" colspan=\"4\" width=\"45%\">";
-						print "<a href=\"find.php?directory=".$dir."&thumbdir=".$dir."&level=".($search_controller->level+1).$thumbget."&amp;type=file&amp;query=".$search_controller->query."\">".$dir."</a>";
-						print "</td></tr>";
+						print "<a href=\"find.php?directory=".$dir."&amp;thumbdir=".$dir."&amp;level=".($search_controller->level+1).$thumbget."&amp;type=file&amp;query=".$search_controller->query."\">".$dir."</a>";
+						print "</td></tr>\n";
 					}
 				}
 			}
 		}
-//		print "<tr><td class=\"list_value $TEXT_DIRECTION\">";
-		print "<tr>";
 		
 		$applyfilter = ($search_controller->query != "");
-		print "<br />";
 		
 		if ($search_controller->external_links == "1") $directory = "external_links";
 		$medialist = MediaFS::GetMediaFilelist($directory, $search_controller->query);
@@ -309,7 +306,7 @@ if ($search_controller->action == "filter") {
 			print GM_LANG_no_results;
 			print "</td></tr>";
 		}
-		print "</table></table></div>";
+		print "</table></div>";
 	}
 	else if ($search_controller->type == "media") {
 		print "\n\t<table class=\"list_table center $TEXT_DIRECTION\">\n\t\t";
@@ -397,7 +394,6 @@ if ($search_controller->action == "filter") {
 		print "</div>";
 	}
 }
-print "</div>";
 if ($search_controller->type != "specialchar") {?>
 <script language="JavaScript" type="text/javascript">
 <!--

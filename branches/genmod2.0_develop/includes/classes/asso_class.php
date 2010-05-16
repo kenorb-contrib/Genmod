@@ -153,7 +153,7 @@ class Asso {
 						$disp = PrivacyFunctions::FactViewRestricted($this->xref1, $rec, 2);
 					}
 					else {
-						$rec = "1 ASSO @".SplitKey($this->xref2, "id")."@\r\n2 RESN ".$asso["resn"]."\r\n";
+						$rec = "1 ASSO @".SplitKey($this->xref2, "id")."@\r\n2 RESN ".$this->resn."\r\n";
 						$disp = PrivacyFunctions::FactViewRestricted($this->xref1, $rec, 2);
 					}
 					if (!$disp) $this->disp = false;

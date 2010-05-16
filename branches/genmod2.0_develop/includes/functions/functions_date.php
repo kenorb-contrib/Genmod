@@ -872,12 +872,12 @@ function GetDateUrl($datestr, $CalYear=""){
 					  if (isset($start_day) && strlen($start_day) > 0 && isset($start_month) && strlen($start_month) > 0) {
 						if (isset($start_year) && strlen($start_year) > 0) $datelink .= "year=".$start_year;
 						else if (isset($end_year) && strlen($end_year) > 0) $datelink .= "year=".$end_year;
-						if ($action == "today") $datelink .= "&day=".$start_day;
-					    $datelink .= "&month=".$start_month;
+						if ($action == "today") $datelink .= "&amp;day=".$start_day;
+					    $datelink .= "&amp;month=".$start_month;
 					  }
 					  else if (isset($end_day) && strlen($end_day) > 0 && isset($end_month) && strlen($end_month) > 0) {
 						if (isset($end_year) && strlen($end_year) > 0) $datelink .= "year=".$end_year;
-						if ($action == "today") $datelink .= "&day=".$end_day;
+						if ($action == "today") $datelink .= "&amp;day=".$end_day;
 					    $datelink .= "&month=".$end_month;
 				      }
 				      else if (isset($start_month) && strlen($start_month) > 0) $datelink .= "&month=".$start_month;

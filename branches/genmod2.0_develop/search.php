@@ -70,14 +70,14 @@ if ($search_controller->view == "preview") {
 	//	print "</td><tr><td align=\"center\">".$logstring."</td></tr></table>";
 }
 else {
+	print "<form method=\"post\" onsubmit=\""?>return checknames(this);<?php print " \" action=\"".SCRIPT_NAME."\">";
 	print "<div id=\"search_options\">";
 		// start of new searchform
 		print "<div class=\"topbottombar\">";
 		PrintHelpLink("search_options_help", "qm","search_options");
 		print GM_LANG_search_options;
 		print "</div>";
-		print "<form method=\"post\" onsubmit=\""?>return checknames(this);<?php print " \" action=\"".SCRIPT_NAME."\">";
-		print "<table class=\"width100 center $TEXT_DIRECTION\">";
+		print "<table class=\"width100 center $TEXT_DIRECTION\">\n";
 		
 		// If more than one GEDCOM, switching is allowed AND DB mode is set, let the user select
 		if ((count($GEDCOMS) > 1) && (SystemConfig::$ALLOW_CHANGE_GEDCOM)) {
@@ -98,7 +98,7 @@ else {
 				}
 			}
 			SwitchGedcom();
-			print "</td></tr>";
+			print "</td></tr>\n";
 		}
 		
 		// Show associated persons/fams?
@@ -108,7 +108,7 @@ else {
 		print "<input type=\"checkbox\" name=\"showasso\" value=\"on\" ";
 		if ($search_controller->showasso == "on") print "checked=\"checked\" ";
 		print "/>".GM_LANG_search_asso_text;
-		print "</td></tr>";
+		print "</td></tr>\n";
 		
 		// switch between general and soundex
 		print "<tr><td class=\"shade2\" style=\"padding: 5px;\">".GM_LANG_search_type;
@@ -119,8 +119,8 @@ else {
 		print "<br /><input type=\"radio\" name=\"action\" value=\"soundex\" ";
 		if (($search_controller->action == "soundex") || ($search_controller->action == "")) print "checked=\"checked\" ";
 		print "onclick=\"expand_layer('gsearch'); expand_layer('ssearch');\" />".GM_LANG_search_soundex;
-		print "</td></tr>";
-		print "</table>";
+		print "</td></tr>\n";
+		print "</table>\n";
 	print "</div>";
 	
 		// The first searchform
@@ -133,7 +133,7 @@ else {
 		print "</div>";
 		
 		// search terms
-		print "<table class=\"width100 center $TEXT_DIRECTION\">";
+		print "<table class=\"width100 center $TEXT_DIRECTION\">\n";
 		print "<tr><td class=\"shade2\" style=\"padding: 5px;\">";
 		print GM_LANG_enter_terms;
 		print "</td><td class=\"shade1\" style=\"padding: 5px;\"><input tabindex=\"1\" type=\"text\" name=\"query\" value=\"";
@@ -141,7 +141,7 @@ else {
 		else print "";
 		print "\" />";
 		print "</td><td class=\"shade3\" style=\"vertical-align: middle; padding: 5px;\" rowspan=\"3\">";
-		print "<input tabindex=\"2\" type=\"submit\" value=\"".GM_LANG_search."\" /></tr>";
+			print "<input tabindex=\"2\" type=\"submit\" value=\"".GM_LANG_search."\" /></td></tr>\n";
 		// Choice where to search
 		print "<tr><td class=\"shade2\" style=\"padding: 5px;\">".GM_LANG_search_inrecs;
 		print "</td><td class=\"shade1\" style=\"padding: 5px;\">";
@@ -166,14 +166,14 @@ else {
 		if (!is_null($search_controller->srnote)) print " checked=\"checked\"";
 		print " value=\"yes\" name=\"srnote\" />".GM_LANG_search_notes."<br />";
 		print "</td>";
-		print "</tr>";
+		print "</tr>\n";
 		print "<tr><td class=\"shade2\" style=\"padding: 5px;\">".GM_LANG_search_tagfilter."</td>";
 		print "<td class=\"shade1\" style=\"padding: 5px;\"><input type=\"radio\" name=\"tagfilter\" value=\"on\" ";
 		if (($search_controller->tagfilter == "on") || ($search_controller->tagfilter == "")) print "checked=\"checked\" ";
-		print ">".GM_LANG_search_tagfon."<br /><input type=\"radio\" name=\"tagfilter\" value=\"off\" ";
+		print " />".GM_LANG_search_tagfon."<br /><input type=\"radio\" name=\"tagfilter\" value=\"off\" ";
 		if ($search_controller->tagfilter == "off") print "checked=\"checked\"";
 		print " />".GM_LANG_search_tagfoff;
-		print "</td></tr>";
+		print "</td></tr>\n";
 
 		print "</table>";
 	print "</div>";
@@ -185,9 +185,9 @@ else {
 		print "<div class=\"topbottombar\">";
 		PrintHelpLink("soundex_search_help", "qm");
 		print GM_LANG_soundex_search;
-		print "</div>";
+		print "</div>\n";
 		
-		print "<table class=\"width100 center $TEXT_DIRECTION\">";
+		print "<table class=\"width100 center $TEXT_DIRECTION\">\n";
 		
 		print "<tr><td class=\"shade2\">";
 		print GM_LANG_lastname_search;
@@ -198,53 +198,53 @@ else {
 		print "<td class=\"shade3\" style=\"vertical-align: middle; text-align: center; padding: 5px;\"  rowspan=\"4\">";
 		print "<input tabindex=\"7\" type=\"submit\" value=\"";
 		print GM_LANG_search;
-		print "\" /></td></tr>";
+		print "\" /></td></tr>\n";
 
 		print "<tr><td class=\"shade2\">";
 		print GM_LANG_firstname_search;
 		print "</td><td class=\"shade1\">";
 		print "<input tabindex=\"4\" type=\"text\" name=\"firstname\" value=\"";
 		if ($search_controller->action == "soundex") print $search_controller->myfirstname;
-		print "\" /></td></tr>";
+		print "\" /></td></tr>\n";
 		print "<tr><td class=\"shade2\">";
 		print GM_LANG_search_place;
 		print "</td><td class=\"shade1\"><input tabindex=\"5\" type=\"text\" name=\"place\" value=\"";
 		if ($search_controller->action == "soundex") print $search_controller->myplace;
-		print "\" /></td></tr>";
+		print "\" /></td></tr>\n";
 		print "<tr><td class=\"shade2\">";
 		print GM_LANG_search_year;
 		print "</td><td class=\"shade1\"><input tabindex=\"6\" type=\"text\" name=\"year\" value=\"";
 		if ($search_controller->action == "soundex") print $search_controller->myyear;
 		print "\" /></td>";
-		print "</tr>";
+		print "</tr>\n";
 		print "<tr><td class=\"shade2\" >";
 		print GM_LANG_search_soundextype;
-		print "<td class=\"shade1\" colspan=\"2\" ><input type=\"radio\" name=\"soundex\" value=\"Russell\" ";
+		print "</td><td class=\"shade1\" colspan=\"2\" ><input type=\"radio\" name=\"soundex\" value=\"Russell\" ";
 		if (($search_controller->soundex == "Russell") || ($search_controller->soundex == "")) print "checked=\"checked\" ";
 		print " />".GM_LANG_search_russell."<br /><input type=\"radio\" name=\"soundex\" value=\"DaitchM\" ";
 		if ($search_controller->soundex == "DaitchM") print "checked=\"checked\" ";
 		print " />".GM_LANG_search_DM;
 		print "</td>";
-		print "</td></tr>";
+		print "</tr>\n";
 		print "<tr><td class=\"shade2\">";
 		print GM_LANG_search_prtnames;
 		print "</td><td class=\"shade1\" colspan=\"2\" ><input type=\"radio\" name=\"nameprt\" value=\"hit\" ";
 		if (($search_controller->nameprt == "hit")) print "checked=\"checked\" ";
-		print ">".GM_LANG_search_prthit."<br /><input type=\"radio\" name=\"nameprt\" value=\"all\" ";
+		print " />".GM_LANG_search_prthit."<br /><input type=\"radio\" name=\"nameprt\" value=\"all\" ";
 		if ($search_controller->nameprt == "all" || ($search_controller->nameprt == "")) print "checked=\"checked\" ";;
 		print " />".GM_LANG_search_prtall;
 		print "</td>";
-		print "</td></tr>";
+		print "</tr>\n";
 		print "<tr><td class=\"shade2\">";
 		print GM_LANG_search_sorton;
 		print "</td><td class=\"shade1\" colspan=\"2\" ><input type=\"radio\" name=\"sorton\" value=\"last\" ";
 		if (($search_controller->sorton == "last") || ($search_controller->sorton == "")) print "checked=\"checked\" ";
-		print ">".GM_LANG_lastname_search."<br /><input type=\"radio\" name=\"sorton\" value=\"first\" ";
+		print " />".GM_LANG_lastname_search."<br /><input type=\"radio\" name=\"sorton\" value=\"first\" ";
 		if ($search_controller->sorton == "first") print "checked=\"checked\" ";;
 		print " />".GM_LANG_firstname_search;
 		print "</td>";
-		print "</td></tr>";
-		print "</table>";
+		print "</tr>\n";
+		print "</table>\n";
 	print "</div>";
 	print "</form>";
 }			
