@@ -37,21 +37,25 @@ abstract class MenuBar {
 	 * @return Text         the sub-menu text
 	 */
 	private function GetSubmenuText($textIn, $selected=false) {
+		global $GM_IMAGES;
 		
-		$checkImage = GM_IMAGE_DIR."/checked.gif";
-		$noImage = GM_IMAGE_DIR."/pix1.gif";
-		$displayImage = (file_exists($checkImage) && file_exists($noImage));
+		$displayImage = (file_exists(GM_IMAGE_DIR."/".$GM_IMAGES["check"]["other"]) && file_exists(GM_IMAGE_DIR."/".$GM_IMAGES["nocheck"]["other"]));
 		//$displayImage=false;
-		if ($selected==true) {
-			if ($displayImage==true)
-				return "<img src='{$checkImage}' height='12' witdh='12' alt='' />".$textIn;
-			else
+		if ($selected == true) {
+			if ($displayImage == true) {
+				return "<img src='".GM_IMAGE_DIR."/".$GM_IMAGES["check"]["other"]."' height='12' witdh='12' alt='' />".$textIn;
+			}
+			else {
 				return "<i>".$textIn."</i>";
-		} else {
-			if ($displayImage==true)
-				return "<img src='{$noImage}' height='12' width='12' alt='' />".$textIn;
-			else
+			}
+		}
+		else {
+			if ($displayImage == true) {
+				return "<img src='".GM_IMAGE_DIR."/".$GM_IMAGES["nocheck"]["other"]."' height='12' width='12' alt='' />".$textIn;
+			}
+			else {
 				return $textIn;
+			}
 		}
 	}
 	/**

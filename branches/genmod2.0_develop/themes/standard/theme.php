@@ -149,6 +149,8 @@ $GM_IMAGES["remove"]["other"]	= "remove.gif";
 $GM_IMAGES["link"]["other"]		= "link.gif";
 $GM_IMAGES["delete"]["other"]	= "delete.gif";
 $GM_IMAGES["download"]["other"]	= "download.gif";
+$GM_IMAGES["check"]["other"]	= "checked.gif";
+$GM_IMAGES["nocheck"]["other"]	= "pix1.gif";
 
 //- digits
 $GM_IMAGES["0"]["digit"] = "0.jpg";

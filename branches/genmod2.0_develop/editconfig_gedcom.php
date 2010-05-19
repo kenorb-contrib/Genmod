@@ -490,8 +490,8 @@ if (!isset($themeselect)) $themeselect="";
 
 <table class="facts_table"><tr><td class="topbottombar <?php print $TEXT_DIRECTION;?>">
 <?php
-print "<a href=\"javascript: ".GM_LANG_gedcom_conf."\" onclick=\"expand_layer('file-options'); return false;\"><img id=\"file-options_img\" src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["minus"]["other"]."\" border=\"0\" width=\"11\" height=\"11\" alt=\"\" /></a>";
-print "&nbsp;<a href=\"javascript: ".GM_LANG_gedcom_conf."\" onclick=\"expand_layer('file-options'); return false;\">".GM_LANG_gedcom_conf."</a>";
+print "<a href=\"javascript: ".htmlentities(GM_LANG_gedcom_conf)."\" onclick=\"expand_layer('file-options'); return false;\"><img id=\"file-options_img\" src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["minus"]["other"]."\" border=\"0\" width=\"11\" height=\"11\" alt=\"\" /></a>";
+print "&nbsp;<a href=\"javascript: ".htmlentities(GM_LANG_gedcom_conf)."\" onclick=\"expand_layer('file-options'); return false;\">".GM_LANG_gedcom_conf."</a>";
 ?></td></tr></table>
 <div id="file-options" style="display: block">
 <table class="facts_table">
@@ -752,8 +752,8 @@ print "&nbsp;<a href=\"javascript: ".GM_LANG_gedcom_conf."\" onclick=\"expand_la
 
 <table class="facts_table"><tr><td class="topbottombar <?php print $TEXT_DIRECTION;?>">
 <?php
-print "<a href=\"javascript: ".GM_LANG_media_conf."\" onclick=\"expand_layer('config-media');return false;\"><img id=\"config-media_img\" src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["plus"]["other"]."\" border=\"0\" width=\"11\" height=\"11\" alt=\"\" /></a>";
-print "&nbsp;<a href=\"javascript: ".GM_LANG_media_conf."\" onclick=\"expand_layer('config-media');return false;\">".GM_LANG_media_conf."</a>";
+print "<a href=\"javascript: ".htmlentities(GM_LANG_media_conf)."\" onclick=\"expand_layer('config-media');return false;\"><img id=\"config-media_img\" src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["plus"]["other"]."\" border=\"0\" width=\"11\" height=\"11\" alt=\"\" /></a>";
+print "&nbsp;<a href=\"javascript: ".htmlentities(GM_LANG_media_conf)."\" onclick=\"expand_layer('config-media');return false;\">".GM_LANG_media_conf."</a>";
 ?></td></tr></table>
 <div id="config-media" style="display: none">
 <table class="facts_table">
@@ -819,8 +819,8 @@ print "&nbsp;<a href=\"javascript: ".GM_LANG_media_conf."\" onclick=\"expand_lay
 
 <table class="facts_table"><tr><td class="topbottombar <?php print $TEXT_DIRECTION;?>">
 <?php
-print "<a href=\"javascript: ".GM_LANG_accpriv_conf."\" onclick=\"expand_layer('access-options');return false;\"><img id=\"access-options_img\" src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["plus"]["other"]."\" border=\"0\" width=\"11\" height=\"11\" alt=\"\" /></a>";
-print "&nbsp;<a href=\"javascript: ".GM_LANG_accpriv_conf."\" onclick=\"expand_layer('access-options');return false;\">".GM_LANG_accpriv_conf."</a>";
+print "<a href=\"javascript: ".htmlentities(GM_LANG_accpriv_conf)."\" onclick=\"expand_layer('access-options');return false;\"><img id=\"access-options_img\" src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["plus"]["other"]."\" border=\"0\" width=\"11\" height=\"11\" alt=\"\" /></a>";
+print "&nbsp;<a href=\"javascript: ".htmlentities(GM_LANG_accpriv_conf)."\" onclick=\"expand_layer('access-options');return false;\">".GM_LANG_accpriv_conf."</a>";
 ?></td></tr></table>
 <div id="access-options" style="display: none">
 <table class="facts_table">
@@ -860,15 +860,15 @@ print "&nbsp;<a href=\"javascript: ".GM_LANG_accpriv_conf."\" onclick=\"expand_l
 
 <table class="facts_table"><tr><td class="topbottombar <?php print $TEXT_DIRECTION;?>">
 <?php
-print "<a href=\"javascript: ".GM_LANG_displ_conf."\" onclick=\"expand_layer('layout-options');return false;\"><img id=\"layout-options_img\" src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["plus"]["other"]."\" border=\"0\" width=\"11\" height=\"11\" alt=\"\" /></a>";
-print "&nbsp;<a href=\"javascript: ".GM_LANG_displ_conf."\" onclick=\"expand_layer('layout-options');return false;\">".GM_LANG_displ_conf."</a>";
+print "<a href=\"javascript: ".htmlentities(GM_LANG_displ_conf)."\" onclick=\"expand_layer('layout-options');return false;\"><img id=\"layout-options_img\" src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["plus"]["other"]."\" border=\"0\" width=\"11\" height=\"11\" alt=\"\" /></a>";
+print "&nbsp;<a href=\"javascript: ".htmlentities(GM_LANG_displ_conf)."\" onclick=\"expand_layer('layout-options');return false;\">".GM_LANG_displ_conf."</a>";
 ?></td></tr></table>
 <div id="layout-options" style="display: none">
 
 <table class="facts_table"><tr><td class="subbar">
 <?php
-print "<a href=\"javascript: ".GM_LANG_displ_names_conf."\" onclick=\"expand_layer('layout-options2');return false;\"><img id=\"layout-options2_img\" src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["plus"]["other"]."\" border=\"0\" width=\"11\" height=\"11\" alt=\"\" /></a>";
-print "&nbsp;<a href=\"javascript: ".GM_LANG_displ_names_conf."\" onclick=\"expand_layer('layout-options2');return false;\">".GM_LANG_displ_names_conf."</a>";
+print "<a href=\"javascript: ".htmlentities(GM_LANG_displ_names_conf)."\" onclick=\"expand_layer('layout-options2');return false;\"><img id=\"layout-options2_img\" src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["plus"]["other"]."\" border=\"0\" width=\"11\" height=\"11\" alt=\"\" /></a>";
+print "&nbsp;<a href=\"javascript: ".htmlentities(GM_LANG_displ_names_conf)."\" onclick=\"expand_layer('layout-options2');return false;\">".GM_LANG_displ_names_conf."</a>";
 ?></td></tr></table>
 <div id="layout-options2" style="display: none">
 <table class="facts_table">
@@ -962,8 +962,8 @@ print "&nbsp;<a href=\"javascript: ".GM_LANG_displ_names_conf."\" onclick=\"expa
 
 <table class="facts_table"><tr><td class="subbar">
 <?php
-print "<a href=\"javascript: ".GM_LANG_displ_comsurn_conf."\" onclick=\"expand_layer('layout-options3');return false;\"><img id=\"layout-options3_img\" src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["plus"]["other"]."\" border=\"0\" width=\"11\" height=\"11\" alt=\"\" /></a>";
-print "&nbsp;<a href=\"javascript: ".GM_LANG_displ_comsurn_conf."\" onclick=\"expand_layer('layout-options3');return false;\">".GM_LANG_displ_comsurn_conf."</a>";
+print "<a href=\"javascript: ".htmlentities(GM_LANG_displ_comsurn_conf)."\" onclick=\"expand_layer('layout-options3');return false;\"><img id=\"layout-options3_img\" src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["plus"]["other"]."\" border=\"0\" width=\"11\" height=\"11\" alt=\"\" /></a>";
+print "&nbsp;<a href=\"javascript: ".htmlentities(GM_LANG_displ_comsurn_conf)."\" onclick=\"expand_layer('layout-options3');return false;\">".GM_LANG_displ_comsurn_conf."</a>";
 ?></td></tr></table>
 <div id="layout-options3" style="display: none">
 <table class="facts_table">
@@ -988,8 +988,8 @@ print "&nbsp;<a href=\"javascript: ".GM_LANG_displ_comsurn_conf."\" onclick=\"ex
 ?>
 <table class="facts_table"><tr><td class="subbar <?php print $TEXT_DIRECTION;?>">
 <?php
-print "<a href=\"javascript: ".GM_LANG_displ_layout_conf."\" onclick=\"expand_layer('layout-options4');return false;\"><img id=\"layout-options4_img\" src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["plus"]["other"]."\" border=\"0\" width=\"11\" height=\"11\" alt=\"\" /></a>";
-print "&nbsp;<a href=\"javascript: ".GM_LANG_displ_layout_conf."\" onclick=\"expand_layer('layout-options4');return false;\">".GM_LANG_displ_layout_conf."</a>";
+print "<a href=\"javascript: ".htmlentities(GM_LANG_displ_layout_conf)."\" onclick=\"expand_layer('layout-options4');return false;\"><img id=\"layout-options4_img\" src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["plus"]["other"]."\" border=\"0\" width=\"11\" height=\"11\" alt=\"\" /></a>";
+print "&nbsp;<a href=\"javascript: ".htmlentities(GM_LANG_displ_layout_conf)."\" onclick=\"expand_layer('layout-options4');return false;\">".GM_LANG_displ_layout_conf."</a>";
 ?></td></tr></table>
 <div id="layout-options4" style="display: none">
 <table class="facts_table">
@@ -1090,9 +1090,6 @@ print "</table>";
 			</select>
 		</td>
 	</tr>
-
-		</td>
-	</tr>
 	<tr>
 		<td class="shade2 wrap"><div class="helpicon"><?php PrintHelpLink("INDI_EXT_FAM_FACTS_help", "qm", "INDI_EXT_FAM_FACTS"); print "</div><div class=\"description\">"; print GM_LANG_INDI_EXT_FAM_FACTS;?></div></td>
 		<td class="shade1">
@@ -1113,16 +1110,14 @@ print "</table>";
 	<tr>
 		<td class="shade2 wrap"><div class="helpicon"><?php PrintHelpLink("ALPHA_INDEX_LISTS_help", "qm", "ALPHA_INDEX_LISTS"); print "</div><div class=\"description\">"; print GM_LANG_ALPHA_INDEX_LISTS;?></div></td>
 		<td class="shade1"><input name="NEW_ALPHA_INDEX_LISTS" tabindex="<?php $i++; print $i?>" type="text" size="5" maxlength="4" value="<?php print GedcomConfig::$ALPHA_INDEX_LISTS; ?>" />
-			</select>
 		</td>
 	</tr>
 	<tr>
 		<td class="shade2 wrap"><div class="helpicon"><?php PrintHelpLink("LISTS_ALL_help", "qm", "LISTS_ALL"); print "</div><div class=\"description\">"; print GM_LANG_LISTS_ALL;?></div></td>
-			<td class="shade1">			
-				<select name="NEW_LISTS_ALL" tabindex="<?php $i++; print $i?>">
-					<option value="yes" <?php if (GedcomConfig::$LISTS_ALL) print "selected=\"selected\""; ?>><?php print GM_LANG_yes;?></option>
-					<option value="no" <?php if (!GedcomConfig::$LISTS_ALL) print "selected=\"selected\""; ?>><?php print GM_LANG_no;?></option>
-				</select>
+		<td class="shade1">			
+			<select name="NEW_LISTS_ALL" tabindex="<?php $i++; print $i?>">
+				<option value="yes" <?php if (GedcomConfig::$LISTS_ALL) print "selected=\"selected\""; ?>><?php print GM_LANG_yes;?></option>
+				<option value="no" <?php if (!GedcomConfig::$LISTS_ALL) print "selected=\"selected\""; ?>><?php print GM_LANG_no;?></option>
 			</select>
 		</td>
 	</tr>
@@ -1132,8 +1127,8 @@ print "</table>";
 
 <table class="facts_table"><tr><td class="subbar <?php print $TEXT_DIRECTION;?>">
 <?php
-print "<a href=\"javascript: ".GM_LANG_displ_hide_conf."\" onclick=\"expand_layer('layout-options5');return false;\"><img id=\"layout-options5_img\" src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["plus"]["other"]."\" border=\"0\" width=\"11\" height=\"11\" alt=\"\" /></a>";
-print "&nbsp;<a href=\"javascript: ".GM_LANG_displ_hide_conf."\" onclick=\"expand_layer('layout-options5');return false;\">".GM_LANG_displ_hide_conf."</a>";
+print "<a href=\"javascript: ".htmlentities(GM_LANG_displ_hide_conf)."\" onclick=\"expand_layer('layout-options5');return false;\"><img id=\"layout-options5_img\" src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["plus"]["other"]."\" border=\"0\" width=\"11\" height=\"11\" alt=\"\" /></a>";
+print "&nbsp;<a href=\"javascript: ".htmlentities(GM_LANG_displ_hide_conf)."\" onclick=\"expand_layer('layout-options5');return false;\">".GM_LANG_displ_hide_conf."</a>";
 ?></td></tr></table>
 <div id="layout-options5" style="display: none">
 <table class="facts_table">
@@ -1208,8 +1203,8 @@ print "&nbsp;<a href=\"javascript: ".GM_LANG_displ_hide_conf."\" onclick=\"expan
 ?>
 <table class="facts_table"><tr><td class="topbottombar <?php print $TEXT_DIRECTION;?>">
 <?php
-print "<a href=\"javascript: ".GM_LANG_editopt_conf."\" onclick=\"expand_layer('edit-options');return false;\"><img id=\"edit-options_img\" src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["plus"]["other"]."\" border=\"0\" width=\"11\" height=\"11\" alt=\"\" /></a>";
-print "&nbsp;<a href=\"javascript: ".GM_LANG_editopt_conf."\" onclick=\"expand_layer('edit-options');return false;\">".GM_LANG_editopt_conf."</a>";
+print "<a href=\"javascript: ".htmlentities(GM_LANG_editopt_conf)."\" onclick=\"expand_layer('edit-options');return false;\"><img id=\"edit-options_img\" src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["plus"]["other"]."\" border=\"0\" width=\"11\" height=\"11\" alt=\"\" /></a>";
+print "&nbsp;<a href=\"javascript: ".htmlentities(GM_LANG_editopt_conf)."\" onclick=\"expand_layer('edit-options');return false;\">".GM_LANG_editopt_conf."</a>";
 ?></td></tr></table>
 <div id="edit-options" style="display: none">
 <table class="facts_table">
@@ -1328,8 +1323,8 @@ print "&nbsp;<a href=\"javascript: ".GM_LANG_editopt_conf."\" onclick=\"expand_l
 ?>
 <table class="facts_table"><tr><td class="topbottombar <?php print $TEXT_DIRECTION;?>">
 <?php
-print "<a href=\"javascript: ".GM_LANG_useropt_conf."\" onclick=\"expand_layer('user-options');return false;\"><img id=\"user-options_img\" src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["plus"]["other"]."\" border=\"0\" width=\"11\" height=\"11\" alt=\"\" /></a>";
-print "&nbsp;<a href=\"javascript: ".GM_LANG_useropt_conf."\" onclick=\"expand_layer('user-options');return false;\">".GM_LANG_useropt_conf."</a>";
+print "<a href=\"javascript: ".htmlentities(GM_LANG_useropt_conf)."\" onclick=\"expand_layer('user-options');return false;\"><img id=\"user-options_img\" src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["plus"]["other"]."\" border=\"0\" width=\"11\" height=\"11\" alt=\"\" /></a>";
+print "&nbsp;<a href=\"javascript: ".htmlentities(GM_LANG_useropt_conf)."\" onclick=\"expand_layer('user-options');return false;\">".GM_LANG_useropt_conf."</a>";
 ?></td></tr></table>
 <div id="user-options" style="display: none">
 <table class="facts_table">
@@ -1389,8 +1384,8 @@ print "&nbsp;<a href=\"javascript: ".GM_LANG_useropt_conf."\" onclick=\"expand_l
 
 <table class="facts_table"><tr><td class="topbottombar <?php print $TEXT_DIRECTION;?>">
 <?php
-print "<a href=\"javascript: ".GM_LANG_contact_conf."\" onclick=\"expand_layer('contact-options');return false;\"><img id=\"contact-options_img\" src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["plus"]["other"]."\" border=\"0\" width=\"11\" height=\"11\" alt=\"\" /></a>";
-print "&nbsp;<a href=\"javascript: ".GM_LANG_contact_conf."\" onclick=\"expand_layer('contact-options');return false;\">".GM_LANG_contact_conf."</a>";
+print "<a href=\"javascript: ".htmlentities(GM_LANG_contact_conf)."\" onclick=\"expand_layer('contact-options');return false;\"><img id=\"contact-options_img\" src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["plus"]["other"]."\" border=\"0\" width=\"11\" height=\"11\" alt=\"\" /></a>";
+print "&nbsp;<a href=\"javascript: ".htmlentities(GM_LANG_contact_conf)."\" onclick=\"expand_layer('contact-options');return false;\">".GM_LANG_contact_conf."</a>";
 ?></td></tr></table>
 <div id="contact-options" style="display: none">
 <table class="facts_table">
@@ -1468,8 +1463,8 @@ print "&nbsp;<a href=\"javascript: ".GM_LANG_contact_conf."\" onclick=\"expand_l
 </div>
 <table class="facts_table"><tr><td class="topbottombar <?php print $TEXT_DIRECTION;?>">
 <?php
-print "<a href=\"javascript: ".GM_LANG_meta_conf."\" onclick=\"expand_layer('config-meta');return false;\"><img id=\"config-meta_img\" src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["plus"]["other"]."\" border=\"0\" width=\"11\" height=\"11\" alt=\"\" /></a>";
-print "&nbsp;<a href=\"javascript: ".GM_LANG_meta_conf."\" onclick=\"expand_layer('config-meta');return false;\">".GM_LANG_meta_conf."</a>";
+print "<a href=\"javascript: ".htmlentities(GM_LANG_meta_conf)."\" onclick=\"expand_layer('config-meta');return false;\"><img id=\"config-meta_img\" src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["plus"]["other"]."\" border=\"0\" width=\"11\" height=\"11\" alt=\"\" /></a>";
+print "&nbsp;<a href=\"javascript: ".htmlentities(GM_LANG_meta_conf)."\" onclick=\"expand_layer('config-meta');return false;\">".GM_LANG_meta_conf."</a>";
 ?></td></tr></table>
 <div id="config-meta" style="display: none">
 <table class="facts_table">

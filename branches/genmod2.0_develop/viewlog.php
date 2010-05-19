@@ -96,7 +96,7 @@ if ($auth) {
 	$logcount = AdminFunctions::ReadLog($cat, $max, $type, $gedid, false, true);
 	
 	// Start form
-	print "<form action=\"viewlog.php\" method=\"get\">";
+	print "<form action=\"viewlog.php\" method=\"get\">\n";
 	
 	// -- Print the top line
 	print "<div class=\"topbottombar center\">";
@@ -104,16 +104,16 @@ if ($auth) {
 	if ($cat == "S") print GM_LANG_syslog;
 	else print $GEDCOMS[$gedid]["title"];
 	print " - ".GM_LANG_recs_present." ".$logcount;
-	print "</div>";
+	print "</div>\n";
 
 	// -- Print the buttons bar
-	print"<div id=\"toplinks\" name=\"toplinks\" class=\"center\"><input  type=\"button\" value=\"".GM_LANG_back."\" onclick='self.close();' />&nbsp;<input  type=\"button\" value=\"".GM_LANG_refresh."\" onclick=\"document.location='viewlog.php?type=$type&amp;cat=$cat&amp;max=$max&amp;gedid=$gedid'; \" /></div>";
+	print"<div id=\"toplinks\" class=\"center\"><input  type=\"button\" value=\"".GM_LANG_back."\" onclick='self.close();' />&nbsp;<input  type=\"button\" value=\"".GM_LANG_refresh."\" onclick=\"document.location='viewlog.php?type=$type&amp;cat=$cat&amp;max=$max&amp;gedid=$gedid'; \" /></div>\n";
 	print "<hr />";
 	// -- Print the options title
-	print "<div id=\"viewlog_option\">".GM_LANG_select_an_option."<br />";
+	print "<div id=\"viewlog_option\">".GM_LANG_select_an_option."<br />\n";
 		print "<hr />";
 		// -- Print the options line
-		print "<label for=\"viewlogoption\">".GM_LANG_show_last."</label>";
+		print "<label for=\"viewlogoption\">".GM_LANG_show_last."</label>\n";
 		print "<select id=\"viewlogoption\" name=\"viewlogoption\" onchange=\"document.location=options[selectedIndex].value;\">";
 		print "<option value=\"viewlog.php?cat=".$cat."&amp;type=".$type."&amp;max=20&amp;gedid=$gedid&amp;cat=$cat\"";
 		if ($max == "20") print " selected=\"selected\"";
@@ -127,11 +127,11 @@ if ($auth) {
 		print "<option value=\"viewlog.php?cat=".$cat."&amp;type=".$type."&amp;max=0&amp;gedid=$gedid&amp;cat=$cat\"";
 		if ($max == "0") print " selected=\"selected\"";
 		print " >".GM_LANG_all."</option>";
-		print "</select>";
+		print "</select>\n";
 		print "<br />";
 		
-		print "<label for=\"type\">".GM_LANG_show_events."</label>";
-		print "<input type=\"radio\" name=\"type\" value=\"All\" onclick=\"document.location='viewlog.php?cat=$cat&amp;max=$max&amp;gedid=$gedid'\"";
+		print "<label for=\"type\">".GM_LANG_show_events."</label>\n";
+		print "<input type=\"radio\" name=\"type\" id=\"type\" value=\"All\" onclick=\"document.location='viewlog.php?cat=$cat&amp;max=$max&amp;gedid=$gedid'\"";
 		if ($type == "") print " checked=\"checked\"";
 		print " />".GM_LANG_all."&nbsp;";
 		print "<input type=\"radio\" name=\"type\" value=\"I\" onclick=\"document.location='viewlog.php?type=I&amp;cat=$cat&amp;max=$max&amp;gedid=$gedid'\"";
@@ -143,7 +143,7 @@ if ($auth) {
 		print "<input type=\"radio\" name=\"type\" value=\"E\" onclick=\"document.location='viewlog.php?type=E&amp;cat=$cat&amp;max=$max&amp;gedid=$gedid'\"";
 		if ($type == "E") print " checked=\"checked\"";
 		print " /><img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["log"]["error"]."\" alt=\"".GM_LANG_error."\" />&nbsp;";
-	print "</div>";
+	print "</div>\n";
 	
 	print "<div id=\"viewlog_admin\">";
 	// -- Print the administration title
@@ -167,22 +167,22 @@ if ($auth) {
 		}
 		
 		print "<label for=\"cleanup\">".GM_LANG_cleanup_older."</label>";
-		print "<select id=\"cleanup\" name=\"cleanup\">";
+		print "<select name=\"cleanup\">\n";
 		for ($i=0; $i<=$months; $i++) {
 			print "<option value=\"".$i."M\"";
-			if ($i == $months) print "selected=\"selected\" ";
-			print ">".$i."&nbsp;".GM_LANG_months."</option>";
+			if ($i == $months) print " selected=\"selected\"";
+			print ">".$i."&nbsp;".GM_LANG_months."</option>\n";
 		}
-		print "</select>";
+		print "</select>\n";
 		print "<input type=\"hidden\" name=\"cat\" value=\"$cat\" />";
 		print "<input type=\"hidden\" name=\"max\" value=\"$max\" />";
 		print "<input type=\"hidden\" name=\"type\" value=\"$type\" />";
 		print "<input type=\"hidden\" name=\"gedid\" value=\"$gedid\" />";
-		print "<input  type=\"submit\" name=\"action\" value=\"".GM_LANG_cleanup."\" />";
+		print "<input type=\"submit\" id=\"cleanup\" name=\"action\" value=\"".GM_LANG_cleanup."\" />";
 	}
 	print "<br />";
-	print "<label for=\"cleanup\">".GM_LANG_export."</label>";
-	print "<input  type=\"button\" value=\"".GM_LANG_export_log."\" onclick=\"document.location='viewlog.php?type=$type&amp;cat=$cat&amp;max=$max&amp;gedid=$gedid&amp;action=download'; \" /></td></tr>";
+	print "<label for=\"export\">".GM_LANG_export."</label>";
+	print "<input type=\"button\" id=\"export\" value=\"".GM_LANG_export_log."\" onclick=\"document.location='viewlog.php?type=$type&amp;cat=$cat&amp;max=$max&amp;gedid=$gedid&amp;action=download'; \" />";
 	
 	print "</div>";
 	print "<br clear=\"all\" />";
@@ -197,45 +197,43 @@ if ($auth) {
 	if (($cat == "S") || ($cat == "G")) {
 		print "<tr class=\"admin_item_box shade2\"><td>".GM_LANG_type."</td><td>".GM_LANG_date_time."</td><td>".GM_LANG_ip_address."</td><td>".GM_LANG_user."</td><td>".GM_LANG_message."</td></tr>";
 		foreach ($loglines as $key => $logline) {
-			print "<tr class=\"admin_item_box shade1\">";
+			print "<tr class=\"admin_item_box shade1\">\n";
 			print "<td>";
 			if ($logline["type"] == "I") print "<img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["log"]["information"]."\" alt=\"".GM_LANG_information."\" />";
 			if ($logline["type"] == "W") print "<img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["log"]["warning"]."\" alt=\"".GM_LANG_warning."\" />";
 			if ($logline["type"] == "E") print "<img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["log"]["error"]."\" alt=\"".GM_LANG_error."\" />";
-			print "</td>";
-			print "<td>".date("d.m.Y H:i:s", $logline["time"])."</td>";
-			print "<td>".$logline["ip"]."</td>";
+			print "</td>\n";
+			print "<td>".date("d.m.Y H:i:s", $logline["time"])."</td>\n";
+			print "<td>".$logline["ip"]."</td>\n";
 			print "<td>";
-			if (!empty($logline["user"])) print $logline["user"]."</td>";
-			else print "&nbsp;</td>";
-			print "<td class=\"wrap\">".$logline["text"]."</td>";
-			print "</tr>";
+			if (!empty($logline["user"])) print $logline["user"]."</td>\n";
+			else print "&nbsp;</td>\n";
+			print "<td class=\"wrap\">".htmlentities($logline["text"])."</td>\n";
+			print "</tr>\n";
 		}
-		print "<tr>";
 	}
 
 	if ($cat == "F") {
-		print "<tr class=\"admin_item_box shade2\"><td>".GM_LANG_type."</td><td>".GM_LANG_date_time."</td><td>".GM_LANG_ip_address."</td><td>".GM_LANG_user."</td><td>".GM_LANG_searchtype."</td><td>".GM_LANG_query."</td></tr>";
+		print "<tr class=\"admin_item_box shade2\"><td>".GM_LANG_type."</td><td>".GM_LANG_date_time."</td><td>".GM_LANG_ip_address."</td><td>".GM_LANG_user."</td><td>".GM_LANG_searchtype."</td><td>".GM_LANG_query."</td></tr>\n";
 		foreach ($loglines as $key => $logline) {
-			print "<tr class=\"admin_item_box shade1\">";
+			print "<tr class=\"admin_item_box shade1\">\n";
 			print "<td>";
 			if ($logline["type"] == "I") print "<img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["log"]["information"]."\" alt=\"".GM_LANG_information."\" />";
 			if ($logline["type"] == "W") print "<img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["log"]["warning"]."\" alt=\"".GM_LANG_warning."\" />";
 			if ($logline["type"] == "E") print "<img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["log"]["error"]."\" alt=\"".GM_LANG_error."\" />";
-			print "</td>";
-			print "<td>".date("d.m.Y H:i:s", $logline["time"])."</td>";
-			print "<td>".$logline["ip"]."</td>";
+			print "</td>\n";
+			print "<td>".date("d.m.Y H:i:s", $logline["time"])."</td>\n";
+			print "<td>".$logline["ip"]."</td>\n";
 			print "<td>";
-			if (!empty($logline["user"])) print $logline["user"]."</td>";
-			else print "&nbsp;</td>";
+			if (!empty($logline["user"])) print $logline["user"]."</td>\n";
+			else print "&nbsp;</td>\n";
 			$msg = preg_split("/,/", $logline["text"]);
 			if (empty($msg[0])) $msg[0] = "&nbsp;";
 			if (!isset($msg[1])) $msg[1] = "&nbsp;";
-			print "<td class=\"wrap\">".stripslashes($msg[0])."</td>";
-			print "<td class=\"wrap\">".stripslashes($msg[1])."</td>";
-			print "</tr>";
+			print "<td class=\"wrap\">".stripslashes($msg[0])."</td>\n";
+			print "<td class=\"wrap\">".stripslashes($msg[1])."</td>\n";
+			print "</tr>\n";
 		}
-		print "<tr>";
 	}
 	print "</table>";
 //	print "</div>";

@@ -51,7 +51,6 @@ class Menu {
 	 */
 	public function __construct($label=' ', $strip=true) {
 		$this->submenus = array();
-		$strip = false; // works ok without strip.
 		if ($strip) $this->addLabel(htmlspecialchars($label, ENT_QUOTES, "UTF-8"));
 		else $this->addLabel($label);
 	}
