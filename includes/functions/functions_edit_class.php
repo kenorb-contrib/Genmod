@@ -713,7 +713,6 @@ abstract class EditFunctions {
 			else if (defined("GM_FACT_".$fact)) print constant("GM_FACT_".$fact);
 			else print $fact;
 			print "\n";
-			print "\n</td>";
 		}
 		
 		// NOTE: Tag level
@@ -721,6 +720,10 @@ abstract class EditFunctions {
 			print "<input type=\"hidden\" name=\"glevels[]\" value=\"".$level."\" />\n";
 			print "<input type=\"hidden\" name=\"islink[]\" value=\"".($islink)."\" />\n";
 			print "<input type=\"hidden\" name=\"tag[]\" value=\"".$fact."\" />\n";
+		}
+		
+		if (!in_array($fact, $emptyfacts) || in_array($fact, $canhavey_facts)) {
+			print "\n</td>";
 		}
 		
 		// NOTE: value
@@ -1469,7 +1472,7 @@ abstract class EditFunctions {
 		print "<input type=\"hidden\" name=\"oldgedrec\" value=\"$gedrec\" />\n";
 	
 		// Print the JS to check for valid characters in the filename
-		?><script language="JavaScript">
+		?><script language="JavaScript" type="text/javascript">
 		<!--
 		function check( filename ) {
 			if( !filename.value ) return true;

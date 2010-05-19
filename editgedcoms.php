@@ -47,7 +47,7 @@ if (!$gm_user->userGedcomAdmin()) {
 	exit;
 }
 PrintHeader(GM_LANG_gedcom_adm_head);
-print "<center>\n";
+
 if ($action=="delete") {
 	if (isset($GEDCOMS[$delged])) {
 		PrivacyController::DeletePrivacy($delged);
@@ -241,7 +241,6 @@ if ($action == "deletecount") {
 	if (isset($GEDCOMS[$current_ged])) SwitchGedcom($GEDCOMS[$current_ged]["gedcom"]);
 	
 	print "</table></form>";
-	print "</center>";
 print "</div>";
 
 PrintFooter();
