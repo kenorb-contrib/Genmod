@@ -225,7 +225,8 @@ if ($action == "edit" || $action == "editraw") {
 		else $oldrec = GetSubRecord(1, "1 $fact", $gedrec, $count);
 	}
 	else {
-		if ($object->hiddenfacts) $disp = false;
+		// We make an exception for the admin!
+		if ($object->hiddenfacts && !$gm_user->userIsAdmin()) $disp = false;
 		$oldrec = $gedrec;
 	}
 	// Check links from the fact to hidden sources, media, etc. is not needed: done in hiddenfacts

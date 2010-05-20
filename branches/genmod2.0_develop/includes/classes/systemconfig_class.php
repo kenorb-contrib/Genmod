@@ -72,6 +72,8 @@ abstract class SystemConfig {
 	public static $PROXY_ADDRESS					= "";		//-- Allows obtaining GM-News and GEDCOM checking when the server is behind a proxy.	
 																//-- Type either IP address or name (e.g. mywwwproxy.net)
 	public static $PROXY_PORT						= "";		//-- Proxy port to be used
+	public static $PROXY_USER						= "";		//-- Username for proxy authentication
+	public static $PROXY_PASSWORD					= "";		//-- Password for proxy authentication
 	public static $LOCKOUT_TIME						= -1;		//-- Lockout time after intrusion attempt. -1 = no lockout, 0 = forever, 
 																//-- any other = # minutes
 	public static $VISITOR_LANG						= "Genmod";	//-- Let Genmod determine the site language, or a specific language

@@ -142,12 +142,16 @@ class Result {
 	}
 	
 	public function InsertID() {
-		$rows = @mysql_insert_id($this->result);
+		global $DBCONN;
+		
+		$rows = @mysql_insert_id($DBCONN->connection);
 		return $rows;
 	}
 	
 	public function AffectedRows() {
-		$rows = @mysql_affected_rows($this->result);
+		global $DBCONN;
+		
+		$rows = @mysql_affected_rows($DBCONN->connection);
 		return $rows;
 	}
 }

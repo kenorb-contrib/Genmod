@@ -1223,17 +1223,22 @@ abstract class AdminFunctions {
 		
 		if ($file_type == "facts") {
 			$sql = "UPDATE ".TBLPREFIX."facts";
-			$sql .= " SET lg_".$language2."= '".DbLayer::EscapeQuery($string)."' WHERE lg_string = '".$value."'";
+			$sql .= " SET lg_".$language2."='".DbLayer::EscapeQuery($string)."' WHERE lg_string='".$value."'";
 		}
 		else {
-			$sql = "UPDATE ".TBLPREFIX."language";
+			// If the string doesn't exist yet, we first enter the English text.
+			$sql = "INSERT INTO ".TBLPREFIX."language";
 			if (substr($value, -5) == "_help") $sql .= "_help";
-			$sql .= " SET lg_".$language2."= '".DbLayer::EscapeQuery($string)."' WHERE lg_string = '".$value."'";
+			$sql .= " (lg_string, lg_english) VALUES ('".$value."', '".DbLayer::EscapeQuery($string)."')";
+			$sql .= " ON DUPLICATE KEY UPDATE lg_".$language2."='".DbLayer::EscapeQuery($string)."'";
 		}
 		if ($res = NewQuery($sql)) {
-			$sql = "UPDATE ".TBLPREFIX."lang_settings SET ls_translated='1' WHERE ls_gm_langname='".$language2."'";
-			$res2 = NewQuery($sql);
-			return true;
+			if ($res->AffectedRows() > 0) {
+				$sql = "UPDATE ".TBLPREFIX."lang_settings SET ls_translated='1' WHERE ls_gm_langname='".$language2."'";
+				$res2 = NewQuery($sql);
+				return true;
+			}
+			else return false;
 		}
 		else return false;
 	}

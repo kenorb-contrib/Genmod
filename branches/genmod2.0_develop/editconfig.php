@@ -101,6 +101,8 @@ if ($action == "update") {
 	$CONFIG["NEWS_TYPE"] = $_POST["NEW_NEWS_TYPE"];
 	$CONFIG["PROXY_ADDRESS"] = $_POST["NEW_PROXY_ADDRESS"];
 	$CONFIG["PROXY_PORT"] = $_POST["NEW_PROXY_PORT"];
+	$CONFIG["PROXY_USER"] = $_POST["NEW_PROXY_USER"];
+	$CONFIG["PROXY_PASSWORD"] = $_POST["NEW_PROXY_PASSWORD"];
 	$CONFIG["LOCKOUT_TIME"] = $_POST["NEW_LOCKOUT_TIME"];
 	$CONFIG["VISITOR_LANG"] = $_POST["NEW_VISITOR_LANG"];
 	$CONFIG["DEFAULT_PAGE_SIZE"] = $_POST["NEW_DEFAULT_PAGE_SIZE"];
@@ -644,6 +646,32 @@ PrintHeader(GM_LANG_configure_head);
 			</div>
 			<div class="choice_right">
 				<input type="text" name="NEW_PROXY_PORT" value="<?php print SystemConfig::$PROXY_PORT;?>" dir="ltr" tabindex="<?php $i++; print $i?>" size="5" />
+			</div>
+		</div>
+		<div class="admin_item_box">
+			<div class="width30 choice_left">
+				<div class="helpicon">
+					<?php PrintHelpLink("PROXY_USER_help", "qm", "PROXY_USER");?>
+				</div>
+				<div class="description">
+					<?php print GM_LANG_PROXY_USER; ?>
+				</div>
+			</div>
+			<div class="choice_right">
+				<input type="text" name="NEW_PROXY_USER" value="<?php print SystemConfig::$PROXY_USER;?>" dir="ltr" tabindex="<?php $i++; print $i?>" size="40" />
+			</div>
+		</div>
+		<div class="admin_item_box">
+			<div class="width30 choice_left">
+				<div class="helpicon">
+					<?php PrintHelpLink("PROXY_PASSWORD_help", "qm", "PROXY_PASSWORD");?>
+				</div>
+				<div class="description">
+					<?php print GM_LANG_PROXY_PASSWORD; ?>
+				</div>
+			</div>
+			<div class="choice_right">
+				<input type="text" name="NEW_PROXY_PASSWORD" value="<?php print SystemConfig::$PROXY_PASSWORD;?>" dir="ltr" tabindex="<?php $i++; print $i?>" size="40" />
 			</div>
 		</div>
 		<div class="admin_item_box">

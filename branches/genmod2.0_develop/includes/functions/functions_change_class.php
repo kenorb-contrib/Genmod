@@ -237,7 +237,8 @@ abstract class ChangeFunctions {
 								$change["new"] = "reorder".$counttoadd;
 								$counttoadd++;
 							}
-							$gedlines[$gedname][$chgid] = str_replace(trim($change["old"]), $change["new"], $gedlines[$gedname][$chgid]);
+							$old = trim($change["old"]);
+							$gedlines[$gedname][$chgid] = preg_replace("/$old/", $change["new"], $gedlines[$gedname][$chgid], 1);
 						}
 						
 						if (isset($change["user"]) && isset($change["time"])) {
@@ -355,7 +356,8 @@ abstract class ChangeFunctions {
 						}
 						if ($details["type"] == "raw_edit") $gedrec = $details["new"];
 						else {
-							$gedrec = str_replace(trim($details["old"]), trim($details["new"]), $gedrec);
+							$old = trim($details["old"]);
+							$gedrec = preg_replace("/$old/", trim($details["new"]), $gedrec, 1);
 						}
 	//					print "Acceptchange: ".$id."<br /><br />Details old: ".$details["old"]."<br /><br />Details new:".$details["new"]."<br /><br />New gedrec: ".$gedrec."<br /><br /><br />";
 						if ($counttoadd == 1) {
