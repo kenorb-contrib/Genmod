@@ -54,7 +54,7 @@ if ($action == "phpinfo") {
 		ob_end_clean();
 		
 		$php_info    = str_replace(" width=\"600\"", " width=\"\"", $php_info);
-		$php_info    = str_replace("</body></html>", "", $php_info);
+		$php_info    = str_replace("</div></body></html>", "", $php_info);
 		$php_info    = str_replace("<table", "<table class=\"center facts_table ltr\"", $php_info);
 		$php_info    = str_replace("td class=\"e\"", "td class=\"facts_value wrap\"", $php_info);
 		$php_info    = str_replace("td class=\"v\"", "td class=\"facts_value wrap\"", $php_info);
@@ -64,6 +64,10 @@ if ($action == "phpinfo") {
 		$php_info    = str_replace(";", "; ", $php_info);
 		$php_info    = str_replace(",", ", ", $php_info);
 		
+		function strip_spaces($match) {
+			return "<a name=\"".str_replace(" ", "_", $match[1])."\"";
+		}
+		$php_info	 = preg_replace_callback("/\<a name=\"(.*)\"/", "strip_spaces", $php_info);
 		// Put logo in table header
 		
 		$logo_offset = strpos($php_info, "<td>");

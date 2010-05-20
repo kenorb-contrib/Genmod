@@ -278,7 +278,7 @@ abstract class MenuBar {
 			$submenu = new Menu(GM_LANG_my_favorites);
 			$menu->addSubmenu($submenu);
 			foreach($userfavs as $key => $favorite) {
-				$submenu = new Menu($favorite->title);
+				$submenu = new Menu($favorite->title, false);
 				$submenu->addLink($favorite->link);
 				$menu->submenus[count($menu->submenus)-1]->submenus[]=$submenu;
 			}
@@ -292,7 +292,7 @@ abstract class MenuBar {
 			$menu->addSubmenu($submenu);
 			
 			foreach($gedcomfavs as $key => $favorite) {
-				$submenu = new Menu($favorite->title);
+				$submenu = new Menu($favorite->title, false);
 				$submenu->addLink($favorite->link);
 				$menu->submenus[count($menu->submenus)-1]->submenus[]=$submenu;
 			}

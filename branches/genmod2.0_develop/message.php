@@ -132,8 +132,8 @@ if ($action=="compose") {
 	print '<span class="subheaders">'.GM_LANG_message.'</span>';
 	$_SESSION["good_to_send"] = true;
 	?>
-	<!--
 	<script language="JavaScript" type="text/javascript">
+	<!--
 		function validateEmail(email) {
 			if (email.value.search("(.*)@(.*)")==-1) {
 				alert('<?php print GM_LANG_invalid_email; ?>');

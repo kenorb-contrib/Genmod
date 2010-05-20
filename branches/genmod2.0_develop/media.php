@@ -218,31 +218,31 @@ if ($action == "upload_action" && (!empty($picture))) {
 }
 
 // Form for all screens
-print "<form action=\"media.php\" method=\"post\" name=\"managemedia\" enctype=\"multipart/form-data\">";
-print "<input type=\"hidden\" name=\"action\" value=\"\" />";
-print "<input type=\"hidden\" name=\"directory\" value=\"".urlencode($directory)."\" />";
+print "<form action=\"media.php\" method=\"post\" name=\"managemedia\" enctype=\"multipart/form-data\">\n";
+print "<input type=\"hidden\" name=\"action\" value=\"\" />\n";
+print "<input type=\"hidden\" name=\"directory\" value=\"".urlencode($directory)."\" />\n";
 
 // Sort order
-print "<input type=\"hidden\" name=\"sort\" value=\"".$sort."\" />";
+print "<input type=\"hidden\" name=\"sort\" value=\"".$sort."\" />\n";
 
 // Declare the switch variables
-print "<input type=\"hidden\" name=\"disp1\" />";
-print "<input type=\"hidden\" name=\"disp2\" />";
+print "<input type=\"hidden\" name=\"disp1\" />\n";
+print "<input type=\"hidden\" name=\"disp2\" />\n";
 
 // File management part --------------------------------------------------------------------------------------------------------------------------
 if ($disp1 == "block") {
 	// Setup the left box
-	print "<div id=\"admin_genmod_left\" style=\"display: ".$disp1.";\">";
-		print "<div class=\"".$TEXT_DIRECTION."\">";
-			print "<div class=\"admin_topbottombar\">".GM_LANG_navigation."</div>";
+	print "<div id=\"admin_genmod_left\" style=\"display: ".$disp1.";\">\n";
+		print "<div class=\"".$TEXT_DIRECTION."\">\n";
+			print "<div class=\"admin_topbottombar\">".GM_LANG_navigation."</div>\n";
 	//		print "<div class=\"admin_link\"><a href=\"admin.php\">".GM_LANG_admin."</a></div>";
-			print "<div class=\"admin_genmod_content\">";
+			print "<div class=\"admin_genmod_content\">\n";
 			// Print the external media link
-					print "<a href=\"javascript:".GM_LANG_show_dir."\" onclick=\"document.managemedia.directory.value='external_links'; document.managemedia.submit(); return false;\">";
-					if ($directory == "external_links") print "<span class=\"current\">";
-					print GM_LANG_external_media;
-					if ($directory == "external_links") print "</span>";
-				print "</a><br />";
+				print "<a href=\"javascript:".GM_LANG_show_dir."\" onclick=\"document.managemedia.directory.value='external_links'; document.managemedia.submit(); return false;\">";
+				if ($directory == "external_links") print "<span class=\"current\">";
+				print GM_LANG_external_media;
+				if ($directory == "external_links") print "</span>";
+				print "</a><br />\n";
 			
 			foreach ($dirs as $key => $dir) {
 				$canwrite = MediaFS::DirIsWritable($dir);
@@ -257,11 +257,12 @@ if ($disp1 == "block") {
 					print $d[1];
 					if (!$canwrite) print "</span>";
 					if ($dir == $directory) print "</span>";
+					print "</a>";
 					print "</span>";
+					print "<br />\n";
 				}
-				print "</a><br />";
 			}
-			print "</div>";
+			print "</div>\n";
 		print "</div>";
 	print "</div>";
 	
@@ -274,10 +275,10 @@ if ($disp1 == "block") {
 			// File management
 			print "\n<div class=\"admin_genmod_content\" style=\"border-bottom:1px solid #493424;\" >";
 			print "<div class=\"center\"><b>".GM_LANG_switch_functions."</b></div>";
-			print "<input type=\"radio\" name=\"disp1\" id=\"disp\" value=\"block\"";
+			print "<input type=\"radio\" name=\"disp1\" id=\"dispa\" value=\"block\"";
 			print " checked=\"checked\"";
 			print " onclick=\"document.managemedia.action.value='switch'; document.managemedia.disp2.value='none'; document.managemedia.submit(); return false;\" />" . GM_LANG_file_management."<br />";
-			print "<input type=\"radio\" name=\"disp1\" id=\"disp\" value=\"none\"";
+			print "<input type=\"radio\" name=\"disp1\" id=\"dispb\" value=\"none\"";
 			print " onclick=\"document.managemedia.action.value='switch'; document.managemedia.disp2.value='block'; document.managemedia.submit(); return false;\" />" . GM_LANG_in_export;
 			print "</div>";
 			
@@ -398,13 +399,13 @@ if ($disp1 == "block") {
 			print "<table class=\"width100\">";
 			print "<tr class=\"shade3\">";
 			for ($i=1;$i<=$cols;$i++) {
-				print "<td class=\"width5\">".GM_LANG_select."</td>";
-				print "<td><a href=\"javascript: ".GM_LANG_sort_on_name."\" onclick=\"document.managemedia.sort.value='name'; document.managemedia.submit(); return false;\" title=\"".GM_LANG_sort_on_name."\">".GM_LANG_name."</a></td>";
-				print "<td class=\"width10\"><a href=\"javascript: ".GM_LANG_sort_on_size."\" onclick=\"document.managemedia.sort.value='size'; document.managemedia.submit(); return false;\" title=\"".GM_LANG_sort_on_size."\">".GM_LANG_size."</td>";
-				print "<td class=\"width5\"><a href=\"javascript: ".GM_LANG_sort_on_linked."\" onclick=\"document.managemedia.sort.value='linked'; document.managemedia.submit(); return false;\" title=\"".GM_LANG_sort_on_linked."\">".GM_LANG_linked."</td>";
-				print "<td class=\"width15\" colspan=\"3\" style=\"text-align:center;\">".GM_LANG_action."</td>";
+				print "<td class=\"width5\">".GM_LANG_select."</td>\n";
+				print "<td><a href=\"javascript: ".GM_LANG_sort_on_name."\" onclick=\"document.managemedia.sort.value='name'; document.managemedia.submit(); return false;\" title=\"".GM_LANG_sort_on_name."\">".GM_LANG_name."</a></td>\n";
+				print "<td class=\"width10\"><a href=\"javascript: ".GM_LANG_sort_on_size."\" onclick=\"document.managemedia.sort.value='size'; document.managemedia.submit(); return false;\" title=\"".GM_LANG_sort_on_size."\">".GM_LANG_size."</a></td>\n";
+				print "<td class=\"width5\"><a href=\"javascript: ".GM_LANG_sort_on_linked."\" onclick=\"document.managemedia.sort.value='linked'; document.managemedia.submit(); return false;\" title=\"".GM_LANG_sort_on_linked."\">".GM_LANG_linked."</a></td>\n";
+				print "<td class=\"width15\" colspan=\"3\" style=\"text-align:center;\">".GM_LANG_action."</td>\n";
 			}
-			print "</tr>";
+			print "</tr>\n";
 			$i=0;
 			$canwrite = true;
 			
@@ -416,7 +417,9 @@ if ($disp1 == "block") {
 			if (isset($d[1]) && ($d[1] == "thumbs" || $d[1] == "urls")) $is_thumb_dir = true;
 			else $is_thumb_dir = false;
 			
+			$counter = 0;
 			foreach ($files as $filename => $file) {
+				$counter++;
 				if ($i%2 == 0) print "<tr>";
 				$fileobj = $file["filedata"];
 				// print select
@@ -449,15 +452,15 @@ if ($disp1 == "block") {
 				print "<td style=\"border-bottom:1px solid #493424; text-align:center;\">";
 				if (isset($file["objects"])) {
 					// Define the box with links
-					print "\n\t\t<div id=\"I".$filename."links\" class=\"ie_popup_width person_box shade2 details1\" style=\"position:absolute; height:auto; width:auto; ";
-					print "visibility:hidden;\" onmouseover=\"keepbox('".$filename."'); return false;\" ";
-					print "onmouseout=\"moveout('".$filename."'); return false;\">";
+					print "\n\t\t<div id=\"I".$counter."links\" class=\"ie_popup_width person_box shade2 details1\" style=\"position:absolute; height:auto; width:auto; ";
+					print "visibility:hidden;\" onmouseover=\"keepbox('".$counter."'); return false;\" ";
+					print "onmouseout=\"moveout('".$counter."'); return false;\">";
 					print "<b>".GM_LANG_mm_links."</b><br />";
 					foreach($file["objects"] as $pipo => $media) {
 						print "\n\t<a href=\"mediadetail.php?mid=".$media->xref."&amp;gedid=".$media->gedcomid."\" target=\"_blank\">".$media->title."</a><br />";
 					}
 					print "</div>";
-					print "<img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["link"]["other"]."\" border=\"0\" alt=\"".GM_LANG_click_mm_links."\" style=\"vertical-align:middle;\" onclick=\"showbox(this, '".$filename."', 'relatives'); return false;\" onmouseout=\"moveout('".$filename."');return false;\" />";
+					print "<img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["link"]["other"]."\" border=\"0\" alt=\"".GM_LANG_click_mm_links."\" style=\"vertical-align:middle;\" onclick=\"showbox(this, '".$counter."', 'relatives'); return false;\" onmouseout=\"moveout('".$counter."');return false;\" />";
 				}
 				else print "&nbsp;";
 				print "</td>";
@@ -492,9 +495,9 @@ if ($disp1 == "block") {
 				
 				// Details
 				print "<td style=\"border-bottom:1px solid #493424; text-align:center\">";
-					print "\n\t\t<div id=\"I".$filename."D"."links\" class=\"ie_popup_width person_box shade2 details1\" style=\"position:absolute; height:auto; width:auto; ";
-					print "visibility:hidden;\" onmouseover=\"keepbox('".$filename."D"."'); return false;\" ";
-					print "onmouseout=\"moveout('".$filename."D"."'); return false;\">";
+					print "\n\t\t<div id=\"I".$counter."D"."links\" class=\"ie_popup_width person_box shade2 details1\" style=\"position:absolute; height:auto; width:auto; ";
+					print "visibility:hidden;\" onmouseover=\"keepbox('".$counter."D"."'); return false;\" ";
+					print "onmouseout=\"moveout('".$counter."D"."'); return false;\">";
 					print "<b>".GM_LANG_fdetails."</b><br />";
 					if (!empty($fileobj->f_mimetype)) print "<span class=\"label\">".GM_LANG_media_format.": </span> <span class=\"field\" style=\"direction: ltr;\">".$fileobj->f_mimetype."</span>";
 					if ($fileobj->f_is_image && $fileobj->f_height > 0) print "<span class=\"label\"><br />".GM_LANG_image_size.": </span> <span class=\"field\" style=\"direction: ltr;\">".$fileobj->f_height.($TEXT_DIRECTION =="rtl"?" &rlm;x&rlm; " : " x ").$fileobj->f_width.'</span>';
@@ -505,7 +508,7 @@ if ($disp1 == "block") {
 					print "</span>";
 					print "</div>";
 				
-					print "<img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["search"]["small"]."\" height=\"15\" width=\"15\" border=\"0\" alt=\"".GM_LANG_click_details."\" style=\"vertical-align:middle;\" onclick=\"showbox(this, '".$filename."D"."', 'relatives'); return false;\" onmouseout=\"moveout('".$filename."D"."');return false;\" />";
+					print "<img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["search"]["small"]."\" height=\"15\" width=\"15\" border=\"0\" alt=\"".GM_LANG_click_details."\" style=\"vertical-align:middle;\" onclick=\"showbox(this, '".$counter."D"."', 'relatives'); return false;\" onmouseout=\"moveout('".$counter."D"."');return false;\" />";
 				print "</td>";
 				
 				$i++;
@@ -548,10 +551,10 @@ if ($disp2 == "block") {
 			// File management
 			print "\n<div class=\"admin_genmod_content\" style=\"border-bottom:1px solid #493424;\" >";
 			print "<div class=\"center\"><b>".GM_LANG_switch_functions."</b></div>";
-			print "<input type=\"radio\" name=\"disp2\" id=\"disp\" value=\"none\"";
+			print "<input type=\"radio\" name=\"disp2\" id=\"dispa\" value=\"none\"";
 			print " onclick=\"document.managemedia.action.value='switch'; document.managemedia.disp1.value='block'; document.managemedia.submit(); return false;\" />" . GM_LANG_file_management."<br />";
 			// Switch auto generate thumbs
-			print "<input type=\"radio\" name=\"disp2\" id=\"disp\" value=\"block\"";
+			print "<input type=\"radio\" name=\"disp2\" id=\"dispb\" value=\"block\"";
 			print " checked=\"checked\"";
 			print " onclick=\"document.managemedia.action.value='switch'; document.managemedia.disp1.value='none'; document.managemedia.submit(); return false;\" />" . GM_LANG_in_export;
 			print "</div>";
@@ -568,7 +571,7 @@ if ($disp2 == "block") {
 			
 			// Upload media
 			// Print the JS to check for valid characters in the filename
-			?><script language="JavaScript">
+			?><script language="JavaScript" type="text/javascript">
 			<!--
 			function check( filename ) {
 				if( filename.match( /^[a-zA-Z]:[\w- \\\\]+\..*$/ ) ) 

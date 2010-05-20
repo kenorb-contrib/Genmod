@@ -156,7 +156,6 @@ $maxlines = max($active, $inactive);
 				<?php
 				// Print the Language table in sorted name order
 				for ($i=1; $i<=$maxlines; $i++) { ?>
-					<form name="activelanguage">
 					<div class="admin_item_box">
 						<?php
 						// Left 3 columns: Active language
@@ -177,12 +176,12 @@ $maxlines = max($active, $inactive);
 							<div class="width10 choice_middle">
 								<input
 								<?php
-								if (AdminFunctions::LanguageInUse($value)) print " disabled";
+								if (AdminFunctions::LanguageInUse($value)) print " disabled=\"disabled\"";
 								print " type=\"checkbox\" value=\"$value\" checked=\"checked\" onclick=\"enabledisablelanguage('$value');\" />";
 								?>
 							</div>
 							<div class="width10 choice_middle">
-								<a href="javascript: "<?php print $value;?>" onclick="window.open('editlang_edit_settings.php?action=editold&ln=<?php print $value;?>', '', 'top=50,left=10,width=1000,height=600,scrollbars=1,resizable=1'); return false;""><?php print GM_LANG_lang_edit;?></a>
+								<a href="javascript: <?php print $value;?>" onclick="window.open('editlang_edit_settings.php?action=editold&amp;ln=<?php print $value;?>', '', 'top=50,left=10,width=1000,height=600,scrollbars=1,resizable=1'); return false;"><?php print GM_LANG_lang_edit;?></a>
 							</div>
 							<?php
 						}
@@ -205,13 +204,12 @@ $maxlines = max($active, $inactive);
 								<input type="checkbox" value="<?php print $value; ?>" onclick="enabledisablelanguage('<?php print $value; ?>');" /> 
 							</div>
 							<div class="width10 choice_right">
-								<a href="javascript: "<?php print $value;?>" onclick="window.open('editlang_edit_settings.php?action=editold&ln=<?php print $value;?>', '', 'top=50,left=10,width=1000,height=600,scrollbars=1,resizable=1'); return false;""><?php print GM_LANG_lang_edit;?></a>
+								<a href="javascript: <?php print $value;?>" onclick="window.open('editlang_edit_settings.php?action=editold&amp;ln=<?php print $value;?>', '', 'top=50,left=10,width=1000,height=600,scrollbars=1,resizable=1'); return false;"><?php print GM_LANG_lang_edit;?></a>
 							</div>
 							<?php
 						}
 						?>
 					</div>
-					</form>
 					<?php
 				}
 			print "</form>";

@@ -136,42 +136,42 @@ class EditLangController extends BaseController {
 	}
 	
 	public function ShowLanguageCompare($lang1, $lang2, $facts = false, $help = false) {
-		print '<span class="subheaders">'.GM_LANG_additions.':</span>';
+		print "<span class=\"subheaders\">".GM_LANG_additions.":</span>";
 		$count=0;
 		$colorid = 1;
 		foreach($lang1 as $key=>$value) {
-			print '<div class="language_item_box'.$colorid.'">';
 			if (!array_key_exists($key, $lang2)) {
-				print '<div class="original_language width40">';
+				print "<div class=\"language_item_box".$colorid."\">\n";
+				print "<div class=\"original_language width40\">";
 				print $key;
-				print '</div>';
-				print '<div class="translated_language">'.$value.'</div>';
+				print "</div>\n";
+				print "<div class=\"translated_language\">".$value."</div>";
 				$count++;
 				if ($colorid == 2) $colorid = 1;
 				else $colorid++;
+				print "</div>\n";
 			}
-			print '</div>';
 		}
-		if ($count==0) print '<div class="shade1">'.GM_LANG_no_additions.'</div>';
-		print '<span class="subheaders">'.GM_LANG_subtractions.':</span>';
+		if ($count==0) print "<div class=\"shade1\">".GM_LANG_no_additions."</div>";
+		print "<span class=\"subheaders\">".GM_LANG_subtractions.":</span>";
 		$count = 0;
 		$colorid = 1;
 		foreach($lang2 as $key=>$value) {
-			print '<div class="language_item_box'.$colorid.'">';
 			if (!array_key_exists($key, $lang1)) {
-				print '<div class="original_language">';
+				print "<div class=\"language_item_box".$colorid."\">\n";
+				print "<div class=\"original_language\">\n";
 				if (!$facts && !$help) print constant("GM_LANG_".$key);
 				else if ($facts) print constant("GM_FACT_".$key);
 				else if ($help) print $this->langhelp[$key];
-				print '</div>';
-				print '<div class="translated_language">'.$value.'</div>';
+				print "</div>\n";
+				print "<div class=\"translated_language\">".$value."</div>";
 				$count++;
 				if ($colorid == 2) $colorid = 1;
 				else $colorid++;
+				print "</div>\n";
 			}
-			print '</div>';
 		}
-		if ($count==0) print '<div class="shade1">'.GM_LANG_no_subtractions.'</div>';
+		if ($count==0) print "<div class=\"shade1\">".GM_LANG_no_subtractions."</div>";
 	}
 }
 ?>

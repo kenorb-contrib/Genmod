@@ -697,15 +697,24 @@ abstract class EditFunctions {
 		else if ($fact=="ADDR") $rows=5;
 		else if ($fact=="REPO") $cols = strlen(GedcomConfig::$REPO_ID_PREFIX) + 4;
 	
+		
 		// label
 		if (in_array($fact, $separatorfacts) && $level <= 2) self::AddTagSeparator($fact, $islink);
 		$style="";
 		print "<tr id=\"".$element_id."_tr\" ";
 		if (in_array($fact, $subnamefacts)) print " style=\"display:none;\""; // hide subname facts
 		print " >\n";
+		print "<td class=\"shade2 $TEXT_DIRECTION\">";
+		
+		// NOTE: Tag level
+		if ($level>0) {
+			print "<input type=\"hidden\" name=\"glevels[]\" value=\"".$level."\" />\n";
+			print "<input type=\"hidden\" name=\"islink[]\" value=\"".($islink)."\" />\n";
+			print "<input type=\"hidden\" name=\"tag[]\" value=\"".$fact."\" />\n";
+		}
+		
 		// NOTE: Help link
 		if (!in_array($fact, $emptyfacts) || in_array($fact, $canhavey_facts)) {
-			print "<td class=\"shade2 $TEXT_DIRECTION\">";
 			if ($fact=="DATE") PrintHelpLink("def_gedcom_date_help", "qm", "date");
 			else if ($fact=="RESN") PrintHelpLink($fact."_help", "qm");
 			else PrintHelpLink("edit_".$fact."_help", "qm");
@@ -715,23 +724,16 @@ abstract class EditFunctions {
 			print "\n";
 		}
 		
-		// NOTE: Tag level
-		if ($level>0) {
-			print "<input type=\"hidden\" name=\"glevels[]\" value=\"".$level."\" />\n";
-			print "<input type=\"hidden\" name=\"islink[]\" value=\"".($islink)."\" />\n";
-			print "<input type=\"hidden\" name=\"tag[]\" value=\"".$fact."\" />\n";
-		}
-		
-		if (!in_array($fact, $emptyfacts) || in_array($fact, $canhavey_facts)) {
+		if(in_array($fact, $emptyfacts) && !in_array($fact, $canhavey_facts)) print "<input type=\"hidden\" name=\"text[]\" value=\"\" />\n"; 
+//		if (!in_array($fact, $emptyfacts) || in_array($fact, $canhavey_facts)) {
 			print "\n</td>";
-		}
+//		}
 		
 		// NOTE: value
 		if (!in_array($fact, $emptyfacts) || in_array($fact, $canhavey_facts)) print "<td class=\"shade1\">\n";
 		// NOTE: Retrieve linked NOTE
 		// we must disable editing for this field if the note already has changes.
 		$disable_edit = false;
-		if(in_array($fact, $emptyfacts) && !in_array($fact, $canhavey_facts)) print "<input type=\"hidden\" name=\"text[]\" value=\"\" />\n"; 
 		if (in_array($fact, $canhavey_facts)&& (empty($value) || $value=="y" || $value=="Y")) {
 			$value = strtoupper($value);
 			//-- don't default anything to Y when adding events through people
@@ -742,7 +744,7 @@ abstract class EditFunctions {
 				print "<input type=\"checkbox\" tabindex=\"".$tabkey."\"";
 				$tabkey++;
 				if ($value=="Y") print " checked=\"checked\"";
-				print " onClick=\"if (this.checked) ".$element_id.".value='Y'; else ".$element_id.".value=''; \" />";
+				print " onclick=\"if (this.checked) ".$element_id.".value='Y'; else ".$element_id.".value=''; \" />";
 				print GM_LANG_yes;
 			}
 		}
@@ -860,7 +862,7 @@ abstract class EditFunctions {
 			else {
 				if (!in_array($fact, $emptyfacts)) {
 					print "<input tabindex=\"".$tabkey."\" type=\"text\" id=\"".$element_id."\" name=\"".$element_name."\" value=\"".htmlspecialchars($value)."\" size=\"".$cols."\" dir=\"ltr\"";
-					if ($fact=="NPFX") print " onkeyup=\"wactjavascript_autoComplete(npfx_accept,this,event)\" autocomplete=\"off\" ";
+					if ($fact=="NPFX") print " onkeyup=\"wactjavascript_autoComplete(npfx_accept,this,event);\" ";
 					if (in_array($fact, $subnamefacts)) print " onchange=\"updatewholename();\"";
 					if ($fact=="DATE") print " onblur=\"valid_date(this); sndReq('".$element_id."_date', 'getchangeddate', 'date', this.value, '', '');\"";
 					if ($fact=="EMAIL") print " onblur=\"sndReq('".$element_id."_email', 'checkemail', 'email', this.value, '', '');\"";
@@ -1066,13 +1068,6 @@ abstract class EditFunctions {
 			print "<table class=\"facts_table\">\n";
 			// 2 SOUR
 			$sour_focus_element = self::AddSimpleTag("$level SOUR @");
-			?>
-			<script type="text/javascript">
-			<!--
-			var addsourcefocus = <?php print "'".$sour_focus_element."'"; ?>;
-			//-->
-			</script>
-			<?php
 			// 3 PAGE
 			self::AddSimpleTag(($level+1)." PAGE");
 			// 3 DATA
@@ -1088,6 +1083,13 @@ abstract class EditFunctions {
 				print "</td></tr>";
 			}
 			print "</table></div>";
+			?>
+			<script type="text/javascript">
+			<!--
+			var addsourcefocus = <?php print "'".$sour_focus_element."'"; ?>;
+			//-->
+			</script>
+			<?php
 		}
 		if ($tag=="ASSO") {
 			//-- Add a new ASSOciate
@@ -1098,6 +1100,11 @@ abstract class EditFunctions {
 			print "<table class=\"facts_table\">\n";
 			// 2 ASSO
 			$asso_focus_element = self::AddSimpleTag(($level)." ASSO @");
+			// 3 RELA
+			self::AddSimpleTag(($level+1)." RELA");
+			// 3 NOTE
+			self::AddSimpleTag(($level+1)." NOTE");
+			print "</table></div>";
 			?>
 			<script type="text/javascript">
 			<!--
@@ -1105,11 +1112,6 @@ abstract class EditFunctions {
 			//-->
 			</script>
 			<?php
-			// 3 RELA
-			self::AddSimpleTag(($level+1)." RELA");
-			// 3 NOTE
-			self::AddSimpleTag(($level+1)." NOTE");
-			print "</table></div>";
 		}
 		if ($tag=="NOTE") {
 			//-- Add new note to fact
@@ -1120,6 +1122,7 @@ abstract class EditFunctions {
 			print "<table class=\"facts_table\">\n";
 			// 2 NOTE
 			$note_focus_element = self::AddSimpleTag(($level)." NOTE");
+			print "</table></div>";
 			?>
 			<script type="text/javascript">
 			<!--
@@ -1127,17 +1130,17 @@ abstract class EditFunctions {
 			//-->
 			</script>
 			<?php
-			print "</table></div>";
 		}
 		if ($tag=="GNOTE") {
 			//-- Add new general note to fact
-			print "<a href=\"#\" onclick=\"expand_layer('newgnote'); if(document.getElementById('newgnote').style.display == 'block') document.getElementById(addgnotefocus).focus(); return false;\"><img id=\"newnote_img\" src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["plus"]["other"]."\" border=\"0\" width=\"11\" height=\"11\" alt=\"\" title=\"\" /> ".GM_LANG_add_gnote."</a>";
+			print "<a href=\"#\" onclick=\"expand_layer('newgnote'); if(document.getElementById('newgnote').style.display == 'block') document.getElementById(addgnotefocus).focus(); return false;\"><img id=\"newgnote_img\" src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["plus"]["other"]."\" border=\"0\" width=\"11\" height=\"11\" alt=\"\" title=\"\" /> ".GM_LANG_add_gnote."</a>";
 			PrintHelpLink("edit_add_NOTE_help", "qm");
 			print "<br />";
 			print "<div id=\"newgnote\" style=\"display: none;\">\n";
 			print "<table class=\"facts_table\">\n";
 			// 2 NOTE
 			$gnote_focus_element = self::AddSimpleTag("$level NOTE @");
+			print "</table></div>";
 			?>
 			<script type="text/javascript">
 			<!--
@@ -1145,7 +1148,6 @@ abstract class EditFunctions {
 			//-->
 			</script>
 			<?php
-			print "</table></div>";
 		}
 		if ($tag=="OBJE") {
 			//-- Add new obje to fact
@@ -1156,13 +1158,6 @@ abstract class EditFunctions {
 			print "<table class=\"facts_table\">\n";
 			// 2 OBJE <=== as link
 			$obje_focus_element = self::AddSimpleTag(($level)." OBJE @");
-			?>
-			<script type="text/javascript">
-			<!--
-			var addobjefocus = <?php print "'".$obje_focus_element."'"; ?>;
-			//-->
-			</script>
-			<?php
 			// 2 OBJE <=== as embedded new object
 	//		self::AddSimpleTag(($level)." OBJE");
 			// 3 FORM
@@ -1178,6 +1173,13 @@ abstract class EditFunctions {
 				self::AddSimpleTag(($level+1)." _THUM");
 			}
 			print "</table></div>";
+			?>
+			<script type="text/javascript">
+			<!--
+			var addobjefocus = <?php print "'".$obje_focus_element."'"; ?>;
+			//-->
+			</script>
+			<?php
 		}
 	}
 	
