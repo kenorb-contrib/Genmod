@@ -194,7 +194,7 @@ if ($action=="edituser2") {
 	</td></tr>
 	<?php } ?>
 	<tr>
-		<td class="shade2 wrap"><div class="helpicon"><?php PrintHelpLink("edituser_user_contact_help", "qm"); print "</div><div class=\"description\">"; print GM_LANG_user_contact_method;?></td>
+		<td class="shade2 wrap"><div class="helpicon"><?php PrintHelpLink("edituser_user_contact_help", "qm"); print "</div><div class=\"description\">"; print GM_LANG_user_contact_method;?></div></td>
 		<td class="shade1"><select name="new_contact_method" tabindex="<?php $tab++; print $tab; ?>">
 		<?php if (SystemConfig::$GM_STORE_MESSAGES) { ?>
 				<option value="messaging" <?php if ($gm_user->contactmethod=='messaging') print "selected=\"selected\""; ?>><?php print GM_LANG_messaging;?></option>
@@ -205,7 +205,7 @@ if ($action=="edituser2") {
 				<option value="mailto" <?php if ($gm_user->contactmethod=='mailto') print "selected=\"selected\""; ?>><?php print GM_LANG_mailto;?></option>
 				<option value="none" <?php if ($gm_user->contactmethod=='none') print "selected=\"selected\""; ?>><?php print GM_LANG_no_messaging;?></option>
 			</select>
-		</div></td>
+		</td>
 	</tr>
 	<tr>
       <td class="shade2 wrap"><div class="helpicon"><?php PrintHelpLink("useradmin_visibleonline_help", "qm"); print "</div><div class=\"description\">"; print GM_LANG_visibleonline;?></div></td>

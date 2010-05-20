@@ -222,10 +222,10 @@ if ($action != "save" && $action != "toggleActive") { ?>
 							$i = $sortedflags[$key];
 							print "<option value=\"".$flagfiles["path"][$i]."\" ";
 							if ($v_flagsfile == $flagfiles["path"][$i]){
-								print "selected ";
+								print "selected=\"selected\" ";
 								$flag_i = $i;
 							}
-							print "/>".$flagfiles["file"][$i]."</option>\n";
+							print ">".$flagfiles["file"][$i]."</option>\n";
 						}
 						print "</select>\n";
 					} 

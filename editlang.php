@@ -212,8 +212,8 @@ switch ($el_controller->action) {
 			$counter = 0;
 			$colorid = 1;
 			foreach ($english_language_array as $string => $value) {
-				print '<div class="language_item_box'.$colorid.'">';
-				$dummy_output = "";
+//				print '<div class="language_item_box'.$colorid.'">';
+				$dummy_output = "<div class=\"language_item_box".$colorid."\">";
 				$dummy_output .= "<div class=\"original_language\">";
 				$dummy_output .= $string;
 				$dummy_output .= "</div>\n";
@@ -254,7 +254,7 @@ switch ($el_controller->action) {
 				}
 				$new_counter++;
 				
-				$dummy_output .= "</div>";
+				$dummy_output .= "</div></div>";
 				if (!$el_controller->hide_translated) {
 					print $dummy_output;
 					if ($colorid == 2) $colorid = 1;
@@ -267,7 +267,7 @@ switch ($el_controller->action) {
 					else $colorid++;
 				}
 				$counter++;
-				print '</div>';
+//				print '</div>';
 			}
 		}
 		break;
@@ -487,7 +487,7 @@ switch ($el_controller->action) {
 			</div></div>
 			<div class="admin_item_right"><div class="helpicon"><?php PrintHelpLink("edit_lang_utility_help", "qm", "edit_lang_utility"); ?></div><div class="description"><a href="editlang.php?action=edit"><?php print GM_LANG_edit_lang_utility;?></a></div></div>
 			<div class="admin_item_left"><div class="helpicon"><?php PrintHelpLink("export_lang_utility_help", "qm", "export_lang_utility"); ?></div><div class="description"><a href="editlang.php?action=export"><?php print GM_LANG_export_lang_utility;?></a></div></div>
-			<div class="admin_item_right"><div class="helpicon"><?php PrintHelpLink("translation_forum_desc", "qm", "translation_forum"); ?></div><div class="description"><a href="http://www.genmod.net/index.php?option=com_kunena&Itemid=2&func=showcat&catid=4" target="_blank" ><?php print GM_LANG_translation_forum;?></a></div></div>
+			<div class="admin_item_right"><div class="helpicon"><?php PrintHelpLink("translation_forum_desc", "qm", "translation_forum"); ?></div><div class="description"><a href="http://www.genmod.net/index.php?option=com_kunena&amp;Itemid=2&amp;func=showcat&amp;catid=4" target="_blank" ><?php print GM_LANG_translation_forum;?></a></div></div>
 			<div class="admin_item_left"><div class="helpicon"><?php PrintHelpLink("compare_lang_utility_help", "qm", "compare_lang_utility"); ?></div><div class="description"><a href="editlang.php?action=compare"><?php print GM_LANG_compare_lang_utility;?></a></div></div>
 			<div class="admin_item_right"><div class="helpicon"><?php PrintHelpLink("lang_debug_help", "qm", "lang_debug"); ?></div><div class="description"><a href="editlang.php?action=debug"><?php print GM_LANG_lang_debug;?></a></div></div>
 			<div class="admin_item_left"><div class="helpicon"><?php PrintHelpLink("bom_check_help", "qm", "bom_check"); ?></div><div class="description"><a href="editlang.php?action=bom"><?php print GM_LANG_bom_check;?></a></div></div>
@@ -499,6 +499,6 @@ switch ($el_controller->action) {
 		}
 		break;
 }
-print "</div></div>";
+print "</div>";
 PrintFooter();
 ?>

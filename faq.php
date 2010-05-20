@@ -216,14 +216,14 @@ if ($faq_controller->canconfig && $faq_controller->adminedit) {?>
 											PrintHelpLink("moveup_faq_item_help","qm","moveup_faq_item");?>
 											<a href="faq.php?action=commit&amp;type=moveup&amp;id=<?php print $faq->id; ?>"><img src="<?php print GM_IMAGE_DIR."/".$GM_IMAGES["uarrow"]["other"];?>" alt="" /></a>
 										<?php } 
-										else print "&nbsp";?>
+										else print "&nbsp;";?>
 									</div>
 									<div class="choice_middle width20">
 										<?php if ($id != $highid) {
 											PrintHelpLink("movedown_faq_item_help","qm","movedown_faq_item"); ?>
 											<a href="faq.php?action=commit&amp;type=movedown&amp;id=<?php print $faq->id; ?>"><img src="<?php print GM_IMAGE_DIR."/".$GM_IMAGES["darrow"]["other"];?>" alt="" /></a>
 										<?php } 
-										else print "&nbsp";?>
+										else print "&nbsp;";?>
 									</div>
 									<div class="choice_middle">					
 										<?php PrintHelpLink("edit_faq_item_help","qm","edit_faq_item"); ?>

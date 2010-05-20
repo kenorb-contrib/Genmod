@@ -415,7 +415,7 @@ if ($action=="edituser" || $action == "createform") { ?>
 					</div>
 				</div>
 				<div class="choice_right">
-					<input type="text" name="ufirstname" tabindex="<?php $tab++; print $tab; ?>" <?php if ($action == "edituser") { ?> value="<?php print PrintReady($user->firstname).'"'; } ?>" size="50" />
+					<input type="text" name="ufirstname" tabindex="<?php $tab++; print $tab; ?>" <?php if ($action == "edituser") { ?> value="<?php print PrintReady($user->firstname).'"'; } ?> size="50" />
 				</div>
 			</div>
 			<div class="admin_item_box">
@@ -428,7 +428,7 @@ if ($action=="edituser" || $action == "createform") { ?>
 					</div>
 				</div>
 				<div class="choice_right">
-					<input type="text" name="ulastname" tabindex="<?php $tab++; print $tab; ?>" <?php if ($action == "edituser") { ?> value="<?php print PrintReady($user->lastname).'"'; } ?>" size="50" />
+					<input type="text" name="ulastname" tabindex="<?php $tab++; print $tab; ?>" <?php if ($action == "edituser") { ?> value="<?php print PrintReady($user->lastname).'"'; } ?> size="50" />
 				</div>
 			</div>
 			<div class="admin_item_box">
@@ -506,7 +506,7 @@ if ($action=="edituser" || $action == "createform") { ?>
 					</div>
 				</div>
 				<div class="choice_right">
-					<input type="text" name="emailadress" tabindex="<?php $tab++; print $tab; ?>" dir="ltr" <?php if ($action == "edituser") {?> value="<?php print $user->email; } ?>" size="50" onchange="sndReq('errem', 'checkemail', 'email', this.value);" />&nbsp;&nbsp;<span id="errem"></span>
+					<input type="text" name="emailadress" tabindex="<?php $tab++; print $tab; ?>" dir="ltr" <?php if ($action == "edituser") {?> value="<?php print $user->email.'"'; } ?> size="50" onchange="sndReq('errem', 'checkemail', 'email', this.value);" />&nbsp;&nbsp;<span id="errem"></span>
 				</div>
 			</div>
 			<div class="admin_item_box">
@@ -970,6 +970,7 @@ if ($action == "massupdate") {
 		if (!isset($$str)) unset($userlist[$key]);
 	}
 	?>
+	<form name="massupdate" method="post" action="useradmin.php">
 	<!-- Setup the left box -->
 	<div id="admin_genmod_left">
 		<div class="admin_link"><a href="admin.php"><?php print GM_LANG_admin;?></a></div>
@@ -981,7 +982,6 @@ if ($action == "massupdate") {
 		<div class="admin_topbottombar"><?php print GM_LANG_mu_users; ?></div>
 		<!-- Start print the form -->
 		<?php if (count($userlist) > 0) { ?> 
-			<form name="massupdate" method="post" action="useradmin.php">
 				<input type="hidden" name="action" value="massupdate2" />
 				<input type="hidden" name="sort" value="<?php print $sort;?>" />
 				<input type="hidden" name="filter" value="<?php print $filter;?>" />
@@ -1462,11 +1462,11 @@ if ($action == "massupdate") {
 			<!-- End Gedcom related settings -->
 			
 			<div class="admin_item_box center">
-					<input type="submit" tabindex="<?php print $tab;?>" value="<?php print GM_LANG_mass_update; ?>" />
+					<br /><input type="submit" tabindex="<?php print $tab;?>" value="<?php print GM_LANG_mass_update; ?>" />
 			</div>
-			</form>
 		<?php } ?>
 	</div>
+	</form>
 	<?php
 }
 
@@ -2027,10 +2027,13 @@ if ($action == "") {
 	<div id="admin_genmod_left">
 		<div class="admin_link"><a href="admin.php"><?php print GM_LANG_admin;?></a></div>
 	</div>
+	<!-- Setup the middle box -->
 	<div id="content">
+		<!-- Setup the top bar -->
 		<div class="admin_topbottombar">
 			<?php print "<h3>".GM_LANG_user_admin."</h3>"; ?>
 		</div>
+		<!-- Setup the links to the user list etc -->
 		<div class="admin_item_box">
 			<div class="admin_item_left">
 				<a href="useradmin.php?action=listusers"><?php print GM_LANG_current_users;?></a><br />
@@ -2046,7 +2049,8 @@ if ($action == "") {
 		</div>
 		<?php if ($message != "") {
 			print "<div class=\"shade2 center\">".$message."</div>";
-		}?>
+		} ?>
+		<!-- Setup the top bar for info -->
 		<div class="admin_topbottombar"><?php print GM_LANG_admin_info; ?></div>
 		<?php
 		$users = UserController::GetUsers();
@@ -2088,6 +2092,7 @@ if ($action == "") {
 			}
 		}
 		?>
+		<!-- Setup the info block -->
 		<div class="admin_item_box">
 			<div class="width30 choice_left">
 				<?php print GM_LANG_users_total;?>
@@ -2114,30 +2119,34 @@ if ($action == "") {
 			<div class="width30 choice_left">
 				<?php print GM_LANG_users_gedadmin;?>
 			</div>
-		<?php
-		asort($gedadmin);
-		$pass = 1;
-		foreach ($gedadmin as $key=>$geds) {
+			<?php
+			if (count($gedadmin) == 0) { ?>
+				<div class="width30 choice_right">
+					0
+				</div>
+			<?php } 			
+			asort($gedadmin);
+			$pass = 1;
+			foreach ($gedadmin as $key=>$geds) {
 			if ($pass > 1) { ?>
 				</div>
-					<div class="admin_item_box">
-						<div class="width30 choice_left">
-							&nbsp;
-						</div>
-				<?php }
-				$pass = 2;
+				<div class="admin_item_box">
+					<div class="width30 choice_left">
+						&nbsp;
+					</div>
+			<?php }
+			$pass = 2;
 			?>
-			
-				<div class="width30 choice_right">
-					<?php
-					$ind = 1;
-					if ($geds["number"] == 0) print $geds["name"];
-					else print "<a href=\"useradmin.php?action=listusers&amp;filter=gedadmin&amp;gedid=".$geds["ged"]."\">".$geds["name"]."</a>";
-					?>
-				</div>
-				<div class="choice_right">
-					<?php print $geds["number"]; ?>
-				</div>
+			<div class="width30 choice_right">
+				<?php
+				$ind = 1;
+				if ($geds["number"] == 0) print $geds["name"];
+				else print "<a href=\"useradmin.php?action=listusers&amp;filter=gedadmin&amp;gedid=".$geds["ged"]."\">".$geds["name"]."</a>";
+				?>
+			</div>
+			<div class="choice_right">
+				<?php print (int)$geds["number"]; ?>
+			</div>
 			
 		<?php } ?>
 		</div>
@@ -2191,11 +2200,11 @@ if ($action == "") {
 			$pass = 1;
 			foreach ($userlang as $key=>$ulang) {
 				if ($pass > 1) { ?>
+				</div>
+				<div class="admin_item_box">
+					<div class="width30 choice_left">
+						&nbsp;
 					</div>
-					<div class="admin_item_box">
-						<div class="width30 choice_left">
-							&nbsp;
-						</div>
 				<?php }
 				$pass = 2;
 				?>
@@ -2209,7 +2218,6 @@ if ($action == "") {
 					<?php print $ulang["number"];?>
 				</div>
 			<?php } ?>
-			</div>
 		</div>
 	</div>
 <?php }
@@ -2288,26 +2296,26 @@ if ($action == "cleanup_messages") {
 					}
 					
 					// Now print the users
-					if ($count%2) print "\n<div class=\"admin_item_box wrap\">";
+					if ($count%2) print "\n<div class=\"admin_item_box wrap\">\n";
 						print "<div class=\"choice_left\" style=\"width:28%\">";
 							print $user->username."&nbsp;(".$user->firstname." ".$user->lastname.")";
-						print "</div>";
+						print "</div>\n";
 						print "<div class=\"choice_left width10 center\">";
 							print count($messages);
-						print "</div>";
-						if ($count%2) print "<div class=\"choice_left width10 center\">";
+						print "</div>\n";
+						if ($count%2) print "<div class=\"choice_left width10 center\">\n";
 						else print "<div class=\"choice_right width10 center\">";
 							print "<input type=\"checkbox\" name=\"msg_".$user->username."\" value=\"yes\" />";
-						print "</div>";
-					if ($count%2 == 0) print "</div>";
+						print "</div>\n";
+					if ($count%2 == 0) print "</div>\n";
 				}
 			}
 			if ($count%2) print "</div>";
-			print "<div class=\"admin_item_box shade1\"></div>";
-			print "<div class=\"center shade2\"><br /><input type=\"submit\" value=\"".GM_LANG_del_mail."\" onclick=\"document.cleanmessageform.action.value='cleanup_messbox'; return confirm('".GM_LANG_confirm_sure."');\" /></div>";
+			print "<div class=\"admin_item_box shade1\"></div>\n";
+			print "<div class=\"center shade2\"><br /><input type=\"submit\" value=\"".GM_LANG_del_mail."\" onclick=\"document.cleanmessageform.action.value='cleanup_messbox'; return confirm('".GM_LANG_confirm_sure."');\" /></div>\n";
 			
 			// Print the month cleanup
-			print "<div class=\"admin_item_box shade1\"></div>";
+			print "<div class=\"admin_item_box shade1\"></div>\n";
 			print "<div class=\"admin_item_box shade2 center\"><br />";
 			$sum = array_sum($mons);
 			print GM_LANG_total_messages."&nbsp;&nbsp;&nbsp;".$sum."<br />";
@@ -2323,17 +2331,17 @@ if ($action == "cleanup_messages") {
 				$mons[$mon] = $perc;
 //				print $mon." ".$mons[$mon];
 			}
-			print "<label for=\"cleanup\">".GM_LANG_cleanup_older."&nbsp;&nbsp;&nbsp;</label>";
-			print "<select id=\"cleanup\" name=\"cleanup\">";
+			print "<label for=\"cleanup\">".GM_LANG_cleanup_older."&nbsp;&nbsp;&nbsp;</label>\n";
+			print "<select  name=\"cleanup\">\n";
 			for ($i=0; $i<=$maxmon; $i++) {
 				if (isset($mons[$i])) {
 					print "<option value=\"".$i."\"";
-					if ($i == $maxmon) print "selected=\"selected\" ";
-					print ">".$i."&nbsp;".GM_LANG_months." (".$mons[$i]."%)</option>";
+					if ($i == $maxmon) print " selected=\"selected\" ";
+					print ">".$i."&nbsp;".GM_LANG_months." (".$mons[$i]."%)</option>\n";
 				}
 			}
-			print "</select>";
-			print "<input type=\"submit\" value=\"".GM_LANG_delete."\" onclick=\"document.cleanmessageform.action.value='cleanup_messold'; return confirm('".GM_LANG_confirm_sure."');\" /></div>";
+			print "</select>\n";
+			print "<input type=\"submit\" id=\"cleanup\" value=\"".GM_LANG_delete."\" onclick=\"document.cleanmessageform.action.value='cleanup_messold'; return confirm('".GM_LANG_confirm_sure."');\" /></div>";
 			?>
 		</form>
 	</div>
