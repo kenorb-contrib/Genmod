@@ -69,7 +69,7 @@ else {
 	}
 }
 
-print "\n</div>\n";
+print "\n</div><br style=\"clear:both;\" />\n";
 print "<div class=\"left\">";
 print "<a href=\"#top\" title=\"".GM_LANG_move_up."\">$UpArrow</a><br />";
 print "<a href=\"help_text.php?help=help_contents_help\"><b>".GM_LANG_help_contents."</b></a><br />";
