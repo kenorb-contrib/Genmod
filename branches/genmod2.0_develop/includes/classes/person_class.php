@@ -50,6 +50,8 @@ class Person extends GedcomRecord {
 											// N.B.: If unknown, it is estimated.
 	private $ddate = null;					// The death date in gedcom 2 DATE xxxxxx format. Privacy is applied.
 											// N.B.: If unknown, it is estimated.
+	private $bplac = null;					// The birth place in gedcom 2 DATE xxxxxx format. Privacy is applied. 
+	private $dplac = null;					// The death place in gedcom 2 DATE xxxxxx format. Privacy is applied.
 	private $brec = null;					// The complete birthrecord in gedcom format. Privacy is applied. For now used in timeline.
 	private $drec = null;					// The complete deathrecord in gedcom format. Privacy is applied.
 	private $sex = null;					// Gender of the person: M, F, U. Privacy is applied.
@@ -154,6 +156,12 @@ class Person extends GedcomRecord {
 				break;
 			case "ddate":
 				return $this->GetDeathDate();
+				break;
+			case "bplac":
+				return $this->GetBirthPlace();
+				break;
+			case "dplac":
+				return $this->GetDeathPlace();
 				break;
 			case "brec":
 				return $this->GetBirthRecord();
@@ -402,6 +410,7 @@ class Person extends GedcomRecord {
 			if ($this->DisplayDetails() && PrivacyFunctions::showFact("BIRT", $this->xref, "INDI") && PrivacyFunctions::showFactDetails("BIRT", $this->xref) && !PrivacyFunctions::FactViewRestricted($this->xref, $subrecord, 2)) {
 				$this->brec = $subrecord;
  				$this->bdate = GetSubRecord(2, "2 DATE", $this->brec);
+ 				$this->bplac = GetSubRecord(2, "2 PLAC", $this->brec);
 			}
 			else {
 				$this->brec = "";
@@ -411,6 +420,7 @@ class Person extends GedcomRecord {
 			if ($this->DisplayDetails() && PrivacyFunctions::showFact("DEAT", $this->xref, "INDI") && PrivacyFunctions::showFactDetails("DEAT", $this->xref) && !PrivacyFunctions::FactViewRestricted($this->xref, $subrecord, 2)) {
 				$this->drec = $subrecord;
 				$this->ddate = GetSubRecord(2, "2 DATE", $this->drec);
+ 				$this->dplac = GetSubRecord(2, "2 PLAC", $this->drec);
 			}
 			else {
 				$this->drec = "";
@@ -440,6 +450,19 @@ class Person extends GedcomRecord {
 		if (is_null($this->ddate)) $this->ParseBirthDeath();
 		return $this->ddate;
 	}
+	
+	private function GetBirthPlace() {
+		
+		if (is_null($this->bplac)) $this->ParseBirthDeath();
+		return $this->bplac;
+	}
+	
+	private function GetDeathPlace() {
+		
+		if (is_null($this->dplac)) $this->ParseBirthDeath();
+		return $this->dplac;
+	}
+	
 	private function GetBirthRecord() {
 		
 		if (is_null($this->brec)) $this->ParseBirthDeath();
@@ -552,6 +575,8 @@ class Person extends GedcomRecord {
 						if ($fam->husb->GetDeathRecord() != "" && CompareFacts($this->GetBirthDate(), $fam->husb->GetDeathDate()) < 0 && CompareFacts($fam->husb->GetDeathDate(), $this->GetDeathDate()) < 0) {
 							$factrec = "1 ".$fact;
 							$factrec .= "\n".trim($fam->husb->GetDeathDate());
+							$plac = trim($fam->husb->GetDeathPlace());
+							if (!empty($plac)) $factrec .= "\n".$plac;
 							$factrec .= "\n2 ASSO @".$fam->husb->xref."@";
 							$factrec .= "\n3 RELA ".(NameFunctions::GetSosaName($sosa*2));
 							if ($this->tracefacts) print "AddParentsFacts sosa ".$sosa."- Adding for ".$fam->xref.": ".$fact." ".$factrec."<br />";
@@ -569,6 +594,8 @@ class Person extends GedcomRecord {
 						if ($fam->wife->GetDeathRecord() != "" && CompareFacts($this->GetBirthDate(), $fam->wife->GetDeathDate())<0 && CompareFacts($fam->wife->GetDeathDate(), $this->GetDeathDate())<0) {
 							$factrec = "1 ".$fact;
 							$factrec .= "\n".trim($fam->wife->GetDeathDate());
+							$plac = trim($fam->wife->GetDeathPlace());
+							if (!empty($plac)) $factrec .= "\n".$plac;
 							$factrec .= "\n2 ASSO @".$fam->wife->xref."@";
 							$factrec .= "\n3 RELA ".(NameFunctions::GetSosaName($sosa*2+1));
 							if ($this->tracefacts) print "AddParentsFacts sosa ".$sosa."- Adding for ".$fam->xref.": ".$fact." ".$factrec."<br />";
@@ -597,6 +624,7 @@ class Person extends GedcomRecord {
 							if (CompareFacts($this->bdate, $psfam->marr_date)<0 and CompareFacts($psfam->marr_date, $this->ddate)<0) {
 								$factrec = "1 ".$fact;
 								$factrec .= "\n".trim($psfam->marr_date);
+								$factrec .= ($psfam->marr_plac == "" ? "" : "\n".$psfam->marr_plac);
 								$factrec .= "\n2 ASSO @".$parent->xref."@";
 								$factrec .= "\n3 RELA ".$rela;
 								if ($psfam->husb_id == $parent->xref) $spouse = $psfam->wife_id;
@@ -687,6 +715,8 @@ class Person extends GedcomRecord {
 					if ($child->GetBirthRecord() != "" && CompareFacts($this->GetBirthDate(), $child->GetBirthDate()) < 0 && CompareFacts($child->GetBirthDate(), $this->GetDeathDate()) < 0) {
 						$factrec = "1 ".$fact;
 						$factrec .= "\n".trim($child->bdate);
+						$plac = trim($child->bplac);
+						if (!empty($plac)) $factrec .= "\n".$plac;
 						$factrec .= "\n2 ASSO @".$child->xref."@";
 						$factrec .= "\n3 RELA ".$rela;
 						if ($this->tracefacts) print "AddChildrenFacts (".$option.") - Adding for ".$child->xref.": ".$fact." ".$factrec."<br />";
@@ -705,6 +735,8 @@ class Person extends GedcomRecord {
 					if ($child->GetDeathRecord() != "" && CompareFacts($this->GetBirthDate(), $child->GetDeathDate()) < 0 && CompareFacts($child->GetDeathDate(), $this->GetDeathDate()) < 0) {
 						$factrec = "1 ".$fact;
 						$factrec .= "\n".trim($child->ddate);
+						$plac = trim($child->dplac);
+						if (!empty($plac)) $factrec .= "\n".$plac;
 						$factrec .= "\n2 ASSO @".$child->xref."@";
 						$factrec .= "\n3 RELA ".$rela;
 						if ($this->tracefacts) print "AddChildrenFacts (".$option.") - Adding for ".$child->xref.": ".$fact." ".$factrec."<br />";
@@ -727,6 +759,7 @@ class Person extends GedcomRecord {
 							if (CompareFacts($this->GetBirthDate(), $childfam->marr_date)<0 and CompareFacts($childfam->marr_date, $this->GetDeathDate())<0) {
 								$factrec = "1 ".$fact;
 								$factrec .= "\n".trim($childfam->marr_date);
+								$factrec .= ($childfam->marr_plac == "" ? "" : "\n".trim($childfam->marr_plac));
 								$factrec .= "\n2 ASSO @".$child->xref."@";
 								$factrec .= "\n3 RELA ".$rela;
 								if ($childfam->husb_id == $child->xref) $spouse = $childfam->wife_id;
@@ -792,6 +825,8 @@ class Person extends GedcomRecord {
 			if ($fam->$spperson->GetDeathRecord() != "" && CompareFacts($this->GetBirthDate(), $fam->$spperson->GetDeathDate())<0 and CompareFacts($fam->$spperson->GetDeathDate(), $this->GetDeathDate())<0) {
 				$factrec = "1 ".$fact;
 				$factrec .= "\n".trim($fam->$spperson->ddate);
+				$plac = trim($fam->$spperson->dplac);
+				if (!empty($plac)) $factrec .= "\n".$plac;
 				$factrec .= "\n2 ASSO @".$fam->$spperson->xref."@";
 				$factrec .= "\n3 RELA spouse";
 				if ($this->tracefacts) print "AddSpouseFacts - Adding for ".$fam->$spperson->xref.": ".$fact." ".$factrec."<br />";
@@ -875,13 +910,14 @@ class Person extends GedcomRecord {
 								if (PrivacyFunctions::showFact($fact, $rid, $asso->type) && PrivacyFunctions::showFactDetails($fact, $rid)) {
 									$label = strip_tags(constant("GM_FACT_".$fact));
 									$sdate = GetSubRecord(2, "2 DATE", $srec);
+									$splac = GetSubRecord(2, "2 PLAC", $srec);
 									// relationship ?
 									if ($asso->role == "") $rela = "ASSO";
 									if (defined("GM_LANG_".$asso->role)) $rela = constant("GM_LANG_".$asso->role);
 									else if (defined("GM_FACT_".$asso->role)) $rela = constant("GM_FACT_".$asso->role);
 									// add an event record
 									$factrec = "1 EVEN\n2 TYPE ".$label."<br/>[".$rela."]";
-									$factrec .= "\n".trim($sdate);
+									$factrec .= "\n".trim($sdate).(empty($splac) ? "" : "\n".trim($splac));
 									if ($asso->type == "FAM") {
 										$fam =& Family::GetInstance($rid);
 										if ($asso->associated->husb_id != "") $factrec .= "\n2 ASSO @".$asso->associated->husb_id."@"; 

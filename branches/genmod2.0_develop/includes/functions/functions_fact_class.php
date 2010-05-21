@@ -1268,7 +1268,7 @@ abstract class FactFunctions {
 		}
 		if ($factobj->disp) {
 			if (!in_array($factobj->fact, $emptyfacts)) {
-				$ct = preg_match("/1 $fact(.*)/", $factobj->factrec, $match);
+				$ct = preg_match("/1 $factobj->fact(.*)/", $factobj->factrec, $match);
 				if ($ct>0) print PrintReady(trim($match[1]));
 			}
 			$factobj->PrintFactDate(false, false, $print_parents_age, $print_age_at_event);
@@ -1358,13 +1358,12 @@ abstract class FactFunctions {
 			}
 	
 			if ($text!="") $text=PrintReady($text);
-	
+			
 			$ct = preg_match("/\d DATE(.*)/", $factobj->factrec, $match);
 			if ($ct>0) {
 				$text .= " - <span class=\"date\">".GetDateUrl($match[1], $CalYear)."</span>";
 				$yt = preg_match("/ (\d\d\d\d|\d\d\d)/", $match[1], $ymatch);
 				if ($yt>0) {
-	
 					$hct = preg_match("/2 DATE.*(@#DHEBREW@)/", $match[1], $hmatch);
 		            if ($hct>0 && GedcomConfig::$USE_RTL_FUNCTIONS && $action=='today')
 	                   $age = $currhYear - $ymatch[1];
@@ -1374,7 +1373,7 @@ abstract class FactFunctions {
 					if ($yt2>0) {
 						if (isset($monthtonum[strtolower(trim($bmatch[1]))])) {
 							$emonth = $monthtonum[strtolower(trim($bmatch[1]))];
-							if (!$Upcoming && ($emonth < $monthtonum[strtolower($month)])) $age--;
+							if (!$Upcoming && isset($monthtonum[strtolower($month)]) && ($emonth < $monthtonum[strtolower($month)])) $age--;
 							$bt = preg_match("/(\d+) ... (\d\d\d\d|\d\d\d)/", $match[1], $bmatch);
 							if ($bt>0) {
 								$edate = trim($bmatch[1]);

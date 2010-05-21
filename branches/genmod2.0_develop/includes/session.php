@@ -385,22 +385,23 @@ else $GEDCOMS = array();
 if (empty($_REQUEST["gedid"])) {
 	// Try to get the gedcom id from the session
 	if (isset($_SESSION["GEDCOMID"]) && !empty($_SESSION["GEDCOMID"])) $GEDCOMID = $_SESSION["GEDCOMID"];
-	else {
-		// NOTE: There is no session Gedcom ID yet, and no ID was specified so get the default gedcom
-		if (empty($GEDCOMID)) $GEDCOMID=$DEFAULT_GEDCOMID;
-		// If still empty, get the first imported gedcom's id
-		else if ((empty($GEDCOMID))&&(count($GEDCOMS)>0)) {
-			foreach($GEDCOMS as $ged_file=>$ged_array) {
-				$GEDCOMID = $ged_file;
-				if (CheckForImport($ged_file)) break;
-			}
-		}
-	}
 }
 else {
 	// NOTE: There is a value in the URL for GEDCOMID. Make sure it is a number
 	settype($_REQUEST["gedid"], "integer");
-	$GEDCOMID = $_REQUEST["gedid"];
+	if (isset($GEDCOMS[$gedid])) $GEDCOMID = $_REQUEST["gedid"];
+}
+// We have an unknown or invalid gedcomid. Now get it otherwise
+if (empty($GEDCOMID)) {
+	// NOTE: There is no session Gedcom ID yet, and no ID was specified so get the default gedcom
+	if (empty($GEDCOMID)) $GEDCOMID=$DEFAULT_GEDCOMID;
+	// If still empty, get the first imported gedcom's id
+	else if ((empty($GEDCOMID))&&(count($GEDCOMS)>0)) {
+		foreach($GEDCOMS as $ged_file=>$ged_array) {
+			$GEDCOMID = $ged_file;
+			if (CheckForImport($ged_file)) break;
+		}
+	}
 }
 
 $_SESSION["GEDCOMID"] = $GEDCOMID;
