@@ -826,7 +826,7 @@ if ($step == 5) {
 						$place_count += ImportFunctions::UpdatePlaces($gid, $type, $indirec, false, $gedcomid);
 						$date_count += ImportFunctions::UpdateDates($gid, $indirec, $gedcomid);
 					}
-					else WriteToLog("UploadGedcom -> Import skipped a aecord with a BLOB tag: ".$indirec, "E", "G", get_gedcom_from_id($gedcomid));
+					else WriteToLog("UploadGedcom -&gt; Import skipped a aecord with a BLOB tag: ".$indirec, "E", "G", get_gedcom_from_id($gedcomid));
 						
 					//-- calculate some statistics
 					if (!isset($show_type)){

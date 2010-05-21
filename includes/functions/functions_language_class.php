@@ -98,7 +98,7 @@ abstract class LanguageFunctions {
 			}
 			else {
 				$number = 0;
-				WriteToLog("LoadEnglish-> Language table not available in database. Trying to load language from file.","E","S");
+				WriteToLog("LoadEnglish-&gt; Language table not available in database. Trying to load language from file.","E","S");
 				// NOTE: If both string arrays are empty, no data came out of the database
 				// NOTE: We load the language from the file and write an error to the log
 				if (file_exists("languages/lang.en.txt")) {
@@ -115,9 +115,9 @@ abstract class LanguageFunctions {
 						else $temp[$row["lg_string"]] = substr(trim($data[1]),0,(strlen(trim($data[1]))-1));
 					}
 					if ($number > 0) {
-						WriteToLog("LoadEnglish-> Language successfully loaded from file.","I","S");
+						WriteToLog("LoadEnglish-&gt; Language successfully loaded from file.","I","S");
 					}
-					else WriteToLog("LoadEnglish-> Language was not loaded from file.","E","S");
+					else WriteToLog("LoadEnglish-&gt; Language was not loaded from file.","E","S");
 				}
 	
 				if (file_exists("languages/help_text.en.txt")) {
@@ -133,8 +133,8 @@ abstract class LanguageFunctions {
 						}
 						else $temp[$row["lg_string"]] = substr(trim($data[1]),0,(strlen(trim($data[1]))-1));
 					}
-					if ($number > 0) WriteToLog("Language help successfully loaded from file.","I","S");
-					else WriteToLog("LoadEnglish-> Language help was not loaded from file.","E","S");
+					if ($number > 0) WriteToLog("LoadEnglish-&gt; Language help successfully loaded from file.","I","S");
+					else WriteToLog("LoadEnglish-&gt; Language help was not loaded from file.","E","S");
 				}
 			}
 		}
@@ -187,7 +187,7 @@ abstract class LanguageFunctions {
 			}
 			else {
 				$number = 0;
-				WriteToLog("LoadEnglishFacts-> Facts table not available in database. Trying to load facts from file.","E","S");
+				WriteToLog("LoadEnglishFacts-&gt; Facts table not available in database. Trying to load facts from file.","E","S");
 				// NOTE: If both string arrays are empty, no data came out of the database
 				// NOTE: We load the language from the file and write an error to the log
 				if (file_exists("languages/facts.en.txt")) {
@@ -205,12 +205,12 @@ abstract class LanguageFunctions {
 					}
 					if (!$return) {
 						if ($found) {
-							WriteToLog("LoadEnglishFacts-> Factarray successfully loaded from file.","I","S");
+							WriteToLog("LoadEnglishFacts-&gt; Factarray successfully loaded from file.","I","S");
 						}
-						else WriteToLog("LoadEnglishFacts-> Factarray was not loaded from file.","E","S");
+						else WriteToLog("LoadEnglishFacts-&gt; Factarray was not loaded from file.","E","S");
 					}
 				}
-				else WriteToLog("LoadEnglishFacts-> Factarray was not loaded from file.","E","S");
+				else WriteToLog("LoadEnglishFacts-&gt; Factarray was not loaded from file.","E","S");
 			}
 		}
 		if ($return) return $temp;

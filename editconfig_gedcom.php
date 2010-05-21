@@ -391,7 +391,7 @@ if ($action=="update") {
 			}
 		}
 	}
-	WriteToLog("EditConfigGedcom-> Gedcom configuration for ".$FILE."  updated by >".$gm_user->username."<", "I", "G", get_id_from_gedcom($FILE));
+	WriteToLog("EditConfigGedcom-&gt; Gedcom configuration for ".$FILE."  updated by >".$gm_user->username."<", "I", "G", get_id_from_gedcom($FILE));
 	if (!$errors) {
 		$gednews = NewsController::getUserNews(get_id_from_gedcom($FILE));
 		if (count($gednews)==0) {

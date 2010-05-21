@@ -366,9 +366,9 @@ switch ($action) {
 			// Restore logfiles. Do this first, so we can write the restore results to the logfile.
 			if (isset($_POST["um_logs"])) {
 				$result = AdminFunctions::ImportTable("export_log.sql");
-				if (empty($result)) WriteToLog("Restore-> Restore of logfiles and counters successful", "I", "S");
+				if (empty($result)) WriteToLog("Restore-&gt; Restore of logfiles and counters successful", "I", "S");
 				else {
-					WriteToLog("Restore-> Restore of logfiles and counters failed with error: ".$result, "E", "S");
+					WriteToLog("Restore-&gt; Restore of logfiles and counters failed with error: ".$result, "E", "S");
 					$error = true;
 				}
 			}
@@ -376,9 +376,9 @@ switch ($action) {
 			// Restore lockout table
 			if (isset($_POST["um_config"])) {
 				$result = AdminFunctions::ImportTable("export_config.sql");
-				if (empty($result)) WriteToLog("Restore-> Restore of lockout table successful", "I", "S");
+				if (empty($result)) WriteToLog("Restore-&gt; Restore of lockout table successful", "I", "S");
 				else {
-					WriteToLog("Restore-> Restore of lockout table failed with error: ".$result, "E", "S");
+					WriteToLog("Restore-&gt; Restore of lockout table failed with error: ".$result, "E", "S");
 					$error = true;
 				}
 			}
@@ -386,9 +386,9 @@ switch ($action) {
 			// Restore language settings 
 			if (isset($_POST["um_lang"])) {
 				$result = AdminFunctions::ImportTable("export_lang_settings.sql");
-				if (empty($result)) WriteToLog("Restore-> Restore of language settings successful", "I", "S");
+				if (empty($result)) WriteToLog("Restore-&gt; Restore of language settings successful", "I", "S");
 				else {
-					WriteToLog("Restore-> Restore of language settings failed with error: ".$result, "E", "S");
+					WriteToLog("Restore-&gt; Restore of language settings failed with error: ".$result, "E", "S");
 					$error = true;
 				}
 			}
@@ -396,9 +396,9 @@ switch ($action) {
 			// Restore changes
 			if (isset($_POST["um_changes"])) {
 				$result = AdminFunctions::ImportTable("export_changes.sql");
-				if (empty($result)) WriteToLog("Restore-> Restore of changes successful", "I", "S");
+				if (empty($result)) WriteToLog("Restore-&gt; Restore of changes successful", "I", "S");
 				else {
-					WriteToLog("Restore-> Restore of changes failed with error: ".$result, "E", "S");
+					WriteToLog("Restore-&gt; Restore of changes failed with error: ".$result, "E", "S");
 					$error = true;
 				}
 			}
@@ -406,9 +406,9 @@ switch ($action) {
 			// Restore gedcom settings
 			if (isset($_POST["um_gedsets"])) {
 				$result = AdminFunctions::ImportTable("export_gedcomsettings.sql");
-				if (empty($result)) WriteToLog("Restore-> Restore of gedcom settings successful", "I", "S");
+				if (empty($result)) WriteToLog("Restore-&gt; Restore of gedcom settings successful", "I", "S");
 				else {
-					WriteToLog("Restore-> Restore of gedcom settings failed with error: ".$result, "E", "S");
+					WriteToLog("Restore-&gt; Restore of gedcom settings failed with error: ".$result, "E", "S");
 					$error = true;
 				}
 			}
@@ -416,9 +416,9 @@ switch ($action) {
 			// Restore usersettings
 			if (isset($_POST["um_usinfo"])) {
 				$result = AdminFunctions::ImportTable("export_users.sql");
-				if (empty($result)) WriteToLog("Restore-> Restore of usersettings successful", "I", "S");
+				if (empty($result)) WriteToLog("Restore-&gt; Restore of usersettings successful", "I", "S");
 				else {
-					WriteToLog("Restore-> Restore of usersettings failed with error: ".$result, "E", "S");
+					WriteToLog("Restore-&gt; Restore of usersettings failed with error: ".$result, "E", "S");
 					$error = true;
 				}
 			}
@@ -426,9 +426,9 @@ switch ($action) {
 			// Restore MyPages
 			if (isset($_POST["um_mypages"])) {
 				$result = AdminFunctions::ImportTable("export_mypages.sql");
-				if (empty($result)) WriteToLog("Restore-> Restore of MyPages successful", "I", "S");
+				if (empty($result)) WriteToLog("Restore-&gt; Restore of MyPages successful", "I", "S");
 				else {
-					WriteToLog("Restore-> Restore of MyPages failed with error: ".$result, "E", "S");
+					WriteToLog("Restore-&gt; Restore of MyPages failed with error: ".$result, "E", "S");
 					$error = true;
 				}
 			}
@@ -436,9 +436,9 @@ switch ($action) {
 			// Restore Actions
 			if (isset($_POST["um_actions"])) {
 				$result = AdminFunctions::ImportTable("export_actions.sql");
-				if (empty($result)) WriteToLog("Restore-> Restore of ToDo's successful", "I", "S");
+				if (empty($result)) WriteToLog("Restore-&gt; Restore of ToDo's successful", "I", "S");
 				else {
-					WriteToLog("Restore-> Restore of ToDo's failed with error: ".$result, "E", "S");
+					WriteToLog("Restore-&gt; Restore of ToDo's failed with error: ".$result, "E", "S");
 					$error = true;
 				}
 			}

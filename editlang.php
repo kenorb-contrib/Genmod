@@ -326,16 +326,16 @@ switch ($el_controller->action) {
 					if (!$handle = fopen("languages/lang.".$el_controller->lang_shortcut.".txt", "w")) {
 						print str_replace("#lang_filename#", "languages/lang.".$el_controller->lang_shortcut.".txt", GM_LANG_no_open)."<br />";
 						$storeerror = true;
-						WriteToLog("EditLang-> Can't open file languages/lang.".$el_controller->lang_shortcut.".txt", "E", "S");
+						WriteToLog("EditLang-&gt; Can't open file languages/lang.".$el_controller->lang_shortcut.".txt", "E", "S");
 					}
 					else {
 						if (fwrite($handle, $data)) {
-							WriteToLog("EditLang-> ".GM_LANG_editlang_lang_export_success, "I", "S");
+							WriteToLog("EditLang-&gt; ".GM_LANG_editlang_lang_export_success, "I", "S");
 							print GM_LANG_editlang_lang_export_success."<br />";
 						}
 						else {
 							$storeerror = true;
-							WriteToLog("EditLang-> ".GM_LANG_editlang_lang_export_no_success, "E", "S");
+							WriteToLog("EditLang-&gt; ".GM_LANG_editlang_lang_export_no_success, "E", "S");
 							print "<span class=\"error\">".GM_LANG_editlang_lang_export_no_success."</span><br />";
 						}
 						fclose($handle);            
@@ -346,16 +346,16 @@ switch ($el_controller->action) {
 					if (!$handle_help = fopen("languages/help_text.".$el_controller->lang_shortcut.".txt", "w")) {
 						print str_replace("#lang_filename#", "languages/help_text.".$el_controller->lang_shortcut.".txt", GM_LANG_no_open)."<br />";
 						$storeerror = true;
-						WriteToLog("EditLang-> Can't open file languages/help_text.".$el_controller->lang_shortcut.".txt", "E", "S");
+						WriteToLog("EditLang-&gt; Can't open file languages/help_text.".$el_controller->lang_shortcut.".txt", "E", "S");
 					}
 					else {
 						if (fwrite($handle_help, $data_help)) {
-							WriteToLog("EditLang-> ".GM_LANG_editlang_help_export_success, "I", "S");
+							WriteToLog("EditLang-&gt; ".GM_LANG_editlang_help_export_success, "I", "S");
 							print GM_LANG_editlang_help_export_success."<br />";
 						}
 						else {
 							$storeerror = true;
-							WriteToLog("EditLang-> ".GM_LANG_editlang_help_no_export_success, "E", "S");
+							WriteToLog("EditLang-&gt; ".GM_LANG_editlang_help_no_export_success, "E", "S");
 							print "<span class=\"error\">".GM_LANG_editlang_help_no_export_success."</span><br />";
 						}
 						fclose($handle_help);
@@ -373,16 +373,16 @@ switch ($el_controller->action) {
 					if (!$handle = fopen("languages/facts.".$el_controller->lang_shortcut.".txt", "w")) {
 						print str_replace("#lang_filename#", "languages/facts.".$el_controller->lang_shortcut.".txt", GM_LANG_no_open)."<br />";
 						$storeerror = true;
-						WriteToLog("EditLang-> Can't open file languages/facts.".$el_controller->lang_shortcut.".txt", "E", "S");
+						WriteToLog("EditLang-&gt; Can't open file languages/facts.".$el_controller->lang_shortcut.".txt", "E", "S");
 					}
 					else {
 						if (fwrite($handle, $data)) {
-							WriteToLog("EditLang-> ".GM_LANG_editlang_facts_export_success, "I", "S");
+							WriteToLog("EditLang-&gt; ".GM_LANG_editlang_facts_export_success, "I", "S");
 							print GM_LANG_editlang_facts_export_success."<br />";
 						}
 						else {
 							$storeerror = true;
-							WriteToLog("EditLang-> ".GM_LANG_editlang_facts_export_no_success, "E", "S");
+							WriteToLog("EditLang-&gt; ".GM_LANG_editlang_facts_export_no_success, "E", "S");
 							print "<span class=\"error\">".GM_LANG_editlang_facts_export_no_success."</span><br />";
 						}
 						fclose($handle);            

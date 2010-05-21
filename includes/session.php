@@ -260,6 +260,8 @@ $CONFIG_VARS[] = "CONFIG_VERSION";
 $CONFIG_VARS[] = "NEWS_TYPE";
 $CONFIG_VARS[] = "PROXY_ADDRESS";
 $CONFIG_VARS[] = "PROXY_PORT";
+$CONFIG_VARS[] = "PROXY_USER";
+$CONFIG_VARS[] = "PROXY_PASSWORD";
 $CONFIG_VARS[] = "DEFAULT_GEDCOMID";
 $CONFIG_VARS[] = "GEDCOMS";
 $CONFIG_VARS[] = "CONFIGURED";
@@ -280,7 +282,7 @@ foreach($CONFIG_VARS as $indexval => $VAR) {
 			// NOTE: Setup the database connection, needed for logging
 //			include("db_layer.php");
 			$DBCONN = New DbLayer();
-			WriteToLog("Session-> Config variable override detected. Possible hacking attempt. Script terminated.", "W", "S");
+			WriteToLog("Session-&gt; Config variable override detected. Possible hacking attempt. Script terminated.", "W", "S");
 			SystemFunctions::HandleIntrusion("Session-> Config variable override detected. Possible hacking attempt. Script terminated.\n");
 		}
 		exit;
@@ -337,7 +339,7 @@ foreach($_REQUEST as $key=>$value) {
 		if (preg_match("/((DELETE)|(INSERT)|(UPDATE)|(ALTER)|(CREATE)|( TABLE)|(DROP))\s[A-Za-z0-9 ]{0,200}(\s(FROM)|(INTO)|(TABLE)\s)/i", $value, $imatch) > 0 && SCRIPT_NAME != "/editlang_edit.php") {
 			// NOTE: Setup the database connection, needed for logging
 			$DBCONN = New DbLayer();
-			WriteToLog("Session-> Possible SQL injection detected: $key=>$value. <b>$imatch[0]</b> Script terminated.", "W", "S");
+			WriteToLog("Session-&gt; Possible SQL injection detected: $key=>$value. <b>$imatch[0]</b> Script terminated.", "W", "S");
 			SystemFunctions::HandleIntrusion("Session-> Possible SQL injection detected: $key=>$value.  <b>$imatch[0]</b> Script terminated.");
 			exit;
 		}
@@ -350,7 +352,7 @@ foreach($_REQUEST as $key=>$value) {
 				if (preg_match("/((DELETE)|(INSERT)|(UPDATE)|(ALTER)|(CREATE)|( TABLE)|(DROP))\s[A-Za-z0-9 ]{0,200}(\s(FROM)|(INTO)|(TABLE)\s)/i", $val, $imatch)>0) {
 					// NOTE: Setup the database connection
 					$DBCONN = New DbLayer();
-					WriteToLog("Session-> Possible SQL injection detected: $key=>$val <b>$imatch[0]</b>.  Script terminated.", "W", "S");
+					WriteToLog("Session-&gt; Possible SQL injection detected: $key=>$val <b>$imatch[0]</b>.  Script terminated.", "W", "S");
 					SystemFunctions::HandleIntrusion("Session-> Possible SQL injection detected: $key=>$val <b>$imatch[0]</b>.  Script terminated.");
 					exit;
 				}

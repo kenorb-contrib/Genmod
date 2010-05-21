@@ -378,6 +378,7 @@
 "as_spouse";"Gezin met partner"
 "associate";"relatie"
 "associate_with";"Relatie met"
+"associate_of";"Relatie van"
 "attempt_auto_acc";"Probeer deze wijziging direct te accepteren"
 "attendant";"Verzorger"
 "attending";"Verzorgt"

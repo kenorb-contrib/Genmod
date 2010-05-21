@@ -86,7 +86,7 @@ abstract class SystemFunctions {
 		$ip = $_SERVER["REMOTE_ADDR"];
 		
 		// Make the logstring
-		$str = "HandleIntrusion-> Intrusion detected for ".$_SERVER["SCRIPT_NAME"]."<br />Query string:<br />";
+		$str = "HandleIntrusion-&gt; Intrusion detected for ".$_SERVER["SCRIPT_NAME"]."<br />Query string:<br />";
 		foreach ($_REQUEST as $key => $value) {
 			$str.= $key."&nbsp;=&nbsp;".$value."<br />";
 		}
@@ -151,7 +151,7 @@ abstract class SystemFunctions {
 						}
 					}
 					if (!$excluded) {
-						$string = "CheckSessionIP-> Intrusion detected on session for IP ".$_SESSION['IP']." by ".$_SERVER['REMOTE_ADDR'];
+						$string = "CheckSessionIP-&gt; Intrusion detected on session for IP ".$_SESSION['IP']." by ".$_SERVER['REMOTE_ADDR'];
 						WriteToLog($string, "W", "S");
 						self::HandleIntrusion($string);
 						exit;
@@ -173,7 +173,7 @@ abstract class SystemFunctions {
 		if ((!isset($_SESSION["pageviews"])) || (time() - $_SESSION["pageviews"]["time"] > SystemConfig::$MAX_VIEW_TIME)) {
 			if (isset($_SESSION["pageviews"]) && SystemConfig::$MAX_VIEW_LOGLEVEL == "2") {
 				$str = "Max pageview counter reset: max reached was ".$_SESSION["pageviews"]["number"];
-				WriteToLog("CheckPageViews-> ".$str, "I", "S");
+				WriteToLog("CheckPageViews-&gt; ".$str, "I", "S");
 			}
 			$_SESSION["pageviews"]["time"] = time();
 			$_SESSION["pageviews"]["number"] = 0;
@@ -186,7 +186,7 @@ abstract class SystemFunctions {
 			$time = time() - $_SESSION["pageviews"]["time"];
 			print GM_LANG_maxviews_exceeded;
 			if ((SystemConfig::$MAX_VIEW_LOGLEVEL == "2" || SystemConfig::$MAX_VIEW_LOGLEVEL == "1") && $_SESSION["pageviews"]["hadmsg"] == false) {
-				$str = "CheckPageViews-> Maximum number of pageviews exceeded after ".$time." seconds.";
+				$str = "CheckPageViews-&gt; Maximum number of pageviews exceeded after ".$time." seconds.";
 				WriteToLog($str, "W", "S");
 				$_SESSION["pageviews"]["hadmsg"] = true;
 			}

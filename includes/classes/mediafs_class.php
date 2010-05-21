@@ -349,7 +349,7 @@ abstract class MediaFS {
 					// If not there, no need to proceed
 					//print "generating for ".$filename."<br />";
 					if (!self::GenerateThumbnail($filename, INDEX_DIRECTORY.$file_basename, $ignoremediadir=true, $ext="")) {
-						WriteToLog("MediaFS->ThumbnailFile: Cannot generate thumbnail from ".$filename.".", "E", "S");
+						WriteToLog("MediaFS-&gt;ThumbnailFile&gt; Cannot generate thumbnail from ".$filename.".", "E", "S");
 						return "";
 					}
 					
@@ -396,7 +396,7 @@ abstract class MediaFS {
 						if (self::GenerateThumbnail($filename, GedcomConfig::$MEDIA_DIRECTORY."thumbs/urls/".$file_basename)) {
 							return GedcomConfig::$MEDIA_DIRECTORY."thumbs/urls/".$file_basename;
 						}
-						else WriteToLog("MediaFS->ThumbnailFile: Cannot generate thumbnail from ".$filename.".", "E", "S");
+						else WriteToLog("MediaFS-&gt;ThumbnailFile&gt; Cannot generate thumbnail from ".$filename.".", "E", "S");
 					}
 				}
 			}
@@ -504,15 +504,15 @@ abstract class MediaFS {
 		if (!$ignoremediadir && strstr($filename, "://") && !is_dir(GedcomConfig::$MEDIA_DIRECTORY."thumbs/urls")) {
 			self::CreateDir(GedcomConfig::$MEDIA_DIRECTORY, "thumbs");
 			self::CreateDir(GedcomConfig::$MEDIA_DIRECTORY."thums/", "urls");
-			WriteToLog("MediaFS->GenerateThumbnail: Folder ".GedcomConfig::$MEDIA_DIRECTORY."thumbs/urls/ created.", "I", "S");
+			WriteToLog("MediaFS-&gt;GenerateThumbnail-&gt; Folder ".GedcomConfig::$MEDIA_DIRECTORY."thumbs/urls/ created.", "I", "S");
 		}
 		if (!strstr($filename, "://")) {
 			if (!file_exists($filename)) {
-				WriteToLog("MediaFS->GenerateThumbnail: Cannot create thumb from non-existent file: ".$filename, "E");
+				WriteToLog("MediaFS-&gt;GenerateThumbnail-&gt; Cannot create thumb from non-existent file: ".$filename, "E");
 				return false;
 			}
 			if (!@fopen($filename, "r")) {
-				WriteToLog("MediaFS->GenerateThumbnail: Cannot open file for creating thumb: ".$filename.". Check permissions.", "E");
+				WriteToLog("MediaFS-&gt;GenerateThumbnail-&gt; Cannot open file for creating thumb: ".$filename.". Check permissions.", "E");
 				return false;
 			}
 			$imgsize = @getimagesize($filename);
@@ -556,10 +556,10 @@ abstract class MediaFS {
 			if (empty($ext)) $ext = strtolower(trim($match[1]));
 			if ($ext=="gif") {
 				if (function_exists("imagecreatefromgif") && function_exists("imagegif")) {
-					WriteToLog("MediaFS->GenerateThumbnail: Create thumb attempt for ".$filename, "I", "S");
+					WriteToLog("MediaFS-&gt;GenerateThumbnail-&gt; Create thumb attempt for ".$filename, "I", "S");
 					$im = @imagecreatefromgif($filename);
 					if (empty($im)) {
-						WriteToLog("MediaFS->GenerateThumbnail: There were problems creating thumb for ".$filename, "W", "S");
+						WriteToLog("MediaFS-&gt;GenerateThumbnail-&gt; There were problems creating thumb for ".$filename, "W", "S");
 						return false;
 					}
 					$new = imagecreatetruecolor($width, $height);
@@ -567,7 +567,7 @@ abstract class MediaFS {
 					imagegif($new, $thumbnail);
 					imagedestroy($im);
 					imagedestroy($new);
-					WriteToLog("MediaFS->GenerateThumbnail: Created thumb for ".$filename, "I", "S");
+					WriteToLog("MediaFS-&gt;GenerateThumbnail-&gt; Created thumb for ".$filename, "I", "S");
 					return true;
 				}
 			}
@@ -576,7 +576,7 @@ abstract class MediaFS {
 					WriteToLog("MediaFS->GenerateThumbnail: Create thumb attempt for ".$filename, "I", "S");
 					$im = @imagecreatefromjpeg($filename);
 					if (empty($im)) {
-						WriteToLog("MediaFS->GenerateThumbnail: There were problems creating thumb for ".$filename, "W", "S");
+						WriteToLog("MediaFS-&gt;GenerateThumbnail-&gt; There were problems creating thumb for ".$filename, "W", "S");
 						return false;
 					}
 					$new = imagecreatetruecolor($width, $height);
@@ -584,16 +584,16 @@ abstract class MediaFS {
 					imagejpeg($new, $thumbnail);
 					imagedestroy($im);
 					imagedestroy($new);
-					WriteToLog("MediaFS->GenerateThumbnail: Created thumb for ".$filename, "I", "S");
+					WriteToLog("MediaFS-&gt;GenerateThumbnail-&gt; Created thumb for ".$filename, "I", "S");
 					return true;
 				}
 			}
 			else if ($ext=="png") {
 				if (function_exists("imagecreatefrompng") && function_exists("imagepng")) {
-					WriteToLog("MediaFS->GenerateThumbnail: Create thumb attempt for ".$filename, "I", "S");
+					WriteToLog("MediaFS-&gt;GenerateThumbnail-&gt; Create thumb attempt for ".$filename, "I", "S");
 					$im = @imagecreatefrompng($filename);
 					if (empty($im)) {
-						WriteToLog("MediaFS->GenerateThumbnail: There were problems creating thumb for ".$filename, "W", "S");
+						WriteToLog("MediaFS-&gt;GenerateThumbnail-&gt; There were problems creating thumb for ".$filename, "W", "S");
 						return false;
 					}
 					$new = imagecreatetruecolor($width, $height);
@@ -601,7 +601,7 @@ abstract class MediaFS {
 					imagepng($new, $thumbnail);
 					imagedestroy($im);
 					imagedestroy($new);
-					WriteToLog("MediaFS->GenerateThumbnail: Created thumb for ".$filename, "I", "S");
+					WriteToLog("MediaFS-&gt;GenerateThumbnail-&gt; Created thumb for ".$filename, "I", "S");
 					return true;
 				}
 			}
@@ -647,7 +647,7 @@ abstract class MediaFS {
 					
 					// Is such a file allowed?
 					if (!in_array(strtolower($ext), $MEDIATYPE)) {
-						WriteToLog("MediaFS->UploadFiles: Illegal upload attempt. File: ".$file, "W", "S");
+						WriteToLog("MediaFS-&gt;UploadFiles-&gt; Illegal upload attempt. File: ".$file, "W", "S");
 						$result["error"] = GM_LANG_ext_not_allowed;
 						$result["errno"] = 5;
 						unlink($upload["tmp_name"]);
@@ -913,7 +913,7 @@ abstract class MediaFS {
 		if ($dbmode) {
 
 			if (!$delete &&	self::GetFileDetails($filename, true)) {
-				WriteToLog("MediaFS->CreateFile: File already exists in DB: ".$filename, "W", "S");
+				WriteToLog("MediaFS-&gt;CreateFile-&gt; File already exists in DB: ".$filename, "W", "S");
 				return false;
 			}
 			
@@ -921,7 +921,7 @@ abstract class MediaFS {
 //			self::$fdetails["file"] = $realfile;
 			self::$fdetails["file"] = $filename;
 			if (!self::GetFileDetails($filename, false)) {
-				WriteToLog("MediaFS->CreateFile: Error getting file details of ".$filename, "W", "S");
+				WriteToLog("MediaFS-&gt;CreateFile-&gt; Error getting file details of ".$filename, "W", "S");
 				return false;
 			}
 			self::CreateDir(self::$fdetails["path"], "", true);
@@ -934,18 +934,18 @@ abstract class MediaFS {
 		
 			$success = self::WriteDBFileDetails($delete);
 			if (!$success) {
-				WriteToLog("MediaFS->CreateFile: Error writing media file details for ".$filename, "W", "S");
+				WriteToLog("MediaFS-&gt;CreateFile-&gt; Error writing media file details for ".$filename, "W", "S");
 				return false;
 			}
 			else $success = self::WriteDBDatafile($filename, $delete, $delonimport);
 			if (!$success) {
-				WriteToLog("MediaFS->CreateFile: Error writing media file data for ".$filename, "W", "S");
+				WriteToLog("MediaFS-&gt;CreateFile-&gt; Error writing media file data for ".$filename, "W", "S");
 				return false;
 			}
 			else if (self::$fdetails["is_image"] && !empty($thumb)) {
 				$success = self::WriteDBThumbfile(self::$fdetails["file"], $thumb, $delete, $delonimport);
 				if (!$success) {
-					WriteToLog("MediaFS->CreateFile: Error writing media thumb data for ".$filename, "W", "S");
+					WriteToLog("MediaFS-&gt;CreateFile-&gt; Error writing media thumb data for ".$filename, "W", "S");
 					return false;
 				}
 			}
@@ -956,13 +956,13 @@ abstract class MediaFS {
 			if (self::GetFileDetails($filename, false)) {
 				// If present and we don't overwrite, return error
 				if (!$delete) {
-					WriteToLog("MediaFS->CreateFile: File already exists in filesys: ".$filename, "W", "S");
+					WriteToLog("MediaFS->CreateFile-&gt; File already exists in filesys: ".$filename, "W", "S");
 					return false;
 				}
 				else {
 					// Else delete the FS-file
 					if (!self::DeleteFile(self::$fdetails["fname"], self::$fdetails["path"], false)) {
-						WriteToLog("MediaFS->CreateFile: Cannot delete from filesys: ".$filename, "W", "S");
+						WriteToLog("MediaFS-&gt;CreateFile-&gt; Cannot delete from filesys: ".$filename, "W", "S");
 						return false;
 					}
 				}
@@ -980,36 +980,36 @@ abstract class MediaFS {
 //			print $realfile."<br />";
 			self::$fdetails["file"] = $realfile;
 			if (!self::GetFileDetails($realfile, true)) {
-				WriteToLog("MediaFS->CreateFile: Error getting DB file details of ".$filename, "W", "S");
+				WriteToLog("MediaFS-&gt;CreateFile-&gt; Error getting DB file details of ".$filename, "W", "S");
 				return false;
 			}
 			// Create the directory in file mode
 			if (empty(self::$fdetails["path"])) self::$fdetails["path"] = GedcomConfig::$MEDIA_DIRECTORY;
 			// 1. main directory
 			if (!self::CreateDir(self::$fdetails["path"], "", false)) {
-				WriteToLog("MediaFS->CreateFile: Cannot create folder ".self::$fdetails["path"], "W", "S");
+				WriteToLog("MediaFS-&gt;CreateFile-&gt; Cannot create folder ".self::$fdetails["path"], "W", "S");
 				return false;
 			}
 			// 2. Thumb directory
 			if (!self::CreateDir("thumbs", self::$fdetails["path"], false)) {
-				WriteToLog("MediaFS->CreateFile: Cannot create folder ".self::$fdetails["path"]."thumbs", "W", "S");
+				WriteToLog("MediaFS-&gt;CreateFile-&gt; Cannot create folder ".self::$fdetails["path"]."thumbs", "W", "S");
 				return false;
 			}
 			// 3. If llink, url directory
 			if ($islink && !self::CreateDir("urls", self::$fdetails["path"]."thumbs/", false)) {
-				WriteToLog("MediaFS->CreateFile: Cannot create folder ".self::$fdetails["path"]."thumbs/urls", "W", "S");
+				WriteToLog("MediaFS-&gt;CreateFile-&gt; Cannot create folder ".self::$fdetails["path"]."thumbs/urls", "W", "S");
 				return false;
 			}
 			if (!self::DirIsWritable(self::$fdetails["path"], false)) {
-				WriteToLog("MediaFS->CreateFile: Folder not writable: ".self::$fdetails["path"],"W", "S");
+				WriteToLog("MediaFS-&gt;CreateFile-&gt; Folder not writable: ".self::$fdetails["path"],"W", "S");
 				return false;
 			}
 			if ($exportthum != "no" && !self::DirIsWritable(self::$fdetails["path"]."thumbs", false)) {
-				WriteToLog("MediaFS->CreateFile: Folder not writable: ".self::$fdetails["path"]."thumbs", "W", "S");
+				WriteToLog("MediaFS-&gt;CreateFile-&gt; Folder not writable: ".self::$fdetails["path"]."thumbs", "W", "S");
 				return false;
 			}
 			if ($islink && $exportthum != "no" && !self::DirIsWritable(GedcomConfig::$MEDIA_DIRECTORY."thumbs/urls", false)) {
-				WriteToLog("MediaFS->CreateFile: Folder not writable: ".GedcomConfig::$MEDIA_DIRECTORY."thumbs/urls", "W", "S");
+				WriteToLog("MediaFS-&gt;CreateFile-&gt; Folder not writable: ".GedcomConfig::$MEDIA_DIRECTORY."thumbs/urls", "W", "S");
 				return false;
 			}
 			
@@ -1073,7 +1073,7 @@ abstract class MediaFS {
 				if (!empty($directory)) {
 					$directory .= "/";
 					if (!self::CreateDir($directory, $basedir, $dbmode, true)) {
-						WriteToLog("MediaFS->CreateDir: Cannot create folder ".$basedir.$directory." for tree ".$parent.$dir, "W", "S");
+						WriteToLog("MediaFS-&gt;CreateDir-&gt; Cannot create folder ".$basedir.$directory." for tree ".$parent.$dir, "W", "S");
 						return false;
 					}
 					$basedir .= $directory;
@@ -1103,7 +1103,7 @@ abstract class MediaFS {
 				if (!@mkdir($parent.$dir, 0777)) {
 					return false;
 				}
-				else WriteToLog("MediaFS->CreateDir: Created folder ".$parent.$dir, "I", "S");
+				else WriteToLog("MediaFS-&gt;CreateDir-&gt; Created folder ".$parent.$dir, "I", "S");
 
 			}
 			else return true;
@@ -1190,7 +1190,7 @@ abstract class MediaFS {
 				// Dont forget the thumb! No problem if it cannot be moved, it will be deleted now and created later.
 				@copy($from."thumbs/".$file, $to."thumbs/".$file);
 				if (!$success) {
-					WriteToLog("MediaFS->MoveFile: Cannot copy file to its new destination: <br />File: ".$file." From: ".$from." To ".$to, "W", "S");
+					WriteToLog("MediaFS-&gt;MoveFile-&gt; Cannot copy file to its new destination: <br />File: ".$file." From: ".$from." To ".$to, "W", "S");
 					return false;
 				}
 				return self::DeleteFile($file, $from, false);

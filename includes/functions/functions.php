@@ -107,7 +107,7 @@ function GmErrorHandler($errno, $errstr, $errfile, $errline) {
 		$logline .= "Using URL: ".$_SERVER["SCRIPT_NAME"]."?".GetQueryString()."<br />";
 		//$msg .= "Error occurred on line ".$errline." of file ".basename($errfile)."<br />\n";
 		print "\n<br />".$msg;
-		WriteToLog("GmErrorHandler-> ".$logline, "E", "S");
+		WriteToLog("GmErrorHandler-&gt; ".$logline, "E", "S");
 		if (($errno<16)&&(function_exists("debug_backtrace"))&&(strstr($errstr, "headers already sent by")===false)) {
 			$backtrace = array();
 			$backtrace = debug_backtrace();
@@ -123,7 +123,7 @@ function GmErrorHandler($errno, $errstr, $errfile, $errline) {
 			}
 			print $logline;
 		}
-		WriteToLog("GmErrorHandler-> ".$logline, "E", "S");
+		WriteToLog("GmErrorHandler-&gt; ".$logline, "E", "S");
 		if ($errno==1) die();
 	}
 	return false;

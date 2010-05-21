@@ -68,7 +68,7 @@ if (($action=="send")&&(isset($_SESSION["good_to_send"]))&&($_SESSION["good_to_s
 	if (!isset($_SERVER['HTTP_REFERER']) || stristr($_SERVER['HTTP_REFERER'],"message.php")===false) {
 		print "<center><br /><span class=\"error\">Invalid page referer.</span>\n";
 		print "<br /><br /></center>";
-		WriteToLog('Message-> Invalid page referer while trying to send a message. Possible spam attack.', 'W', 'S');
+		WriteToLog('Message-&gt; Invalid page referer while trying to send a message. Possible spam attack.', 'W', 'S');
 		$action="compose";
 	}
 	if ($action != "compose") {

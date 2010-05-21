@@ -135,7 +135,7 @@ class Favorite {
 			$res = NewQuery($sql);
 			if ($res) return true;
 			else {
-				WriteToLog("Favorite->SetFavorite-> Error editing favorite ".$this->gid, "E", "S");
+				WriteToLog("Favorite-&gt;SetFavorite-&gt; Error editing favorite ".$this->gid, "E", "S");
 				return false;
 			}
 		}
@@ -160,7 +160,7 @@ class Favorite {
 			$res = NewQuery($sql);
 			if ($res) return true;
 			else {
-				WriteToLog("Favorite->AddFavorite-> Error adding favorite ".$this->gid, "E", "S");
+				WriteToLog("Favorite-&gt;AddFavorite-&gt; Error adding favorite ".$this->gid, "E", "S");
 				return false;
 			}
 		}

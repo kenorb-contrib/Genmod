@@ -168,7 +168,7 @@ class DbLayer extends MysqlDb {
 					$kmsg = "";
 					$sql = "ALTER TABLE `".$tablename."`";
 					if (isset($fields["row"])) {
-						$fmsg = "DBLayer-> Table ".$tablename." added field(s)";
+						$fmsg = "DBLayer-&gt; Table ".$tablename." added field(s)";
 						foreach ($fields["row"] as $column => $field) {
 							$field["details"] = preg_replace(array("/#charset#/", "/#collate#/"), array($server_charset, $server_collation), $field["details"]);
 							$prev = " FIRST";
@@ -183,7 +183,7 @@ class DbLayer extends MysqlDb {
 						}
 					}
 					if (isset($fields["key"])) {
-						$kmsg = "DBLayer-> Table ".$tablename." added key(s)";
+						$kmsg = "DBLayer-&gt; Table ".$tablename." added key(s)";
 						foreach ($fields["key"] as $column => $field) {
 							$sql .= " ADD ".$field.", ";
 							$kmsg .= " ".$column;
@@ -215,7 +215,7 @@ class DbLayer extends MysqlDb {
 					$sql .= ") TYPE=MyISAM CHARACTER SET ".$server_charset." COLLATE ".$server_collation;
 					$res = NewQuery($sql);
 					if ($res) {
-						WriteToLog("DBLayer-> Log table was missing. New log table created.","W","S", "", false);
+						WriteToLog("DBLayer-&gt; Log table was missing. New log table created.","W","S", "", false);
 						$res->FreeResult();
 					}
 				}
@@ -228,7 +228,7 @@ class DbLayer extends MysqlDb {
 				$res = @NewQuery($sql);
 				if ($res) {
 					$res->FreeResult();
-					WriteToLog("DBLayer-> Table ".$table." is deleted.","W","S", "", false);
+					WriteToLog("DBLayer-&gt; Table ".$table." is deleted.","W","S", "", false);
 				}
 			}
 				
@@ -239,7 +239,7 @@ class DbLayer extends MysqlDb {
 				$res = @NewQuery($sql);
 				if ($res) {
 					$res->FreeResult();
-					WriteToLog("DBLayer-> Table ".$row[0]." deleted index ".$row[1],"W","S", "", false);
+					WriteToLog("DBLayer-&gt; Table ".$row[0]." deleted index ".$row[1],"W","S", "", false);
 				}
 			}
 			// and rows
@@ -248,7 +248,7 @@ class DbLayer extends MysqlDb {
 				$res = NewQuery($sql);
 				if ($res) {
 					$res->FreeResult();
-					WriteToLog("DBLayer-> Table ".$row[0]." deleted field ".$row[1],"W","S", "", false);
+					WriteToLog("DBLayer-&gt; Table ".$row[0]." deleted field ".$row[1],"W","S", "", false);
 				}
 			}
 			foreach ($db_layout as $tablename => $fields) {
@@ -258,7 +258,7 @@ class DbLayer extends MysqlDb {
 					$res = NewQuery("SHOW TABLES LIKE '".$tablename."'");
 					if ($res->NumRows() > 0) {
 						// NOTE: Table exists, only add the missing entries
-						$fmsg = "DBLayer-> Table ".$tablename." added field(s)";
+						$fmsg = "DBLayer-&gt; Table ".$tablename." added field(s)";
 						$sql = "ALTER TABLE `".$tablename."`";
 						if (isset($fields["row"])) {
 							foreach ($fields["row"] as $column => $field) {
@@ -275,7 +275,7 @@ class DbLayer extends MysqlDb {
 							}
 						}
 						if (isset($fields["key"])) {
-							$kmsg = "DBLayer-> Table ".$tablename." added key(s)";
+							$kmsg = "DBLayer-&gt; Table ".$tablename." added key(s)";
 							foreach ($fields["key"] as $column => $field) {
 								$sql .= " ADD ".$field.", ";
 								$kmsg .= " ".$column;
@@ -307,7 +307,7 @@ class DbLayer extends MysqlDb {
 						$sql .= ") TYPE=MyISAM CHARACTER SET ".$server_charset." COLLATE ".$server_collation;
 						$res = NewQuery($sql);
 						if ($res) {
-							WriteToLog("DBLayer-> ".$tablename." table was missing. New table created.","W","S", "", false);
+							WriteToLog("DBLayer-&gt; ".$tablename." table was missing. New table created.","W","S", "", false);
 							$res->FreeResult();
 						}
 					}

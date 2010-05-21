@@ -1604,6 +1604,7 @@ class Person extends GedcomRecord {
 				SwitchGedcom($asso->gedcomid);
 				// Print the asso lines with the person who is pointed to as asso, to the relation is either to a family, or to a person 
 				if ($this->xref == $asso->xref2) {
+					$rel = "of";
 					if ($asso->type == "INDI") {
 						$assoname = $asso->associated->GetName();
 						print "<br /><a href=\"individual.php?pid=".$asso->xref1."&amp;gedid=".$asso->gedcomid."\" title=\"".$assoname."\" class=\"list_item\">";
@@ -1615,13 +1616,14 @@ class Person extends GedcomRecord {
 					$assoxref = $asso->associated->addxref;
 	  			}
 	  			else {
+		  			$rel = "with";
 					$assoname = $asso->assoperson->GetName();
 					$assoxref = $asso->assoperson->addxref;
 					print "<br /><a href=\"individual.php?pid=".$asso->xref2."&amp;gedid=".$asso->gedcomid."\" title=\"".$assoname."\" class=\"list_item\">";
 	  			}
 				if ($TEXT_DIRECTION=="ltr") print " <span dir=\"ltr\">";
 				else print " <span dir=\"rtl\">";
-				print "(".GM_LANG_associate_with.": ".$assoname.$assoxref;
+				print "(".constant("GM_LANG_associate_".$rel).": ".$assoname.$assoxref;
 				if ($asso->fact != "" || $asso->role != "") {
 					print " - ";
 					if ($asso->fact != "") print constant("GM_FACT_".$asso->fact);

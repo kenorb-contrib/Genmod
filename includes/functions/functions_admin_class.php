@@ -727,7 +727,7 @@ abstract class AdminFunctions {
 			unlink($path.$_FILES[$uploadname]['name']);
 		}
 		if (move_uploaded_file($_FILES[$uploadname]['tmp_name'], $path.$_FILES[$uploadname]['name'])) {
-				WriteToLog("MoveUploadedGedcom-> Gedcom ".$path.$_FILES[$uploadname]['name']." uploaded", "I", "S");
+				WriteToLog("MoveUploadedGedcom-&gt; Gedcom ".$path.$_FILES[$uploadname]['name']." uploaded", "I", "S");
 		}
 		// Get the gedcom name from the ZIP 
 		if (strstr(strtolower(trim($_FILES[$uploadname]['name'])), ".zip") == ".zip") {
@@ -824,7 +824,9 @@ abstract class AdminFunctions {
 			else $ip = SystemConfig::$PROXY_ADDRESS;
 			$handle = @fsockopen($ip, SystemConfig::$PROXY_PORT);
 			if ($handle!=false) {
-				$com = "GET http://www.genmod.net/gmnews.txt HTTP/1.1\r\nAccept: */*\r\nAccept-Language: de-ch\r\nAccept-Encoding: gzip, deflate\r\nUser-Agent: Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.0)\r\nHost: ".SystemConfig::$PROXY_ADDRESS.":".SystemConfig::$PROXY_PORT."\r\nConnection: Keep-Alive\r\n\r\n";
+				$com = "GET http://www.genmod.net/gmnews.txt HTTP/1.1\r\nAccept: */*\r\nAccept-Language: de-ch\r\nAccept-Encoding: gzip, deflate\r\nUser-Agent: Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.0)\r\nHost: ".SystemConfig::$PROXY_ADDRESS.":".SystemConfig::$PROXY_PORT."\r\n";
+				if (SystemConfig::$PROXY_USER != "") $com .= "Proxy-Authorization: Basic ".base64_encode(SystemConfig::$PROXY_USER.":".SystemConfig::$PROXY_PASSWORD) . "\r\n";
+				$com .= "Connection: Keep-Alive\r\n\r\n";
 				fputs($handle, $com);
 				$txt = fread($handle, 65535);
 				fclose($handle);
@@ -861,7 +863,7 @@ abstract class AdminFunctions {
 			}
 		}
 		else {
-			WriteToLog("GetGMNewsItems-> News cannot be reached on Genmod News Server", "E");
+			WriteToLog("GetGMNewsItems-&gt; News cannot be reached on Genmod News Server", "E");
 			$item["date"] = "";
 			$item["type"] = "Urgent";
 			$item["header"] = "Warning: News cannot be retrieved";
@@ -907,19 +909,19 @@ abstract class AdminFunctions {
 			// Empty the table
 			$sql = "TRUNCATE TABLE ".TBLPREFIX."language";
 			if (!$result = NewQuery($sql)) {
-				WriteToLog("StoreEnglish-> Language table could not be dropped", "E", "S");
+				WriteToLog("StoreEnglish-&gt; Language table could not be dropped", "E", "S");
 				return false;
 			}
 			// Empty the table
 			$sql = "TRUNCATE TABLE ".TBLPREFIX."language_help";
 			if (!$result = NewQuery($sql)) {
-				WriteToLog("StoreEnglish-> Language help table could not be dropped", "E", "S");
+				WriteToLog("StoreEnglish-&gt; Language help table could not be dropped", "E", "S");
 				return false;
 			}
 			// Empty the table
 			$sql = "TRUNCATE TABLE ".TBLPREFIX."facts";
 			if (!$result = NewQuery($sql)) {
-				WriteToLog("StoreEnglish-> Facts table could not be dropped", "E", "S");
+				WriteToLog("StoreEnglish-&gt; Facts table could not be dropped", "E", "S");
 				return false;
 			}
 		}
@@ -938,11 +940,11 @@ abstract class AdminFunctions {
 				
 	//			$gm_lang[$data[0]] = $data[1];
 				// NOTE: Store the language variable in the database
-				if (!isset($data[1])) WriteToLog("StoreEnglish-> Invalid language string ".$line, "E", "S");
+				if (!isset($data[1])) WriteToLog("StoreEnglish-&gt; Invalid language string ".$line, "E", "S");
 				else {
 					$sql = "INSERT INTO ".TBLPREFIX."language VALUES ('".mysql_real_escape_string($data[0])."', '".mysql_real_escape_string($data[1])."', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '".time()."', '".$gm_user->username."')";
 					if (!$result = NewQuery($sql)) {
-						WriteToLog("StoreEnglish-> Could not add language string ".$line." for language English to table ", "E", "S");
+						WriteToLog("StoreEnglish-&gt; Could not add language string ".$line." for language English to table ", "E", "S");
 					}
 					else $result->FreeResult();
 				 }
@@ -958,8 +960,8 @@ abstract class AdminFunctions {
 				$sql = "INSERT INTO ".TBLPREFIX."lang_settings (ls_gm_langname, ls_translated, ls_md5_lang, ls_md5_help, ls_md5_facts) VALUES ('english', '0','".md5_file("languages/lang.en.txt")."', '".md5_file("languages/help_text.en.txt")."', '".md5_file("languages/facts.en.txt")."')";
 				$res = NewQuery($sql);
 			}
-			WriteToLog("StoreEnglish-> English language added to the database", "I", "S");
-			if ($only_english) WriteToLog("StoreEnglish-> Additional languages are not restored", "W", "S");
+			WriteToLog("StoreEnglish-&gt; English language added to the database", "I", "S");
+			if ($only_english) WriteToLog("StoreEnglish-&gt; Additional languages are not restored", "W", "S");
 		}
 		
 		if (file_exists("languages/facts.en.txt")) {
@@ -976,17 +978,17 @@ abstract class AdminFunctions {
 				
 				
 				// NOTE: Store the language variable in the database
-				if (!isset($data[1])) WriteToLog("StoreEnglish-> Invalid facts string ".$line, "E", "S");
+				if (!isset($data[1])) WriteToLog("StoreEnglish-&gt; Invalid facts string ".$line, "E", "S");
 				else {
 					$sql = "INSERT INTO ".TBLPREFIX."facts VALUES ('".mysql_real_escape_string($data[0])."', '".mysql_real_escape_string($data[1])."', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '".time()."', '".$gm_user->username."')";
 					if (!$result = NewQuery($sql)) {
-						WriteToLog("StoreEnglish-> Could not add facts string ".$line." for language English to table ", "E", "S");
+						WriteToLog("StoreEnglish-&gt; Could not add facts string ".$line." for language English to table ", "E", "S");
 					}
 					else $result->FreeResult();
 				 }
 			}
-			WriteToLog("StoreEnglish-> English facts added to the database", "I", "S");
-			if ($only_english) WriteToLog("StoreEnglish-> Additional facts languages are not restored", "W", "S");
+			WriteToLog("StoreEnglish-&gt; English facts added to the database", "I", "S");
+			if ($only_english) WriteToLog("StoreEnglish-&gt; Additional facts languages are not restored", "W", "S");
 		}
 		
 		if (!$only_english) {
@@ -998,13 +1000,13 @@ abstract class AdminFunctions {
 					// NOTE: Add the help language variable to the language array
 	//				$gm_lang[$data[0]] = $data[1];
 					
-					if (!isset($data[1])) WriteToLog("StoreEnglish-> Invalid language help string ".$line, "E", "S");
+					if (!isset($data[1])) WriteToLog("StoreEnglish-&gt; Invalid language help string ".$line, "E", "S");
 					else {
 						$data[0] = substr(trim($data[0]), 1);
 						$data[1] = substr(trim($data[1]), 0, -1);
 						$sql = "INSERT INTO ".TBLPREFIX."language_help VALUES ('".mysql_real_escape_string($data[0])."', '".mysql_real_escape_string($data[1])."', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '".time()."', '".$gm_user->username."')";
 						if (!$result = NewQuery($sql)) {
-							WriteToLog("StoreEnglish-> Could not add language help string ".$line." for language English to table ", "E", "S");
+							WriteToLog("StoreEnglish-&gt; Could not add language help string ".$line." for language English to table ", "E", "S");
 						}
 						else {
 	//						set_time_limit(10);
@@ -1012,7 +1014,7 @@ abstract class AdminFunctions {
 						}
 					}
 				}
-				WriteToLog("StoreEnglish-> English help added to the database", "I", "S");
+				WriteToLog("StoreEnglish-&gt; English help added to the database", "I", "S");
 			}
 			
 			// Add all active languages if english is not specified
@@ -1043,7 +1045,7 @@ abstract class AdminFunctions {
 			$lines = file("languages/lang.".$language_settings[$storelang]["lang_short_cut"].".txt");
 			foreach ($lines as $key => $line) {
 				$data = preg_split("/\";\"/", $line, 2);
-				if (!isset($data[1])) WriteToLog("StoreLanguage-> Invalid language string ".$line, "E", "S");
+				if (!isset($data[1])) WriteToLog("StoreLanguage-&gt; Invalid language string ".$line, "E", "S");
 				else {
 	       		    $data[0] = substr(ltrim($data[0]), 1);
 	                $data[1] = substr(rtrim($data[1]), 0, -1);
@@ -1053,7 +1055,7 @@ abstract class AdminFunctions {
 		                if ($res->NumRows() == 0) {
 							$sql = "INSERT INTO ".TBLPREFIX."language VALUES ('".mysql_real_escape_string($data[0])."', '".mysql_real_escape_string($data[1])."', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '".time()."', '".$gm_user->username."')";
 							if (!$result = NewQuery($sql)) {
-								WriteToLog("StoreLanguage-> Could not add language string ".$line." for language English to table ", "E", "S");
+								WriteToLog("StoreLanguage-&gt; Could not add language string ".$line." for language English to table ", "E", "S");
 							}
 							else $result->FreeResult();
 						}
@@ -1061,7 +1063,7 @@ abstract class AdminFunctions {
 							$res->FreeResult();
 			       			$sql = "UPDATE ".TBLPREFIX."language SET `lg_".$storelang."` = '".mysql_real_escape_string($data[1])."', lg_last_update_date='".time()."', lg_last_update_by='".$gm_user->username."' WHERE lg_string = '".$data[0]."' LIMIT 1";
 	    		   			if (!$result = NewQuery($sql)) {
-	            	            WriteToLog("StoreLanguage-> Could not update language string ".$line." for language ".$storelang." to table ", "E", "S");
+	            	            WriteToLog("StoreLanguage-&gt; Could not update language string ".$line." for language ".$storelang." to table ", "E", "S");
 		                    }
 							else $result->FreeResult();
 						}
@@ -1069,7 +1071,7 @@ abstract class AdminFunctions {
 					else {
 		       			$sql = "UPDATE ".TBLPREFIX."language SET `lg_".$storelang."` = '".mysql_real_escape_string($data[1])."', lg_last_update_date='".time()."', lg_last_update_by='".$gm_user->username."' WHERE lg_string = '".$data[0]."' LIMIT 1";
 	    	   			if (!$result = NewQuery($sql)) {
-	           	            WriteToLog("StoreLanguage-> Could not update language string ".$line." for language ".$storelang." to table ", "E", "S");
+	           	            WriteToLog("StoreLanguage-&gt; Could not update language string ".$line." for language ".$storelang." to table ", "E", "S");
 		                }
 						else $result->FreeResult();
 					}
@@ -1080,7 +1082,7 @@ abstract class AdminFunctions {
 			$lines = file("languages/help_text.".$language_settings[$storelang]["lang_short_cut"].".txt");
 			foreach ($lines as $key => $line) {
 				$data = preg_split("/\";\"/", $line, 2);
-				if (!isset($data[1])) WriteToLog("StoreLanguage-> Invalid language help string ".$line, "E", "S");
+				if (!isset($data[1])) WriteToLog("StoreLanguage-&gt; Invalid language help string ".$line, "E", "S");
 				else {
 	                $data[0] = substr(ltrim($data[0]), 1);
 	                $data[1] = substr(rtrim($data[1]), 0, -1);
@@ -1090,7 +1092,7 @@ abstract class AdminFunctions {
 		                if ($res->NumRows() == 0) {
 							$sql = "INSERT INTO ".TBLPREFIX."language_help VALUES ('".mysql_real_escape_string($data[0])."', '".mysql_real_escape_string($data[1])."', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '".time()."', '".$gm_user->username."')";
 							if (!$result = NewQuery($sql)) {
-								WriteToLog("StoreLanguage-> Could not add language help string ".$line." for language English to table ", "E", "S");
+								WriteToLog("StoreLanguage-&gt; Could not add language help string ".$line." for language English to table ", "E", "S");
 							}
 							else $result->FreeResult();
 						}
@@ -1098,7 +1100,7 @@ abstract class AdminFunctions {
 							$res->FreeResult();
 		                	$sql = "UPDATE ".TBLPREFIX."language_help SET `lg_".$storelang."` = '".mysql_real_escape_string($data[1])."', lg_last_update_date='".time()."', lg_last_update_by='".$gm_user->username."' WHERE lg_string = '".$data[0]."' LIMIT 1";
 	    	            	if (!$result = NewQuery($sql)) {
-	        	                  WriteToLog("StoreLanguage-> Could not update language help string ".$line." for language ".$storelang." to table ", "E", "S");
+	        	                  WriteToLog("StoreLanguage-&gt; Could not update language help string ".$line." for language ".$storelang." to table ", "E", "S");
 	            	        }
 							else $result->FreeResult();
 						}
@@ -1106,7 +1108,7 @@ abstract class AdminFunctions {
 	               	else {
 		            	$sql = "UPDATE ".TBLPREFIX."language_help SET `lg_".$storelang."` = '".mysql_real_escape_string($data[1])."', lg_last_update_date='".time()."', lg_last_update_by='".$gm_user->username."' WHERE lg_string = '".$data[0]."' LIMIT 1";
 	    	            if (!$result = NewQuery($sql)) {
-	        	            WriteToLog("StoreLanguage-> Could not update language help string ".$line." for language ".$storelang." to table ", "E", "S");
+	        	            WriteToLog("StoreLanguage-&gt; Could not update language help string ".$line." for language ".$storelang." to table ", "E", "S");
 	            	    }
 						else $result->FreeResult();
 	               	}
@@ -1117,7 +1119,7 @@ abstract class AdminFunctions {
 			$lines = file("languages/facts.".$language_settings[$storelang]["lang_short_cut"].".txt");
 			foreach ($lines as $key => $line) {
 				$data = preg_split("/\";\"/", $line, 2);
-				if (!isset($data[1])) WriteToLog("StoreLanguage-> Invalid facts string ".$line, "E", "S");
+				if (!isset($data[1])) WriteToLog("StoreLanguage-&gt; Invalid facts string ".$line, "E", "S");
 				else {
 	                $data[0] = substr(ltrim($data[0]), 1);
 	                $data[1] = substr(rtrim($data[1]), 0, -1);
@@ -1127,7 +1129,7 @@ abstract class AdminFunctions {
 		                if ($res->NumRows() == 0) {
 							$sql = "INSERT INTO ".TBLPREFIX."facts VALUES ('".mysql_real_escape_string($data[0])."', '".mysql_real_escape_string($data[1])."', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '".time()."', '".$gm_user->username."')";
 							if (!$result = NewQuery($sql)) {
-								WriteToLog("StoreLanguage-> Could not add facts string ".$line." for language English to table ", "E", "S");
+								WriteToLog("StoreLanguage-&gt; Could not add facts string ".$line." for language English to table ", "E", "S");
 							}
 							else $result->FreeResult();
 						}
@@ -1135,7 +1137,7 @@ abstract class AdminFunctions {
 							$res->FreeResult();
 	    	            	$sql = "UPDATE ".TBLPREFIX."facts SET `lg_".$storelang."` = '".mysql_real_escape_string($data[1])."', lg_last_update_date='".time()."', lg_last_update_by='".$gm_user->username."' WHERE lg_string = '".$data[0]."' LIMIT 1";
 	        	        	if (!$result = NewQuery($sql)) {
-	            	              WriteToLog("StoreLanguage-> Could not add facts string ".$line." for language ".$storelang." to table ", "E", "S");
+	            	              WriteToLog("StoreLanguage-&gt; Could not add facts string ".$line." for language ".$storelang." to table ", "E", "S");
 	                	    }
 							else $result->FreeResult();
 						}
@@ -1143,7 +1145,7 @@ abstract class AdminFunctions {
 	               	else {
 	   	            	$sql = "UPDATE ".TBLPREFIX."facts SET `lg_".$storelang."` = '".mysql_real_escape_string($data[1])."', lg_last_update_date='".time()."', lg_last_update_by='".$gm_user->username."' WHERE lg_string = '".$data[0]."' LIMIT 1";
 	       	        	if (!$result = NewQuery($sql)) {
-							WriteToLog("StoreLanguage-> Could not add facts string ".$line." for language ".$storelang." to table ", "E", "S");
+							WriteToLog("StoreLanguage-&gt; Could not add facts string ".$line." for language ".$storelang." to table ", "E", "S");
 	                	}
 						else $result->FreeResult();
 	               	}

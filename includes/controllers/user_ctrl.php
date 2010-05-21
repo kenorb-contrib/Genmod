@@ -180,7 +180,7 @@ abstract class UserController {
 					$_SESSION['cookie_login'] = false;
 					
 					// -- The session vars MUST be set BEFORE writing to the log.
-					WriteToLog("Users->AuthenticateUser: Login Successful -> " . $username ." <-", "I", "S");
+					WriteToLog("Users-&gt;AuthenticateUser-&gt; Login Successful -&gt; " . $username ." &lt;-", "I", "S");
 					if (defined("GM_LANG_".$user->language)) $_SESSION['CLANGUAGE'] = $user->language;
 					
 					//-- only change the gedcom if the user does not have a gedcom id
@@ -199,7 +199,7 @@ abstract class UserController {
 				}
 			}
 		}
-		WriteToLog("Users->AuthenticateUser: Login Failed -> " . $username ." <-", "W", "S");
+		WriteToLog("Users-&gt;AuthenticateUser-&gt; Login Failed -&gt; " . $username ." &lt;-", "W", "S");
 		return false;
 	}
 	
@@ -226,8 +226,8 @@ abstract class UserController {
 		}
 		$sql = "UPDATE ".TBLPREFIX."users SET u_loggedin='N' WHERE BINARY u_username='".$username."'";
 		$res = NewQuery($sql);
-		if ($logtext == "") WriteToLog("UserController::UserLogout: Succesful logout for " . $username . " <-", "I", "S");
-		else WriteToLog("UserController::UserLogout: ".$logtext." -> " . $username . " <-", "I", "S");
+		if ($logtext == "") WriteToLog("UserController-&gt;UserLogout-&gt; Succesful logout for -&gt; " . $username . " &lt;-", "I", "S");
+		else WriteToLog("UserController-&gt;UserLogout-&gt; ".$logtext." -&gt; " . $username . " &lt;-", "I", "S");
 
 		if ((isset($_SESSION['gm_user']) && ($_SESSION['gm_user']==$username)) || (isset($_COOKIE['gm_rem'])&&$_COOKIE['gm_rem']==$username)) {
 			if ($_SESSION['gm_user']==$username) {
@@ -360,7 +360,7 @@ abstract class UserController {
 			$activeuser = self::GetUserName();
 			if ($activeuser == "") $activeuser = "Anonymous user";
 			$newuser =& User::RenewInstance($newuser->username);
-			WriteToLog("UserController::AddUser: ".$activeuser." ".$msg." user -> ".$newuser->username." <-", "I", "S");
+			WriteToLog("UserController-&gt;AddUser-&gt; ".$activeuser." ".$msg." user -&gt; ".$newuser->username." &lt;-", "I", "S");
 			return true;
 		}
 		else return false;
@@ -380,7 +380,7 @@ abstract class UserController {
 		$res = NewQuery($sql);
 		$activeuser = self::GetUserName();
 		if ($activeuser == "") $activeuser = "Anonymous user";
-		if (($msg != "changed") && ($msg != "requested password for") && ($msg != "verified")) WriteToLog("UserController::DeleteUser: ".$activeuser." ".$msg." user -&gt; ".$username." &lt;-", "I", "S");
+		if (($msg != "changed") && ($msg != "requested password for") && ($msg != "verified")) WriteToLog("UserController-&gt;DeleteUser-&gt; ".$activeuser." ".$msg." user -&gt; ".$username." &lt;-", "I", "S");
 		if ($res) {
 			User::DeleteInstance($username);
 			return true;

@@ -34,7 +34,7 @@ if (!isset($filename)) $filename = "";
 // Check if the extension is legal
 $filename = urldecode($filename);
 if (!MediaFS::IsValidMedia($filename)) {
-	WriteToLog("ImageView-> Illegal display attempt. File: ".$filename, "W", "S");
+	WriteToLog("ImageView-&gt; Illegal display attempt. File: ".$filename, "W", "S");
 	exit;
 }
 
