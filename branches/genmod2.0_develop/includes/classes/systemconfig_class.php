@@ -142,7 +142,7 @@ abstract class SystemConfig {
 			// Otherwise, it's a DB value and we must check if it has changed or is even new
 			else {
 				if (!isset(self::$configdb_list[$key]) || self::$configdb_list[$key] != $param) {
-					WriteToLog("SystemConfig-> Admin has set ".$key." to ".$param, "I", "S");
+					WriteToLog("SystemConfig-&gt;StoreConfig-&gt; Admin has set ".$key." to ".$param, "I", "S");
 					self::SetConfigDBValue($key, $param);
 				}
 			}
@@ -162,7 +162,7 @@ abstract class SystemConfig {
 			$configtext .= self::AddConfigFooter();
 			// Write the config file
 			if (self::WriteConfig($configtext)) {
-				WriteToLog("SystemConfig-> Admin has updated config for ".$newconfig["SERVER_URL"], "I", "S");
+				WriteToLog("SystemConfig-&gt;StoreConfig-&gt; Admin has updated config for ".$newconfig["SERVER_URL"], "I", "S");
 				return true;
 			}
 			else return false;
@@ -185,7 +185,7 @@ abstract class SystemConfig {
 		$configtext .= self::AddConfigFooter();
 		// Write the config file
 		if (self::WriteConfig($configtext)) {
-			WriteToLog("SystemConfig-> Admin has deleted config for ".$config_name, "I", "S");
+			WriteToLog("SystemConfig-&gt;DeleteConfig-&gt; Admin has deleted config for ".$config_name, "I", "S");
 			return true;
 		}
 		else return false;
@@ -230,7 +230,7 @@ abstract class SystemConfig {
 				//-- If not boolean, add the value in quotes
 				else $text .= "\$CONFIG[\"".$key."\"] = '".addslashes($conf)."';\n";
 				if (!isset($CONFIG_PARMS[$config["SERVER_URL"]][$key]) || $CONFIG_PARMS[$config["SERVER_URL"]][$key] != $config[$key]) {
-					WriteToLog("SystemConfig-> Admin has set ".$key." to ".$conf, "I", "S");
+					WriteToLog("SystemConfig-&gt;AddConfig-&gt; Admin has set ".$key." to ".$conf, "I", "S");
 					global $key;
 					$key = $conf;
 				}

@@ -109,7 +109,7 @@ class FAQ {
 		$sql = "UPDATE ".TBLPREFIX."faqs SET fa_order=fa_order-1 WHERE fa_order>".$this->order." AND fa_file=".$this->gedcomid;
 		$res = NewQuery($sql);
 		unset(self::$cache[$this->gedcomid][$this->id]);
-		WriteToLog("FAQ-> FAQ item has been deleted.<br />ID: ".$this->id.".<br />Gedcom ID: ".$this->gedcomid, "I", "G", $this->gedcomid);
+		WriteToLog("FAQ-&gt; FAQ item has been deleted.<br />ID: ".$this->id.".<br />Gedcom ID: ".$this->gedcomid, "I", "G", $this->gedcomid);
 	}
 	
 	public function MoveMeUp() {
@@ -120,7 +120,7 @@ class FAQ {
 		$res = NewQuery($sql);
 		$sql = "UPDATE ".TBLPREFIX."faqs SET fa_order=fa_order-1 WHERE fa_id=".$this->id." AND fa_file=".$this->gedcomid;
 		$res = NewQuery($sql);
-		WriteToLog("FAQ-> FAQ item has been moved up.<br />ID: ".$this->id.".<br />Gedcom ID: ".$this->gedcomid, "I", "G", $this->gedcomid);
+		WriteToLog("FAQ-&gt; FAQ item has been moved up.<br />ID: ".$this->id.".<br />Gedcom ID: ".$this->gedcomid, "I", "G", $this->gedcomid);
 	}
 		
 	public function MoveMeDown() {
@@ -129,14 +129,14 @@ class FAQ {
 		$res = NewQuery($sql);
 		$sql = "UPDATE ".TBLPREFIX."faqs SET fa_order=fa_order+1 WHERE fa_id=".$this->id." AND fa_file=".$this->gedcomid;
 		$res = NewQuery($sql);
-		WriteToLog("FAQ-> FAQ item has been moved down.<br />ID: ".$this->id.".<br />Gedcom ID: ".$this->gedcomid, "I", "G", $this->gedcomid);
+		WriteToLog("FAQ-&gt; FAQ item has been moved down.<br />ID: ".$this->id.".<br />Gedcom ID: ".$this->gedcomid, "I", "G", $this->gedcomid);
 	}
 	
 	public function UpdateMe($header, $body) {
 		
 		$sql = "UPDATE ".TBLPREFIX."faqs SET fa_header='".DbLayer::EscapeQuery($header)."', fa_body='".DbLayer::EscapeQuery($body)."' WHERE fa_id='".$this->id."'";
 		$res = NewQuery($sql);
-		WriteToLog("FAQ-> FAQ item has been edited.<br />ID: ".$this->id.".<br />Gedcom ID: ".$this->gedcomid, "I", "G", $this->gedcomid);
+		WriteToLog("FAQ-&gt; FAQ item has been edited.<br />ID: ".$this->id.".<br />Gedcom ID: ".$this->gedcomid, "I", "G", $this->gedcomid);
 	}
 	
 	public function AddMe($header, $body) {
@@ -149,7 +149,7 @@ class FAQ {
 		else $order = $max + 1;
 		$sql = "INSERT INTO ".TBLPREFIX."faqs VALUES('', '".$order."', '".DbLayer::EscapeQuery($header)."', '".DbLayer::EscapeQuery($body)."', '".$this->gedcomid."')";
 		$res = NewQuery($sql);
-		WriteToLog("FAQ-> FAQ item has been added.<br />ID: ".$res->InsertID().".<br />Gedcom ID: ".$this->gedcomid, "I", "G", $this->gedcomid);
+		WriteToLog("FAQ-&gt; FAQ item has been added.<br />ID: ".$res->InsertID().".<br />Gedcom ID: ".$this->gedcomid, "I", "G", $this->gedcomid);
 	}
 }
 ?>

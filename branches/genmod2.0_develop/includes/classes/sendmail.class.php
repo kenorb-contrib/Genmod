@@ -134,7 +134,7 @@ class SendMail {
 		$sent = mail($mailto, $subject, $this->message, $this->header);
 		if ($sent) return true;
 		else {
-			WriteToLog("SendMail->Outputmail: There was an error sending mail<br />mailto: ".$mailto."<br />subject: ".$subject."<br />header: ".$this->header."<br />message: ".$this->message, "E", "S");
+			WriteToLog("SendMail-&gt;Outputmail-&gt; There was an error sending mail<br />mailto: ".$mailto."<br />subject: ".$subject."<br />header: ".$this->header."<br />message: ".$this->message, "E", "S");
 			return false;
 		}
 	}

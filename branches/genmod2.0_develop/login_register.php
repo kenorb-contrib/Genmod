@@ -140,7 +140,7 @@ switch ($action) {
 			<tr><td class="ltr"><?php print GM_LANG_pwreqinfo;?></td></tr>
 			</table>
 			<?php
-			WriteToLog("LoginRegister-> Password request was sent to user: ".$user_name, "W", "S");
+			WriteToLog("LoginRegister-&gt; Password request was sent to user: ".$user_name, "W", "S");
 		}
 		print "</div>";
 		break;
@@ -359,7 +359,7 @@ switch ($action) {
 			print "<div class=\"center\">";
 			$user_created_ok = false;
 				
-			WriteToLog("LoginRegister-> User registration requested for: ".$user_name, "I", "S");
+			WriteToLog("LoginRegister-&gt; User registration requested for: ".$user_name, "I", "S");
 			$user = new user();
 			$user->username = $user_name;
 			$user->firstname = $user_firstname;
@@ -525,7 +525,7 @@ switch ($action) {
 		break;
 	case "verify_hash" :
   		$QUERY_STRING = "";
-		WriteToLog("LoginRegister-> User attempted to verify hashcode: ".$user_name, "I", "S");
+		WriteToLog("LoginRegister-&gt; User attempted to verify hashcode: ".$user_name, "I", "S");
 		PrintHeader("Genmod - " . GM_LANG_user_verify);# <-- better verification of authentication code
 		print "<div class=\"center\">";
 		print "<table class=\"center facts_table ltr\">";

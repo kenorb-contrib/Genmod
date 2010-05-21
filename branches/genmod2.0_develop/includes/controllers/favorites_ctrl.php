@@ -44,7 +44,7 @@ abstract class FavoritesController {
 		$res = NewQuery($sql);
 		if ($res) return true;
 		else {
-			WriteToLog("FavoritesController::DeleteFavorite-> Error deleting favorite ".$fv_id, "E", "S");
+			WriteToLog("FavoritesController-&gt;DeleteFavorite-> Error deleting favorite ".$fv_id, "E", "S");
 			return false;
 		}
 	}

@@ -649,7 +649,7 @@ abstract class ImportFunctions {
 				$res = NewQuery($sql);
 				if ($res) $res->FreeResult();
 			}
-			else WriteToLog("Import->Soundex: Indi without soundex codes encountered: ".$kgid, "W", "G", $gedfile);
+			else WriteToLog("ImportRecord-&gt; Soundex: Indi without soundex codes encountered: ".$kgid, "W", "G", $gedfile);
 		}
 		else if ($type == "FAM") {
 			$indirec = EditFunctions::CleanupTagsY($indirec);
@@ -747,11 +747,11 @@ abstract class ImportFunctions {
 		$sql = "INSERT INTO ".TBLPREFIX."media_mapping VALUES(NULL,'".addslashes($media)."','".addslashes($indi)."','".addslashes($order)."','".$gedid."','".addslashes($gedrec)."', '".$rectype."')";
 		$res = NewQuery($sql);
 		if ($res) {
-			WriteToLog("AddDBLink->New media link added to the database: ".$media, "I", "G", $gedid);
+			WriteToLog("AddDBLink-&gt; New media link added to the database: ".$media, "I", "G", $gedid);
 			return true;
 		}
 		else {
-			WriteToLog("AddDBLink->There was a problem adding media record: ".$media, "E", "G", $gedid);
+			WriteToLog("AddDBLink-&gt;There was a problem adding media record: ".$media, "E", "G", $gedid);
 			return false;
 		}
 	}
@@ -891,7 +891,7 @@ abstract class ImportFunctions {
 		if ($ct) $rectype = $tmatch[1];
 		else {
 			$r = substr($indirec, 0, 6);
-			if ($r != "0 HEAD" && $r != "0 TRLR") WriteToLog("UpdateMedia-> Unknown record type encountered on import: ".$indirec, "E", "G", $gedfile);
+			if ($r != "0 HEAD" && $r != "0 TRLR") WriteToLog("UpdateMedia-&gt; Unknown record type encountered on import: ".$indirec, "E", "G", $gedfile);
 			return $indirec;
 		}
 		

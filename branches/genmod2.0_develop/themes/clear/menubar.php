@@ -158,7 +158,7 @@ if (is_object($custommenu)) $showmenu[GM_LANG_my_pages] = CreateMenu($custommenu
 			?>
 		</div>
 	</div>
-	<br clear="all" />
+	<br style="clear: all" />
 	<div style="float: <?php print $rdir; ?>; margin-<?php print $rdir; ?>: 0em; text-align: <?php print $rdir; ?>;">
 		<form action="search.php" method="get" name="searchformtop">
 			<input type="hidden" name="action" value="general" />
@@ -167,7 +167,7 @@ if (is_object($custommenu)) $showmenu[GM_LANG_my_pages] = CreateMenu($custommenu
 			<input type="submit" value="<?php print GM_LANG_search;?>" />
 		</form>
 	</div>
-	<br clear="all" />
+	<br style="clear: all;" />
 	
 	<script type="text/javascript">
 	<!--

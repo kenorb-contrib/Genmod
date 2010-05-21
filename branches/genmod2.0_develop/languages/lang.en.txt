@@ -2592,6 +2592,7 @@
 "unapproved_link";"Changes are present for one or more links to this record. These changes will show up after approval."
 "approve_first";"Please approve pending changes for this record first."
 "associate_with";"Associate with"
+"associate_of";"Associate of"
 "embedvar_not_found";"<b>embedded variable not found</b>"
 "embedvar_not_allowed";"<b>embedded variable not allowed</b>"
 "descent_steps";"Descent steps"

@@ -202,10 +202,10 @@ if ($action == "update") {
 //		else if ($value=='no') $$key=false;
 //		else $$key=$value;
 //	}
-	if (!$error_db && !$error_db2 && !$error_db3 && !$error_indexdir && !$error_url && !$error_cnf && !$error_ali && !$error_ali_login) WriteToLog("EditConfig-> System configuration updated successfully.","I","S");
+	if (!$error_db && !$error_db2 && !$error_db3 && !$error_indexdir && !$error_url && !$error_cnf && !$error_ali && !$error_ali_login) WriteToLog("EditConfig-&gt; System configuration updated successfully.","I","S");
 	else {
 //		print "db: ".$error_db." db2: ".$error_db2." db3: ".$error_db3." indexdir: ".$error_indexdir." url: ".$error_url." cnf: ".$error_cnf." ali: ".$error_ali." all_login: ".$error_ali_login."<br />";
-		WriteToLog("EditConfig-> System configuration update failed.","E","S");
+		WriteToLog("EditConfig-&gt; System configuration update failed.","E","S");
 //		exit;
 	}
 	header("Location: editconfig.php?message=".urlencode($message));

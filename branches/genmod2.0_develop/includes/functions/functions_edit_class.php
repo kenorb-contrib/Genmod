@@ -73,7 +73,7 @@ abstract class EditFunctions {
 			$oldgid = $gid;
 			$gid = trim($match[1]);
 			if ($oldgid!=$gid) {
-				WriteToLog("ReplaceGedrec-> Warning: $oldgid was changed to $gid", "W", "G", $gedid);
+				WriteToLog("ReplaceGedrec-&gt; Warning: $oldgid was changed to $gid", "W", "G", $gedid);
 			}
 		}
 		
@@ -92,7 +92,7 @@ abstract class EditFunctions {
 		$sql .= ", '".$fact."', '".DbLayer::EscapeQuery($oldrec)."', '".DbLayer::EscapeQuery($newrec)."', '".trim($gid_type)."')";
 		$res = NewQuery($sql);
 		
-		WriteToLog("ReplaceGedrec-> Replacing gedcom record $gid ->" . $gm_user->username ."<-", "I", "G", $gedid);
+		WriteToLog("ReplaceGedrec-&gt; Replacing gedcom record $gid ->" . $gm_user->username ."<-", "I", "G", $gedid);
 		// Clear the ChangeFunctions::GetChangeData cache
 		ChangeFunctions::ResetChangeCaches();
 		return true;
@@ -118,7 +118,7 @@ abstract class EditFunctions {
 		$sql = "INSERT INTO ".TBLPREFIX."changes (ch_cid, ch_gid, ch_file, ch_type, ch_user, ch_time, ch_fact, ch_new, ch_gid_type)";
 		$sql .= "VALUES ('".$change_id."', '".$xref."', '".$gedid."', '".$change_type."', '".$gm_user->username."', '".time()."', '".$fact."', '".DbLayer::EscapeQuery($newrec)."', '".$type."')";
 		$res = NewQuery($sql);
-		WriteToLog("AppendGedrec-> Appending new $type record $xref ->" . $gm_user->username ."<-", "I", "G", $gedid);
+		WriteToLog("AppendGedrec-&gt; Appending new $type record $xref -&gt;" . $gm_user->username ."&lt;-", "I", "G", $gedid);
 	
 		// Clear the ChangeFunctions::GetChangeData cache
 		ChangeFunctions::ResetChangeCaches();
@@ -156,7 +156,7 @@ abstract class EditFunctions {
 		$object = ReConstructObject($gid, $gid_type);
 		if (!is_object($object) || $object->isempty) {
 			print "DeleteGedrec-> Could not find gedcom record with xref: $gid. <br />";
-			WriteToLog("DeleteGedrec-> Could not find gedcom record with xref: $gid ->" . $gm_user->username ."<-", "E", "G", GedcomConfig::$GEDCOMID);
+			WriteToLog("DeleteGedrec-&gt; Could not find gedcom record with xref: $gid -&gt;" . $gm_user->username ."&lt;-", "E", "G", GedcomConfig::$GEDCOMID);
 			return false;
 		}
 		else {
@@ -204,7 +204,7 @@ abstract class EditFunctions {
 						
 				
 		}
-		WriteToLog("DeleteGedrec-> Deleting gedcom record $gid ->" . $gm_user->username ."<-", "I", "G", GedcomConfig::$GEDCOMID);
+		WriteToLog("DeleteGedrec-&gt; Deleting gedcom record $gid -&gt;" . $gm_user->username ."&lt;-", "I", "G", GedcomConfig::$GEDCOMID);
 		// Clear the ChangeFunctions::GetChangeData cache
 		ChangeFunctions::ResetChangeCaches();
 		return true;
@@ -223,7 +223,7 @@ abstract class EditFunctions {
 			if ($ct2 == 0) {
 				print "CheckGedcom-> Invalid GEDCOM 5.5 format.\n";
 				print "<pre>".$gedrec."</pre>";
-				WriteToLog("CheckGedcom-> Invalid GEDCOM 5.5 format.->" . $gm_user->username ."<-", "I", "G", GedcomConfig::$GEDCOMID);
+				WriteToLog("CheckGedcom-&gt; Invalid GEDCOM 5.5 format.-&gt;" . $gm_user->username ."&lt;-", "I", "G", GedcomConfig::$GEDCOMID);
 				print $pipo;
 				return false;
 			}

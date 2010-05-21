@@ -312,7 +312,7 @@ if ($action=="update") {
 	}
 	$settings->person_facts = $person_facts;	
 	PrivacyController::StorePrivacy($settings);
-	WriteToLog("Privacy-> Privacy file updated", "I", "G", GedcomConfig::$GEDCOMID);
+	WriteToLog("Privacy-&gt; Privacy file updated", "I", "G", GedcomConfig::$GEDCOMID);
 	
 }
 

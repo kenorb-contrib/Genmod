@@ -84,7 +84,7 @@ if ($auth) {
 					$g[] = $gedid;
 				}
 				else $g = $gedid;
-				WriteToLog("ViewLog-> Cleanup up logfile older than ".date("d.m.Y H:i:s", $timestamp), "I", $cat, $g);
+				WriteToLog("ViewLog-&gt; Cleanup up logfile older than ".date("d.m.Y H:i:s", $timestamp), "I", $cat, $g);
 			}
 			else print GM_LANG_cleanup_failed;
 		}
@@ -185,7 +185,7 @@ if ($auth) {
 	print "<input type=\"button\" id=\"export\" value=\"".GM_LANG_export_log."\" onclick=\"document.location='viewlog.php?type=$type&amp;cat=$cat&amp;max=$max&amp;gedid=$gedid&amp;action=download'; \" />";
 	
 	print "</div>";
-	print "<br clear=\"all\" />";
+	print "<br style=\"clear: all;\" />";
 	
 	// Perform the query
 	$loglines = AdminFunctions::ReadLog($cat, $max, $type, $gedid);
@@ -208,7 +208,7 @@ if ($auth) {
 			print "<td>";
 			if (!empty($logline["user"])) print $logline["user"]."</td>\n";
 			else print "&nbsp;</td>\n";
-			print "<td class=\"wrap\">".htmlentities($logline["text"])."</td>\n";
+			print "<td class=\"wrap\">".$logline["text"]."</td>\n";
 			print "</tr>\n";
 		}
 	}

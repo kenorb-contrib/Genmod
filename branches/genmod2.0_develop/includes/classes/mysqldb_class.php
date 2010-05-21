@@ -83,7 +83,7 @@ abstract class MysqlDb {
 		$timee = GetMicrotime();
 		if (!$res && !$noreport) {
 			$this->HandleError($sql);
-			WriteToLog("Query-> Error occured: ".mysql_error()."<br />Query: ".htmlentities($sql),"E","S");
+			WriteToLog("Query-&gt; Error occured: ".mysql_error()."<br />Query: ".htmlentities($sql),"E","S");
 //			print "Query-> Error occured: ".mysql_error()."<br />Query: ".htmlentities($sql);
 		}
 		// Increase the querytime

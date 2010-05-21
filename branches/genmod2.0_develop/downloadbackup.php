@@ -36,7 +36,7 @@ $et = preg_match("/(\.\w+)$/", $fname, $ematch);
 if ($et>0) $ext = substr(trim($ematch[1]),1);
 else $ext = "";
 if (!in_array(strtolower($ext), $legal) || !$gm_user->userGedcomAdmin() || empty($fname)) {
-	WriteToLog("DownloadBackup-> Illegal download attempt. File: ".$fname, "W", "S");
+	WriteToLog("DownloadBackup-&gt; Illegal download attempt. File: ".$fname, "W", "S");
 	header("HTTP/1.1 403 Forbidden");
 	exit;
 }

@@ -42,7 +42,7 @@ $et = preg_match("/(\.\w+)$/", $file, $ematch);
 if ($et>0) $ext = substr(trim($ematch[1]),1);
 else $ext = "";
 if (!MediaFS::IsValidMedia($file)) {
-	WriteToLog("ShowBlob-> Illegal display attempt. File: ".$file, "W", "S");
+	WriteToLog("ShowBlob-&gt; Illegal display attempt. File: ".$file, "W", "S");
 	exit;
 }
 
@@ -57,7 +57,7 @@ $res = NewQuery($sql);
 while ($row = $res->FetchRow()) {
 	$media =& MediaItem::GetInstance($row[0], "", GedcomConfig::$GEDCOMID);
 	if (!$media->disp_as_link) {
-		WriteToLog("ShowBlob-> Unauthorised access to media: ".$file, "W", "S");
+		WriteToLog("ShowBlob-&gt; Unauthorised access to media: ".$file, "W", "S");
 		header("HTTP/1.1 403 Forbidden");
 		exit;
 	}
