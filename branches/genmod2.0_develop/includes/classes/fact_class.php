@@ -57,8 +57,9 @@ class Fact {
 	private $count = null;			// N-th fact of this type for the owner
 	private $style = null;			// Style to print this fact with
 	private $descr = null;			// Fact description
+	private $rela = null;			// If this is a relafact, the person's ID for which the fact is displayed.
 		
-	public function __construct($parent, $parent_type, $gedcomid, $fact, $factrec, $count=1, $style = "") {
+	public function __construct($parent, $parent_type, $gedcomid, $fact, $factrec, $count=1, $style = "", $rela = "") {
 		
 		$this->fact = trim($fact);
 		$this->factrec = $factrec;
@@ -70,6 +71,8 @@ class Fact {
 		$ct = preg_match("/2 TYPE (.*)/", $this->factrec, $match);
 		if ($ct>0) $this->factref = trim($match[1]);
 		else $this->factref = $this->fact;
+		if (!empty($rela)) $this->rela = $rela;
+
 	}
 
 	public function __get($property) {
@@ -351,13 +354,17 @@ class Fact {
 				// age of parents at child birth
 				if ($this->fact == "BIRT") $this->GetOwner()->PrintParentsAge($match[1]);
 			}
-			if ($print_own_age && $this->owner_type == "INDI") {
+			if ($print_own_age && ($this->owner_type == "INDI" || !is_null($this->rela))) {
 				// age at event
 				if ($this->fact != "CHAN") {
 					// do not print age after death
-					$deatrec=GetSubRecord(1, "1 DEAT", $this->GetOwner()->gedrec);
-					if ((CompareFacts($this->factrec, $this->GetOwner()->drec)!=1)||(strstr($this->factrec, "1 DEAT"))) {
-						$prtstr .= $this->GetOwner()->GetAge($match[1]);
+					$deatrec = GetSubRecord(1, "1 DEAT", $this->GetOwner()->gedrec);
+					if (!is_null($this->rela) || CompareFacts($this->factrec, $this->GetOwner()->drec) != 1 || strstr($this->factrec, "1 DEAT")) {
+						if (!is_null($this->rela)) {
+							$rela =& Person::GetInstance($this->rela);
+							$prtstr .= $rela->GetAge($match[1]);
+						}
+						else $prtstr .= $this->GetOwner()->GetAge($match[1]);
 					}
 				}
 			}

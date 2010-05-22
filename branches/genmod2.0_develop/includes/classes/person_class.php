@@ -532,7 +532,7 @@ class Person extends GedcomRecord {
 							$subrecord.="2 _GMFS @".$fam->xref."@\r\n";
 							if ($this->tracefacts) print "AddFamilyFacts - Adding for ".$fam->xref.": ".$factobj->fact." ".$subrecord."<br />";
 							// Beware! This fact is owned by the family, NOT by this individual!
-							$this->facts[] = new fact($fam->xref, $fam->datatype, $fam->gedcomid, $factobj->fact, $subrecord, $count_facts[$factobj->fact], $factobj->style);
+							$this->facts[] = new fact($fam->xref, $fam->datatype, $fam->gedcomid, $factobj->fact, $subrecord, $count_facts[$factobj->fact], $factobj->style, $this->xref);
 						}
 					}
 				}
@@ -580,7 +580,7 @@ class Person extends GedcomRecord {
 							$factrec .= "\n2 ASSO @".$fam->husb->xref."@";
 							$factrec .= "\n3 RELA ".(NameFunctions::GetSosaName($sosa*2));
 							if ($this->tracefacts) print "AddParentsFacts sosa ".$sosa."- Adding for ".$fam->xref.": ".$fact." ".$factrec."<br />";
-							$this->facts[] = new Fact($fam->husb->xref, $fam->husb->datatype, $fam->husb->gedcomid, "X$fact", $factrec, 0, "");
+							$this->facts[] = new Fact($fam->husb->xref, $fam->husb->datatype, $fam->husb->gedcomid, "X$fact", $factrec, 0, "", $this->xref);
 						}
 					}
 					if ($sosa==1) $this->AddStepSiblingsFacts($fam->husb, $fam->xref); // stepsiblings with father
@@ -599,7 +599,7 @@ class Person extends GedcomRecord {
 							$factrec .= "\n2 ASSO @".$fam->wife->xref."@";
 							$factrec .= "\n3 RELA ".(NameFunctions::GetSosaName($sosa*2+1));
 							if ($this->tracefacts) print "AddParentsFacts sosa ".$sosa."- Adding for ".$fam->xref.": ".$fact." ".$factrec."<br />";
-							$this->facts[] = new Fact($fam->wife->xref, $fam->wife->datatype, $fam->wife->gedcomid, "X$fact", $factrec, 0, "");
+							$this->facts[] = new Fact($fam->wife->xref, $fam->wife->datatype, $fam->wife->gedcomid, "X$fact", $factrec, 0, "", $this->xref);
 						}
 					}
 					if ($sosa==1) $this->AddStepSiblingsFacts($fam->wife, $fam->xref); // stepsiblings with mother
@@ -639,7 +639,7 @@ class Person extends GedcomRecord {
 								$factrec .= "\n2 ASSO @".$psfam->xref."@";
 								$factrec .= "\n3 RELA family";
 								if ($this->tracefacts) print "AddParentsFacts sosa ".$sosa."- Adding for ".$fam->xref.": ".$fact." ".$factrec."<br />";
-								$this->facts[] = new Fact($psfam->xref, $psfam->datatype, $psfam->gedcomid, "X$fact", $factrec, 0, "");
+								$this->facts[] = new Fact($psfam->xref, $psfam->datatype, $psfam->gedcomid, "X$fact", $factrec, 0, "", $this->xref);
 							}
 						}
 					}
@@ -720,7 +720,7 @@ class Person extends GedcomRecord {
 						$factrec .= "\n2 ASSO @".$child->xref."@";
 						$factrec .= "\n3 RELA ".$rela;
 						if ($this->tracefacts) print "AddChildrenFacts (".$option.") - Adding for ".$child->xref.": ".$fact." ".$factrec."<br />";
-						$this->facts[] = new Fact($child->xref, $child->datatype, $child->gedcomid, "X$fact", $factrec, 0, "");
+						$this->facts[] = new Fact($child->xref, $child->datatype, $child->gedcomid, "X$fact", $factrec, 0, "", $this->xref);
 					}
 				}
 				// add child death
@@ -740,7 +740,7 @@ class Person extends GedcomRecord {
 						$factrec .= "\n2 ASSO @".$child->xref."@";
 						$factrec .= "\n3 RELA ".$rela;
 						if ($this->tracefacts) print "AddChildrenFacts (".$option.") - Adding for ".$child->xref.": ".$fact." ".$factrec."<br />";
-						$this->facts[] = new Fact($child->xref, $child->datatype, $child->gedcomid, "X$fact", $factrec, 0, "");
+						$this->facts[] = new Fact($child->xref, $child->datatype, $child->gedcomid, "X$fact", $factrec, 0, "", $this->xref);
 					}
 				}
 				// add child marriage
@@ -781,7 +781,7 @@ class Person extends GedcomRecord {
 								$arec = GetSubRecord(2, "2 ASSO @".$child->xref."@", $childfam->marr_fact->factrec);
 								if ($arec) $factrec .= "\n".$arec;
 								if ($this->tracefacts) print "AddChildrenFacts (".$option.") - Adding for ".$child->xref.": ".$fact." ".$factrec."<br />";
-								$this->facts[] = new Fact($childfam->xref, $childfam->datatype, $childfam->gedcomid, "X$fact", $factrec, 0, "");
+								$this->facts[] = new Fact($childfam->xref, $childfam->datatype, $childfam->gedcomid, "X$fact", $factrec, 0, "", $this->xref);
 							}
 						}
 					}
@@ -830,7 +830,7 @@ class Person extends GedcomRecord {
 				$factrec .= "\n2 ASSO @".$fam->$spperson->xref."@";
 				$factrec .= "\n3 RELA spouse";
 				if ($this->tracefacts) print "AddSpouseFacts - Adding for ".$fam->$spperson->xref.": ".$fact." ".$factrec."<br />";
-				$this->facts[] = new Fact($fam->$spperson->xref, $fam->$spperson->datatype, $fam->$spperson->gedcomid, "X$fact", $factrec, 0, "");
+				$this->facts[] = new Fact($fam->$spperson->xref, $fam->$spperson->datatype, $fam->$spperson->gedcomid, "X$fact", $factrec, 0, "", $this->xref);
 			}
 		}
 	}
@@ -926,7 +926,7 @@ class Person extends GedcomRecord {
 									else $factrec .= "\n2 ASSO @".$rid."@\n3 RELA ".$label;
 									//$factrec .= "\n3 NOTE ".$rela;
 									$factrec .= "\n2 ASSO @".$pid."@\n3 RELA ".$rela;
-									$this->facts[] = new Fact($asso->associated->xref, $asso->associated->datatype, $asso->associated->gedcomid, "X_$fact", $factrec, 0, "");
+									$this->facts[] = new Fact($asso->associated->xref, $asso->associated->datatype, $asso->associated->gedcomid, "X_$fact", $factrec, 0, "", $this->xref);
 								}
 							}
 						}

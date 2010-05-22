@@ -245,9 +245,7 @@ class FamilyBookController extends ChartController {
 		if ($this->show_spouse) {
 			foreach($person->spousefamilies as $indexval => $fam) {
 				if (is_object($fam->marr_fact)) {
-//					print "<br />";
-					if ($fam->disp && $fam->marr_date != "") print "<span class=\"date\">".NameFunctions::GetFirstLetter($fam->marr_fact->descr).": ".$fam->marr_fact->datestring."</span>";
-//					FactFunctions::PrintSimpleFact($fam->marr_fact, false, false); 
+					if ($fam->disp && $fam->marr_date != "") print "<span class=\"date\">".NameFunctions::GetFirstLetter($fam->marr_fact->descr).": ".GetChangedDate($fam->marr_fact->datestring)."</span>";
 				}
 				if ($fam->husb_id != $person->xref) PersonFunctions::PrintPedigreePerson($fam->husb, 1, true, $this->boxcount, 1, $this->view, $this->params);
 				else PersonFunctions::PrintPedigreePerson($fam->wife, 1, true, $this->boxcount, 1, $this->view, $this->params);
