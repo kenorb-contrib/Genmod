@@ -50,8 +50,8 @@ class Person extends GedcomRecord {
 											// N.B.: If unknown, it is estimated.
 	private $ddate = null;					// The death date in gedcom 2 DATE xxxxxx format. Privacy is applied.
 											// N.B.: If unknown, it is estimated.
-	private $bplac = null;					// The birth place in gedcom 2 DATE xxxxxx format. Privacy is applied. 
-	private $dplac = null;					// The death place in gedcom 2 DATE xxxxxx format. Privacy is applied.
+	private $bplac = null;					// The birth place in gedcom 2 PLAC xxxxxx format. Privacy is applied. 
+	private $dplac = null;					// The death place in gedcom 2 PLAC xxxxxx format. Privacy is applied.
 	private $brec = null;					// The complete birthrecord in gedcom format. Privacy is applied. For now used in timeline.
 	private $drec = null;					// The complete deathrecord in gedcom format. Privacy is applied.
 	private $sex = null;					// Gender of the person: M, F, U. Privacy is applied.

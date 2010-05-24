@@ -2635,3 +2635,8 @@
 "rcblock_show_sour";"Show changes for sources"
 "rcblock_show_repo";"Show changes for repositories"
 "rcblock_show_obje";"Show changes for media items"
+"external_search";"External Search"
+"year_range_start";"Year range (start)"
+"year_range_end";"Year range (end)"
+"birthplac";"Birth place"
+"deathplac";"Death place"
