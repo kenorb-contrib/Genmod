@@ -271,6 +271,22 @@ switch($action) {
 		}
 	break;
 	
+	case "extsearchformprint":
+		$es_controller = new ExternalSearchController($pid, $gedcomid);
+		$es_controller->PrintSearchForm($formno);
+	break;
+	
+	case "extsearchservice":
+		$es_controller = new ExternalSearchController($pid, $gedcomid);
+		// See what params we must have received
+		$params = $es_controller->GetParams($formno);
+		$searchparms = array();
+		foreach ($params as $inputname => $formname) {
+			$searchparms[$inputname] = $$inputname;
+		}
+		print $es_controller->PrintServiceResults($formno, $searchparms);
+		break;
+	
 	case "send_empty":
 		print "";
 	break;

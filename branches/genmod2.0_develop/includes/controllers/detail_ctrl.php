@@ -50,7 +50,7 @@ abstract class DetailController extends BaseController{
 		// The array always starts with '0', which indicates the "all" option.
 		switch (get_class($this)) {
 			case "IndividualController":
-				$this->tabs = array('0', 'relatives', 'facts', 'sources', 'media', 'notes', 'relations', 'actions_person');
+				$this->tabs = array('0', 'relatives', 'facts', 'sources', 'media', 'notes', 'relations', 'actions_person', 'external_search');
 				$this->tabtype = "indi";
 				$this->object_name = "indi";
 				$this->fact_filter = array("OBJE", "SOUR", "NOTE", "SEX", "NAME");
@@ -137,7 +137,7 @@ abstract class DetailController extends BaseController{
 				// empty tabs
 				for (i=0; i<tabid.length; i++) {
 					var elt = document.getElementById('door'+i);
-					if (document.getElementById('no_tab'+i)) { // empty ?
+					if (document.getElementById('no_tab'+i)) { // empty ? then show it only to users who have edit rights
 						if (<?php if ($gm_user->userCanEdit()) echo 'true'; else echo 'false';?>) {
 							elt.style.display='block';
 							elt.style.opacity='0.4';
@@ -180,6 +180,7 @@ abstract class DetailController extends BaseController{
 					if ($tab == "notes") print ($this->tabtype == "indi" || $this->tabtype == "fam" ? "accesskey=\"".GM_LANG_accesskey_individual_notes."\"" : "").">".GM_LANG_notes."</a></dd>\n";
 					if ($tab == "relations") print ($this->tabtype == "indi" || $this->tabtype == "fam" ? "accesskey=\"".GM_LANG_accesskey_individual_relations."\"" : "").">".GM_LANG_relations."</a></dd>\n";
 					if ($tab == "actions_person") print ($this->tabtype == "indi" || $this->tabtype == "fam" ? "accesskey=\"".GM_LANG_accesskey_individual_research_log."\"" : "").">".GM_LANG_research_log."</a></dd>\n";
+					if ($tab == "external_search") print ">".GM_LANG_external_search."</a></dd>\n";
 				}
 			}
 			print "<dd id=\"door0\"><a href=\"javascript:;\" onclick=\"tabswitch(0)\" >".GM_LANG_all."</a></dd>\n";
@@ -747,6 +748,23 @@ abstract class DetailController extends BaseController{
 				}
 				else print "<div id=\"no_tab".$index."\" class=\"shade1\">".($gm_user->userCanEdit() ? GM_LANG_no_tab7 : "")."</div>\n";
 				print "<br style=\" clear: both;\" /></div>";
+			}
+			if ($tab == "external_search") {
+				print "<div id=\"external_search\" class=\"tab_page\" style=\"display:none;\" >\n";
+				if ($gm_user->userCanEdit()) {
+					$es_controller = new ExternalSearchController($this->$object_name);
+					if ($es_controller->optioncount > 0) {
+						print "<br />";
+						print "<div style=\"float: left;\" class=\"width30\" id=\"esearchform\">\n";
+						$es_controller->PrintSearchForm();
+						print "</div>\n";
+						print "<div style=\"float: left;\" class=\"width60\" id=\"esearchresults\">";
+						print "</div>";
+					}
+					else print "<div id=\"no_tab".$index."\" class=\"shade1\"></div>\n";
+				}
+				else print "<div id=\"no_tab".$index."\" class=\"shade1\"></div>\n";
+				print "</div>";
 			}
 		}	
 		print "<script type=\"text/javascript\">\n<!--\n";
