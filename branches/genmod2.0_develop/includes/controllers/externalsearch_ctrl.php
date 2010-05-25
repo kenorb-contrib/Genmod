@@ -177,6 +177,7 @@ class ExternalSearchController {
 		/* This function supports the following fieldnames:
 		 * fullname			Full name of the person, in the format: "firstname surname"
 		 * surname			Surname of the person
+		 * firstname		First name of the person
 		 * gbdate			Birthdate in gedcom format e.g. 12 MAY 1880
 		 * bplace			Birthplace
 		 * gddate			Deathdate in gedcom format e.g. 12 MAY 1880
@@ -197,7 +198,13 @@ class ExternalSearchController {
 			case "surname":
 				print "<tr><td class=\"shade2\">".GM_LANG_surname."</td>";
 				$this->PrintCheckSelect($field, $checked);
-				print "<td class=\"shade1\"><input name=\"".$field."\" size=\"25\" value=\"".$this->indi->name_array[0][2]."\" tabindex=\"".$tabindex."\" /></td</tr>\n";
+				print "<td class=\"shade1\"><input name=\"".$field."\" size=\"25\" value=\"".($this->indi->name_array[0][2] == "@N.N." ? "" : $this->indi->name_array[0][2])."\" tabindex=\"".$tabindex."\" /></td</tr>\n";
+				break;
+			case "firstname":
+				print "<tr><td class=\"shade2\">".GM_LANG_firstname.":</td>";
+				$this->PrintCheckSelect($field, $checked);
+				$name = trim(substr($this->indi->name_array[0][0], 0, strpos($this->indi->name_array[0][0], "/")));
+				print "<td class=\"shade1\"><input name=\"".$field."\" size=\"25\" value=\"".($name == "@P.N." ? "" : $name)."\" tabindex=\"".$tabindex."\" /></td</tr>\n";
 				break;
 			case "gbdate":
 				print "<tr><td class=\"shade2\">".GM_FACT_BIRT.":</td>";
