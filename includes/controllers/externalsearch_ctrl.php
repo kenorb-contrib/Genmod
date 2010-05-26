@@ -102,7 +102,7 @@ class ExternalSearchController {
 		$module = $this->modules[$number];
 		
 		// Print the searchform
-		print "<form name=\"extsearch\" method=\"get\">\n";
+		print "<form name=\"extsearch\" method=\"get\" action=\"individual.php\">\n";
 		
 		// 1. Search form title
 		print "<table class=\"width100\">\n";
@@ -131,7 +131,7 @@ class ExternalSearchController {
 			print " onclick=\"window.open('".$module->link;
 			$first = true;
 			foreach($module->params as $inputname => $formname) {
-				if (!$first) print "+'&";
+				if (!$first) print "+'&amp;";
 				print $inputname."='+(document.extsearch.".$formname."_checked.checked ? escape(document.extsearch.".$formname.".value) : '')";
 				$first = false;
 			}
@@ -193,43 +193,43 @@ class ExternalSearchController {
 			case "fullname":
 				print "<tr><td class=\"shade2\">".GM_LANG_name.":</td>";
 				$this->PrintCheckSelect($field, $checked);
-				print "<td class=\"shade1\"><input name=\"".$field."\" size=\"25\" value=\"".NameFunctions::CheckNN(NameFunctions::GetNameInRecord($this->indi->gedrec))."\" tabindex=\"".$tabindex."\" /></td</tr>\n";
+				print "<td class=\"shade1\"><input name=\"".$field."\" size=\"25\" value=\"".NameFunctions::CheckNN(NameFunctions::GetNameInRecord($this->indi->gedrec))."\" tabindex=\"".$tabindex."\" /></td></tr>\n";
 				break;
 			case "surname":
 				print "<tr><td class=\"shade2\">".GM_LANG_surname."</td>";
 				$this->PrintCheckSelect($field, $checked);
-				print "<td class=\"shade1\"><input name=\"".$field."\" size=\"25\" value=\"".($this->indi->name_array[0][2] == "@N.N." ? "" : $this->indi->name_array[0][2])."\" tabindex=\"".$tabindex."\" /></td</tr>\n";
+				print "<td class=\"shade1\"><input name=\"".$field."\" size=\"25\" value=\"".($this->indi->name_array[0][2] == "@N.N." ? "" : $this->indi->name_array[0][2])."\" tabindex=\"".$tabindex."\" /></td></tr>\n";
 				break;
 			case "firstname":
 				print "<tr><td class=\"shade2\">".GM_LANG_firstname.":</td>";
 				$this->PrintCheckSelect($field, $checked);
 				$name = trim(substr($this->indi->name_array[0][0], 0, strpos($this->indi->name_array[0][0], "/")));
-				print "<td class=\"shade1\"><input name=\"".$field."\" size=\"25\" value=\"".($name == "@P.N." ? "" : $name)."\" tabindex=\"".$tabindex."\" /></td</tr>\n";
+				print "<td class=\"shade1\"><input name=\"".$field."\" size=\"25\" value=\"".($name == "@P.N." ? "" : $name)."\" tabindex=\"".$tabindex."\" /></td></tr>\n";
 				break;
 			case "gbdate":
 				print "<tr><td class=\"shade2\">".GM_FACT_BIRT.":</td>";
 				$this->PrintCheckSelect($field, $checked);
-				print "<td class=\"shade1\"><input name=\"".$field."\" size=\"25\" value=\"".GetGedcomValue("DATE", 2, $this->indi->bdate, "", false)."\" tabindex=\"".$tabindex."\" /></td</tr>\n";
+				print "<td class=\"shade1\"><input name=\"".$field."\" size=\"25\" value=\"".GetGedcomValue("DATE", 2, $this->indi->bdate, "", false)."\" tabindex=\"".$tabindex."\" /></td></tr>\n";
 				break;
 			case "bplace":
 				print "<tr><td class=\"shade2\">".GM_LANG_birthplac.":</td>";
 				$this->PrintCheckSelect($field, $checked);
-				print "<td class=\"shade1\"><input name=\"".$field."\" size=\"25\" value=\"".GetGedcomValue("PLAC", 2, $this->indi->bplac, "", false)."\" tabindex=\"".$tabindex."\" /></td</tr>\n";
+				print "<td class=\"shade1\"><input name=\"".$field."\" size=\"25\" value=\"".GetGedcomValue("PLAC", 2, $this->indi->bplac, "", false)."\" tabindex=\"".$tabindex."\" /></td></tr>\n";
 				break;
 			case "gddate":
 				print "<tr><td class=\"shade2\">".GM_FACT_DEAT.":</td>";
 				$this->PrintCheckSelect($field, $checked);
-				print "<td class=\"shade1\"><input name=\"".$field."\" size=\"25\" value=\"".GetGedcomValue("DATE", 2, $this->indi->ddate, "", false)."\" tabindex=\"".$tabindex."\" /></td</tr>\n";
+				print "<td class=\"shade1\"><input name=\"".$field."\" size=\"25\" value=\"".GetGedcomValue("DATE", 2, $this->indi->ddate, "", false)."\" tabindex=\"".$tabindex."\" /></td></tr>\n";
 				break;
 			case "dplace":
 				print "<tr><td class=\"shade2\">".GM_LANG_deathplac.":</td>";
 				$this->PrintCheckSelect($field, $checked);
-				print "<td class=\"shade1\"><input name=\"".$field."\" size=\"25\" value=\"".GetGedcomValue("PLAC", 2, $this->indi->dplac, "", false)."\" tabindex=\"".$tabindex."\" /></td</tr>\n";
+				print "<td class=\"shade1\"><input name=\"".$field."\" size=\"25\" value=\"".GetGedcomValue("PLAC", 2, $this->indi->dplac, "", false)."\" tabindex=\"".$tabindex."\" /></td></tr>\n";
 				break;
 			case "ggender":
 				print "<tr><td class=\"shade2\">".GM_LANG_sex.":</td>";
 				$this->PrintCheckSelect($field, $checked);
-				print "<td class=\"shade1\"><input name=\"".$field."\" size=\"25\" value=\"".$this->indi->sex."\" tabindex=\"".$tabindex."\" /></td</tr>\n";
+				print "<td class=\"shade1\"><input name=\"".$field."\" size=\"25\" value=\"".$this->indi->sex."\" tabindex=\"".$tabindex."\" /></td></tr>\n";
 				break;
 			case "gplace":
 				print "<tr><td class=\"shade2\">".GM_FACT_PLAC.":</td>";
@@ -241,7 +241,7 @@ class ExternalSearchController {
 						break;
 					}
 				}
-				print "<td class=\"shade1\"><input name=\"".$field."\" size=\"25\" value=\"".$plac."\" tabindex=\"".$tabindex."\" /></td</tr>\n";
+				print "<td class=\"shade1\"><input name=\"".$field."\" size=\"25\" value=\"".$plac."\" tabindex=\"".$tabindex."\" /></td></tr>\n";
 				break;
 			case "yrange1":
 				print "<tr><td class=\"shade2\">".GM_LANG_year_range_start.":</td>";
@@ -269,7 +269,7 @@ class ExternalSearchController {
 	
 	private function PrintCheckSelect($field, $checked) {
 		
-		print "<td class=\"shade2 center\"><input type=\"checkbox\" name=\"".$field."_checked\" ".($checked ? "checked=\"checked\" " : "")."value=\"yes\" />";
+		print "<td class=\"shade2 center\"><input type=\"checkbox\" name=\"".$field."_checked\" ".($checked ? "checked=\"checked\" " : "")."value=\"yes\" /></td>";
 	}
 	
 	public function GetParams($number) {
