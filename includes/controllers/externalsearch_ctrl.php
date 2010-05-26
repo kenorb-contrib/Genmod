@@ -47,10 +47,17 @@ class ExternalSearchController {
 		if (!is_object($indi)) $indi = Person::GetInstance($indi, "", $gedcomid);
 		
 		if ($indi->gedcomid != GedcomConfig::$GEDCOMID) SwitchGedcom($gedcomid);
-		if ($gm_user->userIsAdmin() || $gm_user->GedcomAdmin()) $this->userlevel = 3;
-		else if ($gm_user->userCanEdit()) $this->userlevel = 2;
-		else if ($gm_user->userPrivAccess()) $this->userlevel = 1;
-		else $this->userlevel = 0;
+		
+		if (!$gm_user->userExternalSearch()) {
+			$this->userlevel = -1;
+			$this->optioncount = 0;
+		}
+		else {
+			if ($gm_user->userIsAdmin() || $gm_user->GedcomAdmin()) $this->userlevel = 3;
+			else if ($gm_user->userCanEdit()) $this->userlevel = 2;
+			else if ($gm_user->userPrivAccess()) $this->userlevel = 1;
+			else $this->userlevel = 0;
+		}
 		
 		$this->indi = $indi;
 	}
@@ -62,9 +69,6 @@ class ExternalSearchController {
 				break;
 			case "action":
 				return $this->action;
-				break;
-			default:
-				return parent::__get($property);
 				break;
 		}
 	}
@@ -209,7 +213,16 @@ class ExternalSearchController {
 			case "gbdate":
 				print "<tr><td class=\"shade2\">".GM_FACT_BIRT.":</td>";
 				$this->PrintCheckSelect($field, $checked);
-				print "<td class=\"shade1\"><input name=\"".$field."\" size=\"25\" value=\"".GetGedcomValue("DATE", 2, $this->indi->bdate, "", false)."\" tabindex=\"".$tabindex."\" /></td></tr>\n";
+				print "<td class=\"shade1\"><input name=\"".$field."\" id=\"".$field."\" size=\"25\" value=\"".GetGedcomValue("DATE", 2, $this->indi->bdate, "", false)."\" tabindex=\"".$tabindex."\" />&nbsp;";
+				EditFunctions::PrintCalendarPopup($field);
+				print "</td></tr>\n";
+				break;
+			case "gbyear":
+				print "<tr><td class=\"shade2\">".GM_LANG_birthyear.":</td>";
+				$this->PrintCheckSelect($field, $checked);
+				$date = ParseDate(GetGedcomValue("DATE", 2, $this->indi->bdate, "", false));
+				$year = $date[0]["year"];
+				print "<td class=\"shade1\"><input name=\"".$field."\" id=\"".$field."\" size=\"25\" value=\"".$year."\" tabindex=\"".$tabindex."\" /></td></tr>\n";
 				break;
 			case "bplace":
 				print "<tr><td class=\"shade2\">".GM_LANG_birthplac.":</td>";
@@ -219,7 +232,16 @@ class ExternalSearchController {
 			case "gddate":
 				print "<tr><td class=\"shade2\">".GM_FACT_DEAT.":</td>";
 				$this->PrintCheckSelect($field, $checked);
-				print "<td class=\"shade1\"><input name=\"".$field."\" size=\"25\" value=\"".GetGedcomValue("DATE", 2, $this->indi->ddate, "", false)."\" tabindex=\"".$tabindex."\" /></td></tr>\n";
+				print "<td class=\"shade1\"><input name=\"".$field."\" id=\"".$field."\" size=\"25\" value=\"".GetGedcomValue("DATE", 2, $this->indi->ddate, "", false)."\" tabindex=\"".$tabindex."\" />&nbsp;";
+				EditFunctions::PrintCalendarPopup($field);
+				print "</td></tr>\n";
+				break;
+			case "gdyear":
+				print "<tr><td class=\"shade2\">".GM_LANG_deathyear.":</td>";
+				$this->PrintCheckSelect($field, $checked);
+				$date = ParseDate(GetGedcomValue("DATE", 2, $this->indi->ddate, "", false));
+				$year = $date[0]["year"];
+				print "<td class=\"shade1\"><input name=\"".$field."\" id=\"".$field."\" size=\"25\" value=\"".$year."\" tabindex=\"".$tabindex."\" /></td></tr>\n";
 				break;
 			case "dplace":
 				print "<tr><td class=\"shade2\">".GM_LANG_deathplac.":</td>";
@@ -229,7 +251,9 @@ class ExternalSearchController {
 			case "ggender":
 				print "<tr><td class=\"shade2\">".GM_LANG_sex.":</td>";
 				$this->PrintCheckSelect($field, $checked);
-				print "<td class=\"shade1\"><input name=\"".$field."\" size=\"25\" value=\"".$this->indi->sex."\" tabindex=\"".$tabindex."\" /></td></tr>\n";
+				print "<td class=\"shade1\">";
+				EditFunctions::PrintGender($field, $field, $this->indi->sex, $tabindex);
+				print "</td></tr>\n";
 				break;
 			case "gplace":
 				print "<tr><td class=\"shade2\">".GM_FACT_PLAC.":</td>";

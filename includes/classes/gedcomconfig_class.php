@@ -98,6 +98,7 @@ abstract class GedcomConfig {
 	public static $SHOW_FAM_ID_NUMBERS = true;				// Show gedcom id numbers next to family names
 	public static $SHOW_PEDIGREE_PLACES = "9";				// What level to show the birth and death places next to the birth and death dates 
 															// on the pedigree and descendency charts.
+	public static $SHOW_EXTERNAL_SEARCH = 5;				// Access level for external search
 	public static $SHOW_NICK = false;						// Whether or not to show the nickname in parenthesis between first and last name
 	public static $NICK_DELIM = "()";						// If nicks are shown, they are contained between these two characters
 	public static $MEDIA_EXTERNAL = true;					// Set whether or not to change links starting with http, ftp etc.

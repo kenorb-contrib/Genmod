@@ -804,13 +804,7 @@ abstract class EditFunctions {
 			print "</select>\n";
 		}
 		else if ($fact == "SEX") {
-			print "<select tabindex=\"".$tabkey."\" id=\"".$element_id."\" name=\"".$element_name."\">\n<option value=\"M\"";
-			if ($value=="M") print " selected=\"selected\"";
-			print ">".GM_LANG_male."</option>\n<option value=\"F\"";
-			if ($value=="F") print " selected=\"selected\"";
-			print ">".GM_LANG_female."</option>\n<option value=\"U\"";
-			if ($value=="U" || empty($value)) print " selected=\"selected\"";
-			print ">".GM_LANG_unknown."</option>\n</select>\n";
+			self::PrintGender($element_id, $element_name, $value, $tabkey);
 		}
 		else if ($fact == "PEDI") {
 			self::PrintPedi($element_id, $element_name, $value, $switch);
@@ -1380,6 +1374,16 @@ abstract class EditFunctions {
 		print ">".GM_LANG_sealing."</option>\n";
 			
 		print "</select>\n";
+	}
+	
+	public function PrintGender($element_id, $element_name, $value, $tabkey) {
+		print "<select tabindex=\"".$tabkey."\" id=\"".$element_id."\" name=\"".$element_name."\">\n<option value=\"M\"";
+		if ($value=="M") print " selected=\"selected\"";
+		print ">".GM_LANG_male."</option>\n<option value=\"F\"";
+		if ($value=="F") print " selected=\"selected\"";
+		print ">".GM_LANG_female."</option>\n<option value=\"U\"";
+		if ($value=="U" || empty($value)) print " selected=\"selected\"";
+		print ">".GM_LANG_unknown."</option>\n</select>\n";
 	}
 	
 	public function SubmitterRecord($level, $gedrec) {

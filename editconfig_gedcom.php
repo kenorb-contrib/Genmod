@@ -333,6 +333,7 @@ if ($action=="update") {
 	$newconf["show_context_help"] = $boolarray[$_POST["NEW_SHOW_CONTEXT_HELP"]];
 	$newconf["show_counter"] = $boolarray[$_POST["NEW_SHOW_COUNTER"]];
 	$newconf["show_empty_boxes"] = $boolarray[$_POST["NEW_SHOW_EMPTY_BOXES"]];
+	$newconf["show_external_search"] = $_POST["NEW_SHOW_EXTERNAL_SEARCH"];
 	$newconf["lists_all"] = $boolarray[$_POST["NEW_LISTS_ALL"]];
 	$newconf["show_fam_id_numbers"] = $boolarray[$_POST["NEW_SHOW_FAM_ID_NUMBERS"]];
 	$newconf["show_gedcom_record"] = $_POST["NEW_SHOW_GEDCOM_RECORD"];
@@ -1118,6 +1119,19 @@ print "</table>";
 			<select name="NEW_LISTS_ALL" tabindex="<?php $i++; print $i?>">
 				<option value="yes" <?php if (GedcomConfig::$LISTS_ALL) print "selected=\"selected\""; ?>><?php print GM_LANG_yes;?></option>
 				<option value="no" <?php if (!GedcomConfig::$LISTS_ALL) print "selected=\"selected\""; ?>><?php print GM_LANG_no;?></option>
+			</select>
+		</td>
+	</tr>
+	<tr>
+		<td class="shade2 wrap"><div class="helpicon"><?php PrintHelpLink("SHOW_EXTERNAL_SEARCH_help", "qm", "SHOW_EXTERNAL_SEARCH"); print "</div><div class=\"description\">"; print GM_LANG_SHOW_EXTERNAL_SEARCH;?></div></td>
+		<td class="shade1"><select name="NEW_SHOW_EXTERNAL_SEARCH" tabindex="<?php $i++; print $i?>">
+				<option value="-1" <?php if (GedcomConfig::$SHOW_EXTERNAL_SEARCH == "-1") print "selected=\"selected\""; ?>><?php print constant("GM_LANG_show_gedrec_-1");?></option>
+				<option value="0" <?php if (GedcomConfig::$SHOW_EXTERNAL_SEARCH == "0") print "selected=\"selected\""; ?>><?php print GM_LANG_show_gedrec_0;?></option>
+				<option value="1" <?php if (GedcomConfig::$SHOW_EXTERNAL_SEARCH == "1") print "selected=\"selected\""; ?>><?php print GM_LANG_show_gedrec_1;?></option>
+				<option value="2" <?php if (GedcomConfig::$SHOW_EXTERNAL_SEARCH == "2") print "selected=\"selected\""; ?>><?php print GM_LANG_show_gedrec_2;?></option>
+				<option value="3" <?php if (GedcomConfig::$SHOW_EXTERNAL_SEARCH == "3") print "selected=\"selected\""; ?>><?php print GM_LANG_show_gedrec_3;?></option>
+				<option value="4" <?php if (GedcomConfig::$SHOW_EXTERNAL_SEARCH == "4") print "selected=\"selected\""; ?>><?php print GM_LANG_show_gedrec_4;?></option>
+				<option value="5" <?php if (GedcomConfig::$SHOW_EXTERNAL_SEARCH == "5") print "selected=\"selected\""; ?>><?php print GM_LANG_show_gedrec_5;?></option>
 			</select>
 		</td>
 	</tr>
