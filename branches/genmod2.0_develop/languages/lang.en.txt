@@ -2640,3 +2640,6 @@
 "year_range_end";"Year range (end)"
 "birthplac";"Birth place"
 "deathplac";"Death place"
+"birthyear";"Birth year"
+"deathyear";"Death year"
+"SHOW_EXTERNAL_SEARCH";"External search tab on indipage (overrides module settings)"

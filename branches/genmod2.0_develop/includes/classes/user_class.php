@@ -371,6 +371,29 @@ class User {
 	}
 
 	/**
+	* Determine if the user can use the external search modules
+	* @author	Genmod Development Team
+	* @param		string	$username		The username or if not set, the current user
+	* @param		string	$ged			The GEDCOM file or if not set, the current user
+	* @return 		boolean					Return true or false as a result
+	*/ 
+	public function userExternalSearch($gedid="") {
+		
+		if ($this->username == "empty" || $this->username == "") return false;
+
+		if (empty($gedid)) $gedid = GedcomConfig::$GEDCOMID;
+		
+		if (GedcomConfig::$SHOW_EXTERNAL_SEARCH == -1) return false;
+		if (GedcomConfig::$SHOW_EXTERNAL_SEARCH == 0) return true;
+		if (GedcomConfig::$SHOW_EXTERNAL_SEARCH == 1 && $this->UserPrivAccess($gedid)) return true;
+		if (GedcomConfig::$SHOW_EXTERNAL_SEARCH == 2 && $this->UserCanEdit($gedid)) return true;
+		if (GedcomConfig::$SHOW_EXTERNAL_SEARCH == 3 && $this->UserCanAccept($gedid)) return true;
+		if (GedcomConfig::$SHOW_EXTERNAL_SEARCH == 4 && $this->UserGedcomAdmin($gedid)) return true;
+		if (GedcomConfig::$SHOW_EXTERNAL_SEARCH == 5 && $this->UserIsAdmin()) return true;
+		return false;
+	}
+	
+	/**
 	* Determine if the user can edit raw GEDCOM lines
 	* @author	Genmod Development Team
 	* @param		string	$username		The username or if not set, the current user

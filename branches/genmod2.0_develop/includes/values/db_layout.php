@@ -303,6 +303,7 @@ $db_original[TBLPREFIX."gedconf"]["row"]["gc_last_today"]["details"] = "INT (11)
 $db_original[TBLPREFIX."gedconf"]["row"]["gc_last_stats"]["details"] = "INT (11) DEFAULT '0'";
 $db_original[TBLPREFIX."gedconf"]["row"]["gc_display_pinyin"]["details"] = "TINYINT (1) DEFAULT '0'";
 $db_original[TBLPREFIX."gedconf"]["row"]["gc_last_plotdata"]["details"] = "TINYINT (1) DEFAULT '0'";
+$db_original[TBLPREFIX."gedconf"]["row"]["gc_show_external_search"]["details"] = "TINYINT (1) DEFAULT '5'";
 $db_original[TBLPREFIX."gedconf"]["key"]["primary"] = "PRIMARY KEY  (`gc_gedcomid`)";
 
 $db_original[TBLPREFIX."individual_family"]["row"]["ID"]["details"] = "INT NOT NULL AUTO_INCREMENT";
