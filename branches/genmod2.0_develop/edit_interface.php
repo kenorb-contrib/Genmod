@@ -475,7 +475,7 @@ switch ($action) {
 					print "<select name=\"order[$i]\">\n";
 					for($j=1; $j<=$ct; $j++) {
 						print "<option value=\"".($j)."\"";
-						if ($j==$i) print " selected=\"selected\"";
+						if ($j == $i) print " selected=\"selected\"";
 						print ">".($j)."</option>\n";
 					}
 					print "</select>\n";
@@ -557,8 +557,8 @@ switch ($action) {
 					print "<tr>\n<td class=\"shade2\">\n";
 					print "<select name=\"order[".$keys[$child->xref]."]\">\n";
 					for($j = 1; $j <= $ct; $j++) {
-						print "<option value=\"".($j)."\"";
-						if ($j == $keys[$child->xref]) print " selected=\"selected\"";
+						print "<option value=\"".$j."\"";
+						if ($j == $i) print " selected=\"selected\"";
 						print ">".($j)."</option>\n";
 					}
 					print "</select>\n";
@@ -585,6 +585,7 @@ switch ($action) {
 		if (EditFunctions::CheckReorder($order)) {
 			$change_id = EditFunctions::GetNewXref("CHANGE");
 			$success = true;
+			print_r($order);
 			$lines = count($order);
 			$f = array();
 			for ($i = 1; $i <= $lines; $i++) {
@@ -644,7 +645,7 @@ switch ($action) {
 					print "<select name=\"order[".$keys[$family->xref]."]\">\n";
 					for($j = 1; $j <= $ct; $j++) {
 						print "<option value=\"".($j)."\"";
-						if ($j == $keys[$family->xref]) print " selected=\"selected\"";
+						if ($j == $i) print " selected=\"selected\"";
 						print ">".($j)."</option>\n";
 					}
 					print "</select>\n";
