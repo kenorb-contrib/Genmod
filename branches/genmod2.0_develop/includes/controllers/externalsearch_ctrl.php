@@ -40,6 +40,9 @@ class ExternalSearchController {
 	private $addlink = null;						// for type is link: parameters to add to the link
 	
 	private $indi = null;							// Container for the indi object
+	private $hasrange = false;						// If the input fields contain a year range
+	private $range1 = null;							// Name of the first range field (required to set a value if missing)
+	private $range2 = null;							// Name of the second range field (required to set a value if missing)
 
 	public function __construct($indi, $gedcomid="") {
 		global $gm_user;
@@ -60,6 +63,8 @@ class ExternalSearchController {
 		}
 		
 		$this->indi = $indi;
+		
+
 	}
 	
 	public function __get($property) {
@@ -99,59 +104,104 @@ class ExternalSearchController {
 		return $this->modulelist;
 	}
 	
-	public function PrintSearchForm($number=0) {
+	public function PrintSearchForm($number=4) {
 		
 		// Do preliminary work
 		if (is_null($this->modules)) $this->LoadModules();
 		$module = $this->modules[$number];
 		
 		// Print the searchform
-		print "<form name=\"extsearch\" method=\"get\" action=\"individual.php\">\n";
+		print "<form name=\"selarchive\" method=\"get\" action=\"individual.php\">\n";
 		
 		// 1. Search form title
 		print "<table class=\"width100\">\n";
 		print "<tr><td colspan=\"3\" class=\"topbottombar\">".GM_LANG_external_search."</td></tr>\n";
 		
 		// 2. Choose search at
-		print "<tr><td class=\"shade2\" colspan=\"2\">".GM_LANG_choose."</td>\n";
-		print "<td class=\"shade1\">";
-		print "<select name=\"selsearch\" onchange=\"sndReq('esearchform', 'extsearchformprint', 'pid', '".$this->indi->xref."', 'gedcomid', '".$this->indi->gedcomid."', 'formno', document.extsearch.selsearch.value); document.getElementById('esearchresults').innerHTML='';\">\n";
+		print "<tr><td class=\"shade2 width40\">".GM_LANG_choose."</td>\n";
+		print "<td class=\"shade1 width60\" colspan=\"2\">";
+		print "<select name=\"selsearch\" onchange=\"sndReq('esearchform', 'extsearchformprint', 'pid', '".$this->indi->xref."', 'gedcomid', '".$this->indi->gedcomid."', 'formno', document.selarchive.selsearch.value); document.getElementById('esearchresults').innerHTML='';\">\n";
 		foreach ($this->modules as $index => $modobj) {
 			print "<option value=\"".$index."\"";
 			if ($number == $index) print " selected=\"selected\"";
 			print ">".$modobj->display_name."</option>\n";
 		}
-		print "</select></td>\n</tr>\n";
+		print "</select></td>\n</tr></table></form>";
+		
+		if ($module->method != "form") print "<form name=\"extsearch\" method=\"get\" action=\"individual.php\">\n";
+		else print "<form name=\"".$module->formname."\" method=\"post\" action=\"".$module->link."\" target=\"_blank\">\n";
+		print "<table class=\"width100\">\n";
 		
 		// Print the input fields
 		foreach($module->params as $inputname => $formname) {
-			$this->PrintInputField($formname, (in_array($formname, $module->params_checked)));
+			if ($module->method == "form") $this->PrintInputField($formname, $inputname, (in_array($formname, $module->params_checked)));
+			else $this->PrintInputField($formname, $formname, (in_array($formname, $module->params_checked)));
 		}
 			
-		// Print the submit button
+		// Print the hidden input fields and the submit button
 		print "<tr><td class=\"shade2 center\" colspan=\"3\">\n";
-		print "<input type=\"button\" name=\"".GM_LANG_search."\" value=\"".GM_LANG_search."\"";
+		if ($module->method == "form") {
+			foreach($module->params_hidden as $field => $value) {
+				print "<input type=\"hidden\" name=\"".$field."\" value=\"".$value."\" />\n";
+			}
+		}
+		print "<input type=\"submit\" name=\"".GM_LANG_search."\" value=\"".GM_LANG_search."\"";
 		if ($module->method == "link") {
-			print " onclick=\"window.open('".$module->link;
+			print " onclick=\"".($this->hasrange && $module->yearrange_type == "both" ? "CheckRange();" : "")."window.open('".$module->link;
 			$first = true;
 			foreach($module->params as $inputname => $formname) {
 				if (!$first) print "+'&amp;";
 				print $inputname."='+(document.extsearch.".$formname."_checked.checked ? escape(document.extsearch.".$formname.".value) : '')";
 				$first = false;
 			}
+			print ");return false;\" />\n";
 		}
-		else {
+		elseif ($module->method == "SOAP") {
 			print " onclick=\"sndReq('esearchresults', 'extsearchservice', 'formno', '".$number."', 'pid', '".$this->indi->xref."', 'gedcomid', '".$this->indi->gedcomid."'";
 			foreach($module->params as $inputname => $formname) {
 				print ", '".$inputname."', (document.extsearch.".$formname."_checked".".checked == 1 ? escape(document.extsearch.".$formname.".value) : '')";
 			}
+			print ");return false;\" />\n";
 		}
-		print ")\" />\n";
+		elseif($module->method == "form") {
+			print " onclick=\"";
+			$str1 = "";
+			$str2 = "";
+			foreach($module->params as $inputname => $formname) {
+				$str1 .= "if(document.".$module->formname.".".$formname."_checked".".checked == 0) {var ".$inputname."=document.".$module->formname.".".$inputname.".value; document.".$module->formname.".".$inputname.".value=''};";
+				$str2 .= "if(typeof(".$inputname.") != 'undefined') {document.".$module->formname.".".$inputname.".value=".$inputname."};";
+			}
+			print ($this->hasrange && $module->yearrange_type == "both" ? "CheckRange();" : "").$str1."document.".$module->formname.".submit();".$str2;
+			print "return false;\" />\n";
+		}
 		print "</td></tr>\n";
 		// Close the form
 		print "</table>\n";
-		print "</form>\n";	
+		print "</form>\n";
 		
+		// If needed, print the JS to check the year range
+		if ($this->hasrange == true && $module->yearrange_type == "both") {
+			if ($module->method == "link") $formname = "extsearch";
+			else $formname = $module->formname;
+			print "<script><!--\n";
+			?>
+			function CheckRange() {
+				if (!document.<?php print $formname; ?>.yrange1_checked.checked + !document.<?php print $formname; ?>.yrange2_checked.checked == 1) {
+					document.<?php print $formname; ?>.yrange2_checked.checked = 1;
+					document.<?php print $formname; ?>.yrange1_checked.checked = 1;
+				}
+				if (document.<?php print $formname; ?>.yrange1_checked.checked) {
+					if (document.<?php print $formname.".".$this->range1; ?>.value == '') {
+						document.<?php print $formname.".".$this->range1; ?>.value = 1500;
+					}
+					if (document.<?php print $formname.".".$this->range2; ?>.value == '') {
+						document.<?php print $formname.".".$this->range2; ?>.value = 2020;
+					}
+				}
+			}
+			<?php
+			print "//--></script>";
+		}
 	}
 	
 	private function LoadModules() {
@@ -175,12 +225,14 @@ class ExternalSearchController {
 		return $this->modules;
 	}
 	
-	private function PrintInputField($field, $checked) {
+	private function PrintInputField($field, $inputname, $checked) {
 		static $tabindex;
 	
 		/* This function supports the following fieldnames:
 		 * fullname			Full name of the person, in the format: "firstname surname"
 		 * surname			Surname of the person
+		 * stripsurname		Surname of the person, with prefixes stripped off
+		 * infix			Prefix of the persons surname
 		 * firstname		First name of the person
 		 * gbdate			Birthdate in gedcom format e.g. 12 MAY 1880
 		 * bplace			Birthplace
@@ -195,25 +247,35 @@ class ExternalSearchController {
 		if (!isset($tabindex)) $tabindex = 1;
 		switch($field) {
 			case "fullname":
-				print "<tr><td class=\"shade2\">".GM_LANG_name.":</td>";
+				print "<tr><td class=\"shade2 width30\">".GM_LANG_name.":</td>";
 				$this->PrintCheckSelect($field, $checked);
-				print "<td class=\"shade1\"><input name=\"".$field."\" size=\"25\" value=\"".NameFunctions::CheckNN(NameFunctions::GetNameInRecord($this->indi->gedrec))."\" tabindex=\"".$tabindex."\" /></td></tr>\n";
+				print "<td class=\"shade1 width60\"><input name=\"".$inputname."\" size=\"25\" value=\"".NameFunctions::CheckNN(NameFunctions::GetNameInRecord($this->indi->gedrec))."\" tabindex=\"".$tabindex."\" /></td></tr>\n";
 				break;
 			case "surname":
 				print "<tr><td class=\"shade2\">".GM_LANG_surname."</td>";
 				$this->PrintCheckSelect($field, $checked);
-				print "<td class=\"shade1\"><input name=\"".$field."\" size=\"25\" value=\"".($this->indi->name_array[0][2] == "@N.N." ? "" : $this->indi->name_array[0][2])."\" tabindex=\"".$tabindex."\" /></td></tr>\n";
+				print "<td class=\"shade1\"><input name=\"".$inputname."\" size=\"25\" value=\"".($this->indi->name_array[0][2] == "@N.N." ? "" : $this->indi->name_array[0][2])."\" tabindex=\"".$tabindex."\" /></td></tr>\n";
+				break;
+			case "stripsurname":
+				print "<tr><td class=\"shade2\">".GM_LANG_surname."</td>";
+				$this->PrintCheckSelect($field, $checked);
+				print "<td class=\"shade1\"><input name=\"".$inputname."\" size=\"25\" value=\"".($this->indi->name_array[0][2] == "@N.N." ? "" : NameFunctions::StripPrefix($this->indi->name_array[0][2]))."\" tabindex=\"".$tabindex."\" /></td></tr>\n";
+				break;
+			case "infix":
+				print "<tr><td class=\"shade2\">".GM_FACT_SPFX.":</td>";
+				$this->PrintCheckSelect($field, $checked);
+				print "<td class=\"shade1\"><input name=\"".$inputname."\" size=\"25\" value=\"".($this->indi->name_array[0][2] == "@N.N." ? "" : trim(str_replace(NameFunctions::StripPrefix($this->indi->name_array[0][2]),"", $this->indi->name_array[0][2])))."\" tabindex=\"".$tabindex."\" /></td></tr>\n";
 				break;
 			case "firstname":
 				print "<tr><td class=\"shade2\">".GM_LANG_firstname.":</td>";
 				$this->PrintCheckSelect($field, $checked);
 				$name = trim(substr($this->indi->name_array[0][0], 0, strpos($this->indi->name_array[0][0], "/")));
-				print "<td class=\"shade1\"><input name=\"".$field."\" size=\"25\" value=\"".($name == "@P.N." ? "" : $name)."\" tabindex=\"".$tabindex."\" /></td></tr>\n";
+				print "<td class=\"shade1\"><input name=\"".$inputname."\" size=\"25\" value=\"".($name == "@P.N." ? "" : $name)."\" tabindex=\"".$tabindex."\" /></td></tr>\n";
 				break;
 			case "gbdate":
 				print "<tr><td class=\"shade2\">".GM_FACT_BIRT.":</td>";
 				$this->PrintCheckSelect($field, $checked);
-				print "<td class=\"shade1\"><input name=\"".$field."\" id=\"".$field."\" size=\"25\" value=\"".GetGedcomValue("DATE", 2, $this->indi->bdate, "", false)."\" tabindex=\"".$tabindex."\" />&nbsp;";
+				print "<td class=\"shade1\"><input name=\"".$inputname."\" id=\"".$inputname."\" size=\"25\" value=\"".GetGedcomValue("DATE", 2, $this->indi->bdate, "", false)."\" tabindex=\"".$tabindex."\" />&nbsp;";
 				EditFunctions::PrintCalendarPopup($field);
 				print "</td></tr>\n";
 				break;
@@ -222,17 +284,17 @@ class ExternalSearchController {
 				$this->PrintCheckSelect($field, $checked);
 				$date = ParseDate(GetGedcomValue("DATE", 2, $this->indi->bdate, "", false));
 				$year = $date[0]["year"];
-				print "<td class=\"shade1\"><input name=\"".$field."\" id=\"".$field."\" size=\"25\" value=\"".$year."\" tabindex=\"".$tabindex."\" /></td></tr>\n";
+				print "<td class=\"shade1\"><input name=\"".$inputname."\" id=\"".$inputname."\" size=\"25\" value=\"".$year."\" tabindex=\"".$tabindex."\" /></td></tr>\n";
 				break;
 			case "bplace":
 				print "<tr><td class=\"shade2\">".GM_LANG_birthplac.":</td>";
 				$this->PrintCheckSelect($field, $checked);
-				print "<td class=\"shade1\"><input name=\"".$field."\" size=\"25\" value=\"".GetGedcomValue("PLAC", 2, $this->indi->bplac, "", false)."\" tabindex=\"".$tabindex."\" /></td></tr>\n";
+				print "<td class=\"shade1\"><input name=\"".$inputname."\" size=\"25\" value=\"".GetGedcomValue("PLAC", 2, $this->indi->bplac, "", false)."\" tabindex=\"".$tabindex."\" /></td></tr>\n";
 				break;
 			case "gddate":
 				print "<tr><td class=\"shade2\">".GM_FACT_DEAT.":</td>";
 				$this->PrintCheckSelect($field, $checked);
-				print "<td class=\"shade1\"><input name=\"".$field."\" id=\"".$field."\" size=\"25\" value=\"".GetGedcomValue("DATE", 2, $this->indi->ddate, "", false)."\" tabindex=\"".$tabindex."\" />&nbsp;";
+				print "<td class=\"shade1\"><input name=\"".$inputname."\" id=\"".$inputname."\" size=\"25\" value=\"".GetGedcomValue("DATE", 2, $this->indi->ddate, "", false)."\" tabindex=\"".$tabindex."\" />&nbsp;";
 				EditFunctions::PrintCalendarPopup($field);
 				print "</td></tr>\n";
 				break;
@@ -241,12 +303,12 @@ class ExternalSearchController {
 				$this->PrintCheckSelect($field, $checked);
 				$date = ParseDate(GetGedcomValue("DATE", 2, $this->indi->ddate, "", false));
 				$year = $date[0]["year"];
-				print "<td class=\"shade1\"><input name=\"".$field."\" id=\"".$field."\" size=\"25\" value=\"".$year."\" tabindex=\"".$tabindex."\" /></td></tr>\n";
+				print "<td class=\"shade1\"><input name=\"".$inputname."\" id=\"".$inputname."\" size=\"25\" value=\"".$year."\" tabindex=\"".$tabindex."\" /></td></tr>\n";
 				break;
 			case "dplace":
 				print "<tr><td class=\"shade2\">".GM_LANG_deathplac.":</td>";
 				$this->PrintCheckSelect($field, $checked);
-				print "<td class=\"shade1\"><input name=\"".$field."\" size=\"25\" value=\"".GetGedcomValue("PLAC", 2, $this->indi->dplac, "", false)."\" tabindex=\"".$tabindex."\" /></td></tr>\n";
+				print "<td class=\"shade1\"><input name=\"".$inputname."\" size=\"25\" value=\"".GetGedcomValue("PLAC", 2, $this->indi->dplac, "", false)."\" tabindex=\"".$tabindex."\" /></td></tr>\n";
 				break;
 			case "ggender":
 				print "<tr><td class=\"shade2\">".GM_LANG_sex.":</td>";
@@ -265,9 +327,11 @@ class ExternalSearchController {
 						break;
 					}
 				}
-				print "<td class=\"shade1\"><input name=\"".$field."\" size=\"25\" value=\"".$plac."\" tabindex=\"".$tabindex."\" /></td></tr>\n";
+				print "<td class=\"shade1\"><input name=\"".$inputname."\" size=\"25\" value=\"".$plac."\" tabindex=\"".$tabindex."\" /></td></tr>\n";
 				break;
 			case "yrange1":
+				$this->hasrange = true;
+				$this->range1 = $inputname;
 				print "<tr><td class=\"shade2\">".GM_LANG_year_range_start.":</td>";
 				$this->PrintCheckSelect($field, $checked);
 				if ($this->indi->brec != "") {
@@ -275,9 +339,11 @@ class ExternalSearchController {
 					$byear = $year[0]["year"];
 				}
 				else $byear = "";
-				print "<td class=\"shade1\"><input name=\"".$field."\" size=\"4\" value=\"".$byear."\" tabindex=\"".$tabindex."\" /></td></tr>\n";
+				print "<td class=\"shade1\"><input name=\"".$inputname."\" size=\"4\" value=\"".$byear."\" tabindex=\"".$tabindex."\" /></td></tr>\n";
 				break;
 			case "yrange2":
+				$this->hasrange = true;
+				$this->range2 = $inputname;
 				print "<tr><td class=\"shade2\">".GM_LANG_year_range_end.":</td>";
 				$this->PrintCheckSelect($field, $checked);
 				if ($this->indi->drec != "") {
@@ -285,7 +351,7 @@ class ExternalSearchController {
 					$dyear = $year[0]["year"];
 				}
 				else $dyear = "";
-				print "<td class=\"shade1\"><input name=\"".$field."\" size=\"4\" value=\"".$dyear."\" tabindex=\"".$tabindex."\" /></td></tr>\n";
+				print "<td class=\"shade1\"><input name=\"".$inputname."\" size=\"4\" value=\"".$dyear."\" tabindex=\"".$tabindex."\" /></td></tr>\n";
 				break;
 		}
 		$tabindex++;
@@ -293,7 +359,7 @@ class ExternalSearchController {
 	
 	private function PrintCheckSelect($field, $checked) {
 		
-		print "<td class=\"shade2 center\"><input type=\"checkbox\" name=\"".$field."_checked\" ".($checked ? "checked=\"checked\" " : "")."value=\"yes\" /></td>";
+		print "<td class=\"shade2 center width10\"><input type=\"checkbox\" name=\"".$field."_checked\" ".($checked ? "checked=\"checked\" " : "")."value=\"yes\" /></td>";
 	}
 	
 	public function GetParams($number) {
