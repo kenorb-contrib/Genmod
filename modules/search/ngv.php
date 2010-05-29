@@ -9,7 +9,7 @@ class NGVSearchModule {
 																	// 0 is visitor, 1 is authenticated user, 2 is editor, 3 is (gedcom)admin.
 	
 	// Connection information
-	public $method 			= "link";								// Either "link" or "SOAP"
+	public $method 			= "link";								// Either "link" or "form" or "SOAP"
 	public $link			= "http://www.ngv.nl/genealogie/search.php?nnqualify=bevat&amp;mynickname=&amp;tqualify=bevat&amp;mytitle=&amp;sfqualify=bevat&amp;mysuffix=&amp;mybool=AND&amp;tree=-x--all--x-&amp;showspouse=yes&amp;";
 																	// For link type: The link to the website, including the ? or &amp;
 																	// For SOAP type: The link to the service

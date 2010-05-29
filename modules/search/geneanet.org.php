@@ -9,7 +9,7 @@ class GeneanetSearchModule {
 															// 0 is visitor, 1 is authenticated user, 2 is editor, 3 is (gedcom)admin.
 	
 	// Connection information
-	public $method 			= "link";						// Either "link" or "SOAP"
+	public $method 			= "link";						// Either "link" or "form" or "SOAP"
 	public $link			= "http://search.geneanet.org/result.php?";
 															// For link type: The link to the website, including the ?
 															// For SOAP type: The link to the service
@@ -23,6 +23,11 @@ class GeneanetSearchModule {
 								"place"		=> "gplace",
 								"start" 	=> "yrange1",
 								"end"		=> "yrange2");
+								
+	// If the year range is selected, we must indicate if the website always expects two filled in values.
+	// Possible values: "single" and "both"
+	public $yearrange_type	= "single";
+	
 	public $params_checked	= array("surname");				// Array with values of the params array,which must have their checkbox checked by default
 								
 	

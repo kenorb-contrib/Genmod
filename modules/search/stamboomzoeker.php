@@ -9,7 +9,7 @@ class StamboomzoekerSearchModule {
 															// 0 is visitor, 1 is authenticated user, 2 is editor, 3 is (gedcom)admin.
 	
 	// Connection information
-	public $method 			= "link";						// Either "link" or "SOAP"
+	public $method 			= "link";						// Either "link" or "form" or "SOAP"
 	public $link			= "http://www.stamboomzoeker.nl/search.php?l=nl&amp;";
 															// For link type: The link to the website, including the ?
 															// For SOAP type: The link to the service
@@ -24,6 +24,11 @@ class StamboomzoekerSearchModule {
 								"bd1" 		=> "yrange1",
 								"bd2"		=> "yrange2",
 								"bp"		=> "bplace");
+								
+	// If the year range is selected, we must indicate if the website always expects two filled in values.
+	// Possible values: "single" and "both"
+	public $yearrange_type	= "both";
+
 	public $params_checked	= array("surname");				// Array with values of the params array,which must have their checkbox checked by default
 								
 	
