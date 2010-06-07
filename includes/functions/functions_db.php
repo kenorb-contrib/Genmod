@@ -294,8 +294,8 @@ function GetLastChangeDate($type, $pid, $gedid, $head=false) {
 	
 	$object = ConstructObject($pid, $type, $gedid);
 
-	// pid does not exist
-	if ($object->isempty) return false;
+	// pid does not exist or whatever, the function returned false
+	if ($object == false) return false;
 	
 	// return the date/time from the CHAN record
 	if ($object->lastchanged != "") return $object->lastchanged;
