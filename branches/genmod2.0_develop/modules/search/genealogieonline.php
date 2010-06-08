@@ -1,42 +1,53 @@
 <?php
+/**
+ * Class file for external search
+ *
+ * Genmod: Genealogy Viewer
+ * Copyright (C) 2005 - 2008 Genmod Development Team
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ *
+ * @package Genmod
+ * @subpackage classes
+ * @version $Id: asso_class.php 190 2010-05-16 11:24:59Z sjouke $
+ */
 
-class GenealogieOnlineSearchModule {
+class GenealogieOnlineSearchModule extends BaseExternalSearch {
 	
 	// Class information
-	public $classname 		= "GenealogieOnlineSearchModule";	// Name of the class
-	public $display_name 	= "GenealogieOnline";				// Name to display on the dropdown menu
-	public $accesslevel		= 2;								// Minimum userlevel required to access this module
-																// 0 is visitor, 1 is authenticated user, 2 is editor, 3 is (gedcom)admin.
-	
-	// Connection information
-	public $method 			= "SOAP";							// Either "link" or "SOAP"
-	public $link			= "http://www.genealogieonline.nl/pgv/genservice2.php?wsdl";
-																// For link type: The link to the website, including the ?
-																// For SOAP type: The link to the service
-	public $wsdl 			= true;								// For SOAP type: if using WSDL or not
-	public $searchcmd		= "search";							// For SOAP type: the method to be called for performing the search
+	public $classname 			= "GenealogieOnlineSearchModule";	// Name of the class
 	
 	// Result information
-	public $totalresults 	= null;								// Total number of persons returned
-	public $indilist 		= null;								// Array containing the person objects created from the results
-	
-	// Input data definition
-	// The array key is one of those supported by the website which is linked or connected.
-	// The array value is one of those supported by the external search controller. See the docu in that file.
-	public $params			= array(
-								"name" 			=> "fullname",
-								"surname"		=> "surname",
-								"gender"		=> "ggender",
-								"birtdate" 		=> "gbdate",
-								"birthplace" 	=> "bplace",
-								"deathdate"		=> "gddate",
-								"deathplace"	=> "dplace");
-	
-	public $params_checked	= array("fullname");				// Array with values of the params array,which must have their checkbox checked by
-																// default
+	private $totalresults 		= 0;								// Total number of persons returned
+	private $indilist 			= null;								// Array containing the person objects created from the results
 	
 	
 	public function __construct() {
+		
+		parent::__construct();
+		
+		$this->display_name 	= "GenealogieOnline";
+		$this->method 			= "SOAP";
+		$this->link				= "http://www.genealogieonline.nl/pgv/genservice2.php?wsdl";
+		$this->wsdl 			= true;
+		$this->searchcmd		= "search";
+		$this->params			= array(
+									"name" 			=> "fullname",
+									"birthplace" 	=> "bplace",
+									"deathplace"	=> "dplace");
+		$this->params_checked	= array("fullname");
 	}
 	
 	// Construct and return the query
@@ -60,7 +71,7 @@ class GenealogieOnlineSearchModule {
 		// Get the total results
 		if (isset($results["totalResults"])) $this->totalresults = $results["totalResults"];
 		else $results["totalResults"] = "0";
-		print "Total results: ".$this->totalresults."<br /><br />";
+		print GM_LANG_hs_results." ".$this->totalresults."<br /><br />";
 		
 		// Convert the data from the service to Genmod format
 		$indilist = array();

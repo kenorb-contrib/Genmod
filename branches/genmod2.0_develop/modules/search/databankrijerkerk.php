@@ -1,38 +1,48 @@
 <?php
+/**
+ * Class file for external search
+ *
+ * Genmod: Genealogy Viewer
+ * Copyright (C) 2005 - 2008 Genmod Development Team
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ *
+ * @package Genmod
+ * @subpackage classes
+ * @version $Id: asso_class.php 190 2010-05-16 11:24:59Z sjouke $
+ */
 
-class RijerkerkSearchModule {
+class RijerkerkSearchModule extends BaseExternalSearch {
 	
 	// Class information
-	public $classname 		= "RijerkerkSearchModule";			// Name of the class
-	public $display_name 	= "Genealogiedatabank Rijerkerk";	// Name to display on the dropdown menu
-	public $accesslevel		= 2;								// Minimum userlevel required to access this module
-																// 0 is visitor, 1 is authenticated user, 2 is editor, 3 is (gedcom)admin.
-	
-	// Connection information
-	public $method 			= "link";							// Either "link" or "form" or "SOAP"
-	public $link			= "http://www.rijerkerk.net/databank/?a=search&amp;";
-																// For link type: The link to the website, including the ?
-																// For SOAP type: The link to the service
-	public $wsdl 			= true;								// For SOAP type: if using WSDL or not
-	
-	// Input data definition
-	// The array key is one of those supported by the website which is linked or connected.
-	// The array value is one of those supported by the external search controller. See the docu in that file.
-	public $params			= array(
-								"sn"		=> "surname",
-								"gv"		=> "firstname",
-								"pl"		=> "gplace",
-								"dd" 		=> "yrange1",
-								"ddd"		=> "yrange2");
-								
-	// If the year range is selected, we must indicate if the website always expects two filled in values.
-	// Possible values: "single" and "both"
-	public $yearrange_type	= "both";
-	
-	public $params_checked	= array("surname");				// Array with values of the params array,which must have their checkbox checked by default
-								
+	public $classname 			= "RijerkerkSearchModule";			// Name of the class
 	
 	public function __construct() {
+		
+		parent::__construct();
+		
+		$this->display_name 	= "Genealogiedatabank Rijerkerk";
+		$this->method 			= "link";
+		$this->link				= "http://www.rijerkerk.net/databank/?a=search&amp;";
+		$this->params			= array(
+									"sn"		=> "surname",
+									"gv"		=> "firstname",
+									"pl"		=> "gplace",
+									"dd" 		=> "yrange1",
+									"ddd"		=> "yrange2");
+		$this->params_checked	= array("surname");	
 	}
 }
 ?>
