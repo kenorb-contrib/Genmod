@@ -1857,8 +1857,10 @@ function RelativePathFile($file) {
 
 function ReplaceEmbedText($text) {
 	global $CONFIG_VARS;
-	
-	while (preg_match("/#(.+)#/", $text, $match) > 0) {
+
+	$offset = 0;	
+	while (preg_match("/#(\w+)#/", $text, $match, 0, $offset) > 0) {
+
 		$varname = $match[1];
 		global $$varname;
 		
@@ -1877,8 +1879,12 @@ function ReplaceEmbedText($text) {
 		// check constant with prefix
 		else if (defined("GM_".$varname)) $text = preg_replace("/$match[0]/", constant("GM_".$varname), $text);
 		
-		// if nothing is found, replace with error message. Doing nothing would cause an endless loop anyway
-		else $text = preg_replace("/$match[0]/", GM_LANG_embedvar_not_found, $text);
+		// if nothing is found, we skip this match (can be anything, like HTML) and search from there on
+		else {
+			$offset = strpos($text, $match[0]);
+			if ($offset === false) break;
+			$offset += 1;
+		}
 	}
 	return $text;
 }	

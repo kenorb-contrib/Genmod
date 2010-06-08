@@ -62,23 +62,24 @@ function print_html_block($block=true, $config="", $side, $index) {
 
 function print_html_block_config($config) {
 	global $GM_BLOCKS, $TEXT_DIRECTION, $LANGUAGE, $language_settings;
-	$useFCK = file_exists("./modules/FCKeditor/fckeditor.php");
-	if($useFCK){
-		include("./modules/FCKeditor/fckeditor.php");
+	
+	$useCK = file_exists("modules/CKeditor/ckeditor.php");
+	if($useCK){
+		include("modules/CKeditor/ckeditor.php");
 	}
 	if (empty($config)) $config = $GM_BLOCKS["print_html_block"]["config"];
 	?>
 	<tr><td class="shade1">
 	<?php
-		if ($useFCK) { // use FCKeditor module
-			$oFCKeditor = new FCKeditor('html') ;
-			$oFCKeditor->BasePath =  './modules/FCKeditor/';
-			$oFCKeditor->Value = $config["html"];
-			$oFCKeditor->Width = 700;
-			$oFCKeditor->Height = 450;
-			$oFCKeditor->Config['AutoDetectLanguage'] = false ;
-			$oFCKeditor->Config['DefaultLanguage'] = $language_settings[$LANGUAGE]["lang_short_cut"];
-			$oFCKeditor->Create() ;
+		if ($useCK) { // use CKeditor module
+			?><script type="text/javascript" src="modules/CKEditor/ckeditor.js"></script><?php
+			$oCKEditor = new CKeditor();
+			$oCKEditor->BasePath = "modules/CKEditor/";
+			$oCKEditor->config["height"] = 450;
+			$oCKEditor->config["enterMode"] = "br";
+			$oCKEditor->config["ShiftEnterMode"] = "p";
+			$oCKeditor->config["language"] = $language_settings[$LANGUAGE]["lang_short_cut"];
+			$oCKEditor->editor("html", $config['html']);
 		} else { //use standard textarea
 			print "<textarea name=\"html\" rows=\"10\" cols=\"80\">" . $config["html"] ."</textarea>";
 		}

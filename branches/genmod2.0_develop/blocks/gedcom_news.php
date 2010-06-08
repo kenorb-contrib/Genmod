@@ -66,7 +66,7 @@ function print_gedcom_news($block = true, $config="", $side, $index) {
 		$trans = get_html_translation_table(HTML_SPECIALCHARS);
 		$trans = array_flip($trans);
 		$news->text = strtr($news->text, $trans);
-		$news->text = nl2br($news->text);
+//		$news->text = nl2br($news->text); // Causes extra linebreaks
 		print PrintReady($news->text)."<br />\n";
 		if ($gm_user->userGedcomAdmin()) {
 			print "<hr size=\"1\" />";

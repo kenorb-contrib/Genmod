@@ -45,6 +45,7 @@ abstract class NewsController {
 			$news = new News($row);
 			return $news;
 		}
+		return false;
 	}
 	
 	public function DeleteNews($id) {
