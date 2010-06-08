@@ -1,53 +1,59 @@
 <?php
+/**
+ * Class file for external search
+ *
+ * Genmod: Genealogy Viewer
+ * Copyright (C) 2005 - 2008 Genmod Development Team
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ *
+ * @package Genmod
+ * @subpackage classes
+ * @version $Id: asso_class.php 190 2010-05-16 11:24:59Z sjouke $
+ */
 
-class AlmeloSearchModule {
+class AlmeloSearchModule extends BaseExternalSearch {
 	
 	// Class information
-	public $classname 		= "AlmeloSearchModule";			// Name of the class
-	public $display_name 	= "Archief Almelo";				// Name to display on the dropdown menu
-	public $accesslevel		= 2;							// Minimum userlevel required to access this module
-															// 0 is visitor, 1 is authenticated user, 2 is editor, 3 is (gedcom)admin.
-	
-	// Connection information
-	public $method 			= "form";						// Either "link" or "form" or "SOAP"
-	public $link			= "http://www.archiefalmelo.nl/index.php?option=com_genealogie_zoeken&Itemid=52&sub=resultaat";
-															// For link type: The link to the website, including the ?
-															// For SOAP type: The link to the service
-	public $wsdl 			= true;							// For SOAP type: if using WSDL or not
-	
-	// Input data definition. These are the fields that will display on the form, which may be prefilled and can be filled in by the user
-	// The array key is one of those supported by the website which is linked or connected.
-	// The array value is one of those supported by the external search controller. See the docu in that file.
-	public $params			= array(
-								"achternaam"				=> "stripsurname",
-								"voornaam"	 				=> "firstname",
-								"jaar_van" 					=> "yrange1",
-								"jaar_tot" 					=> "yrange2"
-								);
-	
-	// If the year range is selected, we must indicate if the website always expects two filled in values.
-	// Possible values: "single" and "both"
-	public $yearrange_type	= "both";
-
-	// Array with values of the above params array,which must have their checkbox checked by default
-	public $params_checked	= array("stripsurname");
-	
-	// For "form" type: Array with additional fields which will be hidden in the form, with the indicated value
-	public $params_hidden = array(
-								"zoekmethode_achternaam"	=> "exact",
-								"zoekmethode_voornaam" 		=> "exact",
-								"plaats" 					=> "all",
-								"bron_a" 					=> "1",
-								"bron_g" 					=> "1",
-								"bron_h" 					=> "1",
-								"bron_o" 					=> "1",
-								"rol" 						=> "all"
-								);
-								
-	// For "form" type: name of the form to submit
-	public $formname = "form_01";
+	public $classname 			= "AlmeloSearchModule";			// Name of the class
 	
 	public function __construct() {
+		
+		parent::__construct();
+		
+		$this->display_name 	= "Archief Almelo";
+		$this->method 			= "form";
+		$this->link				= "http://www.archiefalmelo.nl/index.php?option=com_genealogie_zoeken&Itemid=52&sub=resultaat";
+		$this->params			= array(
+									"achternaam"				=> "stripsurname",
+									"voornaam"	 				=> "firstname",
+									"jaar_van" 					=> "yrange1",
+									"jaar_tot" 					=> "yrange2"
+									);
+		$this->params_checked	= array("stripsurname");
+		$this->params_hidden 	= array(
+									"zoekmethode_achternaam"	=> "exact",
+									"zoekmethode_voornaam" 		=> "exact",
+									"plaats" 					=> "all",
+									"bron_a" 					=> "1",
+									"bron_g" 					=> "1",
+									"bron_h" 					=> "1",
+									"bron_o" 					=> "1",
+									"rol" 						=> "all"
+									);
+		$this->formname 		= "form_01";
 	}
 }
 ?>
