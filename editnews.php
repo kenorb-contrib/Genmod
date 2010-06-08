@@ -28,20 +28,20 @@
 */
 require("config.php");
 
-/**
- * Inclusion of the FCK Editor
-*/
-$useFCK = file_exists("./modules/FCKeditor/fckeditor.php");
-if($useFCK){
-	include("./modules/FCKeditor/fckeditor.php");
-}
-
 $username = $gm_username;
 if (empty($username)) {
 	PrintSimpleHeader("");
 	print GM_LANG_access_denied;
 	PrintSimpleFooter();
 	exit;
+}
+
+/**
+ * Inclusion of the CK Editor
+*/
+$useCK = file_exists("modules/CKEditor/ckeditor.php");
+if($useCK){
+	include("modules/CKEditor/ckeditor.php");
 }
 
 if (!isset($action)) $action="compose";
@@ -61,7 +61,7 @@ if ($action=="compose") {
 				document.messageform.title.focus();
 				return false;
 			}
-			<?php if (! $useFCK) { //will be empty for FCK. FIXME, use FCK API to check for content.
+			<?php if (! $useCK) { //will be empty for FCK. FIXME, use FCK API to check for content.
 			?>
 			if (frm.text.value=="") {
 				alert('<?php print GM_LANG_enter_text; ?>');
@@ -95,20 +95,20 @@ if ($action=="compose") {
 	print "<tr><td align=\"right\">".GM_LANG_title."</td><td><input type=\"text\" name=\"title\" size=\"50\" value=\"".$news->title."\" /><br /></td></tr>\n";
 	print "<tr><td valign=\"top\" align=\"right\">".GM_LANG_article_text."<br /></td>";
 	print "<td>";
-	if ($useFCK) { // use FCKeditor module
+	if ($useCK) { // use CKeditor module
 		$trans = get_html_translation_table(HTML_SPECIALCHARS);
 		$trans = array_flip($trans);
 		$news->text = strtr($news->text, $trans);
-		$news->text = nl2br($news->text);
+//		$news->text = nl2br($news->text); This causes extra line breaks in CKEditor!
 		
-		$oFCKeditor = new FCKeditor('text') ;
-		$oFCKeditor->BasePath =  './modules/FCKeditor/';
-		$oFCKeditor->Value = $news->text;
-		$oFCKeditor->Width = 700;
-		$oFCKeditor->Height = 450;
-		$oFCKeditor->Config['AutoDetectLanguage'] = false ;
-		$oFCKeditor->Config['DefaultLanguage'] = $language_settings[$LANGUAGE]["lang_short_cut"];
-		$oFCKeditor->Create() ;
+		?><script type="text/javascript" src="modules/CKEditor/ckeditor.js"></script><?php
+		$oCKeditor = new CKEditor();
+		$oCKeditor->BasePath = 'modules/CKEditor/';
+		$oCKeditor->config["height"] = 450;
+		$oCKEditor->config["enterMode"] = "br";
+		$oCKEditor->config["ShiftEnterMode"] = "p";
+		$oCKeditor->config['language'] = $language_settings[$LANGUAGE]["lang_short_cut"];
+		$oCKeditor->editor("text", $news->text) ;
 	} else { //use standard textarea
 		print "<textarea name=\"text\" cols=\"80\" rows=\"10\">".$news->text."</textarea>";
 	}
@@ -118,7 +118,8 @@ if ($action=="compose") {
 	print "</form>\n";
 }
 else if ($action=="save") {
-	$news = new News($news_id);
+	$news = NewsController::getNewsItem($news_id);
+	if (!is_object($news)) $news = new News();
 	$date=time()-$_SESSION["timediff"];
 	if (empty($title)) $title="No Title";
 	if (empty($text)) $text="No Text";

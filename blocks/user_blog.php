@@ -57,15 +57,15 @@ function print_user_news($block=true, $config="", $side, $index) {
 		
 		$news->title = ReplaceEmbedText($news->title);
 		print "<span class=\"news_title\">".PrintReady($news->title)."</span><br />\n";
-		print "<span class=\"news_date\">".GetChangedDate("$day $mon $year")." - ".date($TIME_FORMAT, $news->date)."</span><br /><br />\n";
+		print "<span class=\"news_date\">".GetChangedDate("$day $mon $year")." - ".date($TIME_FORMAT, $news->date)."</span><br />\n";
 		
 		$news->text = ReplaceEmbedText($news->text);
 		$trans = get_html_translation_table(HTML_SPECIALCHARS);
 		$trans = array_flip($trans);
 		$news->text = strtr($news->text, $trans);
-		$news->text = nl2br($news->text);
-		print PrintReady($news->text)."<br /><br />\n";
-		print "<a href=\"#\" onclick=\"editnews('".$news->id."'); return false;\">".GM_LANG_edit."</a> | ";
+//		$news->text = nl2br($news->text);
+		print PrintReady($news->text)."\n";
+		print "<br /><a href=\"#\" onclick=\"editnews('".$news->id."'); return false;\">".GM_LANG_edit."</a> | ";
 		print "<a href=\"index.php?action=deletenews&amp;news_id=".$news->id."&amp;command=$command\" onclick=\"return confirm('".GM_LANG_confirm_journal_delete."');\">".GM_LANG_delete."</a><br />";
 		print "</div><br />\n";
 	}

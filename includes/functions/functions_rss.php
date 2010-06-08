@@ -386,7 +386,7 @@ function getGedcomNews() {
 		$trans = get_html_translation_table(HTML_SPECIALCHARS);
 		$trans = array_flip($trans);
 		$news->text = strtr($news->text, $trans);
-		$news->text = nl2br($news->text);
+//		$news->text = nl2br($news->text);
 		$data .= $news->text;
 		$itemArray[2] = $data;
 		$itemArray[3] = $news->anchor;

@@ -48,11 +48,11 @@ if ($custompage->action == "edit") {
 			}
 			else {
 				/**
-				 * Inclusion of the FCK Editor
+				 * Inclusion of the CK Editor
 				*/
-				$useFCK = file_exists("./modules/FCKeditor/fckeditor.php");
-				if($useFCK){
-					include("./modules/FCKeditor/fckeditor.php");
+				$useCK = file_exists("modules/CKEditor/ckeditor.php");
+				if($useCK){
+					include("modules/CKEditor/ckeditor.php");
 				}
 				print "<form name=\"htmlpage\" method=\"post\" action=\"custompage.php\">";
 				print "<input type=\"hidden\" name=\"action\" value=\"".$custompage->action."\">";
@@ -65,19 +65,16 @@ if ($custompage->action == "edit") {
 				print "\" /><br />";
 				
 				print GM_LANG_content.":<br />";
-				if ($useFCK) { // use FCKeditor module
-					if ($custompage->page_id != "newpage") $text = $custompage->page->content;
-					else $text = "";
+				if ($useCK) { // use CKeditor module
 					
-					$oFCKeditor = new FCKeditor("html");
-					$oFCKeditor->BasePath =  "./modules/FCKeditor/";
-					$oFCKeditor->Value = $text;
-					$oFCKeditor->Width = 700;
-					$oFCKeditor->Height = 450;
-					$oFCKeditor->Config["EnterMode"] = "br";
-					$oFCKeditor->Config["AutoDetectLanguage"] = false ;
-					$oFCKeditor->Config["DefaultLanguage"] = $language_settings[$LANGUAGE]["lang_short_cut"];
-					$oFCKeditor->Create() ;
+					?><script type="text/javascript" src="modules/CKEditor/ckeditor.js"></script><?php
+					$oCKEditor = new CKEditor();
+					$oCKEditor->BasePath = "modules/CKEditor/";
+					$oCKEditor->config["height"] = 450;
+					$oCKEditor->config["enterMode"] = "br";
+					$oCKEditor->config["ShiftEnterMode"] = "p";
+					$oCKeditor->config["language"] = $language_settings[$LANGUAGE]["lang_short_cut"];
+					$oCKEditor->editor("html", ($custompage->page_id != "newpage" ? $custompage->page->content : ""));
 				} 
 				else { //use standard textarea
 					print "<textarea name=\"html\" rows=\"15\" cols=\"80\">";
