@@ -21,7 +21,7 @@
  *
  * @package Genmod
  * @subpackage Controllers
- * @version $Id: action_ctrl.php 146 2010-03-20 08:18:10Z sjouke $
+ * @version $Id$
  */
 if (stristr($_SERVER["SCRIPT_NAME"],basename(__FILE__))) {
 	require "../../intrusion.php";
