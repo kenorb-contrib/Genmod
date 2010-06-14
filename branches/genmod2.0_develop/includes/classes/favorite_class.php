@@ -95,7 +95,8 @@ class Favorite {
 		if (is_null($this->title) || $this->title == "") {
 			SwitchGedcom($this->file);
 			$this->GetObject();
-			$this->title = $this->object->title.$this->object->addxref;
+			if (is_object($this->object)) $this->title = $this->object->title.$this->object->addxref;
+			else $this->title = "";
 			SwitchGedcom();
 		}
 		return $this->title;
