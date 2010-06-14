@@ -104,7 +104,7 @@ class ExternalSearchController {
 		return $this->modulelist;
 	}
 	
-	public function PrintSearchForm($number=4) {
+	public function PrintSearchForm($number=1) {
 		
 		// Do preliminary work
 		if (is_null($this->modules)) $this->LoadModules();
@@ -145,9 +145,16 @@ class ExternalSearchController {
 				print "<input type=\"hidden\" name=\"".$field."\" value=\"".$value."\" />\n";
 			}
 		}
+		// Print the submit button
+		if (($module->method == "link" || $module->method == "form") && $this->hasrange && $module->yearrange_type == "both") {
+			if ($module->method == "link") $formname = "extsearch";
+			else $formname = $module->formname;
+			$checkrange = "if (document.".$formname.".yrange1_checked.checked + document.".$formname.".yrange2_checked.checked == 1) {document.".$formname.".yrange2_checked.checked = 1;document.".$formname.".yrange1_checked.checked = 1;} if (document.".$formname.".yrange1_checked.checked) {if (document.".$formname.".".$this->range1.".value == '') {document.".$formname.".".$this->range1.".value = 1500;} if (document.".$formname.".".$this->range2.".value == '') {document.".$formname.".".$this->range2.".value = ".date("Y").";}};";
+		}
+		else $checkrange = "";
 		print "<input type=\"submit\" name=\"".GM_LANG_search."\" value=\"".GM_LANG_search."\"";
 		if ($module->method == "link") {
-			print " onclick=\"".($this->hasrange && $module->yearrange_type == "both" ? "CheckRange();" : "")."window.open('".$module->link;
+			print " onclick=\"".$checkrange."window.open('".$module->link;
 			$first = true;
 			foreach($module->params as $inputname => $formname) {
 				if (!$first) print "+'&amp;";
@@ -165,13 +172,14 @@ class ExternalSearchController {
 		}
 		elseif($module->method == "form") {
 			print " onclick=\"";
+//			if (isset($module->preopen) && $module->preopen != "") print "pre=window.open('".$module->preopen."', 'pre');alert('wacht');var obj=pre;alert(obj.location.href);return false;pre.close();";
 			$str1 = "";
 			$str2 = "";
 			foreach($module->params as $inputname => $formname) {
 				$str1 .= "if(document.".$module->formname.".".$formname."_checked".".checked == 0) {var ".$inputname."=document.".$module->formname.".".$inputname.".value; document.".$module->formname.".".$inputname.".value=''};";
 				$str2 .= "if(typeof(".$inputname.") != 'undefined') {document.".$module->formname.".".$inputname.".value=".$inputname."};";
 			}
-			print ($this->hasrange && $module->yearrange_type == "both" ? "CheckRange();" : "").$str1."document.".$module->formname.".submit();".$str2;
+			print $checkrange.$str1."document.".$module->formname.".submit();".$str2;
 			print "return false;\" />\n";
 		}
 		print "</td></tr>\n";
@@ -179,29 +187,6 @@ class ExternalSearchController {
 		print "</table>\n";
 		print "</form>\n";
 		
-		// If needed, print the JS to check the year range
-		if ($this->hasrange == true && $module->yearrange_type == "both") {
-			if ($module->method == "link") $formname = "extsearch";
-			else $formname = $module->formname;
-			print "<script><!--\n";
-			?>
-			function CheckRange() {
-				if (!document.<?php print $formname; ?>.yrange1_checked.checked + !document.<?php print $formname; ?>.yrange2_checked.checked == 1) {
-					document.<?php print $formname; ?>.yrange2_checked.checked = 1;
-					document.<?php print $formname; ?>.yrange1_checked.checked = 1;
-				}
-				if (document.<?php print $formname; ?>.yrange1_checked.checked) {
-					if (document.<?php print $formname.".".$this->range1; ?>.value == '') {
-						document.<?php print $formname.".".$this->range1; ?>.value = 1500;
-					}
-					if (document.<?php print $formname.".".$this->range2; ?>.value == '') {
-						document.<?php print $formname.".".$this->range2; ?>.value = 2020;
-					}
-				}
-			}
-			<?php
-			print "//--></script>";
-		}
 	}
 	
 	private function LoadModules() {
@@ -378,7 +363,7 @@ class ExternalSearchController {
 		$query = $module->GetQuery($params);
 		if (!$query) print GM_LANG_no_results;
 		else {
-			require_once("soap/lib/nusoap.php");
+			require_once("modules/soap/lib/nusoap.php");
 			$client = new nusoap_client($module->link, ($module->wsdl ? "'wsdl'" : "''"), SystemConfig::$PROXY_ADDRESS, SystemConfig::$PROXY_PORT, SystemConfig::$PROXY_USER, SystemConfig::$PROXY_PASSWORD);
 			if ($client->getError()) print "Connection error";
 			else {
@@ -398,7 +383,7 @@ class ExternalSearchController {
 	private function SoapPresent() {
 		
 		if (is_null($this->soap_present)) {
-			if (file_exists("soap/lib/nusoap.php")) $this->soap_present = true;
+			if (file_exists("modules/soap/lib/nusoap.php")) $this->soap_present = true;
 			else $this->soap_present = false;
 		}
 		return $this->soap_present;

@@ -56,18 +56,20 @@ foreach($vars as $name=>$var) {
 	$newvars[$name]["id"] = $var;
 	if (!empty($type[$name]) && (($type[$name]=="INDI")||($type[$name]=="FAM")||($type[$name]=="SOUR"))) {
 		$object = ConstructObject($var);
-		$gedcom = $object->gedrec;
-		if (empty($gedcom)) $action="setup";
-		if ($type[$name]=="FAM") {
-			if (preg_match("/0 @.*@ INDI/", $gedcom)>0) {
-				foreach($object->spousefamilies as $key => $fam) {
-					$gedcom = $fam->gedrec;
-					if (!empty($gedcom)) $vars[$name] = $fam->xref;
-					else $action="setup";
+		if (!is_object($object)) $action="setup";
+		else {
+			$gedcom = $object->gedrec;
+			if ($type[$name]=="FAM") {
+				if (preg_match("/0 @.*@ INDI/", $gedcom)>0) {
+					foreach($object->spousefamilies as $key => $fam) {
+						$gedcom = $fam->gedrec;
+						if (!empty($gedcom)) $vars[$name] = $fam->xref;
+						else $action="setup";
+					}
 				}
 			}
+			$newvars[$name]["gedcom"] = $gedcom;
 		}
-		$newvars[$name]["gedcom"] = $gedcom;
 	}
 }
 $vars = $newvars;
@@ -282,6 +284,10 @@ function paste_id(value) {
 }
 //-- run the report
 else if ($action=="run") {
+	
+	// compression will give the wrong content length!
+	if(ini_get('zlib.output_compression')) @ini_set('zlib.output_compression', 'Off');
+	
 	//-- load the report generator
 	switch ($output) {
 	case "HTML":

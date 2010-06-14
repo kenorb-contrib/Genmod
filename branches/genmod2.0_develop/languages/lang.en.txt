@@ -1355,7 +1355,7 @@
 "statsubmit";"Show the plot"
 "stpl";"..."
 "stplGDno";"Graphics Display Library is not available in PHP 4. Please contact your system administrator"
-"stpljpgraphno";"JpGraph modules are not available in directory <i>genmod/modules/jpgraph/</i>. More information about this module may be found in the modules/readme.txt file or in the Genmod forum. Please get them from http://www.aditus.nu/jpgraph/jpdownload.php<br /> <h3>First install JpGraph in directory <i>genmod/modules/jpgraph/</i></h3><br />"
+"stpljpgraphno";"JpGraph modules are not available in directory <i>genmod/modules/jpgraph/</i>. More information about this module may be found in the modules/readme.txt file or in the Genmod forum. Please get them from http://jpgraph.net/download/<br /> <h3>First install JpGraph in directory <i>genmod/modules/jpgraph/</i></h3><br />"
 "stplinfo";"plotting information:"
 "stpltype";"type:"
 "stplnoim";"not implemented:"
