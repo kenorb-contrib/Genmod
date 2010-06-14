@@ -2138,7 +2138,7 @@
 "stplgzas";"grenzen z-as:"
 "stplinfo";"variabelen voor deze grafiek:"
 "stplipot";"/ per tijdeenheid"
-"stpljpgraphno";"JPgraph modules zijn niet beschikbaar in Genmod/jpgraph/. U kunt ze downloaden vanaf http://www.aditus.nu/jpgraph/jpdownload.php<br> <h3>Installeer eerst JPgraph in directory Genmod/jpgraph/ </h3><br>"
+"stpljpgraphno";"JPgraph modules zijn niet beschikbaar in Genmod/jpgraph/. U kunt ze downloaden vanaf http://jpgraph.net/download/<br> <h3>Installeer eerst JPgraph in directory Genmod/jpgraph/ </h3><br>"
 "stplmarrbirth";"Maanden tussen huwelijk en geboorte eerste kind"
 "stplmf";"/ man-vrouw"
 "stplmonth";"maand"

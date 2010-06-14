@@ -1934,8 +1934,8 @@ function GMRvarSHandler($attrs) {
 //			print "var2: ".$var."<br />";
 			$var = preg_replace(array("/\[/","/\]/","/@fact/","/@desc/"), array("['","']",$tfact,$desc), $var);
 			//print "var3: ".$var."<br />";
-			if (substr($var, 0, 8) == "GM_LANG_" || substr($var, 0, 8) == "GM_FACT_") $var = constant($var);
-			else eval("if (isset(\$$var) && !empty(\$$var)) \$var = \$$var;");
+			if ((substr($var, 0, 8) == "GM_LANG_" || substr($var, 0, 8) == "GM_FACT_") && defined($var)) $var = constant($var);
+			else if (strstr($var, " ") === false) eval("if (isset(\$$var) && !empty(\$$var)) \$var = \$$var;");
 		}
 		$currentElement->addText($var);
 	}
@@ -1948,8 +1948,8 @@ function GMRvarLetterSHandler($attrs) {
 	if (!empty($var)) {
 		$tfact = $fact;
 		$var = preg_replace(array("/\[/","/\]/","/@fact/","/@desc/"), array("['","']",$tfact,$desc), $var);
-		if (substr($var, 0, 8) == "GM_FACT_" || substr($ver, 0, 8) == "GM_LANG_") $var = constant($var);
-		else eval("if (isset(\$$var) && !empty(\$$var)) \$var = \$$var;");
+			if ((substr($var, 0, 8) == "GM_LANG_" || substr($var, 0, 8) == "GM_FACT_") && defined($var)) $var = constant($var);
+			else if (strstr($var, " ") === false) eval("if (isset(\$$var) && !empty(\$$var)) \$var = \$$var;");
 
 		$letter = NameFunctions::GetFirstLetter($var);
 

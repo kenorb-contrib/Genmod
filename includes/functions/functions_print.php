@@ -213,9 +213,9 @@ function showBack() {
 ?>
 <script language="JavaScript" type="text/javascript">
 <!--
-	 <?php print "query = \"$query_string\";\n"; ?>
-	 <?php print "textDirection = \"$TEXT_DIRECTION\";\n"; ?>
-	 <?php print "browserType = \"$BROWSERTYPE\";\n"; ?>
+	 <?php print "query = \"".$query_string."\";\n"; ?>
+	 <?php print "textDirection = \"".$TEXT_DIRECTION."\";\n"; ?>
+	 <?php print "browserType = \"".$BROWSERTYPE."\";\n"; ?>
 	 <?php print "themeName = \"".strtolower($theme_name)."\";\n"; ?>
 	 <?php print "SCRIPT_NAME = \"".SCRIPT_NAME."\";\n"; ?>
 	 /* keep the session id when opening new windows */

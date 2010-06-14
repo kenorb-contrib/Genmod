@@ -74,7 +74,8 @@ if($clippings_controller->action == 'download') {
 		// -- create zipped media file====> is a todo
 		print GM_LANG_media_files."<ul>";
 		for($m=0; $m < $clippings_controller->mediacount; $m++) {
-			print "<li><a href=\"".GedcomConfig::$MEDIA_DIRECTORY.$clippings_controller->media[$m]."\">".substr($clippings_controller->media[$m], strrpos($clippings_controller->media[$m], "/"))."</a></li>";
+			$fileobj = new MFile(trim(GedcomConfig::$MEDIA_DIRECTORY.$clippings_controller->media[$m]));
+			print "<li><a href=\"".$fileobj->f_main_file."\">".substr($clippings_controller->media[$m], strrpos($clippings_controller->media[$m], "/")+1)."</a></li>";
 		}
 		print "</ul>";
 	}
