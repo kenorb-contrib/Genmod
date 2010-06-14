@@ -21,7 +21,7 @@
  *
  * @package Genmod
  * @subpackage classes
- * @version $Id: asso_class.php 190 2010-05-16 11:24:59Z sjouke $
+ * @version $Id$
  */
 
 class WestBrabantSearchModule extends BaseExternalSearch {
