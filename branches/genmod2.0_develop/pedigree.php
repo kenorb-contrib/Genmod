@@ -289,7 +289,7 @@ print "<div id=\"content_pedigree\">";
 			$person =& Person::GetInstance($treeid[$i], "", GedcomConfig::$GEDCOMID);
 			$fams = count($person->childfamilies);
 			
-			PersonFunctions::PrintPedigreePerson($person, 1, 1, 0, 1, $pedigree_controller->view, $pedigree_controller->params);
+			PersonFunctions::PrintPedigreePerson($person, 1, $pedigree_controller->show_full, 0, 1, $pedigree_controller->view, $pedigree_controller->params);
 			
 			if ($curgen == 1 && $fams > 0) {
 				$did = 1;
