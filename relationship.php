@@ -460,7 +460,7 @@ if (!$relationship_controller->person1->isempty && !$relationship_controller->pe
 				}
 				print "<div id=\"box".$pid.".1.0\" style=\"position:absolute; ".($TEXT_DIRECTION == "ltr" ? "left" : "right").":".$pxoffset."px; top:".$yoffset."px; width:".$Dbwidth."px; height:".$Dbheight."px; z-index:".(count($node["path"]) - $index)."; \"><table><tr><td colspan=\"2\" width=\"".$Dbwidth."\" height=\"".$Dbheight."\">";
 				$person =& Person::GetInstance($pid);
-				PersonFunctions::PrintPedigreePerson($person, 1, ($relationship_controller->view != "preview"), 0, 1, "", $relationship_controller->params);
+				PersonFunctions::PrintPedigreePerson($person, 1, ($relationship_controller->view != "preview" && $relationship_controller->show_full), 0, 1, "", $relationship_controller->params);
 				print "</td></tr></table></div>\n";
 			}
 		}

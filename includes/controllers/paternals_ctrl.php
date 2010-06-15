@@ -118,7 +118,7 @@ class PaternalsController extends ChartController {
 		$this->PrintFamArrow("u", $this->GetRootObject());
 		print "</div>";
 		print "<br /><br />";
-		PersonFunctions::PrintPedigreePerson($this->GetRootObject(), 1, true, $this->boxcount, 1, $this->view, $this->params);
+		PersonFunctions::PrintPedigreePerson($this->GetRootObject(), 1, $this->show_full, $this->boxcount, 1, $this->view, $this->params);
 		$this->boxcount++;
 		$this->rootfams = array($this->GetRootObject()->primaryfamily);
 		for ($i = 2; $i <= $this->split; $i++) {
@@ -158,7 +158,7 @@ class PaternalsController extends ChartController {
 			print "<br style=\"clear:both;\" />";
 			foreach($persons as $key2 => $person) {
 				print "<div style=\"width:".$width."px; min-width:".$perc."%; float:left;\" align=\"center\">";
-				if (is_object($person) || GedcomConfig::$SHOW_EMPTY_BOXES) PersonFunctions::PrintPedigreePerson($person, 1, true, $this->boxcount, 1, $this->view, $this->params);
+				if (is_object($person) || GedcomConfig::$SHOW_EMPTY_BOXES) PersonFunctions::PrintPedigreePerson($person, 1, $this->show_full, $this->boxcount, 1, $this->view, $this->params);
 				else print "&nbsp;";
 				$this->boxcount++;
 				print "</div>";
@@ -178,12 +178,12 @@ class PaternalsController extends ChartController {
 		foreach ($fams as $key =>$famid) {
 			$family =& Family::GetInstance($famid);
 			print "<div style=\"width:".$width."px; min-width:".$perc."%; float:left;\" align=\"center\">";
-			PersonFunctions::PrintPedigreePerson($family->husb, 1, true, $this->boxcount, 1, $this->view, $this->params);
+			PersonFunctions::PrintPedigreePerson($family->husb, 1, $this->show_full, $this->boxcount, 1, $this->view, $this->params);
 			$this->boxcount++;
 			$newfams[] = (is_object($family->husb) ? $family->husb->primaryfamily : "");
 			print "</div>";
 			print "<div style=\"width:".$width."px; min-width:".$perc."%; float:left;\" align=\"center\">";
-			PersonFunctions::PrintPedigreePerson($family->wife, 1, true, $this->boxcount, 1, $this->view, $this->params);
+			PersonFunctions::PrintPedigreePerson($family->wife, 1, $this->show_full, $this->boxcount, 1, $this->view, $this->params);
 			$this->boxcount++;
 			$newfams[] = (is_object($family->wife) ? $family->wife->primaryfamily : "");
 			print "</div>";
@@ -257,7 +257,7 @@ class PaternalsController extends ChartController {
 					$person = Person::GetInstance(SplitKey($cols[$i][$cnt], "id"));
 				}
 				else $person = "";
-				PersonFunctions::PrintPedigreePerson($person, 1, true, $this->boxcount, 1, $this->view, $this->params);
+				PersonFunctions::PrintPedigreePerson($person, 1, $this->show_full, $this->boxcount, 1, $this->view, $this->params);
 				$this->boxcount++;
 				print "</div>";
 			}

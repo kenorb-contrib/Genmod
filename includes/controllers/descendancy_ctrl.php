@@ -85,7 +85,8 @@ class DescendancyController extends ChartController {
 		else print "<img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["hline"]["other"]."\" height=\"2\" width=\"$Dindent\" border=\"0\" alt=\"\" /></td><td style=\"vertical-align:middle;\">\n";
 		
 		$child =& Person::GetInstance($pid);
-		PersonFunctions::PrintPedigreePerson($child, 1, true, '', $this->view, "", $this->params);
+
+		PersonFunctions::PrintPedigreePerson($child, 1, $this->show_full, 0, $this->view, "", $this->params);
 		print "</td>";
 	
 		// check if child has parents and add an arrow
@@ -155,7 +156,7 @@ class DescendancyController extends ChartController {
 			print "<ul style=\"list-style: none; display: block;\" id=\"".$family->xref.$this->personcount."\">";
 			print "<li>";
 			print "<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\"><tr><td>";
-			PersonFunctions::PrintPedigreePerson($spouse, 1, true, 0, 1, $this->view, $this->params);
+			PersonFunctions::PrintPedigreePerson($spouse, 1, $this->show_full, 0, 1, $this->view, $this->params);
 			print "</td>";
 	
 			// check if spouse has parents and add an arrow
