@@ -47,7 +47,8 @@ class FamilyController extends DetailController
 			$bheight,
 			$famlist,
 			$ENABLE_CLIPPINGS_CART,
-			$nonfacts
+			$nonfacts,
+			$show_full
 		;
 		
 		parent::__construct();
@@ -56,6 +57,7 @@ class FamilyController extends DetailController
 		$pbwidth = $bwidth + 12;
 		$pbheight = $bheight + 14;
 		$nonfacts = array("FAMS", "FAMC", "MAY", "BLOB", "HUSB", "WIFE", "CHIL", "_MEND", "");
+		$show_full = true; // Only full boxes on the family page
 		
 		if (!empty($_REQUEST["famid"])) $this->xref = strtoupper($_REQUEST["famid"]);
 		$this->xref = CleanInput($this->xref);

@@ -529,7 +529,7 @@ abstract class PersonFunctions {
 		 */
 		print "<table cellspacing=\"0\" cellpadding=\"0\" border=\"0\"><tr><td rowspan=\"2\" style=\"vertical-align:middle;\">";
 		print "<span class=\"subheaders\">" . NameFunctions::GetSosaName($sosa*2+1) . "</span>";
-		print "\n\t<table style=\"width: " . ($pbwidth) . "px; height: " . $pbheight . "px;\"><tr>";
+		print "\n\t<table style=\"width: " . ($pbwidth) . "px; height: " . $pbheight . "px;\" border=\"0\"><tr>";
 		if ($parid) {
 			if ($family->wife_id == $parid) ChartFunctions::PrintSosaNumber($label);
 			else ChartFunctions::PrintSosaNumber(str_repeat("&nbsp; ", strlen($label)-1));
@@ -605,7 +605,7 @@ abstract class PersonFunctions {
 	 * @param string $label optional indi label (descendancy booklet)
 	 */
 	public function PrintFamilyChildren($family, $childid = "", $sosa = 0, $label="", $view="") {
-		global $pbwidth, $pbheight, $show_famlink, $show_cousins;
+		global $pbwidth, $pbheight, $show_full, $show_cousins;
 		global $GM_IMAGES, $show_changes, $TEXT_DIRECTION, $gm_user;
 	
 		if ($show_changes && $gm_user->UserCanEdit()) $canshow = true;
@@ -634,7 +634,7 @@ abstract class PersonFunctions {
 					
 					print "<td ".$style."style=\"vertical-align:middle;\" >";
 					print self::GetPediName($chil->famc[$family->xref]["relation"], $chil->sex);
-					self::PrintPedigreePerson($chil, 1, $show_famlink, 1, $chil->view);
+					self::PrintPedigreePerson($chil, 1, $show_full, 1, $chil->view);
 					print "</td>";
 					// Don't print the children's spouses and children if private
 					if ($sosa != 0 && $chil->disp_name) {
@@ -679,7 +679,7 @@ abstract class PersonFunctions {
 							print "<td style=\"vertical-align: middle;";
 							if ($cfam->div_date != "" && $view != "preview") print " filter:alpha(opacity=40);-moz-opacity:0.4\">";
 							else print "\">";
-							PersonFunctions::PrintPedigreePerson($spouse, 1, $show_famlink, 9);
+							PersonFunctions::PrintPedigreePerson($spouse, 1, $show_full, 9);
 							print "</td>\n";
 							// cousins
 							if ($show_cousins) {
@@ -699,7 +699,7 @@ abstract class PersonFunctions {
 		   	ChartFunctions::PrintSosaNumber($sosa, $childid);
 		   	print "<td style=\"vertical-align:middle;\">";
 		   	$child =& Person::GetInstance($childid);
-		   	PersonFunctions::PrintPedigreePerson($child, 1, $show_famlink, 0);
+		   	PersonFunctions::PrintPedigreePerson($child, 1, $show_full, 0);
 		   	print "</td></tr>\n";
 	   	}
 		print "</table><br />";
