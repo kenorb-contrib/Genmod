@@ -50,7 +50,10 @@ abstract class DetailController extends BaseController{
 		// The array always starts with '0', which indicates the "all" option.
 		switch (get_class($this)) {
 			case "IndividualController":
-				$this->tabs = array('0', 'relatives', 'facts', 'sources', 'media', 'notes', 'relations', 'actions_person', 'external_search');
+				if ($this->IsPrintPreview()) {
+					$this->tabs = array('0', 'relatives', 'facts', 'sources', 'media', 'notes', 'relations', 'actions_person');
+				}
+				else $this->tabs = array('0', 'relatives', 'facts', 'sources', 'media', 'notes', 'relations', 'actions_person', 'external_search');
 				$this->tabtype = "indi";
 				$this->object_name = "indi";
 				$this->fact_filter = array("OBJE", "SOUR", "NOTE", "SEX", "NAME");
@@ -123,7 +126,7 @@ abstract class DetailController extends BaseController{
 		<script type="text/javascript">
 		<!--
 		function tabswitch(n) {
-			sndReq('dummy', 'remembertab', 'xref', '<?php print JoinKey($this->xref, GedcomConfig::$GEDCOMID); ?>' , 'tab_tab', n, 'type', '<?php print $this->tabtype; ?>');
+		if ('<?php echo $this->view; ?>' != 'preview') sndReq('dummy', 'remembertab', 'xref', '<?php print JoinKey($this->xref, GedcomConfig::$GEDCOMID); ?>' , 'tab_tab', n, 'type', '<?php print $this->tabtype; ?>');
 			if (n==<?php print count($this->tabs); ?>) n = 0;
 			var tabid = new Array(<?php print "'".implode("','", $this->tabs)."'"; ?>);
 			// show all tabs ?
@@ -248,7 +251,7 @@ abstract class DetailController extends BaseController{
 				if ($this->IsPrintPreview()) { 
 					print "<br /><span class=\"label\">";
 					if ($this->tabtype == "sour") print GM_LANG_other_records;
-					else if ($this->tabtype == "media") print GM_LANG_other_mmrecords;
+					else if ($this->tabtype == "obje") print GM_LANG_other_mmrecords;
 					elseif ($this->tabtype != "indi" && $this->tabtype != "fam") print constant("GM_LANG_other_".$this->tabtype."_records");
 					print "</span>";
 				}

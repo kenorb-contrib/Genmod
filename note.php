@@ -51,7 +51,7 @@ $note_controller->CheckRawEdited();
 	<tr>
 		<td>
 		<span class="name_head"><?php print PrintReady($note_controller->note->GetTitle(40, $note_controller->note->show_changes).$note_controller->note->addxref); ?></span><br />
-		<?php if(GedcomConfig::$SHOW_COUNTER) print "\n<br /><br /><span style=\"margin-left: 3px;\">".GM_LANG_hit_count."&nbsp;".$hits."</span>\n"; ?><br />
+		<?php if(GedcomConfig::$SHOW_COUNTER && !$note_controller->IsPrintPreview()) print "\n<br /><br /><span style=\"margin-left: 3px;\">".GM_LANG_hit_count."&nbsp;".$hits."</span>\n"; ?><br />
 		</td>
 	</tr>
 </table>

@@ -86,7 +86,7 @@ class DescendancyController extends ChartController {
 		
 		$child =& Person::GetInstance($pid);
 
-		PersonFunctions::PrintPedigreePerson($child, 1, $this->show_full, 0, $this->view, "", $this->params);
+		PersonFunctions::PrintPedigreePerson($child, 1, $this->show_full, 0, 1, $this->view, $this->params);
 		print "</td>";
 	
 		// check if child has parents and add an arrow

@@ -51,7 +51,7 @@ $source_controller->CheckRawEdited();
 	<tr>
 		<td>
 		<span class="name_head"><?php print PrintReady($source_controller->source->title.$source_controller->source->addxref);?></span><br />
-		<?php if(GedcomConfig::$SHOW_COUNTER) print "\n<br /><br /><span style=\"margin-left: 3px;\">".GM_LANG_hit_count."&nbsp;".$hits."</span>\n"; ?>
+		<?php if(GedcomConfig::$SHOW_COUNTER && !$source_controller->IsPrintPreview()) print "\n<br /><br /><span style=\"margin-left: 3px;\">".GM_LANG_hit_count."&nbsp;".$hits."</span>\n"; ?>
 		</td>
 	</tr>
 	<tr>

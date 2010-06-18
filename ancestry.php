@@ -48,7 +48,7 @@ $pbheight = $bheight+14;
 PrintHeader($ancestry_controller->pagetitle);
 print "<div id=\"content_pedigree\">";
 
-if ($ancestry_controller->view == "preview") print "<h3>" . str_replace("#PEDIGREE_GENERATIONS#", ConvertNumber($PEDIGREE_GENERATIONS), GM_LANG_gen_ancestry_chart) . ":";
+if ($ancestry_controller->view == "preview") print "<h3>" . str_replace("#PEDIGREE_GENERATIONS#", ConvertNumber($ancestry_controller->num_generations), GM_LANG_gen_ancestry_chart) . ":";
 else print "<h3>" . GM_LANG_ancestry_chart . ":";
 print "<br />".PrintReady($ancestry_controller->root->name);
 if ($ancestry_controller->root->addname != "") print "<br />" . PrintReady($ancestry_controller->root->addname);
@@ -125,10 +125,10 @@ END;
 			$fam = $person->primaryfamily;
 			if (!empty($fam)) {
 				$family =& Family::GetInstance($fam);
-				ChartFunctions::PrintSosaFamily($family, $pid, $i + 1);
+				ChartFunctions::PrintSosaFamily($family, $pid, $i + 1, "", "", "", $ancestry_controller->view);
 			}
 			// show empty family only if it is the first and only one
-			else if ($i == 0) ChartFunctions::PrintSosaFamily("", $pid, $i + 1);
+			else if ($i == 0) ChartFunctions::PrintSosaFamily("", $pid, $i + 1, "", "", "", $ancestry_controller->view);
 		}
 	}
 }

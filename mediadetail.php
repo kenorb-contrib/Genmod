@@ -79,7 +79,7 @@ $media_controller->CheckRawEdited();
 		}
 		MediaFS::DispImgLink($filename, $thumbnail, $media_controller->media->title, "", 0, 0, $imgwidth, $imgheight, $media_controller->media->fileobj->f_is_image, $media_controller->media->fileobj->f_file_exists);
 		?>
-		<?php if(GedcomConfig::$SHOW_COUNTER) {
+		<?php if(GedcomConfig::$SHOW_COUNTER && !$media_controller->IsPrintPreview()) {
 			print "\n<br /><br /><span style=\"margin-left: 3px;\">".GM_LANG_hit_count."&nbsp;".$hits."</span>\n";
 		}?>
 		</td>

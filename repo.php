@@ -50,7 +50,7 @@ $repository_controller->CheckRawEdited();
 	<tr>
 		<td>
 		<span class="name_head"><?php print PrintReady($repository_controller->repo->title.$repository_controller->repo->addxref);?></span><br />
-		<?php if(GedcomConfig::$SHOW_COUNTER) {
+		<?php if(GedcomConfig::$SHOW_COUNTER && !$repository_controller->IsPrintPreview()) {
 			print "\n<br /><br /><span style=\"margin-left: 3px;\">".GM_LANG_hit_count."&nbsp;".$hits."</span>\n";
 		}?>
 		</td>
