@@ -247,7 +247,7 @@ class FamilyController extends DetailController
 		print "\n\t<br /><span class=\"subheaders\">" . GM_LANG_family_group_info;
 		print $this->family->addxref;
 		print "</span>";
-		if(GedcomConfig::$SHOW_COUNTER) {
+		if(GedcomConfig::$SHOW_COUNTER && !$this->IsPrintPreview()) {
 			// Print indi counter only if displaying a non-private person
 			print "\n<span style=\"margin-left: 3px; vertical-align:bottom;\">".GM_LANG_hit_count."&nbsp;".$hits."</span>\n";
 		}

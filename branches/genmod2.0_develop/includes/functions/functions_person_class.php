@@ -467,7 +467,7 @@ abstract class PersonFunctions {
 		print "\n\t<td style=\"vertical-align:middle;\"".$style.">";
 		// Fix for overloading error of array object
 		$husband = $family->$husb;
-		self::PrintPedigreePerson($husband, 1, $show_full, 1, $family->view);
+		self::PrintPedigreePerson($husband, 1, $show_full, 1, 1, $view);
 		print "</td></tr></table>";
 		print "</td>\n";
 		
@@ -492,7 +492,7 @@ abstract class PersonFunctions {
 				if ($sosa > 0) ChartFunctions::PrintSosaNumber($sosa * 4);
 				if (is_object($fath) && $fath->xref == $gparid) ChartFunctions::PrintSosaNumber(trim(substr($label,0,-3),".").".");
 				print "\n\t<td style=\"vertical-align:middle;\">";
-				self::PrintPedigreePerson($fath, 1, $show_full, 1, $family->view);
+				self::PrintPedigreePerson($fath, 1, $show_full, 1, 1, $view);
 				print "</td></tr></table>";
 	//		}
 			print "</td>";
@@ -510,7 +510,7 @@ abstract class PersonFunctions {
 			if ($sosa > 0) ChartFunctions::PrintSosaNumber($sosa * 4 + 1);
 			if (is_object($moth) && $moth->xref == $gparid) ChartFunctions::PrintSosaNumber(trim(substr($label,0,-3),".").".");
 			print "\n\t<td style=\"vertical-align:middle;\">";
-			self::PrintPedigreePerson($moth, 1, $show_full, 1, $family->view);
+			self::PrintPedigreePerson($moth, 1, $show_full, 1, 1, $view);
 			print "</td></tr></table>";
 			print "</td>\n";
 		}
@@ -546,7 +546,7 @@ abstract class PersonFunctions {
 		print "\n\t<td style=\"vertical-align:middle;\"".$style.">";
 		// Fix for overloading error of array object
 		$wwife = $family->$wife;
-		self::PrintPedigreePerson($wwife, 1, $show_full, 1, $family->view);
+		self::PrintPedigreePerson($wwife, 1, $show_full, 1, 1, $view);
 		print "</td></tr></table>";
 		print "</td>\n";
 		
@@ -571,7 +571,7 @@ abstract class PersonFunctions {
 				if ($sosa > 0) ChartFunctions::PrintSosaNumber($sosa * 4 + 2);
 				if (is_object($fath) && $fath->xref == $gparid) ChartFunctions::PrintSosaNumber(trim(substr($label,0,-3),".").".");
 				print "\n\t<td style=\"vertical-align:middle;\">";
-				self::PrintPedigreePerson($fath, 1, $show_full, 1, $family->view);
+				self::PrintPedigreePerson($fath, 1, $show_full, 1, 1, $view);
 				print "</td></tr></table>";
 	//		}
 			print "</td>\n";
@@ -589,7 +589,7 @@ abstract class PersonFunctions {
 			if ($sosa > 0) ChartFunctions::PrintSosaNumber($sosa * 4 + 1);
 			if (is_object($moth) && $moth->xref == $gparid) ChartFunctions::PrintSosaNumber(trim(substr($label,0,-3),".").".");
 			print "\n\t<td style=\"vertical-align:middle;\">";
-			self::PrintPedigreePerson($moth, 1, $show_full, 1, $family->view);
+			self::PrintPedigreePerson($moth, 1, $show_full, 1, 1, $view);
 			print "</td></tr></table>";
 			print "</td>\n";
 		}
@@ -634,7 +634,7 @@ abstract class PersonFunctions {
 					
 					print "<td ".$style."style=\"vertical-align:middle;\" >";
 					print self::GetPediName($chil->famc[$family->xref]["relation"], $chil->sex);
-					self::PrintPedigreePerson($chil, 1, $show_full, 1, $chil->view);
+					self::PrintPedigreePerson($chil, 1, $show_full, 1, 1, $view);
 					print "</td>";
 					// Don't print the children's spouses and children if private
 					if ($sosa != 0 && $chil->disp_name) {
@@ -679,7 +679,7 @@ abstract class PersonFunctions {
 							print "<td style=\"vertical-align: middle;";
 							if ($cfam->div_date != "" && $view != "preview") print " filter:alpha(opacity=40);-moz-opacity:0.4\">";
 							else print "\">";
-							PersonFunctions::PrintPedigreePerson($spouse, 1, $show_full, 9);
+							PersonFunctions::PrintPedigreePerson($spouse, 1, $show_full, 9, 1, $view);
 							print "</td>\n";
 							// cousins
 							if ($show_cousins) {
@@ -699,7 +699,7 @@ abstract class PersonFunctions {
 		   	ChartFunctions::PrintSosaNumber($sosa, $childid);
 		   	print "<td style=\"vertical-align:middle;\">";
 		   	$child =& Person::GetInstance($childid);
-		   	PersonFunctions::PrintPedigreePerson($child, 1, $show_full, 0);
+		   	PersonFunctions::PrintPedigreePerson($child, 1, $show_full, 0, 1, $view);
 		   	print "</td></tr>\n";
 	   	}
 		print "</table><br />";
