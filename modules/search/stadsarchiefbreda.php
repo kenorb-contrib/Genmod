@@ -58,6 +58,9 @@ class BredaSearchModule extends BaseExternalSearch {
 									"plaats[R]" 				=> "1",
 									"plaats[T]" 				=> "1",
 									"bron_a" 					=> "1",
+									"bron_d" 					=> "1",
+									"bron_t" 					=> "1",
+									"bron_b" 					=> "1",
 									"bron_g" 					=> "1",
 									"bron_h" 					=> "1",
 									"bron_o" 					=> "1",
@@ -65,6 +68,7 @@ class BredaSearchModule extends BaseExternalSearch {
 									"datum_van_maand" 			=> "01",
 									"datum_tot_dag" 			=> "31",
 									"datum_tot_maand" 			=> "12",
+									"diversen"					=> ""
 									);
 		$this->formname 		= "form_01";
 	}
