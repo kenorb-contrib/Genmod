@@ -104,8 +104,8 @@ if (empty($action)) {
 }
 
 //-- Include the requirements here
-$min_php_version = "5.0";
-$min_mysql_version = "5.0.3";
+$min_php_version = "5.2";
+$min_mysql_version = "5.1";
 $min_memory_limit = "32";
 $php_ini_settings = array(
 	"output_buffering"=>"4096", 
