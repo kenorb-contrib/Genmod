@@ -24,7 +24,7 @@
  * @version $Id: asso_class.php 190 2010-05-16 11:24:59Z sjouke $
  */
 
-class BaseExternalSearch {
+abstract class BaseExternalSearch {
 	
 	// Class information
 	public $classname 			= "BaseExternalSearch";		// Name of the class
