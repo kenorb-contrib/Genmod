@@ -5,7 +5,7 @@
  * Provides links for administrators to get to other administrative areas of the site
  *
  * Genmod: Genealogy Viewer
- * Copyright (C) 2005 Genmod Development Team
+ * Copyright (C) 2005 - 2008 Genmod Development Team
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,7 +23,7 @@
  *
  * @package Genmod
  * @subpackage Admin
- * @version $Id: gminfo.php,v 1.3 2006/02/19 11:32:04 roland-d Exp $
+ * @version $Id$
  */
 
 /**
@@ -31,23 +31,17 @@
 */
 require "config.php";
 
-if (!userGedcomAdmin($gm_username)) {
-	 header("Location: login.php?url=gminfo.php?action=".$action);
+if (!$gm_user->userGedcomAdmin()) {
+	if (LOGIN_URL == "") header("Location: login.php?url=gminfo.php?action=".$action);
+	else header("Location: ".LOGIN_URL."?url=gminfo.php?action=".$action);
 exit;
 }
 
-/**
- * Inclusion of the language files
-*/
-/*
-require $GM_BASE_DIRECTORY . $confighelpfile["english"];
-if (file_exists($GM_BASE_DIRECTORY . $confighelpfile[$LANGUAGE])) require $GM_BASE_DIRECTORY . $confighelpfile[$LANGUAGE];
-*/
 if (!isset($action)) $action = "";
 
 if ($action == "phpinfo") {
 	$helpindex = "phpinfo_help";
-	print_header($gm_lang["phpinfo"]);
+	PrintHeader(GM_LANG_phpinfo);
 	 ?>
 	<div class="center">
 		<?php
@@ -60,7 +54,7 @@ if ($action == "phpinfo") {
 		ob_end_clean();
 		
 		$php_info    = str_replace(" width=\"600\"", " width=\"\"", $php_info);
-		$php_info    = str_replace("</body></html>", "", $php_info);
+		$php_info    = str_replace("</div></body></html>", "", $php_info);
 		$php_info    = str_replace("<table", "<table class=\"center facts_table ltr\"", $php_info);
 		$php_info    = str_replace("td class=\"e\"", "td class=\"facts_value wrap\"", $php_info);
 		$php_info    = str_replace("td class=\"v\"", "td class=\"facts_value wrap\"", $php_info);
@@ -70,6 +64,10 @@ if ($action == "phpinfo") {
 		$php_info    = str_replace(";", "; ", $php_info);
 		$php_info    = str_replace(",", ", ", $php_info);
 		
+		function strip_spaces($match) {
+			return "<a name=\"".str_replace(" ", "_", $match[1])."\"";
+		}
+		$php_info	 = preg_replace_callback("/\<a name=\"(.*)\"/", "strip_spaces", $php_info);
 		// Put logo in table header
 		
 		$logo_offset = strpos($php_info, "<td>");
@@ -91,20 +89,20 @@ if ($action == "phpinfo") {
 }
 
 if ($action=="confighelp") {
-	print_header($gm_lang["help_config"]);
-	print "<h2 class=\"center\">".str2upper($gm_lang["help_config"])."</h2><br />";
+	PrintHeader(GM_LANG_help_config);
+	print "<h3 class=\"center\">".Str2Upper(GM_LANG_help_config)."</h3><br />";
 	$language_array = array();
-	$language_array = loadLanguage($LANGUAGE,true, true);
+	$language_array = LanguageFunctions::LoadLanguage($LANGUAGE,true, true);
 	
 	print "<ol>";
 	foreach ($language_array as $string => $text) {
 		if (stristr($text, "~#gm_lang")) {
 			print "<li>";
-			print stripslashes(print_text($text,0,2)) . "<br /><br /></li>\r\n";
+			print stripslashes(PrintText($text,0,2)) . "<br /><br /></li>\r\n";
 		}
 	}
-    	print "</ol>";
+    print "</ol>";
 }
 
-print_footer();
+PrintFooter();
 ?>

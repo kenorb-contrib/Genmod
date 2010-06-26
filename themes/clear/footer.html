@@ -1,0 +1,23 @@
+<!-- linkbreaks added to give space between footer and content -->
+<br /><br />
+<?php
+global $CONFIG_PARMS, $spider, $gm_user, $MEDIA_IN_DB;
+if (!isset($without_close)) print "</div> <!-- closing div id=\"content\" -->\n";
+print "<div id=\"footer\" class=\"$TEXT_DIRECTION\">";
+	PrintContactLinks();
+	print "<div class=\"center\" style=\"width:99%;\">";
+	if (GedcomConfig::$SHOW_STATS) PrintExecutionStats();
+	if (DEBUG) PrintCachedObjectCount();
+	if(CONFIGURED) {
+		if ($gm_user->userCanAccept() && ChangeFunctions::GetChangeData(true, "", true)) {
+			print "<br />".GM_LANG_changes_exist." <a href=\"#\" onclick=\"window.open('edit_changes.php','','width=800,height=600,resizable=1,scrollbars=1'); return false;\">".
+			GM_LANG_accept_changes."</a>\n";
+		}
+	}
+	print "<br />Running <a href=\"http://www.genmod.net\" target=\"_blank\">Genmod";
+	if (count($CONFIG_PARMS) >1) print " Enterprise";
+	if (SystemConfig::$MEDIA_IN_DB) print " VFS";
+	print "</a>  - Version ".GM_VERSION." ".GM_VERSION_RELEASE;
+	print "</div>";
+	print "</div> <!-- close div id=\"footer\" -->\n";
+?>

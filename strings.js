@@ -20,7 +20,7 @@
  *
  * @package Genmod
  * @subpackage Display
- * @version $Id: strings.js,v 1.1 2005/10/23 21:36:54 roland-d Exp $
+ * @version $Id$
  */
 	function trim(str) {
 		return str.replace(/(^\s*)|(\s*$)/g,'');

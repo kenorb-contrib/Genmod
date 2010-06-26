@@ -23,11 +23,18 @@
  *
  * @package Genmod
  * @subpackage Themes
- * @version $Id: style.css,v 1.30 2006/05/28 13:00:03 roland-d Exp $
+ * @version $Id$
  */
 
 .something {
 	/*empty style to make sure that the BODY style is not ignored */
+}
+
+IMG {
+	border: 0px;
+}
+.message_bottom {
+	margin-bottom: 5px;
 }
 #centermenu {
 	margin: 0px auto;
@@ -35,7 +42,11 @@
 div.row {
 	clear: both;
 }
-  
+div.left {
+	float: left;
+	padding: 0.2em 0em 0.2em 0em; /* top right bottom left */
+	background-color: #F5F5F5;
+}
 div.row span.label {
 *	clear: both;	/* applied * to hide from other browsers except IE */
 	float: left;
@@ -72,35 +83,8 @@ div.row span.option {
 	height: 2em;
 	padding: 0em 0em 0em 0.2em; /* top right bottom left */
 }
-fieldset {
-	border: none;
-}
-fieldset .label{
-	background-color: #DFDFDF;
-	float: left;
-	clear: both;
-	display: block;
-	*height: 1.8em;
-	padding: 0.2em 0em 0em 0.5em; /* top right bottom left */
-	margin-top: 0.2em;
-}
-fieldset .option {
-	float: right;
-	background-color: #F1F1F1;
-	*height: 2em;
-	padding-left: 1em; /* top right bottom left */
-	clear: none;
-	margin-top: 0.2em;
-}
-fieldset .submit {
-	float: right;
-	*height: 2em;
-	padding-left: 1em; /* top right bottom left */
-	clear: none;
-	margin-top: 0.2em;
-}
 HTML {
-	color: #0045BF;
+	color: #0E60EF;
 	background-color: #FFFFFF;
 	font-family: "Trebuchet MS", verdana, arial, helvetica, sans-serif;
 	font-size: 12px;
@@ -131,7 +115,12 @@ UL {
 	border: 1px solid #000000;
 	margin: 0;
 	width: 99%;
- }
+}
+.person_details {
+	float: left;
+	white-space: normal;
+	overflow: hidden;
+}
 .person_box {
 	background-color: #DFE5FF;
 	border: solid #000000 1px;
@@ -144,9 +133,7 @@ UL {
 	background-color: #FFFFFF;
 	border: solid #493424 1px;
 }
-.person_box:target, #gedcom_stats:target {
-	/* background-color: #FFFFCC;*/
-}
+
 .center {
 	text-align: center;
 	margin-left: auto;
@@ -174,17 +161,7 @@ table.center {
 	white-space: nowrap;
 	padding: 14px;
 }
-/*
-.list_value_wrap {
-	background-color: #CFCFCF;
-	color: #0045BF;
-	border: solid #493424 1px;
-	font-family: Arial, sans-serif;
-	font-size: 12px;
-	vertical-align: top;
-	white-space: normal;
-}
-*/
+
 .list_value_wrap_red {
 	background-color: #D6E0EA;
 	color: red;
@@ -195,8 +172,8 @@ table.center {
 
 .list_item {
 	font-size: 10px;
-	/* white-space: nowrap; */
 }
+
 .facts_table {
 	width: 99%;
 }
@@ -375,12 +352,22 @@ table.center {
 }
 */
 
+.current {
+	font-weight: bold;
+}
+.readonly {
+	color: #DD0000;
+}
 .error {
 	color: #DD0000;
 	font-weight: bold;
 }
 .warning {
 	color: red;
+	font-weight: bold;
+}
+.okay {
+	color: green;
 	font-weight: bold;
 }
 .indent {
@@ -617,46 +604,6 @@ table.center {
 	font-size: 10px;
 	width: 99%;
 }
-
-/*-- index.php specific style sheets -- */
-.small_inner_block {
-/*	height: auto;   */
-	max-height: 215px;
-	overflow: auto;
-	font-size: 10px;
-	text-decoration: none;
-}
-
-.block {
-	background-color: #F1F1F1;
-	color: #0045BF;
-	border: solid #000000 1px;
-	vertical-align: top;
-	margin: 1px;
-	padding: 5px;
-}
-
-#index_main_blocks {
-	clear: none;
-	width: 74%;
-	float: left;
-}
-
-#index_small_blocks {
-	clear: none;
-	width: 25%;
-	float: right;
-}
-
-#index_full_blocks {
-	clear: none;
-	width: 100%;
-}
-
-#random_picture {
-	text-align: center;
-}
-
 
 /*-- pedigree chart specific stylesheets --*/
 #pedigree_chart {
@@ -900,10 +847,13 @@ TD {
 .width10 {
 	width: 10%;
 }
+.width15 {
+	width: 15%;
+}
 .width20 {
 	width: 20%;
 }
-.width25 {
+.width25, .change_language_item_left {
 	width: 25%;
 }
 .width30 {
@@ -915,7 +865,7 @@ TD {
 .width40 {
 	width: 40%;
 }
-.width50 {
+.width50, .admin_item_left, .admin_item_right  {
 	width: 50%;
 }
 .width55 {
@@ -927,7 +877,7 @@ TD {
 .width65 {
 	width: 65%;
 }
-.width70 {
+.width70, .change_language_item_right {
 	width: 70%;
 }
 .width75 {
@@ -997,7 +947,6 @@ select {
 /* Admin menu */
 .admin_genmod_content {
 	background-color: #DFDFDF;
-	vertical-align: top;
 	padding: 3px;
 	white-space: normal;
 	margin-top: 3px;
@@ -1013,7 +962,7 @@ select {
      float: right;
      margin-top: 5px;
 }
-.admin_topbottombar {
+.admin_topbottombar, .admin_return {
 	color: #333333;
 	border: 0.1em solid;
 	border-color: #DE0036;
@@ -1021,6 +970,26 @@ select {
 	text-align: center;
 	font-weight: bold;
 	margin-bottom: 0.5em;
+}
+.admin_return {
+	margin-top: 0.5em;
+}
+.admin_link {
+	border: 0.1em solid #DE0036;
+	text-align: center;
+	margin-bottom: 0.5em;
+}
+.admin_item_box {
+	overflow: hidden;
+}
+.item_box {
+	overflow: hidden;
+}
+.admin_item_left, .change_language_item_left, .faq_item_left {
+	float: left;
+}
+.admin_item_right, .change_language_item_right, .faq_item_right {
+	float: right;
 }
 .topbar {
 	color: #333333;
@@ -1033,23 +1002,41 @@ select {
 .admin_optionbox {
 	background-color: #F1F1F1;
 }
-#content {
+#content, #userlisting {
      margin-left: 200px;
      margin-right: 200px;
      margin-top: 5px;
+*	height: 1%;
+
+}
+#content_popup {
+     margin-left: 100px;
+     margin-right: 100px;
+     margin-top: 5px;
+*	height: 1%;
+
 }
 #content_pedigree {
+}
+#content_hourglass {
+	margin-left: 10px;
+     margin-right: 10px;
+}
+#content_editlang {
+     margin-left: 100px;
+     margin-right: 100px;
+     margin-top: 5px;
 }
 .seperator {
      clear: both;
      background-color: #F1F1F1;
 }
 /* lighter shade */
-.shade1 {
-     background-color: #F1F1F1;
+.shade1, .admin_item_box, .language_item_box1, .block, .item_box, .change_language_item_right {
+     background-color: #F5F5F5;
 }
 /* darker shade */
-.shade2 {
+.shade2, .language_item_box2, .change_language_item_left {
 	background-color: #DFDFDF;
 }
 /* top shade */
@@ -1068,12 +1055,46 @@ select {
 }
 
 /* block styles */
+.small_inner_block {
+	max-height: 215px;
+	overflow: auto;
+	font-size: 10px;
+	text-decoration: none;
+}
+
+.block {
+	vertical-align: top;
+	margin: 1px;
+	padding: 5px;
+}
 .blockhc {
 	font-weight: bold;
 	margin-left: 10px;
+	background-color: #DFDFDF;
 }
 .blockcontent {
 	margin-top: 3px;
+}
+
+#index_main_blocks {
+	clear: none;
+	width: 74%;
+	float: left;
+}
+
+#index_small_blocks {
+	clear: none;
+	width: 25%;
+	float: right;
+}
+
+#index_full_blocks {
+	clear: none;
+	width: 100%;
+}
+
+#random_picture {
+	text-align: center;
 }
 
 /* Indi page */
@@ -1108,6 +1129,9 @@ select {
 .door dd {
 	margin: 2px 2px 2px 2px; 
 	padding: 2px 6px 2px 6px; 
+	border-left: outset #9CA3D4 1px;
+	border-top: outset #9CA3D4 2px;
+	border-right: outset #9CA3D4 3px;
 	height: 100%; 
 	float: left; 
 	font-weight: bold; 
@@ -1132,7 +1156,7 @@ select {
 	font-weight: bold;
 }
 #search_options {
-	width: 35%; 
+	width: 40%; 
      float: left;
      margin-top: 0.5em;
 	margin-left: 5%;
@@ -1167,17 +1191,9 @@ select {
 	border-style: none;
 }
 .label_form {
-	text-align: left;
-	width: 160px;
-	padding-right: 20px;
 	display: block;
 	float: left;
-	margin-bottom: 10px;
-}
-.input_form {
-	display: block;
-	width: 140px;
-	float: left;
+	width: 75px;
 	margin-bottom: 10px;
 }
 .label_form_remember {
@@ -1205,41 +1221,433 @@ select {
 	margin-bottom: 10px;
 }
 #index_edit_container {
-	width: 70%;
+	width: 85%;
 	margin-left: auto;
 	margin-right: auto;
 }
 #index_edit_left_arrow {
      float: left;
+	width: 5%;
      margin-top: 55px;
 }
 #index_edit_left {
-     width: 180px; 
+     width: 25%; 
      float: left;
      margin-top: 5px;
 }
 #index_edit_left_right_arrow {
      float: left;
+	width: 5%;
      margin-top: 55px;
 }
 #index_edit_content {
+	width: 25%;
      margin-left: auto;
      margin-right: auto;
      margin-top: 5px;
 }
 #index_edit_right_left_arrow {  
      float: right;
+	width: 5%;
      margin-top: 55px;
 }
 #index_edit_right {  
-     width: 180px; 
+     width: 25%; 
      float: right;
      margin-top: 5px;
 }
 #index_edit_right_arrow {  
      float: right;
+	width: 5%;
      margin-top: 55px;
 }
 #index_edit_advice {
 	margin-top: 5px;
 }
+
+/* ######### Style for Top Links Menu ######### */
+.chromestyle{
+	width: 99%;
+}
+
+.chromestyle:after{ /*Add margin between menu and rest of content in Firefox*/
+	content: "."; 
+	display: block; 
+	height: 0; 
+	clear: both; 
+	visibility: hidden;
+}
+
+.chromestyle ul{
+	width: 100%;
+	padding: 0;
+	margin: 0;
+	text-align: left; /*set value to "left", "center", or "right"*/
+}
+
+.chromestyle ul li{
+	display: inline;
+}
+
+.chromestyle ul li a{
+	padding: 4px 7px;
+	margin: 0;
+	text-decoration: none;
+	float: left;
+}
+
+.chromemenu ul li a:hover {
+	color: #FF4949;
+}
+
+.chromeimages {
+	border: none; 
+	padding-right: 0.5em;
+}
+
+
+/* ######### Style for Drop Down Menu ######### */
+
+.dropmenudiv{
+	position:absolute;
+	top: 0;
+	border: 1px solid #DE0036; /*THEME CHANGE HERE*/
+	line-height:18px;
+	z-index:100;
+	background-color: #F1F1F1;
+	width: 200px;
+	visibility: hidden;
+}
+
+.dropmenudiv a{
+	width: auto;
+	display: block;
+	text-indent: 3px;
+	padding: 2px 0;
+	text-decoration: none;
+}
+
+* html .dropmenudiv a{ /*IE only hack*/
+	width: 100%;
+}
+
+.dropmenudiv a:hover{ /*THEME CHANGE HERE*/
+	background-color: #FFFFFF;
+	text-decoration: none;
+}
+
+.favorite_padding {
+	padding-left: 0.5em;
+}
+
+/* ######### Style for Progress Bar ######### */
+
+.progress_box {
+	background-color: #DFE5FF;
+	border: solid #000000 1px;
+	width: 350px; 
+	margin: 10px; 
+	text-align: center;
+	clear: left;
+}
+.progress_bar {
+	background-color: #DFE5FF;
+	border: solid #000000 1px;
+	width: 1%; 
+	height: 18px; 
+	text-align: center; 
+	overflow: hidden;
+}
+.inner_progress_bar {
+	left: 10px; 
+	right: 10px; 
+	width: 300px; 
+	height: 20px; 
+	border: inset #CCCCCC 3px; 
+	background-color: #000000;
+}
+progress_links {
+	float: right;
+	width: 500px; 
+	text-align: center;
+	padding-top: 10px;
+}
+import_statistics {
+	float: left; 
+	position: relative; 
+	width: 500px;
+	clear: left;
+}
+
+#import_content {
+     margin-top: 5px;
+}
+
+/* ######### Style menu choices ######### */
+.choice_left {
+	float: left;
+	margin-left: 0.3em;
+}
+.choice_middle {
+	float: left;
+	margin-left: 0.3em;
+	margin-right: 0.3em;
+}
+.choice_right {
+	float: left;
+	margin-right: 0.3em;
+}
+
+/* ######### Style user administration ######### */
+#userlisting {
+     margin-right: 50px;
+}
+.width_select, .width_deledit {
+	width: 6%;
+}
+.width_username {
+	width: 10%;
+}
+.width_fullname, .width_priviliges, .width_registered, .width_last_logged_in {
+	width: 12%;
+}
+.width_languages {
+	width: 8%;
+}
+.user_verified, .admin_approved {
+	width: 6%;
+}
+.mass_heading_outer {
+	overflow: hidden;
+	border: 0.1em solid #DE0036;
+	margin-top: 0.5em;
+	margin-bottom: 0.5em;
+}
+.mass_heading_style {
+	color: #333333;
+	padding: 0.4em;
+	font-weight: bold;
+	float: left;
+	text-align: center;
+}
+.chart_box {
+	overflow: hidden;
+}
+
+#debug_output {
+    float:left;
+    width:100%;
+    background:#DAE0D2 url("../../images/tab_background.jpg")
+      repeat-x bottom;
+    font-size:93%;
+    line-height:normal;
+    font-weight: bold;
+
+    }
+#debug_output ul {
+    margin:0;
+    list-style:none;
+    padding:10px 10px 0;
+    }
+#debug_output a {
+    display:block;
+    padding:5px 15px 4px;
+    text-decoration: none;
+    }
+#debug_output li {
+    float:left;
+    background:url("../../images/tab_right_off.jpg")
+      no-repeat right top;
+    margin:0;
+    padding:0;
+    }
+#debug_output a {
+    display:block;
+    background:url("../../images/tab_left_off.jpg")
+      no-repeat left top;
+    padding:5px 15px;
+    }
+#debug_output .current {
+    background-image:url("../../images/tab_right_on.jpg");
+    }
+#debug_output .current a {
+    background-image:url("../../images/tab_left_on.jpg");
+    padding-bottom:5px;
+    color: #1d83e0;
+ }
+ 
+ /*****************************TRANSMENU**********************************/
+ /* this is the clipping region for the menu. it's width and height get set by script, depending on the size of the items table */
+.transMenu {
+	position:absolute;
+	overflow:hidden;
+	left:-1000px;
+	top:-1000px;
+	}
+
+/* this is the main container for the menu itself. it's width and height get set by script, depending on the size of the items table */
+.transMenu .content {
+	position:absolute;
+	}
+
+/* this table comprises all menu items. each TR is one item. It is relatively positioned so that the shadow and background transparent divs can be positioned underneath it */
+.transMenu .items {
+	position:relative;
+	left:0px; top:0px;
+	z-index:2;
+	}
+
+.transMenu.top .items {
+	border-top:none;
+	}
+
+/* each TR.item is one menu item */
+.transMenu .item {
+    color:#336;
+    font-size:10px;
+    font-family:sans-serif;
+    text-decoration:none;
+	/* this is a hack for mac/ie5, whom incorrectly cascades the border properties of the parent table to each row */
+	border:none;
+	cursor:pointer;
+	cursor:hand;
+	}
+
+/* this DIV is the semi-transparent white background of each menu. the -moz-opacity is a proprietary way to get transparency in mozilla, the filter is for IE/windows 5.0+. */
+/* we set the background color in script because ie mac does not use it; that browser only uses a semi-transparent white PNG that the spacer gif inside this DIV is replaced by */
+.transMenu .background {
+	position:absolute;
+	left:0px; top:0px;
+	z-index:1;
+	-moz-opacity:1;
+	filter:alpha(opacity=100);
+	}
+
+/* same concept as .background, but this is the sliver of shadow on the right of the menu. It's left, height, and background are set by script. In IE5/mac, it uses a PNG */
+.transMenu .shadowRight {
+	position:absolute;
+	z-index:3;
+	top:3px; width:2px;
+	-moz-opacity:0.8;
+	filter:alpha(opacity=40);
+	}
+
+/* same concept as .background, but this is the sliver of shadow on the bottom of the menu. It's top, width, and background are set by script. In IE5/mac, it uses a PNG */
+.transMenu .shadowBottom {
+	position:absolute;
+	z-index:1;
+	left:3px; height:2px;
+	-moz-opacity:.4;
+	filter:alpha(opacity=40);
+	}
+
+/* this is the class that is used when the mouse is over an item. script sets the row to this class when required. */
+.transMenu .item.hover {
+	background:#fdfdfd;
+	color:black;
+	}
+
+/* this is either the dingbat that indicates there is a submenu, or a spacer gif in it's place. We give it extra margin to create some space between the text and the dingbat */
+.transMenu .item img {
+	margin-left:10px;
+}
+
+#downloadgedcom_form {
+	width: 60%;
+	margin-left: auto;
+	margin-right: auto;
+}
+#downloadgedcom_content {
+	margin-left: auto;
+	margin-right: auto;
+}
+#downloadgedcom_labels {
+	float: left;
+	white-space: nowrap;
+	text-align: left;
+}
+#downloadgedcom_options {
+	float: left;
+	text-align: left;
+}
+#downloadgedcom_options #privradio {
+	float: left;
+	text-align: left;
+}
+
+#downloadgedcom_form br {
+	clear: both;
+}
+#notice {
+	margin-left: auto;
+	margin-right: auto;
+	text-align: left;
+	white-space: auto;
+}
+#PLAC_CTRY_flag {
+	padding-right: 5px;
+}
+#menu {
+	margin-left: 35px;
+}
+#headerlogo {
+	background-image: url(header.gif);
+	background-repeat: no-repeat;
+}
+#searchhelp_text {
+	margin-top: 5px;
+}
+#searchhelp_how {
+	margin-bottom: 5px;
+}
+
+/* ######### Style language translation ######### */
+.language_item_box {
+	overflow: show;
+}
+.translated_language {
+	/* text-align: left; */
+	overflow: hidden;
+}
+
+.original_language {
+	float: left;
+	width: 45%;
+	padding: 5px;
+}
+.translated_language {
+	width: 45%;
+	padding: 5px;
+}
+
+#editlang_edit_title {
+	font-size: 16px;
+	border: 1px solid #DE0036;
+	margin-bottom: 10px;
+}
+#original_text textarea {
+	background-color: #CECECE;
+}
+
+#translated_text, #original_text {
+	font-size: 16px;
+}
+
+textarea {
+	border: 1px solid #493424;
+}
+#viewlog_option, #viewlog_admin {
+	float: left;
+	padding: 3px;
+	width: 45%;
+}
+#logdetails {
+	height: 400px;
+	overflow: auto;
+}
+#viewlog_option label, #viewlog_admin label {
+	width: 150px;
+	text-align: right;
+	margin-right: 5px;
+}
+

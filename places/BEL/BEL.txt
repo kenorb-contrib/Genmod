@@ -1,0 +1,4 @@
+<!-- @version $Id: BEL.txt,v 1.1 2008/09/10 10:40:13 sjouke Exp $ -->
+Bruxelles-Capitale (BXL)
+Flandre (FLD)
+Wallonie (WAL)

@@ -1,10 +1,10 @@
 <?php
 /**
- * MyGedView page allows a logged in user the abilty
+ * MyGenMod page allows a logged in user the abilty
  * to keep bookmarks, see a list of upcoming events, etc.
  *
  * Genmod: Genealogy Viewer
- * Copyright (C) 2005 Genmod Development Team
+ * Copyright (C) 2005 - 2008 Genmod Development Team
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,9 +22,10 @@
  *
  * @package Genmod
  * @subpackage Display
- * @version $Id: index.php,v 1.6 2006/05/28 13:00:03 roland-d Exp $
+ * @version $Id$
  */
 
+ 
 /**
  * Inclusion of the module extension
 */
@@ -38,11 +39,10 @@ if (isset ($_REQUEST['mod'])) {
 */
 require("config.php");
 
-if (!isset($CONFIGURED)) {
+if (!defined('CONFIGURED')) {
 	print "Unable to include the config.php file.  Make sure that . is in your PHP include path in the php.ini file.";
 	exit;
 }
-
 /**
  * Block definition array
  *
@@ -51,7 +51,7 @@ if (!isset($CONFIGURED)) {
  * their names and the function to call them
  * "name" is the name of the block in the lists
  * "descr" is the name of a $gm_lang variable to describe this block
- * - eg: "whatever" here means that $gm_lang["whatever"] describes this block
+ * - eg: "whatever" here means that GM_LANG_whatever describes this block
  * "type" the options are "user" or "gedcom" or undefined
  * - The type determines which lists the block is available in.
  * - Leaving the type undefined allows it to be on both the user and gedcom portal
@@ -68,27 +68,22 @@ while (false !== ($entry = $d->read())) {
 }
 $d->close();
 
-if (isset($_SESSION["timediff"])) $time = time()-$_SESSION["timediff"];
-else $time = time();
-$day = date("j", $time);
-$month = date("M", $time);
-$year = date("Y", $time);
-if ($USE_RTL_FUNCTIONS) {
+if (GedcomConfig::$USE_RTL_FUNCTIONS) {
 	//-------> Today's Hebrew Day with Gedcom Month
 	$datearray = array();
- 	$datearray[0]["day"]   = $day;
- 	$datearray[0]["mon"]   = $monthtonum[str2lower(trim($month))];
- 	$datearray[0]["year"]  = $year;
- 	$datearray[0]["month"] = $month;
+ 	$datearray[0]["day"]   = GetCurrentDay();
+ 	$datearray[0]["mon"]   = $monthtonum[Str2Lower(trim(GetCurrentMonth()))];
+ 	$datearray[0]["year"]  = GetCurrentYear();
+ 	$datearray[0]["month"] = GetCurrentMonth();
 
-    $date   = gregorianToJewishGedcomDate($datearray);
+    $date   = GregorianToJewishGedcomDate($datearray);
     $hDay   = $date[0]["day"];
     $hMonth = $date[0]["month"];
     $hYear	= $date[0]["year"];
 
 //    $currhDay   = $hDay;
 //    $currhMon   = trim($date[0]["month"]);
-//    $currhMonth = $monthtonum[str2lower($currhMon)];
+//    $currhMonth = $monthtonum[Str2Lower($currhMon)];
     $currhYear 	= $hYear;
 }
 
@@ -96,43 +91,41 @@ if (!isset($action)) $action="";
 
 //-- make sure that they have user status before they can use this page
 //-- otherwise have them login again
-$uname = $gm_username;
-if (empty($uname)) {
+if ($gm_user->username == "") {
 	if (!empty($command)) {
 		if ($command=="user") {
-			header("Location: login.php?help_message=mygedview_login_help&url=".urlencode("index.php?command=user"));
+			if (LOGIN_URL == "") header("Location: login.php?help_message=mygedview_login_help&url=".urlencode("index.php?command=user"));
+			else header("Location: ".LOGIN_URL."?help_message=mygedview_login_help&url=".urlencode("index.php?command=user"));
 			exit;
 		}
 	}
 	$command="gedcom";
 }
-else $user = getUser($uname);
 
 if (empty($command)) $command="user";
 
-if (!empty($uname)) {
+if ($gm_user->username != "") {
 	//-- add favorites action
 	if (($action=="addfav")&&(!empty($gid))) {
 		$gid = strtoupper($gid);
 		if (!isset($favnote)) $favnote = "";
-		$indirec = find_gedcom_record($gid);
-		$ct = preg_match("/0 @(.*)@ (.*)/", $indirec, $match);
-		if ($indirec && $ct>0) {
+		$favobject = ConstructObject($gid, "", GedcomConfig::$GEDCOMID);
+		if (is_object($favobject)) {
 			$favorite = array();
 			if (!isset($favtype)) {
 				if ($command=="user") $favtype = "user";
 				else $favtype = "gedcom";
 			}
-			if ($favtype=="gedcom") $favtype = $GEDCOM;
-			else $favtype=$uname;
-			$favorite["username"] = $favtype;
-			$favorite["gid"] = $gid;
-			$favorite["type"] = trim($match[2]);
-			$favorite["file"] = $GEDCOM;
-			$favorite["url"] = "";
-			$favorite["note"] = $favnote;
-			$favorite["title"] = "";
-			addFavorite($favorite);
+			$favorite = new Favorite();
+			if ($favtype == "gedcom") $favorite->username = "";
+			else $favorite->username = $gm_user->username;
+			$favorite->gid = $gid;
+			$favorite->type = $favobject->type;
+			$favorite->file = GedcomConfig::$GEDCOMID;
+			$favorite->url = "";
+			$favorite->note = $favnote;
+			$favorite->title = "";
+			$favorite->SetFavorite();
 		}
 	}
 	if (($action=="addfav")&&(!empty($url))) {
@@ -143,88 +136,45 @@ if (!empty($uname)) {
 			if ($command=="user") $favtype = "user";
 			else $favtype = "gedcom";
 		}
-		if ($favtype=="gedcom") $favtype = $GEDCOM;
-		else $favtype=$uname;
-		$favorite["username"] = $favtype;
-		$favorite["gid"] = "";
-		$favorite["type"] = "URL";
-		$favorite["file"] = $GEDCOM;
-		$favorite["url"] = $url;
-		$favorite["note"] = $favnote;
-		$favorite["title"] = $favtitle;
-		addFavorite($favorite);
+		$favorite = new Favorite();
+		if ($favtype == "gedcom") $favorite->username = "";
+		else $favorite->username = $gm_user->username;
+		$favorite->gid = "";
+		$favorite->type = "URL";
+		$favorite->file = GedcomConfig::$GEDCOMID;
+		$favorite->url = $url;
+		$favorite->note = $favnote;
+		$favorite->title = $favtitle;
+		$favorite->SetFavorite();
 	}
 	if (($action=="deletefav")&&(isset($fv_id))) {
-		deleteFavorite($fv_id);
+		FavoritesController::deleteFavorite($fv_id);
 	}
 	else if ($action=="deletemessage") {
 		if (isset($message_id)) {
-			if (!is_array($message_id)) deleteMessage($message_id);
+			if (!is_array($message_id)) MessageController::deleteMessage($message_id);
 			else {
 				foreach($message_id as $indexval => $mid) {
-					if (isset($mid)) deleteMessage($mid);
+					if (isset($mid)) MessageController::deleteMessage($mid);
 				}
 			}
 		}
 	}
 	else if (($action=="deletenews")&&(isset($news_id))) {
-		deleteNews($news_id);
+		NewsController::DeleteNews($news_id);
 	}
 }
 
 //-- get the blocks list
-if ($command=="user") {
-	$ublocks = getBlocks($uname);
-	if ((count($ublocks["main"])==0) && (count($ublocks["right"])==0)) {
-		$ublocks["main"][] = array("print_todays_events", "");
-		$ublocks["main"][] = array("print_user_messages", "");
-		$ublocks["main"][] = array("print_user_favorites", "");
-
-		$ublocks["right"][] = array("print_welcome_block", "");
-		$ublocks["right"][] = array("print_random_media", "");
-		$ublocks["right"][] = array("print_upcoming_events", "");
-		$ublocks["right"][] = array("print_logged_in_users", "");
-	}
-}
-else {
-	$ublocks = getBlocks($GEDCOM);
-	if ((count($ublocks["main"])==0) && (count($ublocks["right"])==0)) {
-		$ublocks["main"][] = array("print_gedcom_stats", "");
-		$ublocks["main"][] = array("print_gedcom_news", "");
-		$ublocks["main"][] = array("print_gedcom_favorites", "");
-		$ublocks["main"][] = array("review_changes_block", "");
-
-		$ublocks["right"][] = array("print_gedcom_block", "");
-		$ublocks["right"][] = array("print_random_media", "");
-		$ublocks["right"][] = array("print_todays_events", "");
-		$ublocks["right"][] = array("print_logged_in_users", "");
-	}
-}
-
-//-- Set some behaviour controls that depend on which blocks are selected
-$welcome_block_present = false;
-$gedcom_block_present = false;
-$top10_block_present = false;
-$login_block_present = false;
-foreach($ublocks["right"] as $block) {
-	if ($block[0]=="print_welcome_block") $welcome_block_present = true;
-	if ($block[0]=="print_gedcom_block") $gedcom_block_present = true;
-	if ($block[0]=="print_block_name_top10") $top10_block_present = true;
-	if ($block[0]=="print_login_block") $login_block_present = true;
-}
-foreach($ublocks["main"] as $block) {
-	if ($block[0]=="print_welcome_block") $welcome_block_present = true;
-	if ($block[0]=="print_gedcom_block") $gedcom_block_present = true;
-	if ($block[0]=="print_block_name_top10") $top10_block_present = true;
-	if ($block[0]=="print_login_block") $login_block_present = true;
-}
+if ($command=="user") $ublocks = new Blocks("user", $gm_user->username, $action);
+else $ublocks = new Blocks("gedcom", "", $action);
 
 if ($command=="user") {
 	$helpindex = "index_myged_help";
-	print_header($gm_lang["mygedview"]);
+	PrintHeader(GM_LANG_mygedview);
 }
 else {
-	print_header($GEDCOMS[$GEDCOM]["title"]);
+	PrintHeader("");
 }
 ?>
 <script language="JavaScript" type="text/javascript">
@@ -248,56 +198,71 @@ else {
 //-- start of main content section
 if ($command=="user") {
 	print "<div>";
-	print "<h1>".$gm_lang["mygedview"]."</h1>";
-	print $gm_lang["mygedview_desc"];
+	print "<h3>".GM_LANG_mygedview."</h3>";
+	print GM_LANG_mygedview_desc;
 	print "</div>\n";
 }
-if (count($ublocks["main"]) != 0) {
-	if (count($ublocks["right"]) != 0) print "\t<div id=\"index_main_blocks\">\n";
+$disp_stats = false;
+if (count($ublocks->main) != 0) {
+	if (count($ublocks->right) != 0) print "\t<div id=\"index_main_blocks\">\n";
 	else print "\t<div id=\"index_full_blocks\">\n";
 
-	foreach($ublocks["main"] as $bindex=>$block) {
-//		$time1 = getmicrotime();
+	foreach($ublocks->main as $bindex=>$block) {
+		if ($disp_stats) {
+			$time1 = getmicrotime();
+			$queries1 = $TOTAL_QUERIES;
+		}
 		if (function_exists($block[0])) eval($block[0]."(false, \$block[1], \"main\", $bindex);");
-//		$time2 = getmicrotime();
-//		$time = $time2 - $time1;
-//		printf(" %.3f ", $time);
-//		print "<br />";
+		if ($disp_stats) {
+			$time2 = getmicrotime();
+			$time = $time2 - $time1;
+			print "Execution time: ";
+			printf(" %.3f ", $time);
+			print "<br />";
+			print "Queries: ".($TOTAL_QUERIES - $queries1)." ";
+		}
 	}
 	print "</div>\n";
 }
 //-- end of main content section
 
 //-- start of blocks section
-if (count($ublocks["right"]) != 0) {
-	if (count($ublocks["main"]) != 0) print "\t<div id=\"index_small_blocks\">\n";
+if (count($ublocks->right) != 0) {
+	if (count($ublocks->main) != 0) print "\t<div id=\"index_small_blocks\">\n";
 	else print "\t<div id=\"index_full_blocks\">\n";
-	foreach($ublocks["right"] as $bindex => $block) {
+	foreach($ublocks->right as $bindex => $block) {
 		// NOTE: print_random_media(true, $block[1], right, $bindex
-//		$time1 = getmicrotime();
+		if ($disp_stats) {
+			$time1 = getmicrotime();
+			$queries1 = $TOTAL_QUERIES;
+		}
 		if (function_exists($block[0])) eval($block[0]."(true, \$block[1], \"right\", $bindex);");
-//		$time2 = getmicrotime();
-//		$time = $time2 - $time1;
-//		printf(" %.3f ", $time);
-//		print "<br />";
+		if ($disp_stats) {
+			$time2 = getmicrotime();
+			$time = $time2 - $time1;
+			print "Execution time: ";
+			printf(" %.3f ", $time);
+			print "<br />";
+			print "Queries: ".($TOTAL_QUERIES - $queries1)." ";
+		}
 	}
 	print "\t</div>\n";
 }
 //-- end of blocks section
 
-if (($command=="user") and (!$welcome_block_present)) {
+if (($command=="user") and (!$ublocks->welcome_block_present)) {
 	print "<div>";
-	print_help_link("mygedview_customize_help", "qm");
-	print "<a href=\"#\" onclick=\"window.open('index_edit.php?name=".$gm_username."&amp;command=user', '', 'top=50,left=10,width=1000,height=400,scrollbars=1,resizable=1');\">".$gm_lang["customize_page"]."</a>\n";
+	PrintHelpLink("mygedview_customize_help", "qm");
+	print "<a href=\"#\" onclick=\"window.open('index_edit.php?name=".$gm_user->username."&amp;command=user', '', 'top=50,left=10,width=1000,height=400,scrollbars=1,resizable=1');\">".GM_LANG_customize_page."</a>\n";
 	print "</div>";
 }
-if (($command=="gedcom") and (!$gedcom_block_present)) {
-	if (userIsAdmin($gm_username)) {
+if (($command=="gedcom") and (!$ublocks->gedcom_block_present)) {
+	if ($gm_user->userIsAdmin()) {
 		print "<div>";
-		print "<a href=\"#\" onclick=\"window.open('index_edit.php?name=$GEDCOM&amp;command=gedcom', '', 'top=50,left=10,width=1000,height=400,scrollbars=1,resizable=1');\">".$gm_lang["customize_gedcom_page"]."</a>\n";
+		print "<a href=\"#\" onclick=\"window.open('index_edit.php?name=GedcomConfig::$GEDCOMID&amp;command=gedcom', '', 'top=50,left=10,width=1000,height=400,scrollbars=1,resizable=1');\">".GM_LANG_customize_gedcom_page."</a>\n";
 		print "</div>";
 	}
 }
 
-print_footer();
+PrintFooter();
 ?>

@@ -1,0 +1,119 @@
+<GMReport access="PRIV_USER" icon="place" type="general">
+	<!-- $Id$ -->
+	<GMRTitle><GMRvar var="GM_LANG_changes_report" /></GMRTitle>
+	<GMRDescription>Prints a list of individuals matching specific change criteria</GMRDescription>
+	<GMRInput name="changeRangeStart" lookup="DATE" type="text" default="NOW-30"><GMRvar var="GM_LANG_changedate2" /></GMRInput>
+	<GMRInput name="changeRangeEnd" lookup="DATE" type="text" default="NOW"><GMRvar var="GM_LANG_changedate1" /></GMRInput>
+	<GMRInput name="sortby" type="select" options="CHAN,NAME,BIRT,ID"><GMRvar var="GM_LANG_sort_by" /></GMRInput>
+	<GMRInput name="section" type="select" options="all_sections,review_changes_block,recent_changes_block"><GMRvar var="GM_LANG_show_sections" /></GMRInput>
+	<GMRInput name="showIndID" type="checkbox" default="SHOW_ID_NUMBERS"><GMRvar var="GM_LANG_SHOW_ID_NUMBERS" /></GMRInput>
+	<GMRInput name="showFamID" type="checkbox" default="SHOW_FAM_ID_NUMBERS"><GMRvar var="GM_LANG_SHOW_FAM_ID_NUMBERS" /></GMRInput>
+	<GMRInput name="pageSize" type="select" options="AVAIL_PAGE_SIZES" default="DEFAULT_PAGE_SIZE"><GMRvar var="GM_LANG_page_size" /></GMRInput>
+	<GMRStyle name="header" font="LucidaSansUnicode" size="16" style="b" />
+	<GMRStyle name="header2" font="LucidaSansUnicode" size="12" style="b" />
+	<GMRStyle name="pagenum" font="LucidaSansUnicode" size="8" style="" />
+	<GMRStyle name="text" font="LucidaSansUnicode" size="9" style="" />
+	<GMRStyle name="label" font="LucidaSansUnicode" size="10" style="b" />
+	<GMRDoc pageSize="$pageSize" orientation="L" margin="24">
+		<GMRHeader>
+			<GMRCell width="0" height="20" align="center" style="header"><GMRvar var="GM_LANG_changes_report" /></GMRCell>
+			<!-- GMRCell width="0" height="10" align="right" style="pagenum"><GMRvar var="GM_LANG_page" /> <GMRPageNum /> <GMRvar var="GM_LANG_of" /> <GMRTotalPages /> - <GMRNow /></GMRCell -->
+			<GMRTextBox width="50%" height="10" border="0">
+				<GMRText style="pagenum"><GMRNow /></GMRText>
+			</GMRTextBox>
+			<GMRTextBox width="0" height="10" border="0" newline="1">
+				<GMRText style="pagenum" align="right"><GMRvar var="GM_LANG_page" /> <GMRPageNum /> <GMRvar var="GM_LANG_of" /> <GMRTotalPages /></GMRText>
+			</GMRTextBox>
+		</GMRHeader>
+		<GMRBody>
+			<!-- pending changes section -->
+			<GMRif condition="$section=='all_sections' || $section=='allsections' || $section=='review_changes_block' || $section=='reviewchangesblock'">
+				<GMRCell width="0" height="20" align="center" style="header2"><GMRvar var="GM_LANG_review_changes_block" /></GMRCell>
+				<GMRTextBox width="250" height="12" border="1" fill="#DDDDDD">
+					<GMRText style="label"><GMRvar var="GM_LANG_name" /></GMRText>
+				</GMRTextBox>
+				<GMRTextBox width="240" height="12" border="1" fill="#DDDDDD">
+					<GMRText style="label"><GMRvar var="GM_LANG_differences" /></GMRText>
+				</GMRTextBox>
+				<GMRTextBox width="150" height="12" border="1" fill="#DDDDDD">
+					<GMRText style="label"><GMRvar var="GM_FACT_CHAN" /></GMRText>
+				</GMRTextBox>
+				<GMRTextBox width="0" height="12" border="1" fill="#DDDDDD" newline="1">
+					<GMRText style="label"><GMRvar var="GM_FACT__GMU" /></GMRText>
+				</GMRTextBox>
+				<GMRList list="pending" sortby="$sortby">
+					<GMRTextBox width="250" height="12" border="0">
+						<GMRText style="text">
+							<GMRif condition="substr(@ID,0,1)=='F'">
+								<GMRGetPersonName id="@HUSB" hideID="true" />+<GMRGetPersonName id="@WIFE" hideID="true" /><GMRif condition="$showFamID"> (<GMRGedcomValue tag="@id" />)</GMRif>
+							</GMRif>
+							<GMRif condition="substr(@ID,0,1)!='F'">
+								<GMRGetPersonName id="" />
+							</GMRif>
+						</GMRText>
+					</GMRTextBox>
+					<GMRTextBox width="240" height="12" border="0">
+						<GMRFacts ignore="CHAN" families="0" diff="true">
+							<GMRText style="text">
+								<GMRvar var="GM_FACT_@fact" /> <GMRGedcomValue tag="@fact:DATE" /><br />
+							</GMRText>
+						</GMRFacts>
+					</GMRTextBox>
+					<GMRTextBox width="150" height="12" border="0">
+						<GMRText style="text"><GMRGedcomValue tag="CHAN:DATE" /> <GMRGedcomValue tag="CHAN:DATE:TIME" /></GMRText>
+					</GMRTextBox>
+					<GMRTextBox width="0" height="12" border="0" newline="1">
+						<GMRText style="text"><GMRGedcomValue tag="CHAN:_GMU" /></GMRText>
+					</GMRTextBox>
+				</GMRList>
+				<GMRCell width="0" height="25" border="0" align="right" style="label">
+					<GMRvar var="GM_LANG_changes_pending_tot" /><GMRListTotal /><br />
+				</GMRCell>
+			</GMRif>
+			<!-- newpage if all sections -->
+			<GMRif condition="$section=='all_sections' || $section=='allsections'">
+				<GMRNewPage />
+			</GMRif>
+			<!-- Recent Changes Section -->
+			<GMRif condition="$section=='all_sections' ||$section=='allsections' || $section=='recent_changes_block' || $section=='recentchangesblock'">
+				<GMRCell width="0" height="20" align="center" style="header2"><GMRvar var="GM_LANG_recent_changes_block" /> <GMRvar var="changeRangeStart" date="1" /> - <GMRvar var="changeRangeEnd" date="1" /></GMRCell>
+				<GMRTextBox width="250" height="12" border="1" fill="#DDDDDD">
+					<GMRText style="label"><GMRvar var="GM_LANG_name" /></GMRText>
+				</GMRTextBox>
+				<GMRTextBox width="240" height="12" border="1" fill="#DDDDDD">
+					<GMRText style="label"><GMRvar var="GM_FACT_BIRT" /> - <GMRvar var="GM_FACT_DEAT" /></GMRText>
+				</GMRTextBox>
+				<GMRTextBox width="150" height="12" border="1" fill="#DDDDDD">
+					<GMRText style="label"><GMRvar var="GM_FACT_CHAN" /></GMRText>
+				</GMRTextBox>
+				<GMRTextBox width="0" height="12" border="1" fill="#DDDDDD" newline="1">
+					<GMRText style="label"><GMRvar var="GM_FACT__GMU" /></GMRText>
+				</GMRTextBox>
+				<GMRList list="individual" filter1="CHAN:DATE LTE $changeRangeEnd" filter2="CHAN:DATE GTE $changeRangeStart" sortby="$sortby">
+					<GMRTextBox width="250" height="12" border="0">
+						<GMRText style="text"><GMRGetPersonName id="" /></GMRText>
+					</GMRTextBox>
+					<GMRTextBox width="240" height="12" border="0">
+						<GMRText style="text">
+						<GMRif condition="@BIRT:DATE!='' or @BIRT:PLAC!=''">
+							<GMRvarLetter var="GM_FACT_BIRT" />: <GMRGedcomValue tag="BIRT:DATE" /> - 
+						</GMRif>
+						<GMRif condition="@DEAT:DATE!='' or @DEAT:PLAC!=''">
+							<GMRvarLetter var="GM_FACT_DEAT" />: <GMRGedcomValue tag="DEAT:DATE" />
+						</GMRif>
+						</GMRText>
+					</GMRTextBox>
+					<GMRTextBox width="150" height="12" border="0">
+						<GMRText style="text"><GMRGedcomValue tag="CHAN:DATE" /> <GMRGedcomValue tag="CHAN:DATE:TIME" /></GMRText>
+					</GMRTextBox>
+					<GMRTextBox width="0" height="12" border="0" newline="1">
+						<GMRText style="text"><GMRGedcomValue tag="CHAN:_GMU" /></GMRText>
+					</GMRTextBox>
+				</GMRList>
+				<GMRCell width="0" height="25" border="0" align="right" style="label">
+					<GMRvar var="GM_LANG_changes_accepted_tot" /><GMRListTotal />
+				</GMRCell>
+			</GMRif>
+		</GMRBody>
+	</GMRDoc>
+</GMReport>

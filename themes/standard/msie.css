@@ -12,3 +12,15 @@
 	height: 215px;
 	overflow: auto;
 }
+#content {
+	 height: 1%;
+}
+.width50, .admin_item_left, .admin_item_right  {
+	width: 49%;
+}
+.admin_item_box, .person_box, .person_boxF, .person_boxNN {
+	height: 1%;
+}
+.ie_popup_width {
+	width: 150px;
+}

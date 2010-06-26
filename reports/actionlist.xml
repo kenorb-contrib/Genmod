@@ -1,0 +1,82 @@
+<GMReport access="PRIV_USER" icon="place" type="repo">
+	<!-- $Id$ -->
+	<GMRTitle><GMRvar var="GM_LANG_actionlist" /></GMRTitle>
+	<GMRDescription>Prints a list of actions with repository and individual data</GMRDescription>
+	<GMRInput name="repo" lookup="REPO" type="text" default=""><GMRvar var="GM_LANG_repo" /></GMRInput>
+	<GMRInput name="status" type="select" options="all,action0,action1"><GMRvar var="GM_LANG_show_status" /></GMRInput>
+	<GMRInput name="sortby" type="select" options="NAME,ID"><GMRvar var="GM_LANG_sort_by" /></GMRInput>
+	<GMRInput name="pageSize" type="select" options="AVAIL_PAGE_SIZES" default="DEFAULT_PAGE_SIZE"><GMRvar var="GM_LANG_page_size" /></GMRInput>
+	<GMRStyle name="header" font="LucidaSansUnicode" size="16" style="" />
+	<GMRStyle name="header2" font="LucidaSansUnicode" size="12" style="" />
+	<GMRStyle name="pagenum" font="LucidaSansUnicode" size="8" style="" />
+	<GMRStyle name="text" font="LucidaSansUnicode" size="9" style="" />
+	<GMRStyle name="label" font="LucidaSansUnicode" size="10" style="" />
+	<GMRDoc pageSize="$pageSize" orientation="P" margin="24">
+		<GMRHeader>
+			<GMRCell width="0" height="20" align="center" style="header">
+				<GMRvar var="GM_LANG_actionlist" />
+				<GMRif condition="$status!='all'">
+				 (<GMRvar var="GM_LANG_$status" />)
+				</GMRif>
+			</GMRCell>
+			<!-- GMRCell width="0" height="10" align="right" style="pagenum"><GMRvar var="GM_LANG_page" /> <GMRPageNum /> <GMRvar var="GM_LANG_of" /> <GMRTotalPages /> - <GMRNow /></GMRCell -->
+			<GMRTextBox width="50%" height="10" border="0">
+				<GMRText style="pagenum"><GMRNow /></GMRText>
+			</GMRTextBox>
+			<GMRTextBox width="0" height="10" border="0" newline="1">
+				<GMRText style="pagenum" align="right"><GMRvar var="GM_LANG_page" /> <GMRPageNum /> <GMRvar var="GM_LANG_of" /> <GMRTotalPages /></GMRText>
+			</GMRTextBox>
+		</GMRHeader>
+		<GMRBody>
+			<GMRList list="actions">
+				<GMRTextBox border="0" width="$width" height="16" newline="1">
+					<GMRText style="header2"><GMRGedcomValue tag="NAME" /></GMRText>
+				</GMRTextBox>
+				<GMRTextBox width="240" height="12" border="1" fill="#DDDDDD">
+					<GMRText style="label"><GMRvar var="GM_LANG_individual" /></GMRText>
+				</GMRTextBox>
+				<GMRif condition="$status=='all'">
+					<GMRTextBox width="240" height="12" border="1" newline="0" fill="#DDDDDD">
+						<GMRText style="label"><GMRvar var="GM_LANG_action" /></GMRText>
+					</GMRTextBox>
+					<GMRTextBox width="0" height="12" border="1" newline="1" fill="#DDDDDD">
+						<GMRText style="label"><GMRvar var="GM_LANG_status" /></GMRText>
+					</GMRTextBox>
+				</GMRif>
+				<GMRif condition="$status!='all'">
+					<GMRTextBox width="0" height="12" border="1" newline="1" fill="#DDDDDD">
+						<GMRText style="label"><GMRvar var="GM_LANG_action" /></GMRText>
+					</GMRTextBox>
+				</GMRif>
+				<GMRRepeatTag tag="_TODO">
+					<GMRTextBox width="240" height="12" border="0">
+						<GMRText style="text"><GMRGetPersonName id="_TODO:@INDI" /></GMRText>
+						<GMRGedcom id="@INDI">
+						<GMRif condition="@BIRT:DATE!=''">
+							<GMRText style="text"><br /><GMRvarLetter var="GM_FACT_BIRT" />: <GMRGedcomValue tag="BIRT:DATE" />  <GMRGedcomValue tag="BIRT:PLAC" /></GMRText>
+						</GMRif>
+						<GMRif condition="@DEAT:DATE!=''">
+							<GMRText style="text"><br /><GMRvarLetter var="GM_FACT_DEAT" />: <GMRGedcomValue tag="DEAT:DATE" />  <GMRGedcomValue tag="DEAT:PLAC" /></GMRText>
+						</GMRif>
+						</GMRGedcom>
+					</GMRTextBox>
+					<GMRif condition="$status=='all'">
+						<GMRTextBox width="240" height="12" border="0">
+							<GMRText style="text"><GMRGedcomValue tag="_TODO:NOTE" /></GMRText>
+						</GMRTextBox>
+						<GMRTextBox width="0" height="12" border="0" newline="1">
+							<GMRText style="text"><GMRGedcomValue tag="_TODO:_STAT" /></GMRText>
+						</GMRTextBox>
+					</GMRif>
+					<GMRif condition="$status!='all'">
+						<GMRTextBox width="0" height="12" border="0" newline="1">
+							<GMRText style="text"><GMRGedcomValue tag="_TODO:NOTE" /></GMRText>
+						</GMRTextBox>
+					</GMRif>
+				<GMRLine x1="25" x2="570" />
+				</GMRRepeatTag>
+				<GMRTextBox border="0" width="$width" height="9" newline="1"></GMRTextBox>
+			</GMRList>
+		</GMRBody>
+	</GMRDoc>
+</GMReport>

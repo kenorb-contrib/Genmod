@@ -3,7 +3,7 @@
  * GET data from a server file to populate a contextual place list
  *
  * Genmod: Genealogy Viewer
- * Copyright (C) 2005 Genmod Development Team
+ * Copyright (C) 2005 - 2008 Genmod Development Team
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,8 +21,7 @@
  *
  * @package Genmod
  * @subpackage Edit
- * @version $Id: getdata.php,v 1.1 2005/10/23 21:49:12 roland-d Exp $
- * @see functions_places.php
+ * @version $Id$
  */
 
 $field=@$HTTP_GET_VARS["field"];

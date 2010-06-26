@@ -3,7 +3,7 @@
  * Popup window that will allow a user to search for a media
  *
  * Genmod: Genealogy Viewer
- * Copyright (C) 2005 Genmod Development Team
+ * Copyright (C) 2005 - 2008 Genmod Development Team
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,1165 +22,644 @@
  * @author Genmod Development Team
  * @package Genmod
  * @subpackage Display
- * @version $Id: media.php,v 1.12 2006/04/30 18:44:15 roland-d Exp $
+ * @version $Id$
  */
 
- /* TODO:
- *	Add check for missing index.php files when creating a directory
- *	Add an option to generate thumbnails for all files on the page
- *	Add filter for correct media like php, gif etc.
- *  Check for URL instead of physical file
- *	Check array buld up use ID_GEDCOM for aray key
- */
-
- /* Standard variable convention media.php
- *	$filename = Filename of the media item
- *	$thumbnail = Filename of the thumbnail of the media item
- *	$gedfile = Name of the GEDCOM file
- *	$medialist = Array with all media items
- */
- 
 /**
  * Inclusion of the configuration file
 */
 require("config.php");
 
-/**
- * Inclusion of the edit functions
-*/
-require("includes/functions_edit.php");
-
-global $gm_changes;
-
-if (!isset($action)) {
-	if (isset($gen_all_thumb)) $action = "thumbnail";
-	else if (isset($search)) $action = "filter";
-	else if (isset($display)) $action = "filter";
-	else $action="";
-}
-if (empty($action)) $action="filter";
-
-if (!isset($media)) $media="";
-if (!isset($filter)) $filter="";
-if (!isset($directory)) $directory = $MEDIA_DIRECTORY;
-if (!isset($level)) $level=0;
-if (!isset($start)) $start = 0;
-if (!isset($max)) $max = 20;
-if (!isset($external_links)) $external_links = "";
-
-$badmedia = array(".","..","CVS","thumbs","index.php","MediaInfo.txt", ".cvsignore");
-
-$showthumb= isset($showthumb);
-$thumbget = "";
-if ($showthumb) {$thumbget = "&amp;showthumb=true";}
-
-//-- prevent script from accessing an area outside of the media directory
-//-- and keep level consistency
-if (($level < 0) || ($level > $MEDIA_DIRECTORY_LEVELS)){
-	$directory = $MEDIA_DIRECTORY;
-	$level = 0;
-} elseif (preg_match("'^$MEDIA_DIRECTORY'", $directory)==0){
-	$directory = $MEDIA_DIRECTORY;
-	$level = 0;
-}
-
-//-- force the thumbnail directory to have the same layout as the media directory
-//-- Dots and slashes should be escaped for the preg_replace
-$srch = "/".addcslashes($MEDIA_DIRECTORY,'/.')."/";
-$repl = addcslashes($MEDIA_DIRECTORY."thumbs/",'/.');
-$thumbdir = stripcslashes(preg_replace($srch, $repl, $directory));
-
-//-- only allow users with edit privileges to access script.
-if ((!userCanEdit($gm_username)) || (!$ALLOW_EDIT_GEDCOM)) {
-	header("Location: login.php?url=media.php");
+// Only gedcom admins may do this
+if (!$gm_user->userGedcomAdmin()) {
+	if (LOGIN_URL == "") header("Location: login.php?".GetQueryString(true));
+	else header("Location: ".LOGIN_URL."?url=media.php&amp;".GetQueryString(true));
 	exit;
 }
+if (!isset($sort)) $sort = "name";
+if (!isset($directory)) $directory = GedcomConfig::$MEDIA_DIRECTORY;
+else $directory = urldecode($directory);
+if (!isset($action)) $action = "";
+if (!isset($filter)) $filter = "";
+if (!isset($thumbs)) $thumbs = false;
+if (!isset($autothumbs)) $autothumbs = false;
+if (!isset($file)) $file = "";
+else $file = urldecode($file);
+if (!isset($error)) $error = "";
+if (!isset($disp1)) $disp1 = "block";
+if (!isset($disp2)) $disp2 = "none";
+if ($disp1 == "block") $disp2 = "none";
 
-//-- check for admin once (used a bit in this script)
-$isadmin =  userIsAdmin($gm_username);
+GedcomConfig::$AUTO_GENERATE_THUMBS = $autothumbs;
 
-//-- TODO add check for -- admin can manipulate files
-$fileaccess = false;
-if ($isadmin) {
-	$fileaccess = true;
+PrintHeader(GM_LANG_manage_media." - ".$GEDCOMS[GedcomConfig::$GEDCOMID]['title']);
+
+if ($action == "delete") {
+	MediaFS::DeleteFile(basename($file), RelativePathFile($directory));
+}
+if ($disp1 == "block") {
+	$dirs = MediaFS::GetMediaDirList(GedcomConfig::$MEDIA_DIRECTORY, true, 1, false, true);
+//	if (!in_array(GedcomConfig::$MEDIA_DIRECTORY, $dirs)) $dirs[] = GedcomConfig::$MEDIA_DIRECTORY;
+	sort($dirs);
+	$files = MediaFS::GetMediaFileList($directory, $filter);
+	if ($sort == "name") uasort($files, "MMNameSort");
+	else if ($sort == "size") uasort($files, "MMSizeSort");
+	else uasort($files, "MMLinkSort");
 }
 
-// Print the header of the page
-print_header($gm_lang["manage_media"]);
-?>
-<script language="JavaScript" type="text/javascript">
-<!--
-	function pasteid(id) {
-		window.opener.paste_id(id);
-		window.close();
-	}
-	function openImage(filename, width, height) {
-		height=height+50;
-		screenW = screen.width;
-	 	screenH = screen.height;
-	 	if (width>screenW) width=screenW;
-	 	if (height>screenH) height=screenH;
-		if ((filename.search(/\.jpg$/gi)!=-1)||(filename.search(/\.gif$/gi)!=-1)) window.open('imageview.php?filename='+filename,'','top=50,left=50,height='+height+',width='+width+',scrollbars=1,resizable=1');
-		else window.open(unescape(filename),'','top=50,left=50,height='+height+',width='+width+',scrollbars=1,resizable=1');
-		return false;
-	}
-	function ilinkitem(mediaid, type) {
-		window.open('inverselink.php?mediaid='+mediaid+'&linkto='+type+'&'+sessionname+'='+sessionid, '', 'top=50,left=50,width=600,height=500,resizable=1,scrollbars=1');
-		return false;
-	}
-
-	function checknames(frm) {
-		if (document.managemedia.subclick) button = document.managemedia.subclick.value;
-		if (frm.filter.value.length < 2 & button != "display" & button != "gen_all_thumb") {
-			alert("<?php print $gm_lang["search_more_chars"]?>");
-			frm.filter.focus();
-			return false;
-		}
-		if (button == "display" | button == "gen_all_thumb") {
-			frm.filter.value = "";
-		}
-		return true;
-	}
-	
-	function checkpath(folder) {
-		value = folder.value;
-		if (value.substr(value.length-1,1) == "/") value = value.substr(0, value.length-1);
-		result = value.split("/");
-		if (result.length > <?php print $MEDIA_DIRECTORY_LEVELS;?>) {
-			alert('<?php print $gm_lang["max_media_depth"] ;?>');
-			folder.focus();
-			return false;
-		}
-	}
-
-//-->
-</script>
-<script src="genmod.js" language="JavaScript" type="text/javascript"></script>
-<form name="managemedia" method="post" onsubmit="return checknames(this);" action="media.php">
-	<input type="hidden" name="directory" value="<?php $action == "deletedir"?print $parentdir:print $directory; ?>" />
-	<input type="hidden" name="thumbdir" value="<?php print $thumbdir; ?>" />
-	<input type="hidden" name="level" value="<?php print $level; ?>" />
-	<input type="hidden" name="all" value="true" />
-	<input type="hidden" name="subclick" />
-	<table class="fact_table center width90 <?php print $TEXT_DIRECTION; ?>">
-	<tr><td class="topbottombar" colspan="6"><?php print_help_link("manage_media_help","qm","manage_media");print $gm_lang["manage_media"];?></td></tr>
-	<!-- // NOTE: Filter options -->
-	<tr><td class="shade2 width20"><?php print_help_link("filter_help","qm","filter"); print $gm_lang["filter"];?></td>
-	<td class="shade1"><input type="text" name="filter" value="<?php if(isset($filter)) print $filter; ?>"/>&nbsp;<input type="submit" name="search" value="<?php print $gm_lang["filter"];?>" onclick="this.form.subclick.value=this.name" /></td>
-	<!-- // NOTE: Show thumbnails -->
-	<td class="shade2"><?php print_help_link("show_thumb_help","qm", "show_thumbnail");?><?php print $gm_lang["show_thumbnail"];?></td>
-	<td class="shade1"><input type="checkbox" name="showthumb" value="true" <?php if( $showthumb) print "checked=\"checked\""; ?> onclick="submit();" /></td>
-	<!-- // NOTE: Upload media files -->
-	<td class="shade2 wrap"><?php print_help_link("upload_media_help","qm","upload_media"); print $gm_lang["upload_media"];?></td>
-	<td class="shade1"><?php print "<a href=\"#\" onclick=\"expand_layer('uploadmedia');\">".$gm_lang["upload_media"]."</a>";?></td></tr>
-	
-	<!-- // NOTE: Filter options -->
-	<tr><td class="shade2 width20 wrap"><?php print_help_link("display_all_help","qm","display_all"); print $gm_lang["display_all"];?></td>
-	<td class="shade1"><input type="checkbox" name="display" value="<?php print $gm_lang["display_all"];?>" onclick="document.managemedia.filter.value = ''; submit();" /></td>
-	<!-- // NOTE: Generate all thumbs -->
-	<td class="shade2 wrap"><?php print_help_link("gen_all_thumb_help","qm","gen_thumb"); print $gm_lang["gen_thumb"];?></td>
-	<td class="shade1"><input type="checkbox" name="gen_all_thumb" value="" onclick="submit();" /></td>
-	<!-- // NOTE: Empty entry to fill table -->
-	<td class="shade2"><?php print_help_link("add_media_help", "qm"); ?><?php print $gm_lang["add_media_lbl"]; ?></td>
-	<td class="shade1">
-	<a href="javascript: <?php echo $gm_lang["add_media_lbl"]; ?>" onclick="window.open('addmedia.php?action=showmediaform', '', 'top=50,left=50,width=900,height=650,resizable=1,scrollbars=1'); return false;"> <?php echo $gm_lang["add_media"]; ?></a>
-	</td>
-	</tr>
-	</table>
-</form>
-<?php
-
-// NOTE: Here is checked if the media structure is OK, if not , we cannot continue
-if (check_media_structure()) {
-	/**
-	 * This action creates a new directory in the current directory
-	 *
-	 * Checks are made for relative filename exploits.
-	 * The index.php is created which points back to the medialist page
-	 * The same is done for the thumbnail directory to keep filesystem consistent
-	 *
-	 * Directory access checks are done during menu creation so the user
-	 * cannot create directories deeper than the configured level
-	 *
-	 * @name $action->newdir
-	 */
-	if ($action == "newdir") {
-		// security checks, no names with . .. / \ in them
-		// add more if required
-		$clean = true;
-		$badchars = array(".","/","\\");
-		for ($i = 0; $i < sizeof($badchars); $i++) {
-			$pos = strpos($newdir,$badchars[$i]);
-			if (is_bool($pos)) continue;
-			$clean = false;
-			break;
-		}
-		if ($clean) {
-			$res = mkdir($directory.$newdir);
-			$res = mkdir($thumbdir.$newdir);
-			if (file_exists($directory."index.php")) {
-				$inddata = file_get_contents($directory."index.php");
-				$inddata = str_replace(": ../",": ../../",$inddata);
-				$fp = @fopen($directory.$newdir."/index.php","w+");
-				if (!$fp) print "<div class=\"error\">".$gm_lang["security_no_create"].$directory.$newdir."</div>";
-				else {
-					fputs($fp,$inddata);
-					fclose($fp);
-				}
+if ($action == "select_action") {
+	$changed = false;
+	$errors = false;
+	if ($sel_action == "move" && urldecode($move_folder) != $directory) {
+		foreach ($files as $filename => $fdetails) {
+			$movefrom = "select".preg_replace(array("/\(/","/\)/","/\./","/-/","/ /","/\//","/\+/"), array("_","_","_","_","_","_","_"), $filename); 
+			if (isset($$movefrom)) {
+				$changed = true;
+//				print "found move for ".$filename." - ".$$movefrom." from ".$directory." to ".urldecode($move_folder)."<br />";
+				$result = MediaFS::MoveFile($filename, RelativePathFile($directory), RelativePathFile(urldecode($move_folder)));
+				if(!$result) $errors = true;
 			}
-			else print "<div class=\"error\">".$gm_lang["security_not_exist"].$directory."</div>";
-			
-			if (file_exists($thumbdir."index.php")) {
-				$inddata = file_get_contents($thumbdir."index.php");
-				$inddata = str_replace(": ../",": ../../",$inddata);
-				$fp = @fopen($thumbdir.$newdir."/index.php","w+");
-				if (!$fp) print "<div class=\"error\">".$gm_lang["security_no_create"].$thumbdir.$newdir."</div>";
-				else {
-					fputs($fp,$inddata);
-					fclose($fp);
-				}
-			}
-			else print "<div class=\"error\">".$gm_lang["security_not_exist"].$thumbdir."</div>";
 		}
+		if (!$changed) $error = GM_LANG_nothing_selected;
 		else {
-			print "<div class=\"error\">".$gm_lang["illegal_chars"]."</div>";
+			if (!$errors) $error = GM_LANG_move_ok;
+			else $error = GM_LANG_move_fail;
 		}
-		$medialist = get_medialist();
-		$action="filter";
 	}
 	
-	if ($action == "deletedir") {
-		print "<table class=\"list_table center width50\">";
-		print "<tr><td class=\"messagebox\">";
-		// Check if media directory and thumbs directory are empty
-		$clean = false;
-		$files = array();
-		$thumbfiles = array();
-		$resdir = false;
-		$resthumb = false;
-		// Media directory check
-		if (is_dir($directory)) {
-		   	$handle = opendir($directory);
-		   	$files = array();
-		   	while (false !== ($file = readdir($handle))) {
-				if (!in_array($file, $badmedia)) $files[] = $file;
-		   	}
+	if ($sel_action == "delete") {
+		foreach ($files as $filename => $fdetails) {
+			$delfile = "select".preg_replace(array("/\(/","/\)/","/\./","/-/","/ /","/\//","/\+/"), array("_","_","_","_","_","_","_"), $filename); 
+			if (isset($$delfile)) {
+				$changed = true;
+				$result = MediaFS::DeleteFile(basename($filename), RelativePathFile($directory));
+				if(!$result) $errors = true;
+			}
 		}
+		if (!$changed) $error = GM_LANG_nothing_selected;
 		else {
-			print "<div class=\"error\">".$directory." ".$gm_lang["directory_not_exist"]."</div>";
-			WriteToLog($directory." ".$gm_lang["directory_not_exist"], "E", "S");
+			if (!$errors) $error = GM_LANG_delete_ok;
+			else $error = GM_LANG_delete_fail;
 		}
-		
-	   	// Thumbs directory check
-	   	if (is_dir($thumbdir)) {
-		   	$handle = opendir($thumbdir);
-		   	$thumbfiles = array();
-		   	while (false !== ($file = readdir($handle))) {
-				if (!in_array($file, $badmedia)) $thumbfiles[] = $file;
-		   	}
-	   		closedir($handle);
-	   	}
-	   	else {
-			print "<div class=\"error\">".$thumbdir." ".$gm_lang["directory_not_exist"]."</div>";
-			WriteToLog($thumbdir." ".$gm_lang["directory_not_exist"], "E", "S");
-		}
-	
-		if (!isset($error)) {
-			if (count($files) > 0 ) {
-				print "<div class=\"error\">".$directory." -- ".$gm_lang["directory_not_empty"]."</div>";
-				WriteToLog($directory." -- ".$gm_lang["directory_not_empty"], "E", "S");
-				$clean = false;
-			}
-			if (count($thumbfiles) > 0) {
-				print "<div class=\"error\">".$thumbdir." -- ".$gm_lang["directory_not_empty"]."</div>";
-				WriteToLog($thumbdir." -- ".$gm_lang["directory_not_empty"], "E", "S");
-				$clean = false;
-			}
-			else $clean = true;
-		}
-		
-		// Only start deleting if both media and thumbnail directory exist
-		if ($clean) {
-			if (file_exists($directory."index.php")) @unlink($directory."index.php");
-			if (file_exists($thumbdir."index.php")) @unlink($thumbdir."index.php");
-			if (is_dir($directory)) $resdir = @rmdir(substr($directory,0,-1));
-			if (is_dir($thumbdir)) $resthumb = @rmdir(substr($thumbdir,0,-1));
-			if ($resdir && $resthumb) {
-				print $gm_lang["delete_dir_success"];
-				WriteToLog($directory." -- ".$gm_lang["delete_dir_success"], "I", "S");
-			}
-			else {
-				if (!$resdir) {
-					print "<div class=\"error\">".$gm_lang["media_not_deleted"]."</div>";
-					WriteToLog($directory." -- ".$gm_lang["media_not_deleted"], "E", "S");
-				}
-				else {
-					print $gm_lang["media_deleted"];
-					WriteToLog($directory." -- ".$gm_lang["media_deleted"], "I", "S");
-				}
-				if (!$resthumb) {
-					print "<div class=\"error\">".$gm_lang["thumbs_not_deleted"]."</div>";
-					WriteToLog($thumbdir." -- ".$gm_lang["thumbs_not_deleted"], "E", "S");
-				}
-				else {
-					print $gm_lang["thumbs_deleted"];
-					WriteToLog($thumbdir." -- ".$gm_lang["thumbs_deleted"], "I", "S");
-				}
-				
-			}
-		}
-		$directory = $parentdir;
-		$medialist = get_medialist();
-		$action="filter";
-		print "</td></tr></table>";
 	}
-	
-	
-	/**
-	 * This action moves a file one directory level at a time
-	 *
-	 * Note: this will generally not work with default install.
-	 * files and dirs need to be writable by the php/web user,
-	 *
-	 * Thumbnails are moved as well forcing a consistent directory structure
-	 * Directory access checks are done during menu creation so directories
-	 * deeper than the configured level will not be shown even if they exist.
-	 *
-	 * @name $action->moveto
-	 */
-	if ($action=="moveto") {
-		// just in case someone fashions the right url
-		if ($isadmin && $fileaccess) {
-			$exists = false;
-			
-			// file details
-			$filename = $_REQUEST["movefile"];
-			$moveto = $_REQUEST["movetodir"];
-			$resfile = false;
-			// and the thumbnail
-			$tdirfrom = preg_replace("'$MEDIA_DIRECTORY'",$MEDIA_DIRECTORY."thumbs/",$filename);
-			$tdirto = preg_replace("'$MEDIA_DIRECTORY'",$MEDIA_DIRECTORY."thumbs/",$directory).$moveto;
-			$resthumb = false;
-			// Check if the files do not yet exist on the new location
-			$movefile = set_media_path($filename, $moveto);
-			$movethumb = set_media_path($filename, $moveto, true);
-			
-			if (file_exists($movefile)) {
-				print "<span class=\"error\">".$gm_lang["media_exists"]."</span>";
-				WriteToLog($movefile." ".$gm_lang["media_exists"], "E", "S");
-				$exists = true;
-			}
-			if (file_exists($movethumb)) {
-				print "<span class=\"error\">".$gm_lang["media_thumb_exists"]."</span>";
-				WriteToLog($movethumb." ".$gm_lang["media_thumb_exists"], "E", "S");
-				$exists = true;
-			}
-			
-			if ($exists == true) {
-				$action = "filter";
-			}
-			else {
-				// Moving the thumbnail file if it exists
-				// no error if admin chooses not to have a thumbnail file
-				if (file_exists($tdirfrom)) {
-					if (is_dir($tdirto)) $resthumb = @rename($tdirfrom, $movethumb);
-					else {
-						// however if there is a thumbnail file and no directory to put it in
-						if (mkdir($tdirto,0777)) $resthumb = @rename($tdirfrom, $movethumb);
-						else {
-							// abort the whole operation to keep the directory structure valid
-							print $tdirto.$gm_lang["no_thumb_dir"];
-							WriteToLog($tdirto.$gm_lang["no_thumb_dir"], "E", "S");
-							print_simple_footer();
-							exit;
-						}
-					}
-				}
-				
-				// no major error from thumbnail so move the file
-				$resfile = @rename($filename, $movefile);
-				
-				if ($resthumb && $resfile) {
-					print $gm_lang["move_file_success"];
-					WriteToLog($tdirto.$gm_lang["no_thumb_dir"], "I", "S");
-				}
-				
-				// also inform the database of this move if from the embedded admin page
-				if (strlen($_REQUEST["xref"])>0) {
-					move_db_media($filename, $movefile, $GEDCOM);
-				}
-			}
-		}
-		$medialist = get_medialist();
-		$action="filter";
+	if ($changed) {
+		// Get the file list again, it's changed by the mass update
+		$files = MediaFS::GetMediaFileList($directory, $filter);
+		if ($sort == "name") uasort($files, "MMNameSort");
+		else if ($sort == "size") uasort($files, "MMSizeSort");
+		else uasort($files, "MMLinkSort");
 	}
-	
-	/**
-	 * This action generates a thumbnail for the file
-	 *
-	 * @name $action->thumbnail
-	 */
-	if ($action == "thumbnail") {
-		print "<table class=\"list_table $TEXT_DIRECTION width50\">";
-		print "<tr><td class=\"messagebox wrap\">";
-		// TODO: add option to generate thumbnails for all images on page
-		// Cycle through $medialist and skip all exisiting thumbs
-		
-		// Check if $all is true, if so generate thumbnails for all files that do 
-		// not yet have any thumbnails created. Otherwise only the file specified.
-		if ($all == true) {
-			foreach ($medialist as $key => $media) {
-				$thumbnail = preg_replace("'$MEDIA_DIRECTORY'",$MEDIA_DIRECTORY."thumbs/",$media["FILE"]);
-				if (!file_exists($thumbnail)) {
-					if (generate_thumbnail($media["FILE"],$thumbnail)) {
-						print_text("thumb_genned");
-						WriteToLog(print_text("thumb_genned",0,1), "I", "G", $GEDCOM);
-					}
-					else {
-						print "<span class=\"error\">";
-						print_text("thumbgen_error");
-						print "</span>";
-						WriteToLog(print_text("thumbgen_error",0,1), "E", "G", $GEDCOM);
-					}
-					print "<br />";
-				}
-			}
-		}
-		else if ($all == false) {
-			$filename = $_REQUEST["file"];
-			$thumbnail = preg_replace("'$MEDIA_DIRECTORY'",$MEDIA_DIRECTORY."thumbs/",$filename);
-			if (generate_thumbnail($filename,$thumbnail)) {
-				print_text("thumb_genned");
-				WriteToLog(print_text("thumb_genned",0,1), "I", "G", $GEDCOM);
-			}
-			else {
-				print "<span class=\"error\">";
-				print_text("thumbgen_error");
-				print "</span>";
-				WriteToLog(print_text("thumbgen_error",0,1), "E", "G", $GEDCOM);
-			}
-		}
-		$medialist = get_medialist();
-		$action = "filter";
-		print "</td></tr></table>";
+}
+//print "<pre>";
+//print_r($files);	
+//print "</pre>";
+if ($action == "directory_action") {
+	if ($dir_action == "create" && isset($new_dir) && !empty($new_dir)) {
+		if (MediaFS::CreateDir($new_dir, $parent_dir, SystemConfig::$MEDIA_IN_DB)) $error = GM_LANG_dir_created;
+		else $error = GM_LANG_dir_not_created;
 	}
-		
-	// Upload media items
-	if ($action == "upload") {
-		$upload_errors = array($gm_lang["file_success"], $gm_lang["file_too_big"], $gm_lang["file_too_big"],$gm_lang["file_partial"], $gm_lang["file_missing"]);
-		?>
-		<?php
-		// Sanity check for the thumbs folder, does it exist?
-		for($i=1; $i<6; $i++) {
-			// Check if the folder name does not start with a /. If so, remove it.
-			if (substr($_POST["folder".$i],0,1) == "/") $_POST["folder".$i] = substr($_POST["folder".$i],1);
-			// Check if the folder name does end with a /. If no so, add it.
-			if (substr($_POST["folder".$i],-1,1) != "/") $_POST["folder".$i] .= "/";
-			$error="";
-			if (!empty($_FILES['mediafile'.$i]["name"])) {
-				$thumbgenned = false;
-				// Check if the folder exists
-				if (!is_dir($MEDIA_DIRECTORY.$_POST["folder".$i])) {
-					$dirs = array();
-					// Split folder path into seperate directories
-					if (stristr($_POST["folder".$i], "/")) {
-						$dirs = preg_split("/\//", $_POST["folder".$i]);
-						array_pop($dirs);
-					}
-					// If there is only one folder specified create this folder and its thumbnail folder
-					if (count($dirs) == 0) {
-						if (!is_dir($MEDIA_DIRECTORY.$_POST["folder".$i])) mkdir($MEDIA_DIRECTORY.$_POST["folder".$i]);
-						// Sanity check for the thumbs folder, does it exist?
-						if (!is_dir($MEDIA_DIRECTORY."thumbs")) mkdir($MEDIA_DIRECTORY."thumbs");
-						if (!is_dir($MEDIA_DIRECTORY."thumbs/".$_POST["folder".$i])) mkdir($MEDIA_DIRECTORY."thumbs/".$_POST["folder".$i]);
-					}
-					// There are multiple directories specified, so go through all directories and check if they exist
-					// if they don't exist create them, create their thumbnail directory
-					// and put an index.php file in each folder created
-					else {
-						$tempdir = "";
-						foreach ($dirs as $key => $dir) {
-							$tempdir .= $dir;
-							if (!is_dir($MEDIA_DIRECTORY.$tempdir)) mkdir($MEDIA_DIRECTORY.$tempdir);
-							if (!is_dir($MEDIA_DIRECTORY."thumbs/".$tempdir)) mkdir($MEDIA_DIRECTORY."thumbs/".$tempdir);
-							$tempdir .= "/";
-							if (file_exists($MEDIA_DIRECTORY."index.php")) {
-								$inddata = file_get_contents($MEDIA_DIRECTORY."index.php");
-								$strdots = ": ".str_repeat("../", $key+2);
-								$inddata = str_replace(": ../",$strdots,$inddata);
-								$inddatathumb = str_replace(": ../",$strdots."../",$inddata);
-								$fp = @fopen($MEDIA_DIRECTORY.$tempdir."index.php","w+");
-								$fpthumb = @fopen($MEDIA_DIRECTORY."thumbs/".$tempdir."index.php","w+");
-								if (!$fp) print "<div class=\"error\">".$gm_lang["security_no_create"].$MEDIA_DIRECTORY.$tempdir."</div>";
-								if (!$fpthumb) print "<div class=\"error\">".$gm_lang["security_no_create"].$MEDIA_DIRECTORY."thumbs/".$tempdir."</div>";
-								else {
-									// Write the index.php for the normal media folder
-									fputs($fp,$inddata);
-									fclose($fp);
-									// Write the index.php for the thumbs media folder
-									fputs($fpthumb,$inddatathumb);
-									fclose($fpthumb);
-								}
-							}
-							else print "<div class=\"error\">".$gm_lang["security_not_exist"].$MEDIA_DIRECTORY."</div>";
-						}
-					}
-				}
-				// Copy file into the destination directory
-				if (move_uploaded_file($_FILES['mediafile'.$i]['tmp_name'], $MEDIA_DIRECTORY.$_POST["folder".$i].basename($_FILES['mediafile'.$i]['name']))) {
-					// Set file permission to read/write for everybody
-					@chmod($MEDIA_DIRECTORY.$_POST["folder".$i].basename($_FILES['mediafile'.$i]['name']), 0644);
-					WriteToLog("Media file ".$MEDIA_DIRECTORY.$_POST["folder".$i].basename($_FILES['mediafile'.$i]['name'])." uploaded by >".$gm_username."<", "I", "S");
-					// Check if a thumbnail file is specified by the user
-					// if so copy it to the thumbnail folder
-					if (!empty($_FILES['thumbnail'.$i]["name"])) {
-						if (!move_uploaded_file($_FILES['thumbnail'.$i]['tmp_name'], $MEDIA_DIRECTORY."thumbs/".$_POST["folder".$i].basename($_FILES['thumbnail'.$i]['name']))) {
-							
-							$error .= $gm_lang["upload_error"]."<br />".$upload_errors[$_FILES['thumbnail'.$i]['error']]."<br />";
-						}
-						else {
-							// Set file permission on thumbnail to read/write for everybody
-							@chmod($MEDIA_DIRECTORY."thumbs/".$_POST["folder".$i].basename($_FILES['thumbnail'.$i]['name']), 0644);
-							WriteToLog("Media thumbnail ".$MEDIA_DIRECTORY."thumbs/".$_POST["folder".$i].basename($_FILES['thumbnail'.$i]['name'])." uploaded by >".$gm_username."<", "I", "S");
-						}
-					}
-					// The user did not specify a thumbnail but let's see if the user want
-					// a thumbnail generated. Let's do it.
-					else if (!empty($_POST['genthumb'.$i]) && ($_POST['genthumb'.$i]=="yes")) {
-						// Check if the filename has an extension that can be used for thumbnail generation
-						$filename = $MEDIA_DIRECTORY.$_POST["folder".$i].basename($_FILES['mediafile'.$i]['name']);
-						$thumbnail = $MEDIA_DIRECTORY."thumbs".$_POST["folder".$i].basename($_FILES['mediafile'.$i]['name']);
-						$ct = preg_match("/\.([^\.]+)$/", $filename, $match);
-						if ($ct>0) {
-							$ext = strtolower(trim($match[1]));
-							if ($ext=="jpg" || $ext=="jpeg" || $ext=="gif" || $ext=="png") {
-								$thumbgenned = generate_thumbnail($filename, $thumbnail);
-								if (!$thumbgenned) $error .= $gm_lang["thumbgen_error"].$filename."<br />";
-								else {
-									// Set file permission on thumbnail to read/write for everybody
-									@chmod($thumbnail, 0644);
-									print_text("thumb_genned");
-									print "<br />";
-									WriteToLog("Media thumbnail ".$MEDIA_DIRECTORY."thumbs/".$_POST["folder".$i].basename($_FILES['thumbnail'.$i]['name'])." generated by >".$gm_username."<", "I", "S");
-								}
-							}
-						}
-					}
-				}
-				// the file cannot be copied then print the error and stop processing
-				else $error .= $gm_lang["upload_error"]."<br />".$upload_errors[$_FILES['mediafile'.$i]['error']]."<br />";
-	
-				// Let's see if there are any errors generated and print it
-				if (!empty($error)) print "<span class=\"error\">".$error."</span><br />\n";
-				// No errors found then tell the user all is successful
-				else {
-					print $gm_lang["upload_successful"]."<br /><br />";
-					$imgsize = getimagesize($MEDIA_DIRECTORY.$_POST["folder".$i].$_FILES['mediafile'.$i]['name']);
-					$imgwidth = $imgsize[0]+50;
-					$imgheight = $imgsize[1]+50;
-					print "<a href=\"#\" onclick=\"return openImage('".urlencode($MEDIA_DIRECTORY.$_POST["folder".$i].$_FILES['mediafile'.$i]['name'])."',$imgwidth, $imgheight);\">".$_FILES['mediafile'.$i]['name']."</a>";
-					print"<br /><br />";
-				}
-			}
+	if ($dir_action == "delete") {
+		if (!isset($del_dir)) $error = GM_LANG_dirdel_fail;
+		else {
+			if (MediaFS::DeleteDir(urldecode($del_dir), SystemConfig::$MEDIA_IN_DB)) $error = GM_LANG_dirdel_ok;
+			else $error = GM_LANG_dirdel_fail;
 		}
-		$medialist = get_medialist();
-		$action = "filter";
 	}
+	$dirs = MediaFS::GetMediaDirList(GedcomConfig::$MEDIA_DIRECTORY, true, 1, false, true);
+//	if (!in_array(GedcomConfig::$MEDIA_DIRECTORY, $dirs)) $dirs[] = GedcomConfig::$MEDIA_DIRECTORY;
+	sort($dirs);
+}
+
+if ($action == "import_action") {
+	// delold = delete file system file after imported
+	// delexist = overwrite file in DB if exists
+	// linked = import only files that are linked to MM-objects
+	if(!isset($linked)) $linked = false;
+	if(!isset($delold)) $delold = false;
+	if(!isset($delexist)) $delexist = false;
+	$count = 0;
 	
-	print "<div id=\"uploadmedia\" style=\"display:none\">";
-	// Check if Media Directory is writeable or if Media features are enabled
-	// If one of these is not true then do not continue
-	if (!dir_is_writable($MEDIA_DIRECTORY) || !$MULTI_MEDIA) {
-		print "<span class=\"error\"><b>";
-		print $gm_lang["no_upload"];
-		print "</b></span><br />";
+	// Linked only
+	if ($linked) {
+		// Read the files into the table
+		$sql = "SELECT m_mfile, m_gedrec FROM ".TBLPREFIX."media WHERE m_file='".GedcomConfig::$GEDCOMID."'";
+		$res = NewQuery($sql);
+		while ($row = $res->Fetchrow()) {
+			$filefromged = GetGedcomValue("FILE", 1, $row[1]);
+			if (stristr($filefromged, "://")) $file = $filefromged;
+			else $file = GedcomConfig::$MEDIA_DIRECTORY.$row[0];
+			// dbmode is always true for import
+			if (MediaFS::CreateFile($file, $delexist, true, $delold)) $count++;
+			else $error = GM_LANG_m_imp_err."<br />";
+		}
 	}
-	// We have the green light to upload media, print the form
 	else {
-		print "<form name=\"uploadmedia\" enctype=\"multipart/form-data\" method=\"post\" action=\"media.php\">";
-		print "<input type=\"hidden\" name=\"action\" value=\"upload\" />";
-		print "<input type=\"hidden\" name=\"showthumb\" value=\"$showthumb\" />";
-		print "<table class=\"list_table $TEXT_DIRECTION width60\">";
-		if (!$filesize = ini_get('upload_max_filesize')) $filesize = "2M";
-		print "<tr><td class=\"topbottombar\" colspan=\"2\">".$gm_lang["upload_media"]."<br />".$gm_lang["max_upload_size"].$filesize."</td></tr>";
-		$tab = 1;
-		// Print 6 forms for uploading images
-		for($i=1; $i<6; $i++) {
-			print "<tr>";
-				print "<td class=\"shade2 width20\">";
-				print_help_link("upload_media_help","qm", "upload_media");
-				print $gm_lang["folder"];
-				print "</td>";
-				print "<td class=\"shade1\">";
-				// Check is done here if the folder specified is not longer than the
-				// media depth. If it is, a JS popup informs the user. User cannot leave
-				// the input box until corrected. This does not work in Firefox.
-				print "<input name=\"folder".$i."\" type=\"text\" size=\"60\" tabindex=\"".$tab++."\" onblur=\"checkpath(this)\" />";
-				print "</td>";
-			print "</tr>";
-			print "<tr>";
-				print "<td class=\"shade2\">";
-				print $gm_lang["media_file"];
-				print "</td>";
-				print "<td class=\"shade1\">";
-				print "<input name=\"mediafile".$i."\" type=\"file\" size=\"60\" tabindex=\"".$tab++."\" />";
-				print "</td>";
-			print "</tr>";
-			print "<tr>";
-				print "<td class=\"shade2\">";
-				print $gm_lang["thumbnail"];
-				print "</td>";
-				print "<td class=\"shade1\">";
-				print "<input name=\"thumbnail".$i."\" type=\"file\" tabindex=\"".$tab++."\" size=\"60\" />";
-				print "</td>";
-			print "</tr>";
-	
-			// Check for thumbnail generation support
-			$ThumbSupport = "";
-			if (function_exists("imagecreatefromjpeg") and function_exists("imagejpeg")) $ThumbSupport .= ", JPG";
-			if (function_exists("imagecreatefromgif") and function_exists("imagegif")) $ThumbSupport .= ", GIF";
-			if (function_exists("imagecreatefrompng") and function_exists("imagepng")) $ThumbSupport .= ", PNG";
-			if (!$AUTO_GENERATE_THUMBS) $ThumbSupport = "";
-			
-			if ($ThumbSupport != "") {
-				$ThumbSupport = substr($ThumbSupport, 2);	// Trim off first ", "
-				print "<tr><td class=\"shade2 wrap\">";
-				print_help_link("generate_thumb_help", "qm","generate_thumbnail");
-				print $gm_lang["generate_thumbnail"].$ThumbSupport;
-				print "</td><td class=\"shade1\">";
-				print "<input type=\"checkbox\" name=\"genthumb".$i."\" value=\"yes\" tabindex=\"".$tab++."\" />";
-				print "</td></tr>";
+		$dirs = MediaFS::GetMediaDirList(GedcomConfig::$MEDIA_DIRECTORY, true, 1, false, false, false);
+		foreach ($dirs as $pipo => $dir) {
+			$files = MediaFS::GetFileList($dir, "", false);
+			foreach ($files as $dikkedeur => $file) {
+				// dbmode is always true for import
+				if (MediaFS::CreateFile($file, $delexist, true, $delold)) $count++;
+				else $error = GM_LANG_m_imp_err."<br />";
 			}
-		}
-
-		// Print the submit button for uploading the media
-		print "<tr><td class=\"topbottombar\" colspan=\"2\"><input type=\"submit\" value=\"".$gm_lang["upload"]."\" tabindex=\"".$tab++."\" /></td></tr>";
-		print "</table></form>";
-	}
-	print "</div><br />";
-	
-	// Delete file
-	if ($action == "deletefile") {
-		print "<table class=\"list_table $TEXT_DIRECTION width50\">";
-		print "<tr><td class=\"messagebox wrap\">";
-		// Check if file exist. If so, delete it
-		if (file_exists($filename)) {
-			if (@unlink($filename)) {
-				print $gm_lang["media_file_deleted"]."<br />";
-				WriteToLog($filename." -- ".$gm_lang["media_file_deleted"], "I", "G", $GEDCOM);
-			}
-			else {
-				print "<span class=\"error\">".$gm_lang["media_file_not_deleted"]."</span><br />";
-				WriteToLog($filename." -- ".$gm_lang["media_file_not_deleted"], "E", "G", $GEDCOM);
-			}
-		}
-		
-		// Check if thumbnail exists. If so, delete it.
-		$thumbnail = preg_replace("'$MEDIA_DIRECTORY'",$MEDIA_DIRECTORY."thumbs/",$filename);
-		if (file_exists($thumbnail)) {
-			if (@unlink($thumbnail)) {
-				print $gm_lang["thumbnail_deleted"]."<br />";
-				WriteToLog($thumbnail." -- ".$gm_lang["thumbnail_deleted"], "I", "G", $GEDCOM);
-			}
-			else {
-				print "<span class=\"error\">".$gm_lang["thumbnail_not_deleted"]."</span><br />";
-				WriteToLog($thumbnail." -- ".$gm_lang["thumbnail_not_deleted"], "E", "G", $GEDCOM);
-			}
-		}
-		
-		// Check if file is in media database
-		if ($xref != "") {
-			if (remove_db_media($xref, $gedfile)) {
-				print $gm_lang["media_record_deleted"]."<br />";
-				WriteToLog($xref." -- ".$gm_lang["media_record_deleted"], "I", "G", $GEDCOM);
-			}
-			else {
-				print "<span class=\"error\">".$gm_lang["media_record_not_deleted"]."</span><br />";
-				WriteToLog($xref." -- ".$gm_lang["media_record_not_deleted"], "E", "G", $GEDCOM);
-			}
-		}
-		// Remove references to media file from gedcom and database
-		// Check for XREF and FILE
-		if ($xref != "" || $filename) {
-			
-			// Combine the searchquery of filename and xref
-			if ($xref != "") $query[] = $xref;
-			$query[] = $filename;
-
-			// Find the INDIS with the mediafile in it
-			$foundindis = search_indis($query, true, "OR");
-			
-			// Now update the record
-			if ($xref != "") $regex = "/OBJE @".$xref."@|FILE ".preg_replace("/\//","\\/",$filename)."/";
-			else $regex = "/FILE ".preg_replace("/\//","\\/",$filename)."/";
-			foreach ($foundindis as $pid => $person) {
-				// Check if changes to the record exist
-				if (isset($gm_changes[$pid."_".$person["gedfile"]])) $person["gedcom"] = find_gedcom_record($pid);
-				$subrecs = get_all_subrecords($person["gedcom"], "", false, false, false);
-				$newrec = "0 @$pid@ INDI\r\n";
-				foreach($subrecs as $ind=>$subrec) {
-			    	if (preg_match($regex, $subrec)==0) $newrec .= $subrec."\r\n";
-		    	}
-				// If the record has changed save it
-				if (isset($newrec)) {
-					if (replace_gedrec($pid, $newrec)) {
-						print_text("record_updated");
-						print "<br />";
-						WriteToLog(print_text("record_updated"), "I", "G", $GEDCOM);
-					}
-					else {
-						print "<span class=\"error\">";
-						print_text("record_not_updated");
-						print "</span><br />";
-						WriteToLog(print_text("record_not_updated"), "E", "G", $GEDCOM);
-					}
-				}
-			}
-			
-			// Find the FAMS with the mediafile in it
-			$foundfams = search_fams($query, true, "OR");
-			
-			// Now update the record
-			if ($xref != "") $regex = "/OBJE @".$xref."@|FILE ".preg_replace("/\//","\\/",$filename)."/";
-			else $regex = "/FILE ".preg_replace("/\//","\\/",$filename)."/";
-			foreach ($foundfams as $pid => $family) {
-				if (isset($gm_changes[$pid."_".$family["gedfile"]])) $family["gedcom"] = find_gedcom_record($pid);
-				$subrecs = get_all_subrecords($family["gedcom"], "", false, false, false);
-				$newrec = "0 @$pid@ FAM\r\n";
-				foreach($subrecs as $fam=>$subrec) {
-			    	if (preg_match($regex, $subrec)==0) $newrec .= $subrec."\r\n";
-		    	}
-				// If the record has changed save it
-				if (isset($newrec)) {
-					print "<br />"; 
-					if (replace_gedrec($pid, $newrec)) {
-						print_text("record_updated");
-						print "<br />";
-						WriteToLog(print_text("record_updated"), "I", "G", $GEDCOM);
-					}
-					else {
-						print "<span class=\"error\">";
-						print_text("record_not_updated");
-						print "</span><br />";
-						WriteToLog(print_text("record_not_updated"), "E", "G", $GEDCOM);
-					}
-				}
-			}			
-
-			// Find the SOURCE with the mediafile in it
-			$foundsources = search_sources($query, true, "OR");
-			
-			// Now update the record
-			if ($xref != "") $regex = "/OBJE @".$xref."@|FILE ".preg_replace("/\//","\\/",$filename)."/";
-			else $regex = "/FILE ".preg_replace("/\//","\\/",$filename)."/";
-			foreach ($foundsources as $pid => $source) {
-				if (isset($gm_changes[$pid."_".$source["gedfile"]])) $source["gedcom"] = find_gedcom_record($pid);
-				$subrecs = get_all_subrecords($source["gedcom"], "", false, false, false);
-				$newrec = "0 @$pid@ SOUR\r\n";
-				foreach($subrecs as $src=>$subrec) {
-			    	if (preg_match($regex, $subrec)==0) $newrec .= $subrec."\r\n";
-		    	}
-				// If the record has changed save it
-				if (isset($newrec)) {
-					print "<br />"; 
-					if (replace_gedrec($pid, $newrec)) {
-						print_text("record_updated");
-						print "<br />";
-						WriteToLog(print_text("record_updated"), "I", "G", $GEDCOM);
-					}
-					else {
-						print "<span class=\"error\">";
-						print_text("record_not_updated");
-						print "</span><br />";
-						WriteToLog(print_text("record_not_updated"), "E", "G", $GEDCOM);
-					}
-				}
-			}						
-		
-			// Remove mediarecord from gedcom
-			if ($xref != "") {
-				print "<br />";
-				if (delete_gedrec($xref)) {
-					print_text("record_removed");
-					WriteToLog(print_text("record_removed"), "I", "G", $GEDCOM);
-				}
-				else {
-					print "<span class=\"error\">";
-					print_text("record_not_removed");
-					print "</span>";
-					WriteToLog(print_text("record_not_removed"), "E", "G", $GEDCOM);
-				}
-			}
-		}
-		$medialist = get_medialist();
-		$action = "filter";
-		print "</td></tr></table>";
-	}
-	
-	if ($action=="showmedia") {
-		$medialist = get_medialist();
-		if (count($medialist)>0) {
-			print "<table class=\"list_table\">\n";
-			print "<tr><td class=\"list_label\">".$gm_lang["delete"]."</td><td class=\"list_label\">".$gm_lang["title"]."</td><td class=\"list_label\">".$gm_lang["gedcomid"]."</td>\n";
-			print "<td class=\"list_label\">".$factarray["FILE"]."</td><td class=\"list_label\">".$gm_lang["highlighted"]."</td><td class=\"list_label\">order</td><td class=\"list_label\">gedcom</td></tr>\n";
-			foreach($medialist as $indexval => $media) {
-				print "<tr>";
-				print "<td class=\"list_value\"><a href=\"addmedia.php?action=delete&m_id=".$media["ID"]."\">delete</a></td>";
-				print "<td class=\"list_value\"><a href=\"addmedia.php?action=edit&m_id=".$media["ID"]."\">edit</a></td>";
-				print "<td class=\"list_value\">".$media["TITL"]."</td>";
-				print "<td class=\"list_value\">";
-				print_list_person($media["INDI"], array(get_person_name($media["INDI"]), $GEDCOM));
-				print "</td>";
-				print "<td class=\"list_value\">".$media["FILE"]."</td>";
-				print "<td class=\"list_value\">".$media["_PRIM"]."</td>";
-				print "<td class=\"list_value\">".$media["ORDER"]."</td>";
-				print "<td class=\"list_value\">".$media["GEDFILE"]."</td>";
-				print "</tr>\n";
-			}
-			print "</table>\n";
 		}
 	}
-	
-	
-	if ($action=="showmediaform") {
-	
-	?>
-		<script language="JavaScript" type="text/javascript">
-		<!--
-		var pasteto;
-	
-		function paste_id(value) {
-			pasteto.value=value;
-		}
-		function findMedia(field) {
-			pasteto = field;
-			findwin = window.open('find.php?type=media', '', 'left=50,top=50,width=850,height=450,resizable=1,scrollbars=1');
-			return false;
-		}
-		//-->
-		</script>
-	<?php
-	
-	//-- add a table and form to easily add new values to the table
-		print "<form method=\"post\" name=\"newmedia\" action=\"addmedia.php\">\n";
-		print "<input type=\"hidden\" name=\"action\" value=\"newentry\" />\n";
-		print "<input type=\"hidden\" name=\"ged\" value=\"$GEDCOM\" />\n";
-		print "<table class=\"facts_table\">\n";
-		print "<tr><td class=\"facts_label\">".$factarray["FILE"];
-		print_help_link("edit_FILE_help","qm");
-		print "</td><td class=\"facts_value\"><input type=\"text\" id=\"m_file\" name=\"m_file\" />";
-		print_specialchar_link("m_file","");
-		print_findmedia_link("m_file");
-		print "</td></tr>\n";
-		print "<tr><td class=\"facts_label\">".$gm_lang["extension"];
-		print_help_link("edit_FORM_help","qm");
-		print "</td><td class=\"facts_value\"><input type=\"text\" id=\"m_ext\" width=\"4\" name=\"m_ext\" value=\"jpeg\" />";
-		print_autopaste_link("m_ext", array("avi", "bmp", "gif", "jpeg", "mp3", "ole", "pcx", "tiff", "wav"), false);
-		print "<tr><td class=\"facts_label\">".$gm_lang["title"];
-		print_help_link("edit_TITL_help","qm");
-		print "</td><td class=\"facts_value\"><input id=\"titl\" type=\"text\" name=\"m_titl\" />";
-		print_specialchar_link("titl","");
-		print "</td></tr>\n";
-		print "<tr><td class=\"facts_label\">".$gm_lang["gedcom_file"];
-		print_help_link("edit_ged_list_help","qm");
-		print "</td><td class=\"facts_value\"><select name=\"m_gedfile\">";
-		foreach($GEDCOMS as $ged=>$gedarray) {
-			print "<option value=\"$ged\"";
-			if ($ged==$GEDCOM) print " selected=\"selected\"";
-			print ">".PrintReady($gedarray["title"])."</option>\n";
-		}
-		print "</select></td></tr>\n";
-		print "</table>\n";
-		print_add_layer("NOTE");
-	
-		print "<center><br /><input type=\"submit\" value=\"".$gm_lang["add_media_button"]."\" /><br /><br />\n";
-		print "</form>\n";
-	}
-	
-	/**
-	 * Generate Move To flyout menu
-	 *
-	 * Access control to directories are in this routine
-	 *
-	 * @param mixed $dirlist array() list of subdirectories
-	 * @param string $directory string current working directory
-	 * @param sring $filename filename to generate this menu and links for
-	 */
-	function print_link_menu($mediaid) {
-		global $gm_lang;
-	
-		// main link displayed on page
-		$menu = array();
-		$menu["label"] = $gm_lang["set_link"];
-		$menu["link"] = "#";
-		$menu["class"] = "thememenuitem";
-		$menu["hoverclass"] = "";
-		$menu["submenuclass"] = "submenu";
-		$menu["flyout"] = "left";
-		$menu["items"] = array();
-	
-		$submenu = array();
-		$submenu["label"] = $gm_lang["to_person"];
-		$submenu["link"] = "#";
-		$submenu["hoverclass"] = "submenuitem";
-		$submenu["onclick"] = "return ilinkitem('$mediaid','person')";
-		$submenu["class"] = "submenuitem";
-		$menu["items"][] = $submenu;
-	
-		$submenu = array();
-		$submenu["label"] = $gm_lang["to_family"];
-		$submenu["link"] = "#";
-		$submenu["hoverclass"] = "submenuitem";
-		$submenu["onclick"] = "return ilinkitem('$mediaid','family')";
-		$submenu["class"] = "submenuitem";
-		$menu["items"][] = $submenu;
-	
-		$submenu = array();
-		$submenu["label"] = $gm_lang["to_source"];
-		$submenu["link"] = "#";
-		$submenu["hoverclass"] = "submenuitem";
-		$submenu["onclick"] = "return ilinkitem('$mediaid','source')";
-		$submenu["class"] = "submenuitem";
-		$menu["items"][] = $submenu;
-	
-		print_menu($menu);
-	}
-	
-	/**
-	 * Generate Move To flyout menu
-	 *
-	 * Access control to directories are in this routine
-	 *
-	 * @param mixed $dirlist array() list of subdirectories
-	 * @param string $directory string current working directory
-	 * @param sring $filename filename to generate this menu and links for
-	 * @ignore
-	 */
-	function print_move_to_menu($dirlist,$directory, $filename, $xref) {
-		global $level, $MEDIA_DIRECTORY_LEVELS, $gm_lang, $thumbget;
-	
-		// main link displayed on page
-		$menu = array();
-		$menu["label"] = $gm_lang["move_to"];
-		$menu["link"] = "#";
-		$menu["class"] = "";
-		$menu["hoverclass"] = "thememenuitem_hover";
-		$menu["submenuclass"] = "submenu";
-		$menu["flyout"] = "left";
-		$menu["items"] = array();
-	
-		// add option to move file up a level
-		// Sanity check 2 Don't allow file move above the main media directory
-		if ($level>0) {
-			$submenu = array();
-			$submenu["label"] = "<b>&nbsp;&nbsp;&nbsp;<--&nbsp;&nbsp;&nbsp;</b>";
-			$submenu["link"] = "media.php?directory=$directory&action=moveto&level=$level&movetodir=..&movefile=$filename&xref=$xref".$thumbget;
-			$submenu["class"] = "submenuitem";
-			$menu["items"][] = $submenu;
-	
-		}
-		// Add lower level directories
-		// Sanity check 3 Don't list directories which are at a lower level
-		//                than configured in the xxxxx_conf.php
-		if ($level < $MEDIA_DIRECTORY_LEVELS) {
-			foreach ($dirlist as $indexval => $dir) {
-				$submenu = array();
-				$submenu["label"] = $dir;
-				$submenu["link"] = "media.php?directory=$directory&action=moveto&level=$level&movetodir=$dir&movefile=$filename&xref=$xref".$thumbget;
-				$submenu["class"] = "submenuitem";
-				$menu["items"][] = $submenu;
-			}
-		}
-		print_menu($menu);
-	}
-	
-	if ($action == "filter") {
-		global $dirs;
-		
-		// Get the list of media items
-		$medialist = get_medialist(true);
-		/**
-		 * This is the default action for the page
-		 *
-		 * Displays a list of dirs and files. Displaying only
-		 * thumbnails as the images may be large and we do not want large delays
-		 * while adminstering the file structure
-		 *
-		 * @name $action->filter
-		 */
-		// Show link to previous folder
-		if ($level>0) {
-			$levels = preg_split("'/'", $directory);
-			$pdir = "";
-			for($i=0; $i<count($levels)-2; $i++) $pdir.=$levels[$i]."/";
-			$levels = preg_split("'/'", $thumbdir);
-			$pthumb = "";
-			for($i=0; $i<count($levels)-2; $i++) $pthumb.=$levels[$i]."/";
-			$uplink = "<a href=\"media.php?directory=$pdir&thumbdir=$pthumb&level=".($level-1).$thumbget."\">&nbsp;&nbsp;&nbsp;&lt;-- $pdir&nbsp;&nbsp;&nbsp;</a>\n";
-		}
-		
-		// Start of media directory table
-		print "<table class=\"list_table width50 $TEXT_DIRECTION\">";
-	
-		// Tell the user where he is
-		print "<tr><td class=\"topbottombar\" colspan=\"2\">".$gm_lang["current_dir"].substr($directory,0,-1)."</td></tr>";
-
-		// display the directory list
-		if (count($dirs) || $level) {
-			sort($dirs);
-			if ($level){
-				print "<tr><td class=\"shade1 $TEXT_DIRECTION\" colspan=\"2\">";
-				print $uplink."</td></tr>";
-			}
-			foreach ($dirs as $indexval => $dir) {
-				print "<tr><td class=\"shade2 $TEXT_DIRECTION\">";
-				print "<a href=\"media.php?directory=$directory$dir/&thumbdir=$directory$dir/&level=".($level+1).$thumbget."\">$dir</a>";
-				print "</td>";
-				print "<td class=\"shade1 $TEXT_DIRECTION\">";
-				// Delete directory option
-				print "<form name=\"blah\" action=\"media.php\" method=\"post\">";
-				print "<input type=\"hidden\" name=\"directory\" value=\"".$directory.$dir."/\" />";
-				print "<input type=\"hidden\" name=\"thumbdir\" value=\"".$directory.$dir."/\" />";
-				print "<input type=\"hidden\" name=\"parentdir\" value=\"".$directory."\" />";
-				print "<input type=\"hidden\" name=\"level\" value=\"".($level)."\" />";
-				print "<input type=\"hidden\" name=\"dir\" value=\"".$dir."\" />";
-				print "<input type=\"hidden\" name=\"action\" value=\"deletedir\" />";
-				print "<input type=\"image\" src=\"".$GM_IMAGE_DIR."/".$GM_IMAGES["remove"]["other"]."\" onclick=\"return confirm('".$gm_lang["confirm_folder_delete"]."');\">";
-				print "</form></td></tr>";
-				
-			}
-		}
-		print "<tr><td class=\"list_value $TEXT_DIRECTION\">";
-		// Form for ceating a new directory
-		// Checks admin user can write and is not trying to create lower level dir
-		// than the configured number of levels
-		if ($isadmin && $fileaccess && ($level < $MEDIA_DIRECTORY_LEVELS)) {
-			print "<form action=\"media.php\" method=\"get\">";
-			print "<input type=\"hidden\" name=\"directory\" value=\"".$directory."\" />";
-			print "<input type=\"hidden\" name=\"thumbdir\" value=\"".$thumbdir."\" />";
-			print "<input type=\"hidden\" name=\"level\" value=\"".$level."\" />";
-			print "<input type=\"hidden\" name=\"action\" value=\"newdir\" />";
-			print "<input type=\"submit\" value=\"".$gm_lang["add"]."\" /></td>";
-			print "<td class=\"list_value $TEXT_DIRECTION\"><input type=\"text\" name=\"newdir\"/></form>";
-		}
-		print "</td></tr></table>";
-		$applyfilter = ($filter != "");
-		print "<br />";
-		// display the images TODO x across if lots of files??
-		if (count($medialist)) {
-			print "\n\t<table class=\"list_table\">";
-			foreach ($medialist as $indexval => $media) {
-	
-				// Check if the media belongs to the current folder
-				// print "Afgekeurd: ".$media["FILE"]."<br />";
-				preg_match_all("/\//", $media["FILE"], $hits);
-				$ct = count($hits[0]);
-				if (($ct <= $level+1 && $external_links != "http" && !stristr($media["FILE"],"://")) || (stristr($media["FILE"],"://") && $external_links == "http")) {
-					// simple filter to reduce the number of items to view
-					if ($applyfilter) $isvalid = (strpos(str2lower($media["FILE"]),str2lower($filter)) !== false);
-					else $isvalid = true;
-	
-					if ($isvalid) {
-						if (is_file($media["FILE"]) && filesize($media["FILE"]) != 0){
-							$imgsize = getimagesize($media["FILE"]);
-							if ($imgsize) {
-								$imgwidth = $imgsize[0]+50;
-								$imgheight = $imgsize[1]+50;
-							}
-							else {
-								$imgwidth = 300;
-								$imgheight = 300;
-							}
-						}
-						else {
-							$imgsize = array();
-							$imgsize[0] = false;
-							$imgsize[1] = false;
-							$imgwidth = 0;
-							$imgheight = 0;
-						}
-						
-						// Show column with file operations options
-						print "<tr><td class=\"shade1 $TEXT_DIRECTION\">";
-						
-						// Move To menu
-						// Sanity check 1 user must be admin and no point doing file admin if all in one dir
-						if ( $MEDIA_DIRECTORY_LEVELS && $fileaccess && count($gm_changes) == 0) print_move_to_menu($dirs,$directory,$media["FILE"], $media["XREF"]);
-	
-						// NOTE: Edit File
-						print "<a href=\"#\" onclick=\"return edit_record('".$media["XREF"]."', 1);\">".$gm_lang["edit"]."</a><br />";
-						
-						// Delete File
-						// do not forget to remove links to this file from the gedcom and DB
-						if (!stristr($media["FILE"], "://")) print "<a href=\"media.php?action=deletefile&amp;showthumb=".$showthumb."&amp;filename=".$media["FILE"]."&amp;xref=".$media["XREF"]."&amp;gedfile=".$media["GEDFILE"]."\" onclick=\"return confirm('".$gm_lang["confirm_delete_file"]."');\">".$gm_lang["delete_file"]."</a><br />";
-						
-						// Set Link
-						// Only set link on media that is in the DB
-						// print_help_link("admin_set_link_help","qm");
-						if ($media["XREF"] != "") print_link_menu($media["XREF"]);
-						
-						// Generate thumbnail
-						$ct = preg_match("/\.([^\.]+)$/", $media["FILE"], $match);
-						if ($ct>0) $ext = strtolower(trim($match[1]));
-						if (!isset($media["THUMB"]) && ($ext=="jpg" || $ext=="jpeg" || $ext=="gif" || $ext=="png")) print "<a href=\"media.php?directory=$directory&amp;action=thumbnail&amp;all=0&amp;level=$level&amp;file=".$media["FILE"]."$thumbget\">".$gm_lang["gen_thumb"]."</a>";
-						
-						// NOTE: Close column for file operations
-						print "</td>";
-						
-						//-- thumbnail field
-						if ($showthumb) {
-							print "\n\t\t\t<td class=\"shade1 $TEXT_DIRECTION\">";
-							// if (isset($media["THUMB"])) {
-								print "<a href=\"#\" onclick=\"return openImage('".preg_replace("/'/", "\'", rawurlencode($media["FILE"]))."',$imgwidth, $imgheight);\"><img src=\"".filename_encode($media["THUMB"])."\" border=\"0\" alt=\"";
-								if (isset($media["TITL"])) print $media["TITL"];
-								else print "";
-								print "\"/></a>\n";
-							//}
-							// else print "&nbsp;";
-							print "</td>";
-						}
-						
-						//-- name and size field
-						print "\n\t\t\t<td class=\"shade1 $TEXT_DIRECTION\">";
-						if ($media["TITL"] != "") print PrintReady("<b>".$media["TITL"]."</b> (".$media["XREF"].")")."<br />";
-						if (!file_exists($media["FILE"]) && !stristr($media["FILE"], "://")) print filename_encode($media["FILE"])."<br /><span class=\"error\">".$gm_lang["file_not_exists"]."</span><br />";
-						else if (!stristr($media["FILE"], "://")) {
-							print "<a href=\"#\" onclick=\"return openImage('".preg_replace("/'/", "\'", filename_encode($media["FILE"]))."',$imgwidth, $imgheight);\">".filename_encode($media["FILE"])."</a>";
-							print "<br /><sub>&nbsp;&nbsp;".$gm_lang["image_size"]." -- ".$imgsize[0]."x".$imgsize[1]."</sub><br />";
-						}
-						else print filename_encode($media["FILE"])."<br />";
-						if ($media["LINKED"]) {
-							print $gm_lang["media_linked"]."<br />";
-							foreach ($media["LINKS"] as $indi => $type) {
-								if ($type=="INDI") {
-						            print " <br /><a href=\"individual.php?pid=".$indi."\"> ".$gm_lang["view_person"]." - ".PrintReady(get_person_name($indi))."</a>";
-								}
-								else if ($type=="FAM") {
-						           	print "<br /> <a href=\"family.php?famid=".$indi."\"> ".$gm_lang["view_family"]." - ".PrintReady(get_family_descriptor($indi))."</a>";
-								}
-								else if ($type=="SOUR") {
-						            	print "<br /> <a href=\"source.php?sid=".$indi."\"> ".$gm_lang["view_source"]." - ".PrintReady(get_source_descriptor($indi))."</a>";
-								}
-								//-- no reason why we might not get media linked to media. eg stills from movie clip, or differents resolutions of the same item
-								else if ($type=="OBJE") {
-									//-- TODO add a similar function get_media_descriptor($gid)
-								}
-							}
-						}
-						else {
-							print $gm_lang["media_not_linked"];
-						}
-						print "\n\t\t\t</td></tr>";
-					}
-				}
-			}
-			print "\n\t\t</tr>\n\t</table><br />";
-		}
-	}
-	
-	?>
-<?php
+	$error .= GM_LANG_mm_inserts." ".$count;
 }
-else print $gm_lang["media_folder_corrupt"];
-print_footer();
+
+if ($action == "export_action") {
+	// delold - delete DB file after exported
+	// delexist - overwrite file in file system if exists
+	// linked - export only files that are linked to MM-objects
+	// genthumbs - no, yes; also export thumbnails
+	if(!isset($linked)) $linked = false;
+	if(!isset($delold)) $delold = false;
+	if(!isset($delexist)) $delexist = false;
+	$count = 0;
+
+	// Linked only
+	if ($linked) {
+		$sql = "SELECT m_mfile, m_gedrec FROM ".TBLPREFIX."media WHERE m_file='".GedcomConfig::$GEDCOMID."'";
+		$res = NewQuery($sql);
+		while ($row = $res->Fetchrow()) {
+			$filefromged = GetGedcomValue("FILE", 1, $row[1]);
+			if (stristr($filefromged, "://")) $file = $filefromged;
+			else $file = GedcomConfig::$MEDIA_DIRECTORY.$row[0];
+			if (MediaFS::CreateFile($file, $delexist, false, $delold, $genthumbs)) $count++;
+			else $error = GM_LANG_m_imp_err."<br />";
+		}
+	}
+	else {
+		$dirs = MediaFS::GetMediaDirList(GedcomConfig::$MEDIA_DIRECTORY, true, 1, false, false, true); 
+		$dirs[] = "external_links";
+		foreach ($dirs as $pipo => $dir) {
+			$files = MediaFS::GetFileList($dir, "", true);
+			foreach ($files as $dikkedeur => $file) {
+				if (MediaFS::CreateFile($file, $delexist, false, $delold, $genthumbs)) $count++;
+				else $error = GM_LANG_m_imp_err."<br />";
+			}
+		}
+	}	
+	$error .= GM_LANG_mm_exports." ".$count;
+}
+
+if ($action == "upload_action" && (!empty($picture))) {
+	// picture - Name of the uploaded file
+	// thumbnail - Name of the uploaded thumb
+	// folder - Folder to place the new file
+	// delupl - Overwrite if exists
+	if (!isset($delupl)) $delupl = false;
+	$result = MediaFS::UploadFiles($_FILES, $folder, $delupl);
+	$filename = $result["filename"];
+	if ($result["errno"] != 0) {
+		$error = GM_LANG_upload_error."<br />".$result["error"];
+	}
+	else $error = $result["error"];
+}
+
+// Form for all screens
+print "<form action=\"media.php\" method=\"post\" name=\"managemedia\" enctype=\"multipart/form-data\">\n";
+print "<input type=\"hidden\" name=\"action\" value=\"\" />\n";
+print "<input type=\"hidden\" name=\"directory\" value=\"".urlencode($directory)."\" />\n";
+
+// Sort order
+print "<input type=\"hidden\" name=\"sort\" value=\"".$sort."\" />\n";
+
+// Declare the switch variables
+print "<input type=\"hidden\" name=\"disp1\" />\n";
+print "<input type=\"hidden\" name=\"disp2\" />\n";
+
+// File management part --------------------------------------------------------------------------------------------------------------------------
+if ($disp1 == "block") {
+	// Setup the left box
+	print "<div id=\"admin_genmod_left\" style=\"display: ".$disp1.";\">\n";
+		print "<div class=\"".$TEXT_DIRECTION."\">\n";
+			print "<div class=\"admin_topbottombar\">".GM_LANG_navigation."</div>\n";
+	//		print "<div class=\"admin_link\"><a href=\"admin.php\">".GM_LANG_admin."</a></div>";
+			print "<div class=\"admin_genmod_content\">\n";
+			// Print the external media link
+				print "<a href=\"javascript:".GM_LANG_show_dir."\" onclick=\"document.managemedia.directory.value='external_links'; document.managemedia.submit(); return false;\">";
+				if ($directory == "external_links") print "<span class=\"current\">";
+				print GM_LANG_external_media;
+				if ($directory == "external_links") print "</span>";
+				print "</a><br />\n";
+			
+			foreach ($dirs as $key => $dir) {
+				$canwrite = MediaFS::DirIsWritable($dir);
+				$indent = preg_match_all("/\//", RelativePathFile($dir), $m)*10;
+				$d = preg_split("/\//",$dir);
+				$d = array_reverse($d);
+				if (isset($d[1])) {
+					print "<span style=\"padding-left:".$indent."pt;\">";
+					print "<a href=\"javascript:".GM_LANG_show_dir."\" onclick=\"document.managemedia.directory.value='".urlencode($dir)."'; document.managemedia.submit(); return false;\">";
+					if ($dir == RelativePathFile($directory)) print "<span class=\"current\">";
+					if (!$canwrite) print "<span class=\"readonly\">";
+					print $d[1];
+					if (!$canwrite) print "</span>";
+					if ($dir == $directory) print "</span>";
+					print "</a>";
+					print "</span>";
+					print "<br />\n";
+				}
+			}
+			print "</div>\n";
+		print "</div>";
+	print "</div>";
+	
+	// Setup the right box
+	print "\n<div id=\"admin_genmod_right\" style=\"display: ".$disp1.";\">";
+		print "\n<div class=\"".$TEXT_DIRECTION."\">";
+			print "<div class=\"admin_topbottombar\">".GM_LANG_options."</div>";
+			
+			// Switch screen option
+			// File management
+			print "\n<div class=\"admin_genmod_content\" style=\"border-bottom:1px solid #493424;\" >";
+			print "<div class=\"center\"><b>".GM_LANG_switch_functions."</b></div>";
+			print "<input type=\"radio\" name=\"disp1\" id=\"dispa\" value=\"block\"";
+			print " checked=\"checked\"";
+			print " onclick=\"document.managemedia.action.value='switch'; document.managemedia.disp2.value='none'; document.managemedia.submit(); return false;\" />" . GM_LANG_file_management."<br />";
+			print "<input type=\"radio\" name=\"disp1\" id=\"dispb\" value=\"none\"";
+			print " onclick=\"document.managemedia.action.value='switch'; document.managemedia.disp2.value='block'; document.managemedia.submit(); return false;\" />" . GM_LANG_in_export;
+			print "</div>";
+			
+			// Thumbnail options
+			// Show thumbs
+			print "\n<div class=\"admin_genmod_content\" style=\"border-bottom:1px solid #493424;\" >";
+			print "<div class=\"center\"><b>".GM_LANG_thumb_options."</b></div>";
+			print "<input type=\"checkbox\" name=\"thumbs\" id=\"thumbs\" value=\"1\"";
+			if ($thumbs) print "\" checked=\"checked\"";
+			print " onclick=\"document.managemedia.submit(); return false;\" />" . GM_LANG_show_thumbnail."<br />";
+			// Switch auto generate thumbs
+			print "<input type=\"checkbox\" name=\"autothumbs\" id=\"autothumbs\" value=\"1\"";
+			if ($autothumbs) print " checked=\"checked\"";
+			print " />" . GM_LANG_auto_thumbs;
+			print "</div>";
+			
+			// Filter
+			print "\n<div class=\"admin_genmod_content center\" style=\"border-bottom:1px solid #493424;\" >";
+			print "<b>".GM_LANG_filter."</b><br />";
+			print "<input class=\"width90\" type=\"text\" name=\"filter\" value=\"".$filter."\" /><br />";
+			print "<input type=\"button\" value=\"".GM_LANG_filter."\" onclick=\"document.managemedia.action.value='filter'; document.managemedia.submit(); return false;\" />";
+			print "</div>";
+			
+			// Select/deselect all
+			if ($directory != "external_links") {
+				print "\n<div class=\"admin_genmod_content center\" style=\"border-bottom:1px solid #493424;\" >";
+				$link1 = "\n<a href=\"javascript: ".urlencode(GM_LANG_select_all)."\" onclick=\"";
+				$link2 = "\n<a href=\"javascript: ".urlencode(GM_LANG_deselect_all)."\" onclick=\"";
+				foreach ($files as $filename => $file) {
+					$link1 .= "document.managemedia.select".preg_replace(array("/\(/","/\)/","/\./","/-/","/ /","/\//","/\+/"), array("_","_","_","_","_","_","_"), $filename).".checked=true; ";
+					$link2 .= "document.managemedia.select".preg_replace(array("/\(/","/\)/","/\./","/-/","/ /","/\//","/\+/"), array("_","_","_","_","_","_","_"), $filename).".checked=false; ";
+				}
+				$link1 .= "return false;\">";
+				$link2 .= "return false;\">";
+				print $link1.GM_LANG_select_all."</a>";
+				print "&nbsp;/&nbsp;";
+				print $link2.GM_LANG_deselect_all."</a>";
+				print "\n</div>";
+			}
+			
+			// Actions with selected
+			print "\n<div class=\"admin_genmod_content\" style=\"border-bottom:1px solid #493424;\" >";
+			print "<div class=\"center\"><b>".GM_LANG_with_selected."</b></div>";
+			if (GedcomConfig::$MEDIA_DIRECTORY_LEVELS > 0) {
+				// Move
+				print "<input type=\"radio\" name=\"sel_action\" value=\"move\" checked=\"checked\"/>";
+				print GM_LANG_sel_location."<br />";
+				print "<div style=\"overflow-x:scroll; width:99%; overflow: -moz-scrollbars-horizontal;\">";
+				print "<select name=\"move_folder\">";
+				$d = RelativePathFile($directory);
+				foreach($dirs as $key => $dir) {
+					if (MediaFS::DirIsWritable($dir)) {
+						if ($dir != $d) print "<option value=\"".urlencode($dir)."\">".$dir."</option>";
+					}
+				}
+				print "</select></div><br />";
+			}
+			// Delete
+			print "<input type=\"radio\" name=\"sel_action\" value=\"delete\" ".(GedcomConfig::$MEDIA_DIRECTORY_LEVELS == 0 ? "checked=\"checked\"" : "")." />".GM_LANG_delete."<br />";
+			// The submit button
+			print "<div class=\"center\"><input type=\"button\" value=\"".GM_LANG_go."\" onclick=\"document.managemedia.action.value='select_action'; document.managemedia.submit(); return false;\" /></div>";
+			print "\n</div>";
+		
+			if (GedcomConfig::$MEDIA_DIRECTORY_LEVELS > 0) {
+				// Directory maintenance
+				print "\n<div class=\"admin_genmod_content\" style=\"border-bottom:1px solid #493424;\" >";
+				print "<div class=\"center\"><b>".GM_LANG_directories."</b></div>";
+				// Create
+				print "<input type=\"radio\" name=\"dir_action\" value=\"create\" checked=\"checked\"/>";
+				print GM_LANG_create_dir."<br /><input class=\"width90\" type=\"text\" name=\"new_dir\" /><br />";
+				print GM_LANG_under."<br />";
+				print "<div style=\"overflow-x:scroll; width:99%; overflow: -moz-scrollbars-horizontal;\">";			
+				print "<select name=\"parent_dir\">";
+				foreach($dirs as $key => $dir) {
+					if (MediaFS::DirIsWritable($dir)) {
+						$d = RelativePathFile($dir);
+						$l = preg_split("/\//", $d);
+						if (count($l)-1 <= GedcomConfig::$MEDIA_DIRECTORY_LEVELS) print "<option value=\"".urlencode($dir)."\">".$dir."</option>";
+					}
+				}
+				print "</select>";
+				print "</div><br />";
+				// Delete
+				$csel = 0;
+				$sel = "<div style=\"overflow-x:scroll; width:99%; overflow: -moz-scrollbars-horizontal;\">";
+				$sel .= "<select name=\"del_dir\">";
+				// To fix: only dirs with no subdirs
+				foreach($dirs as $key => $dir) {
+					if (MediaFS::DirIsWritable($dir) && MediaFS::DeleteDir($dir, SystemConfig::$MEDIA_IN_DB, true) && $dir != RelativePathFile(GedcomConfig::$MEDIA_DIRECTORY)) {
+						$sel .= "<option value=\"".urlencode($dir)."\">".$dir."</option>";
+						$csel++;
+					}
+				}
+				$sel .= "</select></div>";
+				print "<input type=\"radio\" name=\"dir_action\" value=\"delete\" ";
+				if (!$csel) print "disabled=\"disabled\" ";
+				print "/>";
+				print GM_LANG_delete_directory."<br />";
+				if ($csel) print $sel;
+				else print GM_LANG_no_empty_dirs;
+				// The submit button
+				print "<br /><div class=\"center\"><input type=\"button\" value=\"".GM_LANG_go."\" onclick=\"document.managemedia.action.value='directory_action'; document.managemedia.submit(); return false;\" /></div>";
+				print "</div>";
+			}
+		
+		print "</div>";
+	print "</div>";
+	
+	// Setup the middle box
+	$cols = 1; // 1 or 2
+	print "\n<div id=\"content\" style=\"display: ".$disp1.";\">";
+		print "\n<div class=\"".$TEXT_DIRECTION."\">";
+			print "<div class=\"admin_topbottombar\">".GM_LANG_manage_media." - ".$GEDCOMS[GedcomConfig::$GEDCOMID]['title'];
+			if (!empty($error)) print "<br /><span class=\"error\">".$error."</span>";
+			print "<br />".GM_LANG_files_found."&nbsp;".count($files);
+			print "</div>";
+			print "\n<div class=\"admin_genmod_content\">";
+			print "<table class=\"width100\">";
+			print "<tr class=\"shade3\">";
+			for ($i=1;$i<=$cols;$i++) {
+				print "<td class=\"width5\">".GM_LANG_select."</td>\n";
+				print "<td><a href=\"javascript: ".GM_LANG_sort_on_name."\" onclick=\"document.managemedia.sort.value='name'; document.managemedia.submit(); return false;\" title=\"".GM_LANG_sort_on_name."\">".GM_LANG_name."</a></td>\n";
+				print "<td class=\"width10\"><a href=\"javascript: ".GM_LANG_sort_on_size."\" onclick=\"document.managemedia.sort.value='size'; document.managemedia.submit(); return false;\" title=\"".GM_LANG_sort_on_size."\">".GM_LANG_size."</a></td>\n";
+				print "<td class=\"width5\"><a href=\"javascript: ".GM_LANG_sort_on_linked."\" onclick=\"document.managemedia.sort.value='linked'; document.managemedia.submit(); return false;\" title=\"".GM_LANG_sort_on_linked."\">".GM_LANG_linked."</a></td>\n";
+				print "<td class=\"width15\" colspan=\"3\" style=\"text-align:center;\">".GM_LANG_action."</td>\n";
+			}
+			print "</tr>\n";
+			$i=0;
+			$canwrite = true;
+			
+			// Get the type of dir we have here. If it's a thumb dir or the url dir where the thumbs for the urls are stored,
+			// we will display the thumb itself instead of it's thumb, which is a placeholder.
+			$curdir = RelativePathFile($directory);
+			$d = preg_split("/\//",$curdir);
+			$d = array_reverse($d);
+			if (isset($d[1]) && ($d[1] == "thumbs" || $d[1] == "urls")) $is_thumb_dir = true;
+			else $is_thumb_dir = false;
+			
+			$counter = 0;
+			foreach ($files as $filename => $file) {
+				$counter++;
+				if ($i%2 == 0) print "<tr>";
+				$fileobj = $file["filedata"];
+				// print select
+				print "<td style=\"border-bottom:1px solid #493424; ";
+				if ($i%2 == 1) print "border-left:1px solid #493424;";
+				print "\">";
+				if ($directory != "external_links") print "<input type=\"checkbox\" name=\"select".preg_replace(array("/\(/","/\)/","/\./","/-/","/ /","/\//","/\+/"), array("_","_","_","_","_","_","_"), $filename)."\" value=\"yes\" />";
+				else print "&nbsp;";
+				print "</td>";
+				
+				// print filename
+				print "<td style=\"border-bottom:1px solid #493424;\" class=\"wrap\">";
+				if (!SystemConfig::$MEDIA_IN_DB) $canwrite = AdminFunctions::FileIsWriteable($filename);
+				if (!$thumbs) $thumbname = "";
+				else $thumbname = ($is_thumb_dir ? ($fileobj->f_is_image ? $fileobj->f_main_file : $fileobj->f_thumb_file) : $fileobj->f_thumb_file);
+				$close = MediaFS::DispImgLink($fileobj->f_main_file, $thumbname, $fileobj->f_file, "", 100, 100, $fileobj->f_width, $fileobj->f_height, $fileobj->f_is_image, $fileobj->f_file_exists, false);
+				if (!$canwrite) print "<span class=\"readonly\">";
+				if ($directory == "external_links") print $filename;
+				else print basename($filename);
+				if (!$canwrite) print "</span>";
+				if ($close) print "</a>";
+				print "</td>";
+	
+				// print size
+				print "<td style=\"border-bottom:1px solid #493424; text-align:right\">";
+				print GetFileSize($fileobj->f_file_size);
+				print "</td>";
+	
+				// Linked
+				print "<td style=\"border-bottom:1px solid #493424; text-align:center;\">";
+				if (isset($file["objects"])) {
+					// Define the box with links
+					print "\n\t\t<div id=\"I".$counter."links\" class=\"ie_popup_width person_box shade2 details1\" style=\"position:absolute; height:auto; width:auto; ";
+					print "visibility:hidden;\" onmouseover=\"keepbox('".$counter."'); return false;\" ";
+					print "onmouseout=\"moveout('".$counter."'); return false;\">";
+					print "<b>".GM_LANG_mm_links."</b><br />";
+					foreach($file["objects"] as $pipo => $media) {
+						print "\n\t<a href=\"mediadetail.php?mid=".$media->xref."&amp;gedid=".$media->gedcomid."\" target=\"_blank\">".$media->title."</a><br />";
+					}
+					print "</div>";
+					print "<img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["link"]["other"]."\" border=\"0\" alt=\"".GM_LANG_click_mm_links."\" style=\"vertical-align:middle;\" onclick=\"showbox(this, '".$counter."', 'relatives'); return false;\" onmouseout=\"moveout('".$counter."');return false;\" />";
+				}
+				else print "&nbsp;";
+				print "</td>";
+	
+				// Print actions
+				// Delete 
+				print "<td style=\"border-bottom:1px solid #493424; text-align:center\">";
+				if ($canwrite) {
+					print "<a href=\"media.php?action=delete&amp;file=".urlencode(MediaFS::NormalizeLink($filename))."&amp;directory=".$directory."&amp;thumbs=".$thumbs."&amp;filter=".$filter."\" onclick=\"return confirm('".GM_LANG_del_mm_file1;
+					if (isset($file["objects"])) print GM_LANG_del_mm_file2;
+					print "');\">";
+					print "<img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["delete"]["other"]."\" border=\"0\" alt=\"".GM_LANG_delete_file."\" style=\"vertical-align:middle;\"/></a>";
+				}
+				else print "&nbsp;";
+				print "</td>";
+				
+				// Download
+				print "<td style=\"border-bottom:1px solid #493424; text-align:center\">";
+				if (SystemConfig::$MEDIA_IN_DB) {
+					if (!empty($fileobj->f_link)) {
+						print "<a href=\"showblob.php?link=".urlencode($fileobj->f_link);
+					}
+					else {
+						print "<a href=\"showblob.php?file=".urlencode($filename);
+					}	
+					if (!empty($fileobj->f_mimetype)) print "&amp;header=".urlencode($fileobj->f_mimetype);
+					print "\" target=\"_blank\">";
+				}
+				else print "<a href=\"downloadbackup.php?fname=".urlencode($filename)."\" target=\"_blank\">";
+				print "<img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["download"]["other"]."\" border=\"0\" alt=\"".GM_LANG_download_now."\" style=\"vertical-align:middle;\"/>";
+				print "</a></td>";
+				
+				// Details
+				print "<td style=\"border-bottom:1px solid #493424; text-align:center\">";
+					print "\n\t\t<div id=\"I".$counter."D"."links\" class=\"ie_popup_width person_box shade2 details1\" style=\"position:absolute; height:auto; width:auto; ";
+					print "visibility:hidden;\" onmouseover=\"keepbox('".$counter."D"."'); return false;\" ";
+					print "onmouseout=\"moveout('".$counter."D"."'); return false;\">";
+					print "<b>".GM_LANG_fdetails."</b><br />";
+					if (!empty($fileobj->f_mimetype)) print "<span class=\"label\">".GM_LANG_media_format.": </span> <span class=\"field\" style=\"direction: ltr;\">".$fileobj->f_mimetype."</span>";
+					if ($fileobj->f_is_image && $fileobj->f_height > 0) print "<span class=\"label\"><br />".GM_LANG_image_size.": </span> <span class=\"field\" style=\"direction: ltr;\">".$fileobj->f_height.($TEXT_DIRECTION =="rtl"?" &rlm;x&rlm; " : " x ").$fileobj->f_width.'</span>';
+					if ($fileobj->f_file_size > 0) print "<span class=\"label\"><br />".GM_LANG_media_file_size.": </span> <span class=\"field\" style=\"direction: ltr;\">".GetFileSize($fileobj->f_file_size)."</span>";
+					print "<span class=\"label\"><br />".GM_LANG_file_status.": </span> <span class=\"field\" style=\"direction: ltr;\">";
+					if ($canwrite) print GM_LANG_stat_rw;
+					else print GM_LANG_stat_ro;
+					print "</span>";
+					print "</div>";
+				
+					print "<img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["search"]["small"]."\" height=\"15\" width=\"15\" border=\"0\" alt=\"".GM_LANG_click_details."\" style=\"vertical-align:middle;\" onclick=\"showbox(this, '".$counter."D"."', 'relatives'); return false;\" onmouseout=\"moveout('".$counter."D"."');return false;\" />";
+				print "</td>";
+				
+				$i++;
+				if ($cols == 1) $i++;
+				if ($i%2 == 0) print "</tr>";
+			}
+			if ($i%2 != 0) {
+				print "<td style=\"border-bottom:1px solid #493424;border-left:1px solid #493424;\">&nbsp;</td>";
+				for ($j=1;$j<=6;$j++) {
+					print "<td style=\"border-bottom:1px solid #493424;\">&nbsp;</td>";
+				}
+				print "</tr>";
+			}
+			print "</table>";
+			print "</div>";
+		print "</div>";
+	print "</div>";
+}
+
+if ($disp2 == "block") {
+// File up/download, import/export --------------------------------------------------------------------------------------------------------------------
+
+	// Left block
+	print "<div id=\"admin_genmod_left\" style=\"display: ".$disp2.";\">";
+		print "<div class=\"".$TEXT_DIRECTION."\">";
+			print "<div class=\"admin_topbottombar\">".GM_LANG_navigation."</div>";
+	//		print "<div class=\"admin_link\"><a href=\"admin.php\">".GM_LANG_admin."</a></div>";
+			print "<div class=\"admin_genmod_content\">";
+			
+			print "</div>";
+		print "</div>";
+	print "</div>";
+			
+	// Setup the right box
+	print "\n<div id=\"admin_genmod_right\" style=\"display: ".$disp2.";\">";
+		print "\n<div class=\"".$TEXT_DIRECTION."\">";
+		print "<div class=\"admin_topbottombar\">".GM_LANG_options."</div>";
+			
+			// Switch screen option
+			// File management
+			print "\n<div class=\"admin_genmod_content\" style=\"border-bottom:1px solid #493424;\" >";
+			print "<div class=\"center\"><b>".GM_LANG_switch_functions."</b></div>";
+			print "<input type=\"radio\" name=\"disp2\" id=\"dispa\" value=\"none\"";
+			print " onclick=\"document.managemedia.action.value='switch'; document.managemedia.disp1.value='block'; document.managemedia.submit(); return false;\" />" . GM_LANG_file_management."<br />";
+			// Switch auto generate thumbs
+			print "<input type=\"radio\" name=\"disp2\" id=\"dispb\" value=\"block\"";
+			print " checked=\"checked\"";
+			print " onclick=\"document.managemedia.action.value='switch'; document.managemedia.disp1.value='none'; document.managemedia.submit(); return false;\" />" . GM_LANG_in_export;
+			print "</div>";
+			
+		print "</div>";
+	print "</div>";
+	
+	// Setup the middle box
+	print "\n<div id=\"content\" style=\"display: ".$disp2.";\">";
+		print "\n<div class=\"".$TEXT_DIRECTION."\">";
+			print "<div class=\"admin_topbottombar\">".GM_LANG_manage_media." - ".$GEDCOMS[GedcomConfig::$GEDCOMID]['title'];
+			if (!empty($error)) print "<br /><span class=\"error\">".$error."</span>";
+			print "</div>";
+			
+			// Upload media
+			// Print the JS to check for valid characters in the filename
+			?><script language="JavaScript" type="text/javascript">
+			<!--
+			function check( filename ) {
+				if( filename.match( /^[a-zA-Z]:[\w- \\\\]+\..*$/ ) ) 
+					return true;
+				else
+					alert( "<?php print GM_LANG_invalid_file; ?>" ) ;
+					return false;
+			}
+			-->
+			</script> <?php
+			print "\n<div class=\"admin_genmod_content\" style=\"border-bottom:1px solid #493424;\" >";
+				print "<div class=\"center\"><b>";
+				if (SystemConfig::$MEDIA_IN_DB) print GM_LANG_upload_db;
+				else print GM_LANG_upload_filesys;
+				print "</b><br />";
+				if (!$filesize = ini_get('upload_max_filesize')) $filesize = "2M";
+				print GM_LANG_max_upload_size.$filesize."</div><br />";
+				print "<div style=\"padding-left: 20%;\">";
+					// Box for user to choose to upload file from local computer
+					print "<input type=\"file\" name=\"picture\" size=\"30\" />&nbsp;&nbsp;&nbsp;".GM_LANG_upload_file."<br /><br />";
+					// Box for user to choose to upload thumb from local computer
+//					print "<input type=\"file\" name=\"thumbnail\" size=\"30\" />&nbsp;&nbsp;&nbsp;".GM_LANG_upl_thumb."<br /><br />";
+					// Box for user to choose the folder to store the image
+					$dirlist = MediaFS::GetMediaDirList(GedcomConfig::$MEDIA_DIRECTORY, true, 1, true, false, SystemConfig::$MEDIA_IN_DB);
+//					if (!in_array(GedcomConfig::$MEDIA_DIRECTORY, $dirlist)) $dirlist[] = GedcomConfig::$MEDIA_DIRECTORY;
+					sort($dirlist);
+					print "<select name=\"folder\">";
+					foreach($dirlist as $key => $dir) {
+						print "<option value=\"".$dir."\">".$dir."</option>";
+					}
+					print "</select>";
+					print "&nbsp;&nbsp;&nbsp;".GM_LANG_upload_to_folder."<br /><br />";
+					print "<input type=\"checkbox\" name=\"delupl\" value=\"1\" />".GM_LANG_del_upl_files."<br />";
+				print "</div><br />";
+				print "<div class=\"center\"><input type=\"button\" value=\"".GM_LANG_go."\" onclick=\"document.managemedia.action.value='upload_action'; if (check(document.managemedia.picture.value)) document.managemedia.submit(); return false;\" /></div><br />";
+			print "\n</div>";
+			
+			// Export DB->filesys
+			print "\n<div class=\"admin_genmod_content\" style=\"border-bottom:1px solid #493424;\" >";
+				print "<div class=\"center\"><b>".GM_LANG_db_to_file."</b></div><br />";
+				print "<div style=\"padding-left: 20%;\">";
+					print "<input type=\"checkbox\" name=\"delold\" value=\"1\" />".GM_LANG_del_exp_files."<br />";
+					print "<input type=\"checkbox\" name=\"delexist\" value=\"1\" />".GM_LANG_del_exist_files."<br /><br />";
+					print "<input type=\"checkbox\" name=\"linked\" value=\"1\" />".GM_LANG_linked_only."<br /><br />";
+					print "<input type=\"radio\" name=\"genthumbs\" value=\"no\" checked=\"checked\" />".GM_LANG_exp_no_thum."<br />";
+					print "<input type=\"radio\" name=\"genthumbs\" value=\"yes\" />".GM_LANG_exp_thumb."<br />";
+				print "</div><br />";
+				print "<div class=\"center\"><input type=\"button\" value=\"".GM_LANG_go."\" onclick=\"document.managemedia.action.value='export_action'; document.managemedia.submit(); return false;\" /></div><br />";
+			print "\n</div>";
+			
+			// Import filesys->DB
+			print "\n<div class=\"admin_genmod_content\" style=\"border-bottom:1px solid #493424;\" >";
+				print "<div class=\"center\"><b>".GM_LANG_file_to_db."</b></div><br />";
+				print "<div style=\"padding-left: 20%;\">";
+					print "<input type=\"checkbox\" name=\"delold\" value=\"1\" />".GM_LANG_del_imp_files."<br />";
+					print "<input type=\"checkbox\" name=\"delexist\" value=\"1\" />".GM_LANG_del_exist_db."<br />";
+					print "<input type=\"checkbox\" name=\"linked\" value=\"1\" />".GM_LANG_linked_only."<br />";
+				print "</div><br />";
+				print "<div class=\"center\"><input type=\"button\" value=\"".GM_LANG_go."\" onclick=\"document.managemedia.action.value='import_action'; document.managemedia.submit(); return false;\" /></div><br />";
+			print "\n</div>";
+			
+		print "</div>";
+	print "</div>";
+}
+print "</form>";
+
+function MMNameSort($a, $b) {
+	
+	$aname = (is_null($a["filedata"]->f_link) ? basename($a["filedata"]->f_file) : $a["filedata"]->f_file);
+	$bname = (is_null($b["filedata"]->f_link) ? basename($b["filedata"]->f_file) : $b["filedata"]->f_file);
+	return StringSort($aname, $bname);
+}
+
+function MMSizeSort($a, $b) {
+	
+	return ($a["filedata"]->f_file_size == $b["filedata"]->f_file_size ? MMNameSort($a, $b) : ($a["filedata"]->f_file_size > $b["filedata"]->f_file_size ? 1 : -1));
+}
+
+function MMLinkSort($a, $b) {
+	
+	if (isset($a["objects"])) $cnta = count($a["objects"]);
+	else $cnta = 0;
+	
+	if (isset($b["objects"])) $cntb = count($b["objects"]);
+	else $cntb = 0;
+	
+	if ($cnta == $cntb) return MMNameSort($a, $b); 
+	else return ($cnta  < $cntb);
+}
+PrintFooter();
 ?>

@@ -3,7 +3,7 @@
  * Send a message to a user in the system
  *
  * Genmod: Genealogy Viewer
- * Copyright (C) 2005 Genmod Development Team
+ * Copyright (C) 2005 - 2008 Genmod Development Team
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,7 +21,7 @@
  *
  * @package Genmod
  * @subpackage Admin
- * @version $Id: message.php,v 1.6 2006/03/11 16:19:29 sjouke Exp $
+ * @version $Id$
  */
  
 /**
@@ -29,15 +29,9 @@
 */
 require("config.php");
 
-/**
- * Inclusion of the language files
-*/
-require $GM_BASE_DIRECTORY.$confighelpfile["english"];
-if (file_exists($GM_BASE_DIRECTORY.$confighelpfile[$LANGUAGE])) require $GM_BASE_DIRECTORY.$confighelpfile[$LANGUAGE];
-
 if (!isset($action)) $action="compose";
 
-print_simple_header($gm_lang["Genmod_message"]);
+PrintSimpleHeader(GM_LANG_Genmod_message);
 
 if (!isset($subject)) $subject = "";
 if (!isset($url)) $url = "";
@@ -48,13 +42,13 @@ if (!isset($from_name)) $from_name="";
 if (!isset($from_email)) $from_email="";
 
 if (empty($to)) {
-	print "<span class=\"error\">".$gm_lang["no_to_user"]."</span><br />";
-	print_simple_footer();
+	print "<span class=\"error\">".GM_LANG_no_to_user."</span><br />";
+	PrintSimpleFooter();
 	exit;
 }
-if ($to=="all" && !userIsAdmin($gm_username)) {
-	print "<span class=\"error\">".$gm_lang["no_to_user"]."</span><br />";
-	print_simple_footer();
+if ($to=="all" && !$gm_user->userIsAdmin()) {
+	print "<span class=\"error\">".GM_LANG_no_to_user."</span><br />";
+	PrintSimpleFooter();
 	exit;
 }
 
@@ -62,35 +56,19 @@ if ($to=="all" && !userIsAdmin($gm_username)) {
 if (($action=="send")&&(isset($_SESSION["good_to_send"]))&&($_SESSION["good_to_send"]===true)) {
 	$_SESSION["good_to_send"] = false;
 	if (!empty($from_email)) $from = $from_email;
-	$tuser = getUser($from);
-	if (!$tuser) {
-		$mt = preg_match("/(.+)@(.+)/", $from, $match);
-		if ($mt>0) {
-			$host = trim($match[2]);
-			if (function_exists("checkdnsrr")) {
-				$ip = checkdnsrr($host);
-				if ($ip === false) {
-					$host = "www.".$host;
-					$ip = checkdnsrr($host);
-					if ($ip === false) {
-						print "<center><br /><span class=\"error\">".$gm_lang["invalid_email"]."</span>\n";
-						print "<br /><br /></center>";
-						$action="compose";
-					}
-				}
-			}
-	    }
-	    else {
-		    print "<center><br /><span class=\"error\">".$gm_lang["invalid_email"]."</span>\n";
-		    print "<br /><br /></center>";
-		    $action="compose";
+	$tuser =& User::GetInstance($from);
+	if ($tuser->is_empty) {
+		if (!CheckEmailAddress($from)) {
+			print "<center><br /><span class=\"error\">".GM_LANG_invalid_email."</span>\n";
+			print "<br /><br /></center>";
+			$action="compose";
 	    }
 	}
 	//-- check referer for possible spam attack
 	if (!isset($_SERVER['HTTP_REFERER']) || stristr($_SERVER['HTTP_REFERER'],"message.php")===false) {
 		print "<center><br /><span class=\"error\">Invalid page referer.</span>\n";
 		print "<br /><br /></center>";
-		WriteToLog('Invalid page referer while trying to send a message. Possible spam attack.', 'W', 'S');
+		WriteToLog('Message-&gt; Invalid page referer while trying to send a message. Possible spam attack.', 'W', 'S');
 		$action="compose";
 	}
 	if ($action != "compose") {
@@ -98,47 +76,51 @@ if (($action=="send")&&(isset($_SESSION["good_to_send"]))&&($_SESSION["good_to_s
 		$toarray[] = $to;
 		if ($to == "all") {
 			$toarray = array();
-			$users = getUsers();
-			foreach($users as $indexval => $tuser) $toarray[] = $tuser["username"];
+			$users = UserController::GetUsers();
+			foreach($users as $indexval => $tuser) {
+				if ($tuser->username != $gm_user->username) $toarray[] = $tuser->username;
+			}
 		}
 		if ($to == "never_logged") {
 			$toarray = array();
-			$users = getUsers();
+			$users = UserController::GetUsers();
 			foreach($users as $indexval => $tuser) {
-				if ($tuser["reg_timestamp"] > $tuser["sessiontime"]) {
-					$toarray[] = $tuser["username"];
+				if ($tuser->reg_timestamp > $tuser->sessiontime) {
+					$toarray[] = $tuser->username;
 				}
 			}
 		}
 		if ($to == "last_6mo") {
 			$toarray = array();
-			$users = getUsers();
+			$users = UserController::GetUsers();
 			$sixmos = 60*60*24*30*6;	//-- timestamp for six months
 			foreach($users as $indexval => $tuser) {
-				if (time() - $tuser["sessiontime"] > $sixmos) {
-					$toarray[] = $tuser["username"];
+				if (time() - $tuser->sessiontime > $sixmos) {
+					$toarray[] = $tuser->username;
 				}
 			}
 		}
 		$i = 0;
 		foreach($toarray as $indexval => $to) {
-			$message = array();
-			$message["to"]=$to;
-			$message["from"]=$from;
+			$message = null;
+			$message = new Message();
+			$message->to = $to;
+			$message->from = $from;
 			if (!empty($from_name)) {
-				$message["from_name"] = $from_name;
-				$message["from_email"] = $from_email;
+				$message->from_name = $from_name;
+				$message->from_email = $from_email;
 			}
-			$message["subject"] = $subject;
+			$message->subject = $subject;
 			$url = preg_replace("/".session_name()."=.*/", "", $url);
-			$message["body"] = $body;
-			$message["created"] = $time;
-			$message["method"] = $method;
-			$message["url"] = $url;
-			if ($i>0) $message["no_from"] = true;
-			if (addMessage($message)) {
-				print $gm_lang["message_sent"]." - ";
-				if ($touser = getUser($to)) print $touser["firstname"]."&nbsp;".$touser["lastname"]."<br />";
+			$message->body = $body;
+			$message->created = $time;
+			$message->method = $method;
+			$message->url = $url;
+			if ($i>0) $message->no_from = true;
+			if ($message->AddMessage()) {
+				print GM_LANG_message_sent." - ";
+				$touser =& User::GetInstance($to);
+				if ($touser->username != $from) print $touser->firstname."&nbsp;".$touser->lastname."<br />";
 				else print $to;
 			}
 			$i++;
@@ -147,13 +129,14 @@ if (($action=="send")&&(isset($_SESSION["good_to_send"]))&&($_SESSION["good_to_s
 }
 
 if ($action=="compose") {
-	print '<span class="subheaders">'.$gm_lang["message"].'</span>';
+	print '<span class="subheaders">'.GM_LANG_message.'</span>';
 	$_SESSION["good_to_send"] = true;
 	?>
 	<script language="JavaScript" type="text/javascript">
+	<!--
 		function validateEmail(email) {
 			if (email.value.search("(.*)@(.*)")==-1) {
-				alert('<?php print $gm_lang["invalid_email"]; ?>');
+				alert('<?php print GM_LANG_invalid_email; ?>');
 				email.focus();
 				return false;
 			}
@@ -161,60 +144,61 @@ if ($action=="compose") {
 		}
 		function checkForm(frm) {
 			if (frm.subject.value=="") {
-				alert('<?php print $gm_lang["enter_subject"]; ?>');
+				alert('<?php print GM_LANG_enter_subject; ?>');
 				document.messageform.subject.focus();
 				return false;
 			}
 			if (frm.body.value=="") {
-				alert('<?php print $gm_lang["enter_body"]; ?>');
+				alert('<?php print GM_LANG_enter_body; ?>');
 				document.messageform.body.focus();
 				return false;
 			}
 			return true;
 		}
+	//-->
 	</script>
 	<?php
-	$username = $gm_username;
+	$username = $gm_user->username;
 	if (empty($username)) {
-		print "<br /><br />".$gm_lang["message_instructions"];
+		print "<br /><br />".GM_LANG_message_instructions;
 	}
 	print "<br /><form name=\"messageform\" method=\"post\" action=\"message.php\" onsubmit=\"t = new Date(); document.messageform.time.value=t.toUTCString(); ";
 	if (empty($username)) print "return validateEmail(document.messageform.from_email);";
 	else print "return checkForm(this);";
 	print "\">\n";
 	print "<table>\n";
-	$touser = getUser($to);
-	$lang_temp = "lang_name_".$touser["language"];
-	if ($touser) {
-		print "<tr><td></td><td>".str_replace("#TO_USER#", "<b>".$touser["firstname"]." ".$touser["lastname"]."</b>", $gm_lang["sending_to"])."<br />";
-		print str_replace("#USERLANG#", "<b>".$gm_lang[$lang_temp]."</b>", $gm_lang["preferred_lang"])."</td></tr>\n";
+	$touser =& User::GetInstance($to);
+	$lang_temp = "lang_name_".$touser->language;
+	if (!empty($touser->username)) {
+		print "<tr><td></td><td>".str_replace("#TO_USER#", "<b>".$touser->firstname." ".$touser->lastname."</b>", GM_LANG_sending_to)."<br />";
+		print str_replace("#USERLANG#", "<b>".constant("GM_LANG_".$lang_temp)."</b>", GM_LANG_preferred_lang)."</td></tr>\n";
 	}
 
 	if (empty($username)){
-		print "<tr><td valign=\"top\" width=\"15%\" align=\"right\">".$gm_lang["message_from_name"]."</td>";
-		print "<td><input type=\"text\" name=\"from_name\" size=\"40\" value=\"$from_name\" /></td></tr><tr><td valign=\"top\" align=\"right\">".$gm_lang["message_from"]."</td><td><input type=\"text\" name=\"from_email\" size=\"40\" value=\"$from_email\" /><br />".$gm_lang["provide_email"]."<br /><br /></td></tr>\n";
+		print "<tr><td valign=\"top\" width=\"15%\" align=\"right\">".GM_LANG_message_from_name."</td>";
+		print "<td><input type=\"text\" name=\"from_name\" size=\"40\" value=\"$from_name\" /></td></tr><tr><td valign=\"top\" align=\"right\">".GM_LANG_message_from."</td><td class=\"wrap\"><input type=\"text\" name=\"from_email\" size=\"40\" value=\"$from_email\" onchange=\"sndReq('mailerr', 'checkemail', 'email', this.value);\" /> <span id=\"mailerr\"></span><br />".GM_LANG_provide_email."<br /><br /></td></tr>\n";
 	}
-	print "<tr><td align=\"right\">".$gm_lang["message_subject"]."</td>";
+	print "<tr><td align=\"right\">".GM_LANG_message_subject."</td>";
 	print "<td>";
 	if (!empty($username)){
-		print "<input type=\"hidden\" name=\"from\" value=\"$username\" />\n";
+		print "<input type=\"hidden\" name=\"from\" value=\"$username\"/>\n";
 	}
 	print "<input type=\"hidden\" name=\"action\" value=\"send\" />\n";
 	print "<input type=\"hidden\" name=\"to\" value=\"$to\" />\n";
 	print "<input type=\"hidden\" name=\"time\" value=\"\" />\n";
 	print "<input type=\"hidden\" name=\"method\" value=\"$method\" />\n";
 	print "<input type=\"hidden\" name=\"url\" value=\"$url\" />\n";
-	print "<input type=\"text\" name=\"subject\" size=\"50\" value=\"$subject\" /><br /></td></tr>\n";
-	print "<tr><td valign=\"top\" align=\"right\">".$gm_lang["message_body"]."<br /></td><td><textarea name=\"body\" cols=\"50\" rows=\"7\">$body</textarea><br /></td></tr>\n";
-	print "<tr><td></td><td><input type=\"submit\" value=\"".$gm_lang["send"]."\" /></td></tr>\n";
+	print "<input type=\"text\" name=\"subject\" size=\"50\" value=\"".stripslashes($subject)."\" /><br /></td></tr>\n";
+	print "<tr><td valign=\"top\" align=\"right\">".GM_LANG_message_body."<br /></td><td><textarea name=\"body\" cols=\"50\" rows=\"7\">$body</textarea><br /></td></tr>\n";
+	print "<tr><td></td><td><input type=\"submit\" value=\"".GM_LANG_send."\" /></td></tr>\n";
 	print "</table>\n";
 	print "</form>\n";
-	if ($method=="messaging2") print_text("messaging2_help");
+	if ($method=="messaging2") PrintText("messaging2_help");
 }
 else if ($action=="delete") {
-	if (deleteMessage($id)) print $gm_lang["message_deleted"];
+	if (MessageController::deleteMessage($id)) print GM_LANG_message_deleted;
 }
-print "<center><br /><br /><a href=\"#\" onclick=\"if (window.opener.refreshpage) window.opener.refreshpage(); window.close();\">".$gm_lang["close_window"]."</a><br /></center>";
+print "<center><br /><br /><a href=\"#\" onclick=\"if (window.opener.refreshpage) window.opener.refreshpage(); window.close();\">".GM_LANG_close_window."</a><br /></center>";
 
-print_simple_footer();
+PrintSimpleFooter();
 ?>

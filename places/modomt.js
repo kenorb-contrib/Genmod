@@ -1,5 +1,5 @@
 /**
- * @version $Id: modomt.js,v 1.1 2005/10/23 21:49:12 roland-d Exp $
+ * @version $Id$
  * @author http://momche.net
  */
 

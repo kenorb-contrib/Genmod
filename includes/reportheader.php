@@ -1,19 +1,20 @@
 <?php
-
 /**
  * Report Header Parser
+ *
+ * Genmod: Genealogy Viewer
+ * Copyright (C) 2005 - 2008 Genmod Development Team
  *
  * used by the SAX parser to generate PDF reports from the XML report file.
  *
  * @package Genmod
  * @subpackage Reports
- * @version $Id: reportheader.php,v 1.1 2005/10/23 21:48:42 roland-d Exp $
+ * @version $Id$
  */
 
 //-- do not allow direct access to this file
-if (strstr($_SERVER["SCRIPT_NAME"],"reportheader.php")) {   
-	print "Why do you want to do that?";   
-	exit;   
+if (stristr($_SERVER["SCRIPT_NAME"],basename(__FILE__))) {
+	require "../intrusion.php";
 } 
  
 /**
@@ -34,6 +35,7 @@ $elementHandler["GMRInput"]["end"]			= "GMRInputEHandler";
 $text = "";
 $report_array = array();
 
+define("AVAIL_PAGE_SIZES", "letter,legal,A4,A3,A5");
 
 
 /**
@@ -77,7 +79,6 @@ function endElement($parser, $name) {
  */
 function characterData($parser, $data) {
 	global $text;
-	
 	$text .= $data;
 }
 
@@ -93,19 +94,52 @@ function GMReportSHandler($attrs) {
 
 	if (isset($attrs["icon"])) $report_array["icon"] = $attrs["icon"];
 	else $report_array["icon"] = "";
+
+	if (isset($attrs["type"])) $report_array["type"] = $attrs["type"];
+	else $report_array["type"] = "general";
 }
 
 function GMRvarSHandler($attrs) {
-	global $text, $vars, $gm_lang, $factarray, $fact, $desc, $type, $generation;
-	
+	global $text, $vars, $fact, $desc, $type, $generation;
+
 	$var = $attrs["var"];
 	if (!empty($var)) {
-		$tfact = $fact;
-		if ($fact=="EVEN") $tfact = $type;
-		$var = preg_replace(array("/\[/","/\]/","/@fact/","/@desc/"), array("['","']",$tfact,$desc), $var);
-		eval("if (!empty(\$$var)) \$var = \$$var;");
-		$ct = preg_match("/factarray\['(.*)'\]/", $var, $match);
-		if ($ct>0) $var = $match[1];
+		if (!empty($attrs["date"])) {
+		}
+		if (!empty($vars[$var]['id'])) {
+			$var = $vars[$var]['id'];
+		}
+		else if (substr($var, 0, 8) == "GM_LANG_") {
+			$ct = preg_match("/GM_LANG_(.*)/", $var, $match);
+			if ($ct > 0) {
+				if (substr($match[1], 0, 1) == "$") $match[1] = eval("if(isset($match[1])) print $match[1]; else print '';");
+				$var = "GM_LANG_".$match[1];
+			}
+			if (defined($var)) $var = constant($var);
+		}
+		else if (substr($var, 0, 8) == "GM_FACT_") {
+			$ct = preg_match("/GM_FACT_(.*)/", $var, $match);
+			if ($ct > 0) {
+				if (substr($match[1], 0, 1) == "$") {
+					$match[1] = eval("if(isset($match[1])) print $match[1]; else print '';");
+					$var = "GM_FACT_".$match[1];
+				}
+			}
+			if (defined($var)) $var = constant($var);
+		}
+		else {
+			$tfact = $fact;
+			if ($fact=="EVEN" || $fact=="FACT") $tfact = $type;
+			$var = preg_replace(array("/\[/","/\]/","/@fact/","/@desc/"), array("['","']",$tfact,$desc), $var);
+			if (isset($$var)) {
+				eval("if (!empty(\$$var)) \$var = \$$var;");
+			}
+			$ct = preg_match("/factarray\['(.*)'\]/", $var, $match);
+			if ($ct>0) {
+				if (defined("GM_FACT_".$match[1])) $var = constant("GM_FACT_".$match[1]);
+				else $var = $match[1];
+			}
+		}
 		$text .= $var;
 	}
 }
@@ -144,8 +178,42 @@ function GMRInputSHandler($attrs) {
 	if (isset($attrs["name"])) $input["name"] = $attrs["name"];
 	if (isset($attrs["type"])) $input["type"] = $attrs["type"];
 	if (isset($attrs["lookup"])) $input["lookup"] = $attrs["lookup"];
-	if (isset($attrs["default"])) $input["default"] = $attrs["default"];
-	if (isset($attrs["options"])) $input["options"] = $attrs["options"];
+	if (isset($attrs["default"])) {
+		switch ($attrs["default"]) {
+		case "DEFAULT_PAGE_SIZE":
+			$input["default"] = SystemConfig::$DEFAULT_PAGE_SIZE;
+			break;
+		case "SHOW_ID_NUMBERS":
+			$input["default"] = GedcomConfig::$SHOW_ID_NUMBERS;
+			break;
+		case "SHOW_FAM_ID_NUMBERS":
+			$input["default"] = GedcomConfig::$SHOW_FAM_ID_NUMBERS;
+			break;
+		case "NOW":
+			$input["default"] = date("d M Y");
+			break;
+		default:
+			$ct = preg_match("/NOW\s*([+\-])\s*(\d+)/", $attrs['default'], $match);
+			if ($ct>0) {
+//				$plus = 1;
+//				if ($match[1]=="-") $plus = -1;
+//				$input["default"] = date("d M Y", time()+$plus*60*60*24*$match[2]);
+//print $match[1].$match[2]." days";
+				$input["default"] = date("d M Y", strtotime($match[1].$match[2]." days"));
+			}
+			else {
+				$input["default"] = $attrs["default"];
+			}
+			break;
+		}
+	}
+	if (isset($attrs["options"])) {
+		$options = $attrs["options"];
+		if ($options == "AVAIL_PAGE_SIZES") {
+			$options = AVAIL_PAGE_SIZES;
+		}
+		$input["options"] = $options;
+	}
 }
 
 function GMRInputEHandler() {

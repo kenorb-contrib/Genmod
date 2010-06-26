@@ -4,7 +4,7 @@
  * to keep bookmarks, see a list of upcoming events, etc.
  *
  * Genmod: Genealogy Viewer
- * Copyright (C) 2005 Genmod Development Team
+ * Copyright (C) 2005 - 2008 Genmod Development Team
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -24,7 +24,7 @@
  *
  * @package Genmod
  * @subpackage Display
- * @version $Id: index_edit.php,v 1.14 2006/05/13 07:53:45 roland-d Exp $
+ * @version $Id$
  */
 
 /**
@@ -32,21 +32,20 @@
 */
 require("config.php");
 
-global $gm_lang, $GM_USE_HELPIMG, $GM_IMAGES, $GM_IMAGE_DIR, $TEXT_DIRECTION;
+global $GM_IMAGES, $TEXT_DIRECTION;
 global $GEDCOM_TITLE;
 
 
 //-- make sure that they have user status before they can use this page
 //-- otherwise have them login again
-$uname = $gm_username;
-if (empty($uname) || empty($name)) {
-	print_simple_header("");
-	print $gm_lang["access_denied"];
-	print "<div class=\"center\"><a href=\"javascript:// ".$gm_lang["close_window"]."\" onclick=\"self.close();\">".$gm_lang["close_window"]."</a></div>\n";
-	print_simple_footer();
+if (empty($gm_user->username) || empty($name)) {
+	PrintSimpleHeader("");
+	print GM_LANG_access_denied;
+	print "<div class=\"center\"><a href=\"javascript:// ".GM_LANG_close_window."\" onclick=\"self.close();\">".GM_LANG_close_window."</a></div>\n";
+	PrintSimpleFooter();
 	exit;
 }
-if (!userIsAdmin($uname)) $setdefault=false;
+if (!$gm_user->userIsAdmin()) $setdefault=false;
 
 if (!isset($action)) $action="";
 if (!isset($command)) $command="user";
@@ -57,16 +56,16 @@ if (!isset($side)) $side="main";
 if (!isset($index)) $index=1;
 
 // Define all the icons we're going to use
-$IconHelp = $gm_lang["qm"];
-if ($GM_USE_HELPIMG) {
-	$IconHelp = "<img src=\"".$GM_IMAGE_DIR."/".$GM_IMAGES["help"]["small"]."\" class=\"icon\" width=\"15\" height=\"15\" alt=\"\" />";
+$IconHelp = GM_LANG_qm;
+if (GM_USE_HELPIMG) {
+	$IconHelp = "<img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["help"]["small"]."\" class=\"icon\" width=\"15\" height=\"15\" alt=\"\" />";
 }
-$IconUarrow = "<img src=\"".$GM_IMAGE_DIR."/".$GM_IMAGES["uarrow"]["other"]."\" width=\"20\" height=\"20\" alt=\"\" />";
-$IconDarrow = "<img src=\"".$GM_IMAGE_DIR."/".$GM_IMAGES["darrow"]["other"]."\" width=\"20\" height=\"20\" alt=\"\" />";
-$IconRarrow = "<img src=\"".$GM_IMAGE_DIR."/".$GM_IMAGES["rarrow"]["other"]."\" width=\"20\" height=\"20\" alt=\"\" />";
-$IconLarrow = "<img src=\"".$GM_IMAGE_DIR."/".$GM_IMAGES["larrow"]["other"]."\" width=\"20\" height=\"20\" alt=\"\" />";
-$IconRDarrow = "<img src=\"".$GM_IMAGE_DIR."/".$GM_IMAGES["rdarrow"]["other"]."\" width=\"20\" height=\"20\" alt=\"\" />";
-$IconLDarrow = "<img src=\"".$GM_IMAGE_DIR."/".$GM_IMAGES["ldarrow"]["other"]."\" width=\"20\" height=\"20\" alt=\"\" />";
+$IconUarrow = "<img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["uarrow"]["other"]."\" width=\"20\" height=\"20\" alt=\"\" />";
+$IconDarrow = "<img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["darrow"]["other"]."\" width=\"20\" height=\"20\" alt=\"\" />";
+$IconRarrow = "<img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["rarrow"]["other"]."\" width=\"20\" height=\"20\" alt=\"\" />";
+$IconLarrow = "<img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["larrow"]["other"]."\" width=\"20\" height=\"20\" alt=\"\" />";
+$IconRDarrow = "<img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["rdarrow"]["other"]."\" width=\"20\" height=\"20\" alt=\"\" />";
+$IconLDarrow = "<img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["ldarrow"]["other"]."\" width=\"20\" height=\"20\" alt=\"\" />";
 
 /**
  * Block definition array
@@ -76,7 +75,7 @@ $IconLDarrow = "<img src=\"".$GM_IMAGE_DIR."/".$GM_IMAGES["ldarrow"]["other"]."\
  * their names and the function to call them
  * "name" is the name of the block in the lists
  * "descr" is the name of a gm_lang var to describe this block.  Eg: if the block is
- * described by $gm_lang["my_block_text"], put "my_block_text" here.
+ * described by GM_LANG_my_block_text"], put "my_block_text" here.
  * "type" the options are "user" or "gedcom" or undefined
  * - The type determines which lists the block is available in.
  * - Leaving the type undefined allows it to be on both the user and gedcom portal
@@ -87,11 +86,12 @@ $GM_BLOCKS = array();
 
 //-- See if https is used for login
 $httpslogin = false;
-if ((empty($LOGIN_URL) && substr($SERVER_URL,0,5) == "https") || substr($LOGIN_URL,0,5) == "https") $httpslogin = true;
+if ((LOGIN_URL == "" && substr(SERVER_URL,0,5) == "https") || substr(LOGIN_URL,0,5) == "https") $httpslogin = true;
 //-- load all of the blocks
+
 $d = dir("blocks");
 while (false !== ($entry = $d->read())) {
-	if (($entry!=".") && ($entry!="..") && ($entry!="CVS") && (strstr($entry, ".")==".php")) {
+	if (strstr($entry, ".")==".php") {
 		if (!($entry == "login_block.php" && $httpslogin)) include_once("blocks/".$entry);
 	}
 }
@@ -113,58 +113,31 @@ asort($SortedBlocks);
 reset($SortedBlocks);
 
 // Build sorted table of block summary descriptions
-global $gm_lang;
-$gm_lang["block_summary_table"] = "";
+
+$block_summary_table = "";
 $SortedBlocks = array_flip($SortedBlocks);
 foreach($SortedBlocks as $key => $b) {
 	$temp = $GM_BLOCKS[$b]["descr"];
-	$gm_lang["block_summary_table"] .= "<tr valign='top'>";
-	$gm_lang["block_summary_table"] .= "<td>".$GM_BLOCKS[$b]["name"]."</td>";
-	$gm_lang["block_summary_table"] .= "<td>#gm_lang[$temp]#</td>";
-	$gm_lang["block_summary_table"] .= "</tr>";
+	$block_summary_table .= "<tr valign='top'>";
+	$block_summary_table .= "<td>".$GM_BLOCKS[$b]["name"]."</td>";
+	$block_summary_table .= "<td>#gm_lang[$temp]#</td>";
+	$block_summary_table .= "</tr>";
 }
 $SortedBlocks = array_flip($SortedBlocks);
 
 //-- get the blocks list
-if ($command=="user") {
-	$ublocks = getBlocks($uname);
-	if (($action=="reset") || ((count($ublocks["main"])==0) && (count($ublocks["right"])==0))) {
-		$ublocks["main"] = array();
-		$ublocks["main"][] = array("print_todays_events", "");
-		$ublocks["main"][] = array("print_user_messages", "");
-		$ublocks["main"][] = array("print_user_favorites", "");
+if ($command=="user") $ublocks = new Blocks("user", $gm_user->username, $action);
+else $ublocks = new Blocks("gedcom", "", $action);
 
-		$ublocks["right"] = array();
-		$ublocks["right"][] = array("print_welcome_block", "");
-		$ublocks["right"][] = array("print_random_media", "");
-		$ublocks["right"][] = array("print_upcoming_events", "");
-		$ublocks["right"][] = array("print_logged_in_users", "");
-	}
-}
-else {
-	$ublocks = getBlocks($GEDCOM);
-	if (($action=="reset") or ((count($ublocks["main"])==0) and (count($ublocks["right"])==0))) {
-		$ublocks["main"] = array();
-		$ublocks["main"][] = array("print_gedcom_stats", "");
-		$ublocks["main"][] = array("print_gedcom_news", "");
-		$ublocks["main"][] = array("print_gedcom_favorites", "");
-		$ublocks["main"][] = array("review_changes_block", "");
+if ($command=="user") PrintSimpleHeader(GM_LANG_mygedview);
+else PrintSimpleHeader($GEDCOMS[GedcomConfig::$GEDCOMID]["title"]);
 
-		$ublocks["right"] = array();
-		$ublocks["right"][] = array("print_gedcom_block", "");
-		$ublocks["right"][] = array("print_random_media", "");
-		$ublocks["right"][] = array("print_todays_events", "");
-		$ublocks["right"][] = array("print_logged_in_users", "");
-	}
-}
-
-if ($command=="user") print_simple_header($gm_lang["mygedview"]);
-else print_simple_header($GEDCOMS[$GEDCOM]["title"]);
-
-$GEDCOM_TITLE = PrintReady($GEDCOMS[$GEDCOM]["title"]);  // needed in $gm_lang["rss_descr"]
+$GEDCOM_TITLE = PrintReady($GEDCOMS[GedcomConfig::$GEDCOMID]["title"]);  // needed in GM_LANG_rss_descr
 
 if ($action=="updateconfig") {
-	$block = $ublocks[$side][$index];
+	$block = $ublocks->$side;
+	$block = $block[$index];
+
 	if (isset($GM_BLOCKS[$block[0]]["canconfig"]) && $GM_BLOCKS[$block[0]]["canconfig"] && isset($GM_BLOCKS[$block[0]]["config"]) && is_array($GM_BLOCKS[$block[0]]["config"])) {
 		$config = $block[1];
 		foreach($GM_BLOCKS[$block[0]]["config"] as $config_name=>$config_value) {
@@ -175,65 +148,104 @@ if ($action=="updateconfig") {
 				$config[$config_name] = "";
 			}
 		}
-		$ublocks[$side][$index][1] = $config;
-		setBlocks($name, $ublocks, $setdefault);
+		// Cleanup the config for parameters that no longer exist
+		foreach ($config as $key => $value) {
+			if (!array_key_exists($key, $GM_BLOCKS[$block[0]]["config"])) unset($config[$key]);
+		}
+		if ($side == "main") $ublocks->main[$index][1] = $config;
+		else $ublocks->right[$index][1] = $config;
+		$ublocks->SetValues($setdefault);
+		if ($block[0] == "print_upcoming_events" || $block[0] == "print_todays_events") GedcomConfig::ResetCaches();
+		if ($block[0] == "print_block_name_top10") unset($_SESSION["top10_surnames"]);
 	}
-	print $gm_lang["config_update_ok"]."<br />\n";?>
+	print GM_LANG_config_update_ok."<br />\n";?>
 	<script language="JavaScript" type="text/javascript">
+	<!--
 	opener.location.reload();
 	window.close();
+	//-->
 	</script>
 	<?php
 }
 
 if ($action=="update") {
-	$newublocks["main"] = array();
+	$newublocks = new Blocks($command, $name, "init");
 	if (is_array($main)) {
 		foreach($main as $indexval => $b) {
 			$config = "";
 			$index = "";
-			reset($ublocks["main"]);
-			foreach($ublocks["main"] as $index=>$block) {
+			reset($ublocks->main);
+			foreach($ublocks->main as $index=>$block) {
 				if ($block[0]==$b) {
 					$config = $block[1];
 					break;
 				}
 			}
-			if ($index!="") unset($ublocks["main"][$index]);
-			$newublocks["main"][] = array($b, $config);
+			if ($index!="") unset($ublocks->main[$index]);
+			$newublocks->main[] = array($b, $config);
 		}
 	}
 
-	$newublocks["right"] = array();
 	if (is_array($right)) {
 		foreach($right as $indexval => $b) {
 			$config = "";
 			$index = "";
-			reset($ublocks["right"]);
-			foreach($ublocks["right"] as $index=>$block) {
+			reset($ublocks->right);
+			foreach($ublocks->right as $index=>$block) {
 				if ($block[0]==$b) {
 					$config = $block[1];
 					break;
 				}
 			}
-			if ($index!="") unset($ublocks["right"][$index]);
-			$newublocks["right"][] = array($b, $config);
+			if ($index!="") unset($ublocks->right[$index]);
+			$newublocks->right[] = array($b, $config);
 		}
 	}
-	$ublocks = $newublocks;
-	setBlocks($name, $ublocks, $setdefault); ?>
+	$newublocks->SetValues($setdefault);?>
 	<script language="JavaScript" type="text/javascript">
+	<!--
 	opener.location.reload();
 	window.close();
+	//-->
 	</script>
 	<?php
 }
 
-if ($action=="configure" && isset($ublocks[$side][$index])) {
-	$block = $ublocks[$side][$index];
+// NOTE: Store the changed userfavorite
+if ($action == "storefav") {
+	$favorite = new favorite();
+	$favorite->username = $username;
+	$favorite->id = $id;
+	$favorite->gid = $gid;
+	$favorite->type = $type;
+	$favorite->file = $file;
+	if (isset($favurl)) $favorite->url = $favurl;
+	if (isset($favnote)) $favorite->note = $favnote;
+	if (isset($favtitle)) $favorite->title = $favtitle;
+	if ($favorite->SetFavorite()) { ?>
+		<script language="JavaScript" type="text/javascript">
+		<!--
+		opener.location.reload();
+		window.close();
+		//-->
+		</script>
+		<?php
+	}
+	else {
+		print "<span class=\"error\">".GM_LANG_favorite_not_stored."</span>";
+		print "<div class=\"center\"><a href=\"javascript:// ".GM_LANG_close_window."\" onclick=\"self.close();\">".GM_LANG_close_window."</a></div>\n";
+		PrintFooter();
+		exit;
+	}
+}
+
+$block = $ublocks->$side;
+if ($action=="configure" && isset($block[$index])) {
+	
+	$block = $block[$index];
 	print "<table class=\"facts_table ".$TEXT_DIRECTION."\">";
 	print "<tr><td class=\"facts_label\">";
-	print "<h2>".$gm_lang["config_block"]."</h2>";
+	print "<h3>".GM_LANG_config_block."</h3>";
 	print "</td></tr>";
 	print "<tr><td class=\"topbottombar\">";
 	print "<b>".$GM_BLOCKS[$block[0]]["name"]."</b>";
@@ -241,7 +253,7 @@ if ($action=="configure" && isset($ublocks[$side][$index])) {
 	print "</table>";
 	
 	/**
-	print "<label class=\"label_form\" for=\"username\">".$gm_lang["username"]."</label>";
+	print "<label class=\"label_form\" for=\"username\">".GM_LANG_username"]."</label>";
 	print "<input class=\"input_form\" type=\"text\" id=\"username\" name=\"username\" /><br style=\"clear: left;\"/>";
 	*/
 	print "\n<form name=\"block\" method=\"post\" action=\"index_edit.php\">\n";
@@ -251,21 +263,22 @@ if ($action=="configure" && isset($ublocks[$side][$index])) {
 	print "<input type=\"hidden\" name=\"side\" value=\"$side\" />\n";
 	print "<input type=\"hidden\" name=\"index\" value=\"$index\" />\n";
 	print "<table border=\"0\" class=\"facts_table ".$TEXT_DIRECTION."\">";
+	
 	if ($GM_BLOCKS[$block[0]]["canconfig"]) {
 		eval($block[0]."_config(\$block[1]);");
 		print "<tr><td colspan=\"2\" class=\"center\">";
-		print_help_link("click_here_help", "qm", "click_here");
-		print "<input type=\"button\" value=\"".$gm_lang["click_here"]."\" onclick=\"document.block.submit();\" />";
-		print "&nbsp&nbsp;<input type =\"button\" value=\"".$gm_lang["cancel"]."\" onclick=\"window.close();\" />";
+		PrintHelpLink("click_here_help", "qm", "click_here");
+		print "<input type=\"button\" value=\"".GM_LANG_click_here."\" onclick=\"document.block.submit();\" />";
+		print "&nbsp&nbsp;<input type =\"button\" value=\"".GM_LANG_cancel."\" onclick=\"window.close();\" />";
 		print "</td></tr>";
 	}
 	else {
 		print "<tr><td colspan=\"2\" class=\"shade1\">";
-		print $gm_lang["block_not_configure"];
+		print GM_LANG_block_not_configure;
 		print "</td></tr>";
 		print "<tr><td colspan=\"2\" class=\"center\">";
-		print_help_link("click_here_help", "qm");
-		print "<input type=\"button\" value=\"".$gm_lang["click_here"]."\" onclick=\"parentrefresh();\" />";
+		PrintHelpLink("click_here_help", "qm");
+		print "<input type=\"button\" value=\"".GM_LANG_click_here."\" onclick=\"parentrefresh();\" />";
 		print "</td></tr>";
 	}
 	print "</table>";
@@ -361,9 +374,9 @@ else {
 	<?php
 	print "var block_descr = new Array();\n";
 	foreach($GM_BLOCKS as $b=>$block) {
-		print "block_descr['$b'] = '".preg_replace("/'/", "\\'", print_text($block["descr"],0,1))."';\n";
+		print "block_descr['$b'] = '".preg_replace("/'/", "\\'", PrintText($block["descr"],0,1))."';\n";
 	}
-	print "block_descr['advice1'] = '".preg_replace("/'/", "\\'", print_text('index_edit_advice',0,1))."';\n";
+	print "block_descr['advice1'] = '".preg_replace("/'/", "\\'", PrintText('index_edit_advice',0,1))."';\n";
 	?>
 
 
@@ -409,27 +422,27 @@ else {
 		<?php
 		// NOTE: Print the header
 		print "<div class=\"topbottombar\">";
-			print_help_link("portal_config_intructions", "qm");
-			if ($command=="user") print "<b>".str2upper($gm_lang["customize_page"])."</b>";
-			else print "<b>".str2upper($gm_lang["customize_gedcom_page"])."</b>";
+			PrintHelpLink("portal_config_intructions", "qm");
+			if ($command=="user") print "<b>".Str2Upper(GM_LANG_customize_page)."</b>";
+			else print "<b>".Str2Upper(GM_LANG_customize_gedcom_page)."</b>";
 		print "</div>";
-		
+
 		// NOTE: Print the container
 		print "<div id=\"index_edit_container\">";
 			// NOTE: Print the arrows for moving the left block items up and down
 			print "<div id=\"index_edit_left_arrow\">";
-				print "<a tabindex=\"-1\" onclick=\"move_up_block('main_select');\" title=\"".$gm_lang["move_up"]."\">".$IconUarrow."</a>";
+				print "<a tabindex=\"-1\" onclick=\"move_up_block('main_select');\" title=\"".GM_LANG_move_up."\">".$IconUarrow."</a>";
 				print "<br />";
-				print "<a tabindex=\"-1\" onclick=\"move_down_block('main_select');\" title=\"".$gm_lang["move_down"]."\">".$IconDarrow."</a>";
+				print "<a tabindex=\"-1\" onclick=\"move_down_block('main_select');\" title=\"".GM_LANG_move_down."\">".$IconDarrow."</a>";
 				print "<br /><br />";
-				print_help_link("block_move_up_help", "qm");
+				PrintHelpLink("block_move_up_help", "qm");
 			print "</div>";
 			
 			// NOTE: Print the blocks currently in the left frame
 			print "<div id=\"index_edit_left\">";
-				print "<b>".$gm_lang["main_section"]."</b>";
+				print "<b>".GM_LANG_main_section."</b>";
 				print "<select multiple=\"multiple\" id=\"main_select\" name=\"main[]\" size=\"10\" onchange=\"show_description('main_select');\">\n";
-				foreach($ublocks["main"] as $indexval => $block) {
+				foreach($ublocks->main as $indexval => $block) {
 					if (function_exists($block[0])) {
 						print "<option value=\"$block[0]\">".$GM_BLOCKS[$block[0]]["name"]."</option>\n";
 					}
@@ -439,29 +452,29 @@ else {
 			
 			// NOTE: Print the arrows for moving items left and right
 			print "<div id=\"index_edit_left_right_arrow\">";
-				print "<a tabindex=\"-1\" onclick=\"move_left_right_block('main_select', 'right_select');\" title=\"".$gm_lang["move_right"]."\">".$IconRDarrow."</a>";
+				print "<a tabindex=\"-1\" onclick=\"move_left_right_block('main_select', 'right_select');\" title=\"".GM_LANG_move_right."\">".$IconRDarrow."</a>";
 				print "<br />";
-				print "<a tabindex=\"-1\" onclick=\"move_left_right_block('main_select', 'available_select');\" title=\"".$gm_lang["remove"]."\">".$IconRarrow."</a>";
+				print "<a tabindex=\"-1\" onclick=\"move_left_right_block('main_select', 'available_select');\" title=\"".GM_LANG_remove."\">".$IconRarrow."</a>";
 				print "<br />";
-				print "<a tabindex=\"-1\" onclick=\"move_left_right_block('available_select', 'main_select');\" title=\"".$gm_lang["add"]."\">".$IconLarrow."</a>";
+				print "<a tabindex=\"-1\" onclick=\"move_left_right_block('available_select', 'main_select');\" title=\"".GM_LANG_add."\">".$IconLarrow."</a>";
 				print "<br /><br />";
-				print_help_link("block_move_right_help", "qm");
+				PrintHelpLink("block_move_right_help", "qm");
 			print "</div>";
 			
 			// NOTE: Print the arrows for moving the right block items up and down
 			print "<div id=\"index_edit_right_arrow\">";
-				print "<a tabindex=\"-1\" onclick=\"move_up_block('right_select');\" title=\"".$gm_lang["move_up"]."\">".$IconUarrow."</a>";
+				print "<a tabindex=\"-1\" onclick=\"move_up_block('right_select');\" title=\"".GM_LANG_move_up."\">".$IconUarrow."</a>";
 				print "<br />";
-				print "<a tabindex=\"-1\" onclick=\"move_down_block('right_select');\" title=\"".$gm_lang["move_down"]."\">".$IconDarrow."</a>";
+				print "<a tabindex=\"-1\" onclick=\"move_down_block('right_select');\" title=\"".GM_LANG_move_down."\">".$IconDarrow."</a>";
 				print "<br /><br />";
-				print_help_link("block_move_up_help", "qm");
+				PrintHelpLink("block_move_up_help", "qm");
 			print "</div>";
 			
 			// NOTE: Print the blocks currently in the right frame
 			print "<div id=\"index_edit_right\">";
-				print "<b>".$gm_lang["right_section"]."</b>";
+				print "<b>".GM_LANG_right_section."</b>";
 				print "<select multiple=\"multiple\" id=\"right_select\" name=\"right[]\" size=\"10\" onchange=\"show_description('right_select');\">\n";
-				foreach($ublocks["right"] as $indexval => $block) {
+				foreach($ublocks->right as $indexval => $block) {
 					if (function_exists($block[0])) {
 						print "<option value=\"$block[0]\">".$GM_BLOCKS[$block[0]]["name"]."</option>\n";
 					}
@@ -471,19 +484,19 @@ else {
 			
 			// NOTE: Print the arrows for moving items left and right
 			print "<div id=\"index_edit_right_left_arrow\">";
-				print "<a tabindex=\"-1\" onclick=\"move_left_right_block('right_select', 'main_select');\" title=\"".$gm_lang["move_left"]."\">".$IconLDarrow."</a>";
+				print "<a tabindex=\"-1\" onclick=\"move_left_right_block('right_select', 'main_select');\" title=\"".GM_LANG_move_left."\">".$IconLDarrow."</a>";
 				print "<br />";
-				print "<a tabindex=\"-1\" onclick=\"move_left_right_block('right_select', 'available_select');\" title=\"".$gm_lang["remove"]."\">".$IconLarrow."</a>";
+				print "<a tabindex=\"-1\" onclick=\"move_left_right_block('right_select', 'available_select');\" title=\"".GM_LANG_remove."\">".$IconLarrow."</a>";
 				print "<br />";
-				print "<a tabindex=\"-1\" onclick=\"move_left_right_block('available_select', 'right_select');\" title=\"".$gm_lang["add"]."\">".$IconRarrow."</a>";
+				print "<a tabindex=\"-1\" onclick=\"move_left_right_block('available_select', 'right_select');\" title=\"".GM_LANG_add."\">".$IconRarrow."</a>";
 				print "<br /><br />";
-				print_help_link("block_move_right_help", "qm");
+				PrintHelpLink("block_move_right_help", "qm");
 			print "</div>";
 			
 			// NOTE: Print the blocks currently available
 			print "<div id=\"index_edit_content\">";
 				print " <a href=\"#\" class=\"help\" tabindex=\"0\" onclick=\"expand_layer('help',true); expand_layer('configure', false);\">".$IconHelp."</a> \n";
-				print "<b>".$gm_lang["available_blocks"]."</b><br />";
+				print "<b>".GM_LANG_available_blocks."</b><br />";
 				print "<select id=\"available_select\" name=\"available[]\" size=\"10\" onchange=\"show_description('available_select');\">\n";
 				foreach($SortedBlocks as $key => $value) {
 					if (!isset($GM_BLOCKS[$key]["type"])) $GM_BLOCKS[$key]["type"]=$command;
@@ -494,27 +507,27 @@ else {
 						
 			// NOTE: Print the box for showing the advice
 			print "<div id=\"index_edit_advice\" class=\"wrap $TEXT_DIRECTION\">";
-				print $gm_lang["index_edit_advice"];
+				print GM_LANG_index_edit_advice;
 			print "</div>";
 			
 			// NOTE: Print the submit buttons
 			print "<div>";
-				if ((userIsAdmin($uname))&&($command=='user')) {
-					print $gm_lang["use_blocks_for_default"]."<input type=\"checkbox\" name=\"setdefault\" value=\"1\" /><br />\n";
+				if (($gm_user->userIsAdmin())&&($command=='user')) {
+					print GM_LANG_use_blocks_for_default."<input type=\"checkbox\" name=\"setdefault\" value=\"1\" /><br />\n";
 				}
 				
 				if ($command=='user') {
-					print_help_link("block_default_portal", "qm");
+					PrintHelpLink("block_default_portal", "qm");
 				} 
 				else {
-					print_help_link("block_default_index", "qm");
+					PrintHelpLink("block_default_index", "qm");
 				}
-				print "<input type=\"button\" value=\"".$gm_lang["reset_default_blocks"]."\" onclick=\"window.location='index_edit.php?command=$command&amp;action=reset&amp;name=".preg_replace("/'/", "\'", $name)."';\" />\n";
+				print "<input type=\"button\" value=\"".GM_LANG_reset_default_blocks."\" onclick=\"window.location='index_edit.php?command=$command&amp;action=reset&amp;name=".preg_replace("/'/", "\'", $name)."';\" />\n";
 				print "&nbsp;&nbsp;";
-				print_help_link("click_here_help", "qm");
-				print "<input type=\"button\" value=\"".$gm_lang["click_here"]."\" onclick=\"select_options(); document.config_setup.submit();\" />\n";
+				PrintHelpLink("click_here_help", "qm");
+				print "<input type=\"button\" value=\"".GM_LANG_click_here."\" onclick=\"select_options(); document.config_setup.submit();\" />\n";
 				print "&nbsp;&nbsp;";
-				print "<input type =\"button\" value=\"".$gm_lang["cancel"]."\" onclick=\"window.close();\" />";
+				print "<input type =\"button\" value=\"".GM_LANG_cancel."\" onclick=\"window.close();\" />";
 			print "</div>";
 		print "</div>";
 		print "</form>\n";
@@ -523,8 +536,8 @@ else {
 	// NOTE: Hidden help text for column items
 	print "\n\t<div id=\"help\" class=\"tab_page\" style=\"position: absolute; display: none; top: auto; left: auto; z-index: 2; \">\n\t";
 
-	print "<br /><center><input type=\"button\" value=\"".$gm_lang["click_here"]."\" onclick=\"expand_layer('configure', true); expand_layer('help', false);\" /></center><br /><br />\n";
-	print_text("block_summaries");
+	print "<br /><center><input type=\"button\" value=\"".GM_LANG_click_here."\" onclick=\"expand_layer('configure', true); expand_layer('help', false);\" /></center><br /><br />\n";
+	PrintText("block_summaries");
 
 	// end of 2nd tab
 	print "</div>\n";

@@ -3,7 +3,7 @@
  * Modifies the themes by means of a user friendly interface
  *
  * Genmod: Genealogy Viewer
- * Copyright (C) 2005 Genmod Development Team
+ * Copyright (C) 2005 - 2008 Genmod Development Team
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,19 +21,13 @@
  *
  * @package Genmod
  * @subpackage Themes
- * @version $Id: theme_edit.php,v 1.2 2006/01/09 14:19:30 sjouke Exp $
+ * @version $Id$
  */
 
 /**
  * Inclusion of the configuration file
 */
 require("config.php");
-
-/**
- * Inclusion of the language files
-*/
-require($GM_BASE_DIRECTORY.$factsfile["english"]);
-if (file_exists($GM_BASE_DIRECTORY . $factsfile[$LANGUAGE])) require $GM_BASE_DIRECTORY . $factsfile[$LANGUAGE];
 
 if (!isset($action)) $action="";
 if (!isset($choose_theme)) $choose_theme="";
@@ -42,26 +36,27 @@ if (!isset($choose_theme)) $choose_theme="";
 //-- otherwise have them login again
 $uname = $gm_username;
 if (empty($uname)) {
-	header("Location: login.php?url=theme_edit.php");
+	if (LOGIN_URL == "") header("Location: login.php?url=theme_edit.php");
+	else header("Location: ".LOGIN_URL."?url=theme_edit.php");
 	exit;
 }
-$user = getUser($uname);
+$user =& User::GetInstance($uname);
 
 // -- print html header information
-print_header("Theme editor");
+PrintHeader("Theme editor");
 
 ?>
 <form name="editform" method="post";">
 <input type="hidden" name="oldusername" value="<?php print $uname; ?>" />
 <table class="list_table <?php print $TEXT_DIRECTION; ?>">
-<tr><td class="facts_label"><?php print $gm_lang["user_theme"];print_help_link("edituser_user_theme_help", "qm");?></td><td class="facts_value" valign="top">
+<tr><td class="facts_label"><?php print GM_LANG_user_theme;PrintHelpLink("edituser_user_theme_help", "qm");?></td><td class="facts_value" valign="top">
 	<select name="choose_theme">
-	<option value=""><?php print $gm_lang["site_default"]; ?></option>
+	<option value=""><?php print GM_LANG_site_default; ?></option>
 			<?php
-				$themes = get_theme_names();
+				$themes = GetThemeNames();
 				foreach($themes as $indexval => $themedir) {
 					print "<option value=\"".$themedir["dir"]."\"";
-					if ($themedir["dir"] == $choose_theme) print " selected=\"selected\"";
+					if ($themedir["dirs == $choose_theme) print " selected=\"selected\"";
 					print ">".$themedir["name"]."</option>\n";
 				}
 			?>
@@ -71,7 +66,7 @@ print_header("Theme editor");
 <input type="submit" value="Change stylesheet" />
 </form>
 <?php
-if (strlen($choose_theme) == 0) $choose_theme = $THEME_DIR;
+if (strlen($choose_theme) == 0) $choose_theme = GedcomConfig::$THEME_DIR;
 $output = file($choose_theme."/style.css");
 $start = FALSE;
 $empty = TRUE;
@@ -179,6 +174,6 @@ foreach ($tags as $l => $tag){
 	print "<tr><td><br /></td><td><br /></td><td><br /></td></tr>\r\n";
 }
 print "</table>";
-print_footer();
+PrintFooter();
 print "\n\t</div>\n</body>\n</html>";
 ?>

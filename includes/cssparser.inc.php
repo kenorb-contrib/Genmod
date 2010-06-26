@@ -4,7 +4,7 @@
  *
  * See the readme file : http://www.phpclasses.org/browse/file/4685.html
  *
- * $Id: cssparser.inc.php,v 1.1 2005/10/23 21:48:42 roland-d Exp $
+ * $Id$
  *
  * @author http://www.phpclasses.org/browse/package/1289.html
  * @package Genmod
@@ -12,6 +12,7 @@
  */
 
 class cssparser {
+  var $classname = "cssparser";
   var $css;
   var $html;
 

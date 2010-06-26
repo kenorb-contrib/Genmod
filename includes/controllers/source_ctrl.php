@@ -3,7 +3,7 @@
  * Controller for the source page view
  * 
  * Genmod: Genealogy Viewer
- * Copyright (C) 2005 Genmod Development Team
+ * Copyright (C) 2005 - 2008 Genmod Development Team
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,124 +21,48 @@
  *
  * @package Genmod
  * @subpackage Charts
- * @version $Id: source_ctrl.php,v 1.5 2005/12/18 21:16:58 roland-d Exp $
+ * @version $Id$
  */
+if (stristr($_SERVER["SCRIPT_NAME"],"source_ctrl")) {
+	require "../../intrusion.php";
+}
 
-require_once("config.php");
-require_once 'includes/controllers/basecontrol.php';
-require_once 'includes/source_class.php';
-require_once 'includes/menu.php';
-require_once($GM_BASE_DIRECTORY.$factsfile["english"]);
-if (file_exists($GM_BASE_DIRECTORY.$factsfile[$LANGUAGE])) require_once($GM_BASE_DIRECTORY.$factsfile[$LANGUAGE]);
-
-$nonfacts = array();
 /**
  * Main controller class for the source page.
  */
-class SourceControllerRoot extends BaseController {
-	var $sid;
-	var $show_changes = "yes";
-	var $action = "";
-	var $source = null;
-	var $uname = "";
-	var $diffsource = null;
-	var $accept_success = false;
-	var $canedit = false;
+class SourceController extends DetailController {
+	
+	public $classname = "SourceController";	// Name of this class
+	public $source = null;					// Holder for the source object
 	
 	/**
 	 * constructor
 	 */
-	function SourceRootController() {
-		parent::BaseController();
-	}
-	
-	/**
-	 * initialize the controller
-	 */
-	function init() {
-		global $gm_lang, $CONTACT_EMAIL, $GEDCOM, $gm_changes;
+	public function __construct() {
+		global $ENABLE_CLIPPINGS_CART, $nonfacts;
 		
-		if (!empty($_REQUEST["show_changes"])) $this->show_changes = $_REQUEST["show_changes"];
-		if (!empty($_REQUEST["action"])) $this->action = $_REQUEST["action"];
-		if (!empty($_REQUEST["sid"])) $this->sid = strtoupper($_REQUEST["sid"]);
-		$this->sid = clean_input($this->sid);
+		parent::__construct();
+
+		$nonfacts = array();
 		
-		$sourcerec = find_source_record($this->sid);
-		if (!$sourcerec) $sourcerec = "0 @".$this->sid."@ SOUR\r\n";
+		if (!empty($_REQUEST["sid"])) $this->xref = strtoupper($_REQUEST["sid"]);
+		$this->xref = CleanInput($this->xref);
 		
-		$this->source = new Source($sourcerec);
-		
-		if (!$this->source->canDisplayDetails()) {
-			print_header($gm_lang["private"]." ".$gm_lang["source_info"]);
-			print_privacy_error($CONTACT_EMAIL);
-			print_footer();
-			exit;
-		}
-		
-		$this->uname = getUserName();
+		$this->source =& Source::GetInstance($this->xref);
 		
 		//-- perform the desired action
 		switch($this->action) {
 			case "addfav":
 				$this->addFavorite();
 				break;
-			case "accept":
-				$this->acceptChanges();
-				break;
-		}
-		
-		//-- check for the user
-		//-- if the user can edit and there are changes then get the new changes
-		if ($this->show_changes=="yes" && userCanEdit($this->uname) && isset($gm_changes[$this->sid."_".$GEDCOM])) {
-			$newrec = find_gedcom_record($this->sid);
-			$this->diffsource = new Source($newrec);
-			$sourcerec = $newrec;
-		}
-		
-		if ($this->source->canDisplayDetails()) {
-			$this->canedit = userCanEdit($this->uname);
-		}
-		
-		if ($this->show_changes=="yes" && $this->canedit) {
-			$this->source->diffMerge($this->diffsource);
 		}
 	}
 	
-	/**
-	 * Add a new favorite for the action user
-	 */
-	function addFavorite() {
-		global $GEDCOM;
-		if (empty($this->uname)) return;
-		if (!empty($_REQUEST["gid"])) {
-			$gid = strtoupper($_REQUEST["gid"]);
-			$indirec = find_source_record($gid);
-			if ($indirec) {
-				$favorite = array();
-				$favorite["username"] = $this->uname;
-				$favorite["gid"] = $gid;
-				$favorite["type"] = "SOUR";
-				$favorite["file"] = $GEDCOM;
-				$favorite["url"] = "";
-				$favorite["note"] = "";
-				$favorite["title"] = "";
-				addFavorite($favorite);
-			}
-		}
-	}
-	/**
-	 * Accept any edit changes into the database
-	 * Also update the indirec we will use to generate the page
-	 */
-	function acceptChanges() {
-		global $GEDCOM;
-		
-		if (!userCanAccept($this->uname)) return;
-		if (accept_changes($this->sid."_".$GEDCOM)) {
-			$this->show_changes="no";
-			$this->accept_success=true;
-			$indirec = find_gedcom_record($this->sid);
-			$this->source = new Source($indirec);
+	public function __get($property) {
+		switch($property) {
+			default:
+				return parent::__get($property);
+				break;
 		}
 	}
 	
@@ -146,89 +70,51 @@ class SourceControllerRoot extends BaseController {
 	 * get the title for this page
 	 * @return string
 	 */
-	function getPageTitle() {
-		global $gm_lang;
-		return $this->source->getTitle()." - ".$this->sid." - ".$gm_lang["source_info"];
-	}
-	/**
-	 * check if use can edit this person
-	 * @return boolean
-	 */
-	function userCanEdit() {
-		return $this->canedit;
+	protected function getPageTitle() {
+
+		if (is_null($this->pagetitle)) {
+			$this->pagetitle = "";
+			if ($this->source->title) {
+				$this->pagetitle .= $this->source->title.$this->source->addxref." - ";
+			}
+			$this->pagetitle .= GM_LANG_source_info;
+		}
+		return $this->pagetitle;
 	}
 	
 	/**
 	 * get edit menut
 	 * @return Menu
 	 */
-	function &getEditMenu() {
-		global $TEXT_DIRECTION, $GM_IMAGE_DIR, $GM_IMAGES, $GEDCOM, $gm_lang, $gm_changes;
-		if ($TEXT_DIRECTION=="rtl") $ff="_rtl";
-		else $ff="";
-		
-		if (!$this->userCanEdit()) {
-			$tempvar = false;
-			return $tempvar;
-		}
+	public function &getEditMenu() {
+		global $gm_user;
 		
 		// edit source menu
-		$menu = new Menu($gm_lang['edit_source']);
-		$menu->addOnclick("return edit_raw('".$this->sid."', 'edit_raw');");
-		if (!empty($GM_IMAGES["edit_sour"]["small"]))
-			$menu->addIcon("{$GM_IMAGE_DIR}/{$GM_IMAGES['edit_sour']['small']}");
-		$menu->addClass("submenuitem{$ff}", "submenuitem_hover{$ff}", "submenu{$ff}");
+		$menu = new Menu(GM_LANG_edit_source);
+		if (!$this->source->isdeleted) {
+			// edit source / edit_raw
+			if ($gm_user->userCanEditGedlines()) {
+				$submenu = new Menu(GM_LANG_edit_raw);
+				$submenu->addLink("edit_raw('".$this->source->xref."', 'edit_raw', 'SOUR');");
+				$menu->addSubmenu($submenu);
+			}
 
-		// edit source / edit_raw
-		$submenu = new Menu($gm_lang['edit_raw']);
-		$submenu->addOnclick("return edit_raw('".$this->sid."', 'edit_raw');");
-		if (!empty($GM_IMAGES["edit_sour"]["small"]))
-			$submenu->addIcon("{$GM_IMAGE_DIR}/{$GM_IMAGES['edit_sour']['small']}");
-		$submenu->addClass("submenuitem{$ff}", "submenuitem_hover{$ff}");
-		$menu->addSubmenu($submenu);
-		
-		// edit source / delete_source
-		$submenu = new Menu($gm_lang['delete_source']);
-		$submenu->addOnclick("if (confirm('".$gm_lang["confirm_delete_source"]."')) return deletesource('".$this->sid."', 'delete_source'); else return false;");
-		if (!empty($GM_IMAGES["edit_sour"]["small"]))
-			$submenu->addIcon("{$GM_IMAGE_DIR}/{$GM_IMAGES['edit_sour']['small']}");
-		$submenu->addClass("submenuitem{$ff}", "submenuitem_hover{$ff}");
-		$menu->addSubmenu($submenu);
-
-		if (isset($gm_changes[$this->sid.'_'.$GEDCOM]))
-		{
+			// edit source / delete_source
+			$submenu = new Menu(GM_LANG_delete_source);
+			$submenu->addLink("if (confirm('".GM_LANG_confirm_delete_source."'))  deletesource('".$this->source->xref."', 'delete_source'); ");
+			$menu->addSubmenu($submenu);
+		}
+		if ($this->source->ischanged) {
 			// edit_sour / seperator
 			$submenu = new Menu();
 			$submenu->isSeperator();
 			$menu->addSubmenu($submenu);
 
 			// edit_sour / show/hide changes
-			if ($this->show_changes == 'no')
-			{
-				$submenu = new Menu($gm_lang['show_changes'], 'source.php?sid='.$this->sid.'&amp;show_changes=yes');
-				if (!empty($GM_IMAGES["edit_sour"]["small"]))
-				$submenu->addIcon("{$GM_IMAGE_DIR}/{$GM_IMAGES['edit_sour']['small']}");
-				$submenu->addClass("submenuitem{$ff}", "submenuitem_hover{$ff}");
-				$menu->addSubmenu($submenu);
-			}
-			else
-			{
-				$submenu = new Menu($gm_lang['hide_changes'], 'source.php?sid='.$this->sid.'&amp;show_changes=no');
-				if (!empty($GM_IMAGES["edit_sour"]["small"]))
-				$submenu->addIcon("{$GM_IMAGE_DIR}/{$GM_IMAGES['edit_fam']['small']}");
-				$submenu->addClass("submenuitem{$ff}", "submenuitem_hover{$ff}");
-				$menu->addSubmenu($submenu);
-			}
-
-			if (userCanAccept($this->uname))
-			{
-				// edit_source / accept_all
-				$submenu = new Menu($gm_lang['accept_all'], 'source.php?sid='.$this->sid.'&amp;action=accept');
-				if (!empty($GM_IMAGES["edit_sour"]["small"]))
-				$submenu->addIcon("{$GM_IMAGE_DIR}/{$GM_IMAGES['edit_fam']['small']}");
-				$submenu->addClass("submenuitem{$ff}", "submenuitem_hover{$ff}");
-				$menu->addSubmenu($submenu);
-			}
+			if (!$this->source->show_changes) $submenu = new Menu(GM_LANG_show_changes);
+			else $submenu = new Menu(GM_LANG_hide_changes);
+			$submenu->addLink('showchanges();');
+			$menu->addSubmenu($submenu);
 		}
 		return $menu;
 	}
@@ -237,87 +123,32 @@ class SourceControllerRoot extends BaseController {
 	 * get the other menu
 	 * @return Menu
 	 */
-	function &getOtherMenu() {
-		global $TEXT_DIRECTION, $GM_IMAGE_DIR, $GM_IMAGES, $GEDCOM, $gm_lang;
-		global $SHOW_GEDCOM_RECORD, $ENABLE_CLIPPINGS_CART;
+	public function &getOtherMenu() {
+		global $ENABLE_CLIPPINGS_CART, $gm_user;
 		
-		if ($TEXT_DIRECTION=="rtl") $ff="_rtl";
-		else $ff="";
-		
-		if (!$this->source->canDisplayDetails() || (!$SHOW_GEDCOM_RECORD && $ENABLE_CLIPPINGS_CART < getUserAccessLevel())) {
-			$tempvar = false;
-			return $tempvar;
-		}
-		
-			// other menu
-		$menu = new Menu($gm_lang['other']);
-		$menu->addClass("submenuitem{$ff}", "submenuitem_hover{$ff}", "submenu{$ff}");
-		if ($SHOW_GEDCOM_RECORD)
-		{
-			$menu->addIcon("{$GM_IMAGE_DIR}/{$GM_IMAGES['gedcom']['small']}");
-			if ($this->show_changes == 'yes'  && $this->userCanEdit())
-			{
-				$menu->addLink("javascript:show_gedcom_record('new');");
-			}
-			else
-			{
-				$menu->addLink("javascript:show_gedcom_record();");
-			}
-		}
-		else
-		{
-			if (!empty($GM_IMAGES["clippings"]["small"]))
-				$menu->addIcon("{$GM_IMAGE_DIR}/{$GM_IMAGES['clippings']['small']}");
-			$menu->addLink('clippings.php?action=add&amp;id='.$this->sid.'&amp;type=sour');
-		}
-		if ($SHOW_GEDCOM_RECORD)
-		{
+		// other menu
+		$menu = new Menu(GM_LANG_other);
+		if ($gm_user->userCanViewGedlines()) {
 				// other / view_gedcom
-				$submenu = new Menu($gm_lang['view_gedcom']);
-				if ($this->show_changes == 'yes' && $this->userCanEdit())
-				{
-					$submenu->addLink("javascript:show_gedcom_record('new');");
-				}
-				else
-				{
-					$submenu->addLink("javascript:show_gedcom_record();");
-				}
-				$submenu->addIcon("{$GM_IMAGE_DIR}/{$GM_IMAGES['gedcom']['small']}");
-				$submenu->addClass("submenuitem{$ff}", "submenuitem_hover{$ff}");
+				if ($this->source->show_changes && $this->source->canedit) $execute = "show_gedcom_record('new');";
+				else $execute = "show_gedcom_record();";
+				$submenu = new Menu(GM_LANG_view_gedcom);
+				$submenu->addLink($execute);
 				$menu->addSubmenu($submenu);
 		}
-		if ($ENABLE_CLIPPINGS_CART >= getUserAccessLevel())
-		{
+		if ($ENABLE_CLIPPINGS_CART >= $gm_user->getUserAccessLevel()) {
 				// other / add_to_cart
-				$submenu = new Menu($gm_lang['add_to_cart'], 'clippings.php?action=add&amp;id='.$this->sid.'&amp;type=sour');
-				if (!empty($GM_IMAGES["clippings"]["small"]))
-					$submenu->addIcon("{$GM_IMAGE_DIR}/{$GM_IMAGES['clippings']['small']}");
-				$submenu->addClass("submenuitem{$ff}", "submenuitem_hover{$ff}");
+				$submenu = new Menu(GM_LANG_add_to_cart);
+				$submenu->addLink('clippings.php?action=add&id='.$this->source->xref.'&type=sour');
 				$menu->addSubmenu($submenu);
 		}
-		if ($this->source->canDisplayDetails() && !empty($this->uname))
-		{
+		if ($this->source->disp && !empty($this->uname) && !$this->source->isuserfav) {
 				// other / add_to_my_favorites
-				$submenu = new Menu($gm_lang['add_to_my_favorites'], 'source.php?action=addfav&amp;sid='.$this->sid.'&amp;gid='.$this->sid);
-				$submenu->addIcon("{$GM_IMAGE_DIR}/{$GM_IMAGES['gedcom']['small']}");
-				$submenu->addClass("submenuitem{$ff}", "submenuitem_hover{$ff}");
+				$submenu = new Menu(GM_LANG_add_to_my_favorites);
+				$submenu->addLink('source.php?action=addfav&sid='.$this->source->xref.'&gedid='.GedcomConfig::$GEDCOMID);
 				$menu->addSubmenu($submenu);
 		}
 		return $menu;
 	}
 }
-// -- end of class
-//-- load a user extended class if one exists
-if (file_exists('includes/controllers/source_ctrl_user.php'))
-{
-	include_once 'includes/controllers/source_ctrl_user.php';
-}
-else
-{
-	class SourceController extends SourceControllerRoot
-	{
-	}
-}
-$controller = new SourceController();
-$controller->init();
 ?>

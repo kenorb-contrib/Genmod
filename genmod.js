@@ -2,7 +2,7 @@
  * Common javascript functions
  *
  * Genmod: Genealogy Viewer
- * Copyright (C) 2005 Genmod Development Team
+ * Copyright (C) 2005 - 2007 Genmod Development Team
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,7 +20,7 @@
  *
  * @package Genmod
  * @subpackage Display
- * @version $Id: genmod.js,v 1.23 2006/03/14 21:55:32 roland-d Exp $
+ * @version $Id$
  */
 if (!document.getElementById)	// Check if browser supports the getElementByID function
 {
@@ -77,7 +77,7 @@ function showbox(startpos, layer, boxpid){
 function moveout(layer) {
 	browserName=navigator.appName;
  	if (browserName == "Microsoft Internet Explorer") {
-	 		clearTimeout(windowout);
+		windowout=setTimeout("hidebox('"+layer+"')", 1000);
  	}
  	else {
 		hidebox(layer); 
@@ -93,11 +93,9 @@ function hidebox(layer){
 // IE fix for flickering the box when the mouse is going from link to link
 function keepbox(layer){
 	var keepbox;
+	clearTimeout(windowout);
 	keepbox = document.getElementById('I'+layer+'links');
 	keepbox.style.visibility = 'visible';
-	if (browserName == "Microsoft Internet Explorer") {
-		windowout=setTimeout("moveout('"+layer+"')", 1000);
- 	}
 	return false;
 }
 // Find the horizontal position
@@ -138,13 +136,14 @@ function closeHelp() {
 	if (helpWin) helpWin.close();
 }
 
-function openImage(filename, width, height) {
-		height=height+50;
+function openImage(filename, width, height, checkfile) {
+		checkfile = typeof(checkfile) != 'undefined' ? checkfile : 1;
+		height = 50 + (1*height);
 		screenW = screen.width;
 	 	screenH = screen.height;
 	 	if (width>screenW-100) width=screenW-100;
 	 	if (height>screenH-110) height=screenH-120;
-		if ((filename.search(/\.je?pg$/gi)!=-1)||(filename.search(/\.gif$/gi)!=-1)||(filename.search(/\.png$/gi)!=-1)||(filename.search(/\.bmp$/gi)!=-1)) window.open('imageview.php?filename='+filename,'','top=50,left=50,height='+height+',width='+width+',scrollbars=1,resizable=1');
+		if (checkfile==1) window.open('imageview.php?filename='+filename,'','top=50,left=50,height='+height+',width='+width+',scrollbars=1,resizable=1');
 		else window.open(unescape(filename),'','top=50,left=50,height='+height+',width='+width+',scrollbars=1,resizable=1');
 		return false;
 	}
@@ -162,6 +161,8 @@ function MM_findObj(n, d) { //v4.01
   for(i=0;!x&&d.layers&&i<d.layers.length;i++) x=MM_findObj(n,d.layers[i].document);
   if(!x && d.getElementById) x=d.getElementById(n); return x;
 }
+
+
 
 function MM_showHideLayers() { //v6.0
   var i,p,v,obj,args=MM_showHideLayers.arguments;
@@ -181,7 +182,8 @@ function MM_showHideLayers() { //v6.0
     	if (args[i+1]=='followmouse') {
 	    	pobj = MM_findObj(args[i+3]);
 	    	if (pobj!=null) {
-		    	if (pobj.style.top!="auto") {
+//		    	if (pobj.style.top!="auto") {
+		    	if (pobj.style.top!="auto" && args[i+3]!="relatives") {
 			    	obj.top=5+msY-parseInt(pobj.style.top)+'px';
 			    	if (textDirection=="ltr") obj.left=5+msX-parseInt(pobj.style.left)+'px';
 			    	if (textDirection=="rtl") obj.right=5+msX-parseInt(pobj.style.right)+'px';
@@ -221,30 +223,79 @@ function MM_showHideLayers() { //v6.0
   }
 }
 
+
 var show = false;
-	function togglechildrenbox() {
+	function togglechildrenbox(sid) {
 		if (show) {
-			MM_showHideLayers('childbox', ' ', 'hide',' ');
+			MM_showHideLayers('childbox'+sid, ' ', 'hide',' ');
 			show=false;
 		}
 		else {
-			MM_showHideLayers('childbox', ' ', 'show', ' ');
+			MM_showHideLayers('childbox'+sid, ' ', 'show', ' ');
 			show=true;
 		}
 		return false;
 	}
-
-	function togglefavoritesbox() {
-		favsbox = document.getElementById("favs_popup");
-		if (favsbox) {
-			if (favsbox.style.visibility=="visible") {
-				MM_showHideLayers('favs_popup', ' ', 'hide',' ');
+	
+	var lastfamilybox = "";
+	var popupopen = 0;
+	function show_family_box(boxid, pboxid) {
+		popupopen = 1;
+		lastfamilybox=boxid;
+		if (pboxid=='relatives') MM_showHideLayers('I'+boxid+'links', 'followmouse', 'show',''+pboxid);
+		else {
+			famlinks = document.getElementById("I"+boxid+"links");
+			divbox = document.getElementById("out-"+boxid);
+			parentbox = document.getElementById("box"+boxid);
+			//alert(famlinks+" "+divbox+" "+parentbox);
+			if (famlinks && divbox && parentbox) {
+				famlinks.style.top = "0px";
+				if (textDirection=="ltr") famleft = parseInt(divbox.style.width)+15;
+				else famleft = 0;
+				if (isNaN(famleft)) {
+					famleft = 0;
+					famlinks.style.top = parentbox.offsetTop+"px";
+				}
+				pagewidth = document.documentElement.offsetWidth+document.documentElement.scrollLeft;
+				if (textDirection=="rtl") pagewidth -= document.documentElement.scrollLeft;
+				if (famleft+parseInt(parentbox.style.left) > pagewidth-100) famleft=25;
+				famlinks.style.left = famleft + "px";
+				if (SCRIPT_NAME.indexOf("index.php")!=-1) famlinks.style.left = "100%";
+				MM_showHideLayers('I'+boxid+'links', ' ', 'show',''+pboxid);
+				return;
 			}
-			else {
-				MM_showHideLayers('favs_popup', ' ', 'show', ' ');
-			}
+			MM_showHideLayers('I'+boxid+'links', 'followmouse', 'show',''+pboxid);
 		}
-		return false;
+	}
+
+// Doesn't seem to be used
+//	function togglefavoritesbox() {
+//		favsbox = document.getElementById("favs_popup");
+//		if (favsbox) {
+//			if (favsbox.style.visibility=="visible") {
+//				MM_showHideLayers('favs_popup', ' ', 'hide',' ');
+//			}
+//			else {
+//				MM_showHideLayers('favs_popup', ' ', 'show', ' ');
+//			}
+//		}
+//		return false;
+//	}
+	
+	function hide_family_box(boxid) {
+		MM_showHideLayers('I'+boxid+'links', '', 'hide','');
+		popupopen = 0;
+		lastfamilybox="";
+	}
+	
+	var timeouts = new Array();
+	function family_box_timeout(boxid) {
+		tout = setTimeout("hide_family_box('"+boxid+"')", 2500);
+		timeouts[boxid] = tout;
+	}
+
+	function clear_family_box_timeout(boxid) {
+		clearTimeout(timeouts[boxid]);
 	}
 
 	function expand_layer(sid,show) {
@@ -287,20 +338,20 @@ var show = false;
 		arrows[index].src = tmp;
 	}
 
-function quickEdit(pid, action, change_type) {
-	window.open('edit_quickupdate.php?pid='+pid+'&change_type='+change_type+"&"+sessionname+"="+sessionid+"&action="+action, '', 'top=50,left=50,width=750,height=600,resizable=1,scrollbars=1');
-	return false;
-}
+//function quickEdit(pid, action, change_type) {
+//	window.open('edit_quickupdate.php?pid='+pid+'&change_type='+change_type+"&"+sessionname+"="+sessionid+"&action="+action, '', 'top=50,left=50,width=750,height=600,resizable=1,scrollbars=1');
+//	return false;
+//}
 
 function reply(username, subject) {
 	window.open('message.php?to='+username+'&subject='+subject+"&"+sessionname+"="+sessionid, '', 'top=50,left=50,width=650,height=500,resizable=1,scrollbars=1');
 	return false;
 }
-
-function delete_message(id) {
-	window.open('message.php?action=delete&id='+id+"&"+sessionname+"="+sessionid, '', 'top=50,left=50,width=650,height=500,resizable=1,scrollbars=1');
-	return false;
-}
+// Doesn't seem to be used
+//function delete_message(id) {
+//	window.open('message.php?action=delete&id='+id+"&"+sessionname+"="+sessionid, '', 'top=50,left=50,width=650,height=500,resizable=1,scrollbars=1');
+//	return false;
+//}
 
 function valid_date(datefield) {
 	date = new Date(datefield.value);
@@ -318,6 +369,8 @@ var oldz = 0;
 var oldleft = 0;
 var big = 0;
 var oldboxid = "";
+var oldbstyle = "";
+var oldrandom = 0;
 var oldimgw = 0;
 var oldimgh = 0;
 var oldimgw1 = 0;
@@ -328,36 +381,43 @@ var oldname = 0;
 var oldthumbdisp = 0;
 var repositioned = 0;
 var oldiconsdislpay = 0;
-function expandbox(boxid, bstyle) {
+function expandbox(boxid, bstyle, random) {
+	// NOTE: Check if the box has already been zoomed into
 	if (big==1) {
-		restorebox(oldboxid, bstyle);
-		if (boxid==oldboxid) return true;
+		// This will also close another box if still open
+		restorebox(oldboxid, oldbstyle, oldrandom);
+		if (boxid == oldboxid) return true;
 	}
+	// Set the correct identifiers
+	boxsav = boxid;
+	boxid = boxid+"."+random;
+	boxidparent = boxid;
+
 	url = window.location.toString();
 	divbox = document.getElementById("out-"+boxid);
 	inbox = document.getElementById("inout-"+boxid);
 	inbox2 = document.getElementById("inout2-"+boxid);
-	parentbox = document.getElementById("box"+boxid);
+	parentbox = document.getElementById("box-"+boxidparent);
 	if (!parentbox) {
 		parentbox=divbox;
-	//	if (bstyle!=2) divbox.style.position="absolute";
 	}
 	sex = document.getElementById("box-"+boxid+"-sex");
 	thumb1 = document.getElementById("box-"+boxid+"-thumb");
 	famlinks = document.getElementById("I"+boxid+"links");
 	icons = document.getElementById("icons-"+boxid);
 	iconz = document.getElementById("iconz-"+boxid);	// This is the Zoom icon
-	
 	if (divbox) {
 		if (icons) {
-		oldiconsdislpay = icons.style.display;
-		icons.style.display = "block";
+			oldiconsdislpay = icons.style.display;
+			icons.style.display = "block";
 		}
 		if (iconz) {
 			if (iconz.src==zoominout[0].src) iconz.src = zoominout[1].src;
 			else iconz.src = zoominout[0].src;
 		}
-		oldboxid=boxid;
+		oldboxid=boxsav;
+		oldbstyle=bstyle;
+		oldrandom=random;
 		big = 1;
 		oldheight=divbox.style.height;
 		oldwidth=divbox.style.width;
@@ -367,12 +427,14 @@ function expandbox(boxid, bstyle) {
 			divbox.style.width='350px';
 			diff = 350-parseInt(oldwidth);
 			if (famlinks) {
-				famleft = parseInt(famlinks.style.left);
+				if (famlinks.style.left > 0) famleft = parseInt(famlinks.style.left);
+				else famleft = 0;
 				famlinks.style.left = (famleft+diff)+"px";
 			}
 			//parentbox.style.width = parseInt(parentbox.style.width)+diff;
 		}
 		divleft = parseInt(parentbox.style.left);
+		
 		if (textDirection=="rtl") divleft = parseInt(parentbox.style.right);
 		oldleft=divleft;
 		divleft = divleft - diff;
@@ -381,10 +443,10 @@ function expandbox(boxid, bstyle) {
 			repositioned = 1;
 			divleft=0;
 		}
-		if (url.indexOf("pedigree.php")!=-1) {
-			if (textDirection=="ltr") parentbox.style.left=divleft+"px";
-			else parentbox.style.right=divleft+"px";
-		}
+//		if (url.indexOf("pedigree.php")!=-1) {
+//			if (textDirection=="ltr") parentbox.style.left=divleft+"px";
+//			else parentbox.style.right=divleft+"px";
+//		}
 		divbox.style.height='auto';
 		if (inbox) inbox.style.display='block';
 		if (inbox2) inbox2.style.display='none';
@@ -422,12 +484,21 @@ function expandbox(boxid, bstyle) {
 	}
 	return true;
 }
-function restorebox(boxid, bstyle) {
+function restorebox(boxid, bstyle, random) {
+	// Set the correct identifiers
+	boxidparent = boxid;
+	boxid = boxid+"."+random; 
+
+	// Reset the previous boxid
+	prevboxid = "";
+	prevbstyle = "";
+	prevrandom = "";
+	
 	divbox = document.getElementById("out-"+boxid);
 	inbox = document.getElementById("inout-"+boxid);
 	inbox2 = document.getElementById("inout2-"+boxid);
 	famlinks = document.getElementById("I"+boxid+"links");
-	parentbox = document.getElementById("box"+boxid);
+	parentbox = document.getElementById("box"+boxidparent);
 	if (!parentbox) {
 		parentbox=divbox;
 	}
@@ -596,7 +667,7 @@ function hide_submenu(elementid) {
  */
 function timeout_submenu(elementid) {
 	if (menutimeouts[elementid] == null) {
-		tout = setTimeout("hide_submenu('"+elementid+"')", 500);
+		tout = setTimeout("hide_submenu('"+elementid+"')", 1000);
 		menutimeouts[elementid] = tout;
 	}
 }
@@ -648,7 +719,7 @@ function loadHandler() {
 }
 var IE = document.all?true:false;
 if (!IE) document.captureEvents(Event.MOUSEMOVE|Event.KEYDOWN|Event.KEYUP);
-//document.onmousemove = getMouseXY;
+document.onmousemove = getMouseXY;
 document.onkeyup = checkKeyPressed;
 
 //Highlight image script - START
@@ -873,12 +944,25 @@ var monthLabels = new Array();
   	
   	return false;
   }
-  
+   
 function cal_dateClicked(dateFieldId, dateDivId, year, month, day) {
 cal_setDateField(dateFieldId, year, month, day);
 cal_toggleDate(dateDivId, dateFieldId);
 return false;
 }
+ 
+// Main function to retrieve mouse x-y pos.s
+function getMouseXY(e) {
+  if (IE) { // grab the x-y pos.s if browser is IE
+    msX = event.clientX + document.documentElement.scrollLeft;
+    msY = event.clientY + document.documentElement.scrollTop;
+  } else {  // grab the x-y pos.s if browser is NS
+    msX = e.pageX;
+    msY = e.pageY;
+  }
+  return true;
+}
+  
 
 /**
  * Find links to the following data:
@@ -887,6 +971,7 @@ return false;
  * - Families
  * - Media (These are media filenames)
  * - Object (These are media references e.g. M1)
+ * - Notes
  * - Sources
  * - Repositories
  * - Special characters
@@ -898,12 +983,14 @@ return false;
  * - print_findmedia_link
  * - print_findobject_link
  * - print_findsource_link
+ * - print_findnote_link
  * - print_findrepository_link
  * - print_specialchar_link
 */
-function findIndi(field) {
+function findIndi(field,gedcom) {
      pastefield = field;
-     window.open('find.php?type=indi', '', 'left=50,top=50,width=850,height=450,resizable=1,scrollbars=1');
+	if (!gedcom) gedcom = 0;
+     window.open('find.php?type=indi&gedid='+gedcom, '', 'left=50,top=50,width=850,height=450,resizable=1,scrollbars=1');
      return false;
 }
 
@@ -918,14 +1005,14 @@ function findFamily(field) {
 	window.open('find.php?type=fam', '', 'left=50,top=50,width=850,height=450,resizable=1,scrollbars=1');
 	return false;
 }
+function findMFile(field) {
+	pastefield = field;
+	window.open('find.php?type=file', '', 'left=50,top=50,width=850,height=450,resizable=1,scrollbars=1');
+	return false;
+}
 function findMedia(field) {
 	pastefield = field;
 	window.open('find.php?type=media', '', 'left=50,top=50,width=850,height=450,resizable=1,scrollbars=1');
-	return false;
-}
-function findObject(field) {
-	pastefield = field;
-	window.open('find.php?type=object', '', 'left=50,top=50,width=850,height=450,resizable=1,scrollbars=1');
 	return false;
 }
 function findSource(field) {
@@ -938,162 +1025,52 @@ function findRepository(field) {
 	window.open('find.php?type=repo', '', 'left=50,top=50,width=850,height=450,resizable=1,scrollbars=1');
 	return false;
 }
+function findNote(field) {
+	pastefield = field;
+	window.open('find.php?type=note', '', 'left=50,top=50,width=850,height=450,resizable=1,scrollbars=1');
+	return false;
+}
 function findSpecialChar(field) {
+	language_filter = "";
+	magnify = "";
 	pastefield = field;
-	window.open('find.php?type=specialchar&amp;language_filter='+language_filter+'&amp;magnify='+magnify, '', 'top=55,left=55,scrollbars=1,resizeable=1');
+	window.open('find.php?type=specialchar&amp;language_filter='+language_filter+'&amp;magnify='+magnify, '', 'top=50,left=50,width=850,height=450,scrollbars=1,resizeable=1');
 	return false;
 }
 
 /**
- * Editing links that opens an edit window via edit_interface.php
+ * Change the colour of a specified element
  */
+function ChangeClass(id, newClass) {
+	identity=document.getElementById(id);
+	identity.className=newClass;
+}
 /**
- * Delete
+ * Check all gedcoms for search in search.php
  */
-function deleteperson(pid, change_type) {
-	window.open('edit_interface.php?action=deleteperson&pid='+pid+'&change_type='+change_type+"&"+sessionname+"="+sessionid, '', 'top=50,left=50,width=600,height=500,resizable=1,scrollbars=1');
-	return false;
-}
 
-function delete_family(famid, change_type) {
-	window.open('edit_interface.php?action=deletefamily&famid='+famid+'&change_type='+change_type+"&"+sessionname+"="+sessionid, '', 'top=50,left=50,width=750,height=600,resizable=1,scrollbars=1');
-	return false;
-}
-
-function deletesource(pid, change_type) {
-	 window.open('edit_interface.php?action=deletesource&pid='+pid+'&change_type='+change_type+"&"+sessionname+"="+sessionid, '', 'top=50,left=50,width=600,height=500,resizable=1,scrollbars=1');
-	 return false;
-}
-
-function deleterepository(pid, change_type) {
-	 window.open('edit_interface.php?action=deleterepo&pid='+pid+'&change_type='+change_type+"&"+sessionname+"="+sessionid, '', 'top=50,left=50,width=600,height=500,resizable=1,scrollbars=1');
-	 return false;
-}
-
-function delete_record(pid, fact, change_type, count) {
-	if (!count) count = 1;
-	window.open('edit_interface.php?action=delete&pid='+pid+'&change_type='+change_type+'&fact='+fact+'&count='+count+"&"+sessionname+"="+sessionid, '', 'top=50,left=50,width=600,height=500,resizable=1,scrollbars=1');
-	return false;
-}
-
-/**
- * Reorder
- */
-function reorder_children(famid, change_type) {
-	window.open('edit_interface.php?action=reorder_children&pid='+famid+'&change_type='+change_type+"&"+sessionname+"="+sessionid, '', 'top=50,left=50,width=710,height=500,resizable=1,scrollbars=1');
-	return false;
-}
-
-function reorder_families(pid, change_type) {
-	window.open('edit_interface.php?action=reorder_fams&pid='+pid+'&change_type='+change_type+"&"+sessionname+"="+sessionid, '', 'top=50,left=50,width=710,height=500,resizable=1,scrollbars=1');
-	return false;
-}
-
-function change_family_members(famid, change_type) {
-	window.open('edit_interface.php?action=changefamily&famid='+famid+'&change_type='+change_type+"&"+sessionname+"="+sessionid, '', 'top=50,left=50,width=750,height=600,resizable=1,scrollbars=1');
-	return false;
-}
-
-/**
- * Add
- */
-function add_record(pid, fact, change_type) {
-	factfield = document.getElementById(fact);
-	if (factfield) {
-		factvalue = factfield.options[factfield.selectedIndex].value;
-		if (factvalue.substr(0, 10)=="clipboard_") window.open('edit_interface.php?action=paste&pid='+pid+'&change_type='+change_type+'&fact='+factvalue.substr(10)+"&"+sessionname+"="+sessionid, '', 'top=50,left=50,width=710,height=500,resizable=1,scrollbars=1');
-		else window.open('edit_interface.php?action=add&pid='+pid+'&change_type='+change_type+'&fact='+factvalue+"&"+sessionname+"="+sessionid, '', 'top=50,left=50,width=710,height=500,resizable=1,scrollbars=1');
+function CheckAllGed(master){
+	var checked = master.checked;
+	var col = document.getElementsByTagName('INPUT');
+	for (var i=0;i<col.length;i++) {
+		if (col[i].className == 'checkged') { 
+			col[i].checked = checked;
+		}
 	}
-	return false;
 }
 
-function add_new_record(pid, fact, change_type) {
-	window.open('edit_interface.php?action=add&pid='+pid+'&change_type='+change_type+'&fact='+fact+"&"+sessionname+"="+sessionid, '', 'top=50,left=50,width=710,height=500,resizable=1,scrollbars=1');
-	return false;
+function Urldecode(string) {
+
+ 	var string = decodeURI(string);
+ 	var string = unescape(string);
+	var string = string.replace(/\+/g," ");
+	return string;
 }
 
-function addnewchild(famid, change_type) {
-	window.open('edit_interface.php?action=addchild&famid='+famid+'&change_type='+change_type+"&"+sessionname+"="+sessionid, '', 'top=50,left=50,width=710,height=500,resizable=1,scrollbars=1');
-	return false;
-}
-
-function addnewspouse(famid, famtag, change_type) {
-	window.open('edit_interface.php?action=addspouse&famid='+famid+'&change_type='+change_type+'&famtag='+famtag+"&"+sessionname+"="+sessionid, '', 'top=50,left=50,width=710,height=500,resizable=1,scrollbars=1');
-	return false;
-}
-
-function addspouse(pid, famtag, change_type) {
-	window.open('edit_interface.php?action=addspouse&pid='+pid+'&change_type='+change_type+'&famtag='+famtag+'&famid=new&'+sessionname+"="+sessionid, '', 'top=50,left=50,width=710,height=500,resizable=1,scrollbars=1');
-	return false;
-}
-
-function add_famc(pid, change_type) {
-	 window.open('edit_interface.php?action=addfamlink&pid='+pid+'&change_type='+change_type+'&famtag=CHIL'+"&"+sessionname+"="+sessionid, '', 'top=50,left=50,width=710,height=500,resizable=1,scrollbars=1');
-	return false;
-}
-
-function add_fams(pid, famtag, change_type) {
-	window.open('edit_interface.php?action=addfamlink&pid='+pid+'&change_type='+change_type+'&famtag='+famtag+"&"+sessionname+"="+sessionid, '', 'top=50,left=50,width=710,height=500,resizable=1,scrollbars=1');
-	return false;
-}
-function add_name(pid, change_type) {
-	window.open('edit_interface.php?action=addname&pid='+pid+'&change_type='+change_type+"&"+sessionname+"="+sessionid, '', 'top=50,left=50,width=710,height=500,resizable=1,scrollbars=1');
-	return false;
-}
-
-function addnewparent(pid, famtag, change_type) {
-	window.open('edit_interface.php?action=addnewparent&pid='+pid+'&change_type='+change_type+'&famtag='+famtag+'&famid=new'+"&"+sessionname+"="+sessionid, '', 'top=50,left=50,width=710,height=500,resizable=1,scrollbars=1');
-	return false;
-}
-
-function addnewparentfamily(pid, famtag, famid, change_type) {
-	window.open('edit_interface.php?action=addnewparent&pid='+pid+'&change_type='+change_type+'&famtag='+famtag+'&famid='+famid+"&"+sessionname+"="+sessionid, '', 'top=50,left=50,width=710,height=500,resizable=1,scrollbars=1');
-	return false;
-}
-
-function addnewsource(field, change_type) {
-	pastefield = field;
-	window.open('edit_interface.php?action=addnewsource&pid=newsour&change_type='+change_type, '', 'top=70,left=70,width=600,height=500,resizable=1,scrollbars=1');
-	return false;
-}
-
-function addnewrepository(field, change_type) {
-	pastefield = field;
-	window.open('edit_interface.php?action=addnewrepository&pid=newrepo&change_type='+change_type, '', 'top=70,left=70,width=600,height=500,resizable=1,scrollbars=1');
-	return false;
-}
-
-/**
- * Edit
- */
-function edit_record(pid, fact, count, change_type) {
-	window.open('edit_interface.php?action=edit&pid='+pid+'&fact='+fact+'&count='+count+'&change_type='+change_type+"&"+sessionname+"="+sessionid, '', 'top=50,left=50,width=900,height=650,resizable=1,scrollbars=1');
-	return false;
-}
-
-function edit_raw(pid, change_type) {
-	window.open('edit_interface.php?action=editraw&pid='+pid+'&change_type='+change_type+"&"+sessionname+"="+sessionid, '', 'top=50,left=50,width=710,height=550,resizable=1,scrollbars=1');
-	return false;
-}
-
-function edit_name(pid, fact, count, change_type) {
-	if (!count) count = 1;
-	window.open('edit_interface.php?action=editname&pid='+pid+'&fact='+fact+'&count='+count+'&change_type='+change_type+"&"+sessionname+"="+sessionid, '', 'top=50,left=50,width=710,height=500,resizable=1,scrollbars=1');
-	return false;
-}
-
-/**
- * Copy
-*/
-function copy_record(pid, fact, count, change_type) {
-	window.open('edit_interface.php?action=copy&pid='+pid+'&fact='+fact+'&count='+count+'&change_type='+change_type+"&"+sessionname+"="+sessionid, '', 'top=50,left=50,width=710,height=500,resizable=1,scrollbars=1');
-	return false;
-}
-
-/**
- * Link
- */
-function linkspouse(pid, famtag, change_type) {
-	window.open('edit_interface.php?action=linkspouse&pid='+pid+'&change_type='+change_type+'&famtag='+famtag+'&famid=new&'+sessionname+"="+sessionid, '', 'top=50,left=50,width=710,height=500,resizable=1,scrollbars=1');
+function SetBoxSize(add) {
+	var a=Number(document.getElementById('box_width').value); 
+	a+=add;
+	if(a<50||isNaN(a)) a=50; 
+	document.getElementById('box_width').value=a;
 	return false;
 }

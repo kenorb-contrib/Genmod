@@ -3,7 +3,7 @@
  * Display a diff between two language files to help in translating.
  *
  * Genmod: Genealogy Viewer
- * Copyright (C) 2005 Genmod Development Team
+ * Copyright (C) 2005 = 2007 Genmod Development Team
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,65 +21,16 @@
  *
  * @package Genmod
  * @subpackage Languages
- * @version $Id: editlang.php,v 1.11 2006/02/27 22:07:26 roland-d Exp $
+ * @version $Id$
  */
 
-/**
- * Inclusion of the configuration file
-*/
 require "config.php";
 
-/**
- * Inclusion of the language files
-*/
-if (file_exists($GM_BASE_DIRECTORY . $confighelpfile[$LANGUAGE])) require $GM_BASE_DIRECTORY . $confighelpfile[$LANGUAGE];
+$el_controller = new EditLangController();
 
+PrintHeader($el_controller->pagetitle);
 
-
-/**
- * Inclusion of the language editing functions
-*/
-require $GM_BASE_DIRECTORY . "includes/functions_editlang.php";
-
-if (!isset($action)) $action="";
-if (!isset($hide_translated)) $hide_translated=false;
-if (!isset($language2)) $language2 = $LANGUAGE;
-if (!isset($file_type)) $file_type = "lang";
-if (!isset($language1)) $language1 = "english";
-$lang_shortcut = $language_settings[$language2]["lang_short_cut"];
-
-//-- make sure that they have admin status before they can use this page
-//-- otherwise have them login again
-$uname = $gm_username;
-if (empty($uname)) {
-	header("Location: login.php?url=editlang.php");
-	exit;
-}
-
-switch ($action){
-  case "edit": 
-  	print_header($gm_lang["edit_lang_utility"]);
-	break;
-  case "export": 
-  	print_header($gm_lang["export_lang_utility"]);
-	break;
-  case "compare": 
-  	print_header($gm_lang["compare_lang_utility"]); 
-	break;
-  default	: 
-  	print_header($gm_lang["edit_langdiff"]); 
-	break;
-}
-if (isset($execute) && $action == "debug") {
-	if (isset($_POST["DEBUG_LANG"])) $_SESSION["DEBUG_LANG"] = $_POST["DEBUG_LANG"];
-	else $_SESSION["DEBUG_LANG"] = "no";
-	$DEBUG_LANG = $_SESSION["DEBUG_LANG"];
-}
-
-$QUERY_STRING = preg_replace("/&amp;/", "&", $QUERY_STRING);
-$QUERY_STRING = preg_replace("/&&/", "&", $QUERY_STRING);
-if (strpos($QUERY_STRING,"&dv="))$QUERY_STRING = substr($QUERY_STRING,0,strpos($QUERY_STRING,"&dv="));
-
+// Print the JS for the pages
 print "<script language=\"JavaScript\" type=\"text/javascript\">\n";
 print "<!--\n";
 print "var helpWin;\n";
@@ -89,618 +40,465 @@ print "else helpWin.location = 'editlang_edit.php?' + which;\n";
 print "return false;\n";
 print "}\n";
 print "function showchanges(which2) {\n";
-print "\twindow.location = '$SCRIPT_NAME?$QUERY_STRING'+which2;\n";
+print "\twindow.location = '".$_SERVER['SCRIPT_NAME']."?".$el_controller->query_string."'+which2;\n";
 print "}\n";
 print "//-->\n";
 print "</script>\n";
 
-print "<div class=\"center\">";
-
-// Sort the Language table into localized language name order
-foreach ($gm_language as $key => $value){
-	$d_LangName = "lang_name_".$key;
-	$Sorted_Langs[$key] = $gm_lang[$d_LangName];
-}
-asort($Sorted_Langs);
-
-/* Language File Edit Mask */
-
-switch ($action) {
-     case "loadenglish" :
-          print "<table class=\"center $TEXT_DIRECTION\">";
-		print "<tr><td class=\"topbottombar\" colspan=\"2\">";
-		print $gm_lang["load_english"];
-		print "</td></tr>";		
-		print "<tr><td class=\"shade1 center\">";
-		if (storeEnglish()) {
-               loadEnglish();
-               WriteToLog($gm_lang["english_loaded"]);
-               print $gm_lang["english_loaded"];
-          }
-          else {
-               loadEnglish();
-               WriteToLog($gm_lang["english_not_loaded"], "E", "S");
-               print $gm_lang["english_not_loaded"];
-		}
-		print "</td></tr>";
-		print  "<tr><td class=\"center\"><a href=\"editlang.php\"><b>";
-		print $gm_lang["lang_back"];
-		print "</b></a></td></tr></table><br />";                         
-		print "<a href=\"editlang.php\">".$gm_lang["lang_back"]."</a>";
+?>
+<!-- Setup the left box -->
+<div id="admin_genmod_left">
+	<div class="admin_link"><a href="admin.php"><?php print GM_LANG_admin;?></a></div>
+	<?php
+	if ($el_controller->action != "") print "<div class=\"admin_link\"><a href=\"editlang.php\">".GM_LANG_translator_tools."</a></div>";
+	?>
+</div>
+<div id="content">
+<?php
+switch ($el_controller->action) {
+	case 'debug':
+		?>
+		<form name="debug_form" method="post" action="editlang.php">
+		<input type="hidden" name="page" value="editlang" />
+		<input type="hidden" name="action" value="debug" />
+		<input type="hidden" name="execute" value="true" />
+		<div class="admin_topbottombar">
+			<?php print GM_LANG_lang_debug; ?>
+		</div>
+		<div class="admin_item_box">
+			<div class="choice_left">
+				<input type="checkbox" name="DEBUG_LANG" value="yes" 
+				<?php
+				if (isset($_SESSION["DEBUG_LANG"])) {
+					if (($_SESSION["DEBUG_LANG"]) == "yes") print "checked=\"checked\"";
+				}
+				?>
+				/>
+				<?php print GM_LANG_lang_debug_use?>&nbsp;&nbsp;
+			</div>
+			<div class="choice_middle">
+				<input  type="submit" value="<?php print GM_LANG_save;?>" />
+			</div>
+		</div>
+		</form>
+		<?php
 		break;
-	case "bom" :
-		print "<table class=\"center $TEXT_DIRECTION\">";
-		print "<tr><td class=\"topbottombar\" colspan=\"2\">";
-		print $gm_lang["bom_check"];
-		print "</td></tr>";		
-		print "<tr><td class=\"shade1 center\">";
-		check_bom();
-		print "</td></tr>";
-		print  "<tr><td class=\"center\"><a href=\"editlang.php\"><b>";
-		print $gm_lang["lang_back"];
-		print "</b></a></td></tr></table><br />";
-		break;
-	case "edit" :
-		print "<form name=\"choose_form\" method=\"get\" action=\"$SCRIPT_NAME\">";
-		print "<input type=\"hidden\" name=\"action\" value=\"edit\" />";
-		print "<input type=\"hidden\" name=\"execute\" value=\"true\" />";
-		print "<table class=\"center $TEXT_DIRECTION\">";
-		print "<tr><td class=\"topbottombar\" colspan=\"4\">";
-		print $gm_lang["edit_lang_utility"];
-		print "</td></tr>";		
-		print "<tr>";
-		print "<td class=\"shade1\">";
-		print_help_link("language_to_edit_help", "qm", "language_to_edit");
-		print $gm_lang["language_to_edit"];
-		print ":";
-		print "<br />";
-		print "<select name=\"language2\">";
-		foreach ($Sorted_Langs as $key => $value){
-			print "\n\t\t\t<option value=\"$key\"";
-			if ($key == $language2) print " selected=\"selected\"";
-			print ">".$gm_lang["lang_name_".$key]."</option>";
-		}
-		print "</select>";
-		print "</td>";
-		print "<td class=\"shade1\">";
-		print_help_link("file_to_edit_help", "qm", "file_to_edit");
-		print $gm_lang["file_to_edit"].":";
-		print "<br />";
-		print "<select name=\"file_type\">";
-		print "\n\t\t\t<option value=\"lang\"";
-		if ($file_type == "lang") print " selected=\"selected\"";
-		print ">"."Main texts"."</option>";
-		
-		print "\n\t\t\t<option value=\"help_text\"";
-		if ($file_type == "help_text") print " selected=\"selected\"";
-		print ">" . "Help texts" . "</option>";
-		
-		print "\n\t\t\t<option value=\"facts\"";
-		if ($file_type == "facts") print " selected=\"selected\"";
-		print ">" . "Facts" . "</option>";
-		print "</select>";
-		print "</td>";
-		
-		print "<td class=\"shade1\">";
-		print_help_link("hide_translated_help", "qm", "hide_translated");
-		print $gm_lang["hide_translated"];
-		print ":";
-		print "<br />";
-		print "<select name=\"hide_translated\">";
-		print "<option";
-		if (!$hide_translated) print " selected=\"selected\"";
-		print " value=\"";
-		print "0";
-		print "\">";
-		print $gm_lang["no"];
-		print "</option>";
-		print "<option";
-		if ($hide_translated) print " selected=\"selected\"";
-		print " value=\"";
-		print "1";
-		print "\">";
-		print $gm_lang["yes"];
-		print "</option>";
-		print "</select>";
-		print "</td>";
-		print "<td class=\"shade1\" style=\"text-align: center; \">";
-		print "<input type=\"submit\" value=\"" . $gm_lang["edit"] . "\" />";
-		print "</td>";
-		print "</tr>";
-		print  "<tr><td class=\"center\" colspan=\"4\"><a href=\"editlang.php\"><b>";
-		print $gm_lang["lang_back"];
-		print "</b></a></td></tr>";
-		print "</table><br />";
-		print "</form>";
-		if (isset($execute)) {
-			print "<table class=\"center $TEXT_DIRECTION\" style=\"width:70%; \">";
-			print "<tr><td class=\"topbottombar\" colspan=\"2\"><span class=\"subheaders\">" . $gm_lang["listing"] . ": \"";
-			switch ($file_type) {
+	case 'edit':
+		?>
+		<form name="choose_form" method="get" action="<?php print $_SERVER['SCRIPT_NAME']; ?>">
+			<input type="hidden" name="page" value="editlang" />
+			<input type="hidden" name="action" value="edit" />
+			<input type="hidden" name="execute" value="true" />
+			<div class="admin_topbottombar">
+				<?php print GM_LANG_edit_lang_utility; ?>
+			</div>
+			<div class="admin_item_box">
+				<div class="width30 choice_left">
+					<div class="helpicon">
+						<?php PrintHelpLink("language_to_edit_help", "qm", "language_to_edit");?>
+					</div>
+					<div class="description">
+						<?php
+						print GM_LANG_language_to_edit."<br />";
+						print "<select name=\"language2\">";
+						foreach ($el_controller->sorted_langs as $key => $value){
+							print "\n\t\t\t<option value=\"$key\"";
+							if ($key == $el_controller->language2) print " selected=\"selected\"";
+							print ">".constant("GM_LANG_lang_name_".$key)."</option>";
+						}
+						?>
+						</select>
+					</div>
+				</div>
+				<div class="width30 choice_middle">
+					<div class="helpicon">
+						<?php PrintHelpLink("file_to_edit_help", "qm", "file_to_edit");?>
+					</div>
+					<div class="description">
+						<?php
+						print GM_LANG_file_to_edit."<br />";
+						print "<select name=\"file_type\">";
+						print "\n\t\t\t<option value=\"lang\"";
+						if ($el_controller->file_type == "lang") print " selected=\"selected\"";
+						print ">".GM_LANG_comparing_main."</option>";
+						
+						print "\n\t\t\t<option value=\"help_text\"";
+						if ($el_controller->file_type == "help_text") print " selected=\"selected\"";
+						print ">" . GM_LANG_comparing_helptext . "</option>";
+						
+						print "\n\t\t\t<option value=\"facts\"";
+						if ($el_controller->file_type == "facts") print " selected=\"selected\"";
+						print ">" . GM_LANG_comparing_facts . "</option>";
+						?>
+						</select>
+					</div>
+				</div>
+				<div class="width30 choice_middle">
+					<div class="helpicon">
+						<?php PrintHelpLink("hide_translated_help", "qm", "hide_translated");?>
+					</div>
+					<div class="description">
+						<?php
+						print GM_LANG_hide_translated."<br />";
+						print "<select name=\"hide_translated\">";
+						print "<option";
+						if (!$el_controller->hide_translated) print " selected=\"selected\"";
+						print " value=\"";
+						print "0";
+						print "\">";
+						print GM_LANG_no;
+						print "</option>";
+						print "<option";
+						if ($el_controller->hide_translated) print " selected=\"selected\"";
+						print " value=\"";
+						print "1";
+						print "\">";
+						print GM_LANG_yes;
+						print "</option>";
+						?>
+						</select>
+					</div>
+				</div>
+			</div>
+			<div class="admin_item_box">
+				<div class="center">
+					<input  type="submit" value="<?php print GM_LANG_edit;?>" />
+				</div>
+			</div>
+		</form>
+		<?php
+		if ($el_controller->execute) {
+			?>
+			<div class="topbottombar subheaders"><?php print GM_LANG_listing;?>: "
+			<?php
+			switch ($el_controller->file_type) {
 				case "lang":
-					print $gm_lang["lang_name_english"] . "\" ";
-					print $gm_lang["and"] . " \"";
-					print $gm_lang["lang_name_".$language2];
-					// read the english lang.en.php file into array
+					print constant("GM_LANG_lang_name_english") . "\" ";
+					print GM_LANG_and . " \"";
+					print constant("GM_LANG_lang_name_".$el_controller->language2);
+					// read the english lang.en.txt file into array
 					$english_language_array = array();
-					$english_language_array = loadEnglish(true);
-					// read the chosen lang.xx.php file into array
+					$english_language_array = LanguageFunctions::LoadEnglish(true,false,false);
+					// read the chosen lang.xx.txt file into array
 					$new_language_array = array();
-					$new_language_array = loadLanguage($language2, true);
+					$new_language_array = LanguageFunctions::LoadLanguage($el_controller->language2, true);
 					break;
 				case "help_text":
-		      		print $helptextfile["english"]."\" ";
-					print $gm_lang["and"] . " \"";
-					print $gm_lang["lang_name_".$language2];
-					// read the english lang.en.php file into array
+					print constant("GM_LANG_lang_name_english") . "\" ";
+					print GM_LANG_and . " \"";
+					print constant("GM_LANG_lang_name_".$el_controller->language2);
+					// read the english lang.en.txt file into array
 					$english_language_array = array();
-					$english_language_array = loadEnglish(true, true);
-					// read the chosen lang.xx.php file into array
+					$english_language_array = LanguageFunctions::LoadEnglish(true, true);
+					// read the chosen lang.xx.txt file into array
 					$new_language_array = array();
-					$new_language_array = loadLanguage($language2, true, true);
+					$new_language_array = LanguageFunctions::LoadLanguage($el_controller->language2, true, true);
 					break;
 				case "facts":
-		      		print $factsfile["english"]."\" ";
-					print $gm_lang["and"] . " \"";
-					print $factsfile[$language2];
-					// read the english lang.en.php file into array
+					print constant("GM_LANG_lang_name_english") . "\" ";
+					print GM_LANG_and . " \"";
+					print constant("GM_LANG_lang_name_".$el_controller->language2);
+					// read the english lang.en.txt file into array
 					$english_language_array = array();
-					$english_language_array = read_complete_file_into_array($factsfile["english"], "factarray[");
-					// read the chosen lang.xx.php file into array
+					$english_language_array = LanguageFunctions::LoadEnglishFacts(true);
+					// read the chosen lang.xx.txt file into array
 					$new_language_array = array();
-					$new_language_array = read_complete_file_into_array($factsfile[$language2], "factarray[");
+					$new_language_array = AdminFunctions::LoadFacts($el_controller->language2);
 					break;					
 			}
-			print "\"</span><br /><br />\n";
-			print "<span class=\"subheaders\">" . $gm_lang["contents"] . ":</span></td></tr>";
+			print "\"<br />\n";
+			print GM_LANG_contents . ":</div>";
 			$lastfound = (-1);
 			$counter = 0;
+			$colorid = 1;
 			foreach ($english_language_array as $string => $value) {
-				$dummy_output = "";
-				$dummy_output .= "<tr>";
-				$dummy_output .= "<td class=\"facts_label\" rowspan=\"2\" dir=\"ltr\">";
+//				print '<div class="language_item_box'.$colorid.'">';
+				$dummy_output = "<div class=\"language_item_box".$colorid."\">";
+				$dummy_output .= "<div class=\"original_language\">";
 				$dummy_output .= $string;
-				$dummy_output .= "</td>\n";
-				$dummy_output .= "<td class=\"shade1 wrap\">";
+				$dummy_output .= "</div>\n";
+				$dummy_output .= "<div class=\"translated_language\">";
 				$dummy_output .= "\n<a name=\"a1_".$counter."\"></a>\n";
-				if (stripslashes(mask_all($value)) == "") {
-					$dummy_output .= "<strong style=\"color: #FF0000\">" . str_replace("#LANGUAGE_FILE#", $gm_language[$language1], $gm_lang["message_empty_warning"]) . "</strong>";
+				
+				$val = stripslashes(AdminFunctions::Mask_all($value));
+				if ($val == "") {
+					$dummy_output .= "<strong style=\"color: #FF0000\">" . str_replace("#LANGUAGE_FILE#", $gm_language[$el_controller->language1], GM_LANG_message_empty_warning) . "</strong>";
 				}
-				else $dummy_output .= "<i>" . stripslashes(mask_all($value)) . "</i>";
-				$dummy_output .= "</td>";
-				$dummy_output .= "</tr>\n";
-				$dummy_output_02 = "";
-				$dummy_output_02 .= "<tr>\n";
-				$dummy_output_02 .= "<td class=\"shade1 wrap\">";
-				$found = false;
+				else $dummy_output .= "<i>" . $val . "</i>";
+				$dummy_output .= '</div>';
+				$dummy_output .= "<div class=\"original_language\">";
+				$dummy_output .= "&nbsp;";
+				$dummy_output .= "</div>";
+				$dummy_output .= "<div class=\"translated_language\">";
 				$new_counter = 0;
-				foreach ($new_language_array as $new_string => $new_value) {
-					if (strlen(trim($new_value)) != 0) {
-						if ($new_string == $string) {
-				        		$dDummy =  $new_value;
-				        		$dummy_output_02 .= "<a href=\"#\" onclick=\"return helpPopup00('" . "ls01=" . $string . "&amp;ls02=" . $new_string . "&amp;language2=" . $language2 . "&amp;file_type=" . $file_type . "&amp;" . session_name() . "=" . session_id() . "&amp;anchor=a1_" . $counter . "');\">";
-				        		$dummy_output_02 .= stripslashes(mask_all($dDummy));
-				        		if (stripslashes(mask_all($dDummy)) == "") {
-				          		$dummy_output_02 .= "<strong style=\"color: #FF0000\">" . str_replace("#LANGUAGE_FILE#", $gm_language[$language2], $gm_lang["message_empty_warning"]) . "</strong>";
-				        		}
-				        		$dummy_output_02 .= "</a>";
-				        		$found = true;
-				        		$lastfound = $new_counter;
-				        		break;
-				      	}
-				    	}
-					$new_counter++;
+				$found = false;
+				// NOTE: Get the translated text
+				if (isset($new_language_array[$string])) {
+					$dDummy =  $new_language_array[trim($string)];
+					$dummy_output .= "<a href=\"#\" onclick=\"return helpPopup00('" . "ls01=" . $string . "&amp;ls02=" . $string . "&amp;language2=" . $el_controller->language2 . "&amp;file_type=" . $el_controller->file_type . "&amp;" . session_name() . "=" . session_id() . "&amp;anchor=a1_" . $counter . "');\">";
+					$dum = stripslashes(AdminFunctions::Mask_all($dDummy));
+					$dummy_output .= $dum;
+					if ($dum == "") {
+						$dummy_output .= "<strong style=\"color: #FF0000\">" . str_replace("#LANGUAGE_FILE#", $gm_language[$el_controller->language2], GM_LANG_message_empty_warning) . "</strong>";
+					}
+					$dummy_output .= "</a>";
+					$lastfound = $new_counter;
+					$found = true;
 				}
-				if ((($hide_translated) and (!$found)) or (!$hide_translated)) {
+				else {
+					$dummy_output .= "<a style=\"color: #FF0000\" href=\"#\" onclick=\"return helpPopup00('" . "ls01=" . $string . "&amp;ls02=" . (0 - intval($lastfound) - 1) . "&amp;language2=" . $el_controller->language2 . "&amp;file_type=" . $el_controller->file_type . "&amp;anchor=a1_" . $counter . "');\">";
+					$dummy_output .= "<i>";
+					if ($val == "") $dummy_output .= "&nbsp;";
+					else $dummy_output .= $val;
+					$dummy_output .= "</i></a>";
+				}
+				$new_counter++;
+				
+				$dummy_output .= "</div></div>";
+				if (!$el_controller->hide_translated) {
 					print $dummy_output;
-					print $dummy_output_02;
-					if (!$found) {
-						print "<a style=\"color: #FF0000\" href=\"#\" onclick=\"return helpPopup00('" . "ls01=" . $string . "&amp;ls02=" . (0 - intval($lastfound) - 1) . "&amp;language2=" . $language2 . "&amp;file_type=" . $file_type . "&amp;anchor=a1_" . $counter . "');\">";
-						print "<i>";
-						if (stripslashes(mask_all($value)) == "") print "&nbsp;";
-						else print stripslashes(mask_all($value));
-						print "</i>";
-						print "</a>";
-				  	}
-					print "</td>";
-					print "</tr>\n";
+					if ($colorid == 2) $colorid = 1;
+					else $colorid++;
+				}
+				// NOTE: Print the untranslated strings
+				else if ($el_controller->hide_translated && !$found) {
+					print $dummy_output;
+					if ($colorid == 2) $colorid = 1;
+					else $colorid++;
 				}
 				$counter++;
+//				print '</div>';
 			}
-			print "</table><br />";
 		}
 		break;
-	case "debug" :
-		print "<form name=\"debug_form\" method=\"post\" action=\"editlang.php\">";
-		print "<input type=\"hidden\" name=\"action\" value=\"debug\" />";
-		print "<input type=\"hidden\" name=\"execute\" value=\"true\" />";
-		print "<table class=\"center $TEXT_DIRECTION\">";
-		print "<tr><td class=\"topbottombar\" colspan=\"3\">";
-		print $gm_lang["lang_debug"];
-		print "</td></tr>";				
-		print "<tr>";
-		print "<td class=\"shade1\" >";
-		print "<input type=\"checkbox\" name=\"DEBUG_LANG\" value=\"yes\" ";
-		if (isset($_SESSION["DEBUG_LANG"])) {
-			if (($_SESSION["DEBUG_LANG"]) == "yes") print "checked=\"checked\"";
-		}
-		print " />";
-		print $gm_lang["lang_debug_use"]."&nbsp;&nbsp;</td>";
-		print "<td class=\"shade1\" align=\"center\" ><input type=\"submit\" value=\"".$gm_lang["save"]."\" />";
-		print "</td>";
-		print "</tr>";
-		print  "<tr><td class=\"center\" colspan=\"4\"><a href=\"editlang.php\"><b>";
-		print $gm_lang["lang_back"];
-		print "</b></a></td></tr>";
-		print "</table><br />";
-		print "</form>";
-		break;
-	case "export" :
-		print "<form name=\"export_form\" method=\"get\" action=\"$SCRIPT_NAME\">";
-		print "<input type=\"hidden\" name=\"action\" value=\"export\" />";
-		print "<input type=\"hidden\" name=\"execute\" value=\"true\" />";
-		print "<table class=\"center $TEXT_DIRECTION\">";
-		print "<tr><td class=\"topbottombar\" colspan=\"3\">";
-		print $gm_lang["export_lang_utility"];
-		print "</td></tr>";
-		print "<tr>";
-		print "<td class=\"shade1\">";
-		print_help_link("language_to_export_help", "qm", "language_to_export");
-		print $gm_lang["language_to_export"];
-		print ":";
-		print "<br />";
-		print "<select name=\"language2\">";
-		foreach ($Sorted_Langs as $key => $value){
-			print "\n\t\t\t<option value=\"$key\"";
-			if ($key == $language2) print " selected=\"selected\"";
-			print ">".$gm_lang["lang_name_".$key]."</option>";
-		}
-		print "</select>";
-		print "</td>";
-		
-		print "<td class=\"shade1\" style=\"text-align: center; \">";
-		print "<input type=\"submit\" value=\"" . $gm_lang["export"] . "\" />";
-		print "</td></tr>";
-		print  "<tr><td class=\"center\" colspan=\"4\"><a href=\"editlang.php\"><b>";
-		print $gm_lang["lang_back"];
-		print "</b></a></td></tr>";
-		print "</table><br /></form>";
-          if (isset($execute)) {
-               $data = "";
-	          $data_help = "";
-               $storelang = loadLanguage($language2, true) + loadLanguage($language2, true, true);
-               foreach($storelang as $string => $value) {
-          		if (stristr($string, "_help")) $data_help .= "\"".$string."\";\"".$value."\"\r\n";
-          		else $data .= "\"".$string."\";\"".$value."\"\r\n";
-          	}
-          	if (!$handle = fopen("languages/lang.".$lang_shortcut.".txt", "w")) {
-                    print str_replace("#lang_filename#", "languages/lang.".$lang_shortcut.".txt", $gm_lang["no_open"])."<br />";
-                    WriteToLog("Can't open file languages/lang.".$lang_shortcut.".txt", "E", "S");
-               }
-               else {
-                    if (fwrite($handle, $data)) {
-                         WriteToLog($gm_lang["editlang_lang_export_success"], "I", "S");
-                         print $gm_lang["editlang_lang_export_success"]."<br />";
-                    }
-     	          else {
-                         WriteToLog($gm_lang["editlang_lang_export_no_success"], "E", "S");
-                         print $gm_lang["editlang_lang_export_success"]."<br />";
-                    }
-               	fclose($handle);            
-               }
-	          if (!$handle_help = fopen("languages/help_text.".$lang_shortcut.".txt", "w")) {
-	               print str_replace("#lang_filename#", "languages/help_text.".$lang_shortcut.".txt", $gm_lang["no_open"])."<br />";
-                    WriteToLog("Can't open file languages/help_text.".$lang_shortcut.".txt", "E", "S");
-               }
-	          else {
-               	if (fwrite($handle_help, $data_help)) {
-               	     WriteToLog($gm_lang["editlang_help_export_success"], "I", "S");
-                         print $gm_lang["editlang_help_export_success"]."<br />";
-                    }
-               	else {
-                         WriteToLog($gm_lang["editlang_help_no_export_success"], "E", "S");
-                         print $gm_lang["editlang_lang_export_success"]."<br />";
-                    }
-               	fclose($handle_help);
-               }
-          }
-		break;
-	case "compare" :
-		print "<form name=\"langdiff_form\" method=\"get\" action=\"$SCRIPT_NAME\">";
-		print "<input type=\"hidden\" name=\"action\" value=\"compare\" />";
-		print "<input type=\"hidden\" name=\"execute\" value=\"true\" />";
-		print "<table class=\"center $TEXT_DIRECTION\">";
-		print "<tr><td class=\"topbottombar\" colspan=\"3\">";
-		print $gm_lang["compare_lang_utility"];
-	     print "</td></tr>";
-		print "<tr>";
-		print "<td class=\"shade1\">";
-		print $gm_lang["new_language"];
-		print ":";
-		print_help_link("new_language_help", "qm");
-		print "<br />";
-		print "<select name=\"language1\">";
-		foreach ($Sorted_Langs as $key => $value){
-			print "\n\t\t\t<option value=\"$key\"";
-			if ($key == $language1) print " selected=\"selected\"";
-			print ">".$gm_lang["lang_name_".$key]."</option>";
-		}
-		print "</select>";
-		print "</td>";
-		print "<td class=\"shade1\">";
-		print $gm_lang["old_language"];
-		print ":";
-		print_help_link("old_language_help", "qm");
-		print "<br />";
-		print "<select name=\"language2\">";
-		foreach ($Sorted_Langs as $key => $value){
-			print "\n\t\t\t<option value=\"$key\"";
-			if ($key == $language2) print " selected=\"selected\"";
-			print ">".$gm_lang["lang_name_".$key]."</option>";
-		}
-		print "</select>";
-		print "</td>";
-
-		print "<td class=\"shade1 center\">";
-		print "<input type=\"submit\" value=\"" . $gm_lang["compare"] . "\" />";
-		print "</td>";
-		print "</tr>";
-	     print  "<tr><td class=\"center\" colspan=\"4\"><a href=\"editlang.php\"><b>";
-	     print $gm_lang["lang_back"];
-	     print "</b></a></td></tr>";
-		print "</table>";
-		print "</form>";
-          if (isset($execute)) {
-               $d_gm_lang["comparing"] = $gm_lang["comparing"];
-               $d_gm_lang["no_additions"] = $gm_lang["no_additions"];
-               $d_gm_lang["additions"] = $gm_lang["additions"];
-               $d_gm_lang["subtractions"] = $gm_lang["subtractions"];
-               $d_gm_lang["no_subtractions"] = $gm_lang["no_subtractions"];
-
-               $lang1 = loadLanguage($language1, true);
-               $lang2 = loadLanguage($language2, true);
-		     print "<br /><span class=\"subheaders\">".$d_gm_lang["comparing"]."<br />\"".$gm_language[$language1]."\" <---> \"".$gm_language[$language2]."\"</span><br /><br />\n";
-               print "<span class=\"subheaders\">".$d_gm_lang["additions"].":</span><table class=\"center $TEXT_DIRECTION\">\n";
-
-               if (file_exists($GM_BASE_DIRECTORY.$gm_language[$language2])) require $GM_BASE_DIRECTORY.$gm_language[$language2];
-		     $count=0;
-		     foreach($lang1 as $key=>$value) {
-                    if (!array_key_exists($key, $lang2)) {
-                         print "<tr><td class=\"facts_label\">\$gm_lang[\"$key\"]</td>\n";
-                         print "<td class=\"shade1 wrap\">\"$value\";</td></tr>\n";
-                         $count++;
-		          }
-               }
-               if ($count==0) {
-                    print "<tr><td colspan=\"2\" class=\"shade1\">".$d_gm_lang["no_additions"]."</td></tr>\n";
-               }
-               print "</table><br /><br />\n";
-               print "<span class=\"subheaders\">".$d_gm_lang["subtractions"].":</span><table class=\"facts_table $TEXT_DIRECTION\">\n";
-               $count=0;
-               foreach($lang2 as $key=>$value) {
-                    if (!array_key_exists($key, $lang1)) {
-                         print "<tr><td class=\"facts_label\">\$gm_lang[\"$key\"]</td>\n";
-                         print "<td class=\"shade1 wrap\">\"$value\";</td></tr>\n";
-                         $count++;
-                    }
-               }
-               if ($count==0) {
-                    print "<tr><td colspan=\"2\" class=\"shade1\">".$d_gm_lang["no_subtractions"]."</td></tr>\n";
-               }
-               print "</table><br /><br />\n";
-
-               print "<img src=\"".$GM_IMAGE_DIR."/".$GM_IMAGES["hline"]["other"]."\" width=\"100%\" height=\"6\" alt=\"\" /><br />\n";
-               print "<span class=\"subheaders\">".$d_gm_lang["comparing"]."<br />\"".$factsfile[$language1]."\" <---> \"".$factsfile[$language2]."\"<br /><br /></span>\n";
-               $factsarray=array();
-               require $GM_BASE_DIRECTORY.$factsfile[$language1];
-               $lang1 = $factarray;
-               $factarray=array();
-               if (file_exists($GM_BASE_DIRECTORY.$factsfile[$language2])) require $GM_BASE_DIRECTORY.$factsfile[$language2];
-               print "<span class=\"subheaders\">".$d_gm_lang["additions"].":</span><table class=\"facts_table $TEXT_DIRECTION\">\n";
-               $count=0;
-               foreach($lang1 as $key=>$value) {
-                    if (!array_key_exists($key, $factarray)) {
-     		      	print "<tr><td class=\"facts_label\">\$factarray[\"$key\"]</td>\n";
-     		      	print "<td class=\"shade1 wrap\">\"$value\";</td></tr>\n";
-     		      	$count++;
-                    }
-               }
-               if ($count==0) {
-                    print "<tr><td colspan=\"2\" class=\"shade1\">".$d_gm_lang["no_additions"]."</td></tr>\n";
-               }
-               print "</table><br /><br />\n";
-               print "<span class=\"subheaders\">".$d_gm_lang["subtractions"].":</span><table class=\"facts_table $TEXT_DIRECTION\">\n";
-               $count=0;
-               foreach($factarray as $key=>$value) {
-                    if (!array_key_exists($key, $lang1)) {
-     		      	print "<tr><td class=\"facts_label\">\$gm_lang[\"$key\"]</td>\n";
-     		      	print "<td class=\"shade1 wrap\">\"$value\";</td></tr>\n";
-     		      	$count++;
-                    }
-               }
-               if ($count==0) {
-                    print "<tr><td colspan=\"2\" class=\"shade1\">".$d_gm_lang["no_subtractions"]."</td></tr>\n";
-               }
-               print "</table><br /><br />\n";
-
-               if (file_exists($confighelpfile[$language2])) {
-                    print "<img src=\"".$GM_IMAGE_DIR."/".$GM_IMAGES["hline"]["other"]."\" width=\"100%\" height=\"6\" alt=\"\" /><br />\n";
-                    print "<span class=\"subheaders\">".$d_gm_lang["comparing"]."<br />\"".$confighelpfile[$language1]."\" <---> \"".$confighelpfile[$language2]."\"</span><br /><br />\n";
-                    $lang1 = loadLanguage($language1, true, true);
-                    $lang2 = loadLanguage($language2, true, true);
-                    print "<span class=\"subheaders\">".$d_gm_lang["additions"].":</span><table class=\"facts_table $TEXT_DIRECTION\">\n";
-                    $count=0;
-                    foreach($lang1 as $key=>$value) {
-                         if (!array_key_exists($key, $lang2)) {
-                              print "<tr><td class=\"facts_label\">\$gm_lang[\"$key\"]</td>\n";
-                              print "<td class=\"shade1 wrap\">\"$value\";</td></tr>\n";
-                              $count++;
-                         }
-                    }
-                    if ($count==0) {
-                         print "<tr><td colspan=\"2\" class=\"shade1\">".$d_gm_lang["no_additions"]."</td></tr>\n";
-                    }
-                    
-                    print "</table><br /><br />\n";
-                    print "<span class=\"subheaders\">".$d_gm_lang["subtractions"].":</span><table class=\"facts_table $TEXT_DIRECTION\">\n";
-                    $count=0;
-                    foreach($lang2 as $key=>$value) {
-     		      	if (!array_key_exists($key, $lang1)) {
-                              print "<tr><td class=\"facts_label\">\$gm_lang[\"$key\"]</td>\n";
-                              print "<td class=\"shade1 wrap\">\"$value\";</td></tr>\n";
-                              $count++;
-                         }
-                    }
-                    if ($count==0) {
-                         print "<tr><td colspan=\"2\" class=\"shade1\">".$d_gm_lang["no_subtractions"]."</td></tr>\n";
-                    }
-                    print "</table><br /><br />\n";
-		    }
-          }
-          print "<br />";
-          break;
-	default :?>
-		<br />
-		<table class="center <?php print $TEXT_DIRECTION ?>">
-		<tr>
-			<td class="topbottombar center" colspan="2">
-				<?php print $gm_lang["edit_langdiff"]; ?>
-			</td>
-		</tr>
-		<tr>
-			<td class="shade1"><?php
-				// BOM Check is no longer necessary for plain text files
-				print_help_link("bom_check_help", "qm");
-				print "<a href=\"editlang.php?action=bom\">".$gm_lang["bom_check"]."</a>";
-	    	?></td>
-	      	<td class="shade1"><?php
-				print_help_link("edit_lang_utility_help", "qm");
-	      		print "<a href=\"editlang.php?action=edit\">".$gm_lang["edit_lang_utility"]."</a>";
-	    	?></td>
-	    </tr>
-	    <tr>
-	    	<td class="shade1"><?php
-	    		print_help_link("lang_debug_help", "qm");
-	        	print "<a href=\"editlang.php?action=debug\">".$gm_lang["lang_debug"]."</a>";
-	    	?></td>
-		  	<td class="shade1"><?php
-				print_help_link("export_lang_utility_help", "qm");
-		  		print "<a href=\"editlang.php?action=export\">".$gm_lang["export_lang_utility"]."</a>";
-			?></td>
-		</tr>
-		<tr>
-			<td class="shade1"><?php
-				print_help_link("translation_forum_desc", "qm"); ?>
-				<a href="http://www.genmod.net/forum/viewforum.php?f=4" target="_blank" ><?php
-				print $gm_lang["translation_forum"];
-	      	?></td>
-		  	<td class="shade1"><?php
-				print_help_link("compare_lang_utility_help", "qm");		  	
-	      		print "<a href=\"editlang.php?action=compare\">".$gm_lang["compare_lang_utility"]."</a>";
-		  	?></td>
-		</tr>
-		<tr>
-    	          <td class="shade1"><?php print_help_link("add_new_language_help", "qm"); ?><a href="changelanguage.php?action=addnew"><?php print $gm_lang["add_new_language"];?></a>
-	 	    </td>
-      		<td class="shade1"><?php print_help_link("help_changelanguage.php", "qm"); ?><a href="changelanguage.php?action=editold"><?php print $gm_lang["enable_disable_lang"];?></a>
-	     	<?php
-	     	if (!file_exists($INDEX_DIRECTORY . "lang_settings.php")) {
-	     		print "<br /><span class=\"error\">";
-	     		print $gm_lang["LANGUAGE_DEFAULT"];
-	     		print "</span>";
-         	}
-	     	?>      
-	  	</td>
-	  </tr>
-          <td class="shade1"><?php print_help_link("load_english_help", "qm", "load_english"); ?><a href="editlang.php?action=loadenglish"><?php print $gm_lang["load_english"];?></a>
-          </td>
-          <td class="shade1">&nbsp;</td> 
-       </tr>	
-		<tr>
-		  	<td colspan="2">
-		  	<div class="center">
-				<a href="admin.php"><b><?php print $gm_lang["lang_back_admin"];?></a>
+	case 'export':
+		?>
+		<form name="export_form" method="get" action="editlang.php">
+		<input type="hidden" name="page" value="editlang" />
+		<input type="hidden" name="action" value="export" />
+		<input type="hidden" name="execute" value="true" />
+		<div class="admin_topbottombar">
+			<?php print GM_LANG_export_lang_utility; ?>
+		</div>
+		<div class="admin_item_box">
+			<div class="width25 choice_left">
+				<div class="helpicon">
+					<?php PrintHelpLink("language_to_export_help", "qm", "language_to_export"); ?>
+				</div>
+				<div class="description">
+					<?php print GM_LANG_language_to_export; ?>
+					<br />
+					<select name="language2">
+					<?php
+					foreach ($el_controller->sorted_langs as $key => $value){
+						if ($language_settings[$key]["gm_lang_use"]) {
+							print "\n\t\t\t<option value=\"$key\"";
+							if ($key == $el_controller->language2) print " selected=\"selected\"";
+							print ">".constant("GM_LANG_lang_name_".$key)."</option>";
+						}
+					}
+					?>
+					</select>
+				</div>
 			</div>
-			</td>
-		</tr>
-		</table>
-		<br />
+			<div class="width25 center choice_right">
+				<input  type="submit" value="<?php print GM_LANG_export;?>" />
+			</div>
+		</div>
+		</form>
+		
 		<?php
+		if ($el_controller->execute) {
+			print "<div class=\"shade2 center\">";
+				print GM_LANG_export_results;
+			print "</div>";
+			print "<div class=\"shade1 ltr\">";
+				$data = "";
+				$data_help = "";
+				$storeerror = false;
+				$storelang = LanguageFunctions::LoadLanguage($el_controller->language2, true) + LanguageFunctions::LoadLanguage($el_controller->language2, true, true);
+				ksort($storelang);
+				foreach($storelang as $string => $value) {
+					if (substr($string, -5) == "_help") $data_help .= "\"".$string."\";\"".$value."\"\r\n";
+					else $data .= "\"".$string."\";\"".$value."\"\r\n";
+				}
+				if (!empty($data)) {
+					if (!$handle = fopen("languages/lang.".$el_controller->lang_shortcut.".txt", "w")) {
+						print str_replace("#lang_filename#", "languages/lang.".$el_controller->lang_shortcut.".txt", GM_LANG_no_open)."<br />";
+						$storeerror = true;
+						WriteToLog("EditLang-&gt; Can't open file languages/lang.".$el_controller->lang_shortcut.".txt", "E", "S");
+					}
+					else {
+						if (fwrite($handle, $data)) {
+							WriteToLog("EditLang-&gt; ".GM_LANG_editlang_lang_export_success, "I", "S");
+							print GM_LANG_editlang_lang_export_success."<br />";
+						}
+						else {
+							$storeerror = true;
+							WriteToLog("EditLang-&gt; ".GM_LANG_editlang_lang_export_no_success, "E", "S");
+							print "<span class=\"error\">".GM_LANG_editlang_lang_export_no_success."</span><br />";
+						}
+						fclose($handle);            
+					}
+				}
+				else print "<span class=\"error\">".GM_LANG_lang_not_stored."</span><br />";
+				if (!empty($data_help)) {
+					if (!$handle_help = fopen("languages/help_text.".$el_controller->lang_shortcut.".txt", "w")) {
+						print str_replace("#lang_filename#", "languages/help_text.".$el_controller->lang_shortcut.".txt", GM_LANG_no_open)."<br />";
+						$storeerror = true;
+						WriteToLog("EditLang-&gt; Can't open file languages/help_text.".$el_controller->lang_shortcut.".txt", "E", "S");
+					}
+					else {
+						if (fwrite($handle_help, $data_help)) {
+							WriteToLog("EditLang-&gt; ".GM_LANG_editlang_help_export_success, "I", "S");
+							print GM_LANG_editlang_help_export_success."<br />";
+						}
+						else {
+							$storeerror = true;
+							WriteToLog("EditLang-&gt; ".GM_LANG_editlang_help_no_export_success, "E", "S");
+							print "<span class=\"error\">".GM_LANG_editlang_help_no_export_success."</span><br />";
+						}
+						fclose($handle_help);
+					}
+				}
+				else print "<span class=\"error\">".GM_LANG_lang_help_not_stored."</span><br />";
+				
+				$data = "";
+				$storefacts = AdminFunctions::LoadFacts($el_controller->language2);
+				ksort($storefacts);
+				foreach($storefacts as $string => $value) {
+					$data .= "\"".$string."\";\"".$value."\"\r\n";
+				}
+				if (!empty($data)) {
+					if (!$handle = fopen("languages/facts.".$el_controller->lang_shortcut.".txt", "w")) {
+						print str_replace("#lang_filename#", "languages/facts.".$el_controller->lang_shortcut.".txt", GM_LANG_no_open)."<br />";
+						$storeerror = true;
+						WriteToLog("EditLang-&gt; Can't open file languages/facts.".$el_controller->lang_shortcut.".txt", "E", "S");
+					}
+					else {
+						if (fwrite($handle, $data)) {
+							WriteToLog("EditLang-&gt; ".GM_LANG_editlang_facts_export_success, "I", "S");
+							print GM_LANG_editlang_facts_export_success."<br />";
+						}
+						else {
+							$storeerror = true;
+							WriteToLog("EditLang-&gt; ".GM_LANG_editlang_facts_export_no_success, "E", "S");
+							print "<span class=\"error\">".GM_LANG_editlang_facts_export_no_success."</span><br />";
+						}
+						fclose($handle);            
+					}
+				}
+				else print "<span class=\"error\">".GM_LANG_lang_facts_not_stored."</span><br />";
+				if (!$storeerror) {
+					$sql = "UPDATE ".TBLPREFIX."lang_settings SET ls_translated = '0', ls_md5_lang = '".md5_file("languages/lang.".$language_settings[$el_controller->language2]["lang_short_cut"].".txt")."', ls_md5_help = '".md5_file("languages/help_text.".$language_settings[$el_controller->language2]["lang_short_cut"].".txt")."', ls_md5_facts = '".md5_file("languages/facts.".$language_settings[$el_controller->language2]["lang_short_cut"].".txt")."' WHERE ls_gm_langname='".$el_controller->language2."'";
+					$res = NewQuery($sql);
+				}
+			print "</div>";
+		}
+		break;
+	case 'compare':
+		?>
+		<form name="langdiff_form" method="get" action="editlang.php">
+		<input type="hidden" name="page" value="editlang" />
+		<input type="hidden" name="action" value="compare" />
+		<input type="hidden" name="execute" value="true" />
+		<div class="admin_topbottombar">
+			<?php print GM_LANG_compare_lang_utility; ?>
+		</div>
+		<div class="admin_item_box">
+			<div class="width25 choice_left">
+				<div class="helpicon">
+					<?php PrintHelpLink("new_language_help", "qm", "new_language");?>
+				</div>
+				<div class="description">
+					<?php
+					print GM_LANG_new_language."<br />";
+					print "<select name=\"language1\">";
+					foreach ($el_controller->sorted_langs as $key => $value) {
+						if ($language_settings[$key]["gm_lang_use"]) {
+							print "\n\t\t\t<option value=\"$key\"";
+							if ($key == $el_controller->language1) print " selected=\"selected\"";
+							print ">".constant("GM_LANG_lang_name_".$key)."</option>";
+						}
+					}
+					?>
+					</select>
+				</div>
+			</div>
+			<div class="width25 choice_middle">
+				<div class="helpicon">
+					<?php PrintHelpLink("old_language_help", "qm", "old_language");?>
+				</div>
+				<div class="description">
+					<?php
+					print GM_LANG_old_language."<br />";
+					print "<select name=\"language2\">";
+					foreach ($el_controller->sorted_langs as $key => $value) {
+						if ($language_settings[$key]["gm_lang_use"]) {
+							print "\n\t\t\t<option value=\"$key\"";
+							if ($key == $el_controller->language2) print " selected=\"selected\"";
+							print ">".constant("GM_LANG_lang_name_".$key)."</option>";
+						}
+					}
+					?>
+					</select>
+				</div>
+			</div>
+			<div class="width25 center choice_right">
+				<input  type="submit" value="<?php print GM_LANG_compare; ?>" />
+			</div>
+		</div>
+		</form>
+		<?php
+		if ($el_controller->execute) {
+			?>
+			<div class="topbottombar subheaders">
+				<?php print GM_LANG_comparing_main;?>
+			</div>
+			<?php
+			$el_controller->ShowLanguageCompare(LanguageFunctions::LoadLanguage($el_controller->language1, true), LanguageFunctions::LoadLanguage($el_controller->language2, true))
+			?>
+			<img src="<?php print GM_IMAGE_DIR."/".$GM_IMAGES["hline"]["other"];?>" width="100%" height="6" alt="" /><br />
+			<div class="topbottombar subheaders">
+				<?php print GM_LANG_comparing_facts;?>
+			</div>
+			<?php
+			$el_controller->ShowLanguageCompare(AdminFunctions::LoadFacts($el_controller->language1), AdminFunctions::LoadFacts($el_controller->language2), true);
+				?>
+			<img src="<?php print GM_IMAGE_DIR."/".$GM_IMAGES["hline"]["other"];?>" width="100%" height="6" alt="" /><br />
+			<div class="topbottombar subheaders">
+				<?php print GM_LANG_comparing_helptext;?>
+			</div>
+			<?php
+			$el_controller->langhelp = LanguageFunctions::LoadEnglish(true, true, true);
+			$el_controller->ShowLanguageCompare(LanguageFunctions::LoadLanguage($el_controller->language1, true, true), LanguageFunctions::LoadLanguage($el_controller->language2, true, true), false, true);
+			$el_controller->langhelp = array();
+		}
+		break;
+	default:
+		?>
+		<div class="admin_topbottombar">
+		<?php
+		print "<h3>".GM_LANG_edit_langdiff."</h3>";
+		?>
+		</div>
+		<div class="admin_item_box">
+			<div class="admin_item_left"><div class="helpicon"><?php PrintHelpLink("help_changelanguage.php", "qm", "enable_disable_lang"); ?></div><div class="description"><a href="changelanguage.php"><?php print GM_LANG_enable_disable_lang;?></a>
+			</div></div>
+			<div class="admin_item_right"><div class="helpicon"><?php PrintHelpLink("edit_lang_utility_help", "qm", "edit_lang_utility"); ?></div><div class="description"><a href="editlang.php?action=edit"><?php print GM_LANG_edit_lang_utility;?></a></div></div>
+			<div class="admin_item_left"><div class="helpicon"><?php PrintHelpLink("export_lang_utility_help", "qm", "export_lang_utility"); ?></div><div class="description"><a href="editlang.php?action=export"><?php print GM_LANG_export_lang_utility;?></a></div></div>
+			<div class="admin_item_right"><div class="helpicon"><?php PrintHelpLink("translation_forum_desc", "qm", "translation_forum"); ?></div><div class="description"><a href="http://www.genmod.net/index.php?option=com_kunena&amp;Itemid=2&amp;func=showcat&amp;catid=4" target="_blank" ><?php print GM_LANG_translation_forum;?></a></div></div>
+			<div class="admin_item_left"><div class="helpicon"><?php PrintHelpLink("compare_lang_utility_help", "qm", "compare_lang_utility"); ?></div><div class="description"><a href="editlang.php?action=compare"><?php print GM_LANG_compare_lang_utility;?></a></div></div>
+			<div class="admin_item_right"><div class="helpicon"><?php PrintHelpLink("lang_debug_help", "qm", "lang_debug"); ?></div><div class="description"><a href="editlang.php?action=debug"><?php print GM_LANG_lang_debug;?></a></div></div>
+			<div class="admin_item_left"><div class="helpicon"><?php PrintHelpLink("bom_check_help", "qm", "bom_check"); ?></div><div class="description"><a href="editlang.php?action=bom"><?php print GM_LANG_bom_check;?></a></div></div>
+		</div>
+		<?php
+		if ($el_controller->action == "bom") {
+			print "<div class=\"shade2 center\">".GM_LANG_bom_check."</div>";
+			print "<div class=\"shade1 ltr\">".AdminFunctions::CheckBom()."</div>";
+		}
+		break;
 }
-?>
-</div>
-<?php
-
-//-- load file for language settings
-require($GM_BASE_DIRECTORY . "includes/lang_settings_std.php");
-$Languages_Default = true;
-if (file_exists($INDEX_DIRECTORY . "lang_settings.php")) {
-	$DefaultSettings = $language_settings;		// Save default settings, so we can merge properly
-	require($INDEX_DIRECTORY . "lang_settings.php");
-	$ConfiguredSettings = $language_settings;	// Save configured settings, same reason
-	$language_settings = array_merge($DefaultSettings, $ConfiguredSettings);	// Copy new langs into config
-	unset($DefaultSettings);
-	unset($ConfiguredSettings);		// We don't need these any more
-	$Languages_Default = false;
-}
-	
-/* Re-build the various language-related arrays
- *		Note:
- *		This code existed in both lang_settings_std.php and in lang_settings.php.
- *		It has been removed from both files and inserted here, where it belongs.
- */
-$languages 				= array();
-$gm_lang_use 			= array();
-$gm_lang 				= array();
-$lang_short_cut 		= array();
-$lang_langcode 			= array();
-$gm_language 			= array();
-$confighelpfile 		= array();
-$helptextfile 			= array();
-$flagsfile 				= array();
-$factsfile 				= array();
-$factsarray 			= array();
-$gm_lang_name 			= array();
-$langcode				= array();
-$ALPHABET_upper			= array();
-$ALPHABET_lower			= array();
-$DATE_FORMAT_array		= array();
-$TIME_FORMAT_array		= array();
-$WEEK_START_array		= array();
-$TEXT_DIRECTION_array	= array();
-$NAME_REVERSE_array		= array();
-
-foreach ($language_settings as $key => $value) {
-	$languages[$key] 			= $value["gm_langname"];
-	$gm_lang_use[$key]			= $value["gm_lang_use"];
-	$gm_lang[$key]				= $value["gm_lang"];
-	$lang_short_cut[$key]		= $value["lang_short_cut"];
-	$lang_langcode[$key]		= $value["langcode"];
-	$gm_language[$key]			= $value["gm_language"];
-	$confighelpfile[$key]		= $value["confighelpfile"];
-	$helptextfile[$key]			= $value["helptextfile"];
-	$flagsfile[$key]			= $value["flagsfile"];
-	$factsfile[$key]			= $value["factsfile"];
-	$ALPHABET_upper[$key]		= $value["ALPHABET_upper"];
-	$ALPHABET_lower[$key]		= $value["ALPHABET_lower"];
-	$DATE_FORMAT_array[$key]		= $value["DATE_FORMAT"];
-	$TIME_FORMAT_array[$key]		= $value["TIME_FORMAT"];;
-	$WEEK_START_array[$key]		= $value["WEEK_START"];
-	$TEXT_DIRECTION_array[$key]	= $value["TEXT_DIRECTION"];
-	$NAME_REVERSE_array[$key]	= $value["NAME_REVERSE"];
-	
-	$gm_lang["lang_name_$key"]	= $value["gm_lang"];
-	
-	$dDummy = $value["langcode"];
-	$ct = strpos($dDummy, ";");
-	while ($ct > 1) {
-		$shrtcut = substr($dDummy,0,$ct);
-		$dDummy = substr($dDummy,$ct+1);
-		$langcode[$shrtcut]		= $key;
-		$ct = strpos($dDummy, ";");
-	}
-}
-	
-loadEnglish();
-loadLanguage($LANGUAGE);
-print_footer();
+print "</div>";
+PrintFooter();
 ?>
