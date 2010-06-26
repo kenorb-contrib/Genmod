@@ -1,0 +1,169 @@
+<GMReport access="PRIV_PUBLIC" icon="cfamily" type="indi">
+	<!-- $Id$ -->
+	<GMRTitle><GMRvar var="GM_LANG_relatives_report_ext" /></GMRTitle>
+	<GMRDescription>Prints a list of individuals related to a specific person</GMRDescription>
+	<GMRInput name="pid" lookup="INDI" type="text"><GMRvar var="GM_LANG_enter_pid" /></GMRInput>
+	<GMRInput name="relatives" type="select" options="child-family,spouse-family,direct-ancestors,ancestors,descendants,all"><GMRvar var="GM_LANG_choose_relatives" /></GMRInput>
+	<GMRInput name="sortby" type="select" options="none,BIRT,DEAT,NAME,ID"><GMRvar var="GM_LANG_sort_by" /></GMRInput>
+	<GMRInput name="showIndID" type="checkbox" default="SHOW_ID_NUMBERS"><GMRvar var="GM_LANG_SHOW_ID_NUMBERS" /></GMRInput>
+	<GMRInput name="showFamID" type="checkbox" default="SHOW_FAM_ID_NUMBERS"><GMRvar var="GM_LANG_SHOW_FAM_ID_NUMBERS" /></GMRInput>
+	<GMRInput name="pageSize" type="select" options="AVAIL_PAGE_SIZES" default="DEFAULT_PAGE_SIZE"><GMRvar var="GM_LANG_page_size" /></GMRInput>
+	<GMRStyle name="header" font="LucidaSansUnicode" size="14" style="b" />
+	<GMRStyle name="pagenum" font="LucidaSansUnicode" size="8" style="" />
+	<GMRStyle name="text" font="LucidaSansUnicode" size="10" style="" />
+	<GMRStyle name="bold" font="LucidaSansUnicode" size="10" style="b" />
+	<GMRStyle name="mini" font="LucidaSansUnicode" size="8" style="" />
+	<GMRStyle name="minibold" font="LucidaSansUnicode" size="8" style="b" />
+	<GMRStyle name="name1" font="LucidaSansUnicode" size="14" style="" />
+	<GMRStyle name="label" font="LucidaSansUnicode" size="10" style="b" />
+	<GMRDoc pageSize="$pageSize" orientation="L" margin="24">
+	<GMRSetVar name="height1" value="12" />
+	<GMRSetVar name="height2" value="10" />
+	<!-- GMRSetVar name="width1" value="40" / -->
+	<GMRSetVar name="width2" value="190" />
+	<GMRSetVar name="width3" value="120" />
+	<GMRSetVar name="width4" value="120" />
+	<GMRSetVar name="width5" value="150" />
+	<GMRSetVar name="width6" value="150" />
+	<GMRSetVar name="widthB2" value="280" />
+	<GMRSetVar name="widthB3" value="40" />
+	<GMRSetVar name="widthB4" value="375" />
+	<GMRSetVar name="NICK" value="false" />
+
+		<GMRHeader>
+			<GMRCell width="0" height="20" align="center" style="header"><GMRvar var="GM_LANG_relatives_report_ext" /></GMRCell>
+			<!-- GMRCell width="0" height="10" align="right" style="pagenum"><GMRvar var="GM_LANG_page" /> <GMRPageNum /> <GMRvar var="GM_LANG_of" /> <GMRTotalPages /> - <GMRNow /></GMRCell -->
+			<GMRTextBox width="50%" height="10" border="0">
+				<GMRText style="pagenum"><GMRNow /></GMRText>
+			</GMRTextBox>
+			<GMRTextBox width="0" height="10" border="0" newline="1">
+				<GMRText style="pagenum" align="right"><GMRvar var="GM_LANG_page" /> <GMRPageNum /> <GMRvar var="GM_LANG_of" /> <GMRTotalPages /></GMRText>
+			</GMRTextBox>
+			<!-- GMRTextBox width="$width1" height="$height1" border="1">
+				<GMRText style="label">ID</GMRText>
+			</GMRTextBox -->
+			<GMRTextBox border="0" width="$width" height="16" newline="1">
+				<GMRText style="name1"><GMRGetPersonName id="$pid" /></GMRText>
+			</GMRTextBox>
+			<GMRTextBox width="" height="3" border="0" newline="1"></GMRTextBox>
+			<GMRTextBox width="$width2" height="$height1" fill="#DDDDDD" border="1">
+				<GMRText style="label"><GMRvar var="GM_LANG_name" /></GMRText>
+			</GMRTextBox>
+			<GMRTextBox width="$width3" height="$height1" fill="#DDDDDD" border="1">
+				<GMRText style="label"><GMRvar var="GM_FACT_BIRT" /></GMRText>
+			</GMRTextBox>
+			<GMRTextBox width="$width4" height="$height1" fill="#DDDDDD" border="1">
+				<GMRText style="label"><GMRvar var="GM_FACT_DEAT" /></GMRText>
+			</GMRTextBox>
+			<GMRTextBox width="$width5" height="$height1" fill="#DDDDDD" border="1">
+				<GMRText style="label"><GMRvar var="GM_LANG_father" /></GMRText>
+			</GMRTextBox>
+			<GMRTextBox width="$width6" height="$height1" fill="#DDDDDD" border="1" newline="1">
+				<GMRText style="label"><GMRvar var="GM_LANG_mother" /></GMRText>
+			</GMRTextBox>
+			<GMRTextBox width="" height="3" border="0" newline="1"></GMRTextBox>
+		</GMRHeader>
+		<GMRBody>
+			<GMRRelatives id="$pid" group="$relatives" sortby="$sortby">
+				<GMRSetVar name="sex" value="@SEX" />
+				<!-- 1. Block -->
+				<!-- GMRTextBox width="$width1" height="$height1" border="0">
+					<GMRText style="bold"><GMRGedcomValue tag="@id" /></GMRText>
+				</GMRTextBox -->
+				<GMRTextBox width="$width2" height="$height1" border="0">
+					<GMRText style="bold"><GMRGetPersonName id="" /></GMRText>
+				</GMRTextBox>
+				<GMRTextBox width="$width3" height="$height1" border="0">
+					<GMRText style="text"><GMRGedcomValue tag="BIRT:DATE" truncate="20" /></GMRText>
+				</GMRTextBox>
+				<GMRTextBox width="$width4" height="$height1" border="0">
+					<GMRText style="text"><GMRGedcomValue tag="DEAT:DATE" truncate="20" /></GMRText>
+				</GMRTextBox>
+
+				<GMRGedcom id="@FAMC">
+					<GMRTextBox width="$width5" height="$height1" border="0">
+						<GMRGedcom id="@HUSB">
+						<GMRText style="text"><GMRGetPersonName id="" truncate="20" hideID="true" /></GMRText>
+						<GMRText style="mini"><GMRif condition="$showIndID"> (<GMRGedcomValue tag="@id" />)</GMRif></GMRText>
+						</GMRGedcom>
+					</GMRTextBox>
+
+					<GMRTextBox width="$width6" height="$height1" border="0">
+						<GMRGedcom id="@WIFE">
+						<GMRText style="text"><GMRGetPersonName id="" truncate="20" hideID="true" /></GMRText>
+						<GMRText style="mini"><GMRif condition="$showIndID"> (<GMRGedcomValue tag="@id" />)</GMRif></GMRText>
+						</GMRGedcom>
+					</GMRTextBox>
+				</GMRGedcom>
+
+				<GMRTextBox width="" height="$height1" border="0" newline="1"></GMRTextBox>
+
+
+				<!-- 2. Block -->
+				<!-- GMRTextBox width="$width1" height="$height2" border="0">
+					<GMRText style="mini"></GMRText>
+				</GMRTextBox -->
+				<GMRTextBox width="$width2" height="$height2" border="0">
+					<GMRText style="mini"><PVRGedcomValue tag="@CHIL" /></GMRText>
+				</GMRTextBox>
+				<GMRTextBox width="$width3" height="$height2" border="0">
+					<GMRText style="mini"><GMRGedcomValue tag="BIRT:PLAC" /></GMRText>
+				</GMRTextBox>
+				<GMRTextBox width="$width4" height="$height2" border="0" newline="1">
+					<GMRText style="mini"><GMRGedcomValue tag="DEAT:PLAC" /></GMRText>
+				</GMRTextBox>
+
+				<GMRTextBox width="" height="3" border="0" newline="1"></GMRTextBox>
+
+				<!-- 3. Block -->
+				<GMRRepeatTag tag="FAMS">
+					<GMRTextBox width="" height="3" border="0" newline="1"></GMRTextBox>
+
+					<GMRGedcom id="@FAMS">
+						<!-- GMRTextBox width="$width1" height="$height2" border="0">
+						</GMRTextBox -->
+
+						<GMRTextBox width="$widthB2" height="$height2" border="0">
+							<GMRif condition="$sex=='M'">
+								<GMRText style="mini">
+									<GMRvar var="GM_LANG_family" /><GMRif condition="$showFamID"> (<GMRGedcomValue tag="@id" />)</GMRif> <GMRvar var="GM_LANG_with" /> <GMRGetPersonName id="@WIFE" /> <GMRGedcomValue tag="MARR:DATE" />
+								</GMRText>
+							</GMRif>
+							<GMRif condition="$sex=='F'">
+								<GMRText style="mini">
+									<GMRvar var="GM_LANG_family" /><GMRif condition="$showFamID"> (<GMRGedcomValue tag="@id" />)</GMRif> <GMRvar var="GM_LANG_with" /> <GMRGetPersonName id="@HUSB" /> <GMRGedcomValue tag="MARR:DATE" />
+								</GMRText>
+							</GMRif>
+						</GMRTextBox>
+						
+						<GMRif condition="@CHIL!=''">
+						<GMRTextBox width="$widthB3" height="$height2" border="0">
+							<GMRText style="minibold"><GMRvar var="GM_LANG_children" />:</GMRText>
+						</GMRTextBox>
+						<GMRTextBox width="$widthB4" height="$height2" border="0" newline="1">
+							<GMRRepeatTag tag="CHIL">
+								<GMRGedcom id="@CHIL">
+									<GMRText style="mini">
+										<GMRGetPersonName id="" truncate="20" />, 
+									</GMRText>
+								</GMRGedcom>
+							</GMRRepeatTag>
+						</GMRTextBox>
+						</GMRif>
+						<GMRif condition="@CHIL==''">
+							<GMRTextBox width="$widthB4" height="$height2" border="0" newline="1" />
+						</GMRif>
+					</GMRGedcom>
+				</GMRRepeatTag>
+
+				<GMRTextBox width="" height="3" border="0" newline="1"></GMRTextBox>
+
+				<GMRLine x1="25" x2="740" />
+				<GMRTextBox width="" height="3" border="0" newline="1"></GMRTextBox>
+			</GMRRelatives>
+			<GMRCell width="0" height="15" border="0" align="right" style="label">
+				<br /><GMRvar var="GM_LANG_total_indis" />: <GMRListTotal />
+			</GMRCell>
+		</GMRBody>
+	</GMRDoc>
+</GMReport>

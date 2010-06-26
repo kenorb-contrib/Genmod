@@ -1,0 +1,51 @@
+<GMReport access="PRIV_PUBLIC" icon="cfamily" type="indi">
+	<!-- $Id$ -->
+	<GMRTitle><GMRvar var="GM_LANG_relatives_report" /></GMRTitle>
+	<GMRDescription>Prints a list of individuals related to a specific person</GMRDescription>
+	<GMRInput name="pid" lookup="INDI" type="text"><GMRvar var="GM_LANG_enter_pid" /></GMRInput>
+	<GMRInput name="relatives" type="select" options="child-family,spouse-family,direct-ancestors,ancestors,descendants,all"><GMRvar var="GM_LANG_choose_relatives" /></GMRInput>
+	<GMRInput name="sortby" type="select" options="none,BIRT,DEAT,NAME,ID"><GMRvar var="GM_LANG_sort_by" /></GMRInput>
+	<GMRInput name="showIndID" type="checkbox" default="SHOW_ID_NUMBERS"><GMRvar var="GM_LANG_SHOW_ID_NUMBERS" /></GMRInput>
+	<GMRInput name="pageSize" type="select" options="AVAIL_PAGE_SIZES" default="DEFAULT_PAGE_SIZE"><GMRvar var="GM_LANG_page_size" /></GMRInput>
+	<GMRStyle name="header" font="LucidaSansUnicode" size="14" style="b" />
+	<GMRStyle name="pagenum" font="LucidaSansUnicode" size="8" style="" />
+	<GMRStyle name="text" font="LucidaSansUnicode" size="9" style="" />
+	<GMRStyle name="label" font="LucidaSansUnicode" size="9" style="b" />
+	<GMRDoc pageSize="$pageSize" orientation="P" margin="24">
+		<GMRHeader>
+			<GMRCell width="0" height="20" align="center" style="header"><GMRvar var="GM_LANG_relatives_report" /></GMRCell>
+			<!-- GMRCell width="0" height="10" align="right" style="pagenum"><GMRvar var="GM_LANG_page" /> <GMRPageNum /> <GMRvar var="GM_LANG_of" /> <GMRTotalPages /> - <GMRNow /></GMRCell -->
+			<GMRTextBox width="50%" height="10" border="0">
+				<GMRText style="pagenum"><GMRNow /></GMRText>
+			</GMRTextBox>
+			<GMRTextBox width="0" height="10" border="0" newline="1">
+				<GMRText style="pagenum" align="right"><GMRvar var="GM_LANG_page" /> <GMRPageNum /> <GMRvar var="GM_LANG_of" /> <GMRTotalPages /></GMRText>
+			</GMRTextBox>
+			<GMRTextBox width="195" height="14" border="1" fill="#DDDDDD">
+				<GMRText style="label"><GMRvar var="GM_LANG_name" /></GMRText>
+			</GMRTextBox>
+			<GMRTextBox width="170" height="14" border="1" fill="#DDDDDD">
+				<GMRText style="label"><GMRvar var="GM_FACT_BIRT" /></GMRText>
+			</GMRTextBox>
+			<GMRTextBox width="0" height="14" border="1" fill="#DDDDDD" newline="1">
+				<GMRText style="label"><GMRvar var="GM_FACT_DEAT" /></GMRText>
+			</GMRTextBox>
+		</GMRHeader>
+		<GMRBody>
+			<GMRRelatives id="$pid" group="$relatives" sortby="$sortby">
+				<GMRTextBox width="195" height="12" border="0">
+					<GMRText style="text"><GMRGetPersonName id="" /></GMRText>
+				</GMRTextBox>
+				<GMRTextBox width="170" height="12" border="0">
+					<GMRText style="text"><GMRGedcomValue tag="BIRT:DATE" />  <GMRGedcomValue tag="BIRT:PLAC" /></GMRText>
+				</GMRTextBox>
+				<GMRTextBox width="0" height="12" border="0" newline="1">
+					<GMRText style="text"><GMRGedcomValue tag="DEAT:DATE" />  <GMRGedcomValue tag="DEAT:PLAC" /></GMRText>
+				</GMRTextBox>
+			</GMRRelatives>
+			<GMRCell width="0" height="15" border="0" align="right" style="label">
+				<br /><GMRvar var="GM_LANG_total_indis" />: <GMRListTotal />
+			</GMRCell>
+		</GMRBody>
+	</GMRDoc>
+</GMReport>

@@ -1,0 +1,15 @@
+<!-- @version $Id: USA_California_Trinity.txt,v 1.1 2005/10/23 22:08:17 roland-d Exp $ -->
+<!-- @see http://www.naco.org/ -->
+Big Bar
+Burnt Ranch
+Douglas City
+Hayfork
+Helena
+Hyampom
+Junction City
+Lewiston
+Mad River
+Salyer
+Trinity Center
+Weaverville
+Zenia

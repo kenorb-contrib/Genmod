@@ -1,0 +1,19 @@
+<!-- @version $Id: USA_Indiana_Howard.txt,v 1.1 2005/10/23 22:08:18 roland-d Exp $ -->
+<!-- @see http://www.naco.org/ -->
+Center Township
+Clay Township
+Ervin Township
+Greentown
+Harrison Township
+Hemlock
+Honey Creek Township
+Howard Township
+Jackson Township
+Kokomo
+Liberty Township
+Monroe Township
+Oakford
+Russiaville
+Taylor Township
+Union Township
+West Middleton
