@@ -38,6 +38,7 @@
 
 define('GM_VERSION', "2.0");
 define('GM_VERSION_RELEASE', "Beta 1");
+define('DEBUG', false);
 $min_php_version = "5.2";
 $min_mysql_version = "5.1";
 $stylesheet = "install_style.css";
@@ -122,7 +123,7 @@ if ($step > 2) {
 		$step = 2;
 		$error = GM_LANG_error.": ". mysql_error();
 	}
-	if (!$upgrade && in_array(INDEX_DIRECTORY, $index_inuse)) {
+	if (!$upgrade && in_array($INDEX_DIRECTORY, $index_inuse)) {
 		$step = 2;
 		$error .= "<br />".GM_LANG_error.": Index directory already in use by another site.";
 	}

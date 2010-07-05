@@ -8,9 +8,17 @@
 	# $Id$
 =====================================================================
 
+Version 2.0 beta 2
+- Fixed DEBUG constant not set in install (sjouke)
+- Fixed custompage contains obsolete quote (sjouke)
+- Fixed config_maint cannot delete system config (sjouke)
+- Fixed handling of backslashes in search/find terms (sjouke)
+- Fixed printer friendly version of search shows no results (sjouke)
+
 Version 2.0 beta 1
 - Fixed note favorites don't display in menu and blocks (sjouke)
-- Fixed various language files contain English texts (sjouke) 
+- Fixed various language files contain English texts (sjouke)
+- Various other additions and fixes, see http://www.genmod.net
 
 Version 1.7 final
 - Fixed delete person should also delete ASSO pointers from others (sjouke)

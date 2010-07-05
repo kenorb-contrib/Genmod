@@ -589,7 +589,7 @@ class SearchController extends BaseController {
 		}
 		
 		
-		if (isset($_REQUEST["query"]) && !empty($_REQUEST["query"])) $this->query = $_REQUEST["query"];
+		if (isset($_REQUEST["query"]) && !empty($_REQUEST["query"])) $this->query = preg_replace("/\\\/", "", $_REQUEST["query"]);
 	
 		if ($this->type == "indi") $this->srindi = "yes";
 		else if ($this->type == "fam") $this->srfams = "yes";

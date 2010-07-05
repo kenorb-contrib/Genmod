@@ -1327,8 +1327,8 @@ function GetQueryString($encode=false) {
 	}
 	// Remove the trailing ampersand to prevent it from being duplicated
 	$qstring = substr($qstring, 0, -1);
-	if ($encode) return urlencode($qstring);
-	else return $qstring;
+	if ($encode) return urlencode(rtrim($qstring, "\x5C"));
+	else return rtrim($qstring, "\x5C");
 }
 
 
@@ -1796,11 +1796,11 @@ function CheckEmailAddress($address) {
 	if ($mt>0) {
 		$host = trim($match[2]);
 		// First try a realtime check to see if the domain exists
-		if (function_exists("checkdnsrr")) {
-			$ip = checkdnsrr($host);
+		if (function_exists("getmxrr")) {
+			$ip = getmxrr($host, $mxhosts);
 			if ($ip === false) {
 				$host = "www.".$host;
-				$ip = checkdnsrr($host);
+				$ip = getmxrr($host, $mxhosts);
 				if ($ip === false) return false;
 				else return true;
 			}

@@ -498,13 +498,13 @@ abstract class SearchFunctions {
 				if (substr($squery,-1) == "*") $wildcard = ".*";
 				else $wildcard = "";
 				if (substr($squery, 0, 1) == "-") {
-					$term = preg_replace("/[+<>\*\"\~\?]/", "", substr($squery,1));
+					$term = preg_replace("/[+<>\*\"\~\?\\\]/", "", substr($squery,1));
 					if (!empty($term)) $cquery["excludes"][] = array("term"=>$term, "operator"=>"NOT", "wildcard"=>$wildcard);
 				}
 				else {
 					if (substr($squery, 0, 1) == "+") $operator = "AND";
 					else $operator = "OR";
-					$term = preg_replace("/[+<>\*\"\~\?]/", "", $squery);
+					$term = preg_replace("/[+<>\*\"\~\?\\\]/", "", $squery);
 					if (!empty($term)) $cquery["includes"][] = array("term"=>$term, "operator"=>$operator, "wildcard"=>$wildcard);
 				}
 			}
