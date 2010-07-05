@@ -42,7 +42,7 @@ if ($custompage->action == "edit") {
 				foreach ($custompage->pages as $ct => $page) {
 					print "<tr><td class=\"shade2\"><a style=\"text-decoration: none;\" href=\"custompage.php?action=".$custompage->action."&amp;task=".GM_LANG_edit."&amp;page_id=".$page->id."\"><img class=\"noborder\" src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["edit"]["button"]."\" alt=\"".GM_LANG_edit."\" /></a>&nbsp;";
 					print "<a href=\"custompage.php?action=".$custompage->action."&amp;task=".GM_LANG_delete."&amp;page_id=".$page->id."\" onclick=\"return confirm('".GM_LANG_confirm_page_delete."'); \"><img class=\"noborder\" src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["delete"]["button"]."\" alt=\"".GM_LANG_delete."\" /></a></td>";
-					print "<td class=\"shade1\">".$page->title."</td></tr>"';
+					print "<td class=\"shade1\">".$page->title."</td></tr>";
 				}
 				print "</table>";
 			}

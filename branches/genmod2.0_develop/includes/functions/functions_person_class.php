@@ -1,4 +1,4 @@
-<?
+<?php
 /**
  * Function for printing objects
  *

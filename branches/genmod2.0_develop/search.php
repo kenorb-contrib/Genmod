@@ -449,10 +449,10 @@ if ($search_controller->action == "general") {
 	else $tab = 0;
 	if ($tab != "0") {
 		print "<script type=\"text/javascript\">\n<!--\n";
-		print "tabswitch($tab)";
+		if ($search_controller->isPrintPreview()) print "tabswitch(0)";
+		else print "tabswitch($tab)";
 		print "\n//-->\n</script>\n";
 	}
 }
-
 PrintFooter();
 ?>

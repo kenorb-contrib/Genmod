@@ -87,12 +87,9 @@ PrintHeader(GM_LANG_config_maint);
 				else $aliases = array();
 				?>
 				<div class="admin_item_box">
-				<div class="width10 choice_left"><input type="checkbox" name="delconf[]" value="
-				<?php 
-					print $site."\"";
+				<div class="width10 choice_left"><input type="checkbox" name="delconf[]" value="<?php print $site."\"";
 					if ($site == SERVER_URL || in_array(SERVER_URL, $aliases)) print " disabled=\"disabled\""; 
-				?>
-				/>
+				?>/>
 				</div>
 				<div class="width30 choice_right"><?php print $site; ?></div>
 				<div class="width30 choice_right"><?php 
