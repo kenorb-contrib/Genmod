@@ -386,7 +386,7 @@ if (!empty($check_gedcoms)) {
 			$lang = $LANGUAGE;
 			SwitchGedcom($ged);
 			$LANGUAGE = $lang;
-			print "<tr><td class=\"shade1 wrap\" rowspan=\"23\">".$value["title"]."</td><td class=\"shade1 wrap\">";
+			print "<tr><td class=\"shade1 wrap\" rowspan=\"24\">".$value["title"]."</td><td class=\"shade1 wrap\">";
 			// Get the partial indilist
 			$sql = "SELECT i_id, i_gedrec, i_file FROM ".TBLPREFIX."individuals WHERE i_file='".$id."'";
 			$res = NewQuery($sql);
@@ -967,23 +967,29 @@ if (!empty($check_gedcoms)) {
  			print "</td></tr>";
 			
 
- 			// Expand the indi array with Indi->fam 
+ 			// Expand the indi array with Indi->fam
+ 			// Also record the double pointers from one indi to the same family
+ 			$double_indi_to_fam = array();
 			foreach($indilist as $key=>$indi) {
 				$s = preg_match_all("/\n1 FAMS @(.+)@/", $indi["gedcom"], $match);
 				if ($s) {
 					foreach($match[1] as $key2=>$fid) {
+						if (isset($indilist[$key]["FAMS"][$fid])) $double_indi_to_fam[$key][$fid] = true;
 						$indilist[$key]["FAMS"][$fid] = true;
 					}
 				}
 				$s = preg_match_all("/\n1 FAMC @(.+)@/", $indi["gedcom"], $match);
 				if ($s) {
 					foreach($match[1] as $key2=>$fid) {
+						if (isset($indilist[$key]["FAMS"][$fid]) || isset($indilist[$key]["FAMC"][$fid])) $double_indi_to_fam[$key][$fid] = true;
 						$indilist[$key]["FAMC"][$fid] = true;
 					}
 				}
 			}
 	
 			// Expand the fam array with fam->indi and check for possible order problems
+ 			// Also record the double pointers from one fam to the same indi
+ 			$double_fam_to_indi = array();
 			$error = false;
 			print "<tr><td class=\"shade1 wrap\">";
 			foreach($cfamlist as $key=>$fam) {
@@ -992,6 +998,7 @@ if (!empty($check_gedcoms)) {
 					$first = true;
 					$printed = false;
 					foreach($match as $key2=>$cid) {
+						if (isset($cfamlist[$key]["CHIL"][$cid[1]])) $double_fam_to_indi[$key][$cid[1]] = true;
 						$cfamlist[$key]["CHIL"][$cid[1]] = true;
 						// Check the order of children in families
 						$rec = GetSubRecord(1, "BIRT", $indilist[$cid[1]]['gedcom']);
@@ -1021,12 +1028,14 @@ if (!empty($check_gedcoms)) {
 				$s = preg_match_all("/\n1 HUSB @(.+)@/", $fam["gedcom"], $match);
 				if ($s) {
 					foreach($match[1] as $key2=>$hid) {
+						if (isset($cfamlist[$key]["CHIL"][$hid]) || isset($cfamlist[$key]["HUSB"][$hid])) $double_fam_to_indi[$key][$hid] = true;
 						$cfamlist[$key]["HUSB"][$hid] = true;
 					}
 				}
 				$s = preg_match_all("/\n1 WIFE @(.+)@/", $fam["gedcom"], $match);
 				if ($s) {
 					foreach($match[1] as $key2=>$hid) {
+						if (isset($cfamlist[$key]["CHIL"][$hid]) || isset($cfamlist[$key]["HUSB"][$hid]) || isset($cfamlist[$key]["WIFE"][$hid])) $double_fam_to_indi[$key][$hid] = true;
 						$cfamlist[$key]["WIFE"][$hid] = true;
 					}
 				}
@@ -1035,6 +1044,32 @@ if (!empty($check_gedcoms)) {
 			else print "</ul>";
 			print "</td></tr>";
 
+			// Print the results for the double pointers fam -> indi
+			$num = 0;
+			$error1 = false;
+			$error2 = false;
+			print "<tr><td class=\"shade1 wrap\">";
+			foreach($double_fam_to_indi as $fam => $indiarr) {
+				foreach($indiarr as $indi => $nothing) {
+					if (!$error1) {
+						$error1 = true;
+						print $error_icon.GM_LANG_sc_double_fam_to_indi."<br />";
+					}
+					print GM_LANG_sc_fam." <a href=\"family.php?gedid=".GedcomConfig::$GEDCOMID."&amp;famid=".$fam."\" target=\"_BLANK\">".$fam."</a><br />".GM_LANG_sc_indi." <a href=\"individual.php?gedid=".GedcomConfig::$GEDCOMID."&amp;pid=".$indi."\" target=\"_BLANK\">".$indi."</a><br /><br />";
+				}
+			}
+			foreach($double_indi_to_fam as $indi => $famarr) {
+				foreach($famarr as $fam => $nothing) {
+					if (!$error2) {
+						$error2 = true;
+						print $error_icon.GM_LANG_sc_double_indi_to_fam."<br />";
+					}
+					print GM_LANG_sc_indi." <a href=\"individual.php?gedid=".GedcomConfig::$GEDCOMID."&amp;pid=".$indi."\" target=\"_BLANK\">".$indi."</a><br />".GM_LANG_sc_fam." <a href=\"family.php?gedid=".GedcomConfig::$GEDCOMID."&amp;famid=".$fam."\" target=\"_BLANK\">".$fam."</a><br /><br />";
+				}
+			}
+			if (!$error1 && !$error2) print $info_icon.GM_LANG_sc_double_ok;
+			print "</td></tr>";
+			
 			// Check for empty fams with no reference to any indi
 			$num = 0;
 			$error = false;

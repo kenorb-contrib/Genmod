@@ -130,7 +130,7 @@ date_default_timezone_set(date_default_timezone_get());
 
 // NOTE: Version of Genmod
 define("GM_VERSION", "2.0");
-define("GM_VERSION_RELEASE", "Beta 1");
+define("GM_VERSION_RELEASE", "Beta 2");
 define("GM_REQUIRED_PRIVACY_VERSION", "3.3");
 define("GM_REQUIRED_CONFIG_VERSION", "3.1");
 
