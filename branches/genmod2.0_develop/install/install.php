@@ -37,7 +37,7 @@
 // 5. Admin user
 
 define('GM_VERSION', "2.0");
-define('GM_VERSION_RELEASE', "Beta 1");
+define('GM_VERSION_RELEASE', "Beta 2");
 define('DEBUG', false);
 $min_php_version = "5.2";
 $min_mysql_version = "5.1";
