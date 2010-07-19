@@ -9,7 +9,9 @@
 =====================================================================
 
 Version 2.0 beta 2
-- Changed version number to 2.0 beta 2
+- Fixed wrong display of changes on new, unapproved indi (sjouke)
+- Removed debug code from edit_interface (sjouke)
+- Changed version number to 2.0 beta 2 (sjouke)
 - Added check for 1 to 1 relation indi-fam in sanitycheck (sjouke)
 - Fixed DEBUG constant not set in install (sjouke)
 - Fixed custompage contains obsolete quote (sjouke)
