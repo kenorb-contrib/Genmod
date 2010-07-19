@@ -585,7 +585,6 @@ switch ($action) {
 		if (EditFunctions::CheckReorder($order)) {
 			$change_id = EditFunctions::GetNewXref("CHANGE");
 			$success = true;
-			print_r($order);
 			$lines = count($order);
 			$f = array();
 			for ($i = 1; $i <= $lines; $i++) {

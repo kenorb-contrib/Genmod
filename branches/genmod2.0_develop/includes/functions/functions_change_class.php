@@ -645,9 +645,11 @@ abstract class ChangeFunctions {
 					if ($row["ch_old"] == "" && preg_match("/0 @.*@/", $row["ch_new"], $match) > 0) {
 						$subs = getallsubrecords($row["ch_new"], "", false, false, false);
 						foreach ($subs as $key => $sub) {
-							$ct = preg_match("/\d (\w+) /", $sub, $match);
-							$tag = $match[1];
-							$facts[] = array("tag"=> $tag, "old"=>"", "new"=>$sub);
+							$ct = preg_match("/1\s(\w+).*/", $sub, $match);
+							if ($ct > 0) {
+								$tag = $match[1];
+								$facts[] = array("tag"=> $tag, "old"=>"", "new"=>$sub);
+							}
 						}
 					}
 					else {
