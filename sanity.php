@@ -525,6 +525,7 @@ if (!empty($check_gedcoms)) {
 			$error = false;
 			$num = 0;
 			foreach($indilist as $key=>$gedlines) {
+				$numnci = 0; // Number of level 2 source citations per person. 
 				$s = preg_match_all("/\n\d SOUR @(.+)@/", $gedlines["gedcom"], $match);
 				// if more use $match[1] as array
 				if ($s) {
@@ -573,10 +574,19 @@ if (!empty($check_gedcoms)) {
 								$ft = preg_match("/^1\s(\w+)/", $fact, $match);
 								$type = $match[1];
 								$numnc++;
-								if (stristr($fact, "2 SOUR") == 0 && !in_array($type, $non_cits_facts)) {
-									$no_cits[$key."[".GedcomConfig::$GEDCOMID."]"] = array($key, GedcomConfig::$GEDCOMID, "INDI", $type, $gedlines["gedcom"]);
+								if (preg_match("/\n2 SOUR/", $fact) == 0) {
+									if (!in_array($type, $non_cits_facts)) {
+										$no_cits[$key."[".GedcomConfig::$GEDCOMID."]"] = array($key, GedcomConfig::$GEDCOMID, "INDI", $type, $gedlines["gedcom"]);
+									}
 								}
+								else $numnci++;
 							}
+						}
+					}
+					// If no level 2 citations found, there must be a level 1 citation
+					if ($numnci == 0) {
+						if (preg_match("/\n1 SOUR/", $gedlines["gedcom"]) == 0) {
+							$no_cits[$key."[".GedcomConfig::$GEDCOMID."]"] = array($key, GedcomConfig::$GEDCOMID, "INDI", GM_LANG_individual, $gedlines["gedcom"]);
 						}
 					}
 				}
@@ -688,6 +698,7 @@ if (!empty($check_gedcoms)) {
 			$error = false;
 			$num = 0;
 			foreach($cfamlist as $key=>$gedlines) {
+				$numncf = 0; // Number of level 2 source citations per family. 
 				$s = preg_match_all("/\n\d SOUR @(.+)@/", $gedlines["gedcom"], $match);
 				// if more use $match[1] as array
 				if ($s) {
@@ -736,11 +747,14 @@ if (!empty($check_gedcoms)) {
 							if (substr($fact, 0, 1) > 0) {
 								$ft = preg_match("/^1\s(\w+)/", $fact, $match);
 								$type = $match[1];
-								if (stristr($fact, "2 SOUR") == 0 && !in_array($type, $non_cits_facts)) {
-									$no_cits[$key."[".GedcomConfig::$GEDCOMID."]"] = array($key, GedcomConfig::$GEDCOMID, "FAM", $type, $gedlines["gedcom"]);
-									$numnc++;
-									$inames = true;
+								if (preg_match("/\n2 SOUR/", $fact) == 0) {
+									if (!in_array($type, $non_cits_facts)) {
+										$no_cits[$key."[".GedcomConfig::$GEDCOMID."]"] = array($key, GedcomConfig::$GEDCOMID, "FAM", $type, $gedlines["gedcom"]);
+										$numnc++;
+										$inames = true;
+									}
 								}
+								else $numncf++;
 							}
 						}
 						if ($inames) {
@@ -753,6 +767,12 @@ if (!empty($check_gedcoms)) {
 							else $parents["WIFE"] = "";
 							if (!empty($parents["HUSB"])) $indilist[$parents["HUSB"]]["names"] = NameFunctions::GetIndiNames($indilist[$parents["HUSB"]]["gedcom"]);
 							if (!empty($parents["WIFE"])) $indilist[$parents["WIFE"]]["names"] = NameFunctions::GetIndiNames($indilist[$parents["WIFE"]]["gedcom"]);
+						}
+					}
+					// If no level 2 citations found, there must be a level 1 citation
+					if ($numncf == 0) {
+						if (preg_match("/\n1 SOUR/", $gedlines["gedcom"]) == 0) {
+							$no_cits[$key."[".GedcomConfig::$GEDCOMID."]"] = array($key, GedcomConfig::$GEDCOMID, "FAM", GM_LANG_family, $gedlines["gedcom"]);
 						}
 					}
 				}
