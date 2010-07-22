@@ -9,6 +9,7 @@
 =====================================================================
 
 Version 2.0 beta 2
+- Added check for L1 sources if no L2 are found in sanity check (sjouke)
 - Fixed wrong display of changes on new, unapproved indi (sjouke)
 - Removed debug code from edit_interface (sjouke)
 - Changed version number to 2.0 beta 2 (sjouke)
