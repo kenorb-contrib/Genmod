@@ -413,7 +413,7 @@ else {
 	<?php
 	// NOTE: Page block settings
 	?>
-	<div id="configure" class="tab_page center" style="position: absolute; display: block; top: auto; left: auto; z-index: 1; ">
+	<div id="configure" class="center" style="position:absolute; display:block; top:auto; left:auto; z-index:1; width:99%;">
 		<br />
 		<form name="config_setup" method="post" action="index_edit.php">
 		<input type="hidden" name="command" value="<?php print $command;?>" />
@@ -440,7 +440,7 @@ else {
 			
 			// NOTE: Print the blocks currently in the left frame
 			print "<div id=\"index_edit_left\">";
-				print "<b>".GM_LANG_main_section."</b>";
+				print "<b>".GM_LANG_main_section."</b><br />";
 				print "<select multiple=\"multiple\" id=\"main_select\" name=\"main[]\" size=\"10\" onchange=\"show_description('main_select');\">\n";
 				foreach($ublocks->main as $indexval => $block) {
 					if (function_exists($block[0])) {
@@ -472,7 +472,7 @@ else {
 			
 			// NOTE: Print the blocks currently in the right frame
 			print "<div id=\"index_edit_right\">";
-				print "<b>".GM_LANG_right_section."</b>";
+				print "<b>".GM_LANG_right_section."</b><br />";
 				print "<select multiple=\"multiple\" id=\"right_select\" name=\"right[]\" size=\"10\" onchange=\"show_description('right_select');\">\n";
 				foreach($ublocks->right as $indexval => $block) {
 					if (function_exists($block[0])) {
@@ -503,12 +503,12 @@ else {
 					print "<option value=\"$key\">".$SortedBlocks[$key]."</option>\n";
 				}
 				print "</select>\n";
-			print "</div>";
+			print "</div><br style=\"clear:both;\" />";
 						
 			// NOTE: Print the box for showing the advice
 			print "<div id=\"index_edit_advice\" class=\"wrap $TEXT_DIRECTION\">";
 				print GM_LANG_index_edit_advice;
-			print "</div>";
+			print "</div><br />";
 			
 			// NOTE: Print the submit buttons
 			print "<div>";

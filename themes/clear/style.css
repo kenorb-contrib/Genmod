@@ -1237,7 +1237,6 @@ select {
      margin-top: 55px;
 }
 #index_edit_left {
-     width: 25%; 
      float: left;
      margin-top: 5px;
 }
@@ -1247,7 +1246,6 @@ select {
      margin-top: 55px;
 }
 #index_edit_content {
-	width: 25%;
      margin-left: auto;
      margin-right: auto;
      margin-top: 5px;
@@ -1258,7 +1256,6 @@ select {
      margin-top: 55px;
 }
 #index_edit_right {  
-     width: 25%; 
      float: right;
      margin-top: 5px;
 }

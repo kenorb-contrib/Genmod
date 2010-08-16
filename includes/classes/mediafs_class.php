@@ -1299,7 +1299,7 @@ abstract class MediaFS {
 	
 	public function GetStorageType() {
 		
-		if (SystemConfig::$MEDIA_IN_DB) return "VFS";
+		if (SystemConfig::$MEDIA_IN_DB) return " VFS";
 		else return "";
 	}
 

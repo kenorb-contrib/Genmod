@@ -456,9 +456,9 @@ function PrintSimpleFooter() {
 	print "\n\t<br /><br /><div class=\"center\" style=\"width: 99%;\">";
 	PrintContactLinks();
 	print "<br />Running <a href=\"http://www.genmod.net/\" target=\"_blank\">Genmod";
-	if (count($CONFIG_PARMS) >1) print " Enterprise ";
+	if (count($CONFIG_PARMS) >1) print " Enterprise";
 	print MediaFS::GetStorageType();
-	print "</a> Version ".GM_VERSION." ".GM_VERSION_RELEASE;
+	print "</a> - Version ".GM_VERSION." ".GM_VERSION_RELEASE;
 	if (GedcomConfig::$SHOW_STATS) PrintExecutionStats();
 	print "</div>";
 	if (DebugCollector::$show) DebugCollector::PrintDebug();
