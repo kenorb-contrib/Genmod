@@ -58,8 +58,8 @@ PrintSimpleHeader($search_controller->pagetitle);
 	}
 
 	function checknames(frm) {
-			button = typeof(document.forms[0].subclick) != 'undefined' ? document.forms[0].subclick.value : 'any';
-			if (frm.query.value.length < 2 & button != 'all') {
+		button = typeof(document.forms[0].subclick) != 'undefined' ? document.forms[0].subclick.value : 'any';
+		if (frm.query.value.length < 2 & button != 'all' && frm.query.value.charCodeAt(0) < 256) {
 			alert("<?php print GM_LANG_search_more_chars?>");
 			frm.query.focus();
 			return false;
