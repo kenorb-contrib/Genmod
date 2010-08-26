@@ -9,6 +9,7 @@
 =====================================================================
 
 Version 2.0 beta 2
+- Fixed window.opener.location.reload (sjouke)
 - Fixed options jumping around in index edit (sjouke)
 - Fixed space before VFS in footer text (sjouke)
 - Added check for L1 sources if no L2 are found in sanity check (sjouke)

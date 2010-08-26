@@ -474,6 +474,6 @@ else {
 	print "</td></tr></table>";
 }
 print "<br /><br />\n</center></div>\n";
-print "<center><a href=\"#\" onclick=\"window.opener.reload(); window.close();\">".GM_LANG_close_window."</a><br /></center>\n";
+print "<center><a href=\"#\" onclick=\"window.opener.location.reload(); window.close();\">".GM_LANG_close_window."</a><br /></center>\n";
 PrintSimpleFooter();
 ?>
