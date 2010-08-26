@@ -88,7 +88,7 @@ PrintSimpleHeader("Edit Interface ".GM_VERSION);
 	}
 	
 	function edit_close() {
-		window.opener.reload();
+		window.opener.location.reload();
 		window.close();
 	}
 //-->

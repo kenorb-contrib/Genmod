@@ -1061,7 +1061,7 @@ abstract class FactFunctions {
 		print GM_LANG_add_fact;
 		if (isset($_SESSION["clipboard"]) && count($_SESSION["clipboard"]) != 0) {
 			print "<class id=\"clear_clipboard\"><br />";
-			print "<a href=\"#\" onclick=\"sndReq('clear_clipboard', 'clear_clipboard'); window.reload(); return false;\">";
+			print "<a href=\"#\" onclick=\"sndReq('clear_clipboard', 'clear_clipboard'); window.location.reload(); return false;\">";
 			print GM_LANG_clear_clipboard;
 			print "</a></span>";
 		}
