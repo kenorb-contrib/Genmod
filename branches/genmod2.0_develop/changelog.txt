@@ -9,6 +9,7 @@
 =====================================================================
 
 Version 2.0 beta 2
+- Fixed find doesn't accept 1 chinese character as input (sjouke)
 - Fixed window.opener.location.reload (sjouke)
 - Fixed options jumping around in index edit (sjouke)
 - Fixed space before VFS in footer text (sjouke)
