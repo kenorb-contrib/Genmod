@@ -9,6 +9,7 @@
 =====================================================================
 
 Version 2.0 beta 2
+- Added option to exclude IP(range) from require authentication or not (sjouke)
 - Fixed find doesn't accept 1 chinese character as input (sjouke)
 - Fixed window.opener.location.reload (sjouke)
 - Fixed options jumping around in index edit (sjouke)

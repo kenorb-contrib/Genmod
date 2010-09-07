@@ -269,7 +269,7 @@ abstract class MenuBar {
 			$userfavs = FavoritesController::getUserFavorites($gm_user->username);
 		}
 		else {
-			if (GedcomConfig::$REQUIRE_AUTHENTICATION) return false;
+			if (GedcomConfig::$MUST_AUTHENTICATE) return false;
 			$userfavs = array();
 		}
 		

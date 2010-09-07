@@ -335,7 +335,7 @@ switch ($action) {
 				}
 				?>
 				<tr><td class="shade2 nowrap ltr"><?php PrintHelpLink("edituser_email_help", "qm", "emailadress");print GM_LANG_emailadress;?></td><td class="shade1 ltr"><input type="text" size="30" name="user_email" value="<?php if (!$user_email_false) print $user_email;?>" tabindex="<?php print $i++;?>" onchange="sndReq('errem', 'checkemail', 'email', this.value);" /> * <span id="errem"></span></td></tr>
-				<?php if (GedcomConfig::$REQUIRE_AUTHENTICATION && $SHOW_LIVING_NAMES>=$PRIV_PUBLIC) { ?>
+				<?php if (GedcomConfig::$MUST_AUTHENTICATE && $SHOW_LIVING_NAMES>=$PRIV_PUBLIC) { ?>
 				<tr><td class="shade2 nowrap ltr"><?php PrintHelpLink("register_gedcomid_help", "qm", "gedcomid");print GM_LANG_gedcomid;?></td><td class="shade1 ltr" valign="top" ><input type="text" size="10" name="user_gedcomid" id="user_gedcomid" value="" tabindex="<?php print $i++;?>" /><?php LinkFunctions::PrintFindIndiLink("user_gedcomid",""); ?></td></tr>
 				<?php } ?>
 				<tr><td class="shade2 nowrap ltr"><?php PrintHelpLink("register_comments_help", "qm", "comments");print GM_LANG_comments;?></td><td class="shade1 ltr" valign="top" ><textarea cols="50" rows="5" name="user_comments" tabindex="<?php print $i++;?>"><?php if (!$user_comments_false) print $user_comments;?></textarea> *</td></tr>

@@ -108,7 +108,7 @@ if ($_SESSION["cookie_login"]) {
 	PrintText("cookie_login_help");
 	print "</div><br /><br />\n";
 }
-if (GedcomConfig::$REQUIRE_AUTHENTICATION) {
+if (GedcomConfig::$MUST_AUTHENTICATE) {
 	print "<table class=\"center width60 ".$TEXT_DIRECTION."\"><tr><td class=\"wrap\">";
 	if (empty($help_message) || !isset($help_message)) {
 		if (!empty(GedcomConfig::$GEDCOMID)) SwitchGedcom(GedcomConfig::$GEDCOMID);
@@ -175,7 +175,7 @@ else {
 		    <td colspan="2">
 		    <?php
 		        if (GedcomConfig::$SHOW_CONTEXT_HELP) {
-		          if (GedcomConfig::$REQUIRE_AUTHENTICATION) {
+		          if (GedcomConfig::$MUST_AUTHENTICATE) {
 		            PrintHelpLink("login_buttons_aut_help", "qm", "login");
 		          }
 		          else {
