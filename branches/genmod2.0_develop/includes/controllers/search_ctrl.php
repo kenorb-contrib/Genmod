@@ -416,7 +416,7 @@ class SearchController extends BaseController {
 		// Check if we may search in the selected geds
 		foreach($this->searchgeds as $key => $gedid) {
 			SwitchGedcom($gedid);
-			if (GedcomConfig::$REQUIRE_AUTHENTICATION && $this->uname == "") unset($this->searchgeds[$key]);
+			if (GedcomConfig::$MUST_AUTHENTICATE && $this->uname == "") unset($this->searchgeds[$key]);
 		}
 		SwitchGedcom();
 	}	

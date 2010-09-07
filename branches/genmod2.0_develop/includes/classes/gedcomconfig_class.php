@@ -74,6 +74,10 @@ abstract class GedcomConfig {
 	public static $SHOW_PARENTS_AGE = true;					// Show age of parents on charts next to the birth date
 	public static $REQUIRE_AUTHENTICATION = false;			// Set this to true to force all visitors to login before they can view anything 
 															// on the site
+	public static $EXCLUDE_REQUIRE_AUTHENTICATION = "";		// Range of IP addresses and/or hostnames to exclude from the above:
+															// If require_authentication is true, it will give IP's in this list instant visitors
+															// access. If false, it will force these IP's to login and will hide the visitors level
+															// data for them.
 	public static $WELCOME_TEXT_AUTH_MODE = "1";			// Sets which predefined of custom welcome message will be displayed on the 
 															// welcome page in authentication mode
 	public static $WELCOME_TEXT_AUTH_MODE_4 = "";			// Customized welcome text to display on login screen if that option is chosen
@@ -194,6 +198,8 @@ abstract class GedcomConfig {
 	public static $LAST_STATS = null;						// Date stamp when the last cache for gedcom stats was built
 	public static $LAST_PLOTDATA = null;					// Date stamp when the last cache for plots was built
 	
+	public static $MUST_AUTHENTICATE = null;				// Holder for the calculated value of REQUIRE_AUTHENTICATION and
+															// EXCLUDE_REQUIRE_AUTHENTICATION
 	public static $GEDCONF = array();						// Holder of all stored configurations
 	private static $lastmail = null;						// Holder for all LAST_CHANGE_EMAIL values of the gedcoms
 	private static $cachenames = array("upcoming", "today", "stats", "plotdata");
@@ -218,6 +224,7 @@ abstract class GedcomConfig {
 			unset(self::$defaults["GEDCOMID"]);
 			unset(self::$defaults["defaults"]);
 			unset(self::$defaults["GEDCONF"]);
+			unset(self::$defaults["MUST_AUTHENTICATE"]);
 		}
 			
 		if (isset(self::$GEDCONF[$gedcomid])) {
@@ -262,6 +269,11 @@ abstract class GedcomConfig {
 				$GEDCOMID = self::$GEDCOMID;
 			}
 		}
+		
+		// Set the MUST_AUTHENTICATE variable
+		if (SystemFunctions::IPInRange($_SERVER["REMOTE_ADDR"], self::$EXCLUDE_REQUIRE_AUTHENTICATION)) self::$MUST_AUTHENTICATE = !self::$REQUIRE_AUTHENTICATION;
+		else self::$MUST_AUTHENTICATE = self::$REQUIRE_AUTHENTICATION;
+		
 		// If the pinyin table wasn't previously loaded and is required, load it now
 		if (self::$DISPLAY_PINYIN) {
 			global $pinyin;

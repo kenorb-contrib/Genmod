@@ -128,7 +128,7 @@ function PrintHeader($title, $head="",$use_alternate_styles=true) {
 //	if (!isset(GedcomConfig::$META_TITLE)) GedcomConfig::$META_TITLE = "";
 	if (isset($GEDCOMS[GedcomConfig::$GEDCOMID]["title"])) $title = $GEDCOMS[GedcomConfig::$GEDCOMID]["title"]." :: ".$title;
 	print "<title>".PrintReady(strip_tags($title)." - ".GedcomConfig::$META_TITLE." - Genmod", TRUE)."</title>\n\t";
-	 if (!GedcomConfig::$REQUIRE_AUTHENTICATION){
+	 if (!GedcomConfig::$MUST_AUTHENTICATE){
 		print "<link href=\"" . SERVER_URL .  "rss.php\" rel=\"alternate\" type=\"application/rss+xml\" title=\"RSS\"></link>\n\t";
 	 }
 	 print "<link rel=\"stylesheet\" href=\"".GM_STYLESHEET."\" type=\"text/css\" media=\"all\"></link>\n\t";

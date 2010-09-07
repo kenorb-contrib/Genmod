@@ -87,7 +87,7 @@ else {
 			echo '<input type="checkbox" onclick="CheckAllGed(this)" />'.GM_LANG_select_deselect_all.'<br>';
 			foreach ($GEDCOMS as $key=>$ged) {
 				SwitchGedcom($key);
-				if ($gm_user->username != "" || !GedcomConfig::$REQUIRE_AUTHENTICATION) {
+				if ($gm_user->username != "" || !GedcomConfig::$MUST_AUTHENTICATE) {
 					$str = "sg".$key;
 					print "<input type=\"checkbox\" ";
 					if (($key == GedcomConfig::$GEDCOMID) && ($search_controller->action == "")) print "checked=\"checked\" ";

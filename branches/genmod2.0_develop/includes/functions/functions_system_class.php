@@ -118,38 +118,7 @@ abstract class SystemFunctions {
 		if (isset($_SESSION['gm_user']) && !empty($_SESSION['gm_user'])) {
 			if (isset($_SESSION['IP']) && !empty($_SESSION['IP'])) {
 				if ($_SESSION['IP'] != $_SERVER['REMOTE_ADDR']) {
-					$excluded = false;
-					$lines = preg_split("/[;,]/", SystemConfig::$EXCLUDE_HOSTS);
-					$hostname = gethostbyaddr($_SERVER["REMOTE_ADDR"]);
-					foreach ($lines as $key => $line) {
-						$line = trim($line);
-	//					print $line."<br />";
-						if (!empty($line)) {
-							// is it a hostname?
-							if (preg_match("/[a-zA_Z]/", $line, $match)) {
-								$host = strtolower(preg_replace("/\*/", ".*", $line));
-								if (preg_match("/($host)/", strtolower($hostname), $match)) {
-									$excluded = true;
-									break;
-								}
-							}
-							// Is it a single IP?
-							if (preg_match("/^([0-9]{1,3}\.){3}[0-9]{1,3}$/", $line, $match)) {
-								if ($line == $_SERVER["REMOTE_ADDR"]) {
-									$excluded = true;
-									break;
-								}
-							}
-							// Is it an IP-range?
-							if (preg_match("/^([0-9]{1,3}\.){3}([0-9]{1,3}\-)([0-9]{1,3}\.){3}[0-9]{1,3}$/", $line, $match)) {
-								$ips = split("-", $line);
-								if (ip2long($_SERVER["REMOTE_ADDR"]) <= ip2long($ips[1]) && ip2long($_SERVER["REMOTE_ADDR"]) >= ip2long($ips[0])) {
-									$excluded = true;
-									break;
-								}
-							}
-						}
-					}
+					$excluded = self::IPInRange($_SERVER["REMOTE_ADDR"], SystemConfig::$EXCLUDE_HOSTS);
 					if (!$excluded) {
 						$string = "CheckSessionIP-&gt; Intrusion detected on session for IP ".$_SESSION['IP']." by ".$_SERVER['REMOTE_ADDR'];
 						WriteToLog($string, "W", "S");
@@ -160,15 +129,51 @@ abstract class SystemFunctions {
 			}
 		}
 	}
-	
+
+	public function IPInRange($ip, $range) {
+
+		$excluded = false;
+		$lines = preg_split("/[;,]/", $range);
+		$hostname = gethostbyaddr($ip);
+		foreach ($lines as $key => $line) {
+			$line = trim($line);
+//					print $line."<br />";
+			if (!empty($line)) {
+				// is it a hostname?
+				if (preg_match("/[a-zA_Z]/", $line, $match)) {
+					$host = strtolower(preg_replace("/\*/", ".*", $line));
+					if (preg_match("/($host)/", strtolower($hostname), $match)) {
+						$excluded = true;
+						break;
+					}
+				}
+				// Is it a single IP?
+				if (preg_match("/^([0-9]{1,3}\.){3}[0-9]{1,3}$/", $line, $match)) {
+					if ($line == $ip) {
+						$excluded = true;
+						break;
+					}
+				}
+				// Is it an IP-range?
+				if (preg_match("/^([0-9]{1,3}\.){3}([0-9]{1,3}\-)([0-9]{1,3}\.){3}[0-9]{1,3}$/", $line, $match)) {
+					$ips = split("-", $line);
+					if (ip2long($ip) <= ip2long($ips[1]) && ip2long($ip) >= ip2long($ips[0])) {
+						$excluded = true;
+						break;
+					}
+				}
+			}
+		}
+		return $excluded;
+	}	
 	/**
 	 * check if the maximum number of page views per hour for a session has been exeeded.
 	 */
 	public function CheckPageViews() {
 		
 		if (SystemConfig::$MAX_VIEW_TIME == 0) return;
-		
-		if (in_array(basename($_SERVER["SCRIPT_NAME"]), array("useradmin", "showblob.php")) || substr(basename($_SERVER["SCRIPT_NAME"]), 0, 4) == "edit") return;
+
+		if (in_array(basename($_SERVER["SCRIPT_NAME"]), array("useradmin.php", "showblob.php")) || substr(basename($_SERVER["SCRIPT_NAME"]), 0, 4) == "edit") return;
 		
 		if ((!isset($_SESSION["pageviews"])) || (time() - $_SESSION["pageviews"]["time"] > SystemConfig::$MAX_VIEW_TIME)) {
 			if (isset($_SESSION["pageviews"]) && SystemConfig::$MAX_VIEW_LOGLEVEL == "2") {

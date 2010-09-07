@@ -274,6 +274,7 @@ if ($action=="update") {
 	$newconf["edit_autoclose"] = $boolarray[$_POST["NEW_EDIT_AUTOCLOSE"]];
 	$newconf["edit_gedcom_record"] = $_POST["NEW_EDIT_GEDCOM_RECORD"];
 	$newconf["enable_multi_language"] = $boolarray[$_POST["NEW_ENABLE_MULTI_LANGUAGE"]];
+	$newconf["exclude_require_authentication"] = $_POST["NEW_EXCLUDE_REQUIRE_AUTHENTICATION"];
 	$newconf["expand_relatives_events"] = $boolarray[$_POST["NEW_EXPAND_RELATIVES_EVENTS"]];
 	$newconf["fam_facts_add"] = $_POST["NEW_FAM_FACTS_ADD"];
 	$newconf["fam_facts_unique"] = $_POST["NEW_FAM_FACTS_UNIQUE"];
@@ -831,6 +832,11 @@ print "&nbsp;<a href=\"javascript: ".htmlentities(GM_LANG_accpriv_conf)."\" oncl
 				<option value="yes" <?php if (GedcomConfig::$REQUIRE_AUTHENTICATION) print "selected=\"selected\""; ?>><?php print GM_LANG_yes;?></option>
 				<option value="no" <?php if (!GedcomConfig::$REQUIRE_AUTHENTICATION) print "selected=\"selected\""; ?>><?php print GM_LANG_no;?></option>
 			</select>
+		</td>
+	</tr>
+	<tr>
+		<td class="shade2 wrap width20"><div class="helpicon"><?php PrintHelpLink("EXCLUDE_REQUIRE_AUTHENTICATION_help", "qm", "EXCLUDE_REQUIRE_AUTHENTICATION"); print "</div><div class=\"description\">"; print GM_LANG_EXCLUDE_REQUIRE_AUTHENTICATION;?></div></td>
+		<td class="shade1"><input type="text" name="NEW_EXCLUDE_REQUIRE_AUTHENTICATION" value="<?php print GedcomConfig::$EXCLUDE_REQUIRE_AUTHENTICATION;?>" tabindex="<?php $i++; print $i?>" size="60" />
 		</td>
 	</tr>
 	<tr>

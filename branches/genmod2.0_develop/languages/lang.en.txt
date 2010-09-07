@@ -1656,6 +1656,7 @@
 "EXPAND_RELATIVES_EVENTS";"Automatically expand list of events"
 "HIDE_LIVE_PEOPLE";"Show people who are alive"
 "REQUIRE_AUTHENTICATION";"Require visitor authentication"
+"EXCLUDE_REQUIRE_AUTHENTICATION";"Exceptions to require visitor authentication"
 "WELCOME_TEXT_AUTH_MODE";"Welcome text on Login page in Authentication mode"
 "WELCOME_TEXT_AUTH_MODE_OPT1";"Predefined text that states all users can request a user account"
 "WELCOME_TEXT_AUTH_MODE_OPT2";"Predefined text that states admin will decide on each request for a user account"

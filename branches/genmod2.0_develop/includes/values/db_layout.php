@@ -213,6 +213,7 @@ $db_original[TBLPREFIX."gedconf"]["row"]["gc_link_icons"]["details"] = "VARCHAR 
 $db_original[TBLPREFIX."gedconf"]["row"]["gc_abbreviate_chart_labels"]["details"] = "TINYINT(1)";
 $db_original[TBLPREFIX."gedconf"]["row"]["gc_show_parents_age"]["details"] = "TINYINT(1)";
 $db_original[TBLPREFIX."gedconf"]["row"]["gc_require_authentication"]["details"] = "TINYINT(1)";
+$db_original[TBLPREFIX."gedconf"]["row"]["gc_exclude_require_authentication"]["details"] = "VARCHAR (128) CHARACTER SET #charset# COLLATE #collate# ";
 $db_original[TBLPREFIX."gedconf"]["row"]["gc_welcome_text_auth_mode"]["details"] = "INT (2)";
 $db_original[TBLPREFIX."gedconf"]["row"]["gc_welcome_text_auth_mode_4"]["details"] = "TEXT CHARACTER SET #charset# COLLATE #collate# ";
 $db_original[TBLPREFIX."gedconf"]["row"]["gc_welcome_text_cust_head"]["details"] = "TINYINT(1)";

@@ -130,6 +130,7 @@
 "REPO_QUICK_ADDFACTS";"Snelkoppelingen voor gebeurtenissen van bewaaarplaatsen"
 "REQUIRE_ADMIN_AUTH_REGISTRATION";"Beheerder moet nieuwe aanmeldingen goedkeuren"
 "REQUIRE_AUTHENTICATION";"Vereis bezoekersauthenticatie"
+"EXCLUDE_REQUIRE_AUTHENTICATION";"Uitzonderingen op vereis bezoekersauthenticatie"
 "RSS_FORMAT";"RSS-indeling"
 "RSS_block_select";"Selecteer te tonen blokken in de RSS-feed"
 "SEARCHLOG_CREATE";"Archiveer logbestand zoekopdrachten"

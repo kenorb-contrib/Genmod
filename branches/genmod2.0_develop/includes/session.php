@@ -693,7 +693,7 @@ if ((strstr(SCRIPT_NAME, "editconfig.php")===false) &&(strstr(SCRIPT_NAME, "edit
 		UserController::UserLogout($gm_username);
 		$Action = "";
 		$gm_user =& User::GetInstance($gm_username);
-		if (GedcomConfig::$REQUIRE_AUTHENTICATION) {
+		if (GedcomConfig::$MUST_AUTHENTICATE) {
 			header("Location: ".GedcomConfig::$HOME_SITE_URL);
 			exit;
 		}
@@ -706,7 +706,7 @@ if ((strstr(SCRIPT_NAME, "editconfig.php")===false) &&(strstr(SCRIPT_NAME, "edit
 		}
 	}
 	
-	if (GedcomConfig::$REQUIRE_AUTHENTICATION) {
+	if (GedcomConfig::$MUST_AUTHENTICATE) {
 		if (empty($gm_username)) {
 			if ((strstr(SCRIPT_NAME, "login.php")===false)
 				&&(strstr(SCRIPT_NAME, "login_register.php")===false)
