@@ -207,6 +207,7 @@ function CompareFactsDate($arec, $brec) {
 	// If either date can't be parsed, don't sort.
 	if (!$adate[0]["year"] || !$bdate[0]["year"]) {
 		if (preg_match('/2 _SORT (\d+)/', $arec, $match1) && preg_match('/2 _SORT (\d+)/', $brec, $match2)) {
+			print "no sort ".$arec." ".$brec."<br />";
 			return $match1[1]-$match2[1];
 		}
 		return 0;
@@ -215,12 +216,12 @@ function CompareFactsDate($arec, $brec) {
 	// Remember that dates can be ranges and overlapping ranges sort equally.
 	if (isset($parsecache[$amatch[1]]["min"])) $amin = $parsecache[$amatch[1]]["min"];
 	else {
-		$amin = adodb_mktime(0, 0, 0, $adate[0]["mon"], $adate[0]["day"], $adate[0]["year"]);
+		$amin = adodb_mktime(0, 0, 0, (empty($adate[0]["mon"]) ? 1 : $adate[0]["mon"]), (empty($adate[0]["day"]) ? 1 : $adate[0]["day"]), $adate[0]["year"]);
 		$parsecache[$amatch[1]]["min"] = $amin;
 	}
 	if (isset($parsecache[$bmatch[1]]["min"])) $bmin = $parsecache[$bmatch[1]]["min"];
 	else {
-		$bmin = adodb_mktime(0, 0, 0, $bdate[0]["mon"], $bdate[0]["day"], $bdate[0]["year"]);
+		$bmin = adodb_mktime(0, 0, 0, (empty($bdate[0]["mon"]) ? 1 : $bdate[0]["mon"]), (empty($bdate[0]["day"]) ? 1 : $bdate[0]["day"]), $bdate[0]["year"]);
 		$parsecache[$bmatch[1]]["min"] = $bmin;
 	}
 	if (isset($adate[1]["year"])) {
@@ -239,8 +240,16 @@ function CompareFactsDate($arec, $brec) {
 		}
 	}
 	else $bmax = $bmin;
-
-
+/*
+print "arec: ".$arec." brec: ".$brec."<br />";
+print "amin: ".$amin." amax: ".$amax." bmin: ".$bmin." bmax: ".$bmax."<br />";
+print_r($adate);
+print "<br />";
+print adodb_date("d m Y", $amin)."<br />";
+print_r($bdate);
+print "<br />";
+print adodb_date("d m Y", $bmin)."<br />";
+*/
 	// BEF/AFT XXX sort as the day before/after XXX
 	if ($adate[0]["ext"]=='BEF') {
 		$amin=$amin-1;
@@ -258,12 +267,15 @@ function CompareFactsDate($arec, $brec) {
 			$bmax=$bmax+1;
 			$bmin=$bmax;
 		}
-
-	if ($amax<$bmin)
+	if ($amax < $bmin) {
+		// print "A return -1<br />";
 		return -1;
+	}
 	else
-		if ($amin>$bmax)
+		if ($amin > $bmax) {
+			// print "B return 1<br />";
 			return 1;
+		}
 		else {
 			//-- ranged date... take the type of fact sorting into account
 			$factWeight = 0;
@@ -272,24 +284,32 @@ function CompareFactsDate($arec, $brec) {
 			}
 			//-- fact is prefered to come before, so compare using the minimum ranges
 			if ($factWeight < 0 && $amin!=$bmin) {
+				// print "C return ".($amin-$bmin)."<br />";
 				return ($amin-$bmin);
 			} else
 				if ($factWeight > 0 && $bmax!=$amax) {
 					//-- fact is prefered to come after, so compare using the max of the ranges
+					// print "D return ".($bmax-$amax)."<br />";
 					return ($bmax-$amax);
 				} else {
 					//-- facts are the same or the ranges don't give enough info, so use the average of the range
 					$aavg = ($amin+$amax)/2;
 					$bavg = ($bmin+$bmax)/2;
-					if ($aavg<$bavg)
+					if ($aavg<$bavg) {
+						// print "E return -1<br />";
 						return -1;
+					}
 					else
-						if ($aavg>$bavg)
+						if ($aavg>$bavg) {
+							// print "F return 1<br />";
 							return 1;
-						else
+						}
+						else {
+							// print "G return ".$factWeight."<br />";
 							return $factWeight;
+						}
 				}
-		
+			// print "H return 0";
 			return 0;
 		}
 }
@@ -402,8 +422,8 @@ function SortFactObjs(&$arr, $type="", $desc=false) {
 	}
 	
 	// Pass two - modified bubble/insertion sort on date
-	for ($i=0; $i<count($arr)-1; ++$i)
-		for ($j=count($arr)-1; $j>$i; --$j)
+	for ($i=0; $i<count($arr)-1; $i++)
+		for ($j=count($arr)-1; $j>$i; $j--)
 			if ((!$desc && CompareFactsDate($arr[$i]->factrec,$arr[$j]->factrec)>0) || ($desc && CompareFactsDate($arr[$i]->factrec,$arr[$j]->factrec)<0)) {
 				$tmp=$arr[$i];
 				for ($k=$i; $k<$j; ++$k)
