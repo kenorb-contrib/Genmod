@@ -2029,29 +2029,22 @@ if ($action == "") {
 	</div>
 	<!-- Setup the middle box -->
 	<div id="content">
-		<!-- Setup the top bar -->
-		<div class="admin_topbottombar">
-			<?php print "<h3>".GM_LANG_user_admin."</h3>"; ?>
-		</div>
-		<!-- Setup the links to the user list etc -->
-		<div class="admin_item_box">
-			<div class="admin_item_left">
-				<a href="useradmin.php?action=listusers"><?php print GM_LANG_current_users;?></a><br />
-				<a href="useradmin.php?action=cleanup"><?php print GM_LANG_cleanup_users;?></a><br />
-				<a href="useradmin.php?action=cleanup_messages"><?php print GM_LANG_cleanup_messages;?></a><br />
-				<a href="useradmin.php?action=createform"><?php print GM_LANG_add_user;?></a><br />
-			</div>
-			<div class="admin_item_right">
-				<a href="javascript: <?php print GM_LANG_message_to_all; ?>" onclick="message('all', 'messaging2', '', ''); return false;"><?php print GM_LANG_message_to_all; ?></a><br />
-				<a href="javascript: <?php print GM_LANG_broadcast_never_logged_in; ?>" onclick="message('never_logged', 'messaging2', '', ''); return false;"><?php print GM_LANG_broadcast_never_logged_in; ?></a><br />
-				<a href="javascript: <?php print GM_LANG_broadcast_not_logged_6mo; ?>" onclick="message('last_6mo', 'messaging2', '', ''); return false;"><?php print GM_LANG_broadcast_not_logged_6mo; ?></a><br />
-			</div>
-		</div>
-		<?php if ($message != "") {
-			print "<div class=\"shade2 center\">".$message."</div>";
-		} ?>
+		<?php
+			$menu = new AdminMenu();
+			$menu->SetBarText(GM_LANG_user_admin);
+			$menu->AddItem("", "", "", "useradmin.php?action=listusers", GM_LANG_current_users, "left");
+			$menu->AddItem("", "", "", "useradmin.php?action=cleanup", GM_LANG_cleanup_users, "left");
+			$menu->AddItem("", "", "", "useradmin.php?action=cleanup_messages", GM_LANG_cleanup_messages, "left");
+			$menu->AddItem("", "", "", "useradmin.php?action=createform", GM_LANG_add_user, "left");
+			$menu->AddItem("", "", "", "javascript: ".GM_LANG_message_to_all."\" onclick=\"message('all', 'messaging2', '', ''); return false;\"",  GM_LANG_message_to_all, "right");
+			$menu->AddItem("", "", "", "javascript: ".GM_LANG_broadcast_never_logged_in."\" onclick=\"message('never_logged', 'messaging2', '', ''); return false;\"", GM_LANG_broadcast_never_logged_in, "right");
+			$menu->AddItem("", "", "", "javascript: ".GM_LANG_broadcast_not_logged_6mo."\" onclick=\"message('last_6mo', 'messaging2', '', ''); return false;\"", GM_LANG_broadcast_not_logged_6mo, "right");
+			$menu->PrintItems();
+			if ($message != "") {
+				print "<div class=\"shade2 center\">".$message."</div>";
+			} ?>
 		<!-- Setup the top bar for info -->
-		<div class="admin_topbottombar"><?php print GM_LANG_admin_info; ?></div>
+		<div class="admin_topbottombar" style="margin-top: 1em;"><?php print GM_LANG_admin_info; ?></div>
 		<?php
 		$users = UserController::GetUsers();
 		$totusers = 0;			// Total number of users
@@ -2294,7 +2287,6 @@ if ($action == "cleanup_messages") {
 						if (isset($mons[$mmon])) $mons[$mmon]++;
 						else $mons[$mmon] = 1;
 					}
-					
 					// Now print the users
 					if ($count%2) print "\n<div class=\"admin_item_box wrap\">\n";
 						print "<div class=\"choice_left\" style=\"width:28%\">";
@@ -2319,9 +2311,9 @@ if ($action == "cleanup_messages") {
 			print "<div class=\"admin_item_box shade2 center\"><br />";
 			$sum = array_sum($mons);
 			print GM_LANG_total_messages."&nbsp;&nbsp;&nbsp;".$sum."<br />";
+			ksort($mons);	
 			$maxmon = end(array_keys($mons));
 			// Convert the totals to cumulative percentage
-			ksort($mons);	
 			$mons = array_reverse($mons, true);
 			$tot = 0;
 			foreach ($mons as $mon =>$number) {

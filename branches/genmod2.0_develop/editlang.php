@@ -476,23 +476,16 @@ switch ($el_controller->action) {
 		}
 		break;
 	default:
-		?>
-		<div class="admin_topbottombar">
-		<?php
-		print "<h3>".GM_LANG_edit_langdiff."</h3>";
-		?>
-		</div>
-		<div class="admin_item_box">
-			<div class="admin_item_left"><div class="helpicon"><?php PrintHelpLink("help_changelanguage.php", "qm", "enable_disable_lang"); ?></div><div class="description"><a href="changelanguage.php"><?php print GM_LANG_enable_disable_lang;?></a>
-			</div></div>
-			<div class="admin_item_right"><div class="helpicon"><?php PrintHelpLink("edit_lang_utility_help", "qm", "edit_lang_utility"); ?></div><div class="description"><a href="editlang.php?action=edit"><?php print GM_LANG_edit_lang_utility;?></a></div></div>
-			<div class="admin_item_left"><div class="helpicon"><?php PrintHelpLink("export_lang_utility_help", "qm", "export_lang_utility"); ?></div><div class="description"><a href="editlang.php?action=export"><?php print GM_LANG_export_lang_utility;?></a></div></div>
-			<div class="admin_item_right"><div class="helpicon"><?php PrintHelpLink("translation_forum_desc", "qm", "translation_forum"); ?></div><div class="description"><a href="http://www.genmod.net/index.php?option=com_kunena&amp;Itemid=2&amp;func=showcat&amp;catid=4" target="_blank" ><?php print GM_LANG_translation_forum;?></a></div></div>
-			<div class="admin_item_left"><div class="helpicon"><?php PrintHelpLink("compare_lang_utility_help", "qm", "compare_lang_utility"); ?></div><div class="description"><a href="editlang.php?action=compare"><?php print GM_LANG_compare_lang_utility;?></a></div></div>
-			<div class="admin_item_right"><div class="helpicon"><?php PrintHelpLink("lang_debug_help", "qm", "lang_debug"); ?></div><div class="description"><a href="editlang.php?action=debug"><?php print GM_LANG_lang_debug;?></a></div></div>
-			<div class="admin_item_left"><div class="helpicon"><?php PrintHelpLink("bom_check_help", "qm", "bom_check"); ?></div><div class="description"><a href="editlang.php?action=bom"><?php print GM_LANG_bom_check;?></a></div></div>
-		</div>
-		<?php
+		$menu = new AdminMenu();
+		$menu->SetBarText(GM_LANG_edit_langdiff);
+		$menu->AddItem("help_changelanguage.php", "qm", "enable_disable_lang", "changelanguage.php", GM_LANG_enable_disable_lang, "left");
+		$menu->AddItem("edit_lang_utility_help", "qm", "edit_lang_utility", "editlang.php?action=edit", GM_LANG_edit_lang_utility, "right");
+		$menu->AddItem("export_lang_utility_help", "qm", "export_lang_utility", "editlang.php?action=export", GM_LANG_export_lang_utility, "left");
+		$menu->AddItem("translation_forum_desc", "qm", "translation_forum", "http://www.genmod.net/index.php?option=com_kunena&amp;Itemid=2&amp;func=showcat&amp;catid=4\" target=\"_blank", GM_LANG_translation_forum, "right");
+		$menu->AddItem("compare_lang_utility_help", "qm", "compare_lang_utility", "editlang.php?action=compare", GM_LANG_compare_lang_utility, "left");
+		$menu->AddItem("lang_debug_help", "qm", "lang_debug", "editlang.php?action=debug", GM_LANG_lang_debug, "right");
+		$menu->AddItem("bom_check_help", "qm", "bom_check", "editlang.php?action=bom", GM_LANG_bom_check, "left");
+		$menu->PrintItems();
 		if ($el_controller->action == "bom") {
 			print "<div class=\"shade2 center\">".GM_LANG_bom_check."</div>";
 			print "<div class=\"shade1 ltr\">".AdminFunctions::CheckBom()."</div>";

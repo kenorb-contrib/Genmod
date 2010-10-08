@@ -9,6 +9,9 @@
 =====================================================================
 
 Version 2.0 beta 2
+- Fixed upcoming events, alive only, displays marriages of dead people (sjouke)
+- Added adminmenu class for unified admin menus (sjouke)
+- Fixed cleanup messages older than option (sjouke)
 - Fixed facts with only year don't sort properly (sjouke)
 - Added option to exclude IP(range) from require authentication or not (sjouke)
 - Fixed find doesn't accept 1 chinese character as input (sjouke)
