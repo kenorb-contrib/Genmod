@@ -120,23 +120,22 @@ foreach($users as $indexval => $user) {
 
 <!-- Setup the middle box -->
 <div id="content">
-	<div class="admin_topbottombar">
-		<?php print "<h3>".GM_LANG_administration_maintenance."</h3>"; ?>
-	</div>
-	<div class="admin_item_box">
-		<div class="admin_item_left"><div class="helpicon"><?php PrintHelpLink("help_sanity.php", "qm", "sc_sanity_check"); ?></div><div class="description"><a href="sanity.php"><?php print GM_LANG_sc_sanity_check;?></a></div></div>
-		<div class="admin_item_right"><div class="helpicon"><?php PrintHelpLink("restart_setup_help", "qm", "restart_setup"); ?></div><div class="description"><a href="install/install.php"><?php print GM_LANG_restart_setup;?></a></div></div>
-		<div class="admin_item_left"><div class="helpicon"><?php PrintHelpLink("load_english_help", "qm", "load_english"); ?></div><div class="description"><a href="admin_maint.php?action=loadenglish"><?php print GM_LANG_load_all_langs;?></a></div></div>
-		<div class="admin_item_right"><div class="helpicon"><?php PrintHelpLink("reset_isdead_help", "qm", "reset_isdead"); ?></div><div class="description"><a href="admin_maint.php?action=resetisdead"><?php print GM_LANG_reset_isdead;?></a></div></div>
-		<div class="admin_item_left"><div class="helpicon"><?php PrintHelpLink("generate_report_title_help", "qm", "generate_report_title"); ?></div><div class="description"><a href="admin_maint.php?action=reports"><?php print GM_LANG_generate_report_title;?></a></div></div>
-		<div class="admin_item_right"><div class="helpicon"><?php PrintHelpLink("build_isdead", "qm", "build_isdead"); ?></div><div class="description"><a href="admin_maint.php?action=buildisdead"><?php print GM_LANG_build_isdead;?></a></div></div>
-		<div class="admin_item_left"><div class="helpicon"><?php PrintHelpLink("reset_caches_help", "qm", "reset_caches"); ?></div><div class="description"><a href="admin_maint.php?action=resetcaches"><?php print GM_LANG_reset_caches;?></a></div></div>
-		<div class="admin_item_right"><div class="helpicon"><?php PrintHelpLink("disp_db_settings_help", "qm", "disp_db_settings"); ?></div><div class="description"><a href="admin_maint.php?action=dispdbsettings"><?php print GM_LANG_disp_db_settings;?></a></div></div>
-		<div class="admin_item_left"><div class="helpicon"><?php PrintHelpLink("config_maint_help", "qm", "config_maint"); ?></div><div class="description"><a href="config_maint.php"><?php print GM_LANG_config_maint;?></a></div></div>
-		<div class="admin_item_right"><div class="helpicon"><?php PrintHelpLink("lockout_maint_help", "qm", "lockout_maint"); ?></div><div class="description"><a href="lockout_maint.php"><?php print GM_LANG_lockout_maint;?></a></div></div>
-		<div class="admin_item_left"><div class="helpicon"><?php PrintHelpLink("check_md5_help", "qm", "check_md5"); ?></div><div class="description"><a href="admin_maint.php?action=checkmd5"><?php print GM_LANG_check_md5;?></a></div></div>
-	</div>
 	<?php
+	$menu = new AdminMenu();
+	$menu->SetBarText(GM_LANG_administration_maintenance);
+	$menu->AddItem("help_sanity.php", "qm", "sc_sanity_check", "sanity.php", GM_LANG_sc_sanity_check, "left");
+	$menu->AddItem("restart_setup_help", "qm", "restart_setup", "install/install.php", GM_LANG_restart_setup, "right");
+	$menu->AddItem("load_english_help", "qm", "load_english", "admin_maint.php?action=loadenglish", GM_LANG_load_all_langs, "left");
+	$menu->AddItem("reset_isdead_help", "qm", "reset_isdead", "admin_maint.php?action=resetisdead", GM_LANG_reset_isdead, "right");
+	$menu->AddItem("generate_report_title_help", "qm", "generate_report_title", "admin_maint.php?action=reports", GM_LANG_generate_report_title, "left");
+	$menu->AddItem("build_isdead", "qm", "build_isdead", "admin_maint.php?action=buildisdead", GM_LANG_build_isdead, "right");
+	$menu->AddItem("reset_caches_help", "qm", "reset_caches", "admin_maint.php?action=resetcaches", GM_LANG_reset_caches, "left");
+	$menu->AddItem("disp_db_settings_help", "qm", "disp_db_settings", "admin_maint.php?action=dispdbsettings", GM_LANG_disp_db_settings, "right");
+	if (count($CONFIG_PARMS) > 1) $menu->AddItem("config_maint_help", "qm", "config_maint", "config_maint.php", GM_LANG_config_maint, "left");
+	$menu->AddItem("lockout_maint_help", "qm", "lockout_maint", "lockout_maint.php", GM_LANG_lockout_maint, "right");
+	$menu->AddItem("check_md5_help", "qm", "check_md5", "admin_maint.php?action=checkmd5", GM_LANG_check_md5, "left");
+	$menu->PrintItems();
+	
 	if ($message != "") {
 		print "<div class=\"shade2 center\">".$message."</div>";
 	}

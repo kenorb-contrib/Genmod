@@ -121,7 +121,7 @@ abstract class BlockFunctions {
 			}
 			$indilist = self::SearchIndisDateRange($dstart, $mstart, "", $dend, $mend, "", $filter, "no", $skipfacts);
 			// Search database for raw Family data if no cache was found
-			$famlist = self::SearchFamsDateRange($dstart, $mstart, "", $dend, $mend, "", "no", $skipfacts);
+			$famlist = self::SearchFamsDateRange($dstart, $mstart, "", $dend, $mend, "", $filter, "no", $skipfacts);
 
 			// Apply filter criteria and perform other transformations on the raw data
 			foreach($indilist as $gid => $indi) {
@@ -259,7 +259,7 @@ abstract class BlockFunctions {
 		$todate = $year.date("m", $monthstart).$mday3;
 		
 		if ($config["show_indi"] == "yes") $dayindilist = self::SearchIndisDateRange($mday2, $monthtonum[$mmon2], $myear2, $mday3, $monthtonum[$mmon], $year, "", "no", "", false, "CHAN");
-		if ($config["show_fam"] == "yes") $dayfamlist = self::SearchFamsDateRange($mday2, $monthtonum[$mmon2], $myear2, $mday3, $monthtonum[$mmon], $year, "no", "", false, "CHAN");
+		if ($config["show_fam"] == "yes") $dayfamlist = self::SearchFamsDateRange($mday2, $monthtonum[$mmon2], $myear2, $mday3, $monthtonum[$mmon], $year, "", "no", "", false, "CHAN");
 		if ($config["show_repo"] == "yes" && $SHOW_SOURCES >= $gm_user->getUserAccessLevel()) $dayrepolist = self::SearchOtherDateRange($mday2, $monthtonum[$mmon2], $myear2, $mday3, $monthtonum[$mmon], $year, "", false, "CHAN");
 		if ($config["show_sour"] == "yes" && $SHOW_SOURCES >= $gm_user->getUserAccessLevel()) $daysourcelist = self::SearchSourcesDateRange($mday2, $monthtonum[$mmon2], $myear2, $mday3, $monthtonum[$mmon], $year, "", false, "CHAN");
 		if ($config["show_obje"] == "yes") $daymedialist = self::SearchMediaDateRange($mday2, $monthtonum[$mmon2], $myear2, $mday3, $monthtonum[$mmon], $year, "", false, "CHAN");
@@ -744,7 +744,7 @@ abstract class BlockFunctions {
 	 * @param	boolean $allgeds setting if all gedcoms should be searched, default is false
 	 * @return	array $myfamlist array with all individuals that matched the query
 	 */
-	private function SearchFamsDateRange($dstart="1", $mstart="1", $ystart, $dend="31", $mend="12", $yend, $onlyBDM="no", $skipfacts="", $allgeds=false, $onlyfacts="") {
+	private function SearchFamsDateRange($dstart="1", $mstart="1", $ystart, $dend="31", $mend="12", $yend, $filter="", $onlyBDM="no", $skipfacts="", $allgeds=false, $onlyfacts="") {
 		
 		$famlist = array();
 		$sql = "SELECT f_key, f_id, f_husb, f_wife, f_file, f_gedrec FROM ".TBLPREFIX."dates, ".TBLPREFIX."families WHERE f_key=d_key ";
@@ -768,6 +768,15 @@ abstract class BlockFunctions {
 			//print "Indi's selected for fams: ".count($select)."<br />";
 			$selection = "'".implode("','", $select)."'";
 			ListFunctions::GetIndilist($allgeds, $selection, false);
+		}
+		if ($filter == "living") {
+			foreach($famlist as $key => $fam) {
+				// If both are dead, delete, delete the record
+				if (($fam->husb_id != "" && $fam->husb->isdead) && ($fam->wife_id != "" && $fam->wife->isdead)) {
+					// print $fam->xref." ".$fam->husb->isdead." ".$fam->wife->isdead."<br />";
+					unset($famlist[$key]);
+				}
+			}
 		}
 		return $famlist;
 	}
