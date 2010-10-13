@@ -9,6 +9,9 @@
 =====================================================================
 
 Version 2.0 beta 2
+- Added number of files per folder in media management (sjouke)
+- Moved media types to MediaFS class (sjouke)
+- Added gendex file generation script (sjouke)
 - Fixed upcoming events, alive only, displays marriages of dead people (sjouke)
 - Added adminmenu class for unified admin menus (sjouke)
 - Fixed cleanup messages older than option (sjouke)

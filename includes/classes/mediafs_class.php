@@ -33,6 +33,7 @@ abstract class MediaFS {
 	
 	public $classname 		= "MediaFS";	// Name of the class
 	public static $fdetails = array();		// Holder for the file details
+	public static $MEDIATYPE = array("a11","acb","adc","adf","afm","ai","aiff","aif","amg","anm","ans","apd","asf","au","avi","awm","bga","bmp","bob","bpt","bw","cal","cel","cdr","cgm","cmp","cmv","cmx","cpi","cur","cut","cvs","cwk","dcs","dib","dmf","dng","doc","dsm","dxf","dwg","emf","enc","eps","fac","fax","fit","fla","flc","fli","fpx","ftk","ged","gif","gmf","hdf","iax","ica","icb","ico","idw","iff","img","jbg","jbig","jfif","jpe","jpeg","jp2","jpg","jtf","jtp","lwf","mac","mid","midi","miff","mki","mmm",".mod","mov","mp2","mp3","mpg","mpt","msk","msp","mus","mvi","nap","ogg","pal","pbm","pcc","pcd","pcf","pct","pcx","pdd","pdf","pfr","pgm","pic","pict","pk","pm3","pm4","pm5","png","ppm","ppt","ps","psd","psp","pxr","qt","qxd","ras","rgb","rgba","rif","rip","rla","rle","rpf","rtf","scr","sdc","sdd","sdw","sgi","sid","sng","swf","tga","tiff","tif","txt","text","tub","ul","vda","vis","vob","vpg","vst","wav","wdb","win","wk1","wks","wmf","wmv","wpd","wxf","wp4","wp5","wp6","wpg","wpp","xbm","xls","xpm","xwd","yuv","zgm"); 	// Valid mediatypes
 	
 	public function GetMediaDirList($directory="", $all=true, $level=1, $checkwrite=true, $incthumbdir=false, $dbmode="unset") {
 		
@@ -88,7 +89,6 @@ abstract class MediaFS {
 	}
 
 	public function GetFileList($directory, $filter="", $dbmode=false) {
-		global $MEDIATYPE;
 		
 		$dirfiles = array();
 		if (!$dbmode) {
@@ -153,7 +153,6 @@ abstract class MediaFS {
 		
 		
 	public function GetMediaFilelist($directory, $filter="", $dbmode="unset") {
-		global $MEDIATYPE;
 
  		if ($dbmode == "unset") $dbmode = SystemConfig::$MEDIA_IN_DB;
 		$directory = RelativePathFile($directory);
@@ -612,7 +611,7 @@ abstract class MediaFS {
 	
 	
 	public function UploadFiles($files, $path, $overwrite=false) {
-		global $MEDIATYPE, $error;
+		global $error;
 		
 		$error = "";
 		$result = array("filename"=>"", "error"=>"", "errno"=>"0");
@@ -646,7 +645,7 @@ abstract class MediaFS {
 					else $ext = "";
 					
 					// Is such a file allowed?
-					if (!in_array(strtolower($ext), $MEDIATYPE)) {
+					if (!self::IsValidMedia($file)) {
 						WriteToLog("MediaFS-&gt;UploadFiles-&gt; Illegal upload attempt. File: ".$file, "W", "S");
 						$result["error"] = GM_LANG_ext_not_allowed;
 						$result["errno"] = 5;
@@ -1266,12 +1265,11 @@ abstract class MediaFS {
 	}
 	
 	public function IsValidMedia($filename) {
-		global $MEDIATYPE;
 		
 		$et = preg_match("/(\.\w+)$/", $filename, $ematch);
 		if ($et>0) $ext = substr(trim($ematch[1]),1);
 		else $ext = "";
-		return in_array(strtolower($ext), $MEDIATYPE);
+		return in_array(strtolower($ext), self::$MEDIATYPE);
 	}
 	
 	public function FileExists($filename) {

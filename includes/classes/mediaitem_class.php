@@ -199,6 +199,7 @@ class MediaItem extends GedcomRecord {
 	}
 	
 	private function getLevel() {
+		
 		if (is_null($this->level)) {
 			if ($this->show_changes && $this->ThisChanged()) $this->level = substr(trim($this->GetChangedGedrec()), 0, 1);
 			else $this->level = substr(trim($this->gedrec), 0, 1);
@@ -207,10 +208,9 @@ class MediaItem extends GedcomRecord {
 	}
 
 	private function IsValidMedia() {
-		global $MEDIATYPE;
 		
 		if (is_null($this->validmedia)) {
-			$this->validmedia = in_array(strtolower($this->GetExtension()), $MEDIATYPE);
+			$this->validmedia = MediaFS::IsValidMedia($this->filename);
 		}
 		return $this->validmedia;
 	}
