@@ -89,7 +89,7 @@ class DownloadGedcomController extends BaseController {
 	}	
 		
 	public function DownloadZip() {
-		global $gm_user, $MEDIATYPE; // for downloadbackup
+		global $gm_user;
 		
 		require('includes/pclzip.lib.php');
 		$zipfile = INDEX_DIRECTORY."dl".adodb_date("YmdHis").".zip";

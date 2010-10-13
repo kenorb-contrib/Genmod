@@ -246,7 +246,7 @@ if ($disp1 == "block") {
 			
 			foreach ($dirs as $key => $dir) {
 				$canwrite = MediaFS::DirIsWritable($dir);
-				$indent = preg_match_all("/\//", RelativePathFile($dir), $m)*10;
+				$indent = preg_match_all("/\//", RelativePathFile($dir), $m)*8;
 				$d = preg_split("/\//",$dir);
 				$d = array_reverse($d);
 				if (isset($d[1])) {
@@ -256,7 +256,8 @@ if ($disp1 == "block") {
 					if (!$canwrite) print "<span class=\"readonly\">";
 					print $d[1];
 					if (!$canwrite) print "</span>";
-					if ($dir == $directory) print "</span>";
+					if ($dir == RelativePathFile($directory)) print "</span>";
+					print PrintReady("&nbsp;(".count(MediaFS::GetFileList($dir, "", SystemConfig::$MEDIA_IN_DB)).")");
 					print "</a>";
 					print "</span>";
 					print "<br />\n";

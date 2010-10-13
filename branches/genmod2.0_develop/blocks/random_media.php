@@ -35,7 +35,6 @@ $GM_BLOCKS["print_random_media"]["rss"]     = false;
 //-- function to display a random picture from the gedcom
 function print_random_media($block = true, $config="", $side, $index) {
 	global $TEXT_DIRECTION, $GM_IMAGES;
-	global $MEDIATYPE;
 	
 	srand();
 	$random = 10;
@@ -55,7 +54,7 @@ function print_random_media($block = true, $config="", $side, $index) {
 		$imgwidth = 300;
 		$imgheight = 300;
 		if (preg_match("'://'", $media->filename)) {
-			if (in_array(strtolower($media->extension), $MEDIATYPE)){
+			if (MediaFS::IsValidMedia($media->filename)) {
 			   $imgwidth = 400;
 			   $imgheight = 500;
 			} 

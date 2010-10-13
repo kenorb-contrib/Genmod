@@ -744,7 +744,7 @@ abstract class FactFunctions {
 	
 	//-- Print the links to multi-media objects
 	public function PrintFactMedia($factobj, $level, $nobr=true) {
-		global $TEXT_DIRECTION, $MEDIATYPE;
+		global $TEXT_DIRECTION;
 		global $GM_IMAGES;
 		
 		// This is to prevent that notes are printed as part of the fact for family facts displayed on the indipage

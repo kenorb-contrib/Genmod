@@ -207,7 +207,7 @@ function CompareFactsDate($arec, $brec) {
 	// If either date can't be parsed, don't sort.
 	if (!$adate[0]["year"] || !$bdate[0]["year"]) {
 		if (preg_match('/2 _SORT (\d+)/', $arec, $match1) && preg_match('/2 _SORT (\d+)/', $brec, $match2)) {
-			print "no sort ".$arec." ".$brec."<br />";
+			// print "no sort ".$arec." ".$brec."<br />";
 			return $match1[1]-$match2[1];
 		}
 		return 0;

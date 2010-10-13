@@ -31,7 +31,7 @@ require "config.php";
 
 // Check if the extension is legal and if the user has rights to download this
 $fname = urldecode($fname);
-$legal = array_merge(array("zip", "ged"), $MEDIATYPE);
+$legal = array_merge(array("zip", "ged"), MediaFS::$MEDIATYPE);
 $et = preg_match("/(\.\w+)$/", $fname, $ematch);
 if ($et>0) $ext = substr(trim($ematch[1]),1);
 else $ext = "";
