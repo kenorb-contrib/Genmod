@@ -2166,10 +2166,12 @@ switch ($action) {
 				// Finished adding missing tags
 				// Print the next fact
 				EditFunctions::AddSimpleTag($level." ".$fact." ".$text);
-//				print "adding tag ".$level." ".$fact." ".nl2br($text)."<br />";
+//				print "adding tag. rectype: ".$rectype." level:".$level." fact: ".$fact." orgfact: ".$orgfact." content: ".nl2br($text)."<br />";
 				if ($fact=="DATE" && $orgfact != "SOUR" && !strpos(@$gedlines[$i+1], " TIME")) {
-					EditFunctions::AddSimpleTag(($level+1)." TIME");
-					$tags[] = "TIME";
+					if (in_array($orgfact, $timefacts) && $level <= 3) {
+						EditFunctions::AddSimpleTag(($level+1)." TIME"); 
+						$tags[] = "TIME";
+					}
 				}
 				if ($fact=="MARR" && !strpos(@$gedlines[$i+1], " TYPE")) {
 					EditFunctions::AddSimpleTag(($level+1)." TYPE");
@@ -2271,7 +2273,8 @@ switch ($action) {
 			if (!in_array("RESN", $tags)&& $rectype != "OBJE") EditFunctions::AddSimpleTag("2 RESN");
 			print "</table>";
 			if ($orgfact != "SEX" && $orgfact != "RESN" && $rectype != "OBJE") {
-				if (!in_array($orgfact, $nonassolayerfacts)) EditFunctions::PrintAddLayer("ASSO");
+				// Only show asso's for family or indi facts
+				if (($rectype == "FAM" || $rectype == "INDI") && !in_array($orgfact, $nonassolayerfacts)) EditFunctions::PrintAddLayer("ASSO");
 				if (!in_array($orgfact, $nonsourlayerfacts)) EditFunctions::PrintAddLayer("SOUR");
 				if (!in_array($orgfact, $nonobjelayerfacts)) EditFunctions::PrintAddLayer("OBJE");
 				if (!in_array($orgfact, $nonnotelayerfacts)) {

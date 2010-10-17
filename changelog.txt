@@ -9,6 +9,9 @@
 =====================================================================
 
 Version 2.0 beta 2
+- Fixed DATA:TEXT not printed in source citations (sjouke)
+- Fixed edit fam fact from indipage, fact count error (sjouke)
+- Fixed TIME input field not for every DATE in edit (sjouke)
 - Added number of files per folder in media management (sjouke)
 - Moved media types to MediaFS class (sjouke)
 - Added gendex file generation script (sjouke)

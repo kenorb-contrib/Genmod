@@ -509,6 +509,7 @@ class Person extends GedcomRecord {
 	 */
 	public function AddFamilyFacts($continue=true) {
 		global $nonfacts, $nonfamfacts;
+		
 		if (!$this->DisplayDetails()) return;
 		if (is_null($this->facts)) $this->ParseFacts();
 		$this->GetSpouseFamilies();
@@ -520,10 +521,8 @@ class Person extends GedcomRecord {
 				else $spperson = "husb";
 				$fam->ParseFacts();
 				// No need to check privacy. Already done in ParseFacts.
-				$count_facts = array(); 
+				// Also we maintain the fact count determined by ParseFacts. This will ensure editing the right fact.
 				foreach ($fam->facts as $key => $factobj) {
-					if (!isset($count_facts[$factobj->fact])) $count_facts[$factobj->fact] = 1;
-					else $count_facts[$factobj->fact]++;
 					// -- handle special source fact case
 					if ($factobj->fact != "SOUR" && $factobj->fact != "OBJE" && $factobj->fact != "NOTE" && $factobj->fact != "CHAN" && $factobj->fact != "_UID" && $factobj->fact!="RIN") {
 						if (!in_array($factobj->fact, $nonfacts) && !in_array($factobj->fact, $nonfamfacts)) {
@@ -532,7 +531,7 @@ class Person extends GedcomRecord {
 							$subrecord.="2 _GMFS @".$fam->xref."@\r\n";
 							if ($this->tracefacts) print "AddFamilyFacts - Adding for ".$fam->xref.": ".$factobj->fact." ".$subrecord."<br />";
 							// Beware! This fact is owned by the family, NOT by this individual!
-							$this->facts[] = new fact($fam->xref, $fam->datatype, $fam->gedcomid, $factobj->fact, $subrecord, $count_facts[$factobj->fact], $factobj->style, $this->xref);
+							$this->facts[] = new fact($fam->xref, $fam->datatype, $fam->gedcomid, $factobj->fact, $subrecord, $factobj->count, $factobj->style, $this->xref);
 						}
 					}
 				}

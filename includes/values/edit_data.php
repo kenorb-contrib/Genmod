@@ -57,6 +57,9 @@ $nonplacfacts = array("SLGC","SLGS","ENDL","ASSO","RESN");
 global $nondatefacts;
 $nondatefacts = array("ABBR","ADDR","ASSO","AFN","AUTH","EMAIL","FAX","NAME","NOTE","GNOTE","OBJE","PHON","PUBL","REPO","SEX","SOUR","TEXT","TITL","WWW","_EMAIL","EMAIL","REFN","NCHI","NMR","RIN","FILE","FORM","_PRIM","_SSHOW","_TYPE","_SCBK","RESN");
 
+global $timefacts;
+$timefacts = array("BIRT", "DEAT", "MARR");
+
 global $nonassolayerfacts;
 $nonassolayerfacts = array("ASSO","OBJE","REPO","SOUR","NOTE","GNOTE");
 
