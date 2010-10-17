@@ -1805,7 +1805,7 @@ abstract class EditFunctions {
 	}
 	
 	public function AddMissingTags($tags) {
-		global $templefacts, $nondatefacts, $nonplacfacts, $focus;
+		global $templefacts, $nondatefacts, $nonplacfacts, $timefacts, $focus;
 	
 		// Now add some missing tags :
 		if (in_array($tags[0], $templefacts)) {
@@ -1837,10 +1837,8 @@ abstract class EditFunctions {
 		if (!in_array($tags[0], $nondatefacts)) {
 			// 2 DATE
 			// 3 TIME
-			if (!in_array("DATE", $tags)) {
-				self::AddSimpleTag("2 DATE");
-				self::AddSimpleTag("3 TIME");
-			}
+			if (!in_array("DATE", $tags)) self::AddSimpleTag("2 DATE");
+			if (!in_array("TIME", $tags) && in_array($tags[0], $timefacts)) self::AddSimpleTag("3 TIME");
 			// 2 PLAC
 			if (!in_array("PLAC", $tags) && !in_array($tags[0], $nonplacfacts) && !in_array("TEMP", $tags)) self::AddSimpleTag("2 PLAC");
 		}

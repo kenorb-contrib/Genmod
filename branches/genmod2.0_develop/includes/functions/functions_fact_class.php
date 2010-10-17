@@ -698,7 +698,7 @@ abstract class FactFunctions {
 						else $first = false;
 						print "<span class=\"label\">".GM_LANG_date.": </span><span class=\"field\">".GetChangedDate($cmatch[1])."</span>";
 					}
-					$tt = preg_match_all("/\n$n2level TEXT (.*)(?:\r\n|\r|\n)/", $sourcerec, $tmatch, PREG_SET_ORDER);
+					$tt = preg_match_all("/\n$n2level\sTEXT\s(.*)(\r\n|\r|\n)?/", $sourcerec, $tmatch, PREG_SET_ORDER);
 					for($k=0; $k<$tt; $k++) {
 						if (!$first || $k != 0) print "<br />";
 						else $first = false;
@@ -720,7 +720,7 @@ abstract class FactFunctions {
 					else $first = false;
 					print "<span class=\"label\">".GM_FACT_QUAY.": </span><span class=\"field\">".$cmatch[1]."</span>";
 				}
-				$cs = preg_match_all("/\n$nlevel TEXT (.*)(?:\r\n|\r|\n)/", $sourcerec, $tmatch, PREG_SET_ORDER);
+				$cs = preg_match_all("/\n$nlevel TEXT (.*)(\r\n|\r|\n)?/", $sourcerec, $tmatch, PREG_SET_ORDER);
 				for($k=0; $k<$cs; $k++) {
 					if (!$first || $k != 0) print "<br />";
 					else $first = false;
