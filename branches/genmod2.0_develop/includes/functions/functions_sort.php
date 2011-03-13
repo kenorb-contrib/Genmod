@@ -917,8 +917,10 @@ function CompareDate($a, $b) {
 		else $tag = $sortby;
 	}
 	if (is_object($a)) {
-		$arec = $a->gedrec;
-		$brec = $b->gedrec;
+		if ($a->ischanged) $arec = $a->changedgedrec;
+		else $arec = $a->gedrec;
+		if ($b->ischanged) $brec = $b->changedgedrec;
+		else $brec = $b->gedrec;
 	}
 	else if (is_array($a)) {
 		$arec = $a["gedcom"];

@@ -334,7 +334,7 @@ class Source extends GedcomRecord {
 	
 	protected function ReadSourceRecord() {
 		
-		$sql = "SELECT s_gedrec FROM ".TBLPREFIX."sources WHERE s_key='".JoinKey($this->xref, $this->gedcomid)."'";
+		$sql = "SELECT s_gedrec FROM ".TBLPREFIX."sources WHERE s_key='".DbLayer::EscapeQuery(JoinKey($this->xref, $this->gedcomid))."'";
 		$res = NewQuery($sql);
 		if ($res) {
 			if ($res->NumRows() != 0) {

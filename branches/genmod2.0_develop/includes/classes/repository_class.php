@@ -236,7 +236,7 @@ class Repository extends GedcomRecord {
 
 	protected function ReadRepositoryRecord() {
 		
-		$sql = "SELECT o_gedrec FROM ".TBLPREFIX."other WHERE o_key='".JoinKey($this->xref,	$this->gedcomid)."' AND o_type='REPO'";
+		$sql = "SELECT o_gedrec FROM ".TBLPREFIX."other WHERE o_key='".DbLayer::EscapeQuery(JoinKey($this->xref, $this->gedcomid))."' AND o_type='REPO'";
 		$res = NewQuery($sql);
 		if ($res) {
 			if ($res->NumRows() != 0) {

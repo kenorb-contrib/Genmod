@@ -304,7 +304,7 @@ class Note extends GedcomRecord {
 	
 	protected function ReadNoteRecord() {
 		
-		$sql = "SELECT o_gedrec FROM ".TBLPREFIX."other WHERE o_key='".JoinKey($this->xref,	$this->gedcomid)."' AND o_type='NOTE'";
+		$sql = "SELECT o_gedrec FROM ".TBLPREFIX."other WHERE o_key='".DbLayer::EscapeQuery(JoinKey($this->xref, $this->gedcomid))."' AND o_type='NOTE'";
 		$res = NewQuery($sql);
 		if ($res) {
 			if ($res->NumRows() != 0) {
