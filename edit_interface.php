@@ -1493,6 +1493,7 @@ switch ($action) {
 			if ($addsource) $newrec .= "2 SOUR @XXX@\r\n";
 		}
 		$newrec = EditFunctions::HandleUpdates($newrec);
+		$l1source = GetSubRecord(1, "1 SOUR", $newrec);
 		if ($addsource == "2") {
 			$addsourcevalue = GetSubRecord(1, "1 SOUR", $newrec);
 			$addsourcevalue = substr(preg_replace("/\n(\d) /e", "'\n'.SumNums($1, 1).' '", $addsourcevalue),1);
@@ -1504,7 +1505,7 @@ switch ($action) {
 	
 		if ($xref) print "<br /><br />".GM_LANG_update_successful;
 		else exit;
-		
+
 		$success = true;
 		if ($famid == "new") {
 			$famrec = "0 @new@ FAM\r\n";
@@ -1531,6 +1532,8 @@ switch ($action) {
 				$famrec .= "1 MARR Y\r\n";
 				if ($addsource) $famrec .= $addsourcevalue;
 			}
+			// If there is no marriage info to attach the source info, do it to the family record
+			else $famrec .= $l1source;
 			$famid = EditFunctions::AppendGedrec($famrec, "FAM", $change_id, $change_type);
 		}
 		else if (!empty($famid)) {
@@ -1811,6 +1814,7 @@ switch ($action) {
 		}
 		
 		$newrec = EditFunctions::HandleUpdates($newrec);
+		$l1source = GetSubRecord(1, "1 SOUR", $newrec);
 		if ($addsource == "2") {
 			$addsourcevalue = GetSubRecord(1, "1 SOUR", $newrec);
 			$addsourcevalue = substr(preg_replace("/\n(\d) /e", "'\n'.SumNums($1, 1).' '", $addsourcevalue),1);
@@ -1867,6 +1871,10 @@ switch ($action) {
 			$newrec = "1 MARR Y\r\n";
 			if ($addsource) $newrec .= $addsourcevalue;
 			EditFunctions::ReplaceGedrec($famid, "", $newrec, "MARR", $change_id, $change_type, "", "FAM");
+		}
+		// If there is no marriage info to attach the source info, do it to the family record
+		else {
+			if (!empty($l1source)) EditFunctions::ReplaceGedrec($famid, "", $l1source, "SOUR", $change_id, $change_type, "", "FAM");;
 		}
 		break;
 		

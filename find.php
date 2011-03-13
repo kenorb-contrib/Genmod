@@ -314,7 +314,7 @@ if ($search_controller->action == "filter") {
 			foreach ($search_controller->printmedia as $key => $mediakey) {
 				$media = $search_controller->smedialist[$mediakey];
 				print "\n\t\t<tr><td class=\"shade1 wrap $TEXT_DIRECTION\">";
-				MediaFS::DispImgLink($media->fileobj->f_file, $media->fileobj->f_thumb_file, $media->title, "", 50, 0, ($media->fileobj->f_width+50), ($media->fileobj->f_height+50), $media->fileobj->f_is_image, $media->fileobj->f_file_exists);
+				MediaFS::DispImgLink($media->fileobj->f_main_file, $media->fileobj->f_thumb_file, $media->title, "", 50, 0, ($media->fileobj->f_width+50), ($media->fileobj->f_height+50), $media->fileobj->f_is_image, $media->fileobj->f_file_exists);
 				print "&nbsp;<a href=\"#\" onclick=\"pasteid('".$media->xref."');\">".PrintReady($media->title.$media->addxref)."</a>";
 				print "\n\t\t</td></tr>";
 			}

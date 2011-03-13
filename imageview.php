@@ -64,9 +64,10 @@ PrintSimpleHeader(GM_LANG_imageview);
 		if (zoom<10) zoom=10;
 		i.style.width=Math.round((zoom/100)*imgwidth)+"px";
 		i.style.height=null;
+		document.getElementById('zoomval').value=Math.round(zoom);
 	}
 	function resetimage() {
-		setzoom('100');
+		setzoom(initzoom);
 		document.getElementById('zoomval').value=zoom;
 		i = document.getElementById('theimage');
 		i.style.left='0px';
@@ -117,8 +118,8 @@ PrintSimpleHeader(GM_LANG_imageview);
 	 function resizeWindow() { 
 		if (document.images) { 
 			if (document.images.length == 3) { 
-				height=document.images[0].height+80; 
-				width=document.images[0].width+20; 
+				height=(document.images[0].height * 100 / initzoom)+80; 
+				width=(document.images[0].width * 100 / initzoom)+20; 
 				if(width > screen.width-100) width = screen.width-100; 
 				if(height > screen.height-110) height = screen.height-110; 
 				if (document.layers) window.resizeTo(width+20,height+20) 
@@ -128,7 +129,7 @@ PrintSimpleHeader(GM_LANG_imageview);
 			else setTimeout('resizeWindow()',1000); 
 		} 
 		resizeViewport(); 
-		resetimage(); 
+		//resetimage(); 
 	} 
 
 	function resizeViewport() {
@@ -140,9 +141,10 @@ PrintSimpleHeader(GM_LANG_imageview);
 			pagewidth = window.outerWidth-25;
 			pageheight = window.outerHeight-25-140;
 		}
-		viewport = document.getElementById("imagecropper");
+		viewport = document.getElementById('imagecropper');
 		viewport.style.width=(pagewidth-35)+"px";
-		viewport.style.height=(pageheight-60)+"px";
+		viewport.style.height=(pageheight-100)+"px"; // The page must hold the viewport AND the page footer
+		return;
 		i = document.getElementById('theimage');
 		i.style.left="0px";
 		i.style.top="0px";
@@ -164,9 +166,7 @@ PrintSimpleHeader(GM_LANG_imageview);
 	document.onmousemove = getMouseXY;
 	document.onmouseup = releaseimage;
 
-	window.onresize = resizeViewport;
-	//window.onload = resizeWindow;
--->
+//-->
 </script>
 <?php
 //$filename = FilenameDecode($filename);
@@ -209,24 +209,30 @@ else {
 			$imgheight = 50;
 		}
 	}
-//	print $imgwidth." ".$imgheight;
-	print "<script language=\"JavaScript\" type=\"text/javascript\"><!--\n";
-//	print "var height = document.documentElement.clientHeight;";
-//	print "if (height < ".$imgheight.") {";
-//	print "zoom = zoom * height / ".$imgheight.";";
-//	print "setzoom(zoom);";
-//	print "alert(zoom);";
-//	print "}";
-	print "var imgwidth = $imgwidth-5;\n var imgheight = $imgheight-5;\n";
-	print "var landscape = false;\n";
-	print "if (imgwidth > imgheight) landscape = true;\n";
-	print "//--></script>\n";
 	print '<br /><div id="imagecropper" style="position: relative; border: outset white 3px; background-color: black; overflow: auto; vertical-align: middle; text-align: center; width: '.$imgwidth.'px; height: '.$imgheight.'px; ">';
 	print "\n<img id=\"theimage\" src=\"$filename\" style=\"position: absolute; left: 1px; top: 1px; cursor: move;\" onmousedown=\"panimage(); return false;\" alt=\"\" />\n";
 	print '</div>';
 }
+//	print $imgwidth." ".$imgheight;
+	?>
+	<script language="JavaScript" type="text/javascript">
+	<!--
+	var height = document.documentElement.clientHeight;
+	var imgheight = <?php print $imgheight; ?>;
+	var imgwidth = <?php print $imgwidth; ?>;
+	if (height < imgheight) {
+		zoom = zoom * height / imgheight;
+		setzoom(zoom);
+	}
+	var landscape = false;
+	var initzoom = zoom;
+	if (imgwidth > imgheight) landscape = true;
+	window.onload = resizeWindow; // Use without () as it throws errors in IE
+	window.onresize = resizeViewport;  // Use without () as it throws errors in IE
+	//-->
+	</script><?php
 print "</form>\n";
-print "<div style=\"position: relative bottom; \">\n";
-PrintSimpleFooter();
+print "<div style=\"position: relative; bottom: 0; \">\n";
 print "</div>\n";
+PrintSimpleFooter();
 ?>

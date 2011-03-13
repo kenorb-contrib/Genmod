@@ -543,7 +543,7 @@ class Family extends GedcomRecord {
 			if ($this->show_changes && $this->ThisChanged()) $gedrec = $this->GetChangedGedRec();
 			else $gedrec = $this->gedrec;
 
-			$subrecord = GetSubRecord(1, "1 DIV", $this->gedrec);
+			$subrecord = GetSubRecord(1, "1 DIV", $gedrec);
 			if (!empty($subrecord) && PrivacyFunctions::showFact("DIV", $this->xref, "FAM") && !PrivacyFunctions::FactViewRestricted($this->xref, $subrecord, 2)) {
 				$this->div_fact = new Fact($this->xref, $this->datatype, $this->gedcomid, "DIV", $subrecord);
 				$this->div_date = $this->div_fact->simpledate;
@@ -562,8 +562,8 @@ class Family extends GedcomRecord {
 		
 		if ($this->show_changes && $this->ThisChanged()) $gedrec = $this->GetChangedGedRec();
 		else $gedrec = $this->gedrec;
+		$subrecord = GetSubRecord(1, "1 MARR", $gedrec);
 
-		$subrecord = GetSubRecord(1, "1 MARR", $this->gedrec);
 		if ($this->DisplayDetails() && !empty($subrecord) && PrivacyFunctions::showFact("MARR", $this->xref, "FAM") && !PrivacyFunctions::FactViewRestricted($this->xref, $subrecord, 2)) {
 			$this->marr_fact = new Fact($this->xref, $this->datatype, $this->gedcomid, "MARR", $subrecord);
 			$this->marr_date = $this->marr_fact->simpledate;
@@ -633,7 +633,7 @@ class Family extends GedcomRecord {
 	
 	protected function ReadFamilyRecord() {
 		
-		$sql = "SELECT f_gedrec FROM ".TBLPREFIX."families WHERE f_key='".JoinKey($this->xref, $this->gedcomid)."'";
+		$sql = "SELECT f_gedrec FROM ".TBLPREFIX."families WHERE f_key='".DbLayer::EscapeQuery(JoinKey($this->xref, $this->gedcomid))."'";
 		$res = NewQuery($sql);
 		if ($res) {
 			if ($res->NumRows() != 0) {
