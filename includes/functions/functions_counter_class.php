@@ -33,7 +33,7 @@ abstract class CounterFunctions {
 	public function GetCounter() {
 		global $GM_IMAGES, $bot;
 		global $pid, $famid, $sid, $rid, $mid, $oid;
-		
+
 		//only do counter stuff if counters are enabled
 		if(GedcomConfig::$SHOW_COUNTER) {
 		
@@ -45,33 +45,33 @@ abstract class CounterFunctions {
 			if (isset($pid) || isset($famid) || isset($sid) || isset($rid) || isset($oid) || isset($mid)) {
 				// See if the ID exists. If not, we set the counter to 0.
 				$object = null;
-				switch ($_SERVER["SCRIPT_NAME"]) {
-					case "/individual.php": 
+				$p = pathinfo($_SERVER["SCRIPT_NAME"]);
+				switch ($p["filename"]) {
+					case "individual": 
 						$object =& Person::GetInstance($pid);
 						$type = "INDI";
 						break;
-					case "/family.php":
+					case "family":
 						$object =& Family::GetInstance($famid);
 						$type = "FAM";
 						break;
-					case "/source.php": 
+					case "source": 
 						$object =& Source::GetInstance($sid); 
 						$type = "SOUR";
 						break;
-					case "/repo.php": 
+					case "repo": 
 						$object =& Repository::GetInstance($rid); 
 						$type = "REPO";
 						break;
-					case "/note.php": 
+					case "note": 
 						$object =& Note::GetInstance($oid); 
 						$type = "NOTE";
 						break;
-					case "/mediadetail.php": 
+					case "mediadetail": 
 						$object =& MediaItem::GetInstance($mid); 
 						$type = "OBJE";
 						break;
 				}
-					
 				if (is_object($object) && !$object->isempty) {
 					
 					if (isset($pid)) $cpid = $pid;
@@ -96,7 +96,9 @@ abstract class CounterFunctions {
 					}
 					$_SESSION[$GM_INDI_COUNTER_NAME][$cpid] = $hits;
 				}
-				else $hits = 0;
+				else {
+					$hits = 0;
+				}
 			}
 			else { 
 				//web site counter
