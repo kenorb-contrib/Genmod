@@ -323,7 +323,7 @@ class MediaItem extends GedcomRecord {
 
 	protected function ReadMediaRecord() {
 		
-		$sql = "SELECT m_gedrec FROM ".TBLPREFIX."media WHERE m_media='".$this->xref."' AND m_file='".$this->gedcomid."'";
+		$sql = "SELECT m_gedrec FROM ".TBLPREFIX."media WHERE m_media='".DbLayer::EscapeQuery($this->xref)."' AND m_file='".$this->gedcomid."'";
 		$res = NewQuery($sql);
 		if ($res) {
 			if ($res->NumRows() != 0) {
