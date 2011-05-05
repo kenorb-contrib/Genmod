@@ -9,6 +9,7 @@
 =====================================================================
 
 Version 2.0 beta 2
+- Fixed SQL error if quotes are used in topsearch (sjouke)
 - Fixed counters not working if Genmod is in subdir (sjouke) 
 - Fixed invalid ID throws SQL error (sjouke)
 - Added imageviewer resize image to fit in window (sjouke)
