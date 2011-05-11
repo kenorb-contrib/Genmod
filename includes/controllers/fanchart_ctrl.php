@@ -99,7 +99,8 @@ class FanchartController extends ChartController {
 		$slen = strlen($string);
 		for ($i=0; $i<$slen; $i++) {
 			//print "cw: ".ord(substr($string, $i,1))." waarde ".$cw[ord(substr($string, $i,1))]."<br />";
-			$len += $cw[ord(substr($string, $i,1))];
+			if (isset($cw[ord(substr($string, $i,1))])) $len += $cw[ord(substr($string, $i,1))];
+			else $len += 316;
 		}
 		return $len;
 	}
