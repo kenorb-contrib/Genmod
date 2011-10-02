@@ -37,8 +37,8 @@ class FamilySearchRecordSearchSearchModule extends BaseExternalSearch {
 		$this->method 			= "link";
 		$this->link				= "https://www.familysearch.org/search/records#count=20&amp;query=%2B";
 		$this->params			= array(
-									"surname"		=> "surname",
 									"givenname"		=> "firstname",
+									"surname"		=> "surname",
 									"birth_year" 	=> "gbyear",
 									"birth_place"	=> "bplace"
 									);
