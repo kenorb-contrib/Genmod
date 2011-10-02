@@ -92,13 +92,13 @@ function print_gedcom_stats($block = true, $config="", $side, $index) {
 		print "</table></td><td><br /></td><td valign=\"top\">";
 		print "<table cellspacing=\"0\" cellpadding=\"1\" border=\"0\">";
 		if ($config["stat_first_birth"]=="yes" && !empty($stats["gs_earliest_birth_gid"])) {
-			print "<tr><td valign=\"top\">".GM_LANG_stat_earliest_birth."</td><td class=\"rtl\">&nbsp;<span style=\"font-weight: bold\"><a href=\"calendar.php?action=year&amp;year=".$stats["gs_earliest_birth_year"]."\">".$stats["gs_earliest_birth_year"]."</a></span>&nbsp;</td><td valign=\"top\" class=\"ltr wrap\">";
+			print "<tr><td valign=\"top\">".GM_LANG_stat_earliest_birth."</td><td class=\"rtl\">&nbsp;<span style=\"font-weight: bold\"><a href=\"calendar.php?link=17&amp;action=year&amp;year=".$stats["gs_earliest_birth_year"]."\">".$stats["gs_earliest_birth_year"]."</a></span>&nbsp;</td><td valign=\"top\" class=\"ltr wrap\">";
 			$person =& Person::GetInstance($stats["gs_earliest_birth_gid"]);
 			if ($person->disp) $person->PrintListPerson(false, false);
 			print "</td></tr>\n";
 		}
 		if ($config["stat_last_birth"]=="yes" && !empty($stats["gs_latest_birth_gid"])) {
-			print "<tr><td valign=\"top\">".GM_LANG_stat_latest_birth."</td><td class=\"rtl\">&nbsp;<span style=\"font-weight: bold\"><a href=\"calendar.php?action=year&amp;year=".$stats["gs_latest_birth_year"]."\">".$stats["gs_latest_birth_year"]."</a></span>&nbsp;</td><td valign=\"top\" class=\"ltr wrap\">";
+			print "<tr><td valign=\"top\">".GM_LANG_stat_latest_birth."</td><td class=\"rtl\">&nbsp;<span style=\"font-weight: bold\"><a href=\"calendar.php?link=18&amp;action=year&amp;year=".$stats["gs_latest_birth_year"]."\">".$stats["gs_latest_birth_year"]."</a></span>&nbsp;</td><td valign=\"top\" class=\"ltr wrap\">";
 			$person =& Person::GetInstance($stats["gs_latest_birth_gid"]);
 			if ($person->disp) $person->PrintListPerson(false, false);
 			print "</td></tr>\n";

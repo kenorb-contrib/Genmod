@@ -44,10 +44,11 @@ class GenealogieOnlineSearchModule extends BaseExternalSearch {
 		$this->wsdl 			= true;
 		$this->searchcmd		= "search";
 		$this->params			= array(
-									"name" 			=> "fullname",
+									"name" 			=> "firstname",
+									"surname" 		=> "surname",
 									"birthplace" 	=> "bplace",
 									"deathplace"	=> "dplace");
-		$this->params_checked	= array("fullname");
+		$this->params_checked	= array("firstname", "surname");
 	}
 	
 	// Construct and return the query
@@ -72,7 +73,6 @@ class GenealogieOnlineSearchModule extends BaseExternalSearch {
 		if (isset($results["totalResults"])) $this->totalresults = $results["totalResults"];
 		else $results["totalResults"] = "0";
 		print GM_LANG_hs_results." ".$this->totalresults."<br /><br />";
-		
 		// Convert the data from the service to Genmod format
 		$indilist = array();
 		if (isset($results["persons"])) {
@@ -80,12 +80,16 @@ class GenealogieOnlineSearchModule extends BaseExternalSearch {
 				if (is_numeric($field)) {
 					$gedrec = "0 @".$content["PID"]."@ INDI\r\n";
 					$gedrec .= "1 NAME ".$content["gedcomName"]."\r\n";
-					if (!empty($content["gender"])) $gedrec .= "1 SEX ".$content["gender"]."\r\n";
-					if (!empty($content["birthDate"]) || !empty($content["birthPlace"])) $gedrec .= "1 BIRT\r\n";
-					if (!empty($content["birthDate"])) $gedrec .= "2 DATE ".$content["birthDate"]."\r\n";
+					foreach($content as $key => $value) {
+						$content[$key] = str_replace("*", "", $value);
+						$content[$key] = str_replace("00000000", "", $value);
+					}
+					// if (!empty($content["gender"])) $gedrec .= "1 SEX ".$content["gender"]."\r\n";
+					if (!empty($content["birthDateNum"]) || !empty($content["birthPlace"])) $gedrec .= "1 BIRT\r\n";
+					if (!empty($content["birthDateNum"])) $gedrec .= "2 DATE ".substr($content["birthDateNum"],0,4)."\r\n";
 					if (!empty($content["birthPlace"])) $gedrec .= "2 PLAC ".utf8_encode($content["birthPlace"])."\r\n";
-					if (!empty($content["deathDate"]) || !empty($content["deathPlace"])) $gedrec .= "1 DEAT\r\n";
-					if (!empty($content["deathDate"])) $gedrec .= "2 DATE ".$content["deathDate"]."\r\n";
+					if (!empty($content["deathDateNum"]) || !empty($content["deathPlace"])) $gedrec .= "1 DEAT\r\n";
+					if (!empty($content["deathDateNum"])) $gedrec .= "2 DATE ".substr($content["deathDateNum"],0,4)."\r\n";
 					if (!empty($content["deathPlace"])) $gedrec .= "2 PLAC ".utf8_encode($content["deathPlace"])."\r\n";
 					$data = array();
 					$data["i_isdead"] = true;
@@ -113,10 +117,6 @@ class GenealogieOnlineSearchModule extends BaseExternalSearch {
 			}
 			print "<br />";
 		}
-
-		
-		
-		
 	}
 }
 ?>

@@ -9,6 +9,9 @@
 =====================================================================
 
 Version 2.0 beta 2
+- Fixed update on some external search modules (sjouke)
+- Added Familysearch to external searched (sjouke)
+- Fixed Google indexing errors om JS feed (sjouke)
 - Fixed error in fanchart is character not in font (sjouke)
 - Fixed SQL error if quotes are used in topsearch (sjouke)
 - Fixed counters not working if Genmod is in subdir (sjouke) 

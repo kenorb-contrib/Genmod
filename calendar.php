@@ -58,7 +58,7 @@ if ($view!="preview") {
 	print GM_LANG_day."</td>\n";
 	print "<td colspan=\"7\" class=\"shade1\">";
 	for($i = 1; $i < ($calendar_controller->m_days+1); $i++) {
-		print "<a href=\"calendar.php?day=".$i."&amp;month=".strtolower($calendar_controller->month)."&amp;year=".$calendar_controller->year."&amp;filterev=".$calendar_controller->filterev."&amp;filterof=".$calendar_controller->filterof."&amp;filtersx=".$calendar_controller->filtersx."&amp;action=today\">";
+		print "<a href=\"calendar.php?link=10&amp;day=".$i."&amp;month=".strtolower($calendar_controller->month)."&amp;year=".$calendar_controller->year."&amp;filterev=".$calendar_controller->filterev."&amp;filterof=".$calendar_controller->filterof."&amp;filtersx=".$calendar_controller->filtersx."&amp;action=today\">";
 		if ($i == $calendar_controller->day) print "<span class=\"error\">".$i."</span>";
 		else print $i;
 		print "</a> | ";
@@ -71,7 +71,7 @@ if ($view!="preview") {
   	if (GedcomConfig::$CALENDAR_FORMAT!="gregorian" || $calendar_controller->usehebrew) $datestr = "$Dd $Mm $Yy";
 // 	if ($CALENDAR_FORMAT!="gregorian") $datestr = "$Dd $Mm $Yy"; // MA @@@
 	else $datestr = "$Dd $Mm";
-	print "<a href=\"calendar.php?filterev=".$calendar_controller->filterev."&amp;filterof=".$calendar_controller->filterof."&amp;filtersx=".$calendar_controller->filtersx."&amp;year=".$calendar_controller->year."\"><b>".GetChangedDate($datestr);
+	print "<a href=\"calendar.php?link=13&amp;filterev=".$calendar_controller->filterev."&amp;filterof=".$calendar_controller->filterof."&amp;filtersx=".$calendar_controller->filtersx."&amp;year=".$calendar_controller->year."\"><b>".GetChangedDate($datestr);
 	if ($calendar_controller->usehebrew) {
 		$hdatestr = "@#DHEBREW@ ".$calendar_controller->currhDay." ".$calendar_controller->currhMonth." ".$calendar_controller->currhYear;
 		print " / ".GetChangedDate($hdatestr, $calendar_controller->CalYear);
@@ -87,7 +87,7 @@ if ($view!="preview") {
 	foreach($monthtonum as $mon=>$num) {
 		if (defined("GM_LANG_".$mon)) {
 			if (empty($mm)) $mm=strtolower($calendar_controller->month);
-			print "<a href=\"calendar.php?day=".$calendar_controller->day."&amp;month=".$mon."&amp;year=".$calendar_controller->year."&amp;filterev=".$calendar_controller->filterev."&amp;filterof=".$calendar_controller->filterof."&amp;filtersx=".$calendar_controller->filtersx."&amp;action=".($calendar_controller->action == "year" ? "calendar" : $calendar_controller->action)."\">";
+			print "<a href=\"calendar.php?link=1&amp;day=".$calendar_controller->day."&amp;month=".$mon."&amp;year=".$calendar_controller->year."&amp;filterev=".$calendar_controller->filterev."&amp;filterof=".$calendar_controller->filterof."&amp;filtersx=".$calendar_controller->filtersx."&amp;action=".($calendar_controller->action == "year" ? "calendar" : $calendar_controller->action)."\">";
 			$monthstr = constant("GM_LANG_".$mon);
 			if ($mon==$mm) print "<span class=\"error\">".$monthstr."</span>";
 			else print $monthstr;
@@ -95,7 +95,7 @@ if ($view!="preview") {
 		}
 	}
 
-	print "<a href=\"calendar.php?month=".strtolower(adodb_date("M"))."&amp;action=calendar&amp;filterev=".$calendar_controller->filterev."&amp;filterof=".$calendar_controller->filterof."&amp;filtersx=".$calendar_controller->filtersx."\"><b>".constant("GM_LANG_".strtolower(adodb_date("M")))." ".strtolower(adodb_date("Y"))."</b></a> | ";
+	print "<a href=\"calendar.php?link=14&amp;month=".strtolower(adodb_date("M"))."&amp;action=calendar&amp;filterev=".$calendar_controller->filterev."&amp;filterof=".$calendar_controller->filterof."&amp;filtersx=".$calendar_controller->filtersx."\"><b>".constant("GM_LANG_".strtolower(adodb_date("M")))." ".strtolower(adodb_date("Y"))."</b></a> | ";
 	print "</td>\n";
 	print "</tr><tr>";
 	print "<td class=\"shade2 vmiddle\">";
@@ -103,14 +103,14 @@ if ($view!="preview") {
 	print GM_LANG_year."</td>\n";
 	print "<td class=\"shade1 vmiddle\">";
 	if (strlen($calendar_controller->year) < 5){
-		if ($calendar_controller->year<"AA") print " <a href=\"calendar.php?day=".$calendar_controller->day."&amp;month=".$calendar_controller->month."&amp;year=".($calendar_controller->year-1)."&amp;action=".($calendar_controller->action == "calendar" ? "calendar" : "year")."&amp;filterev=".$calendar_controller->filterev."&amp;filterof=".$calendar_controller->filterof."&amp;filtersx=".$calendar_controller->filtersx."\" title=\"".($calendar_controller->year-1)."\" >-1</a> ";
+		if ($calendar_controller->year<"AA") print " <a href=\"calendar.php?link=2&amp;day=".$calendar_controller->day."&amp;month=".$calendar_controller->month."&amp;year=".($calendar_controller->year-1)."&amp;action=".($calendar_controller->action == "calendar" ? "calendar" : "year")."&amp;filterev=".$calendar_controller->filterev."&amp;filterof=".$calendar_controller->filterof."&amp;filtersx=".$calendar_controller->filtersx."\" title=\"".($calendar_controller->year-1)."\" >-1</a> ";
 	}
 	print "<input type=\"text\" name=\"year\" value=\"".$calendar_controller->year."\" size=\"7\" />";
 	if (strlen($calendar_controller->year) < 5){
-		if ($calendar_controller->year<(adodb_date("Y"))) print " <a href=\"calendar.php?day=".$calendar_controller->day."&amp;month=".$calendar_controller->month."&amp;year=".($calendar_controller->year+1)."&amp;action=".($calendar_controller->action == "calendar" ? "calendar" : "year")."&amp;filterev=".$calendar_controller->filterev."&amp;filterof=".$calendar_controller->filterof."&amp;filtersx=".$calendar_controller->filtersx."\" title=\"".($calendar_controller->year+1)."\" >+1</a> |";
+		if ($calendar_controller->year<(adodb_date("Y"))) print " <a href=\"calendar.php?link=3&amp;day=".$calendar_controller->day."&amp;month=".$calendar_controller->month."&amp;year=".($calendar_controller->year+1)."&amp;action=".($calendar_controller->action == "calendar" ? "calendar" : "year")."&amp;filterev=".$calendar_controller->filterev."&amp;filterof=".$calendar_controller->filterof."&amp;filtersx=".$calendar_controller->filtersx."\" title=\"".($calendar_controller->year+1)."\" >+1</a> |";
 		else if ($calendar_controller->year < "AA") print " +1 |";
 	}
-	print " <a href=\"calendar.php?day=".$calendar_controller->day."&amp;month=".$calendar_controller->month."&amp;year=".adodb_date("Y")."&amp;action=".($calendar_controller->action == "calendar" ? "calendar" : "year")."&amp;filterev=".$calendar_controller->filterev."&amp;filterof=".$calendar_controller->filterof."&amp;filtersx=".$calendar_controller->filtersx."\"><b>".strtolower(adodb_date("Y"))."</b></a> | ";
+	print " <a href=\"calendar.php?link=4&amp;day=".$calendar_controller->day."&amp;month=".$calendar_controller->month."&amp;year=".adodb_date("Y")."&amp;action=".($calendar_controller->action == "calendar" ? "calendar" : "year")."&amp;filterev=".$calendar_controller->filterev."&amp;filterof=".$calendar_controller->filterof."&amp;filtersx=".$calendar_controller->filtersx."\"><b>".strtolower(adodb_date("Y"))."</b></a> | ";
 
 	print "</td>\n ";
 	if ($HIDE_LIVE_PEOPLE >= $gm_user->GetUserAccessLevel()) {
@@ -138,12 +138,12 @@ if ($view!="preview") {
 		if ($calendar_controller->filterof == "all") print "<span class=\"error\">".GM_LANG_all_people. "</span> | ";
 		else {
 			$filt="all";
-			print "<a href=\"calendar.php?day=".$calendar_controller->day."&amp;month=".$calendar_controller->month."&amp;year=".$calendar_controller->year."&amp;filterof=".$filt."&amp;filtersx=".$calendar_controller->filtersx."&amp;action=".$calendar_controller->action."\">".htmlentities(GM_LANG_all_people)."</a>"." | ";
+			print "<a href=\"calendar.php?link=5&amp;day=".$calendar_controller->day."&amp;month=".$calendar_controller->month."&amp;year=".$calendar_controller->year."&amp;filterof=".$filt."&amp;filtersx=".$calendar_controller->filtersx."&amp;action=".$calendar_controller->action."\">".htmlentities(GM_LANG_all_people)."</a>"." | ";
 		}
 		if ($calendar_controller->filterof == "recent") print "<span class=\"error\">".htmlentities(GM_LANG_recent_events). "</span> | ";
 		else {
 			$filt = "recent";
-			print "<a href=\"calendar.php?day=".$calendar_controller->day."&amp;month=".$calendar_controller->month."&amp;year=".$calendar_controller->year."&amp;filterof=".$filt."&amp;filtersx=".$calendar_controller->filtersx."&amp;action=".$calendar_controller->action."\">".htmlentities(GM_LANG_recent_events)."</a>"." | ";
+			print "<a href=\"calendar.php?link=6&amp;day=".$calendar_controller->day."&amp;month=".$calendar_controller->month."&amp;year=".$calendar_controller->year."&amp;filterof=".$filt."&amp;filtersx=".$calendar_controller->filtersx."&amp;action=".$calendar_controller->action."\">".htmlentities(GM_LANG_recent_events)."</a>"." | ";
 		}
 	}
 	
@@ -161,7 +161,7 @@ if ($view!="preview") {
 		}
 		else {
 			$fs="";
-			print " <a href=\"calendar.php?day=".$calendar_controller->day."&amp;month=".$calendar_controller->month."&amp;year=".$calendar_controller->year."&amp;filterev=".$calendar_controller->filterev."&amp;filterof=".$calendar_controller->filterof."&amp;filtersx=".$fs."&amp;action=".$calendar_controller->action."\">";
+			print " <a href=\"calendar.php?link=7&amp;day=".$calendar_controller->day."&amp;month=".$calendar_controller->month."&amp;year=".$calendar_controller->year."&amp;filterev=".$calendar_controller->filterev."&amp;filterof=".$calendar_controller->filterof."&amp;filtersx=".$fs."&amp;action=".$calendar_controller->action."\">";
 			print "<img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["sex"]["small"]."\" title=\"".GM_LANG_all."\" alt=\"".GM_LANG_all."\" width=\"9\" height=\"9\" border=\"0\" align=\"middle\" />";
 			print "<img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["sexf"]["small"]."\" title=\"".GM_LANG_all."\" alt=\"".GM_LANG_all."\" width=\"9\" height=\"9\" border=\"0\" align=\"middle\" />";
 			print "</a>"." | ";
@@ -172,7 +172,7 @@ if ($view!="preview") {
 		}
 		else {
 			$fs = "M";
-			print "<a href=\"calendar.php?day=".$calendar_controller->day."&amp;month=".$calendar_controller->month."&amp;year=".$calendar_controller->year."&amp;filterev=".$calendar_controller->filterev."&amp;filterof=".$calendar_controller->filterof."&amp;filtersx=".$fs."&amp;action=".$calendar_controller->action."\">";
+			print "<a href=\"calendar.php?link=8&amp;day=".$calendar_controller->day."&amp;month=".$calendar_controller->month."&amp;year=".$calendar_controller->year."&amp;filterev=".$calendar_controller->filterev."&amp;filterof=".$calendar_controller->filterof."&amp;filtersx=".$fs."&amp;action=".$calendar_controller->action."\">";
 			print "<img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["sex"]["small"]."\" title=\"".GM_LANG_male."\" alt=\"".GM_LANG_male."\" width=\"9\" height=\"9\" border=\"0\" align=\"middle\" />";
 			print "</a>"." | ";
 		}
@@ -182,7 +182,7 @@ if ($view!="preview") {
 		}
 		else {
 			$fs = "F";
-			print "<a href=\"calendar.php?day=".$calendar_controller->day."&amp;month=".$calendar_controller->month."&amp;year=".$calendar_controller->year."&amp;filterev=".$calendar_controller->filterev."&amp;filterof=".$calendar_controller->filterof."&amp;filtersx=".$fs."&amp;action=".$calendar_controller->action."\">";
+			print "<a href=\"calendar.php?link=9&amp;day=".$calendar_controller->day."&amp;month=".$calendar_controller->month."&amp;year=".$calendar_controller->year."&amp;filterev=".$calendar_controller->filterev."&amp;filterof=".$calendar_controller->filterof."&amp;filtersx=".$fs."&amp;action=".$calendar_controller->action."\">";
 			print "<img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["sexf"]["small"]."\" title=\"".GM_LANG_female."\" alt=\"".GM_LANG_female."\" width=\"9\" height=\"9\" border=\"0\" align=\"middle\" />";
 			print "</a>"." | ";
 		}

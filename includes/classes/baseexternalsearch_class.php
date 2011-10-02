@@ -58,6 +58,12 @@ abstract class BaseExternalSearch {
 	// For "form" type: name of the form to submit
 	protected $formname 		= "";
 	
+	// For "link" type: The character that concatenates the form fields in the URL
+	protected $field_concat		= "&amp;";
+	
+	// For "link" type: The character that concatenates the form fields and values in the URL
+	protected $field_val_concat	= "=";
+	
 	public function __construct() {
 	}
 	
@@ -95,6 +101,12 @@ abstract class BaseExternalSearch {
 				break;
 			case "formname":
 				return $this->formname;
+				break;
+			case "field_concat":
+				return $this->field_concat;
+				break;
+			case "field_val_concat":
+				return $this->field_val_concat;
 				break;
 			default:
 				print "<span class=\"error\">Invalid property ".$property." for __get in ".get_class($this)." class</span><br />";

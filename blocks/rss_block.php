@@ -43,7 +43,7 @@ $GM_BLOCKS["print_RSS_block"]["rss"]		= false;
  * Prints a block allowing the user to login to the site directly from the portal
  */
 function print_RSS_block($block = true, $config="", $side, $index) {
-	global $LANGUAGE, $command, $QUERY_STRING, $GM_BLOCKS, $gm_user, $GM_IMAGES;
+	global $LANGUAGE, $command, $QUERY_STRING, $GM_BLOCKS, $gm_user, $GM_IMAGES, $bot;
 
 	print "<div id=\"rss_block\" class=\"block\">\n";
 	print "<div class=\"blockhc\">";
@@ -79,9 +79,11 @@ function print_RSS_block($block = true, $config="", $side, $index) {
 	print "\n\t\t<option value=\"HTML\"";
 	if (GedcomConfig::$RSS_FORMAT=="HTML") print " selected=\"selected\"";
 	print ">HTML</option>";
-	print "\n\t\t<option value=\"JS\"";
-	if (GedcomConfig::$RSS_FORMAT=="JS") print " selected=\"selected\"";
-	print ">JavaScript</option>";
+	if (!$bot) {
+		print "\n\t\t<option value=\"JS\"";
+		if (GedcomConfig::$RSS_FORMAT=="JS") print " selected=\"selected\"";
+		print ">JavaScript</option>";
+	}
 	print "\n\t</select>";
 	//print "\n\t<select name=\"module\" class=\"header_select\" onchange=\"javascript:document.getElementById('rss_button').href = 'rss.php?lang=' + document.rssform.lang.value + (document.rssform.module.value==''? '' : '&module=' + document.rssform.module.value) + (document.rssform.rssStyle.value==''? '' : '&rssStyle=' + document.rssform.rssStyle.value);\">";
 	print "\n\t<select name=\"module\" class=\"header_select\" onchange=\"javascript:document.getElementById('rss_button').href = 'rss.php?lang=" . $LANGUAGE . "' + (document.rssform.module.value==''? '' : '&amp;module=' + document.rssform.module.value) + (document.rssform.rssStyle.value==''? '' : '&amp;rssStyle=' + document.rssform.rssStyle.value);\">";

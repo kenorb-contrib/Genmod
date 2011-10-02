@@ -131,7 +131,6 @@ class ExternalSearchController {
 		if ($module->method != "form") print "<form name=\"extsearch\" method=\"get\" action=\"individual.php\">\n";
 		else print "<form name=\"".$module->formname."\" method=\"post\" action=\"".$module->link."\" target=\"_blank\">\n";
 		print "<table class=\"width100\">\n";
-		
 		// Print the input fields
 		foreach($module->params as $inputname => $formname) {
 			if ($module->method == "form") $this->PrintInputField($formname, $inputname, (in_array($formname, $module->params_checked)));
@@ -154,14 +153,21 @@ class ExternalSearchController {
 		else $checkrange = "";
 		print "<input type=\"submit\" name=\"".GM_LANG_search."\" value=\"".GM_LANG_search."\"";
 		if ($module->method == "link") {
-			print " onclick=\"".$checkrange."window.open('".$module->link;
-			$first = true;
+			print " onclick=\"".$checkrange."\n";
+			print "\turl = '".$module->link."';\n";
+			print "\tfirst = true;\n";
 			foreach($module->params as $inputname => $formname) {
-				if (!$first) print "+'&amp;";
-				print $inputname."='+(document.extsearch.".$formname."_checked.checked ? escape(document.extsearch.".$formname.".value) : '')";
-				$first = false;
+				print "\tif (!first && document.extsearch.".$formname."_checked.checked && document.extsearch.".$formname.".value.length > 0) {\n";
+				print "\t\turl = url + '".$module->field_concat."'\n";
+				print "\t}\n";
+				print "\tif (document.extsearch.".$formname."_checked.checked && document.extsearch.".$formname.".value.length > 0) {\n";
+				print "\t\turl = url + '".$inputname.$module->field_val_concat."'+(escape(document.extsearch.".$formname.".value));\n";
+				print "\t\tfirst = false;\n";
+				print "\t}\n";
 			}
-			print ");return false;\" />\n";
+//			print "\turl = url.replace(/'/g, '\\'');";
+			print "\twindow.open(url);\n";
+			print "\treturn false;\" />\n";
 		}
 		elseif ($module->method == "SOAP") {
 			print " onclick=\"sndReq('esearchresults', 'extsearchservice', 'formno', '".$number."', 'pid', '".$this->indi->xref."', 'gedcomid', '".$this->indi->gedcomid."'";
@@ -220,8 +226,10 @@ class ExternalSearchController {
 		 * infix			Prefix of the persons surname
 		 * firstname		First name of the person
 		 * gbdate			Birthdate in gedcom format e.g. 12 MAY 1880
+		 * gbyear			Birthyear
 		 * bplace			Birthplace
 		 * gddate			Deathdate in gedcom format e.g. 12 MAY 1880
+		 * gdyear			Deathyear
 		 * dplace			Deathplace
 		 * ggender			Gedcom value (M, F, U) of the gender of the person
 		 * gplace			General placename selection on any fact
@@ -269,7 +277,7 @@ class ExternalSearchController {
 				$this->PrintCheckSelect($field, $checked);
 				$date = ParseDate(GetGedcomValue("DATE", 2, $this->indi->bdate, "", false));
 				$year = $date[0]["year"];
-				print "<td class=\"shade1\"><input name=\"".$inputname."\" id=\"".$inputname."\" size=\"25\" value=\"".$year."\" tabindex=\"".$tabindex."\" /></td></tr>\n";
+				print "<td class=\"shade1\"><input name=\"".$inputname."\" id=\"".$inputname."\" size=\"25\" value=\"".($year == 0 ? "" : $year)."\" tabindex=\"".$tabindex."\" /></td></tr>\n";
 				break;
 			case "bplace":
 				print "<tr><td class=\"shade2\">".GM_LANG_birthplac.":</td>";
@@ -288,7 +296,7 @@ class ExternalSearchController {
 				$this->PrintCheckSelect($field, $checked);
 				$date = ParseDate(GetGedcomValue("DATE", 2, $this->indi->ddate, "", false));
 				$year = $date[0]["year"];
-				print "<td class=\"shade1\"><input name=\"".$inputname."\" id=\"".$inputname."\" size=\"25\" value=\"".$year."\" tabindex=\"".$tabindex."\" /></td></tr>\n";
+				print "<td class=\"shade1\"><input name=\"".$inputname."\" id=\"".$inputname."\" size=\"25\" value=\"".($year == 0 ? "" : $year)."\" tabindex=\"".$tabindex."\" /></td></tr>\n";
 				break;
 			case "dplace":
 				print "<tr><td class=\"shade2\">".GM_LANG_deathplac.":</td>";
@@ -324,7 +332,7 @@ class ExternalSearchController {
 					$byear = $year[0]["year"];
 				}
 				else $byear = "";
-				print "<td class=\"shade1\"><input name=\"".$inputname."\" size=\"4\" value=\"".$byear."\" tabindex=\"".$tabindex."\" /></td></tr>\n";
+				print "<td class=\"shade1\"><input name=\"".$inputname."\" size=\"4\" value=\"".($byear == 0 ? "" : $byear)."\" tabindex=\"".$tabindex."\" /></td></tr>\n";
 				break;
 			case "yrange2":
 				$this->hasrange = true;
@@ -336,7 +344,7 @@ class ExternalSearchController {
 					$dyear = $year[0]["year"];
 				}
 				else $dyear = "";
-				print "<td class=\"shade1\"><input name=\"".$inputname."\" size=\"4\" value=\"".$dyear."\" tabindex=\"".$tabindex."\" /></td></tr>\n";
+				print "<td class=\"shade1\"><input name=\"".$inputname."\" size=\"4\" value=\"".($dyear == 0 ? "" : $dyear)."\" tabindex=\"".$tabindex."\" /></td></tr>\n";
 				break;
 		}
 		$tabindex++;

@@ -24,28 +24,29 @@
  * @version $Id$
  */
 
-class WestBrabantSearchModule extends BaseExternalSearch {
+class FamilySearchRecordSearchSearchModule extends BaseExternalSearch {
 	
 	// Class information
-	public $classname 			= "WestBrabantSearchModule";		// Name of the class
+	public $classname 			= "FamilySearchRecordSearchSearchModule";	// Name of the class
 	
 	public function __construct() {
 		
 		parent::__construct();
 		
-		$this->display_name 	= "Regionaal Archief West-Brabant";
+		$this->display_name 	= "FamilySearch";
 		$this->method 			= "link";
-		$this->link				= "http://www.regionaalarchiefwestbrabant.nl/zoeken/voorouders/resultaat/q/";
+		$this->link				= "https://www.familysearch.org/search/records#count=20&amp;query=%2B";
 		$this->params			= array(
-									"persoon_achternaam_t_0"	=> "surname",
-									"persoon_voornaam_t_0"		=> "firstname",
-									"plaats_t"					=> "gplace"
+									"surname"		=> "surname",
+									"givenname"		=> "firstname",
+									"birth_year" 	=> "gbyear",
+									"birth_place"	=> "bplace"
 									);
-//									"jaar_van" 					=> "yrange1",
-//									"jaar_tot"	 				=> "yrange2"
 		$this->params_checked	= array("surname");
-		$this->field_concat		= "/q/";
-		$this->field_val_concat	= "/";
+		
+		$this->field_concat		= "%20%2B";
+		$this->field_val_concat	= "%3A";
+		
 	}
 }
 ?>

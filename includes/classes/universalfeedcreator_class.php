@@ -1476,7 +1476,18 @@ class JSCreator extends HTMLCreator {
 		
 		$jsFeed = "";
 		foreach ($feedArray as $value) {
-			$jsFeed .= "document.write('".trim(addslashes($value))."');\n";
+//			$jsFeed .= "document.write('".trim(addslashes($value))."');\n";
+
+			// Replace single quotes outside tags with html code
+			$search = "\'";
+			$replace = "&#039";
+			$value = preg_replace('/'.$search.'(?![^<]*>)/', $replace, $value);
+
+			// Replace single quotes in html tags (the remaining ones in the string) with double quotes
+			$replace = '"';
+			$value = str_replace("'", '"', $value);
+			
+			$jsFeed .= "document.write('".trim($value)."');\n";
 		}
 		return $jsFeed;
 	}
