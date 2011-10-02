@@ -29,39 +29,24 @@ class TilburgSearchModule extends BaseExternalSearch {
 	// Class information
 	public $classname 			= "TilburgSearchModule";		// Name of the class
 
-		
 	public function __construct() {
 		
 		parent::__construct();
 		
 		$this->display_name 	= "Regionaal Archief Tilburg";
-		$this->method 			= "form";
-		$this->link				= "http://www.regionaalarchieftilburg.nl/index.php?option=com_genealogie_zoeken&Itemid=47&sub=resultaat";
+		$this->method 			= "link";
+		$this->link				= "http://www.regionaalarchieftilburg.nl/zoeken-in-databases/genealogie/resultaten/q/";
 		$this->params			= array(
-									"achternaam"				=> "stripsurname",
-									"voornaam"	 				=> "firstname",
-									"jaar_van" 					=> "yrange1",
-									"jaar_tot"	 				=> "yrange2"
+									"persoon_achternaam_t_0"	=> "stripsurname",
+									"persoon_voornaam_t_0"		=> "firstname",
+									"persoon_tussenvoegsel_t_0"	=> "infix",
+									"plaats_t"					=> "gplace"
 									);
+//									"jaar_van" 					=> "yrange1",
+//									"jaar_tot"	 				=> "yrange2"
 		$this->params_checked	= array("stripsurname");
-		$this->params_hidden 	= array(
-									"zoekmethode_achternaam"	=> "exact",
-									"zoekmethode_voornaam"		=> "exact",
-									"plaats" 					=> "",
-									"bron_a" 					=> "1",
-									"bron_d" 					=> "1",
-									"bron_g" 					=> "1",
-									"bron_t" 					=> "1",
-									"bron_h" 					=> "1",
-									"bron_b" 					=> "1",
-									"bron_o" 					=> "1",
-									"bron_bp" 					=> "1",
-									"bron_na" 					=> "1",
-									"bron_br" 					=> "1",
-									"bron_ra" 					=> "1",
-									"rol" 						=> "all"
-									);
-		$this->formname 		= "form_01";
+		$this->field_concat		= "/q/";
+		$this->field_val_concat	= "/";
 	}
 }
 ?>

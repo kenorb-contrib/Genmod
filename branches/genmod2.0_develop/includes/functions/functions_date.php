@@ -859,7 +859,7 @@ function GetDateUrl($datestr, $CalYear=""){
 						}
 					}
 
-					$datelink = "<a class=\"date\" href=\"calendar.php?gedid=".GedcomConfig::$GEDCOMID."&amp;";
+					$datelink = '<a class="date" href="calendar.php?link=11&amp;gedid='.GedcomConfig::$GEDCOMID.'&amp;';
 					If ($action == "year" && ((isset($start_year) && strlen($start_year)>0) ||
 					    (isset($end_year) && strlen($end_year)>0))) {
 						if (isset($start_year) && strlen($start_year)>0) $datelink .= "year=".$start_year;
@@ -882,7 +882,7 @@ function GetDateUrl($datestr, $CalYear=""){
 				      }
 				      else if (isset($start_month) && strlen($start_month) > 0) $datelink .= "&month=".$start_month;
 				    }
-					$datelink .= "&amp;filterof=all&amp;action=".$action."\">";
+					$datelink .= '&amp;filterof=all&amp;action='.$action.'">';
                     if (isset($match_bet[5][4])	&& isset($match_bet[11][4])) {
 						if (trim($match_bet[5][0])==trim($match_bet[5][4]) && trim($match_bet[11][0])==trim($match_bet[11][4])) {
 							$tmp       = GetChangedDate($match_bet[0][1]." @#DHEBREW@ ".$match_bet[5][0]);
@@ -922,7 +922,7 @@ function GetDateUrl($datestr, $CalYear=""){
 						else if (!empty($year))   				$tmpdatelink  = "year";
 						     else if (!empty($month))   		$tmpdatelink  = "calendar";
 						          else 							$tmpdatelink  = "";
-						$tmplink = "\">";
+						$tmplink = '">';
 					}
 
 					if (stristr($datestr, "#DHEBREW") && GedcomConfig::$USE_RTL_FUNCTIONS) {
@@ -955,7 +955,7 @@ function GetDateUrl($datestr, $CalYear=""){
     													$year    = $dateheb[0]["year"];
     						else                        $year    = "";
 					}
-					$datelink = "<a class=\"date\" href=\"calendar.php?gedid=".GedcomConfig::$GEDCOMID."&amp;";
+					$datelink = '<a class="date" href="calendar.php?link=12&amp;gedid='.GedcomConfig::$GEDCOMID.'&amp;';
 					if (isset($day) && strlen($day) > 0) 	 $datelink 	.= "day=".$day."&amp;";
 					if (isset($month) && strlen($month) > 0) $datelink 	.= "month=".$month."&amp;";
 					if (isset($year) && strlen($year) > 0)   $datelink 	.= "year=".$year;
