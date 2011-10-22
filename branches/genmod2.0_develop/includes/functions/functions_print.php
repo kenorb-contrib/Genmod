@@ -421,13 +421,14 @@ function PrintFooter() {
 	
 	if (!isset($footer_count)) $footer_count = 1;
 	else $footer_count++;
-	
 	print "<!-- begin footer -->\n";
+	print "<div id=\"FooterSectionDummy\"></div>";
+	print "<div id=\"FooterSection\" class=\"$TEXT_DIRECTION\">";
 	$QUERY_STRING = preg_replace("/&/", "&", $QUERY_STRING);
 	if ($view != "preview") include(GM_FOOTERFILE);
 	else {
 		include(GM_PRINT_FOOTERFILE);
-		print "\n\t<div class=\"center width95\"><br />";
+		print "\n\t<div class=\"FooterPreviewLinkContainer\"><br />";
 		$backlink = SCRIPT_NAME."?".GetQueryString();
 		if (!$printlink) {
 			print "\n\t<br /><a id=\"printlink\" href=\"#\" onclick=\"print(); return false;\">".GM_LANG_print."</a><br />";
@@ -441,6 +442,15 @@ function PrintFooter() {
 	// print "</div>";
 	if (DebugCollector::$show) DebugCollector::PrintDebug();
 	include("includes/values/include_bottom.php");	
+	print "</div> <!-- close div id=\"FooterSection\" -->\n";
+	print "</div> <!-- close div id=\"GenmodContainer\" -->\n";
+	?>
+	<script type="text/javascript">
+	<!--
+	document.getElementById('FooterSectionDummy').style.paddingBottom = (document.getElementById('FooterSection').clientHeight);
+	//-->
+	</script>
+	<?php
 	print "\n\t</body>\n</html>";
 	//-- We write the session data and close it. Fix for intermittend logoff.
 	session_write_close();
@@ -453,15 +463,17 @@ function PrintSimpleFooter() {
 	global $CONFIG_PARMS;
 	global $QUERY_STRING;
 	
-	print "\n\t<br /><br /><div class=\"center\" style=\"width: 99%;\">";
+	print "\n\t<div id=\"FooterSection\">";
 	PrintContactLinks();
 	print "<br />Running <a href=\"http://www.genmod.net/\" target=\"_blank\">Genmod";
 	if (count($CONFIG_PARMS) >1) print " Enterprise";
 	print MediaFS::GetStorageType();
 	print "</a> - Version ".GM_VERSION." ".GM_VERSION_RELEASE;
 	if (GedcomConfig::$SHOW_STATS) PrintExecutionStats();
-	print "</div>";
 	if (DebugCollector::$show) DebugCollector::PrintDebug();
+	print "</div>";
+	// Close Genmod container
+	print "</div>";
 	print "\n\t</body>\n</html>";
 	//-- We write the session data and close it. Fix for intermittend logoff.
 	session_write_close();
@@ -509,7 +521,7 @@ function PrintExecutionStats() {
 	global $start_time, $TOTAL_QUERIES, $PRIVACY_CHECKS, $QUERY_EXECTIME;
 	$end_time = GetMicrotime();
 	$exectime = $end_time - $start_time;
-	print "<br /><br />".GM_LANG_exec_time;
+	print GM_LANG_exec_time;
 	printf(" %.3f ".GM_LANG_sec, $exectime);
 	print "  ".GM_LANG_total_queries." $TOTAL_QUERIES.";
 	print " ".GM_LANG_query_exec_time;
@@ -524,7 +536,6 @@ function PrintExecutionStats() {
 			print ".";
 		}
 	}
-	print "<br />";
 }
 
 /**
@@ -541,24 +552,24 @@ function PrintContactLinks($style=0) {
 	if (GedcomConfig::$CONTACT_METHOD=="none") GedcomConfig::$CONTACT_EMAIL = GedcomConfig::$WEBMASTER_EMAIL;
 	switch($style) {
 		case 0:
-			print "<div class=\"contact_links\">\n";
+			print "<div class=\"FooterContactLinks\">\n";
 			//--only display one message if the contact users are the same
 			if (GedcomConfig::$CONTACT_EMAIL == GedcomConfig::$WEBMASTER_EMAIL) {
 				$user =& User::GetInstance(GedcomConfig::$WEBMASTER_EMAIL);
 				if (!$user->is_empty && GedcomConfig::$SUPPORT_METHOD != "mailto") {
-					print GM_LANG_for_all_contact." <a href=\"#\" accesskey=\"". GM_LANG_accesskey_contact ."\" onclick=\"message('".GedcomConfig::$WEBMASTER_EMAIL."', '".GedcomConfig::$SUPPORT_METHOD."'); return false;\">".$user->firstname." ".$user->lastname."</a><br />\n";
+					print GM_LANG_for_all_contact." <a href=\"#\" accesskey=\"". GM_LANG_accesskey_contact ."\" onclick=\"message('".GedcomConfig::$WEBMASTER_EMAIL."', '".GedcomConfig::$SUPPORT_METHOD."'); return false;\">".$user->firstname." ".$user->lastname."</a>\n";
 				}
 				else {
 					print GM_LANG_for_support." <a href=\"mailto:";
-					if (!empty($gm_user->username)) print $user->email."\" accesskey=\"". GM_LANG_accesskey_contact ."\">".$gm_user->firstname." ".$gm_user->lastname."</a><br />\n";
-					else print GedcomConfig::$WEBMASTER_EMAIL."\">".GedcomConfig::$WEBMASTER_EMAIL."</a><br />\n";
+					if (!empty($gm_user->username)) print $user->email."\" accesskey=\"". GM_LANG_accesskey_contact ."\">".$gm_user->firstname." ".$gm_user->lastname."</a>\n";
+					else print GedcomConfig::$WEBMASTER_EMAIL."\">".GedcomConfig::$WEBMASTER_EMAIL."</a>\n";
 				}
 			}
 			//-- display two messages if the contact users are different
 			else {
 				  $user =& User::GetInstance(GedcomConfig::$CONTACT_EMAIL);
 				  if (!$user->is_empty && GedcomConfig::$CONTACT_METHOD!="mailto") {
-					  print GM_LANG_for_contact." <a href=\"#\" accesskey=\"". GM_LANG_accesskey_contact ."\" onclick=\"message('".GedcomConfig::$CONTACT_EMAIL."', '".GedcomConfig::$CONTACT_METHOD."'); return false;\">".$gm_user->firstname." ".$gm_user->lastname."</a><br /><br />\n";
+					  print GM_LANG_for_contact." <a href=\"#\" accesskey=\"". GM_LANG_accesskey_contact ."\" onclick=\"message('".GedcomConfig::$CONTACT_EMAIL."', '".GedcomConfig::$CONTACT_METHOD."'); return false;\">".$gm_user->firstname." ".$gm_user->lastname."</a><br />\n";
 				  }
 				  else {
 					   print GM_LANG_for_contact." <a href=\"mailto:";
@@ -567,12 +578,12 @@ function PrintContactLinks($style=0) {
 				  }
 				  $user =& User::GetInstance(GedcomConfig::$WEBMASTER_EMAIL);
 				  if ($user && GedcomConfig::$SUPPORT_METHOD != "mailto") {
-					  print GM_LANG_for_support." <a href=\"#\" onclick=\"message('".GedcomConfig::$WEBMASTER_EMAIL."', '".GedcomConfig::$SUPPORT_METHOD."'); return false;\">".$gm_user->firstname." ".$gm_user->lastname."</a><br />\n";
+					  print GM_LANG_for_support." <a href=\"#\" onclick=\"message('".GedcomConfig::$WEBMASTER_EMAIL."', '".GedcomConfig::$SUPPORT_METHOD."'); return false;\">".$gm_user->firstname." ".$gm_user->lastname."</a>\n";
 				  }
 				  else {
 					   print GM_LANG_for_support." <a href=\"mailto:";
-					   if (!empty($gm_user->username)) print $gm_user->email."\">".$gm_user->firstname." ".$gm_user->lastname."</a><br />\n";
-					   else print GedcomConfig::$WEBMASTER_EMAIL."\">".GedcomConfig::$WEBMASTER_EMAIL."</a><br />\n";
+					   if (!empty($gm_user->username)) print $gm_user->email."\">".$gm_user->firstname." ".$gm_user->lastname."</a>\n";
+					   else print GedcomConfig::$WEBMASTER_EMAIL."\">".GedcomConfig::$WEBMASTER_EMAIL."</a>\n";
 				  }
 			}
 			print "</div>\n";
@@ -670,7 +681,7 @@ function PrintHelpLink($help, $helpText, $show_desc="", $use_print_text=false, $
 	if (($view!="preview")&&($_SESSION["show_context_help"])){
 		if ($helpText=="qm_ah"){
 			if ($gm_user->userIsAdmin()){
-				 $output .= " <a class=\"error help\" tabindex=\"0\" href=\"javascript:";
+				 $output .= " <a class=\"Error help\" tabindex=\"0\" href=\"javascript:";
 				 if ($show_desc == "") $output .= $help;
 				 else if ($use_print_text) $output .= PrintText($show_desc, 0, 1);
 				 else if (stristr(constant("GM_LANG_".$show_desc), "\"")) $output .= preg_replace('/\"/','\'', constant("GM_LANG_".$show_desc));
@@ -1135,7 +1146,7 @@ function PrintPrivacyError($username) {
 	 if ($username == GedcomConfig::$WEBMASTER_EMAIL) $method = GedcomConfig::$SUPPORT_METHOD;
 	 $user =& User::GetInstance($username);
 	 if (empty($user->username)) $method = "mailto";
-	 print "<br /><span class=\"error\">".GM_LANG_privacy_error;
+	 print "<br /><span class=\"Error\">".GM_LANG_privacy_error;
 	 if ($method=="none") {
 		  print "</span><br />\n";
 		  return;
@@ -1161,12 +1172,17 @@ function PrintAccessKeyHeaders() {
 	global $action;
 	
 	?>
-	<div class="accesskeys">
-	<a class="accesskeys" href="#content" title="<?php print GM_LANG_accesskey_skip_to_content_desc; ?>" tabindex="0" accesskey="<?php print GM_LANG_accesskey_skip_to_content; ?>"><?php print GM_LANG_accesskey_skip_to_content_desc; ?></a>
-	<a class="accesskeys" href="javascript://accesskey_viewing_advice_help" onfocus="this.onclick" onclick="return helpPopup('accesskey_viewing_advice_help');" title="<?php print GM_LANG_accesskey_viewing_advice_desc; ?>" accesskey="<?php print GM_LANG_accesskey_viewing_advice; ?>"><?php print GM_LANG_accesskey_viewing_advice_desc; ?></a>
+	<div class="HeaderAccessKeys">
+	<a class="HeaderAccessKeys" href="#content" title="<?php print GM_LANG_accesskey_skip_to_content_desc; ?>" tabindex="0" accesskey="<?php print GM_LANG_accesskey_skip_to_content; ?>"><?php print GM_LANG_accesskey_skip_to_content_desc; ?></a>
+	<a class="HeaderAccessKeys" href="javascript://accesskey_viewing_advice_help" onfocus="this.onclick" onclick="return helpPopup('accesskey_viewing_advice_help');" title="<?php print GM_LANG_accesskey_viewing_advice_desc; ?>" accesskey="<?php print GM_LANG_accesskey_viewing_advice; ?>"><?php print GM_LANG_accesskey_viewing_advice_desc; ?></a>
 	<a href="javascript://help_<?php print basename(SCRIPT_NAME); ?>" onclick="return helpPopup('help_<?php print basename(SCRIPT_NAME); ?>&amp;action=<?php print $action;?>');" accesskey="<?php print GM_LANG_accesskey_help_current_page; ?>"> </a>
 	<a href="javascript://help_contents_help" onclick="return helpPopup('help_contents_help');" accesskey="<?php print GM_LANG_accesskey_help_content; ?>"> </a>
 	</div>
 	<?php
+}
+
+function PrintGetSetError($property, $class, $type) {
+	
+	print "<span class=\"Error\">Invalid property ".$property." for __".$type." in ".$class." class</span><br />";
 }
 ?>

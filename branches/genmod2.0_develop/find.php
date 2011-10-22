@@ -309,7 +309,7 @@ if ($search_controller->action == "filter") {
 		print "</table></div>";
 	}
 	else if ($search_controller->type == "media") {
-		print "\n\t<table class=\"list_table center $TEXT_DIRECTION\">\n\t\t";
+		print "\n\t<table class=\"ListTable $TEXT_DIRECTION\">\n\t\t";
 		if (count($search_controller->media_total) > 0) {
 			foreach ($search_controller->printmedia as $key => $mediakey) {
 				$media = $search_controller->smedialist[$mediakey];

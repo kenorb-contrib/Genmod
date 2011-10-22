@@ -136,7 +136,7 @@ class EditLangController extends BaseController {
 	}
 	
 	public function ShowLanguageCompare($lang1, $lang2, $facts = false, $help = false) {
-		print "<span class=\"subheaders\">".GM_LANG_additions.":</span>";
+		print "<span class=\"SubHeader\">".GM_LANG_additions.":</span>";
 		$count=0;
 		$colorid = 1;
 		foreach($lang1 as $key=>$value) {
@@ -153,7 +153,7 @@ class EditLangController extends BaseController {
 			}
 		}
 		if ($count==0) print "<div class=\"shade1\">".GM_LANG_no_additions."</div>";
-		print "<span class=\"subheaders\">".GM_LANG_subtractions.":</span>";
+		print "<span class=\"SubHeader\">".GM_LANG_subtractions.":</span>";
 		$count = 0;
 		$colorid = 1;
 		foreach($lang2 as $key=>$value) {

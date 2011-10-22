@@ -93,6 +93,6 @@ if ($custompage->action == "edit") {
 else {
 	print html_entity_decode($custompage->page->content);
 }
-print "<div class=\"error center\">".$custompage->message."</div>";
+print "<div class=\"Error center\">".$custompage->message."</div>";
 PrintFooter();
 ?>

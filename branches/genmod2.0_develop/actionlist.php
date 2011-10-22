@@ -32,7 +32,7 @@ require("config.php");
 PrintHeader(GM_LANG_actionlist);
 
 if (!$gm_user->ShowActionLog()) {
-	print "<span class=\"error\">".GM_LANG_access_denied."</span>";
+	print "<span class=\"Error\">".GM_LANG_access_denied."</span>";
 	PrintFooter();
 	exit;
 }
@@ -40,22 +40,22 @@ if (!$gm_user->ShowActionLog()) {
 if (!isset($sort)) $sort = "person"; // Default to sort on person
 if (!isset($status)) $status = "0"; // Default to open ToDo's
 
-print "<div class=\"center\">";
-print "<h3>".GM_LANG_actionlist."</h3>\n\t";
+print "<div class=\"ActionListOptionContainer\">";
+print "<span class=\"PageTitleName\">".GM_LANG_actionlist."</span>\n\t";
 
 if ($view != "preview") {
 	print "\n\t<form name=\"actionlist\" action=\"actionlist.php\" method=\"post\">";
-	print "\n\t\t<table class=\"list_table center $TEXT_DIRECTION\">\n\t\t\t<tr>";
+	print "\n\t\t<table class=\"ListTable $TEXT_DIRECTION\">\n\t\t\t<tr>";
 	// Upper options block
-	print "\n\t\t\t<td class=\"shade3 center\" colspan=\"4\">".GM_LANG_choose."</td></tr>";
+	print "\n\t\t\t<td class=\"NavBlockHeader\" colspan=\"4\">".GM_LANG_choose."</td></tr>";
 	// Sort by part 1
-	print "<tr><td class=\"shade1\">".GM_LANG_sort_by_person."</td>";
-	print "<td class=\"shade2\" style=\"vertical-align: middle;\"><input type=\"radio\" name=\"sort\" value=\"person\" onclick=\"submit()\"";
+	print "<tr><td class=\"NavBlockLabel\">".GM_LANG_sort_by_person."</td>";
+	print "<td class=\"NavBlockField\"><input type=\"radio\" name=\"sort\" value=\"person\" onclick=\"submit()\"";
 	if ($sort == "person") print " checked=\"checked\" ";
 	print " /></td>";
 	// Show what status
-	print "<td class=\"shade1\" rowspan=\"2\" style=\"vertical-align: middle;\">".GM_LANG_show_status."</td>";
-	print "<td class=\"shade2\"  rowspan=\"2\" style=\"vertical-align: middle;\">";
+	print "<td class=\"NavBlockLabel\" rowspan=\"2\">".GM_LANG_show_status."</td>";
+	print "<td class=\"NavBlockField\"  rowspan=\"2\">";
 	print "<select name=\"status\" onchange=\"submit()\">";
 	print "<option value=\"\"";
 	if ($status == "") print " selected=\"selected\"";
@@ -68,57 +68,58 @@ if ($view != "preview") {
 	print ">".GM_LANG_action1."</option>";
 	print "</select></td></tr>";
 	// Sort by part 2
-	print "<tr><td class=\"shade1\">".GM_LANG_sort_by_repo."</td>";
-	print "<td class=\"shade2\" style=\"vertical-align: middle;\"><input type=\"radio\" name=\"sort\" value=\"repo\" onclick=\"submit()\"";
+	print "<tr><td class=\"NavBlockLabel\">".GM_LANG_sort_by_repo."</td>";
+	print "<td class=\"NavBlockField\"><input type=\"radio\" name=\"sort\" value=\"repo\" onclick=\"submit()\"";
 	if ($sort == "repo") print " checked=\"checked\" ";
 	print " /></td></tr>";
 	print "</table></form>";
 }
+print "</div>";
        
 // Get the data
 $actionlist = ActionController::GetActionList($status, $sort == "repo");
-print "<br />";
-
+print "<div class=\"ActionListListContainer\">";
 if (count($actionlist) == 0) {
-	print "<span class=\"error\">".GM_LANG_no_action_found."</span>";
+	print "<span class=\"Error\">".GM_LANG_no_action_found."</span>";
 }
 else {
-	print "<div class=\"width90 center\"><table class=\"$TEXT_DIRECTION center\">";
+	print "<table class=\"ListTable $TEXT_DIRECTION\">";
+	print "\n\t\t\t<td class=\"NavBlockHeader\" colspan=\"4\">".GM_LANG_actionlist."</td></tr>";
 	if ($sort == "person") {
-		print "<tr><td class=\"shade2\">".GM_LANG_action_for_id."</td><td class=\"shade2\">".GM_LANG_repo."</td><td class=\"shade2\">".GM_LANG_status."</td><td class=\"shade2\">".GM_LANG_description."</td></tr>";
+		print "<tr><td class=\"ListTableColumnHeader\">".GM_LANG_action_for_id."</td><td class=\"ListTableColumnHeader\">".GM_LANG_repo."</td><td class=\"ListTableColumnHeader\">".GM_LANG_status."</td><td class=\"ListTableColumnHeader\">".GM_LANG_description."</td></tr>";
 		foreach($actionlist as $key => $action) {
 			if ($action->disp) {
-				print "<tr><td class=\"shade1 wrap\">";
+				print "<tr><td class=\"ListTableContent\">";
 				if (is_object($action->pid_obj)) {
 					if ($action->type == "INDI") $action->pid_obj->PrintListPerson(false, true);
 					elseif ($action->type == "FAM") $action->pid_obj->PrintListFamily(false);
 				}
 				else print "&nbsp;";
-				print "</td><td class=\"shade1 wrap\">";
+				print "</td><td class=\"ListTableContent\">";
 				if (is_object($action->repo_obj)) $action->repo_obj->PrintListRepository(false, 1, false);
 				else print "&nbsp;";
-				print "</td><td class=\"shade1\">".constant("GM_LANG_action".$action->status)."</td><td class=\"shade1 wrap\">".nl2br(stripslashes($action->text))."</td></tr>";
+				print "</td><td class=\"ListTableContent\">".constant("GM_LANG_action".$action->status)."</td><td class=\"ListTableContent\">".nl2br(stripslashes($action->text))."</td></tr>";
 			}
 		}
 	}
 	if ($sort == "repo") {
-		print "<tr><td class=\"shade2\">".GM_LANG_repo."</td><td class=\"shade2\">".GM_LANG_action_for_id."</td><td class=\"shade2\">".GM_LANG_status."</td><td class=\"shade2\">".GM_LANG_description."</td></tr>";
+		print "<tr><td class=\"ListTableColumnHeader\">".GM_LANG_repo."</td><td class=\"ListTableColumnHeader\">".GM_LANG_action_for_id."</td><td class=\"ListTableColumnHeader\">".GM_LANG_status."</td><td class=\"ListTableColumnHeader\">".GM_LANG_description."</td></tr>";
 		foreach($actionlist as $key => $action) {
 			if ($action->disp) {
-				print "<tr><td class=\"shade1 wrap\">";
+				print "<tr><td class=\"ListTableContent\">";
 				if (is_object($action->repo_obj)) $action->repo_obj->PrintListRepository(false, 1, false);
 				else print "&nbsp;";
-				print "</td><td class=\"shade1 wrap\">";
+				print "</td><td class=\"ListTableContent\">";
 				if (is_object($action->pid_obj)) {
 					if ($action->type == "INDI") $action->pid_obj->PrintListPerson(false, true);
 					elseif ($action->type == "FAM") $action->pid_obj->PrintListFamily(false);
 				}
 				else print "&nbsp;";
-				print "</td><td class=\"shade1\">".constant("GM_LANG_action".$action->status)."</td><td class=\"shade1 wrap\">".nl2br(stripslashes($action->text))."</td></tr>";
+				print "</td><td class=\"ListTableContent\">".constant("GM_LANG_action".$action->status)."</td><td class=\"ListTableContent\">".nl2br(stripslashes($action->text))."</td></tr>";
 			}
 		}
 	}
-	print "</table></div>";
+	print "</table>";
 }
 print "</div>";
 PrintFooter();

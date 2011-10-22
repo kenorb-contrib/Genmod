@@ -36,9 +36,9 @@ define("GM_LANG_edit_RESN_help", "#gm_lang[RESN_help]#");
 define("GM_LANG_help_aliveinyear.php", "#gm_lang[alive_in_year_help]#");
 
 //General
-define("GM_LANG_start_ahelp", "<div class=\"list_value_wrap\"><center class=\"error\">#gm_lang[start_admin_help]#</center>");
-define("GM_LANG_end_ahelp", "<center class=\"error\">#gm_lang[end_admin_help]#</center></div>");
-define("GM_LANG_redast", "<span class=\"error\"<b>*</b></span>");
+define("GM_LANG_start_ahelp", "<div class=\"list_value_wrap\"><center class=\"Error\">#gm_lang[start_admin_help]#</center>");
+define("GM_LANG_end_ahelp", "<center class=\"Error\">#gm_lang[end_admin_help]#</center></div>");
+define("GM_LANG_redast", "<span class=\"Error\"<b>*</b></span>");
 
 // lower to UPPER conversions
 define("GM_LANG_upper_mygedview", Str2Upper(GM_LANG_mygedview));
@@ -108,7 +108,7 @@ define("GM_LANG_faq_page_help",	"#gm_lang[help_faq.php]#<br /><a href=\"#top\">$
 
 //-- 	G E D C O M
 //-- Gedcom Info
-define("GM_LANG_gedcom_info_help", "<div class=\"name_head center\"><b>#gm_lang[help_contents_gedcom_info]#</b></div><br />#gm_lang[def_gedcom_help]#<br /><a href=\"#top\">$UpArrow </a>#gm_lang[def_gedcom_date_help]#<br /><a href=\"#top\">$UpArrow </a>#gm_lang[ppp_levels_help]#");
+define("GM_LANG_gedcom_info_help", "<div class=\"PageTitleName center\"><b>#gm_lang[help_contents_gedcom_info]#</b></div><br />#gm_lang[def_gedcom_help]#<br /><a href=\"#top\">$UpArrow </a>#gm_lang[def_gedcom_date_help]#<br /><a href=\"#top\">$UpArrow </a>#gm_lang[ppp_levels_help]#");
 
 //-- Add Gedcom
 define("GM_LANG_help_addgedcom.php", "#gm_lang[add_gedcom_help]#<br /><br />#gm_lang[add_upload_gedcom_help]#<br />#gm_lang[readme_help]#");
@@ -137,8 +137,8 @@ $vpos = strpos(GM_LANG_soundex_search, ":", 0);
 if ($vpos>0) $soundex_search = substr(GM_LANG_soundex_search, 0, $vpos);
 else $soundex_search = GM_LANG_soundex_search;
 
-define("GM_LANG_help_used_in_contents", "<div class=\"name_head center\"><b>#gm_lang[page_help]#</b></div><br />#gm_lang[help_help_items]#");
-define("GM_LANG_search_used_in_contents", "<div class=\"name_head center\"><b>#gm_lang[search]#</b></div><ul><li><a href=\"#header_search\">#gm_lang[header]#</a><li><a href=\"#menu_search\">#gm_lang[menu]#</a><li><a href=\"#help_search\">#gm_lang[search]#<li><a href=\"#search_enter_terms\">$enter_terms</a><li><a href=\"#soundex_search\">$soundex_search</ul><br /><br /><a href=\"#top\">$UpArrow </a><a name=\"header_search\"></a>#gm_lang[header_search_help]#<br /><br /><a href=\"#top\">$UpArrow </a><a name=\"menu_search\"></a>#gm_lang[menu_search_help]#<br /><a href=\"#top\">$UpArrow </a><a name=\"help_search\"></a>#gm_lang[help_search.php]#<br /><a href=\"#top\">$UpArrow </a><a name=\"search_enter_terms\"></a>#gm_lang[search_enter_terms_help]#<br /><br /><br /><a name=\"soundex_search\"></a><a href=\"#top\">$UpArrow </a>#gm_lang[soundex_search_help]#");
+define("GM_LANG_help_used_in_contents", "<div class=\"PageTitleName center\"><b>#gm_lang[page_help]#</b></div><br />#gm_lang[help_help_items]#");
+define("GM_LANG_search_used_in_contents", "<div class=\"PageTitleName center\"><b>#gm_lang[search]#</b></div><ul><li><a href=\"#header_search\">#gm_lang[header]#</a><li><a href=\"#menu_search\">#gm_lang[menu]#</a><li><a href=\"#help_search\">#gm_lang[search]#<li><a href=\"#search_enter_terms\">$enter_terms</a><li><a href=\"#soundex_search\">$soundex_search</ul><br /><br /><a href=\"#top\">$UpArrow </a><a name=\"header_search\"></a>#gm_lang[header_search_help]#<br /><br /><a href=\"#top\">$UpArrow </a><a name=\"menu_search\"></a>#gm_lang[menu_search_help]#<br /><a href=\"#top\">$UpArrow </a><a name=\"help_search\"></a>#gm_lang[help_search.php]#<br /><a href=\"#top\">$UpArrow </a><a name=\"search_enter_terms\"></a>#gm_lang[search_enter_terms_help]#<br /><br /><br /><a name=\"soundex_search\"></a><a href=\"#top\">$UpArrow </a>#gm_lang[soundex_search_help]#");
 
 
 /*-- Var's for Menu Item: Help contents

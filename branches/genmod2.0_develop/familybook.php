@@ -40,10 +40,10 @@ if ($familybook_controller->show_full == false) {
 // -- print html header information
 print "<div id=\"content_pedigree\">";
 
-print "\n\t<h3>".GM_LANG_familybook_chart.":";
-print "<br />".PrintReady($familybook_controller->root->name);
-if ($familybook_controller->root->addname != "") print "<br />" . PrintReady($familybook_controller->root->addname);
-print "</h3>";
+print "\n\t<span class=\"PageTitleName\">".GM_LANG_familybook_chart.":";
+print "&nbsp;".PrintReady($familybook_controller->root->name);
+if ($familybook_controller->root->addname != "") print "&nbsp;" . PrintReady($familybook_controller->root->addname);
+print "</span>";
 ?>
 
 <script language="JavaScript" type="text/javascript">
@@ -62,7 +62,7 @@ print "</h3>";
 <?php
 if ($familybook_controller->view != "preview") {
 	print "<form method=\"get\" name=\"people\" action=\"?\">\n";
-	print "\n\t\t<table class=\"list_table ".$TEXT_DIRECTION."\" align=\"";
+	print "\n\t\t<table class=\"ListTable ".$TEXT_DIRECTION."\" align=\"";
 	if ($TEXT_DIRECTION == "ltr") print "left";
 	else print "right";
 	print "\">";

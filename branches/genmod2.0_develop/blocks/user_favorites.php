@@ -39,13 +39,14 @@ function print_user_favorites($block=true, $config="", $side, $index) {
 		$userfavs = FavoritesController::getUserFavorites($gm_user->username);
 		if (!is_array($userfavs)) $userfavs = array();
 		print "<!-- Start of user favorites //-->";
-		print "<div id=\"user_favorites\" class=\"block\">\n"; // block
-		print "<div class=\"blockhc\">";
+		print "<div id=\"user_favorites\" class=\"BlockContainer\">\n"; // block
+		print "<div class=\"BlockHeader\">";
 		PrintHelpLink("mygedview_favorites_help", "qm", "my_favorites");
 		print GM_LANG_my_favorites." &lrm;(".count($userfavs).")&lrm;";
 		print "</div>";
-		print "<div class=\"blockcontent\">";
-		if ($block) print "<div class=\"small_inner_block\">\n";
+		print "<div class=\"BlockContent\">";
+		if ($block) print "<div class=\"RestrictedBlockHeightRight\">\n";
+		else print "<div class=\"RestrictedBlockHeightMain\">\n";
 		if (count($userfavs)==0) {
 			PrintText("no_favorites");
 			print "\n";
@@ -54,7 +55,7 @@ function print_user_favorites($block=true, $config="", $side, $index) {
 			BlockFunctions::PrintBlockFavorites($userfavs, $side, $index);
 		}
 		BlockFunctions::PrintBlockAddFavorite($command, "user", $side);	
-		if ($block) print "</div>\n";
+		print "</div>\n";
 		print "</div>\n"; // content
 		print "</div>";   // block
 		print "<!-- end of user favorites //-->";

@@ -327,7 +327,6 @@ class IndilistController extends ListController {
 		if (!is_numeric($this->year)) return -2;
 		if (!isset($alive)) $alive = array();
 		if (isset($alive[$person->key])) return $alive[$person->key];
-	
 		$bddates = estimateBD($person, $this->type);
 		// First check if we must assume something
 		if ($this->useMAA) {
@@ -338,9 +337,8 @@ class IndilistController extends ListController {
 				}
 			}
 			if (isset($bddates["death"]["year"]) && $bddates["death"]["type"] == "true" && (!isset($bddates["birth"]["year"]) || $bddates["birth"]["type"] != "true")) {
-				if ($person->xref == "I405") print "hier2";
 				if (!isset($bddates["birth"]["year"]) || (isset($bddates["birth"]["year"]) && $bddates["birth"]["year"] < $bddates["death"]["year"] - $MAX_ALIVE_AGE)) {
-					$bddates["birth"]["year"] = $bddates["birth"]["year"] - $MAX_ALIVE_AGE;
+					$bddates["birth"]["year"] = $bddates["death"]["year"] - $MAX_ALIVE_AGE;
 					$bddates["birth"]["type"] = "est";
 				}
 			}

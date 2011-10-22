@@ -859,7 +859,7 @@ function GetDateUrl($datestr, $CalYear=""){
 						}
 					}
 
-					$datelink = '<a class="date" href="calendar.php?link=11&amp;gedid='.GedcomConfig::$GEDCOMID.'&amp;';
+					$datelink = '<a class="FactDate" href="calendar.php?link=11&amp;gedid='.GedcomConfig::$GEDCOMID.'&amp;';
 					If ($action == "year" && ((isset($start_year) && strlen($start_year)>0) ||
 					    (isset($end_year) && strlen($end_year)>0))) {
 						if (isset($start_year) && strlen($start_year)>0) $datelink .= "year=".$start_year;
@@ -955,7 +955,7 @@ function GetDateUrl($datestr, $CalYear=""){
     													$year    = $dateheb[0]["year"];
     						else                        $year    = "";
 					}
-					$datelink = '<a class="date" href="calendar.php?link=12&amp;gedid='.GedcomConfig::$GEDCOMID.'&amp;';
+					$datelink = '<a class="FactDate" href="calendar.php?link=12&amp;gedid='.GedcomConfig::$GEDCOMID.'&amp;';
 					if (isset($day) && strlen($day) > 0) 	 $datelink 	.= "day=".$day."&amp;";
 					if (isset($month) && strlen($month) > 0) $datelink 	.= "month=".$month."&amp;";
 					if (isset($year) && strlen($year) > 0)   $datelink 	.= "year=".$year;

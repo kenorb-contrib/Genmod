@@ -313,7 +313,7 @@ abstract class ImportFunctions {
 		<!--
 		function complete_progress(time, exectext, go_pedi, go_welc) {
 			progress = document.getElementById("progress_header");
-			if (progress) progress.innerHTML = '<?php print "<span class=\"error\"><b>".GM_LANG_import_complete."</b></span><br />";?>'+exectext+' '+time+' '+"<?php print GM_LANG_sec; ?>";
+			if (progress) progress.innerHTML = '<?php print "<span class=\"Error\"><b>".GM_LANG_import_complete."</b></span><br />";?>'+exectext+' '+time+' '+"<?php print GM_LANG_sec; ?>";
 			progress = document.getElementById("link1");
 			if (progress) progress.innerHTML = '<a href="pedigree.php?gedid=<?php print $gedid; ?>">'+go_pedi+'</a>';
 			progress = document.getElementById("link2");

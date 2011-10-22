@@ -691,9 +691,7 @@ abstract class PlotFunctions {
 		}
 		$titleLength = strpos($mytitle."\n", "\n");
 		$title = substr($mytitle, 0, $titleLength);
-		print "<center>";
-		print "<img src=\"imageflush.php?image_type=png&amp;image_name=$tempVarName\" width=\"$imageSize[0]\" height=\"$imageSize[1]\" border=\"0\" alt=\"$title\" title=\"$title\" />";
-		print "</center><br /><br />";
+		print "<img class=\"StatsPlot\" src=\"imageflush.php?image_type=png&amp;image_name=$tempVarName\" width=\"$imageSize[0]\" height=\"$imageSize[1]\" border=\"0\" alt=\"$title\" title=\"$title\" />";
 	}
 	
 	private function CalcAxis($xas_grenzen) {

@@ -89,10 +89,10 @@ class FamilyBookController extends ChartController {
 	public function PrintInputDescentSteps() {
 	
 		if ($this->page == "familybook.php") {
-			print "<tr><td class=\"shade2\" >";
+			print "<tr><td class=\"NavBlockLabel\" >";
 			PrintHelpLink("desc_descent_help", "qm");
 			print GM_LANG_descent_steps."&nbsp;</td>";
-			print "<td class=\"shade1 vmiddle\">";
+			print "<td class=\"NavBlockField\">";
 			print "<input class=\"pedigree_form\" type=\"text\" size=\"3\" name=\"num_descent\" value=\"".$this->num_descent."\" />";
 			print "</td></tr>";
 		}
@@ -100,10 +100,10 @@ class FamilyBookController extends ChartController {
 	
 	public function PrintInputShowSpouse() {
 		
-		print "<tr><td class=\"shade2\" >";
+		print "<tr><td class=\"NavBlockLabel\" >";
 		PrintHelpLink("show_spouse_help", "qm");
 		print GM_LANG_show_spouses."&nbsp;</td>";
-		print "<td class=\"shade1 vmiddle\">";
+		print "<td class=\"NavBlockField\">";
 		print "<input type=\"checkbox\" value=\"1\" name=\"show_spouse\"";
 		if ($this->show_spouse) print " checked=\"checked\"";
 		print " />";

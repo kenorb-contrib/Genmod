@@ -142,7 +142,7 @@ abstract class DebugCollector {
 		else {
 			$pages = array("output", "autoload", "queries", "session", "post", "get");
 			?>
-			<div id="debug_output">
+			<div id="DebugOutput">
 			<ul>
 				<li id="output_tab" class="current" ><a href="#" onclick="<?php self::HideDivs($pages, 'output');  ?> return false;">Output</a></li>
 				<li id="autoload_tab"><a href="#" onclick="<?php self::HideDivs($pages, 'autoload');  ?> return false;">Autoload</a></li>

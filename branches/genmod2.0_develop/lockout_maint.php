@@ -148,12 +148,12 @@ PrintHeader(GM_LANG_lockout_maint);
 		<div class="admin_item_box">
 			<div class="width30 choice_left"><?php print GM_LANG_ip_address; ?></div>
 			<div class="width30 choice_middle"><input type="text" name="add_ip" value="<?php if (isset($add_ip)) print $add_ip;?>" size="15" maxlength="15" /></div>
-			<?php if ($error1) {?><div class="width30 choice_right"><span class="error"><?php print GM_LANG_invalid_ip; ?></span></div><?php } ?>
+			<?php if ($error1) {?><div class="width30 choice_right"><span class="Error"><?php print GM_LANG_invalid_ip; ?></span></div><?php } ?>
 		</div>
 		<div class="admin_item_box">
 			<div class="width30 choice_left"><?php print GM_LANG_username; ?></div>
 			<div class="width30 choice_middle"><input type="text" name="add_user" value="<?php if (isset($add_user)) print $add_user;?>" size="25" /></div>
-			<?php if ($error2) {?><div class="width30 choice_right"><span class="error"><?php print GM_LANG_invalid_user; ?></span></div><?php } ?>
+			<?php if ($error2) {?><div class="width30 choice_right"><span class="Error"><?php print GM_LANG_invalid_user; ?></span></div><?php } ?>
 		</div>
 			<div class="admin_item_box center shade2">
 				<input type="submit" value="<?php print GM_LANG_lockout_submit;?>" />

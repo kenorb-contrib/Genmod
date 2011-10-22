@@ -42,12 +42,12 @@ function print_random_media($block = true, $config="", $side, $index) {
 	$mediacontroller->RetrieveMedia($random,0,1); 
 	if ($mediacontroller->mediainlist > 0) {
 		$media = $mediacontroller->lastitem;
-		print "<div id=\"random_picture\" class=\"block\">\n";
-		print "<div class=\"blockhc ltr\">";
+		print "<div id=\"random_picture\" class=\"BlockContainer\">\n";
+		print "<div class=\"BlockHeader ltr\">";
 		PrintHelpLink("index_media_help", "qm", "random_picture");
 		print GM_LANG_random_picture;
 		print "</div>";
-		print "<div class=\"blockcontent";
+		print "<div class=\"BlockContent";
 		if ($block) print " details1 wrap\"";
 		else print " details2 wrap\"";
 		print " >";

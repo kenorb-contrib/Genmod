@@ -146,7 +146,7 @@ function SearchIdDetails($checkVar, $outputVar) {
 		else print $object->type." ".$object->xref;
 	}
 	else {
-		print "<span class=\"error\">";
+		print "<span class=\"Error\">";
 		if ($outputVar == 1) {
 			print GM_LANG_unable_to_find_privacy_indi;
 			print "<br />[" . $checkVar . "]";
@@ -182,12 +182,12 @@ function PrintFactChoice() {
 if (empty($action)) $action="";
 PrintHeader(GM_LANG_privacy_header);
 ?>
-<table class="facts_table <?php print $TEXT_DIRECTION ?>">
+<table class="FactsTable <?php print $TEXT_DIRECTION ?>">
 	<tr>
 		<td colspan="2" class="admin_topbottombar"><?php
 			print "<h3>".GM_LANG_edit_privacy_title." - ".$GEDCOMS[$gedid]["title"]. "</h3>";
 			if (UserController::CheckPrivacyOverrides($gedid)) {
-				print "<span class=\"error\">".GM_LANG_user_overr_exists;
+				print "<span class=\"Error\">".GM_LANG_user_overr_exists;
 				if ($gm_user->UserIsAdmin()) print "<a href=\"useradmin.php?action=listusers&amp;filter=privoverride&amp;gedid=$gedid\"> ".GM_LANG_user_overr_show."</a>";
 				print "</span><br />";
 			}
@@ -205,7 +205,7 @@ if ($action=="update") {
 	$boolarray["no"]="0";
 	$boolarray[false]="0";
 	$boolarray[true]="1";
-	print "<table class=\"facts_table $TEXT_DIRECTION\">";
+	print "<table class=\"FactsTable $TEXT_DIRECTION\">";
 	print "<tr><td class=\"shade2\">";
 	print GM_LANG_performing_update;
 	print "<br />";
@@ -338,7 +338,7 @@ if ($action=="update") {
 
     // NOTE: General Privacy Settings header bar
     ?>
-	<table class="facts_table">
+	<table class="FactsTable">
     	<tr>
     		<td class="topbottombar <?php print $TEXT_DIRECTION;?>">
 		<?php
@@ -353,7 +353,7 @@ if ($action=="update") {
     <?php // NOTE: General Privacy Settings options
     ?>
     <div id="general-privacy-options" style="display: block">
-    <table class="facts_table">
+    <table class="FactsTable">
       <tr>
         <td class="shade2 wrap width40"><?php PrintHelpLink("PRIVACY_BY_RESN_help", "qm", "PRIVACY_BY_RESN"); print GM_LANG_PRIVACY_BY_RESN; ?>
         </td>
@@ -394,7 +394,7 @@ if ($action=="update") {
 
     <?php // NOTE: Age related Privacy Settings header bar
     ?>
-	<table class="facts_table">
+	<table class="FactsTable">
     	<tr>
     		<td class="topbottombar <?php print $TEXT_DIRECTION;?>">
 		<?php
@@ -408,7 +408,7 @@ if ($action=="update") {
     <?php // NOTE: Age related Privacy Settings options
     ?>
     <div id="age-privacy-options" style="display: none">
-    <table class="facts_table">
+    <table class="FactsTable">
 	<tr>
 		<td class="shade2 wrap width40 <?php print $TEXT_DIRECTION;?>"><?php PrintHelpLink("HIDE_LIVE_PEOPLE_help", "qm", "HIDE_LIVE_PEOPLE"); print GM_LANG_HIDE_LIVE_PEOPLE;?></td>
 		<td class="shade1 width60">
@@ -490,7 +490,7 @@ if ($action=="update") {
   
 	// NOTE: General Person Settings header bar
   	?>
-     <table class="facts_table">
+     <table class="FactsTable">
      	<tr>
      		<td class="topbottombar <?php print $TEXT_DIRECTION;?>">
      		<?php
@@ -503,7 +503,7 @@ if ($action=="update") {
     <?php // NOTE: General Privacy Settings options
     ?>
     <div id="person-privacy-options" style="display: none">
-    	<table class="facts_table">
+    	<table class="FactsTable">
         	<tr>
             	<td class="topbottombar" colspan="2"><b><?php print GM_LANG_add_new_pp_setting; ?></b>
             	</td>
@@ -534,7 +534,7 @@ if ($action=="update") {
           <?php
           if (count($person_privacy) > 0) {
           ?>
-          <table class="facts_table">
+          <table class="FactsTable">
             <tr>
               <td class="topbottombar" colspan="4"><?php print GM_LANG_edit_exist_person_privacy_settings; ?>
               </td>
@@ -570,7 +570,7 @@ if ($action=="update") {
   
   	// User Privacy Settings header bar
     ?>
-	<table class="facts_table">
+	<table class="FactsTable">
 		<tr>
 			<td class="topbottombar <?php print $TEXT_DIRECTION;?>">
      		<?php
@@ -583,7 +583,7 @@ if ($action=="update") {
     <?php // User Privacy Settings options
     ?>
     <div id="user-privacy-options" style="display: none">
-          <table class="facts_table">
+          <table class="FactsTable">
             <tr>
               <td class="topbottombar" colspan="3"><b><?php print GM_LANG_add_new_up_setting; ?></b>
               </td>
@@ -631,7 +631,7 @@ if ($action=="update") {
        <?php
           if (count($user_privacy) > 0) {
           ?>
-          <table class="facts_table">
+          <table class="FactsTable">
             <tr>
               <td class="topbottombar" colspan="5"><?php print GM_LANG_edit_exist_user_privacy_settings; ?>
               </td>
@@ -671,7 +671,7 @@ if ($action=="update") {
   	
   	// NOTE: Global Settings header bar
     ?>
-	<table class="facts_table"><tr><td class="topbottombar <?php print $TEXT_DIRECTION;?>">
+	<table class="FactsTable"><tr><td class="topbottombar <?php print $TEXT_DIRECTION;?>">
      <?php
     print "<a href=\"javascript: ".GM_LANG_global_facts."\" onclick=\"expand_layer('global-facts-options');return false\"><img id=\"global-facts-options_img\" src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["plus"]["other"]."\" border=\"0\" width=\"11\" height=\"11\" alt=\"\" /></a> ";?>
     	   <?php PrintHelpLink("global_facts_help", "qm", "global_facts");?>
@@ -682,7 +682,7 @@ if ($action=="update") {
     <?php // NOTE: General User Privacy Settings options
     ?>
     <div id="global-facts-options" style="display: none">
-          <table class="facts_table">
+          <table class="FactsTable">
             <tr>
               <td class="topbottombar" colspan="3"><b><?php print GM_LANG_add_new_gf_setting; ?></b></td>
             </tr>
@@ -714,7 +714,7 @@ if ($action=="update") {
           <?php
           if (count($global_facts) > 0) {
           ?>
-          <table class="facts_table">
+          <table class="FactsTable">
             <tr>
               <td class="topbottombar" colspan="4"><b><?php print GM_LANG_edit_exist_global_facts_settings; ?></b></td>
             </tr>
@@ -758,7 +758,7 @@ if ($action=="update") {
   <?php //-------------person_facts------------------------------------------------------------------------ 
     	// NOTE: Person Facts header bar
     ?>
-	<table class="facts_table"><tr><td class="topbottombar <?php print $TEXT_DIRECTION;?>">
+	<table class="FactsTable"><tr><td class="topbottombar <?php print $TEXT_DIRECTION;?>">
      <?php
     print "<a href=\"javascript: ".GM_LANG_person_facts."\" onclick=\"expand_layer('person-facts-options');return false\"><img id=\"person-facts-options_img\" src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["plus"]["other"]."\" border=\"0\" width=\"11\" height=\"11\" alt=\"\" /></a> ";?>
     	   <?php PrintHelpLink("person_facts_help", "qm", "person_facts");?>
@@ -769,7 +769,7 @@ if ($action=="update") {
     <?php // NOTE: Person Facts options
     ?>
     <div id="person-facts-options" style="display: none">
-          <table class="facts_table">
+          <table class="FactsTable">
             <?php //--Start--add person_facts for individuals----------------------------------------------- 
             ?>
             <tr>
@@ -815,7 +815,7 @@ if ($action=="update") {
       <?php
       if (count($person_facts) > 0) {
       ?>
-      <table class="facts_table">
+      <table class="FactsTable">
         <tr>
           <td class="topbottombar" colspan="6"><b><?php print GM_LANG_edit_exist_person_facts_settings; ?></b></td>
         </tr>
@@ -860,7 +860,7 @@ if ($action=="update") {
       <?php
       }?>
     </div>
-    <table class="facts_table" border="0">
+    <table class="FactsTable" border="0">
 	<tr><td class="topbottombar">
 	<input type="submit" value="<?php print GM_LANG_save_config?>" onclick="closeHelp();" />
 	&nbsp;&nbsp;

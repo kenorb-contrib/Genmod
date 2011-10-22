@@ -112,7 +112,7 @@ if ($action=="createuser") {
 	if ($pass == TRUE){
 		$uuser =& User::GetInstance($uusername);
 		if (!$uuser->is_empty) {
-			print "<span class=\"error\">".GM_LANG_duplicate_username."</span><br />";
+			print "<span class=\"Error\">".GM_LANG_duplicate_username."</span><br />";
 		}
 		else if ($pass1==$pass2) {
 			$user = new User();
@@ -180,15 +180,15 @@ if ($action=="createuser") {
 				AdminFunctions::UpdateUserIndiEmail($user);
 			}
 			else {
-				$message .= "<span class=\"error\">".GM_LANG_user_create_error."<br /></span>";
+				$message .= "<span class=\"Error\">".GM_LANG_user_create_error."<br /></span>";
 			}
 		}
 		else {
-			$message .= "<span class=\"error\">".GM_LANG_password_mismatch."</span><br />";
+			$message .= "<span class=\"Error\">".GM_LANG_password_mismatch."</span><br />";
 		}
 	}
 	else {
-		$message .= "<span class=\"error\">".GM_LANG_invalid_username."</span><br />";
+		$message .= "<span class=\"Error\">".GM_LANG_invalid_username."</span><br />";
 	}
 	$action = "";
 }
@@ -198,7 +198,7 @@ if ($action=="deleteuser") {
 		$message .= GM_LANG_delete_user_ok;
 		NewsController::DeleteUserNews($username);
 	}
-	else $message .= "<span class=\"error\">".GM_LANG_delete_user_nok."</span>";
+	else $message .= "<span class=\"Error\">".GM_LANG_delete_user_nok."</span>";
 }
 //-- section to update a user by first deleting them
 //-- and then adding them again
@@ -217,7 +217,7 @@ if ($action=="edituser2") {
 	if ($pass == TRUE){
 		$u =& User::GetInstance($uusername);
 		if ($uusername!=$oldusername && !$u->is_empty) {
-			print "<span class=\"error\">".GM_LANG_duplicate_username."</span><br />";
+			print "<span class=\"Error\">".GM_LANG_duplicate_username."</span><br />";
 			$action="edituser";
 			$username = $oldusername;
 		}
@@ -333,14 +333,14 @@ if ($action=="edituser2") {
 			}
 		}
 		else {
-			print "<span class=\"error\">".GM_LANG_password_mismatch."</span><br />";
+			print "<span class=\"Error\">".GM_LANG_password_mismatch."</span><br />";
 			$action="edituser";
 			$username = $oldusername;
 		}
 		$message = "";
 	}
 	else {
-		print "<span class=\"error\">".GM_LANG_invalid_username."</span><br />";
+		print "<span class=\"Error\">".GM_LANG_invalid_username."</span><br />";
 	}
 }
 //-- print the form to edit a user
@@ -954,7 +954,7 @@ if ($action=="edituser" || $action == "createform") { ?>
 		</form>
 		<?php }
 		else {
-			print "<div class=\"shade2 center\"><span class=\"error\">".GM_LANG_user_not_exist."</span></div>";
+			print "<div class=\"shade2 center\"><span class=\"Error\">".GM_LANG_user_not_exist."</span></div>";
 		}
 		?>
 	</div>
@@ -1978,7 +1978,7 @@ if ($action == "cleanup") {
 			}
 			// NOTE: Nothing found to clean up
 			if ($ucnt == 0) {
-				print "<div class=\"shade2 center\"><span class=\"error\">".GM_LANG_usr_no_cleanup."</span></div>";
+				print "<div class=\"shade2 center\"><span class=\"Error\">".GM_LANG_usr_no_cleanup."</span></div>";
 			}
 			else { ?>
 				<div class="admin_item_box center">

@@ -44,8 +44,8 @@ function print_quickstart_block($block = true, $config="", $side, $index) {
 	if (empty($config)) $config = $GM_BLOCKS["print_quickstart_block"]["config"];
 	if (!isset($config['search_all_geds'])) $config = $GM_BLOCKS["print_quickstart_block"]["config"];
 
-	print "<div id=\"quickstart_block\" class=\"block $TEXT_DIRECTION\">\n";
-	print "<div class=\"blockhc\">";
+	print "<div id=\"quickstart_block\" class=\"BlockContainer $TEXT_DIRECTION\">\n";
+	print "<div class=\"BlockHeader\">";
 	PrintHelpLink("index_quickstart_help", "qm", "quickstart");
 	if ($GM_BLOCKS["print_quickstart_block"]["canconfig"]) {
 		if ((($command=="gedcom")&&($gm_user->userGedcomAdmin())) || (($command=="user")&&($gm_user->username != ""))) {
@@ -63,7 +63,7 @@ function print_quickstart_block($block = true, $config="", $side, $index) {
 	if (SystemConfig::$ALLOW_CHANGE_GEDCOM && $config["search_all_geds"] == "yes") print "yes";
 	else print "no";
 	print "\" />";
-	print "<table class=\"blockcontent $TEXT_DIRECTION\">";
+	print "<table class=\"BlockContent $TEXT_DIRECTION\">";
 	print "<tr><td colspan=\"2\"><b>".GM_LANG_soundex_search."</b><br /></td>";
 	print "<td rowspan=\"8\" width=\"100\">&nbsp;</td>";
 	print "<td><b>".GM_LANG_qs_jump."</b></td>";

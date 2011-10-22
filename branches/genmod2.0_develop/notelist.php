@@ -43,7 +43,7 @@ $note_total = GetListSize("notelist");
 $note_count = count($note_controller->notelist); 
 $note_hide = $note_total - $note_count;
 
-print "\n\t<table class=\"list_table $TEXT_DIRECTION center\">\n\t\t<tr><td class=\"shade2 center\"";
+print "\n\t<table class=\"ListTable $TEXT_DIRECTION\">\n\t\t<tr><td class=\"shade2 center\"";
 if($note_count > 12) print " colspan=\"2\"";
 print "><img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["note"]["other"]."\" border=\"0\" title=\"".GM_LANG_notes."\" alt=\"".GM_LANG_notes."\" />&nbsp;&nbsp;";
 print GM_LANG_titles_found;

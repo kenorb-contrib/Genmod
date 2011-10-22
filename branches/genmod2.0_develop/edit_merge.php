@@ -51,7 +51,7 @@ $can_auto_accept = true;
 
 //-- make sure they have accept access privileges
 if (!$gm_user->userCanAccept()) {
-	print "<span class=\"error\">".GM_LANG_access_denied."</span>";
+	print "<span class=\"Error\">".GM_LANG_access_denied."</span>";
 	PrintFooter();
 	exit;
 }
@@ -325,7 +325,7 @@ if ($action != "choose") {
 			if ($action == "select") {
 				print "<div id=\"content\">";
 				print "<div class=\"admin_topbottombar\"><h3>".GM_LANG_merge_step2."</h3>";
-				if (!empty($errorstring)) print "<span class=\"error\">".GM_LANG_merge_notunique."&nbsp;".$errorstring."</span><br />";
+				if (!empty($errorstring)) print "<span class=\"Error\">".GM_LANG_merge_notunique."&nbsp;".$errorstring."</span><br />";
 				print "</div><form method=\"post\" action=\"edit_merge.php\">\n";
 				print "<div class=\"center\">".GM_LANG_merge_facts_same."<br /><br /></div>\n";
 				print "<input type=\"hidden\" name=\"gid1\" value=\"$gid1\" />\n";
@@ -335,7 +335,7 @@ if ($action != "choose") {
 				$equal_count=0;
 				$skip1 = array();
 				$skip2 = array();
-				print "<table border=\"1\" class=\"list_table wrap\" align=\"center\" style=\"width:50%;\">\n";
+				print "<table border=\"1\" class=\"ListTable\" style=\"width:50%;\">\n";
 				foreach($facts1 as $i=>$fact1) {
 					foreach($facts2 as $j=>$fact2) {
 						if (Str2Upper($fact1["subrec"])==Str2Upper($fact2["subrec"])) {
@@ -354,7 +354,7 @@ if ($action != "choose") {
 				}
 				print "</table><br />\n";
 				print "<div class=\"center\">".GM_LANG_unmatching_facts."<br /></div>\n";
-				print "<table class=\"list_table wrap\" style=\"width:100%;\">\n";
+				print "<table class=\"ListTable\" style=\"width:100%;\">\n";
 				print "<tr><td class=\"list_label\">".GM_LANG_record." $gid1</td><td class=\"list_label\">".GM_LANG_record." $gid2</td></tr>\n";
 				print "<tr><td valign=\"top\" class=\"list_value\">\n";
 				print "<table border=\"1\">\n";
@@ -427,10 +427,10 @@ if ($action=="choose") {
 	<?php
 	print "<div id=\"content\">";
 		print "<div class=\"admin_topbottombar\"><h3>".GM_LANG_merge_step1."</h3><br />";
-			if ($error == "1") print "<span class=\"error\">".GM_LANG_same_ids."</span><br />";
-			if ($error == "2") print "<span class=\"error\">".GM_LANG_merge_haschanges."</span><br />";
-			if ($error == "3") print "<span class=\"error\">".GM_LANG_unable_to_find_record."</span><br />";
-			if ($error == "4") print "<span class=\"error\">".GM_LANG_merge_same."</span><br />";
+			if ($error == "1") print "<span class=\"Error\">".GM_LANG_same_ids."</span><br />";
+			if ($error == "2") print "<span class=\"Error\">".GM_LANG_merge_haschanges."</span><br />";
+			if ($error == "3") print "<span class=\"Error\">".GM_LANG_unable_to_find_record."</span><br />";
+			if ($error == "4") print "<span class=\"Error\">".GM_LANG_merge_same."</span><br />";
 			print GM_LANG_select_gedcom_records."</div>";
 		print "<form method=\"post\" name=\"merge\" action=\"edit_merge.php\">";
 		print "<input type=\"hidden\" name=\"action\" value=\"select\" />";

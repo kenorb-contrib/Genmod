@@ -56,7 +56,7 @@ print "<div class=\"center\">\n";
 //-- and then adding them again
 if ($action=="edituser2") {
 	if ($username != $oldusername && !$gm_user->is_empty) {
-		print "<span class=\"error\">".GM_LANG_duplicate_username."</span><br />";
+		print "<span class=\"Error\">".GM_LANG_duplicate_username."</span><br />";
 	}
 	else if ($pass1==$pass2) {
 		$alphabet = GetAlphabet();
@@ -97,11 +97,11 @@ if ($action=="edituser2") {
 			if ($sync_data_changed) AdminFunctions::UpdateUserIndiEmail($newuser);
 		}
 		else {
-			print "<span class=\"error\">".GM_LANG_invalid_username."</span><br />";
+			print "<span class=\"Error\">".GM_LANG_invalid_username."</span><br />";
 		}
 	}
 	else {
-		print "<span class=\"error\">".GM_LANG_password_mismatch."</span><br />";
+		print "<span class=\"Error\">".GM_LANG_password_mismatch."</span><br />";
 		$action="edituser";
 	}
 }
@@ -143,7 +143,7 @@ if ($action=="edituser2") {
 <input type="hidden" name="action" value="edituser2" />
 <input type="hidden" name="oldusername" value="<?php print $gm_user->username; ?>" />
 <?php $tab=0; ?>
-<table class="list_table <?php print $TEXT_DIRECTION; ?>">
+<table class="ListTable <?php print $TEXT_DIRECTION; ?>">
 	<tr><td class="topbottombar" colspan="2"><h3><?php print GM_LANG_editowndata;?></h3></td></tr>
 	<tr><td class="shade2 width20 wrap"><div class="helpicon"><?php PrintHelpLink("edituser_username_help", "qm"); print "</div><div class=\"description\">"; print GM_LANG_username;?></div></td><td class="shade1"><input type="text" name="username" tabindex="<?php $tab++; print $tab; ?>" value="<?php print $gm_user->username?>" /></td></tr>
 	<tr><td class="shade2 wrap"><div class="helpicon"><?php PrintHelpLink("edituser_firstname_help", "qm"); print "</div><div class=\"description\">"; print GM_LANG_firstname;?></div></td><td class="shade1"><input type="text" name="firstname" tabindex="<?php $tab++; print $tab; ?>" value="<?php print $gm_user->firstname?>" /></td></tr>

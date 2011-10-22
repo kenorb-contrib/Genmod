@@ -41,15 +41,16 @@ function print_gedcom_news($block = true, $config="", $side, $index) {
 	global $GM_IMAGES, $TEXT_DIRECTION, $command, $TIME_FORMAT, $gm_user;
 
 	$usernews = NewsController::getUserNews(GedcomConfig::$GEDCOMID);
-	print "<div id=\"gedcom_news\" class=\"block\">\n";
-	print "<div class=\"blockhc\">";
+	print "<div id=\"gedcom_news\" class=\"BlockContainer\">\n";
+	print "<div class=\"BlockHeader\">";
 	if ($gm_user->userGedcomAdmin()) PrintHelpLink("index_gedcom_news_ahelp", "qm_ah");
 	else PrintHelpLink("index_gedcom_news_help", "qm", "gedcom_news");
 	print GM_LANG_gedcom_news;
 	print "</div>";
-	print "<div class=\"blockcontent\">";
+	print "<div class=\"BlockContent\">";
 
-	if ($block) print "<div class=\"small_inner_block, $TEXT_DIRECTION\">\n";
+	if ($block) print "<div class=\"RestrictedBlockHeightRight, $TEXT_DIRECTION\">\n";
+	else print "<div class=\"RestrictedBlockHeightMain\">\n";
 	if (count($usernews)==0) {
 		print GM_LANG_no_news;
 		print "<br />";
@@ -75,7 +76,7 @@ function print_gedcom_news($block = true, $config="", $side, $index) {
 		}
 		print "</div>\n";
 	}
-	if ($block) print "</div>\n";
+	print "</div>\n";
 	if ($gm_user->userGedcomAdmin()) print "<a href=\"#\" onclick=\"addnews('".GedcomConfig::$GEDCOMID."'); return false;\">".GM_LANG_add_news."</a>\n";
 	print "</div>\n";
 	print "</div>";

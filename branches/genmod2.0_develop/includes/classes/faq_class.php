@@ -97,7 +97,7 @@ class FAQ {
 				return $this->is_empty;
 				break;
 			default:
-				print "<span class=\"error\">Invalid property ".$property." for __get in ".get_class($this)." class</span><br />";
+				PrintGetSetError($property, get_class($this), "get");
 				break;
 		}
 	}

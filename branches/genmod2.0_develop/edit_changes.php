@@ -58,7 +58,7 @@ PrintSimpleHeader(GM_LANG_review_changes);
 </script>
 <?php
 print "<div id=\"content_popup\" class=\"center\">\n";
-print "<span class=\"subheaders\">";
+print "<span class=\"SubHeader\">";
 PrintHelpLink("accept_gedcom", "qm", "review_changes");
 print GM_LANG_review_changes;
 print "</span><br /><br />\n";
@@ -451,7 +451,7 @@ else {
 		}
 	}
 	print "</table>";
-	print "<br /><br /><table class=\"list_table center\">\r\n";
+	print "<br /><br /><table class=\"ListTable\">\r\n";
 	print "<tr><td class=\"topbottombar\" colspan=\"2\">";
 	PrintHelpLink("view_gedcom_help", "qm", "view_gedcom");
 	print GM_LANG_view_gedcom."</td></tr>";
@@ -465,7 +465,7 @@ else {
 	}
 	print "</table>";
 	//-- accept and reject all
-	print "<br /><br /><table class=\"list_table center\">";
+	print "<br /><br /><table class=\"ListTable\">";
 	print "<tr><td class=\"shade2\">";
 	print "<a href=\"edit_changes.php?action=acceptall&amp;gedfile=".GedcomConfig::$GEDCOMID."\" onclick=\"return confirm('".GM_LANG_accept_all_confirm."');\">".GM_LANG_accept_all."</a>\n";
 	print "</td>";

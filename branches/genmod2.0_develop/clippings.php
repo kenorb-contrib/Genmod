@@ -36,7 +36,7 @@ $clippings_controller = new ClippingsController();
 
 // -- print html header information
 PrintHeader($clippings_controller->pagetitle);
-print "\r\n\t<h3>".$clippings_controller->title."</h3>";
+print "\r\n\t<div class=\"PageTitleName\">".$clippings_controller->title."</div>";
 
 if ($clippings_controller->action == 'add') {
 	if ($clippings_controller->type == 'fam') {
@@ -90,10 +90,25 @@ if (!isset($clippings_controller->cart[GedcomConfig::$GEDCOMID]) || count($clipp
 	print "\r\n\t\t<br /><br />".GM_LANG_cart_is_empty."<br /><br />";
 }
 else {
+	if ($clippings_controller->action != 'download') {
+		print "<form method=\"post\" action=\"clippings.php\">\n<input type=\"hidden\" name=\"action\" value=\"download\" />\n";
+		?>
+		<table class="ListTable">
+		<tr><td class="NavBlockHeader" colspan="2"><?php print GM_LANG_choose; ?></td></tr>
+		<tr><td class="NavBlockLabel"><?php print GM_LANG_utf8_to_ansi; PrintHelpLink("utf8_ansi_help", "qm"); ?></td><td class="NavBlockField"><input type="checkbox" name="convert" value="yes" /></td></tr>
+		<tr><td class="NavBlockLabel"><?php print GM_LANG_remove_custom_tags; PrintHelpLink("remove_tags_help", "qm"); ?></td><td class="NavBlockField"><input type="checkbox" name="remove" value="yes" checked="checked" /></td></tr>
+		<tr><td class="NavBlockFooter" colspan="2"><input type="submit"  value="<?php print GM_LANG_download_now; ?>" />
+		<?php
+		PrintHelpLink("clip_download_help", "qm"); ?>
+		<input type="button" value="<?php print GM_LANG_empty_cart; ?>" onclick="this.form.action.value='empty'; this.form.submit();" />
+		<?php 
+		PrintHelpLink("empty_cart_help", "qm");
+		print "</td></tr></table></form><br /><br />";
+	}		
 	$ct = count($clippings_controller->cart[GedcomConfig::$GEDCOMID]);
-	print "\r\n\t<table class=\"list_table\">\r\n\t\t<tr>\r\n\t\t\t<td class=\"list_label\">".GM_LANG_type."</td><td class=\"list_label\">".GM_LANG_id."</td><td class=\"list_label\">".GM_LANG_name_description."</td><td class=\"list_label\">".GM_LANG_remove."</td>\r\n\t\t</tr>";
+	print "\r\n\t<table class=\"ListTable\">\r\n\t\t<tr><td class=\"ListTableHeader\" colspan=\"4\">".GM_LANG_clip_cart."</td></tr>\r\n\t\t<tr>\r\n\t\t\t<td class=\"ListTableColumnHeader\">".GM_LANG_type."</td><td class=\"ListTableColumnHeader\">".GM_LANG_id."</td><td class=\"ListTableColumnHeader\">".GM_LANG_name_description."</td><td class=\"ListTableColumnHeader\">".GM_LANG_remove."</td>\r\n\t\t</tr>";
 	for($i=0; $i<$ct; $i++) {
-		print "\r\n\t\t<tr>\r\n\t\t<td class=\"list_value\">";
+		print "\r\n\t\t<tr>\r\n\t\t<td class=\"ListTableContent\">";
 		$clipping = $clippings_controller->cart[GedcomConfig::$GEDCOMID][$i];
 		if($clipping['type']=='indi') print "<img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["indis"]["small"]."\" border=\"0\" alt=\"".GM_LANG_individual."\" />";
 		else if($clipping['type']=='fam') print "<img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["sfamily"]["small"]."\" border=\"0\" alt=\"".GM_LANG_family."\" />";
@@ -101,7 +116,7 @@ else {
 		else if($clipping['type']=='repo') print "<img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["repository"]["small"]."\" border=\"0\" alt=\"".GM_LANG_repo."\" />";
 		else if($clipping['type']=='obje') print "<img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["media"]["small"]."\" border=\"0\" alt=\"".GM_LANG_media."\" />";
 		else if($clipping['type']=='note') print "<img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["note"]["other"]."\" border=\"0\" alt=\"".GM_LANG_note."\" />";
-		print "</td><td class=\"list_value\">".$clipping['id']."</td><td class=\"list_value\">";
+		print "</td><td class=\"ListTableContent\">".$clipping['id']."</td><td class=\"ListTableContent\">";
 
 		$id_ok = true;
 		$object =& ConstructObject($clipping['id'], $clipping['type']);
@@ -124,23 +139,9 @@ else {
 		else if($clipping['type'] == 'obje') {
 			$object->PrintListMedia(false);
 		}
-		print "</td><td class=\"list_value\"><a href=\"clippings.php?action=remove&amp;item=$i\">".GM_LANG_remove."</a></td>\r\n\t\t</tr>";
+		print "</td><td class=\"ListTableContent\"><a href=\"clippings.php?action=remove&amp;item=$i\">".GM_LANG_remove."</a></td>\r\n\t\t</tr>";
 	}
 	print "\r\n\t</table>";
-	if ($clippings_controller->action != 'download') {
-		print "<form method=\"post\" action=\"clippings.php\">\n<input type=\"hidden\" name=\"action\" value=\"download\" />\n";
-		?>
-		<table>
-		<tr><td><input type="checkbox" name="convert" value="yes" /></td><td><?php print GM_LANG_utf8_to_ansi; PrintHelpLink("utf8_ansi_help", "qm"); ?></td></tr>
-		<tr><td><input type="checkbox" name="remove" value="yes" checked="checked" /></td><td><?php print GM_LANG_remove_custom_tags; PrintHelpLink("remove_tags_help", "qm"); ?></td></tr>
-		</table>
-		<input type="submit"  value="<?php print GM_LANG_download_now; ?>" />
-		<?php
-		PrintHelpLink("clip_download_help", "qm");
-		print "<br /></form>";
-	}
-	print "\r\n\t<br /><a href=\"clippings.php?action=empty\">".GM_LANG_empty_cart."  "."</a>";
-	PrintHelpLink("empty_cart_help", "qm");
 }
 if (isset($_SESSION["cart"])) $_SESSION["cart"] = $clippings_controller->cart;
 PrintFooter();

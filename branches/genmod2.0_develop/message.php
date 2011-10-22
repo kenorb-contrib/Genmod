@@ -42,12 +42,12 @@ if (!isset($from_name)) $from_name="";
 if (!isset($from_email)) $from_email="";
 
 if (empty($to)) {
-	print "<span class=\"error\">".GM_LANG_no_to_user."</span><br />";
+	print "<span class=\"Error\">".GM_LANG_no_to_user."</span><br />";
 	PrintSimpleFooter();
 	exit;
 }
 if ($to=="all" && !$gm_user->userIsAdmin()) {
-	print "<span class=\"error\">".GM_LANG_no_to_user."</span><br />";
+	print "<span class=\"Error\">".GM_LANG_no_to_user."</span><br />";
 	PrintSimpleFooter();
 	exit;
 }
@@ -59,14 +59,14 @@ if (($action=="send")&&(isset($_SESSION["good_to_send"]))&&($_SESSION["good_to_s
 	$tuser =& User::GetInstance($from);
 	if ($tuser->is_empty) {
 		if (!CheckEmailAddress($from)) {
-			print "<center><br /><span class=\"error\">".GM_LANG_invalid_email."</span>\n";
+			print "<center><br /><span class=\"Error\">".GM_LANG_invalid_email."</span>\n";
 			print "<br /><br /></center>";
 			$action="compose";
 	    }
 	}
 	//-- check referer for possible spam attack
 	if (!isset($_SERVER['HTTP_REFERER']) || stristr($_SERVER['HTTP_REFERER'],"message.php")===false) {
-		print "<center><br /><span class=\"error\">Invalid page referer.</span>\n";
+		print "<center><br /><span class=\"Error\">Invalid page referer.</span>\n";
 		print "<br /><br /></center>";
 		WriteToLog('Message-&gt; Invalid page referer while trying to send a message. Possible spam attack.', 'W', 'S');
 		$action="compose";
@@ -129,7 +129,7 @@ if (($action=="send")&&(isset($_SESSION["good_to_send"]))&&($_SESSION["good_to_s
 }
 
 if ($action=="compose") {
-	print '<span class="subheaders">'.GM_LANG_message.'</span>';
+	print '<span class="SubHeader">'.GM_LANG_message.'</span>';
 	$_SESSION["good_to_send"] = true;
 	?>
 	<script language="JavaScript" type="text/javascript">

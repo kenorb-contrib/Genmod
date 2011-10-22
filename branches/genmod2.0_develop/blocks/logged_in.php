@@ -57,13 +57,14 @@ function print_logged_in_users($block=true, $config="", $side, $index) {
 			}
 		}
 
-		print "<div id=\"logged_in_users\" class=\"block\">\n";
-		print "<div class=\"blockhc\">";
+		print "<div id=\"logged_in_users\" class=\"BlockContainer\">\n";
+		print "<div class=\"BlockHeader\">";
 		PrintHelpLink("index_loggedin_help", "qm", "users_logged_in");
 		print GM_LANG_users_logged_in;
 		print "</div>";
-		print "<div class=\"blockcontent\">";
-		if ($block) print "<div class=\"small_inner_block\">\n";
+		print "<div class=\"BlockContent\">";
+		if ($block) print "<div class=\"RestrictedBlockHeightRight\">\n";
+		else print "<div class=\"RestrictedBlockHeightMain\">\n";
 		$LoginUsers = count($loggedusers);
 		if (($LoginUsers == 0) and ($NumAnonymous == 0)) {
 			print "<b>".GM_LANG_no_login_users."</b>";
@@ -95,7 +96,7 @@ function print_logged_in_users($block=true, $config="", $side, $index) {
 			print "</td></tr>";
 		}
 		if (count($loggedusers) > 0) print "</table>";
-		if ($block) print "</div>\n";
+		print "</div>\n";
 		print "</div>"; // blockcontent
 		print "</div>"; // block
 }

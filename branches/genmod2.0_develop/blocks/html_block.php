@@ -39,14 +39,15 @@ function print_html_block($block=true, $config="", $side, $index) {
 	if ($config["only_show_logged_in"] != "no" && $gm_user->username == "") return;
 	if (!isset($HTML_BLOCK_COUNT)) $HTML_BLOCK_COUNT = 0;
 	$HTML_BLOCK_COUNT++;
-	print "<div id=\"html_block$HTML_BLOCK_COUNT\" class=\"block\">\n";
-	print "<div class=\"blockcontent\">";
-	if ($block) print "<div class=\"small_inner_block\">\n";
+	print "<div id=\"html_block$HTML_BLOCK_COUNT\" class=\"BlockContainer\">\n";
+	print "<div class=\"BlockContent\">";
+	if ($block) print "<div class=\"RestrictedBlockHeightRight\">\n";
+	else print "<div class=\"RestrictedBlockHeightMain\">\n";
 
 	$config["html"] = ReplaceEmbedText($config["html"]);
 	print $config["html"];
 
-	if ($block) print "</div>\n";
+	print "</div>\n";
 	if ($GM_BLOCKS["print_html_block"]["canconfig"]) {
 		$username = $gm_user->username;
 		if ((($command=="gedcom")&&($gm_user->userGedcomAdmin())) || (($command=="user")&&(!empty($username)))) {

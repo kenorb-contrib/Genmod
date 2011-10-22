@@ -243,7 +243,7 @@ document.onmousemove = MM;
 document.onmouseup = MU;
 //-->
 </script>
-<h3><?php print GM_LANG_timeline_chart; ?></h3>
+<span class="PageTitleName"><?php print GM_LANG_timeline_chart; ?></span>
 <form name="people" action="timeline.php">
 <?php
 $controller->checkPrivacy();
@@ -398,12 +398,12 @@ if (count($controller->people)>0) {
 						<table class="person<?php print $col; ?>" style="cursor: hand;">
 							<tr>
 								<td valign="top" width="120"><?php print GM_LANG_year; ?>  
-									<span id="yearform<?php print $p; ?>" class="field">
+									<span id="yearform<?php print $p; ?>" class="FactDetailField">
 									<?php print $tyear; ?>
 									</span>
 								</td>
 								<td valign="top" width="130">(<?php print GM_LANG_age;?>  
-									<span id="ageform<?php print $p; ?>" class="field"><?php print $tage; ?></span>) 
+									<span id="ageform<?php print $p; ?>" class="FactDetailField"><?php print $tage; ?></span>) 
 								</td>
 							</tr>
 						</table>

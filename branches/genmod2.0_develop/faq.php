@@ -141,7 +141,7 @@ if ($faq_controller->canconfig && $faq_controller->adminedit) {?>
 			}
 			else if (count($faqs) == 0 && !$faq_controller->canconfig) { ?>
 				<div class="shade2 item_box">
-					<div class="error"><?php print GM_LANG_no_faq_items; ?></div>
+					<div class="Error"><?php print GM_LANG_no_faq_items; ?></div>
 				</div>
 				<?php
 			}

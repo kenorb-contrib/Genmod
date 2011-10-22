@@ -269,8 +269,8 @@ class Repository extends GedcomRecord {
 		if ($prtact) {
 			$this->GetLinksFromActionCount();
 			if ($this->action_closed > 0) {
-				if ($TEXT_DIRECTION=="ltr") print "<span class=\"error\"> &lrm;(".$this->action_closed.")&lrm;</span>";
-				else print "<span class=\"error\"> &rlm;(".$this->action_closed.")&rlm;</span>";
+				if ($TEXT_DIRECTION=="ltr") print "<span class=\"Error\"> &lrm;(".$this->action_closed.")&lrm;</span>";
+				else print "<span class=\"Error\"> &rlm;(".$this->action_closed.")&rlm;</span>";
 			}
 			if ($this->action_open > 0) {
 				if ($TEXT_DIRECTION=="ltr") print "<span class=\"okay\"> &lrm;(".$this->action_open.")&lrm;</span>";

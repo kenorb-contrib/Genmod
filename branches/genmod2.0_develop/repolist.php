@@ -52,7 +52,7 @@ print "<h3>".GM_LANG_repo_list."</h3>\n\t";
 
 $ctot = $repolist_controller->repo_total + $repolist_controller->repo_add - $repolist_controller->repo_hide;
 
-print "\n\t<table class=\"list_table $TEXT_DIRECTION center\">\n\t\t<tr><td class=\"shade2 center\"";
+print "\n\t<table class=\"ListTable $TEXT_DIRECTION center\">\n\t\t<tr><td class=\"shade2 center\"";
 if($ctot > 12) print " colspan=\"2\"";
 print "><img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["repository"]["small"]."\" border=\"0\" title=\"".GM_LANG_titles_found."\" alt=\"".GM_LANG_titles_found."\" />&nbsp;&nbsp;";
 print GM_LANG_titles_found;

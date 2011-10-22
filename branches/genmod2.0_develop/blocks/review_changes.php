@@ -81,8 +81,8 @@ function review_changes_block($block = true, $config="", $side, $index) {
 		}
 	}
 	if ($display_block && $gm_user->userCanEdit()) {
-		print "<div id=\"review_changes_block\" class=\"block\">\n";
-		print "<div class=\"blockhc\">";
+		print "<div id=\"review_changes_block\" class=\"BlockContainer\">\n";
+		print "<div class=\"BlockHeader\">";
 		PrintHelpLink("review_changes_help", "qm", "review_changes");
 		if ($GM_BLOCKS["review_changes_block"]["canconfig"]) {
 			if ((($command=="gedcom")&&($gm_user->userGedcomAdmin())) || (($command=="user")&&($gm_user->username != ""))) {
@@ -94,9 +94,10 @@ function review_changes_block($block = true, $config="", $side, $index) {
 		}
 		print GM_LANG_review_changes;
 		print "</div>";
-		print "<div class=\"blockcontent\">";
+		print "<div class=\"BlockContent\">";
 		if ($gm_user->userCanAccept()) print "<a href=\"#\" onclick=\"window.open('edit_changes.php','','width=600,height=600,resizable=1,scrollbars=1'); return false;\">".GM_LANG_accept_changes."</a><br />\n";
-		if ($block) print "<div class=\"small_inner_block $TEXT_DIRECTION\">\n";
+		if ($block) print "<div class=\"RestrictedBlockHeightRight $TEXT_DIRECTION\">\n";
+		else print "<div class=\"RestrictedBlockHeightMain\">\n";
 		if ($config["sendmail"]=="yes" && GedcomConfig::$LAST_CHANGE_EMAIL != 0) {
 			$day = date("j", GedcomConfig::$LAST_CHANGE_EMAIL);
 			$mon = date("M", GedcomConfig::$LAST_CHANGE_EMAIL);
@@ -129,7 +130,7 @@ function review_changes_block($block = true, $config="", $side, $index) {
 				}
 			}
 		}
-		if ($block) print "</div>\n";
+		print "</div>\n";
 		print "</div>";
 		print "</div>";
 	}
@@ -138,7 +139,7 @@ function review_changes_block($block = true, $config="", $side, $index) {
 function review_changes_block_config($config) {
 	global $GM_BLOCKS, $TEXT_DIRECTION;
 	if (empty($config)) $config = $GM_BLOCKS["review_changes_block"]["config"];
-	print "<table class=\"facts_table ".$TEXT_DIRECTION."\">";
+	print "<table class=\"FactsTable ".$TEXT_DIRECTION."\">";
 	print "<tr><td class=\"shade2\">".GM_LANG_review_changes_email."</td><td class=\"shade1\">";
 	print "&nbsp;<select name='sendmail'>";
 		print "<option value='yes'";

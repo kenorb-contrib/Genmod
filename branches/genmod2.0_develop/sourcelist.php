@@ -38,7 +38,7 @@ print "<h3>".GM_LANG_source_list."</h3>\n\t";
 
 $ctot = $sourcelist_controller->sour_total + $sourcelist_controller->sour_add - $sourcelist_controller->sour_hide;
 
-print "\n\t<table class=\"list_table $TEXT_DIRECTION center\">\n\t\t<tr><td class=\"shade2 center\"";
+print "\n\t<table class=\"ListTable $TEXT_DIRECTION\">\n\t\t<tr><td class=\"shade2 center\"";
 if ($ctot > 12)	print " colspan=\"2\"";
 print "><img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["source"]["small"]."\" border=\"0\" title=\"".GM_LANG_sources."\" alt=\"".GM_LANG_sources."\" />&nbsp;&nbsp;";
 print GM_LANG_titles_found;

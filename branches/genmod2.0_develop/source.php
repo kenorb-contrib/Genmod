@@ -47,15 +47,10 @@ $source_controller->CheckRawEdited();
 <div id="show_changes"></div>
 <?php $source_controller->PrintDetailJS(); ?>
 
-<table class="list_table">
-	<tr>
-		<td>
-		<span class="name_head"><?php print PrintReady($source_controller->source->title.$source_controller->source->addxref);?></span><br />
-		<?php if(GedcomConfig::$SHOW_COUNTER && !$source_controller->IsPrintPreview()) print "\n<br /><br /><span style=\"margin-left: 3px;\">".GM_LANG_hit_count."&nbsp;".$hits."</span>\n"; ?>
-		</td>
-	</tr>
-	<tr>
-</table>
+<div class="DetailHeaderSection">
+	<div class="PageTitleName"><?php print PrintReady($source_controller->source->title.$source_controller->source->addxref);?></div><br />
+	<?php if(GedcomConfig::$SHOW_COUNTER && !$source_controller->IsPrintPreview()) print "\n<div class=\"PageCounter\">".GM_LANG_hit_count."&nbsp;".$hits."</div>\n"; ?>
+</div>
 <?php
 
 // Print the tab doors

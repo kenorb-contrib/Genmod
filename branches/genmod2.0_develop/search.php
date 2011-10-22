@@ -282,7 +282,7 @@ if ($search_controller->action == "general") {
 				}
 				// current door
 				for (i=0; i<tabid.length; i++) {
-					document.getElementById('door'+i).className='shade1 rela';
+					document.getElementById('door'+i).className='FactRela';
 				}
 				document.getElementById('door'+n).className='shade1';
 				return false;
@@ -291,7 +291,7 @@ if ($search_controller->action == "general") {
 		//-->
 		</script>
 		<div id="result" class="width100" style="display: inline-block;"><br /><br />
-		<div class="door">
+		<div id="TabDoor">
 		<dl>
 		<dd id="door1"><a href="javascript:;" onclick="tabswitch(1)" ><?php print GM_LANG_search_indis." (".count($search_controller->indi_total).")";?></a></dd>
 		<dd id="door2"><a href="javascript:;" onclick="tabswitch(2)" ><?php print GM_LANG_search_fams." (".count($search_controller->fam_total).")";?></a></dd>
@@ -306,35 +306,35 @@ if ($search_controller->action == "general") {
 		<?php
 
 		// Print the indis	
-		print "<div id=\"indis\" class=\"tab_page\" style=\"display:none;\" >";
+		print "<div id=\"indis\" class=\"TabPage\" style=\"display:none;\" >";
 		
 		if (!SearchFunctions::PrintIndiSearchResults($search_controller)) print "<div id=\"no_tab1\"></div>";
 		print "<br /></div>";
 		
 		// print the fams
-		print "<div id=\"fams\" class=\"tab_page\" style=\"display:none;\" >";
+		print "<div id=\"fams\" class=\"TabPage\" style=\"display:none;\" >";
 		
 		if (!SearchFunctions::PrintFamSearchResults($search_controller)) print "<div id=\"no_tab2\"></div>";
 		print "<br /></div>";
 		
 		// Print the sources
-		print "<div id=\"sources\" class=\"tab_page\" style=\"display:none;\" >";
+		print "<div id=\"sources\" class=\"TabPage\" style=\"display:none;\" >";
 		
 		if (!SearchFunctions::PrintSourceSearchResults($search_controller)) print "<div id=\"no_tab3\"></div>";
 		print "<br /></div>";
 		
 		// Print the repositories
-		print "<div id=\"repos\" class=\"tab_page\" style=\"display:none;\" >";
+		print "<div id=\"repos\" class=\"TabPage\" style=\"display:none;\" >";
 		
 		if (!SearchFunctions::PrintRepoSearchResults($search_controller)) print "<div id=\"no_tab4\"></div>";
 		print "<br /></div>";
 		
 		// Print the media
-		print "<div id=\"media\" class=\"tab_page\" style=\"display:none;\" >";
+		print "<div id=\"media\" class=\"TabPage\" style=\"display:none;\" >";
 		if (count($search_controller->media_total) > 0) {
 			
 			$ctm = count($search_controller->printmedia);
-			print "\n\t<table class=\"list_table  $TEXT_DIRECTION\">\n\t\t<tr><td class=\"shade2 center\"";
+			print "\n\t<table class=\"ListTable  $TEXT_DIRECTION\">\n\t\t<tr><td class=\"shade2 center\"";
 			if($ctm > 12) print " colspan=\"2\"";
 			print "><img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["media"]["small"]."\" border=\"0\" title=\"".GM_LANG_media."\" alt=\"".GM_LANG_media."\" />&nbsp;&nbsp;";
 			print GM_LANG_media;
@@ -360,7 +360,7 @@ if ($search_controller->action == "general") {
 		print "<br /></div>";
 		
 		// Print the notes
-		print "<div id=\"notes\" class=\"tab_page\" style=\"display:none;\" >";
+		print "<div id=\"notes\" class=\"TabPage\" style=\"display:none;\" >";
 		if (!SearchFunctions::PrintNoteSearchResults($search_controller)) print "<div id=\"no_tab6\"></div>";
 		print "<br /></div>";
 		
@@ -376,7 +376,7 @@ if ($search_controller->action == "soundex") {
 		$ct = count($search_controller->printindiname);
 		if ($ct > 0) {
 			print "<div class=\"search_results\"><br />";
-			print "\n\t<table class=\"list_table $TEXT_DIRECTION\">\n\t\t<tr>\n\t\t";
+			print "\n\t<table class=\"ListTable $TEXT_DIRECTION\">\n\t\t<tr>\n\t\t";
 			$extrafams = false;
 			if (count($search_controller->printfamname) > 0) $extrafams = true;
 			if ($extrafams) {

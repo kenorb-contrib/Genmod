@@ -240,7 +240,7 @@ if ($step >= 1) {
 			print "\">";
 			if (!empty($gedfilename) && !file_exists($path.$gedfilename)) {
 				print "<div class=\"shade1 wrap\">";
-				print "<span class=\"error\">".GM_LANG_file_not_found."&nbsp;".$path.$gedfilename."</span>\n";
+				print "<span class=\"Error\">".GM_LANG_file_not_found."&nbsp;".$path.$gedfilename."</span>\n";
 				print "</div>";
 				$step = 1;
 				$gedfilename = "";
@@ -271,7 +271,7 @@ if ($step >= 1) {
 				print "<span style=\"vertical-align: 25%;\">".GM_LANG_gedcom_file."</span>&nbsp;";
 				print "<input name=\"uploadfile\" type=\"file\" size=\"60\" /><span style=\"vertical-align: 25%\">";
 				if (!$filesize = ini_get('upload_max_filesize')) $filesize = "2M";
-				print " (".GM_LANG_max_upload_size." ".$filesize.")</span>".(isset($error_msg) ? "&nbsp;<span class=\"error\" style=\"vertical-align: 25%;\">".$error_msg."</span>" : "");
+				print " (".GM_LANG_max_upload_size." ".$filesize.")</span>".(isset($error_msg) ? "&nbsp;<span class=\"Error\" style=\"vertical-align: 25%;\">".$error_msg."</span>" : "");
 				if (isset($error_msg)) $step = 1;
 				print "</div>";
 			print "</div>";
@@ -325,7 +325,7 @@ if ($step == 2) {
 			print "&nbsp;<a href=\"javascript: ".GM_LANG_verify_gedcom."\" onclick=\"expand_layer('verify_gedcom');return false\">".GM_LANG_verify_gedcom."</a>";
 		print "\n</div>";
 		print "\n<div id=\"verify_gedcom\" class=\"shade1\" style=\"display: block;\">";
-			print "<span class=\"error\">".GM_LANG_dataset_exists."</span><br /><br />";
+			print "<span class=\"Error\">".GM_LANG_dataset_exists."</span><br /><br />";
 		// TODO: Check for existing changes
 			print "\n<div class=\"shade1\">". GM_LANG_empty_dataset."&nbsp;";
 				print "<select name=\"override\">";
@@ -431,7 +431,7 @@ if ($step >= 3) {
 		print "\">";
 		print "\n<div class=\"shade1\">";
 			print GM_LANG_performing_validation."<br />";
-			if (isset($error) && !empty($error)) print "<span class=\"error\">".$error."</span>\n";
+			if (isset($error) && !empty($error)) print "<span class=\"Error\">".$error."</span>\n";
 			// Check for cleanup, skip not clicked
 			if ($step == 3 && (!isset($skip_cleanup) || $skip_cleanup != GM_LANG_skip_cleanup)) {
 				$l_headcleanup = false;
@@ -467,34 +467,34 @@ if ($step >= 3) {
 					$cleanup_needed = "yes";
 					print "<input type=\"hidden\" name=\"cleanup_needed\" value=\"yes\">";
 					if (!AdminFunctions::FileIsWriteable($path.$gedfilename) && (file_exists($path.$gedfilename))) {
-						print "<span class=\"error\">".str_replace("#GEDCOM#", get_gedcom_from_id(GedcomConfig::$GEDCOMID), GM_LANG_error_header_write)."</span>\n";
+						print "<span class=\"Error\">".str_replace("#GEDCOM#", get_gedcom_from_id(GedcomConfig::$GEDCOMID), GM_LANG_error_header_write)."</span>\n";
 					}
 					// NOTE: Check for head cleanu
 					if ($l_headcleanup) {
 						print "\n<div class=\"shade1 wrap\">";
 							PrintHelpLink("invalid_header_help", "qm", "invalid_header");
-							print "<span class=\"error\">".GM_LANG_invalid_header."</span>\n";
+							print "<span class=\"Error\">".GM_LANG_invalid_header."</span>\n";
 						print "</div><br />";
 					}
 					// NOTE: Check for mac file cleanup
 					if ($l_macfilecleanup) {
 						print "\n<div class=\"shade1 wrap\">";
 							PrintHelpLink("macfile_detected_help", "qm", "macfile_detected");
-							print "<span class=\"error\">".GM_LANG_macfile_detected."</span>\n";
+							print "<span class=\"Error\">".GM_LANG_macfile_detected."</span>\n";
 						print "</div><br />";
 					}
 					// NOTE: Check for line endings cleanup
 					if ($l_lineendingscleanup) {
 						print "\n<div class=\"shade1 wrap\">";
 							PrintHelpLink("empty_lines_detected_help", "qm", "empty_lines_detected");
-							print "<span class=\"error\">".GM_LANG_empty_lines_detected."</span>\n";
+							print "<span class=\"Error\">".GM_LANG_empty_lines_detected."</span>\n";
 						print "</div><br />";
 					}
 					// NOTE: Check for place cleanup
 					if ($l_placecleanup) {
 						print "\n<div class=\"shade1 wrap\">";
 							PrintHelpLink("cleanup_places_help", "qm", "cleanup_places");
-							print "<span class=\"error\">".GM_LANG_place_cleanup_detected."</span>\n";
+							print "<span class=\"Error\">".GM_LANG_place_cleanup_detected."</span>\n";
 						print "</div>";
 						print "\n<div class=\"shade2 wrap\">";
 							print GM_LANG_cleanup_places;
@@ -506,7 +506,7 @@ if ($step >= 3) {
 					// NOTE: Check for date cleanup
 					if ($l_datecleanup) {
 						print "\n<div class=\"shade1 wrap\">";
-							print "<span class=\"error\">".GM_LANG_invalid_dates."</span>\n";
+							print "<span class=\"Error\">".GM_LANG_invalid_dates."</span>\n";
 						print "</div>";
 						print "\n<div class=\"shade2\">";
 							PrintHelpLink("detected_date_help", "qm");
@@ -522,7 +522,7 @@ if ($step >= 3) {
 					// NOTE: Check for ansi encoding
 					if ($l_isansi) {
 						print "\n<div class=\"shade1\">";
-							print "<span class=\"error\">".GM_LANG_ansi_encoding_detected."</span>\n";
+							print "<span class=\"Error\">".GM_LANG_ansi_encoding_detected."</span>\n";
 						print "</div>";
 						print "\n<div class=\"shade2 wrap\">";
 							PrintHelpLink("detected_ansi2utf_help", "qm", "ansi_to_utf8");
@@ -1097,7 +1097,7 @@ if ($step == 6) {
 		}
 	}
 	NameFunctions::DMSoundex("", "closecache");
-	$show_table_marr = "<table class=\"list_table center\"><tr>";
+	$show_table_marr = "<table class=\"ListTable\"><tr>";
 	$show_table_marr .= "<tr><td class=\"topbottombar\" colspan=\"3\">".GM_LANG_import_marr_names."</td></tr>";
 	$show_table_marr .= "<td class=\"shade2\">&nbsp;".GM_LANG_exec_time."&nbsp;</td>";
 	$show_table_marr .= "<td class=\"shade2\">&nbsp;".GM_LANG_found_record."&nbsp;</td>";
@@ -1119,7 +1119,7 @@ if ($step == 5 || $step == 6) {
 	print "<script type=\"text/javascript\"><!--\ncomplete_progress(".($importtime + $marr_importtime).", '".GM_LANG_exec_time."', '".GM_LANG_click_here_to_go_to_pedigree_tree."', '".GM_LANG_welcome_page."');\n//-->\n</script>";
 	
 	// TODO: Layout for Hebrew
-	$show_table1 = "<table class=\"list_table center\">";
+	$show_table1 = "<table class=\"ListTable\">";
 	$show_table1 .= "<tr><td class=\"topbottombar\" colspan=\"4\">".GM_LANG_ged_import."</td></tr>";
 	$show_table1 .= "<tr><td class=\"shade2\">&nbsp;".GM_LANG_exec_time."&nbsp;</td>";
 	$show_table1 .= "<td class=\"shade2\">&nbsp;".GM_LANG_bytes_read."&nbsp;</td>\n";

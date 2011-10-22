@@ -97,7 +97,7 @@ if ($action=="newentry") {
 	$result = MediaFS::UploadFiles($_FILES, $folder);
 	
 	if ($result["errno"] != 0) {
-		print "<span class=\"error\">".GM_LANG_upload_error."<br />".$result["error"]."</span><br />";
+		print "<span class=\"Error\">".GM_LANG_upload_error."<br />".$result["error"]."</span><br />";
 	}
 	else {
 		$filename = $result["filename"];
@@ -139,7 +139,7 @@ if ($action=="newentry") {
 		}
 		else {
 			$xref = $dm;
-			print "<br /><br /><span class=\"error\">".GM_LANG_no_double_media."</span>";
+			print "<br /><br /><span class=\"Error\">".GM_LANG_no_double_media."</span>";
 		}
 		if ($paste) {
 			if (GedcomConfig::$EDIT_AUTOCLOSE) print "\n<script type=\"text/javascript\">\n<!--\nopenerpasteid('$xref');\n//-->\n</script>";

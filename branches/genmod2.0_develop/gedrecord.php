@@ -35,7 +35,7 @@ $pid = CleanInput($pid);
 PrintSimpleHeader($pid);
 
 if ((!$gm_user->userCanViewGedlines()) && (!$gm_user->UserCanAccept())) {
-	print "<span class=\"error\">".GM_LANG_ged_noshow."</span>\n";
+	print "<span class=\"Error\">".GM_LANG_ged_noshow."</span>\n";
 	print "</body></html>";
 	exit;
 }
@@ -46,7 +46,7 @@ if (!$object->isempty && !$object->disp) {
 	exit;
 }
 if ($changed) {
-	print "<table class=\"facts_table\">\r\n";
+	print "<table class=\"FactsTable\">\r\n";
 	print "<tr class=\"topbottombar\"><td>".GM_LANG_old_record."</td><td>".GM_LANG_new_record."</td></tr>\r\n";
 	print "<tr class=\"shade1 wrap\"><td>".nl2br($object->oldprivategedrec)."</td><td>".nl2br($object->newprivategedrec)."</td></tr>\r\n";
 	print "<tr class=\"topbottombar\"><td colspan=\"2\">&nbsp;</td></tr></table>\r\n";

@@ -57,14 +57,14 @@ switch ($action) {
 		}
 		//-->
 		</script>
-		<div class="center">
+		<div class="LoginPageContainer">
 			<form name="requestpwform" action="login_register.php" method="post" onsubmit="t = new Date(); document.requestpwform.time.value=t.toUTCString(); return checkform(this);">
 			<input type="hidden" name="time" value="" />
 			<input type="hidden" name="action" value="requestpw" />
 			<span class="warning"><?php print $message;?></span>
-			<table class="center facts_table width20">
+			<table class="LoginPageTable">
 			<tr><td class="topbottombar" colspan="2"><?php PrintHelpLink("pls_note11", "qm", "lost_pw_reset"); print GM_LANG_lost_pw_reset;?></td></tr>
-			 <tr><td class="shade2 ltr"><?php print GM_LANG_username?></td><td class="shade1 ltr"><input type="text" name="user_name" value="" /></td></tr>
+			 <tr><td class="FormLabelCell"><?php print GM_LANG_username?></td><td class="FormInputCell"><input type="text" name="user_name" value="" /></td></tr>
 			 <tr><td class="topbottombar" colspan="2"><input type="submit" value="<?php print GM_LANG_lost_pw_reset; ?>" /></td></tr>
 		    </table>
 		  </form>
@@ -80,7 +80,7 @@ switch ($action) {
 		$QUERY_STRING = "";
 		if (!isset($user_name)) $user_name = "";
 		PrintHeader("Genmod - " . GM_LANG_lost_pw_reset);
-		print "<div class=\"center\">";
+		print "<div class=\"LoginPageContainer\">";
 		$newuser =& User::GetInstance($user_name);
 		if ($newuser->is_empty) {
 			print "<span class=\"warning\">";
@@ -136,7 +136,7 @@ switch ($action) {
 			$WEEK_START	= $WEEK_START_array[$LANGUAGE];
 			$NAME_REVERSE	= $NAME_REVERSE_array[$LANGUAGE];
 			?>
-			<table class="center facts_table">
+			<table class="center FactsTable">
 			<tr><td class="ltr"><?php print GM_LANG_pwreqinfo;?></td></tr>
 			</table>
 			<?php
@@ -303,11 +303,11 @@ switch ($action) {
 			}
 			//-->
 			</script>
-			<div class="center">
+			<div class="LoginPageContainer">
 			<form name="registerform" method="post" action="login_register.php" onsubmit="t = new Date(); document.registerform.time.value=t.toUTCString(); return checkform(this);">
 				<input type="hidden" name="action" value="register" />
 				<input type="hidden" name="time" value="" />
-				<table class="center facts_table width20">
+				<table class="center FactsTable width20">
 				<?php $i = 1;?>
 				<tr><td class="topbottombar" colspan="2"><?php PrintHelpLink("register_info_0".GedcomConfig::$WELCOME_TEXT_AUTH_MODE."", "qm", "requestaccount"); print GM_LANG_requestaccount;?><?php if (strlen($message) > 0) print "<br /><span class=\"warning\">".$message."</span>"; ?></td></tr>
 				<tr><td class="shade2 nowrap ltr"><?php PrintHelpLink("username_help", "qm", "username"); print GM_LANG_username;?></td><td class="shade1 ltr"><input type="text" name="user_name" value="<?php if (!$user_name_false) print $user_name;?>" tabindex="<?php print $i;?>" onchange="sndReq('errus', 'checkuser', 'username', this.value);" /> * <span id="errus"></span></td></tr>
@@ -356,7 +356,7 @@ switch ($action) {
 		$QUERY_STRING = "";
 		if (isset($user_name)) {
 			PrintHeader("Genmod - " . GM_LANG_registernew);
-			print "<div class=\"center\">";
+			print "<div class=\"LoginPageContainer\">";
 			$user_created_ok = false;
 				
 			WriteToLog("LoginRegister-&gt; User registration requested for: ".$user_name, "I", "S");
@@ -481,7 +481,7 @@ switch ($action) {
 				$WEEK_START	= $WEEK_START_array[$LANGUAGE];
 				$NAME_REVERSE	= $NAME_REVERSE_array[$LANGUAGE];
 				?>
-				<table class="center facts_table">
+				<table class="center FactsTable">
 				<tr><td class="ltr wrap"><?php print str_replace("#user_fullname#", $user_firstname." ".$user_lastname, GM_LANG_thankyou);?><br /><br />
 				<?php
 				if (SystemConfig::$REQUIRE_ADMIN_AUTH_REGISTRATION) print str_replace("#user_email#", $user_email, GM_LANG_pls_note06);
@@ -503,11 +503,11 @@ switch ($action) {
 		if (!isset($user_name)) $user_name = "";
 		if (!isset($user_hashcode)) $user_hashcode = "";
 		PrintHeader("Genmod - " . GM_LANG_user_verify);
-		print "<div class=\"center\">";
+		print "<div class=\"LoginPageContainer\">";
 		?><form name="verifyform" method="post" action="" onsubmit="t = new Date(); document.verifyform.time.value=t.toUTCString();">
 		<input type="hidden" name="action" value="verify_hash" />
 		<input type="hidden" name="time" value="" />
-		<table class="center facts_table width20">
+		<table class="center FactsTable width20">
 			<tr><td class="topbottombar" colspan="2"><?php PrintHelpLink("pls_note07", "qm", "user_verify"); print GM_LANG_user_verify;?></td></tr>
 			<tr><td class="shade2 ltr"><?php print GM_LANG_username; ?></td><td class="shade1 ltr"><input type="text" name="user_name" value="<?php print $user_name; ?>" /></td></tr>
 			<tr><td class="shade2 ltr"><?php print GM_LANG_password; ?></td><td class="shade1 ltr"><input type="password" name="user_password" value="" /></td></tr>
@@ -527,8 +527,8 @@ switch ($action) {
   		$QUERY_STRING = "";
 		WriteToLog("LoginRegister-&gt; User attempted to verify hashcode: ".$user_name, "I", "S");
 		PrintHeader("Genmod - " . GM_LANG_user_verify);# <-- better verification of authentication code
-		print "<div class=\"center\">";
-		print "<table class=\"center facts_table ltr\">";
+		print "<div class=\"LoginPageContainer\">";
+		print "<table class=\"center FactsTable ltr\">";
 		print "<tr><td class=\"topbottombar\">".GM_LANG_user_verify."</td></tr>";
 		print "<tr><td class=\"shade1\">";
 		print str_replace("#user_name#", $user_name, GM_LANG_pls_note08);

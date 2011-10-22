@@ -41,9 +41,9 @@ PrintHeader($pedigree_controller->pagetitle);
 print "<div id=\"content_pedigree\">";
 
 	// Print the page title
-	if ($pedigree_controller->view == "preview") print "<h3>".str_replace("#PEDIGREE_GENERATIONS#", ConvertNumber($pedigree_controller->num_generations), GM_LANG_gen_ped_chart).":";
-	else print "<h3>".GM_LANG_index_header.":";
-	print "<br />".$pedigree_controller->root->name;
+	if ($pedigree_controller->view == "preview") print "<span class=\"PageTitleName\">".str_replace("#PEDIGREE_GENERATIONS#", ConvertNumber($pedigree_controller->num_generations), GM_LANG_gen_ped_chart).":";
+	else print "<span class=\"PageTitleName\">".GM_LANG_index_header.":";
+	print "&nbsp;".$pedigree_controller->root->name;
 	if ($pedigree_controller->root->addname != "") print "<br />" . $pedigree_controller->root->addname;
 	
 	// Print the family relation
@@ -54,7 +54,7 @@ print "<div id=\"content_pedigree\">";
 		if ($TEXT_DIRECTION == "ltr") print "&nbsp;&lrm;(".constant("GM_LANG_".$famrela."_parents").")&lrm;";
 		else print "&nbsp;&rlm;(".constant("GM_LANG_".$famrela."_parents").")&rlm;";
 	}
-	print "</h3>";
+	print "</span>";
 
 	// NOTE: Print the form to change the number of displayed generations
 	if ($pedigree_controller->view != "preview") {
@@ -68,8 +68,8 @@ print "<div id=\"content_pedigree\">";
 		//-->
 		</script>
 		<?php
-		if ($pedigree_controller->max_generation == true) print "<span class=\"error\">".str_replace("#PEDIGREE_GENERATIONS#", ConvertNumber($pedigree_controller->num_generations), GM_LANG_max_generation)."</span>";
-		if ($pedigree_controller->min_generation == true) print "<span class=\"error\">".GM_LANG_min_generation."</span>";
+		if ($pedigree_controller->max_generation == true) print "<span class=\"Error\">".str_replace("#PEDIGREE_GENERATIONS#", ConvertNumber($pedigree_controller->num_generations), GM_LANG_max_generation)."</span>";
+		if ($pedigree_controller->min_generation == true) print "<span class=\"Error\">".GM_LANG_min_generation."</span>";
 		print "<form name=\"people\" method=\"get\" action=\"pedigree.php\">";
 		print "<table class=\"pedigree_table $TEXT_DIRECTION\" width=\"225\">";
 		
@@ -83,10 +83,10 @@ print "<div id=\"content_pedigree\">";
 		$pedigree_controller->PrintInputGenerations(GedcomConfig::$MAX_PEDIGREE_GENERATIONS, "PEDIGREE_GENERATIONS_help");	
 
 		// Orientation
-		print "<tr><td class=\"shade2 wrap\">";
+		print "<tr><td class=\"NavBlockLabel\">";
 		PrintHelpLink("talloffset_help", "qm");
 		print GM_LANG_orientation;
-		print "</td><td class=\"shade1\">";
+		print "</td><td class=\"NavBlockField\">";
 		print "<input type=\"radio\" name=\"talloffset\" value=\"0\" ";
 		if (!$pedigree_controller->talloffset) print "checked=\"checked\" ";
 		print "onclick=\"document.people.talloffset.value='1';\" />".GM_LANG_portrait;
@@ -340,19 +340,19 @@ print "<div id=\"content_pedigree\">";
 			if ($TEXT_DIRECTION=="rtl") print "rtl\" style=\"position:absolute; right:";
 			else print "ltr\" style=\"position:absolute; left:";
 			print $xoffset."px; top:".$yoffset."px; width:".$pbwidth."px; height:".$pbheight."px; visibility: hidden;\">";
-			print "\n\t\t\t<table class=\"person_box\"><tr><td>";
+			print "\n\t\t\t<table class=\"PersonBox\"><tr><td>";
 			foreach($pedigree_controller->root->spousefamilies as $key => $fam) {
 				if($pedigree_controller->xref != $fam->husb_id) $me = $fam->husb;
 				else $me = $fam->wife;
 				if (is_object($me) && !$me->isempty) {
 					print "\n\t\t\t\t<a href=\"pedigree.php?num_generations=".$pedigree_controller->num_generations."&amp;rootid=".$me->xref."&amp;show_details=".$pedigree_controller->show_details."&amp;talloffset=".$pedigree_controller->talloffset."\"><span class=\"name1\">";
 					print $me->name;
-					print "<br /></a>";
+					print "<br /></span></a>";
 				}
 				foreach($fam->children as $key2 => $child) {
 					print "\n\t\t\t\t&nbsp;&nbsp;<a href=\"pedigree.php?num_generations=".$pedigree_controller->num_generations."&amp;rootid=".$child->xref."&amp;show_details=".$pedigree_controller->show_details."&amp;talloffset=".$pedigree_controller->talloffset."\"><span class=\"name1\">";
 					print $child->name;
-					print "<br /></a>";
+					print "<br /></span></a>";
 				}
 			}
 			//-- print the siblings

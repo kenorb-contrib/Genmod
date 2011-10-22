@@ -42,12 +42,12 @@ if ($hourglass_controller->show_full == false) {
 }
 
 // -- print html header information
-print "<div id=\"content_pedigree\">";
+print "<div id=\"content_hourglass\">";
 
-print "\n\t<h3>".GM_LANG_hourglass_chart.": ";
+print "\n\t<span class=\"PageTitleName\">".GM_LANG_hourglass_chart.": ";
 print PrintReady($hourglass_controller->root->name);
-if ($hourglass_controller->root->addname != "") print "<br />" . PrintReady($hourglass_controller->root->addname);
-print "</h3>";
+if ($hourglass_controller->root->addname != "") print "&nbsp;" . PrintReady($hourglass_controller->root->addname);
+print "</span>";
 ?>
 
 <script language="JavaScript" type="text/javascript">
@@ -66,7 +66,7 @@ print "</h3>";
 <?php
 if ($hourglass_controller->view != "preview") {
 	print "<form method=\"get\" name=\"people\" action=\"?\">\n";
-	print "\n\t\t<table class=\"list_table ".$TEXT_DIRECTION."\" align=\"";
+	print "\n\t\t<table class=\"ListTable ".$TEXT_DIRECTION."\" align=\"";
 	if ($TEXT_DIRECTION == "ltr") print "left";
 	else print "right";
 	print "\">";

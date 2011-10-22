@@ -131,7 +131,7 @@ if ($action == "save") {
 	
 	print "<div align=\"center\"><center>";
 	
-	print "<table class=\"facts_table\">";
+	print "<table class=\"FactsTable\">";
 	print "<tr>";
 	print "<td class=\"facts_label03\">";
 	PrintText("savelang_help");
@@ -144,7 +144,7 @@ if ($action == "save") {
 	
 	print "<form name=\"Form2\" method=\"post\" action=\"" .$_SERVER["SCRIPT_NAME"]. "\">";
 	print "<input type=\"hidden\" name=\"lang_filename_orig\" value=\"".$lang_filename_orig."\" />";
-	print "<table class=\"facts_table\">";
+	print "<table class=\"FactsTable\">";
 	print "<tr>";
 	if ($Write_Ok) print "<td class=\"facts_label03\" style=\"color: #0000FF; font-weight: bold; \">".PrintText("original_message",0,1);
 	else {
@@ -164,7 +164,7 @@ if ($action == "save") {
 	
 	if ($Write_Ok) {
 		print "<br />";
-		print "<table class=\"facts_table\">";
+		print "<table class=\"FactsTable\">";
 		print "<tr>";
 		print "<td class=\"facts_label03\" style=\"color: #0000FF; font-weight: bold; \">";
 		PrintText("changed_message");
@@ -181,7 +181,7 @@ if ($action == "save") {
 		print "<br />";
 	}
 	
-	print "<table class=\"facts_table\">";
+	print "<table class=\"FactsTable\">";
 	print "<tr>";
 	print "<td class=\"facts_value\" style=\"text-align:center; \" >";
 	srand((double)microtime()*1000000);

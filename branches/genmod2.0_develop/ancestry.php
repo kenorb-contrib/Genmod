@@ -48,11 +48,11 @@ $pbheight = $bheight+14;
 PrintHeader($ancestry_controller->pagetitle);
 print "<div id=\"content_pedigree\">";
 
-if ($ancestry_controller->view == "preview") print "<h3>" . str_replace("#PEDIGREE_GENERATIONS#", ConvertNumber($ancestry_controller->num_generations), GM_LANG_gen_ancestry_chart) . ":";
-else print "<h3>" . GM_LANG_ancestry_chart . ":";
-print "<br />".PrintReady($ancestry_controller->root->name);
-if ($ancestry_controller->root->addname != "") print "<br />" . PrintReady($ancestry_controller->root->addname);
-print "</h3>";
+if ($ancestry_controller->view == "preview") print "<span class=\"PageTitleName\">" . str_replace("#PEDIGREE_GENERATIONS#", ConvertNumber($ancestry_controller->num_generations), GM_LANG_gen_ancestry_chart) . ":";
+else print "<span class=\"PageTitleName\">" . GM_LANG_ancestry_chart . ":";
+print "&nbsp;".PrintReady($ancestry_controller->root->name);
+if ($ancestry_controller->root->addname != "") print "&nbsp;" . PrintReady($ancestry_controller->root->addname);
+print "</span>";
 
 // -- print the form to change the number of displayed generations
 if ($ancestry_controller->view != "preview") {
@@ -67,10 +67,10 @@ if ($ancestry_controller->view != "preview") {
 	//-->
 	</script>
 	<?php
-	if (isset($ancestry_controller->max_generation) == true) print "<span class=\"error\">" . str_replace("#PEDIGREE_GENERATIONS#", ConvertNumber($ancestry_controller->num_generations), GM_LANG_max_generation) . "</span>";
-	if (isset($ancestry_controller->min_generation) == true) print "<span class=\"error\">" . GM_LANG_min_generation . "</span>";
+	if (isset($ancestry_controller->max_generation) == true) print "<span class=\"Error\">" . str_replace("#PEDIGREE_GENERATIONS#", ConvertNumber($ancestry_controller->num_generations), GM_LANG_max_generation) . "</span>";
+	if (isset($ancestry_controller->min_generation) == true) print "<span class=\"Error\">" . GM_LANG_min_generation . "</span>";
 	print "<form name=\"people\" id=\"people\" method=\"get\" action=\"?\">";
-	print "\n\t\t<table class=\"list_table ".$TEXT_DIRECTION."\" align=\"";
+	print "\n\t\t<table class=\"ListTable ".$TEXT_DIRECTION."\" align=\"";
 	if ($TEXT_DIRECTION == "ltr") print "right";
 	else print "left";
 	print "\">";

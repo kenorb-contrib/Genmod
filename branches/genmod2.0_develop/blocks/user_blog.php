@@ -41,19 +41,20 @@ function print_user_news($block=true, $config="", $side, $index) {
 
 	$usernews = NewsController::getUserNews($gm_user->username);
 
-	print "<div id=\"user_news\" class=\"block\">\n";
-	print "<div class=\"blockhc\">";
+	print "<div id=\"user_news\" class=\"BlockContainer\">\n";
+	print "<div class=\"BlockHeader\">";
 	PrintHelpLink("mygedview_myjournal_help", "qm", "my_journal");
 	print GM_LANG_my_journal;
 	print "</div>";
-	print "<div class=\"blockcontent\">";
-	if ($block) print "<div class=\"small_inner_block, $TEXT_DIRECTION\">\n";
+	print "<div class=\"BlockContent\">";
+	if ($block) print "<div class=\"RestrictedBlockHeightRight, $TEXT_DIRECTION\">\n";
+	else print "<div class=\"RestrictedBlockHeightMain\">\n";
 	if (count($usernews)==0) print GM_LANG_no_journal;
 	foreach($usernews as $key => $news) {
 		$day = date("j", $news->date);
 		$mon = date("M", $news->date);
 		$year = date("Y", $news->date);
-		print "<div class=\"person_box\">\n";
+		print "<div class=\"PersonBox\">\n";
 		
 		$news->title = ReplaceEmbedText($news->title);
 		print "<span class=\"news_title\">".PrintReady($news->title)."</span><br />\n";
@@ -69,7 +70,7 @@ function print_user_news($block=true, $config="", $side, $index) {
 		print "<a href=\"index.php?action=deletenews&amp;news_id=".$news->id."&amp;command=$command\" onclick=\"return confirm('".GM_LANG_confirm_journal_delete."');\">".GM_LANG_delete."</a><br />";
 		print "</div><br />\n";
 	}
-	if ($block) print "</div>\n";
+	print "</div>\n";
 	if ($gm_user->username != "") print "<br /><a href=\"#\" onclick=\"addnews('".$gm_user->username."'); return false;\">".GM_LANG_add_journal."</a>\n";
 	print "</div>\n";
 	print "</div>";

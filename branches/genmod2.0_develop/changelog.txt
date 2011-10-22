@@ -9,6 +9,8 @@
 =====================================================================
 
 Version 2.0 beta 2
+- Fixed aliveinyear losing firstname letter (sjouke)
+- Fixed aliveinyear error in death year estimation (sjouke)
 - Fixed update on some external search modules (sjouke)
 - Added Familysearch to external searched (sjouke)
 - Fixed Google indexing errors om JS feed (sjouke)

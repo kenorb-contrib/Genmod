@@ -47,14 +47,10 @@ $note_controller->CheckRawEdited();
 <div id="show_changes"></div>
 <?php $note_controller->PrintDetailJS(); ?>
 
-<table class="list_table">
-	<tr>
-		<td>
-		<span class="name_head"><?php print PrintReady($note_controller->note->GetTitle(40, $note_controller->note->show_changes).$note_controller->note->addxref); ?></span><br />
-		<?php if(GedcomConfig::$SHOW_COUNTER && !$note_controller->IsPrintPreview()) print "\n<br /><br /><span style=\"margin-left: 3px;\">".GM_LANG_hit_count."&nbsp;".$hits."</span>\n"; ?><br />
-		</td>
-	</tr>
-</table>
+<div class="DetailHeaderSection">
+	<div  class="PageTitleName"><?php print PrintReady($note_controller->note->GetTitle(40, $note_controller->note->show_changes).$note_controller->note->addxref); ?></div>
+	<?php if(GedcomConfig::$SHOW_COUNTER && !$note_controller->IsPrintPreview()) print "\n<div class=\"PageCounter\">".GM_LANG_hit_count."&nbsp;".$hits."</div>\n"; ?>
+</div>
 
 <?php 
 

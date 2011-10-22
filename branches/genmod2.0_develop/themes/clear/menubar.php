@@ -88,7 +88,8 @@ if (is_object($repomenu)) $showmenu[GM_LANG_this_repository] = CreateMenu($repom
 if (is_object($helpmenu)) $showmenu[GM_LANG_helpmenu] = CreateMenu($helpmenu);
 if (is_object($custommenu)) $showmenu[GM_LANG_my_pages] = CreateMenu($custommenu);
 ?>
-<div id="header" class="<?php echo $TEXT_DIRECTION; ?>">
+<div id="GenmodContainer">
+<div id="HeaderSection" class="<?php echo $TEXT_DIRECTION; ?>">
 	<script type="text/javascript" src="transmenu.js"></script>
 	<script type="text/javascript">
 	<!--
@@ -129,25 +130,25 @@ if (is_object($custommenu)) $showmenu[GM_LANG_my_pages] = CreateMenu($custommenu
 		$ldir = "right";
 	}
 	?>
-	<?php if (isset($GEDCOMS[GedcomConfig::$GEDCOMID])) { ?>
-		<div style="width: 1em; height: 1em;">
-		<a href="index.php?command=gedcom">
-		<img src="<?php print GM_IMAGE_DIR."/".$GM_IMAGES['gedcom']['small']; ?>" alt="<?php print $GEDCOMS[GedcomConfig::$GEDCOMID]['title']; ?>" />
-		</a>
-		</div>
-	<?php } 
-	else { ?>
-		<div id="headerlogo" />
-	<?php } ?>
-	<div id="menu" class="shade1 <?php echo $TEXT_DIRECTION; ?>">
-		<div class="shade1" style="float: <?php print $ldir; ?>;">
+	<div id="HeaderMenuContainer" class="<?php echo $TEXT_DIRECTION; ?>">
+		<?php if (isset($GEDCOMS[GedcomConfig::$GEDCOMID])) { ?>
+			<div id="HeaderLogoLink">
+			<a href="index.php?command=gedcom">
+			<img src="<?php print GM_IMAGE_DIR."/".$GM_IMAGES['gedcom']['small']; ?>" alt="<?php print $GEDCOMS[GedcomConfig::$GEDCOMID]['title']; ?>" />
+			</a>
+			</div>
+		<?php } 
+		else { ?>
+			<div id="HeaderLogo" />
+		<?php } ?>
+		<div id="HeaderMenuBar" style="float: <?php print $ldir; ?>;">
 			<?php foreach (array_keys($showmenu) as $number => $name) { 
 				$num = $number + 1;?>
 			<a id="<?php echo "menutitle".$num; ?>" href="#"><?php echo $name; ?></a> 
 				&nbsp;&nbsp;
 			<?php } ?>
 		</div>
-		<div class="shade1" style="float: <?php print $rdir; ?>; text-align: <?php print $ldir; ?>; margin-<?php print $rdir; ?>: 0em; width: 20em;">
+		<div id="HeaderLinkBar">
 			<?php 
 			if (isset($gm_user->gedcomid[GedcomConfig::$GEDCOMID]) && !empty($gm_user->gedcomid[GedcomConfig::$GEDCOMID])) {
 				$person =& Person::GetInstance($gm_user->gedcomid[GedcomConfig::$GEDCOMID], "", GedcomConfig::$GEDCOMID);
@@ -158,8 +159,8 @@ if (is_object($custommenu)) $showmenu[GM_LANG_my_pages] = CreateMenu($custommenu
 			?>
 		</div>
 	</div>
-	<br style="clear:both;" />
-	<div style="float: <?php print $rdir; ?>; margin-<?php print $rdir; ?>: 0em; text-align: <?php print $rdir; ?>;">
+	<br class="ClearBoth" />
+	<div id="HeaderQuickSearch">
 		<form action="search.php" method="get" name="searchformtop">
 			<input type="hidden" name="action" value="general" />
 			<input type="hidden" name="topsearch" value="yes" />
@@ -167,7 +168,7 @@ if (is_object($custommenu)) $showmenu[GM_LANG_my_pages] = CreateMenu($custommenu
 			<input type="submit" value="<?php print GM_LANG_search;?>" />
 		</form>
 	</div>
-	<br style="clear: both;" />
+	<br class="ClearBoth" />
 	
 	<script type="text/javascript">
 	<!--
@@ -188,7 +189,7 @@ if (is_object($custommenu)) $showmenu[GM_LANG_my_pages] = CreateMenu($custommenu
 		// of the actuator from which to measure the offset positions above. Here we are saying we want the 
 		// menu to appear directly below the bottom left corner of the actuator
 		//==================================================================================================
-		var ms = new TransMenuSet(TransMenu.direction.down, 10, 15, TransMenu.reference.bottomLeft);
+		var ms = new TransMenuSet(TransMenu.direction.down, -10, 3, TransMenu.reference.bottomLeft);
 
 		//==================================================================================================
 		// create a dropdown menu

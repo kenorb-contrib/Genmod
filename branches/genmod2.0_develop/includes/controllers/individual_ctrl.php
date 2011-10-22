@@ -188,7 +188,7 @@ class IndividualController extends DetailController {
 						else $filename = $media->fileobj->f_main_file;
 						if ($media->fileobj->f_height != 0 && $media->fileobj->f_height < 150) $height = $media->fileobj->f_height;
 						else $height = 150;
-						$this->HighlightedObject = '<img src="'.$filename.'" class="image" height="'.$height.'" alt="'.$media->title.'" />';
+						$this->HighlightedObject = '<img src="'.$filename.'" class="IndiPicture" height="'.$height.'" alt="'.$media->title.'" />';
 						$this->canshowhighlightedobj = true;
 					}
 					else $this->canshowhighlightedobj = false;
@@ -414,13 +414,13 @@ class IndividualController extends DetailController {
 		$lines = split("\n", $factrec);
 		$this->name_count++;
 		// NOTE: If there is more than one name, print the aka tag
-		if ($this->name_count>1) print "\n\t\t<span class=\"label\">".GM_LANG_aka." </span><br />\n";
+		if ($this->name_count>1) print "\n\t\t<span class=\"IndiHeaderLabel\">".GM_LANG_aka." </span><br />\n";
 		
 		$ct = preg_match_all("/2 (SURN)|(GIVN) (.*)/", $factrec, $nmatch, PREG_SET_ORDER);
 		if ($ct==0) {
 			$nt = preg_match("/1 NAME (.*)/", $factrec, $nmatch);
 			if ($nt>0){
-				print "\n\t\t<span class=\"label\">".GM_LANG_name.": </span><br />";
+				print "\n\t\t<span class=\"IndiHeaderLabel\">".GM_LANG_name.": </span><br />";
 				$name = trim($nmatch[1]);
 				if (NameFunctions::HasChinese($name, true)) $add = "";
 				else $add = " ";
@@ -433,18 +433,18 @@ class IndividualController extends DetailController {
 					$npfx = trim($match[1]);
 					if (strpos($name, $npfx)===false) $name = $npfx." ".$name;
 				}
-				print PrintReady($name)."<br />\n";
+				print "<span class=\"IndiHeaderField\">".PrintReady($name)."</span><br />\n";
 			}
 		}
 		$ct = preg_match_all("/\n2 (\w+) (.*)/", $factrec, $nmatch, PREG_SET_ORDER);
 		for($i=0; $i<$ct; $i++) {
 			$fact = trim($nmatch[$i][1]);
 			if (($fact!="SOUR")&&($fact!="NOTE")) {
-				print "\n\t\t\t<span class=\"label\">";
+				print "\n\t\t\t<span class=\"IndiHeaderLabel\">";
 				if (defined("GM_LANG_".$fact)) print constant("GM_LANG_".$fact);
 				else if (defined("GM_FACT_".$fact)) print constant("GM_FACT_".$fact);
 				else print $fact;
-				print ":</span><span class=\"field\"> ";
+				print ":</span><span class=\"IndiHeaderField\"> ";
 				if (isset($nmatch[$i][2])) {
 			  		$name = trim($nmatch[$i][2]);
 					if ($NAME_REVERSE || NameFunctions::HasChinese($name, true)) $name = NameFunctions::ReverseName($name);
@@ -517,7 +517,7 @@ class IndividualController extends DetailController {
 	 * get the person box stylesheet class
 	 * for the given person
 	 * @param Person $person
-	 * @return string	returns 'person_box', 'person_boxF', or 'person_boxNN'
+	 * @return string	returns 'PersonBox', 'PersonBoxF', or 'PersonBoxNN'
 	 */
 	protected function getPersonStyle(&$person) {
 
@@ -532,7 +532,7 @@ class IndividualController extends DetailController {
 				$isf = "NN";
 				break;
 		}
-		return "person_box".$isf;
+		return "PersonBox".$isf;
 	}
 	
 	protected function PrintToggleJS1() {

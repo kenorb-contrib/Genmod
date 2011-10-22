@@ -38,7 +38,7 @@ print "<div class=\"center\"><h3>".GM_LANG_unlink_list."</h3></div>\n";
 $indis = ListFunctions::GetIndiList("no", "unlinked");
 
 if (count($indis) == 0) {
-	print "<div class=\"error center\">".GM_LANG_sc_ged_nounlink."</div>";
+	print "<div class=\"Error center\">".GM_LANG_sc_ged_nounlink."</div>";
 }
 else $unlinkedlist_controller->PrintPersonList($indis);
 PrintFooter();

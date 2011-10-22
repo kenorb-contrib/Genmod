@@ -101,15 +101,15 @@ else {
 
 if ($type=="full") PrintHeader(GM_LANG_login_head);
 else PrintSimpleHeader(GM_LANG_login_head);
-print "<div class=\"center\">\n";
+print "<div class=\"LoginPageContainer\">\n";
 
 if ($_SESSION["cookie_login"]) {
-	print "<div style=\"width:70%\" align=\"left\">\n";
+	print "<div class=\"LoginPageText\">\n";
 	PrintText("cookie_login_help");
-	print "</div><br /><br />\n";
+	print "</div>\n";
 }
 if (GedcomConfig::$MUST_AUTHENTICATE) {
-	print "<table class=\"center width60 ".$TEXT_DIRECTION."\"><tr><td class=\"wrap\">";
+	print "<div class=\"LoginPageText\">";
 	if (empty($help_message) || !isset($help_message)) {
 		if (!empty(GedcomConfig::$GEDCOMID)) SwitchGedcom(GedcomConfig::$GEDCOMID);
 		switch (GedcomConfig::$WELCOME_TEXT_AUTH_MODE){
@@ -135,13 +135,13 @@ if (GedcomConfig::$MUST_AUTHENTICATE) {
 		}
 	}
 	else PrintText($help_message);
-	print "</td></tr></table><br /><br />\n";
+	print "</div>\n";
 }
 else {
 	if (!empty($help_message) || isset($help_message)) {
-		print "<table class=\"center width60 ltr\"><tr><td class=\"wrap\">";
+		print "<div class=\"LoginPageText\">";
 		PrintText($help_message);
-		print "</td></tr></table><br /><br />\n";
+		print "</div>\n";
 	}
 }
 	?>
@@ -153,22 +153,22 @@ else {
 		<input type="hidden" name="pid" value="<?php if (isset($pid)) print $pid; ?>" />
 		<input type="hidden" name="type" value="<?php print $type; ?>" />
 		<input type="hidden" name="usertime" value="" />
-		<span class="error"><b><?php print $message?></b></span>
+		<span class="Error"><b><?php print $message?></b></span>
 		<!--table-->
-		<table class="center facts_table width40">
+		<table class="LoginPageTable">
 		  <tr><td class="topbottombar" colspan="2"><?php print GM_LANG_login?></td></tr>
 		  <tr>
-		    <td class="shade2 width40 <?php print $TEXT_DIRECTION; ?>"><?php PrintHelpLink("username_help", "qm", "username"); print GM_LANG_username?></td>
-		    <td class="shade1 <?php print $TEXT_DIRECTION; ?>"><input type="text" tabindex="<?php $i++; print $i?>" name="username" value="<?php print $username?>" size="20" /></td>
+		    <td class="FormLabelCell LoginPageTableTextWidth <?php print $TEXT_DIRECTION; ?>"><?php PrintHelpLink("username_help", "qm", "username"); print GM_LANG_username?></td>
+		    <td class="FormInputCell <?php print $TEXT_DIRECTION; ?>"><input type="text" tabindex="<?php $i++; print $i?>" name="username" value="<?php print $username?>" size="20" /></td>
 		  </tr>
 		  <tr>
-		    <td class="shade2 <?php print $TEXT_DIRECTION; ?>"><?php PrintHelpLink("password_help", "qm", "password"); print GM_LANG_password?></td>
-		    <td class="shade1 <?php print $TEXT_DIRECTION; ?>"><input type="password" tabindex="<?php $i++; print $i?>" name="password" size="20" /></td>
+		    <td class="FormLabelCell <?php print $TEXT_DIRECTION; ?>"><?php PrintHelpLink("password_help", "qm", "password"); print GM_LANG_password?></td>
+		    <td class="FormInputCell <?php print $TEXT_DIRECTION; ?>"><input type="password" tabindex="<?php $i++; print $i?>" name="password" size="20" /></td>
 		  </tr>
 		  <?php if (SystemConfig::$ALLOW_REMEMBER_ME) { ?>
 		  <tr>
-		  	<td class="shade2 <?php print $TEXT_DIRECTION; ?>"><?php PrintHelpLink("remember_me_help", "qm", "remember_me"); print GM_LANG_remember_me?></td>
-		    <td class="shade1 <?php print $TEXT_DIRECTION; ?> "><input type="checkbox" tabindex="<?php $i++; print $i?>" name="remember" value="yes" <?php if (!empty($_COOKIE["gm_rem"])) print "checked=\"checked\""; ?> /></td>
+		  	<td class="FormLabelCell <?php print $TEXT_DIRECTION; ?>"><?php PrintHelpLink("remember_me_help", "qm", "remember_me"); print GM_LANG_remember_me?></td>
+		    <td class="FormInputCell <?php print $TEXT_DIRECTION; ?> "><input type="checkbox" tabindex="<?php $i++; print $i?>" name="remember" value="yes" <?php if (!empty($_COOKIE["gm_rem"])) print "checked=\"checked\""; ?> /></td>
 		  </tr>
 		  <?php } ?>
 		  <tr>
@@ -190,14 +190,14 @@ else {
 </form><br /><br />
 <?php
 $sessname = session_name();
-if (!isset($_COOKIE[$sessname]) && !isset($_COOKIE["gm_rem"])) print "<span class=\"error\">".GM_LANG_cookie_message."</span><br /><br />";
+if (!isset($_COOKIE[$sessname]) && !isset($_COOKIE["gm_rem"])) print "<span class=\"Error\">".GM_LANG_cookie_message."</span><br /><br />";
 if (SystemConfig::$USE_REGISTRATION_MODULE && count($GEDCOMS) > 0) {?>
-	<table class="center facts_table width40">
+	<table class="LoginPageTable">
 	<tr><td class="topbottombar" colspan="2"><?php print GM_LANG_account_information;?></td></tr>
-	<tr><td class="shade2 width40 <?php print $TEXT_DIRECTION; ?>"><?php PrintHelpLink("new_user_help", "qm", "requestaccount"); print GM_LANG_no_account_yet;?></td>
-	<td class="shade1 <?php print $TEXT_DIRECTION; ?>"><a href="login_register.php?action=register"><?php print GM_LANG_requestaccount;?></a></td></tr>
-	<tr><td class="shade2 <?php print $TEXT_DIRECTION; ?>"><?php PrintHelpLink("new_password_help", "qm", "lost_password"); print GM_LANG_lost_password;?></td>
-	<td class="shade1 <?php print $TEXT_DIRECTION; ?>"><a href="login_register.php?action=pwlost"><?php print GM_LANG_requestpassword;?></a></td></tr>
+	<tr><td class="FormLabelCell LoginPageTableTextWidth <?php print $TEXT_DIRECTION; ?>"><?php PrintHelpLink("new_user_help", "qm", "requestaccount"); print GM_LANG_no_account_yet;?></td>
+	<td class="FormInputCell <?php print $TEXT_DIRECTION; ?>"><a href="login_register.php?action=register"><?php print GM_LANG_requestaccount;?></a></td></tr>
+	<tr><td class="FormLabelCell <?php print $TEXT_DIRECTION; ?>"><?php PrintHelpLink("new_password_help", "qm", "lost_password"); print GM_LANG_lost_password;?></td>
+	<td class="FormInputCell <?php print $TEXT_DIRECTION; ?>"><a href="login_register.php?action=pwlost"><?php print GM_LANG_requestpassword;?></a></td></tr>
 	</table>
 <?php
 }

@@ -46,45 +46,38 @@ $media_controller->CheckRawEdited();
 ?>
 <div id="show_changes"></div>
 <?php $media_controller->PrintDetailJS(); ?>
-<table class="list_table">
-	<tr>
-		<td colspan="2">
-		<?php
+<div class="DetailHeaderSection"><?php
+	// Print the title
+	print "<div class=\"PageTitleName\">".PrintReady($media_controller->media->title.$media_controller->media->addxref)."</div>";
 		
-		// Print the title
-		print "<span class=\"name_head\">".PrintReady($media_controller->media->title.$media_controller->media->addxref);
-		print "</span><br />";
-		
-		// Print the picture!
-		$filename = $media_controller->media->fileobj->f_main_file;
-		$thumbnail = $media_controller->media->fileobj->f_thumb_file;
-		// NOTE: Determine the size of the mediafile
-		$imgwidth = 300;
-		$imgheight = 300;
-		if (preg_match("'://'", $filename)) {
-			if ($media_controller->media->validmedia) {
-				$imgwidth = 400;
-				$imgheight = 500;
-			}
-			else {
-				$imgwidth = 800;
-				$imgheight = 400;
-			}
+	// Print the picture!
+	$filename = $media_controller->media->fileobj->f_main_file;
+	$thumbnail = $media_controller->media->fileobj->f_thumb_file;
+	// NOTE: Determine the size of the mediafile
+	$imgwidth = 300;
+	$imgheight = 300;
+	if (preg_match("'://'", $filename)) {
+		if ($media_controller->media->validmedia) {
+			$imgwidth = 400;
+			$imgheight = 500;
 		}
-		else if ((preg_match("'://'", GedcomConfig::$MEDIA_DIRECTORY)>0)||($media_controller->media->fileobj->f_file_exists)) {
-			if ($media_controller->media->fileobj->f_width > 0 && $media_controller->media->fileobj->f_height > 0) {
-				$imgwidth = $media_controller->media->fileobj->f_width+50;
-				$imgheight = $media_controller->media->fileobj->f_height + 50;
-			}
+		else {
+			$imgwidth = 800;
+			$imgheight = 400;
 		}
-		MediaFS::DispImgLink($filename, $thumbnail, $media_controller->media->title, "", 0, 0, $imgwidth, $imgheight, $media_controller->media->fileobj->f_is_image, $media_controller->media->fileobj->f_file_exists);
-		?>
-		<?php if(GedcomConfig::$SHOW_COUNTER && !$media_controller->IsPrintPreview()) {
-			print "\n<br /><br /><span style=\"margin-left: 3px;\">".GM_LANG_hit_count."&nbsp;".$hits."</span>\n";
-		}?>
-		</td>
-	</tr>
-</table>
+	}
+	else if ((preg_match("'://'", GedcomConfig::$MEDIA_DIRECTORY)>0)||($media_controller->media->fileobj->f_file_exists)) {
+		if ($media_controller->media->fileobj->f_width > 0 && $media_controller->media->fileobj->f_height > 0) {
+			$imgwidth = $media_controller->media->fileobj->f_width+50;
+			$imgheight = $media_controller->media->fileobj->f_height + 50;
+		}
+	}
+	MediaFS::DispImgLink($filename, $thumbnail, $media_controller->media->title, "", 0, 0, $imgwidth, $imgheight, $media_controller->media->fileobj->f_is_image, $media_controller->media->fileobj->f_file_exists);
+	?>
+	<?php if(GedcomConfig::$SHOW_COUNTER && !$media_controller->IsPrintPreview()) {
+		print "\n<div class=\"PageCounter\">".GM_LANG_hit_count."&nbsp;".$hits."</div>\n";
+	}?>
+</div>
 <?php	
 $media_controller->PrintTabs();
 

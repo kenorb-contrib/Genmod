@@ -159,7 +159,7 @@ if ($action == "update") {
 	if (!$error_db && !$error_db2 && !$error_db3 && !$error_indexdir && !$error_url && !$error_ali && !$error_ali_login) {
 		
 		if (!SystemConfig::StoreConfig($CONFIG)) {
-			$message .= "<span class=\"error\">".GM_LANG_gm_config_write_error."</span>";
+			$message .= "<span class=\"Error\">".GM_LANG_gm_config_write_error."</span>";
 			$error_cnf = true;
 		}
 		
@@ -232,7 +232,7 @@ PrintHeader(GM_LANG_configure_head);
 			</h3>
 			<?php print GM_LANG_site_config.": ".$CONFIG_SITE; 
 			if ($message != "") {
-				print "<br /><div class=\"error center\">".$message."</div>";
+				print "<br /><div class=\"Error center\">".$message."</div>";
 			}
 			?>
 		</div>
@@ -315,9 +315,9 @@ PrintHeader(GM_LANG_configure_head);
 			</div>
 			<div class="choice_right width65">
 				<input type="text" name="NEW_TBLPREFIX" value="<?php print TBLPREFIX?>" size="4" tabindex="<?php $i++; print $i?>" />
-				<?php if ($error_db) print "<div class=\"error\">".GM_LANG_duplicatedb."</div>"; ?>
-				<?php if ($error_db2) print "<div class=\"error\">".GM_LANG_bad_host_user_pass."</div>"; ?>
-				<?php if ($error_db3) print "<div class=\"error\">".GM_LANG_bad_database_name."</div>"; ?>
+				<?php if ($error_db) print "<div class=\"Error\">".GM_LANG_duplicatedb."</div>"; ?>
+				<?php if ($error_db2) print "<div class=\"Error\">".GM_LANG_bad_host_user_pass."</div>"; ?>
+				<?php if ($error_db3) print "<div class=\"Error\">".GM_LANG_bad_database_name."</div>"; ?>
 			</div>
 		</div>
 		<div class="admin_item_box">
@@ -347,7 +347,7 @@ PrintHeader(GM_LANG_configure_head);
 			</div>
 			<div class="choice_right width65">
 				<input type="text" size="40" name="NEW_INDEX_DIRECTORY" value="<?php print INDEX_DIRECTORY?>" dir="ltr" tabindex="<?php $i++; print $i?>" />
-				<?php if ($error_indexdir) print "<div class=\"error\">".GM_LANG_duplicateindexdir."</div>"; ?>
+				<?php if ($error_indexdir) print "<div class=\"Error\">".GM_LANG_duplicateindexdir."</div>"; ?>
 			</div>
 		</div>
 		<div class="admin_item_box">
@@ -586,7 +586,7 @@ PrintHeader(GM_LANG_configure_head);
 				<input type="text" name="NEW_SERVER_URL" value="<?php print $SERVER_URL?>" dir="ltr" tabindex="<?php $i++; print $i?>" size="40" 
 				<?php if (isset($CONFIG["SERVER_URL"]) && isset($CONFIG_PARMS[$CONFIG["SERVER_URL"]])) print "disabled=\"disabled\""; ?> />
 				<?php
-				if ($error_url) print "<div class=\"error\">".GM_LANG_emptyserverurl."</div>";
+				if ($error_url) print "<div class=\"Error\">".GM_LANG_emptyserverurl."</div>";
 				$GUESS_URL = ("http://".$_SERVER["SERVER_NAME"]);
 				if ($_SERVER["SERVER_PORT"] != 80) $GUESS_URL .= ":".$_SERVER["SERVER_PORT"];
 				$GUESS_URL .= dirname(SCRIPT_NAME)."/";
@@ -605,7 +605,7 @@ PrintHeader(GM_LANG_configure_head);
 			</div>
 			<div class="choice_right">
 				<input type="text" name="NEW_LOGIN_URL" value="<?php print LOGIN_URL?>" dir="ltr" tabindex="<?php $i++; print $i?>" size="40" />
-				<?php if ($error_ali_login) print "<div class=\"error\">".GM_LANG_aliaslogin."</div>"; ?>
+				<?php if ($error_ali_login) print "<div class=\"Error\">".GM_LANG_aliaslogin."</div>"; ?>
 			</div>
 		</div>
 		<div class="admin_item_box">
@@ -619,7 +619,7 @@ PrintHeader(GM_LANG_configure_head);
 			</div>
 			<div class="choice_right">
 				<input type="text" name="NEW_SITE_ALIAS" value="<?php print SITE_ALIAS?>" dir="ltr" tabindex="<?php $i++; print $i?>" size="40" />
-				<?php if ($error_ali) print "<div class=\"error\">".GM_LANG_invalidalias."</div>"; ?>
+				<?php if ($error_ali) print "<div class=\"Error\">".GM_LANG_invalidalias."</div>"; ?>
 			</div>
 		</div>
 		<div class="admin_item_box">

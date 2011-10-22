@@ -99,7 +99,7 @@ if ($action=="choose") {
 	print "<form name=\"choosereport\" method=\"get\" action=\"reportengine.php\">\n";
 	print "<input type=\"hidden\" name=\"action\" value=\"setup\" />\n";
 	print "<input type=\"hidden\" name=\"output\" value=\"$output\" />\n";
-	print "<table class=\"facts_table center width50 $TEXT_DIRECTION\">";
+	print "<table class=\"FactsTable center width50 $TEXT_DIRECTION\">";
 	print "<tr><td class=\"topbottombar\" colspan=\"2\">".GM_LANG_choose_report."</td></tr>";
 	print "<tr><td class=\"shade2 wrap width20 vmiddle\">".GM_LANG_select_report."</td>";
 	print "<td class=\"shade1\">";
@@ -121,7 +121,7 @@ else if ($action=="setup") {
 	PrintHeader(GM_LANG_enter_report_values);
 	//-- make sure the report exists
 	if (!file_exists($report)) {
-		print "<span class=\"error\">The specified report cannot be found</span>\n";
+		print "<span class=\"Error\">The specified report cannot be found</span>\n";
 	}
 	else {
 		require_once("includes/reportheader.php");
@@ -172,7 +172,7 @@ function paste_id(value) {
 		print "<option value=\"PDF\">PDF</option>\n";
 		print "</select><br />\n";
 		*/
-		print "<table class=\"facts_table width50 center $TEXT_DIRECTION\">";
+		print "<table class=\"FactsTable width50 center $TEXT_DIRECTION\">";
 		print "<tr><td class=\"topbottombar\" colspan=\"2\">".GM_LANG_enter_report_values."</td></tr>";
 		print "<tr><td class=\"shade2 width30 wrap\">".GM_LANG_selected_report."</td><td class=\"shade1\">".$report_array["title"]."</td></tr>\n";
 		

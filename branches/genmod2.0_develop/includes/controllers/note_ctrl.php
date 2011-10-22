@@ -200,8 +200,8 @@ class NoteController extends DetailController {
 
 		if (($this->note->textchanged || $this->note->isdeleted) && $this->note->show_changes && !($this->view == "preview")) {
 			$styleadd = "change_old";
-			print "\n\t\t<tr><td class=\"shade2 $styleadd center\" style=\"vertical-align: middle;\"><img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["note"]["other"]."\" width=\"50\" height=\"50\" alt=\"\" /><br />".GM_LANG_note.":";
-			print " </td>\n<td class=\"shade1 $styleadd wrap\">";
+			print "\n\t\t<tr><td class=\"FactLabelCell $styleadd\"><img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["note"]["other"]."\" width=\"50\" height=\"50\" alt=\"\" /><br />".GM_LANG_note.":";
+			print " </td>\n<td class=\"FactDetailCell $styleadd\">";
 			if (PrivacyFunctions::showFactDetails("NOTE", $this->note->xref)) {
 				print PrintReady($this->note->text)."<br />\n";
 				// See if RESN tag prevents display or edit/delete
@@ -218,7 +218,7 @@ class NoteController extends DetailController {
 		}
 		if (($this->note->textchanged || $this->note->isnew) && !$this->note->isdeleted && $this->show_changes && !($this->view == "preview")) $styleadd = "change_new";
 		if (!$this->note->isdeleted || !$this->show_changes) {
-			print "\n\t\t<tr><td class=\"shade2 $styleadd center\" style=\"vertical-align: middle;\"><img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["note"]["other"]."\" width=\"50\" height=\"50\" alt=\"\" /><br />".GM_LANG_note.":";
+			print "\n\t\t<tr><td class=\"FactLabelCell $styleadd\"><img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["note"]["other"]."\" width=\"50\" height=\"50\" alt=\"\" /><br />".GM_LANG_note.":";
 			if ($this->note->canedit && ($styleadd!="change_old")&&($this->view != "preview")&& $mayedit) {
 				$menu = array();
 				$menu["label"] = GM_LANG_edit;
@@ -254,7 +254,7 @@ class NoteController extends DetailController {
 				FactFunctions::PrintFactMenu($menu);
 				print "</div>";
 			}
-			print " </td>\n<td class=\"shade1 $styleadd wrap\">";
+			print " </td>\n<td class=\"FactDetailCell $styleadd\">";
 			if (PrivacyFunctions::showFactDetails("NOTE", $this->note->xref)) {
 				if ($styleadd == "change_new") print PrintReady($this->note->GetNoteText(true))."<br />\n";
 				else print PrintReady($this->note->GetNoteText())."<br />\n";
