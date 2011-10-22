@@ -70,13 +70,13 @@ switch($action) {
 	
 	case "checkuser":
 		$u =& User::GetInstance($username);
-		if (!$u->is_empty) print "<span class=\"error\">".GM_LANG_duplicate_username."</span>";
+		if (!$u->is_empty) print "<span class=\"Error\">".GM_LANG_duplicate_username."</span>";
 		else print "";
 	break;
 	
 	case "checkemail":
 		if (empty($email) || CheckEmailAddress($email)) print "";
-		else print "<span class=\"error\">".GM_LANG_invalid_email."</span>";
+		else print "<span class=\"Error\">".GM_LANG_invalid_email."</span>";
 	break;
 
 	case "getpersonname":
@@ -86,7 +86,7 @@ switch($action) {
 		else {
 			$person =& Person::GetInstance($pid);
 			if ($person->isempty) {
-				print "<span class=\"error\">".GM_LANG_indi_id_no_exists."</span>";
+				print "<span class=\"Error\">".GM_LANG_indi_id_no_exists."</span>";
 			}
 			else if ($person->disp_name) print $person->name.$person->addxref;
 			else print "";
@@ -112,7 +112,7 @@ switch($action) {
 		else {
 			$family =& Family::GetInstance($famid);
 			if ($family->isempty) {
-				print "<span class=\"error\">".GM_LANG_fam_id_no_exists."</span>";
+				print "<span class=\"Error\">".GM_LANG_fam_id_no_exists."</span>";
 			}
 			else if ($family->disp) print $family->name.$family->addxref;
 			else print "";
@@ -125,7 +125,7 @@ switch($action) {
 		else {
 			$source =& Source::GetInstance($sid);
 			if ($source->isempty) {
-				print "<span class=\"error\">".GM_LANG_source_id_no_exists."</span>";
+				print "<span class=\"Error\">".GM_LANG_source_id_no_exists."</span>";
 			}
 			else if ($source->disp) print $source->descriptor.$source->addxref;
 			else print "";
@@ -138,7 +138,7 @@ switch($action) {
 		else {
 			$repo =& Repository::GetInstance($rid);
 			if ($repo->isempty) {
-				print "<span class=\"error\">".GM_LANG_repo_id_no_exists."</span>";
+				print "<span class=\"Error\">".GM_LANG_repo_id_no_exists."</span>";
 			}
 			else if ($repo->disp) print $repo->title.$repo->addxref;
 			else print "";
@@ -151,7 +151,7 @@ switch($action) {
 		else {
 			$media =& MediaItem::GetInstance($mid);
 			if ($media->isempty) {
-				print "<span class=\"error\">".GM_LANG_media_id_no_exists."</span>";
+				print "<span class=\"Error\">".GM_LANG_media_id_no_exists."</span>";
 			}
 			else if ($media->disp) print $media->title.$media->addxref;
 			else print "";
@@ -165,7 +165,7 @@ switch($action) {
 			$note =& Note::GetInstance($oid);
 			// Note is deleted or doesn't exist
 			if ($note->isempty) {
-				print "<span class=\"error\">".GM_LANG_note_id_no_exists."</span>";
+				print "<span class=\"Error\">".GM_LANG_note_id_no_exists."</span>";
 			}
 			else if ($note->disp) print $note->GetTitle(40, true).$note->addxref;
 			else print "";
@@ -232,14 +232,14 @@ switch($action) {
 					$details = trim($ffmatch[2]);
 				}
 				if ($factobj->fact != "EVEN" && $factobj->fact != "FACT") {
-					print "<span class=\"details_label\">";
+					print "<span class=\"FactDetailLabel\">";
 					if (defined("GM_FACT_".$factobj->fact)) print constant("GM_FACT_".$factobj->fact);
 					else print $factobj->fact;
 					print "</span> ";
 				}
 				else {
 					if ($factobj->fact != $factobj->factref) {
-						print "<span class=\"details_label\">";
+						print "<span class=\"FactDetailLabel\">";
 						print $factobj->descr;
 						print "</span> ";
 					}

@@ -1,5 +1,5 @@
-/**
- * Style for Standard theme
+/*
+ * Style for Clear theme
  *
  * Use this stylesheet to customize the display of your site.
  * To learn more about CSS visit http://www.w3.org/TR/REC-CSS2/
@@ -29,16 +29,25 @@
 .something {
 	/*empty style to make sure that the BODY style is not ignored */
 }
+/* The body height must be 99%, to make a less than full page fit with the footer, without the vertical scroll bars.
+   IE is ok with 100% but for FF must be 99% */
+BODY {
+	height: 99%;
+}
 
 IMG {
 	border: 0px;
 }
+
+/* Useradmin message area */
 .message_bottom {
 	margin-bottom: 5px;
 }
+/* Not used? */
 #centermenu {
 	margin: 0px auto;
 }
+
 div.row {
 	clear: both;
 }
@@ -48,7 +57,6 @@ div.left {
 	background-color: #F5F5F5;
 }
 div.row span.label {
-*	clear: both;	/* applied * to hide from other browsers except IE */
 	float: left;
 	text-align: left;
 	background-color: #DFDFDF;
@@ -56,19 +64,22 @@ div.row span.label {
 	padding: 0.2em 0em 0em 1em; /* top right bottom left */
 }
 
+/* span not used? */
 div.row span.rowempty {
-*	clear: both;	/* applied * to hide from other browsers except IE */
 	float: left;
 	width: 100%;
 	text-align: left;
 	background-color: #DFDFDF;
 }
 
+/* span not used? */
 div.row span.rowdivide {
 	float: left;
 	width: 100%;
 	height: 0.2em;
 }
+
+/* Not used? */
 /* A fix for IE since the above class doesn't work */
 .margindivider {
 	 margin-top: 0.2em;
@@ -77,7 +88,6 @@ div.row span.rowdivide {
 }
 
 div.row span.option {
-*	clear: both; /* applied * to hide from other browsers except IE */
 	float: right;
 	background-color: #F1F1F1;
 	height: 2em;
@@ -92,7 +102,15 @@ HTML {
 	margin-right: auto;
 	margin-left: auto;
 	line-height: 150%;
+	height: 99%;
 }
+/* Container for all page content. Min-height is set to fill the page and make room for the footer at the bottom */
+#GenmodContainer {
+	position: relative;
+	min-height: 100%;
+	margin: 0px;
+}
+
 A {
 	color: #454B4F;
 	text-decoration: none;
@@ -112,31 +130,19 @@ UL {
 	padding-right: 15px;
 	margin: 8px;
 }
+
+/* used? */
 .button {
 	width: 60px
 }
+
+/* used in editgedcoms */
 .gedcom_table {
 	border: 1px solid #000000;
 	margin: 0;
 	width: 99%;
 }
-.person_details {
-	float: left;
-	white-space: normal;
-	overflow: hidden;
-}
-.person_box {
-	background-color: #DFE5FF;
-	border: solid #000000 1px;
-}
-.person_boxF {
-	background-color: #FEEFFF;
-	border: solid #000000 1px;
-}
-.person_boxNN {
-	background-color: #FFFFFF;
-	border: solid #493424 1px;
-}
+
 
 .center {
 	text-align: center;
@@ -178,13 +184,7 @@ table.center {
 	font-size: 10px;
 }
 
-.facts_table {
-	width: 99%;
-}
-.facts_label {
-	font-size: 14px;
-	padding: 4px;
-}
+/* not used? */
 .facts_labelrela {
 	background-color: #8C93C4;
 }
@@ -324,10 +324,6 @@ table.center {
 	padding: 0.5em;
 	line-height: 130%;
 }
-.name2 {
-	/* color: #333333; */
-	font-weight: bold;
-}
 .details2 {
 	text-decoration: none;
 }
@@ -336,27 +332,16 @@ table.center {
 	font: bold 14px tahoma, verdana, arial, helvetica, sans-serif;
 }
 .detailsZoom {
-	font: 12px tahoma, verdana, arial, helvetica, sans-serif;
+	font: 11px verdana, arial, helvetica, sans-serif;
 	text-decoration: none;
+	line-height: 130%;
 }
 .details_label {
 	font-weight: bold;
 }
-.name_head {
-	color: #000000;
-	font-weight: bold;
-	font-size: 16px;
-	letter-spacing: .2px;
-	line-height: 120%;
-}
 .date {
 	color: #333377;
 }
-/*
-.label {
-	font: bold 11px tahoma, verdana, arial, helvetica, sans-serif;
-}
-*/
 
 .current {
 	font-weight: bold;
@@ -382,40 +367,12 @@ table.center {
 .indent_rtl {
 	padding-right: 7px;
 }
-.image {
-	padding: 5px;
-	border: solid #000000 1px;
-}
 .sex_image {
 	height: 9px;
 	width: 9px;
 	margin: 0px 3px;
 	border: none;
 	vertical-align: middle;
-}
-.pedigree_image_portrait {
-	float: left;
-	height: 60px;
-	border: solid black 1px;
-	margin-right: 3px;
-}
-.pedigree_image_portrait_rtl {
-	float: right;
-	height: 60px;
-	border: solid black 1px;
-	margin-left: 3px;
-}
-.pedigree_image_landscape {
-	float: left;
-	width: 60px;
-	border: solid black 1px;
-	margin-right: 3px;
-}
-.pedigree_image_landscape_rtl {
-	float: right;
-	width: 60px;
-	border: solid black 1px;
-	margin-left: 3px;
 }
 .pedigree_form {
 	width: 45px;
@@ -451,18 +408,6 @@ table.center {
 	width: 25px;
 	height: 25px;
 }
-.subheaders {
-	font-size: 14px;
-	font-weight: bold;
-	margin-top: 15px;
-	vertical-align: bottom;
-}
-.age {
-	font-size: 9px;
-}
-.source_citations {
-	display: none;
-}
 .lang_form {
 	margin-top: 0px;
 }
@@ -471,9 +416,6 @@ table.center {
 }
 .user_links {
 	white-space: nowrap;
-}
-.contact_links {
-	text-align: center;
 }
 /* This is the original.
  * It's not used, but it's left in in case you want to go back to it. */
@@ -602,13 +544,6 @@ table.center {
 }
 .left {
      text-align: left;
-}
-
-#footer {
-	clear: both;
-	color: #0045BF;
-	font-size: 10px;
-	width: 99%;
 }
 
 /*-- pedigree chart specific stylesheets --*/
@@ -788,11 +723,6 @@ table.center {
 .title {
 	font-size: 20px;
 }
-.accesskeys{
-	width : 1px;
-	height: 1px;
-	overflow: auto;
-}
 /* Styles for the option boxes */
 
 /* Style for the top and bottom bar */
@@ -831,12 +761,6 @@ TD {
 /* Colors */
 .red {
 	color: #FF0000;
-}
-.rela {
-	filter: alpha(opacity=67);
-	filter: progid:DXImageTransform.Microsoft.Alpha(opacity=67);
-	-moz-opacity: 0.67;
-	opacity: 0.67;
 }
 /* Text direction */
 .ltr {
@@ -1012,15 +936,11 @@ select {
      margin-left: 200px;
      margin-right: 200px;
      margin-top: 5px;
-*	height: 1%;
-
 }
 #content_popup {
      margin-left: 100px;
      margin-right: 100px;
      margin-top: 5px;
-*	height: 1%;
-
 }
 #content_pedigree {
 }
@@ -1060,90 +980,21 @@ select {
 	float: right;
 }
 
-/* block styles */
-.small_inner_block {
-	max-height: 225px;
-	overflow: auto;
-	font-size: 10px;
-	text-decoration: none;
-}
 
-.block {
-	vertical-align: top;
-	margin: 1px;
-	padding: 5px;
-}
-.blockhc {
-	font-weight: bold;
-	margin-left: 10px;
-	background-color: #DFDFDF;
-}
-.blockcontent {
-	margin-top: 3px;
-}
-
-#index_main_blocks {
-	clear: none;
-	width: 74%;
-	float: left;
-}
-
-#index_small_blocks {
-	clear: none;
-	width: 25%;
-	float: right;
-}
-
-#index_full_blocks {
-	clear: none;
-	width: 100%;
-}
 
 #random_picture {
 	text-align: center;
-}
-
-/* Indi page */
-#indi_picture {
-	margin: 3px;
-	float: left;
 }
 
 #indi_menu {
 	float: right;
 	margin: 3px;
 }
-#indi_content {
-     margin-top: 5px;
-     height: 150px;
-}
-.indi_spacer {
-	float: left;
-	margin-right: 5px;
-	margin-left: 2px;
-}
 .indilist {
 	padding-left: 2em;
 	padding-right: 2em;
 	vertical-align: top;
 	white-space: normal;
-}
-.door {
-	margin: 0px 0px 0px 0px; 
-	padding: 0px 0px 0px 0px;
-}
-.door dd {
-	margin: 2px 2px 2px 2px; 
-	padding: 2px 6px 2px 6px; 
-	height: 100%; 
-	float: left; 
-	font-weight: bold; 
-	border-left: outset #9CA3D4 1px;
-	border-top: outset #9CA3D4 2px;
-	border-right: outset #9CA3D4 3px;
-	display: none;
-	-moz-border-radius-topleft: 0.6em; 
-	-moz-border-radius-topright: 0.6em;
 }
 #sanity_content {
 	margin-right: auto;
@@ -1268,76 +1119,6 @@ select {
 	margin-top: 5px;
 }
 
-/* ######### Style for Top Links Menu ######### */
-.chromestyle{
-	width: 99%;
-}
-
-.chromestyle:after{ /*Add margin between menu and rest of content in Firefox*/
-	content: "."; 
-	display: block; 
-	height: 0; 
-	clear: both; 
-	visibility: hidden;
-}
-
-.chromestyle ul{
-	width: 100%;
-	padding: 0;
-	margin: 0;
-	text-align: left; /*set value to "left", "center", or "right"*/
-}
-
-.chromestyle ul li{
-	display: inline;
-}
-
-.chromestyle ul li a{
-	padding: 4px 7px;
-	margin: 0;
-	text-decoration: none;
-	float: left;
-}
-
-.chromemenu ul li a:hover {
-	color: #FF4949;
-}
-
-.chromeimages {
-	border: none; 
-	padding-right: 0.5em;
-}
-
-
-/* ######### Style for Drop Down Menu ######### */
-
-.dropmenudiv{
-	position:absolute;
-	top: 0;
-	border: 1px solid #DE0036; /*THEME CHANGE HERE*/
-	line-height:18px;
-	z-index:100;
-	background-color: #F1F1F1;
-	width: 200px;
-	visibility: hidden;
-}
-
-.dropmenudiv a{
-	width: auto;
-	display: block;
-	text-indent: 3px;
-	padding: 2px 0;
-	text-decoration: none;
-}
-
-* html .dropmenudiv a{ /*IE only hack*/
-	width: 100%;
-}
-
-.dropmenudiv a:hover{ /*THEME CHANGE HERE*/
-	background-color: #FFFFFF;
-	text-decoration: none;
-}
 
 .favorite_padding {
 	padding-left: 0.5em;
@@ -1437,48 +1218,6 @@ import_statistics {
 	overflow: hidden;
 }
 
-#debug_output {
-    float:left;
-    width:100%;
-    background:#DAE0D2 url("../../images/tab_background.jpg")
-      repeat-x bottom;
-    font-size:93%;
-    line-height:normal;
-    font-weight: bold;
-
-    }
-#debug_output ul {
-    margin:0;
-    list-style:none;
-    padding:10px 10px 0;
-    }
-#debug_output a {
-    display:block;
-    padding:5px 15px 4px;
-    text-decoration: none;
-    }
-#debug_output li {
-    float:left;
-    background:url("../../images/tab_right_off.jpg")
-      no-repeat right top;
-    margin:0;
-    padding:0;
-    }
-#debug_output a {
-    display:block;
-    background:url("../../images/tab_left_off.jpg")
-      no-repeat left top;
-    padding:5px 15px;
-    }
-#debug_output .current {
-    background-image:url("../../images/tab_right_on.jpg");
-    }
-#debug_output .current a {
-    background-image:url("../../images/tab_left_on.jpg");
-    padding-bottom:5px;
-    color: #1d83e0;
- }
- 
  /*****************************TRANSMENU**********************************/
  /* this is the clipping region for the menu. it's width and height get set by script, depending on the size of the items table */
 .transMenu {
@@ -1499,9 +1238,10 @@ import_statistics {
 	left:0px; top:0px;
 	z-index:2;
 	}
-
+/* padding-left prevents the border to be overwritten on hovering the items */	
 .transMenu.top .items {
 	border-top:none;
+	padding-left: 1px;
 	}
 
 /* each TR.item is one menu item */
@@ -1519,7 +1259,8 @@ import_statistics {
 /* this DIV is the semi-transparent white background of each menu. the -moz-opacity is a proprietary way to get transparency in mozilla, the filter is for IE/windows 5.0+. */
 /* we set the background color in script because ie mac does not use it; that browser only uses a semi-transparent white PNG that the spacer gif inside this DIV is replaced by */
 .transMenu .background {
-	position:absolute;
+	border: 1px solid #9B9796;
+	position: absolute;
 	left:0px; top:0px;
 	z-index:1;
 	-moz-opacity:1;
@@ -1595,13 +1336,6 @@ import_statistics {
 #PLAC_CTRY_flag {
 	padding-right: 5px;
 }
-#menu {
-	margin-left: 35px;
-}
-#headerlogo {
-	background-image: url(header.gif);
-	background-repeat: no-repeat;
-}
 #searchhelp_text {
 	margin-top: 5px;
 }
@@ -1659,3 +1393,724 @@ textarea {
 	margin-right: 5px;
 }
 
+/* ============================== Person box styles ==================================*/
+.PersonBoxNN {
+	background-color: #FFFFFF;
+	border: solid #9B9796 1px;
+	padding: 2px; 
+	overflow: hidden;
+}
+.PersonBox {
+	background-color: #DFE5FF;
+	border: 1px solid #9B9796;
+	padding: 2px; 
+	overflow: hidden;
+}
+.PersonBoxF {
+	background-color: #FEEFFF;
+	border: 1px solid #9B9796;
+	padding: 2px; 
+	overflow: hidden;
+}
+/* Style for the outer div in the person box. Only for large style. Above styles are set in the containing TD */
+.PersonBoxLarge {
+	padding: 2px;
+}
+/* Person picture container */
+.PersonBoxImagePortrait {
+	float: left;
+	height: 60px;
+	margin-right: 3px;
+}
+/* Person picture container */
+.PersonBoxImagePortraitRtl {
+	float: right;
+	height: 60px;
+	margin-left: 3px;
+}
+/* Person picture container */
+.PersonBoxImageLandscape {
+	float: left;
+	width: 60px;
+	margin-right: 3px;
+}
+/* Person picture container */
+.PersonBoxImageLandscapeRtl {
+	float: right;
+	width: 60px;
+	margin-left: 3px;
+}
+/* Person picture. Container size minus the border */
+.PersonBoxImage {
+	max-height: 58px;
+	max-width: 58px;
+	margin: 0px;
+	border: solid #9B9796 1px;
+}
+/* Link box for chart, fam & indi links */
+.PersonBoxLinkBox {
+	white-space: normal;
+	width: 200px;
+	font-size: 10px;
+	text-decoration: none;
+	padding: 0.5em;
+	line-height: 130%;
+	position:absolute;
+	height:auto;
+	visibility:hidden;
+}
+/* Container for the chart links */
+.PersonBoxLinkBoxChartLinks {
+	font-weight: bold;
+}
+/* Container for the family links */
+.PersonBoxLinkBoxFamLinks {
+	margin-top: 0.8em;
+}
+/* Family links */
+.PersonBoxLinkBoxFamLinksFam {
+	font-weight: bold;
+}
+/* Individual links */
+.PersonBoxLinkBoxFamLinksIndi {
+	font-style: italic;
+}
+/* Indent for the individual links */
+.PersonBoxLinkBoxIndent {
+	padding-left: 8px;
+}
+/* used in personbox for name, birth, death etc.*/
+.PersonBoxDetails {
+	float: left;
+	white-space: normal;
+	overflow: hidden;
+	margin-left: 3px;
+}
+/* Width of personbox if no details are shown (name only) */
+.PersonBoxDetailsNoDetails {
+	width: 100%;
+}
+/* Width of personbox on indipage without thumb */
+.PersonBoxDetailsNoThumb {
+	width: 95%;
+}
+/* Width of personbox on indipage with thumb */
+.PersonBoxDetailsThumb {
+	width: 90%;
+}
+/* =============================== Fact styles ======================================= */
+/* Style for the facts tables */
+.FactsTable {
+	width: 100%;
+}
+/* Style for the fact label cell */
+.FactLabelCell {
+	width: 20%;
+	background-color: #DFDFDF;
+	text-align: center;
+	margin-left: auto;
+	margin-right: auto;
+	vertical-align: middle;
+	border: 1px solid #9B9796;
+}
+/* Style for the popup with edit functions */
+.FactLabelCellEdit {
+	width:50px;
+	text-align: center;
+	margin-left: auto;
+	margin-right: auto;
+}
+/* Style for the fact description in the label */
+.FactLabelCellText {
+	font-weight: bold;
+	padding-left: 9px;
+	padding-right: 9px;
+}
+/* Style for the fact image in the label */
+.FactLabelCellImage {
+	width: 50px;
+	height: 50px;
+}
+/* Style for the fact content cell */
+.FactDetailCell {
+    background-color: #F5F5F5;
+	white-space: normal;
+	border: 1px solid #9B9796;
+	padding-left: 6px;
+	white-space: nowrap;
+}
+/* Label and field styles for fact details */
+.FactDetailLabel {
+	font-weight: bold;
+}
+.FactDetailField {
+	white-space: normal;
+}
+
+/* Style for the relalatives facts in the fact list */
+.FactRela {
+	filter: alpha(opacity=67);
+	filter: progid:DXImageTransform.Microsoft.Alpha(opacity=67);
+	-moz-opacity: 0.67;
+	opacity: 0.67;
+}
+/* Style for the display/hide relatives facts links */
+.FactRelaSwitch {
+	background-color: #DFDFDF;
+	border: 1px solid #9B9796;
+}
+/* Style for the source citation details for facts */
+.FactSourceCitationDetails {
+	display: none;
+	margin-left: 15px;
+}
+/* printed fact dates */
+.FactDate {
+}
+
+.facts_label {
+	font-size: 14px;
+	padding: 4px;
+}
+
+/* Age at event */
+.FactAge {
+	font-size: 9px;
+}
+/* Links from facts to family/individual page for associates and partnerships*/
+.FactAssoLink {
+	font-style: italic;
+	font-size: 11px;
+	font-weight: normal;
+}
+/* Indent for associates in fact detail list */
+.AssoIndent {
+	padding-left: 7px;
+}
+
+/* =============================== General styles ======================================= */
+.ClearBoth {
+	clear: both;
+}
+.NameBold {
+	/* color: #333333; */
+	font-weight: bold;
+}
+/* Used as page title */
+.PageTitleName {
+	color: #000000;
+	font-weight: bold;
+	font-size: 16px;
+	letter-spacing: .2px;
+	line-height: 120%;
+}
+/* Style for the page counter on detail pages */
+.PageCounter {
+	margin-left: 2px;
+	margin-top: 5px;
+	margin-bottom: 10px;
+	font-weight: bold; 
+	font-size: 11px;
+}
+.SubHeader {
+	font-size: 14px;
+	font-weight: bold;
+	margin-top: 15px;
+	vertical-align: bottom;
+}
+.FormLabelCell {
+	background-color: #DFDFDF;
+	text-align: left;
+	vertical-align: middle;
+	border: 1px solid #9B9796;
+	padding-left: 6px;
+}
+.FormInputCell {
+    background-color: #F5F5F5;
+	white-space: normal;
+	text-align: left;
+	border: 1px solid #9B9796;
+	padding-left: 6px;
+}
+.Error {
+	color: #DD0000;
+	font-weight: bold;
+}
+
+/* =============================== Header section ======================================= */
+/* Header container */
+#HeaderSection {
+	width: 99%;
+}
+/* Header logo (with and without home link to current gedcom */
+#HeaderLogoLink {
+	float: left;
+}
+#Headerlogo {
+	background-image: url(header.gif);
+	background-repeat: no-repeat;
+	float: left;
+}
+/* Container for Menu bar and gedcom link and quick search */
+#HeaderMenuContainer {
+}
+/* Menu bar */
+#HeaderMenuBar {
+    background-color: #F5F5F5;
+    line-height: 2em;
+	float: left;
+	padding-bottom: 4px;
+	padding-top: 4px;
+	padding-left: 5px;
+	margin-left: 5px;
+	border: 1px solid #9B9796;
+}
+/* Link to person/user and home page */
+#HeaderLinkBar {
+	float: right;
+    background-color: #F5F5F5;
+    width: 248px;
+    text-align: left;
+	border: 1px solid #9B9796;
+	padding: 2px;
+	margin-bottom: 2px;
+}
+/* Quick Search box. The height/margin also determines the spacing to the content block */
+#HeaderQuickSearch {
+	float: right;
+	height: 24px;
+    background-color: #F5F5F5;
+	border: 1px solid #9B9796;
+	margin-bottom: 8px;
+}
+/* Access keys */
+.HeaderAccessKeys{
+	width : 1px;
+	height: 1px;
+	overflow: auto;
+}
+/* ============================= Footer section =========================== */
+/* Style for the per theme specific footer. */
+#FooterSection {
+	clear: both;
+	color: #0045BF;
+	font-size: 10px;
+	width: 99%;
+	position: absolute;
+	bottom: 0;
+	min-height: 0px;
+}
+/* Dummy to create space for the footer section.  Padding-bottom is later set by JS. */
+#FooterSectionDummy {
+	clear: both;
+	padding-bottom: 50px;
+}
+
+/* Contact links in the footer */
+.FooterContactLinks {
+	text-align: center;
+	margin-bottom: 10px;
+}
+/* Link to leave preview mode */
+.FooterPreviewLinkContainer {
+	text-align: center;
+	width: 95%;
+}
+/* Execution statistics in the footer*/
+.FooterExecutionStats {
+	text-align: center;
+	width: 95%;
+}	
+/* styles for the debug collector */
+#DebugOutput {
+    float:left;
+    width:100%;
+    background:#DAE0D2 url("../../images/tab_background.jpg")
+      repeat-x bottom;
+    font-size:93%;
+    line-height:normal;
+    font-weight: bold;
+    }
+#DebugOutput ul {
+    margin:0;
+    list-style:none;
+    padding:10px 10px 0;
+    }
+#DebugOutput a {
+    display:block;
+    padding:5px 15px 4px;
+    text-decoration: none;
+    }
+#DebugOutput li {
+    float:left;
+    background:url("../../images/tab_right_off.jpg")
+      no-repeat right top;
+    margin:0;
+    padding:0;
+    }
+#DebugOutput a {
+    display:block;
+    background:url("../../images/tab_left_off.jpg")
+      no-repeat left top;
+    padding:5px 15px;
+}
+#DebugOutput .current {
+    background-image:url("../../images/tab_right_on.jpg");
+}
+#DebugOutput .current a {
+    background-image:url("../../images/tab_left_on.jpg");
+    padding-bottom:5px;
+    color: #1d83e0;
+}
+ 
+/* =============================== Styles on detail pages ======================================= */
+.DetailHeaderSection {
+	float: left;
+	clear: both;
+	width: 100%;
+}
+.DetailListTable {
+	border-collapse: separate;
+	border-spacing: 1px;
+}
+.DetailListHeader {	
+	background-color: #BFBFBF;
+	text-align: center;
+	font-weight: bold;
+	border: 1px solid #9B9796;
+	padding: 3px;
+}
+.DetaillistContent {
+    background-color: #F5F5F5;
+	white-space: normal;
+	border: 1px solid #9B9796;
+	padding: 3px;
+}
+/* Styles for tabs on detail pages */
+#TabDoor {
+	margin: 0px 0px 0px 0px; 
+	padding: 0px 0px 0px 0px;
+	float: left;
+}
+#TabDoor dd {
+	margin: 2px 2px 2px 2px; 
+	padding: 2px 6px 2px 6px; 
+	height: 100%; 
+	float: left; 
+	font-weight: bold; 
+	border-left: outset #9CA3D4 1px;
+	border-top: outset #9CA3D4 2px;
+	border-right: outset #9CA3D4 3px;
+	display: none;
+	-moz-border-radius-topleft: 0.6em; 
+	-moz-border-radius-topright: 0.6em;
+}
+/* Content of the tab */
+.TabPage {
+	margin-top: 5px;
+}
+
+/* Rela tab containers. Indipage is 2 small, fampage is 1 large */
+.RelaTabContainerIndi {
+	float: left;
+	max-width: 50%;
+}
+.RelaTabContainerFam {
+	float: left;
+	max-width: 80%;
+}
+/* Table holding all info */
+.RelaTabTable {
+	width: 100%
+}
+.RelaTabTableHeader {
+	background-color: #BFBFBF;
+	text-align: center;
+	font-weight: bold;
+	border: 1px solid #9B9796;
+}
+
+/* =============================== Styles on chart pages ======================================= */
+/* Navigation block styles */
+.NavBlockHeader {
+	color: #333333;
+	border: 1px solid;
+	border-color: #DE0036;
+	padding: 4px;
+	text-align: center;
+	margin-left: auto;
+	margin-right: auto;
+	font-weight: bold;
+}
+.NavBlockLabel {
+	background-color: #DFDFDF;
+	border: solid #9B9796 1px;
+	white-space: normal;
+	vertical-align: middle
+}
+.NavBlockField {
+    background-color: #F5F5F5;
+	border: solid #9B9796 1px;
+	vertical-align: middle
+}
+.NavBlockFooter {
+	color: #333333;
+	border: 1px solid;
+	border-color: #DE0036;
+	padding: 4px;
+	text-align: center;
+	margin-left: auto;
+	margin-right: auto;
+	font-weight: bold;
+}
+
+/* =============================== Individual page ======================================= */
+/* Header block (name, picture, some data) */
+#IndiHeaderContainer {
+    margin-top: 0px;
+    clear: both;
+}
+.IndiHeaderBlock {
+	float: left;
+	margin-right: 10px;
+	margin-left: 2px;
+}
+.IndiHeaderLabel {
+	font-weight: bold;
+}
+.IndiHeaderField {
+}
+/* Indi page */
+#IndiPictureContainer {
+	margin: 3px;
+	float: left;
+}
+.IndiPicture {
+	border: 1px solid #9B9796;
+	padding: 5px;
+}
+/* Relatives tab title for families */
+.IndiSubHeader {
+	font-size: 14px;
+	font-weight: bold;
+	margin-top: 6px;
+	margin-bottom: 3px;
+}
+.IndiSubHeader IMG {
+	vertical-align: bottom;
+}
+.IndiSubHeaderLabel {
+	vertical-align: 30%;
+	margin-left: 10px;
+}
+.IndiSubHeaderAssoLink {
+	font-style: italic;
+	font-size: 11px;
+	font-weight: normal;
+	vertical-align: 30%;
+}
+/* External search tab, option block */
+#esearchform {
+	float: left;
+	width: 30%
+}
+/* External search tab, results block */
+#esearchresults {
+	float: left;
+	width: 60%;
+	padding-top: 2px;
+	margin-left: 20px;
+}
+/* External search results spacing between top bar and results */
+#esearchresults .ListTableContent {
+	margin-top: 2px;
+}
+/* Relatives tab on the indi page. Overrides TabPage */
+.IndiRelaTabPage {
+	width: 100%;
+}
+
+/* =============================== Family page ======================================= */
+#FamHeaderContainer {
+    margin-top: 0px;
+    margin-bottom: 20px;
+    clear: both;
+}
+#FamParents {
+}
+/* The padding aligns the title with the group details title */
+#FamChildren {
+	padding-top: 13px;
+}
+#FamGroupDetails {
+}
+#FamLowerBlock {
+	width: 100%;
+	margin-bottom: 20px;
+}
+/* =============================== Statistics(plot) pages ======================================= */
+.StatsContainer {
+	width: 60%;
+	margin-left: auto;
+	margin-right: auto;
+}
+IMG.StatsPlot {
+	display: block;
+	margin-left: auto;
+	margin-right: auto;
+	margin-bottom: 20px;
+	margin-top: 20px;
+}
+/* =============================== Login and register pages ======================================= */
+/* Container for the entire content */
+.LoginPageContainer {
+	text-align: center;
+	margin-left: auto;
+	margin-right: auto;
+}
+.LoginPageText {
+	text-align: left;
+	width: 40%;
+	margin-left: auto;
+	margin-right: auto;
+	margin-bottom: 20px;
+}
+.LoginPageTable {
+	width: 40%;
+	margin-left: auto;
+	margin-right: auto;
+}
+.LoginPageTableTextWidth {
+	width: 40%;
+}
+
+/* =============================== Index page ======================================= */
+
+/* Text above blocks on MyGedcom page */
+#IndexMyGedviewBlock {
+}
+/* Left, large blocks container */
+#IndexMainBlocksContainer {
+	clear: none;
+	width: 74%;
+	float: left;
+	margin-right: 3px;
+}
+/* Right, small blocks container */
+#IndexSmallBlocksContainer {
+	clear: none;
+	width: 25%;
+	float: left;
+}
+/* Full page blocks */
+#IndexFullBlocksContainer {
+	clear: none;
+	width: 100%;
+}
+
+/* =============================== Action List page ======================================= */
+/* Positions the option box */
+.ActionListOptionContainer {
+	width: 40%;
+	margin-left: auto;
+	margin-right: auto;
+	margin-bottom: 25px;
+	text-align: center;
+}
+/* Positions the action list*/
+.ActionListListContainer {
+	width: 80%;
+	margin-left: auto;
+	margin-right: auto;
+}
+/* Spacing between page title and option block */
+DIV.ActionListOptionContainer SPAN {
+	line-height: 3em;
+}
+
+/* =============================== Alive in year page ======================================= */
+/* Positions the option box */
+.AliveInYearOptionContainer {
+	width: 80%;
+	margin-left: auto;
+	margin-right: auto;
+	margin-bottom: 25px;
+	text-align: center;
+}
+/* Positions the action list*/
+.AliveInYearListContainer {
+	width: 80%;
+	margin-left: auto;
+	margin-right: auto;
+	text-align: center;
+}
+/* Spacing between page title and option block */
+DIV.AliveInYearOptionContainer SPAN {
+	line-height: 3em;
+}
+
+/* =============================== Block styles ======================================= */
+/* Restricts the main blocks to the specified height */
+.RestrictedBlockHeightMain {
+	max-height: 400px;
+	overflow: auto;
+	font-size: 10px;
+	text-decoration: none;
+}
+/* Restricts the right blocks to the specified height */
+.RestrictedBlockHeightRight {
+	max-height: 225px;
+	overflow: auto;
+	font-size: 10px;
+	text-decoration: none;
+}
+/* Container for the block content */
+.BlockContainer {
+    background-color: #F5F5F5;
+	vertical-align: top;
+	margin-bottom: 3px;
+	padding: 5px;
+	border: 1px solid #9B9796;
+}
+/* Block header line */
+.BlockHeader {
+	font-weight: bold;
+	padding-left: 10px;
+	background-color: #bfbfbf;
+}
+/* Block content */
+.BlockContent {
+	margin-top: 3px;
+}
+/* =============================== List table styles ======================================= */
+.ListTable {
+	border-collapse: separate;
+	border-spacing: 1px;
+	margin-left: auto;
+	margin-right: auto;
+}
+/* Header row for the table */
+.ListTableHeader {
+	color: #333333;
+	border: 1px solid;
+	border-color: #DE0036;
+	padding: 4px;
+	text-align: center;
+	margin-left: auto;
+	margin-right: auto;
+	font-weight: bold;
+}
+/* Header cell for the columns */
+.ListTableColumnHeader {
+	background-color: #DFDFDF;
+	text-align: center;
+	font-weight: bold;
+	border: 1px solid #9B9796;
+}
+/* Cells for the content */
+.ListTableContent {
+    background-color: #F5F5F5;
+	white-space: normal;
+	border: 1px solid #9B9796;
+	padding: 3px;
+}

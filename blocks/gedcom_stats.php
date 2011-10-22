@@ -56,8 +56,8 @@ function print_gedcom_stats($block = true, $config="", $side, $index) {
 		if (empty($config)) $config = $GM_BLOCKS["print_gedcom_stats"]["config"];
 		if (!isset($config['stat_indi'])) $config = $GM_BLOCKS["print_gedcom_stats"]["config"];
 
-		print "<div id=\"gedcom_stats\" class=\"block\">\n";
-		print "<div class=\"blockhc\">";
+		print "<div id=\"gedcom_stats\" class=\"BlockContainer\">\n";
+		print "<div class=\"BlockHeader\">";
 		PrintHelpLink("index_stats_help", "qm", "gedcom_stats");
 		if ($GM_BLOCKS["print_gedcom_stats"]["canconfig"]) {
 			$username = $gm_user->username;
@@ -70,7 +70,7 @@ function print_gedcom_stats($block = true, $config="", $side, $index) {
 		}
 		print GM_LANG_gedcom_stats;
 		print "</div>";
-		print "<div class=\"blockcontent\">";
+		print "<div class=\"BlockContent\">";
 		print "<b><a href=\"index.php?command=gedcom\">".PrintReady($GEDCOMS[GedcomConfig::$GEDCOMID]["title"])."</a></b><br />\n";
 		$stats = BlockFunctions::GetCachedStatistics();
 		if (isset($stats["gs_title"])) print $stats["gs_title"];

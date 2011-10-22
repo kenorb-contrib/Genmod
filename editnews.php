@@ -51,7 +51,7 @@ PrintSimpleHeader(GM_LANG_edit_news);
 if (empty($uname)) $uname = get_gedcom_from_id(GedcomConfig::$GEDCOMID);
 
 if ($action=="compose") {
-	print '<span class="subheaders">'.GM_LANG_edit_news.'</span>';
+	print '<span class="SubHeader">'.GM_LANG_edit_news.'</span>';
 	?>
 	<script language="JavaScript" type="text/javascript">
 	<!--

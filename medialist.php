@@ -80,7 +80,7 @@ if ($mediacontroller->totalmediaitems > 0) {
 }
 print '</form>';
 
-print '<table class="list_table">';
+print '<table class="ListTable">';
 	print '<tr>';
 	print '<td align="'.($TEXT_DIRECTION == "ltr"?"left":"right").'">';
 	if ($start>0) {
@@ -135,17 +135,17 @@ foreach($mediacontroller->medialist as $index => $mediaitem) {
 	foreach($mediaitem->repolist as $key => $repo) {
 		print "<br /><a href=\"repo.php?rid=".$repo->xref."&amp;gedid=".$repo->gedcomid."\">".GM_LANG_view_repo.": ".$repo->descriptor.$repo->addxref."</a>";
 	}
-	if (is_null($mediaitem->filename) || $mediaitem->filename == "") print '<br /><span class="error">'.GM_LANG_file_empty.' '.$mediaitem->filename.'</span>';
-	else if (!strstr($mediaitem->filename, "://") && !$mediaitem->fileobj->f_file_exists) print '<br /><span class="error">'.GM_LANG_file_not_found.'<br />'.$mediaitem->filename.'</span>';
+	if (is_null($mediaitem->filename) || $mediaitem->filename == "") print '<br /><span class="Error">'.GM_LANG_file_empty.' '.$mediaitem->filename.'</span>';
+	else if (!strstr($mediaitem->filename, "://") && !$mediaitem->fileobj->f_file_exists) print '<br /><span class="Error">'.GM_LANG_file_not_found.'<br />'.$mediaitem->filename.'</span>';
 	
 	print '<br /><br /><div class="indent wrap width95">';
 	FactFunctions::PrintFactNotes($mediaitem, $mediaitem->level+1);
 	
 	print '</div>';
-	if (!is_null($mediaitem->filename) && $mediaitem->filename != "") print "<span class=\"label\"><br />".GM_LANG_filename." : </span> <span class=\"field\" style=\"direction: ltr;\">".$mediaitem->filename."</span>";
+	if (!is_null($mediaitem->filename) && $mediaitem->filename != "") print "<span class=\"FactDetailLabel\"><br />".GM_LANG_filename." : </span> <span class=\"FactDetailField\" style=\"direction: ltr;\">".$mediaitem->filename."</span>";
 	if ($mediaitem->fileobj->f_mimedescr != "") print '<span class="label"><br />'.GM_LANG_media_format.': </span> <span class="field" style="direction: ltr;">'.$mediaitem->fileobj->f_mimedescr."</span>";
-	if ($mediaitem->fileobj->f_is_image && $mediaitem->fileobj->f_width > 0) print '<span class="label"><br />'.GM_LANG_image_size.': </span> <span class="field" style="direction: ltr;">'.$mediaitem->fileobj->f_width.($TEXT_DIRECTION =="rtl"?" &rlm;x&rlm; " : " x ").$mediaitem->fileobj->f_height.'</span>';
-	if ($mediaitem->fileobj->f_file_size > 0) print '<span class="label"><br />'.GM_LANG_media_file_size.': </span> <span class="field" style="direction: ltr;">'.GetFileSize($mediaitem->fileobj->f_file_size).'</span>';
+	if ($mediaitem->fileobj->f_is_image && $mediaitem->fileobj->f_width > 0) print '<span class="label"><br />'.GM_LANG_image_size.': </span> <span class="FactDetailField" style="direction: ltr;">'.$mediaitem->fileobj->f_width.($TEXT_DIRECTION =="rtl"?" &rlm;x&rlm; " : " x ").$mediaitem->fileobj->f_height.'</span>';
+	if ($mediaitem->fileobj->f_file_size > 0) print '<span class="label"><br />'.GM_LANG_media_file_size.': </span> <span class="FactDetailField" style="direction: ltr;">'.GetFileSize($mediaitem->fileobj->f_file_size).'</span>';
 	
 	print '</td></tr></table>';
 	print '</td>';

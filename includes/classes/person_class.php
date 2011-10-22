@@ -1504,7 +1504,7 @@ class Person extends GedcomRecord {
 				if ($convert_hebrew) $date = JewishGedcomDateToGregorian($date);
 				$age1 = $date[0]["year"]-$birthdate[0]["year"];
 				$age2 = $date[1]["year"]-$birthdate[0]["year"];
-				if ($style) $realbirthdt = " <span class=\"age\">(".GM_LANG_age." ";
+				if ($style) $realbirthdt = " <span class=\"FactAge\">(".GM_LANG_age." ";
 				$age1n = ConvertNumber($age1);
 				$age2n = ConvertNumber($age2);
 				$realbirthdt .= GM_LANG_apx." ".$age1n;
@@ -1526,7 +1526,7 @@ class Person extends GedcomRecord {
 							}
 						}
 					}
-					if ($style) $realbirthdt = " <span class=\"age\">(".GM_LANG_age;
+					if ($style) $realbirthdt = " <span class=\"FactAge\">(".GM_LANG_age;
 					$at = preg_match("/([a-zA-Z]{3})\.?/", $birthdate[0]["ext"], $amatch);
 					if ($at==0) $at = preg_match("/([a-zA-Z]{3})\.?/", $datestr, $amatch);
 					if ($at>0) {
@@ -1699,7 +1699,7 @@ class Person extends GedcomRecord {
 					$age = ConvertNumber($childfam->wife->GetAge($date, false));
 					if (10 < $age && $age < 80) $mother_text = "<img src=\"".GM_IMAGE_DIR."/" . $GM_IMAGES["sexf"]["small"] . "\" title=\"" . GM_LANG_mother . "\" alt=\"" . GM_LANG_mother . "\" class=\"sex_image\" />".$age;
 				}
-				if ((!empty($father_text)) || (!empty($mother_text))) print "<span class=\"age\">".$father_text.$mother_text."</span>";
+				if ((!empty($father_text)) || (!empty($mother_text))) print "<span class=\"FactAge\">".$father_text.$mother_text."</span>";
 			}
 		}
 	}

@@ -37,14 +37,14 @@ function print_gedcom_block($block = true, $config="", $side, $index) {
 	global $hits, $GEDCOMS, $TIME_FORMAT, $command,$TEXT_DIRECTION, $gm_user;
 
 
-	print "<div id=\"gedcom_welcome\" class=\"block\" >\n";
-	print "<div class=\"blockhc\">";
-	print PrintReady($GEDCOMS[GedcomConfig::$GEDCOMID]["title"]);	 
+	print "<div id=\"gedcom_welcome\" class=\"BlockContainer\" >\n";
+	print "<div class=\"BlockHeader\">";
+	print PrintReady($GEDCOMS[GedcomConfig::$GEDCOMID]["title"]);
 	print "</div>";
-	print "<div class=\"blockcontent center\">";
+	print "<div class=\"BlockContent center\">";
 	print "<br />".GetChangedDate(GetCurrentDay()." ".GetCurrentMonth()." ".GetCurrentYear())." - ".date($TIME_FORMAT, time()-$_SESSION["timediff"])."<br />\n";
 	if(GedcomConfig::$SHOW_COUNTER)
-			print GM_LANG_hit_count."  ".$hits."<br />\n";
+			print "<span class=\"PageCounter\">".GM_LANG_hit_count."  ".$hits."</span><br />\n";
 	print "\n<br />";
 	print "<a href=\"javascript: ".GM_LANG_add_site_to_favs."\" onclick='window.external.AddFavorite(location.href, document.title); return false;'>".GM_LANG_add_site_to_favs."</a><br />";
 	if ($gm_user->userGedcomAdmin()) {

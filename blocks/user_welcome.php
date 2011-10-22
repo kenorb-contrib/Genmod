@@ -36,11 +36,11 @@ $GM_BLOCKS["print_welcome_block"]["rss"]       	= false;
 function print_welcome_block($block=true, $config="", $side, $index) {
 		global $GM_IMAGES, $TIME_FORMAT, $gm_user;
 
-		print "<div id=\"user_welcome\" class=\"block\">\n";
-		print "<div class=\"blockhc\">";
+		print "<div id=\"user_welcome\" class=\"BlockContainer\">\n";
+		print "<div class=\"BlockHeader\">";
 		print GM_LANG_welcome." ".$gm_user->firstname." ".$gm_user->lastname;
 		print "</div>";
-		print "<div class=\"blockcontent center\">";
+		print "<div class=\"BlockContent center\">";
 		if ($gm_user->editaccount) {
 			print "<div><a href=\"edituser.php\"><img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["mygedview"]["small"]."\" border=\"0\" alt=\"".GM_LANG_myuserdata."\" title=\"".GM_LANG_myuserdata."\" /><br />".GM_LANG_myuserdata."</a></div>";
 		}

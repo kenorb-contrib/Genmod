@@ -66,12 +66,12 @@ function paste_id(value) {
 </script>
 <?php
 print "<div style=\"position: relative; z-index: 1; width:98%;\">\n";
-print "<table class=\"list_table $TEXT_DIRECTION\" style=\"width:100%;\"><tr><td valign=\"top\">";
+print "<table class=\"ListTable $TEXT_DIRECTION\" style=\"width:100%;\"><tr><td valign=\"top\">";
 $title_string = GM_LANG_relationship_chart;
 if ($relationship_controller->pid1 != "" && $relationship_controller->pid2 != "") {
-	$title_string .= ":<br /><br />".$relationship_controller->person1->name." ".GM_LANG_and." ".$relationship_controller->person2->name;
+	$title_string .= ":<br />".$relationship_controller->person1->name." ".GM_LANG_and." ".$relationship_controller->person2->name;
 }
-print "\n\t<h3>".PrintReady($title_string)."</h3>";
+print "\n\t<span class=\"PageTitleName\">".PrintReady($title_string)."</span>";
 print "</td><td>";
 
 // -- print the form to change the number of displayed generations
@@ -80,7 +80,7 @@ if ($relationship_controller->view != "preview") {
 	print "\n\t<form name=\"people\" method=\"get\" action=\"relationship.php\">\n";
 	print "<input type=\"hidden\" name=\"path_to_find\" value=\"".$relationship_controller->path_to_find."\" />\n";
 
-	print "\n\t\t<table class=\"list_table ".$TEXT_DIRECTION."\" align=\"";
+	print "\n\t\t<table class=\"ListTable ".$TEXT_DIRECTION."\" align=\"";
 	if ($TEXT_DIRECTION == "ltr") print "right";
 	else print "left";
 	print "\">";
@@ -89,7 +89,7 @@ if ($relationship_controller->view != "preview") {
 	print "<tr>";
 	
 	// Relationship header
-	print "<td colspan=\"2\" class=\"topbottombar center\">";
+	print "<td colspan=\"2\" class=\"NavBlockHeader\">";
 	print GM_LANG_relationship_chart."</td>";
 
 	// Empty space
@@ -103,10 +103,10 @@ if ($relationship_controller->view != "preview") {
 	print "<tr>";
 	
 	// Person 1
-	print "<td class=\"shade2\">";
+	print "<td class=\"NavBlockLabel\">";
 	PrintHelpLink("relationship_id_help", "qm");
 	print GM_LANG_person1."</td>";
-	print "<td class=\"shade1 vmiddle\">";
+	print "<td class=\"NavBlockField\">";
 	print "<input tabindex=\"1\" class=\"pedigree_form\" type=\"text\" name=\"pid1\" id=\"pid1\" size=\"3\" value=\"".$relationship_controller->pid1."\" />";
 	LinkFunctions::PrintFindIndiLink("pid1","");
         print "</td>";
@@ -122,10 +122,10 @@ if ($relationship_controller->view != "preview") {
 	print "<tr>";
 	
 	// Person 2
-	print "<td class=\"shade2\">";
+	print "<td class=\"NavBlockLabel\">";
 	PrintHelpLink("relationship_id_help", "qm");
 	print GM_LANG_person2."</td>\n";
-	print "<td class=\"shade1 vmiddle\">";
+	print "<td class=\"NavBlockField\">";
 	print "<input tabindex=\"2\" class=\"pedigree_form\" type=\"text\" name=\"pid2\" id=\"pid2\" size=\"3\" value=\"".$relationship_controller->pid2."\" />";
         LinkFunctions::PrintFindIndiLink("pid2","");
         print "</td>";
@@ -141,11 +141,11 @@ if ($relationship_controller->view != "preview") {
 	print "<tr>";
 
 	// Check relationships by marriage
-	print "<td class=\"shade2\">";
+	print "<td class=\"NavBlockLabel\">";
 	PrintHelpLink("follow_spouse_help", "qm");
 	print GM_LANG_follow_spouse;
 	print "</td>";
-	print "<td class=\"shade1\">";
+	print "<td class=\"NavBlockField\">";
 	print "<input tabindex=\"4\" type=\"checkbox\" name=\"followspouse\" value=\"1\"";
 	if ($relationship_controller->followspouse) print " checked=\"checked\"";
 	print " onclick=\"document.people.path_to_find.value='-1';\" /></td>";
@@ -154,10 +154,10 @@ if ($relationship_controller->view != "preview") {
 	print "<td>&nbsp;</td>";
 
 	// Show oldest top
-	print "<td class=\"shade2\">";
+	print "<td class=\"NavBlockLabel\">";
 	PrintHelpLink("oldest_top_help", "qm");
 	print GM_LANG_oldest_top;
-	print "</td><td class=\"shade1\">";
+	print "</td><td class=\"NavBlockField\">";
 	print "<input tabindex=\"5\" type=\"checkbox\" id=\"oldtop\" name=\"asc\" value=\"-1\" ";
 	if ($relationship_controller->asc == -1) print " checked=\"checked\"";
 	if (!$relationship_controller->pretty) print " disabled=\"disabled\"";
@@ -169,7 +169,7 @@ if ($relationship_controller->view != "preview") {
 	print "<tr>";
 	
 	// Show path
-	print "<td class=\"shade2\">";
+	print "<td class=\"NavBlockLabel\">";
 
 	$pass = false;
 	if (isset($_SESSION["relationships"]) && !$relationship_controller->person1->isempty && !$relationship_controller->person2->isempty) {
@@ -198,7 +198,7 @@ if ($relationship_controller->view != "preview") {
 			if ($i == 0) print GM_LANG_show_path.": </td><td class=\"list_value\" style=\"padding: 3px;\">";
 			if ($i > 0) print " | ";
 			if ($i == $relationship_controller->path_to_find){
-				print "<span class=\"error\" style=\"valign: middle\">".($i+1)."</span>";
+				print "<span class=\"Error\" style=\"valign: middle\">".($i+1)."</span>";
 				$new_path = false;
 			}
 			else {
@@ -206,7 +206,7 @@ if ($relationship_controller->view != "preview") {
 			}
 			$i++;
 		}
-		if ($new_path && $relationship_controller->path_to_find < $i+1 && $check_node) print " | <span class=\"error\">".($i+1)."</span>";
+		if ($new_path && $relationship_controller->path_to_find < $i+1 && $check_node) print " | <span class=\"Error\">".($i+1)."</span>";
 		if ($i == 0) print "</td><td class=\"shade1\">";
 		print "</td>";
 	}
@@ -216,8 +216,8 @@ if ($relationship_controller->view != "preview") {
 			else if (!$relationship_controller->person2->disp_name) $disp = false;
 			if ($disp) {
 				print GM_LANG_show_path.": </td>";
-				print "\n\t\t<td class=\"shade1\">";
-				print " <span class=\"error vmmiddle\">";
+				print "\n\t\t<td class=\"NavBlockField\">";
+				print " <span class=\"Error vmmiddle\">";
 				if (isset($_SESSION["relationships"][$relationship_controller->path_to_find])) $check_node = $_SESSION["relationships"][$relationship_controller->path_to_find];
 				else {
 					$check_node = GetRelationship($relationship_controller->person1, $relationship_controller->person2, $relationship_controller->followspouse, 0, true, $relationship_controller->path_to_find);
@@ -232,17 +232,17 @@ if ($relationship_controller->view != "preview") {
 				$prt = true;
 			}
 		}
-		if (!isset($prt)) print "&nbsp;</td><td class=\"shade1\">&nbsp;</td>";
+		if (!isset($prt)) print "&nbsp;</td><td class=\"NavBlockField\">&nbsp;</td>";
 	}
 
 	// Empty space
 	print "<td>&nbsp;</td>";
 
 	// Line up generations
-	print "<td class=\"shade2\">";
+	print "<td class=\"NavBlockLabel\">";
 	PrintHelpLink("line_up_generations_help", "qm");
 	print GM_LANG_line_up_generations."</td>";
-	print "<td class=\"shade1\">";
+	print "<td class=\"NavBlockField\">";
 	print "<input tabindex=\"6\" type=\"checkbox\" name=\"pretty\" value=\"2\"";
 	if ($relationship_controller->pretty) print " checked=\"checked\"";
 	print " onclick=\"toggleStatus('oldtop');\"";
@@ -253,8 +253,8 @@ if ($relationship_controller->view != "preview") {
 	print "<tr>";
 	
 	if (!$relationship_controller->person1->isempty && !$relationship_controller->person2->isempty && $disp){
-		if ($disp && !$check_node) print "<td class=\"wrap vmiddle center\" colspan=\"2\"><span class=\"error\">".(isset($_SESSION["relationships"])?GM_LANG_no_link_found : "")."</span></td>";
-		else print "<td class=\"vmiddle center\" colspan=\"2\"><input type=\"submit\" value=\"".GM_LANG_next_path."\" onclick=\"document.people.path_to_find.value='".($relationship_controller->path_to_find + 1)."';\" /></td>\n";
+		if ($disp && !$check_node) print "<td class=\"NavBlockFooter\" colspan=\"2\"><span class=\"Error\">".(isset($_SESSION["relationships"])?GM_LANG_no_link_found : "")."</span></td>";
+		else print "<td class=\"NavBlockFooter\" colspan=\"2\"><input type=\"submit\" value=\"".GM_LANG_next_path."\" onclick=\"document.people.path_to_find.value='".($relationship_controller->path_to_find + 1)."';\" /></td>\n";
 		$pass = true;
 	}
 

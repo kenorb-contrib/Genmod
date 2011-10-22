@@ -110,7 +110,7 @@ class ActionItem {
 					return $this->getPidObj();
 					break;
 				default:
-					print "<span class=\"error\">Invalid property ".$property." for __get in ".get_class($this)." class</span><br />";
+					PrintGetSetError($property, get_class($this), "get");
 					break;
 			}
 		}
@@ -141,7 +141,7 @@ class ActionItem {
 					if ($value == "1" || $value == "0") $this->status = $value;
 					break;
 				default:
-					print "<span class=\"error\">Invalid property ".$property." for __set in ".get_class($this)." class</span><br />";
+					PrintGetSetError($property, get_class($this), "set");
 					break;
 			}
 		}
@@ -259,7 +259,7 @@ class ActionItem {
 		
 		if ($this->canShow()) {
 			print "<tr>";
-			print "\n\t\t\t<td id=\"actionfull_".$this->id."\" class=\"shade2 center width20\" style=\"vertical-align: middle\">";
+			print "\n\t\t\t<td id=\"actionfull_".$this->id."\" class=\"FactLabelCell\" style=\"vertical-align: middle\">";
 			if ($gm_user->userCanEdit()) {
 				$menu = array();
 				$menu["label"] = GM_LANG_edit;
@@ -290,12 +290,12 @@ class ActionItem {
 				$submenu["class"] = "submenuitem";
 				$submenu["hoverclass"] = "submenuitem_hover";
 				$menu["items"][] = $submenu;
-				print "<div style=\"width:25px;\" class=\"center\" id=\"menu_".$this->id."\">";
+				print "<div class=\"FactLabelCellEdit\" id=\"menu_".$this->id."\">";
 				FactFunctions::PrintFactMenu($menu);
 				print "</div>";
 			}
 			print "</td>";
-			print "<td class=\"shade1 wrap\" id=\"action_".$this->id."\">";
+			print "<td class=\"FactDetailCell\" id=\"action_".$this->id."\">";
 			$this->PrintThisItem();
 			print "</td></tr>";
 		}

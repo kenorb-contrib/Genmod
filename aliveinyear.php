@@ -31,53 +31,51 @@ $indilist_controller = new IndilistController();
 $trace = false;
 
 PrintHeader($indilist_controller->pagetitle);
-print "<div class =\"center\">";
-print "\n\t<h3>";
+print "<div class=\"AliveInYearOptionContainer\">";
+print "\n\t<span class=\"PageTitleName\">";
 PrintHelpLink("alive_in_year_help", "qm");
 print str_replace("#YEAR#", $indilist_controller->year, GM_LANG_is_alive_in);
-print "</h3>";
+print "</span>";
 
 if ($view != "preview") {
 	print "\n\t<form name=\"newyear\" action=\"aliveinyear.php\" method=\"get\">";
-	if (!empty($indilist_controller->alpha)) print "\n\t\t<input type=\"hidden\" name=\"alpha\" value=\"".$indilist_controller->alpha."\" />";
-	if (!empty($indilist_controller->surname)) print "\n\t\t<input type=\"hidden\" name=\"surname\" value=\"".$indilist_controller->surname."\" />";
 	print "\n\t\t<input type=\"hidden\" name=\"surname_sublist\" value=\"".$indilist_controller->surname_sublist."\" />";
 	print "\n\t\t<input type=\"hidden\" name=\"alpha\" value=\"".$indilist_controller->alpha."\" />";
+	print "\n\t\t<input type=\"hidden\" name=\"falpha\" value=\"".$indilist_controller->falpha."\" />";
 	print "\n\t\t<input type=\"hidden\" name=\"surname\" value=\"".$indilist_controller->surname."\" />";
 	print "\n\t\t<input type=\"hidden\" name=\"show_all_firstnames\" value=\"".$indilist_controller->show_all_firstnames."\" />";
 	print "\n\t\t<input type=\"hidden\" name=\"show_all\" value=\"".$indilist_controller->show_all."\" />";
-	print "\n\t\t<table class=\"list_table center ".$TEXT_DIRECTION."\">\n\t\t\t<tr>";
-	print "\n\t\t\t<td class=\"shade3 center\" colspan=\"4\">".GM_LANG_choose."</td></tr>";
-	print "<tr><td class=\"shade1\" rowspan=\"4\" style=\"vertical-align: middle; text-align: center; padding: 5px;\" >";
+	print "\n\t\t<table class=\"ListTable ".$TEXT_DIRECTION."\">\n\t\t\t<tr>";
+	print "\n\t\t\t<td class=\"NavBlockHeader\" colspan=\"4\">".GM_LANG_choose."</td></tr>";
+	print "<tr><td class=\"NavBlockLabel\" rowspan=\"4\">";
 	PrintHelpLink("year_help", "qm");
 	print GM_LANG_year."</td>";
-	print "\n\t\t\t<td class=\"shade2\" rowspan=\"4\" style=\"vertical-align: middle;\" >";
+	print "\n\t\t\t<td class=\"NavBlockField\" rowspan=\"4\">";
 	print "\n\t\t\t\t<input class=\"pedigree_form\" type=\"text\" name=\"year\" size=\"3\" value=\"".$indilist_controller->year."\" />";
 	print "\n\t\t\t\t";
 	print "\n\t\t\t</td>";
-	print "<td class=\"shade1\">".GM_LANG_aiy_usemaa."</td>";
-	print "<td class=\"shade2\" style=\"vertical-align: middle;\"><input type=\"checkbox\" name=\"useMAA\" value=\"1\" onclick=\"submit()\"";
+	print "<td class=\"NavBlockLabel\">".GM_LANG_aiy_usemaa."</td>";
+	print "<td class=\"NavBlockField\"><input type=\"checkbox\" name=\"useMAA\" value=\"1\" onclick=\"submit()\"";
 	if ($indilist_controller->useMAA == "1") print " checked=\"checked\"";
 	print " /></td></tr>";
-	print "<tr><td class=\"shade1\">".GM_LANG_aiy_trueyears."</td>";
-	print "<td class=\"shade2\" style=\"vertical-align: middle;\"><input type=\"radio\" name=\"type\" value=\"true\" onclick=\"submit()\"";
+	print "<tr><td class=\"NavBlockLabel\">".GM_LANG_aiy_trueyears."</td>";
+	print "<td class=\"NavBlockField\"><input type=\"radio\" name=\"type\" value=\"true\" onclick=\"submit()\"";
 	if ($indilist_controller->type == "true") print " checked=\"checked\"";
 	print " /></td></tr>";
-	print "<tr><td class=\"shade1\">".GM_LANG_aiy_narrowyears."</td>";
-	print "<td class=\"shade2\" style=\"vertical-align: middle;\"><input type=\"radio\" name=\"type\" value=\"narrow\" onclick=\"submit()\"";
+	print "<tr><td class=\"NavBlockLabel\">".GM_LANG_aiy_narrowyears."</td>";
+	print "<td class=\"NavBlockField\"><input type=\"radio\" name=\"type\" value=\"narrow\" onclick=\"submit()\"";
 	if ($indilist_controller->type == "narrow") print " checked=\"checked\"";
 	print " /></td></tr>";
-	print "<tr><td class=\"shade1\">".GM_LANG_aiy_wideyears."</td>";
-	print "<td class=\"shade2\" style=\"vertical-align: middle;\"><input type=\"radio\" name=\"type\" value=\"wide\" onclick=\"submit()\"";
+	print "<tr><td class=\"NavBlockLabel\">".GM_LANG_aiy_wideyears."</td>";
+	print "<td class=\"NavBlockField\"><input type=\"radio\" name=\"type\" value=\"wide\" onclick=\"submit()\"";
 	if ($indilist_controller->type == "wide") print " checked=\"checked\"";
 	print " /></td></tr>";
-	print "\n\t\t\t<tr><td colspan=\"4\" class=\"center\">";
+	print "\n\t\t\t<tr><td colspan=\"4\" class=\"NavBlockFooter\">";
 	print "<input type=\"submit\" value=\"".GM_LANG_view."\" /></td>";
 	print "\n\t\t\t</tr>\n\t\t</table>";
 	print "\n\t</form>\n";
 	print "<br />";
 }
-
 /**
  * Check for the @ symbol
  *
@@ -156,12 +154,12 @@ if (count($indialpha) > 0) {
 	if (isset($startalpha)) $indilist_controller->alpha = $startalpha;
 }
 //-- escaped letter for regular expressions
-print "<br /><br />";
+print "</div><div class=\"AliveInYearListContainer\">";
 if ($indilist_controller->surname_sublist == "yes" && $indilist_controller->show_all == "yes") {
 	// Get the surnames of all individuals
 	if ($trace) print "option 1";
 	$surnames = $indilist_controller->GetAlphaIndiNames();
-	print "<div class=\"topbar\">".GM_LANG_surnames."</div>\n";
+	print "<div class=\"ListTableHeader\">".GM_LANG_surnames."</div>\n";
 	$indilist_controller->PrintSurnameList($surnames, "&amp;type=".$indilist_controller->type."&amp;useMAA=".$indilist_controller->useMAA."&amp;year=".$indilist_controller->year);
 
 }
@@ -171,7 +169,7 @@ else if ($indilist_controller->surname_sublist == "yes" && $indilist_controller-
 	// NOTE: Get all of the individuals whose last names start with this letter
 	if ($indilist_controller->alpha != "") {
 		$surnames = $indilist_controller->GetAlphaIndiNames();
-		print "<div class=\"topbar\">".GM_LANG_surnames."</div>\n";
+		print "<div class=\"ListTableHeader\">".GM_LANG_surnames."</div>\n";
 		$indilist_controller->PrintSurnameList($surnames, "&amp;type=".$indilist_controller->type."&amp;useMAA=".$indilist_controller->useMAA."&amp;year=".$indilist_controller->year);
 		
 	}
@@ -198,7 +196,7 @@ else {
 	else {
 		if ($trace) print "option 6";
 		// NOTE: If user wishes to skip surname do not print the surname
-		print "<div class=\"topbar\">";
+		print "<div class=\"ListTableHeader\">";
 		if ($indilist_controller->surname_sublist == "yes" && $indilist_controller->surname == "") print GM_LANG_surnames;
 		else print PrintReady(str_replace("#surname#", NameFunctions::CheckNN($indilist_controller->surname), GM_LANG_indis_with_surname));
 		print "</div>\n";

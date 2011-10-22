@@ -335,37 +335,37 @@ abstract class BlockFunctions {
 						if ($type == "INDI") {
 							print "<td class=\"wrap\"";
 							if ($block) print " width=\"86%\"";
-							print "><a href=\"individual.php?pid=".urlencode($id)."&amp;gedid=".$gedid."\"><span class=\"name2\">\n";
+							print "><a href=\"individual.php?pid=".urlencode($id)."&amp;gedid=".$gedid."\"><span class=\"NameBold\">\n";
 							print $object->revname.($object->revaddname == "" ? "" : "&nbsp;(".$object->revaddname.")")."</span>".$object->addxref;
 							print "</a></td>\n";
 							$i++;
 						}
 						elseif ($type == "FAM") {
-							print "<td class=\"wrap\"><a href=\"family.php?famid=".urlencode($id)."&amp;gedid=".$gedid."\"><span class=\"name2\" >";
+							print "<td class=\"wrap\"><a href=\"family.php?famid=".urlencode($id)."&amp;gedid=".$gedid."\"><span class=\"NameBold\" >";
 							print $object->sortable_name.($object->sortable_addname == "" ? "" : "&nbsp;(".$object->sortable_addname.")")."</span>".$object->addxref;
 							print "</a></td>";
 							$i++;
 						}
 						elseif ($type == "REPO") {
-							print "<td class=\"wrap\"><a href=\"repo.php?rid=".urlencode($id)."&amp;gedid=".$gedid."\"><span class=\"name2\" >";
+							print "<td class=\"wrap\"><a href=\"repo.php?rid=".urlencode($id)."&amp;gedid=".$gedid."\"><span class=\"NameBold\" >";
 							print $object->descriptor.($object->adddescriptor == "" ? "" : "&nbsp;(".$object->adddescriptor.")")."</span>".$object->addxref;
 							print "</a></td>";
 							$i++;
 						}
 						elseif ($type == "SOUR") {
-							print "<td class=\"wrap\"><a href=\"source.php?sid=".urlencode($id)."&amp;gedid=".$gedid."\"><span class=\"name2\" >";
+							print "<td class=\"wrap\"><a href=\"source.php?sid=".urlencode($id)."&amp;gedid=".$gedid."\"><span class=\"NameBold\" >";
 							print $object->descriptor.($object->adddescriptor == "" ? "" : "&nbsp;(".$object->adddescriptor.")")."</span>".$object->addxref;
 							print "</a></td>";
 							$i++;
 						}
 						elseif ($type == "OBJE") {
-							print "<td class=\"wrap\"><a href=\"mediadetail.php?mid=".urlencode($id)."&amp;gedid=".$gedid."\"><span class=\"name2\" >";
+							print "<td class=\"wrap\"><a href=\"mediadetail.php?mid=".urlencode($id)."&amp;gedid=".$gedid."\"><span class=\"NameBold\" >";
 							print $object->title."</span>".$object->addxref;
 							print "</a></td>";
 							$i++;
 						}
 						elseif ($type == "NOTE") {
-							print "<td class=\"wrap\"><a href=\"note.php?oid=".urlencode($id)."&amp;gedid=".$gedid."\"><span class=\"name2\" >";
+							print "<td class=\"wrap\"><a href=\"note.php?oid=".urlencode($id)."&amp;gedid=".$gedid."\"><span class=\"NameBold\" >";
 							print $object->title."</span>".$object->addxref;
 							print "</a></td>";
 							$i++;
@@ -395,7 +395,7 @@ abstract class BlockFunctions {
 			$oldgedid = 
 			SwitchGedcom($favorite->file);
 			if ($favorite->type == "URL") {
-				print "<div id=\"boxurl".$key.".0\" class=\"person_box";
+				print "<div id=\"boxurl".$key.".0\" class=\"PersonBox";
 				print "\"><ul>\n";
 				print "<li><a href=\"".$favorite->url."\">".PrintReady($favorite->title)."</a></li>";
 				print "</ul>";

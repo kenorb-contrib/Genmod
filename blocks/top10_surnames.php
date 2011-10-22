@@ -53,8 +53,8 @@ function print_block_name_top10($block=true, $config="", $side, $index) {
 	else $surnames = unserialize($_SESSION["top10_surnames"]);
 
 	if (count($surnames)>0) {
-		print "<div id=\"top10surnames\" class=\"block\">\n";
-		print "<div class=\"blockhc\">";
+		print "<div id=\"top10surnames\" class=\"BlockContainer\">\n";
+		print "<div class=\"BlockHeader\">";
 		PrintHelpLink("index_common_names_help", "qm");
 		if ($GM_BLOCKS["print_block_name_top10"]["canconfig"]) {
 			if ((($command=="gedcom")&&($gm_user->userGedcomAdmin())) || (($command=="user")&&($gm_user->username != ""))) {
@@ -66,8 +66,9 @@ function print_block_name_top10($block=true, $config="", $side, $index) {
 		}
 		print "<b>".str_replace("10", $config["num"], GM_LANG_block_top10_title)."</b>";
 		print "</div>";
-		print "<div class=\"blockcontent\">\n";
-		if ($block) print "<div class=\"small_inner_block\">\n";
+		print "<div class=\"BlockContent\">\n";
+		if ($block) print "<div class=\"RestrictedBlockHeightRight\">\n";
+		else print "<div class=\"RestrictedBlockHeightMain\">\n";
 		if ($block) print "<table width=\"90%\">";
 		else print "<table>";
 		foreach($surnames as $indexval => $surname) {
@@ -79,7 +80,7 @@ function print_block_name_top10($block=true, $config="", $side, $index) {
 				if ($TEXT_DIRECTION=="ltr") print "&nbsp;";
 				print "</td>";
 			}
-			print "<td class=\"name2\" ";
+			print "<td class=\"NameBold\" ";
 			if ($block) print "width=\"86%\"";
 			print "><a href=\"indilist.php?surname=".urlencode($surname["name"])."\">".PrintReady($surname["name"])."</a></td>";
 			if ($CountSide=="right") {
@@ -92,7 +93,7 @@ function print_block_name_top10($block=true, $config="", $side, $index) {
 			print "</tr>";
 		}
 		print "</table>";
-		if ($block) print "</div>\n";
+		print "</div>\n";
 		print "</div>";
 		print "</div>";
 	}

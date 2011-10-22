@@ -58,8 +58,8 @@ function print_upcoming_events($block=true, $config="", $side, $index) {
 	$found_facts = BlockFunctions::GetCachedEvents($action, $daysprint, $filter, $onlyBDM, $skipfacts);
 	
 	// Output starts here
-	print "<div id=\"upcoming_events\" class=\"block\">";
-	print "<div class=\"blockhc\">";
+	print "<div id=\"upcoming_events\" class=\"BlockContainer\">";
+	print "<div class=\"BlockHeader\">";
 	PrintHelpLink("index_events_help", "qm", "upcoming_events");
 	if ($GM_BLOCKS["print_upcoming_events"]["canconfig"]) {
 		if ((($command=="gedcom")&&($gm_user->userGedcomAdmin())) || (($command=="user")&&($gm_user->username != ""))) {
@@ -71,8 +71,9 @@ function print_upcoming_events($block=true, $config="", $side, $index) {
 	}
 	print GM_LANG_upcoming_events;
 	print "</div>";
-	print "<div class=\"blockcontent\" >";
-	if ($block) print "<div class=\"small_inner_block\">\n";
+	print "<div class=\"BlockContent\" >";
+	if ($block) print "<div class=\"RestrictedBlockHeightRight\">\n";
+	else print "<div class=\"RestrictedBlockHeightMain\">\n";
 	
 	$OutputDone = false;
 	$PrivateFacts = false;
@@ -172,7 +173,7 @@ function print_upcoming_events($block=true, $config="", $side, $index) {
 		print "</b><br />";
 	}
 
-	if ($block) print "</div>\n";
+	print "</div>\n";
 	print "</div>"; // blockcontent
 	print "</div>"; // block
 }

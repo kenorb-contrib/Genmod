@@ -57,8 +57,8 @@ function print_recent_changes($block=true, $config="", $side, $index) {
 // Start output
 	if (count($found_facts)==0 and $HideEmpty=="yes") return false;
 	//	Print block header
-	print "<div id=\"recent_changes\" class=\"block\">";
-	print "<div class=\"blockhc\">";
+	print "<div id=\"recent_changes\" class=\"BlockContainer\">";
+	print "<div class=\"BlockHeader\">";
 	PrintHelpLink("recent_changes_help", "qm", "recent_changes");
 	if ($GM_BLOCKS["print_recent_changes"]["canconfig"]) {
 		$username = $gm_user->username;
@@ -71,8 +71,9 @@ function print_recent_changes($block=true, $config="", $side, $index) {
 	}
 	print GM_LANG_recent_changes;
 	print "</div>";
-	print "<div class=\"blockcontent\" >";
-	if ($block) print "<div class=\"small_inner_block\">\n";
+	print "<div class=\"BlockContent\" >";
+	if ($block) print "<div class=\"RestrictedBlockHeightRight\">\n";
+	else print "<div class=\"RestrictedBlockHeightMain\">\n";
 
 	//	Print block content
 	// 3 is recent changes
@@ -208,7 +209,7 @@ function print_recent_changes($block=true, $config="", $side, $index) {
 
 	}
 
-	if ($block) print "</div>\n"; //small_inner_block
+	print "</div>\n"; //small_inner_block
 	print "</div>"; // blockcontent
 	print "</div>"; // block
 
@@ -278,7 +279,7 @@ function print_recent_changes_config($config) {
 	</select>
 	</td></tr>
 	<tr><td colspan="2" class="shade1 wrap">
-		<span class="error"><?php print GM_LANG_hide_block_warn; ?></span>
+		<span class="Error"><?php print GM_LANG_hide_block_warn; ?></span>
 	</td></tr>
 	<?php
 }

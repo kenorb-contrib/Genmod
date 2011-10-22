@@ -47,13 +47,13 @@ function top10_pageviews($block=true, $config="", $side, $index) {
 	//-- if no results are returned then don't do anything
 	if (count($ids) == 0) {
 		if ($gm_user->userIsAdmin()) {
-			print "<div id=\"top10\" class=\"block\">\n";
-			print "<div class=\"blockhc\">";
+			print "<div id=\"top10\" class=\"BlockContainer\">\n";
+			print "<div class=\"BlockHeader\">";
 			PrintHelpLink("index_top10_pageviews_help", "qm");
 			print GM_LANG_top10_pageviews;
 			print "</div>";
-			print "<div class=\"blockcontent\">\n";
-			print "<span class=\"error\">\n".GM_LANG_top10_pageviews_msg."</span>\n";
+			print "<div class=\"BlockContent\">\n";
+			print "<span class=\"Error\">\n".GM_LANG_top10_pageviews_msg."</span>\n";
 			print "</div>";
 			print "</div>\n";
 		}
@@ -61,8 +61,8 @@ function top10_pageviews($block=true, $config="", $side, $index) {
 	}
 
 	
-	print "<div id=\"top10hits\" class=\"block\">\n";
-	print "<div class=\"blockhc\">";
+	print "<div id=\"top10hits\" class=\"BlockContainer\">\n";
+	print "<div class=\"BlockHeader\">";
 	PrintHelpLink("index_top10_pageviews_help", "qm", "top10_pageviews");
 	if ($GM_BLOCKS["top10_pageviews"]["canconfig"]) {
 		if ((($command=="gedcom")&&($gm_user->userGedcomAdmin())) || (($command=="user")&&($gm_user->username != ""))) {
@@ -74,10 +74,11 @@ function top10_pageviews($block=true, $config="", $side, $index) {
 	}
 	print "<b>".GM_LANG_top10_pageviews."</b>";
 	print "</div>";
-	print "<div class=\"blockcontent\">\n";
-	if ($block) print "<div class=\"small_inner_block\">\n";
+	print "<div class=\"BlockContent\">\n";
+	if ($block) print "<div class=\"RestrictedBlockHeightRight\">\n";
+		else print "<div class=\"RestrictedBlockHeightMain\">\n";
 	BlockFunctions::PrintPageViews($ids, $CountSide, $config["num"], $block);
-	if ($block) print "</div>\n";
+	print "</div>\n";
 	print "</div>";
 	print "</div>";
 }
@@ -87,7 +88,7 @@ function top10_pageviews_config($config) {
 	
 	if (empty($config)) $config = $GM_BLOCKS["top10_pageviews"]["config"];
 	?>
-	<table class="facts_table <?php print $TEXT_DIRECTION; ?>">
+	<table class="FactsTable <?php print $TEXT_DIRECTION; ?>">
 	<tr><td class="shade2"><?php print GM_LANG_num_to_show; ?></td><td class="shade1"><input type="text" name="num" size="2" value="<?php print $config["num"]; ?>" /></td></tr>
 	<tr><td class="shade2"><?php print GM_LANG_before_or_after;?></td><td class="shade1"><select name="count_placement">
 		<option value="left"<?php if ($config["count_placement"]=="left") print " selected=\"selected\"";?>><?php print GM_LANG_before; ?></option>

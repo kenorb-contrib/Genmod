@@ -282,7 +282,7 @@ abstract class EditFunctions {
 		print "<input type=\"hidden\" name=\"change_type\" value=\"".$change_type."\" />\n";
 		print "<input type=\"hidden\" name=\"pid_type\" value=\"".$pid_type."\" />\n";
 		print "<input type=\"hidden\" name=\"famtag\" value=\"".$famtag."\" />\n";
-		print "<table class=\"facts_table\">";
+		print "<table class=\"FactsTable\">";
 		
 		// preset child/father SURN
 		$surn = "";
@@ -1059,7 +1059,7 @@ abstract class EditFunctions {
 			PrintHelpLink("edit_add_SOUR_help", "qm");
 			print "<br />";
 			print "<div id=\"newsource\" style=\"display: none;\">\n";
-			print "<table class=\"facts_table\">\n";
+			print "<table class=\"FactsTable\">\n";
 			// 2 SOUR
 			$sour_focus_element = self::AddSimpleTag("$level SOUR @");
 			// 3 PAGE
@@ -1091,7 +1091,7 @@ abstract class EditFunctions {
 			PrintHelpLink("edit_add_ASSO_help", "qm");
 			print "<br />";
 			print "<div id=\"newasso\" style=\"display: none;\">\n";
-			print "<table class=\"facts_table\">\n";
+			print "<table class=\"FactsTable\">\n";
 			// 2 ASSO
 			$asso_focus_element = self::AddSimpleTag(($level)." ASSO @");
 			// 3 RELA
@@ -1113,7 +1113,7 @@ abstract class EditFunctions {
 			PrintHelpLink("edit_add_NOTE_help", "qm");
 			print "<br />\n";
 			print "<div id=\"newnote\" style=\"display: none;\">\n";
-			print "<table class=\"facts_table\">\n";
+			print "<table class=\"FactsTable\">\n";
 			// 2 NOTE
 			$note_focus_element = self::AddSimpleTag(($level)." NOTE");
 			print "</table></div>";
@@ -1131,7 +1131,7 @@ abstract class EditFunctions {
 			PrintHelpLink("edit_add_NOTE_help", "qm");
 			print "<br />";
 			print "<div id=\"newgnote\" style=\"display: none;\">\n";
-			print "<table class=\"facts_table\">\n";
+			print "<table class=\"FactsTable\">\n";
 			// 2 NOTE
 			$gnote_focus_element = self::AddSimpleTag("$level NOTE @");
 			print "</table></div>";
@@ -1149,7 +1149,7 @@ abstract class EditFunctions {
 			PrintHelpLink("add_media_help", "qm");
 			print "<br />";
 			print "<div id=\"newobje\" style=\"display: none;\">\n";
-			print "<table class=\"facts_table\">\n";
+			print "<table class=\"FactsTable\">\n";
 			// 2 OBJE <=== as link
 			$obje_focus_element = self::AddSimpleTag(($level)." OBJE @");
 			// 2 OBJE <=== as embedded new object
@@ -1238,7 +1238,7 @@ abstract class EditFunctions {
 						if (!is_object($object) || $object->isempty) $passlink = false;
 						else $passlink = true;
 						if (!$passlink) {
-							print "<span class=\"error\">".GM_LANG_link_not_added.": ".$text[$j]."</span><br />";
+							print "<span class=\"Error\">".GM_LANG_link_not_added.": ".$text[$j]."</span><br />";
 							$link_error = true;
 						}
 						else {
@@ -1456,7 +1456,7 @@ abstract class EditFunctions {
 		print "<input type=\"hidden\" name=\"paste\" value=\"1\" />\n";
 		print "<input type=\"hidden\" name=\"change_type\" value=\"$change_type\" />\n";
 		if (isset($pid)) print "<input type=\"hidden\" name=\"pid\" value=\"$pid\" />\n";
-		print "<table class=\"facts_table center $TEXT_DIRECTION\">\n";
+		print "<table class=\"FactsTable center $TEXT_DIRECTION\">\n";
 		print "<tr><td class=\"topbottombar\" colspan=\"2\">".GM_LANG_add_media."</td></tr>";
 		if ($pid == "") {
 			print "<tr><td class=\"shade2\">".GM_LANG_add_fav_enter_id."</td>";

@@ -38,7 +38,7 @@ PrintHeader($calendar_controller->pagetitle);
 
 //Print page top title
 print "<div style=\" text-align: center;\" id=\"calendar_page\">\n";
-print "<table class=\"facts_table ".$TEXT_DIRECTION." width100\">";
+print "<table class=\"FactsTable ".$TEXT_DIRECTION." width100\">";
 print "<tr><td class=\"facts_label\"><h3>";
 print ($calendar_controller->action == "today" ? GM_LANG_on_this_day : ($calendar_controller->action == "calendar" ? GM_LANG_in_this_month : GM_LANG_in_this_year));
 print "</h3></td></tr>\n";
@@ -52,14 +52,14 @@ if ($view!="preview") {
 // Print calender form
 	print "<form name=\"dateform\" method=\"get\" action=\"calendar.php\">";
 	print "<input type=\"hidden\" name=\"action\" value=\"".$calendar_controller->action."\" />";
-	print "\n\t\t<table class=\"facts_table ".$TEXT_DIRECTION." width100\">\n\t\t<tr>";
+	print "\n\t\t<table class=\"FactsTable ".$TEXT_DIRECTION." width100\">\n\t\t<tr>";
 	print "<td class=\"shade2 vmiddle\">";
 	PrintHelpLink("annivers_date_select_help", "qm", "day");
 	print GM_LANG_day."</td>\n";
 	print "<td colspan=\"7\" class=\"shade1\">";
 	for($i = 1; $i < ($calendar_controller->m_days+1); $i++) {
 		print "<a href=\"calendar.php?link=10&amp;day=".$i."&amp;month=".strtolower($calendar_controller->month)."&amp;year=".$calendar_controller->year."&amp;filterev=".$calendar_controller->filterev."&amp;filterof=".$calendar_controller->filterof."&amp;filtersx=".$calendar_controller->filtersx."&amp;action=today\">";
-		if ($i == $calendar_controller->day) print "<span class=\"error\">".$i."</span>";
+		if ($i == $calendar_controller->day) print "<span class=\"Error\">".$i."</span>";
 		else print $i;
 		print "</a> | ";
 	}
@@ -89,7 +89,7 @@ if ($view!="preview") {
 			if (empty($mm)) $mm=strtolower($calendar_controller->month);
 			print "<a href=\"calendar.php?link=1&amp;day=".$calendar_controller->day."&amp;month=".$mon."&amp;year=".$calendar_controller->year."&amp;filterev=".$calendar_controller->filterev."&amp;filterof=".$calendar_controller->filterof."&amp;filtersx=".$calendar_controller->filtersx."&amp;action=".($calendar_controller->action == "year" ? "calendar" : $calendar_controller->action)."\">";
 			$monthstr = constant("GM_LANG_".$mon);
-			if ($mon==$mm) print "<span class=\"error\">".$monthstr."</span>";
+			if ($mon==$mm) print "<span class=\"Error\">".$monthstr."</span>";
 			else print $monthstr;
 			print "</a> | ";
 		}
@@ -135,12 +135,12 @@ if ($view!="preview") {
 	else {
 		print "<td class=\"shade2 vmiddle\">".GM_LANG_showcal."</td>\n";
 		print "<td colspan=\"5\" class=\"shade1 vmiddle\">";
-		if ($calendar_controller->filterof == "all") print "<span class=\"error\">".GM_LANG_all_people. "</span> | ";
+		if ($calendar_controller->filterof == "all") print "<span class=\"Error\">".GM_LANG_all_people. "</span> | ";
 		else {
 			$filt="all";
 			print "<a href=\"calendar.php?link=5&amp;day=".$calendar_controller->day."&amp;month=".$calendar_controller->month."&amp;year=".$calendar_controller->year."&amp;filterof=".$filt."&amp;filtersx=".$calendar_controller->filtersx."&amp;action=".$calendar_controller->action."\">".htmlentities(GM_LANG_all_people)."</a>"." | ";
 		}
-		if ($calendar_controller->filterof == "recent") print "<span class=\"error\">".htmlentities(GM_LANG_recent_events). "</span> | ";
+		if ($calendar_controller->filterof == "recent") print "<span class=\"Error\">".htmlentities(GM_LANG_recent_events). "</span> | ";
 		else {
 			$filt = "recent";
 			print "<a href=\"calendar.php?link=6&amp;day=".$calendar_controller->day."&amp;month=".$calendar_controller->month."&amp;year=".$calendar_controller->year."&amp;filterof=".$filt."&amp;filtersx=".$calendar_controller->filtersx."&amp;action=".$calendar_controller->action."\">".htmlentities(GM_LANG_recent_events)."</a>"." | ";
@@ -384,7 +384,7 @@ if ($calendar_controller->action == "today" || $calendar_controller->action == "
 		print "</tr>";
 	}
 	else {
-		print "\n\t<table class=\"list_table center $TEXT_DIRECTION\">\n\t\t<tr>";
+		print "\n\t<table class=\"ListTable $TEXT_DIRECTION\">\n\t\t<tr>";
 		print "<td class=\"shade1 center\">&nbsp;";
 		print GM_LANG_individuals."  /  ".GM_LANG_families;
 		print "&nbsp;</td></tr><tr><td class=\"warning center\"><i>";
@@ -395,10 +395,10 @@ if ($calendar_controller->action == "today" || $calendar_controller->action == "
 }
 else if ($calendar_controller->action == "calendar") {
 	if(GedcomConfig::$CALENDAR_FORMAT == "jewish" || GedcomConfig::$CALENDAR_FORMAT == "hebrew" || GedcomConfig::$CALENDAR_FORMAT == "hijri") { //since calendar is based on gregorian it doesn't make sense to not display the gregorian caption
-		print "<span class=\"subheaders\">".constant("GM_LANG_".strtolower($calendar_controller->month))." ".$calendar_controller->year."</span> &#160; \n";
+		print "<span class=\"SubHeader\">".constant("GM_LANG_".strtolower($calendar_controller->month))." ".$calendar_controller->year."</span> &#160; \n";
 	}
 	if (empty($WEEK_START)) $WEEK_START="0";                //-- if the starting day for a week was not defined in the language file, then make it Sunday
-	print "<table class=\"list_table center $TEXT_DIRECTION\">\n";
+	print "<table class=\"ListTable $TEXT_DIRECTION\">\n";
 	print "\t<tr>\n";
 	$days = array();
 	$days[0] = "sunday";

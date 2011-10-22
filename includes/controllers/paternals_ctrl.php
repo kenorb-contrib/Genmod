@@ -78,11 +78,11 @@ class PaternalsController extends ChartController {
 	
 	public function PrintInputLine() {
 	
-		print "<tr><td class=\"shade2\">";
+		print "<tr><td class=\"NavBlockLabel\">";
 		PrintHelpLink("paternals_help", "qm");
 		print GM_LANG_paternal_line_type . "&nbsp;</td>";
 	
-		print "<td class=\"shade1 vmiddle\">";
+		print "<td class=\"NavBlockField\">";
 		print "<select name=\"line\">";
 		print "<option value=\"paternal\"".($this->line == "paternal" ?  " selected=\"selected\"" : "").">".GM_LANG_paternal_paternal."</option>";
 		print "<option value=\"maternal\"".($this->line == "maternal" ?  " selected=\"selected\"" : "").">".GM_LANG_paternal_maternal."</option>";
@@ -93,11 +93,11 @@ class PaternalsController extends ChartController {
 	
 	public function PrintInputStart() {
 	
-		print "<tr><td class=\"shade2\">";
+		print "<tr><td class=\"NavBlockLabel\">";
 		PrintHelpLink("paternals_help", "qm");
 		print GM_LANG_paternal_lines_from . "&nbsp;</td>";
 	
-		print "<td class=\"shade1 vmiddle\">";
+		print "<td class=\"NavBlockField\">";
 		print "<select name=\"split\">";
 		print "<option value=\"1\"".($this->split == 1 ?  " selected=\"selected\"" : "").">".GM_LANG_paternal_self."</option>";
 		print "<option value=\"2\"".($this->split == 2 ?  " selected=\"selected\"" : "").">".GM_LANG_paternal_parents."</option>";

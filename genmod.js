@@ -381,6 +381,7 @@ var oldname = 0;
 var oldthumbdisp = 0;
 var repositioned = 0;
 var oldiconsdislpay = 0;
+var oldparentw = 0;
 function expandbox(boxid, bstyle, random) {
 	// NOTE: Check if the box has already been zoomed into
 	if (big==1) {
@@ -390,14 +391,14 @@ function expandbox(boxid, bstyle, random) {
 	}
 	// Set the correct identifiers
 	boxsav = boxid;
-	boxid = boxid+"."+random;
 	boxidparent = boxid;
+	boxid = boxid+"."+random;
 
 	url = window.location.toString();
 	divbox = document.getElementById("out-"+boxid);
 	inbox = document.getElementById("inout-"+boxid);
 	inbox2 = document.getElementById("inout2-"+boxid);
-	parentbox = document.getElementById("box-"+boxidparent);
+	parentbox = document.getElementById("parentbox-"+boxidparent);
 	if (!parentbox) {
 		parentbox=divbox;
 	}
@@ -422,6 +423,7 @@ function expandbox(boxid, bstyle, random) {
 		oldheight=divbox.style.height;
 		oldwidth=divbox.style.width;
 		oldz = parentbox.style.zIndex;
+		oldparentw = parentbox.style.width;
 		if (url.indexOf("descendancy.php")==-1) parentbox.style.zIndex='100';
 		if (bstyle!=2) {
 			divbox.style.width='350px';
@@ -431,7 +433,8 @@ function expandbox(boxid, bstyle, random) {
 				else famleft = 0;
 				famlinks.style.left = (famleft+diff)+"px";
 			}
-			//parentbox.style.width = parseInt(parentbox.style.width)+diff;
+			newwidth = parseInt(parentbox.style.width)+diff;
+			parentbox.style.width = newwidth+'px';
 		}
 		divleft = parseInt(parentbox.style.left);
 		
@@ -488,7 +491,6 @@ function restorebox(boxid, bstyle, random) {
 	// Set the correct identifiers
 	boxidparent = boxid;
 	boxid = boxid+"."+random; 
-
 	// Reset the previous boxid
 	prevboxid = "";
 	prevbstyle = "";
@@ -498,7 +500,7 @@ function restorebox(boxid, bstyle, random) {
 	inbox = document.getElementById("inout-"+boxid);
 	inbox2 = document.getElementById("inout2-"+boxid);
 	famlinks = document.getElementById("I"+boxid+"links");
-	parentbox = document.getElementById("box"+boxidparent);
+	parentbox = document.getElementById("parentbox-"+boxidparent);
 	if (!parentbox) {
 		parentbox=divbox;
 	}
@@ -528,12 +530,14 @@ function restorebox(boxid, bstyle, random) {
 		divbox.style.height=oldheight;
 		divbox.style.width=oldwidth;
 		if (parentbox) {
-			//if (parentbox!=divbox) parentbox.style.width = parseInt(parentbox.style.width)-diff;
+			if (parentbox!=divbox) {
+				parentbox.style.width = oldparentw;
+			}
 			//alert("here");
 			parentbox.style.zIndex=oldz;
 			if (url.indexOf("pedigree.php")!=-1) {
-				if (textDirection=="ltr") parentbox.style.left=oldleft+"px";
-				else parentbox.style.right=oldleft+"px";
+				//if (textDirection=="ltr") parentbox.style.left=oldleft+"px";
+				//else parentbox.style.right=oldleft+"px";
 				// Keep the family links box in its place
 				if (famlinks) {
 					famlinks.style.left = famleft+"px";

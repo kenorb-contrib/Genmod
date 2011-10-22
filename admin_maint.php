@@ -49,17 +49,17 @@ switch ($action) {
                LanguageFunctions::LoadEnglish();
                LanguageFunctions::LoadEnglishFacts();
                WriteToLog("AdminMaint-&gt; ".GM_LANG_all_not_loaded, "E", "S");
-               $message = "<span class=\"error\">".GM_LANG_all_not_loaded."</span>";
+               $message = "<span class=\"Error\">".GM_LANG_all_not_loaded."</span>";
 		}
 		break;
 	case "reports": 
 		$files = GetReportList(true);
 		if ($files) $message = GM_LANG_report_titles_generated;
-		else $message = "<span class=\"error\">".GM_LANG_report_titles_not_generated."</span>";
+		else $message = "<span class=\"Error\">".GM_LANG_report_titles_not_generated."</span>";
 		break;
 	case "resetisdead": 
 		if (AdminFunctions::ResetIsDead()) $message = GM_LANG_isdead_reset;
-		else $message = "<span class=\"error\">".GM_LANG_isdead_not_reset."</span>";
+		else $message = "<span class=\"Error\">".GM_LANG_isdead_not_reset."</span>";
 		break;
 	case "buildisdead":
 		$sql = "SELECT i_id, i_gedrec, i_file, i_isdead FROM ".TBLPREFIX."individuals WHERE i_isdead=-1 AND i_file='".GedcomConfig::$GEDCOMID."'";

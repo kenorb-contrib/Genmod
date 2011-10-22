@@ -393,7 +393,7 @@ if ($disp1 == "block") {
 	print "\n<div id=\"content\" style=\"display: ".$disp1.";\">";
 		print "\n<div class=\"".$TEXT_DIRECTION."\">";
 			print "<div class=\"admin_topbottombar\">".GM_LANG_manage_media." - ".$GEDCOMS[GedcomConfig::$GEDCOMID]['title'];
-			if (!empty($error)) print "<br /><span class=\"error\">".$error."</span>";
+			if (!empty($error)) print "<br /><span class=\"Error\">".$error."</span>";
 			print "<br />".GM_LANG_files_found."&nbsp;".count($files);
 			print "</div>";
 			print "\n<div class=\"admin_genmod_content\">";
@@ -453,7 +453,7 @@ if ($disp1 == "block") {
 				print "<td style=\"border-bottom:1px solid #493424; text-align:center;\">";
 				if (isset($file["objects"])) {
 					// Define the box with links
-					print "\n\t\t<div id=\"I".$counter."links\" class=\"ie_popup_width person_box shade2 details1\" style=\"position:absolute; height:auto; width:auto; ";
+					print "\n\t\t<div id=\"I".$counter."links\" class=\"ie_popup_width PersonBox shade2 details1\" style=\"position:absolute; height:auto; width:auto; ";
 					print "visibility:hidden;\" onmouseover=\"keepbox('".$counter."'); return false;\" ";
 					print "onmouseout=\"moveout('".$counter."'); return false;\">";
 					print "<b>".GM_LANG_mm_links."</b><br />";
@@ -496,14 +496,14 @@ if ($disp1 == "block") {
 				
 				// Details
 				print "<td style=\"border-bottom:1px solid #493424; text-align:center\">";
-					print "\n\t\t<div id=\"I".$counter."D"."links\" class=\"ie_popup_width person_box shade2 details1\" style=\"position:absolute; height:auto; width:auto; ";
+					print "\n\t\t<div id=\"I".$counter."D"."links\" class=\"ie_popup_width PersonBox shade2 details1\" style=\"position:absolute; height:auto; width:auto; ";
 					print "visibility:hidden;\" onmouseover=\"keepbox('".$counter."D"."'); return false;\" ";
 					print "onmouseout=\"moveout('".$counter."D"."'); return false;\">";
 					print "<b>".GM_LANG_fdetails."</b><br />";
-					if (!empty($fileobj->f_mimetype)) print "<span class=\"label\">".GM_LANG_media_format.": </span> <span class=\"field\" style=\"direction: ltr;\">".$fileobj->f_mimetype."</span>";
-					if ($fileobj->f_is_image && $fileobj->f_height > 0) print "<span class=\"label\"><br />".GM_LANG_image_size.": </span> <span class=\"field\" style=\"direction: ltr;\">".$fileobj->f_height.($TEXT_DIRECTION =="rtl"?" &rlm;x&rlm; " : " x ").$fileobj->f_width.'</span>';
-					if ($fileobj->f_file_size > 0) print "<span class=\"label\"><br />".GM_LANG_media_file_size.": </span> <span class=\"field\" style=\"direction: ltr;\">".GetFileSize($fileobj->f_file_size)."</span>";
-					print "<span class=\"label\"><br />".GM_LANG_file_status.": </span> <span class=\"field\" style=\"direction: ltr;\">";
+					if (!empty($fileobj->f_mimetype)) print "<span class=\"FactDetailLabel\">".GM_LANG_media_format.": </span> <span class=\"FactDetailField\" style=\"direction: ltr;\">".$fileobj->f_mimetype."</span>";
+					if ($fileobj->f_is_image && $fileobj->f_height > 0) print "<span class=\"FactDetailLabel\"><br />".GM_LANG_image_size.": </span> <span class=\"FactDetailField\" style=\"direction: ltr;\">".$fileobj->f_height.($TEXT_DIRECTION =="rtl"?" &rlm;x&rlm; " : " x ").$fileobj->f_width.'</span>';
+					if ($fileobj->f_file_size > 0) print "<span class=\"FactDetailLabel\"><br />".GM_LANG_media_file_size.": </span> <span class=\"FactDetailField\" style=\"direction: ltr;\">".GetFileSize($fileobj->f_file_size)."</span>";
+					print "<span class=\"FactDetailLabel\"><br />".GM_LANG_file_status.": </span> <span class=\"FactDetailField\" style=\"direction: ltr;\">";
 					if ($canwrite) print GM_LANG_stat_rw;
 					else print GM_LANG_stat_ro;
 					print "</span>";
@@ -567,7 +567,7 @@ if ($disp2 == "block") {
 	print "\n<div id=\"content\" style=\"display: ".$disp2.";\">";
 		print "\n<div class=\"".$TEXT_DIRECTION."\">";
 			print "<div class=\"admin_topbottombar\">".GM_LANG_manage_media." - ".$GEDCOMS[GedcomConfig::$GEDCOMID]['title'];
-			if (!empty($error)) print "<br /><span class=\"error\">".$error."</span>";
+			if (!empty($error)) print "<br /><span class=\"Error\">".$error."</span>";
 			print "</div>";
 			
 			// Upload media

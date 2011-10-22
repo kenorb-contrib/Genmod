@@ -40,10 +40,10 @@ if ($paternals_controller->show_full == false) {
 // -- print html header information
 print "<div id=\"content_pedigree\" style=\"width:".$paternals_controller->pagewidth."px; min-width:100%;\">";
 
-print "\n\t<h3>".GM_LANG_paternal_chart.": ";
+print "\n\t<span class=\"PageTitleName\">".GM_LANG_paternal_chart.": ";
 print PrintReady($paternals_controller->root->name);
 if ($paternals_controller->root->addname != "") print " (" . PrintReady($paternals_controller->root->addname).")";
-print "</h3>";
+print "</span>";
 ?>
 
 <script language="JavaScript" type="text/javascript">
@@ -62,7 +62,7 @@ print "</h3>";
 <?php
 if ($paternals_controller->view != "preview") {
 	print "<form method=\"get\" name=\"people\" action=\"?\">\n";
-	print "\n\t\t<table class=\"list_table ".$TEXT_DIRECTION."\" align=\"";
+	print "\n\t\t<table class=\"ListTable ".$TEXT_DIRECTION."\" align=\"";
 	if ($TEXT_DIRECTION == "ltr") print "left";
 	else print "right";
 	print "\">";

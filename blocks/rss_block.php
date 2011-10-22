@@ -45,8 +45,8 @@ $GM_BLOCKS["print_RSS_block"]["rss"]		= false;
 function print_RSS_block($block = true, $config="", $side, $index) {
 	global $LANGUAGE, $command, $QUERY_STRING, $GM_BLOCKS, $gm_user, $GM_IMAGES, $bot;
 
-	print "<div id=\"rss_block\" class=\"block\">\n";
-	print "<div class=\"blockhc\">";
+	print "<div id=\"rss_block\" class=\"BlockContainer\">\n";
+	print "<div class=\"BlockHeader\">";
 	PrintHelpLink("rss_feed_help", "qm", "rss_feeds");
 	if ($GM_BLOCKS["print_RSS_block"]["canconfig"]) {
 		if ((($command=="gedcom")&&($gm_user->userGedcomAdmin())) || (($command=="user")&&(!empty($username)))) {
@@ -58,7 +58,7 @@ function print_RSS_block($block = true, $config="", $side, $index) {
 	}
 	print GM_LANG_rss_feeds;
 	print "</div>";
-	print "<div class=\"blockcontent center\">";
+	print "<div class=\"BlockContent center\">";
 	print "<form method=\"post\" action=\"\" name=\"rssform\">\n";
 	//print get_lang_select();
 	print "<br />";

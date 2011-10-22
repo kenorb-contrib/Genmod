@@ -44,13 +44,13 @@ function print_login_block($block = true, $config="", $side, $index) {
 		if (!empty($gm_user->username)) return;
 		if (LOGIN_URL == "") $login = "login.php";
 		else $login = LOGIN_URL;
-		print "<div id=\"login_block\" class=\"block\">\n";
-		print "<div class=\"blockhc\">";
+		print "<div id=\"login_block\" class=\"BlockContainer\">\n";
+		print "<div class=\"BlockHeader\">";
 		if (SystemConfig::$USE_REGISTRATION_MODULE) PrintHelpLink("index_login_register_help", "qm");
 		else PrintHelpLink("index_login_help", "qm", "login");
 		print GM_LANG_login;
 		print "</div>";
-		print "<div class=\"blockcontent width100 center $TEXT_DIRECTION\">";
+		print "<div class=\"BlockContent width100 center $TEXT_DIRECTION\">";
 		print "<form method=\"post\" action=\"$login\" name=\"loginform\" onsubmit=\"t = new Date(); document.loginform.usertime.value=t.getFullYear()+'-'+(t.getMonth()+1)+'-'+t.getDate()+' '+t.getHours()+':'+t.getMinutes()+':'+t.getSeconds(); return true;\">\n";
 		print "<input type=\"hidden\" name=\"url\" value=\"index.php?command=$command&amp;\" />\n";
 		print "<input type=\"hidden\" name=\"gedid\" value=\"";if (isset(GedcomConfig::$GEDCOMID)) print GedcomConfig::$GEDCOMID; print "\" />";

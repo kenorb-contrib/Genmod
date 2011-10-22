@@ -48,7 +48,7 @@ PrintHeader("Theme editor");
 ?>
 <form name="editform" method="post";">
 <input type="hidden" name="oldusername" value="<?php print $uname; ?>" />
-<table class="list_table <?php print $TEXT_DIRECTION; ?>">
+<table class="ListTable <?php print $TEXT_DIRECTION; ?>">
 <tr><td class="facts_label"><?php print GM_LANG_user_theme;PrintHelpLink("edituser_user_theme_help", "qm");?></td><td class="facts_value" valign="top">
 	<select name="choose_theme">
 	<option value=""><?php print GM_LANG_site_default; ?></option>
@@ -146,9 +146,9 @@ foreach ($output as $l => $tag) {
 		}
 	}
 }
-print "<table width=\"50%\" class=\"facts_table\" border=\"3\" cellspacing=\"0\" cellpadding=\"0\">";
+print "<table width=\"50%\" class=\"FactsTable\" border=\"3\" cellspacing=\"0\" cellpadding=\"0\">";
 foreach ($tags as $l => $tag){
-	print "<tr><th class=\"label\" colspan=\"3\">".trim($l)."</th></tr>";
+	print "<tr><th class=\"FactDetailLabel\" colspan=\"3\">".trim($l)."</th></tr>";
 	$i = 0;
 	foreach ($tag["names"] as $n => $name) {
 		print "<tr><td width=\"15%\">$name</td><td width=\"10%\">".$tag["definitions"][$n]."</td>";

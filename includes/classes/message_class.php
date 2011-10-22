@@ -88,7 +88,7 @@ class Message {
 				return $this->GetMessageAge();
 				break;
 			default:
-				print "<span class=\"error\">Invalid property ".$property." for __get in ".get_class($this)." class</span><br />";
+				PrintGetSetError($property, get_class($this), "get");
 				break;
 		}
 	}
@@ -126,7 +126,7 @@ class Message {
 				if (is_bool($value)) $this->no_from = $value;
 				break;
 			default:
-				print "<span class=\"error\">Invalid property ".$property." for __set in ".get_class($this)." class</span><br />";
+				PrintGetSetError($property, get_class($this), "set");
 				break;
 		}
 	}

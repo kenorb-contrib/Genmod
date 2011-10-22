@@ -38,20 +38,21 @@ function print_user_messages($block=true, $config="", $side, $index) {
 
 		$usermessages = MessageController::getUserMessages($gm_user->username);
 
-		print "<div id=\"user_messages\" class=\"block\">\n";
-		print "<div class=\"blockhc\">";
+		print "<div id=\"user_messages\" class=\"BlockContainer\">\n";
+		print "<div class=\"BlockHeader\">";
 		PrintHelpLink("mygedview_message_help", "qm", "my_messages");
 		print GM_LANG_my_messages." &lrm;(".count($usermessages).")&lrm;";
 		print "</div>";
-		print "<div class=\"blockcontent\">";
-		if ($block) print "<div class=\"small_inner_block\">\n";
+		print "<div class=\"BlockContent\">";
+		if ($block) print "<div class=\"RestrictedBlockHeightRight\">\n";
+		else print "<div class=\"RestrictedBlockHeightMain\">\n";
 		print "<form name=\"messageform\" action=\"\" onsubmit=\"return confirm('".GM_LANG_confirm_message_delete."');\">\n";
 		if (count($usermessages)==0) {
 			print GM_LANG_no_messages."<br />";
 		}
 		else {
 			print "<input type=\"hidden\" name=\"action\" value=\"deletemessage\" />\n";
-			print "<table class=\"list_table\"><tr>\n";
+			print "<table class=\"ListTable\"><tr>\n";
 			print "<td class=\"list_label shade3\">".GM_LANG_delete."</td>\n";
 			print "<td class=\"list_label shade3\">".GM_LANG_message_subject."</td>\n";
 			print "<td class=\"list_label shade3\">".GM_LANG_date_created."</td>\n";
@@ -128,7 +129,7 @@ function print_user_messages($block=true, $config="", $side, $index) {
 			print "</select><input type=\"button\" value=\"".GM_LANG_send."\" onclick=\"message(document.messageform.touser.options[document.messageform.touser.selectedIndex].value, 'messaging2', ''); return false;\" />\n";
 		}
 		print "</form>\n";
-		if ($block) print "</div>\n";
+		print "</div>\n";
 		print "</div>"; // blockcontent
 		print "</div>"; // block
 }

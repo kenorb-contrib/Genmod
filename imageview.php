@@ -173,7 +173,7 @@ PrintSimpleHeader(GM_LANG_imageview);
 print "<form name=\"zoomform\" onsubmit=\"setzoom(document.getElementById('zoomval').value); return false;\" action=\"imageview.php\">";
 if (strstr($filename, "://")) $filename = preg_replace("/ /", "%20", $filename);
 if (!SystemConfig::$MEDIA_IN_DB && (empty($filename) || !@fclose(@fopen($filename,"r")))) {
-	print "<span class=\"error\">".GM_LANG_file_not_found."&nbsp;".$filename."</span>";
+	print "<span class=\"Error\">".GM_LANG_file_not_found."&nbsp;".$filename."</span>";
 	print "<br /><br /><div class=\"center\"><a href=\"javascript:// ".GM_LANG_close_window."\" onclick=\"self.close();\">".GM_LANG_close_window."</a></div>\n";
 }
 else {

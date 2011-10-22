@@ -77,10 +77,10 @@ class FanchartController extends ChartController {
 	}
 
 	public function PrintInputFanStyle() {
-		print "<tr><td class=\"shade2\">";
+		print "<tr><td class=\"NavBlockLabel\">";
 		PrintHelpLink("fan_style_help", "qm");
 		print GM_LANG_fan_chart."</td>";
-		print "<td class=\"shade1\">";
+		print "<td class=\"NavBlockField\">";
 		print "<input type=\"radio\" name=\"fan_style\" value=\"2\"";
 		if ($this->fan_style == 2) print " checked=\"checked\"";
 		print " /> 1/2";
@@ -181,12 +181,12 @@ class FanchartController extends ChartController {
 	
 		// check for GD 2.x library
 		if (!defined("IMG_ARC_PIE")) {
-			print "<span class=\"error\">".GM_LANG_gd_library."</span>";
+			print "<span class=\"Error\">".GM_LANG_gd_library."</span>";
 			print " <a href=\"" . GM_LANG_gd_helplink . "\"><img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["help"]["small"]."\" class=\"icon\" alt=\"\" /></a><br /><br />";
 			return false;
 		}
 		if (!function_exists("ImageTtfBbox")) {
-			print "<span class=\"error\">".GM_LANG_gd_freetype."</span>";
+			print "<span class=\"Error\">".GM_LANG_gd_freetype."</span>";
 			print " <a href=\"" . GM_LANG_gd_helplink . "\"><img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["help"]["small"]."\" class=\"icon\" alt=\"\" /></a><br /><br />";
 			return false;
 		}
@@ -209,7 +209,7 @@ class FanchartController extends ChartController {
 		print "\r\n<!-- trace start\r\n font-family\t=\t$fontfile\r\n-->";
 		if ($fontfile{0}!='/') $fontfile = dirname(__FILE__) . "../" . $fontfile;
 		if (!file_exists($fontfile)) {
-			print "<span class=\"error\">".GM_LANG_fontfile_error." : $fontfile</span>";
+			print "<span class=\"Error\">".GM_LANG_fontfile_error." : $fontfile</span>";
 			return false;
 		}
 		if (intval($fontsize)<2) $fontsize = 7;
@@ -401,7 +401,7 @@ class FanchartController extends ChartController {
 	//print "tx: ".$tx." ty ".$ty."<br />";				
 					print "\n\t\t<div id=\"I".$person->xref.".".$count."links\" style=\"position:absolute; left:".$tx."px; top:".$ty."px; width:".$lbwidth."px; visibility:hidden; z-index:'1000';\">";
 	
-					print "\n\t\t\t<table class=\"person_box\"><tr><td class=\"details1\">";
+					print "\n\t\t\t<table class=\"PersonBox\"><tr><td class=\"details1\">";
 					print "<a href=\"individual.php?pid=".$person->xref."&amp;gedid=".GedcomConfig::$GEDCOMID."\"".$mousecode." class=\"name1\">" . PrintReady($person->name);
 					if (!empty($person->addname)) print "<br />" . PrintReady($person->addname);
 					print "</a>\n";

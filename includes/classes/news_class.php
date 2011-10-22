@@ -78,7 +78,7 @@ class News {
 				return $this->anchor;
 				break;
 			default:
-				print "<span class=\"error\">Invalid property ".$property." for __get in ".get_class($this)." class</span><br />";
+				PrintGetSetError($property, get_class($this), "get");
 				break;
 		}
 	}
@@ -98,7 +98,7 @@ class News {
 				$this->date = $value;
 				break;
 			default:
-				print "<span class=\"error\">Invalid property ".$property." for __set in ".get_class($this)." class</span><br />";
+				PrintGetSetError($property, get_class($this), "set");
 				break;
 		}
 	}

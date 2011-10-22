@@ -55,7 +55,7 @@ if ($action == "phpinfo") {
 		
 		$php_info    = str_replace(" width=\"600\"", " width=\"\"", $php_info);
 		$php_info    = str_replace("</div></body></html>", "", $php_info);
-		$php_info    = str_replace("<table", "<table class=\"center facts_table ltr\"", $php_info);
+		$php_info    = str_replace("<table", "<table class=\"center FactsTable ltr\"", $php_info);
 		$php_info    = str_replace("td class=\"e\"", "td class=\"facts_value wrap\"", $php_info);
 		$php_info    = str_replace("td class=\"v\"", "td class=\"facts_value wrap\"", $php_info);
 		$php_info    = str_replace("tr class=\"v\"", "tr", $php_info);

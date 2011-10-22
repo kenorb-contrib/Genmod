@@ -115,11 +115,11 @@ class ExternalSearchController {
 		
 		// 1. Search form title
 		print "<table class=\"width100\">\n";
-		print "<tr><td colspan=\"3\" class=\"topbottombar\">".GM_LANG_external_search."</td></tr>\n";
+		print "<tr><td colspan=\"3\" class=\"NavBlockHeader\">".GM_LANG_external_search."</td></tr>\n";
 		
 		// 2. Choose search at
-		print "<tr><td class=\"shade2 width40\">".GM_LANG_choose."</td>\n";
-		print "<td class=\"shade1 width60\" colspan=\"2\">";
+		print "<tr><td class=\"NavBlockLabel\">".GM_LANG_choose."</td>\n";
+		print "<td class=\"NavBlockField\" colspan=\"2\">";
 		print "<select name=\"selsearch\" onchange=\"sndReq('esearchform', 'extsearchformprint', 'pid', '".$this->indi->xref."', 'gedcomid', '".$this->indi->gedcomid."', 'formno', document.selarchive.selsearch.value); document.getElementById('esearchresults').innerHTML='';\">\n";
 		foreach ($this->modules as $index => $modobj) {
 			print "<option value=\"".$index."\"";
@@ -138,7 +138,7 @@ class ExternalSearchController {
 		}
 			
 		// Print the hidden input fields and the submit button
-		print "<tr><td class=\"shade2 center\" colspan=\"3\">\n";
+		print "<tr><td class=\"NavBlockFooter\" colspan=\"3\">\n";
 		if ($module->method == "form") {
 			foreach($module->params_hidden as $field => $value) {
 				print "<input type=\"hidden\" name=\"".$field."\" value=\"".$value."\" />\n";
@@ -240,78 +240,78 @@ class ExternalSearchController {
 		if (!isset($tabindex)) $tabindex = 1;
 		switch($field) {
 			case "fullname":
-				print "<tr><td class=\"shade2 width30\">".GM_LANG_name.":</td>";
+				print "<tr><td class=\"NavBlockLabel\">".GM_LANG_name.":</td>";
 				$this->PrintCheckSelect($field, $checked);
-				print "<td class=\"shade1 width60\"><input name=\"".$inputname."\" size=\"25\" value=\"".NameFunctions::CheckNN(NameFunctions::GetNameInRecord($this->indi->gedrec))."\" tabindex=\"".$tabindex."\" /></td></tr>\n";
+				print "<td class=\"NavBlockField\"><input name=\"".$inputname."\" size=\"25\" value=\"".NameFunctions::CheckNN(NameFunctions::GetNameInRecord($this->indi->gedrec))."\" tabindex=\"".$tabindex."\" /></td></tr>\n";
 				break;
 			case "surname":
-				print "<tr><td class=\"shade2\">".GM_LANG_surname."</td>";
+				print "<tr><td class=\"NavBlockLabel\">".GM_LANG_surname."</td>";
 				$this->PrintCheckSelect($field, $checked);
-				print "<td class=\"shade1\"><input name=\"".$inputname."\" size=\"25\" value=\"".($this->indi->name_array[0][2] == "@N.N." ? "" : $this->indi->name_array[0][2])."\" tabindex=\"".$tabindex."\" /></td></tr>\n";
+				print "<td class=\"NavBlockField\"><input name=\"".$inputname."\" size=\"25\" value=\"".($this->indi->name_array[0][2] == "@N.N." ? "" : $this->indi->name_array[0][2])."\" tabindex=\"".$tabindex."\" /></td></tr>\n";
 				break;
 			case "stripsurname":
-				print "<tr><td class=\"shade2\">".GM_LANG_surname."</td>";
+				print "<tr><td class=\"NavBlockLabel\">".GM_LANG_surname."</td>";
 				$this->PrintCheckSelect($field, $checked);
-				print "<td class=\"shade1\"><input name=\"".$inputname."\" size=\"25\" value=\"".($this->indi->name_array[0][2] == "@N.N." ? "" : NameFunctions::StripPrefix($this->indi->name_array[0][2]))."\" tabindex=\"".$tabindex."\" /></td></tr>\n";
+				print "<td class=\"NavBlockField\"><input name=\"".$inputname."\" size=\"25\" value=\"".($this->indi->name_array[0][2] == "@N.N." ? "" : NameFunctions::StripPrefix($this->indi->name_array[0][2]))."\" tabindex=\"".$tabindex."\" /></td></tr>\n";
 				break;
 			case "infix":
-				print "<tr><td class=\"shade2\">".GM_FACT_SPFX.":</td>";
+				print "<tr><td class=\"NavBlockLabel\">".GM_FACT_SPFX.":</td>";
 				$this->PrintCheckSelect($field, $checked);
-				print "<td class=\"shade1\"><input name=\"".$inputname."\" size=\"25\" value=\"".($this->indi->name_array[0][2] == "@N.N." ? "" : trim(str_replace(NameFunctions::StripPrefix($this->indi->name_array[0][2]),"", $this->indi->name_array[0][2])))."\" tabindex=\"".$tabindex."\" /></td></tr>\n";
+				print "<td class=\"NavBlockField\"><input name=\"".$inputname."\" size=\"25\" value=\"".($this->indi->name_array[0][2] == "@N.N." ? "" : trim(str_replace(NameFunctions::StripPrefix($this->indi->name_array[0][2]),"", $this->indi->name_array[0][2])))."\" tabindex=\"".$tabindex."\" /></td></tr>\n";
 				break;
 			case "firstname":
-				print "<tr><td class=\"shade2\">".GM_LANG_firstname.":</td>";
+				print "<tr><td class=\"NavBlockLabel\">".GM_LANG_firstname.":</td>";
 				$this->PrintCheckSelect($field, $checked);
 				$name = trim(substr($this->indi->name_array[0][0], 0, strpos($this->indi->name_array[0][0], "/")));
-				print "<td class=\"shade1\"><input name=\"".$inputname."\" size=\"25\" value=\"".($name == "@P.N." ? "" : $name)."\" tabindex=\"".$tabindex."\" /></td></tr>\n";
+				print "<td class=\"NavBlockField\"><input name=\"".$inputname."\" size=\"25\" value=\"".($name == "@P.N." ? "" : $name)."\" tabindex=\"".$tabindex."\" /></td></tr>\n";
 				break;
 			case "gbdate":
-				print "<tr><td class=\"shade2\">".GM_FACT_BIRT.":</td>";
+				print "<tr><td class=\"NavBlockLabel\">".GM_FACT_BIRT.":</td>";
 				$this->PrintCheckSelect($field, $checked);
-				print "<td class=\"shade1\"><input name=\"".$inputname."\" id=\"".$inputname."\" size=\"25\" value=\"".GetGedcomValue("DATE", 2, $this->indi->bdate, "", false)."\" tabindex=\"".$tabindex."\" />&nbsp;";
+				print "<td class=\"NavBlockField\"><input name=\"".$inputname."\" id=\"".$inputname."\" size=\"25\" value=\"".GetGedcomValue("DATE", 2, $this->indi->bdate, "", false)."\" tabindex=\"".$tabindex."\" />&nbsp;";
 				EditFunctions::PrintCalendarPopup($field);
 				print "</td></tr>\n";
 				break;
 			case "gbyear":
-				print "<tr><td class=\"shade2\">".GM_LANG_birthyear.":</td>";
+				print "<tr><td class=\"NavBlockLabel\">".GM_LANG_birthyear.":</td>";
 				$this->PrintCheckSelect($field, $checked);
 				$date = ParseDate(GetGedcomValue("DATE", 2, $this->indi->bdate, "", false));
 				$year = $date[0]["year"];
-				print "<td class=\"shade1\"><input name=\"".$inputname."\" id=\"".$inputname."\" size=\"25\" value=\"".($year == 0 ? "" : $year)."\" tabindex=\"".$tabindex."\" /></td></tr>\n";
+				print "<td class=\"NavBlockField\"><input name=\"".$inputname."\" id=\"".$inputname."\" size=\"25\" value=\"".($year == 0 ? "" : $year)."\" tabindex=\"".$tabindex."\" /></td></tr>\n";
 				break;
 			case "bplace":
-				print "<tr><td class=\"shade2\">".GM_LANG_birthplac.":</td>";
+				print "<tr><td class=\"NavBlockLabel\">".GM_LANG_birthplac.":</td>";
 				$this->PrintCheckSelect($field, $checked);
-				print "<td class=\"shade1\"><input name=\"".$inputname."\" size=\"25\" value=\"".GetGedcomValue("PLAC", 2, $this->indi->bplac, "", false)."\" tabindex=\"".$tabindex."\" /></td></tr>\n";
+				print "<td class=\"NavBlockField\"><input name=\"".$inputname."\" size=\"25\" value=\"".GetGedcomValue("PLAC", 2, $this->indi->bplac, "", false)."\" tabindex=\"".$tabindex."\" /></td></tr>\n";
 				break;
 			case "gddate":
-				print "<tr><td class=\"shade2\">".GM_FACT_DEAT.":</td>";
+				print "<tr><td class=\"NavBlockLabel\">".GM_FACT_DEAT.":</td>";
 				$this->PrintCheckSelect($field, $checked);
-				print "<td class=\"shade1\"><input name=\"".$inputname."\" id=\"".$inputname."\" size=\"25\" value=\"".GetGedcomValue("DATE", 2, $this->indi->ddate, "", false)."\" tabindex=\"".$tabindex."\" />&nbsp;";
+				print "<td class=\"NavBlockField\"><input name=\"".$inputname."\" id=\"".$inputname."\" size=\"25\" value=\"".GetGedcomValue("DATE", 2, $this->indi->ddate, "", false)."\" tabindex=\"".$tabindex."\" />&nbsp;";
 				EditFunctions::PrintCalendarPopup($field);
 				print "</td></tr>\n";
 				break;
 			case "gdyear":
-				print "<tr><td class=\"shade2\">".GM_LANG_deathyear.":</td>";
+				print "<tr><td class=\"NavBlockLabel\">".GM_LANG_deathyear.":</td>";
 				$this->PrintCheckSelect($field, $checked);
 				$date = ParseDate(GetGedcomValue("DATE", 2, $this->indi->ddate, "", false));
 				$year = $date[0]["year"];
-				print "<td class=\"shade1\"><input name=\"".$inputname."\" id=\"".$inputname."\" size=\"25\" value=\"".($year == 0 ? "" : $year)."\" tabindex=\"".$tabindex."\" /></td></tr>\n";
+				print "<td class=\"NavBlockField\"><input name=\"".$inputname."\" id=\"".$inputname."\" size=\"25\" value=\"".($year == 0 ? "" : $year)."\" tabindex=\"".$tabindex."\" /></td></tr>\n";
 				break;
 			case "dplace":
-				print "<tr><td class=\"shade2\">".GM_LANG_deathplac.":</td>";
+				print "<tr><td class=\"NavBlockLabel\">".GM_LANG_deathplac.":</td>";
 				$this->PrintCheckSelect($field, $checked);
-				print "<td class=\"shade1\"><input name=\"".$inputname."\" size=\"25\" value=\"".GetGedcomValue("PLAC", 2, $this->indi->dplac, "", false)."\" tabindex=\"".$tabindex."\" /></td></tr>\n";
+				print "<td class=\"NavBlockField\"><input name=\"".$inputname."\" size=\"25\" value=\"".GetGedcomValue("PLAC", 2, $this->indi->dplac, "", false)."\" tabindex=\"".$tabindex."\" /></td></tr>\n";
 				break;
 			case "ggender":
-				print "<tr><td class=\"shade2\">".GM_LANG_sex.":</td>";
+				print "<tr><td class=\"NavBlockLabel\">".GM_LANG_sex.":</td>";
 				$this->PrintCheckSelect($field, $checked);
-				print "<td class=\"shade1\">";
+				print "<td class=\"NavBlockField\">";
 				EditFunctions::PrintGender($field, $field, $this->indi->sex, $tabindex);
 				print "</td></tr>\n";
 				break;
 			case "gplace":
-				print "<tr><td class=\"shade2\">".GM_FACT_PLAC.":</td>";
+				print "<tr><td class=\"NavBlockLabel\">".GM_FACT_PLAC.":</td>";
 				$this->PrintCheckSelect($field, $checked);
 				$plac = "";
 				foreach ($this->indi->facts as $key =>$factobj) {
@@ -320,31 +320,31 @@ class ExternalSearchController {
 						break;
 					}
 				}
-				print "<td class=\"shade1\"><input name=\"".$inputname."\" size=\"25\" value=\"".$plac."\" tabindex=\"".$tabindex."\" /></td></tr>\n";
+				print "<td class=\"NavBlockField\"><input name=\"".$inputname."\" size=\"25\" value=\"".$plac."\" tabindex=\"".$tabindex."\" /></td></tr>\n";
 				break;
 			case "yrange1":
 				$this->hasrange = true;
 				$this->range1 = $inputname;
-				print "<tr><td class=\"shade2\">".GM_LANG_year_range_start.":</td>";
+				print "<tr><td class=\"NavBlockLabel\">".GM_LANG_year_range_start.":</td>";
 				$this->PrintCheckSelect($field, $checked);
 				if ($this->indi->brec != "") {
 					$year = ParseDate(GetGedcomValue("DATE", 2, $this->indi->brec, "", false));
 					$byear = $year[0]["year"];
 				}
 				else $byear = "";
-				print "<td class=\"shade1\"><input name=\"".$inputname."\" size=\"4\" value=\"".($byear == 0 ? "" : $byear)."\" tabindex=\"".$tabindex."\" /></td></tr>\n";
+				print "<td class=\"NavBlockField\"><input name=\"".$inputname."\" size=\"4\" value=\"".($byear == 0 ? "" : $byear)."\" tabindex=\"".$tabindex."\" /></td></tr>\n";
 				break;
 			case "yrange2":
 				$this->hasrange = true;
 				$this->range2 = $inputname;
-				print "<tr><td class=\"shade2\">".GM_LANG_year_range_end.":</td>";
+				print "<tr><td class=\"NavBlockLabel\">".GM_LANG_year_range_end.":</td>";
 				$this->PrintCheckSelect($field, $checked);
 				if ($this->indi->drec != "") {
 					$year = ParseDate(GetGedcomValue("DATE", 2, $this->indi->drec, "", false));
 					$dyear = $year[0]["year"];
 				}
 				else $dyear = "";
-				print "<td class=\"shade1\"><input name=\"".$inputname."\" size=\"4\" value=\"".($dyear == 0 ? "" : $dyear)."\" tabindex=\"".$tabindex."\" /></td></tr>\n";
+				print "<td class=\"NavBlockField\"><input name=\"".$inputname."\" size=\"4\" value=\"".($dyear == 0 ? "" : $dyear)."\" tabindex=\"".$tabindex."\" /></td></tr>\n";
 				break;
 		}
 		$tabindex++;
@@ -352,7 +352,7 @@ class ExternalSearchController {
 	
 	private function PrintCheckSelect($field, $checked) {
 		
-		print "<td class=\"shade2 center width10\"><input type=\"checkbox\" name=\"".$field."_checked\" ".($checked ? "checked=\"checked\" " : "")."value=\"yes\" /></td>";
+		print "<td class=\"NavBlockLabel\"><input type=\"checkbox\" name=\"".$field."_checked\" ".($checked ? "checked=\"checked\" " : "")."value=\"yes\" /></td>";
 	}
 	
 	public function GetParams($number) {
@@ -364,8 +364,8 @@ class ExternalSearchController {
 
 	public function PrintServiceResults($number, $params) {
 		
-		print "<div class=\"topbottombar width100\" style=\"margin-left:10px; margin-top:2px; margin-right:0px;\">".GM_LANG_um_results."</div>\n";
-		print "<div class=\"shade2 width100\" style=\"margin-left:10px; padding:10px;\">\n";
+		print "<div class=\"NavBlockHeader\">".GM_LANG_um_results."</div>\n";
+		print "<div class=\"ListTableContent\">\n";
 		
 		$module = $this->modules[$number];
 		$query = $module->GetQuery($params);

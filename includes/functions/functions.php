@@ -670,7 +670,7 @@ function GetRelationship(&$pid1, &$pid2, $followspouse=true, $maxlength=0, $igno
 		$end_time = GetMicrotime();
 		$exectime = $end_time - $start_time;
 		if (GedcomConfig::$TIME_LIMIT > 1 && $exectime > GedcomConfig::$TIME_LIMIT - 1) {
-			print "<span class=\"error\">".GM_LANG_timeout_error."</span>\n";
+			print "<span class=\"Error\">".GM_LANG_timeout_error."</span>\n";
 			return false;
 		}
 		if (count($p1nodes) == 0) {

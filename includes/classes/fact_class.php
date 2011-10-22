@@ -139,7 +139,7 @@ class Fact {
 				return $this->getFactDescription();
 				break;
 			default:
-				print "<span class=\"error\">Invalid property ".$property." for __get in ".get_class($this)." class</span><br />";
+				PrintGetSetError($property, get_class($this), "get");
 				break;
 		}
 	}
@@ -154,7 +154,7 @@ class Fact {
 				$this->factrec = $value;
 				break;
 			default:
-				print "<span class=\"error\">Invalid property ".$property." for __set in ".get_class($this)." class</span><br />";
+				PrintGetSetError($property, get_class($this), "set");
 				break;
 		}
 	}
@@ -401,7 +401,7 @@ class Fact {
 		// print gedcom ages
 		foreach ($ages as $indexval=>$agerec) {
 			if (!empty($agerec)) {
-				$prtstr .= "<span class=\"label\">";
+				$prtstr .= "<span class=\"FactDetailLabel\">";
 				if ($indexval == 1) $prtstr .= GM_LANG_husband;
 				else if ($indexval == 2) $prtstr .= GM_LANG_wife;
 				else $prtstr .= GM_FACT_AGE;
@@ -504,13 +504,13 @@ class Fact {
 				$cts = preg_match("/\d LATI (.*)/", $placerec, $match);
 				if ($cts>0) {
 					$map_lati = trim($match[1]);
-					$prtstr .= "<br />".GM_FACT_LATI.": ".$match[1];
+					$prtstr .= "<br /><span class=\"FactDetailLabel\">".GM_FACT_LATI.": </span><span class=\"FactDetailField\">".$match[1]."</span>";
 				}
 				$map_long="";
 				$cts = preg_match("/\d LONG (.*)/", $placerec, $match);
 				if ($cts>0) {
 					$map_long = trim($match[1]);
-					$prtstr .= " ".GM_FACT_LONG.": ".$match[1];
+					$prtstr .= " <span class=\"FactDetailLabel\">".GM_FACT_LONG.": </span><span class=\"FactDetailField\">".$match[1]."</span>";
 				}
 				if (!empty($map_lati) and !empty($map_long)) {
 					$prtstr .= " <a target=\"_BLANK\" href=\"http://www.mapquest.com/maps/map.adp?searchtype=address&formtype=latlong&latlongtype=decimal&latitude=".$map_lati."&longitude=".$map_long."\"><img src=\"images/mapq.gif\" border=\"0\" alt=\"Mapquest &copy;\" title=\"Mapquest &copy;\" /></a>";

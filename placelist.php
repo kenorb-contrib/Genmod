@@ -217,7 +217,7 @@ if ($placelist_controller->display == "hierarchy") {
 	// -- print the array
 	foreach ($placelist as $key => $value) {
 		if ($i==0) {
-			print "\n\t<br />\n\t<table align=\"center\" class=\"list_table $TEXT_DIRECTION\"";
+			print "\n\t<br />\n\t<table align=\"center\" class=\"ListTable $TEXT_DIRECTION\"";
 			if ($TEXT_DIRECTION=="rtl") print " dir=\"rtl\"";
 			print ">\n\t\t<tr>\n\t\t<td class=\"shade2 center\" ";
 			if ($ct1 > 20) print "colspan=\"3\"";
@@ -294,7 +294,7 @@ if ($placelist_controller->level > 0) {
 		// -- array of names
 		$positions = $placelist_controller->GetPlacePositions($placelist_controller->parent, $placelist_controller->level, $placelist_controller->select);
 
-		print "\n\t<br /><br /><table class=\"list_table $TEXT_DIRECTION center\">\n\t\t<tr>";
+		print "\n\t<br /><br /><table class=\"ListTable $TEXT_DIRECTION\">\n\t\t<tr>";
 		$ci = count($placelist_controller->indi_total);
 		$cs = count($placelist_controller->sour_total);
 		$cf = count($placelist_controller->fam_total);
@@ -392,7 +392,7 @@ if ($placelist_controller->display=="list") {
 		print "<b>".GM_LANG_no_results."</b><br />";
 	}
 	else {
-		print "\n\t<table class=\"list_table $TEXT_DIRECTION\"";
+		print "\n\t<table class=\"ListTable $TEXT_DIRECTION\"";
 		if ($TEXT_DIRECTION=="rtl") print " dir=\"rtl\"";
 		print ">\n\t\t<tr>\n\t\t<td class=\"list_label\" ";
 		$ct = count($placelist);

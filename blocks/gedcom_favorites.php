@@ -38,13 +38,14 @@ function print_gedcom_favorites($block = true, $config="", $side, $index) {
 	
 	$userfavs = FavoritesController::getGedcomFavorites(GedcomConfig::$GEDCOMID);
 	if (!is_array($userfavs)) $userfavs = array();
-	print "<div id=\"gedcom_favorites\" class=\"block\">\n";
-	print "<div class=\"blockhc\">";
+	print "<div id=\"gedcom_favorites\" class=\"BlockContainer\">\n";
+	print "<div class=\"BlockHeader\">";
 	PrintHelpLink("index_favorites_help", "qm", "gedcom_favorites");
 	print GM_LANG_gedcom_favorites." &lrm;(".count($userfavs).")&lrm;";
 	print "</div>";
-	print "<div class=\"blockcontent\">";
-	if ($block) print "<div class=\"small_inner_block\">\n";
+	print "<div class=\"BlockContent\">";
+	if ($block) print "<div class=\"RestrictedBlockHeightRight\">\n";
+	else print "<div class=\"RestrictedBlockHeightMain\">\n";
 	if (count($userfavs)==0) {
 		if ($gm_user->userGedcomAdmin()) PrintText("no_favorites");
 		else PrintText("no_gedcom_favorites");
@@ -55,7 +56,7 @@ function print_gedcom_favorites($block = true, $config="", $side, $index) {
 	if ($gm_user->userGedcomAdmin()) { 
 		BlockFunctions::PrintBlockAddFavorite($command, "gedcom", $side);
 	}
-	if ($block) print "</div>\n";
+	print "</div>\n";
 	print "</div>"; // blockcontent
 	print "</div>"; // block
 }

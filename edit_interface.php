@@ -199,7 +199,7 @@ else if (!empty($famid)) {
 }
 else {
 	if (($action!="addchild")&&($action!="addchildaction")&&($action!="submitter")) {
-		print "<span class=\"error\">The \$pid variable was empty.	Unable to perform $action.</span>";
+		print "<span class=\"Error\">The \$pid variable was empty.	Unable to perform $action.</span>";
 		PrintSimpleFooter();
 		exit;
 		// exit added, what's the following line for?
@@ -287,7 +287,7 @@ switch ($action) {
 		else {
 			// As the whole level 0 record is rewritten, we can only do one change at the time
 			if ($object->ischanged) {
-				print "<br /><span class=\"error\">".GM_LANG_approve_first.": ".$pid."</span>";
+				print "<br /><span class=\"Error\">".GM_LANG_approve_first.": ".$pid."</span>";
 				PrintSimpleFooter();
 				exit;
 			}
@@ -301,7 +301,7 @@ switch ($action) {
 		print "<input type=\"hidden\" name=\"fact\" value=\"SUBM\" />\n";
 		print "<input type=\"hidden\" name=\"change_type\" value=\"submitter_record\" />\n";
 		print "<input type=\"hidden\" name=\"pid_type\" value=\"SUBM\" />\n";
-		print "<table class=\"facts_table\">";
+		print "<table class=\"FactsTable\">";
 		EditFunctions::SubmitterRecord(0, $gedrec);
 		print "</table>";
 		if ($gm_user->UserCanAccept() && !$gm_user->userAutoAccept()) print "<br /><input name=\"aa_attempt\" type=\"checkbox\" value=\"1\" />".GM_LANG_attempt_auto_acc."<br />\n";
@@ -414,7 +414,7 @@ switch ($action) {
 	// NOTE: Done for Genmod 2.0
 	case "deletemedia":
 		if (!$factedit) {
-			print "<br /><span class=\"error\">";
+			print "<br /><span class=\"Error\">";
 			print GM_LANG_privacy_prevented_editing;
 			if (!empty($pid)) print "<br />".GM_LANG_privacy_not_granted." pid $pid.";
 			print "</span><br />";
@@ -454,7 +454,7 @@ switch ($action) {
 			<input type="hidden" name="pid" value="<?php print $pid; ?>" />
 			<input type="hidden" name="pid_type" value="<?php print $pid_type; ?>" />
 			<input type="hidden" name="change_type" value="<?php print $change_type; ?>" />
-			<table class="facts_table">
+			<table class="FactsTable">
 			<tr><td class="topbottombar" colspan="2">
 			<?php PrintHelpLink("reorder_media_help", "qm", "reorder_media"); ?>
 			<?php print GM_LANG_reorder_media; ?>
@@ -514,7 +514,7 @@ switch ($action) {
 			if ($success) print "<br /><br />".GM_LANG_update_successful;
 		}
 		else {
-			print "<br /><span class=\"error\">".GM_LANG_invalid_order."</span><br />";
+			print "<br /><span class=\"Error\">".GM_LANG_invalid_order."</span><br />";
 			$success = false;
 		}
 		break;
@@ -530,7 +530,7 @@ switch ($action) {
 			<input type="hidden" name="pid_type" value="<?php print $pid_type; ?>" />
 			<input type="hidden" name="change_type" value="<?php print $change_type; ?>" />
 			<input type="hidden" name="option" value="bybirth" />
-			<table class="facts_table">
+			<table class="FactsTable">
 			<tr><td class="topbottombar" colspan="2">
 			<?php PrintHelpLink("reorder_children_help", "qm", "reorder_children"); ?>
 			<?php print GM_LANG_reorder_children; ?>
@@ -599,7 +599,7 @@ switch ($action) {
 			if ($success) print "<br /><br />".GM_LANG_update_successful;
 		}
 		else {
-			print "<br /><span class=\"error\">".GM_LANG_invalid_order."</span><br />";
+			print "<br /><span class=\"Error\">".GM_LANG_invalid_order."</span><br />";
 			$success = false;
 		}
 		break;
@@ -614,7 +614,7 @@ switch ($action) {
 			<input type="hidden" name="change_type" value="<?php print $change_type; ?>" />
 			<input type="hidden" name="pid_type" value="<?php print $pid_type; ?>" />
 			<input type="hidden" name="option" value="bymarriage" />
-			<table class="facts_table">
+			<table class="FactsTable">
 			<tr><td class="topbottombar <?php print $TEXT_DIRECTION; ?>" colspan="2">
 			<?php PrintHelpLink("reorder_families_help", "qm", "reorder_families"); ?>
 			<?php print GM_LANG_reorder_families; ?>
@@ -685,7 +685,7 @@ switch ($action) {
 			if ($success) print "<br /><br />".GM_LANG_update_successful;
 		}
 		else {
-			print "<br /><span class=\"error\">".GM_LANG_invalid_order."</span><br />";
+			print "<br /><span class=\"Error\">".GM_LANG_invalid_order."</span><br />";
 			$success = false;
 		}
 		break;
@@ -699,7 +699,7 @@ switch ($action) {
 			<input type="hidden" name="pid" value="<?php print $pid; ?>" />
 			<input type="hidden" name="pid_type" value="<?php print $pid_type; ?>" />
 			<input type="hidden" name="change_type" value="<?php print $change_type; ?>" />
-			<table class="facts_table">
+			<table class="FactsTable">
 				<tr><td class="topbottombar <?php print $TEXT_DIRECTION; ?>" colspan="3">
 				<?php PrintHelpLink("relation_families_help", "qm", "relation_families"); ?>
 				<?php print GM_LANG_relation_families; ?>
@@ -789,7 +789,7 @@ switch ($action) {
 			if ($success) print "<br /><br />".GM_LANG_update_successful;
 		}
 		else {
-			print "<br /><span class=\"error\">".GM_LANG_invalid_birthfams."</span><br />";
+			print "<br /><span class=\"Error\">".GM_LANG_invalid_birthfams."</span><br />";
 			$success = false;
 		}
 		
@@ -1215,7 +1215,7 @@ switch ($action) {
 			// We don't know the pid type, as the pid is selected on this page and can be anything
 			if ($change_type == "add_media_link") print "<input type=\"hidden\" name=\"pid_type\" value=\"\" />\n";
 			else print "<input type=\"hidden\" name=\"pid_type\" value=\"".$pid_type."\" />\n";
-			print "<table class=\"facts_table\">";
+			print "<table class=\"FactsTable\">";
 			
 			if (!in_array($fact, $separatorfacts)) EditFunctions::AddTagSeparator($fact);
 			if ($change_type == "add_media_link") {
@@ -1570,7 +1570,7 @@ switch ($action) {
 		print "<input type=\"hidden\" name=\"famtag\" value=\"".$famtag."\" />\n";
 		print "<input type=\"hidden\" name=\"change_type\" value=\"".$change_type."\" />\n";
 		print "<input type=\"hidden\" name=\"pid_type\" value=\"".$pid_type."\" />\n";
-		print "<table class=\"facts_table\">";
+		print "<table class=\"FactsTable\">";
 		print "<tr>";
 		EditFunctions::AddTagSeparator($change_type);
 		print "</tr>";
@@ -1637,7 +1637,7 @@ switch ($action) {
 		print "<input type=\"hidden\" name=\"change_type\" value=\"".$change_type."\" />\n";
 		print "<input type=\"hidden\" name=\"pid_type\" value=\"".$pid_type."\" />\n";
 		print "<input type=\"hidden\" name=\"famtag\" value=\"".$famtag."\" />\n";
-		print "<table class=\"facts_table\">";
+		print "<table class=\"FactsTable\">";
 		print "<tr>";
 		EditFunctions::AddTagSeparator("link_as_child");
 		print "<td class=\"shade2\">".GM_LANG_family."</td>";
@@ -1697,7 +1697,7 @@ switch ($action) {
 						$success = $success && EditFunctions::ReplaceGedrec($pid, "", $newrec, $itag, $change_id, $change_type, "", "INDI");
 					}
 					else {
-						print "<span class=\"error\">".GM_LANG_child_present."</span>";
+						print "<span class=\"Error\">".GM_LANG_child_present."</span>";
 						$success = false;
 					}
 				}
@@ -1707,8 +1707,8 @@ switch ($action) {
 					$ct = preg_match("/1 $famtag @(.*)@/", $famrec, $match);
 					if ($ct>0) {
 						$spid = trim($match[1]);
-						if ($famtag == "HUSB") print "<span class=\"error\">".GM_LANG_husb_present."</span>";
-						else if ($famtag == "WIFE") print "<span class=\"error\">".GM_LANG_wife_present."</span>";
+						if ($famtag == "HUSB") print "<span class=\"Error\">".GM_LANG_husb_present."</span>";
+						else if ($famtag == "WIFE") print "<span class=\"Error\">".GM_LANG_wife_present."</span>";
 						print "<br />";
 						$spouse =& Person::GetInstance($spid);
 						print constant("GM_FACT_".$famtag).": ".$spouse->name;
@@ -1727,7 +1727,7 @@ switch ($action) {
 				}
 				if ($success) print "<br /><br />".GM_LANG_update_successful;
 			}
-			else print "<span class=\"error\">".GM_LANG_family_not_found.": ".$famid."</span>";
+			else print "<span class=\"Error\">".GM_LANG_family_not_found.": ".$famid."</span>";
 		}
 		break;	
 		
@@ -1889,7 +1889,7 @@ switch ($action) {
 		<input type="hidden" name="pid" value="newsour" />
 		<input type="hidden" name="pid_type" value="<php print $pid_type; ?>" />
 		<input type="hidden" name="change_type" value="<?php print $change_type; ?>" />
-		<table class="facts_table"><?php
+		<table class="FactsTable"><?php
 		
 		EditFunctions::AddTagSeparator("create_source");
 		// 1 TITL
@@ -1968,7 +1968,7 @@ switch ($action) {
 			<input type="hidden" name="pid" value="newrepo" />
 			<input type="hidden" name="pid_type" value="<php print $pid_type; ?>" />
 			<input type="hidden" name="change_type" value="<?php print $change_type; ?>" />
-			<table class="facts_table">
+			<table class="FactsTable">
 				<?php EditFunctions::AddTagSeparator("create_repository"); ?>
 				<tr><td class="shade2"><?php print GM_FACT_NAME; ?></td>
 				<td class="shade1"><input tabindex="<?php print $tabkey; ?>" type="text" name="NAME" id="NAME" value="" size="40" maxlength="255" /> <?php LinkFunctions::PrintSpecialCharLink("NAME"); ?></td></tr>
@@ -2051,7 +2051,7 @@ switch ($action) {
 		<input type="hidden" name="pid" value="newgnote" />
 		<input type="hidden" name="pid_type" value="<php print $pid_type; ?>" />
 		<input type="hidden" name="change_type" value="<?php print $change_type; ?>" />
-		<table class="facts_table"><?php
+		<table class="FactsTable"><?php
 		
 //		EditFunctions::AddTagSeparator("create_gnote");
 
@@ -2069,7 +2069,7 @@ switch ($action) {
 	case "addgnoteaction":
 
 		if (empty($NOTE)) {
-			print "<span class=\"error\">".GM_LANG_no_empty_notes."</span>";
+			print "<span class=\"Error\">".GM_LANG_no_empty_notes."</span>";
 		}
 		else {
 			$change_id = EditFunctions::GetNewXref("CHANGE");
@@ -2098,7 +2098,7 @@ switch ($action) {
 		print "<input type=\"hidden\" name=\"change_type\" value=\"".$change_type."\" />";
 		print "<input type=\"hidden\" name=\"pid_type\" value=\"".$pid_type."\" />";
 		print "<input type=\"hidden\" name=\"pid\" value=\"".$pid."\" />";
-		print "<table class=\"facts_table\">";
+		print "<table class=\"FactsTable\">";
 		$orgfact = $fact;
 //		if ($fact == "OBJE" && $change_type == "edit_media_link") {
 //			$oldrec = GetSubRecord(1, "1 $fact", $gedrec, $count);
@@ -2376,7 +2376,7 @@ switch ($action) {
 		print "<input type=\"hidden\" name=\"pid_type\" value=\"".$pid_type."\" />\n";
 		print "<input type=\"hidden\" name=\"famid\" value=\"new\" />\n";
 		print "<input type=\"hidden\" name=\"famtag\" value=\"".$famtag."\" />\n";
-		print "<table class=\"facts_table\">";
+		print "<table class=\"FactsTable\">";
 		EditFunctions::AddTagSeparator($famtag);
 		print "<tr><td class=\"shade2\">";
 		if ($famtag=="WIFE") print GM_LANG_wife;
@@ -2473,7 +2473,7 @@ switch ($action) {
 					if ($famtag == "HUSB") print GM_LANG_husband_added;
 					else if ($famtag == "WIFE") print GM_LANG_wife_added;
 				}
-				else print "<br /><span class=\"error\">".GM_LANG_person_not_found.": ".$spid."</span>";
+				else print "<br /><span class=\"Error\">".GM_LANG_person_not_found.": ".$spid."</span>";
 			}
 		}
 		break;
@@ -2568,7 +2568,7 @@ switch ($action) {
 		if (count($_FILES)>0) {
 			$result = MediaFS::UploadFiles($_FILES, $folder, true);
 			if ($result["errno"] != 0) {
-				print "<span class=\"error\">".GM_LANG_upload_error."<br />".$result["error"]."</span><br />";
+				print "<span class=\"Error\">".GM_LANG_upload_error."<br />".$result["error"]."</span><br />";
 			}
 			else {
 				print $result["error"];

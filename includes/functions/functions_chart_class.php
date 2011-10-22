@@ -35,7 +35,7 @@ abstract class ChartFunctions {
 	 */
 	public function PrintSosaNumber($sosa, $pid = "") {
 		
-		print "<td class=\"subheaders\" style=\"vertical-align: middle; white-space: nowrap;\">";
+		print "<td class=\"SubHeader\" style=\"vertical-align: middle; white-space: nowrap;\">";
 		print $sosa;
 		if ($sosa != "1") {
 			print "<br />";
@@ -68,7 +68,7 @@ abstract class ChartFunctions {
 		print "\r\n\r\n<p style='page-break-before:always' />\r\n";
 		print "<a name=\"".$family->xref."\"></a>\r\n";
 		
-		print "<p class=\"name_head\">".$family->name;
+		print "<p class=\"PageTitleName\">".$family->name;
 		if ($family->addname != "") print "<br />".$family->addname;
 		print "</p>\r\n";
 		

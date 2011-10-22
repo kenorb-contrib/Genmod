@@ -921,7 +921,7 @@ abstract class SearchFunctions {
 		if (count($controller->indi_total) > 0 && !is_null($controller->srindi)) {
 			
 			$cti = count($controller->printindiname);
-			print "\n\t<table class=\"list_table ".$TEXT_DIRECTION."\">\n\t\t<tr><td class=\"shade2 center\"";
+			print "\n\t<table class=\"ListTable ".$TEXT_DIRECTION."\">\n\t\t<tr><td class=\"shade2 center\"";
 			if($cti > 12) print " colspan=\"2\"";
 			print "><img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["indis"]["small"]."\" border=\"0\" title=\"".GM_LANG_people."\" alt=\"".GM_LANG_individuals."\" />&nbsp;&nbsp;";
 			print GM_LANG_individuals;
@@ -954,7 +954,7 @@ abstract class SearchFunctions {
 		if (count($controller->fam_total) > 0) {
 		
 			$ctf = count($controller->printfamname);
-			print "\n\t<table class=\"list_table ".$TEXT_DIRECTION."\">\n\t\t<tr><td class=\"shade2 center\"";
+			print "\n\t<table class=\"ListTable ".$TEXT_DIRECTION."\">\n\t\t<tr><td class=\"shade2 center\"";
 			if ($ctf > 12) print " colspan=\"2\"";
 			print "><img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["sfamily"]["small"]."\" border=\"0\" alt=\"".GM_LANG_families."\" />&nbsp;&nbsp;";
 			print GM_LANG_families;
@@ -987,7 +987,7 @@ abstract class SearchFunctions {
 		if (count($controller->sour_total) > 0) {
 			
 			$cts = count($controller->printsource);
-			print "\n\t<table class=\"list_table $TEXT_DIRECTION\">\n\t\t<tr><td class=\"shade2 center\"";
+			print "\n\t<table class=\"ListTable $TEXT_DIRECTION\">\n\t\t<tr><td class=\"shade2 center\"";
 			if($cts > 12) print " colspan=\"2\"";
 			print "><img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["source"]["small"]."\" border=\"0\" alt=\"".GM_LANG_sources."\" />&nbsp;&nbsp;";
 			print GM_LANG_sources;
@@ -1019,7 +1019,7 @@ abstract class SearchFunctions {
 		if (count($controller->repo_total) > 0) {
 			
 			$ctr = count($controller->printrepo);
-			print "\n\t<table class=\"list_table $TEXT_DIRECTION\">\n\t\t<tr><td class=\"shade2 center\"";
+			print "\n\t<table class=\"ListTable $TEXT_DIRECTION\">\n\t\t<tr><td class=\"shade2 center\"";
 			if($ctr > 12) print " colspan=\"2\"";
 			print "><img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["repository"]["small"]."\" border=\"0\" alt=\"".GM_LANG_search_repos."\" />&nbsp;&nbsp;";
 			print GM_LANG_search_repos;
@@ -1051,7 +1051,7 @@ abstract class SearchFunctions {
 		if (count($controller->note_total) > 0) {
 			
 			$ctn = count($controller->printnote);
-			print "\n\t<table class=\"list_table $TEXT_DIRECTION\">\n\t\t<tr><td class=\"shade2 center\"";
+			print "\n\t<table class=\"ListTable $TEXT_DIRECTION\">\n\t\t<tr><td class=\"shade2 center\"";
 			if($ctn > 12) print " colspan=\"2\"";
 			print "><img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["note"]["other"]."\" border=\"0\" alt=\"".GM_LANG_notes."\" />&nbsp;&nbsp;";
 			print GM_LANG_notes;

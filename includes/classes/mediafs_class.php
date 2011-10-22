@@ -289,7 +289,7 @@ abstract class MediaFS {
 				}
 			}
 		}
-		if (!$linked) print "<span class=\"error\">".GM_LANG_media_not_linked."</span>";
+		if (!$linked) print "<span class=\"Error\">".GM_LANG_media_not_linked."</span>";
 		print "</td>";
 	}
 	
@@ -718,7 +718,7 @@ abstract class MediaFS {
 						}
 					}
 					if (!empty($result["error"])) {
-//						print "<span class=\"error\">".$error."</span><br />";
+//						print "<span class=\"Error\">".$error."</span><br />";
 						return $result;
 					}
 					$result["error"] = GM_LANG_upload_successful;

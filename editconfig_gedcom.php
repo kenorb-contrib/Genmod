@@ -463,7 +463,7 @@ if (!isset($themeselect)) $themeselect="";
 
 <form enctype="multipart/form-data" method="post" name="configform" action="editconfig_gedcom.php">
 
-<table class="facts_table <?php print $TEXT_DIRECTION ?>">
+<table class="FactsTable <?php print $TEXT_DIRECTION ?>">
   <tr>
     <td colspan="2" class="shade3 facts_label center"><?php
     	print "<h3>".GM_LANG_gedconf_head." - ";
@@ -486,17 +486,17 @@ if (!isset($themeselect)) $themeselect="";
 <input type="hidden" name="old_DAYS_TO_SHOW_LIMIT" value="<?php print GedcomConfig::$DAYS_TO_SHOW_LIMIT; ?>" />
 <input type="hidden" name="NEW_LAST_CHANGE_EMAIL" value="<?php print GedcomConfig::$LAST_CHANGE_EMAIL; ?>" />
 <?php
-	if (!empty($error_msg)) print "<br /><span class=\"error\">".$error_msg."</span><br />\n";
+	if (!empty($error_msg)) print "<br /><span class=\"Error\">".$error_msg."</span><br />\n";
 	$i = 0;
 ?>
 
-<table class="facts_table"><tr><td class="topbottombar <?php print $TEXT_DIRECTION;?>">
+<table class="FactsTable"><tr><td class="topbottombar <?php print $TEXT_DIRECTION;?>">
 <?php
 print "<a href=\"javascript: ".htmlentities(GM_LANG_gedcom_conf)."\" onclick=\"expand_layer('file-options'); return false;\"><img id=\"file-options_img\" src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["minus"]["other"]."\" border=\"0\" width=\"11\" height=\"11\" alt=\"\" /></a>";
 print "&nbsp;<a href=\"javascript: ".htmlentities(GM_LANG_gedcom_conf)."\" onclick=\"expand_layer('file-options'); return false;\">".GM_LANG_gedcom_conf."</a>";
 ?></td></tr></table>
 <div id="file-options" style="display: block">
-<table class="facts_table">
+<table class="FactsTable">
 	<tr>
 		<td class="shade2 wrap width20">
 		<?php
@@ -521,7 +521,7 @@ print "&nbsp;<a href=\"javascript: ".htmlentities(GM_LANG_gedcom_conf)."\" oncli
 				if (strtolower(substr(trim($path.$GEDFILENAME), -4)) != ".ged") $GEDFILENAME .= ".ged";
 			}
 			if (!strstr($GEDCOMPATH, "://") && !file_exists($path.$GEDFILENAME)) {
-				print "<br /><span class=\"error\">".str_replace("#GEDCOM#", $GEDCOMPATH, GM_LANG_error_header)."</span>\n";
+				print "<br /><span class=\"Error\">".str_replace("#GEDCOM#", $GEDCOMPATH, GM_LANG_error_header)."</span>\n";
 			}
 		}
 		?>
@@ -624,7 +624,7 @@ print "&nbsp;<a href=\"javascript: ".htmlentities(GM_LANG_gedcom_conf)."\" oncli
 					}
 			    }
 			    else {
-					print "<span class=\"error\">";
+					print "<span class=\"Error\">";
 					print GM_LANG_unable_to_find_indi;
 					print "</span>";
 				}
@@ -651,7 +651,7 @@ print "&nbsp;<a href=\"javascript: ".htmlentities(GM_LANG_gedcom_conf)."\" oncli
 	</tr>
 	</table>
 	<div id="hebrew-cal" style="display: <?php if ((GedcomConfig::$CALENDAR_FORMAT=='jewish')||(GedcomConfig::$CALENDAR_FORMAT=='jewish_and_gregorian')||(GedcomConfig::$CALENDAR_FORMAT=='hebrew')||(GedcomConfig::$CALENDAR_FORMAT=='hebrew_and_gregorian')) print 'block'; else print 'none';?>;">
-	<table class="facts_table">
+	<table class="FactsTable">
 	<tr>
 		<td class="shade2 wrap width20">
 		<div class="helpicon"><?php PrintHelpLink("DISPLAY_JEWISH_THOUSANDS_help", "qm", "DISPLAY_JEWISH_THOUSANDS"); print "</div><div class=\"description\">"; print GM_LANG_DISPLAY_JEWISH_THOUSANDS;?></div></td>
@@ -681,7 +681,7 @@ print "&nbsp;<a href=\"javascript: ".htmlentities(GM_LANG_gedcom_conf)."\" oncli
 	</tr>
 	</table>
 	</div>
-	<table class="facts_table">
+	<table class="FactsTable">
 	<tr>
 		<td class="shade2 wrap width20">
 		<div class="helpicon"><?php PrintHelpLink("USE_RTL_FUNCTIONS_help", "qm", "USE_RTL_FUNCTIONS"); print "</div><div class=\"description\">"; print GM_LANG_USE_RTL_FUNCTIONS;?></div></td>
@@ -752,13 +752,13 @@ print "&nbsp;<a href=\"javascript: ".htmlentities(GM_LANG_gedcom_conf)."\" oncli
 </table>
 </div>
 
-<table class="facts_table"><tr><td class="topbottombar <?php print $TEXT_DIRECTION;?>">
+<table class="FactsTable"><tr><td class="topbottombar <?php print $TEXT_DIRECTION;?>">
 <?php
 print "<a href=\"javascript: ".htmlentities(GM_LANG_media_conf)."\" onclick=\"expand_layer('config-media');return false;\"><img id=\"config-media_img\" src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["plus"]["other"]."\" border=\"0\" width=\"11\" height=\"11\" alt=\"\" /></a>";
 print "&nbsp;<a href=\"javascript: ".htmlentities(GM_LANG_media_conf)."\" onclick=\"expand_layer('config-media');return false;\">".GM_LANG_media_conf."</a>";
 ?></td></tr></table>
 <div id="config-media" style="display: none">
-<table class="facts_table">
+<table class="FactsTable">
 	<tr>
 		<td class="shade2 wrap width20"><div class="helpicon"><?php PrintHelpLink("MEDIA_EXTERNAL_help", "qm", "MEDIA_EXTERNAL"); print "</div><div class=\"description\">"; print GM_LANG_MEDIA_EXTERNAL;?></div></td>
 		<td class="shade1"><select name="NEW_MEDIA_EXTERNAL" tabindex="<?php $i++; print $i?>">
@@ -771,7 +771,7 @@ print "&nbsp;<a href=\"javascript: ".htmlentities(GM_LANG_media_conf)."\" onclic
 		<td class="shade2 wrap"><div class="helpicon"><?php PrintHelpLink("MEDIA_DIRECTORY_help", "qm", "MEDIA_DIRECTORY"); print "</div><div class=\"description\">"; print GM_LANG_MEDIA_DIRECTORY;?></div></td>
 		<td class="shade1"><input type="text" size="50" name="NEW_MEDIA_DIRECTORY" value="<?php print GedcomConfig::$MEDIA_DIRECTORY?>" dir="ltr" tabindex="<?php $i++; print $i?>" />
 		<?php
-		if(preg_match("/.*[a-zA-Z]{1}:.*/",GedcomConfig::$MEDIA_DIRECTORY)>0) print "<span class=\"error\">".GM_LANG_media_drive_letter."</span>\n";
+		if(preg_match("/.*[a-zA-Z]{1}:.*/",GedcomConfig::$MEDIA_DIRECTORY)>0) print "<span class=\"Error\">".GM_LANG_media_drive_letter."</span>\n";
 		?>
 		</td>
 	</tr>
@@ -819,13 +819,13 @@ print "&nbsp;<a href=\"javascript: ".htmlentities(GM_LANG_media_conf)."\" onclic
 </table>
 </div>
 
-<table class="facts_table"><tr><td class="topbottombar <?php print $TEXT_DIRECTION;?>">
+<table class="FactsTable"><tr><td class="topbottombar <?php print $TEXT_DIRECTION;?>">
 <?php
 print "<a href=\"javascript: ".htmlentities(GM_LANG_accpriv_conf)."\" onclick=\"expand_layer('access-options');return false;\"><img id=\"access-options_img\" src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["plus"]["other"]."\" border=\"0\" width=\"11\" height=\"11\" alt=\"\" /></a>";
 print "&nbsp;<a href=\"javascript: ".htmlentities(GM_LANG_accpriv_conf)."\" onclick=\"expand_layer('access-options');return false;\">".GM_LANG_accpriv_conf."</a>";
 ?></td></tr></table>
 <div id="access-options" style="display: none">
-<table class="facts_table">
+<table class="FactsTable">
 	<tr>
 		<td class="shade2 wrap width20"><div class="helpicon"><?php PrintHelpLink("REQUIRE_AUTHENTICATION_help", "qm", "REQUIRE_AUTHENTICATION"); print "</div><div class=\"description\">"; print GM_LANG_REQUIRE_AUTHENTICATION;?></div></td>
 		<td class="shade1"><select name="NEW_REQUIRE_AUTHENTICATION" tabindex="<?php $i++; print $i?>">
@@ -865,20 +865,20 @@ print "&nbsp;<a href=\"javascript: ".htmlentities(GM_LANG_accpriv_conf)."\" oncl
 </table>
 </div>
 
-<table class="facts_table"><tr><td class="topbottombar <?php print $TEXT_DIRECTION;?>">
+<table class="FactsTable"><tr><td class="topbottombar <?php print $TEXT_DIRECTION;?>">
 <?php
 print "<a href=\"javascript: ".htmlentities(GM_LANG_displ_conf)."\" onclick=\"expand_layer('layout-options');return false;\"><img id=\"layout-options_img\" src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["plus"]["other"]."\" border=\"0\" width=\"11\" height=\"11\" alt=\"\" /></a>";
 print "&nbsp;<a href=\"javascript: ".htmlentities(GM_LANG_displ_conf)."\" onclick=\"expand_layer('layout-options');return false;\">".GM_LANG_displ_conf."</a>";
 ?></td></tr></table>
 <div id="layout-options" style="display: none">
 
-<table class="facts_table"><tr><td class="subbar">
+<table class="FactsTable"><tr><td class="subbar">
 <?php
 print "<a href=\"javascript: ".htmlentities(GM_LANG_displ_names_conf)."\" onclick=\"expand_layer('layout-options2');return false;\"><img id=\"layout-options2_img\" src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["plus"]["other"]."\" border=\"0\" width=\"11\" height=\"11\" alt=\"\" /></a>";
 print "&nbsp;<a href=\"javascript: ".htmlentities(GM_LANG_displ_names_conf)."\" onclick=\"expand_layer('layout-options2');return false;\">".GM_LANG_displ_names_conf."</a>";
 ?></td></tr></table>
 <div id="layout-options2" style="display: none">
-<table class="facts_table">
+<table class="FactsTable">
 	<tr>
 		<td class="shade2 wrap width20"><div class="helpicon"><?php PrintHelpLink("PEDIGREE_FULL_DETAILS_help", "qm", "PEDIGREE_FULL_DETAILS"); print "</div><div class=\"description\">"; print GM_LANG_PEDIGREE_FULL_DETAILS;?></div></td>
 		<td class="shade1"><select name="NEW_PEDIGREE_FULL_DETAILS" tabindex="<?php $i++; print $i?>">
@@ -967,13 +967,13 @@ print "&nbsp;<a href=\"javascript: ".htmlentities(GM_LANG_displ_names_conf)."\" 
 </table>
 </div>
 
-<table class="facts_table"><tr><td class="subbar">
+<table class="FactsTable"><tr><td class="subbar">
 <?php
 print "<a href=\"javascript: ".htmlentities(GM_LANG_displ_comsurn_conf)."\" onclick=\"expand_layer('layout-options3');return false;\"><img id=\"layout-options3_img\" src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["plus"]["other"]."\" border=\"0\" width=\"11\" height=\"11\" alt=\"\" /></a>";
 print "&nbsp;<a href=\"javascript: ".htmlentities(GM_LANG_displ_comsurn_conf)."\" onclick=\"expand_layer('layout-options3');return false;\">".GM_LANG_displ_comsurn_conf."</a>";
 ?></td></tr></table>
 <div id="layout-options3" style="display: none">
-<table class="facts_table">
+<table class="FactsTable">
 	<tr>
 		<td class="shade2 wrap width20"><div class="helpicon"><?php PrintHelpLink("COMMON_NAMES_THRESHOLD_help", "qm", "COMMON_NAMES_THRESHOLD"); print "</div><div class=\"description\">"; print GM_LANG_COMMON_NAMES_THRESHOLD;?></div></td>
 		<td class="shade1"><input type="text" name="NEW_COMMON_NAMES_THRESHOLD" value="<?php print GedcomConfig::$COMMON_NAMES_THRESHOLD?>" size="5" tabindex="<?php $i++; print $i?>" /></td>
@@ -993,13 +993,13 @@ print "&nbsp;<a href=\"javascript: ".htmlentities(GM_LANG_displ_comsurn_conf)."\
 
 <?php // Display and Layout
 ?>
-<table class="facts_table"><tr><td class="subbar <?php print $TEXT_DIRECTION;?>">
+<table class="FactsTable"><tr><td class="subbar <?php print $TEXT_DIRECTION;?>">
 <?php
 print "<a href=\"javascript: ".htmlentities(GM_LANG_displ_layout_conf)."\" onclick=\"expand_layer('layout-options4');return false;\"><img id=\"layout-options4_img\" src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["plus"]["other"]."\" border=\"0\" width=\"11\" height=\"11\" alt=\"\" /></a>";
 print "&nbsp;<a href=\"javascript: ".htmlentities(GM_LANG_displ_layout_conf)."\" onclick=\"expand_layer('layout-options4');return false;\">".GM_LANG_displ_layout_conf."</a>";
 ?></td></tr></table>
 <div id="layout-options4" style="display: none">
-<table class="facts_table">
+<table class="FactsTable">
 	<tr>
 		<td class="shade2 wrap width20"><div class="helpicon"><?php PrintHelpLink("DEFAULT_PEDIGREE_GENERATIONS_help", "qm", "DEFAULT_PEDIGREE_GENERATIONS"); print "</div><div class=\"description\">"; print GM_LANG_DEFAULT_PEDIGREE_GENERATIONS;?></div></td>
 		<td class="shade1"><input type="text" name="NEW_DEFAULT_PEDIGREE_GENERATIONS" value="<?php print GedcomConfig::$DEFAULT_PEDIGREE_GENERATIONS?>" size="5" tabindex="<?php $i++; print $i?>" /></td>
@@ -1145,13 +1145,13 @@ print "</table>";
 </div>
 
 
-<table class="facts_table"><tr><td class="subbar <?php print $TEXT_DIRECTION;?>">
+<table class="FactsTable"><tr><td class="subbar <?php print $TEXT_DIRECTION;?>">
 <?php
 print "<a href=\"javascript: ".htmlentities(GM_LANG_displ_hide_conf)."\" onclick=\"expand_layer('layout-options5');return false;\"><img id=\"layout-options5_img\" src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["plus"]["other"]."\" border=\"0\" width=\"11\" height=\"11\" alt=\"\" /></a>";
 print "&nbsp;<a href=\"javascript: ".htmlentities(GM_LANG_displ_hide_conf)."\" onclick=\"expand_layer('layout-options5');return false;\">".GM_LANG_displ_hide_conf."</a>";
 ?></td></tr></table>
 <div id="layout-options5" style="display: none">
-<table class="facts_table">
+<table class="FactsTable">
 	<tr>
 		<td class="shade2 wrap width20"><div class="helpicon"><?php PrintHelpLink("DAYS_TO_SHOW_LIMIT_help", "qm", "DAYS_TO_SHOW_LIMIT"); print "</div><div class=\"description\">"; print GM_LANG_DAYS_TO_SHOW_LIMIT;?></div></td>
 		<td class="shade1"><input type="text" name="NEW_DAYS_TO_SHOW_LIMIT" value="<?php print GedcomConfig::$DAYS_TO_SHOW_LIMIT?>" size="2" tabindex="<?php $i++; print $i?>" /></td>
@@ -1221,13 +1221,13 @@ print "&nbsp;<a href=\"javascript: ".htmlentities(GM_LANG_displ_hide_conf)."\" o
 
 <?php // Edit Options
 ?>
-<table class="facts_table"><tr><td class="topbottombar <?php print $TEXT_DIRECTION;?>">
+<table class="FactsTable"><tr><td class="topbottombar <?php print $TEXT_DIRECTION;?>">
 <?php
 print "<a href=\"javascript: ".htmlentities(GM_LANG_editopt_conf)."\" onclick=\"expand_layer('edit-options');return false;\"><img id=\"edit-options_img\" src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["plus"]["other"]."\" border=\"0\" width=\"11\" height=\"11\" alt=\"\" /></a>";
 print "&nbsp;<a href=\"javascript: ".htmlentities(GM_LANG_editopt_conf)."\" onclick=\"expand_layer('edit-options');return false;\">".GM_LANG_editopt_conf."</a>";
 ?></td></tr></table>
 <div id="edit-options" style="display: none">
-<table class="facts_table">
+<table class="FactsTable">
 	<tr>
 		<td class="shade2 wrap width20"><div class="helpicon"><?php PrintHelpLink("ALLOW_EDIT_GEDCOM_help", "qm", "ALLOW_EDIT_GEDCOM"); print "</div><div class=\"description\">"; print GM_LANG_ALLOW_EDIT_GEDCOM;?></div></td>
 		<td class="shade1"><select name="NEW_ALLOW_EDIT_GEDCOM" tabindex="<?php $i++; print $i?>">
@@ -1341,13 +1341,13 @@ print "&nbsp;<a href=\"javascript: ".htmlentities(GM_LANG_editopt_conf)."\" oncl
 
 <?php // User Options
 ?>
-<table class="facts_table"><tr><td class="topbottombar <?php print $TEXT_DIRECTION;?>">
+<table class="FactsTable"><tr><td class="topbottombar <?php print $TEXT_DIRECTION;?>">
 <?php
 print "<a href=\"javascript: ".htmlentities(GM_LANG_useropt_conf)."\" onclick=\"expand_layer('user-options');return false;\"><img id=\"user-options_img\" src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["plus"]["other"]."\" border=\"0\" width=\"11\" height=\"11\" alt=\"\" /></a>";
 print "&nbsp;<a href=\"javascript: ".htmlentities(GM_LANG_useropt_conf)."\" onclick=\"expand_layer('user-options');return false;\">".GM_LANG_useropt_conf."</a>";
 ?></td></tr></table>
 <div id="user-options" style="display: none">
-<table class="facts_table">
+<table class="FactsTable">
 	<tr>
 		<td class="shade2 wrap width20"><div class="helpicon"><?php PrintHelpLink("ENABLE_MULTI_LANGUAGE_help", "qm", "ENABLE_MULTI_LANGUAGE"); print "</div><div class=\"description\">"; print GM_LANG_ENABLE_MULTI_LANGUAGE;?></div></td>
 		<td class="shade1"><select name="NEW_ENABLE_MULTI_LANGUAGE" tabindex="<?php $i++; print $i?>" >
@@ -1381,7 +1381,7 @@ print "&nbsp;<a href=\"javascript: ".htmlentities(GM_LANG_useropt_conf)."\" oncl
 			<input type="text" name="NTHEME_DIR" value="<?php print $NTHEME_DIR?>" size="40" dir="ltr" tabindex="<?php $i++; print $i?>" />
 	<?php
 	if (!file_exists($NTHEME_DIR)) {
-		print "<span class=\"error\">$NTHEME_DIR ";
+		print "<span class=\"Error\">$NTHEME_DIR ";
 		print GM_LANG_does_not_exist;
 		print "</span>\n";
 		$NTHEME_DIR = GedcomConfig::$THEME_DIR;
@@ -1402,13 +1402,13 @@ print "&nbsp;<a href=\"javascript: ".htmlentities(GM_LANG_useropt_conf)."\" oncl
 
 
 
-<table class="facts_table"><tr><td class="topbottombar <?php print $TEXT_DIRECTION;?>">
+<table class="FactsTable"><tr><td class="topbottombar <?php print $TEXT_DIRECTION;?>">
 <?php
 print "<a href=\"javascript: ".htmlentities(GM_LANG_contact_conf)."\" onclick=\"expand_layer('contact-options');return false;\"><img id=\"contact-options_img\" src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["plus"]["other"]."\" border=\"0\" width=\"11\" height=\"11\" alt=\"\" /></a>";
 print "&nbsp;<a href=\"javascript: ".htmlentities(GM_LANG_contact_conf)."\" onclick=\"expand_layer('contact-options');return false;\">".GM_LANG_contact_conf."</a>";
 ?></td></tr></table>
 <div id="contact-options" style="display: none">
-<table class="facts_table">
+<table class="FactsTable">
 	<tr>
 		<td class="shade2 wrap width20"><div class="helpicon"><?php PrintHelpLink("CONTACT_EMAIL_help", "qm", "CONTACT_EMAIL"); print "</div><div class=\"description\">"; print GM_LANG_CONTACT_EMAIL;?></div></td>
 		<td class="shade1"><select name="NEW_CONTACT_EMAIL" tabindex="<?php $i++; print $i?>">
@@ -1481,13 +1481,13 @@ print "&nbsp;<a href=\"javascript: ".htmlentities(GM_LANG_contact_conf)."\" oncl
 	</tr>
 </table>
 </div>
-<table class="facts_table"><tr><td class="topbottombar <?php print $TEXT_DIRECTION;?>">
+<table class="FactsTable"><tr><td class="topbottombar <?php print $TEXT_DIRECTION;?>">
 <?php
 print "<a href=\"javascript: ".htmlentities(GM_LANG_meta_conf)."\" onclick=\"expand_layer('config-meta');return false;\"><img id=\"config-meta_img\" src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["plus"]["other"]."\" border=\"0\" width=\"11\" height=\"11\" alt=\"\" /></a>";
 print "&nbsp;<a href=\"javascript: ".htmlentities(GM_LANG_meta_conf)."\" onclick=\"expand_layer('config-meta');return false;\">".GM_LANG_meta_conf."</a>";
 ?></td></tr></table>
 <div id="config-meta" style="display: none">
-<table class="facts_table">
+<table class="FactsTable">
 	<tr>
 		<td class="shade2 wrap width20"><div class="helpicon"><?php PrintHelpLink("HOME_SITE_URL_help", "qm", "HOME_SITE_URL"); print "</div><div class=\"description\">"; print GM_LANG_HOME_SITE_URL;?></div></td>
 		<td class="shade1"><input type="text" name="NEW_HOME_SITE_URL" value="<?php print GedcomConfig::$HOME_SITE_URL?>" size="50" dir="ltr" tabindex="<?php $i++; print $i?>" /></td>
@@ -1571,7 +1571,7 @@ print "&nbsp;<a href=\"javascript: ".htmlentities(GM_LANG_meta_conf)."\" onclick
 	</tr>
 </table>
 </div>
-<table class="facts_table" border="0">
+<table class="FactsTable" border="0">
 <tr><td class="center">
 <input type="submit" tabindex="<?php $i++; print $i?>" value="<?php print GM_LANG_save_config?>" onclick="closeHelp();" />
 &nbsp;&nbsp;

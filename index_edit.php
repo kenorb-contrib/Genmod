@@ -232,7 +232,7 @@ if ($action == "storefav") {
 		<?php
 	}
 	else {
-		print "<span class=\"error\">".GM_LANG_favorite_not_stored."</span>";
+		print "<span class=\"Error\">".GM_LANG_favorite_not_stored."</span>";
 		print "<div class=\"center\"><a href=\"javascript:// ".GM_LANG_close_window."\" onclick=\"self.close();\">".GM_LANG_close_window."</a></div>\n";
 		PrintFooter();
 		exit;
@@ -243,7 +243,7 @@ $block = $ublocks->$side;
 if ($action=="configure" && isset($block[$index])) {
 	
 	$block = $block[$index];
-	print "<table class=\"facts_table ".$TEXT_DIRECTION."\">";
+	print "<table class=\"FactsTable ".$TEXT_DIRECTION."\">";
 	print "<tr><td class=\"facts_label\">";
 	print "<h3>".GM_LANG_config_block."</h3>";
 	print "</td></tr>";
@@ -262,7 +262,7 @@ if ($action=="configure" && isset($block[$index])) {
 	print "<input type=\"hidden\" name=\"name\" value=\"$name\" />\n";
 	print "<input type=\"hidden\" name=\"side\" value=\"$side\" />\n";
 	print "<input type=\"hidden\" name=\"index\" value=\"$index\" />\n";
-	print "<table border=\"0\" class=\"facts_table ".$TEXT_DIRECTION."\">";
+	print "<table border=\"0\" class=\"FactsTable ".$TEXT_DIRECTION."\">";
 	
 	if ($GM_BLOCKS[$block[0]]["canconfig"]) {
 		eval($block[0]."_config(\$block[1]);");
@@ -534,7 +534,7 @@ else {
 	print "</div>\n";
 
 	// NOTE: Hidden help text for column items
-	print "\n\t<div id=\"help\" class=\"tab_page\" style=\"position: absolute; display: none; top: auto; left: auto; z-index: 2; \">\n\t";
+	print "\n\t<div id=\"help\" class=\"TabPage\" style=\"position: absolute; display: none; top: auto; left: auto; z-index: 2; \">\n\t";
 
 	print "<br /><center><input type=\"button\" value=\"".GM_LANG_click_here."\" onclick=\"expand_layer('configure', true); expand_layer('help', false);\" /></center><br /><br />\n";
 	PrintText("block_summaries");

@@ -169,7 +169,7 @@ switch ($el_controller->action) {
 		<?php
 		if ($el_controller->execute) {
 			?>
-			<div class="topbottombar subheaders"><?php print GM_LANG_listing;?>: "
+			<div class="topbottombar SubHeader"><?php print GM_LANG_listing;?>: "
 			<?php
 			switch ($el_controller->file_type) {
 				case "lang":
@@ -336,12 +336,12 @@ switch ($el_controller->action) {
 						else {
 							$storeerror = true;
 							WriteToLog("EditLang-&gt; ".GM_LANG_editlang_lang_export_no_success, "E", "S");
-							print "<span class=\"error\">".GM_LANG_editlang_lang_export_no_success."</span><br />";
+							print "<span class=\"Error\">".GM_LANG_editlang_lang_export_no_success."</span><br />";
 						}
 						fclose($handle);            
 					}
 				}
-				else print "<span class=\"error\">".GM_LANG_lang_not_stored."</span><br />";
+				else print "<span class=\"Error\">".GM_LANG_lang_not_stored."</span><br />";
 				if (!empty($data_help)) {
 					if (!$handle_help = fopen("languages/help_text.".$el_controller->lang_shortcut.".txt", "w")) {
 						print str_replace("#lang_filename#", "languages/help_text.".$el_controller->lang_shortcut.".txt", GM_LANG_no_open)."<br />";
@@ -356,12 +356,12 @@ switch ($el_controller->action) {
 						else {
 							$storeerror = true;
 							WriteToLog("EditLang-&gt; ".GM_LANG_editlang_help_no_export_success, "E", "S");
-							print "<span class=\"error\">".GM_LANG_editlang_help_no_export_success."</span><br />";
+							print "<span class=\"Error\">".GM_LANG_editlang_help_no_export_success."</span><br />";
 						}
 						fclose($handle_help);
 					}
 				}
-				else print "<span class=\"error\">".GM_LANG_lang_help_not_stored."</span><br />";
+				else print "<span class=\"Error\">".GM_LANG_lang_help_not_stored."</span><br />";
 				
 				$data = "";
 				$storefacts = AdminFunctions::LoadFacts($el_controller->language2);
@@ -383,12 +383,12 @@ switch ($el_controller->action) {
 						else {
 							$storeerror = true;
 							WriteToLog("EditLang-&gt; ".GM_LANG_editlang_facts_export_no_success, "E", "S");
-							print "<span class=\"error\">".GM_LANG_editlang_facts_export_no_success."</span><br />";
+							print "<span class=\"Error\">".GM_LANG_editlang_facts_export_no_success."</span><br />";
 						}
 						fclose($handle);            
 					}
 				}
-				else print "<span class=\"error\">".GM_LANG_lang_facts_not_stored."</span><br />";
+				else print "<span class=\"Error\">".GM_LANG_lang_facts_not_stored."</span><br />";
 				if (!$storeerror) {
 					$sql = "UPDATE ".TBLPREFIX."lang_settings SET ls_translated = '0', ls_md5_lang = '".md5_file("languages/lang.".$language_settings[$el_controller->language2]["lang_short_cut"].".txt")."', ls_md5_help = '".md5_file("languages/help_text.".$language_settings[$el_controller->language2]["lang_short_cut"].".txt")."', ls_md5_facts = '".md5_file("languages/facts.".$language_settings[$el_controller->language2]["lang_short_cut"].".txt")."' WHERE ls_gm_langname='".$el_controller->language2."'";
 					$res = NewQuery($sql);
@@ -452,21 +452,21 @@ switch ($el_controller->action) {
 		<?php
 		if ($el_controller->execute) {
 			?>
-			<div class="topbottombar subheaders">
+			<div class="topbottombar SubHeader">
 				<?php print GM_LANG_comparing_main;?>
 			</div>
 			<?php
 			$el_controller->ShowLanguageCompare(LanguageFunctions::LoadLanguage($el_controller->language1, true), LanguageFunctions::LoadLanguage($el_controller->language2, true))
 			?>
 			<img src="<?php print GM_IMAGE_DIR."/".$GM_IMAGES["hline"]["other"];?>" width="100%" height="6" alt="" /><br />
-			<div class="topbottombar subheaders">
+			<div class="topbottombar SubHeader">
 				<?php print GM_LANG_comparing_facts;?>
 			</div>
 			<?php
 			$el_controller->ShowLanguageCompare(AdminFunctions::LoadFacts($el_controller->language1), AdminFunctions::LoadFacts($el_controller->language2), true);
 				?>
 			<img src="<?php print GM_IMAGE_DIR."/".$GM_IMAGES["hline"]["other"];?>" width="100%" height="6" alt="" /><br />
-			<div class="topbottombar subheaders">
+			<div class="topbottombar SubHeader">
 				<?php print GM_LANG_comparing_helptext;?>
 			</div>
 			<?php

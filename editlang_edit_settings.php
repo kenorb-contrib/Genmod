@@ -377,15 +377,15 @@ if ($action != "save" && $action != "toggleActive") { ?>
 				<div class="change_language_item_right">
 					<?php
 						print $v_factsfile;
-						if (!file_exists($v_factsfile)) print "&nbsp;&nbsp;<span class=\"error\">" . GM_LANG_file_does_not_exist . "</span>";
+						if (!file_exists($v_factsfile)) print "&nbsp;&nbsp;<span class=\"Error\">" . GM_LANG_file_does_not_exist . "</span>";
 						print "<br />";
 						
 						print $v_helpfile;
-						if (!file_exists($v_helpfile)) print "&nbsp;&nbsp;<span class=\"error\">" . GM_LANG_file_does_not_exist . "</span>";
+						if (!file_exists($v_helpfile)) print "&nbsp;&nbsp;<span class=\"Error\">" . GM_LANG_file_does_not_exist . "</span>";
 						print "<br />";
 						
 						print $v_lang_filename;
-						if (!file_exists($v_lang_filename)) print "&nbsp;&nbsp;<span class=\"error\">" . GM_LANG_file_does_not_exist . "</span>";
+						if (!file_exists($v_lang_filename)) print "&nbsp;&nbsp;<span class=\"Error\">" . GM_LANG_file_does_not_exist . "</span>";
 					?>
 				</div>
 			</div>
@@ -482,9 +482,9 @@ if ($action == "save") {
 			$sentHeader = true;
 			print "<div class=\"center\"><center>";
 		}
-	    print "<span class=\"error\">" . constant("GM_LANG_".$error) . "</span><br /><br />";
+	    print "<span class=\"Error\">" . constant("GM_LANG_".$error) . "</span><br /><br />";
 	    print "<form name=\"Form2\" method=\"post\" action=\"" .SCRIPT_NAME. "\">";
-	    print "<table class=\"facts_table\">";
+	    print "<table class=\"FactsTable\">";
 	    print "<tr>";
 	    print "<td class=\"facts_value\" style=\"text-align:center; \" >";
 	    srand((double)microtime()*1000000);

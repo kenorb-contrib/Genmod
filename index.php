@@ -197,21 +197,22 @@ else {
 <?php
 //-- start of main content section
 if ($command=="user") {
-	print "<div>";
+	print "<div id=\"IndexMyGedviewBlock\">";
 	print "<h3>".GM_LANG_mygedview."</h3>";
 	print GM_LANG_mygedview_desc;
 	print "</div>\n";
 }
 $disp_stats = false;
 if (count($ublocks->main) != 0) {
-	if (count($ublocks->right) != 0) print "\t<div id=\"index_main_blocks\">\n";
-	else print "\t<div id=\"index_full_blocks\">\n";
+	if (count($ublocks->right) != 0) print "\t<div id=\"IndexMainBlocksContainer\">\n";
+	else print "\t<div id=\"IndexFullBlocksContainer\">\n";
 
 	foreach($ublocks->main as $bindex=>$block) {
 		if ($disp_stats) {
 			$time1 = getmicrotime();
 			$queries1 = $TOTAL_QUERIES;
 		}
+		// N.B. Main blocks are not restricted in height!
 		if (function_exists($block[0])) eval($block[0]."(false, \$block[1], \"main\", $bindex);");
 		if ($disp_stats) {
 			$time2 = getmicrotime();
@@ -228,8 +229,8 @@ if (count($ublocks->main) != 0) {
 
 //-- start of blocks section
 if (count($ublocks->right) != 0) {
-	if (count($ublocks->main) != 0) print "\t<div id=\"index_small_blocks\">\n";
-	else print "\t<div id=\"index_full_blocks\">\n";
+	if (count($ublocks->main) != 0) print "\t<div id=\"IndexSmallBlocksContainer\">\n";
+	else print "\t<div id=\"IndexFullBlocksContainer\">\n";
 	foreach($ublocks->right as $bindex => $block) {
 		// NOTE: print_random_media(true, $block[1], right, $bindex
 		if ($disp_stats) {

@@ -60,17 +60,17 @@ PlotFunctions::CheckPlotExtensions();
 
 PlotFunctions::GetPlotData();
 
-print "\n\t<center><h2>".GM_LANG_statistiek_list."</h2>\n\t";
+print "\n\t<center><span class=\"PageTitleName\">".GM_LANG_statistiek_list."</span>\n\t";
 print "</center>";
 print "<form method=\"post\" name=\"form\" action=\"statisticsplot.php\">";
-print "<table class=\"facts_table width60 center $TEXT_DIRECTION\">";
+print "<table class=\"StatsContainer $TEXT_DIRECTION\">";
 
 // statistics
-print "<tr><td class=\"topbottombar\" colspan=\"2\">".GM_LANG_statistics.PrintHelpLink("stat_help","qm", "", false, true)."</td></tr>";
-print "<tr><td class=\"shade2 wrap width30 vmiddle\">".GM_LANG_statnnames."</td><td class=\"shade1\">".$nrpers."</td></tr>";
-print "<tr><td class=\"shade2 wrap width30 vmiddle\">".GM_LANG_statnfam."</td><td class=\"shade1\">".$nrfam."</td></tr>";
-print "<tr><td class=\"shade2 wrap width30 vmiddle\">".GM_LANG_statnmale."</td><td class=\"shade1\">".$nrman."</td></tr>";
-print "<tr><td class=\"shade2 wrap width30 vmiddle\">".GM_LANG_statnfemale."</td><td class=\"shade1\">".$nrvrouw."</td></tr>";
+print "<tr><td class=\"NavBlockHeader\" colspan=\"2\">".GM_LANG_statistics.PrintHelpLink("stat_help","qm", "", false, true)."</td></tr>";
+print "<tr><td class=\"NavBlockLabel\">".GM_LANG_statnnames."</td><td class=\"NavBlockField\">".$nrpers."</td></tr>";
+print "<tr><td class=\"NavBlockLabel\">".GM_LANG_statnfam."</td><td class=\"NavBlockField\">".$nrfam."</td></tr>";
+print "<tr><td class=\"NavBlockLabel\">".GM_LANG_statnmale."</td><td class=\"NavBlockField\">".$nrman."</td></tr>";
+print "<tr><td class=\"NavBlockLabel\">".GM_LANG_statnfemale."</td><td class=\"NavBlockField\">".$nrvrouw."</td></tr>";
 
 //if (!isset($plottype)) $plottype=0;
 if (isset($_SESSION[GedcomConfig::$GEDCOMID."statisticsplot"])) {
@@ -97,9 +97,9 @@ else {
 // plotting variables
 print "<tr><td class=\"topbottombar\" colspan=\"2\">".GM_LANG_statvars."</td></tr>";
 
-print "<tr><td class=\"shade2 wrap width50 vmiddle\">";
+print "<tr><td class=\"NavBlockLabel\">";
 print GM_LANG_statlxa;
-print "</td><td class=\"shade1\">";
+print "</td><td class=\"NavBlockField\">";
 print "<select name=\"x_as\">";
 print "<option value= \"11\" "; if ($x_as == "11") print "selected=\"selected\""; print">".GM_LANG_stat_11_mb; print "</option>";
 print "<option value= \"12\" "; if ($x_as == "12") print "selected=\"selected\""; print">".GM_LANG_stat_12_md; print "</option>";
@@ -114,17 +114,17 @@ print "<option value= \"20\" "; if ($x_as == "20") print "selected=\"selected\""
 print "<option value= \"21\" "; if ($x_as == "21") print "selected=\"selected\""; print">".GM_LANG_stat_21_nok."&nbsp;<i>".GM_LANG_stat_gnx."</i>"; print "</option>";
 print "</select></td></tr>";
 
-print "<tr><td class=\"shade2 wrap vmiddle\">";
+print "<tr><td class=\"NavBlockLabel\">";
 print GM_LANG_statlya;
-print "</td><td class=\"shade1\">";
+print "</td><td class=\"NavBlockField\">";
 print "<select name=\"y_as\">";
 print "<option value= \"201\" "; if ($y_as == "201") print "selected=\"selected\""; print">".GM_LANG_stat_201_num; print "</option>";
 print "<option value= \"202\" "; if ($y_as == "202") print "selected=\"selected\""; print">".GM_LANG_stat_202_perc; print "</option>";
 print "</select></td></tr>";
 
-print "<tr><td class=\"shade2 wrap vmiddle\">";
+print "<tr><td class=\"NavBlockLabel\">";
 print GM_LANG_statlza;
-print "</td><td class=\"shade1\">";
+print "</td><td class=\"NavBlockField\">";
 print "<select name=\"z_as\">";
 print "<option value= \"300\" "; if ($z_as == "300") print "selected=\"selected\""; print">".GM_LANG_stat_300_none; print "</option>";
 print "<option value= \"301\" "; if ($z_as == "301") print "selected=\"selected\""; print">".GM_LANG_stat_301_mf; print "</option>";
@@ -133,51 +133,51 @@ print "</select></td></tr>";
 
 // tickvalues
 print "<tr><td class=\"topbottombar\" colspan=\"2\">".GM_LANG_statmess1."</td></tr>";
-print "<tr><td class=\"shade2 wrap vmiddle\">";
+print "<tr><td class=\"NavBlockLabel\">";
 print GM_LANG_statar_xgl."</td>";
-print "<td class=\"shade1\">";
+print "<td class=\"NavBlockField\">";
 print "<input type=\"text\" name=\"xasGrLeeftijden\" value=\"".$xasGrLeeftijden."\" size=\"60\" onfocus=\"getHelp('periode_help');\" />";
 print "</td></tr>";
 
-print "<tr><td class=\"shade2 wrap vmiddle\">";
+print "<tr><td class=\"NavBlockLabel\">";
 print GM_LANG_statar_xgm."</td>";
-print "<td class=\"shade1\">";
+print "<td class=\"NavBlockField\">";
 print "<input type=\"text\" name=\"xasGrMaanden\" value=\"".$xasGrMaanden."\" size=\"60\" onfocus=\"getHelp('periode_help');\" />";
 print "</td></tr>";
 
-print "<tr><td class=\"shade2 wrap vmiddle\">";
+print "<tr><td class=\"NavBlockLabel\">";
 print GM_LANG_statar_xga."</td>";
-print "<td class=\"shade1\">";
+print "<td class=\"NavBlockField\">";
 print "<input type=\"text\" name=\"xasGrAantallen\" value=\"".$xasGrAantallen."\" size=\"60\" onfocus=\"getHelp('periode_help');\" />";
 print "</td></tr>";
 
-print "<tr><td class=\"shade2 wrap vmiddle\">";
+print "<tr><td class=\"NavBlockLabel\">";
 print GM_LANG_statar_zgp."</td>";
-print "<td class=\"shade1\">";
+print "<td class=\"NavBlockField\">";
 print "<input type=\"text\" name=\"zasGrPeriode\" value=\"".$zasGrPeriode."\" size=\"60\" onfocus=\"getHelp('periode_help');\" />";
 print "</td></tr>";
 
 // Options
 print "<tr><td class=\"topbottombar\" colspan=\"2\">"."Options"/*GM_LANG_statmess1*/."</td></tr>";
-print "<tr><td class=\"shade2 wrap vmiddle\">";
+print "<tr><td class=\"NavBlockLabel\">";
 print GM_LANG_pl_shadow."</td>";
-print "<td class=\"shade1\"><select name=\"showShadow\">";
+print "<td class=\"NavBlockField\"><select name=\"showShadow\">";
 	print "<option value=\"yes\" ";if ($showShadow=="yes") print "selected=\"selected\""; print ">".GM_LANG_yes."</option>";
 	print "<option value=\"no\" ";if ($showShadow=="no") print "selected=\"selected\""; print ">".GM_LANG_no."</option>";
 print "</select></td></tr>";
 
-print "<tr><td class=\"shade2 wrap vmiddle\">";
+print "<tr><td class=\"NavBlockLabel\">";
 print GM_LANG_pl_val."</td>";
-print "<td class=\"shade1\"><select name=\"valuePos\">";
+print "<td class=\"NavBlockField\"><select name=\"valuePos\">";
 	print "<option value=\"none\" ";if ($valuePos=="none") print "selected=\"selected\""; print ">".GM_LANG_none."</option>";
 	print "<option value=\"top\" ";if ($valuePos=="top") print "selected=\"selected\""; print ">".GM_LANG_top."</option>";
 	print "<option value=\"center\" ";if ($valuePos=="center") print "selected=\"selected\""; print ">".GM_LANG_center."</option>";
 	print "<option value=\"bottom\" ";if ($valuePos=="bottom") print "selected=\"selected\""; print ">".GM_LANG_bottom."</option>";
 print "</select></td></tr>";
 
-print "<tr><td class=\"shade2 wrap vmiddle\">";
+print "<tr><td class=\"NavBlockLabel\">";
 print GM_LANG_pl_size."</td>";
-print "<td class=\"shade1\"><select name=\"graphSize\">";
+print "<td class=\"NavBlockField\"><select name=\"graphSize\">";
 	print "<option value=\"autoScreen\" ";if ($graphSize=="autoScreen") print "selected=\"selected\""; print ">".GM_LANG_pl_scr."</option>";
 	print "<option value=\"autoWindow\" ";if ($graphSize=="autoWindow") print "selected=\"selected\""; print ">".GM_LANG_pl_win."</option>";
 	print "<option value=\"700x400\" ";if ($graphSize=="700x400") print "selected=\"selected\""; print ">".GM_LANG_pl_std."</option>";
@@ -189,7 +189,7 @@ print "<input type=\"hidden\" name=\"windowRes\" value=\"\" size=\"10\" />";
 print "</td></tr>";
 
 // Submit bar
-print "<tr><td class=\"topbottombar\" colspan=\"2\">";
+print "<tr><td class=\"NavBlockFooter\" colspan=\"2\">";
 	print "<input type=\"submit\" value=\"".GM_LANG_statsubmit."\" onclick=\"document.form.screenRes.value=screen.width+'x'+screen.height;document.form.windowRes.value=document.body.clientWidth+'x'+document.body.clientHeight;closeHelp();\" />&nbsp;&nbsp;&nbsp;&nbsp;";
 	print "<input type=\"button\" value=\"".GM_LANG_statreset."\" onclick=\"location.href='statistics.php?cleanup=yes'; return false;\" />";
 print "</td></tr></table>";
@@ -199,7 +199,6 @@ print "</form>";
 //--print "plottype=".$plottype."<br>";
 //$_SESSION["plottype"]=$plottype;
 
-print "<br />";
 PrintFooter();
 
 ?>
