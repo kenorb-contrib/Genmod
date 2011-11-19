@@ -68,6 +68,7 @@ switch ($file_type) {
 }
 
 if ($action != "save") {
+	print "<div class=\"EditLangContainer\">";
 	print "<form name=\"Form1\" method=\"post\" action=\"" .$_SERVER["SCRIPT_NAME"]. "\">";
 	print "<input type=\"hidden\" name=\"".session_name()."\" value=\"".session_id()."\" />";
 	print "<input type=\"hidden\" name=\"action\" value=\"save\" />";
@@ -78,12 +79,31 @@ if ($action != "save") {
 	print "<input type=\"hidden\" name=\"file_type\" value=\"" . $file_type . "\" />";
 	print "<input type=\"hidden\" name=\"realtime\" value=\"" . $realtime . "\" />";
 	
-	print '<div id="editlang_edit_title" class="center">';
+	print "<div class=\"NavBlockHeader\">";
 	PrintText("editlang_help");
-	if (!empty($lang_filename)) print ' '.$language_settings[$lang_filename]['gm_lang'];
-	print '</div>';
+	if (!empty($lang_filename)) print "&nbsp;".$language_settings[$lang_filename]['gm_lang'];
+	print "</div>";
 	
-	print "<div id=\"toplinks\" name=\"toplinks\" class=\"center\">";
+	print "<div id=\"original_text\" class=\"NavBlockColumnHeader AdminNavBlockColumnHeader\">";
+	PrintText("original_message");
+	print "</div>";
+	print "<div class=\"NavBlockField EditLangOrgTextArea\">";
+	print "<textarea id=\"old_message\" readonly rows=\"10\" name=\"old_message\" cols=\"75\" >";
+	print stripslashes(AdminFunctions::Mask_all(LanguageFunctions::GetString($ls01, $lang_filename_orig, $file_type)));
+	print "</textarea>";
+	print "</div>";
+	
+	print "<div id=\"translated_text\" class=\"NavBlockColumnHeader AdminNavBlockColumnHeader\">";
+	PrintText("message_to_edit");
+	print "</div>";
+	
+	print "<div class=\"NavBlockField EditLangDestTextArea\">";
+	print "<textarea rows=\"10\" id=\"new_message\" name=\"new_message\" cols=\"75\" style=\"color: #FF0000\" >";
+	if (strlen($ls02) > 0) print stripslashes(AdminFunctions::Mask_all(LanguageFunctions::GetString($ls02, $lang_filename, $file_type)));
+	print "</textarea>";
+	print "</div>";
+	
+	print "<div id=\"toplinks\" name=\"toplinks\" class=\"NavBlockFooter\">";
 	print "<input type=\"submit\" value=\"";
 	PrintText("lang_save");
 	if ($realtime) print "\" onclick=\"window.opener.location.reload()\" />";
@@ -93,22 +113,8 @@ if ($action != "save") {
 	PrintText("cancel");
 	print "\"" . " onclick=\"self.close()\" />";
 	print "</div>";
-	print "<hr />";
-	
-	print '<div id="original_text">';
-	PrintText("original_message");
-	print "<textarea id=\"old_message\" readonly rows=\"10\" name=\"old_message\" cols=\"75\" >";
-	print stripslashes(AdminFunctions::Mask_all(LanguageFunctions::GetString($ls01, $lang_filename_orig, $file_type)));
-	print "</textarea>";
-	print '</div>';
-	
-	print '<div id="translated_text">';
-	PrintText("message_to_edit");
-	print "<textarea rows=\"10\" id=\"new_message\" name=\"new_message\" cols=\"75\" style=\"color: #FF0000\" >";
-	if (strlen($ls02) > 0) print stripslashes(AdminFunctions::Mask_all(LanguageFunctions::GetString($ls02, $lang_filename, $file_type)));
-	print "</textarea>";
-	print '</div>';
 	print "</form>";
+	print "</div>";
 	?>
 	<script language="JavaScript" type="text/javascript">
 	<!--
@@ -129,70 +135,52 @@ if ($action == "save") {
 	$new_message = preg_replace(array("/&amp;/","/&lt;/","/&gt;/"), array("&","<",">"), $new_message);
 	$Write_Ok = AdminFunctions::WriteString($new_message, $ls01, $language2, $file_type);
 	
-	print "<div align=\"center\"><center>";
-	
-	print "<table class=\"FactsTable\">";
-	print "<tr>";
-	print "<td class=\"facts_label03\">";
-	PrintText("savelang_help");
-	print "</td>";
-	print "</tr>";
-	print "<tr>";
-	print "<td class=\"facts_value\" style=\"text-align:center; \">"."(".$language_settings[$lang_filename]['gm_lang'].")"."</td>";
-	print "</tr>";
-	print "</table>";
-	
+	// Header
 	print "<form name=\"Form2\" method=\"post\" action=\"" .$_SERVER["SCRIPT_NAME"]. "\">";
 	print "<input type=\"hidden\" name=\"lang_filename_orig\" value=\"".$lang_filename_orig."\" />";
-	print "<table class=\"FactsTable\">";
-	print "<tr>";
-	if ($Write_Ok) print "<td class=\"facts_label03\" style=\"color: #0000FF; font-weight: bold; \">".PrintText("original_message",0,1);
+	print "<div class=\"EditLangContainer\">";
+	print "<div class=\"NavBlockHeader EditLangNavBlockHeader\">";
+	PrintText("savelang_help");
+	print "&nbsp;(".$language_settings[$lang_filename]['gm_lang'].")";
+	print "</div>";
+	
+	// Old text header
+	print "<div id=\"original_text\" class=\"NavBlockColumnHeader AdminNavBlockColumnHeader\">";
+	if ($Write_Ok) print PrintText("original_message",0,1);
 	else {
-		print "<td class=\"warning\" >";
-		print str_replace("#lang_filename#", $lang_filename, GM_LANG_lang_file_write_error) . "<br /><br />";
+		print "<span class=\"Warning\" >";
+		print str_replace("#lang_filename#", $lang_filename, GM_LANG_lang_file_write_error) . "</span>";
 	}
-	print "</td>";
-	print "</tr>";
+	print "</div>";
+	
+	// Old text
+	print "<div class=\"NavBlockField EditLangNavBlockField\">";
+	
 	if ($Write_Ok) {
-		print "<tr>";
-		print "<td class=\"facts_value wrap\" style=\"text-align:center; color: #0000FF\" >";
 		print "<strong style=\"color: red\">|</strong>".stripslashes(AdminFunctions::Mask_all(LanguageFunctions::GetString($ls01, $lang_filename_orig, $file_type)))."<strong style=\"color: red\">|</strong>";
-		print "</td>";
-		print "</tr>";
 	}
-	print "</table>";
+	print "</div>";
 	
 	if ($Write_Ok) {
-		print "<br />";
-		print "<table class=\"FactsTable\">";
-		print "<tr>";
-		print "<td class=\"facts_label03\" style=\"color: #0000FF; font-weight: bold; \">";
+		// New text header
+		print "<div class=\"NavBlockColumnHeader AdminNavBlockColumnHeader\">";
 		PrintText("changed_message");
-		print "</td>";
-		print "</tr>";
+		print "</div>";
 		
-		print "<tr>";
-		print "<td class=\"facts_value wrap\" style=\"text-align:center; color: #0000FF\" >";
+		// New text
+		print "<div class=\"NavBlockField EditLangNavBlockField\">";
 		print "<strong style=\"color: red; \">|</strong>" . stripslashes(AdminFunctions::Mask_all($new_message)) . "<strong style=\"color: red\">|</strong>";
-		print "</td>";
-		print "</tr>";
-		print "</table>";
-		
-		print "<br />";
+		print "</div>";
 	}
 	
-	print "<table class=\"FactsTable\">";
-	print "<tr>";
-	print "<td class=\"facts_value\" style=\"text-align:center; \" >";
+	print "<div class=\"NavBlockFooter\">";
 	srand((double)microtime()*1000000);
 	if (!$realtime) print "<input type=\"submit\" value=\"" . GM_LANG_close_window . "\"" . " onclick=\"window.opener.showchanges('&dv=".rand()."#".$anchor."'); self.close();\" />";
 	else print "<input type=\"submit\" value=\"" . GM_LANG_close_window . "\"" . " onclick=\"self.close();\" />";
-	print "</td>";
-	print "</tr>";
-	print "</table>";
+	print "</div>";
 	
+	print "</div>";
 	print "</form>";
-	print "</center></div>";
 }
 
 PrintSimpleFooter();

@@ -44,7 +44,7 @@ PrintSimpleHeader(GM_LANG_review_changes);
 <script language="JavaScript" type="text/javascript">
 <!--
 	function show_gedcom_record(xref, type) {
-		var recwin = window.open("gedrecord.php?changed=1&pid="+xref+"&type="+type , "", "top=50,left=50,width=800,height=400,scrollbars=1,scrollable=1,resizable=1");
+		var recwin = window.open("gedrecord.php?changed=1&pid="+xref+"&type="+type , "", "top=50,left=50,width=600,height=400,scrollbars=1,scrollable=1,resizable=1");
 	}
 	function showchanges() {
 	   window.location = '<?php print SCRIPT_NAME; ?>';
@@ -57,49 +57,42 @@ PrintSimpleHeader(GM_LANG_review_changes);
 //-->
 </script>
 <?php
-print "<div id=\"content_popup\" class=\"center\">\n";
-print "<span class=\"SubHeader\">";
+print "<div class=\"NavBlockHeader EditHeader\">\n";
 PrintHelpLink("accept_gedcom", "qm", "review_changes");
 print GM_LANG_review_changes;
-print "</span><br /><br />\n";
 
 // NOTE: User wants to reject the change
 if ($action=="reject") {
 	if (ChangeFunctions::RejectChange($cid, $gedfile)) {
-		print "<br /><br /><b>";
+		print "<br /><br />";
 		print GM_LANG_reject_successful;
-		print "</b><br /><br />";
 	}
 }
 // NOTE: User rejects all changes
 if ($action=="rejectall") {
 	if (ChangeFunctions::RejectChange("", $gedfile, true)) {
-		print "<br /><br /><b>";
+		print "<br /><br />";
 		print GM_LANG_reject_successful;
-		print "</b><br /><br />";
 	}
 }
 // NOTE: User has accepted the change
 if ($action=="accept") {
 	if (ChangeFunctions::AcceptChange($cid, $gedfile)) {
-		print "<br /><br /><b>";
+		print "<br /><br />";
 		print GM_LANG_accept_successful;
-		print "</b><br /><br />";
 	}
 }
 // NOTE: User accepted all changes
 if ($action=="acceptall") {
 	if (ChangeFunctions::AcceptChange("", $gedfile, true)) {
-		print "<br /><br /><b>";
+		print "<br /><br />";
 		print GM_LANG_accept_successful;
-		print "</b><br /><br />";
 	}
 }
+print "</div>";
 
 if (ChangeFunctions::GetChangeData(true, "", true)==0) {
-	print "<br /><br /><b>";
-	print GM_LANG_no_changes;
-	print "</b>";
+	EditFunctions::PrintFailMessage(GM_LANG_no_changes);
 }
 else {
 	
@@ -386,51 +379,56 @@ else {
 	ksort($changegroup);
 
 	// Now, at last, we can start printing!
-	print "<table class=\"shade1\">";
+	print "<table class=\"NavBlockTable EditTable\">";
 	foreach ($changegroup as $groupid => $changes) {
-		print "<tr class=\"topbottombar shade2 $TEXT_DIRECTION\"><td colspan=\"2\">".GM_LANG_change_type.": ";
+		print "<tr><td class=\"NavBlockRowSpacer\">&nbsp;</td></tr>";
+		print "<tr><td class=\"NavBlockColumnHeader EditChangesColumnHeader\" colspan=\"2\">".GM_LANG_change_type.": ";
 		if (defined("GM_LANG_".$changegroup[$groupid][0]["type"])) print constant("GM_LANG_".$changegroup[$groupid][0]["type"]);
 		else print $changegroup[$groupid][0]["type"];
 		if (defined("GM_FACT_".$changegroup[$groupid][0]["fact"])) print ": ".constant("GM_FACT_".$changegroup[$groupid][0]["fact"]);
-		print "</td><td>";
+		print "</td><td class=\"NavBlockColumnHeader EditChangesColumnHeader\">";
 		if ($changegroup[$groupid]["canaccept"]) print "<a href=\"edit_changes.php?action=accept&amp;cid=$groupid&amp;gedfile=".$changegroup[$groupid][0]["file"]."\">".GM_LANG_accept."</a>";
 		if ($changegroup[$groupid]["canaccept"] && $changegroup[$groupid]["canreject"]) print " | ";
 		if ($changegroup[$groupid]["canreject"]) print "<a href=\"edit_changes.php?action=reject&amp;cid=$groupid&amp;gedfile=".$changegroup[$groupid][0]["file"]."\">".GM_LANG_reject."</a>";
 		print "</td></tr>";
-		print "<tr><td>".GM_LANG_name."</td><td>".GM_LANG_username."</td><td>".GM_LANG_date."</td></tr><tr>";
+		print "<tr><td class=\"NavBlockLabel EditChangesLabel\">".GM_LANG_name."</td><td class=\"NavBlockLabel EditChangesLabel\">".GM_LANG_username."</td><td class=\"NavBlockLabel EditChangesLabel\">".GM_LANG_date."</td></tr>";
 		foreach ($changes as $key => $change) {
 			// $change also contains the canaccept and canreject values. Only process if it's an array
 			if (is_array($change)) {
-				print "<tr class=\"shade1\"><td>";
+				print "<tr><td class=\"NavBlockField\">";
 				$object = ConstructObject($change["gid"], $change["gid_type"]);
 				switch ($change["gid_type"]) {
 					case "INDI":
-						$printname =  "<b>".$object->name."</b>".$object->addxref;
+						$printname = "<span class=\"ListItemName\">".$object->name."</span><span class=\"ListItemXref\">".$object->addxref."</span>";
 						$changegids["individuals"][$change["gid"]] = $printname;
 						break;
 					case "FAM":
-						$printname =  "<b>".$object->name."</b>".$object->addxref;
+						$printname = "<span class=\"ListItemName\">".$object->name."</span><span class=\"ListItemXref\">".$object->addxref."</span>";
 						$changegids["families"][$change["gid"]] = $printname;
 						break;
 					case "SOUR":
-						$printname =  "<b>".$object->name."</b>".$object->addxref;
+						$printname = "<span class=\"ListItemName\">".$object->name."</span><span class=\"ListItemXref\">".$object->addxref."</span>";
 						$changegids["source"][$change["gid"]] = $printname;
 						break;
 					case "REPO":
-						$printname =  "<b>".$object->name."</b>".$object->addxref;
+						$printname = "<span class=\"ListItemName\">".$object->name."</span><span class=\"ListItemXref\">".$object->addxref."</span>";
 						$changegids["repo"][$change["gid"]] = $printname;
 						break;
 					case "OBJE":
-						$printname =  "<b>".$object->title."</b>".$object->addxref;
+						$printname = "<span class=\"ListItemName\">".$object->title."</span><span class=\"ListItemXref\">".$object->addxref."</span>";
 						$changegids["media"][$change["gid"]] = $printname;
 						break;
 					case "SUBM":
-						$printname =  "<b>".$object->name."</b>".$object->addxref;
+						$printname = "<span class=\"ListItemName\">".$object->name."</span><span class=\"ListItemXref\">".$object->addxref."</span>";
 						$changegids["subm"][$change["gid"]] = $printname;
 						break;
 					case "NOTE":
-						$printname =  "<b>".$object->title."</b>".$object->addxref;
+						$printname = "<span class=\"ListItemName\">".$object->title."</span><span class=\"ListItemXref\">".$object->addxref."</span>";
 						$changegids["note"][$change["gid"]] = $printname;
+						break;
+					case "HEAD":
+						$printname = "<span class=\"ListItemName\">".$object->classname."</span><span class=\"ListItemXref\">".$object->addxref."</span>";
+						$changegids["head"][$change["gid"]] = $printname;
 						break;
 					default:
 						print "change type not found: ".$change["gid_type"];
@@ -439,41 +437,40 @@ else {
 				print $printname;
 				if ($trace) print "14. a".$changegroup[$groupid]["canaccept"]."r".$changegroup[$groupid]["canreject"];
 				print "</td>";
-				print "<td>";
+				print "<td class=\"NavBlockField\">";
 				$cuser =& User::GetInstance($change["user"]);
 				if (!$cuser->is_empty) print PrintReady($cuser->firstname." ".$cuser->lastname);
 				print "</td>";
 				// NOTE: Use European time format if none is specified.
 				if (empty($TIME_FORMAT)) $TIME_FORMAT = "H:m:s";
-				print "<td>".GetChangedDate(date("j M Y",$change["time"]))." ".date($TIME_FORMAT, $change["time"])."</td></tr>";
+				print "<td class=\"NavBlockField\">".GetChangedDate(date("j M Y",$change["time"]))." ".date($TIME_FORMAT, $change["time"])."</td></tr>";
 			
 			}
 		}
 	}
+	//-- accept and reject all
+	print "<tr><td class=\"NavBlockRowSpacer\">&nbsp;</td></tr>";
+	print "<tr><td class=\"NavBlockFooter EditHeader\" colspan=\"3\">";
+	print "<div class=\"EditChangesLinkAccept\"><a href=\"edit_changes.php?action=acceptall&amp;gedfile=".GedcomConfig::$GEDCOMID."\" onclick=\"return confirm('".GM_LANG_accept_all_confirm."');\">".GM_LANG_accept_all."</a></div>\n";
+	print "<div class=\"EditChangesLinkReject\"><a href=\"edit_changes.php?action=rejectall&amp;gedfile=".GedcomConfig::$GEDCOMID."\" onclick=\"return confirm('".GM_LANG_reject_all_confirm."');\">".GM_LANG_reject_all."</a></div>\n";
+	print "</td></tr>";
+	
 	print "</table>";
-	print "<br /><br /><table class=\"ListTable\">\r\n";
-	print "<tr><td class=\"topbottombar\" colspan=\"2\">";
+	
+	print "<table class=\"NavBlockTable EditChangesLinkTable\">\r\n";
+	print "<tr><td class=\"NavBlockHeader\">";
 	PrintHelpLink("view_gedcom_help", "qm", "view_gedcom");
 	print GM_LANG_view_gedcom."</td></tr>";
-	$rectypes = array("note"=>"NOTE", "subm"=>"SUBM", "media"=>"OBJE", "repo"=>"REPO", "source"=>"SOUR", "families"=>"FAM", "individuals"=>"INDI");
+	$rectypes = array("note"=>"NOTE", "subm"=>"SUBM", "media"=>"OBJE", "repo"=>"REPO", "source"=>"SOUR", "families"=>"FAM", "individuals"=>"INDI", "head"=>"HEAD");
 	foreach ($changegids as $type => $gids) {
 		$rectype = $rectypes[$type];
-		print "<tr><td class=\"shade2\">".constant("GM_LANG_".$type)."</td></tr>";
+		print "<tr><td class=\"NavBlockColumnHeader\">".constant("GM_LANG_".$type)."</td></tr>";
 		foreach ($gids as $gid => $name) {
-			print "<tr><td class=\"shade1 $TEXT_DIRECTION\"><a href=\"javascript:show_gedcom_record('".$gid."','".$rectype."');\">".$name."</a></td></tr>";
+			print "<tr><td class=\"NavBlockField\"><a href=\"javascript:show_gedcom_record('".$gid."','".$rectype."');\">".$name."</a></td></tr>";
 		}
 	}
 	print "</table>";
-	//-- accept and reject all
-	print "<br /><br /><table class=\"ListTable\">";
-	print "<tr><td class=\"shade2\">";
-	print "<a href=\"edit_changes.php?action=acceptall&amp;gedfile=".GedcomConfig::$GEDCOMID."\" onclick=\"return confirm('".GM_LANG_accept_all_confirm."');\">".GM_LANG_accept_all."</a>\n";
-	print "</td>";
-	print "<td class=\"shade2\">";
-	print "<a href=\"edit_changes.php?action=rejectall&amp;gedfile=".GedcomConfig::$GEDCOMID."\" onclick=\"return confirm('".GM_LANG_reject_all_confirm."');\">".GM_LANG_reject_all."</a>\n";
-	print "</td></tr></table>";
 }
-print "<br /><br />\n</center></div>\n";
-print "<center><a href=\"#\" onclick=\"window.opener.location.reload(); window.close();\">".GM_LANG_close_window."</a><br /></center>\n";
+print "<div class=\"CloseWindow\"><a href=\"#\" onclick=\"window.opener.location.reload(); window.close();\">".GM_LANG_close_window."</a></div>\n";
 PrintSimpleFooter();
 ?>

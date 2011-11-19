@@ -34,7 +34,7 @@ class AdminMenu {
 	private $rightitems = array();		// Array of items to print on the rigth side
 	private $bartext = null;			// Main text to print in the topbottombar
 	private $subbartext = null;			// Sub text to print in the topbottombar
-	private $barstyle = null;			// Additional style for the topbottombar
+	private $barstyle = null;			// Additional class for the topbottombar
 	private $narrowbar = false;			// Single or double height topbottombar
 
 	/**
@@ -62,12 +62,18 @@ class AdminMenu {
 	
 	public function AddItem($help, $qm, $help2, $link, $text, $side) {
 		
-		$string = "<div class=\"admin_item_".$side."\">";
-		if (!empty($help)) $string .= "<div class=\"helpicon\">".PrintHelpLink($help, $qm, $help2, false, true)."</div><div class=\"description\">";
+//		$string = "<td class=\"NavBlockLabel".ucfirst(strtolower($side))."\">";
+		$string = "<td class=\"NavBlockLabel AdminNavBlockOption\">";
+		if (!empty($help)) $string .= "<div class=\"HelpIconContainer\">".PrintHelpLink($help, $qm, $help2, false, true)."</div><div class=\"AdminNavBlockOptionText\">";
 		$string .= "<a href=\"".$link."\">".$text."</a></div>";
-		if (!empty($help)) $string .= "</div>";
+		if (!empty($help)) $string .= "</td>";
 		if ($side == "left") $this->leftitems[] = $string;
 		else $this->rightitems[] = $string;
+	}
+
+	public function PrintSpacer() {
+	
+		print "<tr><td class=\"NavBlockRowSpacer\" colspan=\"2\">&nbsp;</td></tr>";
 	}
 	
 	public function PrintItems() {
@@ -76,24 +82,24 @@ class AdminMenu {
 		?>
 		<!-- Setup the top bar -->
 		<?php
-		print "<div class=\"admin_topbottombar\"".(is_null($this->barstyle) ? "" : "style=\"".$this->barstyle."\"").">";
-		print ($this->narrowbar ? "" : "<h3>").$this->bartext.($this->narrowbar ? "" : "</h3>");
+		print "<tr><td colspan=\"2\" class=\"NavBlockHeader ".(is_null($this->barstyle) ? "" : $this->barstyle)."\">";
+		print ($this->narrowbar ? "" : "<div class=\"AdminNavBlockTitle\">").$this->bartext.($this->narrowbar ? "" : "</div>");
 		if(!is_null($this->subbartext)) print $this->subbartext;
-		print "</div>";
+		print "</td></tr>";
 		
 		// Print the items
 		$items = max(count($this->leftitems), count($this->rightitems));
 		?>
 		<!-- Print the options -->
 		<?php
-		print "<div class=\"admin_item_box\">";
 		for ($i=0; $i<$items; $i++) {
+			print "<tr>";
 			if (isset($this->leftitems[$i])) print $this->leftitems[$i];
-			else print "<div class=\"admin_item_left\">&nbsp;</div>";
+			else print "<td class=\"NavBlockLabel AdminNavBlockOption\">&nbsp;</td>";
 			if (isset($this->rightitems[$i])) print $this->rightitems[$i];
-			else print "<div class=\"admin_item_right\">&nbsp;</div>";
+			else print "<td class=\"NavBlockLabel AdminNavBlockOption\">&nbsp;</td>";
+			print "</tr>";
 		}
-		print "</div>";
 	}
 }
 ?>

@@ -38,7 +38,7 @@ if ($familybook_controller->show_full == false) {
 }
 
 // -- print html header information
-print "<div id=\"content_pedigree\">";
+print "<div id=\"content_familybook\">";
 
 print "\n\t<span class=\"PageTitleName\">".GM_LANG_familybook_chart.":";
 print "&nbsp;".PrintReady($familybook_controller->root->name);
@@ -48,13 +48,9 @@ print "</span>";
 
 <script language="JavaScript" type="text/javascript">
 <!--
-	var pasteto;
-	function open_find(textbox) {
-		pasteto = textbox;
-		findwin = window.open('find.php?type=indi', '', 'left=50,top=50,width=850,height=450,resizable=1,scrollbars=1');
-	}
+	var pastefield;
 	function paste_id(value) {
-		pasteto.value=value;
+		pastefield.value=value;
 	}
 //-->
 </script>

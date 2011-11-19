@@ -150,7 +150,7 @@ if ($action=="newentry") {
 }
 
 print "<br />";
-print "<div class=\"center\"><a href=\"#\" onclick=\"if (window.opener.showchanges) window.opener.showchanges(); window.close();\">".GM_LANG_close_window."</a></div>\n";
+print "<div class=\"CloseWindow\"><a href=\"#\" onclick=\"if (window.opener.showchanges) window.opener.showchanges(); window.close();\">".GM_LANG_close_window."</a></div>\n";
 print "<br />";
 PrintSimpleFooter();
 ?>

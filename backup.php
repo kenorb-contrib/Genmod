@@ -58,66 +58,74 @@ switch ($action) {
 }
 ?>
 <!-- Setup the left box -->
-<div id="admin_genmod_left">
-	<div class="admin_link"><a href="admin.php"><?php print GM_LANG_admin;?></a></div>
+<div id="AdminColumnLeft">
+	<?php AdminFunctions::AdminLink("admin.php", GM_LANG_admin); ?>
 </div>
-<div id="content">
+<div id="AdminColumnMiddle">
 	<?php
 	// Backup part
 	if ($action == "backup") { ?>
-		<div class="admin_topbottombar">
-			<h3> <?php PrintHelpLink("um_bu_explain","qm","um_backup"); print GM_LANG_um_backup;?></h3>
-		</div>
 		<form action="<?php print SCRIPT_NAME; ?>" method="post">
-			<input type="hidden" name="action" value="backup" />
+		<table class="NavBlockTable AdminNavBlockTable">
+		<tr>
+			<td colspan="2" class="NavBlockHeader AdminNavBlockHeader">
+				<span class="AdminNavBlockTitle">
+					<?php PrintHelpLink("um_bu_explain","qm","um_backup"); print GM_LANG_um_backup;?>
+				</span>
+			</td>
+		</tr>
+		<input type="hidden" name="action" value="backup" />
 		<?php
 		// If first time, let the user choose the options
 		if ($step == 1) {
 			?>
 			<input type="hidden" name="step" value="2" />
 			<?php if ($nomedia) { 
-				print "<div class=\"shade2\"><br />".GM_LANG_um_nomedia."<br /><br /></div>";
+				print "<tr><td class=\"NavBlockColumnHeader\"><br />".GM_LANG_um_nomedia."<br /><br /></td></tr>";
 			}
 			?>	
-			<div class="admin_item_box">
-				<div class="width50 choice_left"><?php print GM_LANG_um_bu_config; ?></div>
-				<div class="width10 choice_right"><input type="checkbox" name="um_config" value="yes" checked="checked" /></div>
-			</div>
-			<div class="admin_item_box">
-				<div class="width50 choice_left"><?php print GM_LANG_um_bu_lang; ?></div>
-				<div class="width10 choice_right"><input type="checkbox" name="um_lang" value="yes" checked="checked" /></div>
-			</div>
-			<div class="admin_item_box">
-				<div class="width50 choice_left"><?php print GM_LANG_um_bu_gedcoms; ?></div>
-				<div class="width10 choice_right"><input type="checkbox" name="um_gedcoms" value="yes" checked="checked" /></div>
-			</div>
-			<div class="admin_item_box">
-				<div class="width50 choice_left"><?php print GM_LANG_um_bu_media; ?></div>
-				<div class="width10 choice_right"><input type="checkbox" name="um_media" value="yes" <?php if ($nomedia) { ?> disabled="disabled" <?php } else { ?> checked="checked" <?php } ?>  /></div>
-			</div>
-			<div class="admin_item_box">
-				<div class="width50 choice_left"><?php print GM_LANG_um_bu_gedsets; ?></div>
-				<div class="width10 choice_right"><input type="checkbox" name="um_gedsets" value="yes" checked="checked" /></div>
-			</div>
-			<div class="admin_item_box">
-				<div class="width50 choice_left"><?php print GM_LANG_um_bu_logs; ?></div>
-				<div class="width10 choice_right"><input type="checkbox" name="um_logs" value="yes" checked="checked" /></div>
-			</div>
-			<div class="admin_item_box">
-				<div class="width50 choice_left"><?php print GM_LANG_um_bu_usinfo; ?></div>
-				<div class="width10 choice_right"><input type="checkbox" name="um_usinfo" value="yes" checked="checked" /></div>
-			</div>
-			<div class="admin_item_box">
-				<div class="width50 choice_left"><?php print GM_LANG_um_bu_mypages; ?></div>
-				<div class="width10 choice_right"><input type="checkbox" name="um_mypages" value="yes" checked="checked" /></div>
-			</div>
-			<div class="admin_item_box">
-				<div class="width50 choice_left"><?php print GM_LANG_um_bu_actions; ?></div>
-				<div class="width10 choice_right"><input type="checkbox" name="um_actions" value="yes" checked="checked" /></div>
-			</div>
-			<div class="admin_item_box center"><br />
-				<input type="submit" name="submit" value="<?php print GM_LANG_um_mk_bu; ?>" />
-			</div>
+			<tr>
+				<td class="NavBlockLabel"><?php print GM_LANG_um_bu_config; ?></td>
+				<td class="NavBlockField"><input type="checkbox" name="um_config" value="yes" checked="checked" /></td>
+			</tr>
+			<tr>
+				<td class="NavBlockLabel"><?php print GM_LANG_um_bu_lang; ?></td>
+				<td class="NavBlockField"><input type="checkbox" name="um_lang" value="yes" checked="checked" /></td>
+			</tr>
+			<tr>
+				<td class="NavBlockLabel"><?php print GM_LANG_um_bu_gedcoms; ?></td>
+				<td class="NavBlockField"><input type="checkbox" name="um_gedcoms" value="yes" checked="checked" /></td>
+			</tr>
+			<tr>
+				<td class="NavBlockLabel"><?php print GM_LANG_um_bu_media; ?></td>
+				<td class="NavBlockField"><input type="checkbox" name="um_media" value="yes" <?php if ($nomedia) { ?> disabled="disabled" <?php } else { ?> checked="checked" <?php } ?>  /></td>
+			</tr>
+			<tr>
+				<td class="NavBlockLabel"><?php print GM_LANG_um_bu_gedsets; ?></td>
+				<td class="NavBlockField"><input type="checkbox" name="um_gedsets" value="yes" checked="checked" /></td>
+			</tr>
+			<tr>
+				<td class="NavBlockLabel"><?php print GM_LANG_um_bu_logs; ?></td>
+				<td class="NavBlockField"><input type="checkbox" name="um_logs" value="yes" checked="checked" /></td>
+			</tr>
+			<tr>
+				<td class="NavBlockLabel"><?php print GM_LANG_um_bu_usinfo; ?></td>
+				<td class="NavBlockField"><input type="checkbox" name="um_usinfo" value="yes" checked="checked" /></td>
+			</tr>
+			<tr>
+				<td class="NavBlockLabel"><?php print GM_LANG_um_bu_mypages; ?></td>
+				<td class="NavBlockField"><input type="checkbox" name="um_mypages" value="yes" checked="checked" /></td>
+			</tr>
+			<tr>
+				<td class="NavBlockLabel"><?php print GM_LANG_um_bu_actions; ?></td>
+				<td class="NavBlockField"><input type="checkbox" name="um_actions" value="yes" checked="checked" /></td>
+			</tr>
+			<tr>
+				<td colspan="2" class="NavBlockFooter">
+					<input type="submit" name="submit" value="<?php print GM_LANG_um_mk_bu; ?>" />
+				</td>
+			</tr>
+			</table>
 		</form>
 		<?php
 		}
@@ -142,10 +150,10 @@ switch ($action) {
 				foreach ($flist as $key => $mfile) {
 					MediaFS::CreateFile(RelativePathFile(GedcomConfig::$MEDIA_DIRECTORY.MediaFS::CheckMediaDepth($mfile)));
 				}
-				print "<div class=\"shade2\"><br />".GM_LANG_um_mediaexp."<br /></div>";
-				print "<div class=\"admin_item_box center\">";
+				print "<tr><td class=\"NavBlockColumnHeader AdminNavBlockColumnHeader\">".GM_LANG_um_mediaexp."</td></tr>";
+				print "<tr><td class=\"NavBlockFooter\">";
 				print "<input type=\"submit\" name=\"submit\" value=\"".GM_LANG_um_proceed_bu."\" />";
-				print "</div>";
+				print "</td></tr>";
 				print "</form>";
 				PrintFooter();
 				exit;
@@ -242,9 +250,13 @@ switch ($action) {
 				
 				// Make the zip
 				?>
-				<div class="shade2 center">
-					<?php print GM_LANG_um_results; ?>
-				</div>
+				<tr>
+					<td class="NavBlockColumnHeader AdminNavBlockColumnHeader">
+						<?php print GM_LANG_um_results; ?>
+					</td>
+				</tr>
+				<tr>
+					<td class="NavBlockField">
 				<?php
 				if (count($flist) > 0) {
 					require "includes/pclzip.lib.php";
@@ -253,33 +265,40 @@ switch ($action) {
 					$comment = "Created by Genmod ".GM_VERSION." ".GM_VERSION_RELEASE." on ".adodb_date("r").".";
 					$archive = new PclZip($fname);
 					$v_list = $archive->create($flist, PCLZIP_OPT_COMMENT, $comment);
-					print "<div class=\"shade1\"><br />";
-					if ($v_list == 0) print "Error : ".$archive->errorInfo(true)."</div>";
+					if ($v_list == 0) print "Error : ".$archive->errorInfo(true);
 					else {
-						print GM_LANG_um_zip_succ."</div>";
+						print GM_LANG_um_zip_succ."<br />";
 						$url = SERVER_URL;
 						if (substr($url,-1,1)!="/") $url .= "/";
-						print "<div class=\"shade1\"><a href=".$url."downloadbackup.php?fname=".urlencode($fname)." target=_blank>".GM_LANG_um_zip_dl." ".$fname."</a>  (";
-						printf("%.0f Kb", (filesize($fname)/1024));
-						print")<br /></div>";
+						print "<a href=".$url."downloadbackup.php?fname=".urlencode($fname)." target=_blank>".GM_LANG_um_zip_dl." ".$fname."</a>  (";
+						printf ("%.0f Kb", (filesize($fname)/1024));
+						print ")";
 					}
+					print "</td></tr>";
 					
 					// Remove temporary files again
 					foreach ($flist as $key=>$fn) {
 						if (substr($fn, strlen(INDEX_DIRECTORY), 7) == "export_") unlink($fn);
 					}
 				}
-				else print "<div class=\"shade2\"><br />".GM_LANG_um_nofiles."<br /></div>";
+				else print GM_LANG_um_nofiles."<br /></td></tr>";
 			}
 			
 			@set_time_limit($time_limit);
 		}
+		print "</table></form>";
 	}
 	
 	if ($action == "restore") { ?>
-		<div class="admin_topbottombar">
-			<h3><?php print GM_LANG_um_restore; ?></h3>
-		</div>
+		<form action="<?php print SCRIPT_NAME; ?>" method="post">
+		<table class="NavBlockTable AdminNavBlockTable">
+		<tr>
+			<td colspan="2" class="NavBlockHeader AdminNavBlockHeader">
+				<span class="AdminNavBlockTitle">
+					<?php print GM_LANG_um_restore;?>
+				</span>
+			</td>
+		</tr>
 		<?php
 		// If first time, let the user choose the options
 		if (!isset($_POST["um_counters"]) && !isset($_POST["um_changes"]) && !isset($_POST["um_gedsets"]) && !isset($_POST["um_logs"]) && !isset($_POST["um_usinfo"]) && !isset($_POST["um_mypages"]) && !isset($_POST["um_config"]) && !isset($_POST["um_actions"])) {
@@ -290,71 +309,90 @@ switch ($action) {
 			while (false !== ($file = readdir($handle))) {
 				if (substr($file, -4) == ".sql") $files[] = $file;
 			}
-			if (count($files) == "0") $nofiles = true;
-			else $nofiles = false;
+			$found = false;
 			?>
 			
-			<form action="<?php print SCRIPT_NAME; ?>" method="post">
 				<input type="hidden" name="action" value="restore" />
 				<?php 
-				if(in_array("export_config.sql", $files)) { ?>
-					<div class="admin_item_box">
-						<div class="width50 choice_left"><?php print GM_LANG_um_res_config; ?></div>
-						<div class="width10 choice_right"><input type="checkbox" name="um_config" value="yes" /></div>
-					</div>
+				if(in_array("export_config.sql", $files)) { 
+					$found = true;
+					?>
+					<tr>
+						<td class="NavBlockLabel"><?php print GM_LANG_um_res_config; ?></td>
+						<td class="NavBlockField"><input type="checkbox" name="um_config" value="yes" /></td>
+					</tr>
 				<?php }
-				if(in_array("export_lang_settings.sql", $files)) { ?>
-					<div class="admin_item_box">
-						<div class="width50 choice_left"><?php print GM_LANG_um_res_lang; ?></div>
-						<div class="width10 choice_right"><input type="checkbox" name="um_lang" value="yes" /></div>
-					</div>
+				if(in_array("export_lang_settings.sql", $files)) { 
+					$found = true;
+					?>
+					<tr>
+						<td class="NavBlockLabel"><?php print GM_LANG_um_res_lang; ?></td>
+						<td class="NavBlockField"><input type="checkbox" name="um_lang" value="yes" /></td>
+					</tr>
 				<?php }
-				if(in_array("export_changes.sql", $files)) { ?>
-					<div class="admin_item_box">
-						<div class="width50 choice_left"><?php print GM_LANG_um_res_changes; ?></div>
-						<div class="width10 choice_right"><input type="checkbox" name="um_changes" value="yes" /></div>
-					</div>
+				if(in_array("export_changes.sql", $files)) { 
+					$found = true;
+					?>
+					<tr>
+						<td class="NavBlockLabel"><?php print GM_LANG_um_res_changes; ?></td>
+						<td class="NavBlockField"><input type="checkbox" name="um_changes" value="yes" /></td>
+					</tr>
 				<?php }
-				if(in_array("export_gedcomsettings.sql", $files)) { ?>
-					<div class="admin_item_box">
-						<div class="width50 choice_left"><?php print GM_LANG_um_res_gedsets; ?></div>
-						<div class="width10 choice_right"><input type="checkbox" name="um_gedsets" value="yes" /></div>
-					</div>
+				if(in_array("export_gedcomsettings.sql", $files)) { 
+					$found = true;
+					?>
+					<tr>
+						<td class="NavBlockLabel"><?php print GM_LANG_um_res_gedsets; ?></td>
+						<td class="NavBlockField"><input type="checkbox" name="um_gedsets" value="yes" /></td>
+					</tr>
 				<?php }
-				if(in_array("export_log.sql", $files)) { ?>
-					<div class="admin_item_box">
-						<div class="width50 choice_left"><?php print GM_LANG_um_res_logs; ?></div>
-						<div class="width10 choice_right"><input type="checkbox" name="um_logs" value="yes" /></div>
-					</div>
+				if(in_array("export_log.sql", $files)) { 
+					$found = true;
+					?>
+					<tr>
+						<td class="NavBlockLabel"><?php print GM_LANG_um_res_logs; ?></td>
+						<td class="NavBlockField"><input type="checkbox" name="um_logs" value="yes" /></td>
+					</tr>
 				<?php }
-				if(in_array("export_users.sql", $files)) { ?>
-					<div class="admin_item_box">
-						<div class="width50 choice_left"><?php print GM_LANG_um_res_usinfo; ?></div>
-						<div class="width10 choice_right"><input type="checkbox" name="um_usinfo" value="yes" /></div>
-					</div>
+				if(in_array("export_users.sql", $files)) { 
+					$found = true;
+					?>
+					<tr>
+						<td class="NavBlockLabel"><?php print GM_LANG_um_res_usinfo; ?></td>
+						<td class="NavBlockField"><input type="checkbox" name="um_usinfo" value="yes" /></td>
+					</tr>
 				<?php }
-				if(in_array("export_mypages.sql", $files)) { ?>
-					<div class="admin_item_box">
-						<div class="width50 choice_left"><?php print GM_LANG_um_res_mypages; ?></div>
-						<div class="width10 choice_right"><input type="checkbox" name="um_mypages" value="yes" /></div>
-					</div>
+				if(in_array("export_mypages.sql", $files)) { 
+					$found = true;
+					?>
+					<tr>
+						<td class="NavBlockLabel"><?php print GM_LANG_um_res_mypages; ?></td>
+						<td class="NavBlockField"><input type="checkbox" name="um_mypages" value="yes" /></td>
+					</tr>
 				<?php }
-				if(in_array("export_actions.sql", $files)) { ?>
-					<div class="admin_item_box">
-						<div class="width50 choice_left"><?php print GM_LANG_um_res_actions; ?></div>
-						<div class="width10 choice_right"><input type="checkbox" name="um_actions" value="yes" /></div>
-					</div>
+				if(in_array("export_actions.sql", $files)) { 
+					$found = true;
+					?>
+					<tr>
+						<td class="NavBlockLabel"><?php print GM_LANG_um_res_actions; ?></td>
+						<td class="NavBlockField"><input type="checkbox" name="um_actions" value="yes" /></td>
+					</tr>
 				<?php }
-				if ($nofiles) { ?>
-					<div class="admin_item_box">
-						<?php print GM_LANG_um_res_nofiles; ?>
-					</div>
+				if (!$found) { ?>
+					<tr>
+						<td class="NavBlockColumnHeader AdminNavBlockColumnHeader">
+							<?php print GM_LANG_um_res_nofiles; ?>
+						</td>
+					</tr>
 				<?php }
 				else { ?>
-					<div class="admin_item_box center"><br />
-						<input type="submit" name="submit" value="<?php print GM_LANG_um_mk_res; ?>" />
-					</div>
+					<tr>
+						<td colspan="2" class="NavBlockFooter">
+							<input type="submit" name="submit" value="<?php print GM_LANG_um_mk_res; ?>" />
+						</td>
+					</tr>
 				<?php } ?>
+			</table>
 			</form>
 			<?php
 		}
@@ -445,14 +483,20 @@ switch ($action) {
 			
 			// Print the result report
 			?>
-			<div class="shade2 center">
-				<?php print GM_LANG_um_results; ?>
-			</div>
-			<div class="shade1">
-				<?php if ($error) print "<a href=\"javascript: ".GM_LANG_view_syslog."\" onclick=\"window.open('viewlog.php?cat=S&amp;max=20&amp;type=E', '', 'top=50,left=10,width=700,height=600,scrollbars=1,resizable=1'); return false;\">".GM_LANG_um_res_errors."</a>";
-				else print GM_LANG_um_res_success;
-				?>
-			</div>
+			<tr>
+				<td class="NavBlockColumnHeader AdminNavBlockColumnHeader">
+					<?php print GM_LANG_um_results; ?>
+				</td>
+			</tr>
+			<tr>
+				<td class="NavBlockLabel">
+					<?php if ($error) print "<a href=\"javascript: ".GM_LANG_view_syslog."\" onclick=\"window.open('viewlog.php?cat=S&amp;max=20&amp;type=E', '', 'top=50,left=10,width=700,height=600,scrollbars=1,resizable=1'); return false;\">".GM_LANG_um_res_errors."</a>";
+					else print GM_LANG_um_res_success;
+					?>
+				</td>
+			</tr>
+			</table>
+			</form>
 			<?php
 		}
 	}

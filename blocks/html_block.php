@@ -39,26 +39,29 @@ function print_html_block($block=true, $config="", $side, $index) {
 	if ($config["only_show_logged_in"] != "no" && $gm_user->username == "") return;
 	if (!isset($HTML_BLOCK_COUNT)) $HTML_BLOCK_COUNT = 0;
 	$HTML_BLOCK_COUNT++;
+	print "<!-- Start HTML Block //-->";
 	print "<div id=\"html_block$HTML_BLOCK_COUNT\" class=\"BlockContainer\">\n";
-	print "<div class=\"BlockContent\">";
-	if ($block) print "<div class=\"RestrictedBlockHeightRight\">\n";
-	else print "<div class=\"RestrictedBlockHeightMain\">\n";
+		print "<div class=\"BlockContent\">\n";
+			if ($block) print "<div class=\"RestrictedBlockHeightRight\">\n";
+			else print "<div class=\"RestrictedBlockHeightMain\">\n";
 
-	$config["html"] = ReplaceEmbedText($config["html"]);
-	print $config["html"];
+				$config["html"] = ReplaceEmbedText($config["html"]);
+				print $config["html"];
 
-	print "</div>\n";
-	if ($GM_BLOCKS["print_html_block"]["canconfig"]) {
-		$username = $gm_user->username;
-		if ((($command=="gedcom")&&($gm_user->userGedcomAdmin())) || (($command=="user")&&(!empty($username)))) {
-			if ($command=="gedcom") $name = preg_replace("/'/", "\'", get_gedcom_from_id(GedcomConfig::$GEDCOMID));
-			else $name = $username;
-			print "<br /><a href=\"javascript: ".GM_LANG_config_block."\" onclick=\"window.open('index_edit.php?name=$name&amp;command=$command&amp;action=configure&amp;side=$side&amp;index=$index', '', 'top=50,left=50,width=750,height=550,scrollbars=1,resizable=1'); return false;\">";
-			print "<img class=\"adminicon\" src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["admin"]["small"]."\" width=\"15\" height=\"15\" border=\"0\" alt=\"".GM_LANG_config_block."\" /></a>\n";
-		}
-	}
-	print "</div>"; // blockcontent
+			print "</div>\n";
+			if ($GM_BLOCKS["print_html_block"]["canconfig"]) {
+				$username = $gm_user->username;
+				if ((($command=="gedcom")&&($gm_user->userGedcomAdmin())) || (($command=="user")&&(!empty($username)))) {
+					if ($command=="gedcom") $name = preg_replace("/'/", "\'", get_gedcom_from_id(GedcomConfig::$GEDCOMID));
+					else $name = $username;
+					print "<div class=\"BlockAdminLinkBottom\"><a href=\"javascript: ".GM_LANG_config_block."\" onclick=\"window.open('index_edit.php?name=$name&amp;command=$command&amp;action=configure&amp;side=$side&amp;index=$index', '', 'top=50,left=50,width=750,height=550,scrollbars=1,resizable=1'); return false;\">";
+					BlockFunctions::PrintAdminIcon();
+					print "</a></div>";
+				}
+			}
+		print "</div>"; // blockcontent
 	print "</div>"; // block
+	print "<!-- End HTML Block //-->";
 }
 
 function print_html_block_config($config) {
@@ -70,7 +73,7 @@ function print_html_block_config($config) {
 	}
 	if (empty($config)) $config = $GM_BLOCKS["print_html_block"]["config"];
 	?>
-	<tr><td class="shade1">
+	<tr><td class="NavBlockField" colspan="2">
 	<?php
 		if ($useCK) { // use CKeditor module
 			?><script type="text/javascript" src="modules/CKEditor/ckeditor.js"></script><?php
@@ -86,8 +89,9 @@ function print_html_block_config($config) {
 		}
 	?>
 	</td></tr>
-	<tr><td class="shade1">
-  	<?php print GM_LANG_only_show_logged_in;?>
+	<tr><td class="NavBlockLabel">
+  	<?php print GM_LANG_only_show_logged_in;?></td>
+  	<td class="NavBlockField">
 	<select name="only_show_logged_in">
 		<option value="no"<?php if ($config["only_show_logged_in"]=="no") print " selected=\"selected\"";?>><?php print GM_LANG_no; ?></option>
 		<option value="yes"<?php if ($config["only_show_logged_in"]=="yes") print " selected=\"selected\"";?>><?php print GM_LANG_yes; ?></option>

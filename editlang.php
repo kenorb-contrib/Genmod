@@ -47,26 +47,34 @@ print "</script>\n";
 
 ?>
 <!-- Setup the left box -->
-<div id="admin_genmod_left">
-	<div class="admin_link"><a href="admin.php"><?php print GM_LANG_admin;?></a></div>
+<div id="AdminColumnLeft">
+	<?php AdminFunctions::AdminLink("admin.php", GM_LANG_admin); ?>
 	<?php
-	if ($el_controller->action != "") print "<div class=\"admin_link\"><a href=\"editlang.php\">".GM_LANG_translator_tools."</a></div>";
+	if ($el_controller->action != "") AdminFunctions::AdminLink("editlang.php", GM_LANG_translator_tools);
 	?>
 </div>
-<div id="content">
+<div id="AdminColumnMiddle">
 <?php
 switch ($el_controller->action) {
 	case 'debug':
 		?>
 		<form name="debug_form" method="post" action="editlang.php">
+		<table class="NavBlockTable AdminNavBlockTable">
 		<input type="hidden" name="page" value="editlang" />
 		<input type="hidden" name="action" value="debug" />
 		<input type="hidden" name="execute" value="true" />
-		<div class="admin_topbottombar">
-			<?php print GM_LANG_lang_debug; ?>
-		</div>
-		<div class="admin_item_box">
-			<div class="choice_left">
+		<tr>
+			<td colspan="2" class="NavBlockHeader AdminNavBlockHeader">
+				<div class="AdminNavBlockTitle">
+				<?php print GM_LANG_lang_debug; ?>
+				</div>
+			</td>
+		</tr>
+		<tr>
+			<td class="NavBlockLabel AdminNavBlockOption">
+				<?php print GM_LANG_lang_debug_use; ?>
+			</td>
+			<td class="NavBlockField">
 				<input type="checkbox" name="DEBUG_LANG" value="yes" 
 				<?php
 				if (isset($_SESSION["DEBUG_LANG"])) {
@@ -74,50 +82,70 @@ switch ($el_controller->action) {
 				}
 				?>
 				/>
-				<?php print GM_LANG_lang_debug_use?>&nbsp;&nbsp;
-			</div>
-			<div class="choice_middle">
+			</td>
+		</tr>
+		<tr>
+			<td class="NavBlockFooter" colspan="2">
 				<input  type="submit" value="<?php print GM_LANG_save;?>" />
-			</div>
-		</div>
+			</td>
+		</tr>
+		</table>
 		</form>
 		<?php
 		break;
 	case 'edit':
 		?>
 		<form name="choose_form" method="get" action="<?php print $_SERVER['SCRIPT_NAME']; ?>">
+			<table class="NavBlockTable AdminNavBlockTable">
 			<input type="hidden" name="page" value="editlang" />
 			<input type="hidden" name="action" value="edit" />
 			<input type="hidden" name="execute" value="true" />
-			<div class="admin_topbottombar">
-				<?php print GM_LANG_edit_lang_utility; ?>
-			</div>
-			<div class="admin_item_box">
-				<div class="width30 choice_left">
-					<div class="helpicon">
+			<tr>
+				<td colspan="3" class="NavBlockHeader AdminNavBlockHeader">
+					<div class="AdminNavBlockTitle">
+					<?php print GM_LANG_edit_lang_utility; ?>
+					</div>
+				</td>
+			</tr>
+			<tr>
+				<td class="NavBlockColumnHeader">
+					<div class="HelpIconContainer">
 						<?php PrintHelpLink("language_to_edit_help", "qm", "language_to_edit");?>
 					</div>
-					<div class="description">
-						<?php
-						print GM_LANG_language_to_edit."<br />";
-						print "<select name=\"language2\">";
-						foreach ($el_controller->sorted_langs as $key => $value){
-							print "\n\t\t\t<option value=\"$key\"";
-							if ($key == $el_controller->language2) print " selected=\"selected\"";
-							print ">".constant("GM_LANG_lang_name_".$key)."</option>";
-						}
-						?>
-						</select>
+					<div class="AdminNavBlockOptionText">
+						<?php print GM_LANG_language_to_edit; ?>
 					</div>
-				</div>
-				<div class="width30 choice_middle">
-					<div class="helpicon">
+				</td>
+				<td class="NavBlockColumnHeader">
+					<div class="HelpIconContainer">
 						<?php PrintHelpLink("file_to_edit_help", "qm", "file_to_edit");?>
 					</div>
-					<div class="description">
-						<?php
-						print GM_LANG_file_to_edit."<br />";
-						print "<select name=\"file_type\">";
+					<div class="AdminNavBlockOptionText">
+						<?php print GM_LANG_file_to_edit; ?>
+					</div>
+				</td>
+				<td class="NavBlockColumnHeader">
+					<div class="HelpIconContainer">
+						<?php PrintHelpLink("hide_translated_help", "qm", "hide_translated");?>
+					</div>
+					<div class="AdminNavBlockOptionText">
+						<?php print GM_LANG_hide_translated; ?>
+					</div>
+				</td>
+			</tr>
+			<tr>
+				<td class="NavBlockField"> <?php
+					print "<select name=\"language2\">";
+					foreach ($el_controller->sorted_langs as $key => $value){
+						print "\n\t\t\t<option value=\"$key\"";
+						if ($key == $el_controller->language2) print " selected=\"selected\"";
+						print ">".constant("GM_LANG_lang_name_".$key)."</option>";
+					}
+					?>
+					</select>
+				</td>
+				<td class="NavBlockField"> <?php
+					print "<select name=\"file_type\">";
 						print "\n\t\t\t<option value=\"lang\"";
 						if ($el_controller->file_type == "lang") print " selected=\"selected\"";
 						print ">".GM_LANG_comparing_main."</option>";
@@ -125,22 +153,15 @@ switch ($el_controller->action) {
 						print "\n\t\t\t<option value=\"help_text\"";
 						if ($el_controller->file_type == "help_text") print " selected=\"selected\"";
 						print ">" . GM_LANG_comparing_helptext . "</option>";
-						
+	
 						print "\n\t\t\t<option value=\"facts\"";
 						if ($el_controller->file_type == "facts") print " selected=\"selected\"";
 						print ">" . GM_LANG_comparing_facts . "</option>";
 						?>
-						</select>
-					</div>
-				</div>
-				<div class="width30 choice_middle">
-					<div class="helpicon">
-						<?php PrintHelpLink("hide_translated_help", "qm", "hide_translated");?>
-					</div>
-					<div class="description">
-						<?php
-						print GM_LANG_hide_translated."<br />";
-						print "<select name=\"hide_translated\">";
+					</select>
+				</td>
+				<td class="NavBlockField"> <?php
+					print "<select name=\"hide_translated\">";
 						print "<option";
 						if (!$el_controller->hide_translated) print " selected=\"selected\"";
 						print " value=\"";
@@ -156,20 +177,19 @@ switch ($el_controller->action) {
 						print GM_LANG_yes;
 						print "</option>";
 						?>
-						</select>
-					</div>
-				</div>
-			</div>
-			<div class="admin_item_box">
-				<div class="center">
+					</select>
+				</td>
+			</tr>
+			<tr>
+				<td class="NavBlockFooter" colspan="3">
 					<input  type="submit" value="<?php print GM_LANG_edit;?>" />
-				</div>
-			</div>
-		</form>
+				</td>
+			</tr>
 		<?php
 		if ($el_controller->execute) {
 			?>
-			<div class="topbottombar SubHeader"><?php print GM_LANG_listing;?>: "
+			<tr><td colspan="3" class="NavBlockRowSpacer">&nbsp;</td></tr>
+			<tr><td class="NavBlockHeader" colspan="3"><?php print GM_LANG_listing;?>: "
 			<?php
 			switch ($el_controller->file_type) {
 				case "lang":
@@ -207,29 +227,23 @@ switch ($el_controller->action) {
 					break;					
 			}
 			print "\"<br />\n";
-			print GM_LANG_contents . ":</div>";
+			print GM_LANG_contents . ":</td></tr>";
 			$lastfound = (-1);
 			$counter = 0;
-			$colorid = 1;
 			foreach ($english_language_array as $string => $value) {
-//				print '<div class="language_item_box'.$colorid.'">';
-				$dummy_output = "<div class=\"language_item_box".$colorid."\">";
-				$dummy_output .= "<div class=\"original_language\">";
+				$dummy_output = "<tr><td class=\"NavBlockLabel AdminNavBlockLabel\">";
 				$dummy_output .= $string;
-				$dummy_output .= "</div>\n";
-				$dummy_output .= "<div class=\"translated_language\">";
+				$dummy_output .= "</td><td colspan=\"2\" class=\"NavBlockField\">";
 				$dummy_output .= "\n<a name=\"a1_".$counter."\"></a>\n";
 				
 				$val = stripslashes(AdminFunctions::Mask_all($value));
 				if ($val == "") {
-					$dummy_output .= "<strong style=\"color: #FF0000\">" . str_replace("#LANGUAGE_FILE#", $gm_language[$el_controller->language1], GM_LANG_message_empty_warning) . "</strong>";
+					$dummy_output .= "<span class=\"EditLangNoDestText\">" . str_replace("#LANGUAGE_FILE#", $gm_language[$el_controller->language1], GM_LANG_message_empty_warning) . "</span>";
 				}
-				else $dummy_output .= "<i>" . $val . "</i>";
-				$dummy_output .= '</div>';
-				$dummy_output .= "<div class=\"original_language\">";
-				$dummy_output .= "&nbsp;";
-				$dummy_output .= "</div>";
-				$dummy_output .= "<div class=\"translated_language\">";
+				else $dummy_output .= "<div class=\"EditLangTranOrgText\">" . $val . "</div>";
+				
+				$dummy_output .= "<div class=\"NavBlockRowSpacer\">&nbsp;</div>";
+				$dummy_output .= "<div class=\"EditLangTranDestText\">";
 				$new_counter = 0;
 				$found = false;
 				// NOTE: Get the translated text
@@ -239,37 +253,36 @@ switch ($el_controller->action) {
 					$dum = stripslashes(AdminFunctions::Mask_all($dDummy));
 					$dummy_output .= $dum;
 					if ($dum == "") {
-						$dummy_output .= "<strong style=\"color: #FF0000\">" . str_replace("#LANGUAGE_FILE#", $gm_language[$el_controller->language2], GM_LANG_message_empty_warning) . "</strong>";
+						$dummy_output .= "<span class=\"EditLangNoDestText\">" . str_replace("#LANGUAGE_FILE#", $gm_language[$el_controller->language2], GM_LANG_message_empty_warning) . "</span>";
 					}
 					$dummy_output .= "</a>";
 					$lastfound = $new_counter;
 					$found = true;
 				}
 				else {
-					$dummy_output .= "<a style=\"color: #FF0000\" href=\"#\" onclick=\"return helpPopup00('" . "ls01=" . $string . "&amp;ls02=" . (0 - intval($lastfound) - 1) . "&amp;language2=" . $el_controller->language2 . "&amp;file_type=" . $el_controller->file_type . "&amp;anchor=a1_" . $counter . "');\">";
-					$dummy_output .= "<i>";
+					$dummy_output .= "<a class=\"EditLangNoTranDestText\" href=\"#\" onclick=\"return helpPopup00('" . "ls01=" . $string . "&amp;ls02=" . (0 - intval($lastfound) - 1) . "&amp;language2=" . $el_controller->language2 . "&amp;file_type=" . $el_controller->file_type . "&amp;anchor=a1_" . $counter . "');\">";
+					$dummy_output .= "<span class=\"EditLangNoTranDestText\">";
 					if ($val == "") $dummy_output .= "&nbsp;";
 					else $dummy_output .= $val;
-					$dummy_output .= "</i></a>";
+					$dummy_output .= "</span></a>";
 				}
 				$new_counter++;
 				
-				$dummy_output .= "</div></div>";
+				$dummy_output .= "</td></tr>";
 				if (!$el_controller->hide_translated) {
 					print $dummy_output;
-					if ($colorid == 2) $colorid = 1;
-					else $colorid++;
 				}
 				// NOTE: Print the untranslated strings
 				else if ($el_controller->hide_translated && !$found) {
 					print $dummy_output;
-					if ($colorid == 2) $colorid = 1;
-					else $colorid++;
 				}
 				$counter++;
 //				print '</div>';
 			}
-		}
+		} ?>
+		</table>
+		</form>
+		<?php
 		break;
 	case 'export':
 		?>
@@ -277,42 +290,44 @@ switch ($el_controller->action) {
 		<input type="hidden" name="page" value="editlang" />
 		<input type="hidden" name="action" value="export" />
 		<input type="hidden" name="execute" value="true" />
-		<div class="admin_topbottombar">
-			<?php print GM_LANG_export_lang_utility; ?>
-		</div>
-		<div class="admin_item_box">
-			<div class="width25 choice_left">
-				<div class="helpicon">
+		<table class="NavBlockTable AdminNavBlockTable">
+		<tr>
+			<td colspan="2" class="NavBlockHeader AdminNavBlockHeader">
+				<div class="AdminNavBlockTitle">
+				<?php print GM_LANG_export_lang_utility; ?>
+				</div>
+			</td>
+		</tr>
+		<tr>
+			<td class="NavBlockLabel AdminNavBlockOption">
+				<div class="HelpIconContainer">
 					<?php PrintHelpLink("language_to_export_help", "qm", "language_to_export"); ?>
 				</div>
-				<div class="description">
+				<div class="AdminNavBlockOptionText">
 					<?php print GM_LANG_language_to_export; ?>
-					<br />
-					<select name="language2">
-					<?php
-					foreach ($el_controller->sorted_langs as $key => $value){
-						if ($language_settings[$key]["gm_lang_use"]) {
-							print "\n\t\t\t<option value=\"$key\"";
-							if ($key == $el_controller->language2) print " selected=\"selected\"";
-							print ">".constant("GM_LANG_lang_name_".$key)."</option>";
-						}
-					}
-					?>
-					</select>
 				</div>
-			</div>
-			<div class="width25 center choice_right">
-				<input  type="submit" value="<?php print GM_LANG_export;?>" />
-			</div>
-		</div>
-		</form>
+			</td>
+			<td class="NavBlockField">
+				<select name="language2">
+				<?php
+				foreach ($el_controller->sorted_langs as $key => $value){
+					if ($language_settings[$key]["gm_lang_use"]) {
+						print "\n\t\t\t<option value=\"$key\"";
+						if ($key == $el_controller->language2) print " selected=\"selected\"";
+						print ">".constant("GM_LANG_lang_name_".$key)."</option>";
+					}
+				}
+				?>
+				</select>
+			</td>
+		</tr>
 		
 		<?php
 		if ($el_controller->execute) {
-			print "<div class=\"shade2 center\">";
+			print "<tr><td colspan=\"2\" class=\"NavBlockColumnHeader AdminNavBlockColumnHeader\">";
 				print GM_LANG_export_results;
-			print "</div>";
-			print "<div class=\"shade1 ltr\">";
+			print "</td></tr>";
+			print "<tr><td class=\"NavBlockLabel AdminNavBlockOption\" colspan=\"2\">";
 				$data = "";
 				$data_help = "";
 				$storeerror = false;
@@ -393,8 +408,17 @@ switch ($el_controller->action) {
 					$sql = "UPDATE ".TBLPREFIX."lang_settings SET ls_translated = '0', ls_md5_lang = '".md5_file("languages/lang.".$language_settings[$el_controller->language2]["lang_short_cut"].".txt")."', ls_md5_help = '".md5_file("languages/help_text.".$language_settings[$el_controller->language2]["lang_short_cut"].".txt")."', ls_md5_facts = '".md5_file("languages/facts.".$language_settings[$el_controller->language2]["lang_short_cut"].".txt")."' WHERE ls_gm_langname='".$el_controller->language2."'";
 					$res = NewQuery($sql);
 				}
-			print "</div>";
+			print "</td></tr>";
 		}
+		?>
+		<tr>
+			<td class="NavBlockFooter" colspan="2">
+				<input  type="submit" value="<?php print GM_LANG_export;?>" />
+			</td>
+		</tr>
+		</table>
+		</form>
+		<?php
 		break;
 	case 'compare':
 		?>
@@ -402,82 +426,121 @@ switch ($el_controller->action) {
 		<input type="hidden" name="page" value="editlang" />
 		<input type="hidden" name="action" value="compare" />
 		<input type="hidden" name="execute" value="true" />
-		<div class="admin_topbottombar">
-			<?php print GM_LANG_compare_lang_utility; ?>
-		</div>
-		<div class="admin_item_box">
-			<div class="width25 choice_left">
-				<div class="helpicon">
+		<table class="NavBlockTable AdminNavBlockTable">
+		<tr>
+			<td colspan="2" class="NavBlockHeader AdminNavBlockHeader">
+				<div class="AdminNavBlockTitle">
+				<?php print GM_LANG_compare_lang_utility; ?>
+				</div>
+			</td>
+		</tr>
+		<tr>
+			<td class="NavBlockLabel AdminNavBlockOption">
+				<div class="HelpIconContainer">
 					<?php PrintHelpLink("new_language_help", "qm", "new_language");?>
 				</div>
-				<div class="description">
+				<div class="AdminNavBlockOptionText">
 					<?php
-					print GM_LANG_new_language."<br />";
-					print "<select name=\"language1\">";
-					foreach ($el_controller->sorted_langs as $key => $value) {
-						if ($language_settings[$key]["gm_lang_use"]) {
-							print "\n\t\t\t<option value=\"$key\"";
-							if ($key == $el_controller->language1) print " selected=\"selected\"";
-							print ">".constant("GM_LANG_lang_name_".$key)."</option>";
-						}
-					}
+					print GM_LANG_new_language;
 					?>
-					</select>
 				</div>
-			</div>
-			<div class="width25 choice_middle">
-				<div class="helpicon">
+			</td>
+			<td class="NavBlockField"> <?php
+				print "<select name=\"language1\">";
+				foreach ($el_controller->sorted_langs as $key => $value) {
+					if ($language_settings[$key]["gm_lang_use"]) {
+						print "\n\t\t\t<option value=\"$key\"";
+						if ($key == $el_controller->language1) print " selected=\"selected\"";
+						print ">".constant("GM_LANG_lang_name_".$key)."</option>";
+					}
+				}
+				?>
+				</select>
+			</td>
+		</tr>
+		<tr>
+			<td class="NavBlockLabel AdminNavBlockOption">
+				<div class="HelpIconContainer">
 					<?php PrintHelpLink("old_language_help", "qm", "old_language");?>
 				</div>
-				<div class="description">
+				<div class="AdminNavBlockOptionText">
 					<?php
-					print GM_LANG_old_language."<br />";
-					print "<select name=\"language2\">";
-					foreach ($el_controller->sorted_langs as $key => $value) {
-						if ($language_settings[$key]["gm_lang_use"]) {
-							print "\n\t\t\t<option value=\"$key\"";
-							if ($key == $el_controller->language2) print " selected=\"selected\"";
-							print ">".constant("GM_LANG_lang_name_".$key)."</option>";
-						}
-					}
+					print GM_LANG_old_language;
 					?>
-					</select>
 				</div>
-			</div>
-			<div class="width25 center choice_right">
-				<input  type="submit" value="<?php print GM_LANG_compare; ?>" />
-			</div>
-		</div>
-		</form>
+			</td>
+			<td class="NavBlockField"> <?php
+				print "<select name=\"language2\">";
+				foreach ($el_controller->sorted_langs as $key => $value) {
+					if ($language_settings[$key]["gm_lang_use"]) {
+						print "\n\t\t\t<option value=\"$key\"";
+						if ($key == $el_controller->language2) print " selected=\"selected\"";
+						print ">".constant("GM_LANG_lang_name_".$key)."</option>";
+					}
+				}
+				?>
+				</select>
+			</td>
+		</tr>
 		<?php
 		if ($el_controller->execute) {
 			?>
-			<div class="topbottombar SubHeader">
-				<?php print GM_LANG_comparing_main;?>
-			</div>
-			<?php
-			$el_controller->ShowLanguageCompare(LanguageFunctions::LoadLanguage($el_controller->language1, true), LanguageFunctions::LoadLanguage($el_controller->language2, true))
-			?>
-			<img src="<?php print GM_IMAGE_DIR."/".$GM_IMAGES["hline"]["other"];?>" width="100%" height="6" alt="" /><br />
-			<div class="topbottombar SubHeader">
-				<?php print GM_LANG_comparing_facts;?>
-			</div>
-			<?php
-			$el_controller->ShowLanguageCompare(AdminFunctions::LoadFacts($el_controller->language1), AdminFunctions::LoadFacts($el_controller->language2), true);
-				?>
-			<img src="<?php print GM_IMAGE_DIR."/".$GM_IMAGES["hline"]["other"];?>" width="100%" height="6" alt="" /><br />
-			<div class="topbottombar SubHeader">
-				<?php print GM_LANG_comparing_helptext;?>
-			</div>
+			<tr>
+				<td class="NavBlockRowSpacer">
+					&nbsp;
+				</td>
+			</tr>
+			<tr>
+				<td colspan="2" class="NavBlockHeader AdminNavBlockHeader">
+					<?php print GM_LANG_comparing_main; ?>
+				</td>
+			</tr>
+			<?php $el_controller->ShowLanguageCompare(LanguageFunctions::LoadLanguage($el_controller->language1, true), LanguageFunctions::LoadLanguage($el_controller->language2, true)); ?>
+			<tr>
+				<td class="NavBlockRowSpacer">
+					&nbsp;
+				</td>
+			</tr>
+			<tr>
+				<td colspan="2" class="NavBlockHeader AdminNavBlockHeader">
+					<?php print GM_LANG_comparing_facts;?>
+				</td>
+			</tr>
+			<?php $el_controller->ShowLanguageCompare(AdminFunctions::LoadFacts($el_controller->language1), AdminFunctions::LoadFacts($el_controller->language2), true); ?>
+			<tr>
+				<td class="NavBlockRowSpacer">
+					&nbsp;
+				</td>
+			</tr>
+			<tr>
+				<td colspan="2" class="NavBlockHeader AdminNavBlockHeader">
+					<?php print GM_LANG_comparing_helptext;?>
+				</td>
+			</tr>
 			<?php
 			$el_controller->langhelp = LanguageFunctions::LoadEnglish(true, true, true);
 			$el_controller->ShowLanguageCompare(LanguageFunctions::LoadLanguage($el_controller->language1, true, true), LanguageFunctions::LoadLanguage($el_controller->language2, true, true), false, true);
 			$el_controller->langhelp = array();
+			?>
+			<?php
 		}
+		?>
+		<tr>
+			<td class="NavBlockFooter" colspan="2">
+				<input  type="submit" value="<?php print GM_LANG_compare; ?>" />
+			</td>
+		</tr>
+		</table>
+		</form>
+		<?php
 		break;
 	default:
+		?>
+		<table class="NavBlockTable AdminNavBlockTable">
+		<?php
 		$menu = new AdminMenu();
 		$menu->SetBarText(GM_LANG_edit_langdiff);
+		$menu->SetBarStyle("AdminNavBlockHeader");
 		$menu->AddItem("help_changelanguage.php", "qm", "enable_disable_lang", "changelanguage.php", GM_LANG_enable_disable_lang, "left");
 		$menu->AddItem("edit_lang_utility_help", "qm", "edit_lang_utility", "editlang.php?action=edit", GM_LANG_edit_lang_utility, "right");
 		$menu->AddItem("export_lang_utility_help", "qm", "export_lang_utility", "editlang.php?action=export", GM_LANG_export_lang_utility, "left");
@@ -487,9 +550,13 @@ switch ($el_controller->action) {
 		$menu->AddItem("bom_check_help", "qm", "bom_check", "editlang.php?action=bom", GM_LANG_bom_check, "left");
 		$menu->PrintItems();
 		if ($el_controller->action == "bom") {
-			print "<div class=\"shade2 center\">".GM_LANG_bom_check."</div>";
-			print "<div class=\"shade1 ltr\">".AdminFunctions::CheckBom()."</div>";
+			print "<tr><td  colspan=\"2\" class=\"NavBlockRowSpacer\">&nbsp;</td></tr>";
+			print "<tr><td colspan=\"2\" class=\"NavBlockColumnHeader AdminNavBlockColumnHeader\">".GM_LANG_bom_check."</td></tr>";
+			print "<tr><td colspan=\"2\" class=\"NavBlockLabel AdminNavBlockLabel\">".AdminFunctions::CheckBom()."</td></tr>";
 		}
+		?>
+		</table>
+		<?php
 		break;
 }
 print "</div>";

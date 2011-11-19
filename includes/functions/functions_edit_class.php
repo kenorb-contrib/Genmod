@@ -282,7 +282,7 @@ abstract class EditFunctions {
 		print "<input type=\"hidden\" name=\"change_type\" value=\"".$change_type."\" />\n";
 		print "<input type=\"hidden\" name=\"pid_type\" value=\"".$pid_type."\" />\n";
 		print "<input type=\"hidden\" name=\"famtag\" value=\"".$famtag."\" />\n";
-		print "<table class=\"FactsTable\">";
+		print "<table class=\"NavBlockTable EditTable\">";
 		
 		// preset child/father SURN
 		$surn = "";
@@ -427,13 +427,13 @@ abstract class EditFunctions {
 				self::AddSimpleTag("0 PEDI", "", 1, $showbio);
 			}
 				
-			print "</table>\n";
 			self::PrintAddLayer("SOUR", 1, true);
 			self::PrintAddLayer("OBJE", 1);
 			self::PrintAddLayer("NOTE", 1);
 			self::PrintAddLayer("GNOTE", 1);
-			if ($gm_user->UserCanAccept() && !$gm_user->userAutoAccept()) print "<br /><input name=\"aa_attempt\" type=\"checkbox\" value=\"1\" />".GM_LANG_attempt_auto_acc."<br /><br />\n";
-			print "<input type=\"submit\" value=\"".GM_LANG_save."\" /><br />\n";
+			self::AddAutoAcceptLink();
+			print "<tr><td class=\"NavBlockFooter\" colspan=\"2\"><input type=\"submit\" value=\"".GM_LANG_save."\" /></td></tr>\n";
+			print "</table>\n";
 		}
 		else {
 			if ($namerec!="NEW") {
@@ -475,15 +475,15 @@ abstract class EditFunctions {
 			// 2 _MARNM
 			self::AddSimpleTag("0 _MARNM");
 			print "</tr>\n";
-			print "</table>\n";
 			self::PrintAddLayer("SOUR");
 			self::PrintAddLayer("NOTE");
 			self::PrintAddLayer("GNOTE");
-			if ($gm_user->UserCanAccept() && !$gm_user->userAutoAccept()) print "<br /><input name=\"aa_attempt\" type=\"checkbox\" value=\"1\" />".GM_LANG_attempt_auto_acc."<br /><br />\n";
-			print "<input type=\"button\" value=\"".GM_LANG_save."\" onclick=\"document.addchildform.submit(); return false;\"/><br />\n";
+			self::AddAutoAcceptLink();
+			print "<tr><td class=\"NavBlockFooter\" colspan=\"2\"><input type=\"button\" value=\"".GM_LANG_save."\" onclick=\"document.addchildform.submit(); return false;\"/></td></tr>\n";
+			print "</table>\n";
 		}
 		print "</form>\n";
-		if ($nextaction != "update") print "<br /><div id=\"show_ids\"><a href=\"javascript: ".GM_LANG_show_next_id."\" onclick=\"sndReq('show_ids', 'getnextids'); return false;\">".GM_LANG_show_next_id."</a></div>";
+		if ($nextaction != "update") print "<br /><div id=\"show_ids\"><a href=\"javascript: ".GM_LANG_show_next_id."\" onclick=\"sndReq('show_ids', 'getnextids', true); return false;\">".GM_LANG_show_next_id."</a></div>";
 		?>
 		<script type="text/javascript" src="autocomplete.js"></script>
 		<script type="text/javascript">
@@ -629,7 +629,8 @@ abstract class EditFunctions {
 	
 	public function AddTagSeparator($fact="") {
 		
-		print "<tr><td colspan=\"2\" class=\"shade3 center\">";
+		print "<tr><td class=\"NavBlockRowSpacer\">&nbsp;</td></tr>";
+		print "<tr><td colspan=\"2\" class=\"NavBlockColumnHeader EditTableColumnHeader\">";
 		if(!empty($fact)) {
 			if (defined("GM_LANG_".$fact)) print constant("GM_LANG_".$fact);
 			else if (defined("GM_FACT_".$fact)) print constant("GM_FACT_".$fact);
@@ -704,7 +705,7 @@ abstract class EditFunctions {
 		print "<tr id=\"".$element_id."_tr\" ";
 		if (in_array($fact, $subnamefacts)) print " style=\"display:none;\""; // hide subname facts
 		print " >\n";
-		print "<td class=\"shade2 $TEXT_DIRECTION\">";
+		print "<td class=\"NavBlockLabel\">";
 		
 		// NOTE: Tag level
 		if ($level>0) {
@@ -730,7 +731,7 @@ abstract class EditFunctions {
 //		}
 		
 		// NOTE: value
-		if (!in_array($fact, $emptyfacts) || in_array($fact, $canhavey_facts)) print "<td class=\"shade1\">\n";
+		if (!in_array($fact, $emptyfacts) || in_array($fact, $canhavey_facts)) print "<td class=\"NavBlockField\">\n";
 		// NOTE: Retrieve linked NOTE
 		// we must disable editing for this field if the note already has changes.
 		$disable_edit = false;
@@ -858,13 +859,13 @@ abstract class EditFunctions {
 					print "<input tabindex=\"".$tabkey."\" type=\"text\" id=\"".$element_id."\" name=\"".$element_name."\" value=\"".htmlspecialchars($value)."\" size=\"".$cols."\" dir=\"ltr\"";
 					if ($fact=="NPFX") print " onkeyup=\"wactjavascript_autoComplete(npfx_accept,this,event);\" ";
 					if (in_array($fact, $subnamefacts)) print " onchange=\"updatewholename();\"";
-					if ($fact=="DATE") print " onblur=\"valid_date(this); sndReq('".$element_id."_date', 'getchangeddate', 'date', this.value, '', '');\"";
-					if ($fact=="EMAIL") print " onblur=\"sndReq('".$element_id."_email', 'checkemail', 'email', this.value, '', '');\"";
-					if ($fact == "SOUR") print " onblur=\"sndReq('".$element_id."_src', 'getsourcedescriptor', 'sid', this.value, '', '');\"";
-					if ($fact == "REPO") print " onblur=\"sndReq('".$element_id."_repo', 'getrepodescriptor', 'rid', this.value, '', '');\"";
-					if ($fact == "ASSO") print " onblur=\"sndReq('".$element_id."_asso', 'getpersonname', 'pid', this.value, '', '');\"";
-					if ($fact == "NOTE") print " onblur=\"sndReq('".$element_id."_gnote', 'getnotedescriptor', 'oid', this.value, '', '');\"";
-					if ($fact == "OBJE") print " onblur=\"sndReq('".$element_id."_obj', 'getmediadescriptor', 'mid', this.value, '', '');\"";
+					if ($fact=="DATE") print " onblur=\"valid_date(this); sndReq('".$element_id."_date', 'getchangeddate', true, 'date', this.value, '', '');\"";
+					if ($fact=="EMAIL") print " onblur=\"sndReq('".$element_id."_email', 'checkemail', true, 'email', this.value, '', '');\"";
+					if ($fact == "SOUR") print " onblur=\"sndReq('".$element_id."_src', 'getsourcedescriptor', true, 'sid', this.value, '', '');\"";
+					if ($fact == "REPO") print " onblur=\"sndReq('".$element_id."_repo', 'getrepodescriptor', true, 'rid', this.value, '', '');\"";
+					if ($fact == "ASSO") print " onblur=\"sndReq('".$element_id."_asso', 'getpersonname', true, 'pid', this.value, '', '');\"";
+					if ($fact == "NOTE") print " onblur=\"sndReq('".$element_id."_gnote', 'getnotedescriptor', true, 'oid', this.value, '', '');\"";
+					if ($fact == "OBJE") print " onblur=\"sndReq('".$element_id."_obj', 'getmediadescriptor', true, 'mid', this.value, '', '');\"";
 					print " />\n";
 				}
 			}
@@ -935,7 +936,7 @@ abstract class EditFunctions {
 					if ($gedid == GedcomConfig::$GEDCOMID) {
 						$id = SplitKey($_SESSION["last_used"]["REPO"], "id");
 						$repo =& Repository::GetInstance($id);
-						if (CheckExists($id, "REPO")) print "<a href=\"javascript\" onclick=\"document.getElementById('".$element_id."').value='".$id."'; sndReq('".$element_id."_repo', 'getrepodescriptor', 'rid', '".$id."', '', ''); return false;\">".GM_LANG_click_for." ".$repo->name.$repo->addxref."</a>";
+						if (CheckExists($id, "REPO")) print "<a href=\"javascript\" onclick=\"document.getElementById('".$element_id."').value='".$id."'; sndReq('".$element_id."_repo', 'getrepodescriptor', true, 'rid', '".$id."', '', ''); return false;\">".GM_LANG_click_for." ".$repo->name.$repo->addxref."</a>";
 					}
 				}
 			}
@@ -958,7 +959,7 @@ abstract class EditFunctions {
 				?>
 				<script>
 				<!--
-				sndReq('<?php print $element_id."_gnote";?>', 'getnotedescriptor', 'oid', '<?php print $value;?>', '', '');
+				sndReq('<?php print $element_id."_gnote";?>', 'getnotedescriptor', true, 'oid', '<?php print $value;?>', '', '');
 				//-->
 				</script>
 			<?php
@@ -969,12 +970,12 @@ abstract class EditFunctions {
 					if ($gedid == GedcomConfig::$GEDCOMID) {
 						$id = SplitKey($_SESSION["last_used"]["NOTE"], "id");
 						if (CheckExists($id, "NOTE")) {
-							print "<a href=\"javascript\" onclick=\"document.getElementById('".$element_id."').value='".$id."'; sndReq('".$element_id."_gnote', 'getnotedescriptor', 'oid', '".$id."', '', ''); return false;\">".GM_LANG_click_for." ";
+							print "<a href=\"javascript\" onclick=\"document.getElementById('".$element_id."').value='".$id."'; sndReq('".$element_id."_gnote', 'getnotedescriptor', true, 'oid', '".$id."', '', ''); return false;\">".GM_LANG_click_for." ";
 							print "<span id=\"".$element_id."_gnote2\"></span></a>";
 							?>
 							<script>
 							<!--
-							sndReq('<?php print $element_id."_gnote2";?>', 'getnotedescriptor', 'oid', '<?php print $id;?>', '', '');
+							sndReq('<?php print $element_id."_gnote2";?>', 'getnotedescriptor', true, 'oid', '<?php print $id;?>', '', '');
 							//-->
 							</script>
 							<?php
@@ -996,7 +997,7 @@ abstract class EditFunctions {
 					if ($gedid == GedcomConfig::$GEDCOMID) {
 						$id = SplitKey($_SESSION["last_used"]["SOUR"], "id");
 						$obj = ConstructObject($id, "SOUR");
-						if (is_object($obj)) print "<a href=\"javascript\" onclick=\"document.getElementById('".$element_id."').value='".$id."'; sndReq('".$element_id."_src', 'getsourcedescriptor', 'sid', '".$id."', '', ''); return false;\">".GM_LANG_click_for." ".$obj->name.$obj->addxref."</a>";
+						if (is_object($obj)) print "<a href=\"javascript\" onclick=\"document.getElementById('".$element_id."').value='".$id."'; sndReq('".$element_id."_src', 'getsourcedescriptor', true, 'sid', '".$id."', '', ''); return false;\">".GM_LANG_click_for." ".$obj->name.$obj->addxref."</a>";
 					}
 				}
 			}
@@ -1015,7 +1016,7 @@ abstract class EditFunctions {
 					if ($gedid == GedcomConfig::$GEDCOMID) {
 						$id = SplitKey($_SESSION["last_used"]["OBJE"], "id");
 						$obj = ConstructObject($id, "OBJE");
-						if (is_object($obj)) print "<a href=\"javascript\" onclick=\"document.getElementById('".$element_id."').value='".$id."'; sndReq('".$element_id."_obj', 'getmediadescriptor', 'mid', '".$id."', '', ''); return false;\">".GM_LANG_click_for." ".$obj->name.$obj->addxref."</a>";
+						if (is_object($obj)) print "<a href=\"javascript\" onclick=\"document.getElementById('".$element_id."').value='".$id."'; sndReq('".$element_id."_obj', 'getmediadescriptor', true, 'mid', '".$id."', '', ''); return false;\">".GM_LANG_click_for." ".$obj->name.$obj->addxref."</a>";
 					}
 				}
 			}
@@ -1052,7 +1053,15 @@ abstract class EditFunctions {
 	 */
 	public function PrintAddLayer($tag, $level=2, $addfact=false) {
 		global $GM_IMAGES, $TEXT_DIRECTION;
+		static $header_printed;
+		
+		if (!isset($header_printed)) {
+			$header_printed = true;
+			print "<tr><td colspan=\"2\" class=\"\"></td></tr>";
+			print "<tr><td class=\"NavBlockColumnHeader EditTableColumnHeader\" colspan=\"2\">".GM_LANG_add_info_links."</td></tr>";
+		}
 	
+		print "<tr><td class=\"NavBlockLabel\" colspan=\"2\">";
 		if ($tag=="SOUR") {
 			//-- Add new source to fact
 			print "<a href=\"#\" onclick=\"expand_layer('newsource'); if(document.getElementById('newsource').style.display == 'block') document.getElementById(addsourcefocus).focus(); return false;\"><img id=\"newsource_img\" src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["plus"]["other"]."\" border=\"0\" width=\"11\" height=\"11\" alt=\"\" title=\"\" /> ".GM_LANG_add_source."</a>";
@@ -1071,7 +1080,7 @@ abstract class EditFunctions {
 			// 4 TEXT
 			self::AddSimpleTag(($level+2)." TEXT");
 			if ($addfact) {
-				print "<tr><td colspan=\"2\" class=\"shade2 $TEXT_DIRECTION\"><input type=\"radio\" name=\"addsource\" value=\"0\" />".GM_LANG_add_source_citation_to_person."<br />\n";
+				print "<tr><td colspan=\"2\" class=\"NavBlockLabel\"><input type=\"radio\" name=\"addsource\" value=\"0\" />".GM_LANG_add_source_citation_to_person."<br />\n";
 				print "<input type=\"radio\" name=\"addsource\" value=\"1\" />".GM_LANG_add_source_reference_to_fact."<br />\n";
 				print "<input type=\"radio\" name=\"addsource\" value=\"2\" checked=\"checked\" />".GM_LANG_add_source_citation_to_fact."<br />\n";
 				print "</td></tr>";
@@ -1175,6 +1184,7 @@ abstract class EditFunctions {
 			</script>
 			<?php
 		}
+		print "</td></tr>";
 	}
 	
 	/**
@@ -1456,11 +1466,11 @@ abstract class EditFunctions {
 		print "<input type=\"hidden\" name=\"paste\" value=\"1\" />\n";
 		print "<input type=\"hidden\" name=\"change_type\" value=\"$change_type\" />\n";
 		if (isset($pid)) print "<input type=\"hidden\" name=\"pid\" value=\"$pid\" />\n";
-		print "<table class=\"FactsTable center $TEXT_DIRECTION\">\n";
-		print "<tr><td class=\"topbottombar\" colspan=\"2\">".GM_LANG_add_media."</td></tr>";
+		print "<table class=\"NavBlockTable EditTable\">\n";
+		self::AddTagSeparator($change_type);
 		if ($pid == "") {
-			print "<tr><td class=\"shade2\">".GM_LANG_add_fav_enter_id."</td>";
-			print "<td class=\"shade1\"><input type=\"text\" name=\"gid\" id=\"gid\" size=\"3\" value=\"\" />";
+			print "<tr><td class=\"NavBlockLabel\">".GM_LANG_add_fav_enter_id."</td>";
+			print "<td class=\"NavBlockField\"><input type=\"text\" name=\"gid\" id=\"gid\" size=\"3\" value=\"\" />";
 			LinkFunctions::PrintFindIndiLink("gid","");
 			LinkFunctions::PrintFindFamilyLink("gid");
 			LinkFunctions::PrintFindSourceLink("gid");
@@ -1524,9 +1534,9 @@ abstract class EditFunctions {
 					else self::AddSimpleTag("$level $tag $value");
 					if ($tag == "FILE") {
 						// Box for user to choose to upload file from local computer
-						print "<tr><td class=\"shade2\">&nbsp;</td><td class=\"shade1\"><input type=\"file\" name=\"picture\" size=\"60\"></td></tr>";
+						print "<tr><td class=\"NavBlockLabel\">&nbsp;</td><td class=\"NavBlockField\"><input type=\"file\" name=\"picture\" size=\"60\"></td></tr>";
 						// Box for user to choose the folder to store the image
-						print "<tr><td class=\"shade2\">".GM_LANG_folder."</td><td class=\"shade1\"><input type=\"text\" name=\"folder\" size=\"60\"></td></tr>";
+						print "<tr><td class=\"NavBlockLabel\">".GM_LANG_folder."</td><td class=\"NavBlockField\"><input type=\"text\" name=\"folder\" size=\"60\"></td></tr>";
 					}
 				}
 			}
@@ -1545,10 +1555,10 @@ abstract class EditFunctions {
 			if (in_array("FILE", $facts_add) || in_array("FILE", $facts_unique)) {
 				$element_id = self::AddSimpleTag("1 FILE");
 				// Box for user to choose to upload file from local computer
-				print "<tr><td class=\"shade2\">".GM_LANG_upload_file."</td><td class=\"shade1\"><input type=\"file\" name=\"picture\" size=\"60\"></td></tr>";
+				print "<tr><td class=\"NavBlockLabel\">".GM_LANG_upload_file."</td><td class=\"NavBlockField\"><input type=\"file\" name=\"picture\" size=\"60\"></td></tr>";
 				// Box for user to choose the folder to store the image
 				$dirlist = MediaFS::GetMediaDirList(GedcomConfig::$MEDIA_DIRECTORY, true, 1, true, false);
-				print "<tr><td class=\"shade2\">".GM_LANG_upload_to_folder."</td><td class=\"shade1\">";
+				print "<tr><td class=\"NavBlockLabel\">".GM_LANG_upload_to_folder."</td><td class=\"NavBlockField\">";
 		//		<input type=\"text\" name=\"folder\" size=\"60\">
 				print "<select name=\"folder\">";
 				foreach($dirlist as $key => $dir) {
@@ -1567,14 +1577,11 @@ abstract class EditFunctions {
 	// 		PRIM and THUM are added at linklevel		
 			if (in_array("NOTE", $facts_add) || in_array("NOTE", $facts_unique)) self::AddSimpleTag("1 NOTE");
 			if (in_array("SOUR", $facts_add) || in_array("SOUR", $facts_unique)) {
-				print "<tr><td colspan=\"2\">";
 				self::PrintAddLayer("SOUR", 1);
-				print"</td></tr>";
 			}
 		}
-			
-		if ($gm_user->UserCanAccept() && !$gm_user->userAutoAccept()) print "<tr><td class=\"shade1\" colspan=\"2\"><input name=\"aa_attempt\" type=\"checkbox\" value=\"1\" />".GM_LANG_attempt_auto_acc."</td></tr>";
-		print "<tr><td class=\"topbottombar\" colspan=\"2\"><input type=\"submit\" onclick=\"return check(document.newmedia.picture.value);\" value=\"".GM_LANG_add_media_button."\" /></td></tr>\n";
+		self::AddAutoAcceptLink();	
+		print "<tr><td class=\"NavBlockFooter\" colspan=\"2\"><input type=\"submit\" onclick=\"return check(document.newmedia.picture.value);\" value=\"".GM_LANG_add_media_button."\" /></td></tr>\n";
 		print "</table>\n";
 		print "</form>\n";
 		if (isset($element_id)) print "\n<script type=\"text/javascript\">\n<!--\ndocument.getElementById(\"".$element_id."\").focus();\n//-->\n</script>";
@@ -1586,7 +1593,7 @@ abstract class EditFunctions {
 			
 		foreach ($records as $key1 => $object) {	
 			foreach ($object->facts as $key2 => $fact) {
-				if ($fact->style != "change_old") {
+				if ($fact->style != "ChangeOld") {
 					if (preg_match("/@$oldgid@/", $fact->factrec)) {
 						if ($fact->fact != "CHIL" && $fact->fact != "HUSB" && $fact->fact != "WIFE" && $fact->fact != "FAMC" && $fact->fact != "FAMS") {
 							$newsub = preg_replace("/(\d) (\w+) @$oldgid@/", "$1 $2 @$newgid@", $fact->factrec);
@@ -1605,7 +1612,7 @@ abstract class EditFunctions {
 		$success = true;
 		foreach ($records as $key1 => $object) {
 			foreach($object->facts as $key2 => $fact) {
-				if ($fact->style != "change_old") {
+				if ($fact->style != "ChangeOld") {
 					if (preg_match("/(\d) (\w+ @$oldgid@)/", $fact->factrec, $match2)) {
 						// print "subold: ".$fact->factrec."<br />";
 						$subdel = GetSubRecord($match2[1], $match2[1]." ".$match2[2], $fact->factrec);
@@ -1865,10 +1872,10 @@ abstract class EditFunctions {
 		if ($tags[0]=="FILE") {
 			// 1 FILE
 			// Box for user to choose to upload file from local computer
-			print "<tr><td class=\"shade2\">".GM_LANG_upload_file."</td><td class=\"shade1\"><input type=\"file\" name=\"picture\" size=\"60\"></td></tr>";
+			print "<tr><td class=\"NavBlockLabel\">".GM_LANG_upload_file."</td><td class=\"NavBlockField\"><input type=\"file\" name=\"picture\" size=\"60\"></td></tr>";
 			// Box for user to choose the folder to store the image
 			$dirlist = MediaFS::GetMediaDirList(GedcomConfig::$MEDIA_DIRECTORY, true, 1, true, false);
-			print "<tr><td class=\"shade2\">".GM_LANG_upload_to_folder."</td><td class=\"shade1\">";
+			print "<tr><td class=\"NavBlockLabel\">".GM_LANG_upload_to_folder."</td><td class=\"NavBlockField\">";
 			print "<select name=\"folder\">";
 			foreach($dirlist as $key => $dir) {
 				print "<option value=\"".$dir."\">".$dir."</option>";
@@ -2378,6 +2385,29 @@ abstract class EditFunctions {
 			else print "<div id='".$subtagname."_div' name='".$subtagname."_div' style='overflow:hidden; border-width:thin; border-style:none;'><img name='".$subtagname."_img' src='images/spacer.gif' usemap='usemap' border='0' alt='' title='' /></div>";
 		}
 		print "</div>";
+	}
+	
+	public function AddAutoAcceptLink($cols=2) {
+		global $gm_user;
+		
+		if ($gm_user->UserCanAccept() && !$gm_user->userAutoAccept()) {
+			print "<tr><td ".($cols > 1 ? "colspan=\"".$cols."\" " : "")."class=\"NavBlockRowSpacer\">&nbsp;</td></tr>";
+			print "<tr><td ".($cols > 1 ? "colspan=\"".$cols."\" " : "")."class=\"NavBlockColumnHeader EditTableColumnHeader\">".GM_LANG_auto_accept_options."</td></tr>\n";
+			print "<tr><td ".($cols > 1 ? "colspan=\"".$cols."\" " : "")."class=\"NavBlockLabel\">\n";
+			print "<input name=\"aa_attempt\" type=\"checkbox\" value=\"1\" />".GM_LANG_attempt_auto_acc."\n";
+			print "</td></tr>\n";
+			print "<tr><td ".($cols > 1 ? "colspan=\"".$cols."\" " : "")."class=\"NavBlockRowSpacer\">&nbsp;</td></tr>";
+		}
+	}
+	
+	public function PrintSuccessMessage($message="") {
+		
+		print "<div class=\"EditMessageSuccess\">".($message == "" ? GM_LANG_update_successful : $message)."</div>";
+	}
+
+	public function PrintFailMessage($message) {
+		
+		print "<div class=\"EditMessageFail\">".$message."</div>";
 	}
 }
 ?>

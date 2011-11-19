@@ -266,7 +266,7 @@ class ActionItem {
 				$menu["labelpos"] = "right";
 				$menu["icon"] = "";
 				$menu["link"] = "#";
-				$menu["onclick"] = "sndReq('action_".$this->id."', 'action_edit', 'aid', '".$this->id."', '', '');";
+				$menu["onclick"] = "sndReq('action_".$this->id."', 'action_edit', true, 'aid', '".$this->id."', '', '');";
 				$menu["class"] = "";
 				$menu["hoverclass"] = "";
 				$menu["flyout"] = "down";
@@ -276,7 +276,7 @@ class ActionItem {
 				$submenu["label"] = GM_LANG_edit;
 				$submenu["labelpos"] = "right";
 				$submenu["icon"] = "";
-				$submenu["onclick"] = "sndReq('action_".$this->id."', 'action_edit', 'aid', '".$this->id."', '', '');";
+				$submenu["onclick"] = "sndReq('action_".$this->id."', 'action_edit', true, 'aid', '".$this->id."', '', '');";
 				$submenu["link"] = "#";
 				$submenu["class"] = "submenuitem";
 				$submenu["hoverclass"] = "submenuitem_hover";
@@ -285,7 +285,7 @@ class ActionItem {
 				$submenu["label"] = GM_LANG_delete;
 				$submenu["labelpos"] = "right";
 				$submenu["icon"] = "";
-				$submenu["onclick"] = "if (confirm('".GM_LANG_check_delete."')) { sndReq('action_".$this->id."', 'action_delete', 'aid', '".$this->id."', '', ''); window.location.reload(); }";
+				$submenu["onclick"] = "if (confirm('".GM_LANG_check_delete."')) { sndReq('action_".$this->id."', 'action_delete', true, 'aid', '".$this->id."', '', ''); window.location.reload(); }";
 				$submenu["link"] = "#";
 				$submenu["class"] = "submenuitem";
 				$submenu["hoverclass"] = "submenuitem_hover";
@@ -307,7 +307,7 @@ class ActionItem {
 			print "<b>".GM_LANG_todo."</b><br />";
 			print "<textarea id=\"actiontext\" name=\"actiontext\" rows=\"4\" cols=\"60\">".stripslashes($this->text)."</textarea>";
 			print "<br /><br /><b>".GM_LANG_repo."</b><br />";
-			print "<input type=\"text\" size=\"10\" value=\"".$this->repo."\" id=\"repo\" name=\"repo\" onblur=\"sndReq('desc_".$this->id."', 'getrepodescriptor', 'rid', this.value,'','');\">";
+			print "<input type=\"text\" size=\"10\" value=\"".$this->repo."\" id=\"repo\" name=\"repo\" onblur=\"sndReq('desc_".$this->id."', 'getrepodescriptor', true, 'rid', this.value,'','');\">";
 			LinkFunctions::PrintFindRepositoryLink('repo');
 			LinkFunctions::PrintAddNewRepositoryLink('repo');
 		
@@ -323,7 +323,7 @@ class ActionItem {
 			else print ">";
 			print GM_LANG_action1."</option>";
 			print "</select><br /><br />";
-			print "<input type=\"button\" value=\"".GM_LANG_save."\" onclick=\"sndReq('action_".$this->id."', 'action_update', 'aid','".$this->id."','actiontext', encodeURI(document.actionform.actiontext.value), 'repo', document.actionform.repo.value, 'status', document.actionform.status.value, 'pid', document.actionform.pid.value); \" />";
+			print "<input type=\"button\" value=\"".GM_LANG_save."\" onclick=\"sndReq('action_".$this->id."', 'action_update', true, 'aid','".$this->id."','actiontext', encodeURI(document.actionform.actiontext.value), 'repo', document.actionform.repo.value, 'status', document.actionform.status.value, 'pid', document.actionform.pid.value); \" />";
 		}
 	}
 	
@@ -333,7 +333,7 @@ class ActionItem {
 			print "<b>".GM_LANG_todo."</b><br />";
 			print "<textarea id=\"actiontext\" name=\"actiontext\" rows=\"4\" cols=\"60\"></textarea>";
 			print "<br /><br /><b>".GM_LANG_repo."</b><br />";
-			print "<input type=\"text\" size=\"10\" value=\"\" id=\"repo\" name=\"repo\" onblur=\"sndReq('desc_".$this->id."', 'getrepodescriptor', 'rid', this.value,'','');\">";
+			print "<input type=\"text\" size=\"10\" value=\"\" id=\"repo\" name=\"repo\" onblur=\"sndReq('desc_".$this->id."', 'getrepodescriptor', true, 'rid', this.value,'','');\">";
 			LinkFunctions::PrintFindRepositoryLink('repo');
 			LinkFunctions::PrintAddNewRepositoryLink('repo');
 	
@@ -343,7 +343,7 @@ class ActionItem {
 			print "<option value=\"0\" selected=\"selected\" >".GM_LANG_action0."</option>";
 			print "<option value=\"1\" >".GM_LANG_action1."</option>";
 			print "</select><br /><br />";
-			print "<input type=\"button\" value=\"".GM_LANG_save."\" onclick=\"sndReq('add_todo', 'action_add2', 'aid','".$this->id."','actiontext', encodeURI(document.actionform.actiontext.value), 'repo', document.actionform.repo.value, 'status', document.actionform.status.value, 'pid', document.actionform.pid.value, 'type', '".strtoupper($this->type)."'); window.location.reload();\" />";
+			print "<input type=\"button\" value=\"".GM_LANG_save."\" onclick=\"sndReq('add_todo', 'action_add2', true, 'aid','".$this->id."','actiontext', encodeURI(document.actionform.actiontext.value), 'repo', document.actionform.repo.value, 'status', document.actionform.status.value, 'pid', document.actionform.pid.value, 'type', '".strtoupper($this->type)."'); window.location.reload();\" />";
 		}
 	}
 	

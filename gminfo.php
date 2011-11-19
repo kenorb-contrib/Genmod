@@ -38,12 +38,25 @@ exit;
 }
 
 if (!isset($action)) $action = "";
+if ($action == "phpinfo") PrintHeader(GM_LANG_phpinfo);
+else PrintHeader(GM_LANG_help_config);
+?><!-- Setup the left box -->
+	<div id="AdminColumnLeft">
+		<?php 
+		AdminFunctions::AdminLink("admin.php", GM_LANG_admin);
+		 ?>
+	</div>
+	
+	<!-- Setup the right box -->
+	<div id="AdminColumnRight">
+	</div>
+	<div id="AdminColumnMiddle">
+<?php
+
 
 if ($action == "phpinfo") {
 	$helpindex = "phpinfo_help";
-	PrintHeader(GM_LANG_phpinfo);
 	 ?>
-	<div class="center">
 		<?php
 		
 		ob_start();
@@ -55,12 +68,13 @@ if ($action == "phpinfo") {
 		
 		$php_info    = str_replace(" width=\"600\"", " width=\"\"", $php_info);
 		$php_info    = str_replace("</div></body></html>", "", $php_info);
-		$php_info    = str_replace("<table", "<table class=\"center FactsTable ltr\"", $php_info);
-		$php_info    = str_replace("td class=\"e\"", "td class=\"facts_value wrap\"", $php_info);
-		$php_info    = str_replace("td class=\"v\"", "td class=\"facts_value wrap\"", $php_info);
+		$php_info    = str_replace("<table", "<table class=\"GMInfoTable\"", $php_info);
+		$php_info    = str_replace("td class=\"e\"", "td class=\"NavBlockLabel GMInfoLabel\"", $php_info);
+		$php_info    = str_replace("td class=\"v\"", "td class=\"NavBlockField GMInfoField\"", $php_info);
 		$php_info    = str_replace("tr class=\"v\"", "tr", $php_info);
 		$php_info    = str_replace("tr class=\"h\"", "tr", $php_info);
-		
+		$php_info    = str_replace("<th>", "<th class=\"NavBlockColumnHeader\">", $php_info);
+
 		$php_info    = str_replace(";", "; ", $php_info);
 		$php_info    = str_replace(",", ", ", $php_info);
 		
@@ -71,7 +85,7 @@ if ($action == "phpinfo") {
 		// Put logo in table header
 		
 		$logo_offset = strpos($php_info, "<td>");
-		$php_info = substr_replace($php_info, "<td colspan=\"3\" class=\"facts_label03 wrap\">", $logo_offset, 4);
+		$php_info = substr_replace($php_info, "<td colspan=\"3\" class=\"NavBlockHeader AdminNavBlockHeader\">", $logo_offset, 4);
 		$logo_width_offset = strpos($php_info, "width=\"\"");
 		$php_info = substr_replace($php_info, "width=\"800\"", $logo_width_offset, 8);
 		$php_info    = str_replace(" width=\"\"", "", $php_info);
@@ -83,16 +97,14 @@ if ($action == "phpinfo") {
 		print $php_info;
 		
 		?>		
-	</div>
 	<?php
-//	exit;
 }
 
 if ($action=="confighelp") {
-	PrintHeader(GM_LANG_help_config);
-	print "<h3 class=\"center\">".Str2Upper(GM_LANG_help_config)."</h3><br />";
+	print "<div class=\"NavBlockHeader AdminNavBlockHeader\"><span class=\"AdminNavBlockTitle\">".Str2Upper(GM_LANG_help_config)."</span></div>";
 	$language_array = array();
 	$language_array = LanguageFunctions::LoadLanguage($LANGUAGE,true, true);
+	print "<div class=\"NavBlockField GMInfoHelpList\">";
 	
 	print "<ol>";
 	foreach ($language_array as $string => $text) {
@@ -102,7 +114,8 @@ if ($action=="confighelp") {
 		}
 	}
     print "</ol>";
+    print "</div>";
 }
-
+print "</div>";
 PrintFooter();
 ?>

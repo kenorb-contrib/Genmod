@@ -263,26 +263,26 @@ $controller->checkPrivacy();
 		if ($i==$half) print "</tr><tr>";
 		$i++;
 		?>
-		<td class="person<?php print $col; ?>" style="padding: 5px;">
+		<td class="TimelinePerson TimelinePerson<?php print $col; ?>">
 		<?php
 		if ((!is_null($indi))&&($indi->disp)) {
 			switch($sex) {
 			case "M":
 				$seximage = GM_IMAGE_DIR."/".$GM_IMAGES["sex"]["small"];
 				?>
-				<img src="<?php print $seximage; ?>" title="<?php print GM_LANG_male; ?>" alt="<?php print GM_LANG_male; ?>" vspace="0" hspace="0" class="sex_image" border="0" />
+				<img src="<?php print $seximage; ?>" title="<?php print GM_LANG_male; ?>" alt="<?php print GM_LANG_male; ?>" vspace="0" hspace="0" class="SexImage" border="0" />
 				<?php
 				break;
 			case "F":
 				$seximage = GM_IMAGE_DIR."/".$GM_IMAGES["sexf"]["small"];
 				?>
-				<img src="<?php print $seximage; ?>" title="<?php print GM_LANG_female; ?>" alt="<?php print GM_LANG_female; ?>" vspace="0" hspace="0" class="sex_image" border="0" />
+				<img src="<?php print $seximage; ?>" title="<?php print GM_LANG_female; ?>" alt="<?php print GM_LANG_female; ?>" vspace="0" hspace="0" class="SexImage" border="0" />
 				<?php
 				break;
 			default:
 				$seximage = GM_IMAGE_DIR."/".$GM_IMAGES["sexn"]["small"];
 				?>
-				<img src="<?php print $seximage; ?>" title="<?php print GM_LANG_sex." ".GM_LANG_unknown; ?>" alt="<?php print GM_LANG_sex." ".GM_LANG_unknown; ?>" vspace="0" hspace="0" class="sex_image" border="0" />
+				<img src="<?php print $seximage; ?>" title="<?php print GM_LANG_sex." ".GM_LANG_unknown; ?>" alt="<?php print GM_LANG_sex." ".GM_LANG_unknown; ?>" vspace="0" hspace="0" class="SexImage" border="0" />
 				<?php
 				break;
 			}
@@ -296,9 +296,9 @@ $controller->checkPrivacy();
 				PrintHelpLink("remove_person_help", "qm");
 				?>
 				<a href="timeline.php?<?php print $controller->pidlinks; ?>&amp;scale=<?php print $controller->scale; ?>&amp;remove=<?php print $pid;?>" >
-				<span class="details1"><?php print GM_LANG_remove_person; ?></span></a>
+				<span class="PersonDetails1"><?php print GM_LANG_remove_person; ?></span></a>
 			<?php if ($indi->brec != "") { ?>
-				<span class="details1"><br />
+				<span class="PersonDetails1"><br />
 				<?php PrintHelpLink("show_age_marker_help", "qm"); ?>
 				<?php print GM_LANG_show_age; ?>
 				<input type="checkbox" name="agebar<?php print $p; ?>" value="ON" onclick="showhide('agebox<?php print $p; ?>', this);" />
@@ -317,7 +317,7 @@ $controller->checkPrivacy();
 				PrintHelpLink("remove_person_help", "qm");
 				?>
 				<a href="timeline.php?<?php print $controller->pidlinks; ?>&amp;scale=<?php print $controller->scale; ?>&amp;remove=<?php print $pid;?>" >
-				<span class="details1"><?php print GM_LANG_remove_person; ?></span></a>
+				<span class="PersonDetails1"><?php print GM_LANG_remove_person; ?></span></a>
 			<?php } ?>
 			<br />
 		<?php } ?>
@@ -326,19 +326,19 @@ $controller->checkPrivacy();
 	if (!$controller->isPrintPreview()) {
 		if (!isset($col)) $col = 0;
 		?>
-		<td class="person<?php print $col; ?>" style="padding: 5px" valign="top">
+		<td class="TimelinePerson<?php print ($col+1); ?>" valign="top">
 			<?php PrintHelpLink("add_person_help", "qm"); ?>
 			<?php print GM_LANG_add_another;?>&nbsp;
-			<input class="pedigree_form" type="text" size="5" id="newpid" name="newpid" />&nbsp;
+			<input class="PidInputField" type="text" size="5" id="newpid" name="newpid" />&nbsp;
 			<?php LinkFunctions::PrintFindIndiLink("newpid","");?>
 			<br />
 			<br />
-			<div style="text-align: center"><input type="submit" value="<?php print GM_LANG_show; ?>" /></div>
+			<div class="TimelineShowButton"><input type="submit" value="<?php print GM_LANG_show; ?>" /></div>
 		</td>
 	<?php }
 	if ((count($controller->people)>0)&&(!$controller->isPrintPreview())) {
 		?>
-		<td class="list_value" style="padding: 5px">
+		<td class="NavBlockLabel" style="padding: 5px">
 			<a href="<?php print SCRIPT_NAME."?".$controller->pidlinks."scale=".($controller->scale+2); ?>"><?php print GM_LANG_zoom_in; ?></a><br />
 			<a href="<?php print SCRIPT_NAME."?".$controller->pidlinks."scale=".($controller->scale-2); ?>"><?php print GM_LANG_zoom_out; ?></a>
 		</td>
@@ -435,11 +435,11 @@ if (count($controller->people)>0) {
 	//-->
 	</script>
 </div>
-<?php } ?>
+<?php } 
+?>
 <script language="JavaScript" type="text/javascript">
 <!--
 	timeline_chart_div = document.getElementById("timeline_chart");
-	if (!timeline_chart_div) timeline_chart_div = document.getElementById("timeline_chart_rtl");
 	if (timeline_chart_div) timeline_chart_div.style.height = '<?php print $baseyoffset+(($controller->topyear-$controller->baseyear)*$controller->scale*1.1); ?>px';
 //-->
 </script>

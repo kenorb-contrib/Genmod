@@ -111,20 +111,29 @@ if(function_exists('apache_setenv')) {
 
 
 // NOTE: Change header depending on action
-if ($action == "upload_form" || $action == "reupload_form") PrintHeader(GM_LANG_upload_gedcom);
-else if ($action == "add_form") PrintHeader(GM_LANG_add_gedcom);
-else if ($action == "add_new_form") PrintHeader(GM_LANG_add_new_gedcom);
-else if ($action == "merge_form") PrintHeader(GM_LANG_merge_gedcom);
-else PrintHeader(GM_LANG_ged_import);
+if ($action == "upload_form" || $action == "reupload_form") $headertext = GM_LANG_upload_gedcom;
+else if ($action == "add_form") $headertext = GM_LANG_add_gedcom;
+else if ($action == "add_new_form") $headertext = GM_LANG_add_new_gedcom;
+else if ($action == "merge_form") $headertext = GM_LANG_merge_gedcom;
+else $headertext = GM_LANG_ged_import;
+PrintHeader($headertext);
+?>
+<!-- Setup the left box -->
+<div id="AdminColumnLeft">
+	<?php AdminFunctions::AdminLink("admin.php", GM_LANG_admin); ?>
+	<?php AdminFunctions::AdminLink("editgedcoms.php", GM_LANG_manage_gedcoms); ?>
+</div>
 
-print "\n<div id=\"import_content\">";
+<!-- Setup the middle box -->
+<div id="AdminColumnMiddle">
+<?php
 // NOTE: Print form header
 print "\n<form enctype=\"multipart/form-data\" method=\"post\" name=\"configform\" action=\"uploadgedcom.php\">";
 print "\n<input type=\"hidden\" name=\"action\" value=\"".$action."\" />";
 print "\n<input type=\"hidden\" name=\"gedcomid\" value=\"".$gedcomid."\" />";
 print "\n<input type=\"hidden\" name=\"import_existing\" value=\"".(isset($import_existing) && $import_existing == true ? 1 : 0)."\" />";
 print "\n<input type=\"hidden\" name=\"override\" value=\"".(isset($override) && $override == "yes" ? "yes" : "")."\" />";
-
+print "\n<div class=\"NavBlockHeader AdminNavBlockHeader UploadGedcomNavBlockHeader\"><span class=\"AdminNavBlockTitle\">".$headertext."</span></div>";
 
 // Step 1
 // Add a new empty gedcom if requested
@@ -137,22 +146,22 @@ if ($step >= 1) {
 		else $fp = fopen(INDEX_DIRECTORY.$gedfilename, "wb");
 		if ($fp) {
 			$newgedcom = "0 HEAD
-	1 SOUR Genmod
-	2 VERS ".GM_VERSION." ".GM_VERSION_RELEASE."
-	1 DEST ANSTFILE
-	1 GEDC
-	2 VERS 5.5
-	2 FORM Lineage-Linked
-	1 CHAR UTF-8
-	0 @I1@ INDI
-	1 NAME Given Names /Surname/
-	2 GIVN Given Names
-	2 SURN Surname
-	1 SEX M
-	1 BIRT
-	2 DATE 01 JAN 1850
-	2 PLAC Click edit and change me
-	0 TRLR";
+1 SOUR Genmod
+2 VERS ".GM_VERSION." ".GM_VERSION_RELEASE."
+1 DEST ANSTFILE
+1 GEDC
+2 VERS 5.5
+2 FORM Lineage-Linked
+1 CHAR UTF-8
+0 @I1@ INDI
+1 NAME Given Names /Surname/
+2 GIVN Given Names
+2 SURN Surname
+1 SEX M
+1 BIRT
+2 DATE 01 JAN 1850
+2 PLAC Click edit and change me
+0 TRLR";
 			fwrite($fp, $newgedcom);
 			fclose($fp);
 			$verify = "validate_form";
@@ -162,6 +171,7 @@ if ($step >= 1) {
 			$utf8convert = "no";
 			$ged = $gedfilename;
 			$step = 5;
+			$auto_continue = "yes";
 		}
 	}
 	
@@ -197,25 +207,24 @@ if ($step >= 1) {
 		$link1 = "merge_gedcom_help";
 		$link2 = "merge_gedcom";
 	}
-	print "\n\n<div class=\"topbottombar $TEXT_DIRECTION\">";
-	print "<a href=\"javascript: ";
-	print $v1."\" onclick=\"expand_layer('".$layer."');return false\"><img id=\"".$img."\" src=\"".GM_IMAGE_DIR."/";
-	if ($step > 3) print $GM_IMAGES["plus"]["other"];
-	else print $GM_IMAGES["minus"]["other"];
-	print "\" border=\"0\" width=\"11\" height=\"11\" alt=\"\" /></a>";
-	PrintHelpLink($link1, "qm", $link2);
-	print "&nbsp;<a href=\"javascript: ";
-	print $v1;
-	print "\" onclick=\"expand_layer('".$layer."');return false;\">";
-	print $v1;
-	print "</a>";
+	print "\n\n<div class=\"NavBlockHeader UploadGedcomSubHeader\">";
+		print "<a href=\"javascript: ";
+		print $v1."\" onclick=\"expand_layer('".$layer."');return false\"><img id=\"".$img."\" src=\"".GM_IMAGE_DIR."/";
+		if ($step > 3) print $GM_IMAGES["plus"]["other"];
+		else print $GM_IMAGES["minus"]["other"];
+		print "\" border=\"0\" width=\"11\" height=\"11\" alt=\"\" /></a>";
+		PrintHelpLink($link1, "qm", $link2);
+		print "&nbsp;<a href=\"javascript: ";
+		print $v1;
+		print "\" onclick=\"expand_layer('".$layer."');return false;\">";
+		print $v1;
+		print "</a>";
 	print "\n</div>";
 		
 	$i = 0;
 	if ($action != "merge_form") {
 		// Now print the content of this section: filename
-		print "\n\n<div class=\"shade1\" style=\"padding-top:5px;\">";
-			print "\n<div id=\"".$layer."\" class=\"shade1 width100\" style=\"padding: 0.2em 0em 0.2em 0em; display: ";
+		print "\n<div id=\"".$layer."\" class=\"NavBlockLabel UploadGedcomNavBlockLabel\" style=\"display: ";
 			if ($step > 3) print "none ";
 			else print "block ";
 			print "\">";
@@ -223,9 +232,8 @@ if ($step >= 1) {
 			print GM_LANG_gedcom_file;
 			// Actually this is dummy. The path and gedfilename are calculated from the gedcomid and not from this variable.
 			print "&nbsp;\n<input type=\"text\" name=\"gedfilename\" value=\"".$path.$gedfilename."\" size=\"60\" dir=\"ltr\" tabindex=\"".$i."\" disabled=\"disabled\" />";
-			print "\n</div>";
-		print "\n</div>";
-		
+		print "\n<!-- Close file block //--></div>";
+	
 		// if we have nothing to do here, we can proceed
 		if ($step == 1) $step = 2;
 	}
@@ -233,28 +241,25 @@ if ($step >= 1) {
 		if ($step == 1 && !empty($gedfilename)) $step = 3;
 		// Print the inputs for the mergefile
 		// 1. File on the server
-		print "<div class=\"shade1\" style=\"padding-top:5px;\">";
-			print "<div id=\"".$layer."\" style=\"display: ";
+		print "<div class=\"NavBlockLabel UploadGedcomNavBlockLabel\" id=\"".$layer."\" style=\"display: ";
 			if ($step > 3) print "none ";
 			else print "block ";
 			print "\">";
+			$ferror = "";
 			if (!empty($gedfilename) && !file_exists($path.$gedfilename)) {
-				print "<div class=\"shade1 wrap\">";
-				print "<span class=\"Error\">".GM_LANG_file_not_found."&nbsp;".$path.$gedfilename."</span>\n";
-				print "</div>";
+				$ferror = "<span class=\"Error\">".GM_LANG_file_not_found."&nbsp;".$path.$gedfilename."</span>\n";
 				$step = 1;
 				$gedfilename = "";
 			}
 			PrintHelpLink("gedcom_path_help", "qm","gedcom_path");
-			print "<span style=\"vertical-align: 25%;\">".GM_LANG_gedcom_file."</span>&nbsp;";
-			print "<input type=\"text\" name=\"mergefile\" value=\"".(isset($gedfilename) && strlen($gedfilename) > 4 ? $path.$gedfilename : "")."\" size=\"60\" dir=\"ltr\" tabindex=\"".$i."\"" .($step > 1 ? "disabled=\"disabled\" " : "")." />";
+			print GM_LANG_gedcom_file."</span>&nbsp;&nbsp;";
+			print "<input type=\"text\" name=\"mergefile\" value=\"".(isset($gedfilename) && strlen($gedfilename) > 4 ? $path.$gedfilename : "")."\" size=\"60\" dir=\"ltr\" tabindex=\"".$i."\"" .($step > 1 ? "disabled=\"disabled\" " : "")." />&nbsp;&nbsp;" . $ferror;
 			if ($step > 1) print "\n<input type=\"hidden\" name=\"mergefile\" value=\"".$mergefile."\" />";
-			print "</div>";
 		print "</div>";
 		// 2. Upload file. Show only if no gedfilename is know.
 		if (empty($gedfilename)) {
 			// Print the bar
-			print "<div class=\"topbottombar $TEXT_DIRECTION\">";
+			print "<div class=\"NavBlockHeader UploadGedcomSubHeader\">";
 				print "<a href=\"javascript: ".GM_LANG_merge_what_upload."\" onclick=\"expand_layer('upload_gedcom'); return false;\"><img id=\"upload_gedcom_img\" src=\"".GM_IMAGE_DIR."/";
 				if ($step > 2) print $GM_IMAGES["plus"]["other"];
 				else print $GM_IMAGES["minus"]["other"];
@@ -263,21 +268,19 @@ if ($step >= 1) {
 				print "&nbsp;<a href=\"javascript: ".GM_LANG_merge_what_upload."\" onclick=\"expand_layer('upload_gedcom');return false\">".GM_LANG_merge_what_upload."</a>";
 			print "</div>";
 			// Print the content
-			print "<div class=\"shade1\" style=\"padding-top:5px;\">";
-				print "<div id=\"upload_gedcom\" style=\"display: ";
+			print "<div class=\"NavBlockLabel UploadGedcomNavBlockLabel\" id=\"upload_gedcom\" style=\"display: ";
 				if ($step > 2) print "none ";
 				else print "block ";
 				print "\">";
-				print "<span style=\"vertical-align: 25%;\">".GM_LANG_gedcom_file."</span>&nbsp;";
-				print "<input name=\"uploadfile\" type=\"file\" size=\"60\" /><span style=\"vertical-align: 25%\">";
+				print GM_LANG_gedcom_file."&nbsp;&nbsp;";
+				print "<input name=\"uploadfile\" type=\"file\" size=\"60\" />";
 				if (!$filesize = ini_get('upload_max_filesize')) $filesize = "2M";
-				print " (".GM_LANG_max_upload_size." ".$filesize.")</span>".(isset($error_msg) ? "&nbsp;<span class=\"Error\" style=\"vertical-align: 25%;\">".$error_msg."</span>" : "");
+				print " (".GM_LANG_max_upload_size." ".$filesize.")".(isset($error_msg) ? "&nbsp;<span class=\"Error\">".$error_msg."</span>" : "");
 				if (isset($error_msg)) $step = 1;
-				print "</div>";
 			print "</div>";
 		}
 		// 3. File to merge with
-		print "<div class=\"topbottombar $TEXT_DIRECTION\">";
+		print "<div class=\"NavBlockHeader UploadGedcomSubHeader\">";
 			print "<a href=\"javascript: ".GM_LANG_merge_with."\" onclick=\"expand_layer('merge_gedcom'); return false;\"><img id=\"merge_gedcom_img\" src=\"".GM_IMAGE_DIR."/";
 			if ($step > 3) print $GM_IMAGES["plus"]["other"];
 			else print $GM_IMAGES["minus"]["other"];
@@ -285,26 +288,23 @@ if ($step >= 1) {
 			PrintHelpLink("upload_gedcom_help", "qm", "upload_gedcom");
 			print "&nbsp;<a href=\"javascript: ".GM_LANG_merge_with."\" onclick=\"expand_layer('merge_gedcom');return false\">".GM_LANG_merge_with."</a>";
 		print "</div>";
-		print "<div class=\"shade1\" style=\"padding-top:5px;\">";
-			print "<div id=\"merge_gedcom\" style=\"display: ";
+		print "<div class=\"NavBlockLabel UploadGedcomNavBlockLabel\" id=\"merge_gedcom\" style=\"display: ";
 			if ($step > 3) print "none ";
 			else print "block ";
 			print "\">";
-			print "<div class=\"shade1 wrap\"><span style=\"vertical-align: 25%\">".GM_LANG_merge_with."</span>&nbsp;";
-				print "<select name=\"gedcomid\"";
-				if ($step > 1) print "disabled=\"disabled\" ";
-				print ">";
-				foreach($GEDCOMS as $gedc=>$gedarray) {
-					print "<option value=\"".$gedc."\"";
-					if (isset($gedcomid)) {
-						if ($gedcomid == $gedc) print " selected=\"selected\"";
-					}
-					else if (GedcomConfig::$GEDCOMID == $gedc) print " selected=\"selected\"";
-					print ">".PrintReady($gedarray["title"])."</option>";
+			print GM_LANG_merge_with."&nbsp;&nbsp;";
+			print "<select name=\"gedcomid\"";
+			if ($step > 1) print "disabled=\"disabled\" ";
+			print ">";
+			foreach($GEDCOMS as $gedc=>$gedarray) {
+				print "<option value=\"".$gedc."\"";
+				if (isset($gedcomid)) {
+					if ($gedcomid == $gedc) print " selected=\"selected\"";
 				}
-				print "</select>";
-				print "</div>";
-			print "</div>";
+				else if (GedcomConfig::$GEDCOMID == $gedc) print " selected=\"selected\"";
+				print ">".PrintReady($gedarray["title"])."</option>";
+			}
+			print "</select>";
 		print "</div>";
 	}
 }
@@ -317,23 +317,23 @@ if ($step == 2) {
 	$imported = CheckForImport($gedfilename);
 	if ($imported && (!isset($override) || $override != "yes")) {
 		// print the second block
-		print "\n\n<div class=\"topbottombar $TEXT_DIRECTION\">";
+		print "\n\n<div class=\"NavBlockHeader UploadGedcomSubHeader\">";
 			print "\n<a href=\"javascript: ".GM_LANG_verify_gedcom."\" onclick=\"expand_layer('verify_gedcom');return false\"><img id=\"verify_gedcom_img\" src=\"".GM_IMAGE_DIR."/";
 			print $GM_IMAGES["minus"]["other"];
 			print "\" border=\"0\" width=\"11\" height=\"11\" alt=\"\" /></a>";
 			PrintHelpLink("verify_gedcom_help", "qm", "verify_gedcom");
 			print "&nbsp;<a href=\"javascript: ".GM_LANG_verify_gedcom."\" onclick=\"expand_layer('verify_gedcom');return false\">".GM_LANG_verify_gedcom."</a>";
 		print "\n</div>";
-		print "\n<div id=\"verify_gedcom\" class=\"shade1\" style=\"display: block;\">";
+		print "\n<div id=\"verify_gedcom\" class=\"NavBlockLabel UploadGedcomNavBlockLabel\" style=\"display: block;\">";
 			print "<span class=\"Error\">".GM_LANG_dataset_exists."</span><br /><br />";
 		// TODO: Check for existing changes
-			print "\n<div class=\"shade1\">". GM_LANG_empty_dataset."&nbsp;";
+			print "\n<div>". GM_LANG_empty_dataset."&nbsp;";
 				print "<select name=\"override\">";
 				print "<option value=\"no\">".GM_LANG_no."</option>";
 				print "<option value=\"yes\">".GM_LANG_yes."</option>";
 				print "</select>";
 			print "\n</div>";
-		print "\n</div>";
+		print "\n<!-- Close empty DB block //--></div>";
 		print "<input type=\"hidden\" name=\"step\" value=\"2\">";
 	}
 	else $step = 3;
@@ -416,7 +416,7 @@ if ($step >= 3) {
 	}
 	// If the gedcom is not checked for cleanup, do it now. 
 	// After checking, the appriopriate form will display.
-	print "\n\n<div class=\"topbottombar $TEXT_DIRECTION\">";
+	print "\n\n<div class=\"NavBlockHeader UploadGedcomSubHeader\">";
 		print "\n<a href=\"javascript: ".GM_LANG_validate_gedcom."\" onclick=\"expand_layer('validate_gedcom');return false\"><img id=\"validate_gedcom_img\" src=\"".GM_IMAGE_DIR."/";
 		if ($step > 3) print $GM_IMAGES["plus"]["other"];
 		else print $GM_IMAGES["minus"]["other"];
@@ -424,135 +424,130 @@ if ($step >= 3) {
 		PrintHelpLink("validate_gedcom_help", "qm","validate_gedcom");
 		print "&nbsp;\n<a href=\"javascript: ".GM_LANG_validate_gedcom."\" onclick=\"expand_layer('validate_gedcom');return false\">".GM_LANG_validate_gedcom."</a>";
 	print "\n</div>";
-	print "\n<div class=\"shade1\" style=\"padding-top:5px;\">";
-		print "\n<div id=\"validate_gedcom\" style=\"display: ";
+	print "\n<div id=\"validate_gedcom\" class=\"NavBlockLabel UploadGedcomNavBlockLabel\" style=\"display: ";
 		if ($step > 3) print "none ";
 		else print "block ";
 		print "\">";
-		print "\n<div class=\"shade1\">";
-			print GM_LANG_performing_validation."<br />";
-			if (isset($error) && !empty($error)) print "<span class=\"Error\">".$error."</span>\n";
-			// Check for cleanup, skip not clicked
-			if ($step == 3 && (!isset($skip_cleanup) || $skip_cleanup != GM_LANG_skip_cleanup)) {
-				$l_headcleanup = false;
-				$l_macfilecleanup = false;
-				$l_lineendingscleanup = false;
-				$l_placecleanup = false;
-				$l_datecleanup=false;
-				$l_isansi = false;
-				$fp = fopen($path.$gedfilename, "r");
-				if (!$fp) {
-					print "error opening file ".$path.$gedfilename;
-					exit;
-				}
-				//-- read the gedcom and test it in 8KB chunks
-				while(!feof($fp)) {
-					$fcontents = fread($fp, 1024*8);
-					$fcontents = preg_replace("/\n\W+/", "\n", $fcontents);
-					
-					if (!$l_headcleanup && ImportFunctions::NeedHeadCleanup($fcontents)) $l_headcleanup = true;
-					if (!$l_macfilecleanup && ImportFunctions::NeedMacfileCleanup($fcontents)) $l_macfilecleanup = true;
-					if (!$l_lineendingscleanup && ImportFunctions::NeedLineEndingsCleanup($fcontents)) $l_lineendingscleanup = true;
-					if (!$l_placecleanup && ($placesample = ImportFunctions::NeedPlaceCleanup($fcontents)) !== false) $l_placecleanup = true;
-					if (!$l_datecleanup && ($datesample = ImportFunctions::NeedDateCleanup($fcontents)) !== false) $l_datecleanup = true;
-					if (!$l_isansi && ImportFunctions::IsAnsi($fcontents)) $l_isansi = true;
-				}
-				fclose($fp);
+		print GM_LANG_performing_validation."<br />";
+		if (isset($error) && !empty($error)) print "<span class=\"Error\">".$error."</span>\n";
+		// Check for cleanup, skip not clicked
+		if ($step == 3 && (!isset($skip_cleanup) || $skip_cleanup != GM_LANG_skip_cleanup)) {
+			$l_headcleanup = false;
+			$l_macfilecleanup = false;
+			$l_lineendingscleanup = false;
+			$l_placecleanup = false;
+			$l_datecleanup=false;
+			$l_isansi = false;
+			$fp = fopen($path.$gedfilename, "r");
+			if (!$fp) {
+				print "error opening file ".$path.$gedfilename;
+				exit;
+			}
+			//-- read the gedcom and test it in 8KB chunks
+			while(!feof($fp)) {
+				$fcontents = fread($fp, 1024*8);
+				$fcontents = preg_replace("/\n\W+/", "\n", $fcontents);
 				
-				if (!$l_datecleanup && !$l_isansi  && !$l_headcleanup && !$l_macfilecleanup &&!$l_placecleanup && !$l_lineendingscleanup) {
-					print GM_LANG_valid_gedcom;
-					$step = 4;
-				}
-				else {
-					$cleanup_needed = "yes";
-					print "<input type=\"hidden\" name=\"cleanup_needed\" value=\"yes\">";
-					if (!AdminFunctions::FileIsWriteable($path.$gedfilename) && (file_exists($path.$gedfilename))) {
-						print "<span class=\"Error\">".str_replace("#GEDCOM#", get_gedcom_from_id(GedcomConfig::$GEDCOMID), GM_LANG_error_header_write)."</span>\n";
-					}
-					// NOTE: Check for head cleanu
-					if ($l_headcleanup) {
-						print "\n<div class=\"shade1 wrap\">";
-							PrintHelpLink("invalid_header_help", "qm", "invalid_header");
-							print "<span class=\"Error\">".GM_LANG_invalid_header."</span>\n";
-						print "</div><br />";
-					}
-					// NOTE: Check for mac file cleanup
-					if ($l_macfilecleanup) {
-						print "\n<div class=\"shade1 wrap\">";
-							PrintHelpLink("macfile_detected_help", "qm", "macfile_detected");
-							print "<span class=\"Error\">".GM_LANG_macfile_detected."</span>\n";
-						print "</div><br />";
-					}
-					// NOTE: Check for line endings cleanup
-					if ($l_lineendingscleanup) {
-						print "\n<div class=\"shade1 wrap\">";
-							PrintHelpLink("empty_lines_detected_help", "qm", "empty_lines_detected");
-							print "<span class=\"Error\">".GM_LANG_empty_lines_detected."</span>\n";
-						print "</div><br />";
-					}
-					// NOTE: Check for place cleanup
-					if ($l_placecleanup) {
-						print "\n<div class=\"shade1 wrap\">";
-							PrintHelpLink("cleanup_places_help", "qm", "cleanup_places");
-							print "<span class=\"Error\">".GM_LANG_place_cleanup_detected."</span>\n";
-						print "</div>";
-						print "\n<div class=\"shade2 wrap\">";
-							print GM_LANG_cleanup_places;
-							print "<select name=\"cleanup_places\">\n";
-							print "<option value=\"yes\" selected=\"selected\">".GM_LANG_yes."</option>\n<option value=\"no\">".GM_LANG_no."</option>\n</select>";
-						print "</div>";
-						print "\n<div class=\"shade1\">".GM_LANG_example_place."<br />".PrintReady(nl2br($placesample[0]))."</div><br />\n";
-					}
-					// NOTE: Check for date cleanup
-					if ($l_datecleanup) {
-						print "\n<div class=\"shade1 wrap\">";
-							print "<span class=\"Error\">".GM_LANG_invalid_dates."</span>\n";
-						print "</div>";
-						print "\n<div class=\"shade2\">";
-							PrintHelpLink("detected_date_help", "qm");
-							print GM_LANG_date_format;
-							if (isset($datesample["choose"])){
-								print "<select name=\"datetype\">\n";
-								print "<option value=\"1\">".GM_LANG_day_before_month."</option>\n<option value=\"2\">".GM_LANG_month_before_day."</option>\n</select>";
-							}
-							else print "<input type=\"hidden\" name=\"datetype\" value=\"3\" />";
-						print "</div>";
-						print "\n<div class=\"shade1\">".GM_LANG_example_date."<br />".$datesample[0]."</div><br />";
-					}
-					// NOTE: Check for ansi encoding
-					if ($l_isansi) {
-						print "\n<div class=\"shade1\">";
-							print "<span class=\"Error\">".GM_LANG_ansi_encoding_detected."</span>\n";
-						print "</div>";
-						print "\n<div class=\"shade2 wrap\">";
-							PrintHelpLink("detected_ansi2utf_help", "qm", "ansi_to_utf8");
-							print GM_LANG_ansi_to_utf8;
-							print "<select name=\"utf8convert\">\n";
-							print "<option value=\"yes\" selected=\"selected\">".GM_LANG_yes."</option>\n";
-							print "<option value=\"no\">".GM_LANG_no."</option>\n</select>";
-						print "</div><br />";
-					}
-				}
+				if (!$l_headcleanup && ImportFunctions::NeedHeadCleanup($fcontents)) $l_headcleanup = true;
+				if (!$l_macfilecleanup && ImportFunctions::NeedMacfileCleanup($fcontents)) $l_macfilecleanup = true;
+				if (!$l_lineendingscleanup && ImportFunctions::NeedLineEndingsCleanup($fcontents)) $l_lineendingscleanup = true;
+				if (!$l_placecleanup && ($placesample = ImportFunctions::NeedPlaceCleanup($fcontents)) !== false) $l_placecleanup = true;
+				if (!$l_datecleanup && ($datesample = ImportFunctions::NeedDateCleanup($fcontents)) !== false) $l_datecleanup = true;
+				if (!$l_isansi && ImportFunctions::IsAnsi($fcontents)) $l_isansi = true;
 			}
-			// Not step 3 or skip cleanup
-			if ((!isset($cleanup_needed) || $cleanup_needed != "yes") || (isset($skip_cleanup) && $skip_cleanup == GM_LANG_skip_cleanup)) {
+			fclose($fp);
+			
+			if (!$l_datecleanup && !$l_isansi  && !$l_headcleanup && !$l_macfilecleanup &&!$l_placecleanup && !$l_lineendingscleanup) {
 				print GM_LANG_valid_gedcom;
-				if ($step == 3) $step = 4;
+				$step = 4;
 			}
-			else print "<input type=\"hidden\" name=\"step\" value=\"3\">";
-			if (isset($cleaned)) {
-				print GM_LANG_cleanup_success;
-				print "<input type=\"hidden\" name=\"cleaned\" value=\"yes\" />"; // next time also display this message
+			else {
+				$cleanup_needed = "yes";
+				print "<input type=\"hidden\" name=\"cleanup_needed\" value=\"yes\">";
+				if (!AdminFunctions::FileIsWriteable($path.$gedfilename) && (file_exists($path.$gedfilename))) {
+					print "<div class=\"NavBlockField UploadGedcomErrorBox\">";
+					print "<span class=\"Error\">".str_replace("#GEDCOM#", get_gedcom_from_id(GedcomConfig::$GEDCOMID), GM_LANG_error_header_write)."</span>\n";
+					print "</div>";
+				}
+				// NOTE: Check for head cleanu
+				if ($l_headcleanup) {
+					print "<div class=\"NavBlockField UploadGedcomErrorBox\">";
+						PrintHelpLink("invalid_header_help", "qm", "invalid_header");
+						print "<span class=\"Error\">".GM_LANG_invalid_header."</span>\n";
+					print "</div>";
+				}
+				// NOTE: Check for mac file cleanup
+				if ($l_macfilecleanup) {
+					print "<div class=\"NavBlockField UploadGedcomErrorBox\">";
+						PrintHelpLink("macfile_detected_help", "qm", "macfile_detected");
+						print "<span class=\"Error\">".GM_LANG_macfile_detected."</span>\n";
+					print "</div>";
+				}
+				// NOTE: Check for line endings cleanup
+				if ($l_lineendingscleanup) {
+					print "<div class=\"NavBlockField UploadGedcomErrorBox\">";
+						PrintHelpLink("empty_lines_detected_help", "qm", "empty_lines_detected");
+						print "<span class=\"Error\">".GM_LANG_empty_lines_detected."</span>\n";
+					print "</div>";
+				}
+				// NOTE: Check for place cleanup
+				if ($l_placecleanup) {
+					print "<div class=\"NavBlockField UploadGedcomErrorBox\">";
+					PrintHelpLink("cleanup_places_help", "qm", "cleanup_places");
+					print "<span class=\"Error\">".GM_LANG_place_cleanup_detected."</span>\n";
+					print "<br /><br />";
+					print GM_LANG_example_place."<br />".PrintReady(nl2br($placesample[0]))."\n";
+						print GM_LANG_cleanup_places."&nbsp;&nbsp;";
+						print "<select name=\"cleanup_places\">\n";
+						print "<option value=\"yes\" selected=\"selected\">".GM_LANG_yes."</option>\n<option value=\"no\">".GM_LANG_no."</option>\n</select><br />";
+					print "</div>";
+				}
+				// NOTE: Check for date cleanup
+				if ($l_datecleanup) {
+					print "<div class=\"NavBlockField UploadGedcomErrorBox\">";
+						PrintHelpLink("detected_date_help", "qm");
+						print "<span class=\"Error\">".GM_LANG_invalid_dates."</span>\n";
+						print "<br /><br />";
+						print GM_LANG_example_date."<br />".$datesample[0]."<br />";
+						if (isset($datesample["choose"])){
+							print GM_LANG_date_format."&nbsp;&nbsp;";
+							print "<select name=\"datetype\">\n";
+							print "<option value=\"1\">".GM_LANG_day_before_month."</option>\n<option value=\"2\">".GM_LANG_month_before_day."</option>\n</select>";
+						}
+						else print "<input type=\"hidden\" name=\"datetype\" value=\"3\" />";
+					print "</div>";
+				}
+				// NOTE: Check for ansi encoding
+				if ($l_isansi) {
+					print "<div class=\"NavBlockField UploadGedcomErrorBox\">";
+						PrintHelpLink("detected_ansi2utf_help", "qm", "ansi_to_utf8");
+						print "<span class=\"Error\">".GM_LANG_ansi_encoding_detected."</span>\n";
+						print "<br /><br />";
+						print GM_LANG_ansi_to_utf8."&nbsp;&nbsp;";
+						print "<select name=\"utf8convert\">\n";
+						print "<option value=\"yes\" selected=\"selected\">".GM_LANG_yes."</option>\n";
+						print "<option value=\"no\">".GM_LANG_no."</option>\n</select>";
+					print "</div>";
+				}
 			}
-			print "</div>";
-		print "</div>";
-	print "</div>";
+		}
+		// Not step 3 or skip cleanup
+		if ((!isset($cleanup_needed) || $cleanup_needed != "yes") || (isset($skip_cleanup) && $skip_cleanup == GM_LANG_skip_cleanup)) {
+			print GM_LANG_valid_gedcom;
+			if ($step == 3) $step = 4;
+		}
+		else print "<input type=\"hidden\" name=\"step\" value=\"3\">";
+		if (isset($cleaned)) {
+			print GM_LANG_cleanup_success;
+			print "<input type=\"hidden\" name=\"cleaned\" value=\"yes\" />"; // next time also display this message
+		}
+	print "<!-- Close validation block //--></div>";
 }
 
 
 if ($step >= 4) {
 	// NOTE: Additional import options
-	print "\n<div class=\"topbottombar $TEXT_DIRECTION\">";
+	print "\n\n<div class=\"NavBlockHeader UploadGedcomSubHeader\">";
 		print "<a href=\"javascript: ".GM_LANG_import_options."\" onclick=\"expand_layer('import_options');return false\"><img id=\"import_options_img\" src=\"".GM_IMAGE_DIR."/";
 		if ($step > 4) print $GM_IMAGES["plus"]["other"];
 		else print $GM_IMAGES["minus"]["other"];
@@ -560,120 +555,120 @@ if ($step >= 4) {
 		PrintHelpLink("import_options_help", "qm", "import_options");
 		print "&nbsp;<a href=\"javascript: ".GM_LANG_import_options."\" onclick=\"expand_layer('import_options');return false\">".GM_LANG_import_options."</a>";
 	print "</div>";
-	print "\n<div class=\"shade1 width100\" style=\"padding-top:5px;\">";
-		print "\n<div id=\"import_options\" style=\"display: ";
+	print "\n<div id=\"import_options\" style=\"display: ";
 		if ($step > 4) print "none ";
 		else print "block ";
-		print "\"><table>";
-			// NOTE: Time limit for import
-			// TODO: Write help text
-			print "<tr><td class=\"shade2 wrap width20\">";
-				PrintHelpLink("time_limit_help", "qm", "time_limit");
-				print GM_LANG_time_limit;
-				print "</td><td class=\"shade2 wrap width20\">";
-				if ($step > 4)  {
-					print $timelimit;
-					print "<input type=\"hidden\" name=\"timelimit\" value=\"".$timelimit."\" />";
-				}
-				else print "<input type=\"text\" name=\"timelimit\" value=\"".$timelimit."\" size=\"5\" />\n";
-			print "</td></tr>";
-			
-			// NOTE: Auto-click "Continue" button
-			print "<tr><td class=\"shade2 wrap width20\">";
-			PrintHelpLink("auto_ontinue_help", "qm", "auto_continue");
-			print GM_LANG_auto_continue;
-			print "</td><td class=\"shade2 width20\">";
+		print "\">";
+		print "<table class=\"NavBlockTable UploadGedcomNavBlockTable\">";
+	
+		// NOTE: Time limit for import
+		// TODO: Write help text
+		print "<tr><td class=\"NavBlockLabel UploadGedcomNavBlockLabel\">";
+			PrintHelpLink("time_limit_help", "qm", "time_limit");
+			print GM_LANG_time_limit;
+			print "</td><td class=\"NavBlockField UploadGedcomNavBlockField\">";
 			if ($step > 4)  {
-				print constant("GM_LANG_".$auto_continue);
-				print "<input type=\"hidden\" name=\"auto_continue\" value=\"".$auto_continue."\" />";
+				print $timelimit;
+				print "<input type=\"hidden\" name=\"timelimit\" value=\"".$timelimit."\" />";
 			}
-			else {
-				print "<select name=\"auto_continue\"";
-				print ">\n";
-				print "<option value=\"yes\">".GM_LANG_yes."</option>\n";
-				print "<option value=\"no\">".GM_LANG_no."</option>\n</select>";
-			}
-			print "</td></tr>";
+			else print "<input type=\"text\" name=\"timelimit\" value=\"".$timelimit."\" size=\"5\" />\n";
+		print "</td></tr>";
+		
+		// NOTE: Auto-click "Continue" button
+		print "<tr><td class=\"NavBlockLabel UploadGedcomNavBlockLabel\">";
+		PrintHelpLink("auto_ontinue_help", "qm", "auto_continue");
+		print GM_LANG_auto_continue;
+		print "</td><td class=\"NavBlockField UploadGedcomNavBlockField\">";
+		if ($step > 4)  {
+			print constant("GM_LANG_".$auto_continue);
+			print "<input type=\"hidden\" name=\"auto_continue\" value=\"".$auto_continue."\" />";
+		}
+		else {
+			print "<select name=\"auto_continue\"";
+			print ">\n";
+			print "<option value=\"yes\">".GM_LANG_yes."</option>\n";
+			print "<option value=\"no\">".GM_LANG_no."</option>\n</select>";
+		}
+		print "</td></tr>";
 
-			// NOTE: Import married names
-			print "<tr><td class=\"shade2 wrap width20\">";
-			PrintHelpLink("import_marr_names_help", "qm", "import_marr_names");
-			print GM_LANG_import_marr_names.":";
-			print "</td><td class=\"shade2 wrap width20\">";
-			if ($step > 4) {
-				print constant("GM_LANG_".$marr_names);
-				print "<input type=\"hidden\" name=\"marr_names\" value=\"".$marr_names."\" />";
-			}
-			else {
-				print "<select name=\"marr_names\">\n";
-				print "<option value=\"yes\"";
-				if (isset($marr_names) && $marr_names == "yes") print " selected=\"selected\"";
-				print ">".GM_LANG_yes."</option>\n";
-				print "<option value=\"no\"";
-				if (!isset($marr_names) || $marr_names == "no") print " selected=\"selected\"";
-				print ">".GM_LANG_no."</option>\n</select>";
-			}
-			print "</td></tr>";
-			
-			// NOTE: change XREF to RIN, REFN, or Don't change
-			print "<tr><td class=\"shade2 wrap width20\">";
-			PrintHelpLink("change_indi2id_help", "qm", "change_id");
-			print GM_LANG_change_id;
-			print "</td><td class=\"shade2 wrap width20\">";
-			if ($step > 4) {
-				if ($xreftype == "NA") print GM_LANG_do_not_change;
-				else print $xreftype;
-				print "<input type=\"hidden\" name=\"xreftype\" value=\"".$xreftype."\" />";
-			}
-			else {
-				print "<select name=\"xreftype\">\n";
-				print "<option value=\"NA\">".GM_LANG_do_not_change."</option>\n<option value=\"RIN\">RIN</option>\n";
-				print "<option value=\"REFN\">REFN</option>\n</select>";
-			}
-			print "</td></tr>";
-			
-			// NOTE: option to convert to utf8
-			print "<tr><td class=\"shade2 wrap width20\">";
-			PrintHelpLink("convert_ansi2utf_help", "qm", "ansi_to_utf8");
-			print GM_LANG_ansi_to_utf8;
-			print "</td><td class=\"shade2 wrap width20\">";
-			if ($step > 4) {
-				print constant("GM_LANG_".strtolower($utf8convert));
-				print "<input type=\"hidden\" name=\"utf8convert\" value=\"".$utf8convert."\" />";
-			}
-			else {
-				print "<select name=\"utf8convert\">\n";
-				print "<option value=\"yes\">".GM_LANG_yes."</option>\n";
-				print "<option value=\"no\" selected=\"selected\">".GM_LANG_no."</option>\n</select>";
-			}
-			print "</td></tr>";
+		// NOTE: Import married names
+		print "<tr><td class=\"NavBlockLabel UploadGedcomNavBlockLabel\">";
+		PrintHelpLink("import_marr_names_help", "qm", "import_marr_names");
+		print GM_LANG_import_marr_names.":";
+		print "</td><td class=\"NavBlockField UploadGedcomNavBlockField\">";
+		if ($step > 4) {
+			print constant("GM_LANG_".$marr_names);
+			print "<input type=\"hidden\" name=\"marr_names\" value=\"".$marr_names."\" />";
+		}
+		else {
+			print "<select name=\"marr_names\">\n";
+			print "<option value=\"yes\"";
+			if (isset($marr_names) && $marr_names == "yes") print " selected=\"selected\"";
+			print ">".GM_LANG_yes."</option>\n";
+			print "<option value=\"no\"";
+			if (!isset($marr_names) || $marr_names == "no") print " selected=\"selected\"";
+			print ">".GM_LANG_no."</option>\n</select>";
+		}
+		print "</td></tr>";
+		
+		// NOTE: change XREF to RIN, REFN, or Don't change
+		print "<tr><td class=\"NavBlockLabel UploadGedcomNavBlockLabel\">";
+		PrintHelpLink("change_indi2id_help", "qm", "change_id");
+		print GM_LANG_change_id;
+		print "</td><td class=\"NavBlockField UploadGedcomNavBlockField\">";
+		if ($step > 4) {
+			if ($xreftype == "NA") print GM_LANG_do_not_change;
+			else print $xreftype;
+			print "<input type=\"hidden\" name=\"xreftype\" value=\"".$xreftype."\" />";
+		}
+		else {
+			print "<select name=\"xreftype\">\n";
+			print "<option value=\"NA\">".GM_LANG_do_not_change."</option>\n<option value=\"RIN\">RIN</option>\n";
+			print "<option value=\"REFN\">REFN</option>\n</select>";
+		}
+		print "</td></tr>";
+		
+		// NOTE: option to convert to utf8
+		print "<tr><td class=\"NavBlockLabel UploadGedcomNavBlockLabel\">";
+		PrintHelpLink("convert_ansi2utf_help", "qm", "ansi_to_utf8");
+		print GM_LANG_ansi_to_utf8;
+		print "</td><td class=\"NavBlockField UploadGedcomNavBlockField\">";
+		if ($step > 4) {
+			print constant("GM_LANG_".strtolower($utf8convert));
+			print "<input type=\"hidden\" name=\"utf8convert\" value=\"".$utf8convert."\" />";
+		}
+		else {
+			print "<select name=\"utf8convert\">\n";
+			print "<option value=\"yes\">".GM_LANG_yes."</option>\n";
+			print "<option value=\"no\" selected=\"selected\">".GM_LANG_no."</option>\n</select>";
+		}
+		print "</td></tr>";
 
-			// NOTE: option to merge double embedded MM items
-			print "<tr><td class=\"shade2 wrap width20\">";
-			PrintHelpLink("MERGE_DOUBLE_MEDIA_help", "qm", "MERGE_DOUBLE_MEDIA");
-			print GM_LANG_MERGE_DOUBLE_MEDIA;
-			print "</td><td class=\"shade2 wrap width20\">";
-			if ($step > 4) {
-				print constant("GM_LANG_merge_dm_".$merge_media);
-				print "<input type=\"hidden\" name=\"merge_media\" value=\"".$merge_media."\" />";
-			}
-			else {
-				print "<select name=\"merge_media\">\n";
-				print "<option value=\"0\" ";
-				if (GedcomConfig::$MERGE_DOUBLE_MEDIA == "0") print "selected=\"selected\"";
-				print ">".GM_LANG_merge_dm_0."</option>";
-				print "<option value=\"1\" ";
-				if (GedcomConfig::$MERGE_DOUBLE_MEDIA == "1" || empty($MERGE_DOUBLE_MEDIA)) print "selected=\"selected\"";
-				print ">".GM_LANG_merge_dm_1."</option>";
-				print "<option value=\"2\" ";
-				if (GedcomConfig::$MERGE_DOUBLE_MEDIA == "2") print "selected=\"selected\"";
-				print ">".GM_LANG_merge_dm_2."</option>";
-			}
-			print "</td></tr></table>";
-							
-			if ($step == 4) print "<input type=\"hidden\" name=\"step\" value=\"5\" />";
-		print "</div>";
-	print "</div>";
+		// NOTE: option to merge double embedded MM items
+		print "<tr><td class=\"NavBlockLabel UploadGedcomNavBlockLabel\">";
+		PrintHelpLink("MERGE_DOUBLE_MEDIA_help", "qm", "MERGE_DOUBLE_MEDIA");
+		print GM_LANG_MERGE_DOUBLE_MEDIA;
+		print "</td><td class=\"NavBlockField UploadGedcomNavBlockField\">";
+		if ($step > 4) {
+			print constant("GM_LANG_merge_dm_".$merge_media);
+			print "<input type=\"hidden\" name=\"merge_media\" value=\"".$merge_media."\" />";
+		}
+		else {
+			print "<select name=\"merge_media\">\n";
+			print "<option value=\"0\" ";
+			if (GedcomConfig::$MERGE_DOUBLE_MEDIA == "0") print "selected=\"selected\"";
+			print ">".GM_LANG_merge_dm_0."</option>";
+			print "<option value=\"1\" ";
+			if (GedcomConfig::$MERGE_DOUBLE_MEDIA == "1" || empty($MERGE_DOUBLE_MEDIA)) print "selected=\"selected\"";
+			print ">".GM_LANG_merge_dm_1."</option>";
+			print "<option value=\"2\" ";
+			if (GedcomConfig::$MERGE_DOUBLE_MEDIA == "2") print "selected=\"selected\"";
+			print ">".GM_LANG_merge_dm_2."</option>";
+		}
+		print "</td></tr></table>";
+						
+		if ($step == 4) print "<input type=\"hidden\" name=\"step\" value=\"5\" />";
+	print "<!-- Close option block //--></div>";
 }
 
 if ($step == 5 || $step == 6) {
@@ -706,9 +701,10 @@ if ($step == 5) {
 		if (!ini_get('safe_mode')) @set_time_limit($timelimit);
 		
 		$FILE_SIZE = filesize($path.$gedfilename);
-		print "\n<div class=\"topbottombar $TEXT_DIRECTION\">";
+		print "\n<div class=\"NavBlockHeader UploadGedcomSubHeader\">";
 		print GM_LANG_reading_file." ".$path.$gedfilename;
 		print "</div>";
+		print "<div class=\"NavBlockLabel UploadGedcomNavBlockLabel\">";
 		ImportFunctions::SetupProgressBar($FILE_SIZE);
 		flush();
 		@ob_flush();
@@ -905,12 +901,14 @@ if ($step == 5) {
 							//-- close the file connection
 							fclose($fpged);
 							$_SESSION["import"]["resumed"]++;
-							
-							print GM_LANG_import_time_exceeded;
+							print "</div>";
+							print "<div class=\"NavBlockFooter\">";
+							print GM_LANG_import_time_exceeded."<br /><br />";
 							print "<input type=\"hidden\" name=\"stage\" value=\"1\" />";
 							print "<input type=\"hidden\" name=\"step\" value=\"5\" />";
 							// This is the (auto)continue button
 							print "<input type=\"submit\" name=\"continue\" value=\"".GM_LANG_del_proceed."\" />";
+							print "</div>";
 							NameFunctions::DMSoundex("", "closecache");
 							//-- We write the session data and close it. Fix for intermittend logoff.
 							session_write_close();
@@ -1069,6 +1067,7 @@ if ($step == 6) {
 				$_SESSION["import"]["marr_resumed"]		= 1;
 //				$_SESSION["import"]["k"]				= $k;
 				?>
+				</div>
 				<div class="shade2"><?php print GM_LANG_import_time_exceeded; ?></div>
 				<?php
 				// This is the (auto)continue button
@@ -1097,17 +1096,17 @@ if ($step == 6) {
 		}
 	}
 	NameFunctions::DMSoundex("", "closecache");
-	$show_table_marr = "<table class=\"ListTable\"><tr>";
-	$show_table_marr .= "<tr><td class=\"topbottombar\" colspan=\"3\">".GM_LANG_import_marr_names."</td></tr>";
-	$show_table_marr .= "<td class=\"shade2\">&nbsp;".GM_LANG_exec_time."&nbsp;</td>";
-	$show_table_marr .= "<td class=\"shade2\">&nbsp;".GM_LANG_found_record."&nbsp;</td>";
-	$show_table_marr .= "<td class=\"shade2\">&nbsp;".GM_LANG_type."&nbsp;</td></tr>\n";
+	$show_table_marr = "<table class=\"NavBlockTable\"><tr>";
+	$show_table_marr .= "<tr><td class=\"NavBlockHeader\" colspan=\"3\">".GM_LANG_import_marr_names."</td></tr>";
+	$show_table_marr .= "<td class=\"NavBlockColumnHeader\">".GM_LANG_exec_time."</td>";
+	$show_table_marr .= "<td class=\"NavBlockColumnHeader\">".GM_LANG_found_record."</td>";
+	$show_table_marr .= "<td class=\"NavBlockColumnHeader\">".GM_LANG_type."</td></tr>\n";
 	$newtime = time();
 	$exectime = $newtime - $oldtime;
 	$marr_importtime = $exectime + $marr_importtime;
-	$show_table_marr .= "<tr><td class=\"shade1 indent_rtl rtl\">".$marr_importtime." ".GM_LANG_sec."</td>\n";
-	$show_table_marr .= "<td class=\"shade1 indent_rtl rtl\">".$names_added."<script type=\"text/javascript\"><!--\nupdate_progress(".$k.", ".($exectime + $marr_importtime).");//-->\n</script></td>";
-	$show_table_marr .= "<td class=\"shade1\">&nbsp;INDI&nbsp;</td></tr>\n";
+	$show_table_marr .= "<tr><td class=\"NavBlockField\">".$marr_importtime." ".GM_LANG_sec."</td>\n";
+	$show_table_marr .= "<td class=\"NavBlockField\">".$names_added."<script type=\"text/javascript\"><!--\nupdate_progress(".$k.", ".($exectime + $marr_importtime).");//-->\n</script></td>";
+	$show_table_marr .= "<td class=\"NavBlockField\">&nbsp;INDI&nbsp;</td></tr>\n";
 	$show_table_marr .= "</table><br />\n";
 	$stage=10;
 	$record_count=0;
@@ -1119,29 +1118,27 @@ if ($step == 5 || $step == 6) {
 	print "<script type=\"text/javascript\"><!--\ncomplete_progress(".($importtime + $marr_importtime).", '".GM_LANG_exec_time."', '".GM_LANG_click_here_to_go_to_pedigree_tree."', '".GM_LANG_welcome_page."');\n//-->\n</script>";
 	
 	// TODO: Layout for Hebrew
-	$show_table1 = "<table class=\"ListTable\">";
-	$show_table1 .= "<tr><td class=\"topbottombar\" colspan=\"4\">".GM_LANG_ged_import."</td></tr>";
-	$show_table1 .= "<tr><td class=\"shade2\">&nbsp;".GM_LANG_exec_time."&nbsp;</td>";
-	$show_table1 .= "<td class=\"shade2\">&nbsp;".GM_LANG_bytes_read."&nbsp;</td>\n";
-	$show_table1 .= "<td class=\"shade2\">&nbsp;".GM_LANG_found_record."&nbsp;</td>";
-	$show_table1 .= "<td class=\"shade2\">&nbsp;".GM_LANG_type."&nbsp;</td></tr>\n";
+	$show_table1 = "<table class=\"NavBlockTable\">";
+	$show_table1 .= "<tr><td class=\"NavBlockHeader\" colspan=\"4\">".GM_LANG_import_statistics."</td></tr>";
+	$show_table1 .= "<tr><td class=\"NavBlockColumnHeader\">".GM_LANG_exec_time."</td>";
+	$show_table1 .= "<td class=\"NavBlockColumnHeader\">".GM_LANG_bytes_read."</td>\n";
+	$show_table1 .= "<td class=\"NavBlockColumnHeader\">".GM_LANG_found_record."</td>";
+	$show_table1 .= "<td class=\"NavBlockColumnHeader\">".GM_LANG_type."</td></tr>\n";
 	$total = 0;
 	foreach($listtype as $indexval => $type) {
-		$show_table1 .= "<tr><td class=\"shade1 indent_rtl rtl \">".$type["exectime"]." ".GM_LANG_sec."</td>";
-		$show_table1 .= "<td class=\"shade1 indent_rtl rtl \">".($type["bytes"]=="0"?"++":$type["bytes"])."</td>\n";
-		$show_table1 .= "<td class=\"shade1 indent_rtl rtl \">".$type["i"]."</td>";
+		$show_table1 .= "<tr><td class=\"NavBlockField\">".$type["exectime"]." ".GM_LANG_sec."</td>";
+		$show_table1 .= "<td class=\"NavBlockField\">".($type["bytes"]=="0"?"++":$type["bytes"])."</td>\n";
+		$show_table1 .= "<td class=\"NavBlockField\">".$type["i"]."</td>";
 		$total += $type["i"];
-		$show_table1 .= "<td class=\"shade1 rtl\">&nbsp;".$type["type"]."&nbsp;</td></tr>\n";
+		$show_table1 .= "<td class=\"NavBlockField\">".$type["type"]."</td></tr>\n";
 	}
-	$show_table1 .= "<tr><td class=\"shade1 indent_rtl rtl \">".$importtime." ".GM_LANG_sec."</td>";
-	$show_table1 .= "<td class=\"shade1 indent_rtl rtl \">".$TOTAL_BYTES."<script type=\"text/javascript\"><!--\nupdate_progress(".$TOTAL_BYTES.", ".$exectime.");\n//-->\n</script></td>\n";
-	$show_table1 .= "<td class=\"shade1 indent_rtl rtl \">".$total."</td>";
-	$show_table1 .= "<td class=\"shade1\">&nbsp;</td></tr>\n";
+	$show_table1 .= "<tr><td class=\"NavBlockField\">".$importtime." ".GM_LANG_sec."</td>";
+	$show_table1 .= "<td class=\"NavBlockField\">".$TOTAL_BYTES."<script type=\"text/javascript\"><!--\nupdate_progress(".$TOTAL_BYTES.", ".$exectime.");\n//-->\n</script></td>\n";
+	$show_table1 .= "<td class=\"NavBlockField\">".$total."</td>";
+	$show_table1 .= "<td class=\"NavBlockField\">&nbsp;</td></tr>\n";
 	$show_table1 .= "</table>\n";
-	print "\n<div class=\"import_statistics center\">";
-		print "<br /><br />".GM_LANG_import_statistics."<br />";
-		if (isset($skip_table)) print "<br />...";
-		else {
+	print "\n<div class=\"UploadGedcomImportStats\">";
+		if (!isset($skip_table)) {
 			print $show_table1;
 			if ($marr_names == "yes") print $show_table_marr;
 		}
@@ -1152,25 +1149,32 @@ if ($step == 5 || $step == 6) {
 	unset($_SESSION["import"]);
 	if (!ini_get('safe_mode')) @set_time_limit(GedcomConfig::$TIME_LIMIT);
 }
-	
-	
-print "\n<div class=\"center\" style=\"margin-top: 5px;\">";
+$NBfooter = false;
 // Don't show the continue botton if the import process is finished!
-if ($step < 5) print "<input type=\"submit\" name=\"continue\" value=\"".GM_LANG_del_proceed."\" />&nbsp;";
+if ($step < 5) {
+	print "<div class=\"NavBlockFooter\"><input type=\"submit\" name=\"continue\" value=\"".GM_LANG_del_proceed."\" />&nbsp;";
+	$NBfooter = true;
+}
 
 if ($step == 3 && (isset($cleanup_needed) && $cleanup_needed == "yes") && (!isset($skip_cleanup) || $skip_cleanup != GM_LANG_skip_cleanup)) {
+	if (!$NBfooter) print "<div class=\"NavBlockFooter\">";
 	PrintHelpLink("skip_cleanup_help", "qm", "skip_cleanup");
 	print "<input type=\"submit\" name=\"skip_cleanup\" value=\"".GM_LANG_skip_cleanup."\" />&nbsp;\n";
+	$NBfooter = true;
 }
 
 // Option to cancel the import
 if ($step < 5) {
+	if (!$NBfooter) print "<div class=\"NavBlockFooter\">";
 	print "<input type=\"hidden\" name=\"cancel_import\" value=\"\" />";
 	print "<input type=\"button\" name=\"cancel\" value=\"".GM_LANG_cancel."\" onclick=\"document.configform.cancel_import.value='yes'; document.configform.submit(); \" />";
+	$NBfooter = true;
 }
-print "</div>";
+if ($NBfooter) print "<!-- Close block footer //--></div>";
+print "<!-- Close middle section //--></div>"; 
 ?>
 </form>
+<!-- Close Genmod container //--></div>
 <?php
 SwitchGedcom();
 PrintFooter();

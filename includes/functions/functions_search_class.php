@@ -921,23 +921,23 @@ abstract class SearchFunctions {
 		if (count($controller->indi_total) > 0 && !is_null($controller->srindi)) {
 			
 			$cti = count($controller->printindiname);
-			print "\n\t<table class=\"ListTable ".$TEXT_DIRECTION."\">\n\t\t<tr><td class=\"shade2 center\"";
+			print "\n\t<table class=\"ListTable".($controller->classname == 'SearchController' && $controller->origin != 'find' ? ' SearchListTable' : '')."\">\n\t\t<tr><td class=\"ListTableColumnHeader\"";
 			if($cti > 12) print " colspan=\"2\"";
 			print "><img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["indis"]["small"]."\" border=\"0\" title=\"".GM_LANG_people."\" alt=\"".GM_LANG_individuals."\" />&nbsp;&nbsp;";
 			print GM_LANG_individuals;
-			print "</td></tr><tr><td class=\"$TEXT_DIRECTION shade1 wrap\"><ul>";
+			print "</td></tr><tr><td class=\"ListTableContent\"><ul>";
 			$i=1;
 			$indi_private = array();
 			foreach($controller->printindiname as $pkey => $pvalue) {
 				$person = $controller->sindilist[JoinKey($pvalue[1], $pvalue[2])];
 				if (!$person->PrintListPerson(true, false, "", $pvalue[4], "", $pvalue[3], $paste)) $indi_private[$person->key] = true;;
 				print "\n";
-				if ($i==ceil($cti/2) && $cti>12) print "</ul></td><td class=\"shade1 wrap\"><ul>\n";
+				if ($i==ceil($cti/2) && $cti>12) print "</ul></td><td class=\"ListTableContent\"><ul>\n";
 				$i++;
 			}
-			print "\n\t\t</ul>&nbsp;</td></tr>";
+			print "\n\t\t</ul></td></tr>";
 			
-			print "<tr><td>".GM_LANG_total_indis." ".count($controller->indi_total);
+			print "<tr><td class=\"ListTableColumnFooter\" ".($cti>12 ? " colspan=\"2\"" : "").">".GM_LANG_total_indis." ".count($controller->indi_total);
 			if (count($indi_private)>0) print "  (".GM_LANG_private." ".count($indi_private).")";
 			if (count($controller->indi_hide) > 0) print "  --  ".GM_LANG_hidden." ".count($controller->indi_hide);
 			if (count($indi_private) > 0 || count($controller->indi_hide) > 0) PrintHelpLink("privacy_error_help", "qm");
@@ -954,23 +954,23 @@ abstract class SearchFunctions {
 		if (count($controller->fam_total) > 0) {
 		
 			$ctf = count($controller->printfamname);
-			print "\n\t<table class=\"ListTable ".$TEXT_DIRECTION."\">\n\t\t<tr><td class=\"shade2 center\"";
+			print "\n\t<table class=\"ListTable".($controller->classname == 'SearchController' && $controller->origin != 'find' ? ' SearchListTable' : '')."\">\n\t\t<tr><td class=\"ListTableColumnHeader\"";
 			if ($ctf > 12) print " colspan=\"2\"";
 			print "><img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["sfamily"]["small"]."\" border=\"0\" alt=\"".GM_LANG_families."\" />&nbsp;&nbsp;";
 			print GM_LANG_families;
-			print "</td></tr><tr><td class=\"$TEXT_DIRECTION shade1 wrap\"><ul>";
+			print "</td></tr><tr><td class=\"ListTableContent\"><ul>";
 			$i=1;
 			$fam_private = array();
 			foreach($controller->printfamname as $pkey => $pvalue) {
 				$fam = $controller->sfamlist[JoinKey($pvalue[1], $pvalue[2])];
 				if (!$fam->PrintListFamily(true, "", $pvalue[0], $pvalue[3], $paste)) $fam_private[$fam->key] = true;
 				print "\n";
-				if ($i==ceil($ctf/2) && $ctf>12) print "</ul></td><td class=\"shade1 wrap\"><ul>\n";
+				if ($i==ceil($ctf/2) && $ctf>12) print "</ul></td><td class=\"ListTableContent\"><ul>\n";
 				$i++;
 			}
-			print "\n\t\t</ul>&nbsp;</td></tr>";
+			print "\n\t\t</ul></td></tr>";
 			
-			print "<tr><td>".GM_LANG_total_fams." ".count($controller->fam_total);
+			print "<tr><td class=\"ListTableColumnFooter\" ".($ctf>12 ? " colspan=\"2\"" : "").">".GM_LANG_total_fams." ".count($controller->fam_total);
 			if (count($fam_private) > 0) print "  (".GM_LANG_private." ".count($fam_private).")";
 			if (count($controller->fam_hide) > 0) print "  --  ".GM_LANG_hidden." ".count($controller->fam_hide);
 			if (count($fam_private) > 0 || count($controller->fam_hide) > 0) PrintHelpLink("privacy_error_help", "qm");
@@ -987,22 +987,22 @@ abstract class SearchFunctions {
 		if (count($controller->sour_total) > 0) {
 			
 			$cts = count($controller->printsource);
-			print "\n\t<table class=\"ListTable $TEXT_DIRECTION\">\n\t\t<tr><td class=\"shade2 center\"";
+			print "\n\t<table class=\"ListTable".($controller->classname == 'SearchController' && $controller->origin != 'find' ? ' SearchListTable' : '')."\">\n\t\t<tr><td class=\"ListTableColumnHeader\"";
 			if($cts > 12) print " colspan=\"2\"";
 			print "><img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["source"]["small"]."\" border=\"0\" alt=\"".GM_LANG_sources."\" />&nbsp;&nbsp;";
 			print GM_LANG_sources;
-			print "</td></tr><tr><td class=\"$TEXT_DIRECTION shade1 wrap\"><ul>";
+			print "</td></tr><tr><td class=\"ListTableContent\"><ul>";
 			$sour_private = array();
 			$i=1;
 			foreach ($controller->printsource as $key => $sourcekey) {
 				$source = $controller->ssourcelist[$sourcekey];
 				if (!$source->PrintListSource(true, 1, "", $paste)) $sour_private[$source->key] = true;
-				if ($i==ceil($cts/2) && $cts>12) print "</ul></td><td class=\"shade1 wrap\"><ul>\n";
+				if ($i==ceil($cts/2) && $cts>12) print "</ul></td><td class=\"ListTableContent\"><ul>\n";
 				$i++;
 			}
-			print "\n\t\t</ul>&nbsp;</td></tr>";
+			print "\n\t\t</ul></td></tr>";
 			
-			print "<tr><td>".GM_LANG_total_sources." ".count($controller->sour_total);
+			print "<tr><td class=\"ListTableColumnFooter\" ".($cts>12 ? " colspan=\"2\"" : "").">".GM_LANG_total_sources." ".count($controller->sour_total);
 			if (count($controller->sour_hide) > 0) print "  --  ".GM_LANG_hidden." ".count($controller->sour_hide);
 			if (count($sour_private) > 0) print "  --  ".GM_LANG_private." ".count($sour_private);
 			if (count($sour_private) > 0 || count($controller->sour_hide) > 0) PrintHelpLink("privacy_error_help", "qm");
@@ -1019,22 +1019,22 @@ abstract class SearchFunctions {
 		if (count($controller->repo_total) > 0) {
 			
 			$ctr = count($controller->printrepo);
-			print "\n\t<table class=\"ListTable $TEXT_DIRECTION\">\n\t\t<tr><td class=\"shade2 center\"";
+			print "\n\t<table class=\"ListTable".($controller->classname == 'SearchController' && $controller->origin != 'find' ? ' SearchListTable' : '')."\">\n\t\t<tr><td class=\"ListTableColumnHeader\"";
 			if($ctr > 12) print " colspan=\"2\"";
 			print "><img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["repository"]["small"]."\" border=\"0\" alt=\"".GM_LANG_search_repos."\" />&nbsp;&nbsp;";
 			print GM_LANG_search_repos;
-			print "</td></tr><tr><td class=\"$TEXT_DIRECTION shade1 wrap\"><ul>";
+			print "</td></tr><tr><td class=\"ListTableContent\"><ul>";
 			$repo_private = array();
 			$i=1;
 			foreach ($controller->printrepo as $key => $repokey) {
 				$repo = $controller->srepolist[$repokey];
 				if (!$repo->PrintListRepository(true, 1, false, "", $paste)) $repo_private[$repo->key] = true;
-				if ($i==ceil($ctr/2) && $ctr>12) print "</ul></td><td class=\"shade1 wrap\"><ul>\n";
+				if ($i==ceil($ctr/2) && $ctr>12) print "</ul></td><td class=\"ListTableContent\"><ul>\n";
 				$i++;
 			}
-			print "\n\t\t</ul>&nbsp;</td></tr>";
+			print "\n\t\t</ul></td></tr>";
 			
-			print "<tr><td>".GM_LANG_total_repositories." ".count($controller->repo_total);
+			print "<tr><td class=\"ListTableColumnFooter\" ".($ctr>12 ? " colspan=\"2\"" : "").">".GM_LANG_total_repositories." ".count($controller->repo_total);
 			if (count($controller->repo_hide) > 0) print "  --  ".GM_LANG_hidden." ".count($controller->repo_hide);
 			if (count($repo_private)>0) print "  --  ".GM_LANG_private." ".count($repo_private);
 			if (count($repo_private) > 0 || count($controller->repo_hide) > 0) PrintHelpLink("privacy_error_help", "qm");
@@ -1051,21 +1051,21 @@ abstract class SearchFunctions {
 		if (count($controller->note_total) > 0) {
 			
 			$ctn = count($controller->printnote);
-			print "\n\t<table class=\"ListTable $TEXT_DIRECTION\">\n\t\t<tr><td class=\"shade2 center\"";
+			print "\n\t<table class=\"ListTable".($controller->classname == 'SearchController' && $controller->origin != 'find' ? ' SearchListTable' : '')."\">\n\t\t<tr><td class=\"ListTableColumnHeader\"";
 			if($ctn > 12) print " colspan=\"2\"";
 			print "><img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["note"]["other"]."\" border=\"0\" alt=\"".GM_LANG_notes."\" />&nbsp;&nbsp;";
 			print GM_LANG_notes;
-			print "</td></tr><tr><td class=\"$TEXT_DIRECTION shade1 wrap\"><ul>";
+			print "</td></tr><tr><td class=\"ListTableContent\"><ul>";
 			$i=1;
 			$note_private = array();
 			foreach ($controller->printnote as $key => $notekey) {
 				$note = $controller->snotelist[$notekey];
 				if (!$note->PrintListNote(60, true, $paste)) $note_private[$note->key] = true;
-				if ($i == ceil($ctn/2) && $ctn>12) print "</ul></td><td class=\"shade1 wrap\"><ul>\n";
+				if ($i == ceil($ctn/2) && $ctn>12) print "</ul></td><td class=\"ListTableContent\"><ul>\n";
 				$i++;
 			}
-			print "\n\t\t</ul>&nbsp;</td></tr>";
-			print "<tr><td>".GM_LANG_total_notes." ".count($controller->note_total);
+			print "\n\t\t</ul></td></tr>";
+			print "<tr><td class=\"ListTableColumnFooter\" ".($ctn>12 ? " colspan=\"2\"" : "").">".GM_LANG_total_notes." ".count($controller->note_total);
 			if (count($controller->note_hide) > 0) print "  --  ".GM_LANG_hidden." ".count($controller->note_hide);
 			if (count($note_private) > 0) print "  --  ".GM_LANG_private." ".count($note_private);
 			if (count($note_private) > 0 || count($controller->note_hide) > 0) PrintHelpLink("privacy_error_help", "qm");

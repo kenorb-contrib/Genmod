@@ -65,117 +65,190 @@ function paste_id(value) {
 //-->
 </script>
 <?php
-print "<div style=\"position: relative; z-index: 1; width:98%;\">\n";
-print "<table class=\"ListTable $TEXT_DIRECTION\" style=\"width:100%;\"><tr><td valign=\"top\">";
 $title_string = GM_LANG_relationship_chart;
 if ($relationship_controller->pid1 != "" && $relationship_controller->pid2 != "") {
 	$title_string .= ":<br />".$relationship_controller->person1->name." ".GM_LANG_and." ".$relationship_controller->person2->name;
 }
+print "<div class=\"RelationshipPageTitle\">";
 print "\n\t<span class=\"PageTitleName\">".PrintReady($title_string)."</span>";
-print "</td><td>";
+print "</div>";
 
 // -- print the form to change the number of displayed generations
 if ($relationship_controller->view != "preview") {
 	$Dbaseyoffset += 70;
+	print "<div class=\"RelationNavBlock\">\n";
 	print "\n\t<form name=\"people\" method=\"get\" action=\"relationship.php\">\n";
 	print "<input type=\"hidden\" name=\"path_to_find\" value=\"".$relationship_controller->path_to_find."\" />\n";
 
-	print "\n\t\t<table class=\"ListTable ".$TEXT_DIRECTION."\" align=\"";
-	if ($TEXT_DIRECTION == "ltr") print "right";
-	else print "left";
-	print "\">";
+	print "\n\t\t<table class=\"ListTable\">";
 
 	// First row
 	print "<tr>";
 	
-	// Relationship header
-	print "<td colspan=\"2\" class=\"NavBlockHeader\">";
-	print GM_LANG_relationship_chart."</td>";
+		// Relationship header
+		print "<td colspan=\"2\" class=\"NavBlockHeader\">";
+		print GM_LANG_relationship_chart."</td>";
 
-	// Empty space
-	print "<td>&nbsp;</td>";
+		// Empty space
+		print "<td>&nbsp;</td>";
 
-	// Options header
-	$relationship_controller->PrintInputHeader(false);
+		// Options header
+		$relationship_controller->PrintInputHeader(false);
 	
 	print "</tr>";
+	
 	// Second row
 	print "<tr>";
 	
-	// Person 1
-	print "<td class=\"NavBlockLabel\">";
-	PrintHelpLink("relationship_id_help", "qm");
-	print GM_LANG_person1."</td>";
-	print "<td class=\"NavBlockField\">";
-	print "<input tabindex=\"1\" class=\"pedigree_form\" type=\"text\" name=\"pid1\" id=\"pid1\" size=\"3\" value=\"".$relationship_controller->pid1."\" />";
-	LinkFunctions::PrintFindIndiLink("pid1","");
-        print "</td>";
+		// Person 1
+		$relationship_controller->PrintPidInput(1);
+		
+		// Empty space
+		print "<td>&nbsp;</td>";
 
-	// Empty space
-	print "<td>&nbsp;</td>";
-
-	// Show details
-	$relationship_controller->PrintInputShowFull(false);
+		// Show details
+		$relationship_controller->PrintInputShowFull(false);
 	
 	print "</tr>";
+	
 	// Third row
 	print "<tr>";
 	
-	// Person 2
-	print "<td class=\"NavBlockLabel\">";
-	PrintHelpLink("relationship_id_help", "qm");
-	print GM_LANG_person2."</td>\n";
-	print "<td class=\"NavBlockField\">";
-	print "<input tabindex=\"2\" class=\"pedigree_form\" type=\"text\" name=\"pid2\" id=\"pid2\" size=\"3\" value=\"".$relationship_controller->pid2."\" />";
-        LinkFunctions::PrintFindIndiLink("pid2","");
-        print "</td>";
+		// Person 2
+		$relationship_controller->PrintPidInput(2);
 
-	// Empty space
-	print "<td>&nbsp;</td>";
+		// Empty space
+		print "<td>&nbsp;</td>";
 
-	// Show details
-	$relationship_controller->PrintInputBoxWidth(false);
+		// Box width
+		$relationship_controller->PrintInputBoxWidth(false);
 	
 	print "</tr>";
+	
 	// Fourth row
 	print "<tr>";
 
-	// Check relationships by marriage
-	print "<td class=\"NavBlockLabel\">";
-	PrintHelpLink("follow_spouse_help", "qm");
-	print GM_LANG_follow_spouse;
-	print "</td>";
-	print "<td class=\"NavBlockField\">";
-	print "<input tabindex=\"4\" type=\"checkbox\" name=\"followspouse\" value=\"1\"";
-	if ($relationship_controller->followspouse) print " checked=\"checked\"";
-	print " onclick=\"document.people.path_to_find.value='-1';\" /></td>";
+		// Check relationships by marriage
+		$relationship_controller->PrintCheckRelationship();
 	
-	// Empty space
-	print "<td>&nbsp;</td>";
+		// Empty space
+		print "<td>&nbsp;</td>";
 
-	// Show oldest top
-	print "<td class=\"NavBlockLabel\">";
-	PrintHelpLink("oldest_top_help", "qm");
-	print GM_LANG_oldest_top;
-	print "</td><td class=\"NavBlockField\">";
-	print "<input tabindex=\"5\" type=\"checkbox\" id=\"oldtop\" name=\"asc\" value=\"-1\" ";
-	if ($relationship_controller->asc == -1) print " checked=\"checked\"";
-	if (!$relationship_controller->pretty) print " disabled=\"disabled\"";
-	print " />";
-	print "</td>";
+		// Show oldest top
+		$relationship_controller->PrintShowOldestTop();
 	
 	print "</tr>";
+	
 	// Fifth row
 	print "<tr>";
 	
-	// Show path
-	print "<td class=\"NavBlockLabel\">";
+		// Show path
+		print "<td class=\"NavBlockLabel\">";
+		$pass = false;
+		if (isset($_SESSION["relationships"]) && !$relationship_controller->person1->isempty && !$relationship_controller->person2->isempty) {
+			$pass = true;
+			$i = 0;
+			$new_path = true;
+			if (isset($_SESSION["relationships"][$relationship_controller->path_to_find])) {
+				$node = $_SESSION["relationships"][$relationship_controller->path_to_find];
+			}
+			else {
+				$node = GetRelationship($relationship_controller->person1, $relationship_controller->person2, $relationship_controller->followspouse, 0, true, $relationship_controller->path_to_find);
+				$_SESSION["pid1"] = $relationship_controller->pid1;
+				$_SESSION["pid2"] = $relationship_controller->pid2;
+				$_SESSION["relationships"][$relationship_controller->path_to_find] = $node;
+			}
+			if (!$node){
+				//print "path --";
+				$relationship_controller->path_to_find--;
+				$check_node = $node;
+			}
+			foreach($_SESSION["relationships"] as $indexval => $node) {
+				if ($node == false) {
+					$check_node = false;
+					break;
+				}
+				if ($i == 0) print GM_LANG_show_path.": </td><td class=\"NavBlockField\">";
+				if ($i > 0) print " | ";
+				if ($i == $relationship_controller->path_to_find){
+					print "<span class=\"Error\">".($i+1)."</span>";
+					$new_path = false;
+				}
+				else {
+					print "<a href=\"relationship.php?pid1=".$relationship_controller->pid1."&amp;pid2=".$relationship_controller->pid2."&amp;path_to_find=".$i."&amp;followspouse=".$relationship_controller->followspouse."&amp;pretty=".$relationship_controller->pretty."&amp;show_details=".$relationship_controller->show_details."&amp;asc=".$relationship_controller->asc."&amp;box_width=".$box_width."\">".($i+1)."</a>\n";
+				}
+				$i++;
+			}
+			if ($new_path && $relationship_controller->path_to_find < $i+1 && $check_node) print " | <span class=\"Error\">".($i+1)."</span>";
+			if ($i == 0) print "</td><td class=\"NavBlockField\">";
+			print "</td>";
+		}
+		else {
+			if (!$relationship_controller->person1->isempty && !$relationship_controller->person2->isempty) {
+				if (!$relationship_controller->person1->disp_name) $disp = false;
+				else if (!$relationship_controller->person2->disp_name) $disp = false;
+				if ($disp) {
+					print GM_LANG_show_path.": </td>";
+					print "\n\t\t<td class=\"NavBlockField\">";
+					print " <span class=\"Error\">";
+					if (isset($_SESSION["relationships"][$relationship_controller->path_to_find])) $check_node = $_SESSION["relationships"][$relationship_controller->path_to_find];
+					else {
+						$check_node = GetRelationship($relationship_controller->person1, $relationship_controller->person2, $relationship_controller->followspouse, 0, true, $relationship_controller->path_to_find);
+	//					if ($check_node !== false) {
+							$_SESSION["pid1"] = $relationship_controller->pid1;
+							$_SESSION["pid2"] = $relationship_controller->pid2;
+							if (!isset($_SESSION["relationships"])) $_SESSION["relationships"] = array();
+							$_SESSION["relationships"][$relationship_controller->path_to_find] = $check_node;
+	//					}
+					}
+					print ($check_node ? "1" : "&nbsp;".GM_LANG_no_results)."</span></td>";
+					$prt = true;
+				}
+			}
+			if (!isset($prt)) print "&nbsp;</td><td class=\"NavBlockField\">&nbsp;</td>";
+		}
 
-	$pass = false;
-	if (isset($_SESSION["relationships"]) && !$relationship_controller->person1->isempty && !$relationship_controller->person2->isempty) {
-		$pass = true;
-		$i = 0;
-		$new_path = true;
+		// Empty space
+		print "<td>&nbsp;</td>";
+
+		// Line up generations
+		$relationship_controller->PrintLineUpGenerations();
+
+	print "</tr>";
+	
+	// Sixth row
+	print "<tr>";
+	
+		// Link to search for the next path
+		if (!$relationship_controller->person1->isempty && !$relationship_controller->person2->isempty && $disp){
+			if ($disp && !$check_node) print "<td class=\"NavBlockFooter\" colspan=\"2\"><span class=\"Error\">".(isset($_SESSION["relationships"])?GM_LANG_no_link_found : "")."</span></td>";
+			else print "<td class=\"NavBlockFooter\" colspan=\"2\"><input type=\"submit\" value=\"".GM_LANG_next_path."\" onclick=\"document.people.path_to_find.value='".($relationship_controller->path_to_find + 1)."';\" /></td>\n";
+			$pass = true;
+		}
+		// Or nothing
+		if ($pass == false) print "<td colspan=\"2\">&nbsp;</td>";
+	
+		// Empty space
+		print "<td>&nbsp;</td>";
+	
+		// View button
+		$relationship_controller->PrintInputSubmit(false);
+		
+	print "</tr>";
+
+
+	print "</table></form>";
+	print "</div>\n";
+}
+else {
+	$Dbaseyoffset=55;
+	$Dbasexoffset=10;
+}
+
+$maxyoffset = $Dbaseyoffset;
+if (!$relationship_controller->person1->isempty && !$relationship_controller->person2->isempty) {
+	if (!$disp) PrintPrivacyError(GedcomConfig::$CONTACT_EMAIL);
+	else {
 		if (isset($_SESSION["relationships"][$relationship_controller->path_to_find])) {
 			$node = $_SESSION["relationships"][$relationship_controller->path_to_find];
 		}
@@ -183,112 +256,13 @@ if ($relationship_controller->view != "preview") {
 			$node = GetRelationship($relationship_controller->person1, $relationship_controller->person2, $relationship_controller->followspouse, 0, true, $relationship_controller->path_to_find);
 			$_SESSION["pid1"] = $relationship_controller->pid1;
 			$_SESSION["pid2"] = $relationship_controller->pid2;
-			$_SESSION["relationships"][$relationship_controller->path_to_find] = $node;
-		}
-		if (!$node){
-			//print "path --";
-			$relationship_controller->path_to_find--;
-			$check_node = $node;
-		}
-		foreach($_SESSION["relationships"] as $indexval => $node) {
-			if ($node == false) {
-				$check_node = false;
-				break;
-			}
-			if ($i == 0) print GM_LANG_show_path.": </td><td class=\"list_value\" style=\"padding: 3px;\">";
-			if ($i > 0) print " | ";
-			if ($i == $relationship_controller->path_to_find){
-				print "<span class=\"Error\" style=\"valign: middle\">".($i+1)."</span>";
-				$new_path = false;
-			}
-			else {
-				print "<a href=\"relationship.php?pid1=".$relationship_controller->pid1."&amp;pid2=".$relationship_controller->pid2."&amp;path_to_find=".$i."&amp;followspouse=".$relationship_controller->followspouse."&amp;pretty=".$relationship_controller->pretty."&amp;show_details=".$relationship_controller->show_details."&amp;asc=".$relationship_controller->asc."&amp;box_width=".$box_width."\">".($i+1)."</a>\n";
-			}
-			$i++;
-		}
-		if ($new_path && $relationship_controller->path_to_find < $i+1 && $check_node) print " | <span class=\"Error\">".($i+1)."</span>";
-		if ($i == 0) print "</td><td class=\"shade1\">";
-		print "</td>";
-	}
-	else {
-		if (!$relationship_controller->person1->isempty && !$relationship_controller->person2->isempty) {
-			if (!$relationship_controller->person1->disp_name) $disp = false;
-			else if (!$relationship_controller->person2->disp_name) $disp = false;
-			if ($disp) {
-				print GM_LANG_show_path.": </td>";
-				print "\n\t\t<td class=\"NavBlockField\">";
-				print " <span class=\"Error vmmiddle\">";
-				if (isset($_SESSION["relationships"][$relationship_controller->path_to_find])) $check_node = $_SESSION["relationships"][$relationship_controller->path_to_find];
-				else {
-					$check_node = GetRelationship($relationship_controller->person1, $relationship_controller->person2, $relationship_controller->followspouse, 0, true, $relationship_controller->path_to_find);
-//					if ($check_node !== false) {
-						$_SESSION["pid1"] = $relationship_controller->pid1;
-						$_SESSION["pid2"] = $relationship_controller->pid2;
-						if (!isset($_SESSION["relationships"])) $_SESSION["relationships"] = array();
-						$_SESSION["relationships"][$relationship_controller->path_to_find] = $check_node;
-//					}
-				}
-				print ($check_node ? "1" : "&nbsp;".GM_LANG_no_results)."</span></td>";
-				$prt = true;
-			}
-		}
-		if (!isset($prt)) print "&nbsp;</td><td class=\"NavBlockField\">&nbsp;</td>";
-	}
-
-	// Empty space
-	print "<td>&nbsp;</td>";
-
-	// Line up generations
-	print "<td class=\"NavBlockLabel\">";
-	PrintHelpLink("line_up_generations_help", "qm");
-	print GM_LANG_line_up_generations."</td>";
-	print "<td class=\"NavBlockField\">";
-	print "<input tabindex=\"6\" type=\"checkbox\" name=\"pretty\" value=\"2\"";
-	if ($relationship_controller->pretty) print " checked=\"checked\"";
-	print " onclick=\"toggleStatus('oldtop');\"";
-	print " /></td>";
-
-	print "</tr>";
-	// Sixth row
-	print "<tr>";
-	
-	if (!$relationship_controller->person1->isempty && !$relationship_controller->person2->isempty && $disp){
-		if ($disp && !$check_node) print "<td class=\"NavBlockFooter\" colspan=\"2\"><span class=\"Error\">".(isset($_SESSION["relationships"])?GM_LANG_no_link_found : "")."</span></td>";
-		else print "<td class=\"NavBlockFooter\" colspan=\"2\"><input type=\"submit\" value=\"".GM_LANG_next_path."\" onclick=\"document.people.path_to_find.value='".($relationship_controller->path_to_find + 1)."';\" /></td>\n";
-		$pass = true;
-	}
-
-	if ($pass == false) print "<td colspan=\"2\" class=\"center wrap\">&nbsp;</td>";
-
-	// Empty space
-	print "<td>&nbsp;</td>";
-
-	// View button
-	$relationship_controller->PrintInputSubmit(false);
-	
-	print "</tr>";
-
-
-	print "</table></form>";
-}
-else {
-	$Dbaseyoffset=55;
-	$Dbasexoffset=10;
-}
-print "</td></tr></table>";
-print "</div>\n";
-
-$maxyoffset = $Dbaseyoffset;
-if (!$relationship_controller->person1->isempty && !$relationship_controller->person2->isempty) {
-	if (!$disp) PrintPrivacyError(GedcomConfig::$CONTACT_EMAIL);
-	else {
-		if (isset($_SESSION["relationships"][$relationship_controller->path_to_find])) $node = $_SESSION["relationships"][$relationship_controller->path_to_find];
-		else {
-			$node = GetRelationship($relationship_controller->person1, $relationship_controller->person2, $relationship_controller->followspouse, 0, true, $relationship_controller->path_to_find);
-			$_SESSION["pid1"] = $relationship_controller->pid1;
-			$_SESSION["pid2"] = $relationship_controller->pid2;
 			if (!isset($_SESSION["relationships"])) $_SESSION["relationships"] = array();
 			$_SESSION["relationships"][$relationship_controller->path_to_find] = $node;
+		}
+		// if all paths are found, the last path is empty, and we can try to load the last found path.
+		if (!$node && isset($_SESSION["relationships"][$relationship_controller->path_to_find-1])){
+			$relationship_controller->path_to_find--;
+			$node = $_SESSION["relationships"][$relationship_controller->path_to_find];
 		}
 		$yoffset = $Dbaseyoffset;
 		$xoffset = $Dbasexoffset;
@@ -325,9 +299,7 @@ if (!$relationship_controller->person1->isempty && !$relationship_controller->pe
 		if ($TEXT_DIRECTION == "rtl") {
 			$GM_IMAGES["rarrow"]["other"] = $GM_IMAGES["larrow"]["other"];
 		}
-		print "<div id=\"relationship_chart";
-		if ($TEXT_DIRECTION=="rtl") print "_rtl";
-		print "\">\n";
+		print "<div id=\"relationship_chart\">\n";
 		if (isset($node["path"])) {
 			foreach($node["path"] as $index=>$pid) {
 			    print "\r\n\r\n<!-- Node ".$index." ".$node["relations"][$index]." ".$pid." -->\r\n";
@@ -458,10 +430,10 @@ if (!$relationship_controller->person1->isempty && !$relationship_controller->pe
 					}
 					print "</div>\n";
 				}
-				print "<div id=\"box".$pid.".1.0\" style=\"position:absolute; ".($TEXT_DIRECTION == "ltr" ? "left" : "right").":".$pxoffset."px; top:".$yoffset."px; width:".$Dbwidth."px; height:".$Dbheight."px; z-index:".(count($node["path"]) - $index)."; \"><table><tr><td colspan=\"2\" width=\"".$Dbwidth."\" height=\"".$Dbheight."\">";
+				print "<div id=\"box".$pid.".1.0\" style=\"position:absolute; ".($TEXT_DIRECTION == "ltr" ? "left" : "right").":".$pxoffset."px; top:".$yoffset."px; width:".$Dbwidth."px; height:".$Dbheight."px; z-index:".(count($node["path"]) - $index)."; \">";
 				$person =& Person::GetInstance($pid);
 				PersonFunctions::PrintPedigreePerson($person, 1, ($relationship_controller->view != "preview" && $relationship_controller->show_full), 0, 1, "", $relationship_controller->params);
-				print "</td></tr></table></div>\n";
+				print "</div>\n";
 			}
 		}
 		print "</div>\n";
@@ -473,7 +445,6 @@ $maxyoffset += 100;
 <script language="JavaScript" type="text/javascript">
 <!--
 	relationship_chart_div = document.getElementById("relationship_chart");
-	if (!relationship_chart_div) relationship_chart_div = document.getElementById("relationship_chart_rtl");
 	if (relationship_chart_div) {
 		relationship_chart_div.style.height = <?php print $maxyoffset; ?> + "px";
 		relationship_chart_div.style.width = "100%";

@@ -5,7 +5,7 @@
  * $Id$
  *
  * Genmod: Genealogy Viewer
- * Copyright (C) 2005 - 2008 Genmod Development Team
+ * Copyright (C) 2005 - 2012 Genmod Development Team
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -485,7 +485,7 @@ abstract class AdminFunctions {
 					$logline["time"] = $log_row["l_timestamp"];
 					$logline["ip"] = $log_row["l_ip"];
 					$logline["user"] = $log_row["l_user"];
-					$logline["text"] = $log_row["l_text"];
+					$logline["text"] = self::SplitLine($log_row["l_text"], 100);
 					$logline["gedcomid"] = $log_row["l_file"];
 					$loglines[] = $logline;
 				}
@@ -503,6 +503,19 @@ abstract class AdminFunctions {
 				return $number[0];
 			}
 		}
+	}
+	public function SplitLine($text, $max) {
+		
+		$arr = explode("<br />", $text);
+		$newarr = array();
+		foreach($arr as $key => $line) {
+			while (strlen($line) > $max) {
+				$newarr[] = substr($line, 0, 80);
+				$line = substr($line, 80);
+			}
+			$newarr[] = $line;
+		}
+		return implode("<br />", $newarr);
 	}
 	
 	public function NewLogRecs($cat, $gedid="") {
@@ -1395,17 +1408,17 @@ abstract class AdminFunctions {
 					$str = file_get_contents($language["gm_language"]);
 					if (ord($str{0}) == 239 && ord($str{1}) == 187 && ord($str{2}) == 191) {
 						$check = true;
-						$output .= "<span class=\"warning\">".GM_LANG_bom_found.substr($language["gm_language"], 10).".</span>";
+						$output .= "<span class=\"Warning\">".GM_LANG_bom_found.substr($language["gm_language"], 10).".</span>";
 						$output .= "<br />";
 						$writetext = htmlentities(substr($str,3, strlen($str)));
 						if (!$handle = @fopen($language["gm_language"], "w")){
-							$output .= "<span class=\"warning\">";
+							$output .= "<span class=\"Warning\">";
 							$output .= str_replace("#lang_filename#", substr($language["gm_language"], 10), GM_LANG_no_open) . "<br /><br />";
 							$output .= "</span>";
 							$success = false;
 						}
 						if (@fwrite($handle,html_entity_decode($writetext)) === FALSE) {
-							$output .= "<span class=\"warning\">";
+							$output .= "<span class=\"Warning\">";
 							$output .= str_replace("#lang_filename#", substr($language["gm_language"], 10), GM_LANG_lang_file_write_error) . "<br /><br />";
 							$output .= "</span>";
 							$success = false;
@@ -1413,7 +1426,7 @@ abstract class AdminFunctions {
 					}
 				}
 				else {
-					$output .= "<span class=\"warning\">";
+					$output .= "<span class=\"Warning\">";
 					$output .= str_replace("#lang_filename#", substr($language["gm_language"], 10), GM_LANG_no_open) . "<br /><br />";
 					$output .= "</span>";
 				}
@@ -1424,17 +1437,17 @@ abstract class AdminFunctions {
 						$str = file_get_contents($language["helptextfile"]);
 						if (ord($str{0}) == 239 && ord($str{1}) == 187 && ord($str{2}) == 191) {
 							$check = true;
-							$output .= "<span class=\"warning\">".GM_LANG_bom_found.substr($language["helptextfile"], 10).".</span>";
+							$output .= "<span class=\"Warning\">".GM_LANG_bom_found.substr($language["helptextfile"], 10).".</span>";
 							$output .= "<br />";
 							$writetext = htmlentities(substr($str,3, strlen($str)));
 							if (!$handle = @fopen($language["helptextfile"], "w")){
-								$output .= "<span class=\"warning\">";
+								$output .= "<span class=\"Warning\">";
 								$output .= str_replace("#lang_filename#", substr($language["helptextfile"], 10), GM_LANG_no_open) . "<br /><br />";
 								$output .= "</span>";
 								$success = false;
 							}
 							if (@fwrite($handle,html_entity_decode($writetext)) === FALSE) {
-								$output .= "<span class=\"warning\">";
+								$output .= "<span class=\"Warning\">";
 								$output .= str_replace("#lang_filename#", substr($language["helptextfile"], 10), GM_LANG_lang_file_write_error) . "<br /><br />";
 								$output .= "</span>";
 								$success = false;
@@ -1443,7 +1456,7 @@ abstract class AdminFunctions {
 					}
 				}
 				else {
-					$output .= "<span class=\"warning\">";
+					$output .= "<span class=\"Warning\">";
 					$output .= str_replace("#lang_filename#", substr($language["helptextfile"], 10), GM_LANG_no_open) . "<br /><br />";
 					$output .= "</span>";
 				}
@@ -1452,17 +1465,17 @@ abstract class AdminFunctions {
 					$str = file_get_contents($language["factsfile"]);
 					if (ord($str{0}) == 239 && ord($str{1}) == 187 && ord($str{2}) == 191) {
 						$check = true;
-						$output .= "<span class=\"warning\">".GM_LANG_bom_found.substr($language["factsfile"], 10).".</span>";
+						$output .= "<span class=\"Warning\">".GM_LANG_bom_found.substr($language["factsfile"], 10).".</span>";
 						$output .= "<br />";
 						$writetext = htmlentities(substr($str,3, strlen($str)));
 						if (!$handle = @fopen($language["factsfile"], "w")){
-							$output .= "<span class=\"warning\">";
+							$output .= "<span class=\"Warning\">";
 							$output .= str_replace("#lang_filename#", substr($language["factsfile"], 10), GM_LANG_no_open) . "<br /><br />";
 							$output .= "</span>";
 							$success = false;
 						}
 						if (@fwrite($handle,html_entity_decode($writetext)) === FALSE) {
-							$output .= "<span class=\"warning\">";
+							$output .= "<span class=\"Warning\">";
 							$output .= str_replace("#lang_filename#", substr($language["factsfile"], 10), GM_LANG_lang_file_write_error) . "<br /><br />";
 							$output .= "</span>";
 							$success = false;
@@ -1470,7 +1483,7 @@ abstract class AdminFunctions {
 					}
 				}
 				else {
-					$output .= "<span class=\"warning\">";
+					$output .= "<span class=\"Warning\">";
 					$output .= str_replace("#lang_filename#", substr($language["factsfile"], 10), GM_LANG_no_open) . "<br /><br />";
 					$output .= "</span>";
 				}
@@ -1665,6 +1678,14 @@ abstract class AdminFunctions {
 			if (!empty($lang[1])) return $lang[1];
 			else return $lang[0];
 		}
+	}
+	
+	public function AdminLink ($link, $text, $help="", $helpText="", $show_desc="") {
+		
+		print "<div class=\"AdminColumnLeftLink\">";
+		if (!empty($help)) PrintHelpLink($help, $helpText, $show_desc);
+		print "<a href=\"".$link."\">".$text."</a>";
+		print "</div>";
 	}
 }
 ?>

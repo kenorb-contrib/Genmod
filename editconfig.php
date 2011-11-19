@@ -52,7 +52,7 @@ $error_ali_login = false;
 if (!isset($action)) $action="";
 if (!isset($LOGIN_URL)) $LOGIN_URL = "";
 if (!isset($NEW_LANGS)) $NEW_LANGS = array();
-if (isset($message)) $message = urldecode($message);
+if (isset($message)) $message = html_entity_decode($message);
 else $message = "";
 $i = 1;
 
@@ -213,281 +213,284 @@ if ($action == "update") {
 PrintHeader(GM_LANG_configure_head);
 ?>
 <!-- Setup the left box -->
-<div id="admin_genmod_left">
-	<div class="admin_link"><a href="admin.php"><?php print GM_LANG_admin;?></a></div>
+<div id="AdminColumnLeft">
+	<?php AdminFunctions::AdminLink("admin.php", GM_LANG_admin); ?>
 </div>
 
-<div id="content">
+<div id="AdminColumnMiddle">
 	<?php
 	if (defined("SERVER_URL") && isset($CONFIG_SITE) && SERVER_URL != $CONFIG_SITE) $SERVER_URL = $CONFIG_SITE;
 	else $SERVER_URL = SERVER_URL;
 	?>
 	<form method="post" name="configform" action="editconfig.php">
+	<table class="NavBlockTable AdminNavBlockTable">
 		<input type="hidden" name="action" value="update" />
 		<input type="hidden" name="NEW_SERVER_URL" value="<?php print $SERVER_URL;?>" />
-		<div class="admin_topbottombar">
-			<h3>
-				<?php PrintHelpLink("configure_genmod_help", "qm", "configure");?>
-				<?php print GM_LANG_configure; ?>
-			</h3>
-			<?php print GM_LANG_site_config.": ".$CONFIG_SITE; 
-			if ($message != "") {
-				print "<br /><div class=\"Error center\">".$message."</div>";
-			}
-			?>
-		</div>
-		<div class="admin_item_box">
-			<div class="width30 choice_left">
-				<div class="helpicon">
+		<tr>
+			<td colspan="2" class="NavBlockHeader AdminNavBlockHeader">
+				<span class="AdminNavBlockTitle">
+					<?php PrintHelpLink("configure_genmod_help", "qm", "configure");?>
+					<?php print GM_LANG_configure; ?>
+				</span><br />
+				<?php print GM_LANG_site_config.": ".$CONFIG_SITE; 
+				if ($message != "") {
+					print "<br /><div class=\"Error\">".$message."</div>";
+				}
+				?>
+			</td>
+		</tr>
+		<tr>
+			<td class="NavBlockLabel">
+				<div class="HelpIconContainer">
 					<?php PrintHelpLink("DBHOST_help", "qm", "DBHOST");?>
 				</div>
-				<div class="description">
+				<div class="AdminNavBlockOptionText">
 					<?php print GM_LANG_DBHOST; ?>
 				</div>
-			</div>
-			<div class="choice_right">
+			</td>
+			<td class="NavBlockField">
 				<input type="text" dir="ltr" name="NEW_DBHOST" value="<?php if ($gm_user->UserIsAdmin()) print DBHOST?>" size="40" tabindex="<?php $i++; print $i?>" />
-			</div>
-		</div>
-		<div class="admin_item_box">
-			<div class="width30 choice_left">
-				<div class="helpicon">
+			</td>
+		</tr>
+		<tr>
+			<td class="NavBlockLabel">
+				<div class="HelpIconContainer">
 					<?php PrintHelpLink("DBUSER_help", "qm", "DBUSER");?>
 				</div>
-				<div class="description">
+				<div class="AdminNavBlockOptionText">
 					<?php  print GM_LANG_DBUSER; ?>
 				</div>
-			</div>
-			<div class="choice_right">
+			</td>
+			<td class="NavBlockField">
 				<input type="text" dir="ltr" name="NEW_DBUSER" value="<?php if ($gm_user->UserIsAdmin()) print DBUSER?>" size="40" tabindex="<?php $i++; print $i?>" />
-			</div>
-		</div>
-		<div class="admin_item_box">
-			<div class="width30 choice_left">
-				<div class="helpicon">
+			</td>
+		</tr>
+		<tr>
+			<td class="NavBlockLabel">
+				<div class="HelpIconContainer">
 					<?php PrintHelpLink("DBPASS_help", "qm", "DBPASS");?>
 				</div>
-				<div class="description">
+				<div class="AdminNavBlockOptionText">
 					<?php print GM_LANG_DBPASS; ?>
 				</div>
-			</div>
-			<div class="choice_right">
+			</td>
+			<td class="NavBlockField">
 				<input type="text" dir="ltr" name="NEW_DBPASS" value="" size="40" tabindex="<?php $i++; print $i?>" />
-			</div>
-		</div>
-		<div class="admin_item_box">
-			<div class="width30 choice_left">
-				<div class="helpicon">
+			</td>
+		</tr>
+		<tr>
+			<td class="NavBlockLabel">
+				<div class="HelpIconContainer">
 					<?php PrintHelpLink("DBNAME_help", "qm", "DBNAME");?>
 				</div>
-				<div class="description">
+				<div class="AdminNavBlockOptionText">
 					<?php print GM_LANG_DBNAME; ?>
 				</div>
-			</div>
-			<div class="choice_right">
+			</td>
+			<td class="NavBlockField">
 				<input type="text" dir="ltr" name="NEW_DBNAME" value="<?php if ($gm_user->UserIsAdmin()) print DBNAME?>" size="40" tabindex="<?php $i++; print $i?>" />
-			</div>
-		</div>
-		<div class="admin_item_box">
-			<div class="width30 choice_left">
-				<div class="helpicon">
+			</td>
+		</tr>
+		<tr>
+			<td class="NavBlockLabel">
+				<div class="HelpIconContainer">
 					<?php PrintHelpLink("DBPERSIST_help", "qm", "DBPERSIST");?>
 				</div>
-				<div class="description">
+				<div class="AdminNavBlockOptionText">
 					<?php print GM_LANG_DBPERSIST; ?>
 				</div>
-			</div>
-			<div class="choice_right">
+			</td>
+			<td class="NavBlockField">
 				<select name="NEW_DBPERSIST" tabindex="<?php $i++; print $i?>">
 					<option value="yes" <?php if (DBPERSIST) print "selected=\"selected\""; ?>><?php print GM_LANG_yes;?></option>
 					<option value="no" <?php if (!DBPERSIST) print "selected=\"selected\""; ?>><?php print GM_LANG_no;?></option>
 				</select>
-			</div>
-		</div>
-		<div class="admin_item_box">
-			<div class="width30 choice_left">
-				<div class="helpicon">
+			</td>
+		</tr>
+		<tr>
+			<td class="NavBlockLabel">
+				<div class="HelpIconContainer">
 					<?php PrintHelpLink("TBLPREFIX_help", "qm", "TBLPREFIX");?>
 				</div>
-				<div class="description">
+				<div class="AdminNavBlockOptionText">
 					<?php print GM_LANG_TBLPREFIX; ?>
 				</div>
-			</div>
-			<div class="choice_right width65">
+			</td>
+			<td class="NavBlockField">
 				<input type="text" name="NEW_TBLPREFIX" value="<?php print TBLPREFIX?>" size="4" tabindex="<?php $i++; print $i?>" />
 				<?php if ($error_db) print "<div class=\"Error\">".GM_LANG_duplicatedb."</div>"; ?>
 				<?php if ($error_db2) print "<div class=\"Error\">".GM_LANG_bad_host_user_pass."</div>"; ?>
 				<?php if ($error_db3) print "<div class=\"Error\">".GM_LANG_bad_database_name."</div>"; ?>
-			</div>
-		</div>
-		<div class="admin_item_box">
-			<div class="width30 choice_left">
-				<div class="helpicon">
+			</td>
+		</tr>
+		<tr>
+			<td class="NavBlockLabel">
+				<div class="HelpIconContainer">
 					<?php PrintHelpLink("ALLOW_CHANGE_GEDCOM_help", "qm", "ALLOW_CHANGE_GEDCOM");?>
 				</div>
-				<div class="description">
+				<div class="AdminNavBlockOptionText">
 					<?php print GM_LANG_ALLOW_CHANGE_GEDCOM; ?>
 				</div>
-			</div>
-			<div class="choice_right">
+			</td>
+			<td class="NavBlockField">
 				<select name="NEW_ALLOW_CHANGE_GEDCOM" tabindex="<?php $i++; print $i?>">
 					<option value="yes" <?php if (SystemConfig::$ALLOW_CHANGE_GEDCOM) print "selected=\"selected\""; ?>><?php print GM_LANG_yes;?></option>
 					<option value="no" <?php if (!SystemConfig::$ALLOW_CHANGE_GEDCOM) print "selected=\"selected\""; ?>><?php print GM_LANG_no;?></option>
 				</select>
-			</div>
-		</div>
-		<div class="admin_item_box">
-			<div class="width30 choice_left">
-				<div class="helpicon">
+			</td>
+		</tr>
+		<tr>
+			<td class="NavBlockLabel">
+				<div class="HelpIconContainer">
 					<?php PrintHelpLink("INDEX_DIRECTORY_help", "qm", "INDEX_DIRECTORY");?>
 				</div>
-				<div class="description">
+				<div class="AdminNavBlockOptionText">
 					<?php print GM_LANG_INDEX_DIRECTORY; ?>
 				</div>
-			</div>
-			<div class="choice_right width65">
+			</td>
+			<td class="NavBlockField">
 				<input type="text" size="40" name="NEW_INDEX_DIRECTORY" value="<?php print INDEX_DIRECTORY?>" dir="ltr" tabindex="<?php $i++; print $i?>" />
 				<?php if ($error_indexdir) print "<div class=\"Error\">".GM_LANG_duplicateindexdir."</div>"; ?>
-			</div>
-		</div>
-		<div class="admin_item_box">
-			<div class="width30 choice_left">
-				<div class="helpicon">
+			</td>
+		</tr>
+		<tr>
+			<td class="NavBlockLabel">
+				<div class="HelpIconContainer">
 					<?php PrintHelpLink("MEDIA_IN_DB_help", "qm", "MEDIA_IN_DB");?>
 				</div>
-				<div class="description">
+				<div class="AdminNavBlockOptionText">
 					<?php print GM_LANG_MEDIA_IN_DB; ?>
 				</div>
-			</div>
-			<div class="choice_right">
+			</td>
+			<td class="NavBlockField">
 				<select name="NEW_MEDIA_IN_DB" tabindex="<?php $i++; print $i?>">
 					<option value="yes" <?php if (SystemConfig::$MEDIA_IN_DB) print "selected=\"selected\""; ?>><?php print GM_LANG_yes;?></option>
 					<option value="no" <?php if (!SystemConfig::$MEDIA_IN_DB) print "selected=\"selected\""; ?>><?php print GM_LANG_no;?></option>
 				</select>
-			</div>
-		</div>
-		<div class="admin_item_box">
-			<div class="width30 choice_left">
-				<div class="helpicon">
+			</td>
+		</tr>
+		<tr>
+			<td class="NavBlockLabel">
+				<div class="HelpIconContainer">
 					<?php PrintHelpLink("GM_STORE_MESSAGES_help", "qm", "GM_STORE_MESSAGES");?>
 				</div>
-				<div class="description">
+				<div class="AdminNavBlockOptionText">
 					<?php print GM_LANG_GM_STORE_MESSAGES; ?>
 				</div>
-			</div>
-			<div class="choice_right">
+			</td>
+			<td class="NavBlockField">
 				<select name="NEW_GM_STORE_MESSAGES" tabindex="<?php $i++; print $i?>">
 					<option value="yes" <?php if (SystemConfig::$GM_STORE_MESSAGES) print "selected=\"selected\""; ?>><?php print GM_LANG_yes;?></option>
 					<option value="no" <?php if (!SystemConfig::$GM_STORE_MESSAGES) print "selected=\"selected\""; ?>><?php print GM_LANG_no;?></option>
 				</select>
-			</div>
-		</div>
-		<div class="admin_item_box">
-			<div class="width30 choice_left">
-				<div class="helpicon">
+			</td>
+		</tr>
+		<tr>
+			<td class="NavBlockLabel">
+				<div class="HelpIconContainer">
 					<?php PrintHelpLink("USE_REGISTRATION_MODULE_help", "qm", "USE_REGISTRATION_MODULE");?>
 				</div>
-				<div class="description">
+				<div class="AdminNavBlockOptionText">
 					<?php print GM_LANG_USE_REGISTRATION_MODULE; ?>
 				</div>
-			</div>
-			<div class="choice_right">
+			</td>
+			<td class="NavBlockField">
 				<select name="NEW_USE_REGISTRATION_MODULE" tabindex="<?php $i++; print $i?>">
 					<option value="yes" <?php if (SystemConfig::$USE_REGISTRATION_MODULE) print "selected=\"selected\""; ?>><?php print GM_LANG_yes;?></option>
 					<option value="no" <?php if (!SystemConfig::$USE_REGISTRATION_MODULE) print "selected=\"selected\""; ?>><?php print GM_LANG_no;?></option>
 				</select>
-			</div>
-		</div>
-		<div class="admin_item_box">
-			<div class="width30 choice_left">
-				<div class="helpicon">
+			</td>
+		</tr>
+		<tr>
+			<td class="NavBlockLabel">
+				<div class="HelpIconContainer">
 					<?php PrintHelpLink("REQUIRE_ADMIN_AUTH_REGISTRATION_help", "qm", "REQUIRE_ADMIN_AUTH_REGISTRATION");?>
 				</div>
-				<div class="description">
+				<div class="AdminNavBlockOptionText">
 					<?php print GM_LANG_REQUIRE_ADMIN_AUTH_REGISTRATION; ?>
 				</div>
-			</div>
-			<div class="choice_right">
+			</td>
+			<td class="NavBlockField">
 				<select name="NEW_REQUIRE_ADMIN_AUTH_REGISTRATION" tabindex="<?php $i++; print $i?>">
 					<option value="yes" <?php if (SystemConfig::$REQUIRE_ADMIN_AUTH_REGISTRATION) print "selected=\"selected\""; ?>><?php print GM_LANG_yes;?></option>
 					<option value="no" <?php if (!SystemConfig::$REQUIRE_ADMIN_AUTH_REGISTRATION) print "selected=\"selected\""; ?>><?php print GM_LANG_no;?></option>
 				</select>
-			</div>
-		</div>
-		<div class="admin_item_box">
-			<div class="width30 choice_left">
-				<div class="helpicon">
+			</td>
+		</tr>
+		<tr>
+			<td class="NavBlockLabel">
+				<div class="HelpIconContainer">
 					<?php PrintHelpLink("GM_SIMPLE_MAIL_help", "qm", "GM_SIMPLE_MAIL");?>
 				</div>
-				<div class="description">
+				<div class="AdminNavBlockOptionText">
 					<?php print GM_LANG_GM_SIMPLE_MAIL; ?>
 				</div>
-			</div>
-			<div class="choice_right">
+			</td>
+			<td class="NavBlockField">
 				<select name="NEW_GM_SIMPLE_MAIL" tabindex="<?php $i++; print $i?>">
 					<option value="yes" <?php if (SystemConfig::$GM_SIMPLE_MAIL) print "selected=\"selected\""; ?>><?php print GM_LANG_yes;?></option>
 					<option value="no" <?php if (!SystemConfig::$GM_SIMPLE_MAIL) print "selected=\"selected\""; ?>><?php print GM_LANG_no;?></option>
 				</select>
-			</div>
-		</div>
-		<div class="admin_item_box">
-			<div class="width30 choice_left">
-				<div class="helpicon">
+			</td>
+		</tr>
+		<tr>
+			<td class="NavBlockLabel">
+				<div class="HelpIconContainer">
 					<?php PrintHelpLink("ALLOW_USER_THEMES_help", "qm", "ALLOW_USER_THEMES");?>
 				</div>
-				<div class="description">
+				<div class="AdminNavBlockOptionText">
 					<?php print GM_LANG_ALLOW_USER_THEMES; ?>
 				</div>
-			</div>
-			<div class="choice_right">
+			</td>
+			<td class="NavBlockField">
 				<select name="NEW_ALLOW_USER_THEMES" tabindex="<?php $i++; print $i?>">
 					<option value="yes" <?php if (SystemConfig::$ALLOW_USER_THEMES) print "selected=\"selected\""; ?>><?php print GM_LANG_yes;?></option>
 					<option value="no" <?php if (!SystemConfig::$ALLOW_USER_THEMES) print "selected=\"selected\""; ?>><?php print GM_LANG_no;?></option>
 				</select>
-			</div>
-		</div>
-		<div class="admin_item_box">
-			<div class="width30 choice_left">
-				<div class="helpicon">
+			</td>
+		</tr>
+		<tr>
+			<td class="NavBlockLabel">
+				<div class="HelpIconContainer">
 					<?php PrintHelpLink("NEWS_TYPE_help", "qm", "NEWS_TYPE");?>
 				</div>
-				<div class="description">
+				<div class="AdminNavBlockOptionText">
 					<?php print GM_LANG_NEWS_TYPE; ?>
 				</div>
-			</div>
-			<div class="choice_right">
+			</td>
+			<td class="NavBlockField">
 				<select name="NEW_NEWS_TYPE" tabindex="<?php $i++; print $i?>">
 					<option value="Normal" <?php if (SystemConfig::$NEWS_TYPE == "Normal") print "selected=\"selected\""; ?>><?php print GM_LANG_normal;?></option>
 					<option value="Urgent" <?php if (SystemConfig::$NEWS_TYPE == "Urgent") print "selected=\"selected\""; ?>><?php print GM_LANG_urgent;?></option>
 				</select>
-			</div>
-		</div>
-		<div class="admin_item_box">
-			<div class="width30 choice_left">
-				<div class="helpicon">
+			</td>
+		</tr>
+		<tr>
+			<td class="NavBlockLabel">
+				<div class="HelpIconContainer">
 					<?php PrintHelpLink("ALLOW_REMEMBER_ME_help", "qm", "ALLOW_REMEMBER_ME");?>
 				</div>
-				<div class="description">
+				<div class="AdminNavBlockOptionText">
 					<?php print GM_LANG_ALLOW_REMEMBER_ME; ?>
 				</div>
-			</div>
-			<div class="choice_right">
+			</td>
+			<td class="NavBlockField">
 				<select name="NEW_ALLOW_REMEMBER_ME" tabindex="<?php $i++; print $i?>">
 					<option value="yes" <?php if (SystemConfig::$ALLOW_REMEMBER_ME) print "selected=\"selected\""; ?>><?php print GM_LANG_yes;?></option>
 					<option value="no" <?php if (!SystemConfig::$ALLOW_REMEMBER_ME) print "selected=\"selected\""; ?>><?php print GM_LANG_no;?></option>
 				</select>
-			</div>
-		</div>
-		<div class="admin_item_box">
-			<div class="width30 choice_left">
-				<div class="helpicon">
+			</td>
+		</tr>
+		<tr>
+			<td class="NavBlockLabel">
+				<div class="HelpIconContainer">
 					<?php PrintHelpLink("LANG_SELECTION_help", "qm", "LANG_SELECTION");?>
 				</div>
-				<div class="description">
+				<div class="AdminNavBlockOptionText">
 					<?php print GM_LANG_LANG_SELECTION; ?>
 				</div>
-			</div>
-			<div class="choice_right width65">
+			</td>
+			<td class="NavBlockField">
 				<?php
 				// NOTE: Build a sorted list of language names in the currently active language
 				foreach ($language_settings as $key => $value){
@@ -513,7 +516,6 @@ PrintHeader(GM_LANG_configure_head);
 				$SortedLangs = array_flip($SortedLangs);
 				while ($curline <= $lines) {
 					// NOTE: Start each table row
-					print "<div class=\"admin_item_box\">";
 						$curcol = 0;
 						$showkey = 0;
 						// NOTE: Print each column
@@ -524,7 +526,7 @@ PrintHeader(GM_LANG_configure_head);
 							if (array_key_exists($showkey, $LangsList)) {
 								$LocalName = $LangsList[$showkey];
 								$LangName = $SortedLangs[$LocalName];
-								print "<div class=\"choice_middle width30\">";
+								print "<div class=\"EditConfigLangColumn\">";
 								print "<input type=\"checkbox\" name=\"NEW_LANGS[".$LangName."]\" value=\"".$LangName."\" ";
 								if (array_key_exists($LangName, $ActiveLangs) || AdminFunctions::LanguageInUse($LangName)) print "checked=\"checked\" ";
 								if (AdminFunctions::LanguageInUse($LangName)) print "disabled=\"disabled\" ";
@@ -533,7 +535,7 @@ PrintHeader(GM_LANG_configure_head);
 								print "</div>";
 							}
 							else {
-								print "<div class=\"choice_middle width30\">";
+								print "<div class=\"EditConfigLangColumn\">";
 								print "&nbsp;";
 								print "&nbsp;\n";
 								print "</div>";
@@ -544,22 +546,21 @@ PrintHeader(GM_LANG_configure_head);
 					
 					$curline++;
 					// Finish the table row
-					print "</div>";
 				}
 				
 				?>
-			</div>
-		</div>
-		<div class="admin_item_box">
-			<div class="width30 choice_left">
-				<div class="helpicon">
+			</td>
+		</tr>
+		<tr>
+			<td class="NavBlockLabel">
+				<div class="HelpIconContainer">
 					<?php PrintHelpLink("VISITOR_LANG_help", "qm", "VISITOR_LANG");?>
 				</div>
-				<div class="description">
+				<div class="AdminNavBlockOptionText">
 					<?php print GM_LANG_VISITOR_LANG; ?>
 				</div>
-			</div>
-			<div class="choice_right">
+			</td>
+			<td class="NavBlockField">
 				<select name="NEW_VISITOR_LANG" tabindex="<?php $i++; print $i?>">
 					<option value="Genmod" <?php if (SystemConfig::$VISITOR_LANG == "Genmod") print "selected=\"selected\""; ?>><?php print GM_LANG_genmod_lang;?></option>
 					<?php
@@ -571,18 +572,18 @@ PrintHeader(GM_LANG_configure_head);
 						}
 					} ?>
 				</select>
-			</div>
-		</div>
-		<div class="admin_item_box">
-			<div class="width30 choice_left">
-				<div class="helpicon">
+			</td>
+		</tr>
+		<tr>
+			<td class="NavBlockLabel">
+				<div class="HelpIconContainer">
 					<?php PrintHelpLink("SERVER_URL_help", "qm", "SERVER_URL");?>
 				</div>
-				<div class="description">
+				<div class="AdminNavBlockOptionText">
 					<?php print GM_LANG_SERVER_URL; ?>
 				</div>
-			</div>
-			<div class="choice_right width65">
+			</td>
+			<td class="NavBlockField">
 				<input type="text" name="NEW_SERVER_URL" value="<?php print $SERVER_URL?>" dir="ltr" tabindex="<?php $i++; print $i?>" size="40" 
 				<?php if (isset($CONFIG["SERVER_URL"]) && isset($CONFIG_PARMS[$CONFIG["SERVER_URL"]])) print "disabled=\"disabled\""; ?> />
 				<?php
@@ -592,124 +593,124 @@ PrintHeader(GM_LANG_configure_head);
 				$GUESS_URL .= dirname(SCRIPT_NAME)."/";
 				$GUESS_URL = stripslashes($GUESS_URL);
 				print "<div>".PrintText("server_url_note",0,1)."</div>"; ?>
-			</div>
-		</div>
-		<div class="admin_item_box">
-			<div class="width30 choice_left">
-				<div class="helpicon">
+			</td>
+		</tr>
+		<tr>
+			<td class="NavBlockLabel">
+				<div class="HelpIconContainer">
 					<?php PrintHelpLink("LOGIN_URL_help", "qm", "LOGIN_URL");?>
 				</div>
-				<div class="description">
+				<div class="AdminNavBlockOptionText">
 					<?php print GM_LANG_LOGIN_URL; ?>
 				</div>
-			</div>
-			<div class="choice_right">
+			</td>
+			<td class="NavBlockField">
 				<input type="text" name="NEW_LOGIN_URL" value="<?php print LOGIN_URL?>" dir="ltr" tabindex="<?php $i++; print $i?>" size="40" />
 				<?php if ($error_ali_login) print "<div class=\"Error\">".GM_LANG_aliaslogin."</div>"; ?>
-			</div>
-		</div>
-		<div class="admin_item_box">
-			<div class="width30 choice_left">
-				<div class="helpicon">
+			</td>
+		</tr>
+		<tr>
+			<td class="NavBlockLabel">
+				<div class="HelpIconContainer">
 					<?php PrintHelpLink("SITE_ALIAS_help", "qm", "LOGIN_URL");?>
 				</div>
-				<div class="description">
+				<div class="AdminNavBlockOptionText">
 					<?php print GM_LANG_SITE_ALIAS; ?>
 				</div>
-			</div>
-			<div class="choice_right">
+			</td>
+			<td class="NavBlockField">
 				<input type="text" name="NEW_SITE_ALIAS" value="<?php print SITE_ALIAS?>" dir="ltr" tabindex="<?php $i++; print $i?>" size="40" />
 				<?php if ($error_ali) print "<div class=\"Error\">".GM_LANG_invalidalias."</div>"; ?>
-			</div>
-		</div>
-		<div class="admin_item_box">
-			<div class="width30 choice_left">
-				<div class="helpicon">
+			</td>
+		</tr>
+		<tr>
+			<td class="NavBlockLabel">
+				<div class="HelpIconContainer">
 					<?php PrintHelpLink("PROXY_ADDRESS_help", "qm", "PROXY_ADDRESS");?>
 				</div>
-				<div class="description">
+				<div class="AdminNavBlockOptionText">
 					<?php print GM_LANG_PROXY_ADDRESS; ?>
 				</div>
-			</div>
-			<div class="choice_right">
+			</td>
+			<td class="NavBlockField">
 				<input type="text" name="NEW_PROXY_ADDRESS" value="<?php print SystemConfig::$PROXY_ADDRESS;?>" dir="ltr" tabindex="<?php $i++; print $i?>" size="40" />
-			</div>
-		</div>
-		<div class="admin_item_box">
-			<div class="width30 choice_left">
-				<div class="helpicon">
+			</td>
+		</tr>
+		<tr>
+			<td class="NavBlockLabel">
+				<div class="HelpIconContainer">
 					<?php PrintHelpLink("PROXY_PORT_help", "qm", "PROXY_PORT");?>
 				</div>
-				<div class="description">
+				<div class="AdminNavBlockOptionText">
 					<?php print GM_LANG_PROXY_PORT; ?>
 				</div>
-			</div>
-			<div class="choice_right">
+			</td>
+			<td class="NavBlockField">
 				<input type="text" name="NEW_PROXY_PORT" value="<?php print SystemConfig::$PROXY_PORT;?>" dir="ltr" tabindex="<?php $i++; print $i?>" size="5" />
-			</div>
-		</div>
-		<div class="admin_item_box">
-			<div class="width30 choice_left">
-				<div class="helpicon">
+			</td>
+		</tr>
+		<tr>
+			<td class="NavBlockLabel">
+				<div class="HelpIconContainer">
 					<?php PrintHelpLink("PROXY_USER_help", "qm", "PROXY_USER");?>
 				</div>
-				<div class="description">
+				<div class="AdminNavBlockOptionText">
 					<?php print GM_LANG_PROXY_USER; ?>
 				</div>
-			</div>
-			<div class="choice_right">
+			</td>
+			<td class="NavBlockField">
 				<input type="text" name="NEW_PROXY_USER" value="<?php print SystemConfig::$PROXY_USER;?>" dir="ltr" tabindex="<?php $i++; print $i?>" size="40" />
-			</div>
-		</div>
-		<div class="admin_item_box">
-			<div class="width30 choice_left">
-				<div class="helpicon">
+			</td>
+		</tr>
+		<tr>
+			<td class="NavBlockLabel">
+				<div class="HelpIconContainer">
 					<?php PrintHelpLink("PROXY_PASSWORD_help", "qm", "PROXY_PASSWORD");?>
 				</div>
-				<div class="description">
+				<div class="AdminNavBlockOptionText">
 					<?php print GM_LANG_PROXY_PASSWORD; ?>
 				</div>
-			</div>
-			<div class="choice_right">
+			</td>
+			<td class="NavBlockField">
 				<input type="text" name="NEW_PROXY_PASSWORD" value="<?php print SystemConfig::$PROXY_PASSWORD;?>" dir="ltr" tabindex="<?php $i++; print $i?>" size="40" />
-			</div>
-		</div>
-		<div class="admin_item_box">
-			<div class="width30 choice_left">
-				<div class="helpicon">
+			</td>
+		</tr>
+		<tr>
+			<td class="NavBlockLabel">
+				<div class="HelpIconContainer">
 					<?php PrintHelpLink("GM_SESSION_SAVE_PATH_help", "qm", "GM_SESSION_SAVE_PATH");?>
 				</div>
-				<div class="description">
+				<div class="AdminNavBlockOptionText">
 					<?php print GM_LANG_GM_SESSION_SAVE_PATH; ?>
 				</div>
-			</div>
-			<div class="choice_right">
+			</td>
+			<td class="NavBlockField">
 				<input type="text" dir="ltr" name="NEW_GM_SESSION_SAVE_PATH" value="<?php print GM_SESSION_SAVE_PATH;?>" tabindex="<?php $i++; print $i?>" size="40" />
-			</div>
-		</div>
-		<div class="admin_item_box">
-			<div class="width30 choice_left">
-				<div class="helpicon">
+			</td>
+		</tr>
+		<tr>
+			<td class="NavBlockLabel">
+				<div class="HelpIconContainer">
 					<?php PrintHelpLink("GM_SESSION_TIME_help", "qm", "GM_SESSION_TIME");?>
 				</div>
-				<div class="description">
+				<div class="AdminNavBlockOptionText">
 					<?php print GM_LANG_GM_SESSION_TIME; ?>
 				</div>
-			</div>
-			<div class="choice_right">
+			</td>
+			<td class="NavBlockField">
 				<input type="text" name="NEW_GM_SESSION_TIME" value="<?php print GM_SESSION_TIME;?>" tabindex="<?php $i++; print $i?>" size="5" />
-			</div>
-		</div>
-		<div class="admin_item_box">
-			<div class="width30 choice_left">
-				<div class="helpicon">
+			</td>
+		</tr>
+		<tr>
+			<td class="NavBlockLabel">
+				<div class="HelpIconContainer">
 					<?php PrintHelpLink("MAX_VIEW_RATE_help", "qm", "MAX_VIEW_RATE");?>
 				</div>
-				<div class="description">
+				<div class="AdminNavBlockOptionText">
 					<?php print GM_LANG_MAX_VIEW_RATE; ?>
 				</div>
-			</div>
-			<div class="choice_right">
+			</td>
+			<td class="NavBlockField">
 				<input type="text" name="NEW_MAX_VIEWS" value="<?php print SystemConfig::$MAX_VIEWS;?>" tabindex="<?php $i++; print $i?>" size="5" />
 				<?php
 					if ($TEXT_DIRECTION == "ltr") print GM_LANG_page_views;
@@ -727,57 +728,57 @@ PrintHeader(GM_LANG_configure_head);
 					<option value="2" <?php if (SystemConfig::$MAX_VIEW_LOGLEVEL == "2") print "selected=\"selected\""; ?>><?php print GM_LANG_loglevel_2;?></option>
 				</select>
 				
-			</div>
-		</div>
-		<div class="admin_item_box">
-			<div class="width30 choice_left">
-				<div class="helpicon">
+			</td>
+		</tr>
+		<tr>
+			<td class="NavBlockLabel">
+				<div class="HelpIconContainer">
 					<?php PrintHelpLink("EXCLUDE_HOSTS_help", "qm", "LOCKOUT_TIME");?>
 				</div>
-				<div class="description">
+				<div class="AdminNavBlockOptionText">
 					<?php print GM_LANG_EXCLUDE_HOSTS; ?>
 				</div>
-			</div>
-			<div class="choice_right">
+			</td>
+			<td class="NavBlockField">
 				<input type="text" name="NEW_EXCLUDE_HOSTS" value="<?php print SystemConfig::$EXCLUDE_HOSTS;?>" tabindex="<?php $i++; print $i?>" size="60" />
-			</div>
-		</div>
-		<div class="admin_item_box">
-			<div class="width30 choice_left">
-				<div class="helpicon">
+			</td>
+		</tr>
+		<tr>
+			<td class="NavBlockLabel">
+				<div class="HelpIconContainer">
 					<?php PrintHelpLink("LOCKOUT_TIME_help", "qm", "LOCKOUT_TIME");?>
 				</div>
-				<div class="description">
+				<div class="AdminNavBlockOptionText">
 					<?php print GM_LANG_LOCKOUT_TIME; ?>
 				</div>
-			</div>
-			<div class="choice_right">
+			</td>
+			<td class="NavBlockField">
 				<input type="text" name="NEW_LOCKOUT_TIME" value="<?php print SystemConfig::$LOCKOUT_TIME;?>" tabindex="<?php $i++; print $i?>" size="5" />
-			</div>
-		</div>
-		<div class="admin_item_box">
-			<div class="width30 choice_left">
-				<div class="helpicon">
+			</td>
+		</tr>
+		<tr>
+			<td class="NavBlockLabel">
+				<div class="HelpIconContainer">
 					<?php PrintHelpLink("GM_MEMORY_LIMIT_help", "qm", "GM_MEMORY_LIMIT");?>
 				</div>
-				<div class="description">
+				<div class="AdminNavBlockOptionText">
 					<?php print GM_LANG_GM_MEMORY_LIMIT; ?>
 				</div>
-			</div>
-			<div class="choice_right">
+			</td>
+			<td class="NavBlockField">
 				<input type="text" name="NEW_GM_MEMORY_LIMIT" value="<?php print SystemConfig::$GM_MEMORY_LIMIT;?>" tabindex="<?php $i++; print $i?>" size="5" />
-			</div>
-		</div>
-		<div class="admin_item_box">
-			<div class="width30 choice_left">
-				<div class="helpicon">
+			</td>
+		</tr>
+		<tr>
+			<td class="NavBlockLabel">
+				<div class="HelpIconContainer">
 					<?php PrintHelpLink("DEFAULT_PAGE_SIZE_help", "qm", "DEFAULT_PAGE_SIZE");?>
 				</div>
-				<div class="description">
+				<div class="AdminNavBlockOptionText">
 					<?php print GM_LANG_DEFAULT_PAGE_SIZE; ?>
 				</div>
-			</div>
-			<div class="choice_right">
+			</td>
+			<td class="NavBlockField">
 				<?php
 				require_once("includes/reportheader.php");
 				$sizes = explode(",", AVAIL_PAGE_SIZES);
@@ -790,11 +791,14 @@ PrintHeader(GM_LANG_configure_head);
 						print "</option>";
 					} ?>
 				</select>
-			</div>
-		</div>
-		<div class="admin_item_box center">
-			<input type="submit" value="<?php print GM_LANG_save;?>" />
-		</div>
+			</td>
+		</tr>
+		<tr>
+			<td class="NavBlockFooter" colspan="2">
+				<input type="submit" value="<?php print GM_LANG_save;?>" />
+			</td>
+		</tr>
+		</table>
 	</form>
 	<?php if (!CONFIGURED) { ?>
 		<script language="JavaScript" type="text/javascript">

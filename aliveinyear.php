@@ -31,11 +31,13 @@ $indilist_controller = new IndilistController();
 $trace = false;
 
 PrintHeader($indilist_controller->pagetitle);
+
+print "<div id=\"AliveInYearPage\">";
 print "<div class=\"AliveInYearOptionContainer\">";
-print "\n\t<span class=\"PageTitleName\">";
+print "\n\t<div class=\"PageTitleName\">";
 PrintHelpLink("alive_in_year_help", "qm");
 print str_replace("#YEAR#", $indilist_controller->year, GM_LANG_is_alive_in);
-print "</span>";
+print "</div>";
 
 if ($view != "preview") {
 	print "\n\t<form name=\"newyear\" action=\"aliveinyear.php\" method=\"get\">";
@@ -45,13 +47,13 @@ if ($view != "preview") {
 	print "\n\t\t<input type=\"hidden\" name=\"surname\" value=\"".$indilist_controller->surname."\" />";
 	print "\n\t\t<input type=\"hidden\" name=\"show_all_firstnames\" value=\"".$indilist_controller->show_all_firstnames."\" />";
 	print "\n\t\t<input type=\"hidden\" name=\"show_all\" value=\"".$indilist_controller->show_all."\" />";
-	print "\n\t\t<table class=\"ListTable ".$TEXT_DIRECTION."\">\n\t\t\t<tr>";
+	print "\n\t\t<table class=\"NavBlockTable\">\n\t\t\t<tr>";
 	print "\n\t\t\t<td class=\"NavBlockHeader\" colspan=\"4\">".GM_LANG_choose."</td></tr>";
 	print "<tr><td class=\"NavBlockLabel\" rowspan=\"4\">";
 	PrintHelpLink("year_help", "qm");
 	print GM_LANG_year."</td>";
 	print "\n\t\t\t<td class=\"NavBlockField\" rowspan=\"4\">";
-	print "\n\t\t\t\t<input class=\"pedigree_form\" type=\"text\" name=\"year\" size=\"3\" value=\"".$indilist_controller->year."\" />";
+	print "\n\t\t\t\t<input class=\"PidInputField\" type=\"text\" name=\"year\" size=\"3\" value=\"".$indilist_controller->year."\" />";
 	print "\n\t\t\t\t";
 	print "\n\t\t\t</td>";
 	print "<td class=\"NavBlockLabel\">".GM_LANG_aiy_usemaa."</td>";
@@ -74,8 +76,8 @@ if ($view != "preview") {
 	print "<input type=\"submit\" value=\"".GM_LANG_view."\" /></td>";
 	print "\n\t\t\t</tr>\n\t\t</table>";
 	print "\n\t</form>\n";
-	print "<br />";
 }
+print "</div>";
 /**
  * Check for the @ symbol
  *
@@ -103,13 +105,15 @@ $indialpha = $indilist_controller->GetLetterBar();
 
 // Print the letter bar
 if (count($indialpha) > 0) {
+	print "<div class=\"IndiFamLetterBar\">";
 	PrintHelpLink("alpha_help", "qm");
+	print GM_LANG_first_letter_sname."<br />\n";
 	foreach($indialpha as $key=>$letter) {
 		if ($letter != "@") {
 			print "<a href=\"".SCRIPT_NAME."?alpha=".urlencode($letter)."&amp;surname_sublist=".$indilist_controller->surname_sublist."&amp;show_all=no&amp;type=".$indilist_controller->type."&amp;useMAA=".$indilist_controller->useMAA."&amp;year=".$indilist_controller->year;
 			if ($indilist_controller->allgeds == "yes") print "&amp;allgeds=yes";
 			print "\">";
-			if ($indilist_controller->alpha == $letter && $indilist_controller->show_all == "no") print "<span class=\"warning\">".htmlspecialchars($letter)."</span>";
+			if ($indilist_controller->alpha == $letter && $indilist_controller->show_all == "no") print "<span class=\"Warning\">".htmlspecialchars($letter)."</span>";
 			else print htmlspecialchars($letter);
 			print "</a> | \n";
 		}
@@ -125,7 +129,7 @@ if (count($indialpha) > 0) {
 		if ($indilist_controller->alpha == "@") {
 			print "<a href=\"".SCRIPT_NAME."?alpha=".urlencode("@")."&amp;surname_sublist=yes&amp;surname=@N.N.&amp;type=".$indilist_controller->type."&amp;useMAA=".$indilist_controller->useMAA."&amp;year=".$indilist_controller->year;
 			if ($indilist_controller->allgeds == "yes") print "&amp;allgeds=yes";
-			print "\"><span class=\"warning\">".PrintReady(GM_LANG_NN)."</span></a>";
+			print "\"><span class=\"Warning\">".PrintReady(GM_LANG_NN)."</span></a>";
 		}
 		else {
 			print "<a href=\"".SCRIPT_NAME."?alpha=".urlencode("@")."&amp;surname_sublist=yes&amp;surname=@N.N.&amp;type=".$indilist_controller->type."&amp;useMAA=".$indilist_controller->useMAA."&amp;year=".$indilist_controller->year;
@@ -143,7 +147,7 @@ if (count($indialpha) > 0) {
 		if ($indilist_controller->show_all == "yes") {
 			print "<a href=\"".SCRIPT_NAME."?show_all=yes&amp;surname_sublist=".$indilist_controller->surname_sublist."&amp;type=".$indilist_controller->type."&amp;useMAA=".$indilist_controller->useMAA."&amp;year=".$indilist_controller->year;
 			if ($indilist_controller->allgeds == "yes") print "&amp;allgeds=yes";
-			print "\"><span class=\"warning\">".GM_LANG_all."</span></a>\n";
+			print "\"><span class=\"Warning\">".GM_LANG_all."</span></a>\n";
 		}
 		else {
 			print "<a href=\"".SCRIPT_NAME."?show_all=yes&amp;surname_sublist=".$indilist_controller->surname_sublist."&amp;type=".$indilist_controller->type."&amp;useMAA=".$indilist_controller->useMAA."&amp;year=".$indilist_controller->year;
@@ -152,14 +156,13 @@ if (count($indialpha) > 0) {
 		}
 	}
 	if (isset($startalpha)) $indilist_controller->alpha = $startalpha;
+	print "</div>";
 }
 //-- escaped letter for regular expressions
-print "</div><div class=\"AliveInYearListContainer\">";
 if ($indilist_controller->surname_sublist == "yes" && $indilist_controller->show_all == "yes") {
 	// Get the surnames of all individuals
 	if ($trace) print "option 1";
 	$surnames = $indilist_controller->GetAlphaIndiNames();
-	print "<div class=\"ListTableHeader\">".GM_LANG_surnames."</div>\n";
 	$indilist_controller->PrintSurnameList($surnames, "&amp;type=".$indilist_controller->type."&amp;useMAA=".$indilist_controller->useMAA."&amp;year=".$indilist_controller->year);
 
 }
@@ -169,7 +172,6 @@ else if ($indilist_controller->surname_sublist == "yes" && $indilist_controller-
 	// NOTE: Get all of the individuals whose last names start with this letter
 	if ($indilist_controller->alpha != "") {
 		$surnames = $indilist_controller->GetAlphaIndiNames();
-		print "<div class=\"ListTableHeader\">".GM_LANG_surnames."</div>\n";
 		$indilist_controller->PrintSurnameList($surnames, "&amp;type=".$indilist_controller->type."&amp;useMAA=".$indilist_controller->useMAA."&amp;year=".$indilist_controller->year);
 		
 	}
@@ -196,19 +198,17 @@ else {
 	else {
 		if ($trace) print "option 6";
 		// NOTE: If user wishes to skip surname do not print the surname
-		print "<div class=\"ListTableHeader\">";
-		if ($indilist_controller->surname_sublist == "yes" && $indilist_controller->surname == "") print GM_LANG_surnames;
-		else print PrintReady(str_replace("#surname#", NameFunctions::CheckNN($indilist_controller->surname), GM_LANG_indis_with_surname));
-		print "</div>\n";
 		$indilist_controller->PrintPersonList($tindilist, true);
 	}
 }
 
-if ($indilist_controller->alpha != "@" && $indilist_controller->surname == "") {
-	PrintHelpLink("skip_sublist_help", "qm", "skip_surnames");
-	print "<br /><a href=\"".SCRIPT_NAME."?alpha=".urlencode($indilist_controller->alpha)."&amp;surname_sublist=".($indilist_controller->surname_sublist == "yes" ? "no" : "yes")."&amp;show_all=".$indilist_controller->show_all."&amp;type=".$indilist_controller->type."&amp;useMAA=".$indilist_controller->useMAA."&amp;year=".$indilist_controller->year;
-	if ($indilist_controller->allgeds == "yes") print "&amp;allgeds=yes";
-	print "\">".($indilist_controller->surname_sublist == "yes" ? GM_LANG_skip_surnames : GM_LANG_show_surnames)."</a>";
+if ($indilist_controller->alpha != "" && $indilist_controller->surname == "") {
+	print "<div class=\"IndiFamShowHideSurnameList\">";
+		PrintHelpLink("skip_sublist_help", "qm", "skip_surnames");
+		print "<br /><a href=\"".SCRIPT_NAME."?alpha=".urlencode($indilist_controller->alpha)."&amp;surname_sublist=".($indilist_controller->surname_sublist == "yes" ? "no" : "yes")."&amp;show_all=".$indilist_controller->show_all."&amp;type=".$indilist_controller->type."&amp;useMAA=".$indilist_controller->useMAA."&amp;year=".$indilist_controller->year;
+		if ($indilist_controller->allgeds == "yes") print "&amp;allgeds=yes";
+		print "\">".($indilist_controller->surname_sublist == "yes" ? GM_LANG_skip_surnames : GM_LANG_show_surnames)."</a>";
+	print "</div>";
 }
 print "</div>\n";
 PrintFooter();

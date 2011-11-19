@@ -348,7 +348,7 @@ class Fact {
 				$timerec = GetSubRecord(2, "2 TIME", $this->factrec);
 				if (empty($timerec)) $timerec = GetSubRecord(2, "2 DATE", $this->getSimpleDate());
 				$tt = preg_match("/[2-3] TIME (.*)/", $timerec, $tmatch);
-				if ($tt>0) $prtstr .= " - <span class=\"date\">".$tmatch[1]."</span>";
+				if ($tt>0) $prtstr .= " - <span class=\"Date\">".$tmatch[1]."</span>";
 			}
 			if ($print_parents_age && $this->owner_type == "INDI") {
 				// age of parents at child birth

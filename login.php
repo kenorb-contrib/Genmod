@@ -155,24 +155,24 @@ else {
 		<input type="hidden" name="usertime" value="" />
 		<span class="Error"><b><?php print $message?></b></span>
 		<!--table-->
-		<table class="LoginPageTable">
-		  <tr><td class="topbottombar" colspan="2"><?php print GM_LANG_login?></td></tr>
+		<table class="NavBlockTable LoginPageTable">
+		  <tr><td class="NavBlockHeader" colspan="2"><?php print GM_LANG_login?></td></tr>
 		  <tr>
-		    <td class="FormLabelCell LoginPageTableTextWidth <?php print $TEXT_DIRECTION; ?>"><?php PrintHelpLink("username_help", "qm", "username"); print GM_LANG_username?></td>
-		    <td class="FormInputCell <?php print $TEXT_DIRECTION; ?>"><input type="text" tabindex="<?php $i++; print $i?>" name="username" value="<?php print $username?>" size="20" /></td>
+		    <td class="NavBlockLabel LoginPageTableTextWidth <?php print $TEXT_DIRECTION; ?>"><?php PrintHelpLink("username_help", "qm", "username"); print GM_LANG_username?></td>
+		    <td class="NavBlockField <?php print $TEXT_DIRECTION; ?>"><input type="text" tabindex="<?php $i++; print $i?>" name="username" value="<?php print $username?>" size="20" /></td>
 		  </tr>
 		  <tr>
-		    <td class="FormLabelCell <?php print $TEXT_DIRECTION; ?>"><?php PrintHelpLink("password_help", "qm", "password"); print GM_LANG_password?></td>
-		    <td class="FormInputCell <?php print $TEXT_DIRECTION; ?>"><input type="password" tabindex="<?php $i++; print $i?>" name="password" size="20" /></td>
+		    <td class="NavBlockLabel <?php print $TEXT_DIRECTION; ?>"><?php PrintHelpLink("password_help", "qm", "password"); print GM_LANG_password?></td>
+		    <td class="NavBlockField <?php print $TEXT_DIRECTION; ?>"><input type="password" tabindex="<?php $i++; print $i?>" name="password" size="20" /></td>
 		  </tr>
 		  <?php if (SystemConfig::$ALLOW_REMEMBER_ME) { ?>
 		  <tr>
-		  	<td class="FormLabelCell <?php print $TEXT_DIRECTION; ?>"><?php PrintHelpLink("remember_me_help", "qm", "remember_me"); print GM_LANG_remember_me?></td>
-		    <td class="FormInputCell <?php print $TEXT_DIRECTION; ?> "><input type="checkbox" tabindex="<?php $i++; print $i?>" name="remember" value="yes" <?php if (!empty($_COOKIE["gm_rem"])) print "checked=\"checked\""; ?> /></td>
+		  	<td class="NavBlockLabel <?php print $TEXT_DIRECTION; ?>"><?php PrintHelpLink("remember_me_help", "qm", "remember_me"); print GM_LANG_remember_me?></td>
+		    <td class="NavBlockField <?php print $TEXT_DIRECTION; ?> "><input type="checkbox" tabindex="<?php $i++; print $i?>" name="remember" value="yes" <?php if (!empty($_COOKIE["gm_rem"])) print "checked=\"checked\""; ?> /></td>
 		  </tr>
 		  <?php } ?>
 		  <tr>
-		    <td colspan="2">
+		    <td colspan="2" class="NavBlockFooter">
 		    <?php
 		        if (GedcomConfig::$SHOW_CONTEXT_HELP) {
 		          if (GedcomConfig::$MUST_AUTHENTICATE) {
@@ -192,12 +192,12 @@ else {
 $sessname = session_name();
 if (!isset($_COOKIE[$sessname]) && !isset($_COOKIE["gm_rem"])) print "<span class=\"Error\">".GM_LANG_cookie_message."</span><br /><br />";
 if (SystemConfig::$USE_REGISTRATION_MODULE && count($GEDCOMS) > 0) {?>
-	<table class="LoginPageTable">
-	<tr><td class="topbottombar" colspan="2"><?php print GM_LANG_account_information;?></td></tr>
-	<tr><td class="FormLabelCell LoginPageTableTextWidth <?php print $TEXT_DIRECTION; ?>"><?php PrintHelpLink("new_user_help", "qm", "requestaccount"); print GM_LANG_no_account_yet;?></td>
-	<td class="FormInputCell <?php print $TEXT_DIRECTION; ?>"><a href="login_register.php?action=register"><?php print GM_LANG_requestaccount;?></a></td></tr>
-	<tr><td class="FormLabelCell <?php print $TEXT_DIRECTION; ?>"><?php PrintHelpLink("new_password_help", "qm", "lost_password"); print GM_LANG_lost_password;?></td>
-	<td class="FormInputCell <?php print $TEXT_DIRECTION; ?>"><a href="login_register.php?action=pwlost"><?php print GM_LANG_requestpassword;?></a></td></tr>
+	<table class="NavBlockTable LoginPageTable">
+	<tr><td class="NavBlockHeader" colspan="2"><?php print GM_LANG_account_information;?></td></tr>
+	<tr><td class="NavBlockLabel LoginPageTableTextWidth <?php print $TEXT_DIRECTION; ?>"><?php PrintHelpLink("new_user_help", "qm", "requestaccount"); print GM_LANG_no_account_yet;?></td>
+	<td class="NavBlockField <?php print $TEXT_DIRECTION; ?>"><a href="login_register.php?action=register"><?php print GM_LANG_requestaccount;?></a></td></tr>
+	<tr><td class="NavBlockLabel <?php print $TEXT_DIRECTION; ?>"><?php PrintHelpLink("new_password_help", "qm", "lost_password"); print GM_LANG_lost_password;?></td>
+	<td class="NavBlockField <?php print $TEXT_DIRECTION; ?>"><a href="login_register.php?action=pwlost"><?php print GM_LANG_requestpassword;?></a></td></tr>
 	</table>
 <?php
 }

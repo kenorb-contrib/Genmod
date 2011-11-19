@@ -483,7 +483,7 @@ class Person extends GedcomRecord {
 
 		if (is_null($this->sex)) {
 			// if a person is deleted, get his old gender. Otherwise it will show as unknown.
-			if ($this->show_changes && $this->ThisChanged() && !$this->Thisdeleted()) $gedrec = $this->GetChangedGedRec();
+			if ($this->show_changes && $this->ThisChanged() && !$this->ThisDeleted()) $gedrec = $this->GetChangedGedRec();
 			else $gedrec = $this->gedrec;
 
 			if (PrivacyFunctions::showFact("SEX", $this->xref, "INDI") && PrivacyFunctions::showFactDetails("SEX", $this->xref)) {
@@ -1317,7 +1317,7 @@ class Person extends GedcomRecord {
 		
 		if (is_null($this->fams)) {
 	
-			if ($this->show_changes && $this->ThisChanged()) $gedrec = $this->GetChangedGedRec();
+			if ($this->show_changes && $this->ThisChanged() && !$this->ThisDeleted()) $gedrec = $this->GetChangedGedRec();
 			else $gedrec = $this->gedrec;
 			
 			$this->fams = array();
@@ -1620,18 +1620,19 @@ class Person extends GedcomRecord {
 		else $addname = "";
 		
 		if ($paste) {
-			print "<a href=\"#\" onclick=\"sndReq(document.getElementById('dummy'), 'lastused', 'type', '".$this->datatype."', 'id', '".$this->key."'); pasteid('".$this->xref."', ''); return false;\" class=\"list_item\"><b>";
+			print "<a href=\"#\" onclick=\"sndReq(document.getElementById('dummy'), 'lastused', false, 'type', '".$this->datatype."', 'id', '".$this->key."'); pasteid('".$this->xref."', ''); return false;\" class=\"ListItem\"><span class=\"ListItemName\">";
 		}
 		else {
-			print "<a href=\"individual.php?pid=".$this->xref."&amp;gedid=".$this->gedcomid."\" class=\"list_item\"><b>";
+			print "<a href=\"individual.php?pid=".$this->xref."&amp;gedid=".$this->gedcomid."\" class=\"ListItem\"><span class=\"ListItemName\">";
 		}
-		print NameFunctions::CheckNN($desc).$addname."</b>".$this->addxref;
+		print NameFunctions::CheckNN($desc).$addname."</span><span class=\"ListItemXref\">".$this->addxref."</span><span class=\"ListItemMajorFact\">";
 		PersonFunctions::PrintFirstMajorFact($this, true, $break);
+		print "</span>";
 		if (!empty($fact)) {
-			print " <i>(";
+			print " <span class=\"ListItemAddFact\">(";
 			if (defined("GM_FACT_".$fact)) print constant("GM_FACT_".$fact);
 			else print $fact;
-			print ")</i>";
+			print ")</span>";
 		}
 		print "</a>\n";
 		if (is_array($assos) && ($this->disp)) {
@@ -1642,11 +1643,11 @@ class Person extends GedcomRecord {
 					$rel = "of";
 					if ($asso->type == "INDI") {
 						$assoname = $asso->associated->GetName();
-						print "<br /><a href=\"individual.php?pid=".$asso->xref1."&amp;gedid=".$asso->gedcomid."\" title=\"".$assoname."\" class=\"list_item\">";
+						print "<br /><a href=\"individual.php?pid=".$asso->xref1."&amp;gedid=".$asso->gedcomid."\" title=\"".$assoname."\" class=\"ListItem\">";
 	  				}
 	  				else {
 						$assoname = $asso->associated->name;
-						print "<br /><a href=\"family.php?famid=".$asso->xref1."&amp;gedid=".$asso->gedcomid."\" title=\"".$assoname."\" class=\"list_item\">";
+						print "<br /><a href=\"family.php?famid=".$asso->xref1."&amp;gedid=".$asso->gedcomid."\" title=\"".$assoname."\" class=\"ListItem\">";
 					}
 					$assoxref = $asso->associated->addxref;
 	  			}
@@ -1654,17 +1655,20 @@ class Person extends GedcomRecord {
 		  			$rel = "with";
 					$assoname = $asso->assoperson->GetName();
 					$assoxref = $asso->assoperson->addxref;
-					print "<br /><a href=\"individual.php?pid=".$asso->xref2."&amp;gedid=".$asso->gedcomid."\" title=\"".$assoname."\" class=\"list_item\">";
+					print "<br /><a href=\"individual.php?pid=".$asso->xref2."&amp;gedid=".$asso->gedcomid."\" title=\"".$assoname."\" class=\"ListItem\">";
 	  			}
 				if ($TEXT_DIRECTION=="ltr") print " <span dir=\"ltr\">";
 				else print " <span dir=\"rtl\">";
-				print "(".constant("GM_LANG_associate_".$rel).": ".$assoname.$assoxref;
+				print "(<span class=\"ListItemAssoText\">".constant("GM_LANG_associate_".$rel).":</span> "."<span class=\"ListItemAssoName\">".$assoname."</span><span class=\"ListItemAssoXref\">".$assoxref."</span>";
 				if ($asso->fact != "" || $asso->role != "") {
 					print " - ";
-					if ($asso->fact != "") print constant("GM_FACT_".$asso->fact);
-					if ($asso->fact != "" && $asso->role != "") print " : ";
+					if ($asso->fact != "") print "<span class=\"ListItemAssoFact\">".constant("GM_FACT_".$asso->fact);
+					if ($asso->fact != "" && $asso->role != "") print " : </span>";
+					else print "</span>";
+					print "<span class=\"ListItemAssoRole\">";
 					if (defined("GM_LANG_".$asso->role)) print constant("GM_LANG_".$asso->role);
 					else print $asso->role;
+					print "</span>";
 				}
 				print ")</span></a>";
 		  		SwitchGedcom();
@@ -1692,12 +1696,12 @@ class Person extends GedcomRecord {
 				// father
 				if (is_object($childfam->husb)) {
 					$age = ConvertNumber($childfam->husb->GetAge($date, false));
-					if (10<$age && $age<80) $father_text = "<img src=\"".GM_IMAGE_DIR."/" . $GM_IMAGES["sex"]["small"] . "\" title=\"" . GM_LANG_father . "\" alt=\"" . GM_LANG_father . "\" class=\"sex_image\" />".$age;
+					if (10<$age && $age<80) $father_text = "<img src=\"".GM_IMAGE_DIR."/" . $GM_IMAGES["sex"]["small"] . "\" title=\"" . GM_LANG_father . "\" alt=\"" . GM_LANG_father . "\" class=\"SexImage\" />".$age;
 				}
 				// mother
 				if (is_object($childfam->wife)) {
 					$age = ConvertNumber($childfam->wife->GetAge($date, false));
-					if (10 < $age && $age < 80) $mother_text = "<img src=\"".GM_IMAGE_DIR."/" . $GM_IMAGES["sexf"]["small"] . "\" title=\"" . GM_LANG_mother . "\" alt=\"" . GM_LANG_mother . "\" class=\"sex_image\" />".$age;
+					if (10 < $age && $age < 80) $mother_text = "<img src=\"".GM_IMAGE_DIR."/" . $GM_IMAGES["sexf"]["small"] . "\" title=\"" . GM_LANG_mother . "\" alt=\"" . GM_LANG_mother . "\" class=\"SexImage\" />".$age;
 				}
 				if ((!empty($father_text)) || (!empty($mother_text))) print "<span class=\"FactAge\">".$father_text.$mother_text."</span>";
 			}

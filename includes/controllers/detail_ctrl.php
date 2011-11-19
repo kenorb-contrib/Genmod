@@ -126,7 +126,7 @@ abstract class DetailController extends BaseController{
 		<script type="text/javascript">
 		<!--
 		function tabswitch(n) {
-		if ('<?php echo $this->view; ?>' != 'preview') sndReq('dummy', 'remembertab', 'xref', '<?php print JoinKey($this->xref, GedcomConfig::$GEDCOMID); ?>' , 'tab_tab', n, 'type', '<?php print $this->tabtype; ?>');
+		if ('<?php echo $this->view; ?>' != 'preview') sndReq('dummy', 'remembertab', true, 'xref', '<?php print JoinKey($this->xref, GedcomConfig::$GEDCOMID); ?>' , 'tab_tab', n, 'type', '<?php print $this->tabtype; ?>');
 			if (n==<?php print count($this->tabs); ?>) n = 0;
 			var tabid = new Array(<?php print "'".implode("','", $this->tabs)."'"; ?>);
 			// show all tabs ?
@@ -218,7 +218,6 @@ abstract class DetailController extends BaseController{
 				if ($this->tabtype == "note") $this->PrintGeneralNote();
 				foreach($this->$object_name->facts as $key => $factobj) {
 					if ($factobj->fact != "" && !in_array($factobj->fact, $this->fact_filter)) {
-//						$styleadd = $value[3];
 						if ($factobj->fact == "OBJE") {
 							FactFunctions::PrintMainmedia($factobj, $this->$object_name->xref, $this->$object_name->canedit);
 						}
@@ -458,14 +457,14 @@ abstract class DetailController extends BaseController{
 					// Start of todo list
 					print "\n\t<table class=\"DetailListTable $TEXT_DIRECTION\">";
 					print "<tr><td colspan=\"3\" class=\"DetailListHeader\">".GM_LANG_actionlist."</td></tr>";
-					print "<tr><td class=\"shade2 center\">".GM_LANG_todo."</td><td class=\"shade2 center\">".GM_LANG_for."</td><td class=\"shade2 center\">".GM_LANG_status."</td></tr>";
+					print "<tr><td class=\"DetailListColumnHeader\">".GM_LANG_todo."</td><td class=\"DetailListColumnHeader\">".GM_LANG_for."</td><td class=\"DetailListColumnHeader\">".GM_LANG_status."</td></tr>";
 					foreach ($this->$object_name->actionlist as $key => $item) {
 						print "<tr>";
-						print "<td class=\"shade1 wrap\">".nl2br(stripslashes($item->text))."</td>";
-						print "<td class=\"shade1\">";
+						print "<td class=\"DetaillistContent\">".nl2br(stripslashes($item->text))."</td>";
+						print "<td class=\"DetaillistContent\">";
 						print "<a href=\"individual.php?pid=".$item->pid."&amp;gedid=".$item->gedcomid."\">".$item->piddesc."</a>";
 						print "</td>";
-						print "<td class=\"shade1\">".constant("GM_LANG_action".$item->status)."</td>";
+						print "<td class=\"DetaillistContent\">".constant("GM_LANG_action".$item->status)."</td>";
 						print "</tr>";
 					}
 					print "<tr><td>".GM_LANG_total_actions." ".$this->$object_name->action_count;
@@ -801,10 +800,10 @@ abstract class DetailController extends BaseController{
 		<script language="JavaScript" type="text/javascript">
 		<!--
 			function show_gedcom_record() {
-				var recwin = window.open("gedrecord.php?pid=<?php print $this->$object_name->xref; ?>&type=<?php print $this->$object_name->type;?>", "", "top=0,left=0,width=300,height=400,scrollbars=1,scrollable=1,resizable=1");
+				var recwin = window.open("gedrecord.php?pid=<?php print $this->$object_name->xref; ?>&type=<?php print $this->$object_name->type;?>", "", "top=0,left=0,width=600,height=400,scrollbars=1,scrollable=1,resizable=1");
 			}
 			function showchanges() {
-				sndReq('show_changes', 'set_show_changes', 'set_show_changes', '<?php if ($this->show_changes) print false; else print true; ?>');
+				sndReq('show_changes', 'set_show_changes', true, 'set_show_changes', '<?php if ($this->show_changes) print false; else print true; ?>');
 				window.location.reload();
 			}
 			
@@ -862,7 +861,7 @@ abstract class DetailController extends BaseController{
 		
 		if ($suppress != "husb") {
 			if ($family->show_changes && $family->husbold_id != "") {
-				$style = " change_old";
+				$style = " ChangeOld";
 				print "<tr><td class=\"FactLabelCell".$style."\">";
 				print "&nbsp;</td>"; // No relation for former wives
 				print "<td class=\"".$this->getPersonStyle($family->husbold).$style."\">";
@@ -872,7 +871,7 @@ abstract class DetailController extends BaseController{
 			}
 			if ($family->husb_id != "") {
 				$style = "";
-				if ($this->show_changes && $family->husb_status != "") $style = " change_new";
+				if ($this->show_changes && $family->husb_status != "") $style = " ChangeNew";
 				print "<tr><td class=\"FactLabelCell".$style."\">";
 				print "<span class=\"FactLabelCellText\">".$family->husb->label[$family->xref]."</span></td>";
 				print "<td class=\"".$this->getPersonStyle($family->husb).$style."\">";
@@ -883,7 +882,7 @@ abstract class DetailController extends BaseController{
 		}
 		if ($suppress != "wife") {
 			if ($family->show_changes && $family->wifeold_id != "") {
-				$style = " change_old";
+				$style = " ChangeOld";
 				print "<tr><td class=\"FactLabelCell".$style."\">";
 				print "&nbsp;</td>"; // No relation for former husbands
 				print "<td class=\"".$this->getPersonStyle($family->wifeold).$style."\">";
@@ -893,7 +892,7 @@ abstract class DetailController extends BaseController{
 			}
 			if ($family->wife_id != "") {
 				$style = "";
-				if ($this->show_changes && $family->wife_status != "") $style = " change_new";
+				if ($this->show_changes && $family->wife_status != "") $style = " ChangeNew";
 				print "<tr><td class=\"FactLabelCell".$style."\">";
 				print "<span class=\"FactLabelCellText\">".$family->wife->label[$family->xref]."</span></td>";
 				print "<td class=\"".$this->getPersonStyle($family->wife).$style."\">";
@@ -912,8 +911,8 @@ abstract class DetailController extends BaseController{
 			if (isset($child->label[$family->xref])) {
 				$style = "";
 				if ($child->show_changes) {
-					if ($family->child_status[$childid] == "new") $style = " change_new";
-					elseif ($family->child_status[$childid] == "deleted") $style = " change_old";
+					if ($family->child_status[$childid] == "new") $style = " ChangeNew";
+					elseif ($family->child_status[$childid] == "deleted") $style = " ChangeOld";
 				}
 				print "<tr><td class=\"FactLabelCell".$style."\">";
 				print "<span class=\"FactLabelCellText\">".$child->label[$family->xref]."</span></td>";

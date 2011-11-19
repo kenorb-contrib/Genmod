@@ -51,7 +51,6 @@ PrintSimpleHeader(GM_LANG_edit_news);
 if (empty($uname)) $uname = get_gedcom_from_id(GedcomConfig::$GEDCOMID);
 
 if ($action=="compose") {
-	print '<span class="SubHeader">'.GM_LANG_edit_news.'</span>';
 	?>
 	<script language="JavaScript" type="text/javascript">
 	<!--
@@ -74,7 +73,7 @@ if ($action=="compose") {
 	//-->
 	</script>
 	<?php
-	print "<br /><form name=\"messageform\" method=\"post\" onsubmit=\"return checkForm(this);";
+	print "<form name=\"messageform\" method=\"post\" onsubmit=\"return checkForm(this);";
 	print "\">\n";
 	if (isset($news_id)) {
 		$news = NewsController::getNewsItem($news_id);
@@ -91,29 +90,30 @@ if ($action=="compose") {
 	print "<input type=\"hidden\" name=\"uname\" value=\"".$news->username."\" />\n";
 	print "<input type=\"hidden\" name=\"news_id\" value=\"".$news->id."\" />\n";
 	print "<input type=\"hidden\" name=\"date\" value=\"".$news->date."\" />\n";
-	print "<table>\n";
-	print "<tr><td align=\"right\">".GM_LANG_title."</td><td><input type=\"text\" name=\"title\" size=\"50\" value=\"".$news->title."\" /><br /></td></tr>\n";
-	print "<tr><td valign=\"top\" align=\"right\">".GM_LANG_article_text."<br /></td>";
-	print "<td>";
-	if ($useCK) { // use CKeditor module
-		$trans = get_html_translation_table(HTML_SPECIALCHARS);
-		$trans = array_flip($trans);
-		$news->text = strtr($news->text, $trans);
-//		$news->text = nl2br($news->text); This causes extra line breaks in CKEditor!
-		
-		?><script type="text/javascript" src="modules/CKEditor/ckeditor.js"></script><?php
-		$oCKeditor = new CKEditor();
-		$oCKeditor->BasePath = 'modules/CKEditor/';
-		$oCKeditor->config["height"] = 450;
-		$oCKEditor->config["enterMode"] = "br";
-		$oCKEditor->config["ShiftEnterMode"] = "p";
-		$oCKeditor->config['language'] = $language_settings[$LANGUAGE]["lang_short_cut"];
-		$oCKeditor->editor("text", $news->text) ;
-	} else { //use standard textarea
-		print "<textarea name=\"text\" cols=\"80\" rows=\"10\">".$news->text."</textarea>";
-	}
-	print "<br /></td></tr>\n";
-	print "<tr><td></td><td><input type=\"submit\"  value=\"".GM_LANG_save."\" /></td></tr>\n";
+	print "<table class=\"NavBlockTable\">\n";
+		print "<tr><td colspan=\"2\" class=\"NavBlockHeader\">".GM_LANG_edit_news."</td>";
+		print "<tr><td class=\"NavBlockLabel\">".GM_LANG_title."</td><td class=\"NavBlockField\"><input type=\"text\" name=\"title\" size=\"50\" value=\"".$news->title."\" /><br /></td></tr>\n";
+		print "<tr><td class=\"NavBlockLabel\">".GM_LANG_article_text."</td>";
+		print "<td class=\"NavBlockField\">";
+		if ($useCK) { // use CKeditor module
+			$trans = get_html_translation_table(HTML_SPECIALCHARS);
+			$trans = array_flip($trans);
+			$news->text = strtr($news->text, $trans);
+	//		$news->text = nl2br($news->text); This causes extra line breaks in CKEditor!
+			
+			?><script type="text/javascript" src="modules/CKEditor/ckeditor.js"></script><?php
+			$oCKeditor = new CKEditor();
+			$oCKeditor->BasePath = 'modules/CKEditor/';
+			$oCKeditor->config["height"] = 450;
+			$oCKEditor->config["enterMode"] = "br";
+			$oCKEditor->config["ShiftEnterMode"] = "p";
+			$oCKeditor->config['language'] = $language_settings[$LANGUAGE]["lang_short_cut"];
+			$oCKeditor->editor("text", $news->text) ;
+		} else { //use standard textarea
+			print "<textarea name=\"text\" cols=\"80\" rows=\"10\">".$news->text."</textarea>";
+		}
+		print "</td></tr>\n";
+		print "<tr><td class=\"NavBlockFooter\" colspan=\"2\"><input type=\"submit\"  value=\"".GM_LANG_save."\" /></td></tr>\n";
 	print "</table>\n";
 	print "</form>\n";
 }
@@ -134,7 +134,7 @@ else if ($action=="save") {
 else if ($action=="delete") {
 	if (NewsController::DeleteNews($news_id)) print GM_LANG_news_deleted;
 }
-print "<center><br /><br /><a href=\"#\" onclick=\"if (window.opener.refreshpage) window.opener.refreshpage(); window.close();\">".GM_LANG_close_window."</a><br /></center>";
+print "<div class=\"CloseWindow\"><a href=\"#\" onclick=\"if (window.opener.refreshpage) window.opener.refreshpage(); window.close();\">".GM_LANG_close_window."</a></div>";
 
 PrintSimpleFooter();
 ?>

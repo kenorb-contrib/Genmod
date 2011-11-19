@@ -183,7 +183,7 @@ class IndilistController extends ListController {
 			$firstalpha = $this->GetLetterBar(false);
 			
 			// NOTE: Print the second alpha letter list for the unknown names
-			print "<br /><div class=\"shade1 list_value center\" style=\"width:auto; margin: 0 auto 0 auto;\">\n";
+			print "<div class=\"IndiFamLetterBar\">\n";
 			PrintHelpLink("firstname_alpha_help", "qm");
 			print GM_LANG_first_letter_fname."<br />\n";
 			$first = true;
@@ -207,7 +207,7 @@ class IndilistController extends ListController {
 					if ($this->allgeds == "yes") print "&amp;allgeds=yes";
 					print "\">";
 					// NOTE: Red color for the chosen letter otherwise simply print the letter
-					if ($this->falpha == $letter && $this->show_all_firstnames == "no") print "<span class=\"warning\">".htmlspecialchars($letter)."</span>";
+					if ($this->falpha == $letter && $this->show_all_firstnames == "no") print "<span class=\"Warning\">".htmlspecialchars($letter)."</span>";
 					else print htmlspecialchars($letter);
 					print "</a>\n";
 				}
@@ -222,7 +222,7 @@ class IndilistController extends ListController {
 				if ($this->surname_sublist == "yes" && !empty($this->surname)) print "surname=".$this->surname."&amp;";
 				print "alpha=".urlencode($this->alpha)."&amp;falpha=@&amp;surname_sublist=".$this->surname_sublist."&amp;show_all=".$this->show_all;
 				if ($this->allgeds == "yes") print "&amp;allgeds=yes";
-				if (!empty($this->falpha) && $this->falpha == "@") print "\"><span class=\"warning\">".PrintReady(GM_LANG_NN)."</span></a>\n";
+				if (!empty($this->falpha) && $this->falpha == "@") print "\"><span class=\"Warning\">".PrintReady(GM_LANG_NN)."</span></a>\n";
 				else print "\">".PrintReady(GM_LANG_NN)."</a>\n";
 			$pass = false;
 			}
@@ -236,11 +236,10 @@ class IndilistController extends ListController {
 				// NOTE: Include the surname if surnames are to be listed
 				if ($this->allgeds == "yes") print "&amp;allgeds=yes&amp;";
 				if ($this->surname_sublist == "yes" && !empty($this->surname)) print "surname=".urlencode($this->surname)."&amp;";
-				if ($this->show_all_firstnames == "yes") print "show_all_firstnames=no&amp;show_all=".$this->show_all."&amp;surname_sublist=".$this->surname_sublist."\"><span class=\"warning\">".GM_LANG_all."</span></a>\n";
+				if ($this->show_all_firstnames == "yes") print "show_all_firstnames=no&amp;show_all=".$this->show_all."&amp;surname_sublist=".$this->surname_sublist."\"><span class=\"Warning\">".GM_LANG_all."</span></a>\n";
 				else print "show_all_firstnames=yes&amp;show_all=".$this->show_all."&amp;surname_sublist=".$this->surname_sublist."\">".GM_LANG_all."</a>\n";
 			}
-			print "</div><br />\n";
-			print "<div class=\"topbar\">".GM_LANG_individual_list."</div>\n";
+			print "</div>\n";
 			
 			if (isset($fstartalpha)) $this->falpha = $fstartalpha;
 			// NOTE: Get only the names who start with the matching first letter. This is the case if no firstletter is chosen yet, and the list must be split because of the number of records found.
@@ -280,8 +279,25 @@ class IndilistController extends ListController {
 			$total_indis = count($personlist);
 			$count = count($names);
 			$i=0;
-			print "<table class=\"center ".$TEXT_DIRECTION."\"><tr>";
-			print "<td class=\"shade1 list_value indilist $TEXT_DIRECTION\"><ul>\n";
+			print "<table class=\"ListTable IndiFamListTable\">";
+			print "<tr><td class=\"ListTableHeader\" colspan=\"2\">";
+			// List with a specific surname
+			if (stristr(SCRIPT_NAME,"unlinked.php")) print GM_LANG_individual_list;
+			else if ($this->surname_sublist == "yes" && $this->surname != "") {
+				print PrintReady(str_replace("#surname#", NameFunctions::CheckNN($this->surname), GM_LANG_indis_with_surname));
+			}
+			else if ($this->show_all == "no") {
+				// All persons with a surname with a specific letter 
+				print PrintReady(str_replace("#letter#", ($this->alpha == "@" ? GM_LANG_NN : htmlspecialchars($this->alpha)), GM_LANG_indis_with_surname_letter));
+			}
+			else {
+				print PrintReady(str_replace("#letter#", ($this->falpha == "@" ? GM_LANG_PN : htmlspecialchars($this->falpha)), GM_LANG_indis_with_fistname_letter));
+			}
+//			if ($this->surname_sublist == "yes" && $this->surname == "") print GM_LANG_surnames;
+//			else print PrintReady(str_replace("#surname#", NameFunctions::CheckNN($this->surname), GM_LANG_indis_with_surname));
+			print "</td></tr>";
+			// Before we start printing, we first count the lines of printed individuals
+			$printcount = 0;
 			foreach($names as $indexval => $namearray) {
 				$person = $personlist[$namearray[1]];
 				if (stristr(SCRIPT_NAME,"aliveinyear.php")) {
@@ -290,19 +306,42 @@ class IndilistController extends ListController {
 					else if ($this->CheckAlive($person) == -2) $indi_unknown[$person->key] = true;
 					else {
 						$indi_alive[$person->key] = true;
-						if (!$person->PrintListPerson(true, false, "", $namearray[2])) $indi_private[$person->key] = true;
+						if (!$person->disp) $indi_private[$person->key] = true;
+						else $printcount++;
 					}
 				}
 				else {
-					if (!$person->PrintListPerson(true, false, "", $namearray[2])) {
-						$indi_private[$person->key] = true;
+					if (!$person->disp_name) $indi_private[$person->key] = true;
+					else $printcount++;
+				}
+			}
+			// Only print the table if we have anything to print
+			$cols = 1;
+			if ($printcount > 0) {
+				print "<tr><td class=\"ListTableContent IndiFamListTableContent\"><ul>\n";
+				foreach($names as $indexval => $namearray) {
+					$person = $personlist[$namearray[1]];
+					if (stristr(SCRIPT_NAME,"aliveinyear.php")) {
+						if (isset($indi_alive[$person->key]) && !isset($indi_private[$person->key])) {
+							$person->PrintListPerson(true, false, "", $namearray[2]);
+							$i++;
+						}
+					}
+					else {
+						if (!isset($indi_private[$person->key])) {
+							$person->PrintListPerson(true, false, "", $namearray[2]);
+							$i++;
+						}
+					}
+					// This is passed multiple times without changing $i, if persons are hidden. Therefore we must track the col
+					if ($i==ceil($printcount/2) && $printcount>8 && $cols < 2) {
+						print "</ul></td><td class=\"ListTableContent IndiFamListTableContent\"><ul>\n";
+						$cols++;
 					}
 				}
-				$i++;
-				if ($i==ceil($count/2) && $count>8) print "</ul></td><td class=\"shade1 list_value indilist $TEXT_DIRECTION\"><ul>\n";			
+				print "</ul></td></tr>\n";
 			}
-			print "</ul></td>\n";
-			print "</tr><tr><td colspan=\"2\" class=\"center\">";
+			print "<tr><td colspan=\"".$cols."\" class=\"ListTableColumnFooter\">";
 			if (GedcomConfig::$SHOW_MARRIED_NAMES) print GM_LANG_total_names." ".count($names)."<br />\n";
 			print GM_LANG_total_indis." ".$total_indis;
 			if (count($indi_private)>0) {
@@ -319,7 +358,8 @@ class IndilistController extends ListController {
 			print "</tr></table>";
 		}
 	}
-	
+	// Check the alive status of a person IN A SPECIFIC YEAR
+	// This means that DEAT Y must be ignored as it's only true at the present moment
 	private function CheckAlive($person) {
 		global $MAX_ALIVE_AGE;
 		static $alive;

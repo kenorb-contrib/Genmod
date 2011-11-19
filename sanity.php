@@ -62,41 +62,64 @@ $warn_icon = "<img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["log"]["warning"]."\" alt
 $error_icon = "<img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["log"]["error"]."\" alt=\"".GM_LANG_error."\" />&nbsp;";
 ?>
 <!-- Setup the left box -->
-<div id="admin_genmod_left">
-	<div class="admin_link"><a href="admin.php"><?php print GM_LANG_admin;?></a></div>
-	<div class="admin_link"><a href="admin_maint.php"><?php print GM_LANG_administration_maintenance;?></a></div>
-	<?php if (!empty($action)) { ?><div class="admin_link"><a href="sanity.php"><?php print GM_LANG_sc_sanity_check;?></a></div><?php } ?>
+<div id="AdminColumnLeft">
+	<?php AdminFunctions::AdminLink("admin.php", GM_LANG_admin); ?>
+	<?php AdminFunctions::AdminLink("admin_maint.php", GM_LANG_administration_maintenance); ?>
+	<?php if (!empty($action)) { 
+		AdminFunctions::AdminLink("sanity.php", GM_LANG_sc_sanity_check);
+	} ?>
 </div>
-<div id="content">
-	<div class="admin_topbottombar">
-		<h3><?php print GM_LANG_sc_sanity_check;?></h3>
-	</div>
+<div id="AdminColumnMiddle">
+	<form action="<?php print SCRIPT_NAME; ?>" method="post">
+	<table class="NavBlockTable AdminNavBlockTable">
+		<tr>
+			<td colspan="2" class="NavBlockHeader AdminNavBlockHeader"><div class="AdminNavBlockTitle"><?php print GM_LANG_sc_sanity_check;?></div></td>
+		</tr>
 <?php
 // Display the options menu
 if (empty($action)) {
 	?>
 
-	<form action="<?php print SCRIPT_NAME; ?>" method="post">
 	<input type="hidden" name="action" value="checksanity" />
-	<table class="width100">
-		<tr><td colspan="2" class="topbottombar"><?php print GM_LANG_options; ?></td></tr>
-		<tr><td class="shade2"><?php print GM_LANG_sc_check_components; ?></td><td class="shade1"><input type="checkbox" name="check_components" value="yes" /></td></tr>
-		<tr><td class="shade2"><?php print GM_LANG_sc_check_sys_settings; ?></td><td class="shade1"><input type="checkbox" name="check_settings" value="yes" /></td></tr>
-		<tr><td class="shade2"><?php print GM_LANG_sc_check_oldgeds; ?></td><td class="shade1"><input type="checkbox" name="check_oldgeds" value="yes" /></td></tr>
+		<tr>
+			<td colspan="2" class="NavBlockHeader"><?php print GM_LANG_options; ?></td>
+		</tr>
+		<tr>
+			<td class="NavBlockLabel AdminNavBlockLabel"><?php print GM_LANG_sc_check_components; ?></td>
+			<td class="NavBlockField AdminNavBlockField"><input type="checkbox" name="check_components" value="yes" /></td>
+		</tr>
+		<tr>
+			<td class="NavBlockLabel AdminNavBlockLabel"><?php print GM_LANG_sc_check_sys_settings; ?></td>
+			<td class="NavBlockField AdminNavBlockField"><input type="checkbox" name="check_settings" value="yes" /></td>
+		</tr>
+		<tr>
+			<td class="NavBlockLabel AdminNavBlockLabel"><?php print GM_LANG_sc_check_oldgeds; ?></td>
+			<td class="NavBlockField AdminNavBlockField"><input type="checkbox" name="check_oldgeds" value="yes" /></td>
+		</tr>
 		<?php if (count($GEDCOMS) > 0) { ?>
-		<tr><td class="shade2"><?php print GM_LANG_sc_ged_sets; ?></td><td class="shade1"><?php
-		foreach($GEDCOMS as $ged => $value) {
-			print "<span style=\"vertical-align: 25%\"><input type=\"checkbox\" name=\"check_gedcoms".$value["id"]."\" value=\"yes\" />&nbsp;".$value["title"]."</span><br />";
-		}
-		print "<span style=\"vertical-align: 25%\">".GM_LANG_options."</span><br />";
-		print "<span style=\"vertical-align: 25%\"><input type=\"checkbox\" name=\"check_gedtags\" value=\"yes\" />&nbsp;".GM_LANG_sc_check_gedtags."</span><br />";
-		print "<span style=\"vertical-align: 25%\"><input type=\"checkbox\" name=\"check_cits\" value=\"yes\" />&nbsp;".GM_LANG_sc_cits."</span><br />";
-		print "<span style=\"vertical-align: 25%\"><input type=\"checkbox\" name=\"check_unlinked\" value=\"yes\" />&nbsp;".GM_LANG_sc_ged_displ_unlinked."</span><br />";
-		?></td></tr><?php } ?>
-		<tr><td class="shade2"><?php print GM_LANG_sc_fs_security; ?></td><td class="shade1"><input type="checkbox" name="check_filesys" value="yes" /></td></tr>
-		<tr><td style="padding: 5px" colspan="2" class="center"><span style="vertical-align: 25%"><button type="submit" name="submit"><?php print GM_LANG_sc_start; ?></button>
-		</span></td></tr>
-	</table></form><br /><br />
+			<tr>
+				<td class="NavBlockLabel AdminNavBlockLabel"><?php print GM_LANG_sc_ged_sets; ?></td>
+				<td class="NavBlockField AdminNavBlockField"><?php
+					foreach($GEDCOMS as $ged => $value) {
+						print "<input type=\"checkbox\" name=\"check_gedcoms".$value["id"]."\" value=\"yes\" />&nbsp;".$value["title"]."<br />";
+					}
+					print "<div class=\"Indent\">".GM_LANG_options."</div>";
+					print "<div class=\"Indent\"><input type=\"checkbox\" name=\"check_gedtags\" value=\"yes\" />&nbsp;".GM_LANG_sc_check_gedtags."</div>";
+					print "<div class=\"Indent\"><input type=\"checkbox\" name=\"check_cits\" value=\"yes\" />&nbsp;".GM_LANG_sc_cits."</div>";
+					print "<div class=\"Indent\"><input type=\"checkbox\" name=\"check_unlinked\" value=\"yes\" />&nbsp;".GM_LANG_sc_ged_displ_unlinked."</div>";
+					?>
+				</td>
+			</tr>
+		<?php } ?>
+		<tr>
+			<td class="NavBlockLabel AdminNavBlockLabel"><?php print GM_LANG_sc_fs_security; ?></td>
+			<td class="NavBlockField AdminNavBlockField"><input type="checkbox" name="check_filesys" value="yes" /></td>
+		</tr>
+		<tr>
+			<td class="NavBlockFooter" colspan="2"><button type="submit" name="submit"><?php print GM_LANG_sc_start; ?></button></td>
+		</tr>
+	</table>
+	</form>
 	</div>
 	<?php
 	PrintFooter();
@@ -130,20 +153,19 @@ $boolean["1"] = "1";
 $boolean["0"] = "0";
 
 //-- print header lines
-print "<table class=\"width100\">";
 if (!empty($check_components)) {
 	//-- Platform components
-	print "<tr><td colspan=\"2\" class=\"topbottombar\">".GM_LANG_sc_check_components."</td></tr>";
-	print "<tr><td class=\"shade2 center\">".GM_LANG_sc_check."</td><td class=\"shade2 center\">".GM_LANG_sc_result."</td></tr>";
+	print "<tr><td colspan=\"2\" class=\"NavBlockHeader\">".GM_LANG_sc_check_components."</td></tr>";
+	print "<tr><td class=\"NavBlockColumnHeader AdminNavBlockColumnHeader\">".GM_LANG_sc_check."</td><td class=\"NavBlockColumnHeader AdminNavBlockColumnHeader\">".GM_LANG_sc_result."</td></tr>";
 
 		// Check versions
 		// PHP
-		print "<tr><td class=\"shade1\">".GM_LANG_sc_php."</td><td class=\"shade1 wrap\">";
+		print "<tr><td class=\"NavBlockLabel AdminNavBlockLabel\">".GM_LANG_sc_php."</td><td class=\"NavBlockLabel AdminNavBlockLabel\">";
 		if (phpversion()< $min_php_version) print $error_icon.GM_LANG_sc_php_low."<br />".GM_LANG_sc_ver_req." ".$min_php_version;
 		else print $info_icon.GM_LANG_sc_ok;
 		print "<br />".GM_LANG_sc_ver_found." ".phpversion()."</td></tr>";
 		// Presence of GD
-		print "<tr><td class=\"shade1\">".GM_LANG_sc_gd."</td><td class=\"shade1\">";
+		print "<tr><td class=\"NavBlockLabel AdminNavBlockLabel\">".GM_LANG_sc_gd."</td><td class=\"NavBlockLabel AdminNavBlockLabel\">";
 		if (!defined("IMG_ARC_PIE")) print $warn_icon.GM_LANG_sc_gd_missing;
 		else {
 			print $info_icon.GM_LANG_sc_ok."<br />".GM_LANG_sc_ver_found." ";
@@ -153,7 +175,7 @@ if (!empty($check_components)) {
 		print "</td></tr>";
 
 		// MySQL
-		print "<tr><td class=\"shade1\">".GM_LANG_sc_mysql."</td><td class=\"shade1 wrap\">";
+		print "<tr><td class=\"NavBlockLabel AdminNavBlockLabel\">".GM_LANG_sc_mysql."</td><td class=\"NavBlockLabel AdminNavBlockLabel\">";
 		if (substr(mysql_get_server_info(), 0, strlen($min_mysql_version)) < $min_mysql_version) print $error_icon.GM_LANG_sc_mysql_low."<br />".GM_LANG_sc_ver_req." ".$min_mysql_version;
 		else print $info_icon.GM_LANG_sc_ok;
 		print "<br />".GM_LANG_sc_ver_found." ".mysql_get_server_info()."</td></tr>";
@@ -161,11 +183,11 @@ if (!empty($check_components)) {
 
 if (!empty($check_settings)) {
 	//-- PHP and MySQL settings
-	print "<tr><td colspan=\"2\" class=\"topbottombar\">".GM_LANG_sc_check_sys_settings."</td></tr>";
-	print "<tr><td class=\"shade2 center\">".GM_LANG_sc_check."</td><td class=\"shade2 center\">".GM_LANG_sc_result."</td></tr>";
+	print "<tr><td colspan=\"2\" class=\"NavBlockHeader\">".GM_LANG_sc_check_sys_settings."</td></tr>";
+	print "<tr><td class=\"NavBlockColumnHeader AdminNavBlockColumnHeader\">".GM_LANG_sc_check."</td><td class=\"NavBlockColumnHeader AdminNavBlockColumnHeader\">".GM_LANG_sc_result."</td></tr>";
 	
 		// PHP ini settings
-		print "<tr><td class=\"shade1\">".GM_LANG_sc_php_ini."</td><td class=\"shade1 wrap\">";
+		print "<tr><td class=\"NavBlockLabel AdminNavBlockLabel\">".GM_LANG_sc_php_ini."</td><td class=\"NavBlockLabel AdminNavBlockLabel\">";
 		$error_printed = false;
 		foreach($php_ini_settings as $setting => $value) {
 			$equal = false;
@@ -195,7 +217,7 @@ if (!empty($check_settings)) {
 		print "</td></tr>";
 		
 		// MySQL connect user rights
-		print "<tr><td class=\"shade1\">".GM_LANG_sc_mysql_user."</td><td class=\"shade1 wrap\">";
+		print "<tr><td class=\"NavBlockLabel AdminNavBlockLabel\">".GM_LANG_sc_mysql_user."</td><td class=\"NavBlockLabel AdminNavBlockLabel\">";
 		$res = NewQuery("DROP TABLE ".TBLPREFIX."testsanity", true);
 		$res = NewQuery("CREATE TABLE ".TBLPREFIX."testsanity (s_text VARCHAR(255))", true);
 		if (!$res) print $error_icon.GM_LANG_sc_no_rights;
@@ -235,7 +257,7 @@ if (!empty($check_settings)) {
 		print "</td></tr>";
 
 		// Obsolete MySQL user rights
-		print "<tr><td class=\"shade1\">".GM_LANG_sc_mysql_user_obs."</td><td class=\"shade1 wrap\">";
+		print "<tr><td class=\"NavBlockLabel AdminNavBlockLabel\">".GM_LANG_sc_mysql_user_obs."</td><td class=\"NavBlockLabel AdminNavBlockLabel\">";
 		$errors = false;
 		$res = NewQuery("SELECT * FROM MYSQL.USER", true);
 		if ($res) {
@@ -271,7 +293,7 @@ if (!empty($check_settings)) {
 		print "</td></tr>";
 		
 		// MySQL table optimization
-		print "<tr><td class=\"shade1\">".GM_LANG_sc_opt_tables."</td><td class=\"shade1 wrap\">";
+		print "<tr><td class=\"NavBlockLabel AdminNavBlockLabel\">".GM_LANG_sc_opt_tables."</td><td class=\"NavBlockLabel AdminNavBlockLabel\">";
 		$errors = false;
 		$res = NewQuery("SHOW TABLES", true);
 		if (!$res) print $warn_icon.GM_LANG_sc_opt_cannot;
@@ -291,9 +313,9 @@ if (!empty($check_settings)) {
 if (!empty($check_oldgeds)) {
 	
 	//-- Old gedcom id's: the gedcoms table is leading here
-	print "<tr><td colspan=\"2\" class=\"topbottombar\">".GM_LANG_sc_check_oldgeds."</td></tr>";
-	print "<tr><td class=\"shade2 center\">".GM_LANG_sc_check."</td><td class=\"shade2 center\">".GM_LANG_sc_result."</td></tr>";
-	print "<tr><td class=\"shade1\">".GM_LANG_sc_check_invgeds."</td><td class=\"shade1 wrap\">";
+	print "<tr><td colspan=\"2\" class=\"NavBlockHeader\">".GM_LANG_sc_check_oldgeds."</td></tr>";
+	print "<tr><td class=\"NavBlockColumnHeader AdminNavBlockColumnHeader\">".GM_LANG_sc_check."</td><td class=\"NavBlockColumnHeader AdminNavBlockColumnHeader\">".GM_LANG_sc_result."</td></tr>";
+	print "<tr><td class=\"NavBlockLabel AdminNavBlockLabel\">".GM_LANG_sc_check_invgeds."</td><td class=\"NavBlockLabel AdminNavBlockLabel\">";
 	$geds = array();
 	$ageds = array();
 	$gednames = array();
@@ -375,8 +397,8 @@ if (!empty($check_oldgeds)) {
 if (!empty($check_gedcoms)) {
 
 	//-- GEDCOM settings
-	print "<tr><td colspan=\"2\" class=\"topbottombar\">".GM_LANG_sc_ged_sets."</td></tr>";
-	print "<tr><td class=\"shade2 center\">".GM_LANG_sc_check."</td><td class=\"shade2 center\">".GM_LANG_sc_result."</td></tr>";
+	print "<tr><td colspan=\"2\" class=\"NavBlockHeader\">".GM_LANG_sc_ged_sets."</td></tr>";
+	print "<tr><td class=\"NavBlockColumnHeader AdminNavBlockColumnHeader\">".GM_LANG_sc_check."</td><td class=\"NavBlockColumnHeader AdminNavBlockColumnHeader\">".GM_LANG_sc_result."</td></tr>";
 	foreach ($GEDCOMS as $ged=>$value) {
 		$var = "check_gedcoms".$value["id"];
 		if (isset($$var)) {
@@ -386,7 +408,7 @@ if (!empty($check_gedcoms)) {
 			$lang = $LANGUAGE;
 			SwitchGedcom($ged);
 			$LANGUAGE = $lang;
-			print "<tr><td class=\"shade1 wrap\" rowspan=\"24\">".$value["title"]."</td><td class=\"shade1 wrap\">";
+			print "<tr><td class=\"NavBlockLabel AdminNavBlockLabel\" rowspan=\"24\">".$value["title"]."</td><td class=\"NavBlockLabel AdminNavBlockLabel\">";
 			// Get the partial indilist
 			$sql = "SELECT i_id, i_gedrec, i_file FROM ".TBLPREFIX."individuals WHERE i_file='".$id."'";
 			$res = NewQuery($sql);
@@ -521,7 +543,7 @@ if (!empty($check_gedcoms)) {
 			$non_cits_facts = array("CHAN", "NOTE", "SOUR", "FAMS", "FAMC", "_UID", "OBJE", "NAME", "SEX", "CHIL", "HUSB", "WIFE", "ASSO");
 			
 			// Check for reference to non existing sources for indi's
-			print "<tr><td class=\"shade1 wrap\">";
+			print "<tr><td class=\"NavBlockLabel AdminNavBlockLabel\">";
 			$error = false;
 			$num = 0;
 			foreach($indilist as $key=>$gedlines) {
@@ -597,7 +619,7 @@ if (!empty($check_gedcoms)) {
 			print "</td></tr>";
 					
 			// Check for ASSO/ALIA's that point to non existing indi's
-			print "<tr><td class=\"shade1 wrap\">";
+			print "<tr><td class=\"NavBlockLabel AdminNavBlockLabel\">";
 			$error = false;
 			$num = 0;
 			foreach($cirelalist as $key=>$gedlines) {
@@ -642,7 +664,7 @@ if (!empty($check_gedcoms)) {
 			print "</td></tr>";
 
 			// Check for reference to non existing sources for media
-			print "<tr><td class=\"shade1 wrap\">";
+			print "<tr><td class=\"NavBlockLabel AdminNavBlockLabel\">";
 			$error = false;
 			$num = 0;
 			foreach($cmedialist as $key=>$gedlines) {
@@ -694,7 +716,7 @@ if (!empty($check_gedcoms)) {
 			print "</td></tr>";
 			
 			// Check for reference to non existing sources for fams
-			print "<tr><td class=\"shade1 wrap\">";
+			print "<tr><td class=\"NavBlockLabel AdminNavBlockLabel\">";
 			$error = false;
 			$num = 0;
 			foreach($cfamlist as $key=>$gedlines) {
@@ -783,7 +805,7 @@ if (!empty($check_gedcoms)) {
 			print "</td></tr>";
 		
 			// Check for reference to non existing repo for sources
-			print "<tr><td class=\"shade1 wrap\">";
+			print "<tr><td class=\"NavBlockLabel AdminNavBlockLabel\">";
 			$error = false;
 			$num = 0;
 			foreach($sourcelist as $key=>$source) {
@@ -835,7 +857,7 @@ if (!empty($check_gedcoms)) {
 			print" </td></tr>";
 		
 			// Check for sources with no reference to a repository
-			print "<tr><td class=\"shade1 wrap\">";
+			print "<tr><td class=\"NavBlockLabel AdminNavBlockLabel\">";
 			$error = false;
 			$num = 0;
 			foreach($sourcelist as $key=>$source) {
@@ -858,7 +880,7 @@ if (!empty($check_gedcoms)) {
 			print" </td></tr>";
 		
 			// Check for unreferenced sources
-			print "<tr><td class=\"shade1 wrap\">";
+			print "<tr><td class=\"NavBlockLabel AdminNavBlockLabel\">";
 			$error = false;
 			$num = 0;
 			foreach($sourcelist as $sid=>$value) {
@@ -879,7 +901,7 @@ if (!empty($check_gedcoms)) {
 			print "</td></tr>";
 
 			// Check for unreferenced repositories
-			print "<tr><td class=\"shade1 wrap\">";
+			print "<tr><td class=\"NavBlockLabel AdminNavBlockLabel\">";
 			$error = false;
 			$num = 0;
 			foreach($crepolist as $rid=>$value) {
@@ -923,7 +945,7 @@ if (!empty($check_gedcoms)) {
 			print "</td></tr>";
 	
 			// Print the non-existent facts
-			print "<tr><td class=\"shade1 wrap\">";
+			print "<tr><td class=\"NavBlockLabel AdminNavBlockLabel\">";
 			if (!empty($check_gedtags)) {
 				if (count($wrongfacts) == 0) print $info_icon.GM_LANG_sc_nowrongfacts." ";
 				else {
@@ -961,7 +983,7 @@ if (!empty($check_gedcoms)) {
  			print "</td></tr>";
 			
 			// Print the records with no source citations
-			print "<tr><td class=\"shade1 wrap\">";
+			print "<tr><td class=\"NavBlockLabel AdminNavBlockLabel\">";
 			if (!empty($check_cits)) {
 				if (count($no_cits) == 0) print $info_icon.GM_LANG_sc_cits_ok." ";
 				else {
@@ -1011,7 +1033,7 @@ if (!empty($check_gedcoms)) {
  			// Also record the double pointers from one fam to the same indi
  			$double_fam_to_indi = array();
 			$error = false;
-			print "<tr><td class=\"shade1 wrap\">";
+			print "<tr><td class=\"NavBlockLabel AdminNavBlockLabel\">";
 			foreach($cfamlist as $key=>$fam) {
 				$s = preg_match_all("/\n1 CHIL @(.+)@/", $fam["gedcom"], $match, PREG_SET_ORDER);
 				if ($s) {
@@ -1068,7 +1090,7 @@ if (!empty($check_gedcoms)) {
 			$num = 0;
 			$error1 = false;
 			$error2 = false;
-			print "<tr><td class=\"shade1 wrap\">";
+			print "<tr><td class=\"NavBlockLabel AdminNavBlockLabel\">";
 			foreach($double_fam_to_indi as $fam => $indiarr) {
 				foreach($indiarr as $indi => $nothing) {
 					if (!$error1) {
@@ -1093,7 +1115,7 @@ if (!empty($check_gedcoms)) {
 			// Check for empty fams with no reference to any indi
 			$num = 0;
 			$error = false;
-			print "<tr><td class=\"shade1 wrap\">";
+			print "<tr><td class=\"NavBlockLabel AdminNavBlockLabel\">";
 			foreach($cfamlist as $key=>$cfam) {
 				$num++;
 				if (!isset($cfam["CHIL"]) && !isset($cfam["WIFE"]) && !isset($cfam["HUSB"])) {
@@ -1113,7 +1135,7 @@ if (!empty($check_gedcoms)) {
 			// Check the indi's for references to fams. If pair of references found, unset them.
 			$num = 0;
 			$error = false;
-			print "<tr><td class=\"shade1 wrap\">";
+			print "<tr><td class=\"NavBlockLabel AdminNavBlockLabel\">";
 			foreach($indilist as $key=>$cindi) {
 				foreach($cindi as $role=>$pointerarr) {
 					if ($role == "FAMS") {
@@ -1219,7 +1241,7 @@ if (!empty($check_gedcoms)) {
 			print "</td></tr>";
 			
 			// Check for reference to non existing 0 MM records from individuals
-			print "<tr><td class=\"shade1 wrap\">";
+			print "<tr><td class=\"NavBlockLabel AdminNavBlockLabel\">";
 			$error = false;
 			$num = 0;
 			foreach($indilist as $key=>$gedlines) {
@@ -1247,7 +1269,7 @@ if (!empty($check_gedcoms)) {
 			print "</td></tr>";
 			
 			// Check for reference to non existing 0 MM records from fams
-			print "<tr><td class=\"shade1 wrap\">";
+			print "<tr><td class=\"NavBlockLabel AdminNavBlockLabel\">";
 			$error = false;
 			$num = 0;
 			foreach($cfamlist as $key=>$gedlines) {
@@ -1275,7 +1297,7 @@ if (!empty($check_gedcoms)) {
 			print "</td></tr>";
 			
 			// Check for reference to non existing 0 MM records from sources
-			print "<tr><td class=\"shade1 wrap\">";
+			print "<tr><td class=\"NavBlockLabel AdminNavBlockLabel\">";
 			$error = false;
 			$num = 0;
 			foreach($sourcelist as $key=>$gedlines) {
@@ -1303,7 +1325,7 @@ if (!empty($check_gedcoms)) {
 			print "</td></tr>";
 
 			// Check for reference to non existing 0 MM records from repositories
-			print "<tr><td class=\"shade1 wrap\">";
+			print "<tr><td class=\"NavBlockLabel AdminNavBlockLabel\">";
 			$error = false;
 			$num = 0;
 			foreach($crepolist as $key=>$repo) {
@@ -1331,7 +1353,7 @@ if (!empty($check_gedcoms)) {
 			print "</td></tr>";
 			
 			// Check for unreferenced mediaitems
-			print "<tr><td class=\"shade1 wrap\">";
+			print "<tr><td class=\"NavBlockLabel AdminNavBlockLabel\">";
 			$error = false;
 			$num = 0;
 			foreach($cmedialist as $mid=>$value) {
@@ -1400,7 +1422,7 @@ if (!empty($check_gedcoms)) {
 			}
 
 			// Check if all references to files from MM exist
-			print "<tr><td class=\"shade1 wrap\">";
+			print "<tr><td class=\"NavBlockLabel AdminNavBlockLabel\">";
 			$error = false;
 			$num = 0;
 			foreach($cmedialist as $mid=>$value) {
@@ -1433,7 +1455,7 @@ if (!empty($check_gedcoms)) {
 			print "</td></tr>";
 			
 			// Check if all files are referenced to
-			print "<tr><td class=\"shade1 wrap\">";
+			print "<tr><td class=\"NavBlockLabel AdminNavBlockLabel\">";
 			$error = false;
 			$num = 0;
 			foreach($flist as $file=>$ref) {
@@ -1453,7 +1475,7 @@ if (!empty($check_gedcoms)) {
 			
 			// NOTE results
 			// Check on references to non existing notes
-			print "<tr><td class=\"shade1 wrap\">";
+			print "<tr><td class=\"NavBlockLabel AdminNavBlockLabel\">";
 			if (count($inv_noteref) == 0) {
 				print $info_icon.GM_LANG_sc_ok_noteref." ";
 			}
@@ -1497,7 +1519,7 @@ if (!empty($check_gedcoms)) {
 			print "</td></tr>";	
 			
 			// Check for unreferenced general notes
-			print "<tr><td class=\"shade1 wrap\">";
+			print "<tr><td class=\"NavBlockLabel AdminNavBlockLabel\">";
 			$error = false;
 			$num = 0;
 			foreach($cnotelist as $oid=>$value) {
@@ -1523,11 +1545,11 @@ if (!empty($check_gedcoms)) {
 if (!empty($check_filesys)) {
 		
 	//-- File system security
-	print "<tr><td colspan=\"2\" class=\"topbottombar\">".GM_LANG_sc_fs_security."</td></tr>";
-	print "<tr><td class=\"shade2 center\">".GM_LANG_sc_check."</td><td class=\"shade2 center\">".GM_LANG_sc_result."</td></tr>";
+	print "<tr><td colspan=\"2\" class=\"NavBlockHeader\">".GM_LANG_sc_fs_security."</td></tr>";
+	print "<tr><td class=\"NavBlockColumnHeader AdminNavBlockColumnHeader\">".GM_LANG_sc_check."</td><td class=\"NavBlockColumnHeader AdminNavBlockColumnHeader\">".GM_LANG_sc_result."</td></tr>";
 	
 		// Root dir
-		print "<tr><td class=\"shade1 wrap\">".GM_LANG_sc_fs_main."</td><td class=\"shade1 wrap\">";
+		print "<tr><td class=\"NavBlockLabel AdminNavBlockLabel\">".GM_LANG_sc_fs_main."</td><td class=\"NavBlockLabel AdminNavBlockLabel\">";
 		$dir = "includes/.."; // From PHP5 dir will not read ./ as the current dir. A workaround is to name a subdirectory and point back to the parent.
 		$errors1 = false;
 		if (MediaFS::DirIsWritable($dir, false)) {
@@ -1558,7 +1580,7 @@ if (!empty($check_filesys)) {
 		print "</td></tr>";
 		
 		// Index dir
-		print "<tr><td class=\"shade1 wrap\">".GM_LANG_sc_fs_index."</td><td class=\"shade1 wrap\">";
+		print "<tr><td class=\"NavBlockLabel AdminNavBlockLabel\">".GM_LANG_sc_fs_index."</td><td class=\"NavBlockLabel AdminNavBlockLabel\">";
 		$dir = INDEX_DIRECTORY;
 		$errors1 = false;
 		if (!MediaFS::DirIsWritable($dir, false)) {
@@ -1590,7 +1612,7 @@ if (!empty($check_filesys)) {
 		print "</td></tr>";
 		
 		// Languages directory
-		print "<tr><td class=\"shade1 wrap\">".GM_LANG_sc_fs_languages."</td><td class=\"shade1 wrap\">";
+		print "<tr><td class=\"NavBlockLabel AdminNavBlockLabel\">".GM_LANG_sc_fs_languages."</td><td class=\"NavBlockLabel AdminNavBlockLabel\">";
 		$dir = "./languages/";
 		$write1 = false;
 		$num = 0;
@@ -1617,7 +1639,7 @@ if (!empty($check_filesys)) {
 		// Media directories
 		// Check only if media is stored in the physical file system
 		if (!SystemConfig::$MEDIA_IN_DB) {
-			print "<tr><td class=\"shade1 wrap\">".GM_LANG_sc_fs_media."</td><td class=\"shade1 wrap\">";
+			print "<tr><td class=\"NavBlockLabel AdminNavBlockLabel\">".GM_LANG_sc_fs_media."</td><td class=\"NavBlockLabel AdminNavBlockLabel\">";
 			$res = NewQuery("SELECT gc_media_directory, gc_gedcomid FROM ".TBLPREFIX."gedconf");
 			if ($res) {
 				$dirs = array();
@@ -1640,7 +1662,7 @@ if (!empty($check_filesys)) {
 		}
 		else {
 			// If media is in DB, do a VFS sanity check instead
-			print "<tr><td class=\"shade1 wrap\">".GM_LANG_sc_fs_media."</td><td class=\"shade1 wrap\">";
+			print "<tr><td class=\"NavBlockLabel AdminNavBlockLabel\">".GM_LANG_sc_fs_media."</td><td class=\"NavBlockLabel AdminNavBlockLabel\">";
 			
 			// Get the arrays of filedir, filedata and thumbdata
 			$vferror = false;
@@ -1739,7 +1761,7 @@ if (!empty($check_filesys)) {
 			
 		
 		// All other files and dirs
-		print "<tr><td class=\"shade1 wrap\">".GM_LANG_sc_fs_other."</td><td class=\"shade1 wrap\">";
+		print "<tr><td class=\"NavBlockLabel AdminNavBlockLabel\">".GM_LANG_sc_fs_other."</td><td class=\"NavBlockLabel AdminNavBlockLabel\">";
 		$dirs = AdminFunctions::GetDirList(array("./blocks/", "./fonts/", "./hooks/", "./images/", "./includes/", "./modules/", "./places/", "./reports/", "./themes/", "./ufpdf/"));
 		$errors1 = false;
 		foreach ($dirs as $key=>$dir) {

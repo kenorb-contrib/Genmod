@@ -301,6 +301,7 @@ abstract class UserController {
 	public function AddUser($newuser, $msg = "added") {
 		global $USE_RELATIONSHIP_PRIVACY, $MAX_RELATION_PATH_LENGTH, $GEDCOMS;
 
+		$success = true;
 		if (!isset($newuser->auto_accept)) $newuser->auto_accept = "N";
 		$newuser->firstname = preg_replace("/\//", "", $newuser->firstname);
 		$newuser->lastname = preg_replace("/\//", "", $newuser->lastname);
@@ -355,15 +356,16 @@ abstract class UserController {
 				if (isset($newuser->show_living_names[$id])) $sql .= $newuser->show_living_names[$id]."')";
 				else $sql .= "')";
 				
-				$res = NewQuery($sql);
+				if (!$res = NewQuery($sql)) $success = false;
 			}
 			$activeuser = self::GetUserName();
 			if ($activeuser == "") $activeuser = "Anonymous user";
 			$newuser =& User::RenewInstance($newuser->username);
 			WriteToLog("UserController-&gt;AddUser-&gt; ".$activeuser." ".$msg." user -&gt; ".$newuser->username." &lt;-", "I", "S");
-			return true;
+
 		}
-		else return false;
+		else $success = false;
+		return $success;
 	}
 
 	/**

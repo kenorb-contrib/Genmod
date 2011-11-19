@@ -272,31 +272,35 @@ abstract class ListController extends BaseController {
 		$col = 1;
 		$this->count_names = count($surnames);
 		if ($this->count_names == 0) return;
-		else if ($this->count_names > 36) $col=4;
-		else if ($this->count_names > 18) $col=3;
+		else if ($this->count_names > 130) $col=5;
+		else if ($this->count_names > 54) $col=4;
+		else if ($this->count_names > 24) $col=3;
 		else if ($this->count_names > 6) $col=2;
 		$newcol = ceil($this->count_names/$col);
-		print "<table class=\"center $TEXT_DIRECTION\"><tr>";
-		print "<td class=\"shade1 list_value wrap\">\n";
+		print "<table class=\"ListTable IndiFamSurnameListTable\">";
+		print "<tr><td class=\"ListTableHeader\" colspan=\"".$col."\">";
+		print GM_LANG_surnames;
+		print "</td></tr><tr>";
+		print "<td class=\"ListTableContent\">\n";
 		
 		// Surnames with starting and ending letters in 2 text orientations is shown in
 		// a wrong way on the page with different orientation from the orientation of the first name letter
 		foreach($surnames as $surname=>$namecount) {
 			if (begRTLText($namecount["name"])) {
-	 			print "<div class =\"rtl\" dir=\"rtl\">&nbsp;<a href=\"".SCRIPT_NAME."?alpha=".urlencode($this->alpha)."&amp;surname_sublist=".$this->surname_sublist."&amp;surname=".urlencode($namecount["name"]).$resturl;
+	 			print "<div class =\"IndiFamSurnameLink\"><a href=\"".SCRIPT_NAME."?alpha=".urlencode($this->alpha)."&amp;surname_sublist=".$this->surname_sublist."&amp;surname=".urlencode($namecount["name"]).$resturl;
 	 			if ($this->allgeds == "yes") print "&amp;allgeds=yes";
-	 			print "\">&nbsp;";
+	 			print "\">";
 	 			if (NameFunctions::HasChinese($namecount["name"])) print PrintReady($namecount["name"]." (".NameFunctions::GetPinYin($namecount["name"]).")");
 	 			else print PrintReady($namecount["name"]);
 	 			print "&rlm; - [".($namecount["match"])."]&rlm;";
 			}
 			else if (substr($namecount["name"], 0, 4) == "@N.N") {
-				print "<div class =\"ltr\" dir=\"ltr\">&nbsp;<a href=\"".SCRIPT_NAME."?alpha=".urlencode($this->alpha)."&amp;surname_sublist=".$this->surname_sublist."&amp;surname=@N.N.".$resturl;
+				print "<div class =\"IndiFamSurnameLink\"><a href=\"".SCRIPT_NAME."?alpha=".urlencode($this->alpha)."&amp;surname_sublist=".$this->surname_sublist."&amp;surname=@N.N.".$resturl;
 	 			if ($this->allgeds == "yes") print "&amp;allgeds=yes";
-				print "\">&nbsp;".GM_LANG_NN . "&lrm; - [".($namecount["match"])."]&lrm;&nbsp;";
+				print "\">".GM_LANG_NN . "&lrm; - [".($namecount["match"])."]&lrm;";
 			}
 			else {
-				print "<div class =\"ltr\" dir=\"ltr\">&nbsp;<a href=\"".SCRIPT_NAME."?alpha=".urlencode($this->alpha)."&amp;surname_sublist=".$this->surname_sublist."&amp;surname=".urlencode($namecount["name"]).$resturl;
+				print "<div class =\"IndiFamSurnameLink\"><a href=\"".SCRIPT_NAME."?alpha=".urlencode($this->alpha)."&amp;surname_sublist=".$this->surname_sublist."&amp;surname=".urlencode($namecount["name"]).$resturl;
 	 			if ($this->allgeds == "yes") print "&amp;allgeds=yes";
 				print "\">";
 	 			if (NameFunctions::HasChinese($namecount["name"])) print PrintReady($namecount["name"]." (".NameFunctions::GetPinYin($namecount["name"]).")");
@@ -308,13 +312,13 @@ abstract class ListController extends BaseController {
 			$this->count_objs += $namecount["match"];
 			$i++;
 			if ($i==$newcol && $i < $this->count_names) {
-				print "</td><td class=\"shade1 list_value wrap\">\n";
+				print "</td><td class=\"ListTableContent\">\n";
 				$newcol = $i + ceil($this->count_names/$col);
 			}
 		}
 		print "</td>\n";
 		if ($this->count_names > 1) {
-			print "</tr><tr><td colspan=\"$col\" class=\"center\">&nbsp;";
+			print "</tr><tr><td colspan=\"$col\" class=\"ListTableColumnFooter\">";
 			print GM_LANG_total_names." ".$this->count_names."<br />";
 			if ($this->classname == "FamlistController") print GM_LANG_total_fams." ".round($this->count_objs/2,0);
 			else print GM_LANG_total_indis." ".$this->count_objs;

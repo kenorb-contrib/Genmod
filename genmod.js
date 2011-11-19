@@ -38,10 +38,9 @@ function showbox(startpos, layer, boxpid){
 		if (box == null) boxpid = 'relatives';
 		else box_width = box.offsetWidth;
 	}
-	
-	// Get all the positions
-	newY = findPosY(startpos);
-	newX = findPosX(startpos);
+	// Get all the positions and align the box nicely with the icon
+	newY = findPosY(startpos)-33;
+	newX = findPosX(startpos)-8;
 	pagewidth = document.body.clientWidth;
 	showbox_width = showbox.offsetWidth;
 	image_width = startpos.offsetWidth;
@@ -456,17 +455,17 @@ function expandbox(boxid, bstyle, random) {
 		fontdef = document.getElementById("fontdef-"+boxid);
 		if (fontdef) {
 			oldfont = fontdef.className;
-			fontdef.className = 'detailsZoom';
+			fontdef.className = 'PersonDetailsZoom';
 		}
 		namedef = document.getElementById("namedef-"+boxid);
 		if (namedef) {
 			oldname = namedef.className;
-			namedef.className = 'nameZoom';
+			namedef.className = 'PersonNameZoom';
 		}
 		addnamedef = document.getElementById("addnamedef-"+boxid);
 		if (addnamedef) {
 			oldaddname = addnamedef.className;
-			addnamedef.className = 'nameZoom';
+			addnamedef.className = 'PersonNameZoom';
 		}
 		if (thumb1) {
 			oldthumbdisp = thumb1.style.display;

@@ -45,7 +45,7 @@ print "<span class=\"PageTitleName\">".GM_LANG_actionlist."</span>\n\t";
 
 if ($view != "preview") {
 	print "\n\t<form name=\"actionlist\" action=\"actionlist.php\" method=\"post\">";
-	print "\n\t\t<table class=\"ListTable $TEXT_DIRECTION\">\n\t\t\t<tr>";
+	print "\n\t\t<table class=\"NavBlockTable\">\n\t\t\t<tr>";
 	// Upper options block
 	print "\n\t\t\t<td class=\"NavBlockHeader\" colspan=\"4\">".GM_LANG_choose."</td></tr>";
 	// Sort by part 1
@@ -83,7 +83,7 @@ if (count($actionlist) == 0) {
 	print "<span class=\"Error\">".GM_LANG_no_action_found."</span>";
 }
 else {
-	print "<table class=\"ListTable $TEXT_DIRECTION\">";
+	print "<table class=\"NavBlockTable\">";
 	print "\n\t\t\t<td class=\"NavBlockHeader\" colspan=\"4\">".GM_LANG_actionlist."</td></tr>";
 	if ($sort == "person") {
 		print "<tr><td class=\"ListTableColumnHeader\">".GM_LANG_action_for_id."</td><td class=\"ListTableColumnHeader\">".GM_LANG_repo."</td><td class=\"ListTableColumnHeader\">".GM_LANG_status."</td><td class=\"ListTableColumnHeader\">".GM_LANG_description."</td></tr>";

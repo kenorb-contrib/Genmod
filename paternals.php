@@ -38,62 +38,56 @@ if ($paternals_controller->show_full == false) {
 }
 
 // -- print html header information
-print "<div id=\"content_pedigree\" style=\"width:".$paternals_controller->pagewidth."px; min-width:100%;\">";
+print "<div id=\"content_paternals\" style=\"width:".$paternals_controller->pagewidth."px;\">";
 
-print "\n\t<span class=\"PageTitleName\">".GM_LANG_paternal_chart.": ";
+print "\n\t<div class=\"PageTitleName\">".GM_LANG_paternal_chart.": ";
 print PrintReady($paternals_controller->root->name);
 if ($paternals_controller->root->addname != "") print " (" . PrintReady($paternals_controller->root->addname).")";
-print "</span>";
+print "</div>";
 ?>
 
 <script language="JavaScript" type="text/javascript">
 <!--
-	var pasteto;
-	function open_find(textbox) {
-		pasteto = textbox;
-		findwin = window.open('find.php?type=indi', '', 'left=50,top=50,width=850,height=450,resizable=1,scrollbars=1');
-	}
+	var pastefield;
 	function paste_id(value) {
-		pasteto.value=value;
+		pastefield.value=value;
 	}
 //-->
 </script>
 
 <?php
 if ($paternals_controller->view != "preview") {
-	print "<form method=\"get\" name=\"people\" action=\"?\">\n";
-	print "\n\t\t<table class=\"ListTable ".$TEXT_DIRECTION."\" align=\"";
-	if ($TEXT_DIRECTION == "ltr") print "left";
-	else print "right";
-	print "\">";
-	
-	// Header
-	$paternals_controller->PrintInputHeader();
-	
-	// NOTE: rootid
-	$paternals_controller->PrintInputRootId();
-
-	// NOTE: line to follow
-	$paternals_controller->PrintInputLine();
-	
-	// NOTE: start at
-	$paternals_controller->PrintInputStart();
-
-	// NOTE: box width
-	$paternals_controller->PrintInputBoxWidth();
-	
-	// NOTE: show full
-	$paternals_controller->PrintInputShowFull();
-	
-	// Submit
-	$paternals_controller->PrintInputSubmit();
-	
-	print "</table>";
-	print "</form>\n";
+	print "<div class=\"PaternalsNavBlock\">";
+		print "<form method=\"get\" name=\"people\" action=\"?\">\n";
+			print "\n\t\t<table class=\"NavBlockTable PaternalsNavBlockTable\">";
+			
+			// Header
+			$paternals_controller->PrintInputHeader();
+			
+			// NOTE: rootid
+			$paternals_controller->PrintInputRootId();
+		
+			// NOTE: line to follow
+			$paternals_controller->PrintInputLine();
+			
+			// NOTE: start at
+			$paternals_controller->PrintInputStart();
+		
+			// NOTE: box width
+			$paternals_controller->PrintInputBoxWidth();
+			
+			// NOTE: show full
+			$paternals_controller->PrintInputShowFull();
+			
+			// Submit
+			$paternals_controller->PrintInputSubmit();
+			
+			print "</table>";
+		print "</form>\n";
+	print "</div>";
 }
 $paternals_controller->PrintPaternalLines();
 print "</div>\n";
-print "<br /><br />\n";
 
 PrintFooter();
 ?>

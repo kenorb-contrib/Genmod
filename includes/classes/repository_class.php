@@ -259,8 +259,8 @@ class Repository extends GedcomRecord {
 			else print "\n\t\t\t<li class=\"ltr\" dir=\"ltr\">";
 		}
 
-		if ($paste) print "<a href=\"#\" onclick=\"sndReq(document.getElementById('dummy'), 'lastused', 'type', '".$this->datatype."', 'id', '".$this->key."'); pasteid('".$this->xref."'); return false;\" class=\"list_item\">";
-		else print "<a href=\"repo.php?rid=".$this->xref."&amp;gedid=".$this->gedcomid."\" class=\"list_item\">";
+		if ($paste) print "<a href=\"#\" onclick=\"sndReq(document.getElementById('dummy'), 'lastused', false, 'type', '".$this->datatype."', 'id', '".$this->key."'); pasteid('".$this->xref."'); return false;\" class=\"ListItem\">";
+		else print "<a href=\"repo.php?rid=".$this->xref."&amp;gedid=".$this->gedcomid."\" class=\"ListItem\">";
 		if ($type == 1) print PrintReady($this->GetTitle());
 		else if ($type == 2) print PrintReady($this->GetRepoDescriptor());
 		else if ($type == 3) print PrintReady($this->GetAddRepoDescriptor());
@@ -269,12 +269,12 @@ class Repository extends GedcomRecord {
 		if ($prtact) {
 			$this->GetLinksFromActionCount();
 			if ($this->action_closed > 0) {
-				if ($TEXT_DIRECTION=="ltr") print "<span class=\"Error\"> &lrm;(".$this->action_closed.")&lrm;</span>";
-				else print "<span class=\"Error\"> &rlm;(".$this->action_closed.")&rlm;</span>";
+				if ($TEXT_DIRECTION=="ltr") print "<span class=\"ClosedAction\"> &lrm;(".$this->action_closed.")&lrm;</span>";
+				else print "<span class=\"ClosedAction\"> &rlm;(".$this->action_closed.")&rlm;</span>";
 			}
 			if ($this->action_open > 0) {
-				if ($TEXT_DIRECTION=="ltr") print "<span class=\"okay\"> &lrm;(".$this->action_open.")&lrm;</span>";
-				else print "<span class=\"okay\"> &rlm;(".$this->action_open.")&rlm;</span>";
+				if ($TEXT_DIRECTION=="ltr") print "<span class=\"OpenAction\"> &lrm;(".$this->action_open.")&lrm;</span>";
+				else print "<span class=\"OpenAction\"> &rlm;(".$this->action_open.")&rlm;</span>";
 			}
 		}			
 		if (!empty($fact)) {

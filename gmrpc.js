@@ -11,8 +11,9 @@ function createRequestObject() {
 
 var http = createRequestObject();
 var element_id;
+var action_value;
 
-function sndReq(element, action, param1, val1, param2, val2, param3, val3, param4, val4, param5, val5, param6, val6, param7, val7, param8, val8, param9, val9, param10, val10) {
+function sndReq(element, action, mode, param1, val1, param2, val2, param3, val3, param4, val4, param5, val5, param6, val6, param7, val7, param8, val8, param9, val9, param10, val10) {
 	param1 = typeof(param1) != 'undefined' ? param1 : "dummy1";
 	param2 = typeof(param2) != 'undefined' ? param2 : "dummy2";
 	param3 = typeof(param3) != 'undefined' ? param3 : "dummy3";
@@ -36,7 +37,7 @@ function sndReq(element, action, param1, val1, param2, val2, param3, val3, param
 	var randomnumber = Math.floor(Math.random()*1000001)
 	element_id = element;
 	action_value = action;
-    http.open('GET', 'gmrpc.php?action='+action+'&'+param1+'='+val1+'&'+param2+'='+val2+'&'+param3+'='+val3+'&'+param4+'='+val4+'&'+param5+'='+val5+'&'+param6+'='+val6+'&'+param7+'='+val7+'&'+param8+'='+val8+'&'+param9+'='+val9+'&'+param10+'='+val10+'&'+sessionname+'='+sessionid+'&wqp='+randomnumber, true);
+    http.open('GET', 'gmrpc.php?action='+action+'&'+param1+'='+val1+'&'+param2+'='+val2+'&'+param3+'='+val3+'&'+param4+'='+val4+'&'+param5+'='+val5+'&'+param6+'='+val6+'&'+param7+'='+val7+'&'+param8+'='+val8+'&'+param9+'='+val9+'&'+param10+'='+val10+'&'+sessionname+'='+sessionid+'&wqp='+randomnumber, mode);
     http.send(null);
     http.onreadystatechange = handleResponse;
 
@@ -45,6 +46,9 @@ function sndReq(element, action, param1, val1, param2, val2, param3, val3, param
 function handleResponse() {
     if(http.readyState == 4) {
         document.getElementById(element_id).innerHTML = http.responseText;
+        // Fix for IE not rendering the div after AJAX load
+        document.getElementById('GenmodContainer').style.display="none";
+        document.getElementById('GenmodContainer').style.display="block";
     }
    	else if (action_value != 'remembertab') document.getElementById(element_id).innerHTML = '<img src="images/ajax-loader.gif" />';
 }

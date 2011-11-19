@@ -39,7 +39,9 @@ if (!isset($help)) $help = "";
 */
 require ("helptext_vars.php");
 PrintSimpleHeader(GM_LANG_help_header);
-print "<a name=\"top\"></a><span class=\"helpheader\">".GM_LANG_help_header."</span><br /><br />\n<div class=\"left\">\n";
+print "<div id=\"HelpPage\">\n";
+print "<a name=\"top\"></a><div class=\"HelpHeader\">".GM_LANG_help_header."</div>\n";
+print "<div class=\"HelpContent\">\n";
 $actione = "";
 
 if (isset($action)) $actione = $action;
@@ -68,12 +70,13 @@ else {
 		}
 	}
 }
+print "\n</div>\n";
 
-print "\n</div><br style=\"clear:both;\" />\n";
-print "<div class=\"left\">";
-print "<a href=\"#top\" title=\"".GM_LANG_move_up."\">$UpArrow</a><br />";
-print "<a href=\"help_text.php?help=help_contents_help\"><b>".GM_LANG_help_contents."</b></a><br />";
-print "<a href=\"#\" onclick=\"window.close();\"><b>".GM_LANG_close_window."</b></a>";
+print "<div class=\"HelpFooter\">";
+print "<div class=\"HelpFooterLink\"><a href=\"#top\" title=\"".GM_LANG_move_up."\">$UpArrow</a></div>";
+print "<div class=\"HelpFooterLink\"><a href=\"help_text.php?help=help_contents_help\">".GM_LANG_help_contents."</a></div>";
+print "<div class=\"HelpFooterLink\"><a href=\"#\" onclick=\"window.close();\">".GM_LANG_close_window."</a></div>";
+print "<div class=\"ClearBoth;\">&nbsp;</div>";
 print "</div>";
 PrintSimpleFooter();
 ?>

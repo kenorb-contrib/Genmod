@@ -151,7 +151,7 @@ print "<br />";
 $ssp = session_save_path();
 if (0) {
 	if (!is_writable($ssp)) {
-		print "<span class=\"error\">".GM_LANG_session_cannot_start."</span>";
+		print "<span class=\"Error\">".GM_LANG_session_cannot_start."</span>";
 		print "<br />";
 		print GM_LANG_session_path.$ssp;
 		// NOTE: Delete session information since it cannot be written
@@ -170,7 +170,7 @@ if ($step == 1) {
 	
 	if (phpversion() < $min_php_version) {
 		print "<img src=\"images/nok.png\" alt=\"PHP version too low\"/> ";
-		print "<span class=\"error\">Genmod requires PHP version 4.3.0 or later.</b><br />\nYour server is running PHP version ".phpversion().". Please ask your server's Administrator to upgrade the PHP installation.</span>";
+		print "<span class=\"Error\">Genmod requires PHP version 4.3.0 or later.</b><br />\nYour server is running PHP version ".phpversion().". Please ask your server's Administrator to upgrade the PHP installation.</span>";
 		print "<br /><br />";
 		$setup_php = false;
 	}
@@ -188,7 +188,7 @@ if ($step == 1) {
 			if (!file_exists("../".$MEDIA_DIRECTORY."index.php")) {
 				$inddata = html_entity_decode("<?php\nheader(\"Location: ../medialist.php\");\nexit;\n?>");
 				$fp = @fopen("../".GedcomConfig::$MEDIA_DIRECTORY."index.php","w+");
-				if (!$fp) print "<span class=\"error\">".GM_LANG_security_no_create.GedcomConfig::$MEDIA_DIRECTORY."</span>";
+				if (!$fp) print "<span class=\"Error\">".GM_LANG_security_no_create.GedcomConfig::$MEDIA_DIRECTORY."</span>";
 				else {
 					// Write the index.php for the media folder
 					fputs($fp,$inddata);
@@ -208,7 +208,7 @@ if ($step == 1) {
 	}
 	else {
 		print "<img src=\"images/nok.png\" alt=\"Media structure NOK\"/> ";
-		print "<span class=\"error\">The media folder structure has been checked and not found OK. The media folder could not be created.</span><br />";
+		print "<span class=\"Error\">The media folder structure has been checked and not found OK. The media folder could not be created.</span><br />";
 	}
 	// Check if the thumbs folder exists
 	if (!is_dir("../".GedcomConfig::$MEDIA_DIRECTORY."thumbs")) {
@@ -237,7 +237,7 @@ if ($step == 1) {
 	}
 	else {
 		print "<img src=\"images/nok.png\" alt=\"Media structure NOK\"/> ";
-		print "<span class=\"error\">The thumbnail media folder structure has been checked and not found OK. The media folder could not be created.</span>";
+		print "<span class=\"Error\">The thumbnail media folder structure has been checked and not found OK. The media folder could not be created.</span>";
 	}
 	
 	if ($setup_php && $media && $thumbs) {
@@ -255,7 +255,7 @@ if ($step == 1) {
 		print "<img src=\"images/nok.png\" alt=\"Requirements not OK\"/> ";
 		print "Unable to continue. Please update your system so that you meet all requirements.";
 		print "<br /><br />";
-		print "<span class=\"error\">The installation has been terminated.</span>";
+		print "<span class=\"Error\">The installation has been terminated.</span>";
 	}
 }
 
@@ -264,41 +264,41 @@ if ($step == 2) {
 	print GM_LANG_step2;
 	print "<br /><br />";
 	
-	if (!empty($error)) print "<span class=\"error\">".$error."</span><br /><br />";
+	if (!empty($error)) print "<span class=\"Error\">".$error."</span><br /><br />";
 	print "<form method=\"post\" action=\"".$_SERVER["SCRIPT_NAME"]."\" name=\"loginform\">\n";
 	print "<input type=\"hidden\" name=\"step\" value=\"3\"/>";
-	print "<label class=\"label_form\">Database details</label><br style=\"clear: left;\"/>";
-	print "<label class=\"label_form\" for=\"DBHOST\">".GM_LANG_DBHOST."</label>";
-	print "<input class=\"input_form\" type=\"text\" id=\"DBHOST\" name=\"DBHOST\" value=\"";
+	print "<label class=\"InstallLabelForm\">Database details</label><br style=\"clear: left;\"/>";
+	print "<label class=\"InstallLabelForm\" for=\"DBHOST\">".GM_LANG_DBHOST."</label>";
+	print "<input class=\"InstallInputForm\" type=\"text\" id=\"DBHOST\" name=\"DBHOST\" value=\"";
 	if ($upgrade) print $newconfigparms[$LOCATION]["DBHOST"];
 	else print "localhost";
 	if (!isset($DBUSER)) $DBUSER = "";
 	if (!isset($DBPASS)) $DBPASS = "";
 	print "\" /><br style=\"clear: left;\"/>";
-	print "<label class=\"label_form\" for=\"DBUSER\">".GM_LANG_DBUSER."</label>";
-	print "<input class=\"input_form\" type=\"text\" id=\"DBUSER\" name=\"DBUSER\" value=\"".$DBUSER."\"/><br style=\"clear: left;\"/>";
-	print "<label class=\"label_form\" for=\"DBPASS\">".GM_LANG_DBPASS."</label>";
-	print "<input class=\"input_form\" type=\"password\" id=\"DBPASS\" name=\"DBPASS\" value=\"".$DBPASS."\" /><br style=\"clear: left;\"/>";
-	print "<label class=\"label_form\" for=\"DBNAME\">".GM_LANG_DBNAME."</label>";
-	print "<input class=\"input_form\" type=\"text\" id=\"DBNAME\" name=\"DBNAME\" value=\"";
+	print "<label class=\"InstallLabelForm\" for=\"DBUSER\">".GM_LANG_DBUSER."</label>";
+	print "<input class=\"InstallInputForm\" type=\"text\" id=\"DBUSER\" name=\"DBUSER\" value=\"".$DBUSER."\"/><br style=\"clear: left;\"/>";
+	print "<label class=\"InstallLabelForm\" for=\"DBPASS\">".GM_LANG_DBPASS."</label>";
+	print "<input class=\"InstallInputForm\" type=\"password\" id=\"DBPASS\" name=\"DBPASS\" value=\"".$DBPASS."\" /><br style=\"clear: left;\"/>";
+	print "<label class=\"InstallLabelForm\" for=\"DBNAME\">".GM_LANG_DBNAME."</label>";
+	print "<input class=\"InstallInputForm\" type=\"text\" id=\"DBNAME\" name=\"DBNAME\" value=\"";
 	if (isset($DBNAME)) print $DBNAME;
 	else if ($upgrade) print $newconfigparms[$LOCATION]["DBNAME"];
 	else print "genmod";
 	print "\" /><br style=\"clear: left;\"/>";
-	print "<label class=\"label_form\" for=\"TBLPREFIX\">".GM_LANG_TBLPREFIX."</label>";
-	print "<input class=\"input_form\" type=\"text\" id=\"TBLPREFIX\" name=\"TBLPREFIX\" value=\"";
+	print "<label class=\"InstallLabelForm\" for=\"TBLPREFIX\">".GM_LANG_TBLPREFIX."</label>";
+	print "<input class=\"InstallInputForm\" type=\"text\" id=\"TBLPREFIX\" name=\"TBLPREFIX\" value=\"";
 	if (isset($TBLPREFIX)) print $TBLPREFIX;
 	else if ($upgrade) print $newconfigparms[$LOCATION]["TBLPREFIX"];
 	else print "gm_";
 	print "\" /><br style=\"clear: left;\"/>";
-	print "<label class=\"label_form\" for=\"INDEX_DIRECTORY\">".GM_LANG_INDEX_DIRECTORY."</label>";
-	print "<input class=\"input_form\" type=\"text\" id=\"INDEX_DIRECTORY\" name=\"INDEX_DIRECTORY\" value=\"";
+	print "<label class=\"InstallLabelForm\" for=\"INDEX_DIRECTORY\">".GM_LANG_INDEX_DIRECTORY."</label>";
+	print "<input class=\"InstallInputForm\" type=\"text\" id=\"INDEX_DIRECTORY\" name=\"INDEX_DIRECTORY\" value=\"";
 	if (isset($INDEX_DIRECTORY)) print $INDEX_DIRECTORY;
 	else if ($upgrade) print $newconfigparms[$LOCATION]["INDEX_DIRECTORY"];
 	else print GuessIndexDirectory($index_inuse);
 	print "\" /><br style=\"clear: left;\"/>";
-	print "<label class=\"label_form\" for=\"submit\" />&nbsp;</label>";
-	print "<input class=\"input_form\" type=\"submit\"  id=\"submit\" name=\"submit\" value=\"".GM_LANG_next."\"/><br style=\"clear: left;\"/>";
+	print "<label class=\"InstallLabelForm\" for=\"submit\" />&nbsp;</label>";
+	print "<input class=\"InstallInputForm\" type=\"submit\"  id=\"submit\" name=\"submit\" value=\"".GM_LANG_next."\"/><br style=\"clear: left;\"/>";
 	print "</form>";
 
 }
@@ -383,7 +383,7 @@ if ($step == 3) {
 		print "<img src=\"images/nok.png\" alt=\"Requirements not OK\"/> ";
 		print "Unable to continue. Please update your system so that you meet all requirements.";
 		print "<br /><br />";
-		print "<span class=\"error\">The installation has been terminated.</span>";
+		print "<span class=\"Error\">The installation has been terminated.</span>";
 	}
 }
 if ($step == 4) {
@@ -497,19 +497,19 @@ if ($step == 4) {
 		<form method="post" action="<?php print $_SERVER["SCRIPT_NAME"];?>" onsubmit="return checkform(this);">
 			<input type="hidden" name="action" value="createadminuser" />
 			<input type="hidden" name="step" value="4" />
-			<label class="label_form"><?php print GM_LANG_username;?></label>
-			<input class="input_form" type="text" name="username" /><br style="clear: left;" />
-			<label class="label_form"><?php print GM_LANG_firstname;?></label>
-			<input class="input_form" type="text" name="firstname" /><br style="clear: left;" />
-			<label class="label_form"><?php print GM_LANG_lastname;?></label>
-			<input class="input_form" type="text" name="lastname" /><br style="clear: left;" />
-			<label class="label_form"><?php print GM_LANG_password;?></label>
-			<input class="input_form" type="password" name="pass1" /><br style="clear: left;" />
-			<label class="label_form"><?php print GM_LANG_confirm;?></label>
-			<input class="input_form" type="password" name="pass2" /><br style="clear: left;" />
-			<label class="label_form"><?php print GM_LANG_emailadress;?></label>
-			<input class="input_form" type="text" name="emailadress" size="45" /><br style="clear: left;" />
-			<input class="input_form" type="submit" value="<?php print GM_LANG_create_user; ?>" />
+			<label class="InstallLabelForm"><?php print GM_LANG_username;?></label>
+			<input class="InstallInputForm" type="text" name="username" /><br style="clear: left;" />
+			<label class="InstallLabelForm"><?php print GM_LANG_firstname;?></label>
+			<input class="InstallInputForm" type="text" name="firstname" /><br style="clear: left;" />
+			<label class="InstallLabelForm"><?php print GM_LANG_lastname;?></label>
+			<input class="InstallInputForm" type="text" name="lastname" /><br style="clear: left;" />
+			<label class="InstallLabelForm"><?php print GM_LANG_password;?></label>
+			<input class="InstallInputForm" type="password" name="pass1" /><br style="clear: left;" />
+			<label class="InstallLabelForm"><?php print GM_LANG_confirm;?></label>
+			<input class="InstallInputForm" type="password" name="pass2" /><br style="clear: left;" />
+			<label class="InstallLabelForm"><?php print GM_LANG_emailadress;?></label>
+			<input class="InstallInputForm" type="text" name="emailadress" size="45" /><br style="clear: left;" />
+			<input class="InstallLabelForm" type="submit" value="<?php print GM_LANG_create_user; ?>" />
 		</form>
 		<?php
 		
@@ -798,7 +798,7 @@ if ($step == 7) {
 	}
 	else {
 		print "<img src=\"images/nok.png\" alt=\"Configuration save NOK\" /> Configuration file could not be saved.<br />";
-		print "<span class=\"error\">Most likely the file is not writeable.</span><br />";
+		print "<span class=\"Error\">Most likely the file is not writeable.</span><br />";
 	}
 	
 	// Set the chosen languages to active

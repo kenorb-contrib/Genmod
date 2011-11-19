@@ -348,11 +348,10 @@ abstract class ImportFunctions {
 		</script>
 		<?php
 		// NOTE: Print the progress bar for the GEDCOM file
-		print "<div>";
-			print "<div id=\"progress_header\" class=\"progress_box center\" style=\"float: left;\">\n";
+			print "<div class=\"UploadGedcomGProgressBox\">\n";
 				print "<b>".GM_LANG_import_progress."</b>";
-				print "<div class=\"inner_progress_bar center\">\n";
-					print "<div id=\"progress_div\" class=\"progress_bar center\">";
+				print "<div class=\"UploadGedcomInnerProgressBar\">\n";
+					print "<div id=\"progress_div\" class=\"UploadGedcomProgressBar\">";
 					if (isset($_SESSION["TOTAL_BYTES"])) {
 						print "\n<script type=\"text/javascript\"><!--\nupdate_progress(".$_SESSION["TOTAL_BYTES"].",".$_SESSION["exectime_start"].");\n//-->\n</script>\n";
 					}
@@ -361,22 +360,22 @@ abstract class ImportFunctions {
 				print "</div>\n";
 			print "</div>\n";
 			
+			
+			// NOTE: Print the progress bar for the time
+			print "<div class=\"UploadGedcomTProgressBox\">\n";
+				if ($timelimit == 0) print "<b>".GM_LANG_time_limit." ".GM_LANG_none."</b>";
+				else print "<b>".GM_LANG_time_limit." ".$timelimit." ".GM_LANG_sec."</b>";
+				print "<div class=\"UploadGedcomInnerProgressBar\">\n";
+					print "<div id=\"time_div\" class=\"UploadGedcomProgressBar\">1%</div>\n";
+				print "</div>\n";
+			print "</div>\n";
+			
 			// NOTE: Print the links after import
-			print "<div class=\"progress_links\">";
+			print "<div class=\"UploadGedcomProgressLinks\">";
 				print "<div id=\"link1\">&nbsp;</div>";
 				print "<div id=\"link2\">&nbsp;</div>";
 				print "<div id=\"link3\">&nbsp;</div>";
 			print "</div>";
-			
-			// NOTE: Print the progress bar for the time
-			print "<div id=\"progress_header\" class=\"progress_box center\">\n";
-				if ($timelimit == 0) print "<b>".GM_LANG_time_limit." ".GM_LANG_none."</b>";
-				else print "<b>".GM_LANG_time_limit." ".$timelimit." ".GM_LANG_sec."</b>";
-				print "<div class=\"inner_progress_bar center\">\n";
-					print "<div id=\"time_div\" class=\"progress_bar center\">1%</div>\n";
-				print "</div>\n";
-			print "</div>\n";
-		print "</div>";
 		flush();
 		@ob_flush();
 	}
@@ -1345,7 +1344,7 @@ abstract class ImportFunctions {
 	 * @param string $surname	the surname for this name
 	 * @param string $letter	the letter for this name
 	 */
-	public function AddNewName($indi, $newname, $letter, $fletter, $surname, $nick, $indirec) {
+	public function AddNewName($indi, $newname, $letter, $fletter, $surname, $indirec, $nick="") {
 	
 		$kgid = JoinKey($indi->xref, $indi->gedcomid);
 		$sql = "INSERT INTO ".TBLPREFIX."names VALUES('0', '".DbLayer::EscapeQuery($kgid)."','".DbLayer::EscapeQuery($indi->xref)."','".$indi->gedcomid."','".DbLayer::EscapeQuery($newname)."','".DbLayer::EscapeQuery($letter)."','".DbLayer::EscapeQuery($fletter)."','".DbLayer::EscapeQuery($surname)."', '".DbLayer::EscapeQuery($nick)."','C')";

@@ -197,8 +197,8 @@ else {
 <?php
 //-- start of main content section
 if ($command=="user") {
-	print "<div id=\"IndexMyGedviewBlock\">";
-	print "<h3>".GM_LANG_mygedview."</h3>";
+	print "<div id=\"IndexMyGenmodBlock\">";
+	print "<div class=\"MyGenmodHeader\">".GM_LANG_mygedview."</div>";
 	print GM_LANG_mygedview_desc;
 	print "</div>\n";
 }

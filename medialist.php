@@ -41,22 +41,8 @@ if (!isset($media)) {
 
 // Header for the page
 PrintHeader(GM_LANG_multi_title);
-print '<div class="center"><h3>'.GM_LANG_multi_title.'</h3></div>';
-
-// A form for filtering the media items
-?>
-<form action="medialist.php" method="GET">
-	<input type="hidden" name="action" value="filter" />
-	<input type="hidden" name="search" value="yes" />
-	<table class="list-table center">
-	<tr>
-	<td class="list-label <?php print $TEXT_DIRECTION; ?>"><?php print GM_LANG_filter; ?></td>
-	<td class="list-label <?php print $TEXT_DIRECTION; ?>">&nbsp;<input id="filter" name="filter" value="<?php print $filter; ?>" /></td>
-	<td class="list-label <?php print $TEXT_DIRECTION; ?>"><input type="submit" value=" &gt; " />
-	<?php PrintHelpLink("simple_filter_help","qm"); ?></td>
-	</tr>
-	</table>
-<?php  
+print "<div id=\"MediaListPage\">";
+print '<div class="PageTitleName">'.GM_LANG_multi_title.'</div>';
 
 // Retrieve the media items
 if (empty($filter)) $mediacontroller->RetrieveMedia(0, $start, $max);
@@ -66,57 +52,88 @@ else $mediacontroller->RetrieveFilterMedia($filter, $start, $max);
 $count = $max;
 if ($count > $mediacontroller->mediainlist) $count = $mediacontroller->mediainlist;
 
-print '<div align="center">'.$mediacontroller->totalmediaitems.' '.GM_LANG_media_found.'<br />';
-
-// Dropdown selector for number of items to show
-if ($mediacontroller->totalmediaitems > 0) {
-	print GM_LANG_medialist_show.' <select name="max" onchange="javascript:submit();">';
-	for ($i=1;($i<=20&&$i-1<ceil($mediacontroller->totalmediaitems/10));$i++) {
-		print '<option value="'.($i*10).'" ';
-		if ($i*10==$max) print 'selected="selected" ';
-		print ' >'.($i*10).'</option>';
-	}
-	print '</select> '.GM_LANG_per_page;
-}
+// A form for filtering the media items
+?>
+<form action="medialist.php" method="get">
+	<input type="hidden" name="action" value="filter" />
+	<input type="hidden" name="search" value="yes" />
+	<table class="NavBlockTable">
+		<tr>
+			<td colspan="3" class="NavBlockHeader"><?php print GM_LANG_options; ?></td>
+		</tr>
+		<tr>
+			<td class="NavBlockLabel"><?php print GM_LANG_filter; ?></td>
+			
+			<td class="NavBlockField"><input id="filter" name="filter" value="<?php print $filter; ?>" /></td>
+			<td class="NavBlockLabel">
+			<?php
+			// Dropdown selector for number of items to show
+			if ($mediacontroller->totalmediaitems > 0) {
+				print GM_LANG_medialist_show.' <select name="max" onchange="javascript:submit();">';
+				for ($i=1;($i<=20&&$i-1<ceil($mediacontroller->totalmediaitems/10));$i++) {
+					print '<option value="'.($i*10).'" ';
+					if ($i*10==$max) print 'selected="selected" ';
+					print ' >'.($i*10).'</option>';
+				}
+				print '</select> '.GM_LANG_per_page;
+			}
+			?>
+			</td>
+		</tr>
+		<tr>
+			<td colspan="3" class="NavBlockLabel"><?php print $mediacontroller->totalmediaitems.' '.GM_LANG_media_found;?></td>
+		</tr>
+		<tr>
+			<td colspan="3" class="NavBlockFooter <?php print $TEXT_DIRECTION; ?>"><input type="submit" value=" &gt; " /><?php PrintHelpLink("simple_filter_help","qm"); ?></td>
+		</tr>
+	</table>
+<?php  
 print '</form>';
 
-print '<table class="ListTable">';
-	print '<tr>';
-	print '<td align="'.($TEXT_DIRECTION == "ltr"?"left":"right").'">';
-	if ($start>0) {
-		$newstart = $start-$max;
-		if ($newstart<0) $newstart = 0;
-		print '<a href="medialist.php?filter='.$filter.'&amp;search=no&amp;start='.$newstart.'&amp;max='.$max.'">'.htmlentities(GM_LANG_prev).'</a>';
-	}
-	print '</td><td align="'.($TEXT_DIRECTION == "ltr"?"right":"left").'">';
-	if ($max < $mediacontroller->mediainlist) {
-		$newstart = $start + $max;
-		print '<a href="medialist.php?filter='.$filter.'&amp;search=no&amp;start='.$newstart.'&amp;max='.$max.'">'.htmlentities(GM_LANG_next).'</a>';
-	}
-	print '</td></tr>';
-print '<tr>';
+print "<div class=\"MediaListArrowContainer\">";
+if ($start>0) {
+	print "<div class=\"MediaListLeftArrow\">";
+	$newstart = $start-$max;
+	if ($newstart<0) $newstart = 0;
+	print '<a href="medialist.php?filter='.$filter.'&amp;search=no&amp;start='.$newstart.'&amp;max='.$max.'">'.GM_LANG_prev.'</a></div>';
+}
+if ($max < $mediacontroller->mediainlist) {
+	$newstart = $start + $max;
+	print "<div class=\"MediaListRightArrow\">";
+	print '<a href="medialist.php?filter='.$filter.'&amp;search=no&amp;start='.$newstart.'&amp;max='.$max.'">'.GM_LANG_next.'</a></div>';
+}
+print "</div>";
 
 // -- print the array
+print "<div class=\"MediaListResult\">";
 $i=0;
+print "<table class=\"ListTable MediaListTable\"><tr>";
 foreach($mediacontroller->medialist as $index => $mediaitem) {
-	print '<td class="list_value wrap width50">';
-	print '<table class="'.$TEXT_DIRECTION.'"><tr><td valign="top" class="wrap">';
-
+	
+	print "<td class=\"ListTableContent MediaListTableContent\">";
+	print "<table class=\"MediaListObjectTable\">";
+	print "<tr><td class=\"MediaListImage\">";
 	MediaFS::DispImgLink($mediaitem->fileobj->f_main_file, $mediaitem->fileobj->f_thumb_file, $mediaitem->title, "", 0, 0, $mediaitem->fileobj->f_width, $mediaitem->fileobj->f_height, $mediaitem->fileobj->f_is_image, $mediaitem->fileobj->f_file_exists);
-	print '</td><td class="list_value wrap width100" style="border: none;">';
+	print "</td>";
 
+	print "<td class=\"MediaListText\">";
+	
+	// Print the title/link to the media object
 	if (!GedcomConfig::$MEDIA_EXTERNAL && !$mediaitem->fileobj->f_file_exists);
 	else print "<a href=\"mediadetail.php?mid=".$mediaitem->xref."\">";
 
-	if ($mediaitem->title == $mediaitem->filename) print '<b>&lrm;'.$mediaitem->title.'</b>';
-	else if ($mediaitem->title != "") print '<b>'.PrintReady($mediaitem->title).'</b>';
-	else print '<b>'.PrintReady($mediaitem->filename).'</b>';
+	if ($mediaitem->title == $mediaitem->filename) print "<b>&lrm;".$mediaitem->title."</b>";
+	else if ($mediaitem->title != "") print "<b>".PrintReady($mediaitem->title)."</b>";
+	else print "<b>".PrintReady($mediaitem->filename)."</b>";
 	
 	if (!GedcomConfig::$MEDIA_EXTERNAL && !$mediaitem->fileobj->f_file_exists);
-	else print '</a>';
+	else print "</a>";
+	
+	// Print the objects that link to this item
 	$indiexists = false;
 	$famexists = false;
 	$sourexists = false;
+	$repoexists = false;
 	foreach($mediaitem->indilist as $key => $indi) {
 		print "<br /><a href=\"individual.php?pid=".$indi->xref."&amp;gedid=".$indi->gedcomid."\">".GM_LANG_view_person.": ".$indi->name.($indi->addname == "" ? "" : " - ".$indi->addname).$indi->addxref."</a>";
 		$indiexists = true;
@@ -134,41 +151,43 @@ foreach($mediacontroller->medialist as $index => $mediaitem) {
 	if ($sourexists) print "<br />";
 	foreach($mediaitem->repolist as $key => $repo) {
 		print "<br /><a href=\"repo.php?rid=".$repo->xref."&amp;gedid=".$repo->gedcomid."\">".GM_LANG_view_repo.": ".$repo->descriptor.$repo->addxref."</a>";
+		$repoexists = true;
 	}
+	if ($repoexists) print "<br />";
+	print "<br />";
 	if (is_null($mediaitem->filename) || $mediaitem->filename == "") print '<br /><span class="Error">'.GM_LANG_file_empty.' '.$mediaitem->filename.'</span>';
 	else if (!strstr($mediaitem->filename, "://") && !$mediaitem->fileobj->f_file_exists) print '<br /><span class="Error">'.GM_LANG_file_not_found.'<br />'.$mediaitem->filename.'</span>';
 	
-	print '<br /><br /><div class="indent wrap width95">';
-	FactFunctions::PrintFactNotes($mediaitem, $mediaitem->level+1);
+	if (FactFunctions::PrintFactNotes($mediaitem, $mediaitem->level+1)) print "<br />";
 	
-	print '</div>';
 	if (!is_null($mediaitem->filename) && $mediaitem->filename != "") print "<span class=\"FactDetailLabel\"><br />".GM_LANG_filename." : </span> <span class=\"FactDetailField\" style=\"direction: ltr;\">".$mediaitem->filename."</span>";
-	if ($mediaitem->fileobj->f_mimedescr != "") print '<span class="label"><br />'.GM_LANG_media_format.': </span> <span class="field" style="direction: ltr;">'.$mediaitem->fileobj->f_mimedescr."</span>";
-	if ($mediaitem->fileobj->f_is_image && $mediaitem->fileobj->f_width > 0) print '<span class="label"><br />'.GM_LANG_image_size.': </span> <span class="FactDetailField" style="direction: ltr;">'.$mediaitem->fileobj->f_width.($TEXT_DIRECTION =="rtl"?" &rlm;x&rlm; " : " x ").$mediaitem->fileobj->f_height.'</span>';
-	if ($mediaitem->fileobj->f_file_size > 0) print '<span class="label"><br />'.GM_LANG_media_file_size.': </span> <span class="FactDetailField" style="direction: ltr;">'.GetFileSize($mediaitem->fileobj->f_file_size).'</span>';
+	if ($mediaitem->fileobj->f_mimedescr != "") print '<span class="FactDetailLabel"><br />'.GM_LANG_media_format.': </span> <span class="FactDetailField" style="direction: ltr;">'.$mediaitem->fileobj->f_mimedescr."</span>";
+	if ($mediaitem->fileobj->f_is_image && $mediaitem->fileobj->f_width > 0) print '<span class="FactDetailLabel"><br />'.GM_LANG_image_size.': </span> <span class="FactDetailField" style="direction: ltr;">'.$mediaitem->fileobj->f_width.($TEXT_DIRECTION =="rtl"?" &rlm;x&rlm; " : " x ").$mediaitem->fileobj->f_height.'</span>';
+	if ($mediaitem->fileobj->f_file_size > 0) print '<span class="FactDetailLabel"><br />'.GM_LANG_media_file_size.': </span> <span class="FactDetailField" style="direction: ltr;">'.GetFileSize($mediaitem->fileobj->f_file_size).'</span>';
+	print "</td></tr></table>";
+	print "</td>";
 	
-	print '</td></tr></table>';
-	print '</td>';
 	if ($i%2 == 1 && $i < ($count-1)) print "</tr><tr>";
 	$i++;
 	if ($i == $count) break;
 }
+// Print an extra empty cell if the numer is odd.
+if ($i%2) print "<td class=\"ListTableContent MediaListTableContent\"&nbsp;</td>";
 print "</tr>";
+print "</table></div>";
+
 // NOTE: print the next and previous links
-	print '<tr>';
-	print '<td align="'.($TEXT_DIRECTION == "ltr"?"left":"right").'">';
-	if ($start>0) {
-		$newstart = $start-$max;
-		if ($newstart<0) $newstart = 0;
-		print '<a href="medialist.php?filter='.$filter.'&amp;search=no&amp;start='.$newstart.'&amp;max='.$max.'">'.GM_LANG_prev.'</a>';
-	}
-	print '</td><td align="'.($TEXT_DIRECTION == "ltr"?"right":"left").'">';
-	if ($max < $mediacontroller->mediainlist) {
-		$newstart = $start + $max;
-		print '<a href="medialist.php?filter='.$filter.'&amp;search=no&amp;start='.$newstart.'&amp;max='.$max.'">'.GM_LANG_next.'</a>';
-	}
-	print '</td></tr>';
-print "</table><br />";
+if ($start>0) {
+	print "<div class=\"MediaListLeftArrow\">";
+	$newstart = $start-$max;
+	if ($newstart<0) $newstart = 0;
+	print '<a href="medialist.php?filter='.$filter.'&amp;search=no&amp;start='.$newstart.'&amp;max='.$max.'">'.GM_LANG_prev.'</a></div>';
+}
+if ($max < $mediacontroller->mediainlist) {
+	$newstart = $start + $max;
+	print "<div class=\"MediaListRightArrow\">";
+	print '<a href="medialist.php?filter='.$filter.'&amp;search=no&amp;start='.$newstart.'&amp;max='.$max.'">'.GM_LANG_next.'</a></div>';
+}
 print "</div>";
 PrintFooter();
 ?>

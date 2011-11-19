@@ -52,7 +52,7 @@ $sentHeader = false;    // Indicates whether HTML headers have been sent
 if ($action !="save" and $action != "toggleActive") {
 	PrintSimpleHeader(GM_LANG_config_lang_utility);
 	$sentHeader = true;
-	print "<div id=\"content_editlang\">";
+	print "<div id=\"EditLangContent\">";
 }
 
 if ($action == "new_lang") {
@@ -110,38 +110,33 @@ if ($action != "save" && $action != "toggleActive") { ?>
 	//-->
 	</script>
 	
-	<div class="admin_topbottombar">
-		<h3>
-		<?php
-		if ($action == "new_lang") print GM_LANG_add_new_language;
-		else print GM_LANG_config_lang_utility;
-		?>
-		</h3>
-	</div>
-	<div class="admin_topbottombar"><?php print constant("GM_LANG_".$d_LangName); ?></div>
 	<form name="Form1" method="post" action="editlang_edit_settings.php">
 		<input type="hidden" name="action" value="save" />
 		<input type="hidden" name="ln" value="<?php print $ln;?>" />
+	<table class="NavBlockTable AdminNavBlockTable">
+		<tr>
+			<td class="NavBlockHeader AdminNavBlockHeader" colspan="2">
+				<?php print "<div class=\"AdminNavBlockTitle\">";
+				if ($action == "new_lang") print GM_LANG_add_new_language;
+				else print GM_LANG_config_lang_utility;
+				?>
+				</div>
+				<?php print constant("GM_LANG_".$d_LangName); ?>
+			</td>
+		</tr>
 		<?php                          
 		if ($action == "new_lang") print "<input type=\"hidden\" name=\"new_old\" value=\"new\" />";
 		else print "<input type=\"hidden\" name=\"new_old\" value=\"old\" />";
-		?>
-		<div class="admin_item_box center shade3">
-			<input type="submit" value="<?php print GM_LANG_lang_save;?>" />
-			&nbsp;&nbsp;
-			<input type="submit" value="<?php print GM_LANG_cancel;?>" onclick="CloseWindow();" />
-		</div>
-		<?php
 		if ($action != "new_lang") {
 			if ($protectActive) $v_lang_use = true;
 			if (!isset($v_lang_use)) $v_lang_use = $gm_lang_use[$ln];
 			?>
-			<div class="admin_item_box">
-				<div class="change_language_item_left">
-					<div class="helpicon"><?php PrintHelpLink("active_help", "qm"); ?></div>
-					<div class="description"><?php print GM_LANG_active;?></div>
-				</div>
-				<div class="change_language_item_right">
+			<tr>
+				<td class="NavBlockLabel AdimNavBlockLabel">
+					<div class="HelpIconContainer"><?php PrintHelpLink("active_help", "qm"); ?></div>
+					<div class="AdminNavBlockOptionText"><?php print GM_LANG_active;?></div>
+				</td>
+				<td class="NavBlockField AdimNavBlockField">
 					<?php
 					if ($v_lang_use) {
 						print "<input";
@@ -150,49 +145,49 @@ if ($action != "save" && $action != "toggleActive") { ?>
 					}
 					else print "<input type=\"checkbox\" name=\"v_lang_use\" value=\"true\" />";
 					?>
-				</div>
-			</div>
+				</td>
+			</tr>
 			<?php
 		}
 		else print "<input type=\"hidden\" name=\"v_lang_use\" value=\"".$gm_lang_use[$ln]."\" />";
 		?>
-		<div class="admin_item_box">
-			<div class="change_language_item_left">
+		<tr>
+			<td class="NavBlockLabel AdimNavBlockLabel">
 				<?php if (!isset($v_original_lang_name)) $v_original_lang_name = constant("GM_LANG_".$ln);?>
-				<div class="helpicon"><?php PrintHelpLink("original_lang_name_help", "qm"); ?></div>
-				<div class="description"><?php print str_replace("#D_LANGNAME#", constant("GM_LANG_".$d_LangName), GM_LANG_original_lang_name);?></div>
-			</div>
-			<div class="change_language_item_right">
+				<div class="HelpIconContainer"><?php PrintHelpLink("original_lang_name_help", "qm"); ?></div>
+				<div class="AdminNavBlockOptionText"><?php print str_replace("#D_LANGNAME#", constant("GM_LANG_".$d_LangName), GM_LANG_original_lang_name);?></div>
+			</td>
+			<td class="NavBlockField AdimNavBlockField">
 				<input type="text" name="v_original_lang_name" size="30" value="<?php print $v_original_lang_name;?>" />
-			</div>
-		</div>
-		<div class="admin_item_box">
-			<div class="change_language_item_left">
+			</td>
+		</tr>
+		<tr>
+			<td class="NavBlockLabel AdimNavBlockLabel">
 				<?php if (!isset($v_lang_shortcut)) $v_lang_shortcut = $lang_short_cut[$ln];?>
-				<div class="helpicon"><?php PrintHelpLink("lang_shortcut_help", "qm"); ?></div>
-				<div class="description"><?php print GM_LANG_lang_shortcut;?></div>
-			</div>
-			<div class="change_language_item_right">
+				<div class="HelpIconContainer"><?php PrintHelpLink("lang_shortcut_help", "qm"); ?></div>
+				<div class="AdminNavBlockOptionText"><?php print GM_LANG_lang_shortcut;?></div>
+			</td>
+			<td class="NavBlockField AdimNavBlockField">
 				<input type="text" name="v_lang_shortcut" size="2" value="<?php print $v_lang_shortcut;?>" onchange="document.Form1.action.value=''; submit();" />
-			</div>
-		</div>
-		<div class="admin_item_box">
-			<div class="change_language_item_left">
+			</td>
+		</tr>
+		<tr>
+			<td class="NavBlockLabel AdimNavBlockLabel">
 				<?php if (!isset($v_lang_langcode)) $v_lang_langcode = $lang_langcode[$ln];?>
-				<div class="helpicon"><?php PrintHelpLink("lang_langcode_help", "qm"); ?></div>
-				<div class="description"><?php print GM_LANG_lang_langcode;?></div>
-			</div>
-			<div class="change_language_item_right">
+				<div class="HelpIconContainer"><?php PrintHelpLink("lang_langcode_help", "qm"); ?></div>
+				<div class="AdminNavBlockOptionText"><?php print GM_LANG_lang_langcode;?></div>
+			</td>
+			<td class="NavBlockField AdimNavBlockField">
 				<input type="text" name="v_lang_langcode" size="40" value="<?php print $v_lang_langcode;?>" />
-			</div>
-		</div>
-		<div class="admin_item_box">
-			<div class="change_language_item_left">
+			</td>
+		</tr>
+		<tr>
+			<td class="NavBlockLabel AdimNavBlockLabel">
 				<?php if (!isset($v_flagsfile)) $v_flagsfile = $flagsfile[$ln];?>
-				<div class="helpicon"><?php PrintHelpLink("flagsfile_help", "qm"); ?></div>
-				<div class="description"><?php print GM_LANG_flagsfile;?></div>
-			</div>
-			<div class="change_language_item_right">
+				<div class="HelpIconContainer"><?php PrintHelpLink("flagsfile_help", "qm"); ?></div>
+				<div class="AdminNavBlockOptionText"><?php print GM_LANG_flagsfile;?></div>
+			</td>
+			<td class="NavBlockField AdimNavBlockField">
 				<?php
 				$dire = "images/flags";
 				if ($handle = opendir($dire)) {
@@ -241,39 +236,39 @@ if ($action != "save" && $action != "toggleActive") { ?>
 					}
 				}
 				if (isset($flag_i) && isset($flagfiles["path"][$flag_i])){
-					print "<div id=\"flag\" style=\"display: inline; padding-left: 7px;\">";
-					print "<img src=\"".$flagfiles["path"][$flag_i]."\" alt=\"\" class=\"brightflag\" style=\"border: solid black 1px\" /></div>\n";
+					print "<div id=\"Flag\">";
+					print "<img src=\"".$flagfiles["path"][$flag_i]."\" alt=\"\" class=\"BrightFlag\" /></div>\n";
 				}
 				?>
-			</div>
-		</div>
-		<div class="admin_item_box">
-			<div class="change_language_item_left">
+			</td>
+		</tr>
+		<tr>
+			<td class="NavBlockLabel AdimNavBlockLabel">
 				<?php if (!isset($v_date_format)) $v_date_format = $DATE_FORMAT_array[$ln];?>
-				<div class="helpicon"><?php PrintHelpLink("date_format_help", "qm", "date_format"); ?></div>
-				<div class="description"><?php print GM_LANG_date_format;?></div>
-			</div>
-			<div class="change_language_item_right">
+				<div class="HelpIconContainer"><?php PrintHelpLink("date_format_help", "qm", "date_format"); ?></div>
+				<div class="AdminNavBlockOptionText"><?php print GM_LANG_date_format;?></div>
+			</td>
+			<td class="NavBlockField AdimNavBlockField">
 				<input type="text" name="v_date_format" size="30" value="<?php print $v_date_format;?>" />
-			</div>
-		</div>
-		<div class="admin_item_box">
-			<div class="change_language_item_left">
+			</td>
+		</tr>
+		<tr>
+			<td class="NavBlockLabel AdimNavBlockLabel">
 				<?php if (!isset($v_time_format)) $v_time_format = $TIME_FORMAT_array[$ln];?>
-				<div class="helpicon"><?php PrintHelpLink("time_format_help", "qm", "time_format"); ?></div>
-				<div class="description"><?php print GM_LANG_time_format;?></div>
-			</div>
-			<div class="change_language_item_right">
+				<div class="HelpIconContainer"><?php PrintHelpLink("time_format_help", "qm", "time_format"); ?></div>
+				<div class="AdminNavBlockOptionText"><?php print GM_LANG_time_format;?></div>
+			</td>
+			<td class="NavBlockField AdimNavBlockField">
 				<input type="text" name="v_time_format" size="30" value="<?php print $v_time_format;?>" />
-			</div>
-		</div>
-		<div class="admin_item_box">
-			<div class="change_language_item_left">
+			</td>
+		</tr>
+		<tr>
+			<td class="NavBlockLabel AdimNavBlockLabel">
 				<?php if (!isset($v_week_start)) $v_week_start = $WEEK_START_array[$ln];?>
-				<div class="helpicon"><?php PrintHelpLink("week_start_help", "qm","week_start"); ?></div>
-				<div class="description"><?php print GM_LANG_week_start;?></div>
-			</div>
-			<div class="change_language_item_right">
+				<div class="HelpIconContainer"><?php PrintHelpLink("week_start_help", "qm","week_start"); ?></div>
+				<div class="AdminNavBlockOptionText"><?php print GM_LANG_week_start;?></div>
+			</td>
+			<td class="NavBlockField AdimNavBlockField">
 				<select size="1" name="v_week_start">
 				<?php
 				$dayArray = array(GM_LANG_sunday,GM_LANG_monday,GM_LANG_tuesday,GM_LANG_wednesday,GM_LANG_thursday,GM_LANG_friday,GM_LANG_saturday);
@@ -288,15 +283,15 @@ if ($action != "save" && $action != "toggleActive") { ?>
 				}
 				?>
 				</select>
-			</div>
-		</div>
-		<div class="admin_item_box">
-			<div class="change_language_item_left">
+			</td>
+		</tr>
+		<tr>
+			<td class="NavBlockLabel AdimNavBlockLabel">
 				<?php if (!isset($v_text_direction)) $v_text_direction = $TEXT_DIRECTION_array[$ln];?>
-				<div class="helpicon"><?php PrintHelpLink("text_direction_help", "qm", "text_direction"); ?></div>
-				<div class="description"><?php print GM_LANG_text_direction;?></div>
-			</div>
-			<div class="change_language_item_right">
+				<div class="HelpIconContainer"><?php PrintHelpLink("text_direction_help", "qm", "text_direction"); ?></div>
+				<div class="AdminNavBlockOptionText"><?php print GM_LANG_text_direction;?></div>
+			</td>
+			<td class="NavBlockField AdimNavBlockField">
 				<select size="1" name="v_text_direction">
 				<option
 				<?php if ($v_text_direction == "ltr") print " selected=\"selected\""; ?>
@@ -309,15 +304,15 @@ if ($action != "save" && $action != "toggleActive") { ?>
 				<?php print GM_LANG_rtl;?>
 				</option>
 				</select>
-			</div>
-		</div>
-		<div class="admin_item_box">
-			<div class="change_language_item_left">
+			</td>
+		</tr>
+		<tr>
+			<td class="NavBlockLabel AdimNavBlockLabel">
 				<?php if (!isset($v_name_reverse)) $v_name_reverse = $NAME_REVERSE_array[$ln];?>
-				<div class="helpicon"><?php PrintHelpLink("name_reverse_help", "qm", "name_reverse"); ?></div>
-				<div class="description"><?php print GM_LANG_name_reverse;?></div>
-			</div>
-			<div class="change_language_item_right">
+				<div class="HelpIconContainer"><?php PrintHelpLink("name_reverse_help", "qm", "name_reverse"); ?></div>
+				<div class="AdminNavBlockOptionText"><?php print GM_LANG_name_reverse;?></div>
+			</td>
+			<td class="NavBlockField AdimNavBlockField">
 				<select size="1" name="v_name_reverse">
 				<option
 				<?php if (!$v_name_reverse) print " selected=\"selected\""; ?>
@@ -330,38 +325,38 @@ if ($action != "save" && $action != "toggleActive") { ?>
 				<?php print GM_LANG_yes;?>
 				</option>
 				</select>
-			</div>
-		</div>
-		<div class="admin_item_box">
-			<div class="change_language_item_left">
+			</td>
+		</tr>
+		<tr>
+			<td class="NavBlockLabel AdimNavBlockLabel">
 				<?php if (!isset($v_alphabet_upper)) $v_alphabet_upper = $ALPHABET_upper[$ln];?>
-				<div class="helpicon"><?php PrintHelpLink("alphabet_upper_help", "qm", "alphabet_upper"); ?></div>
-				<div class="description"><?php print GM_LANG_alphabet_upper;?></div>
-			</div>
-			<div class="change_language_item_right">
+				<div class="HelpIconContainer"><?php PrintHelpLink("alphabet_upper_help", "qm", "alphabet_upper"); ?></div>
+				<div class="AdminNavBlockOptionText"><?php print GM_LANG_alphabet_upper;?></div>
+			</td>
+			<td class="NavBlockField AdimNavBlockField">
 				<input type="text" name="v_alphabet_upper" size="50" value="<?php print $v_alphabet_upper;?>" />
-			</div>
-		</div>
-		<div class="admin_item_box">
-			<div class="change_language_item_left">
+			</td>
+		</tr>
+		<tr>
+			<td class="NavBlockLabel AdimNavBlockLabel">
 				<?php if (!isset($v_alphabet_lower)) $v_alphabet_lower = $ALPHABET_lower[$ln];?>
-				<div class="helpicon"><?php PrintHelpLink("alphabet_lower_help", "qm", "alphabet_lower"); ?></div>
-				<div class="description"><?php print GM_LANG_alphabet_lower;?></div>
-			</div>
-			<div class="change_language_item_right">
+				<div class="HelpIconContainer"><?php PrintHelpLink("alphabet_lower_help", "qm", "alphabet_lower"); ?></div>
+				<div class="AdminNavBlockOptionText"><?php print GM_LANG_alphabet_lower;?></div>
+			</td>
+			<td class="NavBlockField AdimNavBlockField">
 				<input type="text" name="v_alphabet_lower" size="50" value="<?php print $v_alphabet_lower;?>" />
-			</div>
-		</div>
-		<div class="admin_item_box">
-			<div class="change_language_item_left">
+			</td>
+		</tr>
+		<tr>
+			<td class="NavBlockLabel AdimNavBlockLabel">
 				<?php if (!isset($v_mon_short)) $v_mon_short = $MON_SHORT_array[$ln];?>
-				<div class="helpicon"><?php PrintHelpLink("mon_short_help", "qm", "mon_short"); ?></div>
-				<div class="description"><?php print GM_LANG_mon_short;?></div>
-			</div>
-			<div class="change_language_item_right">
+				<div class="HelpIconContainer"><?php PrintHelpLink("mon_short_help", "qm", "mon_short"); ?></div>
+				<div class="AdminNavBlockOptionText"><?php print GM_LANG_mon_short;?></div>
+			</td>
+			<td class="NavBlockField AdimNavBlockField">
 				<input type="text" name="v_mon_short" size="50" value="<?php print $v_mon_short;?>" />
-			</div>
-		</div>
+			</td>
+		</tr>
 		<?php
 		if (!isset($v_lang_filename)) $v_lang_filename = "languages/lang.".$v_lang_shortcut.".txt";
 		if (!isset($v_factsfile)) $v_factsfile = "languages/facts.".$v_lang_shortcut.".txt";
@@ -369,12 +364,12 @@ if ($action != "save" && $action != "toggleActive") { ?>
 		if (!isset($v_mon_short)) $v_mon_short = "";
 		if ($action != "new_lang"){
 			?>
-			<div class="admin_item_box">
-				<div class="change_language_item_left">
-					<div class="helpicon"><?php PrintHelpLink("lang_filenames_help", "qm", "lang_filenames"); ?></div>
-					<div class="description"><?php print GM_LANG_lang_filenames;?></div>
-				</div>
-				<div class="change_language_item_right">
+			<tr>
+				<td class="NavBlockLabel AdimNavBlockLabel">
+					<div class="HelpIconContainer"><?php PrintHelpLink("lang_filenames_help", "qm", "lang_filenames"); ?></div>
+					<div class="AdminNavBlockOptionText"><?php print GM_LANG_lang_filenames;?></div>
+				</td>
+				<td class="NavBlockField AdimNavBlockField">
 					<?php
 						print $v_factsfile;
 						if (!file_exists($v_factsfile)) print "&nbsp;&nbsp;<span class=\"Error\">" . GM_LANG_file_does_not_exist . "</span>";
@@ -387,16 +382,18 @@ if ($action != "save" && $action != "toggleActive") { ?>
 						print $v_lang_filename;
 						if (!file_exists($v_lang_filename)) print "&nbsp;&nbsp;<span class=\"Error\">" . GM_LANG_file_does_not_exist . "</span>";
 					?>
-				</div>
-			</div>
+				</td>
+			</tr>
 			<?php
 		}
 		?>
-		<div class="admin_item_box center shade3">
-			<input type="submit" value="<?php print GM_LANG_lang_save;?>" />
-			&nbsp;&nbsp;
-			<input type="submit" value="<?php print GM_LANG_cancel;?>" onclick="CloseWindow();" />
-		</div>
+		<tr>
+			<td class="NavBlockFooter" colspan="2">
+				<input type="submit" value="<?php print GM_LANG_lang_save;?>" />
+				&nbsp;&nbsp;
+				<input type="submit" value="<?php print GM_LANG_cancel;?>" onclick="CloseWindow();" />
+			</td>
+		</tr>
 	</form>
 	<?php
 }
@@ -475,20 +472,19 @@ if ($action == "save") {
 	$newvars["MON_SHORT"]		= $MON_SHORT_array[$ln];
 	if (!AdminFunctions::StoreLangVars($newvars)) $error = "lang_config_write_error";
 	else $error = "";
-	
+
 	if ($error != "") {
 		if (!$sentHeader) {
 			PrintSimpleHeader(GM_LANG_config_lang_utility);
 			$sentHeader = true;
-			print "<div class=\"center\"><center>";
 		}
-	    print "<span class=\"Error\">" . constant("GM_LANG_".$error) . "</span><br /><br />";
 	    print "<form name=\"Form2\" method=\"post\" action=\"" .SCRIPT_NAME. "\">";
-	    print "<table class=\"FactsTable\">";
+	    print "<table class=\"NavBlockTable AdminNavBlockTable\">";
 	    print "<tr>";
-	    print "<td class=\"facts_value\" style=\"text-align:center; \" >";
+	    print "<td class=\"NavBlockHeader\">";
+	    print "<span class=\"Error\">" . constant("GM_LANG_".$error) . "</span><br /><br />";
 	    srand((double)microtime()*1000000);
-	    print "<input type=\"submit\" value=\"" . GM_LANG_close_window . "\"" . " onclick=\"window.opener.showchanges(); self.close();\" />";
+	    print "<input type=\"submit\" value=\"" . GM_LANG_close_window . "\"" . " onclick=\"self.close(); return false;\" />";
 	    print "</td>";
 	    print "</tr>";
 	    print "</table>";

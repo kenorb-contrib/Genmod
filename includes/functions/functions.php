@@ -521,7 +521,7 @@ function FindHighlightedObject($obj) {
 	// If a media item has no PRIM Y and PRIM N in the fact record that is pointing to it, store it for further investigation.
 	foreach($facts as $key => $fact) {
 		$media =& MediaItem::GetInstance($fact->linkxref, "", $fact->gedcomid);
-		if ($fact->style != "change_old") {
+		if ($fact->style != "ChangeOld") {
 			$prim = GetGedcomValue("_PRIM", 2, $fact->factrec);
 			if ($prim == "Y") {
 				$primfile = $media->filename;

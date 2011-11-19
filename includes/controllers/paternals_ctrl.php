@@ -113,23 +113,23 @@ class PaternalsController extends ChartController {
 		// Print the root person
 		// Set the width of the containing div to the calculated value.
 		// Minimum if full screen width to keep it centered
-		print "<div style=\"width:".$this->pagewidth."px; min-width:100%\" align=\"center\">";
-		print "<div style=\"width:51%; float:right;\" align=\"left\">";
-		$this->PrintFamArrow("u", $this->GetRootObject());
+		print "<div class=\"PaternalsContent\" style=\"width:".$this->pagewidth."px;\">";
+			print "<div class=\"PaternalsUpArrow\">";
+				$this->PrintFamArrow("u", $this->GetRootObject());
+			print "</div>";
+			print "<br /><br />";
+			PersonFunctions::PrintPedigreePerson($this->GetRootObject(), 1, $this->show_full, $this->boxcount, 1, $this->view, $this->params);
+			$this->boxcount++;
+			$this->rootfams = array($this->GetRootObject()->primaryfamily);
+			for ($i = 2; $i <= $this->split; $i++) {
+				$this->rootfams = $this->PrintParents($this->rootfams, $i);
+			}
+			// Only go on if the persons had ancestral families
+			if (count($this->rootfams > 0)) {
+				if ($this->line == "long") $this->PrintLongestLines();
+				else $this->PrintAncestors();
+			}
 		print "</div>";
-		print "<br /><br />";
-		PersonFunctions::PrintPedigreePerson($this->GetRootObject(), 1, $this->show_full, $this->boxcount, 1, $this->view, $this->params);
-		$this->boxcount++;
-		$this->rootfams = array($this->GetRootObject()->primaryfamily);
-		for ($i = 2; $i <= $this->split; $i++) {
-			$this->rootfams = $this->PrintParents($this->rootfams, $i);
-		}
-		// Only go on if the persons had ancestral families
-		if (count($this->rootfams > 0)) {
-			if ($this->line == "long") $this->PrintLongestLines();
-			else $this->PrintAncestors();
-		}
-		print "</div><br style=\"clear:both;\" />";
 	}
 
 	private function PrintAncestors() {
@@ -155,9 +155,10 @@ class PaternalsController extends ChartController {
 				print (is_object($persons[$i]) || GedcomConfig::$SHOW_EMPTY_BOXES ? $this->PrintVLine() : "&nbsp");
 				print "</div>";
 			}
+			// Break must be here to force single persons on the next line
 			print "<br style=\"clear:both;\" />";
 			foreach($persons as $key2 => $person) {
-				print "<div style=\"width:".$width."px; min-width:".$perc."%; float:left;\" align=\"center\">";
+				print "<div style=\"width:".$width."px; min-width:".$perc."%; float:left;\">";
 				if (is_object($person) || GedcomConfig::$SHOW_EMPTY_BOXES) PersonFunctions::PrintPedigreePerson($person, 1, $this->show_full, $this->boxcount, 1, $this->view, $this->params);
 				else print "&nbsp;";
 				$this->boxcount++;
@@ -177,12 +178,12 @@ class PaternalsController extends ChartController {
 		$this->PrintLines($cnt, $width, $perc);
 		foreach ($fams as $key =>$famid) {
 			$family =& Family::GetInstance($famid);
-			print "<div style=\"width:".$width."px; min-width:".$perc."%; float:left;\" align=\"center\">";
+			print "<div style=\"width:".$width."px; min-width:".$perc."%; float:left;\">";
 			PersonFunctions::PrintPedigreePerson($family->husb, 1, $this->show_full, $this->boxcount, 1, $this->view, $this->params);
 			$this->boxcount++;
 			$newfams[] = (is_object($family->husb) ? $family->husb->primaryfamily : "");
 			print "</div>";
-			print "<div style=\"width:".$width."px; min-width:".$perc."%; float:left;\" align=\"center\">";
+			print "<div style=\"width:".$width."px; min-width:".$perc."%; float:left;\">";
 			PersonFunctions::PrintPedigreePerson($family->wife, 1, $this->show_full, $this->boxcount, 1, $this->view, $this->params);
 			$this->boxcount++;
 			$newfams[] = (is_object($family->wife) ? $family->wife->primaryfamily : "");
@@ -200,10 +201,10 @@ class PaternalsController extends ChartController {
 			print "<div style=\"width:".($width*2)."px; min-width:".($perc*2)."%; float:left;\" align=\"center\">";
 			$this->PrintVLine();
 			print "<div style=\"width:49.9%;\"><img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["hline"]["other"]."\" width=\"100%\" height=\"3\" alt=\"\" /></div>\n";
-			print "<div style=\"width:49.9%; float:left;\" align=\"center\">";
+			print "<div class=\"PaternalsVlineContainer\" align=\"center\">";
 			$this->PrintVLine();
 			print "</div>";
-			print "<div style=\"width:49.9%; float:left;\" align=\"center\">";
+			print "<div class=\"PaternalsVlineContainer\" align=\"center\">";
 			$this->PrintVLine();
 			print "</div>";
 			print "</div>";
@@ -214,7 +215,7 @@ class PaternalsController extends ChartController {
 	private function PrintVLine() {
 		global $GM_IMAGES;
 		
-		print "<div style=\"width:6px; height:20px; margin: 5px 0px 5px 0px; vertical-align:middle; background: url('".GM_IMAGE_DIR."/".$GM_IMAGES["vline"]["other"]."');\"><img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["spacer"]["other"]."\" width=\"3\" alt=\"\" /></div>";
+		print "<div class=\"PaternalsVline\" style=\"background: url('".GM_IMAGE_DIR."/".$GM_IMAGES["vline"]["other"]."');\"><img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["spacer"]["other"]."\" width=\"3\" alt=\"\" /></div>";
 	}
 	
 	private function PrintLongestLines() {

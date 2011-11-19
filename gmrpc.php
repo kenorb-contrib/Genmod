@@ -47,7 +47,7 @@ switch($action) {
 			if (in_array($type, array("indi", "sour", "note", "repo"))) $_SESSION["last_tab"][$type][$xref] = $tab_tab;
 		}
 	break;
-	
+
 	case "set_show_changes":
 		if (!$gm_user->userCanEdit()) {
 			print "";
@@ -67,13 +67,13 @@ switch($action) {
 			print GM_LANG_next_free." ".constant("GM_LANG_".$desc[$k]).": ".EditFunctions::GetNewXref($type)."<br />";
 		}
 	break;
-	
+
 	case "checkuser":
 		$u =& User::GetInstance($username);
 		if (!$u->is_empty) print "<span class=\"Error\">".GM_LANG_duplicate_username."</span>";
 		else print "";
 	break;
-	
+
 	case "checkemail":
 		if (empty($email) || CheckEmailAddress($email)) print "";
 		else print "<span class=\"Error\">".GM_LANG_invalid_email."</span>";
@@ -93,7 +93,7 @@ switch($action) {
 		}
 		SwitchGedcom();
 	break;
-	
+
 	case "getpersonnamefact":
 		if (!isset($gedid)) $gedid = GedcomConfig::$GEDCOMID;
 		SwitchGedcom($gedid);
@@ -105,7 +105,7 @@ switch($action) {
 		}
 		SwitchGedcom();
 	break;
-	
+
 	case "getfamilydescriptor":
 		$famid = strtoupper($famid);
 		if (empty($famid)) print "";
@@ -118,7 +118,7 @@ switch($action) {
 			else print "";
 		}
 	break;
-	
+
 	case "getsourcedescriptor":
 		$sid = strtoupper($sid);
 		if (empty($sid)) print "";
@@ -131,7 +131,7 @@ switch($action) {
 			else print "";
 		}
 	break;
-	
+
 	case "getrepodescriptor":
 		$rid = strtoupper($rid);
 		if (empty($rid)) print "";
@@ -157,7 +157,7 @@ switch($action) {
 			else print "";
 		}
 	break;
-	
+
 	case "getnotedescriptor":
 		$oid = strtoupper($oid);
 		if (empty($oid)) print "";
@@ -171,22 +171,22 @@ switch($action) {
 			else print "";
 		}
 	break;
-			
+
 	case "getchangeddate":
 		print GetChangedDate(EditFunctions::CheckInputDate($date));
 	break;
-	
+
 	case "action_edit":
 		$action = ActionController::GetItem($aid);
 		$action->EditThisItem();
 	break;
-	
+
 	// Actions for the ToDo list 
 	case "action_delete":
 		$action = ActionController::GetItem($aid);
 		$action->DeleteThis();
 	break;
-	
+
 	case "action_update":
 		$action = ActionController::GetItem($aid);
 		if (isset($actiontext))$action->text = urldecode($actiontext);
@@ -202,7 +202,7 @@ switch($action) {
 		$action = ActionController::GetNewItem($type);
 		$action->AddThisItem();
 	break;
-	
+
 	case "action_add2":
 		$action = ActionController::GetNewItem($type);
 		if (isset($actiontext))$action->text = urldecode($actiontext);
@@ -270,12 +270,12 @@ switch($action) {
 			}
 		}
 	break;
-	
+
 	case "extsearchformprint":
 		$es_controller = new ExternalSearchController($pid, $gedcomid);
 		$es_controller->PrintSearchForm($formno);
 	break;
-	
+
 	case "extsearchservice":
 		$es_controller = new ExternalSearchController($pid, $gedcomid);
 		// See what params we must have received
@@ -286,7 +286,11 @@ switch($action) {
 		}
 		print $es_controller->PrintServiceResults($formno, $searchparms);
 		break;
-	
+
+	case "getpinyin":
+		print GM_LANG_PinYin_translation." ".NameFunctions::GetPinYin(urldecode($chinese));
+		break;
+
 	case "send_empty":
 		print "";
 	break;

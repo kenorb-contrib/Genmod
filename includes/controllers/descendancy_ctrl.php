@@ -147,10 +147,10 @@ class DescendancyController extends ChartController {
 			// print marriage info
 			print "<li>";
 			print "<img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["spacer"]["other"]."\" height=\"2\" width=\"$Dindent\" border=\"0\" alt=\"\" />";
-			print "<span class=\"details1\" style=\"white-space: nowrap; \" >";
+			print "<div class=\"PersonDetails1 DescendancyListMarrBlock\">";
 			print "<a href=\"#\" onclick=\"expand_layer('".$family->xref.$this->personcount."'); return false;\" class=\"top\"><img id=\"".$family->xref.$this->personcount."_img\" src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["minus"]["other"]."\" align=\"middle\" hspace=\"0\" vspace=\"3\" border=\"0\" alt=\"".GM_LANG_view_family."\" /></a> ";
 			if ($family->disp) FactFunctions::PrintSimpleFact($family->marr_fact, false, false); 
-			print "</span>";
+			print "</div>";
 	
 			// print spouse
 			print "<ul style=\"list-style: none; display: block;\" id=\"".$family->xref.$this->personcount."\">";
@@ -176,7 +176,7 @@ class DescendancyController extends ChartController {
 			$this->personcount++;
 	
 			// children
-			print "<tr><td colspan=\"3\" class=\"details1\" >&nbsp;";
+			print "<tr><td colspan=\"3\" class=\"PersonDetails1\" >&nbsp;";
 			if ($family->disp) {
 				if ($family->children_count < 1) print GM_LANG_no_children;
 				else print GM_FACT_NCHI.": ".$family->children_count;

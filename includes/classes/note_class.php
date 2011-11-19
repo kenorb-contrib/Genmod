@@ -322,8 +322,8 @@ class Note extends GedcomRecord {
 			if (begRTLText($this->GetTitle())) print "\n\t\t\t<li class=\"rtl\" dir=\"rtl\">";
 			else print "\n\t\t\t<li class=\"ltr\" dir=\"ltr\">";
 		}
-		if ($paste) print "<a href=\"#\" onclick=\"sndReq(document.getElementById('dummy'), 'lastused', 'type', '".$this->datatype."', 'id', '".$this->key."'); pasteid('".$this->xref."', ''); return false;\" class=\"list_item\">";
-		else print "\n\t\t\t<a href=\"note.php?oid=".$this->xref."&amp;gedid=".$this->gedcomid."\" class=\"list_item\">";
+		if ($paste) print "<a href=\"#\" onclick=\"sndReq(document.getElementById('dummy'), 'lastused', false, 'type', '".$this->datatype."', 'id', '".$this->key."'); pasteid('".$this->xref."', ''); return false;\" class=\"ListItem\">";
+		else print "\n\t\t\t<a href=\"note.php?oid=".$this->xref."&amp;gedid=".$this->gedcomid."\" class=\"ListItem\">";
 		print PrintReady($this->GetTitle($len));
 		print $this->addxref;
 		print "</a>\n";

@@ -36,6 +36,7 @@ function print_block_name_top10($block=true, $config="", $side, $index) {
 	global $TEXT_DIRECTION;
 	global $GM_BLOCKS, $command, $GM_IMAGES, $gm_user;
 
+	print "<!-- Start Top10 Surnames Block //-->";
 	function top_surname_sort($a, $b) {
 		return $b["match"] - $a["match"];
 	}
@@ -54,63 +55,60 @@ function print_block_name_top10($block=true, $config="", $side, $index) {
 
 	if (count($surnames)>0) {
 		print "<div id=\"top10surnames\" class=\"BlockContainer\">\n";
-		print "<div class=\"BlockHeader\">";
-		PrintHelpLink("index_common_names_help", "qm");
-		if ($GM_BLOCKS["print_block_name_top10"]["canconfig"]) {
-			if ((($command=="gedcom")&&($gm_user->userGedcomAdmin())) || (($command=="user")&&($gm_user->username != ""))) {
-				if ($command=="gedcom") $name = preg_replace("/'/", "\'", get_gedcom_from_id(GedcomConfig::$GEDCOMID));
-				else $name = $gm_user->username;
-				print "<a href=\"javascript: ".GM_LANG_config_block."\" onclick=\"window.open('index_edit.php?name=$name&amp;command=$command&amp;action=configure&amp;side=$side&amp;index=$index', '', 'top=50,left=50,width=500,height=250,scrollbars=1,resizable=1'); return false;\">";
-				print "<img class=\"adminicon\" src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["admin"]["small"]."\" width=\"15\" height=\"15\" border=\"0\" alt=\"".GM_LANG_config_block."\" /></a>\n";
+			print "<div class=\"BlockHeader\">";
+			PrintHelpLink("index_common_names_help", "qm");
+			if ($GM_BLOCKS["print_block_name_top10"]["canconfig"]) {
+				if ((($command=="gedcom")&&($gm_user->userGedcomAdmin())) || (($command=="user")&&($gm_user->username != ""))) {
+					if ($command=="gedcom") $name = preg_replace("/'/", "\'", get_gedcom_from_id(GedcomConfig::$GEDCOMID));
+					else $name = $gm_user->username;
+					print "<a href=\"javascript: ".GM_LANG_config_block."\" onclick=\"window.open('index_edit.php?name=$name&amp;command=$command&amp;action=configure&amp;side=$side&amp;index=$index', '', 'top=50,left=50,width=500,height=250,scrollbars=1,resizable=1'); return false;\">";
+					BlockFunctions::PrintAdminIcon();
+					print "</a>";
+				}
 			}
-		}
-		print "<b>".str_replace("10", $config["num"], GM_LANG_block_top10_title)."</b>";
-		print "</div>";
-		print "<div class=\"BlockContent\">\n";
-		if ($block) print "<div class=\"RestrictedBlockHeightRight\">\n";
-		else print "<div class=\"RestrictedBlockHeightMain\">\n";
-		if ($block) print "<table width=\"90%\">";
-		else print "<table>";
-		foreach($surnames as $indexval => $surname) {
-			print "<tr valign=\"top\">";
-			if ($CountSide=="left") {
-				print "<td dir=\"ltr\" align=\"right\">";
-				if ($TEXT_DIRECTION=="rtl") print "&nbsp;";
-				print "[".$surname["match"]."]";
-				if ($TEXT_DIRECTION=="ltr") print "&nbsp;";
-				print "</td>";
-			}
-			print "<td class=\"NameBold\" ";
-			if ($block) print "width=\"86%\"";
-			print "><a href=\"indilist.php?surname=".urlencode($surname["name"])."\">".PrintReady($surname["name"])."</a></td>";
-			if ($CountSide=="right") {
-				print "<td dir=\"ltr\" align=\"right\">";
-				if ($TEXT_DIRECTION=="ltr") print "&nbsp;";
-				print "[".$surname["match"]."]";
-				if ($TEXT_DIRECTION=="rtl") print "&nbsp;";
-				print "</td>";
-			}
-			print "</tr>";
-		}
-		print "</table>";
-		print "</div>\n";
-		print "</div>";
+			print str_replace("10", $config["num"], GM_LANG_block_top10_title);
+			print "</div>";
+			print "<div class=\"BlockContent\">\n";
+				if ($block) print "<div class=\"RestrictedBlockHeightRight\">\n";
+				else print "<div class=\"RestrictedBlockHeightMain\">\n";
+					if ($block) print "<table class=\"Top10BlockTable\">";
+					else print "<table class=\"Top10BlockTableWide\">";
+						foreach($surnames as $indexval => $surname) {
+							print "<tr>";
+							if ($CountSide=="left") {
+								print "<td class=\"Top10LeftCounter\">";
+									print "[".$surname["match"]."]";
+								print "</td>";
+							}
+							print "<td class=\"Top10BlockLink\" ";
+							print "><a href=\"indilist.php?surname=".urlencode($surname["name"])."\">".PrintReady($surname["name"])."</a></td>";
+							if ($CountSide=="right") {
+								print "<td class=\"Top10RightCounter\">";
+									print "[".$surname["match"]."]";
+								print "</td>";
+							}
+							print "</tr>";
+						}
+					print "</table>";
+				print "</div>\n";
+			print "</div>";
 		print "</div>";
 	}
+	print "<!-- End Top10 Surnames Block //-->";
 }
 
 function print_block_name_top10_config($config) {
 	global $GM_BLOCKS, $TEXT_DIRECTION;
 	if (empty($config)) $config = $GM_BLOCKS["print_block_name_top10"]["config"];
 
-	print "<tr><td class=\"shade2 width20\">".GM_LANG_num_to_show."</td>";?>
-	<td class="shade1">
+	print "<tr><td class=\"NavBlockLabel\">".GM_LANG_num_to_show."</td>";?>
+	<td class="NavBlockField">
 		<input type="text" name="num" size="2" value="<?php print $config["num"]; ?>" />
 	</td></tr>
 
 	<?php
-  	print "<tr><td class=\"shade2 width20\">".GM_LANG_before_or_after."</td>";?>
-	<td class="shade1">
+  	print "<tr><td class=\"NavBlockLabel\">".GM_LANG_before_or_after."</td>";?>
+	<td class="NavBlockField">
 	<select name="count_placement">
 		<option value="left"<?php if ($config["count_placement"]=="left") print " selected=\"selected\"";?>><?php print GM_LANG_before; ?></option>
 		<option value="right"<?php if ($config["count_placement"]=="right") print " selected=\"selected\"";?>><?php print GM_LANG_after; ?></option>

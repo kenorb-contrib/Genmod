@@ -31,7 +31,11 @@ if (stristr($_SERVER["SCRIPT_NAME"],basename(__FILE__))) {
 
 abstract class BlockFunctions {
 	
-	
+	public function PrintAdminIcon() {
+		global $GM_IMAGES;
+		
+		print "<img class=\"BlockAdminIcon\" src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["admin"]["small"]."\" alt=\"".GM_LANG_config_block."\" />\n";
+	}
 	/**
 	 * get the top surnames
 	 * @param int $num	how many surnames to return
@@ -314,8 +318,8 @@ abstract class BlockFunctions {
 		global $TEXT_DIRECTION, $gm_user;
 		
 		if (count($ids)>0) {
-			if ($block) print "<table width=\"90%\">";
-			else print "<table>";
+			if ($block) print "<table class=\"Top10BlockTable\">";
+			else print "<table class=\"Top10BlockTableWide\">";
 			$i=0;
 			foreach($ids as $id=>$counter) {
 				$count = $counter["number"];
@@ -324,57 +328,52 @@ abstract class BlockFunctions {
 				$object = ConstructObject($id, $type, $gedid);
 				if (is_object($object)) {
 					if ($object->disp_name && !$object->isempty) {
-						print "<tr valign=\"top\">";
+						print "<tr>";
 						if ($CountSide == "left") {
-							print "<td dir=\"ltr\" align=\"right\">";
-							if ($TEXT_DIRECTION=="rtl") print "&nbsp;";
+							print "<td class=\"Top10LeftCounter\">";
 							print "[".$count."]";
-							if ($TEXT_DIRECTION=="ltr") print "&nbsp;";
 							print "</td>";
 						}
 						if ($type == "INDI") {
-							print "<td class=\"wrap\"";
-							if ($block) print " width=\"86%\"";
-							print "><a href=\"individual.php?pid=".urlencode($id)."&amp;gedid=".$gedid."\"><span class=\"NameBold\">\n";
+							print "<td class=\"Top10BlockLink\"";
+							print "><a href=\"individual.php?pid=".urlencode($id)."&amp;gedid=".$gedid."\"><span class=\"Top10Name\">\n";
 							print $object->revname.($object->revaddname == "" ? "" : "&nbsp;(".$object->revaddname.")")."</span>".$object->addxref;
 							print "</a></td>\n";
 							$i++;
 						}
 						elseif ($type == "FAM") {
-							print "<td class=\"wrap\"><a href=\"family.php?famid=".urlencode($id)."&amp;gedid=".$gedid."\"><span class=\"NameBold\" >";
+							print "<td class=\"Top10BlockLink\"><a href=\"family.php?famid=".urlencode($id)."&amp;gedid=".$gedid."\"><span class=\"Top10Name\">";
 							print $object->sortable_name.($object->sortable_addname == "" ? "" : "&nbsp;(".$object->sortable_addname.")")."</span>".$object->addxref;
 							print "</a></td>";
 							$i++;
 						}
 						elseif ($type == "REPO") {
-							print "<td class=\"wrap\"><a href=\"repo.php?rid=".urlencode($id)."&amp;gedid=".$gedid."\"><span class=\"NameBold\" >";
+							print "<td class=\"Top10BlockLink\"><a href=\"repo.php?rid=".urlencode($id)."&amp;gedid=".$gedid."\"><span class=\"Top10Name\">";
 							print $object->descriptor.($object->adddescriptor == "" ? "" : "&nbsp;(".$object->adddescriptor.")")."</span>".$object->addxref;
 							print "</a></td>";
 							$i++;
 						}
 						elseif ($type == "SOUR") {
-							print "<td class=\"wrap\"><a href=\"source.php?sid=".urlencode($id)."&amp;gedid=".$gedid."\"><span class=\"NameBold\" >";
+							print "<td class=\"Top10BlockLink\"><a href=\"source.php?sid=".urlencode($id)."&amp;gedid=".$gedid."\"><span class=\"Top10Name\">";
 							print $object->descriptor.($object->adddescriptor == "" ? "" : "&nbsp;(".$object->adddescriptor.")")."</span>".$object->addxref;
 							print "</a></td>";
 							$i++;
 						}
 						elseif ($type == "OBJE") {
-							print "<td class=\"wrap\"><a href=\"mediadetail.php?mid=".urlencode($id)."&amp;gedid=".$gedid."\"><span class=\"NameBold\" >";
-							print $object->title."</span>".$object->addxref;
+							print "<td class=\"Top10BlockLink\"><a href=\"mediadetail.php?mid=".urlencode($id)."&amp;gedid=".$gedid."\"><span class=\"Top10Name\">";
+							print "</span>".$object->title.$object->addxref;
 							print "</a></td>";
 							$i++;
 						}
 						elseif ($type == "NOTE") {
-							print "<td class=\"wrap\"><a href=\"note.php?oid=".urlencode($id)."&amp;gedid=".$gedid."\"><span class=\"NameBold\" >";
-							print $object->title."</span>".$object->addxref;
+							print "<td class=\"Top10BlockLink\"><a href=\"note.php?oid=".urlencode($id)."&amp;gedid=".$gedid."\"><span class=\"Top10Name\">";
+							print "</span>".$object->title.$object->addxref;
 							print "</a></td>";
 							$i++;
 						}
 						if ($CountSide == "right") {
-							print "<td dir=\"ltr\" align=\"right\">";
-							if ($TEXT_DIRECTION=="ltr") print "&nbsp;";
-							print "[".$count."]";
-							if ($TEXT_DIRECTION=="rtl") print "&nbsp;";
+							print "<td class=\"Top10RightCounter\">";
+\							print "[".$count."]";
 							print "</td>";
 						}
 						print "</tr>";
@@ -399,11 +398,11 @@ abstract class BlockFunctions {
 				print "\"><ul>\n";
 				print "<li><a href=\"".$favorite->url."\">".PrintReady($favorite->title)."</a></li>";
 				print "</ul>";
-				print "<span class=\"favorite_padding\">".PrintReady($favorite->note)."</span>";
+				print "<span class=\"FavoriteNotePadding\">".PrintReady($favorite->note)."</span>";
 			}
 			else {
 				$favorite->GetObject();
-				print "<div id=\"box".$favorite->object->xref.".0\" class=\"person_box";
+				print "<div id=\"box".$favorite->object->xref.".0\" class=\"PersonBox";
 				if ($favorite->type == "INDI") {
 					if ($favorite->object->sex == "F") print "F\">\n";
 					elseif ($favorite->object->sex == "U") print "NN\">\n";
@@ -425,13 +424,13 @@ abstract class BlockFunctions {
 					else print "<br />";
 				}
 			}
-			if (!empty($favorite->note)) print "<span class=\"favorite_padding\">".PrintReady(GM_LANG_note.": ".$favorite->note)."</span>";
+			if (!empty($favorite->note)) print "<div class=\"FavoriteNotePadding\">".PrintReady("<span class='FactDetailLabel'>".GM_LANG_note.": </span>".$favorite->note)."</div>";
 			print "</div>\n";
 			if ($command == "user" || $gm_user->userIsAdmin()) {
 				if (!empty($favorite->note)) print "&nbsp;&nbsp;";
-				print "<a class=\"font9\" href=\"index.php?command=$command&amp;action=deletefav&amp;fv_id=".$key."\" onclick=\"return confirm('".GM_LANG_confirm_fav_remove."');\">".GM_LANG_remove."</a>\n";
+				print "<a class=\"SmallEditLinks\" href=\"index.php?command=$command&amp;action=deletefav&amp;fv_id=".$key."\" onclick=\"return confirm('".GM_LANG_confirm_fav_remove."');\">".GM_LANG_remove."</a>\n";
 				print "&nbsp;";
-				print "<a class=\"font9\" href=\"javascript: ".GM_LANG_config_block."\" onclick=\"window.open('index_edit.php?favid=$key&amp;name=$gm_user->username&amp;command=$command&amp;action=configure&amp;side=$side&amp;index=$index', '', 'top=50,left=50,width=600,height=400,scrollbars=1,resizable=1'); return false;\">".GM_LANG_edit."</a>";
+				print "<a class=\"SmallEditLinks\" href=\"javascript: ".GM_LANG_config_block."\" onclick=\"window.open('index_edit.php?favid=$key&amp;name=$gm_user->username&amp;command=$command&amp;action=configure&amp;side=$side&amp;index=$index', '', 'top=50,left=50,width=600,height=400,scrollbars=1,resizable=1'); return false;\">".GM_LANG_edit."</a>";
 			}
 			else print "&nbsp;";
 			SwitchGedcom();
@@ -455,26 +454,43 @@ abstract class BlockFunctions {
 		PrintHelpLink("index_add_favorites_help", "qm", "add_favorite");
 		print "<b><a href=\"javascript: ".GM_LANG_add_favorite." \" onclick=\"expand_layer('add_".$type."_fav'); return false;\"><img id=\"add_".$type."_fav_img\" src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["plus"]["other"]."\" border=\"0\" alt=\"".GM_LANG_add_favorite."\" />&nbsp;".GM_LANG_add_favorite."</a></b>";
 		print "<br /><div id=\"add_".$type."_fav\" style=\"display: none;\">\n";
-		print "<form name=\"addfavform\" method=\"get\" action=\"index.php\">\n";
-		print "<input type=\"hidden\" name=\"action\" value=\"addfav\" />\n";
-		print "<input type=\"hidden\" name=\"command\" value=\"$command\" />\n";
-		print "<input type=\"hidden\" name=\"favtype\" value=\"".$type."\" />\n";
-		print "<table border=\"0\" cellspacing=\"0\" width=\"100%\"><tr><td>".GM_LANG_add_fav_enter_id." <br />";
-		print "<input class=\"pedigree_form\" type=\"text\" name=\"gid\" id=\"gid\" size=\"3\" value=\"\" />";
-		LinkFunctions::PrintFindIndiLink("gid",GedcomConfig::$GEDCOMID);
-		LinkFunctions::PrintFindFamilyLink("gid");
-		LinkFunctions::PrintFindSourceLink("gid");
-		LinkFunctions::PrintFindMediaLink("gid");
-		LinkFunctions::PrintFindNoteLink("gid");
-		print "\n<br />".GM_LANG_add_fav_or_enter_url;
-		print "\n<br />".GM_LANG_url."<input type=\"text\" name=\"url\" size=\"40\" value=\"\" />";
-		print "\n<br />".GM_LANG_title." <input type=\"text\" name=\"favtitle\" size=\"40\" value=\"\" />";
-		if ($side != "right") print "\n</td><td>";
-		else print "<br /><br />";
-		print "\n".GM_LANG_add_fav_enter_note;
-		print "\n<br /><textarea name=\"favnote\" rows=\"6\" cols=\"40\"></textarea>";
-		print "</td></tr></table>\n";
-		print "\n<br /><input type=\"submit\" value=\"".GM_LANG_add."\" style=\"font-size: 8pt; \" />";
+			print "<form name=\"addfavform\" method=\"get\" action=\"index.php\">\n";
+			print "<input type=\"hidden\" name=\"action\" value=\"addfav\" />\n";
+			print "<input type=\"hidden\" name=\"command\" value=\"$command\" />\n";
+			print "<input type=\"hidden\" name=\"favtype\" value=\"".$type."\" />\n";
+			print "<div class=\"AddFavLeftBlock\">";
+				print "<table class=\"BlockTable\">";
+					print "<tr>";
+						print "<td class=\"BlockLabel\">".GM_LANG_add_fav_enter_id."</td>";
+						print "<td class=\"BlockField\">";
+							print "<input class=\"PidInputField\" type=\"text\" name=\"gid\" id=\"gid\" size=\"3\" value=\"\" />";
+							LinkFunctions::PrintFindIndiLink("gid",GedcomConfig::$GEDCOMID);
+							LinkFunctions::PrintFindFamilyLink("gid");
+							LinkFunctions::PrintFindSourceLink("gid");
+							LinkFunctions::PrintFindMediaLink("gid");
+							LinkFunctions::PrintFindNoteLink("gid");
+						print "</td>";
+					print "</tr>";
+					print "<tr>";
+						print "<td colspan=\"2\" class=\"BlockLabel\">".GM_LANG_add_fav_or_enter_url."</td>";
+					print "</tr>";
+					print "<tr>";
+						print "<td class=\"BlockLabel\">".GM_LANG_url."</td>";
+						print "<td class=\"BlockField\"><input type=\"text\" name=\"url\" size=\"40\" value=\"\" /></td>";
+					print "</tr>";
+					print "<tr>";
+						print "<td class=\"BlockLabel\">".GM_LANG_title."</td>";
+						print "<td class=\"BlockField\"><input type=\"text\" name=\"favtitle\" size=\"40\" value=\"\" /></td>";
+					print "</tr>";
+					print "<tr><td colspan=\"2\" class=\"BlockFooter\"><input type=\"submit\" value=\"".GM_LANG_add."\" style=\"font-size: 8pt; \" /></td</tr>";
+				print "</table>\n";
+			print "</div>";
+			print "<div class=\"AddFavRightBlock\">";
+				print "<table class=\"BlockTable\">";
+					print "<tr><td class=\"BlockLabel\">".GM_LANG_add_fav_enter_note."</td></tr>";
+					print "<tr><td class=\"BlockField\"><textarea name=\"favnote\" rows=\"6\" cols=\"40\"></textarea></td></tr>";
+				print "</table>\n";
+			print "</div>";
 		print "\n</form></div>\n";
 	}
 

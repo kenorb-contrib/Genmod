@@ -40,43 +40,50 @@ if (!isset($action) || $action != "search") {
 PrintSimpleHeader(GM_LANG_hs_title);
 
 ?>
+<div id="SearchHelpPage">
 <form name="entersearch" action="<?php print SCRIPT_NAME; ?>" method="post" >
 	<input name="action" type="hidden" value="search" />
-	<div class="topbottombar"><?php PrintHelpLink("hs_title_help", "qm", "hs_title"); print GM_LANG_hs_title; ?></div>
-	<!-- // Enter the keyword(s) -->
-	<div id="searchhelp_text">
-		<label for="searchtext"><?php PrintHelpLink("hs_keyword_advice", "qm", "hs_keyword"); print GM_LANG_hs_keyword; ?></label>
-		<input type="text" id="searchtext" name="searchtext" dir="ltr" size="60" value="<?php print $searchtext; ?>" />
-	</div>
-	<!-- // How to search -->
-	<div id="searchhelp_how">
-		<label for="searchhow"><?php PrintHelpLink("hs_searchhow_advice", "qm", "hs_searchhow"); print GM_LANG_hs_searchhow; ?></label>
-		<input type="radio" id="searchhow" name="searchhow" dir="ltr" value="any"
-		<?php
-		if ($searchhow == "any") print " checked=\"checked\"";
-		print " />".GM_LANG_hs_searchany;
-		?>
-		<input type="radio" name="searchhow" dir="ltr" value="all"
-		<?php
-		if ($searchhow == "all") print " checked=\"checked\"";
-		print " />".GM_LANG_hs_searchall;
-		?>
-		<input type="radio" name="searchhow" dir="ltr" value="sentence"
-		<?php
-		if ($searchhow == "sentence") print " checked=\"checked\"";
-		print " />".GM_LANG_hs_searchsentence;
-		?>
-	</div>
-	<div class="topbottombar">
-		<input type="submit" name="entertext" value="<?php print GM_LANG_hs_search;?>" />
-		<input type="button" value="<?php print GM_LANG_hs_close; ?>" onclick='self.close();' />
-	</div>
+	<table class="NavBlockTable SearchHelpTable">
+		<tr>
+			<td class="NavBlockHeader" colspan="2"><?php PrintHelpLink("hs_title_help", "qm", "hs_title"); print GM_LANG_hs_title; ?></td>
+		</tr>
+		<!-- // Enter the keyword(s) -->
+		<tr>
+			<td class="NavBlockLabel"><?php PrintHelpLink("hs_keyword_advice", "qm", "hs_keyword"); print GM_LANG_hs_keyword; ?></td>
+			<td class="NavBlockField"><input type="text" id="searchtext" name="searchtext" dir="ltr" size="60" value="<?php print $searchtext; ?>" /></td>
+		</tr>
+		<!-- // How to search -->
+		<tr>
+			<td class="NavBlockLabel"><?php PrintHelpLink("hs_searchhow_advice", "qm", "hs_searchhow"); print GM_LANG_hs_searchhow; ?></td>
+			<td class="NavBlockField"><input type="radio" id="searchhow" name="searchhow" dir="ltr" value="any"
+			<?php
+			if ($searchhow == "any") print " checked=\"checked\"";
+			print " />".GM_LANG_hs_searchany;
+			?>
+			<input type="radio" name="searchhow" dir="ltr" value="all"
+			<?php
+			if ($searchhow == "all") print " checked=\"checked\"";
+			print " />".GM_LANG_hs_searchall;
+			?>
+			<input type="radio" name="searchhow" dir="ltr" value="sentence"
+			<?php
+			if ($searchhow == "sentence") print " checked=\"checked\"";
+			print " />".GM_LANG_hs_searchsentence."</td>";
+			?>
+		</tr>
+		<tr>
+			<td class="NavBlockFooter" colspan="2">
+			<input type="submit" name="entertext" value="<?php print GM_LANG_hs_search;?>" />
+			<input type="button" value="<?php print GM_LANG_hs_close; ?>" onclick='self.close();' />
+			</td>
+		</tr>
+	</table>
 </form>
 <?php
 
 if (!empty($searchtext))  {
 	$found = 0;
-	$searchresults = "<hr />";
+	$searchresults = "";
 	// Load languages
 	$helpvarnames = array();
 	$helpvarnames = LanguageFunctions::LoadLanguage($LANGUAGE, true, true);
@@ -106,7 +113,7 @@ if (!empty($searchtext))  {
 				// Set the search string for preg_replace, case insensitive
 				$srch = "/$criterium/i";
 				// The \\0 is for wrapping the existing string in the text with the span
-				$repl = "<span class=\"search_hit\">\\0</span>";
+				$repl = "<span class=\"SearchHit\">\\0</span>";
 				$helptxt = preg_replace($srch, $repl, $helptxt);
 				$cfound++;
 			}
@@ -116,17 +123,22 @@ if (!empty($searchtext))  {
 		if (($searchhow == "any" && $cfound >= 1) ||
 			($searchhow == "all" && $cnotfound == 0) ||
 			($searchhow == "sentence" && $cfound >= 1)) {
-			$searchresults .= $helptxt.'<hr />';
+			$searchresults .= "<tr><td class=\"ListTableContent\">".$helptxt."</td></tr>";
 			$found++;
 		}
 	}
 	// Print total results, if a search has been performed
 	if (!empty($searchtext)) {
-		print $searchresults;
-		print '<div id="searchhelp_result" class="topbottombar">'.GM_LANG_hs_results.' '.$found.'</div>';
+		?>
+		<table class="ListTable SearchHelpTable">
+			<tr><td class="ListTableHeader"><?php print GM_LANG_hs_results."&nbsp;".$found; ?></td></tr>
+			<?php print $searchresults; ?>
+		</table>
+		<?php
 	}
 }
 ?>
+</div>
 <script language="JavaScript" type="text/javascript">
 <!--
 	document.entersearch.searchtext.focus();

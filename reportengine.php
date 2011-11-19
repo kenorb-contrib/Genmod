@@ -95,23 +95,24 @@ if ($action=="choose") {
 	$reports = GetReportList(true);
 	PrintHeader(GM_LANG_choose_report);
 
-	print "<br /><br />\n";
+	print "<div id=\"ReportEngineContent\">\n";
+	print "\n\t<span class=\"PageTitleName\">".GM_LANG_report_engine."</span>";
 	print "<form name=\"choosereport\" method=\"get\" action=\"reportengine.php\">\n";
 	print "<input type=\"hidden\" name=\"action\" value=\"setup\" />\n";
 	print "<input type=\"hidden\" name=\"output\" value=\"$output\" />\n";
-	print "<table class=\"FactsTable center width50 $TEXT_DIRECTION\">";
-	print "<tr><td class=\"topbottombar\" colspan=\"2\">".GM_LANG_choose_report."</td></tr>";
-	print "<tr><td class=\"shade2 wrap width20 vmiddle\">".GM_LANG_select_report."</td>";
-	print "<td class=\"shade1\">";
+	print "<table class=\"NavBlockTable ReportEngineNavBlockTable\">";
+	print "<tr><td class=\"NavBlockHeader\" colspan=\"2\">".GM_LANG_choose_report."</td></tr>";
+	print "<tr><td class=\"NavBlockLabel\">".GM_LANG_select_report."</td>";
+	print "<td class=\"NavBlockField\">";
 	print "<select name=\"report\">\n";
 	foreach($reports as $file=>$report) {
 		print "<option value=\"".$report["file"]."\">".$report["title"][$LANGUAGE]."</option>\n";
 	}
 	print "</select></td></tr>\n";
-	print "<tr><td class=\"topbottombar\" colspan=\"2\"><input type=\"submit\" value=\"".GM_LANG_click_here."\" /></td></tr>";
+	print "<tr><td class=\"NavBlockFooter\" colspan=\"2\"><input type=\"submit\" value=\"".GM_LANG_click_here."\" /></td></tr>";
 	print "</table>";
 	print "</form>\n";
-	print "<br /><br />\n";
+	print "</div\n";
 
 	PrintFooter();
 }
@@ -161,6 +162,8 @@ function paste_id(value) {
 </script>
 		<?php
 		InitCalendarPopUp();
+		print "<div id=\"ReportEngineContent\">\n";
+		print "\n\t<span class=\"PageTitleName\">".GM_LANG_report_engine."</span>";
 		print "<form name=\"setupreport\" method=\"get\" action=\"reportengine.php\">\n";
 		print "<input type=\"hidden\" name=\"action\" value=\"run\" />\n";
 		print "<input type=\"hidden\" name=\"report\" value=\"$report\" />\n";
@@ -172,17 +175,17 @@ function paste_id(value) {
 		print "<option value=\"PDF\">PDF</option>\n";
 		print "</select><br />\n";
 		*/
-		print "<table class=\"FactsTable width50 center $TEXT_DIRECTION\">";
-		print "<tr><td class=\"topbottombar\" colspan=\"2\">".GM_LANG_enter_report_values."</td></tr>";
-		print "<tr><td class=\"shade2 width30 wrap\">".GM_LANG_selected_report."</td><td class=\"shade1\">".$report_array["title"]."</td></tr>\n";
+		print "<table class=\"NavBlockTable ReportEngineNavBlockTable\">";
+		print "<tr><td class=\"NavBlockHeader\" colspan=\"2\">".GM_LANG_enter_report_values."</td></tr>";
+		print "<tr><td class=\"NavBlockLabel\">".GM_LANG_selected_report."</td><td class=\"NavBlockField\">".$report_array["title"]."</td></tr>\n";
 		
 		$firstrun = 0;
 		if (!isset($report_array["inputs"])) $report_array["inputs"] = array();
 		foreach($report_array["inputs"] as $indexval => $input) {
 			if ((($input["name"] == "sources") && ($SHOW_SOURCES >= $gm_user->getUserAccessLevel())) || ($input["name"] != "sources")) {
-				print "<tr><td class=\"shade2 wrap\">\n";
+				print "<tr><td class=\"NavBlockLabel\">\n";
 				print "<input type=\"hidden\" name=\"varnames[]\" value=\"".$input["name"]."\" />\n";
-				print $input["value"]."</td><td class=\"shade1\">";
+				print $input["value"]."</td><td class=\"NavBlockField\">";
 				if (!isset($input["type"])) $input["type"] = "text";
 				if (!isset($input["default"])) $input["default"] = "";
 				if (isset($input["lookup"])) {
@@ -264,7 +267,7 @@ function paste_id(value) {
 
 /*		?>
 		<tr><td class="shade2 wrap"></td>
-		<td class="shade1">
+		<td class="NavBlockField">
 		<table><tr>
 		<td><center><input type="radio" name="output" value="PDF" checked="checked" /><img src="images/media/pdf.gif" alt="PDF" title="PDF" /></center></td>
 		<td><center><input type="radio" name="output" value="HTML" <?php if ($output=="HTML") echo " checked=\"checked\"";?> /><img src="images/media/html.gif" alt="HTML" title="HTML" /></center></td>
@@ -275,10 +278,10 @@ function paste_id(value) {
 		</td></tr>
 		<?php */
 
-		print "<tr><td class=\"topbottombar\" colspan=\"2\"><input type=\"submit\" value=\"".GM_LANG_download_report."\" onclick=\"document.setupreport.elements['download'].value='1';\"/></td></tr>\n";
+		print "<tr><td class=\"NavBlockFooter\" colspan=\"2\"><input type=\"submit\" value=\"".GM_LANG_download_report."\" onclick=\"document.setupreport.elements['download'].value='1';\"/></td></tr>\n";
 		print "</table>\n";
 		print "</form>\n";
-		print "<br /><br />\n";
+		print "</div>\n";
 	}
 	PrintFooter();
 }
@@ -327,5 +330,4 @@ else if ($action=="run") {
 	xml_parser_free($xml_parser);
 
 }
-
 ?>

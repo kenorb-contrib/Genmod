@@ -46,7 +46,7 @@ $pbheight = $bheight+14;
 
 // -- print html header information
 PrintHeader($ancestry_controller->pagetitle);
-print "<div id=\"content_pedigree\">";
+print "<div id=\"content_ancestry\">";
 
 if ($ancestry_controller->view == "preview") print "<span class=\"PageTitleName\">" . str_replace("#PEDIGREE_GENERATIONS#", ConvertNumber($ancestry_controller->num_generations), GM_LANG_gen_ancestry_chart) . ":";
 else print "<span class=\"PageTitleName\">" . GM_LANG_ancestry_chart . ":";
@@ -69,38 +69,37 @@ if ($ancestry_controller->view != "preview") {
 	<?php
 	if (isset($ancestry_controller->max_generation) == true) print "<span class=\"Error\">" . str_replace("#PEDIGREE_GENERATIONS#", ConvertNumber($ancestry_controller->num_generations), GM_LANG_max_generation) . "</span>";
 	if (isset($ancestry_controller->min_generation) == true) print "<span class=\"Error\">" . GM_LANG_min_generation . "</span>";
-	print "<form name=\"people\" id=\"people\" method=\"get\" action=\"?\">";
-	print "\n\t\t<table class=\"ListTable ".$TEXT_DIRECTION."\" align=\"";
-	if ($TEXT_DIRECTION == "ltr") print "right";
-	else print "left";
-	print "\">";
-
-	// Option header
-	$ancestry_controller->PrintInputHeader();
-	
-	// Root ID
-	$ancestry_controller->PrintInputRootId();
-
-	// Generations
-	$ancestry_controller->PrintInputGenerations(GedcomConfig::$MAX_DESCENDANCY_GENERATIONS, "PEDIGREE_GENERATIONS_help");	
-	
-	// Box width
-	$ancestry_controller->PrintInputBoxWidth();
-
-	// NOTE: show full
-	$ancestry_controller->PrintInputShowFull();
+	print "<div class=\"AncestryNavBlock\">";
+		print "<form name=\"people\" id=\"people\" method=\"get\" action=\"?\">";
+			print "\n\t\t<table class=\"NavBlockTable AncestryNavBlockTable\">";
+		
+			// Option header
+			$ancestry_controller->PrintInputHeader();
 			
-	// NOTE: chart style
-	$ancestry_controller->PrintInputChartStyle();
-
-	// NOTE: show cousins
-	$ancestry_controller->PrintInputShowCousins();
-
-	// Submit
-	$ancestry_controller->PrintInputSubmit();
-	
-	print "</table>";
-	print "</form>\n";
+			// Root ID
+			$ancestry_controller->PrintInputRootId();
+		
+			// Generations
+			$ancestry_controller->PrintInputGenerations(GedcomConfig::$MAX_DESCENDANCY_GENERATIONS, "PEDIGREE_GENERATIONS_help");	
+			
+			// Box width
+			$ancestry_controller->PrintInputBoxWidth();
+		
+			// NOTE: show full
+			$ancestry_controller->PrintInputShowFull();
+					
+			// NOTE: chart style
+			$ancestry_controller->PrintInputChartStyle();
+		
+			// NOTE: show cousins
+			$ancestry_controller->PrintInputShowCousins();
+		
+			// Submit
+			$ancestry_controller->PrintInputSubmit();
+			
+			print "</table>";
+		print "</form>\n";
+	print "</div>";
 }
 
 if ($ancestry_controller->chart_style) {
@@ -133,10 +132,9 @@ END;
 	}
 }
 else {
-	print "<ul style=\"list-style: none; display: block;\" id=\"ancestry_chart".($TEXT_DIRECTION=="rtl" ? "_rtl" : "") ."\">\r\n";
+	print "<ul style=\"list-style: none; display: block;\" id=\"ancestry_chart\">\r\n";
 	$ancestry_controller->PrintChildAscendancy($ancestry_controller->root, 1, $ancestry_controller->num_generations);
 	print "</ul>";
-	print "<br />";
 }
 print "</div>";
 PrintFooter();

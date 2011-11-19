@@ -72,7 +72,7 @@ $controller->CheckRawEdited();
 			// Name not changed
 			if ($name["old"] == $name["new"]) {
 				print "<div class=\"IndiHeaderBlock";
-				if ($controller->show_changes && $controller->indi->isdeleted) print " change_old";
+				if ($controller->show_changes && $controller->indi->isdeleted) print " ChangeOld";
 				print "\">";
 				$controller->PrintNameRecord($name["old"], $num);
 				print "</div>";
@@ -83,13 +83,13 @@ $controller->CheckRawEdited();
 				print "<div>";
 				print "<table class=\"IndiHeaderBlock\">";
 				if (!empty($name["old"])) {
-					print "<tr><td class=\"change_old\">";
+					print "<tr><td class=\"ChangeOld\">";
 					$controller->PrintNameRecord($name["old"], $num, false);
 					print "</td></tr>";
 				}
 				if (!empty($name["new"])) {
 					$controller->name_count--;
-					print "<tr><td class=\"change_new\">";
+					print "<tr><td class=\"ChangeNew\">";
 					$controller->PrintNameRecord($name["new"], $num);
 					print "</td></tr>";
 				}
@@ -109,12 +109,12 @@ $controller->CheckRawEdited();
 				$controller->GenderRecord($factobj->factrec, $factobj->fact);
 				print "<span class=\"IndiHeaderLabel $TEXT_DIRECTION\">".PrintReady(GM_LANG_sex.":")."</span>&nbsp;<span class=\"IndiHeaderField\">".$controller->indi->sexdetails["gender"];
 				print " <img src=\"".$controller->indi->sexdetails["image"]."\" title=\"".$controller->indi->sexdetails["gender"]."\" alt=\"".$controller->indi->sexdetails["gender"];
-				print "\" width=\"0\" height=\"0\" class=\"sex_image\" border=\"0\" />";
-				if ($controller->indi->canedit && !$controller->indi->isdeleted && $factobj->style != "change_old") {
-					if ($controller->indi->sexdetails["add"]) print "<br /><a class=\"font9\" href=\"#\" onclick=\"add_new_record('".$controller->xref."', 'SEX', 'add_gender', 'INDI'); return false;\">".GM_LANG_edit."</a>";
+				print "\" width=\"0\" height=\"0\" class=\"SexImage\" border=\"0\" />";
+				if ($controller->indi->canedit && !$controller->indi->isdeleted && $factobj->style != "ChangeOld") {
+					if ($controller->indi->sexdetails["add"]) print "<br /><a class=\"SmallEditLinks\" href=\"#\" onclick=\"add_new_record('".$controller->xref."', 'SEX', 'add_gender', 'INDI'); return false;\">".GM_LANG_edit."</a>";
 					else {
-						print "<br /><a class=\"font9\" href=\"#\" onclick=\"edit_record('".$controller->xref."', 'SEX', 1, 'edit_gender', 'INDI'); return false;\">".GM_LANG_edit."</a> | ";
-						print "<a class=\"font9\" href=\"#\" onclick=\"delete_record('".$controller->xref."', 'SEX', 1, 'edit_gender', 'INDI'); return false;\">".GM_LANG_delete."</a>\n";
+						print "<br /><a class=\"SmallEditLinks\" href=\"#\" onclick=\"edit_record('".$controller->xref."', 'SEX', 1, 'edit_gender', 'INDI'); return false;\">".GM_LANG_edit."</a> | ";
+						print "<a class=\"SmallEditLinks\" href=\"#\" onclick=\"delete_record('".$controller->xref."', 'SEX', 1, 'edit_gender', 'INDI'); return false;\">".GM_LANG_delete."</a>\n";
 					}
 				}
 				print "</span>";
@@ -126,14 +126,14 @@ $controller->CheckRawEdited();
 		print "<div class=\"IndiHeaderBlock $TEXT_DIRECTION\">";
 		$bfacts = $controller->indi->SelectFacts(array("BIRT"));
 		foreach ($bfacts as $key => $factobj) {
-			print "<span class=\"IndiHeaderLabel ".$factobj->style."\">".$factobj->descr.":</span>&nbsp;<span class=\"IndiHeaderField\">";
+			print "<span class=\"IndiHeaderLabel ".$factobj->style."\">".$factobj->descr.":</span>&nbsp;<span class=\"IndiHeaderField ".$factobj->style."\">";
 			$factobj->PrintFactDate();
 			$factobj->PrintFactPlace();
 			print "</span><br />";
 		}
 		$dfacts = $controller->indi->SelectFacts(array("DEAT"));
 		foreach ($dfacts as $key => $factobj) {
-			print "<span class=\"IndiHeaderLabel ".$factobj->style."\">".$factobj->descr.":</span>&nbsp;<span class=\"IndiHeaderField\">";
+			print "<span class=\"IndiHeaderLabel ".$factobj->style."\">".$factobj->descr.":</span>&nbsp;<span class=\"IndiHeaderField ".$factobj->style."\">";
 			$factobj->PrintFactDate();
 			$factobj->PrintFactPlace();
 			print "</span><br />";

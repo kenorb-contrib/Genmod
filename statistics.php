@@ -60,10 +60,9 @@ PlotFunctions::CheckPlotExtensions();
 
 PlotFunctions::GetPlotData();
 
-print "\n\t<center><span class=\"PageTitleName\">".GM_LANG_statistiek_list."</span>\n\t";
-print "</center>";
+print "\n\t<div class=\"StatisticsPageTitle\"><span class=\"PageTitleName\">".GM_LANG_statistiek_list."</span></div>\n\t";
 print "<form method=\"post\" name=\"form\" action=\"statisticsplot.php\">";
-print "<table class=\"StatsContainer $TEXT_DIRECTION\">";
+print "<table class=\"NavBlockTable StatsContainer\">";
 
 // statistics
 print "<tr><td class=\"NavBlockHeader\" colspan=\"2\">".GM_LANG_statistics.PrintHelpLink("stat_help","qm", "", false, true)."</td></tr>";
@@ -95,7 +94,7 @@ else {
 }
 
 // plotting variables
-print "<tr><td class=\"topbottombar\" colspan=\"2\">".GM_LANG_statvars."</td></tr>";
+print "<tr><td class=\"NavBlockHeader\" colspan=\"2\">".GM_LANG_statvars."</td></tr>";
 
 print "<tr><td class=\"NavBlockLabel\">";
 print GM_LANG_statlxa;
@@ -106,12 +105,12 @@ print "<option value= \"12\" "; if ($x_as == "12") print "selected=\"selected\""
 print "<option value= \"13\" "; if ($x_as == "13") print "selected=\"selected\""; print">".GM_LANG_stat_13_mm; print "</option>";
 print "<option value= \"14\" "; if ($x_as == "14") print "selected=\"selected\""; print">".GM_LANG_stat_14_mb1; print "</option>";
 print "<option value= \"15\" "; if ($x_as == "15") print "selected=\"selected\""; print">".GM_LANG_stat_15_mm1; print "</option>";
-print "<option value= \"16\" "; if ($x_as == "16") print "selected=\"selected\""; print">".GM_LANG_stat_16_mmb."&nbsp;<i>".GM_LANG_stat_gmx."</i>"; print "</option>";
-print "<option value= \"17\" "; if ($x_as == "17") print "selected=\"selected\""; print">".GM_LANG_stat_17_arb."&nbsp;<i>".GM_LANG_stat_gax."</i>"; print "</option>";
-print "<option value= \"18\" "; if ($x_as == "18") print "selected=\"selected\""; print">".GM_LANG_stat_18_ard."&nbsp;<i>".GM_LANG_stat_gax."</i>"; print "</option>";
-print "<option value= \"19\" "; if ($x_as == "19") print "selected=\"selected\""; print">".GM_LANG_stat_19_arm."&nbsp;<i>".GM_LANG_stat_gax."</i>"; print "</option>";
-print "<option value= \"20\" "; if ($x_as == "20") print "selected=\"selected\""; print">".GM_LANG_stat_20_arm1."&nbsp;<i>".GM_LANG_stat_gax."</i>"; print "</option>";
-print "<option value= \"21\" "; if ($x_as == "21") print "selected=\"selected\""; print">".GM_LANG_stat_21_nok."&nbsp;<i>".GM_LANG_stat_gnx."</i>"; print "</option>";
+print "<option value= \"16\" "; if ($x_as == "16") print "selected=\"selected\""; print">".GM_LANG_stat_16_mmb."&nbsp;".GM_LANG_stat_gmx; print "</option>";
+print "<option value= \"17\" "; if ($x_as == "17") print "selected=\"selected\""; print">".GM_LANG_stat_17_arb."&nbsp;".GM_LANG_stat_gax; print "</option>";
+print "<option value= \"18\" "; if ($x_as == "18") print "selected=\"selected\""; print">".GM_LANG_stat_18_ard."&nbsp;".GM_LANG_stat_gax; print "</option>";
+print "<option value= \"19\" "; if ($x_as == "19") print "selected=\"selected\""; print">".GM_LANG_stat_19_arm."&nbsp;".GM_LANG_stat_gax; print "</option>";
+print "<option value= \"20\" "; if ($x_as == "20") print "selected=\"selected\""; print">".GM_LANG_stat_20_arm1."&nbsp;".GM_LANG_stat_gax; print "</option>";
+print "<option value= \"21\" "; if ($x_as == "21") print "selected=\"selected\""; print">".GM_LANG_stat_21_nok."&nbsp;".GM_LANG_stat_gnx; print "</option>";
 print "</select></td></tr>";
 
 print "<tr><td class=\"NavBlockLabel\">";
@@ -132,7 +131,7 @@ print "<option value= \"302\" "; if ($z_as == "302") print "selected=\"selected\
 print "</select></td></tr>";
 
 // tickvalues
-print "<tr><td class=\"topbottombar\" colspan=\"2\">".GM_LANG_statmess1."</td></tr>";
+print "<tr><td class=\"NavBlockHeader\" colspan=\"2\">".GM_LANG_statmess1."</td></tr>";
 print "<tr><td class=\"NavBlockLabel\">";
 print GM_LANG_statar_xgl."</td>";
 print "<td class=\"NavBlockField\">";
@@ -158,7 +157,7 @@ print "<input type=\"text\" name=\"zasGrPeriode\" value=\"".$zasGrPeriode."\" si
 print "</td></tr>";
 
 // Options
-print "<tr><td class=\"topbottombar\" colspan=\"2\">"."Options"/*GM_LANG_statmess1*/."</td></tr>";
+print "<tr><td class=\"NavBlockHeader\" colspan=\"2\">".GM_LANG_options."</td></tr>";
 print "<tr><td class=\"NavBlockLabel\">";
 print GM_LANG_pl_shadow."</td>";
 print "<td class=\"NavBlockField\"><select name=\"showShadow\">";

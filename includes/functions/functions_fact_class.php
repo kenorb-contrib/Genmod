@@ -157,7 +157,7 @@ abstract class FactFunctions {
 								$prt = true;
 							}
 							$prt = self::PrintAddressStructure($repo, 1, $prt) || $prt;
-							$prted = self::PrintFactNotes($repo, 1) || $prt;
+							$prted = self::PrintFactNotes($repo, 1, !$prt) || $prt;
 						}
 						else if ($fact == "SUBM") {
 							$subm =& Submitter::GetInstance($match[1]);
@@ -368,7 +368,7 @@ abstract class FactFunctions {
 			if ($factobj->disp) {
 				print "<span class=\"FactDetailField\">";
 				MediaFS::DispImgLink($media->fileobj->f_main_file, $media->fileobj->f_thumb_file, $media->title, "mainmedia", 0, 0, $imgwidth, $imgheight, $media->fileobj->f_is_image, $media->fileobj->f_file_exists);
-				print "<a href=\"mediadetail.php?mid=".$media->xref."&amp;gedid=".$media->gedcomid."\"><i>".PrintReady(($factobj->style == "change_old" ? $media->oldtitle : $media->title))."</i></a>";
+				print "<a href=\"mediadetail.php?mid=".$media->xref."&amp;gedid=".$media->gedcomid."\"><i>".PrintReady(($factobj->style == "ChangeOld" ? $media->oldtitle : $media->title))."</i></a>";
 				if ($media->fileobj->f_thumb_file == "" && preg_match("'://'", $media->filename)) print "<br /><a href=\"".$media->filename."\" target=\"_blank\">".$media->filename."</a>";
 				print "</span>";
 				// NOTE: Print the format of the media
@@ -422,9 +422,9 @@ abstract class FactFunctions {
 			print "\n\t\t\t<td class=\"FactDetailCell ".$factobj->style."\">";
 			if ($factobj->disp) {
 				print "<span class=\"FactDetailField\"><a href=\"source.php?sid=".$source->xref."\">";
-    			print ($factobj->style == "change_old" ? $source->olddescriptor : $source->descriptor);
+    			print ($factobj->style == "ChangeOld" ? $source->olddescriptor : $source->descriptor);
    				//-- Print additional source title
-   				if ($factobj->style == "change_old" && $source->oldadddescriptor != "") print " - ".$source->oldadddescriptor;
+   				if ($factobj->style == "ChangeOld" && $source->oldadddescriptor != "") print " - ".$source->oldadddescriptor;
    				else if ($source->adddescriptor != "") print " - ".$source->adddescriptor;
 				print "</a></span>";
 				$cs = preg_match("/2 PAGE (.*)/", $factobj->factrec, $cmatch);
@@ -516,7 +516,7 @@ abstract class FactFunctions {
 				}
 				else {
 					//-- print linked note records
-				   	print "<a href=\"note.php?oid=".$note->xref."&amp;gedid=".$note->gedcomid."\">".($factobj->style == "change_old" ? $note->oldtext : $note->text)."</a>";
+				   	print "<a href=\"note.php?oid=".$note->xref."&amp;gedid=".$note->gedcomid."\">".($factobj->style == "ChangeOld" ? $note->oldtext : $note->text)."</a>";
 					self::PrintFactSources($note, 2);
 				}
 				print "</span>";
@@ -598,7 +598,7 @@ abstract class FactFunctions {
 				}
 			}
 //			if (preg_match("/$nlevel SOUR/", $noterec)>0) {
-//				print "<div class=\"indent\">";
+//				print "<div class=\"Indent\">";
 //			  	PrintFactSources($noterec, $nlevel);
 //			  	print "</div>";
 //		  	}
@@ -633,7 +633,7 @@ abstract class FactFunctions {
 		elseif ($factobj->disp) {
 			// We have a factobject as input, and must print the level 2 or higher sources
 			if ($level > 1 && $factobj->datatype == "sub") {
-				$type = ($factobj->style == "change_old" ? "old" : "");
+				$type = ($factobj->style == "ChangeOld" ? "old" : "");
 				$i = 1;
 				do {
 					$rec = GetSubRecord(2, "$level SOUR", $factobj->factrec, $i);
@@ -742,7 +742,7 @@ abstract class FactFunctions {
 					print PrintReady($text);
 					print "</span>";
 				}
-				print "<div class=\"indent\">";
+				print "<div class=\"Indent\">";
 //				self::PrintFactMedia($sourcerec, $nlevel);
 				self::PrintFactNotes($sourcerec, $nlevel, false);
 				print "</div>";
@@ -912,7 +912,7 @@ abstract class FactFunctions {
 			$edit_actions = array("edit_fact", "edit_fact", "copy_fact", "delete_fact");
 			print "</span>";
 		}
-		if ($factobj->canedit && $factobj->style!="change_old" && !$factobj->owner->view && $mayedit) {
+		if ($factobj->canedit && $factobj->style!="ChangeOld" && !$factobj->owner->view && $mayedit) {
 			$menu = array();
 			$menu["label"] = GM_LANG_edit;
 			$menu["labelpos"] = "right";
@@ -1027,8 +1027,8 @@ abstract class FactFunctions {
 						if (!$asso->view) {
 							$family =& Family::GetInstance($pid);
 							if (!$family->isempty) {
-								if ($family->husb_id != "" && $family->husb_id != $asso->xref) print " - <span class=\"FactAssoLink\"><a href=\"relationship.php?pid1=".$family->husb_id."&amp;pid2=".$asso->xref."&amp;followspouse=1&amp;gedid=".$asso->gedcomid."\">[" . GM_LANG_relationship_chart . "<img src=\"".GM_IMAGE_DIR."/" . $GM_IMAGES["sex"]["small"] . "\" title=\"" . GM_LANG_husband . "\" alt=\"" . GM_LANG_husband . "\" class=\"sex_image\" />]</a></span>";
-								if ($family->wife_id != "" && $family->wife_id != $asso->xref) print " - <span class=\"FactAssoLink\"><a href=\"relationship.php?pid1=".$family->wife_id."&amp;pid2=".$asso->xref."&amp;followspouse=1&amp;gedid=".$asso->gedcomid."\">[" . GM_LANG_relationship_chart . "<img src=\"".GM_IMAGE_DIR."/" . $GM_IMAGES["sexf"]["small"] . "\" title=\"" . GM_LANG_wife . "\" alt=\"" . GM_LANG_wife . "\" class=\"sex_image\" />]</a></span>";
+								if ($family->husb_id != "" && $family->husb_id != $asso->xref) print " - <span class=\"FactAssoLink\"><a href=\"relationship.php?pid1=".$family->husb_id."&amp;pid2=".$asso->xref."&amp;followspouse=1&amp;gedid=".$asso->gedcomid."\">[" . GM_LANG_relationship_chart . "<img src=\"".GM_IMAGE_DIR."/" . $GM_IMAGES["sex"]["small"] . "\" title=\"" . GM_LANG_husband . "\" alt=\"" . GM_LANG_husband . "\" class=\"SexImage\" />]</a></span>";
+								if ($family->wife_id != "" && $family->wife_id != $asso->xref) print " - <span class=\"FactAssoLink\"><a href=\"relationship.php?pid1=".$family->wife_id."&amp;pid2=".$asso->xref."&amp;followspouse=1&amp;gedid=".$asso->gedcomid."\">[" . GM_LANG_relationship_chart . "<img src=\"".GM_IMAGE_DIR."/" . $GM_IMAGES["sexf"]["small"] . "\" title=\"" . GM_LANG_wife . "\" alt=\"" . GM_LANG_wife . "\" class=\"SexImage\" />]</a></span>";
 							}
 							else if ($pid != $asso->xref) print " - <span class=\"FactAssoLink\"><a href=\"relationship.php?pid1=".$pid."&amp;pid2=".$asso->xref."&amp;followspouse=1&amp;gedid=".$asso->gedcomid."\">[" . GM_LANG_relationship_chart . "]</a></span>";
 						}
@@ -1077,7 +1077,7 @@ abstract class FactFunctions {
 		print GM_LANG_add_fact."</span>";
 		if (isset($_SESSION["clipboard"]) && count($_SESSION["clipboard"]) != 0) {
 			print "<span class id=\"clear_clipboard\"><br />";
-			print "<a href=\"#\" onclick=\"sndReq('clear_clipboard', 'clear_clipboard'); window.location.reload(); return false;\">";
+			print "<a href=\"#\" onclick=\"sndReq('clear_clipboard', 'clear_clipboard', true); window.location.reload(); return false;\">";
 			print GM_LANG_clear_clipboard;
 			print "</a></span>";
 		}
@@ -1150,7 +1150,7 @@ abstract class FactFunctions {
 		for($i=0; $i<$ct; $i++) {
 			$firstline = false;
 	 		$arec = GetSubRecord($level, "$level ADDR", $object->factrec, $i+1);
-	 		if ($level>1) print "\n\t\t<span class=\"FactDetailLabel\">".GM_FACT_ADDR.": </span><br /><div class=\"indent\">";
+	 		if ($level>1) print "\n\t\t<span class=\"FactDetailLabel\">".GM_FACT_ADDR.": </span><br /><div class=\"Indent\">";
 	 		print "<span class=\"FactDetailField\">";
 			$cn = preg_match("/$nlevel _NAME (.*)/", $arec, $cmatch);
 			if ($cn>0) print str_replace("/", "", $cmatch[1])."<br />\n";
@@ -1381,7 +1381,7 @@ abstract class FactFunctions {
 			
 			$ct = preg_match("/\d DATE(.*)/", $factobj->factrec, $match);
 			if ($ct>0) {
-				$text .= " - <span class=\"date\">".GetDateUrl($match[1], $CalYear)."</span>";
+				$text .= " - <span class=\"Date\">".GetDateUrl($match[1], $CalYear)."</span>";
 				$yt = preg_match("/ (\d\d\d\d|\d\d\d)/", $match[1], $ymatch);
 				if ($yt>0) {
 					$hct = preg_match("/2 DATE.*(@#DHEBREW@)/", $match[1], $hmatch);

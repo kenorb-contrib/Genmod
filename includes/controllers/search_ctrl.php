@@ -143,7 +143,7 @@ class SearchController extends BaseController {
 			$this->GetSearchGeds();
 	
 			// If topsearch, see if we must jump to a record
-			if ($this->topsearch == "yes") $this->CheckTopSearch();		
+			if ($this->topsearch == "yes") $this->CheckTopSearch();
 			
 			// Reset some settings if the quicksearch is selected
 			if (!$this->CheckQuickStart()) {
@@ -331,6 +331,9 @@ class SearchController extends BaseController {
 				break;
 			case "language_filter":
 				return $this->language_filter;
+				break;
+			case "origin":
+				return $this->origin;
 				break;
 			default:
 				return parent::__get($property);

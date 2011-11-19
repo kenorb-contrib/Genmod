@@ -46,14 +46,16 @@ PrintHeader(GM_LANG_config_maint);
 
 ?>
 <!-- Setup the left box -->
-<div id="admin_genmod_left">
-	<div class="admin_link"><a href="admin.php"><?php print GM_LANG_admin;?></a></div>
-	<div class="admin_link"><a href="admin_maint.php"><?php print GM_LANG_administration_maintenance;?></a></div>
+<div id="AdminColumnLeft">
+	<?php AdminFunctions::AdminLink("admin.php", GM_LANG_admin); ?>
+	<?php AdminFunctions::AdminLink("admin_maint.php", GM_LANG_administration_maintenance); ?>
 </div>
 
-<div id="content">
+<div id="AdminColumnMiddle">
+	<form method="post" name="configform" action="config_maint.php">
+	<input type="hidden" name="action" value="update" />
 	<?php
-	if ($action == "update" && isset($delconf)) {
+	if ($action == "update" && is_array($delconf)) {
 		foreach ($delconf as $key => $value) {
 			if (!SystemConfig::DeleteConfig($value)) {
 				$message = "<span class=\"Error\">".GM_LANG_gm_config_write_error."</span>";
@@ -63,46 +65,61 @@ PrintHeader(GM_LANG_config_maint);
 		}
 	}
 	?>
-	<form method="post" name="configform" action="config_maint.php">
-		<input type="hidden" name="action" value="update" />
-		<div class="admin_topbottombar">
-			<h3>
-				<?php PrintHelpLink("config_maint_help", "qm", "config_maint");?>
-				<?php print GM_LANG_config_maint; ?>
-			</h3>
-		</div>
+	<table class="NavBlockTable AdminNavBlockTable">
+		<tr>
+			<td colspan="3" class="NavBlockHeader AdminNavBlockHeader">
+				<div class="AdminNavBlockTitle">
+					<?php PrintHelpLink("config_maint_help", "qm", "config_maint");?>
+					<?php print GM_LANG_config_maint;?>
+				</div><?php
+				if (isset($message)) {
+					print "<div class=\"Error\">".$message."</div>";
+				} ?>
+			</td>
+		</tr>
 		<?php
-		if (isset($message)) {
-			print "<div class=\"shade2 center\">".$message."</div>";
-		}
 		?>
-		<div class="admin_item_box shade2">
-			<div class="width10 choice_left"><?php print GM_LANG_select; ?></div>
-			<div class="width30 choice_right"><?php print GM_LANG_site_name; ?></div>
-			<div class="width30 choice_right"><?php print GM_LANG_SITE_ALIAS; ?></div>
-		</div>
+		<tr>
+			<td class="NavBlockColumnHeader AdminNavBlockColumnHeader">
+				<?php print GM_LANG_select; ?>
+			</td>
+			<td class="NavBlockColumnHeader AdminNavBlockColumnHeader">
+				<?php print GM_LANG_site_name; ?>
+			</td>
+			<td class="NavBlockColumnHeader AdminNavBlockColumnHeader">
+				<?php print GM_LANG_SITE_ALIAS; ?>
+			</td>
+		</tr>
 		<?php
-			foreach ($CONFIG_PARMS as $site => $parms) {
-				if (isset($parms["SITE_ALIAS"])) $aliases = explode(",", $parms["SITE_ALIAS"]);
-				else $aliases = array();
-				?>
-				<div class="admin_item_box">
-				<div class="width10 choice_left"><input type="checkbox" name="delconf[]" value="<?php print $site."\"";
+		foreach ($CONFIG_PARMS as $site => $parms) {
+			if (isset($parms["SITE_ALIAS"])) $aliases = explode(",", $parms["SITE_ALIAS"]);
+			else $aliases = array();
+			?>
+			<tr>
+				<td class="NavBlockField AdimNavBlockField NavBlockCheckRadio">
+					<input type="checkbox" name="delconf[]" value="<?php print $site."\"";
 					if ($site == SERVER_URL || in_array(SERVER_URL, $aliases)) print " disabled=\"disabled\""; 
-				?>/>
-				</div>
-				<div class="width30 choice_right"><?php print $site; ?></div>
-				<div class="width30 choice_right"><?php 
+					?>/>
+				</td>
+				<td class="NavBlockLabel AdimNavBlockLabel">
+					<?php print $site; ?>
+				</td>
+				<td class="NavBlockLabel AdimNavBlockLabel">
+				<?php
 				foreach ($aliases as $key => $alias) {
 					print $alias."<br />";
 				}
-				?></div>
-				</div>
-			<?php } ?>
-			<div class="admin_item_box center shade2">
-				<br />
+				?>
+				</td>
+			</tr>
+			<?php
+		} ?>
+		<tr>
+			<td colspan="3" class="NavBlockFooter">
 				<input type="submit" value="<?php print GM_LANG_delete_sel_configs;?>" />
-			</div>
+			</td>
+		</tr>
+	</table>
 	</form>
 </div>
 <?php

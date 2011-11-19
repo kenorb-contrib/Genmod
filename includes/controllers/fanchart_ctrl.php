@@ -397,61 +397,68 @@ class FanchartController extends ChartController {
 					if ($this->view != "") $url .= "&amp;view=".$this->view;
 					$count=0;
 					$mousecode = " onmouseover=\"clear_family_box_timeout('".$person->xref.".".$count."');\" onmouseout=\"family_box_timeout('".$person->xref.".".$count."');\"";
-					$lbwidth=200;
+					$lbwidth=250;
 	//print "tx: ".$tx." ty ".$ty."<br />";				
-					print "\n\t\t<div id=\"I".$person->xref.".".$count."links\" style=\"position:absolute; left:".$tx."px; top:".$ty."px; width:".$lbwidth."px; visibility:hidden; z-index:'1000';\">";
+					print "\n\t\t<div class=\"PersonBox".($person->sex=="F"?"F":($person->sex=="U"?"NN":""))." PersonBoxLinkBox\" id=\"I".$person->xref.".".$count."links\" style=\"position:absolute; left:".$tx."px; top:".$ty."px; width:".$lbwidth."px; visibility:hidden; z-index:'1000';\">";
+						print "<div class=\"PersonBoxLinkBoxFamLinks\">";
+							print "<a href=\"individual.php?pid=".$person->xref."&amp;gedid=".GedcomConfig::$GEDCOMID."\"".$mousecode." class=\"PersonName1\">" . PrintReady($person->name);
+							if (!empty($person->addname)) print "<br />" . PrintReady($person->addname);
+						print "</a><br /><br /></div>\n";
+						print "<div class=\"PersonBoxLinkBoxChartLinks\">";
+							print "<a href=\"pedigree.php?rootid=".$person->xref."&amp;gedid=".GedcomConfig::$GEDCOMID."\"".$mousecode.">".GM_LANG_index_header."</a>\n";
+							print "<br /><a href=\"descendancy.php?rootid=".$person->xref."&amp;gedid=".GedcomConfig::$GEDCOMID."\"".$mousecode.">".GM_LANG_descend_chart."</a>\n";
+							print "<br /><a href=\"ancestry.php?rootid=".$person->xref."&amp;gedid=".GedcomConfig::$GEDCOMID."\"".$mousecode.">".GM_LANG_ancestry_chart."</a>\n";
+							print "<br /><a href=\"fanchart.php?rootid=".$person->xref."&amp;gedid=".GedcomConfig::$GEDCOMID."&amp;num_generations=".$this->num_generations."&amp;box_width=".$this->box_width."&amp;fan_style=".$this->fan_style."\"".$mousecode.">".GM_LANG_fan_chart."</a>\n";
+							print "<br /><a href=\"hourglass.php?pid=".$person->xref."&amp;gedid=".GedcomConfig::$GEDCOMID."\"".$mousecode.">".GM_LANG_hourglass_chart."</a>\n";
+							print "<br /><a href=\"familybook.php?rootid=".$person->xref."&amp;gedid=".$person->gedcomid."\"".$mousecode.">".GM_LANG_familybook_chart."</a>\n";
+							if ($reltome)  print "<br /><a href=\"relationship.php?pid1=".$gm_user->gedcomid[GedcomConfig::$GEDCOMID]."&amp;pid2=".$person->xref."&amp;gedid=".GedcomConfig::$GEDCOMID."\"".$mousecode.">".GM_LANG_relationship_to_me."</a>\n";
+							print "<br /><a href=\"timeline.php?pids0=".$person->xref."&amp;gedid=".$person->gedcomid."\">".GM_LANG_timeline_chart."</a>\n";
+							print "<br /><a href=\"paternals.php?rootid=".$person->xref."&amp;gedid=".$person->gedcomid."\">".GM_LANG_paternal_chart."</a>\n";
+						print "</div>";
+						
+						print "<div class=\"PersonBoxLinkBoxFamLinks\">";
 	
-					print "\n\t\t\t<table class=\"PersonBox\"><tr><td class=\"details1\">";
-					print "<a href=\"individual.php?pid=".$person->xref."&amp;gedid=".GedcomConfig::$GEDCOMID."\"".$mousecode." class=\"name1\">" . PrintReady($person->name);
-					if (!empty($person->addname)) print "<br />" . PrintReady($person->addname);
-					print "</a>\n";
-					print "<br /><a href=\"pedigree.php?rootid=".$person->xref."&amp;gedid=".GedcomConfig::$GEDCOMID."\"".$mousecode.">".GM_LANG_index_header."</a>\n";
-					print "<br /><a href=\"descendancy.php?rootid=".$person->xref."&amp;gedid=".GedcomConfig::$GEDCOMID."\"".$mousecode.">".GM_LANG_descend_chart."</a>\n";
-					if ($reltome)  print "<br /><a href=\"relationship.php?pid1=".$gm_user->gedcomid[GedcomConfig::$GEDCOMID]."&amp;pid2=".$person->xref."&amp;gedid=".GedcomConfig::$GEDCOMID."\"".$mousecode.">".GM_LANG_relationship_to_me."</a>\n";
-					print "<br /><a href=\"ancestry.php?rootid=".$person->xref."&amp;gedid=".GedcomConfig::$GEDCOMID."\"".$mousecode.">".GM_LANG_ancestry_chart."</a>\n";
-					print "<br /><a href=\"fanchart.php?rootid=".$person->xref."&amp;gedid=".GedcomConfig::$GEDCOMID."&amp;num_generations=".$this->num_generations."&amp;box_width=".$this->box_width."&amp;fan_style=".$this->fan_style."\"".$mousecode.">".GM_LANG_fan_chart."</a>\n";
-					print "<br /><a href=\"hourglass.php?pid=".$person->xref."&amp;gedid=".GedcomConfig::$GEDCOMID."\"".$mousecode.">".GM_LANG_hourglass_chart."</a>\n";
-	
-					if ($sosa>=1) {
-						$num=0;
-						foreach($person->childfamilies as $key => $childfamily) {
-							$num += $childfamily->children_count;
-						}
-						if (count($person->spousefamilies) > 0 || $num > 1) {
-							//-- spouse(s) and children
-							foreach($person->spousefamilies as $key2 => $spfamily) {
-								if($spfamily->husb_id != "" && $spfamily->wife_id != "") {
-									if ($person->xref != $spfamily->husb_id) $spid = $spfamily->husb_id;
-									else $spid = $spfamily->wife_id;
-									$linkurl = str_replace("id=".$person->xref, "id=".$spid, $url);
-										// TODO: Fix links
-									print "\n<br /><a href=\"".$linkurl."\"".$mousecode." class=\"name1\">";
-									print ($spid == $spfamily->husb_id ? $spfamily->husb->name : $spfamily->wife->name);
-									print "</a>";
-								}
-								foreach ($spfamily->children as $key3 => $child) {
-									$linkurl=str_replace("id=".$person->xref, "id=".$child->xref, $url);
-									print "\n<br />&nbsp;&nbsp;<a href=\"$linkurl\"".$mousecode." class=\"name1\">&lt; ";
-									print $child->name;
-									print "</a>";
-								}
+						if ($sosa>=1) {
+							$num=0;
+							foreach($person->childfamilies as $key => $childfamily) {
+								$num += $childfamily->children_count;
 							}
-							//-- siblings
-							foreach($person->childfamilies as $key => $chfamily) {
-								if ($chfamily->children_count > 1) print "\n<br /><span class=\"name1\">".GM_LANG_siblings."</span>";
-								foreach ($chfamily->children as $key2 => $child) {
-									if ($child->xref != $person->xref) {
-										$linkurl = str_replace("id=".$person->xref, "id=".$child->xref, $url);
+							if (count($person->spousefamilies) > 0 || $num > 1) {
+								//-- spouse(s) and children
+								foreach($person->spousefamilies as $key2 => $spfamily) {
+									if($spfamily->husb_id != "" && $spfamily->wife_id != "") {
+										print "\n<span class=\"PersonBoxLinkBoxFamLinksFam\">".GM_LANG_fam_spouse."</span><br />";
+										if ($person->xref != $spfamily->husb_id) $spid = $spfamily->husb_id;
+										else $spid = $spfamily->wife_id;
+										$linkurl = str_replace("id=".$person->xref, "id=".$spid, $url);
 											// TODO: Fix links
-										print "\n<br />&nbsp;&nbsp;<a href=\"$linkurl\"".$mousecode." class=\"name1\"> ";
-										print $child->name.$child->addxref;
+										print "\n<a href=\"".$linkurl."\"".$mousecode." class=\"PersonBoxLinkBoxFamLinksIndi\">";
+										print ($spid == $spfamily->husb_id ? $spfamily->husb->name : $spfamily->wife->name);
 										print "</a>";
+									}
+									foreach ($spfamily->children as $key3 => $child) {
+										$linkurl=str_replace("id=".$person->xref, "id=".$child->xref, $url);
+										print "\n<br /><a href=\"$linkurl\"".$mousecode." class=\"PersonBoxLinkBoxFamLinksIndi PersonBoxLinkBoxIndent\">";
+										print $child->name;
+										print "</a>";
+									}
+								}
+								//-- siblings
+								foreach($person->childfamilies as $key => $chfamily) {
+									if ($chfamily->children_count > 1) print "\n<br /><span class=\"PersonBoxLinkBoxFamLinksFam\">".GM_LANG_siblings."</span>";
+									foreach ($chfamily->children as $key2 => $child) {
+										if ($child->xref != $person->xref) {
+											$linkurl = str_replace("id=".$person->xref, "id=".$child->xref, $url);
+												// TODO: Fix links
+											print "\n<br /><a href=\"$linkurl\"".$mousecode." class=\"PersonBoxLinkBoxFamLinksIndi PersonBoxLinkBoxIndent\"> ";
+											print $child->name.$child->addxref;
+											print "</a>";
+										}
 									}
 								}
 							}
 						}
-					}
-					print "</td></tr></table>\n\t\t";
+						print "</div>";
 					print "</div>";
 					$imagemap .= " onclick=\"show_family_box('".$person->xref.".".$count."', 'relatives'); return false;\"";
 					$imagemap .= " onmouseout=\"family_box_timeout('".$person->xref.".".$count."'); return false;\"";
@@ -488,9 +495,9 @@ class FanchartController extends ChartController {
 		$image_name="V".time();
 		unset($_SESSION[$image_name]);          // statisticsplot.php uses this to hold a file name to send to browser
 		$image_title=preg_replace("~<.*>~", "", $name) . " " . GM_LANG_fan_chart;
-		print "\r\n<p align=\"center\" >";
+		print "\r\n<div style=\"float: left;\">";
 		print "<img src=\"imageflush.php?image_type=png&amp;image_name=".$image_name."\" width=\"".$fanw."\" height=\"".$fanh."\" border=\"0\" alt=\"".$image_title."\" title=\"".$image_title."\" usemap=\"#fanmap\" />";
-		print "\r\n</p>\r\n";
+		print "\r\n</div>\r\n";
 		ImageDestroy($image);
 	}
 

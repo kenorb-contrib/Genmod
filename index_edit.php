@@ -41,7 +41,7 @@ global $GEDCOM_TITLE;
 if (empty($gm_user->username) || empty($name)) {
 	PrintSimpleHeader("");
 	print GM_LANG_access_denied;
-	print "<div class=\"center\"><a href=\"javascript:// ".GM_LANG_close_window."\" onclick=\"self.close();\">".GM_LANG_close_window."</a></div>\n";
+	print "<div class=\"CloseWindow\"><a href=\"javascript:// ".GM_LANG_close_window."\" onclick=\"self.close();\">".GM_LANG_close_window."</a></div>\n";
 	PrintSimpleFooter();
 	exit;
 }
@@ -118,11 +118,12 @@ $block_summary_table = "";
 $SortedBlocks = array_flip($SortedBlocks);
 foreach($SortedBlocks as $key => $b) {
 	$temp = $GM_BLOCKS[$b]["descr"];
-	$block_summary_table .= "<tr valign='top'>";
-	$block_summary_table .= "<td>".$GM_BLOCKS[$b]["name"]."</td>";
-	$block_summary_table .= "<td>#gm_lang[$temp]#</td>";
+	$block_summary_table .= "<tr>";
+	$block_summary_table .= "<td class=\"NavBlockField\">".$GM_BLOCKS[$b]["name"]."</td>";
+	$block_summary_table .= "<td class=\"NavBlockField\">#gm_lang[$temp]#</td>";
 	$block_summary_table .= "</tr>";
 }
+define('GM_LANG_block_summary_table', $block_summary_table);
 $SortedBlocks = array_flip($SortedBlocks);
 
 //-- get the blocks list
@@ -233,7 +234,7 @@ if ($action == "storefav") {
 	}
 	else {
 		print "<span class=\"Error\">".GM_LANG_favorite_not_stored."</span>";
-		print "<div class=\"center\"><a href=\"javascript:// ".GM_LANG_close_window."\" onclick=\"self.close();\">".GM_LANG_close_window."</a></div>\n";
+		print "<div class=\"CloseWindow\"><a href=\"javascript:// ".GM_LANG_close_window."\" onclick=\"self.close();\">".GM_LANG_close_window."</a></div>\n";
 		PrintFooter();
 		exit;
 	}
@@ -243,40 +244,34 @@ $block = $ublocks->$side;
 if ($action=="configure" && isset($block[$index])) {
 	
 	$block = $block[$index];
-	print "<table class=\"FactsTable ".$TEXT_DIRECTION."\">";
-	print "<tr><td class=\"facts_label\">";
-	print "<h3>".GM_LANG_config_block."</h3>";
-	print "</td></tr>";
-	print "<tr><td class=\"topbottombar\">";
-	print "<b>".$GM_BLOCKS[$block[0]]["name"]."</b>";
-	print "</td></tr>";
-	print "</table>";
 	
-	/**
-	print "<label class=\"label_form\" for=\"username\">".GM_LANG_username"]."</label>";
-	print "<input class=\"input_form\" type=\"text\" id=\"username\" name=\"username\" /><br style=\"clear: left;\"/>";
-	*/
 	print "\n<form name=\"block\" method=\"post\" action=\"index_edit.php\">\n";
 	print "<input type=\"hidden\" name=\"command\" value=\"$command\" />\n";
 	print "<input type=\"hidden\" name=\"action\" value=\"updateconfig\" />\n";
 	print "<input type=\"hidden\" name=\"name\" value=\"$name\" />\n";
 	print "<input type=\"hidden\" name=\"side\" value=\"$side\" />\n";
 	print "<input type=\"hidden\" name=\"index\" value=\"$index\" />\n";
-	print "<table border=\"0\" class=\"FactsTable ".$TEXT_DIRECTION."\">";
+	print "<table class=\"NavBlockTable\">";
+	print "<tr><td class=\"NavBlockHeader\" colspan=\"2\">".GM_LANG_config_block.": ".$GM_BLOCKS[$block[0]]["name"]."</td></tr>";
+	
+	/**
+	print "<label class=\"InstallLabelForm\" for=\"username\">".GM_LANG_username"]."</label>";
+	print "<input class=\"input_form\" type=\"text\" id=\"username\" name=\"username\" /><br style=\"clear: left;\"/>";
+	*/
 	
 	if ($GM_BLOCKS[$block[0]]["canconfig"]) {
 		eval($block[0]."_config(\$block[1]);");
-		print "<tr><td colspan=\"2\" class=\"center\">";
+		print "<tr><td colspan=\"2\" class=\"NavBlockFooter\">";
 		PrintHelpLink("click_here_help", "qm", "click_here");
 		print "<input type=\"button\" value=\"".GM_LANG_click_here."\" onclick=\"document.block.submit();\" />";
 		print "&nbsp&nbsp;<input type =\"button\" value=\"".GM_LANG_cancel."\" onclick=\"window.close();\" />";
 		print "</td></tr>";
 	}
 	else {
-		print "<tr><td colspan=\"2\" class=\"shade1\">";
+		print "<tr><td colspan=\"2\" class=\"NavBlockLabel\">";
 		print GM_LANG_block_not_configure;
 		print "</td></tr>";
-		print "<tr><td colspan=\"2\" class=\"center\">";
+		print "<tr><td colspan=\"2\" class=\"NavBlockFooter\">";
 		PrintHelpLink("click_here_help", "qm");
 		print "<input type=\"button\" value=\"".GM_LANG_click_here."\" onclick=\"parentrefresh();\" />";
 		print "</td></tr>";
@@ -336,7 +331,7 @@ else {
 	function move_left_right_block(add_to_column, remove_from_column) {
 		section_select = document.getElementById(remove_from_column);
 		add_select = document.getElementById(add_to_column);
-		instruct = document.getElementById('index_edit_advice');
+		instruct = document.getElementById('IndexEditAdvice');
 		if ((section_select) && (add_select)) {
 			add_option = add_select.options[add_select.selectedIndex];
 			if (remove_from_column != 'available_select') {
@@ -388,7 +383,7 @@ else {
 	 */
 	function show_description(list_name) {
 		list_select = document.getElementById(list_name);
-		instruct = document.getElementById('index_edit_advice');
+		instruct = document.getElementById('IndexEditAdvice');
 		if (list_select && instruct) {
 			instruct.innerHTML = block_descr[list_select.options[list_select.selectedIndex].value];
 		}
@@ -413,108 +408,111 @@ else {
 	<?php
 	// NOTE: Page block settings
 	?>
-	<div id="configure" class="center" style="position:absolute; display:block; top:auto; left:auto; z-index:1; width:99%;">
+	<div id="IndexEditConfigure">
 		<br />
 		<form name="config_setup" method="post" action="index_edit.php">
 		<input type="hidden" name="command" value="<?php print $command;?>" />
 		<input type="hidden" name="action" value="update" />
 		<input type="hidden" name="name" value="<?php print $name;?>" />
 		<?php
-		// NOTE: Print the header
-		print "<div class=\"topbottombar\">";
-			PrintHelpLink("portal_config_intructions", "qm");
-			if ($command=="user") print "<b>".Str2Upper(GM_LANG_customize_page)."</b>";
-			else print "<b>".Str2Upper(GM_LANG_customize_gedcom_page)."</b>";
-		print "</div>";
 
 		// NOTE: Print the container
-		print "<div id=\"index_edit_container\">";
-			// NOTE: Print the arrows for moving the left block items up and down
-			print "<div id=\"index_edit_left_arrow\">";
-				print "<a tabindex=\"-1\" onclick=\"move_up_block('main_select');\" title=\"".GM_LANG_move_up."\">".$IconUarrow."</a>";
-				print "<br />";
-				print "<a tabindex=\"-1\" onclick=\"move_down_block('main_select');\" title=\"".GM_LANG_move_down."\">".$IconDarrow."</a>";
-				print "<br /><br />";
-				PrintHelpLink("block_move_up_help", "qm");
+		// NOTE: Print the header
+		print "<div id=\"IndexEditContainer\">";
+			print "<div class=\"NavBlockHeader\">";
+				PrintHelpLink("portal_config_intructions", "qm");
+				if ($command=="user") print Str2Upper(GM_LANG_customize_page);
+				else print Str2Upper(GM_LANG_customize_gedcom_page);
 			print "</div>";
-			
-			// NOTE: Print the blocks currently in the left frame
-			print "<div id=\"index_edit_left\">";
-				print "<b>".GM_LANG_main_section."</b><br />";
-				print "<select multiple=\"multiple\" id=\"main_select\" name=\"main[]\" size=\"10\" onchange=\"show_description('main_select');\">\n";
-				foreach($ublocks->main as $indexval => $block) {
-					if (function_exists($block[0])) {
-						print "<option value=\"$block[0]\">".$GM_BLOCKS[$block[0]]["name"]."</option>\n";
+			print "<div class=\"IndexEditContent\">";
+				// NOTE: Print the arrows for moving the left block items up and down
+				print "<div id=\"IndexEditLeftArrow\">";
+					print "<a tabindex=\"-1\" onclick=\"move_up_block('main_select');\" title=\"".GM_LANG_move_up."\">".$IconUarrow."</a>";
+					print "<br />";
+					print "<a tabindex=\"-1\" onclick=\"move_down_block('main_select');\" title=\"".GM_LANG_move_down."\">".$IconDarrow."</a>";
+					print "<br /><br />";
+					PrintHelpLink("block_move_up_help", "qm");
+				print "</div>";
+				
+				// NOTE: Print the blocks currently in the left frame
+				print "<div id=\"IndexEditLeft\">";
+					print GM_LANG_main_section."<br />";
+					print "<select multiple=\"multiple\" id=\"main_select\" name=\"main[]\" size=\"10\" onchange=\"show_description('main_select');\">\n";
+					foreach($ublocks->main as $indexval => $block) {
+						if (function_exists($block[0])) {
+							print "<option value=\"$block[0]\">".$GM_BLOCKS[$block[0]]["name"]."</option>\n";
+						}
 					}
-				}
-				print "</select>\n";
-			print "</div>";
-			
-			// NOTE: Print the arrows for moving items left and right
-			print "<div id=\"index_edit_left_right_arrow\">";
-				print "<a tabindex=\"-1\" onclick=\"move_left_right_block('main_select', 'right_select');\" title=\"".GM_LANG_move_right."\">".$IconRDarrow."</a>";
-				print "<br />";
-				print "<a tabindex=\"-1\" onclick=\"move_left_right_block('main_select', 'available_select');\" title=\"".GM_LANG_remove."\">".$IconRarrow."</a>";
-				print "<br />";
-				print "<a tabindex=\"-1\" onclick=\"move_left_right_block('available_select', 'main_select');\" title=\"".GM_LANG_add."\">".$IconLarrow."</a>";
-				print "<br /><br />";
-				PrintHelpLink("block_move_right_help", "qm");
-			print "</div>";
-			
-			// NOTE: Print the arrows for moving the right block items up and down
-			print "<div id=\"index_edit_right_arrow\">";
-				print "<a tabindex=\"-1\" onclick=\"move_up_block('right_select');\" title=\"".GM_LANG_move_up."\">".$IconUarrow."</a>";
-				print "<br />";
-				print "<a tabindex=\"-1\" onclick=\"move_down_block('right_select');\" title=\"".GM_LANG_move_down."\">".$IconDarrow."</a>";
-				print "<br /><br />";
-				PrintHelpLink("block_move_up_help", "qm");
-			print "</div>";
-			
-			// NOTE: Print the blocks currently in the right frame
-			print "<div id=\"index_edit_right\">";
-				print "<b>".GM_LANG_right_section."</b><br />";
-				print "<select multiple=\"multiple\" id=\"right_select\" name=\"right[]\" size=\"10\" onchange=\"show_description('right_select');\">\n";
-				foreach($ublocks->right as $indexval => $block) {
-					if (function_exists($block[0])) {
-						print "<option value=\"$block[0]\">".$GM_BLOCKS[$block[0]]["name"]."</option>\n";
+					print "</select>\n";
+				print "</div>";
+				
+				// NOTE: Print the arrows for moving items left and right
+				print "<div id=\"IndexEditLeftRightArrow\">";
+					print "<a tabindex=\"-1\" onclick=\"move_left_right_block('main_select', 'right_select');\" title=\"".GM_LANG_move_right."\">".$IconRDarrow."</a>";
+					print "<br />";
+					print "<a tabindex=\"-1\" onclick=\"move_left_right_block('main_select', 'available_select');\" title=\"".GM_LANG_remove."\">".$IconRarrow."</a>";
+					print "<br />";
+					print "<a tabindex=\"-1\" onclick=\"move_left_right_block('available_select', 'main_select');\" title=\"".GM_LANG_add."\">".$IconLarrow."</a>";
+					print "<br /><br />";
+					PrintHelpLink("block_move_right_help", "qm");
+				print "</div>";
+				
+				// NOTE: Print the arrows for moving the right block items up and down
+				print "<div id=\"IndexEditRightArrow\">";
+					print "<a tabindex=\"-1\" onclick=\"move_up_block('right_select');\" title=\"".GM_LANG_move_up."\">".$IconUarrow."</a>";
+					print "<br />";
+					print "<a tabindex=\"-1\" onclick=\"move_down_block('right_select');\" title=\"".GM_LANG_move_down."\">".$IconDarrow."</a>";
+					print "<br /><br />";
+					PrintHelpLink("block_move_up_help", "qm");
+				print "</div>";
+				
+				// NOTE: Print the blocks currently in the right frame
+				print "<div id=\"IndexEditRight\">";
+					print GM_LANG_right_section."<br />";
+					print "<select multiple=\"multiple\" id=\"right_select\" name=\"right[]\" size=\"10\" onchange=\"show_description('right_select');\">\n";
+					foreach($ublocks->right as $indexval => $block) {
+						if (function_exists($block[0])) {
+							print "<option value=\"$block[0]\">".$GM_BLOCKS[$block[0]]["name"]."</option>\n";
+						}
 					}
-				}
-				print "</select>\n";
+					print "</select>\n";
+				print "</div>";
+				
+				// NOTE: Print the arrows for moving items left and right
+				print "<div id=\"IndexEditRightLeftArrow\">";
+					print "<a tabindex=\"-1\" onclick=\"move_left_right_block('right_select', 'main_select');\" title=\"".GM_LANG_move_left."\">".$IconLDarrow."</a>";
+					print "<br />";
+					print "<a tabindex=\"-1\" onclick=\"move_left_right_block('right_select', 'available_select');\" title=\"".GM_LANG_remove."\">".$IconLarrow."</a>";
+					print "<br />";
+					print "<a tabindex=\"-1\" onclick=\"move_left_right_block('available_select', 'right_select');\" title=\"".GM_LANG_add."\">".$IconRarrow."</a>";
+					print "<br /><br />";
+					PrintHelpLink("block_move_right_help", "qm");
+				print "</div>";
+				
+				// NOTE: Print the blocks currently available
+				print "<div id=\"IndexEditContent\">";
+					print " <a href=\"#\" class=\"help\" tabindex=\"0\" onclick=\"expand_layer('IndexEditConfigureHelp',true); expand_layer('IndexEditConfigure', false);\">".$IconHelp."</a> \n";
+					print GM_LANG_available_blocks."<br />";
+					print "<select id=\"available_select\" name=\"available[]\" size=\"10\" onchange=\"show_description('available_select');\">\n";
+					foreach($SortedBlocks as $key => $value) {
+						if (!isset($GM_BLOCKS[$key]["type"])) $GM_BLOCKS[$key]["type"]=$command;
+						print "<option value=\"$key\">".$SortedBlocks[$key]."</option>\n";
+					}
+					print "</select>\n";
+							
+					// NOTE: Print the box for showing the advice
+					print "<div id=\"IndexEditAdvice\">";
+						print GM_LANG_index_edit_advice;
+					print "</div>";
+					if (($gm_user->userIsAdmin())&&($command=='user')) {
+						print "<div id=\"IndexEditSetDefault\">";
+						print GM_LANG_use_blocks_for_default."&nbsp;&nbsp;<input type=\"checkbox\" name=\"setdefault\" value=\"1\" />\n";
+						print "</div>";
+					}
+				print "</div>";
 			print "</div>";
-			
-			// NOTE: Print the arrows for moving items left and right
-			print "<div id=\"index_edit_right_left_arrow\">";
-				print "<a tabindex=\"-1\" onclick=\"move_left_right_block('right_select', 'main_select');\" title=\"".GM_LANG_move_left."\">".$IconLDarrow."</a>";
-				print "<br />";
-				print "<a tabindex=\"-1\" onclick=\"move_left_right_block('right_select', 'available_select');\" title=\"".GM_LANG_remove."\">".$IconLarrow."</a>";
-				print "<br />";
-				print "<a tabindex=\"-1\" onclick=\"move_left_right_block('available_select', 'right_select');\" title=\"".GM_LANG_add."\">".$IconRarrow."</a>";
-				print "<br /><br />";
-				PrintHelpLink("block_move_right_help", "qm");
-			print "</div>";
-			
-			// NOTE: Print the blocks currently available
-			print "<div id=\"index_edit_content\">";
-				print " <a href=\"#\" class=\"help\" tabindex=\"0\" onclick=\"expand_layer('help',true); expand_layer('configure', false);\">".$IconHelp."</a> \n";
-				print "<b>".GM_LANG_available_blocks."</b><br />";
-				print "<select id=\"available_select\" name=\"available[]\" size=\"10\" onchange=\"show_description('available_select');\">\n";
-				foreach($SortedBlocks as $key => $value) {
-					if (!isset($GM_BLOCKS[$key]["type"])) $GM_BLOCKS[$key]["type"]=$command;
-					print "<option value=\"$key\">".$SortedBlocks[$key]."</option>\n";
-				}
-				print "</select>\n";
-			print "</div><br style=\"clear:both;\" />";
-						
-			// NOTE: Print the box for showing the advice
-			print "<div id=\"index_edit_advice\" class=\"wrap $TEXT_DIRECTION\">";
-				print GM_LANG_index_edit_advice;
-			print "</div><br />";
-			
 			// NOTE: Print the submit buttons
-			print "<div>";
-				if (($gm_user->userIsAdmin())&&($command=='user')) {
-					print GM_LANG_use_blocks_for_default."<input type=\"checkbox\" name=\"setdefault\" value=\"1\" /><br />\n";
-				}
+			print "<div class=\"NavBlockFooter\">";
 				
 				if ($command=='user') {
 					PrintHelpLink("block_default_portal", "qm");
@@ -534,14 +532,12 @@ else {
 	print "</div>\n";
 
 	// NOTE: Hidden help text for column items
-	print "\n\t<div id=\"help\" class=\"TabPage\" style=\"position: absolute; display: none; top: auto; left: auto; z-index: 2; \">\n\t";
+	print "\n\t<div id=\"IndexEditConfigureHelp\" class=\"TabPage\">\n\t";
 
-	print "<br /><center><input type=\"button\" value=\"".GM_LANG_click_here."\" onclick=\"expand_layer('configure', true); expand_layer('help', false);\" /></center><br /><br />\n";
+	print "<br /><center><input type=\"button\" value=\"".GM_LANG_click_here."\" onclick=\"expand_layer('IndexEditConfigure', true); expand_layer('IndexEditConfigureHelp', false);\" /></center><br /><br />\n";
 	PrintText("block_summaries");
 
 	// end of 2nd tab
 	print "</div>\n";
 }
-
-print "</body></html>";
 ?>
