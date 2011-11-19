@@ -47,7 +47,7 @@ $show_full = $descendancy_controller->show_full;
 
 
 // -- print html header information
-print "<div id=\"content_pedigree\">";
+print "<div id=\"content_descendancy\">";
 
 print "\n\t<span class=\"PageTitleName\">".GM_LANG_descend_chart.":";
 print "&nbsp;".PrintReady($descendancy_controller->root->name);
@@ -66,40 +66,39 @@ function paste_id(value) {
 
 <?php
 if ($descendancy_controller->view != "preview") {
-	$show_famlink = true;
-	print "<form method=\"get\" name=\"people\" action=\"?\">\n";
-	// 	PrintHelpLink("descendancy_help", "page_help");
-	print "\n\t\t<table class=\"ListTable ".$TEXT_DIRECTION."\" align=\"";
-	if ($TEXT_DIRECTION == "ltr") print "right";
-	else print "left";
-	print "\">";
-	
-	// NOTE: Option header
-	$descendancy_controller->PrintInputHeader();
-	
-	// NOTE: rootid
-	$descendancy_controller->PrintInputRootId();
-
-	// NOTE: generations
-	$descendancy_controller->PrintInputGenerations(GedcomConfig::$MAX_DESCENDANCY_GENERATIONS, "desc_generations_help");	
-	
-	// NOTE: box width
-	$descendancy_controller->PrintInputBoxWidth();
-
-	// NOTE: show full
-	$descendancy_controller->PrintInputShowFull();
-
-	// NOTE: chart style
-	$descendancy_controller->PrintInputChartStyle();
-
-	// NOTE: show cousins
-	$descendancy_controller->PrintInputShowCousins();
-	
-	// Submit
-	$descendancy_controller->PrintInputSubmit();
-	
-	print "</table>";
-	print "</form>\n";
+	print "<div class=\"DescendancyNavBlock\">";
+		$show_famlink = true;
+		print "<form method=\"get\" name=\"people\" action=\"?\">\n";
+		// 	PrintHelpLink("descendancy_help", "page_help");
+			print "\n\t\t<table class=\"NavBlockTable DescendancyNavBlockTable\">";
+			
+			// NOTE: Option header
+			$descendancy_controller->PrintInputHeader();
+			
+			// NOTE: rootid
+			$descendancy_controller->PrintInputRootId();
+		
+			// NOTE: generations
+			$descendancy_controller->PrintInputGenerations(GedcomConfig::$MAX_DESCENDANCY_GENERATIONS, "desc_generations_help");	
+			
+			// NOTE: box width
+			$descendancy_controller->PrintInputBoxWidth();
+		
+			// NOTE: show full
+			$descendancy_controller->PrintInputShowFull();
+		
+			// NOTE: chart style
+			$descendancy_controller->PrintInputChartStyle();
+		
+			// NOTE: show cousins
+			$descendancy_controller->PrintInputShowCousins();
+			
+			// Submit
+			$descendancy_controller->PrintInputSubmit();
+			
+			print "</table>";
+		print "</form>\n";
+	print "</div>";
 }
 ?>
 
@@ -113,10 +112,9 @@ if ($descendancy_controller->chart_style) {
 }
 else {
 // descendancy list
-	print "<ul style=\"list-style: none; display: block;\" id=\"descendancy_chart".($TEXT_DIRECTION=="rtl" ? "_rtl" : "") ."\">\r\n";
+	print "<ul style=\"list-style: none; display: block;\" id=\"descendancy_chart\">\r\n";
 	$descendancy_controller->PrintChildDescendancy($descendancy_controller->xref, $descendancy_controller->num_generations);
 	print "</ul>";
-	print "<br />";
 }
 print "</div>";
 PrintFooter();

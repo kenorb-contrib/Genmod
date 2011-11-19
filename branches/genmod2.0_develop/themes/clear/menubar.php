@@ -54,12 +54,14 @@ $favoritesmenu = MenuBar::GetFavoritesMenu();
 $custommenu = MenuBar::GetCustomMenu();
 
 function CreateMenu($menuobject, $level=0, $sub=false) {
-	global $outputmenu;
+	global $outputmenu, $GM_IMAGES;
+	
 	if (!$sub) $outputmenu = array();
 	foreach ($menuobject->submenus as $sublevel => $submenu) {
 		if (count($submenu->submenus) > 0) {
 			foreach ($submenu->submenus as $key => $lowsub) {
 				$tempmenu = CreateMenu($lowsub, $level++, true);
+				//if ($lowsub->seperator) $tempmenu->label = "<div class='seperator'>"."<img src='".GM_IMAGE_DIR."/".$GM_IMAGES['hline']['other']."' height='3' alt='' />"."</div>";
 				$outputmenu[$submenu->label][$key]["label"] = $tempmenu->label;
 				$outputmenu[$submenu->label][$key]["link"] = $tempmenu->link;
 			}
@@ -88,7 +90,6 @@ if (is_object($repomenu)) $showmenu[GM_LANG_this_repository] = CreateMenu($repom
 if (is_object($helpmenu)) $showmenu[GM_LANG_helpmenu] = CreateMenu($helpmenu);
 if (is_object($custommenu)) $showmenu[GM_LANG_my_pages] = CreateMenu($custommenu);
 ?>
-<div id="GenmodContainer">
 <div id="HeaderSection" class="<?php echo $TEXT_DIRECTION; ?>">
 	<script type="text/javascript" src="transmenu.js"></script>
 	<script type="text/javascript">

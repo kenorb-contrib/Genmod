@@ -36,29 +36,31 @@ function print_gedcom_favorites($block = true, $config="", $side, $index) {
 	global $GM_IMAGES, $command, $sourcelist, $TEXT_DIRECTION;
 	global $gm_user;
 	
+	print "<!-- Start Gedcom Favorites Block //-->";
 	$userfavs = FavoritesController::getGedcomFavorites(GedcomConfig::$GEDCOMID);
 	if (!is_array($userfavs)) $userfavs = array();
 	print "<div id=\"gedcom_favorites\" class=\"BlockContainer\">\n";
-	print "<div class=\"BlockHeader\">";
-	PrintHelpLink("index_favorites_help", "qm", "gedcom_favorites");
-	print GM_LANG_gedcom_favorites." &lrm;(".count($userfavs).")&lrm;";
-	print "</div>";
-	print "<div class=\"BlockContent\">";
-	if ($block) print "<div class=\"RestrictedBlockHeightRight\">\n";
-	else print "<div class=\"RestrictedBlockHeightMain\">\n";
-	if (count($userfavs)==0) {
-		if ($gm_user->userGedcomAdmin()) PrintText("no_favorites");
-		else PrintText("no_gedcom_favorites");
-	}
-	else {
-		BlockFunctions::PrintBlockFavorites($userfavs, $side, $index);
-	}
-	if ($gm_user->userGedcomAdmin()) { 
-		BlockFunctions::PrintBlockAddFavorite($command, "gedcom", $side);
-	}
-	print "</div>\n";
-	print "</div>"; // blockcontent
+		print "<div class=\"BlockHeader\">";
+			PrintHelpLink("index_favorites_help", "qm", "gedcom_favorites");
+			print GM_LANG_gedcom_favorites." &lrm;(".count($userfavs).")&lrm;";
+		print "</div>";
+		print "<div class=\"BlockContent\">";
+			if ($block) print "<div class=\"RestrictedBlockHeightRight\">\n";
+			else print "<div class=\"RestrictedBlockHeightMain\">\n";
+				if (count($userfavs)==0) {
+					if ($gm_user->userGedcomAdmin()) PrintText("no_favorites");
+					else PrintText("no_gedcom_favorites");
+				}
+				else {
+					BlockFunctions::PrintBlockFavorites($userfavs, $side, $index);
+				}
+				if ($gm_user->userGedcomAdmin()) { 
+					BlockFunctions::PrintBlockAddFavorite($command, "gedcom", $side);
+				}
+			print "</div>\n";
+		print "</div>"; // blockcontent
 	print "</div>"; // block
+	print "<!-- End Gedcom Favorites Block //-->";
 }
 function print_gedcom_favorites_config($favid="") {
 	
@@ -67,24 +69,22 @@ function print_gedcom_favorites_config($favid="") {
 	$userfave = FavoritesController::getGedcomFavorites(GedcomConfig::$GEDCOMID, $favid);
 	$fav = $userfave[0];
 	
-	print "<br />";
+	print "<tr><td colspan=\"2\" class=\"NavBlockLabel\">";
 	print $fav->title;
-	print "<br />";
 	print "<input type=\"hidden\" name=\"action\" value=\"storefav\" />\n";
 	print "<input type=\"hidden\" name=\"id\" value=\"".$fav->id."\" />\n";
 	print "<input type=\"hidden\" name=\"gid\" value=\"".$fav->gid."\" />\n";
 	print "<input type=\"hidden\" name=\"username\" value=\"\" />\n";
 	print "<input type=\"hidden\" name=\"type\" value=\"".$fav->type."\" />\n";
 	print "<input type=\"hidden\" name=\"file\" value=\"".$fav->file."\" />\n";
+	print "</td></tr>";
 	if ($fav->type == "URL") {
-		print "<label for=\"favurl\">".GM_LANG_url."</label>";
-		print "<input type=\"text\" id=\"favurl\" name=\"favurl\" size=\"40\" value=\"".$fav->url."\">";
-		print "<br />";
-		print "<label for=\"title\">".GM_LANG_title."</label>";
-		print "<input type=\"text\" id=\"title\" name=\"favtitle\" size=\"40\" value=\"".$fav->title."\">";
-		print "<br />";
+		print "<tr><td class=\"NavBlockLabel\">".GM_LANG_url."</td>";
+		print "<td class=\"NavBlockField\"><input type=\"text\" id=\"favurl\" name=\"favurl\" size=\"40\" value=\"".$fav->url."\"></td></tr>";
+		print "<tr><td class=\"NavBlockLabel\">".GM_LANG_title."</td>";
+		print "<td class=\"NavBlockField\"><input type=\"text\" id=\"title\" name=\"favtitle\" size=\"40\" value=\"".$fav->title."\"></td></tr>";
 	}
-	print "<label for=\"favnote\">".GM_LANG_add_fav_enter_note."</label>";
-	print "<textarea id=\"favnote\" name=\"favnote\" rows=\"6\" cols=\"40\">".$fav->note."</textarea>";
+	print "<tr><td class=\"NavBlockLabel\">".GM_LANG_add_fav_enter_note."</td>";
+	print "<td class=\"NavBlockField\"><textarea id=\"favnote\" name=\"favnote\" rows=\"6\" cols=\"40\">".$fav->note."</textarea></td></tr>";
 }
 ?>

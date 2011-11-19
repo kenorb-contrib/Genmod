@@ -226,17 +226,17 @@ abstract class PersonFunctions {
 				if ($person->disp_name) {
 					// NOTE: Start span namedef-$personcount.$pid.$count
 					print "<a href=\"individual.php?pid=".$person->xref."&amp;gedid=".$person->gedcomid."\"><span id=\"namedef-".$person->xref.".".$personcount.".".$count.".".$random."\" ";
-					if (hasRTLText($person->name) && $style=="1") print "class=\"NameBold\">";
-					else print "class=\"name$style\">";
+					if (hasRTLText($person->name) && $style=="1") print "class=\"PersonNameBold\">";
+					else print "class=\"PersonName$style\">";
 					print PrintReady($person->name);
 					// NOTE: IMG ID
 					print "<img id=\"box-".$person->xref.".".$personcount.".".$count.".".$random."-sex\" src=\"".GM_IMAGE_DIR."/";
 					if ($isF=="") print $GM_IMAGES["sex"]["small"]."\" title=\"".GM_LANG_male."\" alt=\"".GM_LANG_male;
 					else  if ($isF=="F")print $GM_IMAGES["sexf"]["small"]."\" title=\"".GM_LANG_female."\" alt=\"".GM_LANG_female;
 					else  print $GM_IMAGES["sexn"]["small"]."\" title=\"".GM_LANG_unknown."\" alt=\"".GM_LANG_unknown;
-					print "\" class=\"sex_image\" />";
+					print "\" class=\"SexImage\" />";
 					if (GedcomConfig::$SHOW_ID_NUMBERS) {
-						print "</span><span class=\"details$style\">";
+						print "</span><span class=\"PersonDetails$style\">";
 						print $person->addxref;
 						// NOTE: Close span namedef-$personcount.$pid.$count
 						print "</span>";
@@ -245,8 +245,8 @@ abstract class PersonFunctions {
 						print "<br />";
 						// NOTE: Start span addnamedef-$personcount.$pid.$count
 						// NOTE: Close span addnamedef-$personcount.$pid.$count
-						if (hasRTLText($person->addname) && $style=="1") print "<span id=\"addnamedef-".$person->xref.".".$personcount.".".$count.".".$random."\" class=\"NameBold\"> ";
-						else print "<span id=\"addnamedef-".$person->xref.".".$personcount.".".$count."\" class=\"name$style\"> ";
+						if (hasRTLText($person->addname) && $style=="1") print "<span id=\"addnamedef-".$person->xref.".".$personcount.".".$count.".".$random."\" class=\"PersonNameBold\"> ";
+						else print "<span id=\"addnamedef-".$person->xref.".".$personcount.".".$count."\" class=\"PersonName$style\"> ";
 						print $person->addname."</span><br />";
 					}
 					print "</a>";
@@ -260,12 +260,12 @@ abstract class PersonFunctions {
 					}
 					// NOTE: Start span namedef-$pid.$personcount.$count
 					// NOTE: Close span namedef-$pid.$personcount.$count
-					print "return false;\"><span id=\"namedef-".$person->xref.".".$personcount.".".$count.".".$random."\" class=\"name$style\">".GM_LANG_private."</span></a>\n";
+					print "return false;\"><span id=\"namedef-".$person->xref.".".$personcount.".".$count.".".$random."\" class=\"PersonName$style\">".GM_LANG_private."</span></a>\n";
 				}
 				if ($show_full) {
 					// NOTE: Start span fontdef-$pid.$personcount.$count
 					// NOTE: Close span fontdef-$pid.$personcount.$count
-					print "<br /><span id=\"fontdef-".$person->xref.".".$personcount.".".$count.".".$random."\" class=\"details$style\">";
+					print "<br /><span id=\"fontdef-".$person->xref.".".$personcount.".".$count.".".$random."\" class=\"PersonDetails$style\">";
 					print GM_LANG_private;
 					print "</span>";
 				}
@@ -284,8 +284,8 @@ abstract class PersonFunctions {
 					if (GedcomConfig::$ZOOM_BOXES=="click") print " onclick=\"event.cancelBubble = true;\"";
 				}
 				// NOTE: Start span namedef-$pid.$personcount.$count
-				if (hasRTLText($person->name) && $style=="1") print "><span id=\"namedef-".$person->xref.".".$personcount.".".$count.".".$random."\" class=\"NameBold";
-				else print "><span id=\"namedef-".$person->xref.".".$personcount.".".$count.".".$random."\" class=\"name$style";
+				if (hasRTLText($person->name) && $style=="1") print "><span id=\"namedef-".$person->xref.".".$personcount.".".$count.".".$random."\" class=\"PersonNameBold";
+				else print "><span id=\"namedef-".$person->xref.".".$personcount.".".$count.".".$random."\" class=\"PersonName$style";
 				// NOTE: Add optional CSS style for each fact
 	//			$cssfacts = array("BIRT","CHR","DEAT","BURI","CREM","ADOP","BAPM","BARM","BASM","BLES","CHRA","CONF","FCOM","ORDN","NATU","EMIG","IMMI","CENS","PROB","WILL","GRAD","RETI","CAST","DSCR","EDUC","IDNO","NATI","NCHI","NMR","OCCU","PROP","RELI","RESI","SSN","TITL","BAPL","CONL","ENDL","SLGC","_MILI");
 	//			foreach($cssfacts as $indexval => $fact) {
@@ -296,25 +296,25 @@ abstract class PersonFunctions {
 				print $person->name;
 				// NOTE: Close span namedef-$pid.$personcount.$count
 				print "</span>";
-				print "<span class=\"name$style\">";
+				print "<span class=\"PersonName$style\">";
 				// NOTE: IMG ID
 				print "<img id=\"box-".$person->xref.".".$personcount.".".$count.".".$random."-sex\" src=\"".GM_IMAGE_DIR."/";
 				if ($isF=="") print $GM_IMAGES["sex"]["small"]."\" title=\"".GM_LANG_male."\" alt=\"".GM_LANG_male;
 				else  if ($isF=="F")print $GM_IMAGES["sexf"]["small"]."\" title=\"".GM_LANG_female."\" alt=\"".GM_LANG_female;
 				else  print $GM_IMAGES["sexn"]["small"]."\" title=\"".GM_LANG_unknown."\" alt=\"".GM_LANG_unknown;
-				print "\" class=\"sex_image\" />";
+				print "\" class=\"SexImage\" />";
 				print "</span>\r\n";
 				if (GedcomConfig::$SHOW_ID_NUMBERS) {
-					print "<span class=\"details$style\">";
+					print "<span class=\"PersonDetails$style\">";
 					print $person->addxref;
 					print "</span>";
 				}
-				if (GedcomConfig::$SHOW_LDS_AT_GLANCE) print "<span class=\"details$style\">".GetLdsGlance($person->gedrec)."</span>";
+				if (GedcomConfig::$SHOW_LDS_AT_GLANCE) print "<span class=\"PersonDetails$style\">".GetLdsGlance($person->gedrec)."</span>";
 				if ($person->addname != "") {
 					print "<br />";
 					if (hasRTLText($person->addname) && $style=="1")
-					print "<span id=\"addnamedef-".$person->xref.".".$count.".".$random."\" class=\"NameBold\"> ";
-					else print "<span id=\"addnamedef-".$person->xref.".".$count.".".$random."\" class=\"name$style\"> ";
+					print "<span id=\"addnamedef-".$person->xref.".".$count.".".$random."\" class=\"PersonNameBold\"> ";
+					else print "<span id=\"addnamedef-".$person->xref.".".$count.".".$random."\" class=\"PersonName$style\"> ";
 					print $person->addname."</span><br />";
 				}
 				print "</a>";
@@ -322,7 +322,7 @@ abstract class PersonFunctions {
 				// NOTE: Start div inout-$pid.$personcount.$count
 				if (!$show_full) print "\n<div id=\"inout-".$person->xref.".".$personcount.".".$count.".".$random."\" style=\"display: none;\">\n";
 				// NOTE: Start div fontdev-$pid.$personcount.$count
-				print "<div id=\"fontdef-".$person->xref.".".$personcount.".".$count.".".$random."\" class=\"details$style\">";
+				print "<div id=\"fontdef-".$person->xref.".".$personcount.".".$count.".".$random."\" class=\"PersonDetails$style\">";
 				// NOTE: Start div inout2-$pid.$personcount.$count
 				if ($show_full) print "\n<div id=\"inout2-".$person->xref.".".$personcount.".".$count.".".$random."\" style=\"display: block;\">\n";
 				
@@ -360,8 +360,8 @@ abstract class PersonFunctions {
 				$factobjs = $person->SelectFacts($tagstoprint);
 				SortFactObjs($factobjs, "INDI");
 				foreach($factobjs as $key => $factobj) {
-					// Exclude old values if we show changes
-					if (!($person->show_changes && $factobj->style == "change_old")) {
+					// Exclude old values if we show changes, but include them if the whole person is deleted
+					if (!($person->show_changes && $factobj->style == "ChangeOld" && !$person->isdeleted)) {
 						FactFunctions::PrintSimpleFact($factobj, true, false);
 					}
 				}
@@ -373,6 +373,7 @@ abstract class PersonFunctions {
 				// NOTE: Open div inout-$pid.$personcount.$count
 				if ($show_full) {
 					print "\n<div id=\"inout-".$person->xref.".".$personcount.".".$count.".".$random."\" style=\"display: none;\">";
+//					print "\n<div id=\"inout-".$person->xref.".".$personcount.".".$count.".".$random."\" style=\"display: none; position:absolute; z-index:1000; border-top:0; left:16px; width: 350px; top:50px;\" class=\"PersonBox\">";
 					print "</div>\n";
 				}
 				// NOTE: Close div fontdev-$pid.$personcount.$count
@@ -399,9 +400,9 @@ abstract class PersonFunctions {
 				// NOTE: Zoom icon
 				if (GedcomConfig::$ZOOM_BOXES != "disabled" && $show_famlink && $show_full && !$view && $person->disp_name) {
 					print "<a href=\"javascript: ".GM_LANG_zoom_box."\"";
-					if (GedcomConfig::$ZOOM_BOXES=="mouseover") print " onmouseover=\"expandbox('".$person->xref.".".$personcount.".".$count."', $style, '".$random."'); if(document.getElementById('inout-".$person->xref.".".$personcount.".".$count.".".$random."').innerHTML=='') sndReq('inout-".$person->xref.".".$personcount.".".$count.".".$random."', 'getzoomfacts', 'pid', '".$person->xref."', 'gedcomid', '".$person->gedcomid."', 'canshow', '".$canshow."', 'view', '".$view."');\" onmouseout=\"restorebox('".$person->xref.".".$personcount.".".$count."', $style, '".$random."');\" onclick=\"return false;\"";
-					if (GedcomConfig::$ZOOM_BOXES=="mousedown") print " onmousedown=\"expandbox('".$person->xref.".".$personcount.".".$count."', $style, '".$random."'); if(document.getElementById('inout-".$person->xref.".".$personcount.".".$count.".".$random."').innerHTML=='') sndReq('inout-".$person->xref.".".$personcount.".".$count.".".$random."', 'getzoomfacts', 'pid', '".$person->xref."', 'gedcomid', '".$person->gedcomid."', 'canshow', '".$canshow."', 'view', '".$view."');\" onmouseup=\"restorebox('".$person->xref.".".$personcount.".".$count."', $style, '".$random."');\" onclick=\"return false;\"";
-					if (GedcomConfig::$ZOOM_BOXES=="click") print " onclick=\"expandbox('".$person->xref.".".$personcount.".".$count."', $style, '".$random."'); if(document.getElementById('inout-".$person->xref.".".$personcount.".".$count.".".$random."').innerHTML=='') sndReq('inout-".$person->xref.".".$personcount.".".$count.".".$random."', 'getzoomfacts', 'pid', '".$person->xref."', 'gedcomid', '".$person->gedcomid."', 'canshow', '".$canshow."', 'view', '".$view."'); return false;\"";
+					if (GedcomConfig::$ZOOM_BOXES=="mouseover") print " onmouseover=\"expandbox('".$person->xref.".".$personcount.".".$count."', $style, '".$random."'); if(document.getElementById('inout-".$person->xref.".".$personcount.".".$count.".".$random."').innerHTML=='') sndReq('inout-".$person->xref.".".$personcount.".".$count.".".$random."', 'getzoomfacts', true, 'pid', '".$person->xref."', 'gedcomid', '".$person->gedcomid."', 'canshow', '".$canshow."', 'view', '".$view."');\" onmouseout=\"restorebox('".$person->xref.".".$personcount.".".$count."', $style, '".$random."');\" onclick=\"return false;\"";
+					if (GedcomConfig::$ZOOM_BOXES=="mousedown") print " onmousedown=\"expandbox('".$person->xref.".".$personcount.".".$count."', $style, '".$random."'); if(document.getElementById('inout-".$person->xref.".".$personcount.".".$count.".".$random."').innerHTML=='') sndReq('inout-".$person->xref.".".$personcount.".".$count.".".$random."', 'getzoomfacts', true, 'pid', '".$person->xref."', 'gedcomid', '".$person->gedcomid."', 'canshow', '".$canshow."', 'view', '".$view."');\" onmouseup=\"restorebox('".$person->xref.".".$personcount.".".$count."', $style, '".$random."');\" onclick=\"return false;\"";
+					if (GedcomConfig::$ZOOM_BOXES=="click") print " onclick=\"expandbox('".$person->xref.".".$personcount.".".$count."', $style, '".$random."'); if(document.getElementById('inout-".$person->xref.".".$personcount.".".$count.".".$random."').innerHTML=='') sndReq('inout-".$person->xref.".".$personcount.".".$count.".".$random."', 'getzoomfacts', true, 'pid', '".$person->xref."', 'gedcomid', '".$person->gedcomid."', 'canshow', '".$canshow."', 'view', '".$view."'); return false;\"";
 					print "><img id=\"iconz-".$person->xref.".".$personcount.".".$count.".".$random."\" src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["zoomin"]["other"]."\" width=\"25\" height=\"25\" border=\"0\" alt=\"".GM_LANG_zoom_box."\" title=\"".GM_LANG_zoom_box."\" /></a>";
 				}
 				// NOTE: Popup box icon (don't show if the person is private)
@@ -466,11 +467,11 @@ abstract class PersonFunctions {
 		$husb = "husb";
 		if ($family->husb_status == "") $style = "";
 		elseif ($family->husb_status == "deleted") {
-			$style = " class=\"facts_valuered\"";
+			$style = " class=\"PersonBoxContainerDeleted\"";
 			$husb = "husbold";
 		}
-		elseif ($family->husb_status == "new" || $family->husb_status == "changed") $style = " class=\"facts_valueblue\""; 
-		print "\n\t<td style=\"vertical-align:middle;\"".$style.">";
+		elseif ($family->husb_status == "new" || $family->husb_status == "changed") $style = " class=\"PersonBoxContainerChanged\""; 
+		print "\n\t<td".$style.">";
 		// Fix for overloading error of array object
 		$husband = $family->$husb;
 		self::PrintPedigreePerson($husband, 1, $show_full, 1, 1, $view);
@@ -522,7 +523,7 @@ abstract class PersonFunctions {
 		}
 		print "</tr></table>\n\n";
 		if ($sosa!=0) {
-			print "<a href=\"family.php?famid=".$family->xref."&amp;gedid=".$family->gedcomid."\" class=\"details1\">";
+			print "<a href=\"family.php?famid=".$family->xref."&amp;gedid=".$family->gedcomid."\" class=\"PersonDetails1\">";
 			print $family->addxref;
 			if ($family->addxref != "") print "&nbsp;&nbsp;";
 			FactFunctions::PrintSimpleFact($family->marr_fact, false, false); 
@@ -545,11 +546,11 @@ abstract class PersonFunctions {
 		$wife = "wife";
 		if ($family->wife_status == "") $style = "";
 		elseif ($family->wife_status == "deleted") {
-			$style = " class=\"facts_valuered\"";
+			$style = " class=\"PersonBoxContainerDeleted\"";
 			$wife = "wifeold";
 		}
-		elseif ($family->wife_status == "new" || $family->wife_status == "changed") $style = " class=\"facts_valueblue\""; 
-		print "\n\t<td style=\"vertical-align:middle;\"".$style.">";
+		elseif ($family->wife_status == "new" || $family->wife_status == "changed") $style = " class=\"PersonBoxContainerChanged\""; 
+		print "\n\t<td".$style.">";
 		// Fix for overloading error of array object
 		$wwife = $family->$wife;
 		self::PrintPedigreePerson($wwife, 1, $show_full, 1, 1, $view);
@@ -592,7 +593,7 @@ abstract class PersonFunctions {
 			// wife's mother
 			print "</tr><tr><td style=\"vertical-align:middle;\"><img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["hline"]["other"]."\" alt=\"\" /></td><td>";
 			print "\n\t<table style=\"width: " . ($pbwidth) . "px; height: " . $pbheight . "px;\" border=\"0\"><tr>";
-			if ($sosa > 0) ChartFunctions::PrintSosaNumber($sosa * 4 + 1);
+			if ($sosa > 0) ChartFunctions::PrintSosaNumber($sosa * 4 + 3);
 			if (is_object($moth) && $moth->xref == $gparid) ChartFunctions::PrintSosaNumber(trim(substr($label,0,-3),".").".");
 			print "\n\t<td style=\"vertical-align:middle;\">";
 			self::PrintPedigreePerson($moth, 1, $show_full, 1, 1, $view);
@@ -634,8 +635,8 @@ abstract class PersonFunctions {
 					}
 					$style = "";
 					if ($family->show_changes) {
-						if ($family->GetChildStatus($chil->xref) == "new") $style = "class=\"change_new\" ";
-						elseif ($family->GetChildStatus($chil->xref) == "deleted") $style = "class=\"change_old\" ";
+						if ($family->GetChildStatus($chil->xref) == "new") $style = "class=\"ChangeNew\" ";
+						elseif ($family->GetChildStatus($chil->xref) == "deleted") $style = "class=\"ChangeOld\" ";
 					}
 					
 					print "<td ".$style."style=\"vertical-align:middle;\" >";
@@ -665,18 +666,18 @@ abstract class PersonFunctions {
 								print " width=\"3\" src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["vline"]["other"]."\" alt=\"\" />";
 								print "</td>";
 							}
-							print "<td class=\"details1\" style=\"vertical-align:middle;\" align=\"center\">";
+							print "<td class=\"PersonDetails1\" style=\"vertical-align:middle;\" align=\"center\">";
 							
 							// marriage date. We only print this if the family can be shown
-							if ($cfam->disp && $cfam->marr_date != "") print "<span class=\"date\">".$cfam->marr_fact->datestring."</span>";
+							if ($cfam->disp && $cfam->marr_date != "") print "<span class=\"Date\">".$cfam->marr_fact->datestring."</span>";
 							
 							// divorce date. We only print this if the family can be shown
 							print "<br /><img width=\"100%\" height=\"3\" src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["hline"]["other"]."\" alt=\"\" />";
-							if ($cfam->disp && $cfam->div_date != "") print "-<br /><span class=\"date\">".$cfam->div_fact->datestring."</span>";
+							if ($cfam->disp && $cfam->div_date != "") print "-<br /><span class=\"Date\">".$cfam->div_fact->datestring."</span>";
 							
 							// family link
 							print "<br />";
-							print "<a class=\"details1\" href=\"family.php?famid=".$cfam->xref."&amp;gedid=".$cfam->gedcomid."\">";
+							print "<a class=\"PersonDetails1\" href=\"family.php?famid=".$cfam->xref."&amp;gedid=".$cfam->gedcomid."\">";
 							print $cfam->addxref;
 							print "</a>";
 							print "</td>\n";

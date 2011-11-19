@@ -9,6 +9,18 @@
 =====================================================================
 
 Version 2.0 beta 2
+- Fixed block summary doesn't show in index edit (sjouke)
+- Fixed submitter record edited from wrong gedcom (sjouke)
+- Fixed error in import of married names (sjouke)
+- Fixed config error message includes html (sjouke)
+- Fixed check on empty lockouts (sjouke)
+- Fixed no message in restore if other sql files are found (sjouke)
+- Fixed show contextual help on/off doesn't work (sjouke)
+- Fixed IE bug rerendering the page after AJAX call (sjouke)
+- Fixed Relationship chart print version is empty (sjouke)
+- Fixed JS error in find ID function (sjouke)
+- Fixed invalid sosa number in ancestry book (sjouke)
+- Fixed JS error in ajax calls (sjouke)
 - Fixed aliveinyear losing firstname letter (sjouke)
 - Fixed aliveinyear error in death year estimation (sjouke)
 - Fixed update on some external search modules (sjouke)

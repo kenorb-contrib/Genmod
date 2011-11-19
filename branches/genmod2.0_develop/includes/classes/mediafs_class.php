@@ -259,30 +259,30 @@ abstract class MediaFS {
 		}
 
 		if ($thumb) {
-			print "\n\t\t\t<td class=\"list_value wrap $TEXT_DIRECTION\">";
+			print "\n\t\t\t<td class=\"ListTableContent\">";
 			$twidth = 50;
 			$theight = 50;
 			self::DispImgLink($realfile, $thumbfile, $fileobj->f_main_file, "", $twidth, $theight, $fileobj->f_width, $fileobj->f_height, $fileobj->f_is_image, $fileobj->f_file_exists);
 			print "</td>";
 		}
 		
-		print "<td class=\"list_value wrap $TEXT_DIRECTION\"";
+		print "<td class=\"ListTableContent\"";
 		if (!$thumb) print " colspan=\"2\" ";
 		print ">";
-		print GM_LANG_filename."&nbsp;";
-		if (!$paste) print $fileobj->f_file."<br />";
+		print "<span class=\"FindMediaFileLabel\">".GM_LANG_filename."</span>&nbsp;";
+		if (!$paste) print "<span class=\"ListItemName\">".$fileobj->f_file."</span><br />";
 		else {
 			$m = RelativePathFile(GedcomConfig::$MEDIA_DIRECTORY);
 			if (!empty($m)) $plink = preg_replace("~$m~", "", $fileobj->f_pastelink);
 			else $plink = $fileobj->f_pastelink;
-			print "<a href=\"#\" onclick=\"pasteid('".preg_replace("/'/", "\'", FilenameEncode($plink))."');\">".basename($fileobj->f_file)."</a><br />";
+			print "<a href=\"#\" onclick=\"pasteid('".preg_replace("/'/", "\'", FilenameEncode($plink))."');\"><span class=\"ListItemName FindMediaFileName\">".basename($fileobj->f_file)."</span></a><br />";
 		}
 		$linked = false;
 		if (isset($file["objects"])) {
 			foreach ($file["objects"] as $index => $media) {
 				if ($media->xref != "") {
-					if (!$linked) print "<br />".GM_LANG_used_in."<br />";
-					if ($media->title != "") $title = "<b>".$media->title."</b> (".$media->xref.")";
+					if (!$linked) print "<span class=\"FindMediaFileLabel\">".GM_LANG_used_in."</span><br />";
+					if ($media->title != "") $title = "<span class=\"ListItemName FindMediaFileName\">".$media->title."</span> <span class=\"ListItemXref FindMediaFileXref\">(".$media->xref.")</span>";
 					else $title = "";
 					print "<a href=\"mediadetail.php?mid=".$media->xref."&amp;gedid=".$media->gedcomid."\" target=\"blank\">".PrintReady($title)."</a><br />";
 					$linked = true;
@@ -1336,7 +1336,7 @@ abstract class MediaFS {
 				$close = true;
 			}
 		}
-		if (!empty($thumbname)) print "<img src=\"".FilenameEncode($thumbname)."\" border=\"0\" ".($width > 0 ? "width=\"".$width."\" " : "").($height > 0 ? "height=\"".$height."\" " : "")." class=\"thumbnail\" ".($center ? "" : "align=\"".($TEXT_DIRECTION == "rtl" ? "right" : "left")."\"")." alt=\"\" />";
+		if (!empty($thumbname)) print "<img src=\"".FilenameEncode($thumbname)."\" border=\"0\" ".($width > 0 ? "width=\"".$width."\" " : "").($height > 0 ? "height=\"".$height."\" " : "")." class=\"Thumbnail\" ".($center ? "" : "align=\"".($TEXT_DIRECTION == "rtl" ? "right" : "left")."\"")." alt=\"\" />";
 		if ($close) {
 			if ($closelink) print "</a>\n";
 			return true;

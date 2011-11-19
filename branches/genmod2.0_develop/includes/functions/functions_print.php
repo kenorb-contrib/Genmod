@@ -280,6 +280,8 @@ var whichhelp = 'help_<?php print basename(SCRIPT_NAME)."&amp;action=".$action; 
 	// print "<div id=\"container\">";
 	print "<!-- begin header section -->\n";
 	include("includes/values/include_top.php");
+	// Genmod container
+	print "<div id=\"GenmodContainer\">";
 	 
 	if ($view!="preview") include(GM_MENUBAR);
 	else include(GM_PRINT_HEADERFILE);
@@ -355,13 +357,6 @@ function PrintSimpleHeader($title) {
 	GedcomConfig::$META_DESCRIPTION = $old_META_DESCRIPTION;
 	GedcomConfig::$META_PAGE_TOPIC = $old_META_PAGE_TOPIC;
 	?>
-	<style type="text/css">
-	<!--
-	.largechars {
-		font-size: 18px;
-	}
-	-->
-	</style>
 	 <script language="JavaScript" type="text/javascript">
 	 <!--
 	 /* set these vars so that the session can be passed to new windows */
@@ -403,9 +398,11 @@ function PrintSimpleHeader($title) {
 		</script>
 		<link href="modules/greybox/gb_styles.css" rel="stylesheet" type="text/css" />
 	<?php }
-	print "</head>\n\t<body style=\"margin: 5px;\"";
+	print "</head>\n\t<body";
 	print " onload=\"loadHandler();\">\n\t";
-	 if (USE_GREYBOX) { ?>
+		// Genmod container
+	print "<div id=\"GenmodContainer\">";
+	if (USE_GREYBOX) { ?>
 		<script type="text/javascript" src="modules/greybox/AJS.js"></script>
 		<script type="text/javascript" src="modules/greybox/AJS_fx.js"></script>
 		<script type="text/javascript" src="modules/greybox/gb_scripts.js"></script>
@@ -447,7 +444,7 @@ function PrintFooter() {
 	?>
 	<script type="text/javascript">
 	<!--
-	document.getElementById('FooterSectionDummy').style.paddingBottom = (document.getElementById('FooterSection').clientHeight);
+	document.getElementById('FooterSectionDummy').style.paddingBottom = (document.getElementById('FooterSection').offsetHeight);
 	//-->
 	</script>
 	<?php
@@ -463,17 +460,27 @@ function PrintSimpleFooter() {
 	global $CONFIG_PARMS;
 	global $QUERY_STRING;
 	
+	print "<!-- begin footer -->\n";
+	print "<div id=\"FooterSectionDummy\"></div>";
 	print "\n\t<div id=\"FooterSection\">";
-	PrintContactLinks();
-	print "<br />Running <a href=\"http://www.genmod.net/\" target=\"_blank\">Genmod";
-	if (count($CONFIG_PARMS) >1) print " Enterprise";
-	print MediaFS::GetStorageType();
-	print "</a> - Version ".GM_VERSION." ".GM_VERSION_RELEASE;
-	if (GedcomConfig::$SHOW_STATS) PrintExecutionStats();
-	if (DebugCollector::$show) DebugCollector::PrintDebug();
-	print "</div>";
-	// Close Genmod container
-	print "</div>";
+		PrintContactLinks();
+		print "<div class=\"FooterExecutionStats\">";
+			if (GedcomConfig::$SHOW_STATS) PrintExecutionStats();
+			print "<br />Running <a href=\"http://www.genmod.net/\" target=\"_blank\">Genmod";
+			if (count($CONFIG_PARMS) >1) print " Enterprise";
+			print MediaFS::GetStorageType();
+			print "</a> - Version ".GM_VERSION." ".GM_VERSION_RELEASE;
+			if (DebugCollector::$show) DebugCollector::PrintDebug();
+		print "</div>"; // close FooterExecutionStats
+	print "</div>"; // Close FooterContainer
+	print "</div>"; // Close Genmod container
+	?>
+	<script type="text/javascript">
+	<!--
+	document.getElementById('FooterSectionDummy').style.paddingBottom = (document.getElementById('FooterSection').clientHeight);
+	//-->
+	</script>
+	<?php
 	print "\n\t</body>\n</html>";
 	//-- We write the session data and close it. Fix for intermittend logoff.
 	session_write_close();
@@ -675,13 +682,13 @@ function PrintContactLinks($style=0) {
 function PrintHelpLink($help, $helpText, $show_desc="", $use_print_text=false, $return=false) {
 	global $view, $GM_IMAGES, $gm_user;
 	
-	if (GM_USE_HELPIMG) $sentense = "<img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["help"]["small"]."\" class=\"icon\" width=\"15\" height=\"15\" alt=\"\" />";
+	if (GM_USE_HELPIMG) $sentense = "<img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["help"]["small"]."\" class=\"HelpImage\" width=\"15\" height=\"15\" alt=\"\" />";
 	else $sentense = constant("GM_LANG_".$helpText);
 	$output = "";
 	if (($view!="preview")&&($_SESSION["show_context_help"])){
 		if ($helpText=="qm_ah"){
 			if ($gm_user->userIsAdmin()){
-				 $output .= " <a class=\"Error help\" tabindex=\"0\" href=\"javascript:";
+				 $output .= " <a class=\"Error HelpImage\" tabindex=\"0\" href=\"javascript:";
 				 if ($show_desc == "") $output .= $help;
 				 else if ($use_print_text) $output .= PrintText($show_desc, 0, 1);
 				 else if (stristr(constant("GM_LANG_".$show_desc), "\"")) $output .= preg_replace('/\"/','\'', constant("GM_LANG_".$show_desc));
@@ -690,7 +697,7 @@ function PrintHelpLink($help, $helpText, $show_desc="", $use_print_text=false, $
 			}
 		}
 		else {
-			$output .= " <a class=\"help\" tabindex=\"0\" href=\"javascript: ";
+			$output .= " <a class=\"HelpImage\" tabindex=\"0\" href=\"javascript: ";
 			if ($show_desc == "") $output .= $help;
 			else if ($use_print_text) $output .= PrintText($show_desc, 0, 1);
 			else if (stristr(constant("GM_LANG_".$show_desc), "\"")) $output .= preg_replace('/\"/','\'',constant("GM_LANG_".$show_desc));
@@ -787,7 +794,7 @@ function PrintText($help, $level=0, $noprint=0){
 		  if (stristr($mod_sentence, "~")){		// If there's a second one:
 			  $pos2 = strpos($mod_sentence, "~");
 			  $replace = substr($sentence, ($pos1+1), ($pos2-$pos1-1));
-			  $replace_text = "<span class=\"helpstart\">".Str2Upper($replace)."</span>";
+			  $replace_text = "<span class=\"HelpContentHeader\">".Str2Upper($replace)."</span>";
 			  $sentence = str_replace("~".$replace."~", $replace_text, $sentence);
 		  } else break;
 	 }
@@ -836,12 +843,12 @@ function PrintHelpIndex($help){
 	 uasort($help_sorted, "StringSort");
 	 if ($ch==0) $ch=count($help_sorted);
 	 else $ch +=$ch;
-	 if ($ch>0) print "<table width=\"100%\"><tr><td style=\"vertical-align: top;\"><ul>";
+	 if ($ch>0) print "<table class=\"ListTable\"><tr><td class=\"ListTableContent HelpContentList\"><ul>";
 	 $i=0;
 	 foreach ($help_sorted as $k => $help_item){
 		print "<li>".$k."</li>";
 		$i++;
-		if ($i==ceil($ch/2)) print "</ul></td><td style=\"vertical-align: top;\"><ul>";
+		if ($i==ceil($ch/2)) print "</ul></td><td  class=\"ListTableContent HelpContentList\"><ul>";
 	 }
 	 if ($ch>0) print "</ul></td></tr></table>";
 }
@@ -887,13 +894,13 @@ function PrintReady($text, $InHeaders=false) {
 			$hasallhits = true;
 			foreach($queries as $index=>$query1) {
 				if (preg_match("/(".$query1.")/i", $text)) {
-					$newtext = preg_replace("/(".$query1.")/i", "<span class=\"search_hit\">$1</span>", $newtext);
+					$newtext = preg_replace("/(".$query1.")/i", "<span class=\"SearchHit\">$1</span>", $newtext);
 				}
 				else if (preg_match("/(".Str2Upper($query1).")/", Str2Upper($text))) {
 					$nlen = strlen($query1);
 					$npos = strpos(Str2Upper($text), Str2Upper($query1));
 					$newtext = substr_replace($newtext, "</span>", $npos+$nlen, 0);
-					$newtext = substr_replace($newtext, "<span class=\"search_hit\">", $npos, 0);
+					$newtext = substr_replace($newtext, "<span class=\"SearchHit\">", $npos, 0);
 				}
 				else $hasallhits = false;
 			}
@@ -906,13 +913,13 @@ function PrintReady($text, $InHeaders=false) {
 			$hasallhits = true;
 			foreach($queries as $index=>$query1) {
 			if (preg_match("/(".$query1.")/i", $text)) {
-			$newtext = preg_replace("/(".$query1.")/i", "<span class=\"search_hit\">$1</span>", $newtext);
+			$newtext = preg_replace("/(".$query1.")/i", "<span class=\"SearchHit\">$1</span>", $newtext);
 			}
 			else if (preg_match("/(".Str2Upper($query1).")/", Str2Upper($text))) {
 			$nlen = strlen($query1);
 			$npos = strpos(Str2Upper($text), Str2Upper($query1));
 			$newtext = substr_replace($newtext, "</span>", $npos+$nlen, 0);
-			$newtext = substr_replace($newtext, "<span class=\"search_hit\">", $npos, 0);
+			$newtext = substr_replace($newtext, "<span class=\"SearchHit\">", $npos, 0);
 			}
 			else $hasallhits = false;
 			}
@@ -924,13 +931,13 @@ function PrintReady($text, $InHeaders=false) {
 				$hasallhits = true;
 				foreach($queries as $index=>$query1) {
 					if (preg_match("/(".$query1.")/i", $text)) {
-						$newtext = preg_replace("/(".$query1.")/i", "<span class=\"search_hit\">$1</span>", $newtext);
+						$newtext = preg_replace("/(".$query1.")/i", "<span class=\"SearchHit\">$1</span>", $newtext);
 					}
 					else if (preg_match("/(".Str2Upper($query1).")/", Str2Upper($text))) {
 						$nlen = strlen($query1);
 						$npos = strpos(Str2Upper($text), Str2Upper($query1));
 						$newtext = substr_replace($newtext, "</span>", $npos+$nlen, 0);
-						$newtext = substr_replace($newtext, "<span class=\"search_hit\">", $npos, 0);
+						$newtext = substr_replace($newtext, "<span class=\"SearchHit\">", $npos, 0);
 					}
 					else $hasallhits = false;
 				}
@@ -942,13 +949,13 @@ function PrintReady($text, $InHeaders=false) {
 				$hasallhits = true;
 				foreach($queries as $index=>$query1) {
 					if (preg_match("/(".$query1.")/i", $text)) {
-						$newtext = preg_replace("/(".$query1.")/i", "<span class=\"search_hit\">$1</span>", $newtext);
+						$newtext = preg_replace("/(".$query1.")/i", "<span class=\"SearchHit\">$1</span>", $newtext);
 					}
 					else if (preg_match("/(".Str2Upper($query1).")/", Str2Upper($text))) {
 						$nlen = strlen($query1);
 						$npos = strpos(Str2Upper($text), Str2Upper($query1));
 						$newtext = substr_replace($newtext, "</span>", $npos+$nlen, 0);
-						$newtext = substr_replace($newtext, "<span class=\"search_hit\">", $npos, 0);
+						$newtext = substr_replace($newtext, "<span class=\"SearchHit\">", $npos, 0);
 					}
 					else $hasallhits = false;
 				}
@@ -960,7 +967,7 @@ function PrintReady($text, $InHeaders=false) {
 				$hasallhits = true;
 				foreach($queries as $index=>$query1) {
 					if (preg_match("/(".$query1.")/i", $text)) {
-						$newtext = preg_replace("/(".$query1.")/i", "<span class=\"search_hit\">$1</span>", $newtext);
+						$newtext = preg_replace("/(".$query1.")/i", "<span class=\"SearchHit\">$1</span>", $newtext);
 					}
 					else $hasallhits = false;
 				}

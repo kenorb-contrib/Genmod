@@ -32,9 +32,9 @@ require("config.php");
 $placelist_controller = new PlacelistController();
 
 PrintHeader($placelist_controller->pagetitle);
+print "<div id=\"PlaceListPage\">";
+print '<div class="PageTitleName">'.$placelist_controller->title.'</div>';
 
-print "\n\t<div class=\"center\" >";
-print "<h3>".$placelist_controller->title."</h3>\n\t";
 
 //-- hierarchical display
 if ($placelist_controller->display == "hierarchy") {
@@ -52,6 +52,7 @@ if ($placelist_controller->display == "hierarchy") {
 
 	// -- print the breadcrumb hierarchy
 	$numls=0;
+	print "<div class=\"PlaceListBreadCrumb\">";
 	if ($placelist_controller->level > 0) {
 		//-- link to search results
 		if (($placelist_controller->level > 1 || $placelist_controller->parent[0] != "") && $numfound > 0) {
@@ -93,9 +94,10 @@ if ($placelist_controller->display == "hierarchy") {
 	print "</a>";
 
 	PrintHelpLink("ppp_levels_help", "qm");
-
+	print "</div>";
+	
+	$map_printed = false;
 	// show clickable map if found
-	print "\n\t<br /><br />\n\t<table class=\"width90 center\"><tr><td class=\"center\">";
 	if ($placelist_controller->level >= 1 && $placelist_controller->level <= 3) {
 		$country = $placelist_controller->parent[0];
 		if ($country == "\xD7\x99\xD7\xA9\xD7\xA8\xD7\x90\xD7\x9C") $country = "ISR"; // Israel hebrew name
@@ -139,6 +141,8 @@ if ($placelist_controller->display == "hierarchy") {
 			$imgfile = "places/".$country."/".$mapname.".gif";
 		}
 		if (file_exists($imgfile) and file_exists($mapfile)) {
+			print "\n\t\n\t<div class=\"PlaceListMap\">";
+			$map_printed = true;
 			include ($mapfile);
 //			changed $mapname to $areaname for alt and title to show the area full name and not just area code	// eikland
 			print "<img src='".$imgfile."' usemap='#".$mapname."' border='0' alt='".$areaname."' title='".$areaname."' />";
@@ -202,7 +206,7 @@ if ($placelist_controller->display == "hierarchy") {
 			//-->
 			</script>
 			<?php
-			print "</td><td style=\"margin-left:15; vertical-align: top;\">";
+		print "</div>";
 		}
 	}
 
@@ -217,9 +221,10 @@ if ($placelist_controller->display == "hierarchy") {
 	// -- print the array
 	foreach ($placelist as $key => $value) {
 		if ($i==0) {
-			print "\n\t<br />\n\t<table align=\"center\" class=\"ListTable $TEXT_DIRECTION\"";
+			print "<div class=\"".($map_printed ? "PlaceListMapNavRight" : "PlaceListMapNavCenter")."\">";
+			print "\n\t<table class=\"ListTable PlaceListTable\"";
 			if ($TEXT_DIRECTION=="rtl") print " dir=\"rtl\"";
-			print ">\n\t\t<tr>\n\t\t<td class=\"shade2 center\" ";
+			print ">\n\t\t<tr>\n\t\t<td class=\"ListTableHeader\" ";
 			if ($ct1 > 20) print "colspan=\"3\"";
 			else if ($ct1 > 4) print "colspan=\"2\"";
 			print ">&nbsp;";
@@ -232,15 +237,15 @@ if ($placelist_controller->display == "hierarchy") {
 
 			print "&nbsp;";
 			PrintHelpLink("ppp_placelist_help", "qm");
-			print "</td></tr><tr><td class=\"shade1 center\"><ul>\n\t\t\t";
+			print "</td></tr><tr><td class=\"ListTableContent\"><ul>\n\t\t\t";
 		}
 
 //		print "<li ";
 		if (begRTLText($value))
-			 print "<li class=\"rtl\" dir=\"rtl\"";
-		else print "<li class=\"ltr\" dir=\"ltr\"";
-		print " type=\"square\">\n<a href=\"placelist.php?action=".$placelist_controller->action."&amp;level=".($placelist_controller->level + 1).$linklevels;
-		print "&amp;parent[$placelist_controller->level]=".urlencode($value)."&amp;select=".$placelist_controller->select."\" class=\"shade1\">";
+			 print "<li class=\"rtl\" dir=\"rtl\">";
+		else print "<li class=\"ltr\" dir=\"ltr\">";
+		print "\n<a href=\"placelist.php?action=".$placelist_controller->action."&amp;level=".($placelist_controller->level + 1).$linklevels;
+		print "&amp;parent[$placelist_controller->level]=".urlencode($value)."&amp;select=".$placelist_controller->select."\">";
 
 		if (trim($value)=="") print GM_LANG_unknown;
 		else {
@@ -251,25 +256,25 @@ if ($placelist_controller->display == "hierarchy") {
 		}
 		print "</a></li>\n";
 		if ($ct1 > 20){
-			if ($i == floor($ct1 / 3)) print "\n\t\t</ul></td>\n\t\t<td class=\"shade1\"><ul>";
-			if ($i == floor(($ct1 / 3) * 2)) print "\n\t\t</ul></td>\n\t\t<td class=\"shade1\"><ul>";
+			if ($i == floor($ct1 / 3)) print "\n\t\t</ul></td>\n\t\t<td class=\"ListTableContent\"><ul>";
+			if ($i == floor(($ct1 / 3) * 2)) print "\n\t\t</ul></td>\n\t\t<td class=\"ListTableContent\"><ul>";
 		}
-		else if ($ct1 > 4 && $i == floor($ct1 / 2)) print "\n\t\t</ul></td>\n\t\t<td class=\"shade1\"><ul>";
+		else if ($ct1 > 4 && $i == floor($ct1 / 2)) print "\n\t\t</ul></td>\n\t\t<td class=\"ListTableContent\"><ul>";
 	    $i++;
 	}
 	if ($i>0){
 		print "\n\t\t</ul></td></tr>";
 		if ($placelist_controller->action != "show" && $placelist_controller->level > 0) {
-			print "<tr>\n\t\t<td class=\"shade2 center\" ";
+			print "<tr>\n\t\t<td class=\"ListTableContent\" ";
 			if ($ct1 > 20) print "colspan=\"3\"";
 			else if ($ct1 > 4) print "colspan=\"2\"";
 			print ">\n\t";
 			print GM_LANG_view_records_in_place;
 			PrintHelpLink("ppp_view_records_help", "qm");
-			print "</td></tr><tr><td class=\"shade1\" ";
+			print "</td></tr><tr><td class=\"ListTableColumnFooter\" ";
 			if ($ct1 > 20) print "colspan=\"3\"";
 			else if ($ct1 > 4) print "colspan=\"2\"";
-			print " style=\"text-align: center;\">";
+			print ">";
 			print "<a href=\"placelist.php?select=".$placelist_controller->select."&amp;action=show&amp;level=".$placelist_controller->level;
 			foreach($placelist_controller->parent as $key=>$value) {
 				print "&amp;parent[$key]=".urlencode(trim($value));
@@ -284,44 +289,55 @@ if ($placelist_controller->display == "hierarchy") {
 			print "</td></tr>";
 		}
 		print "</table>";
+		print "</div>";
 	}
-	print "</td></tr></table>";
-
 }
 
 if ($placelist_controller->level > 0) {
 	if ($placelist_controller->action == "show") {
+		
+		
 		// -- array of names
 		$positions = $placelist_controller->GetPlacePositions($placelist_controller->parent, $placelist_controller->level, $placelist_controller->select);
-
-		print "\n\t<br /><br /><table class=\"ListTable $TEXT_DIRECTION\">\n\t\t<tr>";
+		print "<form action=\"placelist.php\" name=\"selectplace\" method=\"get\">";
+		print "<input type=\"hidden\" name=\"action\" value=\"".$placelist_controller->action."\" />";
+		print "<input type=\"hidden\" name=\"display\" value=\"".$placelist_controller->display."\" />";
+		print "<input type=\"hidden\" name=\"level\" value=\"".$placelist_controller->level."\" />";
+		$j = 0;
+		while (isset($placelist_controller->parent[$j])) {
+			print "<input type=\"hidden\" name=\"parent[]\" value=\"".$placelist_controller->parent[$j]."\" />";
+			$j++;
+		}
+		
+		//Print the event filter
+		print "<div class=\"PlaceListNavContainer\">";
+			print "<table class=\"NavBlockTable\">";
+			print "<tr><td class=\"NavBlockHeader\" colspan=\"2\">".GM_LANG_filter."</td></tr>";
+			print "<tr>";
+			print "<td class=\"NavBlockLabel\">".GM_LANG_pl_show_event."</td>";
+			print "<td class=\"NavBlockField\"><select name=\"select\" onchange=\"document.selectplace.submit(); return false;\">";
+			PrintFilterEvent($placelist_controller->select);
+			print "</select></td>";
+			print "</tr></table>";
+		print "</div>";
+		
+		// print the list of indi's, fams and sources
+		print "<div class=\"PlaceListTableContainer\">";
+		print "\n\t<table class=\"ListTable PlaceListTable\">\n\t\t<tr>";
 		$ci = count($placelist_controller->indi_total);
 		$cs = count($placelist_controller->sour_total);
 		$cf = count($placelist_controller->fam_total);
 
 		$cnt = ($ci > 0) + ($cf > 0) + ($cs > 0);
-		print "<td class=\"shade2 center\" colspan=\"".$cnt."\">";
-		print "<form action=\"placelist.php\" name=\"selectplace\" method=\"get\">";
-		print "<input type=\"hidden\" name=\"action\" value=\"".$placelist_controller->action."\">";
-		print "<input type=\"hidden\" name=\"display\" value=\"".$placelist_controller->display."\">";
-		print "<input type=\"hidden\" name=\"level\" value=\"".$placelist_controller->level."\">";
-		$j = 0;
-		while (isset($placelist_controller->parent[$j])) {
-			print "<input type=\"hidden\" name=\"parent[]\" value=\"".$placelist_controller->parent[$j]."\">";
-			$j++;
-		}
-		print GM_LANG_pl_show_event.":&nbsp";
-		print "<select name=\"select\" onchange=\"document.selectplace.submit(); return false;\" />";
-		PrintFilterEvent($placelist_controller->select);
-		print "</select>";
-		print "</form>";
+		print "<td class=\"ListTableHeader\" colspan=\"".$cnt."\">".GM_LANG_place_list_objects;
+		PrintHelpLink("ppp_name_list_help", "qm");
 		print "</td></tr><tr>";
-		if ($ci>0) print "<td class=\"shade2 center\"><img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["indis"]["small"]."\" border=\"0\" alt=\"\" /> ".GM_LANG_individuals."</td>";
-		if ($cs>0) print "<td class=\"shade2 center\"><img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["source"]["small"]."\" border=\"0\" alt=\"\" /> ".GM_LANG_sources."</td>";
-		if ($cf>0) print "<td class=\"shade2 center\"><img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["sfamily"]["small"]."\" border=\"0\" alt=\"\" /> ".GM_LANG_families."</td>";
+		if ($ci>0) print "<td class=\"ListTableColumnHeader\"><img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["indis"]["small"]."\" border=\"0\" alt=\"\" /> ".GM_LANG_individuals."</td>";
+		if ($cs>0) print "<td class=\"ListTableColumnHeader\"><img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["source"]["small"]."\" border=\"0\" alt=\"\" /> ".GM_LANG_sources."</td>";
+		if ($cf>0) print "<td class=\"ListTableColumnHeader\"><img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["sfamily"]["small"]."\" border=\"0\" alt=\"\" /> ".GM_LANG_families."</td>";
 		print "</tr><tr>";
 		if ($ci>0) {
-			print "\n\t\t<td class=\"shade1 wrap\">";
+			print "\n\t\t<td class=\"ListTableContent\">";
 			print "\n<ul>";
 			foreach($positions["INDI"] as $key => $indi) {
 				$indi->PrintListPerson();
@@ -330,16 +346,16 @@ if ($placelist_controller->level > 0) {
 			print "\n\t\t</td>\n\t\t";
 		}
 		if ($cs>0) {
-			print "<td class=\"shade1 wrap\">";
+			print "<td class=\"ListTableContent\">";
 			print "\n<ul>";
 			foreach($positions["SOUR"] as $key => $source) {
 				$source->PrintListSource();
 			}
 			print "\n</ul>";
-			print "<br />\n\t\t</td>\n\t\t";
+			print "\n\t\t</td>\n\t\t";
 		}
 		if ($cf>0) {
-			print "<td class=\"shade1 wrap\">";
+			print "<td class=\"ListTableContent\">";
 			print "\n<ul>";
 			foreach($positions["FAM"] as $key => $family) {
 				$family->PrintListFamily();
@@ -348,7 +364,7 @@ if ($placelist_controller->level > 0) {
 		}
 		print "\n\t\t</tr><tr>";
 		if ($ci>0) {
-			print "<td>";
+			print "<td class=\"ListTableColumnFooter\">";
 			print GM_LANG_total_indis." ".$ci;
 			if (count($placelist_controller->indi_hide) > 0) {
 				print "&nbsp;--&nbsp;";
@@ -358,7 +374,7 @@ if ($placelist_controller->level > 0) {
 			print "</td>\n";
 		}
 		if ($cs>0) {
-			print "<td>";
+			print "<td class=\"ListTableColumnFooter\">";
 			print GM_LANG_total_sources." ".$cs;
 			if (count($placelist_controller->sour_hide) > 0) {
 				print "&nbsp;--&nbsp;";
@@ -368,7 +384,7 @@ if ($placelist_controller->level > 0) {
 			print "</td>\n";
 		}
 		if ($cf>0) {
-			print "<td>";
+			print "<td class=\"ListTableColumnFooter\">";
 			print GM_LANG_total_fams." ".$cf;
 			if (count($placelist_controller->fam_hide) > 0) {
 				print "&nbsp;--&nbsp;";
@@ -377,9 +393,12 @@ if ($placelist_controller->level > 0) {
 			}
 			print "</td>\n";
 		}
+		if ($cnt == 0) {
+			print "<td class=\"ListTableColumnFooter\">".GM_LANG_no_results."</td>";
+		}
 		print "</tr>\n\t</table>";
-		PrintHelpLink("ppp_name_list_help", "qm");
-		print "<br />";
+		print "</div>";
+		print "</form>";
 	}
 }
 
@@ -389,19 +408,19 @@ if ($placelist_controller->display=="list") {
 	$placelist = ListFunctions::FindPlaceList("");
 	
 	if (count($placelist)==0) {
-		print "<b>".GM_LANG_no_results."</b><br />";
+		print "<b>".GM_LANG_no_results."</b>";
 	}
 	else {
-		print "\n\t<table class=\"ListTable $TEXT_DIRECTION\"";
+		print "\n\t<table class=\"ListTable PlaceListTable\"";
 		if ($TEXT_DIRECTION=="rtl") print " dir=\"rtl\"";
-		print ">\n\t\t<tr>\n\t\t<td class=\"list_label\" ";
+		print ">\n\t\t<tr>\n\t\t<td class=\"ListTableHeader\" ";
 		$ct = count($placelist);
 		print " colspan=\"".($ct>20?"3":"2")."\">&nbsp;";
 		print "<img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["place"]["small"]."\" border=\"0\" title=\"".GM_LANG_search_place."\" alt=\"".GM_LANG_search_place."\" />&nbsp;&nbsp;";
 		print GM_LANG_place_list2;
 		print "&nbsp;";
 		PrintHelpLink("ppp_placelist_help2", "qm");
-		print "</td></tr><tr><td class=\"shade1 wrap\"><ul>\n\t\t\t";
+		print "</td></tr><tr><td class=\"ListTableContent\"><ul>\n\t\t\t";
 		$i=0;
 		foreach($placelist as $indexval => $revplace) {
 			$linklevels = "";
@@ -418,42 +437,42 @@ if ($placelist_controller->display=="list") {
 			}
 //			print "<li";
 			if (begRTLText($revplace))
-			     print "<li class=\"rtl\" dir=\"rtl\"";
-		    else print "<li class=\"ltr\" dir=\"ltr\"";
-			print "type=\"square\"><a href=\"placelist.php?action=show&amp;display=hierarchy&amp;level=".$level.$linklevels."&amp;select=".$placelist_controller->select."\">";
+			     print "<li class=\"rtl\" dir=\"rtl\">";
+		    else print "<li class=\"ltr\" dir=\"ltr\">";
+			print "<a href=\"placelist.php?action=show&amp;display=hierarchy&amp;level=".$level.$linklevels."&amp;select=".$placelist_controller->select."\">";
 			print PrintReady($revplace)."</a></li>\n";
 			$i++;
 			if ($ct > 20){
-				if ($i == floor($ct / 3)) print "\n\t\t</ul></td>\n\t\t<td class=\"shade1 wrap\"><ul>";
-				if ($i == floor(($ct / 3) * 2)) print "\n\t\t</ul></td>\n\t\t<td class=\"shade1 wrap\"><ul>";
+				if ($i == floor($ct / 3)) print "\n\t\t</ul></td>\n\t\t<td class=\"ListTableContent\"><ul>";
+				if ($i == floor(($ct / 3) * 2)) print "\n\t\t</ul></td>\n\t\t<td class=\"ListTableContent\"><ul>";
 			}
-			else if ($i == floor($ct/2)) print "</ul></td><td class=\"shade1 wrap\"><ul>\n\t\t\t";
+			else if ($i == floor($ct/2)) print "</ul></td><td class=\"ListTableContent\"><ul>\n\t\t\t";
 		}
 		print "\n\t\t</ul></td></tr>\n\t\t";
 		if ($i>1) {
-			print "<tr><td>";
+			print "<tr><td class=\"ListTableColumnFooter\" colspan=\"".($ct>20?"3":"2")."\">";
 			if ($i>0) print GM_LANG_total_unic_places." ".$i;
 			print "</td></tr>\n";
 		}
 		print "\n\t\t</table>";
 	}
 }
-
-print "<br /><a href=\"placelist.php?select=all&amp;display=";
-if ($placelist_controller->display == "list") print "hierarchy\">".GM_LANG_show_place_hierarchy;
-else print "list\">".GM_LANG_show_place_list;
-print "</a><br /><br />\n";
-
-$head = Header::GetInstance("HEAD", "", GedcomConfig::$GEDCOMID);
-if ($head->placeformat != "") {
-	print  GM_LANG_form.$head->placeformat;
-	PrintHelpLink("ppp_match_one_help", "qm");
-}
-else {
-	print GM_LANG_form.GM_LANG_default_form."  ".GM_LANG_default_form_info;
-	PrintHelpLink("ppp_default_form_help", "qm");
-}
-
-print "<br /><br /></div>";
+print "<div class=\"PlaceListBottomLinks\">";
+	print "<a href=\"placelist.php?select=all&amp;display=";
+	if ($placelist_controller->display == "list") print "hierarchy\">".GM_LANG_show_place_hierarchy;
+	else print "list\">".GM_LANG_show_place_list;
+	print "</a><br />\n";
+	
+	$head = Header::GetInstance("HEAD", "", GedcomConfig::$GEDCOMID);
+	if ($head->placeformat != "") {
+		print  GM_LANG_form.$head->placeformat;
+		PrintHelpLink("ppp_match_one_help", "qm");
+	}
+	else {
+		print GM_LANG_form.GM_LANG_default_form."  ".GM_LANG_default_form_info;
+		PrintHelpLink("ppp_default_form_help", "qm");
+	}
+print "</div>";
+print "</div>";
 PrintFooter();
 ?>

@@ -52,12 +52,12 @@ PrintHeader(GM_LANG_lockout_maint);
 
 ?>
 <!-- Setup the left box -->
-<div id="admin_genmod_left">
-	<div class="admin_link"><a href="admin.php"><?php print GM_LANG_admin;?></a></div>
-	<div class="admin_link"><a href="admin_maint.php"><?php print GM_LANG_administration_maintenance;?></a></div>
+<div id="AdminColumnLeft">
+	<?php AdminFunctions::AdminLink("admin.php", GM_LANG_admin); ?>
+	<?php AdminFunctions::AdminLink("admin_maint.php", GM_LANG_administration_maintenance); ?>
 </div>
 
-<div id="content">
+<div id="AdminColumnMiddle">
 	<?php
 	$error1 = false;
 	$error2 = false;
@@ -83,7 +83,7 @@ PrintHeader(GM_LANG_lockout_maint);
 		}
 		else {
 			$u =& User::GetInstance($add_user);
-			if ($u->is_empty) {
+			if ($u->is_empty || empty($add_user)) {
 				$error2 = true;
 			}
 			else {
@@ -95,23 +95,25 @@ PrintHeader(GM_LANG_lockout_maint);
 	?>
 	<form method="post" name="lockoutform" action="lockout_maint.php">
 		<input type="hidden" name="action" value="update" />
-		<div class="admin_topbottombar">
-			<h3>
-				<?php PrintHelpLink("lockout_maint_help", "qm", "lockout_maint");?>
-				<?php print GM_LANG_lockout_maint; ?>
-			</h3>
-		</div>
+		<table class="NavBlockTable AdminNavBlockTable">
+			<tr>
+				<td colspan="5" class="NavBlockHeader AdminNavBlockHeader">
+				<?php print "<div class=\"AdminNavBlockTitle\">".GM_LANG_lockout_maint; ?>
+				<?php PrintHelpLink("lockout_maint_help", "qm", "lockout_maint");?></div>
+				</td>
+			</tr>
 		<?php
 		$sql = "SELECT * FROM ".TBLPREFIX."lockout ORDER BY lo_timestamp ASC";
 		$res = NewQuery($sql);
-		if ($res && $res->NumRows() > 0) {
-			?><div class="admin_item_box shade2">
-				<div class="width10 choice_left"><?php print GM_LANG_select; ?></div>
-				<div class="width15 choice_middle"><?php print GM_LANG_ip_address; ?></div>
-				<div class="width20 choice_middle"><?php print GM_LANG_username; ?></div>
-				<div class="width20 choice_middle"><?php print GM_LANG_lockout_at; ?></div>
-				<div class="width20 choice_right"><?php print GM_LANG_release_at; ?></div>
-			</div><?php
+		if ($res && $res->NumRows() > 0) { ?>
+			<tr>
+				<td class="NavBlockColumnHeader AdminNavBlockColumnHeader"><?php print GM_LANG_select; ?></td>
+				<td class="NavBlockColumnHeader AdminNavBlockColumnHeader"><?php print GM_LANG_ip_address; ?></td>
+				<td class="NavBlockColumnHeader AdminNavBlockColumnHeader"><?php print GM_LANG_username; ?></td>
+				<td class="NavBlockColumnHeader AdminNavBlockColumnHeader"><?php print GM_LANG_lockout_at; ?></td>
+				<td class="NavBlockColumnHeader AdminNavBlockColumnHeader"><?php print GM_LANG_release_at; ?></td>
+			</tr>
+			<tr><?php
 			while ($row = $res->FetchRow()) {
 				$locktime = GetChangedDate(date("d", $row[1])." ".date("M", $row[1])." ".date("Y", $row[1]))." - ".date($TIME_FORMAT, $row[1]);
 				if($row[2] == "0") $releasetime = GM_LANG_until_unlocked;
@@ -119,45 +121,59 @@ PrintHeader(GM_LANG_lockout_maint);
 					$releasetime = GetChangedDate(date("d", $row[2])." ".date("M", $row[2])." ".date("Y", $row[2]))." - ".date($TIME_FORMAT, $row[2]);
 				}
 				?>
-				<div class="admin_item_box">
-				<div class="width10 choice_left"><input type="checkbox" name="dellock[]" value="
+				<td class="AdminNavBlockField NavBlockField"><input type="checkbox" name="dellock[]" value="
 				<?php print $row[0]."#".$row[3]; ?>
 				" />
-				</div>
-				<div class="width15 choice_middle"><?php print $row[0]; ?></div>
-				<div class="width20 choice_middle"><?php print $row[3]; ?></div>
-				<div class="width20 choice_middle"><?php print $locktime; ?></div>
-				<div class="width20 choice_right"><?php print $releasetime; ?></div>
-				</div>
+				<td class="AdminNavBlockLabel NavBlockLabel"><?php print $row[0]; ?></td>
+				<td class="AdminNavBlockLabel NavBlockLabel"><?php print $row[3]; ?></td>
+				<td class="AdminNavBlockLabel NavBlockLabel"><?php print $locktime; ?></td>
+				<td class="AdminNavBlockLabel NavBlockLabel"><?php print $releasetime; ?></td>
+			</tr>
 			<?php } ?>
-			<div class="admin_item_box center shade2">
-				<input type="submit" value="<?php print GM_LANG_delete_selected;?>" />
-			</div>
+			<tr>
+				<td class="NavBlockFooter" colspan="5">
+					<input type="submit" value="<?php print GM_LANG_delete_selected;?>" />
+				</td>
+			</tr>
 		<?php } 
 		else { ?>
-			<div class="admin_item_box center">
-			<?php print GM_LANG_no_lockouts; ?>
-			</div>
+			<tr>
+				<td class="NavBlockColumnHeader AdminNavBlockColumnHeader">
+					<?php print GM_LANG_no_lockouts; ?>
+				</td>
+			</tr>
 		<?php } ?>
-	</form><br />
+		</table>
+	</form>
 	<form method="post" name="lockoutaddform" action="lockout_maint.php">
 		<input type="hidden" name="action" value="add" />
-		<div class="admin_item_box shade2 center">
-			<div class="width100 choice_middle"><?php print GM_LANG_add_lockout; ?></div>
-		</div>
-		<div class="admin_item_box">
-			<div class="width30 choice_left"><?php print GM_LANG_ip_address; ?></div>
-			<div class="width30 choice_middle"><input type="text" name="add_ip" value="<?php if (isset($add_ip)) print $add_ip;?>" size="15" maxlength="15" /></div>
-			<?php if ($error1) {?><div class="width30 choice_right"><span class="Error"><?php print GM_LANG_invalid_ip; ?></span></div><?php } ?>
-		</div>
-		<div class="admin_item_box">
-			<div class="width30 choice_left"><?php print GM_LANG_username; ?></div>
-			<div class="width30 choice_middle"><input type="text" name="add_user" value="<?php if (isset($add_user)) print $add_user;?>" size="25" /></div>
-			<?php if ($error2) {?><div class="width30 choice_right"><span class="Error"><?php print GM_LANG_invalid_user; ?></span></div><?php } ?>
-		</div>
-			<div class="admin_item_box center shade2">
+		<table class="NavBlockTable AdminNavBlockTable">
+			<tr>
+				<td colspan="2" class="NavBlockRowSpacer">&nbsp</td>
+			</tr>
+			<tr>
+				<td colspan="2" class="NavBlockHeader">
+					<?php print GM_LANG_add_lockout; ?>
+				</td>
+			</tr>
+			<tr>
+				<td class="NavBlockLabel AdminNavBlockLabel"><?php print GM_LANG_ip_address; ?></td>
+				<td class="NavBlockField AdminNavBlockField"><input type="text" name="add_ip" value="<?php if (isset($add_ip)) print $add_ip;?>" size="15" maxlength="15" />
+					<?php if ($error1) {?><span class="Error"><?php print GM_LANG_invalid_ip; ?></span>
+					<?php } ?>
+				</td>
+		</tr>
+			<td class="NavBlockLabel AdminNavBlockLabel"><?php print GM_LANG_username; ?></td>
+			<td class="NavBlockField AdminNavBlockField"><input type="text" name="add_user" value="<?php if (isset($add_user)) print $add_user;?>" size="25" />
+				<?php if ($error2) {?><span class="Error"><?php print GM_LANG_invalid_user; ?></span>
+				<?php } ?>
+			</td>
+		</tr>
+			<td class="NavBlockFooter" colspan="2">
 				<input type="submit" value="<?php print GM_LANG_lockout_submit;?>" />
-			</div>
+			</td>
+		</tr>
+	</table>
 	</form>
 </div>
 <?php

@@ -154,9 +154,9 @@ abstract class ChartController extends BaseController {
 		
 		print "<tr><td class=\"NavBlockLabel\">";
 		PrintHelpLink("rootid_help", "qm");
-		print GM_LANG_root_person."&nbsp;</td>";
+		print GM_LANG_root_person."</td>";
 		print "<td class=\"NavBlockField\">";
-		print "<input class=\"pedigree_form\" type=\"text\" name=\"rootid\" id=\"rootid\" size=\"3\" value=\"".$this->xref."\" />";
+		print "<input class=\"PidInputField\" type=\"text\" name=\"rootid\" id=\"rootid\" size=\"3\" value=\"".$this->xref."\" />";
 		LinkFunctions::PrintFindIndiLink("rootid","");
 		print "</td></tr>";
 	}
@@ -178,7 +178,7 @@ abstract class ChartController extends BaseController {
 	public function PrintInputHeader($tr=true) {
 		
 		if ($tr) print "<tr>";
-		print "<td colspan=\"2\" class=\"topbottombar\" style=\"text-align:center; \">";
+		print "<td colspan=\"2\" class=\"NavBlockHeader\">";
 		print GM_LANG_options."</td>";
 		if ($tr) print "</tr>";
 	}
@@ -298,8 +298,8 @@ abstract class ChartController extends BaseController {
 						print "\n\t\t\t\t<a href=\"".SCRIPT_NAME."?rootid=".$spouse->xref.(isset($this->line) ? "&amp;line=".$this->line : "").(isset($this->split) ? "&amp;split=".$this->split : "").(isset($this->show_spouse) ? "&amp;show_spouse=".$this->show_spouse : "")."&amp;show_details=".$this->show_details."&amp;num_generations=".$this->num_generations."&amp;box_width=".$this->box_width.(isset($this->num_descent) ? "&amp;num_descent=".$this->num_descent : "")."\"><span ";
 						if ($spouse->disp_name) {
 							if (hasRTLText($spouse->name))
-							     print "class=\"NameBold\">";
-			   				else print "class=\"name1\">";
+							     print "class=\"PersonNameBold\">";
+			   				else print "class=\"PersonName1\">";
 							print $spouse->name;
 						}
 						else print GM_LANG_private;
@@ -309,8 +309,8 @@ abstract class ChartController extends BaseController {
 						print "\n\t\t\t\t&nbsp;&nbsp;<a href=\"".SCRIPT_NAME."?rootid=".$child->xref.(isset($this->line) ? "&amp;line=".$this->line : "").(isset($this->split) ? "&amp;split=".$this->split : "").(isset($this->show_spouse) ? "&amp;show_spouse=".$this->show_spouse : "")."&amp;show_details=".$this->show_details."&amp;num_generations=".$this->num_generations."&amp;box_width=".$this->box_width.(isset($this->num_descent) ? "&amp;num_descent=".$this->num_descent : "")."\"><span ";
 						if ($child->disp_name) {
 							if (hasRTLText($child->name))
-							     print "class=\"NameBold\">&lt; ";
-				   			else print "class=\"name1\">&lt; ";
+							     print "class=\"PersonNameBold\">&lt; ";
+				   			else print "class=\"PersonName1\">&lt; ";
 							print $child->name;
 						}
 						else print ">" . GM_LANG_private;
@@ -320,13 +320,13 @@ abstract class ChartController extends BaseController {
 				//-- print the siblings
 				foreach($person->childfamilies as $key => $cfamily) {
 					if($cfamily->husb_id != "" || $cfamily->wife_id != "") {
-						print "<span class=\"name1\"><br />".GM_LANG_parents."<br /></span>";
+						print "<span class=\"PersonName1\"><br />".GM_LANG_parents."<br /></span>";
 						if ($cfamily->husb_id != "") {
 							print "\n\t\t\t\t&nbsp;&nbsp;<a href=\"".SCRIPT_NAME."?rootid=".$cfamily->husb_id.(isset($this->line) ? "&amp;line=".$this->line : "").(isset($this->split) ? "&amp;split=".$this->split : "").(isset($this->show_spouse) ? "&amp;show_spouse=".$this->show_spouse : "")."&amp;show_details=".$this->show_details."&amp;num_generations=".$this->num_generations."&amp;box_width=".$this->box_width.(isset($this->num_descent) ? "&amp;num_descent=".$this->num_descent : "")."\"><span ";
 							if ($cfamily->husb->disp_name) {
 								if (hasRTLText($cfamily->husb->name))
-								     print "class=\"NameBold\">";
-				   				else print "class=\"name1\">";
+								     print "class=\"PersonNameBold\">";
+				   				else print "class=\"PersonName1\">";
 								print $cfamily->husb->name;
 							}
 							else print GM_LANG_private;
@@ -336,8 +336,8 @@ abstract class ChartController extends BaseController {
 							print "\n\t\t\t\t&nbsp;&nbsp;<a href=\"".SCRIPT_NAME."?rootid=".$cfamily->wife_id.(isset($this->line) ? "&amp;line=".$this->line : "").(isset($this->split) ? "&amp;split=".$this->split : "").(isset($this->show_spouse) ? "&amp;show_spouse=".$this->show_spouse : "")."&amp;show_details=".$this->show_details."&amp;num_generations=".$this->num_generations."&amp;box_width=".$this->box_width.(isset($this->num_descent) ? "&amp;num_descent=".$this->num_descent : "")."\"><span ";
 							if ($cfamily->wife->disp_name) {
 								if (hasRTLText($cfamily->wife->name))
-								     print "class=\"NameBold\">";
-				   				else print "class=\"name1\">";
+								     print "class=\"PersonNameBold\">";
+				   				else print "class=\"PersonName1\">";
 								print $cfamily->wife->name;
 							}
 							else print GM_LANG_private;
@@ -345,14 +345,14 @@ abstract class ChartController extends BaseController {
 						}
 					}
 					if ($cfamily->children_count > 1) {
-						print "<span class=\"name1\"><br />".GM_LANG_siblings."<br /></span>";
+						print "<span class=\"PersonName1\"><br />".GM_LANG_siblings."<br /></span>";
 						foreach($cfamily->children as $key2 => $child) {
 							if ($child->xref != $person->xref) {
 								print "\n\t\t\t\t&nbsp;&nbsp;<a href=\"".SCRIPT_NAME."?rootid=".$child->xref.(isset($this->line) ? "&amp;line=".$this->line : "").(isset($this->split) ? "&amp;split=".$this->split : "").(isset($this->show_spouse) ? "&amp;show_spouse=".$this->show_spouse : "")."&amp;show_details=".$this->show_details."&amp;num_generations=".$this->num_generations."&amp;box_width=".$this->box_width.(isset($this->num_descent) ? "&amp;num_descent=".$this->num_descent : "")."\"><span ";
 								if ($child->disp_name) {
 									if (hasRTLText($child->name))
-									print "class=\"NameBold\"> ";
-					   				else print "class=\"name1\"> ";
+									print "class=\"PersonNameBold\"> ";
+					   				else print "class=\"PersonName1\"> ";
 									print $child->name;
 								}
 								else print ">". GM_LANG_private;

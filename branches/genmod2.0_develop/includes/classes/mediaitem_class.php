@@ -342,9 +342,9 @@ class MediaItem extends GedcomRecord {
 			else print "\n\t\t\t<li class=\"ltr\" dir=\"ltr\">";
 		}
 		if ($paste) {
-			print "<a href=\"#\" onclick=\"sndReq(document.getElementById('dummy'), 'lastused', 'type', '".$this->datatype."', 'id', '".$this->key."'); pasteid('".$this->xref."', ''); return false;\" class=\"list_item\">";
+			print "<a href=\"#\" onclick=\"sndReq(document.getElementById('dummy'), 'lastused', false, 'type', '".$this->datatype."', 'id', '".$this->key."'); pasteid('".$this->xref."', ''); return false;\" class=\"ListItem\">";
 		}
-		else print "\n\t\t\t<a href=\"mediadetail.php?mid=".$this->xref."&amp;gedid=".$this->gedcomid."\" class=\"list_item\">";
+		else print "\n\t\t\t<a href=\"mediadetail.php?mid=".$this->xref."&amp;gedid=".$this->gedcomid."\" class=\"ListItem\">";
 		print PrintReady($this->GetTitle());
 		print $this->addxref;
 		if (!empty($fact)) {

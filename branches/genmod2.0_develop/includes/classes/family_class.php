@@ -655,8 +655,8 @@ class Family extends GedcomRecord {
 			if (begRTLText($desc)) print "\n\t\t\t<li class=\"rtl\" dir=\"rtl\">";
 			else print "\n\t\t\t<li class=\"ltr\" dir=\"ltr\">";
 		}
-		if ($paste) print "<a href=\"#\" onclick=\"sndReq(document.getElementById('dummy'), 'lastused', 'type', '".$this->datatype."', 'id', '".$this->key."'); pasteid('".$this->xref."'); return false;\" class=\"list_item\">";
-		else print "\n\t\t\t<a href=\"family.php?famid=".$this->xref."&amp;gedid=".$this->gedcomid."\" class=\"list_item\">";
+		if ($paste) print "<a href=\"#\" onclick=\"sndReq(document.getElementById('dummy'), 'lastused', false, 'type', '".$this->datatype."', 'id', '".$this->key."'); pasteid('".$this->xref."'); return false;\" class=\"ListItem\">";
+		else print "\n\t\t\t<a href=\"family.php?famid=".$this->xref."&amp;gedid=".$this->gedcomid."\" class=\"ListItem\">";
 		print "<b>".$desc;
 		// There must be a primary name to add the additional name. And they must not be the same (might be the case if the name parameter was filled).
 		if (!empty($desc) && $this->GetFamilyAddDescriptor() != "" && $this->GetFamilyAddDescriptor() != $desc) print "&nbsp;(".$this->GetFamilyAddDescriptor().")";
@@ -680,7 +680,7 @@ class Family extends GedcomRecord {
 				SwitchGedcom($asso->gedcomid);
 				$assoname = $asso->assoperson->name;
 				$assoxref = $asso->assoperson->addxref;
-				print "<br /><a href=\"individual.php?pid=".$asso->xref2."&amp;gedid=".$asso->gedcomid."\" title=\"".$assoname."\" class=\"list_item\">";
+				print "<br /><a href=\"individual.php?pid=".$asso->xref2."&amp;gedid=".$asso->gedcomid."\" title=\"".$assoname."\" class=\"ListItem\">";
 				if ($TEXT_DIRECTION=="ltr") print " <span dir=\"ltr\">";
 				else print " <span dir=\"rtl\">";
 				print "(".GM_LANG_associate_with.": ".$assoname.$assoxref;

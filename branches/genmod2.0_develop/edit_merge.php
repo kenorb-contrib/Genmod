@@ -56,16 +56,18 @@ if (!$gm_user->userCanAccept()) {
 	exit;
 }
 ?>	<!-- Setup the left box -->
-	<div id="admin_genmod_left">
-		<div class="admin_link"><a href="admin.php"><?php print GM_LANG_admin;?></a></div>
-		<?php if ($action != "choose") { ?>
-		<div class="admin_link"><a href="edit_merge.php"><?php print GM_LANG_merge_records;?></a></div>
-		<?php } ?>
+	<div id="AdminColumnLeft">
+		<?php 
+		AdminFunctions::AdminLink("admin.php", GM_LANG_admin);
+		if ($action != "choose") {
+			AdminFunctions::AdminLink("edit_merge.php", GM_LANG_merge_records);
+		}
+		 ?>
 	</div>
 	
 	<!-- Setup the right box -->
-	<div id="admin_genmod_right">
-	</div>	
+	<div id="AdminColumnRight">
+	</div>
 <?php
 if ($action != "choose") {
 	if ($gid1 == $gid2) {
@@ -175,9 +177,9 @@ if ($action != "choose") {
 */					
 				$change_id = EditFunctions::GetNewXref("CHANGE");
 				$change_type = "MERGE";
-				print "<div id=\"content\">";
-				print "<div class=\"admin_topbottombar\"><h3>".GM_LANG_merge_step3."</h3><br />\n";
-				print "Performing Record Merge<br /></div>\n";
+				print "<div id=\"AdminColumnMiddle\">";
+				print "<div class=\"NavBlockHeader AdminNavBlockHeader\"><span class=\"AdminNavBlockTitle\">".GM_LANG_merge_step3."</span><br /><br />\n";
+				print GM_LANG_merge_perform."</div>\n";
 				// Delete the old record2
 				EditFunctions::DeleteGedrec($gid2, $change_id, $change_type, $object1->type);
 
@@ -312,22 +314,20 @@ if ($action != "choose") {
 
 				// Now update all links in other records from ged2 to ged1
 				EditFunctions::ReplaceLinks($gid2, $gid1, $mtype, $change_id, $change_type, $mergeged);
+				print "<div class=\"NavBlockLabel\">";
 				if (isset($change_id) && $can_auto_accept &&  $gm_user->userAutoAccept()) {
 					ChangeFunctions::AcceptChange($change_id, GedcomConfig::$GEDCOMID);
 					print GM_LANG_merge_success_auto;
 				}
 				else print GM_LANG_merge_success;
 				
-				print "<br />\n";
-				print "<div class=\"topbottombar\"><a href=\"edit_merge.php?action=choose\">".GM_LANG_merge_more."</a><br /></div>\n";
+				print "</div>\n";
+				print "<div class=\"NavBlockFooter\"><a href=\"edit_merge.php?action=choose\">".GM_LANG_merge_more."</a></div>\n";
 //				print "</div>\n";
 			}
 			if ($action == "select") {
-				print "<div id=\"content\">";
-				print "<div class=\"admin_topbottombar\"><h3>".GM_LANG_merge_step2."</h3>";
-				if (!empty($errorstring)) print "<span class=\"Error\">".GM_LANG_merge_notunique."&nbsp;".$errorstring."</span><br />";
-				print "</div><form method=\"post\" action=\"edit_merge.php\">\n";
-				print "<div class=\"center\">".GM_LANG_merge_facts_same."<br /><br /></div>\n";
+				print "<div id=\"AdminColumnMiddle\">";
+				print "<form method=\"post\" action=\"edit_merge.php\">\n";
 				print "<input type=\"hidden\" name=\"gid1\" value=\"$gid1\" />\n";
 				print "<input type=\"hidden\" name=\"gid2\" value=\"$gid2\" />\n";
 				print "<input type=\"hidden\" name=\"ged\" value=\"$mergeged\" />\n";
@@ -335,48 +335,52 @@ if ($action != "choose") {
 				$equal_count=0;
 				$skip1 = array();
 				$skip2 = array();
-				print "<table border=\"1\" class=\"ListTable\" style=\"width:50%;\">\n";
+				print "<table class=\"NavBlockTable AdminNavBlockTable\">\n";
+				print "<tr><td class=\"NavBlockHeader AdminNavBlockHeader\" colspan=\"2\"><span class=\"AdminNavBlockTitle\">".GM_LANG_merge_step2."</span><br /><br />";
+				if (!empty($errorstring)) print "<span class=\"Error\">".GM_LANG_merge_notunique."&nbsp;".$errorstring."</span><br />";
+				print "</td></tr>";
+				print "<tr><td class=\"NavBlockRowSpacer\" colspan=\"2\">&nbsp;</td></tr>";
+				print "<tr><td class=\"NavBlockColumnHeader\" colspan=\"2\">".GM_LANG_merge_facts_same."</td></tr>";
 				foreach($facts1 as $i=>$fact1) {
 					foreach($facts2 as $j=>$fact2) {
 						if (Str2Upper($fact1["subrec"])==Str2Upper($fact2["subrec"])) {
 							$skip1[] = $i;
 							$skip2[] = $j;
 							$equal_count++;
-							print "<tr><td>";
+							print "<tr><td class=\"NavBlockLabel\">";
 							if (defined("GM_FACT_".$fact1["fact"])) print constant("GM_FACT_".$fact1["fact"]);
 							else print $fact1["fact"];
-							print "<input type=\"hidden\" name=\"keep1[]\" value=\"$i\" /></td>\n<td>".nl2br($fact1["subrec"])."</td></tr>\n";
+							print "<input type=\"hidden\" name=\"keep1[]\" value=\"$i\" /></td>\n<td class=\"NavBlockField\">".nl2br($fact1["subrec"])."</td></tr>\n";
 						}
 					}
 				}
 				if ($equal_count==0) {
-					print "<tr><td>".GM_LANG_no_matches_found."</td></tr>\n";
+					print "<tr><td class=\"NavBlockLabel\" colspan=\"2\">".GM_LANG_no_matches_found."</td></tr>\n";
 				}
-				print "</table><br />\n";
-				print "<div class=\"center\">".GM_LANG_unmatching_facts."<br /></div>\n";
-				print "<table class=\"ListTable\" style=\"width:100%;\">\n";
-				print "<tr><td class=\"list_label\">".GM_LANG_record." $gid1</td><td class=\"list_label\">".GM_LANG_record." $gid2</td></tr>\n";
-				print "<tr><td valign=\"top\" class=\"list_value\">\n";
-				print "<table border=\"1\">\n";
+				print "<tr><td class=\"NavBlockRowSpacer\">&nbsp;</td></tr>";
+				print "<tr><td class=\"NavBlockColumnHeader\" colspan=\"2\">".GM_LANG_unmatching_facts."</td></tr>";
+				print "<tr><td class=\"NavBlockLabel\">".GM_LANG_record." $gid1</td><td class=\"NavBlockLabel\">".GM_LANG_record." $gid2</td></tr>\n";
+				print "<tr><td class=\"NavBlockField MergeFactsBlock\">\n";
+				print "<table class=\"MergeFactsTable\">\n";
 				foreach($facts1 as $i=>$fact1) {
 					if (($fact1["fact"]!="CHAN")&&(!in_array($i, $skip1))) {
-						print "<tr><td><input type=\"checkbox\" name=\"keep1[]\" value=\"$i\" checked=\"checked\" /></td>";
-						print "<td class=\"wrap\">".nl2br($fact1["subrec"])."</td></tr>\n";
+						print "<tr><td><input class=\"MergeFactSelect\" type=\"checkbox\" name=\"keep1[]\" value=\"$i\" checked=\"checked\" /></td>";
+						print "<td class=\"MergeFactData\">".nl2br($fact1["subrec"])."</td></tr>\n";
 					}
 				}
 				print "</table>\n";
-				print "</td><td valign=\"top\" class=\"list_value\">\n";
-				print "<table border=\"1\">\n";
+				print "</td><td class=\"NavBlockField MergeFactsBlock\">\n";
+				print "<table class=\"MergeFactsTable\">\n";
 				foreach($facts2 as $j=>$fact2) {
 					if (($fact2["fact"]!="CHAN")&&(!in_array($j, $skip2))) {
-						print "<tr><td><input type=\"checkbox\" name=\"keep2[]\" value=\"$j\" checked=\"checked\" /></td>";
-						print "<td class=\"wrap\">".nl2br($fact2["subrec"])."</td></tr>\n";
+						print "<tr><td><input class=\"MergeFactSelect\" type=\"checkbox\" name=\"keep2[]\" value=\"$j\" checked=\"checked\" /></td>";
+						print "<td class=\"MergeFactData\">".nl2br($fact2["subrec"])."</td></tr>\n";
 					}
 				}
 				print "</table>\n";
 				print "</td></tr>\n";
+				print "<tr><td class=\"NavBlockFooter\" colspan=\"2\"><input type=\"submit\"  value=\"".GM_LANG_merge_records."\" /></td></tr>\n";
 				print "</table>\n";
-				print "<div class=\"center\"><input type=\"submit\"  value=\"".GM_LANG_merge_records."\" /></div>\n";
 				print "</form></div>\n";
 			}
 		}
@@ -425,18 +429,18 @@ if ($action=="choose") {
 	</script>
 	
 	<?php
-	print "<div id=\"content\">";
-		print "<div class=\"admin_topbottombar\"><h3>".GM_LANG_merge_step1."</h3><br />";
+	print "<div id=\"AdminColumnMiddle\">";
+		print "<form method=\"post\" name=\"merge\" action=\"edit_merge.php\">";
+		print "<input type=\"hidden\" name=\"action\" value=\"select\" />";
+		print "<table class=\"NavBlockTable AdminNavBlockTable\">";
+			print "<tr><td class=\"NavBlockHeader AdminNavBlockHeader\" colspan=\"2\"><span class=\"AdminNavBlockTitle\">".GM_LANG_merge_step1."</span><br /><br />";
 			if ($error == "1") print "<span class=\"Error\">".GM_LANG_same_ids."</span><br />";
 			if ($error == "2") print "<span class=\"Error\">".GM_LANG_merge_haschanges."</span><br />";
 			if ($error == "3") print "<span class=\"Error\">".GM_LANG_unable_to_find_record."</span><br />";
 			if ($error == "4") print "<span class=\"Error\">".GM_LANG_merge_same."</span><br />";
-			print GM_LANG_select_gedcom_records."</div>";
-		print "<form method=\"post\" name=\"merge\" action=\"edit_merge.php\">";
-		print "<input type=\"hidden\" name=\"action\" value=\"select\" />";
-		print "<table style=\"width:100%\">";
-			print "<tr><td class=\"shade1\">".GM_LANG_choose_gedcom."<br /></td>";
-			print "<td class=\"shade1\"><select name=\"mergeged\">\n";
+			print GM_LANG_select_gedcom_records."</td></tr>";
+			print "<tr><td class=\"NavBlockLabel\">".GM_LANG_choose_gedcom."<br /></td>";
+			print "<td class=\"NavBlockField\"><select name=\"mergeged\">\n";
 			if (!isset($mergeged) || empty($mergeged)) $mergeged = GedcomConfig::$GEDCOMID;
 			foreach($GEDCOMS as $gedc=>$gedarray) {
 				$gedid = $gedarray["id"];
@@ -446,11 +450,11 @@ if ($action=="choose") {
 					print ">".$gedarray["title"]."</option>\n";
 				}
 			}
-			print "</select>\n<br />";
+			print "</select>\n";
 			print "</td></tr>";
 			
-			print "<tr><td class=\"shade1\">".GM_LANG_merge_to."<br /></td>";
-			print "<td class=\"shade1\"><input type=\"text\" name=\"gid1\" value=\"".$gid1."\" size=\"10\" tabindex=\"1\" /> ";
+			print "<tr><td class=\"NavBlockLabel\">".GM_LANG_merge_to."</td>";
+			print "<td class=\"NavBlockField\"><input type=\"text\" name=\"gid1\" value=\"".$gid1."\" size=\"10\" tabindex=\"1\" /> ";
 			print "<a href=\"javascript:iopen_find(document.merge.gid1, document.merge.mergeged);\"> ".GM_LANG_find_individual."</a> |";
 			print " <a href=\"javascript:fopen_find(document.merge.gid1, document.merge.mergeged);\"> ".GM_LANG_find_familyid."</a> |";
 			print " <a href=\"javascript:sopen_find(document.merge.gid1, document.merge.mergeged);\"> ".GM_LANG_find_sourceid."</a> |";
@@ -458,8 +462,8 @@ if ($action=="choose") {
 			PrintHelpLink("rootid_help", "qm");
 			print "</td></tr>";
 
-			print "<tr><td class=\"shade1\">".GM_LANG_merge_from."<br /></td>";
-			print "<td class=\"shade1\"><input type=\"text\" name=\"gid2\" value=\"".$gid2."\" size=\"10\" tabindex=\"2\" /> ";
+			print "<tr><td class=\"NavBlockLabel\">".GM_LANG_merge_from."<br /></td>";
+			print "<td class=\"NavBlockField\"><input type=\"text\" name=\"gid2\" value=\"".$gid2."\" size=\"10\" tabindex=\"2\" /> ";
 			print "<a href=\"javascript:iopen_find(document.merge.gid2, document.merge.mergeged);\"> ".GM_LANG_find_individual."</a> |";
 			print " <a href=\"javascript:fopen_find(document.merge.gid2, document.merge.mergeged);\"> ".GM_LANG_find_familyid."</a> |";
 			print " <a href=\"javascript:sopen_find(document.merge.gid2, document.merge.mergeged);\"> ".GM_LANG_find_sourceid."</a> |";
@@ -467,8 +471,8 @@ if ($action=="choose") {
 			PrintHelpLink("rootid_help", "qm");
 			print "</td></tr>";
 
+		print "<tr><td colspan=\"2\" class=\"NavBlockFooter\"><input type=\"submit\"  value=\"".GM_LANG_merge_records."\" /></td></tr>\n";
 		print "</table>";
-		print "<div class=\"center\"><input type=\"submit\"  value=\"".GM_LANG_merge_records."\" /><br /></div>\n";
 		print "</form>\n";
 	print "</div>";
 	?>

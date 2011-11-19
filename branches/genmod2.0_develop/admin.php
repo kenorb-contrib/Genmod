@@ -85,52 +85,49 @@ if (file_exists(INDEX_DIRECTORY."emergency_syslog.txt")) {
 }
 ?>
 <!-- Setup the left box -->
-<div id="admin_genmod_left">
-     <div class="<?php print $TEXT_DIRECTION ?>">
+<div id="AdminColumnLeft">
 
- 	<?php
-	$news = AdminFunctions::GetGMNewsItems();
-	if (count($news)>0) { ?>
-	     <div class="admin_topbottombar"><?php print GM_LANG_genmodnews; ?></div>
-          <div class="admin_genmod_content">
-          <?php 
-          foreach ($news as $key => $item) {
-               if (SystemConfig::$NEWS_TYPE == "Normal" || $item["type"] == SystemConfig::$NEWS_TYPE) {
-                    print "<b>".$item["date"];
-                    if ($item["type"] == "Urgent") print "&nbsp;-&nbsp;<span class=\"Error\">".$item["type"]."</span>";
-                    print "&nbsp;-&nbsp;".$item["header"]."</b><br />";
-                    print $item["text"]."<br /><br />";
-               }
-          }
-          print "</div>";
-	} ?>
-	</div>
+<?php
+$news = AdminFunctions::GetGMNewsItems();
+if (count($news)>0) { ?>
+     <div class="NavBlockHeader"><?php print GM_LANG_genmodnews; ?></div>
+      <div class="AdminGenmodContent">
+      <?php 
+      foreach ($news as $key => $item) {
+           if (SystemConfig::$NEWS_TYPE == "Normal" || $item["type"] == SystemConfig::$NEWS_TYPE) {
+                print "<b>".$item["date"];
+                if ($item["type"] == "Urgent") print "&nbsp;-&nbsp;<span class=\"Error\">".$item["type"]."</span>";
+                print "&nbsp;-&nbsp;".$item["header"]."</b><br />";
+                print $item["text"]."<br /><br />";
+           }
+      }
+      print "</div>";
+} ?>
 </div>
 	
 <!-- Setup the right box -->
-<div id="admin_genmod_right">
+<div id="AdminColumnRight">
      <div class="<?php print $TEXT_DIRECTION ?>">
-     	<div class="admin_topbottombar"><?php print GM_LANG_messages; ?></div>
-          <div class="admin_genmod_content">
+     	<div class="NavBlockHeader"><?php print GM_LANG_messages; ?></div>
           <?php
           if ($gm_user->userIsAdmin()) {
                if ($err_write) {
-                    print "<div class=\"Error admin_genmod_content\">";
+                    print "<div class=\"Error AdminGenmodContent\">";
                     print GM_LANG_config_still_writable;
                     print "</div>";
                }
                if ($verify_msg) {
-                    print "<div class=\"admin_genmod_content\">";
+                    print "<div class=\"AdminGenmodContent\">";
                     print "<a href=\"useradmin.php?action=listusers&amp;filter=admunver\" class=\"Error\">".GM_LANG_admin_verification_waiting."</a>";
                     print "</div>";
                }
                if ($warn_msg) {
-                    print "<div class=\"admin_genmod_content\">";
+                    print "<div class=\"AdminGenmodContent\">";
                     print "<a href=\"useradmin.php?action=listusers&amp;filter=warnings\" class=\"Error\" >".GM_LANG_admin_user_warnings."</a>";
                     print "</div>";
                }
                if ($export_msg) {
-                    print "<div class=\"Error admin_genmod_content\">";
+                    print "<div class=\"Error AdminGenmodContent\">";
                     print GM_LANG_export_warn;
                     foreach ($explangs as $key => $explang) {
 	                    print "<br /><a href=\"editlang.php?action=export&amp;language2=".$explang["lang"]."\" >".$explang["name"]."</a>";
@@ -138,7 +135,7 @@ if (file_exists(INDEX_DIRECTORY."emergency_syslog.txt")) {
                     print "</div>";
                }
                if ($import_msg) {
-                    print "<div class=\"Error admin_genmod_content\">";
+                    print "<div class=\"Error AdminGenmodContent\">";
                     print GM_LANG_import_warn;
                     $skip = false;
                     foreach ($implangs as $key => $implang) {
@@ -155,20 +152,21 @@ if (file_exists(INDEX_DIRECTORY."emergency_syslog.txt")) {
                     print "</div>";
                }
                if ($emergency_msg) {
-                    print "<div class=\"Error admin_genmod_content\">";
+                    print "<div class=\"Error AdminGenmodContent\">";
                     print $emergency_text;
                     print "</div>";
                }
           }?>
-          </div>
      </div>
 </div>
 
 <!-- Setup the middle box -->
-<div id="content">
+<div id="AdminColumnMiddle">
+	<table class="NavBlockTable AdminNavBlockTable">
 	<?php
 		// Header bar
 		$menu = new AdminMenu();
+		$menu->SetBarStyle("AdminNavBlockHeader");
 		$menu->SetBarText("Genmod v" . GM_VERSION . " " . GM_VERSION_RELEASE . "<br />" . GM_LANG_administration, false);
 		$menu->SetSubBarText(GM_LANG_system_time." ".GetChangedDate(date("j M Y"))." - ".date($TIME_FORMAT));
 		$menu->PrintItems();
@@ -176,17 +174,18 @@ if (file_exists(INDEX_DIRECTORY."emergency_syslog.txt")) {
 		// Informational part of the menu
 		$menu = new AdminMenu();
 		$menu->SetBarText(GM_LANG_admin_info, true);
-		$menu->SetBarStyle("margin-top: 1em;");
+		$menu->SetBarStyle("");
 		$menu->AddItem("readmefile_help", "qm", "", 'readme.txt" target="manual" title="'.GM_LANG_view_readme, GM_LANG_readme_documentation, "left");
 		$menu->AddItem("phpinfo_help", "qm", "", 'gminfo.php?action=phpinfo" title="'.GM_LANG_show_phpinfo, GM_LANG_phpinfo, "right");
 		$menu->AddItem("config_help_help", "qm", "help_config", "gminfo.php?action=confighelp", GM_LANG_help_config, "left");
 		$menu->AddItem("changelog_help", "qm", "", 'changelog.php" target="manual" title="'.PrintText("changelog",0 ,1), PrintText("changelog",0 ,1), "right");
+		$menu->PrintSpacer();
 		$menu->PrintItems();
 
 		// Gedcom related part of the menu
 		$menu = new AdminMenu();
 		$menu->SetBarText(GM_LANG_admin_geds, true);
-		$menu->SetBarStyle("margin-top: 1em;");
+		$menu->SetBarStyle("");
 		$menu->AddItem("edit_gedcoms_help", "qm", "", "editgedcoms.php", GM_LANG_manage_gedcoms, "left");
 		$menu->AddItem("help_edit_merge.php", "qm", "", "edit_merge.php", GM_LANG_merge_records, "right");
 		$menu->AddItem("help_media.php", "qm", "manage_media", "media.php", GM_LANG_manage_media, "left");
@@ -196,12 +195,13 @@ if (file_exists(INDEX_DIRECTORY."emergency_syslog.txt")) {
 		if (ChangeFunctions::GetChangeData(true, "", true)) {
 			$menu->AddItem("review_changes_help", "qm", "", "#\" onclick=\"window.open('edit_changes.php','','width=600,height=600,resizable=1,scrollbars=1'); return false;", GM_LANG_accept_changes, "left");
 		}
+		$menu->PrintSpacer();
 		$menu->PrintItems();
 		// Admin part of the menu
 		if ($gm_user->userIsAdmin()) {
 			$menu = new AdminMenu();
 			$menu->SetBarText(GM_LANG_admin_site, true);
-			$menu->SetBarStyle("margin-top: 1em;");
+			$menu->SetBarStyle("");
 			$menu->AddItem("help_editconfig.php", "qm", "", "editconfig.php", GM_LANG_configuration, "left");
 			$menu->AddItem("um_bu_help", "qm", "", "backup.php?action=backup", GM_LANG_um_backup, "right");
 			$menu->AddItem("help_useradmin.php", "qm", "", "useradmin.php", GM_LANG_user_admin, "left");
@@ -209,10 +209,12 @@ if (file_exists(INDEX_DIRECTORY."emergency_syslog.txt")) {
 			$menu->AddItem("help_editlang.php", "qm", "", "editlang.php", GM_LANG_translator_tools, "left");
 			$menu->AddItem("help_faq.php", "qm", "", "faq.php", GM_LANG_faq_list, "right");
 			$menu->AddItem("admin_maint_help", "qm", "maintenance", "admin_maint.php", GM_LANG_maintenance, "left");
-			$menu->AddItem("help_viewlog.php", "qm", "view_syslog", "javascript: ".GM_LANG_view_syslog."\" onclick=\"window.open('viewlog.php?cat=S&amp;max=20', '', 'top=50,left=10,width=1000,height=600,scrollbars=1,resizable=1'); ChangeClass('syslog', 'shade1'); return false;\"", (AdminFunctions::NewLogRecs("S") ? "<span id=\"syslog\" class=\"Error\">".GM_LANG_view_syslog."</span>" : "<span id=\"syslog\">".GM_LANG_view_syslog."</span>"), "right");
+			$menu->AddItem("help_viewlog.php", "qm", "view_syslog", "javascript: ".GM_LANG_view_syslog."\" onclick=\"window.open('viewlog.php?cat=S&amp;max=20', '', 'top=50,left=10,width=1000,height=600,scrollbars=1,resizable=1'); ChangeClass('syslog', ''); return false;\"", (AdminFunctions::NewLogRecs("S") ? "<span id=\"syslog\" class=\"Error\">".GM_LANG_view_syslog."</span>" : "<span id=\"syslog\">".GM_LANG_view_syslog."</span>"), "right");
+			$menu->PrintSpacer();
 			$menu->PrintItems();
 		}
 	?>
+	</table>
 </div>
 <?php
 PrintFooter();

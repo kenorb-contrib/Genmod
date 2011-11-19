@@ -88,7 +88,6 @@ if (is_object($repomenu)) $showmenu[GM_LANG_this_repository] = CreateMenu($repom
 if (is_object($helpmenu)) $showmenu[GM_LANG_helpmenu] = CreateMenu($helpmenu);
 if (is_object($custommenu)) $showmenu[GM_LANG_my_pages] = CreateMenu($custommenu);
 ?>
-<div id="GenmodContainer">
 <div id="HeaderSection" class="<?php echo $TEXT_DIRECTION; ?>">
 	<script type="text/javascript" src="transmenu.js"></script>
 	<script type="text/javascript">

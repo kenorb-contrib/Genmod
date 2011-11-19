@@ -45,60 +45,61 @@ $GM_BLOCKS["print_RSS_block"]["rss"]		= false;
 function print_RSS_block($block = true, $config="", $side, $index) {
 	global $LANGUAGE, $command, $QUERY_STRING, $GM_BLOCKS, $gm_user, $GM_IMAGES, $bot;
 
+	print "<!-- Start RSS Block //-->";
 	print "<div id=\"rss_block\" class=\"BlockContainer\">\n";
-	print "<div class=\"BlockHeader\">";
-	PrintHelpLink("rss_feed_help", "qm", "rss_feeds");
-	if ($GM_BLOCKS["print_RSS_block"]["canconfig"]) {
-		if ((($command=="gedcom")&&($gm_user->userGedcomAdmin())) || (($command=="user")&&(!empty($username)))) {
-			if ($command=="gedcom") $name = preg_replace("/'/", "\'", get_gedcom_from_id(GedcomConfig::$GEDCOMID));
-			else $name = $gm_user->username;
-			print "<a href=\"javascript: ".GM_LANG_config_block."\" onclick=\"window.open('index_edit.php?name=$name&amp;command=$command&amp;action=configure&amp;side=$side&amp;index=$index', '', 'top=50,left=50,width=600,height=350,scrollbars=1,resizable=1'); return false;\">";
-			print "<img class=\"adminicon\" src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["admin"]["small"]."\" width=\"15\" height=\"15\" border=\"0\" alt=\"".GM_LANG_config_block."\" /></a>\n";
-		}
-	}
-	print GM_LANG_rss_feeds;
+		print "<div class=\"BlockHeader\">";
+			PrintHelpLink("rss_feed_help", "qm", "rss_feeds");
+			if ($GM_BLOCKS["print_RSS_block"]["canconfig"]) {
+				if ((($command=="gedcom")&&($gm_user->userGedcomAdmin())) || (($command=="user")&&(!empty($username)))) {
+					if ($command=="gedcom") $name = preg_replace("/'/", "\'", get_gedcom_from_id(GedcomConfig::$GEDCOMID));
+					else $name = $gm_user->username;
+					print "<a href=\"javascript: ".GM_LANG_config_block."\" onclick=\"window.open('index_edit.php?name=$name&amp;command=$command&amp;action=configure&amp;side=$side&amp;index=$index', '', 'top=50,left=50,width=600,height=350,scrollbars=1,resizable=1'); return false;\">";
+					BlockFunctions::PrintAdminIcon();
+					print "</a>";
+				}
+			}
+			print GM_LANG_rss_feeds;
+		print "</div>";
+		print "<div class=\"BlockContent\">";
+			print "<form method=\"post\" action=\"\" name=\"rssform\" class=\"RSSBlockForm\">\n";
+			//print get_lang_select();
+			//print "\n\t<select name=\"rssStyle\" class=\"BlockSelectField\" onchange=\"javascript:document.getElementById('rss_button').href = 'rss.php?lang=' + document.rssform.lang.value + (document.rssform.module.value==''? '' : '&module=' + document.rssform.module.value) + (document.rssform.rssStyle.value==''? '' : '&rssStyle=' + document.rssform.rssStyle.value);\">";
+			print "\n\t<select name=\"rssStyle\" class=\"BlockSelectField\" onchange=\"document.getElementById('rss_button').href = 'rss.php?lang=" . $LANGUAGE . "' + (document.rssform.module.value==''? '' : '&amp;module=' + document.rssform.module.value) + (document.rssform.rssStyle.value==''? '' : '&amp;rssStyle=' + document.rssform.rssStyle.value);\">";
+			print "\n\t\t<option value=\"RSS0.91\"";
+			if (GedcomConfig::$RSS_FORMAT=="RSS0.91") print " selected=\"selected\"";
+			print ">RSS 0.91</option>";
+			print "\n\t\t<option value=\"RSS1.0\"";
+			if (GedcomConfig::$RSS_FORMAT=="RSS1.0") print " selected=\"selected\"";
+			print ">RSS 1.0</option>";
+			print "\n\t\t<option value=\"RSS2.0\"";
+			if (GedcomConfig::$RSS_FORMAT=="RSS2.0") print " selected=\"selected\"";
+			print ">RSS 2.0</option>";
+			print "\n\t\t<option value=\"ATOM\"";
+			if (GedcomConfig::$RSS_FORMAT=="ATOM") print " selected=\"selected\"";
+			print ">ATOM</option>";
+			print "\n\t\t<option value=\"HTML\"";
+			if (GedcomConfig::$RSS_FORMAT=="HTML") print " selected=\"selected\"";
+			print ">HTML</option>";
+			if (!$bot) {
+				print "\n\t\t<option value=\"JS\"";
+				if (GedcomConfig::$RSS_FORMAT=="JS") print " selected=\"selected\"";
+				print ">JavaScript</option>";
+			}
+			print "\n\t</select>";
+			print "\n\t<select name=\"module\" class=\"BlockSelectField\" onchange=\"javascript:document.getElementById('rss_button').href = 'rss.php?lang=" . $LANGUAGE . "' + (document.rssform.module.value==''? '' : '&amp;module=' + document.rssform.module.value) + (document.rssform.rssStyle.value==''? '' : '&amp;rssStyle=' + document.rssform.rssStyle.value);\">";
+			print "\n\t\t<option value=\"\">" . GM_LANG_all . "</option>";
+			if (empty($config)) $config = $GM_BLOCKS["print_RSS_block"]["config"];
+			foreach ($config as $block => $value) {
+				if ($value == "yes") {
+					print "\n\t\t<option value=\"".$block."\">" . $GM_BLOCKS[$block]["name"] . " </option>";
+				}
+			}
+			print "\n\t</select>";
+			print "<div class=\"RSSBlockButton\"><a id=\"rss_button\" href=\"rss.php?lang=" . $LANGUAGE . "\"><img class=\"icon\" src=\"images/xml.gif\" alt=\"RSS\" title=\"RSS\" /></a></div>";
+			print "</form>\n";
+		print "</div>";
 	print "</div>";
-	print "<div class=\"BlockContent center\">";
-	print "<form method=\"post\" action=\"\" name=\"rssform\">\n";
-	//print get_lang_select();
-	print "<br />";
-	//print "\n\t<select name=\"rssStyle\" class=\"header_select\" onchange=\"javascript:document.getElementById('rss_button').href = 'rss.php?lang=' + document.rssform.lang.value + (document.rssform.module.value==''? '' : '&module=' + document.rssform.module.value) + (document.rssform.rssStyle.value==''? '' : '&rssStyle=' + document.rssform.rssStyle.value);\">";
-	print "\n\t<select name=\"rssStyle\" class=\"header_select\" onchange=\"document.getElementById('rss_button').href = 'rss.php?lang=" . $LANGUAGE . "' + (document.rssform.module.value==''? '' : '&amp;module=' + document.rssform.module.value) + (document.rssform.rssStyle.value==''? '' : '&amp;rssStyle=' + document.rssform.rssStyle.value);\">";
-	print "\n\t\t<option value=\"RSS0.91\"";
-	if (GedcomConfig::$RSS_FORMAT=="RSS0.91") print " selected=\"selected\"";
-	print ">RSS 0.91</option>";
-	print "\n\t\t<option value=\"RSS1.0\"";
-	if (GedcomConfig::$RSS_FORMAT=="RSS1.0") print " selected=\"selected\"";
-	print ">RSS 1.0</option>";
-	print "\n\t\t<option value=\"RSS2.0\"";
-	if (GedcomConfig::$RSS_FORMAT=="RSS2.0") print " selected=\"selected\"";
-	print ">RSS 2.0</option>";
-	print "\n\t\t<option value=\"ATOM\"";
-	if (GedcomConfig::$RSS_FORMAT=="ATOM") print " selected=\"selected\"";
-	print ">ATOM</option>";
-	print "\n\t\t<option value=\"HTML\"";
-	if (GedcomConfig::$RSS_FORMAT=="HTML") print " selected=\"selected\"";
-	print ">HTML</option>";
-	if (!$bot) {
-		print "\n\t\t<option value=\"JS\"";
-		if (GedcomConfig::$RSS_FORMAT=="JS") print " selected=\"selected\"";
-		print ">JavaScript</option>";
-	}
-	print "\n\t</select>";
-	//print "\n\t<select name=\"module\" class=\"header_select\" onchange=\"javascript:document.getElementById('rss_button').href = 'rss.php?lang=' + document.rssform.lang.value + (document.rssform.module.value==''? '' : '&module=' + document.rssform.module.value) + (document.rssform.rssStyle.value==''? '' : '&rssStyle=' + document.rssform.rssStyle.value);\">";
-	print "\n\t<select name=\"module\" class=\"header_select\" onchange=\"javascript:document.getElementById('rss_button').href = 'rss.php?lang=" . $LANGUAGE . "' + (document.rssform.module.value==''? '' : '&amp;module=' + document.rssform.module.value) + (document.rssform.rssStyle.value==''? '' : '&amp;rssStyle=' + document.rssform.rssStyle.value);\">";
-	print "\n\t\t<option value=\"\">" . GM_LANG_all . "</option>";
-	if (empty($config)) $config = $GM_BLOCKS["print_RSS_block"]["config"];
-	foreach ($config as $block => $value) {
-		if ($value == "yes") {
-			print "\n\t\t<option value=\"".$block."\">" . $GM_BLOCKS[$block]["name"] . " </option>";
-		}
-	}
-	print "\n\t</select>";
-	print "<br /><br /><a id=\"rss_button\" href=\"rss.php?lang=" . $LANGUAGE . "\"><img class=\"icon\" src=\"images/xml.gif\" alt=\"RSS\" title=\"RSS\" /></a>";
-	print "</form>\n";
-	print "</div>";
-	print "</div>";
+	print "<!-- End Theme Select Block //-->";
 }
 
 function print_rss_block_config($config) {
@@ -106,21 +107,17 @@ function print_rss_block_config($config) {
 	
 	if (empty($config)) $config = $GM_BLOCKS["print_RSS_block"]["config"];
 	?><tr>
-		<td class="shade2 width20"><?php print GM_LANG_RSS_block_select; ?></td>
-		<td class="shade1">
-			<table>
+		<td class="NavBlockLabel"><?php print GM_LANG_RSS_block_select; ?></td>
+		<td class="NavBlockField">
 			<?php foreach($GM_BLOCKS as $blockname => $params) {
 				if ($params["rss"] == true) { ?>
-					<tr>
-						<td><input type="checkbox" value="yes" name="<?php print $blockname; ?>" <?php 
+						<input type="checkbox" value="yes" name="<?php print $blockname; ?>" <?php 
 						if (!isset($config[$blockname]) && !isset($GM_BLOCKS["print_RSS_block"]["config"][$blockname])) print "disabled=\"disabled\"";
 						elseif (isset($config[$blockname]) && $config[$blockname] == "yes") print "checked=\"checked\"";
 						?>
-						 /> <?php print $params["name"]; ?></td>
-					</tr>
+						 /> <?php print $params["name"]; ?><br />
 				<?php }
 			} ?>
-			</table>
 		</td>
 	</tr>
 	<?php
@@ -137,8 +134,8 @@ function print_rss_block_config($config) {
 		if (empty($LANG_FORM_COUNT)) $LANG_FORM_COUNT=1;
 		else $LANG_FORM_COUNT++;
 
-		//$ret .= "<select name=\"lang\" class=\"header_select\" onchange=\"javascript:document.getElementById('rss_button').href = 'rss.php?lang=' + document.rssform.lang.value + (document.rssform.module.value==''? '' : '&module=' + document.rssform.module.value) + (document.rssform.rssStyle.value==''? '' : '&rssStyle=' + document.rssform.rssStyle.value);\">";
-		$ret .= "<select name=\"lang\" class=\"header_select\" onchange=\"javascript:document.getElementById('rss_button').href = 'rss.php?lang=" . $LANGUAGE . "' + (document.rssform.module.value==''? '' : '&module=' + document.rssform.module.value) + (document.rssform.rssStyle.value==''? '' : '&rssStyle=' + document.rssform.rssStyle.value);\">";
+		//$ret .= "<select name=\"lang\" class=\"BlockSelectField\" onchange=\"javascript:document.getElementById('rss_button').href = 'rss.php?lang=' + document.rssform.lang.value + (document.rssform.module.value==''? '' : '&module=' + document.rssform.module.value) + (document.rssform.rssStyle.value==''? '' : '&rssStyle=' + document.rssform.rssStyle.value);\">";
+		$ret .= "<select name=\"lang\" class=\"BlockSelectField\" onchange=\"javascript:document.getElementById('rss_button').href = 'rss.php?lang=" . $LANGUAGE . "' + (document.rssform.module.value==''? '' : '&module=' + document.rssform.module.value) + (document.rssform.rssStyle.value==''? '' : '&rssStyle=' + document.rssform.rssStyle.value);\">";
 
 		foreach ($gm_language as $key=>$value) {
 			if ($language_settings[$key]["gm_lang_use"]) {

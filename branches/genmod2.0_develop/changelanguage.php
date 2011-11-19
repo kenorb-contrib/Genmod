@@ -87,12 +87,12 @@ $inactive = count($split_langs_inactive);
 $maxlines = max($active, $inactive);
 ?>
 <!-- Setup the left box -->
-<div id="admin_genmod_left">
-	<div class="admin_link"><a href="admin.php"><?php print GM_LANG_admin;?></a></div>
-	<div class="admin_link"><a href="editlang.php"><?php print GM_LANG_translator_tools;?></a></div>
+<div id="AdminColumnLeft">
+	<?php AdminFunctions::AdminLink("admin.php", GM_LANG_admin); ?>
+	<?php AdminFunctions::AdminLink("editlang.php", GM_LANG_translator_tools); ?>
 </div>
 
-<div id="content">
+<div id="AdminColumnMiddle">
 	<?php
 	switch ($action) {
 		case "addnew" :  ?>
@@ -104,10 +104,10 @@ $maxlines = max($active, $inactive);
 			</div>
 			<div class="admin_item_box">
 				<div class="width25 choice_left">
-					<div class="helpicon">
+					<div class="HelpIconContainer">
 						<?php PrintHelpLink("add_new_language_help", "qm", "add_new_language");?>
 					</div>
-					<div class="description">
+					<div class="AdminNavBlockOptionText">
 						<?php require(SystemConfig::$GM_BASE_DIRECTORY . "includes/values/lang_codes_std.php"); ?>
 						<select name="new_shortcut">
 						<?php
@@ -140,49 +140,66 @@ $maxlines = max($active, $inactive);
 			break;
 		default : ?>
 			<form name="lang_config_form" method="get" action="<?php print SCRIPT_NAME;?>">
+			<table class="NavBlockTable AdminNavBlockTable">
 				<input type="hidden" name="action" value="config_lang" />
-				<div class="admin_topbottombar">
-					<?php PrintHelpLink("config_lang_utility_help", "qm", "config_lang_utility");?>
-					<?php print GM_LANG_config_lang_utility; ?>
-				</div>
-				<div class="admin_item_box">
-					<div class="width25 choice_left"><?php print GM_LANG_lang_language; ?></div>
-					<div class="width10 choice_middle"><?php print GM_LANG_active; ?></div>
-					<div class="width10 choice_middle"><?php print GM_LANG_edit_settings; ?></div>
-					<div class="width25 choice_middle"><?php print GM_LANG_lang_language; ?></div>
-					<div class="width10 choice_middle"><?php print GM_LANG_active; ?></div>
-					<div class="width10 choice_right"><?php print GM_LANG_edit_settings; ?></div>
-				</div>
+				<tr>
+					<td colspan="6" class="NavBlockHeader AdminNavBlockHeader">
+						<div class="AdminNavBlockTitle">
+						<?php PrintHelpLink("config_lang_utility_help", "qm", "config_lang_utility");?>
+						<?php print GM_LANG_config_lang_utility; ?>
+						</div>
+					</td>
+				</tr>
+				<tr>
+					<td class="NavBlockColumnHeader AdminNavBlockColumnHeader">
+						<?php print GM_LANG_lang_language; ?>
+					</td>
+					<td class="NavBlockColumnHeader AdminNavBlockColumnHeader">
+						<?php print GM_LANG_active; ?>
+					</td>
+					<td class="NavBlockColumnHeader AdminNavBlockColumnHeader">
+						<?php print GM_LANG_edit_settings; ?>
+					</td>
+					<td class="NavBlockColumnHeader AdminNavBlockColumnHeader">
+						<?php print GM_LANG_lang_language; ?>
+					</td>
+					<td class="NavBlockColumnHeader AdminNavBlockColumnHeader">
+						<?php print GM_LANG_active; ?>
+					</td>
+					<td class="NavBlockColumnHeader AdminNavBlockColumnHeader">
+						<?php print GM_LANG_edit_settings; ?>
+					</td>
+				</tr>
 				<?php
 				// Print the Language table in sorted name order
 				for ($i=1; $i<=$maxlines; $i++) { ?>
-					<div class="admin_item_box">
+					<tr>
 						<?php
 						// Left 3 columns: Active language
 						$value = "";
 						if ($i <= $active) $value = $split_langs_active[$i];
 					
 						if ($value == "") { ?>
-							<div class="width25 choice_left">&nbsp;</div>
-							<div class="width10 choice_middle">&nbsp;</div>
-							<div class="width10 choice_middle">&nbsp;</div>
+							<td class="NavBlockLabel">&nbsp;</td>
+							<td class="NavBlockLabel">&nbsp;</td>
+							<td class="NavBlockLabel">&nbsp;</td>
 							<?php
 						} 
 						else { 
 							$d_LangName = "lang_name_" . $value; ?>
-							<div class="width25 choice_left">
+							<td class="NavBlockLabel">
 								<?php print constant("GM_LANG_".$d_LangName) ?>
-							</div>
-							<div class="width10 choice_middle">
+							</td>
+							<td class="NavBlockLabel">
 								<input
 								<?php
 								if (AdminFunctions::LanguageInUse($value)) print " disabled=\"disabled\"";
 								print " type=\"checkbox\" value=\"$value\" checked=\"checked\" onclick=\"enabledisablelanguage('$value');\" />";
 								?>
-							</div>
-							<div class="width10 choice_middle">
+							</td>
+							<td class="NavBlockLabel">
 								<a href="javascript: <?php print $value;?>" onclick="window.open('editlang_edit_settings.php?action=editold&amp;ln=<?php print $value;?>', '', 'top=50,left=10,width=1000,height=600,scrollbars=1,resizable=1'); return false;"><?php print GM_LANG_lang_edit;?></a>
-							</div>
+							</td>
 							<?php
 						}
 						
@@ -190,66 +207,87 @@ $maxlines = max($active, $inactive);
 						$value = "";
 						if ($i <= $inactive) $value = $split_langs_inactive[$i];
 						if ($value == "") { ?>
-							<div class="width25 choice_left">&nbsp;</div>
-							<div class="width10 choice_middle">&nbsp;</div>
-							<div class="width10 choice_middle">&nbsp;</div>
+							<td class="NavBlockLabel">&nbsp;</td>
+							<td class="NavBlockLabel">&nbsp;</td>
+							<td class="NavBlockLabel">&nbsp;</td>
 							<?php
 						} 
 						else { 
 							$d_LangName = "lang_name_" . $value; ?>
-							<div class="width25 choice_left">
+							<td class="NavBlockLabel">
 								<?php print constant("GM_LANG_".$d_LangName); ?>
-							</div>
-							<div class="width10 choice_middle">
+							</td>
+							<td class="NavBlockLabel">
 								<input type="checkbox" value="<?php print $value; ?>" onclick="enabledisablelanguage('<?php print $value; ?>');" /> 
-							</div>
-							<div class="width10 choice_right">
+							</td>
+							<td class="NavBlockLabel">
 								<a href="javascript: <?php print $value;?>" onclick="window.open('editlang_edit_settings.php?action=editold&amp;ln=<?php print $value;?>', '', 'top=50,left=10,width=1000,height=600,scrollbars=1,resizable=1'); return false;"><?php print GM_LANG_lang_edit;?></a>
-							</div>
+							</td>
 							<?php
 						}
 						?>
-					</div>
+					</tr>
 					<?php
 				}
-			print "</form>";
+			print "</table></form>";
 			$USERLANG = $LANGUAGE;
 			?>
-			<div class="admin_topbottombar">
-				<?php print GM_LANG_configured_languages; ?>
-			</div>
-			<div class="admin_item_box">
-				<div class="width20 choice_left">
-					<?php print GM_LANG_current_gedcoms;?>
-				</div>
-				<?php
-				foreach ($configuredlanguages["gedcom"] as $key => $value) {
-					print "<div class=\"width20 choice_middle\">";
-						// Print gedcom names
-						foreach($value as $gedcomname => $used) {
-							print "<a href=\"editconfig_gedcom.php?gedid=".get_id_from_gedcom($gedcomname)."\" target=\"blank\">".$gedcomname."</a><br />";
-						}
-					print "<br /></div>";
-					print "<div class=\"choice_right\">";
-						// Print language name and flag
-						print "<img src=\"".$language_settings[$key]["flagsfile"]."\" class=\"brightflag\" alt=\"".constant("GM_LANG_lang_name_".$key)."\" title=\"".constant("GM_LANG_lang_name_".$key)."\" />&nbsp;".constant("GM_LANG_lang_name_".$key)."<br />";
-					print "</div>";
-					print "</div><div class=\"admin_item_box\"><div class=\"width20 choice_left\">&nbsp;</div>";
+			<table class="NavBlockTable AdminNavBlockTable">
+			<tr>
+				<td colspan="3" class="NavBlockRowSpacer">
+					&nbsp;
+				</td>
+			</tr>
+			<tr>
+				<td colspan="3" class="NavBlockHeader AdminNavBlockHeader">
+					<?php print GM_LANG_configured_languages; ?>
+				</td>
+			</tr>
+			<?php
+			$count = 1; 
+			foreach ($configuredlanguages["gedcom"] as $key => $value) {
+				foreach($value as $gedcomname => $used) {
+					$count++;
 				}
-				?>
-			</div>
-			<div class="admin_item_box">
-				<div class="width20 choice_left"><?php print GM_LANG_users_langs;?></div>
-				<?php
+			}
+			$first = true;
+			foreach ($configuredlanguages["gedcom"] as $key => $value) {
+				print "<tr>";
+				if ($first) {
+					print "<td class=\"NavBlockLabel AdminNavBlockLabel\" rowspan=\"".$count."\">";
+					print GM_LANG_current_gedcoms;
+					print "</td>";
+					$first = false;
+				}
+				print "<td class=\"NavBlockLabel AdminNavBlockLabel\">";
+				// Print gedcom names
+				foreach($value as $gedcomname => $used) {
+					print "<a href=\"editconfig_gedcom.php?gedid=".get_id_from_gedcom($gedcomname)."\" target=\"blank\">".$gedcomname."</a>";
+				}
+				print "</td>";
+				print "<td class=\"NavBlockLabel AdminNavBlockLabel\">";
+				// Print language name and flag
+				print "<img src=\"".$language_settings[$key]["flagsfile"]."\" class=\"BrightFlag\" alt=\"".constant("GM_LANG_lang_name_".$key)."\" title=\"".constant("GM_LANG_lang_name_".$key)."\" />".constant("GM_LANG_lang_name_".$key);
+				print "</td></tr>";
+			}
+			print "<tr><td class=\"NavBlockLabel AdminNavBlockLabel\" colspan=\"2\">&nbsp;</td></tr>";
+			$first = true;
 				foreach ($configuredlanguages["users"] as $key => $value) {
-					print "<div class=\"width20 choice_middle\"><a href=\"useradmin.php?action=listusers&amp;filter=language&amp;usrlang=".$key."\">".count($value)."</a></div>";
-					print "<div class=\"choice_right\">";
-					print "<img src=\"".$language_settings[$key]["flagsfile"]."\" class=\"brightflag\" alt=\"".constant("GM_LANG_lang_name_".$key)."\" title=\"".constant("GM_LANG_lang_name_".$key)."\" />&nbsp;".constant("GM_LANG_lang_name_".$key)."<br /></div>";
-					print "</div><div class=\"admin_item_box\"><div class=\"width20 choice_left\">&nbsp;</div>";
+					print "<tr>";
+					if ($first) {
+						?><td rowspan="<?php print (count($configuredlanguages["users"])+1); ?>" class="NavBlockLabel AdminNavBlockLabel">
+							<?php print GM_LANG_users_langs;?>
+						</td>
+					<?php
+						$first = false;
+					}
+					print "<td class=\"NavBlockLabel AdminNavBlockLabel\"><a href=\"useradmin.php?action=listusers&amp;filter=language&amp;usrlang=".$key."\">".count($value)."</a></td>";
+					print "<td class=\"NavBlockLabel AdminNavBlockLabel\">";
+					print "<img src=\"".$language_settings[$key]["flagsfile"]."\" class=\"BrightFlag\" alt=\"".constant("GM_LANG_lang_name_".$key)."\" title=\"".constant("GM_LANG_lang_name_".$key)."\" />".constant("GM_LANG_lang_name_".$key)."</td></tr>";
 				}
 				?>
 			
-		</div>
+		</table>
 		<?php
 		break;
 		

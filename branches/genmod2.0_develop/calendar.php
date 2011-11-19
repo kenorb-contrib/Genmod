@@ -37,191 +37,193 @@ $calendar_controller = new CalendarController();
 PrintHeader($calendar_controller->pagetitle);
 
 //Print page top title
-print "<div style=\" text-align: center;\" id=\"calendar_page\">\n";
-print "<table class=\"FactsTable ".$TEXT_DIRECTION." width100\">";
-print "<tr><td class=\"facts_label\"><h3>";
-print ($calendar_controller->action == "today" ? GM_LANG_on_this_day : ($calendar_controller->action == "calendar" ? GM_LANG_in_this_month : GM_LANG_in_this_year));
-print "</h3></td></tr>\n";
+print "<div id=\"CalendarPage\">\n";
+	print "<div id=\"CalendarPageTitle\">\n";
+	print "<span class=\"PageTitleName\">".($calendar_controller->action == "today" ? GM_LANG_on_this_day : ($calendar_controller->action == "calendar" ? GM_LANG_in_this_month : GM_LANG_in_this_year))."</span>";
+print "</div>";
 
-// Print the title bar
-print "<tr><td class=\"topbottombar\">";
-print $calendar_controller->bartext;
-print "</td></tr></table>";
-
-if ($view!="preview") {
-// Print calender form
+print "<div class=\"CalendarOptionBlock\">";
 	print "<form name=\"dateform\" method=\"get\" action=\"calendar.php\">";
 	print "<input type=\"hidden\" name=\"action\" value=\"".$calendar_controller->action."\" />";
-	print "\n\t\t<table class=\"FactsTable ".$TEXT_DIRECTION." width100\">\n\t\t<tr>";
-	print "<td class=\"shade2 vmiddle\">";
-	PrintHelpLink("annivers_date_select_help", "qm", "day");
-	print GM_LANG_day."</td>\n";
-	print "<td colspan=\"7\" class=\"shade1\">";
-	for($i = 1; $i < ($calendar_controller->m_days+1); $i++) {
-		print "<a href=\"calendar.php?link=10&amp;day=".$i."&amp;month=".strtolower($calendar_controller->month)."&amp;year=".$calendar_controller->year."&amp;filterev=".$calendar_controller->filterev."&amp;filterof=".$calendar_controller->filterof."&amp;filtersx=".$calendar_controller->filtersx."&amp;action=today\">";
-		if ($i == $calendar_controller->day) print "<span class=\"Error\">".$i."</span>";
-		else print $i;
-		print "</a> | ";
-	}
-	$Dd = adodb_date("j");
-	$Mm = adodb_date("M");
-	$Yy = adodb_date("Y");
-//	print "<a href=\"calendar.php?filterev=$calendar_controller->filterev&amp;filterof=$calendar_controller->filterof&amp;filtersx=$calendar_controller->filtersx\"><b>".GetChangedDate("$Dd $Mm $Yy")."</b></a> | ";
-	//-- for alternate calendars the year is needed
-  	if (GedcomConfig::$CALENDAR_FORMAT!="gregorian" || $calendar_controller->usehebrew) $datestr = "$Dd $Mm $Yy";
-// 	if ($CALENDAR_FORMAT!="gregorian") $datestr = "$Dd $Mm $Yy"; // MA @@@
-	else $datestr = "$Dd $Mm";
-	print "<a href=\"calendar.php?link=13&amp;filterev=".$calendar_controller->filterev."&amp;filterof=".$calendar_controller->filterof."&amp;filtersx=".$calendar_controller->filtersx."&amp;year=".$calendar_controller->year."\"><b>".GetChangedDate($datestr);
-	if ($calendar_controller->usehebrew) {
-		$hdatestr = "@#DHEBREW@ ".$calendar_controller->currhDay." ".$calendar_controller->currhMonth." ".$calendar_controller->currhYear;
-		print " / ".GetChangedDate($hdatestr, $calendar_controller->CalYear);
-	}
-	print "</b></a> | ";
-	print "</td>\n";
+	print "<table class=\"NavBlockTable CalendarNavBlockTable\">";
 
-	print "</tr><tr>";
-	print "<td class=\"shade2 vmiddle\">";
-	PrintHelpLink("annivers_month_select_help", "qm", "month");
-	print GM_LANG_month."</td>\n";
-	print "<td colspan=\"7\" class=\"shade1\">";
-	foreach($monthtonum as $mon=>$num) {
-		if (defined("GM_LANG_".$mon)) {
-			if (empty($mm)) $mm=strtolower($calendar_controller->month);
-			print "<a href=\"calendar.php?link=1&amp;day=".$calendar_controller->day."&amp;month=".$mon."&amp;year=".$calendar_controller->year."&amp;filterev=".$calendar_controller->filterev."&amp;filterof=".$calendar_controller->filterof."&amp;filtersx=".$calendar_controller->filtersx."&amp;action=".($calendar_controller->action == "year" ? "calendar" : $calendar_controller->action)."\">";
-			$monthstr = constant("GM_LANG_".$mon);
-			if ($mon==$mm) print "<span class=\"Error\">".$monthstr."</span>";
-			else print $monthstr;
+	// Print the title bar
+	print "<tr><td class=\"NavBlockHeader\" colspan=\"8\">";
+	print $calendar_controller->bartext;
+	print "</td></tr>";
+
+	if ($view!="preview") {
+	// Print calender form
+		print "<tr><td class=\"NavBlockLabel\">";
+		PrintHelpLink("annivers_date_select_help", "qm", "day");
+		print GM_LANG_day."</td>\n";
+		print "<td colspan=\"7\" class=\"NavBlockField\">";
+		for($i = 1; $i < ($calendar_controller->m_days+1); $i++) {
+			print "<a href=\"calendar.php?link=10&amp;day=".$i."&amp;month=".strtolower($calendar_controller->month)."&amp;year=".$calendar_controller->year."&amp;filterev=".$calendar_controller->filterev."&amp;filterof=".$calendar_controller->filterof."&amp;filtersx=".$calendar_controller->filtersx."&amp;action=today\">";
+			if ($i == $calendar_controller->day) print "<span class=\"CalendarNavBlockSelDate\">".$i."</span>";
+			else print $i;
 			print "</a> | ";
 		}
-	}
-
-	print "<a href=\"calendar.php?link=14&amp;month=".strtolower(adodb_date("M"))."&amp;action=calendar&amp;filterev=".$calendar_controller->filterev."&amp;filterof=".$calendar_controller->filterof."&amp;filtersx=".$calendar_controller->filtersx."\"><b>".constant("GM_LANG_".strtolower(adodb_date("M")))." ".strtolower(adodb_date("Y"))."</b></a> | ";
-	print "</td>\n";
-	print "</tr><tr>";
-	print "<td class=\"shade2 vmiddle\">";
-	PrintHelpLink("annivers_year_select_help", "qm", "year");
-	print GM_LANG_year."</td>\n";
-	print "<td class=\"shade1 vmiddle\">";
-	if (strlen($calendar_controller->year) < 5){
-		if ($calendar_controller->year<"AA") print " <a href=\"calendar.php?link=2&amp;day=".$calendar_controller->day."&amp;month=".$calendar_controller->month."&amp;year=".($calendar_controller->year-1)."&amp;action=".($calendar_controller->action == "calendar" ? "calendar" : "year")."&amp;filterev=".$calendar_controller->filterev."&amp;filterof=".$calendar_controller->filterof."&amp;filtersx=".$calendar_controller->filtersx."\" title=\"".($calendar_controller->year-1)."\" >-1</a> ";
-	}
-	print "<input type=\"text\" name=\"year\" value=\"".$calendar_controller->year."\" size=\"7\" />";
-	if (strlen($calendar_controller->year) < 5){
-		if ($calendar_controller->year<(adodb_date("Y"))) print " <a href=\"calendar.php?link=3&amp;day=".$calendar_controller->day."&amp;month=".$calendar_controller->month."&amp;year=".($calendar_controller->year+1)."&amp;action=".($calendar_controller->action == "calendar" ? "calendar" : "year")."&amp;filterev=".$calendar_controller->filterev."&amp;filterof=".$calendar_controller->filterof."&amp;filtersx=".$calendar_controller->filtersx."\" title=\"".($calendar_controller->year+1)."\" >+1</a> |";
-		else if ($calendar_controller->year < "AA") print " +1 |";
-	}
-	print " <a href=\"calendar.php?link=4&amp;day=".$calendar_controller->day."&amp;month=".$calendar_controller->month."&amp;year=".adodb_date("Y")."&amp;action=".($calendar_controller->action == "calendar" ? "calendar" : "year")."&amp;filterev=".$calendar_controller->filterev."&amp;filterof=".$calendar_controller->filterof."&amp;filtersx=".$calendar_controller->filtersx."\"><b>".strtolower(adodb_date("Y"))."</b></a> | ";
-
-	print "</td>\n ";
-	if ($HIDE_LIVE_PEOPLE >= $gm_user->GetUserAccessLevel()) {
-		print "<td class=\"shade2 vmiddle\">";
-		PrintHelpLink("annivers_show_help", "qm", "show");
-		print GM_LANG_show.":&nbsp;</td>\n";
-		print "<td class=\"shade1 vmiddle\">";
-
-		print "<input type=\"hidden\" name=\"filterof\" value=\"".$calendar_controller->filterof."\" />";
-		print "<select name=\"filterof\" onchange=\"document.dateform.submit();\">\n";
-		print "<option value=\"all\"";
-		if ($calendar_controller->filterof == "all") print " selected=\"selected\"";
-		print ">".htmlentities(GM_LANG_all_people)."</option>\n";
-		print "<option value=\"living\"";
-		if ($calendar_controller->filterof == "living") print " selected=\"selected\"";
-		print ">".htmlentities(GM_LANG_living_only)."</option>\n";
-		print "<option value=\"recent\"";
-		if ($calendar_controller->filterof == "recent") print " selected=\"selected\"";
-		print ">".htmlentities(GM_LANG_recent_events)."</option>\n";
-		print "</select>\n";
-	}
-	else {
-		print "<td class=\"shade2 vmiddle\">".GM_LANG_showcal."</td>\n";
-		print "<td colspan=\"5\" class=\"shade1 vmiddle\">";
-		if ($calendar_controller->filterof == "all") print "<span class=\"Error\">".GM_LANG_all_people. "</span> | ";
-		else {
-			$filt="all";
-			print "<a href=\"calendar.php?link=5&amp;day=".$calendar_controller->day."&amp;month=".$calendar_controller->month."&amp;year=".$calendar_controller->year."&amp;filterof=".$filt."&amp;filtersx=".$calendar_controller->filtersx."&amp;action=".$calendar_controller->action."\">".htmlentities(GM_LANG_all_people)."</a>"." | ";
+		$Dd = adodb_date("j");
+		$Mm = adodb_date("M");
+		$Yy = adodb_date("Y");
+	//	print "<a href=\"calendar.php?filterev=$calendar_controller->filterev&amp;filterof=$calendar_controller->filterof&amp;filtersx=$calendar_controller->filtersx\"><b>".GetChangedDate("$Dd $Mm $Yy")."</b></a> | ";
+		//-- for alternate calendars the year is needed
+	  	if (GedcomConfig::$CALENDAR_FORMAT!="gregorian" || $calendar_controller->usehebrew) $datestr = "$Dd $Mm $Yy";
+	// 	if ($CALENDAR_FORMAT!="gregorian") $datestr = "$Dd $Mm $Yy"; // MA @@@
+		else $datestr = "$Dd $Mm";
+		print "<a href=\"calendar.php?link=13&amp;filterev=".$calendar_controller->filterev."&amp;filterof=".$calendar_controller->filterof."&amp;filtersx=".$calendar_controller->filtersx."&amp;year=".$calendar_controller->year."\"><span class=\"CalendarNavBlockCurDate\">".GetChangedDate($datestr);
+		if ($calendar_controller->usehebrew) {
+			$hdatestr = "@#DHEBREW@ ".$calendar_controller->currhDay." ".$calendar_controller->currhMonth." ".$calendar_controller->currhYear;
+			print " / ".GetChangedDate($hdatestr, $calendar_controller->CalYear);
 		}
-		if ($calendar_controller->filterof == "recent") print "<span class=\"Error\">".htmlentities(GM_LANG_recent_events). "</span> | ";
-		else {
-			$filt = "recent";
-			print "<a href=\"calendar.php?link=6&amp;day=".$calendar_controller->day."&amp;month=".$calendar_controller->month."&amp;year=".$calendar_controller->year."&amp;filterof=".$filt."&amp;filtersx=".$calendar_controller->filtersx."&amp;action=".$calendar_controller->action."\">".htmlentities(GM_LANG_recent_events)."</a>"." | ";
-		}
-	}
+		print "</span></a> | ";
+		print "</td>\n";
 	
-
-	if ($HIDE_LIVE_PEOPLE >= $gm_user->GetUserAccessLevel()) {
+		print "</tr><tr>";
+		print "<td class=\"NavBlockLabel\">";
+		PrintHelpLink("annivers_month_select_help", "qm", "month");
+		print GM_LANG_month."</td>\n";
+		print "<td colspan=\"7\" class=\"NavBlockField\">";
+		foreach($monthtonum as $mon=>$num) {
+			if (defined("GM_LANG_".$mon)) {
+				if (empty($mm)) $mm=strtolower($calendar_controller->month);
+				print "<a href=\"calendar.php?link=1&amp;day=".$calendar_controller->day."&amp;month=".$mon."&amp;year=".$calendar_controller->year."&amp;filterev=".$calendar_controller->filterev."&amp;filterof=".$calendar_controller->filterof."&amp;filtersx=".$calendar_controller->filtersx."&amp;action=".($calendar_controller->action == "year" ? "calendar" : $calendar_controller->action)."\">";
+				$monthstr = constant("GM_LANG_".$mon);
+				if ($mon==$mm) print "<span class=\"CalendarNavBlockSelDate\">".$monthstr."</span>";
+				else print $monthstr;
+				print "</a> | ";
+			}
+		}
+	
+		print "<a href=\"calendar.php?link=14&amp;month=".strtolower(adodb_date("M"))."&amp;action=calendar&amp;filterev=".$calendar_controller->filterev."&amp;filterof=".$calendar_controller->filterof."&amp;filtersx=".$calendar_controller->filtersx."\"><span class=\"CalendarNavBlockCurDate\">".constant("GM_LANG_".strtolower(adodb_date("M")))." ".strtolower(adodb_date("Y"))."</span></a> | ";
+		print "</td>\n";
+		print "</tr><tr>";
+		print "<td class=\"NavBlockLabel\">";
+		PrintHelpLink("annivers_year_select_help", "qm", "year");
+		print GM_LANG_year."</td>\n";
+		print "<td class=\"NavBlockField\">";
+		if (strlen($calendar_controller->year) < 5){
+			if ($calendar_controller->year<"AA") print " <a href=\"calendar.php?link=2&amp;day=".$calendar_controller->day."&amp;month=".$calendar_controller->month."&amp;year=".($calendar_controller->year-1)."&amp;action=".($calendar_controller->action == "calendar" ? "calendar" : "year")."&amp;filterev=".$calendar_controller->filterev."&amp;filterof=".$calendar_controller->filterof."&amp;filtersx=".$calendar_controller->filtersx."\" title=\"".($calendar_controller->year-1)."\" >-1</a> ";
+		}
+		print "<input type=\"text\" name=\"year\" value=\"".$calendar_controller->year."\" size=\"7\" />";
+		if (strlen($calendar_controller->year) < 5){
+			if ($calendar_controller->year<(adodb_date("Y"))) print " <a href=\"calendar.php?link=3&amp;day=".$calendar_controller->day."&amp;month=".$calendar_controller->month."&amp;year=".($calendar_controller->year+1)."&amp;action=".($calendar_controller->action == "calendar" ? "calendar" : "year")."&amp;filterev=".$calendar_controller->filterev."&amp;filterof=".$calendar_controller->filterof."&amp;filtersx=".$calendar_controller->filtersx."\" title=\"".($calendar_controller->year+1)."\" >+1</a> |";
+			else if ($calendar_controller->year < "AA") print " +1 |";
+		}
+		print " <a href=\"calendar.php?link=4&amp;day=".$calendar_controller->day."&amp;month=".$calendar_controller->month."&amp;year=".adodb_date("Y")."&amp;action=".($calendar_controller->action == "calendar" ? "calendar" : "year")."&amp;filterev=".$calendar_controller->filterev."&amp;filterof=".$calendar_controller->filterof."&amp;filtersx=".$calendar_controller->filtersx."\"><span class=\"CalendarNavBlockCurDate\">".strtolower(adodb_date("Y"))."</span></a> | ";
+	
 		print "</td>\n ";
-		print "<td class=\"shade2 vmiddle\">";
-		PrintHelpLink("annivers_sex_help", "qm", "sex");
-		print GM_LANG_sex.":&nbsp;</td>\n";
-		print "<td class=\"shade1 vmiddle\">";
-		if ($calendar_controller->filtersx == ""){
-			print " <img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["sex"]["small"]."\" title=\"".GM_LANG_all."\" alt=\"".GM_LANG_all."\" width=\"15\" height=\"15\" border=\"0\" align=\"middle\" />";
-			print "<img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["sexf"]["small"]."\" title=\"".GM_LANG_all."\" alt=\"".GM_LANG_all."\" width=\"15\" height=\"15\" border=\"0\" align=\"middle\" />";
-			print " | ";
-		}
-		else {
-			$fs="";
-			print " <a href=\"calendar.php?link=7&amp;day=".$calendar_controller->day."&amp;month=".$calendar_controller->month."&amp;year=".$calendar_controller->year."&amp;filterev=".$calendar_controller->filterev."&amp;filterof=".$calendar_controller->filterof."&amp;filtersx=".$fs."&amp;action=".$calendar_controller->action."\">";
-			print "<img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["sex"]["small"]."\" title=\"".GM_LANG_all."\" alt=\"".GM_LANG_all."\" width=\"9\" height=\"9\" border=\"0\" align=\"middle\" />";
-			print "<img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["sexf"]["small"]."\" title=\"".GM_LANG_all."\" alt=\"".GM_LANG_all."\" width=\"9\" height=\"9\" border=\"0\" align=\"middle\" />";
-			print "</a>"." | ";
-		}
-		if ($calendar_controller->filtersx == "M"){
-			print "<img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["sex"]["small"]."\" title=\"".GM_LANG_male."\" alt=\"".GM_LANG_male."\" width=\"15\" height=\"15\" border=\"0\" align=\"middle\" />";
-			print " | ";
-		}
-		else {
-			$fs = "M";
-			print "<a href=\"calendar.php?link=8&amp;day=".$calendar_controller->day."&amp;month=".$calendar_controller->month."&amp;year=".$calendar_controller->year."&amp;filterev=".$calendar_controller->filterev."&amp;filterof=".$calendar_controller->filterof."&amp;filtersx=".$fs."&amp;action=".$calendar_controller->action."\">";
-			print "<img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["sex"]["small"]."\" title=\"".GM_LANG_male."\" alt=\"".GM_LANG_male."\" width=\"9\" height=\"9\" border=\"0\" align=\"middle\" />";
-			print "</a>"." | ";
-		}
-		if ($calendar_controller->filtersx == "F"){
-			print "<img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["sexf"]["small"]."\" title=\"".GM_LANG_female."\" alt=\"".GM_LANG_female."\" width=\"15\" height=\"15\" border=\"0\" align=\"middle\" />";
-			print " | ";
-		}
-		else {
-			$fs = "F";
-			print "<a href=\"calendar.php?link=9&amp;day=".$calendar_controller->day."&amp;month=".$calendar_controller->month."&amp;year=".$calendar_controller->year."&amp;filterev=".$calendar_controller->filterev."&amp;filterof=".$calendar_controller->filterof."&amp;filtersx=".$fs."&amp;action=".$calendar_controller->action."\">";
-			print "<img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["sexf"]["small"]."\" title=\"".GM_LANG_female."\" alt=\"".GM_LANG_female."\" width=\"9\" height=\"9\" border=\"0\" align=\"middle\" />";
-			print "</a>"." | ";
-		}
-		
-	}
-
-	if ($HIDE_LIVE_PEOPLE >= $gm_user->GetUserAccessLevel()) {
-		print "</td>\n ";
-		print "<td class=\"shade2 vmiddle\">";
-		PrintHelpLink("annivers_event_help", "qm", "showcal");
-		print GM_LANG_showcal."&nbsp;</td>\n";
-		print "<td class=\"shade1\"";
-		if ($HIDE_LIVE_PEOPLE >= $gm_user->GetUserAccessLevel()) print ">";
-		else print " colspan=\"3\">";
-		print "<input type=\"hidden\" name=\"filterev\" value=\"".$calendar_controller->filterev."\" />";
-		print "<select name=\"filterev\" onchange=\"document.dateform.submit();\">\n";
-		
-		print "<option value=\"bdm\"";
-		if ($calendar_controller->filterev == "bdm") print " selected=\"selected\"";
-		print ">".GM_LANG_bdm."</option>\n";
-		
-		PrintFilterEvent($calendar_controller->filterev);
-	}
-
-	print "</td>\n";
-	print "</tr>";
-	print "<tr><td class=\"topbottombar\" colspan=\"8\">";
-	PrintHelpLink("day_month_help", "qm");
-	print "<input type=\"hidden\" name=\"day\" value=\"".$calendar_controller->day."\" />";
-	print "<input type=\"hidden\" name=\"month\" value=\"".$mm."\" />";
-	print "<input type=\"hidden\" name=\"filtersx\" value=\"".$calendar_controller->filtersx."\" />";
-	print "<input type=\"submit\"  value=\"".GM_LANG_viewday."\" onclick=\"document.dateform.elements['action'].value='today';\" />\n";
-	print "<input type=\"submit\"  value=\"".GM_LANG_viewmonth."\" onclick=\"document.dateform.elements['action'].value='calendar';\" />\n";
-	print "<input type=\"submit\"  value=\"".GM_LANG_viewyear."\" onclick=\"document.dateform.elements['action'].value='year';\" />\n";
-	print "</td></tr></table><br />";
-	print "</form>\n";
+		if ($HIDE_LIVE_PEOPLE >= $gm_user->GetUserAccessLevel()) {
+			print "<td class=\"NavBlockLabel\">";
+			PrintHelpLink("annivers_show_help", "qm", "show");
+			print GM_LANG_show.":&nbsp;</td>\n";
+			print "<td class=\"NavBlockField\">";
 	
+			print "<input type=\"hidden\" name=\"filterof\" value=\"".$calendar_controller->filterof."\" />";
+			print "<select name=\"filterof\" onchange=\"document.dateform.submit();\">\n";
+			print "<option value=\"all\"";
+			if ($calendar_controller->filterof == "all") print " selected=\"selected\"";
+			print ">".htmlentities(GM_LANG_all_people)."</option>\n";
+			print "<option value=\"living\"";
+			if ($calendar_controller->filterof == "living") print " selected=\"selected\"";
+			print ">".htmlentities(GM_LANG_living_only)."</option>\n";
+			print "<option value=\"recent\"";
+			if ($calendar_controller->filterof == "recent") print " selected=\"selected\"";
+			print ">".htmlentities(GM_LANG_recent_events)."</option>\n";
+			print "</select>\n";
+		}
+		else {
+			print "<td class=\"NavBlockLabel\">".GM_LANG_showcal."</td>\n";
+			print "<td colspan=\"5\" class=\"NavBlockField\">";
+			if ($calendar_controller->filterof == "all") print "<span class=\"Error\">".GM_LANG_all_people. "</span> | ";
+			else {
+				$filt="all";
+				print "<a href=\"calendar.php?link=5&amp;day=".$calendar_controller->day."&amp;month=".$calendar_controller->month."&amp;year=".$calendar_controller->year."&amp;filterof=".$filt."&amp;filtersx=".$calendar_controller->filtersx."&amp;action=".$calendar_controller->action."\">".htmlentities(GM_LANG_all_people)."</a>"." | ";
+			}
+			if ($calendar_controller->filterof == "recent") print "<span class=\"Error\">".htmlentities(GM_LANG_recent_events). "</span> | ";
+			else {
+				$filt = "recent";
+				print "<a href=\"calendar.php?link=6&amp;day=".$calendar_controller->day."&amp;month=".$calendar_controller->month."&amp;year=".$calendar_controller->year."&amp;filterof=".$filt."&amp;filtersx=".$calendar_controller->filtersx."&amp;action=".$calendar_controller->action."\">".htmlentities(GM_LANG_recent_events)."</a>"." | ";
+			}
+		}
+		
 	
+		if ($HIDE_LIVE_PEOPLE >= $gm_user->GetUserAccessLevel()) {
+			print "</td>\n ";
+			print "<td class=\"NavBlockLabel\">";
+			PrintHelpLink("annivers_sex_help", "qm", "sex");
+			print GM_LANG_sex.":&nbsp;</td>\n";
+			print "<td class=\"NavBlockField\">";
+			if ($calendar_controller->filtersx == ""){
+				print " <img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["sex"]["small"]."\" title=\"".GM_LANG_all."\" alt=\"".GM_LANG_all."\" width=\"15\" height=\"15\" border=\"0\" align=\"middle\" />";
+				print "<img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["sexf"]["small"]."\" title=\"".GM_LANG_all."\" alt=\"".GM_LANG_all."\" width=\"15\" height=\"15\" border=\"0\" align=\"middle\" />";
+				print " | ";
+			}
+			else {
+				$fs="";
+				print " <a href=\"calendar.php?link=7&amp;day=".$calendar_controller->day."&amp;month=".$calendar_controller->month."&amp;year=".$calendar_controller->year."&amp;filterev=".$calendar_controller->filterev."&amp;filterof=".$calendar_controller->filterof."&amp;filtersx=".$fs."&amp;action=".$calendar_controller->action."\">";
+				print "<img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["sex"]["small"]."\" title=\"".GM_LANG_all."\" alt=\"".GM_LANG_all."\" width=\"9\" height=\"9\" border=\"0\" align=\"middle\" />";
+				print "<img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["sexf"]["small"]."\" title=\"".GM_LANG_all."\" alt=\"".GM_LANG_all."\" width=\"9\" height=\"9\" border=\"0\" align=\"middle\" />";
+				print "</a>"." | ";
+			}
+			if ($calendar_controller->filtersx == "M"){
+				print "<img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["sex"]["small"]."\" title=\"".GM_LANG_male."\" alt=\"".GM_LANG_male."\" width=\"15\" height=\"15\" border=\"0\" align=\"middle\" />";
+				print " | ";
+			}
+			else {
+				$fs = "M";
+				print "<a href=\"calendar.php?link=8&amp;day=".$calendar_controller->day."&amp;month=".$calendar_controller->month."&amp;year=".$calendar_controller->year."&amp;filterev=".$calendar_controller->filterev."&amp;filterof=".$calendar_controller->filterof."&amp;filtersx=".$fs."&amp;action=".$calendar_controller->action."\">";
+				print "<img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["sex"]["small"]."\" title=\"".GM_LANG_male."\" alt=\"".GM_LANG_male."\" width=\"9\" height=\"9\" border=\"0\" align=\"middle\" />";
+				print "</a>"." | ";
+			}
+			if ($calendar_controller->filtersx == "F"){
+				print "<img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["sexf"]["small"]."\" title=\"".GM_LANG_female."\" alt=\"".GM_LANG_female."\" width=\"15\" height=\"15\" border=\"0\" align=\"middle\" />";
+				print " | ";
+			}
+			else {
+				$fs = "F";
+				print "<a href=\"calendar.php?link=9&amp;day=".$calendar_controller->day."&amp;month=".$calendar_controller->month."&amp;year=".$calendar_controller->year."&amp;filterev=".$calendar_controller->filterev."&amp;filterof=".$calendar_controller->filterof."&amp;filtersx=".$fs."&amp;action=".$calendar_controller->action."\">";
+				print "<img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["sexf"]["small"]."\" title=\"".GM_LANG_female."\" alt=\"".GM_LANG_female."\" width=\"9\" height=\"9\" border=\"0\" align=\"middle\" />";
+				print "</a>"." | ";
+			}
+			
+		}
+	
+		if ($HIDE_LIVE_PEOPLE >= $gm_user->GetUserAccessLevel()) {
+			print "</td>\n ";
+			print "<td class=\"NavBlockLabel\">";
+			PrintHelpLink("annivers_event_help", "qm", "showcal");
+			print GM_LANG_showcal."&nbsp;</td>\n";
+			print "<td class=\"NavBlockField\"";
+			if ($HIDE_LIVE_PEOPLE >= $gm_user->GetUserAccessLevel()) print ">";
+			else print " colspan=\"3\">";
+			print "<input type=\"hidden\" name=\"filterev\" value=\"".$calendar_controller->filterev."\" />";
+			print "<select name=\"filterev\" onchange=\"document.dateform.submit();\">\n";
+			
+			print "<option value=\"bdm\"";
+			if ($calendar_controller->filterev == "bdm") print " selected=\"selected\"";
+			print ">".GM_LANG_bdm."</option>\n";
+			
+			PrintFilterEvent($calendar_controller->filterev);
+		}
+	
+		print "</td>\n";
+		print "</tr>";
+		print "<tr><td class=\"NavBlockFooter\" colspan=\"8\">";
+		PrintHelpLink("day_month_help", "qm");
+		print "<input type=\"hidden\" name=\"day\" value=\"".$calendar_controller->day."\" />";
+		print "<input type=\"hidden\" name=\"month\" value=\"".$mm."\" />";
+		print "<input type=\"hidden\" name=\"filtersx\" value=\"".$calendar_controller->filtersx."\" />";
+		print "<input type=\"submit\"  value=\"".GM_LANG_viewday."\" onclick=\"document.dateform.elements['action'].value='today';\" />\n";
+		print "<input type=\"submit\"  value=\"".GM_LANG_viewmonth."\" onclick=\"document.dateform.elements['action'].value='calendar';\" />\n";
+		print "<input type=\"submit\"  value=\"".GM_LANG_viewyear."\" onclick=\"document.dateform.elements['action'].value='year';\" />\n";
+		print "</td></tr></table>";
+		print "</form>\n";
+	print "</div>\n";
 }
+
+print "<div class=\"CalendarResultContainer\">";
 if ($calendar_controller->action == "today" || $calendar_controller->action == "year") {
 	
 	$calendar_controller->GetDayYearLists();
@@ -250,10 +252,10 @@ if ($calendar_controller->action == "today" || $calendar_controller->action == "
 			$text_fact = $calendar_controller->GetDateFacts($indifacts);
 			if (!empty($text_fact)) {
 				$index++;
-				$text_indi .= "<li><a href=\"individual.php?pid=".$indi->xref."&amp;gedid=".$indi->gedcomid."\"><b>";
+				$text_indi .= "<li><a href=\"individual.php?pid=".$indi->xref."&amp;gedid=".$indi->gedcomid."\"><span class=\"CalendarDayFactName\">";
 				$text_indi .= $indi->revname;
 				if ($indi->addname != "") $text_indi .= "&nbsp;".PrintReady("(".$indi->revaddname.")");
-				$text_indi .= "</b><img id=\"box-".$indi->xref.".".$index."-sex\" src=\"".GM_IMAGE_DIR."/";
+				$text_indi .= "</span><img id=\"box-".$indi->xref.".".$index."-sex\" src=\"".GM_IMAGE_DIR."/";
 				if ($indi->sex == "M"){
 					$count_male++;
 					$text_indi .= $GM_IMAGES["sex"]["small"]."\" title=\"".GM_LANG_male."\" alt=\"".GM_LANG_male;
@@ -266,14 +268,12 @@ if ($calendar_controller->action == "today" || $calendar_controller->action == "
 					$count_unknown++;
 					$text_indi .= $GM_IMAGES["sexn"]["small"]."\" title=\"".GM_LANG_unknown."\" alt=\"".GM_LANG_unknown;
 				}
-				$text_indi .= "\" class=\"sex_image\" />";
+				$text_indi .= "\" class=\"SexImage\" />";
 				$text_indi .= $indi->addxref;
-				$text_indi .= "</a><br />\n\t\t";
-				$text_indi .= "<div class=\"indent";
-				if($TEXT_DIRECTION == "rtl") $text_indi .= "_rtl";
-				$text_indi .= "\">";
+				$text_indi .= "</a>\n\t\t";
+				$text_indi .= "<div class=\"CalendarFactIndent\">";
 				$text_indi .= $text_fact;
-				$text_indi .= "<br /></div></li>\n\t\t";
+				$text_indi .= "</div></li>\n\t\t";
 				$count_indi++;
 			}
 			// else if (!$filterout && $text_fact!="") $count__url_indi++; //?? admin sees as private in year also indis w/o a year in their fact 
@@ -297,16 +297,16 @@ if ($calendar_controller->action == "today" || $calendar_controller->action == "
 				$famfacts = $fam->SelectFacts($select, true);
 				$text_fact = $calendar_controller->GetDateFacts($famfacts);
 				if (!empty($text_fact) && $fam->disp) {
-					$text_fam .= "<li><a href=\"family.php?famid=".$fam->xref."&amp;gedid=".$fam->gedcomid."\"><b>";
+					$text_fam .= "<li><a href=\"family.php?famid=".$fam->xref."&amp;gedid=".$fam->gedcomid."\"><span class=\"CalendarDayFactName\">";
 					$text_fam .= $fam->sortable_name;
 					if ($fam->sortable_addname != "") $text_fam .= "&nbsp(".$fam->sortable_addname.")";
-					$text_fam .= "</b>".$fam->addxref;
-					$text_fam .= "</a><br />\n\t\t";
-					$text_fam .= "<div class=\"indent";
+					$text_fam .= "</span>".$fam->addxref;
+					$text_fam .= "</a>\n\t\t";
+					$text_fam .= "<div class=\"CalendarFactIndent";
 					if ($TEXT_DIRECTION == "rtl") $text_fam .= "_rtl";
 					$text_fam .= "\">";
 					$text_fam .= $text_fact;
-					$text_fam .= "<br /></div></li>\n\t\t";
+					$text_fam .= "</div></li>\n\t\t";
 					$count_fam++;
 				}
 //				else if (!$filterout) $count_private_fam[$gid] = 1;
@@ -319,16 +319,16 @@ if ($calendar_controller->action == "today" || $calendar_controller->action == "
 	$count_private_indi = count($count_private_indi);
 	// Print the day/year list(s)
 	if (!empty($text_indi) || !empty($text_fam) || $count_private_indi>0 || $count_private_fam>0) {
-		print "\n\t\t<table class=\"center $TEXT_DIRECTION\">\n\t\t<tr>";
+		print "\n\t\t<table class=\"ListTable\">\n\t\t<tr>";
 		if (!empty($text_indi) || ($count_private_indi>0)) {
-			print "<td class=\"shade2 center\"><img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["indis"]["small"]."\" border=\"0\" title=\"".GM_LANG_individuals."\" alt=\"".GM_LANG_individuals."\" /> ".GM_LANG_individuals."</td>";
+			print "<td class=\"ListTableColumnHeader\"><img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["indis"]["small"]."\" border=\"0\" title=\"".GM_LANG_individuals."\" alt=\"".GM_LANG_individuals."\" /> ".GM_LANG_individuals."</td>";
 		}
 		if (!empty($text_fam) || ($count_private_fam)) {
-			print "<td class=\"shade2 center\"><img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["sfamily"]["small"]."\" border=\"0\" title=\"".GM_LANG_families."\" alt=\"".GM_LANG_families."\" /> ".GM_LANG_families."</td>";
+			print "<td class=\"ListTableColumnHeader\"><img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["sfamily"]["small"]."\" border=\"0\" title=\"".GM_LANG_families."\" alt=\"".GM_LANG_families."\" /> ".GM_LANG_families."</td>";
 		}
 		print "</tr><tr>\n\t\t";
 		if (!empty($text_indi) || ($count_private_indi)) {
-			print "<td class=\"shade1\"><ul>\n\t\t";
+			print "<td class=\"ListTableContent CalendarDYListTableContent\"><ul>\n\t\t";
 			if (!empty($text_indi)) print $text_indi;
 			if ($count_private_indi > 0){
 				PrintHelpLink("privacy_error_help", "qm", "private");
@@ -340,7 +340,7 @@ if ($calendar_controller->action == "today" || $calendar_controller->action == "
 			print "</ul></td>";
 		}
 		if (!empty($text_fam) || ($count_private_fam)) {
-			print "<td class=\"shade1\"><ul>\n\t\t";
+			print "<td class=\"ListTableContent CalendarDYListTableContent\"><ul>\n\t\t";
 			if (!empty($text_fam)) print $text_fam;
 			if ($count_private_fam > 0){
 				PrintHelpLink("privacy_error_help", "qm", "private");
@@ -353,52 +353,48 @@ if ($calendar_controller->action == "today" || $calendar_controller->action == "
 		}
 		print "</tr><tr>";
 		if ($count_indi > 0 || $count_private_indi > 0){
-			print "<td class=\"shade2\">\n";
+			print "<td class=\"ListTableColumnFooter\">\n";
 			if (($count_male + $count_female + $count_unknown + $count_private_indi) > 0)
 			print GM_LANG_total_indis." ".($count_male+$count_female+$count_unknown+$count_private_indi)."<br />&nbsp;&nbsp;";
 			if ($count_male > 0){
 				print "<img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["sex"]["small"]."\" ";
-				print "title=\"".GM_LANG_male."\" alt=\"".GM_LANG_male."\" class=\"sex_image\" />&nbsp;";
+				print "title=\"".GM_LANG_male."\" alt=\"".GM_LANG_male."\" class=\"SexImage\" />&nbsp;";
 				print $count_male;
 			}
 			if ($count_male > 0 && $count_female > 0) print "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
 			if ($count_female > 0) {
 				print "<img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["sexf"]["small"]."\" ";
-				print "title=\"".GM_LANG_female."\" alt=\"".GM_LANG_female."\" class=\"sex_image\"  />&nbsp;";
+				print "title=\"".GM_LANG_female."\" alt=\"".GM_LANG_female."\" class=\"SexImage\"  />&nbsp;";
 				print $count_female;
 			}
 			if ($count_unknown > 0) {
 				print "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
 				print "<img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["sexn"]["small"]."\" ";
-				print "title=\"".GM_LANG_unknown."\" alt=\"".GM_LANG_unknown."\" class=\"sex_image\" />&nbsp;";
+				print "title=\"".GM_LANG_unknown."\" alt=\"".GM_LANG_unknown."\" class=\"SexImage\" />&nbsp;";
 				print $count_unknown;
 			}
 			print "</td>";
 		}
 		if ($count_fam > 0 || $count_private_fam > 0) {
-			print "<td class=\"shade2\">\n";
+			print "<td class=\"ListTableColumnFooter\">\n";
 			if ($count_fam > 0 || $count_private_fam > 0) print GM_LANG_total_fams;
 			print "&nbsp;&nbsp;".($count_fam+$count_private_fam);
 			print "</td>";
 		}
-		print "</tr>";
+		print "</tr></table>";
 	}
 	else {
-		print "\n\t<table class=\"ListTable $TEXT_DIRECTION\">\n\t\t<tr>";
-		print "<td class=\"shade1 center\">&nbsp;";
-		print GM_LANG_individuals."  /  ".GM_LANG_families;
-		print "&nbsp;</td></tr><tr><td class=\"warning center\"><i>";
+		print "\n\t<div class=\"Warning CalendarWarning\">";
 		print GM_LANG_no_results;
-		print "</i><br />\n\t\t</td></tr>";
+		print "</div>";
 	}
-	if ($view == "preview") print "<tr><td>";
 }
 else if ($calendar_controller->action == "calendar") {
 	if(GedcomConfig::$CALENDAR_FORMAT == "jewish" || GedcomConfig::$CALENDAR_FORMAT == "hebrew" || GedcomConfig::$CALENDAR_FORMAT == "hijri") { //since calendar is based on gregorian it doesn't make sense to not display the gregorian caption
 		print "<span class=\"SubHeader\">".constant("GM_LANG_".strtolower($calendar_controller->month))." ".$calendar_controller->year."</span> &#160; \n";
 	}
 	if (empty($WEEK_START)) $WEEK_START="0";                //-- if the starting day for a week was not defined in the language file, then make it Sunday
-	print "<table class=\"ListTable $TEXT_DIRECTION\">\n";
+	print "<table class=\"ListTable CalendarDayBoxTable\">\n";
 	print "\t<tr>\n";
 	$days = array();
 	$days[0] = "sunday";
@@ -410,7 +406,7 @@ else if ($calendar_controller->action == "calendar") {
 	$days[6] = "saturday";
 	$j = $WEEK_START;
 	for($i=0; $i<7; $i++) {
-		print "\t\t<td class=\"shade2\">".constant("GM_LANG_".$days[$j])."</td>\n";
+		print "\t\t<td class=\"ListTableColumnHeader\">".constant("GM_LANG_".$days[$j])."</td>\n";
 		$j++;
 		if ($j>6) $j=0;
 	}
@@ -423,17 +419,12 @@ else if ($calendar_controller->action == "calendar") {
 			$mday = adodb_date("j", $monthstart);
 			$mmon = strtolower(adodb_date("M", $monthstart));
 
-			print "\t\t<td class=\"shade1 wrap\">\n";
+			print "\t\t<td class=\"ListTableContent CalendarDayListTableContent\">\n";
 			if ($calendar_controller->show_no_day == 0 && $j == 0 && $k == 0) $show_not_set = true;
 			else if ($calendar_controller->show_no_day == $k && $j == 6) $show_not_set = true;
 			if ($mmon == strtolower($calendar_controller->month) || $show_not_set) {
 				if ($show_not_set) {
 					$pregquery = "2 DATE(|[^\n]*[^\d]+|[^\n]*([ |0]0)|[^\n]*3[$calendar_controller->lastday-9]|[^\n]*[4-9][0-9]) $calendar_controller->month";
-					
-					// I see April 1973 in 2004 both correctly in April and in March with another event
-
-					// Include here Hebrew dates that do not convert to a Gregorian date (same into blocks) - like 31 NSN 5724
-					
 					if (GedcomConfig::$USE_RTL_FUNCTIONS) {
 						    $preghbquery1 = "";
 						    $preghbquery2 = "";
@@ -463,7 +454,7 @@ else if ($calendar_controller->action == "calendar") {
 					$currentDay = false;
 					if(($calendar_controller->year == adodb_date("Y")) && (strtolower($calendar_controller->month) == strtolower(adodb_date("M"))) && ($mday == adodb_date("j"))) //current day
 						$currentDay = true;
-					print "<span class=\"cal_day". ($currentDay?" current_day":"") ."\">".$mday."</span>";
+					print "<div class=\"CalendarDay". ($currentDay?" CalendarDayCurrentDay":"") ."\">".$mday."</div>";
 					if (GedcomConfig::$CALENDAR_FORMAT == "hebrew_and_gregorian" || GedcomConfig::$CALENDAR_FORMAT == "hebrew" ||
 						((GedcomConfig::$CALENDAR_FORMAT == "jewish_and_gregorian" || GedcomConfig::$CALENDAR_FORMAT == "jewish" || ($calendar_controller->usehebrew)) && $LANGUAGE == "hebrew")) {
 						$monthTemp = $monthtonum[strtolower($calendar_controller->month)];
@@ -471,7 +462,7 @@ else if ($calendar_controller->action == "calendar") {
 						$hebrewDate = jdtojewish($jd);
 						// if ($calendar_controller->usehebrew) {
 							list ($hebrewMonth, $hebrewDay, $hebrewYear) = split ('/', $hebrewDate);
-							print "<span class=\"rtl_cal_day". ($currentDay?" current_day":"") ."\">";
+							print "<span class=\"CalendarDayRtl". ($currentDay?" CalendarDayCurrentDay":"") ."\">";
 							print GetHebrewJewishDay($hebrewDay) . " " .GetHebrewJewishMonth($hebrewMonth, $hebrewYear) . "</span>";
 						// }
 					}
@@ -482,7 +473,7 @@ else if ($calendar_controller->action == "calendar") {
 						$hebrewDate = jdtojewish($jd);
 						// if ($calendar_controller->usehebrew) {
 							list ($hebrewMonth, $hebrewDay, $hebrewYear) = split ('/', $hebrewDate);
-							print "<span class=\"rtl_cal_day". ($currentDay?" current_day":"") ."\">";
+							print "<span class=\"CalendarDayRtl". ($currentDay?" CalendarDayCurrentDay":"") ."\">";
 							print $hebrewDay . " " . GetJewishMonthName($hebrewMonth, $hebrewYear) . "</span>";
 						// }
 					}
@@ -490,10 +481,9 @@ else if ($calendar_controller->action == "calendar") {
 						$monthTemp = $monthtonum[strtolower($calendar_controller->month)];
 						$hDate = GetHijri($mday, $monthTemp, $calendar_controller->year);
 						list ($hMonthName, $calendar_controller->hDay, $calendar_controller->hYear) = split ('/', $hDate);
-						print "<span class=\"rtl_cal_day". ($currentDay?" current_day":"") ."\">";
+						print "<span class=\"CalendarDayRtl". ($currentDay?" CalendarDayCurrentDay":"") ."\">";
 						print $calendar_controller->hDay . " " . $hMonthName . "</span>";
 					}
-					print "<br style=\"clear: both\" />";
 					$dayindilist = array();
 
 					if ($mday<10) $pregquery = "2 DATE[^\n]*[ |0]$mday $mmon";
@@ -590,14 +580,12 @@ else if ($calendar_controller->action == "calendar") {
 								else $text_fact .= $text_temp;
 							}
 							if (!empty($text_fact) && $indi->disp) {
-								$text_day .= "<a href=\"individual.php?pid=".$indi->xref."&amp;gedid=".$indi->gedcomid."\"><b>";
+								$text_day .= "<a href=\"individual.php?pid=".$indi->xref."&amp;gedid=".$indi->gedcomid."\"><span class=\"CalendarDayFactName\">";
 								$text_day .= $indi->revname;
 								if ($indi->addname != "") $text_day .= "&nbsp;".PrintReady("(".$indi->revaddname.")");
-								$text_day .= "</b>".$indi->addxref;
+								$text_day .= "</span>".$indi->addxref;
 								$text_day .= "</a><br />\n";
-								$text_day .= "<div class=\"indent";
-								if($TEXT_DIRECTION == "rtl") $text_day .= "_rtl";
-								$text_day .= " $TEXT_DIRECTION\">";
+								$text_day .= "<div class=\"CalendarFactIndent\">";
 								$text_day .= $text_fact;
 								$text_day .= "</div><br />\n";
 							}
@@ -639,14 +627,12 @@ else if ($calendar_controller->action == "calendar") {
 									else $text_fact .= $text_temp;
 								}
 								if (!empty($text_fact) && $fam->disp) {
-									$text_day .= "<a href=\"family.php?famid=".$fam->xref."&amp;gedid=".$fam->gedcomid."\"><b>";
+									$text_day .= "<a href=\"family.php?famid=".$fam->xref."&amp;gedid=".$fam->gedcomid."\"><span class=\"CalendarDayFactName\">";
 									$text_day .= $fam->sortable_name;
 									if ($fam->sortable_addname != "") $text_day .= "&nbsp".PrintReady("(".$fam->sortable_addname.")");
-									$text_day .= "</b>".$fam->addxref;
+									$text_day .= "</span>".$fam->addxref;
 									$text_day .= "</a><br />\n";
-									$text_day .= "<div class=\"indent";
-									if ($TEXT_DIRECTION == "rtl") $text_day .= "_rtl";
-									$text_day .= "\">";
+									$text_day .= "<div class=\"CalendarFactIndent\">";
 									$text_day .= $text_fact;
 									$text_day .= "</div><br />\n";
 								}
@@ -658,15 +644,14 @@ else if ($calendar_controller->action == "calendar") {
 				// Print the calendar day list
 				if ($show_not_set){
 					if ($text_day!=""){
-						print "<span class=\"cal_day\"";
+						print "<div class=\"CalendarDay\"";
 						if ($TEXT_DIRECTION == "rtl") print	" style=\"float: right;\"";
-						print " >".GM_LANG_day_not_set."</span>";
-						print "<br style=\"clear: both\" />";
+						print " >".GM_LANG_day_not_set."</div>";
 					}
 					$show_not_set = false;
 					$calendar_controller->show_no_day = -1;
 				}
-				print "<div id=\"day$k-$j\" class=\"details1\" style=\"width: 120px; height: ";
+				print "<div id=\"day$k-$j\" class=\"PersonDetails1 CalendarDayBoxDetails\" style=\"height: ";
 				if ($view=="preview") print "100%;";
 				else print "150px; overflow: auto;";
 				print "\">\n";
@@ -698,6 +683,8 @@ else if ($calendar_controller->action == "calendar") {
 		print "\t</tr>\n";
 	} //-- end week for loop
 	if ($view=="preview") print "<tr><td colspan=\"7\">";
+	else print "</table>";
+
 }
 if ($view=="preview"){
 	if (isset($gid)) {
@@ -720,8 +707,9 @@ if ($view=="preview"){
 	if (!empty($showfilter)) print $showfilter.")\n";
 	else print GM_LANG_all.")\n";
 	print "</td></tr>";
+	print "</table>";
 }
-print "</table>\n";
-print "</div><br />\n";
+print "</div>";
+print "</div>\n";
 PrintFooter();
 ?>

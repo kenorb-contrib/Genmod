@@ -43,6 +43,8 @@ abstract class ChartFunctions {
 			$srch = "rootid=".$_REQUEST["rootid"];
 			$repl = "rootid=".$pid;
 			$url = "?".str_replace($srch, $repl, $url);
+			$url = str_replace("&amp;", "&", $url);
+			$url = str_replace("&", "&amp;", $url);
 			self::PrintUrlArrow($pid, $url, "#$pid");
 			print "&nbsp;";
 		}

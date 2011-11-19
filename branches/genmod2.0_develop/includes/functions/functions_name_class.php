@@ -518,12 +518,12 @@ abstract class NameFunctions {
 			$names = preg_replace(array("/@N.N.?/","/@P.N.?/"), array($NN,$PN), trim($names));
 	
 			if (GedcomConfig::$UNDERLINE_NAME_QUOTES) {
-				if ($starred) $names = preg_replace("/\"(.+)\"/", "<span class=\"starredname\">$1</span>", $names);
+				if ($starred) $names = preg_replace("/\"(.+)\"/", "<span class=\"StarredName\">$1</span>", $names);
 				else $names = preg_replace("/\"(.+)\"/", "$1", $names);
 			}
 			//-- underline names with a * at the end
 			//-- see this forum thread http://sourceforge.net/forum/forum.php?thread_id=1223099&forum_id=185165
-			if ($starred) $names = preg_replace("/([^ ]+)\*/", "<span class=\"starredname\">$1</span>", $names);
+			if ($starred) $names = preg_replace("/([^ ]+)\*/", "<span class=\"StarredName\">$1</span>", $names);
 			else $names = preg_replace("/([^ ]+)\*/", "$1", $names);
 			return $names;
 		}
@@ -539,12 +539,12 @@ abstract class NameFunctions {
 				
 				for($i=0; $i<count($names); $i++) {
 					if (GedcomConfig::$UNDERLINE_NAME_QUOTES) {
-						if ($starred) $names[$i] = preg_replace("/\"(.+)\"/", "<span class=\"starredname\">$1</span>", $names[$i]);
+						if ($starred) $names[$i] = preg_replace("/\"(.+)\"/", "<span class=\"StarredName\">$1</span>", $names[$i]);
 						else $names[$i] = preg_replace("/\"(.+)\"/", "$1", $names[$i]);
 					}
 					//-- underline names with a * at the end
 					//-- see this forum thread http://sourceforge.net/forum/forum.php?thread_id=1223099&forum_id=185165
-					if ($starred) $names[$i] = preg_replace("/([^ ]+)\*/", "<span class=\"starredname\">$1</span>", $names[$i]);
+					if ($starred) $names[$i] = preg_replace("/([^ ]+)\*/", "<span class=\"StarredName\">$1</span>", $names[$i]);
 					else $names[$i] = preg_replace("/([^ ]+)\*/", "$1", $names[$i]);
 	
 					if (stristr($names[$i], "@N.N")) $names[$i] = preg_replace("/@N.N.?/", $NN, trim($names[$i]));

@@ -72,60 +72,61 @@ PrintSimpleHeader($search_controller->pagetitle);
 //-->
 </script>
 <?php
-print "<div class=\"topbottombar width60\">";
-
+print "<div id=\"FindContent\">";
+$head = "";
 switch ($search_controller->type) {
 	case "indi" :
-		print GM_LANG_find_individual;
+		$head = GM_LANG_find_individual;
 		break;
 	case "fam" :
-		print GM_LANG_find_fam_list;
+		$head = GM_LANG_find_fam_list;
 		break;
 	case "media" :
-		print GM_LANG_find_media;
+		$head = GM_LANG_find_media;
 		break;
 	case "file" :
-		print GM_LANG_find_mfile;
+		$head = GM_LANG_find_mfile;
 		break;
 	case "place" :
-		print GM_LANG_find_place;
+		$head = GM_LANG_find_place;
 		break;
 	case "repo" :
-		print GM_LANG_repo_list;
+		$head = GM_LANG_repo_list;
 		break;
 	case "source" :
-		print GM_LANG_find_source;
+		$head = GM_LANG_find_source;
 		break;
 	case "note" :
-		print GM_LANG_find_note;
+		$head = GM_LANG_find_note;
 		break;
 	case "specialchar" :
-		print GM_LANG_find_specialchar;
+		$head = GM_LANG_find_specialchar;
 		break;
 }
-print "</div>\n";
+print "</td></tr>\n";
 
 // NOTE: Show inputs for indi, fam
 if (in_array($search_controller->type, array("indi", "fam", "media", "note", "source", "repo")))  {
 	print "<form name=\"filter".$search_controller->type."\" method=\"post\" onsubmit=\"return checknames(this);\" action=\"find.php\">";
-	print "<div class=\"width60 center shade1\"><br />";
 	print "<input type=\"hidden\" name=\"action\" value=\"filter\" />";
 	print "<input type=\"hidden\" name=\"type\" value=\"".$search_controller->type."\" />";
-	print "<label class=\"width10\" style=\"padding: 5px;\">";
-	print constant("GM_LANG_".($search_controller->type == "indi" || $search_controller->type == "fam" ? "name" : $search_controller->type)."_contains")."</label> <input type=\"text\" name=\"query\" value=\"";
+	print "<table class=\"FindHeaderTable\">";
+	print "<tr><td class=\"NavBlockHeader\" colspan=\"2\">".$head."</td></tr>";
+
+	print "<tr><td class=\"NavBlockLabel\">";
+	print constant("GM_LANG_".($search_controller->type == "indi" || $search_controller->type == "fam" ? "name" : $search_controller->type)."_contains")."</td><td class=\"NavBlockField\"><input type=\"text\" name=\"query\" value=\"";
 	if (!is_null($search_controller->query)) print stripslashes($search_controller->query);
 	print "\" />";
 	PrintHelpLink("simple_filter_help","qm");
-	print "<br /><br /></div>";
-	print "<div class=\"width60 center\" style=\"padding: 5px;\">";
-	print "<input type=\"submit\"  value=\"".GM_LANG_filter."\" /><br />";
-	print "</div></form>";
+	print "</td></tr>";
+	print "<tr><td class=\"NavBlockFooter\" colspan=\"2\">";
+	print "<input type=\"submit\"  value=\"".GM_LANG_filter."\" /></tr></td>";
+	print "</table></form>";
 }		
 
 // Show mediafiles and hide the rest
 else if ($search_controller->type == "file") {
 	print "<form name=\"filterfile\" method=\"post\" onsubmit=\"return checknames(this);\" action=\"find.php\">\n";
-	print "<div class=\"width60 center shade1\">\n";
 	print "<input type=\"hidden\" name=\"directory\" value=\"".$search_controller->directory."\" />\n";
 	print "<input type=\"hidden\" name=\"thumbdir\" value=\"".$search_controller->thumbdir."\" />\n";
 	print "<input type=\"hidden\" name=\"level\" value=\"".$search_controller->level."\" />\n";
@@ -133,96 +134,104 @@ else if ($search_controller->type == "file") {
 	print "<input type=\"hidden\" name=\"external_links\" value=\"".$search_controller->external_links."\" />\n";
 	print "<input type=\"hidden\" name=\"type\" value=\"file\" />\n";
 	print "<input type=\"hidden\" name=\"subclick\" value=\"\" />\n"; // This is for passing the name of which submit button was clicked		
-	print "<label class=\"width10\" style=\"padding: 5px;\">";
-	print GM_LANG_file_contains."</label> <input type=\"text\" name=\"query\" value=\"";
+	print "<table class=\"FindHeaderTable\">";
+	print "<tr><td class=\"NavBlockHeader\" colspan=\"2\">".$head."</td></tr>";
+
+	print "<tr><td class=\"NavBlockLabel\">";
+	print GM_LANG_file_contains."</td><td class=\"NavBlockField\"><input type=\"text\" name=\"query\" value=\"";
 	if (!is_null($search_controller->query)) print $search_controller->query;
 	print "\" />\n";
 	PrintHelpLink("simple_filter_help","qm");
-	print "</div>\n";
-	print "<div class=\"width60 center\" style=\"padding: 5px;\">\n";
-	print "<input type=\"checkbox\" name=\"showthumb\" value=\"true\" ";
-	if( $search_controller->showthumb) print "checked=\"checked\" ";
-	print "onclick=\"javascript: this.form.submit();\" />".GM_LANG_show_thumbnail;
+	print "</td></tr>\n";
+	print "<tr><td class=\"NavBlockLabel\">";
+	print GM_LANG_show_thumbnail;
 	PrintHelpLink("show_thumb_help","qm");
-	print "<br /><br /><input type=\"submit\"  name=\"search\" value=\"".GM_LANG_filter."\" onclick=\"this.form.subclick.value=this.name; return true;\" />&nbsp;";
+	print "</td>\n<td class=\"NavBlockField\"><input type=\"checkbox\" name=\"showthumb\" value=\"true\" ";
+	if( $search_controller->showthumb) print "checked=\"checked\" ";
+	print "onclick=\"javascript: this.form.submit();\" />";
+	print "</td></tr>";
+	print "<tr><td class=\"NavBlockFooter\" colspan=\"2\"><input type=\"submit\"  name=\"search\" value=\"".GM_LANG_filter."\" onclick=\"this.form.subclick.value=this.name; return true;\" />&nbsp;";
 	print "<input type=\"submit\"  name=\"all\" value=\"".GM_LANG_display_all."\" onclick=\"this.form.subclick.value=this.name; return true;\" />";
-	print "</div>\n</form>\n";
+	print "</td></tr></table>\n</form>\n";
 }
 
 // Show place and hide the rest
 else if ($search_controller->type == "place") {
 	print "<form name=\"filterplace\" method=\"post\"  onsubmit=\"return checknames(this);\" action=\"find.php\">\n";
-	print "<div class=\"width60 center shade1\"><br />\n";
 	print "<input type=\"hidden\" name=\"action\" value=\"filter\" />\n";
 	print "<input type=\"hidden\" name=\"type\" value=\"place\" />\n";
 	print "<input type=\"hidden\" name=\"subclick\" />\n"; // This is for passing the name of which submit button was clicked				
-	print "<label class=\"width10\" style=\"padding: 5px;\">";
-	print GM_LANG_place_contains."</label> <input type=\"text\" name=\"query\" value=\"";
+	print "<table class=\"FindHeaderTable\">";
+	print "<tr><td class=\"NavBlockHeader\" colspan=\"2\">".$head."</td></tr>";
+
+	print "<tr><td class=\"NavBlockLabel\">";
+	print GM_LANG_place_contains."</td><td class=\"NavBlockField\"><input type=\"text\" name=\"query\" value=\"";
 	if (!is_null($search_controller->query)) print stripslashes($search_controller->query);
 	print "\" />";
-	print "<br /><br /></div>";
-	print "<div class=\"width60 center\" style=\"padding: 5px;\">";
-	print "<input type=\"submit\"  name=\"search\" value=\"".GM_LANG_filter."\" onclick=\"this.form.subclick.value=this.name\" />&nbsp;";
-	print "<input type=\"submit\"  name=\"all\" value=\"".GM_LANG_display_all."\" onclick=\"this.form.subclick.value=this.name\" />";
-	print "</div></form>";
+	print "</td></tr>";
+	print "<tr><td class=\"NavBlockFooter\" colspan=\"2\"><input type=\"submit\"  name=\"search\" value=\"".GM_LANG_filter."\" onclick=\"this.form.subclick.value=this.name\" />&nbsp;";
+	print "<input type=\"submit\" name=\"all\" value=\"".GM_LANG_display_all."\" onclick=\"this.form.subclick.value=this.name\" />";
+	print "</td></tr></table></form>";
 }
 
 // Show specialchar and hide the rest
 else if ($search_controller->type == "specialchar") {
 	print "<form name=\"filterspecialchar\" method=\"post\" action=\"find.php\">";
-	print "<div class=\"width60 center shade1\"><br />";
 	print "<input type=\"hidden\" name=\"action\" value=\"filter\" />";
 	print "<input type=\"hidden\" name=\"type\" value=\"specialchar\" />";
 	print "<input type=\"hidden\" name=\"magnify\" value=\"".$search_controller->magnify."\" />";
-	print "<label class=\"width10\" style=\"padding: 5px;\">";
-	print GM_LANG_change_lang."</label> ";
+	print "<table class=\"FindHeaderTable\">";
+	print "<tr><td class=\"NavBlockHeader\" colspan=\"2\">".$head."</td></tr>";
+
+	print "<tr><td class=\"NavBlockLabel\">";
+	print GM_LANG_change_lang."</td><td class=\"NavBlockField\">";
 	print "<select id=\"language_filter\" name=\"language_filter\" onchange=\"submit();\">";
 	foreach($specialchar_languages as $key=>$value) {
 		print "\n\t<option value=\"".$key."\"";
 		if ($key == $search_controller->language_filter) print " selected=\"selected\"";
 		print ">".$value."</option>";
 	}
-	print "</select><br /><br /><a href=\"#\" onclick=\"setMagnify()\">".($search_controller->magnify ? GM_LANG_reduce : GM_LANG_magnify)."</a><br />";
-	print "</div></form>";
+	print "</select></td></tr>";
+	print "<tr><td class=\"NavBlockLabel FindEnlargeLink\" colspan=\"2\"><a href=\"#\" onclick=\"setMagnify()\">".($search_controller->magnify ? GM_LANG_reduce : GM_LANG_magnify)."</a></td></tr>";
+	print "</table></form>";
 }
 // end column for find options
-print "<br />";
-print "<div class=\"center\">";
-print "<a href=\"#\" onclick=\"if (window.opener.showchanges) window.opener.showchanges(); window.close();\">".GM_LANG_close_window."</a><br />\n";
+print "<div class=\"CloseWindow\">";
+print "<a href=\"#\" onclick=\"if (window.opener.showchanges) window.opener.showchanges(); window.close();\">".GM_LANG_close_window."</a>\n";
 print "</div>";
 
 if ($search_controller->action == "filter") {
 	// Output Individual
 	if ($search_controller->type == "indi") {
-		print "<div id=\"indis\" class=\"center width100\">";
+		print "<div id=\"FindIndis\">";
 		if (!SearchFunctions::PrintIndiSearchResults($search_controller, true)) print GM_LANG_no_results;
 		print "</div>";
 	}
 
 	// Output Family
 	else if ($search_controller->type == "fam") {
-		print "<div id=\"fams\" class=\"center width100\">";
+		print "<div id=\"FindFams\">";
 		if (!SearchFunctions::PrintFamSearchResults($search_controller, true)) print GM_LANG_no_results;
 		print "</div>";
 	}
 
 	// Output Repositories
 	else if ($search_controller->type == "repo") {
-		print "<div id=\"repos\" class=\"center width100\">";
+		print "<div id=\"FindRepos\">";
 		if (!SearchFunctions::PrintRepoSearchResults($search_controller, true)) print GM_LANG_no_results;
 		print "</div>";
 	}
 	
 	// Output Sources
 	else if ($search_controller->type == "source") {
-		print "<div id=\"sources\" class=\"center width100\">";
+		print "<div id=\"FindSources\">";
 		if (!SearchFunctions::PrintSourceSearchResults($search_controller, true)) print GM_LANG_no_results;
 		print "</div>";
 	}
 	
 	// Output Notes
 	else if ($search_controller->type == "note") {
-		print "<div id=\"notes\" class=\"center width100\">";
+		print "<div id=\"Findnotes\">";
 		if (!SearchFunctions::PrintNoteSearchResults($search_controller, true)) print GM_LANG_no_results;
 		print "</div>";
 	}
@@ -234,9 +243,8 @@ if ($search_controller->action == "filter") {
 //		print "find dir: ".$search_controller->directory."<br />";
 		$dirs = MediaFS::GetMediaDirList($search_controller->directory, false, 1, false, false);
 		//print_r($dirs);
-		print "<br />";
-		print "<div align=\"center\">";
-		print "\n\t<table class=\"tabs_table center $TEXT_DIRECTION width100\">\n\t\t";
+		print "<div id=\"FindMediafiles\">";
+		print "\n\t<table class=\"ListTable\">\n\t\t";
 		$directory = RelativePathFile($search_controller->directory);
 		$mdir = RelativePathFile(GedcomConfig::$MEDIA_DIRECTORY);
 		
@@ -252,7 +260,7 @@ if ($search_controller->action == "filter") {
 		}
 
 		// Tell the user where he is
-		print "<tr><td class=\"list_value wrap $TEXT_DIRECTION\" colspan=\"4\">".GM_LANG_current_dir;
+		print "<tr><td class=\"ListTableHeader\" colspan=\"4\">".GM_LANG_current_dir;
 		if ($search_controller->external_links == "1") print GM_LANG_external_media;
 		else print $directory;
 		print "</td></tr>\n";
@@ -262,22 +270,22 @@ if ($search_controller->action == "filter") {
 		if (count($dirs) || $search_controller->level) {
 			sort($dirs);
 			if ($search_controller->level){
-				print "<tr><td class=\"list_value $TEXT_DIRECTION\" colspan=\"4\">";
+				print "<tr><td class=\"ListTableColumnHeader FindMediaFileDirs\" colspan=\"4\">";
 				print $uplink."</td></tr>";
 			}
-			print "<tr><td class=\"shade2 $TEXT_DIRECTION\" colspan=\"4\">";
+			print "<tr><td class=\"ListTableColumnHeader FindMediaFileDirs\" colspan=\"4\">";
 			print "<a href=\"find.php?directory=&amp;external_links=1&amp;type=file".$thumbget."&amp;level=0\">".GM_LANG_external_media."</a>";
 			print "</td></tr>\n";
 			// If we view the external links, add a link to the main directory
 			if ($search_controller->external_links == "1") {
-				print "<tr><td class=\"list_value wrap $TEXT_DIRECTION\" colspan=\"4\" width=\"45%\">";
+				print "<tr><td class=\"ListTableColumnHeader FindMediaFileDirs\" colspan=\"4\" width=\"45%\">";
 				print "<a href=\"find.php?directory=".GedcomConfig::$MEDIA_DIRECTORY."&amp;thumbdir=".GedcomConfig::$MEDIA_DIRECTORY.$thumbget."&amp;level=0&amp;type=file&amp;query=".$search_controller->query."\">".$mdir."</a>";
 				print "</td></tr>\n";
 			}
 			if ($search_controller->level < GedcomConfig::$MEDIA_DIRECTORY_LEVELS) {
 				foreach ($dirs as $indexval => $dir) {
 					if ($dir != $directory) {
-						print "<tr><td class=\"list_value wrap $TEXT_DIRECTION\" colspan=\"4\" width=\"45%\">";
+						print "<tr><td class=\"ListTableColumnHeader FindMediaFileDirs\" colspan=\"4\" width=\"45%\">";
 						print "<a href=\"find.php?directory=".$dir."&amp;thumbdir=".$dir."&amp;level=".($search_controller->level+1).$thumbget."&amp;type=file&amp;query=".$search_controller->query."\">".$dir."</a>";
 						print "</td></tr>\n";
 					}
@@ -293,6 +301,7 @@ if ($search_controller->action == "filter") {
 		// Privacy is already checked in the function
 		// An empty media object is returned for not coupled files
 		if (count($medialist) > 0) {
+			print "<tr><td class=\"ListTableHeader\" colspan=\"4\">".GM_LANG_physical_files."</td></tr>";
 			$prt = 0;
 			foreach ($medialist as $file => $mediaobjs) {
 				if ($prt%2 == 0) print "<tr>";
@@ -302,37 +311,41 @@ if ($search_controller->action == "filter") {
 			}
 		}
 		else {
-			print "<tr><td class=\"list_value_wrap\">";
+			print "<tr><td class=\"ListTableColumnFooter\" colspan=\"4\">";
 			print GM_LANG_no_results;
 			print "</td></tr>";
 		}
 		print "</table></div>";
 	}
 	else if ($search_controller->type == "media") {
-		print "\n\t<table class=\"ListTable $TEXT_DIRECTION\">\n\t\t";
+		print "<div id=\"FindMediafiles\">";
+		print "\n\t<table class=\"ListTable\">\n\t\t";
+		print "<tr><td colspan=\"2\" class=\"ListTableHeader\">".GM_LANG_search_media."</td></tr>";
 		if (count($search_controller->media_total) > 0) {
 			foreach ($search_controller->printmedia as $key => $mediakey) {
 				$media = $search_controller->smedialist[$mediakey];
-				print "\n\t\t<tr><td class=\"shade1 wrap $TEXT_DIRECTION\">";
+				print "\n\t\t<tr><td class=\"ListTableContent FindMediaImage\">";
 				MediaFS::DispImgLink($media->fileobj->f_main_file, $media->fileobj->f_thumb_file, $media->title, "", 50, 0, ($media->fileobj->f_width+50), ($media->fileobj->f_height+50), $media->fileobj->f_is_image, $media->fileobj->f_file_exists);
-				print "&nbsp;<a href=\"#\" onclick=\"pasteid('".$media->xref."');\">".PrintReady($media->title.$media->addxref)."</a>";
+				print "</td><td class=\"ListTableContent FindMediaText\"><a href=\"#\" onclick=\"pasteid('".$media->xref."');\">".PrintReady($media->title.$media->addxref)."</a>";
 				print "\n\t\t</td></tr>";
 			}
 		}
 		else {
-			print "<tr><td class=\"list_value_wrap\">";
+			print "<tr><td class=\"ListTableColumnFooter\">";
 			print GM_LANG_no_results;
 			print "</td></tr>";
 		}
-		print "</table>";
+		print "</table></div>";
 	}
 	// Output Places
 	else if ($search_controller->type == "place") {
-		print "\n\t<table class=\"tabs_table $TEXT_DIRECTION\" width=\"90%\">\n\t\t";
+		print "<div id=\"FindPlaces\">";
+		print "\n\t<table class=\"ListTable\">\n\t\t";
+		print "<tr><td class=\"ListTableHeader\">".GM_LANG_search_place."</td></tr>";
 		$placelist = ListFunctions::FindPlaceList($search_controller->query);
 		$ctplace = count($placelist);
 		if ($ctplace>0) {
-			print "\n\t\t<tr><td class=\"list_value_wrap $TEXT_DIRECTION\"><ul>";
+			print "\n\t\t<tr><td class=\"ListTableContent\"><ul>";
 			foreach($placelist as $indexval => $revplace) {
 				$levels = preg_split ("/,/", $revplace);		// -- split the place into comma seperated values
 				$levels = array_reverse($levels);				// -- reverse the array so that we get the top level first
@@ -346,50 +359,53 @@ if ($search_controller->action == "filter") {
 				print "<li><a href=\"#\" onclick=\"pasteid('".preg_replace(array("/'/",'/"/'), array("\'",'&quot;'), $placetext)."');\">".PrintReady($revplace)."</a></li>\n";
 			}
 			print "\n\t\t</ul></td></tr>";
-			print "<tr><td class=\"list_label\">".GM_LANG_total_places." ".$ctplace;
+			print "<tr><td class=\"ListTableColumnFooter\">".GM_LANG_total_places." ".$ctplace;
 			print "</td></tr>";
 		}
 		else {
-			print "<tr><td class=\"list_value_wrap $TEXT_DIRECTION\"><ul>";
+			print "<tr><td class=\"ListTableColumnFooter\">";
 			print GM_LANG_no_results;
 			print "</td></tr>";
 		}
-		print "</table>";
+		print "</table></div>";
 	}
 
 	// Output Special Characters
 	else if ($search_controller->type == "specialchar") {
-		print "\n\t<div class=\"list_value center width90 ".$TEXT_DIRECTION."\">";
+		print "\n\t<div class=\"FindChar\">";
 		//upper case special characters
 		foreach($ucspecialchars as $key=>$value) {
 			$value = str_replace("'","\'",$value);
-			print "\n\t\t\t<a href=\"#\" onclick=\"return paste_char('".$value."','".$search_controller->language_filter."','".$search_controller->magnify."');\"><span class=\"list_item\" dir=\"".$TEXT_DIRECTION."\">";
-			if ($search_controller->magnify) print "<span class=\"largechars\">";
+			print "\n\t\t\t<a href=\"#\" onclick=\"return paste_char('".$value."','".$search_controller->language_filter."','".$search_controller->magnify."');\"><span class=\"ListItem\" dir=\"".$TEXT_DIRECTION."\">";
+			if ($search_controller->magnify) print "<span class=\"FindLargeChars\">";
+			else print "<span class=\"FindSmallChars\">";
 			print $key;
-			if ($search_controller->magnify) print "</span>";
-			print "</span></a>  \n";
+			print "</span>";
+			print "</span></a>\n";
 		}
 		print "</div>";
-		print "\n\t<div class=\"list_value center width90 $TEXT_DIRECTION\" style=\"margin-top:5px;\">";
+		print "\n\t<div class=\"FindChar\">";
 		// lower case special characters
 		foreach($lcspecialchars as $key=>$value) {
 			$value = str_replace("'","\'",$value);
-			print "\n\t\t\t<a href=\"#\" onclick=\"return paste_char('".$value."','".$search_controller->language_filter."','".$search_controller->magnify."');\"><span class=\"list_item\" dir=\"".$TEXT_DIRECTION."\">";
-			if ($search_controller->magnify) print "<span class=\"largechars\">";
+			print "\n\t\t\t<a href=\"#\" onclick=\"return paste_char('".$value."','".$search_controller->language_filter."','".$search_controller->magnify."');\"><span class=\"ListItem\" dir=\"".$TEXT_DIRECTION."\">";
+			if ($search_controller->magnify) print "<span class=\"FindLargeChars\">";
+			else print "<span class=\"FindSmallChars\">";
 			print $key;
-			if ($search_controller->magnify) print "</span>";
-			print "</span></a>  \n";
+			print "</span>";
+			print "</span></a>\n";
 		}
 		print "</div>";
-		print "\n\t<div class=\"list_value center width90 $TEXT_DIRECTION\" style=\"margin-top:5px;\">";
+		print "\n\t<div class=\"FindChar\">";
 		// other special characters (not letters)
 		foreach($otherspecialchars as $key=>$value) {
 			$value = str_replace("'","\'",$value);
-			print "\n\t\t\t<a href=\"#\" onclick=\"return paste_char('".$value."','".$search_controller->language_filter."','".$search_controller->magnify."');\"><span class=\"list_item\" dir=\"".$TEXT_DIRECTION."\">";
-			if ($search_controller->magnify) print "<span class=\"largechars\">";
+			print "\n\t\t\t<a href=\"#\" onclick=\"return paste_char('".$value."','".$search_controller->language_filter."','".$search_controller->magnify."');\"><span class=\"ListItem\" dir=\"".$TEXT_DIRECTION."\">";
+			if ($search_controller->magnify) print "<span class=\"FindLargeChars\">";
+			else print "<span class=\"FindSmallChars\">";
 			print $key;
-			if ($search_controller->magnify) print "</span>";
-			print "</span></a>  \n";
+			print "</span>";
+			print "</span></a>\n";
 		}
 		print "</div>";
 	}
@@ -401,5 +417,6 @@ if ($search_controller->type != "specialchar") {?>
 //-->
 </script>
 <?php }
+print "</div>";
 PrintSimpleFooter();
 ?>

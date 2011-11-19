@@ -135,5 +135,55 @@ class RelationshipController extends ChartController {
 		}
 		return $this->pagetitle;
 	}
+	
+	public function PrintPidInput($number) {
+		
+		$pid = "pid".$number;
+		print "<td class=\"NavBlockLabel\">";
+		PrintHelpLink("relationship_id_help", "qm");
+		print constant("GM_LANG_person".$number)."</td>";
+		print "<td class=\"NavBlockField\">";
+		print "<input tabindex=\"".$number."\" class=\"PidInputField\" type=\"text\" name=\"".$pid."\" id=\"".$pid."\" size=\"3\" value=\"".$this->$pid."\" />";
+		LinkFunctions::PrintFindIndiLink($pid,"");
+	        print "</td>";
+	}
+
+	public function PrintCheckRelationship() {
+
+		print "<td class=\"NavBlockLabel\">";
+		PrintHelpLink("follow_spouse_help", "qm");
+		print GM_LANG_follow_spouse;
+		print "</td>";
+		print "<td class=\"NavBlockField\">";
+		print "<input tabindex=\"4\" type=\"checkbox\" name=\"followspouse\" value=\"1\"";
+		if ($this->followspouse) print " checked=\"checked\"";
+		print " onclick=\"document.people.path_to_find.value='-1';\" /></td>";
+	}
+	
+	public function PrintShowOldestTop() {
+		
+		print "<td class=\"NavBlockLabel\">";
+		PrintHelpLink("oldest_top_help", "qm");
+		print GM_LANG_oldest_top;
+		print "</td><td class=\"NavBlockField\">";
+		print "<input tabindex=\"5\" type=\"checkbox\" id=\"oldtop\" name=\"asc\" value=\"-1\" ";
+		if ($this->asc == -1) print " checked=\"checked\"";
+		if (!$this->pretty) print " disabled=\"disabled\"";
+		print " />";
+		print "</td>";
+	}
+	
+	public function PrintLineUpGenerations() {
+		
+		print "<td class=\"NavBlockLabel\">";
+		PrintHelpLink("line_up_generations_help", "qm");
+		print GM_LANG_line_up_generations."</td>";
+		print "<td class=\"NavBlockField\">";
+		print "<input tabindex=\"6\" type=\"checkbox\" name=\"pretty\" value=\"2\"";
+		if ($this->pretty) print " checked=\"checked\"";
+		print " onclick=\"toggleStatus('oldtop');\"";
+		print " /></td>";
+	}
+		
 }
 ?>

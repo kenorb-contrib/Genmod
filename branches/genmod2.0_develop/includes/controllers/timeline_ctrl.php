@@ -72,7 +72,12 @@ class TimelineController extends BaseController {
 			$i++;
 		}
 		if (!empty($newpid)) $this->pids[] = $newpid;
-		if (count($this->pids) == 0) $this->pids[] = ChartFunctions::CheckRootId("");
+		if (count($this->pids) == 0) {
+			$this->pids[] = ChartFunctions::CheckRootId("");
+			$person =&Person::GetInstance($this->pids[0], "", $this->gedcomid);
+			if ($person->isempty || !$person->disp) $this->pids = array();
+		}
+
 
 		//-- make sure that arrays are indexed by numbers
 		$this->pids = array_values($this->pids);
@@ -81,7 +86,7 @@ class TimelineController extends BaseController {
 		//-- cleanup user input
 		foreach($this->pids as $key=>$value) {
 			if ($value!=$remove) {
-				$value = CleanInput($value);
+				$value = strtoupper(CleanInput($value));
 				$this->pids[$key] = $value;
 				$this->people[] =& Person::GetInstance($value);
 			}
@@ -229,11 +234,11 @@ class TimelineController extends BaseController {
 			print "<table cellspacing=\"0\" cellpadding=\"0\" border=\"0\" style=\"cursor: hand;\"><tr><td style=\"vertical-align: middle;\">\n";
 			print "<img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["hline"]["other"]."\" name=\"boxline$factcount\" id=\"boxline$factcount\" height=\"3\" align=\"left\" hspace=\"0\" width=\"10\" vspace=\"0\" alt=\"\" />\n";
 			$col = $factitem["p"] % 6;
-			print "</td><td valign=\"top\" class=\"person".$col."\">\n";
+			print "</td><td valign=\"top\" class=\"TimelinePerson".$col."\">\n";
 			if (count($this->pids) > 6)	print $thisperson->name." - ";
 			print $factobj->descr;
 			print "--";
-			print "<span class=\"date\">".GetChangedDate($factobj->datestring)."</span> ";
+			print "<span class=\"Date\">".GetChangedDate($factobj->datestring)."</span> ";
 			if (GedcomConfig::$SHOW_PEDIGREE_PLACES > 0) {
 				$factobj->PrintFactPlace(false, false, false, true);
 			}
@@ -251,7 +256,7 @@ class TimelineController extends BaseController {
 					if ($p == count($this->pids)) $p = $factitem["p"];
 					$col = $p % 6;
 					$spouse =& Person::GetInstance($spouse);
-					print " <span class=\"person".$col."\"> <a href=\"individual.php?pid=".$spouse->xref."&amp;gedid=".$spouse->gedcomid."\">";
+					print " <span class=\"TimelinePerson".$col."\">".$p." <a href=\"individual.php?pid=".$spouse->xref."&amp;gedid=".$spouse->gedcomid."\">";
 					print PrintReady($spouse->name.($spouse->addname == "" ? "" : "&nbsp;(".$spouse->addname.")"));
 					$age = $spouse->GetAge($factobj->datestring);
 					print "</a> ".$age."</span>";

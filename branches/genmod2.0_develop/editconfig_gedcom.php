@@ -461,57 +461,64 @@ if (!isset($themeselect)) $themeselect="";
 //-->
 </script>
 
+<!-- Setup the left box -->
+<div id="AdminColumnLeft">
+	<?php AdminFunctions::AdminLink("admin.php", GM_LANG_admin); ?>
+	<?php AdminFunctions::AdminLink("editgedcoms.php", GM_LANG_manage_gedcoms); ?>
+</div>
+
+<!-- Setup the middle box -->
+<div id="AdminColumnMiddle">
 <form enctype="multipart/form-data" method="post" name="configform" action="editconfig_gedcom.php">
 
-<table class="FactsTable <?php print $TEXT_DIRECTION ?>">
-  <tr>
-    <td colspan="2" class="shade3 facts_label center"><?php
-    	print "<h3>".GM_LANG_gedconf_head." - ";
-		if (isset($gedid) && isset($GEDCOMS[$gedid])) print $GEDCOMS[$gedid]["title"];
-		else if ($source == "add_form") print GM_LANG_add_gedcom;
-		else if ($source == "upload_form" || $source == "reupload_form") print GM_LANG_upload_gedcom;
-		else if ($source == "add_new_form") print GM_LANG_add_new_gedcom;
-		print "</h3>";
-		print "<a href=\"editgedcoms.php\"><b>";
-		print GM_LANG_lang_back_manage_gedcoms;
-		print "</b></a><br /><br />";
-    	?>
-    </td>
-  </tr>
-</table>
-
-<input type="hidden" name="action" value="update" />
-<input type="hidden" name="source" value="<?php print $source; ?>" />
-<input type="hidden" name="oldgedid" value="<?php print $oldgedid; ?>" />
-<input type="hidden" name="old_DAYS_TO_SHOW_LIMIT" value="<?php print GedcomConfig::$DAYS_TO_SHOW_LIMIT; ?>" />
-<input type="hidden" name="NEW_LAST_CHANGE_EMAIL" value="<?php print GedcomConfig::$LAST_CHANGE_EMAIL; ?>" />
-<?php
+<table class="NavBlockTable AdminNavBlockTable">
+	<tr>
+    	<td colspan="2" class="NavBlockHeader AdminNavBlockHeader"><span class="AdminNavBlockTitle"><?php
+			print GM_LANG_gedconf_head."</span> - ";
+			if (isset($gedid) && isset($GEDCOMS[$gedid])) print $GEDCOMS[$gedid]["title"];
+			else if ($source == "add_form") print GM_LANG_add_gedcom;
+			else if ($source == "upload_form" || $source == "reupload_form") print GM_LANG_upload_gedcom;
+			else if ($source == "add_new_form") print GM_LANG_add_new_gedcom;
+			?>
+		</td>
+	</tr>
+	<input type="hidden" name="action" value="update" />
+	<input type="hidden" name="source" value="<?php print $source; ?>" />
+	<input type="hidden" name="oldgedid" value="<?php print $oldgedid; ?>" />
+	<input type="hidden" name="old_DAYS_TO_SHOW_LIMIT" value="<?php print GedcomConfig::$DAYS_TO_SHOW_LIMIT; ?>" />
+	<input type="hidden" name="NEW_LAST_CHANGE_EMAIL" value="<?php print GedcomConfig::$LAST_CHANGE_EMAIL; ?>" />
+	<?php
 	if (!empty($error_msg)) print "<br /><span class=\"Error\">".$error_msg."</span><br />\n";
 	$i = 0;
-?>
-
-<table class="FactsTable"><tr><td class="topbottombar <?php print $TEXT_DIRECTION;?>">
-<?php
-print "<a href=\"javascript: ".htmlentities(GM_LANG_gedcom_conf)."\" onclick=\"expand_layer('file-options'); return false;\"><img id=\"file-options_img\" src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["minus"]["other"]."\" border=\"0\" width=\"11\" height=\"11\" alt=\"\" /></a>";
-print "&nbsp;<a href=\"javascript: ".htmlentities(GM_LANG_gedcom_conf)."\" onclick=\"expand_layer('file-options'); return false;\">".GM_LANG_gedcom_conf."</a>";
-?></td></tr></table>
-<div id="file-options" style="display: block">
-<table class="FactsTable">
+	?>
+</table>
+<table class="NavBlockTable AdminNavBlockTable">
 	<tr>
-		<td class="shade2 wrap width20">
+		<td class="NavBlockHeader ConfigNavBlockHeader">
+			<?php
+			print "<a href=\"javascript: ".htmlentities(GM_LANG_gedcom_conf)."\" onclick=\"expand_layer('file-options'); return false;\"><img id=\"file-options_img\" src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["minus"]["other"]."\" border=\"0\" width=\"11\" height=\"11\" alt=\"\" /></a>";
+			print "&nbsp;<a href=\"javascript: ".htmlentities(GM_LANG_gedcom_conf)."\" onclick=\"expand_layer('file-options'); return false;\">".GM_LANG_gedcom_conf."</a>";
+			?>
+		</td>
+	</tr>
+</table>
+<div id="file-options" style="display: block">
+<table class="NavBlockTable AdminNavBlockTable">
+	<tr>
+		<td class="NavBlockLabel AdminNavBlockLabel">
 		<?php
 		if ($source == "upload_form" || $source == "reupload_form") {
-			print "<div class=\"helpicon\">";
-			PrintHelpLink("upload_path_help", "qm", "upload_path"); print "</div><div class=\"description\">"; print GM_LANG_upload_path;
-			print "</div></td><td class=\"shade1\">";
+			print "<div class=\"HelpIconContainer\">";
+			PrintHelpLink("upload_path_help", "qm", "upload_path"); print "</div><div class=\"AdminNavBlockOptionText\">"; print GM_LANG_upload_path;
+			print "</div></td><td class=\"NavBlockField AdminNavBlockField\">";
 			print "<input name=\"GEDCOMPATH\" type=\"file\" size=\"60\" />";
 			if (!$filesize = ini_get('upload_max_filesize')) $filesize = "2M";
 			print " ( ".GM_LANG_max_upload_size." $filesize )";
 		}
 		else {
-			print "<div class=\"helpicon\">";
-			PrintHelpLink("gedcom_path_help", "qm", "gedcom_path"); print "</div><div class=\"description\">"; print GM_LANG_gedcom_path;
-			print "</div></td><td class=\"shade1\">";
+			print "<div class=\"HelpIconContainer\">";
+			PrintHelpLink("gedcom_path_help", "qm", "gedcom_path"); print "</div><div class=\"AdminNavBlockOptionText\">"; print GM_LANG_gedcom_path;
+			print "</div></td><td class=\"NavBlockField AdminNavBlockField\">";
 				?>
 			<input type="text" name="GEDCOMPATH" value="<?php print preg_replace('/\\*/', '\\', $GEDCOMPATH);?>" size="40" dir ="ltr" tabindex="<?php $i++; print $i?>" <?php if (empty($source)) print " disabled=\"disabled\"";?>/>
 			<?php
@@ -528,13 +535,13 @@ print "&nbsp;<a href=\"javascript: ".htmlentities(GM_LANG_gedcom_conf)."\" oncli
 		</td>
 	</tr>
 	<tr>
-		<td class="shade2 wrap"><div class="helpicon"><?php PrintHelpLink("gedcom_title_help", "qm", "gedcom_title", true); print "</div><div class=\"description\">";print PrintText("gedcom_title",0,0,false);?></div></td>
-		<td class="shade1"><input type="text" name="gedcom_title" dir="ltr" value="<?php print preg_replace("/\"/", "&quot;", PrintReady($gedcom_title)); ?>" size="40" tabindex="<?php $i++; print $i?>" /></td>
+		<td class="NavBlockLabel AdminNavBlockLabel"><div class="HelpIconContainer"><?php PrintHelpLink("gedcom_title_help", "qm", "gedcom_title", true); print "</div><div class=\"AdminNavBlockOptionText\">";print PrintText("gedcom_title",0,0,false);?></div></td>
+		<td class="NavBlockField AdminNavBlockField"><input type="text" name="gedcom_title" dir="ltr" value="<?php print preg_replace("/\"/", "&quot;", PrintReady($gedcom_title)); ?>" size="40" tabindex="<?php $i++; print $i?>" /></td>
 	</tr>
 	<tr>
-		<td class="shade2 wrap">
-		<div class="helpicon"><?php PrintHelpLink("LANGUAGE_help", "qm", "LANGUAGE"); print "</div><div class=\"description\">";print GM_LANG_LANGUAGE;?></div></td>
-		<td class="shade1"><input type="hidden" name="changelanguage" value="yes" />
+		<td class="NavBlockLabel AdminNavBlockLabel">
+		<div class="HelpIconContainer"><?php PrintHelpLink("LANGUAGE_help", "qm", "LANGUAGE"); print "</div><div class=\"AdminNavBlockOptionText\">";print GM_LANG_LANGUAGE;?></div></td>
+		<td class="NavBlockField AdminNavBlockField"><input type="hidden" name="changelanguage" value="yes" />
 		<select name="NEW_GEDCOMLANG" dir="ltr" tabindex="<?php $i++; print $i?>" >
 		<?php
 			foreach ($gm_language as $key=>$value) {
@@ -549,22 +556,22 @@ print "&nbsp;<a href=\"javascript: ".htmlentities(GM_LANG_gedcom_conf)."\" oncli
 		</td>
 	</tr>
 	<tr>
-		<td class="shade2 wrap width20">
-		<div class="helpicon"><?php PrintHelpLink("DISPLAY_PINYIN_help", "qm", "DISPLAY_PINYIN"); print "</div><div class=\"description\">"; print GM_LANG_DISPLAY_PINYIN;?></div></td>
-		<td class="shade1"><select name="NEW_DISPLAY_PINYIN" tabindex="<?php $i++; print $i?>">
+		<td class="NavBlockLabel AdminNavBlockLabel">
+		<div class="HelpIconContainer"><?php PrintHelpLink("DISPLAY_PINYIN_help", "qm", "DISPLAY_PINYIN"); print "</div><div class=\"AdminNavBlockOptionText\">"; print GM_LANG_DISPLAY_PINYIN;?></div></td>
+		<td class="NavBlockField AdminNavBlockField"><select name="NEW_DISPLAY_PINYIN" tabindex="<?php $i++; print $i?>">
 				<option value="yes" <?php if (GedcomConfig::$DISPLAY_PINYIN) print "selected=\"selected\""; ?>><?php print GM_LANG_yes;?></option>
 				<option value="no" <?php if (!GedcomConfig::$DISPLAY_PINYIN) print "selected=\"selected\""; ?>><?php print GM_LANG_no;?></option>
 			</select>
 		</td>
 	</tr>
 	<tr>
-		<td class="shade2 wrap width20">
-		<div class="helpicon"><?php PrintHelpLink("CHARACTER_SET_help", "qm", "CHARACTER_SET"); print "</div><div class=\"description\">"; print GM_LANG_CHARACTER_SET;?></div></td>
-		<td class="shade1"><input type="text" name="NEW_CHARACTER_SET" dir="ltr" value="<?php print GedcomConfig::$CHARACTER_SET;?>" tabindex="<?php $i++; print $i?>" /></td>
+		<td class="NavBlockLabel AdminNavBlockLabel">
+		<div class="HelpIconContainer"><?php PrintHelpLink("CHARACTER_SET_help", "qm", "CHARACTER_SET"); print "</div><div class=\"AdminNavBlockOptionText\">"; print GM_LANG_CHARACTER_SET;?></div></td>
+		<td class="NavBlockField AdminNavBlockField"><input type="text" name="NEW_CHARACTER_SET" dir="ltr" value="<?php print GedcomConfig::$CHARACTER_SET;?>" tabindex="<?php $i++; print $i?>" /></td>
 	</tr>
 	<tr>
-		<td class="shade2 wrap">
-		<div class="helpicon"><?php PrintHelpLink("PEDIGREE_ROOT_ID_help", "qm", "PEDIGREE_ROOT_ID"); print "</div><div class=\"description\">"; print GM_LANG_PEDIGREE_ROOT_ID;?></div></td>
+		<td class="NavBlockLabel AdminNavBlockLabel">
+		<div class="HelpIconContainer"><?php PrintHelpLink("PEDIGREE_ROOT_ID_help", "qm", "PEDIGREE_ROOT_ID"); print "</div><div class=\"AdminNavBlockOptionText\">"; print GM_LANG_PEDIGREE_ROOT_ID;?></div></td>
 
 		<?php
 		$indirec = "";
@@ -613,12 +620,12 @@ print "&nbsp;<a href=\"javascript: ".htmlentities(GM_LANG_gedcom_conf)."\" oncli
 		}
 		$person = Person::GetInstance(GedcomConfig::$PEDIGREE_ROOT_ID, $indirec, get_id_from_gedcom($GEDFILENAME));
 	?>
-	<td class="shade1"><input type="text" name="NEW_PEDIGREE_ROOT_ID" id="NEW_PEDIGREE_ROOT_ID" value="<?php print GedcomConfig::$PEDIGREE_ROOT_ID?>" size="5" tabindex="<?php $i++; print $i?>" />
+	<td class="NavBlockField AdminNavBlockField"><input type="text" name="NEW_PEDIGREE_ROOT_ID" id="NEW_PEDIGREE_ROOT_ID" value="<?php print GedcomConfig::$PEDIGREE_ROOT_ID?>" size="5" tabindex="<?php $i++; print $i?>" />
 			<?php
 			if ($source == "") {
 				if (!$person->isempty) {
 					if ($source == "") {
-						print "\n<span class=\"list_item\">".$person->name;
+						print "\n<span class=\"ListItem\">".$person->name;
 						PersonFunctions::PrintFirstMajorFact($person);
 						print "</span>\n";
 					}
@@ -634,9 +641,9 @@ print "&nbsp;<a href=\"javascript: ".htmlentities(GM_LANG_gedcom_conf)."\" oncli
 		</td>
 	</tr>
 	<tr>
-		<td class="shade2 wrap">
-		<div class="helpicon"><?php PrintHelpLink("CALENDAR_FORMAT_help", "qm", "CALENDAR_FORMAT"); print "</div><div class=\"description\">"; print GM_LANG_CALENDAR_FORMAT;?></div></td>
-		<td class="shade1"><select name="NEW_CALENDAR_FORMAT" tabindex="<?php $i++; print $i?>"  onchange="show_jewish(this, 'hebrew-cal');">
+		<td class="NavBlockLabel AdminNavBlockLabel">
+		<div class="HelpIconContainer"><?php PrintHelpLink("CALENDAR_FORMAT_help", "qm", "CALENDAR_FORMAT"); print "</div><div class=\"AdminNavBlockOptionText\">"; print GM_LANG_CALENDAR_FORMAT;?></div></td>
+		<td class="NavBlockField AdminNavBlockField"><select name="NEW_CALENDAR_FORMAT" tabindex="<?php $i++; print $i?>"  onchange="show_jewish(this, 'hebrew-cal1'); show_jewish(this, 'hebrew-cal2'); show_jewish(this, 'hebrew-cal3');">
 				<option value="gregorian" <?php if (GedcomConfig::$CALENDAR_FORMAT=='gregorian') print "selected=\"selected\""; ?>><?php print GM_LANG_gregorian;?></option>
 				<option value="julian" <?php if (GedcomConfig::$CALENDAR_FORMAT=='julian') print "selected=\"selected\""; ?>><?php print GM_LANG_julian;?></option>
 				<option value="french" <?php if (GedcomConfig::$CALENDAR_FORMAT=='french') print "selected=\"selected\""; ?>><?php print GM_LANG_config_french;?></option>
@@ -649,101 +656,95 @@ print "&nbsp;<a href=\"javascript: ".htmlentities(GM_LANG_gedcom_conf)."\" oncli
 			</select>
 		</td>
 	</tr>
-	</table>
-	<div id="hebrew-cal" style="display: <?php if ((GedcomConfig::$CALENDAR_FORMAT=='jewish')||(GedcomConfig::$CALENDAR_FORMAT=='jewish_and_gregorian')||(GedcomConfig::$CALENDAR_FORMAT=='hebrew')||(GedcomConfig::$CALENDAR_FORMAT=='hebrew_and_gregorian')) print 'block'; else print 'none';?>;">
-	<table class="FactsTable">
-	<tr>
-		<td class="shade2 wrap width20">
-		<div class="helpicon"><?php PrintHelpLink("DISPLAY_JEWISH_THOUSANDS_help", "qm", "DISPLAY_JEWISH_THOUSANDS"); print "</div><div class=\"description\">"; print GM_LANG_DISPLAY_JEWISH_THOUSANDS;?></div></td>
-		<td class="shade1"><select name="NEW_DISPLAY_JEWISH_THOUSANDS">
+	<tr id="hebrew-cal1" style="display: <?php if ((GedcomConfig::$CALENDAR_FORMAT=='jewish')||(GedcomConfig::$CALENDAR_FORMAT=='jewish_and_gregorian')||(GedcomConfig::$CALENDAR_FORMAT=='hebrew')||(GedcomConfig::$CALENDAR_FORMAT=='hebrew_and_gregorian')) print 'block'; else print 'none';?>;">
+		<td class="NavBlockLabel AdminNavBlockLabel">
+		<div class="HelpIconContainer"><?php PrintHelpLink("DISPLAY_JEWISH_THOUSANDS_help", "qm", "DISPLAY_JEWISH_THOUSANDS"); print "</div><div class=\"AdminNavBlockOptionText\">"; print GM_LANG_DISPLAY_JEWISH_THOUSANDS;?></div></td>
+		<td class="NavBlockField AdminNavBlockField"><select name="NEW_DISPLAY_JEWISH_THOUSANDS">
 				<option value="yes" <?php if (GedcomConfig::$DISPLAY_JEWISH_THOUSANDS) print "selected=\"selected\""; ?>><?php print GM_LANG_yes;?></option>
 				<option value="no" <?php if (!GedcomConfig::$DISPLAY_JEWISH_THOUSANDS) print "selected=\"selected\""; ?>><?php print GM_LANG_no;?></option>
 			</select>
 		</td>
 	</tr>
-	<tr>
-		<td class="shade2 wrap">
-		<div class="helpicon"><?php PrintHelpLink("DISPLAY_JEWISH_GERESHAYIM_help", "qm", "DISPLAY_JEWISH_GERESHAYIM"); print "</div><div class=\"description\">"; print GM_LANG_DISPLAY_JEWISH_GERESHAYIM;?></div></td>
-		<td class="shade1"><select name="NEW_DISPLAY_JEWISH_GERESHAYIM">
+	<tr id="hebrew-cal2" style="display: <?php if ((GedcomConfig::$CALENDAR_FORMAT=='jewish')||(GedcomConfig::$CALENDAR_FORMAT=='jewish_and_gregorian')||(GedcomConfig::$CALENDAR_FORMAT=='hebrew')||(GedcomConfig::$CALENDAR_FORMAT=='hebrew_and_gregorian')) print 'block'; else print 'none';?>;">
+		<td class="NavBlockLabel AdminNavBlockLabel">
+		<div class="HelpIconContainer"><?php PrintHelpLink("DISPLAY_JEWISH_GERESHAYIM_help", "qm", "DISPLAY_JEWISH_GERESHAYIM"); print "</div><div class=\"AdminNavBlockOptionText\">"; print GM_LANG_DISPLAY_JEWISH_GERESHAYIM;?></div></td>
+		<td class="NavBlockField AdminNavBlockField"><select name="NEW_DISPLAY_JEWISH_GERESHAYIM">
 				<option value="yes" <?php if (GedcomConfig::$DISPLAY_JEWISH_GERESHAYIM) print "selected=\"selected\""; ?>><?php print GM_LANG_yes;?></option>
 				<option value="no" <?php if (!GedcomConfig::$DISPLAY_JEWISH_GERESHAYIM) print "selected=\"selected\""; ?>><?php print GM_LANG_no;?></option>
 			</select>
 		</td>
 	</tr>
-	<tr>
-		<td class="shade2 wrap">
-		<div class="helpicon"><?php PrintHelpLink("JEWISH_ASHKENAZ_PRONUNCIATION_help", "qm", "JEWISH_ASHKENAZ_PRONUNCIATION"); print "</div><div class=\"description\">"; print GM_LANG_JEWISH_ASHKENAZ_PRONUNCIATION;?></div></td>
-		<td class="shade1"><select name="NEW_JEWISH_ASHKENAZ_PRONUNCIATION">
+	<tr id="hebrew-cal3" style="display: <?php if ((GedcomConfig::$CALENDAR_FORMAT=='jewish')||(GedcomConfig::$CALENDAR_FORMAT=='jewish_and_gregorian')||(GedcomConfig::$CALENDAR_FORMAT=='hebrew')||(GedcomConfig::$CALENDAR_FORMAT=='hebrew_and_gregorian')) print 'block'; else print 'none';?>;">
+		<td class="NavBlockLabel AdminNavBlockLabel">
+		<div class="HelpIconContainer"><?php PrintHelpLink("JEWISH_ASHKENAZ_PRONUNCIATION_help", "qm", "JEWISH_ASHKENAZ_PRONUNCIATION"); print "</div><div class=\"AdminNavBlockOptionText\">"; print GM_LANG_JEWISH_ASHKENAZ_PRONUNCIATION;?></div></td>
+		<td class="NavBlockField AdminNavBlockField"><select name="NEW_JEWISH_ASHKENAZ_PRONUNCIATION">
 				<option value="yes" <?php if (GedcomConfig::$JEWISH_ASHKENAZ_PRONUNCIATION) print "selected=\"selected\""; ?>><?php print GM_LANG_yes;?></option>
 				<option value="no" <?php if (!GedcomConfig::$JEWISH_ASHKENAZ_PRONUNCIATION) print "selected=\"selected\""; ?>><?php print GM_LANG_no;?></option>
 			</select>
 		</td>
 	</tr>
-	</table>
-	</div>
-	<table class="FactsTable">
 	<tr>
-		<td class="shade2 wrap width20">
-		<div class="helpicon"><?php PrintHelpLink("USE_RTL_FUNCTIONS_help", "qm", "USE_RTL_FUNCTIONS"); print "</div><div class=\"description\">"; print GM_LANG_USE_RTL_FUNCTIONS;?></div></td>
-		<td class="shade1"><select name="NEW_USE_RTL_FUNCTIONS" tabindex="<?php $i++; print $i?>">
+		<td class="NavBlockLabel AdminNavBlockLabel">
+		<div class="HelpIconContainer"><?php PrintHelpLink("USE_RTL_FUNCTIONS_help", "qm", "USE_RTL_FUNCTIONS"); print "</div><div class=\"AdminNavBlockOptionText\">"; print GM_LANG_USE_RTL_FUNCTIONS;?></div></td>
+		<td class="NavBlockField AdminNavBlockField"><select name="NEW_USE_RTL_FUNCTIONS" tabindex="<?php $i++; print $i?>">
 				<option value="yes" <?php if (GedcomConfig::$USE_RTL_FUNCTIONS) print "selected=\"selected\""; ?>><?php print GM_LANG_yes;?></option>
 				<option value="no" <?php if (!GedcomConfig::$USE_RTL_FUNCTIONS) print "selected=\"selected\""; ?>><?php print GM_LANG_no;?></option>
 			</select>
 		</td>
 	</tr>
 	<tr>
-		<td class="shade2 wrap">
-		<div class="helpicon"><?php PrintHelpLink("USE_RIN_help", "qm", "USE_RIN"); print "</div><div class=\"description\">"; print GM_LANG_USE_RIN;?></div></td>
-		<td class="shade1"><select name="NEW_USE_RIN" tabindex="<?php $i++; print $i?>">
+		<td class="NavBlockLabel AdminNavBlockLabel">
+		<div class="HelpIconContainer"><?php PrintHelpLink("USE_RIN_help", "qm", "USE_RIN"); print "</div><div class=\"AdminNavBlockOptionText\">"; print GM_LANG_USE_RIN;?></div></td>
+		<td class="NavBlockField AdminNavBlockField"><select name="NEW_USE_RIN" tabindex="<?php $i++; print $i?>">
 				<option value="yes" <?php if (GedcomConfig::$USE_RIN) print "selected=\"selected\""; ?>><?php print GM_LANG_yes;?></option>
 				<option value="no" <?php if (!GedcomConfig::$USE_RIN) print "selected=\"selected\""; ?>><?php print GM_LANG_no;?></option>
 			</select>
 		</td>
 	</tr>
 	<tr>
-		<td class="shade2 wrap">
-		<div class="helpicon"><?php PrintHelpLink("GEDCOM_ID_PREFIX_help", "qm", "GEDCOM_ID_PREFIX"); print "</div><div class=\"description\">"; print GM_LANG_GEDCOM_ID_PREFIX;?></div></td>
-		<td class="shade1"><input type="text" name="NEW_GEDCOM_ID_PREFIX" dir="ltr" value="<?php print GedcomConfig::$GEDCOM_ID_PREFIX?>" size="5" tabindex="<?php $i++; print $i?>" />
+		<td class="NavBlockLabel AdminNavBlockLabel">
+		<div class="HelpIconContainer"><?php PrintHelpLink("GEDCOM_ID_PREFIX_help", "qm", "GEDCOM_ID_PREFIX"); print "</div><div class=\"AdminNavBlockOptionText\">"; print GM_LANG_GEDCOM_ID_PREFIX;?></div></td>
+		<td class="NavBlockField AdminNavBlockField"><input type="text" name="NEW_GEDCOM_ID_PREFIX" dir="ltr" value="<?php print GedcomConfig::$GEDCOM_ID_PREFIX?>" size="5" tabindex="<?php $i++; print $i?>" />
 		</td>
 	</tr>
 	<tr>
-		<td class="shade2 wrap">
-		<div class="helpicon"><?php PrintHelpLink("FAM_ID_PREFIX_help", "qm", "FAM_ID_PREFIX"); print "</div><div class=\"description\">"; print GM_LANG_FAM_ID_PREFIX;?></div></td>
-		<td class="shade1"><input type="text" name="NEW_FAM_ID_PREFIX" dir="ltr" value="<?php print GedcomConfig::$FAM_ID_PREFIX?>" size="5" tabindex="<?php $i++; print $i?>" />
+		<td class="NavBlockLabel AdminNavBlockLabel">
+		<div class="HelpIconContainer"><?php PrintHelpLink("FAM_ID_PREFIX_help", "qm", "FAM_ID_PREFIX"); print "</div><div class=\"AdminNavBlockOptionText\">"; print GM_LANG_FAM_ID_PREFIX;?></div></td>
+		<td class="NavBlockField AdminNavBlockField"><input type="text" name="NEW_FAM_ID_PREFIX" dir="ltr" value="<?php print GedcomConfig::$FAM_ID_PREFIX?>" size="5" tabindex="<?php $i++; print $i?>" />
 		</td>
 	</tr>
 	<tr>
-		<td class="shade2 wrap"><div class="helpicon"><?php PrintHelpLink("SOURCE_ID_PREFIX_help", "qm", "SOURCE_ID_PREFIX"); print "</div><div class=\"description\">"; print GM_LANG_SOURCE_ID_PREFIX;?></div></td>
-		<td class="shade1"><input type="text" name="NEW_SOURCE_ID_PREFIX" dir="ltr" value="<?php print GedcomConfig::$SOURCE_ID_PREFIX?>" size="5" tabindex="<?php $i++; print $i?>" />
+		<td class="NavBlockLabel AdminNavBlockLabel"><div class="HelpIconContainer"><?php PrintHelpLink("SOURCE_ID_PREFIX_help", "qm", "SOURCE_ID_PREFIX"); print "</div><div class=\"AdminNavBlockOptionText\">"; print GM_LANG_SOURCE_ID_PREFIX;?></div></td>
+		<td class="NavBlockField AdminNavBlockField"><input type="text" name="NEW_SOURCE_ID_PREFIX" dir="ltr" value="<?php print GedcomConfig::$SOURCE_ID_PREFIX?>" size="5" tabindex="<?php $i++; print $i?>" />
 		</td>
 	</tr>
 	<tr>
-		<td class="shade2 wrap"><div class="helpicon"><?php PrintHelpLink("REPO_ID_PREFIX_help", "qm", "REPO_ID_PREFIX"); print "</div><div class=\"description\">"; print GM_LANG_REPO_ID_PREFIX;?></div></td>
-		<td class="shade1"><input type="text" name="NEW_REPO_ID_PREFIX" dir="ltr" value="<?php print GedcomConfig::$REPO_ID_PREFIX?>" size="5" tabindex="<?php $i++; print $i?>" />
+		<td class="NavBlockLabel AdminNavBlockLabel"><div class="HelpIconContainer"><?php PrintHelpLink("REPO_ID_PREFIX_help", "qm", "REPO_ID_PREFIX"); print "</div><div class=\"AdminNavBlockOptionText\">"; print GM_LANG_REPO_ID_PREFIX;?></div></td>
+		<td class="NavBlockField AdminNavBlockField"><input type="text" name="NEW_REPO_ID_PREFIX" dir="ltr" value="<?php print GedcomConfig::$REPO_ID_PREFIX?>" size="5" tabindex="<?php $i++; print $i?>" />
 		</td>
 	</tr>
 	<tr>
-		<td class="shade2 wrap"><div class="helpicon"><?php PrintHelpLink("MEDIA_ID_PREFIX_help", "qm", "MEDIA_ID_PREFIX"); print "</div><div class=\"description\">";print GM_LANG_MEDIA_ID_PREFIX;?></div></td>
-		<td class="shade1"><input type="text" name="NEW_MEDIA_ID_PREFIX" dir="ltr" value="<?php print GedcomConfig::$MEDIA_ID_PREFIX?>" size="5" tabindex="<?php $i++; print $i?>" />
+		<td class="NavBlockLabel AdminNavBlockLabel"><div class="HelpIconContainer"><?php PrintHelpLink("MEDIA_ID_PREFIX_help", "qm", "MEDIA_ID_PREFIX"); print "</div><div class=\"AdminNavBlockOptionText\">";print GM_LANG_MEDIA_ID_PREFIX;?></div></td>
+		<td class="NavBlockField AdminNavBlockField"><input type="text" name="NEW_MEDIA_ID_PREFIX" dir="ltr" value="<?php print GedcomConfig::$MEDIA_ID_PREFIX?>" size="5" tabindex="<?php $i++; print $i?>" />
 		</td>
 	</tr>
 	<tr>
-		<td class="shade2 wrap"><div class="helpicon"><?php PrintHelpLink("NOTE_ID_PREFIX_help", "qm", "NOTE_ID_PREFIX"); print "</div><div class=\"description\">";print GM_LANG_NOTE_ID_PREFIX;?></div></td>
-		<td class="shade1"><input type="text" name="NEW_NOTE_ID_PREFIX" dir="ltr" value="<?php print GedcomConfig::$NOTE_ID_PREFIX?>" size="5" tabindex="<?php $i++; print $i?>" />
+		<td class="NavBlockLabel AdminNavBlockLabel"><div class="HelpIconContainer"><?php PrintHelpLink("NOTE_ID_PREFIX_help", "qm", "NOTE_ID_PREFIX"); print "</div><div class=\"AdminNavBlockOptionText\">";print GM_LANG_NOTE_ID_PREFIX;?></div></td>
+		<td class="NavBlockField AdminNavBlockField"><input type="text" name="NEW_NOTE_ID_PREFIX" dir="ltr" value="<?php print GedcomConfig::$NOTE_ID_PREFIX?>" size="5" tabindex="<?php $i++; print $i?>" />
 		</td>
 	</tr>
 	<tr>
-		<td class="shade2 wrap width20">
-		<div class="helpicon"><?php PrintHelpLink("KEEP_ACTIONS_help", "qm", "KEEP_ACTIONS"); print "</div><div class=\"description\">"; print GM_LANG_KEEP_ACTIONS;?></div></td>
-		<td class="shade1"><select name="NEW_KEEP_ACTIONS" tabindex="<?php $i++; print $i?>">
+		<td class="NavBlockLabel AdminNavBlockLabel">
+		<div class="HelpIconContainer"><?php PrintHelpLink("KEEP_ACTIONS_help", "qm", "KEEP_ACTIONS"); print "</div><div class=\"AdminNavBlockOptionText\">"; print GM_LANG_KEEP_ACTIONS;?></div></td>
+		<td class="NavBlockField AdminNavBlockField"><select name="NEW_KEEP_ACTIONS" tabindex="<?php $i++; print $i?>">
 				<option value="yes" <?php if (GedcomConfig::$KEEP_ACTIONS) print "selected=\"selected\""; ?>><?php print GM_LANG_yes;?></option>
 				<option value="no" <?php if (!GedcomConfig::$KEEP_ACTIONS) print "selected=\"selected\""; ?>><?php print GM_LANG_no;?></option>
 			</select>
 		</td>
 	</tr>
 	<tr>
-		<td class="shade2 wrap"><div class="helpicon"><?php PrintHelpLink("time_limit_help", "qm", "PHP_TIME_LIMIT"); print "</div><div class=\"description\">"; print GM_LANG_PHP_TIME_LIMIT;?></div></td>
-		<td class="shade1"><input type="text" name="NEW_TIME_LIMIT" value="<?php print GedcomConfig::$TIME_LIMIT?>" size="5" tabindex="<?php $i++; print $i?>"/><br />
+		<td class="NavBlockLabel AdminNavBlockLabel"><div class="HelpIconContainer"><?php PrintHelpLink("time_limit_help", "qm", "PHP_TIME_LIMIT"); print "</div><div class=\"AdminNavBlockOptionText\">"; print GM_LANG_PHP_TIME_LIMIT;?></div></td>
+		<td class="NavBlockField AdminNavBlockField"><input type="text" name="NEW_TIME_LIMIT" value="<?php print GedcomConfig::$TIME_LIMIT?>" size="5" tabindex="<?php $i++; print $i?>"/><br />
 		<?php if (SystemConfig::$max_execution_time == 0) print GM_LANG_maxtime_not_set;
 		else print GM_LANG_maxtime_is."&nbsp;".SystemConfig::$max_execution_time;
 		print "<br />".GM_LANG_maxtime_measure;
@@ -752,64 +753,69 @@ print "&nbsp;<a href=\"javascript: ".htmlentities(GM_LANG_gedcom_conf)."\" oncli
 </table>
 </div>
 
-<table class="FactsTable"><tr><td class="topbottombar <?php print $TEXT_DIRECTION;?>">
-<?php
-print "<a href=\"javascript: ".htmlentities(GM_LANG_media_conf)."\" onclick=\"expand_layer('config-media');return false;\"><img id=\"config-media_img\" src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["plus"]["other"]."\" border=\"0\" width=\"11\" height=\"11\" alt=\"\" /></a>";
-print "&nbsp;<a href=\"javascript: ".htmlentities(GM_LANG_media_conf)."\" onclick=\"expand_layer('config-media');return false;\">".GM_LANG_media_conf."</a>";
-?></td></tr></table>
-<div id="config-media" style="display: none">
-<table class="FactsTable">
+<table class="NavBlockTable AdminNavBlockTable">
 	<tr>
-		<td class="shade2 wrap width20"><div class="helpicon"><?php PrintHelpLink("MEDIA_EXTERNAL_help", "qm", "MEDIA_EXTERNAL"); print "</div><div class=\"description\">"; print GM_LANG_MEDIA_EXTERNAL;?></div></td>
-		<td class="shade1"><select name="NEW_MEDIA_EXTERNAL" tabindex="<?php $i++; print $i?>">
+		<td class="NavBlockHeader ConfigNavBlockHeader">
+			<?php
+			print "<a href=\"javascript: ".htmlentities(GM_LANG_media_conf)."\" onclick=\"expand_layer('config-media');return false;\"><img id=\"config-media_img\" src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["plus"]["other"]."\" border=\"0\" width=\"11\" height=\"11\" alt=\"\" /></a>";
+			print "&nbsp;<a href=\"javascript: ".htmlentities(GM_LANG_media_conf)."\" onclick=\"expand_layer('config-media');return false;\">".GM_LANG_media_conf."</a>";
+			?>
+		</td>
+	</tr>
+</table>
+<div id="config-media" style="display: none">
+<table class="NavBlockTable AdminNavBlockTable">
+	<tr>
+		<td class="NavBlockLabel AdminNavBlockLabel"><div class="HelpIconContainer"><?php PrintHelpLink("MEDIA_EXTERNAL_help", "qm", "MEDIA_EXTERNAL"); print "</div><div class=\"AdminNavBlockOptionText\">"; print GM_LANG_MEDIA_EXTERNAL;?></div></td>
+		<td class="NavBlockField AdminNavBlockField"><select name="NEW_MEDIA_EXTERNAL" tabindex="<?php $i++; print $i?>">
 				<option value="yes" <?php if (GedcomConfig::$MEDIA_EXTERNAL) print "selected=\"selected\""; ?>><?php print GM_LANG_yes;?></option>
 				<option value="no" <?php if (!GedcomConfig::$MEDIA_EXTERNAL) print "selected=\"selected\""; ?>><?php print GM_LANG_no;?></option>
 			</select>
 		</td>
 	</tr>
 	<tr>
-		<td class="shade2 wrap"><div class="helpicon"><?php PrintHelpLink("MEDIA_DIRECTORY_help", "qm", "MEDIA_DIRECTORY"); print "</div><div class=\"description\">"; print GM_LANG_MEDIA_DIRECTORY;?></div></td>
-		<td class="shade1"><input type="text" size="50" name="NEW_MEDIA_DIRECTORY" value="<?php print GedcomConfig::$MEDIA_DIRECTORY?>" dir="ltr" tabindex="<?php $i++; print $i?>" />
+		<td class="NavBlockLabel AdminNavBlockLabel"><div class="HelpIconContainer"><?php PrintHelpLink("MEDIA_DIRECTORY_help", "qm", "MEDIA_DIRECTORY"); print "</div><div class=\"AdminNavBlockOptionText\">"; print GM_LANG_MEDIA_DIRECTORY;?></div></td>
+		<td class="NavBlockField AdminNavBlockField"><input type="text" size="50" name="NEW_MEDIA_DIRECTORY" value="<?php print GedcomConfig::$MEDIA_DIRECTORY?>" dir="ltr" tabindex="<?php $i++; print $i?>" />
 		<?php
 		if(preg_match("/.*[a-zA-Z]{1}:.*/",GedcomConfig::$MEDIA_DIRECTORY)>0) print "<span class=\"Error\">".GM_LANG_media_drive_letter."</span>\n";
 		?>
 		</td>
 	</tr>
 	<tr>
-		<td class="shade2 wrap"><div class="helpicon"><?php PrintHelpLink("MEDIA_DIRECTORY_LEVELS_help", "qm", "MEDIA_DIRECTORY_LEVELS"); print "</div><div class=\"description\">"; print GM_LANG_MEDIA_DIRECTORY_LEVELS;?></div></td>
-		<td class="shade1"><input type="text" name="NEW_MEDIA_DIRECTORY_LEVELS" value="<?php print GedcomConfig::$MEDIA_DIRECTORY_LEVELS?>" size="5" tabindex="<?php $i++; print $i?>" /></td>
+		<td class="NavBlockLabel AdminNavBlockLabel"><div class="HelpIconContainer"><?php PrintHelpLink("MEDIA_DIRECTORY_LEVELS_help", "qm", "MEDIA_DIRECTORY_LEVELS"); print "</div><div class=\"AdminNavBlockOptionText\">"; print GM_LANG_MEDIA_DIRECTORY_LEVELS;?></div></td>
+		<td class="NavBlockField AdminNavBlockField"><input type="text" name="NEW_MEDIA_DIRECTORY_LEVELS" value="<?php print GedcomConfig::$MEDIA_DIRECTORY_LEVELS?>" size="5" tabindex="<?php $i++; print $i?>" /></td>
 	</tr>
 	<tr>
-		<td class="shade2 wrap"><div class="helpicon"><?php PrintHelpLink("THUMBNAIL_WIDTH_help", "qm", "THUMBNAIL_WIDTH"); print "</div><div class=\"description\">"; print GM_LANG_THUMBNAIL_WIDTH;?></div></td>
-		<td class="shade1"><input type="text" name="NEW_THUMBNAIL_WIDTH" value="<?php print GedcomConfig::$THUMBNAIL_WIDTH?>" size="5" tabindex="<?php $i++; print $i?>" /></td>
+		<td class="NavBlockLabel AdminNavBlockLabel"><div class="HelpIconContainer"><?php PrintHelpLink("THUMBNAIL_WIDTH_help", "qm", "THUMBNAIL_WIDTH"); print "</div><div class=\"AdminNavBlockOptionText\">"; print GM_LANG_THUMBNAIL_WIDTH;?></div></td>
+		<td class="NavBlockField AdminNavBlockField"><input type="text" name="NEW_THUMBNAIL_WIDTH" value="<?php print GedcomConfig::$THUMBNAIL_WIDTH?>" size="5" tabindex="<?php $i++; print $i?>" /></td>
 	</tr>
 	<tr>
-		<td class="shade2 wrap"><div class="helpicon"><?php PrintHelpLink("AUTO_GENERATE_THUMBS_help", "qm", "AUTO_GENERATE_THUMBS"); print "</div><div class=\"description\">"; print GM_LANG_AUTO_GENERATE_THUMBS;?></div></td>
-		<td class="shade1"><select name="NEW_AUTO_GENERATE_THUMBS" tabindex="<?php $i++; print $i?>">
+		<td class="NavBlockLabel AdminNavBlockLabel"><div class="HelpIconContainer"><?php PrintHelpLink("AUTO_GENERATE_THUMBS_help", "qm", "AUTO_GENERATE_THUMBS"); print "</div><div class=\"AdminNavBlockOptionText\">"; print GM_LANG_AUTO_GENERATE_THUMBS;?></div></td>
+		<td class="NavBlockField AdminNavBlockField"><select name="NEW_AUTO_GENERATE_THUMBS" tabindex="<?php $i++; print $i?>">
 				<option value="yes" <?php if (GedcomConfig::$AUTO_GENERATE_THUMBS) print "selected=\"selected\""; ?>><?php print GM_LANG_yes;?></option>
 				<option value="no" <?php if (!GedcomConfig::$AUTO_GENERATE_THUMBS) print "selected=\"selected\""; ?>><?php print GM_LANG_no;?></option>
 			</select>
 		</td>
 	</tr>
 	<tr>
-		<td class="shade2 wrap"><div class="helpicon"><?php PrintHelpLink("SHOW_HIGHLIGHT_IMAGES_help", "qm", "SHOW_HIGHLIGHT_IMAGES"); print "</div><div class=\"description\">"; print GM_LANG_SHOW_HIGHLIGHT_IMAGES;?></div></td>
-		<td class="shade1"><select name="NEW_SHOW_HIGHLIGHT_IMAGES" tabindex="<?php $i++; print $i?>">
+		<td class="NavBlockLabel AdminNavBlockLabel"><div class="HelpIconContainer"><?php PrintHelpLink("SHOW_HIGHLIGHT_IMAGES_help", "qm", "SHOW_HIGHLIGHT_IMAGES"); print "</div><div class=\"AdminNavBlockOptionText\">"; print GM_LANG_SHOW_HIGHLIGHT_IMAGES;?></div></td>
+		<td class="NavBlockField AdminNavBlockField"><select name="NEW_SHOW_HIGHLIGHT_IMAGES" tabindex="<?php $i++; print $i?>">
 				<option value="yes" <?php if (GedcomConfig::$SHOW_HIGHLIGHT_IMAGES) print "selected=\"selected\""; ?>><?php print GM_LANG_yes;?></option>
 				<option value="no" <?php if (!GedcomConfig::$SHOW_HIGHLIGHT_IMAGES) print "selected=\"selected\""; ?>><?php print GM_LANG_no;?></option>
 			</select>
 		</td>
 	</tr>
 	<tr>
-		<td class="shade2 wrap"><div class="helpicon"><?php PrintHelpLink("USE_THUMBS_MAIN_help", "qm", "USE_THUMBS_MAIN"); print "</div><div class=\"description\">"; print GM_LANG_USE_THUMBS_MAIN;?></div></td>
-		<td class="shade1"><select name="NEW_USE_THUMBS_MAIN" tabindex="<?php $i++; print $i?>">
+		<td class="NavBlockLabel AdminNavBlockLabel"><div class="HelpIconContainer"><?php PrintHelpLink("USE_THUMBS_MAIN_help", "qm", "USE_THUMBS_MAIN"); print "</div><div class=\"AdminNavBlockOptionText\">"; print GM_LANG_USE_THUMBS_MAIN;?></div></td>
+		<td class="NavBlockField AdminNavBlockField"><select name="NEW_USE_THUMBS_MAIN" tabindex="<?php $i++; print $i?>">
 				<option value="yes" <?php if (GedcomConfig::$USE_THUMBS_MAIN) print "selected=\"selected\""; ?>><?php print GM_LANG_yes;?></option>
 				<option value="no" <?php if (!GedcomConfig::$USE_THUMBS_MAIN) print "selected=\"selected\""; ?>><?php print GM_LANG_no;?></option>
 			</select>
 		</td>
 	</tr>
 	<tr>
-		<td class="shade2 wrap"><div class="helpicon"><?php PrintHelpLink("MERGE_DOUBLE_MEDIA_help", "qm", "MERGE_DOUBLE_MEDIA"); print "</div><div class=\"description\">"; print GM_LANG_MERGE_DOUBLE_MEDIA;?></div></td>
-		<td class="shade1"><select name="NEW_MERGE_DOUBLE_MEDIA" tabindex="<?php $i++; print $i?>">
+		<td class="NavBlockLabel AdminNavBlockLabel"><div class="HelpIconContainer"><?php PrintHelpLink("MERGE_DOUBLE_MEDIA_help", "qm", "MERGE_DOUBLE_MEDIA"); print "</div><div class=\"AdminNavBlockOptionText\">"; print GM_LANG_MERGE_DOUBLE_MEDIA;?></div></td>
+		<td class="NavBlockField AdminNavBlockField"><select name="NEW_MERGE_DOUBLE_MEDIA" tabindex="<?php $i++; print $i?>">
 				<option value="0" <?php if (GedcomConfig::$MERGE_DOUBLE_MEDIA == "0") print "selected=\"selected\""; ?>><?php print GM_LANG_merge_dm_0;?></option>
 				<option value="1" <?php if (GedcomConfig::$MERGE_DOUBLE_MEDIA == "1" || empty($MERGE_DOUBLE_MEDIA)) print "selected=\"selected\""; ?>><?php print GM_LANG_merge_dm_1;?></option>
 				<option value="2" <?php if (GedcomConfig::$MERGE_DOUBLE_MEDIA == "2") print "selected=\"selected\""; ?>><?php print GM_LANG_merge_dm_2;?></option>
@@ -819,29 +825,31 @@ print "&nbsp;<a href=\"javascript: ".htmlentities(GM_LANG_media_conf)."\" onclic
 </table>
 </div>
 
-<table class="FactsTable"><tr><td class="topbottombar <?php print $TEXT_DIRECTION;?>">
+<table class="NavBlockTable AdminNavBlockTable">
+	<tr>
+		<td class="NavBlockHeader ConfigNavBlockHeader">
 <?php
 print "<a href=\"javascript: ".htmlentities(GM_LANG_accpriv_conf)."\" onclick=\"expand_layer('access-options');return false;\"><img id=\"access-options_img\" src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["plus"]["other"]."\" border=\"0\" width=\"11\" height=\"11\" alt=\"\" /></a>";
 print "&nbsp;<a href=\"javascript: ".htmlentities(GM_LANG_accpriv_conf)."\" onclick=\"expand_layer('access-options');return false;\">".GM_LANG_accpriv_conf."</a>";
 ?></td></tr></table>
 <div id="access-options" style="display: none">
-<table class="FactsTable">
+<table class="NavBlockTable AdminNavBlockTable">
 	<tr>
-		<td class="shade2 wrap width20"><div class="helpicon"><?php PrintHelpLink("REQUIRE_AUTHENTICATION_help", "qm", "REQUIRE_AUTHENTICATION"); print "</div><div class=\"description\">"; print GM_LANG_REQUIRE_AUTHENTICATION;?></div></td>
-		<td class="shade1"><select name="NEW_REQUIRE_AUTHENTICATION" tabindex="<?php $i++; print $i?>">
+		<td class="NavBlockLabel AdminNavBlockLabel"><div class="HelpIconContainer"><?php PrintHelpLink("REQUIRE_AUTHENTICATION_help", "qm", "REQUIRE_AUTHENTICATION"); print "</div><div class=\"AdminNavBlockOptionText\">"; print GM_LANG_REQUIRE_AUTHENTICATION;?></div></td>
+		<td class="NavBlockField AdminNavBlockField"><select name="NEW_REQUIRE_AUTHENTICATION" tabindex="<?php $i++; print $i?>">
 				<option value="yes" <?php if (GedcomConfig::$REQUIRE_AUTHENTICATION) print "selected=\"selected\""; ?>><?php print GM_LANG_yes;?></option>
 				<option value="no" <?php if (!GedcomConfig::$REQUIRE_AUTHENTICATION) print "selected=\"selected\""; ?>><?php print GM_LANG_no;?></option>
 			</select>
 		</td>
 	</tr>
 	<tr>
-		<td class="shade2 wrap width20"><div class="helpicon"><?php PrintHelpLink("EXCLUDE_REQUIRE_AUTHENTICATION_help", "qm", "EXCLUDE_REQUIRE_AUTHENTICATION"); print "</div><div class=\"description\">"; print GM_LANG_EXCLUDE_REQUIRE_AUTHENTICATION;?></div></td>
-		<td class="shade1"><input type="text" name="NEW_EXCLUDE_REQUIRE_AUTHENTICATION" value="<?php print GedcomConfig::$EXCLUDE_REQUIRE_AUTHENTICATION;?>" tabindex="<?php $i++; print $i?>" size="60" />
+		<td class="NavBlockLabel AdminNavBlockLabel"><div class="HelpIconContainer"><?php PrintHelpLink("EXCLUDE_REQUIRE_AUTHENTICATION_help", "qm", "EXCLUDE_REQUIRE_AUTHENTICATION"); print "</div><div class=\"AdminNavBlockOptionText\">"; print GM_LANG_EXCLUDE_REQUIRE_AUTHENTICATION;?></div></td>
+		<td class="NavBlockField AdminNavBlockField"><input type="text" name="NEW_EXCLUDE_REQUIRE_AUTHENTICATION" value="<?php print GedcomConfig::$EXCLUDE_REQUIRE_AUTHENTICATION;?>" tabindex="<?php $i++; print $i?>" size="60" />
 		</td>
 	</tr>
 	<tr>
-		<td class="shade2 wrap"><div class="helpicon"><?php PrintHelpLink("WELCOME_TEXT_AUTH_MODE_help", "qm", "WELCOME_TEXT_AUTH_MODE"); print "</div><div class=\"description\">"; print GM_LANG_WELCOME_TEXT_AUTH_MODE;?></div></td>
-		<td class="shade1"><select name="NEW_WELCOME_TEXT_AUTH_MODE" tabindex="<?php $i++; print $i?>">
+		<td class="NavBlockLabel AdminNavBlockLabel"><div class="HelpIconContainer"><?php PrintHelpLink("WELCOME_TEXT_AUTH_MODE_help", "qm", "WELCOME_TEXT_AUTH_MODE"); print "</div><div class=\"AdminNavBlockOptionText\">"; print GM_LANG_WELCOME_TEXT_AUTH_MODE;?></div></td>
+		<td class="NavBlockField AdminNavBlockField"><select name="NEW_WELCOME_TEXT_AUTH_MODE" tabindex="<?php $i++; print $i?>">
 				<option value="1" <?php if (GedcomConfig::$WELCOME_TEXT_AUTH_MODE=='1') print "selected=\"selected\""; ?>><?php print GM_LANG_WELCOME_TEXT_AUTH_MODE_OPT1;?></option>
 				<option value="2" <?php if (GedcomConfig::$WELCOME_TEXT_AUTH_MODE=='2') print "selected=\"selected\""; ?>><?php print GM_LANG_WELCOME_TEXT_AUTH_MODE_OPT2;?></option>
 				<option value="3" <?php if (GedcomConfig::$WELCOME_TEXT_AUTH_MODE=='3') print "selected=\"selected\""; ?>><?php print GM_LANG_WELCOME_TEXT_AUTH_MODE_OPT3;?></option>
@@ -850,115 +858,117 @@ print "&nbsp;<a href=\"javascript: ".htmlentities(GM_LANG_accpriv_conf)."\" oncl
 		</td>
 	</tr>
 	<tr>
-		<td class="shade2 wrap"><div class="helpicon"><?php PrintHelpLink("WELCOME_TEXT_AUTH_MODE_CUST_HEAD_help", "qm", "WELCOME_TEXT_AUTH_MODE_CUST_HEAD"); print "</div><div class=\"description\">"; print GM_LANG_WELCOME_TEXT_AUTH_MODE_CUST_HEAD;?></div></td>
-		<td class="shade1"><select name="NEW_WELCOME_TEXT_CUST_HEAD" tabindex="<?php $i++; print $i?>" >
+		<td class="NavBlockLabel AdminNavBlockLabel"><div class="HelpIconContainer"><?php PrintHelpLink("WELCOME_TEXT_AUTH_MODE_CUST_HEAD_help", "qm", "WELCOME_TEXT_AUTH_MODE_CUST_HEAD"); print "</div><div class=\"AdminNavBlockOptionText\">"; print GM_LANG_WELCOME_TEXT_AUTH_MODE_CUST_HEAD;?></div></td>
+		<td class="NavBlockField AdminNavBlockField"><select name="NEW_WELCOME_TEXT_CUST_HEAD" tabindex="<?php $i++; print $i?>" >
 				<option value="yes" <?php if (GedcomConfig::$WELCOME_TEXT_CUST_HEAD) print "selected=\"selected\""; ?>><?php print GM_LANG_yes;?></option>
 				<option value="no" <?php if (!GedcomConfig::$WELCOME_TEXT_CUST_HEAD) print "selected=\"selected\""; ?>><?php print GM_LANG_no;?></option>
 			</select>
 		</td>
 	</tr>
 	<tr>
-		<td class="shade2 wrap"><div class="helpicon"><?php PrintHelpLink("WELCOME_TEXT_AUTH_MODE_CUST_help", "qm", "WELCOME_TEXT_AUTH_MODE_CUST"); print "</div><div class=\"description\">"; print GM_LANG_WELCOME_TEXT_AUTH_MODE_CUST;?></div></td>
-		<td class="shade1"><textarea name="NEW_WELCOME_TEXT_AUTH_MODE_4" rows="5" cols="60" dir="ltr" tabindex="<?php $i++; print $i?>"><?php print  GedcomConfig::$WELCOME_TEXT_AUTH_MODE_4 ?></textarea>
+		<td class="NavBlockLabel AdminNavBlockLabel"><div class="HelpIconContainer"><?php PrintHelpLink("WELCOME_TEXT_AUTH_MODE_CUST_help", "qm", "WELCOME_TEXT_AUTH_MODE_CUST"); print "</div><div class=\"AdminNavBlockOptionText\">"; print GM_LANG_WELCOME_TEXT_AUTH_MODE_CUST;?></div></td>
+		<td class="NavBlockField AdminNavBlockField"><textarea name="NEW_WELCOME_TEXT_AUTH_MODE_4" rows="5" cols="60" dir="ltr" tabindex="<?php $i++; print $i?>"><?php print  GedcomConfig::$WELCOME_TEXT_AUTH_MODE_4 ?></textarea>
 		</td>
 	</tr>
 </table>
 </div>
 
-<table class="FactsTable"><tr><td class="topbottombar <?php print $TEXT_DIRECTION;?>">
+<table class="NavBlockTable AdminNavBlockTable">
+	<tr>
+		<td class="NavBlockHeader ConfigNavBlockHeader">
 <?php
 print "<a href=\"javascript: ".htmlentities(GM_LANG_displ_conf)."\" onclick=\"expand_layer('layout-options');return false;\"><img id=\"layout-options_img\" src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["plus"]["other"]."\" border=\"0\" width=\"11\" height=\"11\" alt=\"\" /></a>";
 print "&nbsp;<a href=\"javascript: ".htmlentities(GM_LANG_displ_conf)."\" onclick=\"expand_layer('layout-options');return false;\">".GM_LANG_displ_conf."</a>";
 ?></td></tr></table>
 <div id="layout-options" style="display: none">
 
-<table class="FactsTable"><tr><td class="subbar">
+<table class="NavBlockTable AdminNavBlockTable"><tr><td class="ConfigNavBlockSubbar">
 <?php
 print "<a href=\"javascript: ".htmlentities(GM_LANG_displ_names_conf)."\" onclick=\"expand_layer('layout-options2');return false;\"><img id=\"layout-options2_img\" src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["plus"]["other"]."\" border=\"0\" width=\"11\" height=\"11\" alt=\"\" /></a>";
 print "&nbsp;<a href=\"javascript: ".htmlentities(GM_LANG_displ_names_conf)."\" onclick=\"expand_layer('layout-options2');return false;\">".GM_LANG_displ_names_conf."</a>";
 ?></td></tr></table>
 <div id="layout-options2" style="display: none">
-<table class="FactsTable">
+<table class="NavBlockTable AdminNavBlockTable">
 	<tr>
-		<td class="shade2 wrap width20"><div class="helpicon"><?php PrintHelpLink("PEDIGREE_FULL_DETAILS_help", "qm", "PEDIGREE_FULL_DETAILS"); print "</div><div class=\"description\">"; print GM_LANG_PEDIGREE_FULL_DETAILS;?></div></td>
-		<td class="shade1"><select name="NEW_PEDIGREE_FULL_DETAILS" tabindex="<?php $i++; print $i?>">
+		<td class="NavBlockLabel AdminNavBlockLabel"><div class="HelpIconContainer"><?php PrintHelpLink("PEDIGREE_FULL_DETAILS_help", "qm", "PEDIGREE_FULL_DETAILS"); print "</div><div class=\"AdminNavBlockOptionText\">"; print GM_LANG_PEDIGREE_FULL_DETAILS;?></div></td>
+		<td class="NavBlockField AdminNavBlockField"><select name="NEW_PEDIGREE_FULL_DETAILS" tabindex="<?php $i++; print $i?>">
 				<option value="yes" <?php if (GedcomConfig::$PEDIGREE_FULL_DETAILS) print "selected=\"selected\""; ?>><?php print GM_LANG_yes;?></option>
 				<option value="no" <?php if (!GedcomConfig::$PEDIGREE_FULL_DETAILS) print "selected=\"selected\""; ?>><?php print GM_LANG_no;?></option>
 			</select>
 		</td>
 	</tr>
 	<tr>
-		<td class="shade2 wrap"><div class="helpicon"><?php PrintHelpLink("ABBREVIATE_CHART_LABELS_help", "qm", "ABBREVIATE_CHART_LABELS"); print "</div><div class=\"description\">"; print GM_LANG_ABBREVIATE_CHART_LABELS;?></div></td>
-		<td class="shade1"><select name="NEW_ABBREVIATE_CHART_LABELS" tabindex="<?php $i++; print $i?>">
+		<td class="NavBlockLabel AdminNavBlockLabel"><div class="HelpIconContainer"><?php PrintHelpLink("ABBREVIATE_CHART_LABELS_help", "qm", "ABBREVIATE_CHART_LABELS"); print "</div><div class=\"AdminNavBlockOptionText\">"; print GM_LANG_ABBREVIATE_CHART_LABELS;?></div></td>
+		<td class="NavBlockField AdminNavBlockField"><select name="NEW_ABBREVIATE_CHART_LABELS" tabindex="<?php $i++; print $i?>">
 				<option value="yes" <?php if (GedcomConfig::$ABBREVIATE_CHART_LABELS) print "selected=\"selected\""; ?>><?php print GM_LANG_yes;?></option>
 				<option value="no" <?php if (!GedcomConfig::$ABBREVIATE_CHART_LABELS) print "selected=\"selected\""; ?>><?php print GM_LANG_no;?></option>
 			</select>
 		</td>
 	</tr>
 	<tr>
-		<td class="shade2 wrap"><div class="helpicon"><?php PrintHelpLink("SHOW_PARENTS_AGE_help", "qm", "SHOW_PARENTS_AGE"); print "</div><div class=\"description\">"; print GM_LANG_SHOW_PARENTS_AGE;?></div></td>
-		<td class="shade1"><select name="NEW_SHOW_PARENTS_AGE" tabindex="<?php $i++; print $i?>">
+		<td class="NavBlockLabel AdminNavBlockLabel"><div class="HelpIconContainer"><?php PrintHelpLink("SHOW_PARENTS_AGE_help", "qm", "SHOW_PARENTS_AGE"); print "</div><div class=\"AdminNavBlockOptionText\">"; print GM_LANG_SHOW_PARENTS_AGE;?></div></td>
+		<td class="NavBlockField AdminNavBlockField"><select name="NEW_SHOW_PARENTS_AGE" tabindex="<?php $i++; print $i?>">
 				<option value="yes" <?php if (GedcomConfig::$SHOW_PARENTS_AGE) print "selected=\"selected\""; ?>><?php print GM_LANG_yes;?></option>
 				<option value="no" <?php if (!GedcomConfig::$SHOW_PARENTS_AGE) print "selected=\"selected\""; ?>><?php print GM_LANG_no;?></option>
 			</select>
 		</td>
 	</tr>
 	<tr>
-		<td class="shade2 wrap"><div class="helpicon"><?php PrintHelpLink("SHOW_LDS_AT_GLANCE_help", "qm", "SHOW_LDS_AT_GLANCE"); print "</div><div class=\"description\">"; print GM_LANG_SHOW_LDS_AT_GLANCE;?></div></td>
-		<td class="shade1"><select name="NEW_SHOW_LDS_AT_GLANCE" tabindex="<?php $i++; print $i?>">
+		<td class="NavBlockLabel AdminNavBlockLabel"><div class="HelpIconContainer"><?php PrintHelpLink("SHOW_LDS_AT_GLANCE_help", "qm", "SHOW_LDS_AT_GLANCE"); print "</div><div class=\"AdminNavBlockOptionText\">"; print GM_LANG_SHOW_LDS_AT_GLANCE;?></div></td>
+		<td class="NavBlockField AdminNavBlockField"><select name="NEW_SHOW_LDS_AT_GLANCE" tabindex="<?php $i++; print $i?>">
 				<option value="yes" <?php if (GedcomConfig::$SHOW_LDS_AT_GLANCE) print "selected=\"selected\""; ?>><?php print GM_LANG_yes;?></option>
 				<option value="no" <?php if (!GedcomConfig::$SHOW_LDS_AT_GLANCE) print "selected=\"selected\""; ?>><?php print GM_LANG_no;?></option>
 			</select>
 		</td>
 	</tr>
 	<tr>
-		<td class="shade2 wrap"><div class="helpicon"><?php PrintHelpLink("SHOW_NICK_help", "qm", "SHOW_NICK"); print "</div><div class=\"description\">"; print GM_LANG_SHOW_NICK;?></div></td>
-		<td class="shade1"><select name="NEW_SHOW_NICK" tabindex="<?php $i++; print $i?>">
+		<td class="NavBlockLabel AdminNavBlockLabel"><div class="HelpIconContainer"><?php PrintHelpLink("SHOW_NICK_help", "qm", "SHOW_NICK"); print "</div><div class=\"AdminNavBlockOptionText\">"; print GM_LANG_SHOW_NICK;?></div></td>
+		<td class="NavBlockField AdminNavBlockField"><select name="NEW_SHOW_NICK" tabindex="<?php $i++; print $i?>">
 				<option value="yes" <?php if (GedcomConfig::$SHOW_NICK) print "selected=\"selected\""; ?>><?php print GM_LANG_yes;?></option>
 				<option value="no" <?php if (!GedcomConfig::$SHOW_NICK) print "selected=\"selected\""; ?>><?php print GM_LANG_no;?></option>
 			</select>
 		</td>
 	</tr>
 	<tr>
-		<td class="shade2 wrap"><div class="helpicon"><?php PrintHelpLink("NICK_DELIM_help", "qm", "NICK_DELIM"); print "</div><div class=\"description\">"; print GM_LANG_NICK_DELIM;?></div></td>
-		<td class="shade1">
+		<td class="NavBlockLabel AdminNavBlockLabel"><div class="HelpIconContainer"><?php PrintHelpLink("NICK_DELIM_help", "qm", "NICK_DELIM"); print "</div><div class=\"AdminNavBlockOptionText\">"; print GM_LANG_NICK_DELIM;?></div></td>
+		<td class="NavBlockField AdminNavBlockField">
 			<input type="text" size="1" maxlength="1" name="NEW_NICK_DELIM0" value="<?php if (empty(GedcomConfig::$NICK_DELIM)) print "("; else print htmlentities(substr(GedcomConfig::$NICK_DELIM, 0, 1), ENT_QUOTES);?>" dir="ltr" tabindex="<?php $i++; print $i?>" />
 			<input type="text" size="1" maxlength="1" name="NEW_NICK_DELIM1" value="<?php if (empty(GedcomConfig::$NICK_DELIM)) print ")"; else print htmlentities(substr(GedcomConfig::$NICK_DELIM, 1, 1), ENT_QUOTES);?>" dir="ltr" tabindex="<?php $i++; print $i?>" />
 		</td>
 	</tr>
 	<tr>
-		<td class="shade2 wrap"><div class="helpicon"><?php PrintHelpLink("CHART_BOX_TAGS_help", "qm", "CHART_BOX_TAGS"); print "</div><div class=\"description\">"; print GM_LANG_CHART_BOX_TAGS;?></div></td>
-		<td class="shade1">
+		<td class="NavBlockLabel AdminNavBlockLabel"><div class="HelpIconContainer"><?php PrintHelpLink("CHART_BOX_TAGS_help", "qm", "CHART_BOX_TAGS"); print "</div><div class=\"AdminNavBlockOptionText\">"; print GM_LANG_CHART_BOX_TAGS;?></div></td>
+		<td class="NavBlockField AdminNavBlockField">
 			<input type="text" size="50" name="NEW_CHART_BOX_TAGS" value="<?php print GedcomConfig::$CHART_BOX_TAGS?>" dir="ltr" tabindex="<?php $i++; print $i?>" />
 		</td>
 	</tr>
 	<tr>
-		<td class="shade2 wrap"><div class="helpicon"><?php PrintHelpLink("SHOW_MARRIED_NAMES_help", "qm", "SHOW_MARRIED_NAMES"); print "</div><div class=\"description\">"; print GM_LANG_SHOW_MARRIED_NAMES;?></div></td>
-		<td class="shade1"><select name="NEW_SHOW_MARRIED_NAMES" tabindex="<?php $i++; print $i?>">
+		<td class="NavBlockLabel AdminNavBlockLabel"><div class="HelpIconContainer"><?php PrintHelpLink("SHOW_MARRIED_NAMES_help", "qm", "SHOW_MARRIED_NAMES"); print "</div><div class=\"AdminNavBlockOptionText\">"; print GM_LANG_SHOW_MARRIED_NAMES;?></div></td>
+		<td class="NavBlockField AdminNavBlockField"><select name="NEW_SHOW_MARRIED_NAMES" tabindex="<?php $i++; print $i?>">
 				<option value="yes" <?php if (GedcomConfig::$SHOW_MARRIED_NAMES) print "selected=\"selected\""; ?>><?php print GM_LANG_yes;?></option>
 				<option value="no" <?php if (!GedcomConfig::$SHOW_MARRIED_NAMES) print "selected=\"selected\""; ?>><?php print GM_LANG_no;?></option>
 			</select>
 		</td>
 	</tr>
 	<tr>
-		<td class="shade2 wrap"><div class="helpicon"><?php PrintHelpLink("UNDERLINE_NAME_QUOTES_help", "qm", "UNDERLINE_NAME_QUOTES"); print "</div><div class=\"description\">"; print GM_LANG_UNDERLINE_NAME_QUOTES;?></div></td>
-		<td class="shade1"><select name="NEW_UNDERLINE_NAME_QUOTES" tabindex="<?php $i++; print $i?>">
+		<td class="NavBlockLabel AdminNavBlockLabel"><div class="HelpIconContainer"><?php PrintHelpLink("UNDERLINE_NAME_QUOTES_help", "qm", "UNDERLINE_NAME_QUOTES"); print "</div><div class=\"AdminNavBlockOptionText\">"; print GM_LANG_UNDERLINE_NAME_QUOTES;?></div></td>
+		<td class="NavBlockField AdminNavBlockField"><select name="NEW_UNDERLINE_NAME_QUOTES" tabindex="<?php $i++; print $i?>">
 				<option value="yes" <?php if (GedcomConfig::$UNDERLINE_NAME_QUOTES) print "selected=\"selected\""; ?>><?php print GM_LANG_yes;?></option>
 				<option value="no" <?php if (!GedcomConfig::$UNDERLINE_NAME_QUOTES) print "selected=\"selected\""; ?>><?php print GM_LANG_no;?></option>
 			</select>
 		</td>
 	</tr>
 	<tr>
-		<td class="shade2 wrap"><div class="helpicon"><?php PrintHelpLink("SHOW_ID_NUMBERS_help", "qm", "SHOW_ID_NUMBERS"); print "</div><div class=\"description\">"; print GM_LANG_SHOW_ID_NUMBERS;?></div></td>
-		<td class="shade1"><select name="NEW_SHOW_ID_NUMBERS" tabindex="<?php $i++; print $i?>">
+		<td class="NavBlockLabel AdminNavBlockLabel"><div class="HelpIconContainer"><?php PrintHelpLink("SHOW_ID_NUMBERS_help", "qm", "SHOW_ID_NUMBERS"); print "</div><div class=\"AdminNavBlockOptionText\">"; print GM_LANG_SHOW_ID_NUMBERS;?></div></td>
+		<td class="NavBlockField AdminNavBlockField"><select name="NEW_SHOW_ID_NUMBERS" tabindex="<?php $i++; print $i?>">
 				<option value="yes" <?php if (GedcomConfig::$SHOW_ID_NUMBERS) print "selected=\"selected\""; ?>><?php print GM_LANG_yes;?></option>
 				<option value="no" <?php if (!GedcomConfig::$SHOW_ID_NUMBERS) print "selected=\"selected\""; ?>><?php print GM_LANG_no;?></option>
 			</select>
 		</td>
 	</tr>
 	<tr>
-		<td class="shade2 wrap"><div class="helpicon"><?php PrintHelpLink("SHOW_FAM_ID_NUMBERS_help", "qm", "SHOW_FAM_ID_NUMBERS"); print "</div><div class=\"description\">"; print GM_LANG_SHOW_FAM_ID_NUMBERS;?></div></td>
-        <td class="shade1"><select name="NEW_SHOW_FAM_ID_NUMBERS" tabindex="<?php $i++; print $i?>">
+		<td class="NavBlockLabel AdminNavBlockLabel"><div class="HelpIconContainer"><?php PrintHelpLink("SHOW_FAM_ID_NUMBERS_help", "qm", "SHOW_FAM_ID_NUMBERS"); print "</div><div class=\"AdminNavBlockOptionText\">"; print GM_LANG_SHOW_FAM_ID_NUMBERS;?></div></td>
+        <td class="NavBlockField AdminNavBlockField"><select name="NEW_SHOW_FAM_ID_NUMBERS" tabindex="<?php $i++; print $i?>">
 			<option value="yes" <?php if (GedcomConfig::$SHOW_FAM_ID_NUMBERS) print "selected=\"selected\""; ?>><?php print GM_LANG_yes;?></option>
             <option value="no" <?php if (!GedcomConfig::$SHOW_FAM_ID_NUMBERS) print "selected=\"selected\""; ?>><?php print GM_LANG_no;?></option>
             </select>
@@ -967,66 +977,66 @@ print "&nbsp;<a href=\"javascript: ".htmlentities(GM_LANG_displ_names_conf)."\" 
 </table>
 </div>
 
-<table class="FactsTable"><tr><td class="subbar">
+<table class="NavBlockTable AdminNavBlockTable"><tr><td class="ConfigNavBlockSubbar">
 <?php
 print "<a href=\"javascript: ".htmlentities(GM_LANG_displ_comsurn_conf)."\" onclick=\"expand_layer('layout-options3');return false;\"><img id=\"layout-options3_img\" src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["plus"]["other"]."\" border=\"0\" width=\"11\" height=\"11\" alt=\"\" /></a>";
 print "&nbsp;<a href=\"javascript: ".htmlentities(GM_LANG_displ_comsurn_conf)."\" onclick=\"expand_layer('layout-options3');return false;\">".GM_LANG_displ_comsurn_conf."</a>";
 ?></td></tr></table>
 <div id="layout-options3" style="display: none">
-<table class="FactsTable">
+<table class="NavBlockTable AdminNavBlockTable">
 	<tr>
-		<td class="shade2 wrap width20"><div class="helpicon"><?php PrintHelpLink("COMMON_NAMES_THRESHOLD_help", "qm", "COMMON_NAMES_THRESHOLD"); print "</div><div class=\"description\">"; print GM_LANG_COMMON_NAMES_THRESHOLD;?></div></td>
-		<td class="shade1"><input type="text" name="NEW_COMMON_NAMES_THRESHOLD" value="<?php print GedcomConfig::$COMMON_NAMES_THRESHOLD?>" size="5" tabindex="<?php $i++; print $i?>" /></td>
+		<td class="NavBlockLabel AdminNavBlockLabel"><div class="HelpIconContainer"><?php PrintHelpLink("COMMON_NAMES_THRESHOLD_help", "qm", "COMMON_NAMES_THRESHOLD"); print "</div><div class=\"AdminNavBlockOptionText\">"; print GM_LANG_COMMON_NAMES_THRESHOLD;?></div></td>
+		<td class="NavBlockField AdminNavBlockField"><input type="text" name="NEW_COMMON_NAMES_THRESHOLD" value="<?php print GedcomConfig::$COMMON_NAMES_THRESHOLD?>" size="5" tabindex="<?php $i++; print $i?>" /></td>
 	</tr>
 
 	<tr>
-		<td class="shade2 wrap"><div class="helpicon"><?php PrintHelpLink("COMMON_NAMES_ADD_help", "qm", "COMMON_NAMES_ADD"); print "</div><div class=\"description\">"; print GM_LANG_COMMON_NAMES_ADD;?></div></td>
-		<td class="shade1"><input type="text" name="NEW_COMMON_NAMES_ADD" dir="ltr" value="<?php print GedcomConfig::$COMMON_NAMES_ADD?>" size="50" tabindex="<?php $i++; print $i?>" /></td>
+		<td class="NavBlockLabel AdminNavBlockLabel"><div class="HelpIconContainer"><?php PrintHelpLink("COMMON_NAMES_ADD_help", "qm", "COMMON_NAMES_ADD"); print "</div><div class=\"AdminNavBlockOptionText\">"; print GM_LANG_COMMON_NAMES_ADD;?></div></td>
+		<td class="NavBlockField AdminNavBlockField"><input type="text" name="NEW_COMMON_NAMES_ADD" dir="ltr" value="<?php print GedcomConfig::$COMMON_NAMES_ADD?>" size="50" tabindex="<?php $i++; print $i?>" /></td>
 	</tr>
 
 	<tr>
-		<td class="shade2 wrap"><div class="helpicon"><?php PrintHelpLink("COMMON_NAMES_REMOVE_help", "qm", "COMMON_NAMES_REMOVE"); print "</div><div class=\"description\">"; print GM_LANG_COMMON_NAMES_REMOVE;?></div></td>
-		<td class="shade1"><input type="text" name="NEW_COMMON_NAMES_REMOVE" dir="ltr" value="<?php print GedcomConfig::$COMMON_NAMES_REMOVE?>" size="50" tabindex="<?php $i++; print $i?>" /></td>
+		<td class="NavBlockLabel AdminNavBlockLabel"><div class="HelpIconContainer"><?php PrintHelpLink("COMMON_NAMES_REMOVE_help", "qm", "COMMON_NAMES_REMOVE"); print "</div><div class=\"AdminNavBlockOptionText\">"; print GM_LANG_COMMON_NAMES_REMOVE;?></div></td>
+		<td class="NavBlockField AdminNavBlockField"><input type="text" name="NEW_COMMON_NAMES_REMOVE" dir="ltr" value="<?php print GedcomConfig::$COMMON_NAMES_REMOVE?>" size="50" tabindex="<?php $i++; print $i?>" /></td>
 	</tr>
 </table>
 </div>
 
 <?php // Display and Layout
 ?>
-<table class="FactsTable"><tr><td class="subbar <?php print $TEXT_DIRECTION;?>">
+<table class="NavBlockTable AdminNavBlockTable"><tr><td class="ConfigNavBlockSubbar">
 <?php
 print "<a href=\"javascript: ".htmlentities(GM_LANG_displ_layout_conf)."\" onclick=\"expand_layer('layout-options4');return false;\"><img id=\"layout-options4_img\" src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["plus"]["other"]."\" border=\"0\" width=\"11\" height=\"11\" alt=\"\" /></a>";
 print "&nbsp;<a href=\"javascript: ".htmlentities(GM_LANG_displ_layout_conf)."\" onclick=\"expand_layer('layout-options4');return false;\">".GM_LANG_displ_layout_conf."</a>";
 ?></td></tr></table>
 <div id="layout-options4" style="display: none">
-<table class="FactsTable">
+<table class="NavBlockTable AdminNavBlockTable">
 	<tr>
-		<td class="shade2 wrap width20"><div class="helpicon"><?php PrintHelpLink("DEFAULT_PEDIGREE_GENERATIONS_help", "qm", "DEFAULT_PEDIGREE_GENERATIONS"); print "</div><div class=\"description\">"; print GM_LANG_DEFAULT_PEDIGREE_GENERATIONS;?></div></td>
-		<td class="shade1"><input type="text" name="NEW_DEFAULT_PEDIGREE_GENERATIONS" value="<?php print GedcomConfig::$DEFAULT_PEDIGREE_GENERATIONS?>" size="5" tabindex="<?php $i++; print $i?>" /></td>
+		<td class="NavBlockLabel AdminNavBlockLabel"><div class="HelpIconContainer"><?php PrintHelpLink("DEFAULT_PEDIGREE_GENERATIONS_help", "qm", "DEFAULT_PEDIGREE_GENERATIONS"); print "</div><div class=\"AdminNavBlockOptionText\">"; print GM_LANG_DEFAULT_PEDIGREE_GENERATIONS;?></div></td>
+		<td class="NavBlockField AdminNavBlockField"><input type="text" name="NEW_DEFAULT_PEDIGREE_GENERATIONS" value="<?php print GedcomConfig::$DEFAULT_PEDIGREE_GENERATIONS?>" size="5" tabindex="<?php $i++; print $i?>" /></td>
 	</tr>
 	<tr>
-		<td class="shade2 wrap"><div class="helpicon"><?php PrintHelpLink("MAX_PEDIGREE_GENERATIONS_help", "qm", "MAX_PEDIGREE_GENERATIONS"); print "</div><div class=\"description\">"; print GM_LANG_MAX_PEDIGREE_GENERATIONS;?></div></td>
-		<td class="shade1"><input type="text" name="NEW_MAX_PEDIGREE_GENERATIONS" value="<?php print GedcomConfig::$MAX_PEDIGREE_GENERATIONS?>" size="5" tabindex="<?php $i++; print $i?>" /></td>
+		<td class="NavBlockLabel AdminNavBlockLabel"><div class="HelpIconContainer"><?php PrintHelpLink("MAX_PEDIGREE_GENERATIONS_help", "qm", "MAX_PEDIGREE_GENERATIONS"); print "</div><div class=\"AdminNavBlockOptionText\">"; print GM_LANG_MAX_PEDIGREE_GENERATIONS;?></div></td>
+		<td class="NavBlockField AdminNavBlockField"><input type="text" name="NEW_MAX_PEDIGREE_GENERATIONS" value="<?php print GedcomConfig::$MAX_PEDIGREE_GENERATIONS?>" size="5" tabindex="<?php $i++; print $i?>" /></td>
 	</tr>
 	<tr>
-		<td class="shade2 wrap"><div class="helpicon"><?php PrintHelpLink("MAX_DESCENDANCY_GENERATIONS_help", "qm", "MAX_DESCENDANCY_GENERATIONS"); print "</div><div class=\"description\">"; print GM_LANG_MAX_DESCENDANCY_GENERATIONS;?></div></td>
-		<td class="shade1"><input type="text" name="NEW_MAX_DESCENDANCY_GENERATIONS" value="<?php print GedcomConfig::$MAX_DESCENDANCY_GENERATIONS?>" size="5" tabindex="<?php $i++; print $i?>" /></td>
+		<td class="NavBlockLabel AdminNavBlockLabel"><div class="HelpIconContainer"><?php PrintHelpLink("MAX_DESCENDANCY_GENERATIONS_help", "qm", "MAX_DESCENDANCY_GENERATIONS"); print "</div><div class=\"AdminNavBlockOptionText\">"; print GM_LANG_MAX_DESCENDANCY_GENERATIONS;?></div></td>
+		<td class="NavBlockField AdminNavBlockField"><input type="text" name="NEW_MAX_DESCENDANCY_GENERATIONS" value="<?php print GedcomConfig::$MAX_DESCENDANCY_GENERATIONS?>" size="5" tabindex="<?php $i++; print $i?>" /></td>
 	</tr>
 	<tr>
-		<td class="shade2 wrap"><div class="helpicon"><?php PrintHelpLink("PEDIGREE_LAYOUT_help", "qm", "PEDIGREE_LAYOUT"); print "</div><div class=\"description\">"; print GM_LANG_PEDIGREE_LAYOUT;?></div></td>
-		<td class="shade1"><select name="NEW_PEDIGREE_LAYOUT" tabindex="<?php $i++; print $i?>">
+		<td class="NavBlockLabel AdminNavBlockLabel"><div class="HelpIconContainer"><?php PrintHelpLink("PEDIGREE_LAYOUT_help", "qm", "PEDIGREE_LAYOUT"); print "</div><div class=\"AdminNavBlockOptionText\">"; print GM_LANG_PEDIGREE_LAYOUT;?></div></td>
+		<td class="NavBlockField AdminNavBlockField"><select name="NEW_PEDIGREE_LAYOUT" tabindex="<?php $i++; print $i?>">
 				<option value="yes" <?php if (GedcomConfig::$PEDIGREE_LAYOUT) print "selected=\"selected\""; ?>><?php print GM_LANG_landscape;?></option>
 				<option value="no" <?php if (!GedcomConfig::$PEDIGREE_LAYOUT) print "selected=\"selected\""; ?>><?php print GM_LANG_portrait;?></option>
 			</select>
 		</td>
 	</tr>
 	<tr>
-		<td class="shade2 wrap"><div class="helpicon"><?php PrintHelpLink("SHOW_PEDIGREE_PLACES_help", "qm", "SHOW_PEDIGREE_PLACES"); print "</div><div class=\"description\">"; print GM_LANG_SHOW_PEDIGREE_PLACES;?></div></td>
-		<td class="shade1"><input type="text" size="5" name="NEW_SHOW_PEDIGREE_PLACES" value="<?php print GedcomConfig::$SHOW_PEDIGREE_PLACES; ?>" tabindex="<?php $i++; print $i?>" /></td>
+		<td class="NavBlockLabel AdminNavBlockLabel"><div class="HelpIconContainer"><?php PrintHelpLink("SHOW_PEDIGREE_PLACES_help", "qm", "SHOW_PEDIGREE_PLACES"); print "</div><div class=\"AdminNavBlockOptionText\">"; print GM_LANG_SHOW_PEDIGREE_PLACES;?></div></td>
+		<td class="NavBlockField AdminNavBlockField"><input type="text" size="5" name="NEW_SHOW_PEDIGREE_PLACES" value="<?php print GedcomConfig::$SHOW_PEDIGREE_PLACES; ?>" tabindex="<?php $i++; print $i?>" /></td>
 	</tr>
 	<tr>
-		<td class="shade2 wrap"><div class="helpicon"><?php PrintHelpLink("ZOOM_BOXES_help", "qm", "ZOOM_BOXES"); print "</div><div class=\"description\">"; print GM_LANG_ZOOM_BOXES;?></div></td>
-		<td class="shade1"><select name="NEW_ZOOM_BOXES" tabindex="<?php $i++; print $i?>">
+		<td class="NavBlockLabel AdminNavBlockLabel"><div class="HelpIconContainer"><?php PrintHelpLink("ZOOM_BOXES_help", "qm", "ZOOM_BOXES"); print "</div><div class=\"AdminNavBlockOptionText\">"; print GM_LANG_ZOOM_BOXES;?></div></td>
+		<td class="NavBlockField AdminNavBlockField"><select name="NEW_ZOOM_BOXES" tabindex="<?php $i++; print $i?>">
 				<option value="disabled" <?php if (GedcomConfig::$ZOOM_BOXES=='disabled') print "selected=\"selected\""; ?>><?php print GM_LANG_disabled;?></option>
 				<option value="mouseover" <?php if (GedcomConfig::$ZOOM_BOXES=='mouseover') print "selected=\"selected\""; ?>><?php print GM_LANG_mouseover;?></option>
 				<option value="mousedown" <?php if (GedcomConfig::$ZOOM_BOXES=='mousedown') print "selected=\"selected\""; ?>><?php print GM_LANG_mousedown;?></option>
@@ -1035,8 +1045,8 @@ print "&nbsp;<a href=\"javascript: ".htmlentities(GM_LANG_displ_layout_conf)."\"
 		</td>
 	</tr>
 	<tr>
-		<td class="shade2 wrap"><div class="helpicon"><?php PrintHelpLink("LINK_ICONS_help", "qm", "LINK_ICONS"); print "</div><div class=\"description\">"; print GM_LANG_LINK_ICONS;?></div></td>
-		<td class="shade1"><select name="NEW_LINK_ICONS" tabindex="<?php $i++; print $i?>">
+		<td class="NavBlockLabel AdminNavBlockLabel"><div class="HelpIconContainer"><?php PrintHelpLink("LINK_ICONS_help", "qm", "LINK_ICONS"); print "</div><div class=\"AdminNavBlockOptionText\">"; print GM_LANG_LINK_ICONS;?></div></td>
+		<td class="NavBlockField AdminNavBlockField"><select name="NEW_LINK_ICONS" tabindex="<?php $i++; print $i?>">
 				<option value="disabled" <?php if (GedcomConfig::$LINK_ICONS=='disabled') print "selected=\"selected\""; ?>><?php print GM_LANG_disabled;?></option>
 				<option value="mouseover" <?php if (GedcomConfig::$LINK_ICONS=='mouseover') print "selected=\"selected\""; ?>><?php print GM_LANG_mouseover;?></option>
 				<option value="click" <?php if (GedcomConfig::$LINK_ICONS=='click') print "selected=\"selected\""; ?>><?php print GM_LANG_click;?></option>
@@ -1044,8 +1054,8 @@ print "&nbsp;<a href=\"javascript: ".htmlentities(GM_LANG_displ_layout_conf)."\"
 		</td>
 	</tr>
 	<tr>
-		<td class="shade2 wrap"><div class="helpicon"><?php PrintHelpLink("GEDCOM_DEFAULT_TAB_help", "qm", "GEDCOM_DEFAULT_TAB"); print "</div><div class=\"description\">"; print GM_LANG_GEDCOM_DEFAULT_TAB;?></div></td>
-		<td class="shade1"><select name="NEW_GEDCOM_DEFAULT_TAB" tabindex="<?php $i++; print $i?>">
+		<td class="NavBlockLabel AdminNavBlockLabel"><div class="HelpIconContainer"><?php PrintHelpLink("GEDCOM_DEFAULT_TAB_help", "qm", "GEDCOM_DEFAULT_TAB"); print "</div><div class=\"AdminNavBlockOptionText\">"; print GM_LANG_GEDCOM_DEFAULT_TAB;?></div></td>
+		<td class="NavBlockField AdminNavBlockField"><select name="NEW_GEDCOM_DEFAULT_TAB" tabindex="<?php $i++; print $i?>">
 				<option value="0" <?php if (GedcomConfig::$GEDCOM_DEFAULT_TAB==0) print "selected=\"selected\""; ?>><?php print GM_LANG_personal_facts;?></option>
 				<option value="1" <?php if (GedcomConfig::$GEDCOM_DEFAULT_TAB==1) print "selected=\"selected\""; ?>><?php print GM_LANG_notes;?></option>
 				<option value="2" <?php if (GedcomConfig::$GEDCOM_DEFAULT_TAB==2) print "selected=\"selected\""; ?>><?php print GM_LANG_ssourcess;?></option>
@@ -1056,13 +1066,13 @@ print "&nbsp;<a href=\"javascript: ".htmlentities(GM_LANG_displ_layout_conf)."\"
 		</td>
 	</tr>
 	<tr>
-		<td class="shade2 wrap"><div class="helpicon"><?php PrintHelpLink("SHOW_RELATIVES_EVENTS_help", "qm", "SHOW_RELATIVES_EVENTS"); print "</div><div class=\"description\">"; print GM_LANG_SHOW_RELATIVES_EVENTS;?></div></td>
-		<td class="shade1">
+		<td class="NavBlockLabel AdminNavBlockLabel"><div class="HelpIconContainer"><?php PrintHelpLink("SHOW_RELATIVES_EVENTS_help", "qm", "SHOW_RELATIVES_EVENTS"); print "</div><div class=\"AdminNavBlockOptionText\">"; print GM_LANG_SHOW_RELATIVES_EVENTS;?></div></td>
+		<td class="NavBlockField AdminNavBlockField">
 			<input type="hidden" name="NEW_SHOW_RELATIVES_EVENTS" value="<?php echo GedcomConfig::$SHOW_RELATIVES_EVENTS?>" />
 <?php
 
 $previous = "_DEAT_";
-print "<table>";
+print "<table><tr><td>";
 
 $factarr = get_defined_constants(true);
 foreach ($factarr["user"] as $factkey=>$factlabel) {
@@ -1071,26 +1081,23 @@ foreach ($factarr["user"] as $factkey=>$factlabel) {
 		$f6=substr($factkey,8,6);
 		$factkey = substr($factkey, 8);
 		if ($f6=="_BIRT_" or $f6=="_MARR_" or $f6=="_DEAT_") {
-			if ($f6=="_BIRT_") print "<tr>";
-			if ($f6=="_MARR_" and $previous!="_BIRT_") print "<tr><td>&nbsp;</td>";
-			if ($f6=="_DEAT_" and $previous=="_DEAT_") print "<tr><td>&nbsp;</td>";
-			if ($f6=="_DEAT_" and $previous!="_MARR_") print "<td>&nbsp;</td>";
-			print "\n<td><input type=\"checkbox\" name=\"SHOW_RELATIVES_EVENTS_checkbox\" value=\"".$factkey."\"";
+			print "\n<input type=\"checkbox\" name=\"SHOW_RELATIVES_EVENTS_checkbox\" value=\"".$factkey."\"";
 			if (strstr(GedcomConfig::$SHOW_RELATIVES_EVENTS,$factkey)) print " checked=\"checked\"";
 			print " onchange=\"var old=document.configform.NEW_SHOW_RELATIVES_EVENTS.value; if (this.checked) old+=','+this.value; else old=old.replace(/".$factkey."/g,''); old=old.replace(/[,]+/gi,','); old=old.replace(/^[,]/gi,''); old=old.replace(/[,]$/gi,''); document.configform.NEW_SHOW_RELATIVES_EVENTS.value=old\" ";
-			print " /> ".$factlabel."</td>";
-			if ($f6=="_DEAT_") print "</tr>";
+			print " /> ".$factlabel."<br />";
+			if ($factkey == "_DEAT_SIBL") print "</td><td>";
 			$previous=$f6;
 		}
 	}
 }
+print "</tr>";
 print "</table>"; 
 ?>
 		</td>
 	</tr>
 	<tr>
-		<td class="shade2 wrap"><div class="helpicon"><?php PrintHelpLink("EXPAND_RELATIVES_EVENTS_help", "qm", "EXPAND_RELATIVES_EVENTS"); print "</div><div class=\"description\">"; print GM_LANG_EXPAND_RELATIVES_EVENTS;?></div></td>
-		<td class="shade1">
+		<td class="NavBlockLabel AdminNavBlockLabel"><div class="HelpIconContainer"><?php PrintHelpLink("EXPAND_RELATIVES_EVENTS_help", "qm", "EXPAND_RELATIVES_EVENTS"); print "</div><div class=\"AdminNavBlockOptionText\">"; print GM_LANG_EXPAND_RELATIVES_EVENTS;?></div></td>
+		<td class="NavBlockField AdminNavBlockField">
 			<select name="NEW_EXPAND_RELATIVES_EVENTS" tabindex="<?php $i++; print $i?>">
 				<option value="yes" <?php if (GedcomConfig::$EXPAND_RELATIVES_EVENTS) print "selected=\"selected\""; ?>><?php print GM_LANG_yes;?></option>
 				<option value="no" <?php if (!GedcomConfig::$EXPAND_RELATIVES_EVENTS) print "selected=\"selected\""; ?>><?php print GM_LANG_no;?></option>
@@ -1098,8 +1105,8 @@ print "</table>";
 		</td>
 	</tr>
 	<tr>
-		<td class="shade2 wrap"><div class="helpicon"><?php PrintHelpLink("INDI_EXT_FAM_FACTS_help", "qm", "INDI_EXT_FAM_FACTS"); print "</div><div class=\"description\">"; print GM_LANG_INDI_EXT_FAM_FACTS;?></div></td>
-		<td class="shade1">
+		<td class="NavBlockLabel AdminNavBlockLabel"><div class="HelpIconContainer"><?php PrintHelpLink("INDI_EXT_FAM_FACTS_help", "qm", "INDI_EXT_FAM_FACTS"); print "</div><div class=\"AdminNavBlockOptionText\">"; print GM_LANG_INDI_EXT_FAM_FACTS;?></div></td>
+		<td class="NavBlockField AdminNavBlockField">
 			<select name="NEW_INDI_EXT_FAM_FACTS" tabindex="<?php $i++; print $i?>">
 				<option value="yes" <?php if (GedcomConfig::$INDI_EXT_FAM_FACTS) print "selected=\"selected\""; ?>><?php print GM_LANG_yes;?></option>
 				<option value="no" <?php if (!GedcomConfig::$INDI_EXT_FAM_FACTS) print "selected=\"selected\""; ?>><?php print GM_LANG_no;?></option>
@@ -1107,21 +1114,21 @@ print "</table>";
 		</td>
 	</tr>
 	<tr>
-		<td class="shade2 wrap"><div class="helpicon"><?php PrintHelpLink("POSTAL_CODE_help", "qm", "POSTAL_CODE"); print "</div><div class=\"description\">"; print GM_LANG_POSTAL_CODE;?></div></td>
-		<td class="shade1"><select name="NEW_POSTAL_CODE" tabindex="<?php $i++; print $i?>">
+		<td class="NavBlockLabel AdminNavBlockLabel"><div class="HelpIconContainer"><?php PrintHelpLink("POSTAL_CODE_help", "qm", "POSTAL_CODE"); print "</div><div class=\"AdminNavBlockOptionText\">"; print GM_LANG_POSTAL_CODE;?></div></td>
+		<td class="NavBlockField AdminNavBlockField"><select name="NEW_POSTAL_CODE" tabindex="<?php $i++; print $i?>">
 				<option value="yes" <?php if (GedcomConfig::$POSTAL_CODE) print "selected=\"selected\""; ?>><?php print ucfirst(GM_LANG_after);?></option>
 				<option value="no" <?php if (!GedcomConfig::$POSTAL_CODE) print "selected=\"selected\""; ?>><?php print ucfirst(GM_LANG_before);?></option>
 			</select>
 		</td>
 	</tr>
 	<tr>
-		<td class="shade2 wrap"><div class="helpicon"><?php PrintHelpLink("ALPHA_INDEX_LISTS_help", "qm", "ALPHA_INDEX_LISTS"); print "</div><div class=\"description\">"; print GM_LANG_ALPHA_INDEX_LISTS;?></div></td>
-		<td class="shade1"><input name="NEW_ALPHA_INDEX_LISTS" tabindex="<?php $i++; print $i?>" type="text" size="5" maxlength="4" value="<?php print GedcomConfig::$ALPHA_INDEX_LISTS; ?>" />
+		<td class="NavBlockLabel AdminNavBlockLabel"><div class="HelpIconContainer"><?php PrintHelpLink("ALPHA_INDEX_LISTS_help", "qm", "ALPHA_INDEX_LISTS"); print "</div><div class=\"AdminNavBlockOptionText\">"; print GM_LANG_ALPHA_INDEX_LISTS;?></div></td>
+		<td class="NavBlockField AdminNavBlockField"><input name="NEW_ALPHA_INDEX_LISTS" tabindex="<?php $i++; print $i?>" type="text" size="5" maxlength="4" value="<?php print GedcomConfig::$ALPHA_INDEX_LISTS; ?>" />
 		</td>
 	</tr>
 	<tr>
-		<td class="shade2 wrap"><div class="helpicon"><?php PrintHelpLink("LISTS_ALL_help", "qm", "LISTS_ALL"); print "</div><div class=\"description\">"; print GM_LANG_LISTS_ALL;?></div></td>
-		<td class="shade1">			
+		<td class="NavBlockLabel AdminNavBlockLabel"><div class="HelpIconContainer"><?php PrintHelpLink("LISTS_ALL_help", "qm", "LISTS_ALL"); print "</div><div class=\"AdminNavBlockOptionText\">"; print GM_LANG_LISTS_ALL;?></div></td>
+		<td class="NavBlockField AdminNavBlockField">			
 			<select name="NEW_LISTS_ALL" tabindex="<?php $i++; print $i?>">
 				<option value="yes" <?php if (GedcomConfig::$LISTS_ALL) print "selected=\"selected\""; ?>><?php print GM_LANG_yes;?></option>
 				<option value="no" <?php if (!GedcomConfig::$LISTS_ALL) print "selected=\"selected\""; ?>><?php print GM_LANG_no;?></option>
@@ -1129,8 +1136,8 @@ print "</table>";
 		</td>
 	</tr>
 	<tr>
-		<td class="shade2 wrap"><div class="helpicon"><?php PrintHelpLink("SHOW_EXTERNAL_SEARCH_help", "qm", "SHOW_EXTERNAL_SEARCH"); print "</div><div class=\"description\">"; print GM_LANG_SHOW_EXTERNAL_SEARCH;?></div></td>
-		<td class="shade1"><select name="NEW_SHOW_EXTERNAL_SEARCH" tabindex="<?php $i++; print $i?>">
+		<td class="NavBlockLabel AdminNavBlockLabel"><div class="HelpIconContainer"><?php PrintHelpLink("SHOW_EXTERNAL_SEARCH_help", "qm", "SHOW_EXTERNAL_SEARCH"); print "</div><div class=\"AdminNavBlockOptionText\">"; print GM_LANG_SHOW_EXTERNAL_SEARCH;?></div></td>
+		<td class="NavBlockField AdminNavBlockField"><select name="NEW_SHOW_EXTERNAL_SEARCH" tabindex="<?php $i++; print $i?>">
 				<option value="-1" <?php if (GedcomConfig::$SHOW_EXTERNAL_SEARCH == "-1") print "selected=\"selected\""; ?>><?php print constant("GM_LANG_show_gedrec_-1");?></option>
 				<option value="0" <?php if (GedcomConfig::$SHOW_EXTERNAL_SEARCH == "0") print "selected=\"selected\""; ?>><?php print GM_LANG_show_gedrec_0;?></option>
 				<option value="1" <?php if (GedcomConfig::$SHOW_EXTERNAL_SEARCH == "1") print "selected=\"selected\""; ?>><?php print GM_LANG_show_gedrec_1;?></option>
@@ -1145,29 +1152,29 @@ print "</table>";
 </div>
 
 
-<table class="FactsTable"><tr><td class="subbar <?php print $TEXT_DIRECTION;?>">
+<table class="NavBlockTable AdminNavBlockTable"><tr><td class="ConfigNavBlockSubbar">
 <?php
 print "<a href=\"javascript: ".htmlentities(GM_LANG_displ_hide_conf)."\" onclick=\"expand_layer('layout-options5');return false;\"><img id=\"layout-options5_img\" src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["plus"]["other"]."\" border=\"0\" width=\"11\" height=\"11\" alt=\"\" /></a>";
 print "&nbsp;<a href=\"javascript: ".htmlentities(GM_LANG_displ_hide_conf)."\" onclick=\"expand_layer('layout-options5');return false;\">".GM_LANG_displ_hide_conf."</a>";
 ?></td></tr></table>
 <div id="layout-options5" style="display: none">
-<table class="FactsTable">
+<table class="NavBlockTable AdminNavBlockTable">
 	<tr>
-		<td class="shade2 wrap width20"><div class="helpicon"><?php PrintHelpLink("DAYS_TO_SHOW_LIMIT_help", "qm", "DAYS_TO_SHOW_LIMIT"); print "</div><div class=\"description\">"; print GM_LANG_DAYS_TO_SHOW_LIMIT;?></div></td>
-		<td class="shade1"><input type="text" name="NEW_DAYS_TO_SHOW_LIMIT" value="<?php print GedcomConfig::$DAYS_TO_SHOW_LIMIT?>" size="2" tabindex="<?php $i++; print $i?>" /></td>
+		<td class="NavBlockLabel AdminNavBlockLabel"><div class="HelpIconContainer"><?php PrintHelpLink("DAYS_TO_SHOW_LIMIT_help", "qm", "DAYS_TO_SHOW_LIMIT"); print "</div><div class=\"AdminNavBlockOptionText\">"; print GM_LANG_DAYS_TO_SHOW_LIMIT;?></div></td>
+		<td class="NavBlockField AdminNavBlockField"><input type="text" name="NEW_DAYS_TO_SHOW_LIMIT" value="<?php print GedcomConfig::$DAYS_TO_SHOW_LIMIT?>" size="2" tabindex="<?php $i++; print $i?>" /></td>
 	</tr>
 
 	<tr>
-		<td class="shade2 wrap"><div class="helpicon"><?php PrintHelpLink("SHOW_EMPTY_BOXES_help", "qm", "SHOW_EMPTY_BOXES"); print "</div><div class=\"description\">"; print GM_LANG_SHOW_EMPTY_BOXES;?></div></td>
-		<td class="shade1"><select name="NEW_SHOW_EMPTY_BOXES" tabindex="<?php $i++; print $i?>">
+		<td class="NavBlockLabel AdminNavBlockLabel"><div class="HelpIconContainer"><?php PrintHelpLink("SHOW_EMPTY_BOXES_help", "qm", "SHOW_EMPTY_BOXES"); print "</div><div class=\"AdminNavBlockOptionText\">"; print GM_LANG_SHOW_EMPTY_BOXES;?></div></td>
+		<td class="NavBlockField AdminNavBlockField"><select name="NEW_SHOW_EMPTY_BOXES" tabindex="<?php $i++; print $i?>">
 				<option value="yes" <?php if (GedcomConfig::$SHOW_EMPTY_BOXES) print "selected=\"selected\""; ?>><?php print GM_LANG_yes;?></option>
 				<option value="no" <?php if (!GedcomConfig::$SHOW_EMPTY_BOXES) print "selected=\"selected\""; ?>><?php print GM_LANG_no;?></option>
 			</select>
 		</td>
 	</tr>
 	<tr>
-		<td class="shade2 wrap"><div class="helpicon"><?php PrintHelpLink("SHOW_GEDCOM_RECORD_help", "qm", "SHOW_GEDCOM_RECORD"); print "</div><div class=\"description\">"; print GM_LANG_SHOW_GEDCOM_RECORD;?></div></td>
-		<td class="shade1"><select name="NEW_SHOW_GEDCOM_RECORD" tabindex="<?php $i++; print $i?>">
+		<td class="NavBlockLabel AdminNavBlockLabel"><div class="HelpIconContainer"><?php PrintHelpLink("SHOW_GEDCOM_RECORD_help", "qm", "SHOW_GEDCOM_RECORD"); print "</div><div class=\"AdminNavBlockOptionText\">"; print GM_LANG_SHOW_GEDCOM_RECORD;?></div></td>
+		<td class="NavBlockField AdminNavBlockField"><select name="NEW_SHOW_GEDCOM_RECORD" tabindex="<?php $i++; print $i?>">
 				<option value="-1" <?php if (GedcomConfig::$SHOW_GEDCOM_RECORD == "-1") print "selected=\"selected\""; ?>><?php print constant("GM_LANG_show_gedrec_-1");?></option>
 				<option value="0" <?php if (GedcomConfig::$SHOW_GEDCOM_RECORD == "0") print "selected=\"selected\""; ?>><?php print GM_LANG_show_gedrec_0;?></option>
 				<option value="1" <?php if (GedcomConfig::$SHOW_GEDCOM_RECORD == "1") print "selected=\"selected\""; ?>><?php print GM_LANG_show_gedrec_1;?></option>
@@ -1179,36 +1186,36 @@ print "&nbsp;<a href=\"javascript: ".htmlentities(GM_LANG_displ_hide_conf)."\" o
 		</td>
 	</tr>
 	<tr>
-		<td class="shade2 wrap"><div class="helpicon"><?php PrintHelpLink("HIDE_GEDCOM_ERRORS_help", "qm", "HIDE_GEDCOM_ERRORS"); print "</div><div class=\"description\">"; print GM_LANG_HIDE_GEDCOM_ERRORS;?></div></td>
-		<td class="shade1"><select name="NEW_HIDE_GEDCOM_ERRORS" tabindex="<?php $i++; print $i?>">
+		<td class="NavBlockLabel AdminNavBlockLabel"><div class="HelpIconContainer"><?php PrintHelpLink("HIDE_GEDCOM_ERRORS_help", "qm", "HIDE_GEDCOM_ERRORS"); print "</div><div class=\"AdminNavBlockOptionText\">"; print GM_LANG_HIDE_GEDCOM_ERRORS;?></div></td>
+		<td class="NavBlockField AdminNavBlockField"><select name="NEW_HIDE_GEDCOM_ERRORS" tabindex="<?php $i++; print $i?>">
 				<option value="yes" <?php if (GedcomConfig::$HIDE_GEDCOM_ERRORS) print "selected=\"selected\""; ?>><?php print GM_LANG_yes;?></option>
 				<option value="no" <?php if (!GedcomConfig::$HIDE_GEDCOM_ERRORS) print "selected=\"selected\""; ?>><?php print GM_LANG_no;?></option>
 			</select>
 		</td>
 	</tr>
 	<tr>
-		<td class="shade2 wrap"><div class="helpicon"><?php PrintHelpLink("WORD_WRAPPED_NOTES_help", "qm", "WORD_WRAPPED_NOTES"); print "</div><div class=\"description\">"; print GM_LANG_WORD_WRAPPED_NOTES;?></div></td>
-		<td class="shade1"><select name="NEW_WORD_WRAPPED_NOTES" tabindex="<?php $i++; print $i?>">
+		<td class="NavBlockLabel AdminNavBlockLabel"><div class="HelpIconContainer"><?php PrintHelpLink("WORD_WRAPPED_NOTES_help", "qm", "WORD_WRAPPED_NOTES"); print "</div><div class=\"AdminNavBlockOptionText\">"; print GM_LANG_WORD_WRAPPED_NOTES;?></div></td>
+		<td class="NavBlockField AdminNavBlockField"><select name="NEW_WORD_WRAPPED_NOTES" tabindex="<?php $i++; print $i?>">
 				<option value="yes" <?php if (GedcomConfig::$WORD_WRAPPED_NOTES) print "selected=\"selected\""; ?>><?php print GM_LANG_yes;?></option>
 				<option value="no" <?php if (!GedcomConfig::$WORD_WRAPPED_NOTES) print "selected=\"selected\""; ?>><?php print GM_LANG_no;?></option>
 			</select>
 		</td>
 	</tr>
 	<tr>
-		<td class="shade2 wrap"><div class="helpicon"><?php PrintHelpLink("FAVICON_help", "qm", "FAVICON"); print "</div><div class=\"description\">"; print GM_LANG_FAVICON;?></div></td>
-		<td class="shade1"><input type="text" name="NEW_FAVICON" value="<?php print GedcomConfig::$FAVICON?>" size="40" dir="ltr" tabindex="<?php $i++; print $i?>" /></td>
+		<td class="NavBlockLabel AdminNavBlockLabel"><div class="HelpIconContainer"><?php PrintHelpLink("FAVICON_help", "qm", "FAVICON"); print "</div><div class=\"AdminNavBlockOptionText\">"; print GM_LANG_FAVICON;?></div></td>
+		<td class="NavBlockField AdminNavBlockField"><input type="text" name="NEW_FAVICON" value="<?php print GedcomConfig::$FAVICON?>" size="40" dir="ltr" tabindex="<?php $i++; print $i?>" /></td>
 	</tr>
 	<tr>
-		<td class="shade2 wrap"><div class="helpicon"><?php PrintHelpLink("SHOW_COUNTER_help", "qm", "SHOW_COUNTER"); print "</div><div class=\"description\">"; print GM_LANG_SHOW_COUNTER;?></div></td>
-		<td class="shade1"><select name="NEW_SHOW_COUNTER" tabindex="<?php $i++; print $i?>">
+		<td class="NavBlockLabel AdminNavBlockLabel"><div class="HelpIconContainer"><?php PrintHelpLink("SHOW_COUNTER_help", "qm", "SHOW_COUNTER"); print "</div><div class=\"AdminNavBlockOptionText\">"; print GM_LANG_SHOW_COUNTER;?></div></td>
+		<td class="NavBlockField AdminNavBlockField"><select name="NEW_SHOW_COUNTER" tabindex="<?php $i++; print $i?>">
 				<option value="yes" <?php if (GedcomConfig::$SHOW_COUNTER) print "selected=\"selected\""; ?>><?php print GM_LANG_yes;?></option>
 				<option value="no" <?php if (!GedcomConfig::$SHOW_COUNTER) print "selected=\"selected\""; ?>><?php print GM_LANG_no;?></option>
 			</select>
 		</td>
 	</tr>
 	<tr>
-		<td class="shade2 wrap"><div class="helpicon"><?php PrintHelpLink("SHOW_STATS_help", "qm", "SHOW_STATS"); print "</div><div class=\"description\">"; print GM_LANG_SHOW_STATS;?></div></td>
-		<td class="shade1"><select name="NEW_SHOW_STATS" tabindex="<?php $i++; print $i?>">
+		<td class="NavBlockLabel AdminNavBlockLabel"><div class="HelpIconContainer"><?php PrintHelpLink("SHOW_STATS_help", "qm", "SHOW_STATS"); print "</div><div class=\"AdminNavBlockOptionText\">"; print GM_LANG_SHOW_STATS;?></div></td>
+		<td class="NavBlockField AdminNavBlockField"><select name="NEW_SHOW_STATS" tabindex="<?php $i++; print $i?>">
 				<option value="yes" <?php if (GedcomConfig::$SHOW_STATS) print "selected=\"selected\""; ?>><?php print GM_LANG_yes;?></option>
 				<option value="no" <?php if (!GedcomConfig::$SHOW_STATS) print "selected=\"selected\""; ?>><?php print GM_LANG_no;?></option>
 			</select>
@@ -1221,24 +1228,26 @@ print "&nbsp;<a href=\"javascript: ".htmlentities(GM_LANG_displ_hide_conf)."\" o
 
 <?php // Edit Options
 ?>
-<table class="FactsTable"><tr><td class="topbottombar <?php print $TEXT_DIRECTION;?>">
+<table class="NavBlockTable AdminNavBlockTable">
+	<tr>
+		<td class="NavBlockHeader ConfigNavBlockHeader">
 <?php
 print "<a href=\"javascript: ".htmlentities(GM_LANG_editopt_conf)."\" onclick=\"expand_layer('edit-options');return false;\"><img id=\"edit-options_img\" src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["plus"]["other"]."\" border=\"0\" width=\"11\" height=\"11\" alt=\"\" /></a>";
 print "&nbsp;<a href=\"javascript: ".htmlentities(GM_LANG_editopt_conf)."\" onclick=\"expand_layer('edit-options');return false;\">".GM_LANG_editopt_conf."</a>";
 ?></td></tr></table>
 <div id="edit-options" style="display: none">
-<table class="FactsTable">
+<table class="NavBlockTable AdminNavBlockTable">
 	<tr>
-		<td class="shade2 wrap width20"><div class="helpicon"><?php PrintHelpLink("ALLOW_EDIT_GEDCOM_help", "qm", "ALLOW_EDIT_GEDCOM"); print "</div><div class=\"description\">"; print GM_LANG_ALLOW_EDIT_GEDCOM;?></div></td>
-		<td class="shade1"><select name="NEW_ALLOW_EDIT_GEDCOM" tabindex="<?php $i++; print $i?>">
+		<td class="NavBlockLabel AdminNavBlockLabel"><div class="HelpIconContainer"><?php PrintHelpLink("ALLOW_EDIT_GEDCOM_help", "qm", "ALLOW_EDIT_GEDCOM"); print "</div><div class=\"AdminNavBlockOptionText\">"; print GM_LANG_ALLOW_EDIT_GEDCOM;?></div></td>
+		<td class="NavBlockField AdminNavBlockField"><select name="NEW_ALLOW_EDIT_GEDCOM" tabindex="<?php $i++; print $i?>">
 				<option value="yes" <?php if (GedcomConfig::$ALLOW_EDIT_GEDCOM) print "selected=\"selected\""; ?>><?php print GM_LANG_yes;?></option>
 				<option value="no" <?php if (!GedcomConfig::$ALLOW_EDIT_GEDCOM) print "selected=\"selected\""; ?>><?php print GM_LANG_no;?></option>
 			</select>
 		</td>
 	</tr>
 	<tr>
-		<td class="shade2 wrap"><div class="helpicon"><?php PrintHelpLink("EDIT_GEDCOM_RECORD_help", "qm", "EDIT_GEDCOM_RECORD"); print "</div><div class=\"description\">"; print GM_LANG_EDIT_GEDCOM_RECORD;?></div></td>
-		<td class="shade1"><select name="NEW_EDIT_GEDCOM_RECORD" tabindex="<?php $i++; print $i?>">
+		<td class="NavBlockLabel AdminNavBlockLabel"><div class="HelpIconContainer"><?php PrintHelpLink("EDIT_GEDCOM_RECORD_help", "qm", "EDIT_GEDCOM_RECORD"); print "</div><div class=\"AdminNavBlockOptionText\">"; print GM_LANG_EDIT_GEDCOM_RECORD;?></div></td>
+		<td class="NavBlockField AdminNavBlockField"><select name="NEW_EDIT_GEDCOM_RECORD" tabindex="<?php $i++; print $i?>">
 				<option value="-1" <?php if (GedcomConfig::$EDIT_GEDCOM_RECORD == "-1") print "selected=\"selected\""; ?>><?php print constant("GM_LANG_show_gedrec_-1");?></option>
 				<option value="2" <?php if (GedcomConfig::$EDIT_GEDCOM_RECORD == "2") print "selected=\"selected\""; ?>><?php print GM_LANG_show_gedrec_2;?></option>
 				<option value="3" <?php if (GedcomConfig::$EDIT_GEDCOM_RECORD == "3") print "selected=\"selected\""; ?>><?php print GM_LANG_show_gedrec_3;?></option>
@@ -1248,88 +1257,88 @@ print "&nbsp;<a href=\"javascript: ".htmlentities(GM_LANG_editopt_conf)."\" oncl
 		</td>
 	</tr>
 	<tr>
-		<td class="shade2 wrap"><div class="helpicon"><?php PrintHelpLink("INDI_FACTS_ADD_help", "qm", "INDI_FACTS_ADD"); print "</div><div class=\"description\">"; print GM_LANG_INDI_FACTS_ADD;?></div></td>
-		<td class="shade1"><input type="text" name="NEW_INDI_FACTS_ADD" value="<?php print GedcomConfig::$INDI_FACTS_ADD; ?>" size="80" dir="ltr" tabindex="<?php $i++; print $i?>" /></td>
+		<td class="NavBlockLabel AdminNavBlockLabel"><div class="HelpIconContainer"><?php PrintHelpLink("INDI_FACTS_ADD_help", "qm", "INDI_FACTS_ADD"); print "</div><div class=\"AdminNavBlockOptionText\">"; print GM_LANG_INDI_FACTS_ADD;?></div></td>
+		<td class="NavBlockField AdminNavBlockField"><input type="text" name="NEW_INDI_FACTS_ADD" value="<?php print GedcomConfig::$INDI_FACTS_ADD; ?>" size="80" dir="ltr" tabindex="<?php $i++; print $i?>" /></td>
 	</tr>
 	<tr>
-		<td class="shade2 wrap"><div class="helpicon"><?php PrintHelpLink("INDI_FACTS_UNIQUE_help", "qm", "INDI_FACTS_UNIQUE"); print "</div><div class=\"description\">"; print GM_LANG_INDI_FACTS_UNIQUE;?></div></td>
-		<td class="shade1"><input type="text" name="NEW_INDI_FACTS_UNIQUE" value="<?php print GedcomConfig::$INDI_FACTS_UNIQUE; ?>" size="80" dir="ltr" tabindex="<?php $i++; print $i?>" /></td>
+		<td class="NavBlockLabel AdminNavBlockLabel"><div class="HelpIconContainer"><?php PrintHelpLink("INDI_FACTS_UNIQUE_help", "qm", "INDI_FACTS_UNIQUE"); print "</div><div class=\"AdminNavBlockOptionText\">"; print GM_LANG_INDI_FACTS_UNIQUE;?></div></td>
+		<td class="NavBlockField AdminNavBlockField"><input type="text" name="NEW_INDI_FACTS_UNIQUE" value="<?php print GedcomConfig::$INDI_FACTS_UNIQUE; ?>" size="80" dir="ltr" tabindex="<?php $i++; print $i?>" /></td>
 	</tr>
 	<tr>
-		<td class="shade2 wrap"><div class="helpicon"><?php PrintHelpLink("INDI_QUICK_ADDFACTS_help", "qm", "INDI_QUICK_ADDFACTS"); print "</div><div class=\"description\">"; print GM_LANG_INDI_QUICK_ADDFACTS;?></div></td>
-		<td class="shade1"><input type="text" name="NEW_INDI_QUICK_ADDFACTS" value="<?php print GedcomConfig::$INDI_QUICK_ADDFACTS; ?>" size="80" dir="ltr" tabindex="<?php $i++; print $i?>" /></td>
+		<td class="NavBlockLabel AdminNavBlockLabel"><div class="HelpIconContainer"><?php PrintHelpLink("INDI_QUICK_ADDFACTS_help", "qm", "INDI_QUICK_ADDFACTS"); print "</div><div class=\"AdminNavBlockOptionText\">"; print GM_LANG_INDI_QUICK_ADDFACTS;?></div></td>
+		<td class="NavBlockField AdminNavBlockField"><input type="text" name="NEW_INDI_QUICK_ADDFACTS" value="<?php print GedcomConfig::$INDI_QUICK_ADDFACTS; ?>" size="80" dir="ltr" tabindex="<?php $i++; print $i?>" /></td>
 	</tr>
 	<tr>
-		<td class="shade2 wrap"><div class="helpicon"><?php PrintHelpLink("FAM_FACTS_ADD_help", "qm", "FAM_FACTS_ADD"); print "</div><div class=\"description\">"; print GM_LANG_FAM_FACTS_ADD;?></div></td>
-		<td class="shade1"><input type="text" name="NEW_FAM_FACTS_ADD" value="<?php print GedcomConfig::$FAM_FACTS_ADD; ?>" size="80" dir="ltr" tabindex="<?php $i++; print $i?>" /></td>
+		<td class="NavBlockLabel AdminNavBlockLabel"><div class="HelpIconContainer"><?php PrintHelpLink("FAM_FACTS_ADD_help", "qm", "FAM_FACTS_ADD"); print "</div><div class=\"AdminNavBlockOptionText\">"; print GM_LANG_FAM_FACTS_ADD;?></div></td>
+		<td class="NavBlockField AdminNavBlockField"><input type="text" name="NEW_FAM_FACTS_ADD" value="<?php print GedcomConfig::$FAM_FACTS_ADD; ?>" size="80" dir="ltr" tabindex="<?php $i++; print $i?>" /></td>
 	</tr>
 	<tr>
-		<td class="shade2 wrap"><div class="helpicon"><?php PrintHelpLink("FAM_FACTS_UNIQUE_help", "qm", "FAM_FACTS_UNIQUE"); print "</div><div class=\"description\">"; print GM_LANG_FAM_FACTS_UNIQUE;?></div></td>
-		<td class="shade1"><input type="text" name="NEW_FAM_FACTS_UNIQUE" value="<?php print GedcomConfig::$FAM_FACTS_UNIQUE; ?>" size="80" dir="ltr" tabindex="<?php $i++; print $i?>" /></td>
+		<td class="NavBlockLabel AdminNavBlockLabel"><div class="HelpIconContainer"><?php PrintHelpLink("FAM_FACTS_UNIQUE_help", "qm", "FAM_FACTS_UNIQUE"); print "</div><div class=\"AdminNavBlockOptionText\">"; print GM_LANG_FAM_FACTS_UNIQUE;?></div></td>
+		<td class="NavBlockField AdminNavBlockField"><input type="text" name="NEW_FAM_FACTS_UNIQUE" value="<?php print GedcomConfig::$FAM_FACTS_UNIQUE; ?>" size="80" dir="ltr" tabindex="<?php $i++; print $i?>" /></td>
 	</tr>
 	<tr>
-		<td class="shade2 wrap"><div class="helpicon"><?php PrintHelpLink("FAM_QUICK_ADDFACTS_help", "qm", "FAM_QUICK_ADDFACTS"); print "</div><div class=\"description\">"; print GM_LANG_FAM_QUICK_ADDFACTS;?></div></td>
-		<td class="shade1"><input type="text" name="NEW_FAM_QUICK_ADDFACTS" value="<?php print GedcomConfig::$FAM_QUICK_ADDFACTS; ?>" size="80" dir="ltr" tabindex="<?php $i++; print $i?>" /></td>
+		<td class="NavBlockLabel AdminNavBlockLabel"><div class="HelpIconContainer"><?php PrintHelpLink("FAM_QUICK_ADDFACTS_help", "qm", "FAM_QUICK_ADDFACTS"); print "</div><div class=\"AdminNavBlockOptionText\">"; print GM_LANG_FAM_QUICK_ADDFACTS;?></div></td>
+		<td class="NavBlockField AdminNavBlockField"><input type="text" name="NEW_FAM_QUICK_ADDFACTS" value="<?php print GedcomConfig::$FAM_QUICK_ADDFACTS; ?>" size="80" dir="ltr" tabindex="<?php $i++; print $i?>" /></td>
 	</tr>
 	<tr>
-		<td class="shade2 wrap"><div class="helpicon"><?php PrintHelpLink("SOUR_FACTS_ADD_help", "qm", "SOUR_FACTS_ADD"); print "</div><div class=\"description\">"; print GM_LANG_SOUR_FACTS_ADD;?></div></td>
-		<td class="shade1"><input type="text" name="NEW_SOUR_FACTS_ADD" value="<?php print GedcomConfig::$SOUR_FACTS_ADD; ?>" size="80" dir="ltr" tabindex="<?php $i++; print $i?>" /></td>
+		<td class="NavBlockLabel AdminNavBlockLabel"><div class="HelpIconContainer"><?php PrintHelpLink("SOUR_FACTS_ADD_help", "qm", "SOUR_FACTS_ADD"); print "</div><div class=\"AdminNavBlockOptionText\">"; print GM_LANG_SOUR_FACTS_ADD;?></div></td>
+		<td class="NavBlockField AdminNavBlockField"><input type="text" name="NEW_SOUR_FACTS_ADD" value="<?php print GedcomConfig::$SOUR_FACTS_ADD; ?>" size="80" dir="ltr" tabindex="<?php $i++; print $i?>" /></td>
 	</tr>
 	<tr>
-		<td class="shade2 wrap"><div class="helpicon"><?php PrintHelpLink("SOUR_FACTS_UNIQUE_help", "qm", "SOUR_FACTS_UNIQUE"); print "</div><div class=\"description\">"; print GM_LANG_SOUR_FACTS_UNIQUE;?></div></td>
-		<td class="shade1"><input type="text" name="NEW_SOUR_FACTS_UNIQUE" value="<?php print GedcomConfig::$SOUR_FACTS_UNIQUE; ?>" size="80" dir="ltr" tabindex="<?php $i++; print $i?>" /></td>
+		<td class="NavBlockLabel AdminNavBlockLabel"><div class="HelpIconContainer"><?php PrintHelpLink("SOUR_FACTS_UNIQUE_help", "qm", "SOUR_FACTS_UNIQUE"); print "</div><div class=\"AdminNavBlockOptionText\">"; print GM_LANG_SOUR_FACTS_UNIQUE;?></div></td>
+		<td class="NavBlockField AdminNavBlockField"><input type="text" name="NEW_SOUR_FACTS_UNIQUE" value="<?php print GedcomConfig::$SOUR_FACTS_UNIQUE; ?>" size="80" dir="ltr" tabindex="<?php $i++; print $i?>" /></td>
 	</tr>
 	<tr>
-		<td class="shade2 wrap"><div class="helpicon"><?php PrintHelpLink("SOUR_QUICK_ADDFACTS_help", "qm", "SOUR_QUICK_ADDFACTS"); print "</div><div class=\"description\">"; print GM_LANG_SOUR_QUICK_ADDFACTS;?></div></td>
-		<td class="shade1"><input type="text" name="NEW_SOUR_QUICK_ADDFACTS" value="<?php print GedcomConfig::$SOUR_QUICK_ADDFACTS; ?>" size="80" dir="ltr" tabindex="<?php $i++; print $i?>" /></td>
+		<td class="NavBlockLabel AdminNavBlockLabel"><div class="HelpIconContainer"><?php PrintHelpLink("SOUR_QUICK_ADDFACTS_help", "qm", "SOUR_QUICK_ADDFACTS"); print "</div><div class=\"AdminNavBlockOptionText\">"; print GM_LANG_SOUR_QUICK_ADDFACTS;?></div></td>
+		<td class="NavBlockField AdminNavBlockField"><input type="text" name="NEW_SOUR_QUICK_ADDFACTS" value="<?php print GedcomConfig::$SOUR_QUICK_ADDFACTS; ?>" size="80" dir="ltr" tabindex="<?php $i++; print $i?>" /></td>
 	</tr>
 	<tr>
-		<td class="shade2 wrap"><div class="helpicon"><?php PrintHelpLink("REPO_FACTS_ADD_help", "qm", "REPO_FACTS_ADD"); print "</div><div class=\"description\">"; print GM_LANG_REPO_FACTS_ADD;?></div></td>
-		<td class="shade1"><input type="text" name="NEW_REPO_FACTS_ADD" value="<?php print GedcomConfig::$REPO_FACTS_ADD; ?>" size="80" dir="ltr" tabindex="<?php $i++; print $i?>" /></td>
+		<td class="NavBlockLabel AdminNavBlockLabel"><div class="HelpIconContainer"><?php PrintHelpLink("REPO_FACTS_ADD_help", "qm", "REPO_FACTS_ADD"); print "</div><div class=\"AdminNavBlockOptionText\">"; print GM_LANG_REPO_FACTS_ADD;?></div></td>
+		<td class="NavBlockField AdminNavBlockField"><input type="text" name="NEW_REPO_FACTS_ADD" value="<?php print GedcomConfig::$REPO_FACTS_ADD; ?>" size="80" dir="ltr" tabindex="<?php $i++; print $i?>" /></td>
 	</tr>
 	<tr>
-		<td class="shade2 wrap"><div class="helpicon"><?php PrintHelpLink("REPO_FACTS_UNIQUE_help", "qm", "REPO_FACTS_UNIQUE"); print "</div><div class=\"description\">"; print GM_LANG_REPO_FACTS_UNIQUE;?></div></td>
-		<td class="shade1"><input type="text" name="NEW_REPO_FACTS_UNIQUE" value="<?php print GedcomConfig::$REPO_FACTS_UNIQUE; ?>" size="80" dir="ltr" tabindex="<?php $i++; print $i?>" /></td>
+		<td class="NavBlockLabel AdminNavBlockLabel"><div class="HelpIconContainer"><?php PrintHelpLink("REPO_FACTS_UNIQUE_help", "qm", "REPO_FACTS_UNIQUE"); print "</div><div class=\"AdminNavBlockOptionText\">"; print GM_LANG_REPO_FACTS_UNIQUE;?></div></td>
+		<td class="NavBlockField AdminNavBlockField"><input type="text" name="NEW_REPO_FACTS_UNIQUE" value="<?php print GedcomConfig::$REPO_FACTS_UNIQUE; ?>" size="80" dir="ltr" tabindex="<?php $i++; print $i?>" /></td>
 	</tr>
 	<tr>
-		<td class="shade2 wrap"><div class="helpicon"><?php PrintHelpLink("REPO_QUICK_ADDFACTS_help", "qm", "REPO_QUICK_ADDFACTS"); print "</div><div class=\"description\">"; print GM_LANG_REPO_QUICK_ADDFACTS;?></div></td>
-		<td class="shade1"><input type="text" name="NEW_REPO_QUICK_ADDFACTS" value="<?php print GedcomConfig::$REPO_QUICK_ADDFACTS; ?>" size="80" dir="ltr" tabindex="<?php $i++; print $i?>" /></td>
+		<td class="NavBlockLabel AdminNavBlockLabel"><div class="HelpIconContainer"><?php PrintHelpLink("REPO_QUICK_ADDFACTS_help", "qm", "REPO_QUICK_ADDFACTS"); print "</div><div class=\"AdminNavBlockOptionText\">"; print GM_LANG_REPO_QUICK_ADDFACTS;?></div></td>
+		<td class="NavBlockField AdminNavBlockField"><input type="text" name="NEW_REPO_QUICK_ADDFACTS" value="<?php print GedcomConfig::$REPO_QUICK_ADDFACTS; ?>" size="80" dir="ltr" tabindex="<?php $i++; print $i?>" /></td>
 	</tr>
 	<tr>
-		<td class="shade2 wrap"><div class="helpicon"><?php PrintHelpLink("MEDIA_FACTS_ADD_help", "qm", "MEDIA_FACTS_ADD"); print "</div><div class=\"description\">"; print GM_LANG_MEDIA_FACTS_ADD;?></div></td>
-		<td class="shade1"><input type="text" name="NEW_MEDIA_FACTS_ADD" value="<?php print GedcomConfig::$MEDIA_FACTS_ADD; ?>" size="80" dir="ltr" tabindex="<?php $i++; print $i?>" /></td>
+		<td class="NavBlockLabel AdminNavBlockLabel"><div class="HelpIconContainer"><?php PrintHelpLink("MEDIA_FACTS_ADD_help", "qm", "MEDIA_FACTS_ADD"); print "</div><div class=\"AdminNavBlockOptionText\">"; print GM_LANG_MEDIA_FACTS_ADD;?></div></td>
+		<td class="NavBlockField AdminNavBlockField"><input type="text" name="NEW_MEDIA_FACTS_ADD" value="<?php print GedcomConfig::$MEDIA_FACTS_ADD; ?>" size="80" dir="ltr" tabindex="<?php $i++; print $i?>" /></td>
 	</tr>
 	<tr>
-		<td class="shade2 wrap"><div class="helpicon"><?php PrintHelpLink("MEDIA_FACTS_UNIQUE_help", "qm", "MEDIA_FACTS_UNIQUE"); print "</div><div class=\"description\">"; print GM_LANG_MEDIA_FACTS_UNIQUE;?></div></td>
-		<td class="shade1"><input type="text" name="NEW_MEDIA_FACTS_UNIQUE" value="<?php print GedcomConfig::$MEDIA_FACTS_UNIQUE; ?>" size="80" dir="ltr" tabindex="<?php $i++; print $i?>" /></td>
+		<td class="NavBlockLabel AdminNavBlockLabel"><div class="HelpIconContainer"><?php PrintHelpLink("MEDIA_FACTS_UNIQUE_help", "qm", "MEDIA_FACTS_UNIQUE"); print "</div><div class=\"AdminNavBlockOptionText\">"; print GM_LANG_MEDIA_FACTS_UNIQUE;?></div></td>
+		<td class="NavBlockField AdminNavBlockField"><input type="text" name="NEW_MEDIA_FACTS_UNIQUE" value="<?php print GedcomConfig::$MEDIA_FACTS_UNIQUE; ?>" size="80" dir="ltr" tabindex="<?php $i++; print $i?>" /></td>
 	</tr>
 	<tr>
-		<td class="shade2 wrap"><div class="helpicon"><?php PrintHelpLink("MEDIA_QUICK_ADDFACTS_help", "qm", "MEDIA_QUICK_ADDFACTS"); print "</div><div class=\"description\">"; print GM_LANG_MEDIA_QUICK_ADDFACTS;?></div></td>
-		<td class="shade1"><input type="text" name="NEW_MEDIA_QUICK_ADDFACTS" value="<?php print GedcomConfig::$MEDIA_QUICK_ADDFACTS; ?>" size="80" dir="ltr" tabindex="<?php $i++; print $i?>" /></td>
+		<td class="NavBlockLabel AdminNavBlockLabel"><div class="HelpIconContainer"><?php PrintHelpLink("MEDIA_QUICK_ADDFACTS_help", "qm", "MEDIA_QUICK_ADDFACTS"); print "</div><div class=\"AdminNavBlockOptionText\">"; print GM_LANG_MEDIA_QUICK_ADDFACTS;?></div></td>
+		<td class="NavBlockField AdminNavBlockField"><input type="text" name="NEW_MEDIA_QUICK_ADDFACTS" value="<?php print GedcomConfig::$MEDIA_QUICK_ADDFACTS; ?>" size="80" dir="ltr" tabindex="<?php $i++; print $i?>" /></td>
 	</tr>
 	<tr>
-		<td class="shade2 wrap"><div class="helpicon"><?php PrintHelpLink("NOTE_FACTS_ADD_help", "qm", "NOTE_FACTS_ADD"); print "</div><div class=\"description\">"; print GM_LANG_NOTE_FACTS_ADD;?></div></td>
-		<td class="shade1"><input type="text" name="NEW_NOTE_FACTS_ADD" value="<?php print GedcomConfig::$NOTE_FACTS_ADD; ?>" size="80" dir="ltr" tabindex="<?php $i++; print $i?>" /></td>
+		<td class="NavBlockLabel AdminNavBlockLabel"><div class="HelpIconContainer"><?php PrintHelpLink("NOTE_FACTS_ADD_help", "qm", "NOTE_FACTS_ADD"); print "</div><div class=\"AdminNavBlockOptionText\">"; print GM_LANG_NOTE_FACTS_ADD;?></div></td>
+		<td class="NavBlockField AdminNavBlockField"><input type="text" name="NEW_NOTE_FACTS_ADD" value="<?php print GedcomConfig::$NOTE_FACTS_ADD; ?>" size="80" dir="ltr" tabindex="<?php $i++; print $i?>" /></td>
 	</tr>
 	<tr>
-		<td class="shade2 wrap"><div class="helpicon"><?php PrintHelpLink("NOTE_FACTS_UNIQUE_help", "qm", "NOTE_FACTS_UNIQUE"); print "</div><div class=\"description\">"; print GM_LANG_NOTE_FACTS_UNIQUE;?></div></td>
-		<td class="shade1"><input type="text" name="NEW_NOTE_FACTS_UNIQUE" value="<?php print GedcomConfig::$NOTE_FACTS_UNIQUE; ?>" size="80" dir="ltr" tabindex="<?php $i++; print $i?>" /></td>
+		<td class="NavBlockLabel AdminNavBlockLabel"><div class="HelpIconContainer"><?php PrintHelpLink("NOTE_FACTS_UNIQUE_help", "qm", "NOTE_FACTS_UNIQUE"); print "</div><div class=\"AdminNavBlockOptionText\">"; print GM_LANG_NOTE_FACTS_UNIQUE;?></div></td>
+		<td class="NavBlockField AdminNavBlockField"><input type="text" name="NEW_NOTE_FACTS_UNIQUE" value="<?php print GedcomConfig::$NOTE_FACTS_UNIQUE; ?>" size="80" dir="ltr" tabindex="<?php $i++; print $i?>" /></td>
 	</tr>
 	<tr>
-		<td class="shade2 wrap"><div class="helpicon"><?php PrintHelpLink("NOTE_QUICK_ADDFACTS_help", "qm", "NOTE_QUICK_ADDFACTS"); print "</div><div class=\"description\">"; print GM_LANG_NOTE_QUICK_ADDFACTS;?></div></td>
-		<td class="shade1"><input type="text" name="NEW_NOTE_QUICK_ADDFACTS" value="<?php print GedcomConfig::$NOTE_QUICK_ADDFACTS; ?>" size="80" dir="ltr" tabindex="<?php $i++; print $i?>" /></td>
+		<td class="NavBlockLabel AdminNavBlockLabel"><div class="HelpIconContainer"><?php PrintHelpLink("NOTE_QUICK_ADDFACTS_help", "qm", "NOTE_QUICK_ADDFACTS"); print "</div><div class=\"AdminNavBlockOptionText\">"; print GM_LANG_NOTE_QUICK_ADDFACTS;?></div></td>
+		<td class="NavBlockField AdminNavBlockField"><input type="text" name="NEW_NOTE_QUICK_ADDFACTS" value="<?php print GedcomConfig::$NOTE_QUICK_ADDFACTS; ?>" size="80" dir="ltr" tabindex="<?php $i++; print $i?>" /></td>
 	</tr>
 	<tr>
-		<td class="shade2 wrap"><div class="helpicon"><?php PrintHelpLink("EDIT_AUTOCLOSE_help", "qm", "EDIT_AUTOCLOSE"); print "</div><div class=\"description\">"; print GM_LANG_EDIT_AUTOCLOSE;?></div></td>
-		<td class="shade1"><select name="NEW_EDIT_AUTOCLOSE" tabindex="<?php $i++; print $i?>">
+		<td class="NavBlockLabel AdminNavBlockLabel"><div class="HelpIconContainer"><?php PrintHelpLink("EDIT_AUTOCLOSE_help", "qm", "EDIT_AUTOCLOSE"); print "</div><div class=\"AdminNavBlockOptionText\">"; print GM_LANG_EDIT_AUTOCLOSE;?></div></td>
+		<td class="NavBlockField AdminNavBlockField"><select name="NEW_EDIT_AUTOCLOSE" tabindex="<?php $i++; print $i?>">
 				<option value="yes" <?php if (GedcomConfig::$EDIT_AUTOCLOSE) print "selected=\"selected\""; ?>><?php print GM_LANG_yes;?></option>
 				<option value="no" <?php if (!GedcomConfig::$EDIT_AUTOCLOSE) print "selected=\"selected\""; ?>><?php print GM_LANG_no;?></option>
 			</select>
 		</td>
 	</tr>
 	<tr>
-		<td class="shade2 wrap"><div class="helpicon"><?php PrintHelpLink("SPLIT_PLACES_help", "qm", "SPLIT_PLACES"); print "</div><div class=\"description\">"; print GM_LANG_SPLIT_PLACES;?></div></td>
-		<td class="shade1"><select name="NEW_SPLIT_PLACES" tabindex="<?php $i++; print $i?>">
+		<td class="NavBlockLabel AdminNavBlockLabel"><div class="HelpIconContainer"><?php PrintHelpLink("SPLIT_PLACES_help", "qm", "SPLIT_PLACES"); print "</div><div class=\"AdminNavBlockOptionText\">"; print GM_LANG_SPLIT_PLACES;?></div></td>
+		<td class="NavBlockField AdminNavBlockField"><select name="NEW_SPLIT_PLACES" tabindex="<?php $i++; print $i?>">
 				<option value="yes" <?php if (GedcomConfig::$SPLIT_PLACES) print "selected=\"selected\""; ?>><?php print GM_LANG_yes;?></option>
 				<option value="no" <?php if (!GedcomConfig::$SPLIT_PLACES) print "selected=\"selected\""; ?>><?php print GM_LANG_no;?></option>
 			</select>
@@ -1341,32 +1350,34 @@ print "&nbsp;<a href=\"javascript: ".htmlentities(GM_LANG_editopt_conf)."\" oncl
 
 <?php // User Options
 ?>
-<table class="FactsTable"><tr><td class="topbottombar <?php print $TEXT_DIRECTION;?>">
+<table class="NavBlockTable AdminNavBlockTable">
+	<tr>
+		<td class="NavBlockHeader ConfigNavBlockHeader">
 <?php
 print "<a href=\"javascript: ".htmlentities(GM_LANG_useropt_conf)."\" onclick=\"expand_layer('user-options');return false;\"><img id=\"user-options_img\" src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["plus"]["other"]."\" border=\"0\" width=\"11\" height=\"11\" alt=\"\" /></a>";
 print "&nbsp;<a href=\"javascript: ".htmlentities(GM_LANG_useropt_conf)."\" onclick=\"expand_layer('user-options');return false;\">".GM_LANG_useropt_conf."</a>";
 ?></td></tr></table>
 <div id="user-options" style="display: none">
-<table class="FactsTable">
+<table class="NavBlockTable AdminNavBlockTable">
 	<tr>
-		<td class="shade2 wrap width20"><div class="helpicon"><?php PrintHelpLink("ENABLE_MULTI_LANGUAGE_help", "qm", "ENABLE_MULTI_LANGUAGE"); print "</div><div class=\"description\">"; print GM_LANG_ENABLE_MULTI_LANGUAGE;?></div></td>
-		<td class="shade1"><select name="NEW_ENABLE_MULTI_LANGUAGE" tabindex="<?php $i++; print $i?>" >
+		<td class="NavBlockLabel AdminNavBlockLabel"><div class="HelpIconContainer"><?php PrintHelpLink("ENABLE_MULTI_LANGUAGE_help", "qm", "ENABLE_MULTI_LANGUAGE"); print "</div><div class=\"AdminNavBlockOptionText\">"; print GM_LANG_ENABLE_MULTI_LANGUAGE;?></div></td>
+		<td class="NavBlockField AdminNavBlockField"><select name="NEW_ENABLE_MULTI_LANGUAGE" tabindex="<?php $i++; print $i?>" >
 				<option value="yes" <?php if (GedcomConfig::$ENABLE_MULTI_LANGUAGE) print "selected=\"selected\""; ?>><?php print GM_LANG_yes;?></option>
 				<option value="no" <?php if (!GedcomConfig::$ENABLE_MULTI_LANGUAGE) print "selected=\"selected\""; ?>><?php print GM_LANG_no;?></option>
 			</select>
 		</td>
 	</tr>
 	<tr>
-		<td class="shade2 wrap"><div class="helpicon"><?php PrintHelpLink("show_context_help_help", "qm", "show_contexthelp"); print "</div><div class=\"description\">"; print GM_LANG_show_contexthelp;?></div></td>
-		<td class="shade1"><select name="NEW_SHOW_CONTEXT_HELP" tabindex="<?php $i++; print $i?>">
+		<td class="NavBlockLabel AdminNavBlockLabel"><div class="HelpIconContainer"><?php PrintHelpLink("show_context_help_help", "qm", "show_contexthelp"); print "</div><div class=\"AdminNavBlockOptionText\">"; print GM_LANG_show_contexthelp;?></div></td>
+		<td class="NavBlockField AdminNavBlockField"><select name="NEW_SHOW_CONTEXT_HELP" tabindex="<?php $i++; print $i?>">
 				<option value="yes" <?php if (GedcomConfig::$SHOW_CONTEXT_HELP) print "selected=\"selected\""; ?>><?php print GM_LANG_yes;?></option>
 				<option value="no" <?php if (!GedcomConfig::$SHOW_CONTEXT_HELP) print "selected=\"selected\""; ?>><?php print GM_LANG_no;?></option>
 			</select>
 		</td>
 	</tr>
 	<tr>
-		<td class="shade2 wrap"><div class="helpicon"><?php PrintHelpLink("THEME_DIR_help", "qm", "THEME_DIR"); print "</div><div class=\"description\">"; print GM_LANG_THEME_DIR;?></div></td>
-		<td class="shade1">
+		<td class="NavBlockLabel AdminNavBlockLabel"><div class="HelpIconContainer"><?php PrintHelpLink("THEME_DIR_help", "qm", "THEME_DIR"); print "</div><div class=\"AdminNavBlockOptionText\">"; print GM_LANG_THEME_DIR;?></div></td>
+		<td class="NavBlockField AdminNavBlockField">
 			<select name="themeselect" dir="ltr" tabindex="<?php $i++; print $i?>"  onchange="document.configform.NTHEME_DIR.value=document.configform.themeselect.options[document.configform.themeselect.selectedIndex].value;">
 				<?php
 					$themes = GetThemeNames();
@@ -1390,8 +1401,8 @@ print "&nbsp;<a href=\"javascript: ".htmlentities(GM_LANG_useropt_conf)."\" oncl
 		</td>
 	</tr>
 	<tr>
-		<td class="shade2 wrap"><div class="helpicon"><?php PrintHelpLink("ALLOW_THEME_DROPDOWN_help", "qm", "ALLOW_THEME_DROPDOWN"); print "</div><div class=\"description\">"; print GM_LANG_ALLOW_THEME_DROPDOWN;?></div></td>
-		<td class="shade1"><select name="NEW_ALLOW_THEME_DROPDOWN" tabindex="<?php $i++; print $i?>">
+		<td class="NavBlockLabel AdminNavBlockLabel"><div class="HelpIconContainer"><?php PrintHelpLink("ALLOW_THEME_DROPDOWN_help", "qm", "ALLOW_THEME_DROPDOWN"); print "</div><div class=\"AdminNavBlockOptionText\">"; print GM_LANG_ALLOW_THEME_DROPDOWN;?></div></td>
+		<td class="NavBlockField AdminNavBlockField"><select name="NEW_ALLOW_THEME_DROPDOWN" tabindex="<?php $i++; print $i?>">
 				<option value="yes" <?php if (GedcomConfig::$ALLOW_THEME_DROPDOWN) print "selected=\"selected\""; ?>><?php print GM_LANG_yes;?></option>
 				<option value="no" <?php if (!GedcomConfig::$ALLOW_THEME_DROPDOWN) print "selected=\"selected\""; ?>><?php print GM_LANG_no;?></option>
 			</select>
@@ -1402,16 +1413,18 @@ print "&nbsp;<a href=\"javascript: ".htmlentities(GM_LANG_useropt_conf)."\" oncl
 
 
 
-<table class="FactsTable"><tr><td class="topbottombar <?php print $TEXT_DIRECTION;?>">
+<table class="NavBlockTable AdminNavBlockTable">
+	<tr>
+		<td class="NavBlockHeader ConfigNavBlockHeader">
 <?php
 print "<a href=\"javascript: ".htmlentities(GM_LANG_contact_conf)."\" onclick=\"expand_layer('contact-options');return false;\"><img id=\"contact-options_img\" src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["plus"]["other"]."\" border=\"0\" width=\"11\" height=\"11\" alt=\"\" /></a>";
 print "&nbsp;<a href=\"javascript: ".htmlentities(GM_LANG_contact_conf)."\" onclick=\"expand_layer('contact-options');return false;\">".GM_LANG_contact_conf."</a>";
 ?></td></tr></table>
 <div id="contact-options" style="display: none">
-<table class="FactsTable">
+<table class="NavBlockTable AdminNavBlockTable">
 	<tr>
-		<td class="shade2 wrap width20"><div class="helpicon"><?php PrintHelpLink("CONTACT_EMAIL_help", "qm", "CONTACT_EMAIL"); print "</div><div class=\"description\">"; print GM_LANG_CONTACT_EMAIL;?></div></td>
-		<td class="shade1"><select name="NEW_CONTACT_EMAIL" tabindex="<?php $i++; print $i?>">
+		<td class="NavBlockLabel AdminNavBlockLabel"><div class="HelpIconContainer"><?php PrintHelpLink("CONTACT_EMAIL_help", "qm", "CONTACT_EMAIL"); print "</div><div class=\"AdminNavBlockOptionText\">"; print GM_LANG_CONTACT_EMAIL;?></div></td>
+		<td class="NavBlockField AdminNavBlockField"><select name="NEW_CONTACT_EMAIL" tabindex="<?php $i++; print $i?>">
 		<?php
 			if (GedcomConfig::$CONTACT_EMAIL=="you@yourdomain.com") GedcomConfig::$CONTACT_EMAIL = $gm_user->username;
 			$users = UserController::GetUsers("lastname", "asc", "firstname");
@@ -1427,8 +1440,8 @@ print "&nbsp;<a href=\"javascript: ".htmlentities(GM_LANG_contact_conf)."\" oncl
 		</td>
 	</tr>
 	<tr>
-		<td class="shade2 wrap"><div class="helpicon"><?php PrintHelpLink("CONTACT_METHOD_help", "qm", "CONTACT_METHOD"); print "</div><div class=\"description\">"; print GM_LANG_CONTACT_METHOD;?></div></td>
-		<td class="shade1"><select name="NEW_CONTACT_METHOD" tabindex="<?php $i++; print $i?>">
+		<td class="NavBlockLabel AdminNavBlockLabel"><div class="HelpIconContainer"><?php PrintHelpLink("CONTACT_METHOD_help", "qm", "CONTACT_METHOD"); print "</div><div class=\"AdminNavBlockOptionText\">"; print GM_LANG_CONTACT_METHOD;?></div></td>
+		<td class="NavBlockField AdminNavBlockField"><select name="NEW_CONTACT_METHOD" tabindex="<?php $i++; print $i?>">
 		<?php if (SystemConfig::$GM_STORE_MESSAGES) { ?>
 				<option value="messaging" <?php if (GedcomConfig::$CONTACT_METHOD=='messaging') print "selected=\"selected\""; ?>><?php print GM_LANG_messaging;?></option>
 				<option value="messaging2" <?php if (GedcomConfig::$CONTACT_METHOD=='messaging2') print "selected=\"selected\""; ?>><?php print GM_LANG_messaging2;?></option>
@@ -1441,8 +1454,8 @@ print "&nbsp;<a href=\"javascript: ".htmlentities(GM_LANG_contact_conf)."\" oncl
 		</td>
 	</tr>
 	<tr>
-		<td class="shade2 wrap"><div class="helpicon"><?php PrintHelpLink("WEBMASTER_EMAIL_help", "qm", "WEBMASTER_EMAIL"); print "</div><div class=\"description\">"; print GM_LANG_WEBMASTER_EMAIL;?></div></td>
-		<td class="shade1"><select name="NEW_WEBMASTER_EMAIL" tabindex="<?php $i++; print $i?>">
+		<td class="NavBlockLabel AdminNavBlockLabel"><div class="HelpIconContainer"><?php PrintHelpLink("WEBMASTER_EMAIL_help", "qm", "WEBMASTER_EMAIL"); print "</div><div class=\"AdminNavBlockOptionText\">"; print GM_LANG_WEBMASTER_EMAIL;?></div></td>
+		<td class="NavBlockField AdminNavBlockField"><select name="NEW_WEBMASTER_EMAIL" tabindex="<?php $i++; print $i?>">
 		<?php
 			$users = UserController::GetUsers("lastname", "asc", "firstname");
 			if (GedcomConfig::$WEBMASTER_EMAIL=="webmaster@yourdomain.com") GedcomConfig::$WEBMASTER_EMAIL = $gm_user->username;
@@ -1458,8 +1471,8 @@ print "&nbsp;<a href=\"javascript: ".htmlentities(GM_LANG_contact_conf)."\" oncl
 		</td>
 	</tr>
 	<tr>
-		<td class="shade2 wrap"><div class="helpicon"><?php PrintHelpLink("SUPPORT_METHOD_help", "qm", "SUPPORT_METHOD"); print "</div><div class=\"description\">"; print GM_LANG_SUPPORT_METHOD;?></div></td>
-		<td class="shade1"><select name="NEW_SUPPORT_METHOD" tabindex="<?php $i++; print $i?>">
+		<td class="NavBlockLabel AdminNavBlockLabel"><div class="HelpIconContainer"><?php PrintHelpLink("SUPPORT_METHOD_help", "qm", "SUPPORT_METHOD"); print "</div><div class=\"AdminNavBlockOptionText\">"; print GM_LANG_SUPPORT_METHOD;?></div></td>
+		<td class="NavBlockField AdminNavBlockField"><select name="NEW_SUPPORT_METHOD" tabindex="<?php $i++; print $i?>">
 		<?php if (SystemConfig::$GM_STORE_MESSAGES) { ?>
 				<option value="messaging" <?php if (GedcomConfig::$SUPPORT_METHOD=='messaging') print "selected=\"selected\""; ?>><?php print GM_LANG_messaging;?></option>
 				<option value="messaging2" <?php if (GedcomConfig::$SUPPORT_METHOD=='messaging2') print "selected=\"selected\""; ?>><?php print GM_LANG_messaging2;?></option>
@@ -1472,8 +1485,8 @@ print "&nbsp;<a href=\"javascript: ".htmlentities(GM_LANG_contact_conf)."\" oncl
 		</td>
 	</tr>
 	<tr>
-		<td class="shade2 wrap"><div class="helpicon"><?php PrintHelpLink("BCC_WEBMASTER_help", "qm", "BCC_WEBMASTER"); print "</div><div class=\"description\">"; print GM_LANG_BCC_WEBMASTER;?></div></td>
-		<td class="shade1"><select name="NEW_BCC_WEBMASTER" tabindex="<?php $i++; print $i?>">
+		<td class="NavBlockLabel AdminNavBlockLabel"><div class="HelpIconContainer"><?php PrintHelpLink("BCC_WEBMASTER_help", "qm", "BCC_WEBMASTER"); print "</div><div class=\"AdminNavBlockOptionText\">"; print GM_LANG_BCC_WEBMASTER;?></div></td>
+		<td class="NavBlockField AdminNavBlockField"><select name="NEW_BCC_WEBMASTER" tabindex="<?php $i++; print $i?>">
 				<option value="yes" <?php if (GedcomConfig::$BCC_WEBMASTER) print "selected=\"selected\""; ?>><?php print GM_LANG_yes;?></option>
 				<option value="no" <?php if (!GedcomConfig::$BCC_WEBMASTER) print "selected=\"selected\""; ?>><?php print GM_LANG_no;?></option>
 			</select>
@@ -1481,86 +1494,88 @@ print "&nbsp;<a href=\"javascript: ".htmlentities(GM_LANG_contact_conf)."\" oncl
 	</tr>
 </table>
 </div>
-<table class="FactsTable"><tr><td class="topbottombar <?php print $TEXT_DIRECTION;?>">
+<table class="NavBlockTable AdminNavBlockTable">
+	<tr>
+		<td class="NavBlockHeader ConfigNavBlockHeader">
 <?php
 print "<a href=\"javascript: ".htmlentities(GM_LANG_meta_conf)."\" onclick=\"expand_layer('config-meta');return false;\"><img id=\"config-meta_img\" src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["plus"]["other"]."\" border=\"0\" width=\"11\" height=\"11\" alt=\"\" /></a>";
 print "&nbsp;<a href=\"javascript: ".htmlentities(GM_LANG_meta_conf)."\" onclick=\"expand_layer('config-meta');return false;\">".GM_LANG_meta_conf."</a>";
 ?></td></tr></table>
 <div id="config-meta" style="display: none">
-<table class="FactsTable">
+<table class="NavBlockTable AdminNavBlockTable">
 	<tr>
-		<td class="shade2 wrap width20"><div class="helpicon"><?php PrintHelpLink("HOME_SITE_URL_help", "qm", "HOME_SITE_URL"); print "</div><div class=\"description\">"; print GM_LANG_HOME_SITE_URL;?></div></td>
-		<td class="shade1"><input type="text" name="NEW_HOME_SITE_URL" value="<?php print GedcomConfig::$HOME_SITE_URL?>" size="50" dir="ltr" tabindex="<?php $i++; print $i?>" /></td>
+		<td class="NavBlockLabel AdminNavBlockLabel"><div class="HelpIconContainer"><?php PrintHelpLink("HOME_SITE_URL_help", "qm", "HOME_SITE_URL"); print "</div><div class=\"AdminNavBlockOptionText\">"; print GM_LANG_HOME_SITE_URL;?></div></td>
+		<td class="NavBlockField AdminNavBlockField"><input type="text" name="NEW_HOME_SITE_URL" value="<?php print GedcomConfig::$HOME_SITE_URL?>" size="50" dir="ltr" tabindex="<?php $i++; print $i?>" /></td>
 	</tr>
 	<tr>
-		<td class="shade2 wrap"><div class="helpicon"><?php PrintHelpLink("HOME_SITE_TEXT_help", "qm", "HOME_SITE_TEXT"); print "</div><div class=\"description\">"; print GM_LANG_HOME_SITE_TEXT;?></div></td>
-		<td class="shade1"><input type="text" dir="ltr" name="NEW_HOME_SITE_TEXT" value="<?php print htmlspecialchars(GedcomConfig::$HOME_SITE_TEXT);?>" size="50" tabindex="<?php $i++; print $i?>" /></td>
+		<td class="NavBlockLabel AdminNavBlockLabel"><div class="HelpIconContainer"><?php PrintHelpLink("HOME_SITE_TEXT_help", "qm", "HOME_SITE_TEXT"); print "</div><div class=\"AdminNavBlockOptionText\">"; print GM_LANG_HOME_SITE_TEXT;?></div></td>
+		<td class="NavBlockField AdminNavBlockField"><input type="text" dir="ltr" name="NEW_HOME_SITE_TEXT" value="<?php print htmlspecialchars(GedcomConfig::$HOME_SITE_TEXT);?>" size="50" tabindex="<?php $i++; print $i?>" /></td>
 	</tr>
 	<tr>
-		<td class="shade2 wrap"><div class="helpicon"><?php PrintHelpLink("META_AUTHOR_help", "qm", "META_AUTHOR"); print "</div><div class=\"description\">"; print GM_LANG_META_AUTHOR;?></div></td>
-		<td class="shade1"><input type="text" dir="ltr" name="NEW_META_AUTHOR" value="<?php print GedcomConfig::$META_AUTHOR?>" tabindex="<?php $i++; print $i?>" /><br />
+		<td class="NavBlockLabel AdminNavBlockLabel"><div class="HelpIconContainer"><?php PrintHelpLink("META_AUTHOR_help", "qm", "META_AUTHOR"); print "</div><div class=\"AdminNavBlockOptionText\">"; print GM_LANG_META_AUTHOR;?></div></td>
+		<td class="NavBlockField AdminNavBlockField"><input type="text" dir="ltr" name="NEW_META_AUTHOR" value="<?php print GedcomConfig::$META_AUTHOR?>" tabindex="<?php $i++; print $i?>" /><br />
 		<?php print PrintText("META_AUTHOR_descr",0,0,false); ?></td>
 	</tr>
 	<tr>
-		<td class="shade2 wrap"><div class="helpicon"><?php PrintHelpLink("META_PUBLISHER_help", "qm", "META_PUBLISHER"); print "</div><div class=\"description\">"; print GM_LANG_META_PUBLISHER;?></div></td>
-		<td class="shade1"><input type="text" dir="ltr" name="NEW_META_PUBLISHER" value="<?php print GedcomConfig::$META_PUBLISHER?>" tabindex="<?php $i++; print $i?>" /><br />
+		<td class="NavBlockLabel AdminNavBlockLabel"><div class="HelpIconContainer"><?php PrintHelpLink("META_PUBLISHER_help", "qm", "META_PUBLISHER"); print "</div><div class=\"AdminNavBlockOptionText\">"; print GM_LANG_META_PUBLISHER;?></div></td>
+		<td class="NavBlockField AdminNavBlockField"><input type="text" dir="ltr" name="NEW_META_PUBLISHER" value="<?php print GedcomConfig::$META_PUBLISHER?>" tabindex="<?php $i++; print $i?>" /><br />
 		<?php print PrintText("META_PUBLISHER_descr",0,0,false); ?></td>
 	</tr>
 	<tr>
-		<td class="shade2 wrap"><div class="helpicon"><?php PrintHelpLink("META_COPYRIGHT_help", "qm", "META_COPYRIGHT"); print "</div><div class=\"description\">"; print GM_LANG_META_COPYRIGHT;?></div></td>
-		<td class="shade1"><input type="text" dir="ltr" name="NEW_META_COPYRIGHT" value="<?php print GedcomConfig::$META_COPYRIGHT?>" tabindex="<?php $i++; print $i?>" /><br />
+		<td class="NavBlockLabel AdminNavBlockLabel"><div class="HelpIconContainer"><?php PrintHelpLink("META_COPYRIGHT_help", "qm", "META_COPYRIGHT"); print "</div><div class=\"AdminNavBlockOptionText\">"; print GM_LANG_META_COPYRIGHT;?></div></td>
+		<td class="NavBlockField AdminNavBlockField"><input type="text" dir="ltr" name="NEW_META_COPYRIGHT" value="<?php print GedcomConfig::$META_COPYRIGHT?>" tabindex="<?php $i++; print $i?>" /><br />
 		<?php print PrintText("META_COPYRIGHT_descr",0,0,false); ?></td>
 	</tr>
 	<tr>
-		<td class="shade2 wrap"><div class="helpicon"><?php PrintHelpLink("META_DESCRIPTION_help", "qm", "META_DESCRIPTION"); print "</div><div class=\"description\">"; print GM_LANG_META_DESCRIPTION;?></div></td>
-		<td class="shade1"><input type="text" dir="ltr" name="NEW_META_DESCRIPTION" value="<?php print GedcomConfig::$META_DESCRIPTION?>" tabindex="<?php $i++; print $i?>" /><br />
+		<td class="NavBlockLabel AdminNavBlockLabel"><div class="HelpIconContainer"><?php PrintHelpLink("META_DESCRIPTION_help", "qm", "META_DESCRIPTION"); print "</div><div class=\"AdminNavBlockOptionText\">"; print GM_LANG_META_DESCRIPTION;?></div></td>
+		<td class="NavBlockField AdminNavBlockField"><input type="text" dir="ltr" name="NEW_META_DESCRIPTION" value="<?php print GedcomConfig::$META_DESCRIPTION?>" tabindex="<?php $i++; print $i?>" /><br />
 		<?php print GM_LANG_META_DESCRIPTION_descr; ?></td>
 	</tr>
 	<tr>
-		<td class="shade2 wrap"><div class="helpicon"><?php PrintHelpLink("META_PAGE_TOPIC_help", "qm", "META_PAGE_TOPIC"); print "</div><div class=\"description\">"; print GM_LANG_META_PAGE_TOPIC;?></div></td>
-		<td class="shade1"><input type="text" dir="ltr" name="NEW_META_PAGE_TOPIC" value="<?php print GedcomConfig::$META_PAGE_TOPIC?>" tabindex="<?php $i++; print $i?>" /><br />
+		<td class="NavBlockLabel AdminNavBlockLabel"><div class="HelpIconContainer"><?php PrintHelpLink("META_PAGE_TOPIC_help", "qm", "META_PAGE_TOPIC"); print "</div><div class=\"AdminNavBlockOptionText\">"; print GM_LANG_META_PAGE_TOPIC;?></div></td>
+		<td class="NavBlockField AdminNavBlockField"><input type="text" dir="ltr" name="NEW_META_PAGE_TOPIC" value="<?php print GedcomConfig::$META_PAGE_TOPIC?>" tabindex="<?php $i++; print $i?>" /><br />
 		<?php print GM_LANG_META_PAGE_TOPIC_descr; ?></td>
 	</tr>
 	<tr>
-		<td class="shade2 wrap"><div class="helpicon"><?php PrintHelpLink("META_AUDIENCE_help", "qm", "META_AUDIENCE"); print "</div><div class=\"description\">"; print GM_LANG_META_AUDIENCE;?></div></td>
-		<td class="shade1"><input type="text" dir="ltr" name="NEW_META_AUDIENCE" value="<?php print GedcomConfig::$META_AUDIENCE?>" tabindex="<?php $i++; print $i?>" /><br />
+		<td class="NavBlockLabel AdminNavBlockLabel"><div class="HelpIconContainer"><?php PrintHelpLink("META_AUDIENCE_help", "qm", "META_AUDIENCE"); print "</div><div class=\"AdminNavBlockOptionText\">"; print GM_LANG_META_AUDIENCE;?></div></td>
+		<td class="NavBlockField AdminNavBlockField"><input type="text" dir="ltr" name="NEW_META_AUDIENCE" value="<?php print GedcomConfig::$META_AUDIENCE?>" tabindex="<?php $i++; print $i?>" /><br />
 		</td>
 	</tr>
 	<tr>
-		<td class="shade2 wrap"><div class="helpicon"><?php PrintHelpLink("META_PAGE_TYPE_help", "qm", "META_PAGE_TYPE"); print "</div><div class=\"description\">"; print GM_LANG_META_PAGE_TYPE;?></div></td>
-		<td class="shade1"><input type="text" dir="ltr" name="NEW_META_PAGE_TYPE" value="<?php print GedcomConfig::$META_PAGE_TYPE?>" tabindex="<?php $i++; print $i?>" /><br />
+		<td class="NavBlockLabel AdminNavBlockLabel"><div class="HelpIconContainer"><?php PrintHelpLink("META_PAGE_TYPE_help", "qm", "META_PAGE_TYPE"); print "</div><div class=\"AdminNavBlockOptionText\">"; print GM_LANG_META_PAGE_TYPE;?></div></td>
+		<td class="NavBlockField AdminNavBlockField"><input type="text" dir="ltr" name="NEW_META_PAGE_TYPE" value="<?php print GedcomConfig::$META_PAGE_TYPE?>" tabindex="<?php $i++; print $i?>" /><br />
 		</td>
 	</tr>
 	<tr>
-		<td class="shade2 wrap"><div class="helpicon"><?php PrintHelpLink("META_ROBOTS_help", "qm", "META_ROBOTS"); print "</div><div class=\"description\">"; print GM_LANG_META_ROBOTS;?></div></td>
-		<td class="shade1"><input type="text" dir="ltr" name="NEW_META_ROBOTS" value="<?php print GedcomConfig::$META_ROBOTS?>" tabindex="<?php $i++; print $i?>" /><br />
+		<td class="NavBlockLabel AdminNavBlockLabel"><div class="HelpIconContainer"><?php PrintHelpLink("META_ROBOTS_help", "qm", "META_ROBOTS"); print "</div><div class=\"AdminNavBlockOptionText\">"; print GM_LANG_META_ROBOTS;?></div></td>
+		<td class="NavBlockField AdminNavBlockField"><input type="text" dir="ltr" name="NEW_META_ROBOTS" value="<?php print GedcomConfig::$META_ROBOTS?>" tabindex="<?php $i++; print $i?>" /><br />
 		</td>
 	</tr>
 	<tr>
-		<td class="shade2 wrap"><div class="helpicon"><?php PrintHelpLink("META_REVISIT_help", "qm", "META_REVISIT"); print "</div><div class=\"description\">"; print GM_LANG_META_REVISIT;?></div></td>
-		<td class="shade1"><input type="text" dir="ltr" name="NEW_META_REVISIT" value="<?php print GedcomConfig::$META_REVISIT?>" tabindex="<?php $i++; print $i?>" /><br />
+		<td class="NavBlockLabel AdminNavBlockLabel"><div class="HelpIconContainer"><?php PrintHelpLink("META_REVISIT_help", "qm", "META_REVISIT"); print "</div><div class=\"AdminNavBlockOptionText\">"; print GM_LANG_META_REVISIT;?></div></td>
+		<td class="NavBlockField AdminNavBlockField"><input type="text" dir="ltr" name="NEW_META_REVISIT" value="<?php print GedcomConfig::$META_REVISIT?>" tabindex="<?php $i++; print $i?>" /><br />
 		</td>
 	</tr>
 	<tr>
-		<td class="shade2 wrap"><div class="helpicon"><?php PrintHelpLink("META_KEYWORDS_help", "qm", "META_KEYWORDS"); print "</div><div class=\"description\">"; print GM_LANG_META_KEYWORDS;?></div></td>
-		<td class="shade1"><input type="text" dir="ltr" name="NEW_META_KEYWORDS" value="<?php print GedcomConfig::$META_KEYWORDS?>" tabindex="<?php $i++; print $i?>" size="75" /><br />
+		<td class="NavBlockLabel AdminNavBlockLabel"><div class="HelpIconContainer"><?php PrintHelpLink("META_KEYWORDS_help", "qm", "META_KEYWORDS"); print "</div><div class=\"AdminNavBlockOptionText\">"; print GM_LANG_META_KEYWORDS;?></div></td>
+		<td class="NavBlockField AdminNavBlockField"><input type="text" dir="ltr" name="NEW_META_KEYWORDS" value="<?php print GedcomConfig::$META_KEYWORDS?>" tabindex="<?php $i++; print $i?>" size="75" /><br />
 		</td>
 	</tr>
 	<tr>
-		<td class="shade2 wrap"><div class="helpicon"><?php PrintHelpLink("META_SURNAME_KEYWORDS_help", "qm", "META_SURNAME_KEYWORDS"); print "</div><div class=\"description\">"; print GM_LANG_META_SURNAME_KEYWORDS;?></div></td>
-		<td class="shade1"><select name="NEW_META_SURNAME_KEYWORDS" tabindex="<?php $i++; print $i?>">
+		<td class="NavBlockLabel AdminNavBlockLabel"><div class="HelpIconContainer"><?php PrintHelpLink("META_SURNAME_KEYWORDS_help", "qm", "META_SURNAME_KEYWORDS"); print "</div><div class=\"AdminNavBlockOptionText\">"; print GM_LANG_META_SURNAME_KEYWORDS;?></div></td>
+		<td class="NavBlockField AdminNavBlockField"><select name="NEW_META_SURNAME_KEYWORDS" tabindex="<?php $i++; print $i?>">
 				<option value="yes" <?php if (GedcomConfig::$META_SURNAME_KEYWORDS) print "selected=\"selected\""; ?>><?php print GM_LANG_yes;?></option>
 				<option value="no" <?php if (!GedcomConfig::$META_SURNAME_KEYWORDS) print "selected=\"selected\""; ?>><?php print GM_LANG_no;?></option>
 			</select>
 		</td>
 	</tr>
 	<tr>
-		<td class="shade2 wrap"><div class="helpicon"><?php PrintHelpLink("META_TITLE_help", "qm", "META_TITLE"); print "</div><div class=\"description\">"; print GM_LANG_META_TITLE;?></div></td>
-		<td class="shade1"><input type="text" dir="ltr" name="NEW_META_TITLE" value="<?php print GedcomConfig::$META_TITLE?>" tabindex="<?php $i++; print $i?>" size="75" /></td>
+		<td class="NavBlockLabel AdminNavBlockLabel"><div class="HelpIconContainer"><?php PrintHelpLink("META_TITLE_help", "qm", "META_TITLE"); print "</div><div class=\"AdminNavBlockOptionText\">"; print GM_LANG_META_TITLE;?></div></td>
+		<td class="NavBlockField AdminNavBlockField"><input type="text" dir="ltr" name="NEW_META_TITLE" value="<?php print GedcomConfig::$META_TITLE?>" tabindex="<?php $i++; print $i?>" size="75" /></td>
 	</tr>
 	<tr>
-		<td class="shade2 wrap"><div class="helpicon"><?php PrintHelpLink("RSS_FORMAT_help", "qm", "RSS_FORMAT"); print "</div><div class=\"description\">"; print GM_LANG_RSS_FORMAT;?></div></td>
-		<td class="shade1"><select name="NEW_RSS_FORMAT" dir="ltr" tabindex="<?php $i++; print $i?>">
+		<td class="NavBlockLabel AdminNavBlockLabel"><div class="HelpIconContainer"><?php PrintHelpLink("RSS_FORMAT_help", "qm", "RSS_FORMAT"); print "</div><div class=\"AdminNavBlockOptionText\">"; print GM_LANG_RSS_FORMAT;?></div></td>
+		<td class="NavBlockField AdminNavBlockField"><select name="NEW_RSS_FORMAT" dir="ltr" tabindex="<?php $i++; print $i?>">
 				<option value="RSS0.91" <?php if (GedcomConfig::$RSS_FORMAT=="RSS0.91") print "selected=\"selected\""; ?>>RSS 0.91</option>
 				<option value="RSS1.0" <?php if (GedcomConfig::$RSS_FORMAT=="RSS1.0") print "selected=\"selected\""; ?>>RSS 1.0</option>
 				<option value="RSS2.0" <?php if (GedcomConfig::$RSS_FORMAT=="RSS2.0") print "selected=\"selected\""; ?>>RSS 2.0</option>
@@ -1571,15 +1586,12 @@ print "&nbsp;<a href=\"javascript: ".htmlentities(GM_LANG_meta_conf)."\" onclick
 	</tr>
 </table>
 </div>
-<table class="FactsTable" border="0">
-<tr><td class="center">
-<input type="submit" tabindex="<?php $i++; print $i?>" value="<?php print GM_LANG_save_config?>" onclick="closeHelp();" />
-&nbsp;&nbsp;
-<input type="reset" tabindex="<?php $i++; print $i?>" value="<?php print GM_LANG_reset?>" /><br />
-</td></tr>
-</table>
+<div class="NavBlockFooter ConfigNavBlockFooter">
+	<input type="submit" tabindex="<?php $i++; print $i?>" value="<?php print GM_LANG_save_config?>" onclick="closeHelp();" />
+	&nbsp;&nbsp;
+	<input type="reset" tabindex="<?php $i++; print $i?>" value="<?php print GM_LANG_reset?>" /><br />
+</div>
 </form>
-<br />
 <?php if (count($GEDCOMS)==0) { ?>
 <script language="JavaScript" type="text/javascript">
 <!--

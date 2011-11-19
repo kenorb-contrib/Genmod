@@ -35,27 +35,26 @@ $pid = CleanInput($pid);
 PrintSimpleHeader($pid);
 
 if ((!$gm_user->userCanViewGedlines()) && (!$gm_user->UserCanAccept())) {
-	print "<span class=\"Error\">".GM_LANG_ged_noshow."</span>\n";
-	print "</body></html>";
-	exit;
+	EditFunctions::PrintFailMessage(GM_LANG_ged_noshow);
 }
 $object =& ConstructObject($pid, $type);
 if (!$object->isempty && !$object->disp) {
 	PrintPrivacyError(GedcomConfig::$CONTACT_EMAIL);
-	print "</body></html>";
-	exit;
 }
+
+print "<table class=\"ListTable\">\r\n";
 if ($changed) {
-	print "<table class=\"FactsTable\">\r\n";
-	print "<tr class=\"topbottombar\"><td>".GM_LANG_old_record."</td><td>".GM_LANG_new_record."</td></tr>\r\n";
-	print "<tr class=\"shade1 wrap\"><td>".nl2br($object->oldprivategedrec)."</td><td>".nl2br($object->newprivategedrec)."</td></tr>\r\n";
-	print "<tr class=\"topbottombar\"><td colspan=\"2\">&nbsp;</td></tr></table>\r\n";
+	print "<tr><td class=\"ListTableHeader\" colspan=\"2\">".GM_LANG_view_gedrec."</td></tr>";
+	print "<tr><td class=\"ListTableColumnHeader\">".GM_LANG_old_record."</td><td class=\"ListTableColumnHeader\">".GM_LANG_new_record."</td></tr>\r\n";
+	print "<tr><td class=\"ListTableContent\">".nl2br($object->oldprivategedrec)."</td><td class=\"ListTableContent\">".nl2br($object->newprivategedrec)."</td></tr>\r\n";
 }
 else {
 	$indirec = $object->privategedrec;
-	print nl2br($indirec);
-	print "<br />";
+	print "<tr><td class=\"ListTableHeader\">".GM_LANG_view_gedrec."</td></tr>";
+	print "<tr><td class=\"ListTableContent\">".nl2br($indirec)."</td></tr>";
 }
-print "<div class=\"center\"><a href=\"#\" onclick=\"window.close();\">".GM_LANG_close_window."</a></div>\n";
+print "</table>";
+	
+print "<div class=\"CloseWindow\"><a href=\"#\" onclick=\"window.close();\">".GM_LANG_close_window."</a></div>\n";
 PrintSimpleFooter();
 ?>

@@ -40,6 +40,7 @@ if (isset($body)) $body = stripslashes($body);
 else $body = "";
 if (!isset($from_name)) $from_name="";
 if (!isset($from_email)) $from_email="";
+$message = "";
 
 if (empty($to)) {
 	print "<span class=\"Error\">".GM_LANG_no_to_user."</span><br />";
@@ -59,15 +60,13 @@ if (($action=="send")&&(isset($_SESSION["good_to_send"]))&&($_SESSION["good_to_s
 	$tuser =& User::GetInstance($from);
 	if ($tuser->is_empty) {
 		if (!CheckEmailAddress($from)) {
-			print "<center><br /><span class=\"Error\">".GM_LANG_invalid_email."</span>\n";
-			print "<br /><br /></center>";
+			$message = GM_LANG_invalid_email;
 			$action="compose";
 	    }
 	}
 	//-- check referer for possible spam attack
 	if (!isset($_SERVER['HTTP_REFERER']) || stristr($_SERVER['HTTP_REFERER'],"message.php")===false) {
-		print "<center><br /><span class=\"Error\">Invalid page referer.</span>\n";
-		print "<br /><br /></center>";
+		$message = "Invalid page referer";
 		WriteToLog('Message-&gt; Invalid page referer while trying to send a message. Possible spam attack.', 'W', 'S');
 		$action="compose";
 	}
@@ -129,7 +128,14 @@ if (($action=="send")&&(isset($_SESSION["good_to_send"]))&&($_SESSION["good_to_s
 }
 
 if ($action=="compose") {
-	print '<span class="SubHeader">'.GM_LANG_message.'</span>';
+	print "<form name=\"messageform\" method=\"post\" action=\"message.php\" onsubmit=\"t = new Date(); document.messageform.time.value=t.toUTCString(); ";
+	if (empty($username)) print "return validateEmail(document.messageform.from_email);";
+	else print "return checkForm(this);";
+	print "\">\n";
+	print "<table class=\"NavBlockTable\">\n";
+	print "<tr><td class=\"NavBlockHeader\" colspan=\"2\">".GM_LANG_message;
+	if (!empty($message)) print "<br /><span class=\"Error\">".$message;
+	print "</td></tr>";
 	$_SESSION["good_to_send"] = true;
 	?>
 	<script language="JavaScript" type="text/javascript">
@@ -160,45 +166,57 @@ if ($action=="compose") {
 	<?php
 	$username = $gm_user->username;
 	if (empty($username)) {
-		print "<br /><br />".GM_LANG_message_instructions;
+		print "<tr><td class=\"NavBlockLabel\" colspan=\"2\">".GM_LANG_message_instructions."</td></tr>";
 	}
-	print "<br /><form name=\"messageform\" method=\"post\" action=\"message.php\" onsubmit=\"t = new Date(); document.messageform.time.value=t.toUTCString(); ";
-	if (empty($username)) print "return validateEmail(document.messageform.from_email);";
-	else print "return checkForm(this);";
-	print "\">\n";
-	print "<table>\n";
 	$touser =& User::GetInstance($to);
 	$lang_temp = "lang_name_".$touser->language;
 	if (!empty($touser->username)) {
-		print "<tr><td></td><td>".str_replace("#TO_USER#", "<b>".$touser->firstname." ".$touser->lastname."</b>", GM_LANG_sending_to)."<br />";
+		print "<tr><td class=\"NavBlockLabel\" colspan=\"2\">".str_replace("#TO_USER#", "<b>".$touser->firstname." ".$touser->lastname."</b>", GM_LANG_sending_to)."<br />";
 		print str_replace("#USERLANG#", "<b>".constant("GM_LANG_".$lang_temp)."</b>", GM_LANG_preferred_lang)."</td></tr>\n";
 	}
 
 	if (empty($username)){
-		print "<tr><td valign=\"top\" width=\"15%\" align=\"right\">".GM_LANG_message_from_name."</td>";
-		print "<td><input type=\"text\" name=\"from_name\" size=\"40\" value=\"$from_name\" /></td></tr><tr><td valign=\"top\" align=\"right\">".GM_LANG_message_from."</td><td class=\"wrap\"><input type=\"text\" name=\"from_email\" size=\"40\" value=\"$from_email\" onchange=\"sndReq('mailerr', 'checkemail', 'email', this.value);\" /> <span id=\"mailerr\"></span><br />".GM_LANG_provide_email."<br /><br /></td></tr>\n";
+		print "<tr>";
+			print "<td class=\"NavBlockLabel\">".GM_LANG_message_from_name."</td>";
+			print "<td class=\"NavBlockField\"><input type=\"text\" name=\"from_name\" size=\"40\" value=\"$from_name\" /></td>";
+		print "</tr>";
+		print "<tr>";
+			print "<td class=\"NavBlockLabel\">".GM_LANG_message_from."</td>";
+			print "<td class=\"NavBlockField\"><input type=\"text\" name=\"from_email\" size=\"40\" value=\"$from_email\" onchange=\"sndReq('mailerr', 'checkemail', true, 'email', this.value);\" /> <span id=\"mailerr\"></span><br />".GM_LANG_provide_email."</td>";
+		print "</tr>\n";
 	}
-	print "<tr><td align=\"right\">".GM_LANG_message_subject."</td>";
-	print "<td>";
-	if (!empty($username)){
-		print "<input type=\"hidden\" name=\"from\" value=\"$username\"/>\n";
+	print "<tr>";
+		print "<td class=\"NavBlockLabel\">".GM_LANG_message_subject."</td>";
+		print "<td class=\"NavBlockField\">";
+		if (!empty($username)){
+			print "<input type=\"hidden\" name=\"from\" value=\"$username\"/>\n";
+		}
+		print "<input type=\"hidden\" name=\"action\" value=\"send\" />\n";
+		print "<input type=\"hidden\" name=\"to\" value=\"$to\" />\n";
+		print "<input type=\"hidden\" name=\"time\" value=\"\" />\n";
+		print "<input type=\"hidden\" name=\"method\" value=\"$method\" />\n";
+		print "<input type=\"hidden\" name=\"url\" value=\"$url\" />\n";
+		print "<input type=\"text\" name=\"subject\" size=\"50\" value=\"".stripslashes($subject)."\" /></td>";
+	print "</tr>\n";
+	print "<tr>";
+		print "<td class=\"NavBlockLabel\">".GM_LANG_message_body."</td>";
+		print "<td class=\"NavBlockField\"><textarea name=\"body\" cols=\"50\" rows=\"7\">$body</textarea></td>";
+	print "</tr>\n";
+	if ($method=="messaging2") {
+		print "<tr><td class=\"NavBlockColumnHeader AdminNavBlockColumnHeader\" colspan=\"2\">";
+		PrintText("messaging2_help");
+		print "</td></tr>";
 	}
-	print "<input type=\"hidden\" name=\"action\" value=\"send\" />\n";
-	print "<input type=\"hidden\" name=\"to\" value=\"$to\" />\n";
-	print "<input type=\"hidden\" name=\"time\" value=\"\" />\n";
-	print "<input type=\"hidden\" name=\"method\" value=\"$method\" />\n";
-	print "<input type=\"hidden\" name=\"url\" value=\"$url\" />\n";
-	print "<input type=\"text\" name=\"subject\" size=\"50\" value=\"".stripslashes($subject)."\" /><br /></td></tr>\n";
-	print "<tr><td valign=\"top\" align=\"right\">".GM_LANG_message_body."<br /></td><td><textarea name=\"body\" cols=\"50\" rows=\"7\">$body</textarea><br /></td></tr>\n";
-	print "<tr><td></td><td><input type=\"submit\" value=\"".GM_LANG_send."\" /></td></tr>\n";
+	print "<tr>";
+		print "<td class=\"NavBlockFooter\" colspan=\"2\"><input type=\"submit\" value=\"".GM_LANG_send."\" /></td>";
+	print "</tr>\n";
 	print "</table>\n";
 	print "</form>\n";
-	if ($method=="messaging2") PrintText("messaging2_help");
 }
 else if ($action=="delete") {
 	if (MessageController::deleteMessage($id)) print GM_LANG_message_deleted;
 }
-print "<center><br /><br /><a href=\"#\" onclick=\"if (window.opener.refreshpage) window.opener.refreshpage(); window.close();\">".GM_LANG_close_window."</a><br /></center>";
+print "<div class=\"CloseWindow\"><a href=\"#\" onclick=\"if (window.opener.refreshpage) window.opener.refreshpage(); window.close();\">".GM_LANG_close_window."</a></div>";
 
 PrintSimpleFooter();
 ?>

@@ -61,11 +61,11 @@ switch ($action) {
 			<form name="requestpwform" action="login_register.php" method="post" onsubmit="t = new Date(); document.requestpwform.time.value=t.toUTCString(); return checkform(this);">
 			<input type="hidden" name="time" value="" />
 			<input type="hidden" name="action" value="requestpw" />
-			<span class="warning"><?php print $message;?></span>
-			<table class="LoginPageTable">
-			<tr><td class="topbottombar" colspan="2"><?php PrintHelpLink("pls_note11", "qm", "lost_pw_reset"); print GM_LANG_lost_pw_reset;?></td></tr>
-			 <tr><td class="FormLabelCell"><?php print GM_LANG_username?></td><td class="FormInputCell"><input type="text" name="user_name" value="" /></td></tr>
-			 <tr><td class="topbottombar" colspan="2"><input type="submit" value="<?php print GM_LANG_lost_pw_reset; ?>" /></td></tr>
+			<span class="Warning"><?php print $message;?></span>
+			<table class="NavBlockTable LoginPageTable">
+			<tr><td class="NavBlockHeader" colspan="2"><?php PrintHelpLink("pls_note11", "qm", "lost_pw_reset"); print GM_LANG_lost_pw_reset;?></td></tr>
+			 <tr><td class="NavBlockLabel"><?php print GM_LANG_username?></td><td class="NavBlockField"><input type="text" name="user_name" value="" /></td></tr>
+			 <tr><td class="NavBlockFooter" colspan="2"><input type="submit" value="<?php print GM_LANG_lost_pw_reset; ?>" /></td></tr>
 		    </table>
 		  </form>
 		</div>
@@ -83,12 +83,12 @@ switch ($action) {
 		print "<div class=\"LoginPageContainer\">";
 		$newuser =& User::GetInstance($user_name);
 		if ($newuser->is_empty) {
-			print "<span class=\"warning\">";
+			print "<span class=\"Warning\">";
 			PrintText("user_not_found");
 			print "</span><br />";
 		}
 		else if (empty($newuser->email)) {
-			print "<span class=\"warning\">";
+			print "<span class=\"Warning\">";
 			PrintText("user_no_email");
 			print "</span><br />";
 		}
@@ -136,7 +136,7 @@ switch ($action) {
 			$WEEK_START	= $WEEK_START_array[$LANGUAGE];
 			$NAME_REVERSE	= $NAME_REVERSE_array[$LANGUAGE];
 			?>
-			<table class="center FactsTable">
+			<table class="FactsTable">
 			<tr><td class="ltr"><?php print GM_LANG_pwreqinfo;?></td></tr>
 			</table>
 			<?php
@@ -307,20 +307,20 @@ switch ($action) {
 			<form name="registerform" method="post" action="login_register.php" onsubmit="t = new Date(); document.registerform.time.value=t.toUTCString(); return checkform(this);">
 				<input type="hidden" name="action" value="register" />
 				<input type="hidden" name="time" value="" />
-				<table class="center FactsTable width20">
+				<table class="NavBlockTable RegisterPageTable">
 				<?php $i = 1;?>
-				<tr><td class="topbottombar" colspan="2"><?php PrintHelpLink("register_info_0".GedcomConfig::$WELCOME_TEXT_AUTH_MODE."", "qm", "requestaccount"); print GM_LANG_requestaccount;?><?php if (strlen($message) > 0) print "<br /><span class=\"warning\">".$message."</span>"; ?></td></tr>
-				<tr><td class="shade2 nowrap ltr"><?php PrintHelpLink("username_help", "qm", "username"); print GM_LANG_username;?></td><td class="shade1 ltr"><input type="text" name="user_name" value="<?php if (!$user_name_false) print $user_name;?>" tabindex="<?php print $i;?>" onchange="sndReq('errus', 'checkuser', 'username', this.value);" /> * <span id="errus"></span></td></tr>
-				<tr><td class="shade2 nowrap ltr"><?php PrintHelpLink("edituser_password_help", "qm", "password"); print GM_LANG_password;?></td><td class="shade1 ltr"><input type="password" name="user_password01" value="" tabindex="<?php print $i++;?>" /> *</td></tr>
-				<tr><td class="shade2 nowrap ltr"><?php PrintHelpLink("edituser_conf_password_help", "qm", "confirm");print GM_LANG_confirm;?></td><td class="shade1 ltr"><input type="password" name="user_password02" value="" tabindex="<?php print $i++;?>" /> *</td></tr>
-				<tr><td class="shade2 nowrap ltr"><?php PrintHelpLink("new_user_firstname_help", "qm", "firstname");print GM_LANG_firstname;?></td><td class="shade1 ltr"><input type="text" name="user_firstname" value="<?php if (!$user_firstname_false) print $user_firstname;?>" tabindex="<?php print $i++;?>" /> *</td></tr>
-				<tr><td class="shade2 nowrap ltr"><?php PrintHelpLink("new_user_lastname_help", "qm", "lastname");print GM_LANG_lastname;?></td><td class="shade1 ltr"><input type="text" name="user_lastname" value="<?php if (!$user_lastname_false) print $user_lastname;?>" tabindex="<?php print $i++;?>" /> *</td></tr>
+				<tr><td class="NavBlockHeader" colspan="2"><?php PrintHelpLink("register_info_0".GedcomConfig::$WELCOME_TEXT_AUTH_MODE."", "qm", "requestaccount"); print GM_LANG_requestaccount;?><?php if (strlen($message) > 0) print "<br /><span class=\"Warning\">".$message."</span>"; ?></td></tr>
+				<tr><td class="NavBlockLabel"><?php PrintHelpLink("username_help", "qm", "username"); print GM_LANG_username;?></td><td class="NavBlockField"><input type="text" name="user_name" value="<?php if (!$user_name_false) print $user_name;?>" tabindex="<?php print $i;?>" onchange="sndReq('errus', 'checkuser', true, 'username', this.value);" /> * <span id="errus"></span></td></tr>
+				<tr><td class="NavBlockLabel"><?php PrintHelpLink("edituser_password_help", "qm", "password"); print GM_LANG_password;?></td><td class="NavBlockField"><input type="password" name="user_password01" value="" tabindex="<?php print $i++;?>" /> *</td></tr>
+				<tr><td class="NavBlockLabel"><?php PrintHelpLink("edituser_conf_password_help", "qm", "confirm");print GM_LANG_confirm;?></td><td class="NavBlockField"><input type="password" name="user_password02" value="" tabindex="<?php print $i++;?>" /> *</td></tr>
+				<tr><td class="NavBlockLabel"><?php PrintHelpLink("new_user_firstname_help", "qm", "firstname");print GM_LANG_firstname;?></td><td class="NavBlockField"><input type="text" name="user_firstname" value="<?php if (!$user_firstname_false) print $user_firstname;?>" tabindex="<?php print $i++;?>" /> *</td></tr>
+				<tr><td class="NavBlockLabel"><?php PrintHelpLink("new_user_lastname_help", "qm", "lastname");print GM_LANG_lastname;?></td><td class="NavBlockField"><input type="text" name="user_lastname" value="<?php if (!$user_lastname_false) print $user_lastname;?>" tabindex="<?php print $i++;?>" /> *</td></tr>
 				<?php
 				if (GedcomConfig::$ENABLE_MULTI_LANGUAGE) {
-					print "<tr><td class=\"shade2 ltr\">";
+					print "<tr><td class=\"NavBlockLabel\">";
 					PrintHelpLink("edituser_change_lang_help", "qm", "change_lang");
 					print GM_LANG_change_lang;
-					print "</td><td class=\"shade1 ltr\"><select name=\"user_language\" tabindex=\"".($i++)."\">";
+					print "</td><td class=\"NavBlockField\"><select name=\"user_language\" tabindex=\"".($i++)."\">";
 					if (isset($user_language) && !$user_language_false) $thislang = $user_language;
 					else $thislang = $LANGUAGE;
 					foreach ($gm_language as $key => $value) {
@@ -334,12 +334,12 @@ switch ($action) {
 					print "</td></tr>\n";
 				}
 				?>
-				<tr><td class="shade2 nowrap ltr"><?php PrintHelpLink("edituser_email_help", "qm", "emailadress");print GM_LANG_emailadress;?></td><td class="shade1 ltr"><input type="text" size="30" name="user_email" value="<?php if (!$user_email_false) print $user_email;?>" tabindex="<?php print $i++;?>" onchange="sndReq('errem', 'checkemail', 'email', this.value);" /> * <span id="errem"></span></td></tr>
+				<tr><td class="NavBlockLabel"><?php PrintHelpLink("edituser_email_help", "qm", "emailadress");print GM_LANG_emailadress;?></td><td class="NavBlockField"><input type="text" size="30" name="user_email" value="<?php if (!$user_email_false) print $user_email;?>" tabindex="<?php print $i++;?>" onchange="sndReq('errem', 'checkemail', true, 'email', this.value);" /> * <span id="errem"></span></td></tr>
 				<?php if (GedcomConfig::$MUST_AUTHENTICATE && $SHOW_LIVING_NAMES>=$PRIV_PUBLIC) { ?>
-				<tr><td class="shade2 nowrap ltr"><?php PrintHelpLink("register_gedcomid_help", "qm", "gedcomid");print GM_LANG_gedcomid;?></td><td class="shade1 ltr" valign="top" ><input type="text" size="10" name="user_gedcomid" id="user_gedcomid" value="" tabindex="<?php print $i++;?>" /><?php LinkFunctions::PrintFindIndiLink("user_gedcomid",""); ?></td></tr>
+				<tr><td class="NavBlockLabel"><?php PrintHelpLink("register_gedcomid_help", "qm", "gedcomid");print GM_LANG_gedcomid;?></td><td class="NavBlockField" valign="top" ><input type="text" size="10" name="user_gedcomid" id="user_gedcomid" value="" tabindex="<?php print $i++;?>" /><?php LinkFunctions::PrintFindIndiLink("user_gedcomid",""); ?></td></tr>
 				<?php } ?>
-				<tr><td class="shade2 nowrap ltr"><?php PrintHelpLink("register_comments_help", "qm", "comments");print GM_LANG_comments;?></td><td class="shade1 ltr" valign="top" ><textarea cols="50" rows="5" name="user_comments" tabindex="<?php print $i++;?>"><?php if (!$user_comments_false) print $user_comments;?></textarea> *</td></tr>
-				<tr><td class="topbottombar" colspan="2"><input type="submit" value="<?php print GM_LANG_requestaccount; ?>" tabindex="<?php print $i++;?>" /></td></tr>
+				<tr><td class="NavBlockLabel"><?php PrintHelpLink("register_comments_help", "qm", "comments");print GM_LANG_comments;?></td><td class="NavBlockField" valign="top" ><textarea cols="50" rows="5" name="user_comments" tabindex="<?php print $i++;?>"><?php if (!$user_comments_false) print $user_comments;?></textarea> *</td></tr>
+				<tr><td class="NavBlockFooter" colspan="2"><input type="submit" value="<?php print GM_LANG_requestaccount; ?>" tabindex="<?php print $i++;?>" /></td></tr>
 				<tr><td align="left" colspan="2" ><?php print GM_LANG_mandatory;?></td></tr>
 				</table>
 			</form>
@@ -395,7 +395,7 @@ switch ($action) {
 			$au = UserController::AddUser($user, "added");
 			if ($au) $user_created_ok = true;
 			else {
-			    print "<span class=\"warning\">";
+			    print "<span class=\"Warning\">";
 			    PrintText("user_create_error");
 			    print "<br /></span>";
 			}
@@ -481,8 +481,8 @@ switch ($action) {
 				$WEEK_START	= $WEEK_START_array[$LANGUAGE];
 				$NAME_REVERSE	= $NAME_REVERSE_array[$LANGUAGE];
 				?>
-				<table class="center FactsTable">
-				<tr><td class="ltr wrap"><?php print str_replace("#user_fullname#", $user_firstname." ".$user_lastname, GM_LANG_thankyou);?><br /><br />
+				<table class="FactsTable">
+				<tr><td class="FactLabelCell"><?php print str_replace("#user_fullname#", $user_firstname." ".$user_lastname, GM_LANG_thankyou);?><br /><br />
 				<?php
 				if (SystemConfig::$REQUIRE_ADMIN_AUTH_REGISTRATION) print str_replace("#user_email#", $user_email, GM_LANG_pls_note06);
 				else print str_replace("#user_email#", $user_email, GM_LANG_pls_note06a);
@@ -507,12 +507,12 @@ switch ($action) {
 		?><form name="verifyform" method="post" action="" onsubmit="t = new Date(); document.verifyform.time.value=t.toUTCString();">
 		<input type="hidden" name="action" value="verify_hash" />
 		<input type="hidden" name="time" value="" />
-		<table class="center FactsTable width20">
-			<tr><td class="topbottombar" colspan="2"><?php PrintHelpLink("pls_note07", "qm", "user_verify"); print GM_LANG_user_verify;?></td></tr>
-			<tr><td class="shade2 ltr"><?php print GM_LANG_username; ?></td><td class="shade1 ltr"><input type="text" name="user_name" value="<?php print $user_name; ?>" /></td></tr>
-			<tr><td class="shade2 ltr"><?php print GM_LANG_password; ?></td><td class="shade1 ltr"><input type="password" name="user_password" value="" /></td></tr>
-			<tr><td class="shade2 ltr"><?php print GM_LANG_hashcode; ?></td><td class="facts_value ltr"><input type="text" name="user_hashcode" value="<?php print $user_hashcode; ?>" /></td></tr>
-			<tr><td class="topbottombar" colspan="2"><input type="submit" value="<?php print GM_LANG_send; ?>" /></td></tr>
+		<table class="NavBlockTable LoginPageTable">
+			<tr><td class="NavBlockHeader" colspan="2"><?php PrintHelpLink("pls_note07", "qm", "user_verify"); print GM_LANG_user_verify;?></td></tr>
+			<tr><td class="NavBlockLabel"><?php print GM_LANG_username; ?></td><td class="NavBlockField"><input type="text" name="user_name" value="<?php print $user_name; ?>" /></td></tr>
+			<tr><td class="NavBlockLabel"><?php print GM_LANG_password; ?></td><td class="NavBlockField"><input type="password" name="user_password" value="" /></td></tr>
+			<tr><td class="NavBlockLabel"><?php print GM_LANG_hashcode; ?></td><td class="NavBlockField"><input type="text" name="user_hashcode" value="<?php print $user_hashcode; ?>" /></td></tr>
+			<tr><td class="NavBlockFooter" colspan="2"><input type="submit" value="<?php print GM_LANG_send; ?>" /></td></tr>
 		</table>
 		</form>
 		</div>
@@ -528,9 +528,9 @@ switch ($action) {
 		WriteToLog("LoginRegister-&gt; User attempted to verify hashcode: ".$user_name, "I", "S");
 		PrintHeader("Genmod - " . GM_LANG_user_verify);# <-- better verification of authentication code
 		print "<div class=\"LoginPageContainer\">";
-		print "<table class=\"center FactsTable ltr\">";
-		print "<tr><td class=\"topbottombar\">".GM_LANG_user_verify."</td></tr>";
-		print "<tr><td class=\"shade1\">";
+		print "<table class=\"NavBlockTable LoginPageTable\">";
+		print "<tr><td class=\"NavBlockHeader\">".GM_LANG_user_verify."</td></tr>";
+		print "<tr><td class=\"NavBlockLabel\">";
 		print str_replace("#user_name#", $user_name, GM_LANG_pls_note08);
 		$user =& User::GetInstance($user_name);
 		if (!$user->is_empty) {
@@ -591,14 +591,14 @@ switch ($action) {
 			} 
 			else {
 				print "<br /><br />";
-				print "<span class=\"warning\">";
+				print "<span class=\"Warning\">";
 				print GM_LANG_data_incorrect;
 				print "</span><br /><br /></td></tr>";
 			}
 		}
 		else {
 			print "<br /><br />";
-			print "<span class=\"warning\">";
+			print "<span class=\"Warning\">";
 			print GM_LANG_user_not_found;
 			print "</span><br /><br /></td></tr>";
 		}

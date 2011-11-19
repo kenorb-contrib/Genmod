@@ -34,8 +34,10 @@ require("config.php");
 $note_controller = new NoteController();
 
 PrintHeader(GM_LANG_note_list);
-print "<div class=\"center\">";
-print "<h3>".GM_LANG_note_list."</h3>\n\t";
+print "<div id=\"NoteListPage\">";
+print "<div class=\"PageTitleName\">";
+print GM_LANG_note_list;
+print "</div>";
 
 $note_controller->GetNoteList();
 
@@ -43,30 +45,31 @@ $note_total = GetListSize("notelist");
 $note_count = count($note_controller->notelist); 
 $note_hide = $note_total - $note_count;
 
-print "\n\t<table class=\"ListTable $TEXT_DIRECTION\">\n\t\t<tr><td class=\"shade2 center\"";
+print "\n\t<table class=\"ListTable NoteListTable\">\n\t\t";
+print "<tr><td class=\"ListTableHeader\"";
 if($note_count > 12) print " colspan=\"2\"";
 print "><img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["note"]["other"]."\" border=\"0\" title=\"".GM_LANG_notes."\" alt=\"".GM_LANG_notes."\" />&nbsp;&nbsp;";
 print GM_LANG_titles_found;
-print "</td></tr><tr><td class=\"$TEXT_DIRECTION shade1 wrap\"><ul>";
+PrintHelpLink("notelist_listbox_help", "qm");
+print "</td></tr><tr><td class=\"ListTableContent\">";
 $i=1;
 if ($note_count > 0){
+	print "<ul>";
 	// -- print the array
 	foreach ($note_controller->notelist as $key => $note) {
 		$note->PrintListNote();
-		if ($i==ceil($note_count/2) && $note_count>12) print "</ul></td><td class=\"shade1 wrap\"><ul>\n";
+		if ($i==ceil($note_count/2) && $note_count>12) print "</ul></td><td class=\"ListTableContent\"><ul>\n";
 		$i++;
 	}
 	print "\n\t\t</ul></td>\n\t\t";
  
-	print "</tr><tr><td>".GM_LANG_total_notes." ".$note_total;
+	print "</tr><tr><td class=\"ListTableColumnFooter\"".($note_count>12 ? " colspan=\"2\"" : "").">".GM_LANG_total_notes." ".$note_total;
 	if ($note_hide > 0) print "<br />".GM_LANG_hidden." ".$note_hide;
 }
-else print "<span class=\"warning\"><i>".GM_LANG_no_results."</span>";
+else print "<span class=\"Warning\"><i>".GM_LANG_no_results."</span>";
 
 print "</td>\n\t\t</tr>\n\t</table>";
 
-PrintHelpLink("notelist_listbox_help", "qm");
 print "</div>";
-print "<br /><br />";
 PrintFooter();
 ?>

@@ -35,6 +35,7 @@ $GM_BLOCKS["top10_botviews"]["rss"]       	= false;
 function top10_botviews($block=true, $config="", $side, $index) {
 	global $GM_BLOCKS, $command, $GM_IMAGES, $gm_user;
 
+	print "<!-- Start Top10 Botviews Block //-->";
 	// This block is only for admins
 	if (!$gm_user->userGedcomAdmin()) return;
 	if (empty($config)) $config = $GM_BLOCKS["top10_botviews"]["config"];
@@ -51,13 +52,13 @@ function top10_botviews($block=true, $config="", $side, $index) {
 	if (count($ids) == 0) {
 		if ($gm_user->userIsAdmin()) {
 			print "<div id=\"top10\" class=\"BlockContainer\">\n";
-			print "<div class=\"BlockHeader\">";
-			PrintHelpLink("index_top10_pageviews_help", "qm");
-			print GM_LANG_top10_botviews;
-			print "</div>";
-			print "<div class=\"BlockContent\">\n";
-			print "<span class=\"Error\">\n".GM_LANG_top10_pageviews_msg."</span>\n";
-			print "</div>";
+				print "<div class=\"BlockHeader\">";
+					PrintHelpLink("index_top10_pageviews_help", "qm");
+					print GM_LANG_top10_botviews;
+				print "</div>";
+				print "<div class=\"BlockContent\">\n";
+					print "<span class=\"Warning\">\n".GM_LANG_top10_pageviews_msg."</span>\n";
+				print "</div>";
 			print "</div>\n";
 		}
 		return;
@@ -65,25 +66,27 @@ function top10_botviews($block=true, $config="", $side, $index) {
 
 	
 	print "<div id=\"top10hits\" class=\"BlockContainer\">\n";
-	print "<div class=\"BlockHeader\">";
-	PrintHelpLink("index_top10_pageviews_help", "qm", "top10_botviews");
-	if ($GM_BLOCKS["top10_botviews"]["canconfig"]) {
-		if ((($command=="gedcom")&&($gm_user->userGedcomAdmin())) || (($command=="user")&&($gm_user->username != ""))) {
-			if ($command=="gedcom") $name = preg_replace("/'/", "\'", get_gedcom_from_id(GedcomConfig::$GEDCOMID));
-			else $name = $gm_user->username;
-			print "<a href=\"javascript: ".GM_LANG_config_block."\" onclick=\"window.open('index_edit.php?name=$name&amp;command=$command&amp;action=configure&amp;side=$side&amp;index=$index', '', 'top=50,left=50,width=500,height=250,scrollbars=1,resizable=1'); return false;\">";
-			print "<img class=\"adminicon\" src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["admin"]["small"]."\" width=\"15\" height=\"15\" border=\"0\" alt=\"".GM_LANG_config_block."\" /></a>\n";
-		}
-	}
-	print "<b>".GM_LANG_top10_botviews."</b>";
+		print "<div class=\"BlockHeader\">";
+			PrintHelpLink("index_top10_pageviews_help", "qm", "top10_botviews");
+			if ($GM_BLOCKS["top10_botviews"]["canconfig"]) {
+				if ((($command=="gedcom")&&($gm_user->userGedcomAdmin())) || (($command=="user")&&($gm_user->username != ""))) {
+					if ($command=="gedcom") $name = preg_replace("/'/", "\'", get_gedcom_from_id(GedcomConfig::$GEDCOMID));
+					else $name = $gm_user->username;
+					print "<a href=\"javascript: ".GM_LANG_config_block."\" onclick=\"window.open('index_edit.php?name=$name&amp;command=$command&amp;action=configure&amp;side=$side&amp;index=$index', '', 'top=50,left=50,width=500,height=250,scrollbars=1,resizable=1'); return false;\">";
+					BlockFunctions::PrintAdminIcon();
+					print "</a>";
+				}
+			}
+			print GM_LANG_top10_botviews;
+		print "</div>";
+		print "<div class=\"BlockContent\">\n";
+			if ($block) print "<div class=\"RestrictedBlockHeightRight\">\n";
+			else print "<div class=\"RestrictedBlockHeightMain\">\n";
+				BlockFunctions::PrintPageViews($ids, $CountSide, $config["num"], $block);
+			print "</div>\n";
+		print "</div>";
 	print "</div>";
-	print "<div class=\"BlockContent\">\n";
-	if ($block) print "<div class=\"RestrictedBlockHeightRight\">\n";
-	else print "<div class=\"RestrictedBlockHeightMain\">\n";
-	BlockFunctions::PrintPageViews($ids, $CountSide, $config["num"], $block);
-	print "</div>\n";
-	print "</div>";
-	print "</div>";
+	print "<!-- End Top10 Botviews Block //-->";
 }
 
 function top10_botviews_config($config) {
@@ -91,9 +94,8 @@ function top10_botviews_config($config) {
 	
 	if (empty($config)) $config = $GM_BLOCKS["top10_botviews"]["config"];
 	?>
-	<table class="FactsTable <?php print $TEXT_DIRECTION; ?>">
-	<tr><td class="shade2"><?php print GM_LANG_num_to_show; ?></td><td class="shade1"><input type="text" name="num" size="2" value="<?php print $config["num"]; ?>" /></td></tr>
-	<tr><td class="shade2"><?php print GM_LANG_before_or_after;?></td><td class="shade1"><select name="count_placement">
+	<tr><td class="NavBlockLabel"><?php print GM_LANG_num_to_show; ?></td><td class="NavBlockField"><input type="text" name="num" size="2" value="<?php print $config["num"]; ?>" /></td></tr>
+	<tr><td class="NavBlockLabel"><?php print GM_LANG_before_or_after;?></td><td class="NavBlockField"><select name="count_placement">
 		<option value="left"<?php if ($config["count_placement"]=="left") print " selected=\"selected\"";?>><?php print GM_LANG_before; ?></option>
 		<option value="right"<?php if ($config["count_placement"]=="right") print " selected=\"selected\"";?>><?php print GM_LANG_after; ?></option>
 	</select>

@@ -34,7 +34,7 @@ require "config.php";
 */
 require ("helptext_vars.php");
 PrintSimpleHeader(GM_LANG_help_config);
-print '<span class="helpheader">';
+print '<span class="HelpHeader">';
 print GM_LANG_help_config;
 print '</span><br /><br /><span class="helptext">';
 if ($help == "help_contents_help") {

@@ -68,6 +68,7 @@ switch ($action) {
 			$person = Person::GetInstance($row["i_id"], $row);
 			$p = $person->isdead;
 		}
+		$message = GM_LANG_rebuilt_isdead;
 		break;
 	case "dispdbsettings":
 		$url = "http://".$_SERVER["SERVER_NAME"]."/";
@@ -110,19 +111,21 @@ foreach($users as $indexval => $user) {
 }
 ?>
 <!-- Setup the left box -->
-<div id="admin_genmod_left">
-	<div class="admin_link"><a href="admin.php"><?php print GM_LANG_admin;?></a></div>
+<div id="AdminColumnLeft">
+	<?php AdminFunctions::AdminLink("admin.php", GM_LANG_admin); ?>
 </div>
 	
 <!-- Setup the right box -->
-<div id="admin_genmod_right">
+<div id="AdminColumnRight">
 </div>
 
 <!-- Setup the middle box -->
-<div id="content">
+<div id="AdminColumnMiddle">
+<table class="NavBlockTable AdminNavBlockTable">
 	<?php
 	$menu = new AdminMenu();
 	$menu->SetBarText(GM_LANG_administration_maintenance);
+	$menu->SetBarStyle("AdminNavBlockHeader");
 	$menu->AddItem("help_sanity.php", "qm", "sc_sanity_check", "sanity.php", GM_LANG_sc_sanity_check, "left");
 	$menu->AddItem("restart_setup_help", "qm", "restart_setup", "install/install.php", GM_LANG_restart_setup, "right");
 	$menu->AddItem("load_english_help", "qm", "load_english", "admin_maint.php?action=loadenglish", GM_LANG_load_all_langs, "left");
@@ -137,12 +140,13 @@ foreach($users as $indexval => $user) {
 	$menu->PrintItems();
 	
 	if ($message != "") {
-		print "<div class=\"shade2 center\">".$message."</div>";
+		print "<tr><td colspan=\"2\" class=\"NavBlockColumnHeader AdminNavBlockColumnHeader\">".$message."</td></tr>";
 	}
 	if ($output != "") {
-		print "<div class=\"shade1 ltr\">".$output."</div>";
+		print "<tr><td colspan=\"2\" class=\"NavBlockLabel AdminNavBlockLabel\">".$output."</td></tr>";
 	}
 	?>
+	</table>
 </div>
 <?php
 PrintFooter();

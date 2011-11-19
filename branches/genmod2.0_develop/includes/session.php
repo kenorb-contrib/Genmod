@@ -643,11 +643,10 @@ $monthtonum["ell"] = 13;
 
 if (!isset($show_context_help)) $show_context_help = "";
 if (!isset($_SESSION["show_context_help"])) $_SESSION["show_context_help"] = GedcomConfig::$SHOW_CONTEXT_HELP;
+if ($show_context_help === "yes") $_SESSION["show_context_help"] = true;
+else if ($show_context_help === "no") $_SESSION["show_context_help"] = false;
 if (!isset($_SESSION["gm_user"])) $_SESSION["gm_user"] = "";
 if (!isset($_SESSION["cookie_login"])) $_SESSION["cookie_login"] = false;
-//if (isset(GedcomConfig::$SHOW_CONTEXT_HELP) && $show_context_help==='yes') $_SESSION["show_context_help"] = true;
-//if (isset(GedcomConfig::$SHOW_CONTEXT_HELP) && $show_context_help==='no') $_SESSION["show_context_help"] = false;
-//if (!isset(GedcomConfig::$USE_THUMBS_MAIN)) GedcomConfig::$USE_THUMBS_MAIN = false;
 
 if ((strstr(SCRIPT_NAME, "editconfig.php")===false) &&(strstr(SCRIPT_NAME, "editconfig_help.php")===false)) {
 	if ((!$DBCONN->connected)||(!UserController::AdminUserExists())) {

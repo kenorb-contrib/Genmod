@@ -36,32 +36,37 @@ $clippings_controller = new ClippingsController();
 
 // -- print html header information
 PrintHeader($clippings_controller->pagetitle);
-print "\r\n\t<div class=\"PageTitleName\">".$clippings_controller->title."</div>";
-
+print "\r\n\t<div class=\"PageTitleName ClippingsPageTitle\">".$clippings_controller->title."</div>";
 if ($clippings_controller->action == 'add') {
 	if ($clippings_controller->type == 'fam') {
-		print "\r\n<form action=\"clippings.php\" method=\"get\">\r\n".GM_LANG_which_links."<br />";
+		print "\r\n<form action=\"clippings.php\" method=\"get\">\r\n";
 		print "\r\n\t<input type=\"hidden\" name=\"id\" value=\"".$clippings_controller->id."\" />";
 		print "\r\n\t<input type=\"hidden\" name=\"type\" value=\"".$clippings_controller->type."\" />";
 		print "\r\n\t<input type=\"hidden\" name=\"action\" value=\"add1\" />";
-		print "\r\n\t<input type=\"radio\" name=\"others\" value=\"none\" />".GM_LANG_just_family."<br />";
-		print "\r\n\t<input type=\"radio\" name=\"others\" value=\"parents\" />".GM_LANG_parents_and_family."<br />";
-		print "\r\n\t<input type=\"radio\" name=\"others\" selected value=\"members\" />".GM_LANG_parents_and_child."<br />";
-		print "\r\n\t<input type=\"radio\" name=\"others\" value=\"descendants\" />".GM_LANG_parents_desc."<br /><br />";
-		print "\r\n\t<input type=\"submit\"  value=\"".GM_LANG_continue."\" /><br />\r\n\t</form>";
+		print "<table class=\"NavBlockTable\">";
+		print "<tr><td class=\"NavBlockHeader\" colspan=\"2\">".GM_LANG_which_links."</td></tr>";
+		print "<tr><td class=\"NavBlockLabel\">".GM_LANG_just_family."</td><td class=\"NavBlockField\"><input type=\"radio\" name=\"others\" value=\"none\" /></td></tr>";
+		print "<tr><td class=\"NavBlockLabel\">".GM_LANG_parents_and_family."</td><td class=\"NavBlockField\"><input type=\"radio\" name=\"others\" value=\"parents\" /></td></tr>";
+		print "<tr><td class=\"NavBlockLabel\">".GM_LANG_parents_and_child."</td><td class=\"NavBlockField\"><input type=\"radio\" name=\"others\" selected value=\"members\" /></td></tr>";
+		print "<tr><td class=\"NavBlockLabel\">".GM_LANG_parents_desc."</td><td class=\"NavBlockField\"><input type=\"radio\" name=\"others\" value=\"descendants\" /></td></tr>";
+		print "<tr><td class=\"NavBlockFooter\" colspan=\"2\"><input type=\"submit\"  value=\"".GM_LANG_continue."\" /></td></tr>";
+		print "</table></form><br /><br />";
 	}
 	else if ($clippings_controller->type == 'indi') {
-		print "\r\n<form action=\"clippings.php\" method=\"get\">\r\n".GM_LANG_which_p_links."<br />";
+		print "\r\n<form action=\"clippings.php\" method=\"get\">\r\n";
 		print "\r\n\t<input type=\"hidden\" name=\"id\" value=\"".$clippings_controller->id."\" />";
 		print "\r\n\t<input type=\"hidden\" name=\"type\" value=\"".$clippings_controller->type."\" />";
 		print "\r\n\t<input type=\"hidden\" name=\"action\" value=\"add1\" />";
-		print "\r\n\t<input type=\"radio\" name=\"others\" value=\"none\" />".GM_LANG_just_person."<br />";
-		print "\r\n\t<input type=\"radio\" name=\"others\" value=\"parents\" />".GM_LANG_person_parents_sibs."<br />";
-		print "\r\n\t<input type=\"radio\" name=\"others\" value=\"ancestors\" />".GM_LANG_person_ancestors."<br />";
-		print "\r\n\t<input type=\"radio\" name=\"others\" value=\"ancestorsfamilies\" />".GM_LANG_person_ancestor_fams."<br />";
-		print "\r\n\t<input type=\"radio\" name=\"others\" selected value=\"members\" />".GM_LANG_person_spouse."<br />";
-		print "\r\n\t<input type=\"radio\" name=\"others\" value=\"descendants\" />".GM_LANG_person_desc."<br /><br />";
-		print "\r\n\t<input type=\"submit\"  value=\"".GM_LANG_continue."\" /><br />\r\n\t</form>";
+		print "<table class=\"NavBlockTable\">";
+		print "<tr><td class=\"NavBlockHeader\" colspan=\"2\">".GM_LANG_which_p_links."</td></tr>";
+		print "<tr><td class=\"NavBlockLabel\">".GM_LANG_just_person."</td><td class=\"NavBlockField\"><input type=\"radio\" name=\"others\" value=\"none\" /></td></tr>";
+		print "<tr><td class=\"NavBlockLabel\">".GM_LANG_person_parents_sibs."</td><td class=\"NavBlockField\"><input type=\"radio\" name=\"others\" value=\"parents\" /></td></tr>";
+		print "<tr><td class=\"NavBlockLabel\">".GM_LANG_person_ancestors."</td><td class=\"NavBlockField\"><input type=\"radio\" name=\"others\" value=\"ancestors\" /></td></tr>";
+		print "<tr><td class=\"NavBlockLabel\">".GM_LANG_person_ancestor_fams."</td><td class=\"NavBlockField\"><input type=\"radio\" name=\"others\" value=\"ancestorsfamilies\" /></td></tr>";
+		print "<tr><td class=\"NavBlockLabel\">".GM_LANG_person_spouse."</td><td class=\"NavBlockField\"><input type=\"radio\" name=\"others\" selected value=\"members\" /></td></tr>";
+		print "<tr><td class=\"NavBlockLabel\">".GM_LANG_person_desc."</td><td class=\"NavBlockField\"><input type=\"radio\" name=\"others\" value=\"descendants\" /></td></tr>";
+		print "<tr><td class=\"NavBlockFooter\" colspan=\"2\"><input type=\"submit\"  value=\"".GM_LANG_continue."\" /></td></tr>";
+		print "</table></form><br /><br />";
 	}
 	else $clippings_controller->action = 'add1';
 }
@@ -69,31 +74,40 @@ if ($clippings_controller->action == 'add') {
 $clippings_controller->PerformAction();
 
 if($clippings_controller->action == 'download') {
-	print "\r\n\t<br /><br />".GM_LANG_download."<br /><br />".GM_LANG_gedcom_file."<ul><li><a href=\"clippings_download.php\">clipping.ged</a></li></ul><br />";
+	print "<div class=\"ClippingsDownloadTable\">";
+	print "<table class=\"NavBlockTable\">";
+	print "<tr><td class=\"NavBlockHeader\" colspan=\"2\">".GM_LANG_clippings_download."</td></tr>";
+	print "<tr><td class=\"NavBlockLabel\" colspan=\"2\">".GM_LANG_download."</td></tr>";
+	print "<tr><td class=\"NavBlockLabel\">".GM_LANG_gedcom_file."</td><td class=\"NavBlockField\"><a href=\"clippings_download.php\">clipping.ged</a></td></tr>";
 	if ($clippings_controller->mediacount > 0) {
 		// -- create zipped media file====> is a todo
-		print GM_LANG_media_files."<ul>";
+		print "<tr><td class=\"NavBlockLabel\" rowspan=\"".$clippings_controller->mediacount."\">".GM_LANG_media_files."</td>";
 		for($m=0; $m < $clippings_controller->mediacount; $m++) {
 			$fileobj = new MFile(trim(GedcomConfig::$MEDIA_DIRECTORY.$clippings_controller->media[$m]));
-			print "<li><a href=\"".$fileobj->f_main_file."\">".substr($clippings_controller->media[$m], strrpos($clippings_controller->media[$m], "/")+1)."</a></li>";
+			print "<td class=\"NavBlockField\"><a href=\"".$fileobj->f_main_file."\">".substr($clippings_controller->media[$m], strrpos($clippings_controller->media[$m], "/")+1)."</a></td>";
+			if ($m <> $clippings_controller->mediacount-1) print "</tr><tr>";
 		}
-		print "</ul>";
+		print "</tr>";
 	}
-	print "<br /><br />";
+	print "</table></div>";
 }
 if (!isset($clippings_controller->cart[GedcomConfig::$GEDCOMID]) || count($clippings_controller->cart[GedcomConfig::$GEDCOMID]) == 0) {
-
+	print "<div class=\"ClippingsMessage\">";
 	// NOTE: display helptext when cart is empty
-	if ($clippings_controller->action != 'add') PrintText("help_clippings.php");
+	if ($clippings_controller->action != 'add') {
+		PrintText("help_clippings.php");
+		print "<br /><br />";
+	}
 	
 	// -- end new lines
-	print "\r\n\t\t<br /><br />".GM_LANG_cart_is_empty."<br /><br />";
+	print "\r\n\t\t".GM_LANG_cart_is_empty."";
+	print "</div>";
 }
 else {
 	if ($clippings_controller->action != 'download') {
 		print "<form method=\"post\" action=\"clippings.php\">\n<input type=\"hidden\" name=\"action\" value=\"download\" />\n";
 		?>
-		<table class="ListTable">
+		<table class="NavBlockTable">
 		<tr><td class="NavBlockHeader" colspan="2"><?php print GM_LANG_choose; ?></td></tr>
 		<tr><td class="NavBlockLabel"><?php print GM_LANG_utf8_to_ansi; PrintHelpLink("utf8_ansi_help", "qm"); ?></td><td class="NavBlockField"><input type="checkbox" name="convert" value="yes" /></td></tr>
 		<tr><td class="NavBlockLabel"><?php print GM_LANG_remove_custom_tags; PrintHelpLink("remove_tags_help", "qm"); ?></td><td class="NavBlockField"><input type="checkbox" name="remove" value="yes" checked="checked" /></td></tr>

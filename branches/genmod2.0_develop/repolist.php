@@ -47,23 +47,29 @@ $repolist_controller = New RepoListController();
 
 
 PrintHeader($repolist_controller->pagetitle);
-print "<div class=\"center\">";
-print "<h3>".GM_LANG_repo_list."</h3>\n\t";
+print "<div id=\"RepoListPage\">";
+print "<div class=\"PageTitleName\">";
+print GM_LANG_repo_list;
+print "</div>";
 
 $ctot = $repolist_controller->repo_total + $repolist_controller->repo_add - $repolist_controller->repo_hide;
 
-print "\n\t<table class=\"ListTable $TEXT_DIRECTION center\">\n\t\t<tr><td class=\"shade2 center\"";
+print "\n\t<table class=\"ListTable RepoListTable\">\n\t\t";
+print "<tr><td class=\"ListTableHeader\"";
 if($ctot > 12) print " colspan=\"2\"";
-print "><img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["repository"]["small"]."\" border=\"0\" title=\"".GM_LANG_titles_found."\" alt=\"".GM_LANG_titles_found."\" />&nbsp;&nbsp;";
+print ">";
+print "<img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["repository"]["small"]."\" border=\"0\" title=\"".GM_LANG_titles_found."\" alt=\"".GM_LANG_titles_found."\" />&nbsp;&nbsp;";
 print GM_LANG_titles_found;
-print "</td></tr><tr><td class=\"$TEXT_DIRECTION shade1 wrap\"><ul>";
+PrintHelpLink("repolist_listbox_help", "qm");
+print "</td></tr><tr><td class=\"ListTableContent\">";
 
 if ($ctot > 0){
 	$i=1;
+	print "<ul>";
 	// -- print the array
 	foreach ($repolist_controller->repolist as $key => $repo) {
 		$repo->PrintListRepository(true, 2);
-		if ($i == ceil($ctot/2) && $ctot>12) print "</ul></td><td class=\"shade1 wrap\"><ul>\n";
+		if ($i == ceil($ctot/2) && $ctot>12) print "</ul></td><td class=\"ListTableContent\"><ul>\n";
 		$i++;
 	}
 	
@@ -71,22 +77,20 @@ if ($ctot > 0){
 		// -- print the additional array
 		foreach ($repolist_controller->addrepolist as $key => $repo) {
 			$repo->PrintListRepository(true, 3);
-			if ($i==ceil($ctot/2) && $ctot>12) print "</ul></td><td class=\"shade1 wrap\"><ul>\n";
+			if ($i==ceil($ctot/2) && $ctot>12) print "</ul></td><td class=\"ListTableContent\"><ul>\n";
 			$i++;
 		}
 	}
 
 	print "\n\t\t</ul></td>\n\t\t";
  
-	print "</tr><tr><td>".GM_LANG_total_repositories." ".$repolist_controller->repo_total;
+	print "</tr><tr><td class=\"ListTableColumnFooter\"".($ctot>12 ? " colspan=\"2\"" : "").">".GM_LANG_total_repositories." ".$repolist_controller->repo_total;
 	if ($repolist_controller->repo_hide > 0) print "  --  ".GM_LANG_hidden." ".$repolist_controller->repo_hide;
 }
-else print "<span class=\"warning\"><i>".GM_LANG_no_results."</span>";
+else print "<span class=\"Warning\">".GM_LANG_no_results."</span>";
 
 print "</td>\n\t\t</tr>\n\t</table>";
 
-PrintHelpLink("repolist_listbox_help", "qm");
 print "</div>";
-print "<br /><br />";
 PrintFooter();
 ?>

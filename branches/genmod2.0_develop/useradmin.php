@@ -348,12 +348,12 @@ if ($action=="edituser2") {
 InitCalendarPopUp();
 if ($action=="edituser" || $action == "createform") { ?>
 	<!-- Setup the left box -->
-	<div id="admin_genmod_left">
-		<div class="admin_link"><a href="admin.php"><?php print GM_LANG_admin;?></a></div>
-		<div class="admin_link"><a href="useradmin.php"><?php print GM_LANG_user_admin;?></a></div>
-		<div class="admin_link"><a href="useradmin.php?action=listusers&amp;sort=<?php print $sort;?>&amp;filter=<?php print $filter;?>&amp;usrlang=<?php print $usrlang;?>&amp;gedid=<?php print $gedid;?>&amp;namefilter=<?php print $namefilter;?>"><?php print GM_LANG_current_users;?></a></div>
+	<div id="AdminColumnLeft">
+		<?php AdminFunctions::AdminLink("admin.php", GM_LANG_admin); ?>
+		<?php AdminFunctions::AdminLink("useradmin.php", GM_LANG_user_admin); ?>
+		<?php AdminFunctions::AdminLink("useradmin.php?action=listusers&amp;sort=".$sort."&amp;filter=".$filter."&amp;usrlang=".$usrlang."&amp;gedid=".$gedid."&amp;namefilter=".$namefilter, GM_LANG_current_users); ?>
 	</div>
-	<div id="content">
+	<div id="AdminColumnMiddle">
 		<?php
 		switch ($action) {
 			case "edituser": 
@@ -378,175 +378,178 @@ if ($action=="edituser" || $action == "createform") { ?>
 				<?php break;
 		}
 		$tab=0; ?>
-		<div class="admin_topbottombar">
-			<h3>
-			<?php switch ($action) {
-				case "edituser":
-					print GM_LANG_update_user;
-					break;
-				case "createform":
-					print GM_LANG_add_user;
-					break;
-			} ?>
-			</h3>
-		</div>
+		<table class="NavBlockTable AdminNavBlockTable">
+		<tr>
+			<td colspan="2" class="NavBlockHeader AdminNavBlockHeader">
+				<div class="AdminNavBlockTitle">
+				<?php switch ($action) {
+					case "edituser":
+						print GM_LANG_update_user;
+						break;
+					case "createform":
+						print GM_LANG_add_user;
+						break;
+				} ?>
+				</div>
+			</td>
+		</tr>
 		<?php
 		if ((isset($user) && !empty($user->username)) || $action == "createform") { ?>
-			<div class="admin_item_box">
-				<div class="width30 choice_left">
-					<div class="helpicon">
-						<?php PrintHelpLink("useradmin_username_help", "qm","username");?>
-					</div>
-					<div class="description">
-						<?php print GM_LANG_username; ?>
-					</div>
+		<tr>
+			<td class="NavBlockLabel AdminNavBlockOption">
+				<div class="HelpIconContainer">
+					<?php PrintHelpLink("useradmin_username_help", "qm","username");?>
 				</div>
-				<div class="choice_right">
-					<input type="text" name="uusername" tabindex="<?php $tab++; print $tab; ?>" <?php if ($action == "edituser") { ?> value="<?php print $user->username.'"'; }?> />
+				<div class="AdminNavBlockOptionText">
+					<?php print GM_LANG_username; ?>
 				</div>
-			</div>
-			<div class="admin_item_box">
-				<div class="width30 choice_left">
-					<div class="helpicon">
-						<?php PrintHelpLink("useradmin_firstname_help", "qm", "firstname");?>
-					</div>
-					<div class="description">
-						<?php print GM_LANG_firstname; ?>
-					</div>
+			</td>
+			<td class="NavBlockField">
+				<input type="text" name="uusername" tabindex="<?php $tab++; print $tab; ?>" <?php if ($action == "edituser") { ?> value="<?php print $user->username.'"'; }?> />
+			</td>
+		</tr>
+		<tr>
+			<td class="NavBlockLabel AdminNavBlockOption">
+				<div class="HelpIconContainer">
+					<?php PrintHelpLink("useradmin_firstname_help", "qm", "firstname");?>
 				</div>
-				<div class="choice_right">
-					<input type="text" name="ufirstname" tabindex="<?php $tab++; print $tab; ?>" <?php if ($action == "edituser") { ?> value="<?php print PrintReady($user->firstname).'"'; } ?> size="50" />
+				<div class="AdminNavBlockOptionText">
+					<?php print GM_LANG_firstname; ?>
 				</div>
-			</div>
-			<div class="admin_item_box">
-				<div class="width30 choice_left">
-					<div class="helpicon">
-						<?php PrintHelpLink("useradmin_lastname_help", "qm","lastname");?>
-					</div>
-					<div class="description">
-						<?php print GM_LANG_lastname; ?>
-					</div>
+			</td>
+				<td class="NavBlockField">
+				<input type="text" name="ufirstname" tabindex="<?php $tab++; print $tab; ?>" <?php if ($action == "edituser") { ?> value="<?php print PrintReady($user->firstname).'"'; } ?> size="50" />
+			</td>
+		</tr>
+		<tr>
+			<td class="NavBlockLabel AdminNavBlockOption">
+				<div class="HelpIconContainer">
+					<?php PrintHelpLink("useradmin_lastname_help", "qm","lastname");?>
 				</div>
-				<div class="choice_right">
-					<input type="text" name="ulastname" tabindex="<?php $tab++; print $tab; ?>" <?php if ($action == "edituser") { ?> value="<?php print PrintReady($user->lastname).'"'; } ?> size="50" />
+				<div class="AdminNavBlockOptionText">
+					<?php print GM_LANG_lastname; ?>
 				</div>
-			</div>
-			<div class="admin_item_box">
-				<div class="width30 choice_left">
-					<div class="helpicon">
-						<?php PrintHelpLink("useradmin_password_help", "qm","password");?>
-					</div>
-					<div class="description">
-						<?php print GM_LANG_password; ?>
-					</div>
+			</td>
+			<td class="NavBlockField">
+				<input type="text" name="ulastname" tabindex="<?php $tab++; print $tab; ?>" <?php if ($action == "edituser") { ?> value="<?php print PrintReady($user->lastname).'"'; } ?> size="50" />
+			</td>
+		</tr>
+		<tr>
+			<td class="NavBlockLabel AdminNavBlockOption">
+				<div class="HelpIconContainer">
+					<?php PrintHelpLink("useradmin_password_help", "qm","password");?>
 				</div>
-				<div class="choice_right">
-					<input type="password" name="pass1" tabindex="<?php $tab++; print $tab; ?>" /><br /><?php if ($action == "edituser") { print GM_LANG_leave_blank; } ?>
+				<div class="AdminNavBlockOptionText">
+					<?php print GM_LANG_password; ?>
 				</div>
-			</div>
-			<div class="admin_item_box">
-				<div class="width30 choice_left">
-					<div class="helpicon">
-						<?php PrintHelpLink("useradmin_conf_password_help", "qm","confirm");?>
-					</div>
-					<div class="description">
-						<?php print GM_LANG_confirm; ?>
-					</div>
+			</td>
+			<td class="NavBlockField">
+				<input type="password" name="pass1" tabindex="<?php $tab++; print $tab; ?>" /><br /><?php if ($action == "edituser") { print GM_LANG_leave_blank; } ?>
+			</td>
+		</tr>
+		<tr>
+			<td class="NavBlockLabel AdminNavBlockOption">
+				<div class="HelpIconContainer">
+					<?php PrintHelpLink("useradmin_conf_password_help", "qm","confirm");?>
 				</div>
-				<div class="choice_right">
-					<input type="password" name="pass2" tabindex="<?php $tab++; print $tab; ?>" />
+				<div class="AdminNavBlockOptionText">
+					<?php print GM_LANG_confirm; ?>
 				</div>
-			</div>
-			<div class="admin_item_box">
-				<div class="width30 choice_left">
-					<div class="helpicon">
-						<?php PrintHelpLink("useradmin_sync_gedcom_help", "qm", "sync_gedcom");?>
-					</div>
-					<div class="description">
-						<?php print GM_LANG_sync_gedcom; ?>
-					</div>
+			</td>
+			<td class="NavBlockField">
+				<input type="password" name="pass2" tabindex="<?php $tab++; print $tab; ?>" />
+			</td>
+		</tr>
+		<tr>
+			<td class="NavBlockLabel AdminNavBlockOption">
+				<div class="HelpIconContainer">
+					<?php PrintHelpLink("useradmin_sync_gedcom_help", "qm", "sync_gedcom");?>
 				</div>
-				<div class="choice_right">
-					<input type="checkbox" name="new_sync_gedcom" tabindex="<?php $tab++; print $tab; ?>" value="Y" <?php if ($action == "edituser") { if ($user->sync_gedcom=="Y") print "checked=\"checked\""; }; ?> />
+				<div class="AdminNavBlockOptionText">
+					<?php print GM_LANG_sync_gedcom; ?>
 				</div>
-			</div>
-			<div class="admin_item_box">
-				<div class="width30 choice_left">
-					<div class="helpicon">
-						<?php PrintHelpLink("useradmin_can_admin_help", "qm", "can_admin");?>
-					</div>
-					<div class="description">
-						<?php print GM_LANG_can_admin; ?>
-					</div>
+			</td>
+			<td class="NavBlockField">
+				<input type="checkbox" name="new_sync_gedcom" tabindex="<?php $tab++; print $tab; ?>" value="Y" <?php if ($action == "edituser") { if ($user->sync_gedcom=="Y") print "checked=\"checked\""; }; ?> />
+			</td>
+		</tr>
+		<tr>
+			<td class="NavBlockLabel AdminNavBlockOption">
+				<div class="HelpIconContainer">
+					<?php PrintHelpLink("useradmin_can_admin_help", "qm", "can_admin");?>
 				</div>
-				<div class="choice_right">
-					<input type="checkbox" name="canadmin" tabindex="<?php $tab++; print $tab; ?>" <?php if ($action == "edituser") {?> value="yes" <?php if ($user->canadmin) print "checked=\"checked\""; if ($user->username==$gm_user->username) print " disabled=\"disabled\""; }?> />
+				<div class="AdminNavBlockOptionText">
+					<?php print GM_LANG_can_admin; ?>
 				</div>
-			</div>
-			<div class="admin_item_box">
-				<div class="width30 choice_left">
-					<div class="helpicon">
-						<?php PrintHelpLink("useradmin_auto_accept_help", "qm", "user_auto_accept");?>
-					</div>
-					<div class="description">
-						<?php print GM_LANG_user_auto_accept; ?>
-					</div>
+			</td>
+			<td class="NavBlockField">
+				<input type="checkbox" name="canadmin" tabindex="<?php $tab++; print $tab; ?>" <?php if ($action == "edituser") {?> value="yes" <?php if ($user->canadmin) print "checked=\"checked\""; if ($user->username==$gm_user->username) print " disabled=\"disabled\""; }?> />
+			</td>
+		</tr>
+		<tr>
+			<td class="NavBlockLabel AdminNavBlockOption">
+				<div class="HelpIconContainer">
+					<?php PrintHelpLink("useradmin_auto_accept_help", "qm", "user_auto_accept");?>
 				</div>
-				<div class="choice_right">
-					<input type="checkbox" name="new_auto_accept" tabindex="<?php $tab++; print $tab; ?>" value="Y" <?php if ($action == "edituser") if ($user->auto_accept) print "checked=\"checked\"";?> />
+				<div class="AdminNavBlockOptionText">
+					<?php print GM_LANG_user_auto_accept; ?>
 				</div>
-			</div>
-			<div class="admin_item_box">
-				<div class="width30 choice_left">
-					<div class="helpicon">
-						<?php PrintHelpLink("useradmin_email_help", "qm", "emailadress");?>
-					</div>
-					<div class="description">
-						<?php print GM_LANG_emailadress; ?>
-					</div>
+			</td>
+			<td class="NavBlockField">
+				<input type="checkbox" name="new_auto_accept" tabindex="<?php $tab++; print $tab; ?>" value="Y" <?php if ($action == "edituser") if ($user->auto_accept) print "checked=\"checked\"";?> />
+			</td>
+		</tr>
+		<tr>
+			<td class="NavBlockLabel AdminNavBlockOption">
+				<div class="HelpIconContainer">
+					<?php PrintHelpLink("useradmin_email_help", "qm", "emailadress");?>
 				</div>
-				<div class="choice_right">
-					<input type="text" name="emailadress" tabindex="<?php $tab++; print $tab; ?>" dir="ltr" <?php if ($action == "edituser") {?> value="<?php print $user->email.'"'; } ?> size="50" onchange="sndReq('errem', 'checkemail', 'email', this.value);" />&nbsp;&nbsp;<span id="errem"></span>
+				<div class="AdminNavBlockOptionText">
+					<?php print GM_LANG_emailadress; ?>
 				</div>
-			</div>
-			<div class="admin_item_box">
-				<div class="width30 choice_left">
-					<div class="helpicon">
-						<?php PrintHelpLink("useradmin_verified_help", "qm", "verified");?>
-					</div>
-					<div class="description">
-						<?php print GM_LANG_verified; ?>
-					</div>
+			</td>
+			<td class="NavBlockField">
+					<input type="text" name="emailadress" tabindex="<?php $tab++; print $tab; ?>" dir="ltr" <?php if ($action == "edituser") {?> value="<?php print $user->email.'"'; } ?> size="50" onchange="sndReq('errem', 'checkemail', 'email', true, this.value);" />&nbsp;&nbsp;<span id="errem"></span>
+			</td>
+		</tr>
+		<tr>
+			<td class="NavBlockLabel AdminNavBlockOption">
+				<div class="HelpIconContainer">
+					<?php PrintHelpLink("useradmin_verified_help", "qm", "verified");?>
 				</div>
-				<div class="choice_right">
+				<div class="AdminNavBlockOptionText">
+					<?php print GM_LANG_verified; ?>
+				</div>
+			</td>
+			<td class="NavBlockField">
 				<input type="checkbox" name="verified" tabindex="<?php $tab++; print $tab; ?>" value="Y" <?php if ($action == "edituser") { if ($user->verified) print "checked=\"checked\""; } else print "checked=\"checked\"";?> />
+			</td>
+		</tr>
+		<tr>
+			<td class="NavBlockLabel AdminNavBlockOption">
+				<div class="HelpIconContainer">
+					<?php PrintHelpLink("useradmin_verbyadmin_help", "qm", "verified_by_admin");?>
 				</div>
-			</div>
-			<div class="admin_item_box">
-				<div class="width30 choice_left">
-					<div class="helpicon">
-						<?php PrintHelpLink("useradmin_verbyadmin_help", "qm", "verified_by_admin");?>
-					</div>
-					<div class="description">
-						<?php print GM_LANG_verified_by_admin; ?>
-					</div>
+				<div class="AdminNavBlockOptionText">
+					<?php print GM_LANG_verified_by_admin; ?>
 				</div>
-				<div class="choice_right">
-					<input type="checkbox" name="verified_by_admin" tabindex="<?php $tab++; print $tab; ?>" value="Y" <?php if ($action == "edituser") { if ($user->verified_by_admin) print "checked=\"checked\""; } else print "checked=\"checked\"";?> />
-				</div>
-			</div>
+			</td>
+			<td class="NavBlockField">
+				<input type="checkbox" name="verified_by_admin" tabindex="<?php $tab++; print $tab; ?>" value="Y" <?php if ($action == "edituser") { if ($user->verified_by_admin) print "checked=\"checked\""; } else print "checked=\"checked\"";?> />
+			</td>
+		</tr>
 			<?php if ($action == "createform") $user =& User::GetInstance($gm_user->username);
 			if (GedcomConfig::$ENABLE_MULTI_LANGUAGE) { ?>
-				<div class="admin_item_box">
-					<div class="width30 choice_left">
-						<div class="helpicon">
+				<tr>
+					<td class="NavBlockLabel AdminNavBlockOption">
+						<div class="HelpIconContainer">
 							<?php PrintHelpLink("edituser_change_lang_help", "qm", "change_lang");?>
 						</div>
-						<div class="description">
+						<div class="AdminNavBlockOptionText">
 							<?php print GM_LANG_change_lang; ?>
 						</div>
-					</div>
-					<div class="choice_right">
+					</td>
+					<td class="NavBlockField">
 						<?php
 						
 						$tab++;
@@ -560,20 +563,20 @@ if ($action=="edituser" || $action == "createform") { ?>
 						}
 						print "</select>\n\t\t";
 						?>
-					</div>
-				</div>
+					</td>
+				</tr>
 			<?php }
 			if (SystemConfig::$ALLOW_USER_THEMES) { ?>
-				<div class="admin_item_box">
-					<div class="width30 choice_left">
-						<div class="helpicon">
+				<tr>
+					<td class="NavBlockLabel AdminNavBlockOption">
+						<div class="HelpIconContainer">
 							<?php PrintHelpLink("useradmin_user_theme_help", "qm", "user_theme");?>
 						</div>
-						<div class="description">
+						<div class="AdminNavBlockOptionText">
 							<?php print GM_LANG_user_theme; ?>
 						</div>
-					</div>
-					<div class="choice_right">
+					</td>
+					<td class="NavBlockField">
 						<select name="user_theme" tabindex="<?php $tab++; print $tab; ?>" dir="ltr">
 							<option value=""><?php print GM_LANG_site_default; ?></option>
 							<?php
@@ -585,263 +588,257 @@ if ($action=="edituser" || $action == "createform") { ?>
 							}
 							?>
 						</select>
-					</div>
-				</div>
+					</td>
+				</tr>
 			<?php } ?>
-			<div class="admin_item_box">
-				<div class="width30 choice_left">
-					<div class="helpicon">
-						<?php PrintHelpLink("useradmin_user_contact_help", "qm", "user_contact_method");?>
-					</div>
-					<div class="description">
-						<?php print GM_LANG_user_contact_method; ?>
-					</div>
+		<tr>
+			<td class="NavBlockLabel AdminNavBlockOption">
+				<div class="HelpIconContainer">
+					<?php PrintHelpLink("useradmin_user_contact_help", "qm", "user_contact_method");?>
 				</div>
-				<div class="choice_right">
-					<select name="new_contact_method" tabindex="<?php $tab++; print $tab; ?>">
-						<?php if (SystemConfig::$GM_STORE_MESSAGES) { ?>
-							<option value="messaging" <?php if ($action == "edituser") if ($user->contactmethod=='messaging') print "selected=\"selected\""; ?>><?php print GM_LANG_messaging;?></option>
-							<option value="messaging2" <?php if ($action == "edituser") { if ($user->contactmethod=='messaging2') print "selected=\"selected\""; } else print "selected=\"selected\"";?>><?php print GM_LANG_messaging2;?></option>
-						<?php } 
-						else { ?>
-							<option value="messaging3" <?php if ($action == "edituser") { if ($user->contactmethod=='messaging3') print "selected=\"selected\""; } else print "selected=\"selected\"";?>><?php print GM_LANG_messaging3;?></option>
-						<?php } ?>
-						<option value="mailto" <?php if ($action == "edituser") if ($user->contactmethod=='mailto') print "selected=\"selected\""; ?>><?php print GM_LANG_mailto;?></option>
-						<option value="none" <?php if ($action == "edituser") if ($user->contactmethod=='none') print "selected=\"selected\""; ?>><?php print GM_LANG_no_messaging;?></option>
-					</select>
+				<div class="AdminNavBlockOptionText">
+					<?php print GM_LANG_user_contact_method; ?>
 				</div>
-			</div>
-			<div class="admin_item_box">
-				<div class="width30 choice_left">
-					<div class="helpicon">
-						<?php PrintHelpLink("useradmin_visibleonline_help", "qm", "visibleonline");?>
-					</div>
-					<div class="description">
-						<?php print GM_LANG_visibleonline; ?>
-					</div>
+			</td>
+			<td class="NavBlockField">
+				<select name="new_contact_method" tabindex="<?php $tab++; print $tab; ?>">
+					<?php if (SystemConfig::$GM_STORE_MESSAGES) { ?>
+						<option value="messaging" <?php if ($action == "edituser") if ($user->contactmethod=='messaging') print "selected=\"selected\""; ?>><?php print GM_LANG_messaging;?></option>
+						<option value="messaging2" <?php if ($action == "edituser") { if ($user->contactmethod=='messaging2') print "selected=\"selected\""; } else print "selected=\"selected\"";?>><?php print GM_LANG_messaging2;?></option>
+					<?php } 
+					else { ?>
+						<option value="messaging3" <?php if ($action == "edituser") { if ($user->contactmethod=='messaging3') print "selected=\"selected\""; } else print "selected=\"selected\"";?>><?php print GM_LANG_messaging3;?></option>
+					<?php } ?>
+					<option value="mailto" <?php if ($action == "edituser") if ($user->contactmethod=='mailto') print "selected=\"selected\""; ?>><?php print GM_LANG_mailto;?></option>
+					<option value="none" <?php if ($action == "edituser") if ($user->contactmethod=='none') print "selected=\"selected\""; ?>><?php print GM_LANG_no_messaging;?></option>
+				</select>
+			</td>
+		</tr>
+		<tr>
+			<td class="NavBlockLabel AdminNavBlockOption">
+				<div class="HelpIconContainer">
+					<?php PrintHelpLink("useradmin_visibleonline_help", "qm", "visibleonline");?>
 				</div>
-				<div class="choice_right">
-					<input type="checkbox" name="visibleonline" tabindex="<?php $tab++; print $tab; ?>" value="yes" <?php if ($action == "edituser") { if ($user->visibleonline) print "checked=\"checked\""; } else print "checked=\"checked\"";?> />
+				<div class="AdminNavBlockOptionText">
+					<?php print GM_LANG_visibleonline; ?>
 				</div>
-			</div>
-			<div class="admin_item_box">
-				<div class="width30 choice_left">
-					<div class="helpicon">
-						<?php PrintHelpLink("useradmin_editaccount_help", "qm", "editaccount");?>
-					</div>
-					<div class="description">
-						<?php print GM_LANG_editaccount; ?>
-					</div>
+			</td>
+			<td class="NavBlockField">
+				<input type="checkbox" name="visibleonline" tabindex="<?php $tab++; print $tab; ?>" value="yes" <?php if ($action == "edituser") { if ($user->visibleonline) print "checked=\"checked\""; } else print "checked=\"checked\"";?> />
+			</td>
+		</tr>
+		<tr>
+			<td class="NavBlockLabel AdminNavBlockOption">
+				<div class="HelpIconContainer">
+					<?php PrintHelpLink("useradmin_editaccount_help", "qm", "editaccount");?>
 				</div>
-				<div class="choice_right">
-					<input type="checkbox" name="editaccount" tabindex="<?php $tab++; print $tab; ?>" value="yes" <?php if ($action == "edituser") { if ($user->editaccount) print "checked=\"checked\""; } else print "checked=\"checked\"";?> />
+				<div class="AdminNavBlockOptionText">
+					<?php print GM_LANG_editaccount; ?>
 				</div>
-			</div>
-			<div class="admin_item_box">
-				<div class="width30 choice_left">
-					<div class="helpicon">
-						<?php PrintHelpLink("useradmin_user_default_tab_help", "qm", "user_default_tab");?>
-					</div>
-					<div class="description">
-						<?php print GM_LANG_user_default_tab; ?>
-					</div>
+			</td>
+			<td class="NavBlockField">
+				<input type="checkbox" name="editaccount" tabindex="<?php $tab++; print $tab; ?>" value="yes" <?php if ($action == "edituser") { if ($user->editaccount) print "checked=\"checked\""; } else print "checked=\"checked\"";?> />
+			</td>
+		</tr>
+		<tr>
+			<td class="NavBlockLabel AdminNavBlockOption">
+				<div class="HelpIconContainer">
+					<?php PrintHelpLink("useradmin_user_default_tab_help", "qm", "user_default_tab");?>
 				</div>
-				<div class="choice_right">
-					<select name="new_default_tab" tabindex="<?php $tab++; print $tab; ?>">
-						<option value="9" <?php if ($action == "edituser") if (@$user->default_tab==9) print "selected=\"selected\""; ?>><?php print GM_LANG_site_default; ?></option>
-						<option value="0" <?php if ($action == "edituser") if (@$user->default_tab==0) print "selected=\"selected\""; ?>><?php print GM_LANG_personal_facts;?></option>
-						<option value="1" <?php if ($action == "edituser") if (@$user->default_tab==1) print "selected=\"selected\""; ?>><?php print GM_LANG_notes;?></option>
-						<option value="2" <?php if ($action == "edituser") if (@$user->default_tab==2) print "selected=\"selected\""; ?>><?php print GM_LANG_ssourcess;?></option>
-						<option value="3" <?php if ($action == "edituser") if (@$user->default_tab==3) print "selected=\"selected\""; ?>><?php print GM_LANG_media;?></option>
-						<option value="4" <?php if ($action == "edituser") if (@$user->default_tab==4) print "selected=\"selected\""; ?>><?php print GM_LANG_relatives;?></option>
-						<option value="6" <?php if ($action == "edituser") if (@$user->default_tab==6) print "selected=\"selected\""; ?>><?php print GM_LANG_all;?></option>
-					</select>
+				<div class="AdminNavBlockOptionText">
+					<?php print GM_LANG_user_default_tab; ?>
 				</div>
-			</div>
-			<?php if ($gm_user->userIsAdmin()) { ?>
-				<div class="admin_item_box">
-					<div class="width30 choice_left">
-						<div class="helpicon">
-							<?php PrintHelpLink("useradmin_comment_help", "qm", "comment");?>
-						</div>
-						<div class="description">
-							<?php print GM_LANG_comment; ?>
-						</div>
+			</td>
+			<td class="NavBlockField">
+				<select name="new_default_tab" tabindex="<?php $tab++; print $tab; ?>">
+					<option value="9" <?php if ($action == "edituser") if (@$user->default_tab==9) print "selected=\"selected\""; ?>><?php print GM_LANG_site_default; ?></option>
+					<option value="0" <?php if ($action == "edituser") if (@$user->default_tab==0) print "selected=\"selected\""; ?>><?php print GM_LANG_personal_facts;?></option>
+					<option value="1" <?php if ($action == "edituser") if (@$user->default_tab==1) print "selected=\"selected\""; ?>><?php print GM_LANG_notes;?></option>
+					<option value="2" <?php if ($action == "edituser") if (@$user->default_tab==2) print "selected=\"selected\""; ?>><?php print GM_LANG_ssourcess;?></option>
+					<option value="3" <?php if ($action == "edituser") if (@$user->default_tab==3) print "selected=\"selected\""; ?>><?php print GM_LANG_media;?></option>
+					<option value="4" <?php if ($action == "edituser") if (@$user->default_tab==4) print "selected=\"selected\""; ?>><?php print GM_LANG_relatives;?></option>
+					<option value="6" <?php if ($action == "edituser") if (@$user->default_tab==6) print "selected=\"selected\""; ?>><?php print GM_LANG_all;?></option>
+				</select>
+			</td>
+		</tr>
+		<?php if ($gm_user->userIsAdmin()) { ?>
+			<tr>
+				<td class="NavBlockLabel AdminNavBlockOption">
+					<div class="HelpIconContainer">
+						<?php PrintHelpLink("useradmin_comment_help", "qm", "comment");?>
 					</div>
-					<div class="choice_right">
-						<textarea cols="40" rows="5" name="new_comment" tabindex="<?php $tab++; print $tab; ?>" ><?php if ($action == "edituser") print stripslashes(PrintReady($user->comment)); ?></textarea>
+					<div class="AdminNavBlockOptionText">
+						<?php print GM_LANG_comment; ?>
 					</div>
-				</div>
-				<div class="admin_item_box">
-					<div class="width30 choice_left">
-						<div class="helpicon">
-							<?php PrintHelpLink("useradmin_comment_exp_help", "qm", "comment_exp");?>
-						</div>
-						<div class="description">
-							<?php print GM_LANG_comment_exp; ?>
-						</div>
+				</td>
+				<td class="NavBlockField">
+					<textarea cols="40" rows="5" name="new_comment" tabindex="<?php $tab++; print $tab; ?>" ><?php if ($action == "edituser") print stripslashes(PrintReady($user->comment)); ?></textarea>
+				</td>
+			</tr>
+			<tr>
+				<td class="NavBlockLabel AdminNavBlockOption">
+					<div class="HelpIconContainer">
+						<?php PrintHelpLink("useradmin_comment_exp_help", "qm", "comment_exp");?>
 					</div>
-					<div class="choice_right">
-						<input type="text" name="new_comment_exp" id="new_comment_exp" tabindex="<?php $tab++; print $tab; ?>" value="<?php if ($action == "edituser") print $user->comment_exp; ?>" />&nbsp;&nbsp;<?php EditFunctions::PrintCalendarPopup("new_comment_exp"); ?>
+					<div class="AdminNavBlockOptionText">
+						<?php print GM_LANG_comment_exp; ?>
 					</div>
-				</div>
+				</td>
+				<td class="NavBlockField">
+					<input type="text" name="new_comment_exp" id="new_comment_exp" tabindex="<?php $tab++; print $tab; ?>" value="<?php if ($action == "edituser") print $user->comment_exp; ?>" />&nbsp;&nbsp;<?php EditFunctions::PrintCalendarPopup("new_comment_exp"); ?>
+				</td>
+			</tr>
 			<?php } ?>
 		<?php
 			
 			
-		foreach($GEDCOMS as $gedcomid=>$gedarray) {
-			print "<div class=\"admin_topbottombar\">".$gedarray["title"]."</div>";
-			
-			?><div class="admin_item_box">
-			
-				<div class="width30 choice_left">
-					<div class="helpicon">
+		foreach($GEDCOMS as $gedcomid=>$gedarray) { ?>
+			<tr>
+				<td colspan="2" class="NavBlockRowSpacer">&nbsp;</td>
+			</tr>
+			<tr>
+				<td colspan="2" class="NavBlockHeader AdminNavBlockHeader">
+					<?php print $gedarray["title"]; ?>
+				</td>
+			</tr>
+			<tr>
+				<td class="NavBlockLabel AdminNavBlockOption">
+					<div class="HelpIconContainer">
 						<?php PrintHelpLink("useradmin_gedcomid_help", "qm","gedcomid");?>
 					</div>
-					<div class="description">
+					<div class="AdminNavBlockOptionText">
 						<?php print GM_LANG_gedcomid; ?>
 					</div>
-				</div>
-				<div class="width65 choice_right">
-					<div class="admin_item_box">
-						<div class="choice_right">
-							<?php
-							$tab++;
-							print "<input type=\"text\" name=\"gedcomid_".$gedcomid."\" id=\"gedcomid_".$gedcomid."\" size=\"6\" tabindex=\"".$tab."\" value=\"";
-							if ($action == "edituser") if (isset($user->gedcomid[$gedcomid])) print $user->gedcomid[$gedcomid];
-							print "\" onblur=\"sndReq('usgid".$gedarray["id"]."', 'getpersonnamefact', 'pid', this.value, 'gedid', '".$gedarray["id"]."');\" />";
-							LinkFunctions::PrintFindIndiLink("gedcomid_$gedcomid",$gedarray["id"]);
-							print "\n<span id=\"usgid".$gedarray["id"]."\" class=\"list_item\"> ";
-							if ($action == "edituser") {
-								if (isset($user->gedcomid[$gedcomid]) && !empty($user->gedcomid[$gedcomid])) {
-									SwitchGedcom($gedcomid);
-									$person =& Person::GetInstance($user->gedcomid[$gedcomid], "", $gedcomid);
-										if (!$person->isempty) {
-										print $person->name;
-										PersonFunctions::PrintFirstMajorFact($person);
-									}
-									SwitchGedcom();								}
+				</td>
+				<td class="NavBlockField">
+					<?php
+					$tab++;
+					print "<input type=\"text\" name=\"gedcomid_".$gedcomid."\" id=\"gedcomid_".$gedcomid."\" size=\"6\" tabindex=\"".$tab."\" value=\"";
+					if ($action == "edituser") if (isset($user->gedcomid[$gedcomid])) print $user->gedcomid[$gedcomid];
+					print "\" onblur=\"sndReq('usgid".$gedarray["id"]."', 'getpersonnamefact', true, 'pid', this.value, 'gedid', '".$gedarray["id"]."');\" />";
+					LinkFunctions::PrintFindIndiLink("gedcomid_$gedcomid",$gedarray["id"]);
+					print "\n<span id=\"usgid".$gedarray["id"]."\" class=\"ListItem\"> ";
+					if ($action == "edituser") {
+						if (isset($user->gedcomid[$gedcomid]) && !empty($user->gedcomid[$gedcomid])) {
+							SwitchGedcom($gedcomid);
+							$person =& Person::GetInstance($user->gedcomid[$gedcomid], "", $gedcomid);
+								if (!$person->isempty) {
+								print $person->name;
+								PersonFunctions::PrintFirstMajorFact($person);
 							}
-							print "</span>\n";
-							?>
-						</div>
-					</div>
-				</div>
-			</div>
-			<div class="admin_item_box">
-				<div class="width30 choice_left">
-					<div class="helpicon">
+							SwitchGedcom();
+						}
+					}
+					print "</span>\n";
+					?>
+				</td>
+			</tr>
+			<tr>
+				<td class="NavBlockLabel AdminNavBlockOption">
+					<div class="HelpIconContainer">
 						<?php PrintHelpLink("useradmin_rootid_help", "qm", "rootid");?>
 					</div>
-					<div class="description">
+					<div class="AdminNavBlockOptionText">
 						<?php print GM_LANG_rootid; ?>
 					</div>
-				</div>
-				<div class="width65 choice_right">
-						<div class="admin_item_box">
-							<div class="choice_right">
-								<?php
-								$tab++;
-								print "<input type=\"text\" name=\"rootid_".$gedcomid."\" id=\"rootid_".$gedcomid."\" tabindex=\"".$tab."\" size=\"6\" value=\"";
-								if ($action == "edituser") if (isset($user->rootid[$gedcomid])) print $user->rootid[$gedcomid];
-								print "\" onblur=\"sndReq('usroot".$gedarray["id"]."', 'getpersonnamefact', 'pid', this.value, 'gedid', '".$gedarray["id"]."');\" />";
-								LinkFunctions::PrintFindIndiLink("rootid_$gedcomid",$gedarray["id"]);
-								print "\n<span id=\"usroot".$gedarray["id"]."\" class=\"list_item\"> ";
-								if ($action == "edituser") {
-									if (isset($user->rootid[$gedcomid]) && !empty($user->rootid[$gedcomid])) {
-										SwitchGedcom($gedcomid);
-										$person =& Person::GetInstance($user->rootid[$gedcomid], "", $gedcomid);
-										if (!$person->isempty) {
-											print $person->name;
-											PersonFunctions::PrintFirstMajorFact($person);
-										}
-										SwitchGedcom();
-									}
-								}
-								print "</span>\n";
-								?>
-							</div>
-						</div>
-				</div>
-			</div>
-			<div class="admin_item_box">
-				<div class="width30 choice_left">
-					<div class="helpicon">
+				</td>
+				<td class="NavBlockField">
+					<?php
+					$tab++;
+					print "<input type=\"text\" name=\"rootid_".$gedcomid."\" id=\"rootid_".$gedcomid."\" tabindex=\"".$tab."\" size=\"6\" value=\"";
+					if ($action == "edituser") if (isset($user->rootid[$gedcomid])) print $user->rootid[$gedcomid];
+					print "\" onblur=\"sndReq('usroot".$gedarray["id"]."', 'getpersonnamefact', true, 'pid', this.value, 'gedid', '".$gedarray["id"]."');\" />";
+					LinkFunctions::PrintFindIndiLink("rootid_$gedcomid",$gedarray["id"]);
+					print "\n<span id=\"usroot".$gedarray["id"]."\" class=\"ListItem\"> ";
+					if ($action == "edituser") {
+						if (isset($user->rootid[$gedcomid]) && !empty($user->rootid[$gedcomid])) {
+							SwitchGedcom($gedcomid);
+							$person =& Person::GetInstance($user->rootid[$gedcomid], "", $gedcomid);
+							if (!$person->isempty) {
+								print $person->name;
+								PersonFunctions::PrintFirstMajorFact($person);
+							}
+							SwitchGedcom();
+						}
+					}
+					print "</span>\n";
+					?>
+				</td>
+			</tr>
+			<tr>
+				<td class="NavBlockLabel AdminNavBlockOption">
+					<div class="HelpIconContainer">
 						<?php PrintHelpLink("useradmin_gedcom_admin_help", "qm", "gedadmin");?>
 					</div>
-					<div class="description">
+					<div class="AdminNavBlockOptionText">
 						<?php print GM_LANG_gedadmin; ?>
 					</div>
-				</div>
-				<div class="choice_right">
+				</td>
+				<td class="NavBlockField">
 					<input type="checkbox" name="new_gedadmin_<?php print $gedcomid;?>" <?php if ($user->canadmin && $action == "edituser") print " disabled=\"disabled\""; ?>tabindex="<?php $tab++; print $tab; ?>" value="Y" <?php if ($action == "edituser") if (isset($user->gedcomadmin[$gedcomid]) && $user->gedcomadmin[$gedcomid]) print "checked=\"checked\"";?> />
-				</div>
-			</div>
-			<div class="admin_item_box">
-				<div class="width30 choice_left">
-					<div class="helpicon">
+				</td>
+			</tr>
+			<tr>
+				<td class="NavBlockLabel AdminNavBlockOption">
+					<div class="HelpIconContainer">
 						<?php PrintHelpLink("useradmin_privgroup_help", "qm","accpriv_conf");?>
 					</div>
-					<div class="description">
+					<div class="AdminNavBlockOptionText">
 						<?php print GM_LANG_accpriv_conf; ?>
 					</div>
-				</div>
-				<div class="width65 choice_right">
-						<div class="admin_item_box">
-							<div class="choice_right">
-								<?php
-								if ($action == "edituser") {
-									if (!isset($user->privgroup[$gedcomid])) $user->privgroup[$gedcomid]="access";
-								}
-								$tab++;
-								print "<select name=\"privgroup_$gedcomid\" tabindex=\"".$tab."\"";
-								if ($user->canadmin && $action == "edituser") print " disabled=\"disabled\"";
-								print ">\n";
-								print "<option value=\"none\"";
-								if ($action == "edituser") if ($user->privgroup[$gedcomid]=="none") print " selected=\"selected\"";
-								print ">".GM_LANG_visitor."</option>\n";
-								print "<option value=\"access\"";
-								if ($action == "edituser") if ($user->privgroup[$gedcomid]=="access") print " selected=\"selected\"";
-								print ">".GM_LANG_user."</option>\n";
-								print "<option value=\"admin\"";
-								if ($action == "edituser") if ($user->privgroup[$gedcomid]=="admin" || $user->canadmin) print " selected=\"selected\"";
-								print ">".GM_LANG_administrator."</option>\n";
+				</td>
+				<td class="NavBlockField">
+					<?php
+					if ($action == "edituser") {
+						if (!isset($user->privgroup[$gedcomid])) $user->privgroup[$gedcomid]="access";
+					}
+					$tab++;
+					print "<select name=\"privgroup_$gedcomid\" tabindex=\"".$tab."\"";
+					if ($user->canadmin && $action == "edituser") print " disabled=\"disabled\"";
+					print ">\n";
+					print "<option value=\"none\"";
+					if ($action == "edituser") if ($user->privgroup[$gedcomid]=="none") print " selected=\"selected\"";
+					print ">".GM_LANG_visitor."</option>\n";
+					print "<option value=\"access\"";
+					if ($action == "edituser") if ($user->privgroup[$gedcomid]=="access") print " selected=\"selected\"";
+					print ">".GM_LANG_user."</option>\n";
+					print "<option value=\"admin\"";
+					if ($action == "edituser") if ($user->privgroup[$gedcomid]=="admin" || $user->canadmin) print " selected=\"selected\"";
+					print ">".GM_LANG_administrator."</option>\n";
 //								print "<option value=\"admin\"";
 //								if ($action == "edituser") if ($user->canedit[$file]=="admin") print " selected=\"selected\"";
 //								print ">".GM_LANG_admin_gedcom."</option>\n";
-								print "</select>\n";
-								?>
-							</div>
-						</div>
-				</div>
-			</div>
-			<div class="admin_item_box">
-				<div class="width30 choice_left">
-					<div class="helpicon">
+					print "</select>\n";
+					?>
+				</td>
+			</tr>
+			<tr>
+				<td class="NavBlockLabel AdminNavBlockOption">
+					<div class="HelpIconContainer">
 						<?php PrintHelpLink("useradmin_relation_priv_help", "qm", "user_relationship_priv");?>
 					</div>
-					<div class="description">
+					<div class="AdminNavBlockOptionText">
 						<?php print GM_LANG_user_relationship_priv; ?>
 					</div>
-				</div>
-				<div class="choice_right">
+				</td>
+				<td class="NavBlockField">
 					<select name="new_relationship_privacy_<?php print $gedcomid; ?>"<?php if ($user->canadmin && $action == "edituser") print " disabled=\"disabled\""; ?> tabindex="<?php $tab++; print $tab; ?>" >
 						<option value=""<?php if ($action == "edituser") if (isset($user->relationship_privacy[$gedcomid]) && $user->relationship_privacy[$gedcomid]=="") print " selected=\"selected\"";?>><?php print GM_LANG_default; ?></option>
 						<option value="Y"<?php if ($action == "edituser") if (isset($user->relationship_privacy[$gedcomid]) && $user->relationship_privacy[$gedcomid]=="Y") print " selected=\"selected\"";?>><?php print GM_LANG_yes; ?></option>
 						<option value="N"<?php if ($action == "edituser") if (isset($user->relationship_privacy[$gedcomid]) && $user->relationship_privacy[$gedcomid]=="N") print " selected=\"selected\"";?>><?php print GM_LANG_no; ?></option>
 						</select>
-				</div>
-			</div>
-			<div class="admin_item_box">
-				<div class="width30 choice_left">
-					<div class="helpicon">
+				</td>
+			</tr>
+			<tr>
+				<td class="NavBlockLabel AdminNavBlockOption">
+					<div class="HelpIconContainer">
 						<?php PrintHelpLink("useradmin_path_length_help", "qm", "user_path_length");?>
 					</div>
-					<div class="description">
+					<div class="AdminNavBlockOptionText">
 						<?php print GM_LANG_user_path_length; ?>
 					</div>
-				</div>
-				<div class="choice_right">
+				</td>
+				<td class="NavBlockField">
           			<select size="1" <?php if ($user->canadmin && $action == "edituser") print "disabled=\"disabled\""; ?> name="new_max_relation_path_<?php print $gedcomid; ?>"><?php
           				for ($y = 1; $y <= 10; $y++) {
             				print "<option";
@@ -852,109 +849,108 @@ if ($action=="edituser" || $action == "createform") { ?>
             				print "</option>";
           				}?>
           			</select>
-				</div>
-			</div>
-			<div class="admin_item_box">
-				<div class="width30 choice_left">
-					<div class="helpicon">
+				</td>
+			</tr>
+			<tr>
+				<td class="NavBlockLabel AdminNavBlockOption">
+					<div class="HelpIconContainer">
 						<?php PrintHelpLink("useradmin_marr_priv_help", "qm", "user_path_marr");?>
 					</div>
-					<div class="description">
+					<div class="AdminNavBlockOptionText">
 						<?php print GM_LANG_user_path_marr; ?>
 					</div>
-				</div>
-				<div class="choice_right">
+				</td>
+				<td class="NavBlockField">
 					<select name="new_check_marriage_relations_<?php print $gedcomid; ?>"<?php if ($user->canadmin && $action == "edituser") print " disabled=\"disabled\""; ?> tabindex="<?php $tab++; print $tab; ?>" >
 						<option value=""<?php if ($action == "edituser") if (isset($user->check_marriage_relations[$gedcomid]) && $user->check_marriage_relations[$gedcomid]=="") print " selected=\"selected\"";?>><?php print GM_LANG_default; ?></option>
 						<option value="Y"<?php if ($action == "edituser") if (isset($user->check_marriage_relations[$gedcomid]) && $user->check_marriage_relations[$gedcomid]=="Y") print " selected=\"selected\"";?>><?php print GM_LANG_yes; ?></option>
 						<option value="N"<?php if ($action == "edituser") if (isset($user->check_marriage_relations[$gedcomid]) && $user->check_marriage_relations[$gedcomid]=="N") print " selected=\"selected\"";?>><?php print GM_LANG_no; ?></option>
 						</select>
-				</div>
-			</div>
-			<div class="admin_item_box">
-				<div class="width30 choice_left">
-					<div class="helpicon">
+				</td>
+			</tr>
+			<tr>
+				<td class="NavBlockLabel AdminNavBlockOption">
+					<div class="HelpIconContainer">
 						<?php PrintHelpLink("useradmin_hide_live_people_help", "qm", "HIDE_LIVE_PEOPLE");?>
 					</div>
-					<div class="description">
+					<div class="AdminNavBlockOptionText">
 						<?php print GM_LANG_HIDE_LIVE_PEOPLE; ?>
 					</div>
-				</div>
-				<div class="choice_right">
+				</td>
+				<td class="NavBlockField">
 					<select name="new_hide_live_people_<?php print $gedcomid; ?>"<?php if ($user->canadmin && $action == "edituser") print " disabled=\"disabled\""; ?> tabindex="<?php $tab++; print $tab; ?>" >
 						<option value=""<?php if ($action == "edituser") if (isset($user->hide_live_people[$gedcomid]) && $user->hide_live_people[$gedcomid]=="") print " selected=\"selected\"";?>><?php print GM_LANG_default; ?></option>
 						<option value="Y"<?php if ($action == "edituser") if (isset($user->hide_live_people[$gedcomid]) && $user->hide_live_people[$gedcomid]=="Y") print " selected=\"selected\"";?>><?php print GM_LANG_yes; ?></option>
 						<option value="N"<?php if ($action == "edituser") if (isset($user->hide_live_people[$gedcomid]) && $user->hide_live_people[$gedcomid]=="N") print " selected=\"selected\"";?>><?php print GM_LANG_no; ?></option>
 						</select>
-				</div>
-			</div>
-			<div class="admin_item_box">
-				<div class="width30 choice_left">
-					<div class="helpicon">
+				</td>
+			</tr>
+			<tr>
+				<td class="NavBlockLabel AdminNavBlockOption">
+					<div class="HelpIconContainer">
 						<?php PrintHelpLink("useradmin_show_living_names_help", "qm", "SHOW_LIVING_NAMES");?>
 					</div>
-					<div class="description">
+					<div class="AdminNavBlockOptionText">
 						<?php print GM_LANG_SHOW_LIVING_NAMES; ?>
 					</div>
-				</div>
-				<div class="choice_right">
+				</td>
+				<td class="NavBlockField">
 					<select name="new_show_living_names_<?php print $gedcomid; ?>"<?php if ($user->canadmin && $action == "edituser") print " disabled=\"disabled\""; ?> tabindex="<?php $tab++; print $tab; ?>" >
 						<option value=""<?php if ($action == "edituser") if (isset($user->show_living_names[$gedcomid]) && $user->show_living_names[$gedcomid]=="") print " selected=\"selected\"";?>><?php print GM_LANG_default; ?></option>
 						<option value="Y"<?php if ($action == "edituser") if (isset($user->show_living_names[$gedcomid]) && $user->show_living_names[$gedcomid]=="Y") print " selected=\"selected\"";?>><?php print GM_LANG_yes; ?></option>
 						<option value="N"<?php if ($action == "edituser") if (isset($user->show_living_names[$gedcomid]) && $user->show_living_names[$gedcomid]=="N") print " selected=\"selected\"";?>><?php print GM_LANG_no; ?></option>
 						</select>
-				</div>
-			</div>
-			<div class="admin_item_box">
-				<div class="width30 choice_left">
-					<div class="helpicon">
+				</td>
+			</tr>
+			<tr>
+				<td class="NavBlockLabel AdminNavBlockOption">
+					<div class="HelpIconContainer">
 						<?php PrintHelpLink("useradmin_can_edit_help", "qm","edit_rights");?>
 					</div>
-					<div class="description">
+					<div class="AdminNavBlockOptionText">
 						<?php print GM_LANG_edit_rights; ?>
 					</div>
-				</div>
-				<div class="width65 choice_right">
-						<div class="admin_item_box">
-							<div class="choice_right">
-								<?php
-								if ($action == "edituser") {
-									if (isset($user->canedit[$gedcomid])) {
-										if ($user->canedit[$gedcomid]===true) $user->canedit[$gedcomid]="yes";
-									}
-									else $user->canedit[$gedcomid]="no";
-								}
-								$tab++;
-								print "<select name=\"canedit_$gedcomid\" tabindex=\"".$tab."\"";
-								if ($user->canadmin && $action == "edituser") print " disabled=\"disabled\"";
-								print ">\n";
-								print "<option value=\"none\"";
-								if ($action == "edituser") if ($user->canedit[$gedcomid]=="none") print " selected=\"selected\"";
-								print ">".GM_LANG_none."</option>\n";
-								print "<option value=\"edit\"";
-								if ($action == "edituser") if ($user->canedit[$gedcomid]=="edit") print " selected=\"selected\"";
-								print ">".GM_LANG_edit."</option>\n";
-								print "<option value=\"accept\"";
-								if ($action == "edituser") if ($user->canedit[$gedcomid]=="accept") print " selected=\"selected\"";
-								print ">".GM_LANG_accept."</option>\n";
+				</td>
+				<td class="NavBlockField">
+					<?php
+					if ($action == "edituser") {
+						if (isset($user->canedit[$gedcomid])) {
+							if ($user->canedit[$gedcomid]===true) $user->canedit[$gedcomid]="yes";
+						}
+						else $user->canedit[$gedcomid]="no";
+					}
+					$tab++;
+					print "<select name=\"canedit_$gedcomid\" tabindex=\"".$tab."\"";
+					if ($user->canadmin && $action == "edituser") print " disabled=\"disabled\"";
+					print ">\n";
+					print "<option value=\"none\"";
+					if ($action == "edituser") if ($user->canedit[$gedcomid]=="none") print " selected=\"selected\"";
+					print ">".GM_LANG_none."</option>\n";
+					print "<option value=\"edit\"";
+					if ($action == "edituser") if ($user->canedit[$gedcomid]=="edit") print " selected=\"selected\"";
+					print ">".GM_LANG_edit."</option>\n";
+					print "<option value=\"accept\"";
+					if ($action == "edituser") if ($user->canedit[$gedcomid]=="accept") print " selected=\"selected\"";
+					print ">".GM_LANG_accept."</option>\n";
 //								print "<option value=\"admin\"";
 //								if ($action == "edituser") if ($user->canedit[$file]=="admin") print " selected=\"selected\"";
 //								print ">".GM_LANG_admin_gedcom."</option>\n";
-								print "</select>\n";
-								?>
-							</div>
-						</div>
-				</div>
-			</div>
+					print "</select>\n";
+					?>
+				</td>
+			</tr>
 			<?php } // end of loop through gedcoms
 			?>
-			<div class="admin_item_box center">
-				<input type="submit" tabindex="<?php $tab++; print $tab; ?>" value="<?php print GM_LANG_update_user; ?>" />
-			</div>
+			<tr>
+				<td class="NavBlockFooter" colspan="2">
+					<input type="submit" tabindex="<?php $tab++; print $tab; ?>" value="<?php print GM_LANG_update_user; ?>" />
+				</td>
+			</tr>
+		</table>
 		</form>
 		<?php }
 		else {
-			print "<div class=\"shade2 center\"><span class=\"Error\">".GM_LANG_user_not_exist."</span></div>";
+			print "<tr><td class=\"NavBlockColumnHeader AdminNavBlockColumnHeader\"><span class=\"Error\">".GM_LANG_user_not_exist."</span></td></tr></table>";
 		}
 		?>
 	</div>
@@ -970,503 +966,439 @@ if ($action == "massupdate") {
 		if (!isset($$str)) unset($userlist[$key]);
 	}
 	?>
-	<form name="massupdate" method="post" action="useradmin.php">
 	<!-- Setup the left box -->
-	<div id="admin_genmod_left">
-		<div class="admin_link"><a href="admin.php"><?php print GM_LANG_admin;?></a></div>
-		<div class="admin_link"><a href="useradmin.php"><?php print GM_LANG_user_admin;?></a></div>
-		<div class="admin_link"><a href="useradmin.php?action=listusers&amp;sort=<?php print $sort;?>&amp;filter=<?php print $filter;?>&amp;usrlang=<?php print $usrlang;?>&amp;gedid=<?php print $gedid;?>&amp;namefilter=<?php print $namefilter;?>"><?php print GM_LANG_current_users;?></a></div>
+	<div id="AdminColumnLeft">
+		<?php AdminFunctions::AdminLink("admin.php", GM_LANG_admin); ?>
+		<?php AdminFunctions::AdminLink("useradmin.php", GM_LANG_user_admin); ?>
+		<?php AdminFunctions::AdminLink("useradmin.php?action=listusers&amp;sort=".$sort."&amp;filter=".$filter."&amp;usrlang=".$usrlang."&amp;gedid=".$gedid."&amp;namefilter=".$namefilter, GM_LANG_current_users); ?>
 	</div>
 	<!-- Setup the right box -->
-	<div id="admin_genmod_right">
-		<div class="admin_topbottombar"><?php print GM_LANG_mu_users; ?></div>
+	<div id="AdminColumnRight">
+		<div class="NavBlockHeader AdminNavBlockHeader"><?php print GM_LANG_mu_users; ?></div>
 		<!-- Start print the form -->
 		<?php if (count($userlist) > 0) { ?> 
-				<input type="hidden" name="action" value="massupdate2" />
-				<input type="hidden" name="sort" value="<?php print $sort;?>" />
-				<input type="hidden" name="filter" value="<?php print $filter;?>" />
-				<input type="hidden" name="usrlang" value="<?php print $usrlang;?>" />
-				<input type="hidden" name="gedid" value="<?php print $gedid; ?>" />
-				<input type="hidden" name="namefilter" value="<?php print $namefilter;?>" />
 			<!-- Print the users -->
+			<div class="NavBlockField UserListMassUsers">
 			<?php
 			foreach ($userlist as $key => $user) { ?>
 				<input type="hidden" name="select<?php print $user->username;?>" value="yes" />
-				<div class="admin_item_box">
-					<div class="choice_left">
-						<?php
-						if ($TEXT_DIRECTION=="ltr") print $user->username." - ".$user->firstname." ".$user->lastname."&lrm;";
-						else                        print $user->username.$user->firstname." ".$user->lastname."&rlm;";
-						?>
-					</div>
-				</div>
+					<?php
+					if ($TEXT_DIRECTION=="ltr") print $user->username." - ".$user->firstname." ".$user->lastname."&lrm;";
+					else                        print $user->username.$user->firstname." ".$user->lastname."&rlm;";
+					?>
 			<?php }
+			?></div><?php
 		} ?>
 	</div>
-	<div id="content">
+	<div id="AdminColumnMiddle">
+	<form name="massupdate" method="post" action="useradmin.php">
+	<input type="hidden" name="action" value="massupdate2" />
+	<input type="hidden" name="sort" value="<?php print $sort;?>" />
+	<input type="hidden" name="filter" value="<?php print $filter;?>" />
+	<input type="hidden" name="usrlang" value="<?php print $usrlang;?>" />
+	<input type="hidden" name="gedid" value="<?php print $gedid; ?>" />
+	<input type="hidden" name="namefilter" value="<?php print $namefilter;?>" />
 	<?php $tab = 0; ?>
-		<div class="admin_topbottombar">
-			<?php print "<h3>".GM_LANG_mass_update."</h3>"; ?>
-		</div>
-		<?php if (count($userlist) == 0) { ?>
-			<div class="shade2 center"><?php print GM_LANG_no_users_selected; ?></div>
-		<?php }
-		else { ?>
-			<div class="mass_heading_outer">
-				<div class="width30 mass_heading_style">
+	<table class="NavBlockTable AdminNavBlockTable">
+		<tr>
+			<td class="NavBlockHeader AdminNavBlockHeader" colspan="3">
+				<?php print "<span class=\"AdminNavBlockTitle\">".GM_LANG_mass_update."</span>"; ?>
+				<?php if (count($userlist) == 0) { ?>
+					<br /><span class="Error"><?php print GM_LANG_no_users_selected; ?></span>
+				<?php } ?>
+			</td>
+		</tr>
+		<?php if (count($userlist) > 0) { ?>
+			<tr>
+				<td class="NavBlockColumnHeader AdminNavBlockColumnHeader">
 					<?php print GM_LANG_mu_descr; ?>
-				</div>
-				<div class="width65 choice_right">
-					<div class="width10 mass_heading_style" style="border-left: 0.1em solid #DE0036; border-right: 0.1em solid #DE0036; margin-left: 0.1em; margin-right: 0.1em;">
-						<?php print GM_LANG_select; ?>
-					</div>
-					<div class="width80 mass_heading_style">
-						<?php print GM_LANG_mu_new_value; ?>
-					</div>
-				</div>
-			</div>
-			<!-- Sync with gedcom -->
-			<div class="admin_item_box">
-				<div class="width30 choice_left">
-					<div class="helpicon">
+				</td>
+				<td class="NavBlockColumnHeader AdminNavBlockColumnHeader">
+					<?php print GM_LANG_select; ?>
+				</td>
+				<td class="NavBlockColumnHeader AdminNavBlockColumnHeader">
+					<?php print GM_LANG_mu_new_value; ?>
+				</td>
+			</tr>
+			<tr>
+				<!-- Sync with gedcom -->
+				<td class="NavBlockLabel AdimNavBlockLabel">
+					<div class="HelpIconContainer">
 						<?php PrintHelpLink("useradmin_sync_gedcom_help", "qm","sync_gedcom");?>
 					</div>
-					<div class="description">
+					<div class="AdminNavBlockOptionText">
 						<?php print GM_LANG_sync_gedcom; ?>
 					</div>
-				</div>
-				<div class="width65 choice_right">
-					<div class="admin_item_box">
-						<div class="width15 choice_middle center">
-							<input type="checkbox" name="change_sync_gedcom" tabindex="<?php print $tab;?>" value="Y" />
-						</div>
-						<div class="width80 choice_right">
-							<input type="checkbox" name="new_sync_gedcom" tabindex="<?php print $tab;?>" value="Y" />
-						</div>
-						<?php $tab++;?>
-					</div>
-				</div>
-			</div>
+				</td>
+				<td class="NavBlockField AdimNavBlockField NavBlockCheckRadio">
+					<input type="checkbox" name="change_sync_gedcom" tabindex="<?php print $tab;?>" value="Y" />
+				</td>
+				<td class="NavBlockField AdimNavBlockField">
+					<input type="checkbox" name="new_sync_gedcom" tabindex="<?php print $tab;?>" value="Y" />
+					<?php $tab++;?>
+				</td>
+			</tr>
 			<!-- Auto accept -->
-			<div class="admin_item_box">
-				<div class="width30 choice_left">
-					<div class="helpicon">
+			<tr>
+				<td class="NavBlockLabel AdimNavBlockLabel">
+					<div class="HelpIconContainer">
 						<?php PrintHelpLink("useradmin_auto_accept_help", "qm", "user_auto_accept");?>
 					</div>
-					<div class="description">
+					<div class="AdminNavBlockOptionText">
 						<?php print GM_LANG_user_auto_accept; ?>
 					</div>
-				</div>
-				<div class="width65 choice_right">
-					<div class="admin_item_box">
-						<div class="width15 choice_middle center">
-							<input type="checkbox" name="change_auto_accept" tabindex="<?php print $tab;?>" value="Y" />
-						</div>
-						<div class="width80 choice_right">
-							<input type="checkbox" name="new_auto_accept" tabindex="<?php print $tab;?>" value="Y" />
-						</div>
-						<?php $tab++;?>
-					</div>
-				</div>
-			</div>
+				</td>
+				<td class="NavBlockField AdimNavBlockField NavBlockCheckRadio">
+					<input type="checkbox" name="change_auto_accept" tabindex="<?php print $tab;?>" value="Y" />
+				</td>
+				<td class="NavBlockField AdimNavBlockField">
+					<input type="checkbox" name="new_auto_accept" tabindex="<?php print $tab;?>" value="Y" />
+					<?php $tab++;?>
+				</td>
+			</tr>
 			<!-- User theme -->
 			<?php
 			if (SystemConfig::$ALLOW_USER_THEMES) { ?>
-				<div class="admin_item_box">
-					<div class="width30 choice_left">
-						<div class="helpicon">
+				<tr>
+					<td class="NavBlockLabel AdimNavBlockLabel">
+						<div class="HelpIconContainer">
 							<?php PrintHelpLink("useradmin_user_theme_help", "qm", "user_theme");?>
 						</div>
-						<div class="description">
+						<div class="AdminNavBlockOptionText">
 							<?php print GM_LANG_user_theme; ?>
 						</div>
-					</div>
-					<div class="width65 choice_right">
-						<div class="admin_item_box">
-							<div class="width15 choice_middle center">
-								<input type="checkbox" name="change_user_theme" tabindex="<?php print $tab;?>" value="Y" />
-							</div>
-							<div class="width80 choice_right">
-								<select name="new_user_theme" tabindex="<?php print $tab;?>">
-								<option value="" selected="selected"><?php print GM_LANG_site_default;?></option>
-								<?php
-								$themes = GetThemeNames();
-								foreach($themes as $indexval => $themedir) {
-									print "<option value=\"".$themedir["dir"]."\"";
-									print ">".$themedir["name"]."</option>\n";
-								} ?>
-								</select>
-							</div>
-							<?php $tab++;?>
-						</div>
-					</div>
-				</div>
+					</td>
+					<td class="NavBlockField AdimNavBlockField NavBlockCheckRadio">
+						<input type="checkbox" name="change_user_theme" tabindex="<?php print $tab;?>" value="Y" />
+					</td>
+					<td class="NavBlockField AdimNavBlockField">
+						<select name="new_user_theme" tabindex="<?php print $tab;?>">
+						<option value="" selected="selected"><?php print GM_LANG_site_default;?></option>
+						<?php
+						$themes = GetThemeNames();
+						foreach($themes as $indexval => $themedir) {
+							print "<option value=\"".$themedir["dir"]."\"";
+							print ">".$themedir["name"]."</option>\n";
+						} ?>
+						</select>
+					</td>
+					<?php $tab++;?>
+				</tr>
 			<?php } ?>
 			<!-- Contact method -->
-			<div class="admin_item_box">
-				<div class="width30 choice_left">
-					<div class="helpicon">
+			<tr>
+				<td class="NavBlockLabel AdimNavBlockLabel">
+					<div class="HelpIconContainer">
 						<?php PrintHelpLink("useradmin_user_contact_help", "qm", "user_contact_method");?>
 					</div>
-					<div class="description">
+					<div class="AdminNavBlockOptionText">
 						<?php print GM_LANG_user_contact_method; ?>
 					</div>
-				</div>
-				<div class="width65 choice_right">
-					<div class="admin_item_box">
-						<div class="width15 choice_middle center">
-							<input type="checkbox" name="change_contact_method" tabindex="<?php print $tab;?>" value="Y" />
-						</div>
-						<div class="width80 choice_right">
-							<select name="new_contact_method" tabindex="<?php print $tab;?>">
-							<?php if (SystemConfig::$GM_STORE_MESSAGES) { ?>
-								<option value="messaging"><?php print GM_LANG_messaging;?></option>
-								<option value="messaging2" selected="selected"><?php print GM_LANG_messaging2;?></option>
-							<?php }
-							else { ?>
-								<option value="messaging3" selected="selected"><?php print GM_LANG_messaging3;?></option>
-							<?php } ?>
-							<option value="mailto"><?php print GM_LANG_mailto;?></option>
-							<option value="none"><?php print GM_LANG_no_messaging;?></option>
-							</select>
-						</div>
-						<?php $tab++;?>
-					</div>
-				</div>
-			</div>
+				</td>
+				<td class="NavBlockField AdimNavBlockField NavBlockCheckRadio">
+					<input type="checkbox" name="change_contact_method" tabindex="<?php print $tab;?>" value="Y" />
+				</td>
+				<td class="NavBlockField AdimNavBlockField">
+					<select name="new_contact_method" tabindex="<?php print $tab;?>">
+					<?php if (SystemConfig::$GM_STORE_MESSAGES) { ?>
+						<option value="messaging"><?php print GM_LANG_messaging;?></option>
+						<option value="messaging2" selected="selected"><?php print GM_LANG_messaging2;?></option>
+					<?php }
+					else { ?>
+						<option value="messaging3" selected="selected"><?php print GM_LANG_messaging3;?></option>
+					<?php } ?>
+					<option value="mailto"><?php print GM_LANG_mailto;?></option>
+					<option value="none"><?php print GM_LANG_no_messaging;?></option>
+					</select>
+					<?php $tab++;?>
+				</td>
+			</tr>
 			<!-- Visible online -->
-			<div class="admin_item_box">
-				<div class="width30 choice_left">
-					<div class="helpicon">
+			<tr>
+				<td class="NavBlockLabel AdimNavBlockLabel">
+					<div class="HelpIconContainer">
 						<?php PrintHelpLink("useradmin_visibleonline_help", "qm", "visibleonline");?>
 					</div>
-					<div class="description">
+					<div class="AdminNavBlockOptionText">
 						<?php print GM_LANG_visibleonline; ?>
 					</div>
-				</div>
-				<div class="width65 choice_right">
-					<div class="admin_item_box">
-						<div class="width15 choice_middle center">
-							<input type="checkbox" name="change_visibleonline" tabindex="<?php print $tab;?>" value="Y" />
-						</div>
-						<div class="width80 choice_right">
-							<input type="checkbox" name="new_visibleonline" tabindex="<?php print $tab;?>" value="Y" checked="checked" />
-						</div>
-						<?php $tab++;?>
-					</div>
-				</div>
-			</div>
+				</td>
+				<td class="NavBlockField AdimNavBlockField NavBlockCheckRadio">
+					<input type="checkbox" name="change_visibleonline" tabindex="<?php print $tab;?>" value="Y" />
+				</td>
+				<td class="NavBlockField AdimNavBlockField">
+					<input type="checkbox" name="new_visibleonline" tabindex="<?php print $tab;?>" value="Y" checked="checked" />
+					<?php $tab++;?>
+				</td>
+			</tr>
 			<!-- Edit account -->
-			<div class="admin_item_box">
-				<div class="width30 choice_left">
-					<div class="helpicon">
+			<tr>
+				<td class="NavBlockLabel AdimNavBlockLabel">
+					<div class="HelpIconContainer">
 						<?php PrintHelpLink("useradmin_editaccount_help", "qm", "editaccount");?>
 					</div>
-					<div class="description">
+					<div class="AdminNavBlockOptionText">
 						<?php print GM_LANG_editaccount; ?>
 					</div>
-				</div>
-				<div class="width65 choice_right">
-					<div class="admin_item_box">
-						<div class="width15 choice_middle center">
-							<input type="checkbox" name="change_editaccount" tabindex="<?php print $tab;?>" value="Y" />
-						</div>
-						<div class="width80 choice_right">
-							<input type="checkbox" name="new_editaccount" tabindex="<?php print $tab;?>" value="Y" checked="checked" />
-						</div>
-						<?php $tab++;?>
-					</div>
-				</div>
-			</div>
+				</td>
+				<td class="NavBlockField AdimNavBlockField NavBlockCheckRadio">
+					<input type="checkbox" name="change_editaccount" tabindex="<?php print $tab;?>" value="Y" />
+				</td>
+				<td class="NavBlockField AdimNavBlockField">
+					<input type="checkbox" name="new_editaccount" tabindex="<?php print $tab;?>" value="Y" checked="checked" />
+					<?php $tab++;?>
+				</td>
+			</tr>
 			<!-- Default tab -->
-			<div class="admin_item_box">
-				<div class="width30 choice_left">
-					<div class="helpicon">
+			<tr>
+				<td class="NavBlockLabel AdimNavBlockLabel">
+					<div class="HelpIconContainer">
 						<?php PrintHelpLink("useradmin_user_default_tab_help", "qm", "user_default_tab");?>
 					</div>
-					<div class="description">
+					<div class="AdminNavBlockOptionText">
 						<?php print GM_LANG_user_default_tab; ?>
 					</div>
-				</div>
-				<div class="width65 choice_right">
-					<div class="admin_item_box">
-						<div class="width15 choice_middle center">
-							<input type="checkbox" name="change_default_tab" tabindex="<?php print $tab;?>" value="Y" />
-						</div>
-						<div class="width80 choice_right">
-							<select name="new_default_tab" tabindex="<?php print $tab;?>">
-								<option value="9"><?php print GM_LANG_site_default; ?></option>
-								<option value="0"><?php print GM_LANG_personal_facts;?></option>
-								<option value="1"><?php print GM_LANG_notes;?></option>
-								<option value="2"><?php print GM_LANG_ssourcess;?></option>
-								<option value="3"><?php print GM_LANG_media;?></option>
-								<option value="4"><?php print GM_LANG_relatives;?></option>
-								<option value="6"><?php print GM_LANG_all;?></option>
-							</select>
-						</div>
-						<?php $tab++;?>
-					</div>
-				</div>
-			</div>
+				</td>
+				<td class="NavBlockField AdimNavBlockField NavBlockCheckRadio">
+					<input type="checkbox" name="change_default_tab" tabindex="<?php print $tab;?>" value="Y" />
+				</td>
+				<td class="NavBlockField AdimNavBlockField">
+					<select name="new_default_tab" tabindex="<?php print $tab;?>">
+						<option value="9"><?php print GM_LANG_site_default; ?></option>
+						<option value="0"><?php print GM_LANG_personal_facts;?></option>
+						<option value="1"><?php print GM_LANG_notes;?></option>
+						<option value="2"><?php print GM_LANG_ssourcess;?></option>
+						<option value="3"><?php print GM_LANG_media;?></option>
+						<option value="4"><?php print GM_LANG_relatives;?></option>
+						<option value="6"><?php print GM_LANG_all;?></option>
+					</select>
+					<?php $tab++;?>
+				</td>
+			</tr>
 			<!-- Gedcom related settings -->
 			<?php
 			foreach($GEDCOMS as $gedcomid=>$gedarray) {
-				print "<div class=\"admin_topbottombar\">".$gedarray["title"]."</div>"; ?>
+				print "<tr><td colspan=\"3\" class=\"NavBlockRowSpacer\">&nbsp;</td></tr>";
+				print "<tr><td class=\"NavBlockHeader\" colspan=\"3\">".$gedarray["title"]."</td></tr>"; ?>
 				<!-- Rootid -->
-				<div class="admin_item_box">
-					<div class="width30 choice_left">
-						<div class="helpicon">
+				<tr>
+					<td class="NavBlockLabel AdimNavBlockLabel">
+						<div class="HelpIconContainer">
 							<?php PrintHelpLink("useradmin_rootid_help", "qm","rootid");?>
 						</div>
-						<div class="description">
+						<div class="AdminNavBlockOptionText">
 							<?php print GM_LANG_rootid; ?>
 						</div>
-					</div>
-					<div class="width65 choice_right">
-						<div class="admin_item_box">
-							<div class="width15 choice_middle center">
-								<?php $tab++; ?>
-								<input type="checkbox" name="change_rootid_<?php print $gedcomid;?>" tabindex="<?php print $tab;?>" value="Y" />
-							</div>
-							<div class="width80 choice_right">
-								<?php $tab++; ?>
-								<input type="text" size="6" name="new_rootid_<?php print $gedcomid;?>" id="new_rootid_<?php print $gedcomid;?>" tabindex="<?php print $tab;?>" value="" onblur="sndReq('usroot<?php print $gedarray["id"];?>', 'getpersonnamefact', 'pid', this.value, 'gedid', '<?php print $gedarray["id"];?>');" />
-								<?php LinkFunctions::PrintFindIndiLink("new_rootid_$gedcomid",$gedarray["id"]);
-								print "\n<span id=\"usroot".$gedarray["id"]."\" class=\"list_item\"> </span>";?>
-							</div>
-						</div>
-					</div>
-				</div>
+					</td>
+					<td class="NavBlockField AdimNavBlockField NavBlockCheckRadio">
+						<?php $tab++; ?>
+						<input type="checkbox" name="change_rootid_<?php print $gedcomid;?>" tabindex="<?php print $tab;?>" value="Y" />
+					</td>
+					<td class="NavBlockField AdimNavBlockField">
+						<?php $tab++; ?>
+						<input type="text" size="6" name="new_rootid_<?php print $gedcomid;?>" id="new_rootid_<?php print $gedcomid;?>" tabindex="<?php print $tab;?>" value="" onblur="sndReq('usroot<?php print $gedarray["id"];?>', 'getpersonnamefact', true, 'pid', this.value, 'gedid', '<?php print $gedarray["id"];?>');" />
+						<?php LinkFunctions::PrintFindIndiLink("new_rootid_$gedcomid",$gedarray["id"]);
+						print "\n<span id=\"usroot".$gedarray["id"]."\" class=\"ListItem\"> </span>";?>
+					</td>
+				</tr>
 				<!-- End of rootid -->
 				<!-- Start of gedcom admin -->
-				<div class="admin_item_box">
-					<div class="width30 choice_left">
-						<div class="helpicon">
+				<tr>
+					<td class="NavBlockLabel AdimNavBlockLabel">
+						<div class="HelpIconContainer">
 							<?php PrintHelpLink("useradmin_gedcom_admin_help", "qm", "gedadmin");?>
 						</div>
-						<div class="description">
+						<div class="AdminNavBlockOptionText">
 							<?php print GM_LANG_gedadmin; ?>
 						</div>
-					</div>
-					<div class="width65 choice_right">
-						<div class="admin_item_box">
-							<div class="width15 choice_middle center">
-								<?php $tab++; ?>
-								<input type="checkbox" name="change_gedadmin_<?php print $gedcomid;?>" tabindex="<?php print $tab;?>" value="Y" />
-							</div>
-							<div class="width80 choice_right">
-								<input type="checkbox" name="new_gedadmin_<?php print $gedcomid;?>" <?php if ($user->canadmin && $action == "edituser") print " disabled=\"disabled\""; ?>tabindex="<?php $tab++; print $tab; ?>" value="Y" <?php if ($action == "edituser") if (isset($user->gedcomadmin[$gedcomid]) && $user->gedcomadmin[$gedcomid]) print "checked=\"checked\"";?> />
-							</div>
-						</div>
-					</div>
-				</div>
+					</td>
+					<td class="NavBlockField AdimNavBlockField NavBlockCheckRadio">
+						<?php $tab++; ?>
+						<input type="checkbox" name="change_gedadmin_<?php print $gedcomid;?>" tabindex="<?php print $tab;?>" value="Y" />
+					</td>
+					<td class="NavBlockField AdimNavBlockField">
+						<input type="checkbox" name="new_gedadmin_<?php print $gedcomid;?>" <?php if ($user->canadmin && $action == "edituser") print " disabled=\"disabled\""; ?>tabindex="<?php $tab++; print $tab; ?>" value="Y" <?php if ($action == "edituser") if (isset($user->gedcomadmin[$gedcomid]) && $user->gedcomadmin[$gedcomid]) print "checked=\"checked\"";?> />
+					</td>
+				</tr>
 				<!-- End of gedcom admin -->
 				<!-- Start of general access level -->
-				<div class="admin_item_box">
-					<div class="width30 choice_left">
-						<div class="helpicon">
+				<tr>
+					<td class="NavBlockLabel AdimNavBlockLabel">
+						<div class="HelpIconContainer">
 							<?php PrintHelpLink("useradmin_can_edit_help", "qm","can_edit");?>
 						</div>
-						<div class="description">
+						<div class="AdminNavBlockOptionText">
 							<?php print GM_LANG_accpriv_conf; ?>
 						</div>
-					</div>
-					<div class="width65 choice_right">
-						<div class="admin_item_box">
-							<div class="width15 choice_middle center">
-								<?php $tab++; ?>
-								<input type="checkbox" name="change_privgroup_<?php print $gedcomid;?>" tabindex="<?php print $tab;?>" value="Y" />
-							</div>
-							<div class="width80 choice_right">
-								<?php if (!isset($user->privgroup[$gedcomid])) $user->privgroup[$gedcomid]="none";
-								$tab++;
-								print "<select name=\"new_privgroup_$gedcomid\" tabindex=\"".$tab."\">\n";
-								print "<option value=\"none\" >".GM_LANG_visitor."</option>\n";
-								print "<option value=\"access\" selected=\"selected\">".GM_LANG_user."</option>\n";
-								print "<option value=\"admin\" >".GM_LANG_administrator."</option>\n";
-								print "</select>\n";
-								?>
-							</div>
-						</div>
-					</div>
-				</div>
+					</td>
+					<td class="NavBlockField AdimNavBlockField NavBlockCheckRadio">
+						<?php $tab++; ?>
+						<input type="checkbox" name="change_privgroup_<?php print $gedcomid;?>" tabindex="<?php print $tab;?>" value="Y" />
+					</td>
+					<td class="NavBlockField AdimNavBlockField">
+						<?php if (!isset($user->privgroup[$gedcomid])) $user->privgroup[$gedcomid]="none";
+						$tab++;
+						print "<select name=\"new_privgroup_$gedcomid\" tabindex=\"".$tab."\">\n";
+							print "<option value=\"none\" >".GM_LANG_visitor."</option>\n";
+							print "<option value=\"access\" selected=\"selected\">".GM_LANG_user."</option>\n";
+							print "<option value=\"admin\" >".GM_LANG_administrator."</option>\n";
+						print "</select>\n";
+						?>
+					</td>
+				</tr>
 				<!-- End of general access level -->
 				<!-- Relationship privacy -->
-				<div class="admin_item_box">
-					<div class="width30 choice_left">
-						<div class="helpicon">
+				<tr>
+					<td class="NavBlockLabel AdimNavBlockLabel">
+						<div class="HelpIconContainer">
 							<?php PrintHelpLink("useradmin_relation_priv_help", "qm", "user_relationship_priv");?>
 						</div>
-						<div class="description">
+						<div class="AdminNavBlockOptionText">
 							<?php print GM_LANG_user_relationship_priv; ?>
 						</div>
-					</div>
-					<div class="width65 choice_right">
-						<div class="admin_item_box">
-							<div class="width15 choice_middle center">
-								<input type="checkbox" name="change_relationship_privacy_<?php print $gedcomid;?>" tabindex="<?php print $tab;?>" value="Y" />
-							</div>
-							<div class="width80 choice_right">
-								<select name="new_relationship_privacy_<?php print $gedcomid; ?>" tabindex="<?php $tab++; print $tab; ?>" >
-									<option value=""><?php print GM_LANG_default; ?></option>
-									<option value="Y"><?php print GM_LANG_yes; ?></option>
-									<option value="N"><?php print GM_LANG_no; ?></option>
-								</select>
-							</div>
-							<?php $tab++;?>
-						</div>
-					</div>
-				</div>
+					</td>
+					<td class="NavBlockField AdimNavBlockField NavBlockCheckRadio">
+						<input type="checkbox" name="change_relationship_privacy_<?php print $gedcomid;?>" tabindex="<?php print $tab;?>" value="Y" />
+					</td>
+					<td class="NavBlockField AdimNavBlockField">
+						<select name="new_relationship_privacy_<?php print $gedcomid; ?>" tabindex="<?php $tab++; print $tab; ?>" >
+							<option value=""><?php print GM_LANG_default; ?></option>
+							<option value="Y"><?php print GM_LANG_yes; ?></option>
+							<option value="N"><?php print GM_LANG_no; ?></option>
+						</select>
+						<?php $tab++;?>
+					</td>
+				</tr>
 				<!-- End Relationship privacy -->
 				<!-- Start Relation path length -->
-				<div class="admin_item_box">
-					<div class="width30 choice_left">
-						<div class="helpicon">
+				<tr>
+					<td class="NavBlockLabel AdimNavBlockLabel">
+						<div class="HelpIconContainer">
 							<?php PrintHelpLink("useradmin_path_length_help", "qm", "user_path_length");?>
 						</div>
-						<div class="description">
+						<div class="AdminNavBlockOptionText">
 							<?php print GM_LANG_user_path_length; ?>
 						</div>
-					</div>
-					<div class="width65 choice_right">
-						<div class="admin_item_box">
-							<div class="width15 choice_middle center">
-								<input type="checkbox" name="change_max_relation_path_<?php print $gedcomid;?>" tabindex="<?php print $tab;?>" value="Y" />
-							</div>
-							<div class="width80 choice_right">
-          						<select size="1" name="new_max_relation_path_<?php print $gedcomid; ?>"><?php
-          							for ($y = 1; $y <= 10; $y++) {
-	            						print "<option>".$y."</option>";
-          							}?>
-          						</select>
-							</div>
+					</td>
+					<td class="NavBlockField AdimNavBlockField NavBlockCheckRadio">
+						<input type="checkbox" name="change_max_relation_path_<?php print $gedcomid;?>" tabindex="<?php print $tab;?>" value="Y" />
+					</td>
+					<td class="NavBlockField AdimNavBlockField">
+						<select size="1" name="new_max_relation_path_<?php print $gedcomid; ?>"><?php
+							for ($y = 1; $y <= 10; $y++) {
+								print "<option>".$y."</option>";
+							}?>
+						</select>
 							<?php $tab++;?>
-						</div>
-					</div>
-				</div>
+					</td>
+				</tr>
 				<!-- End Relation path length -->
 				<!-- Start Check Marriage Relations -->
-				<div class="admin_item_box">
-					<div class="width30 choice_left">
-						<div class="helpicon">
+				<tr>
+					<td class="NavBlockLabel AdimNavBlockLabel">
+						<div class="HelpIconContainer">
 							<?php PrintHelpLink("useradmin_marr_priv_help", "qm", "user_path_marr");?>
 						</div>
-						<div class="description">
+						<div class="AdminNavBlockOptionText">
 							<?php print GM_LANG_user_path_marr; ?>
 						</div>
-					</div>
-					<div class="width65 choice_right">
-						<div class="admin_item_box">
-							<div class="width15 choice_middle center">
-								<input type="checkbox" name="change_check_marriage_relations_<?php print $gedcomid;?>" tabindex="<?php print $tab;?>" value="Y" />
-							</div>
-							<div class="width80 choice_right">
-								<select name="new_check_marriage_relations_<?php print $gedcomid; ?>" tabindex="<?php $tab++; print $tab; ?>" >
-									<option value=""><?php print GM_LANG_default; ?></option>
-									<option value="Y"><?php print GM_LANG_yes; ?></option>
-									<option value="N"><?php print GM_LANG_no; ?></option>
-								</select>
-							</div>
-							<?php $tab++;?>
-						</div>
-					</div>
-				</div>
+					</td>
+					<td class="NavBlockField AdimNavBlockField NavBlockCheckRadio">
+						<input type="checkbox" name="change_check_marriage_relations_<?php print $gedcomid;?>" tabindex="<?php print $tab;?>" value="Y" />
+					</td>
+					<td class="NavBlockField AdimNavBlockField">
+						<select name="new_check_marriage_relations_<?php print $gedcomid; ?>" tabindex="<?php $tab++; print $tab; ?>" >
+							<option value=""><?php print GM_LANG_default; ?></option>
+							<option value="Y"><?php print GM_LANG_yes; ?></option>
+							<option value="N"><?php print GM_LANG_no; ?></option>
+						</select>
+					<?php $tab++;?>
+					</td>
+				</tr>
 				<!-- End Check Marriage Relations -->
 				<!-- Start Hide live people -->
-				<div class="admin_item_box">
-					<div class="width30 choice_left">
-						<div class="helpicon">
+				<tr>
+					<td class="NavBlockLabel AdimNavBlockLabel">
+						<div class="HelpIconContainer">
 							<?php PrintHelpLink("useradmin_hide_live_people_help", "qm", "HIDE_LIVE_PEOPLE");?>
 						</div>
-						<div class="description">
+						<div class="AdminNavBlockOptionText">
 							<?php print GM_LANG_HIDE_LIVE_PEOPLE; ?>
 						</div>
-					</div>
-					<div class="width65 choice_right">
-						<div class="admin_item_box">
-							<div class="width15 choice_middle center">
-								<input type="checkbox" name="change_hide_live_people_<?php print $gedcomid;?>" tabindex="<?php print $tab;?>" value="Y" />
-							</div>
-							<div class="width80 choice_right">
-								<select name="new_hide_live_people_<?php print $gedcomid; ?>" tabindex="<?php $tab++; print $tab; ?>" >
-									<option value=""><?php print GM_LANG_default; ?></option>
-									<option value="Y"><?php print GM_LANG_yes; ?></option>
-									<option value="N"><?php print GM_LANG_no; ?></option>
-								</select>
-							</div>
-							<?php $tab++;?>
-						</div>
-					</div>
-				</div>
+					</td>
+					<td class="NavBlockField AdimNavBlockField NavBlockCheckRadio">
+						<input type="checkbox" name="change_hide_live_people_<?php print $gedcomid;?>" tabindex="<?php print $tab;?>" value="Y" />
+					</td>
+					<td class="NavBlockField AdimNavBlockField">
+						<select name="new_hide_live_people_<?php print $gedcomid; ?>" tabindex="<?php $tab++; print $tab; ?>" >
+							<option value=""><?php print GM_LANG_default; ?></option>
+							<option value="Y"><?php print GM_LANG_yes; ?></option>
+							<option value="N"><?php print GM_LANG_no; ?></option>
+						</select>
+					</td>
+					<?php $tab++;?>
+				</tr>
 				<!-- End Hide live people -->
 				<!-- Start Show living names -->
-				<div class="admin_item_box">
-					<div class="width30 choice_left">
-						<div class="helpicon">
+				<tr>
+					<td class="NavBlockLabel AdimNavBlockLabel">
+						<div class="HelpIconContainer">
 							<?php PrintHelpLink("useradmin_show_living_names_help", "qm", "SHOW_LIVING_NAMES");?>
 						</div>
-						<div class="description">
+						<div class="AdminNavBlockOptionText">
 							<?php print GM_LANG_SHOW_LIVING_NAMES; ?>
 						</div>
-					</div>
-					<div class="width65 choice_right">
-						<div class="admin_item_box">
-							<div class="width15 choice_middle center">
-								<input type="checkbox" name="change_show_living_names_<?php print $gedcomid;?>" tabindex="<?php print $tab;?>" value="Y" />
-							</div>
-							<div class="width80 choice_right">
-								<select name="new_show_living_names_<?php print $gedcomid; ?>" tabindex="<?php $tab++; print $tab; ?>" >
-									<option value=""><?php print GM_LANG_default; ?></option>
-									<option value="Y"><?php print GM_LANG_yes; ?></option>
-									<option value="N"><?php print GM_LANG_no; ?></option>
-								</select>
-							</div>
-							<?php $tab++;?>
-						</div>
-					</div>
-				</div>
+					</td>
+					<td class="NavBlockField AdimNavBlockField NavBlockCheckRadio">
+						<input type="checkbox" name="change_show_living_names_<?php print $gedcomid;?>" tabindex="<?php print $tab;?>" value="Y" />
+					</td>
+					<td class="NavBlockField AdimNavBlockField">
+						<select name="new_show_living_names_<?php print $gedcomid; ?>" tabindex="<?php $tab++; print $tab; ?>" >
+							<option value=""><?php print GM_LANG_default; ?></option>
+							<option value="Y"><?php print GM_LANG_yes; ?></option>
+							<option value="N"><?php print GM_LANG_no; ?></option>
+						</select>
+					</td>
+					<?php $tab++;?>
+				</tr>
 				<!-- End Show living names -->
 				<!-- Start edit rights -->
-				<div class="admin_item_box">
-					<div class="width30 choice_left">
-						<div class="helpicon">
+				<tr>
+					<td class="NavBlockLabel AdimNavBlockLabel">
+						<div class="HelpIconContainer">
 							<?php PrintHelpLink("useradmin_can_edit_help", "qm","can_edit");?>
 						</div>
-						<div class="description">
+						<div class="AdminNavBlockOptionText">
 							<?php print GM_LANG_edit_rights; ?>
 						</div>
-					</div>
-					<div class="width65 choice_right">
-						<div class="admin_item_box">
-							<div class="width15 choice_middle center">
-								<input type="checkbox" name="change_canedit_<?php print $gedcomid;?>" tabindex="<?php print $tab;?>" value="Y" />
-							</div>
-							<div class="width80 choice_right">
-							
-								<?php
-								$tab++;
-								print "<select name=\"new_canedit_$gedcomid\" tabindex=\"".$tab."\"";
-								print ">\n";
-								print "<option value=\"none\" >".GM_LANG_none."</option>\n";
-								print "<option value=\"edit\" >".GM_LANG_edit."</option>\n";
-								print "<option value=\"accept\" >".GM_LANG_accept."</option>\n";
-								print "</select>\n";
-								?>
-							</div>
-						</div>
-					</div>
-				</div>
+					</td>
+					<td class="NavBlockField AdimNavBlockField NavBlockCheckRadio">
+						<input type="checkbox" name="change_canedit_<?php print $gedcomid;?>" tabindex="<?php print $tab;?>" value="Y" />
+					</td>
+					<td class="NavBlockField AdimNavBlockField">
+						<?php
+						$tab++;
+						print "<select name=\"new_canedit_$gedcomid\" tabindex=\"".$tab."\"";
+						print ">\n";
+							print "<option value=\"none\" >".GM_LANG_none."</option>\n";
+							print "<option value=\"edit\" >".GM_LANG_edit."</option>\n";
+							print "<option value=\"accept\" >".GM_LANG_accept."</option>\n";
+						print "</select>\n";
+						?>
+					</td>
+				</tr>
 				<!-- End edit rights -->
 				
 			<?php } ?>
 			<!-- End Gedcom related settings -->
 			
-			<div class="admin_item_box center">
-					<br /><input type="submit" tabindex="<?php print $tab;?>" value="<?php print GM_LANG_mass_update; ?>" />
-			</div>
+			<tr><td colspan="3" class="NavBlockFooter">
+				<input type="submit" tabindex="<?php print $tab;?>" value="<?php print GM_LANG_mass_update; ?>" />
+			</td></tr>
 		<?php } ?>
-	</div>
+	</table>
 	</form>
+	</div>
 	<?php
 }
 
@@ -1660,111 +1592,126 @@ if (($action == "listusers") || ($action == "edituser2") || ($action == "deleteu
 	?>
 	<!-- Setup the left box -->
 	
+		<div id="AdminColumnLeft">
+			<?php AdminFunctions::AdminLink("admin.php", GM_LANG_admin); ?>
+			<?php AdminFunctions::AdminLink("useradmin.php", GM_LANG_user_admin); ?>
+			<?php if ($view != "preview") AdminFunctions::AdminLink("javascript: ".GM_LANG_do_massupdate."\" onclick=\"document.userlist.action.value='massupdate'; document.userlist.submit();return false;\"" , GM_LANG_do_massupdate);
+			?>
+		</div>
+		<div id="UserListing">
 		<form name="userlist" method="post" action="useradmin.php">
 			<input type="hidden" name="action" value="listusers" />
 			<input type="hidden" name="sort" value="<?php print $sort; ?>" />
 			<input type="hidden" name="filter" value="<?php print $filter; ?>" />
 			<input type="hidden" name="usrlang" value="<?php print $usrlang; ?>" />
 			<input type="hidden" name="gedid" value="<?php print $gedid; ?>" />
-		<div id="admin_genmod_left">
-			<div class="admin_link"><a href="admin.php"><?php print GM_LANG_admin;?></a></div>
-			<div class="admin_link"><a href="useradmin.php"><?php print GM_LANG_user_admin;?></a></div>
-		</div>
-		<div id="userlisting">
-			<div class="admin_topbottombar">
-				<?php print "<h3>".GM_LANG_current_users."</h3>"; ?>
-			</div>
-			<div class="admin_link">
-				<a href="javascript: <?php print GM_LANG_do_massupdate; ?>" onclick="document.userlist.action.value='massupdate'; document.userlist.submit();return false;">
-				<?php  if ($view != "preview") print GM_LANG_do_massupdate; else print "&nbsp;"; ?>
-				</a>
-			</div>
-			<?php if ($message != "") {
-				print "<div class=\"shade2 center message_bottom\">".$message."</div>";
-			}?>
-			<div class="admin_topbottombar ltr">
+		<table class="NavBlockTable AdminNavBlockTable">
+		<tr>
+			<td colspan="<?php print ($view == "preview" ? "8": "10");?>" class="NavBlockHeader AdminNavBlockHeader">
+				<div class="AdminNavBlockTitle">
+					<?php print GM_LANG_current_users; ?>
+				</div>
+				<?php if ($message != "") {
+					print "<span class=\"Error\">".$message."</span>";
+				}?>
+			</td>
+		</tr>
+		<tr>
+			<td class="NavBlockLabel AdminNavBlockLabel" colspan="<?php print ($view == "preview" ? "4": "5");?>">
 				<?php print GM_LANG_usernamefilter;?>
+			</td>
+			<td class="NavBlockField AdminNavBlockField" colspan="<?php print ($view == "preview" ? "4": "5");?>">
 				<input type="text" name="namefilter" value="<?php print $namefilter;?>" />
+			</td>
+		</tr>
+		<tr>
+			<td class="NavBlockFooter" colspan="<?php print ($view == "preview" ? "8": "10");?>">
 				<input type="submit" name="refreshlist" value="<?php print GM_LANG_refresh; ?>" />
-			</div>
-			<div class="admin_item_box shade2">
-				<?php if ($view != "preview") { ?>
-				<div class="choice_left width_select">
-					<a href="javascript: <?php print GM_LANG_select;?> " onclick="
-					<?php 
-					foreach($users as $username=>$user) {
- 						print "document.userlist.select".preg_replace(array("/\./","/-/","/ /"), array("_","_","_"), $username).".checked=document.userlist.select".preg_replace(array("/\./","/-/","/ /"), array("_","_","_"), $username).".checked?false:true; ";
-						}
-					?>return false;">
-					<?php print GM_LANG_select;?></a></div>
-				<div class="choice_middle width_deledit"><?php print GM_LANG_delete."<br />".GM_LANG_edit;?></div>
-				<?php } ?>
-				<?php if ($view != "preview") { ?> <div class="choice_left width_username"> <?php } else { ?> <div class="choice_middle width_username"> <?php } ?> 
-					<?php print "<a href=\"useradmin.php?action=listusers&amp;sort=sortuname&amp;namefilter=".$namefilter."&amp;filter=".$filter."&amp;usrlang=".$usrlang."&amp;gedid=".$gedid."\">"; ?><?php print GM_LANG_username; ?></a>
+			</td>
+		</tr>
+		<tr>
+		<?php if ($view != "preview") { ?>
+			<td class="NavBlockColumnHeader AdminNavBlockColumnHeader">
+				<a href="javascript: <?php print GM_LANG_select;?> " onclick="
+				<?php 
+				foreach($users as $username=>$user) {
+					print "document.userlist.select".preg_replace(array("/\./","/-/","/ /"), array("_","_","_"), $username).".checked=document.userlist.select".preg_replace(array("/\./","/-/","/ /"), array("_","_","_"), $username).".checked?false:true; ";
+				}
+				?>return false;">
+				<?php print GM_LANG_select;?></a>
+			</td>
+			<td class="NavBlockColumnHeader AdminNavBlockColumnHeader">
+				<?php print GM_LANG_delete."<br />".GM_LANG_edit;?>
+			</td>
+			<?php } ?>
+			<td class="NavBlockColumnHeader AdminNavBlockColumnHeader">
+				<?php print "<a href=\"useradmin.php?action=listusers&amp;sort=sortuname&amp;namefilter=".$namefilter."&amp;filter=".$filter."&amp;usrlang=".$usrlang."&amp;gedid=".$gedid."\">"; ?><?php print GM_LANG_username; ?></a>
+			</td>
+			<td class="NavBlockColumnHeader AdminNavBlockColumnHeader">
+				<?php print "<a href=\"useradmin.php?action=listusers&amp;sort=sortlname&amp;namefilter=".$namefilter."&amp;filter=".$filter."&amp;usrlang=".$usrlang."&amp;gedid=".$gedid."\">"; ?><?php print GM_LANG_full_name; ?></a>
+			</td>
+			<td class="NavBlockColumnHeader AdminNavBlockColumnHeader">
+				<?php print GM_LANG_inc_languages; ?>
+			</td>
+			<td class="NavBlockColumnHeader AdminNavBlockColumnHeader UserListRightsColumn">
+				<a href="javascript: <?php print GM_LANG_privileges;?>" onclick="
+				<?php
+				$k = 1;
+				for ($i=1, $max=count($users)+1; $i<=$max; $i++) print "expand_layer('user-geds".$i."'); ";
+				print " return false;\">";
+				print "<img id=\"user-geds".$k."_img\" src=\"".GM_IMAGE_DIR."/";
+				if ($showprivs == false) print $GM_IMAGES["plus"]["other"];
+				else print $GM_IMAGES["minus"]["other"]; ?>
+				" width="11" height="11" alt="" />
+				<?php print GM_LANG_privileges; ?>
+				</a>
+				<div id="user-geds<?php print $k;?>" style="display:
+				<?php
+				if ($showprivs == false) { ?> none"> <?php }
+				else { ?> block"> <?php } ?>
 				</div>
-				<div class="choice_middle width_fullname">
-					<?php print "<a href=\"useradmin.php?action=listusers&amp;sort=sortlname&amp;namefilter=".$namefilter."&amp;filter=".$filter."&amp;usrlang=".$usrlang."&amp;gedid=".$gedid."\">"; ?><?php print GM_LANG_full_name; ?></a>
-				</div>
-				<div class="choice_middle width_languages">
-					<?php print GM_LANG_inc_languages; ?>
-				</div>
-				<div class="choice_middle width_priviliges">
-					<a href="javascript: <?php print GM_LANG_privileges;?>" onclick="
-					<?php
-					$k = 1;
-					for ($i=1, $max=count($users)+1; $i<=$max; $i++) print "expand_layer('user-geds".$i."'); ";
-					print " return false;\"><img id=\"user-geds".$k."_img\" src=\"".GM_IMAGE_DIR."/";
-					if ($showprivs == false) print $GM_IMAGES["plus"]["other"];
-					else print $GM_IMAGES["minus"]["other"]; ?>
-					" width="11" height="11" alt="" /></a>
-					<?php print GM_LANG_privileges; ?>
-					<div id="user-geds<?php print $k;?>" style="display:
-					<?php
-					if ($showprivs == false) { ?> none"> <?php }
-					else { ?> block"> <?php } ?>
-					</div>
-				</div>
-				<div class="choice_middle width_registered">
-					<?php print "<a href=\"useradmin.php?action=listusers&amp;sort=sortreg&amp;namefilter=".$namefilter."&amp;filter=".$filter."&amp;usrlang=".$usrlang."&amp;gedid=".$gedid."\">"; ?><?php print GM_LANG_date_registered; ?></a>
-				</div>
-				<div class="choice_middle width_last_logged_in">
-					<?php print "<a href=\"useradmin.php?action=listusers&amp;sort=sortllgn&amp;namefilter=".$namefilter."&amp;filter=".$filter."&amp;usrlang=".$usrlang."&amp;gedid=".$gedid."\">"; ?><?php print GM_LANG_last_login; ?></a>
-				</div>
-				<div class="choice_middle user_verified">
-					<?php print "<a href=\"useradmin.php?action=listusers&amp;sort=sortver&amp;namefilter=".$namefilter."&amp;filter=".$filter."&amp;usrlang=".$usrlang."&amp;gedid=".$gedid."\">"; ?><?php print GM_LANG_verified; ?></a>
-				</div>
-				<div class="choice_right admin_approved">
-					<?php print "<a href=\"useradmin.php?action=listusers&amp;sort=sortveradm&amp;namefilter=".$namefilter."&amp;filter=".$filter."&amp;usrlang=".$usrlang."&amp;gedid=".$gedid."\">"; ?><?php print GM_LANG_verified_by_admin; ?></a>
-				</div>
-			</div>
+			</td>
+			<td class="NavBlockColumnHeader AdminNavBlockColumnHeader">
+				<?php print "<a href=\"useradmin.php?action=listusers&amp;sort=sortreg&amp;namefilter=".$namefilter."&amp;filter=".$filter."&amp;usrlang=".$usrlang."&amp;gedid=".$gedid."\">"; ?><?php print GM_LANG_date_registered; ?></a>
+			</td>
+			<td class="NavBlockColumnHeader AdminNavBlockColumnHeader">
+				<?php print "<a href=\"useradmin.php?action=listusers&amp;sort=sortllgn&amp;namefilter=".$namefilter."&amp;filter=".$filter."&amp;usrlang=".$usrlang."&amp;gedid=".$gedid."\">"; ?><?php print GM_LANG_last_login; ?></a>
+			</td>
+			<td class="NavBlockColumnHeader AdminNavBlockColumnHeader">
+				<?php print "<a href=\"useradmin.php?action=listusers&amp;sort=sortver&amp;namefilter=".$namefilter."&amp;filter=".$filter."&amp;usrlang=".$usrlang."&amp;gedid=".$gedid."\">"; ?><?php print GM_LANG_verified; ?></a>
+			</td>
+			<td class="NavBlockColumnHeader AdminNavBlockColumnHeader">
+				<?php print "<a href=\"useradmin.php?action=listusers&amp;sort=sortveradm&amp;namefilter=".$namefilter."&amp;filter=".$filter."&amp;usrlang=".$usrlang."&amp;gedid=".$gedid."\">"; ?><?php print GM_LANG_verified_by_admin; ?></a>
+			</td>
+		</tr>
+		<?php
+		$k++;
+		foreach($users as $username=>$user) {
+			if (empty($user->language)) $user->language=$LANGUAGE; ?>
 			<?php
-			$k++;
-			foreach($users as $username=>$user) {
-				if (empty($user->language)) $user->language=$LANGUAGE; ?>
-				<div class="admin_item_box">
-					<?php
-					if ($view != "preview") { ?>
-						<div class="choice_left width_select">
-							<input type="checkbox" name="select<?php print preg_replace(array("/\./","/-/","/ /"), array("_","_","_"), $username);?>" value="yes" />
-						</div>
-						<div class="choice_middle width_deledit">
-							<?php if ($user->username != $gm_user->username) {
-								if ($TEXT_DIRECTION=="ltr") print "<a href=\"useradmin.php?action=deleteuser&amp;username=".urlencode($username)."&amp;sort=".$sort."&amp;filter=".$filter."&amp;usrlang=".$usrlang."&amp;gedid=".$gedid."&amp;namefilter=".$namefilter."\" onclick=\"return confirm('".GM_LANG_confirm_user_delete." $username?');\">".GM_LANG_delete."</a><br />\n";
-								else if (begRTLText($username)) print "<a href=\"useradmin.php?action=deleteuser&amp;username=".urlencode($username)."&amp;sort=".$sort."&amp;filter=".$filter."&amp;usrlang=".$usrlang."&amp;gedid=".$gedid."&amp;namefilter=".$namefilter."\" onclick=\"return confirm('?".GM_LANG_confirm_user_delete." $username');\">".GM_LANG_delete."</a><br />\n";
-								else print "<a href=\"useradmin.php?action=deleteuser&amp;username=".urlencode($username)."&amp;sort=".$sort."&amp;filter=".$filter."&amp;usrlang=".$usrlang."&amp;gedid=".$gedid."&amp;namefilter=".$namefilter."\" onclick=\"return confirm('?$username ".GM_LANG_confirm_user_delete." ');\">".GM_LANG_delete."</a><br />\n";
-							}
-							print "<a href=\"useradmin.php?action=edituser&amp;username=".urlencode($username)."&amp;sort=".$sort."&amp;filter=".$filter."&amp;usrlang=".$usrlang."&amp;gedid=".$gedid."&amp;namefilter=".$namefilter."\">".GM_LANG_edit."</a>\n";?>
-						</div>
-					<?php }
-					if ($view != "preview") { ?> <div class="choice_left width_username <?php } else { ?> <div class="choice_middle width_username <?php }
-						if (!empty($user->comment_exp)) {
-							if ((strtotime($user->comment_exp) != "-1") && (strtotime($user->comment_exp) < time("U"))) print " red\">".$username;
-							else print "\">".$username;
+			if ($view != "preview") { ?>
+				<tr>
+					<td class="NavBlockField AdminNavBlockField NavBlockCheckRadio">
+						<input type="checkbox" name="select<?php print preg_replace(array("/\./","/-/","/ /"), array("_","_","_"), $username);?>" value="yes" />
+					</td>
+					<td class="NavBlockLabel AdminNavBlockLabel">
+						<?php if ($user->username != $gm_user->username) {
+							if ($TEXT_DIRECTION=="ltr") print "<a href=\"useradmin.php?action=deleteuser&amp;username=".urlencode($username)."&amp;sort=".$sort."&amp;filter=".$filter."&amp;usrlang=".$usrlang."&amp;gedid=".$gedid."&amp;namefilter=".$namefilter."\" onclick=\"return confirm('".GM_LANG_confirm_user_delete." $username?');\">".GM_LANG_delete."</a><br />\n";
+							else if (begRTLText($username)) print "<a href=\"useradmin.php?action=deleteuser&amp;username=".urlencode($username)."&amp;sort=".$sort."&amp;filter=".$filter."&amp;usrlang=".$usrlang."&amp;gedid=".$gedid."&amp;namefilter=".$namefilter."\" onclick=\"return confirm('?".GM_LANG_confirm_user_delete." $username');\">".GM_LANG_delete."</a><br />\n";
+							else print "<a href=\"useradmin.php?action=deleteuser&amp;username=".urlencode($username)."&amp;sort=".$sort."&amp;filter=".$filter."&amp;usrlang=".$usrlang."&amp;gedid=".$gedid."&amp;namefilter=".$namefilter."\" onclick=\"return confirm('?$username ".GM_LANG_confirm_user_delete." ');\">".GM_LANG_delete."</a><br />\n";
 						}
-						else print "\">".$username;
-						if (!empty($user->comment)) print "<br /><img class=\"adminicon\" title=\"".PrintReady(stripslashes($user->comment))."\" width=\"20\" height=\"20\" align=\"top\" alt=\"".PrintReady(stripslashes($user->comment))."\"  src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["note"]["other"]."\" />";?>
-					</div>
-					<div class="choice_middle width_fullname">
+						print "<a href=\"useradmin.php?action=edituser&amp;username=".urlencode($username)."&amp;sort=".$sort."&amp;filter=".$filter."&amp;usrlang=".$usrlang."&amp;gedid=".$gedid."&amp;namefilter=".$namefilter."\">".GM_LANG_edit."</a>\n";?>
+					</td>
+				<?php } ?>
+					<td class="NavBlockLabel AdminNavBlockLabel"> <?php
+					if (!empty($user->comment_exp)) {
+						if ((strtotime($user->comment_exp) != "-1") && (strtotime($user->comment_exp) < time("U"))) print "<span class=\"Error\">".$username."</span>";
+						else print $username;
+					}
+					else print $username;
+					if (!empty($user->comment)) print "<br /><img class=\"BlockAdminIcon\" title=\"".PrintReady(stripslashes($user->comment))."\" alt=\"".PrintReady(stripslashes($user->comment))."\"  src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["note"]["other"]."\" />";?>
+					</td>
+					<td class="NavBlockLabel AdminNavBlockLabel">
 						<?php
 						if ($TEXT_DIRECTION=="ltr") {
 							if ($NAME_REVERSE) print $user->lastname." ".$user->firstname;
@@ -1777,12 +1724,12 @@ if (($action == "listusers") || ($action == "edituser2") || ($action == "deleteu
 							print "&rlm;\n";
 						}
 						?>
-					</div>
-					<div class="choice_middle width_languages">
+					</td>
+					<td class="NavBlockLabel AdminNavBlockLabel">
 						<?php print constant("GM_LANG_lang_name_".$user->language);?><br />
-						<img src="<?php print $language_settings[$user->language]["flagsfile"];?>" class="brightflag" alt="<?php print constant("GM_LANG_lang_name_".$user->language);?>" title="<?php print constant("GM_LANG_lang_name_".$user->language);?>" />
-					</div>
-					<div class="choice_middle width_priviliges">
+						<img src="<?php print $language_settings[$user->language]["flagsfile"];?>" class="BrightFlag" alt="<?php print constant("GM_LANG_lang_name_".$user->language);?>" title="<?php print constant("GM_LANG_lang_name_".$user->language);?>" />
+					</td>
+					<td class="NavBlockLabel AdminNavBlockLabel">
 						<?php
 						print "<a href=\"javascript: ".GM_LANG_privileges."\" onclick=\"expand_layer('user-geds".$k."'); return false;\"><img id=\"user-geds".$k."_img\" src=\"".GM_IMAGE_DIR."/";
 						if ($showprivs == false) print $GM_IMAGES["plus"]["other"];
@@ -1793,7 +1740,7 @@ if (($action == "listusers") || ($action == "edituser2") || ($action == "deleteu
 						if ($showprivs == false) print "none;\">";
 						else print "block;\">";
 							print "<ul>";
-							if ($user->canadmin) print "<li class=\"warning\">".GM_LANG_can_admin."</li>\n";
+							if ($user->canadmin) print "<li class=\"Warning\">".GM_LANG_can_admin."</li>\n";
 							uksort($GEDCOMS, "strnatcasecmp");
 							reset($GEDCOMS);
 							foreach($GEDCOMS as $gedid=>$gedcom) {
@@ -1803,7 +1750,7 @@ if (($action == "listusers") || ($action == "edituser2") || ($action == "deleteu
 								if (isset($user->gedcomadmin[$gedid]) && $user->gedcomadmin[$gedid]) $vval = "admin_gedcom";
 								if (isset($user->gedcomid[$gedid])) $uged = $user->gedcomid[$gedid];
 								else $uged = "";
-								if ($vval=="accept") print "<li class=\"warning\">"; 
+								if ($vval=="accept") print "<li class=\"Warning\">"; 
 								else print "<li>";
 								print constant("GM_LANG_".$vval)." ";
 								if ($uged != "") print "<a href=\"individual.php?pid=".$uged."&amp;gedid=".$gedid."\">".$gedcom["gedcom"]."</a></li>\n";
@@ -1812,15 +1759,15 @@ if (($action == "listusers") || ($action == "edituser2") || ($action == "deleteu
 							print "</ul>";
 						print "</div>";
 						$k++; ?>
-					</div>
-					<div class="choice_middle width_registered
+					</td>
+					<td class="NavBlockLabel AdminNavBlockLabel UserListDateColumn">
 						<?php
-						if (((date("U") - $user->reg_timestamp) > 604800) && ($user->verified!="Y")) { ?>  red"> <?php }
-						else print " \">";
+						if (((date("U") - $user->reg_timestamp) > 604800) && ($user->verified!="Y")) print "<span class=\"Error\">";
 						print GetChangedDate(date("d", $user->reg_timestamp)." ".date("M", $user->reg_timestamp)." ".date("Y", $user->reg_timestamp))."<br />".date($TIME_FORMAT, $user->reg_timestamp);
+						if (((date("U") - $user->reg_timestamp) > 604800) && ($user->verified!="Y")) print "</span>";
 						?>
-					</div>
-					<div class="choice_middle width_last_logged_in">
+					</td>
+					<td class="NavBlockLabel AdminNavBlockLabel UserListDateColumn">
 						<?php
 						if ($user->reg_timestamp > $user->sessiontime) {
 							print GM_LANG_never;
@@ -1829,23 +1776,29 @@ if (($action == "listusers") || ($action == "edituser2") || ($action == "deleteu
 							print GetChangedDate(date("d", $user->sessiontime)." ".date("M", $user->sessiontime)." ".date("Y", $user->sessiontime))."<br />".date($TIME_FORMAT, $user->sessiontime);
 						}
 						?>
-					</div>
-					<div class="choice_middle user_verified">
+					</td>
+					<td class="NavBlockLabel AdminNavBlockLabel">
 						<?php
 						if ($user->verified=="Y") print GM_LANG_yes;
 						else print GM_LANG_no;
 						?>
-					</div>
-					<div class="choice_right admin_approved">
+					</td>
+					<td class="NavBlockLabel AdminNavBlockLabel">
 						<?php
 						if ($user->verified_by_admin=="Y") print GM_LANG_yes;
 						else print GM_LANG_no;
 						?>
-					</div>
-				</div>
-			<?php } ?>
-		</div>
+					</td>
+				</tr>
+		<?php } ?>
+			<tr>
+				<td colspan="<?php print ($view == "preview" ? "8": "10");?>" class="NavBlockFooter">
+					<input type="submit" name="refreshlist" value="<?php print GM_LANG_refresh; ?>" />
+				</td>
+			</tr>
+		</table>
 	</form>
+	</div>
 	<?php
 }
 
@@ -1854,45 +1807,50 @@ if (($action == "listusers") || ($action == "edituser2") || ($action == "deleteu
 if ($action == "cleanup") {
 	?>
 	<!-- Setup the left box -->
-	<div id="admin_genmod_left">
-		<div class="admin_link"><a href="admin.php"><?php print GM_LANG_admin;?></a></div>
-		<div class="admin_link"><a href="useradmin.php"><?php print GM_LANG_user_admin;?></a></div>
+	<div id="AdminColumnLeft">
+		<?php AdminFunctions::AdminLink("admin.php", GM_LANG_admin); ?>
+		<?php AdminFunctions::AdminLink("useradmin.php", GM_LANG_user_admin); ?>
 	</div>
-	<div id="content">
+	<div id="AdminColumnMiddle">
 		<form name="cleanupform" method="post" action="">
 			<input type="hidden" name="action" value="cleanup2" />
-			<div class="admin_topbottombar">
-				<?php print "<h3>".GM_LANG_cleanup_users."</h3>"; ?>
-			</div>
-			<div class="admin_item_box">
-				<div class="choice_left">
-					<?php
-					// Check for idle users
-					if (!isset($month)) $month = 1;
-					print GM_LANG_usr_idle;?>
+		<table class="NavBlockTable AdminNavBlockTable">
+		<tr>
+			<td colspan="3" class="NavBlockHeader AdminNavBlockHeader">
+				<div class="AdminNavBlockTitle">
+					<?php print GM_LANG_cleanup_users; ?>
 				</div>
-				<div class="choice_middle">
-					<select onchange="document.location=options[selectedIndex].value;">
+			</td>
+		</tr>
+		<tr>
+			<td class="NavBlockLabel AdminNavBlockLabel" colspan="2">
+				<?php
+				// Check for idle users
+				if (!isset($month)) $month = 1;
+				print GM_LANG_usr_idle;?>
+			</td>
+			<td class="NavBlockField AdminNavBlockField">
+				<select onchange="document.location=options[selectedIndex].value;">
 					<?php
 					for($i=1; $i<=12; $i++) { 
 						print "<option value=\"useradmin.php?action=cleanup&amp;month=$i\"";
 						if ($i == $month) print " selected=\"selected\"";
 						print " >".$i."</option>";
 					} ?>
-					</select>
-				</div><br /><br />
-			</div>
-			<div class="admin_item_box shade2">
-				<div class="width30 choice_left">
-					<?php print GM_LANG_username;?>
-				</div>
-				<div class="choice_left width60 shade2">
-					<?php print GM_LANG_message;?>
-				</div>
-				<div class="choice_right shade2">
-					<?php print GM_LANG_select;?>
-				</div><br />
-			</div>
+				</select>
+			</td>
+		</tr>
+		<tr>
+			<td class="NavBlockColumnHeader AdminNavBlockColumnHeader">
+				<?php print GM_LANG_username;?>
+			</td>
+			<td class="NavBlockColumnHeader AdminNavBlockColumnHeader">
+				<?php print GM_LANG_message;?>
+			</td>
+			<td class="NavBlockColumnHeader AdminNavBlockColumnHeader">
+				<?php print GM_LANG_select;?>
+			</td>
+		</tr>
 			<?php
 			// Check users not logged in too long
 			$users = UserController::GetUsers();
@@ -1902,16 +1860,17 @@ if ($action == "cleanup") {
 				else $datelogin = $user->sessiontime;
 				if ((mktime(0, 0, 0, date("m")-$month, date("d"), date("Y")) > $datelogin) && ($user->verified == "Y") && ($user->verified_by_admin == "Y")) {
 					?>
-					<div class="admin_item_box">
-						<div class="width30 choice_left wrap">
-							<?php print $user->username." - ".$user->firstname." ".$user->lastname."</div><div class=\"width60 choice_left wrap\">".GM_LANG_usr_idle_toolong;
-							print GetChangedDate(date("d", $datelogin)." ".date("M", $datelogin)." ".date("Y", $datelogin));?>
-						</div>
-						<div class="choice_right">
-							<input type="checkbox" name="<?php print "del_".preg_replace(array("/\./","/-/","/ /"), array("_","_","_"), $user->username); ?>" value="yes" />
-							<?php $ucnt++; ?>
-						</div>
-					</div>
+					<tr>
+					<td class="NavBlockLabel AdminNavBlockLabel">
+						<?php print $user->username." - ".$user->firstname." ".$user->lastname."</td>";
+						print "<td class=\"NavBlockLabel AdminNavBlockLabel\">".GM_LANG_usr_idle_toolong;
+						print GetChangedDate(date("d", $datelogin)." ".date("M", $datelogin)." ".date("Y", $datelogin));?>
+					</td>
+					<td class="NavBlockField AdminNavBlockField NavBlockCheckRadio">
+						<input type="checkbox" name="<?php print "del_".preg_replace(array("/\./","/-/","/ /"), array("_","_","_"), $user->username); ?>" value="yes" />
+						<?php $ucnt++; ?>
+					</td>
+					</tr>
 					<?php
 				}
 			}
@@ -1920,15 +1879,16 @@ if ($action == "cleanup") {
 			foreach($users as $key=>$user) {
 				if (((date("U") - $user->reg_timestamp) > 604800) && ($user->verified!="Y")) {
 				?>
-				<div class="admin_item_box">
-					<div class="width30 choice_left wrap">
-						<?php print $user->username." - ".$user->firstname." ".$user->lastname."</div><div class=\"width60 choice_left wrap\">".GM_LANG_del_unveru;?>
-					</div>
-					<div class="choice_right">
-						<input type="checkbox" checked="checked" name="<?php print "del_".preg_replace(array("/\./","/-/","/ /"), array("_","_","_"), $user->username); ?>" value="yes" />
-						<?php $ucnt++; ?>
-					</div>
-				</div>
+					<tr>
+						<td class="NavBlockLabel AdminNavBlockLabel">
+							<?php print $user->username." - ".$user->firstname." ".$user->lastname."</td>";
+							print "<td class=\"NavBlockLabel AdminNavBlockLabel\">".GM_LANG_del_unveru;?>
+						</td>
+						<td class="NavBlockField AdminNavBlockField NavBlockCheckRadio">
+							<input type="checkbox" checked="checked" name="<?php print "del_".preg_replace(array("/\./","/-/","/ /"), array("_","_","_"), $user->username); ?>" value="yes" />
+							<?php $ucnt++; ?>
+						</td>
+					</tr>
 				<?php
 				}
 			}
@@ -1937,15 +1897,16 @@ if ($action == "cleanup") {
 			foreach($users as $key=>$user) {
 				if (($user->verified_by_admin!="Y") && ($user->verified == "Y")) {
 				?>
-				<div class="admin_item_box">
-					<div class="width30 choice_left wrap">
-						<?php print $user->username." - ".$user->firstname." ".$user->lastname."</div><div class=\"width60 choice_left wrap\">".GM_LANG_del_unvera; ?>
-					</div>
-					<div class="choice_right">
-						<input type="checkbox" name="<?php print "del_".preg_replace(array("/\./","/-/","/ /"), array("_","_","_"), $user->username); ?>" value="yes" />
-						<?php $ucnt++; ?>
-					</div>
-				</div>
+					<tr>
+						<td class="NavBlockLabel AdminNavBlockLabel">
+							<?php print $user->username." - ".$user->firstname." ".$user->lastname."</td>";
+							print "<td class=\"NavBlockLabel AdminNavBlockLabel\">".GM_LANG_del_unvera; ?>
+						</td>
+						<td class="NavBlockField AdminNavBlockField NavBlockCheckRadio">
+							<input type="checkbox" name="<?php print "del_".preg_replace(array("/\./","/-/","/ /"), array("_","_","_"), $user->username); ?>" value="yes" />
+							<?php $ucnt++; ?>
+						</td>
+					</tr>
 				<?php
 				}
 			}
@@ -1965,26 +1926,30 @@ if ($action == "cleanup") {
 			}
 			ksort($gedrights);
 			foreach($gedrights as $key=>$gedcomid) { ?>
-				<div class="admin_item_box">
-					<div class="width30 choice_left wrap">
-						<?php print $GEDCOMS[$gedcomid]["title"]."</div><div class=\"width60 choice_left wrap\">".GM_LANG_del_gedrights;?>
-					</div>
-					<div class="choice_right">
-						<input type="checkbox" checked="checked" name="<?php print "delg_".$gedcomid; ?>" value="yes" />
-						<?php $ucnt++; ?>
-					</div>
-				</div>
+					<tr>
+						<td class="NavBlockLabel AdminNavBlockLabel">
+							<?php print $GEDCOMS[$gedcomid]["title"]."</td>";
+							print "<td class=\"NavBlockLabel AdminNavBlockLabel\">".GM_LANG_del_gedrights;?>
+						</td>
+						<td class="NavBlockField AdminNavBlockField NavBlockCheckRadio">
+							<input type="checkbox" checked="checked" name="<?php print "delg_".$gedcomid; ?>" value="yes" />
+							<?php $ucnt++; ?>
+						</td>
+					</tr>
 				<?php
 			}
 			// NOTE: Nothing found to clean up
 			if ($ucnt == 0) {
-				print "<div class=\"shade2 center\"><span class=\"Error\">".GM_LANG_usr_no_cleanup."</span></div>";
+				print "<tr><td class=\"NavBlockColumnHeader AdminNavBlockColumnHeader\" colspan=\"3\"><span class=\"Error\">".GM_LANG_usr_no_cleanup."</span></td></tr>";
 			}
 			else { ?>
-				<div class="admin_item_box center">
-					<input type="submit" value="<?php print GM_LANG_del_proceed; ?>" />
-				</div>
+				<tr>
+					<td class="NavBlockFooter" colspan="3">
+						<input type="submit" value="<?php print GM_LANG_del_proceed; ?>" />
+					</td>
+				<tr>
 			<?php } ?>
+		</table>
 		</form>
 	</div>
 	<?php
@@ -2024,14 +1989,16 @@ if ($action == "cleanup2") {
 if ($action == "") {
 	?>
 	<!-- Setup the left box -->
-	<div id="admin_genmod_left">
-		<div class="admin_link"><a href="admin.php"><?php print GM_LANG_admin;?></a></div>
+	<div id="AdminColumnLeft">
+		<?php AdminFunctions::AdminLink("admin.php", GM_LANG_admin); ?>
 	</div>
 	<!-- Setup the middle box -->
-	<div id="content">
+	<div id="AdminColumnMiddle">
+	<table class="NavBlockTable AdminNavBlockTable">
 		<?php
 			$menu = new AdminMenu();
 			$menu->SetBarText(GM_LANG_user_admin);
+			$menu->SetBarStyle("AdminNavBlockHeader");
 			$menu->AddItem("", "", "", "useradmin.php?action=listusers", GM_LANG_current_users, "left");
 			$menu->AddItem("", "", "", "useradmin.php?action=cleanup", GM_LANG_cleanup_users, "left");
 			$menu->AddItem("", "", "", "useradmin.php?action=cleanup_messages", GM_LANG_cleanup_messages, "left");
@@ -2041,10 +2008,19 @@ if ($action == "") {
 			$menu->AddItem("", "", "", "javascript: ".GM_LANG_broadcast_not_logged_6mo."\" onclick=\"message('last_6mo', 'messaging2', '', ''); return false;\"", GM_LANG_broadcast_not_logged_6mo, "right");
 			$menu->PrintItems();
 			if ($message != "") {
-				print "<div class=\"shade2 center\">".$message."</div>";
+				print "<div class=\"Error\">".$message."</div>";
 			} ?>
+			</table>
 		<!-- Setup the top bar for info -->
-		<div class="admin_topbottombar" style="margin-top: 1em;"><?php print GM_LANG_admin_info; ?></div>
+		<table class="NavBlockTable AdminNavBlockTable">
+		<tr>
+			<td colspan="2" class="NavBlockRowSpacer">&nbsp;</td>
+		</tr>
+		<tr>
+			<td class="NavBlockHeader" colspan="2">
+				<?php print GM_LANG_admin_info; ?>
+			</td>
+		</tr>
 		<?php
 		$users = UserController::GetUsers();
 		$totusers = 0;			// Total number of users
@@ -2086,132 +2062,107 @@ if ($action == "") {
 		}
 		?>
 		<!-- Setup the info block -->
-		<div class="admin_item_box">
-			<div class="width30 choice_left">
+		<tr>
+			<td class="NavBlockLabel AdminNavBlockLabel">
 				<?php print GM_LANG_users_total;?>
-			</div>
-			<div class="choice_right">
+			</td>
+			<td class="NavBlockLabel AdminNavBlockLabel">
 				<?php print $totusers; ?>
-			</div>
-		</div>
-		<div class="admin_item_box">
-			<div class="width30 choice_left">
+			</td>
+		</tr>
+		<tr>
+			<td class="NavBlockLabel AdminNavBlockLabel">
 				<?php 
 				if ($adminusers == 0) print GM_LANG_users_admin;
 				else print "<a href=\"useradmin.php?action=listusers&amp;filter=adminusers\">".GM_LANG_users_admin."</a>";
 				?>
-			</div>
-			<div class="choice_right">
+			</td>
+			<td class="NavBlockLabel AdminNavBlockLabel">
 				<?php print $adminusers; ?>
-			</div>
-		</div>
+			</td>
+		</tr>
 		<?php
 		// GEDCOM Administrators
 		?>
-		<div class="admin_item_box">
-			<div class="width30 choice_left">
+		<tr>
+			<td class="NavBlockLabel AdminNavBlockLabel">
 				<?php print GM_LANG_users_gedadmin;?>
-			</div>
+			</td>
 			<?php
 			if (count($gedadmin) == 0) { ?>
-				<div class="width30 choice_right">
+			<td class="NavBlockLabel AdminNavBlockLabel">
 					0
-				</div>
-			<?php } 			
+			</td>
+			<?php }  			
 			asort($gedadmin);
 			$pass = 1;
-			foreach ($gedadmin as $key=>$geds) {
-			if ($pass > 1) { ?>
-				</div>
-				<div class="admin_item_box">
-					<div class="width30 choice_left">
-						&nbsp;
-					</div>
-			<?php }
-			$pass = 2;
-			?>
-			<div class="width30 choice_right">
-				<?php
-				$ind = 1;
-				if ($geds["number"] == 0) print $geds["name"];
-				else print "<a href=\"useradmin.php?action=listusers&amp;filter=gedadmin&amp;gedid=".$geds["ged"]."\">".$geds["name"]."</a>";
+			foreach ($gedadmin as $key=>$geds) { 
+				if ($pass != 1) print "</tr><tr>";
+				$pass++;
 				?>
-			</div>
-			<div class="choice_right">
-				<?php print (int)$geds["number"]; ?>
-			</div>
-			
-		<?php } ?>
-		</div>
+				<td class="NavBlockLabel AdminNavBlockLabel">
+				<?php
+				if ($geds["number"] == 0) print $geds["name"];
+				else print "<a href=\"useradmin.php?action=listusers&amp;filter=gedadmin&amp;gedid=".$geds["ged"]."\">".$geds["name"]."&nbsp;"."(".(int)$geds["number"].")</a>";
+			} ?>
+		</tr>
 		<?php 
 		// Users with warnings
 		?>
-		<div class="admin_item_box">
-			<div class="width30 choice_left">
+		<tr>
+			<td class="NavBlockLabel AdminNavBlockLabel">
 				<?php 
 				if ($warnusers == 0) print GM_LANG_warn_users;
 				else print "<a href=\"useradmin.php?action=listusers&amp;filter=warnings\">".GM_LANG_warn_users."</a>";
 				?>
-			</div>
-			<div class="choice_right">
+			</td>
+			<td class="NavBlockLabel AdminNavBlockLabel">
 				<?php print $warnusers; ?>
-			</div>
-		</div>
-		<div class="admin_item_box">
-			<div class="width30 choice_left">
+			</td>
+		</tr>
+		<tr>
+			<td class="NavBlockLabel AdminNavBlockLabel">
 				<?php 
 				if ($applusers == 0) print GM_LANG_users_unver;
 				else print "<a href=\"useradmin.php?action=listusers&amp;filter=usunver\">".GM_LANG_users_unver."</a>";
 				?>
-			</div>
-			<div class="choice_right">
+			</td>
+			<td class="NavBlockLabel AdminNavBlockLabel">
 				<?php print $applusers; ?>
-			</div>
-		</div>
+			</td>
+		</tr>
 		<?php
 		// Unverified users
 		?>
-		<div class="admin_item_box">
-			<div class="width30 choice_left">
+		<tr>
+			<td class="NavBlockLabel AdminNavBlockLabel">
 				<?php 
 				if ($nverusers == 0) print GM_LANG_users_unver_admin;
 				else print "<a href=\"useradmin.php?action=listusers&amp;filter=admunver\">".GM_LANG_users_unver_admin."</a>";
 				?>
-			</div>
-			<div class="choice_right">
+			</td>
+			<td class="NavBlockLabel AdminNavBlockLabel">
 				<?php print $nverusers; ?>
-			</div>
-		</div>
+			</td>
+		</tr>
 		<?php
 		// User languages
 		?>
-		<div class="admin_item_box">
-			<div class="width30 choice_left">
+		<tr>
+			<td class="NavBlockLabel AdminNavBlockLabel">
 				<?php print GM_LANG_users_langs; ?>
-			</div>
+			</td>
+			<td class="NavBlockLabel AdminNavBlockLabel">
 			<?php asort($userlang);
-			$pass = 1;
 			foreach ($userlang as $key=>$ulang) {
-				if ($pass > 1) { ?>
-				</div>
-				<div class="admin_item_box">
-					<div class="width30 choice_left">
-						&nbsp;
-					</div>
-				<?php }
-				$pass = 2;
 				?>
-				<div class="choice_right">
-					<img src="<?php print $language_settings[$ulang["langname"]]["flagsfile"];?>" class="brightflag" alt="<?php print $key; ?>" title="<?php print $key;?>." />
-				</div>
-				<div class="width10 choice_middle">
+				<img src="<?php print $language_settings[$ulang["langname"]]["flagsfile"];?>" class="BrightFlag" alt="<?php print $key; ?>" title="<?php print $key;?>." />
 					<a href="useradmin.php?action=listusers&amp;filter=language&amp;usrlang=<?php print $ulang["langname"];?>"><?php print $key;?></a>
-				</div>
-				<div class="choice_right">
-					<?php print $ulang["number"];?>
-				</div>
+					<?php print "(".$ulang["number"].")";?><br />
 			<?php } ?>
-		</div>
+			</td>
+		</tr>
+		</table>
 	</div>
 <?php }
 // Cleanup messages
@@ -2241,36 +2192,42 @@ if ($action == "cleanup_messold") {
 if ($action == "cleanup_messages") {
 	?>
 	<!-- Setup the left box -->
-	<div id="admin_genmod_left">
-		<div class="admin_link"><a href="admin.php"><?php print GM_LANG_admin;?></a></div>
-		<div class="admin_link"><a href="useradmin.php"><?php print GM_LANG_user_admin;?></a></div>
+	<div id="AdminColumnLeft">
+		<?php AdminFunctions::AdminLink("admin.php", GM_LANG_admin); ?>
+		<?php AdminFunctions::AdminLink("useradmin.php", GM_LANG_user_admin); ?>
 	</div>
-	<div id="content">
+	<div id="AdminColumnMiddle">
 		<form name="cleanmessageform" method="post" action="">
-			<input type="hidden" name="action" value="cleanup_messages2" />
-			<div class="admin_topbottombar">
-				<?php print "<h3>".GM_LANG_cleanup_messages."</h3>"; ?>
-			</div>
-			<div class="admin_item_box shade2">
-				<div class="choice_left" style="width:28%">
-					<?php print GM_LANG_username;?>
+		<input type="hidden" name="action" value="cleanup_messages2" />
+		<table class="NavBlockTable AdminNavBlockTable">
+		<tr>
+			<td colspan="6" class="NavBlockHeader AdminNavBlockHeader">
+				<div class="AdminNavBlockTitle">
+					<?php print GM_LANG_cleanup_messages; ?>
 				</div>
-				<div class="choice_left width10 center">
-					<?php print GM_LANG_number;?>
-				</div>
-				<div class="choice_left width10 center">
-					<?php print GM_LANG_select;?>
-				</div>
-				<div class="choice_left" style="width:28%">
-					<?php print GM_LANG_username;?>
-				</div>
-				<div class="choice_left width10 center">
-					<?php print GM_LANG_number;?>
-				</div>
-				<div class="choice_right width10 center">
-					<?php print GM_LANG_select;?>
-				</div><br />
-			</div>
+			</td>
+		</tr>
+		<tr>
+			<td class="NavBlockColumnHeader AdminNavBlockColumnHeader">
+				<?php print GM_LANG_username;?>
+			</td>
+			<td class="NavBlockColumnHeader AdminNavBlockColumnHeader">
+				<?php print GM_LANG_number;?>
+			</td>
+			<td class="NavBlockColumnHeader AdminNavBlockColumnHeader">
+				<?php print GM_LANG_select;?>
+			</td>
+			<td class="NavBlockColumnHeader AdminNavBlockColumnHeader">
+				<?php print GM_LANG_username;?>
+			</td>
+			<td class="NavBlockColumnHeader AdminNavBlockColumnHeader">
+				<?php print GM_LANG_number;?>
+			</td>
+			<td class="NavBlockColumnHeader AdminNavBlockColumnHeader">
+				<?php print GM_LANG_select;?>
+			</td>
+		</tr>
+		<tr>
 			<?php
 			if (!isset($users)) $users = UserController::GetUsers();
 			$count = 0;
@@ -2288,29 +2245,27 @@ if ($action == "cleanup_messages") {
 						else $mons[$mmon] = 1;
 					}
 					// Now print the users
-					if ($count%2) print "\n<div class=\"admin_item_box wrap\">\n";
-						print "<div class=\"choice_left\" style=\"width:28%\">";
+					if ($count%2) print "\n<tr>\n";
+						print "<td class=\"NavBlockLabel AdminNavBlockLabel\">";
 							print $user->username."&nbsp;(".$user->firstname." ".$user->lastname.")";
-						print "</div>\n";
-						print "<div class=\"choice_left width10 center\">";
+						print "</td>\n";
+						print "<td class=\"NavBlockLabel AdminNavBlockLabel\">";
 							print count($messages);
-						print "</div>\n";
-						if ($count%2) print "<div class=\"choice_left width10 center\">\n";
-						else print "<div class=\"choice_right width10 center\">";
+						print "</td>\n";
+						print "<td class=\"NavBlockField AdminNavBlockField NavBlockCheckRadio\">";
 							print "<input type=\"checkbox\" name=\"msg_".$user->username."\" value=\"yes\" />";
-						print "</div>\n";
-					if ($count%2 == 0) print "</div>\n";
+						print "</td>\n";
+					if ($count%2 == 0) print "</tr>\n";
 				}
 			}
-			if ($count%2) print "</div>";
-			print "<div class=\"admin_item_box shade1\"></div>\n";
-			print "<div class=\"center shade2\"><br /><input type=\"submit\" value=\"".GM_LANG_del_mail."\" onclick=\"document.cleanmessageform.action.value='cleanup_messbox'; return confirm('".GM_LANG_confirm_sure."');\" /></div>\n";
+			if ($count%2) print "<td class=\"NavBlockLabel AdminNavBlockLabel\">&nbsp;</td><td class=\"NavBlockLabel AdminNavBlockLabel\">&nbsp;</td><td class=\"NavBlockField AdminNavBlockField\">&nbsp;</td></tr>";
+			else print "</tr>";
+			print "<tr><td colspan=\"6\" class=\"NavBlockFooter\"><input type=\"submit\" value=\"".GM_LANG_del_mail."\" onclick=\"document.cleanmessageform.action.value='cleanup_messbox'; return confirm('".GM_LANG_confirm_sure."');\" /></td></tr>\n";
 			
 			// Print the month cleanup
-			print "<div class=\"admin_item_box shade1\"></div>\n";
-			print "<div class=\"admin_item_box shade2 center\"><br />";
 			$sum = array_sum($mons);
-			print GM_LANG_total_messages."&nbsp;&nbsp;&nbsp;".$sum."<br />";
+			print "<tr><td class=\"NavBlockLabel AdminNavBlockLabel\">";
+			print GM_LANG_total_messages."</td><td class=\"NavBlockLabel AdminNavBlockLabel\" colspan=\"2\">".$sum."</td>";
 			ksort($mons);	
 			$maxmon = end(array_keys($mons));
 			// Convert the totals to cumulative percentage
@@ -2323,7 +2278,8 @@ if ($action == "cleanup_messages") {
 				$mons[$mon] = $perc;
 //				print $mon." ".$mons[$mon];
 			}
-			print "<label for=\"cleanup\">".GM_LANG_cleanup_older."&nbsp;&nbsp;&nbsp;</label>\n";
+			print "<td class=\"NavBlockLabel AdminNavBlockLabel\">".GM_LANG_cleanup_older."</td>\n";
+			print "<td class=\"NavBlockField AdminNavBlockField\" colspan=\"2\">";
 			print "<select  name=\"cleanup\">\n";
 			for ($i=0; $i<=$maxmon; $i++) {
 				if (isset($mons[$i])) {
@@ -2333,8 +2289,10 @@ if ($action == "cleanup_messages") {
 				}
 			}
 			print "</select>\n";
-			print "<input type=\"submit\" id=\"cleanup\" value=\"".GM_LANG_delete."\" onclick=\"document.cleanmessageform.action.value='cleanup_messold'; return confirm('".GM_LANG_confirm_sure."');\" /></div>";
+			print "</td></tr>";
+			print "<tr><td colspan=\"6\" class=\"NavBlockFooter\"><input type=\"submit\" id=\"cleanup\" value=\"".GM_LANG_delete."\" onclick=\"document.cleanmessageform.action.value='cleanup_messold'; return confirm('".GM_LANG_confirm_sure."');\" /></td></tr>";
 			?>
+			</table>
 		</form>
 	</div>
 	<?php

@@ -174,7 +174,7 @@ print "<form name=\"zoomform\" onsubmit=\"setzoom(document.getElementById('zoomv
 if (strstr($filename, "://")) $filename = preg_replace("/ /", "%20", $filename);
 if (!SystemConfig::$MEDIA_IN_DB && (empty($filename) || !@fclose(@fopen($filename,"r")))) {
 	print "<span class=\"Error\">".GM_LANG_file_not_found."&nbsp;".$filename."</span>";
-	print "<br /><br /><div class=\"center\"><a href=\"javascript:// ".GM_LANG_close_window."\" onclick=\"self.close();\">".GM_LANG_close_window."</a></div>\n";
+	print "<br /><br /><div class=\"CloseWindow\"><a href=\"javascript:// ".GM_LANG_close_window."\" onclick=\"self.close();\">".GM_LANG_close_window."</a></div>\n";
 }
 else {
 	print "<font size=\"6\"><a href=\"#\" onclick=\"zoomin(); return false;\">+</a> <a href=\"#\" onclick=\"zoomout();\">-</a> </font>";

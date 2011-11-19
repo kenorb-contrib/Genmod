@@ -31,10 +31,11 @@ $indilist_controller = new IndilistController();
 $trace = false;
 
 PrintHeader($indilist_controller->pagetitle);
-print "<div class =\"center\">";
-print "\n\t<h3>";
-PrintHelpLink("name_list_help", "qm", "name_list");
-print GM_LANG_individual_list."</h3>";
+print "<div id=\"IndividualListPage\">";
+	print "<div class =\"PageTitleName\">";
+		PrintHelpLink("name_list_help", "qm", "name_list");
+		print GM_LANG_individual_list;
+	print "</div>";
 
 /**
  * Check for the @ symbol
@@ -63,13 +64,15 @@ $indialpha = $indilist_controller->GetLetterBar();
 
 // Print the letter bar
 if (count($indialpha) > 0) {
+	print "<div class=\"IndiFamLetterBar\">";
 	PrintHelpLink("alpha_help", "qm");
+	print GM_LANG_first_letter_sname."<br />\n";
 	foreach($indialpha as $key=>$letter) {
 		if ($letter != "@") {
 			print "<a href=\"indilist.php?alpha=".urlencode($letter)."&amp;surname_sublist=".$indilist_controller->surname_sublist."&amp;show_all=no";
 			if ($indilist_controller->allgeds == "yes") print "&amp;allgeds=yes";
 			print "\">";
-			if ($indilist_controller->alpha == $letter && $indilist_controller->show_all == "no") print "<span class=\"warning\">".htmlspecialchars($letter)."</span>";
+			if ($indilist_controller->alpha == $letter && $indilist_controller->show_all == "no") print "<span class=\"Warning\">".htmlspecialchars($letter)."</span>";
 			else print htmlspecialchars($letter);
 			print "</a> | \n";
 		}
@@ -85,7 +88,7 @@ if (count($indialpha) > 0) {
 		if ($indilist_controller->alpha == "@") {
 			print "<a href=\"indilist.php?alpha=".urlencode("@")."&amp;surname_sublist=yes&amp;surname=@N.N.";
 			if ($indilist_controller->allgeds == "yes") print "&amp;allgeds=yes";
-			print "\"><span class=\"warning\">".PrintReady(GM_LANG_NN)."</span></a>";
+			print "\"><span class=\"Warning\">".PrintReady(GM_LANG_NN)."</span></a>";
 		}
 		else {
 			print "<a href=\"indilist.php?alpha=".urlencode("@")."&amp;surname_sublist=yes&amp;surname=@N.N.";
@@ -103,7 +106,7 @@ if (count($indialpha) > 0) {
 		if ($indilist_controller->show_all == "yes") {
 			print "<a href=\"indilist.php?show_all=yes&amp;surname_sublist=".$indilist_controller->surname_sublist;
 			if ($indilist_controller->allgeds == "yes") print "&amp;allgeds=yes";
-			print "\"><span class=\"warning\">".GM_LANG_all."</span></a>\n";
+			print "\"><span class=\"Warning\">".GM_LANG_all."</span></a>\n";
 		}
 		else {
 			print "<a href=\"indilist.php?show_all=yes&amp;surname_sublist=".$indilist_controller->surname_sublist;
@@ -112,16 +115,14 @@ if (count($indialpha) > 0) {
 		}
 	}
 	if (isset($startalpha)) $indilist_controller->alpha = $startalpha;
+	print "</div>";
 }
 //-- escaped letter for regular expressions
-print "<br /><br />";
 if ($indilist_controller->surname_sublist == "yes" && $indilist_controller->show_all == "yes") {
 	// Get the surnames of all individuals
 	if ($trace) print "option 1";
 	$surnames = $indilist_controller->GetAlphaIndiNames();
-	print "<div class=\"topbar\">".GM_LANG_surnames."</div>\n";
 	$indilist_controller->PrintSurnameList($surnames);
-
 }
 else if ($indilist_controller->surname_sublist == "yes" && $indilist_controller->surname == "" && $indilist_controller->show_all == "no") {
 
@@ -129,7 +130,6 @@ else if ($indilist_controller->surname_sublist == "yes" && $indilist_controller-
 	// NOTE: Get all of the individuals whose last names start with this letter
 	if ($indilist_controller->alpha != "") {
 		$surnames = $indilist_controller->GetAlphaIndiNames();
-		print "<div class=\"topbar\">".GM_LANG_surnames."</div>\n";
 		$indilist_controller->PrintSurnameList($surnames);
 		
 	}
@@ -155,20 +155,17 @@ else {
 	}
 	else {
 		if ($trace) print "option 6";
-		// NOTE: If user wishes to skip surname do not print the surname
-		print "<div class=\"topbar\">";
-		if ($indilist_controller->surname_sublist == "yes" && $indilist_controller->surname == "") print GM_LANG_surnames;
-		else print PrintReady(str_replace("#surname#", NameFunctions::CheckNN($indilist_controller->surname), GM_LANG_indis_with_surname));
-		print "</div>\n";
 		$indilist_controller->PrintPersonList($tindilist, true);
 	}
 }
-
-if ($indilist_controller->alpha != "@" && $indilist_controller->surname == "") {
-	PrintHelpLink("skip_sublist_help", "qm", "skip_surnames");
-	print "<br /><a href=\"indilist.php?alpha=".urlencode($indilist_controller->alpha)."&amp;surname_sublist=".($indilist_controller->surname_sublist == "yes" ? "no" : "yes")."&amp;show_all=".$indilist_controller->show_all;
-	if ($indilist_controller->allgeds == "yes") print "&amp;allgeds=yes";
-	print "\">".($indilist_controller->surname_sublist == "yes" ? GM_LANG_skip_surnames : GM_LANG_show_surnames)."</a>";
+// Show the skip/show surnamelist only if a specific letter is chosen
+if ($indilist_controller->alpha != "" && $indilist_controller->surname == "") {
+	print "<div class=\"IndiFamShowHideSurnameList\">";
+		PrintHelpLink("skip_sublist_help", "qm", "skip_surnames");
+		print "<br /><a href=\"indilist.php?alpha=".urlencode($indilist_controller->alpha)."&amp;surname_sublist=".($indilist_controller->surname_sublist == "yes" ? "no" : "yes")."&amp;show_all=".$indilist_controller->show_all;
+		if ($indilist_controller->allgeds == "yes") print "&amp;allgeds=yes";
+		print "\">".($indilist_controller->surname_sublist == "yes" ? GM_LANG_skip_surnames : GM_LANG_show_surnames)."</a>";
+	print "</div>";
 }
 print "</div>\n";
 PrintFooter();

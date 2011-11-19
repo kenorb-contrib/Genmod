@@ -531,7 +531,7 @@ abstract class GedcomRecord {
 				if (!empty($fact) && !in_array($fact, array($this->exclude_facts)) && PrivacyFunctions::showFact($fact, $this->xref, $this->type) && !PrivacyFunctions::FactViewRestricted($this->xref, $newrec, 2)) {
 					if (!is_array($selection) || in_array($fact, $selection)) {
 						$added = true;
-						$facts[] = new Fact($this->xref, $this->datatype, $this->gedcomid, $fact, $newrec, $count[$fact], "change_new");
+						$facts[] = new Fact($this->xref, $this->datatype, $this->gedcomid, $fact, $newrec, $count[$fact], "ChangeNew");
 						// We also must raise the counters for new links, otherwise the tab on the detail pages won't display
 						if (!is_array($selection)) {
 							if ($fact == "SOUR") $this->sourfacts_count++;
@@ -548,25 +548,25 @@ abstract class GedcomRecord {
 			$newfacts = array();
 			foreach($facts as $key => $factobj) {
 				// For a new fact, always show
-				if ($factobj->style == "change_new") {
+				if ($factobj->style == "ChangeNew") {
 					// but if the record is deleted, show everything as old
-					if ($this->isdeleted) $factobj->style = "change_old";
+					if ($this->isdeleted) $factobj->style = "ChangeOld";
 					$newfacts[] = $factobj;
 				}
 				else {
 					// if anything changed but is not new........
-					if ($factobj->style != "change_new" && ($this->isdeleted || ChangeFunctions::IsChangedFact($this->xref, $factobj->factrec))) {
+					if ($factobj->style != "ChangeNew" && ($this->isdeleted || ChangeFunctions::IsChangedFact($this->xref, $factobj->factrec))) {
 						// if the record is changed, also show the new value
 						$cfact = ChangeFunctions::RetrieveChangedFact($this->xref, $factobj->fact, $factobj->factrec);
 //						if ($factobj->fact == "OBJE") print "cfact: ".$cfact;
 						// if only a fact is changed/deleted.....
 						if (!$this->isdeleted) {
 							// Add the old fact.
-							$factobj->style = "change_old";
+							$factobj->style = "ChangeOld";
 							$newfacts[] = $factobj;
 							// an empty record indicates deletion, so only add the new record if not empty
 							if (!empty($cfact)) {
-								$newfact = new Fact($this->xref, $this->datatype, $this->gedcomid, $factobj->fact, $cfact, $factobj->count, "change_new");
+								$newfact = new Fact($this->xref, $this->datatype, $this->gedcomid, $factobj->fact, $cfact, $factobj->count, "ChangeNew");
 								// add the new fact
 //								print "<br />added:";
 								$newfacts[] = $newfact;
@@ -575,7 +575,7 @@ abstract class GedcomRecord {
 						// The record is deleted. Show the latest visible value of the fact
 						else {
 							if (!empty($cfact)) $factobj->factrec = $cfact;
-							$factobj->style = "change_old";
+							$factobj->style = "ChangeOld";
 							// add the new fact
 							$newfacts[] = $factobj;
 						}

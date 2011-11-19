@@ -94,8 +94,8 @@ class AncestryController extends ChartController {
 		print "<td style=\"vertical-align:middle;\">";
 		if ($sosa>1) ChartFunctions::PrintUrlArrow($person->xref, "?rootid=".$person->xref."&amp;num_generations=".$this->num_generations."&amp;show_details=".$this->show_details."&amp;box_width=".$this->box_width."&amp;chart_style=".$this->chart_style."", GM_LANG_ancestry_chart, 3);
 		print "</td>";
-		print "<td class=\"details1\" style=\"vertical-align:middle;\">&nbsp;<span class=\"PersonBox". (($sosa==1) ? "NN" : (($sosa%2) ? "F" : "")) . "\">&nbsp;$sosa&nbsp;</span>&nbsp;";
-		print "</td><td class=\"details1\" style=\"vertical-align:middle;\">";
+		print "<td class=\"PersonDetails1\" style=\"vertical-align:middle;\">&nbsp;<span class=\"PersonBox". (($sosa==1) ? "NN" : (($sosa%2) ? "F" : "")) . "\">&nbsp;$sosa&nbsp;</span>&nbsp;";
+		print "</td><td class=\"PersonDetails1\" style=\"vertical-align:middle;\">";
 		$relation ="";
 		if (!$new) $relation = "<br />[=<a href=\"#sosa".$pidarr[$person->xref]."\">".$pidarr[$person->xref]."</a> - ".NameFunctions::GetSosaName($pidarr[$person->xref])."]";
 		else $pidarr[$person->xref] = $sosa;
@@ -108,12 +108,13 @@ class AncestryController extends ChartController {
 			if ($family->showprimary || $family->pedigreetype == "") {
 				if (($family->husb_id != "" || $family->wife_id != "" || GedcomConfig::$SHOW_EMPTY_BOXES) && $new && $depth>0) {
 					// print marriage info
-					print "<span class=\"details1\" style=\"white-space: nowrap;\" >";
+					print "<div class=\"PersonDetails1 AncestryListMarrBlock\">";
 					print "<img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["spacer"]["other"]."\" height=\"2\" width=\"$Dindent\" border=\"0\" align=\"middle\" alt=\"\" /><a href=\"javascript: ".GM_LANG_view_family."\" onclick=\"expand_layer('sosa_".$sosa."'); return false;\" class=\"top\"><img id=\"sosa_".$sosa."_img\" src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["minus"]["other"]."\" align=\"middle\" hspace=\"0\" vspace=\"3\" border=\"0\" alt=\"".GM_LANG_view_family."\" /></a> ";
-					print "&nbsp;<span class=\"PersonBox\">&nbsp;".($sosa*2)."&nbsp;</span>&nbsp;".GM_LANG_and;
-			 		print "&nbsp;<span class=\"PersonBoxF\">&nbsp;".($sosa*2+1)." </span>&nbsp;";
+					if ($family->husb_id != "") print "&nbsp;<span class=\"PersonBox\">&nbsp;".($sosa*2)."&nbsp;</span>&nbsp;";
+					if ($family->husb_id != "" && $family->wife_id != "") print GM_LANG_and;
+			 		if ($family->wife_id != "") print "&nbsp;<span class=\"PersonBoxF\">&nbsp;".($sosa*2+1)." </span>&nbsp;";
 					if ($family->disp) FactFunctions::PrintSimpleFact($family->marr_fact, false, false); 
-					print "</span>";
+					print "</div>";
 					// display parents recursively
 					print "<ul style=\"list-style: none; display: block;\" id=\"sosa_$sosa\">";
 					if (is_object($family->husb)) $this->PrintChildAscendancy($family->husb, $sosa*2, $depth-1);

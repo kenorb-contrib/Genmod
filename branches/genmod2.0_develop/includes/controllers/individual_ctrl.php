@@ -350,10 +350,10 @@ class IndividualController extends DetailController {
 					$menu->addSubmenu($submenu);
 				}
 			
-			$menu->addSeperator();
 			}
 		}
 		if ($this->indi->ischanged) {
+			$menu->addSeperator();
 			if (!$this->indi->show_changes) $submenu = new Menu(GM_LANG_show_changes);
 			else $submenu = new Menu(GM_LANG_hide_changes);
 			$submenu->addLink('showchanges();');
@@ -457,14 +457,14 @@ class IndividualController extends DetailController {
 		}
 		if ($this->TOTAL_NAMES>1 && !$this->isPrintPreview() && $this->indi->canedit && $showedit) {
 			if ($this->name_count==2) PrintHelpLink("delete_name_help", "qm", "delete_name");
-	   		print "<a href=\"#\" class=\"font9\" onclick=\"edit_name('".$this->xref."', 'NAME', '".$this->name_count."', 'edit_name'); return false;\">".GM_LANG_edit_name."</a> | ";
-			print "<a class=\"font9\" href=\"#\" onclick=\"delete_record('".$this->xref."', 'NAME', '".$this->name_count."', 'delete_name', 'INDI'); return false;\">".GM_LANG_delete_name."</a>\n";
+	   		print "<a href=\"#\" class=\"SmallEditLinks\" onclick=\"edit_name('".$this->xref."', 'NAME', '".$this->name_count."', 'edit_name'); return false;\">".GM_LANG_edit_name."</a> | ";
+			print "<a class=\"SmallEditLinks\" href=\"#\" onclick=\"delete_record('".$this->xref."', 'NAME', '".$this->name_count."', 'delete_name', 'INDI'); return false;\">".GM_LANG_delete_name."</a>\n";
 			print "<br />\n";
 		}
 		$ct = preg_match("/\d (NOTE)|(SOUR)/", $factrec);
 		if ($ct>0) {
 			// -- find sources for this name
-			print "<div class=\"indent\">";
+			print "<div class=\"Indent\">";
 			FactFunctions::PrintFactSources($factrec, 2);
 			//-- find the notes for this name
 			print "&nbsp;&nbsp;&nbsp;";

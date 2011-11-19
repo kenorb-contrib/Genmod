@@ -114,13 +114,13 @@ class ExternalSearchController {
 		print "<form name=\"selarchive\" method=\"get\" action=\"individual.php\">\n";
 		
 		// 1. Search form title
-		print "<table class=\"width100\">\n";
-		print "<tr><td colspan=\"3\" class=\"NavBlockHeader\">".GM_LANG_external_search."</td></tr>\n";
+		print "<table class=\"NavBlockTable ESearchFormTable\">\n";
+		print "<tr><td colspan=\"2\" class=\"NavBlockHeader\">".GM_LANG_external_search."</td></tr>\n";
 		
 		// 2. Choose search at
 		print "<tr><td class=\"NavBlockLabel\">".GM_LANG_choose."</td>\n";
-		print "<td class=\"NavBlockField\" colspan=\"2\">";
-		print "<select name=\"selsearch\" onchange=\"sndReq('esearchform', 'extsearchformprint', 'pid', '".$this->indi->xref."', 'gedcomid', '".$this->indi->gedcomid."', 'formno', document.selarchive.selsearch.value); document.getElementById('esearchresults').innerHTML='';\">\n";
+		print "<td class=\"NavBlockField\">";
+		print "<select name=\"selsearch\" onchange=\"sndReq('esearchform', 'extsearchformprint', true, 'pid', '".$this->indi->xref."', 'gedcomid', '".$this->indi->gedcomid."', 'formno', document.selarchive.selsearch.value); document.getElementById('esearchresults').innerHTML='';\">\n";
 		foreach ($this->modules as $index => $modobj) {
 			print "<option value=\"".$index."\"";
 			if ($number == $index) print " selected=\"selected\"";
@@ -130,7 +130,7 @@ class ExternalSearchController {
 		
 		if ($module->method != "form") print "<form name=\"extsearch\" method=\"get\" action=\"individual.php\">\n";
 		else print "<form name=\"".$module->formname."\" method=\"post\" action=\"".$module->link."\" target=\"_blank\">\n";
-		print "<table class=\"width100\">\n";
+		print "<table class=\"NavBlockTable ESearchFormTable\">\n";
 		// Print the input fields
 		foreach($module->params as $inputname => $formname) {
 			if ($module->method == "form") $this->PrintInputField($formname, $inputname, (in_array($formname, $module->params_checked)));
@@ -170,7 +170,7 @@ class ExternalSearchController {
 			print "\treturn false;\" />\n";
 		}
 		elseif ($module->method == "SOAP") {
-			print " onclick=\"sndReq('esearchresults', 'extsearchservice', 'formno', '".$number."', 'pid', '".$this->indi->xref."', 'gedcomid', '".$this->indi->gedcomid."'";
+			print " onclick=\"sndReq('esearchresults', 'extsearchservice', true, 'formno', '".$number."', 'pid', '".$this->indi->xref."', 'gedcomid', '".$this->indi->gedcomid."'";
 			foreach($module->params as $inputname => $formname) {
 				print ", '".$inputname."', (document.extsearch.".$formname."_checked".".checked == 1 ? escape(document.extsearch.".$formname.".value) : '')";
 			}

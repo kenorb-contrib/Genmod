@@ -39,40 +39,47 @@ $GM_BLOCKS["print_user_news"]["rss"]        = false;
 function print_user_news($block=true, $config="", $side, $index) {
 	global $TEXT_DIRECTION, $command, $TIME_FORMAT, $gm_user;
 
+	print "<!-- Start User News Block //-->";
 	$usernews = NewsController::getUserNews($gm_user->username);
 
 	print "<div id=\"user_news\" class=\"BlockContainer\">\n";
-	print "<div class=\"BlockHeader\">";
-	PrintHelpLink("mygedview_myjournal_help", "qm", "my_journal");
-	print GM_LANG_my_journal;
+		print "<div class=\"BlockHeader\">";
+			PrintHelpLink("mygedview_myjournal_help", "qm", "my_journal");
+			print GM_LANG_my_journal;
+		print "</div>";
+		print "<div class=\"BlockContent\">";
+			if ($block) print "<div class=\"RestrictedBlockHeightRight\">\n";
+			else print "<div class=\"RestrictedBlockHeightMain\">\n";
+			if (count($usernews)==0) {
+				print "<div class=\"NewsMessage\">".GM_LANG_no_journal."</div>";
+			}
+			foreach($usernews as $key => $news) {
+				$day = date("j", $news->date);
+				$mon = date("M", $news->date);
+				$year = date("Y", $news->date);
+				print "<div class=\"NewsBlockItem\">\n";
+				
+					$news->title = ReplaceEmbedText($news->title);
+					print "<div class=\"NewsBlockTitle\">".PrintReady($news->title)."</div>\n";
+					print "<div class=\"NewsBlockDate\">".GetChangedDate("$day $mon $year")." - ".date($TIME_FORMAT, $news->date)."</div>\n";
+					
+					$news->text = ReplaceEmbedText($news->text);
+					$trans = get_html_translation_table(HTML_SPECIALCHARS);
+					$trans = array_flip($trans);
+					$news->text = strtr($news->text, $trans);
+			//		$news->text = nl2br($news->text);
+					print "<div class=\"NewsBlockText\">".PrintReady($news->text)."</div>\n";
+					print "<div class=\"SmallEditLinks\">";
+						print "<a href=\"#\" onclick=\"editnews('".$news->id."'); return false;\">".GM_LANG_edit."</a> | ";
+						print "<a href=\"index.php?action=deletenews&amp;news_id=".$news->id."&amp;command=$command\" onclick=\"return confirm('".GM_LANG_confirm_journal_delete."');\">".GM_LANG_delete."</a>";
+						print "<hr size=\"1\" />";
+					print "</div>";
+				print "</div>\n";
+			}
+			print "</div>\n";
+		if ($gm_user->username != "") print "<div class=\"SmallEditLinks\"><a href=\"#\" onclick=\"addnews('".$gm_user->username."'); return false;\">".GM_LANG_add_journal."</a></div>\n";
+		print "</div>\n";
 	print "</div>";
-	print "<div class=\"BlockContent\">";
-	if ($block) print "<div class=\"RestrictedBlockHeightRight, $TEXT_DIRECTION\">\n";
-	else print "<div class=\"RestrictedBlockHeightMain\">\n";
-	if (count($usernews)==0) print GM_LANG_no_journal;
-	foreach($usernews as $key => $news) {
-		$day = date("j", $news->date);
-		$mon = date("M", $news->date);
-		$year = date("Y", $news->date);
-		print "<div class=\"PersonBox\">\n";
-		
-		$news->title = ReplaceEmbedText($news->title);
-		print "<span class=\"news_title\">".PrintReady($news->title)."</span><br />\n";
-		print "<span class=\"news_date\">".GetChangedDate("$day $mon $year")." - ".date($TIME_FORMAT, $news->date)."</span><br />\n";
-		
-		$news->text = ReplaceEmbedText($news->text);
-		$trans = get_html_translation_table(HTML_SPECIALCHARS);
-		$trans = array_flip($trans);
-		$news->text = strtr($news->text, $trans);
-//		$news->text = nl2br($news->text);
-		print PrintReady($news->text)."\n";
-		print "<br /><a href=\"#\" onclick=\"editnews('".$news->id."'); return false;\">".GM_LANG_edit."</a> | ";
-		print "<a href=\"index.php?action=deletenews&amp;news_id=".$news->id."&amp;command=$command\" onclick=\"return confirm('".GM_LANG_confirm_journal_delete."');\">".GM_LANG_delete."</a><br />";
-		print "</div><br />\n";
-	}
-	print "</div>\n";
-	if ($gm_user->username != "") print "<br /><a href=\"#\" onclick=\"addnews('".$gm_user->username."'); return false;\">".GM_LANG_add_journal."</a>\n";
-	print "</div>\n";
-	print "</div>";
+	print "<!-- End User News Block //-->";
 }
 ?>

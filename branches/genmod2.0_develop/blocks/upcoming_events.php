@@ -39,6 +39,7 @@ function print_upcoming_events($block=true, $config="", $side, $index) {
 	global $GM_IMAGES, $GM_BLOCKS;
 	global $gm_user;
 
+	print "<!-- Start Upcoming Events Block //-->";
 	$block = true; // Always restrict this block's height
 	if (empty($config)) $config = $GM_BLOCKS["print_upcoming_events"]["config"];
 //	if (!isset(GedcomConfig::$DAYS_TO_SHOW_LIMIT)) GedcomConfig::$DAYS_TO_SHOW_LIMIT = 15;
@@ -59,123 +60,128 @@ function print_upcoming_events($block=true, $config="", $side, $index) {
 	
 	// Output starts here
 	print "<div id=\"upcoming_events\" class=\"BlockContainer\">";
-	print "<div class=\"BlockHeader\">";
-	PrintHelpLink("index_events_help", "qm", "upcoming_events");
-	if ($GM_BLOCKS["print_upcoming_events"]["canconfig"]) {
-		if ((($command=="gedcom")&&($gm_user->userGedcomAdmin())) || (($command=="user")&&($gm_user->username != ""))) {
-			if ($command=="gedcom") $name = preg_replace("/'/", "\'", get_gedcom_from_id(GedcomConfig::$GEDCOMID));
-			else $name = $gm_user->username;
-			print "<a href=\"javascript: ".GM_LANG_config_block."\" onclick=\"window.open('index_edit.php?name=$name&amp;command=$command&amp;action=configure&amp;side=$side&amp;index=$index', '', 'top=50,left=50,width=500,height=250,scrollbars=1,resizable=1'); return false;\">";
-			print "<img class=\"adminicon\" src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["admin"]["small"]."\" width=\"15\" height=\"15\" border=\"0\" alt=\"".GM_LANG_config_block."\" /></a>\n";
-		}
-	}
-	print GM_LANG_upcoming_events;
-	print "</div>";
-	print "<div class=\"BlockContent\" >";
-	if ($block) print "<div class=\"RestrictedBlockHeightRight\">\n";
-	else print "<div class=\"RestrictedBlockHeightMain\">\n";
-	
-	$OutputDone = false;
-	$PrivateFacts = false;
-	$lastgid="";
-//	print "Facts found: ".count($found_facts)."<br />";
-
-	// Cache the selected indi's and fams in the indilist and famlist
-	$selindi = array();
-	$selfam = array();
-	foreach($found_facts as $key=>$factarr) {
-		if ($factarr[2] == "INDI") $selindi[] = $factarr[0];
-		if ($factarr[2] == "FAM") $selfam[] = $factarr[0];
-	}
-	
-	$selindi = implode("[".GedcomConfig::$GEDCOMID."]','", $selindi);
-	$selindi .= "[".GedcomConfig::$GEDCOMID."]'";
-	$selindi = "'".$selindi;
-	ListFunctions::GetIndiList("no", $selindi);
-	$selfam = implode("[".GedcomConfig::$GEDCOMID."]','", $selfam);
-	$selfam .= "[".GedcomConfig::$GEDCOMID."]'";
-	$selfam = "'".$selfam;
-	ListFunctions::GetFamList("no", $selfam);
-	
-	foreach($found_facts as $key=>$factarr) {
-		$datestamp = $factarr[3];
-		if ($factarr[2]=="INDI") {
-			$person =& Person::GetInstance($factarr[0], "", GedcomConfig::$GEDCOMID);
-			$fact = new Fact($factarr[0], $factarr[2], GedcomConfig::$GEDCOMID, $factarr[6], $factarr[1]);
-			$gid = $factarr[0];
-			$factrec = $factarr[1];
-			if ($person->disp && $fact->disp) {
-				$text = FactFunctions::GetCalendarFact($fact, $action, $filter);
-				if ($text!="filter") {
-					if ($lastgid!=$gid) {
-						if ($lastgid != "") print "<br />";
-						print "<a href=\"individual.php?pid=$gid&amp;gedid=".GedcomConfig::$GEDCOMID."\"><b>";
-						print PrintReady($person->revname.($person->revaddname == "" ? "" : " (".$person->revaddname.")"))."</b>";
-						print "<img id=\"box-".$gid."-".$key."-sex\" src=\"".GM_IMAGE_DIR."/";
-						if ($factarr[5] == "M") print $GM_IMAGES["sex"]["small"]."\" title=\"".GM_LANG_male."\" alt=\"".GM_LANG_male;
-						else if ($factarr[5] == "F") print $GM_IMAGES["sexf"]["small"]."\" title=\"".GM_LANG_female."\" alt=\"".GM_LANG_female;
-						else print $GM_IMAGES["sexn"]["small"]."\" title=\"".GM_LANG_unknown."\" alt=\"".GM_LANG_unknown;
-						print "\" class=\"sex_image\" />";
-						print $person->addxref;
-						print "</a><br />\n";
-						$lastgid = $gid;
-					}
-					print "<div class=\"indent" . ($TEXT_DIRECTION=="rtl"?"_rtl":"") . "\">";
-					print $text;
-					print "</div>";
-					$OutputDone = true;
+		print "<div class=\"BlockHeader\">";
+			PrintHelpLink("index_events_help", "qm", "upcoming_events");
+			if ($GM_BLOCKS["print_upcoming_events"]["canconfig"]) {
+				if ((($command=="gedcom")&&($gm_user->userGedcomAdmin())) || (($command=="user")&&($gm_user->username != ""))) {
+					if ($command=="gedcom") $name = preg_replace("/'/", "\'", get_gedcom_from_id(GedcomConfig::$GEDCOMID));
+					else $name = $gm_user->username;
+					print "<a href=\"javascript: ".GM_LANG_config_block."\" onclick=\"window.open('index_edit.php?name=$name&amp;command=$command&amp;action=configure&amp;side=$side&amp;index=$index', '', 'top=50,left=50,width=500,height=250,scrollbars=1,resizable=1'); return false;\">";
+					BlockFunctions::PrintAdminIcon();
+					print "</a>";
 				}
 			}
-			else $PrivateFacts = true;
-		}
-
-		if ($factarr[2]=="FAM") {
-			$family =& Family::GetInstance($factarr[0], "", GedcomConfig::$GEDCOMID);
-			$fact = new Fact($factarr[0], $factarr[2], GedcomConfig::$GEDCOMID, $factarr[6], $factarr[1]);
-			if ($family->disp && $fact->disp) {
-				$text = FactFunctions::GetCalendarFact($fact, $action, $filter);
-				if ($text!="filter") {
-					if ($lastgid!=$factarr[0]) {
-						if ($lastgid != "") print "<br />";
-						print "<a href=\"family.php?famid=".$family->xref."&amp;gedid=".$family->gedcomid."\"><b>";
-						print PrintReady($family->sortable_name.($family->sortable_addname == "" ? "" : "(".$family->sortable_addname.")"));
-						print "</b>";
-						print $family->addxref;
-						print "</a><br />\n";
-						$lastgid = $family->xref;
-					}
-					print "<div class=\"indent" . ($TEXT_DIRECTION=="rtl"?"_rtl":"") . "\">";
-					print $text;
-					print "</div>";
-					$OutputDone = true;
+			print GM_LANG_upcoming_events;
+		print "</div>";
+		print "<div class=\"BlockContent\" >";
+			if ($block) print "<div class=\"RestrictedBlockHeightRight\">\n";
+			else print "<div class=\"RestrictedBlockHeightMain\">\n";
+			
+				$OutputDone = false;
+				$PrivateFacts = false;
+				$lastgid="";
+			//	print "Facts found: ".count($found_facts)."<br />";
+			
+				// Cache the selected indi's and fams in the indilist and famlist
+				$selindi = array();
+				$selfam = array();
+				foreach($found_facts as $key=>$factarr) {
+					if ($factarr[2] == "INDI") $selindi[] = $factarr[0];
+					if ($factarr[2] == "FAM") $selfam[] = $factarr[0];
 				}
-			}
-			else $PrivateFacts = true;
-		}
-	}
-	
-	if ($PrivateFacts) { // Facts were found but not printed for some reason
-		// 4 is upcoming
-		define("GM_LANG_global_num4",$daysprint);
-		$Advisory = "no_events_privacy";
-		if ($OutputDone) $Advisory = "more_events_privacy";
-		if ($daysprint==1) $Advisory .= "1";
-		print "<b>";
-		PrintText($Advisory);
-		print "</b><br />";
-	} 
-	else if (!$OutputDone) { // No Facts were found
-		define("GM_LANG_global_num4", $daysprint);
-		$Advisory = "no_events_" . $config["filter"];
-		if ($daysprint==1) $Advisory .= "1";
-		print "<b>";
-		PrintText($Advisory);
-		print "</b><br />";
-	}
-
-	print "</div>\n";
-	print "</div>"; // blockcontent
+				
+				$selindi = implode("[".GedcomConfig::$GEDCOMID."]','", $selindi);
+				$selindi .= "[".GedcomConfig::$GEDCOMID."]'";
+				$selindi = "'".$selindi;
+				ListFunctions::GetIndiList("no", $selindi);
+				$selfam = implode("[".GedcomConfig::$GEDCOMID."]','", $selfam);
+				$selfam .= "[".GedcomConfig::$GEDCOMID."]'";
+				$selfam = "'".$selfam;
+				ListFunctions::GetFamList("no", $selfam);
+				
+				foreach($found_facts as $key=>$factarr) {
+					$datestamp = $factarr[3];
+					if ($factarr[2]=="INDI") {
+						$person =& Person::GetInstance($factarr[0], "", GedcomConfig::$GEDCOMID);
+						$fact = new Fact($factarr[0], $factarr[2], GedcomConfig::$GEDCOMID, $factarr[6], $factarr[1]);
+						$gid = $factarr[0];
+						$factrec = $factarr[1];
+						if ($person->disp && $fact->disp) {
+							$text = FactFunctions::GetCalendarFact($fact, $action, $filter);
+							if ($text!="filter") {
+								if ($lastgid!=$gid) {
+									//if ($lastgid != "") print "<br />";
+									print "<div class=\"UpcomingEventsLink\">";
+										print "<a href=\"individual.php?pid=$gid&amp;gedid=".GedcomConfig::$GEDCOMID."\"><span class=\"UpcomingEventsName\">";
+										print PrintReady($person->revname.($person->revaddname == "" ? "" : " (".$person->revaddname.")"))."</span>";
+										print "<img id=\"box-".$gid."-".$key."-sex\" src=\"".GM_IMAGE_DIR."/";
+										if ($factarr[5] == "M") print $GM_IMAGES["sex"]["small"]."\" title=\"".GM_LANG_male."\" alt=\"".GM_LANG_male;
+										else if ($factarr[5] == "F") print $GM_IMAGES["sexf"]["small"]."\" title=\"".GM_LANG_female."\" alt=\"".GM_LANG_female;
+										else print $GM_IMAGES["sexn"]["small"]."\" title=\"".GM_LANG_unknown."\" alt=\"".GM_LANG_unknown;
+										print "\" class=\"SexImage\" />";
+										print $person->addxref;
+										print "</a>";
+									print "</div>\n";
+									$lastgid = $gid;
+								}
+								print "<div class=\"UpcomingEventsFact\">";
+									print $text;
+								print "</div>";
+								$OutputDone = true;
+							}
+						}
+						else $PrivateFacts = true;
+					}
+			
+					if ($factarr[2]=="FAM") {
+						$family =& Family::GetInstance($factarr[0], "", GedcomConfig::$GEDCOMID);
+						$fact = new Fact($factarr[0], $factarr[2], GedcomConfig::$GEDCOMID, $factarr[6], $factarr[1]);
+						if ($family->disp && $fact->disp) {
+							$text = FactFunctions::GetCalendarFact($fact, $action, $filter);
+							if ($text!="filter") {
+								if ($lastgid!=$factarr[0]) {
+//									if ($lastgid != "") print "<br />";
+									print "<div class=\"UpcomingEventsLink\">";
+										print "<a href=\"family.php?famid=".$family->xref."&amp;gedid=".$family->gedcomid."\"><span class=\"UpcomingEventsName\">";
+										print PrintReady($family->sortable_name.($family->sortable_addname == "" ? "" : "(".$family->sortable_addname.")"))."</span>";
+										print $family->addxref;
+										print "</a>";
+									print "</div>\n";
+									$lastgid = $family->xref;
+								}
+								print "<div class=\"UpcomingEventsFact\">";
+									print $text;
+								print "</div>";
+								$OutputDone = true;
+							}
+						}
+						else $PrivateFacts = true;
+					}
+				}
+				
+				if ($PrivateFacts) { // Facts were found but not printed for some reason
+					// 4 is upcoming
+					define("GM_LANG_global_num4",$daysprint);
+					$Advisory = "no_events_privacy";
+					if ($OutputDone) $Advisory = "more_events_privacy";
+					if ($daysprint==1) $Advisory .= "1";
+					print "<div class=\"UpcomingEventsMessage\">";
+						PrintText($Advisory);
+					print "</div>";
+				} 
+				else if (!$OutputDone) { // No Facts were found
+					define("GM_LANG_global_num4", $daysprint);
+					$Advisory = "no_events_" . $config["filter"];
+					if ($daysprint==1) $Advisory .= "1";
+					print "<div class=\"UpcomingEventsMessage\">";
+						PrintText($Advisory);
+					print "</div>";
+				}
+			
+			print "</div>\n";
+		print "</div>"; // blockcontent
 	print "</div>"; // block
+	print "<!-- End Upcoming Events Block //-->";
 }
 
 function print_upcoming_events_config($config) {
@@ -190,16 +196,16 @@ function print_upcoming_events_config($config) {
 	if ($config["days"] < 1) $config["days"] = 1;
 	if ($config["days"] > GedcomConfig::$DAYS_TO_SHOW_LIMIT) $config["days"] = GedcomConfig::$DAYS_TO_SHOW_LIMIT; // valid: 1 to limit
 
-	print "<tr><td class=\"shade2 width20\">";
+	print "<tr><td class=\"NavBlockLabel\">";
 	PrintHelpLink("days_to_show_help", "qm");
 	print GM_LANG_days_to_show."</td>";?>
-	<td class="shade1">
+	<td class="NavBlockField">
 		<input type="text" name="days" size="2" value="<?php print $config["days"]; ?>" />
 	</td></tr>
 
 	<?php
- 	print "<tr><td class=\"shade2 width20\">".GM_LANG_living_or_all."</td>";?>
-	<td class="shade1">
+ 	print "<tr><td class=\"NavBlockLabel\">".GM_LANG_living_or_all."</td>";?>
+	<td class="NavBlockField">
 	<select name="filter">
 		<option value="all"<?php if ($config["filter"]=="all") print " selected=\"selected\"";?>><?php print GM_LANG_no; ?></option>
 		<option value="living"<?php if ($config["filter"]=="living") print " selected=\"selected\"";?>><?php print GM_LANG_yes; ?></option>
@@ -207,10 +213,10 @@ function print_upcoming_events_config($config) {
 	</td></tr>
 
 	<?php
- 	print "<tr><td class=\"shade2 width20\">";
+ 	print "<tr><td class=\"NavBlockLabel\">";
 	PrintHelpLink("basic_or_all_help", "qm");
 	print GM_LANG_basic_or_all."</td>";?>
-	<td class="shade1">
+	<td class="NavBlockField">
 	<select name="onlyBDM">
  	<option value="no"<?php if ($config["onlyBDM"]=="no") print " selected=\"selected\"";?>><?php print GM_LANG_no; ?></option>
  	<option value="yes"<?php if ($config["onlyBDM"]=="yes") print " selected=\"selected\"";?>><?php print GM_LANG_yes; ?></option>

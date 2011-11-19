@@ -52,13 +52,9 @@ print "</span>";
 
 <script language="JavaScript" type="text/javascript">
 <!--
-	var pasteto;
-	function open_find(textbox) {
-		pasteto = textbox;
-		findwin = window.open('find.php?type=indi', '', 'left=50,top=50,width=850,height=450,resizable=1,scrollbars=1');
-	}
+	var pastefield;
 	function paste_id(value) {
-		pasteto.value=value;
+		pastefield.value=value;
 	}
 //-->
 </script>

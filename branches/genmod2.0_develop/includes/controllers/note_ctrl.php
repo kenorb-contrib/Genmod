@@ -199,7 +199,7 @@ class NoteController extends DetailController {
 		if (!$this->note->disp) return false;
 
 		if (($this->note->textchanged || $this->note->isdeleted) && $this->note->show_changes && !($this->view == "preview")) {
-			$styleadd = "change_old";
+			$styleadd = "ChangeOld";
 			print "\n\t\t<tr><td class=\"FactLabelCell $styleadd\"><img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["note"]["other"]."\" width=\"50\" height=\"50\" alt=\"\" /><br />".GM_LANG_note.":";
 			print " </td>\n<td class=\"FactDetailCell $styleadd\">";
 			if (PrivacyFunctions::showFactDetails("NOTE", $this->note->xref)) {
@@ -216,10 +216,10 @@ class NoteController extends DetailController {
 			}
 			print "</td></tr>";
 		}
-		if (($this->note->textchanged || $this->note->isnew) && !$this->note->isdeleted && $this->show_changes && !($this->view == "preview")) $styleadd = "change_new";
+		if (($this->note->textchanged || $this->note->isnew) && !$this->note->isdeleted && $this->show_changes && !($this->view == "preview")) $styleadd = "ChangeNew";
 		if (!$this->note->isdeleted || !$this->show_changes) {
 			print "\n\t\t<tr><td class=\"FactLabelCell $styleadd\"><img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["note"]["other"]."\" width=\"50\" height=\"50\" alt=\"\" /><br />".GM_LANG_note.":";
-			if ($this->note->canedit && ($styleadd!="change_old")&&($this->view != "preview")&& $mayedit) {
+			if ($this->note->canedit && ($styleadd!="ChangeOld")&&($this->view != "preview")&& $mayedit) {
 				$menu = array();
 				$menu["label"] = GM_LANG_edit;
 				$menu["labelpos"] = "right";
@@ -250,13 +250,13 @@ class NoteController extends DetailController {
 				$submenu["hoverclass"] = "submenuitem_hover";
 				$menu["items"][] = $submenu;
 				// No delete option. A note cannot be without text!
-				print " <div style=\"width:25px;\" class=\"center\">";
+				print "<div class=\"FactLabelCellEdit\">";
 				FactFunctions::PrintFactMenu($menu);
 				print "</div>";
 			}
 			print " </td>\n<td class=\"FactDetailCell $styleadd\">";
 			if (PrivacyFunctions::showFactDetails("NOTE", $this->note->xref)) {
-				if ($styleadd == "change_new") print PrintReady($this->note->GetNoteText(true))."<br />\n";
+				if ($styleadd == "ChangeNew") print PrintReady($this->note->GetNoteText(true))."<br />\n";
 				else print PrintReady($this->note->GetNoteText())."<br />\n";
 				// See if RESN tag prevents display or edit/delete
 			 	$resn_tag = preg_match("/2 RESN (.*)/", $this->note->gedrec, $match);

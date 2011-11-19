@@ -136,42 +136,33 @@ class EditLangController extends BaseController {
 	}
 	
 	public function ShowLanguageCompare($lang1, $lang2, $facts = false, $help = false) {
-		print "<span class=\"SubHeader\">".GM_LANG_additions.":</span>";
+		print "<tr><td colspan=\"2\" class=\"NavBlockColumnHeader AdminNavBlockColumnHeader\">".GM_LANG_additions.":</td></tr>";
 		$count=0;
-		$colorid = 1;
 		foreach($lang1 as $key=>$value) {
 			if (!array_key_exists($key, $lang2)) {
-				print "<div class=\"language_item_box".$colorid."\">\n";
-				print "<div class=\"original_language width40\">";
+				print "<tr><td class=\"NavBlockLabel AdminNavBlockLabel\">\n";
 				print $key;
-				print "</div>\n";
-				print "<div class=\"translated_language\">".$value."</div>";
+				print "</td>\n";
+				print "<td class=\"NavBlockField\">".$value."</td></tr>";
 				$count++;
-				if ($colorid == 2) $colorid = 1;
-				else $colorid++;
-				print "</div>\n";
 			}
 		}
-		if ($count==0) print "<div class=\"shade1\">".GM_LANG_no_additions."</div>";
-		print "<span class=\"SubHeader\">".GM_LANG_subtractions.":</span>";
+		if ($count==0) print "<tr><td colspan=\"2\" class=\"NavBlockLabel AdminNavBlockLabel\">".GM_LANG_no_additions."</td></tr>";
+		
+		print "<tr><td colspan=\"2\" class=\"NavBlockColumnHeader AdminNavBlockColumnHeader\">".GM_LANG_subtractions.":</td></tr>";
 		$count = 0;
-		$colorid = 1;
 		foreach($lang2 as $key=>$value) {
 			if (!array_key_exists($key, $lang1)) {
-				print "<div class=\"language_item_box".$colorid."\">\n";
-				print "<div class=\"original_language\">\n";
+				print "<tr><td class=\"NavBlockLabel AdminNavBlockLabel\">\n";
 				if (!$facts && !$help) print constant("GM_LANG_".$key);
 				else if ($facts) print constant("GM_FACT_".$key);
 				else if ($help) print $this->langhelp[$key];
-				print "</div>\n";
-				print "<div class=\"translated_language\">".$value."</div>";
+				print "</td>\n";
+				print "<td class=\"NavBlockField\">".$value."</td></tr>";
 				$count++;
-				if ($colorid == 2) $colorid = 1;
-				else $colorid++;
-				print "</div>\n";
 			}
 		}
-		if ($count==0) print "<div class=\"shade1\">".GM_LANG_no_subtractions."</div>";
+		if ($count==0) print "<tr><td colspan=\"2\" class=\"NavBlockLabel AdminNavBlockLabel\">".GM_LANG_no_subtractions."</td></tr>";
 	}
 }
 ?>

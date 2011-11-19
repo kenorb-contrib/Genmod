@@ -56,7 +56,7 @@ PrintHeader("Theme editor");
 				$themes = GetThemeNames();
 				foreach($themes as $indexval => $themedir) {
 					print "<option value=\"".$themedir["dir"]."\"";
-					if ($themedir["dirs == $choose_theme) print " selected=\"selected\"";
+					if ($themedir["dir"] == $choose_theme) print " selected=\"selected\"";
 					print ">".$themedir["name"]."</option>\n";
 				}
 			?>
