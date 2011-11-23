@@ -350,35 +350,35 @@ if ($action=="update") {
 	<div id="general-privacy-options" style="display: block">
 	<table class="NavBlockTable AdminNavBlockTable">
 	<tr>
-		<td class="NavBlockLabel AdminNavBlockLabel"><?php PrintHelpLink("PRIVACY_BY_RESN_help", "qm", "PRIVACY_BY_RESN"); print GM_LANG_PRIVACY_BY_RESN; ?>
+		<td class="NavBlockLabel AdminNavBlockLabel"><div class="HelpIconContainer"><?php PrintHelpLink("PRIVACY_BY_RESN_help", "qm", "PRIVACY_BY_RESN"); print "</div>".GM_LANG_PRIVACY_BY_RESN; ?>
 		</td>
 		<td class="NavBlockField AdminNavBlockField">
 		<select size="1" name="v_PRIVACY_BY_RESN"><?php WriteYesNo($PRIVACY_BY_RESN); ?></select>
 		</td>
 	</tr>
 	<tr>
-		<td class="NavBlockLabel AdminNavBlockLabel"><?php PrintHelpLink("SHOW_SOURCES_help", "qm", "SHOW_SOURCES"); print GM_LANG_SHOW_SOURCES; ?>
+		<td class="NavBlockLabel AdminNavBlockLabel"><div class="HelpIconContainer"><?php PrintHelpLink("SHOW_SOURCES_help", "qm", "SHOW_SOURCES"); print "</div>".GM_LANG_SHOW_SOURCES; ?>
 		</td>
 		<td class="NavBlockField AdminNavBlockField">
 		<select size="1" name="v_SHOW_SOURCES"><?php WriteAccessOption($SHOW_SOURCES); ?></select>
 		</td>
 	</tr>
 	<tr>
-		<td class="NavBlockLabel AdminNavBlockLabel"><?php PrintHelpLink("LINK_PRIVACY_help", "qm", "LINK_PRIVACY"); print GM_LANG_LINK_PRIVACY; ?>
+		<td class="NavBlockLabel AdminNavBlockLabel"><div class="HelpIconContainer"><?php PrintHelpLink("LINK_PRIVACY_help", "qm", "LINK_PRIVACY"); print "</div>".GM_LANG_LINK_PRIVACY; ?>
 		</td>
 		<td class="NavBlockField AdminNavBlockField">
 		<select size="1" name="v_LINK_PRIVACY"><?php WriteYesNo($LINK_PRIVACY); ?></select>
 		</td>
 	</tr>
 	<tr>
-		<td class="NavBlockLabel AdminNavBlockLabel"><?php PrintHelpLink("ENABLE_CLIPPINGS_CART_help", "qm", "ENABLE_CLIPPINGS_CART"); print GM_LANG_ENABLE_CLIPPINGS_CART; ?>
+		<td class="NavBlockLabel AdminNavBlockLabel"><div class="HelpIconContainer"><?php PrintHelpLink("ENABLE_CLIPPINGS_CART_help", "qm", "ENABLE_CLIPPINGS_CART"); print "</div>".GM_LANG_ENABLE_CLIPPINGS_CART; ?>
 		</td>
 		<td class="NavBlockField AdminNavBlockField">
 		<select size="1" name="v_ENABLE_CLIPPINGS_CART"><?php WriteAccessOption($ENABLE_CLIPPINGS_CART); ?></select>
 		</td>
 	</tr>
 	<tr>
-		<td class="NavBlockLabel AdminNavBlockLabel"><?php PrintHelpLink("SHOW_RESEARCH_LOG_help", "qm", "SHOW_RESEARCH_LOG"); print GM_LANG_SHOW_RESEARCH_LOG; ?>
+		<td class="NavBlockLabel AdminNavBlockLabel"><div class="HelpIconContainer"><?php PrintHelpLink("SHOW_RESEARCH_LOG_help", "qm", "SHOW_RESEARCH_LOG"); print "</div>".GM_LANG_SHOW_RESEARCH_LOG; ?>
 		</td>
 		<td class="NavBlockField AdminNavBlockField">
 		<select size="1" name="v_SHOW_ACTION_LIST"><?php WriteAccessOption($SHOW_ACTION_LIST); ?></select>
@@ -405,27 +405,27 @@ if ($action=="update") {
 	<div id="age-privacy-options" style="display: none">
 	<table class="NavBlockTable AdminNavBlockTable">
 	<tr>
-		<td class="NavBlockLabel AdminNavBlockLabel"><?php PrintHelpLink("HIDE_LIVE_PEOPLE_help", "qm", "HIDE_LIVE_PEOPLE"); print GM_LANG_HIDE_LIVE_PEOPLE;?></td>
+		<td class="NavBlockLabel AdminNavBlockLabel"><div class="HelpIconContainer"><?php PrintHelpLink("HIDE_LIVE_PEOPLE_help", "qm", "HIDE_LIVE_PEOPLE"); print "</div>".GM_LANG_HIDE_LIVE_PEOPLE;?></td>
 		<td class="NavBlockField AdminNavBlockField">
 			<select size="1" name="v_HIDE_LIVE_PEOPLE"><?php WriteAccessOption($HIDE_LIVE_PEOPLE); ?></select>
 		</td>
 	</tr>
 	<tr>
-		<td class="NavBlockLabel AdminNavBlockLabel"><?php PrintHelpLink("SHOW_DEAD_PEOPLE_help", "qm", "SHOW_DEAD_PEOPLE"); print GM_LANG_SHOW_DEAD_PEOPLE; ?>
+		<td class="NavBlockLabel AdminNavBlockLabel"><div class="HelpIconContainer"><?php PrintHelpLink("SHOW_DEAD_PEOPLE_help", "qm", "SHOW_DEAD_PEOPLE"); print "</div>".GM_LANG_SHOW_DEAD_PEOPLE; ?>
 		</td>
 		<td class="NavBlockField AdminNavBlockField">
 		<select size="1" name="v_SHOW_DEAD_PEOPLE"><?php WriteAccessOption($SHOW_DEAD_PEOPLE); ?></select>
 		</td>
 	</tr>
 	<tr>
-		<td class="NavBlockLabel AdminNavBlockLabel"><?php PrintHelpLink("SHOW_LIVING_NAMES_help", "qm", "SHOW_LIVING_NAMES"); print GM_LANG_SHOW_LIVING_NAMES; ?>
+		<td class="NavBlockLabel AdminNavBlockLabel"><div class="HelpIconContainer"><?php PrintHelpLink("SHOW_LIVING_NAMES_help", "qm", "SHOW_LIVING_NAMES"); print "</div>".GM_LANG_SHOW_LIVING_NAMES; ?>
 		</td>
 		<td class="NavBlockField AdminNavBlockField">
 		<select size="1" name="v_SHOW_LIVING_NAMES"><?php WriteAccessOption($SHOW_LIVING_NAMES); ?></select>
 		</td>
 	</tr>
 	<tr>
-		<td class="NavBlockLabel AdminNavBlockLabel"><?php PrintHelpLink("PRIVACY_BY_YEAR_help", "qm", "PRIVACY_BY_YEAR"); print GM_LANG_PRIVACY_BY_YEAR; ?>
+		<td class="NavBlockLabel AdminNavBlockLabel"><div class="HelpIconContainer"><?php PrintHelpLink("PRIVACY_BY_YEAR_help", "qm", "PRIVACY_BY_YEAR"); print "</div>".GM_LANG_PRIVACY_BY_YEAR; ?>
 		</td>
 		<td class="NavBlockField AdminNavBlockField">
 		<select size="1" name="v_PRIVACY_BY_YEAR"><?php WriteYesNo($PRIVACY_BY_YEAR); ?></select>
@@ -433,7 +433,7 @@ if ($action=="update") {
 	</tr>
 	
 	<tr>
-		<td class="NavBlockLabel AdminNavBlockLabel"><?php PrintHelpLink("USE_RELATIONSHIP_PRIVACY_help", "qm", "USE_RELATIONSHIP_PRIVACY"); print GM_LANG_USE_RELATIONSHIP_PRIVACY; ?>
+		<td class="NavBlockLabel AdminNavBlockLabel"><div class="HelpIconContainer"><?php PrintHelpLink("USE_RELATIONSHIP_PRIVACY_help", "qm", "USE_RELATIONSHIP_PRIVACY"); print "</div>".GM_LANG_USE_RELATIONSHIP_PRIVACY; ?>
 		</td>
 		<td class="NavBlockField AdminNavBlockField">
 		<select size="1" name="v_USE_RELATIONSHIP_PRIVACY"><?php WriteYesNo($USE_RELATIONSHIP_PRIVACY); ?></select>
@@ -441,7 +441,7 @@ if ($action=="update") {
 	</tr>
 
 	<tr>
-		<td class="NavBlockLabel AdminNavBlockLabel"><?php PrintHelpLink("MAX_RELATION_PATH_LENGTH_help", "qm", "MAX_RELATION_PATH_LENGTH"); print GM_LANG_MAX_RELATION_PATH_LENGTH; ?>
+		<td class="NavBlockLabel AdminNavBlockLabel"><div class="HelpIconContainer"><?php PrintHelpLink("MAX_RELATION_PATH_LENGTH_help", "qm", "MAX_RELATION_PATH_LENGTH"); print "</div>".GM_LANG_MAX_RELATION_PATH_LENGTH; ?>
 		</td>
 		<td class="NavBlockField AdminNavBlockField">
 		<select size="1" name="v_MAX_RELATION_PATH_LENGTH"><?php
@@ -457,14 +457,14 @@ if ($action=="update") {
 	</tr>
 
 	<tr>
-		<td class="NavBlockLabel AdminNavBlockLabel"><?php PrintHelpLink("CHECK_MARRIAGE_RELATIONS_help", "qm", "CHECK_MARRIAGE_RELATIONS"); print GM_LANG_CHECK_MARRIAGE_RELATIONS; ?>
+		<td class="NavBlockLabel AdminNavBlockLabel"><div class="HelpIconContainer"><?php PrintHelpLink("CHECK_MARRIAGE_RELATIONS_help", "qm", "CHECK_MARRIAGE_RELATIONS"); print "</div>".GM_LANG_CHECK_MARRIAGE_RELATIONS; ?>
 		</td>
 		<td class="NavBlockField AdminNavBlockField">
 		<select size="1" name="v_CHECK_MARRIAGE_RELATIONS"><?php WriteYesNo($CHECK_MARRIAGE_RELATIONS); ?></select>
 		</td>
 	</tr>
 	<tr>
-		<td class="NavBlockLabel AdminNavBlockLabel"><?php PrintHelpLink("CHECK_CHILD_DATES_help", "qm", "CHECK_CHILD_DATES"); print GM_LANG_CHECK_CHILD_DATES;?></td>
+		<td class="NavBlockLabel AdminNavBlockLabel"><div class="HelpIconContainer"><?php PrintHelpLink("CHECK_CHILD_DATES_help", "qm", "CHECK_CHILD_DATES"); print "</div>".GM_LANG_CHECK_CHILD_DATES;?></td>
 		<td class="NavBlockField AdminNavBlockField"><select name="v_CHECK_CHILD_DATES">
 				<option value="yes" <?php if ($CHECK_CHILD_DATES) print "selected=\"selected\""; ?>><?php print GM_LANG_yes;?></option>
 				<option value="no" <?php if (!$CHECK_CHILD_DATES) print "selected=\"selected\""; ?>><?php print GM_LANG_no;?></option>
@@ -473,7 +473,7 @@ if ($action=="update") {
 	</tr>
 	
 	<tr>
-		<td class="NavBlockLabel AdminNavBlockLabel"><?php PrintHelpLink("MAX_ALIVE_AGE_help", "qm", "MAX_ALIVE_AGE"); print GM_LANG_MAX_ALIVE_AGE?>
+		<td class="NavBlockLabel AdminNavBlockLabel"><div class="HelpIconContainer"><?php PrintHelpLink("MAX_ALIVE_AGE_help", "qm", "MAX_ALIVE_AGE"); print "</div>".GM_LANG_MAX_ALIVE_AGE?>
 		</td>
 		<td class="NavBlockField AdminNavBlockField"><input type="text" name="v_MAX_ALIVE_AGE" value="<?php print $MAX_ALIVE_AGE?>" size="5"/>
 		</td>

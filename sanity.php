@@ -71,6 +71,9 @@ $error_icon = "<img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["log"]["error"]."\" alt=
 </div>
 <div id="AdminColumnMiddle">
 	<form action="<?php print SCRIPT_NAME; ?>" method="post">
+	<?php if (empty($action)) {
+		?><input type="hidden" name="action" value="checksanity" /> <?php
+	} ?>
 	<table class="NavBlockTable AdminNavBlockTable">
 		<tr>
 			<td colspan="2" class="NavBlockHeader AdminNavBlockHeader"><div class="AdminNavBlockTitle"><?php print GM_LANG_sc_sanity_check;?></div></td>
@@ -80,7 +83,6 @@ $error_icon = "<img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["log"]["error"]."\" alt=
 if (empty($action)) {
 	?>
 
-	<input type="hidden" name="action" value="checksanity" />
 		<tr>
 			<td colspan="2" class="NavBlockHeader"><?php print GM_LANG_options; ?></td>
 		</tr>

@@ -225,13 +225,13 @@ function paste_id(value) {
 					print " />";
 				}
 				if ($input["type"]=="select") {
-					print "<select name=\"vars[".$input["name"]."]\" id=\"".$input["name"]." var\">\n";
+					print "<select name=\"vars[".$input["name"]."]\" id=\"".$input["name"]."var\">\n";
 					$options = preg_split("/[, ]+/", $input["options"]);
 					foreach($options as $indexval => $option) {
 						print "\t<option value=\"$option\"";
 //LERMAN - add ability to have a selected item
 						if (isset($input["default"]) && ($input["default"] == $option)) {
-							print " SELECTED=selected";
+							print " selected=\"selected\"";
 						}
 						print ">";
 						if (defined("GM_LANG_".$option)) print constant("GM_LANG_".$option);

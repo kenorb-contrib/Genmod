@@ -709,7 +709,7 @@ abstract class PersonFunctions {
 		   	PersonFunctions::PrintPedigreePerson($child, 1, $show_full, 0, 1, $view);
 		   	print "</td></tr>\n";
 	   	}
-		print "</table><br />";
+		print "</table>";
 	}
 	
 	/**

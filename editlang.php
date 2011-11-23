@@ -59,10 +59,10 @@ switch ($el_controller->action) {
 	case 'debug':
 		?>
 		<form name="debug_form" method="post" action="editlang.php">
-		<table class="NavBlockTable AdminNavBlockTable">
 		<input type="hidden" name="page" value="editlang" />
 		<input type="hidden" name="action" value="debug" />
 		<input type="hidden" name="execute" value="true" />
+		<table class="NavBlockTable AdminNavBlockTable">
 		<tr>
 			<td colspan="2" class="NavBlockHeader AdminNavBlockHeader">
 				<div class="AdminNavBlockTitle">

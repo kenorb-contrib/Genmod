@@ -113,7 +113,7 @@ PrintHeader(GM_LANG_lockout_maint);
 				<td class="NavBlockColumnHeader AdminNavBlockColumnHeader"><?php print GM_LANG_lockout_at; ?></td>
 				<td class="NavBlockColumnHeader AdminNavBlockColumnHeader"><?php print GM_LANG_release_at; ?></td>
 			</tr>
-			<tr><?php
+			<?php
 			while ($row = $res->FetchRow()) {
 				$locktime = GetChangedDate(date("d", $row[1])." ".date("M", $row[1])." ".date("Y", $row[1]))." - ".date($TIME_FORMAT, $row[1]);
 				if($row[2] == "0") $releasetime = GM_LANG_until_unlocked;
@@ -121,14 +121,15 @@ PrintHeader(GM_LANG_lockout_maint);
 					$releasetime = GetChangedDate(date("d", $row[2])." ".date("M", $row[2])." ".date("Y", $row[2]))." - ".date($TIME_FORMAT, $row[2]);
 				}
 				?>
-				<td class="AdminNavBlockField NavBlockField"><input type="checkbox" name="dellock[]" value="
-				<?php print $row[0]."#".$row[3]; ?>
-				" />
-				<td class="AdminNavBlockLabel NavBlockLabel"><?php print $row[0]; ?></td>
-				<td class="AdminNavBlockLabel NavBlockLabel"><?php print $row[3]; ?></td>
-				<td class="AdminNavBlockLabel NavBlockLabel"><?php print $locktime; ?></td>
-				<td class="AdminNavBlockLabel NavBlockLabel"><?php print $releasetime; ?></td>
-			</tr>
+				<tr>
+					<td class="AdminNavBlockField NavBlockField"><input type="checkbox" name="dellock[]" value="
+					<?php print $row[0]."#".$row[3]; ?>
+					" />
+					<td class="AdminNavBlockLabel NavBlockLabel"><?php print $row[0]; ?></td>
+					<td class="AdminNavBlockLabel NavBlockLabel"><?php print $row[3]; ?></td>
+					<td class="AdminNavBlockLabel NavBlockLabel"><?php print $locktime; ?></td>
+					<td class="AdminNavBlockLabel NavBlockLabel"><?php print $releasetime; ?></td>
+				</tr>
 			<?php } ?>
 			<tr>
 				<td class="NavBlockFooter" colspan="5">
@@ -149,7 +150,7 @@ PrintHeader(GM_LANG_lockout_maint);
 		<input type="hidden" name="action" value="add" />
 		<table class="NavBlockTable AdminNavBlockTable">
 			<tr>
-				<td colspan="2" class="NavBlockRowSpacer">&nbsp</td>
+				<td colspan="2" class="NavBlockRowSpacer">&nbsp;</td>
 			</tr>
 			<tr>
 				<td colspan="2" class="NavBlockHeader">
@@ -162,16 +163,18 @@ PrintHeader(GM_LANG_lockout_maint);
 					<?php if ($error1) {?><span class="Error"><?php print GM_LANG_invalid_ip; ?></span>
 					<?php } ?>
 				</td>
-		</tr>
-			<td class="NavBlockLabel AdminNavBlockLabel"><?php print GM_LANG_username; ?></td>
-			<td class="NavBlockField AdminNavBlockField"><input type="text" name="add_user" value="<?php if (isset($add_user)) print $add_user;?>" size="25" />
+			</tr>
+			<tr>
+				<td class="NavBlockLabel AdminNavBlockLabel"><?php print GM_LANG_username; ?></td>
+				<td class="NavBlockField AdminNavBlockField"><input type="text" name="add_user" value="<?php if (isset($add_user)) print $add_user;?>" size="25" />
 				<?php if ($error2) {?><span class="Error"><?php print GM_LANG_invalid_user; ?></span>
 				<?php } ?>
-			</td>
-		</tr>
-			<td class="NavBlockFooter" colspan="2">
-				<input type="submit" value="<?php print GM_LANG_lockout_submit;?>" />
-			</td>
+				</td>
+			</tr>
+			<tr>
+				<td class="NavBlockFooter" colspan="2">
+					<input type="submit" value="<?php print GM_LANG_lockout_submit;?>" />
+				</td>
 		</tr>
 	</table>
 	</form>

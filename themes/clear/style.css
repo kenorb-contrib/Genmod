@@ -5,7 +5,7 @@
  * To learn more about CSS visit http://www.w3.org/TR/REC-CSS2/
  *
  * Genmod: Genealogy Viewer
- * Copyright (C) 2005 Genmod Development Team
+ * Copyright (C) 2005 - 2012 Genmod Development Team
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -76,35 +76,11 @@ UL {
 	padding-right: 15px;
 	margin: 8px;
 }
-.icon {
-	border: none;
-}
-.link {
-	font-size: 11px;
-	text-align: center;
-}
-/* used in menubar*/
-.submenu .icon {
-	width: 25px;
-	height: 25px;
-}
-.Thumbnail {
-	height: auto;
-	padding: 3px;
-}
-
-
-.left {
-     text-align: left;
-}
-.StarredName {
-	text-decoration: underline;
-}
-/* Text direction */
-.ltr {
+/* Text direction, RTL remainders */
+.ltr, .left {
 	text-align: left;
 }
-.rtl {
+.rtl, .right {
 	text-align: right;
 }
 
@@ -256,6 +232,16 @@ textarea {
 	border: none;
 	opacity: 0.4;	/* Opera,IE does not yet support this (booo!) */
 }
+.Icon {
+}
+/* used in menubar*/
+.Thumbnail {
+	height: auto;
+	padding: 3px;
+}
+.StarredName {
+	text-decoration: underline;
+}
 
 /* =============================== Header section ======================================= */
 /* Header container */
@@ -325,7 +311,7 @@ textarea {
 #FooterSectionDummy {
 	clear: both;
 	padding-top: 10px;
-	padding-bottom: 50px;
+	padding-bottom: 75px;
 }
 
 /* Contact links in the footer */
@@ -2017,9 +2003,12 @@ DIV.ActionListOptionContainer SPAN {
 /* ============================= Edit Language page =========================== */
 .EditLangTranOrgText {
 	font-style: italic;
+	overflow-x: hidden;
+/*	word-break: break-all; *//* Fix for IE*/
 }
 .EditLangTranDestText {
 	font-style: italic;
+/*	word-break: break-all; *//* Fix for IE*/
 }
 .EditLangNoTranDestText {
 	color: #FF0000;
@@ -2547,6 +2536,10 @@ FORM #AdminColumnLeft, FORM #AdminColumnRight {
 	border: 1px #DE0036 solid;
 	white-space: nowrap;
 	margin-top: 5px;
+}
+.submenu .Icon {
+	width: 25px;
+	height: 25px;
 }
 .submenu_rtl {
 	color: #0045BF;

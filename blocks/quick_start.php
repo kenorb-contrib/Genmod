@@ -89,7 +89,7 @@ function print_quickstart_block($block = true, $config="", $side, $index) {
 	
 				print "<tr><td colspan=\"2\" class=\"BlockFooter\"><input type=\"submit\" id=\"submit\" value=\"".GM_LANG_search."\" /></td></tr>";
 				print "</table>";
-			print "</form></div>";
+			print "</div>";
 			
 			print "<div class=\"QSRightBlock\">";
 				print "<div class=\"BlockSubTitle\">".GM_LANG_qs_jump."</div>";
@@ -111,6 +111,7 @@ function print_quickstart_block($block = true, $config="", $side, $index) {
 				PrintHelpLink("QS_search_help", "qm", "QS_search_tips");
 				print "<b><a href=\"javascript: ".GM_LANG_QS_search_tips."\" onclick=\"helpPopup('QS_search_help'); return false;\">".GM_LANG_QS_search_click."</a></b> \n";
 			print "</div><br class=\"ClearBoth\" />";
+			print "</form>";
 		print "</div>"; // Close BlockContent
 	print "</div>"; // Close BlockContainer
 	print "<script language=\"JavaScript\" type=\"text/javascript\"><!--\n";

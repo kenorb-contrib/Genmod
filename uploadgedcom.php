@@ -252,7 +252,7 @@ if ($step >= 1) {
 				$gedfilename = "";
 			}
 			PrintHelpLink("gedcom_path_help", "qm","gedcom_path");
-			print GM_LANG_gedcom_file."</span>&nbsp;&nbsp;";
+			print GM_LANG_gedcom_file."&nbsp;&nbsp;";
 			print "<input type=\"text\" name=\"mergefile\" value=\"".(isset($gedfilename) && strlen($gedfilename) > 4 ? $path.$gedfilename : "")."\" size=\"60\" dir=\"ltr\" tabindex=\"".$i."\"" .($step > 1 ? "disabled=\"disabled\" " : "")." />&nbsp;&nbsp;" . $ferror;
 			if ($step > 1) print "\n<input type=\"hidden\" name=\"mergefile\" value=\"".$mergefile."\" />";
 		print "</div>";
@@ -334,7 +334,7 @@ if ($step == 2) {
 				print "</select>";
 			print "\n</div>";
 		print "\n<!-- Close empty DB block //--></div>";
-		print "<input type=\"hidden\" name=\"step\" value=\"2\">";
+		print "<input type=\"hidden\" name=\"step\" value=\"2\" />";
 	}
 	else $step = 3;
 }
@@ -536,7 +536,7 @@ if ($step >= 3) {
 			print GM_LANG_valid_gedcom;
 			if ($step == 3) $step = 4;
 		}
-		else print "<input type=\"hidden\" name=\"step\" value=\"3\">";
+		else print "<input type=\"hidden\" name=\"step\" value=\"3\" />";
 		if (isset($cleaned)) {
 			print GM_LANG_cleanup_success;
 			print "<input type=\"hidden\" name=\"cleaned\" value=\"yes\" />"; // next time also display this message
@@ -663,7 +663,7 @@ if ($step >= 4) {
 			print ">".GM_LANG_merge_dm_1."</option>";
 			print "<option value=\"2\" ";
 			if (GedcomConfig::$MERGE_DOUBLE_MEDIA == "2") print "selected=\"selected\"";
-			print ">".GM_LANG_merge_dm_2."</option>";
+			print ">".GM_LANG_merge_dm_2."</option>\n</select>";
 		}
 		print "</td></tr></table>";
 						
@@ -980,6 +980,10 @@ if ($step == 6) {
 		$TOTAL_BYTES 		= $_SESSION["import"]["TOTAL_BYTES"]; 	// For printing later
 //		$k 					= $_SESSION["import"]["k"]; 			// For printing later
 				
+		print "\n<div class=\"NavBlockHeader UploadGedcomSubHeader\">";
+		print GM_LANG_reading_file." ".$path.$gedfilename;
+		print "</div>";
+		print "<div class=\"NavBlockLabel UploadGedcomNavBlockLabel\">";
 		ImportFunctions::SetupProgressBar(count($flist));
 		$newtime = time();
 		$exectime = $newtime - $oldtime;
@@ -1068,10 +1072,11 @@ if ($step == 6) {
 //				$_SESSION["import"]["k"]				= $k;
 				?>
 				</div>
-				<div class="shade2"><?php print GM_LANG_import_time_exceeded; ?></div>
+				<div class="NavBlockFooter">
+				<?php print GM_LANG_import_time_exceeded; ?><br /><br />
 				<?php
 				// This is the (auto)continue button
-				print "<input type=\"submit\" name=\"continue\" value=\"".GM_LANG_del_proceed."\" />";
+				print "<input type=\"submit\" name=\"continue\" value=\"".GM_LANG_del_proceed."\" /></div>";
 				NameFunctions::DMSoundex("", "closecache");
 				//-- We write the session data and close it. Fix for intermittend logoff.
 				session_write_close();
@@ -1144,6 +1149,8 @@ if ($step == 5 || $step == 6) {
 		}
 	print "</div>";
 	
+	print "</div>"; // Close the container for progress and stats
+	
 	// NOTE: Finished Links
 	$record_count=0;
 	unset($_SESSION["import"]);
@@ -1171,11 +1178,8 @@ if ($step < 5) {
 	$NBfooter = true;
 }
 if ($NBfooter) print "<!-- Close block footer //--></div>";
+print "</form>";
 print "<!-- Close middle section //--></div>"; 
-?>
-</form>
-<!-- Close Genmod container //--></div>
-<?php
 SwitchGedcom();
 PrintFooter();
 ?>

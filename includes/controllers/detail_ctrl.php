@@ -489,7 +489,7 @@ abstract class DetailController extends BaseController{
 						foreach ($this->$object_name->childfamilies as $famid => $family) {
 							// Family header
 							print "<div class=\"IndiSubHeader\">";
-							print "<img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["cfamily"]["small"]."\" border=\"0\" class=\"icon\" alt=\"\" />";
+							print "<img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["cfamily"]["small"]."\" border=\"0\" class=\"Icon\" alt=\"\" />";
 							print "<span class=\"IndiSubHeaderLabel\">".$family->label."</span>";
 							if (!$this->view) {
 						 		print "<span class=\"IndiSubHeaderAssoLink\"> - <a href=\"family.php?famid=".$family->xref."&amp;gedid=".$family->gedcomid."\">[".GM_LANG_view_family.$family->addxref."]</a>";
@@ -521,7 +521,7 @@ abstract class DetailController extends BaseController{
 								foreach ($fam->husb->spousefamilies as $famid => $family) {
 									if ($fam->xref != $family->xref && $family->label != "") {
 										print "<div class=\"IndiSubHeader\">";
-										print "<img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["cfamily"]["small"]."\" border=\"0\" class=\"icon\" alt=\"\" />";
+										print "<img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["cfamily"]["small"]."\" border=\"0\" class=\"Icon\" alt=\"\" />";
 										print "<span class=\"IndiSubHeaderLabel\">".$family->label."</span>";
 										if (!$this->view) print "<span class=\"IndiSubHeaderAssoLink\"> - <a href=\"family.php?famid=".$family->xref."&amp;gedid=".$family->gedcomid."\">[".GM_LANG_view_family.$family->addxref."]</a></span>";
 										print "</div>";
@@ -541,7 +541,7 @@ abstract class DetailController extends BaseController{
 								foreach ($fam->wife->spousefamilies as $famid => $family) {
 									if ($fam->xref != $family->xref && $family->label != "") {
 										print "<div class=\"IndiSubHeader\">";
-										print "<img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["cfamily"]["small"]."\" border=\"0\" class=\"icon\" alt=\"\" />";
+										print "<img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["cfamily"]["small"]."\" border=\"0\" class=\"Icon\" alt=\"\" />";
 										print "<span class=\"IndiSubHeaderLabel\">".$family->label."</span>";
 										if (!$this->view) print "<span class=\"IndiSubHeaderAssoLink\"> - <a href=\"family.php?famid=".$family->xref."&amp;gedid=".$family->gedcomid."\">[".GM_LANG_view_family.$family->addxref."]</a></span>";
 										print "</div>";
@@ -559,7 +559,7 @@ abstract class DetailController extends BaseController{
 					if (is_array($this->$object_name->spousefamilies)) {
 						foreach ($this->$object_name->spousefamilies as $famid => $family) {
 							print "<div class=\"IndiSubHeader\">";
-							print "<img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["cfamily"]["small"]."\" border=\"0\" class=\"icon\" alt=\"\" />";
+							print "<img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["cfamily"]["small"]."\" border=\"0\" class=\"Icon\" alt=\"\" />";
 							print "<span class=\"IndiSubHeaderLabel\">".$family->label."</span>";
 							if (!$this->view) print "<span class=\"IndiSubHeaderAssoLink\"> - <a href=\"family.php?famid=".$family->xref."&amp;gedid=".$family->gedcomid."\">[".GM_LANG_view_family.$family->addxref."]</a></span>";
 							print "</div>";

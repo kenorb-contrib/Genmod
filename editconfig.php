@@ -223,9 +223,9 @@ PrintHeader(GM_LANG_configure_head);
 	else $SERVER_URL = SERVER_URL;
 	?>
 	<form method="post" name="configform" action="editconfig.php">
+	<input type="hidden" name="action" value="update" />
+	<input type="hidden" name="NEW_SERVER_URL" value="<?php print $SERVER_URL;?>" />
 	<table class="NavBlockTable AdminNavBlockTable">
-		<input type="hidden" name="action" value="update" />
-		<input type="hidden" name="NEW_SERVER_URL" value="<?php print $SERVER_URL;?>" />
 		<tr>
 			<td colspan="2" class="NavBlockHeader AdminNavBlockHeader">
 				<span class="AdminNavBlockTitle">

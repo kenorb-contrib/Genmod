@@ -190,7 +190,7 @@ $Darrowwidth = 15;		// -- additional width to include for the up arrows
 // Arrow symbol or icon for up-page links on Help pages
 $ImgSrc = GM_IMAGE_DIR."/uarrow3.gif";
 $UpArrow = "<b>^&nbsp;&nbsp;</b>";
-if (file_exists($ImgSrc)) $UpArrow = "<img src=\"$ImgSrc\" class=\"icon\" border=\"0\" alt=\"\" />";
+if (file_exists($ImgSrc)) $UpArrow = "<img src=\"$ImgSrc\" class=\"Icon\" border=\"0\" alt=\"\" />";
 define("GM_LANG_UpArrow", $UpArrow);	// help_text.xx.php requires this _untranslatable_ term!
 
 ?>

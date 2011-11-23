@@ -55,7 +55,7 @@ PrintHeader(GM_LANG_config_maint);
 	<form method="post" name="configform" action="config_maint.php">
 	<input type="hidden" name="action" value="update" />
 	<?php
-	if ($action == "update" && is_array($delconf)) {
+	if ($action == "update" && isset($delconf) && is_array($delconf)) {
 		foreach ($delconf as $key => $value) {
 			if (!SystemConfig::DeleteConfig($value)) {
 				$message = "<span class=\"Error\">".GM_LANG_gm_config_write_error."</span>";

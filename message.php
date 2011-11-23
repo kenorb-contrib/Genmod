@@ -128,20 +128,11 @@ if (($action=="send")&&(isset($_SESSION["good_to_send"]))&&($_SESSION["good_to_s
 }
 
 if ($action=="compose") {
-	print "<form name=\"messageform\" method=\"post\" action=\"message.php\" onsubmit=\"t = new Date(); document.messageform.time.value=t.toUTCString(); ";
-	if (empty($username)) print "return validateEmail(document.messageform.from_email);";
-	else print "return checkForm(this);";
-	print "\">\n";
-	print "<table class=\"NavBlockTable\">\n";
-	print "<tr><td class=\"NavBlockHeader\" colspan=\"2\">".GM_LANG_message;
-	if (!empty($message)) print "<br /><span class=\"Error\">".$message;
-	print "</td></tr>";
-	$_SESSION["good_to_send"] = true;
 	?>
 	<script language="JavaScript" type="text/javascript">
 	<!--
 		function validateEmail(email) {
-			if (email.value.search("(.*)@(.*)")==-1) {
+			if (typeof(email) == "undefined" || email.value.search("(.*)@(.*)")==-1) {
 				alert('<?php print GM_LANG_invalid_email; ?>');
 				email.focus();
 				return false;
@@ -149,14 +140,14 @@ if ($action=="compose") {
 			return checkForm(document.messageform);
 		}
 		function checkForm(frm) {
-			if (frm.subject.value=="") {
+			if (typeof(frm.subject.value) == "undefined" || frm.subject.value=="") {
 				alert('<?php print GM_LANG_enter_subject; ?>');
-				document.messageform.subject.focus();
+				frm.subject.focus();
 				return false;
 			}
-			if (frm.body.value=="") {
+			if (typeof(frm.body.value) == "undefined" || frm.body.value=="") {
 				alert('<?php print GM_LANG_enter_body; ?>');
-				document.messageform.body.focus();
+				frm.body.focus();
 				return false;
 			}
 			return true;
@@ -165,6 +156,15 @@ if ($action=="compose") {
 	</script>
 	<?php
 	$username = $gm_user->username;
+	print "<form name=\"messageform\" method=\"post\" action=\"message.php\" onsubmit=\"t = new Date(); document.messageform.time.value=t.toUTCString(); ";
+	if (empty($username)) print "return validateEmail(document.messageform.from_email);";
+	else print "return checkForm(document.messageform);";
+	print "\">\n";
+	print "<table class=\"NavBlockTable\">\n";
+	print "<tr><td class=\"NavBlockHeader\" colspan=\"2\">".GM_LANG_message;
+	if (!empty($message)) print "<br /><span class=\"Error\">".$message;
+	print "</td></tr>";
+	$_SESSION["good_to_send"] = true;
 	if (empty($username)) {
 		print "<tr><td class=\"NavBlockLabel\" colspan=\"2\">".GM_LANG_message_instructions."</td></tr>";
 	}

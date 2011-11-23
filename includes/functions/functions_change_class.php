@@ -363,7 +363,7 @@ abstract class ChangeFunctions {
 	//					print "Acceptchange: ".$id."<br /><br />Details old: ".$details["old"]."<br /><br />Details new:".$details["new"]."<br /><br />New gedrec: ".$gedrec."<br /><br /><br />";
 						if ($counttoadd == 1) {
 							$update_id = self::UpdateRecord(EditFunctions::CheckGedcom($gedrec, true, $details["user"], $details["time"]));
-							WriteToLog("AcceptChange-&gt; Accepted change for ".$details["gid"].". ->".$gm_user->username."<-", "I", "G", $gedfile);
+							WriteToLog("AcceptChange-&gt; Accepted change for ".$details["gid"].". -&gt;".$gm_user->username."&lt;-", "I", "G", $gedfile);
 						}
 					}
 				}
@@ -421,7 +421,7 @@ abstract class ChangeFunctions {
 		if ($all) {
 			$sql = "DELETE from ".TBLPREFIX."changes where ch_file = '".$gedfile."'";
 			if ($res = NewQuery($sql)) {
-				WriteToLog("RejectChange-&gt; Rejected all changes for $gedfile "." ->" . $gm_user->username ."<-", "I", "G", $gedfile);
+				WriteToLog("RejectChange-&gt; Rejected all changes for $gedfile "." -&gt;" . $gm_user->username ."&lt;-", "I", "G", $gedfile);
 				self::ResetChangeCaches();
 				return true;
 			}
@@ -430,7 +430,7 @@ abstract class ChangeFunctions {
 		else {
 			$sql = "DELETE from ".TBLPREFIX."changes where ch_cid = '".$cid."' AND ch_file = '".$gedfile."'";
 			if ($res = NewQuery($sql)) {
-				WriteToLog("RejectChange-&gt; Rejected change $cid - $gedfile "." ->" . $gm_user->username ."<-", "I", "G", $gedfile);
+				WriteToLog("RejectChange-&gt; Rejected change $cid - $gedfile "." -&gt;" . $gm_user->username ."&lt;-", "I", "G", $gedfile);
 				self::ResetChangeCaches();
 				return true;
 			}

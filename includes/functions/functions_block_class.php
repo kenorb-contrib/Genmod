@@ -482,7 +482,7 @@ abstract class BlockFunctions {
 						print "<td class=\"BlockLabel\">".GM_LANG_title."</td>";
 						print "<td class=\"BlockField\"><input type=\"text\" name=\"favtitle\" size=\"40\" value=\"\" /></td>";
 					print "</tr>";
-					print "<tr><td colspan=\"2\" class=\"BlockFooter\"><input type=\"submit\" value=\"".GM_LANG_add."\" style=\"font-size: 8pt; \" /></td</tr>";
+					print "<tr><td colspan=\"2\" class=\"BlockFooter\"><input type=\"submit\" value=\"".GM_LANG_add."\" style=\"font-size: 8pt; \" /></td></tr>";
 				print "</table>\n";
 			print "</div>";
 			print "<div class=\"AddFavRightBlock\">";

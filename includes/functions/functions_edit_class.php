@@ -92,7 +92,7 @@ abstract class EditFunctions {
 		$sql .= ", '".$fact."', '".DbLayer::EscapeQuery($oldrec)."', '".DbLayer::EscapeQuery($newrec)."', '".trim($gid_type)."')";
 		$res = NewQuery($sql);
 		
-		WriteToLog("ReplaceGedrec-&gt; Replacing gedcom record $gid ->" . $gm_user->username ."<-", "I", "G", $gedid);
+		WriteToLog("ReplaceGedrec-&gt; Replacing gedcom record $gid -&gt;" . $gm_user->username ."&lt;-", "I", "G", $gedid);
 		// Clear the ChangeFunctions::GetChangeData cache
 		ChangeFunctions::ResetChangeCaches();
 		return true;
@@ -474,7 +474,6 @@ abstract class EditFunctions {
 			}
 			// 2 _MARNM
 			self::AddSimpleTag("0 _MARNM");
-			print "</tr>\n";
 			self::PrintAddLayer("SOUR");
 			self::PrintAddLayer("NOTE");
 			self::PrintAddLayer("GNOTE");
@@ -627,9 +626,9 @@ abstract class EditFunctions {
 		print "<div id=\"caldiv".$id."\" style=\"position:absolute;visibility:hidden;background-color:white;layer-background-color:white;\"></div>\n";
 	}
 	
-	public function AddTagSeparator($fact="") {
+	public function AddTagSeparator($fact="", $separator=true) {
 		
-		print "<tr><td class=\"NavBlockRowSpacer\">&nbsp;</td></tr>";
+		if ($separator) print "<tr><td colspan=\"2\" class=\"NavBlockRowSpacer\">&nbsp;</td></tr>";
 		print "<tr><td colspan=\"2\" class=\"NavBlockColumnHeader EditTableColumnHeader\">";
 		if(!empty($fact)) {
 			if (defined("GM_LANG_".$fact)) print constant("GM_LANG_".$fact);
@@ -654,7 +653,7 @@ abstract class EditFunctions {
 	 * @param string $tag			fact record to edit (eg 2 DATE xxxxx)
 	 * @param string $upperlevel	optional upper level tag (eg BIRT)
 	 */
-	public function AddSimpleTag($tag, $upperlevel="", $tab="1", $switch=false) {
+	public function AddSimpleTag($tag, $upperlevel="", $tab="1", $switch=false, $separator=true) {
 		global $GM_IMAGES, $TEMPLE_CODES, $STATUS_CODES;
 		global $assorela, $tags, $emptyfacts, $TEXT_DIRECTION, $confighelpfile;
 		global $NPFX_accept, $SPFX_accept, $NSFX_accept, $FILE_FORM_accept, $upload_count, $separatorfacts, $canhavey_facts;
@@ -700,10 +699,10 @@ abstract class EditFunctions {
 	
 		
 		// label
-		if (in_array($fact, $separatorfacts) && $level <= 2) self::AddTagSeparator($fact, $islink);
+		if (in_array($fact, $separatorfacts) && $level <= 2) self::AddTagSeparator($fact, $separator);
 		$style="";
 		print "<tr id=\"".$element_id."_tr\" ";
-		if (in_array($fact, $subnamefacts)) print " style=\"display:none;\""; // hide subname facts
+		if (in_array($fact, $subnamefacts) || !(!in_array($fact, $emptyfacts) || in_array($fact, $canhavey_facts))) print " style=\"display:none;\""; // hide subname facts
 		print " >\n";
 		print "<td class=\"NavBlockLabel\">";
 		
@@ -716,9 +715,11 @@ abstract class EditFunctions {
 		
 		// NOTE: Help link
 		if (!in_array($fact, $emptyfacts) || in_array($fact, $canhavey_facts)) {
+			print "<div class=\"HelpIconContainer\">";
 			if ($fact=="DATE") PrintHelpLink("def_gedcom_date_help", "qm", "date");
 			else if ($fact=="RESN") PrintHelpLink($fact."_help", "qm");
 			else PrintHelpLink("edit_".$fact."_help", "qm");
+			print "</div>";
 			if (defined("GM_LANG_".$fact)) print constant("GM_LANG_".$fact);
 			else if (defined("GM_FACT_".$fact)) print constant("GM_FACT_".$fact);
 			else print $fact;
@@ -726,12 +727,10 @@ abstract class EditFunctions {
 		}
 		
 		if(in_array($fact, $emptyfacts) && !in_array($fact, $canhavey_facts)) print "<input type=\"hidden\" name=\"text[]\" value=\"\" />\n"; 
-//		if (!in_array($fact, $emptyfacts) || in_array($fact, $canhavey_facts)) {
-			print "\n</td>";
-//		}
+		print "\n</td>";
 		
 		// NOTE: value
-		if (!in_array($fact, $emptyfacts) || in_array($fact, $canhavey_facts)) print "<td class=\"NavBlockField\">\n";
+		print "<td class=\"NavBlockField\">\n";
 		// NOTE: Retrieve linked NOTE
 		// we must disable editing for this field if the note already has changes.
 		$disable_edit = false;
@@ -784,12 +783,15 @@ abstract class EditFunctions {
 		}
 		else if ($fact=="RESN") {
 			print "<table><tr valign=\"top\">\n";
+			$idsuff = "";
 			foreach (array("none", "locked", "privacy", "confidential") as $resn_index => $resn_val) {
 				if ($resn_val=="none") $resnv=""; else $resnv=$resn_val;
-				print "<td><input tabindex=\"".$tabkey."\" type=\"radio\" id=\"".$element_id."\" name=\"".$element_name."\" value=\"".$resnv."\"";
+				print "<td><input tabindex=\"".$tabkey."\" type=\"radio\" id=\"".$element_id.$idsuff."\" name=\"".$element_name."\" value=\"".$resnv."\"";
 				if ($value==$resnv) print " checked=\"checked\"";
 				print " /><small>".constant("GM_LANG_".$resn_val)."</small>";
 				print "</td>\n";
+				if (empty($idsuff)) $idsuff = 0;
+				$idsuff++;
 			}
 			print "</tr></table>\n";
 		}
@@ -957,7 +959,7 @@ abstract class EditFunctions {
 			if ($value) {
 				print "</span>";
 				?>
-				<script>
+				<script type="text/javascript">
 				<!--
 				sndReq('<?php print $element_id."_gnote";?>', 'getnotedescriptor', true, 'oid', '<?php print $value;?>', '', '');
 				//-->
@@ -973,7 +975,7 @@ abstract class EditFunctions {
 							print "<a href=\"javascript\" onclick=\"document.getElementById('".$element_id."').value='".$id."'; sndReq('".$element_id."_gnote', 'getnotedescriptor', true, 'oid', '".$id."', '', ''); return false;\">".GM_LANG_click_for." ";
 							print "<span id=\"".$element_id."_gnote2\"></span></a>";
 							?>
-							<script>
+							<script type="text/javascript">
 							<!--
 							sndReq('<?php print $element_id."_gnote2";?>', 'getnotedescriptor', true, 'oid', '<?php print $id;?>', '', '');
 							//-->
@@ -1040,8 +1042,7 @@ abstract class EditFunctions {
 			print "<a href=\"javascript: ".GM_LANG_show_details."\" onclick=\"togglename(); return false;\"><img style=\"display:none;\" id=\"".$element_id."_minus\" src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["minus"]["other"]."\" border=\"0\" width=\"11\" height=\"11\" alt=\"\" title=\"\" /></a>\n";
 		}
 		
-		if (!in_array($fact, $emptyfacts) || in_array($fact, $canhavey_facts)) print "</td>";
-		print "</tr>\n";
+		print "</td></tr>\n";
 		$tabkey++;
 		return $element_id;
 	}
@@ -1057,7 +1058,7 @@ abstract class EditFunctions {
 		
 		if (!isset($header_printed)) {
 			$header_printed = true;
-			print "<tr><td colspan=\"2\" class=\"\"></td></tr>";
+			print "<tr><td colspan=\"2\" class=\"NavBlockRowSpacer\">&nbsp;</td></tr>";
 			print "<tr><td class=\"NavBlockColumnHeader EditTableColumnHeader\" colspan=\"2\">".GM_LANG_add_info_links."</td></tr>";
 		}
 	
@@ -1066,11 +1067,11 @@ abstract class EditFunctions {
 			//-- Add new source to fact
 			print "<a href=\"#\" onclick=\"expand_layer('newsource'); if(document.getElementById('newsource').style.display == 'block') document.getElementById(addsourcefocus).focus(); return false;\"><img id=\"newsource_img\" src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["plus"]["other"]."\" border=\"0\" width=\"11\" height=\"11\" alt=\"\" title=\"\" /> ".GM_LANG_add_source."</a>";
 			PrintHelpLink("edit_add_SOUR_help", "qm");
-			print "<br />";
+			print "</td></tr></table>";
 			print "<div id=\"newsource\" style=\"display: none;\">\n";
-			print "<table class=\"FactsTable\">\n";
+			print "<table class=\"NavBlockTable EditTable\">\n";
 			// 2 SOUR
-			$sour_focus_element = self::AddSimpleTag("$level SOUR @");
+			$sour_focus_element = self::AddSimpleTag("$level SOUR @", "", 1, false, false);
 			// 3 PAGE
 			self::AddSimpleTag(($level+1)." PAGE");
 			// 3 DATA
@@ -1098,11 +1099,11 @@ abstract class EditFunctions {
 			//-- Add a new ASSOciate
 			print "<a href=\"#\" onclick=\"expand_layer('newasso'); if(document.getElementById('newasso').style.display == 'block') document.getElementById(addassofocus).focus(); return false;\"><img id=\"newasso_img\" src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["plus"]["other"]."\" border=\"0\" width=\"11\" height=\"11\" alt=\"\" title=\"\" /> ".GM_LANG_add_asso."</a>";
 			PrintHelpLink("edit_add_ASSO_help", "qm");
-			print "<br />";
+			print "</td></tr></table>";
 			print "<div id=\"newasso\" style=\"display: none;\">\n";
-			print "<table class=\"FactsTable\">\n";
+			print "<table class=\"NavBlockTable EditTable\">\n";
 			// 2 ASSO
-			$asso_focus_element = self::AddSimpleTag(($level)." ASSO @");
+			$asso_focus_element = self::AddSimpleTag(($level)." ASSO @", "", 1, false, false);
 			// 3 RELA
 			self::AddSimpleTag(($level+1)." RELA");
 			// 3 NOTE
@@ -1120,11 +1121,11 @@ abstract class EditFunctions {
 			//-- Add new note to fact
 			print "<a href=\"#\" onclick=\"expand_layer('newnote'); if(document.getElementById('newnote').style.display == 'block') document.getElementById(addnotefocus).focus(); return false;\"><img id=\"newnote_img\" src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["plus"]["other"]."\" border=\"0\" width=\"11\" height=\"11\" alt=\"\" title=\"\" /> ".GM_LANG_add_note."</a>";
 			PrintHelpLink("edit_add_NOTE_help", "qm");
-			print "<br />\n";
+			print "</td></tr></table>";
 			print "<div id=\"newnote\" style=\"display: none;\">\n";
-			print "<table class=\"FactsTable\">\n";
+			print "<table class=\"NavBlockTable EditTable\">\n";
 			// 2 NOTE
-			$note_focus_element = self::AddSimpleTag(($level)." NOTE");
+			$note_focus_element = self::AddSimpleTag(($level)." NOTE", "", 1, false, false);
 			print "</table></div>";
 			?>
 			<script type="text/javascript">
@@ -1138,11 +1139,11 @@ abstract class EditFunctions {
 			//-- Add new general note to fact
 			print "<a href=\"#\" onclick=\"expand_layer('newgnote'); if(document.getElementById('newgnote').style.display == 'block') document.getElementById(addgnotefocus).focus(); return false;\"><img id=\"newgnote_img\" src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["plus"]["other"]."\" border=\"0\" width=\"11\" height=\"11\" alt=\"\" title=\"\" /> ".GM_LANG_add_gnote."</a>";
 			PrintHelpLink("edit_add_NOTE_help", "qm");
-			print "<br />";
+			print "</td></tr></table>";
 			print "<div id=\"newgnote\" style=\"display: none;\">\n";
 			print "<table class=\"FactsTable\">\n";
 			// 2 NOTE
-			$gnote_focus_element = self::AddSimpleTag("$level NOTE @");
+			$gnote_focus_element = self::AddSimpleTag("$level NOTE @", "", 1, false, false);
 			print "</table></div>";
 			?>
 			<script type="text/javascript">
@@ -1156,11 +1157,11 @@ abstract class EditFunctions {
 			//-- Add new obje to fact
 			print "<a href=\"#\" onclick=\"expand_layer('newobje'); if(document.getElementById('newobje').style.display == 'block') document.getElementById(addobjefocus).focus(); return false;\"><img id=\"newobje_img\" src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["plus"]["other"]."\" border=\"0\" width=\"11\" height=\"11\" alt=\"\" title=\"\" /> ".GM_LANG_add_obje."</a>";
 			PrintHelpLink("add_media_help", "qm");
-			print "<br />";
+			print "</td></tr></table>";
 			print "<div id=\"newobje\" style=\"display: none;\">\n";
-			print "<table class=\"FactsTable\">\n";
+			print "<table class=\"NavBlockTable EditTable\">\n";
 			// 2 OBJE <=== as link
-			$obje_focus_element = self::AddSimpleTag(($level)." OBJE @");
+			$obje_focus_element = self::AddSimpleTag(($level)." OBJE @", "", 1, false, false);
 			// 2 OBJE <=== as embedded new object
 	//		self::AddSimpleTag(($level)." OBJE");
 			// 3 FORM
@@ -1184,7 +1185,7 @@ abstract class EditFunctions {
 			</script>
 			<?php
 		}
-		print "</td></tr>";
+		print "<table class=\"NavBlockTable EditTable\">\n";
 	}
 	
 	/**

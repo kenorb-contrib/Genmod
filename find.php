@@ -120,7 +120,7 @@ if (in_array($search_controller->type, array("indi", "fam", "media", "note", "so
 	PrintHelpLink("simple_filter_help","qm");
 	print "</td></tr>";
 	print "<tr><td class=\"NavBlockFooter\" colspan=\"2\">";
-	print "<input type=\"submit\"  value=\"".GM_LANG_filter."\" /></tr></td>";
+	print "<input type=\"submit\"  value=\"".GM_LANG_filter."\" /></td></tr>";
 	print "</table></form>";
 }		
 

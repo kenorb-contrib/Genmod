@@ -58,7 +58,7 @@ if (!isset($index)) $index=1;
 // Define all the icons we're going to use
 $IconHelp = GM_LANG_qm;
 if (GM_USE_HELPIMG) {
-	$IconHelp = "<img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["help"]["small"]."\" class=\"icon\" width=\"15\" height=\"15\" alt=\"\" />";
+	$IconHelp = "<img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["help"]["small"]."\" class=\"Icon\" width=\"15\" height=\"15\" alt=\"\" />";
 }
 $IconUarrow = "<img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["uarrow"]["other"]."\" width=\"20\" height=\"20\" alt=\"\" />";
 $IconDarrow = "<img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["darrow"]["other"]."\" width=\"20\" height=\"20\" alt=\"\" />";
@@ -409,7 +409,6 @@ else {
 	// NOTE: Page block settings
 	?>
 	<div id="IndexEditConfigure">
-		<br />
 		<form name="config_setup" method="post" action="index_edit.php">
 		<input type="hidden" name="command" value="<?php print $command;?>" />
 		<input type="hidden" name="action" value="update" />
@@ -527,9 +526,9 @@ else {
 				print "&nbsp;&nbsp;";
 				print "<input type =\"button\" value=\"".GM_LANG_cancel."\" onclick=\"window.close();\" />";
 			print "</div>";
-		print "</div>";
+		print "</div>"; // Close IndexEditContainer
 		print "</form>\n";
-	print "</div>\n";
+	print "</div>\n"; // Close IndexEditConfigure
 
 	// NOTE: Hidden help text for column items
 	print "\n\t<div id=\"IndexEditConfigureHelp\" class=\"TabPage\">\n\t";
@@ -540,4 +539,5 @@ else {
 	// end of 2nd tab
 	print "</div>\n";
 }
+PrintSimpleFooter();
 ?>

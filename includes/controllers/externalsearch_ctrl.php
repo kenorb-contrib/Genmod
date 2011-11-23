@@ -153,21 +153,32 @@ class ExternalSearchController {
 		else $checkrange = "";
 		print "<input type=\"submit\" name=\"".GM_LANG_search."\" value=\"".GM_LANG_search."\"";
 		if ($module->method == "link") {
-			print " onclick=\"".$checkrange."\n";
-			print "\turl = '".$module->link."';\n";
-			print "\tfirst = true;\n";
+			$js = "";
+			print " onclick=\"return ESCheckInput();\" />";
+			$js .= $checkrange."\n";
+			$js .= "\turl = '".$module->link."';\n";
+			$js .= "\tfirst = true;\n";
 			foreach($module->params as $inputname => $formname) {
-				print "\tif (!first && document.extsearch.".$formname."_checked.checked && document.extsearch.".$formname.".value.length > 0) {\n";
-				print "\t\turl = url + '".$module->field_concat."'\n";
-				print "\t}\n";
-				print "\tif (document.extsearch.".$formname."_checked.checked && document.extsearch.".$formname.".value.length > 0) {\n";
-				print "\t\turl = url + '".$inputname.$module->field_val_concat."'+(escape(document.extsearch.".$formname.".value));\n";
-				print "\t\tfirst = false;\n";
-				print "\t}\n";
+				$js .= "\tif (!first && document.extsearch.".$formname."_checked.checked && document.extsearch.".$formname.".value.length > 0) {\n";
+				$js .= "\t\turl = url + '".$module->field_concat."'\n";
+				$js .= "\t}\n";
+				$js .= "\tif (document.extsearch.".$formname."_checked.checked && document.extsearch.".$formname.".value.length > 0) {\n";
+				$js .= "\t\turl = url + '".$inputname.$module->field_val_concat."'+(escape(document.extsearch.".$formname.".value));\n";
+				$js .= "\t\tfirst = false;\n";
+				$js .= "\t}\n";
 			}
 //			print "\turl = url.replace(/'/g, '\\'');";
-			print "\twindow.open(url);\n";
-			print "\treturn false;\" />\n";
+			$js .= "\twindow.open(url);\n";
+			$js .= "\treturn false;\n";
+			?>
+			<script type="text/javascript">
+			<!---
+			function ESCheckInput() {
+				<?php print $js; ?>
+			}
+			//-->
+			</script>
+			<?php
 		}
 		elseif ($module->method == "SOAP") {
 			print " onclick=\"sndReq('esearchresults', 'extsearchservice', true, 'formno', '".$number."', 'pid', '".$this->indi->xref."', 'gedcomid', '".$this->indi->gedcomid."'";
